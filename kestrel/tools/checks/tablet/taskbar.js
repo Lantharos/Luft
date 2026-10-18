@@ -1,9 +1,10 @@
+import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
 import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
-import {named, shown} from '../lib/actors.js';
+import {firstStyled, named, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {centerOf} from '../lib/input.js';
 import {gjs, stop, waitForWindow} from '../lib/processes.js';
@@ -20,6 +21,7 @@ const clips = GLib.build_filenamev([GLib.getenv('KESTREL_CAPTURE_DIR'), 'clips']
 
 const panel = () => named('kestrel-panel');
 const strip = () => named('kestrel-tablet-strip');
+const handle = () => firstStyled('kestrel-tablet-strip-handle', strip());
 const monitor = () => Main.layoutManager.primaryMonitor;
 const bottom = () => monitor().y + monitor().height;
 const visible = () => bottom() - (panel().y + panel().translation_y);
@@ -31,6 +33,7 @@ const workBottom = () => {
   const area = Main.layoutManager.getWorkAreaForMonitor(monitor().index);
   return area.y + area.height;
 };
+const fullWidth = () => Math.round(monitor().width * global.display.get_monitor_scale(monitor().index));
 const edgePoint = (offset = 2) => [monitor().x + monitor().width / 3, bottom() - offset];
 
 async function swipeUp() {
@@ -40,22 +43,42 @@ async function swipeUp() {
   await settled(200);
   require(visible() > STRIP + 10 && visible() < EXPANDED, 'the taskbar follows the finger as it swipes up');
   require(strip().opacity < 255 && panel().get_children()[0].opacity < 255, 'the strip and the full taskbar crossfade under the finger');
+  require(handle().scale_x > 1 && handle().opacity < 255, 'the handle stretches and fades as the taskbar comes out');
   await capture('tablet-swipe-mid');
   await touchMove([start[0], start[1] - 30], [start[0], start[1] - 110], 6);
   touchUp();
 }
 
-async function enter(normal) {
-  await clip(clips, 'tablet-enter', () => fold(true), {notes: 'Folded into a tablet'});
+async function widestGap(window, action) {
+  let widest = 0;
+  const signal = global.stage.connect_after('after-paint', () => {
+    const frame = window.get_frame_rect();
+    widest = Math.max(widest, panel().y + panel().translation_y - (frame.y + frame.height));
+  });
+  try {
+    await action();
+  } finally {
+    global.stage.disconnect(signal);
+  }
+  return widest;
+}
+
+async function enter(normal, window) {
+  const gap = await widestGap(window, () => clip(clips, 'tablet-enter', () => fold(true), {notes: 'Folded into a tablet', width: fullWidth()}));
+  require(gap < 0.5, `the maximized window stays under the taskbar as it folds into the strip (gap of ${gap}px)`);
   await eventually(collapsed, 'folding into a tablet collapses the taskbar into a strip');
   require(strip().visible && strip().opacity === 255, 'the strip shows the time and status');
+  const [handleX] = handle().get_transformed_position();
+  const [handleWidth] = handle().get_transformed_size();
+  require(Math.abs(handleX + handleWidth / 2 - (monitor().x + monitor().width / 2)) < 1 && handle().opacity === 255,
+    'the handle sits in the middle of the strip');
   await eventually(() => workBottom() === bottom() - STRIP, 'windows get the space above the strip');
   require(geometry() !== normal, 'the tablet taskbar replaces the normal one');
   await capture('tablet-strip');
 }
 
 async function expandAndCollapse(window) {
-  await clip(clips, 'tablet-swipe-expand', swipeUp, {notes: 'Swiped up from the bottom edge'});
+  await clip(clips, 'tablet-swipe-expand', swipeUp, {notes: 'Swiped up from the bottom edge', width: fullWidth()});
   await eventually(expanded, 'swiping up from the bottom edge expands the taskbar');
   await capture('tablet-expanded');
 
@@ -67,6 +90,7 @@ async function expandAndCollapse(window) {
   await clip(clips, 'tablet-collapse-after-switch', () => tap(centerOf(button)), {notes: 'Tapped an app on the expanded taskbar'});
   await eventually(() => !window.minimized && window.has_focus(), 'tapping an app brings its window back');
   await eventually(collapsed, 'switching to an app collapses the taskbar');
+  await eventually(() => handle().opacity === 255 && handle().scale_x === 1, 'the handle comes back when the taskbar folds away');
 
   await clip(clips, 'tablet-tap-expand', () => tap(centerOf(strip())), {notes: 'Tapped the strip'});
   await eventually(expanded, 'tapping the strip expands the taskbar');
@@ -95,6 +119,36 @@ async function start() {
   await eventually(collapsed, 'closing Start collapses the taskbar');
 }
 
+async function movesWhileShown(action) {
+  let moved = false;
+  let last = geometry();
+  const signal = global.stage.connect_after('after-paint', () => {
+    if (geometry() !== last && panel().opacity > 0) moved = true;
+    last = geometry();
+  });
+  try {
+    await action();
+  } finally {
+    global.stage.disconnect(signal);
+  }
+  return moved;
+}
+
+async function reducedMotion(normal) {
+  const a11y = new Gio.Settings({schema_id: 'org.gnome.desktop.a11y.interface'});
+  a11y.set_string('reduced-motion', 'reduce');
+  try {
+    require(!await movesWhileShown(() => clip(clips, 'tablet-enter-reduced', () => fold(true), {notes: 'Folded with reduced motion'})),
+      'with reduced motion the taskbar fades into the strip instead of moving');
+    await eventually(collapsed, 'with reduced motion folding still collapses the taskbar into a strip');
+    require(!await movesWhileShown(() => clip(clips, 'tablet-leave-reduced', () => fold(false), {notes: 'Unfolded with reduced motion'})),
+      'with reduced motion the normal taskbar fades back in place');
+    await eventually(() => resting() && geometry() === normal && panel().opacity === 255, 'with reduced motion unfolding restores the normal taskbar');
+  } finally {
+    a11y.reset('reduced-motion');
+  }
+}
+
 export async function run() {
   await settled();
   const normal = geometry();
@@ -105,15 +159,17 @@ export async function run() {
     const window = await waitForWindow('Kestrel window check');
     window.maximize();
     await settled();
-    await enter(normal);
+    await enter(normal, window);
     await eventually(() => window.get_frame_rect().y + window.get_frame_rect().height === bottom() - STRIP, 'maximized windows reach down to the strip');
     await expandAndCollapse(window);
     await start();
-    await clip(clips, 'tablet-leave', () => fold(false), {notes: 'Unfolded into a laptop'});
+    const gap = await widestGap(window, () => clip(clips, 'tablet-leave', () => fold(false), {notes: 'Unfolded into a laptop', width: fullWidth()}));
+    require(gap < 0.5, `the maximized window stays under the taskbar as it unfolds (gap of ${gap}px)`);
     await eventually(() => resting() && geometry() === normal, 'unfolding restores the normal taskbar exactly');
     require(!strip(), 'the strip goes away');
     await eventually(() => workBottom() === normalWorkBottom, 'windows give the taskbar its space back');
     await capture('tablet-normal-after');
+    await reducedMotion(normal);
   } finally {
     await fold(false);
     await stop(app);

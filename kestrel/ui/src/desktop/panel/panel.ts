@@ -20,9 +20,10 @@ import { taskbarPreferences, type TaskbarKey } from './preferences/taskbarPrefer
 import { TaskbarSurface } from './preferences/taskbarLook.js';
 import { AutoHide } from './autoHide/autoHide.js';
 import { afterMotion, dropAfterMotion } from '../../shared/afterMotion.js';
-import { animateActor, Spring } from '../../shared/motion.js';
+import { animateActor, Curve, Duration, reducedMotion, Spring } from '../../shared/motion.js';
 import { activeWorkspace, WorkspaceWindows } from './taskbar/workspaceWindows.js';
 import { TabletTaskbar } from './tablet/tabletTaskbar.js';
+import { afterWindowsReach } from './tablet/windowsReach.js';
 
 const KEYS_APP = 'com.lantharos.keys.desktop';
 const RESIZE_DURATION = 240;
@@ -41,6 +42,8 @@ export interface Monitor {
   width: number;
   height: number;
 }
+
+type Rect = Omit<Monitor, 'index'>;
 
 export interface PanelActions {
   start(): void;
@@ -75,6 +78,7 @@ export class KestrelPanel {
   private readonly inputSource: InputSourceIndicator | null = null;
   private readonly refreshAfterMotion = () => this.refreshApps();
   private readonly updateFocusAfterMotion = () => this.taskbar.updateFocus();
+  private stopWaiting = () => {};
 
   constructor(actions: PanelActions, menus: ContextMenus, previews: WindowPreviews, public monitor: Monitor | null, readonly primary: boolean) {
     this.taskbar = new Taskbar(this.tracker, menus, previews, this.favorites, () => this.monitor?.index ?? -1,
@@ -173,11 +177,12 @@ export class KestrelPanel {
     ]);
     this.syncWorkspaceWindows();
     this.refreshApps();
-    this.syncTablet();
+    this.syncTablet(true);
   }
 
   shutdown(): void {
     dropAfterMotion(this.refreshAfterMotion, this.updateFocusAfterMotion);
+    this.stopWaiting();
     this.unwatchPreferences();
     this.workspaceWindows?.destroy();
     this.workspaceWindows = null;
@@ -215,19 +220,27 @@ export class KestrelPanel {
 
   place(animate = false): void {
     if (!this.monitor) return;
-    const { x, y, width, height } = this.monitor;
-    const { height: barHeight, margin } = taskbarPreferences.metrics;
-    const clearance = barHeight + margin;
-    const reserved = taskbarPreferences.reserved;
-    this.strut.set_position(x, y + height - reserved);
-    this.strut.set_size(width, reserved);
-    const bar = { x: x + margin, y: y + height - clearance, width: width - 2 * margin, height: barHeight };
+    this.reserve();
+    const bar = this.bar;
     if (animate) animateActor(this.actor, { ...bar, duration: RESIZE_DURATION, mode: Clutter.AnimationMode.EASE_OUT_QUART });
     else {
       this.actor.set_position(bar.x, bar.y);
       this.actor.set_size(bar.width, bar.height);
     }
     this.autoHide.place();
+  }
+
+  private get bar(): Rect {
+    const { x, y, width, height } = this.monitor!;
+    const { height: barHeight, margin } = taskbarPreferences.metrics;
+    return { x: x + margin, y: y + height - barHeight - margin, width: width - 2 * margin, height: barHeight };
+  }
+
+  private reserve(): void {
+    const { x, y, width, height } = this.monitor!;
+    const reserved = taskbarPreferences.reserved;
+    this.strut.set_position(x, y + height - reserved);
+    this.strut.set_size(width, reserved);
   }
 
   hold(held: boolean): void {
@@ -291,27 +304,81 @@ export class KestrelPanel {
     if (APP_KEYS.includes(key)) this.refreshApps();
   }
 
-  private syncTablet(): void {
-    const touch = taskbarPreferences.touch;
-    if (touch === this.tablet.shown) return;
-    const top = this.actor.y + this.actor.translation_y;
+  private syncTablet(immediate = false): void {
+    if (taskbarPreferences.touch === this.tablet.shown) return;
+    this.stopWaiting();
+    this.peek.actor.visible = !taskbarPreferences.touch;
+    if (immediate || !this.monitor) this.switchTablet();
+    else if (reducedMotion()) this.fadeTablet();
+    else this.morphTablet();
+  }
+
+  private fit(): void {
     const metrics = taskbarPreferences.metrics;
     this.surface.sync();
     this.launcher.resize(metrics.button);
     this.taskbar.resize(metrics);
-    this.peek.actor.visible = !touch;
-    if (touch) {
-      this.place();
-      this.tablet.enter(top - this.actor.y);
-    } else {
-      this.tablet.leave();
-      this.place();
-      if (this.autoHide.shown) {
-        this.actor.translation_y = top - this.actor.y;
-        animateActor(this.actor, { translation_y: 0, spring: Spring.snappy });
-      }
+  }
+
+  private switchTablet(): void {
+    if (taskbarPreferences.touch) this.tablet.enter(() => this.fit(), true);
+    else {
+      this.fit();
+      this.tablet.leave(true);
+      if (this.autoHide.shown) this.actor.translation_y = 0;
     }
-    this.layout.ease();
+    this.place();
+  }
+
+  private fadeTablet(): void {
+    animateActor(this.actor, {
+      opacity: 0, duration: Duration.quick, curve: Curve.decelerate,
+      onStopped: () => {
+        if (taskbarPreferences.touch !== this.tablet.shown) this.switchTablet();
+        animateActor(this.actor, { opacity: 255, duration: Duration.standard, curve: Curve.decelerate });
+      },
+    });
+  }
+
+  private morphTablet(): void {
+    const from = { width: this.actor.width, radius: this.surface.radius };
+    if (taskbarPreferences.touch) {
+      this.tablet.enter(() => this.fit(), false);
+      this.reserve();
+      const { y, height } = this.monitor!;
+      this.stopWaiting = afterWindowsReach(this.monitor!, y + height - taskbarPreferences.reserved, () => {
+        if (this.autoHide.shown) animateActor(this.actor, { translation_y: this.tablet.rest, spring: Spring.smooth });
+        this.morphTo(from);
+      });
+    } else {
+      this.fit();
+      this.tablet.leave(false);
+      if (this.autoHide.shown) {
+        animateActor(this.actor, {
+          translation_y: 0, spring: Spring.smooth,
+          onStopped: () => { if (!this.tablet.shown) this.reserve(); },
+        });
+      } else this.reserve();
+      this.morphTo(from);
+    }
+  }
+
+  private morphTo(from: { width: number; radius: number }): void {
+    const to = { ...this.bar, radius: taskbarPreferences.metrics.radius };
+    animateActor(this.actor, { x: to.x, y: to.y, width: to.width, height: to.height, spring: Spring.smooth });
+    this.morphRadius(from, to);
+    this.autoHide.place();
+  }
+
+  private morphRadius(from: { width: number; radius: number }, to: { width: number; radius: number }): void {
+    const width = this.actor.get_transition('width');
+    if (from.radius === to.radius || !width) return;
+    this.surface.shape(from.radius);
+    width.connect('new-frame', () => {
+      const progress = (this.actor.width - from.width) / (to.width - from.width);
+      this.surface.shape(from.radius + (to.radius - from.radius) * progress);
+    });
+    width.connect('stopped', () => this.surface.shape(null));
   }
 
   private refreshApps(): void {

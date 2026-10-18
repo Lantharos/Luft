@@ -31,6 +31,15 @@ function composite(texture) {
     }));
 }
 
+function opaque(pixbuf, width) {
+  const scale = width / pixbuf.get_width();
+  const height = Math.round(pixbuf.get_height() * scale);
+  const out = GdkPixbuf.Pixbuf.new(GdkPixbuf.Colorspace.RGB, false, 8, width, height);
+  out.fill(0x000000ff);
+  pixbuf.composite(out, 0, 0, width, height, 0, 0, scale, scale, GdkPixbuf.InterpType.BILINEAR, 255);
+  return out;
+}
+
 function luminance(pixbuf) {
   const small = pixbuf.scale_simple(PROBE_SIZE, PROBE_SIZE, GdkPixbuf.InterpType.BILINEAR);
   const pixels = small.get_pixels();
@@ -102,15 +111,13 @@ class Film {
     return this.pool[index];
   }
 
-  async save(dir, startedAt, notes) {
+  async save(dir, startedAt, notes, width) {
     GLib.mkdir_with_parents(dir, 0o755);
     const probes = [];
     const frames = [];
     for (const [index, {slot, at}] of this.frames.entries()) {
       const pixbuf = await composite(slot.texture);
-      const height = Math.round(pixbuf.get_height() * SAVE_WIDTH / pixbuf.get_width());
-      pixbuf.scale_simple(SAVE_WIDTH, height, GdkPixbuf.InterpType.BILINEAR)
-        .savev(GLib.build_filenamev([dir, `${String(index).padStart(3, '0')}.jpg`]), 'jpeg', ['quality'], ['88']);
+      opaque(pixbuf, width).savev(GLib.build_filenamev([dir, `${String(index).padStart(3, '0')}.jpg`]), 'jpeg', ['quality'], ['88']);
       probes.push(luminance(pixbuf));
       frames.push({index, ms: round((at - startedAt) / 1000, 1)});
     }
@@ -128,7 +135,7 @@ class Film {
 
 const film = new Film();
 
-export async function clip(out, name, action, {notes = '', timeout = 6000} = {}) {
+export async function clip(out, name, action, {notes = '', timeout = 6000, width = SAVE_WIDTH} = {}) {
   try {
     film.start();
     global.stage.queue_redraw();
@@ -137,7 +144,7 @@ export async function clip(out, name, action, {notes = '', timeout = 6000} = {})
     await action();
     await film.quiet(timeout);
     film.stop();
-    const frames = await film.save(GLib.build_filenamev([out, name]), startedAt, notes);
+    const frames = await film.save(GLib.build_filenamev([out, name]), startedAt, notes, width);
     console.log(`Kestrel motion: ${name}, ${frames.length} frames over ${frames.at(-1)?.ms ?? 0} ms`);
   } catch (error) {
     film.stop();

@@ -10,6 +10,7 @@
 }
 
 .kestrel-panel.kestrel-taskbar-transparent { @include halo(soft); }
+.kestrel-panel.kestrel-taskbar-transparent .kestrel-tablet-strip-handle { box-shadow: 0 0 3px halo(0.55); }
 .kestrel-taskbar-compact .kestrel-status-button { height: 34px; padding: 0 6px; }
 .kestrel-taskbar-large .kestrel-status-button { height: 48px; padding: 0 10px; }
 .kestrel-taskbar-compact .kestrel-task-button, .kestrel-taskbar-compact .kestrel-status-button, .kestrel-taskbar-compact .kestrel-task-attention { border-radius: 10px; }
@@ -32,6 +33,7 @@
 .kestrel-tablet-strip { padding: 0 12px; border-radius: 0; background-color: transparent; box-shadow: none; }
 .kestrel-tablet-strip-status, .kestrel-tablet-strip-icons { spacing: 10px; }
 .kestrel-tablet-strip .kestrel-clock { font-size: 12px; }
+.kestrel-tablet-strip-handle { width: 64px; height: 4px; border-radius: 2px; }
 
 .kestrel-task-button {
   box-shadow: none;

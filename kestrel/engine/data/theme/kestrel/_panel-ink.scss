@@ -20,6 +20,7 @@
   .kestrel-task-progress { background-color: fill(0.18); }
   .kestrel-task-progress-fill { background-color: ink(); }
   .kestrel-battery { @include battery-tints; }
+  .kestrel-tablet-strip-handle { background-color: ink(0.4); }
   .kestrel-task-button.drop-before { box-shadow: inset 3px 0 ink(0.75); }
   .kestrel-task-button.drop-after { box-shadow: inset -3px 0 ink(0.75); }
 }

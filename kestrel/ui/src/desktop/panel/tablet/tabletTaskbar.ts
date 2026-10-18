@@ -3,12 +3,13 @@ import GLib from 'gi://GLib';
 import type Shell from 'gi://Shell';
 import type St from 'gi://St';
 
-import { animateActor, Curve, Duration, rubberband, Spring } from '../../../shared/motion.js';
+import { animateActor, Curve, Duration, rubberband, Spring, type SpringToken } from '../../../shared/motion.js';
 import { STRIP_HEIGHT, taskbarPreferences } from '../preferences/taskbarPreferences.js';
 import { TabletStrip } from './strip.js';
 
 const IDLE_COLLAPSE = 5000;
 const FLICK_SPEED = 300;
+const LAYER_SCALE = 0.94;
 const OUTSIDE_EVENTS = [Clutter.EventType.BUTTON_PRESS, Clutter.EventType.TOUCH_BEGIN];
 
 const clamp = (value: number) => Math.min(1, Math.max(0, value));
@@ -23,9 +24,12 @@ export class TabletTaskbar {
   private idleTimer = 0;
   private outsideSignal = 0;
   private statusIcons: string[] = [];
+  private fit: (() => void) | null = null;
 
   constructor(private readonly panel: St.Widget, private readonly layers: Clutter.Actor[], private readonly primary: boolean,
-    private readonly available: () => boolean) {}
+    private readonly available: () => boolean) {
+    for (const layer of layers) layer.set_pivot_point(0.5, 0.5);
+  }
 
   get shown(): boolean {
     return this.strip !== null;
@@ -47,28 +51,35 @@ export class TabletTaskbar {
     return this.active || this.holding;
   }
 
-  enter(translation: number): void {
+  enter(fit: () => void, immediate: boolean): void {
     if (this.strip) return;
     this.strip = new TabletStrip(() => this.expand(), this.primary);
     this.strip.updateStatus(this.statusIcons);
-    this.strip.actor.opacity = 0;
     this.panel.add_child(this.strip.actor);
     this.expanded = this.held;
-    if (this.available()) this.panel.translation_y = translation;
-    this.settle(0, Duration.tap);
+    this.fit = fit;
+    if (this.expanded || immediate) this.fitContents();
+    if (immediate) this.snap();
+    else {
+      this.strip.actor.opacity = 0;
+      this.settle(0, null);
+    }
   }
 
-  leave(): void {
+  leave(immediate: boolean): void {
     const strip = this.strip;
     if (!strip) return;
     this.strip = null;
+    this.fit = null;
     this.expanded = false;
     this.following = false;
     this.stopWatching();
-    animateActor(strip.actor, { opacity: 0, duration: Duration.quick, curve: Curve.decelerate, onStopped: () => strip.actor.destroy() });
+    if (immediate) strip.actor.destroy();
+    else animateActor(strip.actor, { opacity: 0, duration: Duration.quick, curve: Curve.decelerate, onStopped: () => strip.actor.destroy() });
     for (const layer of this.layers) {
       layer.show();
-      animateActor(layer, { opacity: 255, duration: Duration.standard, curve: Curve.decelerate });
+      if (immediate) layer.set({ opacity: 255, scale_x: 1, scale_y: 1 });
+      else this.reveal(layer, Duration.tap);
     }
   }
 
@@ -92,8 +103,10 @@ export class TabletTaskbar {
     this.following = true;
     const travel = this.travel;
     const over = Math.max(0, distance - travel);
-    for (const actor of [this.panel, this.strip.actor, ...this.layers]) actor.remove_all_transitions();
+    this.panel.remove_transition('translation-y');
+    for (const actor of [this.strip.actor, ...this.layers]) actor.remove_all_transitions();
     this.panel.translation_y = travel - Math.min(distance, travel) - rubberband(over, travel);
+    this.fitContents();
     this.paint(clamp(distance / travel));
   }
 
@@ -125,32 +138,65 @@ export class TabletTaskbar {
   }
 
   private paint(progress: number): void {
-    const strip = this.strip!.actor;
-    strip.show();
-    strip.opacity = Math.round(255 * clamp(1 - progress * 2));
+    const strip = this.strip!;
+    strip.actor.show();
+    strip.actor.opacity = Math.round(255 * clamp(1 - progress * 2));
+    strip.pull(progress);
+    const shown = clamp((progress - 0.25) / 0.75);
     for (const layer of this.layers) {
       layer.show();
-      layer.opacity = Math.round(255 * clamp((progress - 0.25) / 0.75));
+      const scale = LAYER_SCALE + (1 - LAYER_SCALE) * shown;
+      layer.set({ opacity: Math.round(255 * shown), scale_x: scale, scale_y: scale });
     }
   }
 
-  private settle(velocity: number, fadeOut: number = Duration.quick): void {
-    const strip = this.strip!.actor;
+  private settle(velocity: number, spring: SpringToken | null = Spring.snappy): void {
+    const strip = this.strip!;
     const expanded = this.expanded;
-    if (this.available()) animateActor(this.panel, { translation_y: this.rest, spring: Spring.snappy, velocity });
-    const [shown, hidden] = expanded ? [this.layers, [strip]] : [[strip], this.layers];
-    for (const actor of shown) {
-      actor.show();
-      animateActor(actor, { opacity: 255, duration: Duration.standard, curve: Curve.decelerate });
+    if (spring && this.available()) animateActor(this.panel, { translation_y: this.rest, spring, velocity });
+    strip.settle(!expanded);
+    if (expanded) {
+      this.fitContents();
+      this.layers.forEach(layer => this.reveal(layer));
+      this.conceal(strip.actor, expanded, 1);
+      this.watch();
+    } else {
+      strip.actor.show();
+      animateActor(strip.actor, { opacity: 255, duration: Duration.standard, delay: Duration.tap, curve: Curve.decelerate });
+      this.layers.forEach(layer => this.conceal(layer, expanded, LAYER_SCALE));
+      this.stopWatching();
     }
-    for (const actor of hidden) {
-      animateActor(actor, {
-        opacity: 0, duration: fadeOut, curve: Curve.decelerate,
-        onStopped: (finished: boolean) => { if (finished && this.strip && this.expanded === expanded) actor.hide(); },
-      });
-    }
-    if (expanded) this.watch();
+  }
+
+  private snap(): void {
+    if (this.available()) this.panel.translation_y = this.rest;
+    const [shown, hidden] = this.expanded ? [this.layers, [this.strip!.actor]] : [[this.strip!.actor], this.layers];
+    for (const actor of shown) actor.set({ visible: true, opacity: 255, scale_x: 1, scale_y: 1 });
+    for (const actor of hidden) actor.set({ visible: false, opacity: 0 });
+    this.strip!.settle(!this.expanded);
+    if (this.expanded) this.watch();
     else this.stopWatching();
+  }
+
+  private reveal(layer: Clutter.Actor, delay = 0): void {
+    layer.show();
+    animateActor(layer, { opacity: 255, scale_x: 1, scale_y: 1, duration: Duration.standard, delay, curve: Curve.decelerate });
+  }
+
+  private conceal(actor: Clutter.Actor, expanded: boolean, scale: number): void {
+    animateActor(actor, {
+      opacity: 0, scale_x: scale, scale_y: scale, duration: Duration.quick, curve: Curve.decelerate,
+      onStopped: (finished: boolean) => {
+        if (!finished || !this.strip || this.expanded !== expanded) return;
+        actor.hide();
+        if (!expanded) this.fitContents();
+      },
+    });
+  }
+
+  private fitContents(): void {
+    this.fit?.();
+    this.fit = null;
   }
 
   private watch(): void {

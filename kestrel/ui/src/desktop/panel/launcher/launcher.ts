@@ -5,8 +5,8 @@ import St from 'gi://St';
 
 import primary from './luft-primary.svg';
 import secondary from './luft-secondary.svg';
-import { markEdge, markShade, monochromeShade } from './shade.js';
-import { showsWallpaper, taskbarBackdrops } from '../backdrop.js';
+import { markShade, monochromeShade } from './shade.js';
+import { taskbarBackdrops } from '../backdrop.js';
 import { appIcons } from '../../../appearance/icons/appIcons.js';
 import { animateActor, Spring } from '../../../shared/motion.js';
 import { wallpaperFloor } from '../../wallpaper/floor.js';
@@ -28,23 +28,17 @@ export interface Launcher {
   resize(size: number): void;
 }
 
-interface MarkPaint {
-  fills: string[];
-  edge: string | null;
-}
-
-function markPaint(button: St.Button, panel: St.Widget): () => MarkPaint {
+function markPaint(button: St.Button, panel: St.Widget): () => string[] {
   let shaded = { key: '', shade: '' };
   return () => {
     const foreground = button.peek_theme_node()?.get_foreground_color().to_string() ?? WHITE;
     const paint = appIcons.paint;
     const ink = paint?.ink ?? foreground;
     const backdrops = taskbarBackdrops(panel, wallpaperFloor);
-    if (!backdrops.length) return { fills: [paint?.shade ?? ink, ink], edge: null };
+    if (!backdrops.length) return [paint?.shade ?? ink, ink];
     const key = [ink, paint?.shade, ...backdrops].join();
     if (key !== shaded.key) shaded = { key, shade: paint ? markShade(ink, paint.shade, backdrops) : monochromeShade(ink, backdrops) };
-    const edge = wallpaperFloor.busy && showsWallpaper(panel) ? markEdge(shaded.shade, backdrops[0]) : null;
-    return { fills: [shaded.shade, ink], edge };
+    return [shaded.shade, ink];
   };
 }
 
@@ -71,17 +65,15 @@ function animatedMark(button: St.Button, panel: St.Widget): [St.Widget, (size: n
   const current = markPaint(button, panel);
   let painted = '';
   const paint = () => {
-    const { fills, edge } = current();
-    painted = [...fills, edge].join();
+    const fills = current();
+    painted = fills.join();
     LAYERS.forEach((layer, index) => {
       icons[index].icon_size = Math.round(size * (appIcons.paint ? PAINTED_MARK_SCALE : 1));
       icons[index].gicon = svgIcon(layer.svg, fills[index]);
     });
-    icons[0].style = `icon-shadow: ${edge ? `0 0 1px 1px ${edge}` : 'none'};`;
   };
   const repaint = () => {
-    const { fills, edge } = current();
-    if ([...fills, edge].join() !== painted) paint();
+    if (current().join() !== painted) paint();
   };
   const unwatch = [appIcons.watch(paint), wallpaperFloor.watch(repaint)];
   mark.connect('destroy', () => unwatch.forEach(stop => stop()));

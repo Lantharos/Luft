@@ -4,7 +4,6 @@ const MIN_BACKDROP_CONTRAST = 2.2;
 const MIN_INK_CONTRAST = 1.6;
 const MID_TONE = 50;
 const TONES = Array.from({ length: 101 }, (_, tone) => tone);
-const EDGE = { dark: 'rgba(0, 0, 0, 0.5)', light: 'rgba(255, 255, 255, 0.6)' };
 
 function over(hex: string, backdrop: Rgb): Rgb {
   const alpha = hex.length > 7 ? parseInt(hex.slice(7, 9), 16) / 255 : 1;
@@ -40,5 +39,3 @@ export function markShade(inkHex: string, shadeHex: string, backdrops: Rgb[]): s
 
 export const monochromeShade = (inkHex: string, backdrops: Rgb[]): string =>
   backdrops.every(backdrop => contrast(over(inkHex, backdrop), backdrop) >= MIN_BACKDROP_CONTRAST) ? inkHex : markShade(inkHex, inkHex, backdrops);
-
-export const markEdge = (shadeHex: string, backdrop: Rgb): string => toneOf(fromHex(shadeHex)) > toneOf(backdrop) ? EDGE.dark : EDGE.light;

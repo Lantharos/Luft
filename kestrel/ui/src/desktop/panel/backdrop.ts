@@ -68,4 +68,3 @@ export function taskbarBackdrops(panel: St.Widget, floor: WallpaperFloor): Rgb[]
   return node ? backdropsBehind(panelSurface(node, !!panel.get_effect('backdrop')?.enabled), floor) : [];
 }
 
-export const showsWallpaper = (panel: St.Widget): boolean => (panel.peek_theme_node()?.get_background_color().alpha ?? 0) < 255;

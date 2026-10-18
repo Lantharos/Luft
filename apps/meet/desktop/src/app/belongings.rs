@@ -1,30 +1,25 @@
 use std::path::{Path, PathBuf};
 
 use luft_meet::FolderKind;
-use luft_meet::moving_box::Regional;
 use serde::Serialize;
 use windows::Win32::Foundation::{HANDLE, HLOCAL, LocalFree};
-use windows::Win32::Globalization::GetUserDefaultLocaleName;
 use windows::Win32::Security::Authentication::Identity::{GetUserNameExW, NameDisplay};
 use windows::Win32::Security::Authorization::ConvertSidToStringSidW;
 use windows::Win32::Security::{GetTokenInformation, TOKEN_QUERY, TOKEN_USER, TokenUser};
 use windows::Win32::System::Com::CoTaskMemFree;
-use windows::Win32::System::Registry::{
-    HKEY, HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE, RRF_RT_REG_SZ, RegGetValueW,
-};
+use windows::Win32::System::Registry::{HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE};
 use windows::Win32::System::Threading::{GetCurrentProcess, OpenProcessToken};
-use windows::Win32::System::Time::{DYNAMIC_TIME_ZONE_INFORMATION, GetDynamicTimeZoneInformation};
 use windows::Win32::System::WindowsProgramming::GetUserNameW;
 use windows::Win32::UI::Shell::{
     FOLDERID_Desktop, FOLDERID_Documents, FOLDERID_Downloads, FOLDERID_Music, FOLDERID_Pictures,
     FOLDERID_Videos, KF_FLAG_DEFAULT, SHGetKnownFolderPath,
 };
-use windows::core::{GUID, HSTRING, PWSTR};
+use windows::core::{GUID, PWSTR};
 
+use super::registry::string;
 use crate::folders::{Item, walk};
 use crate::protocol::ChosenAccount;
 
-const LOCALE_NAME_MAX_LENGTH: usize = 85;
 const PICTURES: &str = r"SOFTWARE\Microsoft\Windows\CurrentVersion\AccountPicture\Users";
 
 #[derive(Serialize)]
@@ -42,7 +37,6 @@ pub struct Gathered {
     folders: Vec<FoundFolder>,
     wallpaper: Option<String>,
     account: ChosenAccount,
-    regional: Regional,
 }
 
 pub(super) fn known(kind: FolderKind) -> Option<PathBuf> {
@@ -60,29 +54,6 @@ pub(super) fn known(kind: FolderKind) -> Option<PathBuf> {
         CoTaskMemFree(Some(path.0.cast()));
         text.map(PathBuf::from)
     }
-}
-
-fn string(root: HKEY, key: &str, value: &str) -> Option<String> {
-    let mut buffer = vec![0u16; 1024];
-    let mut size = (buffer.len() * 2) as u32;
-    unsafe {
-        RegGetValueW(
-            root,
-            &HSTRING::from(key),
-            &HSTRING::from(value),
-            RRF_RT_REG_SZ,
-            None,
-            Some(buffer.as_mut_ptr().cast()),
-            Some(&mut size),
-        )
-    }
-    .ok()
-    .ok()?;
-    let end = buffer
-        .iter()
-        .position(|unit| *unit == 0)
-        .unwrap_or(buffer.len());
-    Some(String::from_utf16_lossy(&buffer[..end])).filter(|text| !text.is_empty())
 }
 
 fn existing(path: PathBuf) -> Option<String> {
@@ -151,29 +122,6 @@ fn account() -> ChosenAccount {
     }
 }
 
-fn regional() -> Regional {
-    let mut zone = DYNAMIC_TIME_ZONE_INFORMATION::default();
-    unsafe { GetDynamicTimeZoneInformation(&mut zone) };
-    let end = zone
-        .TimeZoneKeyName
-        .iter()
-        .position(|unit| *unit == 0)
-        .unwrap_or(zone.TimeZoneKeyName.len());
-    let time_zone = String::from_utf16_lossy(&zone.TimeZoneKeyName[..end]);
-    let preload = string(HKEY_CURRENT_USER, r"Keyboard Layout\Preload", "1");
-    let keyboard = preload.as_deref().map(|layout| {
-        string(HKEY_CURRENT_USER, r"Keyboard Layout\Substitutes", layout)
-            .unwrap_or_else(|| layout.to_owned())
-    });
-    let mut locale = [0u16; LOCALE_NAME_MAX_LENGTH];
-    let length = unsafe { GetUserDefaultLocaleName(&mut locale) } as usize;
-    Regional {
-        time_zone: (!time_zone.is_empty()).then_some(time_zone),
-        keyboard,
-        locale: (length > 1).then(|| String::from_utf16_lossy(&locale[..length - 1])),
-    }
-}
-
 fn measure(kind: FolderKind) -> Option<FoundFolder> {
     let path = known(kind)?;
     let mut items: Vec<Item> = Vec::new();
@@ -203,6 +151,5 @@ pub fn gather() -> Gathered {
         folders,
         wallpaper: wallpaper(),
         account: account(),
-        regional: regional(),
     }
 }

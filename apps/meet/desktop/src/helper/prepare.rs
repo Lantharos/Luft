@@ -1,4 +1,5 @@
 use luft_meet::handoff::{LIVE_LABEL, START_LABEL};
+use luft_meet::regional::Hints;
 use luft_meet::{Handoff, Intent, Made, Partitions, Room};
 
 use super::drive::storage::{BASIC_TYPE, ESP_TYPE, Layout, MSFT_Partition, Storage};
@@ -122,6 +123,7 @@ pub fn build(
                 size: plan.room.size,
             }),
         }),
+        hints: Hints::default(),
     };
     state::write_handoff(&live_path, &handoff)
 }

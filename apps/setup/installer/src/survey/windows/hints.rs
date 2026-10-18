@@ -1,40 +1,47 @@
 use std::io::{Read, Seek};
 
 use anyhow::Result;
-
+use luft_meet::regional::Hints;
+use luft_meet::regional::windows::Settings;
 use luft_windows::{Registry, System, Volume};
-
-use super::{Hints, Keyboard, keyboards, zones};
 
 const SHARED_PROFILES: &[&str] = &["Default", "Default User", "Public", "All Users"];
 const DEFAULT_USER_HIVE: &str = r"Windows\System32\config\DEFAULT";
+const PRELOAD: &str = r"Keyboard Layout\Preload";
+const SUBSTITUTES: &str = r"Keyboard Layout\Substitutes";
+const LANGUAGES: [(&str, &str); 2] = [
+    (r"Control Panel\Desktop", "PreferredUILanguages"),
+    (
+        r"Control Panel\Desktop\MuiCached",
+        "MachinePreferredUILanguages",
+    ),
+];
 
 pub(super) fn gather<R: Read + Seek>(volume: &mut Volume<R>, system: &System) -> Result<Hints> {
-    let timezone = match system.control_set() {
-        Some(control_set) => timezone(system.registry(), control_set)?,
+    let time_zone = match system.control_set() {
+        Some(control_set) => system.registry().string(
+            &format!(r"{control_set}\Control\TimeZoneInformation"),
+            "TimeZoneKeyName",
+        )?,
         None => None,
     };
     let Some(user) = user_hive(volume)? else {
-        return Ok(Hints {
-            timezone,
-            ..Hints::default()
-        });
+        return Ok(Settings {
+            time_zone: time_zone.as_deref(),
+            ..Settings::default()
+        }
+        .hints());
     };
     let user = Registry::new(&user)?;
-    Ok(Hints {
-        timezone,
-        keyboard: keyboard(&user)?,
-        locale: user
-            .string(r"Control Panel\International", "LocaleName")?
-            .as_deref()
-            .and_then(posix_locale),
-    })
-}
-
-fn timezone(system: &Registry, control_set: &str) -> Result<Option<String>> {
-    let path = format!(r"{control_set}\Control\TimeZoneInformation");
-    let name = system.string(&path, "TimeZoneKeyName")?;
-    Ok(name.and_then(|name| zones::iana(&name)).map(Into::into))
+    let locale = user.string(r"Control Panel\International", "LocaleName")?;
+    let language = language(&user)?;
+    Ok(Settings {
+        time_zone: time_zone.as_deref(),
+        locale: locale.as_deref(),
+        language: language.as_deref(),
+        keyboards: keyboards(&user)?,
+    }
+    .hints())
 }
 
 fn user_hive<R: Read + Seek>(volume: &mut Volume<R>) -> Result<Option<Vec<u8>>> {
@@ -59,37 +66,25 @@ fn user_hive<R: Read + Seek>(volume: &mut Volume<R>) -> Result<Option<Vec<u8>>> 
     }
 }
 
-fn keyboard(user: &Registry) -> Result<Option<Keyboard>> {
-    let Some(preload) = user.string(r"Keyboard Layout\Preload", "1")? else {
-        return Ok(None);
-    };
-    let klid = user
-        .string(r"Keyboard Layout\Substitutes", &preload)?
-        .unwrap_or(preload);
-    Ok(keyboards::xkb(&klid))
-}
-
-pub(super) fn posix_locale(name: &str) -> Option<String> {
-    let mut parts = name.split('-');
-    let language = parts.next().filter(|language| {
-        (2..=3).contains(&language.len()) && language.bytes().all(|b| b.is_ascii_alphabetic())
-    })?;
-    let mut script = None;
-    let mut region = None;
-    for part in parts {
-        match part.len() {
-            4 => script = Some(part),
-            2 if part.bytes().all(|b| b.is_ascii_alphabetic()) => region = Some(part),
-            _ => {}
+fn language(user: &Registry) -> Result<Option<String>> {
+    for (path, name) in LANGUAGES {
+        if let Some(language) = user
+            .string(path, name)?
+            .filter(|language| !language.is_empty())
+        {
+            return Ok(Some(language));
         }
     }
-    let modifier = match (language, script) {
-        ("sr", Some("Latn")) => "@latin",
-        _ => "",
-    };
-    Some(format!(
-        "{}_{}{modifier}",
-        language.to_ascii_lowercase(),
-        region?.to_ascii_uppercase()
-    ))
+    Ok(None)
+}
+
+fn keyboards(user: &Registry) -> Result<Vec<String>> {
+    let mut klids = Vec::new();
+    for order in 1.. {
+        let Some(preload) = user.string(PRELOAD, &order.to_string())? else {
+            break;
+        };
+        klids.push(user.string(SUBSTITUTES, &preload)?.unwrap_or(preload));
+    }
+    Ok(klids)
 }

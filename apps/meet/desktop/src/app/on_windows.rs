@@ -1,6 +1,7 @@
 use serde_json::Value;
 
 use super::job::Failed;
+pub use super::regional::hints;
 use super::{Events, belongings, dialog, link, logs};
 use crate::check::facts::Platform;
 use crate::protocol::Call;

@@ -22,6 +22,10 @@ export function languageFor(country: string | null): Language | null {
 	return LANGUAGES.find((language) => language.country === country) ?? null;
 }
 
+export function languageNamed(locale: string | null): Language | null {
+	return LANGUAGES.find((language) => language.locale === `${locale}.UTF-8`) ?? null;
+}
+
 const KEYBOARDS: Record<string, string> = {
 	US: 'us', GB: 'gb', IE: 'ie', CA: 'us', AU: 'us', NZ: 'us', IN: 'us', ZA: 'us',
 	DE: 'de', AT: 'at', CH: 'ch', LI: 'ch', LU: 'fr', FR: 'fr', BE: 'be', NL: 'us',

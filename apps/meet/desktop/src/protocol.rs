@@ -1,7 +1,8 @@
 use std::path::PathBuf;
 
 use luft_meet::Intent;
-use luft_meet::moving_box::{FolderKind, Regional};
+use luft_meet::moving_box::FolderKind;
+use luft_meet::regional::Hints;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -32,6 +33,8 @@ pub enum Call {
     Restart {
         intent: Intent,
         windows: WindowsChoices,
+        #[serde(default)]
+        hints: Hints,
     },
     Tidy,
     FirmwareSettings,
@@ -52,6 +55,21 @@ pub enum Call {
         image: Image,
         replace: bool,
     },
+}
+
+impl Call {
+    pub fn with_hints(self, gather: impl FnOnce() -> Hints) -> Self {
+        match self {
+            Self::Restart {
+                intent, windows, ..
+            } => Self::Restart {
+                intent,
+                windows,
+                hints: gather(),
+            },
+            call => call,
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, Default)]
@@ -138,7 +156,6 @@ pub struct Belongings {
     pub folders: Vec<ChosenFolder>,
     pub wallpaper: Option<String>,
     pub account: Option<ChosenAccount>,
-    pub regional: Option<Regional>,
     pub wifi: bool,
     pub bluetooth: bool,
 }

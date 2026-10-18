@@ -23,13 +23,20 @@
 
 	let replaceable = $derived(install.systems.filter((system) => !system.blocked));
 	let view = $state<View>(install.meet ? 'alongside' : 'choose');
+	let trail = $state<View[]>([]);
 	let replacing = $state<string | null>(null);
+	let choicesSeen = $derived(view === 'choose' || trail.includes('choose'));
 
 	$effect(() => {
-		if (install.intent !== 'replace' || replacing || view !== 'choose' || replaceable.length !== 1) return;
-		replacing = replaceable[0].id;
-		view = 'replace';
+		if (view !== 'choose' || trail.length > 0) return;
+		if (install.meet) {
+			view = 'alongside';
+		} else if (install.intent === 'replace' && !replacing && replaceable.length === 1) {
+			replacing = replaceable[0].id;
+			view = 'replace';
+		}
 	});
+
 	let size = $state(0);
 	let wholeDrive = $state<string | null>(null);
 	let freeSpace = $state<string | null>(null);
@@ -77,13 +84,19 @@
 		flow.next();
 	}
 
+	function open(next: View) {
+		trail = [...trail, view];
+		view = next;
+	}
+
 	function back() {
 		install.startError = '';
-		view = 'choose';
+		view = trail.at(-1)!;
+		trail = trail.slice(0, -1);
 	}
 </script>
 
-<StepFrame {title} {description} onback={view === 'choose' ? undefined : back} hideBack={install.starting}>
+<StepFrame {title} {description} onback={trail.length > 0 ? back : undefined} hideBack={install.starting}>
 	{#if !survey}
 		<div class="flex items-center gap-3 py-2 text-[14px] text-[var(--text-soft)]">
 			{#if install.surveyError}
@@ -96,9 +109,9 @@
 	{:else if view === 'choose'}
 		<div class="-mx-2 flex flex-col gap-1">
 			{#if meet?.space}
-				<Choice icon={LayoutPanelLeft} title="Alongside Windows" description="Use the {bytes(meet.space.size)} Meet Luft made next to Windows." onclick={() => (view = 'alongside')} />
+				<Choice icon={LayoutPanelLeft} title="Alongside Windows" description="Use the {bytes(meet.space.size)} Meet Luft made next to Windows." onclick={() => open('alongside')} />
 			{:else if windowsDrive}
-				<Choice icon={LayoutPanelLeft} title="Alongside {windowsName(windowsDrive.windows)}" description="Keep Windows and its files, and give Luft part of its drive." onclick={() => (view = 'alongside')} />
+				<Choice icon={LayoutPanelLeft} title="Alongside {windowsName(windowsDrive.windows)}" description="Keep Windows and its files, and give Luft part of its drive." onclick={() => open('alongside')} />
 			{/if}
 			{#each install.systems as system (system.id)}
 				<Choice
@@ -108,13 +121,13 @@
 					disabled={!!system.blocked}
 					onclick={() => {
 						replacing = system.id;
-						view = 'replace';
+						open('replace');
 					}}
 				/>
 			{/each}
-			<Choice icon={HardDrive} title="Use a whole drive" description="Erase a drive and give all of it to Luft." disabled={install.usableDrives.length === 0} onclick={() => (view = 'whole')} />
+			<Choice icon={HardDrive} title="Use a whole drive" description="Erase a drive and give all of it to Luft." disabled={install.usableDrives.length === 0} onclick={() => open('whole')} />
 			<Choice icon={Sparkles} title="Just try Luft" description="Look around first. Nothing is installed and your drives stay untouched." onclick={justTry} />
-			<Choice icon={SlidersHorizontal} title="Custom" description="Arrange partitions yourself in Disks." onclick={() => (view = 'custom')} />
+			<Choice icon={SlidersHorizontal} title="Custom" description="Arrange partitions yourself in Disks." onclick={() => open('custom')} />
 		</div>
 	{:else if view === 'alongside' && meet?.space && meetDrive}
 		<MeetRoom drive={meetDrive} space={meet.space} packed={meet.movingBox?.bytes ?? null} />
@@ -131,6 +144,9 @@
 		<p class="mt-4 text-[13.5px] text-[var(--danger)]">{install.startError}</p>
 	{/if}
 	{#snippet actions()}
+		{#if !choicesSeen && survey}
+			<button type="button" class="plain-button large" disabled={install.starting} onclick={() => open('choose')}>More options</button>
+		{/if}
 		{#if view !== 'choose'}
 			<button type="button" class="button primary large px-6" disabled={!target || install.starting} onclick={() => (confirming = true)}>
 				{install.starting ? 'Starting…' : view === 'replace' ? 'Replace' : 'Install Luft'}

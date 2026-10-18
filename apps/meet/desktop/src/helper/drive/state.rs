@@ -2,6 +2,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use luft_meet::handoff;
+use luft_meet::regional::Hints;
 use luft_meet::{Handoff, Intent};
 
 use crate::protocol::WindowsChoices;
@@ -83,7 +84,7 @@ pub fn find(layout: &Layout) -> Found {
     }
 }
 
-pub fn restart(intent: Intent, windows: WindowsChoices) -> Result<(), String> {
+pub fn restart(intent: Intent, windows: WindowsChoices, hints: Hints) -> Result<(), String> {
     let storage = Storage::open()?;
     let drive = windows_drive::find()?;
     let layout = storage.layout(&drive.volume)?;
@@ -109,6 +110,7 @@ pub fn restart(intent: Intent, windows: WindowsChoices) -> Result<(), String> {
     handoff.boot_entry = start_entries::ensure(&start, handoff.boot_entry)?;
     record::set_boot_entry(Some(handoff.boot_entry))?;
     handoff.intent = intent;
+    handoff.hints = hints;
     write_handoff(&live, &handoff)?;
     settings::apply(windows)?;
     entries::boot_next(&firmware::Nvram, handoff.boot_entry)?;

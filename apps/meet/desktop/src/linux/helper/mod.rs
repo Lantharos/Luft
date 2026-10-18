@@ -27,7 +27,9 @@ fn handle(context: &Context, call: Call) -> Result<Value, String> {
         Call::Check { source } => serde_json::to_value(prepare::check(&source)?),
         Call::Prepare { source, .. } => serde_json::to_value(prepare::prepare(context, &source)?),
         Call::Refresh { source } => serde_json::to_value(prepare::refresh(context, &source)?),
-        Call::Restart { intent, .. } => serde_json::to_value(restart::restart(intent)?),
+        Call::Restart { intent, hints, .. } => {
+            serde_json::to_value(restart::restart(intent, hints)?)
+        }
         Call::FirmwareSettings => serde_json::to_value(restart::firmware_settings()?),
         Call::Undo => serde_json::to_value(undo::undo(context)?),
         Call::Sticks { iso } => serde_json::to_value(stick::sticks(iso.as_deref())?),

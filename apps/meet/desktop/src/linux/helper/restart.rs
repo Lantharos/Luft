@@ -1,6 +1,7 @@
 use std::process::Command;
 
 use luft_meet::Intent;
+use luft_meet::regional::Hints;
 
 use super::disks;
 use super::efi::{self, Efivars};
@@ -22,7 +23,7 @@ fn reboot() -> Result<(), String> {
     }
 }
 
-pub fn restart(intent: Intent) -> Result<(), String> {
+pub fn restart(intent: Intent, hints: Hints) -> Result<(), String> {
     let made = Made::read();
     let folder = made
         .folder
@@ -38,6 +39,7 @@ pub fn restart(intent: Intent) -> Result<(), String> {
         entries::ensure(&Efivars, &esp.partition()?, esp::LOADER, handoff.boot_entry)?;
     Made::update(|made| made.boot_entry = Some(handoff.boot_entry))?;
     handoff.intent = intent;
+    handoff.hints = hints;
     write_handoff(folder, &handoff)?;
     entries::boot_next(&Efivars, handoff.boot_entry)?;
     reboot()

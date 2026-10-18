@@ -8,7 +8,6 @@ use luft_meet::handoff::{self, Handoff, Intent};
 use luft_meet::moving_box::{self, Manifest};
 use serde::Serialize;
 
-use crate::survey::windows::{self, Hints};
 use crate::system::command::Tool;
 
 const BY_PARTUUID: &str = "/dev/disk/by-partuuid";
@@ -73,8 +72,6 @@ pub struct Summary {
     pub intent: Intent,
     pub room: Option<luft_meet::Room>,
     pub moving_box: Option<Packed>,
-    #[serde(skip)]
-    pub hints: Option<Hints>,
 }
 
 pub fn summarize(handoff: &Handoff, scratch: &Path) -> Summary {
@@ -87,16 +84,6 @@ pub fn summarize(handoff: &Handoff, scratch: &Path) -> Summary {
     Summary {
         intent: handoff.intent,
         room: handoff.room(),
-        hints: manifest
-            .as_ref()
-            .and_then(|manifest| manifest.regional.as_ref())
-            .map(|regional| {
-                windows::hints_from_names(
-                    regional.time_zone.as_deref(),
-                    regional.keyboard.as_deref(),
-                    regional.locale.as_deref(),
-                )
-            }),
         moving_box: manifest.map(|manifest| Packed {
             bytes: manifest.bytes(),
             full_name: manifest

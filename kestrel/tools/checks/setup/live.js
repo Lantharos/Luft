@@ -15,6 +15,7 @@ const AT = {
   password: [315, 369],
   repeat: [315, 442],
   restart: [690, 547],
+  moreOptions: [560, 547],
 };
 
 async function checkAccount(setup) {
@@ -40,7 +41,30 @@ async function checkInstallStarts(setup) {
     'the installed system gets the keyboard, time zone and language chosen at the start');
 }
 
+async function checkFromMeet() {
+  const setup = new Setup();
+  await setup.useMeet(true);
+  await setup.open();
+  await setup.called('SetX11Keyboard rs latin', 'the keyboard layout Meet Luft noted becomes the live session’s');
+  await setup.called('SetTimezone Europe/Belgrade', 'the time zone Meet Luft noted becomes the live session’s');
+  await setup.shot('welcome-meet');
+  await setup.click(AT.keyboard, 'the keyboard list opens');
+  await setup.type('custom');
+  await setup.shot('welcome-keyboard-custom');
+  await setup.click(AT.keyboard, 'clicking outside closes the list');
+  await setup.click(AT.continue, 'continuing shows the room Meet Luft made');
+  await setup.shot('destination-meet');
+  await setup.click(AT.moreOptions, 'more options shows the other ways to install');
+  await setup.shot('destination-meet-choices');
+  await setup.click(AT.back, 'going back shows the room Meet Luft made again');
+  await setup.click(AT.back, 'going back from the room shows the first screen');
+  await setup.shot('destination-meet-back');
+  await setup.close();
+  await setup.useMeet(false);
+}
+
 export async function checkLive() {
+  await checkFromMeet();
   const setup = new Setup();
   await setup.open();
   await setup.called('SetX11Keyboard de nodeadkeys', 'the keyboard layout Windows used becomes the live session’s');

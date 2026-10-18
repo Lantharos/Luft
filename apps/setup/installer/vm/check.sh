@@ -64,6 +64,70 @@ check_wifi_carried() {
   pass "the Wi-Fi joined before installing connects by itself on the new system, its password readable by root alone"
 }
 
+HINTS='{"language":"en_US","locale":"sr_RS@latin","timezone":"Europe/Belgrade","keyboards":[{"layout":"rs","variant":"latin"},{"layout":"us","variant":""}]}'
+ASKED=/run/luft-check/asked-for-code
+CODE=31415926
+
+check_meet_hints() {
+  local hints
+  mkdir -p /run/initramfs/live
+  printf '{"intent":"install","bootEntry":7,"start":"0a1b2c3d-0000-4000-8000-00000000aaaa","live":"0a1b2c3d-0000-4000-8000-00000000bbbb","hints":%s}' "$HINTS" \
+    > /run/initramfs/live/meet.json
+  hints="$(call Survey | jq -r '.data[0]' | jq -cS .hints)" || fail "the survey with Meet Luft's notes failed"
+  [[ "$hints" == "$(jq -cS . <<< "$HINTS")" ]] || fail "the survey doesn't hand setup the language, time zone and keyboards Meet Luft noted: $hints"
+  pass "the survey hands setup the language, formats, time zone and keyboards Meet Luft noted"
+  rm -r /run/initramfs/live
+  systemctl stop luft-installer
+}
+
+write_trust_stand_in() {
+  cat > /run/luft-check/trust.js <<'TRUST'
+import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
+import system from 'system';
+
+const [state, code, asked] = system.programArgs;
+const TRUST = `<node><interface name="com.lantharos.Trust1">
+  <property name="SecureBoot" type="s" access="read"/>
+  <property name="SigningKey" type="a{sv}" access="read"/>
+  <method name="EnrollSigningKey"><arg type="s" direction="out"/></method>
+</interface></node>`;
+
+const trust = Gio.DBusExportedObject.wrapJSObject(TRUST, {
+  SecureBoot: 'on',
+  SigningKey: {State: new GLib.Variant('s', state), Available: new GLib.Variant('b', true)},
+  EnrollSigningKey: () => {
+    GLib.file_set_contents(asked, code);
+    return code;
+  },
+});
+trust.export(Gio.DBus.system, '/com/lantharos/Trust1');
+Gio.bus_own_name_on_connection(Gio.DBus.system, 'com.lantharos.Trust1', Gio.BusNameOwnerFlags.NONE, null, null);
+new GLib.MainLoop(null, false).run();
+TRUST
+}
+
+trust_says() {
+  systemctl stop luft-check-trust 2> /dev/null
+  rm -f "$ASKED"
+  systemd-run --quiet --unit=luft-check-trust gjs -m /run/luft-check/trust.js "$1" "$CODE" "$ASKED"
+  for _ in $(seq 20); do
+    [[ "$(busctl --json=short get-property com.lantharos.Trust1 /com/lantharos/Trust1 com.lantharos.Trust1 SigningKey 2> /dev/null |
+      jq -r .data.State.data)" == "$1" ]] && return
+    sleep 0.5
+  done
+  fail "the stand-in for trustd didn't start"
+}
+
+check_secure_boot_code() {
+  local expected="$1" what="$2" code asked=false wanted=false
+  code="$(busctl --json=short get-property "${BUS[@]}" SecureBootCode | jq -r .data)"
+  [[ -e "$ASKED" ]] && asked=true
+  [[ -n "$expected" ]] && wanted=true
+  [[ "$code" == "$expected" && "$asked" == "$wanted" ]] || fail "$what: the code is '$code' and trustd was asked: $asked"
+  pass "$what"
+}
+
 check_whole_drive() {
   local survey drive
   join_wifi
@@ -257,8 +321,16 @@ check_first_boot_finish() {
 }
 
 mkdir -p "$SOURCE" && mount -o ro LABEL=luft-source "$SOURCE" || fail "the source disk doesn't mount"
+check_meet_hints
+systemctl mask --runtime --now trustd.service
+mkdir -p /run/luft-check && write_trust_stand_in
+trust_says enrolled
 check_whole_drive
+check_secure_boot_code "" "a computer that already trusts Luft's key gets no code to type"
+trust_says none
 check_free_space
+check_secure_boot_code "$CODE" "a computer that doesn't trust Luft's key yet gets the code trustd queued"
+systemctl stop luft-check-trust && systemctl unmask --runtime trustd.service
 check_alongside_windows
 check_first_boot_finish
 report DONE

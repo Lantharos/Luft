@@ -10,7 +10,7 @@
 	let zone = $derived(regional.zoneEntry);
 </script>
 
-<StepFrame title="Welcome to Luft" description="Let’s get you set up. We guessed these from your computer, so change anything that’s off.">
+<StepFrame title="Welcome to Luft" description={regional.description}>
 	<div class="flex flex-col gap-2.5">
 		<Picker
 			icon={Languages}

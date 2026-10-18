@@ -3,7 +3,7 @@ import Gio from 'gi://Gio';
 import {call} from '../lib/dbus.js';
 import {gjs, waitForWindow} from '../lib/processes.js';
 import {pause} from '../lib/wait.js';
-import {eventually, Setup} from './lib/driver.js';
+import {eventually, require, Setup} from './lib/driver.js';
 
 const AT = {
   back: [85, 547],
@@ -67,9 +67,21 @@ async function checkHandoff(endSession) {
   throw new Error('Kestrel kept running after setup finished');
 }
 
+async function checkKeyAlreadyTrusted() {
+  const setup = new Setup();
+  await setup.setSigningKey('enrolled');
+  await setup.open();
+  await setup.click(AT.encrypt, 'setup opens on encryption when the computer already trusts Luft');
+  require(!(await setup.calls()).includes('EnrollSigningKey'), 'no code is asked for when the computer already trusts Luft');
+  await setup.shot('first-boot-trusted');
+  await setup.close();
+  await setup.setSigningKey('none');
+}
+
 export async function checkFirstBoot(endSession) {
   const setup = new Setup();
   await setup.setPhase('first-boot');
+  await checkKeyAlreadyTrusted();
   await setup.open();
   await checkSecureBoot(setup);
   await checkProtect(setup);

@@ -37,6 +37,15 @@ export class Setup {
     return this.control('SetStage', new GLib.Variant('(sd)', [stage, progress]));
   }
 
+  useMeet(meet) {
+    return this.control('UseMeet', new GLib.Variant('(b)', [meet]));
+  }
+
+  setSigningKey(state) {
+    return call(CHECKS, '/com/lantharos/KestrelChecks/Trust', `${CHECKS}.Trust`, 'SetSigningKey', new GLib.Variant('(s)', [state]), null,
+      {connection: this.bus});
+  }
+
   async requests() {
     const reply = await this.control('Requests', null, '(as)');
     return reply.deepUnpack()[0].map(request => JSON.parse(request));

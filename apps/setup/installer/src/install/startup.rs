@@ -17,6 +17,12 @@ struct Reply<T> {
     data: T,
 }
 
+#[derive(Deserialize)]
+#[serde(rename_all = "PascalCase")]
+struct SigningKey {
+    state: Reply<String>,
+}
+
 pub fn place(mounted: &Mounted, at: &Path) -> Result<()> {
     std::fs::create_dir_all(at)?;
     Tool::new("mount").arg(&mounted.esp).arg(at).run()?;
@@ -29,17 +35,21 @@ pub fn place(mounted: &Mounted, at: &Path) -> Result<()> {
     placed.and(unmounted)
 }
 
-fn secure_boot_on() -> Result<bool> {
+fn property<T: for<'de> Deserialize<'de>>(name: &str) -> Result<T> {
     let reply = Tool::new("busctl")
         .args(["--json=short", "get-property"])
         .args(TRUST)
-        .arg("SecureBoot")
+        .arg(name)
         .output()?;
-    Ok(serde_json::from_str::<Reply<String>>(&reply)?.data == "on")
+    Ok(serde_json::from_str::<Reply<T>>(&reply)?.data)
+}
+
+fn already_trusted() -> Result<bool> {
+    Ok(property::<SigningKey>("SigningKey")?.state.data == "enrolled")
 }
 
 pub fn ask_shim_to_trust_luft() -> Result<String> {
-    if !secure_boot_on()? {
+    if property::<String>("SecureBoot")? != "on" || already_trusted()? {
         return Ok(String::new());
     }
     let reply = Tool::new("busctl")

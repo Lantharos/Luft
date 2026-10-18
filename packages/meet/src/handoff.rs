@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use crate::regional::Hints;
+
 pub const FILE: &str = "meet.json";
 pub const START_LABEL: &str = "LUFT-START";
 pub const LIVE_LABEL: &str = "Luft";
@@ -53,6 +55,8 @@ pub struct Handoff {
     pub boot_entry: u16,
     #[serde(flatten)]
     pub made: Made,
+    #[serde(default, skip_serializing_if = "Hints::is_empty")]
+    pub hints: Hints,
 }
 
 impl Handoff {
@@ -130,12 +134,15 @@ mod tests {
         let handoff = Handoff::parse(
             r#"{"intent":"install","start":"{0A1B2C3D-0000-4000-8000-00000000AAAA}",
                 "live":"0a1b2c3d-0000-4000-8000-00000000bbbb","movingBox":null,
-                "room":{"offset":1048576,"size":68719476736},"bootEntry":7}"#,
+                "room":{"offset":1048576,"size":68719476736},"bootEntry":7,
+                "hints":{"timezone":"Europe/Belgrade","keyboards":[{"layout":"rs","variant":"latin"}]}}"#,
         )
         .unwrap();
         let made = handoff.made_partitions().unwrap();
         assert_eq!(made.start, "0a1b2c3d-0000-4000-8000-00000000aaaa");
         assert_eq!(handoff.partitions().count(), 2);
+        assert_eq!(handoff.hints.timezone.as_deref(), Some("Europe/Belgrade"));
+        assert_eq!(handoff.hints.keyboards[0].variant, "latin");
         assert_eq!(Handoff::parse(&handoff.to_json()).unwrap(), handoff);
     }
 

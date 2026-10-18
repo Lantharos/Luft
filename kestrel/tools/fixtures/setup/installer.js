@@ -16,6 +16,7 @@ const CONTROL = `<node><interface name="com.lantharos.KestrelChecks.Installer">
   <method name="SetPhase"><arg type="s" direction="in"/></method>
   <method name="SetStage"><arg type="s" direction="in"/><arg type="d" direction="in"/></method>
   <method name="Requests"><arg type="as" direction="out"/></method>
+  <method name="UseMeet"><arg type="b" direction="in"/></method>
 </interface></node>`;
 
 export const INSTALLER_NAME = 'com.lantharos.Installer1';
@@ -46,14 +47,26 @@ const SURVEY = {
       kind: 'usb', removable: true, blocked: 'running', partitions: 2, esp: null, startupSpace: GIB, windows: null, free: [],
     },
   ],
-  hints: {timezone: 'Europe/Berlin', keyboard: {layout: 'de', variant: 'nodeadkeys'}, locale: 'de_DE'},
-  firmwareLanguage: 'en-US',
+  hints: {language: 'en_US', locale: 'de_DE', timezone: 'Europe/Berlin', keyboards: [{layout: 'de', variant: 'nodeadkeys'}]},
   smallestSystem: 32 * 1024 ** 3,
+};
+const ROOM = {offset: 600 * GB, size: 398 * GB};
+const FROM_MEET = {
+  ...SURVEY,
+  drives: SURVEY.drives.map(drive => drive.device === '/dev/nvme0n1'
+    ? {...drive, meet: true, windows: {...drive.windows, size: 600 * GB - 129 * MIB, room: 0}, free: [ROOM]}
+    : drive),
+  hints: {
+    language: 'en_US', locale: 'sr_RS@latin', timezone: 'Europe/Belgrade',
+    keyboards: [{layout: 'rs', variant: 'latin'}, {layout: 'us', variant: ''}],
+  },
+  meet: {drive: '/org/freedesktop/UDisks2/block_devices/nvme0n1', space: ROOM, intent: 'install', room: ROOM, movingBox: null},
 };
 
 export function publishInstaller(publish, calls) {
   const state = {Phase: 'live', Stage: 'idle', Progress: 0, Error: '', SecureBootCode: ''};
   const requests = [];
+  let survey = SURVEY;
   let exported = null;
   const set = changes => {
     Object.assign(state, changes);
@@ -76,7 +89,7 @@ export function publishInstaller(publish, calls) {
     get SecureBootCode() {
       return state.SecureBootCode;
     },
-    Survey: () => JSON.stringify(SURVEY),
+    Survey: () => JSON.stringify(survey),
     Install: request => {
       requests.push(request);
       calls.push('installer Install');
@@ -93,5 +106,8 @@ export function publishInstaller(publish, calls) {
     SetPhase: phase => set({Phase: phase}),
     SetStage: (stage, progress) => set({Stage: stage, Progress: progress, SecureBootCode: stage === 'finished' ? SECURE_BOOT_CODE : ''}),
     Requests: () => requests.splice(0),
+    UseMeet: meet => {
+      survey = meet ? FROM_MEET : SURVEY;
+    },
   }, '/com/lantharos/KestrelChecks/Installer');
 }

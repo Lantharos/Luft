@@ -1,9 +1,10 @@
 use std::path::{Path, PathBuf};
 
-use anyhow::Result;
+use anyhow::{Result, bail};
 
 use super::CERTIFICATE;
 use super::request::Request;
+use crate::errors::Unsupported;
 use crate::system::command::Tool;
 use crate::system::efi::{self, SecureBoot};
 use crate::system::scratch::Scratch;
@@ -52,14 +53,31 @@ pub(super) fn one_time_code() -> Result<String> {
 }
 
 pub fn request() -> Result<String> {
-    if enrollment() == Enrollment::Pending
-        && let Some(request) = Request::load()
-        && let Some(code) = request.code.clone()
-    {
-        show_on_restart(&request);
-        return Ok(code);
+    match enrollment() {
+        Enrollment::Enrolled => bail!(Unsupported(
+            "This computer already trusts Luft's key.".to_owned()
+        )),
+        Enrollment::Pending => {
+            let request = Request::load().unwrap_or_default();
+            match request.code.clone() {
+                Some(code) => {
+                    show_on_restart(&request);
+                    Ok(code)
+                }
+                None => ask_again(request),
+            }
+        }
+        Enrollment::None => ask_shim(Request::default()),
     }
-    ask_shim(Request::default())
+}
+
+fn revoke() -> Result<()> {
+    Tool::new("mokutil").arg("--revoke-import").status()
+}
+
+fn ask_again(request: Request) -> Result<String> {
+    revoke()?;
+    ask_shim(request)
 }
 
 pub(super) fn hash_file(scratch: &Scratch, code: &str) -> Result<PathBuf> {
@@ -106,7 +124,7 @@ pub fn follow_up() -> Result<()> {
     match (enrollment(), Request::load()) {
         (Enrollment::Enrolled, _) => Request::forget(),
         (Enrollment::Pending, Some(request)) => show_on_restart(&request),
-        (Enrollment::Pending, None) => {}
+        (Enrollment::Pending, None) => ask_again(Request::default()).map(drop)?,
         (Enrollment::None, Some(request)) if request.code.is_some() => missed(request)?,
         (Enrollment::None, Some(_)) => {}
         (Enrollment::None, None) => missed(Request::default())?,
@@ -116,7 +134,7 @@ pub fn follow_up() -> Result<()> {
 
 pub fn cancel() -> Result<()> {
     if enrollment() == Enrollment::Pending {
-        Tool::new("mokutil").arg("--revoke-import").status()?;
+        revoke()?;
     }
     Request::declined(AUTOMATIC_ATTEMPTS).save()?;
     show_on_restart(&Request::default());

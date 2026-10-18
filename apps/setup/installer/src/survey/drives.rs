@@ -7,9 +7,10 @@ use serde::Serialize;
 
 use super::room;
 use luft_meet::Handoff;
+use luft_meet::regional::Hints;
 use luft_windows::bluetooth::Pairing;
 
-use super::windows::{self, Hints};
+use super::windows;
 use crate::install::drive::layout::{ESP_TYPE, Startup};
 
 const LIVE_MEDIUM: &str = "/run/initramfs";

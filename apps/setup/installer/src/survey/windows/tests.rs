@@ -1,6 +1,8 @@
 use luft_windows::testing::{Entry, HiveBuilder, Image, Value};
 
-use super::{Hints, Keyboard, hints, inspect, keyboards, zones};
+use luft_meet::regional::{Hints, Keyboard};
+
+use super::inspect;
 
 fn entry(path: &'static str, contents: Vec<u8>, age_days: u64) -> Entry {
     Entry {
@@ -36,11 +38,11 @@ fn software_hive(product: &'static str, build: &'static str) -> Vec<u8> {
         .build()
 }
 
-fn keyboard(layout: &str, variant: &str) -> Option<Keyboard> {
-    Some(Keyboard {
+fn keyboard(layout: &str, variant: &str) -> Keyboard {
+    Keyboard {
         layout: layout.into(),
         variant: variant.into(),
-    })
+    }
 }
 
 #[test]
@@ -78,6 +80,16 @@ fn reads_installation_from_newest_user_profile() {
             r"Keyboard Layout\Substitutes",
             "00000413",
             Value::Sz("00020409".into()),
+        )
+        .set(
+            r"Keyboard Layout\Preload",
+            "2",
+            Value::Sz("00000407".into()),
+        )
+        .set(
+            r"Control Panel\Desktop",
+            "PreferredUILanguages",
+            Value::Sz("en-GB".into()),
         )
         .build();
     let mut hiberfil = b"HIBR".to_vec();
@@ -119,9 +131,10 @@ fn reads_installation_from_newest_user_profile() {
     assert_eq!(
         windows.hints,
         Hints {
-            timezone: Some("Europe/Berlin".into()),
-            keyboard: keyboard("us", "intl"),
+            language: Some("en_GB".into()),
             locale: Some("nl_NL".into()),
+            timezone: Some("Europe/Amsterdam".into()),
+            keyboards: vec![keyboard("us", "intl"), keyboard("de", "")],
         }
     );
 }
@@ -171,9 +184,10 @@ fn falls_back_to_default_user_hive() {
     assert_eq!(
         windows.hints,
         Hints {
-            timezone: Some("Europe/Paris".into()),
-            keyboard: keyboard("de", ""),
+            language: None,
             locale: Some("de_DE".into()),
+            timezone: Some("Europe/Paris".into()),
+            keyboards: vec![keyboard("de", "")],
         }
     );
 }
@@ -184,29 +198,4 @@ fn ignores_volumes_without_windows() {
         return;
     };
     assert!(inspect(image.open()).unwrap().is_none());
-}
-
-#[test]
-fn maps_windows_time_zones() {
-    assert_eq!(zones::iana("Tokyo Standard Time"), Some("Asia/Tokyo"));
-    assert_eq!(zones::iana("UTC"), Some("Etc/UTC"));
-    assert_eq!(zones::iana("Mars Standard Time"), None);
-}
-
-#[test]
-fn maps_keyboard_layouts() {
-    assert_eq!(keyboards::xkb("0001041f"), keyboard("tr", "f"));
-    assert_eq!(keyboards::xkb("00000807"), keyboard("ch", ""));
-    assert_eq!(keyboards::xkb("00000415"), keyboard("pl", ""));
-    assert_eq!(keyboards::xkb("E0010804"), None);
-}
-
-#[test]
-fn converts_locale_names() {
-    assert_eq!(hints::posix_locale("pt-BR").as_deref(), Some("pt_BR"));
-    assert_eq!(
-        hints::posix_locale("sr-Latn-RS").as_deref(),
-        Some("sr_RS@latin")
-    );
-    assert_eq!(hints::posix_locale("es-419"), None);
 }

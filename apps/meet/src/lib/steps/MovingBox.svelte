@@ -28,7 +28,6 @@
 	let bluetooth = $state(true);
 	let paired = $derived(session.windows?.bluetooth ?? 0);
 	let account = $state(true);
-	let regional = $state(true);
 
 	let chosen = $derived(found?.folders.filter((folder) => folders[folder.kind]) ?? []);
 	let total = $derived(chosen.reduce((sum, folder) => sum + folder.bytes, 0));
@@ -53,7 +52,6 @@
 			folders: chosen.map(({ kind, path }) => ({ kind, path })),
 			wallpaper: wallpaper ? found.wallpaper : null,
 			account: account ? $state.snapshot(found.account) : null,
-			regional: regional ? $state.snapshot(found.regional) : null,
 			wifi,
 			bluetooth: bluetooth && paired > 0
 		});
@@ -114,14 +112,6 @@
 					<span class="flex flex-col">
 						<span class="text-[14.5px] font-medium text-[var(--text)]">Your name and picture</span>
 						<span class="text-[12.5px] text-[var(--text-muted)]">{found.account.fullName}</span>
-					</span>
-				</Checkbox>
-			</div>
-			<div class="row">
-				<Checkbox label="Time zone, keyboard and language" checked={regional} onchange={(next) => (regional = next)}>
-					<span class="flex flex-col">
-						<span class="text-[14.5px] font-medium text-[var(--text)]">Time zone, keyboard and language</span>
-						<span class="text-[12.5px] text-[var(--text-muted)]">So Luft is set up like Windows</span>
 					</span>
 				</Checkbox>
 			</div>

@@ -14,7 +14,7 @@ The steps people see are in [Try Luft with Meet Luft](https://docs.luft.computer
 - The download is checked against its `.sha256`, and the live system is copied out of the ISO as it arrives.
 - The start entry *Meet Luft* goes at the end of the firmware's list, and the firmware is asked to use it once (`BootNext`). Some firmware drops entries it doesn't know, so Meet Luft puts it back before each restart. Luft starts through Fedora's signed shim and GRUB, like the stick.
 - The clock (`RealTimeIsUniversal`) and Fast Startup are changed in Windows itself, so they work with BitLocker on, where Luft can't read Windows' drive.
-- The moving box holds folders from the Windows account, the wallpaper, name and account picture, time zone, keyboard and language, Bluetooth pairings, and Wi-Fi networks with their passwords when ticked.
+- The moving box holds folders from the Windows account, the wallpaper, name and account picture, Bluetooth pairings, and Wi-Fi networks with their passwords when ticked.
 
 ### Partitions
 
@@ -27,7 +27,7 @@ The steps people see are in [Try Luft with Meet Luft](https://docs.luft.computer
 
 When Windows encrypts new partitions with BitLocker as soon as they're formatted, as it does on PCs with device encryption, Meet Luft decrypts its own right away, so the firmware and Luft can read them. Windows' drive stays encrypted. Meet Luft also notes the partitions it made in `C:\ProgramData\Lantharos\Meet Luft\made.json`, so it can always take them back out.
 
-`meet.json` names Meet Luft's partitions by their GUIDs, the room, the start entry and whether the last restart was to try or to install. The live system finds its partition with `root=luft-live:PARTUUID=…` on the kernel command line; the stick uses `root=luft-live:LABEL=…`. None of the partitions get a drive letter.
+`meet.json` names Meet Luft's partitions by their GUIDs, the room, the start entry and whether the last restart was to try or to install. Before each restart it also notes the display language, formats, time zone and keyboard layouts in use, already turned into their Linux names (CLDR's mapping for the time zone, which picks the zone for the formats' country, so *Central Europe Standard Time* in Serbia is Europe/Belgrade), so Install Luft can start with them. On Linux they come from the session's locale, `/etc/localtime` and the GNOME, Plasma or system keyboard settings. The live system finds its partition with `root=luft-live:PARTUUID=…` on the kernel command line; the stick uses `root=luft-live:LABEL=…`. None of the partitions get a drive letter.
 
 At Luft's first start after installing, before the login screen, it removes the start entry, the moving box, the start and live partitions, and grows into the space they used.
 

@@ -22,8 +22,8 @@ Meet Luft downloads only the Luft your computer needs: the image with NVIDIA's d
 2. **It makes room.** Windows makes its own partition smaller, the same way Disk Management does, so this works with BitLocker on. Then Meet Luft downloads Luft, checks it against its checksum, and unpacks it as it arrives.
 3. **It restarts into Luft.** Luft starts through Fedora's signed boot loader, so Secure Boot can stay on. The restart after that goes back to Windows.
    - **Try Luft** opens the desktop. Nothing is installed.
-   - **Install Luft** opens the installer with **Alongside Windows** already chosen, in the room Meet Luft made. Nothing on the drive changes until you confirm there.
-4. **It packs a moving box**, if you like: folders from your Windows account, your wallpaper, your name and account picture, time zone, keyboard and language, Bluetooth devices, and Wi-Fi networks with their passwords (only when you tick that). The installer fills in your name and regional settings from it and unpacks the rest into your new account.
+   - **Install Luft** opens the installer with **Alongside Windows** already chosen, in the room Meet Luft made, and your language, time zone and keyboard already filled in from Windows. **More options** shows the other ways to install. Nothing on the drive changes until you confirm there.
+4. **It packs a moving box**, if you like: folders from your Windows account, your wallpaper, your name and account picture, Bluetooth devices, and Wi-Fi networks with their passwords (only when you tick that). The installer fills in your name from it and unpacks the rest into your new account.
 
 Before restarting, Meet Luft offers to keep the clock right in both systems and, when you install, to turn off Fast Startup. It changes both in Windows itself, so they work with BitLocker on. [Installing alongside Windows](/start/alongside-windows/) explains why they matter.
 

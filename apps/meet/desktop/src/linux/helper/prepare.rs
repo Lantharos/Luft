@@ -1,6 +1,7 @@
 use std::path::Path;
 
 use luft_meet::handoff::{self, Folder, Handoff, Intent, Made as Kind};
+use luft_meet::regional::Hints;
 
 use super::disks::{self, Block};
 use super::efi::Efivars;
@@ -112,6 +113,7 @@ fn build(context: &Context, source: &Source, blocks: &[Block], spot: &Spot) -> R
             filesystem: spot.uuid()?.to_owned(),
             folder: spot.on_filesystem.clone(),
         }),
+        hints: Hints::default(),
     };
     write_handoff(&spot.folder, &handoff)
 }

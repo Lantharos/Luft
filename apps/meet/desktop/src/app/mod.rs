@@ -10,6 +10,10 @@ mod link;
 mod logs;
 #[cfg(windows)]
 mod on_windows;
+#[cfg(windows)]
+mod regional;
+#[cfg(windows)]
+mod registry;
 mod stick;
 
 use std::sync::{Arc, OnceLock};
@@ -21,6 +25,7 @@ use serde_json::Value;
 use crate::linux::app as platform;
 use crate::live::download::Channel;
 use crate::live::source::Source;
+use crate::protocol::Call;
 #[cfg(windows)]
 use on_windows as platform;
 
@@ -61,7 +66,9 @@ fn window(window: SabineWindow, events: &Events) -> SabineWindow {
         .bridge_typed("meet_platform", |_: Value| {
             Ok::<_, BridgeError>(platform::PLATFORM)
         });
-    let window = job::command(window, "meet_call", events, platform::call);
+    let window = job::command(window, "meet_call", events, |events, call: Call| {
+        platform::call(events, call.with_hints(platform::hints))
+    });
     let window = job::command(window, "meet_belongings", events, |_, _: Value| {
         platform::belongings()
     });

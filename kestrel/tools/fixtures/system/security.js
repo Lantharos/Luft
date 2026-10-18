@@ -62,9 +62,11 @@ const attribute = (id, summary, level, flags) => ({
 
 export const SECURITY_NAMES = ['com.lantharos.Trust1', 'com.lantharos.UsbProtection1', 'org.freedesktop.fwupd'];
 
+const overridden = (defaults, overrides) => Object.defineProperties(defaults, Object.getOwnPropertyDescriptors(overrides));
+
 export function publishSecurity(publish, calls, model, trust = {}) {
   const startups = [[WINDOWS_ESP, 'EFI/Microsoft', 'windows', [[0, 'Windows Boot Manager']], []]];
-  publish(TRUST, {
+  publish(TRUST, overridden({
     SecureBoot: 'on',
     Tpm: variants({Present: 'b', Version: 's', Usable: 'b', Reason: 's'}, {Present: true, Version: '2.0', Usable: true, Reason: ''}),
     SigningKey: variants({State: 's', Available: 'b', Reason: 's', Missed: 'u', MissedThisBoot: 'b', OtherKeys: 'as', RemovingOtherKeys: 'b'},
@@ -102,8 +104,7 @@ export function publishSecurity(publish, calls, model, trust = {}) {
       calls.push('GrowSystem');
       return 0;
     },
-    ...trust,
-  }, '/com/lantharos/Trust1');
+  }, trust), '/com/lantharos/Trust1');
   const drives = drivesService(calls, model, RECOVERY_KEY);
   drives.attach(publish(DRIVES, drives.implementation, '/com/lantharos/Trust1'));
 

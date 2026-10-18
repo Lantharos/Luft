@@ -1,12 +1,24 @@
 use serde::Serialize;
 
 const RULES: &str = "/usr/share/X11/xkb/rules/evdev.xml";
+const UNDETERMINED: &str = "und";
 
 #[derive(Serialize)]
 pub struct Keyboard {
     layout: String,
     variant: String,
     name: String,
+}
+
+fn placeholder(layout: roxmltree::Node) -> bool {
+    let mut languages = layout
+        .descendants()
+        .find(|child| child.has_tag_name("configItem"))
+        .into_iter()
+        .flat_map(|item| item.descendants())
+        .filter(|node| node.has_tag_name("iso639Id"))
+        .peekable();
+    languages.peek().is_some() && languages.all(|language| language.text() == Some(UNDETERMINED))
 }
 
 fn text<'a>(node: roxmltree::Node<'a, '_>, name: &str) -> Option<&'a str> {
@@ -30,7 +42,7 @@ pub fn all() -> Vec<Keyboard> {
     };
     let mut keyboards: Vec<Keyboard> = document
         .descendants()
-        .filter(|node| node.has_tag_name("layout"))
+        .filter(|node| node.has_tag_name("layout") && !placeholder(*node))
         .flat_map(|layout| {
             let id = text(layout, "name").unwrap_or_default().to_owned();
             let base = Keyboard {

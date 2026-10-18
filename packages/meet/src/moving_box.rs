@@ -61,14 +61,6 @@ pub struct Account {
     pub picture: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq, Eq)]
-#[serde(rename_all = "camelCase")]
-pub struct Regional {
-    pub time_zone: Option<String>,
-    pub keyboard: Option<String>,
-    pub locale: Option<String>,
-}
-
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct Bluetooth {
@@ -82,7 +74,6 @@ pub struct Bluetooth {
 #[serde(rename_all = "camelCase", default)]
 pub struct Manifest {
     pub account: Option<Account>,
-    pub regional: Option<Regional>,
     pub wallpaper: Option<String>,
     pub wifi: Vec<String>,
     pub bluetooth: Option<Bluetooth>,

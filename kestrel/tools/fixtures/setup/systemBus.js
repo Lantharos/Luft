@@ -11,8 +11,12 @@ import {NETWORK_MANAGER_NAME, publishNetworkManager} from './networkManager.js';
 const CALLS = `<node><interface name="com.lantharos.KestrelChecks.Calls">
   <method name="Take"><arg type="as" direction="out"/></method>
 </interface></node>`;
+const TRUST_CONTROL = `<node><interface name="com.lantharos.KestrelChecks.Trust">
+  <method name="SetSigningKey"><arg type="s" direction="in"/></method>
+</interface></node>`;
 
 const calls = [];
+const signingKey = {State: 'none', Available: true, Reason: '', Missed: 0, MissedThisBoot: false};
 const published = [];
 
 function publish(xml, implementation, path) {
@@ -24,9 +28,11 @@ function publish(xml, implementation, path) {
 
 publishBasics(publish, calls);
 publish(CALLS, {Take: () => calls.splice(0)}, '/com/lantharos/KestrelChecks');
+publish(TRUST_CONTROL, {SetSigningKey: state => (signingKey.State = state)}, '/com/lantharos/KestrelChecks/Trust');
 publishSecurity(publish, calls, publishUdisks(calls), {
-  SigningKey: variants({State: 's', Available: 'b', Reason: 's', Missed: 'u', MissedThisBoot: 'b'},
-    {State: 'none', Available: true, Reason: '', Missed: 0, MissedThisBoot: false}),
+  get SigningKey() {
+    return variants({State: 's', Available: 'b', Reason: 's', Missed: 'u', MissedThisBoot: 'b'}, signingKey);
+  },
   Disk: variants({Device: 's', Encrypted: 'b', State: 's', Progress: 'd', Remaining: 't', Unlock: 'as', RecoveryKeyStored: 'b', TpmRefused: 'b'},
     {Device: '/dev/nvme0n1p3', Encrypted: false, State: 'off', Progress: 0, Remaining: 0, Unlock: [], RecoveryKeyStored: false, TpmRefused: false}),
   EnrollSigningKey: () => {

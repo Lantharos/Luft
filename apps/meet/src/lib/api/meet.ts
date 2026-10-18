@@ -70,24 +70,16 @@ export interface Account {
 	picture: string | null;
 }
 
-export interface Regional {
-	timeZone: string | null;
-	keyboard: string | null;
-	locale: string | null;
-}
-
 export interface Belongings {
 	folders: FoundFolder[];
 	wallpaper: string | null;
 	account: Account;
-	regional: Regional;
 }
 
 export interface Packing {
 	folders: { kind: FolderKind; path: string }[];
 	wallpaper: string | null;
 	account: Account | null;
-	regional: Regional | null;
 	wifi: boolean;
 	bluetooth: boolean;
 }

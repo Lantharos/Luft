@@ -43,7 +43,7 @@ class InstallState {
 		this.surveyError = '';
 		try {
 			this.survey = await installer.survey();
-			regional.suggestFrom(this.survey.hints, this.survey.firmwareLanguage);
+			regional.suggestFrom(this.survey.hints);
 		} catch (error) {
 			this.surveyError = String(error);
 		} finally {

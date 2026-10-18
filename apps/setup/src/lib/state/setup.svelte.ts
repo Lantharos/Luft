@@ -6,7 +6,7 @@ import { regional } from './regional.svelte.js';
 
 function firstBootSkips(trust: TrustState | null, hardware: Hardware): Step[] {
 	const skips: Step[] = [];
-	if (!trust || trust.secureBoot !== 'on' || trust.key === 'enrolled' || !trust.keyAvailable) skips.push('secure-boot');
+	if (!trust || trust.secureBoot !== 'on' || trust.key !== 'none' || !trust.keyAvailable) skips.push('secure-boot');
 	if (!trust || trust.encrypted || trust.encryption !== 'off') skips.push('protect');
 	if (!hardware.fingerprint) skips.push('fingerprint');
 	return skips;

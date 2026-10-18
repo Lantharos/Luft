@@ -74,9 +74,10 @@ export interface Keyboard {
 }
 
 export interface Hints {
-	timezone: string | null;
-	keyboard: Keyboard | null;
+	language: string | null;
 	locale: string | null;
+	timezone: string | null;
+	keyboards: Keyboard[];
 }
 
 export interface MeetSurvey {
@@ -89,7 +90,6 @@ export interface MeetSurvey {
 export interface Survey {
 	drives: Drive[];
 	hints: Hints;
-	firmwareLanguage: string | null;
 	smallestSystem: number;
 	meet: MeetSurvey | null;
 	systems: LinuxSystem[];

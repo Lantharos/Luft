@@ -1,15 +1,7 @@
 import { catalog, formatsCountry, locate, setFormats, useKeyboard, useZone, type Catalog, type KeyboardLayout, type Zone } from '#lib/api/system.js';
 import type { Hints, Keyboard } from '#lib/api/installer.js';
-import { countryOf, DEFAULT_LANGUAGE, keyboardFor, languageFor, LANGUAGES, type Language } from '#lib/regional/languages.js';
-
-type Field = 'language' | 'keyboard' | 'zone';
-
-interface Suggestion {
-	country?: string | null;
-	timezone?: string | null;
-	keyboard?: Keyboard | null;
-	locale?: string | null;
-}
+import { describe, outranks, type Field, type Guesses, type Source } from '#lib/regional/guesses.js';
+import { countryOf, DEFAULT_LANGUAGE, keyboardFor, languageFor, languageNamed, LANGUAGES, type Language } from '#lib/regional/languages.js';
 
 const FALLBACK_ZONE = 'UTC';
 
@@ -20,11 +12,13 @@ class RegionalState {
 	language = $state<Language>(DEFAULT_LANGUAGE);
 	keyboard = $state<Keyboard>({ layout: 'us', variant: '' });
 	zone = $state(FALLBACK_ZONE);
+	guesses = $state<Guesses>({});
 	private chosen = new Set<Field>();
 	private located = false;
 
 	keyboardName = $derived(this.catalog.keyboards.find((entry) => sameKeyboard(entry, this.keyboard))?.name ?? this.keyboard.layout);
 	zoneEntry = $derived(this.catalog.zones.find((entry) => entry.id === this.zone) ?? null);
+	description = $derived(describe(this.guesses));
 
 	async start() {
 		this.catalog = await catalog();
@@ -36,21 +30,18 @@ class RegionalState {
 		const location = await locate().catch(() => null);
 		if (!location?.time_zone) return;
 		this.located = true;
-		if (!this.chosen.has('zone') && location.time_zone !== this.zone) this.applyZone(location.time_zone);
+		if (this.guess('zone', 'network')) this.applyZone(location.time_zone);
 	}
 
-	suggestFrom(hints: Hints, firmwareLanguage: string | null) {
-		this.suggest({ country: countryOf(firmwareLanguage), locale: firmwareLanguage });
-		this.suggest({ country: countryOf(hints.locale), timezone: hints.timezone, keyboard: hints.keyboard, locale: hints.locale });
-	}
-
-	suggest({ country = null, timezone = null, keyboard = null, locale = null }: Suggestion) {
-		const language = languageFor(countryOf(locale)) ?? languageFor(country);
-		if (language && !this.chosen.has('language')) this.language = language;
-		const layout = keyboard ?? (keyboardFor(country) ? { layout: keyboardFor(country)!, variant: '' } : null);
-		if (layout && !this.chosen.has('keyboard') && !sameKeyboard(layout, this.keyboard)) this.applyKeyboard(layout);
-		const zone = timezone ?? this.catalog.zones.find((entry) => entry.code === country)?.id ?? null;
-		if (zone && !this.chosen.has('zone') && zone !== this.zone) this.applyZone(zone);
+	suggestFrom(hints: Hints) {
+		const country = countryOf(hints.locale);
+		const language = languageNamed(hints.language) ?? languageFor(country);
+		if (language && this.guess('language', 'computer')) this.language = language;
+		const layout = keyboardFor(country);
+		const keyboard = hints.keyboards[0] ?? (layout ? { layout, variant: '' } : null);
+		if (keyboard && this.guess('keyboard', 'computer')) this.applyKeyboard(keyboard);
+		const zone = hints.timezone ?? this.catalog.zones.find((entry) => entry.code === country)?.id;
+		if (zone && this.guess('zone', 'computer')) this.applyZone(zone);
 	}
 
 	async adoptFormats() {
@@ -75,12 +66,20 @@ class RegionalState {
 		this.applyZone(zone.id);
 	}
 
+	private guess(field: Field, source: Source) {
+		if (this.chosen.has(field) || !outranks(source, this.guesses[field])) return false;
+		this.guesses[field] = source;
+		return true;
+	}
+
 	private applyKeyboard(keyboard: Keyboard) {
+		if (sameKeyboard(keyboard, this.keyboard)) return;
 		this.keyboard = keyboard;
 		void useKeyboard(keyboard.layout, keyboard.variant).catch(() => {});
 	}
 
 	private applyZone(zone: string) {
+		if (zone === this.zone) return;
 		this.zone = zone;
 		void useZone(zone).catch(() => {});
 	}

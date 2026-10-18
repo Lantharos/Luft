@@ -47,9 +47,11 @@ fn handle(context: &Context, call: Call) -> Result<Value, String> {
         }
         Call::Refresh { source } => serde_json::to_value(refresh::refresh(context, &source)?),
         Call::Pack { belongings } => serde_json::to_value(pack::pack(context, &belongings)?),
-        Call::Restart { intent, windows } => {
-            serde_json::to_value(drive::state::restart(intent, windows)?)
-        }
+        Call::Restart {
+            intent,
+            windows,
+            hints,
+        } => serde_json::to_value(drive::state::restart(intent, windows, hints)?),
         Call::Tidy => serde_json::to_value(prepare::tidy()?),
         Call::FirmwareSettings => serde_json::to_value(system::firmware::restart_into_settings()?),
         Call::Undo => serde_json::to_value(undo::undo(context)?),

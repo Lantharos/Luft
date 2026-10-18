@@ -208,7 +208,6 @@ pub fn pack(context: &Context, belongings: &Belongings) -> Result<Prepared, Stri
             user_name: account.user_name.clone(),
             picture: picture.as_ref().map(|item| item.target.clone()),
         }),
-        regional: belongings.regional.clone(),
         wallpaper: wallpaper.as_ref().map(|item| item.target.clone()),
         wifi: wifi.iter().map(|item| item.target.clone()).collect(),
         bluetooth: bluetooth_keys.as_ref().map(|keys| Bluetooth {

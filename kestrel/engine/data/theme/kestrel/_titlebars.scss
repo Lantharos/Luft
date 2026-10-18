@@ -1,0 +1,20 @@
+.kestrel-titlebar-shadow { border-radius: 15px; background-color: rgba(3, 2, 1, 0); box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5); }
+.kestrel-titlebar-shadow:backdrop { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25); }
+.kestrel-titlebar-shadow.kestrel-titlebar-square { border-radius: 0; box-shadow: none; }
+
+.kestrel-titlebar {
+  padding: 0 6px;
+  border-radius: 15px 15px 0 0;
+  background-color: pick(#f3f3f0, #111110);
+  color: pick(#1b1b19, #f3f3ef);
+  font-family: "Open Runde", sans-serif;
+  transition-duration: $motion-tap;
+}
+.kestrel-titlebar:backdrop { color: #75756e; }
+.kestrel-titlebar.kestrel-titlebar-square { border-radius: 0; }
+.kestrel-titlebar-title { margin: 0 10px; font-size: 13px; font-weight: 600; }
+.kestrel-titlebar-buttons { spacing: 4px; }
+.kestrel-titlebar-button { width: 28px; height: 28px; border-radius: 999px; color: #75756e; transition-duration: $motion-tap; }
+.kestrel-titlebar-button:hover { background-color: rgba(pick(#1b1b19, #f3f3ef), 0.065); color: pick(#1b1b19, #f3f3ef); }
+.kestrel-titlebar:backdrop .kestrel-titlebar-button { color: rgba(#75756e, 0.7); }
+.kestrel-titlebar-icon { icon-size: 16px; }

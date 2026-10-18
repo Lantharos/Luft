@@ -32,7 +32,7 @@ function drawnAtTarget(actor) {
         return false;
     const [, width, height] = actor.get_texture().get_preferred_size();
     const buffer = window.get_buffer_rect();
-    return near(width, buffer.width) && near(height, buffer.height);
+    return near(width, buffer.width) && near(height, buffer.height - window.get_titlebar_height());
 }
 
 /**

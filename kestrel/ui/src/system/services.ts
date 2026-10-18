@@ -1,4 +1,6 @@
 
+import Mtk from 'gi://Mtk';
+
 import type { Context } from '../context.js';
 import { AppearanceService } from '../appearance/service.js';
 import { FontRefresh } from '../appearance/fonts.js';
@@ -6,6 +8,7 @@ import { SystemPrompts } from '../auth/keyring/prompts.js';
 import { PasskeyPrompts } from '../auth/passkeys/service.js';
 import { LoginWallpaper } from '../desktop/wallpaper/loginWallpaper.js';
 import { LaunchFeedback } from '../desktop/windows/launchFeedback.js';
+import { TitleBars } from '../desktop/windows/titleBars/titleBars.js';
 import { VariableRefresh } from '../desktop/windows/variableRefresh.js';
 import { PortalBackend } from '../portal/backend.js';
 import { Farewell } from '../session/farewell.js';
@@ -28,6 +31,7 @@ export class SystemServices {
   private readonly plugSounds = new PlugSounds();
   private readonly launchFeedback = new LaunchFeedback();
   private readonly variableRefresh = new VariableRefresh();
+  private readonly titleBars: TitleBars;
   private readonly loginScreen: { destroy(): void }[];
   private readonly farewell = new Farewell();
   private readonly fontRefresh = new FontRefresh();
@@ -39,6 +43,8 @@ export class SystemServices {
   private readonly peek: PeekService;
 
   constructor(context: Context, ownsTheScreen: boolean, openStart: () => void) {
+    this.titleBars = new TitleBars((window, x, y) =>
+      context.showWindowMenu(window, new Mtk.Rectangle({ x: Math.round(x), y: Math.round(y), width: 0, height: 0 })));
     this.loginScreen = ownsTheScreen ? [new LoginWallpaper(), new LoginDisplays(), new LoginNumLock()] : [];
     this.portal = PortalBackend.forSession(context);
     this.passkeys = new PasskeyPrompts(context);
@@ -67,6 +73,7 @@ export class SystemServices {
     this.plugSounds.destroy();
     this.launchFeedback.destroy();
     this.variableRefresh.destroy();
+    this.titleBars.destroy();
     this.portal.destroy();
     this.passkeys.destroy();
   }

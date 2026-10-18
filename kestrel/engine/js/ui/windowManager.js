@@ -1335,6 +1335,10 @@ export class WindowManager {
         this._windowMenuManager.showWindowMenuForWindow(window, menu, rect);
     }
 
+    showWindowMenu(window, rect) {
+        this._windowMenuManager.showWindowMenuForWindow(window, Meta.WindowMenuType.WM, rect);
+    }
+
     _startSwitcher(display, window, event, binding) {
         const name = binding.get_name();
         if (name === 'switch-applications' && binding.get_modifiers() & Clutter.ModifierType.SUPER_MASK) {

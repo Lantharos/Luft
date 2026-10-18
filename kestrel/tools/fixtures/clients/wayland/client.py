@@ -75,12 +75,13 @@ class Toplevel:
         self.width, self.height, self.pixel, self.pixel_format = width, height, pixel, pixel_format
         connection.send(ids["compositor"], 0, struct.pack("=I", ids["surface"]))
 
-    def map(self, title, app_id):
+    def map(self, title, app_id, prepare=lambda: None):
         connection, ids = self.connection, self.ids
         connection.send(ids["wm_base"], 2, struct.pack("=II", ids["xdg_surface"], ids["surface"]))
         connection.send(ids["xdg_surface"], 1, struct.pack("=I", ids["toplevel"]))
         connection.send(ids["toplevel"], 2, string(title))
         connection.send(ids["toplevel"], 3, string(app_id))
+        prepare()
         connection.send(ids["surface"], 6)
         size = self.width * self.height * 4
         fd = os.memfd_create("kestrel-toplevel")

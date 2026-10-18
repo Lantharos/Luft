@@ -13,6 +13,7 @@ import { GlyphFiles } from './icons/glyphFiles.js';
 import { AccentStylesheet } from './stylesheet.js';
 import { AppThemes } from './themes/appThemes.js';
 import { taskbarStylesheet } from '../desktop/panel/ink/taskbarStylesheet.js';
+import { titleBarStylesheet } from '../desktop/windows/titleBars/titleBarStylesheet.js';
 
 const APPEARANCE_INTERFACE = `<node>
   <interface name="com.lantharos.Kestrel.Appearance">
@@ -38,7 +39,8 @@ const PROPERTIES: [string, string][] = [
 const PERSIST_DELAY = 400;
 
 export class AppearanceService {
-  private readonly stylesheet = new AccentStylesheet('accent', taskbarStylesheet);
+  private readonly stylesheet = new AccentStylesheet('accent', (seed, palette, variant) =>
+    taskbarStylesheet(seed, palette, variant) + titleBarStylesheet(palette, variant));
   private readonly configDirectory = GLib.build_filenamev([GLib.get_user_config_dir(), 'kestrel']);
   private readonly interfaceSettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.interface' });
   private readonly settings = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });

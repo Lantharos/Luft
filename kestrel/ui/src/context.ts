@@ -45,6 +45,7 @@ export interface Context {
   screenShield: { active: boolean; connect(signal: string, callback: () => void): number; disconnect(id: number): void } | null;
   canInteract(): boolean;
   snapWindow(window: Meta.Window, rect: Mtk.Rectangle): void;
+  showWindowMenu(window: Meta.Window, rect: Mtk.Rectangle): void;
   swipeWorkspaces(event: Clutter.Event): boolean;
   activateWindow(window: Meta.Window): void;
   openScreenshot(): void;

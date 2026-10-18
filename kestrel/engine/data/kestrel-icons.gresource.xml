@@ -20,6 +20,9 @@
     <file preprocess="xml-stripblanks">scalable/actions/shell-focus-desktop-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/actions/shell-focus-desktop-symbolic-rtl.svg</file>
     <file preprocess="xml-stripblanks">scalable/actions/shell-focus-windows-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">scalable/actions/titlebar-close-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">scalable/actions/titlebar-maximize-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">scalable/actions/titlebar-minimize-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/apps/com.lantharos.barometer-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/apps/com.lantharos.disks-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/apps/com.lantharos.draft-symbolic.svg</file>

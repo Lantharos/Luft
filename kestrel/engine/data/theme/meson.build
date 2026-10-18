@@ -45,6 +45,7 @@ theme_sources = files([
   'kestrel/_quick-settings.scss',
   'kestrel/_start.scss',
   'kestrel/_surfaces.scss',
+  'kestrel/_titlebars.scss',
   'kestrel/_tokens.scss',
 ])
 

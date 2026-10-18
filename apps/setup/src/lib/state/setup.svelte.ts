@@ -15,8 +15,12 @@ function firstBootSkips(trust: TrustState | null, hardware: Hardware): Step[] {
 class SetupState {
 	hardware = $state<Hardware>(NO_HARDWARE);
 	trust = $state<TrustState | null>(null);
-	needsRestart = $state(false);
+	secureBootCode = $state('');
+	stagedRecoveryKey = $state('');
+	refusedFingers = $state<string[]>([]);
 	ready = $state(false);
+
+	needsRestart = $derived(Boolean(this.secureBootCode || this.stagedRecoveryKey));
 
 	async start() {
 		const state = await appState();
@@ -34,10 +38,6 @@ class SetupState {
 		}
 		this.ready = true;
 		return () => stops.forEach((stop) => stop());
-	}
-
-	async refreshTrust() {
-		this.trust = await trustState().catch(() => null);
 	}
 }
 

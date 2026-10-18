@@ -52,11 +52,11 @@ function progressMessage(result: string, swipe: boolean) {
 		case 'enroll-completed':
 			return 'Fingerprint added.';
 		case 'enroll-data-full':
-			return 'The reader has no room for more fingerprints.';
+			return 'The reader has no room left for another fingerprint.';
 		case 'enroll-disconnected':
-			return 'The fingerprint reader was disconnected.';
+			return 'The fingerprint reader stopped answering. Try again in a moment.';
 		case 'enroll-duplicate':
-			return 'This fingerprint has already been added.';
+			return 'The reader already has this finger saved, probably by Windows or another account. Use a different finger.';
 		default:
 			return 'Couldn’t add this fingerprint. Try again.';
 	}
@@ -65,12 +65,21 @@ function progressMessage(result: string, swipe: boolean) {
 export class FingerprintEnrollment {
 	phase = $state<EnrollPhase>('choosing');
 	message = $state('');
+	private result = $state('');
 	private passed = $state(0);
 	private stopListening: (() => void) | null = null;
 	private readonly reader: Pick<Fingerprints, 'swipe' | 'stages'>;
 
 	constructor(reader: Pick<Fingerprints, 'swipe' | 'stages'>) {
 		this.reader = reader;
+	}
+
+	get needsOtherFinger() {
+		return this.result === 'enroll-duplicate';
+	}
+
+	get readerFull() {
+		return this.result === 'enroll-data-full';
 	}
 
 	get progress() {
@@ -82,11 +91,14 @@ export class FingerprintEnrollment {
 		const { swipe } = this.reader;
 		this.phase = 'scanning';
 		this.passed = 0;
+		this.result = '';
 		this.message = `${swipe ? 'Swipe' : 'Place'} your ${fingerLabel(finger).toLowerCase()} ${swipe ? 'across' : 'on'} the sensor.`;
 		this.stopListening ??= listen<EnrollProgress>(PROGRESS, ({ result, done }) => {
 			if (result === 'enroll-stage-passed') this.passed += 1;
 			this.message = progressMessage(result, swipe);
-			if (done) this.phase = result === 'enroll-completed' ? 'added' : 'failed';
+			if (!done) return;
+			this.result = result;
+			this.phase = result === 'enroll-completed' ? 'added' : 'failed';
 		});
 		try {
 			await invoke<void>('fingerprint_enroll', { finger }, { timeoutMs: WAIT_FOR_PERMISSION });
@@ -98,6 +110,11 @@ export class FingerprintEnrollment {
 
 	cancel() {
 		if (this.phase === 'scanning') void invoke<void>('fingerprint_stop');
+	}
+
+	choose() {
+		this.cancel();
+		this.phase = 'choosing';
 	}
 
 	destroy() {

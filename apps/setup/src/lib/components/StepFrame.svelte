@@ -10,9 +10,10 @@
 		children?: Snippet;
 		actions?: Snippet;
 		onback?: () => void;
+		hideBack?: boolean;
 	}
 
-	let { title, description, children, actions, onback }: Props = $props();
+	let { title, description, children, actions, onback, hideBack = false }: Props = $props();
 
 	let installing = $derived(install.started && !install.failed && !install.finished && flow.step !== 'finishing');
 	let percent = $derived(Math.round((install.status?.progress ?? 0) * 100));
@@ -30,7 +31,7 @@
 	</div>
 	<footer class="mt-5 grid min-h-10 grid-cols-[1fr_auto_1fr] items-center gap-3">
 		<div class="flex justify-start">
-			{#if onback || flow.canGoBack}
+			{#if !hideBack && (onback || flow.canGoBack)}
 				<button type="button" class="plain-button large -ml-3" onclick={() => (onback ? onback() : flow.back())}><ArrowLeft size={17} />Back</button>
 			{/if}
 		</div>

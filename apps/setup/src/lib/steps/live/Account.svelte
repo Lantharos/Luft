@@ -51,7 +51,7 @@
 </script>
 
 <form class="contents" onsubmit={submit}>
-	<StepFrame title="Who’s using this computer?" description="This is the account you sign in with. You can add more people later in Settings.">
+	<StepFrame title="Who’s using this computer?" description="This is the account you sign in with. You can add more people later in Settings." hideBack={saving}>
 		<div class="grid max-w-[520px] gap-3">
 			<TextField bind:value={fullName} label="Your name" showLabel placeholder="Ada Lovelace" autocomplete="name" error={fullNameError} live />
 			<TextField bind:value={userName} label="User name" showLabel error={nameError} live onkeydown={() => (editedUserName = true)} />

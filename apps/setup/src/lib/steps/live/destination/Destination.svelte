@@ -83,7 +83,7 @@
 	}
 </script>
 
-<StepFrame {title} {description} onback={view === 'choose' ? undefined : back}>
+<StepFrame {title} {description} onback={view === 'choose' ? undefined : back} hideBack={install.starting}>
 	{#if !survey}
 		<div class="flex items-center gap-3 py-2 text-[14px] text-[var(--text-soft)]">
 			{#if install.surveyError}

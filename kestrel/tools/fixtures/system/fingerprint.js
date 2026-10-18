@@ -21,6 +21,7 @@ export const FINGERPRINT_NAME = 'net.reactivated.Fprint';
 const DEVICE_PATH = '/net/reactivated/Fprint/Device/0';
 const STAGES = 3;
 const SCAN_INTERVAL = 400;
+const SAVED_BY_WINDOWS = ['right-index-finger'];
 
 export function publishFingerprint(publish, calls) {
   const enrolled = [];
@@ -39,6 +40,10 @@ export function publishFingerprint(publish, calls) {
       let scans = 0;
       GLib.timeout_add(GLib.PRIORITY_DEFAULT, SCAN_INTERVAL, () => {
         scans += 1;
+        if (SAVED_BY_WINDOWS.includes(finger)) {
+          status('enroll-duplicate', true);
+          return GLib.SOURCE_REMOVE;
+        }
         if (scans < STAGES) {
           status('enroll-stage-passed', false);
           return GLib.SOURCE_CONTINUE;

@@ -6,8 +6,9 @@ import {pause} from '../lib/wait.js';
 import {eventually, Setup} from './lib/driver.js';
 
 const AT = {
+  back: [85, 547],
   code: [690, 547],
-  notNow: [560, 547],
+  later: [560, 547],
   encrypt: [680, 547],
   kept: [70, 420],
   addFingerprint: [690, 547],
@@ -21,7 +22,7 @@ async function checkSecureBoot(setup) {
   await setup.click(AT.code, 'asking for the code shows it');
   await setup.called('EnrollSigningKey', 'the code comes from trustd, which asks shim to add the key');
   await setup.shot('secure-boot-code');
-  await setup.click(AT.notNow, 'putting the key off moves on to encryption');
+  await setup.click(AT.later, 'restarting later moves on to encryption');
 }
 
 async function checkProtect(setup) {
@@ -33,12 +34,25 @@ async function checkProtect(setup) {
   await setup.called('TurnOnEncryption', 'encryption is turned on through trustd');
 }
 
+async function released(setup, times, label) {
+  await eventually(async () => (await setup.calls()).filter(call => call === 'fingerprint Release').length === times, label);
+  await setup.app.settle(() => true);
+}
+
 async function checkFingerprint(setup) {
   await setup.shot('fingerprint');
   await setup.click(AT.addFingerprint, 'adding a fingerprint starts scanning');
-  await setup.called('fingerprint EnrollStart right-index-finger', 'the right index finger is added through fprintd');
-  await eventually(async () => (await setup.calls()).includes('fingerprint Release'), 'the reader is released once the finger is added');
-  await setup.app.settle(() => true);
+  await setup.called('fingerprint EnrollStart right-index-finger', 'the right index finger is tried first');
+  await released(setup, 1, 'the reader is released once it says Windows already saved the finger');
+  await setup.shot('fingerprint-duplicate');
+  await setup.click(AT.back, 'going back from the refused finger shows the finger choice again');
+  await setup.shot('fingerprint-back');
+  await setup.click(AT.back, 'going back from the finger choice shows the encryption already set up');
+  await setup.shot('protect-staged');
+  await setup.click(AT.continue, 'continuing from the set up encryption returns to fingerprints');
+  await setup.click(AT.addFingerprint, 'adding a fingerprint starts scanning');
+  await setup.called('fingerprint EnrollStart left-index-finger', 'the next finger is offered after the refused one');
+  await released(setup, 2, 'the reader is released once the finger is added');
   await setup.shot('fingerprint-added');
   await setup.click(AT.continue, 'continuing moves on');
 }

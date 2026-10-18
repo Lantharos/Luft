@@ -16,6 +16,14 @@
 
 	let options = $derived(fingers.map(([value, label]) => ({ value, label })));
 
+	let refused = $state<string[]>([]);
+
+	function chooseAnother() {
+		refused = [...refused, finger];
+		enrollment.choose();
+		finger = fingers.find(([value]) => !refused.includes(value))?.[0] ?? finger;
+	}
+
 	function close() {
 		enrollment.cancel();
 		onclose();
@@ -41,7 +49,11 @@
 			<button type="button" class="button" onclick={close}>Cancel</button>
 		{:else if enrollment.phase === 'failed'}
 			<button type="button" class="button" onclick={close}>Close</button>
-			<button type="button" class="button primary" onclick={() => enrollment.start(finger)}>Try again</button>
+			{#if enrollment.needsOtherFinger}
+				<button type="button" class="button primary" onclick={chooseAnother}>Choose another finger</button>
+			{:else if !enrollment.readerFull}
+				<button type="button" class="button primary" onclick={() => enrollment.start(finger)}>Try again</button>
+			{/if}
 		{:else}
 			<button type="button" class="button primary" onclick={close}>Done</button>
 		{/if}

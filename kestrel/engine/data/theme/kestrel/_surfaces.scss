@@ -38,7 +38,8 @@
 .kestrel-emoji-header { padding: 12px 4px 0; font-size: 12px; font-weight: 600; color: ink(0.60); }
 .kestrel-emoji-name { padding: 0 4px; height: 16px; font-size: 12px; color: ink(0.65); }
 
-.kestrel-task-view { background-color: glass(scrim); color: ink(); }
+.kestrel-task-view { color: ink(); }
+.kestrel-task-scrim { background-color: glass(scrim); }
 .kestrel-task-window { padding: 0; border-radius: 14px; background-color: transparent; box-shadow: none; transition-duration: $motion-tap; }
 .kestrel-task-window:hover, .kestrel-task-window:focus { background-color: fill(0.08); }
 .kestrel-task-header { spacing: 8px; padding: 0 4px 6px 6px; }

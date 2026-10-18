@@ -1,5 +1,5 @@
 import Gio from 'gi://Gio';
-import {Spring, switchWorkspace, taskViewOpen, toggleSurface, touchpad as handleTouchpad} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
+import {Spring, switchWorkspace, taskViewOpen, taskViewProgress, toggleSurface, touchpad as handleTouchpad} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {openBoardWindow} from '../board/lib/board.js';
@@ -151,15 +151,15 @@ async function checkTaskView() {
   toggleSurface('tasks');
   await waitUntil(() => !view.visible, 'the task view hides when closed mid-opening', 2000);
   toggleSurface('tasks');
-  await waitUntil(() => view.opacity === 255, 'the task view opens', 2000);
+  await waitUntil(() => taskViewProgress() === 1, 'the task view opens', 2000);
   toggleSurface('tasks');
   await pause(60);
-  const fading = view.opacity;
+  const leaving = taskViewProgress();
   toggleSurface('tasks');
   await nextFrame();
-  require(fading < 255 && view.opacity >= fading, 'reopening the task view mid-close carries on from where it was');
-  await waitUntil(() => view.opacity === 255 && view.get_first_child().get_transition('scale-x') === null, 'the reopened task view settles', 2000);
-  require(taskViewOpen() && view.get_first_child().scale_x === 1, 'the reopened task view ends fully open');
+  require(leaving < 1 && taskViewProgress() >= leaving, 'reopening the task view mid-close carries on from where it was');
+  await waitUntil(() => taskViewProgress() === 1, 'the reopened task view settles', 2000);
+  require(taskViewOpen(), 'the reopened task view ends fully open');
   toggleSurface('tasks');
   await waitUntil(() => !view.visible, 'the task view closes', 2000);
 }
@@ -180,26 +180,24 @@ const letGo = () => handleTouchpad(touchpad.swipe('end', 4));
 
 async function checkTaskViewGesture() {
   const view = named('kestrel-task-view');
-  const windows = () => view.get_first_child();
-  const still = () => view.get_transition('opacity') === null && windows().get_transition('scale-x') === null;
+  const shown = taskViewProgress;
 
   await fourFingers(1, 20, {thenHold: true});
-  require(view.visible && view.opacity > 0 && view.opacity < 255 && windows().scale_x < 1,
+  require(view.visible && shown() > 0 && shown() < 1,
     'four fingers moving down bring the task view in under the fingers');
   letGo();
   await waitUntil(() => !view.visible && !taskViewOpen(), 'letting go of a short, slow swipe puts the task view away', 2000);
 
   await fourFingers(1, 160);
-  const stretched = windows().scale_x;
-  require(view.opacity === 255 && stretched > 1 && stretched < 1.04, 'swiping past fully open resists');
+  const stretched = shown();
+  require(stretched > 1 && stretched < 1.5, 'swiping past fully open resists');
   letGo();
-  await waitUntil(() => taskViewOpen() && still(), 'a long swipe down opens the task view', 2000);
-  require(view.opacity === 255 && windows().scale_x === 1, 'the task view settles fully open');
+  await waitUntil(() => taskViewOpen() && shown() === 1, 'a long swipe down opens the task view', 2000);
 
   await fourFingers(-1, 20);
-  require(view.opacity < 255 && windows().scale_x < 1, 'four fingers moving up take the task view away with them');
+  require(shown() < 1, 'four fingers moving up take the task view away with them');
   for (let i = 0; i < 20; i++) handleTouchpad(touchpad.swipe('update', 4, 0, STEP));
-  require(view.opacity === 255, 'moving back down mid-way brings it back');
+  require(shown() >= 1, 'moving back down mid-way brings it back');
   for (let i = 0; i < 30; i++) handleTouchpad(touchpad.swipe('update', 4, 0, -STEP));
   letGo();
   await waitUntil(() => !view.visible && !taskViewOpen(), 'a quick swipe up closes the task view', 2000);

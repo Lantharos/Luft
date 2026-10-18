@@ -108,7 +108,7 @@ class KestrelUi {
     const snapLayouts = new SnapLayouts(index => context.layoutManager.getWorkAreaForMonitor(index), context.snapWindow, close);
     this.taskView = new TaskView(context.createBackground, workspace => this.board.frameOf(workspace), close, context.activateWindow);
     this.liveWallpaper = new LiveWallpaper(() => context.layoutManager.monitors);
-    this.rotation = new RotationAnimation(context.layoutManager);
+    this.rotation = new RotationAnimation(context.layoutManager, context.createBackground);
     this.surfaces = new Surfaces({
       context,
       menus: this.menus,
@@ -297,6 +297,7 @@ class KestrelUi {
   }
 
   taskViewOpen(): boolean { return this.taskView.visible; }
+  taskViewProgress(): number { return this.taskView.progress; }
 
   touchpad(event: Clutter.Event): boolean {
     return this.fourFingers.handle(event) || this.board.input.handle(event);
@@ -382,6 +383,8 @@ export function taskbarClearance(): number { return taskbarPreferences.clearance
 export function taskbarOwnsBottomEdge(): boolean { return currentUi !== null && taskbarPreferences.touch; }
 
 export function taskViewOpen(): boolean { return currentUi?.taskViewOpen() ?? false; }
+
+export function taskViewProgress(): number { return currentUi?.taskViewProgress() ?? 0; }
 
 export function lockControls(): LockControls { return currentUi!.lockControls(); }
 

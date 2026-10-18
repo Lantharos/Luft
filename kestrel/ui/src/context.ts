@@ -24,6 +24,7 @@ export interface CaretPopup {
 interface LayoutManager {
   primaryMonitor: Monitor | null;
   monitors: Monitor[];
+  uiGroup: Clutter.Actor;
   addChrome(actor: Clutter.Actor, params?: Record<string, boolean>): void;
   addTopChrome(actor: Clutter.Actor, params?: Record<string, boolean>): void;
   removeChrome(actor: Clutter.Actor): void;

@@ -6,6 +6,7 @@ import * as DND from 'resource:///com/lantharos/kestrel/ui/dnd.js';
 
 import { windowIcon } from '../../appearance/icons/appIcons.js';
 import { animateActor, Duration } from '../../shared/motion.js';
+import type { Monitor } from '../panel/panel.js';
 import type { Rect } from './grid.js';
 
 export const CARD_HEADER = 30;
@@ -16,24 +17,25 @@ export class WindowCard {
   readonly actor: St.Button;
   private readonly preview = new St.Widget({ style_class: 'kestrel-task-preview', clip_to_allocation: true });
   private readonly title: St.Label;
+  private readonly header = new St.BoxLayout({ style_class: 'kestrel-task-header', height: CARD_HEADER });
   private readonly clone: Clutter.Clone | null = null;
+  private origin = { x: 0, y: 0, scale: 1 };
   private readonly signals: number[] = [];
 
   constructor(readonly window: Meta.Window, activate: () => void, changed: () => void) {
     const app = Shell.WindowTracker.get_default().get_window_app(window);
-    const header = new St.BoxLayout({ style_class: 'kestrel-task-header', height: CARD_HEADER });
     const icon = app ? windowIcon(app, window, 16) : new St.Icon({ icon_name: 'application-x-executable-symbolic', icon_size: 16 });
     icon.y_align = Clutter.ActorAlign.CENTER;
-    header.add_child(icon);
+    this.header.add_child(icon);
     this.title = new St.Label({ style_class: 'kestrel-task-title', x_expand: true, y_align: Clutter.ActorAlign.CENTER });
-    header.add_child(this.title);
+    this.header.add_child(this.title);
     const close = new St.Button({ style_class: 'kestrel-task-close', opacity: 0, accessible_name: 'Close window',
       child: new St.Icon({ icon_name: 'window-close-symbolic', icon_size: 14 }) });
     close.connect('clicked', () => window.delete((global as unknown as Shell.Global).get_current_time()));
-    header.add_child(close);
+    this.header.add_child(close);
 
     const body = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL });
-    body.add_child(header);
+    body.add_child(this.header);
     body.add_child(this.preview);
     this.actor = new St.Button({ style_class: 'kestrel-task-window', child: body, can_focus: true, track_hover: true,
       button_mask: St.ButtonMask.PRIMARY | St.ButtonMask.MIDDLE });
@@ -76,17 +78,31 @@ export class WindowCard {
     draggable.connect('drag-end', () => { this.actor.opacity = 255; });
   }
 
-  place({ x, y, width, height }: Rect): void {
+  place({ x, y, width, height }: Rect, monitor: Monitor): void {
+    const frame = this.window.get_frame_rect();
+    const scale = this.window.minimized ? 1 : frame.width / width;
+    this.origin = this.window.minimized
+      ? { x: 0, y: 0, scale }
+      : { x: frame.x - monitor.x - x, y: frame.y - monitor.y - y - CARD_HEADER * scale, scale };
     this.actor.set_position(x, y);
     this.actor.set_size(width, height);
     const previewHeight = height - CARD_HEADER;
     this.preview.set_size(width, previewHeight);
     if (!this.clone) return;
-    const frame = this.window.get_frame_rect();
     const buffer = this.window.get_buffer_rect();
-    const scale = width / frame.width;
-    this.clone.set_position(Math.round((buffer.x - frame.x) * scale), Math.round((buffer.y - frame.y) * scale));
-    this.clone.set_size(Math.round(buffer.width * scale), Math.round(buffer.height * scale));
+    const fit = width / frame.width;
+    this.clone.set_position(Math.round((buffer.x - frame.x) * fit), Math.round((buffer.y - frame.y) * fit));
+    this.clone.set_size(Math.round(buffer.width * fit), Math.round(buffer.height * fit));
+  }
+
+  morph(shown: number): void {
+    const away = 1 - shown;
+    const scale = 1 + (this.origin.scale - 1) * away;
+    const opacity = Math.round(255 * Math.min(1, Math.max(0, shown)));
+    this.actor.set_scale(scale, scale);
+    this.actor.set_translation(this.origin.x * away, this.origin.y * away, 0);
+    this.header.opacity = opacity;
+    if (this.window.minimized) this.actor.opacity = opacity;
   }
 
   destroy(): void {

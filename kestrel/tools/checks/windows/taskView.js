@@ -14,7 +14,7 @@ export async function run() {
   gjs('clients/window.js', ['--multiple']);
   const windows = await waitForWindows(['Kestrel window check 1', 'Kestrel window check 2']);
   const view = named('kestrel-task-view');
-  const cards = () => view.get_first_child().get_children();
+  const cards = () => named('kestrel-task-windows').get_children();
   const desktops = () => view.get_last_child().get_children();
 
   await chord(Clutter.KEY_Super_L, Clutter.KEY_Tab);

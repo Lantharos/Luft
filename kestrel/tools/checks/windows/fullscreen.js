@@ -34,7 +34,7 @@ async function checkStart(game, panel) {
 
 async function checkTaskView(game) {
   const view = named('kestrel-task-view');
-  const cards = () => view.get_first_child().get_children();
+  const cards = () => named('kestrel-task-windows').get_children();
   const desktops = () => view.get_last_child().get_children();
   await chord(Clutter.KEY_Super_L, Clutter.KEY_Tab);
   await eventually(() => shown(view) && cards().length === 1, 'Super+Tab opens the task view over a fullscreen game');

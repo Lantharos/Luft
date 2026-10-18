@@ -51,6 +51,10 @@ class BaseWorkspaceGroup extends Clutter.Actor {
         return this._workspace;
     }
 
+    get background() {
+        return this._background;
+    }
+
     _shouldShowWindow(_window) {
         throw new GObject.NotImplementedError();
     }
@@ -256,6 +260,9 @@ export const MonitorGroup = GObject.registerClass({
             else
                 x += this.baseDistance;
         }
+
+        const activeGroup = this._workspaceGroups.find(g => g.workspace === activeWorkspace) ?? this._workspaceGroups[0];
+        this.insert_child_below(new Clutter.Clone({source: activeGroup.background}), this._container);
 
         this.progress = this.getWorkspaceProgress(activeWorkspace);
 

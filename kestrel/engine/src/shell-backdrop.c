@@ -13,10 +13,35 @@ typedef struct
   int capacity_width;
   int capacity_height;
   MtkRectangle geometry;
+  MtkRectangle shown;
+  int shown_uniform;
   MtkRegion *valid;
 } Backdrop;
 
 #define CAPACITY_STEP 64
+
+static const char *shown_area_declarations =
+  "uniform vec4 backdrop_shown_area;\n";
+
+static const char *shown_area_lookup =
+  "  cogl_tex_coord.st = clamp (cogl_tex_coord.st,\n"
+  "                             backdrop_shown_area.xy,\n"
+  "                             backdrop_shown_area.zw);\n";
+
+static CoglSnippet *
+shown_area_snippet (void)
+{
+  static CoglSnippet *snippet;
+
+  if (!snippet)
+    {
+      snippet = cogl_snippet_new (COGL_SNIPPET_HOOK_TEXTURE_LOOKUP,
+                                  shown_area_declarations, NULL);
+      cogl_snippet_set_pre (snippet, shown_area_lookup);
+    }
+
+  return snippet;
+}
 
 static void
 view_destroyed (gpointer data,
@@ -93,6 +118,9 @@ allocate_backdrop (Backdrop        *backdrop,
                                   COGL_PIPELINE_FILTER_LINEAR);
   cogl_pipeline_set_layer_wrap_mode (backdrop->pipeline, 0,
                                     COGL_PIPELINE_WRAP_MODE_CLAMP_TO_EDGE);
+  cogl_pipeline_add_layer_snippet (backdrop->pipeline, 0, shown_area_snippet ());
+  backdrop->shown_uniform =
+    cogl_pipeline_get_uniform_location (backdrop->pipeline, "backdrop_shown_area");
   cogl_framebuffer_clear4f (backdrop->framebuffer, COGL_BUFFER_BIT_COLOR, 0, 0, 0, 0);
 }
 
@@ -149,6 +177,7 @@ ensure_backdrop (GHashTable          *cache,
   g_clear_pointer (&backdrop->valid, mtk_region_unref);
   backdrop->valid = mtk_region_create ();
   backdrop->geometry = *geometry;
+  backdrop->shown = (MtkRectangle) { 0 };
 
   if (holds (backdrop, source, geometry))
     {
@@ -165,6 +194,27 @@ ensure_backdrop (GHashTable          *cache,
     map_texture_to_geometry (backdrop);
 
   return backdrop;
+}
+
+static gboolean
+clamp_to_shown_area (Backdrop        *backdrop,
+                     const MtkRegion *visible)
+{
+  MtkRectangle shown = mtk_region_get_extents (visible);
+  float texel_x = 0.5f / backdrop->capacity_width;
+  float texel_y = 0.5f / backdrop->capacity_height;
+  float area[4];
+
+  if (mtk_rectangle_equal (&backdrop->shown, &shown))
+    return FALSE;
+
+  backdrop->shown = shown;
+  area[0] = (float) (shown.x - backdrop->geometry.x) / backdrop->capacity_width + texel_x;
+  area[1] = (float) (shown.y - backdrop->geometry.y) / backdrop->capacity_height + texel_y;
+  area[2] = (float) (shown.x + shown.width - backdrop->geometry.x) / backdrop->capacity_width - texel_x;
+  area[3] = (float) (shown.y + shown.height - backdrop->geometry.y) / backdrop->capacity_height - texel_y;
+  cogl_pipeline_set_uniform_float (backdrop->pipeline, backdrop->shown_uniform, 4, 1, area);
+  return TRUE;
 }
 
 CoglPipeline *
@@ -206,6 +256,9 @@ shell_backdrop_capture (GHashTable          *cache,
       clip = (MtkRectangle) { x1, y1, x2 - x1, y2 - y1 };
       mtk_region_intersect_rectangle (visible, &clip);
     }
+
+  if (!mtk_region_is_empty (visible))
+    *changed |= clamp_to_shown_area (backdrop, visible);
 
   if (damage && view)
     {

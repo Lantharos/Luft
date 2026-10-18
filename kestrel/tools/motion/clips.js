@@ -4,7 +4,7 @@ import {dismissImmediately, switchWorkspace, toggleSurface, touchpad as handleTo
 
 import {leaveBoard, openBoardWindow, openWindows, showBoard} from '../checks/board/lib/board.js';
 import {touchpad} from '../checks/board/lib/touchpad.js';
-import {chord, rest} from '../checks/lib/input.js';
+import {chord, rest, swipe} from '../checks/lib/input.js';
 import {stop, stopAll, waitForWindow} from '../checks/lib/processes.js';
 import {nextFrame, pause, settled} from '../checks/lib/wait.js';
 
@@ -108,7 +108,24 @@ async function fourFingers(...moves) {
   handleTouchpad(touchpad.swipe('end', 4));
 }
 
+async function threeFingersPastFirstWorkspace() {
+  const towardsPrevious = new Gio.Settings({schema_id: 'org.gnome.desktop.peripherals.touchpad'}).get_boolean('natural-scroll') ? 1 : -1;
+  swipe(Clutter.TouchpadGesturePhase.BEGIN);
+  for (let i = 0; i < 20; i++) {
+    swipe(Clutter.TouchpadGesturePhase.UPDATE, towardsPrevious * FINGER_STEP);
+    await nextFrame();
+  }
+  swipe(Clutter.TouchpadGesturePhase.END);
+}
+
 async function gestures(clip) {
+  await reset();
+  const client = openBoardWindow('Clip', '800', '500');
+  const window = await waitForWindow(w => w.get_title()?.startsWith('Clip'), 'the clip window opens');
+  window.maximize();
+  await settled();
+  await clip('workspace-past-first-fingers', threeFingersPastFirstWorkspace, {notes: 'Three fingers past the first workspace with a maximized window'});
+  await stop(client);
   await reset();
   await openWindows();
   await settled();

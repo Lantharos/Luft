@@ -1,10 +1,12 @@
 import Clutter from 'gi://Clutter';
+import Cogl from 'gi://Cogl';
 import Mtk from 'gi://Mtk';
 import type Meta from 'gi://Meta';
 import type Shell from 'gi://Shell';
 
 import type { Monitor } from '../panel/panel.js';
-import { animateActor, Curve, Duration, reducedMotion, Spring } from '../../shared/motion.js';
+import { animateActor, Curve, Duration, reducedMotion } from '../../shared/motion.js';
+import { TurningLayer } from './turningLayer.js';
 
 const QUARTER = 90;
 const TRANSFORMS = 4;
@@ -17,8 +19,13 @@ interface Snapshot {
   angle: number;
 }
 
+interface Background {
+  destroy(): void;
+}
+
 interface MonitorSource {
   monitors: Monitor[];
+  uiGroup: Clutter.Actor;
   connect(signal: string, callback: () => void): number;
   disconnect(id: number): void;
 }
@@ -40,8 +47,12 @@ export class RotationAnimation {
   private readonly signals: [{ disconnect(id: number): void }, number][];
   private snapshots: Snapshot[] = [];
   private readonly playing = new Set<Clutter.Actor>();
+  private hiddenScene: number | null = null;
 
-  constructor(private readonly layout: MonitorSource) {
+  constructor(
+    private readonly layout: MonitorSource,
+    private readonly createBackground: (container: Clutter.Actor, monitorIndex: number) => Background,
+  ) {
     this.signals = [
       [this.manager, this.manager.connect('rotating', (_manager, index, from, to) => this.capture(index, from, to))],
       [layout, layout.connect('monitors-changed', () => this.play())],
@@ -51,6 +62,7 @@ export class RotationAnimation {
   destroy(): void {
     for (const [object, id] of this.signals) object.disconnect(id);
     for (const actor of this.playing) actor.destroy();
+    if (this.hiddenScene !== null) this.layout.uiGroup.opacity = this.hiddenScene;
   }
 
   private capture(index: number, from: number, to: number): void {
@@ -67,35 +79,60 @@ export class RotationAnimation {
   private play(): void {
     const snapshots = this.snapshots;
     this.snapshots = [];
-    for (const snapshot of snapshots) {
+    const turning = snapshots.flatMap(snapshot => {
       const monitor = this.layout.monitors[snapshot.index];
-      if (monitor) this.turn(snapshot, monitor);
+      return monitor ? [{ snapshot, monitor }] : [];
+    });
+    if (!turning.length) return;
+    if (reducedMotion()) {
+      for (const { snapshot, monitor } of turning) this.fade(snapshot, monitor);
+      return;
     }
+    if (turning.length === this.layout.monitors.length) this.hideScene();
+    for (const { snapshot, monitor } of turning) this.turn(snapshot, monitor);
   }
 
-  private turn({ content, width, height, angle }: Snapshot, monitor: Monitor): void {
-    const { stage } = shell();
+  private hideScene(): void {
+    const scene = this.layout.uiGroup;
+    this.hiddenScene ??= scene.opacity;
+    scene.opacity = 0;
+  }
+
+  private finish(frame: Clutter.Actor): void {
+    this.playing.delete(frame);
+    frame.destroy();
+    if (this.playing.size || this.hiddenScene === null) return;
+    this.layout.uiGroup.opacity = this.hiddenScene;
+    this.hiddenScene = null;
+  }
+
+  private overlay(monitor: Monitor): Clutter.Actor {
     const frame = new Clutter.Actor({ name: 'kestrel-rotation', x: monitor.x, y: monitor.y, width: monitor.width, height: monitor.height, clip_to_allocation: true });
+    shell().stage.add_child(frame);
+    this.playing.add(frame);
+    return frame;
+  }
+
+  private turn(snapshot: Snapshot, monitor: Monitor): void {
+    const frame = this.overlay(monitor);
+    frame.background_color = new Cogl.Color({ red: 0, green: 0, blue: 0, alpha: 255 });
+    const wallpaper = new Clutter.Actor({ width: monitor.width, height: monitor.height });
+    const background = this.createBackground(wallpaper, monitor.index);
+    frame.connect('destroy', () => background.destroy());
+    frame.add_child(wallpaper);
+    const layer = new TurningLayer(snapshot, monitor, this.layout.uiGroup);
+    frame.add_child(layer.actor);
+    layer.play(() => this.finish(frame));
+  }
+
+  private fade({ content, width, height, angle }: Snapshot, monitor: Monitor): void {
+    const frame = this.overlay(monitor);
     const picture = new Clutter.Actor({
-      content, width, height,
+      content, width, height, rotation_angle_z: angle,
       x: Math.round((monitor.width - width) / 2), y: Math.round((monitor.height - height) / 2),
     });
     picture.set_pivot_point(0.5, 0.5);
-    picture.set_content_scaling_filters(Clutter.ScalingFilter.LINEAR, Clutter.ScalingFilter.LINEAR);
     frame.add_child(picture);
-    stage.add_child(frame);
-    this.playing.add(frame);
-    const done = () => {
-      this.playing.delete(frame);
-      frame.destroy();
-    };
-    if (reducedMotion()) {
-      animateActor(picture, { opacity: 0, duration: Duration.standard, curve: Curve.decelerate, onStopped: done });
-      return;
-    }
-    const fit = Math.min(monitor.width / width, monitor.height / height);
-    picture.rotation_angle_z = angle;
-    animateActor(picture, { rotation_angle_z: 0, scale_x: fit, scale_y: fit, spring: Spring.smooth });
-    animateActor(picture, { opacity: 0, duration: Duration.standard, delay: Duration.quick, curve: Curve.decelerate, onStopped: done });
+    animateActor(picture, { opacity: 0, duration: Duration.standard, curve: Curve.decelerate, onStopped: () => this.finish(frame) });
   }
 }

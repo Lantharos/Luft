@@ -17,6 +17,8 @@ export function summarize({ disk, secureBoot }: Trust, firmwareUpdates: number):
 			return { headline: 'Turning off device encryption', sentence: `${progressLine(disk)}. Keep working while it finishes.`, safe: false };
 		case 'starting':
 			return { headline: 'Restart to start encrypting', sentence: 'Encryption starts the next time this computer restarts.', safe: false };
+		case 'failed':
+			return { headline: 'Encryption didn’t start', sentence: 'Luft started without it and your files weren’t changed. Turn it on again to try once more.', safe: false };
 		case 'off':
 			return disk.device ? { headline: 'Your device could be safer', sentence: 'Turn on device encryption to keep your files private.', safe: false } : null;
 	}

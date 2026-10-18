@@ -47,7 +47,11 @@
 		<Switch label="Device encryption" checked onchange={() => (open = 'off')} />
 	</Row>
 {:else if disk.device}
-	<Row title="Device encryption" description="Keeps your files private if this computer is lost" icon={LockKeyhole}>
+	<Row
+		title="Device encryption"
+		description={disk.state === 'failed' ? 'Didn’t start at the last restart, your files weren’t changed' : 'Keeps your files private if this computer is lost'}
+		icon={LockKeyhole}
+	>
 		<button type="button" class="button" onclick={() => (open = 'on')}>Turn on</button>
 	</Row>
 {/if}

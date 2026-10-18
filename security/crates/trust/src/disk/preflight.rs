@@ -5,9 +5,9 @@ use crate::system::blocks;
 use crate::system::command::Tool;
 use crate::system::{efi, power, tpm};
 
+use super::room::HEADER_ROOM;
 use super::{SystemDisk, keys};
 
-const HEADER_ROOM: u64 = 32 << 20;
 const FREE_SPACE: u64 = 1 << 30;
 
 pub struct Check {

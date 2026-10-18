@@ -61,7 +61,7 @@ Steps:
 
 1. Save the recovery key.
 2. The file system shrinks by 32 MB for the header, and the plan waits on the EFI system partition, with the recovery key sealed to the TPM (or to the passphrase without one).
-3. At the next restart Sushi shows "Encrypting your device" for a few seconds while the header is written.
+3. At the next restart Sushi shows "Encrypting your device" for a few seconds while the header is written. If the file system no longer leaves the 32 MB free, the disk isn't touched: Luft starts unencrypted and Settings says encryption didn't start. Disks won't resize the system's partition while encryption waits for the restart.
 4. The rest is encrypted in the background at idle priority, pausing on battery. A crash or power cut loses nothing.
 5. When it finishes, the TPM is linked and the disk unlocks without a prompt.
 

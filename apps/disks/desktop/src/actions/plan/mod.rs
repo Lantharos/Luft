@@ -7,6 +7,7 @@ use serde::Deserialize;
 
 use super::formatting::{self, Format};
 use super::mounting;
+use crate::trust;
 use crate::udisks::{self, BLOCK, ENCRYPTED, FILESYSTEM, PARTITION, TABLE, no_options};
 use guard::Guard;
 
@@ -134,6 +135,9 @@ async fn place(
     let guard = Guard::volume(block).await?;
     if offset == guard.offset {
         guard.resizable()?;
+        if guard.system && trust::system_encryption_starting().await? {
+            return Err("Device encryption starts at the next restart, so the system's partition keeps its size until then".to_owned());
+        }
         resize::resize(block, size, !guard.system).await?;
         return Ok(None);
     }

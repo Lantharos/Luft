@@ -2,8 +2,9 @@ use std::path::Path;
 
 use anyhow::{Context, Result, bail};
 
+use super::room::HEADER_ROOM;
 use super::state::{Change, Mode, Plan};
-use super::{SystemDisk, keys, preflight, stage};
+use super::{SystemDisk, initrd, keys, preflight, stage};
 use crate::errors::Unsupported;
 use crate::paths;
 use crate::system::blocks;
@@ -11,7 +12,6 @@ use crate::system::command::Tool;
 use crate::system::secret::Secret;
 use crate::system::tpm;
 
-const HEADER_ROOM: u64 = 32 << 20;
 const SHORTEST_PASSPHRASE: usize = 8;
 
 fn new_uuid() -> Result<String> {
@@ -105,6 +105,7 @@ pub fn turn_on(recovery_key: &Secret, pin: &Secret, passphrase: &Secret) -> Resu
         bail!(Unsupported("A PIN needs a TPM.".to_owned()));
     }
     let disk = SystemDisk::find()?;
+    initrd::forget_result();
     let plan = Plan {
         change: Change::Encrypt,
         uuid: new_uuid()?,

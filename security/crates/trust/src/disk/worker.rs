@@ -2,10 +2,9 @@ use std::sync::atomic::AtomicBool;
 
 use anyhow::{Context, Result, bail};
 
-use super::initrd::RESULT;
 pub use super::reencrypt::Progress;
 use super::state::{Change, Mode, Plan};
-use super::{SystemDisk, keys, luks, mask, reencrypt, stage};
+use super::{SystemDisk, initrd, keys, luks, mask, reencrypt, stage};
 use crate::errors::NeedsKey;
 use crate::system::secret::Secret;
 use crate::system::{keyring, power};
@@ -72,7 +71,6 @@ fn abandon_start() {
     keys::forget_kept_pin();
     keys::forget_kept_passphrase();
     Plan::finish();
-    let _ = std::fs::remove_file(RESULT);
 }
 
 pub fn run(plan: &Plan, mut report: impl FnMut(Progress)) -> Result<bool> {
@@ -80,7 +78,7 @@ pub fn run(plan: &Plan, mut report: impl FnMut(Progress)) -> Result<bool> {
     let header_file = plan.header_file();
     let header = luks::read(&plan.partition(), header_file.as_deref(), disk.size())?;
     if plan.change == Change::Encrypt && header.is_none() {
-        if std::fs::read_to_string(RESULT).is_ok_and(|result| result == "failed") {
+        if initrd::start_failed() {
             abandon_start();
         }
         return Ok(false);

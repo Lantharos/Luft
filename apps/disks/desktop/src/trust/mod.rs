@@ -42,14 +42,22 @@ fn drive(map: &Map) -> DriveState {
     }
 }
 
-async fn system_protected() -> Result<bool, String> {
-    let disk = client::read(TRUST)
+async fn system_disk() -> Result<Map, String> {
+    Ok(client::read(TRUST)
         .await?
         .and_then(|properties| get::<OwnedVariant>(&properties, "Disk"))
         .and_then(|value| Map::try_from(value).ok())
-        .unwrap_or_default();
+        .unwrap_or_default())
+}
+
+async fn system_protected() -> Result<bool, String> {
+    let disk = system_disk().await?;
     Ok(get::<bool>(&disk, "Encrypted").unwrap_or(false)
         && get::<String>(&disk, "State").as_deref() == Some("on"))
+}
+
+pub async fn system_encryption_starting() -> Result<bool, String> {
+    Ok(get::<String>(&system_disk().await?, "State").as_deref() == Some("starting"))
 }
 
 pub async fn state() -> Result<Protection, String> {

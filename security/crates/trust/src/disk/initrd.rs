@@ -3,6 +3,7 @@ use std::time::{Duration, Instant};
 
 use anyhow::{Context, Result, bail};
 
+use super::room::{self, HEADER_ROOM};
 use super::state::{Change, MAPPING, Mode, Plan};
 use super::{keys, luks, mask, stage};
 use crate::paths;
@@ -13,7 +14,9 @@ use crate::system::{blocks, efi, keyring};
 
 const DEVICE_WAIT: Duration = Duration::from_secs(90);
 const ATTEMPTS: usize = 5;
-pub const RESULT: &str = "/run/trustd/encryption-result";
+const RESULT: &str = "/run/trustd/encryption-result";
+const STARTED: &str = "started";
+const FAILED: &str = "failed";
 const ESP: &str = "/run/trustd/esp";
 
 struct MountedEsp;
@@ -119,14 +122,9 @@ fn start_encrypting(plan: &Plan, device: &Path, key: &Secret) -> Result<()> {
             "--type",
             "luks2",
         ])
-        .args([
-            "--reduce-device-size",
-            "32M",
-            "--uuid",
-            &plan.uuid,
-            "--key-file",
-            "-",
-        ])
+        .arg("--reduce-device-size")
+        .arg(format!("{}M", HEADER_ROOM >> 20))
+        .args(["--uuid", &plan.uuid, "--key-file", "-"])
         .arg(device)
         .input(key)
         .status();
@@ -150,6 +148,14 @@ fn current_uuid(device: &Path) -> Option<String> {
 fn record(result: &str) {
     let _ = paths::ensure_private(paths::RUNTIME);
     let _ = std::fs::write(RESULT, result);
+}
+
+pub fn start_failed() -> bool {
+    std::fs::read_to_string(RESULT).is_ok_and(|result| result == FAILED)
+}
+
+pub fn forget_result() {
+    let _ = std::fs::remove_file(RESULT);
 }
 
 fn attach(plan: &Plan, device: &Path, header: Option<&Path>) -> Result<()> {
@@ -198,10 +204,12 @@ fn open_while_decrypting(plan: &Plan, folder: &Path, device: &Path) -> Result<()
 fn open_while_encrypting(plan: &Plan, folder: &Path, device: &Path) -> Result<()> {
     let key = match current_uuid(device) {
         None => {
-            let key = match recovery_key(plan, folder, None) {
+            let key = match room::ensure_header_room(device)
+                .and_then(|()| recovery_key(plan, folder, None))
+            {
                 Ok(key) => key,
                 Err(error) => {
-                    record("failed");
+                    record(FAILED);
                     return Err(error);
                 }
             };
@@ -219,7 +227,7 @@ fn open_while_encrypting(plan: &Plan, folder: &Path, device: &Path) -> Result<()
         .status()
         .context("The disk couldn't be opened")?;
     keyring::keep(keys::HANDED_OVER, &key);
-    record("started");
+    record(STARTED);
     Ok(())
 }
 

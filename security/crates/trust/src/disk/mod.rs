@@ -6,6 +6,7 @@ pub mod mask;
 pub mod old_system;
 mod preflight;
 pub mod reencrypt;
+mod room;
 pub mod stage;
 pub mod state;
 mod top_level;
@@ -115,6 +116,7 @@ pub fn status() -> Option<DiskStatus> {
     let header = disk.header().ok().flatten();
     let plan = Plan::load();
     let (state, progress) = match (&plan, &header) {
+        (_, None) if initrd::start_failed() => ("failed", 0.0),
         (Some(plan), None) if plan.change == Change::Encrypt => ("starting", 0.0),
         (Some(plan), Some(header)) => (
             match plan.change {

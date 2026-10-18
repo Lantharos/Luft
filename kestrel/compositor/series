@@ -34,4 +34,4 @@
 0034-backends-follow-the-touchpad-scroll-speed-setting.patch
 0035-clutter-draw-text-and-offscreen-textures-at-the-view.patch
 0036-frames-draw-X11-window-frames-in-Kestrel-s-style.patch
-0037-wayland-send-older-Chromium-builds-touchpad-deltas-i.patch
+0037-wayland-send-Chromium-builds-touchpad-deltas-in-thei.patch

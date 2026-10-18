@@ -20,6 +20,7 @@ const SLOWEST = 0.8;
 const FASTEST = 1.3;
 const GTK_TOUCHPAD_FACTOR = 2.5;
 const HELIUM_OPEN_TIMEOUT = 60000;
+const ELECTRON_OPEN_TIMEOUT = 60000;
 const FLATPAK_OPEN_TIMEOUT = 90000;
 const FLATPAK_SETTLE = 3000;
 const FLATPAK_CHROMIUM = 'org.chromium.Chromium';
@@ -135,6 +136,23 @@ async function checkHelium(appImage) {
   await process.exited;
 }
 
+async function checkElectron(electron, features) {
+  const page = `file://${fixture('pages', 'scroll.html')}`;
+  const surface = `a page in Electron${features.length ? ' with the unscaled touchpad feature' : ''}`;
+  const process = spawn([electron, `--user-data-dir=${scratch('kestrel-electron')}`, '--ozone-platform=wayland', ...features, page],
+    {env: {TMPDIR: scratch()}});
+  const window = await waitForWindow(candidate => candidate.get_title()?.startsWith('Kestrel page'), 'Electron opens the page', ELECTRON_OPEN_TIMEOUT);
+  require(window.get_client_type() === Meta.WindowClientType.WAYLAND, 'Electron runs on Wayland');
+  window.activate(global.get_current_time());
+  await scrollOver(centerOf(window.get_compositor_private()));
+  await eventually(() => window.title.startsWith('Kestrel scrolled:'), `${surface} scrolls`);
+  await settled();
+  requireSane(surface, parseFloat(window.title.split(': ')[1]));
+  await finish();
+  window.delete(global.get_current_time());
+  await process.exited;
+}
+
 function flatpakEnvironment(home) {
   return {HOME: home, XDG_DATA_HOME: `${home}/.local/share`, XDG_CONFIG_HOME: `${home}/.config`, XDG_CACHE_HOME: `${home}/.cache`, FLATPAK_USER_DIR: null, FLATPAK_SYSTEM_DIR: null};
 }
@@ -208,6 +226,9 @@ export async function run() {
   const helium = GLib.getenv('KESTREL_HELIUM');
   if (helium) await checkHelium(helium);
   else console.log('Kestrel scrolling: Helium skipped without KESTREL_HELIUM');
+  const electron = GLib.getenv('KESTREL_ELECTRON');
+  if (electron) for (const features of [[], [SCHELF_CHROMIUM_FEATURES]]) await checkElectron(electron, features);
+  else console.log('Kestrel scrolling: Electron skipped without KESTREL_ELECTRON');
   const flatpakHome = GLib.getenv('KESTREL_FLATPAK_HOME');
   if (flatpakHome) await checkFlatpaks(flatpakHome);
   else console.log('Kestrel scrolling: Flatpak apps skipped without KESTREL_FLATPAK_HOME');

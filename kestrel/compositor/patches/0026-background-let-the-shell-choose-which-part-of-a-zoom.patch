@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Wed, 14 Oct 2026 16:29:17 +0200
-Subject: [PATCH 26/36] background: let the shell choose which part of a zoomed
+Subject: [PATCH 26/37] background: let the shell choose which part of a zoomed
  texture shows
 
 The zoom style always crops a texture around its center. When a wallpaper

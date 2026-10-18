@@ -1,30 +1,33 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Sun, 18 Oct 2026 04:53:53 +0200
-Subject: [PATCH 37/37] wayland: send older Chromium builds touchpad deltas in their
+Subject: [PATCH 37/37] wayland: send Chromium builds touchpad deltas in their
  own units
 
 Chromium multiplies every finger and continuous scroll delta it gets on
 Wayland by 12, treating 10 pixels as one 120-unit wheel notch, so pages
 and Electron apps scroll about twelve times as far as the fingers move.
 Chromium 154 added the WaylandUnscaledTouchpadScrolling feature to stop
-doing that, but the Electron apps people use today are built on older
-Chromium and have no way to opt out.
+doing that, but it is off unless something turns it on, and Electron
+apps have no way for people to turn it on.
 
 When a client's executable sits beside chrome_100_percent.pak, read the
 Chromium release from the V8 version in its snapshot and, for releases
-before 154 that scale, divide its finger and continuous deltas by 12.
-Chromium 143 shipped without the scaling and 154 and later decide for
-themselves through the feature, so both keep their deltas. Each client
-is checked once, when it first asks for a pointer, and kinetic
-scrolling follows because Chromium derives it from the same deltas.
+that scale, divide its finger and continuous deltas by 12. Releases
+before 154 always scale, except 143, which shipped without the scaling.
+From 154 on, browsers keep their deltas, since their flags files enable
+the feature, while Electron apps, recognised by the app in resources/
+beside the executable, keep them only when the last --enable-features
+on their command line names the feature. Each client is checked once,
+when it first asks for a pointer, and kinetic scrolling follows because
+Chromium derives it from the same deltas.
 ---
  src/meson.build                     |   2 +
- src/wayland/meta-wayland-chromium.c | 100 ++++++++++++++++++++++++++++
+ src/wayland/meta-wayland-chromium.c | 186 ++++++++++++++++++++++++++++
  src/wayland/meta-wayland-chromium.h |   7 ++
- src/wayland/meta-wayland-pointer.c  |  12 +++-
+ src/wayland/meta-wayland-pointer.c  |  12 +-
  src/wayland/meta-wayland-pointer.h  |   1 +
- 5 files changed, 120 insertions(+), 2 deletions(-)
+ 5 files changed, 206 insertions(+), 2 deletions(-)
  create mode 100644 src/wayland/meta-wayland-chromium.c
  create mode 100644 src/wayland/meta-wayland-chromium.h
 
@@ -43,10 +46,10 @@ index 92c5a4cb4154198fb855d862b4d22d0ad37e249c..d17a165dcf6582910e286bdec0546bd3
    'wayland/meta-wayland-pointer-constraints.h',
 diff --git a/src/wayland/meta-wayland-chromium.c b/src/wayland/meta-wayland-chromium.c
 new file mode 100644
-index 0000000000000000000000000000000000000000..a890c9b4b21aa2c78357d15be08eb7f1df8e6e82
+index 0000000000000000000000000000000000000000..3f4adf1e2900605ecd494b84145cafe0f50ac4ad
 --- /dev/null
 +++ b/src/wayland/meta-wayland-chromium.c
-@@ -0,0 +1,100 @@
+@@ -0,0 +1,186 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
 +#include "config.h"
 +
@@ -54,6 +57,7 @@ index 0000000000000000000000000000000000000000..a890c9b4b21aa2c78357d15be08eb7f1
 +
 +#include <fcntl.h>
 +#include <stdio.h>
++#include <string.h>
 +#include <unistd.h>
 +
 +#define V8_VERSION_OFFSET 16
@@ -61,10 +65,18 @@ index 0000000000000000000000000000000000000000..a890c9b4b21aa2c78357d15be08eb7f1
 +#define RELEASE_WITH_UNSCALED_SCROLLING 143
 +#define RELEASE_WITH_TOUCHPAD_SCROLLING_FEATURE 154
 +#define CHROMIUM_DELTAS_PER_PIXEL (120.0 / 10.0)
++#define TOUCHPAD_SCROLLING_FEATURE "WaylandUnscaledTouchpadScrolling"
++#define ENABLE_FEATURES "--enable-features="
 +
 +static const char * const v8_snapshots[] = {
 +  "v8_context_snapshot.bin",
 +  "snapshot_blob.bin",
++};
++
++static const char * const electron_apps[] = {
++  "resources/app.asar",
++  "resources/app",
++  "resources/default_app.asar",
 +};
 +
 +static int
@@ -121,11 +133,88 @@ index 0000000000000000000000000000000000000000..a890c9b4b21aa2c78357d15be08eb7f1
 +}
 +
 +static gboolean
-+scales_touchpad_scrolling (int release)
++is_electron (const char *folder)
 +{
-+  return release > 0 &&
-+         release != RELEASE_WITH_UNSCALED_SCROLLING &&
-+         release < RELEASE_WITH_TOUCHPAD_SCROLLING_FEATURE;
++  size_t i;
++
++  for (i = 0; i < G_N_ELEMENTS (electron_apps); i++)
++    {
++      g_autofree char *app = g_build_filename (folder, electron_apps[i], NULL);
++
++      if (g_file_test (app, G_FILE_TEST_EXISTS))
++        return TRUE;
++    }
++
++  return FALSE;
++}
++
++static char *
++last_enabled_features (char  *command_line,
++                       gsize  length)
++{
++  g_auto (GStrv) arguments = NULL;
++  const char *features = NULL;
++  size_t i;
++
++  for (i = 0; i < length; i++)
++    {
++      if (command_line[i] == '\0')
++        command_line[i] = ' ';
++    }
++
++  arguments = g_strsplit (command_line, " ", -1);
++  for (i = 0; arguments[i]; i++)
++    {
++      if (g_str_has_prefix (arguments[i], ENABLE_FEATURES))
++        features = arguments[i] + strlen (ENABLE_FEATURES);
++    }
++
++  return g_strdup (features);
++}
++
++static gboolean
++enables_touchpad_scrolling (pid_t pid)
++{
++  g_autofree char *path = g_strdup_printf ("/proc/%d/cmdline", pid);
++  g_autofree char *command_line = NULL;
++  g_autofree char *enabled = NULL;
++  g_auto (GStrv) features = NULL;
++  gsize length;
++  size_t i;
++
++  if (!g_file_get_contents (path, &command_line, &length, NULL))
++    return FALSE;
++
++  enabled = last_enabled_features (command_line, length);
++  if (!enabled)
++    return FALSE;
++
++  features = g_strsplit (enabled, ",", -1);
++  for (i = 0; features[i]; i++)
++    {
++      size_t name = strcspn (features[i], ":<");
++
++      if (name == strlen (TOUCHPAD_SCROLLING_FEATURE) &&
++          strncmp (features[i], TOUCHPAD_SCROLLING_FEATURE, name) == 0)
++        return TRUE;
++    }
++
++  return FALSE;
++}
++
++static gboolean
++scales_touchpad_scrolling (pid_t       pid,
++                           const char *folder)
++{
++  int release = chromium_release (folder);
++
++  if (release == 0 || release == RELEASE_WITH_UNSCALED_SCROLLING)
++    return FALSE;
++
++  if (release < RELEASE_WITH_TOUCHPAD_SCROLLING_FEATURE)
++    return TRUE;
++
++  return is_electron (folder) && !enables_touchpad_scrolling (pid);
 +}
 +
 +double
@@ -142,7 +231,7 @@ index 0000000000000000000000000000000000000000..a890c9b4b21aa2c78357d15be08eb7f1
 +
 +  resources = g_build_filename (folder, "chrome_100_percent.pak", NULL);
 +  if (!g_file_test (resources, G_FILE_TEST_EXISTS) ||
-+      !scales_touchpad_scrolling (chromium_release (folder)))
++      !scales_touchpad_scrolling (pid, folder))
 +    return 1.0;
 +
 +  return 1.0 / CHROMIUM_DELTAS_PER_PIXEL;

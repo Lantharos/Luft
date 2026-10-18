@@ -110,8 +110,24 @@ enum EncryptionAction {
     Initrd,
 }
 
+impl Command {
+    fn changes_the_system(&self) -> bool {
+        !matches!(
+            self,
+            Command::Status
+                | Command::AntiCheat
+                | Command::Encryption {
+                    action: EncryptionAction::Check
+                }
+        )
+    }
+}
+
 impl Cli {
     pub fn run(self) -> Result<()> {
+        if self.command.changes_the_system() && !rustix::process::geteuid().is_root() {
+            bail!("trustctl needs to run as root for this. Run it again with sudo.");
+        }
         match self.command {
             Command::Status => {
                 report::status();

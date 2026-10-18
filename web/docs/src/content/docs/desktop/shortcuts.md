@@ -18,8 +18,10 @@ sidebar:
 | <kbd>Super</kbd>+<kbd>N</kbd> or <kbd>Super</kbd>+<kbd>M</kbd> | Notifications |
 | <kbd>Super</kbd>+<kbd>V</kbd> | Clipboard history |
 | <kbd>Super</kbd>+<kbd>.</kbd> or <kbd>Super</kbd>+<kbd>;</kbd> | Emoji and symbols |
+| Hold <kbd>Super</kbd>+<kbd>Alt</kbd> | [Dictation](/desktop/dictation/): talk, and let go to type, once it's turned on |
+| <kbd>Super</kbd>+<kbd>Alt</kbd> | Start or stop dictating. It also stops when you stop talking |
 | <kbd>Copilot</kbd> | Start, or the app chosen in Settings |
-| Hold <kbd>Copilot</kbd> | [Dictation](/desktop/dictation/), once it's turned on |
+| Hold <kbd>Copilot</kbd> | Dictation, like holding <kbd>Super</kbd>+<kbd>Alt</kbd> |
 | <kbd>Super</kbd>+<kbd>I</kbd> | Settings |
 | <kbd>Super</kbd>+<kbd>L</kbd> | Lock the screen |
 | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Esc</kbd> | [Barometer](/apps/barometer/), the system monitor |

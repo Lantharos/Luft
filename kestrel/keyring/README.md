@@ -30,7 +30,7 @@ Luft's image carries the keyring. On a regular Fedora install, `kestrel/tools/in
 
 ## App access
 
-Each request is tied to the app that made it, by its Flatpak or app ID, launcher entry or program path. An app can always use what it saved; anything else asks first, and Settings shows and revokes those choices along with the access history. Tools such as `secret-tool` and Seahorse are asked like any other app.
+Each request is tied to the app that made it, by its Flatpak or app ID, launcher entry or program path. An AppImage counts as the image file it runs from, whichever folder it is mounted at. An app can always use what it saved; anything else asks first, and Settings shows and revokes those choices along with the access history. Tools such as `secret-tool` and Seahorse are asked like any other app.
 
 ## App secrets
 
@@ -73,7 +73,7 @@ Run from `kestrel/keyring`:
 | Command | Covers |
 | --- | --- |
 | `cargo test` | Vault format, and TPM sealing, PIN lockout and chip-held keys against `swtpm` |
-| `dbus-run-session -- python3 tools/session/session.py target/debug/luft-keyring` | The daemon on a private bus with a scratch home: items, app access, portal, SSH agent |
+| `dbus-run-session -- python3 tools/session/session.py target/debug/luft-keyring` | The daemon on a private bus with a scratch home: items, app access (including AppImages and Flatpaks across launches), portal, SSH agent |
 | `tools/vm/build.sh`, then `tools/vm/run.sh tpm`, `gone` or `none` | Sign-in, lock screen, `sudo`, Secure Boot changes and PINs in a Fedora VM with SELinux enforcing, with a software TPM, after the TPM is removed, and without one |
 
 ## Adding data to the keyring

@@ -17,14 +17,14 @@ struct Command {
 
 impl Entry {
     pub fn runs(&self, program: &Program) -> bool {
-        let Some(command) = &self.command else {
-            return false;
-        };
+        self.launches(program) || self.program_names().contains(&program.name())
+    }
+
+    fn launches(&self, program: &Program) -> bool {
         let launched = program.launched();
-        if launched == command.path || command.target.as_deref() == Some(launched) {
-            return true;
-        }
-        self.program_names().contains(&program.name())
+        self.command.as_ref().is_some_and(|command| {
+            launched == command.path || command.target.as_deref() == Some(launched)
+        })
     }
 
     pub fn names(&self) -> impl Iterator<Item = String> {
@@ -55,6 +55,20 @@ pub fn find(id: &str) -> Option<Entry> {
     data_directories()
         .into_iter()
         .find_map(|directory| parse(id, &std::fs::read_to_string(directory.join(&file)).ok()?))
+}
+
+pub fn launching(program: &Program) -> Option<Entry> {
+    data_directories()
+        .into_iter()
+        .filter_map(|directory| std::fs::read_dir(directory.join("applications")).ok())
+        .flatten()
+        .flatten()
+        .find_map(|file| {
+            let name = file.file_name();
+            let id = name.to_str()?.strip_suffix(".desktop")?;
+            parse(id, &std::fs::read_to_string(file.path()).ok()?)
+                .filter(|entry| entry.launches(program))
+        })
 }
 
 fn data_directories() -> Vec<PathBuf> {

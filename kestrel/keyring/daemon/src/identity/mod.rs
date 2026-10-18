@@ -1,4 +1,5 @@
 mod desktop;
+mod image;
 mod process;
 mod program;
 mod sabine;
@@ -208,7 +209,8 @@ fn classify(process: &Process) -> App {
         .unit_app_id()
         .and_then(|id| desktop::find(&id))
         .filter(|entry| entry.runs(&program))
-        .or_else(|| desktop::find(&program.name()).filter(|entry| entry.runs(&program)));
+        .or_else(|| desktop::find(&program.name()).filter(|entry| entry.runs(&program)))
+        .or_else(|| program.image().and_then(|_| desktop::launching(&program)));
     let inspecting = program.is_inspector() || program.interpreted() && process.has_terminal();
     host(program, entry, !inspecting)
 }

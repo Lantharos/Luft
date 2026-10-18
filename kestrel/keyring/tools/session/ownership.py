@@ -25,9 +25,9 @@ def launcher_entry(home, desktop_id, name, command):
 
 
 def exercise_ownership(root, home, environment, check, script, requests, lock):
-    def run(program, *arguments, scope=None, extra=None):
+    def run(program, *arguments, scope=None):
         command = [program, READER, *arguments]
-        env = dict(environment, **(extra or {}))
+        env = dict(environment)
         if scope:
             command = [
                 "systemd-run",
@@ -97,23 +97,6 @@ def exercise_ownership(root, home, environment, check, script, requests, lock):
     check(
         run(moved, "read", "app", "notes") == "" and asked() > before,
         "the same program started outside its app is asked first",
-    )
-
-    image = os.path.join(root, "Apps/Vault.AppImage")
-    program_at(image)
-    launcher_entry(home, "vault", "Vault", image)
-    for mount in (".mount_a1B2c3", ".mount_x9Y8z7"):
-        program_at(os.path.join(root, mount, "usr/bin/vault"))
-
-    def from_image(mount, *arguments):
-        folder = os.path.join(root, mount)
-        return run(os.path.join(folder, "usr/bin/vault"), *arguments, extra={"APPDIR": folder, "APPIMAGE": image})
-
-    from_image(".mount_a1B2c3", "store", "Vault", "vault-key", "app", "vault")
-    before = asked()
-    check(
-        from_image(".mount_x9Y8z7", "read", "app", "vault") == "vault-key" and asked() == before,
-        "an AppImage keeps its items though it runs from a new folder every time",
     )
 
     terminal, child = os.openpty()

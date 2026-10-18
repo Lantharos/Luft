@@ -2,13 +2,14 @@ use std::ffi::CString;
 use std::fs::File;
 use std::io::Read;
 use std::os::fd::{AsRawFd, FromRawFd, OwnedFd};
-use std::path::Path;
 
+use super::image;
 use super::program::{Program, is_interpreter};
 
 const PARENT: usize = 1;
 const TERMINAL: usize = 4;
 const STARTED: usize = 19;
+const FUSE_DEVICE: &str = "/dev/fuse";
 
 pub struct Process {
     directory: OwnedFd,
@@ -106,23 +107,41 @@ impl Process {
                     .find(|argument| !argument.is_empty() && !argument.starts_with(b"-"))
                     .and_then(|argument| String::from_utf8(argument.to_vec()).ok())
             });
-        let image = self.image(&executable);
+        let image = image::of(self);
         Program::new(executable, script, image)
     }
 
-    fn image(&self, executable: &str) -> Option<String> {
-        let mount = self.environment("APPDIR")?;
-        Path::new(executable)
-            .starts_with(&mount)
-            .then(|| self.environment("APPIMAGE"))
-            .flatten()
+    pub fn executable_device(&self) -> Option<(u32, u32)> {
+        let mut status = unsafe { std::mem::zeroed::<libc::statx>() };
+        let found = unsafe {
+            libc::statx(
+                self.directory.as_raw_fd(),
+                c"exe".as_ptr(),
+                libc::AT_STATX_DONT_SYNC,
+                0,
+                &raw mut status,
+            )
+        };
+        (found == 0).then_some((status.stx_dev_major, status.stx_dev_minor))
     }
 
-    fn environment(&self, name: &str) -> Option<String> {
-        let environ = self.read("environ")?;
-        environ.split(|byte| *byte == 0).find_map(|entry| {
-            let value = entry.strip_prefix(name.as_bytes())?.strip_prefix(b"=")?;
-            String::from_utf8(value.to_vec()).ok()
+    pub fn mounts(&self) -> Option<String> {
+        String::from_utf8(self.read("mountinfo")?).ok()
+    }
+
+    pub fn serves_fuse(&self, connection: u32) -> bool {
+        let listing = format!("/proc/self/fd/{}/fd", self.directory.as_raw_fd());
+        let Ok(descriptors) = std::fs::read_dir(listing) else {
+            return false;
+        };
+        let wanted = format!("fuse_connection:\t{connection}\n");
+        descriptors.flatten().any(|descriptor| {
+            let number = descriptor.file_name();
+            let number = number.to_string_lossy();
+            self.link(&format!("fd/{number}")).as_deref() == Some(FUSE_DEVICE)
+                && self
+                    .read(&format!("fdinfo/{number}"))
+                    .is_some_and(|info| String::from_utf8_lossy(&info).contains(&wanted))
         })
     }
 

@@ -8,6 +8,7 @@ import time
 
 import gi
 from agent import exercise_agent
+from launches import exercise_launches
 from ownership import exercise_ownership
 from portal import exercise_portal
 from sabine import exercise_sabine
@@ -253,6 +254,7 @@ def exercise(root, home, environment, script, requests):
     exercise_portal(root, home, environment, check)
     exercise_agent(root, environment, check, script, requests, lock, LOGIN)
     exercise_ownership(root, home, environment, check, script, requests, lock)
+    exercise_launches(root, home, environment, check, script, requests)
     exercise_sabine(home, environment, check, script, requests)
 
 

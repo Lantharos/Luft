@@ -36,6 +36,10 @@ impl Program {
         }
     }
 
+    pub fn image(&self) -> Option<&str> {
+        self.image.as_deref()
+    }
+
     pub fn launched(&self) -> &str {
         self.image
             .as_deref()

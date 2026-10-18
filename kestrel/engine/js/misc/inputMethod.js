@@ -78,6 +78,11 @@ export const InputMethod = GObject.registerClass({
         this._keyInterceptor = interceptor;
     }
 
+    showPreedit(text) {
+        const end = text ? [...text].length : 0;
+        this.set_preedit_text(text || null, end, end, Clutter.PreeditResetMode.CLEAR);
+    }
+
     _interceptKey(event) {
         const keycode = event.get_key_code();
         if (event.type() === Clutter.EventType.KEY_RELEASE)

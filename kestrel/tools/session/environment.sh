@@ -43,6 +43,7 @@ build_helpers() {
   cargo build --release --quiet --manifest-path "$root/kestrel/greeter/Cargo.toml"
   cargo build --release --quiet --manifest-path "$root/kestrel/peek/Cargo.toml"
   cargo build --release --quiet --manifest-path "$root/packages/accounts/service/Cargo.toml"
+  (cd "$root/packages/speech/service" && cargo build --release --quiet)
 }
 
 dbus_service() {

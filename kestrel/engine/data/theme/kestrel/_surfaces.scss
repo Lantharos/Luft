@@ -82,3 +82,9 @@
 .screenshot-ui-show-pointer-button:checked { background-color: fill(0.22); color: ink(); }
 .screenshot-ui-shot-cast-button:checked { color: ink(); }
 .screenshot-ui-window-selector { background-color: glass(); }
+
+.kestrel-dictation { padding: 9px 14px; spacing: 10px; border-radius: 18px; background-color: glass(clear); color: ink(0.86); }
+.kestrel-dictation-level { spacing: 3px; height: 18px; }
+.kestrel-dictation-bar { width: 3px; border-radius: 2px; background-color: ink(0.86); transition-duration: $motion-quick; }
+.kestrel-dictation:busy .kestrel-dictation-bar { background-color: ink(0.40); }
+.kestrel-dictation-text { font-size: 13.5px; max-width: 420px; }

@@ -34,6 +34,7 @@ import { StartMenu } from './surfaces/start/startMenu.js';
 import { paintHidden, prewarmAfterStartup } from './surfaces/prewarm.js';
 import { Surfaces, type Surface } from './surfaces/surfaces.js';
 import { confirmStartupOnceSettled } from './system/health/startup.js';
+import { CopilotActions } from './system/dictation/copilotActions.js';
 import { startPeekHost, type HostContext } from './system/peek/host/host.js';
 import type { PeekService } from './system/peek/service.js';
 import { SystemServices } from './system/services.js';
@@ -66,6 +67,7 @@ class KestrelUi {
   readonly board: Board;
   private readonly liveWallpaper: LiveWallpaper;
   private readonly rotation: RotationAnimation;
+  private readonly copilot: CopilotActions;
   private readonly fourFingers = new FourFingerSwipe(direction => this.followFourFingers(direction));
   private focusSignals: (() => void)[] = [];
   private readonly disconnectors: (() => void)[] = [];
@@ -106,6 +108,7 @@ class KestrelUi {
     const notifications = new NotificationCenter(context.messageTray, this.menus, place, close);
     const clipboard = new ClipboardPanel(this.menus, close, place, context.inputMethod);
     const emoji = new EmojiPanel(context.inputMethod, close, text => clipboard.pasteWithoutKeeping(text));
+    this.copilot = new CopilotActions(context, () => this.surfaces.toggle('start'), text => clipboard.pasteWithoutKeeping(text));
     const snapLayouts = new SnapLayouts(index => context.layoutManager.getWorkAreaForMonitor(index), context.snapWindow, close);
     this.taskView = new TaskView(context.createBackground, workspace => this.board.frameOf(workspace), close, context.activateWindow);
     this.liveWallpaper = new LiveWallpaper(() => context.layoutManager.monitors);
@@ -318,6 +321,7 @@ class KestrelUi {
     this.panels.shutdown();
     this.liveWallpaper.destroy();
     this.rotation.destroy();
+    this.copilot.destroy();
     this.board.destroy();
     this.services.destroy();
   }

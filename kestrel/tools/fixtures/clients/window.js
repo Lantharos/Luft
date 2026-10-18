@@ -43,7 +43,10 @@ app.connect('activate', () => {
   });
   if (ARGV.includes('--entry')) {
     const entry = new Gtk.Entry({ margin_top: 160, margin_start: 120, margin_end: 120, valign: Gtk.Align.START });
-    entry.connect('changed', () => { window.title = `Kestrel entry: ${entry.text}`; });
+    let preedit = '';
+    const show = () => { window.title = `Kestrel entry: ${entry.text}${preedit ? ` [${preedit}]` : ''}`; };
+    entry.connect('changed', show);
+    entry.get_delegate().connect('preedit-changed', (_text, text) => { preedit = text; show(); });
     window.set_child(entry);
   } else if (ARGV.includes('--paste')) {
     acceptPastes(window);

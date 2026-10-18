@@ -1,0 +1,19 @@
+<schemalist>
+  <schema id="com.lantharos.kestrel.copilot-key" path="/com/lantharos/kestrel/copilot-key/">
+    <key name="press" type="s">
+      <choices>
+        <choice value="search"/>
+        <choice value="app"/>
+        <choice value="nothing"/>
+      </choices>
+      <default>'search'</default>
+      <summary>What a press of the Copilot key does</summary>
+      <description>"search" opens Start with search, "app" opens the app in the app key, "nothing" ignores the press. Holding the key dictates when dictation is on.</description>
+    </key>
+    <key name="app" type="s">
+      <default>''</default>
+      <summary>App the Copilot key opens</summary>
+      <description>The desktop file ID of the app a press opens when press is "app".</description>
+    </key>
+  </schema>
+</schemalist>

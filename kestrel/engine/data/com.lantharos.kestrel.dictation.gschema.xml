@@ -1,0 +1,24 @@
+<schemalist>
+  <schema id="com.lantharos.kestrel.dictation" path="/com/lantharos/kestrel/dictation/">
+    <key name="enabled" type="b">
+      <default>false</default>
+      <summary>Dictate while the Copilot key is held</summary>
+      <description>When on, holding the Copilot key listens and types what is said into the focused text field. Turning it on in Settings downloads the speech model first.</description>
+    </key>
+    <key name="language" type="s">
+      <default>''</default>
+      <summary>Language to dictate in</summary>
+      <description>A language code such as "en" or "sr". Empty follows the keyboard layout being typed with, then the language the computer is set to.</description>
+    </key>
+    <key name="engine" type="s">
+      <choices>
+        <choice value="automatic"/>
+        <choice value="parakeet"/>
+        <choice value="whisper"/>
+      </choices>
+      <default>'automatic'</default>
+      <summary>Speech recognizer</summary>
+      <description>Automatic uses Parakeet for the 25 European languages it knows and Whisper, on the graphics card, for the others.</description>
+    </key>
+  </schema>
+</schemalist>

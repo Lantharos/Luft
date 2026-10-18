@@ -99,7 +99,7 @@ fn memory() -> Option<u64> {
 }
 
 fn storage() -> Option<Storage> {
-    let root = CString::new("/").ok()?;
+    let root = CString::new(gio::glib::home_dir().into_os_string().into_encoded_bytes()).ok()?;
     let mut stats = std::mem::MaybeUninit::<libc::statvfs>::uninit();
     if unsafe { libc::statvfs(root.as_ptr(), stats.as_mut_ptr()) } != 0 {
         return None;

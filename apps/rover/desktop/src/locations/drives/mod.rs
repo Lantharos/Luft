@@ -67,6 +67,13 @@ pub fn list_drives() -> Vec<DriveInfo> {
         }
     }
 
+    if !by_device.values().any(|drive| drive.mount_point == "/")
+        && let Some(home) = home_device(&by_device)
+        && let Some(system) = by_device.get_mut(&home)
+    {
+        system.mount_point = "/".into();
+    }
+
     let mut drives: Vec<DriveInfo> = by_device.into_values().collect();
     drives.sort_by(|a, b| {
         (a.mount_point != "/")
@@ -145,6 +152,15 @@ fn run(program: &str, args: &[&str]) -> Result<(), String> {
     } else {
         format!("{program}: {stderr}")
     })
+}
+
+fn home_device(drives: &HashMap<String, DriveInfo>) -> Option<String> {
+    let home = fs::canonicalize(gio::glib::home_dir()).ok()?;
+    mounts::visible_mounts()
+        .into_iter()
+        .filter(|mount| home.starts_with(&mount.mount_point) && drives.contains_key(&mount.device))
+        .max_by_key(|mount| mount.mount_point.len())
+        .map(|mount| mount.device)
 }
 
 fn prefers(candidate: &DriveInfo, current: &DriveInfo) -> bool {

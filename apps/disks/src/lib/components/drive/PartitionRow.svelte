@@ -58,10 +58,12 @@
 			<Lock size={13} class="flex-none text-[var(--text-muted)]" aria-label="Encrypted" />
 		{/if}
 		<span class="facts">{facts}</span>
-		<span class="status">{status}</span>
 	</button>
 	<div class="actions">
 		<ActionMenu label="More for {volumeName(volume)}" groups={menu} disabled={busy} />
+		{#if status}
+			<span class="status">{status}</span>
+		{/if}
 		{#if primary}
 			<button type="button" class="button" disabled={busy} onclick={primary.run}>{primary.label}</button>
 		{/if}
@@ -111,8 +113,7 @@
 	}
 
 	.status {
-		margin-left: auto;
-		flex: none;
+		padding: 0 4px;
 		font-size: 13px;
 		color: var(--text-soft);
 		white-space: nowrap;

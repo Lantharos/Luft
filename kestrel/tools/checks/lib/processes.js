@@ -65,3 +65,16 @@ export function firstLine(process) {
   return new Promise(resolve => new Gio.DataInputStream({base_stream: process.get_stdout_pipe()})
     .read_line_async(GLib.PRIORITY_DEFAULT, null, (source, result) => resolve(source.read_line_finish_utf8(result)[0])));
 }
+
+export function outputLines(process) {
+  const stream = new Gio.DataInputStream({base_stream: process.get_stdout_pipe()});
+  const lines = [];
+  const readLine = () => stream.read_line_async(GLib.PRIORITY_DEFAULT, null, (source, result) => {
+    const [line] = source.read_line_finish_utf8(result);
+    if (line === null) return;
+    lines.push(line);
+    readLine();
+  });
+  readLine();
+  return lines;
+}

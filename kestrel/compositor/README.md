@@ -26,6 +26,7 @@ Kestrel runs on its own build of Mutter 51: the upstream release plus an ordered
 - Title bars for X11 apps in Kestrel's style, colored from `~/.config/kestrel/appearance.css`
 - `xdg-decoration` for Wayland apps that ask for server-side title bars, which the shell draws in the same style
 - A signal before a monitor turns, so the shell can animate rotation from a picture of the old orientation
+- `ext-idle-notify-v1`, so apps such as password managers can lock themselves after a while without use, sandboxed or not
 - Virtual input devices that flip the tablet mode switch, for driving tablet mode in checks
 - Smaller fixes, each described in its patch
 

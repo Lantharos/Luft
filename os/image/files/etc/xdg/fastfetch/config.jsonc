@@ -4,12 +4,12 @@
     "type": "file",
     "source": "luft",
     "color": {
-      "1": "yellow",
+      "1": "default",
       "2": "bright_black"
     }
   },
   "display": {
-    "color": "yellow"
+    "color": "default"
   },
   "modules": [
     "title",

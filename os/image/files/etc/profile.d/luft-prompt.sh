@@ -41,7 +41,7 @@ __luft_prompt() {
 	if [[ -n $__luft_who ]]; then
 		printf '\001\e[%sm\002%s\001\e[0m\002 ' "$__luft_who_color" "$__luft_who"
 	fi
-	printf '\001\e[33m\002%s\001\e[0m\002' "$__luft_where"
+	printf '\001\e[1m\002%s\001\e[0m\002' "$__luft_where"
 	if [[ -n $__luft_branch ]]; then
 		printf ' \001\e[90m\002%s\001\e[0m\002' "$__luft_branch"
 	fi

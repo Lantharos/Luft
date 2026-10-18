@@ -15,6 +15,7 @@
 #include <meta/meta-workspace-manager.h>
 
 #include "shell-app-private.h"
+#include "shell-app-scope-private.h"
 #include "shell-enum-types.h"
 #include "shell-global.h"
 #include "shell-util.h"
@@ -1088,13 +1089,19 @@ shell_app_request_quit (ShellApp   *app)
   return TRUE;
 }
 
+typedef struct
+{
+  MetaContext *meta_context;
+  ShellAppScope *scope;
+} ChildSetup;
+
 static void
 child_context_setup (gpointer user_data)
 {
-  ShellGlobal *shell_global = user_data;
-  MetaContext *meta_context = shell_global_get_context (shell_global);
+  ChildSetup *setup = user_data;
 
-  meta_context_restore_rlimit_nofile (meta_context, NULL);
+  meta_context_restore_rlimit_nofile (setup->meta_context, NULL);
+  shell_app_scope_child_setup (setup->scope);
 }
 
 static void
@@ -1241,16 +1248,23 @@ shell_app_launch (ShellApp           *app,
   flags = G_SPAWN_SEARCH_PATH | G_SPAWN_DO_NOT_REAP_CHILD |
           G_SPAWN_LEAVE_DESCRIPTORS_OPEN;
 
-  /* Optimized spawn path, avoiding a child_setup function */
   {
     g_autofd int journalfd = -1;
+    g_autoptr (ShellAppScope) scope = shell_app_scope_new ();
+    ChildSetup setup = {
+      .meta_context = shell_global_get_context (shell_global),
+      .scope = scope,
+    };
 
+    g_object_set_data_full (G_OBJECT (context), SHELL_APP_SCOPE_KEY,
+                            shell_app_scope_ref (scope),
+                            (GDestroyNotify) shell_app_scope_unref);
     journalfd = sd_journal_stream_fd (shell_app_get_id (app), LOG_INFO, FALSE);
 
     ret = g_desktop_app_info_launch_uris_as_manager_with_fds (app->info, NULL,
                                                               context,
                                                               flags,
-                                                              child_context_setup, shell_global,
+                                                              child_context_setup, &setup,
                                                               wait_pid, NULL,
                                                               -1,
                                                               journalfd,

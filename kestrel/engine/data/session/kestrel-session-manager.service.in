@@ -12,3 +12,5 @@ BusName=org.gnome.SessionManager
 ExecStart=@gjs@ -m @pkgdatadir@/kestrel-session.js
 Restart=on-failure
 TimeoutStopSec=5
+OOMScoreAdjust=-800
+MemoryMin=32M

@@ -6,45 +6,55 @@ import * as MessageTray from 'resource:///com/lantharos/kestrel/ui/messageTray.j
 import { appIcons } from '../../appearance/icons/appIcons.js';
 
 const SYSTEMD = 'org.freedesktop.systemd1';
+const OOMD = 'org.freedesktop.oom1';
 const UNIT_PATH = '/org/freedesktop/systemd1/unit/';
-const APP_UNIT = /^app-(?:kestrel|flatpak)-(.+)-\d+\.(?:scope|service)$/;
+const APP_UNIT = /^app-(?:(?:kestrel|flatpak|glib|gnome)-)?(.+?)(?:-\d+\.scope|@[^@]*\.service)$/;
+const CONTAINER_CGROUP = /\/libpod-[0-9a-f]+\.scope(?:\/|$)/;
 
 const unescapeObjectPath = (path: string) => path.replace(/_([0-9a-f]{2})/g, (_match, hex: string) => String.fromCharCode(parseInt(hex, 16)));
 const unescapeUnit = (name: string) => name.replace(/\\x([0-9a-f]{2})/g, (_match, hex: string) => String.fromCharCode(parseInt(hex, 16)));
 
 export class OomNotifier {
-  private readonly subscriptions: number[];
+  private readonly unitSubscriptions: number[];
+  private readonly oomdSubscription: number;
 
   constructor() {
-    const bus = Gio.DBus.session;
-    bus.call(SYSTEMD, '/org/freedesktop/systemd1', `${SYSTEMD}.Manager`, 'Subscribe', null, null, Gio.DBusCallFlags.NO_AUTO_START, -1, null, null);
-    this.subscriptions = ['Scope', 'Service'].map(kind => bus.signal_subscribe(SYSTEMD, 'org.freedesktop.DBus.Properties', 'PropertiesChanged',
+    const session = Gio.DBus.session;
+    session.call(SYSTEMD, '/org/freedesktop/systemd1', `${SYSTEMD}.Manager`, 'Subscribe', null, null, Gio.DBusCallFlags.NO_AUTO_START, -1, null, null);
+    this.unitSubscriptions = ['Scope', 'Service'].map(kind => session.signal_subscribe(SYSTEMD, 'org.freedesktop.DBus.Properties', 'PropertiesChanged',
       null, `${SYSTEMD}.${kind}`, Gio.DBusSignalFlags.NONE, (_connection, _sender, path, _iface, _signal, parameters) => {
         const [, changed] = parameters.deep_unpack() as [string, Record<string, GLib.Variant>];
-        if (changed.Result?.deep_unpack() === 'oom-kill') void this.notify(path, kind);
+        if (changed.Result?.deep_unpack() === 'oom-kill') void this.appClosed(path, kind);
       }));
+    this.oomdSubscription = Gio.DBus.system.signal_subscribe(OOMD, `${OOMD}.Manager`, 'Killed', '/org/freedesktop/oom1', null,
+      Gio.DBusSignalFlags.NONE, (_connection, _sender, _path, _iface, _signal, parameters) => {
+        const [cgroup] = parameters.deep_unpack() as [string, string];
+        if (CONTAINER_CGROUP.test(cgroup)) this.show('A container', null, '');
+      });
   }
 
   destroy(): void {
-    for (const id of this.subscriptions) Gio.DBus.session.signal_unsubscribe(id);
+    for (const id of this.unitSubscriptions) Gio.DBus.session.signal_unsubscribe(id);
+    Gio.DBus.system.signal_unsubscribe(this.oomdSubscription);
   }
 
-  private async notify(path: string, kind: string): Promise<void> {
-    const unit = unescapeObjectPath(path.slice(UNIT_PATH.length));
-    const match = APP_UNIT.exec(unit);
+  private async appClosed(path: string, kind: string): Promise<void> {
+    const match = APP_UNIT.exec(unescapeObjectPath(path.slice(UNIT_PATH.length)));
     if (!match) return;
     const id = unescapeUnit(match[1]);
     const app = Shell.AppSystem.get_default().lookup_app(`${id}.desktop`);
-    const name = app?.get_name() ?? id;
     const peak = await Gio.DBus.session.call(SYSTEMD, path, 'org.freedesktop.DBus.Properties', 'Get',
       new GLib.Variant('(ss)', [`${SYSTEMD}.${kind}`, 'MemoryPeak']), null, Gio.DBusCallFlags.NONE, 1000, null)
       .then(reply => (reply.deep_unpack() as [GLib.Variant])[0].deep_unpack() as number, () => 0);
-    const size = peak > 0 && peak < Number.MAX_SAFE_INTEGER ? ` It was using ${GLib.format_size(peak)}.` : '';
+    this.show(app?.get_name() ?? id, app, peak > 0 && peak < Number.MAX_SAFE_INTEGER ? ` It was using ${GLib.format_size(peak)}.` : '');
+  }
+
+  private show(name: string, app: Shell.App | null, size: string): void {
     const source = MessageTray.getSystemSource();
     source.addNotification(new MessageTray.Notification({
       source,
       title: `${name} was closed to free memory`,
-      body: `The system was running out of memory, so ${name} was stopped to keep everything else responsive.${size}`,
+      body: `The computer was running out of memory, so it was closed to keep everything else responsive.${size}`,
       gicon: app ? appIcons.gicon(app) : new Gio.ThemedIcon({ name: 'dialog-warning-symbolic' }),
     }));
   }

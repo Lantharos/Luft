@@ -56,4 +56,11 @@ install_data('kestrel-session.target', 'kestrel-setup.target', install_dir: syst
 install_data('kestrel-portals.conf', install_dir: datadir / 'xdg-desktop-portal')
 install_data('kestrel.portal', install_dir: datadir / 'xdg-desktop-portal' / 'portals')
 install_data('org.freedesktop.impl.portal.desktop.kestrel.service', install_dir: servicedir)
-install_data('app-slice-oomd.conf', install_dir: systemduserunitdir / 'app.slice.d', rename: '50-kestrel-oomd.conf')
+foreach slice : ['app', 'background', 'user']
+  install_data('slice-oomd.conf', install_dir: systemduserunitdir / slice + '.slice.d', rename: '50-kestrel-oomd.conf')
+endforeach
+install_data('root-slice.conf', install_dir: systemduserunitdir / '-.slice.d', rename: '50-kestrel-session.conf')
+install_data('session-slice.conf', install_dir: systemduserunitdir / 'session.slice.d', rename: '50-kestrel-session.conf')
+foreach service : ['dbus-broker', 'pipewire', 'pipewire-pulse', 'wireplumber', 'xdg-desktop-portal']
+  install_data('session-service.conf', install_dir: systemduserunitdir / service + '.service.d', rename: '50-kestrel-session.conf')
+endforeach

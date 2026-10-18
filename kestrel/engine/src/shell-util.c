@@ -10,6 +10,7 @@
 
 #include <cogl/cogl.h>
 
+#include "shell-app-scope-private.h"
 #include "shell-global.h"
 #include "shell-util.h"
 #include <glib/gi18n-lib.h>
@@ -362,6 +363,7 @@ spawn_child_setup (gpointer user_data)
    * pass the GError to the function, as it may lead to dynamic allocations.
    */
   meta_context_restore_rlimit_nofile (meta_context, NULL);
+  shell_app_scope_reset_oom_score_adjust ();
 }
 
 /**

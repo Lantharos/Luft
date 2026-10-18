@@ -18,4 +18,7 @@ Environment=GSETTINGS_SCHEMA_DIR=@schemadir@
 ExecStopPost=-systemctl --user unset-environment WAYLAND_DISPLAY
 Restart=no
 TimeoutStopSec=5
-OOMScoreAdjust=-1000
+OOMScoreAdjust=-900
+OOMPolicy=continue
+MemoryMin=384M
+MemoryLow=640M

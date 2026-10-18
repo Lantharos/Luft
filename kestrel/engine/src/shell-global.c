@@ -32,6 +32,7 @@
 #include <sys/sysctl.h>
 #endif
 
+#include "shell-app-scope-private.h"
 #include "shell-enum-types.h"
 #include "shell-fonts.h"
 #include "shell-global-private.h"
@@ -321,6 +322,8 @@ shell_global_init (ShellGlobal *global)
   if (!datadir)
     datadir = KESTREL_DATADIR;
   global->datadir = datadir;
+
+  shell_app_scope_init ();
 
   shell_fonts_add_bundled (datadir);
 
@@ -998,7 +1001,7 @@ shell_global_app_launched_cb (GAppLaunchContext *context,
   if (app_name == NULL)
     app_name = g_app_info_get_executable (info);
 
-  shell_systemd_start_app_scope (app_name, pid);
+  shell_app_scope_start (g_object_get_data (G_OBJECT (context), SHELL_APP_SCOPE_KEY), app_name, pid);
 }
 
 /**

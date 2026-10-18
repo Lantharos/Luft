@@ -132,7 +132,7 @@ export class StartMenu {
     launchHistory.record(appKey(app.get_id()!));
     const shellApp = this.appSystem.lookup_app(app.get_id() ?? '');
     if (shellApp) shellApp.activate();
-    else app.launch([], null);
+    else app.launch([], (global as unknown as Shell.Global).create_app_launch_context(0, -1));
     this.close();
   }
 }

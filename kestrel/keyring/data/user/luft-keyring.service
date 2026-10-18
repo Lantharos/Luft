@@ -9,6 +9,8 @@ ExecStart=@libexecdir@/luft-keyring
 Slice=session.slice
 Restart=on-failure
 LimitCORE=0
+OOMScoreAdjust=-800
+MemoryMin=32M
 
 [Install]
 WantedBy=kestrel-session.target

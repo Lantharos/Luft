@@ -12,3 +12,5 @@ Environment=GIO_USE_VFS=local
 ExecStart=@libexecdir@/kestrel-settings
 Restart=on-failure
 TimeoutStopSec=5
+OOMScoreAdjust=-800
+MemoryMin=32M

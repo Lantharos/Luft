@@ -64,9 +64,9 @@ for service in kestrel-greeter kestrel-watchdog; do
 done
 links=(
   share/wayland-sessions/kestrel.desktop share/xdg-desktop-portal/kestrel-portals.conf
-  share/xdg-desktop-portal/portals/kestrel.portal lib/systemd/user/app.slice.d/50-kestrel-oomd.conf
+  share/xdg-desktop-portal/portals/kestrel.portal
 )
-for unit in "$prefix"/lib/systemd/user/kestrel*; do
+for unit in "$prefix"/lib/systemd/user/kestrel* "$prefix"/lib/systemd/user/*.d/50-kestrel-*.conf; do
   links+=("${unit#"$prefix/"}")
 done
 for link in "${links[@]}"; do

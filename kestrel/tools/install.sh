@@ -95,7 +95,9 @@ installed_links() {
   echo "share/wayland-sessions/kestrel.desktop"
   echo "share/xdg-desktop-portal/kestrel-portals.conf"
   echo "share/xdg-desktop-portal/portals/kestrel.portal"
-  echo "lib/systemd/user/app.slice.d/50-kestrel-oomd.conf"
+  for dropin in "$prefix"/lib/systemd/user/*.d/50-kestrel-*.conf; do
+    echo "${dropin#"$prefix/"}"
+  done
   for unit in "$prefix"/lib/systemd/user/kestrel*; do
     echo "lib/systemd/user/$(basename "$unit")"
   done

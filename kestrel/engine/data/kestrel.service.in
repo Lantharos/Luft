@@ -25,5 +25,9 @@ Restart=no
 # Kill any stubborn child processes after this long
 TimeoutStopSec=5
 
-# Lower Kestrel's OOM score to avoid being killed by OOM-killer too early
-OOMScoreAdjust=-1000
+OOMScoreAdjust=-900
+OOMPolicy=continue
+MemoryMin=384M
+MemoryLow=640M
+Delegate=yes
+DelegateSubgroup=shell

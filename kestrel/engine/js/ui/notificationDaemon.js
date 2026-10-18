@@ -539,8 +539,8 @@ class GtkNotificationDaemonAppSource extends MessageTray.Source {
 
     emitActionInvoked(notificationId, actionId, target) {
         const context = global.create_app_launch_context(0, -1);
-        const info = this._app.get_app_info();
-        const token = context.get_startup_notify_id(info, []);
+        const launching = this._app.state === Shell.AppState.STOPPED;
+        const token = context.get_startup_notify_id(launching ? this._app.get_app_info() : null, []);
 
         this._dbusImpl.emit_signal('ActionInvoked',
             GLib.Variant.new('(sssava{sv})', [

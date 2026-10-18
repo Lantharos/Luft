@@ -47,6 +47,7 @@ export { useStandInAccounts } from './system/standIn/accounts.js';
 export { standInBus } from './system/standIn/bus.js';
 export { afterMotion, holdMotion } from './shared/afterMotion.js';
 export { Curve, Duration, Gesture, projection, reducedMotion, rubberband, Spring } from './shared/motion.js';
+export { SwipeAway } from './surfaces/notifications/swipeAway.js';
 
 type Signals = { connect(signal: string, callback: (...args: any[]) => any): number; disconnect(id: number): void };
 

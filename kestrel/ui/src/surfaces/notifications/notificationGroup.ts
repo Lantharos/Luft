@@ -5,6 +5,7 @@ import { HeaderLayout } from 'resource:///com/lantharos/kestrel/ui/headerLayout.
 
 import { appIcons, sourceApp } from '../../appearance/icons/appIcons.js';
 import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
+import { collapse, CollapseLayout } from './collapseLayout.js';
 import { NotificationCard, type Notification, type NotificationSource } from './notificationCard.js';
 
 const COLLAPSED_COUNT = 2;
@@ -12,7 +13,8 @@ const COLLAPSED_COUNT = 2;
 export class NotificationGroup {
   readonly actor = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-notification-group' });
   private readonly cards = new Map<Notification, NotificationCard>();
-  private readonly list = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-notification-group-list' });
+  private readonly list = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-notification-group-list',
+    layout_manager: new CollapseLayout({ orientation: Clutter.Orientation.VERTICAL }) });
   private readonly icon = new St.Icon({ icon_size: 16, style_class: 'kestrel-notification-group-icon', y_align: Clutter.ActorAlign.CENTER });
   private readonly title = new St.Label({ style_class: 'kestrel-muted', x_expand: true, y_align: Clutter.ActorAlign.CENTER });
   private readonly more = new St.Button({ style_class: 'kestrel-text-button kestrel-notification-more', can_focus: true, visible: false });
@@ -20,7 +22,7 @@ export class NotificationGroup {
   private expanded = false;
 
   constructor(private readonly source: NotificationSource, private readonly menus: ContextMenus, private readonly changed: () => void,
-    private readonly close: () => void, private readonly reveal: (actor: Clutter.Actor) => void) {
+    private readonly close: () => void, private readonly reveal: (actor: Clutter.Actor) => void, private readonly resized: () => void) {
     this.app = sourceApp(source);
     if (this.app) appIcons.bind(this.icon, this.app);
     const layout = new HeaderLayout();
@@ -51,6 +53,14 @@ export class NotificationGroup {
     return [...this.source.notifications].sort((a, b) => b.datetime.compare(a.datetime));
   }
 
+  private cardFor(notification: Notification): NotificationCard {
+    const card: NotificationCard = new NotificationCard(notification, this.menus, this.changed, this.close, this.reveal, {
+      moved: () => this.source.notifications.length === 1 ? this.actor : card.actor,
+      dismissed: actor => collapse(actor, this.resized, () => notification.destroy()),
+    });
+    return card;
+  }
+
   refresh(acknowledge: boolean): void {
     const notifications = this.newest();
     const present = new Set(notifications);
@@ -69,7 +79,7 @@ export class NotificationGroup {
     notifications.forEach((notification, index) => {
       let card = this.cards.get(notification);
       if (!card) {
-        card = new NotificationCard(notification, this.menus, this.changed, this.close, this.reveal);
+        card = this.cardFor(notification);
         this.cards.set(notification, card);
         this.list.add_child(card.actor);
       }

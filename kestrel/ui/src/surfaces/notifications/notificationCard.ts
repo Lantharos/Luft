@@ -4,6 +4,7 @@ import GLib from 'gi://GLib';
 import Pango from 'gi://Pango';
 import St from 'gi://St';
 import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
+import { SwipeAway } from './swipeAway.js';
 
 export interface SignalSource {
   connectObject(...args: any[]): void;
@@ -31,14 +32,21 @@ export interface NotificationSource extends SignalSource {
   notifications: Notification[];
 }
 
+export interface CardMotion {
+  moved: () => Clutter.Actor;
+  dismissed: (actor: Clutter.Actor) => void;
+}
+
 export class NotificationCard {
   readonly actor = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-notification' });
   readonly open: St.Button;
   readonly refresh: () => void;
+  private readonly swipe: SwipeAway;
   private readonly actions = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-notification-actions', visible: false });
 
   constructor(private readonly notification: Notification, menus: ContextMenus,
-    changed: () => void, private readonly close: () => void, private readonly reveal: (actor: Clutter.Actor) => void) {
+    changed: () => void, private readonly close: () => void, private readonly reveal: (actor: Clutter.Actor) => void, motion: CardMotion) {
+    this.swipe = new SwipeAway(this.actor, { downward: false, ...motion });
     const header = new St.BoxLayout();
     const title = new St.Label({ text: notification.title, style_class: 'kestrel-section-title', x_expand: true, y_align: Clutter.ActorAlign.CENTER });
     const body = new St.Label({ text: notification.body, visible: !!notification.body, style_class: 'kestrel-muted' });
@@ -55,13 +63,13 @@ export class NotificationCard {
     this.open.connect('key-focus-in', () => reveal(this.open));
     this.open.connect('key-press-event', (_actor, event) => {
       if (event.get_key_symbol() !== Clutter.KEY_Delete) return Clutter.EVENT_PROPAGATE;
-      notification.destroy();
+      this.swipe.dismiss();
       return Clutter.EVENT_STOP;
     });
     header.add_child(this.open);
     const dismiss = new St.Button({ style_class: 'kestrel-notification-dismiss', can_focus: true, track_hover: true, y_align: Clutter.ActorAlign.START,
       accessible_name: 'Dismiss notification', child: new St.Icon({ icon_name: 'window-close-symbolic', icon_size: 16 }) });
-    dismiss.connect('clicked', () => notification.destroy());
+    dismiss.connect('clicked', () => this.swipe.dismiss());
     dismiss.connect('key-focus-in', () => reveal(dismiss));
     header.add_child(dismiss);
     this.actor.add_child(header);
@@ -83,7 +91,7 @@ export class NotificationCard {
       'notify::datetime', changed, 'notify::reply-label', changed,
       'notify::title', changed, 'notify::body', changed, this.actor);
     menus.bind(this.actor, () => [{ label: 'Open', run: () => { close(); notification.activate(); } },
-      { label: 'Dismiss', run: () => notification.destroy() },
+      { label: 'Dismiss', run: () => this.swipe.dismiss() },
       { label: 'Notification settings', run: () => menus.settings('notifications') }]);
   }
 

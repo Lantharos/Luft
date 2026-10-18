@@ -14,22 +14,32 @@ function launchedAs(sequence: Meta.StartupSequence): string[] {
     .filter((name): name is string => !!name).map(name => name.toLowerCase());
 }
 
+function completeLaunchesOf(window: Meta.Window): void {
+  const names = identities(window);
+  for (const sequence of Shell.WindowTracker.get_default().get_startup_sequences())
+    if (!sequence.get_completed() && launchedAs(sequence).some(name => names.has(name))) sequence.complete();
+}
+
 export class LaunchFeedback {
-  private readonly signal: number;
+  private readonly signals: number[];
 
   constructor() {
     const display = (global as unknown as Shell.Global).display;
-    this.signal = display.connect('window-created', (_display, window: Meta.Window) => {
-      const shown = window.connect('shown', () => {
-        window.disconnect(shown);
-        const names = identities(window);
-        for (const sequence of Shell.WindowTracker.get_default().get_startup_sequences())
-          if (!sequence.get_completed() && launchedAs(sequence).some(name => names.has(name))) sequence.complete();
-      });
-    });
+    this.signals = [
+      display.connect('window-created', (_display, window: Meta.Window) => {
+        const shown = window.connect('shown', () => {
+          window.disconnect(shown);
+          completeLaunchesOf(window);
+        });
+      }),
+      display.connect('notify::focus-window', () => {
+        if (display.focus_window) completeLaunchesOf(display.focus_window);
+      }),
+    ];
   }
 
   destroy(): void {
-    (global as unknown as Shell.Global).display.disconnect(this.signal);
+    const display = (global as unknown as Shell.Global).display;
+    for (const signal of this.signals) display.disconnect(signal);
   }
 }

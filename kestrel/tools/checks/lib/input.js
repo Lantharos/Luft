@@ -105,9 +105,10 @@ export async function chord(...keys) {
   release(...keys);
 }
 
-export async function fingerScroll(distance, {steps = 12, interval = DRAG_STEP} = {}) {
+export async function fingerScroll(distance, {steps = 12, interval = DRAG_STEP, horizontal = false} = {}) {
+  const [dx, dy] = horizontal ? [distance / steps, 0] : [0, distance / steps];
   for (let step = 0; step < steps; step++) {
-    pointer().notify_scroll_continuous(now(), 0, distance / steps, Clutter.ScrollSource.FINGER, Clutter.ScrollFinishFlags.NONE);
+    pointer().notify_scroll_continuous(now(), dx, dy, Clutter.ScrollSource.FINGER, Clutter.ScrollFinishFlags.NONE);
     await pause(interval);
   }
 }

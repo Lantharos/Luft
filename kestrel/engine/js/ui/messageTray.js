@@ -7,6 +7,7 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import * as GnomeSession from '../misc/gnomeSession.js';
+import * as KestrelUi from './kestrelUi.js';
 import * as Layout from './layout.js';
 import * as Main from './main.js';
 import * as MessageList from './messageList.js';
@@ -805,6 +806,7 @@ export class MessageTray extends St.Widget {
         // This tracks this._bannerBin.hover and is used to fizzle
         // out non-changing hover notifications in onNotificationHoverChanged.
         this._notificationHovered = false;
+        this._bannerHeld = false;
 
         this._notificationState = State.HIDDEN;
         this._notificationTimeoutId = 0;
@@ -1121,7 +1123,8 @@ export class MessageTray extends St.Widget {
             }
         } else if (this._notificationState === State.SHOWING ||
                    this._notificationState === State.SHOWN) {
-            const expired = (this._userActiveWhileNotificationShown &&
+            const expired = (!this._bannerHeld &&
+                           this._userActiveWhileNotificationShown &&
                            this._notificationState === State.SHOWN &&
                            this._notificationTimeoutId === 0 &&
                            this._notification.urgency !== Urgency.CRITICAL &&
@@ -1170,6 +1173,11 @@ export class MessageTray extends St.Widget {
         this._banner.add_style_class_name('notification-banner');
 
         this._bannerBin.add_child(this._banner);
+        new KestrelUi.SwipeAway(this._banner, {
+            downward: true,
+            held: held => this._holdBanner(held),
+            dismissed: () => this._notification.destroy(NotificationDestroyedReason.DISMISSED),
+        });
 
         this._bannerBin.opacity = 0;
         this._bannerBin.translation_y = BANNER_SLIDE_DISTANCE;
@@ -1229,6 +1237,14 @@ export class MessageTray extends St.Widget {
                 this._updateState();
             },
         });
+    }
+
+    _holdBanner(held) {
+        this._bannerHeld = held;
+        if (held)
+            this._updateNotificationTimeout(0);
+        else if (this._notificationState === State.SHOWN)
+            this._showNotificationCompleted();
     }
 
     _showNotificationCompleted() {
@@ -1301,6 +1317,7 @@ export class MessageTray extends St.Widget {
 
         this._pointerInNotification = false;
         this._notificationRemoved = false;
+        this._bannerHeld = false;
         global.compositor.enable_unredirect();
 
         this._banner.destroy();

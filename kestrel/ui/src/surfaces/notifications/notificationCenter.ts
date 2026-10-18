@@ -4,6 +4,7 @@ import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
 import { ensureActorVisibleInScrollView } from 'resource:///com/lantharos/kestrel/misc/animationUtils.js';
 import type { NotificationCard, NotificationSource, SignalSource } from './notificationCard.js';
+import { CollapseLayout } from './collapseLayout.js';
 import { NotificationGroup } from './notificationGroup.js';
 import St from 'gi://St';
 import { HeaderLayout } from 'resource:///com/lantharos/kestrel/ui/headerLayout.js';
@@ -31,7 +32,8 @@ export class NotificationCenter {
   private closing = false;
   private first: NotificationCard | null = null;
   private readonly scroll: St.ScrollView;
-  private readonly list = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-notification-list' });
+  private readonly list = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-notification-list',
+    layout_manager: new CollapseLayout({ orientation: Clutter.Orientation.VERTICAL }) });
   private readonly headerLayout = new HeaderLayout();
   private readonly header = new St.BoxLayout({ style_class: 'kestrel-notification-header', layout_manager: this.headerLayout });
   private readonly calendar = new Calendar();
@@ -131,7 +133,7 @@ export class NotificationCenter {
       let group = this.groups.get(source);
       if (!group) {
         group = new NotificationGroup(source, this.menus, () => this.invalidate(), this.close,
-          actor => ensureActorVisibleInScrollView(this.scroll, actor));
+          actor => ensureActorVisibleInScrollView(this.scroll, actor), () => { if (this.actor.visible) this.layoutChanged(); });
         this.groups.set(source, group);
         this.list.add_child(group.actor);
       }

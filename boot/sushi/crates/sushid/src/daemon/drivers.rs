@@ -41,16 +41,31 @@ impl Daemon {
 
     pub(super) fn enter_root_after_loading(&mut self, root: PathBuf, waiter: Option<UnixStream>) {
         self.root_waiters.extend(waiter);
-        if self.takeover.will_load() {
+        if self.holds_root() {
             if self.entering_root.is_none() {
                 eprintln!(
-                    "Holding the switch to {} until the graphics driver has loaded",
+                    "Holding the switch to {} until the graphics driver has taken the display over",
                     root.display()
                 );
             }
             self.entering_root = Some(root);
         } else {
             self.answer_root(&root);
+        }
+    }
+
+    fn holds_root(&self) -> bool {
+        self.takeover.will_load() || self.awaits_replacement()
+    }
+
+    fn awaits_replacement(&self) -> bool {
+        self.on_firmware && self.screen.is_none() && self.takeover.is_active()
+    }
+
+    pub(super) fn expect_replacement(&mut self) {
+        if self.on_firmware && !self.takeover.awaits_card() {
+            eprintln!("The graphics driver is taking the display over");
+            self.takeover.expect_driver(self.now());
         }
     }
 
@@ -77,12 +92,14 @@ impl Daemon {
                 self.driver_waiters
                     .drain(..)
                     .for_each(|stream| reply(stream, "ok"));
-                if let Some(root) = self.entering_root.take() {
-                    self.answer_root(&root);
-                }
             }
             Some(Outcome::Finished) => self.settle_loader(now),
             None => {}
+        }
+        if !self.holds_root()
+            && let Some(root) = self.entering_root.take()
+        {
+            self.answer_root(&root);
         }
     }
 }

@@ -6,7 +6,7 @@ What to try when Luft goes on a new computer. Use [luft-nightly.iso](https://get
 
 - [ ] **Secure Boot enrollment.** Leave Secure Boot on. After the restart, the blue screen takes the code Install Luft showed, and Luft starts. `mokutil --sb-state` says it's enabled, and `trustctl status` shows Luft's key as enrolled.
 - [ ] **Alongside Windows.** Windows still starts from the firmware's boot menu, keeps its files, and Luft's startup partition sits next to Windows' EFI system partition when that one is small. With Fast Startup offered and on, it's off in Windows afterwards.
-- [ ] **Graphics handover and the splash.** From the firmware logo to the login screen there's no flash, no black gap and no text, and the logo doesn't jump. Same when restarting and shutting down. On NVIDIA, `bootc status` shows the `-nvidia` image.
+- [ ] **Graphics handover and the splash.** From the firmware logo to the login screen there's no flash, no black gap and no text, and the logo doesn't jump. Same when restarting and shutting down. In `journalctl -b -t sushid`, the splash moves to the graphics card before `Moved into /sysroot`, and on a built-in screen with AMD graphics it says the driver kept the picture. On NVIDIA, `bootc status` shows the `-nvidia` image.
 
 ## Every day
 

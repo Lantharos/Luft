@@ -61,9 +61,7 @@ impl Daemon {
 
     fn take_over(&mut self, display: &Display) -> bool {
         let now = self.now();
-        let seamless = !self.takeover.awaits_card()
-            && display.kept_firmware_picture()
-            && display.shows_planned_modes();
+        let seamless = !self.takeover.awaits_card() && display.keeps_firmware_picture();
         if seamless {
             eprintln!("The graphics driver kept the picture in the saved mode");
         }
@@ -76,6 +74,7 @@ impl Daemon {
         if let Some(screen) = self.screen.take() {
             self.previous = screen.into_parts().0;
         }
+        self.expect_replacement();
     }
 
     pub(super) fn handle_cards(&mut self) {
@@ -92,6 +91,9 @@ impl Daemon {
                             .take()
                             .and_then(|screen| screen.refresh(&self.hints, firmware).ok());
                     }
+                }
+                CardEvent::Changed(path) if self.screen.is_none() && !self.knows(&path) => {
+                    self.card_added(&path)
                 }
                 CardEvent::Removed(path) => {
                     if self.shows(&path) {

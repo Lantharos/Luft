@@ -29,8 +29,8 @@ struct Planned {
     internal: bool,
 }
 
-const SEAMLESS_DRIVERS: [&str; 2] = ["i915", "xe"];
-const SEAMLESS_ON_INTERNAL_PANELS: [&str; 1] = ["amdgpu"];
+const DRIVERS_READING_BACK_THE_FIRMWARE_PICTURE: [&str; 2] = ["i915", "xe"];
+const DRIVERS_SILENTLY_KEEPING_THE_FIRMWARE_PICTURE_ON_PANELS: [&str; 1] = ["amdgpu"];
 
 fn is_internal(interface: connector::Interface) -> bool {
     matches!(
@@ -165,22 +165,21 @@ impl Display {
         Ok(Self { card, outputs })
     }
 
-    /// Whether the driver took over the picture the firmware left on screen instead of switching the display off.
-    pub fn kept_firmware_picture(&self) -> bool {
+    /// Whether the driver still shows the picture the firmware left on screen, and the planned modes keep it.
+    pub fn keeps_firmware_picture(&self) -> bool {
         let driver = self.card.driver().unwrap_or_default();
-        let inherited = self.outputs.iter().all(|output| output.inherited.is_some());
-        let internal = self.outputs.iter().all(|output| output.internal);
-        inherited
-            && (SEAMLESS_DRIVERS.contains(&driver.as_str())
-                || (internal && SEAMLESS_ON_INTERNAL_PANELS.contains(&driver.as_str())))
-    }
-
-    pub fn shows_planned_modes(&self) -> bool {
-        self.outputs.iter().all(|output| {
-            output
-                .inherited
-                .is_some_and(|inherited| same_timing(&inherited, &output.mode))
-        })
+        if DRIVERS_READING_BACK_THE_FIRMWARE_PICTURE.contains(&driver.as_str()) {
+            return self.outputs.iter().all(|output| {
+                output
+                    .inherited
+                    .is_some_and(|inherited| same_timing(&inherited, &output.mode))
+            });
+        }
+        let framebuffer = boot::framebuffer();
+        DRIVERS_SILENTLY_KEEPING_THE_FIRMWARE_PICTURE_ON_PANELS.contains(&driver.as_str())
+            && self.outputs.iter().all(|output| {
+                output.internal && output.inherited.is_none() && Some(output.size()) == framebuffer
+            })
     }
 
     pub fn refresh(self, hints: &ModeHints) -> io::Result<(Self, bool)> {

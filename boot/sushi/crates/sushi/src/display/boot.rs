@@ -25,7 +25,8 @@ fn announced_by_boot_loader() -> Option<(u32, u32)> {
     Some((width.parse().ok()?, height.parse().ok()?))
 }
 
-fn handed_to_linux() -> Option<(u32, u32)> {
+/// The framebuffer Linux got from the firmware, after any mode change by the boot loader.
+pub(super) fn framebuffer() -> Option<(u32, u32)> {
     let boot_params = boot_params()?;
     let field = |range: Range<usize>| {
         Some(u32::from(u16::from_le_bytes(
@@ -38,5 +39,5 @@ fn handed_to_linux() -> Option<(u32, u32)> {
 
 /// The screen the firmware was showing when it handed over: before SushiBoot changed its mode, or as Linux got it.
 pub fn firmware_screen() -> Option<(u32, u32)> {
-    announced_by_boot_loader().or_else(handed_to_linux)
+    announced_by_boot_loader().or_else(framebuffer)
 }

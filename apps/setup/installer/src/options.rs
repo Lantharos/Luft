@@ -1,10 +1,12 @@
 use std::path::PathBuf;
 
-use clap::Parser;
+use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
 #[command(about = "Installs Luft from the live system and finishes first-run setup")]
 pub struct Options {
+    #[command(subcommand)]
+    pub command: Option<Command>,
     /// Where to read the images to install from and how to start them.
     #[arg(long, default_value = "/usr/lib/luft-installer/install.toml")]
     pub config: PathBuf,
@@ -17,4 +19,10 @@ pub struct Options {
     /// Where to assemble the new system while installing.
     #[arg(long, default_value = "/run/luft-installer/target")]
     pub target: PathBuf,
+}
+
+#[derive(Subcommand, Clone, Copy)]
+pub enum Command {
+    /// Removes Meet Luft's partitions or folder and grows Luft into the space they used.
+    Reclaim,
 }

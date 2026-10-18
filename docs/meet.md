@@ -29,7 +29,7 @@ When Windows encrypts new partitions with BitLocker as soon as they're formatted
 
 `meet.json` names Meet Luft's partitions by their GUIDs, the room, the start entry and whether the last restart was to try or to install. The live system finds its partition with `root=luft-live:PARTUUID=…` on the kernel command line; the stick uses `root=luft-live:LABEL=…`. None of the partitions get a drive letter.
 
-After Luft is installed and you sign in for the first time, it removes the start entry, the moving box, the start and live partitions, and grows into the space they used.
+At Luft's first start after installing, before the login screen, it removes the start entry, the moving box, the start and live partitions, and grows into the space they used.
 
 ### Getting a newer Luft
 
@@ -110,6 +110,6 @@ Secure Boot can stay on: Luft starts through Fedora's shim and GRUB, like the st
 
 *Luft is ready* offers *Try Luft*, *Replace* and *Install Luft*; [Try Luft with Meet Luft](https://docs.luft.computer/start/meet-luft/#on-linux) describes them.
 
-*Get the newest Luft* and the nightly builds (**Ctrl+Shift+N**) work as on Windows. *Remove Luft from this computer* deletes the folder, `EFI/luft-meet` and the start entry. `/var/lib/luft-meet/made.json` notes what Meet Luft made, so it can always take it back out. After Luft is installed and you sign in for the first time, it removes them itself.
+*Get the newest Luft* and the nightly builds (**Ctrl+Shift+N**) work as on Windows. *Remove Luft from this computer* deletes the folder, `EFI/luft-meet` and the start entry. `/var/lib/luft-meet/made.json` notes what Meet Luft made, so it can always take it back out. At Luft's first start after installing, it removes them itself.
 
 Meet Luft asks for your password through polkit once, when it first looks at the computer; a helper started with `pkexec` does the work on the drive and the firmware, and the window runs as you.

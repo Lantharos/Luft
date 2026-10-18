@@ -161,7 +161,15 @@ fn remove_all(path: &Path) -> Result<()> {
     }
 }
 
-pub fn reclaim(state_dir: &Path) -> Result<()> {
+pub fn run(state_dir: &Path) -> Result<()> {
+    let state_dir = state_dir.to_owned();
+    tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()?
+        .block_on(async move { tokio::task::spawn_blocking(move || reclaim(&state_dir)).await })?
+}
+
+fn reclaim(state_dir: &Path) -> Result<()> {
     let Ok(text) = std::fs::read_to_string(record(state_dir)) else {
         return Ok(());
     };

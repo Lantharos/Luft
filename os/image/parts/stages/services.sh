@@ -10,10 +10,12 @@ install -Dm755 "$CARGO_TARGET_DIR/release/luft-installer" "$destdir/usr/libexec/
 install -Dm644 "$installer/data/install.toml" "$destdir/usr/lib/luft-installer/install.toml"
 install -Dm644 -t "$destdir/usr/share/dbus-1/system.d" "$installer/data/com.lantharos.Installer1.conf"
 install -Dm644 -t "$destdir/usr/share/dbus-1/system-services" "$installer/data/com.lantharos.Installer1.service"
-install -Dm644 -t "$destdir/usr/lib/systemd/system" "$installer/data/luft-installer.service"
+install -Dm644 -t "$destdir/usr/lib/systemd/system" "$installer/data/luft-installer.service" "$installer/data/luft-installer-reclaim.service"
 install -Dm644 -t "$destdir/usr/share/polkit-1/actions" "$installer/data/com.lantharos.installer.policy"
 install -Dm644 -t "$destdir/usr/share/polkit-1/rules.d" "$installer/data/40-luft-setup.rules"
 install -Dm644 -t "$destdir/usr/share/selinux/packages" "$installer/data/luft-installer.cil"
+printf 'enable luft-installer-reclaim.service\n' |
+  install -Dm644 /dev/stdin "$destdir/usr/lib/systemd/system-preset/40-luft-installer.preset"
 
 updater="$luft/packages/software/updater"
 cargo build --release --locked --manifest-path "$updater/Cargo.toml"

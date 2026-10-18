@@ -9,7 +9,7 @@ import St from 'gi://St';
 import { HeaderLayout } from 'resource:///com/lantharos/kestrel/ui/headerLayout.js';
 import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
 import { blurSurface } from '../../shared/surface.js';
-import { Calendar } from './calendar.js';
+import { Calendar } from './calendar/calendar.js';
 import { MediaCard } from './media.js';
 
 export interface MessageTray extends SignalSource {

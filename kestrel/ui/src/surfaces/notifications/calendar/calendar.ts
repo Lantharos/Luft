@@ -1,56 +1,84 @@
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
+import { animateActor, projection, Spring } from '../../../shared/motion.js';
+import { MonthScroll } from './monthScroll.js';
+import { weekRow, WeekStrip } from './weekStrip.js';
+import { dateOf, dayNumber, firstOfMonth, isoWeek, monthIndex, Weeks } from './weeks.js';
 import { WeekStart } from './weekStart.js';
 
-const WEEKS = 6;
-const DAY = 86_400_000;
+const THROWN_WEEKS_PER_SECOND = 6;
 const monthTitle = new Intl.DateTimeFormat(undefined, { month: 'long', year: 'numeric' });
 const weekdayName = new Intl.DateTimeFormat(undefined, { weekday: 'short' });
 
-function isoWeek(date: Date): number {
-  const thursday = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate() + 3 - (date.getDay() + 6) % 7));
-  return 1 + Math.floor((thursday.getTime() - Date.UTC(thursday.getUTCFullYear(), 0, 1)) / DAY / 7);
-}
-
 export class Calendar {
-  readonly actor = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-calendar' });
+  readonly actor = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-calendar', reactive: true });
   private readonly month = new St.Button({ style_class: 'kestrel-calendar-month', can_focus: true, track_hover: true, x_expand: true, x_align: Clutter.ActorAlign.START });
-  private readonly headings: St.Label[] = [];
-  private readonly days: St.Label[] = [];
+  private readonly headings = weekRow('kestrel-calendar-headings', 'kestrel-calendar-heading');
+  private readonly strip = new WeekStrip();
   private readonly weekStart = new WeekStart();
-  private shown = new Date();
+  private readonly weeks = new Weeks();
+  private readonly scroll = new MonthScroll(this);
+  private shown = monthIndex(new Date());
+  private drawn = { week: NaN, month: NaN, today: NaN };
 
   constructor() {
     const navigation = new St.BoxLayout({ style_class: 'kestrel-calendar-navigation' });
-    this.month.connect('clicked', () => this.showToday());
+    this.month.connect('clicked', () => this.show(monthIndex(new Date()), true));
     navigation.add_child(this.month);
     navigation.add_child(this.pageButton('go-previous-symbolic', 'Previous month', -1));
     navigation.add_child(this.pageButton('go-next-symbolic', 'Next month', 1));
     this.actor.add_child(navigation);
-
-    const grid = new St.Widget({ style_class: 'kestrel-calendar-grid', layout_manager: new Clutter.GridLayout({ column_homogeneous: true, row_spacing: 2 }) });
-    const layout = grid.layout_manager as Clutter.GridLayout;
-    for (let column = 0; column < 7; column++) {
-      const heading = new St.Label({ style_class: 'kestrel-calendar-heading', x_expand: true });
-      this.headings.push(heading);
-      layout.attach(heading, column, 0, 1, 1);
-    }
-    for (let index = 0; index < WEEKS * 7; index++) {
-      const day = new St.Label({ style_class: 'kestrel-calendar-day', x_expand: true, x_align: Clutter.ActorAlign.CENTER });
-      this.days.push(day);
-      layout.attach(day, index % 7, 1 + Math.floor(index / 7), 1, 1);
-    }
+    const grid = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-calendar-grid' });
+    grid.add_child(this.headings[0].get_parent()!);
+    grid.add_child(this.strip);
     this.actor.add_child(grid);
-    const unwatch = this.weekStart.watch(() => this.render());
+    this.strip.connect('notify::week', () => this.render());
+    this.actor.connect('scroll-event', (_actor, event: Clutter.Event) => this.scroll.handle(event));
+    const unwatch = this.weekStart.watch(() => this.align());
     this.actor.connect('destroy', unwatch);
-    this.showToday();
+    this.align();
   }
 
   showToday(): void {
-    const now = new Date();
-    this.shown = new Date(now.getFullYear(), now.getMonth(), 1);
+    this.show(monthIndex(new Date()), false);
+  }
+
+  follow(distance: number): void {
+    this.strip.remove_transition('week');
+    this.strip.week += distance / this.strip.pitch;
+  }
+
+  release(velocity: number): void {
+    const speed = velocity / this.strip.pitch;
+    this.shown = this.weeks.nearestMonth(this.strip.week + projection(speed));
+    const spring = Math.abs(speed) >= THROWN_WEEKS_PER_SECOND ? Spring.thrown : Spring.snappy;
+    animateActor(this.strip, { week: this.weeks.startOf(this.shown), spring, velocity: speed });
+  }
+
+  step(direction: number): void {
+    this.show(this.shown + direction, true);
+  }
+
+  private show(month: number, animate: boolean): void {
+    this.shown = month;
+    const week = this.weeks.startOf(month);
+    if (animate) {
+      animateActor(this.strip, { week, spring: Spring.snappy });
+      return;
+    }
+    this.strip.remove_transition('week');
+    this.strip.week = week;
     this.render();
+  }
+
+  private align(): void {
+    const weekStart = this.weekStart.day;
+    this.weeks.weekStart = weekStart;
+    this.headings.forEach((heading, column) =>
+      heading.text = weekdayName.format(new Date(2023, 0, 1 + (weekStart + column) % 7)).slice(0, 2));
+    this.drawn.week = NaN;
+    this.show(this.shown, false);
   }
 
   private pageButton(icon: string, label: string, direction: number): St.Button {
@@ -58,26 +86,26 @@ export class Calendar {
       style_class: 'kestrel-icon-button kestrel-calendar-page', accessible_name: label, can_focus: true, track_hover: true,
       child: new St.Icon({ icon_name: icon, icon_size: 16 }),
     });
-    button.connect('clicked', () => {
-      this.shown = new Date(this.shown.getFullYear(), this.shown.getMonth() + direction, 1);
-      this.render();
-    });
+    button.connect('clicked', () => this.step(direction));
     return button;
   }
 
   private render(): void {
     const now = new Date();
-    const current = this.shown.getFullYear() === now.getFullYear() && this.shown.getMonth() === now.getMonth();
-    this.month.label = `${monthTitle.format(this.shown)}, week ${isoWeek(current ? now : this.shown)}`;
-    const weekStart = this.weekStart.day;
-    for (const [column, heading] of this.headings.entries())
-      heading.text = weekdayName.format(new Date(2023, 0, 1 + (weekStart + column) % 7)).slice(0, 2);
-    const offset = (this.shown.getDay() - weekStart + 7) % 7;
-    for (const [index, label] of this.days.entries()) {
-      const date = new Date(this.shown.getFullYear(), this.shown.getMonth(), 1 + index - offset);
-      label.text = `${date.getDate()}`;
-      const today = date.toDateString() === now.toDateString();
-      label.set_style_pseudo_class(today ? 'selected' : date.getMonth() === this.shown.getMonth() ? null : 'insensitive');
-    }
+    const today = dayNumber(now);
+    const week = Math.floor(this.strip.week);
+    const month = this.weeks.nearestMonth(this.strip.week);
+    if (week === this.drawn.week && month === this.drawn.month && today === this.drawn.today) return;
+    this.drawn = { week, month, today };
+    const current = month === monthIndex(now);
+    this.month.label = `${monthTitle.format(firstOfMonth(month))}, week ${isoWeek(current ? now : firstOfMonth(month))}`;
+    this.strip.rows.forEach((cells, row) => {
+      const first = this.weeks.firstDay(week + row);
+      cells.forEach((cell, column) => {
+        const date = dateOf(first + column);
+        cell.text = `${date.getDate()}`;
+        cell.set_style_pseudo_class(first + column === today ? 'selected' : monthIndex(date) === month ? null : 'insensitive');
+      });
+    });
   }
 }

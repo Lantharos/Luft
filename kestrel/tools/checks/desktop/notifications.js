@@ -5,13 +5,17 @@ import {dismissImmediately, toggleSurface} from 'resource:///com/lantharos/kestr
 import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 import * as MessageTray from 'resource:///com/lantharos/kestrel/ui/messageTray.js';
 
-import {descendants, firstStyled, labelled, named, shown} from '../lib/actors.js';
+import {descendants, firstStyled, labelled, named, shown, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {call, subscribe} from '../lib/dbus.js';
+import {fingerScroll, liftFingers, moveTo, rest, scroll} from '../lib/input.js';
 import {capture} from '../lib/screenshots.js';
-import {settled, waitUntil} from '../lib/wait.js';
+import {pause, settled, waitUntil} from '../lib/wait.js';
 
 const {require, eventually} = checks('notification');
+const monthTitle = new Intl.DateTimeFormat(undefined, {month: 'long', year: 'numeric'});
+const VELOCITY_WINDOW = 150;
+const WEEKS_DRAGGED = 3;
 
 async function notify(app, title, body, actions = []) {
   const reply = await call('org.gnome.Shell', '/org/freedesktop/Notifications', 'org.freedesktop.Notifications', 'Notify',
@@ -166,6 +170,54 @@ async function checkCalendar() {
   }
 }
 
+async function checkCalendarScrolling() {
+  for (const app of ['Weather', 'Chatter', 'Calendar', 'Mail', 'Files', 'Music', 'Photos', 'Maps'])
+    await notify(app, `${app} update`, 'Something changed.');
+  toggleSurface('notifications');
+  const center = named('kestrel-notifications');
+  await waitUntil(() => shown(center), 'the notification center opens');
+  await settled();
+  const calendar = firstStyled('kestrel-calendar', center);
+  const weeks = firstStyled('kestrel-calendar-viewport', center);
+  const list = styled('kestrel-notification-list', center)[0].get_parent();
+  const today = new Date();
+  const shows = offset => firstStyled('kestrel-calendar-month', center).label
+    .startsWith(`${monthTitle.format(new Date(today.getFullYear(), today.getMonth() + offset, 1))}, `);
+  const atRest = () => !weeks.get_transition('week') && Number.isInteger(weeks.week);
+  try {
+    require(list.vadjustment.upper > list.vadjustment.page_size, 'many notifications make the list scroll');
+    scroll(Clutter.ScrollDirection.DOWN, calendar);
+    await eventually(() => shows(1) && atRest(), 'a wheel notch down over the calendar shows the next month');
+    require(list.vadjustment.value === 0, 'scrolling the calendar leaves the notifications where they are');
+    scroll(Clutter.ScrollDirection.UP, calendar);
+    scroll(Clutter.ScrollDirection.UP, calendar);
+    await eventually(() => shows(-1) && atRest(), 'each wheel notch up goes back one month');
+    await capture('notification-calendar-previous');
+
+    const start = weeks.week;
+    moveTo(calendar);
+    await fingerScroll(WEEKS_DRAGGED * weeks.pitch, {steps: 24});
+    require(Math.abs(weeks.week - start - WEEKS_DRAGGED) < 0.05, 'the calendar follows the fingers on the touchpad');
+    await capture('notification-calendar-dragging');
+    await pause(VELOCITY_WINDOW);
+    liftFingers();
+    await eventually(() => shows(0) && atRest(), 'letting go settles on the nearest month');
+    await fingerScroll(-2 * weeks.pitch, {steps: 6});
+    liftFingers();
+    await eventually(() => atRest() && weeks.week < start, 'a quick swipe up flings back to an earlier month');
+    require(list.vadjustment.value === 0, 'swiping over the calendar leaves the notifications where they are');
+
+    const settledWeek = weeks.week;
+    scroll(Clutter.ScrollDirection.DOWN, list);
+    await eventually(() => list.vadjustment.value > 0, 'the wheel scrolls the notification list');
+    require(weeks.week === settledWeek, 'scrolling the notifications leaves the calendar on its month');
+  } finally {
+    rest();
+    clearAll();
+    dismissImmediately();
+  }
+}
+
 export async function run() {
   const replies = [];
   const unsubscribe = subscribe({iface: 'org.freedesktop.Notifications', member: 'NotificationReplied', path: '/org/freedesktop/Notifications'},
@@ -177,6 +229,7 @@ export async function run() {
     await checkUpdateWhileHiding();
     await checkAppRules();
     await checkCalendar();
+    await checkCalendarScrolling();
   } finally {
     unsubscribe();
     clearAll();

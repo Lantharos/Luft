@@ -5,6 +5,7 @@
 
 .kestrel-calendar { spacing: 10px; }
 .kestrel-calendar-navigation { spacing: 2px; }
+.kestrel-calendar-grid, .kestrel-calendar-weeks { spacing: 2px; }
 .kestrel-calendar-month { padding: 7px 8px; border-radius: 999px; font-size: 13px; font-weight: 600; transition-duration: $motion-tap; }
 .kestrel-calendar-month:hover, .kestrel-calendar-month:focus { background-color: fill(0.10); }
 .kestrel-calendar-page { padding: 8px; }

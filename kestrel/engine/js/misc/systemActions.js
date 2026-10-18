@@ -19,7 +19,6 @@ const RESTART_ACTION_ID          = 'restart';
 const LOCK_SCREEN_ACTION_ID      = 'lock-screen';
 const LOGOUT_ACTION_ID           = 'logout';
 const SUSPEND_ACTION_ID          = 'suspend';
-const LOCK_ORIENTATION_ACTION_ID = 'lock-orientation';
 
 let _singleton = null;
 
@@ -55,14 +54,6 @@ const SystemActions = GObject.registerClass({
             'can-logout', null, null,
             GObject.ParamFlags.READABLE,
             false),
-        'can-lock-orientation': GObject.ParamSpec.boolean(
-            'can-lock-orientation', null, null,
-            GObject.ParamFlags.READABLE,
-            false),
-        'orientation-lock-icon': GObject.ParamSpec.string(
-            'orientation-lock-icon', null, null,
-            GObject.ParamFlags.READWRITE,
-            null),
     },
 }, class SystemActions extends GObject.Object {
     _init() {
@@ -81,15 +72,12 @@ const SystemActions = GObject.registerClass({
             [LOCK_SCREEN_ACTION_ID, {available: false}],
             [LOGOUT_ACTION_ID, {available: false}],
             [SUSPEND_ACTION_ID, {available: false}],
-            [LOCK_ORIENTATION_ACTION_ID, {iconName: '', available: false}],
         ]);
 
         this._lockdownSettings = new Gio.Settings({schema_id: LOCKDOWN_SCHEMA});
-        this._orientationSettings = new Gio.Settings({schema_id: 'com.lantharos.kestrel.touchscreen'});
         this._screenSaverSettings = new Gio.Settings({schema_id: SCREENSAVER_SCHEMA});
 
         this._session = new GnomeSession.SessionManager();
-        this._monitorManager = global.backend.get_monitor_manager();
 
         this._userManager = AccountsService.UserManager.get_default();
 
@@ -126,17 +114,6 @@ const SystemActions = GObject.registerClass({
 
         this.forceUpdate();
 
-        this._orientationSettings.connect('changed::orientation-lock', () => {
-            this._updateOrientationLock();
-            this._updateOrientationLockStatus();
-        });
-        Main.layoutManager.connect('monitors-changed',
-            () => this._updateOrientationLock());
-        this._monitorManager.connect('notify::panel-orientation-managed',
-            () => this._updateOrientationLock());
-        this._updateOrientationLock();
-        this._updateOrientationLockStatus();
-
         Main.sessionMode.connect('updated', () => this._sessionUpdated());
         this._sessionUpdated();
     }
@@ -159,31 +136,6 @@ const SystemActions = GObject.registerClass({
 
     get canLogout() {
         return this._actions.get(LOGOUT_ACTION_ID).available;
-    }
-
-    get canLockOrientation() {
-        return this._actions.get(LOCK_ORIENTATION_ACTION_ID).available;
-    }
-
-    get orientationLockIcon() {
-        return this._actions.get(LOCK_ORIENTATION_ACTION_ID).iconName;
-    }
-
-    _updateOrientationLock() {
-        const available = this._monitorManager.get_panel_orientation_managed();
-
-        this._actions.get(LOCK_ORIENTATION_ACTION_ID).available = available;
-
-        this.notify('can-lock-orientation');
-    }
-
-    _updateOrientationLockStatus() {
-        const locked = this._orientationSettings.get_boolean('orientation-lock');
-        this._actions.get(LOCK_ORIENTATION_ACTION_ID).iconName = locked
-            ? 'rotation-locked-symbolic'
-            : 'rotation-allowed-symbolic';
-
-        this.notify('orientation-lock-icon');
     }
 
     _sessionUpdated() {
@@ -280,14 +232,6 @@ const SystemActions = GObject.registerClass({
         this.notify('can-logout');
 
         return visible;
-    }
-
-    activateLockOrientation() {
-        if (!this._actions.get(LOCK_ORIENTATION_ACTION_ID).available)
-            throw new Error('The lock-orientation action is not available!');
-
-        const locked = this._orientationSettings.get_boolean('orientation-lock');
-        this._orientationSettings.set_boolean('orientation-lock', !locked);
     }
 
     activateLockScreen() {

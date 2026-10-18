@@ -1,17 +1,18 @@
+import Clutter from 'gi://Clutter';
 import GdkPixbuf from 'gi://GdkPixbuf';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
 import {getStyleVariant} from 'resource:///com/lantharos/kestrel/ui/kestrelTheme.js';
-import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
+import {accelerometer, toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 
 import {descendants, named, shown, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {property} from '../lib/dbus.js';
-import {click, drag, rest, rightClick} from '../lib/input.js';
-import {gjs, scratch} from '../lib/processes.js';
+import {chord, click, drag, press, rest, rightClick} from '../lib/input.js';
+import {gjs, scratch, stop} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
-import {settled} from '../lib/wait.js';
+import {settled, waitUntil} from '../lib/wait.js';
 import {contrast} from './lib/colors.js';
 
 const {require, eventually} = checks('quick tile');
@@ -179,6 +180,43 @@ async function checkLayout(shellSettings) {
   await eventually(() => dark.get_parent() === grid() && dark.visible, 'removed tiles can be added back');
 }
 
+async function openAddList() {
+  await eventually(() => !menu().visible && shown(quick()), 'quick settings are open with no menu');
+  await settled();
+  rightClick(surfaceCorner());
+  await eventually(() => shown(named('Add', menu())), 'quick settings offer to add tiles');
+  click(named('Add', menu()));
+  await eventually(() => shown(named('Screenshot', menu())), 'the add list shows the tiles hidden by default');
+}
+
+async function checkRotation() {
+  const touchscreen = new Gio.Settings({schema_id: 'com.lantharos.kestrel.touchscreen'});
+  require(!tile('Auto Rotate'), 'auto rotate is not shown by default');
+  await openAddList();
+  require(!named('Auto Rotate', menu()), 'the add list leaves out auto rotate without an accelerometer');
+  press(Clutter.KEY_Escape);
+  const sensor = gjs('services/sensorProxy.js');
+  try {
+    await eventually(() => accelerometer.present, 'Kestrel finds the accelerometer');
+    await openAddList();
+    require(shown(named('Auto Rotate', menu())), 'the add list offers auto rotate with an accelerometer');
+    click(named('Auto Rotate', menu()));
+    const rotation = await waitUntil(() => tile('Auto Rotate')?.get_parent() === grid() && tile('Auto Rotate').visible && tile('Auto Rotate'), 'auto rotate can be added');
+    rest();
+    await settled();
+    require(rotation.checked && subtitle(rotation) === 'On' && rotation.icon_name === 'rotation-allowed-symbolic', 'auto rotate starts on');
+    await capture('quick-settings-rotation');
+    await toggle(rotation, 'turning auto rotate off locks the rotation',
+      checked => !checked && touchscreen.get_boolean('orientation-lock') && subtitle(rotation) === 'Off' && rotation.icon_name === 'rotation-locked-symbolic');
+    await chord(Clutter.KEY_Super_L, Clutter.KEY_o);
+    await eventually(() => rotation.checked && !touchscreen.get_boolean('orientation-lock'), 'Super+O turns auto rotate back on');
+  } finally {
+    touchscreen.reset('orientation-lock');
+    await stop(sensor);
+  }
+  await eventually(() => !tile('Auto Rotate').visible, 'auto rotate goes away with the accelerometer');
+}
+
 function recordingHandler(opened) {
   const applications = GLib.build_filenamev([GLib.get_user_data_dir(), 'applications']);
   GLib.mkdir_with_parents(applications, 0o755);
@@ -220,6 +258,8 @@ export async function run() {
     toggleSurface('quick');
     await eventually(() => shown(quick()) && TILES.every(title => tile(title)?.visible), 'quick settings show every available tile', 10000);
     await capture('quick-settings-tiles');
+    await checkRotation();
+    shellSettings.reset('quick-tiles-removed');
     await checkKeepAwake();
     await checkToggles(interfaceSettings);
     await checkActiveTiles(shellSettings, interfaceSettings);

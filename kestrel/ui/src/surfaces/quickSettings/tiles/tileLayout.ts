@@ -2,9 +2,14 @@ import Gio from 'gi://Gio';
 
 const ORDER = 'quick-tile-order';
 const REMOVED = 'quick-tiles-removed';
+const KNOWN = 'quick-tiles-known';
 
 export class TileLayout {
   private readonly settings = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
+
+  constructor() {
+    this.hideNewTiles();
+  }
 
   order(defaults: string[]): string[] {
     const stored = this.settings.get_strv(ORDER).filter(id => defaults.includes(id));
@@ -34,6 +39,15 @@ export class TileLayout {
 
   restore(id: string): void {
     this.settings.set_strv(REMOVED, [...this.removed].filter(removed => removed !== id));
+  }
+
+  private hideNewTiles(): void {
+    const hiddenByDefault = this.settings.get_default_value(REMOVED)!.deepUnpack() as string[];
+    const known = new Set(this.settings.get_strv(KNOWN));
+    const unknown = hiddenByDefault.filter(id => !known.has(id));
+    if (!unknown.length) return;
+    if (this.settings.get_user_value(REMOVED)) this.settings.set_strv(REMOVED, [...new Set([...this.removed, ...unknown])]);
+    this.settings.set_strv(KNOWN, hiddenByDefault);
   }
 
   reset(): void {

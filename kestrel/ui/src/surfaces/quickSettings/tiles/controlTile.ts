@@ -77,7 +77,7 @@ export function actionTile(glyph: string | Clutter.Actor, titleText: string, act
   const { body, title, subtitle } = tileParts(typeof glyph === 'string' ? new St.Icon({ style_class: 'kestrel-control-icon', icon_size: TILE_ICON_SIZE, icon_name: glyph }) : glyph);
   title.text = titleText;
   const actor = new St.Button({
-    style_class: 'kestrel-control', can_focus: true, track_hover: true,
+    style_class: 'kestrel-control', can_focus: true, track_hover: true, visible: true,
     accessible_name: titleText, label_actor: title, child: body,
   });
   actor.connect('clicked', activate);

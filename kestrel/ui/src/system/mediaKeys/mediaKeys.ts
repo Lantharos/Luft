@@ -64,7 +64,7 @@ export class MediaKeys {
       'touchpad-toggle': { modes: ANYWHERE, run: () => this.devices.touchpadEnabled(null) },
       'touchpad-on': { modes: ANYWHERE, run: () => this.devices.touchpadEnabled(true) },
       'touchpad-off': { modes: ANYWHERE, run: () => this.devices.touchpadEnabled(false) },
-      'rotate-video-lock': { modes: ANYWHERE, repeats: true, run: () => void this.devices.toggleRotationLock() },
+      'rotate-video-lock': { modes: ANYWHERE, repeats: true, run: () => this.devices.toggleRotationLock() },
       'battery-status': { modes: DESKTOP, run: () => void this.devices.showBattery() },
       'rfkill': { modes: DESKTOP, run: () => void this.devices.toggleRadios(false) },
       'rfkill-bluetooth': { modes: DESKTOP, run: () => void this.devices.toggleRadios(true) },

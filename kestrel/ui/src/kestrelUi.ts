@@ -10,7 +10,7 @@ import { Greeter, type GreeterContext } from './auth/greeter/greeter.js';
 import { LockControls } from './auth/lockScreen/controls.js';
 import { Board, type BoardFrame } from './desktop/board/board.js';
 import { FourFingerSwipe, type SwipeDirection, type SwipeTrack } from './desktop/gestures/fourFingers.js';
-import { ContextMenus } from './desktop/menus/contextMenus.js';
+import { ContextMenus, type MenuEntry } from './desktop/menus/contextMenus.js';
 import { coveredMonitors } from './desktop/panel/coverage.js';
 import type { Monitor } from './desktop/panel/panel.js';
 import { PanelSet } from './desktop/panel/panels.js';
@@ -43,6 +43,7 @@ export { signInToNetwork } from './system/network/signIn.js';
 export { isGame } from './desktop/windows/games.js';
 export { VpnSecrets } from './system/network/vpnSecrets.js';
 export { battery } from './shared/battery/battery.js';
+export { accelerometer } from './desktop/rotation/accelerometer.js';
 export { useStandInAccounts } from './system/standIn/accounts.js';
 export { standInBus } from './system/standIn/bus.js';
 export { afterMotion, holdMotion } from './shared/afterMotion.js';
@@ -170,14 +171,13 @@ class KestrelUi {
       const [x, y] = event.get_coords();
       const target = shellGlobal.stage.get_actor_at_pos(Clutter.PickMode.REACTIVE, x, y);
       if (!this.previews.contains(target)) this.previews.close();
-      if (event.get_button() !== Clutter.BUTTON_SECONDARY || !(target instanceof Meta.BackgroundActor)) return Clutter.EVENT_PROPAGATE;
-      this.menus.open(target, [
-        { label: 'Change wallpaper', run: () => this.menus.settings('appearance') },
-        { label: 'Display settings', run: () => this.menus.settings('display') },
-        { label: 'Settings', run: () => this.menus.settings() },
-      ], x, y);
-      return Clutter.EVENT_STOP;
+      return Clutter.EVENT_PROPAGATE;
     });
+    const bindWallpaper = (actor: Clutter.Actor) => {
+      if (actor instanceof Meta.BackgroundActor) this.menus.bind(actor, () => this.desktopMenu());
+    };
+    context.wallpaper.get_children().forEach(bindWallpaper);
+    this.watch(context.wallpaper, 'child-added', (_wallpaper, actor: Clutter.Actor) => bindWallpaper(actor));
     this.watch(shellGlobal.display, 'overlay-key', () => this.superTapped());
     this.watch(shellGlobal.display, 'in-fullscreen-changed', () => this.queueSyncSession());
     this.watch(shellGlobal.display, 'notify::focus-window', () => this.trackFocusedWindow());
@@ -215,6 +215,14 @@ class KestrelUi {
   private watch(object: Signals, signal: string, callback: (...args: any[]) => any): void {
     const id = object.connect(signal, callback);
     this.disconnectors.push(() => object.disconnect(id));
+  }
+
+  private desktopMenu(): MenuEntry[] {
+    return [
+      { label: 'Change wallpaper', run: () => this.menus.settings('appearance') },
+      { label: 'Display settings', run: () => this.menus.settings('display') },
+      { label: 'Settings', run: () => this.menus.settings() },
+    ];
   }
 
   private desktopAvailable(): boolean {

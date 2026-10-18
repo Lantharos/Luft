@@ -2,6 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import type { Context } from '../../context.js';
+import { accelerometer } from '../../desktop/rotation/accelerometer.js';
 
 type ShowOsd = Context['showOsd'];
 
@@ -39,9 +40,8 @@ export class DeviceKeys {
     this.touchpad.set_string('send-events', next ? 'enabled' : 'disabled');
   }
 
-  async toggleRotationLock(): Promise<void> {
-    const sensor = await properties(Gio.DBus.system, 'net.hadess.SensorProxy', '/net/hadess/SensorProxy', 'net.hadess.SensorProxy').catch(() => null);
-    if (!sensor?.HasAccelerometer) return;
+  toggleRotationLock(): void {
+    if (!accelerometer.present) return;
     const locked = !this.touchscreen.get_boolean('orientation-lock');
     this.touchscreen.set_boolean('orientation-lock', locked);
     this.showOsd(icon(locked ? 'rotation-locked-symbolic' : 'rotation-allowed-symbolic'), null, null, 1);

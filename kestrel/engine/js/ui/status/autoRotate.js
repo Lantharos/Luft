@@ -1,37 +1,35 @@
 import Gio from 'gi://Gio';
 import GObject from 'gi://GObject';
 
-import * as SystemActions from '../../misc/systemActions.js';
+import * as KestrelUi from '../kestrelUi.js';
 
 import {QuickToggle, SystemIndicator} from '../quickSettings.js';
 
 const RotationToggle = GObject.registerClass(
 class RotationToggle extends QuickToggle {
     _init() {
-        this._systemActions = new SystemActions.getDefault();
-
         super._init({
             title: _('Auto Rotate'),
         });
-
-        this._systemActions.bind_property('can-lock-orientation',
-            this, 'visible',
-            GObject.BindingFlags.DEFAULT |
-            GObject.BindingFlags.SYNC_CREATE);
-        this._systemActions.bind_property('orientation-lock-icon',
-            this, 'icon-name',
-            GObject.BindingFlags.DEFAULT |
-            GObject.BindingFlags.SYNC_CREATE);
 
         this._settings = new Gio.Settings({
             schema_id: 'com.lantharos.kestrel.touchscreen',
         });
         this._settings.bind('orientation-lock',
             this, 'checked',
-            Gio.SettingsBindFlags.INVERT_BOOLEAN);
+            Gio.SettingsBindFlags.GET | Gio.SettingsBindFlags.INVERT_BOOLEAN);
+        this.connect('notify::checked', () => this._syncIcon());
+        this._syncIcon();
 
         this.connect('clicked',
-            () => this._systemActions.activateLockOrientation());
+            () => this._settings.set_boolean('orientation-lock', this.checked));
+
+        const unwatch = KestrelUi.accelerometer.watch(present => (this.visible = present));
+        this.connect('destroy', unwatch);
+    }
+
+    _syncIcon() {
+        this.iconName = this.checked ? 'rotation-allowed-symbolic' : 'rotation-locked-symbolic';
     }
 });
 

@@ -7,6 +7,7 @@ import St from 'gi://St';
 import type { Monitor } from '../panel/panel.js';
 import { blurSurface } from '../../shared/surface.js';
 import { animateActor } from '../../shared/motion.js';
+import { longPress } from '../../shared/input/longPress.js';
 import { menuContent, type MenuEntry, type MenuGroup } from './menuContent.js';
 import { openSettings, type SettingsPageId } from '../../system/settingsPages.js';
 import { taskbarPreferences } from '../panel/preferences/taskbarPreferences.js';
@@ -31,6 +32,7 @@ export class ContextMenus {
   private previousFocus: Clutter.Actor | null = null;
   private clearSelection: (() => void) | null = null;
   private anchor: { x: number; y: number; monitor: Monitor } | null = null;
+  private readonly bound = new WeakSet<Clutter.Actor>();
 
   constructor(private readonly monitor: (x: number, y: number) => Monitor | null, private readonly dismissShell: () => void, private readonly enabled: () => boolean, private readonly beforeOpen: () => void, private readonly activateWindow: (window: Meta.Window) => void) {
     blurSurface(this.actor, 18);
@@ -41,6 +43,10 @@ export class ContextMenus {
       this.sourceDestroy = 0;
     });
     this.shield.connect('button-press-event', () => { this.close(); return Clutter.EVENT_STOP; });
+    this.shield.connect('touch-event', (_shield, event) => {
+      if (event.type() === Clutter.EventType.TOUCH_BEGIN) this.close();
+      return Clutter.EVENT_STOP;
+    });
     this.actor.connect('key-press-event', (_actor, event) => {
       const key = event.get_key_symbol();
       if (key === Clutter.KEY_Escape) { this.close(); return Clutter.EVENT_STOP; }
@@ -53,6 +59,8 @@ export class ContextMenus {
   }
 
   bind(actor: Clutter.Actor, entries: () => MenuEntry[]): void {
+    this.bound.add(actor);
+    longPress(actor, (x, y) => this.open(actor, entries(), x, y), target => this.enabled() && this.nearestBound(target) === actor);
     actor.connect('button-press-event', (_actor, event) => {
       if (event.get_button() !== Clutter.BUTTON_SECONDARY) return Clutter.EVENT_PROPAGATE;
       const [x, y] = event.get_coords();
@@ -67,6 +75,11 @@ export class ContextMenus {
       this.open(actor, entries(), x, y);
       return Clutter.EVENT_STOP;
     });
+  }
+
+  private nearestBound(target: Clutter.Actor | null): Clutter.Actor | null {
+    while (target && !this.bound.has(target)) target = target.get_parent();
+    return target;
   }
 
   appEntries(app: Shell.App, windows = app.get_windows(), open = () => app.activate()): MenuEntry[] {

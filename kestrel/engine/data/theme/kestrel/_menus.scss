@@ -13,6 +13,7 @@
 }
 
 .kestrel-context-menu { @include context-menu; }
+.kestrel-hold-cue { border-radius: 999px; background-color: fill(0.2); }
 
 .popup-menu-boxpointer, .candidate-popup-boxpointer {
   -arrow-base: 0; -arrow-rise: 0; -arrow-border-width: 0;

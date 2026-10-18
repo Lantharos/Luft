@@ -90,8 +90,13 @@
       <summary>Order of the Quick Settings tiles</summary>
     </key>
     <key name="quick-tiles-removed" type="as">
-      <default>["screenshot", "settings", "lock"]</default>
+      <default>["screenshot", "settings", "lock", "rotation-0"]</default>
       <summary>Quick Settings tiles removed by the user</summary>
+    </key>
+    <key name="quick-tiles-known" type="as">
+      <default>["screenshot", "settings", "lock"]</default>
+      <summary>Tiles hidden by default that the Quick Settings layout already knows about</summary>
+      <description>Tiles hidden by default that are not listed here are new, and stay hidden in a customized layout until the user adds them.</description>
     </key>
     <key name="live-wallpaper" type="s">
       <default>''</default>

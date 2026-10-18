@@ -29,7 +29,7 @@ restore_settings() {
     dconf write /com/lantharos/kestrel/favorite-apps "$(cat "$session/favorites.txt")"
   fi
   if [[ "$mode" == capture ]]; then
-    for key in quick-tile-order quick-tiles-removed live-wallpaper live-wallpaper-dark; do
+    for key in quick-tile-order quick-tiles-removed quick-tiles-known live-wallpaper live-wallpaper-dark; do
       dconf reset "/com/lantharos/kestrel/$key"
     done
   fi

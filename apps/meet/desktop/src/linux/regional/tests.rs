@@ -12,7 +12,10 @@ fn keyboard(layout: &str, variant: &str) -> Keyboard {
 
 #[test]
 fn locales_lose_their_encoding() {
-    assert_eq!(posix("uz_UZ.UTF-8@cyrillic").as_deref(), Some("uz_UZ@cyrillic"));
+    assert_eq!(
+        posix("uz_UZ.UTF-8@cyrillic").as_deref(),
+        Some("uz_UZ@cyrillic")
+    );
     assert_eq!(posix("en_GB.UTF-8").as_deref(), Some("en_GB"));
     assert_eq!(posix("C.UTF-8"), None);
     assert_eq!(posix("POSIX"), None);

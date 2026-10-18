@@ -17,9 +17,8 @@ const VERBS: Record<Operation['action'], [string, string]> = {
 
 export function activity(operation: Operation) {
 	const [running, queued] = VERBS[operation.action];
-	if (operation.state === 'queued') return queued;
 	if (operation.progress?.stage === 'downloading') return 'Downloading';
-	if (operation.progress?.stage === 'waiting') return 'Waiting';
+	if (operation.state === 'queued' || operation.progress?.stage === 'waiting') return queued;
 	return running;
 }
 

@@ -166,6 +166,8 @@ Four fingers move between the desktop, the board and the task view, and follow t
 | Board | | Turns it back into a desktop |
 | Task view | Closes it | |
 
+In tablet mode, swiping up from the bottom edge pulls the taskbar out of its strip under the finger, and it settles open or closed on `snappy` at the speed of the release. When the screen turns, a picture of the old orientation turns upright and shrinks into the new one on `smooth` while it fades out over `standard`.
+
 Keyboard switches, Super and the wheel, and swipes all drive the same spring, so pressing Super+3 while a switch to the second workspace is still under way carries on across, and reversing turns around where the desktop is. Minimising a window and restoring it, or opening and closing Start, Quick settings, the notification center or the task view, also turn around from wherever they are.
 
 ## Reduced motion

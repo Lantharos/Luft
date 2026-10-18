@@ -13,6 +13,7 @@ import * as Signals from '../misc/signals.js';
 import * as BoxPointer from './boxpointer.js';
 import * as InputSourceManager from './status/keyboard.js';
 import * as IBusManager from '../misc/ibusManager.js';
+import * as KestrelUi from './kestrelUi.js';
 import * as Main from './main.js';
 import * as PageIndicators from './pageIndicators.js';
 import * as PopupMenu from './popupMenu.js';
@@ -907,7 +908,7 @@ export class KeyboardManager extends Signals.EventEmitter {
             side: St.Side.BOTTOM,
         });
         bottomDragGesture.connect('may-recognize', () => {
-            return allowedModes & Main.actionMode;
+            return (allowedModes & Main.actionMode) && !KestrelUi.taskbarOwnsBottomEdge();
         });
         bottomDragGesture.connect('progress', (_action, progress) => {
             this._keyboard?.gestureProgress(progress);

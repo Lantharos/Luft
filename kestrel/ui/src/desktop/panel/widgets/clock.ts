@@ -8,7 +8,7 @@ export class PanelClock {
   readonly actor = new St.Label({ style_class: 'kestrel-clock', y_align: Clutter.ActorAlign.CENTER });
   private readonly clock: WallClock;
 
-  constructor() {
+  constructor(private readonly timeOnly = false) {
     this.actor.clutter_text.set_line_alignment(Pango.Alignment.RIGHT);
     this.clock = new WallClock((now, clock) => this.update(now, clock));
   }
@@ -21,7 +21,7 @@ export class PanelClock {
     const seconds = clock.showSeconds ? ':%S' : '';
     const time = clock.twelveHour ? `%-l:%M${seconds} %p` : `%H:%M${seconds}`;
     const date = clock.settings.get_boolean('clock-show-weekday') ? '%a %-d %b' : '%-d %b';
-    const text = now.format(`${date}\n${time}`) ?? '';
+    const text = now.format(this.timeOnly ? time : `${date}\n${time}`) ?? '';
     if (this.actor.text !== text) this.actor.text = text;
   }
 }

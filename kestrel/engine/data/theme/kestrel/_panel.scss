@@ -15,6 +15,10 @@
 .kestrel-taskbar-compact .kestrel-task-button, .kestrel-taskbar-compact .kestrel-status-button, .kestrel-taskbar-compact .kestrel-task-attention { border-radius: 10px; }
 .kestrel-taskbar-large .kestrel-task-button, .kestrel-taskbar-large .kestrel-status-button, .kestrel-taskbar-large .kestrel-task-attention { border-radius: 14px; }
 .kestrel-taskbar-large .kestrel-clock { font-size: 13px; }
+.kestrel-taskbar-touch .kestrel-status-button { height: 52px; padding: 0 14px; border-radius: 16px; }
+.kestrel-taskbar-touch .kestrel-task-button, .kestrel-taskbar-touch .kestrel-task-attention { border-radius: 16px; }
+.kestrel-taskbar-touch .kestrel-clock { font-size: 13px; }
+.kestrel-taskbar-touch .kestrel-tray-button { padding: 0 12px; }
 
 .kestrel-taskbar { spacing: 2px; }
 .kestrel-panel-status { spacing: 2px; }
@@ -22,6 +26,12 @@
 .kestrel-tray { spacing: 0; }
 .kestrel-tray-button { padding: 0 7px; }
 .kestrel-app-slots { spacing: 0; }
+.kestrel-taskbar-touch .kestrel-taskbar { spacing: 5px; }
+.kestrel-taskbar-touch .kestrel-panel-status { spacing: 6px; }
+
+.kestrel-tablet-strip { padding: 0 12px; border-radius: 0; background-color: transparent; box-shadow: none; }
+.kestrel-tablet-strip-status, .kestrel-tablet-strip-icons { spacing: 10px; }
+.kestrel-tablet-strip .kestrel-clock { font-size: 12px; }
 
 .kestrel-task-button {
   box-shadow: none;

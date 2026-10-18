@@ -1,0 +1,44 @@
+---
+title: Tablet mode
+description: How the taskbar and the screen behave when a convertible folds into a tablet or its keyboard comes off.
+sidebar:
+  order: 2.5
+---
+
+When you fold a convertible laptop back into a tablet, or take the keyboard off a detachable, Luft makes room for your fingers. Unfold it or reattach the keyboard and everything goes back to how it was.
+
+## The taskbar
+
+In tablet mode the taskbar shrinks to a thin strip along the bottom with just the time and the status icons, so the app you're using gets nearly the whole screen. Maximized windows reach down to the strip.
+
+To bring the taskbar up:
+
+- **Swipe up** from the bottom edge of the screen. The taskbar follows your finger; let go once it's halfway up, or flick, and it opens fully.
+- **Tap the strip.**
+
+The full taskbar has bigger buttons with more room between them, so they're easy to hit with a finger. Everything works as usual: tap an app to open or switch to it, tap the Luft mark for [Start](/desktop/start-and-search/), the status icons for [Quick settings](/desktop/quick-settings/) and the clock for [Notifications](/desktop/notifications/).
+
+It folds back into the strip by itself:
+
+- after you tap an app, or switch to another one
+- when you tap anywhere outside it
+- after a few seconds without touching it
+- when you close Start, Quick settings or Notifications after opening them from it
+
+While one of those is open, the taskbar stays up. Start doesn't pop up the on-screen keyboard as it opens; tap the search field when you want to type.
+
+In tablet mode the taskbar always runs edge to edge and never hides automatically, whatever its [options](/desktop/taskbar/#options) say. They apply again once you leave tablet mode.
+
+## The on-screen keyboard
+
+The on-screen keyboard appears when you tap into a text field. Swiping up from the bottom edge brings up the taskbar in tablet mode rather than the keyboard.
+
+## Turning the screen
+
+With **Auto Rotate** on in [Quick settings](/desktop/quick-settings/), the screen follows the way you hold the tablet. When it turns, the picture rotates smoothly into place while apps rearrange themselves underneath. Turn Auto Rotate off to keep the screen as it is.
+
+## When does Luft switch?
+
+Luft follows the tablet switch that convertibles report when they fold past a certain angle or lose their keyboard, as long as the computer has a touchscreen. Most convertibles have one. A computer with a touchscreen but no such switch is treated as a tablet whenever no mouse or touchpad is connected.
+
+If your convertible folds flat but Luft stays in laptop mode, it doesn't report the switch. You can check with `sudo libinput debug-events` in a terminal: folding it should print a `SWITCH_TOGGLE` line for the tablet mode switch.

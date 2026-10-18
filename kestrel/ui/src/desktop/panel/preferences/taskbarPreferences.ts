@@ -1,5 +1,7 @@
 import Gio from 'gi://Gio';
 
+import { tabletMode } from '../tablet/tabletMode.js';
+
 type TaskbarAlignment = 'center' | 'left';
 export type TaskbarLook = 'glass' | 'solid' | 'transparent' | 'accent';
 type TaskbarStyle = 'bar' | 'floating';
@@ -14,6 +16,7 @@ export interface TaskbarMetrics {
   margin: number;
   radius: number;
   inset: number;
+  gap: number;
 }
 
 const SIZES: Record<TaskbarSize, { height: number; button: number; icon: number }> = {
@@ -21,26 +24,38 @@ const SIZES: Record<TaskbarSize, { height: number; button: number; icon: number 
   normal: { height: 48, button: 40, icon: 28 },
   large: { height: 56, button: 48, icon: 34 },
 };
+const TOUCH = { height: 64, button: 52, icon: 36 };
 const FLOATING_MARGIN = 8;
 const BAR_INSET = 4;
+const TOUCH_INSET = 12;
+const SLOT_GAP = 2;
+const TOUCH_SLOT_GAP = 10;
+export const STRIP_HEIGHT = 24;
 
 const KEYS = ['taskbar-alignment', 'taskbar-look', 'taskbar-style', 'taskbar-size', 'taskbar-auto-hide', 'taskbar-show-pinned',
   'taskbar-displays', 'taskbar-windows-per-display', 'taskbar-windows-per-workspace', 'pure-black'] as const;
-export type TaskbarKey = typeof KEYS[number];
+export type TaskbarKey = typeof KEYS[number] | 'tablet';
 
 class TaskbarPreferences {
   private readonly settings = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
   private readonly watchers = new Set<(key: TaskbarKey) => void>();
 
   constructor() {
-    for (const key of KEYS) this.settings.connect(`changed::${key}`, () => this.watchers.forEach(watcher => watcher(key)));
+    for (const key of KEYS) this.settings.connect(`changed::${key}`, () => this.notify(key));
+    tabletMode.watch(() => this.notify('tablet'));
   }
+
+  private notify(key: TaskbarKey): void {
+    this.watchers.forEach(watcher => watcher(key));
+  }
+
+  get touch(): boolean { return tabletMode.active; }
 
   get alignment(): TaskbarAlignment { return this.settings.get_string('taskbar-alignment') as TaskbarAlignment; }
   get look(): TaskbarLook { return this.settings.get_string('taskbar-look') as TaskbarLook; }
-  get style(): TaskbarStyle { return this.settings.get_string('taskbar-style') as TaskbarStyle; }
+  get style(): TaskbarStyle { return this.touch ? 'bar' : this.settings.get_string('taskbar-style') as TaskbarStyle; }
   get size(): TaskbarSize { return this.settings.get_string('taskbar-size') as TaskbarSize; }
-  get autoHide(): TaskbarAutoHide { return this.settings.get_string('taskbar-auto-hide') as TaskbarAutoHide; }
+  get autoHide(): TaskbarAutoHide { return this.touch ? 'never' : this.settings.get_string('taskbar-auto-hide') as TaskbarAutoHide; }
   get showPinned(): boolean { return this.settings.get_boolean('taskbar-show-pinned'); }
   get displays(): TaskbarDisplays { return this.settings.get_string('taskbar-displays') as TaskbarDisplays; }
   get windowsPerDisplay(): boolean { return this.settings.get_boolean('taskbar-windows-per-display'); }
@@ -48,6 +63,7 @@ class TaskbarPreferences {
   get pureBlack(): boolean { return this.settings.get_boolean('pure-black'); }
 
   get metrics(): TaskbarMetrics {
+    if (this.touch) return { ...TOUCH, margin: 0, radius: 0, inset: TOUCH_INSET, gap: TOUCH_SLOT_GAP };
     const size = SIZES[this.size];
     const floating = this.style === 'floating';
     return {
@@ -55,12 +71,17 @@ class TaskbarPreferences {
       margin: floating ? FLOATING_MARGIN : 0,
       radius: floating ? size.height / 2 : 0,
       inset: floating ? Math.round(size.height / 4) : BAR_INSET,
+      gap: SLOT_GAP,
     };
   }
 
   get clearance(): number {
     const { height, margin } = this.metrics;
     return height + margin;
+  }
+
+  get reserved(): number {
+    return this.touch ? STRIP_HEIGHT : this.clearance;
   }
 
   watch(watcher: (key: TaskbarKey) => void): () => void {

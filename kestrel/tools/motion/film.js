@@ -9,7 +9,7 @@ import {pause, settled} from '../checks/lib/wait.js';
 const POOL = 72;
 const QUIET = 250;
 const SAVE_WIDTH = 720;
-const PROBE_WIDTH = 160;
+const PROBE_SIZE = 160;
 const now = () => GLib.get_monotonic_time();
 
 function primaryView(view) {
@@ -32,15 +32,14 @@ function composite(texture) {
 }
 
 function luminance(pixbuf) {
-  const height = Math.round(pixbuf.get_height() * PROBE_WIDTH / pixbuf.get_width());
-  const small = pixbuf.scale_simple(PROBE_WIDTH, height, GdkPixbuf.InterpType.BILINEAR);
+  const small = pixbuf.scale_simple(PROBE_SIZE, PROBE_SIZE, GdkPixbuf.InterpType.BILINEAR);
   const pixels = small.get_pixels();
   const [stride, channels] = [small.get_rowstride(), small.get_n_channels()];
-  const out = new Float32Array(PROBE_WIDTH * height);
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < PROBE_WIDTH; x++) {
+  const out = new Float32Array(PROBE_SIZE * PROBE_SIZE);
+  for (let y = 0; y < PROBE_SIZE; y++) {
+    for (let x = 0; x < PROBE_SIZE; x++) {
       const o = y * stride + x * channels;
-      out[y * PROBE_WIDTH + x] = 0.299 * pixels[o] + 0.587 * pixels[o + 1] + 0.114 * pixels[o + 2];
+      out[y * PROBE_SIZE + x] = 0.299 * pixels[o] + 0.587 * pixels[o + 1] + 0.114 * pixels[o + 2];
     }
   }
   return out;
@@ -50,6 +49,11 @@ function distance(a, b) {
   let sum = 0;
   for (let i = 0; i < a.length; i++) sum += Math.abs(a[i] - b[i]);
   return sum / a.length;
+}
+
+function slotOf(framebuffer) {
+  const texture = Cogl.Texture2D.new_with_size(framebuffer.get_context(), framebuffer.get_width(), framebuffer.get_height());
+  return {texture, offscreen: Cogl.Offscreen.new_with_texture(texture)};
 }
 
 const round = (value, places) => Math.round(value * 10 ** places) / 10 ** places;
@@ -68,8 +72,8 @@ class Film {
       this.lastPaint = now();
       this.ensurePool(view);
       if (this.frames.length >= POOL) return;
-      const slot = this.pool[this.frames.length];
       const framebuffer = view.get_framebuffer();
+      const slot = this.slotFor(this.frames.length, framebuffer);
       framebuffer.blit(slot.offscreen, 0, 0, 0, 0, framebuffer.get_width(), framebuffer.get_height());
       this.frames.push({slot, at: now()});
     });
@@ -88,10 +92,14 @@ class Film {
   ensurePool(view) {
     if (this.pool.length) return;
     const framebuffer = view.get_framebuffer();
-    for (let i = 0; i < POOL; i++) {
-      const texture = Cogl.Texture2D.new_with_size(framebuffer.get_context(), framebuffer.get_width(), framebuffer.get_height());
-      this.pool.push({texture, offscreen: Cogl.Offscreen.new_with_texture(texture)});
-    }
+    for (let i = 0; i < POOL; i++) this.pool.push(slotOf(framebuffer));
+  }
+
+  slotFor(index, framebuffer) {
+    const {texture} = this.pool[index];
+    if (texture.get_width() !== framebuffer.get_width() || texture.get_height() !== framebuffer.get_height())
+      this.pool[index] = slotOf(framebuffer);
+    return this.pool[index];
   }
 
   async save(dir, startedAt, notes) {

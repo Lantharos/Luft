@@ -25,6 +25,8 @@ Kestrel runs on its own build of Mutter 51: the upstream release plus an ordered
 - Touchpad scrolling at the speed set by the touchpad's `scroll-speed` setting, and at the fingers' pace in apps built on Chromium, which would scroll twelve times too far: every one older than 154, and Electron apps on later releases unless they start with Chromium's unscaled touchpad scrolling turned on
 - Title bars for X11 apps in Kestrel's style, colored from `~/.config/kestrel/appearance.css`
 - `xdg-decoration` for Wayland apps that ask for server-side title bars, which the shell draws in the same style
+- A signal before a monitor turns, so the shell can animate rotation from a picture of the old orientation
+- Virtual input devices that flip the tablet mode switch, for driving tablet mode in checks
 - Smaller fixes, each described in its patch
 
 ## Build

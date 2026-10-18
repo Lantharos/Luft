@@ -5,6 +5,7 @@ import type { ContextMenus } from '../menus/contextMenus.js';
 import type { WindowPreviews } from './windowPreviews.js';
 import { taskbarPreferences, type TaskbarKey } from './preferences/taskbarPreferences.js';
 import { WindowOverlap } from './autoHide/windowOverlap.js';
+import { EdgeSwipe } from './tablet/edgeSwipe.js';
 
 interface PanelLayoutManager {
   primaryMonitor: Monitor | null;
@@ -17,6 +18,7 @@ export class PanelSet {
   readonly primary: KestrelPanel;
   private secondary: KestrelPanel[] = [];
   private overlap: WindowOverlap | null = null;
+  private edgeSwipe: EdgeSwipe | null = null;
   private suppressed = false;
   private readonly unwatchPreferences: () => void;
 
@@ -30,6 +32,7 @@ export class PanelSet {
     this.primary = this.create(() => layoutManager.primaryMonitor!, layoutManager.primaryMonitor, true);
     this.unwatchPreferences = taskbarPreferences.watch(key => this.preferenceChanged(key));
     this.syncAutoHide();
+    this.syncEdgeSwipe();
     this.sync();
   }
 
@@ -76,13 +79,15 @@ export class PanelSet {
   }
 
   hold(held: boolean): void {
-    for (const panel of this.all) panel.autoHide.hold(held);
+    for (const panel of this.all) panel.hold(held);
   }
 
   shutdown(): void {
     this.unwatchPreferences();
     this.overlap?.destroy();
     this.overlap = null;
+    this.edgeSwipe?.destroy();
+    this.edgeSwipe = null;
     for (const panel of this.all) panel.shutdown();
   }
 
@@ -91,7 +96,11 @@ export class PanelSet {
       this.sync();
       this.changed();
     }
-    if (key === 'taskbar-auto-hide') this.syncAutoHide();
+    if (key === 'taskbar-auto-hide' || key === 'tablet') this.syncAutoHide();
+    if (key === 'tablet') {
+      this.syncEdgeSwipe();
+      this.changed();
+    }
   }
 
   private syncAutoHide(): void {
@@ -105,6 +114,19 @@ export class PanelSet {
       this.syncStrut(panel);
       panel.autoHide.watch(this.overlap);
     }
+  }
+
+  private syncEdgeSwipe(): void {
+    if (taskbarPreferences.touch) this.edgeSwipe ??= new EdgeSwipe((x, y) => this.panelAt(x, y)?.tablet ?? null);
+    else {
+      this.edgeSwipe?.destroy();
+      this.edgeSwipe = null;
+    }
+  }
+
+  private panelAt(x: number, y: number): KestrelPanel | null {
+    return this.all.find(({ monitor }) => !!monitor &&
+      x >= monitor.x && x < monitor.x + monitor.width && y >= monitor.y && y < monitor.y + monitor.height) ?? null;
   }
 
   private syncStrut(panel: KestrelPanel): void {

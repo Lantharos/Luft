@@ -20,10 +20,10 @@ export class TaskbarSurface {
   }
 
   sync(): void {
-    const { look, size, style, pureBlack, metrics: { radius } } = taskbarPreferences;
+    const { look, size, style, pureBlack, touch, metrics: { radius } } = taskbarPreferences;
     const opaque = pureBlack && isDark();
     this.actor.style_class = [
-      this.baseClasses, `kestrel-taskbar-${look}`, `kestrel-taskbar-${size}`,
+      this.baseClasses, `kestrel-taskbar-${look}`, touch ? 'kestrel-taskbar-touch' : `kestrel-taskbar-${size}`,
       ...style === 'floating' ? ['kestrel-taskbar-floating'] : [],
       ...opaque ? ['kestrel-taskbar-opaque'] : [],
     ].join(' ');

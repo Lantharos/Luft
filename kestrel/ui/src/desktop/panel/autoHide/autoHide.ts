@@ -23,7 +23,7 @@ export class AutoHide {
   private timer = 0;
   private readonly focusSignal: number;
 
-  constructor(private readonly panel: St.Widget, private readonly monitor: () => Monitor | null) {
+  constructor(private readonly panel: St.Widget, private readonly monitor: () => Monitor | null, private readonly rest: () => number) {
     panel.connect('notify::hover', () => this.sync());
     this.edge.connect('notify::hover', () => this.sync());
     const stage = (global as unknown as Shell.Global).stage;
@@ -36,6 +36,10 @@ export class AutoHide {
 
   get hidden(): boolean {
     return !this.revealed;
+  }
+
+  get shown(): boolean {
+    return this.allowed && this.revealed;
   }
 
   setAllowed(allowed: boolean): void {
@@ -119,7 +123,7 @@ export class AutoHide {
     if (!changed) return;
     this.panel.show();
     animateActor(this.panel, {
-      translation_y: revealed ? 0 : taskbarPreferences.clearance,
+      translation_y: revealed ? this.rest() : taskbarPreferences.clearance,
       duration: SLIDE_DURATION,
       mode: revealed ? Clutter.AnimationMode.EASE_OUT_QUART : Clutter.AnimationMode.EASE_IN_QUART,
       onComplete: () => { if (!this.revealed) this.panel.hide(); },
@@ -128,7 +132,7 @@ export class AutoHide {
 
   private settle(): void {
     this.panel.remove_transition('translation-y');
-    this.panel.translation_y = this.revealed ? 0 : taskbarPreferences.clearance;
+    this.panel.translation_y = this.revealed ? this.rest() : taskbarPreferences.clearance;
     this.panel.visible = this.allowed && this.revealed;
   }
 

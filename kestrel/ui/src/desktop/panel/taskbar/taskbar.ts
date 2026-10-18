@@ -17,7 +17,6 @@ import * as DND from 'resource:///com/lantharos/kestrel/ui/dnd.js';
 
 const DOT_SIZE = 4;
 const DOT_GAP = 3;
-const SLOT_GAP = 2;
 const RESIZE_DURATION = 220;
 
 interface AppItem {
@@ -80,12 +79,13 @@ export class Taskbar {
   }
 
   private get slotWidth(): number {
-    return this.metrics.button + SLOT_GAP;
+    return this.metrics.button + this.metrics.gap;
   }
 
   private layoutItem(item: AppItem): void {
-    const { button, icon } = this.metrics;
+    const { button, icon, gap } = this.metrics;
     item.slot.height = button;
+    item.button.set_position(Math.floor(gap / 2), 0);
     item.button.set_size(button, button);
     item.button.child.set_size(button, button);
     item.icon.set_size(icon, icon);

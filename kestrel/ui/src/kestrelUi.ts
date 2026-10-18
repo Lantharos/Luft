@@ -22,6 +22,7 @@ import { wallpaperFloor } from './desktop/wallpaper/floor.js';
 import { LiveWallpaper } from './desktop/wallpaper/liveWallpaper.js';
 import { SnapLayouts } from './desktop/windows/snapLayouts.js';
 import { Workspaces } from './desktop/windows/workspaces.js';
+import { RotationAnimation } from './desktop/rotation/rotation.js';
 import { Setup, type SetupContext } from './session/setup/setup.js';
 import { afterMotion, dropAfterMotion } from './shared/afterMotion.js';
 import { navigateWithKeyboard } from './shared/input/keyboardNavigation.js';
@@ -61,6 +62,7 @@ class KestrelUi {
   private readonly surfaces: Surfaces;
   readonly board: Board;
   private readonly liveWallpaper: LiveWallpaper;
+  private readonly rotation: RotationAnimation;
   private readonly fourFingers = new FourFingerSwipe(direction => this.followFourFingers(direction));
   private focusSignals: (() => void)[] = [];
   private readonly disconnectors: (() => void)[] = [];
@@ -104,6 +106,7 @@ class KestrelUi {
     const snapLayouts = new SnapLayouts(index => context.layoutManager.getWorkAreaForMonitor(index), context.snapWindow, close);
     this.taskView = new TaskView(context.createBackground, workspace => this.board.frameOf(workspace), close, context.activateWindow);
     this.liveWallpaper = new LiveWallpaper(() => context.layoutManager.monitors);
+    this.rotation = new RotationAnimation(context.layoutManager);
     this.surfaces = new Surfaces({
       context,
       menus: this.menus,
@@ -137,7 +140,7 @@ class KestrelUi {
     const holdPanels = () => this.panels.hold(this.menus.actor.visible || this.previews.actor.visible);
     for (const actor of [this.menus.actor, this.previews.actor]) actor.connect('notify::visible', holdPanels);
     this.disconnectors.push(taskbarPreferences.watch(key => {
-      if (key === 'taskbar-style' || key === 'taskbar-size') place();
+      if (key === 'taskbar-style' || key === 'taskbar-size' || key === 'tablet') place();
     }));
 
     context.layoutManager.addTopChrome(this.surfaces.cover);
@@ -303,6 +306,7 @@ class KestrelUi {
     dropAfterMotion(this.syncSessionAfterMotion);
     this.panels.shutdown();
     this.liveWallpaper.destroy();
+    this.rotation.destroy();
     this.board.destroy();
     this.services.destroy();
   }
@@ -372,6 +376,8 @@ export function switchWorkspace(index: number): void { currentUi?.switchWorkspac
 export function openSystemMonitor(): void { systemMonitor()?.activate(); }
 
 export function taskbarClearance(): number { return taskbarPreferences.clearance; }
+
+export function taskbarOwnsBottomEdge(): boolean { return currentUi !== null && taskbarPreferences.touch; }
 
 export function taskViewOpen(): boolean { return currentUi?.taskViewOpen() ?? false; }
 

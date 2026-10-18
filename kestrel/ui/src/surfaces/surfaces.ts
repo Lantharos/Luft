@@ -190,7 +190,7 @@ export class Surfaces {
     }
     this.reveal(actor);
 
-    if (surface === 'start') start.focus();
+    if (surface === 'start' && !taskbarPreferences.touch) start.focus();
     else if (!popup) actor.grab_key_focus();
   }
 

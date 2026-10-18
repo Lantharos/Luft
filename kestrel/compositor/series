@@ -36,3 +36,5 @@
 0036-frames-draw-X11-window-frames-in-Kestrel-s-style.patch
 0037-wayland-send-Chromium-builds-touchpad-deltas-in-thei.patch
 0038-wayland-give-toplevels-that-ask-for-it-a-server-side.patch
+0039-backends-let-virtual-input-devices-flip-the-tablet-m.patch
+0040-backends-tell-the-shell-before-a-monitor-turns.patch

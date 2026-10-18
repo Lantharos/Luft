@@ -2,7 +2,7 @@ import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 
-import { taskbarPreferences } from './preferences/taskbarPreferences.js';
+import { STRIP_HEIGHT, taskbarPreferences } from './preferences/taskbarPreferences.js';
 
 const EASE_DURATION = 260;
 
@@ -23,14 +23,15 @@ export const PanelLayout = GObject.registerClass(
     }
 
     vfunc_allocate(container: Clutter.Actor, allocation: Clutter.ActorBox): void {
-      const [center, status, peek] = container.get_children();
+      const [center, status, peek, ...strips] = container.get_children();
       const width = allocation.get_width();
       const height = allocation.get_height();
       const { inset } = taskbarPreferences.metrics;
       const left = taskbarPreferences.alignment === 'left';
       const easing = GLib.get_monotonic_time() < this.easeUntil;
-      const [, peekWidth] = peek.get_preferred_width(height);
+      const peekWidth = peek.visible ? peek.get_preferred_width(height)[1] : 0;
       peek.allocate(new Clutter.ActorBox({ x1: width - peekWidth, y1: 0, x2: width, y2: height }));
+      for (const strip of strips) strip.allocate(new Clutter.ActorBox({ x1: 0, y1: 0, x2: width, y2: STRIP_HEIGHT }));
       for (const child of [center, status]) {
         const [, naturalWidth] = child.get_preferred_width(-1);
         const [, naturalHeight] = child.get_preferred_height(naturalWidth);

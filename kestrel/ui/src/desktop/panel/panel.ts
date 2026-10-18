@@ -20,8 +20,9 @@ import { taskbarPreferences, type TaskbarKey } from './preferences/taskbarPrefer
 import { TaskbarSurface } from './preferences/taskbarLook.js';
 import { AutoHide } from './autoHide/autoHide.js';
 import { afterMotion, dropAfterMotion } from '../../shared/afterMotion.js';
-import { animateActor } from '../../shared/motion.js';
+import { animateActor, Spring } from '../../shared/motion.js';
 import { activeWorkspace, WorkspaceWindows } from './taskbar/workspaceWindows.js';
+import { TabletTaskbar } from './tablet/tabletTaskbar.js';
 
 const KEYS_APP = 'com.lantharos.keys.desktop';
 const RESIZE_DURATION = 240;
@@ -53,6 +54,8 @@ export class KestrelPanel {
   readonly actor: St.Widget;
   readonly strut = new St.Widget();
   readonly autoHide: AutoHide;
+  readonly tablet: TabletTaskbar;
+  private readonly peek = new DesktopPeek();
   private readonly layout = new PanelLayout();
   private readonly surface: TaskbarSurface;
   private readonly launcher: Launcher;
@@ -75,14 +78,20 @@ export class KestrelPanel {
 
   constructor(actions: PanelActions, menus: ContextMenus, previews: WindowPreviews, public monitor: Monitor | null, readonly primary: boolean) {
     this.taskbar = new Taskbar(this.tracker, menus, previews, this.favorites, () => this.monitor?.index ?? -1,
-      app => this.windowsOf(app), actions.activateWindow, app => this.open(app));
+      app => this.windowsOf(app), window => {
+        actions.activateWindow(window);
+        this.tablet.collapse();
+      }, app => {
+        this.open(app);
+        this.tablet.collapse();
+      });
     this.actor = new St.Widget({
       name: primary ? 'kestrel-panel' : 'kestrel-secondary-panel',
       style_class: 'kestrel-panel',
       reactive: true,
       layout_manager: this.layout,
     });
-    this.autoHide = new AutoHide(this.actor, () => this.monitor);
+    this.autoHide = new AutoHide(this.actor, () => this.monitor, () => this.tablet.rest);
 
     const center = new St.BoxLayout({
       name: primary ? 'kestrel-panel-center' : null,
@@ -133,15 +142,18 @@ export class KestrelPanel {
     this.clockButton.connect('clicked', actions.notifications);
     right.add_child(this.clockButton);
     this.actor.add_child(right);
-    const peek = new DesktopPeek();
-    this.actor.add_child(peek.actor);
-    this.surface = new TaskbarSurface(this.actor, peek.actor);
+    this.actor.add_child(this.peek.actor);
+    this.surface = new TaskbarSurface(this.actor, this.peek.actor);
+    this.tablet = new TabletTaskbar(this.actor, [center, right], primary, () => this.autoHide.shown);
 
     this.externalSignals.push(
       [this.appSystem, this.appSystem.connect('app-state-changed', () => afterMotion(this.refreshAfterMotion))],
       [this.appSystem, this.appSystem.connect('installed-changed', () => this.refreshApps())],
       [this.favorites, this.favorites.connect('changed::favorite-apps', () => this.refreshApps())],
-      [this.tracker, this.tracker.connect('notify::focus-app', () => afterMotion(this.updateFocusAfterMotion))],
+      [this.tracker, this.tracker.connect('notify::focus-app', () => {
+        this.tablet.collapse();
+        afterMotion(this.updateFocusAfterMotion);
+      })],
       ...(['window-entered-monitor', 'window-left-monitor'] as const).map(signal => {
         const display = (global as unknown as Shell.Global).display;
         return [display, display.connect(signal, () => { if (taskbarPreferences.windowsPerDisplay) this.refreshApps(); })] as [Meta.Display, number];
@@ -151,7 +163,7 @@ export class KestrelPanel {
     menus.bind(this.actor, () => {
       const monitor = systemMonitor();
       return [
-        { label: 'Show desktop', run: () => peek.toggleDesktop() },
+        { label: 'Show desktop', run: () => this.peek.toggleDesktop() },
         ...monitor ? [{ label: 'System monitor', run: () => monitor.activate() }] : [],
         { label: 'Taskbar settings', run: () => menus.settings('appearance/taskbar') },
       ];
@@ -161,6 +173,7 @@ export class KestrelPanel {
     ]);
     this.syncWorkspaceWindows();
     this.refreshApps();
+    this.syncTablet();
   }
 
   shutdown(): void {
@@ -172,6 +185,7 @@ export class KestrelPanel {
     this.privacy?.shutdown();
     this.inputSource?.shutdown();
     this.taskbar.shutdown();
+    this.tablet.destroy();
     this.clock.destroy();
     for (const [object, signal] of this.externalSignals) object.disconnect(signal);
     this.externalSignals.length = 0;
@@ -196,6 +210,7 @@ export class KestrelPanel {
       icon.icon_name = iconName;
     });
     for (const icon of icons.slice(iconNames.length)) icon.destroy();
+    this.tablet.updateStatus(iconNames);
   }
 
   place(animate = false): void {
@@ -203,8 +218,9 @@ export class KestrelPanel {
     const { x, y, width, height } = this.monitor;
     const { height: barHeight, margin } = taskbarPreferences.metrics;
     const clearance = barHeight + margin;
-    this.strut.set_position(x, y + height - clearance);
-    this.strut.set_size(width, clearance);
+    const reserved = taskbarPreferences.reserved;
+    this.strut.set_position(x, y + height - reserved);
+    this.strut.set_size(width, reserved);
     const bar = { x: x + margin, y: y + height - clearance, width: width - 2 * margin, height: barHeight };
     if (animate) animateActor(this.actor, { ...bar, duration: RESIZE_DURATION, mode: Clutter.AnimationMode.EASE_OUT_QUART });
     else {
@@ -214,8 +230,14 @@ export class KestrelPanel {
     this.autoHide.place();
   }
 
+  hold(held: boolean): void {
+    this.autoHide.hold(held);
+    this.tablet.hold(held);
+  }
+
   setActive(surface: string | null): void {
     this.autoHide.setActive(surface !== null);
+    this.tablet.setActive(surface !== null);
     for (const [button, active] of [
       [this.launcher.button, surface === 'start'],
       [this.quickButton, surface === 'quick'],
@@ -264,8 +286,32 @@ export class KestrelPanel {
       this.place(true);
     }
     if (key === 'taskbar-alignment' || SHAPE_KEYS.includes(key)) this.layout.ease();
+    if (key === 'tablet') this.syncTablet();
     if (key === 'taskbar-windows-per-workspace') this.syncWorkspaceWindows();
     if (APP_KEYS.includes(key)) this.refreshApps();
+  }
+
+  private syncTablet(): void {
+    const touch = taskbarPreferences.touch;
+    if (touch === this.tablet.shown) return;
+    const top = this.actor.y + this.actor.translation_y;
+    const metrics = taskbarPreferences.metrics;
+    this.surface.sync();
+    this.launcher.resize(metrics.button);
+    this.taskbar.resize(metrics);
+    this.peek.actor.visible = !touch;
+    if (touch) {
+      this.place();
+      this.tablet.enter(top - this.actor.y);
+    } else {
+      this.tablet.leave();
+      this.place();
+      if (this.autoHide.shown) {
+        this.actor.translation_y = top - this.actor.y;
+        animateActor(this.actor, { translation_y: 0, spring: Spring.snappy });
+      }
+    }
+    this.layout.ease();
   }
 
   private refreshApps(): void {

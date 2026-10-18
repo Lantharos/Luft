@@ -99,9 +99,9 @@ const FINGER_STEP = 24;
 
 async function fourFingers(...moves) {
   handleTouchpad(touchpad.swipe('begin', 4));
-  for (const [direction, frames] of moves) {
+  for (const [direction, frames, step = FINGER_STEP] of moves) {
     for (let i = 0; i < frames; i++) {
-      handleTouchpad(touchpad.swipe('update', 4, 0, direction * FINGER_STEP));
+      handleTouchpad(touchpad.swipe('update', 4, 0, direction * step));
       await nextFrame();
     }
   }
@@ -120,6 +120,16 @@ async function gestures(clip) {
   await leaveBoard();
   await clip('tasks-open-fingers', () => fourFingers([1, 20]), {notes: 'Four fingers down'});
   await clip('tasks-close-fingers', () => fourFingers([-1, 20]), {notes: 'Four fingers up'});
+  const fromDesktop = async (name, ...moves) => {
+    await leaveBoard();
+    await reset();
+    await clip(name, () => fourFingers(...moves), {timeout: 8000, notes: 'Four fingers one way, then back the other way before letting go'});
+  };
+  await fromDesktop('tasks-open-fingers-reversed-partway', [1, 5, 140], [-1, 3, 140]);
+  for (const [speed, frames, step] of [['slow', 20, 24], ['quick', 10, 60], ['flick', 5, 140]]) {
+    await fromDesktop(`tasks-open-fingers-reversed-${speed}`, [1, frames, step], [-1, frames + 2, step]);
+    await fromDesktop(`board-enter-fingers-reversed-${speed}`, [-1, frames, step], [1, frames + 2, step]);
+  }
   await stopAll();
   await reset();
 }

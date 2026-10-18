@@ -30,6 +30,7 @@ export class FourFingerSwipe {
   private began = 0;
   private distance = 1;
   private progress = 0;
+  private heading = 0;
   private samples: { time: number; step: number }[] = [];
   private track: SwipeTrack | null = null;
 
@@ -71,6 +72,7 @@ export class FourFingerSwipe {
     const [found, , height] = event.get_source_device()?.get_dimensions() ?? [false, 0, 0];
     this.distance = (found ? height : TOUCHPAD_FALLBACK_HEIGHT) * UNITS_PER_MM * TRACK_SHARE;
     this.progress = 0;
+    this.heading = 0;
     this.samples = [{ time: this.began, step: 0 }];
     this.mode = 'tracking';
     return this.follow(event, this.swipeY);
@@ -79,6 +81,8 @@ export class FourFingerSwipe {
   private follow(event: Clutter.Event, dy: number): boolean {
     const time = event.get_time();
     const step = (this.upward ? -dy : dy) / this.distance;
+    if (step * this.heading < 0) this.samples = [{ time: this.samples.at(-1)!.time, step: 0 }];
+    if (step) this.heading = Math.sign(step);
     this.samples.push({ time, step });
     this.samples = this.samples.filter(sample => sample.time >= time - VELOCITY_WINDOW);
     this.progress += step;

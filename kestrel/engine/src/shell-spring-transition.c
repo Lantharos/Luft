@@ -26,6 +26,8 @@ struct _ShellSpringTransition
   double bounce;
   double velocity;
   double epsilon;
+  double minimum;
+  double maximum;
   Spring spring;
 };
 
@@ -198,6 +200,35 @@ holds_integer (GType type)
     }
 }
 
+#define RANGE_OF(pspec, TYPE) \
+  if (G_IS_PARAM_SPEC_##TYPE (pspec)) \
+    { \
+      *minimum = G_PARAM_SPEC_##TYPE (pspec)->minimum; \
+      *maximum = G_PARAM_SPEC_##TYPE (pspec)->maximum; \
+      return; \
+    }
+
+static void
+property_range (GParamSpec *pspec,
+                double     *minimum,
+                double     *maximum)
+{
+  RANGE_OF (pspec, CHAR)
+  RANGE_OF (pspec, UCHAR)
+  RANGE_OF (pspec, INT)
+  RANGE_OF (pspec, UINT)
+  RANGE_OF (pspec, LONG)
+  RANGE_OF (pspec, ULONG)
+  RANGE_OF (pspec, INT64)
+  RANGE_OF (pspec, UINT64)
+  RANGE_OF (pspec, FLOAT)
+  RANGE_OF (pspec, DOUBLE)
+  *minimum = -G_MAXDOUBLE;
+  *maximum = G_MAXDOUBLE;
+}
+
+#undef RANGE_OF
+
 static void
 set_property_value (ShellSpringTransition *self,
                     ClutterAnimatable     *animatable,
@@ -209,11 +240,11 @@ set_property_value (ShellSpringTransition *self,
 
   if (holds_integer (type))
     value = round (value);
+  value = CLAMP (value, self->minimum, self->maximum);
   g_value_init (&number, G_TYPE_DOUBLE);
   g_value_set_double (&number, value);
   g_value_init (&result, type);
   g_value_transform (&number, &result);
-  g_param_value_validate (self->pspec, &result);
   clutter_animatable_set_final_state (animatable, g_param_spec_get_name (self->pspec), &result);
   g_value_unset (&result);
 }
@@ -231,6 +262,7 @@ shell_spring_transition_attached (ClutterTransition *transition,
 
   self->pspec = clutter_animatable_find_property (animatable, name);
   g_return_if_fail (self->pspec != NULL);
+  property_range (self->pspec, &self->minimum, &self->maximum);
 
   g_value_init (&current, G_PARAM_SPEC_VALUE_TYPE (self->pspec));
   clutter_animatable_get_initial_state (animatable, name, &current);

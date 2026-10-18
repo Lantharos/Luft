@@ -65,6 +65,8 @@ actor.ease({translation_x: target, spring: Spring.smooth, velocity: releaseSpeed
 - `spring` runs a native spring that computes its position at every frame's own time, with no JavaScript per frame.
 - When a new `ease()` replaces a running spring on the same property, the new one starts from the current position with the current speed. Opening something and closing it half-way through turns it around smoothly.
 - `velocity` sets the starting speed in the property's units per second, for example the speed of a finger at release. It can also map property names to speeds.
+- A spring keeps a property inside its range. Opacity released with speed toward 0 rests at 0 while the spring swings back, instead of wrapping around.
+- A release speed counts only the motion since the fingers last changed direction, so turning a swipe around settles with the speed it ends with.
 - `curve` takes one of the curves, in place of `mode`.
 - `St.Adjustment.ease()` and `ease_property()` take the same options.
 

@@ -40,6 +40,7 @@ const EventHistory = class {
 
     reset() {
         this._data = [];
+        this._heading = 0;
     }
 
     trim(time) {
@@ -52,6 +53,10 @@ const EventHistory = class {
     append(time, delta) {
         this.trim(time);
 
+        if (delta * this._heading < 0)
+            this._data = [{time: this._data.at(-1).time, delta: 0}];
+        if (delta)
+            this._heading = Math.sign(delta);
         this._data.push({time, delta});
     }
 

@@ -59,7 +59,7 @@ write_dbus_services() {
     dbus_service "$name" "$(command -v gjs)" -m "$tools/fixtures/session/shellService.js" "$build/js/dbusServices/$name.src.gresource" "$name"
   done
   dbus_service com.lantharos.Kestrel.HotplugSniffer "$build/src/hotplug-sniffer/kestrel-hotplug-sniffer"
-  for name in com.lantharos.Keyring1 org.freedesktop.secrets org.freedesktop.portal.IBus \
+  for name in com.lantharos.Keyring1 org.freedesktop.secrets org.freedesktop.portal.IBus org.freedesktop.portal.Desktop \
     org.gtk.vfs.AfcVolumeMonitor org.gtk.vfs.GPhoto2VolumeMonitor org.gtk.vfs.MTPVolumeMonitor; do
     dbus_service "$name" /usr/bin/false
   done

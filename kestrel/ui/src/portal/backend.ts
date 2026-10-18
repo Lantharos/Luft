@@ -24,6 +24,9 @@ import { WallpaperPortal } from './system/wallpaper.js';
 const BUS_NAME = 'org.freedesktop.impl.portal.desktop.kestrel';
 const PORTAL_PATH = '/org/freedesktop/portal/desktop';
 
+let announcePublished!: () => void;
+export const published = new Promise<void>(resolve => (announcePublished = resolve));
+
 interface Portal {
   readonly dbus: Gio.DBusExportedObject;
   destroy?(): void;
@@ -67,7 +70,7 @@ export class PortalBackend {
   private constructor(portals: Portal[]) {
     this.portals = [this.settings, ...portals];
     for (const portal of this.portals) portal.dbus.export(Gio.DBus.session, PORTAL_PATH);
-    this.nameId = Gio.bus_own_name_on_connection(Gio.DBus.session, BUS_NAME, Gio.BusNameOwnerFlags.NONE, null, null);
+    this.nameId = Gio.bus_own_name_on_connection(Gio.DBus.session, BUS_NAME, Gio.BusNameOwnerFlags.NONE, announcePublished, announcePublished);
   }
 
   setAccent(accent: Rgb): void {

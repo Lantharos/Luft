@@ -222,10 +222,8 @@ async function _initializeSetup() {
     layoutManager.init(KestrelUi.startSetup({layoutManager}));
     global.connect('shutdown', () => KestrelUi.shutdown());
 
-    GLib.idle_add_once(GLib.PRIORITY_DEFAULT, () => {
-        Shell.util_sd_notify();
-        global.context.notify_ready();
-    });
+    KestrelUi.portalPublished.then(() => Shell.util_sd_notify());
+    GLib.idle_add_once(GLib.PRIORITY_DEFAULT, () => global.context.notify_ready());
 
     const runAutomation = await _loadAutomation();
     layoutManager.connect('startup-complete', () => {
@@ -375,11 +373,8 @@ async function _initializeUI() {
     // initiate logouts.
     endSessionDialog = new EndSessionDialog.EndSessionDialog();
 
-    // We're ready for the session manager to move to the next phase
-    GLib.idle_add_once(GLib.PRIORITY_DEFAULT, () => {
-        Shell.util_sd_notify();
-        global.context.notify_ready();
-    });
+    KestrelUi.portalPublished.then(() => Shell.util_sd_notify());
+    GLib.idle_add_once(GLib.PRIORITY_DEFAULT, () => global.context.notify_ready());
 
     _startDate = new Date();
 

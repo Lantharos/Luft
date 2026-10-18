@@ -67,7 +67,7 @@ restore_settings
 mkdir -p "$XDG_RUNTIME_DIR/dconf"
 install -d -m 700 "$KESTREL_APP_RUNTIME_DIR" "$PIPEWIRE_RUNTIME_DIR" "$PULSE_RUNTIME_PATH"
 ln -sfn "$XDG_RUNTIME_DIR/dconf" "$KESTREL_APP_RUNTIME_DIR/dconf"
-rm -f "$KESTREL_AUTHENTICATE_SOCK"
+rm -f "$KESTREL_AUTHENTICATE_SOCK" "$KESTREL_READY_SOCK"
 start_system_bus
 start gjs -m "$build/js/ui/kestrel-session.js"
 system_services="$fixtures/system/systemBus.js"
@@ -87,4 +87,6 @@ DBUS_SYSTEM_BUS_ADDRESS="$KESTREL_SYSTEM_BUS" GIO_USE_VFS=local start "$root/kes
 gdbus wait --session --timeout 10 com.lantharos.Settings
 DBUS_SYSTEM_BUS_ADDRESS="$KESTREL_SYSTEM_BUS" start "$root/kestrel/search/target/release/kestrel-search"
 gdbus wait --session --timeout 10 com.lantharos.Search
-meson devenv -C "$build" "$build/src/kestrel" "$@"
+start python3 "$fixtures/session/portalFrontend.py" "$KESTREL_READY_SOCK" /usr/libexec/xdg-desktop-portal
+wait_until "the readiness socket" test -S "$KESTREL_READY_SOCK"
+NOTIFY_SOCKET="$KESTREL_READY_SOCK" meson devenv -C "$build" "$build/src/kestrel" "$@"

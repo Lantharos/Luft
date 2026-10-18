@@ -204,6 +204,11 @@
       <default>['&lt;Alt&gt;&lt;Super&gt;minus']</default>
       <summary>Zoom the magnifier out</summary>
     </key>
+    <key name="lock-key-notices" type="b">
+      <default>true</default>
+      <summary>Show when Caps Lock or Num Lock turns on or off</summary>
+      <description>When on, a short notice appears on screen each time Caps Lock or Num Lock changes, from any keyboard.</description>
+    </key>
     <key name="custom-keybindings" type="as">
       <default>[]</default>
       <summary>Paths of your own shortcuts</summary>

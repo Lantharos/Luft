@@ -17,6 +17,7 @@
 
 	const keyboard = useSettings<Keyboard>('org.gnome.desktop.peripherals.keyboard', ['repeat', 'delay', 'repeat-interval']);
 	const inputSources = useSettings<{ 'xkb-options': string[] }>('org.gnome.desktop.input-sources', ['xkb-options']);
+	const notices = useSettings<{ 'lock-key-notices': boolean }>('com.lantharos.kestrel.media-keys', ['lock-key-notices']);
 
 	let repeat = $derived(keyboard.values.repeat ?? true);
 	let options = $derived(inputSources.values['xkb-options'] ?? []);
@@ -68,5 +69,12 @@
 	</Row>
 	<Row title="Caps Lock key" description="What happens when you press it">
 		<Select label="Caps Lock key" options={CAPS_LOCK} value={capsLock} placeholder="Custom" onchange={setCapsLock} />
+	</Row>
+	<Row title="Show Caps Lock and Num Lock" description="Briefly shows on screen when either turns on or off">
+		<Switch
+			label="Show Caps Lock and Num Lock"
+			checked={notices.values['lock-key-notices'] ?? true}
+			onchange={(on) => notices.set('lock-key-notices', on)}
+		/>
 	</Row>
 </Section>

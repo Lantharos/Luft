@@ -7,6 +7,7 @@ import { openSettings } from '../settingsPages.js';
 import { AccessibilityKeys } from './accessibility.js';
 import { DeviceKeys } from './devices.js';
 import { CustomShortcuts, launch } from './launchers.js';
+import { LockKeys } from './lockKeys.js';
 import { Players, type PlayerKey } from './players.js';
 import { PowerKeys } from './power.js';
 import { VolumeKeys, type VolumeChange } from './volume.js';
@@ -30,12 +31,14 @@ export class MediaKeys {
   private readonly devices: DeviceKeys;
   private readonly accessibility = new AccessibilityKeys();
   private readonly custom: CustomShortcuts;
+  private readonly lockKeys: LockKeys;
 
   constructor(private readonly context: Context, openStart: () => void) {
     this.volume = new VolumeKeys(context.showOsd);
     this.power = new PowerKeys(() => context.sessionMode.isLocked);
     this.devices = new DeviceKeys(context.showOsd);
     this.custom = new CustomShortcuts(context.keybindings);
+    this.lockKeys = new LockKeys(context.showOsd, context.layoutManager);
     const sound = (change: VolumeChange, output: boolean, options: { quiet?: boolean; precise?: boolean } = {}) =>
       () => this.volume.change(change, { output, ...options });
     const player = (key: PlayerKey) => () => this.press(key);
@@ -106,5 +109,6 @@ export class MediaKeys {
     this.players.destroy();
     this.power.destroy();
     this.custom.destroy();
+    this.lockKeys.destroy();
   }
 }

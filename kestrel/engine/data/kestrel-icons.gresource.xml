@@ -52,10 +52,14 @@
     <file preprocess="xml-stripblanks">scalable/apps/kestrel-thunderbird-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/apps/kestrel-vscode-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/apps/kestrel-zed-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">scalable/status/caps-lock-off-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">scalable/status/caps-lock-on-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/status/check-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/status/keyboard-brightness-high-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/status/keyboard-brightness-medium-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/status/keyboard-brightness-off-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">scalable/status/num-lock-off-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">scalable/status/num-lock-on-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/status/osk-caps-lock-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/status/osk-delete-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/status/osk-emoji-picker-symbolic.svg</file>

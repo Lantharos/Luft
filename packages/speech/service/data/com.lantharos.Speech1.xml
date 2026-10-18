@@ -10,7 +10,8 @@
     <!-- Opens the microphone and starts listening. The layout is the keyboard layout being typed with,
          such as "rs+latin", which picks the language unless one is chosen in Settings; empty uses the
          first one. Fails with com.lantharos.Speech1.Error.NotInstalled, naming the model, when the
-         model for the language isn't downloaded. -->
+         model for the language isn't downloaded, and with com.lantharos.Speech1.Error.Unsupported,
+         naming the language, when the processor can't run the engine the language needs. -->
     <method name="Start">
       <arg name="layout" type="s" direction="in"/>
     </method>
@@ -24,6 +25,9 @@
     <signal name="Partial">
       <arg name="text" type="s"/>
     </signal>
+    <!-- Nobody has spoken for a while: three seconds after the last speech, or eight seconds from
+         the start when nothing was said. Sent once each time listening starts. -->
+    <signal name="Quiet"/>
     <!-- How loud the microphone is, from 0 to 1, about twenty times a second while listening. -->
     <signal name="Level">
       <arg name="level" type="d"/>
@@ -33,8 +37,8 @@
   <interface name="com.lantharos.Speech1.Models">
     <!-- JSON, the Overview in packages/speech/src/types.rs: every model with its size, whether it's
          downloaded, the space it takes and any download in progress; every language with the engine
-         that listens for it; the language and engine dictation uses now; and the models that are still
-         needed for it. -->
+         that listens for it; the language and engine dictation uses now; the engines this computer's
+         processor can run; and the models that are still needed for it. -->
     <method name="Overview">
       <arg name="overview" type="s" direction="out"/>
     </method>

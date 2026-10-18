@@ -53,6 +53,11 @@ async fn serve() -> Result<()> {
                         .emit_signal(None::<&str>, PATH, NAME, "Level", &(level,))
                         .await
                 }
+                Event::Quiet => {
+                    emitter
+                        .emit_signal(None::<&str>, PATH, NAME, "Quiet", &())
+                        .await
+                }
                 Event::Changed => {
                     emitter
                         .emit_signal(

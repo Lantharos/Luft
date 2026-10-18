@@ -1,6 +1,7 @@
 #[cfg(test)]
 mod check;
 mod parakeet;
+mod processor;
 mod whisper;
 
 use std::path::Path;
@@ -9,6 +10,7 @@ use anyhow::Result;
 use luft_speech::types::Engine;
 
 pub use parakeet::Parakeet;
+pub use processor::Processor;
 pub use whisper::Whisper;
 
 /// Whether a recognition is a quick look at speech still going on, or the text

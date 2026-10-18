@@ -24,7 +24,11 @@ impl File {
         let stop = Arc::new(AtomicBool::new(false));
         let stopped = stop.clone();
         let thread = std::thread::spawn(move || {
-            for chunk in samples.chunks(CHUNK) {
+            let silence = [0.0; CHUNK];
+            let chunks = samples
+                .chunks(CHUNK)
+                .chain(std::iter::repeat(silence.as_slice()));
+            for chunk in chunks {
                 if stopped.load(Ordering::Relaxed) {
                     return;
                 }

@@ -1,4 +1,5 @@
 use std::collections::VecDeque;
+use std::time::Duration;
 
 use super::RATE;
 
@@ -25,6 +26,8 @@ pub struct Segmenter {
     noise: f32,
     heard: bool,
     quiet: usize,
+    spoken: bool,
+    since_speech: usize,
     closed: VecDeque<Vec<f32>>,
 }
 
@@ -37,6 +40,8 @@ impl Default for Segmenter {
             noise: FIRST_NOISE,
             heard: false,
             quiet: 0,
+            spoken: false,
+            since_speech: 0,
             closed: VecDeque::new(),
         }
     }
@@ -61,9 +66,12 @@ impl Segmenter {
         self.speech.push(speech);
         if speech {
             self.heard = true;
+            self.spoken = true;
             self.quiet = 0;
+            self.since_speech = 0;
         } else {
             self.quiet += 1;
+            self.since_speech += 1;
         }
         if self.heard && self.quiet >= PAUSE_FRAMES {
             self.close(self.loudness.len() - self.quiet / 2);
@@ -91,6 +99,15 @@ impl Segmenter {
             .rev()
             .take_while(|speech| !**speech)
             .count();
+    }
+
+    pub fn spoken(&self) -> bool {
+        self.spoken
+    }
+
+    /// How long nobody has spoken: since the last speech, or since the start.
+    pub fn quiet_for(&self) -> Duration {
+        Duration::from_secs_f64((self.since_speech * FRAME) as f64 / RATE as f64)
     }
 
     pub fn take_closed(&mut self) -> Option<Vec<f32>> {
@@ -181,6 +198,17 @@ mod tests {
         let first = segmenter.take_closed().expect("a long stretch is cut");
         assert!(first.len() <= LONGEST_FRAMES * FRAME);
         assert!(first.len() >= (LONGEST_FRAMES - CUT_SEARCH_FRAMES) * FRAME);
+    }
+
+    #[test]
+    fn quiet_counts_from_the_last_speech_across_pauses() {
+        let segmenter = feed(&[silence(2.0)]);
+        assert!(!segmenter.spoken());
+        assert!((segmenter.quiet_for().as_secs_f32() - 2.0).abs() < 0.05);
+        let mut segmenter = feed(&[silence(1.0), speech(1.0), silence(2.5)]);
+        assert!(segmenter.take_closed().is_some());
+        assert!(segmenter.spoken());
+        assert!((segmenter.quiet_for().as_secs_f32() - 2.5).abs() < 0.2);
     }
 
     #[test]

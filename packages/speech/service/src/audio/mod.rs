@@ -28,7 +28,8 @@ pub struct Capture {
 
 impl Capture {
     /// Records from the default microphone, or plays a 16 kHz mono WAV file in
-    /// real time when `LUFT_SPEECH_WAV` names one, for checks without a microphone.
+    /// real time and then silence when `LUFT_SPEECH_WAV` names one, for checks
+    /// without a microphone.
     pub fn open(input: Sender<Input>, meter: Meter) -> Result<Self> {
         let source: Box<dyn Send> = match std::env::var_os("LUFT_SPEECH_WAV") {
             Some(path) => Box::new(file::File::play(PathBuf::from(path), input, meter)?),

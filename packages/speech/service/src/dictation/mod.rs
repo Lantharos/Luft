@@ -10,7 +10,7 @@ use crate::audio::{Capture, Input, Meter};
 use crate::hub::{Event, Hub};
 use crate::plan::Plan;
 
-/// One press of the Copilot key: the microphone is open from start until
+/// One dictation: the microphone is open from start until
 /// finish or cancel, and nothing heard is kept once it ends.
 pub struct Session {
     input: Sender<Input>,

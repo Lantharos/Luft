@@ -4,6 +4,7 @@ use std::time::{Duration, Instant};
 use tokio::sync::mpsc::UnboundedSender;
 
 use crate::dictation::Session;
+use crate::engines::Processor;
 use crate::models::{Downloads, Store};
 use crate::warm::Warm;
 
@@ -13,10 +14,12 @@ pub const PATH: &str = "/com/lantharos/Speech1";
 pub enum Event {
     Partial(String),
     Level(f64),
+    Quiet,
     Changed,
 }
 
 pub struct Hub {
+    pub processor: Processor,
     pub store: Store,
     pub downloads: Downloads,
     pub warm: Warm,
@@ -28,6 +31,7 @@ pub struct Hub {
 impl Hub {
     pub fn new(store: Store, events: UnboundedSender<Event>) -> Self {
         Self {
+            processor: Processor::detect(),
             store,
             downloads: Downloads::default(),
             warm: Warm::default(),

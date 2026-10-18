@@ -54,5 +54,7 @@ pub struct Overview {
     pub languages: Vec<Language>,
     pub language: Language,
     pub engine: Engine,
+    /// The engines this computer's processor can run.
+    pub engines: Vec<Engine>,
     pub needed: Vec<String>,
 }

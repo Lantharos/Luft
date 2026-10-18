@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 use gio::prelude::*;
 use luft_software::appimage::{self, AppImage, Placement};
 use luft_software::task::{Cancel, Task};
-use luft_software::{flatpak, updates};
+use luft_software::{flatpak, toolbox, updates};
 
 const SEEDS: &str = "/usr/share/luft/preinstall";
 const BROWSER_TYPES: [&str; 4] = [
@@ -146,4 +146,7 @@ fn update_apps() -> Result<(), String> {
 pub fn integrate_apps() {
     appimage::repair();
     flatpak::integrate();
+    if let Err(error) = toolbox::retire_shadowed() {
+        eprintln!("{error}");
+    }
 }

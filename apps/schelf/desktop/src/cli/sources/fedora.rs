@@ -54,13 +54,7 @@ pub fn install(package: &str) -> (String, Job) {
     }
 }
 
-fn installed(packages: &[&str]) -> HashSet<String> {
-    if in_toolbox() {
-        return toolbox::installed()
-            .into_iter()
-            .map(|tool| tool.package)
-            .collect();
-    }
+fn on_system(packages: &[&str]) -> HashSet<String> {
     if packages.is_empty() {
         return HashSet::new();
     }
@@ -77,6 +71,18 @@ fn installed(packages: &[&str]) -> HashSet<String> {
                 .collect()
         })
         .unwrap_or_default()
+}
+
+pub fn comes_with_luft(package: &str) -> bool {
+    in_toolbox() && on_system(&[package]).contains(package)
+}
+
+fn installed(packages: &[&str]) -> HashSet<String> {
+    let mut installed = on_system(packages);
+    if in_toolbox() {
+        installed.extend(toolbox::installed().into_iter().map(|tool| tool.package));
+    }
+    installed
 }
 
 fn candidates(found: Vec<Available>) -> Vec<Candidate> {

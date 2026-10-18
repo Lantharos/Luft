@@ -76,6 +76,13 @@ fn prepare(target: &str, only: Option<Catalog>, yes: bool) -> Result<Option<Plan
             return Err(Exit::Missing);
         }
     };
+    if candidate.installed
+        && candidate.catalog == Catalog::Fedora
+        && fedora::comes_with_luft(&candidate.id)
+    {
+        println!("{} comes with Luft.", ink.bold(&candidate.name));
+        return Ok(None);
+    }
     if candidate.installed {
         println!(
             "{} is already installed from {}.",

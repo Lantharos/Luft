@@ -20,6 +20,14 @@ Tern is the terminal. It follows your accent, light or dark style, monospace fon
 
 These work in bash, zsh and fish without changing your configuration files.
 
+## The prompt
+
+Bash starts with Luft's prompt: the folder you're in, the Git branch when you're inside a repository, and a `›` that turns red when the last command failed. Your name and the computer's name only appear over SSH, and `root` shows when you're the administrator. The tab shows the folder, or the command while one runs. It uses the terminal's own colours, so it fits any theme.
+
+Setting `PS1` in `~/.bashrc` replaces it with your own.
+
+`fastfetch` comes with Luft and shows its logo. Your own `~/.config/fastfetch/config.jsonc` takes over from Luft's, and `fastfetch --logo luft_small` shows a smaller logo.
+
 ## Preferences
 
 Style, text size, a see-through background and how see-through it is, the cursor's shape and blinking, how much history to keep, which shell to start, and copying text as soon as it's selected.

@@ -32,10 +32,18 @@ __luft_schelf() {
 	local verb=$1
 	shift
 	local -a names=()
-	local word
+	local word present=0
 	for word in "$@"; do
-		[[ $word == -* ]] || names+=("$word")
+		if [[ $word == -* ]]; then
+			continue
+		elif [[ $verb == install ]] && command rpm --query --quiet --whatprovides "$word" 2>/dev/null; then
+			printf '%s is already installed.\n' "$word" >&2
+			((++present))
+		else
+			names+=("$word")
+		fi
 	done
+	((present > 0 && ${#names[@]} == 0)) && return 0
 	if ((${#names[@]} == 0)); then
 		__luft_package_hint "$__luft_manager" "$verb"
 		return 1

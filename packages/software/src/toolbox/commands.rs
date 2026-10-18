@@ -18,7 +18,7 @@ pub fn programs(files: &str) -> Vec<String> {
         .collect()
 }
 
-fn on_system(name: &str) -> bool {
+pub fn on_system(name: &str) -> bool {
     SYSTEM_PATHS
         .iter()
         .any(|folder| Path::new(folder).join(name).exists())

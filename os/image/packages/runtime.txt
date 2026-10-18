@@ -20,6 +20,7 @@ ddcutil
 desktop-file-utils
 egl-utils
 erofs-utils
+fastfetch
 fedora-flathub-remote
 flatpak
 fprintd

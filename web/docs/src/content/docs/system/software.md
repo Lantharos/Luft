@@ -30,6 +30,8 @@ Open an `.AppImage` file and Schelf offers to install it. It moves it into `~/Ap
 
 Command-line tools come from Fedora and go into a [Toolbox](https://containertoolbx.org) container called `fedora-toolbox-45`. Search for them in Schelf, or open an `.rpm` file. Each command gets a small launcher in `~/.local/bin`, so it runs in [Tern](/apps/tern/) like any other, without entering the container.
 
+Tools that already come with Luft, such as `fastfetch`, run on the system itself, so Schelf says they're installed instead of adding a second copy. If a later version of Luft starts including a tool you installed this way, its launcher steps aside for Luft's.
+
 Libraries and `-devel` packages go into the container too, so building against them happens inside it. You can work in the container yourself:
 
 ```sh

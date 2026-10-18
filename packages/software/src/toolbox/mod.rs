@@ -86,6 +86,29 @@ pub fn update(packages: &[String], task: Task) -> Result<(), String> {
     packages.iter().try_for_each(|package| record(package))
 }
 
+pub fn retire_shadowed() -> Result<(), String> {
+    let mut tools = installed::recorded();
+    let mut retired = false;
+    tools.retain_mut(|tool| {
+        let (shadowed, kept): (Vec<String>, Vec<String>) = tool
+            .commands
+            .drain(..)
+            .partition(|command| commands::on_system(command));
+        tool.commands = kept;
+        if shadowed.is_empty() {
+            return true;
+        }
+        commands::unexport(&shadowed);
+        retired = true;
+        !tool.commands.is_empty()
+    });
+    if retired {
+        installed::save(&tools)
+    } else {
+        Ok(())
+    }
+}
+
 pub fn remove(package: &str, task: Task) -> Result<(), String> {
     let removed = transaction::run(&mut dnf(&["remove", package]), Stage::Removing, task);
     if let Err(error) = removed

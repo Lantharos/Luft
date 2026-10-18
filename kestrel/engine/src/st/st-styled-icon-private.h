@@ -24,8 +24,8 @@ void _st_styled_icon_render_async (StStyledIcon        *icon,
                                    gpointer             source_object,
                                    StIconInfo          *info,
                                    gboolean             glyph,
-                                   int                  size,
-                                   int                  scale,
+                                   int                  pixels,
+                                   float                scale,
                                    const char          *path,
                                    GCancellable        *cancellable,
                                    GAsyncReadyCallback  callback,
@@ -38,7 +38,7 @@ GdkPixbuf *_st_styled_icon_paint (const StStyledIconPaint *paint,
                                   GdkPixbuf               *source,
                                   gboolean                 glyph,
                                   int                      size,
-                                  int                      scale);
+                                  float                    scale);
 
 int _st_styled_icon_glyph_size (int size);
 

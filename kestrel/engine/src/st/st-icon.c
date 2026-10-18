@@ -292,15 +292,6 @@ st_icon_style_changed (StWidget *widget)
 }
 
 static void
-st_icon_resource_scale_changed (ClutterActor *actor)
-{
-  st_icon_update (ST_ICON (actor));
-
-  if (CLUTTER_ACTOR_CLASS (st_icon_parent_class)->resource_scale_changed)
-    CLUTTER_ACTOR_CLASS (st_icon_parent_class)->resource_scale_changed (actor);
-}
-
-static void
 st_icon_class_init (StIconClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
@@ -314,7 +305,6 @@ st_icon_class_init (StIconClass *klass)
   actor_class->paint_node = st_icon_paint_node;
 
   widget_class->style_changed = st_icon_style_changed;
-  actor_class->resource_scale_changed = st_icon_resource_scale_changed;
 
   /**
    * StIcon:gicon:
@@ -394,6 +384,9 @@ st_icon_init (StIcon *self)
 
   layout_manager = clutter_bin_layout_new ();
   clutter_actor_set_layout_manager (CLUTTER_ACTOR (self), layout_manager);
+
+  g_signal_connect (self, "real-resource-scale-changed",
+                    G_CALLBACK (st_icon_update), NULL);
 
   texture_cache = st_texture_cache_get_default ();
   self->priv->icon_theme_changed_id =
@@ -582,7 +575,7 @@ st_icon_update (StIcon *icon)
   if (priv->icon_size <= 0)
     return;
 
-  resource_scale = clutter_actor_get_resource_scale (CLUTTER_ACTOR (icon));
+  resource_scale = clutter_actor_get_real_resource_scale (CLUTTER_ACTOR (icon));
 
   stage = clutter_actor_get_stage (CLUTTER_ACTOR (icon));
   context = st_theme_context_get_for_stage (CLUTTER_STAGE (stage));

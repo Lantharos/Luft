@@ -36,8 +36,8 @@ typedef struct
 {
   StStyledIconPaint paint;
   gboolean glyph;
-  int size;
-  int scale;
+  int pixels;
+  float scale;
   char *path;
   GdkPixbuf *source;
 } RenderData;
@@ -311,7 +311,7 @@ render_thread (GTask        *task,
   GError *error = NULL;
 
   pixbuf = _st_styled_icon_paint (&data->paint, data->source, data->glyph,
-                                  data->size * data->scale, data->scale);
+                                  data->pixels, data->scale);
   if (data->path && !save_png (pixbuf, data->path, &error))
     g_task_return_error (task, error);
   else
@@ -357,8 +357,8 @@ _st_styled_icon_render_async (StStyledIcon        *icon,
                               gpointer             source_object,
                               StIconInfo          *info,
                               gboolean             glyph,
-                              int                  size,
-                              int                  scale,
+                              int                  pixels,
+                              float                scale,
                               const char          *path,
                               GCancellable        *cancellable,
                               GAsyncReadyCallback  callback,
@@ -369,7 +369,7 @@ _st_styled_icon_render_async (StStyledIcon        *icon,
 
   data->paint = icon->paint;
   data->glyph = glyph;
-  data->size = size;
+  data->pixels = pixels;
   data->scale = scale;
   data->path = g_strdup (path);
   g_task_set_task_data (task, data, render_data_free);

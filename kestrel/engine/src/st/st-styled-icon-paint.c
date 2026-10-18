@@ -316,7 +316,7 @@ static void
 draw_plate (cairo_t                 *cr,
             const StStyledIconPaint *paint,
             int                      size,
-            int                      scale)
+            float                    scale)
 {
   const CoglColor *plate = &paint->plate;
   double radius = size * PLATE_RADIUS;
@@ -432,7 +432,7 @@ _st_styled_icon_paint (const StStyledIconPaint *paint,
                        GdkPixbuf               *source,
                        gboolean                 glyph,
                        int                      size,
-                       int                      scale)
+                       float                    scale)
 {
   Pixels pixels = {
     gdk_pixbuf_read_pixels (source),

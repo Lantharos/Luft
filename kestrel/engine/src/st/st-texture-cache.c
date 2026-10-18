@@ -843,6 +843,27 @@ on_pixbuf_loaded (GObject      *source,
 }
 
 static void
+icon_lookup_size (int    size,
+                  int    paint_scale,
+                  float  resource_scale,
+                  int   *lookup_size,
+                  int   *lookup_scale)
+{
+  float scale = paint_scale * resource_scale;
+
+  if (scale == floorf (scale))
+    {
+      *lookup_size = size;
+      *lookup_scale = (int) scale;
+    }
+  else
+    {
+      *lookup_size = (int) ceilf (size * scale);
+      *lookup_scale = 1;
+    }
+}
+
+static void
 load_texture_async (StTextureCache       *cache,
                     AsyncTextureLoadData *data)
 {
@@ -864,8 +885,13 @@ load_texture_async (StTextureCache       *cache,
     }
   else if (data->styled)
     {
+      int lookup_size, lookup_scale;
+
+      icon_lookup_size (data->width, data->paint_scale, data->resource_scale,
+                        &lookup_size, &lookup_scale);
       _st_styled_icon_render_async (data->styled, cache, data->icon_info, data->glyph,
-                                    data->width, ceilf (data->paint_scale * data->resource_scale),
+                                    lookup_size * lookup_scale,
+                                    data->paint_scale * data->resource_scale,
                                     NULL, cache->cancellable, on_styled_icon_loaded, data);
     }
   else if (data->icon_info)
@@ -991,20 +1017,23 @@ load_styled_icon (StTextureCache *cache,
 {
   AsyncTextureLoadData *request;
   ClutterActor *actor = create_invisible_actor ();
-  int scale = ceilf (paint_scale * resource_scale);
+  int lookup_size, lookup_scale;
   g_autofree char *icon_string = g_icon_to_string (G_ICON (icon));
-  g_autofree char *key = g_strdup_printf (CACHE_PREFIX_STYLED_ICON "%s,size=%d,scale=%d",
-                                          icon_string ? icon_string : "", size, scale);
+  g_autofree char *key = NULL;
   StTextureCachePolicy policy = icon_string ? ST_TEXTURE_CACHE_POLICY_FOREVER
                                             : ST_TEXTURE_CACHE_POLICY_NONE;
 
+  icon_lookup_size (size, paint_scale, resource_scale, &lookup_size, &lookup_scale);
+  key = g_strdup_printf (CACHE_PREFIX_STYLED_ICON "%s,size=%d,pixels=%d,scale=%d",
+                         icon_string ? icon_string : "", size, lookup_size, lookup_scale);
   clutter_actor_set_content_gravity (actor, CLUTTER_CONTENT_GRAVITY_RESIZE_ASPECT);
   clutter_actor_set_size (actor, size * paint_scale, size * paint_scale);
   if (!ensure_request (cache, key, policy, &request, actor))
     {
       ClutterBackend *backend = clutter_context_get_backend (clutter_actor_get_context (actor));
       gboolean glyph;
-      StIconInfo *info = _st_styled_icon_lookup (icon, cache->icon_theme, size, scale, &glyph);
+      StIconInfo *info = _st_styled_icon_lookup (icon, cache->icon_theme,
+                                                 lookup_size, lookup_scale, &glyph);
 
       if (info == NULL)
         {
@@ -1057,7 +1086,7 @@ st_texture_cache_load_gicon (StTextureCache    *cache,
 {
   AsyncTextureLoadData *request;
   ClutterActor *actor;
-  gint scale;
+  int lookup_size, lookup_scale;
   char *gicon_string;
   g_autofree char *key = NULL;
   float actor_size;
@@ -1112,7 +1141,7 @@ st_texture_cache_load_gicon (StTextureCache    *cache,
   else
     lookup_flags |= ST_ICON_LOOKUP_DIR_LTR;
 
-  scale = ceilf (paint_scale * resource_scale);
+  icon_lookup_size (size, paint_scale, resource_scale, &lookup_size, &lookup_scale);
 
   gicon_string = g_icon_to_string (icon);
   /* A return value of NULL indicates that the icon can not be serialized,
@@ -1124,8 +1153,8 @@ st_texture_cache_load_gicon (StTextureCache    *cache,
   if (colors)
     {
       /* This raises some doubts about the practice of using string keys */
-      key = g_strdup_printf (CACHE_PREFIX_ICON "%s,size=%d,scale=%d,style=%d,colors=%2x%2x%2x%2x,%2x%2x%2x%2x,%2x%2x%2x%2x,%2x%2x%2x%2x",
-                             gicon_string, size, scale, icon_style,
+      key = g_strdup_printf (CACHE_PREFIX_ICON "%s,size=%d,pixels=%d,scale=%d,style=%d,colors=%2x%2x%2x%2x,%2x%2x%2x%2x,%2x%2x%2x%2x,%2x%2x%2x%2x",
+                             gicon_string, size, lookup_size, lookup_scale, icon_style,
                              colors->foreground.red, colors->foreground.blue, colors->foreground.green, colors->foreground.alpha,
                              colors->warning.red, colors->warning.blue, colors->warning.green, colors->warning.alpha,
                              colors->error.red, colors->error.blue, colors->error.green, colors->error.alpha,
@@ -1133,8 +1162,8 @@ st_texture_cache_load_gicon (StTextureCache    *cache,
     }
   else
     {
-      key = g_strdup_printf (CACHE_PREFIX_ICON "%s,size=%d,scale=%d,style=%d",
-                             gicon_string, size, scale, icon_style);
+      key = g_strdup_printf (CACHE_PREFIX_ICON "%s,size=%d,pixels=%d,scale=%d,style=%d",
+                             gicon_string, size, lookup_size, lookup_scale, icon_style);
     }
   g_free (gicon_string);
 
@@ -1149,7 +1178,7 @@ st_texture_cache_load_gicon (StTextureCache    *cache,
       ClutterBackend *clutter_backend = clutter_context_get_backend (context);
 
       info = st_icon_theme_lookup_by_gicon_for_scale (theme, icon,
-                                                      size, scale,
+                                                      lookup_size, lookup_scale,
                                                       lookup_flags);
       if (info == NULL)
         {
@@ -1564,7 +1593,7 @@ st_texture_cache_save_styled_icon_async (StTextureCache      *cache,
       return;
     }
 
-  _st_styled_icon_render_async (icon, cache, info, glyph, size, 1, path,
+  _st_styled_icon_render_async (icon, cache, info, glyph, size, 1.f, path,
                                 cancellable, callback, user_data);
 }
 

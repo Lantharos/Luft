@@ -16,6 +16,7 @@ Kestrel runs on its own build of Mutter 51: the upstream release plus an ordered
 - Shared background blur, `xdg-toplevel-icon-v1` icons, and `kestrel_window_v1` for windows kept out of window lists
 - Snapping and maximizing that animate at once, and windows the shell tiles counting as tiled
 - Shell text with fractional glyph advances and grayscale antialiasing
+- Shell text, icons and labels drawn at a fractional scale's own resolution and on whole pixels, so they stay sharp at 125% and 150%
 - Desktop windows for live wallpapers, and the transformed window groups behind the board
 - Variable refresh only for games, and `wp_content_type_v1`
 - Settings from `kestrel-settings` in place of gnome-settings-daemon, and default display scales aimed at 110 DPI

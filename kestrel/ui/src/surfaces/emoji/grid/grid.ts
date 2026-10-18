@@ -2,6 +2,7 @@ import Clutter from 'gi://Clutter';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 
+import { pixelScale, whenPixelScaleChanges } from '../../../shared/graphics.js';
 import { animateAdjustment } from '../../../shared/motion.js';
 import { withTone, type Item, type Tab } from '../catalog/catalog.js';
 import { CellView } from './cellView.js';
@@ -48,7 +49,7 @@ export class EmojiGrid {
     this.content.add_child(this.spacer);
     this.actor.vadjustment.connect('notify::value', () => this.refresh());
     this.actor.vadjustment.connect('notify::page-size', () => this.refresh());
-    this.actor.connect('resource-scale-changed', () => this.redraw());
+    whenPixelScaleChanges(this.actor, () => this.redraw());
     this.themeContext.connect('notify::scale-factor', () => this.redraw());
     this.actor.connect('style-changed', () => this.inkChanged());
   }
@@ -153,7 +154,7 @@ export class EmojiGrid {
   }
 
   private scale(): number {
-    return this.themeContext.scale_factor * this.actor.get_resource_scale();
+    return this.themeContext.scale_factor * pixelScale(this.actor);
   }
 
   private face(item: Item, scale: number): [string, Glyph | null] {

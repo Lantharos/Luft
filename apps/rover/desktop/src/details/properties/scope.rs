@@ -164,11 +164,11 @@ mod tests {
 
     #[test]
     fn home_leaves_out_cloud_mounts() {
-        let scope = plan_for(&["/var/home/kristof"]);
-        assert_eq!(scope.roots, paths(&["/var/home/kristof"]));
+        let scope = plan_for(&["/var/home/mara"]);
+        assert_eq!(scope.roots, paths(&["/var/home/mara"]));
         assert_eq!(
             scope.skipped,
-            HashSet::from([PathBuf::from("/var/home/kristof/Cloud/iCloud Drive")])
+            HashSet::from([PathBuf::from("/var/home/mara/Cloud/iCloud Drive")])
         );
     }
 

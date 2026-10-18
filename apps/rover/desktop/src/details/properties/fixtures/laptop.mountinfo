@@ -27,5 +27,5 @@
 69 72 0:57 / /var/lib/nfs/rpc_pipefs rw,relatime shared:177 - rpc_pipefs sunrpc rw
 866 60 0:88 / /run/user/1000 rw,nosuid,nodev,relatime shared:1133 - tmpfs tmpfs rw,seclabel,size=1404868k,nr_inodes=351217,mode=700,uid=1000,gid=1000,inode64
 1074 866 0:113 / /run/user/1000/doc rw,nosuid,nodev,relatime shared:1243 - fuse.portal portal rw,user_id=1000,group_id=1000
-1373 72 0:114 / /var/home/kristof/Cloud/iCloud\040Drive rw,nosuid,nodev,relatime shared:1274 - fuse.rclone 945529b0aea0-files: rw,user_id=1000,group_id=1000
+1373 72 0:114 / /var/home/mara/Cloud/iCloud\040Drive rw,nosuid,nodev,relatime shared:1274 - fuse.rclone icloud: rw,user_id=1000,group_id=1000
 324 27 0:90 / /proc/sys/fs/binfmt_misc rw,nosuid,nodev,noexec,relatime shared:385 - binfmt_misc binfmt_misc rw

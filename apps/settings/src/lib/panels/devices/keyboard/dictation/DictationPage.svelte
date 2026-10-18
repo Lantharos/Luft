@@ -56,7 +56,12 @@
 	);
 	let holdWith = $derived(ways.join(' or '));
 	let usable = $derived(info?.engines ?? []);
-	let available = $derived(!info || usable.includes(info.language.engine));
+	let spoken = $derived(info?.languages.find((language) => language.code === settings.values.language) ?? info?.language);
+	let engine = $derived.by(() => {
+		const chosen = settings.values.engine;
+		return chosen && chosen !== 'automatic' && usable.includes(chosen) ? chosen : spoken?.engine;
+	});
+	let available = $derived(!spoken || usable.includes(spoken.engine));
 	let needed = $derived(info?.models.filter((model) => info?.needed.includes(model.id)) ?? []);
 	let downloaded = $derived(
 		info?.models.filter((model) => (model.usage > 0 || model.download) && !(enabled && needed.includes(model))) ?? []
@@ -68,9 +73,10 @@
 			.map((language) => ({ value: language.code, label: language.name })) ?? [])
 	]);
 
-	function describeEngine(current: Overview) {
-		const name = ENGINE_NAMES[current.engine];
-		return current.engine === 'whisper' ? `${name} listens for ${current.language.name}, using the graphics card` : `${name} listens for ${current.language.name}`;
+	function describeEngine() {
+		if (!engine || !spoken) return '';
+		const name = ENGINE_NAMES[engine];
+		return engine === 'whisper' ? `${name} recognizes ${spoken.name} on the graphics card` : `${name} recognizes ${spoken.name}`;
 	}
 
 	async function refresh() {
@@ -144,12 +150,12 @@
 		<Section title="Language">
 			<Row
 				title="Language"
-				description={available ? 'Automatic follows the keyboard layout you type with' : `${current.language.name} isn’t available on this computer`}
+				description={available ? 'Automatic follows the keyboard layout you type with' : `${spoken?.name} isn’t available on this computer`}
 			>
 				<Select label="Language" options={languages} value={settings.values.language ?? ''} onchange={(code) => settings.set('language', code)} />
 			</Row>
 			{#if usable.length > 1}
-				<Row title="Speech recognizer" description={describeEngine(current)}>
+				<Row title="Speech recognizer" description={describeEngine()}>
 					<Select label="Speech recognizer" options={ENGINES} value={settings.values.engine ?? 'automatic'} onchange={(engine) => settings.set('engine', engine)} />
 				</Row>
 			{/if}

@@ -48,28 +48,30 @@
 	}}
 	onkeydown={(event) => event.key === 'Enter' && onopen()}
 >
-	{#if chosen}
-		<span class="check" aria-hidden="true"><Check size={11} strokeWidth={3} /></span>
-	{:else}
-		<span class="dot" aria-hidden="true"></span>
-	{/if}
-	<div class="min-w-0 flex-1">
-		<div class="flex items-baseline gap-2">
-			<span class="sender truncate">{name}</span>
-			{#if row.count > 1}
-				<span class="muted flex-none">{row.count}</span>
-			{/if}
-			<span class="flex-1"></span>
-			{#if row.flagged}
-				<Star size={13} class="star flex-none self-center" />
-			{/if}
-			{#if row.attachments}
-				<Paperclip size={13} class="muted flex-none self-center" />
-			{/if}
-			<span class="date muted flex-none">{when}</span>
+	<div class="body">
+		{#if chosen}
+			<span class="check" aria-hidden="true"><Check size={11} strokeWidth={3} /></span>
+		{:else}
+			<span class="dot" aria-hidden="true"></span>
+		{/if}
+		<div class="min-w-0 flex-1">
+			<div class="flex items-baseline gap-2">
+				<span class="sender truncate">{name}</span>
+				{#if row.count > 1}
+					<span class="muted flex-none">{row.count}</span>
+				{/if}
+				<span class="flex-1"></span>
+				{#if row.flagged}
+					<Star size={13} class="star flex-none self-center" />
+				{/if}
+				{#if row.attachments}
+					<Paperclip size={13} class="muted flex-none self-center" />
+				{/if}
+				<span class="date muted flex-none">{when}</span>
+			</div>
+			<p class="subject truncate">{row.subject || '(no subject)'}</p>
+			<p class="snippet muted truncate">{row.snippet}</p>
 		</div>
-		<p class="subject truncate">{row.subject || '(no subject)'}</p>
-		<p class="snippet muted truncate">{row.snippet}</p>
 	</div>
 	<div class="actions" data-no-drag>
 		<button type="button" class="icon-button" aria-label="Archive" onclick={(event) => act(event, onarchive)} {@attach tooltip('Archive (E)')}>
@@ -89,12 +91,19 @@
 		position: relative;
 		display: flex;
 		height: 100%;
-		align-items: flex-start;
-		gap: 10px;
+		align-items: center;
 		border-radius: 16px;
-		padding: 11px 14px 0 12px;
+		padding: 0 14px 0 12px;
 		cursor: default;
 		transition: background-color var(--motion-tap) var(--ease-decelerate);
+	}
+
+	.body {
+		display: flex;
+		min-width: 0;
+		flex: 1;
+		align-items: flex-start;
+		gap: 10px;
 	}
 
 	.row:hover {

@@ -135,6 +135,10 @@ def shell(command: str, timeout: float) -> str:
         return read_until(r"LUFT-DONE-\d+", timeout)
 
 
+def grow_disk(size: int):
+    qmp(("block_resize", {"device": "virtio0", "size": size}))
+
+
 def main():
     parser = argparse.ArgumentParser(description="Look at and use the Luft VM started by os/vm/run.sh")
     commands = parser.add_subparsers(dest="command", required=True)
@@ -150,6 +154,7 @@ def main():
     queued = commands.add_parser("enroll", help="add the key queued with this code on shim's blue screen, then restart")
     queued.add_argument("code")
     queued.add_argument("--timeout", type=float, default=120)
+    commands.add_parser("grow-disk", help="make the VM's disk bigger while it runs").add_argument("bytes", type=int)
     mok = commands.add_parser("enroll-from-disk", help="add EFI/luft/luft.cer on shim's blue screen, then restart")
     mok.add_argument("--timeout", type=float, default=120)
     arguments = parser.parse_args()
@@ -159,6 +164,8 @@ def main():
         enroll(arguments.code, arguments.timeout)
     elif arguments.command == "enroll-from-disk":
         enroll_from_disk(arguments.timeout)
+    elif arguments.command == "grow-disk":
+        grow_disk(arguments.bytes)
     elif arguments.command == "key":
         press(arguments.combo)
     elif arguments.command == "type":

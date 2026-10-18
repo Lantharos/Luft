@@ -75,4 +75,6 @@ ISO=... MEDIA=cd SECURE_BOOT=1 NETWORK=0 os/vm/run.sh          # as a DVD, Secur
 DISK=os/vm/state/target.qcow2 os/vm/run.sh                     # the installed drive afterwards
 ```
 
+`os/vm/encryption.sh meet` and `os/vm/encryption.sh grown-back` check device encryption on a copy of the installed disk: after Meet Luft's space is given back, and when the file system no longer leaves room for the header.
+
 [docs/hardware-testing.md](../docs/hardware-testing.md) lists what to check on a real computer.

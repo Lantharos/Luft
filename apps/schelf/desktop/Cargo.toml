@@ -20,7 +20,7 @@ libc = "0.2.190"
 luft-app = { path = "../../../packages/app", features = ["apps", "launch"] }
 luft-software = { path = "../../../packages/software" }
 quick-xml = "0.42.0"
-sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.46" }
+sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.47" }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = { version = "1.0.154", features = ["raw_value"] }
 tokio = { version = "1.53.3", default-features = false, features = ["macros", "rt", "signal", "sync"] }

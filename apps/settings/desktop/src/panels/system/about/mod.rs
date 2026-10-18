@@ -7,6 +7,7 @@ use std::fs;
 
 use gio::prelude::*;
 use luft_app::dbus::{self, failed};
+use luft_app::launch::{self, Token};
 use luft_app::{Commands, Events};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
@@ -191,10 +192,10 @@ async fn about(_: Value) -> Result<About, String> {
     .map_err(failed)
 }
 
-fn launch_disks(argument: &str) -> Result<(), String> {
+fn launch_disks(argument: &str, token: Option<&str>) -> Result<(), String> {
     gio_unix::DesktopAppInfo::new(DISKS)
         .ok_or("Disks isn't installed")?
-        .launch_uris(&[argument], gio::AppLaunchContext::NONE)
+        .launch_uris(&[argument], Some(&launch::context(token)))
         .map_err(|error| error.to_string())
 }
 
@@ -211,7 +212,9 @@ pub fn register(window: SabineWindow, _events: &Events) -> SabineWindow {
     window
         .command_async("about", about)
         .command_async("about_rename", rename)
-        .command("about_open_disks", |_: Value| launch_disks("file:///"))
+        .command("about_open_disks", |Token { token }| {
+            launch_disks("file:///", token.as_deref())
+        })
         .command_async("about_other_systems", |_: Value| systems::list())
         .command("about_remove_system", systems::remove)
         .command("about_problems", |_: Value| problems::problems())

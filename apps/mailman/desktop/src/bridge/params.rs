@@ -47,6 +47,7 @@ pub struct NewAccount {
     pub name: String,
     pub config: AccountConfig,
     pub secret: NewSecret,
+    pub token: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -96,6 +97,7 @@ pub struct Part {
     pub id: Option<i64>,
     pub file: Option<String>,
     pub index: u32,
+    pub token: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -111,6 +113,13 @@ pub struct Paths {
 #[derive(Deserialize)]
 pub struct Uri {
     pub uri: String,
+    pub token: Option<String>,
+}
+
+#[derive(Deserialize)]
+pub struct Unsubscribe {
+    pub id: i64,
+    pub token: Option<String>,
 }
 
 #[derive(Deserialize)]

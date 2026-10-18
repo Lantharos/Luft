@@ -1,3 +1,4 @@
+import { activationToken } from '@luft/ui';
 import { invoke, listen } from '#lib/bridge.js';
 
 export interface Wallpaper {
@@ -15,7 +16,7 @@ export const onWallpapersChanged = (callback: (wallpapers: Wallpaper[]) => void)
 export const thumbnail = (path: string) => invoke<string>('appearance_thumbnail', { path });
 export const wallpaperFocus = (path: string) => invoke<Focus>('appearance_wallpaper_focus', { path });
 export const addWallpapers = () => invoke<void>('appearance_add_wallpapers');
-export const openFolder = () => invoke<void>('appearance_open_folder');
+export const openFolder = async () => invoke<void>('appearance_open_folder', { token: await activationToken() });
 
 export function uriToPath(uri: string) {
 	return uri.startsWith('file://') ? decodeURIComponent(uri.slice('file://'.length)) : uri;

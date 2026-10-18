@@ -182,19 +182,19 @@ impl Explorer {
         Ok(scan.update())
     }
 
-    pub async fn show(&self, components: Vec<String>) -> Result<(), String> {
+    pub async fn show(&self, components: Vec<String>, token: Option<&str>) -> Result<(), String> {
         let scan = self.current()?;
         if components.is_empty() {
-            return file_manager::show_folder(&scan.path).await;
+            return file_manager::show_folder(&scan.path, token).await;
         }
         let (parent, path) = scan.location(&components).ok_or("It's no longer there")?;
         let folder = components
             .last()
             .is_some_and(|name| parent.find(std::slice::from_ref(name)).is_some());
         if folder {
-            file_manager::show_folder(&path).await
+            file_manager::show_folder(&path, token).await
         } else {
-            file_manager::show_in_folder(&path).await
+            file_manager::show_in_folder(&path, token).await
         }
     }
 }

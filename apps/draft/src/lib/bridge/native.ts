@@ -1,5 +1,5 @@
 import { app, events, fileUrl, invoke, listen } from '@lantharos/sabine';
-import { fileUrlPath } from '@luft/ui';
+import { activationToken, fileUrlPath } from '@luft/ui';
 import type { Activation, AppState, Backend, Entry, FileIndex, SaveTarget, Stat, StoreName } from './types';
 
 const CHOOSER = { timeoutMs: 24 * 60 * 60 * 1000 };
@@ -36,8 +36,8 @@ export const native: Backend = {
 	chooseFiles: (folder) => invoke<string[]>('choose_files', { folder }, CHOOSER),
 	chooseFolder: (folder) => invoke<string | null>('choose_folder', { folder }, CHOOSER),
 	chooseSave: (name, folder) => invoke<string | null>('choose_save', { name, folder }, CHOOSER),
-	showInFolder: (path) => invoke('show_in_folder', { path }),
-	openLink: (uri) => invoke('open_link', { uri }),
+	showInFolder: async (path) => invoke('show_in_folder', { path, token: await activationToken() }),
+	openLink: async (uri) => invoke('open_link', { uri, token: await activationToken() }),
 	takeOpenedFiles: async () => (await app.takeOpenUrls()).map(fileUrlPath).filter((path) => path !== null),
 	onFilesOpened: (callback) => events.openUrlsAvailable(callback),
 	onFilesChanged: (callback) => listen<{ paths: string[] }>('draft.files', ({ paths }) => callback(paths)),

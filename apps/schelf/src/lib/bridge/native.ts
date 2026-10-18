@@ -1,4 +1,5 @@
 import { invoke, listen } from '@lantharos/sabine';
+import { activationToken } from '@luft/ui';
 import type { Backend } from './types';
 
 const SLOW = { timeoutMs: 300_000 };
@@ -11,7 +12,7 @@ export const native: Backend = {
 	fedoraApps: () => invoke('fedora_apps'),
 	fedoraApp: (id) => invoke('fedora_app', { id }),
 	installed: () => invoke('library_installed'),
-	launch: (desktop) => invoke('library_launch', { desktop }),
+	launch: async (desktop) => invoke('library_launch', { desktop, token: await activationToken() }),
 	fedoraRemovalPlan: (packageName) => invoke('fedora_removal_plan', { package: packageName }),
 	searchTools: (query) => invoke('tools_search', { query }, SLOW),
 	permissions: (installation, reference) => invoke('library_permissions', { installation, reference }),
@@ -21,7 +22,7 @@ export const native: Backend = {
 	operations: () => invoke('operations_list'),
 	start: (key, title, job, members = []) => invoke('operations_start', { key, title, job, members }),
 	cancel: (id) => invoke('operations_cancel', { id }),
-	openUrl: (url) => invoke('app_open_url', { url }),
+	openUrl: async (url) => invoke('app_open_url', { url, token: await activationToken() }),
 	onOperations: (callback) => listen('schelf.operations', callback),
 	onLibraryChanged: (callback) => listen('schelf.library', callback),
 	onActivated: (callback) => listen('singleInstance.activate', callback)

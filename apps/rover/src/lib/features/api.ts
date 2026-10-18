@@ -1,4 +1,5 @@
 import { invoke, listen } from '@lantharos/sabine';
+import { activationToken } from '@luft/ui';
 import type {
 	ArchiveFormat,
 	HistoryState,
@@ -32,8 +33,8 @@ export const requestThumbnails = (paths: string[], size: ThumbnailSize) => invok
 export const startSearch = (query: SearchQuery) => invoke<number>('start_search', { query });
 export const cancelSearch = (id: number) => invoke<void>('cancel_search', { id });
 
-export const openTerminal = (path: string) => invoke<void>('open_terminal', { path });
-export const exploreSpace = (path: string) => invoke<void>('explore_space', { path });
+export const openTerminal = async (path: string) => invoke<void>('open_terminal', { path, token: await activationToken() });
+export const exploreSpace = async (path: string) => invoke<void>('explore_space', { path, token: await activationToken() });
 
 export const fileOwnership = (path: string) => invoke<Ownership>('file_ownership', { path });
 export const setPermissions = (path: string, mode: number) => invoke<void>('set_permissions', { path, mode });

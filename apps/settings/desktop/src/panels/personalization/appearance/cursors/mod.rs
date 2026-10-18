@@ -8,6 +8,7 @@ mod themes;
 mod xcursor;
 
 use gio::prelude::*;
+use luft_app::launch::{self, Token};
 use luft_app::{Commands, Events};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
@@ -26,6 +27,7 @@ struct Theme {
 #[derive(Deserialize)]
 struct Product {
     id: u64,
+    token: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -55,19 +57,19 @@ fn install(events: &Events, Install { id, file }: Install) -> Result<(), String>
     Ok(())
 }
 
-fn launch(uri: &str) -> Result<(), String> {
-    gio::AppInfo::launch_default_for_uri(uri, gio::AppLaunchContext::NONE)
+fn launch(uri: &str, token: Option<&str>) -> Result<(), String> {
+    gio::AppInfo::launch_default_for_uri(uri, Some(&launch::context(token)))
         .map_err(|error| error.to_string())
 }
 
-fn open_page(Product { id }: Product) -> Result<(), String> {
-    launch(&store::product_page(id))
+fn open_page(Product { id, token }: Product) -> Result<(), String> {
+    launch(&store::product_page(id), token.as_deref())
 }
 
-fn open_folder(_: Value) -> Result<(), String> {
+fn open_folder(Token { token }: Token) -> Result<(), String> {
     let user = UserThemes::new()?;
     std::fs::create_dir_all(user.icons()).map_err(|error| error.to_string())?;
-    launch(&gio::File::for_path(user.icons()).uri())
+    launch(&gio::File::for_path(user.icons()).uri(), token.as_deref())
 }
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {

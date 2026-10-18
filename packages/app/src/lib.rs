@@ -8,6 +8,7 @@ pub mod file_manager;
 pub mod fonts;
 #[cfg(feature = "ibus")]
 pub mod ibus;
+pub mod launch;
 pub mod portal;
 #[cfg(feature = "recovery")]
 pub mod recovery;

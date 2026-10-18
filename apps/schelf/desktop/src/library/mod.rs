@@ -46,6 +46,7 @@ pub struct InstalledApp {
 #[derive(Deserialize)]
 struct Desktop {
     desktop: String,
+    token: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -74,10 +75,10 @@ pub fn installed() -> Vec<InstalledApp> {
     apps
 }
 
-fn launch(Desktop { desktop }: Desktop) -> Result<(), String> {
+fn launch(Desktop { desktop, token }: Desktop) -> Result<(), String> {
     let info =
         gio_unix::DesktopAppInfo::new(&desktop).ok_or("That app isn't installed any more.")?;
-    info.launch(&[], gio::AppLaunchContext::NONE)
+    info.launch(&[], Some(&luft_app::launch::context(token.as_deref())))
         .map_err(|error| error.to_string())
 }
 

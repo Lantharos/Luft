@@ -64,6 +64,7 @@ export { ago, bytes, memoryBytes, plural, watts } from './text/format';
 export { renderMarkdown } from './text/markdown';
 export { basename, fileUri, fileUrlPath, isInside, pathsFromUriList } from './text/paths';
 
+export { activationToken } from './shell/activation';
 export { dragFiles, fileDragStart } from './shell/fileDrag';
 export { droppedPaths, fileDrop } from './shell/fileDrop';
 export { default as GlassShell } from './shell/GlassShell.svelte';

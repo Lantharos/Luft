@@ -3,7 +3,7 @@ use luft_app::thumbnails::ThumbnailSize;
 use sabine::SabineWindow;
 use serde::Deserialize;
 
-use super::params::{Empty, Path, Paths};
+use super::params::{Empty, Handoff, Path, Paths};
 use crate::app::state::RoverState;
 use crate::archives::{self, ArchiveFormat};
 use crate::details::properties;
@@ -158,7 +158,9 @@ fn register_discovery(window: SabineWindow, state: &RoverState) -> SabineWindow 
             state.search.cancel(id);
             Ok(())
         })
-        .command("open_terminal", |Path { path }| terminal::open(&path))
+        .command("open_terminal", |Handoff { path, token }| {
+            terminal::open(&path, token.as_deref())
+        })
 }
 
 fn register_properties(window: SabineWindow, state: &RoverState) -> SabineWindow {

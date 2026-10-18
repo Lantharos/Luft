@@ -14,7 +14,7 @@ name = "setup_lib"
 futures-util = { version = "0.3.34", default-features = false }
 gio = "0.22.10"
 gio-unix = "0.22.8"
-luft-app = { path = "../../../packages/app", features = ["recovery"] }
+luft-app = { path = "../../../packages/app", features = ["launch", "recovery"] }
 luft-fingerprint = { path = "../../../packages/fingerprint" }
 luft-meet = { path = "../../../packages/meet" }
 luft-network = { path = "../../../packages/network" }

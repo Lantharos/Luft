@@ -11,6 +11,12 @@ pub struct Path {
 }
 
 #[derive(Deserialize)]
+pub struct Handoff {
+    pub path: String,
+    pub token: Option<String>,
+}
+
+#[derive(Deserialize)]
 pub struct Paths {
     pub paths: Vec<String>,
 }
@@ -38,11 +44,13 @@ pub struct Subtitles {
 pub struct OpenWith {
     pub path: String,
     pub app: String,
+    pub token: Option<String>,
 }
 
 #[derive(Deserialize)]
 pub struct Uri {
     pub uri: String,
+    pub token: Option<String>,
 }
 
 #[derive(Deserialize)]

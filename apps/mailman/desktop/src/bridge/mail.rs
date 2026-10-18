@@ -2,7 +2,7 @@ use std::hash::{DefaultHasher, Hash, Hasher};
 use std::path::PathBuf;
 
 use gio::prelude::*;
-use luft_app::Commands;
+use luft_app::{Commands, launch};
 use luft_app::portal::FileChooser;
 use sabine::SabineWindow;
 use serde::Serialize;
@@ -93,7 +93,7 @@ fn open_attachment(state: &MailmanState, part: Part) -> Result<(), String> {
     let path = folder.join(safe_name(&name));
     std::fs::write(&path, bytes).map_err(|error| error.to_string())?;
     let uri = gio::File::for_path(&path).uri();
-    gio::AppInfo::launch_default_for_uri(&uri, None::<&gio::AppLaunchContext>)
+    gio::AppInfo::launch_default_for_uri(&uri, Some(&launch::context(part.token.as_deref())))
         .map_err(|error| error.to_string())
 }
 
@@ -191,8 +191,8 @@ pub fn register(window: SabineWindow, state: &MailmanState) -> SabineWindow {
             state.store.contacts(&query, 8)
         })
         .command("open_message_file", open_file)
-        .command("open_uri", |Uri { uri }| {
-            gio::AppInfo::launch_default_for_uri(&uri, None::<&gio::AppLaunchContext>)
+        .command("open_uri", |Uri { uri, token }| {
+            gio::AppInfo::launch_default_for_uri(&uri, Some(&launch::context(token.as_deref())))
                 .map_err(|error| error.to_string())
         })
 }

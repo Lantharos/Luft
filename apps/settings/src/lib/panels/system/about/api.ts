@@ -1,3 +1,4 @@
+import { activationToken } from '@luft/ui';
 import { invoke } from '#lib/bridge.js';
 
 export interface About {
@@ -13,7 +14,7 @@ export interface About {
 
 export const about = () => invoke<About>('about');
 export const rename = (name: string) => invoke<void>('about_rename', { name });
-export const openDisks = () => invoke<void>('about_open_disks');
+export const openDisks = async () => invoke<void>('about_open_disks', { token: await activationToken() });
 
 export interface OtherSystem {
 	id: string;
@@ -23,7 +24,7 @@ export interface OtherSystem {
 }
 
 export const otherSystems = () => invoke<OtherSystem[]>('about_other_systems');
-export const removeSystem = (id: string) => invoke<void>('about_remove_system', { id });
+export const removeSystem = async (id: string) => invoke<void>('about_remove_system', { id, token: await activationToken() });
 
 export interface Suggestion {
 	step: string;

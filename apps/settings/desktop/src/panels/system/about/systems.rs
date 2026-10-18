@@ -15,6 +15,7 @@ pub struct OtherSystem {
 #[derive(Deserialize)]
 pub struct Removal {
     id: String,
+    token: Option<String>,
 }
 
 pub async fn list() -> Result<Vec<OtherSystem>, String> {
@@ -34,6 +35,6 @@ pub async fn list() -> Result<Vec<OtherSystem>, String> {
         .collect())
 }
 
-pub fn remove(Removal { id }: Removal) -> Result<(), String> {
-    launch_disks(&format!("disks-system://{id}"))
+pub fn remove(Removal { id, token }: Removal) -> Result<(), String> {
+    launch_disks(&format!("disks-system://{id}"), token.as_deref())
 }

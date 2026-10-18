@@ -6,15 +6,15 @@ use crate::portal::path_uri;
 const FILE_MANAGER: &str = "org.freedesktop.FileManager1";
 const FILE_MANAGER_PATH: &str = "/org/freedesktop/FileManager1";
 
-pub async fn show_in_folder(path: &Path) -> Result<(), String> {
-    show("ShowItems", path).await
+pub async fn show_in_folder(path: &Path, token: Option<&str>) -> Result<(), String> {
+    show("ShowItems", path, token).await
 }
 
-pub async fn show_folder(path: &Path) -> Result<(), String> {
-    show("ShowFolders", path).await
+pub async fn show_folder(path: &Path, token: Option<&str>) -> Result<(), String> {
+    show("ShowFolders", path, token).await
 }
 
-async fn show(method: &str, path: &Path) -> Result<(), String> {
+async fn show(method: &str, path: &Path, token: Option<&str>) -> Result<(), String> {
     dbus::session()
         .await?
         .call_method(
@@ -22,7 +22,7 @@ async fn show(method: &str, path: &Path) -> Result<(), String> {
             FILE_MANAGER_PATH,
             Some(FILE_MANAGER),
             method,
-            &(vec![path_uri(path)], ""),
+            &(vec![path_uri(path)], token.unwrap_or_default()),
         )
         .await
         .map(drop)

@@ -4,6 +4,7 @@ use std::time::{Duration, Instant};
 
 use base64::Engine;
 use base64::engine::general_purpose::URL_SAFE_NO_PAD;
+use luft_app::launch;
 use rand::RngExt;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -155,7 +156,11 @@ pub fn refresh(provider: Provider, refresh_token: &str) -> Result<Tokens, String
     exchange(provider, &form)
 }
 
-pub fn sign_in(provider: Provider, hint: Option<&str>) -> Result<Tokens, String> {
+pub fn sign_in(
+    provider: Provider,
+    hint: Option<&str>,
+    token: Option<&str>,
+) -> Result<Tokens, String> {
     let (client_id, secret) = provider
         .client()
         .ok_or("Signing in with this provider isn't set up")?;
@@ -187,7 +192,7 @@ pub fn sign_in(provider: Provider, hint: Option<&str>) -> Result<Tokens, String>
     if let Some(hint) = hint {
         authorize.query_pairs_mut().append_pair("login_hint", hint);
     }
-    gio::AppInfo::launch_default_for_uri(authorize.as_str(), None::<&gio::AppLaunchContext>)
+    gio::AppInfo::launch_default_for_uri(authorize.as_str(), Some(&launch::context(token)))
         .map_err(|error| error.to_string())?;
     let code = wait_for_code(&listener, &state)?;
     let mut form = vec![

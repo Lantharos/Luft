@@ -11,6 +11,12 @@ pub struct Path {
 }
 
 #[derive(Deserialize)]
+pub struct Handoff {
+    pub path: String,
+    pub token: Option<String>,
+}
+
+#[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Listing {
     pub path: String,
@@ -62,6 +68,7 @@ pub struct Id {
 #[serde(rename_all = "camelCase")]
 pub struct MountPoint {
     pub mount_point: String,
+    pub token: Option<String>,
 }
 
 #[derive(Deserialize)]

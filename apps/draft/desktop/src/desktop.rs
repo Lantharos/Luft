@@ -6,7 +6,7 @@ use luft_app::{dbus, file_manager};
 use serde::Deserialize;
 use zbus::{OwnedObjectPath, Proxy, Variant};
 
-use crate::files::{Target, failed};
+use crate::files::failed;
 
 #[derive(Deserialize)]
 pub struct Open {
@@ -22,6 +22,13 @@ pub struct Save {
 #[derive(Deserialize)]
 pub struct Link {
     uri: String,
+    token: Option<String>,
+}
+
+#[derive(Deserialize)]
+pub struct Handoff {
+    path: String,
+    token: Option<String>,
 }
 
 const LINK_SCHEMES: [&str; 3] = ["http://", "https://", "mailto:"];
@@ -70,11 +77,11 @@ pub async fn choose_save(Save { name, folder }: Save) -> Result<Option<String>, 
     .map(|path| path.map(|path| path.to_string_lossy().into_owned()))
 }
 
-pub async fn show_in_folder(Target { path }: Target) -> Result<(), String> {
-    file_manager::show_in_folder(Path::new(&path)).await
+pub async fn show_in_folder(Handoff { path, token }: Handoff) -> Result<(), String> {
+    file_manager::show_in_folder(Path::new(&path), token.as_deref()).await
 }
 
-pub async fn open_link(Link { uri }: Link) -> Result<(), String> {
+pub async fn open_link(Link { uri, token }: Link) -> Result<(), String> {
     if !LINK_SCHEMES.iter().any(|scheme| uri.starts_with(scheme)) {
         return Err("Only web and mail links open outside Draft".into());
     }
@@ -87,11 +94,15 @@ pub async fn open_link(Link { uri }: Link) -> Result<(), String> {
     .await
     .map_err(failed)?;
     proxy
-        .call::<_, _, OwnedObjectPath>(
-            "OpenURI",
-            &("", uri.as_str(), HashMap::<&str, Variant>::new()),
-        )
+        .call::<_, _, OwnedObjectPath>("OpenURI", &("", uri.as_str(), activation(token.as_deref())))
         .await
         .map(drop)
         .map_err(failed)
+}
+
+fn activation(token: Option<&str>) -> HashMap<&str, Variant<'_>> {
+    token
+        .map(|token| ("activation_token", Variant::from(token)))
+        .into_iter()
+        .collect()
 }

@@ -19,7 +19,7 @@ fn add(state: &MailmanState, request: NewAccount) -> Result<Account, String> {
             (Secret::Password { password }, login)
         }
         NewSecret::OAuth { provider } => {
-            let tokens = oauth_sign_in(provider, Some(&email))?;
+            let tokens = oauth_sign_in(provider, Some(&email), request.token.as_deref())?;
             email = tokens.email.unwrap_or(email);
             if name.is_empty() {
                 name = tokens.name.unwrap_or_default();

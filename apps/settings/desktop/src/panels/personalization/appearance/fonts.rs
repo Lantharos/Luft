@@ -3,6 +3,7 @@ use std::path::PathBuf;
 
 use gio::prelude::*;
 use luft_app::fonts::{self, Defaults, Face, Role};
+use luft_app::launch;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -22,6 +23,7 @@ pub struct Family {
 #[derive(Deserialize)]
 pub struct Open {
     file: String,
+    token: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -87,10 +89,13 @@ pub fn list(_: Value) -> Result<Vec<Family>, String> {
     Ok(families)
 }
 
-pub fn open(Open { file }: Open) -> Result<(), String> {
+pub fn open(Open { file, token }: Open) -> Result<(), String> {
     let magpie = gio_unix::DesktopAppInfo::new(MAGPIE).ok_or("Magpie isn't installed")?;
     magpie
-        .launch(&[gio::File::for_path(file)], gio::AppLaunchContext::NONE)
+        .launch(
+            &[gio::File::for_path(file)],
+            Some(&launch::context(token.as_deref())),
+        )
         .map_err(|error| error.to_string())
 }
 

@@ -19,6 +19,12 @@ pub struct Folder {
 }
 
 #[derive(Deserialize)]
+pub struct Handoff {
+    pub path: String,
+    pub token: Option<String>,
+}
+
+#[derive(Deserialize)]
 pub struct Label {
     pub block: String,
     pub label: String,
@@ -143,6 +149,12 @@ pub struct KeySheet {
 #[derive(Deserialize)]
 pub struct Place {
     pub path: Vec<String>,
+}
+
+#[derive(Deserialize)]
+pub struct Shown {
+    pub path: Vec<String>,
+    pub token: Option<String>,
 }
 
 #[derive(Deserialize)]

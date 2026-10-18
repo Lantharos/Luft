@@ -1,3 +1,4 @@
+import { activationToken } from '@luft/ui';
 import { invoke, listen } from '#lib/bridge.js';
 
 export type Provider = 'onedrive' | 'dropbox' | 'icloud' | 'nextcloud' | 'webdav';
@@ -76,4 +77,4 @@ export const answer = (session: string, reply: Answer) => invoke<void>('accounts
 export const cancel = (session: string) => invoke<void>('accounts_cancel', { session });
 export const rename = (account: string, name: string) => invoke<void>('accounts_rename', { account, name });
 export const remove = (account: string) => invoke<void>('accounts_remove', { account }, { timeoutMs: 600_000 });
-export const openAddress = (url: string) => invoke<void>('accounts_open', { url });
+export const openAddress = async (url: string) => invoke<void>('accounts_open', { url, token: await activationToken() });

@@ -87,13 +87,15 @@ fn register_files(window: SabineWindow, state: &MagpieState) -> SabineWindow {
         .command("other_apps", |Path { path }| {
             Ok(apps::others(FilePath::new(&path)))
         })
-        .command("open_with", |OpenWith { path, app }| {
-            apps::open_with(FilePath::new(&path), &app)
+        .command("open_with", |OpenWith { path, app, token }| {
+            apps::open_with(FilePath::new(&path), &app, token.as_deref())
         })
-        .command_async("show_in_folder", |Path { path }| async move {
-            file_manager::show_in_folder(FilePath::new(&path)).await
+        .command_async("show_in_folder", |Handoff { path, token }| async move {
+            file_manager::show_in_folder(FilePath::new(&path), token.as_deref()).await
         })
-        .command("open_uri", |Uri { uri }| apps::open_uri(&uri))
+        .command("open_uri", |Uri { uri, token }| {
+            apps::open_uri(&uri, token.as_deref())
+        })
 }
 
 fn register_media(window: SabineWindow, state: &MagpieState) -> SabineWindow {

@@ -4,7 +4,7 @@ use std::sync::Once;
 use futures_util::StreamExt;
 use luft_accounts::client::{self, Signal};
 use luft_accounts::types::{Account, Answer, Credentials, Drive, Provider};
-use luft_app::{Commands, Events};
+use luft_app::{Commands, Events, launch};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
@@ -57,6 +57,7 @@ struct Target {
 #[derive(Deserialize)]
 struct Address {
     url: String,
+    token: Option<String>,
 }
 
 async fn snapshot() -> Result<Snapshot, String> {
@@ -93,11 +94,11 @@ async fn accounts(events: Events, _: Value) -> Result<Snapshot, String> {
     Ok(snapshot)
 }
 
-fn open(Address { url }: Address) -> Result<(), String> {
+fn open(Address { url, token }: Address) -> Result<(), String> {
     if !url.starts_with("https://") && !url.starts_with("http://") {
         return Err("That isn't a web address".to_owned());
     }
-    gio::AppInfo::launch_default_for_uri(&url, gio::AppLaunchContext::NONE)
+    gio::AppInfo::launch_default_for_uri(&url, Some(&launch::context(token.as_deref())))
         .map_err(|error| error.to_string())
 }
 

@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 use gio::prelude::*;
-use luft_app::{Appearance, Commands};
+use luft_app::{Appearance, Commands, launch};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -46,13 +46,14 @@ fn files(arguments: &[String], working_directory: Option<&str>) -> Vec<String> {
 #[derive(Deserialize)]
 struct Link {
     url: String,
+    token: Option<String>,
 }
 
-fn open_url(Link { url }: Link) -> Result<(), String> {
+fn open_url(Link { url, token }: Link) -> Result<(), String> {
     if !url.starts_with("https://") && !url.starts_with("http://") {
         return Err("Only web links can be opened.".into());
     }
-    gio::AppInfo::launch_default_for_uri(&url, gio::AppLaunchContext::NONE)
+    gio::AppInfo::launch_default_for_uri(&url, Some(&launch::context(token.as_deref())))
         .map_err(|error| error.to_string())
 }
 

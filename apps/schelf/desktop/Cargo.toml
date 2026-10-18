@@ -17,7 +17,7 @@ futures-util = { version = "0.3.34", default-features = false }
 gio = "0.22.10"
 gio-unix = "0.22.8"
 libc = "0.2.190"
-luft-app = { path = "../../../packages/app", features = ["apps"] }
+luft-app = { path = "../../../packages/app", features = ["apps", "launch"] }
 luft-software = { path = "../../../packages/software" }
 quick-xml = "0.42.0"
 sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.46" }

@@ -1,3 +1,4 @@
+import { activationToken } from '@luft/ui';
 import { invoke, listen } from '#lib/bridge.js';
 
 export interface CursorTheme {
@@ -39,9 +40,9 @@ export type InstallState =
 export const cursorThemes = () => invoke<CursorTheme[]>('appearance_cursor_themes');
 export const cursorPreview = (path: string) => invoke<string>('appearance_cursor_preview', { path });
 export const removeCursorTheme = (name: string) => invoke<void>('appearance_cursor_remove', { name });
-export const openCursorFolder = () => invoke<void>('appearance_cursor_open_folder');
+export const openCursorFolder = async () => invoke<void>('appearance_cursor_open_folder', { token: await activationToken() });
 export const browseCursors = (search: string, order: Order, page: number) => invoke<StorePage>('appearance_cursor_store', { search, order, page });
 export const installCursor = (id: number, file: number) => invoke<void>('appearance_cursor_install', { id, file });
-export const openStorePage = (id: number) => invoke<void>('appearance_cursor_open_page', { id });
+export const openStorePage = async (id: number) => invoke<void>('appearance_cursor_open_page', { id, token: await activationToken() });
 export const onInstallProgress = (callback: (progress: InstallState & { id: number }) => void) =>
 	listen<InstallState & { id: number }>('appearance.cursorInstall', callback);

@@ -6,6 +6,7 @@ use std::sync::{Once, OnceLock};
 use futures_util::StreamExt;
 use luft_accounts::client::{self, Signal};
 use luft_accounts::types::{Drive, FileState};
+use luft_app::launch::{self, Token};
 use luft_app::{Commands, Events};
 use sabine::SabineWindow;
 use serde::Deserialize;
@@ -20,6 +21,12 @@ static WATCH: Once = Once::new();
 #[derive(Deserialize)]
 struct Folder {
     path: String,
+}
+
+#[derive(Deserialize)]
+struct Handoff {
+    path: String,
+    token: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -38,8 +45,8 @@ pub fn is_cloud(path: &str) -> bool {
     Path::new(path).starts_with(root)
 }
 
-fn open(address: &str) -> Result<(), String> {
-    gio::AppInfo::launch_default_for_uri(address, gio::AppLaunchContext::NONE)
+fn open(address: &str, token: Option<&str>) -> Result<(), String> {
+    gio::AppInfo::launch_default_for_uri(address, Some(&launch::context(token)))
         .map_err(|error| error.to_string())
 }
 
@@ -67,8 +74,8 @@ async fn states(Folder { path }: Folder) -> Result<BTreeMap<String, FileState>, 
     client::states(&path).await
 }
 
-async fn open_in_browser(Folder { path }: Folder) -> Result<(), String> {
-    open(&client::web_address(&path).await?)
+async fn open_in_browser(Handoff { path, token }: Handoff) -> Result<(), String> {
+    open(&client::web_address(&path).await?, token.as_deref())
 }
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
@@ -88,5 +95,7 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .command_async("cloud_dismiss_conflict", |Conflict { account, copy }| async move {
             client::dismiss_conflict(&account, &copy).await
         })
-        .command("cloud_add_account", |_: Value| open(ADD_ACCOUNT))
+        .command("cloud_add_account", |Token { token }| {
+            open(ADD_ACCOUNT, token.as_deref())
+        })
 }

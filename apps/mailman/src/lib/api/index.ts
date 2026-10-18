@@ -1,4 +1,5 @@
 import { invoke, isAvailable, listen } from '@lantharos/sabine';
+import { activationToken } from '@luft/ui';
 import type {
 	Account,
 	AccountConfig,
@@ -47,8 +48,8 @@ export const setFocused = (focused: boolean) => call<void>('set_focused', { focu
 export const saveSettings = (settings: Settings) => call<void>('save_settings', { settings });
 
 export const discover = (email: string) => call<Discovery>('discover', { email }, LONG);
-export const addAccount = (email: string, name: string, config: AccountConfig, secret: Secret) =>
-	call<Account>('add_account', { email, name, config, secret }, LONG);
+export const addAccount = async (email: string, name: string, config: AccountConfig, secret: Secret) =>
+	call<Account>('add_account', { email, name, config, secret, token: await activationToken() }, LONG);
 export const removeAccount = (id: number) => call<void>('remove_account', { id });
 export const renameAccount = (id: number, name: string) => call<void>('rename_account', { id, name });
 export const identities = () => call<Identity[]>('identities');
@@ -71,17 +72,18 @@ export const act = (action: Action, target: { threads?: number[]; ids?: number[]
 export type Verdict = 'approved' | 'denied' | 'pending';
 export const screen = (address: string, verdict: Verdict) => call<Verdict>('screen', { address, verdict });
 export type PartSource = { id: number } | { file: string };
-export const openAttachment = (source: PartSource, index: number) => call<void>('open_attachment', { ...source, index }, LONG);
+export const openAttachment = async (source: PartSource, index: number) =>
+	call<void>('open_attachment', { ...source, index, token: await activationToken() }, LONG);
 export const saveAttachment = (source: PartSource, index: number) => call<string | null>('save_attachment', { ...source, index }, FOREVER);
 export const contacts = (query: string) => call<Address[]>('contacts', { query });
 export const openMessageFile = (path: string) => call<OpenedFile>('open_message_file', { path });
-export const openUri = (uri: string) => call<void>('open_uri', { uri });
+export const openUri = async (uri: string) => call<void>('open_uri', { uri, token: await activationToken() });
 
 export const send = (draft: Draft) => call<{ id: number; sendAt: number }>('send', { draft });
 export const cancelSend = (id: number) => call<Draft | null>('cancel_send', { id });
 export const saveDraft = (draft: Draft, replaces: number | null) => call<void>('save_draft', { draft, replaces });
 export const reopenDraft = (id: number) => call<{ account: number; from: string; recipients: Message['recipients']; subject: string; html: string; text: string }>('reopen_draft', { id }, LONG);
-export const unsubscribe = (id: number) => call<'done' | 'opened'>('unsubscribe', { id }, LONG);
+export const unsubscribe = async (id: number) => call<'done' | 'opened'>('unsubscribe', { id, token: await activationToken() }, LONG);
 export const chooseFiles = () => call<Chosen[]>('choose_files', {}, FOREVER);
 export const describeFiles = (paths: string[]) => call<Chosen[]>('describe_files', { paths });
 export const stashFile = (file: File, name = file.name) => invoke<string>('stash_file', { name }, { body: file });

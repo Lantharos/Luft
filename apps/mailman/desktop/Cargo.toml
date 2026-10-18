@@ -20,7 +20,7 @@ gio = "0.22.10"
 hickory-resolver = "0.26.3"
 lol_html = "3.0.1"
 lettre = { version = "0.11.23", default-features = false, features = ["smtp-transport", "rustls", "ring", "rustls-platform-verifier", "hostname"] }
-luft-app = { path = "../../../packages/app", features = ["apps"] }
+luft-app = { path = "../../../packages/app", features = ["apps", "launch"] }
 mail-builder = "1.0.0"
 mail-parser = "0.11.9"
 parking_lot = "0.12.5"

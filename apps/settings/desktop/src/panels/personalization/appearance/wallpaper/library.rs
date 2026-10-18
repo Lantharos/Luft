@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 
 use gio::glib;
 use gio::prelude::*;
-use luft_app::Events;
+use luft_app::{Events, launch};
 use serde::Serialize;
 
 use super::cache::failed;
@@ -113,12 +113,12 @@ pub fn add(uris: &[String]) -> Result<(), String> {
     Ok(())
 }
 
-pub fn open_folder() -> Result<(), String> {
+pub fn open_folder(token: Option<&str>) -> Result<(), String> {
     let folder = folder()?;
     fs::create_dir_all(&folder).map_err(failed)?;
     gio::AppInfo::launch_default_for_uri(
         &gio::File::for_path(&folder).uri(),
-        gio::AppLaunchContext::NONE,
+        Some(&launch::context(token)),
     )
     .map_err(failed)
 }

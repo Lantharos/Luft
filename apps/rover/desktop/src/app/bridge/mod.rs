@@ -85,11 +85,11 @@ fn register_files(window: SabineWindow, state: &RoverState) -> SabineWindow {
                 transfer::move_items(sources, destination, &state.queue, &state.history)
             },
         )
-        .command("open_with_default", |Path { path }| {
-            entries::open_with_default(path)
+        .command("open_with_default", |Handoff { path, token }| {
+            entries::open_with_default(&path, token.as_deref())
         })
         .command("list_drives", |Empty {}| Ok(drives::list_drives()))
-        .command("eject_drive", |MountPoint { mount_point }| {
+        .command("eject_drive", |MountPoint { mount_point, .. }| {
             drives::eject_drive(mount_point)
         })
         .command_async("list_windows", |Empty {}| async {
@@ -101,10 +101,12 @@ fn register_files(window: SabineWindow, state: &RoverState) -> SabineWindow {
                 drives::open_windows(&device, read_only).await
             },
         )
-        .command("manage_drive", |MountPoint { mount_point }| {
-            drives::manage(&mount_point)
+        .command("manage_drive", |MountPoint { mount_point, token }| {
+            drives::manage(&mount_point, token.as_deref())
         })
-        .command("explore_space", |Path { path }| drives::explore(&path))
+        .command("explore_space", |Handoff { path, token }| {
+            drives::explore(&path, token.as_deref())
+        })
 }
 
 fn register_trash(window: SabineWindow, state: &RoverState) -> SabineWindow {

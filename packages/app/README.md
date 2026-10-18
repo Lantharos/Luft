@@ -68,7 +68,8 @@ window
 | `dbus` | [luft-dbus](../dbus): async `session()` and `system()` connections, `at(address)` connects to any other bus |
 | `dbus::objects` | `Objects` reads `ObjectManager` trees; `signals` and `settle` follow their changes |
 | `portal` | `open_file` and `open_files` show the file chooser and return `file://` URIs; `FileChooser` for saving, folders and several filters; `path_uri` and `uri_path` convert between paths and URIs |
-| `file_manager` | `show_in_folder(path)` opens the folder with the file selected, `show_folder(path)` opens the folder itself |
+| `file_manager` | `show_in_folder(path, token)` opens the folder with the file selected, `show_folder(path, token)` opens the folder itself |
+| `launch` | `pass_token` gives a launched program the activation token a page got from `activationToken()` in `@luft/ui`, or clears the one the app was started with; `Token` takes a command's `token` alone |
 | `secrets` | `store`, `load` and `delete` for the app's own secrets in Luft Keyring |
 
 ## Features
@@ -78,6 +79,7 @@ window
 | `apps` | `apps` | `App` with an installed app's id, name and icon path; `icon_path` and `sort_by_name` |
 | `fonts` | `fonts` | `installed()` lists every font face; `user_folder`, `belongs_to_user`, `refresh` and `remove` manage the user's own fonts; `is_monospaced` and `has_fixed_advances`; `use_family`, `reset` and `defaults` set the desktop's system or monospace font |
 | `ibus` | `ibus` | `address()` finds the session's IBus daemon, to connect to with `dbus::at` |
+| `launch` | `launch::context` | A launch context that hands the page's activation token to the app it starts, so its window comes to the front |
 | `recovery` | `recovery` | `Sheet` saves or prints a recovery key; `computer()` names this computer |
 | `thumbnails` | `thumbnails` | `Thumbnails` makes thumbnails in the shared freedesktop cache and sends them to the page in batches |
 

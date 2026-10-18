@@ -14,6 +14,7 @@ struct Target {
 struct Launch {
     path: String,
     app: String,
+    token: Option<String>,
 }
 
 pub fn register(window: SabineWindow) -> SabineWindow {
@@ -22,7 +23,7 @@ pub fn register(window: SabineWindow) -> SabineWindow {
         .command("apps_for_file", |Target { path }| {
             Ok(open_with::apps_for(&path))
         })
-        .command("open_with_app", |Launch { path, app }| {
-            open_with::launch(&path, &app)
+        .command("open_with_app", |Launch { path, app, token }| {
+            open_with::launch(&path, &app, token.as_deref())
         })
 }

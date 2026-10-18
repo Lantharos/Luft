@@ -11,6 +11,7 @@ mod state;
 mod store;
 
 use luft_app::dbus::{self, failed};
+use luft_app::launch::{self, Token};
 use luft_app::{Commands, Events};
 use luft_software::variant::Variant;
 use sabine::SabineWindow;
@@ -159,8 +160,8 @@ async fn set_preferences(preferences: Preferences) -> Result<(), String> {
     Ok(())
 }
 
-fn open_apps(_: Value) -> Result<(), String> {
-    gio::AppInfo::launch_default_for_uri(APP_UPDATES, gio::AppLaunchContext::NONE)
+fn open_apps(Token { token }: Token) -> Result<(), String> {
+    gio::AppInfo::launch_default_for_uri(APP_UPDATES, Some(&launch::context(token.as_deref())))
         .map_err(|error| error.to_string())
 }
 

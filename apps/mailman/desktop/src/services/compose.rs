@@ -1,5 +1,6 @@
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
+use luft_app::launch;
 use serde::Serialize;
 use serde_json::json;
 
@@ -168,7 +169,11 @@ pub fn reopen(state: &MailmanState, id: i64) -> Result<serde_json::Value, String
     }))
 }
 
-pub fn unsubscribe(state: &MailmanState, id: i64) -> Result<Unsubscribed, String> {
+pub fn unsubscribe(
+    state: &MailmanState,
+    id: i64,
+    token: Option<&str>,
+) -> Result<Unsubscribed, String> {
     let message = state.store.message(id)?.ok_or("That message is gone")?;
     let unsubscribe: Unsubscribe = message
         .unsubscribe
@@ -220,7 +225,7 @@ pub fn unsubscribe(state: &MailmanState, id: i64) -> Result<Unsubscribed, String
     let url = unsubscribe
         .http
         .ok_or("This sender doesn't offer a way to unsubscribe")?;
-    gio::AppInfo::launch_default_for_uri(&url, None::<&gio::AppLaunchContext>)
+    gio::AppInfo::launch_default_for_uri(&url, Some(&launch::context(token)))
         .map_err(|error| error.to_string())?;
     Ok(Unsubscribed::Opened)
 }

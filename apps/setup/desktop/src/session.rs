@@ -1,6 +1,7 @@
 use gio::prelude::*;
 use luft_app::Commands;
 use luft_app::dbus::{self, failed};
+use luft_app::launch::{self, Token};
 use sabine::SabineWindow;
 use serde_json::Value;
 use zbus::Connection;
@@ -51,9 +52,9 @@ async fn restart(_: Value) -> Result<(), String> {
         .map_err(failed)
 }
 
-fn open_disks(_: Value) -> Result<(), String> {
+fn open_disks(Token { token }: Token) -> Result<(), String> {
     let app = gio_unix::DesktopAppInfo::new(DISKS).ok_or("Disks isn't installed")?;
-    app.launch(&[], gio::AppLaunchContext::NONE)
+    app.launch(&[], Some(&launch::context(token.as_deref())))
         .map_err(|error| error.to_string())
 }
 

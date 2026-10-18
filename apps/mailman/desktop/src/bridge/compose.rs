@@ -85,8 +85,8 @@ pub fn register(window: SabineWindow, state: &MailmanState) -> SabineWindow {
         .with("reopen_draft", state, |state, Id { id }| {
             compose::reopen(state, id)
         })
-        .with("unsubscribe", state, |state, Id { id }| {
-            compose::unsubscribe(state, id)
+        .with("unsubscribe", state, |state, Unsubscribe { id, token }| {
+            compose::unsubscribe(state, id, token.as_deref())
         })
         .command_async("choose_files", choose_files)
         .command("describe_files", describe_files)

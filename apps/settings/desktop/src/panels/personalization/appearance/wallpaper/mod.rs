@@ -6,6 +6,7 @@ mod thumbnail;
 
 use std::sync::Once;
 
+use luft_app::launch::Token;
 use luft_app::portal::{self, Filter};
 use luft_app::{Commands, Events};
 use sabine::SabineWindow;
@@ -43,5 +44,7 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .command("appearance_thumbnail", thumbnail::thumbnail)
         .command("appearance_wallpaper_focus", focus::focus)
         .command_async("appearance_add_wallpapers", add_wallpapers)
-        .command("appearance_open_folder", |_: Value| library::open_folder())
+        .command("appearance_open_folder", |Token { token }| {
+            library::open_folder(token.as_deref())
+        })
 }

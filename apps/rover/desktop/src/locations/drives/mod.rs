@@ -10,6 +10,7 @@ use std::path::Path;
 use std::process::Command;
 
 use gio::prelude::*;
+use luft_app::launch;
 use serde::Serialize;
 
 pub use watch::watch_mounts;
@@ -110,20 +111,20 @@ pub fn eject_drive(mount_point: String) -> Result<(), String> {
     ))
 }
 
-fn launch_disks(argument: &str) -> Result<(), String> {
+fn launch_disks(argument: &str, token: Option<&str>) -> Result<(), String> {
     gio_unix::DesktopAppInfo::new(DISKS)
         .ok_or("Disks isn't installed")?
-        .launch_uris(&[argument], gio::AppLaunchContext::NONE)
+        .launch_uris(&[argument], Some(&launch::context(token)))
         .map_err(|error| error.to_string())
 }
 
-pub fn manage(mount_point: &str) -> Result<(), String> {
-    launch_disks(&gio::File::for_path(mount_point).uri())
+pub fn manage(mount_point: &str, token: Option<&str>) -> Result<(), String> {
+    launch_disks(&gio::File::for_path(mount_point).uri(), token)
 }
 
-pub fn explore(path: &str) -> Result<(), String> {
+pub fn explore(path: &str, token: Option<&str>) -> Result<(), String> {
     let uri = gio::File::for_path(path).uri();
-    launch_disks(&uri.replacen("file://", "disks-space://", 1))
+    launch_disks(&uri.replacen("file://", "disks-space://", 1), token)
 }
 
 pub fn can_manage() -> bool {

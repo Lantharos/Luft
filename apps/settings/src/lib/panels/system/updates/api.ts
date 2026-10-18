@@ -1,3 +1,4 @@
+import { activationToken } from '@luft/ui';
 import { invoke, listen } from '#lib/bridge.js';
 
 export type Schedule = 'daily' | 'weekly' | 'never';
@@ -117,6 +118,6 @@ export const switchVariant = (variant: Variant) => invoke<void>('updates_switch'
 export const restart = () => invoke<void>('updates_restart');
 export const preferences = () => invoke<Preferences>('updates_preferences');
 export const setPreferences = (preferences: Preferences) => invoke<void>('updates_set_preferences', { ...preferences });
-export const openApps = () => invoke<void>('updates_open_apps');
+export const openApps = async () => invoke<void>('updates_open_apps', { token: await activationToken() });
 export const onActivity = (callback: (activity: Activity) => void) => listen<Activity>('updates.activity', callback);
 export const onOverview = (callback: (overview: Overview) => void) => listen<Overview>('updates.overview', callback);

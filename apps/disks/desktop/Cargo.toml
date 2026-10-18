@@ -13,7 +13,7 @@ name = "disks_lib"
 [dependencies]
 futures-util = { version = "0.3.34", default-features = false }
 gio = "0.22.10"
-luft-app = { path = "../../../packages/app", features = ["recovery"] }
+luft-app = { path = "../../../packages/app", features = ["launch", "recovery"] }
 luft-disks = { path = "../../../packages/disks" }
 parking_lot = "0.12.5"
 rayon = "1.12.0"

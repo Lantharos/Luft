@@ -1,5 +1,5 @@
 import { invoke } from '@lantharos/sabine';
-import type { Appearance } from '@luft/ui';
+import { activationToken, type Appearance } from '@luft/ui';
 
 export interface Hardware {
 	nvidia: boolean;
@@ -76,4 +76,4 @@ export const setFormats = (region: string) => invoke<void>('regional_set_formats
 
 export const finishSetup = () => invoke<boolean>('session_finish');
 export const restart = () => invoke<void>('session_restart', {}, { timeoutMs: WAIT_FOR_PERSON });
-export const openDisks = () => invoke<void>('session_open_disks');
+export const openDisks = async () => invoke<void>('session_open_disks', { token: await activationToken() });

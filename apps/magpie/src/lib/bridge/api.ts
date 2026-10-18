@@ -1,5 +1,5 @@
 import { call, on } from './index';
-import type { Appearance } from '@luft/ui';
+import { activationToken, type Appearance } from '@luft/ui';
 
 export type Kind = 'image' | 'video' | 'audio' | 'document' | 'font';
 
@@ -186,9 +186,9 @@ export const imageDetails = (path: string) => call<ImageDetails>('image_details'
 export const decodeImage = (path: string) => call<Pixels>('decode_image', { path });
 export const setWallpaper = (path: string) => call<'light' | 'dark'>('set_wallpaper', { path });
 export const otherApps = (path: string) => call<App[]>('other_apps', { path });
-export const openWith = (path: string, app: string) => call<void>('open_with', { path, app });
-export const openUri = (uri: string) => call<void>('open_uri', { uri });
-export const showInFolder = (path: string) => call<void>('show_in_folder', { path });
+export const openWith = async (path: string, app: string) => call<void>('open_with', { path, app, token: await activationToken() });
+export const openUri = async (uri: string) => call<void>('open_uri', { uri, token: await activationToken() });
+export const showInFolder = async (path: string) => call<void>('show_in_folder', { path, token: await activationToken() });
 
 export const fontInfo = (path: string) => call<FontFile>('font_info', { path });
 export const fontSource = (path: string, index: number) => call<string>('font_source', { path, index });

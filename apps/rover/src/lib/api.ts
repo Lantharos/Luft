@@ -1,4 +1,5 @@
 import { invoke, listen } from '@lantharos/sabine';
+import { activationToken } from '@luft/ui';
 import type {
 	AppState,
 	DirectoryContents,
@@ -29,16 +30,16 @@ export const createDirectory = (path: string, name: string) => invoke<FileEntry>
 export const renameItem = (path: string, newName: string) => invoke<FileEntry>('rename_item', { path, newName });
 export const copyItems = (sources: string[], destination: string) => invoke<string>('copy_items', { sources, destination });
 export const moveItems = (sources: string[], destination: string) => invoke<string>('move_items', { sources, destination });
-export const openWithDefault = (path: string) => invoke<void>('open_with_default', { path });
+export const openWithDefault = async (path: string) => invoke<void>('open_with_default', { path, token: await activationToken() });
 export const fileDetails = (path: string) => invoke<FileDetails>('file_details', { path });
 export const appsForFile = (path: string) => invoke<OpenWithApps>('apps_for_file', { path });
-export const openWithApp = (path: string, app: string) => invoke<void>('open_with_app', { path, app });
+export const openWithApp = async (path: string, app: string) => invoke<void>('open_with_app', { path, app, token: await activationToken() });
 
 export const listDrives = () => invoke<DriveInfo[]>('list_drives');
 export const ejectDrive = (mountPoint: string) => invoke<void>('eject_drive', { mountPoint });
 export const listWindows = () => invoke<WindowsDrive[]>('list_windows');
 export const openWindows = (device: string, readOnly: boolean) => invoke<string>('open_windows', { device, readOnly }, { timeoutMs: 300_000 });
-export const manageDrive = (mountPoint: string) => invoke<void>('manage_drive', { mountPoint });
+export const manageDrive = async (mountPoint: string) => invoke<void>('manage_drive', { mountPoint, token: await activationToken() });
 
 export const networkLocations = () => invoke<NetworkLocation[]>('network_locations');
 export const connectNetwork = (uri: string) => invoke<NetworkLocation>('network_connect', { uri });
@@ -51,9 +52,10 @@ export const cloudStates = (path: string) => invoke<Record<string, FileState>>('
 export const keepOnDevice = (paths: string[]) => invoke<void>('cloud_keep', { paths });
 export const freeUpSpace = (paths: string[]) => invoke<void>('cloud_free', { paths }, { timeoutMs: 600_000 });
 export const shareLink = (path: string) => invoke<string>('cloud_share_link', { path }, { timeoutMs: 60_000 });
-export const openInBrowser = (path: string) => invoke<void>('cloud_open_in_browser', { path }, { timeoutMs: 60_000 });
+export const openInBrowser = async (path: string) =>
+	invoke<void>('cloud_open_in_browser', { path, token: await activationToken() }, { timeoutMs: 60_000 });
 export const dismissConflict = (account: string, copy: string) => invoke<void>('cloud_dismiss_conflict', { account, copy });
-export const addCloudAccount = () => invoke<void>('cloud_add_account');
+export const addCloudAccount = async () => invoke<void>('cloud_add_account', { token: await activationToken() });
 
 export const recentFiles = () => invoke<FileEntry[]>('recent_files');
 export const trashCount = () => invoke<number>('trash_count');

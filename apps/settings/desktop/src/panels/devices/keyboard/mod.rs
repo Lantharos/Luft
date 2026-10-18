@@ -5,7 +5,7 @@ mod shortcuts;
 use std::collections::HashMap;
 
 use gio::prelude::*;
-use luft_app::{Commands, Events};
+use luft_app::{Commands, Events, launch};
 use sabine::SabineWindow;
 use serde::Deserialize;
 use serde_json::Value;
@@ -20,11 +20,12 @@ struct Apps {
 #[derive(Deserialize)]
 struct Link {
     link: String,
+    token: Option<String>,
 }
 
-fn open_keys(Link { link }: Link) -> Result<(), String> {
+fn open_keys(Link { link, token }: Link) -> Result<(), String> {
     let keys = gio_unix::DesktopAppInfo::new(KEYS).ok_or("Keys isn't installed")?;
-    keys.launch_uris(&[link.as_str()], gio::AppLaunchContext::NONE)
+    keys.launch_uris(&[link.as_str()], Some(&launch::context(token.as_deref())))
         .map_err(|error| error.to_string())
 }
 

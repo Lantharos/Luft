@@ -1,5 +1,6 @@
 use gio::prelude::*;
 use luft_app::apps::App;
+use luft_app::launch;
 use serde::Serialize;
 
 const OWN_APP_PREFIX: &str = "com.lantharos.rover";
@@ -40,10 +41,10 @@ pub fn apps_for(path: &str) -> OpenWith {
     OpenWith { default, others }
 }
 
-pub fn launch(path: &str, app: &str) -> Result<(), String> {
+pub fn launch(path: &str, app: &str, token: Option<&str>) -> Result<(), String> {
     gio_unix::DesktopAppInfo::new(app)
         .ok_or("This app is no longer installed")?
-        .launch(&[gio::File::for_path(path)], gio::AppLaunchContext::NONE)
+        .launch(&[gio::File::for_path(path)], Some(&launch::context(token)))
         .map_err(|error| error.to_string())
 }
 

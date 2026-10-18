@@ -1,5 +1,5 @@
 import { invoke, listen } from '@lantharos/sabine';
-import type { Appearance } from '@luft/ui';
+import { activationToken, type Appearance } from '@luft/ui';
 
 export type Kind = 'nvme' | 'ssd' | 'hdd' | 'usb' | 'card' | 'optical' | 'image';
 export type Filesystem = 'ext4' | 'btrfs' | 'exfat' | 'ntfs' | 'vfat';
@@ -208,7 +208,7 @@ export const unmount = (block: string) => invoke<void>('disks_unmount', { block 
 export const setLabel = (block: string, label: string) => invoke<void>('disks_label', { block, label }, WAIT);
 export const setStartup = (block: string, directory: string | null, readOnly: boolean) =>
 	invoke<void>('disks_startup', { block, directory, readOnly }, WAIT);
-export const openFolder = (path: string) => invoke<void>('disks_open_folder', { path });
+export const openFolder = async (path: string) => invoke<void>('disks_open_folder', { path, token: await activationToken() });
 
 export const formatVolume = (block: string, format: Format) => invoke<void>('disks_format_volume', { block, format }, WAIT);
 export const formatDrive = (block: string, size: number, removable: boolean, format: Format) =>
@@ -263,7 +263,7 @@ export const space = {
 	scan: (path: string) => invoke<SpaceUpdate>('space_scan', { path }),
 	view: (path: string[]) => invoke<SpaceUpdate>('space_view', { path }),
 	trash: (path: string[]) => invoke<SpaceUpdate>('space_trash', { path }),
-	show: (path: string[]) => invoke<void>('space_show', { path }),
+	show: async (path: string[]) => invoke<void>('space_show', { path, token: await activationToken() }),
 	stop: () => invoke<void>('space_stop')
 };
 

@@ -15,8 +15,9 @@ use crate::udisks::{self, snapshot};
 use luft_disks::{partitions, systems};
 use requests::{
     Arguments, Block, ChangePassphrase, CreateImage, CreatePartition, Drive, Encrypt, Folder,
-    FormatDrive, FormatEncrypted, FormatVolume, Grow, KeySheet, Label, Place, PlanStep, Remove,
-    RestoreImage, Resume, Selftest, Startup, SystemId, Unlock, Unlocked, Unlocking, Uuid,
+    FormatDrive, FormatEncrypted, FormatVolume, Grow, Handoff, KeySheet, Label, Place, PlanStep,
+    Remove, RestoreImage, Resume, Selftest, Shown, Startup, SystemId, Unlock, Unlocked, Unlocking,
+    Uuid,
 };
 
 mod requests;
@@ -121,9 +122,13 @@ fn register_space(window: SabineWindow, state: &State) -> SabineWindow {
         .with("space_trash", state, |state, Place { path }| {
             state.explorer.trash(path)
         })
-        .with_async("space_show", state, |state, Place { path }| async move {
-            state.explorer.show(path).await
-        })
+        .with_async(
+            "space_show",
+            state,
+            |state, Shown { path, token }| async move {
+                state.explorer.show(path, token.as_deref()).await
+            },
+        )
         .with("space_stop", state, |state, _: Value| {
             state.explorer.stop();
             Ok(())
@@ -182,7 +187,9 @@ fn register_volumes(window: SabineWindow) -> SabineWindow {
         .command_async("disks_unmount", |Block { block }| async move {
             mounting::unmount(&block).await
         })
-        .command("disks_open_folder", |Folder { path }| open_folder(&path))
+        .command("disks_open_folder", |Handoff { path, token }| {
+            open_folder(&path, token.as_deref())
+        })
         .command_async("disks_label", |Label { block, label }| async move {
             mounting::set_label(&block, &label).await
         })
@@ -229,9 +236,9 @@ fn register_volumes(window: SabineWindow) -> SabineWindow {
         })
 }
 
-fn open_folder(path: &str) -> Result<(), String> {
+fn open_folder(path: &str, token: Option<&str>) -> Result<(), String> {
     let uri = gio::File::for_path(path).uri();
-    gio::AppInfo::launch_default_for_uri(&uri, gio::AppLaunchContext::NONE)
+    gio::AppInfo::launch_default_for_uri(&uri, Some(&luft_app::launch::context(token)))
         .map_err(|error| error.to_string())
 }
 

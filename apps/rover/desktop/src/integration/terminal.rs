@@ -23,7 +23,7 @@ const KNOWN: [&str; 12] = [
     "xterm",
 ];
 
-pub fn open(path: &str) -> Result<(), String> {
+pub fn open(path: &str, token: Option<&str>) -> Result<(), String> {
     let path = Path::new(path);
     let folder = if path.is_dir() {
         path
@@ -33,7 +33,7 @@ pub fn open(path: &str) -> Result<(), String> {
     };
     let mut failures = Vec::new();
     for program in candidates() {
-        match launch(&program, folder) {
+        match launch(&program, folder, token) {
             Ok(()) => return Ok(()),
             Err(error) => failures.push(error),
         }
@@ -86,7 +86,7 @@ fn resolve(program: &Path) -> Option<PathBuf> {
         .find(|candidate| candidate.is_file())
 }
 
-fn launch(program: &Path, folder: &Path) -> Result<(), String> {
+fn launch(program: &Path, folder: &Path, token: Option<&str>) -> Result<(), String> {
     let name = program
         .file_name()
         .map(|name| name.to_string_lossy().into_owned())
@@ -106,7 +106,9 @@ fn launch(program: &Path, folder: &Path) -> Result<(), String> {
         "wezterm" => vec!["start".into(), "--cwd".into(), folder_argument.into_owned()],
         _ => Vec::new(),
     };
-    Command::new(program)
+    let mut command = Command::new(program);
+    luft_app::launch::pass_token(&mut command, token);
+    command
         .args(arguments)
         .current_dir(folder)
         .stdin(Stdio::null())

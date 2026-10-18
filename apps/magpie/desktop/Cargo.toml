@@ -18,7 +18,7 @@ glycin = { version = "4.0.3", default-features = false, features = ["tokio"] }
 imagesize = "0.15.0"
 kamadak-exif = "0.6.1"
 lofty = "0.25.4"
-luft-app = { path = "../../../packages/app", features = ["apps", "fonts", "thumbnails"] }
+luft-app = { path = "../../../packages/app", features = ["apps", "fonts", "launch", "thumbnails"] }
 matroska-demuxer = "0.8.1"
 parking_lot = "0.12.5"
 sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.46" }

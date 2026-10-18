@@ -56,6 +56,7 @@ struct SettingsUpdate {
 #[derive(Deserialize)]
 struct Link {
     uri: String,
+    token: Option<String>,
 }
 
 pub fn register(window: SabineWindow, state: &TernState) -> SabineWindow {
@@ -122,5 +123,7 @@ fn register_app(window: SabineWindow, state: &TernState) -> SabineWindow {
             state,
             |state, SettingsUpdate { settings }| settings::update(settings, &state.settings),
         )
-        .command("open_link", |Link { uri }| links::open(&uri))
+        .command("open_link", |Link { uri, token }| {
+            links::open(&uri, token.as_deref())
+        })
 }

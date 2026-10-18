@@ -4,6 +4,8 @@ use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::time::SystemTime;
 
+use gio::prelude::*;
+use luft_app::launch;
 use serde::Serialize;
 
 use super::privileged::{is_permission_error, os, run_pkexec};
@@ -175,8 +177,12 @@ pub fn user_dirs() -> Result<UserDirs, String> {
     })
 }
 
-pub fn open_with_default(path: String) -> Result<(), String> {
-    open::that_detached(&path).map_err(|error| error.to_string())
+pub fn open_with_default(path: &str, token: Option<&str>) -> Result<(), String> {
+    gio::AppInfo::launch_default_for_uri(
+        &gio::File::for_path(path).uri(),
+        Some(&launch::context(token)),
+    )
+    .map_err(|error| error.to_string())
 }
 
 pub(crate) fn file_entry(path: &Path) -> std::io::Result<FileEntry> {

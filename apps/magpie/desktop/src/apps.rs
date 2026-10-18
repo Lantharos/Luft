@@ -2,6 +2,7 @@ use std::path::Path;
 
 use gio::prelude::*;
 use luft_app::apps::{self, App};
+use luft_app::launch;
 
 const OWN_ID: &str = "com.lantharos.magpie";
 
@@ -20,12 +21,12 @@ pub fn others(path: &Path) -> Vec<App> {
     others
 }
 
-pub fn open_with(path: &Path, app: &str) -> Result<(), String> {
+pub fn open_with(path: &Path, app: &str, token: Option<&str>) -> Result<(), String> {
     let info = gio_unix::DesktopAppInfo::new(app).ok_or("That app is no longer installed")?;
-    info.launch(&[gio::File::for_path(path)], gio::AppLaunchContext::NONE)
+    info.launch(&[gio::File::for_path(path)], Some(&launch::context(token)))
         .map_err(failed)
 }
 
-pub fn open_uri(uri: &str) -> Result<(), String> {
-    gio::AppInfo::launch_default_for_uri(uri, gio::AppLaunchContext::NONE).map_err(failed)
+pub fn open_uri(uri: &str, token: Option<&str>) -> Result<(), String> {
+    gio::AppInfo::launch_default_for_uri(uri, Some(&launch::context(token))).map_err(failed)
 }

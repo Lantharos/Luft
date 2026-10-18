@@ -44,7 +44,7 @@ The `schelf` command, or `sch` for short, does the same as the app:
 
 | Command | Does |
 | --- | --- |
-| `schelf install ripgrep` | Installs an app or a tool, or several at once |
+| `schelf install ripgrep` | Installs an app or a tool, or several at once (`schelf add` works too) |
 | `schelf install ./app.AppImage` | Installs a `.rpm`, `.AppImage`, `.flatpakref` or `.flatpakrepo` file |
 | `schelf remove ripgrep` | Removes something you installed |
 | `schelf search image editor` | Looks on Flathub and in Fedora at once, and through your AppImages |

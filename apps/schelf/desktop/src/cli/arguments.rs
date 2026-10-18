@@ -32,7 +32,10 @@ impl Command {
     }
 
     fn named(word: &str) -> Option<Self> {
-        Self::ALL.into_iter().find(|command| command.word() == word)
+        match word {
+            "add" => Some(Self::Install),
+            word => Self::ALL.into_iter().find(|command| command.word() == word),
+        }
     }
 
     pub fn usage(self) -> &'static str {
@@ -42,7 +45,7 @@ impl Command {
                  Installs apps from Flathub and command-line tools from Fedora into your\n\
                  account, or a .rpm, .AppImage, .flatpakref or .flatpakrepo file. A name\n\
                  found in both is a desktop app from Flathub or a command-line tool from\n\
-                 Fedora; when that still leaves a choice, Schelf asks."
+                 Fedora; when that still leaves a choice, Schelf asks. You can write add instead of install."
             }
             Self::Remove => {
                 "remove NAME...  [--flathub|--fedora|--appimage] [-y]\n\n\

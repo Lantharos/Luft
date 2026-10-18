@@ -12,6 +12,7 @@ name = "settings_lib"
 
 [dependencies]
 bzip2 = "0.6.1"
+deunicode = "1.6.2"
 dirs = "7.0.0"
 flate2 = { version = "1.1.10", default-features = false, features = ["zlib-rs"] }
 futures-util = { version = "0.3.34", default-features = false }

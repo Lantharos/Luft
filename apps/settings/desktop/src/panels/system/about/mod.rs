@@ -199,10 +199,40 @@ fn launch_disks(argument: &str, token: Option<&str>) -> Result<(), String> {
         .map_err(|error| error.to_string())
 }
 
+const HOSTNAME_LENGTH: usize = 63;
+
+fn hostname_for(name: &str) -> String {
+    let mut hostname = String::new();
+    for character in deunicode::deunicode(name)
+        .chars()
+        .flat_map(char::to_lowercase)
+    {
+        if character.is_ascii_alphanumeric() {
+            hostname.push(character);
+        } else if (character.is_whitespace() || character == '-' || character == '_')
+            && !hostname.is_empty()
+            && !hostname.ends_with('-')
+        {
+            hostname.push('-');
+        }
+    }
+    hostname.truncate(HOSTNAME_LENGTH);
+    hostname.trim_end_matches('-').to_owned()
+}
+
 async fn rename(Rename { name }: Rename) -> Result<(), String> {
-    hostnamed()
-        .await?
-        .call_method("SetPrettyHostname", &(name.trim(), true))
+    let name = name.trim();
+    let hostnamed = hostnamed().await?;
+    hostnamed
+        .call_method("SetPrettyHostname", &(name, true))
+        .await
+        .map_err(failed)?;
+    let hostname = hostname_for(name);
+    if hostname.is_empty() {
+        return Ok(());
+    }
+    hostnamed
+        .call_method("SetStaticHostname", &(hostname, true))
         .await
         .map(|_| ())
         .map_err(failed)

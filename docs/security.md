@@ -46,6 +46,7 @@ The TPM releases the disk key only when both match:
 - When PCR 7 changes any other way, Sushi asks for the recovery key once and says why. With Secure Boot on, trustd then seals the disk key to how the computer started, so the next start unlocks by itself again. A TPM with a PIN can't be sealed again without the PIN, so Settings offers to link it again instead.
 - An optional PIN of 6 to 20 digits makes the TPM also require something you know, with its own guessing lockout.
 - Every encrypted disk has a 64-character recovery key, in groups of eight, from letters that type the same on almost every keyboard. With a TPM, a sealed copy lets Settings show it again after an administrator password.
+- Sushi waits for the recovery key, passphrase or PIN for as long as it takes, and a wrong one just asks again. Only a system disk that never shows up ends in the emergency shell.
 
 ## Device encryption
 

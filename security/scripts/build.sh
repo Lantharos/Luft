@@ -51,6 +51,7 @@ place "$trust/com.lantharos.Trust1.xml" /usr/share/dbus-1/interfaces/com.lanthar
 place "$trust/com.lantharos.trust.policy" /usr/share/polkit-1/actions/com.lantharos.trust.policy
 place "$trust/61-trustd-drives.rules" /usr/lib/udev/rules.d/61-trustd-drives.rules
 place "$trust/90-trustd.conf" /usr/lib/dracut/dracut.conf.d/90-trustd.conf
-place "$trust/dracut/trustd-encrypt.service" /usr/lib/dracut/modules.d/90trustd/trustd-encrypt.service
-place "$trust/dracut/cryptsetup-after-pcrphase.conf" /usr/lib/dracut/modules.d/90trustd/cryptsetup-after-pcrphase.conf
-install -Dm755 "$trust/dracut/module-setup.sh" "$destdir/usr/lib/dracut/modules.d/90trustd/module-setup.sh"
+for file in "$trust"/dracut/*; do
+  place "$file" "/usr/lib/dracut/modules.d/90trustd/$(basename "$file")"
+done
+chmod 755 "$destdir/usr/lib/dracut/modules.d/90trustd/module-setup.sh"

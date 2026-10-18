@@ -22,6 +22,9 @@ install() {
     inst_multiple "$systemdsystemunitdir/systemd-pcrextend.socket" "$systemdsystemunitdir/systemd-pcrextend@.service" \
         "$systemdutildir/systemd-tpm2-setup" "$systemdsystemunitdir/systemd-tpm2-setup-early.service"
     inst_simple "$moddir/cryptsetup-after-pcrphase.conf" "$systemdsystemunitdir/systemd-cryptsetup@.service.d/trustd.conf"
+    inst_simple "$moddir/cryptsetup-root-retries.conf" "$systemdsystemunitdir/systemd-cryptsetup@root.service.d/trustd.conf"
+    inst_simple "$moddir/root-waits-for-unlock.conf" "$systemdsystemunitdir/"'dev-gpt\x2dauto\x2droot.device.d/trustd.conf'
+    inst_simple "$moddir/90-luft-root-partition.rules" "$udevrulesdir/90-luft-root-partition.rules"
     $SYSTEMCTL -q --root "$initdir" add-wants sockets.target systemd-pcrextend.socket
     $SYSTEMCTL -q --root "$initdir" add-wants sysinit.target systemd-tpm2-setup-early.service
     $SYSTEMCTL -q --root "$initdir" add-wants cryptsetup.target trustd-encrypt.service

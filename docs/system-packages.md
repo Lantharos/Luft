@@ -23,13 +23,13 @@ When the list becomes empty, all of these go.
 1. Mount the version's system read-only from the composefs repository with `bootc internals cfs mount`, which checks every file against the digest like the startup image does, and put a writable overlay over it.
 2. `dnf --installroot download --resolve` against that version's own package database and Fedora's repositories in `/usr/share/dnf5/repos.d`, without weak dependencies.
 3. Refuse what can't be a system package (below).
-4. Import Fedora's keys from `/usr/share/pki/rpm-gpg` and install with `rpm --install --noscripts --notriggers` and `_pkgverify_level all`, so every package must carry a valid Fedora signature.
+4. Import Fedora's keys from `/usr/share/pki/rpm-gpg` and install with `rpm --install` and `_pkgverify_level all`, so every package must carry a valid Fedora signature. Scriptlets run in the build root, with a private `/dev` holding only `null`, `zero`, `random` and `urandom`, so nothing they do reaches the computer.
 5. Copy out only the files the packages own. A file that would differ from one in the system is refused; one that's identical is left out, so the extension never hides part of Luft. Folders that already exist get the system's owner and mode, since the topmost layer decides them.
-6. Files under `/etc` and `/var` go to `/usr/share/factory` in the extension, with their owner and mode noted in `build.json`.
-7. Turn services on with `systemctl preset` in the build root. Fedora's presets decide for packages they mention (Docker's socket, CUPS); the services of requested packages they don't mention, such as tailscaled, are turned on, while dependencies they don't mention, such as containerd, stay off until something starts them. The links go into the extension's `/usr/lib/systemd/system`, so they leave with it.
+6. Files under `/etc` and `/var` go to `/usr/share/factory` in the extension, with their owner and mode noted in `build.json`. That includes the ghost files a package declares and its scriptlets make, such as libvirt's default network; everything else scriptlets change stays in the build root.
+7. Turn services on with `systemctl preset` in the build root. Fedora's presets decide for packages they mention (Docker's socket, libvirt's sockets, CUPS); the services of requested packages they don't mention, such as tailscaled, are turned on, while dependencies they don't mention, such as containerd, stay off until something starts them. The links go into the extension's `/usr/lib/systemd/system`, so they leave with it.
 8. Label everything with that version's SELinux `file_contexts` and make the EROFS image, which keeps the labels.
 
-Scriptlets don't run. What they used to do is declarative in Fedora now and is done when the extension is merged.
+What scriptlets used to do on the computer itself is declarative in Fedora now, and is done when the extension is merged.
 
 ## Merging and settling
 
@@ -43,13 +43,13 @@ Scriptlets don't run. What they used to do is declarative in Fedora now and is d
 
 The services are queued by hand because systemd merges extensions after the start's targets are queued, so links merged then don't pull anything in by themselves. `Upholds=` would, but it also restarts a service someone stopped.
 
-Installing and removing at runtime build, link, run `systemd-sysext refresh`, settle and start or stop the services that changed.
+Installing and removing at runtime build, link, run `systemd-sysext refresh`, settle and start or stop the services that changed. Units that refuse to be started or stopped by hand, such as iSCSI's start-up unit, and templates are left to systemd. When anything after the build fails, the previous build, or none, is put back and what the new one added is taken away again.
 
 ## Removing
 
-Before a build is merged, `footprint.json` notes every path it declares that doesn't exist yet: package files in `/etc` and `/var`, tmpfiles.d entries, `StateDirectory=` and the like, and the folders daemons conventionally make for themselves, named after a package or unit (`/var/lib/containerd`). Users and groups from sysusers.d are noted the same way. Whatever is noted and no longer declared is deleted, with `userdel` and `groupdel` for users and groups. Paths that existed before are never touched.
+Before a build is merged, `footprint.json` notes every path it declares that doesn't exist yet: package files in `/etc` and `/var`, tmpfiles.d entries, `StateDirectory=` and the like, and the folders daemons conventionally make for themselves, named after a package or unit (`/var/lib/containerd`). Users and groups from sysusers.d are noted the same way. Whatever is noted and no longer declared is deleted, with `userdel` and `groupdel` for users and groups, after ending what still runs as those users: libvirt's virtual machines and its network's dnsmasq outlive the services that started them. Paths that existed before are never touched. The library cache is kept as it was before the first package with libraries and put back after the last one. Every step is tried, and what fails stays noted, so removing again finishes the job.
 
-Installing tailscale and Docker, running a container and removing both leaves `/etc`, `/var`, users and groups as before, except for what a daemon makes on its own where nothing names it: Docker's containerd leaves an empty `/etc/cni/net.d`. Deleting such paths by guesswork, such as every path a package's programs mention, would sooner or later delete something another program put there (containerd also mentions `/etc/cdi`, where NVIDIA's container toolkit keeps its files), so they stay. Network state such as Docker's bridge and firewall rules lasts until the next restart.
+Installing libvirt, running a virtual machine with an emulated TPM on its default network and removing it leaves `/etc`, `/var`, users and groups exactly as before. Installing tailscale and Docker, running a container and removing both leaves `/etc`, `/var`, users and groups as before, except for what a daemon makes on its own where nothing names it: Docker's containerd leaves an empty `/etc/cni/net.d`. Deleting such paths by guesswork, such as every path a package's programs mention, would sooner or later delete something another program put there (containerd also mentions `/etc/cdi`, where NVIDIA's container toolkit keeps its files), so they stay. Network state such as Docker's bridge and firewall rules lasts until the next restart.
 
 ## Updates and going back
 
@@ -60,7 +60,7 @@ Going back needs nothing: the previous version keeps its build. If the list chan
 ## What's refused
 
 - **Kernel modules.** Luft starts with Secure Boot and `lockdown=integrity`, so the kernel enforces module signatures (`module.sig_enforce` is on). Modules would have to be signed with a key enrolled in shim, and the only enrolled key is Luft's, whose private half isn't on the computer. Enrolling a local key isn't supported yet.
-- **SELinux policy modules.** `semodule` rebuilds the binary policy from the module store in `/var/lib/selinux`, which on a bootc system is only written when it's installed, while policy updates arrive precompiled in the image's `/etc/selinux`. Adding a module would rebuild an outdated policy, and the locally changed files would then win bootc's three-way merge of `/etc` at every update, so the image's policy updates would stop arriving. This rules out libvirt for now: its QEMU driver needs swtpm, which needs `swtpm-selinux`.
+- **SELinux policy modules.** `semodule` rebuilds the binary policy from the module store in `/var/lib/selinux`, which on a bootc system is only written when it's installed, while policy updates arrive precompiled in the image's `/etc/selinux`. Adding a module would rebuild an outdated policy, and the locally changed files would then win bootc's three-way merge of `/etc` at every update, so the image's policy updates would stop arriving. Luft's image carries swtpm and `swtpm-selinux` for that reason, since libvirt's QEMU driver needs swtpm, and with it the policy.
 - **Packages Luft already has, or newer versions of them.** The extension would hide part of the system. dnf's resolution against the version's own package database leaves these out unless something needs a newer version, which usually works after the next update.
 - **Files outside `/usr`, `/opt`, `/etc`, `/var` and `/run`**, such as `/boot`.
 

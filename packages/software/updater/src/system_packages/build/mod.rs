@@ -1,4 +1,5 @@
 mod checks;
+mod install;
 mod rpm;
 mod stage;
 mod units;
@@ -10,7 +11,7 @@ use std::os::unix::ffi::OsStrExt;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-use anyhow::{Context, Result, anyhow, bail};
+use anyhow::{Context, Result, anyhow};
 
 use super::manifest::{Build, Package};
 use super::requested::Requested;
@@ -22,7 +23,7 @@ pub const CACHE: &str = "/var/cache/luft/system-packages";
 const WORK: &str = "/var/tmp/luft-system-packages.XXXXXX";
 const WORK_PREFIX: &str = "luft-system-packages.";
 const PERSIST: &str = "var/lib/dnf";
-const KEYS: &str = "usr/share/pki/rpm-gpg";
+pub const LIBRARY_CACHE: &str = "/etc/ld.so.cache";
 const RELEASE: &str = "usr/lib/extension-release.d";
 
 struct Workspace {
@@ -138,37 +139,6 @@ fn download(root: &Path, release: &str, requested: &Requested, into: &Path) -> R
     .map(drop)
 }
 
-fn install(root: &Path, release: &str, rpms: &[rpm::Rpm]) -> Result<()> {
-    let prefix = format!("RPM-GPG-KEY-fedora-{release}-");
-    let keys: Vec<PathBuf> = fs::read_dir(root.join(KEYS))?
-        .flatten()
-        .map(|entry| entry.path())
-        .filter(|path| {
-            path.file_name()
-                .is_some_and(|name| name.as_bytes().starts_with(prefix.as_bytes()))
-        })
-        .collect();
-    if keys.is_empty() {
-        bail!("This system has no keys to check Fedora's packages with.");
-    }
-    run(Command::new("rpmkeys")
-        .arg(format!("--root={}", root.display()))
-        .arg("--import")
-        .args(&keys))?;
-    run(Command::new("rpm")
-        .arg(format!("--root={}", root.display()))
-        .args([
-            "--install",
-            "--noscripts",
-            "--notriggers",
-            "--define",
-            "_pkgverify_level all",
-        ])
-        .args(rpms.iter().map(|rpm| &rpm.path)))
-    .context("Installing the packages")
-    .map(drop)
-}
-
 fn release(stage: &Path, os: &OsRelease) -> Result<()> {
     let folder = stage.join(RELEASE);
     fs::create_dir_all(&folder)?;
@@ -265,7 +235,9 @@ pub fn build(
     checks::check(requested, &rpms, &base)?;
 
     step(Step::Building);
-    install(&root, &os.version_id, &rpms)?;
+    let devices = install::devices(&root)?;
+    work.mounted(&devices);
+    install::install(&root, &os.version_id, &rpms)?;
     let layout = Layout {
         lower: &tree,
         root: &root,
@@ -280,9 +252,24 @@ pub fn build(
         .iter()
         .map(|rpm| rpm.name.clone())
         .chain(enabled.units.values().flatten().cloned());
+    let ghosts = rpms
+        .iter()
+        .flat_map(|rpm| &rpm.files)
+        .filter(|file| {
+            file.ghost && matches!(checks::place(&file.path), Some(checks::Place::Placed))
+        })
+        .map(|file| file.path.clone());
+    let libraries = placed
+        .iter()
+        .any(|entry| entry.path.starts_with("/etc/ld.so.conf.d/"));
+    let cache = libraries.then(|| LIBRARY_CACHE.to_owned());
     let declared = declared::read(
         &stage_folder,
-        placed.iter().map(|entry| entry.path.clone()),
+        placed
+            .iter()
+            .map(|entry| entry.path.clone())
+            .chain(ghosts)
+            .chain(cache),
         names,
     );
     let build = Build {
@@ -301,9 +288,7 @@ pub fn build(
         enabled: enabled.enabled,
         tmpfiles: entries(&stage_folder.join("usr/lib/tmpfiles.d"), "conf"),
         udev_rules: !entries(&stage_folder.join("usr/lib/udev/rules.d"), "rules").is_empty(),
-        libraries: placed
-            .iter()
-            .any(|entry| entry.path.starts_with("/etc/ld.so.conf.d/")),
+        libraries,
         placed,
         declared,
     };

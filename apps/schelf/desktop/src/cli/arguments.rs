@@ -47,7 +47,7 @@ impl Command {
                  found in both is a desktop app from Flathub or a command-line tool from\n\
                  Fedora; when that still leaves a choice, Schelf asks. You can write add instead of install.\n\n\
                  With --system, Fedora packages go into the system itself, for services such\n\
-                 as Tailscale or Docker. They're rebuilt with every update of Luft."
+                 as Tailscale, Docker or libvirt. They're rebuilt with every update of Luft."
             }
             Self::Remove => {
                 "remove NAME...  [--flathub|--fedora|--appimage|--system] [-y]\n\n\

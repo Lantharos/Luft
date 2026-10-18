@@ -92,6 +92,7 @@ mod tests {
                     user: "root".to_owned(),
                     group: "root".to_owned(),
                     mode: 0o100644,
+                    ghost: false,
                 })
                 .collect(),
         }

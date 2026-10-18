@@ -156,15 +156,22 @@ fn footprint() -> Result<Footprint> {
     Footprint::load(&state("footprint.json"))
 }
 
+/// Takes every system package away. Every step is tried, and what couldn't be taken away stays
+/// noted, so removing them again finishes the job.
 fn deactivate(old: Option<&Build>) -> Result<()> {
-    activate::stop_leaving(old, None)?;
-    activate::link(None)?;
-    activate::refresh()?;
-    let mut footprint = footprint()?;
-    footprint.clear(&Declared::default())?;
-    footprint.save(&state("footprint.json"))?;
-    activate::after_removal(old, None)?;
-    forget()
+    let stopped = activate::stop_leaving(old, None);
+    let unlinked = activate::link(None).and_then(|()| activate::refresh());
+    let cleared = footprint().and_then(|mut footprint| {
+        let cleared = footprint.clear(&Declared::default());
+        footprint.save(&state("footprint.json"))?;
+        cleared
+    });
+    let settled = activate::after_removal(old, None);
+    stopped
+        .and(unlinked)
+        .and(cleared)
+        .and(settled)
+        .and_then(|()| forget())
 }
 
 /// Leaves no trace of system packages once there are none.
@@ -186,20 +193,62 @@ fn activate(digest: &str, requested: &Requested, report: &Report) -> Result<()> 
     }
     let build = build_into(digest, requested, report)?;
     report(Step::Starting);
-    activate::stop_leaving(old.as_ref(), Some(&build))?;
     let mut footprint = footprint()?;
     footprint.note(&build.declared);
     footprint.save(&state("footprint.json"))?;
     swap_in(digest)?;
+    if let Err(error) = apply(digest, old.as_ref(), &build, &mut footprint) {
+        if let Err(restoring) = restore(digest, old.as_ref(), &build, &mut footprint) {
+            eprintln!("Putting the system packages back: {restoring:#}");
+        }
+        return Err(error);
+    }
+    remove_folder(&folder(digest, ".old"))
+}
+
+fn apply(
+    digest: &str,
+    old: Option<&Build>,
+    build: &Build,
+    footprint: &mut Footprint,
+) -> Result<()> {
+    activate::stop_leaving(old, Some(build))?;
     activate::link(Some(&folder(digest, "")))?;
     activate::refresh()?;
-    activate::settle(&build)?;
-    activate::create_tmpfiles(&build)?;
+    activate::settle(build)?;
+    activate::create_tmpfiles(build)?;
     footprint.clear(&build.declared)?;
     footprint.save(&state("footprint.json"))?;
-    activate::after_removal(old.as_ref(), Some(&build))?;
-    activate::start_arriving(old.as_ref(), &build)?;
-    remove_folder(&folder(digest, ".old"))
+    activate::after_removal(old, Some(build))?;
+    activate::start_arriving(old, build)
+}
+
+/// Undoes a build that couldn't be brought in: back to the one before, or to none. Every step
+/// is tried, so one that fails doesn't leave the rest in place.
+fn restore(
+    digest: &str,
+    old: Option<&Build>,
+    build: &Build,
+    footprint: &mut Footprint,
+) -> Result<()> {
+    let stopped = activate::stop_leaving(Some(build), old);
+    let relinked = relink(digest, old).and_then(|()| activate::refresh());
+    let cleared = footprint
+        .clear(old.map_or(&Declared::default(), |old| &old.declared))
+        .and_then(|()| footprint.save(&state("footprint.json")));
+    let settled = activate::after_removal(Some(build), old);
+    let started = old.map_or(Ok(()), |old| activate::start_arriving(Some(build), old));
+    stopped.and(relinked).and(cleared).and(settled).and(started)
+}
+
+fn relink(digest: &str, old: Option<&Build>) -> Result<()> {
+    let (current, previous) = (folder(digest, ""), folder(digest, ".old"));
+    remove_folder(&current)?;
+    if old.is_none() {
+        return activate::link(None);
+    }
+    fs::rename(&previous, &current)?;
+    activate::link(Some(&current))
 }
 
 fn prepare_others(requested: &Requested) {

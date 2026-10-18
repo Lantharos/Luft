@@ -89,6 +89,8 @@ shared-mime-info
 skopeo
 steam-devices
 switcheroo-control
+swtpm
+swtpm-selinux
 systemd-boot-unsigned
 systemd-oomd-defaults
 thermald

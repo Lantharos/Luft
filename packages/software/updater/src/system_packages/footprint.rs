@@ -3,6 +3,7 @@ use std::fs;
 use std::io::ErrorKind;
 use std::path::Path;
 use std::process::Command;
+use std::time::Duration;
 
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
@@ -101,31 +102,71 @@ impl Footprint {
         );
     }
 
-    /// Takes away everything noted that `declared` no longer brings.
+    /// Takes away everything noted that `declared` no longer brings. Every entry is tried, and
+    /// those that couldn't be taken away stay noted for the next try.
     pub fn clear(&mut self, declared: &Declared) -> Result<()> {
-        for path in self.paths.clone() {
-            if !declares(declared, &path) {
-                remove(&path)?;
-                self.paths.remove(&path);
-            }
+        let mut failures = Vec::new();
+        let leaving: Vec<String> = self.users.difference(&declared.users).cloned().collect();
+        for user in &leaving {
+            end_processes(user);
         }
-        for user in self.users.clone() {
-            if !declared.users.contains(&user) {
-                if known("passwd", &user) {
-                    run(Command::new("userdel").arg(&user))?;
-                }
-                self.users.remove(&user);
-            }
+        self.paths
+            .retain(|path| declares(declared, path) || kept_after(remove(path), &mut failures));
+        self.users.retain(|user| {
+            declared.users.contains(user)
+                || kept_after(delete("passwd", "userdel", user), &mut failures)
+        });
+        self.groups.retain(|group| {
+            declared.groups.contains(group)
+                || kept_after(delete("group", "groupdel", group), &mut failures)
+        });
+        match failures.into_iter().next() {
+            Some(error) => Err(error),
+            None => Ok(()),
         }
-        for group in self.groups.clone() {
-            if !declared.groups.contains(&group) {
-                if known("group", &group) {
-                    run(Command::new("groupdel").arg(&group))?;
-                }
-                self.groups.remove(&group);
-            }
+    }
+}
+
+fn kept_after(result: Result<()>, failures: &mut Vec<anyhow::Error>) -> bool {
+    match result {
+        Ok(()) => false,
+        Err(error) => {
+            failures.push(error);
+            true
         }
-        Ok(())
+    }
+}
+
+fn delete(database: &str, command: &str, name: &str) -> Result<()> {
+    if known(database, name) {
+        run(Command::new(command).arg(name))?;
+    }
+    Ok(())
+}
+
+fn running_as(user: &str) -> bool {
+    Command::new("pgrep")
+        .args(["--uid", user])
+        .output()
+        .is_ok_and(|output| output.status.success())
+}
+
+/// Ends what still runs as a user the packages made, such as libvirt's virtual machines and its
+/// network's dnsmasq, which outlive the services that started them.
+fn end_processes(user: &str) {
+    if !known("passwd", user) {
+        return;
+    }
+    for signal in ["TERM", "KILL"] {
+        let _ = Command::new("pkill")
+            .args(["--signal", signal, "--uid", user])
+            .status();
+        for _ in 0..50 {
+            if !running_as(user) {
+                return;
+            }
+            std::thread::sleep(Duration::from_millis(200));
+        }
     }
 }
 

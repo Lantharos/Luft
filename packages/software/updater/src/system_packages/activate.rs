@@ -7,6 +7,7 @@ use std::process::Command;
 
 use anyhow::{Context, Result};
 
+use super::build::LIBRARY_CACHE;
 use super::manifest::{Build, Placed};
 use super::{IMAGE, NAME};
 use crate::command::{run, text};
@@ -60,6 +61,9 @@ fn place(entry: &Placed) -> Result<bool> {
     if fs::symlink_metadata(target).is_ok() {
         return Ok(false);
     }
+    if let Some(parent) = target.parent() {
+        fs::create_dir_all(parent)?;
+    }
     let source = Path::new(FACTORY).join(entry.path.trim_start_matches('/'));
     let metadata =
         fs::symlink_metadata(&source).with_context(|| format!("Reading {}", source.display()))?;
@@ -94,6 +98,30 @@ fn place_defaults(build: &Build) -> Result<()> {
     Ok(())
 }
 
+fn library_cache_before() -> PathBuf {
+    super::state("ld.so.cache.before")
+}
+
+/// Rebuilds the library cache for the packages' libraries, keeping the system's own copy to
+/// put back once no package brings libraries any more.
+fn cache_libraries() -> Result<()> {
+    let before = library_cache_before();
+    if Path::new(LIBRARY_CACHE).exists() && !before.exists() {
+        fs::copy(LIBRARY_CACHE, &before)?;
+    }
+    run(&mut Command::new("ldconfig")).map(drop)
+}
+
+fn restore_library_cache() -> Result<()> {
+    let before = library_cache_before();
+    if !before.exists() {
+        return Ok(());
+    }
+    fs::copy(&before, LIBRARY_CACHE)?;
+    fs::remove_file(&before)?;
+    run(Command::new("restorecon").arg(LIBRARY_CACHE)).map(drop)
+}
+
 /// Brings in what the merged packages need besides their files: users and groups, configuration
 /// in /etc, the library cache and udev rules.
 pub fn settle(build: &Build) -> Result<()> {
@@ -102,7 +130,7 @@ pub fn settle(build: &Build) -> Result<()> {
     }
     place_defaults(build)?;
     if build.libraries {
-        run(&mut Command::new("ldconfig"))?;
+        cache_libraries()?;
     }
     if build.udev_rules {
         run(Command::new("udevadm").args(["control", "--reload"]))?;
@@ -132,8 +160,46 @@ pub fn create_tmpfiles(build: &Build) -> Result<()> {
     .map(drop)
 }
 
+/// The units that may be started or stopped by hand. Some, like iSCSI's start-up unit, only
+/// ever run as something else's dependency.
+fn by_hand(units: Vec<String>, refusing: &str) -> Result<Vec<String>> {
+    let shown = text(
+        Command::new("systemctl")
+            .arg("show")
+            .arg(format!("--property=Id,{refusing}"))
+            .args(&units),
+    )?;
+    Ok(refused_by_hand(&shown, refusing, units))
+}
+
+fn refused_by_hand(shown: &str, refusing: &str, units: Vec<String>) -> Vec<String> {
+    let refused: BTreeSet<&str> = shown
+        .split("\n\n")
+        .filter(|block| block.lines().any(|line| line == format!("{refusing}=yes")))
+        .filter_map(|block| block.lines().find_map(|line| line.strip_prefix("Id=")))
+        .collect();
+    units
+        .into_iter()
+        .filter(|unit| !refused.contains(unit.as_str()))
+        .collect()
+}
+
+/// Starts, stops or restarts units, leaving out templates, which only run as instances.
 fn systemctl(verbs: &[&str], units: impl IntoIterator<Item = String>) -> Result<()> {
-    let units: Vec<String> = units.into_iter().collect();
+    let refusing = match verbs[0] {
+        "stop" => "RefuseManualStop",
+        _ => "RefuseManualStart",
+    };
+    let units: Vec<String> = units
+        .into_iter()
+        .filter(|unit| !unit.contains("@."))
+        .collect::<BTreeSet<_>>()
+        .into_iter()
+        .collect();
+    if units.is_empty() {
+        return Ok(());
+    }
+    let units = by_hand(units, refusing)?;
     if units.is_empty() {
         return Ok(());
     }
@@ -179,10 +245,28 @@ pub fn start_arriving(old: Option<&Build>, new: &Build) -> Result<()> {
 pub fn after_removal(old: Option<&Build>, new: Option<&Build>) -> Result<()> {
     let had = |check: fn(&Build) -> bool| old.is_some_and(check) && !new.is_some_and(check);
     if had(|build| build.libraries) {
-        run(&mut Command::new("ldconfig"))?;
+        restore_library_cache()?;
     }
     if had(|build| build.udev_rules) {
         run(Command::new("udevadm").args(["control", "--reload"]))?;
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn leaves_out_units_that_only_run_as_dependencies() {
+        let shown = "RefuseManualStart=no\nId=virtqemud.socket\n\nRefuseManualStart=yes\nId=iscsi-onboot.service\n";
+        let units = vec![
+            "virtqemud.socket".to_owned(),
+            "iscsi-onboot.service".to_owned(),
+        ];
+        assert_eq!(
+            refused_by_hand(shown, "RefuseManualStart", units),
+            ["virtqemud.socket"]
+        );
+    }
 }

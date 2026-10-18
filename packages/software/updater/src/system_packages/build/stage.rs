@@ -133,7 +133,7 @@ pub fn merged(layout: &Layout, rpms: &[Rpm]) -> Result<()> {
     let (mut files, mut folders) = (Vec::new(), Vec::new());
     for rpm in rpms {
         for file in &rpm.files {
-            if !matches!(place(&file.path), Some(Place::Merged)) {
+            if file.ghost || !matches!(place(&file.path), Some(Place::Merged)) {
                 continue;
             }
             if let Fate::New = fate(layout, rpm, file)? {
@@ -156,6 +156,17 @@ pub fn merged(layout: &Layout, rpms: &[Rpm]) -> Result<()> {
     Ok(())
 }
 
+/// The mode a file has in the build root. A ghost only counts when the package's scriptlets
+/// made it.
+fn made_mode(layout: &Layout, file: &File) -> Option<u32> {
+    if !file.ghost {
+        return Some(file.mode);
+    }
+    fs::symlink_metadata(layout.root.join(relative(&file.path)))
+        .ok()
+        .map(|metadata| metadata.mode())
+}
+
 /// Configuration and state go into the factory folder, to be copied to /etc and /var when
 /// they aren't there, like installing the package would have.
 pub fn placed(layout: &Layout, rpms: &[Rpm]) -> Result<Vec<Placed>> {
@@ -167,14 +178,17 @@ pub fn placed(layout: &Layout, rpms: &[Rpm]) -> Result<Vec<Placed>> {
             if !matches!(place(&file.path), Some(Place::Placed)) {
                 continue;
             }
+            let Some(mode) = made_mode(layout, file) else {
+                continue;
+            };
             if let Fate::New = fate(layout, rpm, file)? {
                 entries.push(Placed {
                     path: file.path.clone(),
                     user: file.user.clone(),
                     group: file.group.clone(),
-                    mode: file.mode,
+                    mode,
                 });
-                if is_dir(file) {
+                if mode & KIND == DIRECTORY {
                     fs::create_dir_all(factory.join(relative(&file.path)))?;
                 } else {
                     files.push(relative(&file.path));

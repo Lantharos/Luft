@@ -41,7 +41,7 @@ Toolbox containers share your home folder, so files are where you expect them.
 
 ## System packages
 
-Some software only works as part of the system: services that start with the computer, such as Tailscale or Docker, and udev rules for devices. These come from Fedora as system packages:
+Some software only works as part of the system: services that start with the computer, such as Tailscale, Docker or libvirt, and udev rules for devices. These come from Fedora as system packages:
 
 ```sh
 schelf install --system tailscale
@@ -49,17 +49,23 @@ schelf list --system
 schelf remove --system tailscale
 ```
 
+For virtual machines with [virt-manager](https://flathub.org/apps/org.virt_manager.virt-manager), add libvirt with its default network and `virsh`:
+
+```sh
+schelf install --system libvirt-daemon-kvm libvirt-daemon-config-network libvirt-client
+```
+
 Luft builds a system extension from the packages and what they need, checks Fedora's signatures on every one, and lays it over the system, so their services start right away and with every start after. Schelf lists them under Installed, System, where they can be removed too.
 
 - **Services start by themselves.** Where Fedora has a say, such as starting Docker only when it's first used, that's what happens. Otherwise the services of the packages you asked for start with the computer, while those of packages that only came along stay off until something needs them. To keep one from starting, run `sudo systemctl mask` with its name.
 - **Updates bring them along.** When an update of Luft downloads, the system packages are built again for it, with their newest versions, before you restart. The version before keeps its own copy, so going back to it works as it did. If an update starts before they're ready, they're built as soon as the computer is online.
-- **Removing one leaves the system as it was.** Its services stop, and what it added goes: its settings in `/etc`, its data in `/var`, and the users and groups it made. Removing Docker deletes its images and containers. A service can still leave something it made on its own in a place nobody could tell was its, such as the empty `/etc/cni` Docker's containerd makes, and network changes such as Docker's bridge last until the next restart.
+- **Removing one leaves the system as it was.** Its services stop, and what it added goes: its settings in `/etc`, its data in `/var`, and the users and groups it made. Removing libvirt stops and deletes its virtual machines, and removing Docker its images and containers. A service can still leave something it made on its own in a place nobody could tell was its, such as the empty `/etc/cni` Docker's containerd makes, and network changes such as Docker's bridge last until the next restart.
 - **The list is yours.** `/var/lib/luft/system-packages/packages` lists the packages you asked for, one per line.
 
 Some packages can't be system packages, and Schelf says why:
 
 - **Drivers.** With Secure Boot, the kernel only loads drivers signed with a key the computer trusts, and they can't be signed on the computer. NVIDIA's driver comes with Luft's [NVIDIA image](/system/nvidia/).
-- **SELinux policy.** Changing the security policy on the computer would keep Luft's own policy from being updated. That's why libvirt can't be a system package yet: it needs swtpm, which brings a policy of its own.
+- **SELinux policy.** Changing the security policy on the computer would keep Luft's own policy from being updated. Luft carries the policies common services need, such as swtpm's for the virtual TPMs of libvirt's machines.
 - **Packages that would replace part of Luft**, such as a newer version of a library the system has. These work again after the next update of Luft.
 
 Everything else that needs the system to be changed, such as files in `/boot` or the startup image, stays out too.

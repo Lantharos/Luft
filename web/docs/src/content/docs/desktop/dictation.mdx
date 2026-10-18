@@ -1,0 +1,35 @@
+---
+title: Dictation
+description: Hold the Copilot key and talk to type, in any app, without your voice leaving the computer.
+sidebar:
+  order: 6.5
+---
+
+Hold the <kbd>Copilot</kbd> key and talk. What you say appears in the text field as you speak, and it's typed in when you let go. Press <kbd>Esc</kbd> while holding the key to stop without typing anything.
+
+A quick press of the key opens Start instead. Settings → Keyboard → **Copilot key** changes that to an app of your choice, or to nothing. Keyboards with an assistant key of their own work the same way.
+
+## Turning it on
+
+Dictation is off until you turn it on in Settings → Keyboard → **Dictation**. Turning it on downloads the speech model for your language, about 700 MB, and shows how far along it is. Holding the key before then offers to set it up.
+
+The language follows the keyboard layout you're typing with, so switching to a Serbian layout dictates Serbian, and otherwise the language your computer is set to. You can pick a language instead. Serbian is written in the script your layout uses, Latin or Cyrillic.
+
+| Recognizer | Languages | Download |
+| --- | --- | --- |
+| Parakeet | Bulgarian, Croatian, Czech, Danish, Dutch, English, Estonian, Finnish, French, German, Greek, Hungarian, Italian, Latvian, Lithuanian, Maltese, Polish, Portuguese, Romanian, Russian, Slovak, Slovenian, Spanish, Swedish and Ukrainian | 698 MB |
+| Whisper | About 75 more, including Serbian, Bosnian, Albanian, Turkish, Arabic, Chinese and Japanese. It runs on the graphics card | 574 MB |
+
+**Automatic** picks Parakeet for the languages it knows and Whisper for the rest, and you can choose one yourself. The Dictation page lists the models on the computer and how much space each takes, and **Remove** deletes one. Turning dictation off keeps them until you remove them.
+
+## Privacy
+
+Speech is recognized on your computer. The microphone is only open while you hold the key, the privacy indicator in the taskbar shows it, and nothing you say is saved or sent anywhere. The model is downloaded once from Luft's servers and checked before it's used.
+
+## Apps without text input support
+
+Most apps show the words as you speak. In apps that can't, such as older X11 apps, they show in a small bubble by the text cursor or at the top of the screen, and they're pasted when you let go. Your clipboard is put back right after.
+
+## Memory
+
+The model loads when you start dictating, which takes a second or two the first time, and stays ready for three minutes after you last used it. Parakeet uses about 900 MB of memory while loaded and Whisper uses the graphics card's memory.

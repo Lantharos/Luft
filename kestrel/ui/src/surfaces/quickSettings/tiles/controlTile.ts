@@ -29,7 +29,7 @@ function tileParts(glyph: Clutter.Actor): TileParts {
 }
 
 function chevron(item: QuickControl): St.Button {
-  const icon = new St.Icon({ icon_name: 'go-next-symbolic', icon_size: 14 });
+  const icon = new St.Icon({ style_class: 'kestrel-control-icon', icon_name: 'go-next-symbolic', icon_size: 14 });
   icon.set_pivot_point(0.5, 0.5);
   const more = new St.Button({
     style_class: 'kestrel-control-more', can_focus: true, track_hover: true,
@@ -47,7 +47,7 @@ function chevron(item: QuickControl): St.Button {
 
 export function styleControl(item: QuickControl): void {
   const previous = item.get_child();
-  const icon = new St.Icon({ icon_size: TILE_ICON_SIZE });
+  const icon = new St.Icon({ style_class: 'kestrel-control-icon', icon_size: TILE_ICON_SIZE });
   const { body, top, title, subtitle } = tileParts(icon);
   item.bind_property('gicon', icon, 'gicon', GObject.BindingFlags.SYNC_CREATE);
   item.bind_property('icon-name', icon, 'icon-name', item.icon_name ? GObject.BindingFlags.SYNC_CREATE : GObject.BindingFlags.DEFAULT);
@@ -74,7 +74,7 @@ export interface ActionTile {
 }
 
 export function actionTile(glyph: string | Clutter.Actor, titleText: string, activate: () => void): ActionTile {
-  const { body, title, subtitle } = tileParts(typeof glyph === 'string' ? new St.Icon({ icon_size: TILE_ICON_SIZE, icon_name: glyph }) : glyph);
+  const { body, title, subtitle } = tileParts(typeof glyph === 'string' ? new St.Icon({ style_class: 'kestrel-control-icon', icon_size: TILE_ICON_SIZE, icon_name: glyph }) : glyph);
   title.text = titleText;
   const actor = new St.Button({
     style_class: 'kestrel-control', can_focus: true, track_hover: true,

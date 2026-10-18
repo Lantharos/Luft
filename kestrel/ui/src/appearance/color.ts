@@ -168,6 +168,15 @@ export const contrast = (first: Rgb, second: Rgb) => {
 
 export const readableOn = (background: Rgb): Rgb => contrast(background, WHITE) >= contrast(background, INK) ? WHITE : INK;
 
+const over = (color: Rgb, alpha: number, backdrop: Rgb): Rgb =>
+  color.map((channel, index) => Math.round(channel * alpha + backdrop[index] * (1 - alpha))) as Rgb;
+
+export function readableOver(color: Rgb, alphas: number[], backdrop: Rgb): Rgb {
+  const backgrounds = alphas.map(alpha => over(color, alpha, backdrop));
+  const worst = (ink: Rgb) => Math.min(...backgrounds.map(background => contrast(background, ink)));
+  return worst(WHITE) >= worst(INK) ? WHITE : INK;
+}
+
 export const fromHex = (hex: string): Rgb => [1, 3, 5].map(offset => parseInt(hex.slice(offset, offset + 2), 16)) as Rgb;
 
 export function seedFromColor(color: Rgb): Seed {

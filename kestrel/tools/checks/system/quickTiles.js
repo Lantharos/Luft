@@ -1,13 +1,18 @@
+import GdkPixbuf from 'gi://GdkPixbuf';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
+import St from 'gi://St';
+import {getStyleVariant} from 'resource:///com/lantharos/kestrel/ui/kestrelTheme.js';
 import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 
 import {descendants, named, shown, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
+import {property} from '../lib/dbus.js';
 import {click, drag, rest, rightClick} from '../lib/input.js';
 import {gjs, scratch} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {settled} from '../lib/wait.js';
+import {contrast} from './lib/colors.js';
 
 const {require, eventually} = checks('quick tile');
 const TILES = ['Keep Awake', 'Dark Style', 'Airplane Mode', 'Keyboard Backlight'];
@@ -18,6 +23,9 @@ const LINKS = new Map([
   ['All Networks', 'kestrel-settings:network'],
 ]);
 
+const ACCENT_WALLPAPERS = [['yellow', 0xe8c020ff], ['blue', 0x1838a8ff]];
+const SCHEMES = [['default', 'light', 'LightColors'], ['prefer-dark', 'dark', 'DarkColors']];
+
 const quick = () => named('kestrel-quick-settings');
 const menu = () => named('kestrel-context-menu');
 const tile = title => styled('kestrel-control', quick()).find(control => control.title === title);
@@ -25,6 +33,26 @@ const more = control => styled('kestrel-control-more', control)[0];
 const subtitle = control => styled('kestrel-control-subtitle', control)[0].text;
 const grid = () => styled('kestrel-control', quick())[0].get_parent();
 const statusShows = name => descendants(named('Quick settings', named('kestrel-panel'))).some(actor => actor.visible && actor.icon_name === name);
+
+const appearance = name => property('com.lantharos.Kestrel', '/com/lantharos/Kestrel/Appearance', 'com.lantharos.Kestrel.Appearance', name);
+const hex = color => color.to_string().slice(0, 7);
+const foreground = actor => hex(actor.get_theme_node().get_foreground_color());
+
+function composited(tile, backdrop) {
+  const color = tile.get_theme_node().get_background_color();
+  const alpha = color.alpha / 255;
+  const channels = [color.red, color.green, color.blue].map((channel, index) =>
+    Math.round(channel * alpha + parseInt(backdrop.slice(1 + index * 2, 3 + index * 2), 16) * (1 - alpha)));
+  return `#${channels.map(channel => channel.toString(16).padStart(2, '0')).join('')}`;
+}
+
+function solidWallpaper(name, color) {
+  const path = scratch(`quick-tiles-${name}.png`);
+  const pixbuf = GdkPixbuf.Pixbuf.new(GdkPixbuf.Colorspace.RGB, false, 8, 64, 40);
+  pixbuf.fill(color);
+  pixbuf.savev(path, 'png', [], []);
+  return Gio.File.new_for_path(path).get_uri();
+}
 
 function surfaceCorner() {
   const [x, y] = quick().get_transformed_position();
@@ -88,6 +116,44 @@ async function checkToggles(interfaceSettings) {
   await eventually(() => volume.menu.isOpen, 'the device chevron opens the device list');
   volume._menuButton.emit('clicked', 1);
   await eventually(() => !volume.menu.isOpen, 'the same chevron closes it again');
+}
+
+async function checkActiveInk(name, interfaceSettings) {
+  const accent = await appearance('AccentColor');
+  for (const [scheme, variant, colors] of SCHEMES) {
+    interfaceSettings.set_string('color-scheme', scheme);
+    await eventually(() => getStyleVariant() === variant && hex(St.ThemeContext.get_for_stage(global.stage).get_accent_color()[0]) === accent,
+      `the shell turns ${variant} with the ${name} accent`);
+    await settled();
+    const {surface} = await appearance(colors);
+    const active = styled('kestrel-control', quick()).filter(control => control.checked && control.visible);
+    require(active.length > 1 && active.every(control => {
+      const ink = foreground(styled('kestrel-control-title', control)[0]);
+      return styled('kestrel-control-icon', control).every(icon => foreground(icon) === ink) && contrast(ink, composited(control, surface)) >= 4.5;
+    }), `active tiles draw their icons, chevrons and text in one readable color on the ${name} accent in ${variant}`);
+    await capture(`quick-settings-active-${name}-${variant}`);
+  }
+}
+
+async function checkActiveTiles(shellSettings, interfaceSettings) {
+  const background = new Gio.Settings({schema_id: 'org.gnome.desktop.background'});
+  const wallpapers = ['picture-uri', 'picture-uri-dark'].map(key => [key, background.get_string(key)]);
+  try {
+    shellSettings.set_string('accent', 'white');
+    await eventually(async () => await appearance('AccentColor') === '#ffffff', 'a white accent can be chosen');
+    await checkActiveInk('white', interfaceSettings);
+    shellSettings.set_string('accent', 'wallpaper');
+    for (const [name, color] of ACCENT_WALLPAPERS) {
+      const before = await appearance('AccentColor');
+      const uri = solidWallpaper(name, color);
+      for (const [key] of wallpapers) background.set_string(key, uri);
+      await eventually(async () => await appearance('AccentColor') !== before, `the accent follows the ${name} wallpaper`);
+      await checkActiveInk(name, interfaceSettings);
+    }
+  } finally {
+    for (const [key, uri] of wallpapers) background.set_string(key, uri);
+    shellSettings.reset('accent');
+  }
 }
 
 async function checkLayout(shellSettings) {
@@ -156,6 +222,7 @@ export async function run() {
     await capture('quick-settings-tiles');
     await checkKeepAwake();
     await checkToggles(interfaceSettings);
+    await checkActiveTiles(shellSettings, interfaceSettings);
     await checkLayout(shellSettings);
     await checkSettingsLinks();
   } finally {

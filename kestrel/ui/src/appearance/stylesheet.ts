@@ -5,7 +5,7 @@ import type Shell from 'gi://Shell';
 import St from 'gi://St';
 import { getStyleVariant, setAccent } from 'resource:///com/lantharos/kestrel/ui/kestrelTheme.js';
 
-import { accentColor, fromHex, isNeutral, readableOn, toHex, type Rgb, type Seed } from './color.js';
+import { accentColor, fromHex, isNeutral, readableOn, readableOver, toHex, type Rgb, type Seed } from './color.js';
 import type { Colors, Palette } from './palette.js';
 
 type Variant = 'light' | 'dark';
@@ -15,20 +15,19 @@ const VARIANTS: Variant[] = ['light', 'dark'];
 export const rgba = (hex: string, alpha: number) => `rgba(${fromHex(hex).join(', ')}, ${alpha})`;
 const coglColor = (color: Rgb) => Cogl.Color.from_string(toHex(color))[1];
 
-function checkedControls(fill: string, ink: string): string {
-  return `.kestrel-control.kestrel-control:checked, .kestrel-control.kestrel-control-lifted.kestrel-control-lifted:checked { background-color: ${rgba(fill, 0.86)}; color: ${ink}; }
-.kestrel-control.kestrel-control:checked:hover { background-color: ${rgba(fill, 0.92)}; }
-.kestrel-control.kestrel-control:checked:active { background-color: ${rgba(fill, 0.97)}; }
+const SOLID_TILE = [0.86, 0.92, 0.97];
+const GLASSY_TILE = [0.42, 0.52, 0.6];
+
+function activeTiles(fill: string, alphas: number[], backdrop: string): string {
+  const [rest, hover, active] = alphas;
+  const ink = toHex(readableOver(fromHex(fill), alphas, fromHex(backdrop)));
+  return `.kestrel-control.kestrel-control:checked, .kestrel-control.kestrel-control-lifted.kestrel-control-lifted:checked { background-color: ${rgba(fill, rest)}; color: ${ink}; }
+.kestrel-control.kestrel-control:checked:hover { background-color: ${rgba(fill, hover)}; }
+.kestrel-control.kestrel-control:checked:active { background-color: ${rgba(fill, active)}; }
 .kestrel-control.kestrel-control:checked:focus { box-shadow: inset 0 0 0 1px ${rgba(ink, 0.45)}; }
+.kestrel-control.kestrel-control:checked .kestrel-control-icon { color: ${ink}; }
 .kestrel-control.kestrel-control:checked .kestrel-control-subtitle { color: ${rgba(ink, 0.72)}; }
 .kestrel-control.kestrel-control:checked .kestrel-control-more:hover { background-color: ${rgba(ink, 0.1)}; }
-`;
-}
-
-function glassyCheckedControls(accent: string): string {
-  return `.kestrel-control.kestrel-control:checked { background-color: ${rgba(accent, 0.42)}; }
-.kestrel-control.kestrel-control:checked:hover { background-color: ${rgba(accent, 0.52)}; }
-.kestrel-control.kestrel-control:checked:active { background-color: ${rgba(accent, 0.6)}; }
 `;
 }
 
@@ -47,8 +46,8 @@ function accentStylesheet(seed: Seed, palette: Palette, variant: Variant): strin
   const darkSolid = neutral ? palette.dark.colors : palette.light.colors;
   const solid = dark ? darkSolid : palette.light.colors;
   const highlight = neutral && !dark ? scheme.primary : accent;
-  const checked = dark && !neutral ? glassyCheckedControls(accent) : checkedControls(dark ? accent : scheme.primary, scheme.onPrimary);
-  return `${checked}${lockScreen(accent, darkSolid)}.kestrel-calendar-day.kestrel-calendar-day:selected { background-color: ${solid.primary}; color: ${solid.onPrimary}; }
+  const tiles = activeTiles(dark ? accent : scheme.primary, dark && !neutral ? GLASSY_TILE : SOLID_TILE, scheme.surface);
+  return `${tiles}${lockScreen(accent, darkSolid)}.kestrel-calendar-day.kestrel-calendar-day:selected { background-color: ${solid.primary}; color: ${solid.onPrimary}; }
 .kestrel-slider.kestrel-slider { -barlevel-active-background-color: ${scheme.primary}; }
 .osd-window.osd-window.kestrel-glass .level { -barlevel-active-background-color: ${scheme.primary}; }
 .kestrel-app-focused.kestrel-app-focused .kestrel-running-dot { background-color: ${scheme.primary}; }

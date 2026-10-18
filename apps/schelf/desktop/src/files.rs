@@ -19,7 +19,7 @@ use crate::fedora;
     rename_all = "camelCase",
     rename_all_fields = "camelCase"
 )]
-enum Opened {
+pub enum Opened {
     FlatpakRef {
         path: String,
         id: String,
@@ -176,16 +176,16 @@ fn appimage_file(path: &str) -> Result<Opened, String> {
     })
 }
 
-fn inspect(File { path }: File) -> Result<Opened, String> {
+pub fn inspect(path: &str) -> Result<Opened, String> {
     let lowered = path.to_lowercase();
     if lowered.ends_with(".flatpakref") {
-        flatpak_ref(&path)
+        flatpak_ref(path)
     } else if lowered.ends_with(".flatpakrepo") {
-        flatpak_repo(&path)
+        flatpak_repo(path)
     } else if lowered.ends_with(".rpm") {
-        package(&path)
-    } else if appimage::is_appimage(Path::new(&path)) {
-        appimage_file(&path)
+        package(path)
+    } else if appimage::is_appimage(Path::new(path)) {
+        appimage_file(path)
     } else {
         Err("Schelf can't install this kind of file.".into())
     }
@@ -210,6 +210,6 @@ async fn choose(_: serde_json::Value) -> Result<Option<String>, String> {
 
 pub fn register(window: SabineWindow) -> SabineWindow {
     window
-        .command("files_inspect", inspect)
+        .command("files_inspect", |File { path }| inspect(&path))
         .command_async("files_choose_appimage", choose)
 }

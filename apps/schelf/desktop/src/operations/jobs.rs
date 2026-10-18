@@ -15,7 +15,7 @@ pub enum Action {
     Update,
 }
 
-#[derive(Deserialize, Clone, Debug)]
+#[derive(Deserialize, Serialize, Clone, Debug)]
 #[serde(
     tag = "kind",
     rename_all = "camelCase",
@@ -85,6 +85,7 @@ impl Job {
     }
 
     pub fn run(&self, task: Task) -> Result<(), String> {
+        let _exclusive = task.exclusive()?;
         match self {
             Self::InstallFlathub { id } => {
                 flatpak::ensure_flathub(Installation::User)?;

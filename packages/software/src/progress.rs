@@ -11,6 +11,32 @@ pub enum Stage {
     Finishing,
 }
 
+impl Stage {
+    pub const ALL: [Self; 6] = [
+        Self::Waiting,
+        Self::Preparing,
+        Self::Downloading,
+        Self::Installing,
+        Self::Removing,
+        Self::Finishing,
+    ];
+
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::Waiting => "waiting",
+            Self::Preparing => "preparing",
+            Self::Downloading => "downloading",
+            Self::Installing => "installing",
+            Self::Removing => "removing",
+            Self::Finishing => "finishing",
+        }
+    }
+
+    pub fn named(name: &str) -> Option<Self> {
+        Self::ALL.into_iter().find(|stage| stage.name() == name)
+    }
+}
+
 #[derive(Serialize, Clone, Copy, PartialEq, Debug)]
 pub struct Progress {
     pub stage: Stage,

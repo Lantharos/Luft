@@ -30,12 +30,14 @@ pub fn run(command: &str) -> Option<i32> {
     })
 }
 
-fn quietly<T>(work: impl FnOnce(Task) -> T) -> T {
+fn quietly<T>(work: impl FnOnce(Task) -> Result<T, String>) -> Result<T, String> {
     let cancel = Cancel::default();
-    work(Task {
+    let task = Task {
         report: &|_| {},
         cancel: &cancel,
-    })
+    };
+    let _exclusive = task.exclusive()?;
+    work(task)
 }
 
 fn record() -> PathBuf {

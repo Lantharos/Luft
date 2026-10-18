@@ -1,11 +1,11 @@
 use luft_app::block_on;
 use luft_software::packages;
 use luft_software::task::Task;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::operations::Action;
 
-#[derive(Deserialize, Clone, Debug)]
+#[derive(Deserialize, Serialize, Clone, Debug)]
 #[serde(
     tag = "kind",
     rename_all = "camelCase",

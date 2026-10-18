@@ -121,7 +121,7 @@ async fn joined<T>(work: JoinHandle<Result<T, String>>) -> Result<T, String> {
     work.await.unwrap_or_else(|error| Err(error.to_string()))
 }
 
-async fn check(_: Value) -> Result<Updates, String> {
+pub async fn find() -> (Vec<AppUpdate>, Option<String>) {
     let flatpaks = spawn_blocking(|| flatpak::updates().map(flatpaks));
     let tools = spawn_blocking(installed_tools);
     let appimages = spawn_blocking(appimages);
@@ -138,6 +138,11 @@ async fn check(_: Value) -> Result<Updates, String> {
     apps.extend(appimages);
     apps.extend(tools.unwrap_or_default());
     apps.sort_by_cached_key(|update| (update.platform, update.name.to_lowercase()));
+    (apps, error)
+}
+
+async fn check(_: Value) -> Result<Updates, String> {
+    let (apps, error) = find().await;
     Ok(Updates {
         apps,
         checked: SystemTime::now()

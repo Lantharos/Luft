@@ -1,3 +1,4 @@
+pub mod bus;
 mod jobs;
 
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -6,10 +7,11 @@ use std::time::{Duration, Instant};
 
 use luft_app::{Commands, Events};
 use luft_software::progress::Progress;
-use luft_software::task::{Cancel, Task};
+use luft_software::task::{CANCELLED, Cancel, Task};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender, unbounded_channel};
 
 pub use jobs::{Action, Job};
 
@@ -19,10 +21,20 @@ const PROGRESS_INTERVAL: Duration = Duration::from_millis(120);
 
 #[derive(Serialize, Clone, Copy, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
-enum State {
+pub enum State {
     Queued,
     Running,
     Failed,
+}
+
+impl State {
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::Queued => "queued",
+            Self::Running => "running",
+            Self::Failed => "failed",
+        }
+    }
 }
 
 #[derive(Serialize, Clone)]
@@ -52,13 +64,25 @@ struct Finished {
     succeeded: bool,
 }
 
-#[derive(Deserialize)]
-struct Request {
-    key: String,
-    title: String,
-    job: Job,
+#[derive(Deserialize, Serialize)]
+pub struct Request {
+    pub key: String,
+    pub title: String,
+    pub job: Job,
     #[serde(default)]
-    members: Vec<String>,
+    pub members: Vec<String>,
+}
+
+pub enum Notice {
+    Changed {
+        id: u64,
+        state: State,
+        progress: Option<Progress>,
+    },
+    Finished {
+        id: u64,
+        error: Option<String>,
+    },
 }
 
 #[derive(Deserialize)]
@@ -74,6 +98,7 @@ struct Inner {
     entries: Mutex<Vec<Entry>>,
     wake: Condvar,
     next: AtomicU64,
+    notices: Mutex<Option<UnboundedSender<Notice>>>,
 }
 
 impl Queue {
@@ -83,6 +108,7 @@ impl Queue {
             entries: Mutex::new(Vec::new()),
             wake: Condvar::new(),
             next: AtomicU64::new(1),
+            notices: Mutex::new(None),
         }));
         let worker = queue.clone();
         std::thread::Builder::new()
@@ -97,6 +123,28 @@ impl Queue {
             .entries
             .lock()
             .unwrap_or_else(|poisoned| poisoned.into_inner())
+    }
+
+    pub fn notices(&self) -> UnboundedReceiver<Notice> {
+        let (sender, receiver) = unbounded_channel();
+        *self
+            .0
+            .notices
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner()) = Some(sender);
+        receiver
+    }
+
+    fn notify(&self, notice: Notice) {
+        if let Some(sender) = self
+            .0
+            .notices
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner())
+            .as_ref()
+        {
+            let _ = sender.send(notice);
+        }
     }
 
     fn snapshot(entries: &[Entry]) -> Vec<Operation> {
@@ -133,6 +181,11 @@ impl Queue {
         loop {
             let (id, job, cancel) = self.next_job();
             self.publish();
+            self.notify(Notice::Changed {
+                id,
+                state: State::Running,
+                progress: None,
+            });
             let last = Mutex::new(Instant::now() - PROGRESS_INTERVAL);
             let report = |progress: Progress| {
                 let mut last = last.lock().unwrap_or_else(|poisoned| poisoned.into_inner());
@@ -148,12 +201,18 @@ impl Queue {
                     entry.operation.progress = Some(progress);
                 }
                 self.publish();
+                self.notify(Notice::Changed {
+                    id,
+                    state: State::Running,
+                    progress: Some(progress),
+                });
             };
             let result = job.run(Task {
                 report: &report,
                 cancel: &cancel,
             });
             let succeeded = result.is_ok();
+            let error = result.as_ref().err().cloned();
             let finished = {
                 let mut entries = self.entries();
                 let position = entries.iter().position(|entry| entry.operation.id == id);
@@ -180,13 +239,14 @@ impl Queue {
                 finished
             };
             self.publish();
+            self.notify(Notice::Finished { id, error });
             if let Some(finished) = finished {
                 self.0.events.emit(LIBRARY, finished);
             }
         }
     }
 
-    fn enqueue(
+    pub fn enqueue(
         &self,
         Request {
             key,
@@ -212,15 +272,33 @@ impl Queue {
         });
         self.0.wake.notify_one();
         self.publish();
+        self.notify(Notice::Changed {
+            id,
+            state: State::Queued,
+            progress: None,
+        });
         Ok(id)
     }
 
     fn cancel(&self, Id { id }: Id) -> Result<(), String> {
+        self.stop(id);
+        Ok(())
+    }
+
+    pub fn stop(&self, id: u64) {
         let cancel = {
             let mut entries = self.entries();
             let position = entries.iter().position(|entry| entry.operation.id == id);
             match position.map(|position| (position, entries[position].operation.state)) {
-                Some((position, State::Queued | State::Failed)) => {
+                Some((position, State::Queued)) => {
+                    entries.remove(position);
+                    self.notify(Notice::Finished {
+                        id,
+                        error: Some(CANCELLED.into()),
+                    });
+                    None
+                }
+                Some((position, State::Failed)) => {
                     entries.remove(position);
                     None
                 }
@@ -232,7 +310,6 @@ impl Queue {
             cancel.cancel();
         }
         self.publish();
-        Ok(())
     }
 }
 

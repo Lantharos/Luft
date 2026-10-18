@@ -45,6 +45,14 @@ fn index() -> Result<Arc<Vec<Available>>, String> {
     Ok(index)
 }
 
+pub fn find(package: &str) -> Result<Option<Available>, String> {
+    let index = index()?;
+    Ok(index
+        .binary_search_by(|tool| tool.package.as_str().cmp(package))
+        .ok()
+        .map(|position| index[position].clone()))
+}
+
 fn rank(tool: &Available, needle: &str) -> Option<u8> {
     let name = tool.package.to_lowercase();
     if name == needle {

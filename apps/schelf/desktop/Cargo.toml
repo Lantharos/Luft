@@ -13,15 +13,18 @@ name = "schelf_lib"
 [dependencies]
 dirs = "7.0.0"
 flate2 = { version = "1.1.10", default-features = false, features = ["zlib-rs"] }
+futures-util = { version = "0.3.34", default-features = false }
 gio = "0.22.10"
 gio-unix = "0.22.8"
+libc = "0.2.190"
 luft-app = { path = "../../../packages/app", features = ["apps"] }
 luft-software = { path = "../../../packages/software" }
 quick-xml = "0.42.0"
 sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.46" }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = { version = "1.0.154", features = ["raw_value"] }
-tokio = { version = "1.53.3", default-features = false, features = ["rt"] }
+tokio = { version = "1.53.3", default-features = false, features = ["macros", "rt", "signal", "sync"] }
+zbus = { version = "6.0.0", default-features = false, features = ["proxy", "service", "tokio"] }
 
 [profile.release]
 lto = "fat"

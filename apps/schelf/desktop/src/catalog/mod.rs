@@ -1,6 +1,6 @@
 pub mod cache;
-mod flathub;
-mod tools;
+pub mod flathub;
+pub mod tools;
 
 use luft_app::Commands;
 use sabine::SabineWindow;

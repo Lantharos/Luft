@@ -2804,8 +2804,10 @@ version = "0.1.0"
 dependencies = [
  "dirs",
  "flate2",
+ "futures-util",
  "gio",
  "gio-unix",
+ "libc",
  "luft-app",
  "luft-software",
  "quick-xml 0.42.0",
@@ -2813,6 +2815,7 @@ dependencies = [
  "serde",
  "serde_json",
  "tokio",
+ "zbus",
 ]
 
 [[package]]

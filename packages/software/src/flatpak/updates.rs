@@ -13,6 +13,13 @@ pub struct Update {
     pub download_size: u64,
 }
 
+fn without_kind(reference: &str) -> &str {
+    ["app/", "runtime/"]
+        .into_iter()
+        .find_map(|kind| reference.strip_prefix(kind))
+        .unwrap_or(reference)
+}
+
 pub fn updates() -> Result<Vec<Update>, String> {
     let current = installed()?;
     let listed: Vec<Result<String, String>> = std::thread::scope(|scope| {
@@ -42,6 +49,7 @@ pub fn updates() -> Result<Vec<Update>, String> {
             let [reference, origin, version, download] = columns(line)[..] else {
                 continue;
             };
+            let reference = without_kind(reference);
             let Some(installed) = current.iter().find(|item| {
                 item.installation == installation
                     && item.reference == reference

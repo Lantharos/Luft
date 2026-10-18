@@ -1,6 +1,12 @@
+use std::fs::{self, File, OpenOptions, TryLockError};
+use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
+use std::time::Duration;
 
 use crate::progress::{Progress, Report, Stage};
+
+const LOCK: &str = "luft/software.lock";
+const LOCK_RETRY: Duration = Duration::from_millis(250);
 
 type Hook = Box<dyn Fn() + Send>;
 
@@ -76,9 +82,45 @@ pub struct Task<'a> {
     pub cancel: &'a Cancel,
 }
 
+pub struct Exclusive {
+    _file: File,
+}
+
+fn lock_file() -> Result<File, String> {
+    let path: PathBuf = dirs::runtime_dir()
+        .or_else(dirs::cache_dir)
+        .ok_or("There's no folder to keep the software lock in.")?
+        .join(LOCK);
+    if let Some(folder) = path.parent() {
+        fs::create_dir_all(folder).map_err(|error| error.to_string())?;
+    }
+    OpenOptions::new()
+        .create(true)
+        .truncate(false)
+        .write(true)
+        .open(path)
+        .map_err(|error| error.to_string())
+}
+
 impl Task<'_> {
     pub fn progress(&self, stage: Stage, fraction: Option<f32>) {
         (self.report)(Progress::new(stage, fraction));
+    }
+
+    pub fn exclusive(&self) -> Result<Exclusive, String> {
+        let file = lock_file()?;
+        loop {
+            match file.try_lock() {
+                Ok(()) => return Ok(Exclusive { _file: file }),
+                Err(TryLockError::WouldBlock) => {}
+                Err(TryLockError::Error(error)) => return Err(error.to_string()),
+            }
+            if self.cancel.is_cancelled() {
+                return Err(CANCELLED.into());
+            }
+            self.progress(Stage::Waiting, None);
+            std::thread::sleep(LOCK_RETRY);
+        }
     }
 }
 

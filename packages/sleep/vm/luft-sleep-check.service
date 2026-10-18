@@ -1,0 +1,10 @@
+[Unit]
+Description=Check luft-sleep by sleeping this VM
+After=dbus.service systemd-logind.service local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/luft-sleep-check
+
+[Install]
+WantedBy=multi-user.target

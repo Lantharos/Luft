@@ -1,0 +1,10 @@
+[Unit]
+Description=Shut down instead of sleeping on
+DefaultDependencies=no
+After=systemd-suspend.service suspend.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/systemctl poweroff
+Restart=on-failure
+RestartSec=2

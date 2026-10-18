@@ -1,0 +1,5 @@
+ARG BASE
+FROM ${BASE}
+COPY root/ /
+RUN systemctl enable luft-sleep-check.service && mkdir -p /usr/lib/luft-sleep-check && \
+    dracut --no-hostonly --force --add-drivers "virtio_blk virtio_pci ext4" /usr/lib/luft-sleep-check/initramfs.img "$(ls /usr/lib/modules)"

@@ -1,0 +1,18 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+ "https://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node name="/com/lantharos/Sleep1">
+  <!--
+    How a sleeping computer looks after its battery. Started on demand and stops when idle.
+    SetPowerOffAfter needs com.lantharos.sleep.configure.
+  -->
+  <interface name="com.lantharos.Sleep1">
+    <!-- Seconds a computer sleeps on battery before it shuts down instead, 0 to keep sleeping.
+         While this isn't 0, it also shuts down when the battery falls to 5% while asleep. -->
+    <property name="PowerOffAfter" type="u" access="read">
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
+    </property>
+    <method name="SetPowerOffAfter">
+      <arg name="seconds" type="u" direction="in"/>
+    </method>
+  </interface>
+</node>

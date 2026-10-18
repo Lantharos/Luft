@@ -60,3 +60,5 @@ export const setProfile = (profile: string) => invoke<void>('power_set_profile',
 export const setChargeLimit = (enabled: boolean) => invoke<void>('power_set_charge_limit', { enabled });
 export const setKeyboard = (id: string, level: number) => invoke<void>('power_set_keyboard', { id, level });
 export const onPowerChanged = (callback: (state: PowerState) => void) => listen<PowerState>('power.changed', callback);
+export const powerOffAfter = () => invoke<number | null>('power_off_after');
+export const setPowerOffAfter = (seconds: number) => invoke<void>('power_set_power_off_after', { seconds });

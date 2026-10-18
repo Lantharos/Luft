@@ -5,6 +5,7 @@ import {checkFonts} from './settings/fonts.js';
 import {checkHardware} from './settings/hardware.js';
 import {checkLive} from './settings/live.js';
 import {checkPages} from './settings/pages.js';
+import {checkLongSleep} from './settings/power.js';
 import {checkUpdates} from './settings/updates.js';
 import {checkWallpaper} from './settings/wallpaper.js';
 
@@ -17,6 +18,7 @@ export async function run() {
       await checkAccessibility(app);
       await checkLive(app);
       await checkHardware(app);
+      await checkLongSleep(app);
       await checkFonts(app);
       await checkWallpaper(app);
     });

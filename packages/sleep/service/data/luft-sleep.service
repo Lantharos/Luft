@@ -1,0 +1,8 @@
+[Unit]
+Description=Sleep settings
+
+[Service]
+Type=dbus
+BusName=com.lantharos.Sleep1
+ExecStart=/usr/libexec/luft-sleep
+SyslogIdentifier=luft-sleep

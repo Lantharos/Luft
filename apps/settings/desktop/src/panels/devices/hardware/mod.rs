@@ -1,3 +1,4 @@
+mod keyboards;
 mod pointers;
 mod watch;
 
@@ -21,6 +22,7 @@ pub struct Hardware {
     battery: bool,
     mouse: bool,
     touchpad: bool,
+    copilot_key: bool,
 }
 
 async fn detect() -> Hardware {
@@ -30,6 +32,7 @@ async fn detect() -> Hardware {
         battery: power::has_battery().await,
         mouse: pointers.mouse,
         touchpad: pointers.touchpad,
+        copilot_key: keyboards::copilot_key(),
     }
 }
 

@@ -144,7 +144,8 @@ export function canonical(accelerator: string) {
 
 export function labels(accelerator: string) {
 	const { modifiers, key } = parse(accelerator);
-	return [...MODIFIER_LABELS.filter(([modifier]) => modifiers.has(modifier)).map(([, label]) => label), keyLabel(key)];
+	const held = MODIFIER_LABELS.filter(([modifier]) => modifiers.has(modifier)).map(([, label]) => label);
+	return key ? [...held, keyLabel(key)] : held;
 }
 
 export function typesText(accelerator: string) {

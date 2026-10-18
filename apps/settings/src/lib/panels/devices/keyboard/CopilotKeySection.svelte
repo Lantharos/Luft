@@ -1,13 +1,11 @@
 <script lang="ts">
-	import { Row, Section, Select } from '@luft/ui';
+	import { Row, Section, Select, Switch } from '@luft/ui';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import ChooseAppDialog from '../../system/apps/ChooseAppDialog.svelte';
 	import { installedApps, type App } from '../../system/apps/api';
 
 	type Press = 'search' | 'app' | 'nothing';
-	type CopilotKey = { press: Press; app: string };
-
-	let { ondictation }: { ondictation: () => void } = $props();
+	type CopilotKey = { press: Press; app: string; hold: boolean };
 
 	const PRESSES: { value: Press; label: string }[] = [
 		{ value: 'search', label: 'Open Start' },
@@ -15,7 +13,7 @@
 		{ value: 'nothing', label: 'Nothing' }
 	];
 
-	const key = useSettings<CopilotKey>('com.lantharos.kestrel.copilot-key', ['press', 'app']);
+	const key = useSettings<CopilotKey>('com.lantharos.kestrel.copilot-key', ['press', 'app', 'hold']);
 	const dictation = useSettings<{ enabled: boolean }>('com.lantharos.kestrel.dictation', ['enabled']);
 
 	let apps = $state<App[]>([]);
@@ -46,7 +44,12 @@
 			<button type="button" class="button" onclick={() => (choosing = true)}>{chosen ? 'Change' : 'Choose'}</button>
 		</Row>
 	{/if}
-	<Row title="Hold to dictate" description={dictation.values.enabled ? 'On' : 'Off'} onclick={ondictation} />
+	<Row
+		title="Hold to dictate"
+		description={dictation.values.enabled ? 'Hold the key and talk to type what you say' : 'Works once dictation is on'}
+	>
+		<Switch label="Hold to dictate" checked={key.values.hold ?? true} onchange={(on) => key.set('hold', on)} />
+	</Row>
 </Section>
 
 {#if choosing}

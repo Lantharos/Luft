@@ -130,6 +130,10 @@ export function shownGroups(hardware: Hardware) {
 export function searchPanels(query: string, hardware: Hardware): Panel[] {
 	const needle = query.trim().toLowerCase();
 	return [...PANELS, ...SUBPAGE_PANELS].filter(
-		(panel) => isShown(panel, hardware) && [titleOf(panel, hardware), ...panel.keywords].some((term) => term.toLowerCase().includes(needle))
+		(panel) =>
+			isShown(panel, hardware) &&
+			[titleOf(panel, hardware), ...panel.keywords, ...(hardware.copilotKey ? (panel.copilotKeyKeywords ?? []) : [])].some((term) =>
+				term.toLowerCase().includes(needle)
+			)
 	);
 }

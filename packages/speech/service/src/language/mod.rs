@@ -46,7 +46,7 @@ pub fn all(choice: EngineChoice) -> Vec<Language> {
     languages
 }
 
-/// The language a keyboard layout is for, such as `sr` for `rs+latin`. Layouts
+/// The language a keyboard layout is for, such as `fr` for `ch+fr`. Layouts
 /// used across many languages, like the US one, say nothing.
 fn from_layout(layout: &str) -> Option<Spoken> {
     let (country, variant) = layout.split_once('+').unwrap_or((layout, ""));
@@ -167,19 +167,19 @@ mod tests {
     #[test]
     fn the_keyboard_layout_says_what_is_spoken() {
         assert_eq!(resolve(None, Some("de"), Some("en_US.UTF-8")).code, "de");
-        let serbian = resolve(None, Some("rs+latin"), None);
+        let latin = resolve(None, Some("me"), None);
+        assert_eq!((latin.code.as_str(), latin.script), ("sr", Script::Latin));
         assert_eq!(
-            (serbian.code.as_str(), serbian.script),
-            ("sr", Script::Latin)
+            resolve(None, Some("me+cyrillic"), None).script,
+            Script::Cyrillic
         );
-        assert_eq!(resolve(None, Some("rs"), None).script, Script::Cyrillic);
     }
 
     #[test]
     fn the_us_layout_defers_to_the_computer_language() {
-        assert_eq!(resolve(None, Some("us"), Some("sr_RS.UTF-8")).code, "sr");
+        assert_eq!(resolve(None, Some("us"), Some("uk_UA.UTF-8")).code, "uk");
         assert_eq!(
-            resolve(None, Some("us"), Some("sr_RS.UTF-8@latin")).script,
+            resolve(None, Some("us"), Some("sr_ME.UTF-8@latin")).script,
             Script::Latin
         );
         assert_eq!(resolve(None, Some("us"), Some("C.UTF-8")).code, "en");
@@ -188,7 +188,7 @@ mod tests {
 
     #[test]
     fn a_chosen_language_wins_and_keeps_the_keyboard_script() {
-        let chosen = resolve(Some("sr"), Some("rs+latin"), Some("de_DE.UTF-8"));
+        let chosen = resolve(Some("sr"), Some("me"), Some("de_DE.UTF-8"));
         assert_eq!((chosen.code.as_str(), chosen.script), ("sr", Script::Latin));
         assert_eq!(resolve(Some("fr"), Some("de"), None).code, "fr");
         assert_eq!(resolve(Some("xx"), Some("de"), None).code, "de");

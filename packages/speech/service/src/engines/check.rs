@@ -2,7 +2,7 @@
 //! with what was said. Needs the models, so it only runs when asked:
 //!
 //! LUFT_SPEECH_MODELS=<folder of models> LUFT_SPEECH_SAMPLES=<folder of .wav
-//! and .txt> LUFT_SPEECH_LANGUAGE=sr cargo test --release -- --ignored --nocapture
+//! and .txt> LUFT_SPEECH_LANGUAGE=de cargo test --release -- --ignored --nocapture
 
 use std::path::PathBuf;
 use std::time::Instant;

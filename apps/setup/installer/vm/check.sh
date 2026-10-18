@@ -64,7 +64,7 @@ check_wifi_carried() {
   pass "the Wi-Fi joined before installing connects by itself on the new system, its password readable by root alone"
 }
 
-HINTS='{"language":"en_US","locale":"sr_RS@latin","timezone":"Europe/Belgrade","keyboards":[{"layout":"rs","variant":"latin"},{"layout":"us","variant":""}]}'
+HINTS='{"language":"en_US","locale":"de_AT","timezone":"Europe/Vienna","keyboards":[{"layout":"at","variant":"nodeadkeys"},{"layout":"us","variant":""}]}'
 ASKED=/run/luft-check/asked-for-code
 CODE=31415926
 

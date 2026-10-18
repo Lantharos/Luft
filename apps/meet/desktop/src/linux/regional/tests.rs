@@ -12,7 +12,7 @@ fn keyboard(layout: &str, variant: &str) -> Keyboard {
 
 #[test]
 fn locales_lose_their_encoding() {
-    assert_eq!(posix("sr_RS.UTF-8@latin").as_deref(), Some("sr_RS@latin"));
+    assert_eq!(posix("uz_UZ.UTF-8@cyrillic").as_deref(), Some("uz_UZ@cyrillic"));
     assert_eq!(posix("en_GB.UTF-8").as_deref(), Some("en_GB"));
     assert_eq!(posix("C.UTF-8"), None);
     assert_eq!(posix("POSIX"), None);
@@ -21,8 +21,8 @@ fn locales_lose_their_encoding() {
 #[test]
 fn reads_gnome_input_sources() {
     assert_eq!(
-        from_gnome("[('xkb', 'rs+latin'), ('ibus', 'anthy'), ('xkb', 'us')]\n"),
-        [keyboard("rs", "latin"), keyboard("us", "")]
+        from_gnome("[('xkb', 'ch+fr'), ('ibus', 'anthy'), ('xkb', 'us')]\n"),
+        [keyboard("ch", "fr"), keyboard("us", "")]
     );
     assert_eq!(from_gnome("@a(ss) []\n"), []);
 }
@@ -31,11 +31,11 @@ fn reads_gnome_input_sources() {
 fn reads_keyboard_settings_files() {
     assert_eq!(
         from_settings(
-            "XKBMODEL=\"pc105\"\nXKBLAYOUT=\"us,rs\"\nXKBVARIANT=\",latin\"\n",
+            "XKBMODEL=\"pc105\"\nXKBLAYOUT=\"us,ua\"\nXKBVARIANT=\",phonetic\"\n",
             "XKBLAYOUT",
             "XKBVARIANT"
         ),
-        [keyboard("us", ""), keyboard("rs", "latin")]
+        [keyboard("us", ""), keyboard("ua", "phonetic")]
     );
     assert_eq!(
         from_settings(

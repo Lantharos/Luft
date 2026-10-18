@@ -9,20 +9,20 @@ fn keyboard(layout: &str, variant: &str) -> Keyboard {
 }
 
 #[test]
-fn windows_settings_from_serbia() {
+fn windows_settings_from_slovakia() {
     let settings = Settings {
         time_zone: Some("Central Europe Standard Time"),
-        locale: Some("sr-Latn-RS"),
+        locale: Some("sk-SK"),
         language: Some("en-US"),
-        keyboards: vec!["0000081a".into(), "00000409".into(), "0000081A".into()],
+        keyboards: vec!["0001041b".into(), "00000409".into(), "0001041B".into()],
     };
     assert_eq!(
         settings.hints(),
         Hints {
             language: Some("en_US".into()),
-            locale: Some("sr_RS@latin".into()),
-            timezone: Some("Europe/Belgrade".into()),
-            keyboards: vec![keyboard("rs", "latin"), keyboard("us", "")],
+            locale: Some("sk_SK".into()),
+            timezone: Some("Europe/Bratislava".into()),
+            keyboards: vec![keyboard("sk", "qwerty"), keyboard("us", "")],
         }
     );
 }
@@ -65,6 +65,7 @@ fn windows_locale_names_become_posix() {
     };
     assert_eq!(locale("pt-BR").as_deref(), Some("pt_BR"));
     assert_eq!(locale("de-DE_phoneb").as_deref(), Some("de_DE"));
+    assert_eq!(locale("sr-Latn-ME").as_deref(), Some("sr_ME@latin"));
     assert_eq!(locale("uz-Cyrl-UZ").as_deref(), Some("uz_UZ@cyrillic"));
     assert_eq!(locale("es-419"), None);
     assert_eq!(locale("en"), None);
@@ -95,8 +96,8 @@ fn old_zone_names_become_current_ones() {
         Some("Europe/Kyiv")
     );
     assert_eq!(
-        canonical_zone("Europe/Belgrade").as_deref(),
-        Some("Europe/Belgrade")
+        canonical_zone("Europe/Bratislava").as_deref(),
+        Some("Europe/Bratislava")
     );
     assert_eq!(canonical_zone("Nowhere/Atlantis"), None);
 }

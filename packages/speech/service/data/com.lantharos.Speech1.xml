@@ -8,7 +8,7 @@
   -->
   <interface name="com.lantharos.Speech1">
     <!-- Opens the microphone and starts listening. The layout is the keyboard layout being typed with,
-         such as "rs+latin", which picks the language unless one is chosen in Settings; empty uses the
+         such as "ch+fr", which picks the language unless one is chosen in Settings; empty uses the
          first one. Fails with com.lantharos.Speech1.Error.NotInstalled, naming the model, when the
          model for the language isn't downloaded, and with com.lantharos.Speech1.Error.Unsupported,
          naming the language, when the processor can't run the engine the language needs. -->

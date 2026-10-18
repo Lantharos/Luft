@@ -57,8 +57,8 @@ const FROM_MEET = {
     ? {...drive, meet: true, windows: {...drive.windows, size: 600 * GB - 129 * MIB, room: 0}, free: [ROOM]}
     : drive),
   hints: {
-    language: 'en_US', locale: 'sr_RS@latin', timezone: 'Europe/Belgrade',
-    keyboards: [{layout: 'rs', variant: 'latin'}, {layout: 'us', variant: ''}],
+    language: 'en_US', locale: 'de_AT', timezone: 'Europe/Vienna',
+    keyboards: [{layout: 'at', variant: 'nodeadkeys'}, {layout: 'us', variant: ''}],
   },
   meet: {drive: '/org/freedesktop/UDisks2/block_devices/nvme0n1', space: ROOM, intent: 'install', room: ROOM, movingBox: null},
 };

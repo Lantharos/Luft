@@ -45,8 +45,8 @@ async function checkFromMeet() {
   const setup = new Setup();
   await setup.useMeet(true);
   await setup.open();
-  await setup.called('SetX11Keyboard rs latin', 'the keyboard layout Meet Luft noted becomes the live session’s');
-  await setup.called('SetTimezone Europe/Belgrade', 'the time zone Meet Luft noted becomes the live session’s');
+  await setup.called('SetX11Keyboard at nodeadkeys', 'the keyboard layout Meet Luft noted becomes the live session’s');
+  await setup.called('SetTimezone Europe/Vienna', 'the time zone Meet Luft noted becomes the live session’s');
   await setup.shot('welcome-meet');
   await setup.click(AT.keyboard, 'the keyboard list opens');
   await setup.type('custom');

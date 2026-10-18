@@ -135,14 +135,14 @@ mod tests {
             r#"{"intent":"install","start":"{0A1B2C3D-0000-4000-8000-00000000AAAA}",
                 "live":"0a1b2c3d-0000-4000-8000-00000000bbbb","movingBox":null,
                 "room":{"offset":1048576,"size":68719476736},"bootEntry":7,
-                "hints":{"timezone":"Europe/Belgrade","keyboards":[{"layout":"rs","variant":"latin"}]}}"#,
+                "hints":{"timezone":"Europe/Vienna","keyboards":[{"layout":"ch","variant":"fr"}]}}"#,
         )
         .unwrap();
         let made = handoff.made_partitions().unwrap();
         assert_eq!(made.start, "0a1b2c3d-0000-4000-8000-00000000aaaa");
         assert_eq!(handoff.partitions().count(), 2);
-        assert_eq!(handoff.hints.timezone.as_deref(), Some("Europe/Belgrade"));
-        assert_eq!(handoff.hints.keyboards[0].variant, "latin");
+        assert_eq!(handoff.hints.timezone.as_deref(), Some("Europe/Vienna"));
+        assert_eq!(handoff.hints.keyboards[0].variant, "fr");
         assert_eq!(Handoff::parse(&handoff.to_json()).unwrap(), handoff);
     }
 

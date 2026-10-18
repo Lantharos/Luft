@@ -25,10 +25,12 @@ export class TabletTaskbar {
   private outsideSignal = 0;
   private statusIcons: string[] = [];
   private fit: (() => void) | null = null;
+  private stretched = false;
 
   constructor(private readonly panel: St.Widget, private readonly layers: Clutter.Actor[], private readonly primary: boolean,
     private readonly available: () => boolean) {
     for (const layer of layers) layer.set_pivot_point(0.5, 0.5);
+    panel.connect('notify::translation-y', () => this.anchorBottom());
   }
 
   get shown(): boolean {
@@ -135,6 +137,13 @@ export class TabletTaskbar {
     if (!this.strip) return;
     if (this.held) this.expand();
     else this.collapse();
+  }
+
+  private anchorBottom(): void {
+    const lift = Math.max(0, -this.panel.translation_y);
+    if (!lift && !this.stretched) return;
+    this.stretched = lift > 0;
+    this.panel.height = taskbarPreferences.metrics.height + lift;
   }
 
   private paint(progress: number): void {

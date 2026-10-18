@@ -17,6 +17,7 @@ const {require, eventually} = checks('tablet taskbar');
 const STRIP = 24;
 const EXPANDED = 64;
 const IDLE_COLLAPSE = 5000;
+const DRAG_COMPLETES = 80;
 const clips = GLib.build_filenamev([GLib.getenv('KESTREL_CAPTURE_DIR'), 'clips']);
 
 const panel = () => named('kestrel-panel');
@@ -25,6 +26,7 @@ const handle = () => firstStyled('kestrel-tablet-strip-handle', strip());
 const monitor = () => Main.layoutManager.primaryMonitor;
 const bottom = () => monitor().y + monitor().height;
 const visible = () => bottom() - (panel().y + panel().translation_y);
+const lifted = () => bottom() - (panel().y + panel().translation_y + panel().height);
 const resting = () => !panel().get_transition('translation-y');
 const collapsed = () => resting() && Math.abs(visible() - STRIP) < 0.5 && !panel().get_children()[0].visible;
 const expanded = () => resting() && Math.abs(visible() - EXPANDED) < 0.5 && !strip()?.visible;
@@ -45,8 +47,28 @@ async function swipeUp() {
   require(strip().opacity < 255 && panel().get_children()[0].opacity < 255, 'the strip and the full taskbar crossfade under the finger');
   require(handle().scale_x > 1 && handle().opacity < 255, 'the handle stretches and fades as the taskbar comes out');
   await capture('tablet-swipe-mid');
-  await touchMove([start[0], start[1] - 30], [start[0], start[1] - 110], 6);
+  const stretch = [start[0], bottom() - DRAG_COMPLETES + 2];
+  await touchMove([start[0], start[1] - 30], stretch, 4);
+  await settled(200);
+  require(visible() > EXPANDED + 10, 'the taskbar stretches past fully open under the finger');
+  const apps = panel().get_children()[0];
+  require(apps.get_transformed_position()[1] < bottom() - (EXPANDED + apps.height) / 2 - 1, 'the apps lift with the stretch');
+  await capture('tablet-swipe-overscroll');
+  await touchMove(stretch, [start[0], start[1] - 110], 3);
   touchUp();
+}
+
+async function widestLift(action) {
+  let widest = 0;
+  const signal = global.stage.connect_after('after-paint', () => {
+    widest = Math.max(widest, lifted());
+  });
+  try {
+    await action();
+  } finally {
+    global.stage.disconnect(signal);
+  }
+  return widest;
 }
 
 async function widestGap(window, action) {
@@ -78,7 +100,9 @@ async function enter(normal, window) {
 }
 
 async function expandAndCollapse(window) {
-  await clip(clips, 'tablet-swipe-expand', swipeUp, {notes: 'Swiped up from the bottom edge', width: fullWidth()});
+  const lift = await widestLift(() => clip(clips, 'tablet-swipe-expand', swipeUp,
+    {notes: 'Swiped up from the bottom edge and past fully open', width: fullWidth()}));
+  require(lift < 0.5, `the taskbar stays on the bottom edge while it stretches (lifted ${lift}px)`);
   await eventually(expanded, 'swiping up from the bottom edge expands the taskbar');
   await capture('tablet-expanded');
 

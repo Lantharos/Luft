@@ -9,39 +9,12 @@ use luft_variant::Variant;
 use serde::Deserialize;
 use serde_json::{Map, Value, json};
 
+use crate::command::{self, run};
 use crate::progress::Pull;
 
 const BOOTC: &str = "bootc";
 const PROGRESS_FD: i32 = 3;
 const SLOTS: [&str; 3] = ["booted", "staged", "rollback"];
-
-fn failure(stderr: &[u8]) -> anyhow::Error {
-    let text = String::from_utf8_lossy(stderr);
-    let message = text
-        .lines()
-        .rev()
-        .map(str::trim)
-        .find(|line| !line.is_empty())
-        .map(|line| {
-            line.strip_prefix("error:")
-                .unwrap_or(line)
-                .trim()
-                .to_owned()
-        })
-        .unwrap_or_else(|| "bootc stopped unexpectedly.".to_owned());
-    anyhow!(message)
-}
-
-fn run(command: &mut Command) -> Result<Vec<u8>> {
-    let output = command
-        .stdin(Stdio::null())
-        .output()
-        .with_context(|| format!("Starting {command:?}"))?;
-    if !output.status.success() {
-        return Err(failure(&output.stderr));
-    }
-    Ok(output.stdout)
-}
 
 fn bootc(arguments: &[&str]) -> Result<Vec<u8>> {
     run(Command::new(BOOTC).args(arguments))
@@ -188,7 +161,7 @@ impl Fetch {
             if status.code().is_none() {
                 bail!("The download was stopped.");
             }
-            return Err(failure(&errors));
+            return Err(command::failure(BOOTC, &errors));
         }
         Ok(())
     }

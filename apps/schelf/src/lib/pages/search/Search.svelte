@@ -48,7 +48,7 @@
 				<div class="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-1">
 					{#each installed as app (app.key)}
 						<button type="button" class="result" onclick={() => navigation.push({ page: 'app', target: { installed: app.key }, name: app.name })}>
-							<AppArt icon={app.icon} desktop={app.desktop} tool={app.source === 'tool'} size={40} />
+							<AppArt icon={app.icon} desktop={app.desktop} source={app.source} size={40} />
 							<span class="flex min-w-0 flex-col">
 								<span class="truncate text-[14px] font-semibold">{app.name}</span>
 								<span class="truncate text-[12.5px] text-[var(--text-muted)]">{sourceName(app.source, app.origin)}</span>

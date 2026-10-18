@@ -22,6 +22,7 @@
 		if (installed) {
 			const name = sourceName(installed.source, installed.origin);
 			if (installed.source === 'flatpak') return `${name}, ${installed.installation === 'user' ? 'for you only' : 'for everyone on this computer'}`;
+			if (installed.source === 'system') return 'Fedora, in the system for everyone';
 			return name;
 		}
 		return details?.origin === 'flathub' ? 'Flathub' : 'Fedora';
@@ -38,6 +39,9 @@
 	<Row title="Source" description={installed?.path ?? undefined}><span>{source}</span></Row>
 	{#if installed?.commands.length}
 		<Row title="Commands" description="Run them in Tern"><span class="max-w-[320px] truncate">{installed.commands.join(', ')}</span></Row>
+	{/if}
+	{#if installed?.services.length}
+		<Row title="Services" description="Start with the computer"><span class="max-w-[320px] truncate">{installed.services.join(', ')}</span></Row>
 	{/if}
 	{#if details?.developer}
 		<Row title="Developer" description={details.verified ? `Verified as ${details.verified}` : undefined}><span class="text-right">{details.developer}</span></Row>

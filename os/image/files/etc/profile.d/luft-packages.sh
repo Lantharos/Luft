@@ -7,7 +7,8 @@ __luft_package_hint() {
 		printf 'Luft is based on Fedora, so it uses dnf instead of %s.\n' "$manager" >&2
 	fi
 	printf 'The system is read-only, so software goes into your account instead:\n' >&2
-	printf '  \e[1mschelf install …\e[0m installs apps from Flathub and tools from Fedora, or\n' >&2
+	printf '  \e[1mschelf install …\e[0m installs apps from Flathub and tools from Fedora,\n' >&2
+	printf '  \e[1mschelf install --system …\e[0m adds services such as Tailscale to the system, or\n' >&2
 	printf '  run \e[1mtoolbox enter\e[0m first, then \e[1msudo dnf %s …\e[0m inside it.\n' "${action:-install}" >&2
 }
 

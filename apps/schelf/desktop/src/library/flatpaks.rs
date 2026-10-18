@@ -33,6 +33,7 @@ pub fn installed() -> Vec<InstalledApp> {
                 package: None,
                 path: None,
                 commands: Vec::new(),
+                services: Vec::new(),
                 id: item.id,
             }
         })

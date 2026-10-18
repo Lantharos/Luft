@@ -50,7 +50,10 @@ pub fn describe(app: &InstalledApp) -> String {
     } else {
         format!(" ({id})")
     };
-    format!("{}{id}, from {}", app.name, Origin::of(app.source).title())
+    match app.source {
+        Source::System => format!("{}, a system package", app.name),
+        source => format!("{}{id}, from {}", app.name, Origin::of(source).title()),
+    }
 }
 
 fn removal_job(app: &InstalledApp) -> Job {
@@ -68,6 +71,9 @@ fn removal_job(app: &InstalledApp) -> Job {
             package: app.package.clone().unwrap_or_default(),
         },
         Source::AppImage => Job::RemoveAppImage { id: app.id.clone() },
+        Source::System => Job::RemoveSystemPackages {
+            packages: vec![app.id.clone()],
+        },
     }
 }
 

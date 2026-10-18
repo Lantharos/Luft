@@ -4,6 +4,7 @@ export function removeJob(app: InstalledApp): Job {
 	if (app.source === 'flatpak') return { kind: 'removeFlatpak', installation: app.installation!, reference: app.reference! };
 	if (app.source === 'package') return { kind: 'removePackage', package: app.package! };
 	if (app.source === 'tool') return { kind: 'removeTool', package: app.package! };
+	if (app.source === 'system') return { kind: 'removeSystemPackages', packages: [app.id] };
 	return { kind: 'removeAppImage', id: app.id };
 }
 

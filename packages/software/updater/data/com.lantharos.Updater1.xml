@@ -9,6 +9,9 @@
 
     Download, SwitchVariant, Cancel and Apply need com.lantharos.updater.download; Rollback needs
     com.lantharos.updater.rollback. Status needs nothing.
+
+    A finished download also builds the system packages for the version it staged, before
+    Finished.
   -->
   <interface name="com.lantharos.Updater1">
     <property name="Downloading" type="b" access="read"/>
@@ -36,6 +39,32 @@
     <!-- Empty when the download succeeded. -->
     <signal name="Finished">
       <arg name="error" type="s"/>
+    </signal>
+  </interface>
+
+  <!--
+    Fedora packages added to the system as a system extension, rebuilt for every version of Luft
+    on the computer. Install and Remove need com.lantharos.updater.system-packages and return
+    once the running system uses the new set; Step tells how far they are. List needs nothing.
+  -->
+  <interface name="com.lantharos.Updater1.SystemPackages">
+    <property name="Busy" type="b" access="read"/>
+
+    <!-- JSON: {"requested": [names], "packages": [{"name", "version", "arch", "summary",
+         "requested", "units"}] merged now, dependencies included, "services": [units turned on],
+         "pending": true when the merged set isn't the requested one yet}. -->
+    <method name="List">
+      <arg name="packages" type="s" direction="out"/>
+    </method>
+    <method name="Install">
+      <arg name="names" type="as" direction="in"/>
+    </method>
+    <method name="Remove">
+      <arg name="names" type="as" direction="in"/>
+    </method>
+    <!-- "downloading", "building" or "starting". -->
+    <signal name="Step">
+      <arg name="step" type="s"/>
     </signal>
   </interface>
 </node>

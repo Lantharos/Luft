@@ -41,15 +41,18 @@ impl Command {
     pub fn usage(self) -> &'static str {
         match self {
             Self::Install => {
-                "install NAME|FILE...  [--flathub|--fedora] [-y]\n\n\
+                "install NAME|FILE...  [--flathub|--fedora|--system] [-y]\n\n\
                  Installs apps from Flathub and command-line tools from Fedora into your\n\
                  account, or a .rpm, .AppImage, .flatpakref or .flatpakrepo file. A name\n\
                  found in both is a desktop app from Flathub or a command-line tool from\n\
-                 Fedora; when that still leaves a choice, Schelf asks. You can write add instead of install."
+                 Fedora; when that still leaves a choice, Schelf asks. You can write add instead of install.\n\n\
+                 With --system, Fedora packages go into the system itself, for services such\n\
+                 as Tailscale or Docker. They're rebuilt with every update of Luft."
             }
             Self::Remove => {
-                "remove NAME...  [--flathub|--fedora|--appimage] [-y]\n\n\
-                 Removes apps, AppImages and command-line tools you installed."
+                "remove NAME...  [--flathub|--fedora|--appimage|--system] [-y]\n\n\
+                 Removes apps, AppImages and command-line tools you installed, and system\n\
+                 packages with everything they added."
             }
             Self::Search => {
                 "search QUERY  [--flathub|--fedora]\n\n\
@@ -62,8 +65,8 @@ impl Command {
                  Settings, under Updates."
             }
             Self::List => {
-                "list  [--flathub|--fedora|--appimage]\n\n\
-                 Shows what you installed, by where it came from."
+                "list  [--flathub|--fedora|--appimage|--system]\n\n\
+                 Shows what you installed, by where it came from, and the system packages."
             }
             Self::Info => {
                 "info NAME  [--flathub|--fedora|--appimage]\n\n\
@@ -156,6 +159,7 @@ pub fn help(program: &str, command: Option<Command>) -> String {
          \x20 info NAME             Show details\n\n\
          Options:\n\
          \x20 --flathub, --fedora, --appimage  Use only this source\n\
+         \x20 --system              Fedora packages for the whole system, such as services\n\
          \x20 -y, --yes             Go ahead without asking\n\
          \x20 -h, --help            Show help, also for a command\n\
          \x20 --version             Show the version\n\n\

@@ -1,8 +1,9 @@
 use std::path::PathBuf;
 
+use luft_app::block_on;
 use luft_software::flatpak::{self, FLATHUB, Installation};
 use luft_software::task::Task;
-use luft_software::{appimage, toolbox};
+use luft_software::{appimage, system_packages, toolbox};
 use serde::{Deserialize, Serialize};
 
 use crate::fedora;
@@ -61,6 +62,12 @@ pub enum Job {
     UpdateTools {
         packages: Vec<String>,
     },
+    InstallSystemPackages {
+        packages: Vec<String>,
+    },
+    RemoveSystemPackages {
+        packages: Vec<String>,
+    },
     #[serde(untagged)]
     Fedora(fedora::Job),
 }
@@ -73,10 +80,12 @@ impl Job {
             | Self::AddFlatpakRepo { .. }
             | Self::InstallAppImage { .. }
             | Self::InstallTool { .. }
-            | Self::InstallToolFile { .. } => Action::Install,
-            Self::RemoveFlatpak { .. } | Self::RemoveAppImage { .. } | Self::RemoveTool { .. } => {
-                Action::Remove
-            }
+            | Self::InstallToolFile { .. }
+            | Self::InstallSystemPackages { .. } => Action::Install,
+            Self::RemoveFlatpak { .. }
+            | Self::RemoveAppImage { .. }
+            | Self::RemoveTool { .. }
+            | Self::RemoveSystemPackages { .. } => Action::Remove,
             Self::UpdateFlatpaks { .. }
             | Self::UpdateAppImage { .. }
             | Self::UpdateTools { .. } => Action::Update,
@@ -115,6 +124,12 @@ impl Job {
             }
             Self::UpdateAppImage { id } => appimage::update(&appimage::find(id)?, task).map(|_| ()),
             Self::UpdateTools { packages } => toolbox::update(packages, task),
+            Self::InstallSystemPackages { packages } => {
+                block_on(system_packages::install(packages, task))
+            }
+            Self::RemoveSystemPackages { packages } => {
+                block_on(system_packages::remove(packages, task))
+            }
             Self::Fedora(job) => job.run(task),
         }
     }

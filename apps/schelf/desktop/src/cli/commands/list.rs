@@ -4,7 +4,7 @@ use crate::cli::Exit;
 use crate::cli::arguments::Arguments;
 use crate::cli::sources::{Origin, installed};
 use crate::cli::terminal::{self, Ink, Look, Table};
-use crate::library::InstalledApp;
+use crate::library::{InstalledApp, Source};
 
 fn shown_id(app: &InstalledApp) -> &str {
     app.package.as_deref().unwrap_or(&app.id)
@@ -20,6 +20,12 @@ fn extra(app: &InstalledApp) -> String {
     }
     if !app.commands.is_empty() {
         parts.push(app.commands.join(" "));
+    }
+    if !app.services.is_empty() {
+        parts.push(format!("runs {}", app.services.join(" ")));
+    }
+    if app.source == Source::System && app.version.is_none() {
+        parts.push("being set up".to_owned());
     }
     parts.join(", ")
 }
@@ -49,6 +55,7 @@ pub fn run(arguments: &Arguments) -> Exit {
     if apps.is_empty() {
         match arguments.only {
             Some(Origin::AppImage) => eprintln!("No AppImages are installed."),
+            Some(Origin::System) => eprintln!("There are no system packages."),
             Some(origin) => eprintln!("Nothing from {} is installed.", origin.title()),
             None => eprintln!("Nothing is installed yet."),
         }

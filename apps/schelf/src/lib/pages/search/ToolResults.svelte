@@ -65,7 +65,7 @@
 					{@const installed = library.tool(tool.package)}
 					<div class="row">
 						<button type="button" class="main" disabled={!installed} onclick={() => open(tool)}>
-							<AppArt icon={null} tool size={40} />
+							<AppArt icon={null} source="tool" size={40} />
 							<span class="flex min-w-0 flex-col gap-0.5">
 								<span class="truncate text-[14px] font-medium text-[var(--text)]">{tool.package}</span>
 								<span class="truncate text-[12.5px]" class:failed={operation?.state === 'failed'}>{operation?.state === 'failed' ? operation.error : tool.summary}</span>

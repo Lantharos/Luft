@@ -1,5 +1,6 @@
 mod appimages;
 mod flatpaks;
+mod system;
 mod tools;
 
 use gio::prelude::*;
@@ -18,6 +19,7 @@ pub enum Source {
     Package,
     AppImage,
     Tool,
+    System,
 }
 
 #[derive(Serialize, Clone, Debug)]
@@ -38,6 +40,7 @@ pub struct InstalledApp {
     pub package: Option<String>,
     pub path: Option<String>,
     pub commands: Vec<String>,
+    pub services: Vec<String>,
 }
 
 #[derive(Deserialize)]
@@ -57,12 +60,14 @@ pub fn installed() -> Vec<InstalledApp> {
         let flatpaks = scope.spawn(flatpaks::installed);
         let packages = scope.spawn(fedora::installed);
         let tools = (!fedora::available()).then(|| scope.spawn(tools::installed));
+        let system = scope.spawn(system::installed);
         let mut apps = appimages::installed();
         apps.extend(flatpaks.join().unwrap_or_default());
         apps.extend(packages.join().unwrap_or_default());
         if let Some(tools) = tools {
             apps.extend(tools.join().unwrap_or_default());
         }
+        apps.extend(system.join().unwrap_or_default());
         apps
     });
     apps.sort_by_cached_key(|app| app.name.to_lowercase());

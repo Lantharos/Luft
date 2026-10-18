@@ -7,6 +7,7 @@ Schelf is where you get apps on Luft. It finds, installs, updates and removes ap
 | Flathub | Your account; Flathub is added on first use |
 | AppImage | Your account, in `~/Applications`, with a menu entry, icon and automatic updates |
 | Fedora packages as command-line tools | Your account, in the default Toolbox container, with launchers in `~/.local/bin` |
+| System packages (`--system`) | Everyone, merged over Luft's image as a system extension and rebuilt with each update ([how](../../docs/system-packages.md)) |
 | System software sources | Everyone, through PackageKit, on regular Fedora installs only |
 
 Everything for regular Fedora installs lives in `desktop/src/fedora` and `src/lib/fedora`, and is switched off on Luft's image, where command-line tools take its place.

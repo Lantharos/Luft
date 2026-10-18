@@ -5,6 +5,7 @@ export const date = (seconds: number) => new Date(seconds * 1000).toLocaleDateSt
 export function sourceName(source: Source, origin: string) {
 	if (source === 'appImage') return 'AppImage';
 	if (source === 'tool') return 'Tools container';
+	if (source === 'system') return 'System package';
 	if (source === 'package') return origin || 'System package';
 	return origin === 'flathub' ? 'Flathub' : origin;
 }

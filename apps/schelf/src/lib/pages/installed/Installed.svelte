@@ -15,14 +15,18 @@
 
 	const EMPTY: Partial<Record<Filter, string>> = {
 		appImage: 'AppImages you add show up here, with a place in your app menu.',
-		tool: 'Command-line tools you install from search show up here.'
+		tool: 'Command-line tools you install from search show up here.',
+		system: 'Fedora packages you add to the system, such as services, show up here. Add one in Tern with schelf install --system.'
 	};
+
+	const NOUNS: Partial<Record<Filter, [string, string]>> = { tool: ['tool', 'tools'], system: ['package', 'packages'] };
 
 	let filter = $state<Filter>('all');
 	let removing = $state<InstalledApp | null>(null);
 
 	const shown = $derived(filter === 'all' ? library.installed : library.installed.filter((app) => app.source === filter));
 	const total = $derived(shown.reduce((sum, app) => sum + app.size, 0));
+	const noun = $derived((NOUNS[filter] ?? ['app', 'apps'])[shown.length === 1 ? 0 : 1]);
 
 	async function addAppImage() {
 		const path = await backend().chooseAppImage();
@@ -40,14 +44,14 @@
 				options={[
 					{ value: 'all', label: 'All' },
 					{ value: 'flatpak', label: 'Flatpak' },
-					fedora.available ? { value: 'package', label: 'System' } : { value: 'tool', label: 'Tools' },
+					...(fedora.available ? [{ value: 'package' as const, label: 'System' }] : [{ value: 'tool' as const, label: 'Tools' }, { value: 'system' as const, label: 'System' }]),
 					{ value: 'appImage', label: 'AppImage' }
 				]}
 				onchange={(value) => (filter = value)}
 			/>
 			<div class="flex items-center gap-3">
 				{#if library.loaded}
-					<span class="text-[13px] text-[var(--text-muted)]">{shown.length} {filter === 'tool' ? (shown.length === 1 ? 'tool' : 'tools') : shown.length === 1 ? 'app' : 'apps'} · {bytes(total)}</span>
+					<span class="text-[13px] text-[var(--text-muted)]">{shown.length} {noun}{total ? ` · ${bytes(total)}` : ''}</span>
 				{/if}
 				<button type="button" class="button" onclick={addAppImage}><Plus size={16} />Add AppImage</button>
 			</div>

@@ -19,6 +19,7 @@ dconf
 ddcutil
 desktop-file-utils
 egl-utils
+erofs-utils
 fedora-flathub-remote
 flatpak
 fprintd

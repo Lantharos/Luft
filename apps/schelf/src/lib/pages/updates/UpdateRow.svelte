@@ -25,7 +25,7 @@
 		{#if update.platform}
 			<span class="platform"><Layers size={20} /></span>
 		{:else}
-			<AppArt icon={update.icon} desktop={update.desktop} tool={update.source === 'tool'} size={40} />
+			<AppArt icon={update.icon} desktop={update.desktop} source={update.source} size={40} />
 		{/if}
 		<span class="flex min-w-0 flex-col gap-0.5">
 			<span class="name truncate">{update.name}</span>

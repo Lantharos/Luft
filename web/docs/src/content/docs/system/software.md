@@ -1,19 +1,20 @@
 ---
 title: Installing software
-description: Flatpak apps, AppImages, and command-line tools in a Toolbox container.
+description: Flatpak apps, AppImages, command-line tools in a Toolbox container, and system packages for services.
 sidebar:
   order: 3
 ---
 
-Luft's system is a sealed image, so nothing is installed into it. Apps and tools live next to it instead, in your account, where updates to the system can't break them and they can't break the system. [Schelf](/apps/schelf/) handles all three kinds.
+Luft's system is a sealed image, so apps and tools live next to it, in your account, where updates to the system can't break them and they can't break the system. The few things that have to be part of the system, such as Tailscale or Docker's daemon, are added as system packages. [Schelf](/apps/schelf/) handles all of them.
 
 | Kind | Where it goes | Updates |
 | --- | --- | --- |
 | Flatpak apps from Flathub | Your account | In Schelf, under Updates, or `schelf update` |
 | AppImages | `~/Applications`, with a menu entry and icon | By themselves, a few minutes after you sign in and every six hours |
 | Command-line tools from Fedora | A Toolbox container, with their commands in `~/.local/bin` | In Schelf, under Updates, or `schelf update` |
+| System packages from Fedora | The system, for everyone on the computer | With Luft, in [Settings](/system/updates/) |
 
-None of these need an administrator's password, in Schelf or in the terminal.
+Apps and tools don't need an administrator's password, in Schelf or in the terminal. System packages do.
 
 ## Flatpak
 
@@ -38,6 +39,31 @@ sudo dnf install gcc make     # inside the container
 
 Toolbox containers share your home folder, so files are where you expect them.
 
+## System packages
+
+Some software only works as part of the system: services that start with the computer, such as Tailscale or Docker, and udev rules for devices. These come from Fedora as system packages:
+
+```sh
+schelf install --system tailscale
+schelf list --system
+schelf remove --system tailscale
+```
+
+Luft builds a system extension from the packages and what they need, checks Fedora's signatures on every one, and lays it over the system, so their services start right away and with every start after. Schelf lists them under Installed, System, where they can be removed too.
+
+- **Services start by themselves.** Where Fedora has a say, such as starting Docker only when it's first used, that's what happens. Otherwise the services of the packages you asked for start with the computer, while those of packages that only came along stay off until something needs them. To keep one from starting, run `sudo systemctl mask` with its name.
+- **Updates bring them along.** When an update of Luft downloads, the system packages are built again for it, with their newest versions, before you restart. The version before keeps its own copy, so going back to it works as it did. If an update starts before they're ready, they're built as soon as the computer is online.
+- **Removing one leaves the system as it was.** Its services stop, and what it added goes: its settings in `/etc`, its data in `/var`, and the users and groups it made. Removing Docker deletes its images and containers. A service can still leave something it made on its own in a place nobody could tell was its, such as the empty `/etc/cni` Docker's containerd makes, and network changes such as Docker's bridge last until the next restart.
+- **The list is yours.** `/var/lib/luft/system-packages/packages` lists the packages you asked for, one per line.
+
+Some packages can't be system packages, and Schelf says why:
+
+- **Drivers.** With Secure Boot, the kernel only loads drivers signed with a key the computer trusts, and they can't be signed on the computer. NVIDIA's driver comes with Luft's [NVIDIA image](/system/nvidia/).
+- **SELinux policy.** Changing the security policy on the computer would keep Luft's own policy from being updated. That's why libvirt can't be a system package yet: it needs swtpm, which brings a policy of its own.
+- **Packages that would replace part of Luft**, such as a newer version of a library the system has. These work again after the next update of Luft.
+
+Everything else that needs the system to be changed, such as files in `/boot` or the startup image, stays out too.
+
 ## In the terminal
 
 The `schelf` command, or `sch` for short, does the same as the app:
@@ -49,7 +75,8 @@ The `schelf` command, or `sch` for short, does the same as the app:
 | `schelf remove ripgrep` | Removes something you installed |
 | `schelf search image editor` | Looks on Flathub and in Fedora at once, and through your AppImages |
 | `schelf update` | Updates apps, AppImages and tools. Luft itself updates in [Settings](/system/updates/) |
-| `schelf list` | Shows what you installed, by where it came from |
+| `schelf list` | Shows what you installed, by where it came from, and the system packages |
+| `schelf install --system tailscale` | Adds a Fedora package to the system ([more](#system-packages)) |
 | `schelf info gimp` | Shows the details from every place that has it |
 
 When a name is both on Flathub and in Fedora, a desktop app comes from Flathub and a command-line tool from Fedora. If that still leaves a choice, Schelf asks which one you mean. `--flathub` or `--fedora` picks the place yourself, `-y` goes ahead without asking, and `schelf --help` lists everything.
@@ -85,4 +112,4 @@ Removing and searching work the same way. Asking to upgrade the system points to
 
 ## What doesn't work
 
-Nothing installs into the system itself, by design: the system is the same signed image on every computer, so it can be checked at every start and updated or rolled back as a whole. That's why `dnf install` offers Schelf instead. Drivers and system parts come with Luft's updates.
+`dnf install` doesn't change the system itself, by design: the system is the same signed image on every computer, so it can be checked at every start and updated or rolled back as a whole. That's why `dnf install` offers Schelf instead, and why system packages are laid over the image rather than installed into it. Drivers and the rest of the system come with Luft's updates.

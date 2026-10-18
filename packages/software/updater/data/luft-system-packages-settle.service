@@ -1,0 +1,13 @@
+[Unit]
+Description=Add the users and configuration of the system packages
+DefaultDependencies=no
+After=systemd-sysext.service luft-system-packages-link.service
+Before=systemd-tmpfiles-setup.service sysinit.target
+ConditionPathExists=/run/extensions/luft-system-packages.raw
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/luft-updater settle-system-packages
+
+[Install]
+WantedBy=sysinit.target

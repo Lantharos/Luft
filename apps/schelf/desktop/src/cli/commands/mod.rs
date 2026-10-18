@@ -3,6 +3,7 @@ mod install;
 mod list;
 mod remove;
 mod search;
+mod system;
 mod update;
 
 use super::Exit;
@@ -11,7 +12,12 @@ use super::sources::{Catalog, Origin};
 use super::terminal::{Ink, prompt};
 
 pub fn run(arguments: &Arguments) -> Exit {
+    let system = arguments.only == Some(Origin::System);
     match arguments.command {
+        Command::Install if system => system::install(arguments),
+        Command::Search | Command::Info | Command::Update if system => {
+            system::explain(arguments.command)
+        }
         Command::Install => install::run(arguments),
         Command::Remove => remove::run(arguments),
         Command::Search => search::run(arguments),

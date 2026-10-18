@@ -11,6 +11,7 @@ use zbus::{Connection, interface};
 use super::PATH;
 use super::error::Error;
 use crate::bootc::{self, Fetch};
+use crate::system_packages;
 
 const DOWNLOAD: &str = "com.lantharos.updater.download";
 const ROLLBACK: &str = "com.lantharos.updater.rollback";
@@ -105,15 +106,26 @@ async fn follow(updater: InterfaceRef<Updater>, fetch: Fetch, idle: Arc<Idle>) {
         inner.downloaded.store(bytes, Ordering::Relaxed);
         let _ = inner.downloaded_changed(emitter).await;
     }
-    let error = match work.await {
-        Ok(Ok(())) => String::new(),
-        Ok(Err(error)) => format!("{error:#}"),
-        Err(_) => "The updater stopped unexpectedly.".to_owned(),
-    };
+    let result = work.await;
     let inner = updater.get().await;
     *inner.downloading.lock().expect("download lock") = None;
     let _ = inner.downloading_changed(emitter).await;
+    let error = match result {
+        Ok(Ok(())) => {
+            prepare_system_packages().await;
+            String::new()
+        }
+        Ok(Err(error)) => format!("{error:#}"),
+        Err(_) => "The updater stopped unexpectedly.".to_owned(),
+    };
     let _ = Updater::finished(emitter, &error).await;
+}
+
+async fn prepare_system_packages() {
+    let prepared = tokio::task::spawn_blocking(system_packages::prepare_staged).await;
+    if let Ok(Err(error)) = prepared {
+        eprintln!("Preparing the system packages for the update: {error:#}");
+    }
 }
 
 #[interface(name = "com.lantharos.Updater1")]

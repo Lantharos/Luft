@@ -1,0 +1,313 @@
+mod checks;
+mod rpm;
+mod stage;
+mod units;
+
+use std::collections::BTreeSet;
+use std::ffi::CString;
+use std::fs;
+use std::os::unix::ffi::OsStrExt;
+use std::path::{Path, PathBuf};
+use std::process::Command;
+
+use anyhow::{Context, Result, anyhow, bail};
+
+use super::manifest::{Build, Package};
+use super::requested::Requested;
+use super::{NAME, Step, declared, deployment};
+use crate::command::run;
+use stage::Layout;
+
+pub const CACHE: &str = "/var/cache/luft/system-packages";
+const WORK: &str = "/var/tmp/luft-system-packages.XXXXXX";
+const WORK_PREFIX: &str = "luft-system-packages.";
+const PERSIST: &str = "var/lib/dnf";
+const KEYS: &str = "usr/share/pki/rpm-gpg";
+const RELEASE: &str = "usr/lib/extension-release.d";
+
+struct Workspace {
+    path: PathBuf,
+    mounts: Vec<PathBuf>,
+}
+
+/// Clears what a build that was stopped, by a restart for example, left behind. Builds never
+/// overlap, and their mounts went away with their namespace.
+fn clear_stopped() {
+    let Some(parent) = Path::new(WORK).parent() else {
+        return;
+    };
+    for entry in fs::read_dir(parent).into_iter().flatten().flatten() {
+        if entry
+            .file_name()
+            .as_bytes()
+            .starts_with(WORK_PREFIX.as_bytes())
+        {
+            let _ = fs::remove_dir_all(entry.path());
+        }
+    }
+}
+
+impl Workspace {
+    fn new() -> Result<Self> {
+        clear_stopped();
+        let template = CString::new(WORK)?;
+        let mut template = template.into_bytes_with_nul();
+        let made = unsafe { libc::mkdtemp(template.as_mut_ptr().cast()) };
+        if made.is_null() {
+            return Err(std::io::Error::last_os_error()).context("Making a folder to build in");
+        }
+        template.pop();
+        Ok(Self {
+            path: PathBuf::from(String::from_utf8(template)?),
+            mounts: Vec::new(),
+        })
+    }
+
+    fn folder(&self, name: &str) -> Result<PathBuf> {
+        let path = self.path.join(name);
+        fs::create_dir_all(&path)?;
+        Ok(path)
+    }
+
+    fn mounted(&mut self, at: &Path) {
+        self.mounts.push(at.to_path_buf());
+    }
+}
+
+impl Drop for Workspace {
+    fn drop(&mut self) {
+        let unmounted = self.mounts.iter().rev().all(|at| {
+            Command::new("umount")
+                .arg(at)
+                .status()
+                .is_ok_and(|status| status.success())
+        });
+        if unmounted {
+            let _ = fs::remove_dir_all(&self.path);
+        }
+    }
+}
+
+struct OsRelease {
+    id: String,
+    version_id: String,
+}
+
+fn os_release(tree: &Path) -> Result<OsRelease> {
+    let text = fs::read_to_string(tree.join("usr/lib/os-release"))?;
+    let field = |key: &str| {
+        text.lines()
+            .find_map(|line| line.strip_prefix(key)?.strip_prefix('='))
+            .map(|value| value.trim_matches('"').to_owned())
+            .with_context(|| format!("The system names no {key}"))
+    };
+    Ok(OsRelease {
+        id: field("ID")?,
+        version_id: field("VERSION_ID")?,
+    })
+}
+
+fn download(root: &Path, release: &str, requested: &Requested, into: &Path) -> Result<()> {
+    run(Command::new("dnf")
+        .arg(format!("--installroot={}", root.display()))
+        .arg(format!("--releasever={release}"))
+        .arg(format!(
+            "--setopt=persistdir={}",
+            root.join(PERSIST).display()
+        ))
+        .args([
+            "--setopt=install_weak_deps=False",
+            "--setopt=countme=False",
+            "--assumeyes",
+            "--quiet",
+            "download",
+            "--resolve",
+        ])
+        .arg(format!("--destdir={}", into.display()))
+        .args(requested))
+    .map_err(|error| {
+        let message = error.to_string();
+        match message
+            .strip_prefix("No package \"")
+            .and_then(|rest| rest.split('"').next())
+        {
+            Some(name) => anyhow!("Fedora has no package called {name}."),
+            None => error,
+        }
+    })
+    .map(drop)
+}
+
+fn install(root: &Path, release: &str, rpms: &[rpm::Rpm]) -> Result<()> {
+    let prefix = format!("RPM-GPG-KEY-fedora-{release}-");
+    let keys: Vec<PathBuf> = fs::read_dir(root.join(KEYS))?
+        .flatten()
+        .map(|entry| entry.path())
+        .filter(|path| {
+            path.file_name()
+                .is_some_and(|name| name.as_bytes().starts_with(prefix.as_bytes()))
+        })
+        .collect();
+    if keys.is_empty() {
+        bail!("This system has no keys to check Fedora's packages with.");
+    }
+    run(Command::new("rpmkeys")
+        .arg(format!("--root={}", root.display()))
+        .arg("--import")
+        .args(&keys))?;
+    run(Command::new("rpm")
+        .arg(format!("--root={}", root.display()))
+        .args([
+            "--install",
+            "--noscripts",
+            "--notriggers",
+            "--define",
+            "_pkgverify_level all",
+        ])
+        .args(rpms.iter().map(|rpm| &rpm.path)))
+    .context("Installing the packages")
+    .map(drop)
+}
+
+fn release(stage: &Path, os: &OsRelease) -> Result<()> {
+    let folder = stage.join(RELEASE);
+    fs::create_dir_all(&folder)?;
+    fs::write(
+        folder.join(format!("extension-release.{NAME}")),
+        format!(
+            "ID={}\nVERSION_ID={}\nEXTENSION_RELOAD_MANAGER=1\n",
+            os.id, os.version_id
+        ),
+    )?;
+    Ok(())
+}
+
+fn label(tree: &Path, stage: &Path) -> Result<()> {
+    let contexts = tree.join("etc/selinux/targeted/contexts/files/file_contexts");
+    run(Command::new("setfiles")
+        .args(["-F", "-r"])
+        .arg(stage)
+        .arg(contexts)
+        .arg(stage))
+    .context("Labelling the files for SELinux")
+    .map(drop)
+}
+
+fn image(stage: &Path, at: &Path) -> Result<()> {
+    run(Command::new("mkfs.erofs")
+        .args(["--quiet", "-zlz4hc"])
+        .arg(at)
+        .arg(stage))
+    .context("Making the extension image")
+    .map(drop)
+}
+
+fn entries(folder: &Path, extension: &str) -> Vec<String> {
+    let mut names: Vec<String> = fs::read_dir(folder)
+        .into_iter()
+        .flatten()
+        .flatten()
+        .filter(|entry| {
+            entry
+                .path()
+                .extension()
+                .is_some_and(|found| found == extension)
+        })
+        .filter_map(|entry| entry.file_name().into_string().ok())
+        .collect();
+    names.sort();
+    names
+}
+
+/// Builds the system packages in `requested` for the deployment `digest` into `image`, from
+/// Fedora's repositories for that deployment's version, against the packages it has.
+pub fn build(
+    digest: &str,
+    requested: &Requested,
+    image_path: &Path,
+    step: &dyn Fn(Step),
+) -> Result<Build> {
+    let mut work = Workspace::new()?;
+    let (tree, upper, overlay, root) = (
+        work.folder("tree")?,
+        work.folder("upper")?,
+        work.folder("overlay")?,
+        work.folder("root")?,
+    );
+    let (rpms_folder, stage_folder) = (work.folder("rpms")?, work.folder("stage")?);
+    deployment::mount(digest, &tree)?;
+    work.mounted(&tree);
+    run(Command::new("mount")
+        .args(["-t", "overlay", "overlay", "-o"])
+        .arg(format!(
+            "lowerdir={},upperdir={},workdir={}",
+            tree.display(),
+            upper.display(),
+            overlay.display()
+        ))
+        .arg(&root))?;
+    work.mounted(&root);
+    let cache = root.join("var/cache/libdnf5");
+    fs::create_dir_all(CACHE)?;
+    fs::create_dir_all(&cache)?;
+    run(Command::new("mount").arg("--bind").arg(CACHE).arg(&cache))?;
+    work.mounted(&cache);
+
+    let os = os_release(&tree)?;
+    step(Step::Downloading);
+    download(&root, &os.version_id, requested, &rpms_folder)?;
+    let mut rpms = fs::read_dir(&rpms_folder)?
+        .flatten()
+        .map(|entry| rpm::query(&entry.path()))
+        .collect::<Result<Vec<_>>>()?;
+    rpms.sort_by(|left, right| left.name.cmp(&right.name));
+    let base: BTreeSet<String> = rpm::installed(&root)?.into_iter().collect();
+    checks::check(requested, &rpms, &base)?;
+
+    step(Step::Building);
+    install(&root, &os.version_id, &rpms)?;
+    let layout = Layout {
+        lower: &tree,
+        root: &root,
+        upper: &upper,
+        stage: &stage_folder,
+    };
+    let enabled = stage::enable(&layout, &rpms, requested)?;
+    stage::merged(&layout, &rpms)?;
+    let placed = stage::placed(&layout, &rpms)?;
+    release(&stage_folder, &os)?;
+    let names = rpms
+        .iter()
+        .map(|rpm| rpm.name.clone())
+        .chain(enabled.units.values().flatten().cloned());
+    let declared = declared::read(
+        &stage_folder,
+        placed.iter().map(|entry| entry.path.clone()),
+        names,
+    );
+    let build = Build {
+        requested: requested.clone(),
+        packages: rpms
+            .iter()
+            .map(|rpm| Package {
+                name: rpm.name.clone(),
+                version: rpm.version.clone(),
+                arch: rpm.arch.clone(),
+                summary: rpm.summary.clone(),
+                requested: requested.contains(&rpm.name),
+                units: enabled.units.get(&rpm.name).cloned().unwrap_or_default(),
+            })
+            .collect(),
+        enabled: enabled.enabled,
+        tmpfiles: entries(&stage_folder.join("usr/lib/tmpfiles.d"), "conf"),
+        udev_rules: !entries(&stage_folder.join("usr/lib/udev/rules.d"), "rules").is_empty(),
+        libraries: placed
+            .iter()
+            .any(|entry| entry.path.starts_with("/etc/ld.so.conf.d/")),
+        placed,
+        declared,
+    };
+    label(&tree, &stage_folder)?;
+    image(&stage_folder, image_path)?;
+    Ok(build)
+}

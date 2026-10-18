@@ -27,7 +27,7 @@ PackageKit and the image updater are reached over D-Bus, so their functions are 
 `System::current()` tells them apart at runtime:
 
 - **Packages**: a regular Fedora install. Packages, updates and offline updates go through PackageKit.
-- **Image**: a sealed system started from a bootc image with the composefs backend, such as `ghcr.io/lantharos/luft:45`, recognised by `composefs=` on the kernel command line. System updates are new versions of the image, with the previous version kept to go back to. Nothing is layered on the image: apps come from Flatpak and AppImages, and command-line tools from a Toolbox container.
+- **Image**: a sealed system started from a bootc image with the composefs backend, such as `ghcr.io/lantharos/luft:45`, recognised by `composefs=` on the kernel command line. System updates are new versions of the image, with the previous version kept to go back to. Nothing is layered on the image: apps come from Flatpak and AppImages, command-line tools from a Toolbox container, and the few Fedora packages that must be part of the system, such as services, are merged over it as a system extension.
 
 `LUFT_KERNEL_COMMAND_LINE` names a file to read in place of `/proc/cmdline`, to try either kind on any computer (see [Testing](../../docs/testing.md#image-systems)).
 
@@ -47,6 +47,7 @@ Changing the image needs root, so the image side talks to `luft-updater` (in `up
 | `packages` | Installing, removing and updating Fedora packages through PackageKit |
 | `image` | `Deployments` (`load`, `status`, `check`, `lacks`, `variant_offer`, `switch_size`), `download`, `switch`, `rollback`, and `downloading`, `follow` and `changes` for a download started anywhere |
 | `variant` | [`luft-variant`](../variant/README.md), which image suits this computer |
+| `system_packages` | `list`, `install` and `remove` Fedora packages merged over an image system as a system extension, through `luft-updater` |
 | `toolbox` | `available` lists Fedora's packages; `install`, `install_file`, `remove`, `installed`, `updates` and `update` manage them in the default Toolbox container, with their commands in `~/.local/bin` |
 | `classify` | `Classification::current()`, with `is_app`, `desktop_ids` and `apps`; cached until the RPM database or the applications folder changes |
 | `updates` | `PackageUpdates` (`load`, `apps`, `system`), `appimages()` for AppImages with an update, and `app_count` for every app update including Flatpak and AppImage |
@@ -85,6 +86,10 @@ Versions and release notes come from the image's labels:
 ## Command-line tools
 
 On image systems Schelf installs Fedora packages into the default Toolbox container, `fedora-toolbox-45`, creating it the first time from Fedora's toolbox image, pulled through Podman's API so the download shows its progress. Updates for the tools come from `dnf` inside the container and appear in Schelf's Updates. Each command a package puts in `/usr/bin` gets a small launcher in `~/.local/bin`, unless the system already has a command by that name, so it runs from Tern like any other. The list of tools installed this way is kept in `~/.local/share/luft/tools.json`.
+
+## System packages
+
+`luft-updater` also builds the system packages: Fedora packages merged over the image as one system extension, rebuilt for every version on the computer, including an update right after it downloads. [docs/system-packages.md](../../docs/system-packages.md) explains how. Changing them always asks for an administrator's password.
 
 ## Checks
 

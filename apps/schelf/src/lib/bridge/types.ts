@@ -1,6 +1,6 @@
 import type { Appearance } from '@luft/ui';
 
-export type Source = 'flatpak' | 'package' | 'appImage' | 'tool';
+export type Source = 'flatpak' | 'package' | 'appImage' | 'tool' | 'system';
 export type Installation = 'user' | 'system';
 
 export interface AppState extends Appearance {
@@ -25,6 +25,7 @@ export interface InstalledApp {
 	package: string | null;
 	path: string | null;
 	commands: string[];
+	services: string[];
 }
 
 export interface AppUpdate {
@@ -139,7 +140,8 @@ export type Job =
 	| { kind: 'updateFlatpaks'; installation: Installation; references: string[] }
 	| { kind: 'updatePackages'; packages: string[] }
 	| { kind: 'updateAppImage'; id: string }
-	| { kind: 'updateTools'; packages: string[] };
+	| { kind: 'updateTools'; packages: string[] }
+	| { kind: 'removeSystemPackages'; packages: string[] };
 
 export type OpenedFile =
 	| { kind: 'flatpakRef'; path: string; id: string; title: string; branch: string | null; url: string; runtime: boolean; summary: string | null; homepage: string | null; icon: string | null }

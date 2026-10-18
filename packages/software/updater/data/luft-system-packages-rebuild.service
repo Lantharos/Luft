@@ -1,0 +1,12 @@
+[Unit]
+Description=Build the system packages for this version of Luft
+Wants=network-online.target
+After=network-online.target
+ConditionPathExists=/run/luft/system-packages-rebuild
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/luft-updater rebuild-system-packages
+
+[Install]
+WantedBy=multi-user.target

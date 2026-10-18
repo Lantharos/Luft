@@ -5,7 +5,7 @@ const ICONS = 'https://dl.flathub.org/media/icons/128x128';
 const icon = (id: string) => `${ICONS}/${id}.png`;
 
 function installedApp(source: InstalledApp['source'], id: string, name: string, version: string, size: number, origin: string, extra: Partial<InstalledApp> = {}): InstalledApp {
-	const key = source === 'flatpak' ? `flatpak/${id}/x86_64/stable` : source === 'package' ? `package/${extra.package}` : source === 'tool' ? `tool/${id}` : `appimage/${id}`;
+	const key = source === 'flatpak' ? `flatpak/${id}/x86_64/stable` : source === 'package' ? `package/${extra.package}` : source === 'appImage' ? `appimage/${id}` : `${source}/${id}`;
 	return {
 		key,
 		source,
@@ -22,6 +22,7 @@ function installedApp(source: InstalledApp['source'], id: string, name: string, 
 		package: null,
 		path: null,
 		commands: [],
+		services: [],
 		...extra
 	};
 }
@@ -51,6 +52,13 @@ let installed: InstalledApp[] = [
 					package: 'ripgrep',
 					summary: tools[0].summary,
 					commands: ['rg']
+				}),
+				installedApp('system', 'tailscale', 'tailscale', '1.98.8-1.fc45', 0, 'Fedora', {
+					icon: null,
+					desktop: null,
+					package: 'tailscale',
+					summary: 'The easiest, most secure way to use WireGuard and 2FA',
+					services: ['tailscaled.service']
 				})
 			]
 		: [])

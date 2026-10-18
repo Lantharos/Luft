@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Sun, 18 Oct 2026 14:32:06 +0200
-Subject: [PATCH 39/41] backends: let virtual input devices flip the tablet
+Subject: [PATCH 39/42] backends: let virtual input devices flip the tablet
  mode switch
 
 Add clutter_virtual_input_device_notify_tablet_mode(), implemented by

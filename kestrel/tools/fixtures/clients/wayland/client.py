@@ -1,4 +1,5 @@
 import array
+import collections
 import mmap
 import os
 import socket
@@ -27,25 +28,33 @@ class Connection:
         self.socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         self.socket.connect(path)
         self.pending = b""
+        self.fds = []
+        self.queue = collections.deque()
 
     def send(self, target, opcode, payload=b"", fd=None):
         message = struct.pack("=II", target, (8 + len(payload)) << 16 | opcode) + payload
         ancillary = [(socket.SOL_SOCKET, socket.SCM_RIGHTS, array.array("i", [fd]))] if fd is not None else []
         self.socket.sendmsg([message], ancillary)
 
+    def read(self):
+        data, fds, _, _ = socket.recv_fds(self.socket, 65536, 16)
+        if not data:
+            raise SystemExit("The compositor closed the connection")
+        self.pending += data
+        self.fds += fds
+        while len(self.pending) >= 8:
+            sender, header = struct.unpack_from("=II", self.pending)
+            size = header >> 16
+            if len(self.pending) < size:
+                break
+            payload, self.pending = self.pending[8:size], self.pending[size:]
+            self.queue.append((sender, header & 0xFFFF, payload))
+
     def events(self):
         while True:
-            while len(self.pending) >= 8:
-                sender, header = struct.unpack_from("=II", self.pending)
-                size = header >> 16
-                if len(self.pending) < size:
-                    break
-                payload, self.pending = self.pending[8:size], self.pending[size:]
-                yield sender, header & 0xFFFF, payload
-            data = self.socket.recv(65536)
-            if not data:
-                raise SystemExit("The compositor closed the connection")
-            self.pending += data
+            while self.queue:
+                yield self.queue.popleft()
+            self.read()
 
     def bind(self, interfaces):
         self.send(DISPLAY, 1, struct.pack("=I", REGISTRY))

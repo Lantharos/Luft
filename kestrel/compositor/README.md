@@ -27,6 +27,7 @@ Kestrel runs on its own build of Mutter 51: the upstream release plus an ordered
 - `xdg-decoration` for Wayland apps that ask for server-side title bars, which the shell draws in the same style
 - A signal before a monitor turns, so the shell can animate rotation from a picture of the old orientation
 - `ext-idle-notify-v1`, so apps such as password managers can lock themselves after a while without use, sandboxed or not
+- `ext-data-control-v1`, so password managers can copy a password and clear it again while in the background: apps outside a sandbox always get it, Flatpak apps only when their ID is in `com.lantharos.kestrel` `clipboard-access-apps`
 - Virtual input devices that flip the tablet mode switch, for driving tablet mode in checks
 - Smaller fixes, each described in its patch
 

@@ -39,3 +39,4 @@
 0039-backends-let-virtual-input-devices-flip-the-tablet-m.patch
 0040-backends-tell-the-shell-before-a-monitor-turns.patch
 0041-wayland-tell-clients-when-the-user-goes-idle-with-ex.patch
+0042-wayland-let-trusted-clients-manage-the-clipboard-wit.patch

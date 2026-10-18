@@ -16,15 +16,17 @@
 	let notes = $state<Release | null>(null);
 
 	const busy = $derived(activity.running !== null);
-	const next = $derived(overview.switching ? null : (overview.staged ?? overview.available));
+	const next = $derived(overview.switching ? null : (overview.available ?? overview.staged));
+	const ready = $derived(next !== null && next === overview.staged);
 
 	const released = (release: Release) => (release.released ? `Released ${ago(release.released)}` : null);
 
 	const summary = (release: Release) => release.notes?.split('\n').find((line) => line.trim())?.trim() ?? 'Fixes and improvements across the system';
 
 	function describeNext(release: Release) {
-		const size = overview.staged || !overview.available?.size ? null : `${bytes(overview.available.size)} to download`;
-		return [versionName(release), released(release), size].filter(Boolean).join(' · ');
+		const size = ready || !overview.available?.size ? null : `${bytes(overview.available.size)} to download`;
+		const replaces = !ready && overview.staged ? `Replaces ${versionName(overview.staged).toLowerCase()}, which is waiting to install` : null;
+		return [versionName(release), released(release), size, replaces].filter(Boolean).join(' · ');
 	}
 </script>
 
@@ -38,7 +40,7 @@
 {:else if next}
 	<Section>
 		<Row title={summary(next)} description={describeNext(next)} truncate>
-			{#if overview.staged}
+			{#if ready}
 				<button type="button" class="button primary" disabled={busy} onclick={() => attempt(restart)}>Restart to install</button>
 			{:else if activity.running !== 'download'}
 				<button type="button" class="button primary" disabled={busy} onclick={() => attempt(download)}>Download</button>

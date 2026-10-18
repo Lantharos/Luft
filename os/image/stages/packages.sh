@@ -5,7 +5,7 @@ image="$(cd "$(dirname "$0")/.." && pwd)"
 needed="$1"
 source "$image/stages/rpmfusion.sh"
 
-mapfile -t runtime < <(cat "$image/packages/runtime.txt" "$needed" | sort -u)
+mapfile -t runtime < <(cat "$image/packages/runtime.txt" "$image/packages/fonts.txt" "$needed" | sort -u)
 dnf install -y --setopt=install_weak_deps=False "${runtime[@]}"
 
 use_rpmfusion

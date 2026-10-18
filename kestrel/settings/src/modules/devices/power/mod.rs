@@ -144,6 +144,8 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
         battery_low: level.is_some_and(|level| level >= LOW_WARNING_LEVEL),
         profile: active_profile,
         lid_closed: closed.unwrap_or(false),
+        sleeping: false,
+        locking_for_sleep: false,
         screen_off: false,
         virtual_machine: SystemdProxy::new(system)
             .await?
@@ -245,6 +247,8 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
                         power.lid_closed = closed;
                         if closed {
                             power.lid_closed_action(external_monitor.get().await.unwrap_or(false)).await;
+                        } else {
+                            power.wake().await;
                         }
                     }
                 }

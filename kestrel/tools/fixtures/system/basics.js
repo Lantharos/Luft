@@ -16,6 +16,10 @@ const LOGIN = `<node><interface name="org.freedesktop.login1.Manager">
   <property name="LidClosed" type="b" access="read"/>
   <signal name="PrepareForSleep"><arg type="b"/></signal>
 </interface></node>`;
+const LOGIN_CONTROL = `<node><interface name="com.lantharos.KestrelChecks.Login">
+  <method name="SetLidClosed"><arg type="b" direction="in"/></method>
+  <method name="PrepareForSleep"><arg type="b" direction="in"/></method>
+</interface></node>`;
 const LOGIN_USER = `<node><interface name="org.freedesktop.login1.User">
   <property name="Display" type="(so)" access="read"/>
 </interface></node>`;
@@ -60,7 +64,8 @@ export const BASIC_NAMES = ['org.freedesktop.login1', 'org.freedesktop.UPower', 
 const inhibitors = [];
 
 export function publishBasics(publish, calls) {
-  publish(LOGIN, {
+  let lidClosed = false;
+  const login = publish(LOGIN, {
     InhibitAsync([what, , , mode], invocation) {
       calls.push(`Inhibit ${what} ${mode}`);
       const held = Gio.Socket.new(Gio.SocketFamily.UNIX, Gio.SocketType.STREAM, Gio.SocketProtocol.DEFAULT);
@@ -73,8 +78,15 @@ export function publishBasics(publish, calls) {
     PowerOff: () => calls.push('PowerOff'),
     Reboot: () => calls.push('Reboot'),
     GetUser: () => '/org/freedesktop/login1/user/self',
-    LidClosed: false,
+    get LidClosed() { return lidClosed; },
   }, '/org/freedesktop/login1');
+  publish(LOGIN_CONTROL, {
+    SetLidClosed: closed => {
+      lidClosed = closed;
+      login.emit_property_changed('LidClosed', new GLib.Variant('b', closed));
+    },
+    PrepareForSleep: sleeping => login.emit_signal('PrepareForSleep', new GLib.Variant('(b)', [sleeping])),
+  }, '/com/lantharos/KestrelChecks/Login');
   publish(LOGIN_USER, {Display: ['c1', '/org/freedesktop/login1/session/c1']}, '/org/freedesktop/login1/user/self');
   publish(LOGIN_SESSION, {Active: true}, '/org/freedesktop/login1/session/c1');
   publish(WATCHDOG, {Report: (_stalledMs, compositor) => calls.push(`Report ${compositor}`)}, '/com/lantharos/Kestrel/Watchdog1');

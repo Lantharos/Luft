@@ -49,6 +49,8 @@ pub struct Power {
     pub battery_low: bool,
     pub profile: Option<String>,
     pub lid_closed: bool,
+    pub sleeping: bool,
+    pub locking_for_sleep: bool,
     pub screen_off: bool,
     pub virtual_machine: bool,
     pub warn_before_sleeping: bool,
@@ -297,9 +299,12 @@ impl Power {
             return;
         }
         self.screen_locked = locked;
+        let woke_before_locking = std::mem::take(&mut self.locking_for_sleep) && !self.sleeping;
         self.configure().await;
         if locked {
-            self.set_mode(Mode::Blank).await;
+            if !woke_before_locking {
+                self.set_mode(Mode::Blank).await;
+            }
             self.inhibitors.release_sleep();
         } else {
             self.inhibitors.hold_sleep().await;
@@ -321,11 +326,22 @@ impl Power {
         self.awake_until = Some(Instant::now() + AWAKE_AFTER_PLUGGING_IN);
     }
 
-    pub async fn lid_closed_action(&self, external_monitor: bool) {
+    pub async fn lid_closed_action(&mut self, external_monitor: bool) {
         let suspends = !external_monitor || !self.session_active;
-        if suspends && self.inhibited & SUSPEND_INHIBITED != 0 {
+        if !suspends || self.inhibited & SUSPEND_INHIBITED == 0 {
+            return;
+        }
+        if self.screen_locked {
+            self.set_mode(Mode::Blank).await;
+        } else {
             self.lock_screen().await;
         }
+    }
+
+    pub async fn wake(&mut self) {
+        self.awake_until = None;
+        self.withdraw_warning().await;
+        self.set_mode(Mode::Normal).await;
     }
 
     pub async fn lock_screen(&self) {
@@ -340,14 +356,17 @@ impl Power {
     }
 
     pub async fn prepare_for_sleep(&mut self, sleeping: bool) {
+        self.sleeping = sleeping;
         if sleeping {
             self.withdraw_warning().await;
-            if !self.settings.get::<bool>(SCREENSAVER, "lock-enabled") || self.screen_locked {
+            if self.settings.get::<bool>(SCREENSAVER, "lock-enabled") && !self.screen_locked {
+                self.locking_for_sleep = true;
+            } else {
                 self.screen(false).await;
                 self.inhibitors.release_sleep();
             }
         } else {
-            self.screen(true).await;
+            self.wake().await;
             self.inhibitors.hold_sleep().await;
         }
     }

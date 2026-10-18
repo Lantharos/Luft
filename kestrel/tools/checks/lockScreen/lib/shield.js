@@ -5,7 +5,7 @@ import {named, shown, shownStyled, styled} from '../../lib/actors.js';
 import {moveBy, press} from '../../lib/input.js';
 import {settled, waitUntil} from '../../lib/wait.js';
 
-const darkened = () => styled('lightbox', Main.uiGroup).some(actor => actor.visible);
+export const darkened = () => styled('lightbox', Main.uiGroup).some(actor => actor.visible);
 const promptShown = () => named('kestrel-lock-controls')?.opacity === 255 && shown(named('kestrel-lock-controls'));
 
 export const hint = () => shownStyled('login-dialog-hint')?.text ?? null;

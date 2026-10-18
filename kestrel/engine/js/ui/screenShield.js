@@ -100,6 +100,7 @@ export class ScreenShield extends Signals.EventEmitter {
         this._activationTime = 0;
         this._becameActiveId = 0;
         this._lockTimeoutId = 0;
+        this._fadeTimeoutId = 0;
 
         // The "long" lightbox is used for the longer (20 seconds) fade from session
         // to idle status, the "short" is used for quickly fading to black when locking
@@ -457,10 +458,11 @@ export class ScreenShield extends Signals.EventEmitter {
         if (params.fadeToBlack && params.animateFade) {
             // Take a beat
 
-            const id = GLib.timeout_add_once(GLib.PRIORITY_DEFAULT, MANUAL_FADE_TIME, () => {
+            this._fadeTimeoutId = GLib.timeout_add_once(GLib.PRIORITY_DEFAULT, MANUAL_FADE_TIME, () => {
+                this._fadeTimeoutId = 0;
                 this._activateFade(this._shortLightbox, MANUAL_FADE_TIME);
             });
-            GLib.Source.set_name_by_id(id, '[kestrel] this._activateFade');
+            GLib.Source.set_name_by_id(this._fadeTimeoutId, '[kestrel] this._activateFade');
         } else {
             if (params.fadeToBlack)
                 this._activateFade(this._shortLightbox, 0);
@@ -472,10 +474,34 @@ export class ScreenShield extends Signals.EventEmitter {
     }
 
     _wakeUpScreen() {
-        if (!this.active)
-            return; // already woken up, or not yet asleep
+        if (this._lockScreenState === MessageTray.State.SHOWING)
+            this._showLockScreenAwake();
+        else if (this._lockScreenState === MessageTray.State.SHOWN && !this.active)
+            this._stopFadingToBlack();
+        else if (!this.active)
+            return;
         this._onUserBecameActive();
         this.emit('wake-up-screen');
+    }
+
+    _showLockScreenAwake() {
+        this._lockDialogGroup.remove_all_transitions();
+        this._lockDialogGroup.translation_y = 0;
+        this._lockDialogGroup.opacity = 255;
+        this._lockScreenShown({fadeToBlack: false, animateFade: false});
+    }
+
+    _stopFadingToBlack() {
+        this._cancelFade();
+        this._shortLightbox.lightOff();
+        this._setActive(true);
+    }
+
+    _cancelFade() {
+        if (this._fadeTimeoutId === 0)
+            return;
+        GLib.source_remove(this._fadeTimeoutId);
+        this._fadeTimeoutId = 0;
     }
 
     get locked() {
@@ -534,6 +560,7 @@ export class ScreenShield extends Signals.EventEmitter {
             this._lockTimeoutId = 0;
         }
 
+        this._cancelFade();
         this._activationTime = 0;
         this._setActive(false);
         this._setLocked(false);

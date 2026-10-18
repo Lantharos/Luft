@@ -1,4 +1,5 @@
 mod measure;
+mod scope;
 
 use std::fs;
 use std::os::unix::fs::{MetadataExt, PermissionsExt};

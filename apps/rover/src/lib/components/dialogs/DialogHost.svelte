@@ -10,6 +10,7 @@
 	import { thumbnailSize, thumbnails } from '#lib/features/onscreen/thumbnails.svelte.js';
 	import { isDesktopRuntime } from '#lib/runtime.js';
 	import { settings } from '#lib/state/settings.svelte.js';
+	import type { FileEntry } from '#lib/types/index.js';
 	import CompressDialog from './archive/CompressDialog.svelte';
 	import EmptyTrashDialog from './trash/EmptyTrashDialog.svelte';
 	import AskDialog from './network/AskDialog.svelte';
@@ -47,6 +48,10 @@
 	});
 
 	$effect(() => thumbnails.resize(thumbnailSize(pixels)));
+
+	function driveAt(entries: FileEntry[]) {
+		return entries.length === 1 ? manager.drives.list.find((drive) => drive.mount_point === entries[0].path) : undefined;
+	}
 </script>
 
 <UndoToast />
@@ -58,7 +63,7 @@
 {/if}
 
 {#if dialog?.kind === 'properties'}
-	<PropertiesDialog entries={dialog.entries} onclose={dialogs.close} />
+	<PropertiesDialog entries={dialog.entries} drive={driveAt(dialog.entries)} onclose={dialogs.close} />
 {:else if dialog?.kind === 'rename'}
 	<BatchRenameDialog entries={dialog.entries} siblings={manager.entries} onclose={dialogs.close} />
 {:else if dialog?.kind === 'compress'}

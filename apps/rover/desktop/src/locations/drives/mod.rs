@@ -1,3 +1,4 @@
+mod mount_table;
 mod mounts;
 mod watch;
 mod windows;
@@ -13,6 +14,9 @@ use gio::prelude::*;
 use luft_app::launch;
 use serde::Serialize;
 
+#[cfg(test)]
+pub(crate) use mount_table::parse_mountinfo;
+pub(crate) use mount_table::{MountEntry, mount_table};
 pub use watch::watch_mounts;
 pub use windows::{closed_windows, open_windows};
 

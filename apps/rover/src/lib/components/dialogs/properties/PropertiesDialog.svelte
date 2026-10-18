@@ -3,7 +3,7 @@
 	import * as api from '#lib/api.js';
 	import * as features from '#lib/features/api.js';
 	import type { Measurement, Ownership } from '#lib/features/types.js';
-	import type { FileEntry } from '#lib/types/index.js';
+	import type { DriveInfo, FileEntry } from '#lib/types/index.js';
 	import type { FileDetails } from '#lib/types/details.js';
 	import { errorMessage, formatFullDate } from '#lib/utils/format.js';
 	import { parentPath } from '#lib/utils/paths.js';
@@ -12,10 +12,11 @@
 
 	interface Props {
 		entries: FileEntry[];
+		drive?: DriveInfo;
 		onclose: () => void;
 	}
 
-	let { entries, onclose }: Props = $props();
+	let { entries, drive, onclose }: Props = $props();
 
 	let details = $state.raw<FileDetails | null>(null);
 	let ownership = $state.raw<Ownership | null>(null);
@@ -23,10 +24,10 @@
 	let error = $state<string | null>(null);
 
 	let single = $derived(entries.length === 1 ? entries[0] : null);
-	let measured = $derived(entries.some((entry) => entry.is_dir) || entries.length > 1);
+	let measured = $derived(!drive && (entries.some((entry) => entry.is_dir) || entries.length > 1));
 	let locations = $derived(new Set(entries.map((entry) => parentPath(entry.path))));
-	let title = $derived(single?.name ?? plural(entries.length, 'item'));
-	let kind = $derived(single ? (details?.kind ?? '') : describeMix(entries));
+	let title = $derived(drive?.name ?? single?.name ?? plural(entries.length, 'item'));
+	let kind = $derived(drive ? 'Drive' : single ? (details?.kind ?? '') : describeMix(entries));
 	let octal = $derived(ownership ? (ownership.mode & 0o777).toString(8).padStart(3, '0') : '');
 
 	$effect(() => {
@@ -61,6 +62,7 @@
 	}
 
 	function sizeText() {
+		if (drive) return `${bytes(drive.used_space)} used of ${bytes(drive.total_space)}`;
 		if (!measured) return single ? `${bytes(single.size)} (${single.size.toLocaleString()} bytes)` : '';
 		if (!measurement) return 'Measuring…';
 		const contents = plural(measurement.files, 'file');
@@ -93,6 +95,7 @@
 	<dl class="grid grid-cols-[112px_minmax(0,1fr)] gap-x-4 gap-y-2.5 text-[13px]">
 		{@render row('Kind', kind)}
 		{@render row('Size', sizeText())}
+		{@render row('Free', drive ? bytes(drive.available_space) : '')}
 		{@render row('Location', locations.size === 1 ? [...locations][0] : 'Several folders')}
 		{#if single}
 			{@render row('Points to', details?.linkTarget ?? '')}

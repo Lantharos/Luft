@@ -12,6 +12,7 @@ import {checkNetwork} from './rover/network.js';
 const {require, eventually} = checks('Luft app');
 const DRAG = {steps: 24, interval: 30, hover: 300};
 const AT = {note: [338, 140], inbox: [330, 104], search: [142, 32]};
+const PLACES = {home: {menu: [70, 82], item: [141, 227]}, system: {menu: [70, 718], item: [141, 694]}};
 const SEARCH = {x: 12, y: 14, width: 236, height: 36};
 const CUT = [40, 23];
 const FOLDER = GLib.build_filenamev([GLib.get_home_dir(), 'Drag check']);
@@ -33,6 +34,15 @@ async function checkDrag(app) {
   require(!exists(GLib.build_filenamev([FOLDER, 'Note.txt'])), 'dragging a file onto a folder in Rover moves it there');
 }
 
+async function checkProperties(app) {
+  for (const [place, {menu, item}] of Object.entries(PLACES)) {
+    await changes(app, `right-clicking ${place} in Rover's sidebar opens its menu`, () => app.click(menu, Clutter.BUTTON_SECONDARY));
+    await changes(app, `Rover shows the properties of ${place}`, () => app.click(item));
+    (await app.settle(() => true)).save(`rover-properties-${place}`);
+    await changes(app, 'Escape closes the properties', () => press(Clutter.KEY_Escape));
+  }
+}
+
 async function checkTextMenu(app) {
   app.click(AT.search);
   await changes(app, 'Rover shows what is typed into its search', () => type('inbox'), SEARCH);
@@ -52,6 +62,7 @@ export async function run() {
         await showDark(app, palette);
         await checkDrag(app);
         await checkTextMenu(app);
+        await checkProperties(app);
       });
       const rclone = GLib.find_program_in_path('rclone');
       if (rclone) await checkNetwork(rclone);

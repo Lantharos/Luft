@@ -1,6 +1,8 @@
 use std::fs;
 use std::path::PathBuf;
 
+use super::mount_table::decode_field;
+
 const INCLUDED_FILESYSTEMS: &[&str] = &[
     "ext4",
     "ext3",
@@ -78,23 +80,4 @@ fn is_visible(device: &str, mount_point: &str, fs_type: &str) -> bool {
                         .strip_prefix(system)
                         .is_some_and(|rest| rest.starts_with('/'))
             }))
-}
-
-fn decode_field(value: &str) -> String {
-    let bytes = value.as_bytes();
-    let mut decoded = Vec::with_capacity(bytes.len());
-    let mut index = 0;
-    while index < bytes.len() {
-        if bytes[index] == b'\\'
-            && let Some(octal) = value.get(index + 1..index + 4)
-            && let Ok(byte) = u8::from_str_radix(octal, 8)
-        {
-            decoded.push(byte);
-            index += 4;
-            continue;
-        }
-        decoded.push(bytes[index]);
-        index += 1;
-    }
-    String::from_utf8_lossy(&decoded).into_owned()
 }

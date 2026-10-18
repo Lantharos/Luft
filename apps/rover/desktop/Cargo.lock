@@ -2580,6 +2580,7 @@ dependencies = [
  "percent-encoding",
  "regex",
  "roxmltree 0.21.1",
+ "rustc-hash 2.1.3",
  "sabine",
  "serde",
  "serde_json",

@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::os::unix::fs::MetadataExt;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::thread;
@@ -7,17 +7,32 @@ use std::time::Duration;
 use ignore::{WalkBuilder, WalkState};
 use luft_app::Events;
 use parking_lot::Mutex;
+use rustc_hash::FxHashSet;
 use serde::Serialize;
 
+use super::scope::{self, Scope};
 use crate::app::events::MEASURE_PROGRESS;
+use crate::locations::drives;
 
 const REPORT_INTERVAL: Duration = Duration::from_millis(120);
+const LINKED_SHARDS: usize = 32;
 
 #[derive(Default)]
 struct Totals {
     bytes: AtomicU64,
     files: AtomicU64,
     folders: AtomicU64,
+}
+
+#[derive(Default)]
+struct Linked([Mutex<FxHashSet<(u64, u64)>>; LINKED_SHARDS]);
+
+impl Linked {
+    fn first_sight(&self, device: u64, inode: u64) -> bool {
+        self.0[inode as usize % LINKED_SHARDS]
+            .lock()
+            .insert((device, inode))
+    }
 }
 
 #[derive(Serialize)]
@@ -57,11 +72,7 @@ impl Measurements {
         self.inner.active.lock().push((id, cancelled.clone()));
         let inner = self.inner.clone();
         thread::spawn(move || {
-            inner.run(
-                id,
-                paths.into_iter().map(PathBuf::from).collect(),
-                &cancelled,
-            );
+            inner.run(id, paths, &cancelled);
             inner.active.lock().retain(|(active, _)| *active != id);
         });
         id
@@ -81,14 +92,15 @@ impl Measurements {
 }
 
 impl Inner {
-    fn run(&self, id: u64, paths: Vec<PathBuf>, cancelled: &AtomicBool) {
-        let Some((first, rest)) = paths.split_first() else {
-            return;
-        };
+    fn run(&self, id: u64, paths: Vec<String>, cancelled: &AtomicBool) {
+        let scope = scope::plan(
+            paths.iter().map(|path| scope::resolve(path)).collect(),
+            &drives::mount_table(),
+        );
         let totals = Totals::default();
         let finished = AtomicBool::new(false);
-        thread::scope(|scope| {
-            let reporter = scope.spawn(|| {
+        thread::scope(|threads| {
+            let reporter = threads.spawn(|| {
                 loop {
                     thread::park_timeout(REPORT_INTERVAL);
                     if finished.load(Ordering::Acquire) || cancelled.load(Ordering::Acquire) {
@@ -97,35 +109,7 @@ impl Inner {
                     self.report(id, &totals, false);
                 }
             });
-            let mut builder = WalkBuilder::new(first);
-            for path in rest {
-                builder.add(path);
-            }
-            builder
-                .standard_filters(false)
-                .follow_links(false)
-                .threads(thread::available_parallelism().map_or(4, usize::from))
-                .build_parallel()
-                .run(|| {
-                    let totals = &totals;
-                    Box::new(move |entry| {
-                        if cancelled.load(Ordering::Relaxed) {
-                            return WalkState::Quit;
-                        }
-                        let Ok(entry) = entry else {
-                            return WalkState::Continue;
-                        };
-                        if entry.file_type().is_some_and(|kind| kind.is_dir()) {
-                            if entry.depth() > 0 {
-                                totals.folders.fetch_add(1, Ordering::Relaxed);
-                            }
-                        } else if let Ok(metadata) = entry.metadata() {
-                            totals.files.fetch_add(1, Ordering::Relaxed);
-                            totals.bytes.fetch_add(metadata.len(), Ordering::Relaxed);
-                        }
-                        WalkState::Continue
-                    })
-                });
+            walk(scope, &totals, cancelled);
             finished.store(true, Ordering::Release);
             reporter.thread().unpark();
         });
@@ -146,4 +130,48 @@ impl Inner {
             },
         );
     }
+}
+
+fn walk(scope: Scope, totals: &Totals, cancelled: &AtomicBool) {
+    let Some((first, rest)) = scope.roots.split_first() else {
+        return;
+    };
+    let mut builder = WalkBuilder::new(first);
+    for path in rest {
+        builder.add(path);
+    }
+    if !scope.skipped.is_empty() {
+        let skipped = scope.skipped;
+        builder.filter_entry(move |entry| {
+            !entry.file_type().is_some_and(|kind| kind.is_dir()) || !skipped.contains(entry.path())
+        });
+    }
+    let linked = Linked::default();
+    builder
+        .standard_filters(false)
+        .follow_links(false)
+        .threads(thread::available_parallelism().map_or(4, usize::from))
+        .build_parallel()
+        .run(|| {
+            let linked = &linked;
+            Box::new(move |entry| {
+                if cancelled.load(Ordering::Relaxed) {
+                    return WalkState::Quit;
+                }
+                let Ok(entry) = entry else {
+                    return WalkState::Continue;
+                };
+                if entry.file_type().is_some_and(|kind| kind.is_dir()) {
+                    if entry.depth() > 0 {
+                        totals.folders.fetch_add(1, Ordering::Relaxed);
+                    }
+                } else if let Ok(metadata) = entry.metadata()
+                    && (metadata.nlink() < 2 || linked.first_sight(metadata.dev(), metadata.ino()))
+                {
+                    totals.files.fetch_add(1, Ordering::Relaxed);
+                    totals.bytes.fetch_add(metadata.len(), Ordering::Relaxed);
+                }
+                WalkState::Continue
+            })
+        });
 }

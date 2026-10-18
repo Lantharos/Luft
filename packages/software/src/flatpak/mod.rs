@@ -1,3 +1,4 @@
+mod chromium;
 mod installed;
 mod permissions;
 mod remotes;
@@ -8,6 +9,7 @@ use std::process::Command;
 
 use serde::{Deserialize, Serialize};
 
+pub use chromium::integrate;
 pub use installed::{Installed, installed};
 pub use permissions::{Permissions, permissions};
 pub use remotes::{FLATHUB, ensure_flathub};

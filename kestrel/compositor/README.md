@@ -22,7 +22,7 @@ Kestrel runs on its own build of Mutter 51: the upstream release plus an ordered
 - Settings from `kestrel-settings` in place of gnome-settings-daemon, and default display scales aimed at 110 DPI
 - Recovery from GPU resets, from GNOME/mutter!5247 by Toluwaleke Ogundipe
 - Windows that appear after you moved on open behind and ask for attention instead of taking focus
-- Touchpad scrolling at the speed set by the touchpad's `scroll-speed` setting
+- Touchpad scrolling at the speed set by the touchpad's `scroll-speed` setting, and at the fingers' pace in apps built on Chromium older than 154, which would scroll twelve times too far
 - Title bars for X11 apps in Kestrel's style, colored from `~/.config/kestrel/appearance.css`
 - Smaller fixes, each described in its patch
 

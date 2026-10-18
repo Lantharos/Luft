@@ -7,7 +7,7 @@ use super::{Installation, columns, size};
 
 const LIST_COLUMNS: &str =
     "--columns=application:f,ref:f,origin:f,installation:f,name:f,version:f,size:f,options:f";
-const SYSTEM_EXPORTS: &str = "/var/lib/flatpak/exports/share/applications";
+const SYSTEM_INSTALLATION: &str = "/var/lib/flatpak";
 
 #[derive(Serialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -25,17 +25,28 @@ pub struct Installed {
 
 impl Installed {
     pub fn desktop_file(&self) -> PathBuf {
-        exports(self.installation).join(format!("{}.desktop", self.id))
+        location(self.installation)
+            .join("exports/share/applications")
+            .join(format!("{}.desktop", self.id))
+    }
+
+    pub fn deploy(&self) -> PathBuf {
+        location(self.installation)
+            .join("app")
+            .join(&self.reference)
+            .join("active")
     }
 }
 
-fn exports(installation: Installation) -> PathBuf {
-    match installation {
-        Installation::System => PathBuf::from(SYSTEM_EXPORTS),
-        Installation::User => dirs::data_dir()
-            .unwrap_or_default()
-            .join("flatpak/exports/share/applications"),
-    }
+fn location(installation: Installation) -> PathBuf {
+    let (variable, default) = match installation {
+        Installation::System => ("FLATPAK_SYSTEM_DIR", PathBuf::from(SYSTEM_INSTALLATION)),
+        Installation::User => (
+            "FLATPAK_USER_DIR",
+            dirs::data_dir().unwrap_or_default().join("flatpak"),
+        ),
+    };
+    std::env::var_os(variable).map_or(default, PathBuf::from)
 }
 
 pub fn installed() -> Result<Vec<Installed>, String> {

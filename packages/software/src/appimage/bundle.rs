@@ -7,12 +7,12 @@ use backhand::{FilesystemReader, InnerNode, Node, SquashfsFileReader};
 
 use super::elf;
 use super::library::IconSize;
+use crate::chromium;
 use crate::desktop::DesktopEntry;
 
 const MAX_LINKS: usize = 8;
 const THEMED_ICONS: &str = "/usr/share/icons/hicolor";
 const ELECTRON_MARKERS: [&str; 2] = ["/chrome-sandbox", "/resources/app.asar"];
-const CHROMIUM_MARKER: &str = "chrome_100_percent.pak";
 const IMAGE_EXTENSIONS: [&str; 2] = ["png", "svg"];
 
 pub struct Icon {
@@ -196,10 +196,10 @@ pub fn read(path: &Path) -> Result<Bundle, String> {
     let electron = ELECTRON_MARKERS
         .iter()
         .any(|marker| contents.nodes.contains_key(Path::new(marker)));
-    let chromium = contents
-        .nodes
-        .keys()
-        .any(|path| path.file_name().is_some_and(|name| name == CHROMIUM_MARKER));
+    let chromium = contents.nodes.keys().any(|path| {
+        path.file_name()
+            .is_some_and(|name| name == chromium::RESOURCES)
+    });
     Ok(Bundle {
         desktop_id: desktop
             .file_stem()

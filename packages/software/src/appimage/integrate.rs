@@ -6,14 +6,13 @@ use std::process::Command;
 
 use super::bundle::{self, Bundle};
 use super::library::{self, AppImage, IconSize};
+use crate::chromium;
 use crate::progress::Stage;
 use crate::task::{CANCELLED, Task};
 
 const PREFIX: &str = "appimage-";
 const CHUNK: usize = 1 << 20;
 const MAIN_GROUP: &str = "[Desktop Entry]";
-const ENABLE_FEATURES: &str = "--enable-features=";
-const FINGER_SCROLLING: &str = "WaylandUnscaledTouchpadScrolling:scroll_scaling_factor/1";
 
 fn failed(error: impl std::fmt::Display) -> String {
     error.to_string()
@@ -195,7 +194,7 @@ fn exec_line(original: &str, executable: &Path, bundle: &Bundle) -> String {
         arguments.insert(0, "--no-sandbox".into());
     }
     if bundle.chromium {
-        enable_feature(&mut arguments, FINGER_SCROLLING);
+        chromium::enable_finger_scrolling(&mut arguments);
     }
     let quoted = format!(
         "\"{}\"",
@@ -206,19 +205,6 @@ fn exec_line(original: &str, executable: &Path, bundle: &Bundle) -> String {
         .chain(arguments)
         .collect::<Vec<_>>()
         .join(" ")
-}
-
-fn enable_feature(arguments: &mut Vec<String>, feature: &str) {
-    match arguments
-        .iter_mut()
-        .find(|argument| argument.starts_with(ENABLE_FEATURES))
-    {
-        Some(features) => {
-            features.push(',');
-            features.push_str(feature);
-        }
-        None => arguments.insert(0, format!("{ENABLE_FEATURES}{feature}")),
-    }
 }
 
 fn desktop_entry(bundle: &Bundle, executable: &Path, icon: Option<&str>) -> String {

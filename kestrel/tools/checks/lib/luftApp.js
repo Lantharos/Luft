@@ -47,6 +47,8 @@ function command(name) {
   return {path: GLib.build_filenamev([GLib.get_home_dir(), '.local/share/sabine/apps', `com.lantharos.${name}`, 'install', name]), manifest: null};
 }
 
+export const appBinary = name => command(name).path;
+
 function readLines(stream, onLine) {
   const lines = new Gio.DataInputStream({base_stream: stream});
   const next = () => lines.read_line_async(GLib.PRIORITY_DEFAULT, null, (source, result) => {

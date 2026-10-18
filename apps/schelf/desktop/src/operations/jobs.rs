@@ -98,10 +98,14 @@ impl Job {
         match self {
             Self::InstallFlathub { id } => {
                 flatpak::ensure_flathub(Installation::User)?;
-                flatpak::install(Installation::User, FLATHUB, id, task)
+                flatpak::install(Installation::User, FLATHUB, id, task)?;
+                flatpak::integrate();
+                Ok(())
             }
             Self::InstallFlatpakRef { path } => {
-                flatpak::install_ref(Installation::User, path, task)
+                flatpak::install_ref(Installation::User, path, task)?;
+                flatpak::integrate();
+                Ok(())
             }
             Self::AddFlatpakRepo { path, name } => {
                 flatpak::add_remote(Installation::User, name, path)
@@ -120,7 +124,9 @@ impl Job {
                 references,
             } => {
                 let references: Vec<&str> = references.iter().map(String::as_str).collect();
-                flatpak::update(*installation, &references, task)
+                flatpak::update(*installation, &references, task)?;
+                flatpak::integrate();
+                Ok(())
             }
             Self::UpdateAppImage { id } => appimage::update(&appimage::find(id)?, task).map(|_| ()),
             Self::UpdateTools { packages } => toolbox::update(packages, task),

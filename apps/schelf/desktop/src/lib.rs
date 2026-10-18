@@ -9,7 +9,6 @@ mod operations;
 mod updates;
 
 use luft_app::{Events, GlassWindow};
-use luft_software::appimage;
 use sabine::SabineWindow;
 
 use operations::Queue;
@@ -38,7 +37,7 @@ pub fn run_app() -> ! {
         &events,
         |window| build_window(window, &queue),
         move |_| {
-            std::thread::spawn(appimage::repair);
+            std::thread::spawn(background::integrate_apps);
             luft_app::spawn(serve(served));
         },
     )

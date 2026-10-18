@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 use gio::prelude::*;
 use luft_software::appimage::{self, AppImage, Placement};
 use luft_software::task::{Cancel, Task};
-use luft_software::updates;
+use luft_software::{flatpak, updates};
 
 const SEEDS: &str = "/usr/share/luft/preinstall";
 const BROWSER_TYPES: [&str; 4] = [
@@ -19,6 +19,10 @@ pub fn run(command: &str) -> Option<i32> {
     let result = match command {
         "--preinstall" => preinstall(),
         "--update-apps" => update_apps(),
+        "--integrate-apps" => {
+            integrate_apps();
+            Ok(())
+        }
         _ => return None,
     };
     Some(match result {
@@ -137,4 +141,9 @@ fn update_apps() -> Result<(), String> {
     } else {
         Err(failures.join("\n"))
     }
+}
+
+pub fn integrate_apps() {
+    appimage::repair();
+    flatpak::integrate();
 }

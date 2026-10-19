@@ -10,5 +10,7 @@ export const repoDocs: RepoDoc[] = [
 	{ file: 'docs/cloud.md', slug: 'cloud', order: 7 },
 	{ file: 'docs/appearance.md', slug: 'appearance', order: 8 },
 	{ file: 'docs/motion.md', slug: 'motion', order: 9 },
-	{ file: 'docs/prompts.md', slug: 'prompts', order: 10 }
+	{ file: 'docs/prompts.md', slug: 'prompts', order: 10 },
+	{ file: 'docs/memory.md', slug: 'memory', order: 11 },
+	{ file: 'docs/system-packages.md', slug: 'system-packages', order: 12 }
 ];

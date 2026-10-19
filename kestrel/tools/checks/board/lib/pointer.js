@@ -5,7 +5,7 @@ import {nextFrame, waitUntil} from '../../lib/wait.js';
 import {board, boardResting} from './board.js';
 
 export const screenPoint = (view, viewport, x, y) => [viewport.x + (x - view.x) * view.scale, viewport.y + (y - view.y) * view.scale];
-export const clickOf = window => /@(-?\d+),(-?\d+)/.exec(window.get_title())?.slice(1).map(Number) ?? null;
+const clickOf = window => /@(-?\d+),(-?\d+)/.exec(window.get_title())?.slice(1).map(Number) ?? null;
 
 export function onScreen(window) {
   const rect = window.get_frame_rect();

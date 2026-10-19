@@ -7,7 +7,7 @@ import {waitUntil} from '../../lib/wait.js';
 import {removeTree, write} from '../lib/files.js';
 
 const STARTUP = 20000;
-export const DOMAIN = 'example.com';
+const DOMAIN = 'example.com';
 export const USERS = {alice: 'alice-password', bob: 'bob-password'};
 export const ALIASES = {alice: 'alice.work', bob: 'bob.desk'};
 const HEADERS = `import imaplib, sys

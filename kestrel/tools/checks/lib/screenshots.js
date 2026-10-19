@@ -47,7 +47,7 @@ export async function screenshot(area = null) {
   return stream.steal_as_bytes();
 }
 
-export class Frame {
+class Frame {
   constructor(bytes) {
     this.bytes = bytes;
     this._pixbuf = GdkPixbuf.Pixbuf.new_from_stream(Gio.MemoryInputStream.new_from_bytes(bytes), null);

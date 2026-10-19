@@ -3,7 +3,7 @@ const GiB = 1024 ** 3;
 
 import GLib from 'gi://GLib';
 
-export const KELVIN = 273.15;
+const KELVIN = 273.15;
 export const PASSPHRASE = 'correct horse';
 export const LINUX_DATA = '0fc63daf-8483-4772-8e79-3d69d8477de4';
 export const BASIC_DATA = 'ebd0a0a2-b9e5-4433-87c0-68b6b72699c7';
@@ -12,7 +12,7 @@ const BIOS_BOOT = '21686148-6449-6e6f-744e-656564454649';
 const MICROSOFT_RESERVED = 'e3c9e316-0b5c-4db8-817d-f92df00215ae';
 const WINDOWS_RECOVERY = 'de94bba4-06d1-4d40-a16a-bfd50179d6ac';
 const LINUX_SWAP = '0657fd6d-a4ab-43c4-84e5-0933c84b4f4f';
-export const SPACE_FOLDER = GLib.build_filenamev([GLib.get_user_state_dir(), 'luft-home', 'Space']);
+const SPACE_FOLDER = GLib.build_filenamev([GLib.get_user_state_dir(), 'luft-home', 'Space']);
 
 const drive = (id, props) => ({
   path: `/org/freedesktop/UDisks2/drives/${id}`,

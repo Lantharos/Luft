@@ -20,7 +20,7 @@ const USER = 'ada';
 const PASSWORD = 'correct-horse';
 const SIGN_IN_TIMEOUT = 30000;
 const QUIET = Gio.SubprocessFlags.STDOUT_SILENCE | Gio.SubprocessFlags.STDERR_SILENCE;
-export const FILES_ON_SERVER = {
+const FILES_ON_SERVER = {
   'Documents/Plan.md': '# Plan\n\n- Book the ferry\n- Pack the charger\n',
   'Documents/Budget.csv': 'Month,Rent,Food\nJanuary,950,310\n',
   'Photos/README.txt': 'Holiday photos\n',

@@ -15,10 +15,6 @@ export async function fold(tablet) {
   await waitUntil(() => seat.touch_mode === tablet, `touch mode turns ${tablet ? 'on' : 'off'}`);
 }
 
-export function bottomOf(monitor) {
-  return monitor.y + monitor.height;
-}
-
 export async function tap([x, y]) {
   touchscreen().notify_touch_down(now(), 0, x, y);
   await pause(60);

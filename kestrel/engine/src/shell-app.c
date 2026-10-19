@@ -14,6 +14,7 @@
 #include <meta/meta-context.h>
 #include <meta/meta-workspace-manager.h>
 
+#include "shell-app-memory-private.h"
 #include "shell-app-private.h"
 #include "shell-app-scope-private.h"
 #include "shell-enum-types.h"
@@ -1250,7 +1251,9 @@ shell_app_launch (ShellApp           *app,
 
   {
     g_autofd int journalfd = -1;
-    g_autoptr (ShellAppScope) scope = shell_app_scope_new ();
+    gboolean merge_memory = g_settings_get_boolean (shell_global_get_settings (global), "share-app-memory") &&
+                            shell_app_memory_can_merge (app->info);
+    g_autoptr (ShellAppScope) scope = shell_app_scope_new (merge_memory);
     ChildSetup setup = {
       .meta_context = shell_global_get_context (shell_global),
       .scope = scope,

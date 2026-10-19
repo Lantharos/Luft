@@ -88,6 +88,7 @@ libshell_public_headers = [
 
 libshell_private_headers = [
   'shell-app-private.h',
+  'shell-app-memory-private.h',
   'shell-app-scope-private.h',
   'shell-app-cache-private.h',
   'shell-app-system-private.h',
@@ -99,6 +100,7 @@ libshell_private_headers = [
 libshell_sources = [
   'kestrel-plugin.c',
   'shell-app.c',
+  'shell-app-memory.c',
   'shell-app-scope.c',
   'shell-app-system.c',
   'shell-blur-effect.c',

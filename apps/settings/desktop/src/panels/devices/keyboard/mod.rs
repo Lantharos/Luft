@@ -26,7 +26,7 @@ struct Link {
 
 fn open_keys(Link { link, token }: Link) -> Result<(), String> {
     let keys = gio_unix::DesktopAppInfo::new(KEYS).ok_or("Keys isn't installed")?;
-    keys.launch_uris(&[link.as_str()], Some(&launch::context(token.as_deref())))
+    launch::start(keys.upcast_ref(), &[link.as_str()], token.as_deref())
         .map_err(|error| error.to_string())
 }
 

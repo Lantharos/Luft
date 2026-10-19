@@ -78,7 +78,7 @@ pub fn installed() -> Vec<InstalledApp> {
 fn launch(Desktop { desktop, token }: Desktop) -> Result<(), String> {
     let info =
         gio_unix::DesktopAppInfo::new(&desktop).ok_or("That app isn't installed any more.")?;
-    info.launch(&[], Some(&luft_app::launch::context(token.as_deref())))
+    luft_app::launch::start(info.upcast_ref(), &[], token.as_deref())
         .map_err(|error| error.to_string())
 }
 

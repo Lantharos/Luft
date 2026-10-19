@@ -54,8 +54,7 @@ async fn restart(_: Value) -> Result<(), String> {
 
 fn open_disks(Token { token }: Token) -> Result<(), String> {
     let app = gio_unix::DesktopAppInfo::new(DISKS).ok_or("Disks isn't installed")?;
-    app.launch(&[], Some(&launch::context(token.as_deref())))
-        .map_err(|error| error.to_string())
+    launch::start(app.upcast_ref(), &[], token.as_deref()).map_err(|error| error.to_string())
 }
 
 pub fn register(window: SabineWindow) -> SabineWindow {

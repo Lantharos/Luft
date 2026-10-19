@@ -116,11 +116,7 @@ pub fn add(uris: &[String]) -> Result<(), String> {
 pub fn open_folder(token: Option<&str>) -> Result<(), String> {
     let folder = folder()?;
     fs::create_dir_all(&folder).map_err(failed)?;
-    gio::AppInfo::launch_default_for_uri(
-        &gio::File::for_path(&folder).uri(),
-        Some(&launch::context(token)),
-    )
-    .map_err(failed)
+    launch::open(&gio::File::for_path(&folder).uri(), token).map_err(failed)
 }
 
 fn changes_listing(event: gio::FileMonitorEvent) -> bool {

@@ -42,9 +42,8 @@ pub fn apps_for(path: &str) -> OpenWith {
 }
 
 pub fn launch(path: &str, app: &str, token: Option<&str>) -> Result<(), String> {
-    gio_unix::DesktopAppInfo::new(app)
-        .ok_or("This app is no longer installed")?
-        .launch(&[gio::File::for_path(path)], Some(&launch::context(token)))
+    let app = gio_unix::DesktopAppInfo::new(app).ok_or("This app is no longer installed")?;
+    launch::open_files(app.upcast_ref(), &[gio::File::for_path(path)], token)
         .map_err(|error| error.to_string())
 }
 

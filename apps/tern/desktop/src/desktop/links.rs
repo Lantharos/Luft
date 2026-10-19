@@ -7,6 +7,5 @@ pub fn open(uri: &str, token: Option<&str>) -> Result<(), String> {
     if !scheme.is_some_and(|scheme| OPENABLE_SCHEMES.contains(&scheme.as_str())) {
         return Err("This kind of link can't be opened".to_string());
     }
-    gio::AppInfo::launch_default_for_uri(uri, Some(&luft_app::launch::context(token)))
-        .map_err(|error| error.to_string())
+    luft_app::launch::open(uri, token).map_err(|error| error.to_string())
 }

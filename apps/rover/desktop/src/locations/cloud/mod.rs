@@ -46,8 +46,7 @@ pub fn is_cloud(path: &str) -> bool {
 }
 
 fn open(address: &str, token: Option<&str>) -> Result<(), String> {
-    gio::AppInfo::launch_default_for_uri(address, Some(&launch::context(token)))
-        .map_err(|error| error.to_string())
+    launch::open(address, token).map_err(|error| error.to_string())
 }
 
 async fn drives(events: Events, _: Value) -> Result<Vec<Drive>, String> {

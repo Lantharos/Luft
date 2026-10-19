@@ -98,8 +98,7 @@ fn open(Address { url, token }: Address) -> Result<(), String> {
     if !url.starts_with("https://") && !url.starts_with("http://") {
         return Err("That isn't a web address".to_owned());
     }
-    gio::AppInfo::launch_default_for_uri(&url, Some(&launch::context(token.as_deref())))
-        .map_err(|error| error.to_string())
+    launch::open(&url, token.as_deref()).map_err(|error| error.to_string())
 }
 
 async fn sign_in(

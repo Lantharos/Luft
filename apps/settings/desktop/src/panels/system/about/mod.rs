@@ -193,10 +193,8 @@ async fn about(_: Value) -> Result<About, String> {
 }
 
 fn launch_disks(argument: &str, token: Option<&str>) -> Result<(), String> {
-    gio_unix::DesktopAppInfo::new(DISKS)
-        .ok_or("Disks isn't installed")?
-        .launch_uris(&[argument], Some(&launch::context(token)))
-        .map_err(|error| error.to_string())
+    let disks = gio_unix::DesktopAppInfo::new(DISKS).ok_or("Disks isn't installed")?;
+    launch::start(disks.upcast_ref(), &[argument], token).map_err(|error| error.to_string())
 }
 
 const HOSTNAME_LENGTH: usize = 63;

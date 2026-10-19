@@ -58,8 +58,7 @@ fn install(events: &Events, Install { id, file }: Install) -> Result<(), String>
 }
 
 fn launch(uri: &str, token: Option<&str>) -> Result<(), String> {
-    gio::AppInfo::launch_default_for_uri(uri, Some(&launch::context(token)))
-        .map_err(|error| error.to_string())
+    launch::open(uri, token).map_err(|error| error.to_string())
 }
 
 fn open_page(Product { id, token }: Product) -> Result<(), String> {

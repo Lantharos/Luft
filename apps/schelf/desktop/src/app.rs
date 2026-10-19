@@ -53,8 +53,7 @@ fn open_url(Link { url, token }: Link) -> Result<(), String> {
     if !url.starts_with("https://") && !url.starts_with("http://") {
         return Err("Only web links can be opened.".into());
     }
-    gio::AppInfo::launch_default_for_uri(&url, Some(&launch::context(token.as_deref())))
-        .map_err(|error| error.to_string())
+    launch::open(&url, token.as_deref()).map_err(|error| error.to_string())
 }
 
 async fn state(_: Value) -> Result<AppState, String> {

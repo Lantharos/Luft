@@ -3,13 +3,15 @@
 
 #[cfg(feature = "launch")]
 mod context;
+#[cfg(feature = "launch")]
+mod start;
 
 use std::process::Command;
 
 use serde::Deserialize;
 
 #[cfg(feature = "launch")]
-pub use context::context;
+pub use start::{open, open_files, start};
 
 pub const TOKEN_VARIABLES: [&str; 2] = ["XDG_ACTIVATION_TOKEN", "DESKTOP_STARTUP_ID"];
 
@@ -49,8 +51,7 @@ pub fn open_web_link(uri: &str, token: Option<&str>) -> Result<(), String> {
     if !is_web_link(uri) {
         return Err("Only web and mail links open in other apps".to_owned());
     }
-    gio::AppInfo::launch_default_for_uri(uri, Some(&context(token)))
-        .map_err(|error| error.to_string())
+    open(uri, token).map_err(|error| error.to_string())
 }
 
 #[cfg(test)]

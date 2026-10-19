@@ -161,8 +161,7 @@ async fn set_preferences(preferences: Preferences) -> Result<(), String> {
 }
 
 fn open_apps(Token { token }: Token) -> Result<(), String> {
-    gio::AppInfo::launch_default_for_uri(APP_UPDATES, Some(&launch::context(token.as_deref())))
-        .map_err(|error| error.to_string())
+    launch::open(APP_UPDATES, token.as_deref()).map_err(|error| error.to_string())
 }
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {

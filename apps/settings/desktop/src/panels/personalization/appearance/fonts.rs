@@ -91,11 +91,7 @@ pub fn list(_: Value) -> Result<Vec<Family>, String> {
 
 pub fn open(Open { file, token }: Open) -> Result<(), String> {
     let magpie = gio_unix::DesktopAppInfo::new(MAGPIE).ok_or("Magpie isn't installed")?;
-    magpie
-        .launch(
-            &[gio::File::for_path(file)],
-            Some(&launch::context(token.as_deref())),
-        )
+    launch::open_files(magpie.upcast_ref(), &[gio::File::for_path(file)], token.as_deref())
         .map_err(|error| error.to_string())
 }
 

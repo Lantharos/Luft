@@ -123,10 +123,8 @@ pub fn eject_drive(mount_point: String) -> Result<(), String> {
 }
 
 fn launch_disks(argument: &str, token: Option<&str>) -> Result<(), String> {
-    gio_unix::DesktopAppInfo::new(DISKS)
-        .ok_or("Disks isn't installed")?
-        .launch_uris(&[argument], Some(&launch::context(token)))
-        .map_err(|error| error.to_string())
+    let disks = gio_unix::DesktopAppInfo::new(DISKS).ok_or("Disks isn't installed")?;
+    launch::start(disks.upcast_ref(), &[argument], token).map_err(|error| error.to_string())
 }
 
 pub fn manage(mount_point: &str, token: Option<&str>) -> Result<(), String> {

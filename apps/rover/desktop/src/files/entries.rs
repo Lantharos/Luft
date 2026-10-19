@@ -178,11 +178,7 @@ pub fn user_dirs() -> Result<UserDirs, String> {
 }
 
 pub fn open_with_default(path: &str, token: Option<&str>) -> Result<(), String> {
-    gio::AppInfo::launch_default_for_uri(
-        &gio::File::for_path(path).uri(),
-        Some(&launch::context(token)),
-    )
-    .map_err(|error| error.to_string())
+    launch::open(&gio::File::for_path(path).uri(), token).map_err(|error| error.to_string())
 }
 
 pub(crate) fn file_entry(path: &Path) -> std::io::Result<FileEntry> {

@@ -238,8 +238,7 @@ fn register_volumes(window: SabineWindow) -> SabineWindow {
 
 fn open_folder(path: &str, token: Option<&str>) -> Result<(), String> {
     let uri = gio::File::for_path(path).uri();
-    gio::AppInfo::launch_default_for_uri(&uri, Some(&luft_app::launch::context(token)))
-        .map_err(|error| error.to_string())
+    luft_app::launch::open(&uri, token).map_err(|error| error.to_string())
 }
 
 fn register_encryption(window: SabineWindow) -> SabineWindow {

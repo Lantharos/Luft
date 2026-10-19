@@ -59,7 +59,7 @@ export const PANEL_PAGES: Page<PanelId>[][] = [
 		page('accessibility', 'Accessibility', 'preferences-desktop-accessibility-symbolic', ['a11y', 'universal access', 'screen reader', 'orca', 'zoom', 'magnifier', 'large text', 'high contrast', 'contrast', 'reduce animations', 'reduce motion', 'cursor size', 'on-screen keyboard', 'screen keyboard', 'sticky keys', 'slow keys', 'bounce keys', 'mouse keys', 'dwell click', 'hover click', 'right-click', 'locate pointer', 'find pointer', 'visual alerts', 'flash', 'hearing', 'vision'])
 	],
 	[
-		page('apps', 'Apps', 'view-app-grid-symbolic', ['default apps', 'browser', 'startup', 'autostart']),
+		page('apps', 'Apps', 'view-app-grid-symbolic', ['default apps', 'browser', 'startup', 'autostart', 'memory', 'share memory']),
 		page('privacy', 'Privacy', 'preferences-system-privacy-symbolic', ['screen lock', 'location', 'camera', 'microphone', 'recent files', 'file history', 'trash', 'temporary files']),
 		page('security', 'Security', 'security-high-symbolic', ['secure boot', 'tpm', 'encryption', 'disk encryption', 'bitlocker', 'luks', 'recovery key', 'pin', 'firmware', 'hardware security', 'signing key', 'usb', 'passwords', 'keyring', 'passkeys'])
 	],

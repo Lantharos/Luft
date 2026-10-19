@@ -9,7 +9,7 @@ typedef struct _ShellAppScope ShellAppScope;
 
 void shell_app_scope_init (void);
 
-ShellAppScope *shell_app_scope_new (void);
+ShellAppScope *shell_app_scope_new (gboolean merge_memory);
 ShellAppScope *shell_app_scope_ref (ShellAppScope *scope);
 void shell_app_scope_unref (ShellAppScope *scope);
 

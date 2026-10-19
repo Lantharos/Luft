@@ -192,8 +192,7 @@ pub fn sign_in(
     if let Some(hint) = hint {
         authorize.query_pairs_mut().append_pair("login_hint", hint);
     }
-    gio::AppInfo::launch_default_for_uri(authorize.as_str(), Some(&launch::context(token)))
-        .map_err(|error| error.to_string())?;
+    launch::open(authorize.as_str(), token).map_err(|error| error.to_string())?;
     let code = wait_for_code(&listener, &state)?;
     let mut form = vec![
         ("grant_type", "authorization_code"),

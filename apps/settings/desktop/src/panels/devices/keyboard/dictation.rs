@@ -28,8 +28,7 @@ fn open_homepage(Homepage { url, token }: Homepage) -> Result<(), String> {
     if !url.starts_with("https://") {
         return Err("That isn't a web address".to_owned());
     }
-    gio::AppInfo::launch_default_for_uri(&url, Some(&launch::context(token.as_deref())))
-        .map_err(|error| error.to_string())
+    launch::open(&url, token.as_deref()).map_err(|error| error.to_string())
 }
 
 async fn watch(events: Events) {

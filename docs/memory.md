@@ -16,3 +16,10 @@ When apps ask for more memory than the computer has, Luft closes the app using t
 - If the kernel ever closes a process inside Kestrel's own group, the session keeps running.
 
 GPU memory on integrated graphics (GTT) is ordinary memory that the kernel doesn't count toward any app, so a GPU-heavy app only shows up through the pressure it causes.
+
+## Sharing memory between apps
+
+Apps made with Sabine, which includes every Luft app, start with kernel same-page merging turned on: the kernel looks for memory pages with the same contents, within one app or across several, and keeps a single copy. Web browsers never take part, since a web page could time its own memory writes to learn what other programs hold, and apps that Luft's apps open, such as a browser for a link, start without it too.
+
+The kernel scans 200 pages a second, waking every 5 seconds, which costs about a tenth of a percent of one processor core while such apps run and nothing otherwise. Two open apps settle around 10 to 20 MB smaller after a quarter of an hour.
+Settings › Apps › Share memory between apps turns it off for apps opened afterwards. Mailman takes part when it starts in the background at sign in either way.

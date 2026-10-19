@@ -93,8 +93,7 @@ fn open_attachment(state: &MailmanState, part: Part) -> Result<(), String> {
     let path = folder.join(safe_name(&name));
     std::fs::write(&path, bytes).map_err(|error| error.to_string())?;
     let uri = gio::File::for_path(&path).uri();
-    gio::AppInfo::launch_default_for_uri(&uri, Some(&launch::context(part.token.as_deref())))
-        .map_err(|error| error.to_string())
+    launch::open(&uri, part.token.as_deref()).map_err(|error| error.to_string())
 }
 
 async fn save_attachment(state: MailmanState, part: Part) -> Result<Option<String>, String> {

@@ -23,8 +23,7 @@ pub fn others(path: &Path) -> Vec<App> {
 
 pub fn open_with(path: &Path, app: &str, token: Option<&str>) -> Result<(), String> {
     let info = gio_unix::DesktopAppInfo::new(app).ok_or("That app is no longer installed")?;
-    info.launch(&[gio::File::for_path(path)], Some(&launch::context(token)))
-        .map_err(failed)
+    launch::open_files(info.upcast_ref(), &[gio::File::for_path(path)], token).map_err(failed)
 }
 
 pub fn open_uri(uri: &str, token: Option<&str>) -> Result<(), String> {

@@ -85,7 +85,9 @@ install_authenticator() {
 }
 
 remove_authenticator() {
-  sudo systemctl disable --now kestrel-authenticate.socket || true
+  if [[ -e /usr/local/lib/systemd/system/kestrel-authenticate.socket ]]; then
+    sudo systemctl disable --now kestrel-authenticate.socket
+  fi
   authenticator_units | while read -r unit; do sudo rm -f "/usr/local/lib/systemd/system/$unit"; done
   sudo systemctl daemon-reload
 }
@@ -135,11 +137,19 @@ installed_files() {
     | sed "s|^$prefix/||" | grep -vxF -f <(compositor_extras) | sort -u
 }
 
+remove_empty_folders() {
+  local folder="$1"
+  while [[ "$folder" != "$prefix" && -d "$folder" && -z "$(ls -A "$folder")" ]]; do
+    as_owner "$prefix" rmdir "$folder"
+    folder="$(dirname "$folder")"
+  done
+}
+
 remove_from_prefix() {
   while IFS= read -r file; do
     [[ -d "$prefix/$file" && ! -L "$prefix/$file" ]] && continue
     as_owner "$prefix" rm -f "$prefix/$file"
-    as_owner "$prefix" rmdir -p --ignore-fail-on-non-empty "$(dirname "$prefix/$file")" 2>/dev/null || true
+    remove_empty_folders "$(dirname "$prefix/$file")"
   done
 }
 

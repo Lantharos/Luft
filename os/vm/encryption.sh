@@ -58,7 +58,7 @@ start() {
 }
 
 restart() {
-  "$os/vm/control.py" shell 'systemctl reboot' --timeout 5 > /dev/null || true
+  "$os/vm/control.py" shell 'systemctl reboot' --timeout 5 > /dev/null
   sleep 20
   wait_for_login
 }

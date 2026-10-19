@@ -61,7 +61,7 @@ remove_everything() {
   sudo rm -f "$dracut_config"
   if [[ -f "$manifest" ]]; then
     xargs -a "$manifest" sudo rm -f
-    xargs -a "$manifest" -n1 dirname | sort -ru | xargs sudo rmdir --ignore-fail-on-non-empty 2>/dev/null || true
+    xargs -a "$manifest" -n1 dirname | sort -ru | xargs -r -d '\n' sudo rmdir --ignore-fail-on-non-empty
     sudo rm -f "$manifest"
     sudo rmdir --ignore-fail-on-non-empty "$(dirname "$manifest")"
   fi

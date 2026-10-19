@@ -26,11 +26,20 @@ function inSnap(pid: number): boolean {
   }
 }
 
+export function sandboxedProcess(pid: number): boolean {
+  return inFlatpak(pid) || inSnap(pid);
+}
+
 export async function sandboxed(sender: string): Promise<boolean> {
   try {
-    const pid = await processOf(sender);
-    return inFlatpak(pid) || inSnap(pid);
+    return sandboxedProcess(await processOf(sender));
   } catch {
     return true;
   }
+}
+
+export async function refuseSandboxed(invocation: Gio.DBusMethodInvocation, action: string): Promise<boolean> {
+  if (!await sandboxed(invocation.get_sender()!)) return false;
+  invocation.return_dbus_error('org.freedesktop.DBus.Error.AccessDenied', `Sandboxed apps cannot ${action}`);
+  return true;
 }

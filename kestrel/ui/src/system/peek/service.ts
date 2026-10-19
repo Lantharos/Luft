@@ -4,6 +4,7 @@ import GLib from 'gi://GLib';
 import type Meta from 'gi://Meta';
 
 import { stealFd } from '../../auth/keyring/prompter.js';
+import { sandboxedProcess } from '../../shared/sandbox.js';
 import { callerProcess, type Caller } from './access/callers.js';
 import type { Level } from './access/prompt.js';
 import { PidFd } from './access/processes.js';
@@ -195,6 +196,7 @@ export class PeekService {
     try {
       process = await callerProcess(invocation);
       const pid = process.pid;
+      if (pid && sandboxedProcess(pid)) throw new PeekError('Denied', 'Sandboxed apps cannot see or use other windows');
       const caller = pid ? this.policy.identify(pid) : null;
       if (!caller || process.pid !== pid) throw new PeekError('Denied', 'The program asking ended or could not be recognized');
       this.policy.admit(caller);

@@ -620,6 +620,9 @@ class EndSessionDialog extends ModalDialog.ModalDialog {
     }
 
     async OpenAsync(parameters, invocation) {
+        if (await KestrelUi.refuseSandboxed(invocation, 'ask to end the session'))
+            return;
+
         const [type, timestamp_, totalSecondsToStayOpen, inhibitorObjectPaths] = parameters;
         this._totalSecondsToStayOpen = totalSecondsToStayOpen;
         this._type = type;

@@ -61,6 +61,25 @@ async function checkPortalBackend(app) {
   'apps cannot type into a remote control session without the desktop portal');
 }
 
+async function checkShellServices(app) {
+  const denied = async (path, iface, method, parameters, label) =>
+    require(await failure(app.call(path, iface, method, parameters)) === ACCESS_DENIED, label);
+  require(`${await failure(app.call('/com/lantharos/Kestrel/Peek', 'com.lantharos.Kestrel.Peek', 'List', new GLib.Variant('(s)', ['']))) ?? ''}`.endsWith('Denied'),
+    'sandboxed apps cannot see or use other windows through peek');
+  await denied('/com/lantharos/Kestrel/Passkeys', 'com.lantharos.Kestrel.Passkeys1', 'Open', new GLib.Variant('(a{sv})', [{}]),
+    'sandboxed apps cannot open passkey prompts');
+  await denied('/com/lantharos/Kestrel/Brightness', 'com.lantharos.Kestrel.Brightness', 'SetDimming', new GLib.Variant('(b)', [true]),
+    'sandboxed apps cannot dim the screen');
+  await denied('/org/gtk/Notifications', 'org.gtk.Notifications', 'AddNotification',
+    new GLib.Variant('(ssa{sv})', ['com.obsproject.Studio', 'impostor', {title: new GLib.Variant('s', 'Recording stopped')}]),
+    'sandboxed apps cannot show notifications in the name of other apps');
+  await denied('/org/gtk/MountOperationHandler', 'org.Gtk.MountOperationHandler', 'AskPassword',
+    new GLib.Variant('(sssssu)', ['impostor', 'Enter your password', '', '', '', 0]), 'sandboxed apps cannot ask for passwords as the system');
+  await denied(`${MANAGER[0]}/EndSessionDialog`, `${MANAGER[1]}.EndSessionDialog`, 'Open', new GLib.Variant('(uuuao)', [0, 0, 60, []]),
+    'sandboxed apps cannot open the dialog that ends the session');
+  require(Main.modalCount === 0, 'no system dialog opened for a sandboxed app');
+}
+
 async function checkLockScreen(app) {
   await lock();
   try {
@@ -74,10 +93,21 @@ async function checkLockScreen(app) {
 }
 
 async function checkShellConnection() {
-  const app = await sandboxedApp('org.gnome.ScreenSaver');
+  const app = await sandboxedApp('org.gnome.Shell');
   try {
     await checkPortalBackend(app);
+    await checkShellServices(app);
+  } finally {
+    await app.close();
+  }
+}
+
+async function checkScreenSaver() {
+  const app = await sandboxedApp('org.gnome.ScreenSaver');
+  try {
     await checkLockScreen(app);
+    require(await failure(app.call('/org/gnome/Mutter/RemoteDesktop', 'org.gnome.Mutter.RemoteDesktop', 'CreateSession', null, '(o)')) !== null,
+      'apps allowed to use the screen saver cannot control the computer');
   } finally {
     await app.close();
   }
@@ -101,5 +131,6 @@ async function checkTray() {
 export async function run() {
   await checkSessionManager();
   await checkShellConnection();
+  await checkScreenSaver();
   await checkTray();
 }

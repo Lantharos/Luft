@@ -619,7 +619,10 @@ export class GnomeShellMountOpHandler {
      * @param {Gio.DBusMethodInvocation} invocation
      *      The ID must be unique in the context of the calling process.
      */
-    AskPasswordAsync(params, invocation) {
+    async AskPasswordAsync(params, invocation) {
+        if (await KestrelUi.refuseSandboxed(invocation, 'ask for passwords'))
+            return;
+
         const [id, message, iconName_, defaultUser_, defaultDomain_, flags] = params;
 
         if (this._setCurrentRequest(invocation, id, ShellMountOperationType.ASK_PASSWORD)) {
@@ -668,7 +671,10 @@ export class GnomeShellMountOpHandler {
      *   {string[]} choices: an array of choice strings
      * @param {Gio.DBusMethodInvocation} invocation - invocation
      */
-    AskQuestionAsync(params, invocation) {
+    async AskQuestionAsync(params, invocation) {
+        if (await KestrelUi.refuseSandboxed(invocation, 'ask questions for the system'))
+            return;
+
         const [id, message, iconName_, choices] = params;
 
         if (this._setCurrentRequest(invocation, id, ShellMountOperationType.ASK_QUESTION)) {
@@ -714,7 +720,10 @@ export class GnomeShellMountOpHandler {
      *   {string[]} choices: an array of choice strings
      * @param {Gio.DBusMethodInvocation} invocation - invocation
      */
-    ShowProcessesAsync(params, invocation) {
+    async ShowProcessesAsync(params, invocation) {
+        if (await KestrelUi.refuseSandboxed(invocation, 'ask to close apps'))
+            return;
+
         const [id, message, iconName_, applicationPids, choices] = params;
 
         if (this._setCurrentRequest(invocation, id, ShellMountOperationType.SHOW_PROCESSES)) {

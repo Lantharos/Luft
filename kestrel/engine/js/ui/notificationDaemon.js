@@ -5,6 +5,7 @@ import GObject from 'gi://GObject';
 import Shell from 'gi://Shell';
 
 import * as Config from '../misc/config.js';
+import * as KestrelUi from './kestrelUi.js';
 import {emitSignalToDestination} from '../misc/dbusUtils.js';
 import * as Main from './main.js';
 import * as MessageTray from './messageTray.js';
@@ -681,7 +682,10 @@ class GtkNotificationDaemon {
                 : null);
     }
 
-    AddNotificationAsync(params, invocation) {
+    async AddNotificationAsync(params, invocation) {
+        if (await KestrelUi.refuseSandboxed(invocation, 'show notifications for other apps'))
+            return;
+
         const [appId, notificationId, notificationSerialized] = params;
 
         let source;
@@ -708,7 +712,10 @@ class GtkNotificationDaemon {
         invocation.return_value(null);
     }
 
-    RemoveNotificationAsync(params, invocation) {
+    async RemoveNotificationAsync(params, invocation) {
+        if (await KestrelUi.refuseSandboxed(invocation, 'withdraw notifications of other apps'))
+            return;
+
         const [appId, notificationId] = params;
         const source = this._sources[appId];
         if (source)

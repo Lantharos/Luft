@@ -2,6 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import * as Config from '../misc/config.js';
+import * as KestrelUi from './kestrelUi.js';
 import * as Screenshot from './screenshot.js';
 
 import {loadInterfaceXML} from '../misc/fileUtils.js';
@@ -38,10 +39,7 @@ export class ScreenSaverDBus {
         });
 
         this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(ScreenSaverIface, this);
-        this._dbusImpl.export(Gio.DBus.session, '/org/gnome/ScreenSaver');
-
-        Gio.DBus.session.own_name('org.gnome.ScreenSaver',
-            Gio.BusNameOwnerFlags.NONE, null, null);
+        KestrelUi.ownOnItsOwnConnection('org.gnome.ScreenSaver', [[this._dbusImpl, '/org/gnome/ScreenSaver']], () => {});
     }
 
     LockAsync(parameters, invocation) {
@@ -111,12 +109,18 @@ export class BrightnessDBus {
         this._dbusImpl.emit_signal('BrightnessChanged', null);
     }
 
-    SetDimming(enable) {
+    async SetDimmingAsync([enable], invocation) {
+        if (await KestrelUi.refuseSandboxed(invocation, 'dim the screen'))
+            return;
         this._manager.dimming = enable;
+        invocation.return_value(null);
     }
 
-    SetAutoBrightnessTarget(target) {
+    async SetAutoBrightnessTargetAsync([target], invocation) {
+        if (await KestrelUi.refuseSandboxed(invocation, 'change the screen brightness'))
+            return;
         this._manager.autoBrightnessTarget = target;
+        invocation.return_value(null);
     }
 
     get HasBrightnessControl() {

@@ -225,7 +225,6 @@ pub fn unsubscribe(
     let url = unsubscribe
         .http
         .ok_or("This sender doesn't offer a way to unsubscribe")?;
-    gio::AppInfo::launch_default_for_uri(&url, Some(&launch::context(token)))
-        .map_err(|error| error.to_string())?;
+    launch::open_web_link(&url, token)?;
     Ok(Unsubscribed::Opened)
 }

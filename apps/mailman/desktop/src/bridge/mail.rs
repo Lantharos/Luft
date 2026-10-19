@@ -192,7 +192,6 @@ pub fn register(window: SabineWindow, state: &MailmanState) -> SabineWindow {
         })
         .command("open_message_file", open_file)
         .command("open_uri", |Uri { uri, token }| {
-            gio::AppInfo::launch_default_for_uri(&uri, Some(&launch::context(token.as_deref())))
-                .map_err(|error| error.to_string())
+            launch::open_web_link(&uri, token.as_deref())
         })
 }

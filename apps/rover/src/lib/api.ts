@@ -31,6 +31,7 @@ export const renameItem = (path: string, newName: string) => invoke<FileEntry>('
 export const copyItems = (sources: string[], destination: string) => invoke<string>('copy_items', { sources, destination });
 export const moveItems = (sources: string[], destination: string) => invoke<string>('move_items', { sources, destination });
 export const openWithDefault = async (path: string) => invoke<void>('open_with_default', { path, token: await activationToken() });
+export const openLink = async (uri: string) => invoke<void>('open_link', { uri, token: await activationToken() });
 export const fileDetails = (path: string) => invoke<FileDetails>('file_details', { path });
 export const appsForFile = (path: string) => invoke<OpenWithApps>('apps_for_file', { path });
 export const openWithApp = async (path: string, app: string) => invoke<void>('open_with_app', { path, app, token: await activationToken() });

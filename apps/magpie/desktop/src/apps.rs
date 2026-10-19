@@ -28,5 +28,5 @@ pub fn open_with(path: &Path, app: &str, token: Option<&str>) -> Result<(), Stri
 }
 
 pub fn open_uri(uri: &str, token: Option<&str>) -> Result<(), String> {
-    gio::AppInfo::launch_default_for_uri(uri, Some(&launch::context(token))).map_err(failed)
+    launch::open_web_link(uri, token)
 }

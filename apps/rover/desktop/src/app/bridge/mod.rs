@@ -88,6 +88,9 @@ fn register_files(window: SabineWindow, state: &RoverState) -> SabineWindow {
         .command("open_with_default", |Handoff { path, token }| {
             entries::open_with_default(&path, token.as_deref())
         })
+        .command("open_link", |Link { uri, token }| {
+            luft_app::launch::open_web_link(&uri, token.as_deref())
+        })
         .command("list_drives", |Empty {}| Ok(drives::list_drives()))
         .command("eject_drive", |MountPoint { mount_point, .. }| {
             drives::eject_drive(mount_point)

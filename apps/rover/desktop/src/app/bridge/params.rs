@@ -11,6 +11,12 @@ pub struct Path {
 }
 
 #[derive(Deserialize)]
+pub struct Link {
+    pub uri: String,
+    pub token: Option<String>,
+}
+
+#[derive(Deserialize)]
 pub struct Handoff {
     pub path: String,
     pub token: Option<String>,

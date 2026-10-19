@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 use luft_app::portal::{FileChooser, uri_path};
-use luft_app::{dbus, file_manager};
+use luft_app::{dbus, file_manager, launch};
 use serde::Deserialize;
 use zbus::{OwnedObjectPath, Proxy, Variant};
 
@@ -30,8 +30,6 @@ pub struct Handoff {
     path: String,
     token: Option<String>,
 }
-
-const LINK_SCHEMES: [&str; 3] = ["http://", "https://", "mailto:"];
 
 fn paths(uris: Vec<String>) -> Vec<String> {
     uris.iter()
@@ -82,7 +80,7 @@ pub async fn show_in_folder(Handoff { path, token }: Handoff) -> Result<(), Stri
 }
 
 pub async fn open_link(Link { uri, token }: Link) -> Result<(), String> {
-    if !LINK_SCHEMES.iter().any(|scheme| uri.starts_with(scheme)) {
+    if !launch::is_web_link(&uri) {
         return Err("Only web and mail links open outside Draft".into());
     }
     let proxy = Proxy::new(

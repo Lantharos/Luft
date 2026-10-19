@@ -2,12 +2,13 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
 use luft_disks::udisks::snapshot;
-use luft_disks::udisks::volumes::Segment;
+use luft_disks::udisks::volumes::{Segment, Volume};
 use luft_disks::udisks::{self, PARTITION, no_options};
+use luft_meet::handoff::Role;
 use luft_meet::{Folder, Handoff};
 
 use crate::system::command::Tool;
-use crate::system::files::write;
+use crate::system::files::{remove_beneath, write};
 use crate::system::mount::{self, Mounted};
 use crate::system::wait;
 
@@ -56,12 +57,16 @@ fn root_device() -> Result<String> {
 fn remove_partitions(handoff: &Handoff) -> Result<()> {
     let objects = wait(udisks::objects()).map_err(anyhow::Error::msg)?;
     let drives = snapshot::build(&objects).drives;
-    let ours: Vec<&str> = handoff.partitions().collect();
     for drive in &drives {
         for segment in &drive.segments {
-            if let Segment::Volume(volume) = segment
-                && ours.contains(&volume.partition_uuid.to_ascii_lowercase().as_str())
-            {
+            let Segment::Volume(volume) = segment else {
+                continue;
+            };
+            let partition = volume.partition_uuid.to_ascii_lowercase();
+            let Some((role, _)) = handoff.partitions().find(|(_, ours)| *ours == partition) else {
+                continue;
+            };
+            if made_by_meet(volume, role) {
                 wait(udisks::run(
                     &volume.block,
                     PARTITION,
@@ -70,10 +75,24 @@ fn remove_partitions(handoff: &Handoff) -> Result<()> {
                 ))
                 .map_err(anyhow::Error::msg)
                 .with_context(|| format!("Couldn't remove {}", volume.device))?;
+            } else {
+                eprintln!(
+                    "{} isn't the partition Meet Luft made, so it stays",
+                    volume.device
+                );
             }
         }
     }
     Ok(())
+}
+
+fn made_by_meet(volume: &Volume, role: Role) -> bool {
+    volume
+        .partition_type
+        .as_deref()
+        .is_some_and(|kind| kind.eq_ignore_ascii_case(role.partition_type()))
+        && volume.fs_type == role.filesystem()
+        && volume.label.eq_ignore_ascii_case(role.label())
 }
 
 fn grow_root() -> Result<()> {
@@ -141,7 +160,7 @@ fn remove_folder(folder: &Folder) -> Result<()> {
         "",
         &scratch.join("esp"),
     )?;
-    remove_all(&esp.path().join(&folder.loader))?;
+    remove_beneath(esp.path(), &folder.loader)?;
     drop(esp);
     let device = format!("/dev/disk/by-uuid/{}", folder.filesystem);
     let kind = Tool::new("blkid")
@@ -149,16 +168,7 @@ fn remove_folder(folder: &Folder) -> Result<()> {
         .arg(&device)
         .output()?;
     let top = Mounted::new(&device, mount::top_level(kind.trim()), &scratch.join("top"))?;
-    remove_all(&top.path().join(folder.folder.trim_start_matches('/')))
-}
-
-fn remove_all(path: &Path) -> Result<()> {
-    match std::fs::remove_dir_all(path) {
-        Err(error) if error.kind() != std::io::ErrorKind::NotFound => {
-            Err(error).with_context(|| format!("{} couldn't be removed", path.display()))
-        }
-        _ => Ok(()),
-    }
+    remove_beneath(top.path(), &folder.folder)
 }
 
 pub fn run(state_dir: &Path) -> Result<()> {

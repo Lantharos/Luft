@@ -169,7 +169,12 @@ fn prepare(job: &Job) -> Result<(Mounted, Option<Kept>)> {
     match &job.destination {
         Destination::Partitions(plan) => {
             let parts = wait(partition::apply(plan))?;
-            let skipped: Vec<&str> = job.meet.iter().flat_map(Handoff::partitions).collect();
+            let skipped: Vec<&str> = job
+                .meet
+                .iter()
+                .flat_map(Handoff::partitions)
+                .map(|(_, partition)| partition)
+                .collect();
             Ok((
                 Mounted::assemble(job.target, &plan.device, &parts, &skipped)?,
                 None,

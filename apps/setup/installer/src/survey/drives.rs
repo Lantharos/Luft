@@ -75,7 +75,7 @@ fn volumes(drive: &snapshot::Drive) -> impl Iterator<Item = &Volume> {
 
 fn from_meet(volume: &Volume, handoff: Option<&Handoff>) -> bool {
     let partition = volume.partition_uuid.to_ascii_lowercase();
-    handoff.is_some_and(|handoff| handoff.partitions().any(|ours| ours == partition))
+    handoff.is_some_and(|handoff| handoff.partitions().any(|(_, ours)| ours == partition))
 }
 
 fn runs_from(drive: &snapshot::Drive, handoff: Option<&Handoff>) -> bool {

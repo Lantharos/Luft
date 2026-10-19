@@ -1,3 +1,11 @@
+<script lang="ts" module>
+	let textPreview: Promise<typeof import('./TextPreview.svelte')> | undefined;
+
+	function loadTextPreview() {
+		return (textPreview ??= import('./TextPreview.svelte'));
+	}
+</script>
+
 <script lang="ts">
 	import { fileUrl } from '@lantharos/sabine';
 	import { canPlayNatively, decodeFailed, MediaControls } from '@luft/ui';
@@ -9,7 +17,6 @@
 	import { entryIcon, mayBeTransparent } from '#lib/utils/file-kinds.js';
 	import { previewKind } from '#lib/utils/kinds.js';
 	import NativePreview from './NativePreview.svelte';
-	import TextPreview from './TextPreview.svelte';
 
 	interface Props {
 		entry: FileEntry;
@@ -87,7 +94,9 @@
 		{/if}
 	</div>
 {:else if kind === 'text' || kind === 'markdown'}
-	<TextPreview {entry} markdown={kind === 'markdown'} {full} />
+	{#await loadTextPreview() then { default: TextPreview }}
+		<TextPreview {entry} markdown={kind === 'markdown'} {full} />
+	{/await}
 {:else if kind === 'pdf' && full}
 	<iframe class="preview-document" src={fileUrl(entry.path)} title={entry.name}></iframe>
 {:else}

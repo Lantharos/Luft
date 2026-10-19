@@ -2,54 +2,75 @@
 	font-family: 'Open Runde';
 	font-style: normal;
 	font-weight: 400;
-	font-display: block;
-	src: url('/fonts/OpenRunde-Regular.woff2') format('woff2');
+	font-display: swap;
+	src:
+		local('Open Runde Regular'),
+		local('OpenRunde-Regular'),
+		url('/fonts/OpenRunde-Regular.woff2') format('woff2');
 }
 
 @font-face {
 	font-family: 'Open Runde';
 	font-style: normal;
 	font-weight: 500;
-	font-display: block;
-	src: url('/fonts/OpenRunde-Medium.woff2') format('woff2');
+	font-display: swap;
+	src:
+		local('Open Runde Medium'),
+		local('OpenRunde-Medium'),
+		url('/fonts/OpenRunde-Medium.woff2') format('woff2');
 }
 
 @font-face {
 	font-family: 'Open Runde';
 	font-style: normal;
 	font-weight: 600 700;
-	font-display: block;
-	src: url('/fonts/OpenRunde-Semibold.woff2') format('woff2');
+	font-display: swap;
+	src:
+		local('Open Runde Semibold'),
+		local('OpenRunde-Semibold'),
+		url('/fonts/OpenRunde-Semibold.woff2') format('woff2');
 }
 
 @font-face {
 	font-family: 'Maple Mono NF';
 	font-style: normal;
 	font-weight: 400;
-	font-display: block;
-	src: url('/fonts/MapleMono-NF-Regular.woff2') format('woff2');
+	font-display: swap;
+	src:
+		local('Maple Mono NF Regular'),
+		local('MapleMono-NF-Regular'),
+		url('/fonts/MapleMono-NF-Regular.woff2') format('woff2');
 }
 
 @font-face {
 	font-family: 'Maple Mono NF';
 	font-style: italic;
 	font-weight: 400;
-	font-display: block;
-	src: url('/fonts/MapleMono-NF-Italic.woff2') format('woff2');
+	font-display: swap;
+	src:
+		local('Maple Mono NF Italic'),
+		local('MapleMono-NF-Italic'),
+		url('/fonts/MapleMono-NF-Italic.woff2') format('woff2');
 }
 
 @font-face {
 	font-family: 'Maple Mono NF';
 	font-style: normal;
 	font-weight: 600 700;
-	font-display: block;
-	src: url('/fonts/MapleMono-NF-Bold.woff2') format('woff2');
+	font-display: swap;
+	src:
+		local('Maple Mono NF Bold'),
+		local('MapleMono-NF-Bold'),
+		url('/fonts/MapleMono-NF-Bold.woff2') format('woff2');
 }
 
 @font-face {
 	font-family: 'Maple Mono NF';
 	font-style: italic;
 	font-weight: 600 700;
-	font-display: block;
-	src: url('/fonts/MapleMono-NF-BoldItalic.woff2') format('woff2');
+	font-display: swap;
+	src:
+		local('Maple Mono NF Bold Italic'),
+		local('MapleMono-NF-BoldItalic'),
+		url('/fonts/MapleMono-NF-BoldItalic.woff2') format('woff2');
 }

@@ -13,7 +13,6 @@ const HISTORY_LIMIT = 25;
 const IMAGE_LIMIT = 8;
 const TEXT_LIMIT = 20000;
 const IMAGE_BYTE_LIMIT = 16 * 1024 * 1024;
-const RELEASE_DELAY_MS = 1000;
 const PREFERRED_IMAGE_TYPE = 'image/png';
 const SENSITIVE_MIME_TYPE = 'x-kde-passwordManagerHint';
 const THUMBNAIL_BOUNDS: ThumbnailBounds = { width: 388, height: 128, radius: 6 };
@@ -125,7 +124,7 @@ export class ClipboardHistory {
 
   private releaseDecodedImages(): void {
     if (this.releaseSource) return;
-    this.releaseSource = GLib.timeout_add(GLib.PRIORITY_LOW, RELEASE_DELAY_MS, () => {
+    this.releaseSource = GLib.idle_add(GLib.PRIORITY_LOW, () => {
       this.releaseSource = 0;
       System.gc();
       return GLib.SOURCE_REMOVE;

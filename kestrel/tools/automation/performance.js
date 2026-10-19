@@ -1,12 +1,15 @@
+import GdkPixbuf from 'gi://GdkPixbuf';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
+import System from 'system';
 import {dismissImmediately, toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 import * as MessageTray from 'resource:///com/lantharos/kestrel/ui/messageTray.js';
 
 import {descendants, firstStyled, named} from '../checks/lib/actors.js';
-import {pause, settled} from '../checks/lib/wait.js';
+import {gjs, stop, stopAll, waitForWindow, waitForWindows} from '../checks/lib/processes.js';
+import {pause, settled, waitUntil} from '../checks/lib/wait.js';
 
 const MEASURE_SETTLE = 3000;
 const OPENING = 500_000;
@@ -15,6 +18,11 @@ const WAKEUP_SAMPLE = 10000;
 const FRAME = 16;
 const START_QUERIES = ['f', 'fi', 'fil', 'files', 'file', 'fi', ''];
 const EMOJI_QUERIES = ['p', 'pa', 'par', 'part', 'party', 'h', 'he', 'heart', 'smiling face', ''];
+const CLIPBOARD_IMAGES = 16;
+const CLIPBOARD_IMAGE_SIZE = [1920, 1080];
+const TRAY_SAMPLE = 5000;
+const TASK_VIEW_WINDOWS = 6;
+const IMAGE_TIMEOUT = 15000;
 
 const read = path => new TextDecoder().decode(GLib.file_get_contents(path)[1]);
 const milliseconds = microseconds => Number((microseconds / 1000).toFixed(2));
@@ -183,6 +191,90 @@ async function measureNotificationBurst() {
   }
 }
 
+function noisyImages(count, [width, height]) {
+  const pixels = new Uint8Array(width * height * 3);
+  let seed = 11;
+  for (let index = 0; index < pixels.length; index++) pixels[index] = (seed = seed * 1103515245 + 12345 >>> 0) >>> 24;
+  return Array.from({length: count}, (_, image) => {
+    pixels[0] = image;
+    const pixbuf = GdkPixbuf.Pixbuf.new_from_bytes(new GLib.Bytes(pixels), GdkPixbuf.Colorspace.RGB, false, 8, width, height, width * 3);
+    return new GLib.Bytes(pixbuf.save_to_bufferv('png', ['compression'], ['1'])[1]);
+  });
+}
+
+function storedClipboardImages() {
+  const directory = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_runtime_dir(), 'kestrel', GLib.getenv('WAYLAND_DISPLAY'), 'clipboard']));
+  return directory.query_exists(null) ? [...directory.enumerate_children('standard::name', Gio.FileQueryInfoFlags.NONE, null)].map(info => info.get_name()) : [];
+}
+
+async function measureClipboardImages() {
+  const clipboard = St.Clipboard.get_default();
+  const images = noisyImages(CLIPBOARD_IMAGES, CLIPBOARD_IMAGE_SIZE);
+  System.gc();
+  await settled(MEASURE_SETTLE);
+  const before = processMetrics().residentMemoryMb;
+  const started = GLib.get_monotonic_time();
+  const longestStallMs = await longestStall(async () => {
+    for (const image of images) {
+      const stored = storedClipboardImages();
+      clipboard.set_content(St.ClipboardType.CLIPBOARD, 'image/png', image);
+      await waitUntil(() => storedClipboardImages().some(name => !stored.includes(name)), 'a copied image is kept', IMAGE_TIMEOUT);
+    }
+  });
+  const keptMs = milliseconds(GLib.get_monotonic_time() - started);
+  const afterBurst = processMetrics().residentMemoryMb;
+  await pause(WAKEUP_SAMPLE);
+  report({
+    clipboardImages: images.length, keptMs, longestStallMs,
+    residentBeforeMb: before, residentAfterBurstMb: afterBurst, residentSettledMb: processMetrics().residentMemoryMb,
+  });
+  clipboard.set_text(St.ClipboardType.CLIPBOARD, '');
+}
+
+async function measureTrayUpdates() {
+  const tray = named('kestrel-tray');
+  const app = gjs('clients/trayApp.js', ['--animate']);
+  try {
+    await waitUntil(() => tray.visible, 'the tray shows the animated app');
+    await settled();
+    let previewIconsCreated = 0;
+    const signal = tray.child.connect('child-added', () => previewIconsCreated++);
+    const ticks = cpuTicks();
+    await pause(TRAY_SAMPLE);
+    tray.child.disconnect(signal);
+    report({trayCpuPercent: Number(((cpuTicks() - ticks) / 100 / (TRAY_SAMPLE / 1000) * 100).toFixed(2)), previewIconsCreated});
+  } finally {
+    await stop(app);
+  }
+}
+
+async function measureTaskViewAdd() {
+  const titles = Array.from({length: TASK_VIEW_WINDOWS}, (_, index) => `Kestrel task view ${index + 1}`);
+  for (const title of titles) gjs('clients/stripedWindow.js', [title, '640', '400']);
+  try {
+    await waitForWindows(titles);
+    await settled(MEASURE_SETTLE);
+    toggleSurface('tasks');
+    await settled(MEASURE_SETTLE);
+    const cards = named('kestrel-task-windows');
+    const desktops = named('kestrel-task-view').get_last_child();
+    let cardsCreated = 0;
+    let desktopsCreated = 0;
+    const signals = [[cards, cards.connect('child-added', () => cardsCreated++)], [desktops, desktops.connect('child-added', () => desktopsCreated++)]];
+    const longestStallMs = await longestStall(async () => {
+      gjs('clients/stripedWindow.js', ['Kestrel task view added', '640', '400']);
+      await waitForWindow('Kestrel task view added');
+      await waitUntil(() => cards.get_n_children() === TASK_VIEW_WINDOWS + 1, 'the task view shows the added window');
+      await settled(MEASURE_SETTLE);
+    });
+    for (const [actor, id] of signals) actor.disconnect(id);
+    report({taskViewAdd: TASK_VIEW_WINDOWS + 1, cardsCreated, desktopsCreated, longestStallMs});
+  } finally {
+    await dismiss();
+    await stopAll();
+  }
+}
+
 function threadSwitches() {
   const tasks = Gio.File.new_for_path('/proc/self/task').enumerate_children('standard::name', Gio.FileQueryInfoFlags.NONE, null);
   const switches = new Map();
@@ -228,6 +320,9 @@ export async function run() {
   await measureIconStyles();
   await measureStartSearch();
   await measureNotificationBurst();
+  await measureClipboardImages();
+  await measureTrayUpdates();
+  await measureTaskViewAdd();
   await measureIdle();
   await measureIdleWakeups();
 }

@@ -11,6 +11,7 @@ const ITEM_INTERFACE = `<node><interface name="org.kde.StatusNotifierItem">
   <property name="ItemIsMenu" type="b" access="read"/>
   <method name="Activate"><arg type="i" direction="in"/><arg type="i" direction="in"/></method>
   <signal name="NewTitle"/>
+  <signal name="NewIcon"/>
 </interface></node>`;
 
 const MENU_INTERFACE = `<node><interface name="com.canonical.dbusmenu">
@@ -25,13 +26,20 @@ const MENU_INTERFACE = `<node><interface name="com.canonical.dbusmenu">
 </interface></node>`;
 
 const SIZE = 22;
-const pixels = new Uint8Array(SIZE * SIZE * 4);
-for (let y = 0; y < SIZE; y++) {
-  for (let x = 0; x < SIZE; x++) {
-    const inside = Math.hypot(x - SIZE / 2 + 0.5, y - SIZE / 2 + 0.5) < SIZE / 2 - 2;
-    pixels.set(inside ? [255, 88, 101, 242] : [0, 0, 0, 0], (y * SIZE + x) * 4);
+const ANIMATION_INTERVAL = 16;
+
+function dot(argb) {
+  const pixels = new Uint8Array(SIZE * SIZE * 4);
+  for (let y = 0; y < SIZE; y++) {
+    for (let x = 0; x < SIZE; x++) {
+      const inside = Math.hypot(x - SIZE / 2 + 0.5, y - SIZE / 2 + 0.5) < SIZE / 2 - 2;
+      pixels.set(inside ? argb : [0, 0, 0, 0], (y * SIZE + x) * 4);
+    }
   }
+  return new GLib.Variant('a(iiay)', [[SIZE, SIZE, pixels]]);
 }
+
+const frames = [dot([255, 88, 101, 242]), dot([255, 242, 101, 88])];
 
 let muted = false;
 const node = (id, properties, children = []) => [id, properties, children.map(child => new GLib.Variant('(ia{sv}av)', child))];
@@ -41,8 +49,8 @@ const item = {
   Id: 'kestrel-tray-check',
   Title: 'Chatter',
   Status: 'Active',
-  IconName: ARGV[0] ?? '',
-  IconPixmap: new GLib.Variant('a(iiay)', [[SIZE, SIZE, pixels]]),
+  IconName: ARGV.find(argument => !argument.startsWith('--')) ?? '',
+  IconPixmap: frames[0],
   Menu: '/MenuBar',
   ItemIsMenu: false,
   Activate() {
@@ -79,5 +87,18 @@ itemObject.export(Gio.DBus.session, '/StatusNotifierItem');
 menuObject.export(Gio.DBus.session, '/MenuBar');
 Gio.DBus.session.call('org.kde.StatusNotifierWatcher', '/StatusNotifierWatcher', 'org.kde.StatusNotifierWatcher',
   'RegisterStatusNotifierItem', new GLib.Variant('(s)', ['/StatusNotifierItem']), null, Gio.DBusCallFlags.NONE, -1, null, null);
+
+if (ARGV.includes('--animate')) {
+  let frame = 0;
+  GLib.timeout_add(GLib.PRIORITY_DEFAULT, ANIMATION_INTERVAL, () => {
+    item.IconPixmap = frames[++frame % frames.length];
+    itemObject.emit_signal('NewIcon', null);
+    if (frame % 10 === 0) {
+      item.Title = `Chatter ${frame}`;
+      itemObject.emit_signal('NewTitle', null);
+    }
+    return GLib.SOURCE_CONTINUE;
+  });
+}
 
 new GLib.MainLoop(null, false).run();

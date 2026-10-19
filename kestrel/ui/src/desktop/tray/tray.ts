@@ -69,12 +69,13 @@ export class Tray {
   private sync(): void {
     const shown = this.shown;
     this.actor.visible = shown.length > 0;
-    this.preview.destroy_all_children();
     const layout = PREVIEW_LAYOUTS[Math.min(shown.length, PREVIEW_LAYOUTS.length) - 1] ?? [];
+    while (this.preview.get_n_children() > layout.length) this.preview.get_last_child()!.destroy();
+    while (this.preview.get_n_children() < layout.length) this.preview.add_child(new St.Icon());
+    const icons = this.preview.get_children() as St.Icon[];
     layout.forEach(([x, y, size], index) => {
-      const icon = new St.Icon({ x, y });
-      paintGlyph(icon, shown[index].glyph!, size);
-      this.preview.add_child(icon);
+      icons[index].set_position(x, y);
+      paintGlyph(icons[index], shown[index].glyph!, size);
     });
   }
 

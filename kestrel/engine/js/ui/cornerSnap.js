@@ -1,3 +1,4 @@
+import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 import Mtk from 'gi://Mtk';
@@ -6,7 +7,6 @@ import * as Main from './main.js';
 
 const CORNER_REACH = 96;
 const EDGE_REACH = 4;
-const POLL_INTERVAL = 16;
 const POINTER_MOVE_OPS = [Meta.GrabOp.MOVING, Meta.GrabOp.MOVING_UNCONSTRAINED];
 
 /**
@@ -75,7 +75,7 @@ export class CornerSnap {
         this._morph = morph;
         this._window = null;
         this._zone = null;
-        this._timer = 0;
+        this._motionFilter = 0;
         this._snapped = new WeakMap();
 
         global.display.connect('grab-op-begin', (_display, window, op) => this._begin(window, op));
@@ -138,9 +138,10 @@ export class CornerSnap {
         this._window = window;
         const {width, height} = window.get_frame_rect();
         this._startSize = {width, height};
-        this._timer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, POLL_INTERVAL, () => {
-            this._track();
-            return GLib.SOURCE_CONTINUE;
+        this._motionFilter = Clutter.Event.prepend_filter(null, event => {
+            if (event.type() === Clutter.EventType.MOTION)
+                this._track(...event.get_coords().map(Math.floor));
+            return Clutter.EVENT_PROPAGATE;
         });
     }
 
@@ -171,8 +172,7 @@ export class CornerSnap {
         window.move_resize_frame(true, x, frame.y, snapped.width, snapped.height);
     }
 
-    _track() {
-        const [x, y] = global.get_pointer();
+    _track(x, y) {
         const monitorIndex = global.display.get_monitor_index_for_rect(new Mtk.Rectangle({x, y, width: 1, height: 1}));
         const monitor = Main.layoutManager.monitors[monitorIndex];
         const zone = monitor
@@ -189,8 +189,8 @@ export class CornerSnap {
         if (window !== this._window)
             return;
 
-        GLib.source_remove(this._timer);
-        this._timer = 0;
+        Clutter.Event.remove_filter(this._motionFilter);
+        this._motionFilter = 0;
         const zone = this._zone;
         this._zone = null;
         this._window = null;

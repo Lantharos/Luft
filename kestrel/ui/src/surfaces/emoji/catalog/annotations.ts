@@ -1,47 +1,41 @@
 import GLib from 'gi://GLib';
+import type Shell from 'gi://Shell';
 
 import { annotationKey, type Catalog, type Item } from './catalog.js';
 
-const ROOT = '/usr/share/unicode/cldr/common';
-const FOLDERS = ['annotations', 'annotationsDerived'];
-const ANNOTATION = /<annotation cp="([^"]+)"( type="tts")?>([^<]+)<\/annotation>/g;
-const INHERITED = '↑↑↑';
-const ENTITIES: Record<string, string> = { '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"', '&apos;': "'" };
-
-function unescape(text: string): string {
-  return text.includes('&') ? text.replace(/&(amp|lt|gt|quot|apos);/g, entity => ENTITIES[entity]) : text;
-}
+type Annotation = [keywords: string | null, ...names: string[]];
 
 function locales(): string[] {
   const names = GLib.get_language_names().filter(name => !/[.@]/.test(name) && name !== 'C' && name !== 'POSIX');
   return [...new Set(['en', ...names.reverse()])];
 }
 
-function apply(item: Item, tts: string | undefined, value: string): void {
-  if (!tts) item.keywords = value;
-  else if (item.kind === 'emoji') item.name = value;
-  else item.aliases.push(value);
+function apply(item: Item, [keywords, ...names]: Annotation): void {
+  if (keywords !== null) item.keywords = keywords;
+  if (!names.length) return;
+  if (item.kind === 'emoji') item.name = names[names.length - 1];
+  else item.aliases.push(...names);
+}
+
+function load(folder: string, locale: string): Record<string, Annotation> | null {
+  try {
+    return JSON.parse(new TextDecoder().decode(GLib.file_get_contents(`${folder}/${locale}.json`)[1]));
+  } catch {
+    return null;
+  }
 }
 
 export function annotate(catalog: Catalog): void {
+  const folder = `${(global as unknown as Shell.Global).datadir}/emoji-annotations`;
   const emoji = new Map(catalog.items.filter(item => item.kind === 'emoji').map(item => [annotationKey(item.text), item]));
-  const decoder = new TextDecoder();
   for (const locale of locales()) {
-    for (const folder of FOLDERS) {
-      let contents: Uint8Array;
-      try {
-        contents = GLib.file_get_contents(`${ROOT}/${folder}/${locale}.xml`)[1];
-      } catch {
-        continue;
-      }
-      for (const [, key, tts, value] of decoder.decode(contents).matchAll(ANNOTATION)) {
-        if (value === INHERITED) continue;
-        const text = unescape(key);
-        const picture = emoji.get(text);
-        const character = catalog.find(text);
-        if (picture) apply(picture, tts, unescape(value));
-        if (character && character !== picture) apply(character, tts, unescape(value));
-      }
+    const annotations = load(folder, locale);
+    if (!annotations) continue;
+    for (const [text, annotation] of Object.entries(annotations)) {
+      const picture = emoji.get(text);
+      const character = catalog.find(text);
+      if (picture) apply(picture, annotation);
+      if (character && character !== picture) apply(character, annotation);
     }
   }
 }

@@ -3,6 +3,7 @@ at-spi2-atk-devel
 binutils
 ccache
 clang-devel
+cldr-emoji-annotation
 cmake
 dconf
 file

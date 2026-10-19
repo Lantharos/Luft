@@ -31,6 +31,19 @@ endforeach
 
 fs.copyfile('characters.json', install: true, install_dir: pkgdatadir)
 
+cldr = '/usr/share/unicode/cldr/common'
+if not fs.is_dir(cldr / 'annotations')
+  error('Emoji search needs the emoji names. On Fedora: sudo dnf install cldr-emoji-annotation')
+endif
+custom_target('emoji-annotations',
+  input: files('../../tools/unicode/annotationData.ts', 'emoji.json', 'characters.json'),
+  output: 'emoji-annotations',
+  depfile: 'emoji-annotations.d',
+  command: [find_program('bun'), '@INPUT0@', cldr, '@INPUT1@', '@INPUT2@', '@OUTPUT@', '@DEPFILE@'],
+  install: true,
+  install_dir: pkgdatadir,
+)
+
 cursor_theme_resource = gnome.compile_resources(
   'kestrel-cursor-theme',
   'kestrel-cursor-theme.gresource.xml',

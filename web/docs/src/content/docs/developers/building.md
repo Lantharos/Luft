@@ -13,7 +13,7 @@ Install [Bun](https://bun.sh), Rust and the [Sabine](https://github.com/Lantharo
 
 ```sh
 sudo dnf builddep mutter
-sudo dnf install $(cat os/image/packages/build.txt) greetd gstreamer1-plugin-gtk4 cldr-emoji-annotation
+sudo dnf install $(cat os/image/packages/build.txt) greetd gstreamer1-plugin-gtk4
 ```
 
 ## Kestrel

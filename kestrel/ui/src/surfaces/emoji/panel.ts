@@ -104,6 +104,7 @@ export class EmojiPanel {
 
   open(): void {
     this.prepare();
+    this.index ??= this.indexCatalog(this.catalog!);
     const shellGlobal = global as unknown as Shell.Global;
     const shellFocus = shellGlobal.stage.get_key_focus();
     this.intercepting = !!this.input.currentFocus && (!shellFocus || shellFocus === shellGlobal.stage);
@@ -135,14 +136,6 @@ export class EmojiPanel {
   private prepare(): void {
     if (this.catalog) return;
     const catalog = this.catalog = new Catalog();
-    annotate(catalog);
-    const index = this.index = new SearchIndex(catalog.items);
-    this.indexing = GLib.idle_add(GLib.PRIORITY_LOW, () => {
-      index.extend(INDEX_CHUNK);
-      if (!index.complete) return GLib.SOURCE_CONTINUE;
-      this.indexing = 0;
-      return GLib.SOURCE_REMOVE;
-    });
     const hovered = (title: string | null) => this.hover(title);
     this.tabs = new TabStrip(catalog.tabs, { hovered, activated: index => this.openTab(index) });
     this.tones = new TonePicker({ hovered, activated: tone => this.chooseTone(tone), toggled: () => this.toggleTones(false) });
@@ -157,6 +150,18 @@ export class EmojiPanel {
     body.add_child(this.empty);
     for (const child of [header, switcher, body, this.footer]) this.actor.add_child(child);
     this.showBrowsing();
+  }
+
+  private indexCatalog(catalog: Catalog): SearchIndex {
+    annotate(catalog);
+    const index = new SearchIndex(catalog.items);
+    this.indexing = GLib.idle_add(GLib.PRIORITY_LOW, () => {
+      index.extend(INDEX_CHUNK);
+      if (!index.complete) return GLib.SOURCE_CONTINUE;
+      this.indexing = 0;
+      return GLib.SOURCE_REMOVE;
+    });
+    return index;
   }
 
   private showBrowsing(): void {

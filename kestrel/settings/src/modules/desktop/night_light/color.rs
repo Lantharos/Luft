@@ -1,12 +1,10 @@
 use tokio::sync::mpsc;
-use zbus::{fdo, interface};
+use zbus::interface;
 
 pub const NAME: &str = "com.lantharos.Settings.NightLight";
 pub const PATH: &str = "/com/lantharos/Settings/NightLight";
-const LONGEST_PREVIEW: u32 = 120;
 
 pub enum Command {
-    Preview(u32),
     PauseUntilTomorrow(bool),
 }
 
@@ -21,16 +19,6 @@ pub struct Color {
 
 #[interface(name = "com.lantharos.Settings.NightLight")]
 impl Color {
-    fn night_light_preview(&self, duration: u32) -> fdo::Result<()> {
-        if duration == 0 || duration > LONGEST_PREVIEW {
-            return Err(fdo::Error::InvalidArgs(format!(
-                "A preview lasts between 1 and {LONGEST_PREVIEW} seconds"
-            )));
-        }
-        let _ = self.commands.send(Command::Preview(duration));
-        Ok(())
-    }
-
     #[zbus(property)]
     fn night_light_active(&self) -> bool {
         self.active

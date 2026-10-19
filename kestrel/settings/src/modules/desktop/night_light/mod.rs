@@ -5,7 +5,7 @@ use std::time::Duration;
 
 use futures_util::StreamExt;
 use tokio::sync::mpsc;
-use tokio::time::{Instant, MissedTickBehavior, interval, sleep_until};
+use tokio::time::{Instant, MissedTickBehavior, interval};
 use zbus::Connection;
 use zbus::object_server::InterfaceRef;
 
@@ -40,7 +40,6 @@ struct NightLight {
     sun: Option<Sun>,
     zone: Option<(String, Option<Coordinates>)>,
     paused_at: Option<glib::DateTime>,
-    preview_until: Option<Instant>,
     transition: Option<Transition>,
 }
 
@@ -58,7 +57,6 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
         sun: None,
         zone: None,
         paused_at: None,
-        preview_until: None,
         transition: None,
     };
     let (active, temperature) = light.target(&schedule::now());
@@ -99,10 +97,6 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
                 }
                 Some(request) = requests.recv() => {
                     light.handle(request);
-                    true
-                }
-                () = sleep_until(light.preview_until.unwrap_or_else(Instant::now)), if light.preview_until.is_some() => {
-                    light.preview_until = None;
                     true
                 }
                 _ = step.tick(), if light.transition.is_some() => {
@@ -159,9 +153,6 @@ impl NightLight {
 
     fn handle(&mut self, request: Command) {
         match request {
-            Command::Preview(seconds) => {
-                self.preview_until = Some(Instant::now() + Duration::from_secs(seconds.into()));
-            }
             Command::PauseUntilTomorrow(paused) => {
                 self.paused_at = paused.then(schedule::now);
             }
@@ -184,9 +175,6 @@ impl NightLight {
     fn target(&mut self, now: &glib::DateTime) -> (bool, f64) {
         let warm = f64::from(self.settings.get::<u32>(SCHEMA, "temperature"));
         self.sun = self.coordinates().and_then(|at| schedule::sun(now, at));
-        if self.preview_until.is_some() {
-            return (self.active, warm);
-        }
         if !self.settings.get::<bool>(SCHEMA, "enabled") {
             return (false, NEUTRAL);
         }

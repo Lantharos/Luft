@@ -1,0 +1,183 @@
+name: Checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  rust:
+    name: Rust ${{ matrix.crate }}
+    runs-on: ubuntu-26.04
+    timeout-minutes: 60
+    container: fedora:45
+    strategy:
+      fail-fast: false
+      matrix:
+        crate:
+          - apps/barometer/desktop
+          - apps/disks/desktop
+          - apps/draft/desktop
+          - apps/keys/desktop
+          - apps/magpie/desktop
+          - apps/mailman/desktop
+          - apps/meet/desktop
+          - apps/rover/desktop
+          - apps/schelf/desktop
+          - apps/settings/desktop
+          - apps/setup/desktop
+          - apps/setup/installer
+          - apps/signin/desktop
+          - apps/tern/desktop
+          - boot/sushi
+          - kestrel/greeter
+          - kestrel/keyring
+          - kestrel/openconnect
+          - kestrel/passkeys
+          - kestrel/peek
+          - kestrel/search
+          - kestrel/settings
+          - kestrel/watchdog
+          - packages/accounts
+          - packages/accounts/service
+          - packages/app
+          - packages/dbus
+          - packages/disks
+          - packages/fingerprint
+          - packages/meet
+          - packages/network
+          - packages/sleep/service
+          - packages/software
+          - packages/software/thumbnailer
+          - packages/software/updater
+          - packages/speech
+          - packages/speech/service
+          - packages/variant
+          - packages/windows
+          - packages/windows/service
+          - security
+    defaults:
+      run:
+        working-directory: ${{ matrix.crate }}
+    steps:
+      - name: Install build dependencies
+        working-directory: /
+        run: >-
+          dnf install --assumeyes --setopt=install_weak_deps=False
+          git rustup gcc gcc-c++ clang-devel cmake pkgconf-pkg-config
+          glib2-devel gstreamer1-devel pipewire-devel pulseaudio-libs-devel
+          fontconfig-devel wayland-devel libxkbcommon-devel libdrm-devel
+          pam-devel systemd-devel libseccomp-devel tpm2-tss-devel sqlite-devel
+          onnxruntime-devel vulkan-headers vulkan-loader-devel glslc swtpm
+
+      - uses: actions/checkout@v7
+
+      - name: Install Rust
+        run: |
+          rustup-init -y --profile minimal --component clippy
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+
+      - name: Locate the shared build directory
+        id: build
+        run: echo "dir=$(realpath --relative-to=. "$GITHUB_WORKSPACE/target")" >> "$GITHUB_OUTPUT"
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ${{ matrix.crate }} -> ${{ steps.build.outputs.dir }}
+          key: ${{ matrix.crate }}
+
+      - run: cargo clippy --all-targets -- -D warnings
+
+      - run: cargo test
+
+  uefi:
+    name: Rust UEFI ${{ matrix.crate }}
+    runs-on: ubuntu-26.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - crate: boot/sushi
+            args: -p sushiboot
+          - crate: boot/sushi/scripts/vm/display
+    defaults:
+      run:
+        working-directory: ${{ matrix.crate }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - run: rustup toolchain install stable --profile minimal --component clippy --target x86_64-unknown-uefi
+
+      - name: Locate the shared build directory
+        id: build
+        run: echo "dir=$(realpath --relative-to=. "$GITHUB_WORKSPACE/target")" >> "$GITHUB_OUTPUT"
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ${{ matrix.crate }} -> ${{ steps.build.outputs.dir }}
+          key: uefi-${{ matrix.crate }}
+
+      - run: cargo clippy ${{ matrix.args }} --target x86_64-unknown-uefi -- -D warnings
+
+  meet-windows:
+    name: Rust Meet Luft for Windows
+    runs-on: ubuntu-26.04
+    timeout-minutes: 30
+    container: fedora:45
+    defaults:
+      run:
+        working-directory: apps/meet/desktop
+    steps:
+      - name: Install build dependencies
+        working-directory: /
+        run: dnf install --assumeyes --setopt=install_weak_deps=False git rustup gcc mingw64-gcc
+
+      - uses: actions/checkout@v7
+
+      - name: Install Rust
+        run: |
+          rustup-init -y --profile minimal --component clippy --target x86_64-pc-windows-gnu
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+
+      - name: Locate the shared build directory
+        id: build
+        run: echo "dir=$(realpath --relative-to=. "$GITHUB_WORKSPACE/target")" >> "$GITHUB_OUTPUT"
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apps/meet/desktop -> ${{ steps.build.outputs.dir }}
+          key: windows
+
+      - run: cargo clippy --all-targets --target x86_64-pc-windows-gnu -- -D warnings
+
+  web:
+    name: TypeScript
+    runs-on: ubuntu-26.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install --frozen-lockfile
+
+      - run: bun install --frozen-lockfile
+        working-directory: kestrel/ui
+
+      - run: bun run --filter '*' check
+
+      - run: bun run check
+        working-directory: kestrel/ui

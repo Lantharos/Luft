@@ -7,7 +7,9 @@ SurviveFinalKillSignal=yes
 [Service]
 ExecStart=@libexecdir@/kestrel-watchdog
 StateDirectory=kestrel-watchdog
-UMask=0022
+Group=wheel
+UMask=0027
+StateDirectoryMode=0750
 ProtectHome=yes
 PrivateTmp=yes
 NoNewPrivileges=yes

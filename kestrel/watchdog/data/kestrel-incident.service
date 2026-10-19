@@ -11,7 +11,9 @@ Type=oneshot
 ExecStart=@libexecdir@/kestrel-watchdog boot
 StateDirectory=kestrel-watchdog
 RuntimeDirectory=kestrel-watchdog
-UMask=0022
+Group=wheel
+UMask=0027
+StateDirectoryMode=0750
 TimeoutStartSec=6min
 
 [Install]

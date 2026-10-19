@@ -4,7 +4,10 @@ use std::io::{self, Read};
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
+use super::driver;
+
 const KEPT_LINES: usize = 400;
+const KERNEL_FACILITY: u32 = 0;
 const RELEVANT: [&str; 7] = [
     "NVRM",
     "nvidia",
@@ -35,7 +38,8 @@ pub struct Line {
 
 impl Line {
     pub fn is_failure(&self) -> bool {
-        FAILURES.iter().any(|marker| self.text.contains(marker))
+        driver::is_driver_message(&self.text)
+            && FAILURES.iter().any(|marker| self.text.contains(marker))
     }
 
     pub fn format(&self) -> String {
@@ -55,7 +59,12 @@ pub struct KernelLog {
 
 fn parse(record: &str) -> Option<Line> {
     let (header, message) = record.split_once(';')?;
-    let micros: u64 = header.split(',').nth(2)?.parse().ok()?;
+    let mut fields = header.split(',');
+    let priority: u32 = fields.next()?.parse().ok()?;
+    if priority >> 3 != KERNEL_FACILITY {
+        return None;
+    }
+    let micros: u64 = fields.nth(1)?.parse().ok()?;
     let text = message.lines().next()?.to_owned();
     RELEVANT
         .iter()

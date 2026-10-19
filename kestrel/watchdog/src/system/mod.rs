@@ -1,3 +1,4 @@
+mod driver;
 pub mod gpu;
 pub mod kmsg;
 pub mod proxies;

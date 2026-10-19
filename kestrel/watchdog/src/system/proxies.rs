@@ -10,8 +10,7 @@ pub const SKIP_INHIBITORS: u64 = 1 << 4;
 )]
 pub trait Login {
     fn reboot_with_flags(&self, flags: u64) -> zbus::Result<()>;
-    #[zbus(name = "GetUserByPID")]
-    fn get_user_by_pid(&self, pid: u32) -> zbus::Result<OwnedObjectPath>;
+    fn get_user(&self, uid: u32) -> zbus::Result<OwnedObjectPath>;
 
     #[zbus(property)]
     fn preparing_for_sleep(&self) -> zbus::Result<bool>;

@@ -58,6 +58,6 @@ Every startup image has a Rescue profile, under the newest version in the menu. 
 
 ## Graphics driver stopped responding
 
-When the whole GPU hangs, `kestrel-watchdog` restarts the computer cleanly once the kernel confirms a GPU failure, and saves a report to `/var/lib/kestrel-watchdog/incidents`. At the next start Sushi explains what happened with suggestions for the computer, and Settings lists the last ten incidents under About, Recent problems.
+When the whole GPU hangs, `kestrel-watchdog` restarts the computer cleanly once the kernel confirms a GPU failure, and saves a report to `/var/lib/kestrel-watchdog/incidents`, readable only by administrators. At the next start Sushi explains what happened with suggestions for the computer, and Settings lists the last ten incidents under About, Recent problems.
 
 On NVIDIA cards with Resizable BAR off, the 256 MB BAR1 window can fill up and hang the driver. Turn on Above 4G Decoding and Resizable BAR in the firmware, or add `options nvidia NVreg_EnableResizableBar=1` to a file in `/etc/modprobe.d`; a full shutdown may be needed before the new size applies. `nvidia-smi -q -d MEMORY` shows the window size under BAR1 Memory Usage.

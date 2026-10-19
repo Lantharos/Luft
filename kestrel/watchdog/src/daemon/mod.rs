@@ -1,3 +1,4 @@
+mod caller;
 mod judge;
 mod restart;
 mod threads;
@@ -17,6 +18,7 @@ use crate::incident::{self, collect, efi};
 use crate::system::kmsg::KernelLog;
 use crate::system::output_within;
 use crate::system::proxies::{LoginProxy, SessionProxy, UserProxy};
+use caller::Programs;
 use judge::{Hang, Judge};
 
 const NAME: &str = "com.lantharos.Kestrel.Watchdog1";
@@ -26,6 +28,7 @@ const JOURNAL_SYNC_LIMIT: Duration = Duration::from_secs(5);
 struct Watchdog {
     judge: Mutex<Judge>,
     login: LoginProxy<'static>,
+    programs: Programs,
     hangs: mpsc::Sender<Hang>,
 }
 
@@ -36,6 +39,7 @@ impl Watchdog {
         header: &Header<'_>,
         compositor: u32,
     ) -> fdo::Result<()> {
+        let denied = |reason: &str| Err(fdo::Error::AccessDenied(reason.into()));
         let sender = header
             .sender()
             .ok_or_else(|| fdo::Error::AccessDenied("Unknown caller".into()))?;
@@ -43,17 +47,24 @@ impl Watchdog {
             .await?
             .get_connection_credentials(sender.clone().into())
             .await?;
-        let (Some(uid), Some(pid)) = (credentials.unix_user_id(), credentials.process_id()) else {
-            return Err(fdo::Error::AccessDenied(
-                "The caller can't be identified".into(),
-            ));
+        let (Some(uid), Some(pidfd)) = (credentials.unix_user_id(), credentials.process_fd())
+        else {
+            return denied("The caller can't be identified");
         };
-        if threads::owner(compositor) != Some(uid) {
-            return Err(fdo::Error::AccessDenied(
-                "The compositor belongs to someone else".into(),
-            ));
+        let Some(pid) = caller::pid_of(pidfd) else {
+            return denied("The caller has already quit");
+        };
+        if !self.programs.is_settings(pid, uid) {
+            return denied("Only Kestrel's settings service reports stalls");
         }
-        let user = self.login.get_user_by_pid(pid).await?;
+        if threads::owner(compositor) != Some(uid) || !self.programs.is_compositor(compositor, uid)
+        {
+            return denied("That isn't the caller's Kestrel");
+        }
+        if caller::pid_of(pidfd) != Some(pid) {
+            return denied("The caller has already quit");
+        }
+        let user = self.login.get_user(uid).await?;
         let (_, session) = UserProxy::builder(connection)
             .path(user)
             .build()
@@ -66,9 +77,7 @@ impl Watchdog {
             .await?;
         let (seat, _) = session.seat().await?;
         if !session.active().await? || seat.is_empty() {
-            return Err(fdo::Error::AccessDenied(
-                "The caller's session isn't on screen".into(),
-            ));
+            return denied("The caller's session isn't on screen");
         }
         Ok(())
     }
@@ -152,6 +161,7 @@ pub async fn run() -> ExitCode {
 
 async fn serve() -> zbus::Result<()> {
     let log = KernelLog::watch()?;
+    let programs = Programs::installed()?;
     let system = Connection::system().await?;
     let login = LoginProxy::new(&system).await?;
     let (hangs, mut hung) = mpsc::channel(1);
@@ -162,6 +172,7 @@ async fn serve() -> zbus::Result<()> {
             Watchdog {
                 judge: Mutex::new(Judge::new(log)),
                 login: login.clone(),
+                programs,
                 hangs,
             },
         )

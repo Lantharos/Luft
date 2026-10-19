@@ -2,7 +2,8 @@ use std::fs::{self, File};
 use std::io::{Read, Write};
 use std::os::unix::fs::{PermissionsExt, symlink};
 use std::path::{Path, PathBuf};
-use std::process::Command;
+use std::process::{Command, Stdio};
+use std::sync::OnceLock;
 
 use super::bundle::{self, Bundle};
 use super::library::{self, AppImage, IconSize};
@@ -13,6 +14,7 @@ use crate::task::{CANCELLED, Task};
 const PREFIX: &str = "appimage-";
 const CHUNK: usize = 1 << 20;
 const MAIN_GROUP: &str = "[Desktop Entry]";
+const NO_SANDBOX: &str = "--no-sandbox";
 
 fn failed(error: impl std::fmt::Display) -> String {
     error.to_string()
@@ -60,15 +62,13 @@ pub fn placement(source: &Path, bundle: &Bundle) -> Placement {
                 .unwrap_or_default()
         });
     let slug = slug(&name);
+    let path = library::folder().join(format!("{slug}.AppImage"));
     let id = bundle
         .desktop_id
         .clone()
-        .filter(|id| is_desktop_id(id))
+        .filter(|id| is_desktop_id(id) && library::desktop_id_free(id, &path))
         .unwrap_or_else(|| format!("{PREFIX}{slug}"));
-    Placement {
-        id,
-        path: library::folder().join(format!("{slug}.AppImage")),
-    }
+    Placement { id, path }
 }
 
 fn is_desktop_id(id: &str) -> bool {
@@ -90,6 +90,7 @@ fn add(source: &Path, transfer: Transfer, task: Task) -> Result<AppImage, String
     task.progress(Stage::Preparing, None);
     let bundle = bundle::read(source)?;
     let Placement { id, path } = placement(source, &bundle);
+    claim(&id, &path)?;
     fs::create_dir_all(library::folder()).map_err(failed)?;
     if source != path {
         place(source, &path, transfer, task)?;
@@ -142,7 +143,14 @@ pub fn copy(source: &Path, destination: &Path, task: Task) -> Result<(), String>
     output.sync_all().map_err(failed)
 }
 
+fn claim(id: &str, executable: &Path) -> Result<(), String> {
+    library::owns_entry(id, executable)
+        .then_some(())
+        .ok_or_else(|| "Another app already uses this name in the app menu.".into())
+}
+
 pub fn integrate(id: &str, executable: &Path, bundle: &Bundle) -> Result<(), String> {
+    claim(id, executable)?;
     remove_icons(id);
     for icon in &bundle.icons {
         let folder = library::icons().join(icon.size.folder()).join("apps");
@@ -190,8 +198,11 @@ fn exec_line(original: &str, executable: &Path, bundle: &Bundle) -> String {
         .skip(1)
         .map(str::to_owned)
         .collect();
-    if bundle.electron && !arguments.iter().any(|argument| argument == "--no-sandbox") {
-        arguments.insert(0, "--no-sandbox".into());
+    if bundle.electron
+        && !namespace_sandbox_works()
+        && !arguments.iter().any(|argument| argument == NO_SANDBOX)
+    {
+        arguments.insert(0, NO_SANDBOX.into());
     }
     if bundle.chromium {
         chromium::enable_finger_scrolling(&mut arguments);
@@ -205,6 +216,26 @@ fn exec_line(original: &str, executable: &Path, bundle: &Bundle) -> String {
         .chain(arguments)
         .collect::<Vec<_>>()
         .join(" ")
+}
+
+fn namespace_sandbox_works() -> bool {
+    static WORKS: OnceLock<bool> = OnceLock::new();
+    *WORKS.get_or_init(|| {
+        Command::new("unshare")
+            .args([
+                "--user",
+                "--map-root-user",
+                "--net",
+                "--pid",
+                "--fork",
+                "true",
+            ])
+            .stdin(Stdio::null())
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .status()
+            .is_ok_and(|status| status.success())
+    })
 }
 
 fn desktop_entry(bundle: &Bundle, executable: &Path, icon: Option<&str>) -> String {

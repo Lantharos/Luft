@@ -7,6 +7,8 @@ use crate::desktop::DesktopEntry;
 
 const ICON_FOLDERS: [u32; 13] = [16, 22, 24, 32, 36, 48, 64, 72, 96, 128, 192, 256, 512];
 const SCALABLE: &str = "scalable";
+const DEFAULT_DATA_DIRS: &str = "/usr/local/share:/usr/share";
+const FLATPAK_EXPORTS: &str = "/var/lib/flatpak/exports/share";
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug)]
 pub enum IconSize {
@@ -66,6 +68,31 @@ pub fn folder() -> PathBuf {
 
 pub fn applications() -> PathBuf {
     dirs::data_dir().unwrap_or_default().join("applications")
+}
+
+fn other_applications() -> Vec<PathBuf> {
+    std::env::var("XDG_DATA_DIRS")
+        .unwrap_or_else(|_| DEFAULT_DATA_DIRS.into())
+        .split(':')
+        .filter(|directory| !directory.is_empty())
+        .map(PathBuf::from)
+        .chain(dirs::data_dir().map(|data| data.join("flatpak/exports/share")))
+        .chain([PathBuf::from(FLATPAK_EXPORTS)])
+        .map(|directory| directory.join("applications"))
+        .filter(|folder| *folder != applications())
+        .collect()
+}
+
+pub fn owns_entry(id: &str, executable: &Path) -> bool {
+    let desktop = applications().join(format!("{id}.desktop"));
+    !desktop.exists() || read(&desktop).is_some_and(|app| app.path == executable)
+}
+
+pub fn desktop_id_free(id: &str, executable: &Path) -> bool {
+    owns_entry(id, executable)
+        && other_applications()
+            .iter()
+            .all(|folder| !folder.join(format!("{id}.desktop")).exists())
 }
 
 pub fn icons() -> PathBuf {

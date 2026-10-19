@@ -24,6 +24,21 @@ const WARM_FOR: Duration = Duration::from_secs(180);
 const EXIT_WHEN_IDLE_FOR: Duration = Duration::from_secs(30);
 const CHECK_EVERY: Duration = Duration::from_secs(5);
 
+async fn to_shell<B>(
+    connection: &zbus::Connection,
+    names: &zbus::fdo::DBusProxy<'_>,
+    member: &str,
+    body: &B,
+) -> zbus::Result<()>
+where
+    B: serde::Serialize + zbus::zvariant::DynamicType,
+{
+    let shell = names.get_name_owner(bus::SHELL).await?;
+    connection
+        .emit_signal(Some(shell.as_ref()), PATH, NAME, member, body)
+        .await
+}
+
 fn main() -> Result<()> {
     tokio::runtime::Builder::new_multi_thread()
         .worker_threads(2)
@@ -39,7 +54,8 @@ async fn serve() -> Result<()> {
     let following = hub.clone();
     preferences::watch(move || following.follow())?;
     let connection = zbus::Connection::session().await?;
-    let (dictation, models) = bus::serve(&hub, zbus::fdo::DBusProxy::new(&connection).await?);
+    let names = zbus::fdo::DBusProxy::new(&connection).await?;
+    let (dictation, models) = bus::serve(&hub, names.clone());
     connection.object_server().at(PATH, dictation).await?;
     connection.object_server().at(PATH, models).await?;
     connection.request_name(NAME).await?;
@@ -47,30 +63,14 @@ async fn serve() -> Result<()> {
     tokio::spawn(async move {
         while let Some(event) = received.recv().await {
             let sent = match event {
-                Event::Partial(text) => {
-                    emitter
-                        .emit_signal(None::<&str>, PATH, NAME, "Partial", &(text,))
-                        .await
-                }
-                Event::Typed(text) => {
-                    emitter
-                        .emit_signal(None::<&str>, PATH, NAME, "Typed", &(text,))
-                        .await
-                }
+                Event::Partial(text) => to_shell(&emitter, &names, "Partial", &(text,)).await,
+                Event::Typed(text) => to_shell(&emitter, &names, "Typed", &(text,)).await,
                 Event::Sent(done) => {
                     let _ = done.send(());
                     Ok(())
                 }
-                Event::Level(level) => {
-                    emitter
-                        .emit_signal(None::<&str>, PATH, NAME, "Level", &(level,))
-                        .await
-                }
-                Event::Quiet => {
-                    emitter
-                        .emit_signal(None::<&str>, PATH, NAME, "Quiet", &())
-                        .await
-                }
+                Event::Level(level) => to_shell(&emitter, &names, "Level", &(level,)).await,
+                Event::Quiet => to_shell(&emitter, &names, "Quiet", &()).await,
                 Event::Changed => {
                     emitter
                         .emit_signal(

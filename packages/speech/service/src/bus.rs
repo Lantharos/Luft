@@ -23,7 +23,7 @@ pub enum Error {
     Failed(String),
 }
 
-const SHELL: BusName<'static> = BusName::WellKnown(
+pub const SHELL: BusName<'static> = BusName::WellKnown(
     zbus::names::WellKnownName::from_static_str_unchecked("com.lantharos.Kestrel"),
 );
 

@@ -8,10 +8,10 @@ import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {descendants, firstStyled, named, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {keyboard} from '../lib/input.js';
+import {centerOf, drag, fingerScroll, keyboard, liftFingers, moveTo, rest} from '../lib/input.js';
 import {gjs, repository, scratch, spawn, stop, waitForWindow} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
-import {pause} from '../lib/wait.js';
+import {pause, settled} from '../lib/wait.js';
 
 const {require, eventually} = checks('dictation');
 const SPEECH = 'com.lantharos.Speech1';
@@ -36,6 +36,9 @@ const US_LAYOUT = new GLib.Variant('a(ss)', [['xkb', 'us']]);
 const WAV_HEADER = 44;
 const BYTES_PER_SECOND = 32000;
 const HEARD_ENOUGH = 0.8;
+const SCROLL_DISTANCE = 120;
+const DRAG_DISTANCE = 80;
+const GDK_SHIFT_MASK = 1;
 
 const now = () => GLib.get_monotonic_time();
 const indicator = () => firstStyled('kestrel-dictation');
@@ -46,6 +49,8 @@ const start = () => named('kestrel-start');
 const words = text => text.toLowerCase().split(/[^\p{L}\p{N}']+/u).filter(Boolean);
 const entryText = window => window.title.match(/^Kestrel entry: (.*?)(?: \[.*\])?$/)?.[1] ?? '';
 const preedit = window => window.title.match(/\[(.+)\]$/)?.[1] ?? '';
+const reported = window => JSON.parse(window.title.match(/^Kestrel input: (.*)$/)?.[1] ?? '{"scrolled":0,"clicks":0,"typed":"","modifiers":0}');
+const activeWorkspace = () => global.workspace_manager.get_active_workspace_index();
 
 function holdKeys(keys) {
   for (const key of keys) keyboard().notify_key(now(), key, Clutter.KeyState.PRESSED);
@@ -234,6 +239,78 @@ async function checkChordKeepsShortcuts() {
   await eventually(() => !start().visible, 'and closes it again');
 }
 
+async function scrollOver(window) {
+  moveTo(centerOf(window.get_compositor_private()));
+  await fingerScroll(SCROLL_DISTANCE);
+  liftFingers();
+  await settled();
+}
+
+async function checkInputWhileHolding(window, {name, down, up}) {
+  const before = reported(window);
+  const workspace = activeWorkspace();
+  const frame = window.get_frame_rect();
+  down();
+  await eventually(() => reported(window).modifiers !== 0, `the app sees ${name}’s modifiers as they go down`);
+  await eventually(() => shown(indicator()), `holding ${name} dictates`);
+  await eventually(() => reported(window).modifiers === 0, `the app no longer sees ${name}’s modifiers once dictation starts`);
+  await scrollOver(window);
+  await eventually(() => reported(window).scrolled > before.scrolled, `two fingers scroll the app while ${name} is held`);
+  require(reported(window).scrollModifiers === 0 && activeWorkspace() === workspace, 'the app scrolls without modifiers and the workspace stays');
+  const [x, y] = centerOf(window.get_compositor_private());
+  await drag([x, y], [x + DRAG_DISTANCE, y + DRAG_DISTANCE]);
+  await eventually(() => reported(window).clicks > before.clicks, 'a click while dictating reaches the app');
+  const moved = window.get_frame_rect();
+  require(moved.x === frame.x && moved.y === frame.y && reported(window).clickModifiers === 0, 'dragging in the app doesn’t move its window or carry modifiers');
+  tapKey(KEY_J);
+  await eventually(() => reported(window).typed.endsWith('j'), 'a key typed while dictating reaches the app');
+  require(reported(window).keyModifiers === 0, 'the key reaches the app as typed, without the held modifiers');
+  require(shown(indicator()) && !shown(spinner()), 'scrolling, clicking and typing keep dictation listening');
+  up();
+  await eventually(() => shown(spinner()) || !shown(indicator()), `letting go of ${name} finishes dictating`);
+  await eventually(() => !shown(indicator()), 'the pill goes once the words are in', 10000);
+  rest();
+  holdKeys([KEY_LEFTSHIFT]);
+  await eventually(() => reported(window).modifiers === GDK_SHIFT_MASK, 'Shift pressed afterwards reaches the app on its own');
+  releaseKeys([KEY_LEFTSHIFT]);
+  await eventually(() => reported(window).modifiers === 0, 'and nothing stays held once it’s let go');
+}
+
+async function checkHoldLeavesInputAlone() {
+  const service = gjs('services/speech.js');
+  await eventually(() => owned(SPEECH), 'the stand-in dictation service is on the session bus');
+  const app = gjs('clients/window.js', ['--input']);
+  const window = await waitForWindow('Kestrel window check');
+  await eventually(() => window.has_focus(), 'the app takes the keyboard');
+
+  await checkInputWhileHolding(window, {name: 'Super and Alt', down: () => holdKeys(SUPER_ALT), up: () => releaseKeys(SUPER_ALT)});
+  await checkInputWhileHolding(window, {name: 'the Copilot key', down: holdCopilot, up: releaseCopilot});
+
+  let before = reported(window);
+  tapChord();
+  await eventually(() => shown(indicator()), 'a quick press of Super and Alt listens');
+  await eventually(() => reported(window).modifiers === 0, 'nothing stays held while listening after a press');
+  await scrollOver(window);
+  await eventually(() => reported(window).scrolled > before.scrolled, 'the app scrolls while listening after a press');
+  tapChord();
+  await eventually(() => !shown(indicator()), 'pressing again stops listening', 10000);
+
+  before = reported(window);
+  const workspace = activeWorkspace();
+  holdKeys(SUPER_ALT);
+  await scrollOver(window);
+  await pause(HOLD_MS);
+  require(!shown(indicator()), 'scrolling right after pressing Super and Alt means they weren’t meant for dictation');
+  require(reported(window).scrolled === before.scrolled, 'and the scroll goes to the desktop as Super and scroll, not to the app');
+  releaseKeys(SUPER_ALT);
+  rest();
+  await settled();
+  global.workspace_manager.get_workspace_by_index(workspace).activate(global.get_current_time());
+  await eventually(() => activeWorkspace() === workspace, 'the workspace the app is on comes back');
+  await stop(app);
+  await stop(service);
+}
+
 async function dictateInto(window, seconds, {down, up, name}) {
   const typed = entryText(window);
   down();
@@ -341,6 +418,7 @@ export async function run() {
     await checkPress(copilotKey);
     await checkSetupOffer();
     await checkChordKeepsShortcuts();
+    await checkHoldLeavesInputAlone();
     await checkPill();
     if (!RECORDING) {
       console.log('Kestrel dictation: KESTREL_DICTATION isn’t set, so dictating into apps isn’t checked');

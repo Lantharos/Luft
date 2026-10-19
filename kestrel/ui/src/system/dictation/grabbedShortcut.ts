@@ -12,8 +12,9 @@ const prependFilter = (Clutter.Event as unknown as { prepend_filter: typeof Clut
 
 /**
  * Keys grabbed from the compositor that tell when they go down and come up.
- * Mutter only reports letting go when the shortcut's own key comes up while
- * its modifiers are still held, so the first key to come up ends it.
+ * Mutter only reports letting go when the shortcut's own key comes up, so
+ * the first of its keys to come up ends it, even a modifier. Keys typed
+ * while it's held don't.
  */
 export class GrabbedShortcut {
   private readonly actions: number[] = [];
@@ -40,8 +41,11 @@ export class GrabbedShortcut {
   private pressed(): void {
     this.presses.down();
     if (this.releaseFilter) return;
+    const typed = new Set<number>();
     this.releaseFilter = prependFilter(null, event => {
-      if (event.type() === Clutter.EventType.KEY_RELEASE) this.released();
+      const type = event.type();
+      if (type === Clutter.EventType.KEY_PRESS && !(event.get_flags() & Clutter.EventFlags.FLAG_REPEATED)) typed.add(event.get_key_code());
+      else if (type === Clutter.EventType.KEY_RELEASE && !typed.delete(event.get_key_code())) this.released();
       return Clutter.EVENT_PROPAGATE;
     });
   }

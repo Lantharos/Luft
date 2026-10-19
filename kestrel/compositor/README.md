@@ -29,6 +29,7 @@ Kestrel runs on its own build of Mutter 51: the upstream release plus an ordered
 - `ext-idle-notify-v1`, so apps such as password managers can lock themselves after a while without use, sandboxed or not
 - `ext-data-control-v1`, so password managers can copy a password and clear it again while in the background: apps outside a sandbox always get it, Flatpak apps only when their ID is in `com.lantharos.kestrel` `clipboard-access-apps`
 - Virtual input devices that flip the tablet mode switch, for driving tablet mode in checks
+- Modifiers the shell can treat as used up while a shortcut made of them is held, such as the one held to dictate, so apps scroll, click and type as if they weren't held, and shortcuts that react to being let go that still notice it when a modifier comes up first
 - Smaller fixes, each described in its patch
 
 ## Build

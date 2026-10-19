@@ -16,7 +16,9 @@
  * It's activated once all of them are down, in any order and on either side
  * of the keyboard, and released when one of them comes up. Any other key,
  * button or scroll while they're held spoils it until every one is let go,
- * so shortcuts that start with the same modifiers keep working.
+ * so shortcuts that start with the same modifiers keep working. Once the
+ * seat treats the held modifiers as used up, other input no longer carries
+ * them and leaves the chord alone.
  */
 struct _ShellModifierChord
 {
@@ -211,7 +213,7 @@ filter_event (const ClutterEvent *event,
     case CLUTTER_BUTTON_PRESS:
     case CLUTTER_SCROLL:
     case CLUTTER_TOUCH_BEGIN:
-      if (self->keys)
+      if (self->keys && clutter_event_get_state (event) & HELD_ELSEWHERE)
         spoil (self);
       break;
     default:

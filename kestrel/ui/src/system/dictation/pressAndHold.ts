@@ -1,6 +1,10 @@
+import type Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
+import type Shell from 'gi://Shell';
 
 const HOLD_MS = 300;
+
+const seat = () => (global as unknown as Shell.Global).stage.context.get_backend().get_default_seat() as Clutter.Seat & { consume_held_modifiers(): void };
 
 export interface Presses {
   down(): void;
@@ -34,6 +38,7 @@ export class PressAndHold implements Presses {
     this.holdTimer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, HOLD_MS, () => {
       this.holdTimer = 0;
       this.holding = true;
+      seat().consume_held_modifiers();
       this.actions.begin();
       return GLib.SOURCE_REMOVE;
     });

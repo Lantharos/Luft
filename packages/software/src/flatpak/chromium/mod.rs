@@ -1,8 +1,11 @@
+mod confined;
 mod flags;
 mod launcher;
 
 use std::fs;
 use std::path::Path;
+
+use confined::Folder;
 
 use super::{Installed, installed};
 use crate::chromium;
@@ -32,11 +35,8 @@ fn integrate_app(app: &Installed) -> std::io::Result<()> {
     let Some(flags) = launcher::flags_file(&app.id, &deploy) else {
         return Ok(());
     };
-    let config = dirs::home_dir()
-        .unwrap_or_default()
-        .join(".var/app")
-        .join(&app.id)
-        .join("config");
+    let home = Folder::open(&dirs::home_dir().unwrap_or_default())?;
+    let config = home.descend(&Path::new(".var/app").join(&app.id).join("config"))?;
     flags.enable_finger_scrolling(&config)
 }
 

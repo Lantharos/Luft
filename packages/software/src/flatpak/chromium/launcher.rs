@@ -1,6 +1,7 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
+use super::confined::relative;
 use super::flags::{FlagsFile, Style};
 use crate::chromium::ENABLE_FEATURES;
 
@@ -12,25 +13,30 @@ const FLAGS_SUFFIX: &str = "flags.conf";
 pub fn flags_file(id: &str, deploy: &Path) -> Option<FlagsFile> {
     let files = deploy.join("files");
     if let Ok(cobalt) = fs::read_to_string(files.join(COBALT_CONFIG)) {
-        let name = application_key(&cobalt, "Name")
-            .map(str::to_owned)
-            .unwrap_or_else(|| id.rsplit('.').next().unwrap_or(id).to_lowercase());
-        return Some(FlagsFile {
-            path: PathBuf::from(format!("{name}-{FLAGS_SUFFIX}")),
-            style: Style::Cobalt,
-        });
+        return cobalt_flags_file(&cobalt, id);
     }
     let metadata = fs::read_to_string(deploy.join("metadata")).ok()?;
     let command = application_key(&metadata, "command")?;
     let script = match command.strip_prefix("/app/") {
-        Some(inside) => files.join(inside),
-        None => files.join("bin").join(command),
+        Some(inside) => files.join(relative(Path::new(inside))?),
+        None => files.join("bin").join(relative(Path::new(command))?),
     };
     let script = fs::read(script).ok()?;
     let script = String::from_utf8(script).ok()?;
     script_flags_file(&script).map(|path| FlagsFile {
         path,
         style: Style::Arguments,
+    })
+}
+
+fn cobalt_flags_file(cobalt: &str, id: &str) -> Option<FlagsFile> {
+    let name = application_key(cobalt, "Name")
+        .map(str::to_owned)
+        .unwrap_or_else(|| id.rsplit('.').next().unwrap_or(id).to_lowercase());
+    let path = PathBuf::from(format!("{name}-{FLAGS_SUFFIX}"));
+    (path.components().count() == 1 && relative(&path).is_some()).then_some(FlagsFile {
+        path,
+        style: Style::Cobalt,
     })
 }
 
@@ -59,7 +65,8 @@ fn script_flags_file(script: &str) -> Option<PathBuf> {
                 character.is_ascii_alphanumeric() || "._/-".contains(*character)
             })
             .collect();
-        path.ends_with(FLAGS_SUFFIX).then(|| PathBuf::from(path))
+        (path.ends_with(FLAGS_SUFFIX) && relative(Path::new(&path)).is_some())
+            .then(|| PathBuf::from(path))
     })
 }
 
@@ -86,6 +93,19 @@ mod tests {
     fn ignores_other_config_files() {
         let script = "FIRST_RUN=\"${XDG_CONFIG_HOME}/flatpak-vscode-first-run\"";
         assert_eq!(script_flags_file(script), None);
+    }
+
+    #[test]
+    fn refuses_flags_files_outside_the_config_folder() {
+        let script = "ARGS=\"${XDG_CONFIG_HOME}/../../.bashrc-flags.conf\"";
+        assert_eq!(script_flags_file(script), None);
+        let cobalt = "[Application]\nName=../../.bashrc";
+        assert_eq!(cobalt_flags_file(cobalt, "com.example.Browser"), None);
+        let cobalt = "[Application]\nName=brave";
+        assert_eq!(
+            cobalt_flags_file(cobalt, "com.brave.Browser").map(|file| file.path),
+            Some(PathBuf::from("brave-flags.conf"))
+        );
     }
 
     #[test]

@@ -1,6 +1,6 @@
-use std::fs;
 use std::path::{Path, PathBuf};
 
+use super::confined::Folder;
 use crate::chromium::{self, ENABLE_FEATURES, FINGER_SCROLLING};
 
 const COBALT_FEATURE: &str = "features+=";
@@ -18,16 +18,17 @@ pub struct FlagsFile {
 }
 
 impl FlagsFile {
-    pub fn enable_finger_scrolling(&self, config: &Path) -> std::io::Result<()> {
-        let path = config.join(&self.path);
-        let text = fs::read_to_string(&path).unwrap_or_default();
+    pub fn enable_finger_scrolling(&self, config: &Folder) -> std::io::Result<()> {
+        let name = self
+            .path
+            .file_name()
+            .ok_or(std::io::ErrorKind::InvalidInput)?;
+        let folder = config.descend(self.path.parent().unwrap_or(Path::new("")))?;
+        let text = folder.read_text(name)?;
         let Some(text) = self.style.with_finger_scrolling(&text) else {
             return Ok(());
         };
-        if let Some(folder) = path.parent() {
-            fs::create_dir_all(folder)?;
-        }
-        fs::write(path, text)
+        folder.replace(name, &text)
     }
 }
 

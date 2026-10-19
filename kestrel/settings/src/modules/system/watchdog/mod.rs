@@ -4,7 +4,7 @@ mod stall;
 use std::time::Duration;
 
 use futures_util::StreamExt;
-use tokio::time::{Instant, sleep_until, timeout};
+use tokio::time::{Instant, MissedTickBehavior, interval, timeout};
 use zbus::Connection;
 use zbus::OwnedFd;
 use zbus::fdo::DBusProxy;
@@ -16,8 +16,7 @@ use proxies::{HealthProxy, LoginSessionProxy, LoginUserProxy, WatchdogProxy};
 use stall::Stall;
 
 const KESTREL: &str = "com.lantharos.Kestrel";
-const HEALTHY_INTERVAL: Duration = Duration::from_secs(6);
-const STALLED_INTERVAL: Duration = Duration::from_secs(3);
+const CHECK_INTERVAL: Duration = Duration::from_secs(3);
 const ANSWER_LIMIT: Duration = Duration::from_secs(3);
 const PRESENTATION_LIMIT: Duration = Duration::from_secs(10);
 const POWER_KEYS_AFTER: Duration = Duration::from_secs(6);
@@ -142,7 +141,8 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
 
     tokio::spawn(async move {
         let mut stall = Stall::default();
-        let mut next_check = Instant::now();
+        let mut checks = interval(CHECK_INTERVAL);
+        checks.set_missed_tick_behavior(MissedTickBehavior::Delay);
         loop {
             tokio::select! {
                 Some(signal) = sleeps.next() => {
@@ -150,8 +150,7 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
                         stall.sleeping(args.start);
                     }
                 }
-                _ = sleep_until(next_check) => {
-                    let asked = Instant::now();
+                _ = checks.tick() => {
                     let active = match &display {
                         Some(display) => display.active().await.unwrap_or(true),
                         None => true,
@@ -168,7 +167,6 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
                             Duration::ZERO
                         }
                     };
-                    next_check = asked + if stalled.is_zero() { HEALTHY_INTERVAL } else { STALLED_INTERVAL };
                     if stalled >= POWER_KEYS_AFTER {
                         power_keys.release();
                     } else {

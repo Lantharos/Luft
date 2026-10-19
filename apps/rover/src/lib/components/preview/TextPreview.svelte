@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { renderMarkdown } from '@luft/ui';
+	import { RemoteImagesNotice, renderMarkdown } from '@luft/ui';
 	import { highlight } from '@luft/ui/code';
 	import * as api from '#lib/api.js';
 	import { loadText, type TextPreview } from '#lib/file-manager/inspect/text.js';
@@ -15,12 +15,14 @@
 
 	const PANE_LINES = 60;
 	const HIGHLIGHT_LIMIT = 64 * 1024;
-	const WEB_LINK = /^https?:\/\//i;
+	const WEB_LINK = /^(https?:|mailto:)/i;
 
 	let result = $state.raw<TextPreview | null>(null);
 	let highlighted = $state.raw<{ html: string; rest: string } | null>(null);
 	let text = $derived(result && 'text' in result ? (full ? result.text : result.text.split('\n', PANE_LINES).join('\n')) : '');
 	let html = $state('');
+	let heldBack = $state(false);
+	let remoteImages = $state(false);
 
 	$effect(() => {
 		if (!markdown || !text) {
@@ -28,8 +30,10 @@
 			return;
 		}
 		let current = true;
-		void renderMarkdown(text, entry.path).then((rendered) => {
-			if (current) html = rendered;
+		void renderMarkdown(text, entry.path, remoteImages).then((rendered) => {
+			if (!current) return;
+			html = rendered.html;
+			heldBack = rendered.heldBack;
 		});
 		return () => (current = false);
 	});
@@ -49,6 +53,7 @@
 	$effect(() => {
 		const controller = new AbortController();
 		result = null;
+		remoteImages = false;
 		loadText(entry.path, entry.size, controller.signal).then(
 			(loaded) => (result = loaded),
 			() => (result = { binary: true })
@@ -61,14 +66,19 @@
 		if (!link) return;
 		event.preventDefault();
 		const href = link.getAttribute('href') ?? '';
-		if (WEB_LINK.test(href)) void api.openWithDefault(href);
+		if (WEB_LINK.test(href)) void api.openLink(href);
 	}
 </script>
 
 {#if result && 'binary' in result}
 	<p class="preview-note">This file can’t be shown as text.</p>
 {:else if html}
-	<article class={['preview-markdown', full ? 'is-full' : 'is-compact']} onclickcapture={followLink}>{@html html}</article>
+	<article class={['preview-markdown', full ? 'is-full' : 'is-compact']} onclickcapture={followLink}>
+		{#if heldBack && full}
+			<RemoteImagesNotice class="preview-markdown__remote" onshow={() => (remoteImages = true)} />
+		{/if}
+		{@html html}
+	</article>
 {:else if result && !(markdown && text)}
 	<pre class={['preview-code', full ? 'is-full' : 'is-compact']}>{#if highlighted}{@html highlighted.html}{highlighted.rest}{:else}{text}{/if}{#if full && result.truncated}<span class="preview-code__more">…</span>{/if}</pre>
 {/if}

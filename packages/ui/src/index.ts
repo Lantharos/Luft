@@ -62,6 +62,7 @@ export { Toasts, type ToastMessage } from './notices/toasts.svelte';
 
 export { ago, bytes, memoryBytes, plural, watts } from './text/format';
 export { renderMarkdown } from './text/markdown';
+export { default as RemoteImagesNotice } from './text/RemoteImagesNotice.svelte';
 export { basename, fileUri, fileUrlPath, isInside, pathsFromUriList } from './text/paths';
 
 export { activationToken } from './shell/activation';

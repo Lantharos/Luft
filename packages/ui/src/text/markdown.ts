@@ -1,9 +1,10 @@
 import { fileUrl, isAvailable } from '@lantharos/sabine';
 
 const EXTERNAL = /^[a-z][a-z0-9+.-]*:/i;
+const REMOTE = /^https?:/i;
 const BLOCK_RULES = ['paragraph_open', 'heading_open', 'blockquote_open', 'bullet_list_open', 'ordered_list_open', 'table_open', 'hr', 'code_block'];
 
-type RenderEnv = { path: string | null };
+type RenderEnv = { path: string | null; remoteImages: boolean; heldBack: boolean };
 
 let parser: ReturnType<typeof create> | null = null;
 
@@ -35,15 +36,21 @@ async function create() {
 	const image = markdown.renderer.rules.image!;
 	markdown.renderer.rules.image = (tokens, index, options, env, self) => {
 		const source = String(tokens[index].attrGet('src') ?? '');
-		const { path } = env as RenderEnv;
-		if (isAvailable() && path && source && !EXTERNAL.test(source)) tokens[index].attrSet('src', fileUrl(besideDocument(source, path)));
+		const render = env as RenderEnv;
+		if (REMOTE.test(source) && !render.remoteImages) {
+			render.heldBack = true;
+			tokens[index].attrs = tokens[index].attrs!.filter(([name]) => name !== 'src');
+			tokens[index].attrSet('data-remote', source);
+		} else if (isAvailable() && render.path && source && !EXTERNAL.test(source)) tokens[index].attrSet('src', fileUrl(besideDocument(source, render.path)));
 		return image(tokens, index, options, env, self);
 	};
 	return markdown;
 }
 
-export async function renderMarkdown(source: string, path: string | null) {
+/** Renders `source` to HTML, holding back pictures from the web unless `remoteImages` allows them. */
+export async function renderMarkdown(source: string, path: string | null, remoteImages = false) {
 	parser ??= create();
-	const env: RenderEnv = { path };
-	return (await parser).render(source, env);
+	const env: RenderEnv = { path, remoteImages, heldBack: false };
+	const html = (await parser).render(source, env);
+	return { html, heldBack: env.heldBack };
 }

@@ -279,6 +279,14 @@
 		border-radius: 8px;
 	}
 
+	.preview-markdown img[data-remote] {
+		display: none;
+	}
+
+	.preview-markdown__remote {
+		margin-bottom: 16px;
+	}
+
 	.preview-markdown table {
 		border-collapse: collapse;
 	}

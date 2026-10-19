@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { renderMarkdown } from '@luft/ui';
+	import { RemoteImagesNotice, renderMarkdown } from '@luft/ui';
+	import { SvelteSet } from 'svelte/reactivity';
 	import { highlight } from '@luft/ui/code';
 	import { useApp } from '#lib/app/context.js';
 	import { openPath } from '#lib/documents/opening.js';
@@ -12,6 +13,8 @@
 	const WEB_LINK = /^(https?:|mailto:)/i;
 
 	let html = $state('');
+	let heldBack = $state(false);
+	const showingRemote = new SvelteSet<string>();
 	let container = $state<HTMLElement>();
 	const highlighted = new Map<string, string>();
 
@@ -19,8 +22,11 @@
 		void workspace.revision;
 		const document = workspace.active;
 		if (!document) return;
+		const remoteImages = showingRemote.has(document.id);
 		const timer = setTimeout(async () => {
-			html = await renderMarkdown(workspace.editor.state(document).doc.toString(), document.path);
+			const rendered = await renderMarkdown(workspace.editor.state(document).doc.toString(), document.path, remoteImages);
+			html = rendered.html;
+			heldBack = rendered.heldBack;
 		}, html ? RENDER_DELAY_MS : 0);
 		return () => clearTimeout(timer);
 	});
@@ -78,6 +84,10 @@
 </script>
 
 <article bind:this={container} class="markdown soft-scroll" {@attach links}>
+	{#if heldBack && workspace.active}
+		{@const id = workspace.active.id}
+		<RemoteImagesNotice class="remote" onshow={() => showingRemote.add(id)} />
+	{/if}
 	{@html html}
 </article>
 
@@ -202,5 +212,13 @@
 	.markdown :global(img) {
 		max-width: 100%;
 		border-radius: 10px;
+	}
+
+	.markdown :global(img[data-remote]) {
+		display: none;
+	}
+
+	.markdown :global(.remote) {
+		margin-bottom: 18px;
 	}
 </style>

@@ -43,6 +43,7 @@ function hide() {
 
 export function tooltip(text: string): Attachment<HTMLElement> {
 	return (node) => {
+		if (!text) return;
 		const enter = () => {
 			clearTimeout(timer);
 			const warm = performance.now() - hiddenAt < WARM_MS;

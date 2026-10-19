@@ -25,7 +25,7 @@
 
 <section class="flex min-h-0 flex-1 flex-col gap-0.5">
 	<div class="flex items-center gap-1 pr-1">
-		<h2 class="sidebar-heading flex-1 truncate" title={tree.root}>{basename(tree.root ?? '')}</h2>
+		<h2 class="sidebar-heading flex-1 truncate" {@attach tooltip(tree.root ?? '')}>{basename(tree.root ?? '')}</h2>
 		<button type="button" class="tree-action" aria-label="Collapse folders" onclick={() => tree.collapseAll()} {@attach tooltip('Collapse folders')}>
 			<ChevronsDownUp size={14} />
 		</button>

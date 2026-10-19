@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { bytes } from '@luft/ui';
+	import { bytes, tooltip } from '@luft/ui';
 	import type { ImageDetails, Item } from '#lib/bridge/api.js';
 	import * as api from '#lib/bridge/api.js';
 	import { formatCoordinate, formatDate, formatExposure } from '#lib/library/format.js';
@@ -46,7 +46,7 @@
 </script>
 
 <aside class="details soft-scroll" aria-label="Details">
-	<h2 class="mb-4 truncate text-[15px] font-semibold" title={item.name}>{item.name}</h2>
+	<h2 class="mb-4 truncate text-[15px] font-semibold" {@attach tooltip(item.name)}>{item.name}</h2>
 	<dl class="flex flex-col gap-3.5">
 		{#each rows as [label, value] (label)}
 			<div>

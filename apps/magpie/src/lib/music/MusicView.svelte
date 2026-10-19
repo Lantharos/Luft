@@ -54,7 +54,7 @@
 				<Artwork art={track.art} size={Math.round(Math.min(360, height * 0.42))} radius={14} />
 			</div>
 			<div class="w-full min-w-0 text-center">
-				<h2 class="truncate text-[21px] font-semibold text-[var(--text)]" title={trackTitle(track)}>{trackTitle(track)}</h2>
+				<h2 class="truncate text-[21px] font-semibold text-[var(--text)]" {@attach tooltip(trackTitle(track))}>{trackTitle(track)}</h2>
 				<p class="mt-1 truncate text-[14px] text-[var(--text-muted)]">{byline}</p>
 			</div>
 			<div class="w-full">

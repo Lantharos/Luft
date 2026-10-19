@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import X from '@lucide/svelte/icons/x';
+	import { tooltip } from '@luft/ui';
 	import * as api from '#lib/api/index.js';
 	import type { Address } from '#lib/api/index.js';
 	import ComposeField from './ComposeField.svelte';
@@ -84,7 +85,7 @@
 <ComposeField {label}>
 	<div class="chips">
 		{#each addresses as address (address.address)}
-			<span class="chip" title={address.address}>
+			<span class="chip" {@attach tooltip(address.address)}>
 				{address.name || address.address}
 				<button type="button" aria-label="Remove {address.address}" onclick={() => (addresses = addresses.filter((candidate) => candidate !== address))}><X size={12} /></button>
 			</span>

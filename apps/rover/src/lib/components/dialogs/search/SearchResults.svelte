@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tooltip } from '@luft/ui';
 	import Icon from '#lib/components/Icon.svelte';
 	import type { SearchResult } from '#lib/features/types.js';
 	import { entryIcon } from '#lib/utils/file-kinds.js';
@@ -44,7 +45,7 @@
 						<span class="block truncate text-[12px] text-[var(--text-soft)]">{result.snippet}</span>
 					{/if}
 				</span>
-				<span class="max-w-[40%] shrink-0 truncate text-[12px] text-[var(--text-muted)]" title={parentPath(result.path)}>
+				<span class="max-w-[40%] shrink-0 truncate text-[12px] text-[var(--text-muted)]" {@attach tooltip(parentPath(result.path))}>
 					{location(result)}
 				</span>
 			</button>

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { tick } from 'svelte';
-	import { Checkbox, Dialog, plural, Segmented, TextField } from '@luft/ui';
+	import { Checkbox, Dialog, plural, Segmented, TextField, tooltip } from '@luft/ui';
 	import * as features from '#lib/features/api.js';
 	import { previewRenames, type Casing, type RenameMode, type RenameOptions } from '#lib/features/rename.js';
 	import type { FileEntry } from '#lib/types/index.js';
@@ -96,11 +96,11 @@
 	<ol class="soft-scroll flex max-h-[260px] flex-col overflow-y-auto rounded-[16px] bg-[var(--surface)] p-1.5 text-[13px]">
 		{#each preview as item (item.entry.path)}
 			<li class="grid grid-cols-[minmax(0,1fr)_16px_minmax(0,1fr)] items-center gap-2 rounded-[10px] px-2.5 py-1.5">
-				<span class="truncate text-[var(--text-muted)]" title={item.entry.name}>{item.entry.name}</span>
+				<span class="truncate text-[var(--text-muted)]" {@attach tooltip(item.entry.name)}>{item.entry.name}</span>
 				<span class="text-center text-[var(--text-muted)]" aria-hidden="true">→</span>
 				<span
 					class={['truncate', item.problem ? 'text-[var(--danger)]' : item.name === item.entry.name ? 'text-[var(--text-muted)]' : 'text-[var(--text)]']}
-					title={item.problem ?? item.name}
+					{@attach tooltip(item.problem ?? item.name)}
 				>
 					{item.name || item.problem}
 				</span>

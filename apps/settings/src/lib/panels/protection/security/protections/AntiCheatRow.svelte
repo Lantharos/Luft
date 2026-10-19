@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Gamepad2 from '@lucide/svelte/icons/gamepad-2';
-	import { Row } from '@luft/ui';
+	import { Row, tooltip } from '@luft/ui';
 	import { keepOtherKeys, problem, removeOtherKeys, restart, type AntiCheat, type SigningKey } from '../api';
 	import KeyStepsDialog from './KeyStepsDialog.svelte';
 
@@ -46,7 +46,7 @@
 		<button type="button" class="button" disabled={busy} onclick={() => attempt(keepOtherKeys)}>Cancel</button>
 		<button type="button" class="button" disabled={busy} onclick={() => attempt(restart)}>Restart</button>
 	{:else if key.otherKeys.length}
-		<button type="button" class="button" disabled={busy} title={key.otherKeys.join(', ')} onclick={remove}>Remove</button>
+		<button type="button" class="button" disabled={busy} {@attach tooltip(key.otherKeys.join(', '))} onclick={remove}>Remove</button>
 	{/if}
 </Row>
 

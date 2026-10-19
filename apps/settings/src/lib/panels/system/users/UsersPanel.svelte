@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Camera from '@lucide/svelte/icons/camera';
-	import { Avatar, Dialog, ItemRow, Row, Section, TextField } from '@luft/ui';
+	import { Avatar, Dialog, ItemRow, Row, Section, TextField, tooltip } from '@luft/ui';
 	import FingerprintSection from './FingerprintSection.svelte';
 	import PasswordDialog from './PasswordDialog.svelte';
 	import { accountType, choosePicture, displayName, rename, users, type Users } from './api';
@@ -50,7 +50,7 @@
 {#if accounts}
 	{@const me = accounts.me}
 	<div class="flex items-center gap-5 px-2 pb-2">
-		<button type="button" class="picture" aria-label="Change your picture" title="Change your picture" onclick={() => attempt(choosePicture)}>
+		<button type="button" class="picture" aria-label="Change your picture" {@attach tooltip('Change your picture')} onclick={() => attempt(choosePicture)}>
 			<Avatar picture={me.picture} name={displayName(me)} size={76} {version} />
 			<span class="overlay">Edit</span>
 			<span class="puck"><Camera size={13} /></span>

@@ -15,7 +15,7 @@
 </script>
 
 <div class="font-row" class:divided>
-	<button type="button" class="main" title="Open {family.name}" onclick={onopen}>
+	<button type="button" class="main" {@attach tooltip(`Open ${family.name}`)} onclick={onopen}>
 		<span class="name">{family.name}</span>
 		<span class="sample" style:font-family="'{family.name}', var(--font-sans)" aria-hidden="true">The quick brown fox jumps over the lazy dog</span>
 		<span class="styles">{family.styles === 1 ? '1 style' : `${family.styles} styles`}</span>

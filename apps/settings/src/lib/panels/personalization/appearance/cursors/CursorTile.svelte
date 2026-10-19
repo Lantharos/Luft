@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { fileUrl } from '@lantharos/sabine';
 	import X from '@lucide/svelte/icons/x';
+	import { tooltip } from '@luft/ui';
 	import { cursorPreview, type CursorTheme } from './api';
 
 	interface Props {
@@ -39,7 +40,7 @@
 		<span class="name">{theme.title}</span>
 	</button>
 	{#if theme.removable}
-		<button type="button" class="remove" aria-label="Remove {theme.title}" title="Remove" onclick={onremove}>
+		<button type="button" class="remove" aria-label="Remove {theme.title}" {@attach tooltip('Remove')} onclick={onremove}>
 			<X size={14} />
 		</button>
 	{/if}

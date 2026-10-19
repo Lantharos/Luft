@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { VirtualScroller } from '@luft/ui';
+	import { tooltip, VirtualScroller } from '@luft/ui';
 	import { chrome } from '#lib/app/chrome.svelte.js';
 	import { codepoints, hex } from './characters';
 	import { fontState } from './state.svelte';
@@ -17,7 +17,7 @@
 
 <VirtualScroller class="soft-scroll min-h-0 flex-1" items={list} key={(codepoint) => String(codepoint)} layout={LAYOUT}>
 	{#snippet children(codepoint)}
-		<button type="button" class="glyph" title="Copy {hex(codepoint)}" onclick={() => copy(codepoint)}>
+		<button type="button" class="glyph" {@attach tooltip(`Copy ${hex(codepoint)}`)} onclick={() => copy(codepoint)}>
 			<span class="character" style:font-family="'{fontState.family}'" style:font-variation-settings={fontState.variation}>{String.fromCodePoint(codepoint)}</span>
 			<span class="code">{hex(codepoint)}</span>
 		</button>

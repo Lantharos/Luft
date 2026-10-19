@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { basename, bytes } from '@luft/ui';
+	import { basename, bytes, tooltip } from '@luft/ui';
 	import Icon from '#lib/components/Icon.svelte';
 	import type { ConflictItem } from '#lib/features/types.js';
 	import { formatDate, formatFullDate } from '#lib/utils/format.js';
@@ -22,8 +22,8 @@
 			<Icon name={item.is_dir ? 'folder' : 'file'} size={19} />
 		</span>
 		<div class="min-w-0">
-			<div class="truncate text-[14px] font-medium" title={item.name}>{item.name}</div>
-			<div class="truncate text-[12px] text-[var(--text-muted)]" title={parentPath(item.path)}>
+			<div class="truncate text-[14px] font-medium" {@attach tooltip(item.name)}>{item.name}</div>
+			<div class="truncate text-[12px] text-[var(--text-muted)]" {@attach tooltip(parentPath(item.path))}>
 				In {basename(parentPath(item.path)) || '/'}
 			</div>
 		</div>
@@ -32,7 +32,7 @@
 		<dt class="text-[var(--text-muted)]">Size</dt>
 		<dd class={['truncate text-right', larger ? 'text-[var(--text)]' : 'text-[var(--text-soft)]']}>{bytes(item.size)}</dd>
 		<dt class="text-[var(--text-muted)]">Modified</dt>
-		<dd class={['truncate text-right', newer ? 'text-[var(--accent)]' : 'text-[var(--text-soft)]']} title={formatFullDate(item.modified)}>
+		<dd class={['truncate text-right', newer ? 'text-[var(--accent)]' : 'text-[var(--text-soft)]']} {@attach tooltip(formatFullDate(item.modified))}>
 			{formatDate(item.modified) || 'Unknown'}
 		</dd>
 	</dl>

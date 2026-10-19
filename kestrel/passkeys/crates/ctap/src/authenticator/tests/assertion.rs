@@ -47,10 +47,7 @@ fn signs_in_with_a_discoverable_passkey_without_claiming_backup() {
     assert_eq!(parsed.flags, UP | UV);
     assert_eq!(parsed.flags & BACKUP, 0);
     let user = entries(fields.required(0x04).unwrap());
-    assert_eq!(
-        cbor::text(user.required("name").unwrap()).unwrap(),
-        "mara"
-    );
+    assert_eq!(cbor::text(user.required("name").unwrap()).unwrap(), "mara");
 
     let message = [auth_data, Sha256::digest(b"client data").as_slice()].concat();
     let signature = DerSignature::try_from(bytes(&fields, 0x03)).unwrap();
@@ -89,7 +86,7 @@ fn returns_the_account_picked_in_the_prompt() {
 }
 
 #[test]
-fn silent_probes_skip_the_prompt_and_hide_protected_passkeys() {
+fn silent_probes_skip_the_prompt_and_reveal_only_listed_passkeys() {
     let mock = Mock::default();
     mock.insert(
         vec![1; 16],
@@ -123,5 +120,14 @@ fn silent_probes_skip_the_prompt_and_hide_protected_passkeys() {
     );
     let response = command(&mut authenticator, 0x02, probe(2)).unwrap();
     assert_eq!(parse_auth_data(bytes(&entries(&response), 0x02)).flags, 0);
+    let unlisted = cbor::map([
+        (0x01, Value::from("bank.example")),
+        (0x02, Value::Bytes(vec![0; 32])),
+        (0x05, cbor::map([("up", Value::from(false))])),
+    ]);
+    assert_eq!(
+        command(&mut authenticator, 0x02, unlisted),
+        Err(Status::NoCredentials.code())
+    );
     assert!(authenticator.platform().prompts.borrow().is_empty());
 }

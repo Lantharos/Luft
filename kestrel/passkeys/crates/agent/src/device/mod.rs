@@ -7,6 +7,7 @@ use std::time::Duration;
 
 use ctap::hid::{CBOR, Inbound, Keepalive, Message, Transport};
 use ctap::{Authenticator, Status};
+use tokio::time::MissedTickBehavior;
 
 use crate::platform::Agent;
 use crate::service::Notifier;
@@ -54,6 +55,7 @@ async fn serve(mut relay: Relay, agent: &Agent, notifier: &Notifier) {
     let mut idle = Some(Authenticator::new(agent.clone()));
     let mut busy: Option<Busy> = None;
     let mut keepalive = tokio::time::interval(KEEPALIVE);
+    keepalive.set_missed_tick_behavior(MissedTickBehavior::Delay);
     loop {
         let outgoing = tokio::select! {
             frame = relay.frames.recv() => {
@@ -85,6 +87,7 @@ async fn serve(mut relay: Relay, agent: &Agent, notifier: &Notifier) {
                                 (authenticator, reply)
                             });
                             busy = Some(Busy { channel: message.channel, work });
+                            keepalive.reset();
                             None
                         }
                         Some(Inbound::Cancel(channel)) => {

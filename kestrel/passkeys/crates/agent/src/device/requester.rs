@@ -26,9 +26,11 @@ fn holds(pid: &str, node: &Path) -> bool {
 
 pub fn find(uniq: &str) -> Option<u32> {
     let node = node(uniq)?;
-    fs::read_dir("/proc").ok()?.flatten().find_map(|entry| {
+    let mut holders = fs::read_dir("/proc").ok()?.flatten().filter_map(|entry| {
         let name = entry.file_name();
         let pid = name.to_str()?;
         pid.parse::<u32>().ok().filter(|_| holds(pid, &node))
-    })
+    });
+    let only = holders.next()?;
+    holders.next().is_none().then_some(only)
 }

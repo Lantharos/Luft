@@ -63,6 +63,9 @@ fn relay(mut agent: UnixStream, seat: &Seat) -> io::Result<()> {
         drop(fds);
         if seat_changed {
             seat.flush();
+            if !seat.present() {
+                return Ok(());
+            }
         }
         if agent_ready {
             let mut report = [0; REPORT];
@@ -102,6 +105,10 @@ fn main() -> ExitCode {
             return ExitCode::FAILURE;
         }
     };
+    if !seat.present() {
+        eprintln!("User {uid} has no session on this computer's screen");
+        return ExitCode::FAILURE;
+    }
     match relay(agent, &seat) {
         Ok(()) => ExitCode::SUCCESS,
         Err(error) => {

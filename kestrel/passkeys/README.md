@@ -8,7 +8,7 @@ Browsers see Luft Passkeys as a USB security key, so Chrome, Chromium-based brow
 
 | Part | Runs as | Does |
 | --- | --- | --- |
-| `luft-passkeys-relay` | root, one per connection, no capabilities | Creates the virtual security key (`/dev/uhid`) while its owner is at the screen |
+| `luft-passkeys-relay` | root, one per connection, no capabilities | Creates the virtual security key (`/dev/uhid`) while its owner is at the screen, and refuses anyone without a session there |
 | `luft-passkeys` | you | Speaks CTAP 2.1, asks Kestrel for confirmation, stores passkeys in Luft Keyring |
 | Luft Keyring | you | Keeps passkeys in its Passkeys collection and makes every signature |
 | Kestrel | you | Shows the prompt; `kestrel-authenticate` checks the fingerprint or password |

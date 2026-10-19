@@ -78,6 +78,9 @@ impl<P: Platform> Authenticator<P> {
 
         let listed = !allowed.is_empty();
         let verifying = by_token || options.presence || options.verification;
+        if !verifying && !listed {
+            return Err(Status::NoCredentials);
+        }
         let mut candidates = self.platform.credentials(rp_id).await?;
         candidates.retain(|credential| {
             let eligible = if listed {

@@ -27,8 +27,16 @@ impl Seat {
         Ok(Self { uid, monitor })
     }
 
+    pub fn present(&self) -> bool {
+        self.on_seat(false)
+    }
+
     pub fn active(&self) -> bool {
-        unsafe { sd_uid_is_on_seat(self.uid, 1, c"seat0".as_ptr()) > 0 }
+        self.on_seat(true)
+    }
+
+    fn on_seat(&self, require_active: bool) -> bool {
+        unsafe { sd_uid_is_on_seat(self.uid, c_int::from(require_active), c"seat0".as_ptr()) > 0 }
     }
 
     pub fn fd(&self) -> BorrowedFd<'_> {

@@ -12,5 +12,13 @@ export const repoDocs: RepoDoc[] = [
 	{ file: 'docs/motion.md', slug: 'motion', order: 9 },
 	{ file: 'docs/prompts.md', slug: 'prompts', order: 10 },
 	{ file: 'docs/memory.md', slug: 'memory', order: 11 },
-	{ file: 'docs/system-packages.md', slug: 'system-packages', order: 12 }
+	{ file: 'docs/system-packages.md', slug: 'system-packages', order: 12 },
+	{ file: 'docs/components/kestrel.md', slug: 'kestrel', order: 13 },
+	{ file: 'docs/components/compositor.md', slug: 'compositor', order: 14 },
+	{ file: 'docs/components/keyring.md', slug: 'keyring', order: 15 },
+	{ file: 'docs/components/sushi.md', slug: 'sushi', order: 16 },
+	{ file: 'docs/components/app.md', slug: 'app-shell', order: 17 },
+	{ file: 'docs/components/ui.md', slug: 'ui-kit', order: 18 },
+	{ file: 'docs/components/software.md', slug: 'software-library', order: 19 },
+	{ file: 'docs/components/keys.md', slug: 'keys', order: 20 }
 ];

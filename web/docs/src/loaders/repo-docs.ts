@@ -15,20 +15,20 @@ const repoRoot = new URL('../../../../', import.meta.url);
 const run = promisify(execFile);
 const sourceBlob = `${urls.source}/blob/main/`;
 
-function siteLink(target: string, docs: RepoDoc[], image: boolean) {
+function siteLink(target: string, from: string, docs: RepoDoc[], image: boolean) {
 	const [path, anchor] = target.split('#');
-	const resolved = posix.normalize(posix.join('docs', path));
+	const resolved = posix.normalize(posix.join(posix.dirname(from), path));
 	if (image) return `${urls.source}/raw/main/${resolved}`;
 	const doc = docs.find(({ file }) => file === resolved);
 	if (doc) return `/reference/${doc.slug}/${anchor ? `#${anchor}` : ''}`;
 	return `${sourceBlob}${resolved}${anchor ? `#${anchor}` : ''}`;
 }
 
-function rewriteLinks(markdown: string, docs: RepoDoc[]) {
+function rewriteLinks(markdown: string, from: string, docs: RepoDoc[]) {
 	return markdown.replace(/(!?)(\[[^\]]*\]\()([^)\s]+)\)/g, (match, bang: string, label: string, target: string) => {
 		if (target.startsWith(urls.docs)) return `${bang}${label}${target.slice(urls.docs.length)})`;
 		if (/^([a-z]+:|#|\/)/.test(target)) return match;
-		return `${bang}${label}${siteLink(target, docs, bang === '!')})`;
+		return `${bang}${label}${siteLink(target, from, docs, bang === '!')})`;
 	});
 }
 
@@ -62,7 +62,7 @@ async function loadDoc(context: LoaderContext, doc: RepoDoc, docs: RepoDoc[]) {
 		body,
 		filePath: `src/content/docs/${id}.md`,
 		digest: context.generateDigest(source),
-		rendered: await context.renderMarkdown(rewriteLinks(body, docs), { fileURL: new URL(`web/docs/src/content/docs/${id}.md`, repoRoot) })
+		rendered: await context.renderMarkdown(rewriteLinks(body, doc.file, docs), { fileURL: new URL(`web/docs/src/content/docs/${id}.md`, repoRoot) })
 	});
 }
 

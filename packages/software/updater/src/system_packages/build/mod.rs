@@ -235,9 +235,7 @@ pub fn build(
     checks::check(requested, &rpms, &base)?;
 
     step(Step::Building);
-    let devices = install::devices(&root)?;
-    work.mounted(&devices);
-    install::install(&root, &os.version_id, &rpms)?;
+    install::install(&root, &os.version_id, &rpms_folder, &rpms)?;
     let layout = Layout {
         lower: &tree,
         root: &root,

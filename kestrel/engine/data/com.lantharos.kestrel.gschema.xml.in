@@ -222,15 +222,6 @@
         accent color.
       </description>
     </key>
-    <key name="share-app-memory" type="b">
-      <default>true</default>
-      <summary>Let Sabine apps share identical memory</summary>
-      <description>
-        When enabled, apps built on Sabine keep one copy of memory pages they
-        have in common. Web browsers are never included. Applies to apps
-        opened afterwards.
-      </description>
-    </key>
     <key name="live-wallpaper-on-battery" type="b">
       <default>false</default>
       <summary>Keep live wallpapers playing on battery power</summary>

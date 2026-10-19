@@ -5,7 +5,6 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
-#include <sys/prctl.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <gio/gio.h>
@@ -23,7 +22,6 @@ struct _ShellAppScope
   grefcount ref;
   char *staging;
   int staging_procs;
-  gboolean merge_memory;
 };
 
 typedef struct
@@ -77,8 +75,6 @@ void
 shell_app_scope_child_setup (ShellAppScope *scope)
 {
   shell_app_scope_reset_oom_score_adjust ();
-  if (scope->merge_memory)
-    prctl (PR_SET_MEMORY_MERGE, 1, 0, 0, 0);
   if (scope->staging_procs >= 0)
     write_string (scope->staging_procs, "0");
 }
@@ -324,7 +320,7 @@ shell_app_scope_start (ShellAppScope *scope,
 }
 
 ShellAppScope *
-shell_app_scope_new (gboolean merge_memory)
+shell_app_scope_new (void)
 {
   static guint serial;
   ShellAppScope *scope = g_new0 (ShellAppScope, 1);
@@ -333,7 +329,6 @@ shell_app_scope_new (gboolean merge_memory)
 
   g_ref_count_init (&scope->ref);
   scope->staging_procs = -1;
-  scope->merge_memory = merge_memory;
   if (!staging_root)
     return scope;
 

@@ -1652,7 +1652,6 @@ dependencies = [
  "futures-util",
  "gio",
  "gio-unix",
- "libc",
  "luft-dbus",
  "sabine",
  "serde",

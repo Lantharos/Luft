@@ -14,6 +14,7 @@ import type { WindowPreviews } from '../desktop/panel/windowPreviews.js';
 import type { TaskView } from '../desktop/taskView/taskView.js';
 import type { SnapLayouts } from '../desktop/windows/snapLayouts.js';
 import { animateActor, Curve, Duration, reducedMotion, Spring } from '../shared/motion.js';
+import { navigateWithKeyboard } from '../shared/input/keyboardNavigation.js';
 import { SURFACE_GAP } from '../shared/surface.js';
 import type { ClipboardPanel } from './clipboard/panel.js';
 import type { EmojiPanel } from './emoji/panel.js';
@@ -28,18 +29,23 @@ const START_HEIGHT = 600;
 const EDGE_MARGIN = 12;
 const PANEL_SLIDE = 56;
 
-interface SurfaceParts {
+interface LazySurfaces {
+  start: StartMenu;
+  notifications: NotificationCenter;
+  emoji: EmojiPanel;
+  snapLayouts: SnapLayouts;
+}
+
+type SurfaceFactories = { [Name in keyof LazySurfaces]: () => LazySurfaces[Name] };
+
+interface SurfaceParts extends SurfaceFactories {
   context: Context;
   menus: ContextMenus;
   previews: WindowPreviews;
   panels: () => PanelSet;
   board: Board;
-  start: StartMenu;
   quick: QuickSettings;
-  notifications: NotificationCenter;
   clipboard: ClipboardPanel;
-  emoji: EmojiPanel;
-  snapLayouts: SnapLayouts;
   taskView: TaskView;
   canInteract: () => boolean;
   syncSession: () => void;
@@ -52,25 +58,41 @@ export class Surfaces {
   private current: Surface | null = null;
   private readonly closingSelections = new Map<Clutter.Actor, () => void>();
   private keepsComposited = false;
+  private readonly created: Partial<LazySurfaces> = {};
 
   constructor(private readonly parts: SurfaceParts) {
     this.cover.connect('button-press-event', () => {
       this.close();
       return Clutter.EVENT_STOP;
     });
-    for (const actor of this.all()) this.layer.add_child(actor);
-    const shown = [...this.all(), parts.taskView.actor];
-    for (const actor of shown)
-      actor.connect('notify::visible', () => this.keepComposited(shown.some(surface => surface.visible)));
+    for (const surface of [parts.quick, parts.clipboard]) this.adopt(surface);
+    this.watchVisibility(parts.taskView.actor);
   }
 
   get active(): Surface | null {
     return this.current;
   }
 
+  get start(): StartMenu {
+    return this.ensure('start');
+  }
+
+  get notifications(): NotificationCenter {
+    return this.ensure('notifications');
+  }
+
+  get emoji(): EmojiPanel {
+    return this.ensure('emoji');
+  }
+
+  private get snapLayouts(): SnapLayouts {
+    return this.ensure('snapLayouts');
+  }
+
   all(): St.BoxLayout[] {
-    const { start, quick, notifications, clipboard, emoji, snapLayouts } = this.parts;
-    return [start.actor, quick.actor, notifications.actor, clipboard.actor, emoji.actor, snapLayouts.actor];
+    const { start, notifications, emoji, snapLayouts } = this.created;
+    const { quick, clipboard } = this.parts;
+    return [start, quick, notifications, clipboard, emoji, snapLayouts].flatMap(surface => surface ? [surface.actor] : []);
   }
 
   monitorAt(x: number, y: number): Monitor | null {
@@ -93,7 +115,7 @@ export class Surfaces {
   }
 
   place(): void {
-    const { context, start, quick, notifications, clipboard, emoji, snapLayouts, board } = this.parts;
+    const { context, quick, clipboard, board } = this.parts;
     if (!context.layoutManager.primaryMonitor)
       return;
 
@@ -107,21 +129,24 @@ export class Surfaces {
     const available = monitor.height - clearance - 24;
     const startHeight = Math.min(START_HEIGHT, available);
     const startX = board.shown ? monitor.x + monitor.width - EDGE_MARGIN - startWidth : monitor.x + (monitor.width - startWidth) / 2;
-    start.actor.set_size(startWidth, startHeight);
-    start.actor.set_position(Math.round(startX), bottom - startHeight);
+    const { start, notifications, emoji, snapLayouts } = this.created;
+    start?.actor.set_size(startWidth, startHeight);
+    start?.actor.set_position(Math.round(startX), bottom - startHeight);
 
     for (const [actor, width, height] of [
       [quick.actor, 420, quick.preferredHeight(420, available)],
-      [notifications.actor, 380, notifications.preferredHeight(380, available)],
+      ...notifications ? [[notifications.actor, 380, notifications.preferredHeight(380, available)] as const] : [],
     ] as const) {
       actor.set_size(width, height);
       actor.set_position(Math.round(monitor.x + monitor.width - EDGE_MARGIN - width), bottom - height);
     }
     for (const popup of [clipboard, emoji])
-      popup.place(available, context.layoutManager.getWorkAreaForMonitor(monitor.index));
-    const [snapWidth, snapHeight] = snapLayouts.size();
-    snapLayouts.actor.set_size(snapWidth, snapHeight);
-    snapLayouts.actor.set_position(Math.round(monitor.x + (monitor.width - snapWidth) / 2), bottom - snapHeight);
+      popup?.place(available, context.layoutManager.getWorkAreaForMonitor(monitor.index));
+    if (snapLayouts) {
+      const [snapWidth, snapHeight] = snapLayouts.size();
+      snapLayouts.actor.set_size(snapWidth, snapHeight);
+      snapLayouts.actor.set_position(Math.round(monitor.x + (monitor.width - snapWidth) / 2), bottom - snapHeight);
+    }
     this.clipToFloor();
   }
 
@@ -140,13 +165,13 @@ export class Surfaces {
   }
 
   toggle(surface: Surface, monitor = this.pointerMonitor(), following = false): void {
-    const { previews, snapLayouts, board, taskView, start, notifications } = this.parts;
+    const { previews, board, taskView } = this.parts;
     if (!this.parts.canInteract()) return;
     previews.close();
     const popup = this.popupFor(surface);
     if (popup && !popup.available) return;
     if (popup) monitor = this.current === surface ? this.surfaceMonitor() : this.monitorAt(...popup.locate()) ?? monitor;
-    if (surface === 'snap' && (!snapLayouts.available || board.shown)) return;
+    if (surface === 'snap' && (!this.snapLayouts.available || board.shown)) return;
     if (this.current === surface && this.surfaceMonitor() === monitor) {
       this.close();
       return;
@@ -174,15 +199,15 @@ export class Surfaces {
 
     const actor = this.actorFor(surface);
     this.releaseSelection(actor);
-    if (surface === 'start') start.reset();
+    if (surface === 'start') this.start.reset();
 
     this.layer.get_parent()!.set_child_above_sibling(this.layer, null);
     this.layer.set_child_above_sibling(actor, null);
     const opening = !actor.visible;
     actor.show();
-    if (surface === 'notifications') notifications.prepareOpen();
+    if (surface === 'notifications') this.notifications.prepareOpen();
     popup?.open();
-    if (surface === 'snap') snapLayouts.prepareOpen();
+    if (surface === 'snap') this.snapLayouts.prepareOpen();
     this.place();
     if (opening) {
       actor.opacity = 0;
@@ -190,15 +215,15 @@ export class Surfaces {
     }
     this.reveal(actor);
 
-    if (surface === 'start' && !taskbarPreferences.touch) start.focus();
+    if (surface === 'start' && !taskbarPreferences.touch) this.start.focus();
     else if (!popup) actor.grab_key_focus();
   }
 
   close(fade: number = Duration.quick, velocity?: number): void {
-    const { menus, notifications, taskView, quick } = this.parts;
+    const { menus, taskView, quick } = this.parts;
     menus.close();
     const surface = this.current;
-    if (surface === 'notifications') notifications.freeze();
+    if (surface === 'notifications') this.notifications.freeze();
     if (surface && surface !== 'tasks') this.closingSelections.set(this.actorFor(surface), freezeSelection(this.actorFor(surface)));
     this.setActive(null);
     this.popupFor(surface)?.closed?.();
@@ -238,6 +263,26 @@ export class Surfaces {
     this.layer.set_clip(0, 0, width, floor);
   }
 
+  private ensure<Name extends keyof LazySurfaces>(name: Name): LazySurfaces[Name] {
+    const created = this.created[name];
+    if (created) return created;
+    const surface = this.adopt((this.parts[name] as SurfaceFactories[Name])());
+    this.created[name] = surface;
+    this.place();
+    return surface;
+  }
+
+  private adopt<T extends { actor: St.BoxLayout }>(surface: T): T {
+    this.layer.add_child(surface.actor);
+    this.watchVisibility(surface.actor);
+    navigateWithKeyboard(surface.actor);
+    return surface;
+  }
+
+  private watchVisibility(actor: Clutter.Actor): void {
+    actor.connect('notify::visible', () => this.keepComposited([...this.all(), this.parts.taskView.actor].some(surface => surface.visible)));
+  }
+
   private keepComposited(composited: boolean): void {
     if (composited === this.keepsComposited) return;
     this.keepsComposited = composited;
@@ -275,21 +320,21 @@ export class Surfaces {
   }
 
   private popupFor(surface: Surface | null): CaretPopup | null {
-    return surface === 'clipboard' ? this.parts.clipboard : surface === 'emoji' ? this.parts.emoji : null;
+    return surface === 'clipboard' ? this.parts.clipboard : surface === 'emoji' ? this.emoji : null;
   }
 
   private popupActor(actor: Clutter.Actor): CaretPopup | null {
-    return [this.parts.clipboard, this.parts.emoji].find(popup => popup.actor === actor) ?? null;
+    return [this.parts.clipboard, this.created.emoji].find(popup => popup?.actor === actor) ?? null;
   }
 
   private actorFor(surface: PanelSurface): St.BoxLayout {
     switch (surface) {
-      case 'start': return this.parts.start.actor;
+      case 'start': return this.start.actor;
       case 'quick': return this.parts.quick.actor;
-      case 'notifications': return this.parts.notifications.actor;
+      case 'notifications': return this.notifications.actor;
       case 'clipboard': return this.parts.clipboard.actor;
-      case 'emoji': return this.parts.emoji.actor;
-      case 'snap': return this.parts.snapLayouts.actor;
+      case 'emoji': return this.emoji.actor;
+      case 'snap': return this.snapLayouts.actor;
     }
   }
 

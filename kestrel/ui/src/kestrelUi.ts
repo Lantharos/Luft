@@ -99,17 +99,13 @@ class KestrelUi {
       changed: () => this.syncSession(),
       canInteract: () => this.canInteract() && !this.surfaces.active,
     });
-    const start = new StartMenu(close, this.menus, context.quickSettings);
     this.quick = new QuickSettings(context.quickSettings, place, close,
       icons => {
         this.panels.primary.updateStatus(icons);
         this.board.showStatus(icons);
       }, this.menus, () => this.takeScreenshot());
-    const notifications = new NotificationCenter(context.messageTray, this.menus, place, close);
     const clipboard = new ClipboardPanel(this.menus, close, place, context.inputMethod);
-    const emoji = new EmojiPanel(context.inputMethod, close, text => clipboard.pasteWithoutKeeping(text));
     this.copilot = new CopilotActions(context, () => this.surfaces.toggle('start'), text => clipboard.pasteWithoutKeeping(text));
-    const snapLayouts = new SnapLayouts(index => context.layoutManager.getWorkAreaForMonitor(index), context.snapWindow, close);
     this.taskView = new TaskView(context.createBackground, workspace => this.board.frameOf(workspace), close, context.activateWindow);
     this.liveWallpaper = new LiveWallpaper(() => context.layoutManager.monitors);
     this.rotation = new RotationAnimation(context.layoutManager, context.createBackground);
@@ -119,12 +115,12 @@ class KestrelUi {
       previews: this.previews,
       panels: () => this.panels,
       board: this.board,
-      start,
+      start: () => new StartMenu(close, this.menus, context.quickSettings),
       quick: this.quick,
-      notifications,
+      notifications: () => new NotificationCenter(context.messageTray, this.menus, place, close),
       clipboard,
-      emoji,
-      snapLayouts,
+      emoji: () => new EmojiPanel(context.inputMethod, close, text => clipboard.pasteWithoutKeeping(text)),
+      snapLayouts: () => new SnapLayouts(index => context.layoutManager.getWorkAreaForMonitor(index), context.snapWindow, close),
       taskView: this.taskView,
       canInteract: () => this.canInteract(),
       syncSession: () => this.syncSession(),
@@ -188,7 +184,7 @@ class KestrelUi {
     this.watch(context.sessionMode, 'updated', () => this.syncSession());
     if (context.screenShield) this.watch(context.screenShield, 'active-changed', () => this.syncSession());
     context.registerPanel(this.panels.primary.actor);
-    for (const actor of [...this.surfaces.all(), this.previews.actor, this.taskView.actor])
+    for (const actor of [this.previews.actor, this.taskView.actor])
       navigateWithKeyboard(actor);
     this.watch(context.layoutManager, 'monitors-changed', () => {
       this.dismissImmediately();
@@ -201,12 +197,12 @@ class KestrelUi {
     place();
     this.syncSession();
     this.disconnectors.push(prewarmAfterStartup(context.layoutManager, [
-      () => start.reset(),
-      () => paintHidden(start.actor, start.search),
+      () => this.surfaces.start.reset(),
+      () => paintHidden(this.surfaces.start.actor, this.surfaces.start.search),
       () => paintHidden(this.quick.actor, this.quick.actor),
-      () => paintHidden(notifications.actor, notifications.actor),
-      () => emoji.prewarm(),
-      () => paintHidden(emoji.actor),
+      () => paintHidden(this.surfaces.notifications.actor, this.surfaces.notifications.actor),
+      () => this.surfaces.emoji.prewarm(),
+      () => paintHidden(this.surfaces.emoji.actor),
       () => this.taskView.prewarm(context.layoutManager.primaryMonitor!),
     ]));
   }

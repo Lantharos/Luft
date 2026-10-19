@@ -195,3 +195,22 @@ fn updates_the_key_of_a_device_paired_in_both() {
          [DeviceID]\nVendor=76\n"
     );
 }
+
+#[test]
+fn keeps_names_from_windows_on_one_short_line() {
+    let long = "é".repeat(200);
+    let hive = HiveBuilder::default()
+        .set("Select", "Current", Value::Dword(1))
+        .set(KEYS, "001122334455", Value::Binary(counting(0x10)))
+        .set(
+            HEADPHONES,
+            "Name",
+            Value::Binary(format!("Buds\n[LinkKey]\nKey=00\r{long}\0").into_bytes()),
+        )
+        .build();
+    let found = pairings(&System::new(&hive).unwrap()).unwrap();
+    let name = found[0].name.as_deref().unwrap();
+
+    assert!(name.starts_with("Buds[LinkKey]Key=00éé"));
+    assert_eq!(name.len(), 247);
+}

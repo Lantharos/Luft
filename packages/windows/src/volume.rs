@@ -1,9 +1,11 @@
 use std::io::{BufReader, Read, Seek};
 
-use anyhow::{Context, Result};
+use anyhow::{Context, Result, bail};
 use ntfs::indexes::NtfsFileNameIndex;
 use ntfs::structured_values::{NtfsFileNamespace, NtfsVolumeFlags};
 use ntfs::{KnownNtfsFileRecordNumber, Ntfs, NtfsFile};
+
+const LARGEST_FILE: u64 = 512 << 20;
 
 pub struct Volume<R: Read + Seek> {
     ntfs: Ntfs,
@@ -59,14 +61,27 @@ impl<R: Read + Seek> Volume<R> {
     }
 
     pub fn read(&mut self, path: &str) -> Result<Option<Vec<u8>>> {
-        self.read_limited(path, u64::MAX)
+        self.read_with(path, |length| {
+            if length > LARGEST_FILE {
+                bail!("{path} is larger than {LARGEST_FILE} bytes");
+            }
+            Ok(length)
+        })
     }
 
     pub fn read_limited(&mut self, path: &str, limit: u64) -> Result<Option<Vec<u8>>> {
+        self.read_with(path, |length| Ok(length.min(limit)))
+    }
+
+    fn read_with(
+        &mut self,
+        path: &str,
+        amount: impl FnOnce(u64) -> Result<u64>,
+    ) -> Result<Option<Vec<u8>>> {
         let Some(file) = lookup(&self.ntfs, &mut self.fs, path)? else {
             return Ok(None);
         };
-        read_data(&file, &mut self.fs, limit).map(Some)
+        read_data(&file, &mut self.fs, amount).map(Some)
     }
 
     pub fn modified(&mut self, path: &str) -> Result<Option<u64>> {
@@ -115,14 +130,18 @@ fn lookup<'n, R: Read + Seek>(
     Ok(Some(file))
 }
 
-fn read_data<R: Read + Seek>(file: &NtfsFile, fs: &mut R, limit: u64) -> Result<Vec<u8>> {
+fn read_data<R: Read + Seek>(
+    file: &NtfsFile,
+    fs: &mut R,
+    amount: impl FnOnce(u64) -> Result<u64>,
+) -> Result<Vec<u8>> {
     let Some(item) = file.data(fs, "") else {
         return Ok(Vec::new());
     };
     let item = item?;
     let attribute = item.to_attribute()?;
     let value = attribute.value(fs)?;
-    let length = limit.min(value.len());
+    let length = amount(value.len())?;
     let mut data = Vec::with_capacity(length as usize);
     value.attach(fs).take(length).read_to_end(&mut data)?;
     Ok(data)

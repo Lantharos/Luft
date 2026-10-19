@@ -8,6 +8,7 @@ const PARAMETERS: &str = r"Services\BTHPORT\Parameters";
 const LOW_ENERGY_DEVICES: &str = r"Enum\BTHLE";
 const MITM: u32 = 0x04;
 const RANDOM: u32 = 1;
+const LONGEST_NAME: usize = 248;
 
 struct Place<'a, 'h> {
     registry: &'a Registry<'h>,
@@ -114,7 +115,10 @@ impl Reader<'_, '_> {
         let registry = place.registry;
         let device = place.join(&format!("Dev_{hex}"));
         for instance in registry.subkeys(&device)? {
-            if let Some(name) = registry.string(&format!(r"{device}\{instance}"), "FriendlyName")? {
+            if let Some(name) = registry
+                .string(&format!(r"{device}\{instance}"), "FriendlyName")?
+                .and_then(|name| device_name(&name))
+            {
                 return Ok(Some(name));
             }
         }
@@ -171,6 +175,17 @@ fn utf8_name(bytes: &[u8]) -> Option<String> {
         .iter()
         .position(|byte| *byte == 0)
         .unwrap_or(bytes.len());
-    let name = String::from_utf8_lossy(&bytes[..end]).trim().to_owned();
-    (!name.is_empty()).then_some(name)
+    device_name(&String::from_utf8_lossy(&bytes[..end]))
+}
+
+fn device_name(raw: &str) -> Option<String> {
+    let mut name = String::new();
+    for character in raw.chars().filter(|character| !character.is_control()) {
+        if name.len() + character.len_utf8() > LONGEST_NAME {
+            break;
+        }
+        name.push(character);
+    }
+    let name = name.trim();
+    (!name.is_empty()).then(|| name.to_owned())
 }

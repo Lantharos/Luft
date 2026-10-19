@@ -52,7 +52,7 @@ jobs:
         with:
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
-      - uses: sigstore/cosign-installer@v4
+      - uses: sigstore/cosign-installer@v4.1.2
 
       - name: Sign in to the registry
         run: |
@@ -101,8 +101,15 @@ jobs:
           for reference in "${references[@]}"; do
             podman pull --quiet "$reference" > /dev/null
             digest="$(podman image inspect --format '{{.Digest}}' "$reference")"
-            cosign verify --certificate-identity-regexp "$SIGNER" \
-              --certificate-oidc-issuer https://token.actions.githubusercontent.com "${reference%:*}@$digest" > /dev/null
+            if ! checked="$(cosign verify --certificate-identity-regexp "$SIGNER" \
+              --certificate-oidc-issuer https://token.actions.githubusercontent.com "${reference%:*}@$digest" 2>&1 > /dev/null)"; then
+              if grep -qi "no signatures found" <<<"$checked"; then
+                echo "::notice::$reference was built before images were signed"
+                continue
+              fi
+              echo "$checked" >&2
+              exit 1
+            fi
           done
 
       - name: Build

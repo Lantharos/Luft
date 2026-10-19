@@ -36,7 +36,6 @@ secret_req = '>= 0.18'
 
 fs = import('fs')
 gnome = import('gnome')
-i18n  = import('i18n')
 
 prefix = get_option('prefix')
 
@@ -131,7 +130,6 @@ m_dep = cc.find_library('m', required: false)
 cdata = configuration_data()
 cdata.set_quoted('GETTEXT_PACKAGE', meson.project_name())
 cdata.set_quoted('VERSION', meson.project_version())
-cdata.set_quoted('PACKAGE_VERSION', meson.project_version())
 
 cdata.set('HAVE_PIPEWIRE', have_pipewire)
 cdata.set('HAVE_XWAYLAND', have_xwayland)
@@ -221,10 +219,7 @@ subdir('data')
 subdir('js')
 subdir('src')
 
-gnome.post_install(
-  glib_compile_schemas: true,
-  gtk_update_icon_cache: true
-)
+gnome.post_install(glib_compile_schemas: true)
 
 summary_options = {
   'have_xwayland': have_xwayland,

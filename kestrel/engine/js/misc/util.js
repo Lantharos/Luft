@@ -136,19 +136,6 @@ export function trySpawn(argv) {
     GLib.child_watch_add(GLib.PRIORITY_DEFAULT, pid, () => {});
 }
 
-/**
- * trySpawnCommandLine:
- *
- * @param {readonly string[]} commandLine a command line
- *
- * Runs commandLine in the background. If launching commandLine
- * fails, this will throw an error.
- */
-export function trySpawnCommandLine(commandLine) {
-    const [, argv] = GLib.shell_parse_argv(commandLine);
-    trySpawn(argv);
-}
-
 function _handleSpawnError(command, err) {
     const title = _('Execution of “%s” failed:').format(command);
     // Use dynamic import to not pull in UI related code in unit tests

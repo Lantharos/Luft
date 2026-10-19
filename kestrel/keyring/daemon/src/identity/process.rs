@@ -1,7 +1,8 @@
 use std::ffi::CString;
 use std::fs::File;
 use std::io::Read;
-use std::os::fd::{AsRawFd, FromRawFd, OwnedFd};
+use std::os::fd::{AsRawFd, BorrowedFd, FromRawFd, OwnedFd};
+use std::os::unix::fs::MetadataExt;
 
 use super::image;
 use super::program::{Program, is_interpreter};
@@ -16,7 +17,7 @@ pub struct Process {
 }
 
 impl Process {
-    pub fn open(pid: u32, pidfd: Option<&zbus::OwnedFd>) -> Option<Self> {
+    pub fn open(pid: u32) -> Option<Self> {
         let path = CString::new(format!("/proc/{pid}")).ok()?;
         let fd = unsafe {
             libc::open(
@@ -24,23 +25,15 @@ impl Process {
                 libc::O_PATH | libc::O_DIRECTORY | libc::O_CLOEXEC,
             )
         };
-        if fd < 0 {
-            return None;
-        }
-        let directory = unsafe { OwnedFd::from_raw_fd(fd) };
-        if let Some(pidfd) = pidfd {
-            let alive = unsafe {
-                libc::syscall(
-                    libc::SYS_pidfd_send_signal,
-                    pidfd.as_raw_fd(),
-                    0,
-                    std::ptr::null::<libc::siginfo_t>(),
-                    0,
-                )
-            };
-            (alive == 0).then_some(())?;
-        }
-        Some(Self { directory })
+        (fd >= 0).then(|| Self {
+            directory: unsafe { OwnedFd::from_raw_fd(fd) },
+        })
+    }
+
+    pub fn of_peer(pidfd: BorrowedFd<'_>) -> Option<Self> {
+        let pid = pid_of(pidfd)?;
+        let process = Self::open(pid)?;
+        (pid_of(pidfd) == Some(pid)).then_some(process)
     }
 
     fn read(&self, name: &str) -> Option<Vec<u8>> {
@@ -96,6 +89,18 @@ impl Process {
         Some(link.strip_suffix(" (deleted)").unwrap_or(&link).to_owned())
     }
 
+    pub fn runs_installed(&self, path: &str) -> bool {
+        let Some(running) = self.executable_status() else {
+            return false;
+        };
+        std::fs::metadata(path).is_ok_and(|installed| {
+            installed.uid() == 0
+                && installed.mode() & 0o022 == 0
+                && running.stx_ino == installed.ino()
+                && libc::makedev(running.stx_dev_major, running.stx_dev_minor) == installed.dev()
+        })
+    }
+
     pub fn program(&self, executable: String) -> Program {
         let script = is_interpreter(&executable)
             .then(|| self.read("cmdline"))
@@ -112,17 +117,22 @@ impl Process {
     }
 
     pub fn executable_device(&self) -> Option<(u32, u32)> {
+        self.executable_status()
+            .map(|status| (status.stx_dev_major, status.stx_dev_minor))
+    }
+
+    fn executable_status(&self) -> Option<libc::statx> {
         let mut status = unsafe { std::mem::zeroed::<libc::statx>() };
         let found = unsafe {
             libc::statx(
                 self.directory.as_raw_fd(),
                 c"exe".as_ptr(),
                 libc::AT_STATX_DONT_SYNC,
-                0,
+                libc::STATX_INO,
                 &raw mut status,
             )
         };
-        (found == 0).then_some((status.stx_dev_major, status.stx_dev_minor))
+        (found == 0).then_some(status)
     }
 
     pub fn mounts(&self) -> Option<String> {
@@ -153,7 +163,7 @@ impl Process {
     pub fn parent(&self) -> Option<Self> {
         let parent_id = self.stat_field::<u32>(PARENT)?;
         let started = self.stat_field::<u64>(STARTED)?;
-        let parent = Self::open(parent_id, None)?;
+        let parent = Self::open(parent_id)?;
         let still_its_child = self.stat_field::<u32>(PARENT) == Some(parent_id);
         let started_first = parent.stat_field::<u64>(STARTED)? <= started;
         (still_its_child && started_first).then_some(parent)
@@ -193,4 +203,15 @@ fn app_id_from_unit(unit: &str) -> Option<String> {
         })?;
     let id = name.rsplit('-').next()?;
     Some(id.replace("\\x2d", "-"))
+}
+
+fn pid_of(pidfd: BorrowedFd<'_>) -> Option<u32> {
+    std::fs::read_to_string(format!("/proc/self/fdinfo/{}", pidfd.as_raw_fd()))
+        .ok()?
+        .lines()
+        .find_map(|line| line.strip_prefix("Pid:"))?
+        .trim()
+        .parse()
+        .ok()
+        .filter(|pid| *pid > 0)
 }

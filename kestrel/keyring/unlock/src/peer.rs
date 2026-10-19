@@ -6,7 +6,6 @@ use std::os::unix::fs::{MetadataExt, PermissionsExt};
 use std::path::PathBuf;
 
 const UNIT: &str = "luft-keyring.service";
-const LOADER_VARIABLES: [&[u8]; 3] = [b"LD_PRELOAD=", b"LD_AUDIT=", b"LD_LIBRARY_PATH="];
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Peer {
@@ -66,9 +65,23 @@ impl Verifier {
 
         let binary =
             fs::metadata(&self.daemon).map_err(|_| "the keyring program isn't installed")?;
+        let mode = binary.permissions().mode();
         check(
-            binary.uid() == 0 && binary.permissions().mode() & 0o022 == 0,
+            binary.uid() == 0 && mode & 0o022 == 0,
             "the keyring program isn't protected by root",
+        )?;
+        check(
+            mode & libc::S_ISGID != 0 && binary.gid() != 0,
+            "the keyring program isn't installed with its own group",
+        )?;
+        let raised = field("Gid:").and_then(|mut ids| {
+            let real = ids.next()?.parse::<u32>().ok()?;
+            let effective = ids.next()?.parse::<u32>().ok()?;
+            Some(real != effective && effective == binary.gid())
+        });
+        check(
+            raised == Some(true),
+            "it didn't start with the keyring's group, so it may be watched",
         )?;
         let running = open_at(Some(&process), "exe", libc::O_PATH)
             .and_then(|exe| File::from(exe).metadata().ok())
@@ -91,13 +104,6 @@ impl Verifier {
             "it doesn't run as the keyring service",
         )?;
 
-        let environment = read_at(&process, c"environ").ok_or("its environment can't be read")?;
-        let preloaded = environment.split(|byte| *byte == 0).any(|variable| {
-            LOADER_VARIABLES
-                .iter()
-                .any(|name| variable.starts_with(name))
-        });
-        check(!preloaded, "it was started with extra libraries")?;
         alive(&pidfd, pid).ok_or("its process ended")
     }
 }

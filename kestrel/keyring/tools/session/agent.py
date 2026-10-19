@@ -1,9 +1,15 @@
+import base64
 import os
 import shutil
+import signal
+import socket
+import struct
 import subprocess
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+SIGN_REQUEST = 13
+SIGN_RESPONSE = 14
 
 
 def signs(environment, folder, public_key, name):
@@ -43,12 +49,51 @@ def signs(environment, folder, public_key, name):
     return verified.returncode == 0
 
 
-def as_settings(root):
-    folder = os.path.join(root, "luft/apps/settings/desktop/target/debug")
-    os.makedirs(folder, exist_ok=True)
-    settings = os.path.join(folder, "settings")
-    shutil.copy(sys.executable, settings)
-    return [settings, os.path.join(HERE, "manager.py")]
+SETTINGS_BUILD = "apps/settings/desktop/target/debug/settings"
+
+
+def settings_build(root):
+    return os.path.join(root, "luft", SETTINGS_BUILD)
+
+
+def as_settings(path):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    shutil.copy(sys.executable, path)
+    return [path, os.path.join(HERE, "manager.py")]
+
+
+def agent_pid(environment):
+    with socket.socket(socket.AF_UNIX) as agent:
+        agent.connect(environment["SSH_AUTH_SOCK"])
+        credentials = agent.getsockopt(socket.SOL_SOCKET, socket.SO_PEERCRED, struct.calcsize("3i"))
+        return struct.unpack("3i", credentials)[0]
+
+
+def sign_unidentified(environment, public_key):
+    ours, theirs = socket.socketpair()
+    daemon = agent_pid(environment)
+    os.kill(daemon, signal.SIGSTOP)
+    try:
+        if os.fork() == 0:
+            agent = socket.socket(socket.AF_UNIX)
+            agent.connect(environment["SSH_AUTH_SOCK"])
+            socket.send_fds(theirs, [b"x"], [agent.fileno()])
+            os._exit(0)
+        os.wait()
+    finally:
+        os.kill(daemon, signal.SIGCONT)
+    _, (descriptor,), _, _ = socket.recv_fds(ours, 1, 1)
+    with open(public_key) as key:
+        blob = base64.b64decode(key.read().split()[1])
+    request = bytes([SIGN_REQUEST]) + packed(blob) + packed(b"hello") + struct.pack(">I", 0)
+    with socket.socket(fileno=descriptor) as agent:
+        agent.sendall(packed(request))
+        (length,) = struct.unpack(">I", agent.recv(4, socket.MSG_WAITALL))
+        return agent.recv(length, socket.MSG_WAITALL)[0] == SIGN_RESPONSE
+
+
+def packed(data):
+    return struct.pack(">I", len(data)) + data
 
 
 def exercise_agent(root, environment, check, script, requests, lock, login):
@@ -103,8 +148,22 @@ def exercise_agent(root, environment, check, script, requests, lock, login):
     check("SSH key" in requests("access")[-1]["request"]["title"], "using a careful key asks the person")
     script(access="allow", remember=False)
     check(signs(environment, folder, confirmed + ".pub", "confirmed"), "a key that asks first signs once allowed")
+    script(access="allow", remember=True)
+    asked = len(requests("access"))
+    check(
+        sign_unidentified(environment, confirmed + ".pub")
+        and not requests("access")[-1]["request"].get("remember")
+        and sign_unidentified(environment, confirmed + ".pub")
+        and len(requests("access")) == asked + 2,
+        "a program that can't be identified is never offered to be remembered",
+    )
 
-    manager = as_settings(root)
+    posing = as_settings(os.path.join(root, "elsewhere/luft", SETTINGS_BUILD))
+    refused = subprocess.run(
+        [*posing, "generate", "Nope"], env=environment, capture_output=True, text=True, timeout=60, check=False
+    )
+    check("AccessDenied" in refused.stdout, "a program at another Settings build path can't manage the keyring")
+    manager = as_settings(settings_build(root))
     made = subprocess.run(
         [*manager, "generate", "Laptop"], env=environment, capture_output=True, text=True, timeout=60, check=False
     )

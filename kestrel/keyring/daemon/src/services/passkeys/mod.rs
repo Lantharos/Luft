@@ -72,7 +72,9 @@ pub struct Passkeys {
 impl Passkeys {
     async fn caller(&self, header: &Header<'_>) -> Result<App, PasskeyError> {
         let (_, app) = self.daemon.caller(header).await;
-        if !agent_path().is_some_and(|path| path.as_os_str() == app.executable.as_str()) {
+        if !app.installed
+            || !agent_path().is_some_and(|path| path.as_os_str() == app.executable.as_str())
+        {
             return Err(PasskeyError::NotAllowed(
                 "Only Luft Passkeys can use passkeys".into(),
             ));

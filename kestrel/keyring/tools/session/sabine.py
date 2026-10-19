@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-from ownership import READER, program_at
+from ownership import HERE, READER, program_at
 
 RELAY = "import subprocess, sys; sys.stdout.write(subprocess.run(sys.argv[1:], capture_output=True, timeout=60).stdout.decode())"
 
@@ -77,3 +77,14 @@ def exercise_sabine(home, environment, check, script, requests):
         and hosted(mailman, bumped, "portal").split("|")[0] == mail_portal,
         "each Sabine app gets its own portal secret, kept across host updates",
     )
+
+    settings = program_at(os.path.join(sabine, "apps/com.lantharos.settings/install/settings"))
+    refused = subprocess.run(
+        [settings, os.path.join(HERE, "manager.py"), "generate", "Nope"],
+        env=environment,
+        capture_output=True,
+        text=True,
+        timeout=60,
+        check=False,
+    ).stdout
+    check("AccessDenied" in refused, "an app installed in a person's own Sabine folder isn't taken for a Luft app")

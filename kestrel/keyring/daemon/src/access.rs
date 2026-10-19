@@ -24,6 +24,9 @@ impl Granted {
     }
 
     pub fn add(&self, app: &App, items: &[ItemKey]) {
+        if app.is_unknown() {
+            return;
+        }
         let mut granted = self.items.lock().expect("granted items");
         granted.extend(items.iter().map(|item| (app.key.clone(), item.clone())));
     }
@@ -160,13 +163,14 @@ impl Daemon {
             title: &title,
             body: &body,
             app: &app.icon,
-            remember: true,
+            remember: !app.is_unknown(),
             ..Request::default()
         };
         self.prompter.access(&handle, &request).await
     }
 
     async fn remember(&self, app: &App, items: &[ItemKey], allowed: bool, remember: bool) {
+        let remember = remember && !app.is_unknown();
         if allowed && !remember {
             self.granted.add(app, items);
             return;

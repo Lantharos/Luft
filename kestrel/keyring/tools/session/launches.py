@@ -71,3 +71,23 @@ def exercise_launches(root, home, environment, check, script, requests):
         sandboxed("read", "service", "github.com") == "gh-token" and asked() == before + 1,
         "a Flatpak's remembered choice holds on its next launch",
     )
+
+    planted = subprocess.run(
+        [
+            program_at(os.path.join(root, "planter/planter")),
+            READER,
+            "store",
+            "Planted",
+            "planted",
+            "app_id",
+            "org.example.Notebook",
+        ],
+        env=environment,
+        timeout=60,
+        check=False,
+    )
+    own = sandboxed("portal").split("|")[0]
+    check(
+        planted.returncode == 0 and len(bytes.fromhex(own)) == 64 and own != b"planted".hex(),
+        "another app's item naming a Flatpak isn't handed to that Flatpak as its portal secret",
+    )

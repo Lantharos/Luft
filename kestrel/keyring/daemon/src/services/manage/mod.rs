@@ -13,6 +13,8 @@ pub use apps::AppSecrets;
 pub use status::{Status, publish};
 
 use crate::daemon::Daemon;
+use crate::identity::App;
+#[cfg(debug_assertions)]
 use crate::identity::Kind;
 
 pub const NAME: &str = "com.lantharos.Keyring1";
@@ -35,22 +37,25 @@ pub async fn serve(daemon: &Arc<Daemon>) -> zbus::Result<()> {
     Ok(())
 }
 
-const SETTINGS_BUILDS: [&str; 2] = [
-    "/apps/settings/desktop/target/release/settings",
-    "/apps/settings/desktop/target/debug/settings",
-];
-
 async fn settings_only(daemon: &Daemon, header: &Header<'_>) -> fdo::Result<()> {
     let (_, app) = daemon.caller(header).await;
-    let development = app.kind == Kind::Host
-        && SETTINGS_BUILDS
-            .iter()
-            .any(|build| app.executable.ends_with(build));
-    if app.key == SETTINGS || development {
+    if app.key == SETTINGS || is_development_settings(&app) {
         Ok(())
     } else {
         Err(fdo::Error::AccessDenied(
             "Only Settings can manage the keyring".into(),
         ))
     }
+}
+
+#[cfg(debug_assertions)]
+fn is_development_settings(app: &App) -> bool {
+    app.kind == Kind::Host
+        && std::env::var_os("LUFT_KEYRING_DEVELOPMENT_SETTINGS")
+            .is_some_and(|build| build == app.executable.as_str())
+}
+
+#[cfg(not(debug_assertions))]
+fn is_development_settings(_: &App) -> bool {
+    false
 }

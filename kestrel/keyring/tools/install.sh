@@ -5,6 +5,7 @@ keyring_data="$keyring_root/data"
 keyring_pam=/usr/local/lib64/security
 
 keyring_system_files() {
+  echo "system/luft-keyring.sysusers /usr/local/lib/sysusers.d/luft-keyring.conf"
   echo "system/luft-keyring-unlock.socket /usr/local/lib/systemd/system/luft-keyring-unlock.socket"
   echo "system/luft-keyring-unlock.service /usr/local/lib/systemd/system/luft-keyring-unlock.service"
   echo "pam/kestrel-unlock /etc/pam.d/kestrel-unlock"
@@ -42,10 +43,14 @@ install_keyring() {
     exit 1
   fi
   cargo build --release --manifest-path "$keyring_root/Cargo.toml"
-  local built="$keyring_root/target/release" changed=() program
+  sudo systemd-sysusers "$keyring_data/system/luft-keyring.sysusers"
+  local built="$keyring_root/target/release" changed=() program group mode
   for program in luft-keyring luft-keyring-unlock; do
-    cmp -s "$built/$program" "$prefix/libexec/$program" && continue
-    sudo install -DZ -m755 "$built/$program" "$prefix/libexec/$program"
+    group=root mode=755
+    [[ "$program" == luft-keyring ]] && group=luft-keyring mode=2755
+    cmp -s "$built/$program" "$prefix/libexec/$program" &&
+      [[ "$(stat -c %G:%a "$prefix/libexec/$program")" == "$group:$mode" ]] && continue
+    sudo install -DZ -g "$group" -m"$mode" "$built/$program" "$prefix/libexec/$program"
     changed+=("$program")
   done
   cmp -s "$built/luft-pinentry" "$prefix/libexec/luft-pinentry" || sudo install -DZ -m755 "$built/luft-pinentry" "$prefix/libexec/luft-pinentry"
@@ -54,6 +59,7 @@ install_keyring() {
     keyring_fill "$source" | sudo install -DZ -m644 /dev/stdin "$target"
   done
   sudo semodule -i "$keyring_data/selinux/luft-keyring.cil"
+  sudo restorecon "$prefix/libexec/luft-keyring-unlock"
   if command -v authselect >/dev/null && ! authselect current 2>/dev/null | grep -q with-fingerprint; then
     sudo authselect enable-feature with-fingerprint
   fi

@@ -21,7 +21,7 @@ use tss_esapi::structures::{
 use tss_esapi::traits::{Marshall, UnMarshall};
 use zeroize::Zeroizing;
 
-pub const POLICY_PCRS: [u8; 1] = [7];
+pub const POLICY_PCRS: [u8; 2] = [7, 15];
 
 pub struct Chip {
     context: Context,
@@ -183,7 +183,7 @@ fn policy_session(session: AuthSession) -> Result<PolicySession, Problem> {
 
 fn pcr_selection() -> Result<PcrSelectionList, Problem> {
     PcrSelectionListBuilder::new()
-        .with_selection(HashingAlgorithm::Sha256, &[PcrSlot::Slot7])
+        .with_selection(HashingAlgorithm::Sha256, &[PcrSlot::Slot7, PcrSlot::Slot15])
         .build()
         .map_err(failed)
 }

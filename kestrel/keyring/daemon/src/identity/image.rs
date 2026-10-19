@@ -26,7 +26,7 @@ fn running() -> impl Iterator<Item = Process> {
         .flatten()
         .flatten()
         .filter_map(|entry| entry.file_name().to_str()?.parse().ok())
-        .filter_map(|pid| Process::open(pid, None))
+        .filter_map(Process::open)
 }
 
 fn mount_source(mounts: &str, connection: u32) -> Option<String> {

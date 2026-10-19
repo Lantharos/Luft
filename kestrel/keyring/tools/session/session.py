@@ -7,7 +7,7 @@ import tempfile
 import time
 
 import gi
-from agent import exercise_agent
+from agent import exercise_agent, settings_build
 from launches import exercise_launches
 from ownership import exercise_ownership
 from portal import exercise_portal
@@ -100,7 +100,7 @@ def run(root):
     script(passwords=[LOGIN], access="allow")
     prompter = subprocess.Popen([sys.executable, os.path.join(HERE, "prompter.py"), plan, prompts], env=environment)
     wait_for_name("com.lantharos.Kestrel")
-    daemon = subprocess.Popen([DAEMON], env=environment)
+    daemon = subprocess.Popen([DAEMON], env=dict(environment, LUFT_KEYRING_DEVELOPMENT_SETTINGS=settings_build(root)))
     try:
         wait_for_name("org.freedesktop.secrets")
         exercise(root, home, environment, script, requests)

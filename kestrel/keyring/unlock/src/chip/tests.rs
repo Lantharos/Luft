@@ -59,14 +59,14 @@ fn free_port() -> u16 {
     }
 }
 
-fn extend_secure_boot_pcr(chip: &mut Chip) {
+fn extend(chip: &mut Chip, pcr: PcrHandle) {
     let mut values = DigestValues::new();
     values.set(
         HashingAlgorithm::Sha256,
         Digest::try_from(vec![1; 32]).unwrap(),
     );
     chip.context
-        .execute_with_nullauth_session(|context| context.pcr_extend(PcrHandle::Pcr7, values))
+        .execute_with_nullauth_session(|context| context.pcr_extend(pcr, values))
         .unwrap();
 }
 
@@ -82,7 +82,17 @@ fn a_seal_opens_until_the_secure_boot_state_changes() {
         &[42; 32]
     );
 
-    extend_secure_boot_pcr(&mut chip);
+    extend(&mut chip, PcrHandle::Pcr7);
+    assert_eq!(chip.unseal(&blob, None), Err(Problem::PolicyChanged));
+}
+
+#[test]
+fn a_seal_opens_only_on_the_system_it_was_made_on() {
+    let tpm = Swtpm::start();
+    let mut chip = tpm.chip();
+    let blob = chip.seal(&[7; 32], None).unwrap();
+
+    extend(&mut chip, PcrHandle::Pcr15);
     assert_eq!(chip.unseal(&blob, None), Err(Problem::PolicyChanged));
 }
 

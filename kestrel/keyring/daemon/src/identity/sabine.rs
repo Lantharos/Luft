@@ -4,6 +4,7 @@ use super::program::{Program, file_name};
 const HOST: &str = "sabine-host";
 const HOST_DEPTH: usize = 8;
 const LUFT_PREFIX: &str = "com.lantharos.";
+const SYSTEM_APPS: &str = "/usr/lib/sabine/";
 
 pub fn is_host(executable: &str) -> bool {
     file_name(executable) == HOST
@@ -25,9 +26,7 @@ pub fn launcher(host: &Process) -> Option<Process> {
     None
 }
 
-pub fn luft_app_id(executable: &str) -> Option<String> {
-    let home = std::env::var("HOME").ok()?;
-    let apps = format!("{home}/.local/share/sabine/apps/");
-    let id = executable.strip_prefix(&apps)?.split('/').next()?;
-    id.starts_with(LUFT_PREFIX).then(|| id.to_owned())
+pub fn luft_app_id(process: &Process, executable: &str) -> Option<String> {
+    let id = executable.strip_prefix(SYSTEM_APPS)?.split('/').next()?;
+    (id.starts_with(LUFT_PREFIX) && process.runs_installed(executable)).then(|| id.to_owned())
 }

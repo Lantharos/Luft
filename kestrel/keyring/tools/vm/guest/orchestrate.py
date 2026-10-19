@@ -96,6 +96,12 @@ def extend_secure_boot_state():
     )
 
 
+def unlock_socket_label():
+    with socket.socket(socket.AF_UNIX) as unlock:
+        unlock.connect("/run/luft-keyring/unlock")
+        return unlock.getsockopt(socket.SOL_SOCKET, socket.SO_PEERSEC, 256).rstrip(b"\0").decode()
+
+
 def denials():
     log = subprocess.run(["journalctl", "-k", "-b", "--no-pager"], capture_output=True, text=True, check=False).stdout
     return [line for line in log.splitlines() if "avc:" in line and "denied" in line]
@@ -135,6 +141,10 @@ def main():
         check(
             os.path.exists(f"/var/lib/luft-keyring/{person.pw_uid}.seal"),
             "the security chip holds a seal for the person",
+        )
+        check(
+            ":luft_keyring_unlock_t:" in unlock_socket_label(),
+            "the unlock socket belongs to the unlock service's own SELinux domain",
         )
         login("fingerprint", "fingerprint sign-in")
         extend_secure_boot_state()

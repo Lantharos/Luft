@@ -48,6 +48,7 @@ install -Dm755 "$built/luft-keyring" "$stage$prefix/libexec/luft-keyring"
 install -Dm755 "$built/luft-keyring-unlock" "$stage$prefix/libexec/luft-keyring-unlock"
 install -Dm755 "$built/libpam_luft_keyring.so" "$stage$pamdir/pam_luft_keyring.so"
 install -Dm755 "$authenticator" "$stage$prefix/libexec/kestrel-authenticate"
+fill "$keyring/data/system/luft-keyring.sysusers" /usr/lib/sysusers.d/luft-keyring.conf
 fill "$keyring/data/system/luft-keyring-unlock.socket" /etc/systemd/system/luft-keyring-unlock.socket
 fill "$keyring/data/system/luft-keyring-unlock.service" /etc/systemd/system/luft-keyring-unlock.service
 fill "$units/kestrel-authenticate.socket" /etc/systemd/system/kestrel-authenticate.socket
@@ -76,14 +77,22 @@ podman unshare sh -c "
 "
 podman run --rm --security-opt label=disable --rootfs "$tree" sh -c "
   semodule -N -i /usr/local/share/luft-keyring/luft-keyring.cil
+  systemd-sysusers /usr/lib/sysusers.d/luft-keyring.conf
+  chgrp luft-keyring '$prefix/libexec/luft-keyring'
+  chmod 2755 '$prefix/libexec/luft-keyring'
+  install -Dm755 \"\$(readlink -f /usr/bin/python3)\" /usr/lib/sabine/com.lantharos.settings/settings
   systemctl set-default graphical.target
   systemctl enable luft-keyring-unlock.socket kestrel-authenticate.socket keyring-test.service
   dracut --quiet --force --no-hostonly --add-drivers 'virtio_blk virtio_pci ext4' --kver '$kernel'
 "
 policies=("$tree"/etc/selinux/targeted/policy/policy.*)
+unlock="$prefix/libexec/luft-keyring-unlock"
+podman unshare mv "$tree$unlock" "$vm/unlock.held"
 podman unshare setfiles -c "${policies[-1]}" -r "$tree" "$tree/etc/selinux/targeted/contexts/files/file_contexts" "$tree"
+podman unshare mv "$vm/unlock.held" "$tree$unlock"
 podman unshare sh -c "cat '$tree/lib/modules/$kernel/vmlinuz' > '$vm/vmlinuz'; cat '$tree/boot/initramfs-$kernel.img' > '$vm/initramfs.img'"
 rm -f "$vm/root.img"
 truncate -s 4G "$vm/root.img"
 podman unshare mkfs.ext4 -q -F -L keyring-vm -d "$tree" "$vm/root.img"
+debugfs -w -R "ea_set $unlock security.selinux system_u:object_r:luft_keyring_unlock_exec_t:s0" "$vm/root.img"
 echo "The keyring test machine is ready in $vm"

@@ -19,6 +19,7 @@ const SECRETS: &str = "org.freedesktop.secrets";
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> ExitCode {
     unsafe {
+        libc::setfsgid(libc::getgid());
         libc::prctl(libc::PR_SET_DUMPABLE, 0);
     }
     match run().await {

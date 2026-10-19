@@ -107,11 +107,11 @@ fn is_portal_secret(item: &Item) -> bool {
 }
 
 fn kept_for(item: &Item, app: &App) -> bool {
-    let owned = is_portal_secret(item) && item.owner.as_ref() == Some(&app.key);
+    let owned = item.owner.as_ref() == Some(&app.key);
     let named = app
         .flatpak_id()
         .is_some_and(|id| item.attributes.get(APP_ID).is_some_and(|named| named == id));
-    owned || named
+    is_portal_secret(item) && owned || named && (owned || item.owner.is_none())
 }
 
 #[interface(name = "org.freedesktop.impl.portal.Secret")]

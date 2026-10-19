@@ -56,6 +56,9 @@ configure_security() {
   done
   semodule "${modules[@]}"
   authselect enable-feature with-fingerprint
+  systemd-sysusers /usr/lib/sysusers.d/luft-keyring.conf
+  chgrp luft-keyring /usr/libexec/luft-keyring
+  chmod 2755 /usr/libexec/luft-keyring
 }
 
 refresh_caches() {

@@ -18,6 +18,7 @@ HOME = os.path.expanduser("~")
 USER = pwd.getpwuid(os.getuid()).pw_name
 PASSWORD = "sign-in words"
 SECRET = "repo-token"
+SETTINGS = "/usr/lib/sabine/com.lantharos.settings/settings"
 os.environ.setdefault("DBUS_SESSION_BUS_ADDRESS", f"unix:path=/run/user/{os.getuid()}/bus")
 with open("/var/lib/keyring-test/scenario.json") as file:
     scenario = json.load(file)["name"]
@@ -104,18 +105,31 @@ def sudo(password):
 
 
 def as_settings(method, signature, arguments):
-    folder = os.path.join(HOME, "luft/apps/settings/desktop/target/debug")
-    os.makedirs(folder, exist_ok=True)
-    settings = os.path.join(folder, "settings")
-    shutil.copy(sys.executable, settings)
     code = (
         f"import gi; gi.require_version('Gio','2.0'); from gi.repository import Gio, GLib; "
         f"print(Gio.bus_get_sync(Gio.BusType.SESSION).call_sync('com.lantharos.Keyring1', '/com/lantharos/Keyring1', "
         f"'com.lantharos.Keyring1', '{method}', GLib.Variant('{signature}', {arguments!r}), None, Gio.DBusCallFlags.NONE, 60000, None).unpack())"
     )
     return subprocess.run(
-        [settings, "-c", code], capture_output=True, text=True, timeout=90, check=False
+        [SETTINGS, "-c", code], capture_output=True, text=True, timeout=90, check=False
     ).stdout.strip()
+
+
+def keyring_is_shielded():
+    pid = subprocess.run(
+        ["systemctl", "--user", "show", "--property=MainPID", "--value", "luft-keyring.service"],
+        capture_output=True,
+        text=True,
+        check=False,
+    ).stdout.strip()
+    with open(f"/proc/{pid}/status") as status:
+        real, effective = next(line for line in status if line.startswith("Gid:")).split()[1:3]
+    try:
+        open(f"/proc/{pid}/environ").close()
+        readable = True
+    except PermissionError:
+        readable = False
+    return real != effective and not readable
 
 
 def lock_screen_flows(chip):
@@ -166,6 +180,7 @@ def main():
         check(wait_for("TpmSealed", True), "the keyring is sealed by the security chip")
         check(keyring("Chip") == "ready", "the security chip is ready")
         check(not asked, "signing in with the password asked nothing more")
+        check(keyring_is_shielded(), "the keyring runs with its own group, out of reach of the person's other programs")
         check(
             secret_tool("store", "--label", "Repository", "service", "repo", secret=SECRET).returncode == 0,
             "a secret is saved",

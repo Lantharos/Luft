@@ -84,9 +84,11 @@ Disks can encrypt other drives in place through `trustd`. Partitions the system 
 ## Luft Keyring
 
 - One file, `~/.local/share/luft-keyring/vault`, encrypted with XChaCha20-Poly1305 under a random master key, including item names.
-- The master key is wrapped by your password (Argon2id, 64 MiB, three passes), which always works, and, with a TPM 2.0, by a key sealed to PCR 7. An optional PIN can be added to the TPM wrap.
+- The master key is wrapped by your password (Argon2id, 64 MiB, three passes), which always works, and, with a TPM 2.0, by a key sealed to PCR 7 and PCR 15. An optional PIN can be added to the TPM wrap.
 - Only after the system's sign-in rules succeed does `pam_luft_keyring.so` tell the unlock service, which hands the TPM key only to your own `luft-keyring` (checked by pidfd, installed binary, your user manager's unit, not traced).
-- PCR 7 alone is used so kernel updates never cost a password prompt. A changed Secure Boot state means typing your password once.
+- `luft-keyring` is installed setgid to its own `luft-keyring` group. Starting with that group makes the kernel shield it from the first instruction: your other programs can't trace it, read its memory or slip libraries into it, even through a changed unit. The unlock service only answers a keyring that is running with the group, so one started under a debugger or with no new privileges gets no key.
+- PCR 7 ties the seal to the Secure Boot state, and PCR 15 to this installation: with device encryption the disk's volume key is measured into it at every start, so another system the firmware would start, even a signed one, can't unseal it. Kernel and Luft updates change neither, so they never cost a password prompt. A changed Secure Boot state means typing your password once.
+- Without device encryption, PCR 15 only holds values another system could read off the disk and measure itself, so the seal then rests on Secure Boot alone. Turn on device encryption to have it bound to this computer's own installation.
 - While unlocked, the master key sits in locked, non-dumpable memory; locking wipes it and every secret.
 - Automatic login never unlocks the keyring.
 

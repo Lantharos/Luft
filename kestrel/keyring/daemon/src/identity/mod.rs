@@ -5,6 +5,7 @@ mod program;
 mod sabine;
 
 use std::collections::HashMap;
+use std::os::fd::{AsFd, BorrowedFd};
 use std::path::Path;
 use std::sync::Mutex;
 
@@ -35,6 +36,7 @@ pub struct App {
     pub icon: String,
     pub kind: Kind,
     pub executable: String,
+    pub installed: bool,
     names: Vec<String>,
     claims: bool,
     chromium: bool,
@@ -68,6 +70,7 @@ impl App {
             icon: String::new(),
             kind: Kind::Host,
             executable: String::new(),
+            installed: false,
             names: Vec::new(),
             claims: false,
             chromium: false,
@@ -175,12 +178,12 @@ async fn resolve(connection: &Connection, sender: &str) -> Option<App> {
         .get_connection_credentials(BusName::try_from(sender).ok()?)
         .await
         .ok()?;
-    let process = Process::open(credentials.process_id()?, credentials.process_fd())?;
+    let process = Process::of_peer(credentials.process_fd()?.as_fd())?;
     Some(classify(&process))
 }
 
-pub fn of_process(pid: u32) -> (App, Option<String>) {
-    let Some(process) = Process::open(pid, None) else {
+pub fn of_peer(pidfd: BorrowedFd<'_>) -> (App, Option<String>) {
+    let Some(process) = Process::of_peer(pidfd) else {
         return (App::unknown(), None);
     };
     let surrounding = process
@@ -201,9 +204,10 @@ fn classify(process: &Process) -> App {
             ..classify(&launcher)
         });
     }
-    if let Some(id) = sabine::luft_app_id(&executable) {
+    if let Some(id) = sabine::luft_app_id(process, &executable) {
         return luft(&id, executable);
     }
+    let installed = process.runs_installed(&executable);
     let program = process.program(executable);
     let entry = process
         .unit_app_id()
@@ -212,7 +216,7 @@ fn classify(process: &Process) -> App {
         .or_else(|| desktop::find(&program.name()).filter(|entry| entry.runs(&program)))
         .or_else(|| program.image().and_then(|_| desktop::launching(&program)));
     let inspecting = program.is_inspector() || program.interpreted() && process.has_terminal();
-    host(program, entry, !inspecting)
+    host(program, entry, !inspecting, installed)
 }
 
 fn luft(id: &str, executable: String) -> App {
@@ -225,6 +229,7 @@ fn luft(id: &str, executable: String) -> App {
         ),
         icon: id.to_owned(),
         kind: Kind::Luft,
+        installed: !executable.is_empty(),
         executable,
         names: id_names(id, entry.as_ref()),
         claims: true,
@@ -232,7 +237,7 @@ fn luft(id: &str, executable: String) -> App {
     }
 }
 
-fn host(program: Program, entry: Option<Entry>, claims: bool) -> App {
+fn host(program: Program, entry: Option<Entry>, claims: bool, installed: bool) -> App {
     let text = program.text();
     let key = match &entry {
         Some(entry) => format!("desktop:{}", entry.id),
@@ -253,6 +258,7 @@ fn host(program: Program, entry: Option<Entry>, claims: bool) -> App {
         chromium: !program.interpreted() && is_chromium(&program.executable),
         hosted: false,
         executable: program.executable,
+        installed,
         names,
         claims,
         lineage: Some(Lineage {

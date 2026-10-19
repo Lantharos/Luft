@@ -24,7 +24,9 @@ class MonitorStore {
 		this.#append(snapshot.ticks);
 	}
 
-	#append(ticks: Tick[]) {
+	#append(received: Tick[]) {
+		const after = this.latest?.time ?? 0;
+		const ticks = received.filter((tick) => tick.time > after);
 		if (!ticks.length) return;
 		const next = this.ticks.concat(ticks);
 		const keep = this.capacity + 1;

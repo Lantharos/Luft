@@ -60,6 +60,10 @@ impl Sampler<'_> {
                 control.reset = false;
                 return Wake::Changed(snapshot);
             }
+            if !control.visible {
+                self.shared.wake.wait(&mut control);
+                continue;
+            }
             let now = Instant::now();
             if let Some(at) = self.warm_up.filter(|at| *at < self.next)
                 && now >= at

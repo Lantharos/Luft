@@ -2,6 +2,8 @@ mod cache;
 mod generate;
 mod priority;
 mod raster;
+mod sandbox;
+mod seccomp;
 mod system;
 
 use std::collections::{HashMap, HashSet, VecDeque};

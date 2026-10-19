@@ -1,17 +1,19 @@
 use std::collections::HashMap;
 use std::env;
 use std::fs;
+use std::io;
 use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
+use std::process::Stdio;
 use std::sync::Arc;
-use std::sync::atomic::{AtomicU64, Ordering};
 use std::thread;
 use std::time::{Duration, Instant};
 
+use image::DynamicImage;
 use parking_lot::Mutex;
 
 use super::cache::{Source, ThumbnailSize};
+use super::sandbox::Sandbox;
 
 const POLL_INTERVAL: Duration = Duration::from_millis(25);
 const TIMEOUT: Duration = Duration::from_secs(30);
@@ -87,8 +89,10 @@ impl Thumbnailer {
         source: &Source,
         size: ThumbnailSize,
         cancelled: impl Fn() -> bool,
-    ) -> Result<PathBuf, Failure> {
-        let output = scratch_file();
+    ) -> Result<DynamicImage, Failure> {
+        let failed = |error: io::Error| Failure::Failed(error.to_string());
+        let sandbox = Sandbox::new().map_err(failed)?;
+        let output = sandbox.output();
         let arguments: Vec<String> = self
             .exec
             .iter()
@@ -97,26 +101,22 @@ impl Thumbnailer {
         let (program, arguments) = arguments
             .split_first()
             .ok_or_else(|| Failure::Failed("Empty thumbnailer command".to_string()))?;
-        let mut child = Command::new(program)
-            .args(arguments)
-            .stdin(Stdio::null())
+        let mut child = sandbox
+            .command(&source.path, program, arguments)
+            .map_err(failed)?
             .stdout(Stdio::null())
             .stderr(Stdio::null())
             .spawn()
-            .map_err(|error| Failure::Failed(error.to_string()))?;
+            .map_err(failed)?;
         let started = Instant::now();
         let status = loop {
-            if let Some(status) = child
-                .try_wait()
-                .map_err(|error| Failure::Failed(error.to_string()))?
-            {
+            if let Some(status) = child.try_wait().map_err(failed)? {
                 break status;
             }
             let expired = started.elapsed() >= TIMEOUT;
             if expired || cancelled() {
                 let _ = child.kill();
                 let _ = child.wait();
-                let _ = fs::remove_file(&output);
                 return Err(if expired {
                     Failure::Failed("The thumbnailer took too long".to_string())
                 } else {
@@ -125,12 +125,10 @@ impl Thumbnailer {
             }
             thread::sleep(POLL_INTERVAL);
         };
-        if status.success() && output.is_file() {
-            Ok(output)
-        } else {
-            let _ = fs::remove_file(&output);
-            Err(Failure::Failed(format!("{program} exited with {status}")))
+        if !status.success() {
+            return Err(Failure::Failed(format!("{program} exited with {status}")));
         }
+        sandbox.thumbnail().map_err(Failure::Failed)
     }
 }
 
@@ -221,14 +219,4 @@ fn is_executable(program: &str) -> bool {
     }
     env::var_os("PATH")
         .is_some_and(|paths| env::split_paths(&paths).any(|folder| runnable(&folder.join(program))))
-}
-
-fn scratch_file() -> PathBuf {
-    static NEXT: AtomicU64 = AtomicU64::new(0);
-    let folder = dirs::runtime_dir().unwrap_or_else(env::temp_dir);
-    folder.join(format!(
-        "luft-thumbnail-{}-{}.png",
-        std::process::id(),
-        NEXT.fetch_add(1, Ordering::Relaxed)
-    ))
 }

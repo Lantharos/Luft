@@ -46,11 +46,7 @@ pub(super) fn thumbnail(
             return mime.starts_with("image/").then(|| ready(None));
         };
         match thumbnailer.run(&source, size, cancelled) {
-            Ok(output) => {
-                let image = image::open(&output).map_err(|error| error.to_string());
-                let _ = std::fs::remove_file(&output);
-                image.and_then(|image| raster::fit(image, size.pixels()))
-            }
+            Ok(image) => raster::fit(image, size.pixels()),
             Err(Failure::Cancelled) => return None,
             Err(Failure::Failed(error)) => Err(error),
         }

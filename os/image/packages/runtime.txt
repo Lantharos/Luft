@@ -9,6 +9,7 @@ bluez
 bluez-obexd
 bolt
 btrfs-progs
+bubblewrap
 cldr-emoji-annotation
 colord
 cryptsetup

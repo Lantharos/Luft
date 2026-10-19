@@ -43,3 +43,6 @@ zbus = { version = "6.0.0", default-features = false, features = ["proxy", "toki
 lto = "fat"
 codegen-units = 1
 strip = true
+
+[patch."https://github.com/Lantharos/Sabine"]
+sabine = { git = "https://www.github.com/Lantharos/Sabine", rev = "ef086c9260576c64e1d0bd272ec70494f95a0964" }

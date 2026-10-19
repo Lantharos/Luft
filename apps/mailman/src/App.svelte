@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { appWindow } from '@lantharos/sabine';
 	import { appearance, GlassShell, plural, Toast, tooltip } from '@luft/ui';
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import * as api from '#lib/api/index.js';
@@ -76,16 +75,11 @@
 			api.events.body(reader.receive),
 			api.events.images(remoteImages.receive),
 			api.events.identities(() => void mail.reloadSenders()),
-			api.events.open(({ thread, token }) => {
-				appWindow.focus(token ?? undefined);
-				opened.close();
-				if (thread === null) return navigate('inbox');
-				void openThread(thread);
-			}),
+			api.events.open(() => void takeOpening()),
 			api.events.outbox(({ error }) => {
 				if (error) toasts.show(`Couldn't send: ${error}. Mailman will try again.`, { failed: true });
 			}),
-			api.events.activation((activation) => void api.resolveArguments(activation).then((launches) => opened.handle(launches, false)))
+			api.events.launched(() => void api.takeLaunches().then((launches) => opened.handle(launches, false)))
 		];
 		void start();
 		return () => stops.forEach((stop) => stop());
@@ -95,8 +89,17 @@
 		const state = await api.appState();
 		appearance.start(state);
 		mail.start(state);
-		opened.handle(state.launch, true);
+		opened.handle(await api.takeLaunches(), true);
 		await list.open('inbox');
+		await takeOpening();
+	}
+
+	async function takeOpening() {
+		const opening = await api.takeOpening();
+		if (!opening) return;
+		opened.close();
+		if (opening.thread === null) return navigate('inbox');
+		await openThread(opening.thread);
 	}
 
 	function scheduleRefresh() {

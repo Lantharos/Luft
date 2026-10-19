@@ -1,10 +1,9 @@
-import { invoke, isAvailable, listen } from '@lantharos/sabine';
-import { activationToken } from '@luft/ui';
+import { app, events as sabine, invoke, isAvailable, listen } from '@lantharos/sabine';
+import { activationToken, fileUrlPath } from '@luft/ui';
 import type {
 	Account,
 	AccountConfig,
 	Action,
-	Activation,
 	Address,
 	AppState,
 	Chosen,
@@ -43,7 +42,16 @@ function on<T>(name: string, callback: (payload: T) => void): () => void {
 export type Secret = { kind: 'password'; password: string } | { kind: 'oAuth'; provider: Provider };
 
 export const appState = () => call<AppState>('app_state');
-export const resolveArguments = (activation: Activation) => call<Launch[]>('resolve_arguments', { ...activation });
+
+function launch(url: string): Launch | null {
+	if (url.toLowerCase().startsWith('mailto:')) return { kind: 'mailto', url };
+	const path = fileUrlPath(url);
+	return path === null ? null : { kind: 'message', path };
+}
+
+export const takeLaunches = async () =>
+	isAvailable() ? (await app.takeOpenUrls()).map(launch).filter((launch) => launch !== null) : [];
+export const takeOpening = () => call<{ thread: number | null } | null>('take_opening');
 export const setFocused = (focused: boolean) => call<void>('set_focused', { focused });
 export const saveSettings = (settings: Settings) => call<void>('save_settings', { settings });
 
@@ -94,10 +102,10 @@ export const deleteTemplate = (id: number) => call<void>('delete_template', { id
 export const events = {
 	changed: (callback: (account: number) => void) => on('mailman.changed', callback),
 	status: (callback: (status: Status) => void) => on('mailman.status', callback),
-	open: (callback: (activation: { thread: number | null; token: string | null }) => void) => on('mailman.open', callback),
+	open: (callback: () => void) => on('mailman.open', callback),
 	outbox: (callback: (event: OutboxEvent) => void) => on('mailman.outbox', callback),
 	body: (callback: (arrived: { id: number; error: string | null }) => void) => on('mailman.body', callback),
 	images: (callback: (images: [string, string | null][]) => void) => on('mailman.images', callback),
 	identities: (callback: (account: number) => void) => on('mailman.identities', callback),
-	activation: (callback: (activation: Activation) => void) => on('singleInstance.activate', callback)
+	launched: (callback: () => void) => (isAvailable() ? sabine.openUrlsAvailable(callback) : () => {})
 };

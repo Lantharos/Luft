@@ -59,7 +59,6 @@ export interface Settings {
 export type Launch = { kind: 'mailto'; url: string } | { kind: 'message'; path: string };
 
 export interface AppState extends Appearance {
-	launch: Launch[];
 	accounts: Account[];
 	identities: Identity[];
 	mailboxes: Mailbox[];
@@ -240,7 +239,3 @@ export interface OutboxEvent {
 	error: string | null;
 }
 
-export interface Activation {
-	arguments: string[];
-	workingDirectory: string | null;
-}

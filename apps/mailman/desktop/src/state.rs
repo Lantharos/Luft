@@ -4,7 +4,6 @@ use luft_app::{Appearance, Events};
 use serde::Serialize;
 
 use crate::accounts::{Account, Credentials, Provider, oauth_providers};
-use crate::services::launch::{self, Launch};
 use crate::services::notify::Notifier;
 use crate::store::{Identity, Mailbox, Settings, Store};
 use crate::sync::Engine;
@@ -16,13 +15,11 @@ pub struct MailmanState {
     pub engine: Engine,
     pub credentials: Credentials,
     pub notifier: Notifier,
-    launch: Vec<Launch>,
 }
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AppState {
-    launch: Vec<Launch>,
     accounts: Vec<Account>,
     identities: Vec<Identity>,
     mailboxes: Vec<Mailbox>,
@@ -58,7 +55,6 @@ impl MailmanState {
                 credentials.clone(),
                 notifier.clone(),
             ),
-            launch: launch::current_process(),
             events,
             store,
             credentials,
@@ -74,7 +70,6 @@ impl MailmanState {
     pub async fn app_state(self) -> Result<AppState, String> {
         let appearance = Appearance::current().await;
         Ok(AppState {
-            launch: self.launch.clone(),
             accounts: self.store.accounts()?,
             identities: self.store.identities()?,
             mailboxes: self.store.mailboxes(None)?,

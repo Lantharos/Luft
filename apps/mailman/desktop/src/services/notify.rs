@@ -1,10 +1,11 @@
 use std::collections::HashMap;
-use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::{Arc, OnceLock};
 
 use futures_util::StreamExt;
 use luft_app::{Events, dbus};
 use parking_lot::Mutex;
+use sabine::SabineProcessHandle;
 use serde::Serialize;
 use zbus::{Proxy, Variant};
 
@@ -17,15 +18,21 @@ const PATH: &str = "/org/freedesktop/Notifications";
 const DEFAULT_ACTION: &str = "default";
 const LOW_URGENCY: u8 = 0;
 
-#[derive(Clone, Serialize)]
 struct Activation {
     thread: Option<i64>,
     token: Option<String>,
 }
 
+#[derive(Serialize)]
+pub struct Opening {
+    thread: Option<i64>,
+}
+
 #[derive(Clone, Default)]
 pub struct Notifier {
     shown: Arc<Mutex<HashMap<u32, Activation>>>,
+    opening: Arc<Mutex<Option<Opening>>>,
+    process: Arc<OnceLock<SabineProcessHandle>>,
     focused: Arc<AtomicBool>,
     enabled: Arc<AtomicBool>,
 }
@@ -62,6 +69,14 @@ async fn notify(title: &str, body: &str) -> Result<u32, String> {
 }
 
 impl Notifier {
+    pub fn attach(&self, process: SabineProcessHandle) {
+        let _ = self.process.set(process);
+    }
+
+    pub fn take_opening(&self) -> Option<Opening> {
+        self.opening.lock().take()
+    }
+
     pub fn set_focused(&self, focused: bool) {
         self.focused.store(focused, Ordering::Relaxed);
     }
@@ -112,7 +127,18 @@ impl Notifier {
         });
     }
 
+    fn open(&self, activation: Activation, events: &Events) {
+        *self.opening.lock() = Some(Opening {
+            thread: activation.thread,
+        });
+        events.emit(OPEN_THREAD, ());
+        if let Some(process) = self.process.get() {
+            process.present(activation.token);
+        }
+    }
+
     pub fn watch(&self, events: Events) {
+        let notifier = self.clone();
         let shown = self.shown.clone();
         luft_app::spawn(async move {
             let Ok(proxy) = proxy().await else { return };
@@ -134,7 +160,7 @@ impl Notifier {
                             && action == DEFAULT_ACTION
                             && let Some(activation) = shown.lock().remove(&id)
                         {
-                            events.emit(OPEN_THREAD, activation);
+                            notifier.open(activation, &events);
                         }
                     }
                     Some("NotificationClosed") => {

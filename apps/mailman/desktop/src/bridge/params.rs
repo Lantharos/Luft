@@ -18,13 +18,6 @@ pub struct Thread {
 }
 
 #[derive(Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Arguments {
-    pub arguments: Vec<String>,
-    pub working_directory: Option<String>,
-}
-
-#[derive(Deserialize)]
 pub struct Focus {
     pub focused: bool,
 }

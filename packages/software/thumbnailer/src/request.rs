@@ -1,6 +1,8 @@
 use std::ffi::OsString;
 use std::path::PathBuf;
 
+const MAX_SIZE: u32 = 1024;
+
 pub struct Request {
     pub size: u32,
     pub input: PathBuf,
@@ -20,7 +22,7 @@ impl Request {
         }
         let [input, output] = <[PathBuf; 2]>::try_from(paths).ok()?;
         Some(Self {
-            size: size.filter(|size| *size > 0)?,
+            size: size.filter(|size| (1..=MAX_SIZE).contains(size))?,
             input,
             output,
         })

@@ -819,6 +819,7 @@ version = "0.1.0"
 dependencies = [
  "dirs",
  "fast_image_resize",
+ "flate2",
  "glib",
  "image",
  "luft-software",

@@ -81,7 +81,7 @@ Versions and release notes come from the image's labels:
 
 ## Thumbnails
 
-`luft-thumbnailer` (in [`thumbnailer/`](../../packages/software/thumbnailer)) is a freedesktop thumbnailer that shows the app's own icon for AppImages, Flatpak bundles and `.flatpakref` files, in Rover and anything else that reads the shared thumbnail cache. It reads an AppImage's icons from its squashfs without running or unpacking it, a bundle's from its header, and a reference's from the icons Flatpak already downloaded for its remotes, so it never goes online. SVG icons are drawn at the size asked for.
+`luft-thumbnailer` (in [`thumbnailer/`](../../packages/software/thumbnailer)) is a freedesktop thumbnailer that shows the app's own icon for AppImages, Flatpak bundles and `.flatpakref` files, in Rover and anything else that reads the shared thumbnail cache. It reads an AppImage's icons from its squashfs without running or unpacking it, a bundle's from its header, and a reference's from the icons Flatpak already downloaded for its remotes, so it never goes online. SVG icons are drawn at the size asked for, with only the images embedded in them, never files they point to.
 
 ## Command-line tools
 

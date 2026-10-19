@@ -10,6 +10,7 @@ rust-version = "1.98"
 [dependencies]
 dirs = "7.0.0"
 fast_image_resize = "6.1.0"
+flate2 = "1.1.10"
 glib = "0.22.10"
 image = { version = "0.25.10", default-features = false, features = ["png"] }
 luft-software = { path = "..", default-features = false }

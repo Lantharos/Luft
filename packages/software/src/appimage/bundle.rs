@@ -11,6 +11,7 @@ use crate::chromium;
 use crate::desktop::DesktopEntry;
 
 const MAX_LINKS: usize = 8;
+const MAX_FILE_BYTES: u64 = 16 << 20;
 const THEMED_ICONS: &str = "/usr/share/icons/hicolor";
 const ELECTRON_MARKERS: [&str; 2] = ["/chrome-sandbox", "/resources/app.asar"];
 const IMAGE_EXTENSIONS: [&str; 2] = ["png", "svg"];
@@ -62,9 +63,10 @@ impl<'a, 'b> Contents<'a, 'b> {
         self.filesystem
             .file(file)
             .reader()
+            .take(MAX_FILE_BYTES + 1)
             .read_to_end(&mut bytes)
             .ok()?;
-        Some(bytes)
+        (bytes.len() as u64 <= MAX_FILE_BYTES).then_some(bytes)
     }
 
     fn desktop_file(&self) -> Option<PathBuf> {

@@ -26,6 +26,7 @@ pub fn agent() -> &'static Agent {
     AGENT.get_or_init(|| {
         Agent::config_builder()
             .user_agent(USER_AGENT)
+            .https_only(true)
             .timeout_connect(Some(Duration::from_secs(15)))
             .timeout_recv_response(Some(Duration::from_secs(30)))
             .tls_config(

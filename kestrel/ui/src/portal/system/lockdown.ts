@@ -1,6 +1,8 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
+import { portalObject } from '../core/exported.js';
+
 const LOCKDOWN_XML = `<node><interface name="org.freedesktop.impl.portal.Lockdown">
   <property name="disable-printing" type="b" access="read"/>
   <property name="disable-save-to-disk" type="b" access="read"/>
@@ -18,7 +20,7 @@ interface Source {
 }
 
 export class LockdownPortal {
-  readonly dbus = Gio.DBusExportedObject.wrapJSObject(LOCKDOWN_XML, this);
+  readonly dbus = portalObject(LOCKDOWN_XML, this);
   private readonly sources: Record<string, Source>;
 
   constructor() {

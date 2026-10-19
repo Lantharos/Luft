@@ -1,8 +1,8 @@
-import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import { appNames } from '../core/apps.js';
 import { openDialog } from '../core/dialog.js';
+import { portalObject } from '../core/exported.js';
 import { SUCCESS, respond, type Invocation, type Options } from '../core/request.js';
 import { list, row } from '../core/rows.js';
 
@@ -29,7 +29,7 @@ function describe([, info]: Device): { title: string; subtitle: string } {
 }
 
 export class UsbPortal {
-  readonly dbus = Gio.DBusExportedObject.wrapJSObject(USB_XML, this);
+  readonly dbus = portalObject(USB_XML, this);
   readonly version = 1;
 
   async AcquireDevicesAsync([handle, , appId, devices]: [string, string, string, Device[], Options], invocation: Invocation): Promise<void> {

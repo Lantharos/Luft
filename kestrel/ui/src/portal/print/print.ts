@@ -3,6 +3,7 @@ import GLib from 'gi://GLib';
 import * as MessageTray from 'resource:///com/lantharos/kestrel/ui/messageTray.js';
 
 import { appName } from '../core/apps.js';
+import { portalObject } from '../core/exported.js';
 import { ENDED, SUCCESS, option, respond, type Invocation, type Options, type Outcome } from '../core/request.js';
 import { jobOptions, type PageChoice } from './choices.js';
 import { gtkPageSetup, gtkPreferences, gtkSettings } from './gtk.js';
@@ -62,7 +63,7 @@ export function notifyFailure(printer: Printer, appId: string): void {
 }
 
 export class PrintPortal {
-  readonly dbus = Gio.DBusExportedObject.wrapJSObject(PRINT_XML, this);
+  readonly dbus = portalObject(PRINT_XML, this);
   private readonly prepared = new Map<number, Prepared>();
 
   constructor(private readonly reportFailure?: (printer: Printer, appId: string) => void) {}

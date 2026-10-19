@@ -1,5 +1,4 @@
-import Gio from 'gi://Gio';
-
+import { portalObject } from '../core/exported.js';
 import { ENDED, SUCCESS, respond, type Invocation, type Options, type Outcome } from '../core/request.js';
 import { findSession } from '../core/session.js';
 import { chooseSources } from './dialogs/screenCastDialog.js';
@@ -42,7 +41,7 @@ class ScreenCastSession extends PeerSession {
   selectSources(selection: Selection, options: Options): void {
     this.selection = selection;
     this.persistMode = persistMode(options);
-    this.stored = storedChoice(options, STORED_SOURCES);
+    this.stored = storedChoice(options, STORED_SOURCES, this.appId);
   }
 
   async start(handle: string): Promise<Outcome> {
@@ -80,7 +79,7 @@ class ScreenCastSession extends PeerSession {
     }
     return [SUCCESS, {
       streams: this.recording.results,
-      ...persisted(persist, STORED_SOURCES, this.stored?.created, [storedSources(sources)]),
+      ...persisted(persist, STORED_SOURCES, this.appId, this.stored?.created, [storedSources(sources)]),
     }];
   }
 
@@ -90,7 +89,7 @@ class ScreenCastSession extends PeerSession {
 }
 
 export class ScreenCastPortal {
-  readonly dbus = Gio.DBusExportedObject.wrapJSObject(SCREEN_CAST_XML, this);
+  readonly dbus = portalObject(SCREEN_CAST_XML, this);
   readonly version = 5;
   readonly AvailableSourceTypes = MONITOR | WINDOW | VIRTUAL;
   readonly AvailableCursorModes = HIDDEN | EMBEDDED | METADATA;
@@ -102,14 +101,14 @@ export class ScreenCastPortal {
 
   SelectSourcesAsync([, sessionHandle, , options]: [string, string, string, Options], invocation: Invocation): void {
     const selection = selectionFrom(options);
-    const session = findSession(sessionHandle, ScreenCastSession) ?? findSession(sessionHandle, RemoteDesktopSession);
+    const session = findSession(sessionHandle, ScreenCastSession, invocation) ?? findSession(sessionHandle, RemoteDesktopSession, invocation);
     if (!selection || !session) return respond(invocation, [ENDED, {}]);
     session.selectSources(selection, options);
     respond(invocation, [SUCCESS, {}]);
   }
 
   async StartAsync([handle, sessionHandle]: [string, string, string, string, Options], invocation: Invocation): Promise<void> {
-    const session = findSession(sessionHandle, ScreenCastSession);
+    const session = findSession(sessionHandle, ScreenCastSession, invocation);
     respond(invocation, session ? await session.start(handle) : [ENDED, {}]);
   }
 }

@@ -1,5 +1,4 @@
-import Gio from 'gi://Gio';
-
+import { portalObject } from '../core/exported.js';
 import { option, type Invocation, type Options } from '../core/request.js';
 import { findSession } from '../core/session.js';
 import type { ClipboardBridge } from './clipboardBridge.js';
@@ -18,22 +17,22 @@ const CLIPBOARD_XML = `<node><interface name="org.freedesktop.impl.portal.Clipbo
   <property name="version" type="u" access="read"/>
 </interface></node>`;
 
-function clipboardSession(handle: string): RemoteDesktopSession | InputCaptureSession | null {
-  return findSession(handle, RemoteDesktopSession) ?? findSession(handle, InputCaptureSession);
+function clipboardSession(handle: string, invocation: Invocation): RemoteDesktopSession | InputCaptureSession | null {
+  return findSession(handle, RemoteDesktopSession, invocation) ?? findSession(handle, InputCaptureSession, invocation);
 }
 
 function withClipboard(handle: string, invocation: Invocation, use: (clipboard: ClipboardBridge) => void): void {
-  const clipboard = clipboardSession(handle)?.clipboard;
+  const clipboard = clipboardSession(handle, invocation)?.clipboard;
   if (clipboard) use(clipboard);
   else invocation.return_dbus_error('org.freedesktop.portal.Error.NotAllowed', 'The clipboard isn\'t shared with this session');
 }
 
 export class ClipboardPortal {
-  readonly dbus = Gio.DBusExportedObject.wrapJSObject(CLIPBOARD_XML, this);
+  readonly dbus = portalObject(CLIPBOARD_XML, this);
   readonly version = 1;
 
   RequestClipboardAsync([handle]: [string, Options], invocation: Invocation): void {
-    const session = clipboardSession(handle);
+    const session = clipboardSession(handle, invocation);
     if (!session) return invocation.return_dbus_error('org.freedesktop.portal.Error.NotFound', 'No such session');
     session.clipboardRequested = true;
     invocation.return_value(null);

@@ -2,7 +2,7 @@ import Clutter from 'gi://Clutter';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 
-import { canonical, fromEvent, label, typesText } from './accelerators.js';
+import { canonical, claimable, fromEvent, label } from './accelerators.js';
 import type { AppShortcuts } from './store.js';
 
 const NOT_SET = 'Not set';
@@ -48,7 +48,11 @@ export async function recordShortcuts(appId: string, current: AppShortcuts, unav
         const accelerator = fromEvent(event);
         if (!accelerator) return Clutter.EVENT_STOP;
         const own = new Set(Object.entries(edited).filter(([other]) => other !== id).flatMap(([, entry]) => entry.shortcuts.map(canonical)));
-        if (typesText(accelerator) || unavailable.has(canonical(accelerator)) || own.has(canonical(accelerator))) {
+        if (!claimable(accelerator)) {
+          key.label = `${label(accelerator)} can’t be used`;
+          return Clutter.EVENT_STOP;
+        }
+        if (unavailable.has(canonical(accelerator)) || own.has(canonical(accelerator))) {
           key.label = `${label(accelerator)} is taken`;
           return Clutter.EVENT_STOP;
         }

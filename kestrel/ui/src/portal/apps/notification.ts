@@ -1,6 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
+import { portalObject } from '../core/exported.js';
 import type { Invocation, Options } from '../core/request.js';
 
 const NOTIFICATION_XML = `<node><interface name="org.freedesktop.impl.portal.Notification">
@@ -18,10 +19,10 @@ function applicationPath(appId: string): string {
 }
 
 export class NotificationPortal {
-  readonly dbus = Gio.DBusExportedObject.wrapJSObject(NOTIFICATION_XML, this);
+  readonly dbus = portalObject(NOTIFICATION_XML, this);
   readonly version = 1;
   readonly SupportedOptions = {};
-  private readonly subscription = Gio.DBus.session.signal_subscribe(null, NOTIFICATIONS[2], 'ActionInvoked', NOTIFICATIONS[1], null,
+  private readonly subscription = Gio.DBus.session.signal_subscribe(NOTIFICATIONS[0], NOTIFICATIONS[2], 'ActionInvoked', NOTIFICATIONS[1], null,
     Gio.DBusSignalFlags.NONE, (_connection, _sender, _path, _iface, _signal, parameters) => this.invoked(parameters));
 
   AddNotificationAsync([appId, id, notification]: [string, string, Options], invocation: Invocation): void {

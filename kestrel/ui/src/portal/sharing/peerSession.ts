@@ -11,13 +11,13 @@ export abstract class PeerSession extends PortalSession {
   private readonly watch: number;
   private dialog: PortalDialog | null = null;
 
-  constructor(handle: string, appId: string, readonly peer: string) {
-    super(handle, appId);
-    this.watch = Gio.bus_watch_name_on_connection(Gio.DBus.session, peer, Gio.BusNameWatcherFlags.NONE, null, () => this.close());
+  constructor(handle: string, appId: string, owner: string) {
+    super(handle, appId, owner);
+    this.watch = Gio.bus_watch_name_on_connection(Gio.DBus.session, owner, Gio.BusNameWatcherFlags.NONE, null, () => this.close());
   }
 
   emit(iface: string, signal: string, parameters: GLib.Variant): void {
-    Gio.DBus.session.emit_signal(this.peer, PORTAL_PATH, iface, signal, parameters);
+    Gio.DBus.session.emit_signal(this.owner, PORTAL_PATH, iface, signal, parameters);
   }
 
   protected readonly track = (dialog: PortalDialog | null) => { this.dialog = dialog; };

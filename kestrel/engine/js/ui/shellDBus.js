@@ -54,11 +54,17 @@ export class ScreenSaverDBus {
         this._screenShield.lock(true);
     }
 
-    SetActive(active) {
-        if (active)
+    SetActiveAsync([active], invocation) {
+        if (active) {
             this._screenShield.activate(true);
-        else
+        } else if (this._screenShield.locked) {
+            invocation.return_error_literal(Gio.DBusError, Gio.DBusError.ACCESS_DENIED,
+                'The screen is locked and only unlocks after signing in');
+            return;
+        } else {
             this._screenShield.deactivate(false);
+        }
+        invocation.return_value(null);
     }
 
     GetActive() {

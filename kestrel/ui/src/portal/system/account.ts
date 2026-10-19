@@ -5,6 +5,7 @@ import { Avatar } from 'resource:///com/lantharos/kestrel/ui/userWidget.js';
 
 import { appNames } from '../core/apps.js';
 import { openDialog } from '../core/dialog.js';
+import { portalObject } from '../core/exported.js';
 import { SUCCESS, option, respond, type Invocation, type Options } from '../core/request.js';
 import { row } from '../core/rows.js';
 
@@ -25,7 +26,7 @@ function details(user: AccountsService.User): Options {
 }
 
 export class AccountPortal {
-  readonly dbus = Gio.DBusExportedObject.wrapJSObject(ACCOUNT_XML, this);
+  readonly dbus = portalObject(ACCOUNT_XML, this);
 
   async GetUserInformationAsync([handle, appId, , options]: [string, string, string, Options], invocation: Invocation): Promise<void> {
     const user = AccountsService.UserManager.get_default().get_user(GLib.get_user_name());

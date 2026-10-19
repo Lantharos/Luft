@@ -1,5 +1,7 @@
 import Gio from 'gi://Gio';
-import GLib from 'gi://GLib';
+import type GLib from 'gi://GLib';
+
+import { portalObject } from './exported.js';
 
 const SESSION_XML = `<node><interface name="org.freedesktop.impl.portal.Session">
   <method name="Close"/>
@@ -9,17 +11,17 @@ const SESSION_XML = `<node><interface name="org.freedesktop.impl.portal.Session"
 
 const sessions = new Map<string, PortalSession>();
 
-export function findSession<T extends PortalSession>(handle: string, kind: abstract new (...args: never[]) => T): T | null {
+export function findSession<T extends PortalSession>(handle: string, kind: abstract new (...args: never[]) => T, invocation: Gio.DBusMethodInvocation): T | null {
   const session = sessions.get(handle);
-  return session instanceof kind ? session : null;
+  return session instanceof kind && session.owner === invocation.get_sender() ? session : null;
 }
 
 export abstract class PortalSession {
   readonly version = 1;
-  private readonly exported = Gio.DBusExportedObject.wrapJSObject(SESSION_XML, { Close: () => this.end(), version: this.version });
+  private readonly exported = portalObject(SESSION_XML, { Close: () => this.end(), version: this.version });
   private ended = false;
 
-  constructor(readonly handle: string, readonly appId: string) {
+  constructor(readonly handle: string, readonly appId: string, readonly owner: string) {
     this.exported.export(Gio.DBus.session, handle);
     sessions.set(handle, this);
   }

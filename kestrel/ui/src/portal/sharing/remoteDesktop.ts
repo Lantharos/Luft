@@ -1,6 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
+import { portalObject } from '../core/exported.js';
 import { ENDED, SUCCESS, option, respond, type Invocation, type Options, type Outcome } from '../core/request.js';
 import { findSession } from '../core/session.js';
 import { ClipboardBridge } from './clipboardBridge.js';
@@ -74,7 +75,7 @@ export class RemoteDesktopSession extends PeerSession {
   selectDevices(options: Options): void {
     this.devices = (option<number>(options, 'types') ?? ALL_DEVICES) & ALL_DEVICES;
     this.persistMode = persistMode(options);
-    this.stored = storedChoice(options, STORED_CONTROL);
+    this.stored = storedChoice(options, STORED_CONTROL, this.appId);
   }
 
   selectSources(selection: Selection): void {
@@ -146,7 +147,7 @@ export class RemoteDesktopSession extends PeerSession {
     const results: Options = { devices: new GLib.Variant('u', this.shared) };
     if (this.clipboardRequested) results.clipboard_enabled = new GLib.Variant('b', !!this.clipboard);
     if (this.recording) results.streams = this.recording.results;
-    return [SUCCESS, { ...results, ...persisted(persist, STORED_CONTROL, this.stored?.created, [this.shared, !!this.clipboard, storedSources(choice.sources ?? [])]) }];
+    return [SUCCESS, { ...results, ...persisted(persist, STORED_CONTROL, this.appId, this.stored?.created, [this.shared, !!this.clipboard, storedSources(choice.sources ?? [])]) }];
   }
 
   protected stopped(): void {
@@ -158,7 +159,7 @@ export class RemoteDesktopSession extends PeerSession {
 }
 
 export class RemoteDesktopPortal {
-  readonly dbus = Gio.DBusExportedObject.wrapJSObject(REMOTE_DESKTOP_XML, this);
+  readonly dbus = portalObject(REMOTE_DESKTOP_XML, this);
   readonly version = 2;
   readonly AvailableDeviceTypes = ALL_DEVICES;
 
@@ -173,59 +174,65 @@ export class RemoteDesktopPortal {
   }
 
   SelectDevicesAsync([, sessionHandle, , options]: [string, string, string, Options], invocation: Invocation): void {
-    const session = findSession(sessionHandle, RemoteDesktopSession);
+    const session = findSession(sessionHandle, RemoteDesktopSession, invocation);
     session?.selectDevices(options);
     respond(invocation, [session ? SUCCESS : ENDED, {}]);
   }
 
   async StartAsync([handle, sessionHandle]: [string, string, string, string, Options], invocation: Invocation): Promise<void> {
-    const session = findSession(sessionHandle, RemoteDesktopSession);
+    const session = findSession(sessionHandle, RemoteDesktopSession, invocation);
     respond(invocation, session ? await session.start(handle) : [ENDED, {}]);
   }
 
-  NotifyPointerMotion(handle: string, _options: Options, dx: number, dy: number): void {
-    findSession(handle, RemoteDesktopSession)?.notify('NotifyPointerMotionRelative', '(dd)', [dx, dy]);
+  NotifyPointerMotionAsync([handle, , dx, dy]: [string, Options, number, number], invocation: Invocation): void {
+    this.input(handle, invocation)?.notify('NotifyPointerMotionRelative', '(dd)', [dx, dy]);
   }
 
-  NotifyPointerMotionAbsolute(handle: string, _options: Options, stream: number, x: number, y: number): void {
-    findSession(handle, RemoteDesktopSession)?.notifyOnStream('NotifyPointerMotionAbsolute', '(sdd)', stream, [x, y]);
+  NotifyPointerMotionAbsoluteAsync([handle, , stream, x, y]: [string, Options, number, number, number], invocation: Invocation): void {
+    this.input(handle, invocation)?.notifyOnStream('NotifyPointerMotionAbsolute', '(sdd)', stream, [x, y]);
   }
 
-  NotifyPointerButton(handle: string, _options: Options, button: number, state: number): void {
-    findSession(handle, RemoteDesktopSession)?.notify('NotifyPointerButton', '(ib)', [button, state !== 0]);
+  NotifyPointerButtonAsync([handle, , button, state]: [string, Options, number, number], invocation: Invocation): void {
+    this.input(handle, invocation)?.notify('NotifyPointerButton', '(ib)', [button, state !== 0]);
   }
 
-  NotifyPointerAxis(handle: string, options: Options, dx: number, dy: number): void {
-    findSession(handle, RemoteDesktopSession)?.notify('NotifyPointerAxis', '(ddu)', [dx, dy, option<boolean>(options, 'finish') ? FINISH_SCROLL : 0]);
+  NotifyPointerAxisAsync([handle, options, dx, dy]: [string, Options, number, number], invocation: Invocation): void {
+    this.input(handle, invocation)?.notify('NotifyPointerAxis', '(ddu)', [dx, dy, option<boolean>(options, 'finish') ? FINISH_SCROLL : 0]);
   }
 
-  NotifyPointerAxisDiscrete(handle: string, _options: Options, axis: number, steps: number): void {
-    findSession(handle, RemoteDesktopSession)?.notify('NotifyPointerAxisDiscrete', '(ui)', [axis, steps]);
+  NotifyPointerAxisDiscreteAsync([handle, , axis, steps]: [string, Options, number, number], invocation: Invocation): void {
+    this.input(handle, invocation)?.notify('NotifyPointerAxisDiscrete', '(ui)', [axis, steps]);
   }
 
-  NotifyKeyboardKeycode(handle: string, _options: Options, keycode: number, state: number): void {
-    findSession(handle, RemoteDesktopSession)?.notify('NotifyKeyboardKeycode', '(ub)', [keycode, state !== 0]);
+  NotifyKeyboardKeycodeAsync([handle, , keycode, state]: [string, Options, number, number], invocation: Invocation): void {
+    this.input(handle, invocation)?.notify('NotifyKeyboardKeycode', '(ub)', [keycode, state !== 0]);
   }
 
-  NotifyKeyboardKeysym(handle: string, _options: Options, keysym: number, state: number): void {
-    findSession(handle, RemoteDesktopSession)?.notify('NotifyKeyboardKeysym', '(ub)', [keysym, state !== 0]);
+  NotifyKeyboardKeysymAsync([handle, , keysym, state]: [string, Options, number, number], invocation: Invocation): void {
+    this.input(handle, invocation)?.notify('NotifyKeyboardKeysym', '(ub)', [keysym, state !== 0]);
   }
 
-  NotifyTouchDown(handle: string, _options: Options, stream: number, slot: number, x: number, y: number): void {
-    findSession(handle, RemoteDesktopSession)?.notifyOnStream('NotifyTouchDown', '(sudd)', stream, [slot, x, y]);
+  NotifyTouchDownAsync([handle, , stream, slot, x, y]: [string, Options, number, number, number, number], invocation: Invocation): void {
+    this.input(handle, invocation)?.notifyOnStream('NotifyTouchDown', '(sudd)', stream, [slot, x, y]);
   }
 
-  NotifyTouchMotion(handle: string, _options: Options, stream: number, slot: number, x: number, y: number): void {
-    findSession(handle, RemoteDesktopSession)?.notifyOnStream('NotifyTouchMotion', '(sudd)', stream, [slot, x, y]);
+  NotifyTouchMotionAsync([handle, , stream, slot, x, y]: [string, Options, number, number, number, number], invocation: Invocation): void {
+    this.input(handle, invocation)?.notifyOnStream('NotifyTouchMotion', '(sudd)', stream, [slot, x, y]);
   }
 
-  NotifyTouchUp(handle: string, _options: Options, slot: number): void {
-    findSession(handle, RemoteDesktopSession)?.notify('NotifyTouchUp', '(u)', [slot]);
+  NotifyTouchUpAsync([handle, , slot]: [string, Options, number], invocation: Invocation): void {
+    this.input(handle, invocation)?.notify('NotifyTouchUp', '(u)', [slot]);
   }
 
   ConnectToEISAsync([handle]: [string, string, Options], invocation: Invocation): void {
-    const session = findSession(handle, RemoteDesktopSession);
+    const session = findSession(handle, RemoteDesktopSession, invocation);
     if (!session) return invocation.return_dbus_error('org.freedesktop.portal.Error.NotFound', 'No such session');
     session.connectToEis().then(reply => forwardFd(invocation, reply)).catch(error => failed(invocation, error));
+  }
+
+  private input(handle: string, invocation: Invocation): RemoteDesktopSession | null {
+    const session = findSession(handle, RemoteDesktopSession, invocation);
+    invocation.return_value(null);
+    return session;
   }
 }

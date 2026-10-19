@@ -1,6 +1,8 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
+import { portalObject } from './exported.js';
+
 export const SUCCESS = 0;
 export const CANCELLED = 1;
 export const ENDED = 2;
@@ -14,7 +16,7 @@ const REQUEST_XML = `<node><interface name="org.freedesktop.impl.portal.Request"
 </interface></node>`;
 
 export class PortalRequest {
-  private readonly exported = Gio.DBusExportedObject.wrapJSObject(REQUEST_XML, { Close: () => this.closed() });
+  private readonly exported = portalObject(REQUEST_XML, { Close: () => this.closed() });
 
   constructor(handle: string, private readonly closed: () => void) {
     this.exported.export(Gio.DBus.session, handle);

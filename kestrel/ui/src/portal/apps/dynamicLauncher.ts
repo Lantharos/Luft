@@ -5,6 +5,7 @@ import St from 'gi://St';
 
 import { appNames } from '../core/apps.js';
 import { openDialog } from '../core/dialog.js';
+import { portalObject } from '../core/exported.js';
 import { ENDED, SUCCESS, option, respond, type Invocation, type Options } from '../core/request.js';
 
 const DYNAMIC_LAUNCHER_XML = `<node><interface name="org.freedesktop.impl.portal.DynamicLauncher">
@@ -26,7 +27,7 @@ function siteOf(target: string | undefined): string | null {
 }
 
 export class DynamicLauncherPortal {
-  readonly dbus = Gio.DBusExportedObject.wrapJSObject(DYNAMIC_LAUNCHER_XML, this);
+  readonly dbus = portalObject(DYNAMIC_LAUNCHER_XML, this);
   readonly version = 1;
   readonly SupportedLauncherTypes = APPLICATION | WEB_APPLICATION;
 

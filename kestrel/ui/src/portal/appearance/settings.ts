@@ -4,6 +4,7 @@ import St from 'gi://St';
 
 import type { Rgb } from '../../appearance/color.js';
 import { FontconfigSerial } from '../../shared/fontconfig.js';
+import { portalObject } from '../core/exported.js';
 
 const SETTINGS_XML = `<node><interface name="org.freedesktop.impl.portal.Settings">
   <method name="ReadAll"><arg type="as" direction="in"/><arg type="a{sa{sv}}" direction="out"/></method>
@@ -38,7 +39,7 @@ function matches(namespace: string, patterns: string[]): boolean {
 }
 
 export class SettingsPortal {
-  readonly dbus = Gio.DBusExportedObject.wrapJSObject(SETTINGS_XML, this);
+  readonly dbus = portalObject(SETTINGS_XML, this);
   readonly version = 2;
   private readonly schemas = new Map<string, Gio.Settings>();
   private readonly shell = St.Settings.get();

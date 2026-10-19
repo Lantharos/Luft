@@ -5,11 +5,12 @@ import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {descendants, labelled, showsText, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
+import {privateConnection, subscribe} from '../lib/dbus.js';
 import {click} from '../lib/input.js';
-import {call, portalDialog, requestHandle} from '../lib/portal.js';
+import {BACKEND, call, PORTAL_PATH, portalDialog, requestHandle} from '../lib/portal.js';
 import {scratch} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
-import {settled} from '../lib/wait.js';
+import {pause, settled} from '../lib/wait.js';
 
 const {require, eventually} = checks('portal');
 
@@ -104,10 +105,39 @@ async function checkNotification() {
   await eventually(() => !shows(), 'apps can withdraw their notifications');
 }
 
+async function checkNotificationActions() {
+  const appId = 'com.obsproject.Studio';
+  const invoked = [];
+  const unsubscribe = subscribe({sender: BACKEND, iface: 'org.freedesktop.impl.portal.Notification', member: 'ActionInvoked', path: PORTAL_PATH},
+    (_signal, parameters) => invoked.push(parameters));
+  const impostor = privateConnection();
+  try {
+    impostor.emit_signal(null, '/org/gtk/Notifications', 'org.gtk.Notifications', 'ActionInvoked',
+      new GLib.Variant('(sssava{sv})', [appId, 'recording', 'stop', [], {}]));
+    await pause(500);
+    require(!invoked.length, 'other programs cannot pretend a notification was clicked');
+
+    await call('Notification', 'AddNotification', new GLib.Variant('(ssa{sv})', [appId, 'recording', {
+      title: new GLib.Variant('s', 'Recording'),
+      'default-action': new GLib.Variant('s', 'stop'),
+    }]), null);
+    const notification = () => Main.messageTray.getSources().flatMap(source => source.notifications).find(item => item.title === 'Recording');
+    await eventually(notification, 'apps can show notifications with actions');
+    notification().activate();
+    await eventually(() => invoked.some(([app, id, action]) => app === appId && id === 'recording' && action === 'stop'),
+      'clicking a notification reaches the app that sent it');
+  } finally {
+    unsubscribe();
+    impostor.close_sync(null);
+    await call('Notification', 'RemoveNotification', new GLib.Variant('(ss)', [appId, 'recording']), null);
+  }
+}
+
 export async function run() {
   await checkAppChooser();
   await checkDynamicLauncher();
   await checkEmail();
   await checkBackground();
   await checkNotification();
+  await checkNotificationActions();
 }

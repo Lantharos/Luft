@@ -2,6 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import type Shell from 'gi://Shell';
 
+import { portalObject } from '../core/exported.js';
 import { ENDED, SUCCESS, option, respond, type Invocation, type Options } from '../core/request.js';
 
 const EMAIL_XML = `<node><interface name="org.freedesktop.impl.portal.Email">
@@ -32,7 +33,7 @@ function mailtoUri(options: Options): string {
 }
 
 export class EmailPortal {
-  readonly dbus = Gio.DBusExportedObject.wrapJSObject(EMAIL_XML, this);
+  readonly dbus = portalObject(EMAIL_XML, this);
 
   ComposeEmailAsync([, , , options]: [string, string, string, Options], invocation: Invocation): void {
     const mailer = Gio.AppInfo.get_default_for_uri_scheme('mailto');

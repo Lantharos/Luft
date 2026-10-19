@@ -1,6 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
+import { portalObject } from '../core/exported.js';
 import { ENDED, SUCCESS, option, respond, type Invocation, type Options, type Outcome } from '../core/request.js';
 import { findSession } from '../core/session.js';
 import { ClipboardBridge } from './clipboardBridge.js';
@@ -61,7 +62,7 @@ export class InputCaptureSession extends PeerSession {
     try {
       const capabilities = (option<number>(options, 'capabilities') ?? 0) & ALL_DEVICES;
       const persist = persistMode(options);
-      const stored = storedChoice<[number, boolean]>(options, STORED_CAPTURE);
+      const stored = storedChoice<[number, boolean]>(options, STORED_CAPTURE, this.appId);
       const [response, choice] = stored
         ? [SUCCESS, { clipboard: stored.values[1] && this.clipboardRequested, remember: true }]
         : await this.ask(handle, persist);
@@ -71,7 +72,7 @@ export class InputCaptureSession extends PeerSession {
       await this.open(granted, choice.clipboard);
       const results: Options = { capabilities: new GLib.Variant('u', granted) };
       if (this.clipboardRequested) results.clipboard_enabled = new GLib.Variant('b', !!this.clipboard);
-      return [SUCCESS, { ...results, ...persisted(choice.remember ? persist : DONT_PERSIST, STORED_CAPTURE, stored?.created, [granted, !!this.clipboard]) }];
+      return [SUCCESS, { ...results, ...persisted(choice.remember ? persist : DONT_PERSIST, STORED_CAPTURE, this.appId, stored?.created, [granted, !!this.clipboard]) }];
     } catch (error) {
       console.warn(`Couldn't let ${this.appId || 'an app'} capture input: ${(error as Error).message}`);
       return [ENDED, {}];
@@ -155,7 +156,7 @@ export class InputCaptureSession extends PeerSession {
 }
 
 function sessionCall(handle: string, invocation: Invocation, work: (session: InputCaptureSession) => Promise<Options>): void {
-  const session = findSession(handle, InputCaptureSession);
+  const session = findSession(handle, InputCaptureSession, invocation);
   if (!session) return respond(invocation, [ENDED, {}]);
   work(session).then(results => respond(invocation, [SUCCESS, results])).catch(error => {
     console.warn(`Input capture for ${session.appId || 'an app'} failed: ${error.message}`);
@@ -164,7 +165,7 @@ function sessionCall(handle: string, invocation: Invocation, work: (session: Inp
 }
 
 export class InputCapturePortal {
-  readonly dbus = Gio.DBusExportedObject.wrapJSObject(INPUT_CAPTURE_XML, this);
+  readonly dbus = portalObject(INPUT_CAPTURE_XML, this);
   readonly version = 2;
   readonly SupportedCapabilities = ALL_DEVICES;
 
@@ -174,7 +175,7 @@ export class InputCapturePortal {
   }
 
   async StartAsync([handle, sessionHandle, , , options]: [string, string, string, string, Options], invocation: Invocation): Promise<void> {
-    const session = findSession(sessionHandle, InputCaptureSession);
+    const session = findSession(sessionHandle, InputCaptureSession, invocation);
     respond(invocation, session ? await session.start(handle, options) : [ENDED, {}]);
   }
 
@@ -201,7 +202,7 @@ export class InputCapturePortal {
   }
 
   ConnectToEISAsync([sessionHandle]: [string, string, Options], invocation: Invocation): void {
-    const session = findSession(sessionHandle, InputCaptureSession);
+    const session = findSession(sessionHandle, InputCaptureSession, invocation);
     if (!session) return invocation.return_dbus_error('org.freedesktop.portal.Error.NotFound', 'No such session');
     session.connectToEis().then(reply => forwardFd(invocation, reply)).catch(error => failed(invocation, error));
   }

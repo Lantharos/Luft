@@ -1,6 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
+import { portalObject } from '../core/exported.js';
 import { CANCELLED, ENDED, PortalRequest, SUCCESS, option, respond, type Invocation, type Options, type Outcome } from '../core/request.js';
 
 const SCREENSHOT_XML = `<node><interface name="org.freedesktop.impl.portal.Screenshot">
@@ -58,7 +59,7 @@ function failed(error: GLib.Error): Outcome {
 }
 
 export class ScreenshotPortal {
-  readonly dbus = Gio.DBusExportedObject.wrapJSObject(SCREENSHOT_XML, this);
+  readonly dbus = portalObject(SCREENSHOT_XML, this);
   readonly version = 3;
   readonly AvailableTargets = SCREEN | AREA | ACTIVE_WINDOW;
 

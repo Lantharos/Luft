@@ -6,6 +6,7 @@ import type St from 'gi://St';
 
 import { appIcon } from '../../appearance/icons/appIcons.js';
 import { openDialog, type PortalDialog } from '../core/dialog.js';
+import { portalObject } from '../core/exported.js';
 import { CANCELLED, SUCCESS, option, respond, type Invocation, type Options } from '../core/request.js';
 import { choose, list, row } from '../core/rows.js';
 
@@ -56,7 +57,7 @@ function nothingInstalled(): St.Widget {
 }
 
 export class AppChooserPortal {
-  readonly dbus = Gio.DBusExportedObject.wrapJSObject(APP_CHOOSER_XML, this);
+  readonly dbus = portalObject(APP_CHOOSER_XML, this);
   private readonly open = new Map<string, Chooser>();
 
   async ChooseApplicationAsync([handle, , , choices, options]: [string, string, string, string[], Options], invocation: Invocation): Promise<void> {

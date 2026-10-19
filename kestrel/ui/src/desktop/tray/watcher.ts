@@ -1,6 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
+import { ownOnItsOwnConnection } from '../../shared/dedicatedName.js';
 import { busCall } from './bus.js';
 
 const WATCHER_INTERFACE = `<node>
@@ -31,12 +32,11 @@ export class StatusNotifierWatcher {
   private readonly dbus = Gio.DBusExportedObject.wrapJSObject(WATCHER_INTERFACE, this);
   private readonly items = new Map<string, number>();
   private readonly cancellable = new Gio.Cancellable();
-  private readonly nameId: number;
+  private readonly release: () => void;
 
   constructor(private readonly host: WatcherHost) {
-    this.dbus.export(Gio.DBus.session, '/StatusNotifierWatcher');
-    this.nameId = Gio.bus_own_name_on_connection(Gio.DBus.session, 'org.kde.StatusNotifierWatcher', Gio.BusNameOwnerFlags.NONE,
-      () => this.dbus.emit_signal('StatusNotifierHostRegistered', new GLib.Variant('()', [])), null);
+    this.release = ownOnItsOwnConnection('org.kde.StatusNotifierWatcher', [[this.dbus, '/StatusNotifierWatcher']],
+      () => this.dbus.emit_signal('StatusNotifierHostRegistered', new GLib.Variant('()', [])));
     void this.discoverRunningItems();
   }
 
@@ -68,8 +68,7 @@ export class StatusNotifierWatcher {
     this.cancellable.cancel();
     for (const subscription of this.items.values()) Gio.DBus.session.signal_unsubscribe(subscription);
     this.items.clear();
-    Gio.bus_unown_name(this.nameId);
-    this.dbus.unexport();
+    this.release();
   }
 
   private register(busName: string, objectPath: string): void {

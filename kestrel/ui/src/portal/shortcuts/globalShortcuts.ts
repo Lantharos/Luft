@@ -1,12 +1,13 @@
-import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 
 import type { Keybindings } from '../../context.js';
-import { ENDED, SUCCESS, respond, type Invocation, type Options } from '../core/request.js';
+import { portalObject } from '../core/exported.js';
+import { CANCELLED, ENDED, SUCCESS, respond, type Invocation, type Options } from '../core/request.js';
 import { PortalSession, findSession } from '../core/session.js';
-import { canonical, label, reservedAccelerators, typesText } from './accelerators.js';
+import { canonical, claimable, label, reservedAccelerators } from './accelerators.js';
+import { allowShortcuts } from './consentDialog.js';
 import { recordShortcuts } from './recordDialog.js';
 import { ShortcutStore, type AppShortcuts } from './store.js';
 
@@ -51,8 +52,8 @@ class ShortcutSession extends PortalSession {
   ids: string[] = [];
   readonly grabs = new Map<number, string>();
 
-  constructor(handle: string, appId: string, private readonly onClosed: (session: ShortcutSession) => void) {
-    super(handle, appId);
+  constructor(handle: string, appId: string, owner: string, private readonly onClosed: (session: ShortcutSession) => void) {
+    super(handle, appId, owner);
   }
 
   release(): void {
@@ -67,7 +68,7 @@ class ShortcutSession extends PortalSession {
 }
 
 export class GlobalShortcutsPortal {
-  readonly dbus = Gio.DBusExportedObject.wrapJSObject(GLOBAL_SHORTCUTS_XML, this);
+  readonly dbus = portalObject(GLOBAL_SHORTCUTS_XML, this);
   readonly version = 2;
   private readonly store = new ShortcutStore();
   private readonly sessions = new Set<ShortcutSession>();
@@ -81,13 +82,24 @@ export class GlobalShortcutsPortal {
   }
 
   CreateSessionAsync([, sessionHandle, appId]: [string, string, string, Options], invocation: Invocation): void {
-    this.sessions.add(new ShortcutSession(sessionHandle, appId, session => this.sessions.delete(session)));
+    this.sessions.add(new ShortcutSession(sessionHandle, appId, invocation.get_sender()!, session => this.sessions.delete(session)));
     respond(invocation, [SUCCESS, {}]);
   }
 
-  BindShortcutsAsync([, sessionHandle, requested]: [string, string, Requested, string, Options], invocation: Invocation): void {
-    const session = findSession(sessionHandle, ShortcutSession);
+  async BindShortcutsAsync([handle, sessionHandle, requested]: [string, string, Requested, string, Options], invocation: Invocation): Promise<void> {
+    const session = findSession(sessionHandle, ShortcutSession, invocation);
     if (!session) {
+      respond(invocation, [ENDED, {}]);
+      return;
+    }
+    const stored = this.store.app(session.appId);
+    const proposed = this.bind(session.appId, requested);
+    const added = requested.map(([id]) => id).filter(id => !stored[id] && proposed[id].shortcuts.length).map(id => proposed[id]);
+    if (added.length && !await allowShortcuts(handle, session.appId, added)) {
+      respond(invocation, [CANCELLED, {}]);
+      return;
+    }
+    if (!session.active) {
       respond(invocation, [ENDED, {}]);
       return;
     }
@@ -99,13 +111,13 @@ export class GlobalShortcutsPortal {
   }
 
   ListShortcutsAsync([, sessionHandle]: [string, string], invocation: Invocation): void {
-    const session = findSession(sessionHandle, ShortcutSession);
+    const session = findSession(sessionHandle, ShortcutSession, invocation);
     if (session) respond(invocation, [SUCCESS, { shortcuts: this.describe(session, this.store.app(session.appId)) }]);
     else respond(invocation, [ENDED, {}]);
   }
 
   ConfigureShortcutsAsync([sessionHandle]: [string, string, Options], invocation: Invocation): void {
-    const session = findSession(sessionHandle, ShortcutSession);
+    const session = findSession(sessionHandle, ShortcutSession, invocation);
     if (!session) {
       invocation.return_dbus_error('org.freedesktop.DBus.Error.InvalidArgs', `${sessionHandle} is not a shortcuts session`);
       return;
@@ -139,7 +151,7 @@ export class GlobalShortcutsPortal {
         bound[id] = { ...stored[id], description };
         continue;
       }
-      const accepted = preferred(options).filter(accelerator => !typesText(accelerator) && !unavailable.has(canonical(accelerator)));
+      const accepted = preferred(options).filter(accelerator => claimable(accelerator) && !unavailable.has(canonical(accelerator)));
       accepted.forEach(accelerator => unavailable.add(canonical(accelerator)));
       bound[id] = { description, shortcuts: accepted };
     }

@@ -1,8 +1,8 @@
-import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
 
 import { afterMotion, dropAfterMotion } from '../../shared/afterMotion.js';
+import { portalObject } from '../core/exported.js';
 import { SUCCESS, respond, type Invocation } from '../core/request.js';
 
 const BACKGROUND_XML = `<node><interface name="org.freedesktop.impl.portal.Background">
@@ -28,7 +28,7 @@ function sandboxedApps(): Map<string, Shell.App> {
 }
 
 export class BackgroundPortal {
-  readonly dbus = Gio.DBusExportedObject.wrapJSObject(BACKGROUND_XML, this);
+  readonly dbus = portalObject(BACKGROUND_XML, this);
   private readonly appSystem = Shell.AppSystem.get_default();
   private readonly tracker = Shell.WindowTracker.get_default();
   private readonly signals: [object: Shell.AppSystem | Shell.WindowTracker, id: number][];

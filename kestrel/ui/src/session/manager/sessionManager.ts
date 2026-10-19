@@ -4,6 +4,7 @@ import GLib from 'gi://GLib';
 import { Clients } from './clients.js';
 import { EndSession, type EndAction } from './endSession.js';
 import { Inhibitors } from './inhibitors.js';
+import { sandboxed } from './callers.js';
 import { BUS_NAME, InhibitFlags, MANAGER_PATH, MANAGER_XML } from './interfaces.js';
 import { Peers } from './peers.js';
 import { Presence } from './presence.js';
@@ -12,6 +13,7 @@ import { availability, exportEnvironment, perform, watchSession, type SessionSta
 
 const LOGOUT_NO_CONFIRMATION = 1;
 const LOGOUT_FORCE = 2;
+const SHELL_READY = 'org.freedesktop.impl.portal.desktop.kestrel';
 
 type Invocation = Gio.DBusMethodInvocation;
 
@@ -33,15 +35,13 @@ export class SessionManager {
   });
   private readonly stopWatchingSession: () => void;
   private readonly nameId: number;
+  private startupWatch: number;
   private state: SessionState = { active: true, locked: false };
 
   constructor() {
     const manager = this;
     this.exported = Gio.DBusExportedObject.wrapJSObject(MANAGER_XML, {
-      SetenvAsync: ([name, value]: [string, string], invocation: Invocation) => {
-        exportEnvironment({ [name]: value });
-        invocation.return_value(null);
-      },
+      SetenvAsync: ([name, value]: [string, string], invocation: Invocation) => void this.setenv(name, value, invocation),
       GetLocale: () => GLib.getenv('LANG') ?? 'C',
       RegisterClientAsync: ([_appId]: [string, string], invocation: Invocation) => {
         const sender = invocation.get_sender()!;
@@ -65,7 +65,7 @@ export class SessionManager {
       IsInhibited: (flags: number) => !!(this.inhibitors.flags & flags),
       GetInhibitors: () => this.inhibitors.paths(),
       IsSessionRunning: () => true,
-      Logout: (mode: number) => this.end('logout', mode),
+      LogoutAsync: ([mode]: [number], invocation: Invocation) => void this.logout(mode, invocation),
       Shutdown: () => this.end('shutdown', 0),
       Reboot: () => this.end('reboot', 0),
       SuspendAsync: (_parameters: [], invocation: Invocation) => this.reply(invocation, perform('Suspend').then(() => null)),
@@ -88,9 +88,11 @@ export class SessionManager {
     });
     this.nameId = Gio.bus_own_name_on_connection(Gio.DBus.session, BUS_NAME, Gio.BusNameOwnerFlags.REPLACE, () =>
       this.exported.emit_signal('SessionRunning', new GLib.Variant('()', [])), null);
+    this.startupWatch = Gio.bus_watch_name_on_connection(Gio.DBus.session, SHELL_READY, Gio.BusNameWatcherFlags.NONE, () => this.finishStartup(), null);
   }
 
   destroy(): void {
+    this.finishStartup();
     Gio.bus_unown_name(this.nameId);
     this.stopWatchingSession();
     this.screenSaver.destroy();
@@ -100,6 +102,34 @@ export class SessionManager {
     this.clients.destroy();
     this.peers.destroy();
     this.exported.unexport();
+  }
+
+  private get initializing(): boolean {
+    return this.startupWatch !== 0;
+  }
+
+  private finishStartup(): void {
+    if (this.startupWatch) Gio.bus_unwatch_name(this.startupWatch);
+    this.startupWatch = 0;
+  }
+
+  private async setenv(name: string, value: string, invocation: Invocation): Promise<void> {
+    if (await sandboxed(invocation.get_sender()!)) {
+      invocation.return_dbus_error('org.freedesktop.DBus.Error.AccessDenied', 'Sandboxed apps cannot change the session environment');
+      return;
+    }
+    if (!this.initializing) {
+      invocation.return_dbus_error('org.gnome.SessionManager.NotInInitialization', 'The session environment can only change while the session starts');
+      return;
+    }
+    exportEnvironment({ [name]: value });
+    invocation.return_value(null);
+  }
+
+  private async logout(mode: number, invocation: Invocation): Promise<void> {
+    const confirmed = await sandboxed(invocation.get_sender()!) ? 0 : mode;
+    invocation.return_value(null);
+    this.end('logout', confirmed);
   }
 
   private end(action: EndAction, mode: number): void {

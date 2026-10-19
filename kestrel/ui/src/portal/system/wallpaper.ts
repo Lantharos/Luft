@@ -6,6 +6,7 @@ import St from 'gi://St';
 import { createThumbnail } from '../../surfaces/clipboard/thumbnail.js';
 import { appNames } from '../core/apps.js';
 import { openDialog } from '../core/dialog.js';
+import { portalObject } from '../core/exported.js';
 import { ENDED, SUCCESS, option, type Invocation, type Options } from '../core/request.js';
 
 Gio._promisify(Gio.File.prototype, 'load_bytes_async');
@@ -56,7 +57,7 @@ async function confirm(handle: string, appId: string, bytes: GLib.Bytes): Promis
 }
 
 export class WallpaperPortal {
-  readonly dbus = Gio.DBusExportedObject.wrapJSObject(WALLPAPER_XML, this);
+  readonly dbus = portalObject(WALLPAPER_XML, this);
 
   async SetWallpaperURIAsync([handle, appId, , uri, options]: [string, string, string, string, Options], invocation: Invocation): Promise<void> {
     const reply = (response: number) => invocation.return_value(new GLib.Variant('(u)', [response]));

@@ -1,6 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
+import { portalObject } from '../core/exported.js';
 import { PortalRequest, option, type Invocation, type Options } from '../core/request.js';
 import { PortalSession, findSession } from '../core/session.js';
 
@@ -35,8 +36,8 @@ function callManager(method: string, parameters: GLib.Variant, replyType: string
 class MonitorSession extends PortalSession {
   awaitingResponse = false;
 
-  constructor(handle: string, appId: string, private readonly onClosed: (session: MonitorSession) => void) {
-    super(handle, appId);
+  constructor(handle: string, appId: string, owner: string, private readonly onClosed: (session: MonitorSession) => void) {
+    super(handle, appId, owner);
   }
 
   protected closed(): void {
@@ -45,7 +46,7 @@ class MonitorSession extends PortalSession {
 }
 
 export class InhibitPortal {
-  readonly dbus = Gio.DBusExportedObject.wrapJSObject(INHIBIT_XML, this);
+  readonly dbus = portalObject(INHIBIT_XML, this);
   private readonly monitors = new Set<MonitorSession>();
   private client: Promise<string> | null = null;
   private signals: number[] = [];
@@ -71,7 +72,7 @@ export class InhibitPortal {
 
   CreateMonitorAsync([, sessionHandle, appId]: [string, string, string, string], invocation: Invocation): void {
     this.client ??= this.registerClient();
-    const monitor = new MonitorSession(sessionHandle, appId, ended => {
+    const monitor = new MonitorSession(sessionHandle, appId, invocation.get_sender()!, ended => {
       this.monitors.delete(ended);
       this.answerQuery();
     });
@@ -80,8 +81,9 @@ export class InhibitPortal {
     this.emitState(monitor);
   }
 
-  QueryEndResponse(sessionHandle: string): void {
-    const monitor = findSession(sessionHandle, MonitorSession);
+  QueryEndResponseAsync([sessionHandle]: [string], invocation: Invocation): void {
+    invocation.return_value(null);
+    const monitor = findSession(sessionHandle, MonitorSession, invocation);
     if (!monitor) return;
     monitor.awaitingResponse = false;
     this.answerQuery();

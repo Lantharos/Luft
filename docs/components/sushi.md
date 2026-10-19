@@ -6,7 +6,7 @@ Sushi ([boot/sushi](../../boot/sushi)) is Luft's boot splash, and SushiBoot the 
 
 | Setting | Default | Purpose |
 | --- | --- | --- |
-| `monitors` in `/etc/sushi/sushi.conf` | `/var/lib/kestrel-greeter/display/monitors.xml` | Display arrangement to start in, kept up to date by Kestrel |
+| `monitors` in `/etc/sushi/sushi.conf` | `/var/lib/kestrel-greeter/display/monitors.xml` | Display arrangement to start in, that of whoever signed in last |
 | `/usr/lib/modprobe.d/sushi.conf` | NVIDIA's display driver | Drivers Sushi loads itself; a file with the same name in `/etc/modprobe.d` replaces it |
 
 ## sushictl

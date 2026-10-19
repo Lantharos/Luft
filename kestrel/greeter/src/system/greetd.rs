@@ -5,7 +5,7 @@ use std::path::PathBuf;
 use toml_edit::{DocumentMut, Item, Table, TomlError, value};
 
 use crate::error::Error;
-use crate::files::write_atomically;
+use crate::files::{Readers, write_atomically};
 
 const INITIAL_SESSION: &str = "initial_session";
 
@@ -52,7 +52,11 @@ impl Greetd {
             eprintln!("Couldn't parse {}: {error}", self.config.display());
             Error::Failed("greetd's configuration can't be read".into())
         })?;
-        Ok(write_atomically(&self.config, edited.as_bytes())?)
+        Ok(write_atomically(
+            &self.config,
+            edited.as_bytes(),
+            Readers::Everyone,
+        )?)
     }
 }
 

@@ -1,6 +1,9 @@
-use zbus::OwnedObjectPath;
+use std::fs;
+use std::os::fd::{AsFd, AsRawFd};
+
 use zbus::proxy::CacheProperties;
 use zbus::{Connection, proxy};
+use zbus::{OwnedFd, OwnedObjectPath};
 
 use crate::error::Error;
 
@@ -25,7 +28,18 @@ trait Session {
     fn class(&self) -> zbus::Result<String>;
 }
 
-pub async fn require_greeter(connection: &Connection, pid: u32) -> Result<(), Error> {
+fn pid_of(pidfd: &OwnedFd) -> Option<u32> {
+    fs::read_to_string(format!("/proc/self/fdinfo/{}", pidfd.as_fd().as_raw_fd()))
+        .ok()?
+        .lines()
+        .find_map(|line| line.strip_prefix("Pid:"))?
+        .trim()
+        .parse()
+        .ok()
+}
+
+pub async fn require_greeter(connection: &Connection, pidfd: OwnedFd) -> Result<(), Error> {
+    let pid = pid_of(&pidfd).ok_or_else(Error::not_authorized)?;
     let Ok(path) = ManagerProxy::new(connection)
         .await?
         .get_session_by_pid(pid)
@@ -40,7 +54,7 @@ pub async fn require_greeter(connection: &Connection, pid: u32) -> Result<(), Er
         .await?
         .class()
         .await?;
-    if class == GREETER_CLASS {
+    if class == GREETER_CLASS && pid_of(&pidfd) == Some(pid) {
         Ok(())
     } else {
         Err(Error::not_authorized())

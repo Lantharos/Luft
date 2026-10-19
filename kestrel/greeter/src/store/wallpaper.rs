@@ -40,13 +40,8 @@ const QUALITY: u8 = 90;
 const JXL_CODESTREAM: &[u8] = &[0xff, 0x0a];
 const JXL_CONTAINER: &[u8] = b"\0\0\0\x0cJXL \r\n\x87\n";
 
-pub fn prepare(source: OwnedFd) -> Result<Vec<u8>, Error> {
-    let bytes = read(File::from(source))?;
-    let image = decode(&bytes)?;
-    encode(&image)
-}
-
-fn read(mut file: File) -> Result<Vec<u8>, Error> {
+pub fn read(source: OwnedFd) -> Result<Vec<u8>, Error> {
+    let mut file = File::from(source);
     let unreadable = || Error::invalid("The picture can't be read");
     if !file.metadata().map_err(|_| unreadable())?.is_file() {
         return Err(unreadable());
@@ -118,7 +113,11 @@ fn scale_down(image: RgbImage) -> RgbImage {
     scaled
 }
 
-fn encode(image: &RgbImage) -> Result<Vec<u8>, Error> {
+pub fn encode(bytes: &[u8]) -> Result<Vec<u8>, Error> {
+    compress(&decode(bytes)?)
+}
+
+fn compress(image: &RgbImage) -> Result<Vec<u8>, Error> {
     let edge = |length: u32| u16::try_from(length).expect("wallpapers are scaled below 65536 px");
     let mut jpeg = Vec::new();
     Encoder::new(&mut jpeg, QUALITY)

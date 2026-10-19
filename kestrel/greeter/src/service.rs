@@ -1,6 +1,9 @@
 use std::sync::Arc;
+use std::time::Duration;
 
 use tokio::sync::Mutex;
+use tokio::task::spawn_blocking;
+use tokio::time::timeout;
 use zbus::OwnedFd;
 use zbus::message::Header;
 use zbus::object_server::SignalEmitter;
@@ -21,7 +24,10 @@ pub struct Greeter {
     access: Access,
     idle: Arc<Idle>,
     writing: Mutex<()>,
+    decoding: Mutex<()>,
 }
+
+const READ_LIMIT: Duration = Duration::from_secs(10);
 
 impl Greeter {
     pub fn new(options: Options, idle: Arc<Idle>) -> Self {
@@ -31,7 +37,39 @@ impl Greeter {
             access: Access::new(options.unprivileged),
             idle,
             writing: Mutex::default(),
+            decoding: Mutex::default(),
         }
+    }
+
+    async fn prepare_wallpaper(&self, wallpaper: OwnedFd) -> Result<Vec<u8>, Error> {
+        let bytes = read_within(move || store::read_wallpaper(wallpaper.into())).await?;
+        let _decoding = self.decoding.lock().await;
+        spawn_blocking(move || store::encode_wallpaper(&bytes))
+            .await
+            .unwrap_or_else(|_| Err(Error::unsupported_image("This picture couldn't be opened")))
+    }
+
+    fn shown_user(&self, config: &Config) -> Option<u32> {
+        config
+            .shown_user
+            .or_else(|| users::regular_uid(&self.greetd.automatic_login()))
+    }
+
+    async fn show_user(&self, name: &str) -> Result<(), Error> {
+        let Some(uid) = users::regular_uid(name) else {
+            return Ok(());
+        };
+        let _writing = self.writing.lock().await;
+        let mut config = self.store.config();
+        config.shown_user = Some(uid);
+        if let Some(on) = self.store.user_num_lock(uid) {
+            config.num_lock = on;
+        }
+        self.store.save_config(&config)?;
+        if let Some(arrangement) = self.store.user_displays(uid) {
+            self.store.show_displays(&arrangement)?;
+        }
+        Ok(())
     }
 
     async fn change_config(&self, change: impl FnOnce(&mut Config)) -> Result<(), Error> {
@@ -56,10 +94,13 @@ impl Greeter {
     }
 }
 
-async fn prepare_wallpaper(wallpaper: OwnedFd) -> Result<Vec<u8>, Error> {
-    tokio::task::spawn_blocking(move || store::prepare_wallpaper(wallpaper.into()))
-        .await
-        .unwrap_or_else(|_| Err(Error::unsupported_image("This picture couldn't be opened")))
+async fn read_within<T: Send + 'static>(
+    read: impl FnOnce() -> Result<T, Error> + Send + 'static,
+) -> Result<T, Error> {
+    match timeout(READ_LIMIT, spawn_blocking(read)).await {
+        Ok(Ok(result)) => result,
+        Ok(Err(_)) | Err(_) => Err(Error::invalid("The file couldn't be read")),
+    }
 }
 
 fn require_regular_user(name: &str) -> Result<(), Error> {
@@ -130,7 +171,7 @@ impl Greeter {
             .await?;
         let focus = Focus::new(focus)?;
         let uid = access::caller_uid(connection, &header).await?;
-        let jpeg = prepare_wallpaper(wallpaper).await?;
+        let jpeg = self.prepare_wallpaper(wallpaper).await?;
         let _writing = self.writing.lock().await;
         Ok(self.store.save_user_wallpaper(uid, &jpeg, focus)?)
     }
@@ -145,9 +186,14 @@ impl Greeter {
         self.access
             .authorize(connection, &header, SET_APPEARANCE)
             .await?;
-        let arrangement = store::prepare_displays(arrangement.into())?;
+        let uid = access::caller_uid(connection, &header).await?;
+        let arrangement = read_within(move || store::prepare_displays(arrangement.into())).await?;
         let _writing = self.writing.lock().await;
-        Ok(self.store.save_displays(&arrangement)?)
+        self.store.save_user_displays(uid, &arrangement)?;
+        if self.shown_user(&self.store.config()) == Some(uid) {
+            self.store.show_displays(&arrangement)?;
+        }
+        Ok(())
     }
 
     async fn set_num_lock(
@@ -160,7 +206,15 @@ impl Greeter {
         self.access
             .authorize(connection, &header, SET_APPEARANCE)
             .await?;
-        self.change_config(|config| config.num_lock = on).await
+        let uid = access::caller_uid(connection, &header).await?;
+        let _writing = self.writing.lock().await;
+        self.store.save_user_num_lock(uid, on)?;
+        let mut config = self.store.config();
+        if self.shown_user(&config) == Some(uid) {
+            config.num_lock = on;
+            self.store.save_config(&config)?;
+        }
+        Ok(())
     }
 
     async fn set_shared_wallpaper(
@@ -176,7 +230,7 @@ impl Greeter {
             .authorize(connection, &header, CONFIGURE)
             .await?;
         let focus = Focus::new(focus)?;
-        let jpeg = prepare_wallpaper(wallpaper).await?;
+        let jpeg = self.prepare_wallpaper(wallpaper).await?;
         {
             let _writing = self.writing.lock().await;
             self.store.save_shared_wallpaper(&jpeg, focus)?;
@@ -299,6 +353,7 @@ impl Greeter {
         self.access.authorize_greeter(connection, &header).await?;
         let sessions = sessions::discover();
         let session = session_named(&sessions, &session)?;
+        self.show_user(&username).await?;
         accounts::remember_session(connection, &username, session)
             .await
             .map_err(|error| {

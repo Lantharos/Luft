@@ -7,6 +7,7 @@ pub struct Config {
     pub hidden_users: Vec<String>,
     pub default_session: String,
     pub num_lock: bool,
+    pub shown_user: Option<u32>,
 }
 
 impl Default for Config {
@@ -16,6 +17,7 @@ impl Default for Config {
             hidden_users: Vec::new(),
             default_session: String::new(),
             num_lock: true,
+            shown_user: None,
         }
     }
 }

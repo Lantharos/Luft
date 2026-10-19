@@ -27,3 +27,25 @@ const user = GLib.get_user_name();
 call('SetHiddenUsers', new GLib.Variant('(as)', [[user]]));
 const config = JSON.parse(new TextDecoder().decode(Gio.File.new_for_path(`${state}/config.json`).load_contents(null)[1]));
 require(config.hiddenUsers.includes(user) && config.showUsers, 'hidden people are saved for the login screen');
+
+const readJson = path => JSON.parse(new TextDecoder().decode(Gio.File.new_for_path(path).load_contents(null)[1]));
+const shownDisplays = Gio.File.new_for_path(`${state}/display/monitors.xml`);
+const arrangementPath = `${state}/../monitors.xml`;
+GLib.file_set_contents(arrangementPath, '<monitors version="2"></monitors>');
+const arrangement = Gio.File.new_for_path(arrangementPath).read(null);
+const displayFds = new Gio.UnixFDList();
+displayFds.append(arrangement.get_fd());
+call('SetDisplays', new GLib.Variant('(h)', [0]), displayFds);
+call('SetNumLock', new GLib.Variant('(b)', [false]));
+require(Gio.File.new_for_path(`${folder}/monitors.xml`).query_exists(null) && !shownDisplays.query_exists(null)
+  && readJson(`${state}/config.json`).numLock, 'displays and keyboard state wait for their owner to sign in');
+
+const [sessionId] = Gio.DBus.system.call_sync('com.lantharos.Greeter1', '/com/lantharos/Greeter1', 'org.freedesktop.DBus.Properties',
+  'Get', new GLib.Variant('(ss)', ['com.lantharos.Greeter1', 'Sessions']), null, Gio.DBusCallFlags.NONE, -1, null).recursiveUnpack()[0][0];
+try {
+  call('RememberSession', new GLib.Variant('(ss)', [user, sessionId]));
+} catch {}
+const shown = readJson(`${state}/config.json`);
+require(shown.shownUser === new Gio.Credentials().get_unix_user() && !shown.numLock && shownDisplays.query_exists(null),
+  'the login screen follows the last person who signed in');
+call('SetNumLock', new GLib.Variant('(b)', [true]));

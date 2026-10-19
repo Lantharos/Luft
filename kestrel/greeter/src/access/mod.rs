@@ -50,11 +50,11 @@ impl Access {
     ) -> Result<(), Error> {
         match self {
             Self::Polkit => {
-                let pid = credentials(connection, header)
+                let pidfd = credentials(connection, header)
                     .await?
-                    .process_id()
+                    .into_process_fd()
                     .ok_or_else(Error::not_authorized)?;
-                logind::require_greeter(connection, pid).await
+                logind::require_greeter(connection, pidfd).await
             }
             Self::SameUser(uid) => require_user(connection, header, *uid).await,
         }

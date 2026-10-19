@@ -6,6 +6,7 @@ use sha2::{Digest, Sha256};
 use ureq::Agent;
 use ureq::tls::{RootCerts, TlsConfig};
 
+use super::signature;
 use luft_variant::Variant;
 
 const DOWNLOADS: &str = "https://get.luft.computer";
@@ -101,6 +102,10 @@ fn failed(error: ureq::Error) -> io::Error {
     io::Error::other(error.to_string())
 }
 
+pub fn file_name(url: &str) -> &str {
+    url.rsplit('/').next().unwrap_or(url)
+}
+
 pub fn parse_checksum(text: &str) -> Option<[u8; 32]> {
     let hex = text.split_whitespace().next()?;
     if hex.len() != 64 {
@@ -131,7 +136,7 @@ impl Fetch {
     }
 }
 
-fn checksum(agent: &Agent, iso: &str) -> Result<[u8; 32], Fetch> {
+fn text(agent: &Agent, url: &str) -> Result<String, Fetch> {
     let fetched = |error: ureq::Error| {
         if missing(&error) {
             Fetch::Missing
@@ -139,19 +144,30 @@ fn checksum(agent: &Agent, iso: &str) -> Result<[u8; 32], Fetch> {
             Fetch::Failed(failed(error))
         }
     };
-    let text = agent
-        .get(format!("{iso}.sha256"))
+    agent
+        .get(url)
         .call()
         .map_err(fetched)?
         .body_mut()
         .read_to_string()
-        .map_err(fetched)?;
-    parse_checksum(&text).ok_or_else(|| {
-        Fetch::Failed(io::Error::new(
-            io::ErrorKind::InvalidData,
-            "The checksum file isn't readable",
-        ))
-    })
+        .map_err(fetched)
+}
+
+fn unreadable(message: String) -> Fetch {
+    Fetch::Failed(io::Error::new(io::ErrorKind::InvalidData, message))
+}
+
+fn checksum(agent: &Agent, iso: &str) -> Result<[u8; 32], Fetch> {
+    let checksum = text(agent, &format!("{iso}.sha256"))?;
+    if let Some(key) = signature::PUBLIC_KEY {
+        let signed = match text(agent, &format!("{iso}.sha256.minisig")) {
+            Err(Fetch::Missing) => Err(unreadable(format!("{} isn't signed", file_name(iso)))),
+            other => other,
+        }?;
+        signature::verify(key, &checksum, &signed, file_name(iso)).map_err(unreadable)?;
+    }
+    parse_checksum(&checksum)
+        .ok_or_else(|| unreadable("The checksum file isn't readable".to_owned()))
 }
 
 pub fn published_checksum(agent: &Agent, iso: &str) -> io::Result<Option<[u8; 32]>> {

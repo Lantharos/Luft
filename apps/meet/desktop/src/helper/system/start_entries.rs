@@ -1,8 +1,9 @@
 use std::os::windows::process::CommandExt;
 use std::path::Path;
-use std::process::{Command, Stdio};
+use std::process::Stdio;
 
 use super::firmware::Nvram;
+use super::programs;
 use crate::boot::entries;
 use crate::boot::load_option::{self, Decoded, Partition};
 use crate::check::facts::StartEntry;
@@ -64,7 +65,7 @@ pub fn tidy(entries: &[StartEntry]) -> Result<(), String> {
         .iter()
         .filter_map(|entry| entry.windows_object.as_deref())
     {
-        let forgotten = Command::new("bcdedit")
+        let forgotten = programs::windows("bcdedit")
             .args(["/delete", object])
             .stdout(Stdio::null())
             .creation_flags(NO_WINDOW)

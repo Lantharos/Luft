@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 
 use ureq::Agent;
 
-use super::download::{Download, Hashing, format_checksum, parse_checksum};
+use super::download::{Download, Hashing, file_name, format_checksum, parse_checksum};
 
 const CHECKSUM: &str = ".sha256";
 const PARTIAL: &str = ".part";
@@ -33,12 +33,8 @@ fn beside(path: &Path, suffix: &str) -> PathBuf {
     PathBuf::from(name)
 }
 
-fn name_of(url: &str) -> &str {
-    url.rsplit('/').next().unwrap_or(url)
-}
-
 pub fn kept_at(folder: &Path, url: &str, checksum: &[u8; 32]) -> Option<PathBuf> {
-    let path = folder.join(name_of(url));
+    let path = folder.join(file_name(url));
     let recorded = fs::read_to_string(beside(&path, CHECKSUM)).ok()?;
     (parse_checksum(&recorded).as_ref() == Some(checksum) && path.is_file()).then_some(path)
 }
@@ -68,7 +64,7 @@ pub fn keep(
         return Ok(path);
     }
     fs::create_dir_all(&folder)?;
-    let path = folder.join(name_of(url));
+    let path = folder.join(file_name(url));
     forget(&path)?;
     let partial = beside(&path, PARTIAL);
     let result = fetch(agent, url, checksum, &partial, progress);
@@ -79,7 +75,7 @@ pub fn keep(
     fs::rename(&partial, &path)?;
     fs::write(
         beside(&path, CHECKSUM),
-        format!("{}  {}\n", format_checksum(checksum), name_of(url)),
+        format!("{}  {}\n", format_checksum(checksum), file_name(url)),
     )?;
     Ok(path)
 }

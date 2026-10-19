@@ -11,7 +11,7 @@ Meet Luft only downloads the image the computer needs: `luft-latest-nvidia.iso` 
 The steps people see are in [Try Luft with Meet Luft](https://docs.luft.computer/start/meet-luft/). Underneath:
 
 - Windows shrinks its own partition through its storage service, as Disk Management does, so it works with BitLocker on. Luft's room and Meet Luft's partitions go right after Windows, in front of a recovery partition at the end of the drive.
-- The download is checked against its `.sha256`, and the live system is copied out of the ISO as it arrives.
+- The download is checked against its `.sha256` as it arrives, and the `.sha256` against its [signature](#signatures). The live system is copied out of the ISO under temporary names, and only takes their place once the whole ISO matched.
 - The start entry *Meet Luft* goes at the end of the firmware's list, and the firmware is asked to use it once (`BootNext`). Some firmware drops entries it doesn't know, so Meet Luft puts it back before each restart. Luft starts through Fedora's signed shim and GRUB, like the stick.
 - The clock (`RealTimeIsUniversal`) and Fast Startup are changed in Windows itself, so they work with BitLocker on, where Luft can't read Windows' drive.
 - The moving box holds folders from the Windows account, the wallpaper, name and account picture, Bluetooth pairings, and Wi-Fi networks with their passwords when ticked.
@@ -25,7 +25,7 @@ The steps people see are in [Try Luft with Meet Luft](https://docs.luft.computer
 | Start | about 512 MB | FAT, an EFI system partition of its own with shim, GRUB, the kernel and its initramfs |
 | Luft | the live system plus 1 GB | exFAT, labelled *Luft*, with `LiveOS` from the ISO, `meet.json` and the logs from Try Luft |
 
-When Windows encrypts new partitions with BitLocker as soon as they're formatted, as it does on PCs with device encryption, Meet Luft decrypts its own right away, so the firmware and Luft can read them. Windows' drive stays encrypted. Meet Luft also notes the partitions it made in `C:\ProgramData\Lantharos\Meet Luft\made.json`, so it can always take them back out.
+When Windows encrypts new partitions with BitLocker as soon as they're formatted, as it does on PCs with device encryption, Meet Luft decrypts its own right away, so the firmware and Luft can read them. Windows' drive stays encrypted. Meet Luft also notes the partitions it made in `C:\ProgramData\Lantharos\Meet Luft\made.json`, so it can always take them back out. Only administrators can open that folder, and Meet Luft only touches partitions noted there, whatever the files on Luft's own partitions say.
 
 `meet.json` names Meet Luft's partitions by their GUIDs, the room, the start entry and whether the last restart was to try or to install. Before each restart it also notes the display language, formats, time zone and keyboard layouts in use, already turned into their Linux names (CLDR's mapping for the time zone, which picks the zone for the formats' country, so *Central Europe Standard Time* in Slovakia is Europe/Bratislava), so Install Luft can start with them. On Linux they come from the session's locale, `/etc/localtime` and the GNOME, Plasma or system keyboard settings. The live system finds its partition with `root=luft-live:PARTUUID=…` on the kernel command line; the stick uses `root=luft-live:LABEL=…`. None of the partitions get a drive letter.
 
@@ -96,7 +96,7 @@ Copy-Item -LiteralPath "${luft}Luft logs" -Destination "$env:TEMP\Luft logs" -Re
 
 ### Running it
 
-Meet Luft asks Windows for administrator rights once, when it first looks at the drive. A small helper does the disk and firmware work with those rights; the window itself runs as you, so it sees your own folders and settings. It needs Windows 10 or 11, and an internet connection unless you pick an ISO.
+Meet Luft asks Windows for administrator rights once, when it first looks at the drive. A small helper does the disk and firmware work with those rights; the window itself runs as you, so it sees your own folders and settings. It needs Windows 10 or 11, and an internet connection unless you pick an ISO. The helper loads Windows' libraries and tools only from `System32`, never from the folder Meet Luft is installed in, and keeps what it handles along the way, like exported Wi-Fi networks and Bluetooth keys, in the administrators-only folder above.
 
 When a step doesn't finish, Meet Luft says which one and offers to try it again. What went wrong is written to `%LOCALAPPDATA%\Sabine\logs\meet.jsonl`.
 
@@ -113,3 +113,20 @@ Secure Boot can stay on: Luft starts through Fedora's shim and GRUB, like the st
 *Get the newest Luft* and the nightly builds (**Ctrl+Shift+N**) work as on Windows. *Remove Luft from this computer* deletes the folder, `EFI/luft-meet` and the start entry. `/var/lib/luft-meet/made.json` notes what Meet Luft made, so it can always take it back out. At Luft's first start after installing, it removes them itself.
 
 Meet Luft asks for your password through polkit once, when it first looks at the computer; a helper started with `pkexec` does the work on the drive and the firmware, and the window runs as you.
+
+## Signatures
+
+Every published `.sha256` can carry a [minisign](https://jedisct1.github.io/minisign/) signature next to it, `.sha256.minisig`, whose trusted comment is the name of the ISO it's for. Meet Luft has the public key built in, and once it has one, it only accepts checksums signed for the exact ISO it downloads, so an image for another channel or graphics card can't be passed off as the one it asked for. An ISO picked with *Use an ISO I already have* is the person's own choice and isn't checked against a signature.
+
+Turning it on:
+
+1. Make a key pair without a password, on a computer you trust: `minisign -G -W -p luft-iso.pub -s luft-iso.key`.
+2. Add the whole contents of `luft-iso.key` to the repository's Actions secrets as `LUFT_ISO_MINISIGN_KEY`, and keep a copy of the file somewhere safe and offline. The ISO workflow signs from then on.
+3. Run the ISO workflow by hand for the latest release and for the nightly build, so every published ISO has its signature.
+4. Put the second line of `luft-iso.pub` into `PUBLIC_KEY` in `apps/meet/desktop/src/live/signature.rs`, as `Some("RW…")`. Builds of Meet Luft from then on refuse downloads whose checksum isn't signed.
+
+Meet Luft itself isn't signed with an Authenticode certificate yet, so Windows shows it from an unknown publisher. Signing waits on a certificate; with one, the Meet Luft workflow signs `meet.exe` and the setup program through Sabine:
+
+1. Make the certificate available on the Windows runner before the *Find signtool* step, for Certum SimplySign by installing SimplySign Desktop and signing in to it, which puts the certificate in the certificate store.
+2. Set the repository variable `WINDOWS_CERTIFICATE_SHA1` to the certificate's thumbprint.
+3. Use a Sabine release newer than 0.48, which signs with a certificate from the store.

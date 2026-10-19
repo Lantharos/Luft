@@ -39,6 +39,18 @@ jobs:
 
       - run: cargo install --git https://github.com/Lantharos/Sabine --tag $env:SABINE --locked sabine-cli
 
+      - name: Find signtool
+        if: vars.WINDOWS_CERTIFICATE_SHA1 != ''
+        run: |
+          $signtool = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin\*\x64\signtool.exe" | Sort-Object FullName -Descending | Select-Object -First 1
+          if (-not $signtool) { throw 'signtool is missing' }
+          $signtool.DirectoryName >> $env:GITHUB_PATH
+          $thumbprint = '${{ vars.WINDOWS_CERTIFICATE_SHA1 }}'
+          if (-not (Get-ChildItem Cert:\CurrentUser\My, Cert:\LocalMachine\My | Where-Object Thumbprint -eq $thumbprint)) {
+            throw "The code signing certificate $thumbprint isn't in the certificate store"
+          }
+          "SABINE_WINDOWS_CERTIFICATE_SHA1=$thumbprint" >> $env:GITHUB_ENV
+
       - name: Bundle
         working-directory: apps/meet
         run: |

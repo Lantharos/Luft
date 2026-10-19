@@ -30,6 +30,15 @@ impl Found {
     pub fn live_path(&self) -> Option<PathBuf> {
         self.live.as_ref()?.volume_path()
     }
+
+    pub fn made_partition(&self, guid: &str) -> Option<&MSFT_Partition> {
+        made_partition(&self.made, guid)
+    }
+}
+
+fn made_partition<'a>(made: &'a [MSFT_Partition], guid: &str) -> Option<&'a MSFT_Partition> {
+    made.iter()
+        .find(|partition| partition.guid().as_deref() == Some(guid))
 }
 
 fn holds_live_system(partition: &MSFT_Partition) -> bool {
@@ -70,13 +79,10 @@ pub fn find(layout: &Layout) -> Found {
     let moving_box = handoff
         .as_ref()
         .and_then(Handoff::moving_box)
-        .and_then(|guid| layout.by_guid(guid))
+        .and_then(|guid| made_partition(&made, guid))
         .cloned();
     Found {
-        boot_entry: handoff
-            .as_ref()
-            .map(|handoff| handoff.boot_entry)
-            .or(record.boot_entry),
+        boot_entry: record.boot_entry,
         handoff,
         live,
         moving_box,
@@ -98,6 +104,9 @@ pub fn restart(intent: Intent, windows: WindowsChoices, hints: Hints) -> Result<
     let made = handoff
         .made_partitions()
         .ok_or("Luft's partitions are missing from Meet Luft's notes")?;
+    found
+        .made_partition(&made.start)
+        .ok_or("Luft's start partition isn't one Meet Luft made")?;
     let start = firmware::partition_on_disk(
         layout.disk.Number,
         layout.disk.LogicalSectorSize as u64,

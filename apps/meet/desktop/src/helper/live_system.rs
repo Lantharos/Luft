@@ -62,11 +62,11 @@ pub fn write(
     let mut volumes = Volumes::new(files::split(start.to_owned(), live.to_owned()));
     iso::extract(&mut hashing, &mut volumes)
         .map_err(|error: io::Error| format!("Luft couldn't be downloaded: {error}"))?;
-    volumes.finish().map_err(|error| error.to_string())?;
     let digest = hashing.digest();
     if expected.is_some_and(|expected| digest != expected) {
         return Err("The download was damaged on the way. Try again.".to_owned());
     }
+    volumes.put_in_place().map_err(|error| error.to_string())?;
     files::write_grub_configs(start, live_guid).map_err(|error| error.to_string())?;
     durable::write(
         &live.join(BUILD_RECORD),

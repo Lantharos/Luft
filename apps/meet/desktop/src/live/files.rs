@@ -17,6 +17,7 @@ const LIVE_FOLDER: &str = "LiveOS/";
 const GRUB_CONFIGS: [&str; 2] = ["EFI/BOOT/grub.cfg", "EFI/fedora/grub.cfg"];
 pub const BUILD_RECORD: &str = "LiveOS/iso.sha256";
 pub const UPDATING: &str = "updating";
+const ARRIVING: &str = ".arriving";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Place {
@@ -98,32 +99,65 @@ pub fn split(start: PathBuf, live: PathBuf) -> impl Fn(&str) -> PathBuf {
 pub struct Volumes<F> {
     target: F,
     open: Option<(String, File)>,
+    arriving: Vec<PathBuf>,
+}
+
+fn arriving_at(path: &Path) -> PathBuf {
+    let mut name = path.as_os_str().to_owned();
+    name.push(ARRIVING);
+    PathBuf::from(name)
 }
 
 impl<F: Fn(&str) -> PathBuf> Volumes<F> {
     pub fn new(target: F) -> Self {
-        Self { target, open: None }
+        Self {
+            target,
+            open: None,
+            arriving: Vec::new(),
+        }
     }
 
     fn file(&mut self, path: &str) -> io::Result<&mut File> {
         if self.open.as_ref().is_none_or(|(open, _)| open != path) {
             let target = (self.target)(path);
             fs::create_dir_all(target.parent().expect("files live in folders"))?;
+            let first = !self.arriving.contains(&target);
             let file = OpenOptions::new()
                 .create(true)
                 .write(true)
-                .truncate(false)
-                .open(&target)?;
+                .truncate(first)
+                .open(arriving_at(&target))?;
+            if first {
+                self.arriving.push(target);
+            }
             self.open = Some((path.to_owned(), file));
         }
         Ok(&mut self.open.as_mut().expect("just opened").1)
     }
 
-    pub fn finish(&mut self) -> io::Result<()> {
+    fn finish(&mut self) -> io::Result<()> {
         if let Some((_, file)) = self.open.take() {
             file.sync_all()?;
         }
         Ok(())
+    }
+
+    pub fn put_in_place(mut self) -> io::Result<()> {
+        self.finish()?;
+        while let Some(target) = self.arriving.last() {
+            fs::rename(arriving_at(target), target)?;
+            self.arriving.pop();
+        }
+        Ok(())
+    }
+}
+
+impl<F> Drop for Volumes<F> {
+    fn drop(&mut self) {
+        self.open = None;
+        for target in &self.arriving {
+            let _ = fs::remove_file(arriving_at(target));
+        }
     }
 }
 
@@ -163,6 +197,26 @@ mod tests {
         ];
         assert_eq!(bytes_for(&entries, Place::Live), 1000);
         assert_eq!(missing(&entries), Some("EFI/BOOT/BOOTX64.EFI"));
+    }
+
+    #[test]
+    fn files_reach_their_place_only_once_put_there() {
+        let root = std::env::temp_dir().join(format!("meet-volumes-{}", std::process::id()));
+        let target = |root: PathBuf| move |path: &str| on(&root, path);
+        let mut kept = Volumes::new(target(root.join("kept")));
+        kept.write("LiveOS/luft.erofs", 0, b"luft").unwrap();
+        kept.write("boot/menu.cfg", 0, b"menu").unwrap();
+        kept.write("LiveOS/luft.erofs", 4, b"!").unwrap();
+        assert!(!root.join("kept/LiveOS/luft.erofs").exists());
+        kept.put_in_place().unwrap();
+        let mut dropped = Volumes::new(target(root.join("dropped")));
+        dropped.write("LiveOS/luft.erofs", 0, b"luft").unwrap();
+        drop(dropped);
+        let erofs = fs::read(root.join("kept/LiveOS/luft.erofs")).unwrap();
+        let leftovers = fs::read_dir(root.join("dropped/LiveOS")).unwrap().count();
+        fs::remove_dir_all(&root).unwrap();
+        assert_eq!(erofs, b"luft!");
+        assert_eq!(leftovers, 0);
     }
 
     #[test]

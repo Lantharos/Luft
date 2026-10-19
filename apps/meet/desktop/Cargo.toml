@@ -10,6 +10,7 @@ rust-version = "1.98"
 [dependencies]
 luft-meet = { path = "../../../packages/meet" }
 luft-variant = { path = "../../../packages/variant" }
+minisign-verify = "0.3.0"
 sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.48" }
 sabine-runtime = { git = "https://github.com/Lantharos/Sabine", tag = "v0.48" }
 serde = { version = "1.0.229", features = ["derive"] }
@@ -37,8 +38,10 @@ windows = { version = "0.62.2", features = [
   "Win32_Security_Authorization",
   "Win32_Storage_FileSystem",
   "Win32_System_Com",
+  "Win32_System_Diagnostics_Debug",
   "Win32_System_IO",
   "Win32_System_Ioctl",
+  "Win32_System_LibraryLoader",
   "Win32_System_Pipes",
   "Win32_System_Power",
   "Win32_System_Registry",

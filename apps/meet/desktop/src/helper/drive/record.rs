@@ -3,6 +3,7 @@ use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
 
+use crate::helper::system::protected;
 use crate::live::durable;
 
 #[derive(Serialize, Deserialize, Default)]
@@ -12,35 +13,34 @@ pub struct Made {
     pub boot_entry: Option<u16>,
 }
 
-fn path() -> PathBuf {
-    let data = std::env::var_os("ProgramData")
-        .map_or_else(|| PathBuf::from(r"C:\ProgramData"), PathBuf::from);
-    data.join("Lantharos").join("Meet Luft").join("made.json")
+fn path() -> Result<PathBuf, String> {
+    Ok(protected::folder()?.join("made.json"))
 }
 
 impl Made {
     pub fn read() -> Self {
-        fs::read_to_string(path())
+        path()
             .ok()
+            .and_then(|path| protected::read(&path))
             .and_then(|text| serde_json::from_str(&text).ok())
             .unwrap_or_default()
     }
 
     fn save(&self) -> Result<(), String> {
-        let path = path();
+        let path = path()?;
         if self.partitions.is_empty() && self.boot_entry.is_none() {
             return match fs::remove_file(&path) {
                 Err(error) if error.kind() != std::io::ErrorKind::NotFound => {
                     Err(error.to_string())
                 }
                 _ => {
-                    let _ = fs::remove_dir(path.parent().expect("the record lives in a folder"));
+                    for folder in path.ancestors().skip(1).take(2) {
+                        let _ = fs::remove_dir(folder);
+                    }
                     Ok(())
                 }
             };
         }
-        fs::create_dir_all(path.parent().expect("the record lives in a folder"))
-            .map_err(|error| error.to_string())?;
         let json = serde_json::to_string_pretty(self).expect("the record always serializes");
         durable::write(&path, json.as_bytes())
             .map_err(|error| format!("Meet Luft couldn't note what it made: {error}"))

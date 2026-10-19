@@ -148,12 +148,6 @@ impl Layout {
             .max()
             .unwrap_or(0)
     }
-
-    pub fn by_guid(&self, guid: &str) -> Option<&MSFT_Partition> {
-        self.partitions
-            .iter()
-            .find(|partition| partition.guid().as_deref() == Some(guid))
-    }
 }
 
 impl Storage {

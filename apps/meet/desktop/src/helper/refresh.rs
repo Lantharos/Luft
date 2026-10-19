@@ -7,6 +7,7 @@ use luft_meet::Handoff;
 use super::drive::storage::{Layout, MSFT_Partition, Storage};
 use super::drive::windows_drive::{self, WindowsDrive};
 use super::drive::{record, state};
+use super::system::protected::Scratch;
 use super::system::start_entries;
 use super::{Context, live_system, prepare, undo};
 use crate::live::iso::Entry;
@@ -16,30 +17,27 @@ use crate::protocol::{Prepared, Stage};
 
 const LOGS: &str = "Luft logs";
 
-struct KeptLogs(PathBuf);
+struct KeptLogs(Scratch);
 
 impl KeptLogs {
-    fn take(live: &Path) -> io::Result<Self> {
-        let kept =
-            Self(std::env::temp_dir().join(format!("meet-luft-logs-{}", std::process::id())));
+    fn take(live: &Path) -> Result<Self, String> {
+        let kept = Self(Scratch::new("logs")?);
         let logs = live.join(LOGS);
         if logs.is_dir() {
-            copy_tree(&logs, &kept.0)?;
+            copy_tree(&logs, &kept.folder()).map_err(|error| error.to_string())?;
         }
         Ok(kept)
     }
 
+    fn folder(&self) -> PathBuf {
+        self.0.path().join(LOGS)
+    }
+
     fn put_back(&self, live: &Path) -> io::Result<()> {
-        if self.0.is_dir() {
-            copy_tree(&self.0, &live.join(LOGS))?;
+        if self.folder().is_dir() {
+            copy_tree(&self.folder(), &live.join(LOGS))?;
         }
         Ok(())
-    }
-}
-
-impl Drop for KeptLogs {
-    fn drop(&mut self) {
-        let _ = fs::remove_dir_all(&self.0);
     }
 }
 
@@ -90,7 +88,7 @@ fn rebuild(
     let live = old[1]
         .volume_path()
         .ok_or("Luft's partition has no volume")?;
-    let logs = KeptLogs::take(&live).map_err(|error| error.to_string())?;
+    let logs = KeptLogs::take(&live)?;
     context.progress(Stage::Partitioning, 0, 2);
     start_entries::remove(&[handoff.boot_entry])?;
     record::set_boot_entry(None)?;
@@ -143,8 +141,8 @@ pub fn refresh(context: &Context, source: &Source) -> Result<Prepared, String> {
     let made = handoff
         .made_partitions()
         .ok_or("Luft's partitions are missing from Meet Luft's notes")?;
-    let start = layout
-        .by_guid(&made.start)
+    let start = found
+        .made_partition(&made.start)
         .cloned()
         .ok_or("Luft's start partition is gone")?;
     let entries = live_system::listing(source)?.entries;

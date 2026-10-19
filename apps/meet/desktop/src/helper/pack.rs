@@ -2,7 +2,7 @@ use std::fs::{self, File};
 use std::io::{Read, Write};
 use std::os::windows::process::CommandExt;
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
+use std::process::Stdio;
 
 use luft_meet::handoff::BOX_LABEL;
 use luft_meet::moving_box::{
@@ -13,7 +13,8 @@ use luft_meet::moving_box::{
 use super::drive::storage::{BASIC_TYPE, MSFT_Partition, Storage};
 use super::drive::windows_drive::{self, WindowsDrive};
 use super::drive::{record, state};
-use super::system::bluetooth;
+use super::system::protected::Scratch;
+use super::system::{bluetooth, programs};
 use super::{Context, prepare};
 use crate::folders::{Item, verbatim, walk};
 use crate::plan::layout::{self, Role};
@@ -23,14 +24,6 @@ use crate::protocol::{Belongings, Prepared, Stage};
 const EXFAT: &str = "exFAT";
 const NO_WINDOW: u32 = 0x0800_0000;
 const CHUNK: usize = 1 << 20;
-
-struct Staging(PathBuf);
-
-impl Drop for Staging {
-    fn drop(&mut self) {
-        let _ = fs::remove_dir_all(&self.0);
-    }
-}
 
 fn single(source: &str, name: &str) -> Option<Item> {
     let source = PathBuf::from(source);
@@ -48,7 +41,7 @@ fn single(source: &str, name: &str) -> Option<Item> {
 
 fn export_wifi(into: &Path) -> Result<Vec<PathBuf>, String> {
     fs::create_dir_all(into).map_err(|error| error.to_string())?;
-    let status = Command::new("netsh")
+    let status = programs::windows("netsh")
         .args(["wlan", "export", "profile", "key=clear"])
         .arg(format!("folder={}", into.display()))
         .stdout(Stdio::null())
@@ -179,14 +172,14 @@ pub fn pack(context: &Context, belongings: &Belongings) -> Result<Prepared, Stri
         .as_ref()
         .and_then(|account| account.picture.as_deref())
         .and_then(|path| single(path, PICTURE));
-    let staging = Staging(std::env::temp_dir().join(format!("meet-luft-{}", std::process::id())));
+    let staging = Scratch::new("packing")?;
     let networks = if belongings.wifi {
-        export_wifi(&staging.0.join("wifi"))?
+        export_wifi(&staging.path().join("wifi"))?
     } else {
         Vec::new()
     };
     let saved = if belongings.bluetooth {
-        Some(bluetooth::save(&staging.0.join("bluetooth"))?)
+        Some(bluetooth::save(&staging.path().join("bluetooth"))?)
     } else {
         None
     };

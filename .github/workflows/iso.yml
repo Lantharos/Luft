@@ -40,6 +40,7 @@ jobs:
       LUFT_ISO: ${{ github.workspace }}/iso
       R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
       R2_BUCKET: ${{ secrets.R2_BUCKET }}
+      SIGNING: ${{ secrets.LUFT_ISO_MINISIGN_KEY != '' }}
     steps:
       - name: Make room
         run: |
@@ -92,24 +93,52 @@ jobs:
           os/iso/build.sh "$IMAGE" "${{ matrix.edition }}"
           ls -l "$LUFT_ISO"
 
+      - name: Checksum for the channel
+        if: env.SKIP != '1'
+        working-directory: ${{ env.LUFT_ISO }}
+        run: |
+          iso="$(ls luft-*.iso)"
+          alias="luft-$CHANNEL${iso#luft-"$VERSION"}"
+          sed "s/$iso/$alias/" "$iso.sha256" > "$alias.sha256"
+          echo "ISO_NAME=$iso" >> "$GITHUB_ENV"
+          echo "ALIAS=$alias" >> "$GITHUB_ENV"
+
+      - name: Sign the checksums
+        if: env.SKIP != '1' && env.SIGNING == 'true'
+        working-directory: ${{ env.LUFT_ISO }}
+        env:
+          LUFT_ISO_MINISIGN_KEY: ${{ secrets.LUFT_ISO_MINISIGN_KEY }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes minisign
+          key="$RUNNER_TEMP/luft-iso.key"
+          trap 'rm -f "$key"' EXIT
+          printf '%s\n' "$LUFT_ISO_MINISIGN_KEY" > "$key"
+          for name in "$ISO_NAME" "$ALIAS"; do
+            minisign -S -s "$key" -m "$name.sha256" -t "$name"
+          done
+
       - name: Upload to R2
         if: env.SKIP != '1' && env.R2_ACCOUNT_ID != '' && env.R2_BUCKET != ''
+        working-directory: ${{ env.LUFT_ISO }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: auto
         run: |
           endpoint="https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com"
-          cd "$LUFT_ISO"
           s3() { aws s3 "$@" --endpoint-url "$endpoint" --no-progress; }
-          iso="$(ls luft-*.iso)"
+          publish() {
+            s3 cp "$ISO_NAME" "s3://$R2_BUCKET/$1"
+            if [[ -e "$1.sha256.minisig" ]]; then
+              s3 cp "$1.sha256.minisig" "s3://$R2_BUCKET/$1.sha256.minisig"
+            fi
+            s3 cp "$1.sha256" "s3://$R2_BUCKET/$1.sha256"
+          }
           if [[ "$CHANNEL" == latest ]]; then
-            s3 cp "$iso" "s3://$R2_BUCKET/$iso"
-            s3 cp "$iso.sha256" "s3://$R2_BUCKET/$iso.sha256"
+            publish "$ISO_NAME"
           fi
-          alias="luft-$CHANNEL${iso#luft-"$VERSION"}"
-          s3 cp "$iso" "s3://$R2_BUCKET/$alias"
-          sed "s/$iso/$alias/" "$iso.sha256" | s3 cp - "s3://$R2_BUCKET/$alias.sha256"
+          publish "$ALIAS"
 
       - name: Keep as a workflow artifact
         if: env.SKIP != '1' && (env.R2_ACCOUNT_ID == '' || env.R2_BUCKET == '')
@@ -140,4 +169,4 @@ jobs:
         run: |
           endpoint="https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com"
           echo "$VERSION" | aws s3 cp - "s3://$R2_BUCKET/luft-nightly.version" --endpoint-url "$endpoint" --no-progress
-          aws s3 rm "s3://$R2_BUCKET/" --endpoint-url "$endpoint" --only-show-errors --recursive --exclude '*' --include 'luft-*-nightly.iso' --include 'luft-*-nightly.iso.sha256'
+          aws s3 rm "s3://$R2_BUCKET/" --endpoint-url "$endpoint" --only-show-errors --recursive --exclude '*' --include 'luft-*-nightly.iso' --include 'luft-*-nightly.iso.sha256' --include 'luft-*-nightly.iso.sha256.minisig'

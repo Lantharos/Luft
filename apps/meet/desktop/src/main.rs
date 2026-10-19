@@ -7,6 +7,8 @@ mod check;
 mod folders;
 #[cfg(windows)]
 mod helper;
+#[cfg(windows)]
+mod libraries;
 #[cfg(target_os = "linux")]
 mod linux;
 mod live;
@@ -19,7 +21,9 @@ mod stick;
 fn main() {
     #[cfg(windows)]
     if let Some(link) = helper::requested() {
-        helper::serve(link);
+        if libraries::only_from_system32() {
+            helper::serve(link);
+        }
         return;
     }
     #[cfg(target_os = "linux")]

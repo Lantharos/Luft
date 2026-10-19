@@ -176,6 +176,7 @@ int st_icon_info_get_base_size (StIconInfo *icon_info);
 int st_icon_info_get_base_scale (StIconInfo *icon_info);
 
 const char * st_icon_info_get_filename (StIconInfo *icon_info);
+GFile * st_icon_info_get_file (StIconInfo *icon_info);
 
 gboolean st_icon_info_is_symbolic (StIconInfo *icon_info);
 

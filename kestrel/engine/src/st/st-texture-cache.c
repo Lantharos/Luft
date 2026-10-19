@@ -1568,6 +1568,24 @@ st_texture_cache_evict_styled_icons (StTextureCache *cache)
 }
 
 /**
+ * st_texture_cache_lookup_styled_icon_file:
+ *
+ * Returns: (transfer full) (nullable): the file that
+ *   st_texture_cache_save_styled_icon_async() draws @icon from at @size
+ */
+GFile *
+st_texture_cache_lookup_styled_icon_file (StTextureCache *cache,
+                                          StStyledIcon   *icon,
+                                          int             size)
+{
+  gboolean glyph;
+  g_autoptr (StIconInfo) info = _st_styled_icon_lookup (icon, cache->icon_theme, size, 1, &glyph);
+  GFile *file = info ? st_icon_info_get_file (info) : NULL;
+
+  return file ? g_object_ref (file) : NULL;
+}
+
+/**
  * st_texture_cache_save_styled_icon_async:
  * @cancellable: (nullable):
  * @callback: (scope async):

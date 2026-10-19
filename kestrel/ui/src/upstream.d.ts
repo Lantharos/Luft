@@ -197,6 +197,7 @@ declare module 'resource:///com/lantharos/kestrel/ui/shellEntry.js' {
 
 declare module 'resource:///com/lantharos/kestrel/misc/config.js' {
   export const LIBEXECDIR: string;
+  export const PACKAGE_VERSION: string;
 }
 
 declare module 'resource:///com/lantharos/kestrel/ui/status/keyboard.js' {

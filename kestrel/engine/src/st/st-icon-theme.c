@@ -2950,6 +2950,20 @@ st_icon_info_get_filename (StIconInfo *icon_info)
 }
 
 /**
+ * st_icon_info_get_file:
+ * @icon_info: a #StIconInfo
+ *
+ * Returns: (nullable) (transfer none): the file the icon loads from
+ */
+GFile *
+st_icon_info_get_file (StIconInfo *icon_info)
+{
+  g_return_val_if_fail (icon_info != NULL, NULL);
+
+  return icon_info->icon_file;
+}
+
+/**
  * st_icon_info_is_symbolic:
  * @icon_info: a #StIconInfo
  *

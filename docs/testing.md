@@ -13,7 +13,7 @@ Build Kestrel first (see [Building Luft](https://docs.luft.computer/developers/b
 | `kestrel/tools/session.sh greeter` | Only the login screen checks, against a stand-in greetd |
 | `kestrel/tools/session.sh setup` | Only the first-run setup checks, in Kestrel's setup mode with Install Luft (needs `KESTREL_DEV_APPS=setup` or an installed build) |
 | `kestrel/tools/session.sh scaling` | The default display scale for laptop panels and monitors of different sizes, as virtual monitors |
-| `kestrel/tools/session.sh performance` | Startup memory, search, notification bursts, actor reuse and idle paints |
+| `kestrel/tools/session.sh performance` | Startup memory, search, notification bursts, actor reuse, idle paints and idle wakeups and CPU |
 | `kestrel/tools/session.sh frames` | Frame times of animations and gestures, see [Frame timing](#frame-timing) |
 | `kestrel/tools/session.sh motion` | Every painted frame of animations, see [Motion clips](#motion-clips) |
 

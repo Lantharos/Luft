@@ -18,7 +18,7 @@ let updates = PackageUpdates::load(Mode::Quiet).await?;
 let waiting_in_schelf = updates::app_count(updates.apps.len());
 ```
 
-Without its default `system` feature (`default-features = false`) it leaves out `packages`, `packagekit`, `image` and `updates`, and with them D-Bus and `luft-app`.
+Without its default `system` feature (`default-features = false`) it leaves out `packages`, `packagekit`, `image`, `system_packages` and `updates`, and with them D-Bus and `luft-app`.
 
 PackageKit and the image updater are reached over D-Bus, so their functions are async. Flatpak, Toolbox and AppImage work runs programs and downloads, so it stays synchronous and belongs on a thread of its own; a job on such a thread waits for the async parts with `luft_app::block_on`.
 
@@ -55,7 +55,7 @@ Changing the image needs root, so the image side talks to `luft-updater` (in `up
 | `packagekit::offline` | `prepared()` lists the prepared offline update and `results()` reports how the last one went |
 | `packagekit::running` | `running()` lists PackageKit transactions in progress and `changes()` streams their changes |
 | `flatpak` | `installed`, `updates`, `install`, `install_ref`, `update`, `uninstall`, `add_remote`, `ensure_flathub` and `permissions`, for the user and system `Installation`; `integrate` turns on touchpad scrolling that follows the fingers on Wayland for installed Chromium-based apps through the flags file their launcher reads, joining the features already listed there and leaving a file that already names the feature alone |
-| `appimage` | `inspect` reads an AppImage's name and icon without running it, and `icons` only its icons; `install` moves it into `~/Applications` and `install_copy` copies it there, with a desktop entry named like the one inside it and its icon, which starts Chromium-based apps with touchpad scrolling that follows the fingers on Wayland; `placement` tells where it would go; `list`, `find`, `remove`, `is_appimage`; `check` and `update` follow the update information embedded in the file (`zsync` and `gh-releases-zsync`) |
+| `appimage` | `inspect` reads an AppImage's name and icon without running it, and `icons` only its icons; `install` moves it into `~/Applications` and `install_link` links it there from where it is, with a desktop entry named like the one inside it and its icon, which starts Chromium-based apps with touchpad scrolling that follows the fingers on Wayland; `placement` tells where it would go; `repair` rewrites the menu entry and icons of AppImages whose icons don't match their sizes; `list`, `find`, `remove`, `is_appimage`; `check` and `update` follow the update information embedded in the file (`zsync` and `gh-releases-zsync`) |
 | `task` | `Task` (a progress `report` and a `Cancel`) passed to every operation that changes the system; `Cancel::while_running` and `while_awaiting` stop work when it's cancelled; `exclusive` waits until no other process is changing the account's software, reporting `Waiting` meanwhile, and holds that until it's dropped |
 | `progress` | `Progress`, `Stage` and `Report` |
 | `http` | Shared HTTP agent with `text` and `download` |

@@ -52,9 +52,10 @@ Keep the `plymouth` package installed: updaters such as `dnf5 offline`, PackageK
 | Command | Does |
 | --- | --- |
 | `sushictl status` | Whether the splash is showing, handing over or holding the display |
-| `sushictl deactivate` | Fades the spinner out and hands the display to the next program |
+| `sushictl deactivate` | Fades the spinner out and hands the display to the next program, keeping the last frame on screen |
 | `sushictl quit` | Closes the splash and returns to the text console |
-| `sushictl show MODE` | Takes the display back: `boot-up`, `shutdown`, `updates`, `system-upgrade`, `firmware-upgrade` or `encrypting` |
+| `sushictl update-root ROOT` | Moves the splash into another root file system, as `sushi-switch-root.service` does with `/sysroot` when the initramfs hands over to the installed system |
+| `sushictl show MODE` | Takes the display back: `boot-up`, `shutdown` (or `reboot`), `updates`, `system-upgrade`, `firmware-upgrade` or `encrypting` |
 | `sushictl load-drivers` | Loads the drivers Sushi takes over |
 | `sushictl notice key-enrollment CODE [--again]` | Explains shim's key enrollment screen at the next restart |
 | `sushictl notice show FILE` | Shows a notice and waits until it's dismissed |

@@ -48,11 +48,10 @@ Luft apps use them through `luft-app`:
 ```rust
 use luft_app::secrets;
 
-secrets::store("account-token", token.as_bytes())?;
-let token = secrets::load("account-token")?;
+secrets::store("account-token", token.as_bytes()).await?;
+let token: Option<Vec<u8>> = secrets::load("account-token").await?;
+secrets::delete("account-token").await?;
 ```
-
-`secrets::register(window)` adds `secrets_store`, `secrets_load` and `secrets_delete` commands for the app's page.
 
 ## SSH agent
 

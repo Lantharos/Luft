@@ -23,14 +23,18 @@ SET_SKIP_WINDOW_LIST, SET_KEEP_ABOVE = 1, 3
 def main():
     requests = sys.argv[1:]
     connection = Connection()
-    connection.bind(
-        (
-            ("wl_compositor", 4, IDS["compositor"]),
-            ("wl_shm", 1, IDS["shm"]),
-            ("xdg_wm_base", 1, IDS["wm_base"]),
-            ("kestrel_window_manager_v1", 1, IDS["window_manager"]),
+    try:
+        connection.bind(
+            (
+                ("wl_compositor", 4, IDS["compositor"]),
+                ("wl_shm", 1, IDS["shm"]),
+                ("xdg_wm_base", 1, IDS["wm_base"]),
+                ("kestrel_window_manager_v1", 1, IDS["window_manager"]),
+            )
         )
-    )
+    except KeyError:
+        print("unavailable", flush=True)
+        return
     toplevel = Toplevel(connection, IDS)
     toplevel.map(f"Kestrel window state: {' '.join(requests)}", "com.lantharos.Kestrel.WindowState")
     connection.send(IDS["window_manager"], 1, struct.pack("=II", IDS["window_state"], IDS["toplevel"]))

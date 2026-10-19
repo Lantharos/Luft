@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Sun, 18 Oct 2026 20:42:43 +0200
+Subject: [PATCH 44/48] window-actor: stop counting surfaces after they leave
+ the window
+
+A window actor follows whether each of its surfaces is mapped and
+obscured to decide whether the window can be seen, and lets the window
+be suspended once none of them can. When a surface left the window only
+its obscured handler was disconnected. Unparenting the surface then
+unmapped it and the still connected mapped handler took it off the
+count a second time, so the window counted one surface fewer than it
+showed. With every surface it still had counted as hidden, a window in
+plain sight was suspended and stopped drawing, and stayed that way
+until it was closed.
+
+From GNOME/mutter!5347.
+---
+ src/compositor/meta-window-actor.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/compositor/meta-window-actor.c b/src/compositor/meta-window-actor.c
+index d79dfb694a65105e917e8ae4463bb0d19b228292..c82a0924e2a5bb14f1e7f7f53de71b369be63db8 100644
+--- a/src/compositor/meta-window-actor.c
++++ b/src/compositor/meta-window-actor.c
+@@ -493,6 +493,9 @@ disconnect_surface_actor_from (MetaSurfaceActor *surface_actor,
+   g_signal_handlers_disconnect_by_func (surface_actor,
+                                         is_surface_actor_obscured_changed,
+                                         window_actor);
++  g_signal_handlers_disconnect_by_func (surface_actor,
++                                        is_surface_actor_mapped_changed,
++                                        window_actor);
+   if (meta_surface_actor_is_obscured (surface_actor))
+     priv->n_obscured_surfaces--;
+   if (clutter_actor_is_mapped (CLUTTER_ACTOR (surface_actor)))

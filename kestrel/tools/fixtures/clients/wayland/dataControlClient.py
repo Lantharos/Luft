@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
+import ctypes
 import os
 import selectors
 import struct
 import sys
+import time
 
 from client import DISPLAY, Connection, read_string, string
 
@@ -15,13 +17,24 @@ SOURCE_OFFER = 0
 OFFER_RECEIVE = 0
 DATA_OFFER, SELECTION = 0, 1
 SOURCE_SEND, SOURCE_CANCELLED = 0, 1
+HANDOFF_DELAY = 0.5
+PR_SET_DUMPABLE = 4
+
+
+def hand_off():
+    """Leaves the connection to a child, so the process that connected is gone when the child uses it."""
+    if os.fork():
+        os._exit(0)
+    time.sleep(HANDOFF_DELAY)
 
 
 class DataControl:
     """Reads, replaces and clears the clipboard through ext-data-control-v1 without a window."""
 
-    def __init__(self):
+    def __init__(self, handoff):
         self.connection = Connection()
+        if handoff:
+            hand_off()
         self.connection.bind((("wl_seat", 1, IDS["seat"]), ("ext_data_control_manager_v1", 1, IDS["manager"])))
         self.connection.send(IDS["manager"], GET_DATA_DEVICE, struct.pack("=II", IDS["device"], IDS["seat"]))
         self.offers = {}
@@ -114,14 +127,18 @@ class DataControl:
 
 
 def main():
+    handoff = "--handoff" in sys.argv
+    if "--undumpable" in sys.argv:
+        ctypes.CDLL(None).prctl(PR_SET_DUMPABLE, 0, 0, 0, 0)
     try:
-        data_control = DataControl()
+        data_control = DataControl(handoff)
     except KeyError:
         print("unavailable", flush=True)
         return
     data_control.roundtrip()
     print("ready", flush=True)
-    data_control.serve()
+    if not handoff:
+        data_control.serve()
 
 
 main()

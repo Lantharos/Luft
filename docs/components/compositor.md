@@ -5,7 +5,8 @@ Kestrel runs on its own build of Mutter 51 ([kestrel/compositor](../../kestrel/c
 ## What the patches add
 
 - Rounded window corners that stay square on maximized, tiled and fullscreen windows, so those keep direct scanout
-- Shared background blur, redraw clip filters the shell uses to repaint glass as far as its blur reaches, `xdg-toplevel-icon-v1` icons, and `kestrel_window_v1` for windows kept out of window lists
+- Shared background blur, redraw clip filters the shell uses to repaint glass as far as its blur reaches, `xdg-toplevel-icon-v1` icons, and `kestrel_window_v1` for windows kept out of window lists, which sandboxed apps don't get
+- `wp_security_context_v1`, which Flatpak uses to tag the connections of its apps with their app ID. A connection made any other way counts as unsandboxed only while the process that made it is still running and shares the compositor's mounts; anything that can't be checked is treated as sandboxed
 - Snapping and maximizing that animate at once, and windows the shell tiles counting as tiled
 - Shell text with fractional glyph advances and grayscale antialiasing
 - Shell text, icons and labels drawn at a fractional scale's own resolution and on whole pixels, so they stay sharp at 125% and 150%
@@ -18,11 +19,22 @@ Kestrel runs on its own build of Mutter 51 ([kestrel/compositor](../../kestrel/c
 - Title bars for X11 apps in Kestrel's style, colored from `~/.config/kestrel/appearance.css`
 - `xdg-decoration` for Wayland apps that ask for server-side title bars, which the shell draws in the same style
 - A signal before a monitor turns, so the shell can animate rotation from a picture of the old orientation
-- `ext-idle-notify-v1`, so apps such as password managers can lock themselves after a while without use, sandboxed or not
-- `ext-data-control-v1`, so password managers can copy a password and clear it again while in the background: apps outside a sandbox always get it, Flatpak apps only when their ID is in `com.lantharos.kestrel` `clipboard-access-apps`
+- `ext-idle-notify-v1`, so apps such as password managers can lock themselves after a while without use, sandboxed or not. Idle times are at least a second, and at least ten seconds for sandboxed apps, so no app can follow someone's typing
+- `ext-data-control-v1`, so password managers can copy a password and clear it again while in the background: apps outside a sandbox always get it, Flatpak apps only when they are allowed to, see [Background clipboard access](#background-clipboard-access)
+- Screen recording, remote control and input capture sessions that only the desktop portal and Kestrel's screencast service can start, and display changes such as rearranging monitors or turning them off that sandboxed apps can't make
 - Virtual input devices that flip the tablet mode switch, for driving tablet mode in checks
 - Modifiers the shell can treat as used up while a shortcut made of them is held, such as the one held to dictate, so apps scroll, click and type as if they weren't held, and shortcuts that react to being let go that still notice it when a modifier comes up first
 - Smaller fixes, each described in its patch
+
+## Background clipboard access
+
+Flatpak apps that may use the clipboard while they aren't focused are listed in `/etc/kestrel/clipboard-access-apps`, one app ID per line. Without that file, 1Password, KeePassXC and Bitwarden may. The file belongs to root, so no app can add itself, not even one allowed to change settings.
+
+```sh
+printf '%s\n' com.onepassword.OnePassword org.keepassxc.KeePassXC | sudo install -DZ -m644 /dev/stdin /etc/kestrel/clipboard-access-apps
+```
+
+The list is read whenever an app connects, so changes apply to apps started afterwards.
 
 ## Edit the patches
 

@@ -31,9 +31,9 @@ class Connection:
         self.fds = []
         self.queue = collections.deque()
 
-    def send(self, target, opcode, payload=b"", fd=None):
+    def send(self, target, opcode, payload=b"", *fds):
         message = struct.pack("=II", target, (8 + len(payload)) << 16 | opcode) + payload
-        ancillary = [(socket.SOL_SOCKET, socket.SCM_RIGHTS, array.array("i", [fd]))] if fd is not None else []
+        ancillary = [(socket.SOL_SOCKET, socket.SCM_RIGHTS, array.array("i", fds))] if fds else []
         self.socket.sendmsg([message], ancillary)
 
     def read(self):

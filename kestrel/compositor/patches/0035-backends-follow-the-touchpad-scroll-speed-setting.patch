@@ -1,0 +1,166 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Sat, 17 Oct 2026 21:30:51 +0200
+Subject: [PATCH 35/48] backends: follow the touchpad scroll speed setting
+
+Scale finger scrolling from touchpads by the scroll-speed key of
+org.gnome.desktop.peripherals.touchpad, which gsettings-desktop-schemas
+51 added for this. Each touchpad keeps its own factor, set from the
+input thread like the other libinput settings, so scrolling reads no
+settings per event. Wheels, continuous sources and virtual devices keep
+their deltas.
+---
+ src/backends/meta-input-settings-private.h    |  3 ++
+ src/backends/meta-input-settings.c            | 29 +++++++++++++++++++
+ .../native/meta-input-device-native.c         |  1 +
+ .../native/meta-input-device-native.h         |  2 ++
+ .../native/meta-input-settings-native.c       |  9 ++++++
+ src/backends/native/meta-seat-impl.c          |  7 +++--
+ 6 files changed, 49 insertions(+), 2 deletions(-)
+
+diff --git a/src/backends/meta-input-settings-private.h b/src/backends/meta-input-settings-private.h
+index 7397b567fad7e0a08266eef33da1d06ad4d459bc..cca87fa76f093b5e6f3b967519a839956fd8f9a4 100644
+--- a/src/backends/meta-input-settings-private.h
++++ b/src/backends/meta-input-settings-private.h
+@@ -73,6 +73,9 @@ struct _MetaInputSettingsClass
+   void (* set_speed) (MetaInputSettings  *settings,
+                       ClutterInputDevice *device,
+                       gdouble             speed);
++  void (* set_scroll_speed) (MetaInputSettings  *settings,
++                             ClutterInputDevice *device,
++                             gdouble             speed);
+   void (* set_left_handed) (MetaInputSettings  *settings,
+                             ClutterInputDevice *device,
+                             gboolean            enabled);
+diff --git a/src/backends/meta-input-settings.c b/src/backends/meta-input-settings.c
+index 1d247b568c2154fd57c303386389a0390c8227bf..b6be454e5005edbd1d550d4434b611e645afab28 100644
+--- a/src/backends/meta-input-settings.c
++++ b/src/backends/meta-input-settings.c
+@@ -588,6 +588,32 @@ update_device_speed (MetaInputSettings      *input_settings,
+     }
+ }
+ 
++static void
++update_touchpad_scroll_speed (MetaInputSettings  *input_settings,
++                              ClutterInputDevice *device)
++{
++  MetaInputSettingsPrivate *priv =
++    meta_input_settings_get_instance_private (input_settings);
++  ConfigDoubleFunc func;
++  gdouble speed;
++
++  func = META_INPUT_SETTINGS_GET_CLASS (input_settings)->set_scroll_speed;
++  speed = g_settings_get_double (priv->touchpad_settings, "scroll-speed");
++
++  if (!device)
++    {
++      settings_set_double_setting (input_settings,
++                                   CLUTTER_INPUT_CAPABILITY_TOUCHPAD,
++                                   CLUTTER_INPUT_CAPABILITY_NONE,
++                                   func, speed);
++    }
++  else if (clutter_input_device_get_capabilities (device) &
++           CLUTTER_INPUT_CAPABILITY_TOUCHPAD)
++    {
++      settings_device_set_double_setting (input_settings, device, func, speed);
++    }
++}
++
+ static void
+ update_device_natural_scroll (MetaInputSettings      *input_settings,
+                               ClutterInputDevice     *device)
+@@ -1319,6 +1345,8 @@ meta_input_settings_changed_cb (GSettings  *settings,
+         update_touchpad_left_handed (input_settings, NULL);
+       else if (strcmp (key, "speed") == 0)
+         update_device_speed (input_settings, NULL);
++      else if (strcmp (key, "scroll-speed") == 0)
++        update_touchpad_scroll_speed (input_settings, NULL);
+       else if (strcmp (key, "natural-scroll") == 0)
+         update_device_natural_scroll (input_settings, NULL);
+       else if (strcmp (key, "accel-profile") == 0 ||
+@@ -1628,6 +1656,7 @@ apply_device_settings (MetaInputSettings  *input_settings,
+     meta_input_settings_get_instance_private (input_settings);
+ 
+   update_device_speed (input_settings, device);
++  update_touchpad_scroll_speed (input_settings, device);
+   update_device_natural_scroll (input_settings, device);
+ 
+   update_mouse_left_handed (input_settings, device);
+diff --git a/src/backends/native/meta-input-device-native.c b/src/backends/native/meta-input-device-native.c
+index 4ad101ae63f9746b38b4fb53f4df8a3b3982fbdc..f2a5fa4c88ee808ed86e24e5486958253bdc57f2 100644
+--- a/src/backends/native/meta-input-device-native.c
++++ b/src/backends/native/meta-input-device-native.c
+@@ -240,6 +240,7 @@ meta_input_device_native_init (MetaInputDeviceNative *self)
+   graphene_matrix_init_identity (&self->device_matrix);
+   self->device_aspect_ratio = 0;
+   self->output_ratio = 0;
++  self->scroll_speed = 1.0;
+   self->width = -1;
+   self->height = -1;
+ }
+diff --git a/src/backends/native/meta-input-device-native.h b/src/backends/native/meta-input-device-native.h
+index 99578f6ad79e02a2d00f7e7cfc2013e58ef734b3..ac43ef640ef56c949be9b44820513e63d726e910 100644
+--- a/src/backends/native/meta-input-device-native.h
++++ b/src/backends/native/meta-input-device-native.h
+@@ -87,6 +87,8 @@ struct _MetaInputDeviceNative
+ 
+   ClutterModifierType button_state;
+ 
++  double scroll_speed;
++
+   /* When the client doesn't support high-resolution scroll, accumulate deltas
+    * until we can notify a discrete event.
+    * Some mice have a free spinning wheel, making possible to lock the wheel
+diff --git a/src/backends/native/meta-input-settings-native.c b/src/backends/native/meta-input-settings-native.c
+index 39f8e76110c63df42e3d44b30b8cad259fe1aa8b..cc2280fa28e3546d3f5b08740c2109ca4c5496c9 100644
+--- a/src/backends/native/meta-input-settings-native.c
++++ b/src/backends/native/meta-input-settings-native.c
+@@ -187,6 +187,14 @@ meta_input_settings_native_set_speed (MetaInputSettings  *settings,
+                                           CLAMP (speed, -1, 1));
+ }
+ 
++static void
++meta_input_settings_native_set_scroll_speed (MetaInputSettings  *settings,
++                                             ClutterInputDevice *device,
++                                             gdouble             speed)
++{
++  META_INPUT_DEVICE_NATIVE (device)->scroll_speed = speed;
++}
++
+ static void
+ meta_input_settings_native_set_left_handed (MetaInputSettings  *settings,
+                                             ClutterInputDevice *device,
+@@ -904,6 +912,7 @@ meta_input_settings_native_class_init (MetaInputSettingsNativeClass *klass)
+   input_settings_class->set_send_events = meta_input_settings_native_set_send_events;
+   input_settings_class->set_matrix = meta_input_settings_native_set_matrix;
+   input_settings_class->set_speed = meta_input_settings_native_set_speed;
++  input_settings_class->set_scroll_speed = meta_input_settings_native_set_scroll_speed;
+   input_settings_class->set_left_handed = meta_input_settings_native_set_left_handed;
+   input_settings_class->set_tap_enabled = meta_input_settings_native_set_tap_enabled;
+   input_settings_class->set_tap_button_map = meta_input_settings_native_set_tap_button_map;
+diff --git a/src/backends/native/meta-seat-impl.c b/src/backends/native/meta-seat-impl.c
+index b0425eaa7f0bf56710e401065c47d9485edbf613..0526a26d9157de30ee7c9d0e6e2d21e8e5b08c3b 100644
+--- a/src/backends/native/meta-seat-impl.c
++++ b/src/backends/native/meta-seat-impl.c
+@@ -2276,7 +2276,7 @@ notify_continuous_axis (MetaSeatImpl                  *seat_impl,
+                         ClutterScrollSource            scroll_source,
+                         struct libinput_event_pointer *axis_event)
+ {
+-  double dx = 0.0, dy = 0.0;
++  double dx = 0.0, dy = 0.0, speed = 1.0;
+   ClutterScrollFinishFlags finish_flags = CLUTTER_SCROLL_FINISHED_NONE;
+ 
+   if (libinput_event_pointer_has_axis (axis_event,
+@@ -2298,8 +2298,11 @@ notify_continuous_axis (MetaSeatImpl                  *seat_impl,
+         finish_flags |= CLUTTER_SCROLL_FINISHED_VERTICAL;
+     }
+ 
++  if (scroll_source == CLUTTER_SCROLL_SOURCE_FINGER)
++    speed = META_INPUT_DEVICE_NATIVE (device)->scroll_speed;
++
+   meta_seat_impl_notify_scroll_continuous_in_impl (seat_impl, device, time_us,
+-                                                   dx, dy,
++                                                   dx * speed, dy * speed,
+                                                    scroll_source, finish_flags);
+ }
+ 

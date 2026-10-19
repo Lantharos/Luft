@@ -128,9 +128,30 @@ async function checkTray() {
   }
 }
 
+async function checkMutter() {
+  const app = await sandboxedApp('org.gnome.Shell');
+  const denied = async (path, iface, method, parameters, label) =>
+    require(await failure(app.call(path, iface, method, parameters)) === ACCESS_DENIED, label);
+  try {
+    await denied('/org/gnome/Mutter/RemoteDesktop', 'org.gnome.Mutter.RemoteDesktop', 'CreateSession', null,
+      'sandboxed apps cannot start remote control through Kestrel\'s names');
+    await denied('/org/gnome/Mutter/ScreenCast', 'org.gnome.Mutter.ScreenCast', 'CreateSession', new GLib.Variant('(a{sv})', [{}]),
+      'sandboxed apps cannot record the screen through Kestrel\'s names');
+    await denied('/org/gnome/Mutter/InputCapture', 'org.gnome.Mutter.InputCapture', 'CreateSession', new GLib.Variant('(u)', [1]),
+      'sandboxed apps cannot capture input through Kestrel\'s names');
+    await denied('/org/gnome/Mutter/DisplayConfig', 'org.gnome.Mutter.DisplayConfig', 'ApplyMonitorsConfig',
+      new GLib.Variant('(uua(iiduba(ssa{sv}))a{sv})', [0, 0, [], {}]), 'sandboxed apps cannot rearrange displays');
+    require(await failure(app.call('/org/gnome/Mutter/DisplayConfig', 'org.gnome.Mutter.DisplayConfig', 'GetCurrentState')) === null,
+      'sandboxed apps can still read the display layout');
+  } finally {
+    await app.close();
+  }
+}
+
 export async function run() {
   await checkSessionManager();
   await checkShellConnection();
   await checkScreenSaver();
   await checkTray();
+  await checkMutter();
 }

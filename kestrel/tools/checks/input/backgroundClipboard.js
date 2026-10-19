@@ -1,13 +1,12 @@
 import Clutter from 'gi://Clutter';
-import Gio from 'gi://Gio';
-import GLib from 'gi://GLib';
 import St from 'gi://St';
 import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 
 import {named, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {press} from '../lib/input.js';
-import {fixture, gjs, outputLines, scratch, spawn, stop, waitForWindow} from '../lib/processes.js';
+import {fixture, gjs, stop, waitForWindow} from '../lib/processes.js';
+import {bubblewrapped, launch, openSecurityContext, through} from '../lib/sandbox.js';
 import {settled} from '../lib/wait.js';
 
 const {require, eventually} = checks('background clipboard');
@@ -19,18 +18,8 @@ const PASSWORD = 'lighthouse-keeper-42';
 
 const clipboardText = () => new Promise(resolve => clipboard.get_text(St.ClipboardType.CLIPBOARD, (_clipboard, text) => resolve(text)));
 
-function sandboxed(appId) {
-  const info = scratch(`flatpak-info-${appId}`);
-  GLib.file_set_contents(info, `[Application]\nname=${appId}\n`);
-  const runtime = GLib.get_user_runtime_dir();
-  return ['bwrap', '--ro-bind', '/usr', '/usr', '--symlink', 'usr/lib64', '/lib64', '--symlink', 'usr/lib', '/lib', '--symlink', 'usr/bin', '/bin',
-    '--proc', '/proc', '--dev', '/dev', '--bind', runtime, runtime, '--ro-bind', fixture('clients'), fixture('clients'), '--ro-bind', info, '/.flatpak-info'];
-}
-
-async function startClient(prefix = []) {
-  const process = spawn([...prefix, 'python3', CLIENT], {flags: Gio.SubprocessFlags.STDIN_PIPE | Gio.SubprocessFlags.STDOUT_PIPE});
-  const lines = outputLines(process);
-  await eventually(() => lines.length > 0, 'the clipboard client connects');
+async function startClient({prefix = [], args = [], socket = null} = {}) {
+  const {process, lines} = await launch([...prefix, 'python3', CLIENT, ...args], {env: through(socket), label: 'the clipboard client connects'});
   const send = async (command, answer) => {
     const seen = lines.length;
     process.get_stdin_pipe().write_all(`${command}\n`, null);
@@ -81,29 +70,56 @@ async function checkX11(client) {
   }
 }
 
-async function checkSandbox() {
-  const untrusted = await startClient(sandboxed(UNTRUSTED_APP));
-  require(!untrusted.available, 'sandboxed apps cannot use the clipboard from the background');
-  await stop(untrusted.process);
-
-  const trusted = await startClient(sandboxed(TRUSTED_APP));
+async function checkFlatpaks() {
+  const notes = await openSecurityContext(UNTRUSTED_APP);
+  const passwords = await openSecurityContext(TRUSTED_APP);
   try {
-    require(trusted.available, 'sandboxed password managers can use the clipboard from the background');
-    await trusted.send('copy plain Boarding pass', 'copied');
-    await eventually(async () => await clipboardText() === 'Boarding pass', 'a sandboxed password manager copies text');
+    require(notes.listening && passwords.listening, 'sandbox engines can give their apps sockets of their own');
+
+    const untrusted = await startClient({socket: notes.socket});
+    require(!untrusted.available, 'sandboxed apps cannot use the clipboard from the background');
+    await stop(untrusted.process);
+
+    const nested = await openSecurityContext(TRUSTED_APP, {socket: notes.socket});
+    require(!nested.listening, 'sandboxed apps cannot open sockets that pass as another app');
+    await stop(nested.process);
+
+    const trusted = await startClient({socket: passwords.socket});
+    try {
+      require(trusted.available, 'sandboxed password managers can use the clipboard from the background');
+      await trusted.send('copy plain Boarding pass', 'copied');
+      await eventually(async () => await clipboardText() === 'Boarding pass', 'a sandboxed password manager copies text');
+    } finally {
+      await stop(trusted.process);
+    }
   } finally {
-    await stop(trusted.process);
+    await Promise.all([stop(notes.process), stop(passwords.process)]);
   }
 }
 
+async function checkImpostors() {
+  const impostor = await startClient({prefix: bubblewrapped(TRUSTED_APP)});
+  require(!impostor.available, 'apps sandboxed without a security context cannot pass as a password manager');
+  await stop(impostor.process);
+
+  const handoff = await startClient({prefix: bubblewrapped(TRUSTED_APP), args: ['--handoff']});
+  require(!handoff.available, 'a sandboxed app cannot use the clipboard by leaving its connection to a child');
+  await stop(handoff.process);
+
+  const engine = await openSecurityContext(TRUSTED_APP, {prefix: bubblewrapped(TRUSTED_APP)});
+  require(!engine.listening, 'sandboxed apps cannot open sockets of their own');
+  await stop(engine.process);
+}
+
 export async function run() {
-  const client = await startClient();
+  const client = await startClient({args: ['--undumpable']});
   try {
-    require(client.available, 'apps outside a sandbox can use the clipboard from the background');
+    require(client.available, 'apps outside a sandbox can use the clipboard from the background, even ones that keep other processes out of their memory');
     await checkPasswordManager(client);
     await checkX11(client);
   } finally {
     await stop(client.process);
   }
-  await checkSandbox();
+  await checkFlatpaks();
+  await checkImpostors();
 }

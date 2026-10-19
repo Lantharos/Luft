@@ -1,0 +1,220 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Mon, 19 Oct 2026 08:39:38 +0200
+Subject: [PATCH 48/48] backends: keep sandboxed apps from recording,
+ controlling and rearranging the screen
+
+The RemoteDesktop, ScreenCast and InputCapture services accepted
+CreateSession from anyone on the session bus. The shell's connection
+owns names Flatpak apps are commonly allowed to talk to, such as
+org.gnome.ScreenSaver, so a sandboxed app could reach these services
+through one of those names and record the screen or control the
+computer without asking.
+
+Only the desktop portal backend and Kestrel's screencast service, the
+two callers that ask the user first, may create sessions now.
+DisplayConfig methods that change displays, such as ApplyMonitorsConfig,
+SetBacklight and SetCrtcGamma, refuse callers that run in a sandbox,
+judged from the process that owns the calling connection the same way
+Wayland clients are.
+---
+ src/backends/meta-dbus-access-checker.c  | 38 ++++++++++++++++++++++++
+ src/backends/meta-dbus-access-checker.h  |  3 ++
+ src/backends/meta-dbus-session-manager.c | 38 ++++++++++++++++++++++++
+ src/backends/meta-monitor-manager.c      | 32 ++++++++++++++++++++
+ 4 files changed, 111 insertions(+)
+
+diff --git a/src/backends/meta-dbus-access-checker.c b/src/backends/meta-dbus-access-checker.c
+index 0ace12607751be46508a315b9788c4ebd5fb791e..525cfd4e31c4a42526b3cfedbed8e6283142e6d5 100644
+--- a/src/backends/meta-dbus-access-checker.c
++++ b/src/backends/meta-dbus-access-checker.c
+@@ -21,7 +21,11 @@
+ 
+ #include "meta-dbus-access-checker.h"
+ 
++#include <gio/gunixfdlist.h>
++#include <glib/gstdio.h>
++
+ #include "core/meta-context-private.h"
++#include "core/meta-sandbox.h"
+ 
+ enum
+ {
+@@ -210,3 +214,37 @@ meta_dbus_access_checker_is_sender_allowed (MetaDbusAccessChecker *self,
+ 
+   return FALSE;
+ }
++
++gboolean
++meta_dbus_sender_is_unsandboxed (GDBusConnection *connection,
++                                 const char      *sender_name)
++{
++  g_autoptr (GUnixFDList) fd_list = NULL;
++  g_autoptr (GVariant) reply = NULL;
++  g_autoptr (GVariant) credentials = NULL;
++  g_autofd int pidfd = -1;
++  int32_t pidfd_handle;
++  uint32_t pid;
++
++  reply = g_dbus_connection_call_with_unix_fd_list_sync (connection,
++                                                         "org.freedesktop.DBus",
++                                                         "/org/freedesktop/DBus",
++                                                         "org.freedesktop.DBus",
++                                                         "GetConnectionCredentials",
++                                                         g_variant_new ("(s)", sender_name),
++                                                         G_VARIANT_TYPE ("(a{sv})"),
++                                                         G_DBUS_CALL_FLAGS_NONE,
++                                                         -1, NULL, &fd_list,
++                                                         NULL, NULL);
++  if (!reply)
++    return FALSE;
++
++  credentials = g_variant_get_child_value (reply, 0);
++  if (!fd_list ||
++      !g_variant_lookup (credentials, "ProcessFD", "h", &pidfd_handle) ||
++      !g_variant_lookup (credentials, "ProcessID", "u", &pid))
++    return FALSE;
++
++  pidfd = g_unix_fd_list_get (fd_list, pidfd_handle, NULL);
++  return pidfd >= 0 && meta_process_is_unsandboxed (pidfd, pid);
++}
+diff --git a/src/backends/meta-dbus-access-checker.h b/src/backends/meta-dbus-access-checker.h
+index acbb942c0c54ad74fe394f76f3a8137733f2cc90..4f96c041d42b6755ee6e340efe40efe4b2ebe70d 100644
+--- a/src/backends/meta-dbus-access-checker.h
++++ b/src/backends/meta-dbus-access-checker.h
+@@ -37,3 +37,6 @@ void meta_dbus_access_checker_allow_sender (MetaDbusAccessChecker *self,
+ 
+ gboolean meta_dbus_access_checker_is_sender_allowed (MetaDbusAccessChecker *self,
+                                                      const char            *sender_name);
++
++gboolean meta_dbus_sender_is_unsandboxed (GDBusConnection *connection,
++                                          const char      *sender_name);
+diff --git a/src/backends/meta-dbus-session-manager.c b/src/backends/meta-dbus-session-manager.c
+index 3944bca391936fadcf020452937a533b82467773..a5df0bd6025aa27d29d51928e93c68fc4cf32f07 100644
+--- a/src/backends/meta-dbus-session-manager.c
++++ b/src/backends/meta-dbus-session-manager.c
+@@ -23,8 +23,14 @@
+ #include <gobject/gvaluecollector.h>
+ 
+ #include "backends/meta-backend-private.h"
++#include "backends/meta-dbus-access-checker.h"
+ #include "backends/meta-dbus-session-watcher.h"
+ 
++static const char * const session_creators[] = {
++  "org.freedesktop.impl.portal.desktop.kestrel",
++  "com.lantharos.Kestrel.Screencast",
++};
++
+ enum
+ {
+   ENABLED,
+@@ -60,6 +66,7 @@ typedef struct _MetaDbusSessionManagerPrivate
+ 
+   guint dbus_name_id;
+   GDBusInterfaceSkeleton *interface_skeleton;
++  MetaDbusAccessChecker *access_checker;
+ 
+   gboolean is_enabled;
+ 
+@@ -107,10 +114,32 @@ meta_dbus_session_manager_finalize (GObject *object)
+   g_clear_pointer (&priv->service_path, g_free);
+ 
+   g_clear_object (&priv->interface_skeleton);
++  g_clear_object (&priv->access_checker);
+ 
+   G_OBJECT_CLASS (meta_dbus_session_manager_parent_class)->finalize (object);
+ }
+ 
++static gboolean
++authorize_method (GDBusInterfaceSkeleton *interface_skeleton,
++                  GDBusMethodInvocation  *invocation,
++                  MetaDbusSessionManager *session_manager)
++{
++  MetaDbusSessionManagerPrivate *priv =
++    meta_dbus_session_manager_get_instance_private (session_manager);
++
++  if (!g_str_equal (g_dbus_method_invocation_get_method_name (invocation),
++                    "CreateSession") ||
++      meta_dbus_access_checker_is_sender_allowed (priv->access_checker,
++                                                  g_dbus_method_invocation_get_sender (invocation)))
++    return TRUE;
++
++  g_dbus_method_invocation_return_error (invocation,
++                                         G_DBUS_ERROR,
++                                         G_DBUS_ERROR_ACCESS_DENIED,
++                                         "Only the desktop portal may create sessions");
++  return FALSE;
++}
++
+ static void
+ on_bus_acquired (GDBusConnection *connection,
+                  const char      *name,
+@@ -122,6 +151,15 @@ on_bus_acquired (GDBusConnection *connection,
+     meta_dbus_session_manager_get_instance_private (session_manager);
+   g_autoptr (GError) error = NULL;
+ 
++  priv->access_checker =
++    meta_dbus_access_checker_new (connection,
++                                  meta_backend_get_context (priv->backend));
++  for (size_t i = 0; i < G_N_ELEMENTS (session_creators); i++)
++    meta_dbus_access_checker_allow_sender (priv->access_checker,
++                                           session_creators[i]);
++  g_signal_connect (priv->interface_skeleton, "g-authorize-method",
++                    G_CALLBACK (authorize_method), session_manager);
++
+   meta_topic (META_DEBUG_BACKEND,
+               "Acquired D-Bus name '%s', exporting service on '%s'",
+               priv->service_name, priv->service_path);
+diff --git a/src/backends/meta-monitor-manager.c b/src/backends/meta-monitor-manager.c
+index 6aa88fc65cb5747350d1b22b4e31546e3518bcfe..d59a976d46cff4cea4e28d915efe250a7b6e21c5 100644
+--- a/src/backends/meta-monitor-manager.c
++++ b/src/backends/meta-monitor-manager.c
+@@ -49,6 +49,7 @@
+ #include "backends/meta-backend-private.h"
+ #include "backends/meta-color-manager-private.h"
+ #include "backends/meta-crtc.h"
++#include "backends/meta-dbus-access-checker.h"
+ #include "backends/meta-logical-monitor-private.h"
+ #include "backends/meta-monitor-private.h"
+ #include "backends/meta-monitor-config-manager.h"
+@@ -3509,9 +3510,40 @@ meta_monitor_manager_handle_set_output_ctm  (MetaDBusDisplayConfig *skeleton,
+   return G_DBUS_METHOD_INVOCATION_HANDLED;
+ }
+ 
++static const char * const display_changing_methods[] = {
++  "ApplyConfiguration",
++  "ApplyMonitorsConfig",
++  "ChangeBacklight",
++  "SetBacklight",
++  "SetCrtcGamma",
++  "SetOutputCTM",
++  NULL,
++};
++
++static gboolean
++authorize_display_config_method (GDBusInterfaceSkeleton *skeleton,
++                                 GDBusMethodInvocation  *invocation,
++                                 MetaMonitorManager     *manager)
++{
++  if (!g_strv_contains (display_changing_methods,
++                        g_dbus_method_invocation_get_method_name (invocation)) ||
++      meta_dbus_sender_is_unsandboxed (g_dbus_method_invocation_get_connection (invocation),
++                                       g_dbus_method_invocation_get_sender (invocation)))
++    return TRUE;
++
++  g_dbus_method_invocation_return_error (invocation,
++                                         G_DBUS_ERROR,
++                                         G_DBUS_ERROR_ACCESS_DENIED,
++                                         "Sandboxed apps cannot change displays");
++  return FALSE;
++}
++
+ static void
+ monitor_manager_setup_dbus_config_handlers (MetaMonitorManager *manager)
+ {
++  g_signal_connect_object (manager->display_config, "g-authorize-method",
++                           G_CALLBACK (authorize_display_config_method),
++                           manager, G_CONNECT_DEFAULT);
+   g_signal_connect_object (manager->display_config, "handle-get-resources",
+                            G_CALLBACK (meta_monitor_manager_handle_get_resources),
+                            manager, G_CONNECT_DEFAULT);

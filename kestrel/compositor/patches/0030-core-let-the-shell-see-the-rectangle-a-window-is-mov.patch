@@ -1,0 +1,117 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Sat, 17 Oct 2026 13:55:20 +0200
+Subject: [PATCH 30/48] core: let the shell see the rectangle a window is
+ moving to
+
+A Wayland window keeps its old frame rectangle until the client has
+acknowledged and drawn the new size, so an animation that starts when
+the window is maximized or moved could only aim at the old rectangle,
+or wait for the client.
+
+meta_window_get_target_frame_rect() returns the rectangle most recently
+sent to a Wayland client that has not drawn it yet, and the frame
+rectangle for every other window, so the shell can start moving a
+window toward where it is going at once.
+---
+ src/core/window.c                 | 22 ++++++++++++++++++++++
+ src/meta/window.h                 |  4 ++++
+ src/wayland/meta-window-wayland.c | 22 ++++++++++++++++++++++
+ src/wayland/meta-window-wayland.h |  3 +++
+ 4 files changed, 51 insertions(+)
+
+diff --git a/src/core/window.c b/src/core/window.c
+index ab606c8c328b3ad3e99ae740bdb571a9f52c4ade..34f925c5d856018d04343430a11593da0789558f 100644
+--- a/src/core/window.c
++++ b/src/core/window.c
+@@ -5127,6 +5127,28 @@ meta_window_get_frame_rect (const MetaWindow *window,
+   *rect = meta_window_config_get_rect (window->config);
+ }
+ 
++/**
++ * meta_window_get_target_frame_rect:
++ * @window: a #MetaWindow
++ * @rect: (out): pointer to an allocated #MtkRectangle
++ *
++ * Gets the frame rectangle that @window is on its way to. A Wayland
++ * client takes its new size only once it has drawn it, so until then
++ * this is the rectangle most recently sent to it, while
++ * meta_window_get_frame_rect() still reports the old one. For every
++ * other window both are the same.
++ */
++void
++meta_window_get_target_frame_rect (MetaWindow   *window,
++                                   MtkRectangle *rect)
++{
++  *rect = meta_window_config_get_rect (window->config);
++
++  if (META_IS_WINDOW_WAYLAND (window))
++    meta_window_wayland_get_pending_frame_rect (META_WINDOW_WAYLAND (window),
++                                                rect);
++}
++
+ /**
+  * meta_window_get_client_area_rect:
+  * @window: a #MetaWindow
+diff --git a/src/meta/window.h b/src/meta/window.h
+index 01ff51d918eaf78fef7c87e6a9e10daec15ce305..75d2d8a4fa7545b7a1783288681b218bc7b73d6f 100644
+--- a/src/meta/window.h
++++ b/src/meta/window.h
+@@ -157,6 +157,10 @@ META_EXPORT
+ void meta_window_get_frame_rect (const MetaWindow *window,
+                                 MtkRectangle      *rect);
+ 
++META_EXPORT
++void meta_window_get_target_frame_rect (MetaWindow   *window,
++                                        MtkRectangle *rect);
++
+ META_EXPORT
+ void meta_window_get_client_content_rect (MetaWindow   *window,
+                                           MtkRectangle *rect);
+diff --git a/src/wayland/meta-window-wayland.c b/src/wayland/meta-window-wayland.c
+index deb8b8cde4fd6cba41e0a54b63e60c7068a8a4a5..4d04b5b58f8f1af68f7ea6d34f44bf248e38ad89 100644
+--- a/src/wayland/meta-window-wayland.c
++++ b/src/wayland/meta-window-wayland.c
+@@ -1984,6 +1984,28 @@ meta_window_wayland_is_acked_fullscreen (MetaWindowWayland *wl_window)
+   return meta_window_config_get_is_fullscreen (config);
+ }
+ 
++void
++meta_window_wayland_get_pending_frame_rect (MetaWindowWayland *wl_window,
++                                            MtkRectangle      *rect)
++{
++  MetaWaylandWindowConfiguration *configuration;
++
++  if (!wl_window->pending_configurations)
++    return;
++
++  configuration = wl_window->pending_configurations->data;
++  if (configuration->has_position)
++    {
++      rect->x = configuration->x;
++      rect->y = configuration->y;
++    }
++  if (configuration->has_size)
++    {
++      rect->width = configuration->width;
++      rect->height = configuration->height;
++    }
++}
++
+ gboolean
+ meta_window_wayland_get_pending_serial (MetaWindowWayland *wl_window,
+                                         uint32_t          *serial)
+diff --git a/src/wayland/meta-window-wayland.h b/src/wayland/meta-window-wayland.h
+index 0c3e7fbda62c7c339a430159f5c293ad802e2767..3d2b3ce41dc1ec89e96c560b205885af0d9e281f 100644
+--- a/src/wayland/meta-window-wayland.h
++++ b/src/wayland/meta-window-wayland.h
+@@ -82,6 +82,9 @@ META_EXPORT_TEST
+ gboolean meta_window_wayland_is_acked_fullscreen (MetaWindowWayland *wl_window);
+ 
+ META_EXPORT_TEST
++void meta_window_wayland_get_pending_frame_rect (MetaWindowWayland *wl_window,
++                                                 MtkRectangle      *rect);
++
+ gboolean meta_window_wayland_get_pending_serial (MetaWindowWayland *wl_window,
+                                                  uint32_t          *serial);
+ 

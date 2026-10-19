@@ -363,15 +363,6 @@
         profile.
       </description>
     </key>
-    <key name="clipboard-access-apps" type="as">
-      <default>['com.onepassword.OnePassword', 'org.keepassxc.KeePassXC', 'com.bitwarden.desktop']</default>
-      <summary>Sandboxed apps that may use the clipboard from the background</summary>
-      <description>
-        Flatpak app IDs that may read, replace and clear the clipboard while
-        they are not focused, as password managers do to copy a password and
-        clear it again later. Apps that are not sandboxed always can.
-      </description>
-    </key>
     <child name="keybindings" schema="com.lantharos.kestrel.keybindings"/>
     <child name="app-switcher" schema="com.lantharos.kestrel.app-switcher"/>
     <child name="window-switcher" schema="com.lantharos.kestrel.window-switcher"/>

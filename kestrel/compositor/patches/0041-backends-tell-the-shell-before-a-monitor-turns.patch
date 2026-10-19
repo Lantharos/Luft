@@ -1,0 +1,110 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Sun, 18 Oct 2026 14:32:37 +0200
+Subject: [PATCH 41/48] backends: tell the shell before a monitor turns
+
+Emit MetaMonitorManager::rotating for each monitor whose transform a new
+configuration changes, before the configuration is applied. The screen
+still shows the old orientation then, so the shell can take a picture of
+it and turn it into the new one instead of the picture jumping.
+---
+ src/backends/meta-monitor-manager.c | 65 +++++++++++++++++++++++++++++
+ 1 file changed, 65 insertions(+)
+
+diff --git a/src/backends/meta-monitor-manager.c b/src/backends/meta-monitor-manager.c
+index f81dcc6dc61788df70bb94adf4e876967f973e4b..6aa88fc65cb5747350d1b22b4e31546e3518bcfe 100644
+--- a/src/backends/meta-monitor-manager.c
++++ b/src/backends/meta-monitor-manager.c
+@@ -89,6 +89,7 @@ enum
+   POWER_SAVE_MODE_CHANGED,
+   CONFIRM_DISPLAY_CHANGE,
+   MONITOR_PRIVACY_SCREEN_CHANGED,
++  ROTATING,
+   SIGNALS_LAST
+ };
+ 
+@@ -563,6 +564,49 @@ update_current_monitor_mode_scale (MetaMonitor *monitor)
+   meta_monitor_set_default_scale (monitor, monitor_mode, scale);
+ }
+ 
++static MetaLogicalMonitor *
++find_current_logical_monitor (MetaMonitorManager       *manager,
++                              MetaLogicalMonitorConfig *logical_monitor_config)
++{
++  MetaMonitorConfig *monitor_config = logical_monitor_config->monitor_configs->data;
++  GList *l;
++
++  for (l = manager->logical_monitors; l; l = l->next)
++    {
++      MetaLogicalMonitor *logical_monitor = l->data;
++      MetaMonitor *monitor = meta_logical_monitor_get_monitors (logical_monitor)->data;
++
++      if (meta_monitor_spec_equals (meta_monitor_get_spec (monitor),
++                                    monitor_config->monitor_spec))
++        return logical_monitor;
++    }
++
++  return NULL;
++}
++
++static void
++announce_rotations (MetaMonitorManager *manager,
++                    MetaMonitorsConfig *config)
++{
++  GList *l;
++
++  for (l = config->logical_monitor_configs; l; l = l->next)
++    {
++      MetaLogicalMonitorConfig *logical_monitor_config = l->data;
++      MetaLogicalMonitor *logical_monitor =
++        find_current_logical_monitor (manager, logical_monitor_config);
++
++      if (!logical_monitor ||
++          logical_monitor->transform == logical_monitor_config->transform)
++        continue;
++
++      g_signal_emit (manager, signals[ROTATING], 0,
++                     logical_monitor->number,
++                     logical_monitor->transform,
++                     logical_monitor_config->transform);
++    }
++}
++
+ gboolean
+ meta_monitor_manager_apply_monitors_config (MetaMonitorManager      *manager,
+                                             MetaMonitorsConfig      *config,
+@@ -572,6 +616,9 @@ meta_monitor_manager_apply_monitors_config (MetaMonitorManager      *manager,
+   MetaMonitorManagerClass *manager_class =
+     META_MONITOR_MANAGER_GET_CLASS (manager);
+ 
++  if (method != META_MONITORS_CONFIG_METHOD_VERIFY && !manager->in_init)
++    announce_rotations (manager, config);
++
+   if (!manager_class->apply_monitors_config (manager, config, method, error))
+     return FALSE;
+ 
+@@ -1622,6 +1669,24 @@ meta_monitor_manager_class_init (MetaMonitorManagerClass *klass)
+                   NULL, NULL, NULL,
+                   G_TYPE_NONE, 2, META_TYPE_LOGICAL_MONITOR, G_TYPE_BOOLEAN);
+ 
++  /**
++   * MetaMonitorManager::rotating:
++   * @monitor_manager: The #MetaMonitorManager
++   * @monitor: The number of the logical monitor about to turn
++   * @from: The #MtkMonitorTransform it has now
++   * @to: The #MtkMonitorTransform it is about to get
++   *
++   * Emitted right before a new configuration turns a monitor, while it still
++   * shows the old orientation, so the shell can animate the change.
++   */
++  signals[ROTATING] =
++    g_signal_new ("rotating",
++                  G_TYPE_FROM_CLASS (object_class),
++                  G_SIGNAL_RUN_LAST,
++                  0,
++                  NULL, NULL, NULL,
++                  G_TYPE_NONE, 3, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT);
++
+   obj_props[PROP_BACKEND] =
+     g_param_spec_object ("backend", NULL, NULL,
+                          META_TYPE_BACKEND,

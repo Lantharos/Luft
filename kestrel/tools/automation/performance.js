@@ -23,6 +23,8 @@ const CLIPBOARD_IMAGE_SIZE = [1920, 1080];
 const TRAY_SAMPLE = 5000;
 const TASK_VIEW_WINDOWS = 6;
 const IMAGE_TIMEOUT = 15000;
+const MEMORY_SAMPLE_INTERVAL = 50;
+const AFTER_BURST = 3000;
 
 const read = path => new TextDecoder().decode(GLib.file_get_contents(path)[1]);
 const milliseconds = microseconds => Number((microseconds / 1000).toFixed(2));
@@ -213,6 +215,11 @@ async function measureClipboardImages() {
   System.gc();
   await settled(MEASURE_SETTLE);
   const before = processMetrics().residentMemoryMb;
+  let peak = before;
+  const sampler = GLib.timeout_add(GLib.PRIORITY_HIGH, MEMORY_SAMPLE_INTERVAL, () => {
+    peak = Math.max(peak, processMetrics().residentMemoryMb);
+    return GLib.SOURCE_CONTINUE;
+  });
   const started = GLib.get_monotonic_time();
   const longestStallMs = await longestStall(async () => {
     for (const image of images) {
@@ -222,11 +229,12 @@ async function measureClipboardImages() {
     }
   });
   const keptMs = milliseconds(GLib.get_monotonic_time() - started);
-  const afterBurst = processMetrics().residentMemoryMb;
+  await pause(AFTER_BURST);
+  GLib.source_remove(sampler);
   await pause(WAKEUP_SAMPLE);
   report({
     clipboardImages: images.length, keptMs, longestStallMs,
-    residentBeforeMb: before, residentAfterBurstMb: afterBurst, residentSettledMb: processMetrics().residentMemoryMb,
+    residentBeforeMb: before, residentPeakMb: peak, residentSettledMb: processMetrics().residentMemoryMb,
   });
   clipboard.set_text(St.ClipboardType.CLIPBOARD, '');
 }

@@ -639,14 +639,8 @@ class NMModemDeviceItem extends NMDeviceItem {
         this._mobileDevice = null;
 
         const capabilities = device.current_capabilities;
-        if (device.udi.indexOf('/org/freedesktop/ModemManager1/Modem') === 0)
+        if (device.udi.startsWith('/org/freedesktop/ModemManager1/Modem'))
             this._mobileDevice = new ModemManager.BroadbandModem(device.udi, capabilities);
-        else if (capabilities & NM.DeviceModemCapabilities.GSM_UMTS)
-            this._mobileDevice = new ModemManager.ModemGsm(device.udi);
-        else if (capabilities & NM.DeviceModemCapabilities.CDMA_EVDO)
-            this._mobileDevice = new ModemManager.ModemCdma(device.udi);
-        else if (capabilities & NM.DeviceModemCapabilities.LTE)
-            this._mobileDevice = new ModemManager.ModemGsm(device.udi);
 
         this._mobileDevice?.connectObject(
             'notify::operator-name', this._sync.bind(this),

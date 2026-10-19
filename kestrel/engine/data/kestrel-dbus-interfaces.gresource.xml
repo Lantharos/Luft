@@ -15,8 +15,6 @@
     <file preprocess="xml-stripblanks">org.freedesktop.ModemManager1.Modem.Modem3gpp.xml</file>
     <file preprocess="xml-stripblanks">org.freedesktop.ModemManager1.Modem.ModemCdma.xml</file>
     <file preprocess="xml-stripblanks">org.freedesktop.ModemManager1.Modem.xml</file>
-    <file preprocess="xml-stripblanks">org.freedesktop.ModemManager.Modem.Cdma.xml</file>
-    <file preprocess="xml-stripblanks">org.freedesktop.ModemManager.Modem.Gsm.Network.xml</file>
     <file preprocess="xml-stripblanks">org.freedesktop.Notifications.xml</file>
     <file preprocess="xml-stripblanks">org.freedesktop.PackageKit.Offline.xml</file>
     <file preprocess="xml-stripblanks">org.freedesktop.UPower.Device.xml</file>

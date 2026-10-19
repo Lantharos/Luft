@@ -51,21 +51,6 @@ function _findProviderForSid(sid) {
     return lookupCdmaSid(sid);
 }
 
-
-// ----------------------------------------------------- //
-// Support for the old ModemManager interface (MM < 0.7) //
-// ----------------------------------------------------- //
-
-
-// The following are not the complete interfaces, just the methods we need
-// (or may need in the future)
-
-const ModemGsmNetworkInterface = loadInterfaceXML('org.freedesktop.ModemManager.Modem.Gsm.Network');
-const ModemGsmNetworkProxy = Gio.DBusProxy.makeProxyWrapper(ModemGsmNetworkInterface);
-
-const ModemCdmaInterface = loadInterfaceXML('org.freedesktop.ModemManager.Modem.Cdma');
-const ModemCdmaProxy = Gio.DBusProxy.makeProxyWrapper(ModemCdmaInterface);
-
 const ModemBase = GObject.registerClass({
     GTypeFlags: GObject.TypeFlags.ABSTRACT,
     Properties: {
@@ -107,84 +92,6 @@ const ModemBase = GObject.registerClass({
         this.notify('signal-quality');
     }
 });
-
-export const ModemGsm = GObject.registerClass(
-class ModemGsm extends ModemBase {
-    _init(path) {
-        super._init();
-        this._proxy = new ModemGsmNetworkProxy(Gio.DBus.system, 'org.freedesktop.ModemManager', path);
-
-        // Code is duplicated because the function have different signatures
-        this._proxy.connectSignal('SignalQuality', (proxy, sender, [quality]) => {
-            this._setSignalQuality(quality);
-        });
-        this._proxy.connectSignal('RegistrationInfo', (proxy, sender, [_status, code, name]) => {
-            this._setOperatorName(_findProviderForMccMnc(name, code));
-        });
-        this._getInitialState();
-    }
-
-    async _getInitialState() {
-        try {
-            const [
-                [status_, code, name],
-                [quality],
-            ] = await Promise.all([
-                this._proxy.GetRegistrationInfoAsync(),
-                this._proxy.GetSignalQualityAsync(),
-            ]);
-            this._setOperatorName(_findProviderForMccMnc(name, code));
-            this._setSignalQuality(quality);
-        } catch {
-            // it will return an error if the device is not connected
-            this._setSignalQuality(0);
-        }
-    }
-});
-
-export const ModemCdma = GObject.registerClass(
-class ModemCdma extends ModemBase {
-    _init(path) {
-        super._init();
-        this._proxy = new ModemCdmaProxy(Gio.DBus.system, 'org.freedesktop.ModemManager', path);
-
-        this._proxy.connectSignal('SignalQuality', (proxy, sender, params) => {
-            this._setSignalQuality(params[0]);
-
-            // receiving this signal means the device got activated
-            // and we can finally call GetServingSystem
-            if (this.operator_name == null)
-                this._refreshServingSystem();
-        });
-        this._getSignalQuality();
-    }
-
-    async _getSignalQuality() {
-        try {
-            const [quality] = await this._proxy.GetSignalQualityAsync();
-            this._setSignalQuality(quality);
-        } catch {
-            // it will return an error if the device is not connected
-            this._setSignalQuality(0);
-        }
-    }
-
-    async _refreshServingSystem() {
-        try {
-            const [bandClass_, band_, sid] =
-                await this._proxy.GetServingSystemAsync();
-            this._setOperatorName(_findProviderForSid(sid));
-        } catch {
-            // it will return an error if the device is not connected
-            this._setOperatorName(null);
-        }
-    }
-});
-
-
-// ------------------------------------------------------- //
-// Support for the new ModemManager1 interface (MM >= 0.7) //
-// ------------------------------------------------------- //
 
 const BroadbandModemInterface = loadInterfaceXML('org.freedesktop.ModemManager1.Modem');
 const BroadbandModemProxy = Gio.DBusProxy.makeProxyWrapper(BroadbandModemInterface);

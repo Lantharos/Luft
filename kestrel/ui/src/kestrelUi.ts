@@ -74,6 +74,7 @@ class KestrelUi {
   private focusSignals: (() => void)[] = [];
   private readonly disconnectors: (() => void)[] = [];
   private sessionSyncLater = 0;
+  private draggedWindow: Meta.Window | null = null;
   private readonly syncSessionAfterMotion = () => this.syncSession();
 
   constructor(private readonly context: Context) {
@@ -183,6 +184,11 @@ class KestrelUi {
     this.watch(shellGlobal.display, 'in-fullscreen-changed', () => this.queueSyncSession());
     this.watch(shellGlobal.display, 'notify::focus-window', () => this.trackFocusedWindow());
     this.watch(shellGlobal.display, 'restacked', () => this.queueSyncSession());
+    this.watch(shellGlobal.display, 'grab-op-begin', (_display, window: Meta.Window | null) => { this.draggedWindow = window; });
+    this.watch(shellGlobal.display, 'grab-op-end', () => {
+      this.draggedWindow = null;
+      this.queueSyncSession();
+    });
     this.watch(context.sessionMode, 'updated', () => this.syncSession());
     if (context.screenShield) this.watch(context.screenShield, 'active-changed', () => this.syncSession());
     context.registerPanel(this.panels.primary.actor);
@@ -238,12 +244,15 @@ class KestrelUi {
     for (const disconnect of this.focusSignals) disconnect();
     const window = (global as unknown as Shell.Global).display.focus_window;
     const actor = window?.get_compositor_private() as Meta.WindowActor | null;
-    const sync = (object: Signals, signal: string) => {
-      const id = object.connect(signal, () => this.queueSyncSession());
+    const sync = (object: Signals, signal: string, when = () => true) => {
+      const id = object.connect(signal, () => {
+        if (when()) this.queueSyncSession();
+      });
       return () => object.disconnect(id);
     };
+    const notDragged = () => window !== this.draggedWindow;
     this.focusSignals = [
-      ...window ? ['size-changed', 'position-changed', 'notify::fullscreen'].map(signal => sync(window, signal)) : [],
+      ...window ? [sync(window, 'size-changed', notDragged), sync(window, 'position-changed', notDragged), sync(window, 'notify::fullscreen')] : [],
       ...actor ? [sync(actor, 'effects-completed')] : [],
     ];
     this.queueSyncSession();

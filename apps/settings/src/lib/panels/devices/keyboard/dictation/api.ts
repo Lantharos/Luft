@@ -36,7 +36,7 @@ export interface Overview {
 	language: Language;
 	engine: Engine;
 	engines: Engine[];
-	needed: string[];
+	model: string | null;
 }
 
 export const overview = () => invoke<Overview>('dictation');

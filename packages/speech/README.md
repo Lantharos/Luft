@@ -18,14 +18,14 @@ Dictation for Luft: hold Super and Alt, or the Copilot key, talk, and what you s
 
 Parakeet covers 25 European languages; Whisper covers the rest. Languages written in more than one script are written in the script of the keyboard layout. The service reads the processor's features from `/proc/cpuinfo` when it starts and refuses languages that need Whisper where it can't run, without loading it. The model loads on the first dictation and unloads three minutes after the last one. `luft-speech.service` caps the service at 2 GB of memory.
 
-Models live in `~/.local/share/luft-speech/models`, one folder each. `data/models.json` lists every file with its size and SHA-256; downloads resume where they stopped and are checked before they're used.
+Models live in `~/.local/share/luft-speech/models`, one folder each. `data/models.json` lists every file with its size and SHA-256; downloads resume where they stopped and are checked before they're used. While dictation is on, the service follows the language and engine chosen in Settings: it downloads the model they need and stops downloading the other.
 
 | File in `service/data` | Goes to |
 | --- | --- |
 | `com.lantharos.Speech1.service` | `/usr/share/dbus-1/services/` |
 | `luft-speech.service` | `/usr/lib/systemd/user/` |
 
-It builds against `onnxruntime-devel`, `vulkan-loader-devel`, `vulkan-headers`, `glslc` and `pipewire-devel`. `LUFT_SPEECH_WAV` plays a 16 kHz mono WAV in place of the microphone, then silence, for checks.
+It builds against `onnxruntime-devel`, `vulkan-loader-devel`, `vulkan-headers`, `glslc` and `pipewire-devel`. For checks, `LUFT_SPEECH_WAV` plays a 16 kHz mono WAV in place of the microphone, then silence, and `LUFT_SPEECH_MIRROR` downloads models from another server.
 
 ## Models
 

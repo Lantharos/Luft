@@ -34,6 +34,9 @@ fn main() -> Result<()> {
 async fn serve() -> Result<()> {
     let (events, mut received) = mpsc::unbounded_channel();
     let hub = Arc::new(Hub::new(Store::from_environment()?, events));
+    hub.follow();
+    let following = hub.clone();
+    preferences::watch(move || following.follow())?;
     let connection = zbus::Connection::session().await?;
     let (dictation, models) = bus::serve(&hub);
     connection.object_server().at(PATH, dictation).await?;

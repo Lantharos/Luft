@@ -8,7 +8,7 @@
 	import Keys from '../shortcuts/Keys.svelte';
 	import type { Binding, ShortcutStore } from '../shortcuts/store.svelte';
 	import ModelRow from './ModelRow.svelte';
-	import { install, onOverview, openHomepage, overview, type EngineChoice, type Model, type Overview } from './api';
+	import { onOverview, openHomepage, overview, type EngineChoice, type Model, type Overview } from './api';
 
 	type Dictation = { enabled: boolean; language: string; engine: EngineChoice };
 	type ShortcutChoice = 'chord' | 'custom' | 'off';
@@ -62,10 +62,8 @@
 		return chosen && chosen !== 'automatic' && usable.includes(chosen) ? chosen : spoken?.engine;
 	});
 	let available = $derived(!spoken || usable.includes(spoken.engine));
-	let needed = $derived(info?.models.filter((model) => info?.needed.includes(model.id)) ?? []);
-	let downloaded = $derived(
-		info?.models.filter((model) => (model.usage > 0 || model.download) && !(enabled && needed.includes(model))) ?? []
-	);
+	let model = $derived(info?.models.find((model) => model.id === info?.model));
+	let downloaded = $derived(info?.models.filter((other) => other !== model && (other.usage > 0 || other.download)) ?? []);
 	let languages = $derived([
 		{ value: '', label: info && !settings.values.language ? `Automatic (${info.language.name})` : 'Automatic' },
 		...(info?.languages
@@ -94,15 +92,12 @@
 		else await store.assign(binding, choice === 'chord' ? [SUPER_ALT] : []);
 	}
 
-	async function turnOn(on: boolean) {
-		await settings.set('enabled', on);
-		if (on) for (const model of needed) await install(model.id);
-	}
 
 	const stop = onOverview((next) => (info = next));
 	onDestroy(stop);
 
 	$effect(() => {
+		void settings.values.enabled;
 		void settings.values.language;
 		void settings.values.engine;
 		void inputSources.values.sources;
@@ -121,12 +116,10 @@
 			description={unavailable ? 'Dictation isn’t installed on this computer' : holdWith ? `Hold ${holdWith} to dictate` : 'Off until it has a shortcut'}
 			disabled={unavailable}
 		>
-			<Switch label="Dictation" checked={enabled} disabled={unavailable} onchange={turnOn} />
+			<Switch label="Dictation" checked={enabled} disabled={unavailable} onchange={(on) => settings.set('enabled', on)} />
 		</Row>
-		{#if enabled}
-			{#each needed as model (model.id)}
-				<ModelRow {model} />
-			{/each}
+		{#if model && !unavailable}
+			<ModelRow {model} />
 		{/if}
 	</Section>
 

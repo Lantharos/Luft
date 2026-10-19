@@ -15,7 +15,7 @@ const ATTEMPTS: u32 = 4;
 const BUFFER: usize = 256 * 1024;
 const REPORT_EVERY: Duration = Duration::from_millis(250);
 
-#[derive(Clone, Default)]
+#[derive(Clone)]
 pub struct Progress {
     pub received: u64,
     pub total: u64,
@@ -67,8 +67,9 @@ impl Downloads {
         &self,
         entry: &'static Entry,
         folder: PathBuf,
+        received: u64,
         changed: impl Fn() + Send + 'static,
-    ) {
+    ) -> bool {
         let mut jobs = self.jobs.lock().expect("downloads lock");
         if jobs.get(&entry.id).is_some_and(|job| {
             job.progress
@@ -77,11 +78,12 @@ impl Downloads {
                 .problem
                 .is_none()
         }) {
-            return;
+            return false;
         }
         let progress = Arc::new(Mutex::new(Progress {
+            received,
             total: entry.size(),
-            ..Progress::default()
+            problem: None,
         }));
         let cancel = Arc::new(AtomicBool::new(false));
         jobs.insert(
@@ -113,12 +115,15 @@ impl Downloads {
             drop(jobs);
             changed();
         });
+        true
     }
 
-    pub fn cancel(&self, id: &str) {
-        if let Some(job) = self.jobs.lock().expect("downloads lock").remove(id) {
+    pub fn cancel(&self, id: &str) -> bool {
+        let job = self.jobs.lock().expect("downloads lock").remove(id);
+        if let Some(job) = &job {
             job.cancel.store(true, Ordering::Relaxed);
         }
+        job.is_some()
     }
 }
 

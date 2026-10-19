@@ -1,6 +1,7 @@
 import {withApp} from './lib/apps.js';
 import {checkPalette, showDark, withPalette} from './lib/palette.js';
 import {checkAccessibility} from './settings/accessibility.js';
+import {checkDictation} from './settings/dictation.js';
 import {checkFonts} from './settings/fonts.js';
 import {checkHardware} from './settings/hardware.js';
 import {checkLive} from './settings/live.js';
@@ -21,6 +22,7 @@ export async function run() {
       await checkLongSleep(app);
       await checkFonts(app);
       await checkWallpaper(app);
+      await checkDictation(app);
     });
     await checkUpdates(palette);
   });

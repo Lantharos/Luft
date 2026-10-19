@@ -37,8 +37,9 @@
   <interface name="com.lantharos.Speech1.Models">
     <!-- JSON, the Overview in packages/speech/src/types.rs: every model with its size, whether it's
          downloaded, the space it takes and any download in progress; every language with the engine
-         that listens for it; the language and engine dictation uses now; the engines this computer's
-         processor can run; and the models that are still needed for it. -->
+         that listens for it; the language, engine and model dictation uses now; and the engines this
+         computer's processor can run. While dictation is on, the model it uses downloads by itself, and
+         downloads of other models stop when the language or engine changes. -->
     <method name="Overview">
       <arg name="overview" type="s" direction="out"/>
     </method>

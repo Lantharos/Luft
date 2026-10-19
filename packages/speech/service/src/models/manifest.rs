@@ -32,6 +32,11 @@ pub struct File {
 static PARSED: LazyLock<Manifest> =
     LazyLock::new(|| serde_json::from_str(MANIFEST).expect("the model list is valid"));
 
+/// Where models are downloaded from: the mirror on the list, or the server
+/// `LUFT_SPEECH_MIRROR` names, for checks.
+static MIRROR: LazyLock<String> =
+    LazyLock::new(|| std::env::var("LUFT_SPEECH_MIRROR").unwrap_or_else(|_| PARSED.mirror.clone()));
+
 pub fn models() -> &'static [Entry] {
     &PARSED.models
 }
@@ -53,7 +58,7 @@ impl Entry {
     }
 
     pub fn url(&self, file: &File) -> String {
-        format!("{}/{}/{}", PARSED.mirror, self.id, file.name)
+        format!("{}/{}/{}", *MIRROR, self.id, file.name)
     }
 
     pub fn file_names(&self) -> Vec<String> {

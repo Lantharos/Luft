@@ -107,13 +107,6 @@ impl Models {
                     }),
             })
             .collect();
-        let needed = models
-            .iter()
-            .filter(|model| {
-                model.id == plan.model.id && !model.installed && processor.runs(model.engine)
-            })
-            .map(|model| model.id.clone())
-            .collect();
         let overview = Overview {
             models,
             languages: language::all(plan.choice),
@@ -124,7 +117,7 @@ impl Models {
             },
             engine: plan.engine,
             engines: processor.engines(),
-            needed,
+            model: processor.runs(plan.engine).then(|| plan.model.id.clone()),
         };
         serde_json::to_string(&overview).expect("the overview always serializes")
     }
@@ -132,11 +125,7 @@ impl Models {
     fn install(&self, model: String) -> Result<(), Error> {
         let entry = manifest::find(&model)
             .ok_or_else(|| Error::Failed(format!("There's no model called {model}")))?;
-        self.hub.store.remove_unlisted()?;
-        let hub = self.hub.clone();
-        self.hub
-            .downloads
-            .start(entry, self.hub.store.folder(entry), move || hub.changed());
+        self.hub.install(entry)?;
         self.hub.changed();
         Ok(())
     }

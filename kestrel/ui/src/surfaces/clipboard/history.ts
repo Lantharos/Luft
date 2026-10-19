@@ -13,6 +13,7 @@ const HISTORY_LIMIT = 25;
 const IMAGE_LIMIT = 8;
 const TEXT_LIMIT = 20000;
 const IMAGE_BYTE_LIMIT = 16 * 1024 * 1024;
+const RELEASE_DELAY_MS = 1000;
 const PREFERRED_IMAGE_TYPE = 'image/png';
 const SENSITIVE_MIME_TYPE = 'x-kde-passwordManagerHint';
 const THUMBNAIL_BOUNDS: ThumbnailBounds = { width: 388, height: 128, radius: 6 };
@@ -51,6 +52,7 @@ export class ClipboardHistory {
   private readonly ownerChanged: number;
   private readonly stopWatchingGraphics = whenGraphicsRestored(() => void this.redrawThumbnails());
   private quiet = false;
+  private releaseSource = 0;
 
   constructor(private readonly changed: () => void) {
     this.ownerChanged = this.selection.connect('owner-changed', (_selection, type: Meta.SelectionType, source: Meta.SelectionSource | null) => {
@@ -118,7 +120,13 @@ export class ClipboardHistory {
     }
     const thumbnail = await createThumbnail(bytes, THUMBNAIL_BOUNDS);
     if (thumbnail) this.remember({ kind: 'image', id, mimeType, file: await this.images.save(id, bytes), thumbnail, copied });
-    GLib.idle_add(GLib.PRIORITY_LOW, () => {
+    this.releaseDecodedImages();
+  }
+
+  private releaseDecodedImages(): void {
+    if (this.releaseSource) return;
+    this.releaseSource = GLib.timeout_add(GLib.PRIORITY_LOW, RELEASE_DELAY_MS, () => {
+      this.releaseSource = 0;
       System.gc();
       return GLib.SOURCE_REMOVE;
     });
@@ -131,6 +139,7 @@ export class ClipboardHistory {
       if (thumbnail) item.thumbnail = thumbnail;
     }
     this.changed();
+    this.releaseDecodedImages();
   }
 
   private remember(entry: ClipboardEntry): void {
@@ -151,6 +160,7 @@ export class ClipboardHistory {
   destroy(): void {
     this.selection.disconnect(this.ownerChanged);
     this.stopWatchingGraphics();
+    if (this.releaseSource) GLib.Source.remove(this.releaseSource);
     for (const item of this.items)
       if (item.kind === 'image') this.images.discard(item.file);
   }

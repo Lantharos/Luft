@@ -12,12 +12,22 @@ static const char * const level_meters[] = {
   NULL,
 };
 
+static const char dictation_app_id[] = "com.lantharos.Speech";
+
+typedef enum
+{
+  RECORDER_LEVEL_METER,
+  RECORDER_APP,
+  RECORDER_DICTATION,
+} RecorderKind;
+
 enum
 {
   PROP_0,
   PROP_OUTPUT,
   PROP_INPUT,
   PROP_RECORDING,
+  PROP_DICTATING,
   N_PROPS
 };
 
@@ -103,18 +113,37 @@ static void
 sync_recording (ShellMixer *mixer)
 {
   gboolean recording = FALSE;
+  gboolean dictating = FALSE;
   GHashTableIter iter;
   gpointer value;
 
   g_hash_table_iter_init (&iter, mixer->recorders);
-  while (!recording && g_hash_table_iter_next (&iter, NULL, &value))
-    recording = GPOINTER_TO_INT (value);
+  while (g_hash_table_iter_next (&iter, NULL, &value))
+    {
+      recording |= GPOINTER_TO_INT (value) == RECORDER_APP;
+      dictating |= GPOINTER_TO_INT (value) == RECORDER_DICTATION;
+    }
 
-  if (mixer->recording == recording)
-    return;
+  if (mixer->recording != recording)
+    {
+      mixer->recording = recording;
+      g_object_notify_by_pspec (G_OBJECT (mixer), props[PROP_RECORDING]);
+    }
+  if (mixer->dictating != dictating)
+    {
+      mixer->dictating = dictating;
+      g_object_notify_by_pspec (G_OBJECT (mixer), props[PROP_DICTATING]);
+    }
+}
 
-  mixer->recording = recording;
-  g_object_notify_by_pspec (G_OBJECT (mixer), props[PROP_RECORDING]);
+static RecorderKind
+recorder_kind (const char *app_id)
+{
+  if (g_strcmp0 (app_id, dictation_app_id) == 0)
+    return RECORDER_DICTATION;
+  if (app_id && g_strv_contains (level_meters, app_id))
+    return RECORDER_LEVEL_METER;
+  return RECORDER_APP;
 }
 
 void
@@ -221,7 +250,7 @@ _shell_mixer_update_recorder (ShellMixer *mixer,
                               const char *app_id)
 {
   g_hash_table_insert (mixer->recorders, GUINT_TO_POINTER (index),
-                       GINT_TO_POINTER (!app_id || !g_strv_contains (level_meters, app_id)));
+                       GINT_TO_POINTER (recorder_kind (app_id)));
   sync_recording (mixer);
 }
 
@@ -278,6 +307,9 @@ shell_mixer_get_property (GObject    *object,
     case PROP_RECORDING:
       g_value_set_boolean (value, mixer->recording);
       break;
+    case PROP_DICTATING:
+      g_value_set_boolean (value, mixer->dictating);
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -322,6 +354,9 @@ shell_mixer_class_init (ShellMixerClass *klass)
                          G_PARAM_READABLE | G_PARAM_STATIC_STRINGS | G_PARAM_EXPLICIT_NOTIFY);
   props[PROP_RECORDING] =
     g_param_spec_boolean ("recording", NULL, NULL, FALSE,
+                          G_PARAM_READABLE | G_PARAM_STATIC_STRINGS | G_PARAM_EXPLICIT_NOTIFY);
+  props[PROP_DICTATING] =
+    g_param_spec_boolean ("dictating", NULL, NULL, FALSE,
                           G_PARAM_READABLE | G_PARAM_STATIC_STRINGS | G_PARAM_EXPLICIT_NOTIFY);
   g_object_class_install_properties (object_class, N_PROPS, props);
 
@@ -414,4 +449,12 @@ shell_mixer_get_recording (ShellMixer *mixer)
   g_return_val_if_fail (SHELL_IS_MIXER (mixer), FALSE);
 
   return mixer->recording;
+}
+
+gboolean
+shell_mixer_get_dictating (ShellMixer *mixer)
+{
+  g_return_val_if_fail (SHELL_IS_MIXER (mixer), FALSE);
+
+  return mixer->dictating;
 }

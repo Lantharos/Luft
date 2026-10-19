@@ -22,9 +22,10 @@ export interface Mixer {
   readonly output: MixerStream | null;
   readonly input: MixerStream | null;
   readonly recording: boolean;
+  readonly dictating: boolean;
   choose_headset(choice: MixerHeadset): void;
   connect(signal: 'headset-changed', callback: (mixer: Mixer, choices: MixerHeadset | 0) => void): number;
-  connect(signal: 'notify::recording', callback: () => void): number;
+  connect(signal: 'notify::recording' | 'notify::dictating', callback: () => void): number;
   disconnect(id: number): void;
 }
 

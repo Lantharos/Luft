@@ -2,9 +2,11 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
+import Shell from 'gi://Shell';
+import {taskbarClearance} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
-import {firstStyled, named, shown} from '../lib/actors.js';
+import {descendants, firstStyled, named, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {keyboard} from '../lib/input.js';
 import {gjs, repository, scratch, spawn, stop, waitForWindow} from '../lib/processes.js';
@@ -37,6 +39,9 @@ const HEARD_ENOUGH = 0.8;
 
 const now = () => GLib.get_monotonic_time();
 const indicator = () => firstStyled('kestrel-dictation');
+const spinner = () => firstStyled('kestrel-dictation-spinner');
+const privacy = () => named('kestrel-privacy');
+const usesMicrophone = () => privacy()?.visible && descendants(privacy()).some(actor => actor.icon_name === 'audio-input-microphone-symbolic');
 const start = () => named('kestrel-start');
 const words = text => text.toLowerCase().split(/[^\p{L}\p{N}']+/u).filter(Boolean);
 const entryText = window => window.title.match(/^Kestrel entry: (.*?)(?: \[.*\])?$/)?.[1] ?? '';
@@ -90,12 +95,85 @@ async function startService(withModels) {
   return process;
 }
 
+function sitsAboveTaskbar(pill) {
+  const [x, y] = pill.get_transformed_position();
+  const [width, height] = pill.get_transformed_size();
+  const monitor = Main.layoutManager.primaryMonitor;
+  const taskbarTop = monitor.y + monitor.height - taskbarClearance();
+  return Math.abs(x + width / 2 - (monitor.x + monitor.width / 2)) <= 1 && y + height < taskbarTop && y + height > taskbarTop - 40;
+}
+
+async function callSpeech(method) {
+  await Gio.DBus.session.call(SPEECH, '/com/lantharos/Speech1', SPEECH, method, method === 'Start' ? new GLib.Variant('(s)', ['us']) : null,
+    null, Gio.DBusCallFlags.NONE, -1, null);
+}
+
+async function checkPill() {
+  const mixer = Shell.Mixer.get_default();
+  const service = gjs('services/speech.js');
+  await eventually(() => owned(SPEECH), 'the stand-in dictation service is on the session bus');
+  const entry = gjs('clients/window.js', ['--entry']);
+  const window = await waitForWindow('Kestrel window check');
+  await eventually(() => window.has_focus() && Main.inputMethod.currentFocus, 'the text field takes the keyboard');
+
+  const typed = entryText(window);
+  holdCopilot();
+  await eventually(() => shown(indicator()), 'holding the Copilot key shows the dictation pill');
+  await eventually(() => sitsAboveTaskbar(indicator()), 'the pill floats centred just above the taskbar');
+  await eventually(() => preedit(window).length > 0, 'what is heard shows in the text field as it is said');
+  require(!firstStyled('kestrel-dictation-text').visible, 'the pill leaves the words to the text field');
+  await eventually(() => mixer.dictating, 'dictation has the microphone open');
+  await pause(500);
+  require(!privacy().visible, 'the privacy indicator stays hidden for dictation the person is holding');
+  await capture('dictation-listening');
+
+  const recorder = spawn(['parecord', '--device=microphone', '/dev/null']);
+  await eventually(usesMicrophone, 'an app recording at the same time still shows the microphone in the privacy indicator');
+  await stop(recorder);
+  await eventually(() => !privacy().visible, 'the privacy indicator goes once that app stops');
+
+  releaseCopilot();
+  await eventually(() => shown(spinner()), 'letting go turns the pill into a spinner while the rest is recognized');
+  require(!privacy().visible, 'the privacy indicator stays hidden as dictation closes the microphone');
+  await pause(900);
+  await capture('dictation-processing');
+  await eventually(() => !preedit(window) && entryText(window) !== typed, 'the words are typed once recognized', 10000);
+  await eventually(() => !shown(indicator()), 'the pill fades out after typing');
+
+  const before = entryText(window);
+  holdCopilot();
+  await eventually(() => preedit(window).length > 0, 'dictating again shows what is heard');
+  tapKey(KEY_ESC);
+  await eventually(() => !shown(indicator()) && !preedit(window), 'Escape fades the pill straight out');
+  require(!shown(spinner()), 'Escape doesn’t wait for recognition');
+  releaseCopilot();
+  await pause(1000);
+  require(entryText(window) === before && !privacy().visible, 'nothing is typed after Escape and the microphone is closed');
+
+  await callSpeech('Start');
+  await eventually(usesMicrophone, 'dictation started by something other than Kestrel shows in the privacy indicator');
+  await callSpeech('Cancel');
+  await eventually(() => !privacy().visible, 'and goes once it stops');
+  await stop(entry);
+
+  const x11 = gjs('clients/window.js', ['--entry'], {env: {GDK_BACKEND: 'x11', GTK_IM_MODULE: 'ibus'}});
+  const x11Window = await waitForWindow('Kestrel window check');
+  await eventually(() => x11Window.has_focus(), 'the X11 text field takes the keyboard');
+  holdCopilot();
+  await eventually(() => firstStyled('kestrel-dictation-text')?.text.split(' ').length >= 4, 'an app without text input support gets the words in the pill');
+  await capture('dictation-text');
+  releaseCopilot();
+  await eventually(() => entryText(x11Window).includes('Pick up'), 'and pasted once recognized', 10000);
+  await stop(x11);
+  await stop(service);
+}
+
 async function checkPress(copilotKey) {
   copilotKey.set_string('press', 'search');
   holdCopilot();
   releaseCopilot();
   await eventually(() => shown(start()), 'a press of the Copilot key opens Start');
-  require(!indicator().visible, 'a press doesn’t start dictating');
+  require(!shown(indicator()), 'a press doesn’t start dictating');
   holdCopilot();
   releaseCopilot();
   await eventually(() => !start().visible, 'another press closes Start again');
@@ -104,7 +182,7 @@ async function checkPress(copilotKey) {
   holdCopilot();
   await eventually(() => shown(start()), 'with holding turned off, the Copilot key opens Start as soon as it goes down');
   await pause(HOLD_MS);
-  require(!indicator().visible, 'holding the Copilot key doesn’t dictate when its hold is turned off');
+  require(!shown(indicator()), 'holding the Copilot key doesn’t dictate when its hold is turned off');
   releaseCopilot();
   holdCopilot();
   releaseCopilot();
@@ -118,7 +196,7 @@ async function checkSetupOffer() {
   await pause(HOLD_MS);
   releaseCopilot();
   await eventually(offeredSetup, 'holding the key without a downloaded model offers to set dictation up');
-  await eventually(() => !indicator().visible, 'the indicator goes away when there’s nothing to listen with');
+  await eventually(() => !shown(indicator()), 'the pill goes away when there’s nothing to listen with');
   dismissNotifications();
 
   holdKeys(SUPER_ALT);
@@ -142,14 +220,14 @@ async function checkChordKeepsShortcuts() {
   await pause(HOLD_MS);
   releaseKeys(ALT_SUPER);
   await pause(400);
-  require(!indicator().visible && !offeredSetup() && !shown(start()), 'Super and Alt with another key, held in either order, leave dictation alone');
+  require(!shown(indicator()) && !offeredSetup() && !shown(start()), 'Super and Alt with another key, held in either order, leave dictation alone');
   holdKeys([KEY_LEFTALT, KEY_TAB]);
   releaseKeys([KEY_TAB]);
   holdKeys([KEY_LEFTMETA]);
   await pause(HOLD_MS);
   releaseKeys([KEY_LEFTMETA, KEY_LEFTALT]);
   await pause(400);
-  require(!indicator().visible && !offeredSetup(), 'Alt+Tab followed by Super doesn’t dictate');
+  require(!shown(indicator()) && !offeredSetup(), 'Alt+Tab followed by Super doesn’t dictate');
   tapKey(KEY_LEFTMETA);
   await eventually(() => shown(start()), 'a press of Super alone still opens Start');
   tapKey(KEY_LEFTMETA);
@@ -240,7 +318,7 @@ async function checkDictation(service, keybindings) {
   require(x11Window.get_client_type() === Meta.WindowClientType.X11, 'the second text field runs under Xwayland');
   await eventually(() => x11Window.has_focus(), 'the X11 text field takes the keyboard');
   holdCopilot();
-  await eventually(() => firstStyled('kestrel-dictation-text')?.text, 'an app without text input support shows what is heard in the indicator', 15000);
+  await eventually(() => firstStyled('kestrel-dictation-text')?.text, 'an app without text input support shows what is heard in the pill', 15000);
   await pause(seconds * 1000);
   releaseCopilot();
   await eventually(() => words(entryText(x11Window)).filter(word => expected.includes(word)).length >= expected.length * HEARD_ENOUGH,
@@ -263,6 +341,7 @@ export async function run() {
     await checkPress(copilotKey);
     await checkSetupOffer();
     await checkChordKeepsShortcuts();
+    await checkPill();
     if (!RECORDING) {
       console.log('Kestrel dictation: KESTREL_DICTATION isn’t set, so dictating into apps isn’t checked');
       return;

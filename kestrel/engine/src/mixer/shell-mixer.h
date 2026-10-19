@@ -24,6 +24,7 @@ double            shell_mixer_get_max_amplified (void);
 ShellMixerStream *shell_mixer_get_output        (ShellMixer *mixer);
 ShellMixerStream *shell_mixer_get_input         (ShellMixer *mixer);
 gboolean          shell_mixer_get_recording     (ShellMixer *mixer);
+gboolean          shell_mixer_get_dictating     (ShellMixer *mixer);
 
 GPtrArray *shell_mixer_get_devices     (ShellMixer       *mixer,
                                         gboolean          output);

@@ -7,7 +7,8 @@ import { getInputSourceManager } from 'resource:///com/lantharos/kestrel/ui/stat
 
 import type { Context } from '../../context.js';
 import { openSettings } from '../settingsPages.js';
-import { DictationIndicator } from './indicator.js';
+import { ownDictation } from './listening.js';
+import { DictationPill } from './pill/pill.js';
 import { NotInstalled, Speech, Unsupported } from './speech.js';
 
 const HELD_MODIFIERS = Clutter.ModifierType.SHIFT_MASK | Clutter.ModifierType.SUPER_MASK | Clutter.ModifierType.MOD4_MASK;
@@ -39,7 +40,7 @@ function afterModifiersAreReleased(run: () => void): void {
 export class Dictation {
   private readonly preferences = new Gio.Settings({ schema_id: 'com.lantharos.kestrel.dictation' });
   private readonly speech: Speech;
-  private readonly indicator: DictationIndicator;
+  private readonly pill: DictationPill;
   private phase: Phase = 'idle';
   private mode: Mode = 'hold';
   private started: Promise<boolean> = Promise.resolve(false);
@@ -50,11 +51,11 @@ export class Dictation {
   private readonly toldUnsupported = new Set<string>();
 
   constructor(private readonly context: Context, private readonly paste: (text: string) => void) {
-    this.indicator = new DictationIndicator(context);
+    this.pill = new DictationPill(context.layoutManager);
     this.speech = new Speech({
       partial: text => this.heard(text),
       level: level => {
-        if (this.phase === 'listening') this.indicator.level(level);
+        if (this.phase === 'listening') this.pill.level(level);
       },
       quiet: () => {
         if (this.mode === 'toggle') this.end();
@@ -77,7 +78,8 @@ export class Dictation {
     this.phase = 'listening';
     this.mode = mode;
     this.target = this.context.inputMethod.currentFocus;
-    this.indicator.show(this.context.inputMethod.caret, !this.target);
+    ownDictation.active = true;
+    this.pill.listen();
     this.listenForEscape();
     this.started = this.speech.start(currentLayout()).then(() => true, error => {
       if (session !== this.session) return false;
@@ -93,7 +95,7 @@ export class Dictation {
     if (this.phase !== 'listening') return;
     const session = this.session;
     this.phase = 'finishing';
-    this.indicator.finishing();
+    this.pill.processing();
     this.stopListeningForEscape();
     this.started
       .then(started => started ? this.speech.stop() : '')
@@ -117,7 +119,7 @@ export class Dictation {
   private heard(text: string): void {
     if (this.phase === 'idle') return;
     if (this.target && this.target === this.context.inputMethod.currentFocus) this.context.inputMethod.showPreedit(text);
-    else this.indicator.heard(text);
+    else this.pill.heard(text);
   }
 
   private deliver(text: string): void {
@@ -136,7 +138,8 @@ export class Dictation {
     this.stopListeningForEscape();
     this.phase = 'idle';
     this.target = null;
-    this.indicator.hide();
+    this.pill.hide();
+    ownDictation.active = false;
   }
 
   private listenForEscape(): void {
@@ -182,6 +185,6 @@ export class Dictation {
   destroy(): void {
     this.cancel();
     this.speech.destroy();
-    this.indicator.destroy();
+    this.pill.destroy();
   }
 }

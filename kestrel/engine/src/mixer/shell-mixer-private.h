@@ -74,6 +74,7 @@ struct _ShellMixer
   ShellMixerStream *output;
   ShellMixerStream *input;
   gboolean recording;
+  gboolean dictating;
 
   GPtrArray *devices[2];
   guint devices_idle_id;

@@ -24,6 +24,7 @@ interface DumpObject {
 
 const SOURCES: Record<string, MediaKind> = { 'Video/Source': 'camera', 'Audio/Source': 'microphone' };
 const LEVEL_METERS = ['com.lantharos.settings', 'org.gnome.VolumeControl', 'org.PulseAudio.pavucontrol'];
+const DICTATION = 'com.lantharos.Speech';
 
 function appFor(props: Record<string, string | number | boolean>): Shell.App | null {
   const portalId = props['pipewire.access.portal.app_id'];
@@ -33,7 +34,7 @@ function appFor(props: Record<string, string | number | boolean>): Shell.App | n
   return pid ? Shell.WindowTracker.get_default().get_app_from_pid(pid) : null;
 }
 
-export async function mediaUsers(): Promise<MediaUser[]> {
+export async function mediaUsers(ownDictation: boolean): Promise<MediaUser[]> {
   const process = Gio.Subprocess.new(['pw-dump'], Gio.SubprocessFlags.STDOUT_PIPE | Gio.SubprocessFlags.STDERR_SILENCE);
   const [, stdout] = await new Promise<[boolean, string | null, string | null]>((resolve, reject) =>
     process.communicate_utf8_async(null, null, (_process, result) => {
@@ -47,7 +48,8 @@ export async function mediaUsers(): Promise<MediaUser[]> {
     const consumer = nodes.get(link.info?.['input-node-id'] ?? -1);
     const kind = SOURCES[String(source?.info?.props?.['media.class'])];
     const props = consumer?.info?.props;
-    if (!kind || !consumer || !props || LEVEL_METERS.includes(String(props['application.id']))) continue;
+    const id = String(props?.['application.id']);
+    if (!kind || !consumer || !props || LEVEL_METERS.includes(id) || (ownDictation && id === DICTATION)) continue;
     const app = appFor(props);
     users.set(`${kind}:${consumer.id}`, {
       kind, node: consumer.id, app,

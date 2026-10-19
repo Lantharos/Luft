@@ -13,7 +13,7 @@ function sandboxRoot() {
   return root;
 }
 
-function bubblewrap(root, socket, talk) {
+function bubblewrap(root, socket, talk, own) {
   const runtime = GLib.get_user_runtime_dir();
   return [
     'bwrap', '--die-with-parent', '--unshare-pid',
@@ -22,18 +22,20 @@ function bubblewrap(root, socket, talk) {
     '--proc', '/proc', '--dev', '/dev', '--bind', '/tmp', '/tmp', '--bind', runtime, runtime, '--bind', root, root,
     '--ro-bind', GLib.build_filenamev([root, 'flatpak-info']), '/.flatpak-info',
     'xdg-dbus-proxy', GLib.getenv('DBUS_SESSION_BUS_ADDRESS'), socket, '--filter', `--talk=${talk}`,
+    ...own ? [`--own=${own}`] : [],
   ];
 }
 
-export async function sandboxedApp(talk) {
+export async function sandboxedApp(talk, {own = null} = {}) {
   const root = sandboxRoot();
   const socket = GLib.build_filenamev([root, `bus-${talk}`]);
   GLib.unlink(socket);
-  const proxy = spawn(bubblewrap(root, socket, talk));
+  const proxy = spawn(bubblewrap(root, socket, talk, own));
   await waitUntil(() => GLib.file_test(socket, GLib.FileTest.EXISTS), `a sandboxed app that may talk to ${talk} starts`, 10000);
   const connection = Gio.DBusConnection.new_for_address_sync(`unix:path=${socket}`,
     Gio.DBusConnectionFlags.AUTHENTICATION_CLIENT | Gio.DBusConnectionFlags.MESSAGE_BUS_CONNECTION, null, null);
   return {
+    connection,
     call(path, iface, method, parameters = null, replyType = null) {
       return connection.call(talk, path, iface, method, parameters, replyType && new GLib.VariantType(replyType), Gio.DBusCallFlags.NONE, 5000, null);
     },

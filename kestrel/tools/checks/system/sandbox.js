@@ -3,7 +3,7 @@ import GLib from 'gi://GLib';
 import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {checks} from '../lib/check.js';
-import {call, subscribe} from '../lib/dbus.js';
+import {call, ownName, subscribe} from '../lib/dbus.js';
 import {pause} from '../lib/wait.js';
 import {lock, unlock} from '../lockScreen/lib/shield.js';
 import {sandboxedApp} from './lib/sandbox.js';
@@ -15,6 +15,7 @@ const PORTAL_PATH = '/org/freedesktop/portal/desktop';
 const ACCESS_DENIED = 'org.freedesktop.DBus.Error.AccessDenied';
 const NOT_IN_INITIALIZATION = 'org.gnome.SessionManager.NotInInitialization';
 const NO_CONFIRMATION = 1;
+const SCREENCAST_SERVICE = 'com.lantharos.Kestrel.Screencast';
 
 async function failure(reply) {
   try {
@@ -141,8 +142,21 @@ async function checkMutter() {
       'sandboxed apps cannot capture input through Kestrel\'s names');
     await denied('/org/gnome/Mutter/DisplayConfig', 'org.gnome.Mutter.DisplayConfig', 'ApplyMonitorsConfig',
       new GLib.Variant('(uua(iiduba(ssa{sv}))a{sv})', [0, 0, [], {}]), 'sandboxed apps cannot rearrange displays');
+    await denied('/org/gnome/Mutter/DisplayConfig', 'org.freedesktop.DBus.Properties', 'Set',
+      new GLib.Variant('(ssv)', ['org.gnome.Mutter.DisplayConfig', 'PowerSaveMode', new GLib.Variant('i', 0)]), 'sandboxed apps cannot turn displays off');
     require(await failure(app.call('/org/gnome/Mutter/DisplayConfig', 'org.gnome.Mutter.DisplayConfig', 'GetCurrentState')) === null,
       'sandboxed apps can still read the display layout');
+  } finally {
+    await app.close();
+  }
+}
+
+async function checkScreencastImpostor() {
+  const app = await sandboxedApp('org.gnome.Shell', {own: SCREENCAST_SERVICE});
+  try {
+    require(await ownName(app.connection, SCREENCAST_SERVICE), 'a sandboxed app can take the name of Kestrel\'s screencast service');
+    require(await failure(app.call('/org/gnome/Mutter/ScreenCast', 'org.gnome.Mutter.ScreenCast', 'CreateSession', new GLib.Variant('(a{sv})', [{}]))) === ACCESS_DENIED,
+      'a sandboxed app with the screencast service\'s name still cannot record the screen');
   } finally {
     await app.close();
   }
@@ -154,4 +168,5 @@ export async function run() {
   await checkScreenSaver();
   await checkTray();
   await checkMutter();
+  await checkScreencastImpostor();
 }

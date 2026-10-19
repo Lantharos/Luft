@@ -8,9 +8,15 @@ use super::stat::stat;
 const SKIPPED_FOLDERS: [&str; 3] = ["node_modules", "__pycache__", "lost+found"];
 pub const CACHE_TAG: &str = "CACHEDIR.TAG";
 pub const REPOSITORY: &str = ".git";
+const GIT_IGNORE: &str = ".gitignore";
+const IGNORE: &str = ".ignore";
 
 pub fn is_hidden(name: &str) -> bool {
     name.starts_with('.')
+}
+
+pub fn shapes_rules(name: &str) -> bool {
+    [REPOSITORY, GIT_IGNORE, IGNORE].contains(&name)
 }
 
 pub fn is_skipped_folder(name: &str) -> bool {
@@ -25,9 +31,9 @@ pub struct IgnoreFile {
 
 fn ignore_files(in_repository: bool) -> &'static [&'static str] {
     if in_repository {
-        &[".gitignore", ".ignore"]
+        &[GIT_IGNORE, IGNORE]
     } else {
-        &[".ignore"]
+        &[IGNORE]
     }
 }
 

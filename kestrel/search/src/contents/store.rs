@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 use std::path::Path;
 
-use rusqlite::{Connection, OptionalExtension, Transaction, params};
+use rusqlite::types::ToSql;
+use rusqlite::{Connection, OptionalExtension, Transaction, params, params_from_iter};
 
 const SCHEMA: &str = "
 PRAGMA journal_mode = WAL;
@@ -28,6 +29,12 @@ pub struct Store {
 pub struct Known {
     pub modified: i64,
     pub size: i64,
+}
+
+pub struct Written {
+    pub id: i64,
+    pub replaced: bool,
+    pub text: String,
 }
 
 pub fn words(query: &str) -> Vec<String> {
@@ -95,21 +102,62 @@ pub fn put(
     path: &str,
     modified: i64,
     size: i64,
-    text: &str,
-) -> rusqlite::Result<()> {
-    let id: i64 = transaction.query_row(
-        "INSERT INTO files (path, modified, size) VALUES (?1, ?2, ?3)
-         ON CONFLICT (path) DO UPDATE SET modified = excluded.modified, size = excluded.size
-         RETURNING id",
-        params![path, modified, size],
-        |row| row.get(0),
+) -> rusqlite::Result<i64> {
+    transaction
+        .prepare_cached(
+            "INSERT INTO files (path, modified, size) VALUES (?1, ?2, ?3)
+             ON CONFLICT (path) DO UPDATE SET modified = excluded.modified, size = excluded.size
+             RETURNING id",
+        )?
+        .query_row(params![path, modified, size], |row| row.get(0))
+}
+
+pub fn write(transaction: &Transaction, written: &[Written]) -> rusqlite::Result<()> {
+    for file in written.iter().filter(|file| file.replaced) {
+        transaction.execute("DELETE FROM words WHERE rowid = ?1", [file.id])?;
+    }
+    let texts: Vec<&Written> = written
+        .iter()
+        .filter(|file| !file.text.is_empty())
+        .collect();
+    if texts.is_empty() {
+        return Ok(());
+    }
+    let rows = vec!["(?, ?)"; texts.len()].join(", ");
+    let values = texts
+        .iter()
+        .flat_map(|file| [&file.id as &dyn ToSql, &file.text as &dyn ToSql]);
+    transaction
+        .prepare_cached(&format!("INSERT INTO words (rowid, body) VALUES {rows}"))?
+        .execute(params_from_iter(values))?;
+    Ok(())
+}
+
+pub fn stored(transaction: &Transaction, path: &str) -> rusqlite::Result<Option<Known>> {
+    transaction
+        .prepare_cached("SELECT modified, size FROM files WHERE path = ?1")?
+        .query_row([path], |row| {
+            Ok(Known {
+                modified: row.get(0)?,
+                size: row.get(1)?,
+            })
+        })
+        .optional()
+}
+
+pub fn forget(transaction: &Transaction, path: &Path) -> rusqlite::Result<()> {
+    let Some(path) = path.to_str() else {
+        return Ok(());
+    };
+    remove(transaction, path)?;
+    let mut statement = transaction.prepare_cached(
+        "DELETE FROM files WHERE path >= ?1 || '/' AND path < ?1 || '0' RETURNING id",
     )?;
-    transaction.execute("DELETE FROM words WHERE rowid = ?1", [id])?;
-    if !text.is_empty() {
-        transaction.execute(
-            "INSERT INTO words (rowid, body) VALUES (?1, ?2)",
-            params![id, text],
-        )?;
+    let ids: Vec<i64> = statement
+        .query_map([path], |row| row.get(0))?
+        .collect::<rusqlite::Result<_>>()?;
+    for id in ids {
+        transaction.execute("DELETE FROM words WHERE rowid = ?1", [id])?;
     }
     Ok(())
 }

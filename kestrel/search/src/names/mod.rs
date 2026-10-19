@@ -70,15 +70,7 @@ impl Names {
         names
     }
 
-    pub fn len(&self) -> usize {
-        self.entries.len()
-    }
-
-    pub fn is_folder(&self, index: usize) -> bool {
-        self.entries[index].folder
-    }
-
-    pub fn name(&self, index: usize) -> &str {
+    fn name(&self, index: usize) -> &str {
         let end = self
             .entries
             .get(index + 1)
@@ -106,7 +98,7 @@ impl Names {
         })
     }
 
-    pub fn path(&self, index: usize) -> PathBuf {
+    fn path(&self, index: usize) -> PathBuf {
         let mut parts: Vec<&str> = self
             .ancestors(index)
             .map(|ancestor| self.name(ancestor))

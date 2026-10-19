@@ -51,6 +51,6 @@ Conversions cover length, mass, temperature, data sizes, time, volume and speed.
 
 ## How files are found
 
-Luft keeps an index of the names and text of files in your home folder. It works at the lowest priority, looks for changes every five minutes (fifteen on battery), and when you open Start or plug in. A file saved a moment ago can take until the next look to appear. File contents are only read while plugged in; on battery, names stay current and contents wait.
+Luft keeps an index of the names and text of files in your home folder. It works at the lowest priority and notes which folders change as you work, then catches up on them every five minutes (fifteen on battery), and when you open Start or plug in. A file saved a moment ago can take until then to appear. File contents are only read while plugged in; on battery, names stay current and contents wait.
 
 The index leaves out hidden files and folders, other drives, anything a Git repository's `.gitignore` or an `.ignore` file excludes, cache folders such as `node_modules`, and read-only folders. Deleting `~/.cache/kestrel/search` makes it read everything again.

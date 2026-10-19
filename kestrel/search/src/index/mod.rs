@@ -1,13 +1,16 @@
+mod refresh;
 mod rules;
 pub mod stat;
 pub mod tree;
+mod walk;
+mod watch;
 
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::{Receiver, RecvTimeoutError};
 use std::sync::{Arc, RwLock};
 use std::time::{Duration, Instant};
 
-use crate::contents::{self, Store};
+use crate::contents::Contents;
 use crate::names::Names;
 use tree::Tree;
 
@@ -25,7 +28,7 @@ pub type Shared = Arc<RwLock<Arc<Names>>>;
 
 pub struct Indexer {
     pub tree: Tree,
-    pub store: Store,
+    pub contents: Contents,
     pub names: Shared,
     pub on_battery: Arc<AtomicBool>,
     pub wake: Receiver<Wake>,
@@ -36,22 +39,22 @@ impl Indexer {
         self.on_battery.load(Ordering::Relaxed)
     }
 
-    fn pass(&mut self, first: bool) -> bool {
-        if self.tree.refresh() || first {
+    fn pass(&mut self) -> bool {
+        let changes = self.tree.refresh();
+        if changes.names {
             *self.names.write().unwrap() = Arc::new(Names::build(&self.tree));
         }
+        self.contents.note(&self.tree, changes);
         if self.on_battery() {
             return false;
         }
-        let names = self.names.read().unwrap().clone();
         let on_battery = &self.on_battery;
-        contents::update(&mut self.store, &names, || {
-            on_battery.load(Ordering::Relaxed)
-        })
-        .unwrap_or_else(|error| {
-            eprintln!("Couldn't index file contents: {error}");
-            false
-        })
+        self.contents
+            .index(&self.tree, || on_battery.load(Ordering::Relaxed))
+            .unwrap_or_else(|error| {
+                eprintln!("Couldn't index file contents: {error}");
+                false
+            })
     }
 
     fn wait(&self, since: Instant, unfinished: bool) -> bool {
@@ -76,10 +79,8 @@ impl Indexer {
     }
 
     pub fn run(mut self) {
-        let mut first = true;
         loop {
-            let unfinished = self.pass(first);
-            first = false;
+            let unfinished = self.pass();
             if !self.wait(Instant::now(), unfinished) {
                 return;
             }

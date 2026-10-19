@@ -18,7 +18,7 @@ use tokio::signal::unix::{SignalKind, signal};
 use zbus::Connection;
 use zbus::fdo::DBusProxy;
 
-use contents::Store;
+use contents::{Contents, Store};
 use index::Indexer;
 use index::tree::Tree;
 use names::Names;
@@ -57,7 +57,7 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
     let (wake, woken) = mpsc::channel();
     let indexer = Indexer {
         tree,
-        store: Store::open(&database)?,
+        contents: Contents::new(Store::open(&database)?),
         names: names.clone(),
         on_battery: on_battery.clone(),
         wake: woken,

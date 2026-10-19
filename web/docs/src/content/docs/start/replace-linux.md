@@ -10,7 +10,7 @@ Install Luft finds Linux systems on the computer's drives and offers **Replace**
 - Fedora's layout, btrfs with `root` and `home` subvolumes
 - a separate `/home` partition, with any file system
 
-A system with everything on one partition, as Ubuntu installs by default, is listed but can't be replaced yet.
+A system with everything on one partition, as Ubuntu installs by default, is listed but can't be replaced.
 
 You can start from a [USB stick](/start/usb-stick/), or from the running system with [Meet Luft](/start/meet-luft/#on-linux), which restarts straight into **Replace**. Either way, the installer explains what stays and what changes before anything happens.
 
@@ -32,6 +32,6 @@ Because your home folder stays, so does everything in it: documents, app setting
 - **On btrfs**, Luft goes into a new subvolume, and the old system is renamed `old-system` and kept until you remove it.
 - **With a separate `/home`**, the old system's partition becomes Luft's.
 
-The old system doesn't start anymore after replacing. Its start entries and boot files go the first time you sign in to Luft. On btrfs, `old-system` stays until you remove it in Disks or Settings, which gives its space to Luft. See [Removing Windows or the old system](/system/remove-other-systems/).
+The old system doesn't start after replacing. Its start entries and boot files go the first time you sign in to Luft. On btrfs, `old-system` stays until you remove it in Disks or Settings, which gives its space to Luft. See [Removing Windows or the old system](/system/remove-other-systems/).
 
 When the EFI system partition is smaller than 1 GB, the old `/boot` partition becomes Luft's startup partition, so it needs to be at least 1 GB.

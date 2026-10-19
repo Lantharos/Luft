@@ -15,7 +15,7 @@ Luft is built on Fedora, so moving over keeps most of what you're used to: the s
 
 A [USB stick](/start/usb-stick/) works just as well: choose **Replace** under *Where Luft goes*.
 
-Replacing works with Fedora Workstation's default layout, btrfs with separate `root` and `home` subvolumes, and with any system whose `/home` is its own partition. An encrypted `/home` can't be replaced yet.
+Replacing works with Fedora Workstation's default layout, btrfs with separate `root` and `home` subvolumes, and with any system whose `/home` is its own partition. An encrypted `/home` can't be replaced.
 
 ## What stays
 
@@ -36,7 +36,7 @@ The old system is kept as a btrfs subvolume called `old-system` until you remove
 | `sudo dnf install` a `-devel` package | `schelf install` puts it in the Toolbox, so build inside `toolbox enter` |
 | `sudo dnf remove`, `dnf search` | `schelf remove`, `schelf search` |
 | `sudo dnf upgrade` | Settings, under Updates. The new version installs at the next restart, and the one before stays to go back to. `schelf update` updates apps and tools |
-| `dnf info`, `dnf list`, `dnf provides` | Work as before |
+| `dnf info`, `dnf list`, `dnf provides` | Work the same |
 | Packages from RPM Fusion and COPR | Luft's image already plays every common video and audio format. Tools from other repositories can go in a Toolbox |
 | GNOME | [Kestrel](/desktop/overview/), Luft's own desktop. GNOME apps keep working |
 

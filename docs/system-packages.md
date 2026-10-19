@@ -29,7 +29,7 @@ When the list becomes empty, all of these go.
 7. Turn services on with `systemctl preset` in the build root. Fedora's presets decide for packages they mention (Docker's socket, libvirt's sockets, CUPS); the services of requested packages they don't mention, such as tailscaled, are turned on, while dependencies they don't mention, such as containerd, stay off until something starts them. The links go into the extension's `/usr/lib/systemd/system`, so they leave with it.
 8. Label everything with that version's SELinux `file_contexts` and make the EROFS image, which keeps the labels.
 
-What scriptlets used to do on the computer itself is declarative in Fedora now, and is done when the extension is merged.
+What scriptlets would otherwise do on the computer itself, such as making users and copying defaults into `/etc`, is declarative in Fedora and is done when the extension is merged.
 
 ## Merging and settling
 
@@ -59,7 +59,7 @@ Going back needs nothing: the previous version keeps its build. If the list chan
 
 ## What's refused
 
-- **Kernel modules.** Luft starts with Secure Boot and `lockdown=integrity`, so the kernel enforces module signatures (`module.sig_enforce` is on). Modules would have to be signed with a key enrolled in shim, and the only enrolled key is Luft's, whose private half isn't on the computer. Enrolling a local key isn't supported yet.
+- **Kernel modules.** Luft starts with Secure Boot and `lockdown=integrity`, so the kernel enforces module signatures (`module.sig_enforce` is on). Modules would have to be signed with a key enrolled in shim, and the only enrolled key is Luft's, whose private half isn't on the computer. Luft has no way to enroll a local key.
 - **SELinux policy modules.** `semodule` rebuilds the binary policy from the module store in `/var/lib/selinux`, which on a bootc system is only written when it's installed, while policy updates arrive precompiled in the image's `/etc/selinux`. Adding a module would rebuild an outdated policy, and the locally changed files would then win bootc's three-way merge of `/etc` at every update, so the image's policy updates would stop arriving. Luft's image carries swtpm and `swtpm-selinux` for that reason, since libvirt's QEMU driver needs swtpm, and with it the policy.
 - **Packages Luft already has, or newer versions of them.** The extension would hide part of the system. dnf's resolution against the version's own package database leaves these out unless something needs a newer version, which usually works after the next update.
 - **Files outside `/usr`, `/opt`, `/etc`, `/var` and `/run`**, such as `/boot`.
@@ -68,4 +68,4 @@ Going back needs nothing: the previous version keeps its build. If the list chan
 
 The extensions aren't signed. They're built on the computer, as root, from packages whose Fedora signatures were checked, into a folder only root can write. Signing them with a key kept on the computer would protect nothing more: anyone who could replace the image could also sign a new one, or change `/etc` instead. `systemd-sysext` merges unsigned images from `/var/lib/extensions` and `/run/extensions` by default; Luft only ever links its own build.
 
-Measured startup and the TPM don't change. Extensions on the running system are merged after the initramfs has unlocked the disk, and nothing is measured for them: PCRs 7, 11, 13 and 15 read the same with and without system packages. The disk unlocks with the TPM as before.
+System packages leave measured startup and the TPM alone. Extensions on the running system are merged after the initramfs has unlocked the disk, and nothing is measured for them: PCRs 7, 11, 13 and 15 read the same with and without system packages, so the disk unlocks with the TPM either way.

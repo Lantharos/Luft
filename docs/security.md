@@ -27,7 +27,7 @@ Epic's Easy Anti-Cheat for Linux, and others like it, only let a game run when t
 
 Settings shows "Ready for games with anti-cheat" under Security, or the first thing missing, such as Secure Boot being off in the firmware. Other keys added to shim can be removed from there; shim's blue screen asks to confirm with a one-time code at the next restart. `trustctl anti-cheat` lists every requirement.
 
-Epic's list of well-known keys doesn't include Luft's key yet. Nothing on the computer changes that; games that check for it start working once Epic adds it.
+Epic's list of well-known keys doesn't include Luft's key, and nothing on the computer changes that; games that check for it start working once Epic adds it.
 
 Secure Boot and the TPM stay optional. With Secure Boot off, SushiBoot starts the kernel without `lockdown=integrity`, so unsigned drivers load and nothing is locked down against the computer's owner; games with anti-cheat just aren't available then. The IOMMU and kexec settings apply either way. Hibernation isn't available while the kernel is locked down; sleep works as usual.
 

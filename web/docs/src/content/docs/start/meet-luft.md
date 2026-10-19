@@ -12,7 +12,7 @@ Meet Luft is a small app for Windows and Linux. It checks your computer, puts Lu
 | Windows 10 or 11 | [meet-luft.exe](https://get.luft.computer/meet-luft.exe) ([checksum](https://get.luft.computer/meet-luft.exe.sha256)) |
 | Linux | [meet-luft.AppImage](https://get.luft.computer/meet-luft.AppImage) ([checksum](https://get.luft.computer/meet-luft.AppImage.sha256)) |
 
-Meet Luft isn't code-signed yet, so Windows SmartScreen asks before it first starts: choose **More info**, then **Run anyway**.
+Meet Luft isn't code-signed, so Windows SmartScreen asks before it first starts: choose **More info**, then **Run anyway**.
 
 Meet Luft downloads only the Luft your computer needs: the image with NVIDIA's driver when it has an NVIDIA graphics card, hybrid laptops included, and the standard image otherwise. The size it shows is the real size of that download. If you already have a Luft ISO, **Use an ISO I already have** skips the download.
 

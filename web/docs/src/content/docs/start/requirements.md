@@ -7,7 +7,7 @@ sidebar:
 
 | | Needs |
 | --- | --- |
-| Processor | 64-bit Intel or AMD. Arm computers aren't supported yet |
+| Processor | 64-bit Intel or AMD. Arm computers aren't supported |
 | Firmware | UEFI. Computers that only start in legacy BIOS mode can't run Luft |
 | Drive | A GPT partition table and at least 32 GB for Luft, or 34 GB next to a small EFI system partition such as Windows' |
 | USB stick | 4 GB or more, if you install from a stick. [Meet Luft](/start/meet-luft/) can do without one |

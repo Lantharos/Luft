@@ -13,7 +13,7 @@ How `luft-accounts` turns online accounts into folders in `~/Cloud`. Using them 
 
 ## App registrations
 
-OneDrive and Dropbox sign in through an app registered with Microsoft and Dropbox. Luft uses rclone's registrations until it has its own. To use Luft's, register:
+OneDrive and Dropbox sign in through an app registered with Microsoft and Dropbox. A build without its own registrations signs in with rclone's. To build with Luft's, register:
 
 | Service | Where | Settings |
 | --- | --- | --- |
@@ -28,7 +28,7 @@ LUFT_DROPBOX_CLIENT_ID=… LUFT_DROPBOX_CLIENT_SECRET=… \
 cargo build --release --manifest-path packages/accounts/service/Cargo.toml
 ```
 
-Accounts signed in before the switch keep working with the registration they were made with until they sign in again. iCloud Drive, Nextcloud and WebDAV need no registration.
+An account keeps the registration it signed in with until it signs in again. iCloud Drive, Nextcloud and WebDAV need no registration.
 
 ## Testing
 

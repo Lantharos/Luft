@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Search from '@lucide/svelte/icons/search';
+	import { SearchField } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
 	import CustomShortcuts from './CustomShortcuts.svelte';
 	import ShortcutsSection from './ShortcutsSection.svelte';
@@ -18,41 +18,11 @@
 
 <SubPage title="Keyboard shortcuts" back="Keyboard" {onclose}>
 	{#snippet actions()}
-		<label class="search">
-			<Search size={16} class="shrink-0 text-[var(--text-muted)]" />
-			<input bind:value={query} placeholder="Search shortcuts" aria-label="Search shortcuts" />
-		</label>
+		<div class="w-[260px]">
+			<SearchField label="Search shortcuts" bind:value={query} />
+		</div>
 	{/snippet}
 	<ShortcutsSection {store} {onrecord} {query} />
 	<CustomShortcuts {store} />
 </SubPage>
 
-<style>
-	.search {
-		display: flex;
-		height: 36px;
-		width: 260px;
-		align-items: center;
-		gap: 10px;
-		border-radius: var(--radius-pill);
-		background: var(--surface);
-		padding-inline: 14px;
-		transition: box-shadow var(--motion-tap) var(--ease-decelerate);
-	}
-
-	.search:focus-within {
-		box-shadow: inset 0 0 0 1.5px var(--accent);
-	}
-
-	input {
-		min-width: 0;
-		flex: 1;
-		background: transparent;
-		font-size: 13.5px;
-		outline: none;
-	}
-
-	input::placeholder {
-		color: var(--text-muted);
-	}
-</style>

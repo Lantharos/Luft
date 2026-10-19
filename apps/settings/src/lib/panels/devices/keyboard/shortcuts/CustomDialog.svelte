@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import { Dialog } from '@luft/ui';
+	import { Dialog, TextField } from '@luft/ui';
 	import { typesText } from './accelerator';
 	import KeyCapture from './KeyCapture.svelte';
 	import type { CustomBinding, ShortcutStore } from './store.svelte';
@@ -54,14 +54,8 @@
 </script>
 
 <Dialog title={binding ? 'Edit shortcut' : 'Add shortcut'} {onclose}>
-	<label class="flex flex-col gap-1.5">
-		<span class="field-label">Name</span>
-		<input class="text-field" bind:value={name} />
-	</label>
-	<label class="flex flex-col gap-1.5">
-		<span class="field-label">Command</span>
-		<input class="text-field" bind:value={command} spellcheck="false" />
-	</label>
+	<TextField label="Name" showLabel bind:value={name} />
+	<TextField label="Command" showLabel bind:value={command} />
 	<div class="flex flex-col gap-1.5">
 		<span class="field-label">Shortcut</span>
 		<KeyCapture accelerators={accelerator ? [accelerator] : []} bind:recording oncapture={capture} />
@@ -83,9 +77,8 @@
 
 <style>
 	.field-label {
-		padding-left: 4px;
-		font-size: 12.5px;
-		font-weight: 500;
-		color: var(--text-muted);
+		padding-inline: 4px;
+		font-size: 13px;
+		color: var(--text-soft);
 	}
 </style>

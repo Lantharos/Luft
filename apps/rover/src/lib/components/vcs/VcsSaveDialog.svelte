@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
+	import { TextField } from '@luft/ui';
 	import Icon from '#lib/components/Icon.svelte';
 	import VcsBadge from '#lib/components/vcs/VcsBadge.svelte';
 	import type { VcsState } from '#lib/vcs/state.svelte.js';
@@ -10,10 +11,15 @@
 
 	let { vcs }: Props = $props();
 	let message = $state('');
+	let field = $state<TextField>();
 	let selected = $state.raw<string[]>([]);
 
 	let files = $derived(vcs.changedFiles);
 	let canSubmit = $derived(Boolean(message.trim()) && selected.length > 0 && !vcs.busy);
+
+	$effect(() => {
+		field?.focus();
+	});
 
 	$effect(() => {
 		if (!vcs.saveDialogOpen) return;
@@ -54,17 +60,14 @@
 			</header>
 
 			<div class="grid gap-4 px-4 py-4">
-				<label class="grid gap-2">
-					<span class="text-[12px] text-[var(--text-muted)]">Message</span>
-					<input
-						{@attach (input) => input.focus()}
-						class="h-11 rounded-[14px] bg-[var(--control)] px-3 text-[14px] text-[var(--text)] shadow-[inset_0_1px_0_var(--hairline)] outline-none transition-[background-color,box-shadow] focus:bg-[var(--control-hover)] focus:shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--ink)_18%,transparent)]"
-						value={message}
-						placeholder="Describe your changes"
-						oninput={(event) => (message = event.currentTarget.value)}
-						onkeydown={(event) => event.key === 'Enter' && submit()}
-					/>
-				</label>
+				<TextField
+					bind:this={field}
+					label="Message"
+					showLabel
+					placeholder="Describe your changes"
+					bind:value={message}
+					onkeydown={(event) => event.key === 'Enter' && submit()}
+				/>
 
 				<div class="grid gap-2">
 					<div class="flex items-center justify-between gap-3 text-[12px] text-[var(--text-muted)]">

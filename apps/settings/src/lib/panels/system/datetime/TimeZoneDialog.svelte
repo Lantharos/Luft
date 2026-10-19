@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Check from '@lucide/svelte/icons/check';
-	import { Dialog } from '@luft/ui';
+	import { Dialog, SearchField } from '@luft/ui';
 	import { setTimezone, type Zone } from './api';
 	import { city, country, offsetLabel, offsetMinutes, shortTime } from './zones';
 
@@ -50,9 +50,8 @@
 </script>
 
 <Dialog title="Time zone" {onclose}>
-	<input
-		class="text-field"
-		placeholder="Search for a city or country"
+	<SearchField
+		label="Search for a city or country"
 		bind:value={query}
 		onkeydown={(event) => event.key === 'Enter' && shown[0] && choose(shown[0].id)}
 	/>

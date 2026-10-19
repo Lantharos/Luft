@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import { tooltip } from '@luft/ui';
+	import { SearchField, tooltip } from '@luft/ui';
 	import CaseSensitive from '@lucide/svelte/icons/case-sensitive';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import ChevronUp from '@lucide/svelte/icons/chevron-up';
@@ -22,7 +22,7 @@
 	let caseSensitive = $state(false);
 	let regex = $state(false);
 	let results = $state({ index: -1, count: 0 });
-	let input = $state<HTMLInputElement>();
+	let field = $state<SearchField>();
 
 	let options = $derived<ISearchOptions>({
 		caseSensitive,
@@ -39,8 +39,7 @@
 		const subscription = session.search.onDidChangeResults(({ resultIndex, resultCount }) => {
 			results = { index: resultIndex, count: resultCount };
 		});
-		input?.focus();
-		input?.select();
+		field?.focus();
 		return () => {
 			subscription.dispose();
 			session.search.clearDecorations();
@@ -75,7 +74,9 @@
 </script>
 
 <div class="search-bar" role="search" onpointerdown={(event) => event.stopPropagation()}>
-	<input bind:this={input} bind:value={query} class="search-input" type="text" placeholder="Find" aria-label="Find" spellcheck="false" onkeydown={keydown} />
+	<div class="search-field">
+		<SearchField bind:this={field} bind:value={query} label="Find" onkeydown={keydown} />
+	</div>
 	<span class="search-count">
 		{#if query}
 			{results.count === 0 ? 'No results' : `${results.index + 1} of ${results.count}`}

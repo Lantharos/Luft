@@ -21,7 +21,7 @@
 
 <label class="search {variant}" class:large data-no-drag>
 	<Search size={large ? 17 : 16} class="icon" />
-	<input bind:this={input} class:text-field={variant === 'field'} type="search" placeholder={label} aria-label={label} bind:value {onkeydown} />
+	<input bind:this={input} class:text-field={variant === 'field'} type="search" placeholder={label} aria-label={label} spellcheck="false" bind:value {onkeydown} />
 </label>
 
 <style>

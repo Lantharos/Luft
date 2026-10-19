@@ -53,7 +53,9 @@ pub fn create(task: Task) -> Result<(), String> {
 
 pub fn run(program: &[&str]) -> Command {
     let mut command = Command::new("toolbox");
-    command.args(["run", "--container", &name()]).args(program);
+    command
+        .args(["run", "--container", &name(), "--"])
+        .args(program);
     command
 }
 

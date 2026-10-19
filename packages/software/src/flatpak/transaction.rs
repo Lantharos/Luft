@@ -3,6 +3,7 @@ use std::path::Path;
 use std::process::{Command, Stdio};
 
 use super::{Installation, command, query};
+use crate::operand::operand;
 use crate::progress::Stage;
 use crate::task::{CANCELLED, Task};
 
@@ -18,8 +19,9 @@ pub fn install(
     reference: &str,
     task: Task,
 ) -> Result<(), String> {
+    let (remote, reference) = (operand(remote)?, operand(reference)?);
     run(
-        command(installation).args(["install", "-y", "--or-update", remote, reference]),
+        command(installation).args(["install", "-y", "--or-update", "--", remote, reference]),
         task,
     )
 }
@@ -27,16 +29,20 @@ pub fn install(
 pub fn install_ref(installation: Installation, file: &Path, task: Task) -> Result<(), String> {
     run(
         command(installation)
-            .args(["install", "-y", "--from"])
+            .args(["install", "-y", "--from", "--"])
             .arg(file),
         task,
     )
 }
 
 pub fn update(installation: Installation, references: &[&str], task: Task) -> Result<(), String> {
+    let references = references
+        .iter()
+        .map(|reference| operand(reference))
+        .collect::<Result<Vec<_>, _>>()?;
     run(
         command(installation)
-            .args(["update", "-y"])
+            .args(["update", "-y", "--"])
             .args(references),
         task,
     )
@@ -44,7 +50,7 @@ pub fn update(installation: Installation, references: &[&str], task: Task) -> Re
 
 pub fn uninstall(installation: Installation, reference: &str, task: Task) -> Result<(), String> {
     run(
-        command(installation).args(["uninstall", "-y", reference]),
+        command(installation).args(["uninstall", "-y", "--", operand(reference)?]),
         task,
     )
 }
@@ -53,7 +59,14 @@ pub fn add_remote(installation: Installation, name: &str, file: &Path) -> Result
     let file = file.to_string_lossy();
     query(
         installation,
-        &["remote-add", "--if-not-exists", "--from", name, &file],
+        &[
+            "remote-add",
+            "--if-not-exists",
+            "--from",
+            "--",
+            operand(name)?,
+            &file,
+        ],
     )
     .map(|_| ())
 }

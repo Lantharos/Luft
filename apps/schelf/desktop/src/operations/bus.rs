@@ -1,8 +1,9 @@
-use luft_app::dbus::{self, failed};
+use luft_app::dbus::{self, caller, failed};
 use luft_software::progress::Progress;
 use zbus::fdo::{self, RequestNameFlags};
+use zbus::message::Header;
 use zbus::object_server::SignalEmitter;
-use zbus::{interface, proxy};
+use zbus::{Connection, interface, proxy};
 
 use super::{Notice, Queue, Request, State};
 
@@ -33,14 +34,27 @@ struct Operations {
 
 #[interface(name = "com.lantharos.Schelf1")]
 impl Operations {
-    fn start(&self, request: &str) -> fdo::Result<u64> {
+    async fn start(
+        &self,
+        request: &str,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+    ) -> fdo::Result<u64> {
+        caller::refuse_sandboxed(connection, &header).await?;
         let request: Request = serde_json::from_str(request)
             .map_err(|error| fdo::Error::InvalidArgs(error.to_string()))?;
         self.queue.enqueue(request).map_err(fdo::Error::Failed)
     }
 
-    fn cancel(&self, id: u64) {
+    async fn cancel(
+        &self,
+        id: u64,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+    ) -> fdo::Result<()> {
+        caller::refuse_sandboxed(connection, &header).await?;
         self.queue.stop(id);
+        Ok(())
     }
 
     #[zbus(signal)]

@@ -6,6 +6,7 @@ pub mod flatpak;
 pub mod http;
 #[cfg(feature = "system")]
 pub mod image;
+mod operand;
 #[cfg(feature = "system")]
 pub mod packagekit;
 #[cfg(feature = "system")]

@@ -8,6 +8,7 @@ mod updates;
 
 use std::process::Command;
 
+use crate::operand::operand;
 use crate::progress::Stage;
 use crate::task::Task;
 
@@ -58,14 +59,25 @@ fn record(package: &str) -> Result<(), String> {
 
 pub fn install(package: &str, task: Task) -> Result<(), String> {
     ready(task)?;
-    transaction::run(&mut dnf(&["install", package]), Stage::Installing, task)?;
+    transaction::run(
+        &mut dnf(&["install", "--", operand(package)?]),
+        Stage::Installing,
+        task,
+    )?;
     record(package)
 }
 
 pub fn install_file(path: &str, task: Task) -> Result<(), String> {
     let package = String::from_utf8_lossy(
         &Command::new("rpm")
-            .args(["--query", "--package", "--queryformat", "%{NAME}", path])
+            .args([
+                "--query",
+                "--package",
+                "--queryformat",
+                "%{NAME}",
+                "--",
+                path,
+            ])
             .output()
             .map_err(|error| error.to_string())?
             .stdout,
@@ -75,13 +87,15 @@ pub fn install_file(path: &str, task: Task) -> Result<(), String> {
         return Err("This package file is damaged or isn't meant for this computer.".into());
     }
     ready(task)?;
-    transaction::run(&mut dnf(&["install", path]), Stage::Installing, task)?;
+    transaction::run(&mut dnf(&["install", "--", path]), Stage::Installing, task)?;
     record(&package)
 }
 
 pub fn update(packages: &[String], task: Task) -> Result<(), String> {
-    let mut arguments = vec!["upgrade"];
-    arguments.extend(packages.iter().map(String::as_str));
+    let mut arguments = vec!["upgrade", "--"];
+    for package in packages {
+        arguments.push(operand(package)?);
+    }
     transaction::run(&mut dnf(&arguments), Stage::Installing, task)?;
     packages.iter().try_for_each(|package| record(package))
 }
@@ -110,7 +124,11 @@ pub fn retire_shadowed() -> Result<(), String> {
 }
 
 pub fn remove(package: &str, task: Task) -> Result<(), String> {
-    let removed = transaction::run(&mut dnf(&["remove", package]), Stage::Removing, task);
+    let removed = transaction::run(
+        &mut dnf(&["remove", "--", operand(package)?]),
+        Stage::Removing,
+        task,
+    );
     if let Err(error) = removed
         && !error.contains(NOTHING_TO_REMOVE)
     {

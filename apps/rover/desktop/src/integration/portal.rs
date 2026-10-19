@@ -1,8 +1,10 @@
 use std::collections::HashMap;
 use std::env;
-use std::fs;
+use std::fs::{self, DirBuilder};
+use std::os::unix::fs::DirBuilderExt;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
+use std::time::{SystemTime, UNIX_EPOCH};
 
 use tokio::process::Command;
 use url::Url;
@@ -34,40 +36,37 @@ impl FileChooser {
     #[zbus(out_args("response", "results"))]
     async fn open_file(
         &self,
-        handle: OwnedObjectPath,
+        _handle: OwnedObjectPath,
         _app_id: String,
         _parent_window: String,
         title: String,
         options: Options,
     ) -> zbus::fdo::Result<(u32, Results)> {
-        self.choose(&handle, title, &options, ChooserMode::Open)
-            .await
+        self.choose(title, &options, ChooserMode::Open).await
     }
 
     #[zbus(out_args("response", "results"))]
     async fn save_file(
         &self,
-        handle: OwnedObjectPath,
+        _handle: OwnedObjectPath,
         _app_id: String,
         _parent_window: String,
         title: String,
         options: Options,
     ) -> zbus::fdo::Result<(u32, Results)> {
-        self.choose(&handle, title, &options, ChooserMode::Save)
-            .await
+        self.choose(title, &options, ChooserMode::Save).await
     }
 
     #[zbus(out_args("response", "results"))]
     async fn save_files(
         &self,
-        handle: OwnedObjectPath,
+        _handle: OwnedObjectPath,
         _app_id: String,
         _parent_window: String,
         title: String,
         options: Options,
     ) -> zbus::fdo::Result<(u32, Results)> {
-        self.choose(&handle, title, &options, ChooserMode::SaveFiles)
-            .await
+        self.choose(title, &options, ChooserMode::SaveFiles).await
     }
 
     #[zbus(property)]
@@ -79,18 +78,15 @@ impl FileChooser {
 impl FileChooser {
     async fn choose(
         &self,
-        handle: &OwnedObjectPath,
         title: String,
         options: &Options,
         mode: ChooserMode,
     ) -> zbus::fdo::Result<(u32, Results)> {
-        let response_path = response_path(
-            handle.as_str(),
-            self.next_request.fetch_add(1, Ordering::Relaxed),
-        );
-        let response = run_chooser(&response_path, title, options, mode).await;
-        let _ = fs::remove_file(&response_path);
-        let response = response.map_err(zbus::fdo::Error::Failed)?;
+        let folder = ResponseFolder::create(self.next_request.fetch_add(1, Ordering::Relaxed))
+            .map_err(zbus::fdo::Error::Failed)?;
+        let response = run_chooser(&folder.response(), title, options, mode)
+            .await
+            .map_err(zbus::fdo::Error::Failed)?;
         Ok(portal_results(response))
     }
 }
@@ -170,7 +166,7 @@ fn portal_results(response: ChooserResponse) -> (u32, Results) {
         .collect();
     let mut results = Results::new();
     results.insert("uris".to_string(), owned(uris));
-    results.insert("writable".to_string(), OwnedVariant::from(false));
+    results.insert("writable".to_string(), OwnedVariant::from(true));
     (RESPONSE_SUCCESS, results)
 }
 
@@ -223,15 +219,35 @@ fn bytes_to_path(mut bytes: Vec<u8>) -> Option<String> {
         .filter(|value| !value.is_empty())
 }
 
-fn response_path(handle: &str, request: u64) -> PathBuf {
-    let handle: String = handle
-        .chars()
-        .map(|ch| if ch.is_ascii_alphanumeric() { ch } else { '_' })
-        .collect();
-    env::temp_dir().join(format!(
-        "rover-chooser-{}-{request}-{handle}.json",
-        std::process::id()
-    ))
+struct ResponseFolder(PathBuf);
+
+impl ResponseFolder {
+    fn create(request: u64) -> Result<Self, String> {
+        let runtime = dirs::runtime_dir().ok_or("Rover can't find the session's runtime folder")?;
+        let started = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_nanos();
+        let folder = runtime.join(format!(
+            "rover-chooser-{}-{request}-{started}",
+            std::process::id()
+        ));
+        DirBuilder::new()
+            .mode(0o700)
+            .create(&folder)
+            .map_err(|error| error.to_string())?;
+        Ok(Self(folder))
+    }
+
+    fn response(&self) -> PathBuf {
+        self.0.join("response.json")
+    }
+}
+
+impl Drop for ResponseFolder {
+    fn drop(&mut self) {
+        let _ = fs::remove_dir_all(&self.0);
+    }
 }
 
 fn owned<T>(value: T) -> OwnedVariant

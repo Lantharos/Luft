@@ -1,5 +1,7 @@
 use std::env;
-use std::fs;
+use std::fs::{self, OpenOptions};
+use std::io::Write;
+use std::os::unix::fs::OpenOptionsExt;
 use std::path::PathBuf;
 use std::time::Duration;
 
@@ -92,7 +94,12 @@ impl ChooserSession {
     pub fn respond(&self, response: ChooserResponse) -> Result<(), String> {
         let payload = serde_json::to_vec(&response).map_err(|error| error.to_string())?;
         let staging = self.response_path.with_extension("partial");
-        let result = fs::write(&staging, payload)
+        let result = OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .mode(0o600)
+            .open(&staging)
+            .and_then(|mut file| file.write_all(&payload))
             .and_then(|()| fs::rename(&staging, &self.response_path))
             .map_err(|error| error.to_string());
         std::thread::spawn(|| {

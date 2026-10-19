@@ -17,6 +17,7 @@ export class Unsupported extends Error {
 
 export interface Heard {
   partial(text: string): void;
+  typed(text: string): void;
   level(level: number): void;
   quiet(): void;
 }
@@ -30,6 +31,7 @@ export class Speech {
         (_connection, _sender, _path, _interface, _signal, parameters) => handle(parameters));
     this.subscriptions = [
       subscribe('Partial', parameters => heard.partial((parameters.deep_unpack() as [string])[0])),
+      subscribe('Typed', parameters => heard.typed((parameters.deep_unpack() as [string])[0])),
       subscribe('Level', parameters => heard.level((parameters.deep_unpack() as [number])[0])),
       subscribe('Quiet', () => heard.quiet()),
     ];

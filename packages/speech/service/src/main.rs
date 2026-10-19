@@ -5,6 +5,7 @@ mod engines;
 mod hub;
 mod language;
 mod models;
+mod onnx;
 mod plan;
 mod preferences;
 mod warm;
@@ -50,6 +51,15 @@ async fn serve() -> Result<()> {
                     emitter
                         .emit_signal(None::<&str>, PATH, NAME, "Partial", &(text,))
                         .await
+                }
+                Event::Typed(text) => {
+                    emitter
+                        .emit_signal(None::<&str>, PATH, NAME, "Typed", &(text,))
+                        .await
+                }
+                Event::Sent(done) => {
+                    let _ = done.send(());
+                    Ok(())
                 }
                 Event::Level(level) => {
                     emitter

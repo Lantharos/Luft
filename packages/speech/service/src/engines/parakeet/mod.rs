@@ -1,12 +1,9 @@
 mod vocabulary;
 
 use std::path::Path;
-use std::sync::OnceLock;
 
-use anyhow::{Context, Result, anyhow, bail};
-use ort::environment::Environment;
+use anyhow::{Context, Result, bail};
 use ort::session::Session;
-use ort::session::builder::{GraphOptimizationLevel, SessionBuilder};
 use ort::value::Tensor;
 
 use vocabulary::Vocabulary;
@@ -16,9 +13,17 @@ const ENCODER: &str = "encoder-model.q4.onnx";
 const DECODER: &str = "decoder_joint-model.int8.onnx";
 const VOCABULARY: &str = "vocab.txt";
 const MOST_PIECES_PER_FRAME: usize = 10;
+const SAMPLES_PER_FRAME: usize = 1280;
+const STALLED_FRAMES: usize = 25;
+const LOOK_AGAIN_FRAMES: usize = 2;
 
 /// NVIDIA's Parakeet TDT, a transducer that also predicts how many frames
 /// each piece lasts, so decoding skips ahead instead of visiting every frame.
+/// It sometimes hears nothing more after the end of a sentence, or nothing at
+/// all in speech that starts or ends in the middle of a word, so when it falls
+/// silent well before the end, what comes after the last word it heard is
+/// recognized again on its own, and speech it heard nothing in is looked at
+/// once more from a moment later.
 pub struct Parakeet {
     preprocessor: Session,
     encoder: Session,
@@ -32,28 +37,8 @@ struct DecoderState {
     cell: Vec<f32>,
 }
 
-static ENVIRONMENT: OnceLock<Environment> = OnceLock::new();
-
-fn environment() -> Result<&'static Environment> {
-    if let Some(environment) = ENVIRONMENT.get() {
-        return Ok(environment);
-    }
-    let environment = ort::init()
-        .with_name("luft-speech")
-        .with_telemetry(false)
-        .build()?;
-    Ok(ENVIRONMENT.get_or_init(|| environment))
-}
-
 fn session(path: &Path) -> Result<Session> {
-    let failed = |error: ort::Error<SessionBuilder>| anyhow!("{error}");
-    Session::builder(environment()?)?
-        .with_optimization_level(GraphOptimizationLevel::Level3)
-        .map_err(failed)?
-        .with_intra_threads(super::threads())
-        .map_err(failed)?
-        .with_inter_threads(1)
-        .map_err(failed)?
+    crate::onnx::builder(super::threads())?
         .commit_from_file(path)
         .with_context(|| format!("Couldn't load {}", path.display()))
 }
@@ -88,9 +73,27 @@ impl Parakeet {
     }
 
     pub fn recognize(&mut self, audio: &[f32]) -> Result<String> {
-        let (frames, width, length) = self.encode(audio)?;
-        let pieces = self.decode(&frames, width, length)?;
-        Ok(self.vocabulary.text(&pieces))
+        let mut texts = Vec::new();
+        let mut rest = audio;
+        let mut looked_again = false;
+        loop {
+            let (frames, width, length) = self.encode(rest)?;
+            let (pieces, heard_until) = self.decode(&frames, width, length)?;
+            texts.push(self.vocabulary.text(&pieces));
+            let stalled = length - heard_until >= STALLED_FRAMES;
+            if !stalled || (pieces.is_empty() && looked_again) {
+                break;
+            }
+            looked_again = pieces.is_empty();
+            let resume = if looked_again {
+                LOOK_AGAIN_FRAMES
+            } else {
+                heard_until
+            };
+            rest = &rest[(resume * SAMPLES_PER_FRAME).min(rest.len())..];
+        }
+        texts.retain(|text| !text.is_empty());
+        Ok(texts.join(" "))
     }
 
     fn encode(&mut self, audio: &[f32]) -> Result<(Vec<f32>, usize, usize)> {
@@ -123,7 +126,13 @@ impl Parakeet {
         Ok((by_frame, width, (lengths[0] as usize).min(frames)))
     }
 
-    fn decode(&mut self, frames: &[f32], width: usize, length: usize) -> Result<Vec<usize>> {
+    /// The pieces heard, and the frame after the last one.
+    fn decode(
+        &mut self,
+        frames: &[f32],
+        width: usize,
+        length: usize,
+    ) -> Result<(Vec<usize>, usize)> {
         let blank = self.vocabulary.blank();
         let pieces_in_vocabulary = self.vocabulary.len();
         let state_len: usize = self.state_shape.iter().product();
@@ -134,6 +143,7 @@ impl Parakeet {
         let mut pieces = Vec::new();
         let mut frame = 0;
         let mut emitted = 0;
+        let mut heard_until = 0;
         while frame < length {
             let previous = pieces.last().copied().unwrap_or(blank);
             let encoded = &frames[frame * width..(frame + 1) * width];
@@ -142,6 +152,7 @@ impl Parakeet {
                 state = next;
                 pieces.push(piece);
                 emitted += 1;
+                heard_until = frame + skip.max(1);
             }
             if skip > 0 {
                 frame += skip;
@@ -151,7 +162,7 @@ impl Parakeet {
                 emitted = 0;
             }
         }
-        Ok(pieces)
+        Ok((pieces, heard_until.min(length)))
     }
 
     fn step(

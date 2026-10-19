@@ -4,7 +4,7 @@ use std::time::{Duration, Instant};
 use anyhow::Result;
 use luft_speech::types::Engine;
 
-use crate::audio::{Input, RATE, Segmenter};
+use crate::audio::{Input, RATE, Segmenter, Voice};
 use crate::engines::{Pass, Recognizer};
 use crate::hub::{Event, Hub};
 use crate::language::script;
@@ -14,22 +14,26 @@ const SMALLEST_GROWTH: usize = RATE / 4;
 const QUIET_AFTER_SPEECH: Duration = Duration::from_secs(3);
 const QUIET_WITHOUT_SPEECH: Duration = Duration::from_secs(8);
 
+/// What's been typed so far, so each new piece is written in the keyboard's
+/// script and set apart from the one before it.
 struct Transcript<'a> {
     plan: &'a Plan,
-    heard: Vec<String>,
+    typed: bool,
 }
 
 impl Transcript<'_> {
-    fn with(&self, open: Option<&str>) -> String {
-        let text = self
-            .heard
-            .iter()
-            .map(String::as_str)
-            .chain(open)
-            .filter(|part| !part.is_empty())
-            .collect::<Vec<_>>()
-            .join(" ");
-        script::write(&text, &self.plan.spoken.code, self.plan.spoken.script)
+    fn write(&self, text: &str) -> String {
+        let text = script::write(text, &self.plan.spoken.code, self.plan.spoken.script);
+        match (self.typed, text.is_empty()) {
+            (true, false) => format!(" {text}"),
+            _ => text,
+        }
+    }
+
+    fn typed(&mut self, text: &str) -> Option<String> {
+        let written = self.write(text);
+        self.typed |= !written.is_empty();
+        (!written.is_empty()).then_some(written)
     }
 }
 
@@ -43,7 +47,7 @@ pub fn listen(hub: &Hub, plan: &Plan, input: &Receiver<Input>) -> Result<Option<
     result
 }
 
-fn quiet_long_enough(segments: &Segmenter) -> bool {
+pub fn quiet_long_enough(segments: &Segmenter) -> bool {
     let enough = if segments.spoken() {
         QUIET_AFTER_SPEECH
     } else {
@@ -52,9 +56,10 @@ fn quiet_long_enough(segments: &Segmenter) -> bool {
     segments.quiet_for() >= enough
 }
 
-/// Each finished stretch of speech is recognized once. The one still being
-/// spoken is recognized again as it grows, but at most half the time, so a
-/// slower computer keeps up by looking less often.
+/// Each finished stretch of speech is recognized once and typed at once. The
+/// one still being spoken is recognized again as it grows, but at most half
+/// the time, so a slower computer keeps up by looking less often. What's left
+/// when listening stops is the answer.
 fn transcribe(
     hub: &Hub,
     plan: &Plan,
@@ -67,11 +72,8 @@ fn transcribe(
     };
     let mut cadence = quickest;
     let language = plan.spoken.code.as_str();
-    let mut segments = Segmenter::default();
-    let mut transcript = Transcript {
-        plan,
-        heard: Vec::new(),
-    };
+    let mut segments = Segmenter::new(Voice::new()?);
+    let mut transcript = Transcript { plan, typed: false };
     let mut last_look = Instant::now();
     let mut looked_at = 0;
     let mut stale = false;
@@ -79,27 +81,28 @@ fn transcribe(
     loop {
         match input.recv_timeout(cadence.saturating_sub(last_look.elapsed())) {
             Ok(Input::Audio(samples)) => {
-                segments.push(&samples);
+                segments.push(&samples)?;
                 if !told_quiet && quiet_long_enough(&segments) {
                     told_quiet = true;
                     let _ = hub.events.send(Event::Quiet);
                 }
             }
             Ok(Input::Finish) => {
+                let mut rest = String::new();
                 for segment in segments.finish() {
-                    transcript
-                        .heard
-                        .push(recognizer.recognize(&segment, language, Pass::Final)?);
+                    let text = recognizer.recognize(&segment, language, Pass::Final)?;
+                    rest.extend(transcript.typed(&text));
                 }
-                return Ok(Some(transcript.with(None)));
+                return Ok(Some(rest));
             }
             Ok(Input::Cancel) | Err(RecvTimeoutError::Disconnected) => return Ok(None),
             Err(RecvTimeoutError::Timeout) => {}
         }
         while let Some(segment) = segments.take_closed() {
-            transcript
-                .heard
-                .push(recognizer.recognize(&segment, language, Pass::Final)?);
+            let text = recognizer.recognize(&segment, language, Pass::Final)?;
+            if let Some(typed) = transcript.typed(&text) {
+                let _ = hub.events.send(Event::Typed(typed));
+            }
             looked_at = 0;
             stale = true;
         }
@@ -114,12 +117,10 @@ fn transcribe(
             looked_at = open.len();
             let guess = recognizer.recognize(open, language, Pass::Partial)?;
             cadence = quickest.max(last_look.elapsed() * 2);
-            let _ = hub
-                .events
-                .send(Event::Partial(transcript.with(Some(&guess))));
+            let _ = hub.events.send(Event::Partial(transcript.write(&guess)));
             stale = false;
         } else if stale {
-            let _ = hub.events.send(Event::Partial(transcript.with(None)));
+            let _ = hub.events.send(Event::Partial(String::new()));
             stale = false;
         }
     }

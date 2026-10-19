@@ -7,8 +7,6 @@ use whisper_rs::{
 
 use super::Pass;
 
-const NO_SPEECH: f32 = 0.6;
-
 /// OpenAI's Whisper through whisper.cpp, on the graphics card when Vulkan has
 /// one and on the processor otherwise. It always looks at a whole 30 second
 /// window: the turbo model makes things up when shown less.
@@ -59,7 +57,6 @@ impl Whisper {
         let text: String = self
             .state
             .as_iter()
-            .filter(|segment| segment.no_speech_probability() < NO_SPEECH)
             .filter_map(|segment| segment.to_str_lossy().ok().map(|text| text.into_owned()))
             .collect();
         Ok(text.trim().to_owned())

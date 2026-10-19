@@ -3,6 +3,7 @@ use std::time::{Duration, Instant};
 
 use anyhow::Result;
 use tokio::sync::mpsc::UnboundedSender;
+use tokio::sync::oneshot;
 
 use crate::dictation::Session;
 use crate::engines::Processor;
@@ -17,6 +18,8 @@ pub const PATH: &str = "/com/lantharos/Speech1";
 
 pub enum Event {
     Partial(String),
+    Typed(String),
+    Sent(oneshot::Sender<()>),
     Level(f64),
     Quiet,
     Changed,

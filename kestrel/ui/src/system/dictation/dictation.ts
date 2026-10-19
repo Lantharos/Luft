@@ -47,6 +47,7 @@ export class Dictation {
   private session = 0;
   private target: Clutter.InputFocus | null = null;
   private escapeFilter = 0;
+  private unplaced = '';
   private offeredSetup = false;
   private readonly toldUnsupported = new Set<string>();
 
@@ -54,6 +55,7 @@ export class Dictation {
     this.pill = new DictationPill(context.layoutManager);
     this.speech = new Speech({
       partial: text => this.heard(text),
+      typed: text => this.typed(text),
       level: level => {
         if (this.phase === 'listening') this.pill.level(level);
       },
@@ -116,21 +118,37 @@ export class Dictation {
     this.finish();
   }
 
-  private heard(text: string): void {
-    if (this.phase === 'idle') return;
-    if (this.target && this.target === this.context.inputMethod.currentFocus) this.context.inputMethod.showPreedit(text);
-    else this.pill.heard(text);
+  private inTarget(): boolean {
+    return this.target !== null && this.target === this.context.inputMethod.currentFocus;
   }
 
-  private deliver(text: string): void {
+  private heard(text: string): void {
+    if (this.phase === 'idle') return;
+    if (this.inTarget()) this.context.inputMethod.showPreedit(text);
+    else this.pill.heard(this.unplaced + text);
+  }
+
+  private typed(text: string): void {
+    if (this.phase === 'idle') return;
+    if (this.inTarget() && !this.unplaced) {
+      this.context.inputMethod.showPreedit(null);
+      this.context.inputMethod.commit(text);
+    } else {
+      this.unplaced += text;
+      this.pill.heard(this.unplaced);
+    }
+  }
+
+  private deliver(rest: string): void {
     this.clearPreedit();
+    const text = this.unplaced + rest;
     if (!text) return;
     if (this.context.inputMethod.currentFocus) this.context.inputMethod.commit(text);
     else afterModifiersAreReleased(() => this.paste(text));
   }
 
   private clearPreedit(): void {
-    if (this.target && this.target === this.context.inputMethod.currentFocus) this.context.inputMethod.showPreedit(null);
+    if (this.inTarget()) this.context.inputMethod.showPreedit(null);
   }
 
   private finish(): void {
@@ -138,6 +156,7 @@ export class Dictation {
     this.stopListeningForEscape();
     this.phase = 'idle';
     this.target = null;
+    this.unplaced = '';
     this.pill.hide();
     ownDictation.active = false;
   }

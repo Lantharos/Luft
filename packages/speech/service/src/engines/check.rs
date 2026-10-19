@@ -14,7 +14,7 @@ use crate::audio::{RATE, pcm16_mono};
 use crate::language::script::{self, Script};
 use crate::models::manifest;
 
-fn words(text: &str, language: &str) -> Vec<String> {
+pub fn words(text: &str, language: &str) -> Vec<String> {
     script::write(&text.to_lowercase(), language, Script::Latin)
         .split(|character: char| !character.is_alphanumeric() && character != '\'')
         .filter(|word| !word.is_empty())
@@ -37,6 +37,23 @@ fn word_errors(heard: &[String], said: &[String]) -> usize {
     previous[said.len()]
 }
 
+/// How many of the words said were heard, in the order they were said.
+pub fn said_in_order(heard: &[String], said: &[String]) -> usize {
+    let mut previous = vec![0; said.len() + 1];
+    for heard_word in heard {
+        let mut current = vec![0; said.len() + 1];
+        for (column, said_word) in said.iter().enumerate() {
+            current[column + 1] = if heard_word == said_word {
+                previous[column] + 1
+            } else {
+                previous[column + 1].max(current[column])
+            };
+        }
+        previous = current;
+    }
+    previous[said.len()]
+}
+
 #[test]
 fn errors_count_words_added_dropped_and_changed() {
     let said = words("the cat sat on the mat", "en");
@@ -45,6 +62,7 @@ fn errors_count_words_added_dropped_and_changed() {
         0
     );
     assert_eq!(word_errors(&words("a cat sat on mat", "en"), &said), 2);
+    assert_eq!(said_in_order(&words("a cat sat on mat", "en"), &said), 4);
 }
 
 #[test]

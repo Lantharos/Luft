@@ -1,5 +1,5 @@
 #[cfg(test)]
-mod check;
+pub mod check;
 mod parakeet;
 mod processor;
 mod whisper;

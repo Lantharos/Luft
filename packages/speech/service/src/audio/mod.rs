@@ -2,6 +2,7 @@ mod file;
 mod level;
 mod microphone;
 mod pauses;
+mod voice;
 
 use std::path::PathBuf;
 use std::sync::mpsc::Sender;
@@ -12,6 +13,7 @@ use anyhow::Result;
 pub use file::pcm16_mono;
 pub use level::Meter;
 pub use pauses::Segmenter;
+pub use voice::Voice;
 
 pub const RATE: usize = 16_000;
 

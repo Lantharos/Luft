@@ -206,18 +206,35 @@ jobs:
     if: always() && needs.image.result == 'success'
     runs-on: ubuntu-26.04
     timeout-minutes: 15
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
     env:
       VERSION: ${{ needs.plan.outputs.version }}
       TAGS: ${{ needs.plan.outputs.tags }}
     steps:
+      - uses: sigstore/cosign-installer@v4
+
       - name: Sign in to the registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | podman login ghcr.io --username "${{ github.actor }}" --password-stdin
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | podman login ghcr.io --username "${{ github.actor }}" --password-stdin
+          echo "${{ secrets.GITHUB_TOKEN }}" | cosign login ghcr.io --username "${{ github.actor }}" --password-stdin
+
+      - name: Sign both images
+        run: |
+          for suffix in "" -nvidia; do
+            digest="$(skopeo inspect --format '{{.Digest}}' "docker://$IMAGE:$VERSION$suffix")"
+            cosign sign --yes "$IMAGE@$digest"
+            cosign verify --certificate-identity "https://github.com/$GITHUB_WORKFLOW_REF" \
+              --certificate-oidc-issuer https://token.actions.githubusercontent.com "$IMAGE@$digest" > /dev/null
+          done
 
       - name: Tag both images
         run: |
           for tag in $TAGS; do
             [[ "$tag" != "$VERSION" ]] || continue
             for suffix in "" -nvidia; do
-              skopeo copy --retry-times 3 "docker://$IMAGE:$VERSION$suffix" "docker://$IMAGE:$tag$suffix"
+              skopeo copy --retry-times 3 --preserve-digests "docker://$IMAGE:$VERSION$suffix" "docker://$IMAGE:$tag$suffix"
             done
           done

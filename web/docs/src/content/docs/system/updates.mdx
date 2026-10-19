@@ -47,6 +47,14 @@ sudo bootc switch ghcr.io/lantharos/luft:45-nightly   # or :45 for releases
 
 On a computer with NVIDIA graphics, add `-nvidia` to the end, such as `:45-nightly-nvidia`.
 
+Every image is signed with [Sigstore](https://www.sigstore.dev/) by the GitHub workflow that builds it, and the USB sticks are only made from images whose signature checks out. To check one yourself with [cosign](https://docs.sigstore.dev/cosign/system_config/installation/):
+
+```sh
+cosign verify ghcr.io/lantharos/luft:45-nightly \
+  --certificate-identity-regexp '^https://github\.com/Lantharos/Luft/\.github/workflows/image\.yml@refs/(heads/main|tags/v.+)$' \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com
+```
+
 ## Firmware and apps
 
 - **Firmware** for the computer and its devices also comes through Settings, under Updates, when the maker publishes it. Most firmware updates finish at the next restart.

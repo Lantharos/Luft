@@ -52,8 +52,12 @@ jobs:
         with:
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
+      - uses: sigstore/cosign-installer@v4
+
       - name: Sign in to the registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | podman login ghcr.io --username "${{ github.actor }}" --password-stdin
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | podman login ghcr.io --username "${{ github.actor }}" --password-stdin
+          echo "${{ secrets.GITHUB_TOKEN }}" | cosign login ghcr.io --username "${{ github.actor }}" --password-stdin
 
       - name: Image and channel
         id: channel
@@ -85,6 +89,21 @@ jobs:
           echo "CHANNEL=$channel" >> "$GITHUB_ENV"
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "channel=$channel" >> "$GITHUB_OUTPUT"
+
+      - name: Check the images' signatures
+        if: env.SKIP != '1'
+        env:
+          EDITION: ${{ matrix.edition }}
+          SIGNER: ^https://github\.com/${{ github.repository }}/\.github/workflows/image\.yml@refs/(heads/main|tags/v.+)$
+        run: |
+          references=("$IMAGE")
+          [[ "$EDITION" == standard ]] || references+=("$IMAGE-nvidia")
+          for reference in "${references[@]}"; do
+            podman pull --quiet "$reference" > /dev/null
+            digest="$(podman image inspect --format '{{.Digest}}' "$reference")"
+            cosign verify --certificate-identity-regexp "$SIGNER" \
+              --certificate-oidc-issuer https://token.actions.githubusercontent.com "${reference%:*}@$digest" > /dev/null
+          done
 
       - name: Build
         if: env.SKIP != '1'

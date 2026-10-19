@@ -6,17 +6,19 @@ import St from 'gi://St';
 const BAR = 3;
 const GAP = 2.5;
 const LEVEL_INTERVAL_US = 50_000;
-const SPEECH_FLOOR = 0.2;
-const SPEECH_RANGE = 0.5;
 const FADING_BARS = 3;
-
-const loudness = (level: number) => Math.min(1, Math.max(0, (level - SPEECH_FLOOR) / SPEECH_RANGE)) ** 0.8;
+const FLOOR_RISE = 0.004;
+const PEAK_FALL = 0.008;
+const NOISE_MARGIN = 0.04;
+const LEAST_SPAN = 0.18;
 
 export class Waveform {
   readonly actor = new St.DrawingArea({ style_class: 'kestrel-dictation-waveform', y_align: Clutter.ActorAlign.CENTER });
   private readonly timeline = new Clutter.Timeline({ actor: this.actor, duration: 1000, repeat_count: -1 });
   private levels: number[] = [];
   private arrived = 0;
+  private floor = 1;
+  private peak = 0;
 
   constructor() {
     this.timeline.connect('new-frame', () => this.actor.queue_repaint());
@@ -25,13 +27,18 @@ export class Waveform {
 
   start(): void {
     this.levels = [];
+    this.floor = 1;
+    this.peak = 0;
     this.arrived = GLib.get_monotonic_time();
     this.actor.queue_repaint();
     this.timeline.start();
   }
 
   push(level: number): void {
-    this.levels.push(loudness(level));
+    this.floor = Math.min(level, this.floor + FLOOR_RISE);
+    this.peak = Math.max(level, this.peak - PEAK_FALL);
+    const span = Math.max(this.peak - this.floor, LEAST_SPAN);
+    this.levels.push(Math.min(1, Math.max(0, (level - this.floor - NOISE_MARGIN) / span)) ** 0.8);
     this.arrived = GLib.get_monotonic_time();
   }
 

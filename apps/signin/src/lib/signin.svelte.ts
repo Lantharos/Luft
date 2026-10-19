@@ -1,23 +1,20 @@
 import { Guest, appWindow, events, invoke, listen } from '@lantharos/sabine';
 import { appearance, type Appearance } from '@luft/ui';
 
+interface Target {
+	network: string;
+	url: string;
+}
+
 interface AppState extends Appearance {
-	link: string | null;
+	target: Target | null;
 }
 
 interface Activation {
 	arguments: string[];
 }
 
-const LINK_SCHEME = 'kestrel-signin:';
 const PARTITION = 'portal';
-
-function parse(link: string | null | undefined): { network: string; url: string } | null {
-	if (!link?.startsWith(LINK_SCHEME)) return null;
-	const query = new URLSearchParams(link.slice(LINK_SCHEME.length).replace(/^\?/, ''));
-	const url = query.get('url');
-	return url ? { network: query.get('network') ?? '', url } : null;
-}
 
 class SignIn {
 	network = $state('');
@@ -39,10 +36,10 @@ class SignIn {
 		const stops = [
 			appearance.start(state),
 			listen('signin.online', () => appWindow.close()),
-			listen<Activation>('singleInstance.activate', ({ arguments: args }) => {
-				const target = parse(args.find((argument) => argument.startsWith(LINK_SCHEME)));
-				if (target) void this.open(target);
+			listen<Activation>('singleInstance.activate', async ({ arguments: args }) => {
 				appWindow.focus();
+				const target = await invoke<Target | null>('activation_target', { arguments: args });
+				if (target) await this.open(target);
 			}),
 			events.guestNavigated(({ url }) => {
 				this.address = url;
@@ -50,12 +47,11 @@ class SignIn {
 				void invoke('check_connectivity');
 			})
 		];
-		const target = parse(state.link);
-		if (target) await this.open(target);
+		if (state.target) await this.open(state.target);
 		return () => stops.forEach((stop) => stop());
 	}
 
-	private async open({ network, url }: { network: string; url: string }) {
+	private async open({ network, url }: Target) {
 		this.network = network;
 		this.address = url;
 		this.loading = true;

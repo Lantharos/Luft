@@ -20,6 +20,6 @@ Installing registers the `kestrel-signin:` link scheme. It isn't listed with the
 kestrel-signin:?network=Harbor%20Hotel&url=http%3A%2F%2Ffedoraproject.org%2Fstatic%2Fhotspot.txt
 ```
 
-`network` is the name shown in the window and `url` the sign-in page to open.
+`network` is the name shown in the window and `url` the page to open, which has to be the web address NetworkManager checks the connection with. Links to any other page are ignored, so only Kestrel's sign-in notification opens a page here.
 
 `kestrel/tools/session.sh capture` opens it against a stand-in hotel page and NetworkManager; set `KESTREL_DEV_APPS=signin` to use your own build.

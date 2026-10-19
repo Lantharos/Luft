@@ -46,6 +46,7 @@ export async function run() {
   await sabineService();
   try {
     await control(bus, 'SetConnectivity', new GLib.Variant('(u)', [PORTAL]));
+    await control(bus, 'SetConnectivityCheckUri', new GLib.Variant('(s)', [portal.url]));
     styles.set_string('color-scheme', 'prefer-dark');
     const app = new LuftApp('signin', [`kestrel-signin:?network=${encodeURIComponent('Harbor Hotel')}&url=${encodeURIComponent(portal.url)}`]);
     await app.open();

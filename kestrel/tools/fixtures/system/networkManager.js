@@ -8,6 +8,7 @@ const XML = `<node>
   <property name="Connectivity" type="u" access="read"/>
   <property name="ConnectivityCheckAvailable" type="b" access="read"/>
   <property name="ConnectivityCheckEnabled" type="b" access="read"/>
+  <property name="ConnectivityCheckUri" type="s" access="read"/>
   <property name="NetworkingEnabled" type="b" access="read"/>
   <property name="WirelessEnabled" type="b" access="readwrite"/>
   <property name="WirelessHardwareEnabled" type="b" access="read"/>
@@ -58,6 +59,7 @@ const XML = `<node>
 </node>`;
 const CONTROL = `<node><interface name="com.lantharos.KestrelChecks.NetworkManager">
   <method name="SetConnectivity"><arg type="u" direction="in"/></method>
+  <method name="SetConnectivityCheckUri"><arg type="s" direction="in"/></method>
   <method name="Checks"><arg type="u" direction="out"/></method>
 </interface></node>`;
 
@@ -72,6 +74,7 @@ const DEVICE_ACTIVATED = 100;
 const GLOBAL_CONNECTED = 70;
 const ACTIVATED = 2;
 const FULL = 4;
+const CHECK_URI = 'http://fedoraproject.org/static/hotspot.txt';
 
 export const NETWORK_MANAGER_NAME = 'org.freedesktop.NetworkManager';
 
@@ -101,6 +104,7 @@ export function publishNetworkManager(publish, calls) {
   };
 
   let connectivity = FULL;
+  let checkUri = CHECK_URI;
   let checks = 0;
   const [manager] = object(MANAGER, [
     ['', {
@@ -111,6 +115,9 @@ export function publishNetworkManager(publish, calls) {
       },
       ConnectivityCheckAvailable: true,
       ConnectivityCheckEnabled: true,
+      get ConnectivityCheckUri() {
+        return checkUri;
+      },
       NetworkingEnabled: true,
       WirelessEnabled: true,
       WirelessHardwareEnabled: true,
@@ -146,6 +153,10 @@ export function publishNetworkManager(publish, calls) {
     SetConnectivity(state) {
       connectivity = state;
       manager.emit_property_changed('Connectivity', variant('u', state));
+    },
+    SetConnectivityCheckUri(uri) {
+      checkUri = uri;
+      manager.emit_property_changed('ConnectivityCheckUri', variant('s', uri));
     },
     Checks: () => checks,
   }, '/com/lantharos/KestrelChecks/NetworkManager');

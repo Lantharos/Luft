@@ -2520,6 +2520,7 @@ dependencies = [
  "sabine-service",
  "serde",
  "serde_json",
+ "url",
  "zbus",
 ]
 

@@ -13,6 +13,14 @@ async fn network_manager() -> Option<Proxy<'static>> {
     Proxy::new(connection, SERVICE, PATH, SERVICE).await.ok()
 }
 
+pub async fn check_uri() -> Option<String> {
+    network_manager()
+        .await?
+        .get_property::<String>("ConnectivityCheckUri")
+        .await
+        .ok()
+}
+
 pub fn watch(events: Events) {
     luft_app::spawn(async move {
         let Some(manager) = network_manager().await else {

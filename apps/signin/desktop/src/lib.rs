@@ -1,13 +1,15 @@
 mod connectivity;
+mod link;
 mod profile;
 
 use luft_app::{Appearance, Commands, Events, GlassWindow};
 use sabine::SabineWindow;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
+use link::Target;
+
 const APP_ID: &str = "com.lantharos.signin";
-const LINK_SCHEME: &str = "kestrel-signin:";
 const WINDOW: GlassWindow = GlassWindow {
     title: "Network Sign-In",
     size: (980, 720),
@@ -20,14 +22,24 @@ const WINDOW: GlassWindow = GlassWindow {
 struct AppState {
     #[serde(flatten)]
     appearance: Appearance,
-    link: Option<String>,
+    target: Option<Target>,
+}
+
+#[derive(Deserialize)]
+struct Activation {
+    arguments: Vec<String>,
 }
 
 async fn app_state(_: Value) -> Result<AppState, String> {
+    let arguments: Vec<String> = std::env::args().collect();
     Ok(AppState {
         appearance: Appearance::current().await,
-        link: std::env::args().find(|argument| argument.starts_with(LINK_SCHEME)),
+        target: link::verified(&arguments).await,
     })
+}
+
+async fn activation_target(Activation { arguments }: Activation) -> Result<Option<Target>, String> {
+    Ok(link::verified(&arguments).await)
 }
 
 pub fn run_app() -> ! {
@@ -41,9 +53,8 @@ pub fn run_app() -> ! {
 }
 
 fn register(window: SabineWindow, events: &Events) -> SabineWindow {
-    window.command_async("app_state", app_state).with_async(
-        "check_connectivity",
-        events,
-        connectivity::check,
-    )
+    window
+        .command_async("app_state", app_state)
+        .command_async("activation_target", activation_target)
+        .with_async("check_connectivity", events, connectivity::check)
 }

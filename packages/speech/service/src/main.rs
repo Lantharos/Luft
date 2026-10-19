@@ -39,7 +39,7 @@ async fn serve() -> Result<()> {
     let following = hub.clone();
     preferences::watch(move || following.follow())?;
     let connection = zbus::Connection::session().await?;
-    let (dictation, models) = bus::serve(&hub);
+    let (dictation, models) = bus::serve(&hub, zbus::fdo::DBusProxy::new(&connection).await?);
     connection.object_server().at(PATH, dictation).await?;
     connection.object_server().at(PATH, models).await?;
     connection.request_name(NAME).await?;

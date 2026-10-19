@@ -9,7 +9,7 @@ Dictation for Luft: hold Super and Alt, or the Copilot key, talk, and what you s
 
 ## The service
 
-`luft-speech` owns `com.lantharos.Speech1` (see `service/data/com.lantharos.Speech1.xml`). The session bus starts it when Kestrel or Settings needs it, and it exits after half a minute with nothing to do. It records from the default microphone through PipeWire only between `Start` and `Stop`, keeps the audio in memory, and recognizes it with one of two engines:
+`luft-speech` owns `com.lantharos.Speech1` (see `service/data/com.lantharos.Speech1.xml`). The session bus starts it when Kestrel or Settings needs it, and it exits after half a minute with nothing to do. Only Kestrel may call `Start`, `Stop` and `Cancel`, while Settings manages models through `com.lantharos.Speech1.Models`. It records from the default microphone through PipeWire only between `Start` and `Stop`, keeps the audio in memory, and recognizes it with one of two engines:
 
 | Engine | Runs on | Model |
 | --- | --- | --- |

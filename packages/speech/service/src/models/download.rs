@@ -10,9 +10,10 @@ use anyhow::{Context, Result, bail};
 use sha2::{Digest, Sha256};
 
 use super::manifest::{Entry, File};
+use super::verified::{self, Verified};
 
 const ATTEMPTS: u32 = 4;
-const BUFFER: usize = 256 * 1024;
+pub(super) const BUFFER: usize = 256 * 1024;
 const REPORT_EVERY: Duration = Duration::from_millis(250);
 
 #[derive(Clone)]
@@ -145,9 +146,10 @@ fn download(
     let agent = agent();
     let mut done = 0;
     let mut last_report = Instant::now();
+    let mut verified = Verified::load(folder);
     for file in &entry.files {
         let target = folder.join(&file.name);
-        if fs::metadata(&target).is_ok_and(|meta| meta.len() == file.size) {
+        if verified.confirm(&target, file)? {
             done += file.size;
             continue;
         }
@@ -168,7 +170,10 @@ fn download(
                 },
             );
             match result {
-                Ok(()) => break,
+                Ok(()) => {
+                    verified.record(&target, file)?;
+                    break;
+                }
                 Err(error) if error.is::<Cancelled>() || attempt >= ATTEMPTS => return Err(error),
                 Err(_) => std::thread::sleep(Duration::from_secs(2u64.pow(attempt))),
             }
@@ -182,7 +187,7 @@ fn download(
 fn remove_other_files(entry: &Entry, folder: &Path) -> Result<()> {
     for file in fs::read_dir(folder)?.flatten() {
         let name = file.file_name();
-        if !entry.files.iter().any(|kept| *kept.name == *name) {
+        if name != verified::RECORD && !entry.files.iter().any(|kept| *kept.name == *name) {
             fs::remove_file(file.path())?;
         }
     }
@@ -263,12 +268,7 @@ fn fetch(
     if received != file.size {
         bail!("{} ended early", file.name);
     }
-    let digest: String = hasher
-        .finalize()
-        .iter()
-        .map(|byte| format!("{byte:02x}"))
-        .collect();
-    if digest != file.sha256 {
+    if verified::hex(hasher.finalize()) != file.sha256 {
         fs::remove_file(&part)?;
         bail!(
             "{} didn't match what was expected, so it was thrown away",

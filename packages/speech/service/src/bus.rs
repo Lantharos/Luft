@@ -1,7 +1,10 @@
 use std::sync::Arc;
 
 use luft_speech::types::{Download, Language, Model, Overview};
+use zbus::fdo::DBusProxy;
 use zbus::interface;
+use zbus::message::Header;
+use zbus::names::BusName;
 
 use crate::dictation::Session;
 use crate::hub::Hub;
@@ -16,8 +19,13 @@ pub enum Error {
     ZBus(zbus::Error),
     NotInstalled(String),
     Unsupported(String),
+    NotAllowed(String),
     Failed(String),
 }
+
+const SHELL: BusName<'static> = BusName::WellKnown(
+    zbus::names::WellKnownName::from_static_str_unchecked("com.lantharos.Kestrel"),
+);
 
 impl From<anyhow::Error> for Error {
     fn from(error: anyhow::Error) -> Self {
@@ -31,19 +39,39 @@ fn language_name(code: &str) -> &'static str {
 
 pub struct Dictation {
     hub: Arc<Hub>,
+    bus: DBusProxy<'static>,
+}
+
+impl Dictation {
+    async fn require_shell(&self, header: &Header<'_>) -> Result<(), Error> {
+        let owner = self.bus.get_name_owner(SHELL).await.ok();
+        match (owner, header.sender()) {
+            (Some(owner), Some(sender)) if *owner == *sender => Ok(()),
+            _ => Err(Error::NotAllowed(
+                "Only the desktop can take dictation".into(),
+            )),
+        }
+    }
 }
 
 pub struct Models {
     hub: Arc<Hub>,
 }
 
-pub fn serve(hub: &Arc<Hub>) -> (Dictation, Models) {
-    (Dictation { hub: hub.clone() }, Models { hub: hub.clone() })
+pub fn serve(hub: &Arc<Hub>, bus: DBusProxy<'static>) -> (Dictation, Models) {
+    (
+        Dictation {
+            hub: hub.clone(),
+            bus,
+        },
+        Models { hub: hub.clone() },
+    )
 }
 
 #[interface(name = "com.lantharos.Speech1")]
 impl Dictation {
-    async fn start(&self, layout: String) -> Result<(), Error> {
+    async fn start(&self, #[zbus(header)] header: Header<'_>, layout: String) -> Result<(), Error> {
+        self.require_shell(&header).await?;
         let plan = Plan::now(
             Some(layout.as_str()).filter(|layout| !layout.is_empty()),
             self.hub.processor,
@@ -64,7 +92,8 @@ impl Dictation {
         Ok(())
     }
 
-    async fn stop(&self) -> Result<String, Error> {
+    async fn stop(&self, #[zbus(header)] header: Header<'_>) -> Result<String, Error> {
+        self.require_shell(&header).await?;
         let session = self.hub.session.lock().await.take();
         match session {
             Some(session) => Ok(session.finish().await?),
@@ -72,10 +101,12 @@ impl Dictation {
         }
     }
 
-    async fn cancel(&self) {
+    async fn cancel(&self, #[zbus(header)] header: Header<'_>) -> Result<(), Error> {
+        self.require_shell(&header).await?;
         if let Some(session) = self.hub.session.lock().await.take() {
             session.cancel();
         }
+        Ok(())
     }
 }
 

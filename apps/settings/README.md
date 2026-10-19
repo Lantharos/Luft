@@ -14,19 +14,7 @@ bun run desktop:bundle   # Sabine bundle
 sabine install --bundle .
 ```
 
-Installing registers the `kestrel-settings:` link scheme. If Settings is already open, a link switches the window to that page.
-
-## Links
-
-| Link | Opens |
-|------|-------|
-| `kestrel-settings:<page>` | A page: `network`, `bluetooth`, `display`, `sound`, `power`, `appearance`, `notifications`, `keyboard`, `mouse`, `accessibility`, `apps`, `privacy`, `security`, `datetime`, `users`, `accounts`, `login`, `updates`, `about` |
-| `kestrel-settings:appearance/fonts` | All fonts |
-| `kestrel-settings:appearance/cursors` | Cursor themes |
-| `kestrel-settings:appearance/taskbar` | Taskbar |
-| `kestrel-settings:accounts/add` | Adding an account |
-
-A link to a page for missing hardware, such as Bluetooth without an adapter, explains that instead.
+Installing registers the `kestrel-settings:` link scheme, which [opens a page](https://docs.luft.computer/developers/links/) from another app.
 
 ## Automatic updates
 

@@ -57,10 +57,10 @@ For virtual machines with [virt-manager](https://flathub.org/apps/org.virt_manag
 schelf install --system libvirt-daemon-kvm libvirt-daemon-config-network libvirt-client
 ```
 
-Luft builds a system extension from the packages and what they need, checks Fedora's signatures on every one, and lays it over the system, so their services start right away and with every start after. Schelf lists them under Installed, System, where they can be removed too.
+Luft downloads the packages and what they need from Fedora, checks Fedora's signature on every one, and adds them to the system without changing Luft itself, so their services start right away and with every start after. Schelf lists them under Installed, System, where they can be removed too.
 
 - **Services start by themselves.** Where Fedora has a say, such as starting Docker only when it's first used, that's what happens. Otherwise the services of the packages you asked for start with the computer, while those of packages that only came along stay off until something needs them. To keep one from starting, run `sudo systemctl mask` with its name.
-- **Updates bring them along.** When an update of Luft downloads, the system packages are built again for it, with their newest versions, before you restart. The version before keeps its own copy, so going back to it works as it did. If an update starts before they're ready, they're built as soon as the computer is online.
+- **Updates bring them along.** When an update of Luft downloads, the system packages are built again for it, with their newest versions, before you restart. The version before keeps its own copy, so going back to it brings its packages along. If an update starts before they're ready, they're built as soon as the computer is online.
 - **Removing one leaves the system as it was.** Its services stop, and what it added goes: its settings in `/etc`, its data in `/var`, and the users and groups it made. Removing libvirt stops and deletes its virtual machines, and removing Docker its images and containers. A service can still leave something it made on its own in a place nobody could tell was its, such as the empty `/etc/cni` Docker's containerd makes, and network changes such as Docker's bridge last until the next restart.
 - **The list is yours.** `/var/lib/luft/system-packages/packages` lists the packages you asked for, one per line.
 
@@ -111,7 +111,7 @@ $ dnf install ripgrep
 Luft installs this with Schelf, into your account. Install ripgrep? [Y/n]
 ```
 
-Removing and searching work the same way. Asking to upgrade the system points to Settings, and read-only commands such as `dnf info`, `dnf list` and `dnf provides` work as they always do.
+Removing and searching work the same way. Asking to upgrade the system points to Settings, and read-only commands such as `dnf info`, `dnf list` and `dnf provides` work normally.
 
 ## Fonts and cursors
 
@@ -120,4 +120,4 @@ Removing and searching work the same way. Asking to upgrade the system points to
 
 ## What doesn't work
 
-`dnf install` doesn't change the system itself, by design: the system is the same signed image on every computer, so it can be checked at every start and updated or rolled back as a whole. That's why `dnf install` offers Schelf instead, and why system packages are laid over the image rather than installed into it. Drivers and the rest of the system come with Luft's updates.
+`dnf install` doesn't change the system itself, by design: the system is the same signed image on every computer, so it can be checked at every start and updated or rolled back as a whole. That's why `dnf install` offers Schelf instead, and why system packages sit beside the image rather than inside it. Drivers and the rest of the system come with Luft's updates.

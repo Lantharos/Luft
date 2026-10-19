@@ -1,4 +1,5 @@
 mod cache;
+mod child;
 mod generate;
 mod priority;
 mod raster;
@@ -8,7 +9,6 @@ mod system;
 
 use std::collections::{HashMap, HashSet, VecDeque};
 use std::path::PathBuf;
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::{self, Receiver, RecvTimeoutError, Sender};
 use std::sync::{Arc, Once, OnceLock};
 use std::thread;
@@ -19,6 +19,7 @@ use serde::Serialize;
 
 use crate::bridge::events::Events;
 pub use cache::ThumbnailSize;
+use child::Cancellation;
 use generate::Ready;
 use system::Registry;
 
@@ -34,14 +35,14 @@ struct Batch {
 struct State {
     size: Option<ThumbnailSize>,
     queue: VecDeque<PathBuf>,
-    running: HashMap<PathBuf, Arc<AtomicBool>>,
+    running: HashMap<PathBuf, Arc<Cancellation>>,
 }
 
 impl State {
     fn cancel_running(&self, keep: impl Fn(&PathBuf) -> bool) {
-        for (path, cancelled) in &self.running {
+        for (path, cancellation) in &self.running {
             if !keep(path) {
-                cancelled.store(true, Ordering::Release);
+                cancellation.cancel();
             }
         }
     }
@@ -112,9 +113,8 @@ impl Inner {
     fn work(&self) {
         let registry = self.registry.get_or_init(Registry::load);
         loop {
-            let (path, size, cancelled) = self.next_job();
-            let ready =
-                generate::thumbnail(&path, size, registry, || cancelled.load(Ordering::Acquire));
+            let (path, size, cancellation) = self.next_job();
+            let ready = generate::thumbnail(&path, size, registry, &cancellation);
             let current = {
                 let mut state = self.state.lock();
                 state.running.remove(&path);
@@ -126,15 +126,17 @@ impl Inner {
         }
     }
 
-    fn next_job(&self) -> (PathBuf, ThumbnailSize, Arc<AtomicBool>) {
+    fn next_job(&self) -> (PathBuf, ThumbnailSize, Arc<Cancellation>) {
         let mut state = self.state.lock();
         loop {
             if let Some(size) = state.size
                 && let Some(path) = state.queue.pop_front()
             {
-                let cancelled = Arc::new(AtomicBool::new(false));
-                state.running.insert(path.clone(), cancelled.clone());
-                return (path, size, cancelled);
+                let cancellation = Arc::default();
+                state
+                    .running
+                    .insert(path.clone(), Arc::clone(&cancellation));
+                return (path, size, cancellation);
             }
             self.available.wait(&mut state);
         }

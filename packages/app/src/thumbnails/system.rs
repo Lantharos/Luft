@@ -6,16 +6,15 @@ use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
 use std::sync::Arc;
-use std::thread;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 use image::DynamicImage;
 use parking_lot::Mutex;
 
 use super::cache::{Source, ThumbnailSize};
+use super::child::{Cancellation, Ending};
 use super::sandbox::Sandbox;
 
-const POLL_INTERVAL: Duration = Duration::from_millis(25);
 const TIMEOUT: Duration = Duration::from_secs(30);
 const ENTRY_SECTION: &str = "[Thumbnailer Entry]";
 
@@ -88,7 +87,7 @@ impl Thumbnailer {
         &self,
         source: &Source,
         size: ThumbnailSize,
-        cancelled: impl Fn() -> bool,
+        cancellation: &Cancellation,
     ) -> Result<DynamicImage, Failure> {
         let failed = |error: io::Error| Failure::Failed(error.to_string());
         let sandbox = Sandbox::new().map_err(failed)?;
@@ -101,29 +100,19 @@ impl Thumbnailer {
         let (program, arguments) = arguments
             .split_first()
             .ok_or_else(|| Failure::Failed("Empty thumbnailer command".to_string()))?;
-        let mut child = sandbox
+        let child = sandbox
             .command(&source.path, program, arguments)
             .map_err(failed)?
             .stdout(Stdio::null())
             .stderr(Stdio::null())
             .spawn()
             .map_err(failed)?;
-        let started = Instant::now();
-        let status = loop {
-            if let Some(status) = child.try_wait().map_err(failed)? {
-                break status;
+        let status = match cancellation.wait(child, TIMEOUT).map_err(failed)? {
+            Ending::Exited(status) => status,
+            Ending::Cancelled => return Err(Failure::Cancelled),
+            Ending::TimedOut => {
+                return Err(Failure::Failed("The thumbnailer took too long".to_string()));
             }
-            let expired = started.elapsed() >= TIMEOUT;
-            if expired || cancelled() {
-                let _ = child.kill();
-                let _ = child.wait();
-                return Err(if expired {
-                    Failure::Failed("The thumbnailer took too long".to_string())
-                } else {
-                    Failure::Cancelled
-                });
-            }
-            thread::sleep(POLL_INTERVAL);
         };
         if !status.success() {
             return Err(Failure::Failed(format!("{program} exited with {status}")));

@@ -5,6 +5,7 @@ use std::path::{Path, PathBuf};
 use serde::Serialize;
 
 use super::cache::{self, Source, ThumbnailSize};
+use super::child::Cancellation;
 use super::raster;
 use super::system::{Failure, Registry};
 
@@ -21,7 +22,7 @@ pub(super) fn thumbnail(
     path: &Path,
     size: ThumbnailSize,
     registry: &Registry,
-    cancelled: impl Fn() -> bool,
+    cancellation: &Cancellation,
 ) -> Option<Ready> {
     let source = Source::new(path.to_path_buf())?;
     if source.is_cache_file() {
@@ -45,7 +46,7 @@ pub(super) fn thumbnail(
         let Some(thumbnailer) = registry.find(&mime) else {
             return mime.starts_with("image/").then(|| ready(None));
         };
-        match thumbnailer.run(&source, size, cancelled) {
+        match thumbnailer.run(&source, size, cancellation) {
             Ok(image) => raster::fit(image, size.pixels()),
             Err(Failure::Cancelled) => return None,
             Err(Failure::Failed(error)) => Err(error),

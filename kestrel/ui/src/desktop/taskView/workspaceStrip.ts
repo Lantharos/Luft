@@ -18,63 +18,82 @@ function isWindowSource(source: unknown): source is WindowDragSource {
   return (source as WindowDragSource | null)?.window instanceof Meta.Window;
 }
 
-export class WorkspaceStrip {
-  readonly actor = new St.BoxLayout({ style_class: 'kestrel-task-workspaces', x_align: Clutter.ActorAlign.CENTER });
+class WorkspaceThumbnail {
+  readonly card: St.Button;
+  private readonly windows = new Clutter.Actor();
+  private readonly background: { destroy(): void };
+  private shown: Meta.Window[] = [];
 
-  private backgrounds: { destroy(): void }[] = [];
-
-  constructor(private readonly createBackground: BackgroundFactory, private readonly boardFrame: BoardFrames) {}
-
-  clear(): void {
-    for (const background of this.backgrounds) background.destroy();
-    this.backgrounds = [];
-    this.actor.destroy_all_children();
-  }
-
-  build(monitor: Monitor): void {
-    this.clear();
-    const shell = global as unknown as Shell.Global;
-    const manager = shell.workspace_manager;
-    const active = manager.get_active_workspace();
+  constructor(readonly workspace: Meta.Workspace, index: number, private readonly monitor: Monitor, createBackground: BackgroundFactory) {
     const width = Math.round(THUMBNAIL_HEIGHT * monitor.width / monitor.height);
-    for (let index = 0; index < manager.n_workspaces; index++) {
-      const workspace = manager.get_workspace_by_index(index)!;
-      const thumbnail = this.thumbnail(workspace, monitor, width);
-      const body = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-task-workspace-body' });
-      body.add_child(thumbnail);
-      body.add_child(new St.Label({ text: `Desktop ${index + 1}`, style_class: 'kestrel-task-workspace-label', x_align: Clutter.ActorAlign.CENTER }));
-      const card = new St.Button({ style_class: 'kestrel-task-workspace', child: body, can_focus: true, track_hover: true,
-        accessible_name: `Desktop ${index + 1}` });
-      if (workspace === active) card.add_style_pseudo_class('checked');
-      card.connect('clicked', () => workspace.activate(shell.get_current_time()));
-      this.acceptWindows(card, workspace);
-      this.actor.add_child(card);
-    }
-  }
-
-  private thumbnail(workspace: Meta.Workspace, monitor: Monitor, width: number): St.Widget {
     const scale = width / monitor.width;
     const thumbnail = new St.Widget({ style_class: 'kestrel-task-thumbnail', width, height: THUMBNAIL_HEIGHT, clip_to_allocation: true });
     const contents = new Clutter.Actor({ width: monitor.width, height: monitor.height, scale_x: scale, scale_y: scale });
     thumbnail.add_child(contents);
-    this.backgrounds.push(this.createBackground(contents, monitor.index));
-    const board = this.boardFrame(workspace);
-    const layer = board ? new Clutter.Actor({
-      scale_x: board.scale,
-      scale_y: board.scale,
-      translation_x: board.viewportX - monitor.x - board.x * board.scale,
-      translation_y: board.viewportY - monitor.y - board.y * board.scale,
-    }) : contents;
-    if (board) contents.add_child(layer);
-    const windows = workspace.list_windows()
-      .filter(window => !window.minimized && !window.skip_taskbar && (board || window.get_monitor() === monitor.index));
-    for (const window of (global as unknown as Shell.Global).display.sort_windows_by_stacking(windows)) {
-      const source = window.get_compositor_private() as Meta.WindowActor | null;
-      if (!source) continue;
+    this.background = createBackground(contents, monitor.index);
+    contents.add_child(this.windows);
+    const body = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-task-workspace-body' });
+    body.add_child(thumbnail);
+    body.add_child(new St.Label({ text: `Desktop ${index + 1}`, style_class: 'kestrel-task-workspace-label', x_align: Clutter.ActorAlign.CENTER }));
+    this.card = new St.Button({ style_class: 'kestrel-task-workspace', child: body, can_focus: true, track_hover: true,
+      accessible_name: `Desktop ${index + 1}` });
+    this.card.connect('clicked', () => workspace.activate((global as unknown as Shell.Global).get_current_time()));
+  }
+
+  sync(active: boolean, board: BoardFrame | null): void {
+    if (active) this.card.add_style_pseudo_class('checked');
+    else this.card.remove_style_pseudo_class('checked');
+    const { monitor } = this;
+    this.windows.set({
+      scale_x: board?.scale ?? 1,
+      scale_y: board?.scale ?? 1,
+      translation_x: board ? board.viewportX - monitor.x - board.x * board.scale : -monitor.x,
+      translation_y: board ? board.viewportY - monitor.y - board.y * board.scale : -monitor.y,
+    });
+    const shell = global as unknown as Shell.Global;
+    const windows = shell.display.sort_windows_by_stacking(this.workspace.list_windows()
+      .filter(window => !window.minimized && !window.skip_taskbar && window.get_compositor_private() && (board || window.get_monitor() === monitor.index)));
+    if (windows.length === this.shown.length && windows.every((window, index) => window === this.shown[index])) return;
+    this.shown = windows;
+    this.windows.destroy_all_children();
+    for (const window of windows) {
       const buffer = window.get_buffer_rect();
-      layer.add_child(new Clutter.Clone({ source, x: board ? buffer.x : buffer.x - monitor.x, y: board ? buffer.y : buffer.y - monitor.y }));
+      this.windows.add_child(new Clutter.Clone({ source: window.get_compositor_private() as Meta.WindowActor, x: buffer.x, y: buffer.y }));
     }
-    return thumbnail;
+  }
+
+  destroy(): void {
+    this.background.destroy();
+    this.card.destroy();
+  }
+}
+
+export class WorkspaceStrip {
+  readonly actor = new St.BoxLayout({ style_class: 'kestrel-task-workspaces', x_align: Clutter.ActorAlign.CENTER });
+
+  private thumbnails: WorkspaceThumbnail[] = [];
+
+  constructor(private readonly createBackground: BackgroundFactory, private readonly boardFrame: BoardFrames) {}
+
+  clear(): void {
+    for (const thumbnail of this.thumbnails) thumbnail.destroy();
+    this.thumbnails = [];
+  }
+
+  sync(monitor: Monitor): void {
+    const manager = (global as unknown as Shell.Global).workspace_manager;
+    const workspaces = Array.from({ length: manager.n_workspaces }, (_, index) => manager.get_workspace_by_index(index)!);
+    if (workspaces.length !== this.thumbnails.length || workspaces.some((workspace, index) => this.thumbnails[index].workspace !== workspace)) {
+      this.clear();
+      this.thumbnails = workspaces.map((workspace, index) => {
+        const thumbnail = new WorkspaceThumbnail(workspace, index, monitor, this.createBackground);
+        this.acceptWindows(thumbnail.card, workspace);
+        this.actor.add_child(thumbnail.card);
+        return thumbnail;
+      });
+    }
+    const active = manager.get_active_workspace();
+    for (const thumbnail of this.thumbnails) thumbnail.sync(thumbnail.workspace === active, this.boardFrame(thumbnail.workspace));
   }
 
   private acceptWindows(card: St.Button, workspace: Meta.Workspace): void {

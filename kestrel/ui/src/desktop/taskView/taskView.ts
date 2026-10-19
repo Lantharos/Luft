@@ -26,10 +26,10 @@ export class TaskView {
   private readonly shown = new St.Adjustment({ actor: this.actor, lower: -STRETCH, upper: 1 + STRETCH, value: 0 });
   private readonly strip: WorkspaceStrip;
   private readonly hidden = new Map<Meta.WindowActor, { opacity: number; destroyed: number }>();
-  private cards: WindowCard[] = [];
+  private readonly cards = new Map<Meta.Window, WindowCard>();
   private monitor: Monitor | null = null;
   private signals: [GObject.Object, number][] = [];
-  private rebuildSource = 0;
+  private syncSource = 0;
 
   constructor(background: BackgroundFactory, boardFrame: BoardFrames, private readonly dismiss: () => void, private readonly activateWindow: (window: Meta.Window) => void) {
     blurSurface(this.scrim, 0);
@@ -63,15 +63,15 @@ export class TaskView {
     this.cover(monitor);
     const shell = global as unknown as Shell.Global;
     const manager = shell.workspace_manager;
-    const rebuild = () => this.scheduleRebuild();
+    const sync = () => this.scheduleSync();
     this.signals = [
-      [manager, manager.connect('active-workspace-changed', rebuild)],
-      [manager, manager.connect('workspace-added', rebuild)],
-      [manager, manager.connect('workspace-removed', rebuild)],
-      [shell.display, shell.display.connect('window-created', rebuild)],
+      [manager, manager.connect('active-workspace-changed', sync)],
+      [manager, manager.connect('workspace-added', sync)],
+      [manager, manager.connect('workspace-removed', sync)],
+      [shell.display, shell.display.connect('window-created', sync)],
       [shell.display, shell.display.connect('restacked', () => this.restack())],
     ];
-    this.rebuild();
+    this.sync();
     if (!reducedMotion()) this.hideWindows();
     this.actor.get_parent()!.set_child_above_sibling(this.actor, null);
     if (!this.actor.visible) {
@@ -106,7 +106,7 @@ export class TaskView {
       return;
     }
     this.cover(monitor);
-    this.rebuild();
+    this.sync();
     this.monitor = null;
     paintHidden(this.actor, this.actor);
     this.clearCards();
@@ -118,8 +118,8 @@ export class TaskView {
     this.monitor = null;
     for (const [object, id] of this.signals) object.disconnect(id);
     this.signals = [];
-    if (this.rebuildSource) GLib.Source.remove(this.rebuildSource);
-    this.rebuildSource = 0;
+    if (this.syncSource) GLib.Source.remove(this.syncSource);
+    this.syncSource = 0;
     const finish = () => {
       if (this.monitor) return;
       this.actor.hide();
@@ -152,17 +152,17 @@ export class TaskView {
     const shown = this.shown.value;
     this.scrim.opacity = opacityAt(shown);
     this.strip.actor.opacity = opacityAt(shown);
-    for (const card of this.cards) card.morph(shown);
+    for (const card of this.cards.values()) card.morph(shown);
   }
 
   private restack(): void {
     const order = new Map((global as unknown as Shell.Global).get_window_actors().map((actor, index) => [actor.meta_window, index]));
-    const stacked = [...this.cards].sort((a, b) => (order.get(a.window) ?? 0) - (order.get(b.window) ?? 0));
+    const stacked = [...this.cards.values()].sort((a, b) => (order.get(a.window) ?? 0) - (order.get(b.window) ?? 0));
     for (const card of stacked) this.windowLayer.set_child_above_sibling(card.actor, null);
   }
 
   private hideWindows(): void {
-    for (const card of this.cards) {
+    for (const card of this.cards.values()) {
       const actor = card.window.get_compositor_private() as Meta.WindowActor | null;
       if (!actor || this.hidden.has(actor)) continue;
       this.hidden.set(actor, { opacity: actor.opacity, destroyed: actor.connect('destroy', () => this.hidden.delete(actor)) });
@@ -205,36 +205,43 @@ export class TaskView {
     this.scrim.set_size(monitor.width, monitor.height);
   }
 
-  private scheduleRebuild(): void {
-    if (this.rebuildSource) return;
-    this.rebuildSource = GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
-      this.rebuildSource = 0;
+  private scheduleSync(): void {
+    if (this.syncSource) return;
+    this.syncSource = GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
+      this.syncSource = 0;
       if (!this.monitor) return GLib.SOURCE_REMOVE;
-      this.rebuild();
+      this.sync();
       if (!reducedMotion()) this.hideWindows();
       return GLib.SOURCE_REMOVE;
     });
   }
 
   private clearCards(): void {
-    for (const card of this.cards) card.destroy();
-    this.cards = [];
+    for (const card of this.cards.values()) card.destroy();
+    this.cards.clear();
   }
 
-  private rebuild(): void {
+  private sync(): void {
     const monitor = this.monitor!;
-    const shell = global as unknown as Shell.Global;
-    const focused = shell.stage.get_key_focus();
-    const focusedWindow = this.cards.find(card => card.actor === focused)?.window;
+    const stage = (global as unknown as Shell.Global).stage;
+    const focused = stage.get_key_focus();
     const focusInside = !!focused && this.actor.contains(focused);
-    this.clearCards();
     const windows = this.activeWindows();
-    this.cards = windows.map(window => new WindowCard(window, () => {
-      this.dismiss();
-      this.activateWindow(window);
-    }, () => this.scheduleRebuild()));
-    for (const card of this.cards) this.windowLayer.add_child(card.actor);
-    this.strip.build(monitor);
+    for (const [window, card] of this.cards) {
+      if (windows.includes(window)) continue;
+      card.destroy();
+      this.cards.delete(window);
+    }
+    for (const window of windows) {
+      if (this.cards.has(window)) continue;
+      const card = new WindowCard(window, () => {
+        this.dismiss();
+        this.activateWindow(window);
+      }, () => this.scheduleSync());
+      this.cards.set(window, card);
+      this.windowLayer.add_child(card.actor);
+    }
+    this.strip.sync(monitor);
 
     const width = monitor.width;
     const height = monitor.height;
@@ -246,11 +253,10 @@ export class TaskView {
     this.windowLayer.set_size(width, stripY);
     const area = { x: MARGIN, y: MARGIN, width: width - 2 * MARGIN, height: stripY - 2 * MARGIN };
     const slots = windowSlots(windows.map(window => window.get_frame_rect()), area, SPACING, CARD_HEADER);
-    this.cards.forEach((card, index) => card.place(slots[index], monitor));
+    windows.forEach((window, index) => this.cards.get(window)!.place(slots[index], monitor));
     this.restack();
     this.morph();
-    const restore = this.cards.find(card => card.window === focusedWindow);
-    if (restore) restore.actor.grab_key_focus();
-    else if (focusInside) this.actor.grab_key_focus();
+    const focus = stage.get_key_focus();
+    if (focusInside && !(focus && this.actor.contains(focus))) this.actor.grab_key_focus();
   }
 }

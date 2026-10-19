@@ -113,7 +113,6 @@ export class Board implements BoardActions {
     uiGroup.insert_child_below(this.backdrop.actor, shell().window_group);
     uiGroup.insert_child_above(this.input.shield, shell().window_group);
     host.addChrome(this.corner.actor);
-    this.backdrop.build(host.monitors());
     const manager = shell().workspace_manager;
     this.managerSignal = manager.connect('active-workspace-changed', () => this.syncWorkspace());
   }
@@ -167,7 +166,7 @@ export class Board implements BoardActions {
   }
 
   monitorsChanged(): void {
-    this.backdrop.build(this.host.monitors());
+    this.backdrop.monitorsChanged(this.host.monitors());
     if (this.presented) this.present(this.presented);
   }
 
@@ -477,6 +476,7 @@ export class Board implements BoardActions {
     const primary = this.host.primary();
     this.input.shield.set_position(viewport.x, viewport.y);
     this.input.shield.set_size(viewport.width, viewport.height);
+    this.backdrop.prepare(this.host.monitors());
     this.camera.engage(canvas.view, shell().display.get_monitor_scale(primary?.index ?? 0));
     this.cover(fade);
     this.host.wallpaper.hide();

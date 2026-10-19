@@ -144,9 +144,16 @@ export class Backdrop {
     for (const monitor of this.monitors) monitor.setTile(this.tile, this.brightness);
   }
 
-  build(monitors: Monitor[]): void {
-    for (const monitor of this.monitors) monitor.destroy();
-    for (const wallpaper of this.wallpapers) wallpaper.destroy();
+  prepare(monitors: Monitor[]): void {
+    if (!this.monitors.length) this.build(monitors);
+  }
+
+  monitorsChanged(monitors: Monitor[]): void {
+    if (this.monitors.length) this.build(monitors);
+  }
+
+  private build(monitors: Monitor[]): void {
+    this.clear();
     this.monitors = monitors.map(monitor => {
       const backdrop = new MonitorBackdrop(monitor, this.createBackground, this.tile);
       backdrop.setTile(this.tile, this.brightness);
@@ -173,10 +180,14 @@ export class Backdrop {
   }
 
   destroy(): void {
+    this.clear();
+    this.actor.destroy();
+  }
+
+  private clear(): void {
     for (const monitor of this.monitors) monitor.destroy();
     for (const wallpaper of this.wallpapers) wallpaper.destroy();
     this.monitors = [];
     this.wallpapers = [];
-    this.actor.destroy();
   }
 }

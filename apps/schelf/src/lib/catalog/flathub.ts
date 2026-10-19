@@ -54,7 +54,7 @@ interface Summary {
 const PREFERRED_WIDTH = 752;
 const PAGE_SIZE = 48;
 
-export function toApp(hit: Hit): CatalogApp {
+function toApp(hit: Hit): CatalogApp {
 	return {
 		key: `flathub:${hit.app_id}`,
 		origin: 'flathub',

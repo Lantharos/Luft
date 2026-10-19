@@ -4,7 +4,7 @@ import Meta from 'gi://Meta';
 import type Shell from 'gi://Shell';
 import St from 'gi://St';
 
-export const RESIZE_MARGIN = 8;
+const RESIZE_MARGIN = 8;
 const CORNER_REACH = 20;
 
 interface Zone {

@@ -8,7 +8,7 @@ const SETTLE_SECONDS = 60;
 const SHORTEST_ESTIMATE = 60;
 const LONGEST_ESTIMATE = 24 * 3600;
 
-export type BatteryStatus = 'charging' | 'full' | 'plugged' | 'discharging';
+type BatteryStatus = 'charging' | 'full' | 'plugged' | 'discharging';
 
 export interface BatteryState {
   percentage: number;

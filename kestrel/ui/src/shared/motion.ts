@@ -25,11 +25,6 @@ export function animateAdjustment(adjustment: St.Adjustment, target: number, par
   (adjustment as EasingAdjustment).ease(target, params);
 }
 
-export function springVelocity(actor: Clutter.Actor, property: string): number {
-  const transition = actor.get_transition(property) as (Clutter.Transition & { get_velocity?: () => number }) | null;
-  return transition?.get_velocity?.() ?? 0;
-}
-
 export function liftIcon(button: St.Button, icon: Clutter.Actor): void {
   icon.set_pivot_point(0.5, 0.5);
   const update = () => animateActor(icon, {

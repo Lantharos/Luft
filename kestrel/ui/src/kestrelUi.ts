@@ -47,7 +47,7 @@ export { battery } from './shared/battery/battery.js';
 export { accelerometer } from './desktop/rotation/accelerometer.js';
 export { useStandInAccounts } from './system/standIn/accounts.js';
 export { standInBus } from './system/standIn/bus.js';
-export { afterMotion, holdMotion } from './shared/afterMotion.js';
+export { holdMotion } from './shared/afterMotion.js';
 export { Curve, Duration, Gesture, projection, reducedMotion, rubberband, Spring } from './shared/motion.js';
 export { SwipeAway } from './surfaces/notifications/swipeAway.js';
 export { published as portalPublished } from './portal/backend.js';

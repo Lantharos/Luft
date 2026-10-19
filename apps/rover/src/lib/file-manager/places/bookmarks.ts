@@ -7,7 +7,7 @@ export function isPinned(path: string) {
 	return settings.value.pinnedFolders.some((bookmark) => bookmark.path === path);
 }
 
-export function pin(bookmarks: PinnedFolder[]) {
+function pin(bookmarks: PinnedFolder[]) {
 	settings.update((current) => {
 		const known = new Set(current.pinnedFolders.map((bookmark) => bookmark.path));
 		return { ...current, pinnedFolders: [...current.pinnedFolders, ...bookmarks.filter((bookmark) => !known.has(bookmark.path))] };

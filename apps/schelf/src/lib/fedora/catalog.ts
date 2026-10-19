@@ -2,7 +2,7 @@ import type { Backend, FedoraSummary } from '#lib/bridge/types.js';
 import type { AppDetails, CatalogApp } from '#lib/catalog/types.js';
 import type { Category } from '#lib/catalog/categories.js';
 
-export function toApp(app: FedoraSummary): CatalogApp {
+function toApp(app: FedoraSummary): CatalogApp {
 	return {
 		key: `fedora:${app.id}`,
 		origin: 'fedora',

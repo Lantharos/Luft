@@ -15,12 +15,6 @@ export interface DecodedText {
 	lineEnding: LineEnding;
 }
 
-export class BinaryFileError extends Error {
-	constructor() {
-		super('This file doesn’t contain text');
-	}
-}
-
 function byteOrderMark(bytes: Uint8Array) {
 	return BOMS.find((bom) => bom.bytes.every((byte, index) => bytes[index] === byte))?.encoding ?? null;
 }
@@ -41,7 +35,7 @@ function strictUtf8(bytes: Uint8Array) {
 export async function decode(bytes: Uint8Array, path: string, backend: Backend, forced?: string): Promise<DecodedText> {
 	const marked = byteOrderMark(bytes);
 	const encoding = forced ?? marked;
-	if (!encoding?.startsWith('utf-16') && bytes.subarray(0, SNIFF_BYTES).includes(0)) throw new BinaryFileError();
+	if (!encoding?.startsWith('utf-16') && bytes.subarray(0, SNIFF_BYTES).includes(0)) throw new Error('This file doesn’t contain text');
 	const text = encoding ? new TextDecoder(encoding).decode(bytes) : strictUtf8(bytes);
 	if (text !== null) return { text, encoding: encoding ?? 'utf-8', bom: marked !== null && marked === encoding, lineEnding: lineEnding(text) };
 	const detected = await backend.detectEncoding(path);

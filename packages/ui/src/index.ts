@@ -14,7 +14,7 @@ export { default as Slider } from './controls/Slider.svelte';
 export { default as Switch } from './controls/Switch.svelte';
 export { default as TextField } from './controls/TextField.svelte';
 
-export { Curve, Gesture, motionPreference, projection, rubberband, Spring, SpringValue, type MotionPreference, type SpringOptions, type SpringToken } from './motion';
+export { Curve, Gesture, projection, rubberband, Spring, SpringValue, type SpringToken } from './motion';
 
 export { default as AppIcon } from './media/AppIcon.svelte';
 export { default as Avatar } from './media/Avatar.svelte';
@@ -58,7 +58,7 @@ export { selectionPill } from './motion/pill';
 export { dialog, fade, item, menu, page, toast } from './motion/transitions';
 
 export { default as Toast } from './notices/Toast.svelte';
-export { Toasts, type ToastAction, type ToastMessage } from './notices/toasts.svelte';
+export { Toasts, type ToastMessage } from './notices/toasts.svelte';
 
 export { ago, bytes, memoryBytes, plural, watts } from './text/format';
 export { renderMarkdown } from './text/markdown';
@@ -70,5 +70,5 @@ export { droppedPaths, fileDrop } from './shell/fileDrop';
 export { default as GlassShell } from './shell/GlassShell.svelte';
 export { default as WindowControls } from './shell/WindowControls.svelte';
 
-export type { Rect as VirtualRect, VirtualHandle, VirtualLayout } from './virtual/layout';
+export type { Rect as VirtualRect, VirtualHandle } from './virtual/layout';
 export { default as VirtualScroller } from './virtual/VirtualScroller.svelte';

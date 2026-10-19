@@ -68,7 +68,6 @@
 {#if result && 'binary' in result}
 	<p class="preview-note">This file can’t be shown as text.</p>
 {:else if html}
-	<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 	<article class={['preview-markdown', full ? 'is-full' : 'is-compact']} onclickcapture={followLink}>{@html html}</article>
 {:else if result && !(markdown && text)}
 	<pre class={['preview-code', full ? 'is-full' : 'is-compact']}>{#if highlighted}{@html highlighted.html}{highlighted.rest}{:else}{text}{/if}{#if full && result.truncated}<span class="preview-code__more">…</span>{/if}</pre>

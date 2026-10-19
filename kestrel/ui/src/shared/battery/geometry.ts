@@ -28,7 +28,7 @@ export interface GeometryOptions {
   family: string;
 }
 
-export function levelFont(family: string, size: number): Pango.FontDescription {
+function levelFont(family: string, size: number): Pango.FontDescription {
   const font = Pango.FontDescription.from_string(family);
   font.set_weight(Pango.Weight.BOLD);
   font.set_absolute_size(size * Pango.SCALE);

@@ -21,7 +21,7 @@ Read [How Luft fits together](/developers/architecture/) to find where a change 
 
 ## Licences
 
-Kestrel's engine and the Mutter patches are GPL-2.0-or-later, inherited from GNOME Shell and Mutter. Everything else is MIT unless a folder says otherwise. Open Runde and Maple Mono are under the SIL Open Font License.
+Luft is licensed under the GNU General Public License, version 3 or later. Kestrel's engine and the Mutter patches stay GPL-2.0-or-later, as in GNOME Shell and Mutter. Open Runde and Maple Mono are under the SIL Open Font License. Contributions are accepted under the same licenses.
 
 ## This site
 

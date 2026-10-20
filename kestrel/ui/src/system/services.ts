@@ -8,6 +8,7 @@ import { SystemPrompts } from '../auth/keyring/prompts.js';
 import { PasskeyPrompts } from '../auth/passkeys/service.js';
 import { LoginWallpaper } from '../desktop/wallpaper/loginWallpaper.js';
 import { LaunchFeedback } from '../desktop/windows/launchFeedback.js';
+import { OpenWindows } from '../desktop/windows/openWindows.js';
 import { TitleBars } from '../desktop/windows/titleBars/titleBars.js';
 import { VariableRefresh } from '../desktop/windows/variableRefresh.js';
 import { PortalBackend } from '../portal/backend.js';
@@ -30,6 +31,7 @@ export class SystemServices {
   private readonly batteryWarnings = new BatteryWarnings();
   private readonly plugSounds = new PlugSounds();
   private readonly launchFeedback = new LaunchFeedback();
+  private readonly openWindows = new OpenWindows();
   private readonly variableRefresh = new VariableRefresh();
   private readonly titleBars: TitleBars;
   private readonly loginScreen: { destroy(): void }[];
@@ -72,6 +74,7 @@ export class SystemServices {
     this.batteryWarnings.destroy();
     this.plugSounds.destroy();
     this.launchFeedback.destroy();
+    this.openWindows.destroy();
     this.variableRefresh.destroy();
     this.titleBars.destroy();
     this.portal.destroy();

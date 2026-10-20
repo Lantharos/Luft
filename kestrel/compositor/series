@@ -49,3 +49,4 @@
 0049-wayland-show-and-hide-the-input-panel-as-soon-as-a-t.patch
 0050-core-let-the-shell-play-the-audible-bell.patch
 0051-wayland-deliver-the-cursor-rectangle-of-text-inputs-.patch
+0052-x11-give-up-on-selection-owners-that-stop-answering.patch

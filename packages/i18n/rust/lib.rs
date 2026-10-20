@@ -9,7 +9,7 @@ use fluent_bundle::{FluentMessage, FluentResource};
 use unic_langid::LanguageIdentifier;
 
 pub use fluent_bundle::{FluentArgs, FluentValue};
-pub use locales::{LOCALES, PSEUDO_LOCALE, SOURCE_LOCALE, bcp47, formats, negotiate, requested};
+pub use locales::{LOCALES, PSEUDO_LOCALE, SOURCE_LOCALE, bcp47, formats, negotiate, overridden, requested};
 
 type Bundle = FluentBundle<FluentResource>;
 
@@ -39,6 +39,9 @@ impl Localizer {
     }
 
     pub fn use_locale(&self, requested: &str) {
+        if overridden() {
+            return;
+        }
         let locale = negotiate(&[requested]);
         let mut slot = self.loaded.write().unwrap_or_else(|e| e.into_inner());
         if slot.as_ref().is_none_or(|loaded| loaded.locale != locale) {

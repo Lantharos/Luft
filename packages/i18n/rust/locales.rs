@@ -64,6 +64,10 @@ fn variable(name: &str) -> Option<String> {
     env::var(name).ok().filter(|value| !value.is_empty())
 }
 
+pub fn overridden() -> bool {
+    variable("LUFT_LOCALE").is_some()
+}
+
 pub fn requested() -> Vec<String> {
     if let Some(locale) = variable("LUFT_LOCALE") {
         return vec![locale];

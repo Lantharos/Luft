@@ -77,6 +77,7 @@ impl GlassWindow<'_> {
 pub struct Locale {
     languages: Vec<String>,
     formats: String,
+    fixed: bool,
 }
 
 #[derive(Serialize)]
@@ -96,6 +97,7 @@ impl Appearance {
             locale: Locale {
                 languages: luft_i18n::requested(),
                 formats: luft_i18n::formats(),
+                fixed: luft_i18n::overridden(),
             },
         }
     }

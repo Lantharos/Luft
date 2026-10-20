@@ -13,13 +13,16 @@ function sandboxRoot() {
   return root;
 }
 
+const linkTarget = path => GLib.file_test(path, GLib.FileTest.IS_SYMLINK) ? GLib.file_read_link(path) : path;
+
 function bubblewrap(root, socket, talk, own) {
   const runtime = GLib.get_user_runtime_dir();
+  const cache = linkTarget(GLib.get_user_cache_dir());
   return [
     'bwrap', '--die-with-parent', '--unshare-pid',
     '--ro-bind', '/usr', '/usr', '--ro-bind', '/etc', '/etc',
     '--symlink', 'usr/bin', '/bin', '--symlink', 'usr/sbin', '/sbin', '--symlink', 'usr/lib', '/lib', '--symlink', 'usr/lib64', '/lib64',
-    '--proc', '/proc', '--dev', '/dev', '--bind', '/tmp', '/tmp', '--bind', runtime, runtime, '--bind', root, root,
+    '--proc', '/proc', '--dev', '/dev', '--bind', '/tmp', '/tmp', '--bind', runtime, runtime, '--bind', cache, cache,
     '--ro-bind', GLib.build_filenamev([root, 'flatpak-info']), '/.flatpak-info',
     'xdg-dbus-proxy', GLib.getenv('DBUS_SESSION_BUS_ADDRESS'), socket, '--filter', `--talk=${talk}`,
     ...own ? [`--own=${own}`] : [],

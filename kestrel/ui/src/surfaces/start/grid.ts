@@ -10,6 +10,7 @@ import type { SearchItem, SearchView } from './search/item.js';
 import { animateActor, liftIcon } from '../../shared/motion.js';
 import { appIcon } from '../../appearance/icons/appIcons.js';
 import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
+import { t } from '../../shared/i18n/index.js';
 
 export class StartGrid {
   readonly header = new St.BoxLayout({ style_class: 'kestrel-grid-header' });
@@ -157,7 +158,7 @@ export class StartGrid {
     const folder = !this.searchView && this.folder ? this.layout.folder(this.folder) : undefined;
     this.header.visible = !!folder;
     if (!folder) return;
-    const back = new St.Button({ name: 'kestrel-folder-back', style_class: 'kestrel-folder-back', y_align: Clutter.ActorAlign.START, child: new St.Label({ text: 'Apps', style_class: 'kestrel-section-title' }), can_focus: true, track_hover: true });
+    const back = new St.Button({ name: 'kestrel-folder-back', style_class: 'kestrel-folder-back', y_align: Clutter.ActorAlign.START, child: new St.Label({ text: t('start-apps'), style_class: 'kestrel-section-title' }), can_focus: true, track_hover: true });
     back.connect('clicked', () => this.home());
     this.drag.target(back, source => source.folder ? null : () => { this.layout.move(source.id, null); this.folder = null; });
     this.header.add_child(back);
@@ -233,13 +234,13 @@ export class StartGrid {
     });
     this.menus.bind(button, () => {
       if (folder) return [
-        { label: 'Open folder', run: () => { this.folder = id; this.render(true); } },
-        { label: 'Rename', run: () => { this.folder = id; this.render(true); (this.header.get_last_child() as St.Entry).grab_key_focus(); } },
-        { label: 'Ungroup apps', run: () => { this.layout.dissolve(id); this.render(); } },
+        { label: t('start-folder-open'), run: () => { this.folder = id; this.render(true); } },
+        { label: t('start-folder-rename'), run: () => { this.folder = id; this.render(true); (this.header.get_last_child() as St.Entry).grab_key_focus(); } },
+        { label: t('start-folder-ungroup'), run: () => { this.layout.dissolve(id); this.render(); } },
       ];
       const shellApp = Shell.AppSystem.get_default().lookup_app(id);
-      const entries = shellApp ? this.menus.appEntries(shellApp) : [{ label: 'Open', run: () => this.launch(app!) }];
-      if (this.folder && !this.searchView) entries.push({ label: 'Move to Apps', run: () => { this.layout.move(id, null); this.render(); } });
+      const entries = shellApp ? this.menus.appEntries(shellApp) : [{ label: t('start-open'), run: () => this.launch(app!) }];
+      if (this.folder && !this.searchView) entries.push({ label: t('start-move-to-apps'), run: () => { this.layout.move(id, null); this.render(); } });
       return entries;
     });
     const draggable = this.drag.source(button, { id, folder: !!folder }, () => this.icon(id, 40));

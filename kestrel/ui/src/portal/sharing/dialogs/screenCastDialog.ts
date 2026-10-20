@@ -1,3 +1,4 @@
+import { t } from '../../../shared/i18n/index.js';
 import { openDialog, type PortalDialog } from '../../core/dialog.js';
 import { SUCCESS } from '../../core/request.js';
 import { list } from '../../core/rows.js';
@@ -17,8 +18,8 @@ export async function chooseSources(handle: string, appId: string, selection: Se
   const app = appNames(appId);
   let choice: SourceChoice | null = null;
   const [response] = await openDialog(handle, {
-    title: `Share your screen with ${app.object}?`,
-    description: `${app.subject} will be able to see what you choose.`,
+    title: t('screen-share-title', { appName: app.object }),
+    description: t('screen-share-description', { appName: app.subject }),
     icon: 'screen-shared-symbolic',
     askedBy: appId,
     styleClass: 'kestrel-portal-sharing',
@@ -29,8 +30,8 @@ export async function chooseSources(handle: string, appId: string, selection: Se
     const remember = persistMode === PERSIST_UNTIL_REVOKED ? rememberRow(app.subject) : null;
     if (remember) dialog.content.add_child(list([remember]));
     const [, share] = dialog.buttons([
-      { label: 'Cancel', action: dialog.cancel },
-      { label: 'Share', default: true, action: () => {
+      { label: t('portal-cancel'), action: dialog.cancel },
+      { label: t('portal-share'), default: true, action: () => {
         choice = { sources: sources.selected(), remember: remember?.checked ?? true };
         dialog.finish(SUCCESS);
       } },

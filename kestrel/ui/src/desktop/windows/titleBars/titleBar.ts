@@ -6,6 +6,7 @@ import type Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import { animateActor, Duration } from '../../../shared/motion.js';
+import { localized, t } from '../../../shared/i18n/index.js';
 import { ResizeArea } from './resizeArea.js';
 
 export interface DecoratedWindow extends Meta.Window {
@@ -28,10 +29,11 @@ const PRESSED_SCALE = 0.96;
 const shell = () => global as unknown as Shell.Global;
 const settings = () => shell().stage.get_context().get_settings();
 
-function windowButton(name: string, label: string, activate: () => void): St.Button {
+function windowButton(name: string, labelId: string, activate: () => void): St.Button {
   const icon = new St.Icon({ icon_name: `titlebar-${name}-symbolic`, style_class: 'kestrel-titlebar-icon' });
-  const button = new St.Button({ style_class: `kestrel-titlebar-button kestrel-titlebar-${name}`, accessible_name: label,
+  const button = new St.Button({ style_class: `kestrel-titlebar-button kestrel-titlebar-${name}`,
     child: icon, y_align: Clutter.ActorAlign.CENTER });
+  localized(button, () => (button.accessible_name = t(labelId)));
   button.set_pivot_point(0.5, 0.5);
   button.connect('notify::pressed', () => animateActor(button, {
     scale_x: button.pressed ? PRESSED_SCALE : 1,
@@ -59,9 +61,9 @@ export class TitleBar {
   constructor(private readonly window: DecoratedWindow, private readonly actor: Meta.WindowActor,
     private readonly showMenu: ShowWindowMenu, gone: () => void) {
     this.resizeArea = new ResizeArea(window);
-    this.minimize = windowButton('minimize', 'Minimize', () => window.minimize());
-    this.maximize = windowButton('maximize', 'Maximize', () => this.toggleMaximized());
-    this.close = windowButton('close', 'Close', () => window.delete(shell().get_current_time()));
+    this.minimize = windowButton('minimize', 'title-bar-minimize', () => window.minimize());
+    this.maximize = windowButton('maximize', 'title-bar-maximize', () => this.toggleMaximized());
+    this.close = windowButton('close', 'title-bar-close', () => window.delete(shell().get_current_time()));
     const buttons = new St.BoxLayout({ style_class: 'kestrel-titlebar-buttons' });
     for (const button of [this.minimize, this.maximize, this.close]) buttons.add_child(button);
     this.bar.add_child(this.title);

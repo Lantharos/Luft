@@ -226,7 +226,7 @@ class LanguageSelectionPopup extends NoGrabPopup {
         }
 
         this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        item = this.addSettingsAction(_('Keyboard Settings'), 'keyboard');
+        item = this.addSettingsAction(KestrelUi.t('osk-keyboard-settings'), 'keyboard');
         item.can_focus = false;
     }
 }
@@ -841,7 +841,7 @@ const EmojiSelection = GObject.registerClass({
 
         row.appendRow();
 
-        key = new Key({label: 'ABC', hasAction: true}, []);
+        key = new Key({label: KestrelUi.t('osk-letters-key'), hasAction: true}, []);
         key.keyButton.add_style_class_name('default-key');
         key.connect('released', () => this.emit('toggle'));
         row.appendKey(key, 1.5);

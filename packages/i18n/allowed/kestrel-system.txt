@@ -1,0 +1,4 @@
+kestrel/ui/src/system/network/pluginSecrets.ts	Xauth password
+kestrel/ui/src/system/peek/access/scopes.ts	Program started with peek
+kestrel/ui/src/system/peek/service.ts	The mouse button is 1 (left), 2 (middle) or 3 (right)
+kestrel/ui/src/system/peek/service.ts	Launch needs the process to adopt

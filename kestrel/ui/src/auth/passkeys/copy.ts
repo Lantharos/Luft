@@ -1,3 +1,5 @@
+import { type Args, t } from '../../shared/i18n/index.js';
+
 export type Purpose = 'register' | 'sign-in' | 'manage' | 'registered' | 'choose';
 
 export interface Account {
@@ -19,41 +21,42 @@ export interface Copy {
   icon: string;
 }
 
-function subject(app: string | null): string {
-  return app ?? 'An app';
-}
-
 export function copyFor({ purpose, site, app, accounts }: Request): Copy {
   const account = accounts[0];
+  const asked = (byApp: string, byUnknown: string, args: Args = {}) => app ? t(byApp, { ...args, app }) : t(byUnknown, args);
   switch (purpose) {
     case 'register':
       return {
-        title: `Create a passkey for ${site}?`,
-        description: account ? `${subject(app)} wants to save a passkey for ${account.name || account.displayName}. It stays on this computer.` : `${subject(app)} wants to save a passkey. It stays on this computer.`,
+        title: t('passkeys-register-title', { site }),
+        description: account
+          ? asked('passkeys-register-account-by-app', 'passkeys-register-account', { account: account.name || account.displayName })
+          : asked('passkeys-register-by-app', 'passkeys-register'),
         icon: 'dialog-password-symbolic',
       };
     case 'sign-in':
       return {
-        title: `Sign in to ${site} with your passkey?`,
-        description: accounts.length > 1 ? `${subject(app)} is asking for a passkey. Choose the account to sign in with.` : `${subject(app)} is asking for your passkey.`,
+        title: t('passkeys-sign-in-title', { site }),
+        description: accounts.length > 1
+          ? asked('passkeys-sign-in-choose-by-app', 'passkeys-sign-in-choose')
+          : asked('passkeys-sign-in-by-app', 'passkeys-sign-in'),
         icon: 'dialog-password-symbolic',
       };
     case 'manage':
       return {
-        title: `Let ${app ?? 'this app'} manage your passkeys?`,
-        description: 'It will see which sites you have passkeys for and can remove them.',
+        title: asked('passkeys-manage-title-by-app', 'passkeys-manage-title'),
+        description: t('passkeys-manage-description'),
         icon: 'dialog-password-symbolic',
       };
     case 'registered':
       return {
-        title: `You already have a passkey for ${site}`,
-        description: 'Sign in with the one you have instead.',
+        title: t('passkeys-registered-title', { site }),
+        description: t('passkeys-registered-description'),
         icon: 'dialog-password-symbolic',
       };
     case 'choose':
       return {
-        title: 'Use the passkeys on this computer?',
-        description: `${subject(app)} is asking where your passkey is.`,
+        title: t('passkeys-choose-title'),
+        description: asked('passkeys-choose-by-app', 'passkeys-choose'),
         icon: 'computer-symbolic',
       };
   }

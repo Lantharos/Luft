@@ -3,6 +3,7 @@ import GioUnix from 'gi://GioUnix';
 import Shell from 'gi://Shell';
 
 import type { ContextMenus } from '../../../../desktop/menus/contextMenus.js';
+import { t } from '../../../../shared/i18n/index.js';
 import { appKey } from '../../../../shared/launchHistory.js';
 import type { Ranked, SearchItem } from '../item.js';
 import { rank, searchable, type Query, type Searchable } from '../ranking.js';
@@ -40,7 +41,7 @@ export class AppResults {
       activate: () => this.launch(app),
       menu: () => {
         const shellApp = Shell.AppSystem.get_default().lookup_app(app.get_id()!);
-        return shellApp ? this.menus.appEntries(shellApp) : [{ label: 'Open', run: () => this.launch(app) }];
+        return shellApp ? this.menus.appEntries(shellApp) : [{ label: t('start-open'), run: () => this.launch(app) }];
       },
     };
   }

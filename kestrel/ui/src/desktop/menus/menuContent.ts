@@ -2,6 +2,8 @@ import Clutter from 'gi://Clutter';
 import type Gio from 'gi://Gio';
 import St from 'gi://St';
 
+import { t } from '../../shared/i18n/index.js';
+
 type MenuIcon = Gio.Icon | St.ImageContent | null;
 interface MenuAction { label: string; detail?: string; enabled?: boolean; checked?: boolean; icon?: MenuIcon; run(): void; }
 export interface MenuGroup { label: string; enabled?: boolean; icon?: MenuIcon; children: MenuEntry[] | (() => Promise<MenuEntry[]>); }
@@ -38,7 +40,7 @@ export function menuContent(entries: MenuEntry[], handlers: MenuHandlers): St.Bo
   const checks = items.some(entry => 'run' in entry && entry.checked !== undefined);
   const icons = items.some(entry => entry.icon);
   if (handlers.back) {
-    const back = row('Back', true, handlers, [slot(null, 'go-previous-symbolic')], null);
+    const back = row(t('context-menu-back'), true, handlers, [slot(null, 'go-previous-symbolic')], null);
     back.connect('clicked', handlers.back);
     content.add_child(back);
     content.add_child(new St.Widget({ style_class: 'kestrel-context-separator' }));

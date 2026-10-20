@@ -3,6 +3,7 @@ import GLib from 'gi://GLib';
 import type Meta from 'gi://Meta';
 import type Shell from 'gi://Shell';
 
+import { t } from '../../../shared/i18n/index.js';
 import { PeekError } from '../errors.js';
 import { partOf, windowOfActor } from './family.js';
 import type { Combo } from './keys.js';
@@ -162,7 +163,7 @@ export class Injector {
 
   private async inject(target: Meta.Window, send: (stamp: Stamp) => void | Promise<void>): Promise<void> {
     const [, , modifiers] = shell().get_pointer();
-    if (modifiers & HELD) throw new PeekError('Busy', 'Someone is holding down keys or mouse buttons. Try again in a moment.');
+    if (modifiers & HELD) throw new PeekError('Busy', t('peek-error-input-held'));
     const stamps: number[] = [];
     let delivered = () => {};
     const arrived = new Promise<void>(resolve => (delivered = resolve));
@@ -180,6 +181,6 @@ export class Injector {
     } finally {
       for (const sent of stamps) this.batches.delete(sent);
     }
-    if (batch.dropped) throw new PeekError('Busy', 'The input was stopped because something else was under the point or had the keyboard when it arrived');
+    if (batch.dropped) throw new PeekError('Busy', t('peek-error-input-dropped'));
   }
 }

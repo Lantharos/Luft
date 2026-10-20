@@ -1,5 +1,7 @@
 import type GLib from 'gi://GLib';
 
+import { t } from '../../shared/i18n/index.js';
+
 export const ALLOWED = 0;
 export const DENIED = 1;
 export const DISMISSED = 2;
@@ -58,8 +60,8 @@ function common(options: Options): Common {
 export function accessRequest(options: Options): AccessRequest {
   return {
     ...common(options),
-    allow: text(options, 'allow', 'Allow'),
-    deny: text(options, 'deny', 'Don’t Allow'),
+    allow: text(options, 'allow', t('keyring-allow')),
+    deny: text(options, 'deny', t('keyring-deny')),
     alternative: text(options, 'alternative'),
     single: flag(options, 'single'),
     remember: flag(options, 'remember'),
@@ -69,13 +71,13 @@ export function accessRequest(options: Options): AccessRequest {
 export function passwordRequest(options: Options): PasswordRequest {
   return {
     ...common(options),
-    label: text(options, 'label', 'Password'),
+    label: text(options, 'label', t('keyring-password')),
     warning: text(options, 'warning'),
     numeric: flag(options, 'numeric'),
     confirm: flag(options, 'confirm'),
-    mismatch: text(options, 'mismatch', 'The entries don’t match'),
-    continue: text(options, 'continue', 'Unlock'),
-    cancel: text(options, 'cancel', 'Cancel'),
+    mismatch: text(options, 'mismatch', t('keyring-mismatch')),
+    continue: text(options, 'continue', t('keyring-unlock')),
+    cancel: text(options, 'cancel', t('keyring-cancel')),
     remember: flag(options, 'remember'),
     quality: flag(options, 'quality'),
   };

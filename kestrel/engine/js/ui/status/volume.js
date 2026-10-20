@@ -58,7 +58,7 @@ const StreamSlider = GObject.registerClass({
         this.menu.addMenuItem(this._deviceSection);
 
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        this.menu.addSettingsAction(_('Sound Settings'), 'sound');
+        KestrelUi.bindText(this.menu.addSettingsAction('', 'sound').label, 'volume-sound-settings');
 
         this._stream = null;
 
@@ -71,6 +71,7 @@ const StreamSlider = GObject.registerClass({
             this);
         this._showDevices();
         this.stream = this._defaultStream();
+        KestrelUi.localized(this, () => this._syncIconLabel());
     }
 
     _defaultStream() {
@@ -164,9 +165,14 @@ const StreamSlider = GObject.registerClass({
     _updateVolume() {
         const {muted} = this._stream;
         this._changeSlider(muted ? 0 : this._stream.volume);
-        this.iconLabel = muted ? _('Unmute') : _('Mute');
+        this._syncIconLabel();
         this._updateIcon();
         this.emit('stream-updated');
+    }
+
+    _syncIconLabel() {
+        if (this._stream)
+            this.iconLabel = KestrelUi.t(this._stream.muted ? 'volume-unmute' : 'volume-mute');
     }
 
     _amplifySettingsChanged() {
@@ -228,9 +234,11 @@ class OutputStreamSlider extends StreamSlider {
 
         super._init(true);
 
-        this.slider.accessible_name = _('Volume');
-        this.menu.setHeader('audio-headphones-symbolic', _('Sound Output'));
-        this.menuButtonAccessibleName = _('Open sound output menu');
+        KestrelUi.localized(this, () => {
+            this.slider.accessible_name = KestrelUi.t('volume-output-slider');
+            this.menu.setHeader('audio-headphones-symbolic', KestrelUi.t('volume-output-title'));
+            this.menuButtonAccessibleName = KestrelUi.t('volume-output-open-menu');
+        });
     }
 
     _connectStream(stream) {
@@ -279,10 +287,12 @@ class InputStreamSlider extends StreamSlider {
 
         super._init(false);
 
-        this.slider.accessible_name = _('Microphone');
         this.iconName = 'audio-input-microphone-symbolic';
-        this.menu.setHeader('audio-input-microphone-symbolic', _('Sound Input'));
-        this.menuButtonAccessibleName = _('Open sound input menu');
+        KestrelUi.localized(this, () => {
+            this.slider.accessible_name = KestrelUi.t('volume-input-slider');
+            this.menu.setHeader('audio-input-microphone-symbolic', KestrelUi.t('volume-input-title'));
+            this.menuButtonAccessibleName = KestrelUi.t('volume-input-open-menu');
+        });
     }
 });
 

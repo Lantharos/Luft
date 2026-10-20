@@ -1,14 +1,15 @@
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
+import { t } from '../../../shared/i18n/index.js';
 import { list, row } from '../../core/rows.js';
 
 export function rememberRow(app: string): St.Button {
-  return row({ icon: 'document-open-recent-symbolic', title: 'Remember my choice', subtitle: `${app} won't have to ask again`, checked: true });
+  return row({ icon: 'document-open-recent-symbolic', title: t('screen-share-remember'), subtitle: t('screen-share-remember-description', { appName: app }), checked: true });
 }
 
 export function clipboardRow(): St.Button {
-  return row({ icon: 'edit-paste-symbolic', title: 'Share the clipboard', subtitle: 'Copy and paste in both directions', checked: true });
+  return row({ icon: 'edit-paste-symbolic', title: t('screen-share-clipboard'), subtitle: t('screen-share-clipboard-description'), checked: true });
 }
 
 export function group(title: string, rows: St.Widget[]): St.Widget {

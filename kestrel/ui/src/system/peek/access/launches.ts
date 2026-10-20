@@ -1,6 +1,7 @@
 import Gio from 'gi://Gio';
 import type Meta from 'gi://Meta';
 
+import { t } from '../../../shared/i18n/index.js';
 import { PeekError } from '../errors.js';
 import type { Caller } from './callers.js';
 import { watchUnit } from './lifetime.js';
@@ -53,13 +54,13 @@ export class Launches {
     const pid = program.pid;
     const ownerPid = ownerProcess.pid;
     if (!pid || !ownerPid || statOf(pid)?.parent !== ownerPid)
-      throw new PeekError('Denied', 'Only a program that peek run started itself can be launched');
+      throw new PeekError('Denied', t('peek-error-launch-not-started-by-peek'));
     const name = `peek-${pid}.scope`;
     await this.scopes.start(name, program);
     const unit = processUnit(pid);
     const started = statOf(pid)?.started;
     if (program.pid !== pid || started === undefined || !unit || unitName(unit) !== name)
-      throw new PeekError('Failed', 'The program ended while it was starting');
+      throw new PeekError('Failed', t('peek-error-ended-while-starting'));
     const ended = new Set<() => void>();
     const launch: Launch = {
       handle: randomHandle(), unit, owner, started, ended,
@@ -75,7 +76,7 @@ export class Launches {
   byHandle(handle: string, caller: Caller): Launch {
     const launch = [...this.launches.values()].find(candidate => candidate.handle === handle);
     if (!launch || launch.owner.unit !== caller.unit)
-      throw new PeekError('NotFound', `Nothing you started with peek run has the handle ${handle}, or it has quit`);
+      throw new PeekError('NotFound', t('peek-error-unknown-handle', { handle }));
     return launch;
   }
 

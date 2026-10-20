@@ -8,6 +8,7 @@ import St from 'gi://St';
 
 import * as CheckBox from './checkBox.js';
 import * as Dialog from './dialog.js';
+import * as KestrelUi from './kestrelUi.js';
 import * as ModalDialog from './modalDialog.js';
 
 import {DBusSenderChecker} from '../misc/util.js';
@@ -48,8 +49,8 @@ class AccessDialog extends ModalDialog.ModalDialog {
     _buildLayout(title, description, body, options) {
         // No support for non-modal system dialogs, so ignore the option
         // let modal = options['modal'] || true;
-        const denyLabel = options['deny_label'] || _('Deny');
-        const grantLabel = options['grant_label'] || _('Allow');
+        const denyLabel = options['deny_label'] || KestrelUi.t('access-dialog-deny');
+        const grantLabel = options['grant_label'] || KestrelUi.t('access-dialog-allow');
         const choices = options['choices'] || [];
 
         const content = new Dialog.MessageDialogContent({

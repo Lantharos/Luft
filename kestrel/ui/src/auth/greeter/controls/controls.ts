@@ -4,6 +4,7 @@ import St from 'gi://St';
 import { InputSourceIndicator } from '../../../system/inputSources/indicator.js';
 import type { ContextMenus, MenuEntry } from '../../../desktop/menus/contextMenus.js';
 import { ControlRow } from '../../../desktop/menus/controlRow.js';
+import { t } from '../../../shared/i18n/index.js';
 import { Accessibility } from './accessibility.js';
 import { PowerActions } from './power.js';
 import type { Session } from '../sessions.js';
@@ -18,11 +19,11 @@ export class GreeterControls {
 
   constructor(menus: ContextMenus, private readonly sessions: Session[], private readonly chooseSession: (session: Session) => void) {
     this.row = new ControlRow(menus, 'kestrel-greeter-controls');
-    this.row.button('kestrel-greeter-session', 'Session', this.sessionLabel, () => this.sessionEntries()).visible = sessions.length > 1;
+    this.row.button('kestrel-greeter-session', t('greeter-session'), this.sessionLabel, () => this.sessionEntries()).visible = sessions.length > 1;
     this.inputSource = new InputSourceIndicator(menus, () => []);
     this.row.add(this.inputSource.actor);
-    this.row.button('kestrel-greeter-accessibility', 'Accessibility', this.row.icon('preferences-desktop-accessibility-symbolic'), () => this.accessibility.entries());
-    this.row.button('kestrel-greeter-power', 'Power', this.row.icon('system-shutdown-symbolic'), () => this.power.entries());
+    this.row.button('kestrel-greeter-accessibility', t('greeter-accessibility'), this.row.icon('preferences-desktop-accessibility-symbolic'), () => this.accessibility.entries());
+    this.row.button('kestrel-greeter-power', t('greeter-power'), this.row.icon('system-shutdown-symbolic'), () => this.power.entries());
     void this.power.load();
   }
 

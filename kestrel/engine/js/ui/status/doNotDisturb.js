@@ -1,16 +1,18 @@
 import Gio from 'gi://Gio';
 import GObject from 'gi://GObject';
 
+import * as KestrelUi from '../kestrelUi.js';
+
 import {QuickToggle, SystemIndicator} from '../quickSettings.js';
 
 const DoNotDisturbToggle = GObject.registerClass(
 class DoNotDisturbToggle extends QuickToggle {
     constructor() {
         super({
-            title: _('Do Not Disturb'),
             iconName: 'notifications-disabled-symbolic',
             toggleMode: true,
         });
+        KestrelUi.localized(this, () => (this.title = KestrelUi.t('do-not-disturb-title')));
 
         this._settings = new Gio.Settings({
             schema_id: 'org.gnome.desktop.notifications',

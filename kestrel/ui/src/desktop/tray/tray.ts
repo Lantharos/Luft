@@ -2,6 +2,7 @@ import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
 
+import { localized, t } from '../../shared/i18n/index.js';
 import type { ContextMenus, MenuEntry } from '../menus/contextMenus.js';
 import { paintGlyph, TRAY_ICON_SIZE } from './icon.js';
 import { TrayItem } from './item.js';
@@ -25,9 +26,10 @@ export class Tray {
   constructor(private readonly menus: ContextMenus) {
     this.actor = new St.Button({
       name: 'kestrel-tray', style_class: 'kestrel-status-button kestrel-tray-button', child: this.preview,
-      can_focus: true, visible: false, accessible_name: 'Tray apps',
+      can_focus: true, visible: false,
       button_mask: St.ButtonMask.PRIMARY | St.ButtonMask.SECONDARY,
     });
+    localized(this.actor, () => (this.actor.accessible_name = t('tray-apps')));
     this.actor.connect('clicked', () => this.open());
     this.watcher = new StatusNotifierWatcher(this);
   }
@@ -95,7 +97,7 @@ export class Tray {
     return {
       label: item.title, icon: item.glyph,
       children: async () => [
-        ...item.isOnlyMenu ? [] : [{ label: `Open ${item.title}`, run: activate }, 'separator' as const],
+        ...item.isOnlyMenu ? [] : [{ label: t('tray-open-app', { appName: item.title }), run: activate }, 'separator' as const],
         ...await item.menu(),
       ],
     };

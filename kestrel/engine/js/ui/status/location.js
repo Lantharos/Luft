@@ -6,6 +6,7 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import * as Dialog from '../dialog.js';
+import * as KestrelUi from '../kestrelUi.js';
 import * as ModalDialog from '../modalDialog.js';
 import * as PermissionStore from '../../misc/permissionStore.js';
 
@@ -317,10 +318,9 @@ export const GeolocationDialog = GObject.registerClass({
         this.reqAccuracyLevel = reqAccuracyLevel;
 
         const content = new Dialog.MessageDialogContent({
-            title: _('Allow location access'),
+            title: KestrelUi.t('location-dialog-title'),
             iconName: 'find-location-symbolic',
-            /* Translators: %s is an application name */
-            description: _('The app %s wants to access your location').format(name),
+            description: KestrelUi.t('location-dialog-description', {appName: name}),
         });
 
         const reasonLabel = new St.Label({
@@ -330,7 +330,7 @@ export const GeolocationDialog = GObject.registerClass({
         content.add_child(reasonLabel);
 
         const infoLabel = new St.Label({
-            text: _('Location access can be changed at any time from the privacy settings'),
+            text: KestrelUi.t('location-dialog-info'),
             style_class: 'message-dialog-description',
         });
         content.add_child(infoLabel);
@@ -338,12 +338,12 @@ export const GeolocationDialog = GObject.registerClass({
         this.contentLayout.add_child(content);
 
         const button = this.addButton({
-            label: _('Deny Access'),
+            label: KestrelUi.t('location-dialog-deny'),
             action: this._onDenyClicked.bind(this),
             key: Clutter.KEY_Escape,
         });
         this.addButton({
-            label: _('Grant Access'),
+            label: KestrelUi.t('location-dialog-grant'),
             action: this._onGrantClicked.bind(this),
         });
 

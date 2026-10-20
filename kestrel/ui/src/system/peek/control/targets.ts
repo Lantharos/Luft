@@ -4,6 +4,7 @@ import Graphene from 'gi://Graphene';
 import type Meta from 'gi://Meta';
 import type Shell from 'gi://Shell';
 
+import { t } from '../../../shared/i18n/index.js';
 import { PeekError } from '../errors.js';
 import { captureArea, partOf, windowOfActor } from './family.js';
 
@@ -17,7 +18,7 @@ const shell = () => global as unknown as Shell.Global;
 function stagePoint(window: Meta.Window, [x, y]: Point): Point {
   const area = captureArea(window);
   if (!(x >= 0 && y >= 0 && x < area.width && y < area.height))
-    throw new PeekError('InvalidArgs', `${x}, ${y} is outside the window's picture, which is ${area.width} × ${area.height}`);
+    throw new PeekError('InvalidArgs', t('peek-error-outside', { x: String(x), y: String(y), width: String(area.width), height: String(area.height) }));
   const buffer = window.get_buffer_rect();
   const actor = window.get_compositor_private() as Meta.WindowActor;
   const point = actor.apply_transform_to_point(new Graphene.Point3D({ x: area.x - buffer.x + x / area.scale, y: area.y - buffer.y + y / area.scale, z: 0 }));
@@ -53,8 +54,8 @@ export async function bringForward(window: Meta.Window, activate: (window: Meta.
   const display = shell().display;
   if (display.focus_window !== window) activate(window);
   if (!await settle(() => display.focus_window === window))
-    throw new PeekError('Busy', "The window couldn't be brought to the front");
+    throw new PeekError('Busy', t('peek-error-not-in-front'));
   if (!await settle(() => points.every(point => reaches(window, stagePoint(window, point)))))
-    throw new PeekError('Busy', 'Something else covers that part of the window');
+    throw new PeekError('Busy', t('peek-error-covered'));
   return points.map(point => stagePoint(window, point));
 }

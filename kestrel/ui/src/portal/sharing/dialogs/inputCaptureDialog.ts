@@ -1,5 +1,6 @@
 import type St from 'gi://St';
 
+import { t } from '../../../shared/i18n/index.js';
 import { openDialog, type PortalDialog } from '../../core/dialog.js';
 import { SUCCESS } from '../../core/request.js';
 import { list } from '../../core/rows.js';
@@ -17,8 +18,8 @@ export async function chooseCapture(handle: string, appId: string, clipboardRequ
   const app = appNames(appId);
   let choice: CaptureChoice | null = null;
   const [response] = await openDialog(handle, {
-    title: `Let ${app.object} take over your keyboard and mouse?`,
-    description: `When your pointer reaches the edge of the screen, ${app.object} can take over your keyboard and mouse, for example to control another computer.`,
+    title: t('screen-share-input-capture-title', { appName: app.object }),
+    description: t('screen-share-input-capture-description', { appName: app.object }),
     icon: 'input-mouse-symbolic',
     askedBy: appId,
   }, dialog => {
@@ -31,8 +32,8 @@ export async function chooseCapture(handle: string, appId: string, clipboardRequ
     if (extras.length) dialog.content.add_child(list(extras));
     else dialog.content.hide();
     dialog.buttons([
-      { label: 'Cancel', action: dialog.cancel },
-      { label: 'Allow', default: true, action: () => {
+      { label: t('portal-cancel'), action: dialog.cancel },
+      { label: t('portal-allow'), default: true, action: () => {
         choice = { clipboard: clipboard?.checked ?? false, remember: remember?.checked ?? true };
         dialog.finish(SUCCESS);
       } },

@@ -62,7 +62,7 @@ function forgetUnlessJoined(activeConnection) {
 function ssidToLabel(ssid) {
     let label = NM.utils_ssid_to_utf8(ssid.get_data());
     if (!label)
-        label = _('<unknown>');
+        label = KestrelUi.t('network-menu-unknown-network');
     return label;
 }
 
@@ -316,7 +316,7 @@ class NMConnectionItem extends NMMenuItem {
             'notify::radio-mode', () => this._sync(),
             'notify::name', () => this._sync(),
             this);
-        this._sync();
+        KestrelUi.localized(this, () => this._sync());
     }
 
     get name() {
@@ -341,14 +341,12 @@ class NMConnectionItem extends NMMenuItem {
 
     _getAccessibleName() {
         return this.is_active
-            // Translators: %s is a device name like "MyPhone"
-            ? _('Disconnect %s').format(this.name)
-            // Translators: %s is a device name like "MyPhone"
-            : _('Connect to %s').format(this.name);
+            ? KestrelUi.t('network-menu-disconnect-from', {name: this.name})
+            : KestrelUi.t('network-menu-connect-to', {name: this.name});
     }
 
     _getSubtitleLabel() {
-        return this.is_active ? _('Disconnect') : _('Connect');
+        return KestrelUi.t(this.is_active ? 'network-menu-disconnect' : 'network-menu-connect');
     }
 
     _sync() {
@@ -432,7 +430,7 @@ const NMDeviceItem = GObject.registerClass({
 
         // Item shown in the 0-connections case
         this._autoConnectItem =
-            this.section.addAction(_('Connect'), () => this._autoConnect(), '');
+            this.section.addAction('', () => this._autoConnect(), '');
 
         // Represents the device as a whole when shown
         this.bind_property('name',
@@ -443,7 +441,8 @@ const NMDeviceItem = GObject.registerClass({
             GObject.BindingFlags.SYNC_CREATE);
 
         this._deactivateItem =
-            this.section.addAction(_('Turn Off'), () => this.deactivateConnection());
+            this.section.addAction('', () => this.deactivateConnection());
+        KestrelUi.bindText(this._deactivateItem.label, 'network-menu-turn-off');
 
         this._client.connectObject(
             'notify::connectivity', () => this.notify('icon-name'),
@@ -1027,6 +1026,7 @@ class NMWirelessNetworkItem extends PopupMenu.PopupBaseMenuItem {
             'notify::secure', () => this._updateAccessibleName(),
             'notify::signal-strength', () => this._updateAccessibleName(),
             this);
+        KestrelUi.localized(this, () => this._updateAccessibleName());
     }
 
     get network() {
@@ -1041,10 +1041,11 @@ class NMWirelessNetworkItem extends PopupMenu.PopupBaseMenuItem {
     }
 
     _updateAccessibleName() {
-        const secureString = this._network.secure ? _('Secure') : _('Not secure');
-        const signalStrengthString = _('Signal strength %s%%').format(this._network.signal_strength);
-        // translators: The first placeholder is the network name, the second and indication whether it is secure, and the last the signal strength indication
-        this.accessible_name = _('%s, %s, %s').format(this._label.text, secureString, signalStrengthString);
+        this.accessible_name = KestrelUi.t('network-menu-wifi-network', {
+            name: this._label.text,
+            secure: this._network.secure ? 'yes' : 'no',
+            strength: this._network.signal_strength,
+        });
     }
 });
 
@@ -1144,8 +1145,7 @@ const NMWirelessDeviceItem = GObject.registerClass({
 
     get name() {
         if (this.is_hotspot)
-            /* Translators: %s is a network identifier */
-            return _('%s Hotspot').format(this._deviceName);
+            return KestrelUi.t('network-menu-hotspot', {name: this._deviceName});
 
         const {ssid} = this._activeAccessPoint ?? {};
         if (ssid)
@@ -1428,8 +1428,14 @@ const NMToggle = GObject.registerClass({
             ? [...this._getActiveItems()].length
             : 0;
         if (nActive > 1)
-            return ngettext('%d connected', '%d connected', nActive).format(nActive);
+            return KestrelUi.t('network-menu-connected-count', {count: nActive});
         return source;
+    }
+
+    _refreshLabels() {
+        if (this._itemBinding.source)
+            this.title = this._getDefaultName();
+        this._itemBinding.source?.notify('name');
     }
 
     _updateItemsVisibility() {
@@ -1526,9 +1532,12 @@ class NMVpnToggle extends NMToggle {
     constructor() {
         super();
 
-        this.menu.setHeader('network-vpn-symbolic', _('VPN'));
-        this.menuButtonAccessibleName = _('Open VPN menu');
-        this.menu.addSettingsAction(_('VPN Settings'), 'network');
+        KestrelUi.bindText(this.menu.addSettingsAction('', 'network').label, 'network-menu-vpn-settings');
+        KestrelUi.localized(this, () => {
+            this.menu.setHeader('network-vpn-symbolic', KestrelUi.t('network-menu-vpn'));
+            this.menuButtonAccessibleName = KestrelUi.t('network-menu-vpn-open-menu');
+            this._refreshLabels();
+        });
     }
 
     setClient(client) {
@@ -1542,7 +1551,7 @@ class NMVpnToggle extends NMToggle {
     }
 
     _getDefaultName() {
-        return _('VPN');
+        return KestrelUi.t('network-menu-vpn');
     }
 
     _loadInitialItems() {
@@ -1787,10 +1796,13 @@ class NMWirelessToggle extends NMDeviceToggle {
                 this._stopScanning();
         }, this);
 
-        this.menu.setHeader('network-wireless-symbolic', _('Wi–Fi'));
-        this.menuButtonAccessibleName = _('Open Wi–Fi menu');
         this.menu.addHeaderSuffix(this._scanningSpinner);
-        this.menu.addSettingsAction(_('All Networks'), 'network');
+        KestrelUi.bindText(this.menu.addSettingsAction('', 'network').label, 'network-menu-wifi-settings');
+        KestrelUi.localized(this, () => {
+            this.menu.setHeader('network-wireless-symbolic', KestrelUi.t('network-menu-wifi'));
+            this.menuButtonAccessibleName = KestrelUi.t('network-menu-wifi-open-menu');
+            this._refreshLabels();
+        });
     }
 
     setClient(client) {
@@ -1899,9 +1911,12 @@ class NMWiredToggle extends NMDeviceToggle {
     constructor() {
         super(NM.DeviceType.ETHERNET);
 
-        this.menu.setHeader('network-wired-symbolic', _('Wired Connections'));
-        this.menuButtonAccessibleName = _('Open wired connections menu');
-        this.menu.addSettingsAction(_('Wired Settings'), 'network');
+        KestrelUi.bindText(this.menu.addSettingsAction('', 'network').label, 'network-menu-wired-settings');
+        KestrelUi.localized(this, () => {
+            this.menu.setHeader('network-wired-symbolic', KestrelUi.t('network-menu-wired'));
+            this.menuButtonAccessibleName = KestrelUi.t('network-menu-wired-open-menu');
+            this._refreshLabels();
+        });
     }
 
     _createDeviceMenuItem(device) {
@@ -1914,14 +1929,16 @@ class NMBluetoothToggle extends NMDeviceToggle {
     constructor() {
         super(NM.DeviceType.BT);
 
-        this.menu.setHeader('network-cellular-symbolic', _('Bluetooth Tethers'));
-        this.menuButtonAccessibleName = _('Open Bluetooth tethers menu');
-        this.menu.addSettingsAction(_('Bluetooth Settings'), 'network');
+        KestrelUi.bindText(this.menu.addSettingsAction('', 'network').label, 'network-menu-tether-settings');
+        KestrelUi.localized(this, () => {
+            this.menu.setHeader('network-cellular-symbolic', KestrelUi.t('network-menu-tethers'));
+            this.menuButtonAccessibleName = KestrelUi.t('network-menu-tethers-open-menu');
+            this._refreshLabels();
+        });
     }
 
     _getDefaultName() {
-        // Translators: "Tether" from "Bluetooth Tether"
-        return _('Tether');
+        return KestrelUi.t('network-menu-tether');
     }
 
     _createDeviceMenuItem(device) {
@@ -1934,15 +1951,16 @@ class NMModemToggle extends NMDeviceToggle {
     constructor() {
         super(NM.DeviceType.MODEM);
 
-        this.menu.setHeader('network-cellular-symbolic', _('Mobile Connections'));
-        this.menuButtonAccessibleName = _('Open mobile connections menu');
-
-        this.menu.addSettingsAction(_('Mobile Broadband Settings'), 'network');
+        KestrelUi.bindText(this.menu.addSettingsAction('', 'network').label, 'network-menu-mobile-settings');
+        KestrelUi.localized(this, () => {
+            this.menu.setHeader('network-cellular-symbolic', KestrelUi.t('network-menu-mobile-connections'));
+            this.menuButtonAccessibleName = KestrelUi.t('network-menu-mobile-open-menu');
+            this._refreshLabels();
+        });
     }
 
     _getDefaultName() {
-        // Translators: "Mobile" from "Mobile Broadband"
-        return _('Mobile');
+        return KestrelUi.t('network-menu-mobile');
     }
 
     _createDeviceMenuItem(device) {
@@ -1964,7 +1982,7 @@ class CaptivePortalHandler {
         const source = MessageTray.getSystemSource();
 
         const notification = new MessageTray.Notification({
-            title: _('Sign in to Network'),
+            title: KestrelUi.t('network-menu-sign-in'),
             body: name,
             source,
         });
@@ -2081,8 +2099,8 @@ class Indicator extends SystemIndicator {
         const source = MessageTray.getSystemSource();
         this._notification = new MessageTray.Notification({
             source,
-            title: _('Connection failed'),
-            body: _('Activation of network connection failed'),
+            title: KestrelUi.t('network-menu-failed-title'),
+            body: KestrelUi.t('network-menu-failed-body'),
             iconName: 'network-error-symbolic',
             urgency: MessageTray.Urgency.HIGH,
             isTransient: true,

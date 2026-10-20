@@ -1,6 +1,8 @@
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
+import { t } from '../../shared/i18n/index.js';
+
 export interface Segment<T extends string> {
   readonly value: T;
   readonly label: string;
@@ -29,15 +31,15 @@ export function segments<T extends string>(options: Segment<T>[], selected: T, c
 
 export function stepper(value: number, most: number, changed: (value: number) => void): St.BoxLayout {
   const box = new St.BoxLayout({ style_class: 'kestrel-print-stepper', y_align: Clutter.ActorAlign.CENTER });
-  const count = new St.Entry({ style_class: 'kestrel-print-count', text: String(value), can_focus: true, accessible_name: 'Copies' });
+  const count = new St.Entry({ style_class: 'kestrel-print-count', text: String(value), can_focus: true, accessible_name: t('print-copies') });
   count.clutter_text.x_align = Clutter.ActorAlign.CENTER;
   const step = (icon: string, name: string, by: number) => {
     const button = new St.Button({ style_class: 'kestrel-print-step', child: new St.Icon({ icon_name: icon }), can_focus: true, accessible_name: name });
     button.connect('clicked', () => set(value + by));
     return button;
   };
-  const less = step('list-remove-symbolic', 'Fewer copies', -1);
-  const more = step('list-add-symbolic', 'More copies', 1);
+  const less = step('list-remove-symbolic', t('print-copies-fewer'), -1);
+  const more = step('list-add-symbolic', t('print-copies-more'), 1);
   const set = (next: number) => {
     value = Math.min(Math.max(next, 1), most);
     if (count.text !== String(value)) count.text = String(value);

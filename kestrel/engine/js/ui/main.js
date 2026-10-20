@@ -339,7 +339,7 @@ async function _initializeUI() {
             stopScreencast: () => screenshotUI.stopScreencast(),
             createBackground: (container, monitorIndex) => layoutManager.createBackground(container, monitorIndex),
             wallpaper: layoutManager.backgroundGroup,
-            registerPanel: actor => ctrlAltTabManager.addGroup(actor, _('Panel'), 'view-grid-symbolic'),
+            registerPanel: actor => ctrlAltTabManager.addGroup(actor, 'ctrl-alt-tab-panel', 'view-grid-symbolic'),
             inputMethod,
             keyboard,
             keybindings: {
@@ -364,11 +364,11 @@ async function _initializeUI() {
         const source = MessageTray.getSystemSource();
         const notification = new MessageTray.Notification({
             source,
-            title: _('System was put in unsafe mode'),
-            body: _('Apps now have unrestricted access'),
+            title: KestrelUi.t('unsafe-mode-title'),
+            body: KestrelUi.t('unsafe-mode-body'),
             isTransient: true,
         });
-        notification.addAction(_('Undo'),
+        notification.addAction(KestrelUi.t('unsafe-mode-undo'),
             () => (global.context.unsafe_mode = false));
         source.addNotification(notification);
     });
@@ -399,9 +399,7 @@ async function _initializeUI() {
         if (!runAutomation) {
             const credentials = new Gio.Credentials();
             if (credentials.get_unix_user() === 0) {
-                notify(
-                    _('Logged in as a privileged user'),
-                    _('Running a session as a privileged user should be avoided for security reasons. If possible, you should log in as a normal user.'));
+                notify(KestrelUi.t('privileged-user-title'), KestrelUi.t('privileged-user-body'));
             }
         }
 

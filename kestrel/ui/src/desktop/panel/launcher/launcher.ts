@@ -9,6 +9,7 @@ import { taskbarBackdrops } from '../backdrop.js';
 import { appIcons } from '../../../appearance/icons/appIcons.js';
 import { animateActor, Spring } from '../../../shared/motion.js';
 import { wallpaperFloor } from '../../wallpaper/floor.js';
+import { localized, t } from '../../../shared/i18n/index.js';
 
 const WHITE = '#ffffffff';
 
@@ -77,8 +78,9 @@ function animatedMark(button: St.Button, panel: St.Widget): [St.Widget, (size: n
 export function createLauncher(activate: () => void, size: number, panel: St.Widget): Launcher {
   const button = new St.Button({
     style_class: 'kestrel-task-button', clip_to_allocation: true,
-    can_focus: true, track_hover: true, accessible_name: 'Start',
+    can_focus: true, track_hover: true,
   });
+  localized(button, () => (button.accessible_name = t('taskbar-start')));
   const [mark, resizeMark] = animatedMark(button, panel);
   button.child = mark;
   button.connect('clicked', activate);

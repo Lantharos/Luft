@@ -153,7 +153,7 @@ export const QuickMenuToggle = GObject.registerClass({
         'menu-button-accessible-name': GObject.ParamSpec.string(
             'menu-button-accessible-name', null, null,
             GObject.ParamFlags.READWRITE,
-            _('Open menu')),
+            null),
     },
 }, class QuickMenuToggle extends QuickSettingsItem {
     _init(params) {
@@ -252,7 +252,7 @@ export const QuickSlider = GObject.registerClass({
         'menu-button-accessible-name': GObject.ParamSpec.string(
             'menu-button-accessible-name', null, null,
             GObject.ParamFlags.READWRITE,
-            _('Open menu')),
+            null),
     },
     Signals: {
         'icon-clicked': {},

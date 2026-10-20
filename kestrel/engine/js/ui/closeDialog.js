@@ -39,11 +39,11 @@ export const CloseDialog = GObject.registerClass({
         const tracker = Shell.WindowTracker.get_default();
         const windowApp = tracker.get_window_app(this._window);
 
-        /* Translators: %s is an application name */
-        const title = _('“%s” Is Not Responding').format(windowApp.get_name());
-        const description = _('You may choose to wait a short while for it to ' +
-                            'continue or force the app to quit entirely');
-        return new Dialog.MessageDialogContent({title, description, iconName: 'dialog-warning-symbolic'});
+        return new Dialog.MessageDialogContent({
+            title: KestrelUi.t('close-dialog-title', {appName: windowApp.get_name()}),
+            description: KestrelUi.t('close-dialog-description'),
+            iconName: 'dialog-warning-symbolic',
+        });
     }
 
     _updateScale() {
@@ -69,12 +69,12 @@ export const CloseDialog = GObject.registerClass({
 
         this._dialog.contentLayout.add_child(this._createDialogContent());
         this._dialog.addButton({
-            label: _('Force Quit'),
+            label: KestrelUi.t('close-dialog-force-quit'),
             action: this._onClose.bind(this),
             default: true,
         });
         this._dialog.addButton({
-            label: _('Wait'),
+            label: KestrelUi.t('close-dialog-wait'),
             action: this._onWait.bind(this),
             key: Clutter.KEY_Escape,
         });

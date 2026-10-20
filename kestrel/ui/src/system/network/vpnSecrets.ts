@@ -3,6 +3,7 @@ import NM from 'gi://NM';
 import Shell from 'gi://Shell';
 
 import { loadDialogModules } from '../../auth/keyring/dialog.js';
+import { t } from '../../shared/i18n/index.js';
 import { OpenConnectSignIn } from './openconnect.js';
 import { externalAuthDialog, planFromAuthDialog, planFromSettings, type Plan } from './pluginSecrets.js';
 import { VpnDialog, type Step } from './vpnDialog.js';
@@ -23,7 +24,7 @@ export class VpnSecrets {
 
   constructor(private readonly agent: Shell.NetworkAgent, private readonly requestId: string, private readonly connection: NM.Connection,
     private readonly hints: string[], private readonly flags: NM.SecretAgentGetSecretsFlags, private readonly finished: () => void) {
-    this.title = `Sign in to ${connection.get_id()}`;
+    this.title = t('vpn-sign-in-title', { connection: connection.get_id()! });
     this.start().catch(error => {
       if (!this.done) console.warn(`Kestrel could not ask for the secrets of ${connection.get_id()}: ${error}`);
       this.finish(Shell.NetworkAgentResponse.INTERNAL_ERROR);

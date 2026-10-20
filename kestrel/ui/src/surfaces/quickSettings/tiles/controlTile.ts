@@ -2,6 +2,7 @@ import Clutter from 'gi://Clutter';
 import GObject from 'gi://GObject';
 import St from 'gi://St';
 
+import { localized, t } from '../../../shared/i18n/index.js';
 import { animateActor, Spring } from '../../../shared/motion.js';
 import type { QuickControl } from '../quickControls.js';
 
@@ -32,9 +33,9 @@ function chevron(item: QuickControl): St.Button {
   const icon = new St.Icon({ style_class: 'kestrel-control-icon', icon_name: 'go-next-symbolic', icon_size: 14 });
   icon.set_pivot_point(0.5, 0.5);
   const more = new St.Button({
-    style_class: 'kestrel-control-more', can_focus: true, track_hover: true,
-    accessible_name: 'Show options', child: icon,
+    style_class: 'kestrel-control-more', can_focus: true, track_hover: true, child: icon,
   });
+  localized(more, () => (more.accessible_name = t('quick-settings-show-options')));
   item.bind_property('menu-enabled', more, 'visible', GObject.BindingFlags.SYNC_CREATE);
   more.connect('clicked', () => {
     if (item.menu!.isOpen) item.menu!.close({ animate: true });
@@ -54,11 +55,11 @@ export function styleControl(item: QuickControl): void {
   if (item.menu) top.add_child(chevron(item));
   item.bind_property('title', title, 'text', GObject.BindingFlags.SYNC_CREATE);
   const updateSubtitle = () => {
-    subtitle.text = item.subtitle || (item.checked ? 'On' : 'Off');
+    subtitle.text = item.subtitle || t(item.checked ? 'quick-settings-on' : 'quick-settings-off');
   };
   item.connect('notify::subtitle', updateSubtitle);
   item.connect('notify::checked', updateSubtitle);
-  updateSubtitle();
+  localized(subtitle, updateSubtitle);
   item.style_class = 'kestrel-control';
   item.track_hover = true;
   item.can_focus = true;
@@ -73,13 +74,13 @@ export interface ActionTile {
   subtitle: St.Label;
 }
 
-export function actionTile(glyph: string | Clutter.Actor, titleText: string, activate: () => void): ActionTile {
+export function actionTile(glyph: string | Clutter.Actor, name: string, activate: () => void): ActionTile {
   const { body, title, subtitle } = tileParts(typeof glyph === 'string' ? new St.Icon({ style_class: 'kestrel-control-icon', icon_size: TILE_ICON_SIZE, icon_name: glyph }) : glyph);
-  title.text = titleText;
   const actor = new St.Button({
     style_class: 'kestrel-control', can_focus: true, track_hover: true, visible: true,
-    accessible_name: titleText, label_actor: title, child: body,
+    label_actor: title, child: body,
   });
+  localized(actor, () => (title.text = actor.accessible_name = t(name)));
   actor.connect('clicked', activate);
   return { actor, title, subtitle };
 }

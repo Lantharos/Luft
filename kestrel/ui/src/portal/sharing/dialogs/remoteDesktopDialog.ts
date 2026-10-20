@@ -1,5 +1,6 @@
 import type St from 'gi://St';
 
+import { t } from '../../../shared/i18n/index.js';
 import { openDialog, type PortalDialog } from '../../core/dialog.js';
 import { SUCCESS } from '../../core/request.js';
 import { list, row } from '../../core/rows.js';
@@ -11,9 +12,9 @@ import { clipboardRow, group, rememberRow } from './choices.js';
 import { sourceList } from './sourceList.js';
 
 const DEVICES = [
-  { type: KEYBOARD, icon: 'input-keyboard-symbolic', title: 'Keyboard' },
-  { type: POINTER, icon: 'input-mouse-symbolic', title: 'Mouse and touchpad' },
-  { type: TOUCHSCREEN, icon: 'tablet-symbolic', title: 'Touchscreen' },
+  { type: KEYBOARD, icon: 'input-keyboard-symbolic', title: 'screen-share-device-keyboard' },
+  { type: POINTER, icon: 'input-mouse-symbolic', title: 'screen-share-device-pointer' },
+  { type: TOUCHSCREEN, icon: 'tablet-symbolic', title: 'screen-share-device-touchscreen' },
 ];
 
 interface ControlRequest {
@@ -35,18 +36,18 @@ export async function chooseControl(handle: string, appId: string, request: Cont
   const app = appNames(appId);
   let choice: ControlChoice | null = null;
   const [response] = await openDialog(handle, {
-    title: `Let ${app.object} control your computer?`,
+    title: t('screen-share-remote-desktop-title', { appName: app.object }),
     description: request.selection
-      ? `${app.subject} will be able to see what you choose and use the devices you allow.`
-      : `${app.subject} will be able to use the devices you allow.`,
+      ? t('screen-share-remote-desktop-with-screen', { appName: app.subject })
+      : t('screen-share-remote-desktop-description', { appName: app.subject }),
     icon: 'preferences-desktop-remote-desktop-symbolic',
     askedBy: appId,
     styleClass: 'kestrel-portal-sharing',
   }, dialog => {
     opened(dialog);
     const devices = DEVICES.filter(device => request.devices & device.type)
-      .map(device => ({ type: device.type, button: row({ icon: device.icon, title: device.title, checked: true }) }));
-    if (devices.length) dialog.content.add_child(group('Devices', devices.map(device => device.button)));
+      .map(device => ({ type: device.type, button: row({ icon: device.icon, title: t(device.title), checked: true }) }));
+    if (devices.length) dialog.content.add_child(group(t('screen-share-devices'), devices.map(device => device.button)));
     const sources = request.selection ? sourceList(request.selection, count => { allow.reactive = count > 0; }, true) : null;
     if (sources) dialog.content.add_child(sources.actor);
     const extras: St.Button[] = [];
@@ -56,8 +57,8 @@ export async function chooseControl(handle: string, appId: string, request: Cont
     if (remember) extras.push(remember);
     if (extras.length) dialog.content.add_child(list(extras));
     const [, allow] = dialog.buttons([
-      { label: 'Cancel', action: dialog.cancel },
-      { label: 'Allow', default: true, action: () => {
+      { label: t('portal-cancel'), action: dialog.cancel },
+      { label: t('portal-allow'), default: true, action: () => {
         choice = {
           devices: devices.filter(device => device.button.checked).reduce((mask, device) => mask | device.type, 0),
           sources: sources?.selected() ?? null,

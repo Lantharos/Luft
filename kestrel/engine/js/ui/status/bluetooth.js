@@ -4,6 +4,7 @@ import Pango from 'gi://Pango';
 import St from 'gi://St';
 
 import {Spinner} from '../animation.js';
+import * as KestrelUi from '../kestrelUi.js';
 import * as PopupMenu from '../popupMenu.js';
 import {QuickMenuToggle, SystemIndicator} from '../quickSettings.js';
 
@@ -59,19 +60,13 @@ class BluetoothDeviceItem extends PopupMenu.PopupBaseMenuItem {
         this._device.bind_property('alias',
             this._label, 'text',
             GObject.BindingFlags.SYNC_CREATE);
-        this._device.bind_property_full('connected',
-            this._subtitle, 'text',
-            GObject.BindingFlags.SYNC_CREATE,
-            (bind, source) => [true, source ? _('Disconnect') : _('Connect')],
-            null);
-
         this.connect('destroy', () => (this._spinner = null));
         this.connect('activate', () => this._toggleConnected().catch(logError));
         this._device.connectObject(
-            'notify::alias', () => this._updateAccessibleName(),
-            'notify::connected', () => this._updateAccessibleName(),
+            'notify::alias', () => this._syncLabels(),
+            'notify::connected', () => this._syncLabels(),
             this);
-        this._updateAccessibleName();
+        KestrelUi.localized(this, () => this._syncLabels());
     }
 
     async _toggleConnected() {
@@ -80,24 +75,19 @@ class BluetoothDeviceItem extends PopupMenu.PopupBaseMenuItem {
         this._spinner?.stop();
     }
 
-    _updateAccessibleName() {
-        this.accessible_name = this._device.connected
-            // Translators: %s is a device name like "MyPhone"
-            ? _('Disconnect %s').format(this._device.alias)
-            // Translators: %s is a device name like "MyPhone"
-            : _('Connect to %s').format(this._device.alias);
+    _syncLabels() {
+        const {connected, alias} = this._device;
+        this._subtitle.text = KestrelUi.t(connected ? 'bluetooth-disconnect' : 'bluetooth-connect');
+        this.accessible_name = connected
+            ? KestrelUi.t('bluetooth-disconnect-device', {deviceName: alias})
+            : KestrelUi.t('bluetooth-connect-device', {deviceName: alias});
     }
 });
 
 const BluetoothToggle = GObject.registerClass(
 class BluetoothToggle extends QuickMenuToggle {
     _init(client) {
-        super._init({
-            title: _('Bluetooth'),
-            menuButtonAccessibleName: _('Open Bluetooth menu'),
-        });
-
-        this.menu.setHeader('bluetooth-active-symbolic', _('Bluetooth'));
+        super._init();
 
         this._deviceItems = new Map();
         this._deviceSection = new PopupMenu.PopupMenuSection();
@@ -120,7 +110,7 @@ class BluetoothToggle extends QuickMenuToggle {
             GObject.BindingFlags.INVERT_BOOLEAN);
 
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        this.menu.addSettingsAction(_('Bluetooth Settings'), 'bluetooth');
+        KestrelUi.bindText(this.menu.addSettingsAction('', 'bluetooth').label, 'bluetooth-settings');
 
         this._client = client;
 
@@ -151,8 +141,13 @@ class BluetoothToggle extends QuickMenuToggle {
 
         this.connect('clicked', () => this._client.toggleActive());
 
-        this._updatePlaceholder();
-        this._sync();
+        KestrelUi.localized(this, () => {
+            this.title = KestrelUi.t('bluetooth-title');
+            this.menuButtonAccessibleName = KestrelUi.t('bluetooth-open-menu');
+            this.menu.setHeader('bluetooth-active-symbolic', KestrelUi.t('bluetooth-title'));
+            this._updatePlaceholder();
+            this._sync();
+        });
     }
 
     _onActiveChanged() {
@@ -165,9 +160,9 @@ class BluetoothToggle extends QuickMenuToggle {
     }
 
     _updatePlaceholder() {
-        this._placeholderItem.label.text = this._client.active
-            ? _('No available or connected devices')
-            : _('Turn on Bluetooth to connect to devices');
+        this._placeholderItem.label.text = KestrelUi.t(this._client.active
+            ? 'bluetooth-no-devices'
+            : 'bluetooth-turn-on-hint');
     }
 
     _updatePlaceholderRelation() {
@@ -230,8 +225,7 @@ class BluetoothToggle extends QuickMenuToggle {
         const nConnected = connectedDevices.length;
 
         if (nConnected > 1)
-            /* Translators: This is the number of connected bluetooth devices */
-            this.subtitle = ngettext('%d Connected', '%d Connected', nConnected).format(nConnected);
+            this.subtitle = KestrelUi.t('bluetooth-connected-count', {count: nConnected});
         else if (nConnected === 1)
             this.subtitle = connectedDevices[0].alias;
         else

@@ -6,6 +6,7 @@ import * as MessageTray from 'resource:///com/lantharos/kestrel/ui/messageTray.j
 import { getInputSourceManager } from 'resource:///com/lantharos/kestrel/ui/status/keyboard.js';
 
 import type { Context } from '../../context.js';
+import { t } from '../../shared/i18n/index.js';
 import { openSettings } from '../settingsPages.js';
 import { playSound } from '../sounds/sounds.js';
 import { ownDictation } from './listening.js';
@@ -183,11 +184,11 @@ export class Dictation {
     const source = MessageTray.getSystemSource();
     const notification = new MessageTray.Notification({
       source,
-      title: 'Type by speaking',
-      body: 'Talk to type what you say, in any app. It listens on this computer, so it needs its speech model first.',
+      title: t('dictation-setup-title'),
+      body: t('dictation-setup-body'),
       gicon: new Gio.ThemedIcon({ name: 'audio-input-microphone-symbolic' }),
     });
-    notification.addAction('Set up dictation', () => openSettings('keyboard/dictation'));
+    notification.addAction(t('dictation-setup-action'), () => openSettings('keyboard/dictation'));
     source.addNotification(notification);
   }
 
@@ -197,11 +198,11 @@ export class Dictation {
     const source = MessageTray.getSystemSource();
     const notification = new MessageTray.Notification({
       source,
-      title: `Dictation in ${language} isn’t available on this computer`,
-      body: `Its processor can’t run the speech recognizer ${language} needs. You can dictate in another language.`,
+      title: t('dictation-unsupported-title', { language }),
+      body: t('dictation-unsupported-body', { language }),
       gicon: new Gio.ThemedIcon({ name: 'audio-input-microphone-symbolic' }),
     });
-    notification.addAction('Dictation settings', () => openSettings('keyboard/dictation'));
+    notification.addAction(t('dictation-settings-action'), () => openSettings('keyboard/dictation'));
     source.addNotification(notification);
   }
 

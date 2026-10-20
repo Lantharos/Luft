@@ -4,6 +4,7 @@ import GLib from 'gi://GLib';
 import St from 'gi://St';
 import { Avatar } from 'resource:///com/lantharos/kestrel/ui/userWidget.js';
 
+import { t } from '../../shared/i18n/index.js';
 import { animateActor } from '../../shared/motion.js';
 import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
 import { LOCK, POWER_ACTIONS, bindAvailability, type SessionAction } from '../quickSettings/sessionActions.js';
@@ -41,12 +42,12 @@ export class StartFooter {
 
     this.powerButton = new St.Button({
       style_class: 'kestrel-icon-button', child: this.toggleIcon,
-      accessible_name: 'Power and session', can_focus: true, track_hover: true,
+      accessible_name: t('start-power'), can_focus: true, track_hover: true,
     });
     this.powerButton.connect('clicked', () => this.setOpen(!this.open));
     this.actor.add_child(this.powerButton);
 
-    menus.bind(this.account, () => [{ label: 'Account settings', run: () => menus.settings('users') }]);
+    menus.bind(this.account, () => [{ label: t('start-account-settings'), run: () => menus.settings('users') }]);
   }
 
   get sessionOpen(): boolean { return this.open; }
@@ -55,7 +56,7 @@ export class StartFooter {
     if (this.open === open) return;
     this.open = open;
     this.toggleIcon.icon_name = open ? 'window-close-symbolic' : 'system-shutdown-symbolic';
-    this.powerButton.accessible_name = open ? 'Close power options' : 'Power and session';
+    this.powerButton.accessible_name = t(open ? 'start-power-close' : 'start-power');
     if (open) this.powerButton.add_style_pseudo_class('checked');
     else this.powerButton.remove_style_pseudo_class('checked');
     const [shown, hidden] = open ? [this.actions, this.account] : [this.account, this.actions];
@@ -79,10 +80,11 @@ export class StartFooter {
   private actionButton(action: SessionAction): St.Button {
     const content = new St.BoxLayout({ style_class: 'kestrel-session-action-content', x_align: Clutter.ActorAlign.CENTER });
     content.add_child(new St.Icon({ icon_name: action.icon, icon_size: 16, y_align: Clutter.ActorAlign.CENTER }));
-    content.add_child(new St.Label({ text: action.label, y_align: Clutter.ActorAlign.CENTER }));
+    const label = t(action.message);
+    content.add_child(new St.Label({ text: label, y_align: Clutter.ActorAlign.CENTER }));
     const button = new St.Button({
       style_class: 'kestrel-session-action', child: content,
-      can_focus: true, track_hover: true, accessible_name: action.label,
+      can_focus: true, track_hover: true, accessible_name: label,
     });
     button.connect('clicked', () => {
       this.close();

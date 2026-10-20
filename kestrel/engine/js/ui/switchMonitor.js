@@ -3,6 +3,7 @@ import GObject from 'gi://GObject';
 import Meta from 'gi://Meta';
 import St from 'gi://St';
 
+import * as KestrelUi from './kestrelUi.js';
 import * as SwitcherPopup from './switcherPopup.js';
 
 const APP_ICON_SIZE = 96;
@@ -14,37 +15,25 @@ class SwitchMonitorPopup extends SwitcherPopup.SwitcherPopup {
 
         items.push({
             icon: 'shell-display-mirror-symbolic',
-            /* Translators: this is for display mirroring i.e. cloning.
-             * Try to keep it under around 15 characters.
-             */
-            label: _('Mirror'),
+            label: KestrelUi.t('switch-monitor-mirror'),
             configType: Meta.MonitorSwitchConfigType.ALL_MIRROR,
         });
 
         items.push({
             icon: 'shell-display-extend-all-symbolic',
-            /* Translators: this is for the desktop spanning displays.
-             * Try to keep it under around 15 characters.
-             */
-            label: _('Join Displays'),
+            label: KestrelUi.t('switch-monitor-join'),
             configType: Meta.MonitorSwitchConfigType.ALL_LINEAR,
         });
 
         if (global.backend.get_monitor_manager().has_builtin_panel) {
             items.push({
                 icon: 'shell-display-external-only-symbolic',
-                /* Translators: this is for using only external displays.
-                 * Try to keep it under around 15 characters.
-                 */
-                label: _('External Only'),
+                label: KestrelUi.t('switch-monitor-external-only'),
                 configType: Meta.MonitorSwitchConfigType.EXTERNAL,
             });
             items.push({
                 icon: 'shell-display-built-in-only-symbolic',
-                /* Translators: this is for using only the laptop display.
-                 * Try to keep it under around 15 characters.
-                 */
-                label: _('Built-in Only'),
+                label: KestrelUi.t('switch-monitor-built-in-only'),
                 configType: Meta.MonitorSwitchConfigType.BUILTIN,
             });
         }

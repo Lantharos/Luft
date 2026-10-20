@@ -52,7 +52,7 @@ export class FingerprintAuthentication extends Signals.EventEmitter {
         if (isError) {
             if (this._listening) {
                 KestrelUi.playSound('error');
-                this.emit('hint', _('Fingerprint not recognized'));
+                this.emit('hint', KestrelUi.t('fingerprint-not-recognized'));
             } else {
                 this._stop(null);
             }
@@ -75,10 +75,10 @@ export class FingerprintAuthentication extends Signals.EventEmitter {
         KestrelUi.playSound('error');
         if (this._restarts < RESTARTS) {
             this._restarts++;
-            this.emit('hint', _('Fingerprint not recognized'));
+            this.emit('hint', KestrelUi.t('fingerprint-not-recognized'));
             this._start();
         } else {
-            this._stop(_('Fingerprint not recognized'));
+            this._stop(KestrelUi.t('fingerprint-not-recognized'));
         }
     }
 }

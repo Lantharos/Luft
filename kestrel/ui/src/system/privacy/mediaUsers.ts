@@ -1,6 +1,8 @@
 import Gio from 'gi://Gio';
 import Shell from 'gi://Shell';
 
+import { t } from '../../shared/i18n/index.js';
+
 type MediaKind = 'camera' | 'microphone';
 
 export interface MediaUser {
@@ -53,7 +55,7 @@ export async function mediaUsers(ownDictation: boolean): Promise<MediaUser[]> {
     const app = appFor(props);
     users.set(`${kind}:${consumer.id}`, {
       kind, node: consumer.id, app,
-      name: app?.get_name() ?? String(props['application.name'] ?? props['node.name'] ?? 'An app'),
+      name: app?.get_name() ?? String(props['application.name'] ?? props['node.name'] ?? t('privacy-unknown-app')),
       muted: !!consumer.info?.params?.Props?.some(entry => entry.mute),
     });
   }

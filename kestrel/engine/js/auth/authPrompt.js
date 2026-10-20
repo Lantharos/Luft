@@ -17,7 +17,7 @@ const PASSWORD_QUESTIONS = ['Password:', 'Password: '];
 
 function questionHint(question) {
     if (PASSWORD_QUESTIONS.includes(question))
-        return _('Password');
+        return KestrelUi.t('auth-prompt-password');
     return question.replace(/[:：] *$/, '').trim();
 }
 
@@ -69,11 +69,11 @@ export const AuthPrompt = GObject.registerClass({
 
         this._backButton = new St.Button({
             style_class: 'login-dialog-button cancel-button',
-            accessible_name: _('Back'),
             can_focus: true,
             y_align: Clutter.ActorAlign.CENTER,
             icon_name: 'go-previous-symbolic',
         });
+        KestrelUi.localized(this._backButton, () => (this._backButton.accessible_name = KestrelUi.t('auth-prompt-back')));
         this._backButton.connect('clicked', () => this.cancel());
         row.add_child(this._backButton);
 
@@ -113,10 +113,10 @@ export const AuthPrompt = GObject.registerClass({
 
         this._nextButton = new St.Button({
             style_class: 'login-dialog-button next-button',
-            accessible_name: _('Submit'),
             can_focus: false,
             icon_name: 'go-next-symbolic',
         });
+        KestrelUi.localized(this._nextButton, () => (this._nextButton.accessible_name = KestrelUi.t('auth-prompt-submit')));
         this._nextButton.connect('clicked', () => this._activate());
         this._nextButton.add_style_pseudo_class('default');
         buttonWell.add_child(this._nextButton);
@@ -183,7 +183,7 @@ export const AuthPrompt = GObject.registerClass({
         this._askingUserName = true;
         this._question = null;
         this._preemptiveAnswer = null;
-        this._useEntry(false, _('Username'));
+        this._useEntry(false, KestrelUi.t('auth-prompt-username'));
         this._updateBackButton();
         this._setBusy(false);
         this._setMessage(null);
@@ -300,7 +300,7 @@ export const AuthPrompt = GObject.registerClass({
         if (!authError)
             console.warn(`Authentication did not complete: ${description}`);
         const password = this._question?.secret && PASSWORD_QUESTIONS.includes(this._question.text);
-        this._setMessage(password ? _('That password didn’t work') : _('That didn’t work. Try again.'), true);
+        this._setMessage(KestrelUi.t(password ? 'auth-prompt-wrong-password' : 'auth-prompt-failed'), true);
         wiggle(this._entryArea);
         KestrelUi.playSound('error');
         this._question = null;

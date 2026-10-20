@@ -6,7 +6,7 @@ import type { Keybindings } from '../../context.js';
 import { portalObject } from '../core/exported.js';
 import { CANCELLED, ENDED, SUCCESS, respond, type Invocation, type Options } from '../core/request.js';
 import { PortalSession, findSession } from '../core/session.js';
-import { canonical, claimable, label, reservedAccelerators } from './accelerators.js';
+import { alternatives, canonical, claimable, reservedAccelerators } from './accelerators.js';
 import { allowShortcuts } from './consentDialog.js';
 import { recordShortcuts } from './recordDialog.js';
 import { ShortcutStore, type AppShortcuts } from './store.js';
@@ -174,7 +174,7 @@ export class GlobalShortcutsPortal {
     return new GLib.Variant('a(sa{sv})', session.ids.filter(id => shortcuts[id]).map((id): [string, Options] => {
       const { description, shortcuts: accelerators } = shortcuts[id];
       const options: Options = { description: new GLib.Variant('s', description) };
-      if (accelerators.length) options.trigger_description = new GLib.Variant('s', accelerators.map(label).join(' or '));
+      if (accelerators.length) options.trigger_description = new GLib.Variant('s', alternatives(accelerators));
       return [id, options];
     }));
   }

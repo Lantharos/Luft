@@ -3,6 +3,7 @@ import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
 import type Meta from 'gi://Meta';
 
+import { t } from '../../../shared/i18n/index.js';
 import { identify, type Caller } from '../access/callers.js';
 import { PidFd, cgroupOf } from '../access/processes.js';
 import type { Level } from '../access/prompt.js';
@@ -28,7 +29,7 @@ class HostPolicy implements Policy {
   }
 
   admit(caller: Caller): void {
-    if (caller.unit !== this.owner.unit) throw new PeekError('Denied', 'This display belongs to another program');
+    if (caller.unit !== this.owner.unit) throw new PeekError('Denied', t('peek-error-display-owner'));
   }
 
   held(): Level {
@@ -52,7 +53,7 @@ class HostPolicy implements Policy {
   }
 
   launch(): Promise<string> {
-    throw new PeekError('InvalidArgs', 'Programs in a hidden display are started by peek run');
+    throw new PeekError('InvalidArgs', t('peek-error-display-run'));
   }
 
   async stop(handle: string): Promise<void> {
@@ -66,7 +67,7 @@ class HostPolicy implements Policy {
   reset(): void {}
 
   private check(handle: string): void {
-    if (handle !== this.handle) throw new PeekError('NotFound', `This display was started as ${this.handle}, not ${handle}`);
+    if (handle !== this.handle) throw new PeekError('NotFound', t('peek-error-display-handle', { handle: this.handle, requested: handle }));
   }
 }
 

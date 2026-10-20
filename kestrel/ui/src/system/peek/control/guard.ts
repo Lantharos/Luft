@@ -1,3 +1,4 @@
+import { t } from '../../../shared/i18n/index.js';
 import { PeekError } from '../errors.js';
 
 export interface Screen {
@@ -12,5 +13,5 @@ export function screenGuarded(screen: Screen): boolean {
 
 export function requireOpenScreen(screen: Screen): void {
   if (screenGuarded(screen))
-    throw new PeekError('Busy', 'The screen is locked, or a system prompt is open on it. Try again once it is gone.');
+    throw new PeekError('Busy', t('peek-error-screen-busy'));
 }

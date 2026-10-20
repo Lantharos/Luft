@@ -6,6 +6,7 @@ import St from 'gi://St';
 import { blurSurface } from '../../shared/surface.js';
 import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
 import { blinkCaret } from '../../shared/input/caret.js';
+import { t } from '../../shared/i18n/index.js';
 import { StartGrid } from './grid.js';
 import { StartFooter } from './footer.js';
 import { StartSearch } from './search/search.js';
@@ -35,7 +36,7 @@ export class StartMenu {
     });
     blurSurface(this.actor);
     this.search = new St.Entry({
-      style_class: 'kestrel-search', hint_text: 'Search apps, settings and files',
+      style_class: 'kestrel-search', hint_text: t('start-search-placeholder'),
       can_focus: true, x_expand: true,
       primary_icon: new St.Icon({ icon_name: 'edit-find-symbolic', icon_size: 16 }),
     });
@@ -45,12 +46,12 @@ export class StartMenu {
       const clipboard = St.Clipboard.get_default();
       const copy = () => clipboard.set_text(St.ClipboardType.CLIPBOARD, text.get_selection());
       return [
-        { label: 'Cut', enabled: text.get_selection().length > 0, run: () => { copy(); text.delete_selection(); } },
-        { label: 'Copy', enabled: text.get_selection().length > 0, run: copy },
-        { label: 'Paste', run: () => clipboard.get_text(St.ClipboardType.CLIPBOARD, (_clipboard, value) => {
+        { label: t('start-search-cut'), enabled: text.get_selection().length > 0, run: () => { copy(); text.delete_selection(); } },
+        { label: t('start-search-copy'), enabled: text.get_selection().length > 0, run: copy },
+        { label: t('start-search-paste'), run: () => clipboard.get_text(St.ClipboardType.CLIPBOARD, (_clipboard, value) => {
           if (value) { text.delete_selection(); text.insert_text(value, text.cursor_position); }
         }) },
-        { label: 'Select all', run: () => text.set_selection(0, -1) },
+        { label: t('start-search-select-all'), run: () => text.set_selection(0, -1) },
       ];
     });
     this.search.clutter_text.connect('text-changed', () => this.searchProvider.setText(this.search.get_text()));

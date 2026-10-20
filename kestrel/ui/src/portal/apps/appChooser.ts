@@ -5,6 +5,7 @@ import Shell from 'gi://Shell';
 import type St from 'gi://St';
 
 import { appIcon } from '../../appearance/icons/appIcons.js';
+import { t } from '../../shared/i18n/index.js';
 import { openDialog, type PortalDialog } from '../core/dialog.js';
 import { portalObject } from '../core/exported.js';
 import { CANCELLED, SUCCESS, option, respond, type Invocation, type Options } from '../core/request.js';
@@ -40,9 +41,12 @@ function heading(location: string | undefined, contentType: string | null): { ti
   const kind = contentType ? Gio.content_type_get_description(contentType) : null;
   if (location) {
     const name = GLib.path_get_basename(GLib.uri_unescape_string(location, null) ?? location);
-    return { title: `Open “${name}”`, description: kind ? `Choose an app for this ${kind.toLowerCase()}.` : 'Choose an app to open it.' };
+    return {
+      title: t('portal-app-chooser-open-title', { name }),
+      description: kind ? t('portal-app-chooser-open-kind', { kind }) : t('portal-app-chooser-open-description'),
+    };
   }
-  return { title: 'Choose an app', description: kind ? `Choose an app for ${kind.toLowerCase()} files.` : 'Choose an app to continue.' };
+  return { title: t('portal-app-chooser-title'), description: kind ? t('portal-app-chooser-kind', { kind }) : t('portal-app-chooser-description') };
 }
 
 function findInStore(store: GioUnix.DesktopAppInfo, contentType: string | null): void {
@@ -51,7 +55,7 @@ function findInStore(store: GioUnix.DesktopAppInfo, contentType: string | null):
 }
 
 function nothingInstalled(): St.Widget {
-  const notice = row({ title: 'No installed app can open this' });
+  const notice = row({ title: t('portal-app-chooser-nothing-installed') });
   notice.reactive = notice.can_focus = false;
   return notice;
 }
@@ -90,9 +94,9 @@ export class AppChooserPortal {
     dialog.content.add_child(apps.length ? list(rows, rows.length > SCROLL_AFTER) : nothingInstalled());
     const store = GioUnix.DesktopAppInfo.new(STORE);
     dialog.buttons([
-      { label: 'Cancel', action: dialog.cancel },
-      ...store ? [{ label: 'Find an App', action: () => { findInStore(store, contentType); dialog.finish(CANCELLED); } }] : [],
-      { label: 'Open', action: confirm, default: true, reactive: !!chosen },
+      { label: t('portal-cancel'), action: dialog.cancel },
+      ...store ? [{ label: t('portal-app-chooser-find'), action: () => { findInStore(store, contentType); dialog.finish(CANCELLED); } }] : [],
+      { label: t('portal-app-chooser-open'), action: confirm, default: true, reactive: !!chosen },
     ]);
     const selected = rows.find(button => button.checked);
     if (selected) dialog.modal.setInitialKeyFocus(selected);

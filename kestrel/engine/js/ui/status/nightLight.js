@@ -2,6 +2,8 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 
+import * as KestrelUi from '../kestrelUi.js';
+
 import {QuickToggle, SystemIndicator} from '../quickSettings.js';
 
 import {loadInterfaceXML} from '../../misc/fileUtils.js';
@@ -16,10 +18,10 @@ const NightLightToggle = GObject.registerClass(
 class NightLightToggle extends QuickToggle {
     _init() {
         super._init({
-            title: _('Night Light'),
             iconName: 'night-light-symbolic',
             toggleMode: true,
         });
+        KestrelUi.localized(this, () => (this.title = KestrelUi.t('night-light-title')));
 
         const monitorManager = global.backend.get_monitor_manager();
         monitorManager.bind_property('night-light-supported',

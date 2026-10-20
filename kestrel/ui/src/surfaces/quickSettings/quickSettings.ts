@@ -10,6 +10,7 @@ import type { ContextMenus, MenuEntry } from '../../desktop/menus/contextMenus.j
 import { ScrollPane } from './scrollPane.js';
 import { attachSliderValue } from './sliderValue.js';
 import { KeepAwake } from './keepAwake.js';
+import { t } from '../../shared/i18n/index.js';
 import { animateActor, Spring } from '../../shared/motion.js';
 import { blurSurface } from '../../shared/surface.js';
 import { detach, type QuickControl, type ControlMenu, type QuickSettingsSource } from './quickControls.js';
@@ -93,7 +94,7 @@ export class QuickSettings {
         });
       }
       for (const tile of this.actions.tiles)
-        this.register({ ...tile, name: () => tile.id === 'battery' ? 'Battery' : tile.actor.accessible_name });
+        this.register({ ...tile, name: () => tile.id === 'battery' ? t('quick-settings-battery') : tile.actor.accessible_name });
       this.arrangeTiles(false);
       this.addSlider(source._volumeOutput.quickSettingsItems[0]);
       this.addSlider(createInputSlider());
@@ -169,9 +170,9 @@ export class QuickSettings {
 
   private tileMenu(tile: RegisteredTile): MenuEntry[] {
     const entries: MenuEntry[] = [];
-    if (tile.settingsPanel) entries.push({ label: 'Settings', run: () => this.menus.settings(tile.settingsPanel!) });
+    if (tile.settingsPanel) entries.push({ label: t('quick-settings-tile-settings'), run: () => this.menus.settings(tile.settingsPanel!) });
     entries.push({
-      label: 'Remove', run: () => {
+      label: t('quick-settings-tile-remove'), run: () => {
         this.layoutStore.remove(tile.id);
       },
     });
@@ -184,7 +185,7 @@ export class QuickSettings {
     const addable = this.tiles.filter(tile => removed.has(tile.id) && tile.actor.visible);
     if (addable.length) {
       entries.push({
-        label: 'Add',
+        label: t('quick-settings-add'),
         children: addable.map(tile => ({
           label: tile.name(), run: () => {
             this.layoutStore.restore(tile.id);
@@ -194,7 +195,7 @@ export class QuickSettings {
     }
     if (this.layoutStore.customized) {
       entries.push({
-        label: 'Reset', run: () => {
+        label: t('quick-settings-reset'), run: () => {
           this.layoutStore.reset();
           this.arrangeTiles(true);
         },

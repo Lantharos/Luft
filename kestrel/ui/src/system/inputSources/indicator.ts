@@ -3,6 +3,7 @@ import St from 'gi://St';
 import { getInputSourceManager, type InputSource } from 'resource:///com/lantharos/kestrel/ui/status/keyboard.js';
 
 import type { ContextMenus, MenuEntry } from '../../desktop/menus/contextMenus.js';
+import { localized, t } from '../../shared/i18n/index.js';
 import { ScrollSteps } from '../../shared/input/scrollSteps.js';
 import { modeSymbol, propertyEntries, visibleProperties } from './properties.js';
 
@@ -32,7 +33,7 @@ export class InputSourceIndicator {
       'sources-changed', () => this.sync(),
       'current-source-changed', () => this.sync(),
       'keymap-changed', () => this.sync(), this);
-    this.sync();
+    localized(this.actor, () => this.sync());
   }
 
   contains(actor: Clutter.Actor | null): boolean {
@@ -66,7 +67,7 @@ export class InputSourceIndicator {
     this.actor.visible = !!current && (choices.length > 1 || visibleProperties(properties).length > 0);
     if (!current) return;
     this.label.text = modeSymbol(properties) ?? current.label;
-    this.actor.accessible_name = `Input source: ${current.name}`;
+    this.actor.accessible_name = t('input-source-indicator', { source: current.name });
   }
 
   private open(): void {

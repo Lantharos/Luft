@@ -21,14 +21,14 @@ export class CtrlAltTabManager {
     constructor() {
         this._items = [];
         this.addGroup(global.window_group,
-            _('Windows'),
+            'ctrl-alt-tab-windows',
             'shell-focus-windows-symbolic', {
                 sortGroup: SortGroup.TOP,
                 focusCallback: this._focusWindows.bind(this),
             });
     }
 
-    addGroup(root, name, icon, params) {
+    addGroup(root, nameId, icon, params) {
         const item = Params.parse(params, {
             sortGroup: SortGroup.MIDDLE,
             proxy: root,
@@ -36,7 +36,7 @@ export class CtrlAltTabManager {
         });
 
         item.root = root;
-        item.name = name;
+        item.nameId = nameId;
         item.iconName = icon;
 
         this._items.push(item);
@@ -79,7 +79,9 @@ export class CtrlAltTabManager {
 
     popup(backward, binding, mask) {
         // Start with the set of focus groups that are currently mapped
-        const items = this._items.filter(item => item.proxy.mapped);
+        const items = this._items
+            .filter(item => item.proxy.mapped)
+            .map(item => ({...item, name: KestrelUi.t(item.nameId)}));
 
         // And add the windows metacity would show in its Ctrl-Alt-Tab list
         if (Main.sessionMode.hasWindows) {

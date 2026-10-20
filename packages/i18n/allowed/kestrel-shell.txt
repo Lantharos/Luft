@@ -1,0 +1,4 @@
+kestrel/ui/src/shared/input/longPress.ts	Kestrel long press
+kestrel/ui/src/shared/sandbox.ts	Sandboxed apps cannot ${action}
+kestrel/ui/src/appearance/themes/ghostty.ts	Kestrel Light
+kestrel/ui/src/appearance/themes/ghostty.ts	Kestrel Dark

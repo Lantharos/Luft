@@ -225,8 +225,8 @@ class FdoNotificationDaemon {
                     hasDefaultAction = true;
                 } else if (actionId === 'inline-reply') {
                     notification.set({
-                        replyLabel: label || _('Reply'),
-                        replyPlaceholder: hints['x-kde-reply-placeholder-text'] || _('Write a reply'),
+                        replyLabel: label || KestrelUi.t('messages-reply'),
+                        replyPlaceholder: hints['x-kde-reply-placeholder-text'] || KestrelUi.t('messages-reply-placeholder'),
                     });
                     notification.connectObject('replied', (_notification, text) =>
                         this._emitReplied(id, text, invocation), this);

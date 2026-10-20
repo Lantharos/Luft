@@ -305,7 +305,7 @@ export const BrightnessManager = GObject.registerClass({
                 .map(s => s.nSteps));
             const nSteps = Math.min(maxSteps, SCALE_VALUE_N_STEPS);
 
-            this._globalScale = new BrightnessScale(_('Brightness'), 1.0, nSteps);
+            this._globalScale = new BrightnessScale(null, 1.0, nSteps);
             this._globalScale.connect('notify::value', () => {
                 if (this._inhibitUpdates)
                     return;

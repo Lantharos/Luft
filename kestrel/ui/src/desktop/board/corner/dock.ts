@@ -4,6 +4,7 @@ import St from 'gi://St';
 
 import { appIcon } from '../../../appearance/icons/appIcons.js';
 import { blurSurface } from '../../../shared/surface.js';
+import { localized, t } from '../../../shared/i18n/index.js';
 
 const ICON_SIZE = 20;
 
@@ -17,7 +18,6 @@ export class Dock {
   private readonly launcher = new St.Button({
     style_class: 'kestrel-board-dock-button',
     can_focus: true,
-    accessible_name: 'Open Start',
     child: new St.Icon({ icon_name: 'view-grid-symbolic', style_class: 'kestrel-board-pill-icon' }),
   });
   private readonly apps = new St.BoxLayout({ style_class: 'kestrel-board-dock-apps' });
@@ -25,6 +25,7 @@ export class Dock {
   private readonly tracker = Shell.WindowTracker.get_default();
 
   constructor(private readonly actions: DockActions) {
+    localized(this.launcher, () => (this.launcher.accessible_name = t('board-open-start')));
     this.actor.add_child(this.launcher);
     this.actor.add_child(this.apps);
     blurSurface(this.actor, 999);

@@ -6,6 +6,7 @@ import St from 'gi://St';
 import type { Monitor } from '../../panel/panel.js';
 import { animateActor, Curve, Duration } from '../../../shared/motion.js';
 import { blurSurface } from '../../../shared/surface.js';
+import { localized, t } from '../../../shared/i18n/index.js';
 import { Dock, type DockActions } from './dock.js';
 import { CornerPill } from './pill.js';
 
@@ -21,7 +22,6 @@ export class Corner {
   private readonly overview = new St.Button({
     style_class: 'kestrel-board-overview kestrel-glass',
     can_focus: true,
-    accessible_name: 'Show all windows',
     child: new St.Icon({ icon_name: 'view-restore-symbolic', style_class: 'kestrel-board-pill-icon' }),
     y_align: Clutter.ActorAlign.CENTER,
     visible: false,
@@ -36,6 +36,7 @@ export class Corner {
   constructor(actions: CornerActions) {
     this.dock = new Dock(actions);
     this.pill = new CornerPill(() => actions.openQuickSettings());
+    localized(this.overview, () => (this.overview.accessible_name = t('board-show-all-windows')));
     blurSurface(this.overview, 999);
     this.overview.connect('clicked', () => actions.overview());
     for (const child of [this.overview, this.dock.actor, this.pill.actor]) this.actor.add_child(child);

@@ -1,0 +1,3 @@
+kestrel/ui/src/session/manager/sessionManager.ts	Nothing to inhibit
+kestrel/ui/src/session/manager/sessionManager.ts	Unknown inhibitor
+kestrel/ui/src/session/manager/sessionManager.ts	The session environment can only change while the session starts

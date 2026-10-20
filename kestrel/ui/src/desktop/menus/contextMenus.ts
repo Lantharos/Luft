@@ -11,6 +11,7 @@ import { longPress } from '../../shared/input/longPress.js';
 import { menuContent, type MenuEntry, type MenuGroup } from './menuContent.js';
 import { openSettings, type SettingsPageId } from '../../system/settingsPages.js';
 import { taskbarPreferences } from '../panel/preferences/taskbarPreferences.js';
+import { t } from '../../shared/i18n/index.js';
 
 export type { MenuEntry } from './menuContent.js';
 
@@ -84,30 +85,30 @@ export class ContextMenus {
 
   appEntries(app: Shell.App, windows = app.get_windows(), open = () => app.activate()): MenuEntry[] {
     const launch = (action: () => void) => () => { this.dismissShell(); action(); };
-    const entries: MenuEntry[] = [{ label: 'Open', run: launch(open) }];
+    const entries: MenuEntry[] = [{ label: t('window-menu-open'), run: launch(open) }];
     const info = app.get_app_info();
     if (app.can_open_new_window() && !info?.list_actions().includes('new-window'))
-      entries.push({ label: 'New window', run: launch(() => app.open_new_window(-1)) });
+      entries.push({ label: t('window-menu-new-window'), run: launch(() => app.open_new_window(-1)) });
     for (const action of info?.list_actions() ?? [])
       entries.push({ label: info!.get_action_name(action), run: launch(() => app.launch_action(action, (global as unknown as Shell.Global).get_current_time(), -1)) });
     for (const window of windows) entries.push({ label: window.get_title() || app.get_name(), run: launch(() => this.activateWindow(window)) });
     if (windows.length === 1) {
       const window = windows[0];
-      if (window.can_minimize()) entries.push({ label: window.minimized ? 'Restore' : 'Minimize', run: () => {
+      if (window.can_minimize()) entries.push({ label: t(window.minimized ? 'window-menu-restore' : 'window-menu-minimize'), run: () => {
         if (window.minimized) window.unminimize(); else window.minimize();
       } });
-      if (window.can_maximize()) entries.push({ label: window.is_maximized() ? 'Unmaximize' : 'Maximize', run: () => {
+      if (window.can_maximize()) entries.push({ label: t(window.is_maximized() ? 'window-menu-unmaximize' : 'window-menu-maximize'), run: () => {
         if (window.is_maximized()) window.unmaximize(); else window.maximize();
       } });
     }
     if (taskbarPreferences.showPinned && !app.is_window_backed()) {
       const pinned = this.favorites.get_strv('favorite-apps').includes(app.id);
-      entries.push({ label: pinned ? 'Unpin from taskbar' : 'Pin to taskbar', run: () => {
+      entries.push({ label: t(pinned ? 'window-menu-unpin' : 'window-menu-pin'), run: () => {
         const ids = this.favorites.get_strv('favorite-apps');
         this.favorites.set_strv('favorite-apps', pinned ? ids.filter(id => id !== app.id) : [...ids, app.id]);
       } });
     }
-    if (windows.length) entries.push({ label: windows.length === 1 ? 'Close window' : 'Close all windows', run: () => {
+    if (windows.length) entries.push({ label: t('window-menu-close', { count: windows.length }), run: () => {
       if (windows.length === app.get_windows().length) app.request_quit();
       else for (const window of windows) window.delete((global as unknown as Shell.Global).get_current_time());
     } });

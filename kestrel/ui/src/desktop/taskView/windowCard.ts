@@ -6,6 +6,7 @@ import * as DND from 'resource:///com/lantharos/kestrel/ui/dnd.js';
 
 import { windowIcon } from '../../appearance/icons/appIcons.js';
 import { animateActor, Duration } from '../../shared/motion.js';
+import { localized, t } from '../../shared/i18n/index.js';
 import type { Monitor } from '../panel/panel.js';
 import type { Rect } from './grid.js';
 
@@ -29,8 +30,9 @@ export class WindowCard {
     this.header.add_child(icon);
     this.title = new St.Label({ style_class: 'kestrel-task-title', x_expand: true, y_align: Clutter.ActorAlign.CENTER });
     this.header.add_child(this.title);
-    const close = new St.Button({ style_class: 'kestrel-task-close', opacity: 0, accessible_name: 'Close window',
+    const close = new St.Button({ style_class: 'kestrel-task-close', opacity: 0,
       child: new St.Icon({ icon_name: 'window-close-symbolic', icon_size: 14 }) });
+    localized(close, () => (close.accessible_name = t('task-view-close-window')));
     close.connect('clicked', () => window.delete((global as unknown as Shell.Global).get_current_time()));
     this.header.add_child(close);
 

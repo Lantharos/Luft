@@ -3,6 +3,7 @@ import GLib from 'gi://GLib';
 
 import type { Context } from '../../context.js';
 import { accelerometer } from '../../desktop/rotation/accelerometer.js';
+import { t } from '../../shared/i18n/index.js';
 
 type ShowOsd = Context['showOsd'];
 
@@ -72,16 +73,16 @@ export class DeviceKeys {
     const radios = await properties(Gio.DBus.session, RFKILL, RFKILL_PATH, RFKILL).catch(() => null);
     if (!radios?.[`${prefix}HasAirplaneMode`]) return;
     if (radios[`${prefix}HardwareAirplaneMode`]) {
-      this.showOsd(icon('airplane-mode-symbolic'), 'Airplane mode is on in hardware', null, 1);
+      this.showOsd(icon('airplane-mode-symbolic'), t('media-keys-airplane-mode-hardware'), null, 1);
       return;
     }
     const blocked = !radios[`${prefix}AirplaneMode`];
     await Gio.DBus.session.call(RFKILL, RFKILL_PATH, 'org.freedesktop.DBus.Properties', 'Set',
       new GLib.Variant('(ssv)', [RFKILL, `${prefix}AirplaneMode`, new GLib.Variant('b', blocked)]), null, Gio.DBusCallFlags.NONE, -1, null);
     if (bluetooth)
-      this.showOsd(icon(blocked ? 'bluetooth-disabled-symbolic' : 'bluetooth-active-symbolic'), blocked ? 'Bluetooth off' : 'Bluetooth on', null, 1);
+      this.showOsd(icon(blocked ? 'bluetooth-disabled-symbolic' : 'bluetooth-active-symbolic'), t(blocked ? 'media-keys-bluetooth-off' : 'media-keys-bluetooth-on'), null, 1);
     else
-      this.showOsd(icon(blocked ? 'airplane-mode-symbolic' : 'network-wireless-signal-excellent-symbolic'), blocked ? 'Airplane mode on' : 'Airplane mode off', null, 1);
+      this.showOsd(icon(blocked ? 'airplane-mode-symbolic' : 'network-wireless-signal-excellent-symbolic'), t(blocked ? 'media-keys-airplane-mode-on' : 'media-keys-airplane-mode-off'), null, 1);
   }
 
   eject(): void {

@@ -4,6 +4,7 @@ import St from 'gi://St';
 
 import { appIcons } from '../../appearance/icons/appIcons.js';
 import type { ContextMenus, MenuEntry } from '../../desktop/menus/contextMenus.js';
+import { formatsLocale, localized, t } from '../../shared/i18n/index.js';
 import { windowAccess, type Grant } from '../peek/access/grants.js';
 import { mediaUsers, setMuted, type MediaUser } from './mediaUsers.js';
 import { PrivacyMonitor, type PrivacyState } from './monitor.js';
@@ -16,8 +17,9 @@ const ICONS: Record<keyof PrivacyState, string> = {
   location: 'find-location-symbolic',
   windows: 'focus-windows-symbolic',
 };
-const LABELS: Record<keyof PrivacyState, string> = {
-  camera: 'camera', microphone: 'microphone', sharing: 'screen', recording: 'screen', location: 'location', windows: 'windows',
+const THINGS: Record<keyof PrivacyState, string> = {
+  camera: 'privacy-thing-camera', microphone: 'privacy-thing-microphone', sharing: 'privacy-thing-screen', recording: 'privacy-thing-screen',
+  location: 'privacy-thing-location', windows: 'privacy-thing-windows',
 };
 
 const icon = (name: string) => new Gio.ThemedIcon({ name });
@@ -34,7 +36,7 @@ export class PrivacyIndicator {
     });
     this.actor.connect('clicked', () => void this.open());
     this.monitor = new PrivacyMonitor(() => this.sync());
-    this.sync();
+    localized(this.actor, () => this.sync());
   }
 
   shutdown(): void {
@@ -45,7 +47,8 @@ export class PrivacyIndicator {
     const state = this.monitor.state;
     const active = (Object.keys(ICONS) as (keyof PrivacyState)[]).filter(kind => state[kind]);
     this.actor.visible = active.length > 0;
-    this.actor.accessible_name = `Using your ${[...new Set(active.map(kind => LABELS[kind]))].join(', ')}`;
+    const things = [...new Set(active.map(kind => THINGS[kind]))].map(id => t(id));
+    this.actor.accessible_name = t('privacy-indicator', { things: new Intl.ListFormat(formatsLocale(), { type: 'conjunction' }).format(things) });
     this.icons.destroy_all_children();
     for (const kind of active) this.icons.add_child(new St.Icon({ icon_name: ICONS[kind], icon_size: 16 }));
   }
@@ -56,25 +59,25 @@ export class PrivacyIndicator {
     const entries: MenuEntry[] = [];
     for (const user of users) entries.push(this.userEntry(user));
     if (state.camera && !users.some(user => user.kind === 'camera'))
-      entries.push({ label: 'An app is using the camera', icon: icon(ICONS.camera), enabled: false, run: () => {} });
+      entries.push({ label: t('privacy-camera-unknown-app'), icon: icon(ICONS.camera), enabled: false, run: () => {} });
     if (state.sharing)
-      entries.push({ label: 'Stop sharing the screen', icon: icon(ICONS.sharing), run: () => { for (const handle of this.monitor.handles) if (!handle.is_recording) handle.stop(); } });
+      entries.push({ label: t('privacy-stop-sharing'), icon: icon(ICONS.sharing), run: () => { for (const handle of this.monitor.handles) if (!handle.is_recording) handle.stop(); } });
     if (state.recording)
-      entries.push({ label: 'Stop recording', icon: icon(ICONS.recording), run: this.stopScreencast });
+      entries.push({ label: t('privacy-stop-recording'), icon: icon(ICONS.recording), run: this.stopScreencast });
     if (state.location)
-      entries.push({ label: 'Turn off location services', icon: icon(ICONS.location),
+      entries.push({ label: t('privacy-turn-off-location'), icon: icon(ICONS.location),
         run: () => new Gio.Settings({ schema_id: 'org.gnome.system.location' }).set_boolean('enabled', false) });
     for (const grant of windowAccess.active) entries.push(this.windowsEntry(grant));
-    entries.push('separator', { label: 'Privacy settings', run: () => this.menus.settings('privacy') });
+    entries.push('separator', { label: t('privacy-settings'), run: () => this.menus.settings('privacy') });
     const [x, y] = this.actor.get_transformed_position();
     this.menus.open(this.actor, entries, Math.round(x + this.actor.width / 2), Math.round(y));
   }
 
   private windowsEntry({ caller, level }: Grant): MenuEntry {
     return {
-      label: `${caller.name} · ${level === 'use' ? 'Using your windows' : 'Seeing your windows'}`,
+      label: `${caller.name} · ${t(level === 'use' ? 'privacy-windows-using' : 'privacy-windows-seeing')}`,
       icon: caller.app ? appIcons.gicon(caller.app) : icon(ICONS.windows),
-      children: [{ label: 'Stop access', run: () => windowAccess.revoke(caller.unit) }],
+      children: [{ label: t('privacy-windows-stop'), run: () => windowAccess.revoke(caller.unit) }],
     };
   }
 
@@ -82,10 +85,10 @@ export class PrivacyIndicator {
     const { app, name } = user;
     const actions: MenuEntry[] = [];
     if (user.kind === 'microphone')
-      actions.push({ label: user.muted ? 'Unmute microphone' : 'Mute microphone', run: () => setMuted(user, !user.muted) });
-    if (app) actions.push({ label: `Close ${name}`, run: () => app.request_quit() });
+      actions.push({ label: t(user.muted ? 'privacy-unmute-microphone' : 'privacy-mute-microphone'), run: () => setMuted(user, !user.muted) });
+    if (app) actions.push({ label: t('privacy-close-app', { app: name }), run: () => app.request_quit() });
     return {
-      label: `${name} · ${user.kind === 'camera' ? 'Camera' : user.muted ? 'Microphone muted' : 'Microphone'}`,
+      label: `${name} · ${t(user.kind === 'camera' ? 'privacy-camera' : user.muted ? 'privacy-microphone-muted' : 'privacy-microphone')}`,
       icon: app ? appIcons.gicon(app) : icon(ICONS[user.kind]),
       children: actions,
     };

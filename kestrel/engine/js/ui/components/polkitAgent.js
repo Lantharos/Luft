@@ -9,6 +9,7 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import * as Dialog from '../dialog.js';
+import * as KestrelUi from '../kestrelUi.js';
 import * as Main from '../main.js';
 import * as ModalDialog from '../modalDialog.js';
 import * as ShellEntry from '../shellEntry.js';
@@ -41,9 +42,11 @@ const AuthenticationDialog = GObject.registerClass({
 
         this.connect('closed', this._onDialogClosed.bind(this));
 
-        const title = _('Authentication Required');
-
-        const headerContent = new Dialog.MessageDialogContent({title, description, iconName: 'security-high-symbolic'});
+        const headerContent = new Dialog.MessageDialogContent({
+            title: KestrelUi.t('polkit-title'),
+            description,
+            iconName: 'security-high-symbolic',
+        });
         this.contentLayout.add_child(headerContent);
 
         const bodyContent = new St.BoxLayout({
@@ -86,7 +89,7 @@ const AuthenticationDialog = GObject.registerClass({
         });
 
         if (userName === 'root')
-            this._userLabel.text = _('Administrator');
+            this._userLabel.text = KestrelUi.t('polkit-administrator');
 
         userBox.add_child(this._userLabel);
 
@@ -107,7 +110,7 @@ const AuthenticationDialog = GObject.registerClass({
         this._passwordEntry.bind_property('reactive',
             this._passwordEntry.clutter_text, 'editable',
             GObject.BindingFlags.SYNC_CREATE);
-        this._passwordField = new Dialog.EntryField(this._passwordEntry, _('Password'));
+        this._passwordField = new Dialog.EntryField(this._passwordEntry, KestrelUi.t('polkit-password'));
         passwordBox.add_child(this._passwordField);
 
         const warningBox = new St.BoxLayout({
@@ -141,12 +144,12 @@ const AuthenticationDialog = GObject.registerClass({
         bodyContent.add_child(passwordBox);
 
         this._cancelButton = this.addButton({
-            label: _('Cancel'),
+            label: KestrelUi.t('polkit-cancel'),
             action: this.cancel.bind(this),
             key: Clutter.KEY_Escape,
         });
         this._okButton = this.addButton({
-            label: _('Authenticate'),
+            label: KestrelUi.t('polkit-authenticate'),
             action: this._onAuthenticateButtonPressed.bind(this),
             reactive: false,
         });
@@ -256,11 +259,7 @@ const AuthenticationDialog = GObject.registerClass({
              * show "Sorry, that didn't work. Please try again."
              */
             if (!this._errorMessageLabel.visible) {
-                /* Translators: "that didn't work" refers to the fact that the
-                 * requested authentication was not gained; this can happen
-                 * because of an authentication error (like invalid password),
-                 * for instance. */
-                this._errorMessageLabel.set_text(_('Sorry, that didn’t work. Please try again.'));
+                this._errorMessageLabel.set_text(KestrelUi.t('polkit-failed'));
                 this._errorMessageLabel.show();
                 this._infoMessageLabel.hide();
 
@@ -278,11 +277,8 @@ const AuthenticationDialog = GObject.registerClass({
             this._sessionRequestTimeoutId = 0;
         }
 
-        // Hack: The request string comes directly from PAM, if it's "Password:"
-        // we replace it with our own to allow localization, if it's something
-        // else we remove the last colon and any trailing or leading spaces.
         if (request === 'Password:' || request === 'Password: ')
-            this._passwordField.label = _('Password');
+            this._passwordField.label = KestrelUi.t('polkit-password');
         else
             this._passwordField.label = request.replace(/: *$/, '').trim();
 

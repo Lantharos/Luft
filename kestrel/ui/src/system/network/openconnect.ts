@@ -3,6 +3,7 @@ import GLib from 'gi://GLib';
 import type NM from 'gi://NM';
 import { LIBEXECDIR } from 'resource:///com/lantharos/kestrel/misc/config.js';
 
+import { t } from '../../shared/i18n/index.js';
 import type { Field, Step } from './vpnDialog.js';
 
 Gio._promisify(Gio.DataInputStream.prototype, 'read_line_async');
@@ -66,25 +67,25 @@ export class OpenConnectSignIn {
       case 'form': {
         const values = await steps.ask({ message: message.message, warning: message.error, fields: message.fields.map(field) });
         if (!values) return null;
-        steps.wait('Signing in…');
+        steps.wait(t('vpn-signing-in'));
         await this.send({ values });
         break;
       }
       case 'certificate': {
         const accepted = await steps.ask({
-          message: `${message.host} presented a certificate that can’t be verified (${message.reason}). Its fingerprint is ${message.fingerprint}.`,
-          warning: 'Someone could be pretending to be this server. Only connect if you expected this.',
+          message: t('vpn-certificate-untrusted', { host: message.host, reason: message.reason, fingerprint: message.fingerprint }),
+          warning: t('vpn-certificate-warning'),
           fields: [],
-          action: 'Connect Anyway',
+          action: t('vpn-certificate-connect'),
         });
         if (!accepted) return null;
-        steps.wait('Signing in…');
+        steps.wait(t('vpn-signing-in'));
         await this.send({ accept: true });
         break;
       }
       case 'browse':
         Gio.AppInfo.launch_default_for_uri(message.uri, launch());
-        steps.wait('Finish signing in with your browser.');
+        steps.wait(t('vpn-finish-in-browser'));
         break;
       case 'done':
         return message.secrets;

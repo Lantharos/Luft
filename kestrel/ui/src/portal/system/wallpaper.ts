@@ -4,6 +4,7 @@ import GLib from 'gi://GLib';
 import St from 'gi://St';
 
 import { createThumbnail } from '../../surfaces/clipboard/thumbnail.js';
+import { t } from '../../shared/i18n/index.js';
 import { appNames } from '../core/apps.js';
 import { openDialog } from '../core/dialog.js';
 import { portalObject } from '../core/exported.js';
@@ -43,15 +44,15 @@ async function confirm(handle: string, appId: string, bytes: GLib.Bytes): Promis
   const preview = await createThumbnail(bytes, PREVIEW_BOUNDS);
   if (!preview) return ENDED;
   const [response] = await openDialog(handle, {
-    title: 'Set as your wallpaper?',
-    description: `${appNames(appId).subject} wants to change your wallpaper. It's used in light and dark style and on the lock screen.`,
+    title: t('portal-wallpaper-title'),
+    description: t('portal-wallpaper-description', { appName: appNames(appId).subject }),
     icon: 'preferences-desktop-wallpaper-symbolic',
     askedBy: appId,
   }, dialog => {
     dialog.content.add_child(new St.Widget({ content: preview.content, width: preview.width, height: preview.height, x_align: Clutter.ActorAlign.CENTER }));
     dialog.buttons([
-      { label: 'Cancel', action: dialog.cancel },
-      { label: 'Set Wallpaper', action: () => dialog.finish(SUCCESS), default: true },
+      { label: t('portal-cancel'), action: dialog.cancel },
+      { label: t('portal-wallpaper-set'), action: () => dialog.finish(SUCCESS), default: true },
     ]);
   });
   return response;

@@ -10,6 +10,7 @@ import { freezeSelection } from 'resource:///com/lantharos/kestrel/ui/kestrelGla
 import { ensureActorVisibleInScrollView } from 'resource:///com/lantharos/kestrel/misc/animationUtils.js';
 import type { Monitor } from './panel.js';
 import { windowIcon } from '../../appearance/icons/appIcons.js';
+import { t } from '../../shared/i18n/index.js';
 
 export class WindowPreviews {
   readonly actor = new St.BoxLayout({ name: 'kestrel-window-previews', style_class: 'kestrel-window-previews', reactive: true, track_hover: true, visible: false });
@@ -70,13 +71,14 @@ export class WindowPreviews {
       if (index % columns === 0) { row = new St.BoxLayout({ style_class: 'kestrel-preview-row' }); grid.add_child(row); }
       const card = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, width, style_class: 'kestrel-preview-card' });
       const header = new St.BoxLayout({ style_class: 'kestrel-preview-header' });
-      const title = new St.Label({ text: window.title || app.get_name(), x_expand: true, y_align: Clutter.ActorAlign.CENTER });
+      const name = () => window.title || app.get_name();
+      const title = new St.Label({ text: name(), x_expand: true, y_align: Clutter.ActorAlign.CENTER });
       const icon = windowIcon(app, window, 16);
       icon.y_align = Clutter.ActorAlign.CENTER;
       icon.set_margin_right(6);
       header.add_child(icon);
       header.add_child(title);
-      const close = new St.Button({ style_class: 'kestrel-preview-close', can_focus: true, accessible_name: `Close ${window.title}`, child: new St.Icon({ icon_name: 'window-close-symbolic', icon_size: 16 }) });
+      const close = new St.Button({ style_class: 'kestrel-preview-close', can_focus: true, accessible_name: t('previews-close-window', { title: name() }), child: new St.Icon({ icon_name: 'window-close-symbolic', icon_size: 16 }) });
       close.connect('clicked', () => window.delete((global as unknown as Shell.Global).get_current_time()));
       header.add_child(close);
       card.add_child(header);
@@ -94,13 +96,17 @@ export class WindowPreviews {
         resize();
         this.windowSignals.push([source, source.connect('notify::width', resize)], [source, source.connect('notify::height', resize)]);
       }
-      const activate = new St.Button({ child: preview, can_focus: true, style_class: 'kestrel-preview-window', accessible_name: window.title || app.get_name() });
+      const activate = new St.Button({ child: preview, can_focus: true, style_class: 'kestrel-preview-window', accessible_name: name() });
       activate.connect('clicked', () => { this.close(); this.activateWindow(window); });
       firstWindow ??= activate;
       for (const control of [activate, close]) control.connect('key-focus-in', () => ensureActorVisibleInScrollView(scroll, control));
       card.add_child(activate);
       row!.add_child(card);
-      this.windowSignals.push([window, window.connect('notify::title', () => { title.text = window.title || app.get_name(); activate.accessible_name = title.text; close.accessible_name = `Close ${title.text}`; })]);
+      this.windowSignals.push([window, window.connect('notify::title', () => {
+        title.text = name();
+        activate.accessible_name = title.text;
+        close.accessible_name = t('previews-close-window', { title: title.text });
+      })]);
       this.windowSignals.push([window, window.connect('unmanaged', () => this.close())]);
     });
     scroll.child = grid;

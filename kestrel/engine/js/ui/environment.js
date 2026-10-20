@@ -2,7 +2,6 @@
 import '../misc/dependencies.js';
 
 import {setConsoleLogDomain} from 'console';
-import * as Gettext from 'gettext';
 
 import Cairo from 'cairo';
 import Clutter from 'gi://Clutter';
@@ -375,11 +374,6 @@ function _easeAnimatableProperty(animatable, propName, target, params) {
 
 // Add some bindings to the global JS namespace
 globalThis.global = Shell.Global.get();
-
-globalThis._ = Gettext.gettext;
-globalThis.C_ = Gettext.pgettext;
-globalThis.ngettext = Gettext.ngettext;
-globalThis.N_ = s => s;
 
 GObject.gtypeNameBasedOnJSPath = true;
 

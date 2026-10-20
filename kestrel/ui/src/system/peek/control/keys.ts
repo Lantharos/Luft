@@ -1,5 +1,6 @@
 import Clutter from 'gi://Clutter';
 
+import { t } from '../../../shared/i18n/index.js';
 import { PeekError } from '../errors.js';
 
 export interface Combo {
@@ -34,10 +35,10 @@ function keysym(name: string): number | undefined {
 export function parseCombo(combo: string): Combo {
   const parts = combo.split(/\+(?!$)/);
   const key = keysym(parts.pop()!);
-  if (!combo || key === undefined) throw new PeekError('InvalidArgs', `${combo} isn't a key peek knows`);
+  if (!combo || key === undefined) throw new PeekError('InvalidArgs', t('peek-error-unknown-key', { key: combo }));
   const modifiers = parts.map(part => {
     const modifier = MODIFIERS[part.toLowerCase()];
-    if (modifier === undefined) throw new PeekError('InvalidArgs', `${part} isn't a modifier. Use ctrl, shift, alt or super.`);
+    if (modifier === undefined) throw new PeekError('InvalidArgs', t('peek-error-unknown-modifier', { modifier: part }));
     return modifier;
   });
   return { modifiers, key };

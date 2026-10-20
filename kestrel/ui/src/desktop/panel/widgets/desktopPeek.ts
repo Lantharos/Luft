@@ -5,6 +5,7 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import { animateActor } from '../../../shared/motion.js';
+import { localized, t } from '../../../shared/i18n/index.js';
 
 const PEEK_DELAY = 450;
 const PEEK_DURATION = 180;
@@ -22,11 +23,12 @@ function desktopWindows(): [Meta.WindowActor, Meta.Window][] {
 }
 
 export class DesktopPeek {
-  readonly actor = new St.Button({ style_class: 'kestrel-peek', track_hover: true, reactive: true, accessible_name: 'Show desktop', y_expand: true });
+  readonly actor = new St.Button({ style_class: 'kestrel-peek', track_hover: true, reactive: true, y_expand: true });
   private timer = 0;
   private peeking = false;
 
   constructor() {
+    localized(this.actor, () => (this.actor.accessible_name = t('taskbar-show-desktop')));
     this.actor.connect('notify::hover', () => {
       this.cancel();
       if (this.actor.hover) this.timer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, PEEK_DELAY, () => {

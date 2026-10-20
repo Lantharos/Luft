@@ -4,6 +4,7 @@ import GLib from 'gi://GLib';
 import Pango from 'gi://Pango';
 import St from 'gi://St';
 import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
+import { t } from '../../shared/i18n/index.js';
 import { SwipeAway } from './swipeAway.js';
 
 export interface SignalSource {
@@ -68,7 +69,7 @@ export class NotificationCard {
     });
     header.add_child(this.open);
     const dismiss = new St.Button({ style_class: 'kestrel-notification-dismiss', can_focus: true, track_hover: true, y_align: Clutter.ActorAlign.START,
-      accessible_name: 'Dismiss notification', child: new St.Icon({ icon_name: 'window-close-symbolic', icon_size: 16 }) });
+      accessible_name: t('notifications-dismiss-notification'), child: new St.Icon({ icon_name: 'window-close-symbolic', icon_size: 16 }) });
     dismiss.connect('clicked', () => this.swipe.dismiss());
     dismiss.connect('key-focus-in', () => reveal(dismiss));
     header.add_child(dismiss);
@@ -90,9 +91,9 @@ export class NotificationCard {
     notification.connectObject('action-added', changed, 'action-removed', changed,
       'notify::datetime', changed, 'notify::reply-label', changed,
       'notify::title', changed, 'notify::body', changed, this.actor);
-    menus.bind(this.actor, () => [{ label: 'Open', run: () => { close(); notification.activate(); } },
-      { label: 'Dismiss', run: () => this.swipe.dismiss() },
-      { label: 'Notification settings', run: () => menus.settings('notifications') }]);
+    menus.bind(this.actor, () => [{ label: t('notifications-open'), run: () => { close(); notification.activate(); } },
+      { label: t('notifications-dismiss'), run: () => this.swipe.dismiss() },
+      { label: t('notifications-settings'), run: () => menus.settings('notifications') }]);
   }
 
   private button(label: string, activate: () => void): St.Button {
@@ -115,7 +116,7 @@ export class NotificationCard {
     this.actions.destroy_all_children();
     const row = new St.BoxLayout({ style_class: 'kestrel-notification-reply' });
     const entry = new St.Entry({ style_class: 'kestrel-notification-reply-entry', hint_text: this.notification.replyPlaceholder ?? '', can_focus: true, x_expand: true });
-    const send = new St.Button({ style_class: 'kestrel-notification-reply-send', can_focus: true, accessible_name: 'Send reply',
+    const send = new St.Button({ style_class: 'kestrel-notification-reply-send', can_focus: true, accessible_name: t('notifications-send-reply'),
       child: new St.Icon({ icon_name: 'mail-send-symbolic', icon_size: 16 }) });
     const submit = () => {
       const text = entry.text.trim();

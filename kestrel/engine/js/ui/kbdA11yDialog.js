@@ -4,6 +4,7 @@ import GObject from 'gi://GObject';
 import Meta from 'gi://Meta';
 
 import * as Dialog from './dialog.js';
+import * as KestrelUi from './kestrelUi.js';
 import * as ModalDialog from './modalDialog.js';
 
 const KEYBOARD_A11Y_SCHEMA    = 'org.gnome.desktop.a11y.keyboard';
@@ -30,22 +31,15 @@ class KbdA11yDialog extends GObject.Object {
         if (whatChanged & Meta.KeyboardA11yFlags.SLOW_KEYS_ENABLED) {
             key = KEY_SLOW_KEYS_ENABLED;
             enabled = (newFlags & Meta.KeyboardA11yFlags.SLOW_KEYS_ENABLED) > 0;
-            title = enabled
-                ? _('Slow Keys Turned On')
-                : _('Slow Keys Turned Off');
-            description = _('You just held down the Shift key for 8 seconds. This is the shortcut ' +
-                            'for the Slow Keys feature, which affects the way your keyboard works.');
+            title = KestrelUi.t(enabled ? 'kbd-a11y-slow-keys-on' : 'kbd-a11y-slow-keys-off');
+            description = KestrelUi.t('kbd-a11y-slow-keys-description');
         } else if (whatChanged & Meta.KeyboardA11yFlags.STICKY_KEYS_ENABLED) {
             key = KEY_STICKY_KEYS_ENABLED;
             enabled = (newFlags & Meta.KeyboardA11yFlags.STICKY_KEYS_ENABLED) > 0;
-            title = enabled
-                ? _('Sticky Keys Turned On')
-                : _('Sticky Keys Turned Off');
-            description = enabled
-                ? _('You just pressed the Shift key 5 times in a row. This is the shortcut ' +
-                  'for the Sticky Keys feature, which affects the way your keyboard works.')
-                : _('You just pressed two keys at once, or pressed the Shift key 5 times in a row. ' +
-                  'This turns off the Sticky Keys feature, which affects the way your keyboard works.');
+            title = KestrelUi.t(enabled ? 'kbd-a11y-sticky-keys-on' : 'kbd-a11y-sticky-keys-off');
+            description = KestrelUi.t(enabled
+                ? 'kbd-a11y-sticky-keys-on-description'
+                : 'kbd-a11y-sticky-keys-off-description');
         } else {
             return;
         }
@@ -58,7 +52,7 @@ class KbdA11yDialog extends GObject.Object {
         dialog.contentLayout.add_child(content);
 
         dialog.addButton({
-            label: enabled ? _('Leave On') : _('Turn On'),
+            label: KestrelUi.t(enabled ? 'kbd-a11y-leave-on' : 'kbd-a11y-turn-on'),
             action: () => {
                 this._a11ySettings.set_boolean(key, true);
                 dialog.close();
@@ -68,7 +62,7 @@ class KbdA11yDialog extends GObject.Object {
         });
 
         dialog.addButton({
-            label: enabled ? _('Turn Off') : _('Leave Off'),
+            label: KestrelUi.t(enabled ? 'kbd-a11y-turn-off' : 'kbd-a11y-leave-off'),
             action: () => {
                 this._a11ySettings.set_boolean(key, false);
                 dialog.close();

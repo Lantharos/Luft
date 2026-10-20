@@ -55,23 +55,19 @@ class DisplayChangeDialog extends ModalDialog.ModalDialog {
         const monitorManager = global.backend.get_monitor_manager();
         this._countDown = monitorManager.get_display_configuration_timeout();
 
-        // Translators: This string should be shorter than 30 characters
-        const title = _('Keep these display settings?');
+        const title = KestrelUi.t('display-change-title');
         const description = this._formatCountDown();
 
         this._content = new Dialog.MessageDialogContent({title, description, iconName: 'video-display-symbolic'});
         this.contentLayout.add_child(this._content);
 
-        /* Translators: this and the following message should be limited in length,
-           to avoid ellipsizing the labels.
-        */
         this._cancelButton = this.addButton({
-            label: _('Revert Settings'),
+            label: KestrelUi.t('display-change-revert'),
             action: this._onFailure.bind(this),
             key: Clutter.KEY_Escape,
         });
         this._okButton = this.addButton({
-            label: _('Keep Changes'),
+            label: KestrelUi.t('display-change-keep'),
             action: this._onSuccess.bind(this),
             default: true,
         });
@@ -90,11 +86,7 @@ class DisplayChangeDialog extends ModalDialog.ModalDialog {
     }
 
     _formatCountDown() {
-        const fmt = ngettext(
-            'Settings changes will revert in %d second',
-            'Settings changes will revert in %d seconds',
-            this._countDown);
-        return fmt.format(this._countDown);
+        return KestrelUi.t('display-change-countdown', {seconds: this._countDown});
     }
 
     _tick() {
@@ -473,10 +465,7 @@ class ResizePopup extends St.Widget {
     }
 
     set(rect, displayW, displayH) {
-        /* Translators: This represents the size of a window. The first number is
-         * the width of the window and the second is the height. */
-        const text = _('%d × %d').format(displayW, displayH);
-        this._label.set_text(text);
+        this._label.set_text(KestrelUi.t('window-resize-size', {width: displayW, height: displayH}));
 
         this.set_position(rect.x, rect.y);
         this.set_size(rect.width, rect.height);

@@ -1,3 +1,5 @@
+import { formatsLocale, t } from '../../shared/i18n/index.js';
+
 export interface Paper {
   readonly keyword: string;
   readonly name: string;
@@ -5,11 +7,14 @@ export interface Paper {
   readonly height: number;
 }
 
+type Unit = 'mm' | 'in';
+
 const SELF_DESCRIBING = /^([a-z0-9]+_[a-z0-9.-]+)_(\d+(?:\.\d+)?)x(\d+(?:\.\d+)?)(mm|in)$/;
 const MM_PER_INCH = 25.4;
 const SIZE_TOLERANCE_MM = 1;
+const INTL_UNITS = { mm: 'millimeter', in: 'inch' } as const;
 
-const NAMES: Record<string, string> = {
+const CODES: Record<string, string> = {
   iso_a3: 'A3',
   iso_a4: 'A4',
   iso_a5: 'A5',
@@ -18,20 +23,35 @@ const NAMES: Record<string, string> = {
   iso_b5: 'B5',
   jis_b4: 'B4 (JIS)',
   jis_b5: 'B5 (JIS)',
-  na_letter: 'Letter',
-  na_legal: 'Legal',
-  na_executive: 'Executive',
-  na_ledger: 'Tabloid',
-  na_invoice: 'Statement',
-  'na_number-10': 'Envelope #10',
-  na_monarch: 'Envelope Monarch',
-  iso_dl: 'Envelope DL',
-  iso_c5: 'Envelope C5',
-  iso_c6: 'Envelope C6',
 };
 
-function dimension(value: number): string {
-  return String(Math.round(value * 10) / 10);
+const NAMED: Record<string, string> = {
+  na_letter: 'print-paper-letter',
+  na_legal: 'print-paper-legal',
+  na_executive: 'print-paper-executive',
+  na_ledger: 'print-paper-tabloid',
+  na_invoice: 'print-paper-statement',
+};
+
+const ENVELOPES: Record<string, string> = {
+  'na_number-10': '#10',
+  na_monarch: 'Monarch',
+  iso_dl: 'DL',
+  iso_c5: 'C5',
+  iso_c6: 'C6',
+};
+
+function dimensions(width: number, height: number, unit: Unit): string {
+  const locale = formatsLocale();
+  const plain = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
+  const measured = new Intl.NumberFormat(locale, { maximumFractionDigits: 1, style: 'unit', unit: INTL_UNITS[unit] });
+  return t('print-paper-dimensions', { width: plain.format(width), height: measured.format(height) });
+}
+
+function paperName(base: string, width: number, height: number, unit: Unit): string {
+  if (ENVELOPES[base]) return t('print-paper-envelope', { size: ENVELOPES[base] });
+  if (NAMED[base]) return t(NAMED[base]);
+  return CODES[base] ?? dimensions(width, height, unit);
 }
 
 export function paper(keyword: string): Paper | null {
@@ -41,7 +61,7 @@ export function paper(keyword: string): Paper | null {
   const scale = unit === 'in' ? MM_PER_INCH : 1;
   return {
     keyword,
-    name: NAMES[base] ?? `${dimension(Number(width))} × ${dimension(Number(height))} ${unit}`,
+    name: paperName(base, Number(width), Number(height), unit as Unit),
     width: Number(width) * scale,
     height: Number(height) * scale,
   };
@@ -49,8 +69,8 @@ export function paper(keyword: string): Paper | null {
 
 export function sizeLabel({ width, height, keyword }: Paper): string {
   return keyword.endsWith('in')
-    ? `${dimension(width / MM_PER_INCH)} × ${dimension(height / MM_PER_INCH)} in`
-    : `${Math.round(width)} × ${Math.round(height)} mm`;
+    ? dimensions(width / MM_PER_INCH, height / MM_PER_INCH, 'in')
+    : dimensions(Math.round(width), Math.round(height), 'mm');
 }
 
 export function papers(keywords: string[]): Paper[] {

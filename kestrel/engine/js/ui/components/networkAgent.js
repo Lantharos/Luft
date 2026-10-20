@@ -96,7 +96,7 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
 
         if (flags & NM.SecretAgentGetSecretsFlags.WPS_PBC_ACTIVE) {
             const descriptionLabel = new St.Label({
-                text: _('Alternatively you can connect by pushing the “WPS” button on your router'),
+                text: KestrelUi.t('network-agent-wps-hint'),
                 style_class: 'message-dialog-description',
             });
             descriptionLabel.clutter_text.line_wrap = true;
@@ -108,13 +108,13 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
         this.contentLayout.add_child(contentBox);
 
         this._okButton = {
-            label: _('Connect'),
+            label: KestrelUi.t('network-agent-connect'),
             action: this._onOk.bind(this),
             default: true,
         };
 
         this.setButtons([{
-            label: _('Cancel'),
+            label: KestrelUi.t('network-agent-cancel'),
             action: this.cancel.bind(this),
             key: Clutter.KEY_Escape,
         }, this._okButton]);
@@ -211,7 +211,7 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
         case 'wpa-psk':
         case 'sae':
             secrets.push({
-                label: _('Password'),
+                label: KestrelUi.t('network-agent-password'),
                 key: 'psk',
                 value: this._rejected ? '' : wirelessSecuritySetting.psk || '',
                 validate: this._validateWpaPsk,
@@ -220,7 +220,7 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
             break;
         case 'none': // static WEP
             secrets.push({
-                label: _('Key'),
+                label: KestrelUi.t('network-agent-key'),
                 key: `wep-key${wirelessSecuritySetting.wep_tx_keyidx}`,
                 value: this._rejected ? '' : wirelessSecuritySetting.get_wep_key(wirelessSecuritySetting.wep_tx_keyidx) || '',
                 wep_key_type: wirelessSecuritySetting.wep_key_type,
@@ -231,7 +231,7 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
         case 'ieee8021x':
             if (wirelessSecuritySetting.auth_alg === 'leap') { // Cisco LEAP
                 secrets.push({
-                    label: _('Password'),
+                    label: KestrelUi.t('network-agent-password'),
                     key: 'leap-password',
                     value: wirelessSecuritySetting.leap_password || '',
                     password: true,
@@ -255,7 +255,7 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
         if (this._settingName === '802-1x' && this._hints.length) {
             if (this._hints.includes('identity')) {
                 secrets.push({
-                    label: _('Username'),
+                    label: KestrelUi.t('network-agent-username'),
                     key: 'identity',
                     value: ieee8021xSetting.identity || '',
                     password: false,
@@ -263,7 +263,7 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
             }
             if (this._hints.includes('password')) {
                 secrets.push({
-                    label: _('Password'),
+                    label: KestrelUi.t('network-agent-password'),
                     key: 'password',
                     value: ieee8021xSetting.password || '',
                     password: true,
@@ -271,7 +271,7 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
             }
             if (this._hints.includes('private-key-password')) {
                 secrets.push({
-                    label: _('Private key password'),
+                    label: KestrelUi.t('network-agent-private-key-password'),
                     key: 'private-key-password',
                     value: ieee8021xSetting.private_key_password || '',
                     password: true,
@@ -290,13 +290,13 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
             // is not visible here since we only care about phase2 authentication
             // (and don't even care of which one)
             secrets.push({
-                label: _('Username'),
+                label: KestrelUi.t('network-agent-username'),
                 key: null,
                 value: ieee8021xSetting.identity || '',
                 password: false,
             });
             secrets.push({
-                label: _('Password'),
+                label: KestrelUi.t('network-agent-password'),
                 key: 'password',
                 value: ieee8021xSetting.password || '',
                 password: true,
@@ -304,13 +304,13 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
             break;
         case 'tls':
             secrets.push({
-                label: _('Identity'),
+                label: KestrelUi.t('network-agent-identity'),
                 key: null,
                 value: ieee8021xSetting.identity || '',
                 password: false,
             });
             secrets.push({
-                label: _('Private key password'),
+                label: KestrelUi.t('network-agent-private-key-password'),
                 key: 'private-key-password',
                 value: ieee8021xSetting.private_key_password || '',
                 password: true,
@@ -324,18 +324,18 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
     _getPPPoESecrets(secrets) {
         const pppoeSetting = this._connection.get_setting_pppoe();
         secrets.push({
-            label: _('Username'),
+            label: KestrelUi.t('network-agent-username'),
             key: 'username',
             value: pppoeSetting.username || '',
             password: false,
         });
         secrets.push({
-            label: _('Service'), key: 'service',
+            label: KestrelUi.t('network-agent-service'), key: 'service',
             value: pppoeSetting.service || '',
             password: false,
         });
         secrets.push({
-            label: _('Password'), key: 'password',
+            label: KestrelUi.t('network-agent-password'), key: 'password',
             value: pppoeSetting.password || '',
             password: true,
         });
@@ -348,7 +348,7 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
         else
             setting = this._connection.get_setting_by_name(connectionType);
         secrets.push({
-            label: _('Password'),
+            label: KestrelUi.t('network-agent-password'),
             key: 'password',
             value: setting.value || '',
             password: true,
@@ -368,17 +368,17 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
         case '802-11-wireless':
             wirelessSetting = this._connection.get_setting_wireless();
             ssid = NM.utils_ssid_to_utf8(wirelessSetting.get_ssid().get_data());
-            content.title = _('Authentication required');
+            content.title = KestrelUi.t('network-agent-auth-required');
             content.message = this._rejected
-                ? _('The saved password for “%s” didn’t work. Enter it again.').format(ssid)
-                : _('Passwords or encryption keys are required to access the wireless network “%s”').format(ssid);
+                ? KestrelUi.t('network-agent-wifi-rejected', {networkName: ssid})
+                : KestrelUi.t('network-agent-wifi-secrets', {networkName: ssid});
             this._getWirelessSecrets(content.secrets, wirelessSetting);
             break;
         case '802-3-ethernet':
-            content.title = _('Wired 802.1X authentication');
+            content.title = KestrelUi.t('network-agent-wired-title');
             content.message = null;
             content.secrets.push({
-                label: _('Network name'),
+                label: KestrelUi.t('network-agent-network-name'),
                 key: null,
                 value: connectionSetting.get_id(),
                 password: false,
@@ -386,17 +386,17 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
             this._get8021xSecrets(content.secrets);
             break;
         case 'pppoe':
-            content.title = _('DSL authentication');
+            content.title = KestrelUi.t('network-agent-dsl-title');
             content.message = null;
             this._getPPPoESecrets(content.secrets);
             break;
         case 'gsm':
             if (this._hints.includes('pin')) {
                 const gsmSetting = this._connection.get_setting_gsm();
-                content.title = _('PIN code required');
-                content.message = _('PIN code is needed for the mobile broadband device');
+                content.title = KestrelUi.t('network-agent-pin-title');
+                content.message = KestrelUi.t('network-agent-pin-body');
                 content.secrets.push({
-                    label: _('PIN'),
+                    label: KestrelUi.t('network-agent-pin'),
                     key: 'pin',
                     value: gsmSetting.pin || '',
                     password: true,
@@ -406,8 +406,8 @@ class NetworkSecretDialog extends ModalDialog.ModalDialog {
             // fall through
         case 'cdma':
         case 'bluetooth':
-            content.title = _('Authentication required');
-            content.message = _('A password is required to connect to “%s”').format(connectionSetting.get_id());
+            content.title = KestrelUi.t('network-agent-auth-required');
+            content.message = KestrelUi.t('network-agent-password-required', {networkName: connectionSetting.get_id()});
             this._getMobileSecrets(content.secrets, connectionType);
             break;
         default:
@@ -489,33 +489,33 @@ class NetworkAgent {
         case '802-11-wireless': {
             const wirelessSetting = connection.get_setting_wireless();
             const ssid = NM.utils_ssid_to_utf8(wirelessSetting.get_ssid().get_data());
-            title = _('Authentication required');
-            body = _('Passwords or encryption keys are required to access the wireless network “%s”').format(ssid);
+            title = KestrelUi.t('network-agent-auth-required');
+            body = KestrelUi.t('network-agent-wifi-secrets', {networkName: ssid});
             break;
         }
         case '802-3-ethernet':
-            title = _('Wired 802.1X authentication');
-            body = _('A password is required to connect to “%s”').format(connection.get_id());
+            title = KestrelUi.t('network-agent-wired-title');
+            body = KestrelUi.t('network-agent-password-required', {networkName: connection.get_id()});
             break;
         case 'pppoe':
-            title = _('DSL authentication');
-            body = _('A password is required to connect to “%s”').format(connection.get_id());
+            title = KestrelUi.t('network-agent-dsl-title');
+            body = KestrelUi.t('network-agent-password-required', {networkName: connection.get_id()});
             break;
         case 'gsm':
             if (hints.includes('pin')) {
-                title = _('PIN code required');
-                body = _('PIN code is needed for the mobile broadband device');
+                title = KestrelUi.t('network-agent-pin-title');
+                body = KestrelUi.t('network-agent-pin-body');
                 break;
             }
             // fall through
         case 'cdma':
         case 'bluetooth':
-            title = _('Authentication required');
-            body = _('A password is required to connect to “%s”').format(connectionSetting.get_id());
+            title = KestrelUi.t('network-agent-auth-required');
+            body = KestrelUi.t('network-agent-password-required', {networkName: connectionSetting.get_id()});
             break;
         case 'vpn':
-            title = _('VPN password');
-            body = _('A password is required to connect to “%s”').format(connectionSetting.get_id());
+            title = KestrelUi.t('network-agent-vpn-title');
+            body = KestrelUi.t('network-agent-password-required', {networkName: connectionSetting.get_id()});
             break;
         default:
             log(`Invalid connection type: ${connectionType}`);

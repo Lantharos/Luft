@@ -5,6 +5,7 @@ import Gio from 'gi://Gio';
 import type Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 
+import { t } from '../../../shared/i18n/index.js';
 import { PeekError } from '../errors.js';
 import { captureArea, family, scaleOf } from './family.js';
 
@@ -33,7 +34,7 @@ function settled<T>(start: (done: (result: Gio.AsyncResult) => void) => void, fi
 function snapshot(window: Meta.Window): Snapshot {
   const actor = window.get_compositor_private() as Meta.WindowActor;
   const content = actor.paint_to_content(null) as Clutter.TextureContent | null;
-  if (!content) throw new PeekError('Failed', "The window isn't showing anything to capture");
+  if (!content) throw new PeekError('Failed', t('peek-error-nothing-to-capture'));
   const texture = content.get_texture();
   const scale = scaleOf(window);
   const frame = window.get_frame_rect();
@@ -46,7 +47,7 @@ function snapshot(window: Meta.Window): Snapshot {
   const y = Math.max(top, 0);
   const width = Math.min(right, texture.get_width()) - x;
   const height = Math.min(bottom, texture.get_height()) - y;
-  if (width <= 0 || height <= 0) throw new PeekError('Failed', "The window isn't showing anything to capture");
+  if (width <= 0 || height <= 0) throw new PeekError('Failed', t('peek-error-nothing-to-capture'));
   const whole = x === left && y === top && width === right - left && height === bottom - top;
   return { texture, scale, x, y, width, height, left: x - left, top: y - top, whole };
 }

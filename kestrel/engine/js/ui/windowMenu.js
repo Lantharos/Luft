@@ -2,6 +2,7 @@ import Clutter from 'gi://Clutter';
 import Meta from 'gi://Meta';
 import St from 'gi://St';
 
+import * as KestrelUi from './kestrelUi.js';
 import * as Main from './main.js';
 import * as PopupMenu from './popupMenu.js';
 import * as Screenshot from './screenshot.js';
@@ -23,8 +24,7 @@ export class WindowMenu extends PopupMenu.PopupMenu {
 
         let item;
 
-        // Translators: entry in the window right click menu.
-        item = this.addAction(C_('window-menu', 'Take Screenshot'), async () => {
+        item = this.addAction(KestrelUi.t('title-bar-menu-screenshot'), async () => {
             try {
                 const actor = window.get_compositor_private();
                 const content = actor.paint_to_content(null);
@@ -36,25 +36,25 @@ export class WindowMenu extends PopupMenu.PopupMenu {
             }
         });
 
-        item = this.addAction(_('Hide'), () => {
+        item = this.addAction(KestrelUi.t('title-bar-menu-hide'), () => {
             window.minimize();
         });
         if (!window.can_minimize())
             item.setSensitive(false);
 
         if (window.is_maximized()) {
-            item = this.addAction(_('Restore'), () => {
+            item = this.addAction(KestrelUi.t('title-bar-menu-restore'), () => {
                 window.unmaximize();
             });
         } else {
-            item = this.addAction(_('Maximize'), () => {
+            item = this.addAction(KestrelUi.t('title-bar-menu-maximize'), () => {
                 window.maximize();
             });
         }
         if (!window.can_maximize())
             item.setSensitive(false);
 
-        item = this.addAction(_('Move'), event => {
+        item = this.addAction(KestrelUi.t('title-bar-menu-move'), event => {
             const backend = global.stage.get_context().get_backend();
             const sprite = backend.get_sprite(global.stage, event) ||
                 backend.get_pointer_sprite(global.stage);
@@ -68,7 +68,7 @@ export class WindowMenu extends PopupMenu.PopupMenu {
         if (!window.allows_move())
             item.setSensitive(false);
 
-        item = this.addAction(_('Resize'), event => {
+        item = this.addAction(KestrelUi.t('title-bar-menu-resize'), event => {
             const backend = global.stage.get_context().get_backend();
             const sprite = backend.get_sprite(global.stage, event) ||
                 backend.get_pointer_sprite(global.stage);
@@ -82,7 +82,7 @@ export class WindowMenu extends PopupMenu.PopupMenu {
         if (!window.allows_resize())
             item.setSensitive(false);
 
-        item = this.addAction(_('Always on Top'), () => {
+        item = this.addAction(KestrelUi.t('title-bar-menu-always-on-top'), () => {
             if (window.is_above())
                 window.unmake_above();
             else
@@ -101,7 +101,7 @@ export class WindowMenu extends PopupMenu.PopupMenu {
              window.is_on_primary_monitor())) {
             const isSticky = window.is_on_all_workspaces();
 
-            item = this.addAction(_('Always on Visible Workspace'), () => {
+            item = this.addAction(KestrelUi.t('title-bar-menu-always-on-visible-workspace'), () => {
                 if (isSticky)
                     window.unstick();
                 else
@@ -115,25 +115,25 @@ export class WindowMenu extends PopupMenu.PopupMenu {
             if (!isSticky) {
                 const workspace = window.get_workspace();
                 if (workspace !== workspace.get_neighbor(Meta.MotionDirection.LEFT)) {
-                    this.addAction(_('Move to Workspace Left'), () => {
+                    this.addAction(KestrelUi.t('title-bar-menu-workspace-left'), () => {
                         const dir = Meta.MotionDirection.LEFT;
                         window.change_workspace(workspace.get_neighbor(dir));
                     });
                 }
                 if (workspace !== workspace.get_neighbor(Meta.MotionDirection.RIGHT)) {
-                    this.addAction(_('Move to Workspace Right'), () => {
+                    this.addAction(KestrelUi.t('title-bar-menu-workspace-right'), () => {
                         const dir = Meta.MotionDirection.RIGHT;
                         window.change_workspace(workspace.get_neighbor(dir));
                     });
                 }
                 if (workspace !== workspace.get_neighbor(Meta.MotionDirection.UP)) {
-                    this.addAction(_('Move to Workspace Up'), () => {
+                    this.addAction(KestrelUi.t('title-bar-menu-workspace-up'), () => {
                         const dir = Meta.MotionDirection.UP;
                         window.change_workspace(workspace.get_neighbor(dir));
                     });
                 }
                 if (workspace !== workspace.get_neighbor(Meta.MotionDirection.DOWN)) {
-                    this.addAction(_('Move to Workspace Down'), () => {
+                    this.addAction(KestrelUi.t('title-bar-menu-workspace-down'), () => {
                         const dir = Meta.MotionDirection.DOWN;
                         window.change_workspace(workspace.get_neighbor(dir));
                     });
@@ -151,7 +151,7 @@ export class WindowMenu extends PopupMenu.PopupMenu {
             const upMonitorIndex =
                 display.get_monitor_neighbor_index(monitorIndex, dir);
             if (upMonitorIndex !== -1) {
-                this.addAction(_('Move to Monitor Up'), () => {
+                this.addAction(KestrelUi.t('title-bar-menu-monitor-up'), () => {
                     window.move_to_monitor(upMonitorIndex);
                 });
             }
@@ -160,7 +160,7 @@ export class WindowMenu extends PopupMenu.PopupMenu {
             const downMonitorIndex =
                 display.get_monitor_neighbor_index(monitorIndex, dir);
             if (downMonitorIndex !== -1) {
-                this.addAction(_('Move to Monitor Down'), () => {
+                this.addAction(KestrelUi.t('title-bar-menu-monitor-down'), () => {
                     window.move_to_monitor(downMonitorIndex);
                 });
             }
@@ -169,7 +169,7 @@ export class WindowMenu extends PopupMenu.PopupMenu {
             const leftMonitorIndex =
                 display.get_monitor_neighbor_index(monitorIndex, dir);
             if (leftMonitorIndex !== -1) {
-                this.addAction(_('Move to Monitor Left'), () => {
+                this.addAction(KestrelUi.t('title-bar-menu-monitor-left'), () => {
                     window.move_to_monitor(leftMonitorIndex);
                 });
             }
@@ -178,7 +178,7 @@ export class WindowMenu extends PopupMenu.PopupMenu {
             const rightMonitorIndex =
                 display.get_monitor_neighbor_index(monitorIndex, dir);
             if (rightMonitorIndex !== -1) {
-                this.addAction(_('Move to Monitor Right'), () => {
+                this.addAction(KestrelUi.t('title-bar-menu-monitor-right'), () => {
                     window.move_to_monitor(rightMonitorIndex);
                 });
             }
@@ -186,7 +186,7 @@ export class WindowMenu extends PopupMenu.PopupMenu {
 
         this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
-        item = this.addAction(_('Close'), event => {
+        item = this.addAction(KestrelUi.t('title-bar-menu-close'), event => {
             window.delete(event.get_time());
         });
         if (!window.can_close())

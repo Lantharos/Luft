@@ -11,6 +11,7 @@ import * as Signals from '../misc/signals.js';
 
 import * as GnomeSession from '../misc/gnomeSession.js';
 import * as LoginManager from '../misc/loginManager.js';
+import * as KestrelUi from './kestrelUi.js';
 import * as Lightbox from './lightbox.js';
 import * as Main from './main.js';
 import * as MessageTray from './messageTray.js';
@@ -194,7 +195,7 @@ export class ScreenShield extends Signals.EventEmitter {
         if (inhibit) {
             try {
                 this._inhibitor = await this._loginManager.inhibit(
-                    _('GNOME needs to lock the screen'),
+                    KestrelUi.t('lock-inhibit-reason'),
                     this._inhibitCancellable);
             } catch (e) {
                 if (!e.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.CANCELLED))

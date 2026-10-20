@@ -1,6 +1,7 @@
 import * as SystemActions from 'resource:///com/lantharos/kestrel/misc/systemActions.js';
 
 import type { MenuEntry } from '../../desktop/menus/contextMenus.js';
+import { t } from '../../shared/i18n/index.js';
 
 export class LockPower {
   private readonly actions = SystemActions.getDefault();
@@ -8,9 +9,9 @@ export class LockPower {
   entries(): MenuEntry[] {
     const { actions } = this;
     return [
-      { label: 'Suspend', available: actions.canSuspend, run: () => actions.activateSuspend() },
-      { label: 'Restart…', available: actions.canRestart, run: () => actions.activateRestart() },
-      { label: 'Power off…', available: actions.canPowerOff, run: () => actions.activatePowerOff() },
+      { label: t('lock-screen-suspend'), available: actions.canSuspend, run: () => actions.activateSuspend() },
+      { label: t('lock-screen-restart'), available: actions.canRestart, run: () => actions.activateRestart() },
+      { label: t('lock-screen-power-off'), available: actions.canPowerOff, run: () => actions.activatePowerOff() },
     ].filter(entry => entry.available).map(({ label, run }) => ({ label, run }));
   }
 }

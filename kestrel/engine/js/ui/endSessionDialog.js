@@ -45,83 +45,65 @@ const LOW_BATTERY_THRESHOLD = 30;
 const EndSessionDialogIface = loadInterfaceXML('org.gnome.SessionManager.EndSessionDialog');
 
 const logoutDialogContent = {
-    subjectWithUser: C_('title', 'Log Out %s'),
-    subject: C_('title', 'Log Out'),
+    subjectWithUser: userName => KestrelUi.t('end-session-log-out-user', {userName}),
+    subject: () => KestrelUi.t('end-session-log-out-title'),
     iconName: 'system-log-out-symbolic',
-    descriptionWithUser(user, seconds) {
-        return ngettext(
-            '%s will be logged out automatically in %d second',
-            '%s will be logged out automatically in %d seconds',
-            seconds).format(user, seconds);
+    descriptionWithUser(userName, seconds) {
+        return KestrelUi.t('end-session-log-out-user-countdown', {userName, seconds});
     },
     description(seconds) {
-        return ngettext(
-            'You will be logged out automatically in %d second',
-            'You will be logged out automatically in %d seconds',
-            seconds).format(seconds);
+        return KestrelUi.t('end-session-log-out-countdown', {seconds});
     },
     showBatteryWarning: false,
     confirmButtons: [{
         signal: 'ConfirmedLogout',
-        label: C_('button', 'Log Out'),
+        label: () => KestrelUi.t('end-session-log-out-button'),
     }],
     showOtherSessions: false,
 };
 
 const shutdownDialogContent = {
-    subject: C_('title', 'Power Off'),
-    subjectWithUpdates: C_('title', 'Install Updates & Power Off'),
+    subject: () => KestrelUi.t('end-session-power-off-title'),
+    subjectWithUpdates: () => KestrelUi.t('end-session-power-off-updates-title'),
     description(seconds) {
-        return ngettext(
-            'The system will power off automatically in %d second',
-            'The system will power off automatically in %d seconds',
-            seconds).format(seconds);
+        return KestrelUi.t('end-session-power-off-countdown', {seconds});
     },
-    checkBoxText: C_('checkbox', 'Install pending software updates'),
+    checkBoxText: () => KestrelUi.t('end-session-install-updates'),
     showBatteryWarning: true,
     confirmButtons: [{
         signal: 'ConfirmedShutdown',
-        label: C_('button', 'Power Off'),
+        label: () => KestrelUi.t('end-session-power-off-button'),
     }],
     iconName: 'system-shutdown-symbolic',
     showOtherSessions: true,
 };
 
 const restartDialogContent = {
-    subject: C_('title', 'Restart'),
-    subjectWithUpdates: C_('title', 'Install Updates & Restart'),
+    subject: () => KestrelUi.t('end-session-restart-title'),
+    subjectWithUpdates: () => KestrelUi.t('end-session-restart-updates-title'),
     description(seconds) {
-        return ngettext(
-            'The system will restart automatically in %d second',
-            'The system will restart automatically in %d seconds',
-            seconds).format(seconds);
+        return KestrelUi.t('end-session-restart-countdown', {seconds});
     },
-    checkBoxText: C_('checkbox', 'Install pending software updates'),
+    checkBoxText: () => KestrelUi.t('end-session-install-updates'),
     showBatteryWarning: true,
     confirmButtons: [{
         signal: 'ConfirmedReboot',
-        label: C_('button', 'Restart'),
+        label: () => KestrelUi.t('end-session-restart-button'),
     }],
     iconName: 'system-reboot-symbolic',
     showOtherSessions: true,
 };
 
 const restartUpdateDialogContent = {
-
-    subject: C_('title', 'Restart & Install Updates'),
+    subject: () => KestrelUi.t('end-session-update-restart-title'),
     description(seconds) {
-        return ngettext(
-            'The system will automatically restart and install updates in %d second',
-            'The system will automatically restart and install updates in %d seconds',
-            seconds).format(seconds);
+        return KestrelUi.t('end-session-update-restart-countdown', {seconds});
     },
     showBatteryWarning: true,
     confirmButtons: [{
         signal: 'ConfirmedReboot',
-        label: C_('button', 'Restart & Install'),
+        label: () => KestrelUi.t('end-session-update-restart-button'),
     }],
-    unusedFutureButtonForTranslation: C_('button', 'Install & Power Off'),
-    unusedFutureCheckBoxForTranslation: C_('checkbox', 'Power off after updates are installed'),
     iconName: 'system-reboot-symbolic',
     showOtherSessions: true,
 };
@@ -254,22 +236,20 @@ class EndSessionDialog extends ModalDialog.ModalDialog {
 
         this._batteryWarning = new St.Label({
             style_class: 'end-session-dialog-battery-warning',
-            text: _('Low battery power: please plug in before installing updates'),
         });
+        KestrelUi.bindText(this._batteryWarning, 'end-session-low-battery');
         this._batteryWarning.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         this._batteryWarning.clutter_text.line_wrap = true;
         this._messageDialogContent.add_child(this._batteryWarning);
 
         this.contentLayout.add_child(this._messageDialogContent);
 
-        this._applicationSection = new Dialog.ListSection({
-            title: _('Some applications are busy or have unsaved work'),
-        });
+        this._applicationSection = new Dialog.ListSection();
+        KestrelUi.localized(this._applicationSection, () => (this._applicationSection.title = KestrelUi.t('end-session-busy-apps')));
         this.contentLayout.add_child(this._applicationSection);
 
-        this._sessionSection = new Dialog.ListSection({
-            title: _('Other users are logged in'),
-        });
+        this._sessionSection = new Dialog.ListSection();
+        KestrelUi.localized(this._sessionSection, () => (this._sessionSection.title = KestrelUi.t('end-session-other-users')));
         this.contentLayout.add_child(this._sessionSection);
 
         this._dbusImpl = Gio.DBusExportedObject.wrapJSObject(EndSessionDialogIface, this);
@@ -293,9 +273,11 @@ class EndSessionDialog extends ModalDialog.ModalDialog {
 
     _updatesCheckBoxText(dialogContent) {
         const version = this._pendingUpdates?.version;
-        if (!dialogContent.checkBoxText || !version)
-            return dialogContent.checkBoxText || '';
-        return C_('checkbox', 'Install version %s').format(version);
+        if (!dialogContent.checkBoxText)
+            return '';
+        if (!version)
+            return dialogContent.checkBoxText();
+        return KestrelUi.t('end-session-install-version', {version});
     }
 
     _isDischargingBattery() {
@@ -329,11 +311,10 @@ class EndSessionDialog extends ModalDialog.ModalDialog {
 
         const dialogContent = DialogContent[this._type];
 
-        let subject = dialogContent.subject;
+        let subject = dialogContent.subject();
 
-        // Use different title when we are installing updates
         if (dialogContent.subjectWithUpdates && this._checkBox.checked)
-            subject = dialogContent.subjectWithUpdates;
+            subject = dialogContent.subjectWithUpdates();
 
         this._batteryWarning.visible = this._shouldShowLowBatteryWarning(dialogContent);
 
@@ -346,7 +327,7 @@ class EndSessionDialog extends ModalDialog.ModalDialog {
 
             if (realName != null) {
                 if (dialogContent.subjectWithUser)
-                    subject = dialogContent.subjectWithUser.format(realName);
+                    subject = dialogContent.subjectWithUser(realName);
 
                 if (dialogContent.descriptionWithUser)
                     description = dialogContent.descriptionWithUser(realName, displayTime);
@@ -384,14 +365,14 @@ class EndSessionDialog extends ModalDialog.ModalDialog {
 
         this.addButton({
             action: this.cancel.bind(this),
-            label: _('Cancel'),
+            label: KestrelUi.t('end-session-cancel'),
             key: Clutter.KEY_Escape,
         });
 
         const dialogContent = DialogContent[this._type];
         for (let i = 0; i < dialogContent.confirmButtons.length; i++) {
             const signal = dialogContent.confirmButtons[i].signal;
-            const label = dialogContent.confirmButtons[i].label;
+            const label = dialogContent.confirmButtons[i].label();
             const button = this.addButton({
                 action: () => {
                     const signalId = this.connect('closed', () => {
@@ -414,7 +395,7 @@ class EndSessionDialog extends ModalDialog.ModalDialog {
                             this._confirmRebootToBootLoaderMenu();
                         });
                     },
-                    label: C_('button', 'Boot Options'),
+                    label: KestrelUi.t('end-session-boot-options'),
                 });
                 this._rebootButtonAlt.visible = false;
                 this._altCapture.enabled = true;
@@ -597,11 +578,9 @@ class EndSessionDialog extends ModalDialog.ModalDialog {
 
             let userLabelText;
             if (session.remote)
-                /* Translators: Remote here refers to a remote session, like a ssh login */
-                userLabelText = _('%s (remote)').format(displayUserName);
+                userLabelText = KestrelUi.t('end-session-remote-user', {userName: displayUserName});
             else if (session.type === 'tty')
-                /* Translators: Console here refers to a tty like a VT console */
-                userLabelText = _('%s (console)').format(displayUserName);
+                userLabelText = KestrelUi.t('end-session-console-user', {userName: displayUserName});
             else
                 userLabelText = userName;
 

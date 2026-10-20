@@ -1,6 +1,7 @@
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
+import { FluentNumber, t } from '../../shared/i18n/index.js';
 import { animateActor, Curve, Duration } from '../../shared/motion.js';
 
 const VISIBLE_AFTER_CHANGE_MS = 900;
@@ -24,7 +25,7 @@ export function attachSliderValue(slider: St.Widget & { value: number }): void {
     bubble.set_position(Math.round(thumb - width / 2), Math.round(y - height - BUBBLE_GAP));
   };
   slider.connect('notify::value', () => {
-    bubble.text = `${Math.round(slider.value * 100)}%`;
+    bubble.text = t('quick-settings-slider-value', { percent: new FluentNumber(slider.value, { style: 'percent' }) });
     if (!slider.mapped) return;
     bubble.get_parent()!.set_child_above_sibling(bubble, null);
     bubble.show();

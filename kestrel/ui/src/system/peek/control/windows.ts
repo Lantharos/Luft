@@ -2,6 +2,7 @@ import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 
+import { formatsLocale, t } from '../../../shared/i18n/index.js';
 import type { Level } from '../access/grants.js';
 import { PeekError } from '../errors.js';
 import { captureArea } from './family.js';
@@ -21,7 +22,7 @@ export function listedWindows(): Meta.Window[] {
 
 export function windowById(id: number): Meta.Window {
   const window = listedWindows().find(candidate => candidate.get_id() === id);
-  if (!window) throw new PeekError('NotFound', `No window has the id ${id}. peek list shows the open ones.`);
+  if (!window) throw new PeekError('NotFound', t('peek-error-no-window-id', { id: String(id) }));
   return window;
 }
 
@@ -82,13 +83,13 @@ export function waitForWindow(ended: Set<() => void>, owned: (window: Meta.Windo
     });
     quit = () => {
       finish();
-      reject(new PeekError('Failed', 'The program ended before it opened a window'));
+      reject(new PeekError('Failed', t('peek-error-ended-before-window')));
     };
     ended.add(quit);
     timer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, timeout, () => {
       timer = 0;
       finish();
-      reject(new PeekError('TimedOut', `No window opened within ${timeout / 1000} s`));
+      reject(new PeekError('TimedOut', t('peek-error-no-window-in-time', { duration: new Intl.NumberFormat(formatsLocale(), { style: 'unit', unit: 'second' }).format(timeout / 1000) })));
       return GLib.SOURCE_REMOVE;
     });
   }).then(async window => {

@@ -390,9 +390,7 @@ class MessageHeader extends St.BoxLayout {
             sourceTitle,
             'text',
             GObject.BindingFlags.SYNC_CREATE,
-            // Translators: this is the string displayed in the header when a message
-            // source doesn't have a name
-            (bind, value) => [true, value === null || value === '' ? _('Unknown App') : value],
+            (bind, value) => [true, value === null || value === '' ? KestrelUi.t('messages-unknown-app') : value],
             null);
         const app = KestrelUi.sourceApp(source);
         if (app)
@@ -794,7 +792,7 @@ class NotificationMessage extends Message {
         const send = new St.Button({
             style_class: 'notification-reply-send',
             icon_name: 'mail-send-symbolic',
-            accessible_name: _('Send'),
+            accessible_name: KestrelUi.t('messages-reply-send'),
             can_focus: true,
         });
         const submit = () => {

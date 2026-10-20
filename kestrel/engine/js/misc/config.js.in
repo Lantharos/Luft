@@ -2,10 +2,6 @@
 export const PACKAGE_NAME = '@PACKAGE_NAME@';
 /* The version of this package */
 export const PACKAGE_VERSION = '@PACKAGE_VERSION@';
-/* gettext package */
-export const GETTEXT_PACKAGE = '@GETTEXT_PACKAGE@';
-/* locale dir */
-export const LOCALEDIR = '@datadir@/locale';
 /* other standard directories */
 export const LIBEXECDIR = '@libexecdir@';
 export const PKGDATADIR = '@datadir@/@PACKAGE_NAME@';

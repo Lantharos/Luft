@@ -9,6 +9,7 @@ import { NotificationGroup } from './notificationGroup.js';
 import St from 'gi://St';
 import { HeaderLayout } from 'resource:///com/lantharos/kestrel/ui/headerLayout.js';
 import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
+import { t } from '../../shared/i18n/index.js';
 import { blurSurface } from '../../shared/surface.js';
 import { Calendar } from './calendar/calendar.js';
 import { MediaCard } from './media.js';
@@ -26,7 +27,7 @@ export class NotificationCenter {
 
   private readonly sources = new Set<NotificationSource>();
   private readonly groups = new Map<NotificationSource, NotificationGroup>();
-  private readonly clearButton = new St.Button({ style_class: 'kestrel-text-button', label: 'Clear all', can_focus: true });
+  private readonly clearButton = new St.Button({ style_class: 'kestrel-text-button', can_focus: true });
   private refreshIdle = 0;
   private dirty = true;
   private closing = false;
@@ -49,20 +50,21 @@ export class NotificationCenter {
     });
     blurSurface(this.actor);
     menus.bind(this.actor, () => [
-      { label: 'Clear all notifications', enabled: this.tray.getSources().some(source => source.notifications.length > 0), run: () => this.clear() },
-      { label: 'Show message content on the lock screen', checked: this.shellSettings.get_boolean(LOCK_SCREEN_CONTENT),
+      { label: t('notifications-clear-everything'), enabled: this.tray.getSources().some(source => source.notifications.length > 0), run: () => this.clear() },
+      { label: t('notifications-lock-screen-content'), checked: this.shellSettings.get_boolean(LOCK_SCREEN_CONTENT),
         run: () => this.shellSettings.set_boolean(LOCK_SCREEN_CONTENT, !this.shellSettings.get_boolean(LOCK_SCREEN_CONTENT)) },
-      { label: 'Notification settings', run: () => menus.settings('notifications') },
+      { label: t('notifications-settings'), run: () => menus.settings('notifications') },
     ]);
 
     this.media = new MediaCard(() => { if (this.actor.visible) this.layoutChanged(); });
     this.actor.add_child(this.media.actor);
     this.header.add_child(new St.Label({
-      text: 'Notifications',
+      text: t('notifications-title'),
       style_class: 'kestrel-section-title',
       x_expand: true,
       y_align: Clutter.ActorAlign.CENTER,
     }));
+    this.clearButton.label = t('notifications-clear-all');
     this.clearButton.connect('clicked', () => this.clear());
     this.header.add_child(this.clearButton);
     this.headerLayout.overhang(this.clearButton);

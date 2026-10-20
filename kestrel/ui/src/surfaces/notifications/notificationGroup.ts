@@ -5,6 +5,7 @@ import { HeaderLayout } from 'resource:///com/lantharos/kestrel/ui/headerLayout.
 
 import { appIcons, sourceApp } from '../../appearance/icons/appIcons.js';
 import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
+import { t } from '../../shared/i18n/index.js';
 import { collapse, CollapseLayout } from './collapseLayout.js';
 import { NotificationCard, type Notification, type NotificationSource } from './notificationCard.js';
 
@@ -18,6 +19,8 @@ export class NotificationGroup {
   private readonly icon = new St.Icon({ icon_size: 16, style_class: 'kestrel-notification-group-icon', y_align: Clutter.ActorAlign.CENTER });
   private readonly title = new St.Label({ style_class: 'kestrel-muted', x_expand: true, y_align: Clutter.ActorAlign.CENTER });
   private readonly more = new St.Button({ style_class: 'kestrel-text-button kestrel-notification-more', can_focus: true, visible: false });
+  private readonly clear = new St.Button({ style_class: 'kestrel-notification-dismiss', can_focus: true, track_hover: true,
+    child: new St.Icon({ icon_name: 'edit-clear-all-symbolic', icon_size: 16 }) });
   private readonly app: Shell.App | null;
   private expanded = false;
 
@@ -34,12 +37,10 @@ export class NotificationGroup {
       this.changed();
     });
     header.add_child(this.more);
-    const clear = new St.Button({ style_class: 'kestrel-notification-dismiss', can_focus: true, track_hover: true,
-      accessible_name: `Clear notifications from ${source.title}`, child: new St.Icon({ icon_name: 'edit-clear-all-symbolic', icon_size: 16 }) });
-    clear.connect('clicked', () => { for (const notification of [...source.notifications]) notification.destroy(); });
-    header.add_child(clear);
+    this.clear.connect('clicked', () => { for (const notification of [...source.notifications]) notification.destroy(); });
+    header.add_child(this.clear);
     layout.overhang(this.more);
-    layout.overhang(clear);
+    layout.overhang(this.clear);
     this.actor.add_child(header);
     this.actor.add_child(this.list);
     source.connectObject('notify::title', changed, 'notify::icon', changed, this.actor);
@@ -70,12 +71,13 @@ export class NotificationGroup {
       this.cards.delete(notification);
     }
     this.title.text = this.source.title;
+    this.clear.accessible_name = t('notifications-clear-app', { app: this.source.title });
     if (!this.app) this.icon.gicon = this.source.icon;
     this.icon.visible = !!this.app || !!this.source.icon;
     const hidden = notifications.length - COLLAPSED_COUNT;
     if (hidden <= 0) this.expanded = false;
     this.more.visible = hidden > 0;
-    this.more.label = this.more.accessible_name = this.expanded ? 'Show less' : `${hidden} more`;
+    this.more.label = this.more.accessible_name = this.expanded ? t('notifications-show-less') : t('notifications-more', { count: hidden });
     notifications.forEach((notification, index) => {
       let card = this.cards.get(notification);
       if (!card) {

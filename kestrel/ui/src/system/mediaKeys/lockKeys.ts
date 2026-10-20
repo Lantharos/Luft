@@ -3,19 +3,21 @@ import Gio from 'gi://Gio';
 import type Shell from 'gi://Shell';
 
 import type { Context } from '../../context.js';
+import { t } from '../../shared/i18n/index.js';
 
 type ShowOsd = Context['showOsd'];
 type LayoutManager = Context['layoutManager'];
 
 interface LockKey {
-  name: string;
+  on: string;
+  off: string;
   icon: string;
   isOn(keymap: Clutter.Keymap): boolean;
 }
 
 const LOCK_KEYS: LockKey[] = [
-  { name: 'Caps Lock', icon: 'caps-lock', isOn: keymap => keymap.get_caps_lock_state() },
-  { name: 'Num Lock', icon: 'num-lock', isOn: keymap => keymap.get_num_lock_state() },
+  { on: 'media-keys-caps-lock-on', off: 'media-keys-caps-lock-off', icon: 'caps-lock', isOn: keymap => keymap.get_caps_lock_state() },
+  { on: 'media-keys-num-lock-on', off: 'media-keys-num-lock-off', icon: 'num-lock', isOn: keymap => keymap.get_num_lock_state() },
 ];
 
 export class LockKeys {
@@ -47,7 +49,7 @@ export class LockKeys {
     LOCK_KEYS.forEach((key, index) => {
       const on = this.states[index];
       if (on === previous[index]) return;
-      this.showOsd(Gio.ThemedIcon.new(`${key.icon}-${on ? 'on' : 'off'}-symbolic`), `${key.name} ${on ? 'on' : 'off'}`, null, 1);
+      this.showOsd(Gio.ThemedIcon.new(`${key.icon}-${on ? 'on' : 'off'}-symbolic`), t(on ? key.on : key.off), null, 1);
     });
   }
 

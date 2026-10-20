@@ -5,6 +5,7 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import { blurSurface } from '../../shared/surface.js';
+import { localized, t } from '../../shared/i18n/index.js';
 
 type Zone = [x: number, y: number, width: number, height: number];
 
@@ -71,10 +72,10 @@ export class SnapLayouts {
       const [x, y, width, height] = zone;
       const button = new St.Button({
         style_class: 'kestrel-snap-zone', can_focus: true, track_hover: true,
-        accessible_name: `Snap to ${Math.round(width * 100)}% by ${Math.round(height * 100)}% area`,
         x: Math.round(x * CARD_WIDTH) + ZONE_GAP, y: Math.round(y * CARD_HEIGHT) + ZONE_GAP,
         width: Math.round(width * CARD_WIDTH) - 2 * ZONE_GAP, height: Math.round(height * CARD_HEIGHT) - 2 * ZONE_GAP,
       });
+      localized(button, () => (button.accessible_name = t('snap-zone', { width: Math.round(width * 100), height: Math.round(height * 100) })));
       button.connect('clicked', () => this.apply(zone));
       card.add_child(button);
     }

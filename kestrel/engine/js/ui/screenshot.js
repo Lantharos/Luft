@@ -36,11 +36,9 @@ const ScreencastProxy = Gio.DBusProxy.makeProxyWrapper(ScreencastIface);
 let screenshotNotificationSource = null;
 function getScreenshotNotificationSource() {
     if (!screenshotNotificationSource) {
-        screenshotNotificationSource = new MessageTray.Source({
-            // Translators: notification source name for screenshots and recordings.
-            title: _('Screen Capture'),
-            iconName: 'screenshooter-symbolic',
-        });
+        const source = new MessageTray.Source({iconName: 'screenshooter-symbolic'});
+        KestrelUi.localized(source, () => (source.title = KestrelUi.t('screenshot-source')));
+        screenshotNotificationSource = source;
 
         screenshotNotificationSource.connect('destroy', () => {
             screenshotNotificationSource = null;
@@ -1537,11 +1535,16 @@ export class ScreenshotUI extends St.Widget {
             }));
         }
 
-        const addTooltip = (button, text) => this.add_child(new Tooltip(button, {
-            text,
-            style_class: 'screenshot-ui-tooltip',
-            visible: false,
-        }));
+        const addTooltip = (button, textId) => {
+            const tooltip = new Tooltip(button, {
+                style_class: 'screenshot-ui-tooltip',
+                visible: false,
+            });
+            KestrelUi.bindText(tooltip, textId);
+            this.add_child(tooltip);
+        };
+        const localizeButton = (button, nameId) =>
+            KestrelUi.localized(button, () => (button.accessible_name = KestrelUi.t(nameId)));
         const addSeparator = () => this._panel.add_child(new St.Widget({
             style_class: 'screenshot-ui-separator',
             y_align: Clutter.ActorAlign.CENTER,
@@ -1553,35 +1556,35 @@ export class ScreenshotUI extends St.Widget {
         this._selectionButton = new St.Button({
             style_class: 'screenshot-ui-type-button',
             icon_name: 'screenshot-ui-area-symbolic',
-            accessible_name: _('Area Selection'),
             checked: true,
         });
+        localizeButton(this._selectionButton, 'screenshot-area');
         this._selectionButton.connect('notify::checked',
             this._onSelectionButtonToggled.bind(this));
         this._typeButtonContainer.add_child(this._selectionButton);
-        addTooltip(this._selectionButton, _('Area Selection'));
+        addTooltip(this._selectionButton, 'screenshot-area');
 
         this._screenButton = new St.Button({
             style_class: 'screenshot-ui-type-button',
             icon_name: 'screenshot-ui-display-symbolic',
-            accessible_name: _('Screen Selection'),
             toggle_mode: true,
         });
+        localizeButton(this._screenButton, 'screenshot-screen');
         this._screenButton.connect('notify::checked',
             this._onScreenButtonToggled.bind(this));
         this._typeButtonContainer.add_child(this._screenButton);
-        addTooltip(this._screenButton, _('Screen Selection'));
+        addTooltip(this._screenButton, 'screenshot-screen');
 
         this._windowButton = new St.Button({
             style_class: 'screenshot-ui-type-button',
             icon_name: 'screenshot-ui-window-symbolic',
-            accessible_name: _('Window Selection'),
             toggle_mode: true,
         });
+        localizeButton(this._windowButton, 'screenshot-window');
         this._windowButton.connect('notify::checked',
             this._onWindowButtonToggled.bind(this));
         this._typeButtonContainer.add_child(this._windowButton);
-        addTooltip(this._windowButton, _('Window Selection'));
+        addTooltip(this._windowButton, 'screenshot-window');
 
         addSeparator();
 
@@ -1599,7 +1602,7 @@ export class ScreenshotUI extends St.Widget {
         this._shotButton.connect('notify::checked',
             this._onShotButtonToggled.bind(this));
         this._shotCastContainer.add_child(this._shotButton);
-        addTooltip(this._shotButton, _('Take Screenshot'));
+        addTooltip(this._shotButton, 'screenshot-take');
 
         this._castButton = new St.Button({
             style_class: 'screenshot-ui-shot-cast-button',
@@ -1610,7 +1613,7 @@ export class ScreenshotUI extends St.Widget {
         this._castButton.connect('notify::checked',
             this._onCastButtonToggled.bind(this));
         this._shotCastContainer.add_child(this._castButton);
-        addTooltip(this._castButton, _('Record Screen'));
+        addTooltip(this._castButton, 'screenshot-record');
 
         this._shotButton.bind_property('checked', this._castButton, 'checked',
             GObject.BindingFlags.BIDIRECTIONAL | GObject.BindingFlags.INVERT_BOOLEAN);
@@ -1622,7 +1625,7 @@ export class ScreenshotUI extends St.Widget {
             y_align: Clutter.ActorAlign.CENTER,
         });
         this._panel.add_child(this._showPointerButton);
-        addTooltip(this._showPointerButton, _('Show Pointer'));
+        addTooltip(this._showPointerButton, 'screenshot-show-pointer');
 
         addSeparator();
 
@@ -1635,9 +1638,7 @@ export class ScreenshotUI extends St.Widget {
             x_expand: true,
             y_expand: true,
         }));
-        /* Translators: since this string refers to an action,
-        it needs to be phrased as a verb. */
-        addTooltip(this._captureButton, _('Capture'));
+        addTooltip(this._captureButton, 'screenshot-capture');
         this._captureButton.connect('clicked',
             () => this._onCaptureButtonClicked().catch(logError));
         this._panel.add_child(this._captureButton);
@@ -1645,9 +1646,9 @@ export class ScreenshotUI extends St.Widget {
         this._closeButton = new St.Button({
             style_class: 'screenshot-ui-close-button',
             icon_name: 'window-close-symbolic',
-            accessible_name: _('Close'),
             y_align: Clutter.ActorAlign.CENTER,
         });
+        localizeButton(this._closeButton, 'screenshot-close');
         this._closeButton.connect('clicked', () => this.close());
         this._panel.add_child(this._closeButton);
 
@@ -2260,14 +2261,8 @@ export class ScreenshotUI extends St.Widget {
 
             const [, path] = await method(
                 GLib.build_filenamev([
-                    /* Translators: this is the folder where recorded
-                       screencasts are stored. */
-                    _('Screencasts'),
-                    /* Translators: this is a filename used for screencast
-                     * recording, where "%d" and "%t" date and time, e.g.
-                     * "Screencast From 07-17-2013 10:00:46 PM" */
-                    /* xgettext:no-c-format */
-                    _('Screencast From %d %t'),
+                    KestrelUi.t('screenshot-screencasts-folder'),
+                    KestrelUi.t('screenshot-screencast-file', {date: '%d', time: '%t'}),
                 ]),
                 {'draw-cursor': new GLib.Variant('b', drawCursor)});
 
@@ -2312,8 +2307,7 @@ export class ScreenshotUI extends St.Widget {
             return;
         }
 
-        // Translators: notification title.
-        this._showNotification(_('Screencast Recorded'));
+        this._showNotification(KestrelUi.t('screenshot-screencast-recorded'));
     }
 
     _screencastFailed(phase, error) {
@@ -2325,23 +2319,19 @@ export class ScreenshotUI extends St.Widget {
         case ScreencastPhase.STARTUP:
             delete this._screencastPath;
 
-            // Translators: notification title.
-            this._showNotification(_('Screencast Failed to Start'));
+            this._showNotification(KestrelUi.t('screenshot-screencast-start-failed'));
             break;
 
         case ScreencastPhase.RECORDING:
             if (error.matches(ScreencastErrors, ScreencastError.OUT_OF_DISK_SPACE)) {
-                // Translators: notification title.
-                this._showNotification(_('Screencast Failed: Out of Disk Space'));
+                this._showNotification(KestrelUi.t('screenshot-screencast-out-of-space'));
             } else if (error.matches(ScreencastErrors, ScreencastError.SERVICE_CRASH)) {
                 // We can encourage user to try again on service crashes since the
                 // recorder will auto-blocklist the pipeline that crashed.
 
-                // Translators: notification title.
-                this._showNotification(_('Screencast Failed, Please Try Again'));
+                this._showNotification(KestrelUi.t('screenshot-screencast-try-again'));
             } else {
-                // Translators: notification title.
-                this._showNotification(_('Screencast Failed'));
+                this._showNotification(KestrelUi.t('screenshot-screencast-failed'));
             }
 
             break;
@@ -2353,16 +2343,14 @@ export class ScreenshotUI extends St.Widget {
         const notification = new MessageTray.Notification({
             source,
             title,
-            // Translators: notification body when a screencast was recorded.
-            body: this._screencastPath ? _('Click here to view the video') : '',
+            body: this._screencastPath ? KestrelUi.t('screenshot-screencast-view') : '',
             isTransient: true,
         });
 
         if (this._screencastPath) {
             const file = Gio.file_new_for_path(this._screencastPath);
 
-            // Translators: button on the screencast notification.
-            notification.addAction(_('Show in Rover'), () => {
+            notification.addAction(KestrelUi.t('screenshot-show-in-rover'), () => {
                 const app =
                     Gio.app_info_get_default_for_type('inode/directory', false);
 
@@ -2516,8 +2504,7 @@ function _storeScreenshot(bytes, pixbuf) {
     if (!disableSaveToDisk) {
         const dir = Gio.File.new_for_path(GLib.build_filenamev([
             GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_PICTURES) || GLib.get_home_dir(),
-            // Translators: name of the folder under ~/Pictures for screenshots.
-            _('Screenshots'),
+            KestrelUi.t('screenshot-screenshots-folder'),
         ]));
 
         try {
@@ -2528,9 +2515,7 @@ function _storeScreenshot(bytes, pixbuf) {
         }
 
         const timestamp = time.format('%Y-%m-%d %H-%M-%S');
-        // Translators: this is the name of the file that the screenshot is
-        // saved to. The placeholder is a timestamp, e.g. "2017-05-21 12-24-03".
-        const name = _('Screenshot From %s').format(timestamp);
+        const name = KestrelUi.t('screenshot-file', {timestamp});
 
         // If the target file already exists, try appending a suffix with an
         // increasing number to it.
@@ -2573,18 +2558,15 @@ function _storeScreenshot(bytes, pixbuf) {
     const source = getScreenshotNotificationSource();
     const notification = new MessageTray.Notification({
         source,
-        // Translators: notification title.
-        title: _('Screenshot Captured'),
-        // Translators: notification body when a screenshot was captured.
-        body: _('You can paste the image from the clipboard'),
+        title: KestrelUi.t('screenshot-captured'),
+        body: KestrelUi.t('screenshot-captured-body'),
         datetime: time,
         gicon: content,
         isTransient: true,
     });
 
     if (!disableSaveToDisk) {
-        // Translators: button on the screenshot notification.
-        notification.addAction(_('Show in Rover'), () => {
+        notification.addAction(KestrelUi.t('screenshot-show-in-rover'), () => {
             const app =
                 Gio.app_info_get_default_for_type('inode/directory', false);
 

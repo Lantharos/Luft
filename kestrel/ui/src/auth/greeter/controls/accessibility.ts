@@ -2,6 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import type { MenuEntry } from '../../../desktop/menus/contextMenus.js';
+import { t } from '../../../shared/i18n/index.js';
 
 const LARGER_TEXT = 1.25;
 
@@ -13,12 +14,12 @@ export class Accessibility {
   entries(): MenuEntry[] {
     const largerText = this.interfaceSettings.get_double('text-scaling-factor') > 1;
     const entries: MenuEntry[] = [{
-      label: 'Larger text',
+      label: t('greeter-larger-text'),
       checked: largerText,
       run: () => this.interfaceSettings.set_double('text-scaling-factor', largerText ? 1 : LARGER_TEXT),
     }];
     if (this.screenReaderProgram) entries.push({
-      label: 'Screen reader',
+      label: t('greeter-screen-reader'),
       checked: !!this.screenReader,
       run: () => this.toggleScreenReader(),
     });

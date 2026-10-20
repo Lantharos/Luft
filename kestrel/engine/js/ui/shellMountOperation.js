@@ -296,25 +296,22 @@ const ShellMountPasswordDialog = GObject.registerClass({
         });
 
         if (flags & Gio.AskPasswordFlags.TCRYPT) {
-            this._hiddenVolume = new CheckBox.CheckBox(_('Hidden Volume'));
+            this._hiddenVolume = new CheckBox.CheckBox(KestrelUi.t('mount-hidden-volume'));
             content.add_child(this._hiddenVolume);
 
-            this._systemVolume = new CheckBox.CheckBox(_('Windows System Volume'));
+            this._systemVolume = new CheckBox.CheckBox(KestrelUi.t('mount-windows-system-volume'));
             content.add_child(this._systemVolume);
 
-            this._keyfilesCheckbox = new CheckBox.CheckBox(_('Uses Keyfiles'));
+            this._keyfilesCheckbox = new CheckBox.CheckBox(KestrelUi.t('mount-uses-keyfiles'));
             this._keyfilesCheckbox.connect('clicked', this._onKeyfilesCheckboxClicked.bind(this));
             content.add_child(this._keyfilesCheckbox);
 
             this._keyfilesLabel = new St.Label({visible: false});
             if (disksApp) {
                 this._keyfilesLabel.clutter_text.set_markup(
-                    /* Translators: %s is the Disks application */
-                    _('To unlock a volume that uses keyfiles, use the <i>%s</i> utility instead')
-                   .format(disksApp.get_name()));
+                    KestrelUi.t('mount-keyfiles-use-app', {appName: disksApp.get_name()}));
             } else {
-                this._keyfilesLabel.clutter_text.set_markup(
-                    _('You need an external utility like <i>Disks</i> to unlock a volume that uses keyfiles'));
+                this._keyfilesLabel.clutter_text.set_markup(KestrelUi.t('mount-keyfiles-need-app'));
             }
             this._keyfilesLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
             this._keyfilesLabel.clutter_text.line_wrap = true;
@@ -328,7 +325,7 @@ const ShellMountPasswordDialog = GObject.registerClass({
             this._pimEntry.clutter_text.connect('activate', this._onEntryActivate.bind(this));
             ShellEntry.addContextMenu(this._pimEntry);
 
-            passwordFields.add_child(new Dialog.EntryField(this._pimEntry, _('PIM Number')));
+            passwordFields.add_child(new Dialog.EntryField(this._pimEntry, KestrelUi.t('mount-pim-number')));
         } else {
             this._hiddenVolume = null;
             this._systemVolume = null;
@@ -348,7 +345,7 @@ const ShellMountPasswordDialog = GObject.registerClass({
             animate: true,
         });
 
-        passwordFields.add_child(new Dialog.EntryField(this._passwordEntry, _('Password'), this._workSpinner));
+        passwordFields.add_child(new Dialog.EntryField(this._passwordEntry, KestrelUi.t('mount-password'), this._workSpinner));
 
         const warningBox = new St.BoxLayout({
             orientation: Clutter.Orientation.VERTICAL,
@@ -370,7 +367,7 @@ const ShellMountPasswordDialog = GObject.registerClass({
         content.add_child(passwordFields);
 
         if (flags & Gio.AskPasswordFlags.SAVING_SUPPORTED) {
-            this._rememberChoice = new CheckBox.CheckBox(_('Remember Password'));
+            this._rememberChoice = new CheckBox.CheckBox(KestrelUi.t('mount-remember-password'));
             this._rememberChoice.checked =
                 global.settings.get_boolean(REMEMBER_MOUNT_PASSWORD_KEY);
             content.add_child(this._rememberChoice);
@@ -381,25 +378,24 @@ const ShellMountPasswordDialog = GObject.registerClass({
         this.contentLayout.add_child(content);
 
         this._defaultButtons = [{
-            label: _('Cancel'),
+            label: KestrelUi.t('mount-cancel'),
             action: this._onCancelButton.bind(this),
             key: Clutter.KEY_Escape,
         }, {
-            label: _('Unlock'),
+            label: KestrelUi.t('mount-unlock'),
             action: this._onUnlockButton.bind(this),
             default: true,
         }];
 
         this._usesKeyfilesButtons = [{
-            label: _('Cancel'),
+            label: KestrelUi.t('mount-cancel'),
             action: this._onCancelButton.bind(this),
             key: Clutter.KEY_Escape,
         }];
 
         if (disksApp) {
             this._usesKeyfilesButtons.push({
-                /* Translators: %s is the Disks application */
-                label: _('Open %s').format(disksApp.get_name()),
+                label: KestrelUi.t('mount-open-app', {appName: disksApp.get_name()}),
                 action: () => {
                     disksApp.activate();
                     this._onCancelButton();
@@ -414,7 +410,7 @@ const ShellMountPasswordDialog = GObject.registerClass({
     reaskPassword() {
         this._workSpinner.stop();
         this._passwordEntry.set_text('');
-        this._errorMessageLabel.text = _('Sorry, that didn’t work. Please try again.');
+        this._errorMessageLabel.text = KestrelUi.t('mount-wrong-password');
         this._errorMessageLabel.show();
 
         wiggle(this._passwordEntry);
@@ -435,7 +431,7 @@ const ShellMountPasswordDialog = GObject.registerClass({
 
             if (isNaN(pim)) {
                 this._pimEntry.set_text('');
-                this._errorMessageLabel.text = _('The PIM must be a number or empty');
+                this._errorMessageLabel.text = KestrelUi.t('mount-pim-invalid');
                 this._errorMessageLabel.show();
                 return;
             }

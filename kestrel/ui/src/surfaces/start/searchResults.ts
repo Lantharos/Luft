@@ -4,10 +4,10 @@ import St from 'gi://St';
 import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
 import type { SearchItem, SearchView } from './search/item.js';
 import { appIcons, type IconApp } from '../../appearance/icons/appIcons.js';
+import { t } from '../../shared/i18n/index.js';
 import { isControlEnter } from '../../shared/input/keyboardNavigation.js';
 
 const KEPT_ROWS = 64;
-const BEST_TITLE = 'Best match';
 
 const isApp = (icon: SearchItem['icon']): icon is IconApp => 'get_id' in icon;
 
@@ -23,7 +23,7 @@ interface Row {
 export class SearchResults {
   private readonly rows = new Map<string, Row>();
   private readonly titles = new Map<string, St.Label>();
-  private readonly empty = new St.Label({ text: 'No results', style_class: 'kestrel-empty' });
+  private readonly empty = new St.Label({ text: t('start-search-no-results'), style_class: 'kestrel-empty' });
   private highlighted: Row | null = null;
   private highlighting = true;
 
@@ -41,7 +41,7 @@ export class SearchResults {
       actors.push(this.row(item).actor);
     };
     if (view.best) {
-      if (titled) actors.push(this.title(BEST_TITLE));
+      if (titled) actors.push(this.title(t('start-search-best-match')));
       add(view.best);
     }
     for (const group of view.groups) {
@@ -146,7 +146,7 @@ export class SearchResults {
       return Clutter.EVENT_STOP;
     });
     actor.connect('key-focus-in', () => this.reveal(actor));
-    this.menus.bind(actor, () => row.item.menu?.() ?? [{ label: 'Open', run: () => row.item.activate() }]);
+    this.menus.bind(actor, () => row.item.menu?.() ?? [{ label: t('start-open'), run: () => row.item.activate() }]);
     return row;
   }
 }

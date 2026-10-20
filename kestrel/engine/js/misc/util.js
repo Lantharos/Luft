@@ -109,13 +109,7 @@ export function trySpawn(argv) {
             null, argv, launchContext.get_environment(),
             GLib.SpawnFlags.SEARCH_PATH | GLib.SpawnFlags.DO_NOT_REAP_CHILD);
     } catch (err) {
-        /* Rewrite the error in case of ENOENT */
-        if (err.matches(GLib.SpawnError, GLib.SpawnError.NOENT)) {
-            throw new GLib.SpawnError({
-                code: GLib.SpawnError.NOENT,
-                message: _('Command not found'),
-            });
-        } else if (err instanceof GLib.Error) {
+        if (err instanceof GLib.Error) {
             // The exception from gjs contains an error string like:
             //   Error invoking GLib.spawn_command_line_async: Failed to
             //   execute child process "foo" (No such file or directory)
@@ -137,10 +131,8 @@ export function trySpawn(argv) {
 }
 
 function _handleSpawnError(command, err) {
-    const title = _('Execution of “%s” failed:').format(command);
-    // Use dynamic import to not pull in UI related code in unit tests
-    import('../ui/main.js').then(
-        ({notifyError}) => notifyError(title, err.message));
+    Promise.all([import('../ui/main.js'), import('../ui/kestrelUi.js')]).then(
+        ([{notifyError}, {t}]) => notifyError(t('spawn-failed', {command}), err.message));
 }
 
 /**

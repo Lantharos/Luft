@@ -1362,10 +1362,9 @@ let systemNotificationSource = null;
  */
 export function getSystemSource() {
     if (!systemNotificationSource) {
-        systemNotificationSource = new Source({
-            title: _('System'),
-            iconName: 'cog-wheel-symbolic',
-        });
+        const source = new Source({iconName: 'cog-wheel-symbolic'});
+        KestrelUi.localized(source, () => (source.title = KestrelUi.t('messages-system-source')));
+        systemNotificationSource = source;
 
         systemNotificationSource.connect('destroy', () => {
             systemNotificationSource = null;

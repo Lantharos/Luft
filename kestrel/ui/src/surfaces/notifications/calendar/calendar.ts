@@ -1,6 +1,7 @@
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
+import { formatsLocale, t } from '../../../shared/i18n/index.js';
 import { animateActor, projection, Spring } from '../../../shared/motion.js';
 import { MonthScroll } from './monthScroll.js';
 import { weekRow, WeekStrip } from './weekStrip.js';
@@ -8,8 +9,6 @@ import { dateOf, dayNumber, firstOfMonth, isoWeek, monthIndex, Weeks } from './w
 import { WeekStart } from './weekStart.js';
 
 const THROWN_WEEKS_PER_SECOND = 6;
-const monthTitle = new Intl.DateTimeFormat(undefined, { month: 'long', year: 'numeric' });
-const weekdayName = new Intl.DateTimeFormat(undefined, { weekday: 'short' });
 
 export class Calendar {
   readonly actor = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-calendar', reactive: true });
@@ -21,13 +20,15 @@ export class Calendar {
   private readonly scroll = new MonthScroll(this);
   private shown = monthIndex(new Date());
   private drawn = { week: NaN, month: NaN, today: NaN };
+  private readonly monthTitle = new Intl.DateTimeFormat(formatsLocale(), { month: 'long', year: 'numeric' });
+  private readonly weekdayName = new Intl.DateTimeFormat(formatsLocale(), { weekday: 'short' });
 
   constructor() {
     const navigation = new St.BoxLayout({ style_class: 'kestrel-calendar-navigation' });
     this.month.connect('clicked', () => this.show(monthIndex(new Date()), true));
     navigation.add_child(this.month);
-    navigation.add_child(this.pageButton('go-previous-symbolic', 'Previous month', -1));
-    navigation.add_child(this.pageButton('go-next-symbolic', 'Next month', 1));
+    navigation.add_child(this.pageButton('go-previous-symbolic', t('calendar-previous-month'), -1));
+    navigation.add_child(this.pageButton('go-next-symbolic', t('calendar-next-month'), 1));
     this.actor.add_child(navigation);
     const grid = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-calendar-grid' });
     grid.add_child(this.headings[0].get_parent()!);
@@ -76,7 +77,7 @@ export class Calendar {
     const weekStart = this.weekStart.day;
     this.weeks.weekStart = weekStart;
     this.headings.forEach((heading, column) =>
-      heading.text = weekdayName.format(new Date(2023, 0, 1 + (weekStart + column) % 7)).slice(0, 2));
+      heading.text = this.weekdayName.format(new Date(2023, 0, 1 + (weekStart + column) % 7)).slice(0, 2));
     this.drawn.week = NaN;
     this.show(this.shown, false);
   }
@@ -98,7 +99,7 @@ export class Calendar {
     if (week === this.drawn.week && month === this.drawn.month && today === this.drawn.today) return;
     this.drawn = { week, month, today };
     const current = month === monthIndex(now);
-    this.month.label = `${monthTitle.format(firstOfMonth(month))}, week ${isoWeek(current ? now : firstOfMonth(month))}`;
+    this.month.label = t('calendar-month-week', { month: this.monthTitle.format(firstOfMonth(month)), week: isoWeek(current ? now : firstOfMonth(month)) });
     this.strip.rows.forEach((cells, row) => {
       const first = this.weeks.firstDay(week + row);
       cells.forEach((cell, column) => {

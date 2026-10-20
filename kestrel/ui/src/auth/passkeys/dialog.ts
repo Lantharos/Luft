@@ -3,6 +3,7 @@ import St from 'gi://St';
 
 import type { ModalDialog } from 'resource:///com/lantharos/kestrel/ui/modalDialog.js';
 import { choose, list, row } from '../../portal/core/rows.js';
+import { t } from '../../shared/i18n/index.js';
 import { copyFor, needsVerification, type Request } from './copy.js';
 
 interface Answers {
@@ -71,14 +72,14 @@ export class PasskeyDialog {
     this.fingerprintLabel = new St.Label({ text: this.request.fingerprint ?? '', style_class: 'kestrel-passkey-fingerprint-label', x_expand: true, y_align: Clutter.ActorAlign.CENTER });
     this.fingerprintLabel.clutter_text.line_wrap = true;
     fingerprintBox.add_child(this.fingerprintLabel);
-    const usePassword = new St.Button({ label: 'Use password', style_class: 'kestrel-portal-link', can_focus: true, y_align: Clutter.ActorAlign.CENTER });
+    const usePassword = new St.Button({ label: t('passkeys-use-password'), style_class: 'kestrel-portal-link', can_focus: true, y_align: Clutter.ActorAlign.CENTER });
     usePassword.connect('clicked', () => this.showPassword());
     fingerprintBox.add_child(usePassword);
     this.fingerprintBox = fingerprintBox;
     content.add_child(fingerprintBox);
 
     const passwordBox = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-portal-field', x_expand: true, visible: false });
-    const entry = new St.PasswordEntry({ style_class: 'prompt-dialog-password-entry kestrel-passkey-password', hint_text: 'Password', can_focus: true, x_expand: true });
+    const entry = new St.PasswordEntry({ style_class: 'prompt-dialog-password-entry kestrel-passkey-password', hint_text: t('passkeys-password'), can_focus: true, x_expand: true });
     entry.clutter_text.connect('activate', () => this.submit());
     entry.clutter_text.connect('text-changed', () => this.syncContinue());
     passwordBox.add_child(entry);
@@ -91,8 +92,8 @@ export class PasskeyDialog {
     content.add_child(this.status);
 
     const modal = this.modal!;
-    modal.addButton({ label: 'Cancel', action: () => this.cancel(), key: Clutter.KEY_Escape });
-    this.continueButton = modal.addButton({ label: 'Continue', action: () => this.submit(), default: true, reactive: false });
+    modal.addButton({ label: t('passkeys-cancel'), action: () => this.cancel(), key: Clutter.KEY_Escape });
+    this.continueButton = modal.addButton({ label: t('passkeys-continue'), action: () => this.submit(), default: true, reactive: false });
     this.continueButton.visible = false;
     if (!this.request.fingerprint) this.showPassword();
   }
@@ -100,11 +101,11 @@ export class PasskeyDialog {
   private addConfirmation(): void {
     const modal = this.modal!;
     if (this.request.purpose === 'registered') {
-      modal.addButton({ label: 'OK', action: () => this.confirm(), default: true, key: Clutter.KEY_Escape });
+      modal.addButton({ label: t('passkeys-ok'), action: () => this.confirm(), default: true, key: Clutter.KEY_Escape });
       return;
     }
-    modal.addButton({ label: 'Cancel', action: () => this.cancel(), key: Clutter.KEY_Escape });
-    modal.addButton({ label: 'Use this computer', action: () => this.confirm(), default: true });
+    modal.addButton({ label: t('passkeys-cancel'), action: () => this.cancel(), key: Clutter.KEY_Escape });
+    modal.addButton({ label: t('passkeys-use-this-computer'), action: () => this.confirm(), default: true });
   }
 
   private showPassword(): void {
@@ -155,7 +156,7 @@ export class PasskeyDialog {
 
   fingerprintUnavailable(): void {
     this.showPassword();
-    this.showStatus('Use your password to continue.');
+    this.showStatus(t('passkeys-fingerprint-unavailable'));
   }
 
   wrongPassword(): void {
@@ -165,7 +166,7 @@ export class PasskeyDialog {
     entry.reactive = true;
     entry.grab_key_focus();
     this.syncContinue();
-    this.showStatus('That password isn’t right. Try again.');
+    this.showStatus(t('passkeys-wrong-password'));
   }
 
   close(): void {

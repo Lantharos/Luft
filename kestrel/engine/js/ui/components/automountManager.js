@@ -3,6 +3,7 @@ import GLib from 'gi://GLib';
 import * as Params from '../../misc/params.js';
 
 import * as GnomeSession from '../../misc/gnomeSession.js';
+import * as KestrelUi from '../kestrelUi.js';
 import * as Main from '../main.js';
 import * as ShellMountOperation from '../shellMountOperation.js';
 
@@ -183,8 +184,8 @@ class AutomountManager {
                 this._reaskPassword(volume);
             } else {
                 if (e.message.includes('Compiled against a version of libcryptsetup that does not support the VeraCrypt PIM setting')) {
-                    Main.notifyError(_('Unable to unlock volume'),
-                        _('The installed udisks version does not support the PIM setting'));
+                    Main.notifyError(KestrelUi.t('mount-unlock-failed'),
+                        KestrelUi.t('mount-pim-unsupported'));
                 }
 
                 if (!e.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.FAILED_HANDLED))

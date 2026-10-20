@@ -1,3 +1,4 @@
+import { t } from '../../../../shared/i18n/index.js';
 import { launchHistory } from '../../../../shared/launchHistory.js';
 import type { QuickControl, QuickSettingsSource } from '../../../quickSettings/quickControls.js';
 import { LOCK, POWER_ACTIONS, isAvailable, type SessionAction } from '../../../quickSettings/sessionActions.js';
@@ -11,56 +12,52 @@ const BIAS = 0.2;
 interface Toggle {
   key: string;
   control: (source: QuickSettingsSource) => QuickControl | undefined;
-  title: (on: boolean) => string;
+  turnOn: string;
+  turnOff: string;
+  keywords: string;
   icon: string;
-  keywords: string[];
 }
 
 const TOGGLES: Toggle[] = [
   {
-    key: 'dark-style', control: source => source._darkMode.quickSettingsItems[0],
-    title: on => on ? 'Switch to light style' : 'Switch to dark style', icon: 'dark-mode-symbolic',
-    keywords: ['dark style', 'dark mode', 'dark theme', 'light style', 'light mode', 'light theme'],
+    key: 'dark-style', control: source => source._darkMode.quickSettingsItems[0], icon: 'dark-mode-symbolic',
+    turnOn: 'start-search-dark-style-on', turnOff: 'start-search-dark-style-off', keywords: 'start-search-dark-style-keywords',
   },
   {
-    key: 'night-light', control: source => source._nightLight.quickSettingsItems[0],
-    title: on => on ? 'Turn off night light' : 'Turn on night light', icon: 'night-light-symbolic',
-    keywords: ['night light', 'night shift', 'blue light', 'warm colors'],
+    key: 'night-light', control: source => source._nightLight.quickSettingsItems[0], icon: 'night-light-symbolic',
+    turnOn: 'start-search-night-light-on', turnOff: 'start-search-night-light-off', keywords: 'start-search-night-light-keywords',
   },
   {
-    key: 'do-not-disturb', control: source => source._doNotDisturb.quickSettingsItems[0],
-    title: on => on ? 'Turn off Do Not Disturb' : 'Turn on Do Not Disturb', icon: 'notifications-disabled-symbolic',
-    keywords: ['do not disturb', 'dnd', 'focus', 'quiet', 'silence notifications', 'mute notifications'],
+    key: 'do-not-disturb', control: source => source._doNotDisturb.quickSettingsItems[0], icon: 'notifications-disabled-symbolic',
+    turnOn: 'start-search-do-not-disturb-on', turnOff: 'start-search-do-not-disturb-off', keywords: 'start-search-do-not-disturb-keywords',
   },
   {
-    key: 'wifi', control: source => source._network?._wirelessToggle,
-    title: on => on ? 'Turn off Wi-Fi' : 'Turn on Wi-Fi', icon: 'network-wireless-symbolic',
-    keywords: ['wifi', 'wi-fi', 'wireless', 'wlan'],
+    key: 'wifi', control: source => source._network?._wirelessToggle, icon: 'network-wireless-symbolic',
+    turnOn: 'start-search-wifi-on', turnOff: 'start-search-wifi-off', keywords: 'start-search-wifi-keywords',
   },
   {
-    key: 'bluetooth', control: source => source._bluetooth?.quickSettingsItems[0],
-    title: on => on ? 'Turn off Bluetooth' : 'Turn on Bluetooth', icon: 'bluetooth-active-symbolic',
-    keywords: ['bluetooth'],
+    key: 'bluetooth', control: source => source._bluetooth?.quickSettingsItems[0], icon: 'bluetooth-active-symbolic',
+    turnOn: 'start-search-bluetooth-on', turnOff: 'start-search-bluetooth-off', keywords: 'start-search-bluetooth-keywords',
   },
   {
-    key: 'airplane-mode', control: source => source._rfkill.quickSettingsItems[0],
-    title: on => on ? 'Turn off airplane mode' : 'Turn on airplane mode', icon: 'airplane-mode-symbolic',
-    keywords: ['airplane mode', 'flight mode', 'aeroplane mode', 'radios'],
+    key: 'airplane-mode', control: source => source._rfkill.quickSettingsItems[0], icon: 'airplane-mode-symbolic',
+    turnOn: 'start-search-airplane-mode-on', turnOff: 'start-search-airplane-mode-off', keywords: 'start-search-airplane-mode-keywords',
   },
   {
-    key: 'keep-awake', control: source => source._caffeine.quickSettingsItems[0],
-    title: on => on ? 'Stop keeping awake' : 'Keep awake', icon: 'view-reveal-symbolic',
-    keywords: ['keep awake', 'stay awake', 'caffeine', 'prevent sleep'],
+    key: 'keep-awake', control: source => source._caffeine.quickSettingsItems[0], icon: 'view-reveal-symbolic',
+    turnOn: 'start-search-keep-awake-on', turnOff: 'start-search-keep-awake-off', keywords: 'start-search-keep-awake-keywords',
   },
 ];
 
-const SESSION_KEYWORDS = new Map<SessionAction, string[]>([
-  [LOCK, ['lock screen', 'lock computer']],
-  [POWER_ACTIONS[0], ['sleep', 'standby']],
-  [POWER_ACTIONS[1], ['log out', 'logout', 'sign out', 'sign off', 'end session']],
-  [POWER_ACTIONS[2], ['reboot', 'restart computer']],
-  [POWER_ACTIONS[3], ['shut down', 'shutdown', 'turn off computer', 'power down']],
+const SESSION_KEYWORDS = new Map<SessionAction, string>([
+  [LOCK, 'start-search-lock-keywords'],
+  [POWER_ACTIONS[0], 'start-search-suspend-keywords'],
+  [POWER_ACTIONS[1], 'start-search-log-out-keywords'],
+  [POWER_ACTIONS[2], 'start-search-restart-keywords'],
+  [POWER_ACTIONS[3], 'start-search-power-off-keywords'],
 ]);
+
+const searchWords = (message: string) => t(message).split(',').map(keyword => keyword.trim()).filter(Boolean);
 
 function flip(control: QuickControl): void {
   if (control.toggle_mode) control.checked = !control.checked;
@@ -80,15 +77,16 @@ function entry(key: string, title: string, icon: string, keywords: string[], run
 
 function toggleEntries(toggle: Toggle, control: QuickControl): ActionEntry[] {
   const key = `action:${toggle.key}`;
+  const words = searchWords(toggle.keywords);
   return [false, true].map(on =>
-    entry(key, toggle.title(on), toggle.icon, toggle.keywords, () => flip(control), () => control.visible && control.checked === on));
+    entry(key, t(on ? toggle.turnOff : toggle.turnOn), toggle.icon, words, () => flip(control), () => control.visible && control.checked === on));
 }
 
-const SESSION_ENTRIES = [...SESSION_KEYWORDS].map(([action, keywords]) =>
-  entry(`action:${action.availability}`, action.label, action.icon, keywords, () => action.run(), () => isAvailable(action)));
+const sessionEntries = () => [...SESSION_KEYWORDS].map(([action, message]) =>
+  entry(`action:${action.availability}`, t(action.message), action.icon, searchWords(message), () => action.run(), () => isAvailable(action)));
 
 export class ActionResults {
-  private entries: ActionEntry[] = SESSION_ENTRIES;
+  private entries: ActionEntry[] = sessionEntries();
 
   constructor(source: QuickSettingsSource, private readonly close: () => void) {
     source.ready.then(() => {
@@ -96,7 +94,7 @@ export class ActionResults {
         const control = toggle.control(source);
         return control ? toggleEntries(toggle, control) : [];
       });
-      this.entries = [...toggles, ...SESSION_ENTRIES];
+      this.entries = [...toggles, ...this.entries];
     }).catch(error => console.error('Start could not read the quick settings', error));
   }
 

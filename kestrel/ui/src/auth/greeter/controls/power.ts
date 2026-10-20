@@ -3,11 +3,12 @@ import GLib from 'gi://GLib';
 
 import type { MenuEntry } from '../../../desktop/menus/contextMenus.js';
 import { Blackout } from '../../../session/farewell.js';
+import { t } from '../../../shared/i18n/index.js';
 
 const ACTIONS = [
-  { label: 'Suspend', method: 'Suspend', check: 'CanSuspend', fadeOut: false },
-  { label: 'Restart', method: 'Reboot', check: 'CanReboot', fadeOut: true },
-  { label: 'Power off', method: 'PowerOff', check: 'CanPowerOff', fadeOut: true },
+  { labelId: 'greeter-suspend', method: 'Suspend', check: 'CanSuspend', fadeOut: false },
+  { labelId: 'greeter-restart', method: 'Reboot', check: 'CanReboot', fadeOut: true },
+  { labelId: 'greeter-power-off', method: 'PowerOff', check: 'CanPowerOff', fadeOut: true },
 ];
 
 function callLogind(method: string, parameters: GLib.Variant | null): Promise<GLib.Variant> {
@@ -35,7 +36,7 @@ export class PowerActions {
 
   entries(): MenuEntry[] {
     return this.available.map(action => ({
-      label: action.label,
+      label: t(action.labelId),
       run: () => void this.perform(action),
     }));
   }
@@ -46,7 +47,7 @@ export class PowerActions {
       await callLogind(action.method, new GLib.Variant('(b)', [false]));
     } catch (error) {
       this.blackout.lift();
-      console.warn(`${action.label} did not start: ${error}`);
+      console.warn(`${action.method} did not start: ${error}`);
     }
   }
 }

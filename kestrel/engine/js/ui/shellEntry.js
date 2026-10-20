@@ -5,6 +5,7 @@ import Pango from 'gi://Pango';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 
+import * as KestrelUi from './kestrelUi.js';
 import * as Main from './main.js';
 import * as Params from '../misc/params.js';
 import * as PopupMenu from './popupMenu.js';
@@ -18,12 +19,14 @@ export class EntryMenu extends PopupMenu.PopupMenu {
 
         // Populate menu
         let item;
-        item = new PopupMenu.PopupMenuItem(_('Copy'));
+        item = new PopupMenu.PopupMenuItem('');
+        KestrelUi.bindText(item.label, 'entry-menu-copy');
         item.connect('activate', this._onCopyActivated.bind(this));
         this.addMenuItem(item);
         this._copyItem = item;
 
-        item = new PopupMenu.PopupMenuItem(_('Paste'));
+        item = new PopupMenu.PopupMenuItem('');
+        KestrelUi.bindText(item.label, 'entry-menu-paste');
         item.connect('activate', this._onPasteActivated.bind(this));
         this.addMenuItem(item);
         this._pasteItem = item;
@@ -77,10 +80,9 @@ export class EntryMenu extends PopupMenu.PopupMenu {
     }
 
     _updatePasswordItem() {
-        if (!this._entry.password_visible)
-            this._passwordItem.label.set_text(_('Show Text'));
-        else
-            this._passwordItem.label.set_text(_('Hide Text'));
+        this._passwordItem.label.text = KestrelUi.t(this._entry.password_visible
+            ? 'entry-menu-hide-text'
+            : 'entry-menu-show-text');
     }
 
     _onCopyActivated() {
@@ -169,7 +171,7 @@ class CapsLockWarning extends St.Label {
             ...params,
         });
 
-        this.text = _('Caps Lock is on');
+        KestrelUi.bindText(this, 'entry-caps-lock-on');
 
         this.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         this.clutter_text.line_wrap = true;

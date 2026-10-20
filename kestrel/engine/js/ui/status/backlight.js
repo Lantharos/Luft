@@ -7,6 +7,7 @@ import St from 'gi://St';
 
 import {QuickMenuToggle, SystemIndicator} from '../quickSettings.js';
 
+import * as KestrelUi from '../kestrelUi.js';
 import * as PopupMenu from '../popupMenu.js';
 import {Slider} from '../slider.js';
 
@@ -36,7 +37,7 @@ const SliderItem = GObject.registerClass({
 
         this._sliderChangedId = this._slider.connect('notify::value',
             () => this.notify('value'));
-        this._slider.accessible_name = _('Keyboard Brightness');
+        KestrelUi.localized(this._slider, () => (this._slider.accessible_name = KestrelUi.t('backlight-slider')));
 
         this.add_child(this._slider);
     }
@@ -80,9 +81,9 @@ const DiscreteItem = GObject.registerClass({
         });
 
         this._levelButtons = new Map();
-        this._addLevelButton('off', _('Off'), 'keyboard-brightness-off-symbolic');
-        this._addLevelButton('low', _('Low'), 'keyboard-brightness-medium-symbolic');
-        this._addLevelButton('high', _('High'), 'keyboard-brightness-high-symbolic');
+        this._addLevelButton('off', 'backlight-off', 'keyboard-brightness-off-symbolic');
+        this._addLevelButton('low', 'backlight-low', 'keyboard-brightness-medium-symbolic');
+        this._addLevelButton('high', 'backlight-high', 'keyboard-brightness-high-symbolic');
 
         this.connect('notify::n-levels', () => this._syncLevels());
         this.connect('notify::value', () => this._syncChecked());
@@ -104,7 +105,7 @@ const DiscreteItem = GObject.registerClass({
         return 100 * Math.min(keyIndex, this.nLevels - 1) / (this.nLevels - 1);
     }
 
-    _addLevelButton(key, labelText, iconName) {
+    _addLevelButton(key, labelId, iconName) {
         const box = new St.BoxLayout({
             style_class: 'keyboard-brightness-level',
             orientation: Clutter.Orientation.VERTICAL,
@@ -112,9 +113,9 @@ const DiscreteItem = GObject.registerClass({
         });
 
         const label = new St.Label({
-            text: labelText,
             x_align: Clutter.ActorAlign.CENTER,
         });
+        KestrelUi.bindText(label, labelId);
 
         box.button = new St.Button({
             styleClass: 'icon-button',
@@ -153,9 +154,12 @@ const KeyboardBrightnessToggle = GObject.registerClass(
 class KeyboardBrightnessToggle extends QuickMenuToggle {
     _init() {
         super._init({
-            title: _('Keyboard Backlight'),
             iconName: 'keyboard-brightness-high-symbolic',
-            menuButtonAccessibleName: _('Open keyboard brightness menu'),
+        });
+        KestrelUi.localized(this, () => {
+            this.title = KestrelUi.t('backlight-title');
+            this.menuButtonAccessibleName = KestrelUi.t('backlight-open-menu');
+            this.menu.setHeader('keyboard-brightness-high-symbolic', KestrelUi.t('backlight-title'));
         });
 
         this._proxy = new BrightnessProxy(Gio.DBus.session, BUS_NAME, OBJECT_PATH,
@@ -170,8 +174,6 @@ class KeyboardBrightnessToggle extends QuickMenuToggle {
         this.connect('clicked', () => {
             this._proxy.Brightness = this.checked ? 0 : 100;
         });
-
-        this.menu.setHeader('keyboard-brightness-high-symbolic', _('Keyboard Backlight'));
 
         this._sliderItem = new SliderItem();
         this.menu.box.add_child(this._sliderItem);

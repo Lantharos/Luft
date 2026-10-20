@@ -2,6 +2,7 @@ import Gio from 'gi://Gio';
 import * as MessageTray from 'resource:///com/lantharos/kestrel/ui/messageTray.js';
 
 import { shortDuration } from '../../shared/duration.js';
+import { formatsLocale, t } from '../../shared/i18n/index.js';
 import { playSound } from '../sounds/sounds.js';
 import { PowerDevices, type PowerDevice } from './powerDevices.js';
 
@@ -11,18 +12,19 @@ const RECHARGED_MARGIN = 5;
 const UPS = 3;
 
 const ACCESSORIES: Record<number, [name: string, icon: string]> = {
-  5: ['Mouse', 'input-mouse-symbolic'],
-  6: ['Keyboard', 'input-keyboard-symbolic'],
-  8: ['Phone', 'phone-symbolic'],
-  10: ['Tablet', 'input-tablet-symbolic'],
-  12: ['Controller', 'input-gaming-symbolic'],
-  13: ['Pen', 'input-tablet-symbolic'],
-  14: ['Touchpad', 'input-touchpad-symbolic'],
-  17: ['Headset', 'audio-headset-symbolic'],
-  18: ['Speaker', 'audio-speakers-symbolic'],
-  19: ['Headphones', 'audio-headphones-symbolic'],
-  22: ['Remote', 'input-gaming-symbolic'],
+  5: ['battery-device-mouse', 'input-mouse-symbolic'],
+  6: ['battery-device-keyboard', 'input-keyboard-symbolic'],
+  8: ['battery-device-phone', 'phone-symbolic'],
+  10: ['battery-device-tablet', 'input-tablet-symbolic'],
+  12: ['battery-device-controller', 'input-gaming-symbolic'],
+  13: ['battery-device-pen', 'input-tablet-symbolic'],
+  14: ['battery-device-touchpad', 'input-touchpad-symbolic'],
+  17: ['battery-device-headset', 'audio-headset-symbolic'],
+  18: ['battery-device-speaker', 'audio-speakers-symbolic'],
+  19: ['battery-device-headphones', 'audio-headphones-symbolic'],
+  22: ['battery-device-remote', 'input-gaming-symbolic'],
 };
+const UNKNOWN_ACCESSORY: [name: string, icon: string] = ['battery-device-other', 'battery-low-symbolic'];
 
 interface Warned {
   threshold: number | null;
@@ -40,23 +42,35 @@ function reached(thresholds: number[], percentage: number): number | null {
   return thresholds.filter(threshold => percentage <= threshold).at(-1) ?? null;
 }
 
+function percent(percentage: number): string {
+  return new Intl.NumberFormat(formatsLocale(), { style: 'percent' }).format(Math.round(percentage) / 100);
+}
+
 function systemWarning({ kind, percentage, secondsLeft }: PowerDevice, threshold: number): Warning {
-  const source = kind === UPS ? 'UPS battery' : 'Battery';
-  const left = `${Math.round(percentage)}% left${secondsLeft > 0 ? `, about ${shortDuration(secondsLeft)}` : ''}.`;
+  const ups = kind === UPS;
+  const left = secondsLeft > 0
+    ? t('battery-left-with-time', { percent: percent(percentage), duration: shortDuration(secondsLeft) })
+    : t('battery-left', { percent: percent(percentage) });
   if (threshold === 5)
-    return { title: `${source} almost empty`, body: `${left} Plug in now to avoid losing unsaved work.`, icon: 'battery-caution-symbolic', urgency: MessageTray.Urgency.CRITICAL };
+    return {
+      title: t(ups ? 'battery-ups-almost-empty-title' : 'battery-almost-empty-title'), body: t('battery-almost-empty-body', { left }),
+      icon: 'battery-caution-symbolic', urgency: MessageTray.Urgency.CRITICAL,
+    };
   if (threshold === 10)
-    return { title: `${source} very low`, body: `${left} Plug in soon.`, icon: 'battery-caution-symbolic', urgency: MessageTray.Urgency.HIGH };
-  return { title: `${source} low`, body: left, icon: 'battery-low-symbolic', urgency: MessageTray.Urgency.NORMAL };
+    return {
+      title: t(ups ? 'battery-ups-very-low-title' : 'battery-very-low-title'), body: t('battery-very-low-body', { left }),
+      icon: 'battery-caution-symbolic', urgency: MessageTray.Urgency.HIGH,
+    };
+  return { title: t(ups ? 'battery-ups-low-title' : 'battery-low-title'), body: left, icon: 'battery-low-symbolic', urgency: MessageTray.Urgency.NORMAL };
 }
 
 function accessoryWarning({ kind, model, percentage }: PowerDevice, threshold: number): Warning {
-  const [kindName, icon] = ACCESSORIES[kind] ?? ['Connected device', 'battery-low-symbolic'];
-  const name = model.trim() || kindName;
-  const left = `${Math.round(percentage)}% left.`;
+  const [kindName, icon] = ACCESSORIES[kind] ?? UNKNOWN_ACCESSORY;
+  const device = model.trim() || t(kindName);
+  const left = t('battery-left', { percent: percent(percentage) });
   return threshold === 10
-    ? { title: `${name} battery very low`, body: `${left} Charge it now so it doesn't turn off.`, icon, urgency: MessageTray.Urgency.HIGH }
-    : { title: `${name} battery low`, body: `${left} Charge it soon.`, icon, urgency: MessageTray.Urgency.NORMAL };
+    ? { title: t('battery-device-very-low-title', { device }), body: t('battery-device-very-low-body', { left }), icon, urgency: MessageTray.Urgency.HIGH }
+    : { title: t('battery-device-low-title', { device }), body: t('battery-device-low-body', { left }), icon, urgency: MessageTray.Urgency.NORMAL };
 }
 
 export class BatteryWarnings {

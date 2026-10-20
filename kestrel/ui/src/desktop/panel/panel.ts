@@ -24,6 +24,7 @@ import { animateActor, Curve, Duration, reducedMotion, Spring } from '../../shar
 import { activeWorkspace, WorkspaceWindows } from './taskbar/workspaceWindows.js';
 import { TabletTaskbar } from './tablet/tabletTaskbar.js';
 import { afterWindowsReach } from './tablet/windowsReach.js';
+import { localized, t } from '../../shared/i18n/index.js';
 
 const KEYS_APP = 'com.lantharos.keys.desktop';
 const RESIZE_DURATION = 240;
@@ -121,28 +122,25 @@ export class KestrelPanel {
       this.inputSource = new InputSourceIndicator(menus, layout => {
         const keys = this.appSystem.lookup_app(KEYS_APP);
         return [
-          ...keys && layout ? [{ label: 'Show keyboard layout', run: () => showLayout(keys, layout) }] : [],
-          { label: 'Keyboard settings', run: () => menus.settings('keyboard') },
+          ...keys && layout ? [{ label: t('taskbar-show-keyboard-layout'), run: () => showLayout(keys, layout) }] : [],
+          { label: t('taskbar-keyboard-settings'), run: () => menus.settings('keyboard') },
         ];
       });
       right.add_child(this.inputSource.actor);
       right.add_child(this.tray.actor);
       this.statusIcons.add_child(new BatteryIndicator(16).actor);
-      this.quickButton = new St.Button({
-        style_class: 'kestrel-status-button', child: this.statusIcons,
-        can_focus: true, accessible_name: 'Quick settings',
-      });
-      this.quickButton.connect('clicked', actions.quickSettings);
-      right.add_child(this.quickButton);
-      menus.bind(this.quickButton, () => [
-        { label: 'Network settings', run: () => menus.settings('network') },
-        { label: 'Sound settings', run: () => menus.settings('sound') },
+      const quickButton = new St.Button({ style_class: 'kestrel-status-button', child: this.statusIcons, can_focus: true });
+      localized(quickButton, () => (quickButton.accessible_name = t('taskbar-quick-settings')));
+      quickButton.connect('clicked', actions.quickSettings);
+      right.add_child(quickButton);
+      this.quickButton = quickButton;
+      menus.bind(quickButton, () => [
+        { label: t('taskbar-network-settings'), run: () => menus.settings('network') },
+        { label: t('taskbar-sound-settings'), run: () => menus.settings('sound') },
       ]);
     }
-    this.clockButton = new St.Button({
-      style_class: 'kestrel-status-button', child: this.clock.actor,
-      can_focus: true, accessible_name: 'Notifications and date',
-    });
+    this.clockButton = new St.Button({ style_class: 'kestrel-status-button', child: this.clock.actor, can_focus: true });
+    localized(this.clockButton, () => (this.clockButton.accessible_name = t('taskbar-notifications-and-date')));
     this.clockButton.connect('clicked', actions.notifications);
     right.add_child(this.clockButton);
     this.actor.add_child(right);
@@ -167,13 +165,13 @@ export class KestrelPanel {
     menus.bind(this.actor, () => {
       const monitor = systemMonitor();
       return [
-        { label: 'Show desktop', run: () => this.peek.toggleDesktop() },
-        ...monitor ? [{ label: 'System monitor', run: () => monitor.activate() }] : [],
-        { label: 'Taskbar settings', run: () => menus.settings('appearance/taskbar') },
+        { label: t('taskbar-show-desktop'), run: () => this.peek.toggleDesktop() },
+        ...monitor ? [{ label: t('taskbar-system-monitor'), run: () => monitor.activate() }] : [],
+        { label: t('taskbar-settings'), run: () => menus.settings('appearance/taskbar') },
       ];
     });
     menus.bind(this.clockButton, () => [
-      { label: 'Date and time settings', run: () => menus.settings('datetime') },
+      { label: t('taskbar-date-time-settings'), run: () => menus.settings('datetime') },
     ]);
     this.syncWorkspaceWindows();
     this.refreshApps();

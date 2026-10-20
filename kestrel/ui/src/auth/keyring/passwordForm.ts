@@ -6,6 +6,7 @@ import { wiggle } from 'resource:///com/lantharos/kestrel/misc/animationUtils.js
 import { EntryField } from 'resource:///com/lantharos/kestrel/ui/dialog.js';
 import type { ModalDialog } from 'resource:///com/lantharos/kestrel/ui/modalDialog.js';
 
+import { t } from '../../shared/i18n/index.js';
 import { QualityMeter, type Measure } from './quality.js';
 import type { PasswordRequest } from './request.js';
 
@@ -52,7 +53,7 @@ export class PasswordForm {
     this.field = new EntryField(this.entry, '');
     form.add_child(this.field);
     form.add_child(this.quality.actor);
-    form.add_child(new EntryField(this.confirmEntry, 'Confirm'));
+    form.add_child(new EntryField(this.confirmEntry, t('keyring-confirm')));
 
     const feedback = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-auth-feedback' });
     feedback.add_child(new shellEntry.CapsLockWarning());
@@ -82,7 +83,7 @@ export class PasswordForm {
     this.confirmEntry.visible = request.confirm;
     this.mismatch = request.mismatch;
     this.quality.use(request.quality ? measure : undefined);
-    showText(this.hint, request.fingerprint ? 'Or touch the fingerprint reader' : '');
+    showText(this.hint, request.fingerprint ? t('keyring-fingerprint-alternative') : '');
     this.cancelButton.label = request.cancel;
     this.submitButton.label = request.continue;
     this.warn(request.warning);

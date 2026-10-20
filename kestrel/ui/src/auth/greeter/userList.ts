@@ -3,6 +3,7 @@ import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 import { Avatar } from 'resource:///com/lantharos/kestrel/ui/userWidget.js';
 
+import { t } from '../../shared/i18n/index.js';
 import { displayName } from './accounts.js';
 
 const AVATAR_SIZE = 32;
@@ -23,7 +24,7 @@ export class UserList {
     this.rows = [];
     if (users.length + (offerOthers ? 1 : 0) < 2) return;
     for (const user of users) this.add(user, this.avatar(user), displayName(user));
-    if (offerOthers) this.add(null, new St.Icon({ style_class: 'kestrel-greeter-avatar', icon_name: 'avatar-default-symbolic', icon_size: 18 }), 'Another account');
+    if (offerOthers) this.add(null, new St.Icon({ style_class: 'kestrel-greeter-avatar', icon_name: 'avatar-default-symbolic', icon_size: 18 }), t('greeter-another-account'));
     this.select(selected);
   }
 

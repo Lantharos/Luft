@@ -3,7 +3,7 @@ import * as SystemActions from 'resource:///com/lantharos/kestrel/misc/systemAct
 
 export interface SessionAction {
   icon: string;
-  label: string;
+  message: string;
   availability: string;
   run(): void;
 }
@@ -11,14 +11,14 @@ export interface SessionAction {
 const actions = () => SystemActions.getDefault();
 
 export const LOCK: SessionAction = {
-  icon: 'system-lock-screen-symbolic', label: 'Lock', availability: 'can-lock-screen', run: () => actions().activateLockScreen(),
+  icon: 'system-lock-screen-symbolic', message: 'quick-settings-lock', availability: 'can-lock-screen', run: () => actions().activateLockScreen(),
 };
 
 export const POWER_ACTIONS: SessionAction[] = [
-  { icon: 'weather-clear-night-symbolic', label: 'Suspend', availability: 'can-suspend', run: () => actions().activateSuspend() },
-  { icon: 'system-log-out-symbolic', label: 'Log out', availability: 'can-logout', run: () => actions().activateLogout() },
-  { icon: 'system-reboot-symbolic', label: 'Restart', availability: 'can-restart', run: () => actions().activateRestart() },
-  { icon: 'system-shutdown-symbolic', label: 'Power off', availability: 'can-power-off', run: () => actions().activatePowerOff() },
+  { icon: 'weather-clear-night-symbolic', message: 'quick-settings-suspend', availability: 'can-suspend', run: () => actions().activateSuspend() },
+  { icon: 'system-log-out-symbolic', message: 'quick-settings-log-out', availability: 'can-logout', run: () => actions().activateLogout() },
+  { icon: 'system-reboot-symbolic', message: 'quick-settings-restart', availability: 'can-restart', run: () => actions().activateRestart() },
+  { icon: 'system-shutdown-symbolic', message: 'quick-settings-power-off', availability: 'can-power-off', run: () => actions().activatePowerOff() },
 ];
 
 export function isAvailable(action: SessionAction): boolean {

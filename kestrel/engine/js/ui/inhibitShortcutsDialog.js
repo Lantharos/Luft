@@ -6,6 +6,7 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import * as Dialog from './dialog.js';
+import * as KestrelUi from './kestrelUi.js';
 import * as ModalDialog from './modalDialog.js';
 import * as PermissionStore from '../misc/permissionStore.js';
 
@@ -72,19 +73,17 @@ export const InhibitShortcutsDialog = GObject.registerClass({
         const name = this._app?.get_name() ?? this._window.title;
 
         const content = new Dialog.MessageDialogContent({
-            title: _('Allow inhibiting shortcuts'),
+            title: KestrelUi.t('inhibit-shortcuts-title'),
             iconName: 'input-keyboard-symbolic',
             description: name
-                /* Translators: %s is an application name like "Settings" */
-                ? _('The app %s wants to inhibit shortcuts').format(name)
-                : _('An app wants to inhibit shortcuts'),
+                ? KestrelUi.t('inhibit-shortcuts-app', {appName: name})
+                : KestrelUi.t('inhibit-shortcuts-unknown-app'),
         });
 
         const restoreAccel = Meta.prefs_get_keybinding_label('restore-shortcuts');
         if (restoreAccel) {
             const restoreLabel = new St.Label({
-                /* Translators: %s is a keyboard shortcut like "Super+x" */
-                text: _('You can restore shortcuts by pressing %s').format(restoreAccel),
+                text: KestrelUi.t('inhibit-shortcuts-restore', {shortcut: restoreAccel}),
                 style_class: 'message-dialog-description',
             });
             restoreLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
@@ -95,7 +94,7 @@ export const InhibitShortcutsDialog = GObject.registerClass({
         this._dialog.contentLayout.add_child(content);
 
         this._dialog.addButton({
-            label: _('Deny'),
+            label: KestrelUi.t('inhibit-shortcuts-deny'),
             action: () => {
                 this._saveToPermissionStore(DENIED);
                 this._emitResponse(DialogResponse.DENY);
@@ -104,7 +103,7 @@ export const InhibitShortcutsDialog = GObject.registerClass({
         });
 
         this._dialog.addButton({
-            label: _('Allow'),
+            label: KestrelUi.t('inhibit-shortcuts-allow'),
             action: () => {
                 this._saveToPermissionStore(GRANTED);
                 this._emitResponse(DialogResponse.ALLOW);

@@ -4,6 +4,7 @@ import type Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import { windowIcon } from '../../../appearance/icons/appIcons.js';
+import { t } from '../../../shared/i18n/index.js';
 import { choose, list, row, type RowSpec } from '../../core/rows.js';
 import { MONITOR, VIRTUAL, WINDOW, monitorSources, windowSources, type MonitorSource, type Selection, type Source, type WindowSource } from '../sources.js';
 
@@ -43,12 +44,16 @@ function windowThumbnail({ window, app }: WindowSource): St.Widget {
   return box;
 }
 
+function resolution({ width, height }: MonitorSource): string {
+  return `${width} × ${height}`;
+}
+
 function monitorRows(monitors: MonitorSource[]): [Source, RowSpec][] {
   const several = monitors.length > 1;
   return monitors.map(monitor => [monitor, {
     icon: symbolicThumbnail(monitor.builtin ? 'computer-symbolic' : 'video-display-symbolic'),
     title: monitor.name,
-    subtitle: `${monitor.width} × ${monitor.height}${monitor.primary && several ? ' · Main screen' : ''}`,
+    subtitle: monitor.primary && several ? `${resolution(monitor)} · ${t('screen-share-main-screen')}` : resolution(monitor),
   }]);
 }
 
@@ -68,7 +73,7 @@ function section(title: string | null, rows: St.Button[]): St.Widget {
 
 export function sourceList({ types, multiple }: Selection, changed: (count: number) => void, alwaysLabelled = false): SourceList {
   const screens = types & MONITOR ? monitorRows(monitorSources()) : [];
-  if (types & VIRTUAL) screens.push([{ type: VIRTUAL }, { icon: symbolicThumbnail('list-add-symbolic'), title: 'New virtual screen', subtitle: 'An extra screen just for sharing' }]);
+  if (types & VIRTUAL) screens.push([{ type: VIRTUAL }, { icon: symbolicThumbnail('list-add-symbolic'), title: t('screen-share-new-virtual-screen'), subtitle: t('screen-share-new-virtual-screen-description') }]);
   const windows = types & WINDOW ? windowRows() : [];
   const labelled = alwaysLabelled || (screens.length > 0 && windows.length > 0);
 
@@ -80,9 +85,9 @@ export function sourceList({ types, multiple }: Selection, changed: (count: numb
   for (const button of buttons) button.connect('notify::checked', () => changed(selected().length));
 
   const sections = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-portal-sources', x_expand: true });
-  if (screens.length) sections.add_child(section(labelled ? 'Screens' : null, buttons.slice(0, screens.length)));
-  if (windows.length) sections.add_child(section(labelled ? 'Windows' : null, buttons.slice(screens.length)));
-  if (!entries.length) sections.add_child(new St.Label({ text: 'There are no open windows to share.', style_class: 'kestrel-portal-note' }));
+  if (screens.length) sections.add_child(section(labelled ? t('screen-share-screens') : null, buttons.slice(0, screens.length)));
+  if (windows.length) sections.add_child(section(labelled ? t('screen-share-windows') : null, buttons.slice(screens.length)));
+  if (!entries.length) sections.add_child(new St.Label({ text: t('screen-share-nothing-to-share'), style_class: 'kestrel-portal-note' }));
   const actor = new St.ScrollView({ child: sections, style_class: 'kestrel-portal-scroll', hscrollbar_policy: St.PolicyType.NEVER, vscrollbar_policy: St.PolicyType.AUTOMATIC, overlay_scrollbars: true });
   return { actor, selected };
 }

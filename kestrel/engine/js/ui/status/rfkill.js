@@ -2,6 +2,8 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 
+import * as KestrelUi from '../kestrelUi.js';
+
 import {QuickToggle, SystemIndicator} from '../quickSettings.js';
 
 import {loadInterfaceXML} from '../../misc/fileUtils.js';
@@ -94,9 +96,9 @@ const RfkillToggle = GObject.registerClass(
 class RfkillToggle extends QuickToggle {
     _init() {
         super._init({
-            title: _('Airplane Mode'),
             iconName: 'airplane-mode-symbolic',
         });
+        KestrelUi.localized(this, () => (this.title = KestrelUi.t('airplane-mode-title')));
 
         this._manager = getRfkillManager();
         this._manager.bind_property('show-airplane-mode',

@@ -1,6 +1,8 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
+import { t } from '../../shared/i18n/index.js';
+
 interface Folder { name: string; apps: string[]; }
 interface Layout { items: string[]; folders: Record<string, Folder>; }
 
@@ -37,7 +39,7 @@ export class StartLayout {
     const key = `folder:${GLib.uuid_string_random()}`;
     this.layout.items.splice(index, 1, key);
     this.remove(id);
-    this.layout.folders[key] = { name: 'Folder', apps: [target, id] };
+    this.layout.folders[key] = { name: t('start-folder-default-name'), apps: [target, id] };
     this.save();
   }
 

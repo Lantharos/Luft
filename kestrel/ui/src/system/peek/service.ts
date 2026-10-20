@@ -4,6 +4,7 @@ import GLib from 'gi://GLib';
 import type Meta from 'gi://Meta';
 
 import { stealFd } from '../../auth/keyring/prompter.js';
+import { t } from '../../shared/i18n/index.js';
 import { sandboxedProcess } from '../../shared/sandbox.js';
 import { callerProcess, type Caller } from './access/callers.js';
 import type { Level } from './access/prompt.js';
@@ -92,7 +93,7 @@ export class PeekService {
       const windows = this.policy.windowsOf(handle, caller);
       const window = windows.find(candidate => candidate.has_focus())
         ?? windows.reduce<Meta.Window | null>((newest, candidate) => !newest || candidate.get_id() > newest.get_id() ? candidate : newest, null);
-      if (!window) throw new PeekError('NotFound', `The program started as ${handle} has no window open`);
+      if (!window) throw new PeekError('NotFound', t('peek-error-no-window-for-handle', { handle }));
       return new GLib.Variant('(a{sv})', [this.describe(window, caller)]);
     });
   }
@@ -207,9 +208,9 @@ export class PeekService {
     try {
       process = await callerProcess(invocation);
       const pid = process.pid;
-      if (pid && sandboxedProcess(pid)) throw new PeekError('Denied', 'Sandboxed apps cannot see or use other windows');
+      if (pid && sandboxedProcess(pid)) throw new PeekError('Denied', t('peek-error-sandboxed'));
       const caller = pid ? this.policy.identify(pid) : null;
-      if (!caller || process.pid !== pid) throw new PeekError('Denied', 'The program asking ended or could not be recognized');
+      if (!caller || process.pid !== pid) throw new PeekError('Denied', t('peek-error-unknown-caller'));
       this.policy.admit(caller);
       const reply = await handle(caller, process);
       invocation.return_value(reply);

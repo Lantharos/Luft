@@ -6,6 +6,7 @@ import { MessageDialogContent } from 'resource:///com/lantharos/kestrel/ui/dialo
 import type { ModalDialog } from 'resource:///com/lantharos/kestrel/ui/modalDialog.js';
 
 import { appIcon } from '../../appearance/icons/appIcons.js';
+import { t } from '../../shared/i18n/index.js';
 import { PasswordForm, feedbackLabel, showText, type PasswordEvents, type ShellEntryModule } from './passwordForm.js';
 import type { Measure } from './quality.js';
 import type { AccessRequest, PasswordRequest } from './request.js';
@@ -55,7 +56,7 @@ export class KeyringDialog {
       this.describe(prompt.request);
     } else {
       this.password = new PasswordForm(this.form, this.hint, modal, shellEntry, events);
-      if (prompt.request.remember) this.remember = this.addRemember('Save in your keyring', false);
+      if (prompt.request.remember) this.remember = this.addRemember(t('keyring-save'), false);
       this.retry(prompt.request, measure);
     }
   }
@@ -92,9 +93,9 @@ export class KeyringDialog {
   }
 
   private buildAccess(request: AccessRequest): void {
-    showText(this.hint, request.fingerprint ? 'Touch the fingerprint reader to allow' : '');
+    showText(this.hint, request.fingerprint ? t('keyring-fingerprint-allow') : '');
     this.form.add_child(this.hint);
-    if (request.remember) this.remember = this.addRemember('Remember for this app', true);
+    if (request.remember) this.remember = this.addRemember(t('keyring-remember-for-app'), true);
     this.form.visible = request.fingerprint || request.remember;
     if (request.alternative)
       this.modal.addButton({ label: request.alternative, action: () => this.events.alternative() });

@@ -1,6 +1,7 @@
 import Gio from 'gi://Gio';
 
 import * as GnomeSession from '../../misc/gnomeSession.js';
+import * as KestrelUi from '../kestrelUi.js';
 import * as MessageTray from '../messageTray.js';
 
 Gio._promisify(Gio.Mount.prototype, 'guess_content_type');
@@ -186,13 +187,10 @@ class AutorunDispatcher {
             return;
 
         const source = MessageTray.getSystemSource();
-        /* Translators: %s is the name of a partition on a external drive */
-        const title = _('“%s” connected'.format(mount.get_name()));
-        const body = _('Disk can now be used');
         const notification = new MessageTray.Notification({
             source,
-            title,
-            body,
+            title: KestrelUi.t('autorun-connected', {driveName: mount.get_name()}),
+            body: KestrelUi.t('autorun-ready'),
         });
         notification.connect('activated', () => {
             const app = Gio.app_info_get_default_for_type('inode/directory', false);
@@ -200,7 +198,7 @@ class AutorunDispatcher {
         });
         apps.forEach(app => {
             notification.addAction(
-                _('Open with %s').format(app.get_name()),
+                KestrelUi.t('autorun-open-with', {appName: app.get_name()}),
                 () => startAppForMount(app, mount)
             );
         });

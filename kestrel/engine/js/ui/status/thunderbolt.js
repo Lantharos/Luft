@@ -6,6 +6,7 @@ import GObject from 'gi://GObject';
 import Polkit from 'gi://Polkit';
 import * as Signals from '../../misc/signals.js';
 
+import * as KestrelUi from '../kestrelUi.js';
 import * as Main from '../main.js';
 import * as MessageTray from '../messageTray.js';
 import * as Util from '../../misc/util.js';
@@ -304,19 +305,13 @@ class Indicator extends SystemIndicator {
             return; /* we are done */
 
         if (!unlocked) {
-            const title = _('Unknown Thunderbolt device');
-            const body = _('New device has been detected while you were away. Please disconnect and reconnect the device to start using it.');
-            this._notify(title, body);
+            this._notify(KestrelUi.t('thunderbolt-unknown-title'), KestrelUi.t('thunderbolt-unknown-body'));
         } else {
-            const title = _('Unauthorized Thunderbolt device');
-            const body = _('New device has been detected and needs to be authorized by an administrator');
-            this._notify(title, body);
+            this._notify(KestrelUi.t('thunderbolt-unauthorized-title'), KestrelUi.t('thunderbolt-unauthorized-body'));
         }
     }
 
     _onEnrollFailed(obj, device, error) {
-        const title = _('Thunderbolt authorization error');
-        const body = _('Could not authorize the Thunderbolt device: %s').format(error.message);
-        this._notify(title, body);
+        this._notify(KestrelUi.t('thunderbolt-error-title'), KestrelUi.t('thunderbolt-error-body', {reason: error.message}));
     }
 });

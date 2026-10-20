@@ -3,6 +3,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import { Avatar } from 'resource:///com/lantharos/kestrel/ui/userWidget.js';
 
+import { t } from '../../shared/i18n/index.js';
 import { appNames } from '../core/apps.js';
 import { openDialog } from '../core/dialog.js';
 import { portalObject } from '../core/exported.js';
@@ -32,8 +33,8 @@ export class AccountPortal {
     const user = AccountsService.UserManager.get_default().get_user(GLib.get_user_name());
     const app = appNames(appId);
     respond(invocation, await openDialog(handle, {
-      title: `Share your name and picture with ${app.object}?`,
-      description: option<string>(options, 'reason') || `${app.subject} will see the name and picture of your account.`,
+      title: t('portal-account-title', { appName: app.object }),
+      description: option<string>(options, 'reason') || t('portal-account-description', { appName: app.subject }),
       icon: 'avatar-default-symbolic',
       askedBy: appId,
     }, dialog => {
@@ -43,8 +44,8 @@ export class AccountPortal {
       card.reactive = card.can_focus = false;
       dialog.content.add_child(card);
       dialog.buttons([
-        { label: 'Cancel', action: dialog.cancel },
-        { label: 'Share', action: () => dialog.finish(SUCCESS, details(user)), default: true },
+        { label: t('portal-cancel'), action: dialog.cancel },
+        { label: t('portal-share'), action: () => dialog.finish(SUCCESS, details(user)), default: true },
       ]);
     }));
   }

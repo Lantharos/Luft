@@ -3,11 +3,10 @@ import GObject from 'gi://GObject';
 import St from 'gi://St';
 
 import {QuickSlider, SystemIndicator} from '../quickSettings.js';
+import * as KestrelUi from '../kestrelUi.js';
 import * as Main from '../main.js';
 import * as PopupMenu from '../popupMenu.js';
 import {Slider} from '../slider.js';
-
-const BRIGHTNESS_NAME = _('Brightness');
 
 class BrightnessSliderMenu extends PopupMenu.PopupMenuSection {
     addSlider(scale) {
@@ -39,12 +38,13 @@ class BrightnessItem extends QuickSlider {
     _init() {
         super._init({
             iconName: 'display-brightness-symbolic',
-            menuButtonAccessibleName: _('Open brightness menu'),
         });
 
-        this.slider.accessible_name = BRIGHTNESS_NAME;
-
-        this.menu.setHeader('display-brightness-symbolic', BRIGHTNESS_NAME);
+        KestrelUi.localized(this, () => {
+            this.menuButtonAccessibleName = KestrelUi.t('brightness-open-menu');
+            this.slider.accessible_name = KestrelUi.t('brightness-title');
+            this.menu.setHeader('display-brightness-symbolic', KestrelUi.t('brightness-title'));
+        });
         this._monitorBrightnessSection = new BrightnessSliderMenu();
         this.menu.addMenuItem(this._monitorBrightnessSection);
 

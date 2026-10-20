@@ -3,6 +3,7 @@ import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
 
 import { stealFd } from '../../../auth/keyring/prompter.js';
+import { t } from '../../../shared/i18n/index.js';
 import { PeekError } from '../errors.js';
 import { PidFd, processUnit, statOf, unitName } from './processes.js';
 
@@ -59,6 +60,6 @@ export async function callerProcess(invocation: Gio.DBusMethodInvocation): Promi
     Gio.DBusCallFlags.NONE, -1, null, null);
   const [credentials] = reply.deepUnpack() as [Record<string, GLib.Variant>];
   const fd = credentials.ProcessFD ? stealFd(fds, credentials.ProcessFD.deepUnpack() as number) : null;
-  if (fd === null) throw new PeekError('Failed', 'The session bus did not say which program is asking');
+  if (fd === null) throw new PeekError('Failed', t('peek-error-no-caller'));
   return new PidFd(fd);
 }

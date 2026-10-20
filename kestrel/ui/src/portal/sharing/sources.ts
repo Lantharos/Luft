@@ -2,6 +2,7 @@ import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 
+import { t } from '../../shared/i18n/index.js';
 import { option, type Options } from '../core/request.js';
 
 export const MONITOR = 1;
@@ -59,7 +60,7 @@ export function monitorSources(): MonitorSource[] {
   return (backend.get_monitor_manager().get_logical_monitors() ?? []).flatMap(logical => {
     const { width, height } = display.get_monitor_geometry(logical.get_number());
     return logical.get_monitors().map(monitor => ({
-      type: MONITOR, connector: monitor.get_connector(), match: matchString(monitor), name: monitor.is_virtual() ? 'Virtual screen' : monitor.get_display_name(),
+      type: MONITOR, connector: monitor.get_connector(), match: matchString(monitor), name: monitor.is_virtual() ? t('screen-share-virtual-screen') : monitor.get_display_name(),
       width, height, primary: logical.get_number() === primary, builtin: monitor.is_builtin(),
     }));
   });

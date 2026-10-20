@@ -3,6 +3,7 @@ import St from 'gi://St';
 
 import { BatteryIndicator } from '../../../shared/battery/indicator.js';
 import { animateActor, Spring } from '../../../shared/motion.js';
+import { localized, t } from '../../../shared/i18n/index.js';
 import { PanelClock } from '../widgets/clock.js';
 
 const ICON_SIZE = 14;
@@ -28,8 +29,9 @@ export class TabletStrip {
     content.add_child(status);
     this.actor = new St.Button({
       name: primary ? 'kestrel-tablet-strip' : null, style_class: 'kestrel-tablet-strip',
-      child: content, x_expand: true, can_focus: true, accessible_name: 'Show taskbar',
+      child: content, x_expand: true, can_focus: true,
     });
+    localized(this.actor, () => (this.actor.accessible_name = t('taskbar-show-taskbar')));
     this.actor.connect('clicked', expand);
     this.actor.connect('destroy', () => this.clock.destroy());
   }

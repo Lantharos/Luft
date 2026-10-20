@@ -4,6 +4,7 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import { blurSurface } from '../../shared/surface.js';
+import { t } from '../../shared/i18n/index.js';
 import { animateActor } from '../../shared/motion.js';
 import { boxCenter, findAnchor, heightNear, placeNear, type Anchor, type Box } from '../../shared/placement.js';
 import type { TextInput } from '../../shared/input/textInput.js';
@@ -38,7 +39,7 @@ export class EmojiPanel {
   readonly available = true;
   private readonly preferences = new EmojiPreferences(() => { this.browsing = null; });
   private readonly search = new SearchField(text => this.query(text), () => this.setZone('grid'));
-  private readonly empty = new St.Label({ text: 'No results', style_class: 'kestrel-empty', visible: false, x_align: Clutter.ActorAlign.CENTER, y_align: Clutter.ActorAlign.START });
+  private readonly empty = new St.Label({ text: t('emoji-no-results'), style_class: 'kestrel-empty', visible: false, x_align: Clutter.ActorAlign.CENTER, y_align: Clutter.ActorAlign.START });
   private readonly footer = new St.Label({ style_class: 'kestrel-emoji-name', x_expand: true });
   private readonly grid = new EmojiGrid({
     hovered: item => this.hover(item ? describe(item) : null),
@@ -162,7 +163,7 @@ export class EmojiPanel {
   private showBrowsing(): void {
     const catalog = this.catalog!;
     this.browsing ??= new GridLayout([
-      { title: 'Recently used', tab: catalog.tabs[0], items: this.preferences.recent.flatMap(text => catalog.find(text) ?? []) },
+      { title: t('emoji-recently-used'), tab: catalog.tabs[0], items: this.preferences.recent.flatMap(text => catalog.find(text) ?? []) },
       ...catalog.tabs.flatMap(tab => GridLayout.sections(tab.sections)),
     ]);
     this.empty.hide();

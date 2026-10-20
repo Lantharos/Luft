@@ -13,6 +13,7 @@ import { taskbarPreferences } from '../desktop/panel/preferences/taskbarPreferen
 import type { WindowPreviews } from '../desktop/panel/windowPreviews.js';
 import type { TaskView } from '../desktop/taskView/taskView.js';
 import type { SnapLayouts } from '../desktop/windows/snapLayouts.js';
+import { onLocaleChanged } from '../shared/i18n/index.js';
 import { animateActor, Curve, Duration, reducedMotion, Spring } from '../shared/motion.js';
 import { navigateWithKeyboard } from '../shared/input/keyboardNavigation.js';
 import { raiseSurface, SURFACE_GAP } from '../shared/surface.js';
@@ -59,6 +60,7 @@ export class Surfaces {
   private readonly closingSelections = new Map<Clutter.Actor, () => void>();
   private keepsComposited = false;
   private readonly created: Partial<LazySurfaces> = {};
+  private readonly outdated = new Set<keyof LazySurfaces>();
 
   constructor(private readonly parts: SurfaceParts) {
     this.cover.connect('button-press-event', () => {
@@ -67,6 +69,7 @@ export class Surfaces {
     });
     for (const surface of [parts.quick, parts.clipboard]) this.adopt(surface);
     this.watchVisibility(parts.taskView.actor);
+    this.layer.connect('destroy', onLocaleChanged(() => this.dropOutdated(true)));
   }
 
   get active(): Surface | null {
@@ -112,6 +115,7 @@ export class Surfaces {
       actor.hide();
       this.releaseSelection(actor);
     }
+    this.dropOutdated(false);
   }
 
   place(): void {
@@ -252,6 +256,7 @@ export class Surfaces {
       this.releaseSelection(actor);
       if (surface === 'quick') quick.closeSubmenu(false);
       if (!this.current) panels.setActive(null, null);
+      this.dropOutdated(false);
     });
   }
 
@@ -270,6 +275,18 @@ export class Surfaces {
     this.created[name] = surface;
     this.place();
     return surface;
+  }
+
+  private dropOutdated(languageChanged: boolean): void {
+    const names = Object.keys(this.created) as (keyof LazySurfaces)[];
+    if (languageChanged) names.forEach(name => this.outdated.add(name));
+    for (const name of names) {
+      const { actor } = this.created[name]!;
+      if (!this.outdated.has(name) || actor.visible) continue;
+      this.outdated.delete(name);
+      delete this.created[name];
+      actor.destroy();
+    }
   }
 
   private adopt<T extends { actor: St.BoxLayout }>(surface: T): T {

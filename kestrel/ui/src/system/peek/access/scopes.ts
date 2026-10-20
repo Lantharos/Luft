@@ -1,6 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
+import { t } from '../../../shared/i18n/index.js';
 import { PeekError } from '../errors.js';
 import type { PidFd } from './processes.js';
 
@@ -42,7 +43,7 @@ export class Scopes {
       job.cancel();
       throw error;
     }
-    if (await job.result !== 'done') throw new PeekError('Failed', `systemd couldn't start ${name}`);
+    if (await job.result !== 'done') throw new PeekError('Failed', t('peek-error-launch-failed', { program: name }));
   }
 
   private connection(): Gio.DBusConnection {

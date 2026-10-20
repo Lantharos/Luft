@@ -5,6 +5,7 @@ import St from 'gi://St';
 import { MprisSource, type MprisPlayer } from 'resource:///com/lantharos/kestrel/ui/mpris.js';
 
 import { appIcon } from '../../appearance/icons/appIcons.js';
+import { t } from '../../shared/i18n/index.js';
 
 const COVER_SIZE = 48;
 
@@ -33,9 +34,9 @@ export class MediaCard {
     open.connect('clicked', () => this.player?.raise());
     this.actor.add_child(open);
 
-    this.previous = this.control('media-skip-backward-symbolic', 'Previous track', () => this.player?.previous());
-    this.playPause = this.control('media-playback-start-symbolic', 'Play', () => this.player?.playPause());
-    this.next = this.control('media-skip-forward-symbolic', 'Next track', () => this.player?.next());
+    this.previous = this.control('media-skip-backward-symbolic', t('notifications-media-previous'), () => this.player?.previous());
+    this.playPause = this.control('media-playback-start-symbolic', t('notifications-media-play'), () => this.player?.playPause());
+    this.next = this.control('media-skip-forward-symbolic', t('notifications-media-next'), () => this.player?.next());
 
     this.source.connectObject('player-added', () => this.choosePlayer(), 'player-removed', () => this.choosePlayer(), this.actor);
     this.actor.connect('destroy', () => this.player?.disconnectObject(this.actor));
@@ -72,7 +73,7 @@ export class MediaCard {
       this.artist.text = player.trackArtists.join(', ');
       const playing = player.status === 'Playing';
       (this.playPause.child as St.Icon).icon_name = playing ? 'media-playback-pause-symbolic' : 'media-playback-start-symbolic';
-      this.playPause.accessible_name = playing ? 'Pause' : 'Play';
+      this.playPause.accessible_name = t(playing ? 'notifications-media-pause' : 'notifications-media-play');
       this.previous.reactive = player.canGoPrevious;
       this.next.reactive = player.canGoNext;
       this.syncCover(player);

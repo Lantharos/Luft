@@ -7,6 +7,7 @@ import { ControlRow } from '../../desktop/menus/controlRow.js';
 import type { Monitor } from '../../desktop/panel/panel.js';
 import { battery, type BatteryState } from '../../shared/battery/battery.js';
 import { BatteryIndicator } from '../../shared/battery/indicator.js';
+import { formatsLocale, t } from '../../shared/i18n/index.js';
 import { LockAccessibility } from './accessibility.js';
 import { LockPower } from './power.js';
 
@@ -30,8 +31,8 @@ export class LockControls {
     this.row.add(this.batteryStatus);
     this.inputSource = new InputSourceIndicator(this.menus, () => []);
     this.row.add(this.inputSource.actor);
-    this.row.button('kestrel-lock-accessibility', 'Accessibility', this.row.icon('preferences-desktop-accessibility-symbolic'), () => this.accessibility.entries());
-    this.row.button('kestrel-lock-power', 'Power', this.row.icon('system-shutdown-symbolic'), () => this.power.entries());
+    this.row.button('kestrel-lock-accessibility', t('lock-screen-accessibility'), this.row.icon('preferences-desktop-accessibility-symbolic'), () => this.accessibility.entries());
+    this.row.button('kestrel-lock-power', t('lock-screen-power'), this.row.icon('system-shutdown-symbolic'), () => this.power.entries());
   }
 
   get actor(): St.BoxLayout {
@@ -40,7 +41,7 @@ export class LockControls {
 
   private showBattery(state: BatteryState | null): void {
     this.batteryStatus.visible = !!state;
-    if (state) this.batteryStatus.accessible_name = `Battery ${state.percentage}%`;
+    if (state) this.batteryStatus.accessible_name = t('lock-screen-battery', { level: new Intl.NumberFormat(formatsLocale(), { style: 'percent' }).format(state.percentage / 100) });
   }
 
   destroy(): void {

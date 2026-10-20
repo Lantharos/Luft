@@ -2,6 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import NM from 'gi://NM';
 
+import { t } from '../../shared/i18n/index.js';
 import type { Field } from './vpnDialog.js';
 
 Gio._promisify(Gio.Subprocess.prototype, 'communicate_utf8_async');
@@ -17,18 +18,19 @@ const MESSAGE_HINT = 'x-vpn-message:';
 const FLAGS_SUFFIX = '-flags';
 const ASKED_FLAGS = NM.SettingSecretFlags.AGENT_OWNED | NM.SettingSecretFlags.NOT_SAVED;
 const LABELS: Record<string, string> = {
-  'password': 'Password',
-  'cert-pass': 'Certificate password',
-  'http-proxy-password': 'Proxy password',
-  'xauthpassword': 'Password',
-  'pskvalue': 'Pre-shared key',
-  'Xauth password': 'Password',
-  'IPSec secret': 'Group password',
+  'password': 'vpn-field-password',
+  'cert-pass': 'vpn-field-certificate-password',
+  'http-proxy-password': 'vpn-field-proxy-password',
+  'xauthpassword': 'vpn-field-password',
+  'pskvalue': 'vpn-field-pre-shared-key',
+  'Xauth password': 'vpn-field-password',
+  'IPSec secret': 'vpn-field-group-password',
 };
 
 function label(key: string): string {
+  if (LABELS[key]) return t(LABELS[key]);
   const words = key.replace(/[-_]+/g, ' ').trim();
-  return LABELS[key] ?? words.charAt(0).toUpperCase() + words.slice(1);
+  return words.charAt(0).toUpperCase() + words.slice(1);
 }
 
 function secretField(key: string, value = ''): Field {

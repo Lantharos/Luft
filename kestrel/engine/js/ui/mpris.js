@@ -2,6 +2,7 @@ import Gio from 'gi://Gio';
 import GObject from 'gi://GObject';
 import Shell from 'gi://Shell';
 
+import * as KestrelUi from './kestrelUi.js';
 import * as MessageList from './messageList.js';
 
 import {loadInterfaceXML} from '../misc/fileUtils.js';
@@ -141,7 +142,7 @@ export const MprisPlayer = GObject.registerClass({
                     this._busName}; expected an array of strings, got ${
                     this._trackArtists} (${typeof this._trackArtists})`);
             }
-            this._trackArtists =  [_('Unknown artist')];
+            this._trackArtists = [KestrelUi.t('mpris-unknown-artist')];
         }
 
         this._trackTitle = metadata['xesam:title'];
@@ -151,7 +152,7 @@ export const MprisPlayer = GObject.registerClass({
                     this._busName}; expected a string, got ${
                     this._trackTitle} (${typeof this._trackTitle})`);
             }
-            this._trackTitle = _('Unknown title');
+            this._trackTitle = KestrelUi.t('mpris-unknown-title');
         }
 
         this._trackCoverUrl = metadata['mpris:artUrl'];

@@ -1,6 +1,7 @@
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
+import { t } from '../../shared/i18n/index.js';
 import { openDialog, type PortalDialog } from '../core/dialog.js';
 import { SUCCESS } from '../core/request.js';
 import { choose, list, row } from '../core/rows.js';
@@ -25,14 +26,18 @@ type Adjustable = Pick<Choices, 'copies' | 'pages' | 'ranges' | 'orientation' | 
 
 const ICON = 'printer-symbolic';
 const PICKER_ROWS_BEFORE_SCROLLING = 5;
-const PAGE_LABELS: Record<PageChoice, string> = { all: 'All', current: 'Current', selection: 'Selection', ranges: 'Range' };
-const ORIENTATIONS: Segment<Orientation>[] = [{ value: 'portrait', label: 'Portrait' }, { value: 'landscape', label: 'Landscape' }];
-const SIDES: Segment<string>[] = [{ value: ONE_SIDED, label: 'Off' }, { value: LONG_EDGE, label: 'Long edge' }, { value: SHORT_EDGE, label: 'Short edge' }];
-const COLOR_MODES: Segment<string>[] = [{ value: COLOR, label: 'Color' }, { value: MONOCHROME, label: 'Black & white' }];
+const PAGE_LABELS: Record<PageChoice, string> = { all: 'print-pages-all', current: 'print-pages-current', selection: 'print-pages-selection', ranges: 'print-pages-range' };
+const ORIENTATIONS: Record<Orientation, string> = { portrait: 'print-orientation-portrait', landscape: 'print-orientation-landscape' };
+const SIDES: Record<string, string> = { [ONE_SIDED]: 'print-two-sided-off', [LONG_EDGE]: 'print-two-sided-long-edge', [SHORT_EDGE]: 'print-two-sided-short-edge' };
+const COLOR_MODES: Record<string, string> = { [COLOR]: 'print-color-mode-color', [MONOCHROME]: 'print-color-mode-monochrome' };
+
+function labelled<T extends string>(values: T[], labels: Record<T, string>): Segment<T>[] {
+  return values.map(value => ({ value, label: t(labels[value]) }));
+}
 
 function status(printer: Printer): string {
-  if (!printer.accepting) return 'Not taking documents right now';
-  return printer.paused ? 'Paused' : printer.location;
+  if (!printer.accepting) return t('print-printer-not-accepting');
+  return printer.paused ? t('print-printer-paused') : printer.location;
 }
 
 function printerRow(printer: Printer, opened: (() => void) | null): St.Button {
@@ -66,7 +71,7 @@ class PrintForm {
   private showForm(): void {
     this.render();
     [, this.accept] = this.dialog.buttons([
-      { label: 'Cancel', action: this.dialog.cancel },
+      { label: t('portal-cancel'), action: this.dialog.cancel },
       { label: this.spec.acceptLabel, default: true, action: () => { if (ready(this.choices)) this.dialog.finish(SUCCESS); } },
     ]);
     this.validate();
@@ -80,7 +85,7 @@ class PrintForm {
       selected(index);
       this.showForm();
     });
-    this.dialog.buttons([{ label: 'Back', action: () => this.showForm() }]);
+    this.dialog.buttons([{ label: t('print-back'), action: () => this.showForm() }]);
     (rows.find(candidate => candidate.checked) ?? rows[0]).grab_key_focus();
   }
 
@@ -99,35 +104,36 @@ class PrintForm {
     const { choices, spec } = this;
     const { printer } = choices;
     this.body.add_child(printerRow(printer, spec.printers.length > 1 ? () => this.pickPrinter() : null));
-    this.body.add_child(field('Copies', stepper(choices.copies, printer.maxCopies, copies => this.update({ copies }))));
+    this.body.add_child(field(t('print-copies'), stepper(choices.copies, printer.maxCopies, copies => this.update({ copies }))));
     this.renderPages(spec.pageChoices(printer));
     const available = papers(printer.media);
-    if (choices.paper && available.length > 1) this.body.add_child(field('Paper', pick(choices.paper.name, () => this.pickPaper())));
+    if (choices.paper && available.length > 1) this.body.add_child(field(t('print-paper'), pick(choices.paper.name, () => this.pickPaper())));
     if (spec.orientation)
-      this.body.add_child(field('Orientation', segments(ORIENTATIONS, choices.orientation, orientation => this.update({ orientation }))));
+      this.body.add_child(field(t('print-orientation'), segments(labelled(['portrait', 'landscape'], ORIENTATIONS), choices.orientation, orientation => this.update({ orientation }))));
     const sides = sidesOffered(printer);
     if (sides.length > 1)
-      this.body.add_child(field('Two-sided', segments(SIDES.filter(({ value }) => sides.includes(value)), choices.sides, value => this.update({ sides: value }))));
-    if (colorModesOffered(printer).length > 1)
-      this.body.add_child(field('Color', segments(COLOR_MODES, choices.colorMode, colorMode => this.update({ colorMode }))));
+      this.body.add_child(field(t('print-two-sided'), segments(labelled(sides, SIDES), choices.sides, value => this.update({ sides: value }))));
+    const colorModes = colorModesOffered(printer);
+    if (colorModes.length > 1)
+      this.body.add_child(field(t('print-color'), segments(labelled(colorModes, COLOR_MODES), choices.colorMode, colorMode => this.update({ colorMode }))));
   }
 
   private renderPages(pageChoices: PageChoice[]): void {
     if (pageChoices.length < 2) return;
-    const ranges = new St.Entry({ style_class: 'kestrel-print-ranges', text: this.choices.ranges, hint_text: 'For example 1-3, 5', can_focus: true, x_expand: true, visible: this.choices.pages === 'ranges' });
+    const ranges = new St.Entry({ style_class: 'kestrel-print-ranges', text: this.choices.ranges, hint_text: t('print-pages-range-hint'), can_focus: true, x_expand: true, visible: this.choices.pages === 'ranges' });
     ranges.clutter_text.connect('text-changed', () => this.update({ ranges: ranges.text }));
-    const choice = segments(pageChoices.map(value => ({ value, label: PAGE_LABELS[value] })), this.choices.pages, pages => {
+    const choice = segments(labelled(pageChoices, PAGE_LABELS), this.choices.pages, pages => {
       this.update({ pages });
       ranges.visible = pages === 'ranges';
       if (ranges.visible) ranges.grab_key_focus();
     });
-    this.body.add_child(field('Pages', choice));
+    this.body.add_child(field(t('print-pages'), choice));
     this.body.add_child(ranges);
   }
 
   private pickPrinter(): void {
     const { printers, pageChoices } = this.spec;
-    this.showPicker('Printer', printers.map(printer => row({ icon: ICON, title: printer.description, subtitle: status(printer), checked: printer === this.choices.printer })),
+    this.showPicker(t('print-printer'), printers.map(printer => row({ icon: ICON, title: printer.description, subtitle: status(printer), checked: printer === this.choices.printer })),
       index => {
         this.wanted.printer = printers[index].name;
         this.choices = forPrinter(printers[index], this.wanted, pageChoices(printers[index]));
@@ -136,7 +142,7 @@ class PrintForm {
 
   private pickPaper(): void {
     const available = papers(this.choices.printer.media);
-    this.showPicker('Paper', available.map(paper => row({ title: paper.name, subtitle: sizeLabel(paper), checked: paper.keyword === this.choices.paper?.keyword })),
+    this.showPicker(t('print-paper'), available.map(paper => row({ title: paper.name, subtitle: sizeLabel(paper), checked: paper.keyword === this.choices.paper?.keyword })),
       index => {
         const chosen = available[index];
         this.choices.paper = chosen;
@@ -149,12 +155,12 @@ export async function choosePrint(handle: string, spec: PrintDialogSpec): Promis
   let chosen = (): Choices | null => null;
   const [response] = await openDialog(handle, {
     title: spec.title,
-    description: spec.printers.length ? undefined : 'No printers are set up.',
+    description: spec.printers.length ? undefined : t('print-no-printers'),
     icon: ICON,
     styleClass: 'kestrel-print-dialog',
   }, dialog => {
     if (!spec.printers.length) {
-      dialog.buttons([{ label: 'Cancel', action: dialog.cancel }]);
+      dialog.buttons([{ label: t('portal-cancel'), action: dialog.cancel }]);
       return;
     }
     const form = new PrintForm(dialog, spec);

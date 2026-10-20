@@ -2,6 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import type { ContextMenus } from '../../../desktop/menus/contextMenus.js';
+import { t } from '../../../shared/i18n/index.js';
 import { launchHistory } from '../../../shared/launchHistory.js';
 import type { QuickSettingsSource } from '../../quickSettings/quickControls.js';
 import { Calculator } from './calculator/calculator.js';
@@ -20,7 +21,10 @@ const NAME_BIAS = 0.8;
 const SHORTEST_NAME_QUERY = 2;
 const SHORTEST_CONTENT_QUERY = 3;
 const CONTENT_DELAY = 120;
-const TITLES: Record<GroupId, string> = { apps: 'Apps', actions: 'Actions', settings: 'Settings', files: 'Files', contents: 'Inside files' };
+const TITLES = {
+  apps: 'start-search-group-apps', actions: 'start-search-group-actions', settings: 'start-search-group-settings',
+  files: 'start-search-group-files', contents: 'start-search-group-contents',
+} as const satisfies Record<GroupId, string>;
 
 interface Lookup<T> {
   text: string;
@@ -187,8 +191,8 @@ export class StartSearch {
       .filter(([, entries]) => entries.length)
       .sort(([, a], [, b]) => a[0].score - b[0].score);
     const groups: SearchGroup[] = [...ordered, ['files', without(files.ranked)] as const]
-      .map(([id, entries]) => ({ title: TITLES[id], items: entries.map(({ item }) => item) }));
-    groups.push({ title: TITLES.contents, items: this.mentionItems(files.shown) });
+      .map(([id, entries]) => ({ title: t(TITLES[id]), items: entries.map(({ item }) => item) }));
+    groups.push({ title: t(TITLES.contents), items: this.mentionItems(files.shown) });
     this.show({ best, groups: groups.filter(group => group.items.length), pending: this.waiting.size > 0, fresh });
   }
 }

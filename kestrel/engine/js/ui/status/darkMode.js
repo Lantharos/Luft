@@ -1,6 +1,7 @@
 import Gio from 'gi://Gio';
 import GObject from 'gi://GObject';
 
+import * as KestrelUi from '../kestrelUi.js';
 import * as Main from '../main.js';
 
 import {QuickToggle, SystemIndicator} from '../quickSettings.js';
@@ -9,9 +10,9 @@ const DarkModeToggle = GObject.registerClass(
 class DarkModeToggle extends QuickToggle {
     _init() {
         super._init({
-            title: _('Dark Style'),
             iconName: 'dark-mode-symbolic',
         });
+        KestrelUi.localized(this, () => (this.title = KestrelUi.t('dark-style-title')));
 
         this._settings = new Gio.Settings({
             schema_id: 'org.gnome.desktop.interface',

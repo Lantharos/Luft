@@ -131,7 +131,7 @@ export const UnlockDialog = GObject.registerClass({
 
         this.allowCancel = false;
 
-        Main.ctrlAltTabManager.addGroup(this, _('Unlock Window'), 'dialog-password-symbolic');
+        Main.ctrlAltTabManager.addGroup(this, 'ctrl-alt-tab-unlock', 'dialog-password-symbolic');
 
         this._notificationsBox = new NotificationsBox();
         this._notificationsBox.connect('wake-up-screen', () => this.emit('wake-up-screen'));

@@ -4,9 +4,13 @@ import Pango from 'gi://Pango';
 import St from 'gi://St';
 import { WallClock } from 'resource:///com/lantharos/kestrel/misc/wallClock.js';
 
+import { onLocaleChanged } from '../../../shared/i18n/index.js';
+import { dateText, timeText } from './clockText.js';
+
 export class PanelClock {
   readonly actor = new St.Label({ style_class: 'kestrel-clock', y_align: Clutter.ActorAlign.CENTER });
   private readonly clock: WallClock;
+  private readonly forgetLocale = onLocaleChanged(() => this.update(GLib.DateTime.new_now_local(), this.clock));
 
   constructor(private readonly timeOnly = false) {
     this.actor.clutter_text.set_line_alignment(Pango.Alignment.RIGHT);
@@ -15,13 +19,12 @@ export class PanelClock {
 
   destroy(): void {
     this.clock.destroy();
+    this.forgetLocale();
   }
 
   private update(now: GLib.DateTime, clock: WallClock): void {
-    const seconds = clock.showSeconds ? ':%S' : '';
-    const time = clock.twelveHour ? `%-l:%M${seconds} %p` : `%H:%M${seconds}`;
-    const date = clock.settings.get_boolean('clock-show-weekday') ? '%a %-d %b' : '%-d %b';
-    const text = now.format(this.timeOnly ? time : `${date}\n${time}`) ?? '';
+    const time = timeText(now, clock.twelveHour, clock.showSeconds);
+    const text = this.timeOnly ? time : `${dateText(now, clock.settings.get_boolean('clock-show-weekday'))}\n${time}`;
     if (this.actor.text !== text) this.actor.text = text;
   }
 }

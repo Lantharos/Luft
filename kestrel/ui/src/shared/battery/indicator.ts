@@ -5,11 +5,11 @@ import St from 'gi://St';
 import { battery, type BatteryState } from './battery.js';
 import { batteryGeometry, type BatteryGeometry } from './geometry.js';
 import { paintBattery, type Glyph } from './painter.js';
+import { localized, t } from '../i18n/index.js';
 
 const LOW_LEVEL = 20;
 const HALO_MARGIN = 2;
 const PERCENTAGE_KEY = 'show-battery-percentage';
-const STATUS_TEXT = { charging: 'charging', full: 'fully charged', plugged: 'plugged in', discharging: '' };
 
 export type PercentageMode = 'setting' | 'never';
 
@@ -30,6 +30,7 @@ export class BatteryIndicator {
     this.actor.connect('style-changed', () => this.styleChanged());
     this.actor.connect('repaint', () => this.repaint());
     const unwatch = battery.watch(state => this.show(state));
+    localized(this.actor, () => this.describe());
     this.actor.connect('destroy', () => {
       unwatch();
       this.interface.run_dispose();
@@ -41,10 +42,14 @@ export class BatteryIndicator {
     this.state = state;
     this.actor.visible = !!state;
     if (!state) return;
-    this.actor.accessible_name = [`Battery ${state.percentage}%`, STATUS_TEXT[state.status]].filter(Boolean).join(', ');
+    this.describe();
     if (previous?.percentage === state.percentage && previous.status === state.status) return;
     if (!previous || glyphFor(previous, this.numbered) !== glyphFor(state, this.numbered)) this.relayout();
     else this.actor.queue_repaint();
+  }
+
+  private describe(): void {
+    if (this.state) this.actor.accessible_name = t('battery-level', { percentage: this.state.percentage, status: this.state.status });
   }
 
   private get numbered(): boolean {

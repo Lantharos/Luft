@@ -5,6 +5,7 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
+import { localized, t } from '../../shared/i18n/index.js';
 import { blurSurface } from '../../shared/surface.js';
 import { boxCenter, findAnchor, heightNear, placeNear, type Anchor, type Box } from '../../shared/placement.js';
 import type { TextInput } from '../../shared/input/textInput.js';
@@ -30,7 +31,7 @@ function imageContent({ content, width, height, imageWidth, imageHeight }: Thumb
   return {
     child: new Clutter.Actor({ content, width, height, x_expand: true, x_align: Clutter.ActorAlign.START }),
     style_class: 'kestrel-clipboard-row kestrel-clipboard-image',
-    accessible_name: `Image, ${imageWidth} × ${imageHeight}`,
+    accessible_name: t('clipboard-image', { width: imageWidth, height: imageHeight }),
   };
 }
 
@@ -63,7 +64,8 @@ export class ClipboardPanel {
     });
     this.actor.add_child(this.scroll);
     const footer = new St.BoxLayout({ style_class: 'kestrel-clipboard-footer' });
-    const clear = new St.Button({ style_class: 'kestrel-text-button', label: 'Clear all', can_focus: true, track_hover: true, x_expand: true, x_align: Clutter.ActorAlign.END });
+    const clear = new St.Button({ style_class: 'kestrel-text-button', can_focus: true, track_hover: true, x_expand: true, x_align: Clutter.ActorAlign.END });
+    localized(clear, () => (clear.label = t('clipboard-clear-all')));
     clear.connect('clicked', () => {
       this.history.clear();
       this.close();
@@ -71,6 +73,7 @@ export class ClipboardPanel {
     footer.add_child(clear);
     this.actor.add_child(footer);
     this.actor.connect('destroy', () => this.history.destroy());
+    localized(this.actor, () => (this.dirty = true));
   }
 
   get available(): boolean {
@@ -144,9 +147,9 @@ export class ClipboardPanel {
     });
     this.rows.set(row, entry);
     this.menus.bind(row, () => [
-      { label: 'Paste', run: () => this.paste(entry) },
-      { label: 'Copy', run: () => { void this.history.put(entry); this.close(); } },
-      { label: 'Remove', run: () => this.history.remove(entry) },
+      { label: t('clipboard-paste'), run: () => this.paste(entry) },
+      { label: t('clipboard-copy'), run: () => { void this.history.put(entry); this.close(); } },
+      { label: t('clipboard-remove'), run: () => this.history.remove(entry) },
     ]);
     return row;
   }

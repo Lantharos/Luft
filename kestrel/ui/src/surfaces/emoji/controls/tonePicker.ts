@@ -1,11 +1,15 @@
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
+import { t } from '../../../shared/i18n/index.js';
 import { SKIN_TONES } from '../catalog/catalog.js';
 import { stripButton, type StripEvents } from './tabStrip.js';
 
 const HAND = '✋';
-const NAMES = ['Default skin tone', 'Light skin tone', 'Medium-light skin tone', 'Medium skin tone', 'Medium-dark skin tone', 'Dark skin tone'];
+const NAMES = [
+  'emoji-skin-tone-default', 'emoji-skin-tone-light', 'emoji-skin-tone-medium-light',
+  'emoji-skin-tone-medium', 'emoji-skin-tone-medium-dark', 'emoji-skin-tone-dark',
+];
 
 function hand(tone: number): St.Label {
   return new St.Label({ text: HAND + SKIN_TONES[tone], style_class: 'kestrel-emoji-tone', x_align: Clutter.ActorAlign.CENTER, y_align: Clutter.ActorAlign.CENTER });
@@ -19,10 +23,10 @@ export class TonePicker {
   private focused = -1;
 
   constructor(events: StripEvents & { toggled(): void }) {
-    this.button = stripButton(this.face, 'Skin tone', { hovered: events.hovered, activated: () => events.toggled() }, 0);
+    this.button = stripButton(this.face, t('emoji-skin-tone'), { hovered: events.hovered, activated: () => events.toggled() }, 0);
     this.button.add_style_class_name('kestrel-emoji-tone-button');
     this.button.x_expand = false;
-    this.choices = SKIN_TONES.map((_modifier, tone) => stripButton(hand(tone), NAMES[tone], events, tone));
+    this.choices = SKIN_TONES.map((_modifier, tone) => stripButton(hand(tone), t(NAMES[tone]), events, tone));
     for (const choice of this.choices) this.options.add_child(choice);
   }
 

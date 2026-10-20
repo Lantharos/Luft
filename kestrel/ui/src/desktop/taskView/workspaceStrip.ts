@@ -7,6 +7,7 @@ import * as DND from 'resource:///com/lantharos/kestrel/ui/dnd.js';
 import type { BoardFrame } from '../board/board.js';
 import type { Monitor } from '../panel/panel.js';
 import type { WindowDragSource } from './windowCard.js';
+import { localized, t } from '../../shared/i18n/index.js';
 
 const THUMBNAIL_HEIGHT = 84;
 
@@ -34,9 +35,13 @@ class WorkspaceThumbnail {
     contents.add_child(this.windows);
     const body = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-task-workspace-body' });
     body.add_child(thumbnail);
-    body.add_child(new St.Label({ text: `Desktop ${index + 1}`, style_class: 'kestrel-task-workspace-label', x_align: Clutter.ActorAlign.CENTER }));
-    this.card = new St.Button({ style_class: 'kestrel-task-workspace', child: body, can_focus: true, track_hover: true,
-      accessible_name: `Desktop ${index + 1}` });
+    const label = new St.Label({ style_class: 'kestrel-task-workspace-label', x_align: Clutter.ActorAlign.CENTER });
+    body.add_child(label);
+    this.card = new St.Button({ style_class: 'kestrel-task-workspace', child: body, can_focus: true, track_hover: true });
+    localized(this.card, () => {
+      label.text = t('task-view-desktop', { number: index + 1 });
+      this.card.accessible_name = label.text;
+    });
     this.card.connect('clicked', () => workspace.activate((global as unknown as Shell.Global).get_current_time()));
   }
 

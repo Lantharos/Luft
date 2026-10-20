@@ -4,6 +4,7 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import * as Dialog from './dialog.js';
+import * as KestrelUi from './kestrelUi.js';
 import * as ModalDialog from './modalDialog.js';
 
 import * as Main from './main.js';
@@ -29,7 +30,7 @@ const AudioDeviceSelectionDialog = GObject.registerClass({
 
     _buildLayout() {
         const content = new Dialog.MessageDialogContent({
-            title: _('Select Audio Device'),
+            title: KestrelUi.t('audio-device-title'),
             iconName: 'audio-headphones-symbolic',
         });
 
@@ -44,14 +45,14 @@ const AudioDeviceSelectionDialog = GObject.registerClass({
 
         this.addButton({
             action: () => this.close(),
-            label: _('Cancel'),
+            label: KestrelUi.t('audio-device-cancel'),
             key: Clutter.KEY_Escape,
         });
 
         if (Main.sessionMode.allowSettings) {
             this.addButton({
                 action: this._openSettings.bind(this),
-                label: _('Sound Settings'),
+                label: KestrelUi.t('audio-device-sound-settings'),
             });
         }
     }
@@ -59,11 +60,11 @@ const AudioDeviceSelectionDialog = GObject.registerClass({
     _getDeviceLabel(device) {
         switch (device) {
         case Shell.MixerHeadset.HEADPHONES:
-            return _('Headphones');
+            return KestrelUi.t('audio-device-headphones');
         case Shell.MixerHeadset.HEADSET:
-            return _('Headset');
+            return KestrelUi.t('audio-device-headset');
         case Shell.MixerHeadset.MICROPHONE:
-            return _('Microphone');
+            return KestrelUi.t('audio-device-microphone');
         default:
             return null;
         }

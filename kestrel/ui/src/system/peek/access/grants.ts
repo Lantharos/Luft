@@ -1,5 +1,6 @@
 import type Meta from 'gi://Meta';
 
+import { t } from '../../../shared/i18n/index.js';
 import { PeekError } from '../errors.js';
 import type { Caller } from './callers.js';
 import { Launches } from './launches.js';
@@ -49,14 +50,14 @@ class WindowAccess {
   async require(caller: Caller, window: Meta.Window | null, level: Level): Promise<void> {
     if (this.allows(caller, window, level)) return;
     if (LEVELS.some(declined => RANK[declined] <= RANK[level] && this.declined.has(`${caller.unit} ${declined}`)))
-      throw new PeekError('Denied', `The person using this computer declined this. ${caller.name} can ask again after it quits.`);
+      throw new PeekError('Denied', t('peek-error-declined', { app: caller.name }));
     const key = `${caller.unit} ${level}`;
     let prompt = this.prompts.get(key);
     if (!prompt) {
       prompt = this.ask(caller, level).finally(() => this.prompts.delete(key));
       this.prompts.set(key, prompt);
     }
-    if (!await prompt) throw new PeekError('Denied', "The person using this computer didn't allow it");
+    if (!await prompt) throw new PeekError('Denied', t('peek-error-not-allowed'));
   }
 
   revoke(unit: string): void {

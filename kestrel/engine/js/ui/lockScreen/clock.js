@@ -1,10 +1,11 @@
 import Clutter from 'gi://Clutter';
+import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
-import Shell from 'gi://Shell';
 import St from 'gi://St';
 
-import {formatDateWithCFormatString} from '../../misc/dateUtils.js';
-import {timeFormat} from '../../misc/timeFormats.js';
+import * as KestrelUi from '../kestrelUi.js';
+
+import {formatLongDate, formatTime} from '../../misc/dateUtils.js';
 import {WallClock} from '../../misc/wallClock.js';
 
 const HINT_TIMEOUT = 4;
@@ -48,7 +49,10 @@ class LockClock extends St.BoxLayout {
         });
 
         this._wallClock = new WallClock(this._updateClock.bind(this));
-        this._updateHint();
+        KestrelUi.localized(this, () => {
+            this._updateClock(GLib.DateTime.new_now_local(), this._wallClock);
+            this._updateHint();
+        });
 
         this.connect('destroy', () => {
             this._wallClock.destroy();
@@ -57,12 +61,11 @@ class LockClock extends St.BoxLayout {
     }
 
     _updateClock(now, clock) {
-        this._time.text = now.format(timeFormat(clock.twelveHour, clock.showSeconds)).trim();
-        const dateFormat = Shell.util_translate_time_string(N_('%A %B %-d'));
-        this._date.text = formatDateWithCFormatString(new Date(), dateFormat);
+        this._time.text = formatTime(now, {twelveHour: clock.twelveHour, seconds: clock.showSeconds});
+        this._date.text = formatLongDate(now);
     }
 
     _updateHint() {
-        this._hint.text = this._seat.touch_mode ? _('Swipe up') : _('Click or press a key');
+        this._hint.text = KestrelUi.t(this._seat.touch_mode ? 'lock-clock-swipe-up' : 'lock-clock-click-or-press');
     }
 });

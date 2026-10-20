@@ -1,6 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
+import { t } from '../../shared/i18n/index.js';
 import { portalObject } from '../core/exported.js';
 import { CANCELLED, ENDED, PortalRequest, SUCCESS, option, respond, type Invocation, type Options, type Outcome } from '../core/request.js';
 
@@ -29,7 +30,8 @@ function callShell(method: string, parameters: GLib.Variant | null, replyType: s
 function screenshotPath(): string {
   const directory = GLib.build_filenamev([GLib.get_user_cache_dir(), 'kestrel', 'screenshots']);
   GLib.mkdir_with_parents(directory, 0o700);
-  return GLib.build_filenamev([directory, `Screenshot ${GLib.DateTime.new_now_local().format('%Y-%m-%d %H-%M-%S')}.png`]);
+  const date = GLib.DateTime.new_now_local().format('%Y-%m-%d %H-%M-%S')!;
+  return GLib.build_filenamev([directory, `${t('portal-screenshot-file-name', { date })}.png`]);
 }
 
 async function saved(method: string, parameters: (boolean | number)[], signature: string): Promise<string> {

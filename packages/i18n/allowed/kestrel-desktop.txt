@@ -1,0 +1,2 @@
+kestrel/ui/src/desktop/panel/tablet/edgeSwipe.ts	Tablet taskbar bottom drag
+kestrel/ui/src/desktop/tray/watcher.ts	Only one tray host is supported

@@ -26,6 +26,7 @@ import { RotationAnimation } from './desktop/rotation/rotation.js';
 import { Setup, type SetupContext } from './session/setup/setup.js';
 import { afterMotion, dropAfterMotion } from './shared/afterMotion.js';
 import { navigateWithKeyboard } from './shared/input/keyboardNavigation.js';
+import { t } from './shared/i18n/index.js';
 import { ClipboardPanel } from './surfaces/clipboard/panel.js';
 import { EmojiPanel } from './surfaces/emoji/panel.js';
 import { NotificationCenter } from './surfaces/notifications/notificationCenter.js';
@@ -229,9 +230,9 @@ class KestrelUi {
 
   private desktopMenu(): MenuEntry[] {
     return [
-      { label: 'Change wallpaper', run: () => this.menus.settings('appearance') },
-      { label: 'Display settings', run: () => this.menus.settings('display') },
-      { label: 'Settings', run: () => this.menus.settings() },
+      { label: t('desktop-menu-wallpaper'), run: () => this.menus.settings('appearance') },
+      { label: t('desktop-menu-display-settings'), run: () => this.menus.settings('display') },
+      { label: t('desktop-menu-settings'), run: () => this.menus.settings() },
     ];
   }
 

@@ -1,6 +1,7 @@
 import Gio from 'gi://Gio';
 import GObject from 'gi://GObject';
 
+import * as KestrelUi from '../kestrelUi.js';
 
 import {QuickMenuToggle, SystemIndicator} from '../quickSettings.js';
 
@@ -16,23 +17,23 @@ const PowerProfilesProxy = Gio.DBusProxy.makeProxyWrapper(PowerProfilesIface);
 
 const PROFILE_PARAMS = {
     'performance': {
-        name: C_('Power profile', 'Performance'),
+        nameId: 'power-profile-performance',
         iconName: 'power-profile-performance-symbolic',
     },
 
     'balanced': {
-        name: C_('Power profile', 'Balanced'),
+        nameId: 'power-profile-balanced',
         iconName: 'power-profile-balanced-symbolic',
     },
 
     'power-saver': {
-        name: C_('Power profile', 'Power Saver'),
+        nameId: 'power-profile-power-saver',
         iconName: 'power-profile-power-saver-symbolic',
     },
 };
 
 const FALLBACK_PARAMS = {
-    name: C_('Power profile', 'Custom'),
+    nameId: 'power-profile-custom',
     iconName: 'gnome-power-manager-symbolic',
 };
 
@@ -41,10 +42,7 @@ const LAST_PROFILE_KEY = 'last-selected-power-profile';
 const PowerProfilesToggle = GObject.registerClass(
 class PowerProfilesToggle extends QuickMenuToggle {
     _init() {
-        super._init({
-            title: C_('Quick settings button title', 'Power Mode'),
-            menuButtonAccessibleName: _('Open power profiles menu'),
-        });
+        super._init();
 
         this._profileItems = new Map();
 
@@ -74,11 +72,15 @@ class PowerProfilesToggle extends QuickMenuToggle {
 
         this._profileSection = new PopupMenu.PopupMenuSection();
         this.menu.addMenuItem(this._profileSection);
-        this.menu.setHeader('power-profile-balanced-symbolic', C_('Quick settings menu header', 'Power Mode'));
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        this.menu.addSettingsAction(_('Power Settings'), 'power');
+        KestrelUi.bindText(this.menu.addSettingsAction('', 'power').label, 'power-profile-settings');
 
-        this._sync();
+        KestrelUi.localized(this, () => {
+            this.title = KestrelUi.t('power-profile-title');
+            this.menuButtonAccessibleName = KestrelUi.t('power-profile-open-menu');
+            this.menu.setHeader('power-profile-balanced-symbolic', KestrelUi.t('power-profile-header'));
+            this._sync();
+        });
     }
 
     _syncProfiles() {
@@ -92,11 +94,9 @@ class PowerProfilesToggle extends QuickMenuToggle {
             if (!PROFILE_PARAMS[profile])
                 continue;
 
-            const {name, iconName} = PROFILE_PARAMS[profile];
-            if (!name)
-                continue;
-
-            const item = new PopupMenu.PopupImageMenuItem(name, iconName);
+            const {nameId, iconName} = PROFILE_PARAMS[profile];
+            const item = new PopupMenu.PopupImageMenuItem('', iconName);
+            KestrelUi.bindText(item.label, nameId);
             item.connect('activate',
                 () => (this._proxy.ActiveProfile = profile));
             this._profileItems.set(profile, item);
@@ -120,8 +120,8 @@ class PowerProfilesToggle extends QuickMenuToggle {
                 : PopupMenu.Ornament.NONE);
         }
 
-        const {name: subtitle, iconName} = PROFILE_PARAMS[activeProfile] ?? FALLBACK_PARAMS;
-        this.set({subtitle, iconName});
+        const {nameId, iconName} = PROFILE_PARAMS[activeProfile] ?? FALLBACK_PARAMS;
+        this.set({subtitle: KestrelUi.t(nameId), iconName});
 
         this.checked = activeProfile !== 'balanced';
 

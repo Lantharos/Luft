@@ -2,6 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import * as MessageTray from 'resource:///com/lantharos/kestrel/ui/messageTray.js';
 
+import { t } from '../../shared/i18n/index.js';
 import { appName } from '../core/apps.js';
 import { portalObject } from '../core/exported.js';
 import { ENDED, SUCCESS, option, respond, type Invocation, type Options, type Outcome } from '../core/request.js';
@@ -36,11 +37,11 @@ interface Prepared {
 }
 
 function dialogTitle(appId: string): string {
-  return appId ? `Print from ${appName(appId)}` : 'Print';
+  return appId ? t('print-title-from-app', { appName: appName(appId) }) : t('print-title');
 }
 
 function acceptLabel(options: Options): string {
-  return option<string>(options, 'accept_label')?.replace(/_(.)/g, '$1') || 'Print';
+  return option<string>(options, 'accept_label')?.replace(/_(.)/g, '$1') || t('print-accept');
 }
 
 async function availablePrinters(): Promise<Printer[]> {
@@ -56,8 +57,10 @@ export function notifyFailure(printer: Printer, appId: string): void {
   const source = MessageTray.getSystemSource();
   source.addNotification(new MessageTray.Notification({
     source,
-    title: 'Couldn’t print',
-    body: appId ? `${printer.description} didn’t take the document from ${appName(appId)}.` : `${printer.description} didn’t take the document.`,
+    title: t('print-failed-title'),
+    body: appId
+      ? t('print-failed-from-app', { printer: printer.description, appName: appName(appId) })
+      : t('print-failed', { printer: printer.description }),
     gicon: new Gio.ThemedIcon({ name: 'printer-error-symbolic' }),
   }));
 }
@@ -96,7 +99,7 @@ export class PrintPortal {
     }
     const [response, choices] = await choosePrint(handle, {
       title: dialogTitle(appId),
-      acceptLabel: 'Print',
+      acceptLabel: t('print-accept'),
       printers: await availablePrinters(),
       preferences: {},
       pageChoices: printer => printer.pageRanges ? ['all', 'ranges'] : ['all'],
@@ -111,7 +114,7 @@ export class PrintPortal {
   }
 
   private async print(invocation: Invocation, document: number, { appId, printer, options }: Omit<Prepared, 'expiry'>): Promise<Outcome> {
-    const name = appId ? `Document from ${appName(appId)}` : 'Document';
+    const name = appId ? t('print-job-name-from-app', { appName: appName(appId) }) : t('print-job-name');
     try {
       await submit(printer.name, invocation.get_message().get_unix_fd_list()!.get(document), name, options);
       return [SUCCESS, {}];

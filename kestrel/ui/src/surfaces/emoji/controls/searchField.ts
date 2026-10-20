@@ -1,11 +1,12 @@
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
+import { t } from '../../../shared/i18n/index.js';
 import { CaretBlink } from '../../../shared/input/caret.js';
 
 export class SearchField {
   private readonly entry = new St.Entry({
-    style_class: 'kestrel-search kestrel-emoji-search', hint_text: 'Search', x_expand: true, can_focus: false,
+    style_class: 'kestrel-search kestrel-emoji-search', hint_text: t('emoji-search'), x_expand: true, can_focus: false,
     primary_icon: new St.Icon({ icon_name: 'edit-find-symbolic', icon_size: 16 }),
   });
   private readonly caret = new St.Widget({ style_class: 'kestrel-emoji-caret', x_expand: true, x_align: Clutter.ActorAlign.START, y_align: Clutter.ActorAlign.CENTER, opacity: 0 });

@@ -1,5 +1,6 @@
 import Gio from 'gi://Gio';
 
+import { t } from '../../../shared/i18n/index.js';
 import { codepointOf, loadCharacters, type Character } from './characters.js';
 import { KAOMOJI } from './kaomoji.js';
 
@@ -36,15 +37,15 @@ type Fields = Omit<Item, 'order'>;
 const LIGHT_TONE = '\u{1F3FB}';
 export const SKIN_TONES = ['', LIGHT_TONE, '\u{1F3FC}', '\u{1F3FD}', '\u{1F3FE}', '\u{1F3FF}'];
 const EMOJI_TABS: readonly (readonly [id: string, title: string])[] = [
-  ['smileys', 'Smileys and emotion'],
-  ['people', 'People and body'],
-  ['nature', 'Animals and nature'],
-  ['food', 'Food and drink'],
-  ['activities', 'Activities'],
-  ['travel', 'Travel and places'],
-  ['objects', 'Objects'],
-  ['symbols', 'Symbols'],
-  ['flags', 'Flags'],
+  ['smileys', 'emoji-smileys'],
+  ['people', 'emoji-people'],
+  ['nature', 'emoji-nature'],
+  ['food', 'emoji-food'],
+  ['activities', 'emoji-activities'],
+  ['travel', 'emoji-travel'],
+  ['objects', 'emoji-objects'],
+  ['symbols', 'emoji-symbols'],
+  ['flags', 'emoji-flags'],
 ];
 const ICONS: Record<string, string> = {
   smileys: 'emoji-people-symbolic', people: 'emoji-body-symbolic', nature: 'emoji-nature-symbolic',
@@ -83,13 +84,17 @@ export class Catalog {
     const file = Gio.File.new_for_uri('resource:///com/lantharos/kestrel/osk-layouts/emoji.json');
     const groups: { group: string; emoji: Entry[] }[] = JSON.parse(new TextDecoder().decode(file.load_contents(null)[1]));
     const entries = new Map(groups.map(({ group, emoji }) => [group, emoji]));
-    for (const [id, title] of EMOJI_TABS) this.section(this.tab(id, title, { icon: ICONS[id] }), title, entries.get(id)!.map(emoji));
+    for (const [id, message] of EMOJI_TABS) {
+      const title = t(message);
+      this.section(this.tab(id, title, { icon: ICONS[id] }), title, entries.get(id)!.map(emoji));
+    }
     for (const { id, title, glyph, sections } of loadCharacters()) {
       const tab = this.tab(id, title, { glyph });
       for (const section of sections) this.section(tab, section.title, section.characters.map(character));
     }
-    const kaomoji = this.tab('kaomoji', 'Kaomoji', { glyph: ';)' });
-    this.section(kaomoji, 'Kaomoji', KAOMOJI.map(([text, name, keywords = '']) => ({ text, face: text, toned: null, kind: 'kaomoji', name, aliases: [], keywords })));
+    const kaomojiTitle = t('emoji-kaomoji');
+    const kaomoji = this.tab('kaomoji', kaomojiTitle, { glyph: ';)' });
+    this.section(kaomoji, kaomojiTitle, KAOMOJI.map(([text, name, keywords = '']) => ({ text, face: text, toned: null, kind: 'kaomoji', name, aliases: [], keywords })));
   }
 
   find(text: string): Item | undefined {

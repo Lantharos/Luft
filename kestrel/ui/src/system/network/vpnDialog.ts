@@ -7,6 +7,7 @@ import type { ModalDialog } from 'resource:///com/lantharos/kestrel/ui/modalDial
 
 import { feedbackLabel, showText } from '../../auth/keyring/passwordForm.js';
 import type { DialogModules } from '../../auth/keyring/dialog.js';
+import { t } from '../../shared/i18n/index.js';
 
 interface Choice {
   name: string;
@@ -98,8 +99,8 @@ export class VpnDialog {
     this.form.visible = this.controls.size > 0 || !!step.warning;
     this.setEditable(true);
     this.modal.clearButtons();
-    this.modal.addButton({ label: 'Cancel', action: () => this.cancel(), key: Clutter.KEY_Escape });
-    this.submitButton = this.modal.addButton({ label: step.action ?? 'Connect', action: () => this.submit(), default: true });
+    this.modal.addButton({ label: t('system-cancel'), action: () => this.cancel(), key: Clutter.KEY_Escape });
+    this.submitButton = this.modal.addButton({ label: step.action ?? t('vpn-connect'), action: () => this.submit(), default: true });
     this.sync();
     if (!this.modal.open()) return false;
     const empty = [...this.controls.values()].find(control => control.entry && !control.entry.text);
@@ -112,7 +113,7 @@ export class VpnDialog {
     this.content.description = message;
     this.setEditable(false);
     this.modal.clearButtons();
-    this.modal.addButton({ label: 'Cancel', action: () => this.cancel(), key: Clutter.KEY_Escape });
+    this.modal.addButton({ label: t('system-cancel'), action: () => this.cancel(), key: Clutter.KEY_Escape });
     this.submitButton = null;
   }
 

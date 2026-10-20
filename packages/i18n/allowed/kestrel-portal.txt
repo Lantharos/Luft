@@ -1,0 +1,5 @@
+kestrel/ui/src/portal/core/exported.ts	Only the desktop portal can call ${method.name}
+kestrel/ui/src/portal/sharing/clipboard.ts	The clipboard isn\'t shared with this session
+kestrel/ui/src/portal/sharing/clipboard.ts	No such session
+kestrel/ui/src/portal/sharing/inputCapture.ts	No such session
+kestrel/ui/src/portal/sharing/remoteDesktop.ts	No such session

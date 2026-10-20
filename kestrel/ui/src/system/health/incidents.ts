@@ -2,6 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import * as MessageTray from 'resource:///com/lantharos/kestrel/ui/messageTray.js';
 
+import { formatsLocale, t } from '../../shared/i18n/index.js';
 import { openSettings } from '../settingsPages.js';
 
 Gio._promisify(Gio.File.prototype, 'enumerate_children_async');
@@ -45,11 +46,14 @@ async function newestIncident(): Promise<Incident | null> {
   return newest;
 }
 
-function when(time: number): string {
-  const happened = GLib.DateTime.new_from_unix_local(time);
-  const today = GLib.DateTime.new_now_local();
-  if (happened.get_ymd().join() === today.get_ymd().join()) return `today at ${happened.format('%H:%M')}`;
-  return `on ${happened.format('%-d %B')} at ${happened.format('%H:%M')}`;
+function restartedBody(time: number): string {
+  const happened = new Date(time * 1000);
+  const locale = formatsLocale();
+  return t('health-gpu-reset-body', {
+    day: happened.toDateString() === new Date().toDateString() ? 'today' : 'other',
+    date: happened.toLocaleDateString(locale, { day: 'numeric', month: 'long' }),
+    time: happened.toLocaleTimeString(locale, { timeStyle: 'short' }),
+  });
 }
 
 export async function notifyAboutIncidents(): Promise<void> {
@@ -60,11 +64,11 @@ export async function notifyAboutIncidents(): Promise<void> {
   const source = MessageTray.getSystemSource();
   const notification = new MessageTray.Notification({
     source,
-    title: 'The graphics driver stopped responding',
-    body: `Your computer restarted itself ${when(incident.time)}. Settings shows what can keep it from happening again.`,
+    title: t('health-gpu-reset-title'),
+    body: restartedBody(incident.time),
     gicon: new Gio.ThemedIcon({ name: 'video-display-symbolic' }),
     privacyScope: MessageTray.PrivacyScope.SYSTEM,
   });
-  notification.addAction('Details', () => openSettings('about'));
+  notification.addAction(t('health-gpu-reset-details'), () => openSettings('about'));
   source.addNotification(notification);
 }

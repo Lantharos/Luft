@@ -1,6 +1,9 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 
+import { formatsLocale, locale } from '../../shared/i18n/index.js';
+import { keyLabel } from '../../shared/keys.js';
+
 const MEDIA_KEYS = 'com.lantharos.kestrel.media-keys';
 const CUSTOM_KEYBINDINGS = 'custom-keybindings';
 const CUSTOM_KEYBINDING = 'com.lantharos.kestrel.custom-keybinding';
@@ -19,7 +22,7 @@ const TYPING_MODIFIERS = new Set(['shift', 'mod2', 'lock']);
 const EDITING_LETTERS = new Set(['a', 'c', 'v', 'x', 'y', 'z']);
 const EDITING_KEYS = new Set(['left', 'right', 'up', 'down', 'home', 'end', 'page_up', 'page_down', 'prior', 'next', 'backspace', 'delete',
   'insert', 'tab', 'return', 'escape', 'space', 'f4']);
-const LABELS: [string, string][] = [['super', 'Super'], ['ctrl', 'Ctrl'], ['alt', 'Alt'], ['shift', 'Shift'], ['meta', 'Meta'], ['hyper', 'Hyper']];
+const LABEL_ORDER = ['super', 'ctrl', 'alt', 'shift', 'meta', 'hyper'];
 
 interface Parsed { modifiers: string[]; key: string }
 
@@ -35,8 +38,15 @@ export function canonical(accelerator: string): string {
 
 export function label(accelerator: string): string {
   const { modifiers, key } = parse(accelerator);
-  const names = LABELS.filter(([modifier]) => modifiers.includes(modifier)).map(([, name]) => name);
-  return [...names, key.length === 1 ? key.toUpperCase() : key].join('+');
+  return [...LABEL_ORDER.filter(modifier => modifiers.includes(modifier)), key].map(keyLabel).join('+');
+}
+
+export function labels(accelerators: string[]): string {
+  return new Intl.ListFormat(formatsLocale(), { type: 'unit', style: 'short' }).format(accelerators.map(label));
+}
+
+export function alternatives(accelerators: string[]): string {
+  return new Intl.ListFormat(locale(), { type: 'disjunction' }).format(accelerators.map(label));
 }
 
 export function claimable(accelerator: string): boolean {

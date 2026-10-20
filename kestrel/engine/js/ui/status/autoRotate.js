@@ -8,9 +8,8 @@ import {QuickToggle, SystemIndicator} from '../quickSettings.js';
 const RotationToggle = GObject.registerClass(
 class RotationToggle extends QuickToggle {
     _init() {
-        super._init({
-            title: _('Auto Rotate'),
-        });
+        super._init();
+        KestrelUi.localized(this, () => (this.title = KestrelUi.t('auto-rotate-title')));
 
         this._settings = new Gio.Settings({
             schema_id: 'com.lantharos.kestrel.touchscreen',

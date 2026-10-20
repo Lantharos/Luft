@@ -67,6 +67,11 @@ app.connect('activate', () => {
     entry.connect('changed', show);
     entry.get_delegate().connect('preedit-changed', (_text, text) => { preedit = text; show(); });
     window.set_child(entry);
+  } else if (ARGV.includes('--form')) {
+    const form = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL, spacing: 24, margin_top: 120, margin_start: 120, margin_end: 120 });
+    form.append(new Gtk.Entry());
+    form.append(new Gtk.Button({ label: 'Done', halign: Gtk.Align.START }));
+    window.set_child(form);
   } else if (ARGV.includes('--paste')) {
     acceptPastes(window);
   } else if (ARGV.includes('--scroll')) {

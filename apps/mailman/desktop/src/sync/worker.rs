@@ -423,6 +423,7 @@ impl Worker {
         match sent {
             Ok(()) => {
                 self.shared.store.finish_outgoing(id)?;
+                self.shared.notifier.sent();
                 if let Some(at) = outgoing.remind_at {
                     let sent = envelope::parse(&outgoing.raw);
                     if let Some(message_id) = sent.message_id {

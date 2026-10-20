@@ -17,6 +17,11 @@ const DESTINATION: &str = "org.freedesktop.Notifications";
 const PATH: &str = "/org/freedesktop/Notifications";
 const DEFAULT_ACTION: &str = "default";
 const NORMAL_URGENCY: u8 = 1;
+const NEW_MAIL_SOUND: &str = "message-new-email";
+const SENT_SOUND: &str = "message-sent-email";
+const KESTREL: &str = "com.lantharos.Kestrel";
+const SOUNDS_PATH: &str = "/com/lantharos/Kestrel/Sounds";
+const SOUNDS: &str = "com.lantharos.Kestrel.Sounds";
 
 struct Activation {
     thread: Option<i64>,
@@ -43,12 +48,15 @@ async fn proxy() -> Result<Proxy<'static>, String> {
         .map_err(dbus::failed)
 }
 
-async fn notify(title: &str, body: &str) -> Result<u32, String> {
-    let hints = HashMap::from([
+async fn notify(title: &str, body: &str, sound: Option<&str>) -> Result<u32, String> {
+    let mut hints = HashMap::from([
         ("desktop-entry", Variant::from(APP_ID)),
         ("urgency", Variant::from(NORMAL_URGENCY)),
         ("category", Variant::from("email.arrived")),
     ]);
+    if let Some(sound) = sound {
+        hints.insert("sound-name", Variant::from(sound));
+    }
     proxy()
         .await?
         .call(
@@ -64,6 +72,15 @@ async fn notify(title: &str, body: &str) -> Result<u32, String> {
                 -1i32,
             ),
         )
+        .await
+        .map_err(dbus::failed)
+}
+
+async fn play_sent_sound() -> Result<(), String> {
+    Proxy::new(dbus::session().await?, KESTREL, SOUNDS_PATH, SOUNDS)
+        .await
+        .map_err(dbus::failed)?
+        .call::<_, _, ()>("Play", &(SENT_SOUND,))
         .await
         .map_err(dbus::failed)
 }
@@ -105,17 +122,27 @@ impl Notifier {
                 )
             }
         };
-        self.show(&title, &body, thread);
+        self.present(&title, &body, thread, Some(NEW_MAIL_SOUND));
+    }
+
+    pub fn sent(&self) {
+        luft_app::spawn(async {
+            let _ = play_sent_sound().await;
+        });
     }
 
     pub fn show(&self, title: &str, body: &str, thread: Option<i64>) {
+        self.present(title, body, thread, None);
+    }
+
+    fn present(&self, title: &str, body: &str, thread: Option<i64>, sound: Option<&'static str>) {
         if !self.enabled.load(Ordering::Relaxed) {
             return;
         }
         let shown = self.shown.clone();
         let (title, body) = (title.to_owned(), body.to_owned());
         luft_app::spawn(async move {
-            if let Ok(id) = notify(&title, &body).await {
+            if let Ok(id) = notify(&title, &body, sound).await {
                 shown.lock().insert(
                     id,
                     Activation {

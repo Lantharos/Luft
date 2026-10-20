@@ -5,7 +5,7 @@ driver="$1"
 source "$(dirname "$0")/rpmfusion.sh"
 
 use_rpmfusion
-dnf install -y "$driver"/*.rpm libva-nvidia-driver
+dnf install -y --setopt=tsflags=nodocs "$driver"/*.rpm libva-nvidia-driver
 forget_rpmfusion
 dnf clean all
 

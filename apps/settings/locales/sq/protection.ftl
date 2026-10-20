@@ -1,0 +1,437 @@
+## Shared buttons
+
+settings-protection-cancel = Anulo
+settings-protection-continue = Vazhdo
+settings-protection-close = Mbyll
+settings-protection-done = U krye
+settings-protection-restart = Rinis
+settings-protection-remove = Hiq
+settings-protection-turn-on = Aktivizo
+settings-protection-set-up = Konfiguro
+
+## Privacy: screen lock
+
+settings-privacy-screen-lock = Bllokimi i ekranit
+settings-privacy-screen-off = Ekrani fiket
+settings-privacy-screen-off-hint = Caktohet te Energjia dhe bateria
+settings-privacy-screen-off-after = Pas { $duration }
+settings-privacy-screen-off-never = Asnjëherë
+settings-privacy-lock-when-off = Blloko ekranin kur fiket
+settings-privacy-lock-after = Blloko pas
+settings-privacy-lock-after-hint = Sa të pritet pasi fiket ekrani
+settings-privacy-lock-immediately = Menjëherë
+
+## Privacy: location, camera and microphone
+
+settings-privacy-location = Vendndodhja
+settings-privacy-location-services = Shërbimet e vendndodhjes
+settings-privacy-location-services-hint = U lejon aplikacioneve të gjejnë ku je, për hartat, motin dhe zonat kohore
+settings-privacy-camera = Kamera
+settings-privacy-camera-allow = Lejo aplikacionet të përdorin kamerën
+settings-privacy-microphone = Mikrofoni
+settings-privacy-microphone-allow = Lejo aplikacionet të përdorin mikrofonin
+settings-privacy-apps-asked = Aplikacionet që kërkuan
+settings-privacy-apps-allowed = { $allowed } nga { $total } të lejuara
+
+## Privacy: file history
+
+settings-privacy-file-history = Historiku i skedarëve
+settings-privacy-remember-files = Mbaj mend skedarët e përdorur së fundi
+settings-privacy-remember-files-hint = Aplikacionet mund të shfaqin skedarët që hape së fundi
+settings-privacy-keep-history = Mbaje historikun për
+settings-privacy-keep-forever = Përgjithmonë
+settings-privacy-clear-history = Pastro historikun
+settings-privacy-clear-history-hint = Harro menjëherë çdo skedar në listë
+settings-privacy-clear = Pastro
+settings-privacy-clear-title = Të pastrohet historiku i skedarëve?
+settings-privacy-clear-description = Aplikacionet nuk do t’i shfaqin më skedarët që hape së fundi. Skedarët mbeten aty ku janë.
+
+## Privacy: trash and temporary files
+
+settings-privacy-cleanup = Koshi dhe skedarët e përkohshëm
+settings-privacy-empty-trash = Zbraz koshin automatikisht
+settings-privacy-delete-temp = Fshi automatikisht skedarët e përkohshëm
+settings-privacy-delete-temp-hint = Skedarët e tu në dosjet e përkohshme që nuk i ka përdorur asgjë së fundi
+settings-privacy-delete-after = Fshi pas
+settings-privacy-delete-after-hint = Sa qëndrojnë skedarët para se të hiqen
+
+## Security: summary at the top of the page
+
+settings-security-protected = Pajisja jote është e mbrojtur
+settings-security-encrypting = Po enkriptohet pajisja jote
+settings-security-encrypting-progress = { $progress }. Vazhdo punën ndërsa përfundon.
+settings-security-decrypting = Po çaktivizohet enkriptimi i pajisjes
+settings-security-restart-to-encrypt = Rinis për të nisur enkriptimin
+settings-security-restart-to-encrypt-description = Enkriptimi nis herën tjetër që rinis këtë kompjuter.
+settings-security-encryption-failed = Enkriptimi nuk nisi
+settings-security-encryption-failed-description = Luft u nis pa të dhe skedarët e tu nuk ndryshuan. Aktivizoje sërish për të provuar edhe një herë.
+settings-security-could-be-safer = Pajisja jote mund të ishte më e sigurt
+settings-security-could-be-safer-description = Aktivizo enkriptimin e pajisjes që skedarët e tu të mbeten privatë.
+settings-security-starts-differently-description = Nëse ndryshove cilësimet e Secure Boot, konfirmoje që disku të zhbllokohet sërish vetë.
+settings-security-needed-recovery-key = Disku yt kërkoi çelësin e rikuperimit
+settings-security-needed-recovery-key-description = Lidhe sërish çipin e sigurisë që të zhbllokohet vetë.
+settings-security-firmware-ready-description = Përditësimet e firmware për harduerin tënd janë gati te Përditësimet.
+settings-security-encrypted-secure-boot = Disku yt është i enkriptuar dhe Secure Boot kontrollon si niset.
+settings-security-encrypted = Disku yt është i enkriptuar.
+
+## Security: protections
+
+settings-security-secure-boot = Secure Boot
+settings-security-secure-boot-description = Vetëm softuer i besuar mund ta nisë këtë kompjuter
+settings-security-chip = Çipi i sigurisë
+settings-security-chip-description = Mban çelësat të sigurt dhe kontrollon si u nis ky kompjuter
+settings-firmware-updates-ready = Përditësimet e firmware janë gati
+settings-firmware-updates-count = { $count ->
+    [one] { $count } përditësim për harduerin tënd te Përditësimet
+   *[other] { $count } përditësime për harduerin tënd te Përditësimet
+}
+
+## Security: signed startup
+
+settings-security-signed-startup = Nisja e nënshkruar
+settings-security-signed-startup-on = Menyja e nisjes dhe sistemi janë të nënshkruara për këtë kompjuter
+settings-security-signed-startup-purpose = Lejon të nisë këtë kompjuter vetëm softuerin e nënshkruar për të
+settings-security-signed-startup-restart = Fillon të përdoret pasi të rinisësh
+settings-security-signed-startup-missed = Çelësi nuk u shtua në rinisjen e fundit
+settings-security-signed-startup-pending = Shto çelësin në ekranin blu kur të rinisësh
+settings-security-signed-startup-missed-often = Çelësi nuk u shtua pas disa rinisjesh
+settings-security-show-steps = Shfaq hapat
+settings-security-try-again = Provo sërish
+
+## Security: games with anti-cheat
+
+settings-security-anti-cheat = Lojërat me anti-cheat
+settings-security-anti-cheat-ready = Gati për lojërat me anti-cheat
+settings-security-anti-cheat-removing = Hiq çelësat e tjerë në ekranin blu kur të rinisësh
+settings-security-anti-cheat-luft-key = Epic duhet ende ta shtojë çelësin e Luft në listën e vet
+settings-security-anti-cheat-ready-description = Lojërat mund të kontrollojnë si u nis ky kompjuter
+
+## Security: steps on the blue startup screen
+
+settings-security-key-steps-remove = Hiq çelësat kur të rinisësh
+settings-security-key-steps-add = Shto çelësin kur të rinisësh
+settings-security-key-steps-remove-description = Pasi të rinisësh, një ekran blu pyet për heqjen e çelësave. Pret vetëm 10 sekonda, ndaj shtyp një tast sapo të shfaqet.
+settings-security-key-steps-add-description = Pasi të rinisësh, një ekran blu pyet për një çelës të ri. Pret vetëm 10 sekonda, ndaj shtyp një tast sapo të shfaqet.
+settings-security-key-step-choose = Zgjidh { $option }, pastaj { $next }.
+settings-security-key-step-confirm = Zgjidh { $option }.
+settings-security-key-step-code = Shkruaj kodin më poshtë dhe shtyp { $key }.
+settings-security-key-step-reboot = Zgjidh { $option }.
+settings-security-key-enter = Enter
+settings-security-key-code = Kodi { $code }
+settings-security-key-steps-remove-missed = Nëse e humbet, kompjuteri niset si zakonisht dhe mund të provosh sërish këtu.
+settings-security-key-steps-add-missed = Nëse e humbet, kompjuteri niset si zakonisht dhe hapat shfaqen sërish në rinisjen e ardhshme, me një kod të ri.
+settings-security-later = Më vonë
+settings-security-restart-now = Rinis tani
+
+## Security: hardware security level
+
+settings-security-hardware = Siguria e harduerit
+settings-security-hardware-level-0 = Hardueri yt ka pak nga mbrojtjet që mund të kishte
+settings-security-hardware-level-1 = Hardueri yt ka mbrojtjet bazë
+settings-security-hardware-level-2 = Hardueri yt ka mbrojtjet e rëndësishme
+settings-security-hardware-level-3 = Hardueri yt është i mbrojtur mirë
+settings-security-hardware-level-4 = Hardueri yt mbrohet vetë ndërsa punon
+settings-security-hardware-level-5 = Hardueri yt mbrohet vetë dhe mund ta provojë
+settings-security-hardware-description = { $summary }, niveli { $level } nga { $highest }.
+settings-security-hardware-next = Për nivelin tjetër
+settings-security-hardware-highest = Ky është niveli më i lartë që ekziston.
+settings-security-hardware-inactive = Joaktive tani
+settings-security-hardware-fix-maker = { $count ->
+    [one] Këtë mund ta shtojë vetëm prodhuesi i kompjuterit tënd, zakonisht me një përditësim firmware:
+   *[other] Këto mund t’i shtojë vetëm prodhuesi i kompjuterit tënd, zakonisht me një përditësim firmware:
+}
+settings-security-hardware-fix-firmware = { $count ->
+    [one] Kjo mund të aktivizohet te cilësimet e firmware të kompjuterit tënd:
+   *[other] Këto mund të aktivizohen te cilësimet e firmware të kompjuterit tënd:
+}
+settings-security-hardware-fix-system = { $count ->
+    [one] Kjo varet nga mënyra si është konfiguruar sistemi:
+   *[other] Këto varen nga mënyra si është konfiguruar sistemi:
+}
+settings-security-hardware-fix-unknown = { $count ->
+    [one] Kjo nuk ofrohet në këtë kompjuter:
+   *[other] Këto nuk ofrohen në këtë kompjuter:
+}
+
+## Security: USB protection
+
+settings-usb-hold-back = Mbaji në pritje pajisjet e reja USB
+settings-usb-hold-back-description = Ato që lidhen kur je i bllokuar presin derisa të zhbllokosh
+
+## Device encryption
+
+settings-encryption = Enkriptimi i pajisjes
+settings-encryption-encrypting = Po enkriptohet kjo pajisje
+settings-encryption-decrypting = Po çaktivizohet enkriptimi i pajisjes
+settings-encryption-starting = Nis herën tjetër që rinis
+settings-encryption-failed = Nuk nisi në rinisjen e fundit, skedarët e tu nuk ndryshuan
+settings-encryption-off = I mban skedarët privatë nëse ky kompjuter humbet
+settings-encryption-progress = { $percent } kryer
+settings-encryption-progress-seconds = { $percent } kryer, më pak se një minutë mbetur
+settings-encryption-progress-minutes = { $minutes ->
+    [one] { $percent } kryer, rreth { $minutes } minutë mbetur
+   *[other] { $percent } kryer, rreth { $minutes } minuta mbetur
+}
+settings-encryption-progress-hours = { $hours ->
+    [one] { $percent } kryer, rreth { $hours } orë mbetur
+   *[other] { $percent } kryer, rreth { $hours } orë mbetur
+}
+settings-encryption-unlocks-chip-pin = Zhbllokohet me çipin e sigurisë dhe PIN-in tënd
+settings-encryption-unlocks-chip = Zhbllokohet vetë me çipin e sigurisë
+settings-encryption-unlocks-passphrase = Kërkon frazëkalimin tënd në nisje
+settings-encryption-unlocks-security-key = Zhbllokohet me çelësin tënd të sigurisë në nisje
+settings-encryption-unlocks-recovery-key = Kërkon çelësin tënd të rikuperimit në nisje
+
+## Device encryption: other drives
+
+settings-encryption-drives = Disqet e tjerë
+settings-encryption-drives-hint = Enkripto disqe të tjerë dhe memorie USB te Disqet
+settings-encryption-drives-open = Hap Disqet
+settings-encryption-drive-encrypting = Po enkriptohet një disk, { $percent } kryer
+settings-encryption-drive-encrypting-paused = Po enkriptohet një disk, ndalur në { $percent }
+settings-encryption-drive-decrypting = Po dekriptohet një disk, { $percent } kryer
+settings-encryption-drive-decrypting-paused = Po dekriptohet një disk, ndalur në { $percent }
+settings-encryption-drives-auto-unlock = { $count ->
+    [one] { $count } disk i enkriptuar zhbllokohet me këtë kompjuter
+   *[other] { $count } disqe të enkriptuar zhbllokohen me këtë kompjuter
+}
+
+## Device encryption: turning it on
+
+settings-encryption-turn-on-title = Aktivizo enkriptimin e pajisjes
+settings-encryption-turn-on-description = Skedarët e tu mbeten privatë nëse ky kompjuter humbet ose vidhet. Pa çelësin e duhur, askush nuk mund ta lexojë diskun.
+settings-encryption-blocked-title = Enkriptimi i pajisjes nuk mund të aktivizohet ende
+settings-encryption-blocked-description = Rregullo atë që është shënuar më poshtë, pastaj provo sërish.
+settings-encryption-checking = Po kontrollohet kompjuteri yt…
+settings-encryption-backup = Para se të nisësh, sigurohu që skedarët e rëndësishëm të kenë një kopje rezervë.
+settings-encryption-key-title = Ruaj çelësin e rikuperimit
+settings-encryption-key-description = Nëse disku nuk mund të zhbllokohet ndonjëherë vetë, për shembull pas një riparimi, ky çelës të kthen brenda. Mbaje diku tjetër, jo në këtë kompjuter.
+settings-encryption-unlock-title = Zhbllokimi në nisje
+settings-encryption-unlock-description = Çipi i sigurisë e zhbllokon diskun vetë në nisje, ndaj hyrja mbetet si më parë.
+settings-encryption-passphrase-title = Zgjidh një frazëkalim
+settings-encryption-passphrase-description = Ky kompjuter nuk mund ta zhbllokojë diskun vetë, ndaj e kërkon këtë frazëkalim sa herë niset.
+settings-encryption-summary-title = Gati për enkriptim
+settings-encryption-summary-description = Ja çfarë ndodh më pas.
+settings-encryption-step-restart = Kompjuteri yt riniset një herë.
+settings-encryption-step-screen = Gjatë nisjes shfaqet për pak kohë ekrani “Po enkriptohet pajisja jote”.
+settings-encryption-step-background = Pjesa tjetër ndodh në sfond ndërsa vazhdon punën.
+settings-encryption-step-plugged-in = Mbaje kompjuterin të lidhur në korrent derisa të përfundojë.
+settings-encryption-ask-pin = Kërko edhe një PIN
+settings-encryption-ask-pin-description = E mban diskun të bllokuar edhe nëse dikush e merr kompjuterin. Kërkohet sapo të përfundojë enkriptimi.
+settings-encryption-back = Prapa
+settings-encryption-starting-button = Po niset…
+settings-encryption-restart-and-encrypt = Rinis dhe enkripto
+
+## Device encryption: turning it off
+
+settings-encryption-turn-off-title = Të çaktivizohet enkriptimi i pajisjes?
+settings-encryption-turn-off-description = Skedarët e tu dekriptohen në sfond ndërsa punon. Më pas, kushdo që e nxjerr diskun mund ta lexojë.
+settings-encryption-keep = Mbaje enkriptimin
+settings-encryption-turning-off = Po çaktivizohet…
+settings-encryption-turn-off = Çaktivizo
+
+## Device encryption: unlocking the disk
+
+settings-encryption-unlocking = Zhbllokimi i diskut
+settings-encryption-starts-differently = Ky kompjuter tani niset ndryshe
+settings-encryption-starts-differently-description = Cilësimet e tij të Secure Boot ndryshuan, ndaj disku kërkoi çelësin e rikuperimit. Nëse e bëre ti ndryshimin, konfirmoje që të zhbllokohet sërish vetë
+settings-encryption-confirm = Konfirmo
+settings-encryption-asked-recovery-key = Disku yt kërkoi çelësin e rikuperimit
+settings-encryption-relink-description = Lidhe sërish çipin e sigurisë që të zhbllokohet vetë
+settings-encryption-relink = Lidhe sërish
+settings-encryption-chip-unlock = Zhblloko me çipin e sigurisë
+settings-encryption-chip-unlock-on = Për sa kohë asgjë nuk ndryshon mënyrën si niset ky kompjuter
+settings-encryption-chip-unlock-off = Që të mos shkruash frazëkalim në nisje
+settings-encryption-pin = PIN në nisje
+settings-encryption-pin-description = E shkruan para se të zhbllokohet disku
+settings-encryption-change = Ndrysho
+settings-encryption-add-pin-row = Shto një PIN në nisje
+settings-encryption-add-pin-row-description = E mban diskun të bllokuar edhe nëse kompjuteri merret
+settings-encryption-add-pin = Shto PIN
+settings-encryption-new-key-description = Disku yt nuk kishte ende çelës rikuperimi. Mbaje këtë diku tjetër, jo në këtë kompjuter.
+settings-encryption-stop-chip-title = Të mos zhbllokohet më me çipin e sigurisë?
+settings-encryption-stop-chip-passphrase = Kompjuteri yt do të kërkojë frazëkalimin sa herë niset.
+settings-encryption-stop-chip-recovery-key = Kompjuteri yt do të kërkojë çelësin e rikuperimit sa herë niset, ndaj mbaje afër.
+settings-encryption-stop-chip = Ndalo zhbllokimin
+settings-encryption-remove-pin-title = Të hiqet PIN-i yt?
+settings-encryption-remove-pin-description = Disku do të zhbllokohet sërish vetë kur niset kompjuteri.
+settings-encryption-remove-pin = Hiq PIN-in
+settings-encryption-unlock-disk-title = Zhbllokoje diskun
+settings-encryption-unlock-disk-description = Ky ndryshim kërkon çelësin e rikuperimit ose frazëkalimin që shkruan kur niset kompjuteri.
+settings-encryption-unlock-disk-field = Çelësi i rikuperimit ose frazëkalimi
+
+## Device encryption: security chip and PIN
+
+settings-encryption-chip-setup-description = Çipi i sigurisë në kompjuterin tënd e zhbllokon diskun vetë në nisje, ndaj nuk shkruan më frazëkalim më parë.
+settings-encryption-add-pin-title = Shto një PIN
+settings-encryption-add-pin-description = Do ta shkruash sa herë niset kompjuteri. Pa të, disku mbetet i bllokuar, edhe nëse dikush e merr gjithë kompjuterin.
+settings-encryption-change-pin-title = Ndrysho PIN-in
+settings-encryption-change-pin-description = Do ta shkruash PIN-in e ri sa herë niset kompjuteri.
+settings-encryption-change-pin = Ndrysho PIN-in
+settings-encryption-relink-title = Lidhe sërish çipin e sigurisë
+settings-encryption-relink-pin-description = Shkruaj PIN-in që do të përdorësh në nisje.
+settings-encryption-ask-pin-step = Shton një hap në nisje.
+settings-encryption-pin-field = PIN
+settings-encryption-new-pin-field = PIN-i i ri
+settings-encryption-pin-length = { $min } deri në { $max } shifra
+settings-encryption-pin-digits-only = Përdor vetëm shifra
+settings-encryption-pin-too-short = { $min ->
+    [one] Përdor të paktën { $min } shifër
+   *[other] Përdor të paktën { $min } shifra
+}
+settings-encryption-pin-too-long = { $max ->
+    [one] Përdor të shumtën { $max } shifër
+   *[other] Përdor të shumtën { $max } shifra
+}
+settings-encryption-pins-differ = PIN-et nuk përputhen
+settings-encryption-confirm-field = Konfirmo
+settings-encryption-type-again = Shkruaje sërish
+settings-encryption-passphrase-field = Frazëkalimi
+settings-encryption-passphrase-length = { $min ->
+    [one] Të paktën { $min } karakter
+   *[other] Të paktën { $min } karaktere
+}
+settings-encryption-passphrases-differ = Frazëkalimet nuk përputhen
+
+## Recovery key
+
+settings-recovery-title = Çelësi i rikuperimit
+settings-recovery-description = Të kthen brenda nëse disku nuk mund të zhbllokohet vetë
+settings-recovery-show = Shfaq
+settings-recovery-replace = Zëvendëso
+settings-recovery-replace-title = Të zëvendësohet çelësi i rikuperimit?
+settings-recovery-replace-description = Çelësi aktual nuk funksionon më dhe merr një të ri për ta ruajtur.
+settings-recovery-replace-key = Zëvendëso çelësin
+settings-recovery-shown-title = Çelësi yt i rikuperimit
+settings-recovery-shown-description = Shkruaje nëse kompjuteri të kërkon ndonjëherë çelës rikuperimi në nisje. Mbaj një kopje diku tjetër, jo në këtë kompjuter.
+settings-recovery-fresh-title = Ruaj çelësin e ri të rikuperimit
+settings-recovery-fresh-description = Çelësi yt i mëparshëm nuk funksionon më. Mbaje këtë në letër ose në një menaxher fjalëkalimesh.
+settings-recovery-saved = E kam ruajtur çelësin e rikuperimit
+
+## Passwords and keys (the keyring)
+
+settings-passwords-title = Fjalëkalimet dhe çelësat
+settings-passwords-not-running = Vargu yt i çelësave nuk është në punë
+settings-passwords-not-running-description = Fjalëkalimet dhe çelësat e tu shfaqen këtu sapo të niset
+settings-passwords-locked = I bllokuar
+settings-passwords-contents = { $count ->
+    [0] Ende asgjë e ruajtur
+    [one] { $count } fjalëkalim ose çelës
+   *[other] { $count } fjalëkalime dhe çelësa
+}
+settings-passwords-protected-chip = I mbrojtur nga fjalëkalimi yt dhe çipi i sigurisë
+settings-passwords-protected = I mbrojtur nga fjalëkalimi yt
+settings-passwords-unlock = Zhblloko
+settings-passwords-lock = Blloko
+settings-passwords-seal-title = Vulos me çipin e sigurisë
+settings-passwords-seal-description = Kopjet e tyre nuk mund të hapen në një kompjuter tjetër
+settings-passwords-seal = Vulos
+settings-passwords-fingerprint-on = Zhbllokohet me gjurmën e gishtit
+settings-passwords-fingerprint-on-description = Kur hyn me të, zhbllokohen edhe fjalëkalimet e tua
+settings-passwords-fingerprint = Zhblloko me gjurmën e gishtit
+settings-passwords-fingerprint-description = Shto fillimisht një gjurmë gishti te Përdoruesit
+settings-passwords-pin = Kërko një PIN pas gjurmës së gishtit
+settings-passwords-pin-locked = Zhblloko vargun e çelësave për ta ndryshuar këtë
+settings-passwords-pin-description = Që vetëm gjurma e gishtit të mos mjaftojë për t’i zhbllokuar
+settings-passwords-lock-with-screen = Blloko bashkë me ekranin
+settings-passwords-lock-with-screen-description = Bllokohen dhe zhbllokohen bashkë me ekranin
+settings-passwords-apps = Aplikacionet me qasje
+settings-passwords-apps-locked = Zhblloko vargun e çelësave për t’i parë
+settings-passwords-apps-asked = { $count ->
+    [0] Asnjë aplikacion nuk i ka kërkuar ende
+    [one] { $count } aplikacion i ka kërkuar
+   *[other] { $count } aplikacione i kanë kërkuar
+}
+
+## Passwords and keys: apps with access
+
+settings-passwords-access-back = Siguria
+settings-passwords-access-description = Nëse heq një, aplikacioni pyet sërish herën tjetër.
+settings-passwords-access-not-allowed = Nuk lejohet
+settings-passwords-access-none = Asnjë aplikacion nuk i ka kërkuar ende fjalëkalimet e tua
+settings-passwords-access-revoke = Ndalo { $app } të përdorë { $item }
+settings-passwords-access-reset = Lejo { $app } të kërkojë sërish { $item }
+settings-passwords-stores = Hyrjet e aplikacioneve
+settings-passwords-stores-description = Hyrje që disa aplikacione i mbajnë këtu, ku vetëm ai aplikacion mund t’i lexojë.
+settings-passwords-stores-count = { $count ->
+    [one] { $count } hyrje e ruajtur
+   *[other] { $count } hyrje të ruajtura
+}
+settings-passwords-forget = Harro
+settings-passwords-forget-title = Të harrohet ajo që ruajti { $app }?
+settings-passwords-forget-description = { $app } humbet hyrjet që mbante këtu, ndaj mund të duhet të hysh sërish në të.
+
+## Passwords and keys: recent access
+
+settings-passwords-history = Qasjet e fundit
+settings-passwords-history-read = { $app } përdori “{ $item }”
+settings-passwords-history-read-unnamed = { $app } përdori një fjalëkalim të ruajtur
+settings-passwords-history-saved = { $app } ruajti “{ $item }”
+settings-passwords-history-saved-unnamed = { $app } ruajti një fjalëkalim
+settings-passwords-history-deleted = { $app } fshiu “{ $item }”
+settings-passwords-history-deleted-unnamed = { $app } fshiu një fjalëkalim të ruajtur
+settings-passwords-history-denied = { $app } nuk u lejua të përdorë “{ $item }”
+settings-passwords-history-denied-unnamed = { $app } nuk u lejua të përdorë një fjalëkalim të ruajtur
+settings-passwords-history-signed = { $app } nënshkroi me “{ $item }”
+settings-passwords-history-signed-unnamed = { $app } nënshkroi me një fjalëkalim të ruajtur
+settings-passwords-history-fewer = Shfaq më pak
+settings-passwords-history-all = { $count ->
+    [one] Shfaq të gjitha { $count }
+   *[other] Shfaq të gjitha { $count }
+}
+settings-passwords-history-clear = Pastro historikun
+settings-passwords-history-clear-description = Harro cilat aplikacione e përdorën vargun e çelësave dhe kur
+settings-passwords-history-clear-button = Pastro
+settings-passwords-history-clear-title = Të pastrohen qasjet e fundit?
+settings-passwords-history-clear-confirm = Lista se cilat aplikacione e përdorën vargun e çelësave dhe kur fshihet. Fjalëkalimet dhe çelësat e ruajtur mbeten siç janë.
+
+## Passwords and keys: SSH keys
+
+settings-passwords-ssh = Çelësat SSH
+settings-passwords-ssh-description = Çelësa për të hyrë në serverë, të ruajtur në vargun tënd të çelësave.
+settings-passwords-ssh-unnamed = Çelës pa emër
+settings-passwords-ssh-in-chip = Ruhet në çipin e sigurisë
+settings-passwords-ssh-added = Shtuar { $when }
+settings-passwords-ssh-copy = Kopjo çelësin publik të { $name }
+settings-passwords-ssh-remove = Hiq { $name }
+settings-passwords-ssh-confirm = Pyet para çdo përdorimi
+settings-passwords-ssh-confirm-label = Pyet para çdo përdorimi të { $name }
+settings-passwords-ssh-add-row = Shto një çelës
+settings-passwords-ssh-use = Përdor këta çelësa me SSH
+settings-passwords-ssh-use-description = Kopjo rreshtin që i tregon SSH-së ku janë
+settings-passwords-ssh-copy-line = Kopjo { $line }
+settings-passwords-ssh-remove-title = Të hiqet “{ $name }”?
+settings-passwords-ssh-remove-chip = Ekziston vetëm në çipin e sigurisë së këtij kompjuteri, ndaj zhduket përgjithmonë. Serverët që pranojnë vetëm këtë çelës nuk do të të lejojnë më të hysh me të.
+settings-passwords-ssh-remove-description = Serverët që pranojnë vetëm këtë çelës nuk do të të lejojnë më të hysh me të. Ky veprim nuk mund të zhbëhet.
+settings-passwords-ssh-add-title = Shto një çelës SSH
+settings-passwords-ssh-add-description = Krijohet një çelës i ri në këtë kompjuter. Kopjoje çelësin e tij publik te serverët ku do të hysh.
+settings-passwords-ssh-name = Emri
+settings-passwords-ssh-name-placeholder = Për shembull, laptopi i punës
+settings-passwords-ssh-chip = Ruaje në çipin e sigurisë
+settings-passwords-ssh-chip-description = Nuk mund të kopjohet kurrë jashtë këtij kompjuteri, as nga ti
+settings-passwords-ssh-chip-unsupported = Çipi i sigurisë i këtij kompjuteri nuk mund të mbajë çelësa SSH
+settings-passwords-ssh-add = Shto çelësin
+
+## Passkeys
+
+settings-passkeys-title = Çelësat e kalimit
+settings-passkeys-unavailable = Zhblloko vargun e çelësave për të parë çelësat e kalimit.
+settings-passkeys-chip-fingerprint = Të vulosur nga çipi i sigurisë i këtij kompjuteri. Çdo hyrje kërkon gjurmën e gishtit ose fjalëkalimin.
+settings-passkeys-chip-password = Të vulosur nga çipi i sigurisë i këtij kompjuteri. Çdo hyrje kërkon fjalëkalimin.
+settings-passkeys-password-fingerprint = Të enkriptuar me fjalëkalimin tënd. Çdo hyrje kërkon gjurmën e gishtit ose fjalëkalimin.
+settings-passkeys-password = Të enkriptuar me fjalëkalimin tënd. Çdo hyrje kërkon fjalëkalimin.
+settings-passkeys-last-used = Përdorur për herë të fundit { $when }
+settings-passkeys-never-used = Nuk është përdorur kurrë
+settings-passkeys-password-only = I mbrojtur nga fjalëkalimi yt
+settings-passkeys-unreachable = Shfletuesit nuk i arrijnë dot çelësat e kalimit
+settings-passkeys-unreachable-description = Kthehen sapo shërbimi i çelësave të kalimit të jetë në punë
+settings-passkeys-rename-label = Riemërto çelësin e kalimit për { $site }
+settings-passkeys-remove-label = Hiq çelësin e kalimit për { $site }
+settings-passkeys-empty = Ende nuk ka çelësa kalimi
+settings-passkeys-empty-description = Ata që krijojnë sajtet ruhen këtu për çdo shfletues
+settings-passkeys-remove-title = Të hiqet ky çelës kalimi?
+settings-passkeys-remove-description = Nuk do të mund të hysh më në { $site } me të, ndaj sigurohu që ke një mënyrë tjetër për të hyrë.
+settings-passkeys-rename-title = Riemërto çelësin e kalimit
+settings-passkeys-rename-description = Jepi çelësit të kalimit për { $site } një emër që do ta njohësh.
+settings-passkeys-name = Emri
+settings-passkeys-save = Ruaj

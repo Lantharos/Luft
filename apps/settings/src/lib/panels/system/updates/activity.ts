@@ -8,15 +8,15 @@ function elsewhere({ by, change }: Elsewhere) {
 		case 'refresh':
 			return by ? capitalized(t('settings-updates-elsewhere-refresh-by', { app: by })) : t('settings-updates-checking');
 		case 'download':
-			return by ? t('settings-updates-elsewhere-download-by', { app: by }) : t('settings-updates-downloading');
+			return by ? capitalized(t('settings-updates-elsewhere-download-by', { app: by })) : t('settings-updates-downloading');
 		case 'update':
-			return by ? t('settings-updates-elsewhere-update-by', { app: by }) : t('settings-updates-elsewhere-update');
+			return by ? capitalized(t('settings-updates-elsewhere-update-by', { app: by })) : t('settings-updates-elsewhere-update');
 		case 'install':
-			return by ? t('settings-updates-elsewhere-install-by', { app: by }) : t('settings-updates-elsewhere-install');
+			return by ? capitalized(t('settings-updates-elsewhere-install-by', { app: by })) : t('settings-updates-elsewhere-install');
 		case 'remove':
-			return by ? t('settings-updates-elsewhere-remove-by', { app: by }) : t('settings-updates-elsewhere-remove');
+			return by ? capitalized(t('settings-updates-elsewhere-remove-by', { app: by })) : t('settings-updates-elsewhere-remove');
 		default:
-			return by ? t('settings-updates-elsewhere-change-by', { app: by }) : t('settings-updates-elsewhere-change');
+			return by ? capitalized(t('settings-updates-elsewhere-change-by', { app: by })) : t('settings-updates-elsewhere-change');
 	}
 }
 

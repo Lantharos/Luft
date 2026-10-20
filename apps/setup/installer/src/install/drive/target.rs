@@ -16,13 +16,19 @@ fn find(parts: &[Created], role: Role) -> Option<&Created> {
     parts.iter().find(|part| part.role == role)
 }
 
-fn mount(device: &str, options: &str, at: &Path) -> Result<()> {
+const ROOT_OPTIONS: &str = "compress=zstd:1,noatime";
+
+fn mount_root(device: &str, options: &str, at: &Path) -> Result<()> {
     std::fs::create_dir_all(at)?;
-    let mut mount = Tool::new("mount");
-    if !options.is_empty() {
-        mount = mount.args(["-o", options]);
-    }
-    mount.arg(device).arg(at).run()
+    let options = match options {
+        "" => ROOT_OPTIONS.to_owned(),
+        options => format!("{options},{ROOT_OPTIONS}"),
+    };
+    Tool::new("mount")
+        .args(["-o", &options])
+        .arg(device)
+        .arg(at)
+        .run()
 }
 
 fn first_esp(drive_device: &str, skipped: &[&str]) -> Result<String> {
@@ -77,7 +83,7 @@ impl Mounted {
         root_uuid: &str,
         esp: String,
     ) -> Result<Self> {
-        mount(device, options, root)?;
+        mount_root(device, options, root)?;
         Ok(Self {
             root: root.to_owned(),
             root_uuid: root_uuid.to_owned(),

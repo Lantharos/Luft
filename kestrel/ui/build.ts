@@ -16,6 +16,7 @@ const result = await build({
   format: 'esm',
   platform: 'neutral',
   target: 'es2022',
+  nodePaths: [join(import.meta.dir, 'node_modules')],
   external: ['gi://*', 'resource:///*', 'cairo', 'gettext', 'console', 'system'],
 });
 

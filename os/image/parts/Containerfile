@@ -18,6 +18,9 @@ FROM builder AS kestrel-build
 COPY kestrel /src/kestrel
 COPY packages/motion /src/packages/motion
 COPY packages/ui/src/taskbar /src/packages/ui/src/taskbar
+COPY packages/i18n/src /src/packages/i18n/src
+COPY packages/i18n/tools /src/packages/i18n/tools
+COPY apps/settings/locales /src/apps/settings/locales
 COPY apps/settings/src/lib/panels/pages.ts /src/apps/settings/src/lib/panels/pages.ts
 COPY os/image/parts/stages/kestrel.sh os/image/parts/stages/needed.sh os/image/parts/stages/source-times.ts /src/os/image/parts/stages/
 RUN --mount=type=cache,from=work,target=/var/cache/luft-part,sharing=locked \

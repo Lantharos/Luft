@@ -7,6 +7,8 @@
     "check": "tsc --noEmit"
   },
   "devDependencies": {
+    "@fluent/bundle": "0.19.1",
+    "@fluent/syntax": "0.19.0",
     "@girs/accountsservice-1.0": "5.5.0",
     "@girs/clutter-51": "5.5.0",
     "@girs/geoclue-2.0": "5.5.0",

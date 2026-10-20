@@ -19,7 +19,7 @@ for patch in "$patches"/*.patch; do
 done
 dnf builddep -y --setopt=keepcache=True "$spec"
 env -u CARGO_TARGET_DIR CARGO_PROFILE_RELEASE_LTO=off rpmbuild --define "_topdir $top" \
-  --define "rustflags_codegen_units 16" --define "rustflags_debuginfo 0" --without check -bb "$spec"
+  --define "rustflags_codegen_units 16" --define "rustflags_debuginfo 0" --define "debug_package %{nil}" --without check -bb "$spec"
 mkdir -p "$out"
 cp "$top"/RPMS/*/bootc-[0-9]*.rpm "$out/"
 rm -rf "$top"

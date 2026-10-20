@@ -31,9 +31,9 @@ Installing makes Schelf the app for `.flatpakref`, `.flatpakrepo`, `.rpm` and `.
 
 ## Command line
 
-The same binary is the `schelf` command, with `sch` linked to it in Luft's image: `install`, `remove`, `search`, `update`, `list` and `info`, described in [the docs](https://docs.luft.computer/system/software/#in-the-terminal). Its code is in `desktop/src/cli`, with each place software comes from in `cli/sources`.
+The same binary is the `schelf` command, with `sch` linked to it in Luft's image: `install`, `remove`, `search`, `update`, `list`, `info`, `trust` and `untrust`, described in [the docs](https://docs.luft.computer/system/software/#in-the-terminal). Its code is in `desktop/src/cli`, with each place software comes from in `cli/sources`.
 
-While the app runs, it owns `com.lantharos.Schelf` on the session bus. The `com.lantharos.Schelf1` interface at `/com/lantharos/Schelf` takes an operation as JSON with `Start` (a key, title and job, as Schelf's own pages send them) and stops it with `Cancel`; `Changed` and `Finished` signals report on it. Apps in a Flatpak sandbox can't call it. The command hands its work to the app this way, so both share one queue. Without the app, it runs the work itself. Either way every job holds the account's software lock from `packages/software` while it changes anything.
+While the app runs, it owns `com.lantharos.Schelf` on the session bus. The `com.lantharos.Schelf1` interface at `/com/lantharos/Schelf` takes an operation as JSON with `Start` (a key, title and job, as Schelf's own pages send them) and stops it with `Cancel`; `Changed` and `Finished` signals report on it. Apps in a Flatpak sandbox can't call it unless they have full access. The command hands its work to the app this way, so both share one queue. Without the app, it runs the work itself. Either way every job holds the account's software lock from `packages/software` while it changes anything.
 
 ## Preinstalled apps and background updates
 

@@ -4,6 +4,7 @@ mod list;
 mod remove;
 mod search;
 mod system;
+mod trust;
 mod update;
 
 use super::Exit;
@@ -24,6 +25,8 @@ pub fn run(arguments: &Arguments) -> Exit {
         Command::Update => update::run(arguments),
         Command::List => list::run(arguments),
         Command::Info => info::run(arguments),
+        Command::Trust => trust::run(arguments, true),
+        Command::Untrust => trust::run(arguments, false),
     }
 }
 

@@ -22,6 +22,19 @@ Most desktop apps come from [Flathub](https://flathub.org). Schelf adds Flathub 
 
 The `flatpak` command works too: `flatpak install --user flathub org.example.App`.
 
+### Full access
+
+Flatpak apps run in a sandbox: they only see the files and devices they ask for, can't read the clipboard while you're using another app, and can't control other apps' windows. A few apps need more than that to work well, such as password managers that fill and clear the clipboard or AI assistants that work with your files. For those, turn on **Full access** on the app's page in Schelf. With it, the app can:
+
+- see and change all your files
+- read the clipboard in the background
+- control other apps' windows
+- act like an app installed on the system, including use your devices and talk to other apps
+
+Only give full access to apps you trust. Schelf asks you to confirm, then for an administrator's password, and the app gets its new access the next time it opens. Turning it off puts the app back in its sandbox as it shipped, which also undoes changes you made to its permissions with other tools, such as Flatseal.
+
+AppImages, command-line tools and system packages don't run in a sandbox, so they have full access already.
+
 ## AppImages
 
 Open an `.AppImage` file and Schelf offers to install it. It moves it into `~/Applications` and adds it to Start with its own icon, so it opens like any other app. AppImages you set up earlier with other tools, such as Gear Lever, are picked up too.
@@ -86,6 +99,8 @@ The `schelf` command, or `sch` for short, does the same as the app:
 | `schelf list` | Shows what you installed, by where it came from, and the system packages |
 | `schelf install --system tailscale` | Adds a Fedora package to the system ([more](#system-packages)) |
 | `schelf info gimp` | Shows the details from every place that has it |
+| `schelf trust 1password` | Gives a Flatpak app [full access](#full-access), after warning you and asking first |
+| `schelf untrust 1password` | Puts it back in its sandbox |
 
 When a name is both on Flathub and in Fedora, a desktop app comes from Flathub and a command-line tool from Fedora. If that still leaves a choice, Schelf asks which one you mean. `--flathub` or `--fedora` picks the place yourself, `-y` goes ahead without asking, and `schelf --help` lists everything.
 

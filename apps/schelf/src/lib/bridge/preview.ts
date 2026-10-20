@@ -94,6 +94,7 @@ const fedora: FedoraSummary[] = [
 
 let operations: Operation[] = [];
 let nextId = 1;
+const fullAccess = new Set<string>();
 const listeners = { operations: new Set<(list: Operation[]) => void>(), library: new Set<(finished: Finished) => void>() };
 
 function publish() {
@@ -148,6 +149,12 @@ export const preview: Backend = {
 		return tools.filter((tool) => tool.package.includes(query.toLowerCase()));
 	},
 	permissions: async () => ({ shared: ['network', 'ipc'], sockets: ['wayland', 'pulseaudio'], devices: ['dri'], filesystems: ['xdg-download'], sessionBus: [], systemBus: [] }),
+	fullAccess: async (id) => fullAccess.has(id),
+	setFullAccess: async (id, on) => {
+		await new Promise((resolve) => setTimeout(resolve, 600));
+		if (on) fullAccess.add(id);
+		else fullAccess.delete(id);
+	},
 	checkUpdates: async () => {
 		await new Promise((resolve) => setTimeout(resolve, 600));
 		return { apps: updates, checked: Math.floor(Date.now() / 1000) - 240, error: null };

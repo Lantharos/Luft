@@ -161,6 +161,8 @@ export interface Backend {
 	fedoraRemovalPlan(packageName: string): Promise<string[]>;
 	searchTools(query: string): Promise<ToolSummary[]>;
 	permissions(installation: Installation, reference: string): Promise<Permissions>;
+	fullAccess(id: string): Promise<boolean>;
+	setFullAccess(id: string, on: boolean): Promise<void>;
 	checkUpdates(): Promise<Updates>;
 	inspectFile(path: string): Promise<OpenedFile>;
 	chooseAppImage(): Promise<string | null>;

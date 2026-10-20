@@ -5,22 +5,26 @@
 	import AppArt from '#lib/components/AppArt.svelte';
 	import Description from '#lib/components/Description.svelte';
 	import Screenshots from '#lib/components/Screenshots.svelte';
+	import { fedora } from '#lib/fedora/fedora.svelte.js';
 	import { backend } from '#lib/state/backend.js';
 	import { navigation, type AppTarget } from '#lib/state/navigation.svelte.js';
 	import AppActions from './AppActions.svelte';
 	import AppFacts from './AppFacts.svelte';
+	import FullAccess from './FullAccess.svelte';
 	import { installedFor, load, type Listing, type Loaded } from './load';
 
 	let { target, name }: { target: AppTarget; name: string } = $props();
 
 	let loaded = $state<Loaded | null>(null);
 	let localPermissions = $state<Permissions | null>(null);
+	let fullAccess = $state(false);
 
 	const details = $derived(loaded?.details ?? null);
 	const installed = $derived(installedFor(target, details));
 	const permissions = $derived(localPermissions ?? details?.permissions ?? null);
 	const title = $derived(details?.name ?? installed?.name ?? name);
 	const summary = $derived(details?.summary ?? installed?.summary ?? '');
+	const sandboxed = $derived(installed?.source === 'flatpak' && !fedora.available ? installed : null);
 
 	$effect(() => {
 		const current = target;
@@ -98,7 +102,11 @@
 				</section>
 			{/if}
 			<AppFacts {details} {installed} />
-			{#if permissions}
+			{#if sandboxed}
+				<AccessList permissions={fullAccess ? null : permissions}>
+					<FullAccess app={sandboxed} bind:on={fullAccess} />
+				</AccessList>
+			{:else if permissions}
 				<AccessList {permissions} />
 			{/if}
 		{/if}

@@ -8,16 +8,20 @@ pub enum Command {
     Update,
     List,
     Info,
+    Trust,
+    Untrust,
 }
 
 impl Command {
-    const ALL: [Self; 6] = [
+    const ALL: [Self; 8] = [
         Self::Install,
         Self::Remove,
         Self::Search,
         Self::Update,
         Self::List,
         Self::Info,
+        Self::Trust,
+        Self::Untrust,
     ];
 
     pub fn word(self) -> &'static str {
@@ -28,6 +32,8 @@ impl Command {
             Self::Update => "update",
             Self::List => "list",
             Self::Info => "info",
+            Self::Trust => "trust",
+            Self::Untrust => "untrust",
         }
     }
 
@@ -72,6 +78,18 @@ impl Command {
                 "info NAME  [--flathub|--fedora|--appimage]\n\n\
                  Shows the details of an app or command-line tool, from every source\n\
                  that has it."
+            }
+            Self::Trust => {
+                "trust NAME...  [-y]\n\n\
+                 Gives Flatpak apps full access: they can see and change all your files,\n\
+                 read the clipboard in the background, control other apps' windows and\n\
+                 act like apps installed on the system. Only do this for apps you trust.\n\
+                 It asks for an administrator's password and takes effect the next time\n\
+                 the app opens."
+            }
+            Self::Untrust => {
+                "untrust NAME...\n\n\
+                 Takes full access away again and puts apps back in their sandbox."
             }
         }
     }
@@ -132,7 +150,12 @@ pub fn parse(arguments: &[String]) -> Result<Request, String> {
     }
     let needs_words = matches!(
         command,
-        Command::Install | Command::Remove | Command::Search | Command::Info
+        Command::Install
+            | Command::Remove
+            | Command::Search
+            | Command::Info
+            | Command::Trust
+            | Command::Untrust
     );
     if needs_words && parsed.words.is_empty() {
         return Err(format!("{} needs a name.", command.word()));
@@ -156,7 +179,9 @@ pub fn help(program: &str, command: Option<Command>) -> String {
          \x20 search QUERY          Look for apps and tools everywhere\n\
          \x20 update [NAME...]      Update apps, AppImages and tools\n\
          \x20 list                  Show what you installed\n\
-         \x20 info NAME             Show details\n\n\
+         \x20 info NAME             Show details\n\
+         \x20 trust NAME...         Give Flatpak apps full access\n\
+         \x20 untrust NAME...       Put them back in their sandbox\n\n\
          Options:\n\
          \x20 --flathub, --fedora, --appimage  Use only this source\n\
          \x20 --system              Fedora packages for the whole system, such as services\n\

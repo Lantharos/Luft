@@ -30,6 +30,16 @@ pub fn confirm(question: &str) -> bool {
     }
 }
 
+pub fn agree(question: &str) -> bool {
+    loop {
+        match ask(&format!("{question} [y/N]")).as_deref() {
+            None | Some("" | "n" | "no") => return false,
+            Some("y" | "yes") => return true,
+            Some(_) => eprintln!("Answer y or n."),
+        }
+    }
+}
+
 pub fn choose(options: &[String]) -> Option<usize> {
     let ink = Ink::stderr();
     for (number, option) in options.iter().enumerate() {

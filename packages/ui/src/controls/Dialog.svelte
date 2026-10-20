@@ -21,7 +21,7 @@
 
 	$effect(() => {
 		const previous = document.activeElement as HTMLElement | null;
-		(actionBar?.querySelector<HTMLElement>('.primary:not(:disabled)') ?? panel)?.focus();
+		(actionBar?.querySelector<HTMLElement>('[data-autofocus]') ?? actionBar?.querySelector<HTMLElement>('.primary:not(:disabled)') ?? panel)?.focus();
 		return () => previous?.focus();
 	});
 

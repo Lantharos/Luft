@@ -46,6 +46,7 @@ kestrel_deps = [
   polkit_dep,
   libsystemd_dep,
   libpipewire_dep,
+  gstreamer_dep,
   pango_dep,
   pangofc_dep,
   fontconfig_dep,
@@ -84,6 +85,7 @@ libshell_public_headers = [
   'mixer/shell-mixer.h',
   'mixer/shell-mixer-device.h',
   'mixer/shell-mixer-stream.h',
+  'sound/shell-sound-player.h',
 ]
 
 libshell_private_headers = [
@@ -94,6 +96,7 @@ libshell_private_headers = [
   'shell-global-private.h',
   'shell-wm-private.h',
   'mixer/shell-mixer-private.h',
+  'sound/shell-sound-private.h',
 ]
 
 libshell_sources = [
@@ -133,6 +136,10 @@ libshell_sources = [
   'mixer/shell-mixer-headset.c',
   'mixer/shell-mixer-server.c',
   'mixer/shell-mixer-stream.c',
+  'sound/shell-sound-decode.c',
+  'sound/shell-sound-output.c',
+  'sound/shell-sound-player.c',
+  'sound/shell-sound-theme.c',
 ]
 
 libshell_private_sources = [

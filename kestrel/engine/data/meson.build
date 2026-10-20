@@ -10,7 +10,7 @@ data_resources = [
   {'name': 'theme', 'deps': theme_deps}
 ]
 
-install_subdir('sounds', install_dir: pkgdatadir)
+install_subdir('sounds/luft', install_dir: datadir / 'sounds')
 subdir('fonts')
 subdir('dconf')
 data_resources_targets = []
@@ -73,7 +73,7 @@ configure_file(
   configuration: schemaconf,
   install_dir: schemadir
 )
-foreach name : ['copilot-key', 'diagnostics', 'dictation', 'media-keys', 'night-light', 'power', 'touchscreen']
+foreach name : ['copilot-key', 'diagnostics', 'dictation', 'media-keys', 'night-light', 'power', 'sounds', 'touchscreen']
   configure_file(
     input: 'com.lantharos.kestrel.@0@.gschema.xml'.format(name),
     output: 'com.lantharos.kestrel.@0@.gschema.xml'.format(name),

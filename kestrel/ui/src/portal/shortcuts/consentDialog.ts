@@ -24,6 +24,7 @@ export async function allowShortcuts(handle: string, appId: string, requested: R
     title: `Let ${app.object} use keyboard shortcuts?`,
     description: `These shortcuts reach ${app.object} even while you use other apps.`,
     icon: 'preferences-desktop-keyboard-shortcuts-symbolic',
+    askedBy: appId,
   }, dialog => {
     const list = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-shortcut-list', x_expand: true });
     for (const shortcut of requested) list.add_child(shortcutRow(shortcut));

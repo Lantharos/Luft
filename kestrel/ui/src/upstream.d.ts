@@ -130,8 +130,11 @@ declare module 'resource:///com/lantharos/kestrel/ui/messageTray.js' {
   import Gio from 'gi://Gio';
   export const Urgency: { LOW: number; NORMAL: number; HIGH: number; CRITICAL: number };
   export const PrivacyScope: { USER: number; SYSTEM: number };
+  export class Sound {
+    constructor(sound: import('./system/sounds/sounds.js').NotificationSound | null);
+  }
   export class Notification {
-    constructor(params: { source: Source; title: string; body: string; gicon?: Gio.Icon; urgency?: number; privacyScope?: number });
+    constructor(params: { source: Source; title: string; body: string; gicon?: Gio.Icon; urgency?: number; privacyScope?: number; sound?: Sound });
     connect(signal: 'destroy', callback: () => void): number;
     addAction(label: string, callback: () => void): void;
     destroy(): void;

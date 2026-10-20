@@ -23,13 +23,20 @@ import { DesktopPolicy } from './peek/access/desktop.js';
 import { PeekService } from './peek/service.js';
 import { MediaKeys } from './mediaKeys/mediaKeys.js';
 import { BatteryWarnings } from './power/batteryWarnings.js';
-import { PlugSounds } from './power/plugSounds.js';
+import { ChargerSound } from './sounds/charger.js';
+import { DeviceSounds } from './sounds/devices.js';
+import { RecordingSounds } from './sounds/recording.js';
+import { SoundService } from './sounds/service.js';
+import { playSound } from './sounds/sounds.js';
 
 export class SystemServices {
   private readonly oomNotifier = new OomNotifier();
   private readonly health = new Health();
   private readonly batteryWarnings = new BatteryWarnings();
-  private readonly plugSounds = new PlugSounds();
+  private readonly chargerSound = new ChargerSound();
+  private readonly deviceSounds = new DeviceSounds();
+  private readonly recordingSounds = new RecordingSounds();
+  private readonly soundService = new SoundService();
   private readonly launchFeedback = new LaunchFeedback();
   private readonly openWindows = new OpenWindows();
   private readonly variableRefresh = new VariableRefresh();
@@ -57,6 +64,7 @@ export class SystemServices {
     confirmStartupOnceSettled(context.layoutManager);
     const startup = context.layoutManager.connect('startup-complete', () => {
       context.layoutManager.disconnect(startup);
+      playSound('sign-in');
       void notifyAboutIncidents();
     });
   }
@@ -72,7 +80,10 @@ export class SystemServices {
     this.oomNotifier.destroy();
     this.health.destroy();
     this.batteryWarnings.destroy();
-    this.plugSounds.destroy();
+    this.chargerSound.destroy();
+    this.deviceSounds.destroy();
+    this.recordingSounds.destroy();
+    this.soundService.destroy();
     this.launchFeedback.destroy();
     this.openWindows.destroy();
     this.variableRefresh.destroy();

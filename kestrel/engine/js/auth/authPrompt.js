@@ -6,6 +6,7 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import * as Animation from '../ui/animation.js';
+import * as KestrelUi from '../ui/kestrelUi.js';
 import * as ShellEntry from '../ui/shellEntry.js';
 import * as UserWidget from '../ui/userWidget.js';
 import {wiggle} from '../misc/animationUtils.js';
@@ -301,6 +302,7 @@ export const AuthPrompt = GObject.registerClass({
         const password = this._question?.secret && PASSWORD_QUESTIONS.includes(this._question.text);
         this._setMessage(password ? _('That password didn’t work') : _('That didn’t work. Try again.'), true);
         wiggle(this._entryArea);
+        KestrelUi.playSound('error');
         this._question = null;
         this._preemptiveAnswer = null;
         this._setBusy(false);

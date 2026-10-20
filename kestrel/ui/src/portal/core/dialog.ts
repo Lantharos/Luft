@@ -2,6 +2,7 @@ import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
 import type { ButtonInfo, ModalDialog } from 'resource:///com/lantharos/kestrel/ui/modalDialog.js';
+import { promptAppeared } from '../../system/sounds/sounds.js';
 import { CANCELLED, ENDED, PortalRequest, type Options, type Outcome } from './request.js';
 
 interface DialogSpec {
@@ -9,6 +10,7 @@ interface DialogSpec {
   description?: string;
   icon: string;
   styleClass?: string;
+  askedBy?: string;
 }
 
 export interface PortalDialog {
@@ -54,6 +56,8 @@ export async function openDialog(handle: string | null, spec: DialogSpec, build:
       request?.finish();
       modal.destroy();
       resolve([ENDED, {}]);
+    } else if (spec.askedBy !== undefined) {
+      promptAppeared(spec.askedBy);
     }
   });
 }

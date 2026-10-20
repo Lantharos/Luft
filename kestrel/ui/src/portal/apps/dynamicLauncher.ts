@@ -42,6 +42,7 @@ export class DynamicLauncherPortal {
       title: site ? 'Add this website to your apps?' : 'Add this to your apps?',
       description: site ? `${site} will open in its own window from Start.` : `${appNames(appId).subject} wants to add an app to Start.`,
       icon: 'list-add-symbolic',
+      askedBy: appId,
     }, dialog => {
       const editable = option<boolean>(options, 'editable_name') ?? true;
       const entry = new St.Entry({ text: name, can_focus: editable, x_expand: true });

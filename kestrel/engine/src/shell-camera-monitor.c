@@ -23,10 +23,8 @@
 
 #include "shell-camera-monitor.h"
 
-#ifdef HAVE_PIPEWIRE
 #include <pipewire/pipewire.h>
 #include <spa/utils/result.h>
-#endif
 
 #define RECONNECT_DELAY_MS 5000
 #define DISABLE_DELAY_MS 500
@@ -44,7 +42,6 @@ struct _ShellCameraMonitor {
 
   gboolean cameras_in_use;
 
-#ifdef HAVE_PIPEWIRE
   GPtrArray *node_list;
   guint reconnect_id;
   guint delayed_disable_id;
@@ -55,12 +52,10 @@ struct _ShellCameraMonitor {
   struct pw_registry *registry;
   struct spa_hook core_listener;
   struct spa_hook registry_listener;
-#endif
 };
 
 G_DEFINE_TYPE (ShellCameraMonitor, shell_camera_monitor, G_TYPE_OBJECT);
 
-#ifdef HAVE_PIPEWIRE
 typedef struct _Node {
   ShellCameraMonitor *monitor;
   gboolean running;
@@ -370,12 +365,10 @@ create_pipewire_source (struct pw_loop *pipewire_loop)
   return source;
 }
 
-#endif
 
 static void
 shell_camera_monitor_finalize (GObject *object)
 {
-#ifdef HAVE_PIPEWIRE
   ShellCameraMonitor *monitor = SHELL_CAMERA_MONITOR (object);
 
   shell_camera_monitor_disconnect_core (monitor);
@@ -384,7 +377,6 @@ shell_camera_monitor_finalize (GObject *object)
   g_clear_pointer (&monitor->pipewire_source, g_source_destroy);
   g_clear_handle_id (&monitor->reconnect_id, g_source_remove);
   pw_deinit ();
-#endif
 
   G_OBJECT_CLASS (shell_camera_monitor_parent_class)->finalize (object);
 }
@@ -427,7 +419,6 @@ shell_camera_monitor_class_init (ShellCameraMonitorClass *klass)
 static void
 shell_camera_monitor_init (ShellCameraMonitor *monitor)
 {
-#ifdef HAVE_PIPEWIRE
   struct pw_loop *pipewire_loop;
 
   monitor->node_list =
@@ -454,7 +445,6 @@ shell_camera_monitor_init (ShellCameraMonitor *monitor)
 
 error:
     g_message ("Failed to start camera monitor");
-#endif
 }
 
 gboolean

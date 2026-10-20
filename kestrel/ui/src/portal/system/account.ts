@@ -35,6 +35,7 @@ export class AccountPortal {
       title: `Share your name and picture with ${app.object}?`,
       description: option<string>(options, 'reason') || `${app.subject} will see the name and picture of your account.`,
       icon: 'avatar-default-symbolic',
+      askedBy: appId,
     }, dialog => {
       const avatar = new Avatar(user, { styleClass: 'kestrel-portal-avatar', iconSize: 40 });
       avatar.update();

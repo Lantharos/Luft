@@ -7,6 +7,7 @@ import { getInputSourceManager } from 'resource:///com/lantharos/kestrel/ui/stat
 
 import type { Context } from '../../context.js';
 import { openSettings } from '../settingsPages.js';
+import { playSound } from '../sounds/sounds.js';
 import { ownDictation } from './listening.js';
 import { DictationPill } from './pill/pill.js';
 import { NotInstalled, Speech, Unsupported } from './speech.js';
@@ -81,6 +82,7 @@ export class Dictation {
     this.mode = mode;
     this.target = this.context.inputMethod.currentFocus;
     ownDictation.active = true;
+    playSound('recording-started');
     this.pill.listen();
     this.listenForEscape();
     this.started = this.speech.start(currentLayout()).then(() => true, error => {
@@ -97,6 +99,7 @@ export class Dictation {
     if (this.phase !== 'listening') return;
     const session = this.session;
     this.phase = 'finishing';
+    playSound('recording-stopped');
     this.pill.processing();
     this.stopListeningForEscape();
     this.started
@@ -152,6 +155,7 @@ export class Dictation {
   }
 
   private finish(): void {
+    if (this.phase === 'listening') playSound('recording-stopped');
     this.clearPreedit();
     this.stopListeningForEscape();
     this.phase = 'idle';

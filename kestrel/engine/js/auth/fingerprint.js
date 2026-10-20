@@ -1,3 +1,4 @@
+import * as KestrelUi from '../ui/kestrelUi.js';
 import * as Signals from '../misc/signals.js';
 import {Authentication} from './authentication.js';
 import {connectAuthenticator} from './greetd.js';
@@ -49,10 +50,12 @@ export class FingerprintAuthentication extends Signals.EventEmitter {
 
     _onMessage(text, isError) {
         if (isError) {
-            if (this._listening)
+            if (this._listening) {
+                KestrelUi.playSound('error');
                 this.emit('hint', _('Fingerprint not recognized'));
-            else
+            } else {
                 this._stop(null);
+            }
             return;
         }
 
@@ -66,7 +69,11 @@ export class FingerprintAuthentication extends Signals.EventEmitter {
     _onFailed() {
         if (!this._listening) {
             this._stop(null);
-        } else if (this._restarts < RESTARTS) {
+            return;
+        }
+
+        KestrelUi.playSound('error');
+        if (this._restarts < RESTARTS) {
             this._restarts++;
             this.emit('hint', _('Fingerprint not recognized'));
             this._start();

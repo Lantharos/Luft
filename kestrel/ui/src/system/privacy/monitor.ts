@@ -5,6 +5,7 @@ import type { getGeoclueAgent } from 'resource:///com/lantharos/kestrel/ui/statu
 import { ownDictation } from '../dictation/listening.js';
 import { windowAccess } from '../peek/access/grants.js';
 import { mixer } from '../mediaKeys/mixer.js';
+import { cameraMonitor } from './camera.js';
 
 export interface PrivacyState {
   camera: boolean;
@@ -17,7 +18,7 @@ export interface PrivacyState {
 
 export class PrivacyMonitor {
   readonly handles = new Set<Meta.RemoteAccessHandle>();
-  private readonly camera = new Shell.CameraMonitor();
+  private readonly camera = cameraMonitor();
   private readonly mixer = mixer();
   private geoclue: ReturnType<typeof getGeoclueAgent> | null = null;
   private readonly disconnectors: (() => void)[] = [];

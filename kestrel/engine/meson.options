@@ -1,5 +1,0 @@
-option('camera_monitor',
-  type: 'boolean',
-  value: true,
-  description: 'Enable the camera monitor'
-)

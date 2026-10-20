@@ -1,0 +1,39 @@
+<schemalist>
+  <schema id="com.lantharos.kestrel.sounds" path="/com/lantharos/kestrel/sounds/">
+    <key name="notifications" type="b">
+      <default>true</default>
+      <summary>Notification sounds</summary>
+      <description>Plays a sound when a notification or new mail arrives. Do Not Disturb, the lock screen, a fullscreen game and sharing the screen keep them quiet.</description>
+    </key>
+    <key name="devices" type="b">
+      <default>true</default>
+      <summary>Device and charging sounds</summary>
+      <description>Plays a sound when a USB or Bluetooth device connects or disconnects, when the charger is plugged in, and when the battery runs low.</description>
+    </key>
+    <key name="volume-feedback" type="b">
+      <default>true</default>
+      <summary>Volume feedback</summary>
+      <description>Plays a short tick on the output whose volume changed, from the volume keys or slider.</description>
+    </key>
+    <key name="screenshots" type="b">
+      <default>true</default>
+      <summary>Screenshot sound</summary>
+      <description>Plays a shutter sound when a screenshot is saved.</description>
+    </key>
+    <key name="recording" type="b">
+      <default>true</default>
+      <summary>Recording sounds</summary>
+      <description>Plays a sound when screen recording, screen sharing, the camera or dictation starts and stops.</description>
+    </key>
+    <key name="sign-in" type="b">
+      <default>true</default>
+      <summary>Sign-in sound</summary>
+      <description>Plays a sound once when the desktop appears after signing in.</description>
+    </key>
+    <key name="keyboard" type="b">
+      <default>false</default>
+      <summary>Keyboard taps</summary>
+      <description>Plays a soft tap for each key on the on-screen keyboard, with their own sounds for delete and space.</description>
+    </key>
+  </schema>
+</schemalist>

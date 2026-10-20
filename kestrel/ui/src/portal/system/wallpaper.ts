@@ -46,6 +46,7 @@ async function confirm(handle: string, appId: string, bytes: GLib.Bytes): Promis
     title: 'Set as your wallpaper?',
     description: `${appNames(appId).subject} wants to change your wallpaper. It's used in light and dark style and on the lock screen.`,
     icon: 'preferences-desktop-wallpaper-symbolic',
+    askedBy: appId,
   }, dialog => {
     dialog.content.add_child(new St.Widget({ content: preview.content, width: preview.width, height: preview.height, x_align: Clutter.ActorAlign.CENTER }));
     dialog.buttons([

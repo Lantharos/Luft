@@ -4,6 +4,7 @@ import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import Shell from 'gi://Shell';
 
+import * as KestrelUi from '../kestrelUi.js';
 import * as Main from '../main.js';
 import * as PopupMenu from '../popupMenu.js';
 
@@ -60,7 +61,6 @@ const StreamSlider = GObject.registerClass({
         this.menu.addSettingsAction(_('Sound Settings'), 'sound');
 
         this._stream = null;
-        this._volumeCancellable = null;
 
         this._mixer.connectObject(
             `notify::${output ? 'output' : 'input'}`, () => (this.stream = this._defaultStream()),
@@ -151,18 +151,8 @@ const StreamSlider = GObject.registerClass({
     }
 
     _notifyVolumeChange() {
-        if (this._volumeCancellable)
-            this._volumeCancellable.cancel();
-        this._volumeCancellable = null;
-
-        if (this._stream.running)
-            return;
-
-        this._volumeCancellable = new Gio.Cancellable();
-        const player = global.display.get_sound_player();
-        player.play_from_file(
-            Gio.File.new_for_path(`${global.datadir}/sounds/audio-volume-change.oga`),
-            _('Volume changed'), this._volumeCancellable);
+        if (this._output && !this._stream.muted && !this._stream.running)
+            KestrelUi.playSound('volume-tick');
     }
 
     _changeSlider(value) {

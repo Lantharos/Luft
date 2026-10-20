@@ -24,6 +24,7 @@ polkit_req = '>= 0.100'
 schemas_req = '>= 50.alpha'
 systemd_req = '>= 246'
 pipewire_req = '>= 0.3.49'
+gstreamer_req = '>= 1.24'
 pango_req = '>= 1.46.0'
 harfbuzz_req = '>= 13.0.0'
 json_glib_req = '>= 1.6'
@@ -104,13 +105,8 @@ nm_deps = [
   dependency('libsecret-1', version: secret_req),
 ]
 
-if get_option('camera_monitor')
-  libpipewire_dep = dependency('libpipewire-0.3', version: pipewire_req)
-  have_pipewire = true
-else
-  libpipewire_dep = []
-  have_pipewire = false
-endif
+libpipewire_dep = dependency('libpipewire-0.3', version: pipewire_req)
+gstreamer_dep = dependency('gstreamer-1.0', version: gstreamer_req)
 
 libsystemd_dep = dependency('libsystemd', version: systemd_req)
 systemd_dep = dependency('systemd', version: systemd_req)
@@ -131,7 +127,6 @@ cdata = configuration_data()
 cdata.set_quoted('GETTEXT_PACKAGE', meson.project_name())
 cdata.set_quoted('VERSION', meson.project_version())
 
-cdata.set('HAVE_PIPEWIRE', have_pipewire)
 cdata.set('HAVE_XWAYLAND', have_xwayland)
 
 cdata.set('HAVE_SYS_RESOURCE_H', cc.has_header('sys/resource.h'))
@@ -223,7 +218,6 @@ gnome.post_install(glib_compile_schemas: true)
 
 summary_options = {
   'have_xwayland': have_xwayland,
-  'camera_monitor': get_option('camera_monitor'),
 }
 
 summary_build = {

@@ -34,8 +34,6 @@ class AutomountManager {
         this._volumeMonitor.connectObject(
             'volume-added', this._onVolumeAdded.bind(this),
             'volume-removed', this._onVolumeRemoved.bind(this),
-            'drive-connected', this._onDriveConnected.bind(this),
-            'drive-disconnected', this._onDriveDisconnected.bind(this),
             'drive-eject-button', this._onDriveEjectButton.bind(this), this);
 
         this._mountAllId = GLib.idle_add_once(GLib.PRIORITY_DEFAULT, this._startupMountAll.bind(this));
@@ -73,32 +71,6 @@ class AutomountManager {
         });
 
         this._mountAllId = 0;
-    }
-
-    _onDriveConnected() {
-        // if we're not in the current ConsoleKit session,
-        // or screensaver is active, don't play sounds
-        if (!this._session.SessionIsActive)
-            return;
-
-        const player = global.display.get_sound_player();
-        player.play_from_file(
-            Gio.File.new_for_path(`${global.datadir}/sounds/device-added.oga`),
-            _('External drive connected'),
-            null);
-    }
-
-    _onDriveDisconnected() {
-        // if we're not in the current ConsoleKit session,
-        // or screensaver is active, don't play sounds
-        if (!this._session.SessionIsActive)
-            return;
-
-        const player = global.display.get_sound_player();
-        player.play_from_file(
-            Gio.File.new_for_path(`${global.datadir}/sounds/device-removed.oga`),
-            _('External drive disconnected'),
-            null);
     }
 
     _onDriveEjectButton(monitor, drive) {

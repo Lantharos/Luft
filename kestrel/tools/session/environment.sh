@@ -125,6 +125,8 @@ prepare_session() {
   export XCURSOR_PATH="$XDG_DATA_HOME/icons:$HOME/.local/share/icons:$HOME/.icons:/usr/share/icons:/usr/share/pixmaps"
   mkdir -p "$session/data/fonts"
   ln -sfn "$build/data/fonts" "$session/data/fonts/luft"
+  mkdir -p "$session/data/sounds"
+  ln -sfn "$root/kestrel/engine/data/sounds/luft" "$session/data/sounds/luft"
   write_dbus_services
   mkdir -p "$session/data/xdg-desktop-portal/portals" "$session/config/xdg-desktop-portal"
   ln -sfn "$root/kestrel/engine/data/session/kestrel.portal" "$session/data/xdg-desktop-portal/portals/kestrel.portal"

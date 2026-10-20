@@ -1,0 +1,8 @@
+[Sound Theme]
+Name=Luft
+Comment=Luft's system sounds
+Inherits=freedesktop
+Directories=stereo
+
+[stereo]
+OutputProfile=stereo

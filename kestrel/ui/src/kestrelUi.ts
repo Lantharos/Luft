@@ -53,6 +53,7 @@ export { SwipeAway } from './surfaces/notifications/swipeAway.js';
 export { published as portalPublished } from './portal/backend.js';
 export { ownOnItsOwnConnection } from './shared/dedicatedName.js';
 export { refuseSandboxed } from './shared/sandbox.js';
+export { playNotificationSound, playSound, startSounds } from './system/sounds/sounds.js';
 
 type Signals = { connect(signal: string, callback: (...args: any[]) => any): number; disconnect(id: number): void };
 

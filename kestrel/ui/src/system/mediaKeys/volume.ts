@@ -1,8 +1,8 @@
 import Gio from 'gi://Gio';
-import type Shell from 'gi://Shell';
 import { askForAudioDevice } from 'resource:///com/lantharos/kestrel/ui/audioDeviceSelection.js';
 
 import type { Context } from '../../context.js';
+import { playSound } from '../sounds/sounds.js';
 import { maxAmplified, mixer, type MixerHeadset, type MixerStream } from './mixer.js';
 
 type ShowOsd = Context['showOsd'];
@@ -64,8 +64,7 @@ export class VolumeKeys {
     const changed = muted !== oldMuted || volume !== oldVolume;
     const level = muted ? 0 : Math.min(volume, max);
     this.showOsd(Gio.ThemedIcon.new(icon(output, muted, level)), deviceLabel(stream), level, max);
-    if (output && changed && !quiet && !muted && !stream.running)
-      (global as unknown as Shell.Global).display.get_sound_player().play_from_theme('audio-volume-change', 'Volume changed', null);
+    if (output && changed && !quiet && !muted && !stream.running) playSound('volume-tick');
   }
 
   private askForDevice(choices: MixerHeadset | 0): void {

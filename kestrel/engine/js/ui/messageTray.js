@@ -341,22 +341,19 @@ export const NotificationApplicationPolicy = GObject.registerClass({
     }
 });
 
+const URGENCY_SOUNDS = {
+    [Urgency.LOW]: 'dialog-information',
+    [Urgency.NORMAL]: 'message-new-instant',
+    [Urgency.HIGH]: 'message-new-instant',
+    [Urgency.CRITICAL]: 'dialog-warning',
+};
+
 export const Sound = GObject.registerClass(
 class Sound extends GObject.Object {
-    constructor(file, themedName) {
+    constructor(sound) {
         super();
 
-        this._soundFile = file;
-        this._soundName = themedName;
-    }
-
-    play() {
-        const player = global.display.get_sound_player();
-
-        if (this._soundName)
-            player.play_from_theme(this._soundName, _('Notification sound'), null);
-        else if (this._soundFile)
-            player.play_from_file(this._soundFile, _('Notification sound'), null);
+        this.sound = sound;
     }
 });
 
@@ -483,10 +480,10 @@ export class Notification extends GObject.Object {
     }
 
     playSound() {
-        if (!this.source.policy.enableSound)
+        if (!this.source.policy.enableSound || this.forFeedback || this.sound?.sound === null)
             return;
 
-        this.sound?.play(this.title);
+        KestrelUi.playNotificationSound(this.sound?.sound ?? {name: URGENCY_SOUNDS[this.urgency]});
     }
 
     activate() {
@@ -940,6 +937,9 @@ export class MessageTray extends St.Widget {
         if (notification.acknowledged)
             return;
 
+        if (this._soundAllowed(notification))
+            notification.playSound();
+
         if (!this._bannerAllowed(notification)) {
             if (!notification.source.policy.keepInList)
                 this._discardSoon(notification);
@@ -966,6 +966,14 @@ export class MessageTray extends St.Widget {
             }
         }
         this._updateState();
+    }
+
+    _soundAllowed(notification) {
+        if (this._notificationSettings.get_boolean('show-banners'))
+            return true;
+        const {duringDoNotDisturb} = notification.source.policy;
+        return duringDoNotDisturb === 'always' ||
+            (notification.urgency === Urgency.CRITICAL && duringDoNotDisturb === 'urgent');
     }
 
     _bannerAllowed(notification) {
@@ -1205,7 +1213,6 @@ export class MessageTray extends St.Widget {
 
     _updateShowingNotification() {
         this._notification.acknowledged = true;
-        this._notification.playSound();
 
         // We auto-expand notifications with CRITICAL urgency, or for which the relevant setting
         // is on in the control center.

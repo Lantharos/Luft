@@ -25,7 +25,7 @@ export async function askForAccess(caller: Caller, level: Level): Promise<Answer
     answer = choice;
     finish(SUCCESS);
   };
-  await openDialog(null, { title: copy.title(caller.name), description: copy.description, icon: copy.icon, styleClass: 'kestrel-peek-dialog' }, dialog => {
+  await openDialog(null, { title: copy.title(caller.name), description: copy.description, icon: copy.icon, styleClass: 'kestrel-peek-dialog', askedBy: caller.app?.get_id() ?? '' }, dialog => {
     dialog.content.hide();
     dialog.buttons([
       { label: 'Don’t allow', action: dialog.cancel },

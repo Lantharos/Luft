@@ -38,6 +38,7 @@ export class UsbPortal {
       title: devices.length > 1 ? `Let ${app.object} use these devices?` : `Let ${app.object} use this device?`,
       description: `${app.subject} will be able to talk to the device directly while it's plugged in.`,
       icon: 'media-removable-symbolic',
+      askedBy: appId,
     }, dialog => {
       const rows = devices.map(device => row({ icon: 'media-removable-symbolic', ...describe(device), checked: true }));
       dialog.content.add_child(list(rows, rows.length > 5));

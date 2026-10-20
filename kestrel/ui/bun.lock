@@ -13,6 +13,7 @@
         "@girs/gjs": "5.5.0",
         "@girs/glib-2.0": "5.5.0",
         "@girs/glibunix-2.0": "5.5.0",
+        "@girs/gudev-1.0": "5.5.0",
         "@girs/ibus-1.0": "5.5.0",
         "@girs/meta-51": "5.5.0",
         "@girs/pangocairo-1.0": "5.5.0",
@@ -116,6 +117,8 @@
     "@girs/gobject-2.0": ["@girs/gobject-2.0@5.5.0", "", { "dependencies": { "@girs/gjs": "^5.5.0", "@girs/glib-2.0": "^5.5.0" } }, "sha512-UYLbIaSOMyze9xRa7AS922t3o+5lTu0RRJ7mhLzAjBQ8iD48ttIVJIHkdPe7vq6h17pUsesMXHRfszn5eSZS/Q=="],
 
     "@girs/graphene-1.0": ["@girs/graphene-1.0@5.5.0", "", { "dependencies": { "@girs/gjs": "^5.5.0", "@girs/glib-2.0": "^5.5.0", "@girs/gobject-2.0": "^5.5.0" } }, "sha512-SYeJPLV/+8ez8aj55kVaKNqlPtWaA6HNNYFB7mtXEMWezfC0uE7vKfJbTBnXf1C2kkOz2O6LN6DRx3J4OaHGNg=="],
+
+    "@girs/gudev-1.0": ["@girs/gudev-1.0@5.5.0", "", { "dependencies": { "@girs/gjs": "^5.5.0", "@girs/glib-2.0": "^5.5.0", "@girs/gobject-2.0": "^5.5.0" } }, "sha512-0A8u3w92punc1bJ9+p6rXt2djVAVjrCWbTjFbAuNcMp2K750rb5r/clwIvE53IQMVr9rzx+LKYY/jytTuVMBjg=="],
 
     "@girs/gvc-1.0": ["@girs/gvc-1.0@5.5.0", "", { "dependencies": { "@girs/gio-2.0": "^5.5.0", "@girs/gjs": "^5.5.0", "@girs/glib-2.0": "^5.5.0", "@girs/gmodule-2.0": "^5.5.0", "@girs/gobject-2.0": "^5.5.0" } }, "sha512-FY51IqSfIrJXtBxfcJRQePBIgROAW2oO8TYlWv99CoeILRWPzP1lHdMdvxlSBMy5xC91KYsiKDlZsvDYV9zIXw=="],
 

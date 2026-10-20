@@ -204,15 +204,12 @@ class FdoNotificationDaemon {
 
         const gicon = this._imageForNotificationData(hints);
 
-        const soundFile = 'sound-file' in hints
-            ? Gio.File.new_for_path(hints['sound-file']) : null;
-
         notification.set({
             title: summary,
             body,
             gicon,
             useBodyMarkup: true,
-            sound: new MessageTray.Sound(soundFile, hints['sound-name']),
+            sound: soundFromHints(hints),
             acknowledged: false,
         });
         notification.clearActions();
@@ -419,6 +416,25 @@ class FdoNotificationDaemonSource extends MessageTray.Source {
     }
 });
 
+function soundFromHints(hints) {
+    if (hints['suppress-sound'])
+        return new MessageTray.Sound(null);
+    if ('sound-name' in hints)
+        return new MessageTray.Sound({name: hints['sound-name']});
+    if ('sound-file' in hints)
+        return new MessageTray.Sound({file: Gio.File.new_for_commandline_arg(hints['sound-file'])});
+    return null;
+}
+
+function soundFromPortal(sound, fds) {
+    if (!sound)
+        return null;
+    if (sound.is_of_type(new GLib.VariantType('s')))
+        return sound.unpack() === 'silent' ? new MessageTray.Sound(null) : null;
+    const [kind, value] = sound.deepUnpack();
+    return kind === 'file' && fds ? new MessageTray.Sound({fds, index: value.unpack()}) : null;
+}
+
 const PRIORITY_URGENCY_MAP = {
     low: MessageTray.Urgency.LOW,
     normal: MessageTray.Urgency.NORMAL,
@@ -428,7 +444,7 @@ const PRIORITY_URGENCY_MAP = {
 
 const GtkNotificationDaemonNotification = GObject.registerClass(
 class GtkNotificationDaemonNotification extends MessageTray.Notification {
-    constructor(source, id, notification) {
+    constructor(source, id, notification, fds = null) {
         super({source});
         this._serialized = GLib.Variant.new('a{sv}', notification);
         this.id = id;
@@ -443,6 +459,7 @@ class GtkNotificationDaemonNotification extends MessageTray.Notification {
             'default-action': defaultAction,
             'default-action-target': defaultActionTarget,
             timestamp: time,
+            sound,
         } = notification;
 
         if (priority) {
@@ -474,6 +491,7 @@ class GtkNotificationDaemonNotification extends MessageTray.Notification {
                 ? Gio.icon_deserialize(gicon) : null,
             datetime: time
                 ? GLib.DateTime.new_from_unix_local(time.unpack()) : null,
+            sound: soundFromPortal(sound, fds),
         });
     }
 
@@ -706,7 +724,8 @@ class GtkNotificationDaemon {
 
         const notification = new GtkNotificationDaemonNotification(source,
             notificationId,
-            notificationSerialized);
+            notificationSerialized,
+            invocation.get_message().get_unix_fd_list());
         source.addNotification(notification);
 
         invocation.return_value(null);

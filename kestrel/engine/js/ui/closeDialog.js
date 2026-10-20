@@ -143,6 +143,7 @@ export const CloseDialog = GObject.registerClass({
 
         this._addWindowEffect();
         this._initDialog();
+        KestrelUi.playSound('warning');
 
         global.connectObject(
             'shutdown', () => this._onWait(), this._dialog);

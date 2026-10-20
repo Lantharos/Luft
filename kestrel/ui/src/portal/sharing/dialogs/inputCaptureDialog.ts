@@ -20,6 +20,7 @@ export async function chooseCapture(handle: string, appId: string, clipboardRequ
     title: `Let ${app.object} take over your keyboard and mouse?`,
     description: `When your pointer reaches the edge of the screen, ${app.object} can take over your keyboard and mouse, for example to control another computer.`,
     icon: 'input-mouse-symbolic',
+    askedBy: appId,
   }, dialog => {
     opened(dialog);
     const extras: St.Button[] = [];

@@ -20,6 +20,7 @@ export async function chooseSources(handle: string, appId: string, selection: Se
     title: `Share your screen with ${app.object}?`,
     description: `${app.subject} will be able to see what you choose.`,
     icon: 'screen-shared-symbolic',
+    askedBy: appId,
     styleClass: 'kestrel-portal-sharing',
   }, dialog => {
     opened(dialog);

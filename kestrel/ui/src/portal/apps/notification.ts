@@ -20,13 +20,14 @@ function applicationPath(appId: string): string {
 
 export class NotificationPortal {
   readonly dbus = portalObject(NOTIFICATION_XML, this);
-  readonly version = 1;
+  readonly version = 2;
   readonly SupportedOptions = {};
   private readonly subscription = Gio.DBus.session.signal_subscribe(NOTIFICATIONS[0], NOTIFICATIONS[2], 'ActionInvoked', NOTIFICATIONS[1], null,
     Gio.DBusSignalFlags.NONE, (_connection, _sender, _path, _iface, _signal, parameters) => this.invoked(parameters));
 
   AddNotificationAsync([appId, id, notification]: [string, string, Options], invocation: Invocation): void {
-    this.forward(invocation, 'AddNotification', new GLib.Variant('(ssa{sv})', [appId, id, notification]));
+    this.forward(invocation, 'AddNotification', new GLib.Variant('(ssa{sv})', [appId, id, notification]),
+      invocation.get_message().get_unix_fd_list());
   }
 
   RemoveNotificationAsync([appId, id]: [string, string], invocation: Invocation): void {
@@ -37,8 +38,8 @@ export class NotificationPortal {
     Gio.DBus.session.signal_unsubscribe(this.subscription);
   }
 
-  private forward(invocation: Invocation, method: string, parameters: GLib.Variant): void {
-    Gio.DBus.session.call(...NOTIFICATIONS, method, parameters, null, Gio.DBusCallFlags.NONE, -1, null)
+  private forward(invocation: Invocation, method: string, parameters: GLib.Variant, fds: Gio.UnixFDList | null = null): void {
+    Gio.DBus.session.call_with_unix_fd_list(...NOTIFICATIONS, method, parameters, null, Gio.DBusCallFlags.NONE, -1, fds, null)
       .then(() => invocation.return_value(null))
       .catch((error: GLib.Error) => invocation.return_gerror(error));
   }

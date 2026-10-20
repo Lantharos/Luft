@@ -2,6 +2,7 @@ import Gio from 'gi://Gio';
 import * as MessageTray from 'resource:///com/lantharos/kestrel/ui/messageTray.js';
 
 import { shortDuration } from '../../shared/duration.js';
+import { playSound } from '../sounds/sounds.js';
 import { PowerDevices, type PowerDevice } from './powerDevices.js';
 
 const SYSTEM_THRESHOLDS = [20, 10, 5];
@@ -88,12 +89,14 @@ export class BatteryWarnings {
       source, title, body, urgency,
       gicon: new Gio.ThemedIcon({ name: icon }),
       privacyScope: MessageTray.PrivacyScope.SYSTEM,
+      sound: new MessageTray.Sound(null),
     });
     notification.connect('destroy', () => {
       if (warned.notification === notification) warned.notification = null;
     });
     warned.notification = notification;
     source.addNotification(notification);
+    playSound('low-battery');
   }
 
   private clear(path: string): void {

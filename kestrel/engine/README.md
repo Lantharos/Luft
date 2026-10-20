@@ -29,7 +29,7 @@ The end session dialog is served for gnome-session at `/org/gnome/SessionManager
 | `~/.cache/kestrel/backgrounds` | Decoded wallpapers, reused between sessions |
 | `$XDG_RUNTIME_DIR/kestrel` | Runtime state for the current session |
 
-Logs use the `Kestrel` domain. Sound goes through libpulse, so it works with PipeWire and PulseAudio alike.
+Logs use the `Kestrel` domain. The volume controls go through libpulse, so they work with PipeWire and PulseAudio alike. System sounds play straight through PipeWire.
 
 ## License
 

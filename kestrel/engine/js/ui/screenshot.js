@@ -10,6 +10,7 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import * as GrabHelper from './grabHelper.js';
+import * as KestrelUi from './kestrelUi.js';
 import * as Layout from './layout.js';
 import * as Lightbox from './lightbox.js';
 import * as Main from './main.js';
@@ -2631,10 +2632,6 @@ export async function captureScreenshot(texture, geometry, scale, cursor) {
     if (cursor === null)
         cursor = {texture: null, x: 0, y: 0, scale: 1};
 
-    global.display.get_sound_player().play_from_file(
-        Gio.File.new_for_path(`${global.datadir}/sounds/screen-capture.oga`),
-        _('Screenshot taken'), null);
-
     const pixbuf = await Shell.Screenshot.composite_to_stream(
         texture,
         x, y, w, h,
@@ -2644,7 +2641,9 @@ export async function captureScreenshot(texture, geometry, scale, cursor) {
     );
 
     stream.close(null);
-    return _storeScreenshot(stream.steal_as_bytes(), pixbuf);
+    const file = _storeScreenshot(stream.steal_as_bytes(), pixbuf);
+    KestrelUi.playSound('screenshot');
+    return file;
 }
 
 /**
@@ -2805,10 +2804,7 @@ export class ScreenshotService {
             shooter.connect('screenshot_taken', (s, area) => {
                 const flashspot = new Flashspot(area);
                 flashspot.fire(resolve);
-
-                global.display.get_sound_player().play_from_file(
-                    Gio.File.new_for_path(`${global.datadir}/sounds/screen-capture.oga`),
-                    _('Screenshot taken'), null);
+                KestrelUi.playSound('screenshot');
             });
         });
     }

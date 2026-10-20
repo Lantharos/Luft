@@ -40,6 +40,7 @@ export async function chooseControl(handle: string, appId: string, request: Cont
       ? `${app.subject} will be able to see what you choose and use the devices you allow.`
       : `${app.subject} will be able to use the devices you allow.`,
     icon: 'preferences-desktop-remote-desktop-symbolic',
+    askedBy: appId,
     styleClass: 'kestrel-portal-sharing',
   }, dialog => {
     opened(dialog);

@@ -54,3 +54,9 @@ Strings in Luft's Swedish translation that a native speaker should check: terms 
 - `apps/settings/locales/sv/system.ftl` `settings-datetime-increase`: "Öka { $label }" — $label arrives capitalized (Timme/Minut), so it reads "Öka Timme" to a screen reader.
 - `apps/settings/locales/sv/system.ftl` `settings-about-other-system`: "Ta bort det för att ge dess { $size } till Luft" — "det" assumes the other system is referred to as "systemet" (ett); check against the row title it sits under.
 - `apps/settings/locales/sv/system.ftl` `settings-updates-elsewhere-refresh-by`: "Sökning efter uppdateringar pågår i { $app }" — rephrased so it also reads right when $app is "en annan app"; check it sounds natural next to the other "… av { $app }" lines.
+
+## Website
+
+- `web/site/locales/sv/home.ftl` `home-app-mailman-detail`: "en sållning av nya avsändare" — "screener" has no settled Swedish term; check it's understood.
+- `web/site/locales/sv/home.ftl` `home-question-ready-answer`: "Nattliga byggen" — "nightly builds"; check whether "nightly-versioner" or "nattbyggen" is more familiar.
+- `web/site/locales/sv/home.ftl` `home-motion-heading`: "Rörelse med mening." — free rendering of "It moves like it means it"; check it lands as a heading.

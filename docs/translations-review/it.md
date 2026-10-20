@@ -55,3 +55,10 @@ Strings in Luft's Italian translation that a native speaker should check: terms 
 - `apps/settings/locales/it/system.ftl` `settings-datetime-week-start-regional`: "Come nella tua regione: { $day }" — reordered so a lowercase weekday name doesn't start the label.
 - `apps/settings/locales/it/system.ftl` `settings-updates-installed-when`: "Aggiornamenti installati { $when }" — relies on $when being a relative phrase like "ieri" or "5 minuti fa".
 - `apps/settings/locales/it/system.ftl` `settings-about-storage-free`: "Liberi: { $free } su { $total }" — built with a colon so "liberi" needn't agree with the size.
+
+## Website
+
+- `web/site/locales/it/home.ftl` `home-motion-heading`: "Si muove con convinzione." — free rendering of "It moves like it means it"; check it sounds natural as a heading.
+- `web/site/locales/it/home.ftl` `home-wallpapers-text`: "il colore principale, il vetro e ogni app prendono i suoi colori" — "il vetro" for the desktop's glass material; check it reads well.
+- `web/site/locales/it/home.ftl` `home-question-ready-answer`: "Le build nightly escono ogni volta che cambia qualcosa" — "build nightly" kept in English as in most Italian software projects.
+- `web/site/locales/it/download.ftl` `download-meet-note`: "Ulteriori informazioni, poi Esegui comunque" — SmartScreen's Italian labels from memory; confirm against an Italian Windows 11.

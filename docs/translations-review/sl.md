@@ -53,3 +53,10 @@ Strings in Luft's Slovenian translation that a native speaker should check: term
 - `apps/settings/locales/sl/personalization.ftl` `settings-accessibility-typing-assist-count`: "Vklopljeno: { $count }" — neutral form used for every plural category to avoid agreement with an unnamed noun.
 - `apps/settings/locales/sl/system.ftl` `settings-datetime-increase`: "{ $label }: povečaj" — screen-reader label; word order chosen because $label is capitalized (Ura, Minuta).
 - `apps/settings/locales/sl/system.ftl` `settings-updates-apps-count`: "{ $count } aplikacija ima posodobitev v aplikaciji Schelf" — "aplikacija … v aplikaciji" repeats; a reviewer may prefer another phrasing.
+
+## Website
+
+- `web/site/locales/sl/download.ftl` `download-meet-note`: "Več informacij … Vseeno zaženi" — SmartScreen button labels from memory; check them against a Slovenian Windows.
+- `web/site/locales/sl/home.ftl` `home-intro`: "temelj, ki sam ostaja nedotaknjen" — free rendering of "a core that keeps itself in one piece"; check it reads naturally.
+- `web/site/locales/sl/home.ftl` `home-app-disks`: "Pogoni" — the kind shown under Diski; needed a word other than the app name.
+- `web/site/locales/sl/home.ftl` `home-motion-text`: "zato si lahko sredi giba premisli brez sunka" — the spring metaphor; check it doesn't read oddly.

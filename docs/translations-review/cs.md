@@ -53,3 +53,10 @@ Strings in Luft's Czech translation that a native speaker should check: term cho
 - `apps/settings/locales/cs/personalization.ftl` `settings-appearance-icons-clear`: "Průhledné" — English "Clear" icon style; check it describes the actual look.
 - `apps/settings/locales/cs/system.ftl` `settings-datetime-increase`: "Zvýšit hodnotu: { $label }" — $label is the title form "Hodina"/"Minuta", so a colon construction was used.
 - `apps/settings/locales/cs/system.ftl` `settings-users-fingerprint-remove-description`: "Už se nebudete moct přihlašovat { $finger }." — relies on the instrumental .inline form ("pravým ukazováčkem").
+
+## Website
+
+- `web/site/locales/cs/home.ftl` `home-motion-heading`: "Pohyb, který dává smysl." — free rendering of "It moves like it means it"; check the tone.
+- `web/site/locales/cs/home.ftl` `home-app-mailman-detail`: "prověřování nových odesílatelů" — "screener" has no settled Czech term.
+- `web/site/locales/cs/home.ftl` `home-app-magpie-detail`: "zbytek složky máte na šipce" — colloquial for "an arrow key away"; check it is clear.
+- `web/site/locales/cs/site.ftl` `site-footer-made`: "Vytváří { $lantharos }." — Lantharos as the subject avoids declining the name; check it reads naturally as a credit line.

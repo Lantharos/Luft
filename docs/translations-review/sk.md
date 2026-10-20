@@ -56,3 +56,10 @@ Strings in Luft's Slovak translation that a native speaker should check, each li
 - `apps/settings/locales/sk/personalization.ftl` `settings-accessibility-bounce-keys`: "Filtrovanie opakovaných stlačení" — long; check against the term KDE/GNOME Slovak use and whether it clips.
 - `apps/settings/locales/sk/personalization.ftl` `settings-fonts-monospace`: "Neproporcionálne" — some OSes say „s pevnou šírkou“; check preference.
 - `apps/settings/locales/sk/system.ftl` `settings-updates-elsewhere-refresh-by` (and the other `-by` messages): "{ $app } hľadá aktualizácie" — the app name stands alone as the subject, so the fallback reads „Iná aplikácia hľadá aktualizácie“; check it reads well with real names like „Schelf“.
+
+## Website
+
+- `web/site/locales/sk/download.ftl` `download-meet-note`: "Ďalšie informácie … Spustiť aj tak" — SmartScreen labels from memory, not verified against a Slovak Windows.
+- `web/site/locales/sk/home.ftl` `home-motion-heading`: "Pohyb, ktorý dáva zmysel." — free rendering of "It moves like it means it"; check the tone.
+- `web/site/locales/sk/home.ftl` `home-app-mailman-detail`: "preverovanie nových odosielateľov" — "screener" has no settled Slovak term.
+- `web/site/locales/sk/site.ftl` `site-footer-made`: "Vytvára { $lantharos }." — Lantharos as the subject avoids declining the name; check it reads naturally as a credit line.

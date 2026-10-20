@@ -73,3 +73,10 @@ Strings in Luft's Hungarian translation that a native speaker should check: term
 - `apps/settings/locales/hu/system.ftl` `settings-updates-stay`: "Maradás ennél: { $version }" — button; check it fits and reads well.
 - `apps/settings/locales/hu/system.ftl` `settings-users-fingerprint-remove-description`: "Többé nem használhatja { $finger } a bejelentkezéshez." — relies on the .inline finger forms (accusative with article) from ui.ftl.
 - `apps/settings/locales/hu/connections.ftl` `settings-network-link-connected`: "Csatlakozva" — used for every network and Bluetooth connection, with "csatlakoztatva" kept for things plugged in; Windows writes "Csatlakoztatva" for both, so check which reads more naturally.
+
+## Website
+
+- `web/site/locales/hu/home.ftl` `home-question-ready-answer`: "Éjszakai buildek" — "build" is common in Hungarian IT but informal; "éjszakai kiadás" would clash with the first release.
+- `web/site/locales/hu/home.ftl` `home-motion-heading`: "Minden mozdulatnak célja van." — free rendering of "It moves like it means it".
+- `web/site/locales/hu/home.ftl` `home-get`, `home-look`: "A Luft beszerzése", "Körülnézés" — action-noun button form; check they read well as hero buttons.
+- `web/site/locales/hu/home.ftl` `home-security-sealed-text`: "aláírt lemezkép" — the signed system image; check the term.

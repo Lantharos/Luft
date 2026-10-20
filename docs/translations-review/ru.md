@@ -55,3 +55,10 @@ Strings in Luft's Russian translation that a native speaker should check, each l
 - `apps/settings/locales/ru/personalization.ftl` `settings-cursors-folder-description`: "Здесь появляются темы, сохранённые по пути: Домашняя папка › .local › share › icons" — check the colon construction and that «Домашняя папка» matches Rover's name for Home.
 - `apps/settings/locales/ru/personalization.ftl` `settings-appearance-icons-clear`: "Прозрачные" — unsure whether "Clear" means transparent, glass-like icons; check against the actual look.
 - `apps/settings/locales/ru/personalization.ftl` `settings-appearance-tint-slate`: "Сланцевый" — may feel bookish; «Серо-синий» is an alternative.
+
+## Website
+
+- `web/site/locales/ru/home.ftl` `home-app-mailman-detail`: "проверка новых отправителей" — "screener" has no settled Russian term.
+- `web/site/locales/ru/home.ftl` `home-intro`: "ядро, которое само следит за своей целостностью" — "a core that keeps itself in one piece"; check it doesn't read as the Linux kernel.
+- `web/site/locales/ru/home.ftl` `home-security-heading`: "Безопасность по замыслу, а не по настройкам." — free rendering of "Safe by design, not by settings"; check it sounds natural.
+- `web/site/locales/ru/site.ftl` `site-footer-made`: "…на основе { $fedora }." — relies on Fedora staying undeclined after «на основе».

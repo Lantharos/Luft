@@ -74,3 +74,10 @@ Strings in Luft's Irish translation that a native speaker should check: terms wi
 - `apps/settings/locales/ga/protection.ftl` `settings-security-anti-cheat`: "Cluichí le frith-chaimiléireacht" — there is no settled term for anti-cheat.
 - `apps/settings/locales/ga/system.ftl` `settings-datetime-format-12h`: "r.n./i.n." — check this is the abbreviation people expect on a clock setting.
 - `apps/settings/locales/ga/system.ftl` `settings-updates-apps-count`: "Nuashonruithe i Schelf do { $count } aip" — rephrased to avoid "tá nuashonrú ag", so check the word order.
+
+## Website
+
+- `web/site/locales/ga/download.ftl` `download-meet-note`: "roghnaigh Tuilleadh faisnéise, ansin Rith ar aon nós" — couldn't verify the SmartScreen button labels of the Irish Windows language pack.
+- `web/site/locales/ga/home.ftl` `home-wallpapers-text`: "Tagann { $count } ghrianghraf leis" — counting forms follow the style guide; check the [other] form reads well for 11–19.
+- `web/site/locales/ga/home.ftl` `home-question-ready-answer`: "leaganacha oíche" — no settled term for nightly builds.
+- `web/site/locales/ga/site.ftl` `site-nav-docs`: "Doiciméadú" — check against „Cáipéisíocht” for documentation.

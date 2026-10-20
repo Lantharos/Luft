@@ -62,3 +62,10 @@ Strings in Luft's Estonian translation that a native speaker should check. Each 
 - `apps/settings/locales/et/personalization.ftl` `settings-fonts-sample`: "Põdur Zagrebi tšellomängija-följetonist Ciqo külmetas kehvas garaažis" — the classic Estonian pangram; long, check it fits the preview.
 - `apps/settings/locales/et/personalization.ftl` `settings-appearance-tint-teal`: "Sinakasroheline" and `settings-appearance-tint-slate`: "Hallikassinine" — check these color names fit the swatches' tooltips.
 - `apps/settings/locales/et/personalization.ftl` `settings-appearance-wallpaper-folder-description`: "Pildid › Wallpapers" — the Wallpapers folder keeps its English name on disk; check that „Pildid“ matches the Estonian Pictures folder and that „Kodu“ in the cursors folder path matches how the home folder is shown.
+
+## Website
+
+- `web/site/locales/et/download.ftl` `download-meet-note`: "valige Lisateave ja seejärel Käivita ikkagi" — SmartScreen button labels not verified; check against Estonian Windows 11 („Käivita siiski“ is possible).
+- `web/site/locales/et/home.ftl` `home-question-ready-answer`: "Öiseid järke", "öisest järgust" — no settled Estonian term for nightly builds.
+- `web/site/locales/et/home.ftl` `home-meet-restart`: "Taaskäivitage Lufti" — step heading for "Restart into Luft"; check the illative reads naturally.
+- `web/site/locales/et/home.ftl` `home-motion-heading`: "Liigub nii, nagu peab." — free rendering of "It moves like it means it".

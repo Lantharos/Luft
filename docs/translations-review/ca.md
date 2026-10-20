@@ -60,3 +60,10 @@ Strings in Luft’s Catalan translation that a native speaker should check: term
 - `apps/settings/locales/ca/protection.ftl` `settings-encryption-progress`: "{ $percent } completat" — check the agreement reads naturally («40 % completat») and fits inside settings-security-encrypting-progress.
 - `apps/settings/locales/ca/protection.ftl` `settings-passkeys-last-used`: "Darrer ús: { $when }" — assumes $when is a relative phrase like «fa 3 dies»; same for `settings-passwords-ssh-added` "Afegida { $when }" and `system.ftl` `settings-updates-released` "Publicada { $when }".
 - `apps/settings/locales/ca/system.ftl` `settings-about-other-system`: "Suprimiu-lo per donar-ne els { $size } a Luft" — check the article before the size placeable reads well.
+
+## Website
+
+- `web/site/locales/ca/home.ftl` `home-motion-heading`: "Cada moviment té intenció." — free rendering of "It moves like it means it"; check it works as a heading.
+- `web/site/locales/ca/home.ftl` `home-meet-restart`: "Reinicia a Luft" — step heading written as a button-style imperative; check whether a noun («Reinici a Luft») suits the card better.
+- `web/site/locales/ca/home.ftl` `home-question-ready-answer`: "Les versions nightly surten cada vegada que canvia alguna cosa" — "nightly" kept in English; check whether «versions diàries» reads better.
+- `web/site/locales/ca/download.ftl` `download-meet-note`: "Més informació i després Executa igualment" — SmartScreen's Catalan labels could not be verified; confirm against a Catalan Windows 11.

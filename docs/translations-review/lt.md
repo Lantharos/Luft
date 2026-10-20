@@ -68,3 +68,10 @@ Strings in Luft's Lithuanian translation that a native speaker should check: ter
 - `apps/settings/locales/lt/system.ftl` `settings-about-hostname`: "Kompiuterio vardas" — sits next to "Įrenginio pavadinimas"; check the two are distinct enough.
 - `apps/settings/locales/lt/personalization.ftl` `settings-fonts-sample`: "Įlinkdama fechtuotojo špaga sublykčiojusi pragręžė apvalų arbūzą" — common Lithuanian pangram; check it is the preferred one.
 - `apps/settings/locales/lt/personalization.ftl` `settings-accessibility-bounce-keys`: "Atmetimo klavišai" — no settled Lithuanian term for bounce keys.
+
+## Website
+
+- `web/site/locales/lt/download.ftl` `download-meet-note`: "pasirinkite Daugiau informacijos, tada Vis tiek vykdyti" — SmartScreen button labels not verified; check against Lithuanian Windows 11.
+- `web/site/locales/lt/home.ftl` `home-question-ready-answer`: "Naktinės versijos" — no settled Lithuanian term for nightly builds.
+- `web/site/locales/lt/download.ftl` `download-meet-for-windows`: "Atsisiųsti Meet Luft <span>skirtą Windows</span>" — check the agreement of "skirtą" with Meet Luft.
+- `web/site/locales/lt/home.ftl` `home-start-heading`: "Pradžia žino, kur kas yra." — Start as a bare subject (Pradžia) at the start of a heading; check it's understood as the menu.

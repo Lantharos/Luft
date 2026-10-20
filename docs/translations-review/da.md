@@ -52,3 +52,9 @@ Strings in Luft's Danish translation that a native speaker should check: terms w
 - `apps/settings/locales/da/protection.ftl` `settings-encryption-passphrase-field`: "Adgangsfrase" — used in setup and Settings to stay distinct from "adgangskode"; no settled OS term, check it.
 - `apps/settings/locales/da/system.ftl` `settings-updates-variant-standard`: "Skift til standardudgaven" — "standard image" rendered as "standard edition" here and in the installer's errors, to avoid "aftryk"; check it fits the NVIDIA/standard choice.
 - `apps/settings/locales/da/system.ftl` `settings-datetime-week-start-regional`: "{ $day }, ifølge dit område" — assumes $day arrives as a lowercase weekday that reads fine at the start of the label.
+
+## Website
+
+- `web/site/locales/da/home.ftl` `home-security-sealed-text`: "Hele systemet er ét signeret aftryk" — the style guide avoids "aftryk", but "udgave" doesn't carry "signed image" here; check for a better word.
+- `web/site/locales/da/home.ftl` `home-app-mailman-detail`: "en sortering af nye afsendere" — "screener" has no settled Danish term.
+- `web/site/locales/da/home.ftl` `home-question-ready-answer`: "Natlige builds … en natlig build" — check the gender of "build" and whether "nightly-builds" is more familiar.

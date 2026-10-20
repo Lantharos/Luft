@@ -57,3 +57,10 @@ Strings in Luft's Dutch translation that a native speaker should check: terms wh
 - `apps/settings/locales/nl/connections.ftl` `settings-accounts-online`: "Onlineaccounts" — one-word compound per the spelling rules; GNOME writes "Online-accounts".
 - `apps/settings/locales/nl/system.ftl` `settings-updates-area-drivers`: "Drivers en firmware" — "driver" is used throughout instead of Windows' "stuurprogramma"; check which Dutch users expect.
 - `apps/settings/locales/nl/personalization.ftl` `settings-appearance-wallpaper-folder-description`: "Afbeeldingen › Wallpapers" — assumes the Pictures folder shows as Afbeeldingen (the Dutch folder name); Wallpapers is the real folder name and stays English.
+
+## Website
+
+- `web/site/locales/nl/download.ftl` `download-iso`: "Iso downloaden" — "iso" lowercase per the Groene Boekje rule for letter-by-letter abbreviations; check whether "ISO" reads more natural for a disk image.
+- `web/site/locales/nl/home.ftl` `home-security-sealed-text`: "één ondertekende image" — "image" for the system image has no settled Dutch word; check gender and whether "systeemimage" is clearer.
+- `web/site/locales/nl/download.ftl` `download-meet-windows-checksum`: "Windows-checksum" — kept the loanword over "controlesom"; check which reads better on a download page.
+- `web/site/locales/nl/home.ftl` `home-motion-heading`: "Beweging met een bedoeling." — free rendering of "It moves like it means it"; check it lands as a heading.

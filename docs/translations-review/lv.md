@@ -57,3 +57,10 @@ Strings in Luft's Latvian translation that a native speaker should check: terms 
 - `apps/settings/locales/lv/protection.ftl` `settings-passwords-stores-count`: "Saglabāti pierakstīšanās dati: { $count }" — "sign-in" as a countable noun has no good Latvian form, so the count is moved after a colon.
 - `apps/settings/locales/lv/system.ftl` `settings-about-old-system`: "Saglabāta, kad to aizstāja Luft · { $size }" — feminine agrees with an implied sistēma; check against what the row title shows (e.g. Windows).
 - `apps/settings/locales/lv/system.ftl` `settings-updates-apps-count`: "Lietotnē Schelf ir atjauninājumi { $count } lietotnēm" — dative after the number; check it reads well for every count.
+
+## Website
+
+- `web/site/locales/lv/download.ftl` `download-meet-note`: "izvēlieties Papildinformācija un pēc tam Tik un tā palaist" — SmartScreen button labels not verified; check against Latvian Windows 11.
+- `web/site/locales/lv/home.ftl` `home-question-ready-answer`: "Nakts būvējumi" — no settled Latvian term for nightly builds.
+- `web/site/locales/lv/download.ftl` `download-meet-for-windows`: "Lejupielādēt Meet Luft <span>operētājsistēmai Windows</span>" — check the hidden part isn't too long on wide buttons.
+- `web/site/locales/lv/home.ftl` `home-motion-heading`: "Kustība ar nodomu." — free rendering of "It moves like it means it".

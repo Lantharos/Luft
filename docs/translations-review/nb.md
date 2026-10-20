@@ -47,3 +47,9 @@ Strings in Luft's Norwegian Bokmål translation that a native speaker should che
 - `apps/settings/locales/nb/protection.ftl` `settings-passwords-seal`: "Forsegl" — «forsegle» for sealing to the TPM; check it reads clearly.
 - `apps/settings/locales/nb/system.ftl` `settings-datetime-format-12h`: "12-timers" — English says AM/PM; Norwegian Windows labels it as 12-hour, check the choice is clear next to «24-timers».
 - `apps/settings/locales/nb/system.ftl` `settings-updates-switching-standard`: "Laster ned standardbildet…" — «bildet» for the system image may be read as a picture; «systembildet» may be clearer but longer.
+
+## Website
+
+- `web/site/locales/nb/home.ftl` `home-app-mailman-detail`: "en sortering av nye avsendere" — "screener" has no settled Norwegian term.
+- `web/site/locales/nb/home.ftl` `home-question-ready-answer`: "Nattlige bygg" — "nightly builds"; check whether "nattbygg" or the English term is more familiar.
+- `web/site/locales/nb/home.ftl` `home-app-disks`: "Disker og stasjoner" — describes the Disks app ("Drives"); check it isn't too long under the app name.

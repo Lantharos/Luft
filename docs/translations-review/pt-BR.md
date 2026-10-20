@@ -55,3 +55,9 @@ Strings in Luft's Brazilian Portuguese translation that a native speaker should 
 - `apps/settings/locales/pt-BR/system.ftl` `settings-updates-stay`: "Ficar na { $version }" — elided "versão"; check it reads naturally with a version number.
 
 
+
+## Website
+
+- `web/site/locales/pt-BR/home.ftl` `home-motion-heading`: "Cada movimento tem intenção." — free rendering of "It moves like it means it"; check it works as a heading.
+- `web/site/locales/pt-BR/home.ftl` `home-question-ready-answer`: "As versões nightly saem sempre que algo muda" — "nightly" kept in English as most Brazilian projects do.
+- `web/site/locales/pt-BR/download.ftl` `download-meet-note`: "Mais informações e depois Executar assim mesmo" — SmartScreen's Brazilian labels from memory; confirm against a pt-BR Windows 11.

@@ -61,3 +61,10 @@ Strings in Luft's Icelandic translation that a native speaker should check: term
 - `apps/settings/locales/is/system.ftl` `settings-datetime-week-start-regional`: "{ $day }, samkvæmt svæðinu þínu" — assumes $day is the nominative weekday name.
 - `apps/settings/locales/is/system.ftl` `settings-users-fingerprint-remove-description`: "Þú getur ekki lengur notað { $finger } til að skrá þig inn." — relies on the accusative .inline finger forms from ui.ftl.
 - `apps/settings/locales/is/system.ftl` `settings-about-other-system`: "Fjarlægðu það til að gefa Luft plássið, { $size }" — reworded around the size placeable; check it reads naturally.
+
+## Website
+
+- `web/site/locales/is/download.ftl` `download-meet-note`: "veldu Frekari upplýsingar og svo Keyra samt" — couldn't verify the SmartScreen button labels of the Icelandic Windows language pack.
+- `web/site/locales/is/home.ftl` `home-app-tern`: "Útstöð" — GNOME's word for terminal; „Skipanalína” is the other candidate.
+- `web/site/locales/is/home.ftl` `home-app-rover-detail`: "flýtiskoðun" — coinage for Quick Look, which has no Icelandic name.
+- `web/site/locales/is/home.ftl` `home-question-ready-answer`: "Næturútgáfur … næturuppfærslur" — no settled term for nightly builds.

@@ -73,3 +73,10 @@ Strings in Luft's Maltese translation that a native speaker should check: places
 - `apps/settings/locales/mt/system.ftl` `settings-login-wallpaper-own`: "Tiegħu stess" — masculine generic; may need a neutral phrasing.
 - `apps/settings/locales/mt/protection.ftl` `settings-privacy-location`: "Post" — location is "post" everywhere (servizzi tal-post, Itfi s-servizzi tal-post); "lokalità" was the alternative but reads as a town or village; check against what people expect.
 - `apps/settings/locales/mt/system.ftl` `settings-updates-elsewhere-refresh-by`: "Qed isir tiftix għal aġġornamenti minn { $app }" — impersonal so it reads with an app name and with "app oħra" without gender agreement; check it doesn't sound stiff.
+
+## Website
+
+- `web/site/locales/mt/download.ftl` `download-meet-note`: "Aktar informazzjoni, imbagħad Ħaddem xorta waħda" — couldn't verify the SmartScreen labels in Windows' Maltese language pack; check them against the real dialog.
+- `web/site/locales/mt/home.ftl` `home-essentials-text`: "madum" — "tiles" for the quick settings tiles; check it isn't read too literally as floor tiles.
+- `web/site/locales/mt/home.ftl` `home-app-disks-detail`: "drajvs USB magħmula minn image" — "image" kept in English for a disk image, as in the security section; check it reads naturally.
+- `web/site/locales/mt/home.ftl` `home-motion-text`: "molol" — "springs"; check the image of motion on springs comes across.

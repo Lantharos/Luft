@@ -59,3 +59,10 @@ Strings in Luft's Bulgarian translation that a native speaker should check. Each
 - `apps/settings/locales/bg/system.ftl` `settings-datetime-increase`: "Увеличи: { $label }" — colon used so the case of Час/Минута doesn't matter.
 - `apps/settings/locales/bg/protection.ftl` `settings-encryption-passphrase-field`: "Парола за диска" — used for passphrase in Settings and in setup, to keep it apart from the account password; check it reads naturally everywhere.
 - `apps/settings/locales/bg/personalization.ftl` `settings-appearance-wallpaper-folder-description`: "Снимки › Wallpapers" — "Снимки" is used for the Pictures folder throughout; check it matches the folder name Bulgarian systems actually create (some use "Изображения").
+
+## Website
+
+- `web/site/locales/bg/download.ftl` `download-meet-note`: "Повече информация … Изпълни въпреки това" — SmartScreen button labels from memory; check them against a Bulgarian Windows.
+- `web/site/locales/bg/home.ftl` `home-description`: "Спокойна и бърза работна среда" — "desktop" in the sense of the whole environment, per the glossary's работна среда; check it reads well as the tagline.
+- `web/site/locales/bg/home.ftl` `home-app-disks`: "Съхранение" — the kind shown under Дискове; needed a word other than the app name.
+- `web/site/locales/bg/download.ftl` `download-needs-space-value`: "32 ГБ или повече" — Cyrillic unit as Windows writes it; check against how other Bulgarian strings in Luft show sizes.

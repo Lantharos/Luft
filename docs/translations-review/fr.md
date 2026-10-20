@@ -52,3 +52,10 @@ Strings in Luft's French translation that a native speaker should check: terms w
 - `apps/settings/locales/fr/protection.ftl` `settings-passwords-ssh-added`: "Ajoutée { $when }" — assumes $when reads like « il y a 3 jours » or « hier ». Same for `settings-updates-installed-when` in system.ftl.
 - `apps/settings/locales/fr/personalization.ftl` `settings-appearance-icons-clear`: "Transparentes" — the English "Clear" icon style is ambiguous (glass-like or plain); check against the actual look.
 - `apps/settings/locales/fr/personalization.ftl` `settings-accessibility-typing-assist-count`: "{ $count } activée" — agrees with « aide à la saisie »; check it reads well as a row summary.
+
+## Website
+
+- `web/site/locales/fr/home.ftl` `home-motion-heading`: "Chaque mouvement a un sens." — free rendering of "It moves like it means it"; check it carries the same confidence.
+- `web/site/locales/fr/home.ftl` `home-wallpapers-text`: "la couleur d’accentuation, le verre et chaque application prennent ses couleurs" — "le verre" for the desktop's glass material; check it reads naturally.
+- `web/site/locales/fr/home.ftl` `home-question-ready-answer`: "Des versions nightly sortent à chaque changement" — "nightly" kept in English as most French projects do; check whether « versions quotidiennes » reads better.
+- `web/site/locales/fr/download.ftl` `download-meet-note`: "Informations complémentaires, puis Exécuter quand même" — SmartScreen's French labels from memory; confirm against a French Windows 11.

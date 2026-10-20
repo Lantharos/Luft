@@ -55,3 +55,10 @@ Strings in Luft's Polish translation that a native speaker should check, each li
 - `apps/settings/locales/pl/system.ftl` `settings-updates-apps-count`: "… w sklepie Schelf" — "sklep" avoids repeating "aplikacja … w aplikacji Schelf"; check this is acceptable with the app-name rule.
 - `apps/settings/locales/pl/personalization.ftl` `settings-appearance-wallpaper-tile`: "Sąsiadująco" — Windows' term; check it fits next to the imperative options (Wypełnij, Dopasuj, Wyśrodkuj, Rozciągnij).
 - `apps/settings/locales/pl/personalization.ftl` `settings-appearance-icons-clear`: "Przezroczyste" — assumes "Clear" means the glass-like transparent icon style, not "remove".
+
+## Website
+
+- `web/site/locales/pl/home.ftl` `home-motion-heading`: "Porusza się z wyczuciem." — free rendering of "It moves like it means it"; check it carries the same confidence.
+- `web/site/locales/pl/home.ftl` `home-app-mailman-detail`: "sito dla nowych nadawców" — "screener" has no settled Polish term; check it reads clearly.
+- `web/site/locales/pl/home.ftl` `home-app-disks`: "Zarządzanie dyskami" — "Drives" as the kind, chosen so it doesn't repeat the app name Dyski in "Dyski (Dyski)".
+- `web/site/locales/pl/site.ftl` `site-footer-made`: "Tworzy { $lantharos }." — Lantharos as the subject avoids declining the name; check it reads naturally as a credit line.

@@ -56,3 +56,10 @@ Strings in Luft's Greek translation that a native speaker should check: terms wi
 - `apps/settings/locales/el/protection.ftl` `settings-usb-hold-back`: "Αναμονή για νέες συσκευές USB" — meaning is "block new USB devices while locked"; a reviewer may prefer «Αναστολή νέων συσκευών USB».
 - `apps/settings/locales/el/system.ftl` `settings-updates-switching-standard`: "Λήψη της τυπικής εικόνας…" — «εικόνα» for system image may be read as a picture; «εικόνα συστήματος» is longer but clearer.
 - `apps/settings/locales/el/system.ftl` `settings-about-old-system`: "Διατηρήθηκε όταν το αντικατέστησε το Luft · { $size }" — assumes the old system is neuter (e.g. τα Windows would be plural); check against real values.
+
+## Website
+
+- `web/site/locales/el/download.ftl` `download-meet-note`: "«Περισσότερες πληροφορίες» και μετά «Εκτέλεση οπωσδήποτε»" — the SmartScreen labels as I recall them from Greek Windows; confirm against the real dialog.
+- `web/site/locales/el/site.ftl` `site-footer-made`: "Δημιουργία: { $lantharos }." — colon form avoids giving Lantharos an article and gender; check it doesn't read too terse in a footer.
+- `web/site/locales/el/home.ftl` `home-question-ready-answer`: "Νυχτερινές εκδόσεις" — translates "nightly builds"; Greek developers may expect "nightly" in Latin letters.
+- `web/site/locales/el/home.ftl` `home-motion-heading`: "Κινείται με σκοπό." — free rendering of "It moves like it means it"; check it sounds natural as a heading.

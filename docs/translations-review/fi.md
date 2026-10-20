@@ -65,3 +65,10 @@ Strings in Luft's Finnish translation that a native speaker should check. Each i
 - `apps/settings/locales/fi/system.ftl` `settings-updates-includes`: "Sisältää tietoturvakorjauksia" — uses tietoturva rather than the glossary's suojaus, because Windows Update says tietoturvapäivitys.
 - `apps/settings/locales/fi/system.ftl` `settings-updates-switching-standard`: "Ladataan vakiokuvaa…" — the standard system image (without NVIDIA's driver); check it's clear.
 - `apps/settings/locales/fi/system.ftl` `settings-users-fingerprint-remove-description`: "Tämän jälkeen { $finger } ei enää kelpaa kirjautumiseen." — relies on the .inline finger name in the nominative.
+
+## Website
+
+- `web/site/locales/fi/download.ftl` `download-meet-note`: "valitse Lisätietoja ja sitten Suorita silti" — SmartScreen button labels from memory; check against current Finnish Windows 11.
+- `web/site/locales/fi/home.ftl` `home-question-ready-answer`: "Yökäännöksiä", "yökäännösten päivitykset" — no settled Finnish term for nightly builds; "yöversio" is the alternative.
+- `web/site/locales/fi/home.ftl` `home-motion-heading`: "Liikettä, jossa on tarkoitus." — free rendering of "It moves like it means it"; check it sounds natural as a heading.
+- `web/site/locales/fi/site.ftl` `site-footer-photos`: "Kuvat: { $photographers }, Unsplash." — built so the joined list of names stays in the nominative.

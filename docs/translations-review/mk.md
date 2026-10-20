@@ -60,3 +60,10 @@ Strings in Luft's Macedonian translation that a native speaker should check. Eac
 - `apps/settings/locales/mk/system.ftl` `settings-updates-switching-standard`: "Се презема стандардната слика на системот…" — "system image" as слика на системот; check it isn't read as a picture.
 - `apps/settings/locales/mk/system.ftl` `settings-updates-last-checked`: "Последна проверка { $when }" — relies on relative times like „пред 5 минути“ and „вчера“ reading naturally after it.
 - `apps/settings/locales/mk/system.ftl` `settings-datetime-format-12h`: "12-часовен" — English says AM/PM; the format name reads more naturally.
+
+## Website
+
+- `web/site/locales/mk/download.ftl` `download-meet-note`: "Повеќе информации … Сепак изврши" — SmartScreen button labels could not be verified; check them against a Macedonian Windows.
+- `web/site/locales/mk/home.ftl` `home-intro`: "основа што сама останува неоштетена" — free rendering of "a core that keeps itself in one piece".
+- `web/site/locales/mk/home.ftl` `home-app-disks`: "Складирање" — the kind shown under Дискови; needed a word other than the app name.
+- `web/site/locales/mk/home.ftl` `home-meet-usb`: "запишете го ISO-то сами" — check whether „ISO-то“ or „ISO-сликата“ is the usual form.

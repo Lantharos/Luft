@@ -68,3 +68,10 @@ Strings in Luft's Ukrainian translation that a native speaker should check, each
 - `apps/settings/locales/uk/system.ftl` `settings-datetime-increase`: "Збільшити: { $label }" — colon form so the hour/minute label can stay in the nominative.
 - `apps/settings/locales/uk/system.ftl` `settings-users-fingerprint-remove-description`: "Ви більше не зможете входити, прикладаючи { $finger }." — relies on .inline being in the accusative, which matches the nominative for these masculine nouns.
 - `apps/settings/locales/uk/system.ftl` `settings-updates-stay`: "Залишитися на { $version }" — check that a bare version number after «на» reads well on the button.
+
+## Website
+
+- `web/site/locales/uk/download.ftl` `download-meet-note`: "«Докладніше» … «Усе одно запустити»" — the second SmartScreen label couldn't be verified against a Ukrainian Windows; it may read «Виконати попри все» or similar.
+- `web/site/locales/uk/home.ftl` `home-app-mailman-detail`: "перевірка нових відправників" — "screener" has no settled Ukrainian term.
+- `web/site/locales/uk/home.ftl` `home-intro`: "ядро, яке саме стежить за своєю цілісністю" — "a core that keeps itself in one piece"; check it doesn't read as the Linux kernel.
+- `web/site/locales/uk/site.ftl` `site-footer-made`: "…на основі { $fedora }." — relies on Fedora staying undeclined after «на основі».

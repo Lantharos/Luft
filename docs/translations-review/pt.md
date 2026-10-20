@@ -56,3 +56,10 @@ Strings in Luft's European Portuguese translation that a native speaker should c
 - `apps/settings/locales/pt/protection.ftl` `settings-passwords-ssh-added`: "Adicionada { $when }" — assumes $when reads like «há 3 dias» or «ontem»; the same goes for `settings-passkeys-last-used` and `apps/settings/locales/pt/system.ftl` `settings-updates-installed-when` / `settings-updates-released`.
 - `apps/settings/locales/pt/system.ftl` `settings-updates-apps-count`: "[0] Geridas no Schelf" — agrees with atualizações; check it fits under the "App updates" row.
 - `apps/settings/locales/pt/system.ftl` `settings-about-hostname`: "Nome do anfitrião" — GNOME's term; Windows just says «Nome do dispositivo».
+
+## Website
+
+- `web/site/locales/pt/home.ftl` `home-motion-heading`: "Cada movimento tem intenção." — free rendering of "It moves like it means it"; check it works as a heading.
+- `web/site/locales/pt/home.ftl` `home-start-text`: "quando lho pede" — European contraction; check it doesn't read too formal for marketing copy.
+- `web/site/locales/pt/home.ftl` `home-question-ready-answer`: "As versões nightly saem sempre que algo muda" — "nightly" kept in English; check whether «versões diárias» reads better.
+- `web/site/locales/pt/download.ftl` `download-meet-note`: "Mais informações e depois Executar mesmo assim" — SmartScreen's labels for Portugal from memory, not verified; confirm against a pt-PT Windows 11.

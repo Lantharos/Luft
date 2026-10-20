@@ -60,3 +60,10 @@ Strings in Luft's Turkish translation that a native speaker should check: terms 
 - `apps/settings/locales/tr/system.ftl` `settings-updates-switching-standard`: "Standart sistem görüntüsü indiriliyor…" — "image" as in OS image; check "sistem görüntüsü" is understood and not read as a picture.
 - `apps/settings/locales/tr/system.ftl` `settings-login-wallpaper-own`: "Kişiye özel" — choice "Their own" vs "Herkes için aynı"; check it is clear enough.
 - `apps/settings/locales/tr/system.ftl` `settings-about-other-system`: "Kapladığı { $size } alanı Luft’a vermek için kaldırın" — check with real sizes.
+
+## Website
+
+- `web/site/locales/tr/download.ftl` `download-meet-note`: "önce Ek bilgi, ardından Yine de çalıştır seçeneğini seçin" — SmartScreen labels from memory of Turkish Windows; confirm against the real dialog.
+- `web/site/locales/tr/download.ftl` `download-meet-for-windows`: "<span>Windows için</span> Meet Luft’u indir" — the hidden part moved to the front for natural word order; check it reads well with the span dimmed.
+- `web/site/locales/tr/home.ftl` `home-question-ready-answer`: "gecelik sürümler" — for "nightly builds"; developers may expect "nightly" kept in English.
+- `web/site/locales/tr/home.ftl` `home-motion-heading`: "Her hareketi yerinde." — free rendering of "It moves like it means it"; check it lands as a heading.

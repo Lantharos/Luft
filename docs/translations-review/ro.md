@@ -62,3 +62,10 @@ Strings in Luft's Romanian translation that a native speaker should check. Each 
 - `apps/settings/locales/ro/protection.ftl` `settings-security-anti-cheat`: "Jocuri cu anti-cheat" — kept the gamer loanword.
 - `apps/settings/locales/ro/protection.ftl` `settings-passwords-stores-count`: "{ $count } conectări salvate" — "sign-ins" as countable "conectări"; check naturalness.
 - `apps/settings/locales/ro/system.ftl` `settings-users-account`: "Contul meu" — first person chosen to avoid "dvs."; check against the style guide.
+
+## Website
+
+- `web/site/locales/ro/download.ftl` `download-meet-note`: "alegeți Mai multe informații, apoi Executare oricum" — SmartScreen labels from memory; „Mai multe informații” is confirmed, the second button couldn't be verified (could be „Rulează oricum”).
+- `web/site/locales/ro/home.ftl` `home-intro`: "o bază care se menține singură intactă" — English "a core that keeps itself in one piece"; „nucleu” was avoided because it reads as the kernel.
+- `web/site/locales/ro/home.ftl` `home-app-rover-detail`: "File, previzualizare rapidă…" — „File” for browser-style tabs next to the Fișiere label may be ambiguous; Quick Look has no Romanian name.
+- `web/site/locales/ro/home.ftl` `home-question-ready-answer`: "Versiunile nightly…" — kept "nightly" as the loanword; check whether „zilnice” reads better.

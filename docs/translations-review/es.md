@@ -46,3 +46,10 @@ Strings in Luft's Spanish translation that a native speaker should check: terms 
 - `apps/settings/locales/es/protection.ftl` `settings-usb-hold-back`: "Retener los dispositivos USB nuevos" — check "retener" is clear for holding them back until unlock.
 - `apps/settings/locales/es/system.ftl` `settings-updates-stay`: "Seguir en la { $version }" — elides "versión" before the number; check it reads well with real version values.
 - `apps/settings/locales/es/system.ftl` `settings-updates-released`: "Publicada { $when }" — assumes $when is a phrase like "hace 3 días" or "ayer".
+
+## Website
+
+- `web/site/locales/es/home.ftl` `home-motion-heading`: "Se mueve con intención." — free rendering of "It moves like it means it"; check it works as a heading.
+- `web/site/locales/es/home.ftl` `home-wallpapers-text`: "el color de énfasis, el cristal y todas las aplicaciones toman sus colores" — "el cristal" for the desktop's glass material; check it reads naturally.
+- `web/site/locales/es/home.ftl` `home-question-ready-answer`: "Las versiones nightly salen cada vez que algo cambia" — "nightly" kept in English as most Spanish projects do; check whether «versiones diarias» reads better.
+- `web/site/locales/es/download.ftl` `download-meet-note`: "Más información y luego Ejecutar de todas formas" — SmartScreen's Spanish labels from memory; confirm against a Spanish Windows 11.

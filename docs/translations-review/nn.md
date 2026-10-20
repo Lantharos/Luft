@@ -56,3 +56,10 @@ Strings in Luft's Nynorsk translation that a native speaker should check: terms 
 - `apps/settings/locales/nn/protection.ftl` `settings-encryption-backup`: "… sikkerheitskopi …" — check against «tryggingskopi», which fits the «tryggleik» used elsewhere.
 - `apps/settings/locales/nn/system.ftl` `settings-updates-last-checked`: "Sist sjekka { $when }" — assumes $when arrives as "for 5 minutt sidan" or "i går"; same for `settings-updates-released` and `settings-passwords-ssh-added`.
 - `apps/settings/locales/nn/system.ftl` `settings-updates-switching-standard`: "Lastar ned standardbiletet …" — "image" as in system image; «bilete» could be misread as picture, consider «standardsystemet».
+
+## Website
+
+- `web/site/locales/nn/download.ftl` `download-meet-note`: «Mer informasjon» and «Kjør likevel» — Bokmål SmartScreen labels, since Windows has no Nynorsk; check this reads fine in a Nynorsk sentence.
+- `web/site/locales/nn/home.ftl` `home-app-mailman-detail`: "ei sortering av nye avsendarar" — "screener" has no settled Nynorsk term.
+- `web/site/locales/nn/home.ftl` `home-meet-room`: "Han lagar plass" — Meet Luft referred to as "han" (ein app); check it reads naturally as a step heading.
+- `web/site/locales/nn/home.ftl` `home-question-ready-answer`: "Nattlege bygg" — "nightly builds"; check whether another term is more familiar.

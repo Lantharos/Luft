@@ -341,6 +341,7 @@ async function _initializeUI() {
             wallpaper: layoutManager.backgroundGroup,
             registerPanel: actor => ctrlAltTabManager.addGroup(actor, _('Panel'), 'view-grid-symbolic'),
             inputMethod,
+            keyboard,
             keybindings: {
                 add: (name, settings, flags, modes, handler) => wm.addKeybinding(name, settings, flags, modes, handler),
                 allow: (name, modes) => wm.allowKeybinding(name, modes),

@@ -15,7 +15,7 @@ import type { TaskView } from '../desktop/taskView/taskView.js';
 import type { SnapLayouts } from '../desktop/windows/snapLayouts.js';
 import { animateActor, Curve, Duration, reducedMotion, Spring } from '../shared/motion.js';
 import { navigateWithKeyboard } from '../shared/input/keyboardNavigation.js';
-import { SURFACE_GAP } from '../shared/surface.js';
+import { raiseSurface, SURFACE_GAP } from '../shared/surface.js';
 import type { ClipboardPanel } from './clipboard/panel.js';
 import type { EmojiPanel } from './emoji/panel.js';
 import type { NotificationCenter } from './notifications/notificationCenter.js';
@@ -124,7 +124,7 @@ export class Surfaces {
     const stage = (global as unknown as Shell.Global).stage;
     this.cover.set_size(stage.width, stage.height);
     const startWidth = Math.min(660, monitor.width - 24);
-    const clearance = board.shown ? board.cornerClearance : taskbarPreferences.clearance;
+    const clearance = Math.max(board.shown ? board.cornerClearance : taskbarPreferences.clearance, this.keyboardHeight(monitor));
     const bottom = monitor.y + monitor.height - clearance - SURFACE_GAP;
     const available = monitor.height - clearance - 24;
     const startHeight = Math.min(START_HEIGHT, available);
@@ -201,7 +201,7 @@ export class Surfaces {
     this.releaseSelection(actor);
     if (surface === 'start') this.start.reset();
 
-    this.layer.get_parent()!.set_child_above_sibling(this.layer, null);
+    raiseSurface(this.layer);
     this.layer.set_child_above_sibling(actor, null);
     const opening = !actor.visible;
     actor.show();
@@ -299,6 +299,11 @@ export class Surfaces {
   private setActive(surface: Surface | null): void {
     this.current = surface;
     this.parts.context.messageTray.bannerBlocked = surface === 'notifications';
+  }
+
+  private keyboardHeight(monitor: Monitor): number {
+    const { keyboard, layoutManager } = this.parts.context;
+    return keyboard.visible && layoutManager.keyboardIndex === monitor.index ? layoutManager.keyboardBox.height : 0;
   }
 
   private surfaceMonitor(): Monitor {

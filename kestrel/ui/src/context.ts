@@ -25,11 +25,19 @@ interface LayoutManager {
   primaryMonitor: Monitor | null;
   monitors: Monitor[];
   uiGroup: Clutter.Actor;
+  keyboardBox: Clutter.Actor;
+  keyboardIndex: number;
   addChrome(actor: Clutter.Actor, params?: Record<string, boolean>): void;
   addTopChrome(actor: Clutter.Actor, params?: Record<string, boolean>): void;
   removeChrome(actor: Clutter.Actor): void;
   getWorkAreaForMonitor(index: number): Mtk.Rectangle;
   connect(signal: string, callback: () => void): number;
+  disconnect(id: number): void;
+}
+
+export interface ScreenKeyboard {
+  readonly visible: boolean;
+  connect(signal: 'visibility-changed', callback: () => void): number;
   disconnect(id: number): void;
 }
 
@@ -55,6 +63,7 @@ export interface Context {
   wallpaper: Clutter.Actor;
   registerPanel(actor: St.Widget): void;
   inputMethod: TextInput;
+  keyboard: ScreenKeyboard;
   keybindings: Keybindings;
   showOsd(icon: Gio.Icon, label: string | null, level: number | null, maxLevel: number): void;
 }

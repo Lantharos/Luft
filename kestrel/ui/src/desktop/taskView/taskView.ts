@@ -7,7 +7,7 @@ import St from 'gi://St';
 
 import { animateActor, animateAdjustment, Curve, Duration, reducedMotion, Spring } from '../../shared/motion.js';
 import type { Monitor } from '../panel/panel.js';
-import { blurSurface } from '../../shared/surface.js';
+import { blurSurface, raiseSurface } from '../../shared/surface.js';
 import { paintHidden } from '../../surfaces/prewarm.js';
 import { windowSlots } from './grid.js';
 import { CARD_HEADER, WindowCard } from './windowCard.js';
@@ -73,7 +73,7 @@ export class TaskView {
     ];
     this.sync();
     if (!reducedMotion()) this.hideWindows();
-    this.actor.get_parent()!.set_child_above_sibling(this.actor, null);
+    raiseSurface(this.actor);
     if (!this.actor.visible) {
       const reduced = reducedMotion();
       this.actor.opacity = reduced ? 0 : 255;

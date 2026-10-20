@@ -3,7 +3,7 @@ import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
-import { blurSurface } from '../../shared/surface.js';
+import { blurSurface, raiseSurface } from '../../shared/surface.js';
 import { taskbarPreferences } from './preferences/taskbarPreferences.js';
 import { animateActor } from '../../shared/motion.js';
 import { freezeSelection } from 'resource:///com/lantharos/kestrel/ui/kestrelGlass.js';
@@ -115,7 +115,7 @@ export class WindowPreviews {
     const popupHeight = this.actor.get_preferred_height(popupWidth)[1];
     const [x] = button.get_transformed_position();
     this.actor.set_position(Math.round(Math.max(monitor.x + 12, Math.min(x + button.width / 2 - popupWidth / 2, monitor.x + monitor.width - popupWidth - 12))), monitor.y + monitor.height - clearance - popupHeight - 10);
-    this.actor.get_parent()!.set_child_above_sibling(this.actor, null);
+    raiseSurface(this.actor);
     this.actor.opacity = 0;
     this.actor.translation_y = 8;
     animateActor(this.actor, { opacity: 255, translation_y: 0, duration: 160, mode: Clutter.AnimationMode.EASE_OUT_QUAD });

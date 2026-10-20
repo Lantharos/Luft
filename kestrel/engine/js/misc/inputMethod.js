@@ -450,9 +450,17 @@ export const InputMethod = GObject.registerClass({
             global.display.get_keybinding_action(event.get_key_code(), event.get_state()) !== Meta.KeyBindingAction.NONE;
     }
 
+    _typedOnHardware(event) {
+        return event.type() === Clutter.EventType.KEY_PRESS &&
+            event.get_source_device()?.get_device_node() != null &&
+            Clutter.keysym_to_unicode(event.get_key_symbol()) !== 0;
+    }
+
     vfunc_filter_key_event(event) {
         if (this._forCompositor(event))
             return false;
+        if (this._typedOnHardware(event))
+            Main.keyboard.close();
         if (this._interceptKey(event))
             return true;
         if (!this._context)

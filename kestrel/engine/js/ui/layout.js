@@ -276,23 +276,24 @@ export const LayoutManager = GObject.registerClass({
         });
         this.uiGroup.add_child(this.modalDialogGroup);
 
-        const inputPanelGroup = global.compositor.get_input_panel_group();
-        global.stage.remove_child(inputPanelGroup);
-        this.uiGroup.add_child(inputPanelGroup);
+        this._inputPanelGroup = global.compositor.get_input_panel_group();
+        global.stage.remove_child(this._inputPanelGroup);
+        this.uiGroup.add_child(this._inputPanelGroup);
 
         this.keyboardBox = new St.BoxLayout({
             name: 'keyboardBox',
             reactive: true,
             track_hover: true,
         });
-        inputPanelGroup.add_child(this.keyboardBox);
+        this._inputPanelGroup.add_child(this.keyboardBox);
         this._keyboardHeightNotifyId = 0;
 
         this.screenshotUIGroup = new St.Widget({
             name: 'screenshotUIGroup',
             layout_manager: new Clutter.BinLayout(),
         });
-        this.addTopChrome(this.screenshotUIGroup);
+        this.uiGroup.add_child(this.screenshotUIGroup);
+        this._trackActor(this.screenshotUIGroup);
 
         // A dummy actor that tracks the mouse or text cursor, based on the
         // position and size set in setDummyCursorGeometry.
@@ -708,9 +709,19 @@ export const LayoutManager = GObject.registerClass({
     // @params: (optional) additional params
     //
     // Like addChrome(), but adds @actor above all windows, including popups.
+    // Only the on-screen keyboard stays above it.
     addTopChrome(actor, params) {
-        this.uiGroup.add_child(actor);
+        this.uiGroup.insert_child_below(actor, this._inputPanelGroup);
         this._trackActor(actor, params);
+    }
+
+    // addKeyboardChrome:
+    // @actor: a popup belonging to the on-screen keyboard
+    //
+    // Adds @actor above the on-screen keyboard, where it keeps receiving
+    // input while another actor holds a grab.
+    addKeyboardChrome(actor) {
+        this._inputPanelGroup.add_child(actor);
     }
 
     // trackChrome:

@@ -153,6 +153,7 @@ class KestrelUi {
     context.layoutManager.addTopChrome(this.surfaces.layer);
     context.layoutManager.addTopChrome(this.taskView.actor);
 
+    this.watch(context.keyboard, 'visibility-changed', place);
     this.watch(shellGlobal.stage, 'key-press-event', (_stage, event) => {
       const active = this.surfaces.active;
       if (active && event.get_key_symbol() === Clutter.KEY_Escape) {

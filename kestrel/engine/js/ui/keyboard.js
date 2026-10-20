@@ -21,6 +21,7 @@ import * as SwipeTracker from './swipeTracker.js';
 
 export const KEYBOARD_ANIMATION_TIME = 150;
 const KEYBOARD_REST_TIME = KEYBOARD_ANIMATION_TIME * 2;
+const FIELD_CLEARANCE = 16;
 
 const A11Y_APPLICATIONS_SCHEMA = 'org.gnome.desktop.a11y.applications';
 const SHOW_KEYBOARD = 'screen-keyboard-enabled';
@@ -285,7 +286,7 @@ const Key = GObject.registerClass({
         }
 
         this.keyButton._extendedKeys = this._extendedKeyboard;
-        Main.layoutManager.addTopChrome(this._menu.actor);
+        Main.layoutManager.addKeyboardChrome(this._menu.actor);
     }
 
     _showSubkeys() {
@@ -952,6 +953,7 @@ export class KeyboardManager extends Signals.EventEmitter {
             this._keyboard.destroy();
             this._keyboard = null;
             this._bottomDragGesture.enabled = true;
+            this.emit('visibility-changed');
         }
     }
 
@@ -1012,6 +1014,7 @@ export const Keyboard = GObject.registerClass({
         this._languagePopup = null;
         this._focusWindow = null;
         this._focusWindowStartY = null;
+        this._liftedChrome = null;
 
         this._latched = false; // current level is latched
         this._modifiers = new Set();
@@ -1022,7 +1025,8 @@ export const Keyboard = GObject.registerClass({
         this._focusTracker = new FocusTracker();
         this._focusTracker.connectObject(
             'position-changed', this._onFocusPositionChanged.bind(this),
-            'window-grabbed', this._onFocusWindowMoving.bind(this), this);
+            'window-grabbed', this._onFocusWindowMoving.bind(this),
+            'focus-changed', this._onClientFocusChanged.bind(this), this);
 
         this._windowMovedId = this._focusTracker.connect('window-moved',
             this._onFocusWindowMoving.bind(this));
@@ -1049,6 +1053,16 @@ export const Keyboard = GObject.registerClass({
         super.visible = visible;
     }
 
+    _onClientFocusChanged(_focusTracker, focused) {
+        if (Main.inputMethod.currentFocus)
+            return;
+
+        if (focused)
+            this.open(Main.layoutManager.focusIndex);
+        else
+            this.close();
+    }
+
     _onFocusPositionChanged(focusTracker) {
         const rect = focusTracker.getCurrentRect();
         this.setCursorLocation(focusTracker.currentWindow, rect.x, rect.y, rect.width, rect.height);
@@ -1067,6 +1081,7 @@ export const Keyboard = GObject.registerClass({
         }
 
         this._clearShowIdle();
+        this._liftFocusedChrome(false);
 
         this._keyboardController.setOskCompletion(false);
         this._keyboardController.destroy();
@@ -1120,6 +1135,7 @@ export const Keyboard = GObject.registerClass({
             this._onKeyFocusChanged.bind(this), this);
 
         this._relayout();
+        this._onKeyFocusChanged();
     }
 
     _shouldShowEmoji() {
@@ -1421,7 +1437,7 @@ export const Keyboard = GObject.registerClass({
             this._languagePopup.destroy();
 
         this._languagePopup = new LanguageSelectionPopup(keyActor);
-        Main.layoutManager.addTopChrome(this._languagePopup.actor);
+        Main.layoutManager.addKeyboardChrome(this._languagePopup.actor);
         this._languagePopup.open(BoxPointer.PopupAnimation.FULL);
     }
 
@@ -1536,6 +1552,7 @@ export const Keyboard = GObject.registerClass({
 
         if (this._keyboardVisible) {
             this._relayout();
+            this._liftFocusedChrome(true);
             return;
         }
 
@@ -1617,6 +1634,7 @@ export const Keyboard = GObject.registerClass({
         });
         this._keyboardVisible = true;
         this.emit('visibility-changed');
+        this._liftFocusedChrome(true);
     }
 
     _animateShowComplete() {
@@ -1629,6 +1647,7 @@ export const Keyboard = GObject.registerClass({
     _animateHide() {
         if (this._focusWindow)
             this._animateWindow(this._focusWindow, false);
+        this._liftFocusedChrome(false);
 
         if (this._keyboardHeightNotifyId) {
             Main.layoutManager.keyboardBox.disconnect(this._keyboardHeightNotifyId);
@@ -1711,6 +1730,46 @@ export const Keyboard = GObject.registerClass({
         window.move_frame(true, frameRect.x, frameRect.y);
         this._windowMovedId = this._focusTracker.connect('window-moved',
             this._onFocusWindowMoving.bind(this));
+    }
+
+    _liftFocusedChrome(shown) {
+        const field = shown ? this._focusedField() : null;
+        const chrome = field ? this._chromeOf(field) : null;
+        if (this._liftedChrome && this._liftedChrome !== chrome)
+            this._easeLift(this._liftedChrome, 0);
+        this._liftedChrome = chrome;
+        if (!chrome)
+            return;
+
+        const monitor = Main.layoutManager.keyboardMonitor;
+        const keyboardTop = monitor.y + monitor.height - this.height;
+        const [, fieldY] = field.get_transformed_position();
+        const fieldBottom = fieldY - chrome.translation_y + field.height;
+        const lift = Math.min(Math.max(0, fieldBottom + FIELD_CLEARANCE - keyboardTop), this.height);
+        this._easeLift(chrome, -lift);
+    }
+
+    _focusedField() {
+        const focus = global.stage.key_focus;
+        if (!(focus instanceof Clutter.Text))
+            return null;
+        const parent = focus.get_parent();
+        return parent instanceof St.Entry ? parent : focus;
+    }
+
+    _chromeOf(actor) {
+        const uiGroup = Main.layoutManager.uiGroup;
+        while (actor && actor.get_parent() !== uiGroup)
+            actor = actor.get_parent();
+        return actor;
+    }
+
+    _easeLift(chrome, translation) {
+        chrome.ease({
+            translation_y: translation,
+            duration: KEYBOARD_ANIMATION_TIME,
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+        });
     }
 
     _animateWindow(window, show) {

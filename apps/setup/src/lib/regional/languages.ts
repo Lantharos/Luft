@@ -1,4 +1,4 @@
-import { bcp47 } from '@luft/i18n';
+import { bcp47, match } from '@luft/i18n';
 
 export interface Language {
 	locale: string;
@@ -92,7 +92,9 @@ export function languageFor(country: string | null): Language | null {
 
 export function languageNamed(locale: string | null): Language | null {
 	const tag = locale && bcp47(locale);
-	return LANGUAGES.find((language) => languageTag(language) === tag) ?? null;
+	if (!tag) return null;
+	const translation = match(tag);
+	return LANGUAGES.find((language) => languageTag(language) === tag) ?? LANGUAGES.find((language) => match(languageTag(language)) === translation) ?? null;
 }
 
 const KEYBOARDS: Record<string, string> = {

@@ -2740,6 +2740,13 @@ export class ScreenshotService {
                y + height <= global.screen_height;
     }
 
+    _rejectArea(invocation) {
+        invocation.return_error_literal(
+            Gio.IOErrorEnum,
+            Gio.IOErrorEnum.INVALID_ARGUMENT,
+            'The area is empty or reaches past the screen');
+    }
+
     *_resolveRelativeFilename(filename) {
         filename = filename.replace(/\.png$/, '');
 
@@ -2806,6 +2813,29 @@ export class ScreenshotService {
         });
     }
 
+    async _shoot(invocation, filename, flash, take) {
+        const screenshot = await this._createScreenshot(invocation);
+        if (!screenshot)
+            return;
+
+        const [stream, file] = this._createStream(filename, invocation);
+        if (!stream)
+            return;
+
+        try {
+            await Promise.all([
+                flash ? this._flashAsync(screenshot) : null,
+                take(screenshot, stream),
+            ]);
+            this._onScreenshotComplete(stream, file, invocation);
+        } catch (e) {
+            stream.close(null);
+            invocation.return_gerror(e);
+        } finally {
+            this._removeShooterForSender(invocation.get_sender());
+        }
+    }
+
     _onScreenshotComplete(stream, file, invocation) {
         stream.close(null);
 
@@ -2844,77 +2874,23 @@ export class ScreenshotService {
         let [x, y, width, height, flash, filename] = params;
         [x, y, width, height] = this._scaleArea(x, y, width, height);
         if (!this._checkArea(x, y, width, height)) {
-            invocation.return_error_literal(
-                Gio.IOErrorEnum,
-                Gio.IOErrorEnum.CANCELLED,
-                'Invalid params');
+            this._rejectArea(invocation);
             return;
         }
-        const screenshot = await this._createScreenshot(invocation);
-        if (!screenshot)
-            return;
-
-        const [stream, file] = this._createStream(filename, invocation);
-        if (!stream)
-            return;
-
-        try {
-            await Promise.all([
-                flash ? this._flashAsync(screenshot) : null,
-                screenshot.screenshot_area(x, y, width, height, stream),
-            ]);
-            this._onScreenshotComplete(stream, file, invocation);
-        } catch {
-            invocation.return_value(new GLib.Variant('(bs)', [false, '']));
-        } finally {
-            this._removeShooterForSender(invocation.get_sender());
-        }
+        await this._shoot(invocation, filename, flash,
+            (screenshot, stream) => screenshot.screenshot_area(x, y, width, height, stream));
     }
 
     async ScreenshotWindowAsync(params, invocation) {
         const [includeFrame, includeCursor, flash, filename] = params;
-        const screenshot = await this._createScreenshot(invocation);
-        if (!screenshot)
-            return;
-
-        const [stream, file] = this._createStream(filename, invocation);
-        if (!stream)
-            return;
-
-        try {
-            await Promise.all([
-                flash ? this._flashAsync(screenshot) : null,
-                screenshot.screenshot_window(includeFrame, includeCursor, stream),
-            ]);
-            this._onScreenshotComplete(stream, file, invocation);
-        } catch {
-            invocation.return_value(new GLib.Variant('(bs)', [false, '']));
-        } finally {
-            this._removeShooterForSender(invocation.get_sender());
-        }
+        await this._shoot(invocation, filename, flash,
+            (screenshot, stream) => screenshot.screenshot_window(includeFrame, includeCursor, stream));
     }
 
     async ScreenshotAsync(params, invocation) {
         const [includeCursor, flash, filename] = params;
-        const screenshot = await this._createScreenshot(invocation);
-        if (!screenshot)
-            return;
-
-        const [stream, file] = this._createStream(filename, invocation);
-        if (!stream)
-            return;
-
-        try {
-            await Promise.all([
-                flash ? this._flashAsync(screenshot) : null,
-                screenshot.screenshot(includeCursor, stream),
-            ]);
-            this._onScreenshotComplete(stream, file, invocation);
-        } catch {
-            invocation.return_value(new GLib.Variant('(bs)', [false, '']));
-        } finally {
-            this._removeShooterForSender(invocation.get_sender());
-        }
+        await this._shoot(invocation, filename, flash,
+            (screenshot, stream) => screenshot.screenshot(includeCursor, stream));
     }
 
     async InteractiveScreenshotAsync(params, invocation) {
@@ -2966,10 +2942,7 @@ export class ScreenshotService {
         let [x, y, width, height] = params;
         [x, y, width, height] = this._scaleArea(x, y, width, height);
         if (!this._checkArea(x, y, width, height)) {
-            invocation.return_error_literal(
-                Gio.IOErrorEnum,
-                Gio.IOErrorEnum.CANCELLED,
-                'Invalid params');
+            this._rejectArea(invocation);
             return;
         }
         const flashspot = new Flashspot({x, y, width, height});
@@ -3302,11 +3275,14 @@ class PickPixel extends St.Widget {
 
         this._inPick = true;
         this._previewCursor.set_position(x, y);
-        [this._color] = await this._screenshot.pick_color(x, y);
-        this._inPick = false;
-
-        if (!this._color)
+        try {
+            [this._color] = await this._screenshot.pick_color(x, y);
+        } catch (e) {
+            logError(e, 'Error picking a color');
             return;
+        } finally {
+            this._inPick = false;
+        }
 
         this._recolorEffect.color = this._color;
         this._previewCursor.show();

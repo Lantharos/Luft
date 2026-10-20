@@ -32,11 +32,11 @@ function screenshotPath(): string {
   return GLib.build_filenamev([directory, `Screenshot ${GLib.DateTime.new_now_local().format('%Y-%m-%d %H-%M-%S')}.png`]);
 }
 
-async function saved(method: string, parameters: (boolean | number)[], signature: string): Promise<string | null> {
+async function saved(method: string, parameters: (boolean | number)[], signature: string): Promise<string> {
   const type: string = `(${signature}s)`;
   const reply = await callShell(method, new GLib.Variant(type, [...parameters, screenshotPath()]), '(bs)');
-  const [success, filename] = reply.deep_unpack() as [boolean, string];
-  return success ? Gio.File.new_for_path(filename).get_uri() : null;
+  const [, filename] = reply.deep_unpack() as [boolean, string];
+  return Gio.File.new_for_path(filename).get_uri();
 }
 
 async function capture(target: number | undefined, interactive: boolean): Promise<string | null> {

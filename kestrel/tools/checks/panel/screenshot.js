@@ -6,7 +6,7 @@ import {checks} from '../lib/check.js';
 import {property} from '../lib/dbus.js';
 import {rest} from '../lib/input.js';
 import {inputMethodSettled} from '../lib/inputMethod.js';
-import {capture, captureFrame, renderedFrame} from '../lib/screenshots.js';
+import {capture, captureFrame, renderedFrame, screenshot} from '../lib/screenshots.js';
 import {settled, within} from '../lib/wait.js';
 import {areaOf} from './backdrops/coverage.js';
 import {WALLPAPERS} from './backdrops/wallpapers.js';
@@ -80,7 +80,26 @@ async function checkScheme(scheme) {
   require(frozen.looksLike(onScreen, TOLERANCE), `the ${scheme} taskbar keeps its look under the screenshot tool`);
 }
 
+const EMPTY_AREAS = [{x: 0, y: 0, width: 0, height: 0}, {x: 10, y: 10, width: -4, height: 20}];
+const PROBE = {x: 0, y: 0, width: 16, height: 16};
+
+async function refuses(area) {
+  try {
+    await screenshot(area);
+    return false;
+  } catch (error) {
+    return error.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.INVALID_ARGUMENT);
+  }
+}
+
+async function checkEmptyAreas() {
+  for (const area of EMPTY_AREAS)
+    require(await refuses(area), `a ${area.width}x${area.height} screenshot fails with an error`);
+  require((await screenshot(PROBE)).get_size() > 0, 'Kestrel keeps taking screenshots after refusing empty ones');
+}
+
 export async function run() {
+  await checkEmptyAreas();
   const saved = interfaceSettings.get_string('color-scheme');
   const wallpapers = WALLPAPER_KEYS.map(key => [key, background.get_string(key)]);
   rest();

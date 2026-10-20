@@ -91,6 +91,37 @@ shell_screenshot_init (ShellScreenshot *screenshot)
   screenshot->global = shell_global_get ();
 }
 
+static gboolean
+check_area (int      width,
+            int      height,
+            GError **error)
+{
+  if (width > 0 && height > 0)
+    return TRUE;
+
+  g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
+               "Can't capture an empty %dx%d area", width, height);
+  return FALSE;
+}
+
+static void
+clear_capture (ShellScreenshot *screenshot)
+{
+  g_clear_pointer (&screenshot->image, cairo_surface_destroy);
+  g_clear_object (&screenshot->stream);
+  g_clear_pointer (&screenshot->datetime, g_date_time_unref);
+}
+
+static void
+fail_screenshot (ShellScreenshot *screenshot,
+                 GTask           *result,
+                 GError          *error)
+{
+  clear_capture (screenshot);
+  g_task_return_error (result, error);
+  g_object_unref (result);
+}
+
 static void
 on_screenshot_written (GObject      *source,
                        GAsyncResult *task,
@@ -98,13 +129,15 @@ on_screenshot_written (GObject      *source,
 {
   ShellScreenshot *screenshot = SHELL_SCREENSHOT (source);
   GTask *result = user_data;
+  GError *error = NULL;
 
-  g_task_return_boolean (result, g_task_propagate_boolean (G_TASK (task), NULL));
+  if (g_task_propagate_boolean (G_TASK (task), &error))
+    g_task_return_boolean (result, TRUE);
+  else
+    g_task_return_error (result, error);
   g_object_unref (result);
 
-  g_clear_pointer (&screenshot->image, cairo_surface_destroy);
-  g_clear_object (&screenshot->stream);
-  g_clear_pointer (&screenshot->datetime, g_date_time_unref);
+  clear_capture (screenshot);
 }
 
 static cairo_format_t
@@ -303,6 +336,13 @@ write_screenshot_thread (GTask        *result,
                                      0, 0,
                                      cairo_image_surface_get_width (screenshot->image),
                                      cairo_image_surface_get_height (screenshot->image));
+  if (!pixbuf)
+    {
+      g_task_return_new_error (result, G_IO_ERROR, G_IO_ERROR_FAILED,
+                               "Converting the screenshot failed");
+      return;
+    }
+
   creation_time = g_date_time_format (screenshot->datetime, "%c");
 
   if (!creation_time)
@@ -319,13 +359,14 @@ write_screenshot_thread (GTask        *result,
     g_task_return_boolean (result, TRUE);
 }
 
-static void
+static gboolean
 do_grab_screenshot (ShellScreenshot     *screenshot,
                     int                  x,
                     int                  y,
                     int                  width,
                     int                  height,
-                    ShellScreenshotFlag  flags)
+                    ShellScreenshotFlag  flags,
+                    GError             **error)
 {
   ClutterStage *stage = shell_global_get_stage (screenshot->global);
   MtkRectangle screenshot_rect = { x, y, width, height };
@@ -334,14 +375,28 @@ do_grab_screenshot (ShellScreenshot     *screenshot,
   float scale;
   cairo_surface_t *image;
   ClutterPaintFlag paint_flags = CLUTTER_PAINT_FLAG_NONE;
-  g_autoptr (GError) error = NULL;
+
+  if (!check_area (width, height, error))
+    return FALSE;
 
   clutter_stage_get_capture_final_size (stage, &screenshot_rect,
                                         &image_width,
                                         &image_height,
                                         &scale);
+  if (!check_area (image_width, image_height, error))
+    return FALSE;
+
   image = cairo_image_surface_create (CAIRO_FORMAT_ARGB32,
                                       image_width, image_height);
+  if (cairo_surface_status (image) != CAIRO_STATUS_SUCCESS)
+    {
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+                   "Can't allocate a %dx%d screenshot: %s",
+                   image_width, image_height,
+                   cairo_status_to_string (cairo_surface_status (image)));
+      cairo_surface_destroy (image);
+      return FALSE;
+    }
 
   if (flags & SHELL_SCREENSHOT_FLAG_INCLUDE_CURSOR)
     paint_flags |= CLUTTER_PAINT_FLAG_FORCE_CURSORS;
@@ -353,16 +408,18 @@ do_grab_screenshot (ShellScreenshot     *screenshot,
                                       COGL_PIXEL_FORMAT_ARGB32_NATIVE,
                                       NULL,
                                       paint_flags,
-                                      &error))
+                                      error))
     {
       cairo_surface_destroy (image);
-      g_warning ("Failed to take screenshot: %s", error->message);
-      return;
+      return FALSE;
     }
 
+  g_clear_pointer (&screenshot->image, cairo_surface_destroy);
   screenshot->image = image;
 
+  g_clear_pointer (&screenshot->datetime, g_date_time_unref);
   screenshot->datetime = g_date_time_new_now_local ();
+  return TRUE;
 }
 
 static void
@@ -447,18 +504,26 @@ grab_screenshot (ShellScreenshot     *screenshot,
   MetaDisplay *display;
   int width, height;
   GTask *task;
+  GError *error = NULL;
 
   display = shell_global_get_display (screenshot->global);
   meta_display_get_size (display, &width, &height);
 
-  do_grab_screenshot (screenshot,
-                      0, 0, width, height,
-                      flags);
+  if (!do_grab_screenshot (screenshot,
+                           0, 0, width, height,
+                           flags, &error))
+    {
+      fail_screenshot (screenshot, result, error);
+      return;
+    }
 
   screenshot->screenshot_area.x = 0;
   screenshot->screenshot_area.y = 0;
   screenshot->screenshot_area.width = width;
   screenshot->screenshot_area.height = height;
+
+  g_signal_emit (screenshot, signals[SCREENSHOT_TAKEN], 0,
+                 &screenshot->screenshot_area);
 
   task = g_task_new (screenshot, NULL, on_screenshot_written, result);
   g_task_set_source_tag (task, grab_screenshot);
@@ -488,6 +553,12 @@ grab_screenshot_content (ShellScreenshot *screenshot,
   display = shell_global_get_display (screenshot->global);
   backend = shell_global_get_backend (screenshot->global);
   meta_display_get_size (display, &width, &height);
+  if (!check_area (width, height, &error))
+    {
+      g_task_return_error (result, g_steal_pointer (&error));
+      return;
+    }
+
   screenshot_rect = (MtkRectangle) {
       .x = 0,
       .y = 0,
@@ -599,19 +670,39 @@ grab_window_screenshot (ShellScreenshot     *screenshot,
   MetaDisplay *display = shell_global_get_display (screenshot->global);
   MetaWindow *window = meta_display_get_focus_window (display);
   ClutterActor *window_actor;
-  gfloat actor_x, actor_y;
   g_autoptr (CoglBitmap) bitmap = NULL;
   uint8_t *data;
   int width, height, stride;
   MtkRectangle rect;
+  GError *error = NULL;
+
+  if (!window)
+    {
+      fail_screenshot (screenshot, result,
+                       g_error_new_literal (G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                                            "No window has focus"));
+      return;
+    }
 
   window_actor = CLUTTER_ACTOR (meta_window_get_compositor_private (window));
-  clutter_actor_get_position (window_actor, &actor_x, &actor_y);
+  if (!window_actor)
+    {
+      fail_screenshot (screenshot, result,
+                       g_error_new_literal (G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+                                            "The focused window isn't shown yet"));
+      return;
+    }
 
   meta_window_get_frame_rect (window, &rect);
 
   if (!screenshot->include_frame)
     meta_window_frame_rect_to_client_rect (window, &rect, &rect);
+
+  if (!check_area (rect.width, rect.height, &error))
+    {
+      fail_screenshot (screenshot, result, error);
+      return;
+    }
 
   screenshot->screenshot_area = rect;
 
@@ -619,21 +710,27 @@ grab_window_screenshot (ShellScreenshot     *screenshot,
                                               COGL_PIXEL_FORMAT_ARGB32_NATIVE);
   if (!bitmap)
     {
-      g_task_report_new_error (screenshot, on_screenshot_written, result, NULL,
-                               G_IO_ERROR, G_IO_ERROR_FAILED,
-                               "Capturing window failed");
+      fail_screenshot (screenshot, result,
+                       g_error_new_literal (G_IO_ERROR, G_IO_ERROR_FAILED,
+                                            "Capturing window failed"));
       return;
     }
 
   width = cogl_bitmap_get_width (bitmap);
   height = cogl_bitmap_get_height (bitmap);
+  if (!check_area (width, height, &error))
+    {
+      fail_screenshot (screenshot, result, error);
+      return;
+    }
+
   stride = cogl_bitmap_get_rowstride (bitmap);
   data = cogl_bitmap_map (bitmap, COGL_BUFFER_ACCESS_READ, 0, NULL);
   if (!data)
     {
-      g_task_report_new_error (screenshot, on_screenshot_written, result, NULL,
-                               G_IO_ERROR, G_IO_ERROR_FAILED,
-                               "Capturing window failed");
+      fail_screenshot (screenshot, result,
+                       g_error_new_literal (G_IO_ERROR, G_IO_ERROR_FAILED,
+                                            "Capturing window failed"));
       return;
     }
 
@@ -731,9 +828,6 @@ shell_screenshot_screenshot (ShellScreenshot     *screenshot,
     flags |= SHELL_SCREENSHOT_FLAG_INCLUDE_CURSOR;
 
   grab_screenshot (screenshot, flags, result);
-
-  g_signal_emit (screenshot, signals[SCREENSHOT_TAKEN], 0,
-                  (MtkRectangle *) &screenshot->screenshot_area);
 }
 
 /**
@@ -872,6 +966,7 @@ shell_screenshot_screenshot_area (ShellScreenshot     *screenshot,
 {
   GTask *result;
   g_autoptr (GTask) task = NULL;
+  GError *error = NULL;
 
   g_return_if_fail (SHELL_IS_SCREENSHOT (screenshot));
   g_return_if_fail (G_IS_OUTPUT_STREAM (stream));
@@ -880,7 +975,7 @@ shell_screenshot_screenshot_area (ShellScreenshot     *screenshot,
     if (callback)
       g_task_report_new_error (screenshot,
                                callback,
-                               NULL,
+                               user_data,
                                shell_screenshot_screenshot_area,
                                G_IO_ERROR,
                                G_IO_ERROR_PENDING,
@@ -899,15 +994,20 @@ shell_screenshot_screenshot_area (ShellScreenshot     *screenshot,
   screenshot->screenshot_area.width = width;
   screenshot->screenshot_area.height = height;
 
-  do_grab_screenshot (screenshot,
-                      screenshot->screenshot_area.x,
-                      screenshot->screenshot_area.y,
-                      screenshot->screenshot_area.width,
-                      screenshot->screenshot_area.height,
-                      SHELL_SCREENSHOT_FLAG_NONE);
+  if (!do_grab_screenshot (screenshot,
+                           screenshot->screenshot_area.x,
+                           screenshot->screenshot_area.y,
+                           screenshot->screenshot_area.width,
+                           screenshot->screenshot_area.height,
+                           SHELL_SCREENSHOT_FLAG_NONE,
+                           &error))
+    {
+      fail_screenshot (screenshot, result, error);
+      return;
+    }
 
   g_signal_emit (screenshot, signals[SCREENSHOT_TAKEN], 0,
-                  (MtkRectangle *) &screenshot->screenshot_area);
+                 &screenshot->screenshot_area);
 
   task = g_task_new (screenshot, NULL, on_screenshot_written, result);
   g_task_set_source_tag (task, shell_screenshot_screenshot_area);
@@ -963,21 +1063,16 @@ shell_screenshot_screenshot_window (ShellScreenshot     *screenshot,
                                     GAsyncReadyCallback  callback,
                                     gpointer             user_data)
 {
-  MetaDisplay *display;
-  MetaWindow *window;
   GTask *result;
 
   g_return_if_fail (SHELL_IS_SCREENSHOT (screenshot));
   g_return_if_fail (G_IS_OUTPUT_STREAM (stream));
 
-  display = shell_global_get_display (screenshot->global);
-  window = meta_display_get_focus_window (display);
-
-  if (screenshot->stream != NULL || !window) {
+  if (screenshot->stream != NULL) {
     if (callback)
       g_task_report_new_error (screenshot,
                                callback,
-                               NULL,
+                               user_data,
                                shell_screenshot_screenshot_window,
                                G_IO_ERROR,
                                G_IO_ERROR_PENDING,
@@ -1041,6 +1136,7 @@ shell_screenshot_pick_color (ShellScreenshot     *screenshot,
                              gpointer             user_data)
 {
   g_autoptr (GTask) result = NULL;
+  GError *error = NULL;
 
   g_return_if_fail (SHELL_IS_SCREENSHOT (screenshot));
 
@@ -1052,12 +1148,17 @@ shell_screenshot_pick_color (ShellScreenshot     *screenshot,
   screenshot->screenshot_area.width = 1;
   screenshot->screenshot_area.height = 1;
 
-  do_grab_screenshot (screenshot,
-                      screenshot->screenshot_area.x,
-                      screenshot->screenshot_area.y,
-                      1,
-                      1,
-                      SHELL_SCREENSHOT_FLAG_NONE);
+  if (!do_grab_screenshot (screenshot,
+                           screenshot->screenshot_area.x,
+                           screenshot->screenshot_area.y,
+                           1,
+                           1,
+                           SHELL_SCREENSHOT_FLAG_NONE,
+                           &error))
+    {
+      g_task_return_error (result, error);
+      return;
+    }
 
   g_task_return_boolean (result, TRUE);
 }
@@ -1186,6 +1287,7 @@ shell_screenshot_composite_to_stream (CoglTexture         *texture,
   g_autoptr (GdkPixbuf) pixbuf = NULL;
   g_autofree char *creation_time = NULL;
   g_autoptr (GDateTime) date_time = NULL;
+  GError *error = NULL;
 
   task = g_task_new (NULL, NULL, callback, user_data);
   g_task_set_source_tag (task, shell_screenshot_composite_to_stream);
@@ -1196,6 +1298,22 @@ shell_screenshot_composite_to_stream (CoglTexture         *texture,
       y = 0;
       width = cogl_texture_get_width (texture);
       height = cogl_texture_get_height (texture);
+    }
+
+  if (!check_area (width, height, &error))
+    {
+      g_task_return_error (task, error);
+      return;
+    }
+
+  if (x < 0 || y < 0 ||
+      x + width > (int) cogl_texture_get_width (texture) ||
+      y + height > (int) cogl_texture_get_height (texture))
+    {
+      g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
+                               "The %dx%d area at %d,%d is outside the texture",
+                               width, height, x, y);
+      return;
     }
 
   ctx = cogl_texture_get_context (texture);

@@ -1,6 +1,7 @@
 use minisign_verify::{PublicKey, Signature};
 
-pub const PUBLIC_KEY: Option<&str> = None;
+pub const PUBLIC_KEY: Option<&str> =
+    Some("RWRz9rCK/H8Drrze/f851hxNNOH/D42kpyTMpXV7DT7QoUdCZySZwRWA");
 
 pub fn verify(key: &str, checksum: &str, signature: &str, iso: &str) -> Result<(), String> {
     let key = PublicKey::from_base64(key).map_err(|error| error.to_string())?;

@@ -122,14 +122,9 @@ Meet Luft asks for your password through polkit once, when it first looks at the
 
 ## Signatures
 
-Every published `.sha256` can carry a [minisign](https://jedisct1.github.io/minisign/) signature next to it, `.sha256.minisig`, whose trusted comment is the name of the ISO it's for. Meet Luft has the public key built in, and once it has one, it only accepts checksums signed for the exact ISO it downloads, so an older or other ISO can't be passed off as the one it asked for. An ISO picked with *Use an ISO I already have* is the person's own choice and isn't checked against a signature.
+Every published `.sha256` has a [minisign](https://jedisct1.github.io/minisign/) signature next to it, `.sha256.minisig`, whose trusted comment is the name of the ISO it's for. The ISO workflow signs with the `LUFT_ISO_MINISIGN_KEY` Actions secret, and Meet Luft has the public key built in as `PUBLIC_KEY` in `apps/meet/desktop/src/live/signature.rs`. It only accepts checksums signed for the exact ISO it downloads, so an older or other ISO can't be passed off as the one it asked for, and refuses a download without a signature. An ISO picked with *Use an ISO I already have* is the person's own choice and isn't checked against a signature.
 
-Turning it on:
-
-1. Make a key pair without a password, on a computer you trust: `minisign -G -W -p luft-iso.pub -s luft-iso.key`.
-2. Add the whole contents of `luft-iso.key` to the repository's Actions secrets as `LUFT_ISO_MINISIGN_KEY`, and keep a copy of the file somewhere safe and offline. The ISO workflow signs from then on.
-3. Run the ISO workflow by hand for the latest release and for the nightly build, so every published ISO has its signature.
-4. Put the second line of `luft-iso.pub` into `PUBLIC_KEY` in `apps/meet/desktop/src/live/signature.rs`, as `Some("RW…")`. Builds of Meet Luft from then on refuse downloads whose checksum isn't signed.
+To change the key, make a new pair without a password on a computer you trust (`minisign -G -W -p luft-iso.pub -s luft-iso.key`), replace the secret with the whole of `luft-iso.key`, publish ISOs signed with it, and only then put the second line of `luft-iso.pub` into `PUBLIC_KEY`. Copies of Meet Luft with the old key refuse ISOs signed with the new one.
 
 Meet Luft itself isn't signed with an Authenticode certificate yet, so Windows shows it from an unknown publisher. Signing waits on a certificate; with one, the Meet Luft workflow signs `meet.exe` and the setup program through Sabine:
 

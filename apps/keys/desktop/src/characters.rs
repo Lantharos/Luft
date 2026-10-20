@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 
 const CHARACTERS: &str = include_str!("../../../../kestrel/engine/data/characters.json");
 const EMOJI: &str = include_str!("../../../../kestrel/engine/data/emoji.json");
-const ANNOTATIONS: &str = "/usr/share/unicode/cldr/common/annotations";
+const ANNOTATIONS: &str = "/usr/share/kestrel/emoji-annotations";
 const WORD_BASE: u32 = 0x80;
 const VARIATION: char = '\u{fe0f}';
 
@@ -86,30 +86,19 @@ fn languages() -> Vec<String> {
 fn emoji_names() -> HashMap<String, String> {
     let mut names = HashMap::new();
     for language in languages() {
-        let Ok(xml) = fs::read_to_string(format!("{ANNOTATIONS}/{language}.xml")) else {
+        let Some(annotations) = fs::read(format!("{ANNOTATIONS}/{language}.json"))
+            .ok()
+            .and_then(|json| {
+                serde_json::from_slice::<HashMap<String, Vec<Option<String>>>>(&json).ok()
+            })
+        else {
             continue;
         };
-        for line in xml.lines() {
-            let Some(rest) = line.trim().strip_prefix("<annotation cp=\"") else {
-                continue;
-            };
-            let Some((key, rest)) = rest.split_once('"') else {
-                continue;
-            };
-            let Some(name) = rest
-                .strip_prefix(" type=\"tts\">")
-                .and_then(|rest| rest.strip_suffix("</annotation>"))
-            else {
-                continue;
-            };
-            names.insert(
-                key.replace("&amp;", "&")
-                    .replace("&lt;", "<")
-                    .replace("&gt;", ">")
-                    .replace("&quot;", "\""),
-                name.to_owned(),
-            );
-        }
+        names.extend(
+            annotations
+                .into_iter()
+                .filter_map(|(text, mut annotation)| Some((text, annotation.get_mut(1)?.take()?))),
+        );
     }
     names
 }

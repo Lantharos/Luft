@@ -22,13 +22,14 @@ Import the styles right after Tailwind. They also make Tailwind scan this packag
 Register the plugins in `vite.config.ts`:
 
 ```ts
-import { luftFonts, sabineTarget } from '@luft/ui/vite';
+import { luftFonts, luftLocales, sabineTarget } from '@luft/ui/vite';
 
 export default defineConfig({
-	plugins: [luftFonts(), sabineTarget(), tailwindcss(), svelte()]
+	plugins: [luftFonts(), luftLocales(), sabineTarget(), tailwindcss(), svelte()]
 });
 ```
 
+- `luftLocales` bundles the app's `locales` folder and the kit's own messages, one chunk per language that loads only when that language is in use. See [Translations](../translations.md).
 - `luftFonts` serves the fonts at `/fonts/`, copies them into the build, and scales every `px` or `rem` font size and line height by the desktop's text size (`--text-scale`).
 - `sabineTarget` builds for the Chromium that Sabine ships.
 
@@ -70,7 +71,10 @@ Start the `appearance` store from the startup state that `luft_app::Appearance` 
 import { appearance } from '@luft/ui';
 
 appearance.start(await invoke('app_state'));
+await i18n.ready;
 ```
+
+`appearance.start` also loads the app's translation for the session's language; wait for `i18n.ready` from `@luft/i18n` before showing the window, so it never shows untranslated labels.
 
 | Field | Value |
 | --- | --- |

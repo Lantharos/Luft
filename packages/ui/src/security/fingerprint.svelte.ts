@@ -1,4 +1,5 @@
 import { invoke, listen } from '@lantharos/sabine';
+import { t } from '@luft/i18n';
 
 const WAIT_FOR_PERMISSION = 300_000;
 const PROGRESS = 'fingerprint.enroll';
@@ -17,54 +18,53 @@ interface EnrollProgress {
 export type EnrollPhase = 'choosing' | 'scanning' | 'added' | 'failed';
 
 export const FINGERS = [
-	['right-index-finger', 'Right index finger'],
-	['left-index-finger', 'Left index finger'],
-	['right-thumb', 'Right thumb'],
-	['left-thumb', 'Left thumb'],
-	['right-middle-finger', 'Right middle finger'],
-	['left-middle-finger', 'Left middle finger'],
-	['right-ring-finger', 'Right ring finger'],
-	['left-ring-finger', 'Left ring finger'],
-	['right-little-finger', 'Right little finger'],
-	['left-little-finger', 'Left little finger']
+	['right-index-finger', 'ui-finger-right-index', 'ui-finger-right-index.inline'],
+	['left-index-finger', 'ui-finger-left-index', 'ui-finger-left-index.inline'],
+	['right-thumb', 'ui-finger-right-thumb', 'ui-finger-right-thumb.inline'],
+	['left-thumb', 'ui-finger-left-thumb', 'ui-finger-left-thumb.inline'],
+	['right-middle-finger', 'ui-finger-right-middle', 'ui-finger-right-middle.inline'],
+	['left-middle-finger', 'ui-finger-left-middle', 'ui-finger-left-middle.inline'],
+	['right-ring-finger', 'ui-finger-right-ring', 'ui-finger-right-ring.inline'],
+	['left-ring-finger', 'ui-finger-left-ring', 'ui-finger-left-ring.inline'],
+	['right-little-finger', 'ui-finger-right-little', 'ui-finger-right-little.inline'],
+	['left-little-finger', 'ui-finger-left-little', 'ui-finger-left-little.inline']
 ] as const;
 
-const LABELS: Record<string, string> = Object.fromEntries(FINGERS);
+const MESSAGES = new Map<string, readonly [string, string]>(FINGERS.map(([finger, title, inline]) => [finger, [title, inline]]));
 
-export const fingerLabel = (finger: string) => LABELS[finger] ?? finger;
+export const fingerLabel = (finger: string) => {
+	const messages = MESSAGES.get(finger);
+	return messages ? t(messages[0]) : finger;
+};
+
+export const fingerInSentence = (finger: string) => {
+	const messages = MESSAGES.get(finger);
+	return messages ? t(messages[1]) : finger;
+};
 
 export const fingerprintReader = () => invoke<boolean>('fingerprint_reader');
 export const fingerprints = () => invoke<Fingerprints | null>('fingerprint_list');
 export const deleteFingerprint = (finger: string) => invoke<void>('fingerprint_delete', { finger }, { timeoutMs: WAIT_FOR_PERMISSION });
 
+const PROGRESS_MESSAGES: Record<string, string> = {
+	'enroll-retry-scan': 'ui-fingerprint-retry',
+	'enroll-swipe-too-short': 'ui-fingerprint-swipe-too-short',
+	'enroll-finger-not-centered': 'ui-fingerprint-not-centered',
+	'enroll-remove-and-retry': 'ui-fingerprint-remove-and-retry',
+	'enroll-completed': 'ui-fingerprint-added',
+	'enroll-data-full': 'ui-fingerprint-full',
+	'enroll-disconnected': 'ui-fingerprint-disconnected',
+	'enroll-duplicate': 'ui-fingerprint-duplicate'
+};
+
 function progressMessage(result: string, swipe: boolean) {
-	switch (result) {
-		case 'enroll-stage-passed':
-			return swipe ? 'Good. Swipe again.' : 'Good. Lift your finger, then place it again.';
-		case 'enroll-retry-scan':
-			return 'That didn’t read well. Try again.';
-		case 'enroll-swipe-too-short':
-			return 'Swipe a little slower.';
-		case 'enroll-finger-not-centered':
-			return 'Center your finger on the sensor.';
-		case 'enroll-remove-and-retry':
-			return 'Lift your finger and try again.';
-		case 'enroll-completed':
-			return 'Fingerprint added.';
-		case 'enroll-data-full':
-			return 'The reader has no room left for another fingerprint.';
-		case 'enroll-disconnected':
-			return 'The fingerprint reader stopped answering. Try again in a moment.';
-		case 'enroll-duplicate':
-			return 'The reader already has this finger saved, probably by Windows or another account. Use a different finger.';
-		default:
-			return 'Couldn’t add this fingerprint. Try again.';
-	}
+	if (result === 'enroll-stage-passed') return t(swipe ? 'ui-fingerprint-stage-passed-swipe' : 'ui-fingerprint-stage-passed');
+	return t(PROGRESS_MESSAGES[result] ?? 'ui-fingerprint-failed');
 }
 
 export class FingerprintEnrollment {
 	phase = $state<EnrollPhase>('choosing');
-	message = $state('');
+	private describe = $state<() => string>(() => '');
 	private result = $state('');
 	private passed = $state(0);
 	private stopListening: (() => void) | null = null;
@@ -72,6 +72,10 @@ export class FingerprintEnrollment {
 
 	constructor(reader: Pick<Fingerprints, 'swipe' | 'stages'>) {
 		this.reader = reader;
+	}
+
+	get message() {
+		return this.describe();
 	}
 
 	get needsOtherFinger() {
@@ -92,10 +96,10 @@ export class FingerprintEnrollment {
 		this.phase = 'scanning';
 		this.passed = 0;
 		this.result = '';
-		this.message = `${swipe ? 'Swipe' : 'Place'} your ${fingerLabel(finger).toLowerCase()} ${swipe ? 'across' : 'on'} the sensor.`;
+		this.describe = () => t(swipe ? 'ui-fingerprint-swipe' : 'ui-fingerprint-place', { finger: fingerInSentence(finger) });
 		this.stopListening ??= listen<EnrollProgress>(PROGRESS, ({ result, done }) => {
 			if (result === 'enroll-stage-passed') this.passed += 1;
-			this.message = progressMessage(result, swipe);
+			this.describe = () => progressMessage(result, swipe);
 			if (!done) return;
 			this.result = result;
 			this.phase = result === 'enroll-completed' ? 'added' : 'failed';
@@ -104,7 +108,8 @@ export class FingerprintEnrollment {
 			await invoke<void>('fingerprint_enroll', { finger }, { timeoutMs: WAIT_FOR_PERMISSION });
 		} catch (reason) {
 			this.phase = 'failed';
-			this.message = reason instanceof Error ? reason.message : String(reason);
+			const message = reason instanceof Error ? reason.message : String(reason);
+			this.describe = () => message;
 		}
 	}
 

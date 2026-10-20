@@ -1,6 +1,7 @@
 <script lang="ts">
 	import ImageOff from '@lucide/svelte/icons/image-off';
 	import type { ClassValue } from 'svelte/elements';
+	import { t } from '@luft/i18n';
 
 	interface Props {
 		class?: ClassValue;
@@ -12,8 +13,8 @@
 
 <div class={['remote-images', className]}>
 	<ImageOff size={15} class="flex-none" />
-	<span class="min-w-0 flex-1 truncate">Pictures from the web are hidden</span>
-	<button type="button" class="plain-button" onclick={onshow}>Show</button>
+	<span class="min-w-0 flex-1 truncate">{t('ui-remote-images-hidden')}</span>
+	<button type="button" class="plain-button" onclick={onshow}>{t('ui-remote-images-show')}</button>
 </div>
 
 <style>

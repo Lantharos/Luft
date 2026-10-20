@@ -32,7 +32,7 @@ pub fn run_app() -> ! {
 - `apply_with_page_close` instead of `apply` hands the close button to the page, so `WindowControls`' `onclose` decides when to close.
 - `run` connects `Events` to the page and watches Kestrel's palette and the desktop's fonts. The last closure runs at the same point, for the app's own watchers.
 
-Flatten `Appearance` into the app's startup state so the page gets the palette, fonts and motion preference. `@luft/ui`'s `appearance` store reads it, and follows the `kestrel.palette`, `appearance.typography` and `appearance.motion` events after that:
+Flatten `Appearance` into the app's startup state so the page gets the palette, fonts, motion preference and the session's languages. `@luft/ui`'s `appearance` store reads it, and follows the `kestrel.palette`, `appearance.typography` and `appearance.motion` events after that:
 
 ```rust
 #[derive(Serialize)]
@@ -62,7 +62,8 @@ window
 | `GlassWindow` | Window size, sidebar width and single-instance id; `apply` and `apply_with_page_close` |
 | `run` | Starts the app and the palette and font watchers |
 | `Events` | `emit` sends a JSON event to the page, `emit_bytes` sends raw bytes that arrive as a `Uint8Array` |
-| `Appearance` | Kestrel's palette and the desktop's fonts and text size, for the startup state |
+| `Appearance` | Kestrel's palette, the desktop's fonts and text size, and the languages and formats locale the app should use, for the startup state |
+| `i18n` | [luft-i18n](../../packages/i18n): the `localizer!` and `t!` macros for the app's own translated messages |
 | `Commands` | `command`, `with`, `command_async` and `with_async` for typed bridge commands |
 | `spawn`, `block_on` | Run or wait for async work on Sabine's runtime |
 | `dbus` | [luft-dbus](../../packages/dbus): async `session()` and `system()` connections, `at(address)` connects to any other bus |

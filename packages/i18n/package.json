@@ -14,7 +14,8 @@
 		"./vite": "./vite.js"
 	},
 	"scripts": {
-		"check": "svelte-check --tsconfig ./tsconfig.json && bun tools/lint.ts"
+		"check": "svelte-check --tsconfig ./tsconfig.json && bun tools/lint.ts",
+		"transliterate": "bun tools/transliterate.ts"
 	},
 	"dependencies": {
 		"@fluent/bundle": "^0.19.1"

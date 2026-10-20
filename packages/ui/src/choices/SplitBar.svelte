@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { bytes } from '@luft/ui';
 
 	interface Props {
@@ -18,6 +19,7 @@
 
 	let kept = $derived(total - value);
 	let split = $derived((kept / total) * 100);
+	let windowsSize = $derived(t('ui-split-windows-size', { size: bytes(kept), used: bytes(used) }));
 
 	function clamp(size: number) {
 		return Math.min(max, Math.max(min, Math.round(size / step) * step));
@@ -51,7 +53,7 @@
 		class:dragging
 		role="slider"
 		tabindex="0"
-		aria-label="Space for Luft"
+		aria-label={t('ui-split-space')}
 		aria-valuemin={min}
 		aria-valuemax={max}
 		aria-valuenow={value}
@@ -69,7 +71,7 @@
 		<div class="luft"></div>
 	</div>
 	<div class="flex justify-between text-[13.5px]">
-		<span><span class="font-semibold">Windows</span> <span class="text-[var(--text-soft)]">{bytes(kept)}, {bytes(used)} used</span></span>
+		<span><span class="font-semibold">Windows</span> <span class="text-[var(--text-soft)]">{windowsSize}</span></span>
 		<span><span class="font-semibold">Luft</span> <span class="text-[var(--text-soft)]">{bytes(value)}</span></span>
 	</div>
 </div>

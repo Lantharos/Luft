@@ -1,6 +1,7 @@
 <script lang="ts">
 	import X from '@lucide/svelte/icons/x';
 	import type { ClassValue } from 'svelte/elements';
+	import { t } from '@luft/i18n';
 	import { toast as presence } from '../motion/transitions';
 	import { swipeAway } from './swipe';
 	import type { ToastMessage } from './toasts.svelte';
@@ -52,7 +53,7 @@
 				<button class="toast-action" type="button" onclick={() => act(item, action.run)}>{action.label}</button>
 			{/if}
 			{#if dismissible}
-				<button type="button" class="icon-button" aria-label="Dismiss" onclick={() => dismiss(item)}>
+				<button type="button" class="icon-button" aria-label={t('ui-toast-dismiss')} onclick={() => dismiss(item)}>
 					<X size={15} />
 				</button>
 			{/if}

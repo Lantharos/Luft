@@ -3,6 +3,7 @@
 	import Play from '@lucide/svelte/icons/play';
 	import type { Snippet } from 'svelte';
 	import type { ClassValue } from 'svelte/elements';
+	import { t } from '@luft/i18n';
 	import { tooltip } from '../menus/tooltip';
 	import { formatClock } from './clock';
 	import SeekBar from './SeekBar.svelte';
@@ -39,9 +40,9 @@
 	<button
 		type="button"
 		class="icon-button"
-		aria-label={paused ? 'Play' : 'Pause'}
+		aria-label={t(paused ? 'ui-media-play' : 'ui-media-pause')}
 		onclick={() => (paused = !paused)}
-		{@attach tooltip(paused ? 'Play' : 'Pause')}
+		{@attach tooltip(t(paused ? 'ui-media-play' : 'ui-media-pause'))}
 	>
 		{#if paused}
 			<Play size={16} fill="currentColor" />

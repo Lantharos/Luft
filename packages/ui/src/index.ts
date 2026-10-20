@@ -42,6 +42,7 @@ export { default as VolumeControl } from './playback/VolumeControl.svelte';
 
 export {
 	deleteFingerprint,
+	fingerInSentence,
 	fingerLabel,
 	FINGERS,
 	FingerprintEnrollment,

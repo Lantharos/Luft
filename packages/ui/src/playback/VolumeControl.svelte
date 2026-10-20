@@ -3,6 +3,7 @@
 	import Volume1 from '@lucide/svelte/icons/volume-1';
 	import Volume2 from '@lucide/svelte/icons/volume-2';
 	import VolumeX from '@lucide/svelte/icons/volume-x';
+	import { t } from '@luft/i18n';
 	import Slider from '../controls/Slider.svelte';
 	import { tooltip } from '../menus/tooltip';
 
@@ -35,14 +36,14 @@
 	<button
 		type="button"
 		class="icon-button"
-		aria-label={silent ? 'Unmute' : 'Mute'}
+		aria-label={t(silent ? 'ui-media-unmute' : 'ui-media-mute')}
 		onclick={toggleMute}
-		{@attach tooltip(silent ? 'Unmute' : 'Mute')}
+		{@attach tooltip(t(silent ? 'ui-media-unmute' : 'ui-media-mute'))}
 	>
 		<Icon size={17} />
 	</button>
 	<div class="level">
-		<Slider value={silent ? 0 : volume} step={0.01} label="Volume" oninput={setVolume} onchange={setVolume} />
+		<Slider value={silent ? 0 : volume} step={0.01} label={t('ui-media-volume')} oninput={setVolume} onchange={setVolume} />
 	</div>
 </div>
 

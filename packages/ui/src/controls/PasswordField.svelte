@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Eye from '@lucide/svelte/icons/eye';
 	import EyeOff from '@lucide/svelte/icons/eye-off';
+	import { t } from '@luft/i18n';
 	import TextField from './TextField.svelte';
 
 	interface Props {
@@ -33,7 +34,7 @@
 
 <TextField bind:this={field} bind:value {label} {showLabel} {placeholder} {error} {autocomplete} {disabled} {live} {onkeydown} type={revealed ? 'text' : 'password'}>
 	{#snippet trailing()}
-		<button type="button" class="reveal" aria-label={revealed ? 'Hide password' : 'Show password'} {disabled} onclick={toggle}>
+		<button type="button" class="reveal" aria-label={t(revealed ? 'ui-password-hide' : 'ui-password-show')} {disabled} onclick={toggle}>
 			{#if revealed}
 				<EyeOff size={16} />
 			{:else}

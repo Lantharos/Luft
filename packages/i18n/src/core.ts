@@ -1,5 +1,7 @@
 import { FluentBundle, FluentResource, type FluentVariable } from '@fluent/bundle';
 
+export { FluentNumber } from '@fluent/bundle';
+
 import { PSEUDO_LOCALE, SOURCE_LOCALE } from './locales.js';
 import { pseudolocalize } from './pseudo.js';
 

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { t } from '@luft/i18n';
 	import { formatClock } from './clock';
 
 	const KEY_STEP = 5;
@@ -16,7 +17,7 @@
 		onscrub?: (scrubbing: boolean) => void;
 	}
 
-	let { time, duration, buffered = 0, label = 'Position', preview, onseek, onscrub }: Props = $props();
+	let { time, duration, buffered = 0, label, preview, onseek, onscrub }: Props = $props();
 
 	let track = $state<HTMLDivElement>();
 	let hover = $state<number | null>(null);
@@ -69,7 +70,7 @@
 	bind:this={track}
 	role="slider"
 	tabindex={length ? 0 : -1}
-	aria-label={label}
+	aria-label={label ?? t('ui-media-position')}
 	aria-valuemin={0}
 	aria-valuemax={length}
 	aria-valuenow={shown}

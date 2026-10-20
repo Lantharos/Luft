@@ -4,6 +4,7 @@ import { Junk, Message, parse, Term, type Entry, type Pattern } from '@fluent/sy
 
 import { LOCALES } from '../src/locales.js';
 import { hardCoded } from './strings.js';
+import { cyrillicFileOf, latinFileOf, serbianLatin } from './transliterate.js';
 
 interface Component {
 	name: string;
@@ -17,7 +18,7 @@ const SHARED_BUNDLES: Record<string, string[]> = { settings: ['ui', 'settings-pa
 const SOURCE_FILE = /\.(ts|js|svelte|rs)$/;
 const ID = `([a-z][a-z0-9-]*)(?:\\.[a-z][a-z0-9-]*)?`;
 const REFERENCES = [
-	new RegExp(`(?<![\\w.$])t\\(\\s*['"\`]${ID}['"\`]`, 'g'),
+	new RegExp(`(?:(?<![\\w.$])|KestrelUi\\.)t\\(\\s*['"\`]${ID}['"\`]`, 'g'),
 	new RegExp(`bindText\\([^,()]+,\\s*['"\`]${ID}['"\`]`, 'g'),
 	new RegExp(`\\bt!\\(\\s*[\\w:]+\\s*,\\s*"${ID}"`, 'g'),
 	new RegExp(`\\.(?:t|format)\\(\\s*"${ID}"`, 'g')
@@ -116,6 +117,12 @@ for (const component of components) {
 			const path = relative(ROOT, file);
 			if (!allowed.has(`${path}\t${literal}`)) problems.push(`${path}:${line}: "${literal}" should come from a Fluent file`);
 		}
+	}
+}
+
+for (const { mask } of components) {
+	if (existsSync(cyrillicFileOf(mask)) && readFileSync(latinFileOf(mask), 'utf8') !== serbianLatin(readFileSync(cyrillicFileOf(mask), 'utf8'))) {
+		problems.push(`${mask.replace('*', 'sr-Latn')} isn't the Latin form of the Serbian file; run bun run transliterate in packages/i18n`);
 	}
 }
 

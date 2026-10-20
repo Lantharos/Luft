@@ -1,6 +1,7 @@
 <script lang="ts" generics="T extends string | number">
 	import Check from '@lucide/svelte/icons/check';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
+	import { t } from '@luft/i18n';
 	import Popover from '../menus/Popover.svelte';
 
 	interface Option {
@@ -19,7 +20,7 @@
 
 	const MIN_WIDTH = 200;
 
-	let { options, value, label, placeholder = 'Choose', disabled = false, onchange }: Props = $props();
+	let { options, value, label, placeholder, disabled = false, onchange }: Props = $props();
 
 	let trigger = $state<HTMLButtonElement>();
 	let open = $state(false);
@@ -72,7 +73,7 @@
 	onclick={() => (open ? (open = false) : show())}
 	onkeydown={keydown}
 >
-	<span class="truncate">{selected?.label ?? placeholder}</span>
+	<span class="truncate">{selected?.label ?? placeholder ?? t('ui-select-placeholder')}</span>
 	<ChevronDown size={16} class="chevron" />
 </button>
 

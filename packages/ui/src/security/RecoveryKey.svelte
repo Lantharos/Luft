@@ -2,6 +2,7 @@
 	import Copy from '@lucide/svelte/icons/copy';
 	import Printer from '@lucide/svelte/icons/printer';
 	import Save from '@lucide/svelte/icons/save';
+	import { t } from '@luft/i18n';
 
 	interface Props {
 		key: string;
@@ -31,23 +32,23 @@
 	const print = () => attempt(onprint, 'printing');
 	const copy = () => attempt(() => navigator.clipboard.writeText(key).then(() => true), 'copied');
 
-	const NOTES = { saved: 'Saved', printing: 'Sent to the printer', copied: 'Copied' };
+	const NOTES = { saved: 'ui-recovery-key-saved', printing: 'ui-recovery-key-printing', copied: 'ui-recovery-key-copied' };
 </script>
 
 <div class="flex flex-col gap-3">
-	<div class="key" aria-label="Recovery key {key}">
+	<div class="key" aria-label={t('ui-recovery-key-label', { key })}>
 		{#each groups as group, index (index)}
 			<span>{group}</span>
 		{/each}
 	</div>
 	<div class="flex flex-wrap items-center gap-1">
-		<button type="button" class="plain-button" onclick={save}><Save size={16} />Save to a file</button>
-		<button type="button" class="plain-button" onclick={print}><Printer size={16} />Print</button>
+		<button type="button" class="plain-button" onclick={save}><Save size={16} />{t('ui-recovery-key-save')}</button>
+		<button type="button" class="plain-button" onclick={print}><Printer size={16} />{t('ui-recovery-key-print')}</button>
 		{#if copyable}
-			<button type="button" class="plain-button" onclick={copy}><Copy size={16} />Copy</button>
+			<button type="button" class="plain-button" onclick={copy}><Copy size={16} />{t('ui-recovery-key-copy')}</button>
 		{/if}
 		{#if done}
-			<span class="ml-auto pr-2 text-[12.5px] text-[var(--text-muted)]">{NOTES[done]}</span>
+			<span class="ml-auto pr-2 text-[12.5px] text-[var(--text-muted)]">{t(NOTES[done])}</span>
 		{/if}
 	</div>
 	{#if error}

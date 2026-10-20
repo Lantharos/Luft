@@ -13,6 +13,15 @@ const lineAt = (content: string, index: number) => content.slice(0, index).split
 const blank = (text: string) => text.replace(/[^\n]/g, ' ');
 const withoutExpressions = (text: string) => text.replace(/\$\{[^}]*\}/g, 'X');
 
+function withoutMarkupExpressions(text: string): string {
+	let previous = '';
+	while (previous !== text) {
+		previous = text;
+		text = text.replace(/\{[^{}]*\}/g, blank);
+	}
+	return text;
+}
+
 function scriptStrings(content: string, offset = 0, all = content): Finding[] {
 	const found: Finding[] = [];
 	const lines = content.split('\n');
@@ -43,7 +52,7 @@ function svelteStrings(content: string): Finding[] {
 	for (const match of content.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)) {
 		found.push(...scriptStrings(match[1], match.index + match[0].indexOf(match[1]), content));
 	}
-	const markup = content.replace(/<(script|style)[^>]*>[\s\S]*?<\/\1>/g, blank).replace(/\{[^{}]*\}/g, blank);
+	const markup = withoutMarkupExpressions(content.replace(/<(script|style)[^>]*>[\s\S]*?<\/\1>/g, blank));
 	for (const match of markup.matchAll(/>([^<>]*\p{L}[^<>]*)</gu)) {
 		const text = match[1].trim();
 		if (text) found.push({ line: lineAt(content, match.index), text });

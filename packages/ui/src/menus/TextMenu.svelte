@@ -3,6 +3,7 @@
 	import Copy from '@lucide/svelte/icons/copy';
 	import Scissors from '@lucide/svelte/icons/scissors';
 	import SquareDashedText from '@lucide/svelte/icons/square-dashed-text';
+	import { t } from '@luft/i18n';
 	import ContextMenu from './ContextMenu.svelte';
 	import { editableAt, TextEditing } from './editing';
 	import MenuItem from './MenuItem.svelte';
@@ -27,27 +28,27 @@
 <svelte:window oncontextmenu={open} onpointerdown={() => (menu = null)} onblur={() => (menu = null)} />
 
 {#if menu}
-	{@const { editing } = menu}
+	{@const editing = menu.editing}
 	<ContextMenu at={menu.at} onclose={() => (menu = null)}>
 		{#if editing.field}
 			<MenuItem disabled={!editing.selected || !editing.writable || !editing.copyable} onclick={() => run(editing.cut)}>
 				<Scissors size={16} />
-				<span>Cut</span>
+				<span>{t('ui-edit-cut')}</span>
 			</MenuItem>
 		{/if}
 		<MenuItem disabled={!editing.selected || !editing.copyable} onclick={() => run(editing.copy)}>
 			<Copy size={16} />
-			<span>Copy</span>
+			<span>{t('ui-edit-copy')}</span>
 		</MenuItem>
 		{#if editing.field}
 			<MenuItem disabled={!editing.writable} onclick={() => run(editing.paste)}>
 				<ClipboardPaste size={16} />
-				<span>Paste</span>
+				<span>{t('ui-edit-paste')}</span>
 			</MenuItem>
 			<MenuSeparator />
 			<MenuItem onclick={() => run(editing.selectAll)}>
 				<SquareDashedText size={16} />
-				<span>Select All</span>
+				<span>{t('ui-edit-select-all')}</span>
 			</MenuItem>
 		{/if}
 	</ContextMenu>

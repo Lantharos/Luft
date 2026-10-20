@@ -47,3 +47,4 @@
 0047-keybindings-finish-shortcuts-that-respond-to-release.patch
 0048-backends-keep-sandboxed-apps-from-recording-controll.patch
 0049-wayland-show-and-hide-the-input-panel-as-soon-as-a-t.patch
+0050-core-let-the-shell-play-the-audible-bell.patch

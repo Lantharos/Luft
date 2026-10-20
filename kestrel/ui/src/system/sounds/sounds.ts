@@ -1,8 +1,13 @@
 import Gio from 'gi://Gio';
+import type Shell from 'gi://Shell';
 
 import { categoryOf, SOUNDS, type Category, type Sound } from './catalog.js';
 import { soundPlayer } from './player.js';
 import { busy, followSession, interactingWith, onlyErrors, type SessionMode } from './situation.js';
+
+interface BellDisplay {
+  connect(signal: 'bell', callback: () => boolean): number;
+}
 
 const desktop = new Gio.Settings({ schema_id: 'org.gnome.desktop.sound' });
 const kestrel = new Gio.Settings({ schema_id: 'com.lantharos.kestrel.sounds' });
@@ -10,6 +15,10 @@ const kestrel = new Gio.Settings({ schema_id: 'com.lantharos.kestrel.sounds' });
 export function startSounds(session: SessionMode): void {
   followSession(session);
   soundPlayer().prepare();
+  ((global as unknown as Shell.Global).display as unknown as BellDisplay).connect('bell', () => {
+    playSound('error');
+    return true;
+  });
 }
 
 function allowed(category: Category): boolean {

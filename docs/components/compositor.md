@@ -23,6 +23,7 @@ Kestrel runs on its own build of Mutter 51 ([kestrel/compositor](../../kestrel/c
 - `ext-data-control-v1`, so password managers can copy a password and clear it again while in the background: apps outside a sandbox and Flatpak apps with [full access](#full-access) always get it, other Flatpak apps only when they are 1Password, KeePassXC or Bitwarden
 - Screen recording, remote control and input capture sessions that only the desktop portal and Kestrel's screencast service can start, and display changes such as rearranging monitors or turning them off that sandboxed apps can't make
 - Virtual input devices that flip the tablet mode switch, for driving tablet mode in checks
+- The audible bell from X11 and Wayland apps handed to the shell, which plays it with the rest of its [sounds](kestrel.md#sounds)
 - Modifiers the shell can treat as used up while a shortcut made of them is held, such as the one held to dictate, so apps scroll, click and type as if they weren't held, and shortcuts that react to being let go that still notice it when a modifier comes up first
 - Smaller fixes, each described in its patch
 

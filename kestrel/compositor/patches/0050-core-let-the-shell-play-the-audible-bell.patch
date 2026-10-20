@@ -1,0 +1,87 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Tue, 20 Oct 2026 15:43:34 +0200
+Subject: [PATCH 50/50] core: let the shell play the audible bell
+
+Emit MetaDisplay::bell before playing the bell through the sound
+player, so a shell with its own sound player can play it instead.
+---
+ src/core/bell.c            |  3 +++
+ src/core/display-private.h |  3 +++
+ src/core/display.c         | 27 +++++++++++++++++++++++++++
+ 3 files changed, 33 insertions(+)
+
+diff --git a/src/core/bell.c b/src/core/bell.c
+index bdb3a69821e3c3beafe12546e4e597339d76b88f..fda01fb3b871c92778ebff2cce5f04dc7318bb3d 100644
+--- a/src/core/bell.c
++++ b/src/core/bell.c
+@@ -231,6 +231,9 @@ bell_audible_notify (MetaDisplay *display,
+ {
+   MetaSoundPlayer *player;
+ 
++  if (meta_display_ring_bell (display, window))
++    return TRUE;
++
+   player = meta_display_get_sound_player (display);
+   meta_sound_player_play_from_theme (player,
+                                      "bell-window-system",
+diff --git a/src/core/display-private.h b/src/core/display-private.h
+index 73d090315a6dae4469869196ae36189536935070..b9913e0b8fd133e31f83a00b0ec6a8e711fa11c4 100644
+--- a/src/core/display-private.h
++++ b/src/core/display-private.h
+@@ -327,3 +327,6 @@ void meta_display_maybe_update_sticky_mouse_focus (MetaDisplay *display);
+ 
+ void meta_display_handle_sticky_mouse_focus_event (MetaDisplay        *display,
+                                                    const ClutterEvent *event);
++
++gboolean meta_display_ring_bell (MetaDisplay *display,
++                                 MetaWindow  *window);
+diff --git a/src/core/display.c b/src/core/display.c
+index df86a89f99cc693821fb06988fadaa7da06b1625..f6ddcade6887a366a8527045b58f3ac036f95f53 100644
+--- a/src/core/display.c
++++ b/src/core/display.c
+@@ -180,6 +180,7 @@ enum
+   CLOSING,
+   INIT_XSERVER,
+   WINDOW_VISIBILITY_UPDATED,
++  BELL,
+   LAST_SIGNAL
+ };
+ 
+@@ -351,6 +352,22 @@ meta_display_class_init (MetaDisplayClass *klass)
+                   NULL, NULL, NULL,
+                   G_TYPE_NONE, 2, META_TYPE_WINDOW, G_TYPE_INT64);
+ 
++  /**
++   * MetaDisplay::bell:
++   * @display: the #MetaDisplay
++   * @window: (nullable): the window that rang the bell
++   *
++   * Emitted when a client rings the audible bell. A handler that plays
++   * the bell itself returns %TRUE, which keeps Mutter from playing it.
++   */
++  display_signals[BELL] =
++    g_signal_new ("bell",
++                  G_TYPE_FROM_CLASS (klass),
++                  G_SIGNAL_RUN_LAST,
++                  0,
++                  g_signal_accumulator_true_handled, NULL, NULL,
++                  G_TYPE_BOOLEAN, 1, META_TYPE_WINDOW);
++
+   display_signals[WINDOW_CREATED] =
+     g_signal_new ("window-created",
+                   G_TYPE_FROM_CLASS (klass),
+@@ -3765,3 +3782,13 @@ meta_display_handle_sticky_mouse_focus_event (MetaDisplay        *display,
+       STICKY_FOCUS_UNSTICK_DISTANCE)
+     invalidate_sticky_mouse_focus (display);
+ }
++
++gboolean
++meta_display_ring_bell (MetaDisplay *display,
++                        MetaWindow  *window)
++{
++  gboolean handled = FALSE;
++
++  g_signal_emit (display, display_signals[BELL], 0, window, &handled);
++  return handled;
++}

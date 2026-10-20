@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Sun, 18 Oct 2026 04:53:53 +0200
-Subject: [PATCH 38/49] wayland: send Chromium builds touchpad deltas in their
+Subject: [PATCH 38/50] wayland: send Chromium builds touchpad deltas in their
  own units
 
 Chromium multiplies every finger and continuous scroll delta it gets on

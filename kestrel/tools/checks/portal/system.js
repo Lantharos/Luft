@@ -1,4 +1,5 @@
 import Cairo from 'cairo';
+import AccountsService from 'gi://AccountsService';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
@@ -68,7 +69,10 @@ async function checkAccount() {
   await capture('portal-account');
   click(labelled('Share', dialog));
   const [response, results] = (await shared).recursiveUnpack();
-  require(response === 0 && results.id === GLib.get_user_name() && 'name' in results && 'image' in results, 'apps get your name and picture once you share them');
+  const account = AccountsService.UserManager.get_default().get_user(GLib.get_user_name());
+  const picture = results.image ? Gio.File.new_for_uri(results.image) : null;
+  require(response === 0 && results.id === account.user_name && results.name === account.get_real_name() && !!picture?.query_exists(null),
+    'apps get your name and picture once you share them');
 }
 
 async function checkUsb() {

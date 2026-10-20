@@ -11,11 +11,13 @@ use std::fs::{self, File};
 use std::io::ErrorKind;
 use std::os::fd::AsRawFd;
 use std::path::{Path, PathBuf};
+use std::process::Command;
 use std::sync::Arc;
 
 use anyhow::{Context, Result};
 use serde_json::json;
 
+use crate::command::run;
 use deployment::Slot;
 use footprint::Footprint;
 use manifest::{Build, Declared};
@@ -25,7 +27,7 @@ pub const NAME: &str = "luft-system-packages";
 pub const IMAGE: &str = "luft-system-packages.raw";
 const STATE: &str = "/var/lib/luft/system-packages";
 const MANIFEST: &str = "build.json";
-const REBUILD: &str = "/run/luft/system-packages-rebuild";
+const REBUILD_UNIT: &str = "luft-system-packages-rebuild.service";
 
 #[derive(Clone, Copy, Debug)]
 pub enum Step {
@@ -314,8 +316,8 @@ pub fn prepare_staged() -> Result<()> {
     prune()
 }
 
-/// At startup, before systemd-sysext merges: offers the build made for this version, or asks
-/// for one to be made once the network is up.
+/// At startup, before systemd-sysext merges: offers the build made for this version, or queues
+/// one to be made once the network is up.
 pub fn link() -> Result<()> {
     let requested = requested::load(&state("packages"))?;
     if requested.is_empty() {
@@ -324,8 +326,7 @@ pub fn link() -> Result<()> {
     match current_for(&booted()?, &requested) {
         Some(folder) => activate::link(Some(&folder)),
         None => {
-            fs::create_dir_all(Path::new(REBUILD).parent().context("Rebuild flag")?)?;
-            fs::write(REBUILD, "").map_err(Into::into)
+            run(Command::new("systemctl").args(["start", "--no-block", REBUILD_UNIT])).map(drop)
         }
     }
 }

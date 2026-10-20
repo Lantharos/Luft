@@ -37,9 +37,9 @@ What scriptlets would otherwise do on the computer itself, such as making users 
 
 | Unit | When | Does |
 | --- | --- | --- |
-| `luft-system-packages-link.service` | Before `systemd-sysext.service` | Links the build for the running version's digest (from `composefs=`), if it was made for the current list; otherwise asks for a rebuild |
+| `luft-system-packages-link.service` | Before `systemd-sysext.service` | Links the build for the running version's digest (from `composefs=`), if it was made for the current list; otherwise queues a rebuild |
 | `luft-system-packages-settle.service` | After `systemd-sysext.service`, before `systemd-tmpfiles-setup.service` | Notes what's missing, then runs `systemd-sysusers`, copies `/etc` and `/var` defaults that aren't there, runs `ldconfig` and reloads udev rules when the packages bring them, and queues the services that are turned on |
-| `luft-system-packages-rebuild.service` | Once online, when asked | Builds for the running version and merges it |
+| `luft-system-packages-rebuild.service` | Once online, when the link queues it | Builds for the running version and merges it |
 
 The services are queued by hand because systemd merges extensions after the start's targets are queued, so links merged then don't pull anything in by themselves. `Upholds=` would, but it also restarts a service someone stopped.
 

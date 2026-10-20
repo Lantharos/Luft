@@ -27,7 +27,7 @@ install -Dm644 -t "$destdir/usr/lib/systemd/system" "$updater/data/luft-updater.
   "$updater/data/luft-system-packages-rebuild.service"
 install -Dm644 -t "$destdir/usr/share/polkit-1/actions" "$updater/data/com.lantharos.updater.policy"
 install -Dm644 -t "$destdir/usr/share/polkit-1/rules.d" "$updater/data/50-luft-updater.rules"
-printf 'enable luft-system-packages-%s.service\n' link settle rebuild |
+printf 'enable luft-system-packages-%s.service\n' link settle |
   install -Dm644 /dev/stdin "$destdir/usr/lib/systemd/system-preset/40-luft-system-packages.preset"
 
 thumbnailer="$luft/packages/software/thumbnailer"

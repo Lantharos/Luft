@@ -29,7 +29,7 @@ EOF
 }
 
 preset_units() {
-  awk '$1 == "enable" {print $2}' "$@"
+  awk '$1 == "enable" || $1 == "disable" {print $2}' "$@"
 }
 
 enable_units() {

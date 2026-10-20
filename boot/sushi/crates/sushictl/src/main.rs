@@ -1,3 +1,5 @@
+mod failure;
+
 use std::path::PathBuf;
 use std::process::ExitCode;
 use std::time::Duration;
@@ -36,6 +38,8 @@ enum Action {
         #[command(subcommand)]
         notice: Notice,
     },
+    /// Explain why the computer couldn't start and offer what can be done, in place of an emergency or rescue shell
+    Failure,
 }
 
 #[derive(Subcommand)]
@@ -80,6 +84,7 @@ fn load_drivers() -> ExitCode {
 fn main() -> ExitCode {
     let command = match Cli::parse().command {
         Action::LoadDrivers => return load_drivers(),
+        Action::Failure => return failure::run(),
         Action::Deactivate => Command::Deactivate,
         Action::Quit => Command::Quit,
         Action::UpdateRoot { root } => Command::UpdateRoot(root),

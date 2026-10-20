@@ -22,6 +22,7 @@ Sushi ([boot/sushi](../../boot/sushi)) is Luft's boot splash, and SushiBoot the 
 | `sushictl notice key-enrollment CODE [--again]` | Explains shim's key enrollment screen at the next restart |
 | `sushictl notice show FILE` | Shows a notice and waits until it's dismissed |
 | `sushictl notice clear` | Withdraws a pending notice |
+| `sushictl failure` | Says why the computer couldn't start and offers what can be done, in place of the emergency and rescue shells ([details](../boot.md#when-luft-cant-start)) |
 
 A notice file has one field per line: `title`, `line` and `step` (both repeatable), `footer` (where `{seconds}` counts down), `countdown` and `key`, a letter that dismisses it besides Enter.
 

@@ -11,6 +11,8 @@ const GOOD: &CStr16 = cstr16!("LuftBootGood");
 const TRIED: &CStr16 = cstr16!("LuftBootTried");
 const TRYING: &CStr16 = cstr16!("LuftBootTrying");
 const WENT_BACK: &CStr16 = cstr16!("LuftBootWentBack");
+const GO_BACK: &CStr16 = cstr16!("LuftBootGoBack");
+const PREVIOUS: &CStr16 = cstr16!("LuftBootPrevious");
 
 pub struct Attempts {
     good: Option<String>,
@@ -70,4 +72,19 @@ impl Attempts {
 
 pub fn went_back(version: &str) {
     write(WENT_BACK, version, false);
+}
+
+pub fn take_go_back() -> Option<String> {
+    let entry = read(GO_BACK)?;
+    let _ = runtime::delete_variable(GO_BACK, &LUFT);
+    Some(entry)
+}
+
+pub fn offer_previous(version: Option<&str>) {
+    match version {
+        Some(version) => write(PREVIOUS, version, false),
+        None => {
+            let _ = runtime::delete_variable(PREVIOUS, &LUFT);
+        }
+    }
 }

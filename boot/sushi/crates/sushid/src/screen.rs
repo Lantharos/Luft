@@ -4,7 +4,9 @@ use std::path::Path;
 use rustix::fs::{XattrFlags, getxattr, setxattr};
 use sushi::control;
 use sushi::display::{Card, Display, ModeHints};
-use sushi::scene::{FADE_SECONDS, Notice, Prompt, Rect, Scene, Status, Visuals, ease, is_shaking};
+use sushi::scene::{
+    FADE_SECONDS, Failure, Notice, Prompt, Rect, Scene, Status, Visuals, ease, failure, is_shaking,
+};
 
 use crate::crossfade::Crossfade;
 use crate::firmware::Firmware;
@@ -53,6 +55,7 @@ pub struct Look {
     pub loader: Fader,
     pub prompt: Fader,
     pub notice: Fader,
+    pub failure: Fader,
 }
 
 impl Look {
@@ -61,6 +64,7 @@ impl Look {
             && self.loader.settled(now)
             && self.prompt.settled(now)
             && self.notice.settled(now)
+            && self.failure.settled(now)
     }
 
     pub fn is_animating(&self, now: f32, prompt: Option<&Prompt>) -> bool {
@@ -79,6 +83,15 @@ struct Shown {
     status: Option<(Status, f32)>,
     notice: f32,
     notice_content: Option<Notice>,
+    failure: f32,
+    failure_content: Option<Failure>,
+}
+
+pub struct Content<'a> {
+    pub prompt: Option<&'a Prompt>,
+    pub status: Option<(Status, f32)>,
+    pub notice: Option<&'a Notice>,
+    pub failure: Option<&'a Failure>,
 }
 
 pub struct Screen {
@@ -131,15 +144,27 @@ impl Screen {
         &self.display
     }
 
+    pub fn details_lines(&self) -> usize {
+        self.scenes
+            .iter()
+            .map(|scene| failure::visible_lines(&scene.layout))
+            .min()
+            .unwrap_or(1)
+    }
+
     pub fn draw(
         &mut self,
         look: &Look,
         revealed: f32,
         now: f32,
-        prompt: Option<&Prompt>,
-        status: Option<(Status, f32)>,
-        notice: Option<&Notice>,
+        content: Content,
     ) -> io::Result<()> {
+        let Content {
+            prompt,
+            status,
+            notice,
+            failure,
+        } = content;
         let next = Shown {
             logo: look.logo.value(now),
             loader: look.loader.value(now),
@@ -148,6 +173,8 @@ impl Screen {
             status: status.map(|(status, alpha)| (status, alpha * revealed)),
             notice: look.notice.value(now) * revealed,
             notice_content: notice.cloned(),
+            failure: look.failure.value(now) * revealed,
+            failure_content: failure.cloned(),
         };
         let visuals = Visuals {
             seconds: now,
@@ -159,6 +186,10 @@ impl Screen {
                 .notice_content
                 .as_ref()
                 .map(|notice| (notice, next.notice)),
+            failure: next
+                .failure_content
+                .as_ref()
+                .map(|failure| (failure, next.failure)),
         };
         let first = self.shown.is_none();
         let progress = self
@@ -265,6 +296,9 @@ fn damage(scene: &Scene, shown: &Shown, next: &Shown, now: f32) -> Vec<Rect> {
     }
     if shown.notice != next.notice || shown.notice_content != next.notice_content {
         areas.push(scene.notice_area());
+    }
+    if shown.failure != next.failure || shown.failure_content != next.failure_content {
+        areas.push(scene.failure_area());
     }
     areas
 }

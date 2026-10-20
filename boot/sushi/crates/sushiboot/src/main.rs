@@ -73,9 +73,14 @@ fn efi_main() -> Status {
         .find_map(|pattern| catalog.find(pattern))
         .unwrap_or(first);
     let mut attempts = Attempts::load();
-    let going_back = catalog.going_back(default, &attempts);
-    let failed = going_back.map(|_| default);
-    let default = going_back.unwrap_or(default);
+    let going_back = match attempts::take_go_back().and_then(|entry| catalog.find(&entry)) {
+        Some(left) => catalog.image_of(left).zip(catalog.older(left)),
+        None => catalog
+            .going_back(default, &attempts)
+            .map(|previous| (default, previous)),
+    };
+    let failed = going_back.map(|(failed, _)| failed);
+    let default = going_back.map_or(default, |(_, previous)| previous);
     let mut screen = graphics_handle().and_then(|handle| {
         let gop = protocol::shared::<GraphicsOutput>(handle).ok()?;
         Some(Screen::new(handle, gop))
@@ -88,6 +93,10 @@ fn efi_main() -> Status {
         note_attempt(&catalog, chosen, failed, &mut attempts);
         let entry = &catalog.entries[chosen];
         vars::selected(&entry.id);
+        let previous = catalog
+            .older(chosen)
+            .and_then(|older| catalog.entries[older].image());
+        attempts::offer_previous(previous.map(|(_, release)| release.version.as_str()));
         if start::start(entry).is_ok() {
             return Status::SUCCESS;
         }

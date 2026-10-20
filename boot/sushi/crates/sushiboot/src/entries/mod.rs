@@ -147,6 +147,30 @@ impl Catalog {
         })
     }
 
+    pub fn image_of(&self, index: usize) -> Option<usize> {
+        let Action::Efi { path, .. } = &self.entries[index].action else {
+            return None;
+        };
+        self.entries
+            .iter()
+            .position(|entry| entry.image().is_some_and(|(image, _)| image == path))
+    }
+
+    pub fn older(&self, index: usize) -> Option<usize> {
+        let image = self.image_of(index)?;
+        let (path, release) = self.entries[image].image()?;
+        self.entries
+            .iter()
+            .enumerate()
+            .skip(image + 1)
+            .find(|(_, entry)| {
+                entry
+                    .image()
+                    .is_some_and(|(other, older)| other != path && older.os == release.os)
+            })
+            .map(|(older, _)| older)
+    }
+
     pub fn going_back(&self, index: usize, attempts: &Attempts) -> Option<usize> {
         let (image, release) = self.entries[index].image()?;
         if attempts.is_good(image) || !attempts.exhausted(image) {

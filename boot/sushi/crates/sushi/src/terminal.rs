@@ -25,6 +25,13 @@ pub enum Key {
     Erase,
     Clear,
     Enter,
+    Escape,
+    Up,
+    Down,
+    PageUp,
+    PageDown,
+    Home,
+    End,
 }
 
 #[repr(C)]
@@ -43,7 +50,7 @@ pub struct Terminal {
     file: File,
     saved: Termios,
     pending: Vec<u8>,
-    escape: bool,
+    escape: Option<String>,
 }
 
 impl AsFd for Terminal {
@@ -62,14 +69,33 @@ fn active_console() -> PathBuf {
     PathBuf::from("/dev").join(name)
 }
 
-fn key(character: char, escape: &mut bool) -> Option<Key> {
-    if *escape {
-        *escape = !(character.is_ascii_alphabetic() || character == '~');
+fn sequence(sequence: &str) -> Option<Key> {
+    Some(match sequence {
+        "[A" | "OA" => Key::Up,
+        "[B" | "OB" => Key::Down,
+        "[5~" => Key::PageUp,
+        "[6~" => Key::PageDown,
+        "[H" | "OH" | "[1~" => Key::Home,
+        "[F" | "OF" | "[4~" => Key::End,
+        _ => return None,
+    })
+}
+
+fn key(character: char, escape: &mut Option<String>) -> Option<Key> {
+    if let Some(started) = escape {
+        if started.is_empty() && !matches!(character, '[' | 'O') {
+            *escape = None;
+            return key(character, escape);
+        }
+        started.push(character);
+        if started.len() > 1 && (character.is_ascii_alphabetic() || character == '~') {
+            return escape.take().as_deref().and_then(sequence);
+        }
         return None;
     }
     match character {
         '\u{1b}' => {
-            *escape = true;
+            *escape = Some(String::new());
             None
         }
         '\r' | '\n' => Some(Key::Enter),
@@ -80,16 +106,22 @@ fn key(character: char, escape: &mut bool) -> Option<Key> {
     }
 }
 
-fn decode(pending: &mut Vec<u8>, escape: &mut bool) -> Vec<Key> {
+fn decode(pending: &mut Vec<u8>, escape: &mut Option<String>) -> Vec<Key> {
     let complete = match std::str::from_utf8(pending) {
         Err(error) if error.error_len().is_none() => error.valid_up_to(),
         _ => pending.len(),
     };
     let text = String::from_utf8_lossy(&pending[..complete]).into_owned();
     pending.drain(..complete);
-    text.chars()
+    let mut keys: Vec<Key> = text
+        .chars()
         .filter_map(|character| key(character, escape))
-        .collect()
+        .collect();
+    if escape.as_deref() == Some("") && pending.is_empty() {
+        *escape = None;
+        keys.push(Key::Escape);
+    }
+    keys
 }
 
 impl Terminal {
@@ -104,7 +136,7 @@ impl Terminal {
             file,
             saved,
             pending: Vec::new(),
-            escape: false,
+            escape: None,
         })
     }
 
@@ -184,7 +216,7 @@ mod tests {
     fn decodes_typing_and_skips_cursor_keys() {
         let mut bytes = "pä\u{1b}[Ds\u{7f}\r".as_bytes().to_vec();
         assert_eq!(
-            decode(&mut bytes, &mut false),
+            decode(&mut bytes, &mut None),
             vec![
                 Key::Text('p'),
                 Key::Text('ä'),
@@ -198,10 +230,19 @@ mod tests {
 
     #[test]
     fn keeps_a_character_split_across_reads() {
-        let mut escape = false;
+        let mut escape = None;
         let mut bytes = vec![b'a', 0xC3];
         assert_eq!(decode(&mut bytes, &mut escape), vec![Key::Text('a')]);
         bytes.push(0xAB);
         assert_eq!(decode(&mut bytes, &mut escape), vec![Key::Text('ë')]);
+    }
+
+    #[test]
+    fn reads_moving_keys_and_a_lone_escape() {
+        let mut bytes = "\u{1b}[A\u{1b}[6~\u{1b}OB\u{1b}".as_bytes().to_vec();
+        assert_eq!(
+            decode(&mut bytes, &mut None),
+            vec![Key::Up, Key::PageDown, Key::Down, Key::Escape]
+        );
     }
 }

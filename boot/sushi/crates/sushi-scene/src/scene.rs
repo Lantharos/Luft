@@ -2,6 +2,7 @@ use alloc::sync::Arc;
 
 use tiny_skia::{Color, Pixmap, PixmapPaint, Rect as Area, Transform};
 
+use crate::failure::{self, Failure};
 use crate::image::resized;
 use crate::notice::{self, Notice};
 use crate::prompt::{self, Prompt};
@@ -16,6 +17,7 @@ pub struct Visuals<'a> {
     pub prompt: Option<(&'a Prompt, f32)>,
     pub status: Option<(&'a Status, f32)>,
     pub notice: Option<(&'a Notice, f32)>,
+    pub failure: Option<(&'a Failure, f32)>,
 }
 
 #[derive(Clone)]
@@ -158,6 +160,10 @@ impl Scene {
         self.project(notice::bounds(&self.layout))
     }
 
+    pub fn failure_area(&self) -> Rect {
+        self.project(failure::bounds(&self.layout))
+    }
+
     pub fn content_area(&self, visuals: &Visuals) -> Option<Rect> {
         [
             self.logo_area().filter(|_| visuals.logo > 0.0),
@@ -165,6 +171,7 @@ impl Scene {
             visuals.prompt.map(|_| self.prompt_area()),
             visuals.status.map(|_| self.status_area()),
             visuals.notice.map(|_| self.notice_area()),
+            visuals.failure.map(|_| self.failure_area()),
         ]
         .into_iter()
         .flatten()
@@ -230,6 +237,9 @@ impl Scene {
         }
         if let Some((notice, alpha)) = visuals.notice {
             notice::draw(&mut canvas, &self.layout, view, notice, alpha);
+        }
+        if let Some((shown, alpha)) = visuals.failure {
+            failure::draw(&mut canvas, &self.layout, view, shown, alpha);
         }
         Some(pixmap)
     }

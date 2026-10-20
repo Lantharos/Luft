@@ -1,0 +1,19 @@
+[Unit]
+Description=Shell asked for on the screen that says the computer couldn't start
+Documentation=https://github.com/Lantharos/Luft/blob/main/docs/boot.md#opening-a-shell
+DefaultDependencies=no
+IgnoreOnIsolate=yes
+
+[Service]
+Type=oneshot
+Environment=HOME=/root
+WorkingDirectory=-/root
+ExecStart=-/usr/bin/sulogin --force /dev/%I
+StandardInput=tty-force
+StandardOutput=inherit
+StandardError=inherit
+TTYPath=/dev/%I
+TTYReset=yes
+TimeoutStartSec=infinity
+KillMode=process
+SendSIGHUP=yes

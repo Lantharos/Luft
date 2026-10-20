@@ -8,6 +8,7 @@ pub const RUNTIME_DIR: &str = "/run/sushi";
 pub const SOCKET: &str = "/run/sushi/control";
 pub const PID_FILE: &str = "/run/sushi/pid";
 pub const LOGO_PLACEMENT: &str = "/run/sushi/logo";
+pub const FAILURE: &str = "/run/sushi/failure";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Mode {
@@ -63,6 +64,7 @@ pub enum Command {
     Status,
     KeyEnrollmentNotice(Option<KeyEnrollment>),
     ShowNotice(PathBuf),
+    ShowFailure(PathBuf),
     LoadDrivers,
 }
 
@@ -92,6 +94,10 @@ impl Command {
                 "show" => Self::ShowNotice(PathBuf::from(words.next()?)),
                 _ => return None,
             },
+            "failure" => match words.next()? {
+                "show" => Self::ShowFailure(PathBuf::from(words.next()?)),
+                _ => return None,
+            },
             _ => return None,
         };
         words.next().is_none().then_some(command)
@@ -110,14 +116,23 @@ impl Command {
             ),
             Self::KeyEnrollmentNotice(None) => "notice clear".into(),
             Self::ShowNotice(path) => format!("notice show {}", path.display()),
+            Self::ShowFailure(path) => format!("failure show {}", path.display()),
             Self::LoadDrivers => "load-drivers".into(),
         }
     }
 }
 
 pub fn send(command: &Command, timeout: Duration) -> io::Result<String> {
+    exchange(command, Some(timeout))
+}
+
+pub fn send_and_wait(command: &Command) -> io::Result<String> {
+    exchange(command, None)
+}
+
+fn exchange(command: &Command, timeout: Option<Duration>) -> io::Result<String> {
     let mut stream = UnixStream::connect(SOCKET)?;
-    stream.set_read_timeout(Some(timeout))?;
+    stream.set_read_timeout(timeout)?;
     stream.write_all(format!("{}\n", command.encode()).as_bytes())?;
     let mut reply = String::new();
     BufReader::new(stream).read_line(&mut reply)?;
@@ -146,6 +161,7 @@ mod tests {
             })),
             Command::KeyEnrollmentNotice(None),
             Command::ShowNotice("/run/kestrel-watchdog/notice".into()),
+            Command::ShowFailure("/run/sushi/failure".into()),
             Command::LoadDrivers,
         ] {
             assert_eq!(Command::parse(&command.encode()), Some(command));

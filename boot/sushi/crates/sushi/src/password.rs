@@ -9,6 +9,7 @@ use rustix::time::{ClockId, clock_gettime};
 const REQUESTS: &str = "/run/systemd/ask-password";
 const MODHEX: &[u8; 16] = b"cbdefghijklnrtuv";
 pub const RECOVERY_KEY_LETTERS: usize = 64;
+pub const SHELL: &str = "sushi:shell";
 
 #[derive(Default)]
 pub struct Secret(Vec<u8>);
@@ -59,6 +60,10 @@ impl Secret {
         }
         self.clear();
         self.0 = tidy;
+    }
+
+    pub fn bytes(&self) -> &[u8] {
+        &self.0
     }
 
     pub fn characters(&self) -> usize {
@@ -121,6 +126,12 @@ impl Request {
             .not_after
             .is_none_or(|limit| monotonic_micros() < limit);
         running && current && self.file.exists()
+    }
+
+    pub fn cancel(&self) -> io::Result<()> {
+        UnixDatagram::unbound()?
+            .send_to(b"-", &self.socket)
+            .map(drop)
     }
 
     pub fn answer(&self, secret: &Secret) -> io::Result<()> {

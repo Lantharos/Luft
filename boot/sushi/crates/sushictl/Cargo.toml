@@ -9,6 +9,8 @@ rust-version.workspace = true
 
 [dependencies]
 clap.workspace = true
+libc.workspace = true
+rustix.workspace = true
 sushi.workspace = true
 
 [lints]

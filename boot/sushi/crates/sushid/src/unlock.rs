@@ -75,12 +75,18 @@ impl Unlock {
         } else if self.caps_lock {
             Some(("Caps Lock is on".to_owned(), 0.7))
         } else {
-            letters.map(|letters| {
-                (
-                    format!("{letters} of {RECOVERY_KEY_LETTERS} characters"),
-                    0.5,
-                )
-            })
+            letters
+                .map(|letters| {
+                    (
+                        format!("{letters} of {RECOVERY_KEY_LETTERS} characters"),
+                        0.5,
+                    )
+                })
+                .or_else(|| {
+                    self.ask
+                        .can_go_back()
+                        .then(|| ("Press Esc to go back".to_owned(), 0.5))
+                })
         };
     }
 
@@ -105,6 +111,11 @@ impl Unlock {
                 Key::Text(character) => self.secret.push(character),
                 Key::Erase => self.secret.pop(),
                 Key::Clear => self.secret.clear(),
+                Key::Escape if self.ask.can_go_back() => {
+                    let _ = self.request.cancel();
+                    self.secret.clear();
+                    return Typed::Answered;
+                }
                 Key::Enter => {
                     if self.ask.accepts_recovery_key() {
                         self.secret.tidy_recovery_key();
@@ -114,6 +125,7 @@ impl Unlock {
                     answered.record(&self.request, &self.ask);
                     return Typed::Answered;
                 }
+                _ => {}
             }
         }
         self.rejected &= self.secret.characters() == 0;

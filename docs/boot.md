@@ -34,7 +34,7 @@ Switching stays on the same channel and version: `:1` becomes `:1-nvidia`, `:1-n
 
 A new version gets three tries to reach the login screen. SushiBoot counts each start of a version it hasn't seen work yet. Once the login screen or the desktop has been on screen for five seconds, Kestrel tells trustd, which remembers that version as the one that works. A login screen that crashes as soon as it appears doesn't count. If the third try doesn't get there either, SushiBoot starts the version that last worked instead. Before the login screen, Sushi then explains that the update didn't start and Luft went back, and trustd makes that version the default again with `bootc rollback`. Settings doesn't offer the same update again; the next release replaces it.
 
-A new version only gets tries when there's a version that worked to go back to. The counts are kept in EFI variables (`LuftBootGood` and `LuftBootTried`, vendor `b6a4c1e2-3f5d-4c8a-9e71-2d0f6a8b5c3e`), keyed by the startup image's path, so they survive bootc rewriting its entries. Starting another version from the menu, or Rescue, never counts against an update.
+A new version only gets tries when there's a version that worked to go back to. The counts are kept in EFI variables (`LuftBootGood` and `LuftBootTried`, vendor `b6a4c1e2-3f5d-4c8a-9e71-2d0f6a8b5c3e`), keyed by the startup image's path, so they survive bootc rewriting its entries. Starting another version from the menu, or Rescue, never counts against an update. If the update stops at [the screen that says Luft couldn't start](#when-luft-cant-start), Start the previous version goes back right away.
 
 ## Adding Luft's Secure Boot key
 
@@ -47,9 +47,33 @@ If the blue screen was skipped, the computer still starts: shim shows "Verificat
 
 The key can also be added from the blue screen without a code: press a key for key management, then Enroll key from disk, the EFI system partition, `EFI`, `luft`, `luft.cer`, Continue, Yes and Reboot.
 
-## Rescue
+## When Luft can't start
 
-Every startup image has a Rescue profile, under the newest version in the menu. It starts `rescue.target` with messages on screen and the splash off. The TPM never unlocks the disk in Rescue, so it asks for the recovery key or passphrase, then opens a root shell.
+Luft never leaves anyone at systemd's emergency prompt. Whenever the startup image or the installed system would go to `emergency.target` or `rescue.target`, Sushi shows a screen that says Luft couldn't start, why when it can tell (the disk couldn't be unlocked, found or opened, a system file is damaged, an update didn't finish starting, a drive couldn't be mounted), and what can be done:
+
+- **Enter recovery key**, when the disk didn't unlock in the startup image. The startup carries on and asks again.
+- **Restart**.
+- **Start the previous version**, when SushiBoot found one older than the version that started, first when an update didn't finish starting. SushiBoot starts it at the next start, the same way it goes back after an update that doesn't start, so trustd makes it the default with `bootc rollback` and Sushi explains what happened.
+- **Show details**: the parts of the system that didn't start and the errors logged since the computer started, to scroll through.
+- **Open a shell**.
+
+The targets themselves stay as they are, so everything that isolates to them still does. Only `emergency.service` and `rescue.service`, and dracut's `dracut-emergency.service` in the startup image, run `sushictl failure` in place of `sulogin`. If Sushi isn't running it starts it; without a display the same choices are listed on the console, picked by number. Nothing on the screen times out.
+
+SushiBoot names the version before the one it started in `LuftBootPrevious`, and the screen asks for it by writing the started entry to `LuftBootGoBack` (vendor `b6a4c1e2-3f5d-4c8a-9e71-2d0f6a8b5c3e`), which SushiBoot clears when it reads it.
+
+### Opening a shell
+
+A shell can do anything, and in the startup image the TPM would still unlock the disk for it, so it needs proof that whoever is at the computer may have that:
+
+- When root has a password on the installed system, `sulogin` asks for it.
+- Otherwise, with an encrypted disk, the disk's recovery key or passphrase, checked against the disk with `cryptsetup`. Esc goes back to the screen.
+- On an unencrypted disk, or in Rescue, the shell opens right away. Anyone at an unencrypted computer can read it from a USB stick anyway, and Rescue only starts after the recovery key or passphrase, since the TPM never unlocks the disk for it.
+
+Leaving the shell brings the screen back.
+
+### Rescue
+
+Every startup image has a Rescue profile, under the newest version in the menu. It starts `rescue.target` with messages on screen and the splash off. The TPM never unlocks the disk in Rescue, so it asks for the recovery key or passphrase, then shows the same screen titled Luft is in Rescue, where Open a shell needs nothing more.
 
 ## When the firmware forgets its settings
 

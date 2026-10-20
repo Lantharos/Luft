@@ -1,5 +1,6 @@
 mod cards;
 mod drivers;
+mod failure;
 mod requests;
 
 use std::os::fd::AsFd;
@@ -15,14 +16,14 @@ use sushi::display::{Card, ModeHints};
 use sushi::password::PasswordRequests;
 use sushi::plymouth::{self, Client};
 use sushi::render::Logo;
-use sushi::scene::{Prompt, Scene};
+use sushi::scene::{Failure, Prompt, Scene};
 use sushi::terminal::Terminal;
 use sushi::uevent::CardEvents;
 
 use crate::activity::Activity;
 use crate::firmware::Firmware;
 use crate::notice::Shown;
-use crate::screen::{Fader, Look, Screen};
+use crate::screen::{Content, Fader, Look, Screen};
 use crate::signals::{Switch, VtSignals};
 use crate::takeover::Takeover;
 use crate::unlock::{Answered, Typed, Unlock};
@@ -60,6 +61,7 @@ pub struct Daemon {
     listener: UnixListener,
     plymouth: Option<plymouth::Server>,
     started: Instant,
+    drawn_at: f32,
     phase: Phase,
     look: Look,
     activity: Activity,
@@ -69,6 +71,8 @@ pub struct Daemon {
     key_enrollment: Option<KeyEnrollment>,
     notice: Option<Shown>,
     fading_notice: Option<sushi::scene::Notice>,
+    failure: Option<crate::failure::Shown>,
+    fading_failure: Option<Failure>,
     root: Option<PathBuf>,
     takeover: Takeover,
     on_firmware: bool,
@@ -111,12 +115,14 @@ impl Daemon {
             listener: listen()?,
             plymouth: listen_for_plymouth_clients(),
             started: Instant::now(),
+            drawn_at: 0.0,
             phase: Phase::Splash,
             look: Look {
                 logo: Fader::at(1.0),
                 loader: Fader::at(0.0),
                 prompt: Fader::at(0.0),
                 notice: Fader::at(0.0),
+                failure: Fader::at(0.0),
             },
             activity: Activity::new(),
             unlock: None,
@@ -125,6 +131,8 @@ impl Daemon {
             key_enrollment: None,
             notice: None,
             fading_notice: None,
+            failure: None,
+            fading_failure: None,
             root: None,
             takeover: Takeover::new(),
             on_firmware: false,
@@ -182,7 +190,7 @@ impl Daemon {
             Phase::Splash if self.screen.is_none() => self.held.as_ref().map(|_| WATCH_INTERVAL),
             Phase::Splash => {
                 let prompt = shown_prompt(&self.unlock, &self.fading_prompt);
-                if self.look.is_animating(now, prompt)
+                if self.look.is_animating(self.drawn_at, prompt)
                     || self.activity.is_animating(now)
                     || self.screen.as_ref().is_some_and(Screen::is_crossfading)
                 {
@@ -209,9 +217,17 @@ impl Daemon {
             PollFd::new(&self.requests, PollFlags::IN),
             PollFd::new(&self.signals, PollFlags::IN),
         ];
-        let typing = self.terminal.is_some() && (self.unlock.is_some() || self.notice.is_some());
+        let typing =
+            self.terminal.is_some() && (self.unlock.is_some() || self.waits_for_an_answer());
         if let Some(terminal) = self.terminal.as_ref().filter(|_| typing) {
             fds.push(PollFd::from_borrowed_fd(terminal.as_fd(), PollFlags::IN));
+        }
+        if let Some(waiting) = self
+            .failure
+            .as_ref()
+            .and_then(crate::failure::Shown::waiting)
+        {
+            fds.push(PollFd::from_borrowed_fd(waiting, PollFlags::IN));
         }
         if let Some(server) = &self.plymouth {
             fds.extend(
@@ -290,7 +306,7 @@ impl Daemon {
             self.close_prompt();
         }
         if self.unlock.is_none()
-            && self.notice.is_none()
+            && !self.waits_for_an_answer()
             && let Some(unlock) = Unlock::next(&self.requests, &self.answered, self.now())
         {
             if let Some(terminal) = &self.terminal {
@@ -316,13 +332,21 @@ impl Daemon {
 
     fn settle_loader(&mut self, now: f32) {
         let covered = !self.takeover.is_active()
-            && (self.unlock.is_some() || self.notice.is_some() || self.activity.is_showing());
+            && (self.unlock.is_some() || self.waits_for_an_answer() || self.activity.is_showing());
         self.look
             .loader
             .fade_to(if covered { 0.0 } else { 1.0 }, now);
     }
 
+    fn waits_for_an_answer(&self) -> bool {
+        self.notice.is_some() || self.failure.is_some()
+    }
+
     fn handle_keys(&mut self) {
+        if self.failure.is_some() {
+            self.answer_failure();
+            return;
+        }
         if let Some(shown) = &mut self.notice {
             let keys = self
                 .terminal
@@ -350,6 +374,9 @@ impl Daemon {
         }
         if self.fading_notice.is_some() && self.look.notice.settled(now) {
             self.fading_notice = None;
+        }
+        if self.fading_failure.is_some() && self.look.failure.settled(now) {
+            self.fading_failure = None;
         }
         self.advance_takeover(now);
         match std::mem::replace(&mut self.phase, Phase::Holding) {
@@ -400,20 +427,30 @@ impl Daemon {
     }
 
     fn draw(&mut self) {
+        let now = self.now();
+        self.drawn_at = now;
         if self.away || !matches!(self.phase, Phase::Splash | Phase::Leaving(_)) {
             return;
         }
-        let now = self.now();
         let revealed = self.takeover.revealed(now);
         let status = self.activity.status(now);
         let prompt = shown_prompt(&self.unlock, &self.fading_prompt);
-        let notice = self
-            .notice
-            .as_ref()
-            .map(|shown| &shown.notice)
-            .or(self.fading_notice.as_ref());
+        let content = Content {
+            prompt,
+            status,
+            notice: self
+                .notice
+                .as_ref()
+                .map(|shown| &shown.notice)
+                .or(self.fading_notice.as_ref()),
+            failure: self
+                .failure
+                .as_ref()
+                .map(|shown| &shown.failure)
+                .or(self.fading_failure.as_ref()),
+        };
         if let Some(screen) = &mut self.screen
-            && let Err(error) = screen.draw(&self.look, revealed, now, prompt, status, notice)
+            && let Err(error) = screen.draw(&self.look, revealed, now, content)
         {
             eprintln!("Lost {}: {error}", screen.path().display());
             self.forget_screen();

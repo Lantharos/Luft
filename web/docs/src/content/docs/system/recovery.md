@@ -1,6 +1,6 @@
 ---
 title: Recovery and troubleshooting
-description: The boot menu, going back to an earlier version, Rescue, and what to do when something doesn't start.
+description: The boot menu, going back to an earlier version, what Luft offers when it can't start, Rescue, and other problems.
 sidebar:
   order: 6
 ---
@@ -23,9 +23,21 @@ From a running Luft, holding <kbd>Alt</kbd> in the Restart dialog shows **Boot O
 
 Your files and settings stay as they are either way. See [How updates work](/system/updates/#going-back).
 
+## Luft couldn't start
+
+When something stops Luft from starting, such as a disk that won't unlock or a damaged system file, a screen says **Luft couldn't start**, with the reason when Luft can tell, and offers:
+
+- **Enter recovery key**, when the disk couldn't be unlocked
+- **Restart**
+- **Start the previous version**, when the computer has one. Luft goes back to it, and keeps it until the next update
+- **Show details**, what didn't start and the errors behind it, handy when asking for help
+- **Open a shell**, to fix things by hand. It asks for the disk's recovery key or passphrase first, or for root's password if you gave root one
+
+Choose with the arrow keys and <kbd>Enter</kbd>. None of them change your files.
+
 ## Rescue
 
-**Rescue**, under the newest version in the boot menu, starts a minimal system with messages on screen. It asks for the disk's recovery key or passphrase, since the TPM never unlocks the disk in Rescue, then opens a root shell.
+**Rescue**, under the newest version in the boot menu, starts a minimal system with messages on screen. It asks for the disk's recovery key or passphrase, since the TPM never unlocks the disk in Rescue, then shows the same screen, where **Open a shell** opens a root shell right away.
 
 ## The disk asks for its recovery key
 

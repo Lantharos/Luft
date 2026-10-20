@@ -2,9 +2,11 @@
 
 extern crate alloc;
 
+pub mod failure;
 mod image;
 pub mod loader;
 mod logo;
+mod mark;
 mod monitor;
 mod notice;
 mod prompt;
@@ -12,6 +14,7 @@ mod scene;
 mod status;
 pub mod text;
 
+pub use failure::Failure;
 pub use image::decode_bmp;
 pub use logo::FirmwareLogo;
 pub use monitor::Monitor;

@@ -1,7 +1,7 @@
 use std::path::Path;
 
 use sushi::luks::{self, Unlocking};
-use sushi::password::Request;
+use sushi::password::{Request, SHELL};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Why {
@@ -22,6 +22,7 @@ pub enum Ask {
     Passphrase { disk: Option<String> },
     Pin { security_key: bool },
     Fallback { why: Why, accepts: Accepts },
+    Shell,
 }
 
 pub struct Copy {
@@ -60,6 +61,9 @@ fn has_tpm() -> bool {
 impl Ask {
     pub fn of(request: &Request, pin_answered: bool) -> Self {
         let message = request.message.as_str();
+        if request.id.starts_with(SHELL) {
+            return Self::Shell;
+        }
         if request.id.starts_with("trustd:recovery:") {
             return Self::Fallback {
                 why: Why::Changed,
@@ -103,11 +107,16 @@ impl Ask {
     pub fn accepts_recovery_key(&self) -> bool {
         matches!(
             self,
-            Self::Fallback {
-                accepts: Accepts::RecoveryKey | Accepts::RecoveryKeyOrPassphrase,
-                ..
-            }
+            Self::Shell
+                | Self::Fallback {
+                    accepts: Accepts::RecoveryKey | Accepts::RecoveryKeyOrPassphrase,
+                    ..
+                }
         )
+    }
+
+    pub fn can_go_back(&self) -> bool {
+        *self == Self::Shell
     }
 
     pub fn wants_only_a_recovery_key(&self) -> bool {
@@ -139,6 +148,15 @@ impl Ask {
                 explanation: Vec::new(),
                 placeholder: "PIN",
                 rejected: "That PIN didn't work. Try again.",
+            },
+            Self::Shell => Copy {
+                title: "Enter your recovery key".to_owned(),
+                explanation: vec![
+                    "A shell can change anything on this computer,".to_owned(),
+                    "so it needs the disk's recovery key or passphrase.".to_owned(),
+                ],
+                placeholder: "Recovery key or passphrase",
+                rejected: "That didn't unlock the disk. Try again.",
             },
             Self::Pin { security_key: true } => Copy {
                 title: "Enter your security key's PIN".to_owned(),

@@ -71,6 +71,7 @@ impl Daemon {
                 }
             }
             Command::ShowNotice(_) => reply(stream, "The splash isn't on screen"),
+            Command::ShowFailure(path) => self.show_failure(&path, stream),
         }
     }
 
@@ -204,7 +205,7 @@ impl Daemon {
         }
     }
 
-    fn reclaim(&mut self) {
+    pub(super) fn reclaim(&mut self) {
         match std::mem::replace(&mut self.phase, Phase::Splash) {
             Phase::Splash => return,
             Phase::Leaving(pending) => pending.into_iter().for_each(|waiter| self.finish(waiter)),

@@ -2,7 +2,7 @@
 set -euo pipefail
 
 destdir="$1"
-languages=(en-US en-GB)
+languages=(en-US en-GB de hr sr)
 shared_assets=(icudtl.dat resources.pak chrome_100_percent.pak chrome_200_percent.pak)
 
 keep_languages() {
@@ -10,6 +10,9 @@ keep_languages() {
   for pak in "$1"/*.pak; do
     language="$(basename "$pak" .pak)"
     [[ " ${languages[*]} " == *" ${language%%_*} "* ]] || rm "$pak"
+  done
+  for language in "${languages[@]}"; do
+    [[ -f "$1/$language.pak" ]] || { echo "CEF has no $language.pak" >&2; exit 1; }
   done
 }
 

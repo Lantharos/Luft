@@ -11,12 +11,13 @@
 		icon: Component;
 		mutedIcon: Component;
 		onvolume: (volume: number) => void;
+		onsettle?: () => void;
 		onmute: (muted: boolean) => void;
 		controls?: Snippet;
 		children?: Snippet;
 	}
 
-	let { title, volume, muted, max, icon: Icon, mutedIcon: MutedIcon, onvolume, onmute, controls, children }: Props = $props();
+	let { title, volume, muted, max, icon: Icon, mutedIcon: MutedIcon, onvolume, onsettle, onmute, controls, children }: Props = $props();
 </script>
 
 <Row {title}>
@@ -30,7 +31,18 @@
 		{/if}
 	</button>
 	{#snippet below()}
-		<Slider label={title} value={Math.min(volume, max)} {max} format={percent} disabled={muted} oninput={onvolume} onchange={onvolume} />
+		<Slider
+			label={title}
+			value={Math.min(volume, max)}
+			{max}
+			format={percent}
+			disabled={muted}
+			oninput={onvolume}
+			onchange={(next) => {
+				onvolume(next);
+				onsettle?.();
+			}}
+		/>
 		{@render children?.()}
 	{/snippet}
 </Row>

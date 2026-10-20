@@ -35,8 +35,8 @@
 		<Row title="Banners" description="Pop up on screen when they arrive" disabled={off}>
 			{@render toggle('show-banners', 'Banners', off)}
 		</Row>
-		<Row title="Sound" disabled={off}>
-			{@render toggle('enable-sound-alerts', 'Sound', off)}
+		<Row title="Play a sound" disabled={off}>
+			{@render toggle('enable-sound-alerts', 'Play a sound', off)}
 		</Row>
 		{#if rules}
 			<Row title="Allow during Do Not Disturb" description="Urgent means alarms and calls" disabled={off}>

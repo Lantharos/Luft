@@ -6,12 +6,11 @@
 	import VolumeX from '@lucide/svelte/icons/volume-x';
 	import { Row, Section, Select, Slider, Switch } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
-	import { percent } from '#lib/format.js';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import {
 		onInputLevel,
 		onSoundChanged,
-		setAlertVolume,
+		playSound,
 		setBalance,
 		setDefault,
 		setMeter,
@@ -26,23 +25,22 @@
 	import AppsSection from './AppsSection.svelte';
 	import DevicesSection from './DevicesSection.svelte';
 	import LevelMeter from './LevelMeter.svelte';
+	import SystemSounds from './SystemSounds.svelte';
 	import VolumeRow from './VolumeRow.svelte';
 
-	type Alerts = {
-		'event-sounds': boolean;
-		'input-feedback-sounds': boolean;
+	type Output = {
 		'allow-volume-above-100-percent': boolean;
 	};
 
 	const LOUD_MAX = 1.5;
 
-	const alerts = useSettings<Alerts>('org.gnome.desktop.sound', ['event-sounds', 'input-feedback-sounds', 'allow-volume-above-100-percent']);
+	const loudness = useSettings<Output>('org.gnome.desktop.sound', ['allow-volume-above-100-percent']);
 
 	let sound = $state<Sound | null>(null);
 	let level = $state(0);
 	let page = $state<'apps' | 'devices' | null>(null);
 
-	let max = $derived(alerts.values['allow-volume-above-100-percent'] ? LOUD_MAX : 1);
+	let max = $derived(loudness.values['allow-volume-above-100-percent'] ? LOUD_MAX : 1);
 	let output = $derived(sound?.outputs.find((device) => device.name === sound?.defaultOutput));
 	let input = $derived(sound?.inputs.find((device) => device.name === sound?.defaultInput));
 	let playing = $derived(sound?.apps.length ?? 0);
@@ -108,6 +106,7 @@
 				icon={Volume2}
 				mutedIcon={VolumeX}
 				onvolume={(volume) => setVolume('output', output!.index, volume)}
+				onsettle={() => playSound('audio-volume-change')}
 				onmute={(muted) => setMute('output', output!.index, muted)}
 			/>
 			{#if output.balance !== null}
@@ -119,7 +118,7 @@
 				</Row>
 			{/if}
 			<Row title="Allow louder than 100%" description="Sound can distort at higher volumes">
-				<Switch label="Allow louder than 100%" checked={max > 1} onchange={(on) => alerts.set('allow-volume-above-100-percent', on)} />
+				<Switch label="Allow louder than 100%" checked={max > 1} onchange={(on) => loudness.set('allow-volume-above-100-percent', on)} />
 			</Row>
 		</Section>
 	{/if}
@@ -153,20 +152,5 @@
 		</Section>
 	{/if}
 
-	<Section title="Alerts">
-		<Row title="Alert sounds" description="Plays a sound for notifications and other events">
-			<Switch label="Alert sounds" checked={alerts.values['event-sounds'] ?? true} onchange={(on) => alerts.set('event-sounds', on)} />
-		</Row>
-		{#if sound.alertVolume !== null && (alerts.values['event-sounds'] ?? true)}
-			<Row title="Alert volume">
-				<span class="w-11 text-right tabular-nums">{percent(sound.alertVolume)}</span>
-				{#snippet below()}
-					<Slider label="Alert volume" value={sound!.alertVolume!} format={percent} onchange={setAlertVolume} />
-				{/snippet}
-			</Row>
-		{/if}
-		<Row title="Typing and clicking sounds" description="Plays a sound when you type or click">
-			<Switch label="Typing and clicking sounds" checked={alerts.values['input-feedback-sounds'] ?? false} onchange={(on) => alerts.set('input-feedback-sounds', on)} />
-		</Row>
-	</Section>
+	<SystemSounds volume={sound.alertVolume} />
 {/if}

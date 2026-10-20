@@ -1,4 +1,5 @@
 mod card;
+mod kestrel;
 mod meter;
 mod model;
 mod pulse;
@@ -113,4 +114,6 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .with("sound_meter", events, |events, request| {
             service::send(events, Command::Meter(request))
         })
+        .command_async("sound_preview", kestrel::preview)
+        .command_async("sound_play", kestrel::play)
 }

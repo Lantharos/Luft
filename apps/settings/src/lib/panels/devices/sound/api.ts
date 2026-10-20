@@ -53,6 +53,8 @@ export const setPort = (direction: Direction, index: number, port: string) => in
 export const setProfile = (card: number, profile: string) => invoke<void>('sound_set_profile', { card, profile });
 export const moveApp = (index: number, output: number) => invoke<void>('sound_move_app', { index, output });
 export const setAlertVolume = (volume: number) => invoke<void>('sound_set_alert_volume', { volume });
+export const previewSound = (name: string) => invoke<void>('sound_preview', { name });
+export const playSound = (name: string) => invoke<void>('sound_play', { name });
 export const setMeter = (enabled: boolean) => invoke<void>('sound_meter', { enabled });
 export const onSoundChanged = (callback: (sound: Sound) => void) => listen<Sound>('sound.changed', callback);
 export const onInputLevel = (callback: (level: number) => void) => listen<number>('sound.level', callback);

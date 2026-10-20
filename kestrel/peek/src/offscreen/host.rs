@@ -4,8 +4,9 @@ use std::io::{self, BufRead, BufReader, Read, Write};
 use std::os::fd::{AsFd, AsRawFd, OwnedFd};
 use std::os::unix::fs::DirBuilderExt;
 use std::os::unix::net::UnixStream;
+use std::os::unix::process::ExitStatusExt;
 use std::path::{Path, PathBuf};
-use std::process::{Child, Command, ExitCode, Stdio};
+use std::process::{Child, Command, ExitCode, ExitStatus, Stdio};
 use std::time::Duration;
 
 use rustix::event::{PollFd, PollFlags, Timespec, poll};
@@ -14,10 +15,14 @@ use rustix::pipe::pipe;
 use rustix::process::{Pid, PidfdFlags, Signal, getppid, pidfd_open, pidfd_send_signal, setsid};
 
 use super::cgroup::{Cgroup, populated};
+use super::isolation::Isolation;
 use super::paths::{display, runtime, wayland_socket};
 use crate::launch::STUB;
 
 pub const HOST: &str = "hidden-display";
+pub const ISOLATED: &str = "isolated";
+pub const SHARED: &str = "shared";
+pub const ENDED: &str = "ended";
 
 const STOP_GRACE: Duration = Duration::from_secs(3);
 const PROGRAM_DISPLAY: [&str; 3] = ["WAYLAND_DISPLAY", "DISPLAY", "XAUTHORITY"];
@@ -59,6 +64,7 @@ struct Display {
     handle: String,
     scope: Cgroup,
     compositor: Option<(Child, OwnedFd)>,
+    isolation: Option<Isolation>,
 }
 
 impl Display {
@@ -119,7 +125,7 @@ impl Display {
             .collect())
     }
 
-    fn wait(&self, group: &Cgroup) -> io::Result<()> {
+    fn wait(&self, group: &Cgroup) -> io::Result<bool> {
         let mut events = group.events()?;
         let (_, compositor) = self
             .compositor
@@ -133,10 +139,10 @@ impl Display {
             ];
             poll(&mut fds, None)?;
             if fds[1..].iter().any(|fd| !fd.revents().is_empty()) {
-                break;
+                return Ok(false);
             }
         }
-        Ok(())
+        Ok(true)
     }
 
     fn stop(mut self) -> io::Result<()> {
@@ -147,6 +153,9 @@ impl Display {
             let _ = child.try_wait();
         }
         let _ = fs::remove_dir_all(&self.directory);
+        if let Some(isolation) = &self.isolation {
+            isolation.remove();
+        }
         let socket = runtime()?.join(wayland_socket(&self.handle));
         let _ = fs::remove_file(socket.with_extension("lock"));
         let _ = fs::remove_file(socket);
@@ -157,8 +166,9 @@ impl Display {
 fn start_program(
     command: &[OsString],
     environment: &[(String, String)],
+    isolation: Option<&Isolation>,
     group: &Cgroup,
-) -> io::Result<()> {
+) -> io::Result<Child> {
     let mut program = Command::new(std::env::current_exe()?);
     program
         .arg(STUB)
@@ -169,13 +179,17 @@ fn start_program(
         program.env_remove(name);
     }
     program.envs(environment.iter().map(|(name, value)| (name, value)));
+    if let Some(isolation) = isolation {
+        isolation.apply(&mut program);
+    }
     let mut child = program.spawn()?;
     group.adopt(child.id())?;
     child
         .stdin
         .take()
         .expect("the program's input is piped")
-        .write_all(b"\n")
+        .write_all(b"\n")?;
+    Ok(child)
 }
 
 fn stop_requests() -> io::Result<UnixStream> {
@@ -186,14 +200,24 @@ fn stop_requests() -> io::Result<UnixStream> {
 }
 
 fn report(message: &str) {
-    println!("{message}");
-    let _ = io::stdout().flush();
-    if let Ok(null) = File::open("/dev/null") {
-        let _ = rustix::stdio::dup2_stdout(&null);
+    let mut output = io::stdout();
+    let _ = writeln!(output, "{message}").and_then(|()| output.flush());
+}
+
+fn ending(status: ExitStatus) -> String {
+    match (status.code(), status.signal()) {
+        (Some(code), _) => format!("{ENDED} exit status {code}"),
+        (None, Some(signal)) => format!("{ENDED} killed by signal {signal}"),
+        (None, None) => format!("{ENDED} {status}"),
     }
 }
 
-fn serve(display: &mut Display, size: &str, command: &[OsString]) -> io::Result<Cgroup> {
+fn serve(
+    display: &mut Display,
+    size: &str,
+    isolated: bool,
+    command: &[OsString],
+) -> io::Result<(Cgroup, Child)> {
     setsid()?;
     let parent =
         getppid().ok_or_else(|| io::Error::other("peek run ended before the display started"))?;
@@ -206,15 +230,25 @@ fn serve(display: &mut Display, size: &str, command: &[OsString]) -> io::Result<
     display.scope.child("host")?.adopt(std::process::id())?;
     let program = display.scope.child("program")?;
     DirBuilder::new().mode(0o700).create(&display.directory)?;
+    if isolated {
+        display.isolation = Some(Isolation::prepare(&display.handle, &display.directory)?);
+    }
     let bus = display.start_bus()?;
     let environment = display.start_compositor(size, &bus, &owner)?;
     drop(owner);
-    start_program(command, &environment, &program)?;
-    Ok(program)
+    let child = start_program(command, &environment, display.isolation.as_ref(), &program)?;
+    Ok((program, child))
+}
+
+fn watch(display: &Display, program: &Cgroup, mut child: Child) -> io::Result<()> {
+    if display.wait(program)? {
+        report(&ending(child.wait()?));
+    }
+    Ok(())
 }
 
 pub fn host(arguments: &[OsString]) -> ExitCode {
-    let [handle, size, command @ ..] = arguments else {
+    let [handle, size, sharing, command @ ..] = arguments else {
         return ExitCode::FAILURE;
     };
     let handle = handle.to_string_lossy().into_owned();
@@ -232,23 +266,28 @@ pub fn host(arguments: &[OsString]) -> ExitCode {
         handle,
         scope,
         compositor: None,
+        isolation: None,
     };
-    let served = serve(&mut display, &size.to_string_lossy(), command);
-    match &served {
-        Ok(program) => {
+    let exit = match serve(
+        &mut display,
+        &size.to_string_lossy(),
+        sharing == ISOLATED,
+        command,
+    ) {
+        Ok((program, child)) => {
             report("ready");
-            if let Err(error) = display.wait(program) {
+            if let Err(error) = watch(&display, &program, child) {
                 eprintln!("peek: lost track of the program: {error}");
             }
+            ExitCode::SUCCESS
         }
-        Err(error) => report(&format!("The hidden display couldn't start: {error}")),
-    }
+        Err(error) => {
+            report(&format!("The hidden display couldn't start: {error}"));
+            ExitCode::FAILURE
+        }
+    };
     if let Err(error) = display.stop() {
         eprintln!("peek: couldn't close the hidden display: {error}");
     }
-    if served.is_ok() {
-        ExitCode::SUCCESS
-    } else {
-        ExitCode::FAILURE
-    }
+    exit
 }

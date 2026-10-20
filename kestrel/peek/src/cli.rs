@@ -19,8 +19,10 @@ How it works:
 peek run prints a handle, the only thing it writes to standard output. The program runs on a
 hidden display of its own, so nothing you do reaches the screen, pointer or keyboard of the person
 at the computer, and nothing asks them first. Several programs can run at once, each with its own
-handle. With --here the program opens on the person's screen instead; its windows can still be
-used without asking.
+handle. An app the person already has open starts a separate copy there, with its own runtime
+folder, cache and profile, instead of handing over to theirs; --shared lets it use theirs. With
+--here the program opens on the person's screen instead; its windows can still be used without
+asking.
 
 WINDOW picks a window:
   HANDLE       the focused, or else the newest, window of a program started with peek run
@@ -78,6 +80,10 @@ pub enum Action {
         /// Open the program on the person's screen instead of a hidden display
         #[arg(long)]
         here: bool,
+        /// Let the program share its app instances, caches and profiles with the copies you have open. Without it, a program
+        /// that is already open elsewhere starts a separate copy on the hidden display instead of handing over to yours.
+        #[arg(long, conflicts_with = "here")]
+        shared: bool,
         /// Size of the hidden display in pixels, optionally with its physical size, such as 1920x1200:302x189mm for a 14"
         /// laptop panel, which runs at 150%. Kestrel picks the display's scale from the physical size, as it does for real
         /// screens.

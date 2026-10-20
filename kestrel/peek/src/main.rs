@@ -77,21 +77,33 @@ async fn capture(
     Ok(())
 }
 
+async fn wait_for_window(handle: &str, timeout: u32) -> Result<Window, Failure> {
+    connection(Some(handle))
+        .await?
+        .wait_for_window(handle, timeout)
+        .await
+        .map_err(Failure::from)
+        .and_then(Window::try_from)
+}
+
 async fn run(
     here: bool,
+    shared: bool,
     size: &str,
     wait: Option<u32>,
     log: Option<PathBuf>,
     command: &[OsString],
 ) -> Result<(), Failure> {
-    let log = match log {
+    let log = std::path::absolute(match log {
         Some(log) => log,
         None => scratch_file("run", "log")?,
-    };
+    })?;
+    let mut display = None;
     let handle = if here {
         launch(&connect_session().await?, command, &log).await?
     } else {
-        offscreen::start(command, size, &log)?
+        let started = offscreen::start(command, size, shared, &log)?;
+        display.insert(started).handle.clone()
     };
     let place = if here {
         "on the screen"
@@ -101,20 +113,22 @@ async fn run(
     eprintln!(
         "Started {} {place}. Its output goes to {}",
         command[0].to_string_lossy(),
-        std::path::absolute(&log)?.display()
+        log.display()
     );
     if let Some(timeout) = wait {
-        let window = connection(Some(&handle))
-            .await?
-            .wait_for_window(&handle, timeout)
+        let window = wait_for_window(&handle, timeout)
             .await
-            .map_err(Failure::from)
-            .and_then(Window::try_from)
             .map_err(|Failure(message)| {
-                Failure(format!(
-                    "{message}. The program's output is in {}",
-                    log.display()
-                ))
+                match display.as_mut().and_then(offscreen::Started::ending) {
+                    Some(status) => Failure(format!(
+                        "The program quit before opening a window ({status}). Its output is in {}",
+                        log.display()
+                    )),
+                    None => Failure(format!(
+                        "{message}. The program's output is in {}",
+                        log.display()
+                    )),
+                }
             })?;
         eprintln!("{}", summary(&window));
     }
@@ -148,6 +162,7 @@ async fn dispatch(action: Action) -> Result<(), Failure> {
         }
         Action::Run {
             here,
+            shared,
             size,
             wait_window,
             timeout,
@@ -156,6 +171,7 @@ async fn dispatch(action: Action) -> Result<(), Failure> {
         } => {
             run(
                 here,
+                shared,
                 &size,
                 wait_window.then_some(timeout * 1000),
                 log,

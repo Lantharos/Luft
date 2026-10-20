@@ -28,6 +28,14 @@ pub fn bus(handle: &str) -> io::Result<PathBuf> {
     Ok(display(handle)?.join("bus"))
 }
 
+pub fn cache_home() -> io::Result<PathBuf> {
+    std::env::var_os("XDG_CACHE_HOME")
+        .filter(|path| !path.is_empty())
+        .map(PathBuf::from)
+        .or_else(|| std::env::var_os("HOME").map(|home| PathBuf::from(home).join(".cache")))
+        .ok_or_else(|| io::Error::other("neither XDG_CACHE_HOME nor HOME is set"))
+}
+
 pub fn wayland_socket(handle: &str) -> String {
     format!("peek-{handle}")
 }

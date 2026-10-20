@@ -14,7 +14,7 @@ import {settled} from '../lib/wait.js';
 
 const {require, eventually} = checks('portal');
 const IDLE = 8;
-const PREFER_LIGHT = 2;
+const SCHEMES = {'prefer-dark': 1, 'prefer-light': 2};
 
 async function openedDialog(label) {
   await eventually(() => portalDialog(), label);
@@ -44,9 +44,10 @@ async function checkAppearance() {
   const unsubscribe = subscribe({iface: 'org.freedesktop.impl.portal.Settings', member: 'SettingChanged', path: PORTAL_PATH},
     (_signal, parameters) => changes.push(parameters));
   try {
-    interfaceSettings.set_string('color-scheme', 'prefer-light');
-    await eventually(async () => changes.some(([, key, value]) => key === 'color-scheme' && value === PREFER_LIGHT) &&
-      (await read())['color-scheme'] === PREFER_LIGHT, 'apps follow the light and dark style');
+    const scheme = colorScheme === 'prefer-light' ? 'prefer-dark' : 'prefer-light';
+    interfaceSettings.set_string('color-scheme', scheme);
+    await eventually(async () => changes.some(([, key, value]) => key === 'color-scheme' && value === SCHEMES[scheme]) &&
+      (await read())['color-scheme'] === SCHEMES[scheme], 'apps follow the light and dark style');
   } finally {
     interfaceSettings.set_string('color-scheme', colorScheme);
     unsubscribe();

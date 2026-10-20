@@ -2,7 +2,7 @@ import {resetBattery, setBattery, UPOWER_STATE} from '../lib/battery.js';
 import {checks} from '../lib/check.js';
 import {callLog} from '../system/lib/systemCalls.js';
 import {withApp} from './lib/apps.js';
-import {useScheme} from './lib/palette.js';
+import {withScheme} from './lib/palette.js';
 import {show} from './settings/navigation.js';
 
 const {eventually} = checks('Luft app');
@@ -38,16 +38,17 @@ async function checkLimit(app) {
 }
 
 export async function run() {
-  useScheme('light');
-  try {
-    await setBattery(STATES[0][1]);
-    await withApp('settings', [], async app => {
-      await show(app, 'power');
-      (await app.settle(() => true)).save('settings-battery-full');
-      for (const [name, values] of STATES.slice(1)) await showState(app, name, values);
-      await checkLimit(app);
-    });
-  } finally {
-    await resetBattery();
-  }
+  await withScheme('light', async () => {
+    try {
+      await setBattery(STATES[0][1]);
+      await withApp('settings', [], async app => {
+        await show(app, 'power');
+        (await app.settle(() => true)).save('settings-battery-full');
+        for (const [name, values] of STATES.slice(1)) await showState(app, name, values);
+        await checkLimit(app);
+      });
+    } finally {
+      await resetBattery();
+    }
+  });
 }

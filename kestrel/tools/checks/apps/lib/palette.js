@@ -22,6 +22,16 @@ const styles = {
 const background = new Gio.Settings({schema_id: 'org.gnome.desktop.background'});
 
 export const useScheme = scheme => styles.interface.set_string('color-scheme', `prefer-${scheme}`);
+
+export async function withScheme(scheme, action) {
+  const saved = styles.interface.get_string('color-scheme');
+  useScheme(scheme);
+  try {
+    return await action();
+  } finally {
+    styles.interface.set_string('color-scheme', saved);
+  }
+}
 const appearance = name => property('com.lantharos.Kestrel', '/com/lantharos/Kestrel/Appearance', 'com.lantharos.Kestrel.Appearance', name);
 
 function writeWallpaper(path) {

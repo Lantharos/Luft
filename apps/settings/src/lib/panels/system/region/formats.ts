@@ -7,6 +7,7 @@ export const FORMATS = [
 	'bs_BA.UTF-8',
 	'ca_ES.UTF-8',
 	'ca_AD.UTF-8',
+	'cs_CZ.UTF-8',
 	'da_DK.UTF-8',
 	'de_DE.UTF-8',
 	'de_AT.UTF-8',
@@ -29,16 +30,23 @@ export const FORMATS = [
 	'nl_BE.UTF-8',
 	'nb_NO.UTF-8',
 	'nn_NO.UTF-8',
+	'pl_PL.UTF-8',
 	'pt_BR.UTF-8',
 	'pt_PT.UTF-8',
 	'ro_RO.UTF-8',
 	'sq_AL.UTF-8',
 	'sq_MK.UTF-8',
+	'sk_SK.UTF-8',
+	'sl_SI.UTF-8',
 	'sr_RS.UTF-8@latin',
 	'sv_SE.UTF-8',
 	'sv_FI.UTF-8',
+	'bg_BG.UTF-8',
+	'mk_MK.UTF-8',
+	'ru_RU.UTF-8',
 	'sr_RS.UTF-8',
-	'sr_ME.UTF-8'
+	'sr_ME.UTF-8',
+	'uk_UA.UTF-8'
 ];
 
 const SAMPLE_DATE = Date.UTC(2026, 2, 14, 15, 30);

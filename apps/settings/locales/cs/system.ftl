@@ -1,0 +1,331 @@
+## Apps
+
+settings-apps-defaults = Výchozí aplikace
+settings-apps-defaults-description = Používají se při otevírání odkazů, souborů a složek
+settings-apps-browser = Webový prohlížeč
+settings-apps-email = E-mail
+settings-apps-calendar = Kalendář
+settings-apps-music = Hudba
+settings-apps-videos = Videa
+settings-apps-photos = Fotky
+settings-apps-text-editor = Textový editor
+settings-apps-files = Soubory
+settings-apps-choose = Vyberte
+settings-apps-startup = Po spuštění
+settings-apps-startup-description = Tyto aplikace se otevřou po přihlášení
+settings-apps-startup-app = Otevřít aplikaci { $app } po přihlášení
+settings-apps-startup-add = Přidat aplikaci
+settings-apps-startup-add-title = Přidat aplikaci po spuštění
+settings-apps-startup-add-description = Vyberte aplikaci, která se otevře při každém přihlášení.
+settings-apps-search = Hledat aplikace
+settings-apps-no-match = Hledání neodpovídají žádné aplikace
+settings-apps-cancel = Zrušit
+
+## Date and time
+
+settings-datetime-automatic = Nastavovat čas automaticky
+settings-datetime-automatic-description = Udržuje hodiny přesné pomocí internetu
+settings-datetime-date-and-time = Datum a čas
+settings-datetime-automatic-zone = Nastavovat časové pásmo automaticky
+settings-datetime-automatic-zone-description = Při cestování se řídí vaší polohou
+settings-datetime-automatic-zone-location-off = Chcete-li to použít, zapněte služby určování polohy na stránce Soukromí
+settings-datetime-zone = Časové pásmo
+settings-datetime-zone-description = { $place } · { $offset }
+settings-datetime-clock = Hodiny
+settings-datetime-time-format = Formát času
+settings-datetime-format-24h = 24hodinový
+settings-datetime-format-12h = 12hodinový
+settings-datetime-seconds = Zobrazovat sekundy
+settings-datetime-weekday = Zobrazovat den v týdnu
+settings-datetime-calendar = Kalendář
+settings-datetime-week-start = První den týdne
+settings-datetime-week-start-automatic = Automaticky
+settings-datetime-week-start-monday = Pondělí
+settings-datetime-week-start-sunday = Neděle
+settings-datetime-week-start-regional = { $day }, podle vaší oblasti
+settings-datetime-set-title = Nastavit datum a čas
+settings-datetime-previous-month = Předchozí měsíc
+settings-datetime-next-month = Další měsíc
+settings-datetime-hour = Hodina
+settings-datetime-minute = Minuta
+settings-datetime-day-period = Dopoledne nebo odpoledne
+settings-datetime-increase = Zvýšit hodnotu: { $label }
+settings-datetime-decrease = Snížit hodnotu: { $label }
+settings-datetime-set-failed = Datum a čas se nepodařilo změnit.
+settings-datetime-cancel = Zrušit
+settings-datetime-set = Nastavit
+settings-datetime-zone-search = Hledat město nebo zemi
+settings-datetime-zones = Časová pásma
+settings-datetime-utc = Koordinovaný světový čas
+settings-datetime-zone-no-match = Žádná odpovídající místa
+settings-datetime-zone-failed = Časové pásmo se nepodařilo změnit.
+
+## Users
+
+settings-users-picture = Změnit obrázek
+settings-users-picture-edit = Upravit
+settings-users-account = Váš účet
+settings-users-name = Jméno
+settings-users-name-description = Zobrazuje se při přihlášení a na zamykací obrazovce
+settings-users-change = Změnit
+settings-users-password = Heslo
+settings-users-password-description = Slouží k přihlášení a odemknutí tohoto počítače
+settings-users-password-set = Nastavit heslo
+settings-users-account-type = Typ účtu
+settings-users-administrator = Správce
+settings-users-standard = Standardní účet
+settings-users-others = Další lidé na tomto počítači
+settings-users-name-title = Změnit jméno
+settings-users-name-dialog-description = Takto se zobrazujete při přihlášení.
+settings-users-save = Uložit
+settings-users-cancel = Zrušit
+settings-users-close = Zavřít
+settings-users-done = Hotovo
+settings-users-try-again = Zkusit znovu
+settings-users-remove = Odebrat
+settings-users-password-change-title = Změnit heslo
+settings-users-password-set-title = Nastavit heslo
+settings-users-password-dialog-description = Budete ho používat k přihlášení a odemknutí tohoto počítače.
+settings-users-password-current = Současné heslo
+settings-users-password-new = Nové heslo
+settings-users-password-new-placeholder = { $count ->
+    [one] Alespoň { $count } znak
+    [few] Alespoň { $count } znaky
+    [many] Alespoň { $count } znaku
+   *[other] Alespoň { $count } znaků
+}
+settings-users-password-confirm = Potvrzení
+settings-users-password-confirm-placeholder = Zadejte ho znovu
+settings-users-password-change = Změnit heslo
+settings-users-password-changing = Měnění…
+settings-users-password-wrong = Toto není vaše současné heslo
+settings-users-password-mismatch = Hesla se neshodují
+settings-users-password-too-short = Toto heslo je příliš krátké
+settings-users-password-too-similar = Toto heslo je příliš podobné tomu současnému
+settings-users-password-dictionary-word = Toto heslo vychází ze slova ze slovníku. Zkuste něco méně běžného.
+settings-users-password-too-simple = Toto heslo je příliš jednoduché. Prodlužte ho nebo přidejte více druhů znaků.
+settings-users-password-rejected = Toto heslo nebylo přijato. Zkuste jiné.
+settings-users-password-minimum = { $count ->
+    [one] Použijte alespoň { $count } znak
+    [few] Použijte alespoň { $count } znaky
+    [many] Použijte alespoň { $count } znaku
+   *[other] Použijte alespoň { $count } znaků
+}
+settings-users-password-weak = Slabé. Delší hesla složená z více slov se hůř uhodnou.
+settings-users-password-fair = Přijatelné. Pár dalších znaků ho posílí.
+settings-users-password-strong = Silné
+settings-users-fingerprints = Otisky prstů
+settings-users-fingerprint-add = Přidat otisk prstu
+settings-users-fingerprint-add-description = Přihlašujte se a odemykejte prstem místo zadávání hesla
+settings-users-fingerprint-choose = Vyberte, který prst chcete přidat.
+settings-users-finger = Prst
+settings-users-fingerprint-start = Začít
+settings-users-fingerprint-another = Vybrat jiný prst
+settings-users-fingerprint-remove = Odebrat otisk: { $finger }
+settings-users-fingerprint-remove-title = Odebrat tento otisk prstu?
+settings-users-fingerprint-remove-description = Už se nebudete moct přihlašovat { $finger }.
+
+## Login screen
+
+settings-login-unavailable = Přihlašovací obrazovku nelze v tomto počítači změnit.
+settings-login-wallpaper = Tapeta
+settings-login-wallpaper-label = Tapeta přihlašovací obrazovky
+settings-login-wallpaper-shared-description = Před přihlášením všichni vidí stejný obrázek
+settings-login-wallpaper-own-description = Po výběru účtu každý uvidí svou vlastní tapetu
+settings-login-wallpaper-own = Vlastní
+settings-login-wallpaper-shared = Stejná pro všechny
+settings-login-picture = Obrázek
+settings-login-picture-description = Zobrazuje se za přihlašovací obrazovkou
+settings-login-picture-change = Změnit
+settings-login-people = Lidé
+settings-login-show-people = Zobrazovat lidi na přihlašovací obrazovce
+settings-login-show-people-on = K přihlášení se účet vybírá ze seznamu
+settings-login-show-people-off = K přihlášení každý zadává své uživatelské jméno
+settings-login-person-hidden = K přihlášení zadává uživatelské jméno
+settings-login-show-person = Zobrazovat { $name }
+settings-login-signing-in = Přihlašování
+settings-login-session = Výchozí relace
+settings-login-session-description = Použije se, pokud někdo nezvolí jinou
+settings-login-session-automatic = Automaticky
+settings-login-automatic = Automatické přihlášení
+settings-login-automatic-description = Při spuštění přihlásí bez hesla
+settings-login-automatic-off = Vypnuto
+
+## Updates
+
+settings-updates-checking = Hledání aktualizací…
+settings-updates-downloading = Stahování aktualizací…
+settings-updates-rolling-back = Příprava předchozí verze…
+settings-updates-switching-nvidia = Stahování ovladače NVIDIA…
+settings-updates-switching-standard = Stahování standardního obrazu…
+settings-updates-elsewhere-refresh-by = Aktualizace hledá { $app }
+settings-updates-elsewhere-download-by = Aktualizace stahuje { $app }
+settings-updates-elsewhere-update-by = Aktualizace instaluje { $app }
+settings-updates-elsewhere-update = Instalují se aktualizace
+settings-updates-elsewhere-install-by = Software instaluje { $app }
+settings-updates-elsewhere-install = Instaluje se software
+settings-updates-elsewhere-remove-by = Software odebírá { $app }
+settings-updates-elsewhere-remove = Odebírá se software
+settings-updates-elsewhere-change-by = Software mění { $app }
+settings-updates-elsewhere-change = Mění se software
+settings-updates-elsewhere-wait = Až to skončí, můžete znovu hledat aktualizace
+settings-updates-ready = Aktualizace jsou připravené k instalaci
+settings-updates-available = { $count ->
+    [one] Je k dispozici { $count } aktualizace
+    [few] Jsou k dispozici { $count } aktualizace
+    [many] Je k dispozici { $count } aktualizace
+   *[other] Je k dispozici { $count } aktualizací
+}
+settings-updates-up-to-date = Systém je aktuální
+settings-updates-version = Verze { $version }
+settings-updates-version-new = Nová verze
+settings-updates-returning = Připraveno k návratu na verzi { $version }
+settings-updates-returning-unversioned = Připraveno k návratu na předchozí verzi
+settings-updates-nvidia-ready = Ovladač NVIDIA je připravený
+settings-updates-standard-ready = Standardní obraz je připravený
+settings-updates-version-available = Je k dispozici verze { $version }
+settings-updates-version-available-new = Je k dispozici nová verze
+settings-updates-version-staged = Verze { $version } je připravená k instalaci
+settings-updates-version-staged-new = Nová verze je připravená k instalaci
+settings-updates-restart-install-them = Po restartu se nainstalují. Počítač bude za pár minut zase připravený.
+settings-updates-restart-return = Návrat se dokončí po restartu.
+settings-updates-restart-switch = Dokončí se po restartu. Počítač bude za pár minut zase připravený.
+settings-updates-restart-install-it = Po restartu se nainstaluje. Počítač bude za pár minut zase připravený.
+settings-updates-last-checked = Naposledy zkontrolováno { $when }
+settings-updates-never-checked = Zatím nezkontrolováno
+settings-updates-installed-when = Aktualizace nainstalovány { $when }
+settings-updates-stop = Zastavit
+settings-updates-check = Zkontrolovat
+settings-updates-checking-button = Kontrola…
+settings-updates-apps = Aplikace
+settings-updates-app-updates = Aktualizace aplikací
+settings-updates-apps-checking = Hledání aktualizací aplikací…
+settings-updates-apps-count = { $count ->
+    [0] Spravuje se v aplikaci Schelf
+    [one] V aplikaci Schelf čeká aktualizace pro { $count } aplikaci
+    [few] V aplikaci Schelf čekají aktualizace pro { $count } aplikace
+    [many] V aplikaci Schelf čekají aktualizace pro { $count } aplikace
+   *[other] V aplikaci Schelf čekají aktualizace pro { $count } aplikací
+}
+settings-updates-automatic = Automatické aktualizace
+settings-updates-look = Hledat aktualizace
+settings-updates-look-description = I když je Nastavení zavřené
+settings-updates-schedule-daily = Každý den
+settings-updates-schedule-weekly = Každý týden
+settings-updates-schedule-never = Jen když zkontroluji
+settings-updates-background = Stahovat na pozadí
+settings-updates-background-label = Stahovat aktualizace na pozadí
+settings-updates-background-description = Aktualizace budou připravené k instalaci při příštím restartu
+settings-updates-firmware = Firmware
+settings-updates-firmware-description = Aktualizace softwaru zabudovaného do hardwaru
+settings-updates-firmware-restart = Dokončí se po restartu
+settings-updates-firmware-installing = Instalace…
+settings-updates-firmware-update = Aktualizovat
+settings-updates-firmware-failed = Firmware se nepodařilo aktualizovat
+settings-updates-failed = Poslední aktualizace se nepodařilo nainstalovat
+settings-updates-failed-description = Systém zůstal beze změny
+settings-updates-includes = { $parts ->
+    [security] Obsahuje opravy zabezpečení
+    [kernel] Obsahuje nové jádro Linuxu
+    [drivers] Obsahuje aktualizované ovladače
+    [security-kernel] Obsahuje opravy zabezpečení a nové jádro Linuxu
+    [security-drivers] Obsahuje opravy zabezpečení a aktualizované ovladače
+    [kernel-drivers] Obsahuje nové jádro Linuxu a aktualizované ovladače
+    [security-kernel-drivers] Obsahuje opravy zabezpečení, nové jádro Linuxu a aktualizované ovladače
+   *[other] Opravy a vylepšení v celém systému
+}
+settings-updates-count-size = { $count ->
+    [one] { $count } aktualizace · { $size }
+    [few] { $count } aktualizace · { $size }
+    [many] { $count } aktualizace · { $size }
+   *[other] { $count } aktualizací · { $size }
+}
+settings-updates-restart-and-install = Restartovat a nainstalovat
+settings-updates-download = Stáhnout
+settings-updates-see-included = Zobrazit obsah
+settings-updates-included = Co obsahují
+settings-updates-included-description = { $count ->
+    [one] { $count } aktualizace systému, jeho ovladačů a knihoven
+    [few] { $count } aktualizace systému, jeho ovladačů a knihoven
+    [many] { $count } aktualizace systému, jeho ovladačů a knihoven
+   *[other] { $count } aktualizací systému, jeho ovladačů a knihoven
+}
+settings-updates-security-fix = Oprava zabezpečení
+settings-updates-done = Hotovo
+settings-updates-area-kernel = Jádro Linuxu
+settings-updates-area-drivers = Ovladače a firmware
+settings-updates-area-desktop = Plocha
+settings-updates-area-core = Základ systému
+settings-updates-area-other = Knihovny a nástroje
+settings-updates-released = Vydáno { $when }
+settings-updates-improvements = Opravy a vylepšení v celém systému
+settings-updates-download-size = Ke stažení: { $size }
+settings-updates-replaces = Nahradí verzi { $version }, která čeká na instalaci
+settings-updates-replaces-new = Nahradí novou verzi, která čeká na instalaci
+settings-updates-returning-description = Verze, kterou jste měli předtím. Vaše soubory a nastavení zůstanou beze změny.
+settings-updates-stay = Zůstat u verze { $version }
+settings-updates-stay-unversioned = Zůstat u této verze
+settings-updates-restart = Restartovat
+settings-updates-restart-to-install = Restartovat a nainstalovat
+settings-updates-see-new = Zobrazit novinky
+settings-updates-this-computer = Tento počítač
+settings-updates-installed-version = Nainstalovaná verze
+settings-updates-unknown = Neznámá
+settings-updates-whats-new = Novinky
+settings-updates-go-back-title = Vrátit se k předchozí verzi
+settings-updates-previous = Verze { $version }. Vaše soubory a nastavení zůstanou beze změny.
+settings-updates-previous-unversioned = Vaše soubory a nastavení zůstanou beze změny.
+settings-updates-go-back = Vrátit se
+settings-updates-notes-title = Novinky ve verzi { $version }
+settings-updates-notes-title-new = Novinky v nové verzi
+settings-updates-variant-nvidia = Použít ovladač NVIDIA
+settings-updates-variant-standard = Přejít na standardní obraz
+settings-updates-variant-nvidia-reason = Plný výkon vaší grafiky NVIDIA
+settings-updates-variant-standard-reason = Menší, protože tento počítač nemá grafiku NVIDIA
+settings-updates-switch = Přejít
+
+## About
+
+settings-about-device-name = Název zařízení
+settings-about-device-name-description = Jak tento počítač vidí ostatní zařízení
+settings-about-rename = Přejmenovat
+settings-about-rename-title = Přejmenovat toto zařízení
+settings-about-rename-description = Tento název uvidí ostatní zařízení v okolí.
+settings-about-cancel = Zrušit
+settings-about-hardware = Hardware
+settings-about-processor = Procesor
+settings-about-graphics = Grafika
+settings-about-graphics-numbered = Grafika { $number }
+settings-about-memory = Paměť
+settings-about-storage = Úložiště
+settings-about-storage-free = Volno { $free } z { $total }
+settings-about-manage-drives = Spravovat jednotky
+settings-about-old-system = Ponecháno při nahrazení Luftem · { $size }
+settings-about-other-system = Odebráním uvolníte { $size } pro Luft
+settings-about-remove = Odebrat
+settings-about-software = Software
+settings-about-system = Systém
+settings-about-desktop = Prostředí
+settings-about-kernel = Jádro
+settings-about-hostname = Název hostitele
+settings-about-problems = Nedávné problémy
+settings-about-problem-gpu = Grafický ovladač přestal odpovídat
+settings-about-problem-summary = { $when } · Počítač se sám restartoval
+settings-about-problem-graceful = { $when }. Aplikace byly před restartem počítače požádány o uložení práce.
+settings-about-problem-forced = { $when }. Některé aplikace se nezavřely včas a před restartem počítače byly ukončeny.
+settings-about-problem-emergency = { $when }. Počítač se musel restartovat bez čekání na aplikace.
+settings-about-problem-help = Co může pomoct
+settings-about-problem-what = Co se stalo
+settings-about-problem-log = Úplný protokol jádra z této relace zůstává v systémovém žurnálu. Příkaz nvidia-bug-report.sh spuštěný jako správce ho shromáždí pro hlášení chyby ovladače.
+settings-about-problem-firmware = Restartovat do nastavení firmwaru
+settings-about-done = Hotovo
+
+## Language & Region
+
+settings-region-language = Jazyk
+settings-region-language-description = Kestrel a aplikace Luftu ho použijí hned
+settings-region-language-next-sign-in = Už otevřené aplikace se přepnou po restartu, přihlašovací obrazovka po odhlášení
+settings-region-formats-language = Stejné jako jazyk
+settings-region-formats = Formáty
+settings-region-formats-description = Data, časy, čísla a měrné jednotky
+settings-region-formats-next-sign-in = { $sample }, od příštího přihlášení

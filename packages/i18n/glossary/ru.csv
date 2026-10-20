@@ -1,0 +1,125 @@
+source,target,explanation
+Luft,,"Not translated. Name of the operating system; m, avoid declining it, prefer система Luft"
+Kestrel,,Not translated. Name of Luft's desktop
+Rover,,"Not translated. App name, the file manager"
+Magpie,,"Not translated. App name, the viewer for photos, videos, music and PDFs"
+Mailman,,"Not translated. App name, the mail app"
+Draft,,"Not translated. App name, the text and code editor"
+Tern,,"Not translated. App name, the terminal"
+Schelf,,"Not translated. App name, the app store"
+Barometer,,"Not translated. App name, the system monitor"
+Keys,,"Not translated. App name, makes keyboard layouts and input methods"
+Meet Luft,,Not translated. Name of the Windows app that prepares a PC for Luft
+Helium,,Not translated. Name of the default browser
+Flatpak,,Not translated. App packaging format
+Secure Boot,,"Not translated. UEFI feature, named this way in every PC's firmware setup"
+TPM,,Not translated. Trusted Platform Module; in the interface usually called the security chip
+Bluetooth,,Not translated. Trademark
+Wi-Fi,,"Not translated. Wireless network, as in Windows and macOS"
+Settings,Настройки,"App name and the general word for settings; plural only, в Настройках"
+Disks,Диски,App name for the disk utility
+Install Luft,Установить Luft,App name of the installer; infinitive like a button
+Network Sign-In,Вход в сеть,App that opens the sign-in page of a public Wi-Fi
+File Manager,Файловый менеджер,Generic name of Rover
+Media Viewer,Просмотр медиафайлов,Generic name of Magpie
+Mail,Почта,Generic name of Mailman
+Text Editor,Текстовый редактор,Generic name of Draft
+App Store,Магазин приложений,Generic name of Schelf
+System Monitor,Системный монитор,Generic name of Barometer
+Keyboard Layouts,Раскладки клавиатуры,Generic name of Keys
+Start,Пуск,"The menu opened with Super or the Luft mark; a name, as in Windows; in sentences меню «Пуск», which needs no inflection"
+board,доска,Mode that lays a workspace's windows side by side on an endless canvas; f
+Quick settings,Быстрые настройки,"Panel of switches and sliders opened from the status icons; plural only"
+notification center,центр уведомлений,"Panel with notifications, media and the calendar, opened from the clock; m"
+All windows,Все окна,"The task view: every window of a workspace and the workspaces, Super+Tab"
+snap,прикрепить,"verb, imperfective прикреплять: put a window into a half, third or quarter of the screen; not закрепить, which is pin"
+snap layout,макет прикрепления,One of the arrangements offered by Super+Z; m
+snap group,группа прикрепления,Windows snapped side by side that come back together; f
+taskbar,панель задач,The bar along the bottom of the screen; f
+tray,системный трей,Taskbar button holding the icons of apps running in the background; m
+status icons,значки состояния,"Taskbar icons for network, sound and battery that open Quick settings; m plural"
+lock screen,экран блокировки,Screen shown while the session is locked; m
+login screen,экран входа,Screen listing the people on the computer before anyone signs in; m
+workspace,рабочая область,One of up to ten separate desktops; f; not рабочий стол
+desktop,рабочий стол,The background area behind the windows; also the whole desktop environment; m
+wallpaper,обои,"Picture behind the desktop; plural only, as in Windows and macOS"
+accent color,цвет акцента,Color taken from the wallpaper and used for highlights; m
+dark style,Тёмный режим,Quick settings tile that switches between light and dark; m
+Night light,Ночной свет,Warmer screen colors in the evening; m
+Do Not Disturb,Не беспокоить,Holds back notification banners and sounds
+Airplane mode,Режим полёта,Turns off every radio; m
+Keep awake,Не засыпать,Keeps the screen on for a while
+Power mode,Режим питания,"Performance, Balanced or Power saver; m"
+Power saver,Энергосбережение,Power mode; n
+Dictation,Диктовка,Typing by speaking; f
+clipboard,буфер обмена,Holds what was copied; m
+clipboard history,журнал буфера обмена,"List of recently copied items, Super+V; m"
+emoji,эмодзи,"noun; n, does not decline, same form in the plural"
+screenshot,снимок экрана,Picture of the screen; m
+screen recording,запись экрана,Video of the screen; f
+privacy indicator,индикатор конфиденциальности,"Taskbar icon shown while the camera, microphone, location or screen is in use; m"
+Full access,Полный доступ,"Schelf switch that lets a Flatpak app leave its sandbox: all files, clipboard in the background, other apps' windows; m"
+sandbox,песочница,Isolation Flatpak apps run in; f
+Keyring,связка ключей,"Luft Keyring, which keeps passwords, tokens and keys; f"
+passkey,ключ доступа,"Sign-in key that replaces a password on websites; m, plural ключи доступа"
+recovery key,ключ восстановления,Long code that unlocks an encrypted disk when the TPM can't; m
+security chip,чип безопасности,How the interface names the TPM; m
+device encryption,шифрование устройства,Encryption of the whole disk; n
+encryption,шифрование,noun; n
+signed startup,подписанная загрузка,Startup where every step is checked against Luft's signature; f
+firmware,прошивка,Software built into the hardware; f
+window,окно,noun; n
+pin,закрепить,verb: keep an app on the taskbar or in Start; button Закрепить
+unpin,открепить,verb; button Открепить
+Pin to taskbar,Закрепить на панели задач,Menu item
+open,открыть,verb; button Открыть
+close,закрыть,verb; button Закрыть
+remove,удалить,"verb; button Удалить; убрать when something only leaves a list or place and nothing is lost, Убрать из списка"
+delete,удалить,"verb; button Удалить; for files that go to the trash, Переместить в корзину"
+turn on,включить,"verb, for a feature or setting; button Включить"
+turn off,отключить,"verb, for a feature or setting; button Отключить; выключить only for the computer or a device"
+sign in,войти,verb; button Войти; noun вход
+sign out,выйти,"verb, also Log out; button Выйти; noun выход"
+restart,перезагрузить,"verb, for the computer; button Перезагрузить; перезапустить for an app"
+shut down,выключить,"verb, also Power off; button Выключить, never Закрыть; the act завершение работы"
+suspend,спящий режим,"verb and power menu item, also Sleep; menu item Спящий режим, verb перевести в спящий режим"
+hibernate,гибернация,"verb and power menu item; menu item Гибернация, f"
+lock,заблокировать,verb; button Заблокировать
+unlock,разблокировать,verb; button Разблокировать
+install,установить,verb; button Установить
+update,обновить,verb; button Обновить
+updates,обновления,"noun, new versions of Luft or apps; n plural, singular обновление"
+cancel,Отмена,button
+save,сохранить,verb; button Сохранить
+allow,разрешить,verb; button Разрешить
+forget,забыть,"verb, for a saved network or device; button Забыть"
+share,поделиться,verb; button Поделиться
+search,искать,verb and noun; noun поиск; field placeholder Поиск
+set up,настроить,verb; button Настроить
+try again,Повторить,button; in running text Попробуйте ещё раз
+undo,отменить,verb; button Отменить
+done,Готово,button
+next,Далее,button that moves to the next step
+app,приложение,"noun, also application; n, plural приложения"
+file,файл,noun; m
+folder,папка,noun; f
+trash,корзина,Where deleted files wait; f
+device,устройство,noun; n
+disk,диск,"noun, also drive; m"
+USB stick,USB-накопитель,noun; m
+computer,компьютер,"noun, also PC; m"
+network,сеть,noun; f
+battery,батарея,noun; f
+power,питание,Settings page and button for power; n
+display,экран,"noun, a monitor or built-in screen; also screen; m"
+sound,звук,"noun, the Settings page and audio in general; m"
+notification,уведомление,noun; n
+keyboard shortcut,сочетание клавиш,noun; n
+keyboard layout,раскладка клавиатуры,noun; f
+input method,метод ввода,"Turns what you type into something else, such as Compose sequences or word choices; m"
+touchpad,сенсорная панель,noun; f
+privacy,конфиденциальность,noun; f
+security,безопасность,noun; f
+account,учётная запись,"noun, a user account or online account; f"
+password,пароль,noun; m
+accessibility,специальные возможности,"noun; plural only"

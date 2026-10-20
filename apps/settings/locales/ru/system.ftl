@@ -1,0 +1,331 @@
+## Apps
+
+settings-apps-defaults = Приложения по умолчанию
+settings-apps-defaults-description = Открывают ссылки, файлы и папки
+settings-apps-browser = Браузер
+settings-apps-email = Электронная почта
+settings-apps-calendar = Календарь
+settings-apps-music = Музыка
+settings-apps-videos = Видео
+settings-apps-photos = Фото
+settings-apps-text-editor = Текстовый редактор
+settings-apps-files = Файлы
+settings-apps-choose = Выберите
+settings-apps-startup = Автозапуск
+settings-apps-startup-description = Эти приложения открываются при входе в систему
+settings-apps-startup-app = Открывать приложение { $app } при входе
+settings-apps-startup-add = Добавить приложение
+settings-apps-startup-add-title = Добавить приложение в автозапуск
+settings-apps-startup-add-description = Выберите приложение, которое будет открываться при каждом входе в систему.
+settings-apps-search = Поиск приложений
+settings-apps-no-match = Приложения не найдены
+settings-apps-cancel = Отмена
+
+## Date and time
+
+settings-datetime-automatic = Устанавливать время автоматически
+settings-datetime-automatic-description = Часы сверяются с точным временем через интернет
+settings-datetime-date-and-time = Дата и время
+settings-datetime-automatic-zone = Устанавливать часовой пояс автоматически
+settings-datetime-automatic-zone-description = Меняется вместе с вашим местоположением в поездках
+settings-datetime-automatic-zone-location-off = Для этого включите службы геолокации в разделе «Конфиденциальность»
+settings-datetime-zone = Часовой пояс
+settings-datetime-zone-description = { $place } · { $offset }
+settings-datetime-clock = Часы
+settings-datetime-time-format = Формат времени
+settings-datetime-format-24h = 24-часовой
+settings-datetime-format-12h = 12-часовой
+settings-datetime-seconds = Показывать секунды
+settings-datetime-weekday = Показывать день недели
+settings-datetime-calendar = Календарь
+settings-datetime-week-start = Первый день недели
+settings-datetime-week-start-automatic = Автоматически
+settings-datetime-week-start-monday = Понедельник
+settings-datetime-week-start-sunday = Воскресенье
+settings-datetime-week-start-regional = { $day }, по вашему региону
+settings-datetime-set-title = Установить дату и время
+settings-datetime-previous-month = Предыдущий месяц
+settings-datetime-next-month = Следующий месяц
+settings-datetime-hour = Час
+settings-datetime-minute = Минута
+settings-datetime-day-period = До или после полудня
+settings-datetime-increase = Увеличить: { $label }
+settings-datetime-decrease = Уменьшить: { $label }
+settings-datetime-set-failed = Не удалось изменить дату и время.
+settings-datetime-cancel = Отмена
+settings-datetime-set = Установить
+settings-datetime-zone-search = Поиск города или страны
+settings-datetime-zones = Часовые пояса
+settings-datetime-utc = Всемирное координированное время
+settings-datetime-zone-no-match = Места не найдены
+settings-datetime-zone-failed = Не удалось изменить часовой пояс.
+
+## Users
+
+settings-users-picture = Изменить фото
+settings-users-picture-edit = Изменить
+settings-users-account = Ваша учётная запись
+settings-users-name = Имя
+settings-users-name-description = Показывается при входе и на экране блокировки
+settings-users-change = Изменить
+settings-users-password = Пароль
+settings-users-password-description = Для входа в систему и разблокировки компьютера
+settings-users-password-set = Задать пароль
+settings-users-account-type = Тип учётной записи
+settings-users-administrator = Администратор
+settings-users-standard = Обычная учётная запись
+settings-users-others = Другие пользователи этого компьютера
+settings-users-name-title = Изменить имя
+settings-users-name-dialog-description = Так вас видно при входе в систему.
+settings-users-save = Сохранить
+settings-users-cancel = Отмена
+settings-users-close = Закрыть
+settings-users-done = Готово
+settings-users-try-again = Повторить
+settings-users-remove = Удалить
+settings-users-password-change-title = Изменить пароль
+settings-users-password-set-title = Задать пароль
+settings-users-password-dialog-description = С ним вы будете входить в систему и разблокировать компьютер.
+settings-users-password-current = Текущий пароль
+settings-users-password-new = Новый пароль
+settings-users-password-new-placeholder = { $count ->
+    [one] Не менее { $count } символа
+    [few] Не менее { $count } символов
+    [many] Не менее { $count } символов
+   *[other] Не менее { $count } символа
+}
+settings-users-password-confirm = Подтверждение
+settings-users-password-confirm-placeholder = Введите ещё раз
+settings-users-password-change = Изменить пароль
+settings-users-password-changing = Изменение…
+settings-users-password-wrong = Текущий пароль указан неверно
+settings-users-password-mismatch = Пароли не совпадают
+settings-users-password-too-short = Пароль слишком короткий
+settings-users-password-too-similar = Пароль слишком похож на текущий
+settings-users-password-dictionary-word = Пароль основан на словарном слове. Выберите что-то менее распространённое.
+settings-users-password-too-simple = Пароль слишком простой. Сделайте его длиннее или добавьте символы других типов.
+settings-users-password-rejected = Этот пароль не принят. Попробуйте другой.
+settings-users-password-minimum = { $count ->
+    [one] Используйте не менее { $count } символа
+    [few] Используйте не менее { $count } символов
+    [many] Используйте не менее { $count } символов
+   *[other] Используйте не менее { $count } символа
+}
+settings-users-password-weak = Слабый. Длинный пароль из нескольких слов подобрать сложнее.
+settings-users-password-fair = Средний. Ещё несколько символов сделают его надёжнее.
+settings-users-password-strong = Надёжный
+settings-users-fingerprints = Отпечатки пальцев
+settings-users-fingerprint-add = Добавить отпечаток пальца
+settings-users-fingerprint-add-description = Входите и разблокируйте компьютер пальцем, не вводя пароль
+settings-users-fingerprint-choose = Выберите палец, который хотите добавить.
+settings-users-finger = Палец
+settings-users-fingerprint-start = Начать
+settings-users-fingerprint-another = Выбрать другой палец
+settings-users-fingerprint-remove = Удалить отпечаток: { $finger }
+settings-users-fingerprint-remove-title = Удалить этот отпечаток?
+settings-users-fingerprint-remove-description = Входить в систему { $finger } больше не получится.
+
+## Login screen
+
+settings-login-unavailable = На этом компьютере нельзя изменить экран входа.
+settings-login-wallpaper = Обои
+settings-login-wallpaper-label = Обои экрана входа
+settings-login-wallpaper-shared-description = Все видят одно и то же изображение до входа в систему
+settings-login-wallpaper-own-description = Каждый видит свои обои, когда выбирает свою учётную запись
+settings-login-wallpaper-own = Свои у каждого
+settings-login-wallpaper-shared = Общие для всех
+settings-login-picture = Изображение
+settings-login-picture-description = Показывается на фоне экрана входа
+settings-login-picture-change = Изменить
+settings-login-people = Пользователи
+settings-login-show-people = Показывать пользователей на экране входа
+settings-login-show-people-on = Для входа учётная запись выбирается из списка
+settings-login-show-people-off = Для входа каждый вводит имя пользователя
+settings-login-person-hidden = Для входа вводит имя пользователя
+settings-login-show-person = Показывать: { $name }
+settings-login-signing-in = Вход в систему
+settings-login-session = Сеанс по умолчанию
+settings-login-session-description = Используется, если не выбран другой
+settings-login-session-automatic = Автоматически
+settings-login-automatic = Автоматический вход
+settings-login-automatic-description = Вход без пароля при запуске компьютера
+settings-login-automatic-off = Отключён
+
+## Updates
+
+settings-updates-checking = Поиск обновлений…
+settings-updates-downloading = Скачивание обновлений…
+settings-updates-rolling-back = Подготовка предыдущей версии…
+settings-updates-switching-nvidia = Скачивание драйвера NVIDIA…
+settings-updates-switching-standard = Скачивание стандартного образа…
+settings-updates-elsewhere-refresh-by = { $app } ищет обновления
+settings-updates-elsewhere-download-by = { $app } скачивает обновления
+settings-updates-elsewhere-update-by = { $app } устанавливает обновления
+settings-updates-elsewhere-update = Устанавливаются обновления
+settings-updates-elsewhere-install-by = { $app } устанавливает программы
+settings-updates-elsewhere-install = Устанавливаются программы
+settings-updates-elsewhere-remove-by = { $app } удаляет программы
+settings-updates-elsewhere-remove = Удаляются программы
+settings-updates-elsewhere-change-by = { $app } изменяет программы
+settings-updates-elsewhere-change = Изменяются программы
+settings-updates-elsewhere-wait = Искать обновления можно будет после завершения
+settings-updates-ready = Обновления готовы к установке
+settings-updates-available = { $count ->
+    [one] Доступно { $count } обновление
+    [few] Доступно { $count } обновления
+    [many] Доступно { $count } обновлений
+   *[other] Доступно { $count } обновления
+}
+settings-updates-up-to-date = Система обновлена
+settings-updates-version = Версия { $version }
+settings-updates-version-new = Новая версия
+settings-updates-returning = Всё готово к возврату на версию { $version }
+settings-updates-returning-unversioned = Всё готово к возврату на предыдущую версию
+settings-updates-nvidia-ready = Драйвер NVIDIA готов
+settings-updates-standard-ready = Стандартный образ готов
+settings-updates-version-available = Доступна версия { $version }
+settings-updates-version-available-new = Доступна новая версия
+settings-updates-version-staged = Версия { $version } готова к установке
+settings-updates-version-staged-new = Новая версия готова к установке
+settings-updates-restart-install-them = Перезагрузите компьютер, чтобы установить их. Это займёт несколько минут.
+settings-updates-restart-return = Перезагрузите компьютер, чтобы завершить возврат.
+settings-updates-restart-switch = Перезагрузите компьютер, чтобы завершить. Это займёт несколько минут.
+settings-updates-restart-install-it = Перезагрузите компьютер, чтобы установить её. Это займёт несколько минут.
+settings-updates-last-checked = Последняя проверка: { $when }
+settings-updates-never-checked = Проверок ещё не было
+settings-updates-installed-when = Обновления установлены: { $when }
+settings-updates-stop = Остановить
+settings-updates-check = Проверить
+settings-updates-checking-button = Проверка…
+settings-updates-apps = Приложения
+settings-updates-app-updates = Обновления приложений
+settings-updates-apps-checking = Поиск обновлений приложений…
+settings-updates-apps-count = { $count ->
+    [0] Управляются в приложении Schelf
+    [one] Обновления для { $count } приложения в Schelf
+    [few] Обновления для { $count } приложений в Schelf
+    [many] Обновления для { $count } приложений в Schelf
+   *[other] Обновления для { $count } приложения в Schelf
+}
+settings-updates-automatic = Автоматические обновления
+settings-updates-look = Искать обновления
+settings-updates-look-description = Даже когда Настройки закрыты
+settings-updates-schedule-daily = Каждый день
+settings-updates-schedule-weekly = Каждую неделю
+settings-updates-schedule-never = Только вручную
+settings-updates-background = Скачивать в фоне
+settings-updates-background-label = Скачивать обновления в фоне
+settings-updates-background-description = Обновления будут готовы к установке при следующей перезагрузке
+settings-updates-firmware = Прошивка
+settings-updates-firmware-description = Обновления программ, встроенных в оборудование
+settings-updates-firmware-restart = Завершится после перезагрузки
+settings-updates-firmware-installing = Установка…
+settings-updates-firmware-update = Обновить
+settings-updates-firmware-failed = Не удалось обновить прошивку
+settings-updates-failed = Не удалось установить последние обновления
+settings-updates-failed-description = Система осталась без изменений
+settings-updates-includes = { $parts ->
+    [security] Включает исправления безопасности
+    [kernel] Включает новое ядро Linux
+    [drivers] Включает обновлённые драйверы
+    [security-kernel] Включает исправления безопасности и новое ядро Linux
+    [security-drivers] Включает исправления безопасности и обновлённые драйверы
+    [kernel-drivers] Включает новое ядро Linux и обновлённые драйверы
+    [security-kernel-drivers] Включает исправления безопасности, новое ядро Linux и обновлённые драйверы
+   *[other] Исправления и улучшения во всей системе
+}
+settings-updates-count-size = { $count ->
+    [one] { $count } обновление · { $size }
+    [few] { $count } обновления · { $size }
+    [many] { $count } обновлений · { $size }
+   *[other] { $count } обновления · { $size }
+}
+settings-updates-restart-and-install = Перезагрузить и установить
+settings-updates-download = Скачать
+settings-updates-see-included = Что входит
+settings-updates-included = Что входит в обновление
+settings-updates-included-description = { $count ->
+    [one] { $count } обновление для системы, её драйверов и библиотек
+    [few] { $count } обновления для системы, её драйверов и библиотек
+    [many] { $count } обновлений для системы, её драйверов и библиотек
+   *[other] { $count } обновления для системы, её драйверов и библиотек
+}
+settings-updates-security-fix = Исправление безопасности
+settings-updates-done = Готово
+settings-updates-area-kernel = Ядро Linux
+settings-updates-area-drivers = Драйверы и прошивка
+settings-updates-area-desktop = Рабочий стол
+settings-updates-area-core = Основа системы
+settings-updates-area-other = Библиотеки и инструменты
+settings-updates-released = Выпущено { $when }
+settings-updates-improvements = Исправления и улучшения во всей системе
+settings-updates-download-size = Размер загрузки: { $size }
+settings-updates-replaces = Заменяет версию { $version }, которая ожидает установки
+settings-updates-replaces-new = Заменяет новую версию, которая ожидает установки
+settings-updates-returning-description = Версия, которая была у вас раньше. Ваши файлы и настройки останутся без изменений.
+settings-updates-stay = Остаться на { $version }
+settings-updates-stay-unversioned = Остаться на этой версии
+settings-updates-restart = Перезагрузить
+settings-updates-restart-to-install = Перезагрузить для установки
+settings-updates-see-new = Что нового
+settings-updates-this-computer = Этот компьютер
+settings-updates-installed-version = Установленная версия
+settings-updates-unknown = Неизвестно
+settings-updates-whats-new = Что нового
+settings-updates-go-back-title = Вернуться к предыдущей версии
+settings-updates-previous = Версия { $version }. Ваши файлы и настройки останутся без изменений.
+settings-updates-previous-unversioned = Ваши файлы и настройки останутся без изменений.
+settings-updates-go-back = Вернуться
+settings-updates-notes-title = Что нового в версии { $version }
+settings-updates-notes-title-new = Что нового в новой версии
+settings-updates-variant-nvidia = Использовать драйвер NVIDIA
+settings-updates-variant-standard = Перейти на стандартный образ
+settings-updates-variant-nvidia-reason = Полная производительность видеокарты NVIDIA
+settings-updates-variant-standard-reason = Он меньше, а видеокарты NVIDIA в этом компьютере нет
+settings-updates-switch = Перейти
+
+## About
+
+settings-about-device-name = Имя устройства
+settings-about-device-name-description = Под этим именем компьютер видят другие устройства
+settings-about-rename = Переименовать
+settings-about-rename-title = Переименовать устройство
+settings-about-rename-description = Это имя видят другие устройства поблизости.
+settings-about-cancel = Отмена
+settings-about-hardware = Оборудование
+settings-about-processor = Процессор
+settings-about-graphics = Видеокарта
+settings-about-graphics-numbered = Видеокарта { $number }
+settings-about-memory = Память
+settings-about-storage = Хранилище
+settings-about-storage-free = Свободно { $free } из { $total }
+settings-about-manage-drives = Управление дисками
+settings-about-old-system = Сохранена при установке Luft · { $size }
+settings-about-other-system = Удалите её, чтобы отдать { $size } системе Luft
+settings-about-remove = Удалить
+settings-about-software = Программное обеспечение
+settings-about-system = Система
+settings-about-desktop = Рабочий стол
+settings-about-kernel = Ядро
+settings-about-hostname = Имя хоста
+settings-about-problems = Недавние проблемы
+settings-about-problem-gpu = Графический драйвер перестал отвечать
+settings-about-problem-summary = { $when } · Компьютер перезагрузился сам
+settings-about-problem-graceful = { $when }. Перед перезагрузкой компьютера приложениям было предложено сохранить работу.
+settings-about-problem-forced = { $when }. Некоторые приложения не закрылись вовремя и были остановлены перед перезагрузкой компьютера.
+settings-about-problem-emergency = { $when }. Компьютеру пришлось перезагрузиться, не дожидаясь приложений.
+settings-about-problem-help = Что может помочь
+settings-about-problem-what = Что произошло
+settings-about-problem-log = Полный журнал ядра за тот сеанс хранится в системном журнале. Если запустить nvidia-bug-report.sh от имени администратора, он соберёт его для отчёта об ошибке драйвера.
+settings-about-problem-firmware = Перезагрузить в настройки прошивки
+settings-about-done = Готово
+
+## Language & Region
+
+settings-region-language = Язык
+settings-region-language-description = Kestrel и приложения Luft сразу переходят на него
+settings-region-language-next-sign-in = Уже открытые приложения переключатся после перезапуска, а экран входа — после выхода из системы
+settings-region-formats-language = Как у языка
+settings-region-formats = Форматы
+settings-region-formats-description = Даты, время, числа и единицы измерения
+settings-region-formats-next-sign-in = { $sample }, со следующего входа

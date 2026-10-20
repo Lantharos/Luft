@@ -19,6 +19,7 @@ const LOCALES: [locale: string, country: string][] = [
 	['bs_BA.UTF-8', 'BA'],
 	['ca_ES.UTF-8', 'ES'],
 	['ca_AD.UTF-8', 'AD'],
+	['cs_CZ.UTF-8', 'CZ'],
 	['da_DK.UTF-8', 'DK'],
 	['de_DE.UTF-8', 'DE'],
 	['de_AT.UTF-8', 'AT'],
@@ -41,16 +42,23 @@ const LOCALES: [locale: string, country: string][] = [
 	['nl_BE.UTF-8', 'BE'],
 	['nb_NO.UTF-8', 'NO'],
 	['nn_NO.UTF-8', 'NO'],
+	['pl_PL.UTF-8', 'PL'],
 	['pt_BR.UTF-8', 'BR'],
 	['pt_PT.UTF-8', 'PT'],
 	['ro_RO.UTF-8', 'RO'],
 	['sq_AL.UTF-8', 'AL'],
 	['sq_MK.UTF-8', 'MK'],
+	['sk_SK.UTF-8', 'SK'],
+	['sl_SI.UTF-8', 'SI'],
 	['sr_RS.UTF-8@latin', 'RS'],
 	['sv_SE.UTF-8', 'SE'],
 	['sv_FI.UTF-8', 'FI'],
+	['bg_BG.UTF-8', 'BG'],
+	['mk_MK.UTF-8', 'MK'],
+	['ru_RU.UTF-8', 'RU'],
 	['sr_RS.UTF-8', 'RS'],
-	['sr_ME.UTF-8', 'ME']
+	['sr_ME.UTF-8', 'ME'],
+	['uk_UA.UTF-8', 'UA']
 ];
 
 function ownName(locale: string): string {

@@ -2,9 +2,9 @@ use std::env;
 
 pub const SOURCE_LOCALE: &str = "en";
 pub const PSEUDO_LOCALE: &str = "en-XA";
-pub const LOCALES: [&str; 20] = [
-    "en", "bs", "ca", "da", "de", "es", "fr", "hr", "is", "it", "nl", "nb", "nn", "pt-BR", "pt",
-    "ro", "sq", "sr-Latn", "sv", "sr",
+pub const LOCALES: [&str; 28] = [
+    "en", "bs", "ca", "cs", "da", "de", "es", "fr", "hr", "is", "it", "nl", "nb", "nn", "pl",
+    "pt-BR", "pt", "ro", "sq", "sk", "sl", "sr-Latn", "sv", "bg", "mk", "ru", "sr", "uk",
 ];
 
 pub fn bcp47(locale: &str) -> Option<String> {

@@ -11,6 +11,7 @@ export const LANGUAGES: readonly Language[] = [
 	{ tag: 'en', posix: 'en_US.UTF-8', name: 'English' },
 	{ tag: 'bs', posix: 'bs_BA.UTF-8', name: 'Bosanski' },
 	{ tag: 'ca', posix: 'ca_ES.UTF-8', name: 'Català' },
+	{ tag: 'cs', posix: 'cs_CZ.UTF-8', name: 'Čeština' },
 	{ tag: 'da', posix: 'da_DK.UTF-8', name: 'Dansk' },
 	{ tag: 'de', posix: 'de_DE.UTF-8', name: 'Deutsch' },
 	{ tag: 'es', posix: 'es_ES.UTF-8', name: 'Español' },
@@ -21,13 +22,20 @@ export const LANGUAGES: readonly Language[] = [
 	{ tag: 'nl', posix: 'nl_NL.UTF-8', name: 'Nederlands' },
 	{ tag: 'nb', posix: 'nb_NO.UTF-8', name: 'Norsk bokmål' },
 	{ tag: 'nn', posix: 'nn_NO.UTF-8', name: 'Norsk nynorsk' },
+	{ tag: 'pl', posix: 'pl_PL.UTF-8', name: 'Polski' },
 	{ tag: 'pt-BR', posix: 'pt_BR.UTF-8', name: 'Português (Brasil)' },
 	{ tag: 'pt', posix: 'pt_PT.UTF-8', name: 'Português (Portugal)' },
 	{ tag: 'ro', posix: 'ro_RO.UTF-8', name: 'Română' },
 	{ tag: 'sq', posix: 'sq_AL.UTF-8', name: 'Shqip' },
+	{ tag: 'sk', posix: 'sk_SK.UTF-8', name: 'Slovenčina' },
+	{ tag: 'sl', posix: 'sl_SI.UTF-8', name: 'Slovenščina' },
 	{ tag: 'sr-Latn', posix: 'sr_RS.UTF-8@latin', name: 'Srpski (latinica)' },
 	{ tag: 'sv', posix: 'sv_SE.UTF-8', name: 'Svenska' },
-	{ tag: 'sr', posix: 'sr_RS.UTF-8', name: 'Српски' }
+	{ tag: 'bg', posix: 'bg_BG.UTF-8', name: 'Български' },
+	{ tag: 'mk', posix: 'mk_MK.UTF-8', name: 'Македонски' },
+	{ tag: 'ru', posix: 'ru_RU.UTF-8', name: 'Русский' },
+	{ tag: 'sr', posix: 'sr_RS.UTF-8', name: 'Српски' },
+	{ tag: 'uk', posix: 'uk_UA.UTF-8', name: 'Українська' }
 ];
 
 export const LOCALES: readonly string[] = LANGUAGES.map((language) => language.tag);

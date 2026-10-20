@@ -1,0 +1,55 @@
+# Slovenian review list
+
+Strings in Luft's Slovenian translation that a native speaker should check: terms with no settled equivalent across Windows, GNOME and KDE, and wording that may not fit every value of a placeable.
+
+## Terms and shared strings
+
+- `packages/i18n/glossary/sl.csv` `snap`: "zaskočiti", with "postavitev oken" and "skupina oken" — check what Windows 11 in Slovenian calls Snap and snap layouts; pripeti had to stay free for pin.
+- `packages/i18n/glossary/sl.csv` `tray`: "sistemska vrstica" — the Luft tray is a single taskbar button, so vrstica may read oddly; consider "skrite ikone" or "sistemski pladenj".
+- `packages/i18n/glossary/sl.csv` `board`: "tabla" — no established term; check that it reads naturally for an endless canvas of windows.
+- `packages/i18n/glossary/sl.csv` `Night light`: "Nočna svetloba" — confirm against Windows 11 in Slovenian, which may say "Nočna lučka".
+- `packages/i18n/glossary/sl.csv` `Keep awake`: "Ohrani budnost" — no established term; check it fits a quick settings tile.
+- `packages/i18n/glossary/sl.csv` `Media Viewer`: "Pregledovalnik medijev" — GNOME and KDE sometimes say predstavnost; check which people know better.
+- `packages/i18n/glossary/sl.csv` `notification center`: "središče za obvestila" — Windows has used both središče and center; confirm the current one.
+- `packages/i18n/glossary/sl.csv` `emoji`: "emodži" — check that this spelling is preferred over emoji in Slovenian software.
+- `packages/i18n/glossary/sl.csv` `firmware`: "vdelana programska oprema" — long for labels; check whether a shorter form is acceptable where space is tight.
+- `docs/translations/sl.md` Address and tone: says macOS uses vi in Slovenian — confirm how Apple's Slovenian addresses the reader.
+- `apps/settings/locales/sl/settings.ftl` `settings-subpage-back`: "Nazaj na stran { $page }" — stran keeps the page name in the nominative; check it reads naturally for every panel.
+- `apps/settings/locales/sl/pages.ftl` `settings-page-about`: "O sistemu" — Windows says Vizitka; check which fits a Settings sidebar better.
+- `packages/ui/locales/sl/ui.ftl` `ui-media-pause`: "Začasno ustavi" — Windows' wording; "Premor" is shorter if this ever shows as a visible label.
+- `kestrel/ui/locales/sl/shell.ftl` `battery-level`: "Baterija { $percentage } %, priključena na napajanje" — check the plugged-in but not charging state reads clearly.
+
+## Kestrel and setup
+
+- `kestrel/ui/locales/sl/desktop.ftl` `window-menu-close`: "[one] Zapri okno" — Slovenian `one` also covers 101, where "Zapri okno" would be wrong; English has no count in the text, so check whether a different construction is wanted.
+- `kestrel/ui/locales/sl/surfaces.ftl` `start-search-settings-section`: "Nastavitve – { $page }" — chosen to avoid declining the page title; check it reads naturally as a search result description.
+- `kestrel/ui/locales/sl/system.ftl` `health-gpu-reset-body`: "Računalnik se je sam znova zagnal ({ $date }, { $time }). …" — date in parentheses to avoid the "3. marec / 3. marca" case problem.
+- `kestrel/ui/locales/sl/system.ftl` `oom-closed-body`: "… zato ga je sistem zaprl …" — "ga" fits both aplikacija (as program) and vsebnik only loosely; aplikacija is feminine, so a native check is useful.
+- `kestrel/ui/locales/sl/system.ftl` `peek-see-title`: "Program { $app } želi videti vaša okna" — used "program" rather than "aplikacija" because the asker is usually a command-line tool, as the English errors say.
+- `kestrel/ui/locales/sl/system.ftl` `privacy-indicator`: "V uporabi: { $things }" — dropped "your" so the list items stay in the nominative.
+- `kestrel/ui/locales/sl/portal.ftl` `screen-share-remember-description`: "Naslednjič vas { $appName } ne vpraša znova" — present tense used to avoid gender agreement with the app name.
+- `kestrel/ui/locales/sl/portal.ftl` `usb-description`: "Dokler je naprava priključena, lahko { $appName } z njo komunicira neposredno." — present tense to avoid gender agreement; $appName can also be "aplikacija" when unknown.
+- `kestrel/engine/locales/sl/engine.ftl` `network-menu-connect-to`: "Poveži z omrežjem { $name }" — $name can also be a device (phone tethering), where "omrežjem" is slightly off.
+- `kestrel/engine/locales/sl/engine.ftl` `display-change-title`: "Ohranim nastavitve zaslona?" — must stay under 30 characters; check the first-person form is acceptable.
+- `apps/setup/locales/sl/setup.ftl` `setup-region-intro-guessed`: "Začnimo z nastavitvijo. Nekaj smo že izpolnili: { $guesses }. Popravite, kar ni prav." — $guesses joins pieces like "jezik in tipkovnica glede na računalnik"; check it reads well with the list formatter.
+- `apps/setup/locales/sl/setup.ftl` `setup-network-unavailable`: "Povežete se lahko pozneje prek opravilne vrstice." — English says "from the panel"; assumed it means the taskbar.
+
+## Settings
+
+- `apps/settings/locales/sl/connections.ftl` `settings-bluetooth-request-confirm`: "Ali naj se { $name } seznani s tem računalnikom?" — built so { $name } stays nominative (unnamed is „naprava“); check it reads naturally with real device names.
+- `apps/settings/locales/sl/connections.ftl` `settings-bluetooth-request-authorize`: description "Naprava se bo lahko povezala s tem računalnikom." — { $name } dropped to avoid gender agreement with unknown names; check this is acceptable.
+- `apps/settings/locales/sl/connections.ftl` `settings-bluetooth-windows`: "Naprava/Napravi/Naprave { $devices } …" — agreement assumes $count is the total number of devices in the list.
+- `apps/settings/locales/sl/connections.ftl` `settings-network-ip-link-local`: "Samo lokalna povezava" — no settled Slovenian term for link-local.
+- `apps/settings/locales/sl/connections.ftl` `settings-network-security-owe`: "Izboljšano odprto" — check against Windows' Slovenian wording for Enhanced Open.
+- `apps/settings/locales/sl/connections.ftl` `settings-accounts-apple-account`: "Račun Apple" — Apple has no Slovenian localization; chose the modifier-after-noun order from the style guide.
+- `apps/settings/locales/sl/devices.ftl` `settings-power-duration-minutes`: "{ $minutes } minuto …" — durations are in the accusative (they follow „čez“, „zdrži še“); verify every sentence and picker using them takes the accusative, such as „Zdrži še približno { $time }“.
+- `apps/settings/locales/sl/devices.ftl` `settings-keys-keypad`: "Številčnica { $key }" — check whether keyboards/OSes say Num or something else for keypad keys.
+- `apps/settings/locales/sl/protection.ftl` `settings-encryption-passphrase-field`: "Šifrirno geslo" — used for the passphrase in setup and Settings alike; check it reads as distinct from the account "geslo" and matches what GNOME Disks uses in Slovenian.
+- `apps/settings/locales/sl/protection.ftl` `settings-privacy-screen-off-after`: "{ $duration } nedejavnosti" — rebuilt as "5 minut nedejavnosti" so the duration's case never changes; check it reads well as a row value under "Zaslon se izklopi".
+- `apps/settings/locales/sl/protection.ftl` `settings-security-hardware-fix-maker` (and the other fix-* messages): "Obe lahko doda …" for two — check that "obe" referring to listed protections (zaščite, f) reads naturally.
+- `apps/settings/locales/sl/protection.ftl` `settings-passwords-history-signed`: "Aplikacija { $app } je podpisala s ključem „{ $item }“" — the item may be a password rather than a key; check "s ključem" fits.
+- `apps/settings/locales/sl/protection.ftl` `settings-passwords-access-revoke`: "Prepovej aplikaciji { $app } uporabo elementa „{ $item }“" — "elementa" added to avoid declining the item name; check it isn't stiff.
+- `apps/settings/locales/sl/personalization.ftl` `settings-appearance-wallpaper-tile`: "Razpostavi" — check against the Windows/GNOME Slovenian term for tiled wallpaper ("Tlakovano" is the other candidate).
+- `apps/settings/locales/sl/personalization.ftl` `settings-accessibility-typing-assist-count`: "Vklopljeno: { $count }" — neutral form used for every plural category to avoid agreement with an unnamed noun.
+- `apps/settings/locales/sl/system.ftl` `settings-datetime-increase`: "{ $label }: povečaj" — screen-reader label; word order chosen because $label is capitalized (Ura, Minuta).
+- `apps/settings/locales/sl/system.ftl` `settings-updates-apps-count`: "{ $count } aplikacija ima posodobitev v aplikaciji Schelf" — "aplikacija … v aplikaciji" repeats; a reviewer may prefer another phrasing.

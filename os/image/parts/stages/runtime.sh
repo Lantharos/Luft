@@ -2,7 +2,7 @@
 set -euo pipefail
 
 destdir="$1"
-languages=(en-US en-GB ca da de es fr hr it nl nb pt-BR pt-PT ro sv sr)
+languages=(en-US en-GB ca cs da de es fr hr it nl nb pl pt-BR pt-PT ro sk sl sv bg ru sr uk)
 shared_assets=(icudtl.dat resources.pak chrome_100_percent.pak chrome_200_percent.pak)
 
 keep_languages() {

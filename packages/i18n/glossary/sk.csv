@@ -1,0 +1,125 @@
+source,target,explanation
+Luft,,"Not translated. Name of the operating system; m, inflects like an inanimate noun (Luftu) when a sentence needs it"
+Kestrel,,"Not translated. Name of Luft's desktop; m, inflects (Kestrelu) when a sentence needs it"
+Rover,,"Not translated. App name, the file manager"
+Magpie,,"Not translated. App name, the viewer for photos, videos, music and PDFs"
+Mailman,,"Not translated. App name, the mail app"
+Draft,,"Not translated. App name, the text and code editor"
+Tern,,"Not translated. App name, the terminal"
+Schelf,,"Not translated. App name, the app store"
+Barometer,,"Not translated. App name, the system monitor"
+Keys,,"Not translated. App name, makes keyboard layouts and input methods"
+Meet Luft,,Not translated. Name of the Windows app that prepares a PC for Luft
+Helium,,Not translated. Name of the default browser
+Flatpak,,Not translated. App packaging format
+Secure Boot,,"Not translated. UEFI feature, named this way in every PC's firmware setup"
+TPM,,Not translated. Trusted Platform Module; in the interface usually called the security chip
+Bluetooth,,"Not translated. Trademark; after the noun: adaptér Bluetooth, zariadenie Bluetooth"
+Wi-Fi,,"Not translated. Wireless network; indeclinable, prefer sieť Wi-Fi"
+Settings,Nastavenia,"App name and the general word for settings; n, plural only"
+Disks,Disky,App name for the disk utility
+Install Luft,Inštalovať Luft,App name of the installer
+Network Sign-In,Prihlásenie do siete,App that opens the sign-in page of a public Wi-Fi
+File Manager,Správca súborov,Generic name of Rover
+Media Viewer,Prehliadač médií,Generic name of Magpie
+Mail,Pošta,Generic name of Mailman
+Text Editor,Textový editor,Generic name of Draft
+App Store,Obchod s aplikáciami,Generic name of Schelf
+System Monitor,Monitor systému,Generic name of Barometer
+Keyboard Layouts,Rozloženia klávesnice,Generic name of Keys
+Start,Start,"The menu opened with Super or the Luft mark; a name; m, doesn't inflect well, prefer ponuka Start (v ponuke Start)"
+board,tabuľa,"Mode that lays a workspace's windows side by side on an endless canvas; f, plural tabule"
+Quick settings,Rýchle nastavenia,"Panel of switches and sliders opened from the status icons; n, plural only"
+notification center,centrum oznámení,"Panel with notifications, media and the calendar, opened from the clock; n"
+All windows,Všetky okná,"The task view: every window of a workspace and the workspaces, Super+Tab"
+snap,prichytiť,"verb: put a window into a half, third or quarter of the screen; not pripnúť, which is pin"
+snap layout,rozloženie okien,"One of the arrangements offered by Super+Z; n, plural rozloženia okien"
+snap group,skupina okien,"Windows snapped side by side that come back together; f"
+taskbar,panel úloh,"The bar along the bottom of the screen; m, na paneli úloh"
+tray,systémová lišta,"Taskbar button holding the icons of apps running in the background; f"
+status icons,stavové ikony,"Taskbar icons for network, sound and battery that open Quick settings; f, plural"
+lock screen,uzamknutá obrazovka,"Screen shown while the session is locked; f"
+login screen,prihlasovacia obrazovka,"Screen listing the people on the computer before anyone signs in; f"
+workspace,pracovný priestor,"One of up to ten separate desktops; m, plural pracovné priestory"
+desktop,pracovná plocha,"The background area behind the windows; also the whole desktop environment; f"
+wallpaper,pozadie,"Picture behind the desktop; n"
+accent color,farba zvýraznenia,"Color taken from the wallpaper and used for highlights; f"
+dark style,tmavý režim,"Quick settings tile that switches between light and dark; m"
+Night light,Nočné osvetlenie,"Warmer screen colors in the evening; n"
+Do Not Disturb,Nerušiť,Holds back notification banners and sounds
+Airplane mode,Režim v lietadle,"Turns off every radio; m"
+Keep awake,Nezaspávať,Keeps the screen on for a while
+Power mode,Režim napájania,"Performance, Balanced or Power saver; m"
+Power saver,Šetrenie energie,Power mode; n
+Dictation,Diktovanie,"Typing by speaking; n"
+clipboard,schránka,"Holds what was copied; f"
+clipboard history,história schránky,"List of recently copied items, Super+V; f"
+emoji,emoji,"noun; n, doesn't inflect, plural also emoji"
+screenshot,snímka obrazovky,"Picture of the screen; f, plural snímky obrazovky"
+screen recording,záznam obrazovky,"Video of the screen; m"
+privacy indicator,indikátor súkromia,"Taskbar icon shown while the camera, microphone, location or screen is in use; m"
+Full access,Úplný prístup,"Schelf switch that lets a Flatpak app leave its sandbox: all files, clipboard in the background, other apps' windows; m"
+sandbox,izolované prostredie,"Isolation Flatpak apps run in; n"
+Keyring,zväzok kľúčov,"Luft Keyring, which keeps passwords, tokens and keys; m"
+passkey,prístupový kľúč,"Sign-in key that replaces a password on websites; m, plural prístupové kľúče"
+recovery key,kľúč na obnovenie,"Long code that unlocks an encrypted disk when the TPM can't; m"
+security chip,bezpečnostný čip,"How the interface names the TPM; m"
+device encryption,šifrovanie zariadenia,"Encryption of the whole disk; n"
+encryption,šifrovanie,noun; n
+signed startup,podpísané spustenie,"Startup where every step is checked against Luft's signature; n"
+firmware,firmvér,"Software built into the hardware; m"
+window,okno,"noun; n, plural okná, genitive plural okien"
+pin,pripnúť,verb: keep an app on the taskbar or in Start
+unpin,odopnúť,verb
+Pin to taskbar,Pripnúť na panel úloh,Menu item
+open,otvoriť,verb
+close,zavrieť,verb
+remove,odstrániť,"verb, takes something off a list or out of Luft"
+delete,vymazať,"verb, destroys the data itself, like a file"
+turn on,zapnúť,"verb, for a feature or setting"
+turn off,vypnúť,"verb, for a feature or setting"
+sign in,prihlásiť sa,verb; noun: prihlásenie
+sign out,odhlásiť sa,"verb, also Log out; noun: odhlásenie"
+restart,reštartovať,verb
+shut down,vypnúť,"verb, also Power off"
+suspend,uspať,"verb and power menu item, also Sleep; menu item Režim spánku, the state režim spánku"
+hibernate,Dlhodobý spánok,"verb and power menu item; the verb in running text: prejsť do dlhodobého spánku"
+lock,zamknúť,verb
+unlock,odomknúť,verb
+install,inštalovať,verb; done: nainštalovať
+update,aktualizovať,verb
+updates,aktualizácie,"noun, new versions of Luft or apps; f, plural; singular aktualizácia"
+cancel,Zrušiť,button
+save,uložiť,verb
+allow,povoliť,verb
+forget,zabudnúť,"verb, for a saved network or device"
+share,zdieľať,verb
+search,hľadať,verb; noun: vyhľadávanie
+set up,nastaviť,verb
+try again,Skúsiť znova,button
+undo,vrátiť späť,verb; button: Vrátiť späť
+done,Hotovo,button
+next,Ďalej,button that moves to the next step
+app,aplikácia,"noun, also application; f, plural aplikácie"
+file,súbor,noun; m
+folder,priečinok,"noun; m, plural priečinky"
+trash,kôš,"Where deleted files wait; m, v koši"
+device,zariadenie,noun; n
+disk,disk,"noun, also drive; m; jednotka for a drive you plug in"
+USB stick,USB kľúč,noun; m
+computer,počítač,"noun, also PC; m"
+network,sieť,"noun; f, plural siete"
+battery,batéria,noun; f
+power,napájanie,Settings page and button for power; n
+display,obrazovka,"noun, a monitor or built-in screen; also screen; f"
+sound,zvuk,"noun, the Settings page and audio in general; m"
+notification,oznámenie,"noun; n, plural oznámenia"
+keyboard shortcut,klávesová skratka,noun; f
+keyboard layout,rozloženie klávesnice,noun; n
+input method,metóda vstupu,"Turns what you type into something else, such as Compose sequences or word choices; f"
+touchpad,touchpad,"noun; m, na touchpade"
+privacy,súkromie,noun; n
+security,zabezpečenie,noun; n
+account,účet,"noun, a user account or online account; m, plural účty"
+password,heslo,noun; n
+accessibility,prístupnosť,noun; f

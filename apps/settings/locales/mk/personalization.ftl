@@ -1,0 +1,249 @@
+## Appearance: style
+
+settings-appearance-style = Стил
+settings-appearance-style-title = Изглед
+settings-appearance-style-description = Апликациите што го следат системот се менуваат заедно со него
+settings-appearance-style-light = Светол
+settings-appearance-style-dark = Темен
+settings-appearance-schedule = Автоматски премини на темен
+settings-appearance-schedule-off = Исклучено
+settings-appearance-schedule-sunset = Од зајдисонце до изгрејсонце
+settings-appearance-schedule-custom = Прилагодено
+settings-appearance-schedule-sunset-description = Ги следи зајдисонцето и изгрејсонцето каде што сте
+settings-appearance-schedule-custom-description = Избраниот стил важи до следната промена
+settings-appearance-dark-from = Темен од
+settings-appearance-light-from = Светол од
+settings-appearance-pure-black = Целосно црно
+settings-appearance-pure-black-description = Целосно црни темни позадини, кои штедат енергија на OLED-екрани
+settings-appearance-accent = Акцентна боја
+settings-appearance-accent-wallpaper = Позадина
+settings-appearance-accent-white = Бела
+settings-appearance-accent-white-description = Бела во темниот режим, црна во светлиот режим
+settings-appearance-accent-wallpaper-description = Земена од вашата позадина
+settings-appearance-theme-apps = Усогласи ги другите апликации со позадината
+settings-appearance-theme-apps-description = Другите апликации и терминалите ги добиваат истите бои
+
+## Appearance: wallpaper
+
+settings-appearance-wallpaper = Позадина
+settings-appearance-wallpaper-light-description = Се прикажува додека е вклучен светлиот режим
+settings-appearance-wallpaper-dark-description = Се прикажува додека е вклучен темниот режим
+settings-appearance-wallpaper-position = Положба на позадината. Повлечете или користете ги стрелките за да прикажете друг дел
+settings-appearance-wallpaper-drag = Повлечете за да ја поместите
+settings-appearance-wallpaper-video = { $name }, видео
+settings-appearance-wallpaper-current = Тековна позадина
+settings-appearance-wallpaper-empty = Сликите и видеата од папката Wallpapers во Слики се прикажуваат тука.
+settings-appearance-wallpaper-add = Додај позадини
+settings-appearance-wallpaper-folder = Папка Wallpapers
+settings-appearance-wallpaper-folder-description = Слики › Wallpapers
+settings-appearance-wallpaper-fit-title = Приспособување
+settings-appearance-wallpaper-fit-description = За позадини што не одговараат на обликот на екранот
+settings-appearance-wallpaper-fill = Пополни
+settings-appearance-wallpaper-fit = Приспособи
+settings-appearance-wallpaper-center = Центрирај
+settings-appearance-wallpaper-stretch = Растегни
+settings-appearance-wallpaper-tile = Повторувај
+settings-appearance-wallpaper-span = Низ сите екрани
+settings-appearance-wallpaper-battery = Пуштај видеа на батерија
+settings-appearance-wallpaper-battery-description = Инаку видео позадините паузираат додека не го приклучите полначот
+
+## Appearance: app icons
+
+settings-appearance-icons = Икони на апликации
+settings-appearance-icons-original = Оригинални
+settings-appearance-icons-tinted = Обоени
+settings-appearance-icons-clear = Проѕирни
+settings-appearance-tint = Нијанса
+settings-appearance-tint-description = Првата боја ја следи вашата акцентна боја
+settings-appearance-tint-blue = Сина
+settings-appearance-tint-teal = Тиркизна
+settings-appearance-tint-green = Зелена
+settings-appearance-tint-yellow = Жолта
+settings-appearance-tint-orange = Портокалова
+settings-appearance-tint-red = Црвена
+settings-appearance-tint-pink = Розова
+settings-appearance-tint-purple = Виолетова
+settings-appearance-tint-slate = Сиво-сина
+
+## Appearance: text and motion
+
+settings-appearance-taskbar = Лента со задачи
+settings-appearance-text-and-motion = Текст и движење
+settings-appearance-text-size = Големина на текстот
+settings-appearance-text-size-description = Го зголемува или намалува текстот во сите апликации
+settings-appearance-animations = Анимации
+settings-appearance-animations-description = Прозорците и менијата се движат наместо веднаш да се појават
+
+## Taskbar
+
+settings-taskbar-title = Лента со задачи
+settings-taskbar-back = Изглед
+settings-taskbar-preview = Преглед на лентата со задачи
+settings-taskbar-alignment = Порамнување
+settings-taskbar-align-center = Центар
+settings-taskbar-align-left = Лево
+settings-taskbar-look = Изглед
+settings-taskbar-look-glass = Стакло
+settings-taskbar-look-solid = Непроѕирна
+settings-taskbar-look-transparent = Проѕирна
+settings-taskbar-look-accent = Акцентна
+settings-taskbar-shape = Облик
+settings-taskbar-shape-bar = Од раб до раб
+settings-taskbar-shape-floating = Лебдечка
+settings-taskbar-size = Големина
+settings-taskbar-size-small = Мала
+settings-taskbar-size-medium = Средна
+settings-taskbar-size-large = Голема
+settings-taskbar-auto-hide = Скриј автоматски
+settings-taskbar-hide-never = Никогаш
+settings-taskbar-hide-always = Секогаш
+settings-taskbar-hide-windows = Кога прозорец ќе ја допре
+settings-taskbar-more = Повеќе опции
+settings-taskbar-show-pinned = Прикажи закачени апликации
+settings-taskbar-per-workspace = Наведи само прозорци од тековниот работен простор
+settings-taskbar-every-display = Прикажи на секој екран
+settings-taskbar-per-display = Наведи само прозорци од истиот екран
+
+## Fonts
+
+settings-fonts = Фонтови
+settings-fonts-interface = Интерфејс
+settings-fonts-interface-description = Менија, копчиња и текст на работната површина и во апликациите
+settings-fonts-interface-label = Фонт на интерфејсот
+settings-fonts-monospace = Еднаква ширина
+settings-fonts-monospace-description = Терминали, код и сè што се порамнува во колони
+settings-fonts-monospace-label = Фонт со еднаква ширина
+settings-fonts-all = Сите фонтови
+settings-fonts-all-description = Прегледајте ги фонтовите на овој компјутер, користете некој или отстранете ги оние што сте ги додале
+settings-fonts-back = Изглед
+settings-fonts-search = Пребарај фонтови
+settings-fonts-no-match = Нема фонт со тоа име
+settings-fonts-default = Стандарден
+settings-fonts-sample = Ѕидарски пејзаж: шугав билмез со чудење џвака ќофте и кељ на туѓ цех
+settings-fonts-open = Отвори { $family }
+settings-fonts-styles = { $count ->
+    [one] { $count } стил
+   *[other] { $count } стила
+}
+settings-fonts-more-for = Повеќе за { $family }
+settings-fonts-more = Повеќе
+settings-fonts-use-interface = Користи како системски фонт
+settings-fonts-use-monospace = Користи како фонт со еднаква ширина
+settings-fonts-remove = Отстрани
+
+## Cursors
+
+settings-cursors = Курсор
+settings-cursors-size = Големина
+settings-cursors-size-label = Големина на курсорот
+settings-cursors-size-default = Стандардна
+settings-cursors-size-medium = Средна
+settings-cursors-size-large = Голема
+settings-cursors-size-larger = Поголема
+settings-cursors-size-largest = Најголема
+settings-cursors-get-more = Преземи уште курсори
+settings-cursors-get-more-description = Прелистајте теми споделени на GNOME-Look
+settings-cursors-folder = Папка за курсори
+settings-cursors-folder-description = Темите што ќе ги ставите во Домашна папка › .local › share › icons се прикажуваат тука
+settings-cursors-remove-title = Да се отстрани { $theme }?
+settings-cursors-remove-description = Темата се брише од вашата папка за икони.
+settings-cursors-cancel = Откажи
+settings-cursors-remove = Отстрани
+settings-cursors-remove-theme = Отстрани { $theme }
+settings-cursors-store = Преземи курсори
+settings-cursors-back = Изглед
+settings-cursors-search = Пребарај курсори
+settings-cursors-order = Редослед
+settings-cursors-order-popular = Популарни
+settings-cursors-order-rating = Најдобро оценети
+settings-cursors-order-newest = Нови
+settings-cursors-load-failed = Курсорите не може да се вчитаат
+settings-cursors-try-again = Обиди се повторно
+settings-cursors-no-match = Ништо не одговара на „{ $query }“
+settings-cursors-empty = Тука сè уште нема курсори
+settings-cursors-no-match-description = Обидете се со пократко пребарување или со друг збор
+settings-cursors-store-description = Теми споделени од заедницата на GNOME-Look
+settings-cursors-previous = Претходна
+settings-cursors-next = Следна
+settings-cursors-page = Страница { $page } од { $pages }
+settings-cursors-downloads = { $count ->
+    [one] { $downloads } преземање
+   *[other] { $downloads } преземања
+}
+settings-cursors-installing = Се инсталира { $name }
+settings-cursors-in-use = Се користи
+settings-cursors-use = Користи
+settings-cursors-get = Преземи
+settings-cursors-choose-download = Изберете преземање за { $name }
+settings-cursors-view-online = Погледни на интернет
+
+## Notifications
+
+settings-notifications-dnd = Не вознемирувај
+settings-notifications-dnd-description = Банерите и звуците се исклучени, освен за апликациите што ќе ги дозволите
+settings-notifications-lock-screen = Заклучен екран
+settings-notifications-show-lock-screen = Прикажи известувања на заклучениот екран
+settings-notifications-content = Прикажи ја содржината на пораките
+settings-notifications-content-description = Кога е исклучено, се прикажува само името на апликацијата
+settings-notifications-content-lock-screen = Прикажи ја содржината на пораките на заклучениот екран
+settings-notifications-apps = Известувања од апликации
+settings-notifications-apps-description = Изберете како ве известува секоја апликација
+settings-notifications-back = Известувања
+settings-notifications-search = Пребарај апликации
+settings-notifications-no-match = Ниедна апликација не одговара на пребарувањето
+settings-notifications-from = Известувања од { $app }
+settings-notifications-summary-both = Банери и заклучен екран
+settings-notifications-summary-banners = Банери
+settings-notifications-summary-lock-screen = Заклучен екран
+settings-notifications-summary-list = Само во листата со известувања
+settings-notifications-allow = Дозволи известувања
+settings-notifications-banners = Банери
+settings-notifications-banners-description = Се појавуваат на екранот кога ќе пристигнат
+settings-notifications-sound = Пушти звук
+settings-notifications-dnd-allow = Дозволи при Не вознемирувај
+settings-notifications-dnd-allow-description = Итни се алармите и повиците
+settings-notifications-dnd-never = Никогаш
+settings-notifications-dnd-urgent = Само итни
+settings-notifications-dnd-always = Секогаш
+settings-notifications-keep = Задржи во листата со известувања
+settings-notifications-keep-description = Инаку исчезнуваат кога ќе се затвори нивниот банер
+settings-notifications-app-lock-screen = Прикажи на заклучениот екран
+settings-notifications-done = Готово
+
+## Accessibility
+
+settings-accessibility-seeing = Вид
+settings-accessibility-screen-reader = Читач на екран
+settings-accessibility-zoom = Зумирање
+settings-accessibility-zoom-level = Ниво на зумирање
+settings-accessibility-zoom-factor = { NUMBER($factor, maximumFractionDigits: 2) }×
+settings-accessibility-large-text = Голем текст
+settings-accessibility-high-contrast = Висок контраст
+settings-accessibility-reduce-motion = Помалку движење
+settings-accessibility-reduce-motion-description = Избледување наместо лизгање и зумирање
+settings-accessibility-cursor-size = Големина на курсорот
+settings-accessibility-typing = Пишување
+settings-accessibility-osk = Тастатура на екранот
+settings-accessibility-typing-assist = Помош при пишување
+settings-accessibility-typing-assist-count = { $count ->
+    [0] Исклучено
+    [one] { $count } вклучена
+   *[other] { $count } вклучени
+}
+settings-accessibility-sticky-keys = Лепливи копчиња
+settings-accessibility-slow-keys = Бавни копчиња
+settings-accessibility-slow-keys-delay = Задоцнување на бавните копчиња
+settings-accessibility-bounce-keys = Отскокнувачки копчиња
+settings-accessibility-bounce-keys-delay = Задоцнување на отскокнувачките копчиња
+settings-accessibility-pointing = Покажување
+settings-accessibility-mouse-keys = Копчиња за глувчето
+settings-accessibility-dwell = Клик со задржување на покажувачот
+settings-accessibility-dwell-time = Задржи
+settings-accessibility-hold = Задржи за десен клик
+settings-accessibility-hold-time = Држи
+settings-accessibility-locate-pointer = Притиснете Ctrl за да го најдете покажувачот
+settings-accessibility-hearing = Слух
+settings-accessibility-flash = Трепкање при звучни предупредувања
+settings-accessibility-flash-type = Трепкање
+settings-accessibility-flash-window = Прозорец
+settings-accessibility-flash-screen = Екран

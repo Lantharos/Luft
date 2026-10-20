@@ -1,4 +1,6 @@
+import type { MarkFills } from '../../../../../../packages/ui/src/taskbar/mark';
 import { atTone, contrast, fromHex, seedFromColor, toHex, toneOf, type Rgb } from '../../../appearance/color.js';
+import type { Paint } from '../../../appearance/icons/paint.js';
 
 const MIN_BACKDROP_CONTRAST = 2.2;
 const MIN_INK_CONTRAST = 1.6;
@@ -22,7 +24,7 @@ function quieterTones(inkTone: number, preferredTone: number, quieter: number): 
   return TONES.filter(tone => (tone - inkTone) * quieter > 0).sort((a, b) => Math.abs(a - preferredTone) - Math.abs(b - preferredTone));
 }
 
-export function markShade(inkHex: string, shadeHex: string, backdrops: Rgb[]): string {
+function markShade(inkHex: string, shadeHex: string, backdrops: Rgb[]): string {
   const inks = backdrops.map(backdrop => over(inkHex, backdrop));
   const rate = (shade: Rgb): Rating => ({ shade, ink: lowest(shade, inks, MIN_INK_CONTRAST), backdrop: lowest(shade, backdrops, MIN_BACKDROP_CONTRAST) });
   const preferred = rate(over(shadeHex, backdrops[0]));
@@ -37,5 +39,11 @@ export function markShade(inkHex: string, shadeHex: string, backdrops: Rgb[]): s
   return toHex(best.shade);
 }
 
-export const monochromeShade = (inkHex: string, backdrops: Rgb[]): string =>
+const monochromeShade = (inkHex: string, backdrops: Rgb[]): string =>
   backdrops.every(backdrop => contrast(over(inkHex, backdrop), backdrop) >= MIN_BACKDROP_CONTRAST) ? inkHex : markShade(inkHex, inkHex, backdrops);
+
+export function markFills(foreground: string, paint: Paint | null, backdrops: Rgb[]): MarkFills {
+  const ink = paint?.ink ?? foreground;
+  if (!backdrops.length) return { shade: paint?.shade ?? ink, ink };
+  return { shade: paint ? markShade(ink, paint.shade, backdrops) : monochromeShade(ink, backdrops), ink };
+}

@@ -12,6 +12,7 @@ import { appIcons } from './icons/appIcons.js';
 import { GlyphFiles } from './icons/glyphFiles.js';
 import { AccentStylesheet } from './stylesheet.js';
 import { AppThemes } from './themes/appThemes.js';
+import { taskbarLooks } from '../desktop/panel/ink/taskbarLooks.js';
 import { taskbarStylesheet } from '../desktop/panel/ink/taskbarStylesheet.js';
 import { titleBarStylesheet } from '../desktop/windows/titleBars/titleBarStylesheet.js';
 
@@ -28,13 +29,14 @@ const APPEARANCE_INTERFACE = `<node>
     <property name="LightTerminalColors" type="a{ss}" access="read"/>
     <property name="DarkTerminalColors" type="a{ss}" access="read"/>
     <property name="AppIcons" type="a{ss}" access="read"/>
+    <property name="Taskbar" type="s" access="read"/>
   </interface>
 </node>`;
 
 const PROPERTIES: [string, string][] = [
   ['AccentColor', 's'], ['WallpaperAccentColor', 's'], ['Dark', 'b'], ['PureBlack', 'b'], ['Colors', 'a{ss}'], ['TerminalColors', 'a{ss}'],
   ['LightColors', 'a{ss}'], ['DarkColors', 'a{ss}'], ['LightTerminalColors', 'a{ss}'], ['DarkTerminalColors', 'a{ss}'],
-  ['AppIcons', 'a{ss}'],
+  ['AppIcons', 'a{ss}'], ['Taskbar', 's'],
 ];
 const PERSIST_DELAY = 400;
 
@@ -50,10 +52,14 @@ export class AppearanceService {
   private readonly themes = new AppThemes();
   private readonly schedule: DarkSchedule;
   private readonly glyphFiles = new GlyphFiles();
-  private readonly unwatchIcons = appIcons.watch(() => this.emitChanged('AppIcons'));
+  private readonly unwatchIcons = appIcons.watch(() => {
+    this.emitChanged('AppIcons');
+    if (this.paintTaskbar()) this.emitChanged('Taskbar');
+  });
   private readonly unwatchScheme = watchScheme(() => this.update());
   private wallpaperSeed: Seed | null = null;
   private appearance: Appearance | null = null;
+  private taskbar = '{}';
   private published = '';
   private persistId = 0;
   private writing = Promise.resolve();
@@ -96,6 +102,8 @@ export class AppearanceService {
     return icons;
   }
 
+  get Taskbar(): string { return this.taskbar; }
+
   apply(samples: Rgb[]): void {
     this.wallpaperSeed = seedFromSamples(samples);
     this.update();
@@ -108,6 +116,15 @@ export class AppearanceService {
 
   private get seed(): Seed | null {
     return this.settings.get_string('accent') === 'white' ? NEUTRAL : this.wallpaperSeed;
+  }
+
+  private paintTaskbar(): boolean {
+    const seed = this.seed;
+    if (!seed || !this.palette) return false;
+    const taskbar = JSON.stringify(taskbarLooks(seed, this.palette, isDark() ? 'dark' : 'light', this.PureBlack, appIcons.paint));
+    if (taskbar === this.taskbar) return false;
+    this.taskbar = taskbar;
+    return true;
   }
 
   private update(): void {
@@ -125,7 +142,8 @@ export class AppearanceService {
       palette: buildPalette(seed, this.PureBlack),
     };
     this.stylesheet.apply(seed, this.appearance.palette);
-    const published = JSON.stringify([this.appearance, this.WallpaperAccentColor]);
+    this.paintTaskbar();
+    const published = JSON.stringify([this.appearance, this.WallpaperAccentColor, this.taskbar]);
     if (published === this.published) return;
     this.published = published;
     if (this.appearance.accentColor !== previousAccent) {

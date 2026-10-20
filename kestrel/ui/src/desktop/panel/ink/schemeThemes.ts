@@ -3,6 +3,7 @@ import GObject from 'gi://GObject';
 import type Shell from 'gi://Shell';
 import St from 'gi://St';
 
+import type { Shadow, TaskbarHalos } from '../../../../../../packages/ui/src/taskbar/looks';
 import { panelSurface, type PanelSurface } from '../backdrop.js';
 import type { Rgb } from '../../../appearance/color.js';
 
@@ -11,6 +12,10 @@ export type Halo = 'status-halo' | 'strong-halo' | 'no-halo';
 export type InkPart = 'ink' | 'soft-halo' | Halo;
 
 const PLACEHOLDER = /\.kestrel-panel-(ink|soft-halo|status-halo|strong-halo|no-halo)(?![\w-])/;
+
+const css = (shadow: St.Shadow | null): Shadow | null => shadow && {
+  x: shadow.xoffset, y: shadow.yoffset, blur: shadow.blur, spread: shadow.spread, color: shadow.color.to_string(),
+};
 
 const templateFile = (scheme: Scheme) => Gio.File.new_for_uri(`resource:///com/lantharos/kestrel/theme/panel-ink-${scheme}.css`);
 
@@ -42,8 +47,24 @@ export class SchemeTheme {
     return St.ThemeContext.get_for_stage((global as unknown as Shell.Global).stage);
   }
 
-  private node(classes: string): St.ThemeNode {
-    return St.ThemeNode.new(this.context, this.stage, this.theme, St.Widget.$gtype, null, classes, null, '');
+  private node(classes: string | null, parent = this.stage, type = St.Widget.$gtype): St.ThemeNode {
+    return St.ThemeNode.new(this.context, parent, this.theme, type, null, classes, null, '');
+  }
+
+  inkFills(): { focused: string; dot: string } {
+    const panel = this.node('kestrel-panel-ink');
+    const background = (classes: string) => this.node(classes, panel).get_background_color().to_string();
+    return { focused: background('kestrel-app-focused'), dot: background('kestrel-running-dot') };
+  }
+
+  halos(part: InkPart): TaskbarHalos {
+    const panel = this.node(`kestrel-panel-${part}`);
+    const status = this.node('kestrel-panel-status', panel);
+    return {
+      icon: css(this.node(null, status, St.Icon.$gtype).get_shadow('icon-shadow')),
+      text: css(this.node(null, status, St.Label.$gtype).get_shadow('text-shadow')),
+      dot: css(this.node('kestrel-running-dot', panel).get_shadow('box-shadow')),
+    };
   }
 
   surface(classes: string, blurred: boolean): PanelSurface {

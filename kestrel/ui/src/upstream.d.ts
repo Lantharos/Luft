@@ -23,11 +23,6 @@ declare module 'resource:///com/lantharos/kestrel/ui/userWidget.js' {
   }
 }
 
-declare module '*.svg' {
-  const source: string;
-  export default source;
-}
-
 
 declare module 'resource:///com/lantharos/kestrel/ui/status/volume.js' {
   export function createInputSlider(): import('./surfaces/quickSettings/quickControls.js').QuickControl;

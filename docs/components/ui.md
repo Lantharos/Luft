@@ -81,6 +81,7 @@ appearance.start(await invoke('app_state'));
 | `terminal` | Kestrel's sixteen terminal colors for both styles |
 | `pureBlack` | Whether Pure black is on; sets `data-black` on the root element |
 | `appIcons` | The app icon style, its colors and the glyph folder, used by `AppIcon` |
+| `taskbar` | How the taskbar draws each look on the current wallpaper and style: its surface, ink, Start mark colors, running dots and halos |
 | `typography` | The desktop's system and monospace families and text size |
 | `fontSans`, `fontMono` | Font lists for text drawn outside CSS, such as a canvas |
 
@@ -137,9 +138,10 @@ $effect(() => {
 | `renderMarkdown(source, path)` | Markdown to HTML, with relative images resolved against `path` |
 | `canPlayNatively()`, `decodeFailed(media)` | Whether native video is available, and whether a `<video>` failed to decode |
 | `MediaState` | A native player's state as reactive fields with setters, for `MediaControls` |
+| `MARK_LAYERS`, `MARK_SCALE`, `PAINTED_MARK_SCALE` | The Start mark's two layers, which color each takes and which one carries the taskbar's halo, shared with Kestrel's Start button |
 | `FingerprintEnrollment`, `fingerprints()`, `fingerprintReader()`, `deleteFingerprint(finger)` | Enrolling and managing fingerprints through `luft-fingerprint`; `FINGERS` and `fingerLabel` name the fingers |
 
-Types: `Appearance`, `AppIconStyle`, `Palette`, `Scheme`, `SchemeColors`, `VirtualRect`, `VirtualHandle`, `VirtualLayout`.
+Types: `Appearance`, `AppIconStyle`, `Palette`, `Scheme`, `SchemeColors`, `MarkLayer`, `MarkFills`, `TaskbarLook`, `TaskbarLooks`, `TaskbarLookPaint`, `Shadow`, `VirtualRect`, `VirtualHandle`, `VirtualLayout`.
 
 ## Classes
 

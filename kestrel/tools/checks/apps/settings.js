@@ -8,6 +8,7 @@ import {checkLive} from './settings/live.js';
 import {checkPages} from './settings/pages.js';
 import {checkLongSleep} from './settings/power.js';
 import {checkUpdates} from './settings/updates.js';
+import {checkTaskbarLooks} from './settings/taskbar.js';
 import {checkWallpaper} from './settings/wallpaper.js';
 
 export async function run() {
@@ -15,6 +16,7 @@ export async function run() {
     await withApp('settings', [], async app => {
       await checkPalette(app, palette);
       await checkPages(app);
+      await checkTaskbarLooks(app);
       await showDark(app, palette);
       await checkAccessibility(app);
       await checkLive(app);

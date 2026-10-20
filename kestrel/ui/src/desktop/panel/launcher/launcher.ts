@@ -3,50 +3,40 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
 
-import primary from './luft-primary.svg';
-import secondary from './luft-secondary.svg';
-import { markShade, monochromeShade } from './shade.js';
+import { MARK_LAYERS, MARK_SCALE, markLayerSvg, PAINTED_MARK_SCALE, type MarkFills, type MarkLayer } from '../../../../../../packages/ui/src/taskbar/mark';
+import { markFills } from './shade.js';
 import { taskbarBackdrops } from '../backdrop.js';
 import { appIcons } from '../../../appearance/icons/appIcons.js';
 import { animateActor, Spring } from '../../../shared/motion.js';
 import { wallpaperFloor } from '../../wallpaper/floor.js';
 
-const MARK_SCALE = 0.65;
-const PAINTED_MARK_SCALE = 0.8;
 const WHITE = '#ffffffff';
 
-const svgIcon = (svg: string, fill: string) =>
-  Gio.BytesIcon.new(new GLib.Bytes(new TextEncoder().encode(svg.replace('fill="white"', `fill="${fill}"`))));
-
-const LAYERS = [
-  { svg: secondary, direction: 1, pivot: [0.58, 0.69], style: 'icon-shadow: none;' },
-  { svg: primary, direction: -1, pivot: [0.4, 0.3], style: null },
-] as const;
+const svgIcon = (layer: MarkLayer, fill: string) =>
+  Gio.BytesIcon.new(new GLib.Bytes(new TextEncoder().encode(markLayerSvg(layer, fill))));
 
 export interface Launcher {
   button: St.Button;
   resize(size: number): void;
 }
 
-function markPaint(button: St.Button, panel: St.Widget): () => string[] {
-  let shaded = { key: '', shade: '' };
+function markPaint(button: St.Button, panel: St.Widget): () => MarkFills {
+  let painted = { key: '', fills: { shade: WHITE, ink: WHITE } };
   return () => {
     const foreground = button.peek_theme_node()?.get_foreground_color().to_string() ?? WHITE;
     const paint = appIcons.paint;
-    const ink = paint?.ink ?? foreground;
     const backdrops = taskbarBackdrops(panel, wallpaperFloor);
-    if (!backdrops.length) return [paint?.shade ?? ink, ink];
-    const key = [ink, paint?.shade, ...backdrops].join();
-    if (key !== shaded.key) shaded = { key, shade: paint ? markShade(ink, paint.shade, backdrops) : monochromeShade(ink, backdrops) };
-    return [shaded.shade, ink];
+    const key = [foreground, paint?.ink, paint?.shade, ...backdrops].join();
+    if (key !== painted.key) painted = { key, fills: markFills(foreground, paint, backdrops) };
+    return painted.fills;
   };
 }
 
 function animatedMark(button: St.Button, panel: St.Widget): [St.Widget, (size: number) => void] {
   const mark = new St.Widget({ layout_manager: new Clutter.BinLayout() });
   let size = 0;
-  const icons = LAYERS.map(({ direction, pivot: [pivotX, pivotY], style }) => {
-    const icon = new St.Icon({ style });
+  const icons = MARK_LAYERS.map(({ direction, pivot: [pivotX, pivotY], halo }) => {
+    const icon = new St.Icon({ style: halo ? null : 'icon-shadow: none;' });
     icon.set_pivot_point(pivotX, pivotY);
     mark.add_child(icon);
     const update = () => {
@@ -63,17 +53,16 @@ function animatedMark(button: St.Button, panel: St.Widget): [St.Widget, (size: n
     return icon;
   });
   const current = markPaint(button, panel);
-  let painted = '';
+  let painted: MarkFills | null = null;
   const paint = () => {
-    const fills = current();
-    painted = fills.join();
-    LAYERS.forEach((layer, index) => {
+    const fills = painted = current();
+    MARK_LAYERS.forEach((layer, index) => {
       icons[index].icon_size = Math.round(size * (appIcons.paint ? PAINTED_MARK_SCALE : 1));
-      icons[index].gicon = svgIcon(layer.svg, fills[index]);
+      icons[index].gicon = svgIcon(layer, fills[layer.fill]);
     });
   };
   const repaint = () => {
-    if (current().join() !== painted) paint();
+    if (current() !== painted) paint();
   };
   const unwatch = [appIcons.watch(paint), wallpaperFloor.watch(repaint)];
   mark.connect('destroy', () => unwatch.forEach(stop => stop()));

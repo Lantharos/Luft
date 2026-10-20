@@ -13,7 +13,6 @@ const result = await build({
   outfile: output,
   bundle: true,
   metafile: true,
-  loader: { '.svg': 'text' },
   format: 'esm',
   platform: 'neutral',
   target: 'es2022',

@@ -66,6 +66,7 @@ Terminal colors are the usual sixteen, nudged up to 15° toward the accent, read
 | `Colors`, `TerminalColors` | `a{ss}` | Roles and terminal colors for the current style |
 | `LightColors`, `DarkColors`, `LightTerminalColors`, `DarkTerminalColors` | `a{ss}` | The same for each style |
 | `AppIcons` | `a{ss}` | App icon style, the glyph folder, and the plate, ink, shade and rim colors (`#rrggbbaa`) |
+| `Taskbar` | `s` | JSON describing each taskbar look on the current wallpaper and style: surface, ink, Start mark fills, focused and running dot colors, and halo shadows |
 
 The same data as files, rewritten shortly after each change:
 

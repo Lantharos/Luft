@@ -1,15 +1,10 @@
 import type St from 'gi://St';
 
+import type { GlassShading } from '../../../../../packages/ui/src/taskbar/looks';
 import type { Rgb } from '../../appearance/color.js';
 import type { WallpaperFloor } from '../wallpaper/floor.js';
 
 type Channels = [number, number, number];
-
-interface GlassShading {
-  dim: number;
-  lift: number;
-  saturation: number;
-}
 
 export interface PanelSurface {
   tint: Rgb;

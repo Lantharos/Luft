@@ -1,6 +1,7 @@
 import { events, listen, system } from '@lantharos/sabine';
 
 import type { MotionPreference } from './motion';
+import type { TaskbarLooks } from './taskbar/looks';
 
 const PALETTE_CHANGED = 'kestrel.palette';
 const TYPOGRAPHY_CHANGED = 'appearance.typography';
@@ -36,6 +37,7 @@ export interface Palette {
 	colors: SchemeColors;
 	terminal: SchemeColors;
 	appIcons: AppIcons;
+	taskbar: TaskbarLooks;
 }
 
 const TERMINAL_HUES = ['red', 'green', 'yellow', 'blue', 'magenta', 'cyan'];
@@ -67,6 +69,7 @@ class AppearanceState {
 	colors = $state<SchemeColors>({ light: {}, dark: {} });
 	terminal = $state<SchemeColors>({ light: {}, dark: {} });
 	appIcons = $state<AppIcons | null>(null);
+	taskbar = $state<TaskbarLooks | null>(null);
 	typography = $state<Typography>({ interface: null, monospace: null, textScale: 1 });
 	motion = $state<MotionPreference>('full');
 	fontSans = $derived(fontList(this.typography.interface, SANS));
@@ -107,6 +110,7 @@ class AppearanceState {
 		this.colors = palette.colors;
 		this.terminal = palette.terminal;
 		this.appIcons = palette.appIcons;
+		this.taskbar = palette.taskbar;
 		const root = document.documentElement;
 		root.toggleAttribute('data-black', palette.pureBlack);
 		for (const scheme of SCHEMES) {

@@ -3,14 +3,14 @@ import type { Colors, Palette } from '../../../appearance/palette.js';
 import { rgba } from '../../../appearance/stylesheet.js';
 import { wallpaperFloor } from '../../wallpaper/floor.js';
 import { backdropsBehind, type PanelSurface } from '../backdrop.js';
-import type { TaskbarLook } from '../preferences/taskbarPreferences.js';
+import type { TaskbarLook } from '../../../../../../packages/ui/src/taskbar/looks';
 import { schemeThemes, type Halo, type Scheme, type SchemeTheme } from './schemeThemes.js';
 
 const TEXT_CONTRAST = 4.5;
 const ACCENT_OPACITY = 0.62;
 const OTHER: Record<Scheme, Scheme> = { light: 'dark', dark: 'light' };
 
-interface Tints {
+export interface Tints {
   solid: string;
   accent: string;
 }
@@ -21,10 +21,16 @@ interface Surface {
   surface: PanelSurface;
 }
 
+export interface LookInk extends Surface {
+  backdrops: Rgb[];
+  ink: Scheme;
+  halo: Halo;
+}
+
 const selector = (look: TaskbarLook, opaque = false) => `.kestrel-panel.kestrel-panel.kestrel-taskbar-${look}${opaque ? '.kestrel-taskbar-opaque' : ''}`;
 const worst = (ink: Rgb, backdrops: Rgb[]) => Math.min(...backdrops.map(backdrop => contrast(ink, backdrop)));
 
-function tintsOf(seed: Seed, colors: Colors): Tints {
+export function tintsOf(seed: Seed, colors: Colors): Tints {
   return { solid: colors.surfaceContainer, accent: isNeutral(seed) ? colors.surfaceContainerHighest : colors.primaryContainer };
 }
 
@@ -51,28 +57,30 @@ function inkFor(scheme: Scheme, backdrops: Rgb[], themes: Record<Scheme, SchemeT
   return worst(themes[OTHER[scheme]].ink, backdrops) > own ? OTHER[scheme] : scheme;
 }
 
-interface Choice {
-  ink: Scheme;
-  halo: Halo;
-}
-
 function haloFor(look: TaskbarLook, readable: boolean): Halo {
   if (readable) return 'no-halo';
   if (look !== 'transparent') return 'status-halo';
   return wallpaperFloor.busy ? 'strong-halo' : 'no-halo';
 }
 
+export function lookInks(scheme: Scheme, tints: Tints): LookInk[] {
+  const themes = schemeThemes();
+  return surfaces(themes[scheme], tints).map(surface => {
+    const backdrops = backdropsBehind(surface.surface, wallpaperFloor);
+    const ink = inkFor(scheme, backdrops, themes);
+    return { ...surface, backdrops, ink, halo: haloFor(surface.look, worst(themes[ink].ink, backdrops) >= TEXT_CONTRAST) };
+  });
+}
+
 function inkRules(scheme: Scheme, palette: Palette, tints: Tints): string {
   if (!wallpaperFloor.color) return '';
   const themes = schemeThemes();
-  const chosen = new Map<TaskbarLook, Choice>();
+  const chosen = new Map<TaskbarLook, LookInk>();
   let css = '';
-  for (const { look, opaque, surface } of surfaces(themes[scheme], tints)) {
-    const backdrops = backdropsBehind(surface, wallpaperFloor);
-    const ink = inkFor(scheme, backdrops, themes);
-    const halo = haloFor(look, worst(themes[ink].ink, backdrops) >= TEXT_CONTRAST);
+  for (const choice of lookInks(scheme, tints)) {
+    const { look, opaque, ink, halo } = choice;
     const inherited = opaque ? chosen.get(look)! : { ink: scheme, halo: 'no-halo' };
-    chosen.set(look, { ink, halo });
+    chosen.set(look, choice);
     const target = selector(look, opaque);
     if (ink !== inherited.ink) {
       css += themes[ink].rules('ink', target);

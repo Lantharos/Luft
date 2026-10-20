@@ -57,6 +57,9 @@ export { reorder } from './motion/lists';
 export { selectionPill } from './motion/pill';
 export { dialog, fade, item, menu, page, toast } from './motion/transitions';
 
+export { MARK_HEIGHT, MARK_LAYERS, MARK_SCALE, MARK_WIDTH, PAINTED_MARK_SCALE, type MarkFills, type MarkLayer } from './taskbar/mark';
+export type { GlassShading, Shadow, TaskbarHalos, TaskbarLook, TaskbarLookPaint, TaskbarLooks } from './taskbar/looks';
+
 export { default as Toast } from './notices/Toast.svelte';
 export { Toasts, type ToastMessage } from './notices/toasts.svelte';
 

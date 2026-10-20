@@ -2,7 +2,7 @@
 	import BatteryFull from '@lucide/svelte/icons/battery-full';
 	import Volume2 from '@lucide/svelte/icons/volume-2';
 	import Wifi from '@lucide/svelte/icons/wifi';
-	import { AppIcon, appearance } from '@luft/ui';
+	import { AppIcon, appearance, MARK_HEIGHT, MARK_LAYERS, MARK_SCALE, MARK_WIDTH, PAINTED_MARK_SCALE, type GlassShading, type Shadow } from '@luft/ui';
 	import type { App } from '../../../system/apps/api';
 	import type { Alignment, AutoHide, Look, Size, Style } from './options';
 
@@ -23,20 +23,23 @@
 		normal: { height: 31, button: 26, icon: 18 },
 		large: { height: 36, button: 31, icon: 22 }
 	};
+	const SCALE = 0.65;
 	const FLOATING_MARGIN = 8;
 	const RUNNING = 2;
 
 	let metrics = $derived(METRICS[size]);
 	let floating = $derived(style === 'floating');
-	let dark = $derived(appearance.colors.dark);
-	let tint = $derived(isLight(dark.primaryContainer) ? dark.surfaceContainerHighest : dark.primaryContainer);
+	let paint = $derived(appearance.taskbar?.[look]);
+	let markSize = $derived(Math.round(metrics.button * MARK_SCALE));
+	let markIcon = $derived(Math.round(markSize * ((appearance.appIcons?.style ?? 'default') === 'default' ? 1 : PAINTED_MARK_SCALE)));
 	let time = $state(clock());
 
-	function isLight(hex: string | undefined) {
-		if (!hex) return false;
-		const [r, g, b] = [1, 3, 5].map((start) => parseInt(hex.slice(start, start + 2), 16));
-		return 0.2126 * r + 0.7152 * g + 0.0722 * b > 128;
-	}
+	const px = (value: number) => `${value * SCALE}px`;
+	const dropShadow = (shadow: Shadow | null) => (shadow ? `drop-shadow(${px(shadow.x)} ${px(shadow.y)} ${px(shadow.blur)} ${shadow.color})` : 'none');
+	const textShadow = (shadow: Shadow | null) => (shadow ? `${px(shadow.x)} ${px(shadow.y)} ${px(shadow.blur)} ${shadow.color}` : 'none');
+	const boxShadow = (shadow: Shadow | null) => (shadow ? `${px(shadow.x)} ${px(shadow.y)} ${px(shadow.blur)} ${px(shadow.spread)} ${shadow.color}` : 'none');
+	const backdrop = (glass: GlassShading | null) =>
+		glass ? `blur(14px) saturate(${glass.saturation}) contrast(${1 - glass.lift * 0.8}) brightness(${1 + glass.lift * 0.8 - glass.dim / 10})` : 'none';
 
 	function clock() {
 		return new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' }).format(new Date());
@@ -53,26 +56,37 @@
 		<img src={wallpaper} alt="" decoding="async" />
 	{/if}
 	<div
-		class="bar {look}"
+		class="bar"
 		class:floating
 		class:left={alignment === 'left'}
 		class:hides={autoHide === 'always'}
 		style:--height="{metrics.height}px"
 		style:--button="{metrics.button}px"
 		style:--margin="{floating ? FLOATING_MARGIN : 0}px"
-		style:--tint={tint}
-		style:--solid={dark.surfaceContainer}
+		style:--surface={paint?.surface}
+		style:--backdrop={backdrop(paint?.glass ?? null)}
+		style:--ink={paint?.ink}
+		style:--focused={paint?.focused}
+		style:--dot={paint?.dot}
+		style:--focused-dot={paint?.focusedDot}
+		style:--icon-halo={dropShadow(paint?.iconHalo ?? null)}
+		style:--status-icon-halo={dropShadow(paint?.status.icon ?? null)}
+		style:--status-text-halo={textShadow(paint?.status.text ?? null)}
+		style:--dot-halo={boxShadow(paint?.status.dot ?? null)}
 	>
 		<div class="apps">
-			<span class="slot start" aria-hidden="true">
-				<svg viewBox="0 0 187 197" width={metrics.icon} height={metrics.icon}>
-					<path d="M119.718 130.99C159.986 113.061 161.602 43.9304 179.53 84.1989C197.459 124.467 179.349 171.645 139.081 189.574C98.8128 207.503 51.6341 189.393 33.7053 149.125C15.7766 108.856 79.4495 148.919 119.718 130.99Z" opacity="0.6" />
-					<path d="M78.4133 63.6013C118.682 45.6726 131.515 -28.4531 149.444 11.8151C167.372 52.0837 149.262 99.2624 108.993 117.191C68.7249 135.12 21.5471 117.009 3.61838 76.7409C-14.3103 36.4724 38.1448 81.5298 78.4133 63.6013Z" />
-				</svg>
+			<span class="slot" aria-hidden="true">
+				<span class="mark" style:width="{markSize}px" style:height="{markSize}px">
+					{#each MARK_LAYERS as layer, index (index)}
+						<svg viewBox="0 0 {MARK_WIDTH} {MARK_HEIGHT}" width={markIcon} height={markIcon} class:halo={layer.halo} fill={paint?.mark[layer.fill]}>
+							<path d={layer.path} />
+						</svg>
+					{/each}
+				</span>
 			</span>
 			{#each apps as app, index (app.id)}
 				<span class="slot" class:focused={index === 0}>
-					<AppIcon icon={app.icon} id={app.id} size={metrics.icon} />
+					<span class="icon"><AppIcon icon={app.icon} id={app.id} size={metrics.icon} /></span>
 					{#if index < RUNNING}
 						<span class="dot"></span>
 					{/if}
@@ -112,7 +126,9 @@
 		left: var(--margin);
 		height: var(--height);
 		border-radius: 0;
-		color: #fff;
+		background: var(--surface);
+		backdrop-filter: var(--backdrop);
+		color: var(--ink);
 		transition:
 			left var(--spring-snappy-duration) var(--spring-snappy),
 			right var(--spring-snappy-duration) var(--spring-snappy),
@@ -125,25 +141,6 @@
 
 	.bar.floating {
 		border-radius: calc(var(--height) / 2);
-	}
-
-	.bar.glass {
-		background: rgba(20, 20, 24, 0.38);
-		backdrop-filter: blur(14px) saturate(1.2);
-	}
-
-	.bar.solid {
-		background: var(--solid, #1b1b1f);
-	}
-
-	.bar.accent {
-		background: color-mix(in srgb, var(--tint, #333) 62%, transparent);
-		backdrop-filter: blur(14px) saturate(1.2);
-	}
-
-	.bar.transparent .apps,
-	.bar.transparent .status {
-		filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.55));
 	}
 
 	.bar.hides {
@@ -183,28 +180,43 @@
 			height var(--spring-snappy-duration) var(--spring-snappy);
 	}
 
-	.start svg {
-		fill: currentColor;
+	.mark {
+		display: grid;
+		place-items: center;
+	}
+
+	.mark svg {
+		grid-area: 1 / 1;
+	}
+
+	.mark .halo,
+	.icon {
+		filter: var(--icon-halo);
+	}
+
+	.icon {
+		display: grid;
 	}
 
 	.slot.focused {
-		background: rgba(255, 255, 255, 0.15);
+		background: var(--focused);
 	}
 
 	.dot {
 		position: absolute;
-		bottom: 1.5px;
+		bottom: 0;
 		left: 50%;
 		width: 3px;
 		height: 3px;
-		border-radius: 2px;
-		background: rgba(255, 255, 255, 0.65);
+		border-radius: 1.5px;
+		background: var(--dot);
+		box-shadow: var(--dot-halo);
 		transform: translateX(-50%);
 	}
 
 	.focused .dot {
 		width: 8px;
-		background: var(--accent);
+		background: var(--focused-dot);
 	}
 
 	.status {
@@ -218,6 +230,11 @@
 		font-size: 10px;
 		font-weight: 500;
 		font-variant-numeric: tabular-nums;
+		text-shadow: var(--status-text-halo);
+	}
+
+	.status > :global(svg) {
+		filter: var(--status-icon-halo);
 	}
 
 	.time {

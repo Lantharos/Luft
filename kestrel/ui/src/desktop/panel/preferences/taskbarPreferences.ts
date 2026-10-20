@@ -1,9 +1,9 @@
 import Gio from 'gi://Gio';
 
+import type { TaskbarLook } from '../../../../../../packages/ui/src/taskbar/looks';
 import { tabletMode } from '../tablet/tabletMode.js';
 
 type TaskbarAlignment = 'center' | 'left';
-export type TaskbarLook = 'glass' | 'solid' | 'transparent' | 'accent';
 type TaskbarStyle = 'bar' | 'floating';
 type TaskbarSize = 'compact' | 'normal' | 'large';
 type TaskbarAutoHide = 'never' | 'always' | 'windows';

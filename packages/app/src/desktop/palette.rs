@@ -23,6 +23,7 @@ pub struct Palette {
     colors: Schemes,
     terminal: Schemes,
     app_icons: AppIcons,
+    taskbar: serde_json::Value,
 }
 
 #[derive(Serialize)]
@@ -89,6 +90,7 @@ pub async fn palette() -> Option<Palette> {
         colors: Schemes::read(&proxy, "Colors").await?,
         terminal: Schemes::read(&proxy, "TerminalColors").await?,
         app_icons: AppIcons::from_map(proxy.get_property("AppIcons").await.ok()?)?,
+        taskbar: serde_json::from_str(&proxy.get_property::<String>("Taskbar").await.ok()?).ok()?,
     })
 }
 

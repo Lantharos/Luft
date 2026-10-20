@@ -1,5 +1,9 @@
+use luft_i18n::SystemCatalog;
 use serde::Serialize;
 
+use crate::L10N;
+
+const NAMES: &[&str] = &["xkeyboard-config-2", "xkeyboard-config"];
 const RULES: &str = "/usr/share/X11/xkb/rules/evdev.xml";
 const UNDETERMINED: &str = "und";
 
@@ -40,6 +44,7 @@ pub fn all() -> Vec<Keyboard> {
     let Ok(document) = roxmltree::Document::parse_with_options(&rules, options) else {
         return Vec::new();
     };
+    let names = SystemCatalog::load(NAMES, L10N.locale());
     let mut keyboards: Vec<Keyboard> = document
         .descendants()
         .filter(|node| node.has_tag_name("layout") && !placeholder(*node))
@@ -48,7 +53,9 @@ pub fn all() -> Vec<Keyboard> {
             let base = Keyboard {
                 layout: id.clone(),
                 variant: String::new(),
-                name: text(layout, "description").unwrap_or(&id).to_owned(),
+                name: names
+                    .translate(text(layout, "description").unwrap_or(&id))
+                    .to_owned(),
             };
             let variants = layout
                 .descendants()
@@ -57,7 +64,7 @@ pub fn all() -> Vec<Keyboard> {
                     Some(Keyboard {
                         layout: id.clone(),
                         variant: text(variant, "name")?.to_owned(),
-                        name: text(variant, "description")?.to_owned(),
+                        name: names.translate(text(variant, "description")?).to_owned(),
                     })
                 })
                 .collect::<Vec<_>>();

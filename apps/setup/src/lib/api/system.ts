@@ -40,7 +40,6 @@ export interface KeyboardLayout {
 export interface Zone {
 	id: string;
 	city: string;
-	country: string;
 	code: string;
 }
 

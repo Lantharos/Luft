@@ -2,6 +2,7 @@ import { i18n } from '@luft/i18n';
 import { catalog, formatsCountry, locate, setFormats, useKeyboard, useLanguage, useZone, type Catalog, type KeyboardLayout, type Zone } from '#lib/api/system.js';
 import type { Hints, Keyboard } from '#lib/api/installer.js';
 import { describe, outranks, type Field, type Guesses, type Source } from '#lib/regional/guesses.js';
+import { namedZones } from '#lib/regional/zones.js';
 import { countryOf, DEFAULT_LANGUAGE, keyboardFor, languageFor, languageNamed, LANGUAGES, languageTag, type Language } from '#lib/regional/languages.js';
 
 const FALLBACK_ZONE = 'UTC';
@@ -18,7 +19,8 @@ class RegionalState {
 	private located = false;
 
 	keyboardName = $derived(this.catalog.keyboards.find((entry) => sameKeyboard(entry, this.keyboard))?.name ?? this.keyboard.layout);
-	zoneEntry = $derived(this.catalog.zones.find((entry) => entry.id === this.zone) ?? null);
+	zones = $derived(namedZones(this.catalog.zones, i18n.locale));
+	zoneEntry = $derived(this.zones.find((entry) => entry.id === this.zone) ?? null);
 	description = $derived(describe(this.guesses));
 
 	async start() {
@@ -78,7 +80,9 @@ class RegionalState {
 		this.language = language;
 		const tag = languageTag(language);
 		void i18n.use(tag, tag);
-		void useLanguage(language.locale).catch(() => {});
+		void useLanguage(language.locale)
+			.then(async () => (this.catalog = await catalog()))
+			.catch(() => {});
 	}
 
 	private applyKeyboard(keyboard: Keyboard) {

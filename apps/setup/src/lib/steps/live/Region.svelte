@@ -40,7 +40,7 @@
 			icon={Clock}
 			label={t('setup-region-time-zone')}
 			value={zone ? `${zone.city}, ${zone.country}` : regional.zone}
-			items={regional.catalog.zones}
+			items={regional.zones}
 			key={(entry) => entry.id}
 			name={(entry) => entry.city}
 			detail={(entry) => entry.country}

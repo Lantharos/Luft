@@ -2,11 +2,15 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 
+use luft_i18n::SystemCatalog;
 use roxmltree::{Document, Node, ParsingOptions};
 use serde::Serialize;
 
+use crate::L10N;
+
 const RULES: &str = "/usr/share/X11/xkb/rules/evdev.xml";
 const EMPTY_PLACEHOLDER: &str = "custom";
+const NAMES: &[&str] = &["xkeyboard-config-2", "xkeyboard-config"];
 
 static LAYOUTS: OnceLock<Vec<Layout>> = OnceLock::new();
 
@@ -79,10 +83,14 @@ pub fn all() -> Vec<Layout> {
         layouts.retain(|layout| layout.id != EMPTY_PLACEHOLDER);
         layouts
     });
+    let names = SystemCatalog::load(NAMES, L10N.locale());
     let mut layouts = user_rules()
         .map(|rules| parse(&rules, true))
         .unwrap_or_default();
-    layouts.extend(system.iter().cloned());
+    layouts.extend(system.iter().map(|layout| Layout {
+        name: names.translate(&layout.name).to_owned(),
+        ..layout.clone()
+    }));
     layouts.sort_by(|left, right| left.name.cmp(&right.name));
     layouts
 }

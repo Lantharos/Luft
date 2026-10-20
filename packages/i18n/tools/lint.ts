@@ -15,7 +15,7 @@ interface Component {
 
 const ROOT = join(import.meta.dir, '../../..');
 const SHARED_BUNDLES: Record<string, string[]> = { settings: ['ui', 'settings-pages'], setup: ['ui'], kestrel: ['settings-pages'] };
-const SOURCE_FILE = /\.(ts|js|svelte|rs)$/;
+const SOURCE_FILE = /\.(ts|js|svelte|astro|rs)$/;
 const ID = `([a-z][a-z0-9-]*)(?:\\.[a-z][a-z0-9-]*)?`;
 const REFERENCES = [
 	new RegExp(`(?:(?<![\\w.$])|KestrelUi\\.)t\\(\\s*['"\`]${ID}['"\`]`, 'g'),

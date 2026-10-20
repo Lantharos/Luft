@@ -1,24 +1,27 @@
 ---
+import { localize } from '../../i18n/pages';
+
+const { t } = localize(Astro);
 const requirements = [
-	['Processor', '64-bit Intel or AMD'],
-	['Firmware', 'UEFI. Secure Boot can stay on'],
-	['Space', '32 GB or more'],
-	['Graphics', 'Intel, AMD or NVIDIA, with NVIDIA’s own driver when it’s there'],
-	['Security chip', 'TPM 2.0, optional. It unlocks an encrypted disk by itself'],
-	['USB stick', '4 GB or more, if you use one']
+	[t('download-needs-processor'), t('download-needs-processor-value')],
+	[t('download-needs-firmware'), t('download-needs-firmware-value')],
+	[t('download-needs-space'), t('download-needs-space-value')],
+	[t('download-needs-graphics'), t('download-needs-graphics-value')],
+	[t('download-needs-security-chip'), t('download-needs-security-chip-value')],
+	[t('download-needs-usb'), t('download-needs-usb-value')]
 ];
 ---
 
 <section class="page grid gap-12 py-24 md:grid-cols-12 md:py-36">
 	<div class="reveal md:col-span-4">
-		<h2 class="text-3xl font-semibold tracking-tight">What it needs</h2>
-		<p class="mt-4 text-ink-soft">Most PCs from the last decade are fine.</p>
+		<h2 class="text-3xl font-semibold tracking-tight text-balance">{t('download-needs-heading')}</h2>
+		<p class="mt-4 text-ink-soft">{t('download-needs-text')}</p>
 	</div>
 	<dl class="reveal md:col-span-8">
 		{
 			requirements.map(([name, value]) => (
 				<div class="grid grid-cols-[9rem_1fr] gap-4 border-b border-hairline py-4 sm:grid-cols-[12rem_1fr]">
-					<dt class="font-semibold">{name}</dt>
+					<dt class="font-semibold hyphens-auto">{name}</dt>
 					<dd class="text-ink-soft">{value}</dd>
 				</div>
 			))
@@ -28,17 +31,14 @@ const requirements = [
 
 <section class="page grid gap-12 pb-28 md:grid-cols-12 md:pb-40">
 	<div class="reveal md:col-span-4">
-		<h2 class="text-3xl font-semibold tracking-tight">With a USB stick</h2>
+		<h2 class="text-3xl font-semibold tracking-tight text-balance">{t('download-usb-heading')}</h2>
 	</div>
 	<div class="reveal space-y-4 text-ink-soft md:col-span-8">
-		<p>
-			Write the ISO with Meet Luft, Fedora Media Writer, balenaEtcher or Rufus in DD mode. A Ventoy stick works too: copy the ISO onto it.
-		</p>
-		<p>
-			Start the computer from the stick with its boot menu, usually F12, F11 or Esc while the logo shows. It opens Install Luft, which can put Luft next to Windows, on a whole drive, in place of another Linux, or just let you try it.
-		</p>
-		<p>
-			To check a download, keep its checksum file next to it and run <code class="rounded-md bg-well px-1.5 py-0.5 font-mono text-[0.9em] text-ink">sha256sum -c</code> with the checksum file on Linux, or compare it with <code class="rounded-md bg-well px-1.5 py-0.5 font-mono text-[0.9em] text-ink">Get-FileHash</code> on Windows.
-		</p>
+		<p>{t('download-usb-write')}</p>
+		<p>{t('download-usb-start')}</p>
+		<p
+			class="[&_code]:rounded-md [&_code]:bg-well [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-[0.9em] [&_code]:text-ink"
+			set:html={t('download-usb-check')}
+		/>
 	</div>
 </section>

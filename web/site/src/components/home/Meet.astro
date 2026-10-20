@@ -2,12 +2,15 @@
 import { Image } from 'astro:assets';
 import meetReady from '../../../../../docs/screenshots/meet-ready.png';
 import Actions from '../download/Actions.astro';
+import { localize } from '../../i18n/pages';
 import Backdrop from './Backdrop.astro';
 
+const { t, href } = localize(Astro);
+const iso = href('download#iso');
 const steps = [
-	['Download Meet Luft', 'A small app for Windows and Linux. It checks your computer first and tells you what it found, in plain words.'],
-	['It makes room', 'On Windows it shrinks Windows with Windows’ own tools, so BitLocker is fine. On Linux it keeps Luft in a folder. Nothing else changes.'],
-	['Restart into Luft', 'Try it for as long as you like, then install it next to Windows, or in place of your old Linux with your files kept. The next restart goes back to what you had.']
+	[t('home-meet-download'), t('home-meet-download-text')],
+	[t('home-meet-room'), t('home-meet-room-text')],
+	[t('home-meet-restart'), t('home-meet-restart-text')]
 ];
 ---
 
@@ -16,10 +19,8 @@ const steps = [
 	<div class="absolute inset-0 -z-10 bg-[#f4f1ea]/35" aria-hidden="true"></div>
 	<div class="page grid items-center gap-14 lg:grid-cols-12">
 		<div class="lg:col-span-6">
-			<h2 class="reveal text-headline font-semibold text-balance">Try it tonight. No USB stick.</h2>
-			<p class="reveal mt-6 max-w-xl text-lede text-ink-soft text-pretty">
-				Meet Luft gets your computer ready from the system you already use, then restarts into Luft once.
-			</p>
+			<h2 class="reveal text-headline font-semibold text-balance">{t('home-meet-heading')}</h2>
+			<p class="reveal mt-6 max-w-xl text-lede text-ink-soft text-pretty">{t('home-meet-text')}</p>
 			<ol class="mt-12 space-y-8">
 				{
 					steps.map(([title, text], index) => (
@@ -33,16 +34,14 @@ const steps = [
 					))
 				}
 			</ol>
-			<Actions class="reveal mt-12" isoHref="/download#iso" />
-			<p class="reveal mt-5 text-sm text-ink-soft">
-				Prefer a USB stick? Meet Luft makes one too, or <a class="link" href="/download#iso">write the ISO yourself</a>.
-			</p>
+			<Actions class="reveal mt-12" isoHref={iso} />
+			<p class="reveal mt-5 text-sm text-ink-soft [&_a]:link" set:html={t('home-meet-usb', { iso })} />
 		</div>
 		<div class="settle lg:col-span-5 lg:col-start-8">
 			<div class="overflow-hidden rounded-2xl shadow-[0_40px_90px_-30px_rgb(30_25_15/0.45)] ring-1 ring-black/10">
 				<Image
 					src={meetReady}
-					alt="Meet Luft, ready to try Luft, bring your things along or install it"
+					alt={t('home-meet-shot')}
 					widths={[450, 900]}
 					sizes="(min-width: 64rem) 450px, 90vw"
 					class="h-auto w-full"

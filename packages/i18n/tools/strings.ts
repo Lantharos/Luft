@@ -9,6 +9,9 @@ const LITERAL = /(['"`])((?:\\.|(?!\1)[^\\\n])*)\1/g;
 const LOGGING = /\b(?:console\.\w+|log|logError|debug|info|warn|error|trace|eprintln!|println!|panic!|unreachable!|expect|assert\w*!?|throw new Error|new Error|import|from|describe|it)\s*\(|^\s*(?:import|export \* from|\/\/|\*|#\[)/;
 const SVELTE_ATTRIBUTE = /\s(?:title|label|description|placeholder|aria-label|alt|subtitle|text|heading|missing|hint|confirm|cancel)="([^"{]*\p{L}[^"{]*)"/gu;
 
+const SVELTE_CODE = /<script[^>]*>([\s\S]*?)<\/script>/g;
+const ASTRO_CODE = /(?:^---\n|<script[^>]*>)([\s\S]*?)(?:\n---$|<\/script>)/gm;
+
 const lineAt = (content: string, index: number) => content.slice(0, index).split('\n').length;
 const blank = (text: string) => text.replace(/[^\n]/g, ' ');
 const withoutExpressions = (text: string) => text.replace(/\$\{[^}]*\}/g, 'X');
@@ -47,12 +50,12 @@ function rustStrings(content: string): Finding[] {
 	return scriptStrings(tests >= 0 ? content.slice(0, tests) : content).filter(({ text }) => !text.includes('\\n'));
 }
 
-function svelteStrings(content: string): Finding[] {
+function markupStrings(content: string, code: RegExp): Finding[] {
 	const found: Finding[] = [];
-	for (const match of content.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)) {
+	for (const match of content.matchAll(code)) {
 		found.push(...scriptStrings(match[1], match.index + match[0].indexOf(match[1]), content));
 	}
-	const markup = withoutMarkupExpressions(content.replace(/<(script|style)[^>]*>[\s\S]*?<\/\1>/g, blank));
+	const markup = withoutMarkupExpressions(content.replace(code, blank).replace(/<(script|style)[^>]*>[\s\S]*?<\/\1>/g, blank));
 	for (const match of markup.matchAll(/>([^<>]*\p{L}[^<>]*)</gu)) {
 		const text = match[1].trim();
 		if (text) found.push({ line: lineAt(content, match.index), text });
@@ -63,7 +66,8 @@ function svelteStrings(content: string): Finding[] {
 
 export function hardCoded(file: string, content: string): Finding[] {
 	if (file.endsWith('.d.ts')) return [];
-	if (file.endsWith('.svelte')) return svelteStrings(content);
+	if (file.endsWith('.svelte')) return markupStrings(content, SVELTE_CODE);
+	if (file.endsWith('.astro')) return markupStrings(content, ASTRO_CODE);
 	if (file.endsWith('.rs')) return rustStrings(content);
 	return scriptStrings(content);
 }

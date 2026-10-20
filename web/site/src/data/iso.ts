@@ -6,7 +6,7 @@ export const iso = {
 	nightly: '/download/nightly'
 };
 
-export function formatSize(bytes: number) {
-	const [amount, unit] = bytes >= 1e9 ? [bytes / 1e9, 'GB'] : [bytes / 1e6, 'MB'];
-	return `${amount.toLocaleString('en', { maximumFractionDigits: amount < 10 ? 1 : 0 })} ${unit}`;
+export function formatSize(bytes: number, locale: string) {
+	const [amount, unit] = bytes >= 1e9 ? [bytes / 1e9, 'gigabyte'] : [bytes / 1e6, 'megabyte'];
+	return new Intl.NumberFormat(locale, { style: 'unit', unit, unitDisplay: 'short', maximumFractionDigits: amount < 10 ? 1 : 0 }).format(amount);
 }

@@ -1,0 +1,2 @@
+web/site/src/components/site/Footer.astro	Luft
+web/site/src/components/site/Header.astro	Luft

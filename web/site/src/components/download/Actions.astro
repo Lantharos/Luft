@@ -1,5 +1,6 @@
 ---
 import { iso, meet } from '../../data/downloads';
+import { localize } from '../../i18n/pages';
 
 interface Props {
 	isoHref?: string;
@@ -7,15 +8,12 @@ interface Props {
 }
 
 const { isoHref = iso.href, class: className } = Astro.props;
+const { t } = localize(Astro);
 ---
 
 <div class:list={['flex flex-wrap gap-3', className]}>
-	<a class="button button-primary only-meet only-windows" href={meet.windows.href}>
-		Download Meet Luft <span class="hidden font-normal opacity-70 sm:inline">for Windows</span>
-	</a>
-	<a class="button button-primary only-meet only-linux" href={meet.linux.href}>
-		Download Meet Luft <span class="hidden font-normal opacity-70 sm:inline">for Linux</span>
-	</a>
-	<a class="button button-quiet only-meet" href={isoHref}>Download ISO</a>
-	<a class="button button-primary only-other" href={isoHref}>Download ISO</a>
+	<a class="button button-primary only-meet only-windows [&_span]:hidden [&_span]:font-normal [&_span]:opacity-70 sm:[&_span]:inline" href={meet.windows.href} set:html={t('download-meet-for-windows')} />
+	<a class="button button-primary only-meet only-linux [&_span]:hidden [&_span]:font-normal [&_span]:opacity-70 sm:[&_span]:inline" href={meet.linux.href} set:html={t('download-meet-for-linux')} />
+	<a class="button button-quiet only-meet" href={isoHref}>{t('download-iso')}</a>
+	<a class="button button-primary only-other" href={isoHref}>{t('download-iso')}</a>
 </div>

@@ -1,13 +1,15 @@
 ---
+import { localize } from '../../i18n/pages';
 import Backdrop from './Backdrop.astro';
 
+const { t } = localize(Astro);
 const points = [
-	['Sealed and signed', 'The whole system is one signed image, and every file is checked against it. Nothing can quietly change underneath you.'],
-	['Updates that can’t break it', 'Updates arrive in the background and switch over at the next restart, all at once. The version before is always one choice away.'],
-	['Secure Boot stays on', 'Every step of startup is signed, from the USB stick to the desktop, so there’s nothing to turn off in the firmware.'],
-	['Encrypted, without the typing', 'Turn on encryption with a click. With a TPM, the disk unlocks by itself, and only for the system that belongs to it.'],
-	['Passkeys everywhere', 'Passkeys live on your computer and work in every browser, confirmed with your fingerprint or password.'],
-	['One keyring', 'Passwords, sign-ins, SSH keys and GnuPG are kept in one place, unlocked when you sign in.']
+	[t('home-security-sealed'), t('home-security-sealed-text')],
+	[t('home-security-updates'), t('home-security-updates-text')],
+	[t('home-security-secure-boot'), t('home-security-secure-boot-text')],
+	[t('home-security-encryption'), t('home-security-encryption-text')],
+	[t('home-security-passkeys'), t('home-security-passkeys-text')],
+	[t('home-security-keyring'), t('home-security-keyring-text')]
 ];
 ---
 
@@ -16,10 +18,8 @@ const points = [
 	<div class="absolute inset-0 -z-10 bg-[#0b0d14]/30" aria-hidden="true"></div>
 	<div class="page">
 		<div class="reveal max-w-2xl">
-			<h2 class="text-headline font-semibold text-balance">Safe by design, not by settings.</h2>
-			<p class="mt-6 text-lede text-ink-soft text-pretty">
-				Everything that keeps your computer yours is on from the start, and stays out of your way.
-			</p>
+			<h2 class="text-headline font-semibold text-balance">{t('home-security-heading')}</h2>
+			<p class="mt-6 text-lede text-ink-soft text-pretty">{t('home-security-text')}</p>
 		</div>
 		<dl class="mt-16 grid gap-x-12 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
 			{

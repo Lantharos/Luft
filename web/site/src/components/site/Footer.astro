@@ -1,53 +1,44 @@
 ---
-import { nav, urls } from '@luft/web';
 import { wallpaper } from '../../data/wallpapers';
+import { nav } from '../../data/nav';
+import { joined, link } from '../../i18n/html';
+import { localize } from '../../i18n/pages';
+import Languages from './Languages.astro';
 import Logo from './Logo.astro';
 
 interface Props {
 	credits: string[];
+	page: string;
 }
 
-const photos = Astro.props.credits.map(wallpaper);
+const local = localize(Astro);
+const { locale, t, href } = local;
+const photographers = Astro.props.credits.map(wallpaper).map((photo) => link(photo.url, photo.photographer));
 ---
 
 <footer class="border-t border-hairline">
 	<div class="page grid gap-10 py-14 text-sm text-ink-muted md:grid-cols-[1fr_auto]">
 		<div class="max-w-md space-y-3">
-			<a href="/" class="inline-flex items-center gap-2 text-base font-semibold text-ink">
+			<a href={href('')} class="inline-flex items-center gap-2 text-base font-semibold text-ink">
 				<Logo class="size-5" />
 				Luft
 			</a>
-			<p>
-				Made by <a class="link" href="https://lanth.me">Lantharos</a>. Free and open source, built on{' '}
-				<a class="link" href="https://fedoraproject.org">Fedora</a>.
-			</p>
-			{
-				photos.length > 0 && (
-					<p>
-						Photos by{' '}
-						{photos.map((photo, index) => (
-							<>
-								<a class="link" href={photo.url}>
-									{photo.photographer}
-								</a>
-								{index < photos.length - 2 ? ', ' : index === photos.length - 2 ? ' and ' : ''}
-							</>
-						))}{' '}
-						on Unsplash. Every one of them is a wallpaper in Luft.
-					</p>
-				)
-			}
+			<p set:html={t('site-footer-made', { lantharos: link('https://lanth.me', 'Lantharos'), fedora: link('https://fedoraproject.org', 'Fedora') })} />
+			{photographers.length > 0 && <p set:html={t('site-footer-photos', { photographers: joined(locale, photographers) })} />}
 		</div>
-		<ul class="flex gap-6 md:flex-col md:gap-2 md:text-right">
-			{
-				nav.map(({ label, href }) => (
-					<li>
-						<a class="transition-colors duration-(--motion-tap) hover:text-ink" href={href.replace(urls.site, '') || '/'}>
-							{label}
-						</a>
-					</li>
-				))
-			}
-		</ul>
+		<div class="flex flex-col gap-6 md:items-end">
+			<ul class="flex flex-wrap gap-x-6 gap-y-2 md:flex-col md:gap-2 md:text-right">
+				{
+					nav(local).map(({ label, href }) => (
+						<li>
+							<a class="transition-colors duration-(--motion-tap) hover:text-ink" href={href}>
+								{label}
+							</a>
+						</li>
+					))
+				}
+			</ul>
+			<Languages page={Astro.props.page} />
+		</div>
 	</div>
 </footer>

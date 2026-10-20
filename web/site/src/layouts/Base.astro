@@ -4,33 +4,42 @@ import openRunde from '@luft/web/fonts/OpenRunde-Regular.woff2?url';
 import openRundeSemibold from '@luft/web/fonts/OpenRunde-Semibold.woff2?url';
 import Header from '../components/site/Header.astro';
 import Footer from '../components/site/Footer.astro';
+import { SOURCE_LOCALE } from '../i18n/locales';
+import { alternates, localize } from '../i18n/pages';
 
 interface Props {
 	title: string;
 	description: string;
+	page?: string;
 	credits?: string[];
 	overFog?: boolean;
 }
 
-const { title, description, credits = [], overFog = false } = Astro.props;
+const { title, description, page, credits = [], overFog = false } = Astro.props;
+const { locale, t } = localize(Astro);
 const canonical = new URL(Astro.url.pathname, Astro.site);
+const translations = page === undefined ? [] : alternates(page);
+const fallback = translations.find(({ tag }) => tag === SOURCE_LOCALE);
+const absolute = (href: string) => new URL(href, Astro.site);
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={locale}>
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>{title}</title>
 		<meta name="description" content={description} />
 		<link rel="canonical" href={canonical} />
+		{translations.map(({ tag, href }) => <link rel="alternate" hreflang={tag} href={absolute(href)} />)}
+		{fallback && <link rel="alternate" hreflang="x-default" href={absolute(fallback.href)} />}
 		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 		<meta name="theme-color" content="#fcf9f3" media="(prefers-color-scheme: light)" />
 		<meta name="theme-color" content="#12110e" media="(prefers-color-scheme: dark)" />
 		<meta property="og:title" content={title} />
 		<meta property="og:description" content={description} />
 		<meta property="og:url" content={canonical} />
-		<meta property="og:image" content={new URL('/og.jpg', Astro.site)} />
+		<meta property="og:image" content={absolute('/og.jpg')} />
 		<meta name="twitter:card" content="summary_large_image" />
 		<link rel="preload" href={openRunde} as="font" type="font/woff2" crossorigin />
 		<link rel="preload" href={openRundeSemibold} as="font" type="font/woff2" crossorigin />
@@ -47,11 +56,11 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 		</script>
 	</head>
 	<body class="bg-canvas text-ink font-sans antialiased">
-		<a href="#main" class="skip">Skip to content</a>
+		<a href="#main" class="skip">{t('site-skip')}</a>
 		<Header overFog={overFog} />
 		<main id="main">
 			<slot />
 		</main>
-		<Footer credits={credits} />
+		<Footer credits={credits} page={page ?? ''} />
 	</body>
 </html>

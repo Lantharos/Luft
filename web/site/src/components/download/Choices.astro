@@ -1,46 +1,40 @@
 ---
 import { formatSize, iso, meet } from '../../data/downloads';
+import { localize } from '../../i18n/pages';
 
-const sized = (size: number | null) => (size ? ` · ${formatSize(size)}` : '');
+const { locale, t } = localize(Astro);
+const sized = (size: number | null) => (size ? ` · ${formatSize(size, locale)}` : '');
 ---
 
 <section class="page grid gap-20 py-24 md:py-36 lg:grid-cols-2 lg:gap-x-24 lg:gap-y-0">
 	<div class="only-meet reveal lg:row-span-5 lg:grid lg:grid-rows-subgrid">
 		<h2 class="text-3xl font-semibold tracking-tight">Meet Luft</h2>
-		<p class="mt-4 max-w-md text-lede text-ink-soft text-pretty">
-			The easiest way in. It checks your computer, makes room and restarts into Luft, to try it or install it. No USB stick, and nothing changes until you say so.
-		</p>
+		<p class="mt-4 max-w-md text-lede text-ink-soft text-pretty">{t('download-meet-text')}</p>
 		<div class="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3">
-			<a class="button button-primary only-windows" href={meet.windows.href}>Download for Windows{sized(meet.windows.size)}</a>
-			<a class="button button-primary only-linux" href={meet.linux.href}>Download for Linux{sized(meet.linux.size)}</a>
+			<a class="button button-primary only-windows" href={meet.windows.href}>{t('download-meet-windows')}{sized(meet.windows.size)}</a>
+			<a class="button button-primary only-linux" href={meet.linux.href}>{t('download-meet-linux')}{sized(meet.linux.size)}</a>
 		</div>
-		<p class="mt-5 space-x-4 text-sm text-ink-muted">
-			<a class="link only-linux" href={meet.windows.href}>Windows version</a>
-			<a class="link only-windows" href={meet.linux.href}>Linux version</a>
-			<a class="link" href={meet.windows.checksum}>Windows checksum</a>
-			<a class="link" href={meet.linux.checksum}>Linux checksum</a>
+		<p class="mt-5 flex flex-wrap gap-x-4 gap-y-1 text-sm text-ink-muted">
+			<a class="link only-linux" href={meet.windows.href}>{t('download-meet-windows-version')}</a>
+			<a class="link only-windows" href={meet.linux.href}>{t('download-meet-linux-version')}</a>
+			<a class="link" href={meet.windows.checksum}>{t('download-meet-windows-checksum')}</a>
+			<a class="link" href={meet.linux.checksum}>{t('download-meet-linux-checksum')}</a>
 		</p>
-		<p class="mt-8 max-w-md text-sm text-ink-muted">
-			Windows 10 or 11, or Linux with a UEFI computer. Windows may ask once before opening it the first time: choose More info, then Run anyway.
-		</p>
+		<p class="mt-8 max-w-md text-sm text-ink-muted">{t('download-meet-note')}</p>
 	</div>
 
 	<div id="iso" class="reveal scroll-mt-24 lg:row-span-5 lg:grid lg:grid-rows-subgrid">
 		<h2 class="text-3xl font-semibold tracking-tight">ISO</h2>
-		<p class="mt-4 max-w-md text-lede text-ink-soft text-pretty">
-			For a USB stick, a virtual machine, or a computer that starts from nothing. It installs offline, on any PC.
-		</p>
+		<p class="mt-4 max-w-md text-lede text-ink-soft text-pretty">{t('download-iso-text')}</p>
 		<div class="mt-8">
-			<a class="button button-primary only-other" href={iso.href}>Download ISO<span data-iso-size></span></a>
-			<a class="button button-quiet only-meet" href={iso.href}>Download ISO<span data-iso-size></span></a>
+			<a class="button button-primary only-other" href={iso.href}>{t('download-iso')}<span data-iso-size></span></a>
+			<a class="button button-quiet only-meet" href={iso.href}>{t('download-iso')}<span data-iso-size></span></a>
 		</div>
 		<p class="mt-5 text-sm text-ink-muted">
-			<span class="font-mono" data-iso-name></span><a class="link" href={iso.checksum}>checksum</a> · <a class="link" href={iso.signature}>signature</a>
+			<span class="font-mono" data-iso-name></span><a class="link" href={iso.checksum}>{t('download-checksum')}</a> · <a class="link" href={iso.signature}>{t('download-signature')}</a>
 		</p>
 		<div>
-			<p class="mt-8 hidden max-w-md text-sm text-ink-muted" data-nightly>
-				Testing something new? <a class="link" href={iso.nightly}>The nightly ISO</a> is built whenever Luft changes, and computers installed from it keep getting nightly updates.
-			</p>
+			<p class="mt-8 hidden max-w-md text-sm text-ink-muted [&_a]:link" data-nightly set:html={t('download-nightly', { nightly: iso.nightly })} />
 		</div>
 	</div>
 </section>
@@ -57,7 +51,8 @@ const sized = (size: number | null) => (size ? ` · ${formatSize(size)}` : '');
 	const response = await fetch(iso.details).catch(() => null);
 	if (response?.ok) {
 		const published: Published = await response.json();
-		for (const size of document.querySelectorAll('[data-iso-size]')) size.textContent = ` · ${formatSize(published.size)}`;
+		const size = formatSize(published.size, document.documentElement.lang);
+		for (const label of document.querySelectorAll('[data-iso-size]')) label.textContent = ` · ${size}`;
 		for (const name of document.querySelectorAll('[data-iso-name]')) name.textContent = `${published.name} · `;
 		if (published.folder !== 'nightly') document.querySelector('[data-nightly]')?.classList.remove('hidden');
 	}

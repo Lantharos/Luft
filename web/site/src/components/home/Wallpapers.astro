@@ -1,13 +1,16 @@
 ---
 import { getImage } from 'astro:assets';
 import { wallpapers } from '../../data/wallpapers';
+import { localize } from '../../i18n/pages';
+
+const { t } = localize(Astro);
 
 const tiles = await Promise.all(
 	wallpapers.map(async ({ name, photographer, image }) => {
 		const [small, large] = await Promise.all(
 			[320, 640].map((width) => getImage({ src: image, width, height: Math.round(width * 0.625), fit: 'cover', format: 'avif', quality: 55 }))
 		);
-		return { label: `${name}, a photo by ${photographer}`, src: small.src, srcset: `${small.src} 320w, ${large.src} 640w` };
+		return { label: t('home-wallpaper', { name, photographer }), src: small.src, srcset: `${small.src} 320w, ${large.src} 640w` };
 	})
 );
 const half = Math.ceil(tiles.length / 2);
@@ -16,10 +19,8 @@ const rows = [tiles.slice(0, half), tiles.slice(half)];
 
 <section class="py-24 md:py-44">
 	<div class="page reveal max-w-3xl text-center">
-		<h2 class="text-headline font-semibold text-balance">Pick a photo. Luft does the rest.</h2>
-		<p class="mx-auto mt-6 max-w-2xl text-lede text-ink-soft text-pretty">
-			{wallpapers.length} photographs come with it. Choose one, and the accent, the glass and every app take on its colours, in light and dark.
-		</p>
+		<h2 class="text-headline font-semibold text-balance">{t('home-wallpapers-heading')}</h2>
+		<p class="mx-auto mt-6 max-w-2xl text-lede text-ink-soft text-pretty">{t('home-wallpapers-text', { count: wallpapers.length })}</p>
 	</div>
 	<div class="mt-14 space-y-4 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
 		{

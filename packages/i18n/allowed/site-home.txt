@@ -1,0 +1,2 @@
+web/site/src/components/home/Hero.astro	Luft
+web/site/src/views/Home.astro	Luft

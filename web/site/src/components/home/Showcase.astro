@@ -2,6 +2,9 @@
 import { shot } from '../../data/shots';
 import Shot from '../media/Shot.astro';
 import Frame from './Frame.astro';
+import { localize } from '../../i18n/pages';
+
+const { t } = localize(Astro);
 ---
 
 <section id="tour" class="page relative z-10 -mt-[22svh] scroll-mt-24">
@@ -9,12 +12,10 @@ import Frame from './Frame.astro';
 		<Frame>
 			<Shot
 				{...shot('desktop')}
-				alt="The Luft desktop with Rover, Settings and Tern open over a misty forest"
+				alt={t('home-desktop-alt')}
 				sizes="(min-width: 76rem) 72rem, 94vw"
 			/>
 		</Frame>
 	</div>
-	<p class="reveal mx-auto mt-16 max-w-3xl text-center text-lede text-ink-soft text-pretty md:mt-24">
-		Luft is a complete system for your PC, built on Fedora. It has its own desktop, its own apps and a core that keeps itself in one piece, so you can get on with your day.
-	</p>
+	<p class="reveal mx-auto mt-16 max-w-3xl text-center text-lede text-ink-soft text-pretty md:mt-24">{t('home-intro')}</p>
 </section>

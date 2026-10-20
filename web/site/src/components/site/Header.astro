@@ -1,5 +1,6 @@
 ---
-import { nav, urls } from '@luft/web';
+import { nav } from '../../data/nav';
+import { localize } from '../../i18n/pages';
 import Logo from './Logo.astro';
 
 interface Props {
@@ -7,24 +8,25 @@ interface Props {
 }
 
 const { overFog = false } = Astro.props;
-const local = (href: string) => (href.startsWith(urls.site) ? href.slice(urls.site.length) || '/' : href);
+const page = localize(Astro);
+const { t, href } = page;
 ---
 
 <header class:list={['fixed inset-x-0 top-0 z-50', overFog && 'fog-ink']}>
 	<div class:list={['absolute inset-0 border-b border-hairline bg-glass backdrop-blur-xl backdrop-saturate-150', overFog && 'frost']}></div>
-	<nav class="page relative flex h-16 items-center justify-between" aria-label="Main">
-		<a href="/" class="flex items-center gap-2.5 text-lg font-semibold tracking-tight" aria-label="Luft home">
+	<nav class="page relative flex h-16 items-center justify-between" aria-label={t('site-nav-label')}>
+		<a href={href('')} class="flex items-center gap-2.5 text-lg font-semibold tracking-tight" aria-label={t('site-home-label')}>
 			<Logo class="size-6" />
 			<span>Luft</span>
 		</a>
 		<ul class="flex items-center gap-1 text-[0.9375rem] font-medium">
 			{
-				nav.map(({ label, href }) => (
+				nav(page).map(({ label, href }) => (
 					<li>
 						<a
-							href={local(href)}
+							href={href}
 							class="rounded-full px-3 py-2 opacity-80 transition-opacity duration-(--motion-tap) hover:opacity-100 aria-[current=page]:opacity-100"
-							aria-current={local(href) === Astro.url.pathname ? 'page' : undefined}
+							aria-current={href === Astro.url.pathname ? 'page' : undefined}
 						>
 							{label}
 						</a>

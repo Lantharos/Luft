@@ -1,3 +1,5 @@
+import type { Translate } from '../i18n/translate';
+
 const icons = import.meta.glob<string>('../../../../kestrel/engine/data/icons/scalable/apps/com.lantharos.*-symbolic.svg', {
 	eager: true,
 	query: '?raw',
@@ -19,15 +21,15 @@ export interface App {
 
 const app = (id: string, name: string, does: string, detail: string): App => ({ id, name, does, detail, icon: iconOf(id) });
 
-export const apps: App[] = [
-	app('rover', 'Rover', 'Files', 'Tabs, Quick Look, network drives and your cloud drives, with a sidebar that knows where Windows lives.'),
-	app('settings', 'Settings', 'Settings', 'Every switch in one place, from Wi-Fi and displays to updates, security and the taskbar.'),
-	app('magpie', 'Magpie', 'Photos, videos and music', 'Opens photos, videos, songs, PDFs and fonts, with the rest of the folder an arrow key away.'),
-	app('mailman', 'Mailman', 'Mail', 'One inbox for every account, a screener for new senders and search that works offline.'),
-	app('draft', 'Draft', 'Text and code', 'Over a hundred languages, multiple cursors and a Markdown preview, and it remembers where you left off.'),
-	app('tern', 'Tern', 'Terminal', 'Tabs and split panes, a nudge when a long command finishes, and colours from your wallpaper.'),
-	app('schelf', 'Schelf', 'Apps', 'Thousands of apps from Flathub and AppImages, with permissions explained in plain words.'),
-	app('disks', 'Disks', 'Drives', 'Partitions to scale, encryption, health checks and USB sticks made from an image.'),
-	app('barometer', 'Barometer', 'System monitor', 'What every app is using, with live graphs for the processor, memory, graphics and network.'),
-	app('keys', 'Keys', 'Keyboard layouts', 'Draw your own keyboard layout or input method, and try it before you save it.')
+export const apps = (t: Translate): App[] => [
+	app('rover', 'Rover', t('home-app-rover'), t('home-app-rover-detail')),
+	app('settings', t('home-app-settings-name'), t('home-app-settings'), t('home-app-settings-detail')),
+	app('magpie', 'Magpie', t('home-app-magpie'), t('home-app-magpie-detail')),
+	app('mailman', 'Mailman', t('home-app-mailman'), t('home-app-mailman-detail')),
+	app('draft', 'Draft', t('home-app-draft'), t('home-app-draft-detail')),
+	app('tern', 'Tern', t('home-app-tern'), t('home-app-tern-detail')),
+	app('schelf', 'Schelf', t('home-app-schelf'), t('home-app-schelf-detail')),
+	app('disks', t('home-app-disks-name'), t('home-app-disks'), t('home-app-disks-detail')),
+	app('barometer', 'Barometer', t('home-app-barometer'), t('home-app-barometer-detail')),
+	app('keys', 'Keys', t('home-app-keys'), t('home-app-keys-detail'))
 ];

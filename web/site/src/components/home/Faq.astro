@@ -1,13 +1,16 @@
 ---
 import { faq } from '../../data/faq';
+import { localize } from '../../i18n/pages';
+
+const { t } = localize(Astro);
 ---
 
 <section id="questions" class="page py-24 md:py-44">
 	<div class="grid gap-10 md:grid-cols-12">
-		<h2 class="reveal text-headline font-semibold md:col-span-4">Questions</h2>
+		<h2 class="reveal text-headline font-semibold md:col-span-4">{t('home-questions-heading')}</h2>
 		<div class="md:col-span-8">
 			{
-				faq.map(({ question, answer }) => (
+				faq(t).map(({ question, answer }) => (
 					<details class="faq group border-b border-hairline" name="faq">
 						<summary class="flex cursor-pointer list-none items-center justify-between gap-6 py-6 text-lg font-semibold [&::-webkit-details-marker]:hidden">
 							{question}

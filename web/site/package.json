@@ -10,9 +10,12 @@
 		"deploy": "astro build && wrangler deploy"
 	},
 	"dependencies": {
+		"@astrojs/sitemap": "^3.7.4",
+		"@fluent/bundle": "^0.19.1",
+		"@luft/i18n": "workspace:*",
 		"@luft/web": "workspace:*",
 		"@tailwindcss/vite": "^4.3.3",
-		"astro": "^7.4.0",
+		"astro": "^7.4.1",
 		"sharp": "^0.35.5",
 		"tailwindcss": "^4.3.3"
 	},

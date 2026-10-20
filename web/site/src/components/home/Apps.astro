@@ -1,25 +1,26 @@
 ---
 import { apps } from '../../data/apps';
 import { hasShot, shot } from '../../data/shots';
+import { localize } from '../../i18n/pages';
 import Shot from '../media/Shot.astro';
 import Frame from './Frame.astro';
 
-const shown = apps.filter((app) => hasShot(`app-${app.id}`));
-const others = apps.filter((app) => !shown.includes(app));
+const { t } = localize(Astro);
+const all = apps(t);
+const shown = all.filter((app) => hasShot(`app-${app.id}`));
+const others = all.filter((app) => !shown.includes(app));
 ---
 
 <section id="apps" class="page py-24 md:py-44">
 	<div class="reveal max-w-2xl">
-		<h2 class="text-headline font-semibold text-balance">Apps made for it, from day one.</h2>
-		<p class="mt-6 text-lede text-ink-soft text-pretty">
-			Luft comes with its own apps. They share the desktop’s glass, colours and motion, open in a blink and stay out of your way.
-		</p>
+		<h2 class="text-headline font-semibold text-balance">{t('home-apps-heading')}</h2>
+		<p class="mt-6 text-lede text-ink-soft text-pretty">{t('home-apps-text')}</p>
 	</div>
 
 	<div class="mt-12 grid gap-8 lg:grid-cols-[15rem_1fr] lg:gap-12" data-tabs>
 		<div
 			role="tablist"
-			aria-label="Luft’s apps"
+			aria-label={t('home-apps-label')}
 			aria-orientation="vertical"
 			class="-mx-5 flex snap-x gap-1 overflow-x-auto px-5 [scrollbar-width:none] lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0"
 		>
@@ -55,7 +56,7 @@ const others = apps.filter((app) => !shown.includes(app));
 						hidden={index !== 0}
 					>
 						<Frame>
-							<Shot {...shot(`app-${app.id}`)} alt={`${app.name}, ${app.does.toLowerCase()}`} sizes="(min-width: 76rem) 56rem, (min-width: 64rem) 70vw, 100vw" />
+							<Shot {...shot(`app-${app.id}`)} alt={t('home-app-shot', { app: app.name, kind: app.does })} sizes="(min-width: 76rem) 56rem, (min-width: 64rem) 70vw, 100vw" />
 						</Frame>
 						<p class="mt-5 max-w-2xl text-ink-soft">
 							<span class="font-semibold text-ink">{app.name}.</span> {app.detail}
@@ -71,9 +72,12 @@ const others = apps.filter((app) => !shown.includes(app));
 			others.map((app) => (
 				<li class="flex gap-4">
 					<span class="mt-0.5 size-6 shrink-0 text-accent [&>svg]:size-full" set:html={app.icon} />
-					<p class="text-ink-soft">
-						<span class="font-semibold text-ink">{app.name}</span>, {app.does.toLowerCase()}. {app.detail}
-					</p>
+					<div>
+						<p>
+							<span class="font-semibold">{app.name}</span> <span class="text-ink-muted">{app.does}</span>
+						</p>
+						<p class="mt-1 text-ink-soft">{app.detail}</p>
+					</div>
 				</li>
 			))
 		}

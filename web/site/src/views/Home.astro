@@ -10,14 +10,12 @@ import Showcase from '../components/home/Showcase.astro';
 import Story from '../components/home/Story.astro';
 import Wallpapers from '../components/home/Wallpapers.astro';
 import mist from '../assets/mist.webp';
+import { localize } from '../i18n/pages';
+
+const { t } = localize(Astro);
 ---
 
-<Base
-	title="Luft"
-	description="A calm, quick desktop for your PC. Try it from Windows or Linux with one restart, no USB stick needed."
-	credits={['Fog', 'Nocturne', 'Inversion']}
-	overFog
->
+<Base title="Luft" description={t('home-description')} page="" credits={['Fog', 'Nocturne', 'Inversion']} overFog>
 	<link slot="head" rel="preload" as="image" href={mist.src} type="image/webp" />
 	<Hero />
 	<Showcase />

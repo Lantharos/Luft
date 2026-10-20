@@ -1,3 +1,5 @@
+import { home } from './language';
+
 const DOWNLOADS = 'https://get.luft.computer';
 const RELEASE = '1';
 const NIGHTLY = 'nightly';
@@ -32,7 +34,9 @@ async function find(channel: string) {
 
 export default {
 	async fetch(request, env) {
-		const route = new URL(request.url).pathname.match(ROUTE);
+		const { pathname } = new URL(request.url);
+		if (pathname === '/') return home(request, env.ASSETS);
+		const route = pathname.match(ROUTE);
 		if (!route) return env.ASSETS.fetch(request);
 		const [, channel, part] = route;
 		const found = await find(channel);

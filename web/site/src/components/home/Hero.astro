@@ -2,8 +2,10 @@
 import { Picture } from 'astro:assets';
 import mist from '../../assets/mist.webp';
 import { wallpaper } from '../../data/wallpapers';
+import { localize } from '../../i18n/pages';
 
 const fog = wallpaper('Fog').image;
+const { t, href } = localize(Astro);
 ---
 
 <section class="relative isolate flex h-svh min-h-[38rem] flex-col overflow-hidden bg-[#c9c7c1]">
@@ -37,12 +39,10 @@ const fog = wallpaper('Fog').image;
 
 	<div class="lift-away page flex flex-1 flex-col items-center pt-[18svh] text-center text-ink scheme-light">
 		<h1 class="enter text-display font-semibold">Luft</h1>
-		<p class="enter mt-6 max-w-xl text-lede text-ink-soft" style="--order: 1">
-			A calm, quick desktop for your PC. Try it from Windows or Linux with one restart, no USB stick needed.
-		</p>
+		<p class="enter mt-6 max-w-xl text-lede text-ink-soft" style="--order: 1">{t('home-description')}</p>
 		<div class="enter mt-9 flex flex-wrap justify-center gap-3" style="--order: 2">
-			<a href="/download" class="button bg-ink text-canvas hover:bg-ink/88">Get Luft</a>
-			<a href="#tour" class="button button-quiet">Take a look</a>
+			<a href={href('download')} class="button bg-ink text-canvas hover:bg-ink/88">{t('home-get')}</a>
+			<a href="#tour" class="button button-quiet">{t('home-look')}</a>
 		</div>
 	</div>
 </section>

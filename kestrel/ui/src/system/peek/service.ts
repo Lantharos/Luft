@@ -102,7 +102,7 @@ export class PeekService {
     this.capture(invocation, stealFd(fds, index), async (caller, output) => {
       const window = await this.permitted(caller, id, 'see');
       await Promise.all(this.redraws);
-      await within(captureWindow(window, output), CAPTURE_TIMEOUT, "The window's picture wasn't ready in time");
+      await within(captureWindow(window, output), CAPTURE_TIMEOUT, t('peek-error-window-picture-late'));
     });
   }
 
@@ -112,7 +112,7 @@ export class PeekService {
       await this.policy.require(caller, null, 'see');
       requireOpenScreen(this.screen);
       await Promise.all(this.redraws);
-      await within(captureScreen(output), CAPTURE_TIMEOUT, "The screen's picture wasn't ready in time");
+      await within(captureScreen(output), CAPTURE_TIMEOUT, t('peek-error-screen-picture-late'));
     });
   }
 

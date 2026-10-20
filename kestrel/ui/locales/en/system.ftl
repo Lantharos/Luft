@@ -175,6 +175,8 @@ peek-error-covered = Something else covers that part of the window
 # $x and $y are the coordinates the person typed, $width and $height the size of the window's picture in pixels, all as plain digits
 peek-error-outside = { $x }, { $y } is outside the window's picture, which is { $width } × { $height }
 peek-error-nothing-to-capture = The window isn't showing anything to capture
+peek-error-window-picture-late = The window’s picture wasn’t ready in time
+peek-error-screen-picture-late = The screen’s picture wasn’t ready in time
 # $id is a window number as peek list prints it
 peek-error-no-window-id = No window has the id { $id }. peek list shows the open ones.
 # $handle is a short code that names a started program

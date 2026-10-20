@@ -1,5 +1,6 @@
 mod desktop;
 mod scopes;
+mod windows;
 
 use std::collections::hash_map::Entry;
 use std::collections::{HashMap, HashSet};
@@ -11,6 +12,8 @@ use crate::gpu::ProcessGpu;
 use crate::system::procfile::ProcFile;
 pub use desktop::AppInfo;
 pub use scopes::{Scopes, members};
+pub use windows::OpenWindows;
+use windows::Windowed;
 
 #[derive(Serialize, Clone, Default)]
 #[serde(rename_all = "camelCase")]
@@ -31,6 +34,7 @@ pub struct AppUsage {
     processes: u32,
     threads: u32,
     paused: bool,
+    background: bool,
 }
 
 #[derive(Clone, Copy, Default)]
@@ -183,6 +187,20 @@ pub fn attach_gpu(
             app.encoder = (app.encoder + process.encoder).min(100.0);
             app.decoder = (app.decoder + process.decoder).min(100.0);
         }
+    }
+}
+
+pub fn mark_background(
+    apps: &mut [AppUsage],
+    members: &HashMap<String, Vec<u32>>,
+    windowed: &Windowed,
+) {
+    for app in apps
+        .iter_mut()
+        .filter(|app| desktop::is_desktop_app(&app.key))
+    {
+        let pids = members.get(&app.key).map_or(&[][..], Vec::as_slice);
+        app.background = !windowed.shows(&app.key, pids);
     }
 }
 

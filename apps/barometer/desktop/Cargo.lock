@@ -163,6 +163,9 @@ name = "barometer"
 version = "0.1.0"
 dependencies = [
  "dirs",
+ "futures-util",
+ "gio",
+ "gio-unix",
  "libc",
  "luft-app",
  "nvml-wrapper",
@@ -170,6 +173,7 @@ dependencies = [
  "sabine",
  "serde",
  "serde_json",
+ "zbus",
 ]
 
 [[package]]

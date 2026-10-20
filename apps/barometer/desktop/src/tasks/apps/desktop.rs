@@ -10,6 +10,10 @@ const PSEUDO: &str = "unit:";
 const SABINE_RUNTIME_UNIT: &str = "sabine-runtime@";
 const SABINE_RUNTIME: &str = "sabine:runtime";
 
+pub fn is_desktop_app(key: &str) -> bool {
+    !key.starts_with(PSEUDO) && key != SABINE_RUNTIME
+}
+
 #[derive(Serialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct AppInfo {

@@ -2,12 +2,18 @@ use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
 use std::process::Command;
+use std::thread;
+use std::time::{Duration, Instant};
 
+use gio::prelude::*;
+use luft_app::launch;
 use serde::Deserialize;
 
 use super::apps::members;
 
 const SYSTEM_BIN_DIRS: [&str; 2] = ["/usr/bin", "/bin"];
+const STOP_TIMEOUT: Duration = Duration::from_secs(5);
+const STOP_CHECK: Duration = Duration::from_millis(100);
 
 #[derive(Deserialize, Clone, Copy)]
 #[serde(rename_all = "lowercase")]
@@ -42,6 +48,12 @@ impl Signal {
 pub struct SignalRequest {
     pids: Vec<u32>,
     signal: Signal,
+}
+
+#[derive(Deserialize)]
+pub struct OpenRequest {
+    key: String,
+    token: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -110,6 +122,33 @@ pub fn signal_scopes(scopes: &[PathBuf], signal: Signal) -> Result<(), String> {
             signal,
         }),
     }
+}
+
+pub fn stop_scopes(mut scopes: Vec<PathBuf>) -> Result<(), String> {
+    signal_scopes(&scopes, Signal::Continue)?;
+    signal_scopes(&scopes, Signal::End)?;
+    thread::Builder::new()
+        .name("barometer-stop".into())
+        .spawn(move || {
+            let deadline = Instant::now() + STOP_TIMEOUT;
+            while scopes.iter().any(|scope| populated(scope)) && Instant::now() < deadline {
+                thread::sleep(STOP_CHECK);
+            }
+            scopes.retain(|scope| populated(scope));
+            let _ = signal_scopes(&scopes, Signal::Kill);
+        })
+        .map(drop)
+        .map_err(|error| error.to_string())
+}
+
+pub fn open_app(OpenRequest { key, token }: OpenRequest) -> Result<(), String> {
+    let app = gio_unix::DesktopAppInfo::new(&key).ok_or("That app is no longer installed")?;
+    launch::start(app.upcast_ref(), &[], token.as_deref()).map_err(|error| error.to_string())
+}
+
+fn populated(scope: &Path) -> bool {
+    fs::read_to_string(scope.join("cgroup.events"))
+        .is_ok_and(|events| events.lines().any(|line| line == "populated 1"))
 }
 
 fn threads(pid: u32) -> Vec<u32> {

@@ -133,6 +133,9 @@ impl Sampler<'_> {
                 HashMap::new()
             };
             apps::attach_gpu(&mut usage, &members, &gpu);
+            if let Some(windowed) = self.shared.windows.current().as_ref() {
+                apps::mark_background(&mut usage, &members, windowed);
+            }
             if emit {
                 self.events.emit("barometer.apps", &usage);
             }

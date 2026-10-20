@@ -6,20 +6,22 @@ use super::desktop::{AppInfo, Apps, Unit};
 use crate::tasks::process::{Stat, read_cgroup};
 
 const ANCESTORS: usize = 16;
+const APP_SLICE_OVERRIDE: &str = "LUFT_APP_SLICE";
 
 pub struct Scopes {
     root: PathBuf,
+    marker: String,
     apps: Apps,
     resolved: HashMap<String, Option<String>>,
 }
 
 impl Scopes {
     pub fn new() -> Self {
-        let uid = unsafe { libc::getuid() };
+        let root = std::env::var_os(APP_SLICE_OVERRIDE).map_or_else(app_slice, PathBuf::from);
+        let slice = root.file_name().unwrap_or_default().to_string_lossy();
         Self {
-            root: PathBuf::from(format!(
-                "/sys/fs/cgroup/user.slice/user-{uid}.slice/user@{uid}.service/app.slice"
-            )),
+            marker: format!("/{slice}/"),
+            root,
             apps: Apps::default(),
             resolved: HashMap::new(),
         }
@@ -54,7 +56,7 @@ impl Scopes {
     }
 
     pub fn app_of_cgroup(&mut self, cgroup: &str) -> Option<String> {
-        self.app_of(&relative(cgroup)?)
+        self.app_of(&relative(cgroup, &self.marker)?)
     }
 
     pub fn app_of(&mut self, name: &str) -> Option<String> {
@@ -118,9 +120,16 @@ impl Scopes {
         candidates.extend(members.iter().take(4));
         let scope = candidates
             .into_iter()
-            .find_map(|pid| ancestor_scope(pid, name))?;
+            .find_map(|pid| ancestor_scope(pid, name, &self.marker))?;
         self.resolve(&scope, depth + 1)
     }
+}
+
+fn app_slice() -> PathBuf {
+    let uid = unsafe { libc::getuid() };
+    PathBuf::from(format!(
+        "/sys/fs/cgroup/user.slice/user-{uid}.slice/user@{uid}.service/app.slice"
+    ))
 }
 
 fn units(directory: &Path) -> Vec<String> {
@@ -141,8 +150,8 @@ fn children(directory: &Path) -> Vec<String> {
         .collect()
 }
 
-fn relative(cgroup: &str) -> Option<String> {
-    let (_, rest) = cgroup.split_once("/app.slice/")?;
+fn relative(cgroup: &str, marker: &str) -> Option<String> {
+    let (_, rest) = cgroup.split_once(marker)?;
     let mut parts = rest.split('/');
     let first = parts.next()?;
     Some(if first.ends_with(".slice") {
@@ -160,10 +169,10 @@ pub fn members(path: &Path) -> Vec<u32> {
         .collect()
 }
 
-fn ancestor_scope(pid: u32, name: &str) -> Option<String> {
+fn ancestor_scope(pid: u32, name: &str, marker: &str) -> Option<String> {
     let mut current = parent(pid)?;
     for _ in 0..ANCESTORS {
-        if let Some(scope) = relative(&read_cgroup(current)).filter(|scope| scope != name) {
+        if let Some(scope) = relative(&read_cgroup(current), marker).filter(|scope| scope != name) {
             return Some(scope);
         }
         current = parent(current)?;

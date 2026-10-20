@@ -11,18 +11,28 @@
 		child?: boolean;
 		expanded?: boolean;
 	}
+
+	export interface Heading {
+		key: string;
+		heading: string;
+	}
+
+	export type Entry = Item | Heading;
+
+	export const isItem = (entry: Entry): entry is Item => !('heading' in entry);
 </script>
 
 <script lang="ts">
 	import { AppIcon, VirtualScroller, type VirtualHandle } from '@luft/ui';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import type { Snippet } from 'svelte';
 	import type { Sort } from '#lib/state/settings.svelte.js';
 	import { template, type Column } from './columns';
 	import { desktopId } from './icons';
 	import TableHeader from './TableHeader.svelte';
 
 	interface Props {
-		items: Item[];
+		items: Entry[];
 		columns: Column[];
 		sort: Sort;
 		selected: string | null;
@@ -34,32 +44,34 @@
 		onmenu: (event: MouseEvent, item: Item) => void;
 		ontoggle?: (item: Item) => void;
 		onend: (item: Item, force: boolean) => void;
+		actions?: Snippet<[Item]>;
 	}
 
-	let { items, columns, sort, selected, label, onsort, oncolumns, onselect, onopen, onmenu, ontoggle, onend }: Props = $props();
+	let { items, columns, sort, selected, label, onsort, oncolumns, onselect, onopen, onmenu, ontoggle, onend, actions }: Props = $props();
 
 	const LAYOUT = { itemHeight: 36, gap: 1, padding: { top: 4, right: 10, bottom: 20, left: 10 } };
 
 	let scroller = $state<VirtualHandle>();
-	let index = $derived(items.findIndex((item) => item.key === selected));
+	let rows = $derived(items.filter(isItem));
+	let index = $derived(rows.findIndex((item) => item.key === selected));
 
 	function move(offset: number) {
-		const next = items[Math.min(items.length - 1, Math.max(0, (index < 0 ? -1 : index) + offset))];
+		const next = rows[Math.min(rows.length - 1, Math.max(0, (index < 0 ? -1 : index) + offset))];
 		if (!next) return;
 		onselect(next);
 		scroller?.scrollToIndex(items.indexOf(next));
 	}
 
 	function keydown(event: KeyboardEvent) {
-		const item = items[index];
+		const item = rows[index];
 		const page = scroller?.metrics().pageRows ?? 10;
 		const keys: Record<string, () => void> = {
 			ArrowDown: () => move(1),
 			ArrowUp: () => move(-1),
 			PageDown: () => move(page),
 			PageUp: () => move(-page),
-			Home: () => move(-items.length),
-			End: () => move(items.length),
+			Home: () => move(-rows.length),
+			End: () => move(rows.length),
 			Enter: () => item && onopen(item),
 			Delete: () => item && onend(item, event.shiftKey),
 			ArrowRight: () => item?.expanded === false && ontoggle?.(item),
@@ -91,48 +103,59 @@
 	tabindex={0}
 	onkeydown={keydown}
 >
-	{#snippet children(item, index)}
-		<div
-			class="table-grid task-row"
-			aria-rowindex={index + 2}
-			class:selected={item.key === selected}
-			class:child={item.child}
-			role="row"
-			tabindex="-1"
-			aria-selected={item.key === selected}
-			onpointerdown={() => onselect(item)}
-			ondblclick={() => onopen(item)}
-			oncontextmenu={(event) => {
-				event.preventDefault();
-				onselect(item);
-				onmenu(event, item);
-			}}
-		>
-			<span class="name">
-				{#if item.expanded !== undefined}
-					<button
-						type="button"
-						class="disclosure"
-						class:open={item.expanded}
-						aria-label={item.expanded ? 'Hide processes' : 'Show processes'}
-						onpointerdown={(event) => event.stopPropagation()}
-						onclick={() => ontoggle?.(item)}
-					>
-						<ChevronRight size={15} />
-					</button>
-				{/if}
-				<AppIcon icon={item.icon} id={desktopId(item.app)} size={item.child ? 18 : 22} />
-				<span class="truncate">{item.title}</span>
-				{#if item.note}
-					<span class="note">{item.note}</span>
-				{/if}
-			</span>
-			{#each columns as column (column.id)}
-				<span class="cell" class:numeric={column.numeric}>{column.text(item.row)}</span>
-			{/each}
-		</div>
+	{#snippet children(entry, index)}
+		{#if isItem(entry)}
+			{@render row(entry, index)}
+		{:else}
+			<div class="group-heading" role="row" aria-rowindex={index + 2}>
+				<span role="rowheader">{entry.heading}</span>
+			</div>
+		{/if}
 	{/snippet}
 </VirtualScroller>
+
+{#snippet row(item: Item, index: number)}
+	<div
+		class="table-grid task-row"
+		aria-rowindex={index + 2}
+		class:selected={item.key === selected}
+		class:child={item.child}
+		role="row"
+		tabindex="-1"
+		aria-selected={item.key === selected}
+		onpointerdown={() => onselect(item)}
+		ondblclick={() => onopen(item)}
+		oncontextmenu={(event) => {
+			event.preventDefault();
+			onselect(item);
+			onmenu(event, item);
+		}}
+	>
+		<span class="name">
+			{#if item.expanded !== undefined}
+				<button
+					type="button"
+					class="disclosure"
+					class:open={item.expanded}
+					aria-label={item.expanded ? 'Hide processes' : 'Show processes'}
+					onpointerdown={(event) => event.stopPropagation()}
+					onclick={() => ontoggle?.(item)}
+				>
+					<ChevronRight size={15} />
+				</button>
+			{/if}
+			<AppIcon icon={item.icon} id={desktopId(item.app)} size={item.child ? 18 : 22} />
+			<span class="truncate">{item.title}</span>
+			{#if item.note}
+				<span class="note">{item.note}</span>
+			{/if}
+			{@render actions?.(item)}
+		</span>
+		{#each columns as column (column.id)}
+			<span class="cell" class:numeric={column.numeric}>{column.text(item.row)}</span>
+		{/each}
+	</div>
+{/snippet}
 
 <style>
 	:global(.task-table) {
@@ -177,6 +200,16 @@
 	.child .name {
 		padding-left: 40px;
 		color: var(--text-soft);
+	}
+
+	.group-heading {
+		display: flex;
+		height: 100%;
+		align-items: flex-end;
+		padding: 0 8px 6px;
+		font-size: 12.5px;
+		font-weight: 500;
+		color: var(--text-muted);
 	}
 
 	.disclosure {

@@ -11,7 +11,7 @@ use parking_lot::{Condvar, Mutex};
 use serde::{Deserialize, Serialize};
 
 use crate::system::{Devices, System, Tick};
-use crate::tasks::apps::Scopes;
+use crate::tasks::apps::{OpenWindows, Scopes};
 use crate::tasks::control::{self, Signal};
 
 const DEFAULT_INTERVAL: Duration = Duration::from_secs(1);
@@ -35,6 +35,7 @@ struct Control {
 struct Shared {
     control: Mutex<Control>,
     scopes: Mutex<Scopes>,
+    windows: OpenWindows,
     wake: Condvar,
     history: Mutex<VecDeque<Tick>>,
     devices: Mutex<Option<Devices>>,
@@ -58,6 +59,11 @@ pub struct View {
 pub struct AppSignal {
     key: String,
     signal: Signal,
+}
+
+#[derive(Deserialize)]
+pub struct AppKey {
+    key: String,
 }
 
 #[derive(Deserialize)]
@@ -93,6 +99,7 @@ impl Monitor {
                 reset: true,
             }),
             scopes: Mutex::new(Scopes::new()),
+            windows: OpenWindows::default(),
             wake: Condvar::new(),
             history: Mutex::new(VecDeque::new()),
             devices: Mutex::new(None),
@@ -103,6 +110,7 @@ impl Monitor {
     pub fn start(&self, events: Events) -> std::io::Result<()> {
         let system = System::new()?;
         *self.0.devices.lock() = Some(system.devices());
+        self.0.windows.follow();
         self.0.ready.notify_all();
         let shared = Arc::clone(&self.0);
         thread::Builder::new()
@@ -127,16 +135,21 @@ impl Monitor {
     }
 
     pub fn signal_app(&self, AppSignal { key, signal }: AppSignal) -> Result<(), String> {
-        let paths: Vec<PathBuf> = {
-            let mut scopes = self.0.scopes.lock();
-            let names: Vec<String> = scopes
-                .names()
-                .into_iter()
-                .filter(|name| scopes.app_of(name).as_deref() == Some(key.as_str()))
-                .collect();
-            names.iter().map(|name| scopes.path(name)).collect()
-        };
-        control::signal_scopes(&paths, signal)
+        control::signal_scopes(&self.scopes_of(&key), signal)
+    }
+
+    pub fn stop_app(&self, AppKey { key }: AppKey) -> Result<(), String> {
+        control::stop_scopes(self.scopes_of(&key))
+    }
+
+    fn scopes_of(&self, key: &str) -> Vec<PathBuf> {
+        let mut scopes = self.0.scopes.lock();
+        let names: Vec<String> = scopes
+            .names()
+            .into_iter()
+            .filter(|name| scopes.app_of(name).as_deref() == Some(key))
+            .collect();
+        names.iter().map(|name| scopes.path(name)).collect()
     }
 
     pub fn configure(

@@ -243,6 +243,7 @@ export interface AppUsage {
 	processes: number;
 	threads: number;
 	paused: boolean;
+	background: boolean;
 }
 
 export interface View {
@@ -269,6 +270,8 @@ export interface Backend {
 	details(pid: number): Promise<Details>;
 	signal(pids: number[], signal: Signal): Promise<void>;
 	signalApp(key: string, signal: Signal): Promise<void>;
+	openApp(key: string, token: string | null): Promise<void>;
+	stopApp(key: string): Promise<void>;
 	priority(pid: number, nice: number): Promise<void>;
 	onTick(callback: (tick: Tick) => void): void;
 	onDevices(callback: (devices: Devices) => void): void;

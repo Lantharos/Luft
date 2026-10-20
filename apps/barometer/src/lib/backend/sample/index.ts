@@ -12,6 +12,7 @@ let timer: ReturnType<typeof setInterval> | undefined;
 let settings: Record<string, unknown> | null = null;
 const ticks: Tick[] = [];
 const processes = createProcesses(Date.now());
+const background = new Set(['com.lantharos.mailman.desktop']);
 const listeners = {
 	tick: [] as ((tick: Tick) => void)[],
 	apps: [] as ((apps: AppUsage[]) => void)[],
@@ -43,7 +44,7 @@ function shown() {
 function sendTasks() {
 	advance(processes, interval / 1000);
 	if (view.page === 'apps') {
-		const usage = apps.map((app) => usageOf(app.key, app.name));
+		const usage = apps.map((app) => usageOf(app.key, app.name)).filter((app) => app.processes > 0);
 		listeners.apps.forEach((listener) => listener(usage));
 	}
 	const rows = encode(shown());
@@ -69,8 +70,13 @@ function usageOf(key: string, name: string): AppUsage {
 		decoder: 0,
 		processes: members.length,
 		threads: sum((process) => process.threads),
-		paused: members.length > 0 && members.every((process) => process.state === 'T')
+		paused: members.length > 0 && members.every((process) => process.state === 'T'),
+		background: background.has(key)
 	};
+}
+
+function membersOf(key: string) {
+	return processes.filter((process) => process.app === key).map((process) => process.pid);
 }
 
 function signal(pids: number[], kind: Signal) {
@@ -134,11 +140,12 @@ export const sample: Backend = {
 	snapshot: async (after) => ({ devices: structuredClone(devices) as Devices, ticks: ticks.filter((candidate) => candidate.time > after) }),
 	details: async (pid) => details(pid),
 	signal: async (pids, kind) => signal(pids, kind),
-	signalApp: async (key, kind) =>
-		signal(
-			processes.filter((process) => process.app === key).map((process) => process.pid),
-			kind
-		),
+	signalApp: async (key, kind) => signal(membersOf(key), kind),
+	openApp: async (key) => void background.delete(key),
+	stopApp: async (key) => {
+		signal(membersOf(key), 'end');
+		background.delete(key);
+	},
 	priority: async (pid, nice) => {
 		const process = processes.find((candidate) => candidate.pid === pid);
 		if (process) process.nice = nice;

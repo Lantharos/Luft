@@ -1,3 +1,4 @@
+import { activationToken } from '@luft/ui';
 import type { Signal } from '#lib/backend/types.js';
 import { app } from '#lib/state/app.svelte.js';
 import { notices } from '#lib/state/notices.svelte.js';
@@ -5,6 +6,7 @@ import { processes } from '#lib/state/processes.svelte.js';
 import { usage } from '#lib/state/usage.svelte.js';
 
 const GRACE_MS = 4000;
+const STOP_GRACE_MS = 6000;
 
 export type Target = { title: string; pids: number[] } | { title: string; app: string };
 
@@ -12,6 +14,7 @@ class Actions {
 	details = $state<number | null>(null);
 	priority = $state<{ pid: number; name: string; nice: number } | null>(null);
 	stuck = $state<Target | null>(null);
+	stopping = $state.raw<ReadonlySet<string>>(new Set());
 
 	async signal(target: Target, signal: Signal) {
 		if (!app.backend) return false;
@@ -31,6 +34,26 @@ class Actions {
 			if (!this.#running(target)) return;
 			this.stuck = 'app' in target ? target : { title: target.title, pids: target.pids.filter((pid) => this.#alive(pid)) };
 		}, GRACE_MS);
+	}
+
+	async open(key: string) {
+		if (!app.backend) return;
+		try {
+			await app.backend.openApp(key, await activationToken());
+		} catch (error) {
+			notices.fail(error);
+		}
+	}
+
+	async stop(key: string) {
+		if (!app.backend) return;
+		this.stopping = new Set([...this.stopping, key]);
+		try {
+			await app.backend.stopApp(key);
+		} catch (error) {
+			notices.fail(error);
+		}
+		setTimeout(() => (this.stopping = new Set([...this.stopping].filter((other) => other !== key))), STOP_GRACE_MS);
 	}
 
 	async kill(target: Target) {

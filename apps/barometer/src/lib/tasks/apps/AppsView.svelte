@@ -10,7 +10,7 @@
 	import { APP_COLUMN_IDS, columnsFor, compare, toggleSort, type Row } from '#lib/tasks/columns.js';
 	import TaskMenu from '#lib/tasks/actions/TaskMenu.svelte';
 	import { tasks, type Target } from '#lib/tasks/actions/actions.svelte.js';
-	import TaskTable, { type Item } from '#lib/tasks/TaskTable.svelte';
+	import TaskTable, { type Entry, type Item } from '#lib/tasks/TaskTable.svelte';
 	import { matches } from '#lib/tasks/search.js';
 
 	let query = $state('');
@@ -28,27 +28,34 @@
 			return !needle || app.name.toLowerCase().includes(needle) || (children.get(app.key) ?? []).some((process) => matches(process, query));
 		})
 	);
-	let items = $derived(
+	let ordered = $derived(
 		shown
 			.map((app) => ({ app, row: rowOf(app) }))
 			.sort((a, b) => order(a.row, b.row))
-			.flatMap(({ app, row }) => {
-				const open = usage.expanded.includes(app.key);
-				const head: Item = {
-					key: `app:${app.key}`,
-					row,
-					title: app.name,
-					icon: app.icon,
-					app: app.key,
-					note: app.paused ? 'Paused' : undefined,
-					expanded: open
-				};
-				if (!open) return [head];
-				const members = [...(children.get(app.key) ?? [])].sort(order);
-				return [head, ...members.map((process): Item => ({ key: `pid:${process.pid}`, row: process, title: process.name, icon: app.icon, app: app.key, child: true, note: process.state === 'T' ? 'Paused' : undefined }))];
-			})
 	);
+	let items = $derived.by((): Entry[] => {
+		const windowed = ordered.filter(({ app }) => !app.background).flatMap(entriesOf);
+		const background = ordered.filter(({ app }) => app.background).flatMap(entriesOf);
+		return background.length ? [...windowed, { key: 'heading:background', heading: 'Running in the background' }, ...background] : windowed;
+	});
+	let byKey = $derived(new Map(usage.apps.map((app) => [app.key, app])));
 	let current = $derived(selected ? targetOf(selected) : null);
+
+	function entriesOf({ app, row }: { app: AppUsage; row: Row }): Item[] {
+		const open = usage.expanded.includes(app.key);
+		const head: Item = {
+			key: `app:${app.key}`,
+			row,
+			title: app.name,
+			icon: app.icon,
+			app: app.key,
+			note: tasks.stopping.has(app.key) ? 'Stopping…' : app.paused ? 'Paused' : undefined,
+			expanded: open
+		};
+		if (!open) return [head];
+		const members = [...(children.get(app.key) ?? [])].sort(order);
+		return [head, ...members.map((process): Item => ({ key: `pid:${process.pid}`, row: process, title: process.name, icon: app.icon, app: app.key, child: true, note: process.state === 'T' ? 'Paused' : undefined }))];
+	}
 
 	function rowOf(app: AppUsage): Row {
 		return { ...app, nice: 0, state: app.paused ? 'T' : 'S', userTime: 0, systemTime: 0 };
@@ -83,6 +90,16 @@
 
 <svelte:window onkeydown={shortcuts} />
 
+{#snippet actions(item: Item)}
+	{@const found = item.child || !item.app ? undefined : byKey.get(item.app)}
+	{#if found?.background}
+		<span class="ml-auto flex flex-none gap-1.5" role="presentation" onpointerdown={(event) => event.stopPropagation()} ondblclick={(event) => event.stopPropagation()}>
+			<button type="button" class="button row-action" onclick={() => tasks.open(found.key)}>Open</button>
+			<button type="button" class="button row-action" disabled={tasks.stopping.has(found.key)} onclick={() => tasks.stop(found.key)}>Stop</button>
+		</span>
+	{/if}
+{/snippet}
+
 <Header title="Apps" detail={usage.ready ? `${plural(usage.apps.length, 'app')} running` : null}>
 	<div class="w-[240px]" data-no-drag>
 		<SearchField bind:this={search} bind:value={query} label="Search apps" />
@@ -114,6 +131,7 @@
 			if (found) menu = { at: { x: event.clientX, y: event.clientY }, ...found };
 		}}
 		onend={(item, force) => end(item.key, force)}
+		{actions}
 	/>
 {/if}
 
@@ -130,3 +148,11 @@
 		onclose={() => (columnsMenu = null)}
 	/>
 {/if}
+
+<style>
+	.row-action {
+		min-height: 26px;
+		padding-inline: 12px;
+		font-size: 12px;
+	}
+</style>

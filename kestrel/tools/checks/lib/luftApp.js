@@ -50,6 +50,12 @@ function command(name) {
 
 export const appBinary = name => command(name).path;
 
+function inScope(slice, id, argv) {
+  const unit = `app-${id}-${GLib.random_int()}.scope`;
+  const app = ['env', `XDG_RUNTIME_DIR=${GLib.getenv('KESTREL_APP_RUNTIME_DIR')}`, ...argv];
+  return ['systemd-run', '--user', '--scope', '--quiet', '--collect', `--slice=${slice}`, `--unit=${unit}`, '--', ...app];
+}
+
 function readLines(stream, onLine) {
   const lines = new Gio.DataInputStream({base_stream: stream});
   const next = () => lines.read_line_async(GLib.PRIORITY_DEFAULT, null, (source, result) => {
@@ -91,14 +97,16 @@ export function sabineService() {
 }
 
 export class LuftApp {
-  constructor(name, args = [], env = {}) {
+  constructor(name, args = [], env = {}, {slice = null} = {}) {
     this.name = name;
     this.id = `com.lantharos.${name}`;
     this._log = [];
     const {path, manifest} = command(name);
     if (!GLib.file_test(path, GLib.FileTest.IS_EXECUTABLE))
       throw new Error(`${name} is not built at ${path}`);
-    this._process = spawn([path, ...args], {env: {...environment(manifest), ...env}, flags: Gio.SubprocessFlags.STDOUT_SILENCE | Gio.SubprocessFlags.STDERR_PIPE, cwd: home});
+    const argv = slice ? inScope(slice, this.id, [path, ...args]) : [path, ...args];
+    const scoped = slice ? {XDG_RUNTIME_DIR: GLib.get_user_runtime_dir()} : {};
+    this._process = spawn(argv, {env: {...environment(manifest), ...env, ...scoped}, flags: Gio.SubprocessFlags.STDOUT_SILENCE | Gio.SubprocessFlags.STDERR_PIPE, cwd: home});
     this._painted = false;
     this._exited = false;
     this.lifecycle = [];
@@ -128,8 +136,12 @@ export class LuftApp {
     return !this._exited;
   }
 
+  get pid() {
+    return Number(this._process.get_identifier());
+  }
+
   get residentMb() {
-    const [, status] = GLib.file_get_contents(`/proc/${this._process.get_identifier()}/status`);
+    const [, status] = GLib.file_get_contents(`/proc/${this.pid}/status`);
     return Number(/VmRSS:\s+(\d+)/.exec(new TextDecoder().decode(status))[1]) / 1024;
   }
 

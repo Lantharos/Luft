@@ -31,6 +31,8 @@ pub fn register(window: SabineWindow, monitor: &Monitor) -> SabineWindow {
         .with("monitor_snapshot", monitor, Monitor::snapshot)
         .command("process_details", details::read)
         .with("app_signal", monitor, Monitor::signal_app)
+        .with("app_stop", monitor, Monitor::stop_app)
+        .command("app_open", control::open_app)
         .command("process_signal", control::signal_processes)
         .command("process_priority", control::renice)
 }

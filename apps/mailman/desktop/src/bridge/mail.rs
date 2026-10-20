@@ -2,8 +2,8 @@ use std::hash::{DefaultHasher, Hash, Hasher};
 use std::path::PathBuf;
 
 use gio::prelude::*;
-use luft_app::{Commands, launch};
 use luft_app::portal::FileChooser;
+use luft_app::{Commands, launch};
 use sabine::SabineWindow;
 use serde::Serialize;
 use tokio::task::spawn_blocking;

@@ -1,3 +1,4 @@
+import * as api from '#lib/api/index.js';
 import { composer } from '#lib/compose/composer.svelte.js';
 import * as actions from '#lib/mail/actions.js';
 import { list } from '#lib/mail/list.svelte.js';
@@ -93,7 +94,8 @@ export function commands(shell: Shell): Command[] {
 		{ id: 'add-account', title: 'Add an account', run: shell.addAccount },
 		{ id: 'toggle-screener', title: mail.settings.screener ? 'Turn off the Screener' : 'Turn on the Screener', run: () => void mail.updateSettings({ screener: !mail.settings.screener }).then(list.load) },
 		{ id: 'toggle-bundles', title: mail.settings.bundles ? 'Show bundled mail in the inbox' : 'Bundle newsletters, receipts and updates', run: () => void mail.updateSettings({ bundles: !mail.settings.bundles }).then(list.load) },
-		{ id: 'shortcuts', title: 'Keyboard shortcuts', keys: '?', run: shell.showShortcuts }
+		{ id: 'shortcuts', title: 'Keyboard shortcuts', keys: '?', run: shell.showShortcuts },
+		{ id: 'quit', title: 'Quit Mailman', keys: 'Ctrl Q', run: () => void api.quit() }
 	];
 }
 

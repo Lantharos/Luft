@@ -52,6 +52,7 @@ function launch(url: string): Launch | null {
 export const takeLaunches = async () =>
 	isAvailable() ? (await app.takeOpenUrls()).map(launch).filter((launch) => launch !== null) : [];
 export const takeOpening = () => call<{ thread: number | null } | null>('take_opening');
+export const quit = () => call<void>('quit');
 export const setFocused = (focused: boolean) => call<void>('set_focused', { focused });
 export const saveSettings = (settings: Settings) => call<void>('save_settings', { settings });
 

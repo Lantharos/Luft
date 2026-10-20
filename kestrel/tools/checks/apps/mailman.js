@@ -7,6 +7,7 @@ import {settled} from '../lib/wait.js';
 import {withApp} from './lib/apps.js';
 import {children, exists, removeTree, write} from './lib/files.js';
 import {checkPalette, showDark, withPalette} from './lib/palette.js';
+import {checkBackground} from './mailman/background.js';
 import {checkDelivery} from './mailman/delivery.js';
 
 const {eventually} = checks('Luft app');
@@ -41,6 +42,7 @@ export async function run() {
       await checkPalette(app, palette, {accent: true});
       await checkDrop(app, palette);
     }));
+    await checkBackground();
     const stalwart = GLib.find_program_in_path('stalwart');
     if (stalwart) await checkDelivery(stalwart);
     else console.log('Kestrel Luft app check: mailman delivery skipped without stalwart');

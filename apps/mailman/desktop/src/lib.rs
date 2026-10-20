@@ -13,7 +13,7 @@ use sabine::SabineWindow;
 use state::MailmanState;
 
 pub const APP_ID: &str = "com.lantharos.mailman";
-pub const BACKGROUND: &str = "--background";
+const BACKGROUND: &str = "--background";
 
 const WINDOW: GlassWindow = GlassWindow {
     title: "Mailman",
@@ -23,35 +23,41 @@ const WINDOW: GlassWindow = GlassWindow {
     single_instance: Some(APP_ID),
 };
 
-fn window(window: SabineWindow, state: &MailmanState, background: bool) -> SabineWindow {
+fn launch_activation_token() -> Option<String> {
+    ["XDG_ACTIVATION_TOKEN", "DESKTOP_STARTUP_ID"]
+        .into_iter()
+        .find_map(|name| std::env::var(name).ok())
+        .filter(|token| !token.trim().is_empty())
+}
+
+fn window(window: SabineWindow, state: &MailmanState, opens_window: bool) -> SabineWindow {
     let attached = state.notifier.clone();
     let unfocused = state.notifier.clone();
     let window = WINDOW
         .apply(window)
-        .on_launched(move |process| attached.attach(process))
+        .background()
+        .on_launched(move |process| {
+            if opens_window {
+                process.present(launch_activation_token());
+            }
+            attached.attach(process);
+        })
         .on_visibility_changed(move |visibility| {
             if !visibility.visible {
                 unfocused.set_focused(false);
             }
         });
-    bridge::register(
-        if background {
-            window.background()
-        } else {
-            window
-        },
-        state,
-    )
+    bridge::register(window, state)
 }
 
 pub fn run_app() -> ! {
     let _ = rustls::crypto::ring::default_provider().install_default();
-    let background = std::env::args().any(|argument| argument == BACKGROUND);
+    let opens_window = !std::env::args().any(|argument| argument == BACKGROUND);
     let state = MailmanState::new();
     let started = state.clone();
     luft_app::run(
         &state.events,
-        |sabine| window(sabine, &state, background),
+        |sabine| window(sabine, &state, opens_window),
         move |_| started.start(),
     )
 }

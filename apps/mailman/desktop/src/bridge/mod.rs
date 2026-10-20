@@ -15,6 +15,9 @@ pub fn register(window: SabineWindow, state: &MailmanState) -> SabineWindow {
         .with("take_opening", state, |state, Empty {}| {
             Ok(state.notifier.take_opening())
         })
+        .with("quit", state, |_, Empty {}| -> Result<(), String> {
+            std::process::exit(0)
+        })
         .with("set_focused", state, |state, Focus { focused }| {
             state.notifier.set_focused(focused);
             Ok(())

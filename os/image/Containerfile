@@ -19,8 +19,8 @@ COPY os/image/files/ /
 COPY --from=parts keys/luft-secureboot.der /usr/share/luft/secure-boot/luft.der
 COPY --from=parts keys/luft-pcr-policy.pub.pem /usr/share/luft/secure-boot/pcr-policy.pem
 ARG FEDORA
-ARG VERSION=45.dev
-ARG IMAGE_REFERENCE=ghcr.io/lantharos/luft:${FEDORA}
+ARG VERSION=1.dev
+ARG IMAGE_REFERENCE=ghcr.io/lantharos/luft:1
 RUN --mount=type=bind,source=os/image/stages,target=/run/luft/stages \
     --mount=type=bind,from=parts,source=kestrel/typelibs.txt,target=/run/luft/typelibs.txt \
     /run/luft/stages/finalize.sh luft "${VERSION}" "${IMAGE_REFERENCE}"

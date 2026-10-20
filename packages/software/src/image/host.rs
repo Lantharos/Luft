@@ -55,8 +55,12 @@ pub struct Reference {
 }
 
 impl Reference {
+    fn current(&self) -> String {
+        luft_variant::renamed(&self.image).unwrap_or_else(|| self.image.clone())
+    }
+
     pub fn location(&self) -> Option<String> {
-        registry::location(&self.transport, &self.image)
+        registry::location(&self.transport, &self.current())
     }
 
     pub fn variant(&self) -> Variant {
@@ -65,7 +69,7 @@ impl Reference {
 
     pub fn as_variant(&self, variant: Variant) -> Option<Self> {
         Some(Self {
-            image: variant.reference(&self.image)?,
+            image: variant.reference(&self.current())?,
             transport: self.transport.clone(),
         })
     }

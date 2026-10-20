@@ -10,6 +10,23 @@ What protects a Luft computer, and against what. The services are [trustd and US
 - Each startup image names the exact system it belongs to by its composefs digest, and the system's files are checked against it with fs-verity, so a signed image never starts a changed system. Nothing is signed or rebuilt on the computer.
 - Shipping a Luft shim with the key built in would remove the one-time enrollment screen, but needs Microsoft's shim review and an HSM-backed CA.
 
+## Image signatures
+
+- Every system image is signed in CI when it's pushed to `ghcr.io/lantharos/luft`, by digest, with Luft's image key (a cosign key pair kept as the repository secrets `COSIGN_PRIVATE_KEY` and `COSIGN_PASSWORD`). The signatures sit next to the image in the registry as sigstore attachments, without a transparency-log entry.
+- The public key ships at `/usr/share/pki/containers/luft.pub`. `/etc/containers/policy.json` requires a signature by it for every tag of `ghcr.io/lantharos/luft` and keeps Fedora's defaults for everything else; `/etc/containers/registries.d/luft.yaml` tells the container tools where the signatures are. bootc reads both whenever it fetches the system, so updates, `bootc upgrade` and `bootc switch` refuse an image that isn't signed by the key, and Settings says the update isn't signed by Luft. Install Luft installs from the image on the stick, which the ISO workflow checks against the same key before building the stick.
+- The policy arrives with the image, so a computer accepts its first signed image from a version without one, and refuses unsigned ones from then on.
+- Anyone can check an image by hand with `cosign verify --key luft.pub --insecure-ignore-tlog=true ghcr.io/lantharos/luft:1-nightly`.
+
+### Changing the image key
+
+The old key has to keep working until every computer has an image that trusts the new one:
+
+1. Make the new key pair with `cosign generate-key-pair` and add `luft-next.pub` next to `luft.pub` in `os/image/files/usr/share/pki/containers`. In `policy.json`, replace `keyPath` with `"keyPaths": ["/usr/share/pki/containers/luft.pub", "/usr/share/pki/containers/luft-next.pub"]`. Keep signing with the old key and publish a few nightlies and a release, so computers learn the new key.
+2. Replace the `COSIGN_PRIVATE_KEY` and `COSIGN_PASSWORD` secrets with the new pair. Images are signed with the new key from the next build on.
+3. Once computers have moved on, make the new key `luft.pub`, drop the old one and go back to a single `keyPath`.
+
+A leaked key needs the same steps, done as fast as possible, plus re-signing or removing the images it signed. A computer that hasn't updated past step 1 trusts only the old key and has to be moved by hand with `bootc switch`.
+
 ## Games with anti-cheat
 
 Epic's Easy Anti-Cheat for Linux, and others like it, only let a game run when the computer can show it started the way its maker intended. Luft meets each of Epic's requirements by default:

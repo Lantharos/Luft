@@ -15,6 +15,20 @@ use crate::progress::Pull;
 const BOOTC: &str = "bootc";
 const PROGRESS_FD: i32 = 3;
 const SLOTS: [&str; 3] = ["booted", "staged", "rollback"];
+const UNSIGNED: &str = "This update isn't signed by Luft, so it wasn't downloaded.";
+const SIGNATURE_REFUSALS: [&str; 4] = [
+    "A signature was required",
+    "signature verification failed",
+    "is not accepted",
+    "rejected by policy",
+];
+
+fn unsigned(errors: &[u8]) -> bool {
+    let errors = String::from_utf8_lossy(errors);
+    SIGNATURE_REFUSALS
+        .iter()
+        .any(|refusal| errors.contains(refusal))
+}
 
 fn bootc(arguments: &[&str]) -> Result<Vec<u8>> {
     run(Command::new(BOOTC).args(arguments))
@@ -83,12 +97,16 @@ pub struct Reference {
     transport: String,
 }
 
-pub fn switch_target(variant: Variant) -> Result<Reference> {
+fn followed() -> Result<Reference> {
     let host: Followed = serde_json::from_slice(&bootc(&["status", "--format=json"])?)?;
-    let Reference { image, transport } = host
-        .spec
+    host.spec
         .image
-        .ok_or_else(|| anyhow!("This system doesn't get its updates from an image."))?;
+        .ok_or_else(|| anyhow!("This system doesn't get its updates from an image."))
+}
+
+pub fn switch_target(variant: Variant) -> Result<Reference> {
+    let Reference { image, transport } = followed()?;
+    let image = luft_variant::renamed(&image).unwrap_or(image);
     if Variant::of(&image) == variant {
         bail!("This system already uses that image.");
     }
@@ -105,7 +123,11 @@ pub struct Fetch {
 
 impl Fetch {
     pub fn upgrade() -> Result<Self> {
-        Self::start(&["upgrade", "--download-only"])
+        let renamed = luft_variant::renamed(&followed()?.image);
+        match renamed.as_deref().and_then(|image| image.rsplit_once(':')) {
+            Some((_, tag)) => Self::start(&["upgrade", "--download-only", "--tag", tag]),
+            None => Self::start(&["upgrade", "--download-only"]),
+        }
     }
 
     pub fn switch(target: &Reference) -> Result<Self> {
@@ -161,8 +183,29 @@ impl Fetch {
             if status.code().is_none() {
                 bail!("The download was stopped.");
             }
+            if unsigned(&errors) {
+                bail!(UNSIGNED);
+            }
             return Err(command::failure(BOOTC, &errors));
         }
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::unsigned;
+
+    #[test]
+    fn signature_refusals_are_told_apart_from_other_failures() {
+        for refused in [
+            "Opening image docker://ghcr.io/lantharos/luft:1-nightly: failed to invoke method OpenImage: A signature was required, but no signature exists",
+            "failed to invoke method OpenImage: cryptographic signature verification failed: invalid signature when validating ASN.1 encoded signature",
+        ] {
+            assert!(unsigned(refused.as_bytes()));
+        }
+        assert!(!unsigned(
+            b"Opening image: pinging container registry ghcr.io: connection refused"
+        ));
     }
 }

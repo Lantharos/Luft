@@ -84,8 +84,8 @@ mod tests {
         toml::from_str(images).unwrap()
     }
 
-    const NVIDIA_ONLY: &str = "[images.nvidia]\nsource = \"containers-storage:ghcr.io/lantharos/luft:45-nvidia\"\nsize = 2\n";
-    const UNIVERSAL: &str = "[images.default]\nsource = \"containers-storage:ghcr.io/lantharos/luft:45\"\nsize = 1\n[images.nvidia]\nsource = \"containers-storage:ghcr.io/lantharos/luft:45-nvidia\"\nsize = 2\n";
+    const NVIDIA_ONLY: &str = "[images.nvidia]\nsource = \"containers-storage:ghcr.io/lantharos/luft:1-nvidia\"\nsize = 2\n";
+    const UNIVERSAL: &str = "[images.default]\nsource = \"containers-storage:ghcr.io/lantharos/luft:1\"\nsize = 1\n[images.nvidia]\nsource = \"containers-storage:ghcr.io/lantharos/luft:1-nvidia\"\nsize = 2\n";
 
     #[test]
     fn a_stick_with_one_image_installs_that_one() {

@@ -25,6 +25,8 @@ env:
   CACHE: ghcr.io/lantharos/luft-cache
   LUFT_PARTS: ghcr.io/lantharos/luft-parts
   FEDORA: "45"
+  MAJOR: "1"
+  RETIRED_NIGHTLY: 45-nightly
 
 jobs:
   plan:
@@ -55,7 +57,7 @@ jobs:
         run: |
           if [[ "$GITHUB_REF_TYPE" == tag ]]; then
             version="${GITHUB_REF_NAME#v}"
-            tags=("$FEDORA" "$version")
+            tags=("$MAJOR" "$version")
             since="$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || git rev-parse HEAD~10)"
           else
             if [[ "$GITHUB_EVENT_NAME" == schedule && -z "$(git log --since=24.hours --format=%H -1)" ]]; then
@@ -63,8 +65,8 @@ jobs:
               echo "skip=1" >> "$GITHUB_OUTPUT"
               exit 0
             fi
-            version="$FEDORA.$(date -u +%Y%m%d).${{ github.run_number }}-nightly"
-            tags=("$FEDORA-nightly" "$version")
+            version="$MAJOR.$(date -u +%Y%m%d).${{ github.run_number }}-nightly"
+            tags=("$MAJOR-nightly" "$version" "$RETIRED_NIGHTLY")
             since="$(git rev-list -1 --before=24.hours HEAD)"
           fi
           delimiter="notes-$(openssl rand -hex 8)"
@@ -196,39 +198,32 @@ jobs:
         if: always()
         run: rm -rf "$LUFT_KEYS"
 
-      - name: Push
+      - name: Push and sign
+        env:
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
-          podman push "localhost/luft:$FEDORA" "$IMAGE:$VERSION"
-          podman push "localhost/luft:$FEDORA-nvidia" "$IMAGE:$VERSION-nvidia"
+          key="$(mktemp -d)"
+          trap 'rm -rf "$key"' EXIT
+          printf '%s\n' "$COSIGN_PRIVATE_KEY" > "$key/private"
+          printf '%s' "$COSIGN_PASSWORD" > "$key/password"
+          install -Dm644 -t ~/.config/containers/registries.d os/image/files/etc/containers/registries.d/luft.yaml
+          for suffix in "" -nvidia; do
+            podman push --sign-by-sigstore-private-key "$key/private" --sign-passphrase-file "$key/password" \
+              "localhost/luft:$FEDORA$suffix" "$IMAGE:$VERSION$suffix"
+          done
 
   publish:
     needs: [plan, image]
     if: always() && needs.image.result == 'success'
     runs-on: ubuntu-26.04
     timeout-minutes: 15
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
     env:
       VERSION: ${{ needs.plan.outputs.version }}
       TAGS: ${{ needs.plan.outputs.tags }}
     steps:
-      - uses: sigstore/cosign-installer@v4.1.2
-
       - name: Sign in to the registry
-        run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | podman login ghcr.io --username "${{ github.actor }}" --password-stdin
-          echo "${{ secrets.GITHUB_TOKEN }}" | cosign login ghcr.io --username "${{ github.actor }}" --password-stdin
-
-      - name: Sign both images
-        run: |
-          for suffix in "" -nvidia; do
-            digest="$(skopeo inspect --format '{{.Digest}}' "docker://$IMAGE:$VERSION$suffix")"
-            cosign sign --yes "$IMAGE@$digest"
-            cosign verify --certificate-identity "https://github.com/$GITHUB_WORKFLOW_REF" \
-              --certificate-oidc-issuer https://token.actions.githubusercontent.com "$IMAGE@$digest" > /dev/null
-          done
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | podman login ghcr.io --username "${{ github.actor }}" --password-stdin
 
       - name: Tag both images
         run: |

@@ -166,10 +166,11 @@ check_whole_drive() {
     fail "starting doesn't sign ada in by itself"
   [[ "$(cat "$state/lib/luft-installer/first-boot")" == ada ]] || fail "the first start won't open setup"
   pass "every start signs ada straight into setup until it's finished"
-  local tag=45
-  grep -q '^\[images\.nvidia\]$' /usr/lib/luft-installer/install.toml && tag=45-nvidia
-  grep -rqsx ".*ghcr.io/lantharos/luft:$tag" "$TARGET"/state/deploy/*/*.origin || fail "updates won't come from the image the stick carries"
-  pass "updates come from ghcr.io/lantharos/luft:$tag, the image the stick carries"
+  local followed
+  followed="$(cat /usr/share/luft/image-reference)"
+  grep -q '^\[images\.nvidia\]$' /usr/lib/luft-installer/install.toml && followed+=-nvidia
+  grep -rqsx ".*$followed" "$TARGET"/state/deploy/*/*.origin || fail "updates won't come from the image the stick carries"
+  pass "updates come from $followed, the image the stick carries"
   umount "$TARGET"
   mount -o ro /dev/vdb1 "$TARGET" || fail "the EFI system partition doesn't mount"
   [[ -f "$TARGET/EFI/luft/grubx64.efi" && -f "$TARGET/EFI/BOOT/BOOTX64.EFI" && ! -e "$TARGET/EFI/systemd" ]] &&

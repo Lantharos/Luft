@@ -1,7 +1,9 @@
+mod channel;
 mod graphics;
 
 use serde::{Deserialize, Serialize};
 
+pub use channel::renamed;
 pub use graphics::nvidia_cards;
 
 const NVIDIA_TAG: &str = "-nvidia";
@@ -70,20 +72,20 @@ mod tests {
     fn each_channel_keeps_its_tag_and_changes_only_the_variant() {
         for (standard, nvidia) in [
             (
-                "ghcr.io/lantharos/luft:45",
-                "ghcr.io/lantharos/luft:45-nvidia",
+                "ghcr.io/lantharos/luft:1",
+                "ghcr.io/lantharos/luft:1-nvidia",
             ),
             (
-                "ghcr.io/lantharos/luft:45-nightly",
-                "ghcr.io/lantharos/luft:45-nightly-nvidia",
+                "ghcr.io/lantharos/luft:1-nightly",
+                "ghcr.io/lantharos/luft:1-nightly-nvidia",
             ),
             (
-                "ghcr.io/lantharos/luft:45.20261014",
-                "ghcr.io/lantharos/luft:45.20261014-nvidia",
+                "ghcr.io/lantharos/luft:1.20261014",
+                "ghcr.io/lantharos/luft:1.20261014-nvidia",
             ),
             (
-                "10.0.2.2:5000/lantharos/luft:45",
-                "10.0.2.2:5000/lantharos/luft:45-nvidia",
+                "10.0.2.2:5000/lantharos/luft:1",
+                "10.0.2.2:5000/lantharos/luft:1-nvidia",
             ),
         ] {
             assert_eq!(Variant::Nvidia.reference(standard).as_deref(), Some(nvidia));

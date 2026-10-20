@@ -8,6 +8,7 @@ version = "0.1.0"
 icon = "public/favicon.svg"
 cargo_manifest = "desktop/Cargo.toml"
 mime_types = ["x-scheme-handler/mailto", "message/rfc822"]
+autostart_arguments = "--background"
 
 [install]
 command = "cargo run --manifest-path desktop/Cargo.toml --"

@@ -4,10 +4,12 @@ use anyhow::{Context, Result, anyhow};
 use luft_dbus::objects::Objects;
 use luft_disks::udisks::{self, BLOCK, Options, TABLE, bytes_text};
 use luft_disks::{mounting, resize};
+use luft_i18n::t;
 use zbus::{OwnedObjectPath, Variant};
 
 use super::layout::{Part, Role};
 use super::plan::Plan;
+use crate::L10N;
 
 pub struct Created {
     pub role: Role,
@@ -63,7 +65,7 @@ async fn create(drive: &str, part: &Part) -> Result<String> {
     )
     .await
     .map_err(failed)
-    .with_context(|| format!("Couldn't make the {} partition", part.role.name()))
+    .with_context(|| part.role.creation_failed())
 }
 
 async fn describe(role: Role, block: &str) -> Result<Created> {
@@ -86,7 +88,7 @@ pub async fn apply(plan: &Plan) -> Result<Vec<Created>> {
         resize::resize(&shrink.block, shrink.size, true)
             .await
             .map_err(failed)
-            .context("Windows couldn't be made smaller")?;
+            .with_context(|| t!(L10N, "installer-shrink-failed"))?;
     }
     let mut created = Vec::with_capacity(plan.parts.len());
     for part in &plan.parts {

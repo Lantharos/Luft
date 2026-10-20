@@ -6,6 +6,7 @@ mod session;
 mod trust;
 
 use luft_app::{Appearance, Commands, Events};
+use luft_i18n::{Localizer, localizer, t};
 use luft_meet::{Handoff, Intent};
 use sabine::{SabineLifecyclePolicy, SabineWindow, SingleInstancePolicy, WindowRegion};
 use serde::Serialize;
@@ -15,6 +16,8 @@ const APP_ID: &str = "com.lantharos.setup";
 const SIZE: (u32, u32) = (820, 600);
 const RADIUS: i32 = 22;
 const MEET_NOTES: &str = "/run/initramfs/live/meet.json";
+
+pub static L10N: Localizer = localizer!("locales", ["desktop"]);
 
 #[derive(Serialize)]
 struct AppState {
@@ -31,7 +34,7 @@ fn meet_intent() -> Option<Intent> {
 
 fn window(window: SabineWindow) -> SabineWindow {
     window
-        .title("Set up Luft")
+        .title(t!(L10N, "desktop-window-title"))
         .fixed_size(SIZE.0, SIZE.1)
         .frameless()
         .glass()

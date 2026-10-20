@@ -1,7 +1,9 @@
 use anyhow::{Result, bail};
+use luft_i18n::t;
 use serde::Deserialize;
 
 use super::layout::{self, Part, Startup};
+use crate::L10N;
 use crate::install::Destination;
 use crate::install::windows::Choices;
 use crate::survey::{self, ALIGNMENT, Drive, Survey};
@@ -42,10 +44,10 @@ pub struct Plan {
 
 fn drive<'a>(survey: &'a Survey, block: &str) -> Result<&'a Drive> {
     let Some(drive) = survey.drives.iter().find(|drive| drive.block == block) else {
-        bail!("That drive isn't connected anymore.");
+        bail!(t!(L10N, "installer-drive-gone"));
     };
     if drive.blocked.is_some() {
-        bail!("Luft can't be installed on that drive.");
+        bail!(t!(L10N, "installer-drive-unusable"));
     }
     Ok(drive)
 }
@@ -53,10 +55,14 @@ fn drive<'a>(survey: &'a Survey, block: &str) -> Result<&'a Drive> {
 pub fn resolve(survey: &Survey, target: &Target) -> Result<Destination> {
     if let Target::Replace { system } = target {
         let Some(found) = survey.systems.iter().find(|found| found.id == *system) else {
-            bail!("That system isn't there anymore.");
+            bail!(t!(L10N, "installer-system-gone"));
         };
         let Some(plan) = &found.plan else {
-            bail!("Luft can't replace {} yet.", found.name);
+            bail!(t!(
+                L10N,
+                "installer-system-unreplaceable",
+                system = found.name.as_str()
+            ));
         };
         return Ok(Destination::Replace(Box::new(plan.clone())));
     }
@@ -68,7 +74,7 @@ fn partitions(survey: &Survey, target: &Target) -> Result<Plan> {
         Target::Whole { drive: block } => {
             let drive = drive(survey, block)?;
             if drive.meet {
-                bail!("Luft is starting from that drive right now, so it can't be erased.");
+                bail!(t!(L10N, "installer-drive-running"));
             }
             Ok(Plan {
                 drive: drive.block.clone(),
@@ -86,11 +92,11 @@ fn partitions(survey: &Survey, target: &Target) -> Result<Plan> {
                 .as_ref()
                 .filter(|windows| windows.blocked.is_none())
             else {
-                bail!("Windows on that drive can't be made smaller.");
+                bail!(t!(L10N, "installer-windows-unshrinkable"));
             };
             let size = survey::room::align_down(*size);
             if size < survey.smallest_system + startup.space() || size > windows.room {
-                bail!("That size doesn't fit next to Windows.");
+                bail!(t!(L10N, "installer-size-wont-fit"));
             }
             let kept = windows.size - size;
             Ok(Plan {
@@ -111,10 +117,10 @@ fn partitions(survey: &Survey, target: &Target) -> Result<Plan> {
             let drive = drive(survey, block)?;
             let startup = Startup::for_esp(drive.esp.map(|esp| esp.size));
             let Some(space) = drive.free.iter().find(|space| space.offset == *offset) else {
-                bail!("That free space isn't there anymore.");
+                bail!(t!(L10N, "installer-space-gone"));
             };
             if space.size < survey.smallest_system + startup.space() + ALIGNMENT {
-                bail!("That free space is too small for Luft.");
+                bail!(t!(L10N, "installer-space-too-small"));
             }
             Ok(Plan {
                 drive: drive.block.clone(),

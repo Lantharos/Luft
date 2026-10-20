@@ -3,6 +3,7 @@
 	import Wifi from '@lucide/svelte/icons/wifi';
 	import WifiHigh from '@lucide/svelte/icons/wifi-high';
 	import WifiLow from '@lucide/svelte/icons/wifi-low';
+	import { t } from '@luft/i18n';
 	import { PasswordField } from '@luft/ui';
 	import { needsPassword, type WifiNetwork } from '#lib/api/network.js';
 
@@ -18,9 +19,8 @@
 	let password = $state('');
 
 	let Signal = $derived(network.strength > 66 ? Wifi : network.strength > 33 ? WifiHigh : WifiLow);
-	let status = $derived(
-		problem || { connected: 'Connected', connecting: 'Connecting…', disconnected: network.joined ? 'Saved' : '', unplugged: '' }[network.state]
-	);
+	let statusId = $derived({ connected: 'setup-network-connected', connecting: 'setup-network-connecting', disconnected: network.joined ? 'setup-network-saved' : '', unplugged: '' }[network.state]);
+	let status = $derived(problem || (statusId && t(statusId)));
 </script>
 
 <div class="row" class:open>
@@ -36,8 +36,8 @@
 	</button>
 	{#if open}
 		<form class="flex items-start gap-2 px-4 pb-4" onsubmit={(event) => (event.preventDefault(), onjoin(password))}>
-			<div class="flex-1"><PasswordField bind:value={password} label="Password" placeholder="Password" /></div>
-			<button type="submit" class="button primary large" disabled={!password}>Join</button>
+			<div class="flex-1"><PasswordField bind:value={password} label={t('setup-network-password')} placeholder={t('setup-network-password')} /></div>
+			<button type="submit" class="button primary large" disabled={!password}>{t('setup-network-join')}</button>
 		</form>
 	{/if}
 </div>

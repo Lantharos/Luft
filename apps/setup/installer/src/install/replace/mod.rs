@@ -7,10 +7,12 @@ mod toolbox;
 use std::path::Path;
 
 use anyhow::{Context, Result};
+use luft_i18n::t;
 
 use super::configure::deployment::Deployment;
 use super::drive::layout::Role;
 use super::drive::target::Mounted;
+use crate::L10N;
 use crate::survey::linux::old::{self, OldSystem};
 use crate::survey::linux::{Part, Plan};
 use crate::system::command::Tool;
@@ -160,7 +162,7 @@ impl Kept {
         let opened = Opened::new(&home.part.device, &options, &at)?;
         deployment
             .relabel_kept(&[opened.path().to_owned()])
-            .context("Your files couldn't be labelled for Luft")
+            .with_context(|| t!(L10N, "installer-relabel-failed"))
     }
 
     fn record(&self) -> record::OldSystem {
@@ -191,7 +193,7 @@ impl Kept {
             (&self.top, &self.plan.subvolume, &self.old_name)
         {
             std::fs::rename(top.path().join(current), top.path().join(name))
-                .context("The old system couldn't be set aside")?;
+                .with_context(|| t!(L10N, "installer-set-aside-failed"))?;
         }
         Ok(())
     }

@@ -4,10 +4,12 @@ pub mod unpack;
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
+use luft_i18n::t;
 use luft_meet::handoff::{self, Handoff, Intent};
 use luft_meet::moving_box::{self, Manifest};
 use serde::Serialize;
 
+use crate::L10N;
 use crate::system::command::Tool;
 
 const BY_PARTUUID: &str = "/dev/disk/by-partuuid";
@@ -35,7 +37,7 @@ impl Opened {
             .arg(partition_device(guid))
             .arg(at)
             .run()
-            .context("The moving box couldn't be opened")?;
+            .with_context(|| t!(L10N, "installer-box-unopened"))?;
         Ok(Self { at: at.to_owned() })
     }
 
@@ -45,7 +47,7 @@ impl Opened {
 
     pub fn manifest(&self) -> Result<Manifest> {
         let text = std::fs::read_to_string(self.at.join(moving_box::MANIFEST))
-            .context("The moving box has no list of what's in it")?;
+            .with_context(|| t!(L10N, "installer-box-no-list"))?;
         Manifest::parse(&text).map_err(anyhow::Error::msg)
     }
 }

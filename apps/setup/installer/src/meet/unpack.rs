@@ -3,10 +3,12 @@ use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
+use luft_i18n::t;
 use luft_meet::moving_box::Manifest;
 use luft_meet::wifi;
 use luft_windows::bluetooth::{bluez, saved_pairings};
 
+use crate::L10N;
 use crate::install::Account;
 use crate::install::configure::deployment::Deployment;
 use crate::system::command::Tool;
@@ -34,8 +36,13 @@ impl Copying<'_> {
             if kind.is_dir() {
                 self.tree(&entry.path(), &target)?;
             } else if kind.is_file() {
-                self.done += copy(&entry.path(), &target)
-                    .with_context(|| format!("Couldn't unpack {}", entry.path().display()))?;
+                self.done += copy(&entry.path(), &target).with_context(|| {
+                    t!(
+                        L10N,
+                        "installer-unpack-failed",
+                        path = entry.path().display().to_string()
+                    )
+                })?;
                 (self.progress)(self.done as f64 / self.total.max(1) as f64);
             }
         }
@@ -121,7 +128,7 @@ fn wallpaper(from: &Path, manifest: &Manifest, home: &Path, user: &str) -> Resul
     };
     let name = Path::new(wallpaper)
         .file_name()
-        .context("The wallpaper has no name")?;
+        .with_context(|| t!(L10N, "installer-wallpaper-unnamed"))?;
     let target = home.join(BACKGROUNDS).join(name);
     fs::create_dir_all(target.parent().expect("backgrounds live in a folder"))?;
     copy(&from.join(wallpaper), &target)?;

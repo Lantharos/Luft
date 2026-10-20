@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { PasswordField, TextField } from '@luft/ui';
 	import StepFrame from '#lib/components/StepFrame.svelte';
 	import { flow } from '#lib/state/flow.svelte.js';
@@ -29,9 +30,9 @@
 		if (!editedUserName) userName = suggested;
 	});
 
-	let nameError = $derived(userName && !USER_NAME.test(userName) ? 'Use lowercase letters, numbers, - and _' : '');
-	let fullNameError = $derived(/[:,\n]/.test(fullName) ? 'Leave out commas and colons' : '');
-	let repeatError = $derived(repeated && repeated !== password ? 'The passwords don’t match' : '');
+	let nameError = $derived(userName && !USER_NAME.test(userName) ? t('setup-account-user-name-invalid') : '');
+	let fullNameError = $derived(/[:,\n]/.test(fullName) ? t('setup-account-full-name-invalid') : '');
+	let repeatError = $derived(repeated && repeated !== password ? t('setup-account-mismatch') : '');
 	let ready = $derived(Boolean(fullName.trim() && userName && !nameError && !fullNameError && password && repeated === password));
 
 	async function submit(event: SubmitEvent) {
@@ -51,18 +52,18 @@
 </script>
 
 <form class="contents" onsubmit={submit}>
-	<StepFrame title="Who’s using this computer?" description="This is the account you sign in with. You can add more people later in Settings." hideBack={saving}>
+	<StepFrame title={t('setup-account-title')} description={t('setup-account-description')} hideBack={saving}>
 		<div class="grid max-w-[520px] gap-3">
-			<TextField bind:value={fullName} label="Your name" showLabel placeholder="Ada Lovelace" autocomplete="name" error={fullNameError} live />
-			<TextField bind:value={userName} label="User name" showLabel error={nameError} live onkeydown={() => (editedUserName = true)} />
-			<PasswordField bind:value={password} label="Password" showLabel autocomplete="new-password" />
-			<PasswordField bind:value={repeated} label="Type it again" showLabel autocomplete="new-password" error={repeatError} live />
+			<TextField bind:value={fullName} label={t('setup-account-full-name')} showLabel placeholder={t('setup-account-full-name-example')} autocomplete="name" error={fullNameError} live />
+			<TextField bind:value={userName} label={t('setup-account-user-name')} showLabel error={nameError} live onkeydown={() => (editedUserName = true)} />
+			<PasswordField bind:value={password} label={t('setup-account-password')} showLabel autocomplete="new-password" />
+			<PasswordField bind:value={repeated} label={t('setup-account-repeat')} showLabel autocomplete="new-password" error={repeatError} live />
 			{#if problem}
 				<p class="text-[13.5px] text-[var(--danger)]">{problem}</p>
 			{/if}
 		</div>
 		{#snippet actions()}
-			<button type="submit" class="button primary large px-6" disabled={!ready || saving}>{saving ? 'Saving…' : 'Continue'}</button>
+			<button type="submit" class="button primary large px-6" disabled={!ready || saving}>{t(saving ? 'setup-saving' : 'setup-continue')}</button>
 		{/snippet}
 	</StepFrame>
 </form>

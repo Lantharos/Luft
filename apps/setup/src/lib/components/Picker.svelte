@@ -2,6 +2,7 @@
 	import type { Component } from 'svelte';
 	import Check from '@lucide/svelte/icons/check';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
+	import { t } from '@luft/i18n';
 	import { Popover, SearchField } from '@luft/ui';
 
 	interface Props {
@@ -75,7 +76,7 @@
 {#if open && trigger}
 	<Popover anchor={trigger} {label} role="listbox" maxHeight={340} onclose={() => (open = false)}>
 		<div class="sticky top-0 z-10 bg-[var(--popover)] p-1 pb-2">
-			<SearchField bind:this={search} bind:value={query} label="Search" onkeydown={keydown} />
+			<SearchField bind:this={search} bind:value={query} label={t('setup-picker-search')} onkeydown={keydown} />
 		</div>
 		{#each matches as item, index (key(item))}
 			<button type="button" class="option" class:highlighted={index === highlighted} role="option" aria-selected={key(item) === selected} onpointerenter={() => (highlighted = index)} onclick={() => choose(item)}>
@@ -90,7 +91,7 @@
 				{/if}
 			</button>
 		{:else}
-			<p class="px-3 py-4 text-[13px] text-[var(--text-muted)]">Nothing matches</p>
+			<p class="px-3 py-4 text-[13px] text-[var(--text-muted)]">{t('setup-picker-no-match')}</p>
 		{/each}
 	</Popover>
 {/if}

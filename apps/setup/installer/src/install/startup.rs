@@ -1,9 +1,11 @@
 use std::path::Path;
 
 use anyhow::{Context, Result};
+use luft_i18n::t;
 use serde::Deserialize;
 
 use super::drive::target::Mounted;
+use crate::L10N;
 use crate::system::command::Tool;
 
 const TRUST: [&str; 3] = [
@@ -30,7 +32,7 @@ pub fn place(mounted: &Mounted, at: &Path) -> Result<()> {
         .args(["startup", "install", "--esp"])
         .arg(at)
         .run()
-        .context("Luft's boot menu couldn't be put on the EFI system partition");
+        .with_context(|| t!(L10N, "installer-boot-menu-failed"));
     let unmounted = Tool::new("umount").arg(at).run();
     placed.and(unmounted)
 }
@@ -57,7 +59,7 @@ pub fn ask_shim_to_trust_luft() -> Result<String> {
         .args(TRUST)
         .arg("EnrollSigningKey")
         .output()
-        .context("Luft's Secure Boot key couldn't be queued for the next restart")?;
+        .with_context(|| t!(L10N, "installer-key-queue-failed"))?;
     let (code,): (String,) = serde_json::from_str::<Reply<(String,)>>(&reply)?.data;
     Ok(code)
 }

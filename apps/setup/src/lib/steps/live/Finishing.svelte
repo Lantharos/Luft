@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { i18n, t } from '@luft/i18n';
 	import { restart, finishSetup } from '#lib/api/system.js';
 	import StepFrame from '#lib/components/StepFrame.svelte';
 	import EnrollSteps from '#lib/components/trust/EnrollSteps.svelte';
@@ -6,17 +7,18 @@
 	import { setup } from '#lib/state/setup.svelte.js';
 
 	const STAGES: Record<string, string> = {
-		idle: 'Getting ready',
-		preparing: 'Making room for Luft',
-		copying: 'Copying Luft',
-		waiting: 'Finishing up',
-		configuring: 'Setting up your account',
-		finished: 'Done'
+		idle: 'setup-stage-idle',
+		preparing: 'setup-stage-preparing',
+		copying: 'setup-stage-copying',
+		waiting: 'setup-stage-waiting',
+		configuring: 'setup-stage-configuring',
+		finished: 'setup-stage-finished'
 	};
 
 	let status = $derived(install.status);
 	let code = $derived(status?.secureBootCode ?? '');
 	let percent = $derived(Math.round((status?.progress ?? 0) * 100));
+	let percentFormat = $derived(new Intl.NumberFormat(i18n.formats, { style: 'percent' }));
 	let problem = $state('');
 	let fromStick = $derived(!install.intent);
 
@@ -27,54 +29,52 @@
 </script>
 
 {#if install.failed}
-	<StepFrame title="Luft couldn’t be installed" description={status?.error || 'Something went wrong while installing.'}>
+	<StepFrame title={t('setup-finishing-failed-title')} description={status?.error || t('setup-finishing-failed-description')}>
 		<p class="max-w-[540px] text-[14px] leading-relaxed text-[var(--text-soft)]">
-			Your computer still starts the way it did before. You can keep using Luft {fromStick ? 'from the USB stick' : 'as it is now'}, or restart and try again.
+			{t(fromStick ? 'setup-finishing-failed-stick' : 'setup-finishing-failed-trying')}
 		</p>
 		{#snippet actions()}
-			<button type="button" class="plain-button large" onclick={() => finishSetup()}>{fromStick ? 'Use Luft from the stick' : 'Keep trying Luft'}</button>
-			<button type="button" class="button large px-6" onclick={restartNow}>Restart</button>
+			<button type="button" class="plain-button large" onclick={() => finishSetup()}>{t(fromStick ? 'setup-finishing-use-stick' : 'setup-finishing-keep-trying')}</button>
+			<button type="button" class="button large px-6" onclick={restartNow}>{t('setup-restart')}</button>
 		{/snippet}
 	</StepFrame>
 {:else if install.finished && code}
 	<StepFrame
-		title="Luft is installed"
-		description={fromStick
-			? 'Take out the USB stick once the screen goes dark. A blue screen then asks to trust Luft. Use the keyboard there.'
-			: 'Right after the restart, a blue screen asks to trust Luft. Use the keyboard there.'}
+		title={t('setup-finishing-installed-title')}
+		description={t(fromStick ? 'setup-finishing-trust-stick' : 'setup-finishing-trust')}
 	>
 		<EnrollSteps {code} />
 		{#if problem}
 			<p class="mt-5 text-[13.5px] text-[var(--danger)]">{problem}</p>
 		{/if}
 		{#snippet actions()}
-			<button type="button" class="button primary large px-6" onclick={restartNow}>Restart now</button>
+			<button type="button" class="button primary large px-6" onclick={restartNow}>{t('setup-restart-now')}</button>
 		{/snippet}
 	</StepFrame>
 {:else if install.finished}
 	<StepFrame
-		title="Luft is installed"
-		description={fromStick ? 'Restart to start using it. Take out the USB stick once the screen goes dark.' : 'Restart to start using it.'}
+		title={t('setup-finishing-installed-title')}
+		description={t(fromStick ? 'setup-finishing-restart-stick' : 'setup-finishing-restart')}
 	>
 		{#if problem}
 			<p class="text-[13.5px] text-[var(--danger)]">{problem}</p>
 		{/if}
 		{#snippet actions()}
-			<button type="button" class="button primary large px-6" onclick={restartNow}>Restart now</button>
+			<button type="button" class="button primary large px-6" onclick={restartNow}>{t('setup-restart-now')}</button>
 		{/snippet}
 	</StepFrame>
 {:else}
-	<StepFrame title="Almost there" description="Luft is being copied to your computer. This takes a few minutes.">
+	<StepFrame title={t('setup-finishing-title')} description={t('setup-finishing-description')}>
 		<div class="flex max-w-[540px] flex-col gap-3 pt-6">
 			<div class="flex items-baseline justify-between text-[15px]">
-				<span class="font-medium">{STAGES[status?.stage ?? 'idle']}</span>
-				<span class="text-[var(--text-muted)] tabular-nums">{percent}%</span>
+				<span class="font-medium">{t(STAGES[status?.stage ?? 'idle'])}</span>
+				<span class="text-[var(--text-muted)] tabular-nums">{percentFormat.format(percent / 100)}</span>
 			</div>
 			<div class="h-2 overflow-hidden rounded-full bg-[var(--surface-hover)]">
 				<div class="progress-fill h-full rounded-full bg-[var(--accent)]" style:--progress={percent / 100}></div>
 			</div>
 			{#if setup.hardware.portable && setup.hardware.onBattery}
-				<p class="mt-2 text-[13.5px] text-[var(--text-soft)]">Keep your computer plugged in until it’s done.</p>
+				<p class="mt-2 text-[13.5px] text-[var(--text-soft)]">{t('setup-finishing-plug-in')}</p>
 			{/if}
 		</div>
 	</StepFrame>

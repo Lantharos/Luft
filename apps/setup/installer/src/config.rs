@@ -2,8 +2,11 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
+use luft_i18n::t;
 use luft_variant::Variant;
 use serde::Deserialize;
+
+use crate::L10N;
 
 const GIB: u64 = 1 << 30;
 const IMAGE_REFERENCE: &str = "/usr/share/luft/image-reference";
@@ -62,9 +65,9 @@ impl Config {
     pub fn image(&self, wanted: &str) -> Result<Image> {
         let (variant, source) = self
             .chosen(wanted)
-            .with_context(|| format!("There's no {wanted} image to install."))?;
+            .with_context(|| t!(L10N, "installer-no-image", variant = wanted))?;
         let running = std::fs::read_to_string(IMAGE_REFERENCE)
-            .with_context(|| format!("Couldn't read {IMAGE_REFERENCE}"))?;
+            .with_context(|| t!(L10N, "installer-read-failed", path = IMAGE_REFERENCE))?;
         let target = Variant::named(variant)
             .reference(running.trim())
             .with_context(|| format!("{IMAGE_REFERENCE} names no image tag"))?;

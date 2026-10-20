@@ -71,6 +71,7 @@ export const catalog = () => invoke<Catalog>('regional_catalog');
 export const locate = () => invoke<Location | null>('regional_locate');
 export const useKeyboard = (layout: string, variant: string) => invoke<void>('regional_keyboard', { layout, variant }, { timeoutMs: WAIT_FOR_PERSON });
 export const useZone = (zone: string) => invoke<void>('regional_zone', { zone }, { timeoutMs: WAIT_FOR_PERSON });
+export const useLanguage = (language: string) => invoke<void>('regional_language', { language });
 export const formatsCountry = () => invoke<string | null>('regional_formats_country');
 export const setFormats = (region: string) => invoke<void>('regional_set_formats', { region });
 

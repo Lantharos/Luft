@@ -11,7 +11,10 @@ mod system;
 use std::process::ExitCode;
 
 use clap::Parser;
+use luft_i18n::{Localizer, localizer};
 use options::Command;
+
+pub static L10N: Localizer = localizer!("locales", ["installer"]);
 
 fn main() -> ExitCode {
     let options = options::Options::parse();

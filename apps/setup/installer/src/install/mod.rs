@@ -20,12 +20,14 @@ use configure::{handoff, networks};
 use drive::partition;
 use drive::plan::Plan;
 use drive::target::Mounted;
+use luft_i18n::t;
 use replace::Kept;
 use windows::Windows;
 
 use crate::survey::linux;
 use crate::system::wait;
 
+use crate::L10N;
 use crate::meet::{self, reclaim, unpack};
 
 const PREPARED: f64 = 0.04;
@@ -206,7 +208,7 @@ fn install(job: &Job, report: &impl Fn(Status)) -> Result<()> {
             PREPARED + (copied - PREPARED) * done,
         ))
     })
-    .context("Luft couldn't be copied")?;
+    .with_context(|| t!(L10N, "installer-copy-failed"))?;
     startup::place(&mounted, &job.target.with_extension("esp"))?;
     report(Status::at(Stage::Waiting, copied));
     let (regional, account) = job
@@ -248,7 +250,7 @@ fn install(job: &Job, report: &impl Fn(Status)) -> Result<()> {
             }
             account.name
         }
-        (None, None) => anyhow::bail!("The new account is missing"),
+        (None, None) => anyhow::bail!(t!(L10N, "installer-account-missing")),
     };
     if let Some(meet) = &job.meet {
         reclaim::remember(&deployment.var(STATE), meet)?;

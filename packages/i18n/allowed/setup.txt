@@ -1,0 +1,10 @@
+apps/setup/src/lib/components/trust/EnrollSteps.svelte	Press any key to perform\nMOK management
+apps/setup/src/lib/components/trust/EnrollSteps.svelte	Shim
+apps/setup/src/lib/components/trust/EnrollSteps.svelte	Perform MOK management
+apps/setup/src/lib/components/trust/EnrollSteps.svelte	Continue boot
+apps/setup/src/lib/components/trust/EnrollSteps.svelte	Enroll MOK
+apps/setup/src/lib/components/trust/EnrollSteps.svelte	Enroll key from disk
+apps/setup/src/lib/components/trust/EnrollSteps.svelte	Enroll hash from disk
+apps/setup/src/lib/components/trust/EnrollSteps.svelte	Enroll the key(s)?
+apps/setup/src/lib/steps/live/destination/MeetRoom.svelte	Windows
+apps/setup/src/lib/steps/live/network/Network.svelte	Wi-Fi

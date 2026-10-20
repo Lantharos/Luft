@@ -15,6 +15,7 @@ clap = { version = "4.6.7", features = ["derive"] }
 libc = "0.2.190"
 luft-dbus = { path = "../../../packages/dbus" }
 luft-disks = { path = "../../../packages/disks" }
+luft-i18n = { path = "../../../packages/i18n" }
 luft-meet = { path = "../../../packages/meet" }
 luft-variant = { path = "../../../packages/variant" }
 luft-windows = { path = "../../../packages/windows" }

@@ -2,11 +2,14 @@ use futures_util::StreamExt;
 use luft_app::dbus::service::{Map, Service, absent, get};
 use luft_app::dbus::{error_message, error_name, failed};
 use luft_app::{Commands, Events};
+use luft_i18n::t;
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use zbus::DynamicType;
 use zbus::wire::DynamicDeserialize;
+
+use crate::L10N;
 
 pub const INSTALLER: Service = Service {
     name: "com.lantharos.Installer1",
@@ -56,7 +59,7 @@ pub async fn state() -> Result<Option<State>, String> {
 fn explain(error: &zbus::Error) -> String {
     match (error_name(error), error_message(error)) {
         (Some(name), Some(message)) if name.starts_with(ERROR) => message.to_owned(),
-        _ if absent(error) => "The installer isn't available on this computer".to_owned(),
+        _ if absent(error) => t!(L10N, "desktop-installer-unavailable"),
         _ => failed(error),
     }
 }

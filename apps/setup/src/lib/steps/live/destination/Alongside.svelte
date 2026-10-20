@@ -1,5 +1,6 @@
 <script lang="ts">
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
+	import { t } from '@luft/i18n';
 	import { SplitBar } from '@luft/ui';
 	import type { Drive, WindowsVolume } from '#lib/api/installer.js';
 	import { install } from '#lib/state/install.svelte.js';
@@ -39,7 +40,7 @@
 	<div class="flex flex-col gap-6">
 		<SplitBar total={windows.size} used={windows.used} value={size} {min} {max} step={GIB} onchange={(next) => (size = next)} />
 		<p class="text-[13.5px] leading-relaxed text-[var(--text-soft)]">
-			Drag to share {drive.name} between Windows and Luft. Windows keeps all of its files and some room to grow.
+			{t('setup-alongside-hint', { drive: drive.name })}
 		</p>
 		<WindowsOptions {windows} />
 		{#if install.startError}

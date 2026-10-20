@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Cable from '@lucide/svelte/icons/cable';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
+	import { t } from '@luft/i18n';
 	import { Switch } from '@luft/ui';
 	import * as network from '#lib/api/network.js';
 	import type { Network, WifiNetwork } from '#lib/api/network.js';
@@ -10,8 +11,8 @@
 	import WifiRow from './WifiRow.svelte';
 
 	const SHOWN = 6;
-	const FAILED = 'Couldn’t connect';
-	const WRONG_PASSWORD = 'Wrong password';
+	const FAILED = 'setup-network-failed';
+	const WRONG_PASSWORD = 'setup-network-wrong-password';
 
 	let current = $state<Network | null>(null);
 	let unavailable = $state(false);
@@ -67,17 +68,17 @@
 	}
 </script>
 
-<StepFrame title="Connect to the internet" description="This is optional. Being online lets Luft set your clock and time zone, and you can use the internet while Luft installs.">
+<StepFrame title={t('setup-network-title')} description={t('setup-network-description')}>
 	{#if unavailable}
-		<p class="text-[14px] text-[var(--text-soft)]">Networks aren’t available right now. You can connect later from the panel.</p>
+		<p class="text-[14px] text-[var(--text-soft)]">{t('setup-network-unavailable')}</p>
 	{:else if !current}
-		<div class="flex items-center gap-3 text-[14px] text-[var(--text-soft)]"><LoaderCircle size={18} class="animate-spin" />Looking for networks…</div>
+		<div class="flex items-center gap-3 text-[14px] text-[var(--text-soft)]"><LoaderCircle size={18} class="animate-spin" />{t('setup-network-looking')}</div>
 	{:else}
 		<div class="flex flex-col gap-1">
 			{#if wired}
 				<div class="flex items-center gap-3.5 px-4 py-3">
 					<Cable size={20} class="text-[var(--text-soft)]" />
-					<span class="flex-1 text-[15px]">Connected with a cable</span>
+					<span class="flex-1 text-[15px]">{t('setup-network-cable')}</span>
 				</div>
 			{/if}
 			{#if wifi}
@@ -90,19 +91,19 @@
 						<WifiRow
 							network={entry}
 							open={joining === entry.ssid}
-							problem={problems[entry.ssid] ?? ''}
+							problem={problems[entry.ssid] ? t(problems[entry.ssid]) : ''}
 							onchoose={() => choose(entry)}
 							onjoin={(password) => run(entry.ssid, () => network.join(wifi!.device, entry.ssid, entry.security, password))}
 						/>
 					{/each}
 					{#if !all && wifi.networks.length > SHOWN}
-						<button type="button" class="plain-button self-start" onclick={() => (all = true)}>Show all networks</button>
+						<button type="button" class="plain-button self-start" onclick={() => (all = true)}>{t('setup-network-show-all')}</button>
 					{/if}
 				{/if}
 			{/if}
 		</div>
 	{/if}
 	{#snippet actions()}
-		<button type="button" class="button {online ? 'primary' : ''} large px-6" onclick={() => flow.next()}>{online ? 'Continue' : 'Skip'}</button>
+		<button type="button" class="button {online ? 'primary' : ''} large px-6" onclick={() => flow.next()}>{t(online ? 'setup-continue' : 'setup-network-skip')}</button>
 	{/snippet}
 </StepFrame>

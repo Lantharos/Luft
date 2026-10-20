@@ -1,5 +1,6 @@
 mod error;
 mod interface;
+mod language;
 mod setup;
 
 use std::sync::Arc;
@@ -25,6 +26,7 @@ pub fn run(options: Options) -> anyhow::Result<()> {
 }
 
 async fn serve(options: Options, config: Config) -> zbus::Result<()> {
+    language::restore();
     let idle = Arc::new(Idle::default());
     let connection = zbus::connection::Builder::system()
         .serve_at(PATH, Installer::new(options, config, idle.clone()))

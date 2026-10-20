@@ -2,9 +2,11 @@ use std::os::unix::fs::symlink;
 use std::path::PathBuf;
 
 use anyhow::{Result, bail};
+use luft_i18n::t;
 use serde::Deserialize;
 
 use super::deployment::Deployment;
+use crate::L10N;
 use crate::system::files::write;
 
 #[derive(Deserialize, Clone)]
@@ -40,7 +42,7 @@ impl Regional {
             || !plain(&self.hostname, &['-'])
             || self.hostname.len() > 63
         {
-            bail!("Those regional settings aren't valid.");
+            bail!(t!(L10N, "installer-regional-invalid"));
         }
         Ok(())
     }
@@ -69,10 +71,11 @@ impl Regional {
             .join(&self.timezone)
             .is_file()
         {
-            bail!(
-                "The new system doesn't know the time zone {}.",
-                self.timezone
-            );
+            bail!(t!(
+                L10N,
+                "installer-unknown-zone",
+                zone = self.timezone.as_str()
+            ));
         }
         let files: Vec<(PathBuf, String)> = vec![
             (

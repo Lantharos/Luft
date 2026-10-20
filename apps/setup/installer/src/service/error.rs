@@ -1,3 +1,6 @@
+use luft_i18n::t;
+
+use crate::L10N;
 #[derive(zbus::DBusError, Debug)]
 #[zbus(prefix = "com.lantharos.Installer1.Error")]
 pub enum Error {
@@ -10,7 +13,7 @@ pub enum Error {
 
 impl Error {
     pub fn not_authorized() -> Self {
-        Self::NotAuthorized("You aren't allowed to do this.".to_owned())
+        Self::NotAuthorized(t!(L10N, "installer-not-allowed"))
     }
 
     pub fn relayed(error: zbus::Error) -> Self {

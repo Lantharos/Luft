@@ -1,8 +1,10 @@
 use std::path::PathBuf;
 
 use anyhow::{Context, Result, bail};
+use luft_i18n::t;
 
 use super::deployment::Deployment;
+use crate::L10N;
 use crate::system::command::Tool;
 
 const HOMES: &str = "/var/home";
@@ -23,13 +25,13 @@ impl Account {
             && letters
                 .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '_' || c == '-');
         if !valid_name {
-            bail!("That user name can't be used.");
+            bail!(t!(L10N, "installer-user-name-invalid"));
         }
         if self.full_name.contains([':', '\n', ',']) {
-            bail!("A name can't contain colons, commas or line breaks.");
+            bail!(t!(L10N, "installer-full-name-invalid"));
         }
         if self.password.is_empty() || self.password.contains('\n') {
-            bail!("Choose a password.");
+            bail!(t!(L10N, "installer-password-missing"));
         }
         Ok(())
     }
@@ -41,7 +43,7 @@ impl Account {
             .map(|line| line.split(':').collect::<Vec<_>>())
             .find(|fields| fields.first() == Some(&self.name.as_str()))
             .and_then(|fields| Some(format!("{}:{}", fields.get(2)?, fields.get(3)?)))
-            .context("The new account wasn't saved")
+            .with_context(|| t!(L10N, "installer-account-not-saved"))
     }
 
     pub fn create(&self, deployment: &Deployment) -> Result<()> {

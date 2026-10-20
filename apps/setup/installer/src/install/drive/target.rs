@@ -1,9 +1,11 @@
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
+use luft_i18n::t;
 
 use super::layout::Role;
 use super::partition::Created;
+use crate::L10N;
 use crate::system::command::Tool;
 
 pub struct Mounted {
@@ -56,7 +58,7 @@ fn first_esp(drive_device: &str, skipped: &[&str]) -> Result<String> {
                 })
         })
         .map(|fields| fields[0].to_owned())
-        .context("The drive has no EFI system partition")
+        .with_context(|| t!(L10N, "installer-no-esp"))
 }
 
 impl Mounted {
@@ -66,7 +68,7 @@ impl Mounted {
         parts: &[Created],
         skipped_esps: &[&str],
     ) -> Result<Self> {
-        let system = find(parts, Role::Root).context("No partition for Luft was made")?;
+        let system = find(parts, Role::Root).with_context(|| t!(L10N, "installer-no-root"))?;
         Self::open(
             &system.device,
             "",

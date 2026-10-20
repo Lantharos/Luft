@@ -16,6 +16,8 @@ gio = "0.22.10"
 gio-unix = "0.22.8"
 luft-app = { path = "../../../packages/app", features = ["launch", "recovery"] }
 luft-fingerprint = { path = "../../../packages/fingerprint" }
+libc = "0.2.191"
+luft-i18n = { path = "../../../packages/i18n" }
 luft-meet = { path = "../../../packages/meet" }
 luft-network = { path = "../../../packages/network" }
 luft-variant = { path = "../../../packages/variant" }

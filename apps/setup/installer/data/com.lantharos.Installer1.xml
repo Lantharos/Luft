@@ -11,7 +11,7 @@
 
     Survey, Install, Configure and CreateAccount need com.lantharos.installer.install. The rest only answer the
     account setup is pending for: FinishFirstBoot, and, while setup is still open, the setup steps, which also
-    need com.lantharos.installer.set-up and have to come from Install Luft's own program.
+    need com.lantharos.installer.set-up and have to come from Install Luft's own program. Anyone may call UseLanguage.
   -->
   <interface name="com.lantharos.Installer1">
     <property name="Phase" type="s" access="read"/>
@@ -43,6 +43,10 @@
       <arg name="name" type="s" direction="in"/>
       <arg name="full_name" type="s" direction="in"/>
       <arg name="password" type="s" direction="in"/>
+    </method>
+    <!-- The language errors are written in, as a BCP 47 tag like "de-AT". It's kept until the computer restarts. -->
+    <method name="UseLanguage">
+      <arg name="language" type="s" direction="in"/>
     </method>
     <!-- Only the account setup is pending for: stops signing in automatically. -->
     <method name="FinishFirstBoot"/>

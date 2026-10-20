@@ -1,5 +1,6 @@
 mod formats;
 mod keyboards;
+mod language;
 mod zones;
 
 use std::time::Duration;
@@ -114,4 +115,5 @@ pub fn register(window: SabineWindow) -> SabineWindow {
         .command_async("regional_zone", set_zone)
         .command_async("regional_formats_country", formats::unset_country)
         .command("regional_set_formats", formats::set)
+        .command_async("regional_language", language::use_language)
 }

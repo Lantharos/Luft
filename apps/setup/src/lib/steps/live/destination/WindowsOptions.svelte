@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { plural, Switch } from '@luft/ui';
+	import { t } from '@luft/i18n';
+	import { Switch } from '@luft/ui';
 	import type { WindowsChoices, WindowsVolume } from '#lib/api/installer.js';
 	import { install } from '#lib/state/install.svelte.js';
 
@@ -19,18 +20,18 @@
 		[
 			windows.fastStartup && {
 				key: 'fastStartupOff',
-				title: 'Turn off Fast Startup in Windows',
-				description: 'Windows then shuts down fully, so sound, Wi-Fi and Bluetooth start fresh in Luft and its drive stays open.'
+				title: t('setup-windows-fast-startup'),
+				description: t('setup-windows-fast-startup-description')
 			},
 			!windows.universalClock && {
 				key: 'universalClock',
-				title: 'Keep the clock right in both',
-				description: 'Windows reads the computer’s clock the way Luft does, so the time no longer jumps when you switch.'
+				title: t('setup-windows-clock'),
+				description: t('setup-windows-clock-description')
 			},
 			windows.bluetooth > 0 && {
 				key: 'bluetooth',
-				title: 'Bring your Bluetooth devices',
-				description: `${plural(windows.bluetooth, 'device')} paired in Windows will work in Luft without pairing again.`
+				title: t('setup-windows-bluetooth'),
+				description: t('setup-windows-bluetooth-description', { count: windows.bluetooth })
 			}
 		].filter((option): option is Option => !!option)
 	);

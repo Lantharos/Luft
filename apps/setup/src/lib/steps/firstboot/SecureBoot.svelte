@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { enrollKey, restart } from '#lib/api/system.js';
 	import StepFrame from '#lib/components/StepFrame.svelte';
 	import EnrollSteps from '#lib/components/trust/EnrollSteps.svelte';
@@ -27,10 +28,8 @@
 </script>
 
 <StepFrame
-	title="Your computer doesn’t trust Luft yet"
-	description={setup.secureBootCode
-		? 'Right after the next restart, a blue screen asks to trust Luft. Use the keyboard there with this code.'
-		: 'The blue screen was skipped. Get a new code and restart, then use the keyboard there.'}
+	title={t('setup-secure-boot-title')}
+	description={t(setup.secureBootCode ? 'setup-secure-boot-code' : 'setup-secure-boot-skipped')}
 >
 	<EnrollSteps code={setup.secureBootCode} />
 	{#if problem}
@@ -38,11 +37,11 @@
 	{/if}
 	{#snippet actions()}
 		{#if setup.secureBootCode}
-			<button type="button" class="plain-button large" onclick={() => flow.next()}>Restart later</button>
-			<button type="button" class="button primary large px-6" onclick={restartNow}>Restart now</button>
+			<button type="button" class="plain-button large" onclick={() => flow.next()}>{t('setup-restart-later')}</button>
+			<button type="button" class="button primary large px-6" onclick={restartNow}>{t('setup-restart-now')}</button>
 		{:else}
-			<button type="button" class="plain-button large" disabled={busy} onclick={() => flow.next()}>Not now</button>
-			<button type="button" class="button primary large px-6" disabled={busy} onclick={getCode}>{busy ? 'Getting your code…' : 'Get a new code'}</button>
+			<button type="button" class="plain-button large" disabled={busy} onclick={() => flow.next()}>{t('setup-not-now')}</button>
+			<button type="button" class="button primary large px-6" disabled={busy} onclick={getCode}>{t(busy ? 'setup-secure-boot-getting' : 'setup-secure-boot-new-code')}</button>
 		{/if}
 	{/snippet}
 </StepFrame>

@@ -2,13 +2,14 @@ use luft_app::Commands;
 use luft_app::dbus::service::{Map, Service, absent, get};
 use luft_app::dbus::{error_message, error_name, failed};
 use luft_app::recovery::for_this_computer;
+use luft_i18n::t;
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use zbus::wire::DynamicDeserialize;
 use zbus::{DynamicType, OwnedVariant};
 
-use crate::installer;
+use crate::{L10N, installer};
 
 const TRUST: Service = Service {
     name: "com.lantharos.Trust1",
@@ -72,8 +73,8 @@ fn explain(error: &zbus::Error) -> String {
     let name = error_name(error).unwrap_or_default();
     match error_message(error) {
         Some(message) if name.starts_with(ERROR) => message.to_owned(),
-        _ if name.ends_with("NotAuthorized") => "Your password is needed for this".to_owned(),
-        _ if absent(error) => "Device security isn't available on this computer".to_owned(),
+        _ if name.ends_with("NotAuthorized") => t!(L10N, "desktop-trust-needs-password"),
+        _ if absent(error) => t!(L10N, "desktop-trust-unavailable"),
         _ => failed(error),
     }
 }
@@ -110,7 +111,9 @@ async fn recovery_key(_: Value) -> Result<String, String> {
 }
 
 async fn save_key(Key { key }: Key) -> Result<bool, String> {
-    for_this_computer(&key).save("Recovery key.txt").await
+    for_this_computer(&key)
+        .save(&t!(L10N, "desktop-recovery-file-name"))
+        .await
 }
 
 async fn print_key(Key { key }: Key) -> Result<bool, String> {

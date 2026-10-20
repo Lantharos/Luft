@@ -1,3 +1,4 @@
+import { i18n } from '@luft/i18n';
 import { appearance } from '@luft/ui';
 import { appState, NO_HARDWARE, trustState, type Hardware, type TrustState } from '#lib/api/system.js';
 import { flow, type Step } from './flow.svelte.js';
@@ -25,6 +26,7 @@ class SetupState {
 	async start() {
 		const state = await appState();
 		const stops = [appearance.start(state)];
+		await i18n.ready;
 		this.hardware = state.hardware;
 		stops.push(await install.start(state.hardware, state.meet));
 		const phase = install.status?.phase ?? 'live';

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import LockKeyhole from '@lucide/svelte/icons/lock-keyhole';
+	import { t } from '@luft/i18n';
 	import { Checkbox, PasswordField, RecoveryKey } from '@luft/ui';
 	import { encrypt, encryptionChecks, printKey, recoveryKey, saveKey, type Check } from '#lib/api/system.js';
 	import StepFrame from '#lib/components/StepFrame.svelte';
@@ -46,29 +47,27 @@
 
 {#snippet keepSafe(key: string)}
 	<p class="text-[14px] leading-relaxed text-[var(--text-soft)]">
-		Keep this recovery key somewhere safe, away from this computer. You need it if the computer ever can’t unlock by itself.
+		{t('setup-protect-keep-safe')}
 	</p>
 	<RecoveryKey {key} onsave={() => saveKey(key)} onprint={() => printKey(key)} copyable={false} />
 {/snippet}
 
 {#if staged}
 	<StepFrame
-		title="Your files will be encrypted"
-		description="Encrypting starts by itself after the restart at the end of setup, and you can keep using your computer while it works."
+		title={t('setup-protect-staged-title')}
+		description={t('setup-protect-staged-description')}
 	>
 		<div class="flex max-w-[560px] flex-col gap-5">
 			{@render keepSafe(staged)}
 		</div>
 		{#snippet actions()}
-			<button type="button" class="button primary large px-6" onclick={() => flow.next()}>Continue</button>
+			<button type="button" class="button primary large px-6" onclick={() => flow.next()}>{t('setup-continue')}</button>
 		{/snippet}
 	</StepFrame>
 {:else}
 	<StepFrame
-		title="Protect your files"
-		description={tpm
-			? 'Encrypt this computer so nobody can read your files without signing in, even if it’s lost. It unlocks by itself when it starts.'
-			: 'Encrypt this computer so nobody can read your files without your passphrase, even if it’s lost.'}
+		title={t('setup-protect-title')}
+		description={t(tpm ? 'setup-protect-tpm' : 'setup-protect-passphrase')}
 		hideBack={busy}
 	>
 		{#if failing.length}
@@ -82,27 +81,27 @@
 				{@render keepSafe(key)}
 				{#if !tpm}
 					<div class="grid grid-cols-2 gap-3">
-						<PasswordField bind:value={passphrase} label="Passphrase" showLabel autocomplete="new-password" />
-						<PasswordField bind:value={repeated} label="Type it again" showLabel autocomplete="new-password" error={repeated && repeated !== passphrase ? 'They don’t match' : ''} live />
+						<PasswordField bind:value={passphrase} label={t('setup-protect-passphrase-label')} showLabel autocomplete="new-password" />
+						<PasswordField bind:value={repeated} label={t('setup-protect-repeat')} showLabel autocomplete="new-password" error={repeated && repeated !== passphrase ? t('setup-protect-mismatch') : ''} live />
 					</div>
 				{/if}
-				<Checkbox checked={kept} label="I’ve kept my recovery key" onchange={(checked) => (kept = checked)}>I’ve kept my recovery key</Checkbox>
+				<Checkbox checked={kept} label={t('setup-protect-kept')} onchange={(checked) => (kept = checked)}>{t('setup-protect-kept')}</Checkbox>
 			</div>
 		{:else}
 			<div class="flex items-center gap-4 text-[14px] leading-relaxed text-[var(--text-soft)]">
 				<span class="grid h-14 w-14 flex-none place-items-center rounded-[18px] bg-[var(--accent-soft)] text-[var(--accent)]"><LockKeyhole size={26} /></span>
-				<p class="max-w-[480px]">Encrypting happens in the background after the next restart, and you can keep using your computer meanwhile.</p>
+				<p class="max-w-[480px]">{t('setup-protect-background')}</p>
 			</div>
 		{/if}
 		{#if problem}
 			<p class="mt-4 text-[13.5px] text-[var(--danger)]">{problem}</p>
 		{/if}
 		{#snippet actions()}
-			<button type="button" class="plain-button large" disabled={busy} onclick={() => flow.next()}>Not now</button>
+			<button type="button" class="plain-button large" disabled={busy} onclick={() => flow.next()}>{t('setup-not-now')}</button>
 			{#if key}
-				<button type="button" class="button primary large px-6" disabled={!ready || busy} onclick={turnOn}>Encrypt</button>
+				<button type="button" class="button primary large px-6" disabled={!ready || busy} onclick={turnOn}>{t('setup-protect-encrypt')}</button>
 			{:else if !failing.length}
-				<button type="button" class="button primary large px-6" disabled={busy} onclick={prepare}>{busy ? 'Checking…' : 'Encrypt my files'}</button>
+				<button type="button" class="button primary large px-6" disabled={busy} onclick={prepare}>{t(busy ? 'setup-protect-checking' : 'setup-protect-start')}</button>
 			{/if}
 		{/snippet}
 	</StepFrame>

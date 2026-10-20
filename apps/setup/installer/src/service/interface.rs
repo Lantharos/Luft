@@ -3,6 +3,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 
 use access::Idle;
+use luft_i18n::t;
 use luft_meet::Handoff;
 use tokio::sync::watch;
 use zbus::message::Header;
@@ -11,7 +12,9 @@ use zbus::{Connection, interface};
 
 use super::PATH;
 use super::error::Error;
+use super::language;
 use super::setup::{self, Enrollment};
+use crate::L10N;
 use crate::config::Config;
 use crate::first_boot::fingerprint::Enrolling;
 use crate::first_boot::trust;
@@ -88,7 +91,7 @@ impl Installer {
     ) -> Result<T, Error> {
         tokio::task::spawn_blocking(work)
             .await
-            .map_err(|_| Error::Failed("The installer stopped unexpectedly.".to_owned()))?
+            .map_err(|_| Error::Failed(t!(L10N, "installer-stopped")))?
             .map_err(Error::from)
     }
 }
@@ -174,8 +177,13 @@ impl Installer {
         #[zbus(object_server)] server: &ObjectServer,
     ) -> Result<(), Error> {
         self.authorize(connection, &header, INSTALL).await?;
-        let request: Request = serde_json::from_str(&request)
-            .map_err(|error| Error::Failed(format!("The request isn't valid: {error}")))?;
+        let request: Request = serde_json::from_str(&request).map_err(|error| {
+            Error::Failed(t!(
+                L10N,
+                "installer-request-invalid",
+                error = error.to_string()
+            ))
+        })?;
         let image = self.config.image(&request.variant)?;
         let smallest = self.config.smallest_system;
         let handoff = self.meet.clone();
@@ -194,7 +202,7 @@ impl Installer {
         })
         .await?;
         if self.started.swap(true, Ordering::SeqCst) {
-            return Err(Error::Busy("Luft is already being installed.".to_owned()));
+            return Err(Error::Busy(t!(L10N, "installer-busy")));
         }
         let (sender, updates) = watch::channel(Status::idle());
         let installer = server.interface::<_, Installer>(PATH).await?;
@@ -233,8 +241,13 @@ impl Installer {
         #[zbus(header)] header: Header<'_>,
     ) -> Result<(), Error> {
         self.authorize(connection, &header, INSTALL).await?;
-        let regional: Regional = serde_json::from_str(&regional)
-            .map_err(|error| Error::Failed(format!("The settings aren't valid: {error}")))?;
+        let regional: Regional = serde_json::from_str(&regional).map_err(|error| {
+            Error::Failed(t!(
+                L10N,
+                "installer-settings-invalid",
+                error = error.to_string()
+            ))
+        })?;
         regional.check()?;
         self.answers.set_regional(regional);
         Ok(())
@@ -256,7 +269,7 @@ impl Installer {
         };
         account.check()?;
         if matches!(self.current().stage, Stage::Configuring | Stage::Finished) {
-            return Err(Error::Busy("The account was already made.".to_owned()));
+            return Err(Error::Busy(t!(L10N, "installer-account-exists")));
         }
         self.answers.set_account(account);
         Ok(())
@@ -344,6 +357,10 @@ impl Installer {
             enrollment.end().await;
         }
         Ok(())
+    }
+
+    fn use_language(&self, language: &str) {
+        language::choose(language);
     }
 
     #[zbus(signal)]

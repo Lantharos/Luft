@@ -8,6 +8,7 @@ ExecStart=/usr/libexec/luft-installer
 SELinuxContext=system_u:system_r:install_t:s0
 SyslogIdentifier=luft-installer
 RuntimeDirectory=luft-installer
+RuntimeDirectoryPreserve=yes
 StateDirectory=luft-installer
 KillMode=mixed
 TimeoutStopSec=5min

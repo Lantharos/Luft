@@ -1,0 +1,24 @@
+apps/setup/installer/src/config.rs	Couldn't parse {}
+apps/setup/installer/src/config.rs	Couldn't read {}
+apps/setup/installer/src/first_boot/window.rs	Couldn't read {BOOT_ID}
+apps/setup/installer/src/install/drive/layout.rs	Luft startup
+apps/setup/installer/src/meet/reclaim.rs	Couldn't remove {}
+apps/setup/installer/src/meet/reclaim.rs	Luft couldn't grow into the space Meet Luft used
+apps/setup/installer/src/meet/reclaim.rs	Meet Luft's copy of Luft couldn't be removed
+apps/setup/installer/src/survey/windows/hints.rs	All Users
+apps/setup/installer/src/survey/windows/hints.rs	Control Panel\Desktop
+apps/setup/installer/src/survey/windows/hints.rs	Control Panel\Desktop\MuiCached
+apps/setup/installer/src/survey/windows/hints.rs	Control Panel\International
+apps/setup/installer/src/survey/windows/hints.rs	Default User
+apps/setup/installer/src/survey/windows/hints.rs	Keyboard Layout\Preload
+apps/setup/installer/src/survey/windows/hints.rs	Keyboard Layout\Substitutes
+apps/setup/installer/src/survey/windows/tests.rs	Control Panel\Desktop
+apps/setup/installer/src/survey/windows/tests.rs	Control Panel\International
+apps/setup/installer/src/survey/windows/tests.rs	Keyboard Layout\Preload
+apps/setup/installer/src/survey/windows/tests.rs	Keyboard Layout\Substitutes
+apps/setup/installer/src/survey/windows/tests.rs	Pacific Standard Time
+apps/setup/installer/src/survey/windows/tests.rs	Romance Standard Time
+apps/setup/installer/src/survey/windows/tests.rs	Windows 10 Home
+apps/setup/installer/src/survey/windows/tests.rs	Windows 10 Pro
+apps/setup/installer/src/system/files.rs	Couldn't open {}
+apps/setup/installer/src/system/files.rs	There's nothing to remove

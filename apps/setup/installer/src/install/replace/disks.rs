@@ -3,8 +3,10 @@ use std::path::Path;
 
 use anyhow::{Context, Result, anyhow};
 use luft_disks::udisks::{self, BLOCK, Options, PARTITION};
+use luft_i18n::t;
 use zbus::Variant;
 
+use crate::L10N;
 use crate::install::drive::layout::Role;
 use crate::survey::linux::Part;
 use crate::system::command::Tool;
@@ -56,7 +58,7 @@ pub fn new_subvolume(top: &Path) -> Result<()> {
             .args(["subvolume", "delete", "--recursive"])
             .arg(&path)
             .run()
-            .context("What an earlier attempt left couldn't be cleared")?;
+            .with_context(|| t!(L10N, "installer-leftovers-failed"))?;
     }
     Tool::new("btrfs")
         .args(["subvolume", "create"])
@@ -66,7 +68,7 @@ pub fn new_subvolume(top: &Path) -> Result<()> {
         .args(["subvolume", "set-default"])
         .arg(&path)
         .run()
-        .context("Luft couldn't be made the system that starts")
+        .with_context(|| t!(L10N, "installer-default-failed"))
 }
 
 pub fn free_name(top: &Path, wanted: &str) -> String {

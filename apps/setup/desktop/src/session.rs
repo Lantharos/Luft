@@ -2,11 +2,14 @@ use gio::prelude::*;
 use luft_app::Commands;
 use luft_app::dbus::{self, failed};
 use luft_app::launch::{self, Token};
+use luft_i18n::t;
 use sabine::SabineWindow;
 use serde_json::Value;
 use zbus::Connection;
 use zbus::fdo::DBusProxy;
 use zbus::names::WellKnownName;
+
+use crate::L10N;
 
 const SETUP: &str = "com.lantharos.Kestrel.Setup";
 const SETUP_PATH: &str = "/com/lantharos/Kestrel/Setup";
@@ -53,7 +56,8 @@ async fn restart(_: Value) -> Result<(), String> {
 }
 
 fn open_disks(Token { token }: Token) -> Result<(), String> {
-    let app = gio_unix::DesktopAppInfo::new(DISKS).ok_or("Disks isn't installed")?;
+    let app =
+        gio_unix::DesktopAppInfo::new(DISKS).ok_or_else(|| t!(L10N, "desktop-disks-missing"))?;
     launch::start(app.upcast_ref(), &[], token.as_deref()).map_err(|error| error.to_string())
 }
 

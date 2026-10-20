@@ -1,9 +1,11 @@
 use std::path::Path;
 
 use anyhow::{Context, Result};
+use luft_i18n::t;
 use toml_edit::{DocumentMut, Item, Table, value};
 
 use super::files::write;
+use crate::L10N;
 
 pub const CONFIG: &str = "greetd/config.toml";
 const INITIAL_SESSION: &str = "initial_session";
@@ -11,9 +13,21 @@ const SESSION: &str = "/usr/bin/kestrel-session";
 
 fn read(config: &Path) -> Result<DocumentMut> {
     std::fs::read_to_string(config)
-        .with_context(|| format!("Couldn't read {}", config.display()))?
+        .with_context(|| {
+            t!(
+                L10N,
+                "installer-read-failed",
+                path = config.display().to_string()
+            )
+        })?
         .parse()
-        .with_context(|| format!("Couldn't parse {}", config.display()))
+        .with_context(|| {
+            t!(
+                L10N,
+                "installer-parse-failed",
+                path = config.display().to_string()
+            )
+        })
 }
 
 pub fn sign_in_at_start(config: &Path, user: &str) -> Result<()> {

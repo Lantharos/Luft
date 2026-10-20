@@ -1,4 +1,6 @@
+use crate::L10N;
 use crate::survey::ALIGNMENT;
+use luft_i18n::t;
 
 const MIB: u64 = 1 << 20;
 const ESP_SIZE: u64 = 1024 * MIB;
@@ -45,6 +47,14 @@ impl Role {
             Self::Esp => ("vfat", "EFI"),
             Self::Xbootldr => ("vfat", "LUFT-BOOT"),
             Self::Root => ("btrfs", "luft"),
+        }
+    }
+
+    pub fn creation_failed(self) -> String {
+        match self {
+            Self::Esp => t!(L10N, "installer-esp-partition-failed"),
+            Self::Xbootldr => t!(L10N, "installer-startup-partition-failed"),
+            Self::Root => t!(L10N, "installer-root-partition-failed"),
         }
     }
 

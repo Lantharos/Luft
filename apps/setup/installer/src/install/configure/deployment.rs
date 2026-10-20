@@ -1,7 +1,9 @@
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
+use luft_i18n::t;
 
+use crate::L10N;
 use crate::system::command::Tool;
 
 const DEPLOYMENTS: &str = "state/deploy";
@@ -24,14 +26,14 @@ fn bind(source: &Path, target: &Path) -> Result<()> {
 impl Deployment {
     pub fn mount(target: &Path, at: &Path) -> Result<Self> {
         let state = std::fs::read_dir(target.join(DEPLOYMENTS))
-            .context("The new system has no deployment")?
+            .with_context(|| t!(L10N, "installer-no-deployment"))?
             .flatten()
             .map(|entry| entry.path())
             .find(|path| path.is_dir())
-            .context("The new system has no deployment")?;
+            .with_context(|| t!(L10N, "installer-no-deployment"))?;
         let id = state
             .file_name()
-            .context("The new system's deployment has no name")?;
+            .with_context(|| t!(L10N, "installer-deployment-unnamed"))?;
         std::fs::create_dir_all(at)?;
         Tool::new("bootc")
             .args(["internals", "cfs", "--repo"])
@@ -40,7 +42,7 @@ impl Deployment {
             .arg(id)
             .arg(at)
             .run()
-            .context("The new system couldn't be opened")?;
+            .with_context(|| t!(L10N, "installer-deployment-unopened"))?;
         let deployment = Self {
             root: at.to_owned(),
         };

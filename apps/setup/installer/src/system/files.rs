@@ -6,6 +6,9 @@ use std::os::unix::ffi::OsStrExt;
 use std::path::Path;
 
 use anyhow::{Context, Result};
+use luft_i18n::t;
+
+use crate::L10N;
 
 pub fn write(path: &Path, contents: &str) -> Result<()> {
     let parent = path.parent().context("A file needs a folder")?;
@@ -19,7 +22,13 @@ pub fn write(path: &Path, contents: &str) -> Result<()> {
     let mut file = std::fs::File::create(&staged)?;
     file.write_all(contents.as_bytes())?;
     file.sync_all()?;
-    std::fs::rename(&staged, path).with_context(|| format!("Couldn't write {}", path.display()))
+    std::fs::rename(&staged, path).with_context(|| {
+        t!(
+            L10N,
+            "installer-write-failed",
+            path = path.display().to_string()
+        )
+    })
 }
 
 pub fn remove_beneath(root: &Path, relative: &str) -> Result<()> {

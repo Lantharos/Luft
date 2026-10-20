@@ -1,7 +1,8 @@
-import { catalog, formatsCountry, locate, setFormats, useKeyboard, useZone, type Catalog, type KeyboardLayout, type Zone } from '#lib/api/system.js';
+import { i18n } from '@luft/i18n';
+import { catalog, formatsCountry, locate, setFormats, useKeyboard, useLanguage, useZone, type Catalog, type KeyboardLayout, type Zone } from '#lib/api/system.js';
 import type { Hints, Keyboard } from '#lib/api/installer.js';
 import { describe, outranks, type Field, type Guesses, type Source } from '#lib/regional/guesses.js';
-import { countryOf, DEFAULT_LANGUAGE, keyboardFor, languageFor, languageNamed, LANGUAGES, type Language } from '#lib/regional/languages.js';
+import { countryOf, DEFAULT_LANGUAGE, keyboardFor, languageFor, languageNamed, LANGUAGES, languageTag, type Language } from '#lib/regional/languages.js';
 
 const FALLBACK_ZONE = 'UTC';
 
@@ -36,7 +37,7 @@ class RegionalState {
 	suggestFrom(hints: Hints) {
 		const country = countryOf(hints.locale);
 		const language = languageNamed(hints.language) ?? languageFor(country);
-		if (language && this.guess('language', 'computer')) this.language = language;
+		if (language && this.guess('language', 'computer')) this.applyLanguage(language);
 		const layout = keyboardFor(country);
 		const keyboard = hints.keyboards[0] ?? (layout ? { layout, variant: '' } : null);
 		if (keyboard && this.guess('keyboard', 'computer')) this.applyKeyboard(keyboard);
@@ -53,7 +54,7 @@ class RegionalState {
 
 	chooseLanguage(language: Language) {
 		this.chosen.add('language');
-		this.language = language;
+		this.applyLanguage(language);
 	}
 
 	chooseKeyboard(keyboard: KeyboardLayout) {
@@ -70,6 +71,14 @@ class RegionalState {
 		if (this.chosen.has(field) || !outranks(source, this.guesses[field])) return false;
 		this.guesses[field] = source;
 		return true;
+	}
+
+	private applyLanguage(language: Language) {
+		if (language === this.language) return;
+		this.language = language;
+		const tag = languageTag(language);
+		void i18n.use(tag, tag);
+		void useLanguage(language.locale).catch(() => {});
 	}
 
 	private applyKeyboard(keyboard: Keyboard) {

@@ -6,6 +6,7 @@
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import Sparkles from '@lucide/svelte/icons/sparkles';
 	import SlidersHorizontal from '@lucide/svelte/icons/sliders-horizontal';
+	import { t } from '@luft/i18n';
 	import { bytes, Choice, Dialog } from '@luft/ui';
 	import type { Drive, Target, WindowsVolume } from '#lib/api/installer.js';
 	import { finishSetup } from '#lib/api/system.js';
@@ -60,18 +61,31 @@
 	let chosenSystem = $derived(install.systems.find((system) => system.id === replacing) ?? null);
 	let chosenDrive = $derived(target ? install.drive(target.kind === 'replace' ? (chosenSystem?.drive ?? '') : target.drive) : null);
 
-	const MEET_ROOM: [string, string] = ['Next to Windows', 'Meet Luft already made this room, so Windows stays just as it is.'];
-	const TITLES: Record<View, [string, string]> = {
-		choose: ['Where should Luft go?', 'Pick how Luft fits on this computer. Nothing changes until you confirm.'],
-		alongside: ['Make room next to Windows', 'Windows gets smaller to make space for Luft. Your files in Windows stay as they are.'],
-		whole: ['Choose a drive', 'Luft takes over the whole drive. Everything on it is erased.'],
-		custom: ['Choose the space for Luft', 'Use Disks to arrange your drives your way.'],
-		replace: ['', 'Luft takes its place and keeps what’s yours.']
+	const TITLES: Record<Exclude<View, 'replace'>, [string, string]> = {
+		choose: ['setup-destination-choose-title', 'setup-destination-choose-description'],
+		alongside: ['setup-destination-alongside-title', 'setup-destination-alongside-description'],
+		whole: ['setup-destination-whole-title', 'setup-destination-whole-description'],
+		custom: ['setup-destination-custom-title', 'setup-destination-custom-description']
 	};
 
-	let [title, description] = $derived(
-		view === 'alongside' && meet?.space ? MEET_ROOM : view === 'replace' ? [`Replace ${chosenSystem?.name ?? 'Linux'}`, TITLES.replace[1]] : TITLES[view]
-	);
+	let [title, description] = $derived.by(() => {
+		if (view === 'alongside' && meet?.space) return [t('setup-destination-meet-title'), t('setup-destination-meet-description')];
+		if (view === 'replace') return [t('setup-destination-replace-title', { system: chosenSystem?.name ?? 'Linux' }), t('setup-destination-replace-description')];
+		return TITLES[view].map((id) => t(id));
+	});
+
+	let confirmTitle = $derived.by(() => {
+		if (!target || !chosenDrive) return '';
+		if (target.kind === 'replace') return t('setup-confirm-replace-title', { system: chosenSystem?.name ?? 'Linux' });
+		if (target.kind === 'whole') return t('setup-confirm-erase-title', { drive: chosenDrive.name });
+		if (target.kind === 'alongside') return t('setup-confirm-shrink-title', { size: bytes(chosenDrive.windows!.size - target.size) });
+		return t(meet?.space ? 'setup-confirm-meet-title' : 'setup-confirm-free-title');
+	});
+
+	let confirmDescription = $derived.by(() => {
+		if (target?.kind === 'replace') return t(chosenSystem?.keepsOld ? 'setup-confirm-replace-keep-old' : 'setup-confirm-replace-erase-old');
+		return t(target?.kind === 'whole' ? 'setup-confirm-erase-description' : 'setup-confirm-install-description');
+	});
 
 	async function justTry() {
 		if (!(await finishSetup().catch(() => false))) await appWindow.close();
@@ -101,23 +115,33 @@
 		<div class="flex items-center gap-3 py-2 text-[14px] text-[var(--text-soft)]">
 			{#if install.surveyError}
 				<span class="text-[var(--danger)]">{install.surveyError}</span>
-				<button type="button" class="plain-button" onclick={() => install.look()}>Try again</button>
+				<button type="button" class="plain-button" onclick={() => install.look()}>{t('setup-try-again')}</button>
 			{:else}
-				<LoaderCircle size={18} class="animate-spin" />Looking at your drives…
+				<LoaderCircle size={18} class="animate-spin" />{t('setup-destination-looking')}
 			{/if}
 		</div>
 	{:else if view === 'choose'}
 		<div class="-mx-2 flex flex-col gap-1">
 			{#if meet?.space}
-				<Choice icon={LayoutPanelLeft} title="Alongside Windows" description="Use the {bytes(meet.space.size)} Meet Luft made next to Windows." onclick={() => open('alongside')} />
+				<Choice
+					icon={LayoutPanelLeft}
+					title={t('setup-destination-meet-choice')}
+					description={t('setup-destination-meet-choice-description', { size: bytes(meet.space.size) })}
+					onclick={() => open('alongside')}
+				/>
 			{:else if windowsDrive}
-				<Choice icon={LayoutPanelLeft} title="Alongside {windowsName(windowsDrive.windows)}" description="Keep Windows and its files, and give Luft part of its drive." onclick={() => open('alongside')} />
+				<Choice
+					icon={LayoutPanelLeft}
+					title={t('setup-destination-alongside-choice', { windows: windowsName(windowsDrive.windows) })}
+					description={t('setup-destination-alongside-choice-description')}
+					onclick={() => open('alongside')}
+				/>
 			{/if}
 			{#each install.systems as system (system.id)}
 				<Choice
 					icon={ArrowRightLeft}
-					title="Replace {system.name}"
-					description={system.blocked ? whyNotReplaced(system) : 'Keep your files, your account and your settings, and let Luft take its place.'}
+					title={t('setup-destination-replace-choice', { system: system.name })}
+					description={system.blocked ? whyNotReplaced(system) : t('setup-destination-replace-choice-description')}
 					disabled={!!system.blocked}
 					onclick={() => {
 						replacing = system.id;
@@ -125,9 +149,15 @@
 					}}
 				/>
 			{/each}
-			<Choice icon={HardDrive} title="Use a whole drive" description="Erase a drive and give all of it to Luft." disabled={install.usableDrives.length === 0} onclick={() => open('whole')} />
-			<Choice icon={Sparkles} title="Just try Luft" description="Look around first. Nothing is installed and your drives stay untouched." onclick={justTry} />
-			<Choice icon={SlidersHorizontal} title="Custom" description="Arrange partitions yourself in Disks." onclick={() => open('custom')} />
+			<Choice
+				icon={HardDrive}
+				title={t('setup-destination-whole-choice')}
+				description={t('setup-destination-whole-choice-description')}
+				disabled={install.usableDrives.length === 0}
+				onclick={() => open('whole')}
+			/>
+			<Choice icon={Sparkles} title={t('setup-destination-try-choice')} description={t('setup-destination-try-choice-description')} onclick={justTry} />
+			<Choice icon={SlidersHorizontal} title={t('setup-destination-custom-choice')} description={t('setup-destination-custom-choice-description')} onclick={() => open('custom')} />
 		</div>
 	{:else if view === 'alongside' && meet?.space && meetDrive}
 		<MeetRoom drive={meetDrive} space={meet.space} packed={meet.movingBox?.bytes ?? null} />
@@ -145,11 +175,11 @@
 	{/if}
 	{#snippet actions()}
 		{#if !choicesSeen && survey}
-			<button type="button" class="plain-button large" disabled={install.starting} onclick={() => open('choose')}>More options</button>
+			<button type="button" class="plain-button large" disabled={install.starting} onclick={() => open('choose')}>{t('setup-destination-more-options')}</button>
 		{/if}
 		{#if view !== 'choose'}
 			<button type="button" class="button primary large px-6" disabled={!target || install.starting} onclick={() => (confirming = true)}>
-				{install.starting ? 'Starting…' : view === 'replace' ? 'Replace' : 'Install Luft'}
+				{t(install.starting ? 'setup-destination-starting' : view === 'replace' ? 'setup-destination-replace' : 'setup-destination-install')}
 			</button>
 		{/if}
 	{/snippet}
@@ -157,20 +187,14 @@
 
 {#if confirming && target && chosenDrive}
 	<Dialog
-		title={target.kind === 'replace' ? `Replace ${chosenSystem?.name}?` : target.kind === 'whole' ? `Erase ${chosenDrive.name}?` : target.kind === 'alongside' ? `Shrink Windows to ${bytes(chosenDrive.windows!.size - target.size)}?` : meet?.space ? 'Install Luft next to Windows?' : 'Install Luft in the free space?'}
-		description={target.kind === 'replace'
-			? chosenSystem?.keepsOld
-				? 'Luft starts copying right away. The old system won’t start anymore, and its files stay until you remove them.'
-				: 'Luft starts copying right away. The old system is erased for good, and your files stay where they are.'
-			: target.kind === 'whole'
-			? 'Everything on this drive is erased for good, including other systems and files.'
-			: 'Luft starts copying right away. You can set up your account while it works.'}
+		title={confirmTitle}
+		description={confirmDescription}
 		onclose={() => (confirming = false)}
 	>
 		{#snippet actions()}
-			<button type="button" class="button" onclick={() => (confirming = false)}>Cancel</button>
+			<button type="button" class="button" onclick={() => (confirming = false)}>{t('setup-cancel')}</button>
 			<button type="button" class="button {target.kind === 'whole' ? 'danger' : 'primary'}" onclick={start}>
-				{target.kind === 'whole' ? 'Erase and install' : target.kind === 'replace' ? 'Replace' : 'Install'}
+				{t(target.kind === 'whole' ? 'setup-confirm-erase' : target.kind === 'replace' ? 'setup-destination-replace' : 'setup-confirm-install')}
 			</button>
 		{/snippet}
 	</Dialog>

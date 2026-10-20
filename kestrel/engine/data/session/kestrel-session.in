@@ -21,6 +21,11 @@ mkdir -p "${DCONF_PROFILE%/*}"
 { cat /etc/dconf/profile/user 2> /dev/null || echo user-db:user; printf "\nfile-db:%s\n" "@pkgdatadir@/dconf/kestrel"; } > "$DCONF_PROFILE"
 export DCONF_PROFILE
 
+region="$(gsettings get org.gnome.system.locale region 2> /dev/null | tr -d "'")"
+if [ -n "$region" ]; then
+  export LC_TIME="$region" LC_NUMERIC="$region" LC_MONETARY="$region" LC_MEASUREMENT="$region" LC_PAPER="$region"
+fi
+
 systemctl --user reset-failed
 dbus-update-activation-environment --systemd --all
 

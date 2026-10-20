@@ -26,6 +26,7 @@ const StandInUser = GObject.registerClass({
     'password-mode': GObject.ParamSpec.int('password-mode', null, null, READ, 0, 2, 0),
     'locked': GObject.ParamSpec.boolean('locked', null, null, READ, false),
     'system-account': GObject.ParamSpec.boolean('system-account', null, null, READ, false),
+    'language': GObject.ParamSpec.string('language', null, null, READ, ''),
   },
   Signals: { 'changed': {}, 'sessions-changed': {} },
 }, class StandInUser extends GObject.Object {
@@ -55,6 +56,7 @@ const StandInUser = GObject.registerClass({
   get password_mode(): AccountsService.UserPasswordMode { return this.value('PasswordMode', AccountsService.UserPasswordMode.REGULAR); }
   get locked(): boolean { return this.value('Locked', false); }
   get system_account(): boolean { return this.value('SystemAccount', false); }
+  get language(): string { return this.value('Language', ''); }
 
   get_uid(): number { return this.uid; }
   get_user_name(): string { return this.user_name; }
@@ -62,6 +64,7 @@ const StandInUser = GObject.registerClass({
   get_icon_file(): string { return this.icon_file; }
   get_login_time(): number { return this.login_time; }
   get_password_mode(): AccountsService.UserPasswordMode { return this.password_mode; }
+  get_language(): string { return this.language; }
 });
 
 type StandInUser = InstanceType<typeof StandInUser>;

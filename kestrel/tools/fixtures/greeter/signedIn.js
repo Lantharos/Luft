@@ -14,5 +14,6 @@ require(started.length === 1 && started[0].username === 'mara', 'signing in star
 require(started[0].cmd.join(' ') === 'systemd-cat --identifier=kestrel kestrel-session', 'the session starts the chosen session’s command with its output kept in the journal');
 require(['XDG_SESSION_TYPE=wayland', 'XDG_SESSION_DESKTOP=kestrel', 'XDG_CURRENT_DESKTOP=Kestrel:GNOME']
   .every(variable => started[0].env.includes(variable)), 'the session gets its type and desktop names');
+require(started[0].env.includes('LANG=de_DE.UTF-8'), 'the session starts in the person’s own language');
 require(events.some(event => event.type === 'remembered-session' && event.user === 'mara' && event.session === 'kestrel'),
   'the chosen session is remembered for next time');

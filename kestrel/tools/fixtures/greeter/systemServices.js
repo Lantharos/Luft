@@ -9,7 +9,7 @@ const HOUR = 3600;
 const now = Math.floor(Date.now() / 1000);
 const people = [
   {name: GLib.get_user_name(), realName: 'Sam Rivera', uid: new Gio.Credentials().get_unix_user(), loginTime: now - HOUR, session: 'kestrel'},
-  {name: 'mara', realName: 'Mara Lindqvist', uid: 2001, loginTime: now - 30 * HOUR, session: 'sway'},
+  {name: 'mara', realName: 'Mara Lindqvist', uid: 2001, loginTime: now - 30 * HOUR, session: 'sway', language: 'de_DE.UTF-8'},
   {name: 'theo', realName: 'Theo Brandt', uid: 2002, loginTime: now - 90 * HOUR, session: ''},
 ];
 
@@ -42,7 +42,7 @@ function exportUser(person) {
     HomeDirectory: `/home/${person.name}`,
     Shell: '/bin/bash',
     Email: '',
-    Language: '',
+    Language: person.language ?? '',
     Languages: [],
     Session: person.session,
     SessionType: person.session ? 'wayland' : '',

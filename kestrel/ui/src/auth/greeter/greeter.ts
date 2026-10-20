@@ -229,7 +229,7 @@ export class Greeter {
     this.finishing = true;
     this.menus.close(true);
     await rememberSession(user, session.id);
-    const { command, environment } = sessionCommand(session);
+    const { command, environment } = sessionCommand(session, this.accounts.find(user).get_language() ?? '');
     if (!await this.authentication.startSession(command, environment)) {
       this.finishing = false;
       this.prompt.cancel();

@@ -66,13 +66,14 @@ export function availableSessions(): Session[] {
   return [...sessions.values()].sort((a, b) => a.name.localeCompare(b.name));
 }
 
-export function sessionCommand(session: Session): { command: string[]; environment: string[] } {
+export function sessionCommand(session: Session, language: string): { command: string[]; environment: string[] } {
   return {
     command: ['systemd-cat', `--identifier=${session.id}`, session.exec],
     environment: [
       'XDG_SESSION_TYPE=wayland',
       `XDG_SESSION_DESKTOP=${session.id}`,
       `XDG_CURRENT_DESKTOP=${session.desktopNames}`,
+      ...(language ? [`LANG=${language}`] : []),
     ],
   };
 }

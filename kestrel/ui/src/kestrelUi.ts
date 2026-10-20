@@ -38,6 +38,7 @@ import { confirmStartupOnceSettled } from './system/health/startup.js';
 import { CopilotActions } from './system/dictation/copilotActions.js';
 import { startPeekHost, type HostContext } from './system/peek/host/host.js';
 import type { PeekService } from './system/peek/service.js';
+import { followUserLanguage } from './system/language/language.js';
 import { SystemServices } from './system/services.js';
 
 export { appIcon, appIcons, sourceApp, windowIcon } from './appearance/icons/appIcons.js';
@@ -147,6 +148,7 @@ class KestrelUi {
     });
     const holdPanels = () => this.panels.hold(this.menus.actor.visible || this.previews.actor.visible);
     for (const actor of [this.menus.actor, this.previews.actor]) actor.connect('notify::visible', holdPanels);
+    this.disconnectors.push(followUserLanguage(this.ownsTheScreen));
     this.disconnectors.push(taskbarPreferences.watch(key => {
       if (key === 'taskbar-style' || key === 'taskbar-size' || key === 'tablet') place();
     }));

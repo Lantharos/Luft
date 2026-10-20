@@ -58,7 +58,13 @@ export function publishAccounts(publish) {
   ];
   for (const person of people) {
     person.path = `${ACCOUNTS_PATH}/User${person.uid}`;
-    publish(interfaceXml('org.freedesktop.Accounts.User'), user(person), person.path);
+    const account = user(person);
+    account.SetLanguage = language => {
+      account.Language = language;
+      exported.emit_property_changed('Language', new GLib.Variant('s', language));
+      exported.emit_signal('Changed', null);
+    };
+    const exported = publish(interfaceXml('org.freedesktop.Accounts.User'), account, person.path);
   }
   const [me] = people;
   const found = (person, key) => {

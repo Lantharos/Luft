@@ -2,7 +2,7 @@ import {useScheme} from '../lib/palette.js';
 import {show} from './navigation.js';
 
 const PAGES = ['bluetooth', 'display', 'sound', 'power', 'appearance', 'appearance/fonts', 'appearance/taskbar', 'notifications', 'keyboard', 'keyboard/dictation', 'mouse',
-  'accessibility', 'apps', 'privacy', 'security', 'datetime', 'users', 'login', 'updates', 'about'];
+  'accessibility', 'apps', 'privacy', 'security', 'region', 'datetime', 'users', 'login', 'updates', 'about'];
 
 async function visit(app, scheme) {
   useScheme(scheme);

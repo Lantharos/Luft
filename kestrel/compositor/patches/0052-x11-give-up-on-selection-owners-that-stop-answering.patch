@@ -14,9 +14,9 @@ as soon as the selection loses its owner or the X11 display shuts
 down. The requestor then gets an error and its fd is closed.
 ---
  .../meta-x11-selection-input-stream-private.h |   5 +
- src/x11/meta-x11-selection-input-stream.c     | 151 +++++++++++++++++-
+ src/x11/meta-x11-selection-input-stream.c     | 165 +++++++++++++++++-
  src/x11/meta-x11-selection.c                  |  32 ++++
- 3 files changed, 183 insertions(+), 5 deletions(-)
+ 3 files changed, 194 insertions(+), 8 deletions(-)
 
 diff --git a/src/x11/meta-x11-selection-input-stream-private.h b/src/x11/meta-x11-selection-input-stream-private.h
 index ade8e25c25c28c21df758c826f2d7276cbd1e62d..993c9af9e511bdc6e10b6ece6fe7b24e413c1ac1 100644
@@ -33,7 +33,7 @@ index ade8e25c25c28c21df758c826f2d7276cbd1e62d..993c9af9e511bdc6e10b6ece6fe7b24e
 +
  G_END_DECLS
 diff --git a/src/x11/meta-x11-selection-input-stream.c b/src/x11/meta-x11-selection-input-stream.c
-index da7adb89e70cc910b02d58c1782901843f2d78d5..52c93644a560c309c916e3839b09bde1ff0bae52 100644
+index da7adb89e70cc910b02d58c1782901843f2d78d5..4a8b4591c2c2b1ae6b82543a2ae1aed995316d3d 100644
 --- a/src/x11/meta-x11-selection-input-stream.c
 +++ b/src/x11/meta-x11-selection-input-stream.c
 @@ -23,9 +23,12 @@
@@ -60,11 +60,11 @@ index da7adb89e70cc910b02d58c1782901843f2d78d5..52c93644a560c309c916e3839b09bde1
  
    guint complete : 1;
    guint incr : 1;
-@@ -120,6 +127,19 @@ meta_x11_selection_input_stream_fill_buffer (MetaX11SelectionInputStream *stream
-   return result;
+@@ -121,16 +128,36 @@ meta_x11_selection_input_stream_fill_buffer (MetaX11SelectionInputStream *stream
  }
  
-+static void
+ static void
+-meta_x11_selection_input_stream_flush (MetaX11SelectionInputStream *stream)
 +stop_waiting_for_cancellation (MetaX11SelectionInputStream *stream)
 +{
 +  MetaX11SelectionInputStreamPrivate *priv =
@@ -77,10 +77,29 @@ index da7adb89e70cc910b02d58c1782901843f2d78d5..52c93644a560c309c916e3839b09bde1
 +  g_clear_pointer (&priv->cancelled_source, g_source_unref);
 +}
 +
- static void
- meta_x11_selection_input_stream_flush (MetaX11SelectionInputStream *stream)
++static void
++request_next_chunk (MetaX11SelectionInputStream *stream)
  {
-@@ -138,10 +158,19 @@ meta_x11_selection_input_stream_flush (MetaX11SelectionInputStream *stream)
+   MetaX11SelectionInputStreamPrivate *priv =
+     meta_x11_selection_input_stream_get_instance_private (stream);
+   Display *xdisplay = priv->x11_display->xdisplay;
+-  gssize written;
+ 
+   mtk_x11_error_trap_push (xdisplay);
+   XDeleteProperty (xdisplay, priv->window, priv->xproperty);
+   mtk_x11_error_trap_pop (xdisplay);
++}
++
++static void
++meta_x11_selection_input_stream_flush (MetaX11SelectionInputStream *stream)
++{
++  MetaX11SelectionInputStreamPrivate *priv =
++    meta_x11_selection_input_stream_get_instance_private (stream);
++  gssize written;
+ 
+   if (!meta_x11_selection_input_stream_has_data (stream))
+     return;
+@@ -138,10 +165,19 @@ meta_x11_selection_input_stream_flush (MetaX11SelectionInputStream *stream)
    if (priv->pending_task == NULL)
      return;
  
@@ -104,7 +123,7 @@ index da7adb89e70cc910b02d58c1782901843f2d78d5..52c93644a560c309c916e3839b09bde1
  
    g_clear_object (&priv->pending_task);
    priv->pending_data = NULL;
-@@ -158,6 +187,7 @@ meta_x11_selection_input_stream_complete (MetaX11SelectionInputStream *stream)
+@@ -158,6 +194,7 @@ meta_x11_selection_input_stream_complete (MetaX11SelectionInputStream *stream)
      return;
  
    priv->complete = TRUE;
@@ -112,7 +131,7 @@ index da7adb89e70cc910b02d58c1782901843f2d78d5..52c93644a560c309c916e3839b09bde1
  
    g_async_queue_push (priv->chunks, g_bytes_new (NULL, 0));
    meta_x11_selection_input_stream_flush (stream);
-@@ -168,6 +198,88 @@ meta_x11_selection_input_stream_complete (MetaX11SelectionInputStream *stream)
+@@ -168,6 +205,88 @@ meta_x11_selection_input_stream_complete (MetaX11SelectionInputStream *stream)
    g_object_unref (stream);
  }
  
@@ -201,7 +220,7 @@ index da7adb89e70cc910b02d58c1782901843f2d78d5..52c93644a560c309c916e3839b09bde1
  static gssize
  meta_x11_selection_input_stream_read (GInputStream  *input_stream,
                                        void          *buffer,
-@@ -177,6 +289,14 @@ meta_x11_selection_input_stream_read (GInputStream  *input_stream,
+@@ -177,6 +296,14 @@ meta_x11_selection_input_stream_read (GInputStream  *input_stream,
  {
    MetaX11SelectionInputStream *stream =
      META_X11_SELECTION_INPUT_STREAM (input_stream);
@@ -216,7 +235,7 @@ index da7adb89e70cc910b02d58c1782901843f2d78d5..52c93644a560c309c916e3839b09bde1
  
    return meta_x11_selection_input_stream_fill_buffer (stream, buffer, count);
  }
-@@ -208,7 +328,12 @@ meta_x11_selection_input_stream_read_async (GInputStream        *input_stream,
+@@ -208,7 +335,12 @@ meta_x11_selection_input_stream_read_async (GInputStream        *input_stream,
    g_task_set_source_tag (task, meta_x11_selection_input_stream_read_async);
    g_task_set_priority (task, io_priority);
  
@@ -230,7 +249,7 @@ index da7adb89e70cc910b02d58c1782901843f2d78d5..52c93644a560c309c916e3839b09bde1
      {
        gssize size;
  
-@@ -221,6 +346,7 @@ meta_x11_selection_input_stream_read_async (GInputStream        *input_stream,
+@@ -221,6 +353,7 @@ meta_x11_selection_input_stream_read_async (GInputStream        *input_stream,
        priv->pending_data = buffer;
        priv->pending_size = count;
        priv->pending_task = task;
@@ -238,7 +257,7 @@ index da7adb89e70cc910b02d58c1782901843f2d78d5..52c93644a560c309c916e3839b09bde1
      }
  }
  
-@@ -288,6 +414,7 @@ meta_x11_selection_input_stream_finalize (GObject *object)
+@@ -288,6 +421,7 @@ meta_x11_selection_input_stream_finalize (GObject *object)
    MetaX11Display *x11_display;
  
    g_async_queue_unref (priv->chunks);
@@ -246,15 +265,16 @@ index da7adb89e70cc910b02d58c1782901843f2d78d5..52c93644a560c309c916e3839b09bde1
  
    x11_display = priv->x11_display;
    if (x11_display)
-@@ -443,6 +570,7 @@ meta_x11_selection_input_stream_xevent (MetaX11SelectionInputStream *stream,
+@@ -443,6 +577,8 @@ meta_x11_selection_input_stream_xevent (MetaX11SelectionInputStream *stream,
        else
          {
            g_async_queue_push (priv->chunks, bytes);
 +          wait_for_owner (stream);
++          request_next_chunk (stream);
            meta_x11_selection_input_stream_flush (stream);
          }
        return FALSE;
-@@ -464,6 +592,7 @@ meta_x11_selection_input_stream_xevent (MetaX11SelectionInputStream *stream,
+@@ -464,6 +600,7 @@ meta_x11_selection_input_stream_xevent (MetaX11SelectionInputStream *stream,
              return FALSE;
            }
  
@@ -262,15 +282,17 @@ index da7adb89e70cc910b02d58c1782901843f2d78d5..52c93644a560c309c916e3839b09bde1
          task = g_steal_pointer (&priv->pending_task);
  
          if (xevent->xselection.property == None)
-@@ -495,6 +624,7 @@ meta_x11_selection_input_stream_xevent (MetaX11SelectionInputStream *stream,
+@@ -495,7 +632,8 @@ meta_x11_selection_input_stream_xevent (MetaX11SelectionInputStream *stream,
                      /* The remainder of the selection will come through PropertyNotify
                         events on xwindow */
                      priv->incr = TRUE;
+-                    meta_x11_selection_input_stream_flush (stream);
 +                    wait_for_owner (stream);
-                     meta_x11_selection_input_stream_flush (stream);
++                    request_next_chunk (stream);
                    }
                  else
-@@ -564,6 +694,17 @@ meta_x11_selection_input_stream_new_async (MetaX11Display      *x11_display,
+                   {
+@@ -564,6 +702,17 @@ meta_x11_selection_input_stream_new_async (MetaX11Display      *x11_display,
    priv->pending_task = g_task_new (NULL, cancellable, callback, user_data);
    g_task_set_source_tag (priv->pending_task, meta_x11_selection_input_stream_new_async);
    g_task_set_priority (priv->pending_task, io_priority);
@@ -289,7 +311,7 @@ index da7adb89e70cc910b02d58c1782901843f2d78d5..52c93644a560c309c916e3839b09bde1
  
  GInputStream *
 diff --git a/src/x11/meta-x11-selection.c b/src/x11/meta-x11-selection.c
-index cb16a495d08777e796882b1485e6e2f6b9ad72c9..a7a593e20d611b3aa88d981cc882cd0aec571a7d 100644
+index cb16a495d08777e796882b1485e6e2f6b9ad72c9..0d0c4c470b6700f31f2d411dac0b572396d6ec47 100644
 --- a/src/x11/meta-x11-selection.c
 +++ b/src/x11/meta-x11-selection.c
 @@ -24,6 +24,7 @@
@@ -300,7 +322,7 @@ index cb16a495d08777e796882b1485e6e2f6b9ad72c9..a7a593e20d611b3aa88d981cc882cd0a
  #include "x11/meta-x11-selection-output-stream-private.h"
  #include "x11/meta-x11-selection-private.h"
  
-@@ -344,6 +345,31 @@ source_new_cb (GObject      *object,
+@@ -344,6 +345,32 @@ source_new_cb (GObject      *object,
    g_free (data);
  }
  
@@ -317,7 +339,8 @@ index cb16a495d08777e796882b1485e6e2f6b9ad72c9..a7a593e20d611b3aa88d981cc882cd0a
 +    {
 +      MetaX11SelectionInputStream *stream = l->data;
 +
-+      if (meta_x11_selection_input_stream_get_selection (stream) != xselection)
++      if (xselection != None &&
++          meta_x11_selection_input_stream_get_selection (stream) != xselection)
 +        continue;
 +
 +      meta_x11_selection_input_stream_abort (stream,
@@ -332,7 +355,7 @@ index cb16a495d08777e796882b1485e6e2f6b9ad72c9..a7a593e20d611b3aa88d981cc882cd0a
  static void
  unset_clipboard_owner (gpointer user_data)
  {
-@@ -384,6 +410,9 @@ meta_x11_selection_handle_xfixes_selection_notify (MetaX11Display *x11_display,
+@@ -384,6 +411,9 @@ meta_x11_selection_handle_xfixes_selection_notify (MetaX11Display *x11_display,
  
    x11_display->selection.cancellables[selection_type] = g_cancellable_new ();
  
@@ -342,13 +365,12 @@ index cb16a495d08777e796882b1485e6e2f6b9ad72c9..a7a593e20d611b3aa88d981cc882cd0a
    if (event->owner == None && x11_display->selection.owners[selection_type])
      {
        if (event->subtype == XFixesSetSelectionOwnerNotify)
-@@ -550,6 +579,9 @@ meta_x11_selection_shutdown (MetaX11Display *x11_display)
-           g_cancellable_cancel (x11_display->selection.cancellables[i]);
-           g_clear_object (&x11_display->selection.cancellables[i]);
+@@ -552,6 +582,8 @@ meta_x11_selection_shutdown (MetaX11Display *x11_display)
          }
-+
-+      abort_input_streams (x11_display,
-+                           selection_to_atom (i, x11_display->xdisplay));
      }
  
++  abort_input_streams (x11_display, None);
++
    if (x11_display->selection.xwindow != None)
+     {
+       XDestroyWindow (x11_display->xdisplay, x11_display->selection.xwindow);

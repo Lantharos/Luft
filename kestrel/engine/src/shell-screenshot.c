@@ -1365,6 +1365,13 @@ shell_screenshot_composite_to_stream (CoglTexture         *texture,
                                      cairo_image_surface_get_height (surface));
   cairo_surface_destroy (surface);
 
+  if (!pixbuf)
+    {
+      g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_FAILED,
+                               "Converting the picture failed");
+      return;
+    }
+
   date_time = g_date_time_new_now_local ();
   creation_time = g_date_time_format (date_time, "%c");
 

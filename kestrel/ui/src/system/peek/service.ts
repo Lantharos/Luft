@@ -12,9 +12,10 @@ import { captureScreen, captureWindow } from './control/capture.js';
 import { requireOpenScreen, screenGuarded, type Screen } from './control/guard.js';
 import { Injector } from './control/input.js';
 import { parseCombo, textKeys } from './control/keys.js';
+import { redrawn } from './control/redraw.js';
 import { bringForward, type Point } from './control/targets.js';
 import { describe, listedWindows, windowById } from './control/windows.js';
-import { PeekError, returnError } from './errors.js';
+import { PeekError, returnError, within } from './errors.js';
 import type { Policy } from './policy.js';
 
 const BUS_NAME = 'com.lantharos.Kestrel.Peek';
@@ -47,6 +48,7 @@ const PEEK_XML = `<node><interface name="${BUS_NAME}">
 </interface></node>`;
 
 const BUTTONS = new Set([1, 2, 3]);
+const CAPTURE_TIMEOUT = 10_000;
 
 function mouseButton(button: number): number {
   if (!BUTTONS.has(button)) throw new PeekError('InvalidArgs', 'The mouse button is 1 (left), 2 (middle) or 3 (right)');
@@ -60,6 +62,7 @@ export class PeekService {
   private readonly dbus = Gio.DBusExportedObject.wrapJSObject(PEEK_XML, this);
   private readonly injector: Injector;
   private readonly nameId: number;
+  private readonly redraws = new Set<Promise<void>>();
 
   constructor(private readonly screen: Screen, private readonly activateWindow: (window: Meta.Window) => void,
     private readonly policy: Policy, named: () => void = () => {}) {
@@ -97,7 +100,8 @@ export class PeekService {
   CaptureWindowAsync([id, index]: [number, number], invocation: Invocation, fds: Gio.UnixFDList | null): void {
     this.capture(invocation, stealFd(fds, index), async (caller, output) => {
       const window = await this.permitted(caller, id, 'see');
-      await captureWindow(window, output);
+      await Promise.all(this.redraws);
+      await within(captureWindow(window, output), CAPTURE_TIMEOUT, "The window's picture wasn't ready in time");
     });
   }
 
@@ -106,7 +110,8 @@ export class PeekService {
       requireOpenScreen(this.screen);
       await this.policy.require(caller, null, 'see');
       requireOpenScreen(this.screen);
-      await captureScreen(output);
+      await Promise.all(this.redraws);
+      await within(captureScreen(output), CAPTURE_TIMEOUT, "The screen's picture wasn't ready in time");
     });
   }
 
@@ -166,8 +171,14 @@ export class PeekService {
       const targets = await bringForward(window, this.activateWindow, points);
       requireOpenScreen(this.screen);
       await act(window, targets);
+      this.expectRedraw(window);
       return null;
     });
+  }
+
+  private expectRedraw(window: Meta.Window): void {
+    const redraw = redrawn(window).finally(() => this.redraws.delete(redraw));
+    this.redraws.add(redraw);
   }
 
   private describe(window: Meta.Window, caller: Caller): Record<string, GLib.Variant> {

@@ -5,7 +5,7 @@ How Luft speaks Croatian. The [glossary](../../packages/i18n/glossary/hr.csv) ha
 ## Address and tone
 
 - Prefer sentences without a person at all: „Ažuriranja se instaliraju pri sljedećem pokretanju“, „Nema obavijesti“.
-- When the reader has to be addressed, use **vi**, lowercase, as Windows and GNOME do: „Možete to promijeniti kasnije u Postavkama.“ Never capitalize Vi or Vaš, and never switch to ti.
+- When the reader has to be addressed, use the formal plural **vi**, lowercase, as most operating systems do in Croatian, Windows and GNOME among them: „Možete to promijeniti kasnije u Postavkama.“ Never capitalize Vi or Vaš, and never switch to ti.
 - Luft is friendly but calm. Short, plain sentences, no exclamation marks, no marketing words.
 - Say what happens, not how it works inside.
 - Croatian vocabulary and ijekavian forms: datoteka, mapa, računalo, postavke, zaslon, tipkovnica, sustav, obavijest, vrijeme, svjetlo.

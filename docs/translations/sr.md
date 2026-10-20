@@ -11,7 +11,7 @@ How Luft speaks Serbian. The [glossary](../../packages/i18n/glossary/sr.csv) has
 ## Address and tone
 
 - Prefer sentences without a person at all: „Ажурирања се инсталирају при следећем покретању“, „Нема обавештења“.
-- When the reader has to be addressed, use **ви**, lowercase, as Windows does: „Можете то да промените касније у Подешавањима.“ Never capitalize Ви or Ваш, and never switch to ти.
+- When the reader has to be addressed, use the formal plural **ви**, lowercase, as most operating systems do in Serbian, Windows among them: „Можете то да промените касније у Подешавањима.“ Never capitalize Ви or Ваш, and never switch to ти.
 - Luft is friendly but calm. Short, plain sentences, no exclamation marks, no marketing words.
 - Say what happens, not how it works inside.
 - Ekavian forms and Serbian vocabulary: датотека, фасцикла, рачунар, подешавања, екран, тастатура, систем, обавештење, време, светло.

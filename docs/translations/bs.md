@@ -9,7 +9,7 @@ Bosnian in Luft is written in **Latin script** with **ijekavian** forms: vrijeme
 ## Address and tone
 
 - Prefer sentences without a person at all: „Ažuriranja se instaliraju pri sljedećem pokretanju“, „Nema obavještenja“.
-- When the reader has to be addressed, use **vi**, lowercase, as Windows does: „Možete to promijeniti kasnije u Postavkama.“ Never capitalize Vi or Vaš, and never switch to ti.
+- When the reader has to be addressed, use the formal plural **vi**, lowercase, as most operating systems do in Bosnian, Windows among them: „Možete to promijeniti kasnije u Postavkama.“ Never capitalize Vi or Vaš, and never switch to ti.
 - Luft is friendly but calm. Short, plain sentences, no exclamation marks, no marketing words.
 - Say what happens, not how it works inside.
 

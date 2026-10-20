@@ -160,7 +160,11 @@ fn start_program(
     group: &Cgroup,
 ) -> io::Result<()> {
     let mut program = Command::new(std::env::current_exe()?);
-    program.arg(STUB).args(command).stdin(Stdio::piped());
+    program
+        .arg(STUB)
+        .args(command)
+        .stdin(Stdio::piped())
+        .stdout(io::stderr().as_fd().try_clone_to_owned()?);
     for name in PROGRAM_DISPLAY {
         program.env_remove(name);
     }

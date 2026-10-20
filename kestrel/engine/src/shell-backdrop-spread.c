@@ -6,10 +6,6 @@
 #include "shell-backdrop-private.h"
 #include "shell-global.h"
 
-#define CHANGE_GAP_US (100 * G_TIME_SPAN_MILLISECOND)
-#define SUSTAINED_CHANGE_US (500 * G_TIME_SPAN_MILLISECOND)
-#define SUSTAINED_REFRESH_US (45 * G_TIME_SPAN_MILLISECOND)
-
 static GList *spreads;
 
 struct _ShellBackdropSpread
@@ -20,7 +16,6 @@ struct _ShellBackdropSpread
   MetaStage *stage;
   MetaStageRedrawClipFilter *filter;
   gulong before_paint_id;
-  guint flush_id;
   float reach;
 };
 
@@ -95,95 +90,20 @@ view_region (ClutterStageView *view)
 }
 
 static MtkRegion *
-take_deferred (BackdropFrame *frame)
+take_changes (BackdropFrame *frame)
 {
-  MtkRegion *deferred = g_steal_pointer (&frame->deferred);
+  MtkRegion *changes = g_steal_pointer (&frame->changes);
 
-  frame->deferred = mtk_region_create ();
-  return deferred;
-}
-
-static gboolean flush_deferred (gpointer data);
-
-static void
-schedule_flush (ShellBackdropSpread *spread,
-                int64_t              delay)
-{
-  if (spread->flush_id)
-    return;
-
-  spread->flush_id = g_timeout_add ((delay + G_TIME_SPAN_MILLISECOND - 1) / G_TIME_SPAN_MILLISECOND,
-                                    flush_deferred, spread);
-  g_source_set_name_by_id (spread->flush_id, "[kestrel] flush deferred glass");
-}
-
-static gboolean
-flush_deferred (gpointer data)
-{
-  ShellBackdropSpread *spread = data;
-  int64_t now = g_get_monotonic_time ();
-  int64_t wait = G_MAXINT64;
-  gboolean settled = FALSE;
-  GHashTableIter iter;
-  Backdrop *backdrop;
-
-  spread->flush_id = 0;
-  g_hash_table_iter_init (&iter, spread->cache);
-  while (g_hash_table_iter_next (&iter, NULL, (gpointer *) &backdrop))
-    {
-      int64_t remaining = backdrop->frame.last_change + CHANGE_GAP_US - now;
-
-      if (mtk_region_is_empty (backdrop->frame.deferred))
-        continue;
-
-      if (remaining <= 0)
-        settled = TRUE;
-      else
-        wait = MIN (wait, remaining);
-    }
-
-  if (settled)
-    clutter_actor_queue_redraw (clutter_actor_meta_get_actor (spread->effect));
-  else if (wait != G_MAXINT64)
-    schedule_flush (spread, wait);
-
-  return G_SOURCE_REMOVE;
+  frame->changes = mtk_region_create ();
+  return changes;
 }
 
 static void
 note_change (BackdropFrame   *frame,
-             const MtkRegion *changed,
-             int64_t          now)
+             const MtkRegion *changed)
 {
-  if (now - frame->last_change > CHANGE_GAP_US)
-    frame->changing_since = now;
-  frame->last_change = now;
-  mtk_region_union (frame->deferred, changed);
+  mtk_region_union (frame->changes, changed);
   frame->changed = TRUE;
-}
-
-static void
-decide_refresh (ShellBackdropSpread *spread,
-                BackdropFrame       *frame,
-                BehindChange         change,
-                int64_t              now)
-{
-  gboolean sustained;
-
-  if (frame->refresh || mtk_region_is_empty (frame->deferred))
-    return;
-
-  sustained = now - frame->last_change < CHANGE_GAP_US &&
-    now - frame->changing_since >= SUSTAINED_CHANGE_US;
-  if (change != BEHIND_REARRANGED && sustained &&
-      now - frame->last_refresh < SUSTAINED_REFRESH_US)
-    {
-      schedule_flush (spread, frame->last_change + CHANGE_GAP_US - now);
-      return;
-    }
-
-  frame->refresh = TRUE;
-  frame->last_refresh = now;
 }
 
 static gboolean
@@ -199,7 +119,7 @@ other_glass_refreshes (ShellBackdropSpread *spread,
       Backdrop *backdrop = other == spread ? NULL : g_hash_table_lookup (other->cache, view);
       g_autoptr (MtkRegion) overlap = NULL;
 
-      if (!backdrop || !backdrop->frame.refresh)
+      if (!backdrop || !backdrop->frame.changed)
         continue;
 
       overlap = mtk_region_copy (backdrop->frame.spread);
@@ -219,26 +139,24 @@ look_behind (ShellBackdropSpread *spread,
              const MtkRectangle  *area)
 {
   BackdropFrame *frame = &backdrop->frame;
-  int64_t now = g_get_monotonic_time ();
-  BehindChange change, elsewhere;
+  gboolean changed, elsewhere;
 
   frame->seen = TRUE;
   frame->repainted = redraw_clip ? mtk_region_ref (redraw_clip) : view_region (backdrop->view);
   g_clear_pointer (&frame->looked, mtk_region_unref);
   frame->looked = mtk_region_copy (frame->repainted);
   mtk_region_intersect_rectangle (frame->looked, area);
-  change = shell_backdrop_behind_look (spread->behind, actor,
-                                       frame->repainted, frame->looked,
-                                       &elsewhere);
-  shell_backdrop_mark_behind (spread->cache, backdrop, elsewhere);
-  change = MAX (change, frame->behind);
-  frame->behind = BEHIND_SAME;
-  if (change == BEHIND_SAME && other_glass_refreshes (spread, backdrop->view, frame->looked))
-    change = BEHIND_REPAINTED;
+  changed = shell_backdrop_behind_changed (spread->behind, actor,
+                                           frame->repainted, frame->looked,
+                                           &elsewhere);
+  if (elsewhere)
+    shell_backdrop_mark_behind_changed (spread->cache, backdrop);
+  changed |= frame->behind_changed ||
+    other_glass_refreshes (spread, backdrop->view, frame->looked);
+  frame->behind_changed = FALSE;
 
-  if (change != BEHIND_SAME && !mtk_region_is_empty (frame->looked))
-    note_change (frame, frame->looked, now);
-  decide_refresh (spread, frame, change, now);
+  if (changed && !mtk_region_is_empty (frame->looked))
+    note_change (frame, frame->looked);
 }
 
 static void
@@ -247,7 +165,6 @@ look_at_growth (ShellBackdropSpread *spread,
                 const MtkRegion     *redraw_clip,
                 const MtkRectangle  *area)
 {
-  int64_t now = g_get_monotonic_time ();
   g_autoptr (MtkRegion) grown = mtk_region_copy (redraw_clip);
 
   mtk_region_intersect_rectangle (grown, area);
@@ -257,8 +174,7 @@ look_at_growth (ShellBackdropSpread *spread,
     return;
 
   mtk_region_union (frame->looked, grown);
-  note_change (frame, grown, now);
-  decide_refresh (spread, frame, BEHIND_REPAINTED, now);
+  note_change (frame, grown);
 }
 
 static gboolean
@@ -268,7 +184,7 @@ spread_reach (ShellBackdropSpread *spread,
               MtkRegion           *redraw_clip,
               const MtkRectangle  *area)
 {
-  g_autoptr (MtkRegion) changed = take_deferred (frame);
+  g_autoptr (MtkRegion) changed = take_changes (frame);
   g_autoptr (MtkRegion) repaint = NULL;
   int reach, i;
 
@@ -327,7 +243,7 @@ spread_redraw_clip (MetaStage        *stage,
   else if (redraw_clip)
     look_at_growth (spread, frame, redraw_clip, &area);
 
-  if (frame->refresh)
+  if (frame->changed)
     return spread_reach (spread, frame, view, redraw_clip, &area);
 
   return FALSE;
@@ -343,7 +259,6 @@ forget_frame (ShellBackdropSpread *spread,
     return;
 
   backdrop->frame.seen = FALSE;
-  backdrop->frame.refresh = FALSE;
   backdrop->frame.changed = FALSE;
   g_clear_pointer (&backdrop->frame.repainted, mtk_region_unref);
   g_clear_pointer (&backdrop->frame.looked, mtk_region_unref);
@@ -387,7 +302,6 @@ shell_backdrop_spread_free (ShellBackdropSpread *spread)
   spreads = g_list_remove (spreads, spread);
   meta_stage_remove_redraw_clip_filter (spread->filter);
   g_clear_signal_handler (&spread->before_paint_id, spread->stage);
-  g_clear_handle_id (&spread->flush_id, g_source_remove);
   shell_backdrop_behind_free (spread->behind);
   g_free (spread);
 }

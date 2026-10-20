@@ -137,12 +137,12 @@ damage_reaches (const Placement *placement,
     (before && box_reaches (&before->box, region));
 }
 
-BehindChange
-shell_backdrop_behind_look (ShellBackdropBehind *behind,
-                            ClutterActor        *actor,
-                            const MtkRegion     *repainted,
-                            const MtkRegion     *blurred,
-                            BehindChange        *elsewhere)
+gboolean
+shell_backdrop_behind_changed (ShellBackdropBehind *behind,
+                               ClutterActor        *actor,
+                               const MtkRegion     *repainted,
+                               const MtkRegion     *blurred,
+                               gboolean            *elsewhere)
 {
   guint64 print = PRINT_SEED;
   gboolean rearranged = FALSE;
@@ -187,12 +187,6 @@ shell_backdrop_behind_look (ShellBackdropBehind *behind,
   behind->previous = behind->placements;
   behind->placements = swap;
 
-  if (rearranged)
-    {
-      *elsewhere = BEHIND_REARRANGED;
-      return BEHIND_REARRANGED;
-    }
-
-  *elsewhere = repainted_elsewhere ? BEHIND_REPAINTED : BEHIND_SAME;
-  return repainted_here ? BEHIND_REPAINTED : BEHIND_SAME;
+  *elsewhere = rearranged || repainted_elsewhere;
+  return rearranged || repainted_here;
 }

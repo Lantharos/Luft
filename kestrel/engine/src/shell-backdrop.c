@@ -52,7 +52,7 @@ backdrop_free (gpointer data)
   g_clear_pointer (&backdrop->frame.repainted, mtk_region_unref);
   g_clear_pointer (&backdrop->frame.looked, mtk_region_unref);
   g_clear_pointer (&backdrop->frame.spread, mtk_region_unref);
-  g_clear_pointer (&backdrop->frame.deferred, mtk_region_unref);
+  g_clear_pointer (&backdrop->frame.changes, mtk_region_unref);
   g_free (backdrop);
 }
 
@@ -74,7 +74,7 @@ shell_backdrop_for_view (GHashTable       *cache,
   backdrop = g_new0 (Backdrop, 1);
   backdrop->valid = mtk_region_create ();
   backdrop->frame.spread = mtk_region_create ();
-  backdrop->frame.deferred = mtk_region_create ();
+  backdrop->frame.changes = mtk_region_create ();
   backdrop->cache = cache;
   backdrop->view = view;
   if (view)
@@ -97,14 +97,12 @@ void
 shell_backdrop_forget (Backdrop *backdrop)
 {
   clear_region (&backdrop->valid);
-  clear_region (&backdrop->frame.deferred);
-  backdrop->frame.last_change = 0;
+  clear_region (&backdrop->frame.changes);
 }
 
 void
-shell_backdrop_mark_behind (GHashTable   *cache,
-                            Backdrop     *except,
-                            BehindChange  change)
+shell_backdrop_mark_behind_changed (GHashTable *cache,
+                                    Backdrop   *except)
 {
   GHashTableIter iter;
   Backdrop *backdrop;
@@ -113,7 +111,7 @@ shell_backdrop_mark_behind (GHashTable   *cache,
   while (g_hash_table_iter_next (&iter, NULL, (gpointer *) &backdrop))
     {
       if (backdrop != except)
-        backdrop->frame.behind = MAX (backdrop->frame.behind, change);
+        backdrop->frame.behind_changed = TRUE;
     }
 }
 
@@ -297,7 +295,7 @@ shell_backdrop_capture (GHashTable          *cache,
   g_autoptr (MtkRegion) captured = NULL;
 
   if (!view)
-    shell_backdrop_mark_behind (cache, NULL, BEHIND_REARRANGED);
+    shell_backdrop_mark_behind_changed (cache, NULL);
 
   if (!backdrop->framebuffer)
     return NULL;
@@ -333,7 +331,7 @@ shell_backdrop_capture (GHashTable          *cache,
   mtk_region_intersect (captured, visible);
   mtk_region_subtract (captured, backdrop->valid);
 
-  *changed |= !backdrop->frame.repainted || backdrop->frame.refresh;
+  *changed |= !backdrop->frame.repainted || backdrop->frame.changed;
   if (!mtk_region_is_empty (captured))
     {
       g_autoptr (GError) error = NULL;

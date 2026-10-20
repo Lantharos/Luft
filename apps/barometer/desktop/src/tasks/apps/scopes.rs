@@ -30,7 +30,7 @@ impl Scopes {
         for name in units(&self.root) {
             if name.ends_with(".slice") {
                 names.extend(
-                    units(&self.root.join(&name))
+                    children(&self.root.join(&name))
                         .into_iter()
                         .map(|unit| format!("{name}/{unit}")),
                 );
@@ -124,13 +124,20 @@ impl Scopes {
 }
 
 fn units(directory: &Path) -> Vec<String> {
+    children(directory)
+        .into_iter()
+        .filter(|name| name.starts_with("app-") || name.starts_with("dbus-"))
+        .collect()
+}
+
+fn children(directory: &Path) -> Vec<String> {
     let Ok(entries) = fs::read_dir(directory) else {
         return Vec::new();
     };
     entries
         .flatten()
+        .filter(|entry| entry.file_type().is_ok_and(|kind| kind.is_dir()))
         .filter_map(|entry| entry.file_name().into_string().ok())
-        .filter(|name| name.starts_with("app-") || name.starts_with("dbus-"))
         .collect()
 }
 

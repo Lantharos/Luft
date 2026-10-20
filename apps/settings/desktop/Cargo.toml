@@ -33,7 +33,7 @@ luft-network = { path = "../../../packages/network" }
 luft-software = { path = "../../../packages/software" }
 luft-speech = { path = "../../../packages/speech" }
 roxmltree = "0.21.1"
-sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.48" }
+sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.50" }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.154"
 tar = "0.4.46"

@@ -52,9 +52,6 @@ pub fn run_app() -> ! {
     luft_app::run(
         &state.events,
         |sabine| window(sabine, &state, background),
-        move |_| {
-            services::autostart::run_in_background();
-            started.start();
-        },
+        move |_| started.start(),
     )
 }

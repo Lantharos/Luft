@@ -29,7 +29,7 @@ roxmltree = "0.21.1"
 rusqlite = { version = "0.40.2", features = ["bundled"] }
 rustls = { version = "0.23.46", default-features = false, features = ["ring", "std", "tls12", "logging"] }
 rustls-platform-verifier = "0.7.1"
-sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.48" }
+sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.50" }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.154"
 sha2 = "0.11.1"
@@ -43,6 +43,3 @@ zbus = { version = "6.0.0", default-features = false, features = ["proxy", "toki
 lto = "fat"
 codegen-units = 1
 strip = true
-
-[patch."https://github.com/Lantharos/Sabine"]
-sabine = { git = "https://www.github.com/Lantharos/Sabine", rev = "ef086c9260576c64e1d0bd272ec70494f95a0964" }

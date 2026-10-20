@@ -46,3 +46,4 @@
 0046-backends-let-the-shell-treat-held-modifiers-as-used-.patch
 0047-keybindings-finish-shortcuts-that-respond-to-release.patch
 0048-backends-keep-sandboxed-apps-from-recording-controll.patch
+0049-wayland-show-and-hide-the-input-panel-as-soon-as-a-t.patch

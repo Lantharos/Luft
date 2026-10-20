@@ -34,6 +34,12 @@ const KEY_SIZE = 2;
 const KEY_RELEASE_TIMEOUT = 50;
 const BACKSPACE_WORD_DELETE_THRESHOLD = 50;
 
+function tapSound(key, commitString) {
+    if (key.action === 'delete')
+        return 'keyboard-tap-delete';
+    return commitString === ' ' ? 'keyboard-tap-space' : 'keyboard-tap';
+}
+
 const AspectContainer = GObject.registerClass(
 class AspectContainer extends St.Widget {
     _init(params) {
@@ -659,6 +665,7 @@ const EmojiPager = GObject.registerClass({
             const key = new Key({commitString: modelKey.label}, modelKey.variants);
 
             key.connect('commit', (actor, str) => {
+                KestrelUi.playSound('keyboard-tap');
                 this.emit('emoji', str);
             });
 
@@ -1337,6 +1344,8 @@ export const Keyboard = GObject.registerClass({
                 keyval: key.keyval,
                 hasAction: !!key.action,
             }, strings);
+            const tap = tapSound(key, commitString);
+            button.connect('released', () => KestrelUi.playSound(tap));
 
             if (key.action) {
                 button.connect('released', () => {

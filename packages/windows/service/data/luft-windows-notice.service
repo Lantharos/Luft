@@ -1,6 +1,6 @@
 [Unit]
 Description=Tell about Windows' Fast Startup once
-After=graphical-session.target
+After=kestrel-session.target graphical-session.target
 PartOf=graphical-session.target
 ConditionPathExists=!%S/luft/windows-notice
 ConditionPathExists=|/run/luft-windows/hibernated

@@ -1,7 +1,6 @@
 [Unit]
 Description=Set up installed apps
-DefaultDependencies=no
-After=graphical-session.target luft-preinstall.service
+After=kestrel-session.target graphical-session.target luft-preinstall.service
 PartOf=graphical-session.target
 ConditionUser=!@system
 

@@ -34,6 +34,8 @@ export const locale = (): string => current().locale;
 export const inEnglish = (id: string, args?: Args): string => (english ??= load(SOURCE_LOCALE)).format(id, args);
 
 export function formatsLocale(): string {
+  const override = GLib.getenv('LUFT_LOCALE');
+  if (override) return override;
   const name = GLib.getenv('LC_ALL') || GLib.getenv('LC_TIME') || GLib.getenv('LANG');
   return (name && bcp47(name)) || locale();
 }

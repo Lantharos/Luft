@@ -122,6 +122,9 @@ pub fn requested() -> Vec<String> {
 }
 
 pub fn formats() -> String {
+    if let Some(locale) = variable("LUFT_LOCALE") {
+        return locale;
+    }
     ["LC_ALL", "LC_TIME", "LANG"]
         .into_iter()
         .filter_map(variable)

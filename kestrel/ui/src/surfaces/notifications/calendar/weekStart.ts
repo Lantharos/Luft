@@ -5,8 +5,16 @@ import Shell from 'gi://Shell';
 const { util_get_week_start: regionWeekStart } = Shell as unknown as { util_get_week_start(locale: string): number };
 const CHOSEN: Record<string, number> = { monday: 1, sunday: 0 };
 
-const formatsLocale = (region: string) =>
-  (region || GLib.getenv('LC_ALL') || GLib.getenv('LC_TIME') || GLib.getenv('LANG') || '').split(/[.@]/)[0];
+function posixOf(tag: string): string {
+  const { language, region } = new Intl.Locale(tag).maximize();
+  return `${language}_${region}`;
+}
+
+function formatsLocale(region: string): string {
+  const override = GLib.getenv('LUFT_LOCALE');
+  if (override) return posixOf(override);
+  return (region || GLib.getenv('LC_ALL') || GLib.getenv('LC_TIME') || GLib.getenv('LANG') || '').split(/[.@]/)[0];
+}
 
 export class WeekStart {
   private readonly kestrel = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });

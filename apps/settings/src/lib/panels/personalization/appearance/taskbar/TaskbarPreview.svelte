@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { t } from '@luft/i18n';
+	import { i18n, t } from '@luft/i18n';
 	import BatteryFull from '@lucide/svelte/icons/battery-full';
 	import Volume2 from '@lucide/svelte/icons/volume-2';
 	import Wifi from '@lucide/svelte/icons/wifi';
@@ -43,7 +43,7 @@
 		glass ? `blur(14px) saturate(${glass.saturation}) contrast(${1 - glass.lift * 0.8}) brightness(${1 + glass.lift * 0.8 - glass.dim / 10})` : 'none';
 
 	function clock() {
-		return new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' }).format(new Date());
+		return new Intl.DateTimeFormat(i18n.formats, { hour: 'numeric', minute: '2-digit' }).format(new Date());
 	}
 
 	$effect(() => {

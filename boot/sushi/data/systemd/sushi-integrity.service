@@ -1,0 +1,17 @@
+[Unit]
+Description=Stop before the login screen when a system file doesn't match this version
+Documentation=https://github.com/Lantharos/Luft/blob/main/docs/boot.md#when-luft-cant-start
+DefaultDependencies=no
+After=sysinit.target
+Before=display-manager.service greetd.service
+ConditionPathExists=!/etc/initrd-release
+OnFailure=emergency.target
+OnFailureJobMode=replace-irreversibly
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/sushictl check-files
+
+[Install]
+WantedBy=multi-user.target

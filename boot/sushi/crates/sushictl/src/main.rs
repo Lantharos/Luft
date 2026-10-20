@@ -40,6 +40,8 @@ enum Action {
     },
     /// Explain why the computer couldn't start and offer what can be done, in place of an emergency or rescue shell
     Failure,
+    /// Fail when the kernel refused a system file because it doesn't match the version that started
+    CheckFiles,
 }
 
 #[derive(Subcommand)]
@@ -85,6 +87,7 @@ fn main() -> ExitCode {
     let command = match Cli::parse().command {
         Action::LoadDrivers => return load_drivers(),
         Action::Failure => return failure::run(),
+        Action::CheckFiles => return failure::check_files(),
         Action::Deactivate => Command::Deactivate,
         Action::Quit => Command::Quit,
         Action::UpdateRoot { root } => Command::UpdateRoot(root),

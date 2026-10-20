@@ -57,6 +57,8 @@ Luft never leaves anyone at systemd's emergency prompt. Whenever the startup ima
 - **Show details**: the parts of the system that didn't start and the errors logged since the computer started, to scroll through.
 - **Open a shell**.
 
+A system file that doesn't match the version that started never gets read: the startup image refuses a system image whose fs-verity digest isn't the one on the signed command line, and the kernel refuses any file whose digest isn't the one the image records. If it refused one before the login screen, `sushi-integrity.service` stops there with the same screen, saying a system file is damaged.
+
 The targets themselves stay as they are, so everything that isolates to them still does. Only `emergency.service` and `rescue.service`, and dracut's `dracut-emergency.service` in the startup image, run `sushictl failure` in place of `sulogin`. If Sushi isn't running it starts it; without a display the same choices are listed on the console, picked by number. Nothing on the screen times out.
 
 SushiBoot names the version before the one it started in `LuftBootPrevious`, and the screen asks for it by writing the started entry to `LuftBootGoBack` (vendor `b6a4c1e2-3f5d-4c8a-9e71-2d0f6a8b5c3e`), which SushiBoot clears when it reads it.

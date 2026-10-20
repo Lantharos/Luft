@@ -88,10 +88,12 @@ pub fn wrap<'a>(lines: impl IntoIterator<Item = &'a str>) -> Vec<String> {
     let fits = |line: &str| text::width(line, DETAIL_SIZE) <= room;
     let mut wrapped = Vec::new();
     for line in lines {
-        let mut current = String::new();
-        for word in line.split(' ') {
-            let joined = if current.is_empty() {
-                String::from(word)
+        let text = line.trim_start_matches(' ');
+        let indent = &line[..line.len() - text.len()];
+        let mut current = String::from(indent);
+        for word in text.split(' ') {
+            let joined = if current.trim_start().is_empty() {
+                alloc::format!("{current}{word}")
             } else {
                 alloc::format!("{current} {word}")
             };
@@ -99,14 +101,14 @@ pub fn wrap<'a>(lines: impl IntoIterator<Item = &'a str>) -> Vec<String> {
                 current = joined;
                 continue;
             }
-            if !current.is_empty() {
-                wrapped.push(core::mem::take(&mut current));
+            if !current.trim_start().is_empty() {
+                wrapped.push(core::mem::replace(&mut current, String::from(indent)));
             }
             for character in word.chars() {
                 current.push(character);
                 if !fits(&current) {
                     current.pop();
-                    wrapped.push(core::mem::take(&mut current));
+                    wrapped.push(core::mem::replace(&mut current, String::from(indent)));
                     current.push(character);
                 }
             }

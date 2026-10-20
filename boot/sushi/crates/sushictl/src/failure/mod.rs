@@ -1,4 +1,5 @@
 mod boot;
+mod refused;
 mod shell;
 mod situation;
 mod splash;
@@ -11,7 +12,9 @@ use std::time::Duration;
 use situation::{Action, Situation};
 
 const RETRY_WAIT: Duration = Duration::from_secs(2);
+const KEYCTL_SEARCH: libc::c_long = 10;
 const KEYCTL_INVALIDATE: libc::c_long = 21;
+const KEY_SPEC_USER_KEYRING: libc::c_long = -4;
 
 struct Place {
     in_initrd: bool,
@@ -47,10 +50,11 @@ fn restart() -> ! {
 fn forget_typed_keys() {
     let key = unsafe {
         libc::syscall(
-            libc::SYS_request_key,
+            libc::SYS_keyctl,
+            KEYCTL_SEARCH,
+            KEY_SPEC_USER_KEYRING,
             c"user".as_ptr(),
             c"cryptsetup".as_ptr(),
-            std::ptr::null::<libc::c_char>(),
             0,
         )
     };
@@ -66,6 +70,16 @@ fn try_again(place: &Place) -> ExitCode {
         systemctl(&["--no-block", "isolate", "default.target"]);
     }
     ExitCode::SUCCESS
+}
+
+pub fn check_files() -> ExitCode {
+    let refused = refused::system_files();
+    refused.iter().for_each(|message| eprintln!("{message}"));
+    if refused.is_empty() {
+        ExitCode::SUCCESS
+    } else {
+        ExitCode::FAILURE
+    }
 }
 
 pub fn run() -> ExitCode {

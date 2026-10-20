@@ -4,7 +4,7 @@ set -euo pipefail
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 manifest=/usr/lib/sushi/installed-files
 dracut_config=/etc/dracut.conf.d/90-sushi.conf
-units=(sushi.service sushi-quit.service sushi-shutdown.service sushi-drivers.service)
+units=(sushi.service sushi-quit.service sushi-shutdown.service sushi-drivers.service sushi-integrity.service)
 arguments="sushi plymouth.enable=0 quiet loglevel=3 systemd.show_status=false rd.udev.log_level=3 udev.log_level=3 vt.global_cursor_default=0 fbcon=vc:0-5"
 
 usage() {

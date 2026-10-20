@@ -2,9 +2,10 @@ use std::process::{Command, Stdio};
 
 use sushi::failure_file::{Choice, DETAILS, FailureFile};
 
-use super::boot;
+use super::{boot, refused};
 
 const JOURNAL_LINES: &str = "200";
+const UNIT_LINES: &str = "6";
 const REQUESTED: [&str; 11] = [
     "systemd.unit=emergency.target",
     "systemd.unit=rescue.target",
@@ -152,7 +153,7 @@ fn system_name() -> String {
         .find_map(|line| line.strip_prefix("NAME="))
         .map(|name| name.trim_matches('"').to_owned())
         .filter(|name| !name.is_empty())
-        .unwrap_or_else(|| "Linux".to_owned())
+        .unwrap_or_else(|| "This computer".to_owned())
 }
 
 fn requested() -> bool {
@@ -162,13 +163,24 @@ fn requested() -> bool {
         .any(|argument| REQUESTED.contains(&argument))
 }
 
-fn reason(units: &[Unit], journal: &[String], in_initrd: bool) -> Option<Reason> {
+fn reason(
+    units: &[Unit],
+    refused: &[String],
+    journal: &[String],
+    in_initrd: bool,
+) -> Option<Reason> {
     let failed = |test: fn(&str) -> bool| units.iter().any(|unit| test(&unit.name));
     let timed_out = journal
         .iter()
         .any(|line| line.contains("Timed out waiting for device"));
     let found = if requested() {
         Some(Reason::Requested)
+    } else if !refused.is_empty()
+        || failed(|name| {
+            name == "bootc-root-setup.service" || name == "ostree-prepare-root.service"
+        })
+    {
+        Some(Reason::Damaged)
     } else if failed(|name| {
         name.starts_with("systemd-cryptsetup@") || name == "trustd-encrypt.service"
     }) {
@@ -195,21 +207,40 @@ fn reason(units: &[Unit], journal: &[String], in_initrd: bool) -> Option<Reason>
         None
     };
     match found {
-        Some(Reason::Locked | Reason::Missing | Reason::Requested) => found,
+        Some(Reason::Locked | Reason::Missing | Reason::Requested | Reason::Damaged) => found,
         _ if boot::on_trial() => Some(Reason::Update),
         _ => found,
     }
 }
 
-fn details(units: &[Unit], journal: &[String]) -> Vec<String> {
+fn details(units: &[Unit], refused: &[String], journal: &[String]) -> Vec<String> {
     let mut details = Vec::new();
+    if !refused.is_empty() {
+        details.push("These system files don't match the version that started:".to_owned());
+        details.extend(refused.iter().map(|message| format!("    {message}")));
+        details.push(String::new());
+    }
     if !units.is_empty() {
         details.push("These parts of the system didn't start:".to_owned());
-        details.extend(
-            units
-                .iter()
-                .map(|unit| format!("{} ({})", unit.description, unit.name)),
-        );
+        for unit in units {
+            details.push(format!("{} ({})", unit.description, unit.name));
+            let log = [
+                "-b",
+                "-q",
+                "--no-pager",
+                "-o",
+                "cat",
+                "-n",
+                UNIT_LINES,
+                "-u",
+                &unit.name,
+            ];
+            details.extend(
+                output("journalctl", &log)
+                    .into_iter()
+                    .map(|line| format!("    {line}")),
+            );
+        }
     }
     if !journal.is_empty() {
         if !details.is_empty() {
@@ -224,8 +255,9 @@ fn details(units: &[Unit], journal: &[String]) -> Vec<String> {
 impl Situation {
     pub fn read(in_initrd: bool) -> Self {
         let units = failed_units();
+        let refused = refused::system_files();
         let journal = journal_errors();
-        let reason = reason(&units, &journal, in_initrd);
+        let reason = reason(&units, &refused, &journal, in_initrd);
         let mut actions = Vec::new();
         if in_initrd && reason == Some(Reason::Locked) {
             actions.push(Action::Unlock);
@@ -243,7 +275,7 @@ impl Situation {
         Self {
             reason,
             actions,
-            details: details(&units, &journal),
+            details: details(&units, &refused, &journal),
         }
     }
 

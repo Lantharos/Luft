@@ -3,7 +3,7 @@ name = "luft-accounts"
 version = "0.1.0"
 description = "Online accounts and the cloud drives they bring, shared by Settings, Rover and Luft's other apps"
 authors = ["Kristof"]
-license = "MIT"
+license = "GPL-3.0-or-later"
 edition = "2024"
 rust-version = "1.98"
 

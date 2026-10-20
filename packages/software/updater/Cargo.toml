@@ -3,7 +3,7 @@ name = "luft-updater"
 version = "0.1.0"
 description = "Checks, downloads and rolls back Luft's system image with bootc for Settings and the shell"
 authors = ["Kristof"]
-license = "MIT"
+license = "GPL-3.0-or-later"
 edition = "2024"
 rust-version = "1.98"
 

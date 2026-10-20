@@ -3,7 +3,7 @@ name = "draft"
 version = "0.1.0"
 description = "A text and code editor for Luft"
 authors = ["Kristof"]
-license = "MIT"
+license = "GPL-3.0-or-later"
 edition = "2024"
 rust-version = "1.98"
 

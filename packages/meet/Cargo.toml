@@ -3,7 +3,7 @@ name = "luft-meet"
 version = "0.1.0"
 description = "What Meet Luft leaves on the drive for Install Luft: its partitions, why it restarted and the moving box"
 authors = ["Kristof"]
-license = "MIT"
+license = "GPL-3.0-or-later"
 edition = "2024"
 rust-version = "1.98"
 

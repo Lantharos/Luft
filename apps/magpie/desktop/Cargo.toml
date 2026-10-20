@@ -3,7 +3,7 @@ name = "magpie"
 version = "0.1.0"
 description = "Photos, videos, music and documents for Luft"
 authors = ["Kristof"]
-license = "MIT"
+license = "GPL-3.0-or-later"
 edition = "2024"
 rust-version = "1.98"
 

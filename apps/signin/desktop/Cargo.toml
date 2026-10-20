@@ -3,7 +3,7 @@ name = "signin"
 version = "0.1.0"
 description = "Signs in to Wi-Fi networks that ask for it first"
 authors = ["Kristof"]
-license = "MIT"
+license = "GPL-3.0-or-later"
 edition = "2024"
 rust-version = "1.98"
 

@@ -3,7 +3,7 @@ name = "setup"
 version = "0.1.0"
 description = "Installs Luft and sets up a new computer"
 authors = ["Kristof"]
-license = "MIT"
+license = "GPL-3.0-or-later"
 edition = "2024"
 rust-version = "1.98"
 

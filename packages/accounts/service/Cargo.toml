@@ -3,7 +3,7 @@ name = "luft-accounts-service"
 version = "0.1.0"
 description = "Keeps online accounts in Luft Keyring and brings their files to ~/Cloud through rclone"
 authors = ["Kristof"]
-license = "MIT"
+license = "GPL-3.0-or-later"
 edition = "2024"
 rust-version = "1.98"
 

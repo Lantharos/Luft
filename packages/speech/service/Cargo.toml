@@ -3,7 +3,7 @@ name = "luft-speech-service"
 version = "0.1.0"
 description = "Dictation for Luft: listens while asked and turns speech into text on this computer"
 authors = ["Kristof"]
-license = "MIT"
+license = "GPL-3.0-or-later"
 edition = "2024"
 rust-version = "1.98"
 

@@ -59,7 +59,7 @@ Each folder's README says what it is and how to build it.
 
 ## License and credits
 
-Kestrel's engine is GPL-2.0-or-later, inherited from [GNOME Shell](https://gitlab.gnome.org/GNOME/gnome-shell) (`kestrel/engine/COPYING`), and so are the patches to [Mutter](https://gitlab.gnome.org/GNOME/mutter). The rest is MIT unless a folder says otherwise.
+Luft is licensed under the GNU General Public License, version 3 or later ([`LICENSE`](LICENSE)). Kestrel's engine comes from [GNOME Shell](https://gitlab.gnome.org/GNOME/gnome-shell) and the patches to [Mutter](https://gitlab.gnome.org/GNOME/mutter) follow Mutter, so both stay GPL-2.0-or-later (`kestrel/engine/COPYING`).
 
 - Luft is built on [Fedora](https://fedoraproject.org) and [bootc](https://bootc-dev.github.io/bootc/), and its apps on [Sabine](https://github.com/Lantharos/Sabine).
 - [Open Runde](https://github.com/lauridskern/open-runde) and [Maple Mono](https://github.com/subframe7536/maple-font) are under the SIL Open Font License, in `packages/ui/fonts`.

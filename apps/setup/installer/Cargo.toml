@@ -3,7 +3,7 @@ name = "luft-installer"
 version = "0.1.0"
 description = "Installs Luft from the live system and finishes first-run setup"
 authors = ["Kristof"]
-license = "MIT"
+license = "GPL-3.0-or-later"
 edition = "2024"
 rust-version = "1.98"
 

@@ -3,7 +3,7 @@ name = "schelf"
 version = "0.1.0"
 description = "Apps for Luft"
 authors = ["Kristof"]
-license = "MIT"
+license = "GPL-3.0-or-later"
 edition = "2024"
 rust-version = "1.98"
 

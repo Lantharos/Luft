@@ -3,7 +3,7 @@ name = "luft-network"
 version = "0.1.0"
 description = "Wi-Fi, wired, VPN and connection profiles through NetworkManager, shared by Settings and Setup"
 authors = ["Kristof"]
-license = "MIT"
+license = "GPL-3.0-or-later"
 edition = "2024"
 rust-version = "1.98"
 

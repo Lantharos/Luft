@@ -3,7 +3,7 @@ name = "luft-fingerprint"
 version = "0.1.0"
 description = "Fingerprint readers through fprintd, shared by Settings and Setup"
 authors = ["Kristof"]
-license = "MIT"
+license = "GPL-3.0-or-later"
 edition = "2024"
 rust-version = "1.98"
 

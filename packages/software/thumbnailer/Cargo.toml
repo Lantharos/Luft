@@ -3,7 +3,7 @@ name = "luft-thumbnailer"
 version = "0.1.0"
 description = "Shows the app icon of AppImages, Flatpak bundles and Flatpak references as their thumbnail"
 authors = ["Kristof"]
-license = "MIT"
+license = "GPL-3.0-or-later"
 edition = "2024"
 rust-version = "1.98"
 

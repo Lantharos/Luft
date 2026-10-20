@@ -3,7 +3,7 @@ name = "luft-software"
 version = "0.1.0"
 description = "Apps, system updates and offline updates shared by Luft's software tools"
 authors = ["Kristof"]
-license = "MIT"
+license = "GPL-3.0-or-later"
 edition = "2024"
 rust-version = "1.98"
 

@@ -3,7 +3,7 @@ name = "luft-windows"
 version = "0.1.0"
 description = "Reads and carefully changes a Windows installation on the same computer, for Luft's installer and the Windows service"
 authors = ["Kristof"]
-license = "MIT"
+license = "GPL-3.0-or-later"
 edition = "2024"
 rust-version = "1.98"
 

@@ -3,7 +3,7 @@ name = "luft-disks"
 version = "0.1.0"
 description = "Drives, partitions, mounting and resizing through UDisks, shared by Disks and Luft's installer"
 authors = ["Kristof"]
-license = "MIT"
+license = "GPL-3.0-or-later"
 edition = "2024"
 rust-version = "1.98"
 

@@ -3,7 +3,7 @@ name = "luft-windows-service"
 version = "0.1.0"
 description = "Looks after Windows on the same computer: Fast Startup, its clock and its Bluetooth devices"
 authors = ["Kristof"]
-license = "MIT"
+license = "GPL-3.0-or-later"
 edition = "2024"
 rust-version = "1.98"
 

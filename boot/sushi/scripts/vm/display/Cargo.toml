@@ -3,7 +3,7 @@ name = "vm-display"
 description = "Plays the part of a graphics card's firmware in the Sushi VM: hands over a chosen framebuffer and describes the monitor"
 version = "0.1.0"
 edition = "2024"
-license = "MIT"
+license = "GPL-3.0-or-later"
 publish = false
 
 [[bin]]

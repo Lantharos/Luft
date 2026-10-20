@@ -3,7 +3,7 @@ name = "luft-speech"
 version = "0.1.0"
 description = "Dictation models and their downloads, shared by Settings and the speech service"
 authors = ["Kristof"]
-license = "MIT"
+license = "GPL-3.0-or-later"
 edition = "2024"
 rust-version = "1.98"
 

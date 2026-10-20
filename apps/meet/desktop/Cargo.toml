@@ -3,7 +3,7 @@ name = "meet"
 version = "0.1.0"
 description = "Meet Luft: gets a Windows or Linux computer ready for Luft and starts it without a USB stick"
 authors = ["Kristof"]
-license = "MIT"
+license = "GPL-3.0-or-later"
 edition = "2024"
 rust-version = "1.98"
 

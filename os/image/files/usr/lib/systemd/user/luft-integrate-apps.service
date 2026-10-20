@@ -1,0 +1,15 @@
+[Unit]
+Description=Set up installed apps
+DefaultDependencies=no
+After=graphical-session.target luft-preinstall.service
+PartOf=graphical-session.target
+ConditionUser=!@system
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/schelf --integrate-apps
+Nice=10
+IOSchedulingClass=idle
+
+[Install]
+WantedBy=kestrel-session.target

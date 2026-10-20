@@ -1,5 +1,6 @@
 [Unit]
 Description=Bring over the command-line tools of the system Luft replaced
+DefaultDependencies=no
 After=graphical-session.target
 PartOf=graphical-session.target
 ConditionUser=!@system

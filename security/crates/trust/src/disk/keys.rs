@@ -3,7 +3,6 @@ use std::path::Path;
 use anyhow::{Result, bail};
 
 use super::luks::{self, Header};
-use super::stage;
 use crate::errors::{NeedsKey, Unsupported, WrongKey};
 use crate::keys as signing;
 use crate::paths;
@@ -11,7 +10,7 @@ use crate::system::command::Tool;
 use crate::system::creds::{self, Protection};
 use crate::system::scratch::Scratch;
 use crate::system::secret::Secret;
-use crate::system::{efi, tpm};
+use crate::system::{efi, passbox, tpm};
 
 const MODHEX: &[u8; 16] = b"cbdefghijklnrtuv";
 const ESCROW: &str = "recovery-key.cred";
@@ -19,6 +18,7 @@ const ESCROW_NAME: &str = "trustd.recovery-key";
 const PIN: &str = "pin.cred";
 const PIN_NAME: &str = "trustd.pin";
 const PASSPHRASE: &str = "passphrase.box";
+const NEW_PIN_CREDENTIAL: &str = "cryptenroll.new-tpm2-pin";
 pub const HANDED_OVER: &str = "disk-key";
 
 pub fn generate_recovery_key() -> Result<Secret> {
@@ -177,6 +177,10 @@ pub fn enroll_tpm(
     if let Some(reason) = tpm_unavailable_reason() {
         bail!(Unsupported(reason));
     }
+    let credentials = Scratch::empty()?;
+    if !pin.is_empty() {
+        credentials.write(NEW_PIN_CREDENTIAL, pin)?;
+    }
     Tool::new("systemd-cryptenroll")
         .arg("--unlock-key-file=/dev/stdin")
         .arg("--wipe-slot=tpm2")
@@ -189,7 +193,7 @@ pub fn enroll_tpm(
             "--tpm2-with-pin={}",
             if pin.is_empty() { "no" } else { "yes" }
         ))
-        .env("NEWPIN", pin.text())
+        .env("CREDENTIALS_DIRECTORY", credentials.directory())
         .arg(device)
         .input(unlock)
         .status()
@@ -222,13 +226,17 @@ pub fn keep_passphrase_for_later(passphrase: &Secret, recovery: &Secret) -> Resu
     paths::ensure_private(paths::STATE)?;
     paths::write_private(
         &paths::state(PASSPHRASE),
-        &stage::boxed(passphrase, recovery)?,
+        &passbox::close(passphrase, recovery, &[])?,
     )?;
     Ok(())
 }
 
 pub fn passphrase_kept_for_later(recovery: &Secret) -> Option<Secret> {
-    stage::unbox(&std::fs::read(paths::state(PASSPHRASE)).ok()?, recovery)
+    passbox::open(
+        &std::fs::read(paths::state(PASSPHRASE)).ok()?,
+        recovery,
+        &[],
+    )
 }
 
 pub fn forget_kept_passphrase() {

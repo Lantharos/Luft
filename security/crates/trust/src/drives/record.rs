@@ -1,10 +1,12 @@
 use std::path::{Path, PathBuf};
 
-use anyhow::Result;
+use anyhow::{Result, ensure};
 use serde::{Deserialize, Serialize};
 
 use crate::disk::mask;
+use crate::errors::Unsupported;
 use crate::paths;
+use crate::system::uuid;
 
 const FOLDER: &str = "/var/lib/trustd/drives";
 const CHANGING: &str = "/var/lib/trustd/changing";
@@ -46,8 +48,16 @@ impl Record {
         }
     }
 
-    pub fn load(uuid: &str) -> Option<Self> {
-        serde_json::from_str(&std::fs::read_to_string(file(uuid)).ok()?).ok()
+    fn named_plainly(&self) -> bool {
+        uuid::is_uuid(&self.uuid) && self.partuuid.as_deref().is_none_or(uuid::is_partuuid)
+    }
+
+    pub fn load(id: &str) -> Option<Self> {
+        if !uuid::is_uuid(id) {
+            return None;
+        }
+        let record: Self = serde_json::from_str(&std::fs::read_to_string(file(id)).ok()?).ok()?;
+        (record.uuid == id && record.named_plainly()).then_some(record)
     }
 
     pub fn all() -> Vec<Self> {
@@ -63,6 +73,13 @@ impl Record {
     }
 
     pub fn save(&self) -> Result<()> {
+        ensure!(
+            self.named_plainly(),
+            Unsupported(
+                "This drive's encryption names itself in a way Luft can't keep track of."
+                    .to_owned()
+            )
+        );
         paths::ensure_private(FOLDER)?;
         paths::write_private(&file(&self.uuid), serde_json::to_string(self)?.as_bytes())?;
         let marker = Path::new(CHANGING).join(&self.uuid);

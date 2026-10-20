@@ -20,6 +20,10 @@ impl Scratch {
         Ok(Self { directory })
     }
 
+    pub fn directory(&self) -> &Path {
+        &self.directory
+    }
+
     pub fn write(&self, name: &str, secret: &Secret) -> Result<PathBuf> {
         let path = self.directory.join(name);
         paths::write_private(&path, secret.bytes())?;

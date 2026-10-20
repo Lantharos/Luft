@@ -10,25 +10,9 @@ use crate::paths;
 use crate::system::blocks;
 use crate::system::command::Tool;
 use crate::system::secret::Secret;
-use crate::system::tpm;
+use crate::system::{tpm, uuid};
 
 const SHORTEST_PASSPHRASE: usize = 8;
-
-fn new_uuid() -> Result<String> {
-    let mut bytes = [0u8; 16];
-    getrandom::fill(&mut bytes)?;
-    bytes[6] = (bytes[6] & 0x0f) | 0x40;
-    bytes[8] = (bytes[8] & 0x3f) | 0x80;
-    let hex: String = bytes.iter().map(|byte| format!("{byte:02x}")).collect();
-    Ok(format!(
-        "{}-{}-{}-{}-{}",
-        &hex[..8],
-        &hex[8..12],
-        &hex[12..16],
-        &hex[16..20],
-        &hex[20..]
-    ))
-}
 
 fn make_room(disk: &SystemDisk) -> Result<()> {
     let uuid = blocks::fs_uuid(&disk.partition).context("The file system has no UUID.")?;
@@ -108,11 +92,10 @@ pub fn turn_on(recovery_key: &Secret, pin: &Secret, passphrase: &Secret) -> Resu
     initrd::forget_result();
     let plan = Plan {
         change: Change::Encrypt,
-        uuid: new_uuid()?,
+        uuid: uuid::random()?,
         partuuid: blocks::partuuid(&disk.partition)
             .context("The system partition has no PARTUUID.")?,
         mode,
-        header: None,
     };
     let prepared = stage::write(
         &plan,

@@ -20,6 +20,7 @@ const TRUST = `<node><interface name="com.lantharos.Trust1">
   </method>
   <method name="RemoveTpmUnlock"><arg name="unlock" type="s" direction="in"/></method>
   <method name="ShowRecoveryKey"><arg name="key" type="s" direction="out"/></method>
+  <method name="AcceptSecureBootChange"/>
   <method name="ReplaceRecoveryKey"><arg name="unlock" type="s" direction="in"/><arg name="key" type="s" direction="out"/></method>
   <method name="EnrollSigningKey"><arg name="code" type="s" direction="out"/></method>
   <method name="CancelSigningKeyEnrollment"/>
@@ -73,9 +74,10 @@ export function publishSecurity(publish, calls, model, trust = {}) {
       {State: 'enrolled', Available: true, Reason: '', Missed: 0, MissedThisBoot: false, OtherKeys: [], RemovingOtherKeys: false}),
     Startup: variants({Installed: 'b', Measured: 'b', Available: 'b', Reason: 's'},
       {Installed: true, Measured: true, Available: true, Reason: ''}),
-    Disk: variants({Device: 's', Encrypted: 'b', State: 's', Progress: 'd', Remaining: 't', Unlock: 'as', RecoveryKeyStored: 'b', TpmRefused: 'b'},
+    Disk: variants({Device: 's', Encrypted: 'b', State: 's', Progress: 'd', Remaining: 't', Unlock: 'as', RecoveryKeyStored: 'b', TpmRefused: 'b',
+      SecureBootChanged: 'b'},
       {Device: '/dev/nvme0n1p3', Encrypted: true, State: 'on', Progress: 0, Remaining: 0, Unlock: ['tpm', 'pin', 'recovery-key'],
-        RecoveryKeyStored: true, TpmRefused: false}),
+        RecoveryKeyStored: true, TpmRefused: false, SecureBootChanged: false}),
     AntiCheat: variants({Checks: 'a(sbs)', UsesLuftKey: 'b'},
       {Checks: ANTI_CHEAT_CHECKS.map(id => [id, true, '']), UsesLuftKey: true}),
     GenerateRecoveryKey: () => RECOVERY_KEY,
@@ -88,6 +90,7 @@ export function publishSecurity(publish, calls, model, trust = {}) {
     },
     RemoveTpmUnlock: () => calls.push('RemoveTpmUnlock'),
     ShowRecoveryKey: () => RECOVERY_KEY,
+    AcceptSecureBootChange: () => calls.push('AcceptSecureBootChange'),
     ReplaceRecoveryKey: () => RECOVERY_KEY,
     EnrollSigningKey: () => '48203917',
     CancelSigningKeyEnrollment: () => calls.push('CancelSigningKeyEnrollment'),

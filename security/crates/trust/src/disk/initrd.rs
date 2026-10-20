@@ -1,14 +1,14 @@
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
-use anyhow::{Context, Result, bail};
+use anyhow::{Context, Result, bail, ensure};
 
 use super::room::{self, HEADER_ROOM};
+use super::stage::{self, Staged};
 use super::state::{Change, MAPPING, Mode, Plan};
-use super::{keys, luks, mask, stage};
+use super::{keys, luks, mask};
 use crate::paths;
 use crate::system::command::Tool;
-use crate::system::journal::STAGE_REFUSED;
 use crate::system::secret::Secret;
 use crate::system::{blocks, efi, keyring};
 
@@ -18,6 +18,8 @@ const RESULT: &str = "/run/trustd/encryption-result";
 const STARTED: &str = "started";
 const FAILED: &str = "failed";
 const ESP: &str = "/run/trustd/esp";
+const ROOT_PARTITION: &str = "/dev/luft-root-partition";
+const PLAN_REFUSED: &str = "The encryption plan on the EFI system partition didn't check out, so the disk was left as it was";
 
 struct MountedEsp;
 
@@ -73,36 +75,46 @@ fn ask(id: &str, message: &str) -> Result<Secret> {
         })
 }
 
-fn recovery_key_from_person(device: &Path) -> Result<Secret> {
-    for _ in 0..ATTEMPTS {
-        let typed = keys::normalize(&ask(
-            &format!("recovery:{}", device.display()),
-            "Enter the recovery key",
-        )?);
-        if keys::opens(device, None, &typed) {
+fn key_from_person(device: &Path, header: Option<&Path>, mode: Mode) -> Result<Secret> {
+    let (id, message) = match mode {
+        Mode::Tpm => ("recovery", "Enter the recovery key"),
+        Mode::Passphrase => ("passphrase", "Enter the disk's passphrase"),
+    };
+    loop {
+        let typed = keys::normalize(&ask(&format!("{id}:{}", device.display()), message)?);
+        if keys::opens(device, header, &typed) {
             return Ok(typed);
         }
     }
-    bail!("The recovery key wasn't entered")
 }
 
-fn recovery_key(plan: &Plan, folder: &Path, device: Option<&Path>) -> Result<Secret> {
-    match plan.mode {
-        Mode::Tpm => match stage::open_sealed(folder) {
-            Ok(key) => Ok(key),
-            Err(error) => {
-                eprintln!("{STAGE_REFUSED}: {error:#}");
-                let device = device.context(STAGE_REFUSED)?;
-                recovery_key_from_person(device)
-            }
-        },
+fn recovery_key(staged: &Staged, device: Option<&Path>) -> Result<Secret> {
+    match staged.plan.mode {
+        Mode::Tpm => staged.open_sealed().or_else(|error| {
+            eprintln!("{error:#}");
+            let Some(device) = device else {
+                return Err(error);
+            };
+            key_from_person(device, None, Mode::Tpm)
+        }),
         Mode::Passphrase => {
-            for _ in 0..ATTEMPTS {
+            let attempts = if device.is_some() {
+                usize::MAX
+            } else {
+                ATTEMPTS
+            };
+            for _ in 0..attempts {
                 let typed = ask(
-                    &format!("passphrase:{}", plan.partition().display()),
+                    &format!("passphrase:{}", staged.plan.partition().display()),
                     "Enter the disk's passphrase",
                 )?;
-                if let Some(key) = stage::open_boxed(folder, &typed) {
+                let opens_disk = || {
+                    let key = keys::normalize(&typed);
+                    device
+                        .is_some_and(|device| keys::opens(device, None, &key))
+                        .then_some(key)
+                };
+                if let Some(key) = staged.open_boxed(&typed).or_else(opens_disk) {
                     return Ok(key);
                 }
             }
@@ -176,71 +188,107 @@ fn attach(plan: &Plan, device: &Path, header: Option<&Path>) -> Result<()> {
         .context("The disk couldn't be opened")
 }
 
-fn still_decrypting(header: &Path, device: &Path) -> bool {
-    let size = blocks::kernel_name(device).map_or(0, |name| blocks::size_bytes(&name));
-    luks::read(device, Some(header), size)
-        .is_ok_and(|header| header.is_some_and(|header| header.reencrypting.is_some()))
+fn open_with(device: &Path, header: Option<&Path>, key: &Secret) -> Result<()> {
+    let open = Tool::new("cryptsetup").args(["open", "--allow-discards", "--key-file", "-"]);
+    let open = match header {
+        Some(header) => open.arg("--header").arg(header),
+        None => open,
+    };
+    open.arg(device)
+        .arg(MAPPING)
+        .input(key)
+        .status()
+        .context("The disk couldn't be opened")?;
+    keyring::keep(keys::HANDED_OVER, key);
+    Ok(())
 }
 
-fn open_while_decrypting(plan: &Plan, folder: &Path, device: &Path) -> Result<()> {
+fn still_decrypting(plan: &Plan, header: &Path, device: &Path) -> bool {
+    let size = blocks::kernel_name(device).map_or(0, |name| blocks::size_bytes(&name));
+    luks::read(device, Some(header), size).is_ok_and(|header| {
+        header.is_some_and(|header| header.reencrypting.is_some() && header.uuid == plan.uuid)
+    })
+}
+
+fn open_while_decrypting(staged: &Staged, device: &Path) -> Result<()> {
+    let plan = &staged.plan;
     if current_uuid(device).as_deref() == Some(plan.uuid.as_str()) {
         return attach(plan, device, None);
     }
-    let Some(name) = &plan.header else {
-        return Ok(());
-    };
-    let header = folder.join(name);
-    if !still_decrypting(&header, device) {
+    let header = staged.header().context("The plan has no header file")?;
+    if !still_decrypting(plan, &header, device) {
         return Ok(());
     }
+    let key = match plan.mode {
+        Mode::Tpm => match staged.open_sealed() {
+            Ok(_) => None,
+            Err(error) => {
+                eprintln!("{error:#}");
+                Some(key_from_person(device, Some(&header), Mode::Tpm)?)
+            }
+        },
+        Mode::Passphrase => Some(key_from_person(device, Some(&header), Mode::Passphrase)?),
+    };
     mask::mask_system_disk(&plan.partuuid, &plan.uuid)?;
     let _ = Tool::new("udevadm")
         .args(["trigger", "--action=change", "--settle"])
         .arg(device)
         .status();
-    attach(plan, device, Some(&header))
+    match key {
+        Some(key) => open_with(device, Some(&header), &key),
+        None => attach(plan, device, Some(&header)),
+    }
 }
 
-fn open_while_encrypting(plan: &Plan, folder: &Path, device: &Path) -> Result<()> {
+fn open_while_encrypting(staged: &Staged, device: &Path) -> Result<()> {
+    let plan = &staged.plan;
     let key = match current_uuid(device) {
         None => {
-            let key = match room::ensure_header_room(device)
-                .and_then(|()| recovery_key(plan, folder, None))
-            {
-                Ok(key) => key,
-                Err(error) => {
-                    record(FAILED);
-                    return Err(error);
-                }
-            };
+            let key =
+                match room::ensure_header_room(device).and_then(|()| recovery_key(staged, None)) {
+                    Ok(key) => key,
+                    Err(error) => {
+                        record(FAILED);
+                        return Err(error);
+                    }
+                };
             start_encrypting(plan, device, &key)?;
             key
         }
-        Some(uuid) if uuid == plan.uuid => recovery_key(plan, folder, Some(device))?,
+        Some(uuid) if uuid == plan.uuid => recovery_key(staged, Some(device))?,
         Some(_) => return Ok(()),
     };
-    Tool::new("cryptsetup")
-        .args(["open", "--key-file", "-"])
-        .arg(device)
-        .arg(MAPPING)
-        .input(&key)
-        .status()
-        .context("The disk couldn't be opened")?;
-    keyring::keep(keys::HANDED_OVER, &key);
+    open_with(device, None, &key)?;
     record(STARTED);
     Ok(())
 }
 
+fn root_partition(plan: &Plan) -> Result<PathBuf> {
+    let root = Path::new(ROOT_PARTITION);
+    wait_for(root)?;
+    let name = blocks::kernel_name(root).context("The partition Luft starts from vanished")?;
+    ensure!(
+        blocks::partuuid(&name).as_deref() == Some(plan.partuuid.as_str()),
+        "The plan names a partition Luft doesn't start from"
+    );
+    Ok(blocks::device(&name))
+}
+
 pub fn run() -> Result<()> {
     let esp = MountedEsp::mount()?;
-    let folder = esp.stage();
-    let Some(plan) = stage::plan_in(&folder) else {
+    let Some(staged) = stage::staged_in(&esp.stage()) else {
         return Ok(());
     };
-    let device = plan.partition();
-    wait_for(&device)?;
-    match plan.change {
-        Change::Encrypt => open_while_encrypting(&plan, &folder, &device),
-        Change::Decrypt => open_while_decrypting(&plan, &folder, &device),
+    let checked = staged.and_then(|staged| Ok((root_partition(&staged.plan)?, staged)));
+    let (device, staged) = match checked {
+        Ok(checked) => checked,
+        Err(error) => {
+            record(FAILED);
+            return Err(error.context(PLAN_REFUSED));
+        }
+    };
+    match staged.plan.change {
+        Change::Encrypt => open_while_encrypting(&staged, &device),
+        Change::Decrypt => open_while_decrypting(&staged, &device),
     }
 }

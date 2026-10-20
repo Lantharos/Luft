@@ -134,6 +134,9 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .command_async("security_show_key", |_: Value| {
             trust::call::<_, String>("ShowRecoveryKey", &())
         })
+        .command_async("security_accept_secure_boot", |_: Value| {
+            trust::call::<_, ()>("AcceptSecureBootChange", &())
+        })
         .command_async("security_replace_key", |Unlock { unlock }| async move {
             trust::unlocking::<_, String>("ReplaceRecoveryKey", &unlock).await
         })

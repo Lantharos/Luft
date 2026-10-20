@@ -1,16 +1,21 @@
 use std::path::Path;
 
-use anyhow::Result;
+use anyhow::{Result, ensure};
 
 use crate::paths;
+use crate::system::uuid;
 
 const DECRYPTING: &str = "/etc/trustd/decrypting";
 const DECRYPTING_SYSTEM: &str = "/run/trustd/decrypting";
 const DECRYPTED: &str = "/run/trustd/decrypted";
 
-fn write(folder: &str, partuuid: &str, uuid: &str) -> Result<()> {
+fn write(folder: &str, partuuid: &str, luks_uuid: &str) -> Result<()> {
+    ensure!(
+        uuid::is_partuuid(partuuid) && uuid::is_uuid(luks_uuid),
+        "A disk can only be hidden by its plain IDs"
+    );
     std::fs::create_dir_all(folder)?;
-    paths::write_private(&Path::new(folder).join(partuuid), uuid.as_bytes())?;
+    paths::write_private(&Path::new(folder).join(partuuid), luks_uuid.as_bytes())?;
     Ok(())
 }
 

@@ -10,6 +10,7 @@ const TRIED: &str = "LuftBootTried";
 const TRYING: &str = "LuftBootTrying";
 const WENT_BACK: &str = "LuftBootWentBack";
 const NOTICE: &str = "went-back";
+const LONGEST_VERSION: usize = 64;
 
 pub fn mark_good() -> Result<()> {
     let Some(image) = efi::luft_variable(TRYING) else {
@@ -43,11 +44,19 @@ fn notice(version: &str) -> String {
     .join("\n")
 }
 
+fn printable(version: &[u8]) -> String {
+    String::from_utf8_lossy(version)
+        .chars()
+        .filter(|character| !character.is_control())
+        .take(LONGEST_VERSION)
+        .collect()
+}
+
 pub fn went_back() -> Result<()> {
     let Some(version) = efi::luft_variable(WENT_BACK) else {
         return Ok(());
     };
-    let version = String::from_utf8_lossy(&version);
+    let version = printable(&version);
     if rollback_queued()? {
         Tool::new("bootc").arg("rollback").status()?;
     }
@@ -63,4 +72,17 @@ pub fn went_back() -> Result<()> {
         eprintln!("Couldn't explain going back to the version before: {error:#}");
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn keeps_the_version_on_its_own_line() {
+        assert_eq!(
+            printable(b"45.20261018\nfooter injected\x1b[2J"),
+            "45.20261018footer injected[2J"
+        );
+    }
 }

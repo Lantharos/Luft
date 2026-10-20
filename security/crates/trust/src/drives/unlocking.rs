@@ -4,13 +4,13 @@ use std::path::{Path, PathBuf};
 use anyhow::{Context, Result, bail};
 
 use super::record::Record;
-use crate::disk::{self, keys, luks, stage};
+use crate::disk::{self, keys, luks};
 use crate::errors::Unsupported;
 use crate::paths;
 use crate::system::command::Tool;
 use crate::system::creds::{self, Protection};
 use crate::system::secret::Secret;
-use crate::system::{blocks, keyring, tpm};
+use crate::system::{blocks, keyring, passbox, tpm};
 
 const KEYS: &str = "/etc/luks-keys";
 const KEY_BYTES: usize = 64;
@@ -133,7 +133,7 @@ pub fn forget(record: &mut Record) -> Result<()> {
 pub fn keep_passphrase(record: &Record, passphrase: &Secret, recovery: &Secret) -> Result<()> {
     paths::write_private(
         &record.passphrase_file(),
-        &stage::boxed(passphrase, recovery)?,
+        &passbox::close(passphrase, recovery, &[])?,
     )?;
     Ok(())
 }
@@ -142,7 +142,7 @@ pub fn add_kept_passphrase(device: &Path, record: &Record, recovery: &Secret) ->
     let Ok(boxed) = std::fs::read(record.passphrase_file()) else {
         return Ok(());
     };
-    if let Some(passphrase) = stage::unbox(&boxed, recovery) {
+    if let Some(passphrase) = passbox::open(&boxed, recovery, &[]) {
         let header =
             luks::read(device, None, size_of(device))?.context("The drive isn't encrypted.")?;
         keys::add_keyslot(device, recovery, &passphrase, &header)?;

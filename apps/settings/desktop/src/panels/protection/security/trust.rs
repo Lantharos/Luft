@@ -71,6 +71,7 @@ pub struct Disk {
     unlock: Vec<String>,
     recovery_key_stored: bool,
     tpm_refused: bool,
+    secure_boot_changed: bool,
 }
 
 #[derive(Serialize)]
@@ -176,6 +177,7 @@ fn disk(map: &Map) -> Disk {
         unlock: get(map, "Unlock").unwrap_or_default(),
         recovery_key_stored: flag(map, "RecoveryKeyStored"),
         tpm_refused: flag(map, "TpmRefused"),
+        secure_boot_changed: flag(map, "SecureBootChanged"),
     }
 }
 

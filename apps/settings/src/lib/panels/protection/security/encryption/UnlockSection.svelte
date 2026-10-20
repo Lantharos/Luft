@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Row, Section, Switch } from '@luft/ui';
-	import { problem, removeTpmUnlock, replaceRecoveryKey, setUpTpmUnlock, showRecoveryKey, type Trust } from '../api';
+	import { acceptSecureBootChange, problem, removeTpmUnlock, replaceRecoveryKey, setUpTpmUnlock, showRecoveryKey, type Trust } from '../api';
 	import RecoveryKeyDialog from '../keys/RecoveryKeyDialog.svelte';
 	import ConfirmDialog from './ConfirmDialog.svelte';
 	import TpmDialog, { type TpmMode } from './TpmDialog.svelte';
@@ -52,7 +52,11 @@
 </script>
 
 <Section title="Unlocking your disk">
-	{#if disk.tpmRefused && tpmUnlocks}
+	{#if disk.secureBootChanged && tpmUnlocks}
+		<Row title="This computer starts differently now" description="Its Secure Boot settings changed, so the disk asked for its recovery key. If you made the change, confirm it to unlock by itself again">
+			<button type="button" class="button" disabled={busy} onclick={() => attempt(acceptSecureBootChange)}>Confirm</button>
+		</Row>
+	{:else if disk.tpmRefused && tpmUnlocks}
 		<Row title="Your disk asked for its recovery key" description="Link the security chip again so it unlocks by itself">
 			<button type="button" class="button" disabled={busy} onclick={relink}>Link again</button>
 		</Row>

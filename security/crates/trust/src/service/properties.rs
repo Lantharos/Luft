@@ -80,5 +80,6 @@ pub fn disk(disk: Option<&DiskStatus>, live: Option<Progress>) -> Dict {
         ("Unlock", disk.unlock.clone().into()),
         ("RecoveryKeyStored", disk.recovery_key_stored.into()),
         ("TpmRefused", disk.tpm_refused.into()),
+        ("SecureBootChanged", disk.secure_boot_changed.into()),
     ])
 }

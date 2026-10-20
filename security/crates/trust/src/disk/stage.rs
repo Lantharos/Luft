@@ -1,91 +1,51 @@
 use std::path::{Path, PathBuf};
 
-use anyhow::{Context, Result};
-use argon2::{Algorithm, Argon2, Params, Version};
-use chacha20poly1305::aead::{Aead, KeyInit};
-use chacha20poly1305::{XChaCha20Poly1305, XNonce};
+use anyhow::{Context, Result, ensure};
+use sha2::{Digest, Sha256};
 
-use super::state::Plan;
+use super::keys as disk_keys;
+use super::state::{Change, Mode, Plan};
 use crate::boot::esp;
 use crate::keys;
 use crate::paths;
+use crate::system::journal::STAGE_REFUSED;
 use crate::system::secret::Secret;
-use crate::system::{creds, efi};
+use crate::system::{creds, efi, passbox};
 
 pub const FOLDER: &str = "EFI/luft/encryption";
 const PLAN: &str = "plan.json";
-const SEALED: &str = "recovery-key.cred";
-const BOXED: &str = "recovery-key.box";
+const SEALED: &str = "plan.cred";
+const BOXED: &str = "plan.box";
 const SEALED_NAME: &str = "trustd.stage";
-const SALT: usize = 16;
-const NONCE: usize = 24;
+const DIGEST: usize = 32;
 
-fn derive(passphrase: &Secret, salt: &[u8]) -> Result<[u8; 32]> {
-    let params =
-        Params::new(256 * 1024, 3, 1, Some(32)).map_err(|error| anyhow::anyhow!("{error}"))?;
-    let mut key = [0u8; 32];
-    Argon2::new(Algorithm::Argon2id, Version::V0x13, params)
-        .hash_password_into(passphrase.bytes(), salt, &mut key)
-        .map_err(|error| anyhow::anyhow!("{error}"))?;
-    Ok(key)
-}
-
-pub fn boxed(recovery: &Secret, passphrase: &Secret) -> Result<Vec<u8>> {
-    let mut salt = [0u8; SALT];
-    let mut nonce = [0u8; NONCE];
-    getrandom::fill(&mut salt)?;
-    getrandom::fill(&mut nonce)?;
-    let mut key = derive(passphrase, &salt)?;
-    let cipher = XChaCha20Poly1305::new(&key.into());
-    key.fill(0);
-    let sealed = cipher
-        .encrypt(&XNonce::from(nonce), recovery.bytes())
-        .map_err(|_| anyhow::anyhow!("The recovery key couldn't be protected."))?;
-    Ok([salt.as_slice(), nonce.as_slice(), &sealed].concat())
-}
-
-pub fn unbox(contents: &[u8], passphrase: &Secret) -> Option<Secret> {
-    let (salt, rest) = contents.split_at_checked(SALT)?;
-    let (nonce, sealed) = rest.split_at_checked(NONCE)?;
-    let mut key = derive(passphrase, salt).ok()?;
-    let cipher = XChaCha20Poly1305::new(&key.into());
-    key.fill(0);
-    let nonce: [u8; NONCE] = nonce.try_into().ok()?;
-    cipher
-        .decrypt(&XNonce::from(nonce), sealed)
-        .ok()
-        .map(Secret::new)
+fn digest(text: &[u8]) -> [u8; DIGEST] {
+    Sha256::digest(text).into()
 }
 
 pub fn folder() -> Result<PathBuf> {
     Ok(esp::find()?.file(FOLDER))
 }
 
-fn prepare() -> Result<PathBuf> {
+pub fn write(plan: &Plan, recovery: &Secret, passphrase: Option<&Secret>) -> Result<()> {
+    plan.check()?;
     let folder = folder()?;
     std::fs::create_dir_all(&folder)?;
-    Ok(folder)
-}
-
-pub fn write(plan: &Plan, recovery: &Secret, passphrase: Option<&Secret>) -> Result<()> {
-    let folder = prepare()?;
-    match passphrase {
-        Some(passphrase) => {
-            paths::write_private(&folder.join(BOXED), &boxed(recovery, passphrase)?)?
-        }
-        None => creds::seal_for_startup(
+    let text = serde_json::to_vec(plan)?;
+    match (plan.mode, passphrase) {
+        (Mode::Tpm, _) => creds::seal_for_startup(
             SEALED_NAME,
-            recovery,
+            &Secret::new([digest(&text).as_slice(), recovery.bytes()].concat()),
             Path::new(keys::PCR_PUBLIC_KEY),
             &folder.join(SEALED),
         )?,
+        (Mode::Passphrase, Some(passphrase)) => paths::write_private(
+            &folder.join(BOXED),
+            &passbox::close(recovery, passphrase, &text)?,
+        )?,
+        (Mode::Passphrase, None) => {}
     }
-    write_plan(plan)
-}
-
-pub fn write_plan(plan: &Plan) -> Result<()> {
-    let folder = prepare()?;
-    paths::write_private(&folder.join(PLAN), serde_json::to_string(plan)?.as_bytes())?;
+    paths::write_private(&folder.join(PLAN), &text)?;
     Ok(())
 }
 
@@ -102,31 +62,54 @@ pub fn remove() {
     let _ = efi::announce_disk_change(false);
 }
 
-pub fn plan_in(folder: &Path) -> Option<Plan> {
-    let text = std::fs::read_to_string(folder.join(PLAN)).ok()?;
-    serde_json::from_str(&text).ok()
+fn well_formed_recovery_key(key: &Secret) -> bool {
+    disk_keys::is_recovery_key(key) && disk_keys::normalize(key) == *key
 }
 
-pub fn open_sealed(folder: &Path) -> Result<Secret> {
-    creds::unseal(SEALED_NAME, &folder.join(SEALED)).context(crate::system::journal::STAGE_REFUSED)
+pub struct Staged {
+    pub plan: Plan,
+    text: Vec<u8>,
+    folder: PathBuf,
 }
 
-pub fn open_boxed(folder: &Path, passphrase: &Secret) -> Option<Secret> {
-    unbox(&std::fs::read(folder.join(BOXED)).ok()?, passphrase)
+pub fn staged_in(folder: &Path) -> Option<Result<Staged>> {
+    let text = std::fs::read(folder.join(PLAN)).ok()?;
+    Some(Plan::parse(&text).map(|plan| Staged {
+        plan,
+        text,
+        folder: folder.to_owned(),
+    }))
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+impl Staged {
+    pub fn header(&self) -> Option<PathBuf> {
+        self.plan.header_in(&self.folder)
+    }
 
-    #[test]
-    fn only_the_chosen_passphrase_opens_the_box() {
-        let recovery = Secret::from("cbdefghi-jklnrtuv");
-        let sealed = boxed(&recovery, &Secret::from("correct horse")).unwrap();
-        assert_eq!(
-            unbox(&sealed, &Secret::from("correct horse")),
-            Some(recovery)
+    pub fn open_sealed(&self) -> Result<Secret> {
+        let sealed =
+            creds::unseal(SEALED_NAME, &self.folder.join(SEALED)).context(STAGE_REFUSED)?;
+        let (bound_to, key) = sealed
+            .bytes()
+            .split_at_checked(DIGEST)
+            .context("The TPM's copy of the encryption plan is cut short")?;
+        ensure!(
+            bound_to == digest(&self.text),
+            "The encryption plan isn't the one Luft sealed to the TPM"
         );
-        assert_eq!(unbox(&sealed, &Secret::from("wrong horse")), None);
+        let key = Secret::new(key.to_vec());
+        ensure!(
+            match self.plan.change {
+                Change::Encrypt => well_formed_recovery_key(&key),
+                Change::Decrypt => key.is_empty(),
+            },
+            "The TPM's copy of the encryption plan doesn't hold what Luft seals"
+        );
+        Ok(key)
+    }
+
+    pub fn open_boxed(&self, passphrase: &Secret) -> Option<Secret> {
+        let boxed = std::fs::read(self.folder.join(BOXED)).ok()?;
+        passbox::open(&boxed, passphrase, &self.text).filter(well_formed_recovery_key)
     }
 }

@@ -22,6 +22,8 @@ export function summarize({ disk, secureBoot }: Trust, firmwareUpdates: number):
 		case 'off':
 			return disk.device ? { headline: 'Your device could be safer', sentence: 'Turn on device encryption to keep your files private.', safe: false } : null;
 	}
+	if (disk.secureBootChanged)
+		return { headline: 'This computer starts differently now', sentence: 'If you changed its Secure Boot settings, confirm it so the disk unlocks by itself again.', safe: false };
 	if (disk.tpmRefused) return { headline: 'Your disk needed its recovery key', sentence: 'Link the security chip again so it unlocks by itself.', safe: false };
 	if (firmwareUpdates) return { headline: PROTECTED, sentence: 'Firmware updates for your hardware are ready in Updates.', safe: true };
 	return {

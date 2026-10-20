@@ -9,8 +9,10 @@ use zbus::{Connection, interface};
 
 use super::PATH;
 use super::actions;
+use super::caller;
 use super::error::Error;
 use super::properties::{self, Dict};
+use super::shown::Shown;
 use super::status::{self, Status};
 use crate::boot::{attempts, other_systems, startup};
 use crate::disk::worker::{self, Progress};
@@ -25,6 +27,7 @@ const RECOVERY_KEY: &str = "com.lantharos.trust.show-recovery-key";
 const SECURE_BOOT: &str = "com.lantharos.trust.manage-secure-boot";
 const CONFIRM_STARTUP: &str = "com.lantharos.trust.confirm-startup";
 const OTHER_SYSTEMS: &str = "com.lantharos.trust.remove-other-systems";
+const ACCEPT_SECURE_BOOT: &str = "com.lantharos.trust.accept-secure-boot-change";
 const FRESH: Duration = Duration::from_secs(2);
 const BATTERY_RETRY: Duration = Duration::from_secs(60);
 
@@ -197,8 +200,8 @@ impl Trust {
         properties::disk(self.status().await.disk.as_ref(), live)
     }
 
-    async fn generate_recovery_key(&self) -> Result<String, Error> {
-        Ok(keys::generate_recovery_key()?.text().to_owned())
+    async fn generate_recovery_key(&self) -> Result<Shown, Error> {
+        Ok(Shown(keys::generate_recovery_key()?))
     }
 
     async fn check_encryption(
@@ -259,13 +262,13 @@ impl Trust {
         #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
         unlock: String,
         pin: String,
-    ) -> Result<String, Error> {
+    ) -> Result<Shown, Error> {
         self.authorize(connection, &header, ENCRYPTION).await?;
         let (unlock, pin) = (Secret::from(unlock), Secret::from(pin));
         let created = self
             .run(&emitter, move || actions::set_up_tpm_unlock(&unlock, &pin))
             .await?;
-        Ok(created.map(|key| key.text().to_owned()).unwrap_or_default())
+        Ok(Shown(created.unwrap_or_default()))
     }
 
     async fn remove_tpm_unlock(
@@ -281,17 +284,29 @@ impl Trust {
             .await
     }
 
+    async fn accept_secure_boot_change(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
+    ) -> Result<(), Error> {
+        self.authorize(connection, &header, ACCEPT_SECURE_BOOT)
+            .await?;
+        self.run(&emitter, disk::seal::accept_secure_boot_change)
+            .await
+    }
+
     async fn show_recovery_key(
         &self,
         #[zbus(connection)] connection: &Connection,
         #[zbus(header)] header: Header<'_>,
-    ) -> Result<String, Error> {
+    ) -> Result<Shown, Error> {
         self.authorize(connection, &header, RECOVERY_KEY).await?;
         let _activity = self.idle.hold();
         let key = tokio::task::spawn_blocking(actions::show_recovery_key)
             .await
             .map_err(|_| Error::Failed("The recovery key couldn't be read.".to_owned()))??;
-        Ok(key.text().to_owned())
+        Ok(Shown(key))
     }
 
     async fn replace_recovery_key(
@@ -300,13 +315,13 @@ impl Trust {
         #[zbus(header)] header: Header<'_>,
         #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
         unlock: String,
-    ) -> Result<String, Error> {
+    ) -> Result<Shown, Error> {
         self.authorize(connection, &header, ENCRYPTION).await?;
         let unlock = Secret::from(unlock);
         let key = self
             .run(&emitter, move || actions::replace_recovery_key(&unlock))
             .await?;
-        Ok(key.text().to_owned())
+        Ok(Shown(key))
     }
 
     async fn enroll_signing_key(
@@ -364,6 +379,9 @@ impl Trust {
         #[zbus(connection)] connection: &Connection,
         #[zbus(header)] header: Header<'_>,
     ) -> Result<(), Error> {
+        if !caller::is_the_shell(connection, &header).await? {
+            return Err(Error::not_authorized());
+        }
         self.authorize(connection, &header, CONFIRM_STARTUP).await?;
         let _activity = self.idle.hold();
         tokio::task::spawn_blocking(attempts::mark_good)
@@ -372,7 +390,12 @@ impl Trust {
         Ok(())
     }
 
-    async fn other_startups(&self) -> Result<Vec<OtherStartup>, Error> {
+    async fn other_startups(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+    ) -> Result<Vec<OtherStartup>, Error> {
+        self.authorize(connection, &header, CHECK).await?;
         let _activity = self.idle.hold();
         let startups = tokio::task::spawn_blocking(other_systems::list)
             .await

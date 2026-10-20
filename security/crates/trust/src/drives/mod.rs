@@ -10,8 +10,8 @@ use anyhow::{Context, Result, bail};
 use crate::disk::{Check, keys, luks};
 use crate::errors::{Busy, NeedsKey, Unsupported};
 use crate::system::command::Tool;
-use crate::system::power;
 use crate::system::secret::Secret;
+use crate::system::{power, uuid};
 use hold::Hold;
 pub use record::{Change, Record};
 use room::Room;
@@ -128,22 +128,6 @@ pub fn reprobe(device: &std::path::Path) {
         .status();
 }
 
-fn new_uuid() -> Result<String> {
-    let mut bytes = [0u8; 16];
-    getrandom::fill(&mut bytes)?;
-    bytes[6] = (bytes[6] & 0x0f) | 0x40;
-    bytes[8] = (bytes[8] & 0x3f) | 0x80;
-    let hex: String = bytes.iter().map(|byte| format!("{byte:02x}")).collect();
-    Ok(format!(
-        "{}-{}-{}-{}-{}",
-        &hex[..8],
-        &hex[8..12],
-        &hex[12..16],
-        &hex[16..20],
-        &hex[20..]
-    ))
-}
-
 fn checked_recovery_key(typed: &Secret) -> Result<Secret> {
     let key = keys::normalize(typed);
     if !keys::is_recovery_key(&key) {
@@ -245,7 +229,7 @@ pub fn encrypt(
     let room = room::plan(&target).map_err(Unsupported)?;
     let _held = Hold::new(&target.name)?;
     room::make(&target, &room)?;
-    let mut record = Record::new(new_uuid()?, target.partuuid.clone(), target.removable);
+    let mut record = Record::new(uuid::random()?, target.partuuid.clone(), target.removable);
     record.change = Some(Change::Encrypt);
     record.save()?;
     let started = start_encrypting(&target, &mut record, &recovery, passphrase, auto_unlock);

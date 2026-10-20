@@ -22,14 +22,13 @@ pub fn turn_off(typed: &Secret) -> Result<()> {
         uuid: header.uuid.clone(),
         partuuid: blocks::partuuid(&disk.partition)
             .context("The system partition has no PARTUUID.")?,
-        mode: if header.has(luks::TPM2) {
+        mode: if header.has(luks::TPM2) && keys::tpm_unavailable_reason().is_none() {
             Mode::Tpm
         } else {
             Mode::Passphrase
         },
-        header: Some(format!("{}.luks", header.uuid)),
     };
-    stage::write_plan(&plan)?;
+    stage::write(&plan, &Secret::default(), None)?;
     let header_file = plan.header_file().context("The plan has no header file")?;
     let _ = std::fs::remove_file(&header_file);
     let started = Tool::new("cryptsetup")

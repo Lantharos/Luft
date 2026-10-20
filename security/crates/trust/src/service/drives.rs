@@ -12,10 +12,11 @@ use zbus::{OwnedVariant, Variant};
 
 use super::PATH;
 use super::error::Error;
+use super::shown::Shown;
 use crate::disk::reencrypt::Progress;
 use crate::drives::{self, Change, DriveStatus, Record};
-use crate::system::power;
 use crate::system::secret::Secret;
+use crate::system::{power, uuid};
 
 const CHECK: &str = "com.lantharos.trust.check";
 const MANAGE: &str = "com.lantharos.trust.manage-drive-encryption";
@@ -159,6 +160,16 @@ impl Drives {
             .await
             .map_err(|_| Error::Failed("The change stopped unexpectedly.".to_owned()))?;
         Ok(result?)
+    }
+}
+
+fn drive_id(id: &str) -> Result<(), Error> {
+    if uuid::is_uuid(id) {
+        Ok(())
+    } else {
+        Err(Error::Unsupported(
+            "That isn't a drive Luft encrypts.".to_owned(),
+        ))
     }
 }
 
@@ -327,6 +338,7 @@ impl Drives {
         #[zbus(header)] header: Header<'_>,
         uuid: String,
     ) -> Result<(), Error> {
+        drive_id(&uuid)?;
         self.authorize(connection, &header, MANAGE).await?;
         let paused = uuid.clone();
         self.run(move || drives::pause(&paused)).await?;
@@ -342,6 +354,7 @@ impl Drives {
         uuid: String,
         unlock: String,
     ) -> Result<(), Error> {
+        drive_id(&uuid)?;
         self.authorize(connection, &header, MANAGE).await?;
         let unlock = Secret::from(unlock);
         let record = self.run(move || drives::resume(&uuid, &unlock)).await?;
@@ -354,16 +367,24 @@ impl Drives {
         #[zbus(connection)] connection: &Connection,
         #[zbus(header)] header: Header<'_>,
         uuid: String,
-    ) -> Result<String, Error> {
+    ) -> Result<Shown, Error> {
+        drive_id(&uuid)?;
         self.authorize(connection, &header, RECOVERY_KEY).await?;
         let _activity = self.idle.hold();
         let key = tokio::task::spawn_blocking(move || drives::recovery_key(&uuid))
             .await
             .map_err(|_| Error::Failed("The recovery key couldn't be read.".to_owned()))??;
-        Ok(key.text().to_owned())
+        Ok(Shown(key))
     }
 
-    async fn r#continue(&self, #[zbus(connection)] connection: &Connection) -> Result<(), Error> {
+    async fn r#continue(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+    ) -> Result<(), Error> {
+        if access::caller_uid(connection, &header).await? != Some(0) {
+            return Err(Error::not_authorized());
+        }
         let _activity = self.idle.hold();
         let drives: InterfaceRef<Drives> = connection.object_server().interface(PATH).await?;
         for record in tokio::task::spawn_blocking(drives::ready)

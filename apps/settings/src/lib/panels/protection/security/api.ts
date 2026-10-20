@@ -44,6 +44,7 @@ export interface Disk {
 	unlock: UnlockMethod[];
 	recoveryKeyStored: boolean;
 	tpmRefused: boolean;
+	secureBootChanged: boolean;
 }
 
 export interface Drives {
@@ -111,6 +112,7 @@ export const turnOffEncryption = (unlock: string) => invoke<Outcome<null>>('secu
 export const setUpTpmUnlock = (pin: string) => (unlock: string) => invoke<Outcome<string>>('security_set_up_tpm', { unlock, pin }, WAIT_FOR_PERMISSION);
 export const removeTpmUnlock = (unlock: string) => invoke<Outcome<null>>('security_remove_tpm', { unlock }, WAIT_FOR_PERMISSION);
 export const showRecoveryKey = () => invoke<string>('security_show_key', {}, WAIT_FOR_PERMISSION);
+export const acceptSecureBootChange = () => invoke<void>('security_accept_secure_boot', {}, WAIT_FOR_PERMISSION);
 export const replaceRecoveryKey = (unlock: string) => invoke<Outcome<string>>('security_replace_key', { unlock }, WAIT_FOR_PERMISSION);
 
 export const enrollSigningKey = () => invoke<string>('security_enroll_key', {}, WAIT_FOR_PERMISSION);

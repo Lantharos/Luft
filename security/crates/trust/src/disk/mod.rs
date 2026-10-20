@@ -90,6 +90,7 @@ pub struct DiskStatus {
     pub unlock: Vec<&'static str>,
     pub recovery_key_stored: bool,
     pub tpm_refused: bool,
+    pub secure_boot_changed: bool,
 }
 
 fn unlock_methods(header: &Header) -> Vec<&'static str> {
@@ -158,5 +159,6 @@ pub fn status() -> Option<DiskStatus> {
             .as_ref()
             .is_some_and(|header| header.has(luks::TPM2) || plan.is_some())
             && journal::tpm_refused_this_boot(),
+        secure_boot_changed: seal::secure_boot_changed(),
     })
 }

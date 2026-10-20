@@ -31,7 +31,7 @@ Your files and settings stay as they are either way. See [How updates work](/sys
 
 An encrypted disk normally unlocks by itself with the TPM. It asks for the recovery key when the way the computer starts has changed, such as Secure Boot being turned off, keys being added to or removed from the firmware, or another boot loader starting Luft. The prompt says why it's asking.
 
-Type the 64-character recovery key you saved; it's in groups of eight, made of letters that type the same on almost every keyboard. Once the desktop is up, Settings, under Security, offers to link the TPM again so it unlocks by itself next time.
+Type the 64-character recovery key you saved; it's in groups of eight, made of letters that type the same on almost every keyboard. Once the desktop is up, Settings, under Security, says the computer starts differently now when its Secure Boot keys changed. If you made the change, confirm it there with your password so the disk unlocks by itself next time. If you didn't, leave it: the disk keeps asking for the recovery key, and someone may have changed how your computer starts. With Secure Boot off, Settings offers to link the TPM again instead.
 
 ## The screen stays dark from a USB stick
 

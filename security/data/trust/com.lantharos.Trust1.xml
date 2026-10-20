@@ -24,7 +24,9 @@
       "decrypting", "on"), Progress (d, 0 to 1 while encrypting or decrypting), Remaining (t, seconds, 0 when unknown),
       Unlock (as, any of "tpm", "pin", "passphrase", "recovery-key", "security-key"),
       RecoveryKeyStored (b, the recovery key can be shown again), TpmRefused (b, the TPM didn't unlock the disk
-      at the last startup, so the recovery key or passphrase was needed).
+      at the last startup, so the recovery key or passphrase was needed), SecureBootChanged (b, the Secure Boot
+      settings changed in a way Luft didn't expect, so the TPM stays sealed to the old ones until an administrator
+      confirms them with AcceptSecureBootChange).
 
     AntiCheat: what games with anti-cheat (such as Epic's Easy Anti-Cheat) check about how the computer started.
       Checks (a(sbs): id, met, a sentence for people saying what's missing, empty when met), for "signed-system",
@@ -70,6 +72,8 @@
     <method name="ShowRecoveryKey">
       <arg name="key" type="s" direction="out"/>
     </method>
+    <!-- Seals the disk key to the Secure Boot settings this start measured, after SecureBootChanged. -->
+    <method name="AcceptSecureBootChange"/>
     <method name="ReplaceRecoveryKey">
       <arg name="unlock" type="s" direction="in"/>
       <arg name="key" type="s" direction="out"/>
@@ -110,8 +114,9 @@
       <arg name="unlock" type="s" direction="in"/>
       <arg name="grown" type="t" direction="out"/>
     </method>
-    <!-- Called by the login screen or the desktop once it has been shown for a moment. Remembers the running version
-         as one that starts, so an update that never gets this far goes back to it. -->
+    <!-- Called by the login screen or the desktop once it has been shown for a moment, and only accepted from
+         them. Remembers the running version as one that starts, so an update that never gets this far goes back
+         to it. -->
     <method name="ConfirmStartup"/>
   </interface>
 
@@ -170,7 +175,7 @@
       <arg name="uuid" type="s" direction="in"/>
       <arg name="key" type="s" direction="out"/>
     </method>
-    <!-- Open to everyone: picks up drives that were waiting and are unlocked now. -->
+    <!-- Called by root once a drive is unlocked: picks up drives that were waiting. -->
     <method name="Continue"/>
   </interface>
 </node>

@@ -45,6 +45,16 @@
     </defaults>
   </action>
 
+  <action id="com.lantharos.trust.accept-secure-boot-change">
+    <description>Let the TPM unlock the disk with this computer's new Secure Boot settings</description>
+    <message>Authentication is required to trust how this computer starts now</message>
+    <defaults>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>auth_admin</allow_active>
+    </defaults>
+  </action>
+
   <action id="com.lantharos.trust.manage-secure-boot">
     <description>Change Secure Boot keys and how the computer starts</description>
     <message>Authentication is required to change how the computer starts</message>

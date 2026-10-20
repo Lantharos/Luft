@@ -1,8 +1,10 @@
 pub(crate) mod actions;
+mod caller;
 mod drives;
 mod error;
 mod interface;
 mod properties;
+mod shown;
 pub(crate) mod status;
 
 use std::sync::Arc;

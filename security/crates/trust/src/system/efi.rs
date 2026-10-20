@@ -6,6 +6,7 @@ const GLOBAL: &str = "8be4df61-93ca-11d2-aa0d-00e098032b8c";
 const SHIM: &str = "605dab50-e046-4300-abb6-3dd810dd8b23";
 const STUB: &str = "4a67b082-0a4c-41cf-b6c7-440b29bb8c4f";
 const LUFT: &str = "b6a4c1e2-3f5d-4c8a-9e71-2d0f6a8b5c3e";
+const IMAGE_SECURITY: &str = "d719b2cb-3d3a-4596-a3bc-dad00e67656f";
 const DISK_CHANGE: &str = "LuftDiskChange";
 const NON_VOLATILE_BOOT_RUNTIME: u32 = 0x7;
 const X509: [u8; 16] = [
@@ -75,7 +76,9 @@ pub fn boot_loader() -> Option<String> {
 }
 
 pub fn boot_partition() -> Option<String> {
-    variable("LoaderDevicePartUUID", STUB).map(|data| text(&data).to_lowercase())
+    variable("LoaderDevicePartUUID", STUB)
+        .map(|data| text(&data).to_lowercase())
+        .filter(|partuuid| super::uuid::is_uuid(partuuid))
 }
 
 pub fn global_variable(name: &str) -> Option<Vec<u8>> {
@@ -146,8 +149,13 @@ fn read_u32(data: &[u8], at: usize) -> Option<usize> {
     Some(u32::from_le_bytes(bytes.try_into().ok()?) as usize)
 }
 
-pub fn certificates_in(mut lists: &[u8]) -> Vec<Vec<u8>> {
-    let mut certificates = Vec::new();
+pub struct Signature<'a> {
+    pub kind: &'a [u8],
+    pub data: &'a [u8],
+}
+
+pub fn signatures_in(mut lists: &[u8]) -> Vec<Signature<'_>> {
+    let mut signatures = Vec::new();
     while lists.len() >= 28 {
         let (Some(list_size), Some(header_size), Some(signature_size)) = (
             read_u32(lists, 16),
@@ -159,16 +167,29 @@ pub fn certificates_in(mut lists: &[u8]) -> Vec<Vec<u8>> {
         if list_size < 28 || list_size > lists.len() || signature_size <= 16 {
             break;
         }
-        if lists[..16] == X509 {
-            let mut offset = 28 + header_size;
-            while offset + signature_size <= list_size {
-                certificates.push(lists[offset + 16..offset + signature_size].to_vec());
-                offset += signature_size;
-            }
+        let mut offset = 28 + header_size;
+        while offset + signature_size <= list_size {
+            signatures.push(Signature {
+                kind: &lists[..16],
+                data: &lists[offset + 16..offset + signature_size],
+            });
+            offset += signature_size;
         }
         lists = &lists[list_size..];
     }
-    certificates
+    signatures
+}
+
+pub fn certificates_in(lists: &[u8]) -> Vec<Vec<u8>> {
+    signatures_in(lists)
+        .into_iter()
+        .filter(|signature| signature.kind == X509)
+        .map(|signature| signature.data.to_vec())
+        .collect()
+}
+
+pub fn forbidden_list() -> Vec<u8> {
+    variable("dbx", IMAGE_SECURITY).unwrap_or_default()
 }
 
 #[cfg(test)]

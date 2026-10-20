@@ -42,11 +42,29 @@ The TPM releases the disk key only when both match:
 
 - Updates to Luft and ordinary firmware updates keep unlocking without a prompt.
 - Once the disk is open, its volume key is measured into PCR 15, so anything sealed to the running system later only opens on this disk.
-- A new forbidden list or new keys installed while Luft runs, as Settings and fwupd do, are in the firmware before the restart. As the computer shuts down, trustd works out from the TPM's event log what PCR 7 the next start will measure and seals the disk key to that, so the restart unlocks without a prompt.
-- When PCR 7 changes any other way, Sushi asks for the recovery key once and says why. With Secure Boot on, trustd then seals the disk key to how the computer started, so the next start unlocks by itself again. A TPM with a PIN can't be sealed again without the PIN, so Settings offers to link it again instead.
+- A new forbidden list or new keys installed while Luft runs, as Settings and fwupd do, are in the firmware before the restart. As the computer shuts down, trustd works out from the TPM's event log what PCR 7 the next start will measure and seals the disk key to that, so the restart unlocks without a prompt. It never does this when the forbidden list lost entries the key was sealed with, since removing revocations is what an attacker would do.
+- When PCR 7 changes any other way, Sushi asks for the recovery key once and says why. trustd doesn't follow the change by itself: Settings says the computer starts differently now, and the TPM unlocks by itself again only after an administrator confirms the change there. A TPM with a PIN can't be sealed again without the PIN, so Settings offers to link it again instead.
 - An optional PIN of 6 to 20 digits makes the TPM also require something you know, with its own guessing lockout.
 - Every encrypted disk has a 64-character recovery key, in groups of eight, from letters that type the same on almost every keyboard. With a TPM, a sealed copy lets Settings show it again after an administrator password.
 - Sushi waits for the recovery key, passphrase or PIN for as long as it takes, and a wrong one just asks again. Only a system disk that never shows up ends in the emergency shell.
+
+### Older signed startup images
+
+The policy key's signature over a startup image never expires, so an older Luft image that was signed once still unlocks the disk if someone starts it from the EFI system partition. Rolling back to the version before an update depends on exactly that, so the old image has to keep working for one step back, and only then stop.
+
+What was weighed:
+
+- **systemd-pcrlock** could limit PCR 11 to the images that are installed, keeping the current and the previous one in a policy stored in the TPM. Every update would rewrite that policy before the restart, from a lock file per image, and a policy that doesn't match what starts asks everyone for their recovery key. It also takes over how the TPM token is sealed, so it would replace the signed policy rather than add to it. Too much can go wrong on every update for what it buys.
+- **A version counter in the TPM** that images have to be newer than isn't something systemd's TPM token can check, so the startup would need its own unlocking code in place of systemd-cryptsetup's.
+
+The plan instead is to rotate the policy key when an older image has to stop unlocking:
+
+1. A release that fixes something serious is signed with a new policy key, and ships both public halves.
+2. Before restarting into it, trustd adds a second TPM token sealed to the new key and keeps the old one, so going back to the version before still unlocks.
+3. Once the new version has started and confirmed itself, trustd removes the token for the old key. From then on, images signed with the old key only open the disk with the recovery key.
+4. The old private key is destroyed, and its public half leaves the images after the next release.
+
+Until a rotation is needed, every Luft-signed image keeps unlocking the disk.
 
 ## Device encryption
 
@@ -62,12 +80,20 @@ Requirements, checked first by `trustctl encryption check`:
 Steps:
 
 1. Save the recovery key.
-2. The file system shrinks by 32 MB for the header, and the plan waits on the EFI system partition, with the recovery key sealed to the TPM (or to the passphrase without one).
+2. The file system shrinks by 32 MB for the header, and the plan waits on the EFI system partition, with the recovery key sealed to the TPM (or to the passphrase without one). The plan's fingerprint is sealed with it, so a plan changed on the EFI system partition doesn't open.
 3. At the next restart Sushi shows "Encrypting your device" for a few seconds while the header is written. If the file system no longer leaves the 32 MB free, the disk isn't touched: Luft starts unencrypted and Settings says encryption didn't start. Disks won't resize the system's partition while encryption waits for the restart.
 4. The rest is encrypted in the background at idle priority, pausing on battery. A crash or power cut loses nothing.
 5. When it finishes, the TPM is linked and the disk unlocks without a prompt.
 
 Without a TPM, a passphrase is asked at every start instead. Decrypting works the same way in reverse, with the disk's header kept on the EFI system partition until it finishes, since the startup has to read it before the disk opens.
+
+The EFI system partition can be written by anyone who starts another system on the computer, so the startup trusts nothing on it by itself:
+
+- The plan has to name its disks by plain IDs and the partition Luft starts from; anything else leaves the disk as it is.
+- With the TPM, the plan only counts when its fingerprint comes out of the TPM sealed to Luft's startup, and the recovery key next to it has to be one Luft makes. Without one, the passphrase opens the plan and the recovery key together.
+- While decrypting, the header on the EFI system partition is only used once the TPM vouches for the plan, or once the passphrase or recovery key typed at startup opens it.
+
+Someone who can start another system can still make a TPM-sealed plan of their own, since sealing doesn't take Luft's startup, only opening does. What such a plan can do stays within the partition Luft starts from and Luft's own way of encrypting it, which they could already change from the other system while it's unencrypted.
 
 Only root can read the EFI system partition and the startup partition, so other accounts can't copy the header or the sealed recovery key and try passphrases against them elsewhere.
 

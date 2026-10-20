@@ -34,7 +34,7 @@ Turn on encryption in Settings, under Security. It encrypts the disk in place, w
 
 With a TPM, the disk unlocks by itself when the computer started the way it should. An optional PIN of 6 to 20 digits adds something only you know. Without a TPM, a passphrase is asked at every start.
 
-The TPM keeps unlocking through Luft's updates and ordinary firmware updates. If Secure Boot is turned off or its keys change, the computer asks for the recovery key once and says why; afterwards Settings offers to link the TPM again. Settings can show the recovery key again, after your password, and replace it.
+The TPM keeps unlocking through Luft's updates and ordinary firmware updates. If Secure Boot is turned off or its keys change, the computer asks for the recovery key and says why. When the keys changed, Settings then says the computer starts differently now: if you made the change, confirm it with your password and the disk unlocks by itself again, and until then every start asks for the recovery key. With Secure Boot off, Settings offers to link the TPM again. Settings can show the recovery key again, after your password, and replace it.
 
 Encryption needs the system on a single partition with nothing else unencrypted on the disk, 1 GB free, and the computer plugged in. Settings checks these first.
 

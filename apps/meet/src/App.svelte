@@ -3,6 +3,7 @@
 	import { fly } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 	import { isAvailable } from '@lantharos/sabine';
+	import { i18n, t } from '@luft/i18n';
 	import { appearance, GlassShell, Toast } from '@luft/ui';
 	import WindowButtons from '#lib/components/WindowButtons.svelte';
 	import { session } from '#lib/state/meet.svelte.js';
@@ -33,7 +34,10 @@
 	}
 
 	onMount(() => {
-		if (!isAvailable()) return;
+		if (!isAvailable()) {
+			void i18n.start();
+			return;
+		}
 		const stops = [appearance.start({ palette: null, typography: { interface: null, monospace: null, textScale: 1 }, motion: 'full' }), session.listen()];
 		return () => stops.forEach((stop) => stop());
 	});
@@ -50,7 +54,7 @@
 <GlassShell class="meet-window">
 	<main class="relative flex min-w-0 flex-1 flex-col overflow-hidden">
 		<div class="drag-region absolute inset-x-0 top-0 z-10 flex h-12 items-center justify-between pr-3 pl-14">
-			<span class="text-[12.5px] text-[var(--text-muted)]">{session.nightly ? 'Nightly builds' : ''}</span>
+			<span class="text-[12.5px] text-[var(--text-muted)]">{session.nightly ? t('meet-nightly') : ''}</span>
 			<WindowButtons closable={session.step !== 'working'} />
 		</div>
 		{#key session.step}

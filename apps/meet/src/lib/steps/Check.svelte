@@ -3,6 +3,7 @@
 	import CircleX from '@lucide/svelte/icons/circle-x';
 	import Info from '@lucide/svelte/icons/info';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
+	import { t } from '@luft/i18n';
 	import { bytes, Dialog } from '@luft/ui';
 	import type { Action, Level } from '#lib/api/meet.js';
 	import Frame from '#lib/components/Frame.svelte';
@@ -14,20 +15,20 @@
 	type Confirmed = Exclude<Action, 'chooseIso'>;
 
 	const LABELS: Record<Action, string> = {
-		firmwareSettings: 'Open firmware settings',
-		tidy: 'Tidy up',
-		chooseIso: 'Use an ISO I already have'
+		firmwareSettings: 'check-action-firmware',
+		tidy: 'check-action-tidy',
+		chooseIso: 'meet-iso-use'
 	};
 	const CONFIRMATIONS: Record<Confirmed, { title: string; description: string; confirm: string }> = {
 		firmwareSettings: {
-			title: 'Restart into the firmware settings?',
-			description: 'Save anything you’re working on first. Turn on Secure Boot there and save, and your computer starts again as usual.',
-			confirm: 'Restart'
+			title: 'check-firmware-title',
+			description: 'check-firmware-description',
+			confirm: 'meet-restart'
 		},
 		tidy: {
-			title: 'Remove the old start entries?',
-			description: 'They only point at systems that are already gone. Windows and everything else start just like before.',
-			confirm: 'Remove'
+			title: 'check-tidy-title',
+			description: 'check-tidy-description',
+			confirm: 'meet-remove'
 		}
 	};
 
@@ -35,7 +36,6 @@
 
 	let confirming = $state<Confirmed | null>(null);
 	let readying = $state(false);
-	let computer = $derived(session.platform === 'linux' ? 'computer' : 'PC');
 	let slow = $state(false);
 
 	$effect(() => {
@@ -62,15 +62,21 @@
 	}
 
 	let findings = $derived([...(session.report?.findings ?? [])].sort((a, b) => ORDER[a.level] - ORDER[b.level]));
-	let title = $derived(!session.report ? `Looking at this ${computer}` : session.blocked ? 'Almost there' : `This ${computer} is ready for Luft`);
+	let title = $derived(
+		!session.report
+			? t('check-looking-title', { platform: session.platform })
+			: session.blocked
+				? t('check-blocked-title')
+				: t('check-ready-title', { platform: session.platform })
+	);
 	let description = $derived(
 		!session.report
 			? slow && !session.failure && session.platform === 'windows'
-				? 'Windows is working out how much room it can spare. On a big drive this can take a few minutes.'
-				: 'This takes a moment.'
+				? t('check-slow')
+				: t('check-moment')
 			: session.blocked
-				? 'Something needs to change before Luft can move in. Here’s what to do.'
-				: 'Here’s what Meet Luft found.'
+				? t('check-blocked-description')
+				: t('check-found-description')
 	);
 </script>
 
@@ -80,7 +86,7 @@
 			{#if session.failure}
 				<Problem failure={session.failure} />
 			{:else}
-				<LoaderCircle size={18} class="animate-spin" />Checking the drive, the firmware and the hardware…
+				<LoaderCircle size={18} class="animate-spin" />{t('check-checking')}
 			{/if}
 		</div>
 	{:else}
@@ -94,7 +100,7 @@
 						<span class="text-[13.5px] leading-snug text-[var(--text-soft)]">{finding.detail}</span>
 						{#if finding.action}
 							<button type="button" class="plain-button -ml-3 mt-1 self-start" disabled={session.busy} onclick={() => start(finding.action!)}>
-								{LABELS[finding.action]}
+								{t(LABELS[finding.action])}
 							</button>
 						{/if}
 					</span>
@@ -107,14 +113,14 @@
 	{/if}
 	{#snippet actions()}
 		{#if session.report && session.blocked}
-			<button type="button" class="button large px-6" disabled={session.busy} onclick={() => session.check()}>Check again</button>
+			<button type="button" class="button large px-6" disabled={session.busy} onclick={() => session.check()}>{t('check-again')}</button>
 		{:else if session.report}
 			<button
 				type="button"
 				class="button primary large px-6"
 				onclick={() => (session.platform === 'linux' ? (readying = true) : session.go('room'))}
 			>
-				Continue
+				{t('meet-continue')}
 			</button>
 		{/if}
 	{/snippet}
@@ -122,24 +128,24 @@
 
 {#if readying}
 	<Dialog
-		title="Get Luft ready?"
+		title={t('check-get-ready-title')}
 		description={session.source.kind === 'file'
-			? 'Meet Luft copies Luft from your ISO into a folder on this computer and adds a start entry for it. Nothing is repartitioned.'
-			: `Meet Luft downloads Luft, about ${bytes(session.report?.download ?? 0)}, into a folder on this computer and adds a start entry for it. Nothing is repartitioned.`}
+			? t('check-get-ready-file')
+			: t('check-get-ready-download', { size: bytes(session.report?.download ?? 0) })}
 		onclose={() => (readying = false)}
 	>
 		{#snippet actions()}
-			<button type="button" class="button" onclick={() => (readying = false)}>Cancel</button>
-			<button type="button" class="button primary" onclick={getReady}>Get it ready</button>
+			<button type="button" class="button" onclick={() => (readying = false)}>{t('meet-cancel')}</button>
+			<button type="button" class="button primary" onclick={getReady}>{t('check-get-ready-confirm')}</button>
 		{/snippet}
 	</Dialog>
 {/if}
 
 {#if confirming}
-	<Dialog title={CONFIRMATIONS[confirming].title} description={CONFIRMATIONS[confirming].description} onclose={() => (confirming = null)}>
+	<Dialog title={t(CONFIRMATIONS[confirming].title)} description={t(CONFIRMATIONS[confirming].description)} onclose={() => (confirming = null)}>
 		{#snippet actions()}
-			<button type="button" class="button" onclick={() => (confirming = null)}>Cancel</button>
-			<button type="button" class="button primary" onclick={act}>{CONFIRMATIONS[confirming!].confirm}</button>
+			<button type="button" class="button" onclick={() => (confirming = null)}>{t('meet-cancel')}</button>
+			<button type="button" class="button primary" onclick={act}>{t(CONFIRMATIONS[confirming!].confirm)}</button>
 		{/snippet}
 	</Dialog>
 {/if}

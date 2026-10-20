@@ -1,3 +1,4 @@
+import { i18n, t } from '@luft/i18n';
 import { bytes } from '@luft/ui';
 import type { Stick } from '#lib/api/stick.js';
 
@@ -11,11 +12,11 @@ const FILESYSTEMS: Record<string, string> = {
 
 function contents(stick: Stick) {
 	if (stick.ventoy) return 'Ventoy';
-	const names = stick.volumes.map((volume) => volume.label ?? (volume.filesystem && (FILESYSTEMS[volume.filesystem] ?? volume.filesystem))).filter(Boolean);
-	return names.length ? names.join(', ') : 'Empty';
+	const names = stick.volumes.map((volume) => volume.label ?? (volume.filesystem && (FILESYSTEMS[volume.filesystem] ?? volume.filesystem))).filter((name): name is string => !!name);
+	return names.length ? new Intl.ListFormat(i18n.locale, { type: 'unit' }).format(names) : t('stick-drive-empty');
 }
 
 export function detail(stick: Stick, needed: number) {
-	if (stick.size < needed) return `${bytes(stick.size)} · Too small for Luft`;
-	return `${bytes(stick.size)} · ${contents(stick)}`;
+	if (stick.size < needed) return t('stick-drive-too-small', { size: bytes(stick.size) });
+	return t('stick-drive-detail', { size: bytes(stick.size), contents: contents(stick) });
 }

@@ -4,6 +4,7 @@
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 	import Sparkles from '@lucide/svelte/icons/sparkles';
 	import Usb from '@lucide/svelte/icons/usb';
+	import { t } from '@luft/i18n';
 	import { bytes, Choice, Dialog, Switch } from '@luft/ui';
 	import type { Intent, WindowsChoices } from '#lib/api/meet.js';
 	import Frame from '#lib/components/Frame.svelte';
@@ -28,14 +29,14 @@
 			restarting === 'install' &&
 				facts?.fastStartup && {
 					key: 'fastStartupOff',
-					title: 'Turn off Fast Startup in Windows',
-					description: 'Windows then shuts down fully, so sound, Wi-Fi and Bluetooth start fresh in Luft.'
+					title: t('ready-fast-startup-title'),
+					description: t('ready-fast-startup-description')
 				},
 			facts &&
 				!facts.universalClock && {
 					key: 'universalClock',
-					title: 'Keep the clock right in both',
-					description: 'Windows reads the computer’s clock the way Luft does, so the time no longer jumps when you switch.'
+					title: t('ready-clock-title'),
+					description: t('ready-clock-description')
 				}
 		].filter((option): option is Option => !!option)
 	);
@@ -53,49 +54,47 @@
 	}
 </script>
 
-<Frame title="Luft is ready" description="Choose how you’d like to meet it. Windows starts as usual afterwards, unless you install Luft and choose it.">
+<Frame title={t('ready-title')} description={t('ready-description')}>
 	<div class="-mx-2 flex flex-col gap-1">
 		{#if session.report?.outdated}
 			<Choice
 				icon={RefreshCw}
-				title="Get the newest Luft"
-				description="A newer build is out. It replaces this one and keeps the room and anything you packed."
+				title={t('ready-update-title')}
+				description={t('ready-update-description')}
 				onclick={() => session.update()}
 			/>
 		{/if}
-		<Choice icon={Sparkles} title="Try Luft" description="Restart into Luft without installing anything. Windows starts as usual next time." onclick={() => (restarting = 'try')} />
+		<Choice icon={Sparkles} title={t('ready-try-title')} description={t('ready-try-description')} onclick={() => (restarting = 'try')} />
 		<Choice
 			icon={Package}
-			title="Bring your things"
-			description="Pack documents, photos, Wi-Fi networks and more for Luft to unpack when it’s installed."
-			note={prepared?.movingBox ? `Packed, ${bytes(prepared.movingBox)}` : undefined}
+			title={t('box-title')}
+			description={t('ready-box-description')}
+			note={prepared?.movingBox ? t('ready-box-packed', { size: bytes(prepared.movingBox) }) : undefined}
 			onclick={() => session.go('box')}
 		/>
 		<Choice
 			icon={HardDriveDownload}
-			title="Install Luft"
-			description="Restart into the installer. The {bytes(prepared?.room ?? 0)} next to Windows is already waiting for it."
+			title={t('ready-install-title')}
+			description={t('ready-install-description', { size: bytes(prepared?.room ?? 0) })}
 			onclick={() => (restarting = 'install')}
 		/>
-		<Choice icon={Usb} title="Make a USB stick" description="Put Luft on a stick to start it on any computer." onclick={() => maker.open()} />
+		<Choice icon={Usb} title={t('stick-title')} description={t('ready-stick-description')} onclick={() => maker.open()} />
 	</div>
 	{#if session.failure}
 		<div class="mt-4"><Problem failure={session.failure} /></div>
 	{/if}
 	{#snippet actions()}
-		<button type="button" class="plain-button large mr-auto -ml-3" onclick={() => (removing = true)}>Remove Luft from this PC</button>
+		<button type="button" class="plain-button large mr-auto -ml-3" onclick={() => (removing = true)}>{t('ready-remove')}</button>
 		<button type="button" class="plain-button large" onclick={() => session.chooseIso()}>
-			{session.source.kind === 'file' ? 'Using your Luft ISO' : 'Use an ISO I already have'}
+			{session.source.kind === 'file' ? t('meet-iso-using') : t('meet-iso-use')}
 		</button>
 	{/snippet}
 </Frame>
 
 {#if restarting}
 	<Dialog
-		title="Restart now?"
-		description={restarting === 'try'
-			? 'Save anything you’re working on first. Luft opens in a minute or so, and the next restart brings you back to Windows.'
-			: 'Save anything you’re working on first. The installer opens in a minute or so, and nothing changes until you confirm there.'}
+		title={t('meet-restart-title')}
+		description={restarting === 'try' ? t('ready-restart-try') : t('ready-restart-install')}
 		onclose={() => (restarting = null)}
 	>
 		{#if options.length > 0}
@@ -112,21 +111,21 @@
 			</div>
 		{/if}
 		{#snippet actions()}
-			<button type="button" class="button" onclick={() => (restarting = null)}>Not yet</button>
-			<button type="button" class="button primary" onclick={restart}>Restart</button>
+			<button type="button" class="button" onclick={() => (restarting = null)}>{t('meet-not-yet')}</button>
+			<button type="button" class="button primary" onclick={restart}>{t('meet-restart')}</button>
 		{/snippet}
 	</Dialog>
 {/if}
 
 {#if removing}
 	<Dialog
-		title="Remove Luft from this PC?"
-		description="Meet Luft deletes everything it added, including the moving box, and gives Windows all of its space back."
+		title={t('ready-remove-title')}
+		description={t('ready-remove-description')}
 		onclose={() => (removing = false)}
 	>
 		{#snippet actions()}
-			<button type="button" class="button" onclick={() => (removing = false)}>Keep it</button>
-			<button type="button" class="button danger" onclick={remove}>Remove</button>
+			<button type="button" class="button" onclick={() => (removing = false)}>{t('meet-keep-it')}</button>
+			<button type="button" class="button danger" onclick={remove}>{t('meet-remove')}</button>
 		{/snippet}
 	</Dialog>
 {/if}

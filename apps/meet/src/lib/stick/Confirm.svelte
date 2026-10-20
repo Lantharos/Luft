@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
+	import { i18n, t } from '@luft/i18n';
 	import { bytes, Dialog } from '@luft/ui';
 	import type { Room, Stick, Way } from '#lib/api/stick.js';
 	import { session } from '#lib/state/meet.svelte.js';
@@ -17,10 +18,9 @@
 	let asking = $state<Asking>(untrack(() => (stick.ventoy ? 'ventoy' : 'erase')));
 	let room = $state<Room | null>(null);
 	let needed = $derived(maker.offer?.size ?? 0);
-	const LIST = new Intl.ListFormat('en', { type: 'conjunction' });
 
 	let older = $derived(room?.older ?? []);
-	let named = $derived(LIST.format(older.map((iso) => iso.name)));
+	let named = $derived(new Intl.ListFormat(i18n.locale, { type: 'conjunction' }).format(older.map((iso) => iso.name)));
 	let sameName = $derived(older.some((iso) => iso.name === maker.offer?.name));
 
 	function make(way: Way) {
@@ -40,44 +40,44 @@
 </script>
 
 {#if asking === 'ventoy'}
-	<Dialog title="This stick uses Ventoy" description="Add Luft to it, or erase the whole stick and make it a Luft stick?" {onclose}>
+	<Dialog title={t('stick-ventoy-title')} description={t('stick-ventoy-description')} {onclose}>
 		{#snippet actions()}
-			<button type="button" class="button" onclick={onclose}>Cancel</button>
-			<button type="button" class="button" disabled={session.busy} onclick={() => (asking = 'erase')}>Erase it</button>
-			<button type="button" class="button primary" disabled={session.busy} onclick={addToVentoy}>Add Luft</button>
+			<button type="button" class="button" onclick={onclose}>{t('meet-cancel')}</button>
+			<button type="button" class="button" disabled={session.busy} onclick={() => (asking = 'erase')}>{t('stick-erase-it')}</button>
+			<button type="button" class="button primary" disabled={session.busy} onclick={addToVentoy}>{t('stick-add')}</button>
 		{/snippet}
 	</Dialog>
 {:else if asking === 'replace'}
 	<Dialog
-		title="Replace the Luft on it?"
-		description="{named} {older.length === 1 ? 'is' : 'are'} already on this stick. The new Luft can take {older.length === 1 ? 'its' : 'their'} place."
+		title={t('stick-replace-title')}
+		description={t('stick-replace-description', { names: named, count: older.length })}
 		{onclose}
 	>
 		{#snippet actions()}
 			{#if sameName || room?.fit !== 'beside'}
-				<button type="button" class="button" onclick={onclose}>Cancel</button>
+				<button type="button" class="button" onclick={onclose}>{t('meet-cancel')}</button>
 			{:else}
-				<button type="button" class="button" onclick={() => make({ kind: 'ventoy', replace: false })}>Keep {older.length === 1 ? 'both' : 'all'}</button>
+				<button type="button" class="button" onclick={() => make({ kind: 'ventoy', replace: false })}>{t('stick-keep', { count: older.length })}</button>
 			{/if}
-			<button type="button" class="button primary" onclick={() => make({ kind: 'ventoy', replace: true })}>Replace</button>
+			<button type="button" class="button primary" onclick={() => make({ kind: 'ventoy', replace: true })}>{t('stick-replace')}</button>
 		{/snippet}
 	</Dialog>
 {:else if asking === 'full'}
 	<Dialog
-		title="There isn’t room for Luft"
-		description="Luft needs {bytes(needed)}, and {bytes(room?.free ?? 0)} is free on this stick. Make room on it, or erase it and make it a Luft stick."
+		title={t('stick-full-title')}
+		description={t('stick-full-description', { needed: bytes(needed), free: bytes(room?.free ?? 0) })}
 		{onclose}
 	>
 		{#snippet actions()}
-			<button type="button" class="button" onclick={onclose}>Cancel</button>
-			<button type="button" class="button" onclick={() => (asking = 'erase')}>Erase it</button>
+			<button type="button" class="button" onclick={onclose}>{t('meet-cancel')}</button>
+			<button type="button" class="button" onclick={() => (asking = 'erase')}>{t('stick-erase-it')}</button>
 		{/snippet}
 	</Dialog>
 {:else}
-	<Dialog title="Erase {stick.name}?" description="Everything on this {bytes(stick.size)} stick is erased and replaced with Luft. This can’t be undone." {onclose}>
+	<Dialog title={t('stick-erase-title', { name: stick.name })} description={t('stick-erase-description', { size: bytes(stick.size) })} {onclose}>
 		{#snippet actions()}
-			<button type="button" class="button" onclick={onclose}>Cancel</button>
-			<button type="button" class="button danger" onclick={() => make({ kind: 'erase' })}>Erase and make the stick</button>
+			<button type="button" class="button" onclick={onclose}>{t('meet-cancel')}</button>
+			<button type="button" class="button danger" onclick={() => make({ kind: 'erase' })}>{t('stick-erase-confirm')}</button>
 		{/snippet}
 	</Dialog>
 {/if}

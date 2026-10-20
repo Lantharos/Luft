@@ -1,3 +1,4 @@
+import { t } from '@luft/i18n';
 import { Toasts } from '@luft/ui';
 import * as meet from '#lib/api/meet.js';
 import type { Action, Channel, Intent, Packing, Platform, Prepared, Progress, Report, Source, Stage, WindowsChoices } from '#lib/api/meet.js';
@@ -17,10 +18,9 @@ const GIB = 1024 ** 3;
 const SHARE = 0.4;
 const NOTE_SHOWN = 6000;
 const CHANNEL_NOTES: Record<Channel, string> = {
-	nightly: 'Meet Luft will use nightly builds',
-	latest: 'Meet Luft will use releases again'
+	nightly: 'meet-channel-nightly',
+	latest: 'meet-channel-latest'
 };
-
 
 class MeetState {
 	platform = $state<Platform>('windows');
@@ -92,7 +92,7 @@ class MeetState {
 		if (this.step === 'working') return;
 		const channel: Channel = this.nightly ? 'latest' : 'nightly';
 		this.source = { kind: 'download', channel };
-		this.notes.show(CHANNEL_NOTES[channel], { action: { label: 'Undo', run: () => this.switchChannel() } });
+		this.notes.show(t(CHANNEL_NOTES[channel]), { action: { label: t('meet-undo'), run: () => this.switchChannel() } });
 		if (this.step === 'check') {
 			this.report = null;
 			await this.inspect();
@@ -107,11 +107,11 @@ class MeetState {
 	async saveLogs() {
 		try {
 			const saved = await meet.saveLogs();
-			if (saved) this.notes.show('Saved the logs from Try Luft to your desktop', { action: { label: 'Show', run: () => meet.showFile(saved) } });
-			else this.notes.show('There are no logs from Try Luft yet');
+			if (saved) this.notes.show(t('meet-logs-saved'), { action: { label: t('meet-logs-show'), run: () => meet.showFile(saved) } });
+			else this.notes.show(t('meet-logs-none'));
 		} catch (error) {
 			console.error("Meet Luft couldn't save Try Luft's logs:", error);
-			this.notes.show("Meet Luft couldn't save the logs from Try Luft");
+			this.notes.show(t('meet-logs-failed'));
 		}
 	}
 

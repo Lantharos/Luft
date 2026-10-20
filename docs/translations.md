@@ -28,6 +28,7 @@ Luft is translated into Albanian, Bosnian, Bulgarian, Catalan, Croatian, Czech, 
 | setup | `apps/setup/locales/*/setup.ftl` | Install Luft and first-run setup |
 | setup-desktop | `apps/setup/desktop/locales/*/desktop.ftl` | messages from setup's native side |
 | setup-installer | `apps/setup/installer/locales/*/installer.ftl` | the installer service's errors and progress |
+| meet | `apps/meet/locales/*/meet.ftl` | Meet Luft, the Windows and Linux app that gets a computer ready for Luft |
 | site | `web/site/locales/*/site.ftl` | the website's header, footer, language list and missing-page page |
 | site-home | `web/site/locales/*/home.ftl` | the website's home page |
 | site-download | `web/site/locales/*/download.ftl` | the website's download page |

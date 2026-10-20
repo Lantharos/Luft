@@ -4,6 +4,7 @@
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 	import Sparkles from '@lucide/svelte/icons/sparkles';
 	import Usb from '@lucide/svelte/icons/usb';
+	import { t } from '@luft/i18n';
 	import { Choice, Dialog } from '@luft/ui';
 	import type { Intent } from '#lib/api/meet.js';
 	import Frame from '#lib/components/Frame.svelte';
@@ -15,15 +16,15 @@
 
 	let restarting = $state<Intent | null>(null);
 	let removing = $state(false);
-	let system = $derived(session.linux?.system ?? 'this system');
+	let system = $derived(session.linux?.system ?? t('linux-ready-this-system'));
 	let replaceable = $derived(REPLACEABLE.includes(session.linux?.layout ?? ''));
 
 	let restartNote = $derived(
 		restarting === 'try'
-			? `Save anything you’re working on first. Luft opens in a minute or so, and the next restart brings you back to ${system}.`
+			? t('linux-ready-restart-try', { system })
 			: restarting === 'replace'
-				? `Save anything you’re working on first. The installer opens with ${system} chosen to replace, and shows what stays before anything changes.`
-				: 'Save anything you’re working on first. The installer opens in a minute or so, and nothing changes until you confirm there.'
+				? t('linux-ready-restart-replace', { system })
+				: t('ready-restart-install')
 	);
 
 	function restart() {
@@ -38,62 +39,62 @@
 	}
 </script>
 
-<Frame title="Luft is ready" description="Choose how you’d like to meet it. {system} keeps starting as usual until you decide otherwise.">
+<Frame title={t('ready-title')} description={t('linux-ready-description', { system })}>
 	<div class="-mx-2 flex flex-col gap-1">
 		{#if session.report?.outdated}
 			<Choice
 				icon={RefreshCw}
-				title="Get the newest Luft"
-				description="A newer build is out. It replaces the one Meet Luft keeps and keeps the logs from trying it."
+				title={t('ready-update-title')}
+				description={t('linux-ready-update-description')}
 				onclick={() => session.update()}
 			/>
 		{/if}
-		<Choice icon={Sparkles} title="Try Luft" description="Restart into Luft without changing anything. {system} starts as usual next time." onclick={() => (restarting = 'try')} />
+		<Choice icon={Sparkles} title={t('ready-try-title')} description={t('linux-ready-try-description', { system })} onclick={() => (restarting = 'try')} />
 		{#if replaceable}
 			<Choice
 				icon={ArrowRightLeft}
-				title="Replace {system}"
-				description="Luft takes its place and keeps your files, your account, Wi-Fi networks and other drives. The old system stays until you remove it."
+				title={t('linux-ready-replace-title', { system })}
+				description={t('linux-ready-replace-description')}
 				onclick={() => (restarting = 'replace')}
 			/>
 		{/if}
 		<Choice
 			icon={HardDriveDownload}
-			title="Install Luft"
-			description="Restart into the installer to put Luft on another drive or in free space."
+			title={t('ready-install-title')}
+			description={t('linux-ready-install-description')}
 			onclick={() => (restarting = 'install')}
 		/>
-		<Choice icon={Usb} title="Make a USB stick" description="Put Luft on a stick to start it on any computer." onclick={() => maker.open()} />
+		<Choice icon={Usb} title={t('stick-title')} description={t('ready-stick-description')} onclick={() => maker.open()} />
 	</div>
 	{#if session.failure}
 		<div class="mt-4"><Problem failure={session.failure} /></div>
 	{/if}
 	{#snippet actions()}
-		<button type="button" class="plain-button large mr-auto -ml-3" onclick={() => (removing = true)}>Remove Luft from this computer</button>
+		<button type="button" class="plain-button large mr-auto -ml-3" onclick={() => (removing = true)}>{t('linux-ready-remove')}</button>
 		<button type="button" class="plain-button large" onclick={() => session.chooseIso()}>
-			{session.source.kind === 'file' ? 'Using your Luft ISO' : 'Use an ISO I already have'}
+			{session.source.kind === 'file' ? t('meet-iso-using') : t('meet-iso-use')}
 		</button>
 	{/snippet}
 </Frame>
 
 {#if restarting}
-	<Dialog title="Restart now?" description={restartNote} onclose={() => (restarting = null)}>
+	<Dialog title={t('meet-restart-title')} description={restartNote} onclose={() => (restarting = null)}>
 		{#snippet actions()}
-			<button type="button" class="button" onclick={() => (restarting = null)}>Not yet</button>
-			<button type="button" class="button primary" onclick={restart}>Restart</button>
+			<button type="button" class="button" onclick={() => (restarting = null)}>{t('meet-not-yet')}</button>
+			<button type="button" class="button primary" onclick={restart}>{t('meet-restart')}</button>
 		{/snippet}
 	</Dialog>
 {/if}
 
 {#if removing}
 	<Dialog
-		title="Remove Luft from this computer?"
-		description="Meet Luft deletes Luft’s files, its start files and its start entry. Everything else stays as it is."
+		title={t('linux-ready-remove-title')}
+		description={t('linux-ready-remove-description')}
 		onclose={() => (removing = false)}
 	>
 		{#snippet actions()}
-			<button type="button" class="button" onclick={() => (removing = false)}>Keep it</button>
-			<button type="button" class="button danger" onclick={remove}>Remove</button>
+			<button type="button" class="button" onclick={() => (removing = false)}>{t('meet-keep-it')}</button>
+			<button type="button" class="button danger" onclick={remove}>{t('meet-remove')}</button>
 		{/snippet}
 	</Dialog>
 {/if}

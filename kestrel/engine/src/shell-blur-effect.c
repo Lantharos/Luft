@@ -404,7 +404,7 @@ sync_spread (ShellBlurEffect *self)
   gboolean spreads = self->actor && self->mode == SHELL_BLUR_MODE_BACKGROUND;
 
   if (spreads && !self->spread)
-    self->spread = shell_backdrop_spread_new (CLUTTER_ACTOR_META (self));
+    self->spread = shell_backdrop_spread_new (CLUTTER_ACTOR_META (self), self->backdrops);
   else if (!spreads)
     g_clear_pointer (&self->spread, shell_backdrop_spread_free);
 }
@@ -805,10 +805,9 @@ shell_blur_effect_paint_node (ClutterEffect           *effect,
       if (self->mode == SHELL_BLUR_MODE_BACKGROUND)
         {
           shell_backdrop_spread_set_reach (self->spread, blur_reach (self));
-          backdrop = shell_backdrop_capture (self->backdrops, self->spread,
-                                             self->actor, paint_context,
-                                             &actor_box, &area, scale,
-                                             &background_changed);
+          backdrop = shell_backdrop_capture (self->backdrops, self->actor,
+                                             paint_context, &actor_box, &area,
+                                             scale, &background_changed);
           if (!backdrop)
             goto fail;
 

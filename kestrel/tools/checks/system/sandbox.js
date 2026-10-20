@@ -155,7 +155,8 @@ async function checkMutter() {
 async function checkScreencastImpostor() {
   const app = await sandboxedApp('org.gnome.Shell', {own: SCREENCAST_SERVICE});
   try {
-    require(await ownName(app.connection, SCREENCAST_SERVICE), 'a sandboxed app can take the name of Kestrel\'s screencast service');
+    await eventually(() => ownName(app.connection, SCREENCAST_SERVICE),
+      'a sandboxed app can take the name of Kestrel\'s screencast service once the service quits when idle', 10000);
     require(await failure(app.call('/org/gnome/Mutter/ScreenCast', 'org.gnome.Mutter.ScreenCast', 'CreateSession', new GLib.Variant('(a{sv})', [{}]))) === ACCESS_DENIED,
       'a sandboxed app with the screencast service\'s name still cannot record the screen');
   } finally {

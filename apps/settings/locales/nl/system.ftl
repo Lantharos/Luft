@@ -1,0 +1,319 @@
+## Apps
+
+settings-apps-defaults = Standaard-apps
+settings-apps-defaults-description = Gebruikt als je links, bestanden en mappen opent
+settings-apps-browser = Webbrowser
+settings-apps-email = E-mail
+settings-apps-calendar = Agenda
+settings-apps-music = Muziek
+settings-apps-videos = Video’s
+settings-apps-photos = Foto’s
+settings-apps-text-editor = Teksteditor
+settings-apps-files = Bestanden
+settings-apps-choose = Kiezen
+settings-apps-startup = Opstarten
+settings-apps-startup-description = Deze apps openen als je je aanmeldt
+settings-apps-startup-app = { $app } openen als je je aanmeldt
+settings-apps-startup-add = App toevoegen
+settings-apps-startup-add-title = Opstart-app toevoegen
+settings-apps-startup-add-description = Kies een app die elke keer opent als je je aanmeldt.
+settings-apps-search = Apps zoeken
+settings-apps-no-match = Geen apps gevonden
+settings-apps-cancel = Annuleren
+
+## Date and time
+
+settings-datetime-automatic = Tijd automatisch instellen
+settings-datetime-automatic-description = Houdt de klok gelijk via internet
+settings-datetime-date-and-time = Datum en tijd
+settings-datetime-automatic-zone = Tijdzone automatisch instellen
+settings-datetime-automatic-zone-description = Volgt je locatie als je op reis bent
+settings-datetime-automatic-zone-location-off = Schakel locatievoorzieningen in bij Privacy om dit te gebruiken
+settings-datetime-zone = Tijdzone
+settings-datetime-zone-description = { $place } · { $offset }
+settings-datetime-clock = Klok
+settings-datetime-time-format = Tijdnotatie
+settings-datetime-format-24h = 24 uur
+settings-datetime-format-12h = AM/PM
+settings-datetime-seconds = Seconden tonen
+settings-datetime-weekday = Dag van de week tonen
+settings-datetime-calendar = Agenda
+settings-datetime-week-start = Week begint op
+settings-datetime-week-start-automatic = Automatisch
+settings-datetime-week-start-monday = Maandag
+settings-datetime-week-start-sunday = Zondag
+settings-datetime-week-start-regional = { $day }, volgens je regio
+settings-datetime-set-title = Datum en tijd instellen
+settings-datetime-previous-month = Vorige maand
+settings-datetime-next-month = Volgende maand
+settings-datetime-hour = Uur
+settings-datetime-minute = Minuut
+settings-datetime-day-period = Ochtend of middag
+settings-datetime-increase = { $label } verhogen
+settings-datetime-decrease = { $label } verlagen
+settings-datetime-set-failed = De datum en tijd konden niet worden gewijzigd.
+settings-datetime-cancel = Annuleren
+settings-datetime-set = Instellen
+settings-datetime-zone-search = Zoek een stad of land
+settings-datetime-zones = Tijdzones
+settings-datetime-utc = Gecoördineerde wereldtijd
+settings-datetime-zone-no-match = Geen plaatsen gevonden
+settings-datetime-zone-failed = De tijdzone kon niet worden gewijzigd.
+
+## Users
+
+settings-users-picture = Je afbeelding wijzigen
+settings-users-picture-edit = Bewerken
+settings-users-account = Je account
+settings-users-name = Naam
+settings-users-name-description = Getoond bij het aanmelden en op het vergrendelscherm
+settings-users-change = Wijzigen
+settings-users-password = Wachtwoord
+settings-users-password-description = Gebruikt om je aan te melden en deze computer te ontgrendelen
+settings-users-password-set = Wachtwoord instellen
+settings-users-account-type = Accounttype
+settings-users-administrator = Beheerder
+settings-users-standard = Standaardaccount
+settings-users-others = Andere personen op deze computer
+settings-users-name-title = Je naam wijzigen
+settings-users-name-dialog-description = Zo zien anderen je als je je aanmeldt.
+settings-users-save = Opslaan
+settings-users-cancel = Annuleren
+settings-users-close = Sluiten
+settings-users-done = Klaar
+settings-users-try-again = Opnieuw proberen
+settings-users-remove = Verwijderen
+settings-users-password-change-title = Je wachtwoord wijzigen
+settings-users-password-set-title = Een wachtwoord instellen
+settings-users-password-dialog-description = Je gebruikt het om je aan te melden en deze computer te ontgrendelen.
+settings-users-password-current = Huidig wachtwoord
+settings-users-password-new = Nieuw wachtwoord
+settings-users-password-new-placeholder = { $count ->
+    [one] Minstens { $count } teken
+   *[other] Minstens { $count } tekens
+}
+settings-users-password-confirm = Bevestigen
+settings-users-password-confirm-placeholder = Typ het opnieuw
+settings-users-password-change = Wachtwoord wijzigen
+settings-users-password-changing = Wijzigen…
+settings-users-password-wrong = Dat is niet je huidige wachtwoord
+settings-users-password-mismatch = De wachtwoorden komen niet overeen
+settings-users-password-too-short = Dit wachtwoord is te kort
+settings-users-password-too-similar = Dit lijkt te veel op je huidige wachtwoord
+settings-users-password-dictionary-word = Dit is gebaseerd op een woord uit het woordenboek. Probeer iets minder gangbaars.
+settings-users-password-too-simple = Dit is te eenvoudig. Maak het langer of gebruik meer soorten tekens.
+settings-users-password-rejected = Dit wachtwoord is niet geaccepteerd. Probeer een ander.
+settings-users-password-minimum = { $count ->
+    [one] Gebruik minstens { $count } teken
+   *[other] Gebruik minstens { $count } tekens
+}
+settings-users-password-weak = Zwak. Langere wachtwoorden met een mix van woorden zijn moeilijker te raden.
+settings-users-password-fair = Redelijk. Met een paar tekens meer wordt het sterker.
+settings-users-password-strong = Sterk
+settings-users-fingerprints = Vingerafdrukken
+settings-users-fingerprint-add = Vingerafdruk toevoegen
+settings-users-fingerprint-add-description = Meld je aan en ontgrendel met je vinger in plaats van je wachtwoord te typen
+settings-users-fingerprint-choose = Kies welke vinger je wilt toevoegen.
+settings-users-finger = Vinger
+settings-users-fingerprint-start = Starten
+settings-users-fingerprint-another = Andere vinger kiezen
+settings-users-fingerprint-remove = { $finger } verwijderen
+settings-users-fingerprint-remove-title = Deze vingerafdruk verwijderen?
+settings-users-fingerprint-remove-description = Je kunt je { $finger } dan niet meer gebruiken om je aan te melden.
+
+## Login screen
+
+settings-login-unavailable = Het aanmeldscherm kan op deze computer niet worden gewijzigd.
+settings-login-wallpaper = Achtergrond
+settings-login-wallpaper-label = Achtergrond van het aanmeldscherm
+settings-login-wallpaper-shared-description = Iedereen ziet dezelfde afbeelding voordat hij zich aanmeldt
+settings-login-wallpaper-own-description = Iedereen ziet zijn eigen achtergrond zodra hij zijn account kiest
+settings-login-wallpaper-own = Eigen achtergrond
+settings-login-wallpaper-shared = Voor iedereen hetzelfde
+settings-login-picture = Afbeelding
+settings-login-picture-description = Getoond achter het aanmeldscherm
+settings-login-picture-change = Wijzigen
+settings-login-people = Personen
+settings-login-show-people = Personen tonen op het aanmeldscherm
+settings-login-show-people-on = Kies een account uit een lijst om je aan te melden
+settings-login-show-people-off = Iedereen typt zijn gebruikersnaam om zich aan te melden
+settings-login-person-hidden = Typt een gebruikersnaam om zich aan te melden
+settings-login-show-person = { $name } tonen
+settings-login-signing-in = Aanmelden
+settings-login-session = Standaardsessie
+settings-login-session-description = Gebruikt tenzij iemand een andere kiest
+settings-login-session-automatic = Automatisch
+settings-login-automatic = Automatisch aanmelden
+settings-login-automatic-description = Meldt bij het opstarten aan zonder wachtwoord
+settings-login-automatic-off = Uit
+
+## Updates
+
+settings-updates-checking = Zoeken naar updates…
+settings-updates-downloading = Updates downloaden…
+settings-updates-rolling-back = Vorige versie wordt klaargezet…
+settings-updates-switching-nvidia = Driver van NVIDIA downloaden…
+settings-updates-switching-standard = Standaardimage downloaden…
+settings-updates-elsewhere-refresh-by = { $app } zoekt naar updates
+settings-updates-elsewhere-download-by = Updates worden gedownload door { $app }
+settings-updates-elsewhere-update-by = Updates worden geïnstalleerd door { $app }
+settings-updates-elsewhere-update = Updates worden geïnstalleerd
+settings-updates-elsewhere-install-by = Software wordt geïnstalleerd door { $app }
+settings-updates-elsewhere-install = Software wordt geïnstalleerd
+settings-updates-elsewhere-remove-by = Software wordt verwijderd door { $app }
+settings-updates-elsewhere-remove = Software wordt verwijderd
+settings-updates-elsewhere-change-by = Software wordt gewijzigd door { $app }
+settings-updates-elsewhere-change = Software wordt gewijzigd
+settings-updates-elsewhere-wait = Je kunt opnieuw naar updates zoeken als dit klaar is
+settings-updates-ready = Updates zijn klaar om te installeren
+settings-updates-available = { $count ->
+    [one] { $count } update beschikbaar
+   *[other] { $count } updates beschikbaar
+}
+settings-updates-up-to-date = Je systeem is up-to-date
+settings-updates-version = Versie { $version }
+settings-updates-version-new = Een nieuwe versie
+settings-updates-returning = Klaar om terug te gaan naar versie { $version }
+settings-updates-returning-unversioned = Klaar om terug te gaan naar de vorige versie
+settings-updates-nvidia-ready = De driver van NVIDIA staat klaar
+settings-updates-standard-ready = De standaardimage staat klaar
+settings-updates-version-available = Versie { $version } is beschikbaar
+settings-updates-version-available-new = Er is een nieuwe versie beschikbaar
+settings-updates-version-staged = Versie { $version } is klaar om te installeren
+settings-updates-version-staged-new = Een nieuwe versie is klaar om te installeren
+settings-updates-restart-install-them = Start opnieuw op om ze te installeren. Je computer is binnen een paar minuten terug.
+settings-updates-restart-return = Start opnieuw op om het teruggaan af te ronden.
+settings-updates-restart-switch = Start opnieuw op om af te ronden. Je computer is binnen een paar minuten terug.
+settings-updates-restart-install-it = Start opnieuw op om deze te installeren. Je computer is binnen een paar minuten terug.
+settings-updates-last-checked = Laatst gecontroleerd: { $when }
+settings-updates-never-checked = Nog niet gecontroleerd
+settings-updates-installed-when = Updates geïnstalleerd: { $when }
+settings-updates-stop = Stoppen
+settings-updates-check = Nu controleren
+settings-updates-checking-button = Controleren…
+settings-updates-apps = Apps
+settings-updates-app-updates = App-updates
+settings-updates-apps-checking = Zoeken naar updates voor je apps…
+settings-updates-apps-count = { $count ->
+    [0] Beheerd in Schelf
+    [one] { $count } app heeft een update in Schelf
+   *[other] { $count } apps hebben updates in Schelf
+}
+settings-updates-automatic = Automatische updates
+settings-updates-look = Zoeken naar updates
+settings-updates-look-description = Ook als Instellingen gesloten is
+settings-updates-schedule-daily = Elke dag
+settings-updates-schedule-weekly = Elke week
+settings-updates-schedule-never = Alleen als ik controleer
+settings-updates-background = Op de achtergrond downloaden
+settings-updates-background-label = Updates op de achtergrond downloaden
+settings-updates-background-description = Updates zijn klaar om te installeren bij de volgende herstart
+settings-updates-firmware = Firmware
+settings-updates-firmware-description = Updates voor de software die in je hardware is ingebouwd
+settings-updates-firmware-restart = Wordt afgerond als je opnieuw opstart
+settings-updates-firmware-installing = Installeren…
+settings-updates-firmware-update = Bijwerken
+settings-updates-firmware-failed = De firmware kon niet worden bijgewerkt
+settings-updates-failed = De laatste updates konden niet worden geïnstalleerd
+settings-updates-failed-description = Je systeem is gebleven zoals het was
+settings-updates-includes = { $parts ->
+    [security] Bevat beveiligingsoplossingen
+    [kernel] Bevat een nieuwe Linux-kernel
+    [drivers] Bevat bijgewerkte drivers
+    [security-kernel] Bevat beveiligingsoplossingen en een nieuwe Linux-kernel
+    [security-drivers] Bevat beveiligingsoplossingen en bijgewerkte drivers
+    [kernel-drivers] Bevat een nieuwe Linux-kernel en bijgewerkte drivers
+    [security-kernel-drivers] Bevat beveiligingsoplossingen, een nieuwe Linux-kernel en bijgewerkte drivers
+   *[other] Oplossingen en verbeteringen in het hele systeem
+}
+settings-updates-count-size = { $count ->
+    [one] { $count } update · { $size }
+   *[other] { $count } updates · { $size }
+}
+settings-updates-restart-and-install = Opnieuw opstarten en installeren
+settings-updates-download = Downloaden
+settings-updates-see-included = Bekijken wat erin zit
+settings-updates-included = Wat erin zit
+settings-updates-included-description = { $count ->
+    [one] { $count } update voor het systeem, de drivers en de bibliotheken
+   *[other] { $count } updates voor het systeem, de drivers en de bibliotheken
+}
+settings-updates-security-fix = Beveiligingsoplossing
+settings-updates-done = Klaar
+settings-updates-area-kernel = Linux-kernel
+settings-updates-area-drivers = Drivers en firmware
+settings-updates-area-desktop = Bureaublad
+settings-updates-area-core = Kernsysteem
+settings-updates-area-other = Bibliotheken en hulpmiddelen
+settings-updates-released = Uitgebracht: { $when }
+settings-updates-improvements = Oplossingen en verbeteringen in het hele systeem
+settings-updates-download-size = { $size } te downloaden
+settings-updates-replaces = Vervangt versie { $version }, die wacht op installatie
+settings-updates-replaces-new = Vervangt een nieuwe versie die wacht op installatie
+settings-updates-returning-description = De versie die je eerder had. Je bestanden en instellingen blijven zoals ze zijn.
+settings-updates-stay = Bij { $version } blijven
+settings-updates-stay-unversioned = Bij deze versie blijven
+settings-updates-restart = Opnieuw opstarten
+settings-updates-restart-to-install = Opnieuw opstarten om te installeren
+settings-updates-see-new = Bekijken wat er nieuw is
+settings-updates-this-computer = Deze computer
+settings-updates-installed-version = Geïnstalleerde versie
+settings-updates-unknown = Onbekend
+settings-updates-whats-new = Wat is er nieuw
+settings-updates-go-back-title = Teruggaan naar de vorige versie
+settings-updates-previous = Versie { $version }. Je bestanden en instellingen blijven zoals ze zijn.
+settings-updates-previous-unversioned = Je bestanden en instellingen blijven zoals ze zijn.
+settings-updates-go-back = Teruggaan
+settings-updates-notes-title = Nieuw in versie { $version }
+settings-updates-notes-title-new = Nieuw in de nieuwe versie
+settings-updates-variant-nvidia = Driver van NVIDIA gebruiken
+settings-updates-variant-standard = Overstappen naar de standaardimage
+settings-updates-variant-nvidia-reason = Volle snelheid uit je grafische kaart van NVIDIA
+settings-updates-variant-standard-reason = Kleiner, want deze computer heeft geen grafische kaart van NVIDIA
+settings-updates-switch = Overstappen
+
+## About
+
+settings-about-device-name = Apparaatnaam
+settings-about-device-name-description = Hoe andere apparaten deze computer zien
+settings-about-rename = Naam wijzigen
+settings-about-rename-title = Naam van dit apparaat wijzigen
+settings-about-rename-description = Andere apparaten in de buurt zien deze naam.
+settings-about-cancel = Annuleren
+settings-about-hardware = Hardware
+settings-about-processor = Processor
+settings-about-graphics = Grafische kaart
+settings-about-graphics-numbered = Grafische kaart { $number }
+settings-about-memory = Geheugen
+settings-about-storage = Opslag
+settings-about-storage-free = { $free } vrij van { $total }
+settings-about-manage-drives = Schijven beheren
+settings-about-old-system = Bewaard toen Luft het verving · { $size }
+settings-about-other-system = Verwijder het om de { $size } aan Luft te geven
+settings-about-remove = Verwijderen
+settings-about-software = Software
+settings-about-system = Systeem
+settings-about-desktop = Bureaublad
+settings-about-kernel = Kernel
+settings-about-hostname = Hostnaam
+settings-about-problems = Recente problemen
+settings-about-problem-gpu = De grafische driver reageerde niet meer
+settings-about-problem-summary = { $when } · De computer is vanzelf opnieuw opgestart
+settings-about-problem-graceful = { $when }. Apps is gevraagd hun werk op te slaan voordat de computer opnieuw opstartte.
+settings-about-problem-forced = { $when }. Sommige apps sloten niet op tijd en zijn gestopt voordat de computer opnieuw opstartte.
+settings-about-problem-emergency = { $when }. De computer moest opnieuw opstarten zonder op apps te wachten.
+settings-about-problem-help = Wat kan helpen
+settings-about-problem-what = Wat er gebeurde
+settings-about-problem-log = Het volledige kernellogboek van die sessie blijft bewaard in het systeemlogboek. Als je nvidia-bug-report.sh als beheerder uitvoert, wordt het verzameld voor een foutmelding over de driver.
+settings-about-problem-firmware = Opnieuw opstarten naar firmware-instellingen
+settings-about-done = Klaar
+
+## Language & Region
+
+settings-region-language = Taal
+settings-region-language-description = Kestrel en de apps van Luft gebruiken hem meteen
+settings-region-language-next-sign-in = Apps die al open zijn, wisselen nadat ze opnieuw zijn gestart, het aanmeldscherm nadat je je hebt afgemeld
+settings-region-formats-language = Zelfde als de taal
+settings-region-formats = Notaties
+settings-region-formats-description = Datums, tijden, getallen en maten
+settings-region-formats-next-sign-in = { $sample }, vanaf de volgende aanmelding

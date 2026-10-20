@@ -1,0 +1,319 @@
+## Apps
+
+settings-apps-defaults = Standardapper
+settings-apps-defaults-description = Brukes når du åpner lenker, filer og mapper
+settings-apps-browser = Nettleser
+settings-apps-email = E-post
+settings-apps-calendar = Kalender
+settings-apps-music = Musikk
+settings-apps-videos = Videoer
+settings-apps-photos = Bilder
+settings-apps-text-editor = Tekstredigering
+settings-apps-files = Filer
+settings-apps-choose = Velg
+settings-apps-startup = Oppstart
+settings-apps-startup-description = Disse appene åpnes når du logger inn
+settings-apps-startup-app = Åpne { $app } når du logger inn
+settings-apps-startup-add = Legg til app
+settings-apps-startup-add-title = Legg til en oppstartsapp
+settings-apps-startup-add-description = Velg en app som skal åpnes hver gang du logger inn.
+settings-apps-search = Søk i apper
+settings-apps-no-match = Ingen apper samsvarer med søket
+settings-apps-cancel = Avbryt
+
+## Date and time
+
+settings-datetime-automatic = Still klokken automatisk
+settings-datetime-automatic-description = Holder klokken nøyaktig ved hjelp av internett
+settings-datetime-date-and-time = Dato og klokkeslett
+settings-datetime-automatic-zone = Angi tidssone automatisk
+settings-datetime-automatic-zone-description = Følger posisjonen din når du reiser
+settings-datetime-automatic-zone-location-off = Slå på posisjonstjenester i Personvern for å bruke dette
+settings-datetime-zone = Tidssone
+settings-datetime-zone-description = { $place } · { $offset }
+settings-datetime-clock = Klokke
+settings-datetime-time-format = Tidsformat
+settings-datetime-format-24h = 24-timers
+settings-datetime-format-12h = 12-timers
+settings-datetime-seconds = Vis sekunder
+settings-datetime-weekday = Vis ukedag
+settings-datetime-calendar = Kalender
+settings-datetime-week-start = Uken begynner på
+settings-datetime-week-start-automatic = Automatisk
+settings-datetime-week-start-monday = Mandag
+settings-datetime-week-start-sunday = Søndag
+settings-datetime-week-start-regional = { $day }, fra området ditt
+settings-datetime-set-title = Angi dato og klokkeslett
+settings-datetime-previous-month = Forrige måned
+settings-datetime-next-month = Neste måned
+settings-datetime-hour = Time
+settings-datetime-minute = Minutt
+settings-datetime-day-period = Formiddag eller ettermiddag
+settings-datetime-increase = Øk { $label }
+settings-datetime-decrease = Reduser { $label }
+settings-datetime-set-failed = Kunne ikke endre dato og klokkeslett.
+settings-datetime-cancel = Avbryt
+settings-datetime-set = Angi
+settings-datetime-zone-search = Søk etter en by eller et land
+settings-datetime-zones = Tidssoner
+settings-datetime-utc = Koordinert universaltid
+settings-datetime-zone-no-match = Ingen steder samsvarer
+settings-datetime-zone-failed = Kunne ikke endre tidssonen.
+
+## Users
+
+settings-users-picture = Endre bildet ditt
+settings-users-picture-edit = Rediger
+settings-users-account = Kontoen din
+settings-users-name = Navn
+settings-users-name-description = Vises når du logger inn og på låseskjermen
+settings-users-change = Endre
+settings-users-password = Passord
+settings-users-password-description = Brukes til å logge inn og låse opp denne datamaskinen
+settings-users-password-set = Angi passord
+settings-users-account-type = Kontotype
+settings-users-administrator = Administrator
+settings-users-standard = Standardkonto
+settings-users-others = Andre personer på denne datamaskinen
+settings-users-name-title = Endre navnet ditt
+settings-users-name-dialog-description = Slik vises du når du logger inn.
+settings-users-save = Lagre
+settings-users-cancel = Avbryt
+settings-users-close = Lukk
+settings-users-done = Ferdig
+settings-users-try-again = Prøv igjen
+settings-users-remove = Fjern
+settings-users-password-change-title = Endre passordet ditt
+settings-users-password-set-title = Angi et passord
+settings-users-password-dialog-description = Du bruker det til å logge inn og låse opp denne datamaskinen.
+settings-users-password-current = Nåværende passord
+settings-users-password-new = Nytt passord
+settings-users-password-new-placeholder = { $count ->
+    [one] Minst { $count } tegn
+   *[other] Minst { $count } tegn
+}
+settings-users-password-confirm = Bekreft
+settings-users-password-confirm-placeholder = Skriv det inn igjen
+settings-users-password-change = Endre passord
+settings-users-password-changing = Endrer…
+settings-users-password-wrong = Det er ikke det nåværende passordet ditt
+settings-users-password-mismatch = Passordene er ikke like
+settings-users-password-too-short = Dette passordet er for kort
+settings-users-password-too-similar = Dette ligner for mye på det nåværende passordet ditt
+settings-users-password-dictionary-word = Dette er basert på et ord fra ordboken. Prøv noe mindre vanlig.
+settings-users-password-too-simple = Dette er for enkelt. Gjør det lengre, eller bland inn flere typer tegn.
+settings-users-password-rejected = Dette passordet ble ikke godtatt. Prøv et annet.
+settings-users-password-minimum = { $count ->
+    [one] Bruk minst { $count } tegn
+   *[other] Bruk minst { $count } tegn
+}
+settings-users-password-weak = Svakt. Lengre passord med flere ulike ord er vanskeligere å gjette.
+settings-users-password-fair = Middels. Noen flere tegn gjør det sterkere.
+settings-users-password-strong = Sterkt
+settings-users-fingerprints = Fingeravtrykk
+settings-users-fingerprint-add = Legg til et fingeravtrykk
+settings-users-fingerprint-add-description = Logg inn og lås opp med fingeren i stedet for å skrive inn passordet
+settings-users-fingerprint-choose = Velg hvilken finger du vil legge til.
+settings-users-finger = Finger
+settings-users-fingerprint-start = Start
+settings-users-fingerprint-another = Velg en annen finger
+settings-users-fingerprint-remove = Fjern { $finger }
+settings-users-fingerprint-remove-title = Vil du fjerne dette fingeravtrykket?
+settings-users-fingerprint-remove-description = Du kan ikke lenger bruke { $finger } til å logge inn.
+
+## Login screen
+
+settings-login-unavailable = Påloggingsskjermen kan ikke endres på denne datamaskinen.
+settings-login-wallpaper = Bakgrunnsbilde
+settings-login-wallpaper-label = Bakgrunnsbilde på påloggingsskjermen
+settings-login-wallpaper-shared-description = Alle ser det samme bildet før de logger inn
+settings-login-wallpaper-own-description = Alle ser sitt eget bakgrunnsbilde når de velger kontoen sin
+settings-login-wallpaper-own = Sitt eget
+settings-login-wallpaper-shared = Likt for alle
+settings-login-picture = Bilde
+settings-login-picture-description = Vises bak påloggingsskjermen
+settings-login-picture-change = Endre
+settings-login-people = Personer
+settings-login-show-people = Vis personer på påloggingsskjermen
+settings-login-show-people-on = Velg en konto fra en liste for å logge inn
+settings-login-show-people-off = Alle skriver inn brukernavnet sitt for å logge inn
+settings-login-person-hidden = Skriver inn brukernavnet for å logge inn
+settings-login-show-person = Vis { $name }
+settings-login-signing-in = Pålogging
+settings-login-session = Standardøkt
+settings-login-session-description = Brukes med mindre noen velger en annen
+settings-login-session-automatic = Automatisk
+settings-login-automatic = Automatisk pålogging
+settings-login-automatic-description = Logger inn uten passord ved oppstart
+settings-login-automatic-off = Av
+
+## Updates
+
+settings-updates-checking = Ser etter oppdateringer…
+settings-updates-downloading = Laster ned oppdateringer…
+settings-updates-rolling-back = Gjør klar den forrige versjonen…
+settings-updates-switching-nvidia = Laster ned NVIDIAs driver…
+settings-updates-switching-standard = Laster ned standardbildet…
+settings-updates-elsewhere-refresh-by = { $app } ser etter oppdateringer
+settings-updates-elsewhere-download-by = Oppdateringer lastes ned av { $app }
+settings-updates-elsewhere-update-by = Oppdateringer installeres av { $app }
+settings-updates-elsewhere-update = Oppdateringer installeres
+settings-updates-elsewhere-install-by = Programvare installeres av { $app }
+settings-updates-elsewhere-install = Programvare installeres
+settings-updates-elsewhere-remove-by = Programvare fjernes av { $app }
+settings-updates-elsewhere-remove = Programvare fjernes
+settings-updates-elsewhere-change-by = Programvare endres av { $app }
+settings-updates-elsewhere-change = Programvare endres
+settings-updates-elsewhere-wait = Du kan se etter oppdateringer igjen når det er ferdig
+settings-updates-ready = Oppdateringer er klare til å installeres
+settings-updates-available = { $count ->
+    [one] { $count } oppdatering er tilgjengelig
+   *[other] { $count } oppdateringer er tilgjengelige
+}
+settings-updates-up-to-date = Systemet ditt er oppdatert
+settings-updates-version = Versjon { $version }
+settings-updates-version-new = En ny versjon
+settings-updates-returning = Klar til å gå tilbake til versjon { $version }
+settings-updates-returning-unversioned = Klar til å gå tilbake til den forrige versjonen
+settings-updates-nvidia-ready = NVIDIAs driver er klar
+settings-updates-standard-ready = Standardbildet er klart
+settings-updates-version-available = Versjon { $version } er tilgjengelig
+settings-updates-version-available-new = En ny versjon er tilgjengelig
+settings-updates-version-staged = Versjon { $version } er klar til å installeres
+settings-updates-version-staged-new = En ny versjon er klar til å installeres
+settings-updates-restart-install-them = Start på nytt for å installere dem. Datamaskinen er tilbake om noen minutter.
+settings-updates-restart-return = Start på nytt for å fullføre tilbakegangen.
+settings-updates-restart-switch = Start på nytt for å fullføre. Datamaskinen er tilbake om noen minutter.
+settings-updates-restart-install-it = Start på nytt for å installere den. Datamaskinen er tilbake om noen minutter.
+settings-updates-last-checked = Sist sjekket { $when }
+settings-updates-never-checked = Ikke sjekket ennå
+settings-updates-installed-when = Oppdateringer installert { $when }
+settings-updates-stop = Stopp
+settings-updates-check = Sjekk nå
+settings-updates-checking-button = Sjekker…
+settings-updates-apps = Apper
+settings-updates-app-updates = Appoppdateringer
+settings-updates-apps-checking = Ser etter oppdateringer til appene dine…
+settings-updates-apps-count = { $count ->
+    [0] Håndteres i Schelf
+    [one] { $count } app har en oppdatering i Schelf
+   *[other] { $count } apper har oppdateringer i Schelf
+}
+settings-updates-automatic = Automatiske oppdateringer
+settings-updates-look = Se etter oppdateringer
+settings-updates-look-description = Også når Innstillinger er lukket
+settings-updates-schedule-daily = Hver dag
+settings-updates-schedule-weekly = Hver uke
+settings-updates-schedule-never = Bare når jeg sjekker
+settings-updates-background = Last ned i bakgrunnen
+settings-updates-background-label = Last ned oppdateringer i bakgrunnen
+settings-updates-background-description = Oppdateringene er klare til å installeres neste gang du starter på nytt
+settings-updates-firmware = Fastvare
+settings-updates-firmware-description = Oppdateringer for programvaren som er bygd inn i maskinvaren din
+settings-updates-firmware-restart = Fullføres når du starter på nytt
+settings-updates-firmware-installing = Installerer…
+settings-updates-firmware-update = Oppdater
+settings-updates-firmware-failed = Kunne ikke oppdatere fastvaren
+settings-updates-failed = De siste oppdateringene kunne ikke installeres
+settings-updates-failed-description = Systemet ble latt være som det var
+settings-updates-includes = { $parts ->
+    [security] Inneholder sikkerhetsrettelser
+    [kernel] Inneholder en ny Linux-kjerne
+    [drivers] Inneholder oppdaterte drivere
+    [security-kernel] Inneholder sikkerhetsrettelser og en ny Linux-kjerne
+    [security-drivers] Inneholder sikkerhetsrettelser og oppdaterte drivere
+    [kernel-drivers] Inneholder en ny Linux-kjerne og oppdaterte drivere
+    [security-kernel-drivers] Inneholder sikkerhetsrettelser, en ny Linux-kjerne og oppdaterte drivere
+   *[other] Rettelser og forbedringer i hele systemet
+}
+settings-updates-count-size = { $count ->
+    [one] { $count } oppdatering · { $size }
+   *[other] { $count } oppdateringer · { $size }
+}
+settings-updates-restart-and-install = Start på nytt og installer
+settings-updates-download = Last ned
+settings-updates-see-included = Se hva som er med
+settings-updates-included = Hva som er med
+settings-updates-included-description = { $count ->
+    [one] { $count } oppdatering for systemet, driverne og bibliotekene
+   *[other] { $count } oppdateringer for systemet, driverne og bibliotekene
+}
+settings-updates-security-fix = Sikkerhetsrettelse
+settings-updates-done = Ferdig
+settings-updates-area-kernel = Linux-kjerne
+settings-updates-area-drivers = Drivere og fastvare
+settings-updates-area-desktop = Skrivebord
+settings-updates-area-core = Kjernesystem
+settings-updates-area-other = Biblioteker og verktøy
+settings-updates-released = Utgitt { $when }
+settings-updates-improvements = Rettelser og forbedringer i hele systemet
+settings-updates-download-size = { $size } å laste ned
+settings-updates-replaces = Erstatter versjon { $version }, som venter på å bli installert
+settings-updates-replaces-new = Erstatter en ny versjon som venter på å bli installert
+settings-updates-returning-description = Versjonen du hadde før. Filene og innstillingene dine blir som de er.
+settings-updates-stay = Bli på { $version }
+settings-updates-stay-unversioned = Bli på denne versjonen
+settings-updates-restart = Start på nytt
+settings-updates-restart-to-install = Start på nytt for å installere
+settings-updates-see-new = Se hva som er nytt
+settings-updates-this-computer = Denne datamaskinen
+settings-updates-installed-version = Installert versjon
+settings-updates-unknown = Ukjent
+settings-updates-whats-new = Hva er nytt
+settings-updates-go-back-title = Gå tilbake til forrige versjon
+settings-updates-previous = Versjon { $version }. Filene og innstillingene dine blir som de er.
+settings-updates-previous-unversioned = Filene og innstillingene dine blir som de er.
+settings-updates-go-back = Gå tilbake
+settings-updates-notes-title = Nytt i versjon { $version }
+settings-updates-notes-title-new = Nytt i den nye versjonen
+settings-updates-variant-nvidia = Bruk NVIDIAs driver
+settings-updates-variant-standard = Bytt til standardbildet
+settings-updates-variant-nvidia-reason = Full hastighet fra NVIDIA-grafikken din
+settings-updates-variant-standard-reason = Mindre, siden denne datamaskinen ikke har NVIDIA-grafikk
+settings-updates-switch = Bytt
+
+## About
+
+settings-about-device-name = Enhetsnavn
+settings-about-device-name-description = Slik ser andre enheter denne datamaskinen
+settings-about-rename = Gi nytt navn
+settings-about-rename-title = Gi denne enheten nytt navn
+settings-about-rename-description = Andre enheter i nærheten ser dette navnet.
+settings-about-cancel = Avbryt
+settings-about-hardware = Maskinvare
+settings-about-processor = Prosessor
+settings-about-graphics = Grafikk
+settings-about-graphics-numbered = Grafikk { $number }
+settings-about-memory = Minne
+settings-about-storage = Lagring
+settings-about-storage-free = { $free } ledig av { $total }
+settings-about-manage-drives = Administrer disker
+settings-about-old-system = Beholdt da Luft erstattet det · { $size }
+settings-about-other-system = Fjern det for å gi plassen på { $size } til Luft
+settings-about-remove = Fjern
+settings-about-software = Programvare
+settings-about-system = System
+settings-about-desktop = Skrivebord
+settings-about-kernel = Kjerne
+settings-about-hostname = Vertsnavn
+settings-about-problems = Nylige problemer
+settings-about-problem-gpu = Grafikkdriveren sluttet å svare
+settings-about-problem-summary = { $when } · Datamaskinen startet på nytt av seg selv
+settings-about-problem-graceful = { $when }. Appene ble bedt om å lagre arbeidet sitt før datamaskinen startet på nytt.
+settings-about-problem-forced = { $when }. Noen apper lukket seg ikke i tide og ble stoppet før datamaskinen startet på nytt.
+settings-about-problem-emergency = { $when }. Datamaskinen måtte starte på nytt uten å vente på appene.
+settings-about-problem-help = Dette kan hjelpe
+settings-about-problem-what = Hva som skjedde
+settings-about-problem-log = Hele kjerneloggen fra den økten ligger i systemjournalen. Hvis du kjører nvidia-bug-report.sh som administrator, samles den inn til en feilrapport for driveren.
+settings-about-problem-firmware = Start på nytt i fastvareinnstillingene
+settings-about-done = Ferdig
+
+## Language & Region
+
+settings-region-language = Språk
+settings-region-language-description = Kestrel og Lufts apper bruker det med en gang
+settings-region-language-next-sign-in = Apper som allerede er åpne, bytter når de startes på nytt, påloggingsskjermen når du logger ut
+settings-region-formats-language = Samme som språket
+settings-region-formats = Formater
+settings-region-formats-description = Datoer, klokkeslett, tall og måleenheter
+settings-region-formats-next-sign-in = { $sample }, fra neste pålogging

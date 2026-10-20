@@ -2,8 +2,9 @@ use std::env;
 
 pub const SOURCE_LOCALE: &str = "en";
 pub const PSEUDO_LOCALE: &str = "en-XA";
-pub const LOCALES: [&str; 14] = [
-    "en", "bs", "ca", "de", "es", "fr", "hr", "it", "pt-BR", "pt", "ro", "sq", "sr-Latn", "sr",
+pub const LOCALES: [&str; 20] = [
+    "en", "bs", "ca", "da", "de", "es", "fr", "hr", "is", "it", "nl", "nb", "nn", "pt-BR", "pt",
+    "ro", "sq", "sr-Latn", "sv", "sr",
 ];
 
 pub fn bcp47(locale: &str) -> Option<String> {
@@ -152,5 +153,11 @@ mod tests {
         assert_eq!(negotiate(&["pt-BR"]), "pt-BR");
         assert_eq!(negotiate(&["pt-PT"]), "pt");
         assert_eq!(negotiate(&["pt-AO"]), "pt");
+    }
+
+    #[test]
+    fn reads_norwegian_as_bokmal() {
+        assert_eq!(negotiate(&["no-NO"]), "nb");
+        assert_eq!(negotiate(&["nn-NO"]), "nn");
     }
 }

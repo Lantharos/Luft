@@ -1,8 +1,10 @@
 use std::path::{Component, Path, PathBuf};
 
+use luft_i18n::t;
 use luft_meet::Layout;
 
 use super::disks::{self, Block, Mount};
+use crate::L10N;
 use crate::check::linux::{Place, Readable};
 
 const HOME_FOLDER: &str = "/home/.luft-meet";
@@ -44,8 +46,13 @@ fn on_filesystem(mount: &Mount, folder: &Path) -> Option<String> {
 
 fn spot(blocks: &[Block], folder: &Path) -> Result<Spot, String> {
     let mount = disks::mount_of(folder.parent().unwrap_or(Path::new("/")))?;
-    let on_filesystem = on_filesystem(&mount, folder)
-        .ok_or_else(|| format!("{} can't be started from", folder.display()))?;
+    let on_filesystem = on_filesystem(&mount, folder).ok_or_else(|| {
+        t!(
+            L10N,
+            "drive-folder-not-startable",
+            folder = folder.display().to_string()
+        )
+    })?;
     Ok(Spot {
         folder: folder.to_owned(),
         readable: readable(blocks, &mount),
@@ -83,7 +90,7 @@ impl Spot {
             .uuid
             .as_deref()
             .filter(|uuid| !uuid.is_empty())
-            .ok_or_else(|| "The drive Luft is kept on has no UUID".to_owned())
+            .ok_or_else(|| t!(L10N, "drive-no-uuid"))
     }
 }
 

@@ -3,11 +3,13 @@ use std::os::windows::process::CommandExt;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
+use luft_i18n::t;
 use luft_meet::FolderKind;
 use luft_meet::handoff;
 use windows::Win32::Storage::FileSystem::{FindFirstVolumeW, FindNextVolumeW, FindVolumeClose};
 
 use super::belongings::known;
+use crate::L10N;
 
 const LOGS: &str = "Luft logs";
 const VOLUME_NAME: usize = 50;
@@ -63,14 +65,14 @@ pub fn save() -> Result<Option<String>, String> {
     let Some(session) = latest_session() else {
         return Ok(None);
     };
-    let desktop = known(FolderKind::Desktop).ok_or("Meet Luft couldn't find your desktop")?;
+    let desktop = known(FolderKind::Desktop).ok_or_else(|| t!(L10N, "logs-no-desktop"))?;
     let name = session
         .file_name()
         .expect("a session is a named file")
         .to_string_lossy();
-    let saved = desktop.join(format!("{LOGS} {name}"));
+    let saved = desktop.join(t!(L10N, "logs-file-name", name = name));
     fs::copy(&session, &saved)
-        .map_err(|error| format!("Meet Luft couldn't save Try Luft's logs: {error}"))?;
+        .map_err(|error| t!(L10N, "logs-not-saved", error = error.to_string()))?;
     Ok(Some(saved.to_string_lossy().into_owned()))
 }
 

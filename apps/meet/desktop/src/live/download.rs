@@ -1,12 +1,14 @@
 use std::io::{self, Read};
 use std::time::Duration;
 
+use luft_i18n::t;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use ureq::Agent;
 use ureq::tls::{RootCerts, TlsConfig};
 
 use super::signature;
+use crate::L10N;
 
 const DOWNLOADS: &str = "https://get.luft.computer";
 const MAJOR: &str = "1";
@@ -58,7 +60,10 @@ fn locate_at(
     let pointer: Pointer =
         serde_json::from_str(&text(agent, &format!("{folder}/{POINTER}")).map_err(Fetch::into_io)?)
             .map_err(|_| {
-                io::Error::new(io::ErrorKind::InvalidData, "The newest Luft isn't readable")
+                io::Error::new(
+                    io::ErrorKind::InvalidData,
+                    t!(L10N, "live-pointer-unreadable"),
+                )
             })?;
     let iso = format!("{folder}/{}", pointer.name);
     let checksum = checksum(agent, key, &iso).map_err(Fetch::into_io)?;
@@ -125,7 +130,9 @@ enum Fetch {
 impl Fetch {
     fn into_io(self) -> io::Error {
         match self {
-            Self::Missing => io::Error::new(io::ErrorKind::NotFound, "Luft isn't published there"),
+            Self::Missing => {
+                io::Error::new(io::ErrorKind::NotFound, t!(L10N, "live-not-published"))
+            }
             Self::Failed(error) => error,
         }
     }
@@ -156,13 +163,16 @@ fn checksum(agent: &Agent, key: Option<&str>, iso: &str) -> Result<[u8; 32], Fet
     let checksum = text(agent, &format!("{iso}.sha256"))?;
     if let Some(key) = key {
         let signed = match text(agent, &format!("{iso}.sha256.minisig")) {
-            Err(Fetch::Missing) => Err(unreadable(format!("{} isn't signed", file_name(iso)))),
+            Err(Fetch::Missing) => Err(unreadable(t!(
+                L10N,
+                "live-not-signed",
+                iso = file_name(iso)
+            ))),
             other => other,
         }?;
         signature::verify(key, &checksum, &signed, file_name(iso)).map_err(unreadable)?;
     }
-    parse_checksum(&checksum)
-        .ok_or_else(|| unreadable("The checksum file isn't readable".to_owned()))
+    parse_checksum(&checksum).ok_or_else(|| unreadable(t!(L10N, "live-checksum-unreadable")))
 }
 
 pub struct Download {
@@ -198,7 +208,7 @@ impl Download {
             .call()
             .map_err(failed)?;
         if response.status() != 206 {
-            return Err(io::Error::other("The server can't continue the download"));
+            return Err(io::Error::other(t!(L10N, "live-download-not-resumable")));
         }
         self.body = Box::new(response.into_body().into_reader());
         Ok(())

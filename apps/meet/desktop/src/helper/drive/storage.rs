@@ -2,10 +2,12 @@
 
 use std::path::PathBuf;
 
+use luft_i18n::t;
 use serde::{Deserialize, Serialize};
 use wmi::WMIConnection;
 
 use super::bitlocker::BitLocker;
+use crate::L10N;
 use crate::plan::layout::{Disk, Span, Windows};
 
 pub const ESP_TYPE: &str = "{c12a7328-f81f-11d2-ba4b-00a0c93ec93b}";
@@ -86,7 +88,12 @@ pub struct Storage {
 fn checked(what: &str, value: u32) -> Result<(), String> {
     match value {
         0 => Ok(()),
-        code => Err(format!("{what} (Windows storage error {code})")),
+        code => Err(t!(
+            L10N,
+            "drive-storage-error",
+            what = L10N.t(what),
+            code = code.to_string()
+        )),
     }
 }
 
@@ -186,7 +193,7 @@ impl Storage {
                     .flatten()
                     .any(|path| path.eq_ignore_ascii_case(windows_volume))
             })
-            .ok_or("Windows' partition wasn't found")?;
+            .ok_or_else(|| t!(L10N, "drive-windows-partition-missing"))?;
         let disks: Vec<MSFT_Disk> = self
             .wmi
             .raw_query(format!(
@@ -197,7 +204,7 @@ impl Storage {
         let disk = disks
             .into_iter()
             .next()
-            .ok_or("Windows' drive wasn't found")?;
+            .ok_or_else(|| t!(L10N, "drive-windows-drive-missing"))?;
         Ok(Layout {
             partitions: self.partitions_of(disk.Number)?,
             disk,
@@ -216,7 +223,7 @@ impl Storage {
         volumes
             .into_iter()
             .next()
-            .ok_or_else(|| format!("The volume {path} wasn't found"))
+            .ok_or_else(|| t!(L10N, "drive-volume-missing", path = path))
     }
 
     pub fn windows_plan(&self, layout: &Layout, windows_volume: &str) -> Result<Windows, String> {
@@ -229,10 +236,7 @@ impl Storage {
                 (),
             )
             .map_err(wmi_error)?;
-        checked(
-            "Windows couldn't tell how small its partition can get",
-            supported.ReturnValue,
-        )?;
+        checked("drive-shrink-size-unknown", supported.ReturnValue)?;
         Ok(Windows {
             partition: layout.windows.span(),
             used: volume.Size.saturating_sub(volume.SizeRemaining),
@@ -249,10 +253,7 @@ impl Storage {
                 Resize { Size: size },
             )
             .map_err(wmi_error)?;
-        checked(
-            "Windows couldn't change the size of its partition",
-            returned.ReturnValue,
-        )
+        checked("drive-resize-failed", returned.ReturnValue)
     }
 
     pub fn create(
@@ -274,15 +275,12 @@ impl Storage {
                 },
             )
             .map_err(wmi_error)?;
-        checked(
-            "Windows couldn't make a partition for Luft",
-            returned.ReturnValue,
-        )?;
+        checked("drive-create-failed", returned.ReturnValue)?;
         let created = self
             .partitions_of(layout.disk.Number)?
             .into_iter()
             .find(|partition| partition.Offset == span.offset)
-            .ok_or("The new partition wasn't found")?;
+            .ok_or_else(|| t!(L10N, "drive-new-partition-missing"))?;
         if kind != ESP_TYPE
             && let Err(error) = self.hide(&created)
         {
@@ -303,17 +301,14 @@ impl Storage {
                 },
             )
             .map_err(wmi_error)?;
-        checked(
-            "Windows couldn't keep the new partition out of Explorer",
-            returned.ReturnValue,
-        )
+        checked("drive-hide-failed", returned.ReturnValue)
     }
 
     pub fn refreshed(&self, partition: &MSFT_Partition) -> Result<MSFT_Partition, String> {
         self.partitions_of(partition.DiskNumber)?
             .into_iter()
             .find(|candidate| candidate.Offset == partition.Offset)
-            .ok_or_else(|| "A partition disappeared".to_owned())
+            .ok_or_else(|| t!(L10N, "drive-partition-gone"))
     }
 
     pub fn format(
@@ -325,7 +320,7 @@ impl Storage {
     ) -> Result<PathBuf, String> {
         let path = partition
             .volume_path()
-            .ok_or("The new partition has no volume")?;
+            .ok_or_else(|| t!(L10N, "drive-new-partition-no-volume"))?;
         let volume = self.volume(&path.to_string_lossy())?;
         let returned: Returned = self
             .wmi
@@ -341,10 +336,7 @@ impl Storage {
                 },
             )
             .map_err(wmi_error)?;
-        checked(
-            "Windows couldn't format the new partition",
-            returned.ReturnValue,
-        )?;
+        checked("drive-format-failed", returned.ReturnValue)?;
         BitLocker::open()?.keep_readable(&path)?;
         Ok(path)
     }
@@ -354,10 +346,7 @@ impl Storage {
             .wmi
             .exec_instance_method::<MSFT_Partition, _>(&partition.__Path, "DeleteObject", ())
             .map_err(wmi_error)?;
-        checked(
-            "Windows couldn't remove one of Luft's partitions",
-            returned.ReturnValue,
-        )
+        checked("drive-remove-failed", returned.ReturnValue)
     }
 
     pub fn largest_windows(&self, partition: &MSFT_Partition) -> Result<u64, String> {
@@ -370,10 +359,7 @@ impl Storage {
             .wmi
             .exec_instance_method::<MSFT_Partition, _>(&partition.__Path, "GetSupportedSize", ())
             .map_err(wmi_error)?;
-        checked(
-            "Windows couldn't tell how large its partition can get",
-            supported.ReturnValue,
-        )?;
+        checked("drive-grow-size-unknown", supported.ReturnValue)?;
         Ok(supported.SizeMax)
     }
 }

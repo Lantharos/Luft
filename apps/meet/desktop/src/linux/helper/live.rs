@@ -2,6 +2,9 @@ use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
 
+use luft_i18n::t;
+
+use crate::L10N;
 use crate::live::download::{Hashing, format_checksum};
 use crate::live::durable;
 use crate::live::files::{self, BUILD_RECORD, Place, UPDATING, Volumes};
@@ -48,7 +51,7 @@ pub fn grub_config(filesystem: &str, on_filesystem: &str) -> String {
 pub fn write(context: &Context, source: &Source, spots: &Spots) -> Result<(), String> {
     let expected = source
         .checksum()
-        .map_err(|error| format!("Luft's checksum couldn't be read: {error}"))?;
+        .map_err(|error| t!(L10N, "live-checksum-not-read", error = error.to_string()))?;
     let opened = source.open().map_err(|error| error.to_string())?;
     let total = opened.total;
     let mut hashing = Hashing::new(opened.reader, |read| {
@@ -56,10 +59,10 @@ pub fn write(context: &Context, source: &Source, spots: &Spots) -> Result<(), St
     });
     let mut volumes = Volumes::new(target(spots.loader.to_owned(), spots.folder.to_owned()));
     iso::extract(&mut hashing, &mut volumes)
-        .map_err(|error: io::Error| format!("Luft couldn't be downloaded: {error}"))?;
+        .map_err(|error: io::Error| t!(L10N, "stick-download-failed", error = error.to_string()))?;
     let digest = hashing.digest();
     if expected.is_some_and(|expected| digest != expected) {
-        return Err("The download was damaged on the way. Try again.".to_owned());
+        return Err(t!(L10N, "live-download-damaged"));
     }
     volumes.put_in_place().map_err(|error| error.to_string())?;
     durable::write(
@@ -98,8 +101,14 @@ pub fn rewrite(context: &Context, source: &Source, spots: &Spots) -> Result<(), 
 }
 
 pub fn remove(path: &Path) -> Result<(), String> {
-    gone(fs::remove_dir_all(path))
-        .map_err(|error| format!("{} couldn't be removed: {error}", path.display()))
+    gone(fs::remove_dir_all(path)).map_err(|error| {
+        t!(
+            L10N,
+            "live-not-removed",
+            path = path.display().to_string(),
+            error = error.to_string()
+        )
+    })
 }
 
 #[cfg(test)]

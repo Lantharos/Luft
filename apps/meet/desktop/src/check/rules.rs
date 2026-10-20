@@ -1,8 +1,11 @@
+use luft_i18n::t;
+
 use super::common::{
     Action, Finding, LIVE_ESTIMATE, Level, Topic, download, finding, gib, graphics, processor,
     secure_boot, tpm, wifi,
 };
 use super::facts::{Encryption, Facts, Firmware};
+use crate::L10N;
 use crate::plan::sizes::smallest_luft;
 
 fn startup(facts: &Facts) -> Finding {
@@ -10,20 +13,20 @@ fn startup(facts: &Facts) -> Finding {
         (Firmware::Uefi, true) => finding(
             Topic::Startup,
             Level::Fine,
-            "Starts with UEFI",
-            "Luft starts the same modern way.",
+            t!(L10N, "check-startup-uefi"),
+            t!(L10N, "check-startup-uefi-windows"),
         ),
         (Firmware::Bios, _) => finding(
             Topic::Startup,
             Level::Blocks,
-            "Starts in legacy BIOS mode",
-            "Luft needs UEFI. Windows can switch with MBR2GPT, then UEFI can be turned on in the firmware settings.",
+            t!(L10N, "check-startup-bios"),
+            t!(L10N, "check-startup-bios-windows"),
         ),
         (Firmware::Uefi, false) => finding(
             Topic::Startup,
             Level::Blocks,
-            "The drive uses an old partition table",
-            "Luft needs a GPT drive. Windows can convert it with MBR2GPT without losing files.",
+            t!(L10N, "check-startup-mbr"),
+            t!(L10N, "check-startup-mbr-windows"),
         ),
     }
 }
@@ -33,20 +36,20 @@ fn encryption(facts: &Facts) -> Finding {
         Encryption::Off => finding(
             Topic::Encryption,
             Level::Fine,
-            "Windows isn't encrypted",
-            "Install Luft can read its settings and your Bluetooth devices.",
+            t!(L10N, "check-encryption-off"),
+            t!(L10N, "check-encryption-off-detail"),
         ),
         Encryption::On => finding(
             Topic::Encryption,
             Level::Note,
-            "Windows is encrypted with BitLocker",
-            "That's fine. Windows makes the room itself, and Meet Luft brings over what Luft can't read from a locked drive. Keep your recovery key nearby, just in case.",
+            t!(L10N, "check-encryption-on"),
+            t!(L10N, "check-encryption-on-detail"),
         ),
         Encryption::Changing => finding(
             Topic::Encryption,
             Level::Blocks,
-            "BitLocker is still encrypting or decrypting",
-            "Wait until Windows finishes, then come back. You can see how far it is in Settings, under Device encryption.",
+            t!(L10N, "check-encryption-changing"),
+            t!(L10N, "check-encryption-changing-detail"),
         ),
     }
 }
@@ -56,15 +59,15 @@ fn fast_startup(facts: &Facts) -> Finding {
         finding(
             Topic::FastStartup,
             Level::Note,
-            "Fast Startup is on",
-            "Windows hibernates instead of shutting down, which keeps its drive locked. Meet Luft offers to turn it off before installing.",
+            t!(L10N, "check-fast-startup-on"),
+            t!(L10N, "check-fast-startup-on-detail"),
         )
     } else {
         finding(
             Topic::FastStartup,
             Level::Fine,
-            "Fast Startup is off",
-            "Windows shuts down fully.",
+            t!(L10N, "check-fast-startup-off"),
+            t!(L10N, "check-fast-startup-off-detail"),
         )
     }
 }
@@ -75,18 +78,23 @@ fn space(facts: &Facts, live: u64) -> Finding {
         finding(
             Topic::Space,
             Level::Fine,
-            &format!("Up to {} GB for Luft", gib(facts.most_room - live)),
-            "Windows keeps its files and room to grow.",
+            t!(
+                L10N,
+                "check-space-up-to",
+                size = gib(facts.most_room - live)
+            ),
+            t!(L10N, "check-space-up-to-detail"),
         )
     } else {
         finding(
             Topic::Space,
             Level::Blocks,
-            "Not enough free space",
-            &format!(
-                "Luft needs about {} GB that Windows can give up. Free up {} GB in Windows, for example with Disk Cleanup, then check again.",
-                gib(needed),
-                gib(needed - facts.most_room).max(1)
+            t!(L10N, "check-space-short"),
+            t!(
+                L10N,
+                "check-space-short-windows",
+                needed = gib(needed),
+                missing = gib(needed - facts.most_room).max(1)
             ),
         )
     }
@@ -98,16 +106,18 @@ fn start_entries(facts: &Facts) -> Option<Finding> {
         .iter()
         .map(|entry| entry.name.as_str())
         .collect();
-    let (title, verb) = match names.len() {
-        0 => return None,
-        1 => ("An old start entry".to_owned(), "points"),
-        count => (format!("{count} old start entries"), "point"),
-    };
-    let detail = format!(
-        "{} {verb} at systems that aren't on this PC anymore. They can be tidied away.",
-        names.join(", ")
+    let count = names.len();
+    if count == 0 {
+        return None;
+    }
+    let title = t!(L10N, "check-start-entries", count = count);
+    let detail = t!(
+        L10N,
+        "check-start-entries-detail",
+        count = count,
+        names = names.join(", ")
     );
-    Some(finding(Topic::StartEntries, Level::Note, &title, &detail).with(Action::Tidy))
+    Some(finding(Topic::StartEntries, Level::Note, title, detail).with(Action::Tidy))
 }
 
 pub fn evaluate(facts: &Facts, live: Option<u64>) -> Vec<Finding> {

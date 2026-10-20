@@ -4,6 +4,7 @@ use std::os::windows::process::CommandExt;
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
 
+use luft_i18n::t;
 use luft_meet::handoff::BOX_LABEL;
 use luft_meet::moving_box::{
     self, Account, BLUETOOTH_KEYS, BLUETOOTH_NAMES, Bluetooth, Folder, Manifest, PICTURE,
@@ -16,6 +17,7 @@ use super::drive::{record, state};
 use super::system::protected::Scratch;
 use super::system::{bluetooth, programs};
 use super::{Context, prepare};
+use crate::L10N;
 use crate::folders::{Item, verbatim, walk};
 use crate::plan::layout::{self, Role};
 use crate::plan::sizes::{self, BOX_CLUSTER};
@@ -138,7 +140,7 @@ pub fn pack(context: &Context, belongings: &Belongings) -> Result<Prepared, Stri
     let layout = storage.layout(&drive.volume)?;
     let found = state::find(&layout);
     let (Some(mut handoff), Some(live)) = (found.handoff.clone(), found.live_path()) else {
-        return Err("Make room for Luft first.".to_owned());
+        return Err(t!(L10N, "helper-no-room-yet"));
     };
     if let Some(old) = &found.moving_box {
         storage.delete(old)?;
@@ -229,10 +231,11 @@ pub fn pack(context: &Context, belongings: &Belongings) -> Result<Prepared, Stri
         &[(Role::MovingBox, size)],
     )
     .map_err(|shortfall| {
-        format!(
-            "Windows can give up {} GB more, and these need {} GB.",
-            shortfall.available.saturating_sub(room) >> 30,
-            size.div_ceil(1 << 30)
+        t!(
+            L10N,
+            "helper-box-shortfall",
+            available = shortfall.available.saturating_sub(room) >> 30,
+            needed = size.div_ceil(1 << 30)
         )
     })?;
     if plan.windows_size < layout.windows.Size {
@@ -242,7 +245,11 @@ pub fn pack(context: &Context, belongings: &Belongings) -> Result<Prepared, Stri
     }
     let layout = storage.layout(&drive.volume)?;
     let partition = storage.create(&layout, plan.partitions[0].span, BASIC_TYPE)?;
-    record::made_partition(&partition.guid().ok_or("The moving box has no GUID")?)?;
+    record::made_partition(
+        &partition
+            .guid()
+            .ok_or_else(|| t!(L10N, "drive-box-no-guid"))?,
+    )?;
     if let Err(error) = fill(context, &storage, &partition, &items, &manifest) {
         if let Err(cleanup) = take_back(&storage, &drive, &partition, windows_before) {
             eprintln!("Cleaning up after packing failed didn't work: {cleanup}");
@@ -259,6 +266,5 @@ pub fn pack(context: &Context, belongings: &Belongings) -> Result<Prepared, Stri
     }
     state::write_handoff(&live, &handoff)?;
     let layout = storage.layout(&drive.volume)?;
-    prepare::prepared(&state::find(&layout))
-        .ok_or_else(|| "Luft's partitions disappeared".to_owned())
+    prepare::prepared(&state::find(&layout)).ok_or_else(|| t!(L10N, "drive-partitions-gone"))
 }

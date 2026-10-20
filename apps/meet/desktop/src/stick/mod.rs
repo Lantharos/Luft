@@ -7,8 +7,10 @@ pub mod ventoy;
 
 use std::path::PathBuf;
 
+use luft_i18n::t;
 use serde::{Deserialize, Serialize};
 
+use crate::L10N;
 use crate::live::download::parse_checksum;
 use drives::Stick;
 
@@ -31,15 +33,22 @@ pub struct Finished {
     pub ejected: bool,
 }
 
-pub const GONE: &str = "The stick isn't there anymore. Plug it back in and choose it again.";
-pub const TOO_SMALL: &str = "Luft doesn't fit on this stick. Use one of 4 GB or more.";
-pub const DAMAGED: &str =
-    "The ISO doesn't match its checksum. It may have been damaged on the way.";
+pub fn gone() -> String {
+    t!(L10N, "stick-gone")
+}
+
+pub fn too_small() -> String {
+    t!(L10N, "stick-too-small")
+}
+
+pub fn damaged() -> String {
+    t!(L10N, "stick-damaged")
+}
 
 impl Image {
     pub fn matches(&self, written: &[u8; 32]) -> Result<(), String> {
         match self.checksum.as_deref().and_then(parse_checksum) {
-            Some(expected) if &expected != written => Err(DAMAGED.to_owned()),
+            Some(expected) if &expected != written => Err(damaged()),
             _ => Ok(()),
         }
     }
@@ -49,6 +58,6 @@ pub fn read_back_matches(written: &[u8; 32], read: &[u8; 32]) -> Result<(), Stri
     if written == read {
         Ok(())
     } else {
-        Err("The stick didn't read back what was written to it. It may be worn out, so try another one.".to_owned())
+        Err(t!(L10N, "stick-read-back-differs"))
     }
 }

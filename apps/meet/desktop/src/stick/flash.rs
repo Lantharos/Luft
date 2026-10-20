@@ -1,6 +1,9 @@
 use std::io::{self, Read, Write};
 
+use luft_i18n::t;
 use sha2::{Digest, Sha256};
+
+use crate::L10N;
 
 const CHUNK: usize = 4 << 20;
 const ALIGNMENT: usize = 4096;
@@ -25,7 +28,10 @@ impl Aligned {
 fn fill(source: &mut impl Read, buffer: &mut [u8]) -> io::Result<()> {
     source.read_exact(buffer).map_err(|error| {
         if error.kind() == io::ErrorKind::UnexpectedEof {
-            io::Error::new(io::ErrorKind::UnexpectedEof, "The ISO ended early")
+            io::Error::new(
+                io::ErrorKind::UnexpectedEof,
+                t!(L10N, "stick-iso-ended-early"),
+            )
         } else {
             error
         }

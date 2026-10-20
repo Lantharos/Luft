@@ -1,7 +1,9 @@
+use luft_i18n::t;
 use serde_json::Value;
 
 pub use super::regional::hints;
 use super::{link, logs};
+use crate::L10N;
 use crate::app::Events;
 use crate::app::job::Failed;
 use crate::check::facts::Platform;
@@ -21,8 +23,8 @@ pub fn belongings() -> Result<Value, Failed> {
 
 pub fn pick_iso() -> Option<String> {
     rfd::FileDialog::new()
-        .set_title("Choose a Luft ISO")
-        .add_filter("Luft ISO", &["iso"])
+        .set_title(t!(L10N, "iso-dialog-title"))
+        .add_filter(t!(L10N, "iso-dialog-filter"), &["iso"])
         .pick_file()
         .map(|path| path.to_string_lossy().into_owned())
 }

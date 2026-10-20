@@ -18,8 +18,10 @@ use crate::serving::{self, Context};
 
 pub const ARGUMENT: &str = "--meet-helper";
 
-pub fn requested() -> bool {
-    std::env::args().nth(1).as_deref() == Some(ARGUMENT)
+pub fn requested() -> Option<String> {
+    let mut args = std::env::args().skip(1);
+    (args.next()? == ARGUMENT).then_some(())?;
+    args.next()
 }
 
 fn handle(context: &Context, call: Call) -> Result<Value, String> {

@@ -4,6 +4,7 @@ use std::os::windows::fs::OpenOptionsExt;
 use std::os::windows::io::AsRawHandle;
 use std::time::Duration;
 
+use luft_i18n::t;
 use windows::Win32::Foundation::HANDLE;
 use windows::Win32::Storage::FileSystem::{
     FILE_FLAG_NO_BUFFERING, FILE_FLAG_WRITE_THROUGH, FILE_SHARE_READ, FILE_SHARE_WRITE,
@@ -13,6 +14,8 @@ use windows::Win32::System::Ioctl::{
     FSCTL_DISMOUNT_VOLUME, FSCTL_LOCK_VOLUME, IOCTL_DISK_DELETE_DRIVE_LAYOUT,
     IOCTL_DISK_UPDATE_PROPERTIES,
 };
+
+use crate::L10N;
 
 const LOCK_ATTEMPTS: u32 = 20;
 const LOCK_PAUSE: Duration = Duration::from_millis(250);
@@ -83,14 +86,11 @@ pub fn lock_volumes<'a>(paths: impl IntoIterator<Item = &'a str>) -> Result<Lock
             .write(true)
             .share_mode(shared())
             .open(device)
-            .map_err(|error| format!("The stick's volume couldn't be opened: {error}"))?;
-        lock(&volume).map_err(|error| {
-            format!(
-                "The stick is still in use. Close what has files open on it and try again ({error})"
-            )
-        })?;
+            .map_err(|error| t!(L10N, "stick-volume-not-opened", error = error.to_string()))?;
+        lock(&volume)
+            .map_err(|error| t!(L10N, "stick-volume-in-use", error = error.to_string()))?;
         control(&volume, FSCTL_DISMOUNT_VOLUME)
-            .map_err(|error| format!("Windows couldn't let go of the stick: {error}"))?;
+            .map_err(|error| t!(L10N, "stick-not-dismounted", error = error.to_string()))?;
         locked.push(volume);
     }
     Ok(Locked { _volumes: locked })
@@ -98,10 +98,10 @@ pub fn lock_volumes<'a>(paths: impl IntoIterator<Item = &'a str>) -> Result<Lock
 
 pub fn forget_layout(disk: &File) -> Result<(), String> {
     control(disk, IOCTL_DISK_DELETE_DRIVE_LAYOUT)
-        .map_err(|error| format!("Windows couldn't clear the stick: {error}"))
+        .map_err(|error| t!(L10N, "stick-not-cleared", error = error.to_string()))
 }
 
 pub fn reread_layout(disk: &File) -> Result<(), String> {
     control(disk, IOCTL_DISK_UPDATE_PROPERTIES)
-        .map_err(|error| format!("Windows couldn't look at the stick again: {error}"))
+        .map_err(|error| t!(L10N, "stick-not-refreshed", error = error.to_string()))
 }

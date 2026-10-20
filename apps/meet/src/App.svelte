@@ -6,6 +6,7 @@
 	import { i18n, t } from '@luft/i18n';
 	import { appearance, GlassShell, Toast } from '@luft/ui';
 	import WindowButtons from '#lib/components/WindowButtons.svelte';
+	import * as meet from '#lib/api/meet.js';
 	import { session } from '#lib/state/meet.svelte.js';
 	import Check from '#lib/steps/Check.svelte';
 	import Hello from '#lib/steps/Hello.svelte';
@@ -38,7 +39,10 @@
 			void i18n.start();
 			return;
 		}
-		const stops = [appearance.start({ palette: null, typography: { interface: null, monospace: null, textScale: 1 }, motion: 'full' }), session.listen()];
+		const stops = [session.listen()];
+		void meet.locale().then((locale) => {
+			stops.push(appearance.start({ palette: null, typography: { interface: null, monospace: null, textScale: 1 }, motion: 'full', locale }));
+		});
 		return () => stops.forEach((stop) => stop());
 	});
 

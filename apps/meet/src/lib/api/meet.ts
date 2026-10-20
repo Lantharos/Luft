@@ -1,4 +1,5 @@
 import { invoke, listen } from '@lantharos/sabine';
+import type { Locale } from '@luft/i18n';
 
 export type Level = 'fine' | 'note' | 'blocks';
 export type Stage = 'shrinking' | 'partitioning' | 'downloading' | 'packing' | 'removing' | 'writing' | 'copying' | 'verifying';
@@ -151,4 +152,5 @@ export const showFile = (path: string) => start<null>('meet_show_file', path);
 export const belongings = () => start<Belongings>('meet_belongings');
 export const defaultSource = () => invoke<Source>('meet_source', {});
 export const platform = () => invoke<Platform>('meet_platform', {});
+export const locale = () => invoke<Locale>('meet_locale', {});
 export const onProgress = (callback: (progress: Progress) => void) => listen<Progress>('meet.progress', callback);

@@ -2,11 +2,13 @@ use std::fs::{self, File};
 use std::io::{self, Read, Write};
 use std::path::{Path, PathBuf};
 
+use luft_i18n::t;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
 use super::flash::Aligned;
 use super::{Image, read_back_matches};
+use crate::L10N;
 use crate::protocol::Stage;
 
 const SETTLE_EVERY: u64 = 64 << 20;
@@ -142,7 +144,7 @@ fn digest(file: &mut File, mut progress: impl FnMut(u64)) -> io::Result<[u8; 32]
 fn remove(root: &Path, names: &[String]) -> Result<(), String> {
     for name in names {
         fs::remove_file(root.join(name))
-            .map_err(|error| format!("The older Luft couldn't be removed: {error}"))?;
+            .map_err(|error| t!(L10N, "stick-older-not-removed", error = error.to_string()))?;
     }
     Ok(())
 }
@@ -159,13 +161,13 @@ pub fn add(
     replace: bool,
     progress: impl Fn(Stage, u64, u64),
 ) -> Result<(), String> {
-    let mut iso =
-        File::open(&image.path).map_err(|error| format!("The ISO can't be read: {error}"))?;
+    let mut iso = File::open(&image.path)
+        .map_err(|error| t!(L10N, "stick-iso-unreadable", error = error.to_string()))?;
     let length = iso.metadata().map_err(|error| error.to_string())?.len();
     let name = image
         .path
         .file_name()
-        .ok_or("The ISO has no name")?
+        .ok_or_else(|| t!(L10N, "stick-iso-no-name"))?
         .to_string_lossy()
         .into_owned();
     let older = older(ventoy.root).map_err(|error| error.to_string())?;
@@ -174,19 +176,15 @@ pub fn add(
         .filter(|older| replace || older.name == name)
         .collect();
     if !replace && !replaced.is_empty() {
-        return Err(format!("{name} is already on the stick."));
+        return Err(t!(L10N, "stick-iso-already-there", name = name));
     }
     let replacing = replaced.iter().map(|older| older.size).sum();
     let replaced: Vec<String> = replaced
         .into_iter()
         .map(|older| older.name.clone())
         .collect();
-    let order = order(ventoy.free, length, replacing).map_err(|short| {
-        format!(
-            "There isn't room for Luft on the stick. Free up {} MB on it first.",
-            short.div_ceil(1_000_000)
-        )
-    })?;
+    let order = order(ventoy.free, length, replacing)
+        .map_err(|short| t!(L10N, "stick-no-room", size = short.div_ceil(1_000_000)))?;
     if order == Order::RemoveFirst {
         remove(ventoy.root, &replaced)?;
     }
@@ -196,12 +194,12 @@ pub fn add(
     let written = copy(&mut iso, length, &staged, |done| {
         progress(Stage::Copying, done, length)
     })
-    .map_err(|error| format!("Copying Luft to the stick stopped: {error}"))?;
+    .map_err(|error| t!(L10N, "stick-copy-stopped", error = error.to_string()))?;
     image.matches(&written)?;
     progress(Stage::Verifying, 0, length);
     let mut copied = (ventoy.uncached)(&staged).map_err(|error| error.to_string())?;
     let read = digest(&mut copied, |done| progress(Stage::Verifying, done, length))
-        .map_err(|error| format!("The stick couldn't be read back: {error}"))?;
+        .map_err(|error| t!(L10N, "stick-read-back-failed", error = error.to_string()))?;
     drop(copied);
     read_back_matches(&written, &read)?;
     if order == Order::CopyFirst {

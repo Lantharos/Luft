@@ -1,6 +1,7 @@
 use std::fs::{File, OpenOptions};
 use std::os::windows::io::FromRawHandle;
 
+use luft_i18n::t;
 use serde_json::Value;
 use windows::Win32::Foundation::{CloseHandle, ERROR_CANCELLED, ERROR_PIPE_CONNECTED, HANDLE};
 use windows::Win32::Storage::FileSystem::{
@@ -22,6 +23,8 @@ use windows::core::{HSTRING, PCWSTR, w};
 use super::Events;
 use super::calls::{self, Helper};
 use super::job::Failed;
+use crate::L10N;
+use crate::language;
 use crate::protocol::Call;
 
 const BUFFER: u32 = 1 << 16;
@@ -54,9 +57,10 @@ fn pipe(
         )
     };
     if handle.is_invalid() {
-        return Err(format!(
-            "Meet Luft couldn't talk to its helper: {}",
-            windows::core::Error::from_thread()
+        return Err(t!(
+            L10N,
+            "helper-pipe-failed",
+            error = windows::core::Error::from_thread().to_string()
         ));
     }
     Ok(handle)
@@ -64,9 +68,12 @@ fn pipe(
 
 fn launch(name: &str) -> Result<OwnedHandle, Failed> {
     let program = std::env::current_exe().map_err(|error| error.to_string())?;
-    let parameters = format!("{} {name} {}", crate::helper::ARGUMENT, unsafe {
-        GetCurrentProcessId()
-    });
+    let parameters = format!(
+        "{} {name} {} {}",
+        crate::helper::ARGUMENT,
+        unsafe { GetCurrentProcessId() },
+        language::shown()
+    );
     let program = HSTRING::from(program.as_os_str());
     let parameters = HSTRING::from(parameters);
     let mut info = SHELLEXECUTEINFOW {
@@ -83,8 +90,10 @@ fn launch(name: &str) -> Result<OwnedHandle, Failed> {
         Err(error) if error.code() == ERROR_CANCELLED.to_hresult() => {
             Err(Failed::declined(error.to_string()))
         }
-        Err(error) => Err(Failed::from(format!(
-            "Meet Luft's helper didn't start: {error}"
+        Err(error) => Err(Failed::from(t!(
+            L10N,
+            "helper-not-started",
+            error = error.to_string()
         ))),
     }
 }
@@ -100,9 +109,7 @@ fn accept(handle: HANDLE, helper: u32, name: &str) -> Result<File, String> {
         .map_err(|error| error.to_string())?;
     let file = unsafe { File::from_raw_handle(handle.0) };
     if client != helper {
-        return Err(format!(
-            "Something other than Meet Luft's helper opened {name}"
-        ));
+        return Err(t!(L10N, "helper-pipe-hijacked", pipe = name));
     }
     Ok(file)
 }
@@ -142,7 +149,7 @@ fn start(events: &Events) -> Result<Helper, Failed> {
     let calls = accept(calls, helper_id, &calls_name)?;
     let replies = accept(replies, helper_id, &replies_name)?;
     Ok(Helper::new(calls, replies, events, || {
-        Failed::from("Meet Luft's helper stopped".to_owned())
+        Failed::from(t!(L10N, "helper-stopped"))
     }))
 }
 

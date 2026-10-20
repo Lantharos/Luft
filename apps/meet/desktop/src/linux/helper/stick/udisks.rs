@@ -1,6 +1,9 @@
 use std::path::PathBuf;
 use std::process::Command;
 
+use luft_i18n::t;
+
+use crate::L10N;
 use crate::stick::drives::linux::Block;
 
 const MOUNTED: &str = "Mounted ";
@@ -12,7 +15,7 @@ fn udisksctl(arguments: &[&str]) -> Result<String, String> {
         .args(arguments)
         .arg("--no-user-interaction")
         .output()
-        .map_err(|error| format!("Meet Luft needs UDisks to use the stick: {error}"))?;
+        .map_err(|error| t!(L10N, "stick-udisks-missing", error = error.to_string()))?;
     if output.status.success() {
         Ok(String::from_utf8_lossy(&output.stdout).into_owned())
     } else {
@@ -23,12 +26,12 @@ fn udisksctl(arguments: &[&str]) -> Result<String, String> {
 pub fn unmount(device: &str) -> Result<(), String> {
     udisksctl(&["unmount", "--block-device", device])
         .map(drop)
-        .map_err(|error| format!("{device} is still in use: {error}"))
+        .map_err(|error| t!(L10N, "stick-device-in-use", device = device, error = error))
 }
 
 pub fn mount(device: &str) -> Result<PathBuf, String> {
     let said = udisksctl(&["mount", "--block-device", device])
-        .map_err(|error| format!("Ventoy's partition couldn't be opened: {error}"))?;
+        .map_err(|error| t!(L10N, "stick-ventoy-not-opened", error = error))?;
     said.lines()
         .find_map(|line| line.strip_prefix(MOUNTED)?.split_once(AT))
         .map(|(_, place)| PathBuf::from(place.trim_end_matches('.')))

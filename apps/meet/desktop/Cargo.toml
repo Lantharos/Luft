@@ -8,6 +8,7 @@ edition = "2024"
 rust-version = "1.98"
 
 [dependencies]
+luft-i18n = { path = "../../../packages/i18n" }
 luft-meet = { path = "../../../packages/meet" }
 luft-variant = { path = "../../../packages/variant" }
 minisign-verify = "0.3.0"

@@ -1,6 +1,10 @@
 use std::collections::BTreeMap;
 use std::io::{self, Read};
 
+use luft_i18n::t;
+
+use crate::L10N;
+
 pub const SECTOR: u64 = 2048;
 const FIRST_DESCRIPTOR: u64 = 16;
 const ROOT_RECORD: usize = 156;
@@ -121,9 +125,7 @@ impl<R: Read> Walker<R> {
 
     fn skip_to(&mut self, offset: u64) -> io::Result<()> {
         if offset < self.position {
-            return Err(invalid(
-                "The ISO's files aren't in an order Meet Luft can read",
-            ));
+            return Err(invalid(&t!(L10N, "live-iso-out-of-order")));
         }
         let skipped = io::copy(
             &mut (&mut self.reader).take(offset - self.position),
@@ -141,12 +143,12 @@ impl<R: Read> Walker<R> {
         loop {
             let descriptor = self.sector()?;
             if &descriptor[1..6] != b"CD001" {
-                return Err(invalid("This isn't an ISO image"));
+                return Err(invalid(&t!(L10N, "live-iso-not-iso")));
             }
             match descriptor[0] {
                 2 if JOLIET_ESCAPES.contains(&&descriptor[88..91]) => {
                     let (extent, length) = root_of(&descriptor)
-                        .ok_or_else(|| invalid("The ISO has no root folder"))?;
+                        .ok_or_else(|| invalid(&t!(L10N, "live-iso-no-root")))?;
                     self.queue(
                         extent,
                         Pending::Directory {
@@ -160,7 +162,7 @@ impl<R: Read> Walker<R> {
             }
         }
         if self.pending.is_empty() {
-            return Err(invalid("The ISO has no Joliet names"));
+            return Err(invalid(&t!(L10N, "live-iso-no-joliet")));
         }
         Ok(())
     }

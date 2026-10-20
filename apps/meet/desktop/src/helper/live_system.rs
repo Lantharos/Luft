@@ -2,7 +2,10 @@ use std::fs;
 use std::io;
 use std::path::Path;
 
+use luft_i18n::t;
+
 use super::Context;
+use crate::L10N;
 pub use crate::live::build::unfinished;
 use crate::live::build::{self, Listing};
 use crate::live::download::{Hashing, format_checksum};
@@ -44,7 +47,7 @@ pub fn write(
 ) -> Result<(), String> {
     let expected = source
         .checksum()
-        .map_err(|error| format!("Luft's checksum couldn't be read: {error}"))?;
+        .map_err(|error| t!(L10N, "live-checksum-not-read", error = error.to_string()))?;
     let opened = source.open().map_err(|error| error.to_string())?;
     let total = opened.total;
     let mut hashing = Hashing::new(opened.reader, |read| {
@@ -52,10 +55,10 @@ pub fn write(
     });
     let mut volumes = Volumes::new(files::split(start.to_owned(), live.to_owned()));
     iso::extract(&mut hashing, &mut volumes)
-        .map_err(|error: io::Error| format!("Luft couldn't be downloaded: {error}"))?;
+        .map_err(|error: io::Error| t!(L10N, "stick-download-failed", error = error.to_string()))?;
     let digest = hashing.digest();
     if expected.is_some_and(|expected| digest != expected) {
-        return Err("The download was damaged on the way. Try again.".to_owned());
+        return Err(t!(L10N, "live-download-damaged"));
     }
     volumes.put_in_place().map_err(|error| error.to_string())?;
     files::write_grub_configs(start, live_guid).map_err(|error| error.to_string())?;

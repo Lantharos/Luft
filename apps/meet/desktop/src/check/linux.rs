@@ -1,3 +1,4 @@
+use luft_i18n::t;
 use luft_meet::Layout;
 use serde::{Deserialize, Serialize};
 
@@ -6,6 +7,7 @@ use super::common::{
     tpm, wifi,
 };
 use super::facts::{Firmware, Machine};
+use crate::L10N;
 
 const MIB: u64 = 1 << 20;
 pub const START_FILES: u64 = 16 * MIB;
@@ -45,37 +47,39 @@ fn startup(facts: &LinuxFacts) -> Finding {
         (Firmware::Bios, _, _) => finding(
             Topic::Startup,
             Level::Blocks,
-            "Starts in legacy BIOS mode",
-            "Luft needs UEFI. Turn it on in the firmware settings, along with the system already here, then check again.",
+            t!(L10N, "check-startup-bios"),
+            t!(L10N, "check-startup-bios-linux"),
         ),
         (Firmware::Uefi, false, _) => finding(
             Topic::Startup,
             Level::Blocks,
-            "The drive uses an old partition table",
-            "Luft needs a GPT drive to start from.",
+            t!(L10N, "check-startup-mbr"),
+            t!(L10N, "check-startup-mbr-linux"),
         ),
         (Firmware::Uefi, true, None) => finding(
             Topic::Startup,
             Level::Blocks,
-            "No EFI system partition",
-            "Luft adds its start files next to the ones already on the EFI system partition, and there isn't one.",
+            t!(L10N, "check-startup-no-esp"),
+            t!(L10N, "check-startup-no-esp-detail"),
         ),
         (Firmware::Uefi, true, Some(free)) if free < START_FILES => finding(
             Topic::StartFiles,
             Level::Blocks,
-            "The EFI system partition is full",
-            &format!(
-                "Luft needs {} MB there for its start files. Old kernels or start entries usually take up the space.",
-                START_FILES / MIB
+            t!(L10N, "check-startup-esp-full"),
+            t!(
+                L10N,
+                "check-startup-esp-full-detail",
+                size = START_FILES / MIB
             ),
         ),
         (Firmware::Uefi, true, Some(_)) => finding(
             Topic::Startup,
             Level::Fine,
-            "Starts with UEFI",
-            &format!(
-                "Luft adds its own start entry, and {} keeps starting as it does now.",
-                facts.system
+            t!(L10N, "check-startup-uefi"),
+            t!(
+                L10N,
+                "check-startup-uefi-linux",
+                system = facts.system.as_str()
             ),
         ),
     }
@@ -87,29 +91,34 @@ fn folder(facts: &LinuxFacts) -> Finding {
         Readable::Yes => finding(
             Topic::Folder,
             Level::Fine,
-            "Nothing gets repartitioned",
-            &format!(
-                "Luft is kept as a file on your {} drive and starts from there.",
-                place.filesystem
+            t!(L10N, "check-folder-fine"),
+            t!(
+                L10N,
+                "check-folder-fine-detail",
+                filesystem = place.filesystem.as_str()
             ),
         ),
         Readable::Encrypted => finding(
             Topic::Folder,
             Level::Blocks,
-            "Your files are on an encrypted drive",
-            "Luft can't start from an encrypted drive yet. Use a USB stick to try it instead.",
+            t!(L10N, "check-folder-encrypted"),
+            t!(L10N, "check-folder-encrypted-detail"),
         ),
         Readable::Combined => finding(
             Topic::Folder,
             Level::Blocks,
-            "Your files span more than one partition",
-            "Luft can't start from LVM or RAID yet. Use a USB stick to try it instead.",
+            t!(L10N, "check-folder-combined"),
+            t!(L10N, "check-folder-combined-detail"),
         ),
         Readable::Filesystem => finding(
             Topic::Folder,
             Level::Blocks,
-            &format!("Luft can't start from {}", place.filesystem),
-            "It starts from ext4, btrfs and XFS drives. Use a USB stick to try it instead.",
+            t!(
+                L10N,
+                "check-folder-filesystem",
+                filesystem = place.filesystem.as_str()
+            ),
+            t!(L10N, "check-folder-filesystem-detail"),
         ),
     }
 }
@@ -120,18 +129,19 @@ fn space(facts: &LinuxFacts, live: u64) -> Finding {
         finding(
             Topic::Space,
             Level::Fine,
-            &format!("{} GB free", gib(facts.place.free)),
-            &format!("Luft takes about {} GB while you try it.", gib(live)),
+            t!(L10N, "check-space-free", size = gib(facts.place.free)),
+            t!(L10N, "check-space-free-linux", size = gib(live)),
         )
     } else {
         finding(
             Topic::Space,
             Level::Blocks,
-            "Not enough free space",
-            &format!(
-                "Luft needs about {} GB to start from. Free up {} GB, then check again.",
-                gib(needed),
-                gib(needed - facts.place.free).max(1)
+            t!(L10N, "check-space-short"),
+            t!(
+                L10N,
+                "check-space-short-linux",
+                needed = gib(needed),
+                missing = gib(needed - facts.place.free).max(1)
             ),
         )
     }
@@ -144,25 +154,25 @@ fn system(facts: &LinuxFacts) -> Finding {
             Topic::System,
             Level::Fine,
             name,
-            "Luft can take its place and keep your files, your account and your settings.",
+            t!(L10N, "check-system-replaceable"),
         ),
         Layout::Single => finding(
             Topic::System,
             Level::Note,
             name,
-            "Your files share one partition with the system, so replacing it while keeping them isn't supported yet. Trying and installing Luft work.",
+            t!(L10N, "check-system-single"),
         ),
         Layout::Encrypted => finding(
             Topic::System,
             Level::Note,
             name,
-            "It's encrypted, so replacing it while keeping your files isn't supported yet.",
+            t!(L10N, "check-system-encrypted"),
         ),
         Layout::Unknown => finding(
             Topic::System,
             Level::Note,
             name,
-            "Its drive is laid out in a way Luft can't replace yet while keeping your files.",
+            t!(L10N, "check-system-unknown"),
         ),
     }
 }

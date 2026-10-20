@@ -2,7 +2,10 @@ use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
 
+use luft_i18n::t;
 use serde::{Deserialize, Serialize};
+
+use crate::L10N;
 
 const RECORD: &str = "/var/lib/luft-meet/made.json";
 
@@ -45,7 +48,7 @@ impl Made {
             serde_json::to_vec_pretty(self).expect("the record serializes"),
         )
         .and_then(|()| fs::rename(&staged, path))
-        .map_err(|error| format!("Meet Luft couldn't note what it made: {error}"))
+        .map_err(|error| t!(L10N, "helper-record-not-saved", error = error.to_string()))
     }
 
     pub fn update(change: impl FnOnce(&mut Self)) -> Result<(), String> {

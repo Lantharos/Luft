@@ -3,7 +3,10 @@ use std::io;
 use std::os::fd::AsRawFd;
 use std::path::{Path, PathBuf};
 
+use luft_i18n::t;
+
 use super::{list, udisks};
+use crate::L10N;
 use crate::linux::helper::disks;
 use crate::serving::Context;
 use crate::stick::Image;
@@ -13,7 +16,7 @@ use crate::stick::drives::linux::Block;
 const SECTOR: u64 = 512;
 
 fn not_ventoy() -> String {
-    "This stick doesn't use Ventoy anymore.".to_owned()
+    t!(L10N, "stick-not-ventoy")
 }
 
 fn data(stick: &Block) -> Result<&Block, String> {

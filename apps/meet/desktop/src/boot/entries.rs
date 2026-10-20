@@ -1,4 +1,7 @@
+use luft_i18n::t;
+
 use super::load_option::{self, Partition};
+use crate::L10N;
 
 pub trait Variables {
     fn read(&self, name: &str) -> Result<Option<Vec<u8>>, String>;
@@ -29,7 +32,7 @@ fn free_number(variables: &impl Variables) -> Result<u16, String> {
             return Ok(number);
         }
     }
-    Err("The firmware has no room for another start entry".to_owned())
+    Err(t!(L10N, "firmware-entries-full"))
 }
 
 fn set_entry(variables: &impl Variables, number: u16, option: &[u8]) -> Result<(), String> {

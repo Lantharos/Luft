@@ -1,7 +1,10 @@
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
+use luft_i18n::t;
 use serde::Deserialize;
+
+use crate::L10N;
 
 pub const ESP_TYPE: &str = "c12a7328-f81f-11d2-ba4b-00a0c93ec93b";
 
@@ -59,7 +62,7 @@ pub fn blocks() -> Result<Vec<Block>, String> {
     ]))?;
     serde_json::from_slice::<Listing>(&listing)
         .map(|listing| listing.blockdevices)
-        .map_err(|error| format!("The drives couldn't be listed: {error}"))
+        .map_err(|error| t!(L10N, "drive-list-failed", error = error.to_string()))
 }
 
 pub fn mount_of(path: &Path) -> Result<Mount, String> {
@@ -77,7 +80,13 @@ pub fn mount_of(path: &Path) -> Result<Mount, String> {
     serde_json::from_slice::<Mounts>(&listing)
         .ok()
         .and_then(|mounts| mounts.filesystems.into_iter().next())
-        .ok_or_else(|| format!("Couldn't tell which drive holds {}", path.display()))
+        .ok_or_else(|| {
+            t!(
+                L10N,
+                "drive-of-path-unknown",
+                path = path.display().to_string()
+            )
+        })
 }
 
 pub fn lineage<'a>(blocks: &'a [Block], path: &str) -> Option<Vec<&'a Block>> {

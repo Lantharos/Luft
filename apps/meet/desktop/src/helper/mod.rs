@@ -22,6 +22,7 @@ pub const ARGUMENT: &str = "--meet-helper";
 pub struct Link {
     pipe: String,
     parent: u32,
+    pub locale: String,
 }
 
 pub fn requested() -> Option<Link> {
@@ -30,6 +31,7 @@ pub fn requested() -> Option<Link> {
     Some(Link {
         pipe: args.next()?,
         parent: args.next()?.parse().ok()?,
+        locale: args.next()?,
     })
 }
 

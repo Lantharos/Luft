@@ -1,5 +1,6 @@
 use std::path::Path;
 
+use luft_i18n::t;
 use windows::Win32::Foundation::ERROR_NO_MORE_ITEMS;
 use windows::Win32::Security::SE_BACKUP_NAME;
 use windows::Win32::System::Registry::{
@@ -10,6 +11,7 @@ use windows::Win32::System::Registry::{
 use windows::core::{HSTRING, PWSTR};
 
 use super::privilege;
+use crate::L10N;
 
 const LONGEST_NAME: usize = 256;
 
@@ -67,7 +69,14 @@ pub fn set_dword(key: &str, value: &str, data: u32) -> Result<(), String> {
         )
     }
     .ok()
-    .map_err(|error| format!("Couldn't open {key}: {error}"))?;
+    .map_err(|error| {
+        t!(
+            L10N,
+            "helper-registry-not-opened",
+            key = key,
+            error = error.to_string()
+        )
+    })?;
     let bytes = data.to_le_bytes();
     let written = unsafe {
         RegSetKeyValueW(
@@ -82,9 +91,14 @@ pub fn set_dword(key: &str, value: &str, data: u32) -> Result<(), String> {
     unsafe {
         let _ = RegCloseKey(opened);
     }
-    written
-        .ok()
-        .map_err(|error| format!("Couldn't change {value}: {error}"))
+    written.ok().map_err(|error| {
+        t!(
+            L10N,
+            "helper-registry-not-changed",
+            value = value,
+            error = error.to_string()
+        )
+    })
 }
 
 pub struct Protected(HKEY);
@@ -171,6 +185,13 @@ impl Protected {
             )
         }
         .ok()
-        .map_err(|error| format!("Couldn't save {}: {error}", file.display()))
+        .map_err(|error| {
+            t!(
+                L10N,
+                "helper-registry-not-saved",
+                file = file.display().to_string(),
+                error = error.to_string()
+            )
+        })
     }
 }

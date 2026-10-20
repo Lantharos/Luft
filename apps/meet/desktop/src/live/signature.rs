@@ -1,4 +1,7 @@
+use luft_i18n::t;
 use minisign_verify::{PublicKey, Signature};
+
+use crate::L10N;
 
 pub const PUBLIC_KEY: Option<&str> =
     Some("RWRz9rCK/H8Drrze/f851hxNNOH/D42kpyTMpXV7DT7QoUdCZySZwRWA");
@@ -6,13 +9,15 @@ pub const PUBLIC_KEY: Option<&str> =
 pub fn verify(key: &str, checksum: &str, signature: &str, iso: &str) -> Result<(), String> {
     let key = PublicKey::from_base64(key).map_err(|error| error.to_string())?;
     let signature = Signature::decode(signature)
-        .map_err(|_| format!("The signature of {iso} isn't readable"))?;
+        .map_err(|_| t!(L10N, "live-signature-unreadable", iso = iso))?;
     key.verify(checksum.as_bytes(), &signature, false)
-        .map_err(|_| format!("{iso} isn't signed by Lantharos"))?;
+        .map_err(|_| t!(L10N, "live-signature-wrong-key", iso = iso))?;
     if signature.trusted_comment() != iso {
-        return Err(format!(
-            "The signature is for {}, not {iso}",
-            signature.trusted_comment()
+        return Err(t!(
+            L10N,
+            "live-signature-other-iso",
+            signed = signature.trusted_comment(),
+            iso = iso
         ));
     }
     Ok(())

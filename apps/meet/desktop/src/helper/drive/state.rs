@@ -1,10 +1,12 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
+use luft_i18n::t;
 use luft_meet::handoff;
 use luft_meet::regional::Hints;
 use luft_meet::{Handoff, Intent};
 
+use crate::L10N;
 use crate::protocol::WindowsChoices;
 
 use super::bitlocker::BitLocker;
@@ -96,17 +98,17 @@ pub fn restart(intent: Intent, windows: WindowsChoices, hints: Hints) -> Result<
     let layout = storage.layout(&drive.volume)?;
     let found = find(&layout);
     let (Some(mut handoff), Some(live)) = (found.handoff.clone(), found.live_path()) else {
-        return Err("Luft isn't ready to start yet. Make room for it first.".to_owned());
+        return Err(t!(L10N, "helper-not-ready-to-start-windows"));
     };
     if live_system::unfinished(&live) {
-        return Err("Updating Luft didn't finish. Update it again first.".to_owned());
+        return Err(t!(L10N, "helper-update-unfinished"));
     }
     let made = handoff
         .made_partitions()
-        .ok_or("Luft's partitions are missing from Meet Luft's notes")?;
+        .ok_or_else(|| t!(L10N, "drive-partitions-not-noted"))?;
     found
         .made_partition(&made.start)
-        .ok_or("Luft's start partition isn't one Meet Luft made")?;
+        .ok_or_else(|| t!(L10N, "drive-start-partition-foreign"))?;
     let start = firmware::partition_on_disk(
         layout.disk.Number,
         layout.disk.LogicalSectorSize as u64,

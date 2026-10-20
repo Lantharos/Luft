@@ -1,6 +1,7 @@
 use std::fs::File;
 use std::io::{Read, Seek, SeekFrom};
 
+use luft_i18n::t;
 use windows::Win32::Foundation::{ERROR_ENVVAR_NOT_FOUND, ERROR_INVALID_FUNCTION};
 use windows::Win32::Security::{SE_SHUTDOWN_NAME, SE_SYSTEM_ENVIRONMENT_NAME};
 use windows::Win32::System::Shutdown::{
@@ -13,6 +14,7 @@ use windows::Win32::System::WindowsProgramming::{
 use windows::core::HSTRING;
 
 use super::privilege::enable;
+use crate::L10N;
 use crate::boot::entries::Variables;
 use crate::boot::gpt;
 use crate::boot::load_option::{self, GLOBAL_VARIABLES, Partition};
@@ -49,9 +51,14 @@ fn read(name: &str) -> Result<Option<Vec<u8>>, String> {
             return Ok(None);
         }
         if error.code() == ERROR_INVALID_FUNCTION.to_hresult() {
-            return Err("This PC doesn't start with UEFI".to_owned());
+            return Err(t!(L10N, "firmware-not-uefi"));
         }
-        return Err(format!("Couldn't read {name}: {error}"));
+        return Err(t!(
+            L10N,
+            "firmware-variable-unreadable",
+            name = name,
+            error = error.to_string()
+        ));
     }
     buffer.truncate(length as usize);
     Ok(Some(buffer))
@@ -67,7 +74,14 @@ fn write(name: &str, data: &[u8]) -> Result<(), String> {
             NON_VOLATILE | BOOT_SERVICE | RUNTIME,
         )
     }
-    .map_err(|error| format!("Couldn't save {name} in the firmware: {error}"))
+    .map_err(|error| {
+        t!(
+            L10N,
+            "firmware-variable-not-saved",
+            name = name,
+            error = error.to_string()
+        )
+    })
 }
 
 pub fn secure_boot() -> Option<bool> {
@@ -99,7 +113,7 @@ pub fn restart_into_settings() -> Result<(), String> {
 }
 
 pub fn partition_on_disk(disk: u32, sector: u64, guid: &str) -> Result<Partition, String> {
-    let guid = load_option::guid_bytes(guid).ok_or("The partition's GUID isn't readable")?;
+    let guid = load_option::guid_bytes(guid).ok_or_else(|| t!(L10N, "drive-guid-unreadable"))?;
     let mut drive =
         File::open(format!(r"\\.\PhysicalDrive{disk}")).map_err(|error| error.to_string())?;
     let mut lba1 = vec![0u8; sector as usize];
@@ -109,7 +123,7 @@ pub fn partition_on_disk(disk: u32, sector: u64, guid: &str) -> Result<Partition
     drive
         .read_exact(&mut lba1)
         .map_err(|error| error.to_string())?;
-    let header = gpt::header(&lba1).ok_or("The drive's partition table isn't GPT")?;
+    let header = gpt::header(&lba1).ok_or_else(|| t!(L10N, "drive-not-gpt"))?;
     let bytes = (header.count as u64 * header.entry_size as u64).div_ceil(sector) * sector;
     let mut entries = vec![0u8; bytes as usize];
     drive
@@ -118,8 +132,7 @@ pub fn partition_on_disk(disk: u32, sector: u64, guid: &str) -> Result<Partition
     drive
         .read_exact(&mut entries)
         .map_err(|error| error.to_string())?;
-    gpt::find(&header, &entries, &guid)
-        .ok_or_else(|| "Luft's start partition isn't in the partition table".to_owned())
+    gpt::find(&header, &entries, &guid).ok_or_else(|| t!(L10N, "drive-start-partition-not-listed"))
 }
 
 pub struct Nvram;
@@ -148,5 +161,11 @@ pub fn restart() -> Result<(), String> {
             SHTDN_REASON_MAJOR_OTHER | SHTDN_REASON_FLAG_PLANNED,
         )
     }
-    .map_err(|error| format!("Windows didn't restart: {error}"))
+    .map_err(|error| {
+        t!(
+            L10N,
+            "helper-windows-restart-failed",
+            error = error.to_string()
+        )
+    })
 }

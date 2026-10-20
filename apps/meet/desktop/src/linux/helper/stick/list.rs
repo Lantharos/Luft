@@ -2,10 +2,13 @@ use std::fs::File;
 use std::path::Path;
 use std::process::Command;
 
+use luft_i18n::t;
+
 use super::super::disks;
-use crate::stick::GONE;
+use crate::L10N;
 use crate::stick::drives::Stick;
 use crate::stick::drives::linux::{self, Block, COLUMNS, Listing};
+use crate::stick::gone;
 use crate::stick::table::Slot;
 use crate::stick::ventoy;
 
@@ -16,13 +19,13 @@ pub fn blocks() -> Result<Vec<Block>, String> {
         .env("LC_ALL", "C.UTF-8")
         .args(["--json", "--bytes", "--output", COLUMNS])
         .output()
-        .map_err(|error| format!("The drives couldn't be listed: {error}"))?;
+        .map_err(|error| t!(L10N, "drive-list-failed", error = error.to_string()))?;
     if !output.status.success() {
         return Err(String::from_utf8_lossy(&output.stderr).trim().to_owned());
     }
     serde_json::from_slice::<Listing>(&output.stdout)
         .map(|listing| listing.blockdevices)
-        .map_err(|error| format!("The drives couldn't be listed: {error}"))
+        .map_err(|error| t!(L10N, "drive-list-failed", error = error.to_string()))
 }
 
 pub fn holding(blocks: &[Block], file: &Path) -> Option<String> {
@@ -66,12 +69,12 @@ pub fn find(id: &str, iso: Option<&Path>) -> Result<Block, String> {
         .into_iter()
         .find(|block| block.id() == id)
         .cloned()
-        .ok_or_else(|| GONE.to_owned())
+        .ok_or_else(gone)
 }
 
 pub fn fresh(path: &str) -> Result<Block, String> {
     blocks()?
         .into_iter()
         .find(|block| block.path == path)
-        .ok_or_else(|| GONE.to_owned())
+        .ok_or_else(gone)
 }

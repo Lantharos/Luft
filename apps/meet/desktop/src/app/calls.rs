@@ -4,10 +4,12 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::mpsc::{Sender, channel};
 use std::sync::{Arc, Mutex};
 
+use luft_i18n::t;
 use serde_json::Value;
 
 use super::job::Failed;
 use super::{Events, PROGRESS};
+use crate::L10N;
 use crate::protocol::{Call, Reply, Request};
 
 type Waiting = Arc<Mutex<HashMap<u64, Sender<Result<Value, Failed>>>>>;
@@ -95,9 +97,9 @@ pub fn call(
             .calls
             .write_all(&line)
             .and_then(|()| helper.calls.flush())
-            .map_err(|error| format!("Meet Luft's helper stopped: {error}"))?;
+            .map_err(|error| t!(L10N, "helper-stopped-because", error = error.to_string()))?;
     }
     receiver
         .recv()
-        .map_err(|_| Failed::from("Meet Luft's helper stopped".to_owned()))?
+        .map_err(|_| Failed::from(t!(L10N, "helper-stopped")))?
 }

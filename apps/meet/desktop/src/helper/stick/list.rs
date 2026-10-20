@@ -1,13 +1,15 @@
 use std::path::Path;
 
+use luft_i18n::t;
 use windows::Win32::Storage::FileSystem::{GetVolumeNameForVolumeMountPointW, GetVolumePathNameW};
 use windows::core::HSTRING;
 use wmi::WMIConnection;
 
 use super::disk;
-use crate::stick::GONE;
+use crate::L10N;
 use crate::stick::drives::Stick;
 use crate::stick::drives::windows::{Disk, Storage};
+use crate::stick::gone;
 use crate::stick::table::Slot;
 use crate::stick::ventoy;
 
@@ -18,12 +20,12 @@ fn query<T: serde::de::DeserializeOwned>(
     class: &str,
 ) -> Result<Vec<T>, String> {
     wmi.raw_query(format!("SELECT * FROM {class}"))
-        .map_err(|error| format!("The drives couldn't be listed: {error}"))
+        .map_err(|error| t!(L10N, "drive-list-failed", error = error.to_string()))
 }
 
 pub fn storage() -> Result<Storage, String> {
     let wmi = WMIConnection::with_namespace_path(r"ROOT\Microsoft\Windows\Storage")
-        .map_err(|error| format!("The drives couldn't be listed: {error}"))?;
+        .map_err(|error| t!(L10N, "drive-list-failed", error = error.to_string()))?;
     Ok(Storage {
         disks: query(&wmi, "MSFT_Disk")?,
         partitions: query(&wmi, "MSFT_Partition")?,
@@ -85,6 +87,6 @@ pub fn find(id: &str, iso: Option<&Path>) -> Result<(Storage, Disk), String> {
         .into_iter()
         .find(|disk| disk.id() == id)
         .cloned()
-        .ok_or(GONE)?;
+        .ok_or_else(gone)?;
     Ok((storage, disk))
 }

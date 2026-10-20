@@ -1,8 +1,10 @@
 use std::fs;
 use std::path::PathBuf;
 
+use luft_i18n::t;
 use serde::{Deserialize, Serialize};
 
+use crate::L10N;
 use crate::helper::system::protected;
 use crate::live::durable;
 
@@ -43,7 +45,7 @@ impl Made {
         }
         let json = serde_json::to_string_pretty(self).expect("the record always serializes");
         durable::write(&path, json.as_bytes())
-            .map_err(|error| format!("Meet Luft couldn't note what it made: {error}"))
+            .map_err(|error| t!(L10N, "helper-record-not-saved", error = error.to_string()))
     }
 }
 

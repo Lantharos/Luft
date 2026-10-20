@@ -1,3 +1,4 @@
+use luft_i18n::t;
 use luft_meet::handoff::{LIVE_LABEL, START_LABEL};
 use luft_meet::regional::Hints;
 use luft_meet::{Handoff, Intent, Made, Partitions, Room};
@@ -6,6 +7,7 @@ use super::drive::storage::{BASIC_TYPE, ESP_TYPE, Layout, MSFT_Partition, Storag
 use super::drive::{record, state, windows_drive};
 use super::system::{facts, firmware, start_entries};
 use super::{Context, live_system, undo};
+use crate::L10N;
 use crate::check::facts::Facts;
 use crate::check::rules;
 use crate::live::source::Source;
@@ -67,10 +69,11 @@ pub fn tidy() -> Result<(), String> {
 }
 
 pub fn shortfall(shortfall: layout::Shortfall) -> String {
-    format!(
-        "Windows can give up {} GB, and Luft needs {} GB.",
-        shortfall.available >> 30,
-        shortfall.needed.div_ceil(1 << 30)
+    t!(
+        L10N,
+        "helper-room-shortfall",
+        available = shortfall.available >> 30,
+        needed = shortfall.needed.div_ceil(1 << 30)
     )
 }
 
@@ -93,16 +96,22 @@ pub fn build(
     });
     let start = storage.create(layout, start, ESP_TYPE)?;
     created.push(start.clone());
-    record::made_partition(&start.guid().ok_or("The start partition has no GUID")?)?;
+    record::made_partition(
+        &start
+            .guid()
+            .ok_or_else(|| t!(L10N, "drive-start-no-guid"))?,
+    )?;
     let start_path = storage.format(&start, FAT32, START_LABEL, None)?;
     context.progress(Stage::Partitioning, 1, 2);
     let live = storage.create(layout, live, BASIC_TYPE)?;
     created.push(live.clone());
-    record::made_partition(&live.guid().ok_or("The live partition has no GUID")?)?;
+    record::made_partition(&live.guid().ok_or_else(|| t!(L10N, "drive-live-no-guid"))?)?;
     let live_path = storage.format(&live, EXFAT, LIVE_LABEL, None)?;
     context.progress(Stage::Partitioning, 2, 2);
-    let live_guid = live.guid().ok_or("The live partition has no GUID")?;
-    let start_guid = start.guid().ok_or("The start partition has no GUID")?;
+    let live_guid = live.guid().ok_or_else(|| t!(L10N, "drive-live-no-guid"))?;
+    let start_guid = start
+        .guid()
+        .ok_or_else(|| t!(L10N, "drive-start-no-guid"))?;
     live_system::write(context, source, &start_path, &live_path, &live_guid)?;
     let partition = firmware::partition_on_disk(
         layout.disk.Number,
@@ -142,7 +151,7 @@ pub fn prepare(context: &Context, luft: u64, source: &Source) -> Result<Prepared
     }
     let windows = storage.windows_plan(&layout, &drive.volume)?;
     if luft < sizes::smallest_luft(layout.esp_size(&found.made)) {
-        return Err("Luft needs more room than that.".to_owned());
+        return Err(t!(L10N, "helper-room-too-small"));
     }
     let entries = live_system::listing(source)?.entries;
     let plan = layout::plan(

@@ -3,6 +3,8 @@ mod keyboards;
 mod tests;
 pub mod windows;
 
+use icu_locale_core::LanguageIdentifier;
+use icu_locale_core::subtags::script;
 use icu_time::zone::TimeZone;
 use icu_time::zone::iana::IanaParserExtended;
 use serde::{Deserialize, Serialize};
@@ -32,6 +34,29 @@ impl Hints {
 pub fn canonical_zone(name: &str) -> Option<String> {
     let parsed = IanaParserExtended::new().parse(name);
     (parsed.time_zone != TimeZone::UNKNOWN).then(|| parsed.canonical.to_owned())
+}
+
+fn identifier(name: &str) -> Option<LanguageIdentifier> {
+    let name = name.split('_').next()?;
+    LanguageIdentifier::try_from_str(name).ok()
+}
+
+fn posix(identifier: &LanguageIdentifier) -> String {
+    let region = identifier
+        .region
+        .filter(|region| region.is_alphabetic())
+        .map(|region| format!("_{region}"))
+        .unwrap_or_default();
+    let modifier = match (identifier.language.as_str(), identifier.script) {
+        ("sr", Some(script)) if script == script!("Latn") => "@latin",
+        ("uz", Some(script)) if script == script!("Cyrl") => "@cyrillic",
+        _ => "",
+    };
+    format!("{}{region}{modifier}", identifier.language)
+}
+
+pub fn posix_language(tag: &str) -> Option<String> {
+    identifier(tag).as_ref().map(posix)
 }
 
 pub fn distinct(keyboards: impl IntoIterator<Item = Keyboard>) -> Vec<Keyboard> {

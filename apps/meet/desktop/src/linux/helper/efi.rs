@@ -3,6 +3,9 @@ use std::io::{self, Write};
 use std::os::fd::AsRawFd;
 use std::path::{Path, PathBuf};
 
+use luft_i18n::t;
+
+use crate::L10N;
 use crate::boot::entries::Variables;
 
 const VARIABLES: &str = "/sys/firmware/efi/efivars";
@@ -66,11 +69,25 @@ fn write(name: &str, data: &[u8]) -> io::Result<()> {
 
 impl Variables for Efivars {
     fn read(&self, name: &str) -> Result<Option<Vec<u8>>, String> {
-        read(name).map_err(|error| format!("Couldn't read {name} from the firmware: {error}"))
+        read(name).map_err(|error| {
+            t!(
+                L10N,
+                "firmware-variable-unreadable",
+                name = name,
+                error = error.to_string()
+            )
+        })
     }
 
     fn write(&self, name: &str, data: &[u8]) -> Result<(), String> {
-        write(name, data).map_err(|error| format!("Couldn't save {name} in the firmware: {error}"))
+        write(name, data).map_err(|error| {
+            t!(
+                L10N,
+                "firmware-variable-not-saved",
+                name = name,
+                error = error.to_string()
+            )
+        })
     }
 }
 

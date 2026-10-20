@@ -6,6 +6,8 @@ use std::path::Path;
 
 use luft_meet::regional::{self, Hints};
 
+use crate::language;
+
 const LOCAL_TIME: &str = "/etc/localtime";
 const TIME_ZONE: &str = "/etc/timezone";
 const ZONE_INFO: &str = "zoneinfo/";
@@ -32,15 +34,6 @@ fn posix(locale: &str) -> Option<String> {
     })
 }
 
-fn language() -> Option<String> {
-    let languages = variable(&["LANGUAGE"]).unwrap_or_default();
-    languages.split(':').find_map(posix).or_else(|| {
-        variable(&["LC_ALL", "LC_MESSAGES", "LANG"])
-            .as_deref()
-            .and_then(posix)
-    })
-}
-
 fn time_zone() -> Option<String> {
     let linked = std::fs::read_link(LOCAL_TIME).ok().and_then(|target| {
         let target = target.to_string_lossy().into_owned();
@@ -56,7 +49,7 @@ fn time_zone() -> Option<String> {
 
 pub fn hints() -> Hints {
     Hints {
-        language: language(),
+        language: regional::posix_language(language::hint()),
         locale: variable(&["LC_ALL", "LC_TIME", "LANG"])
             .as_deref()
             .and_then(posix),

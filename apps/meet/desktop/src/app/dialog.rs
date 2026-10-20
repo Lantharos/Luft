@@ -1,5 +1,6 @@
 use std::num::NonZeroIsize;
 
+use luft_i18n::t;
 use raw_window_handle::{
     DisplayHandle, HandleError, HasDisplayHandle, HasWindowHandle, RawWindowHandle,
     Win32WindowHandle, WindowHandle,
@@ -8,6 +9,7 @@ use windows::Win32::UI::WindowsAndMessaging::FindWindowW;
 use windows::core::{HSTRING, PCWSTR};
 
 use super::TITLE;
+use crate::L10N;
 
 struct Owner(NonZeroIsize);
 
@@ -31,8 +33,8 @@ fn meet_window() -> Option<Owner> {
 
 pub fn pick_iso() -> Option<String> {
     let mut dialog = rfd::FileDialog::new()
-        .set_title("Choose a Luft ISO")
-        .add_filter("Luft ISO", &["iso"]);
+        .set_title(t!(L10N, "iso-dialog-title"))
+        .add_filter(t!(L10N, "iso-dialog-filter"), &["iso"]);
     if let Some(owner) = meet_window() {
         dialog = dialog.set_parent(&owner);
     }

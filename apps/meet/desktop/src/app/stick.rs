@@ -8,7 +8,7 @@ use super::{Events, PROGRESS};
 use crate::live::cache;
 use crate::live::source::Source;
 use crate::protocol::{Call, Progress, Stage};
-use crate::stick::DAMAGED;
+use crate::stick::damaged;
 use crate::stick::fetch;
 
 const PROGRESS_INTERVAL: Duration = Duration::from_millis(250);
@@ -73,7 +73,7 @@ pub fn make(
         },
     };
     call(events, request).inspect_err(|failed| {
-        if failed.detail() == DAMAGED && matches!(making.source, Source::Download { .. }) {
+        if failed.detail() == damaged() && matches!(making.source, Source::Download { .. }) {
             let _ = cache::forget(&image.path);
         }
     })

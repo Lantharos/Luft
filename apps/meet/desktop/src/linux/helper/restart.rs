@@ -1,5 +1,6 @@
 use std::process::Command;
 
+use luft_i18n::t;
 use luft_meet::Intent;
 use luft_meet::regional::Hints;
 
@@ -7,6 +8,7 @@ use super::disks;
 use super::efi::{self, Efivars};
 use super::esp;
 use super::prepare::{esp_of, read_handoff, write_handoff};
+use crate::L10N;
 use crate::boot::entries;
 use crate::linux::record::Made;
 use crate::live::build;
@@ -19,7 +21,7 @@ fn reboot() -> Result<(), String> {
     if status.success() {
         Ok(())
     } else {
-        Err("The computer didn't restart".to_owned())
+        Err(t!(L10N, "helper-restart-failed"))
     }
 }
 
@@ -28,11 +30,11 @@ pub fn restart(intent: Intent, hints: Hints) -> Result<(), String> {
     let folder = made
         .folder
         .as_deref()
-        .ok_or("Luft isn't ready to start yet. Get it ready first.")?;
+        .ok_or_else(|| t!(L10N, "helper-not-ready-to-start-linux"))?;
     let mut handoff =
-        read_handoff(folder).ok_or("Luft isn't ready to start yet. Get it ready first.")?;
+        read_handoff(folder).ok_or_else(|| t!(L10N, "helper-not-ready-to-start-linux"))?;
     if build::unfinished(folder) {
-        return Err("Updating Luft didn't finish. Update it again first.".to_owned());
+        return Err(t!(L10N, "helper-update-unfinished"));
     }
     let esp = esp_of(&disks::blocks()?, &made)?;
     handoff.boot_entry =

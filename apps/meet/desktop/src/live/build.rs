@@ -1,10 +1,13 @@
 use std::fs;
 use std::path::Path;
 
+use luft_i18n::t;
+
 use super::download::parse_checksum;
 use super::files::{self, BUILD_RECORD, UPDATING};
 use super::iso::{self, Entry};
 use super::source::Source;
+use crate::L10N;
 
 pub struct Listing {
     pub entries: Vec<Entry>,
@@ -16,7 +19,7 @@ pub fn listing(source: &Source) -> Result<Listing, String> {
     let download = opened.total;
     let entries = iso::list(opened.reader).map_err(|error| error.to_string())?;
     if let Some(missing) = files::missing(&entries) {
-        return Err(format!("The downloaded Luft is missing {missing}"));
+        return Err(t!(L10N, "live-download-incomplete", file = missing));
     }
     Ok(Listing { entries, download })
 }

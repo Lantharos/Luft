@@ -2,9 +2,11 @@ use std::fs::{self, File};
 use std::io::{self, BufWriter};
 use std::path::{Path, PathBuf};
 
+use luft_i18n::t;
 use ureq::Agent;
 
 use super::download::{Download, Hashing, file_name, format_checksum, parse_checksum};
+use crate::L10N;
 
 const CHECKSUM: &str = ".sha256";
 const PARTIAL: &str = ".part";
@@ -16,14 +18,14 @@ fn folder() -> io::Result<PathBuf> {
         .map(PathBuf::from)
         .filter(|path| path.is_absolute())
         .or_else(|| std::env::var_os("HOME").map(|home| Path::new(&home).join(".cache")))
-        .ok_or_else(|| io::Error::other("There's no home folder to keep Luft in"))?;
+        .ok_or_else(|| io::Error::other(t!(L10N, "live-no-home-folder")))?;
     Ok(cache.join("luft-meet"))
 }
 
 #[cfg(windows)]
 fn folder() -> io::Result<PathBuf> {
     let local = std::env::var_os("LOCALAPPDATA")
-        .ok_or_else(|| io::Error::other("There's no local app data folder to keep Luft in"))?;
+        .ok_or_else(|| io::Error::other(t!(L10N, "live-no-app-data-folder")))?;
     Ok(Path::new(&local).join(r"Lantharos\Meet Luft\Downloads"))
 }
 
@@ -98,7 +100,7 @@ fn fetch(
     if &hashing.digest() != checksum {
         return Err(io::Error::new(
             io::ErrorKind::InvalidData,
-            "The download was damaged on the way. Try again.",
+            t!(L10N, "live-download-damaged"),
         ));
     }
     Ok(())

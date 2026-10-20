@@ -2,8 +2,11 @@ use std::os::windows::process::CommandExt;
 use std::path::Path;
 use std::process::Stdio;
 
+use luft_i18n::t;
+
 use super::firmware::Nvram;
 use super::programs;
+use crate::L10N;
 use crate::boot::entries;
 use crate::boot::load_option::{self, Decoded, Partition};
 use crate::check::facts::StartEntry;
@@ -72,7 +75,7 @@ pub fn tidy(entries: &[StartEntry]) -> Result<(), String> {
             .status()
             .map_err(|error| error.to_string())?;
         if !forgotten.success() {
-            return Err(format!("Windows kept the start entry {object}"));
+            return Err(t!(L10N, "firmware-entry-kept", entry = object));
         }
     }
     let numbers: Vec<u16> = entries.iter().map(|entry| entry.number).collect();

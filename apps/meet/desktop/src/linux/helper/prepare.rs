@@ -1,5 +1,6 @@
 use std::path::Path;
 
+use luft_i18n::t;
 use luft_meet::handoff::{self, Folder, Handoff, Intent, Made as Kind};
 use luft_meet::regional::Hints;
 
@@ -9,6 +10,7 @@ use super::esp::{self, Esp};
 use super::live::{self, Spots};
 use super::machine;
 use super::place::{self, Spot};
+use crate::L10N;
 use crate::boot::entries;
 use crate::check::linux::{self, LinuxFacts, Readable, START_FILES};
 use crate::linux::record::Made;
@@ -38,8 +40,7 @@ fn prepared(made: &Made) -> Option<&Path> {
 }
 
 pub fn esp_of(blocks: &[Block], made: &Made) -> Result<Esp, String> {
-    esp::find(blocks, made.esp.as_deref())
-        .ok_or_else(|| "This computer has no EFI system partition".to_owned())
+    esp::find(blocks, made.esp.as_deref()).ok_or_else(|| t!(L10N, "drive-no-esp"))
 }
 
 pub fn check(source: &Source) -> Result<Report<LinuxFacts>, String> {
@@ -93,7 +94,7 @@ fn build(context: &Context, source: &Source, blocks: &[Block], spot: &Spot) -> R
     let opened = esp.open()?;
     let loader = opened.loader();
     if disks::free_space(opened.root()).unwrap_or(0) < START_FILES {
-        return Err("The EFI system partition is too full for Luft's start files.".to_owned());
+        return Err(t!(L10N, "drive-esp-full"));
     }
     Made::update(|made| {
         made.folder = Some(spot.folder.clone());
@@ -127,7 +128,7 @@ pub fn prepare(context: &Context, source: &Source) -> Result<Prepared, String> {
     let blocks = disks::blocks()?;
     let spot = place::choose(&blocks, None)?;
     if spot.readable != Readable::Yes {
-        return Err("Luft can't start from the drive your files are on.".to_owned());
+        return Err(t!(L10N, "drive-folder-unreadable"));
     }
     build(context, source, &blocks, &spot).inspect_err(|_| {
         if let Err(error) = super::undo::undo(context) {
@@ -140,7 +141,7 @@ pub fn prepare(context: &Context, source: &Source) -> Result<Prepared, String> {
 pub fn refresh(context: &Context, source: &Source) -> Result<Prepared, String> {
     let made = Made::read();
     let Some(folder) = prepared(&made) else {
-        return Err("Get Luft ready first.".to_owned());
+        return Err(t!(L10N, "helper-not-ready-linux"));
     };
     let blocks = disks::blocks()?;
     let spot = place::choose(&blocks, Some(folder))?;

@@ -1,9 +1,8 @@
-use icu_locale_core::LanguageIdentifier;
-use icu_locale_core::subtags::{Region, script};
+use icu_locale_core::subtags::Region;
 use icu_time::zone::WindowsParser;
 use icu_time::zone::iana::IanaParserExtended;
 
-use super::{Hints, distinct, keyboards};
+use super::{Hints, distinct, identifier, keyboards, posix, posix_language};
 
 #[derive(Default)]
 pub struct Settings<'a> {
@@ -17,11 +16,14 @@ impl Settings<'_> {
     pub fn hints(&self) -> Hints {
         let locale = self.locale.and_then(identifier);
         Hints {
-            language: self.language.and_then(identifier).and_then(posix),
+            language: self.language.and_then(posix_language),
             timezone: self
                 .time_zone
                 .and_then(|name| zone(name, locale.as_ref().and_then(|locale| locale.region))),
-            locale: locale.and_then(posix),
+            locale: locale
+                .filter(|locale| locale.region.is_some_and(|region| region.is_alphabetic()))
+                .as_ref()
+                .map(posix),
             keyboards: distinct(
                 self.keyboards
                     .iter()
@@ -40,19 +42,4 @@ fn zone(windows: &str, region: Option<Region>) -> Option<String> {
         .iter()
         .find(|entry| entry.time_zone == zone)
         .map(|entry| entry.canonical.to_owned())
-}
-
-fn identifier(name: &str) -> Option<LanguageIdentifier> {
-    let name = name.split('_').next()?;
-    LanguageIdentifier::try_from_str(name).ok()
-}
-
-fn posix(identifier: LanguageIdentifier) -> Option<String> {
-    let region = identifier.region.filter(|region| region.is_alphabetic())?;
-    let modifier = match (identifier.language.as_str(), identifier.script) {
-        ("sr", Some(script)) if script == script!("Latn") => "@latin",
-        ("uz", Some(script)) if script == script!("Cyrl") => "@cyrillic",
-        _ => "",
-    };
-    Some(format!("{}_{}{modifier}", identifier.language, region))
 }

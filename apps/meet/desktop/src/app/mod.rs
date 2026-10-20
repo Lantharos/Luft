@@ -11,7 +11,7 @@ mod logs;
 #[cfg(windows)]
 mod on_windows;
 #[cfg(windows)]
-mod regional;
+pub mod regional;
 #[cfg(windows)]
 mod registry;
 mod stick;
@@ -21,6 +21,7 @@ use std::sync::{Arc, OnceLock};
 use sabine::{BridgeError, BridgeEventEmitter, SabineWindow, SingleInstancePolicy};
 use serde_json::Value;
 
+use crate::language;
 #[cfg(target_os = "linux")]
 use crate::linux::app as platform;
 use crate::live::download::Channel;
@@ -65,6 +66,9 @@ fn window(window: SabineWindow, events: &Events) -> SabineWindow {
         .bridge_typed("meet_source", |_: Value| Ok::<_, BridgeError>(source()))
         .bridge_typed("meet_platform", |_: Value| {
             Ok::<_, BridgeError>(platform::PLATFORM)
+        })
+        .bridge_typed("meet_locale", |_: Value| {
+            Ok::<_, BridgeError>(language::locale())
         });
     let window = job::command(window, "meet_call", events, |events, call: Call| {
         platform::call(events, call.with_hints(platform::hints))
@@ -90,6 +94,7 @@ fn window(window: SabineWindow, events: &Events) -> SabineWindow {
 }
 
 pub fn run() {
+    language::choose();
     let events = Events::default();
     let attached = events.clone();
     SabineWindow::main_with_process(

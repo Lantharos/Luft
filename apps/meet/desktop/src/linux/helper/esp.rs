@@ -2,7 +2,10 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
+use luft_i18n::t;
+
 use super::disks::{self, Block, ESP_TYPE};
+use crate::L10N;
 use crate::boot::load_option::{self, Partition};
 
 pub const LOADER_FOLDER: &str = "EFI/luft-meet";
@@ -100,7 +103,7 @@ impl Esp {
             .status()
             .map_err(|error| error.to_string())?;
         if !mounted.success() {
-            return Err("The EFI system partition couldn't be opened".to_owned());
+            return Err(t!(L10N, "drive-esp-not-opened"));
         }
         Ok(Opened {
             at: PathBuf::from(MOUNTED_HERE),
@@ -115,13 +118,13 @@ impl Esp {
                 .map_err(|error| error.to_string())?
                 .trim()
                 .parse()
-                .map_err(|_| format!("The EFI system partition's {file} isn't readable"))
+                .map_err(|_| t!(L10N, "drive-esp-file-unreadable", file = file))
         };
         let disk = fs::canonicalize(&partition)
             .map_err(|error| error.to_string())?
             .parent()
             .map(Path::to_path_buf)
-            .ok_or("The EFI system partition has no drive")?;
+            .ok_or_else(|| t!(L10N, "drive-esp-no-drive"))?;
         let sector: u64 = fs::read_to_string(disk.join("queue/logical_block_size"))
             .ok()
             .and_then(|text| text.trim().parse().ok())
@@ -131,7 +134,7 @@ impl Esp {
             first_lba: number("start")? * SECTOR / sector,
             sectors: number("size")? * SECTOR / sector,
             guid: load_option::guid_bytes(&self.partuuid)
-                .ok_or("The EFI system partition has no GUID")?,
+                .ok_or_else(|| t!(L10N, "drive-esp-no-guid"))?,
         })
     }
 }

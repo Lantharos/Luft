@@ -7,6 +7,7 @@ mod check;
 mod folders;
 #[cfg(windows)]
 mod helper;
+mod language;
 #[cfg(windows)]
 mod libraries;
 #[cfg(target_os = "linux")]
@@ -18,16 +19,22 @@ mod protocol;
 mod serving;
 mod stick;
 
+use luft_i18n::Localizer;
+
+static L10N: Localizer = luft_i18n::localizer!("locales", ["desktop"]);
+
 fn main() {
     #[cfg(windows)]
     if let Some(link) = helper::requested() {
         if libraries::only_from_system32() {
+            L10N.use_locale(&link.locale);
             helper::serve(link);
         }
         return;
     }
     #[cfg(target_os = "linux")]
-    if linux::helper::requested() {
+    if let Some(locale) = linux::helper::requested() {
+        L10N.use_locale(&locale);
         linux::helper::serve();
         return;
     }

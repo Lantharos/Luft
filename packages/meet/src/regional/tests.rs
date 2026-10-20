@@ -72,6 +72,21 @@ fn windows_locale_names_become_posix() {
 }
 
 #[test]
+fn windows_languages_keep_their_region_when_they_have_one() {
+    let language = |tag| {
+        Settings {
+            language: Some(tag),
+            ..Settings::default()
+        }
+        .hints()
+        .language
+    };
+    assert_eq!(language("de-AT").as_deref(), Some("de_AT"));
+    assert_eq!(language("sr-Latn-RS").as_deref(), Some("sr_RS@latin"));
+    assert_eq!(language("es-419").as_deref(), Some("es"));
+}
+
+#[test]
 fn windows_keyboard_layouts_become_xkb() {
     let keyboards = |klids: &[&str]| {
         Settings {

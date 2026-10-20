@@ -1,6 +1,9 @@
 use std::path::{Path, PathBuf};
 
+use luft_i18n::t;
+
 use super::registry::Protected;
+use crate::L10N;
 
 const PARAMETERS: &str = r"SYSTEM\CurrentControlSet\Services\BTHPORT\Parameters";
 const LOW_ENERGY_DEVICES: &str = r"SYSTEM\CurrentControlSet\Enum\BTHLE";
@@ -37,7 +40,7 @@ pub struct Saved {
 pub fn save(into: &Path) -> Result<Saved, String> {
     std::fs::create_dir_all(into).map_err(|error| error.to_string())?;
     let parameters =
-        Protected::open(PARAMETERS).ok_or("Windows' Bluetooth settings couldn't be opened")?;
+        Protected::open(PARAMETERS).ok_or_else(|| t!(L10N, "helper-bluetooth-unreadable"))?;
     let keys = into.join("keys");
     parameters.save(&keys)?;
     let names = into.join("names");

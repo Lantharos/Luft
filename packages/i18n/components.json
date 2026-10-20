@@ -20,6 +20,7 @@
 	{"name": "setup-desktop", "bundle": "setup-desktop", "mask": "apps/setup/desktop/locales/*/desktop.ftl", "sources": ["apps/setup/desktop/src"]},
 	{"name": "setup-installer", "bundle": "setup-installer", "mask": "apps/setup/installer/locales/*/installer.ftl", "sources": ["apps/setup/installer/src"]},
 	{"name": "meet", "bundle": "meet", "mask": "apps/meet/locales/*/meet.ftl", "sources": ["apps/meet/src"]},
+	{"name": "meet-desktop", "bundle": "meet-desktop", "mask": "apps/meet/desktop/locales/*/desktop.ftl", "sources": ["apps/meet/desktop/src"]},
 	{"name": "site", "bundle": "site", "mask": "web/site/locales/*/site.ftl", "sources": ["web/site/src/layouts", "web/site/src/components/site", "web/site/src/views/NotFound.astro", "web/site/src/data/nav.ts"]},
 	{"name": "site-home", "bundle": "site", "mask": "web/site/locales/*/home.ftl", "sources": ["web/site/src/components/home", "web/site/src/views/Home.astro", "web/site/src/data/apps.ts", "web/site/src/data/faq.ts"]},
 	{"name": "site-download", "bundle": "site", "mask": "web/site/locales/*/download.ftl", "sources": ["web/site/src/components/download", "web/site/src/views/Download.astro"]}

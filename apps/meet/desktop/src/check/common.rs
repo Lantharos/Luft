@@ -1,7 +1,9 @@
+use luft_i18n::t;
 use luft_variant::Variant;
 use serde::{Deserialize, Serialize};
 
 use super::facts::{Architecture, BROADCOM, Machine, Platform};
+use crate::L10N;
 const GIB: u64 = 1 << 30;
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
@@ -48,12 +50,17 @@ pub struct Finding {
     pub action: Option<Action>,
 }
 
-pub fn finding(topic: Topic, level: Level, title: &str, detail: &str) -> Finding {
+pub fn finding(
+    topic: Topic,
+    level: Level,
+    title: impl Into<String>,
+    detail: impl Into<String>,
+) -> Finding {
     Finding {
         topic,
         level,
-        title: title.to_owned(),
-        detail: detail.to_owned(),
+        title: title.into(),
+        detail: detail.into(),
         action: None,
     }
 }
@@ -76,23 +83,23 @@ pub fn processor(machine: &Machine) -> Finding {
         Architecture::X64 => finding(
             Topic::Processor,
             Level::Fine,
-            "64-bit Intel or AMD processor",
-            "Luft runs on it.",
+            t!(L10N, "check-processor-x64"),
+            t!(L10N, "check-processor-x64-detail"),
         ),
         Architecture::Arm64 => finding(
             Topic::Processor,
             Level::Blocks,
-            "Arm processor",
-            "Luft only runs on Intel and AMD processors for now.",
+            t!(L10N, "check-processor-arm"),
+            t!(L10N, "check-processor-arm-detail"),
         ),
         Architecture::Other => finding(
             Topic::Processor,
             Level::Blocks,
             match machine.platform {
-                Platform::Windows => "32-bit Windows",
-                Platform::Linux => "32-bit system",
+                Platform::Windows => t!(L10N, "check-processor-32-bit-windows"),
+                Platform::Linux => t!(L10N, "check-processor-32-bit-system"),
             },
-            "Luft needs a 64-bit Intel or AMD processor.",
+            t!(L10N, "check-processor-32-bit-detail"),
         ),
     }
 }
@@ -108,50 +115,50 @@ const MAKERS: [Maker; 8] = [
     Maker {
         names: &["lenovo"],
         shown: "Lenovo",
-        key: "F2 (F1 on a ThinkPad)",
-        place: "Security, then Secure Boot",
+        key: "check-firmware-key-lenovo",
+        place: "check-firmware-place-security",
     },
     Maker {
         names: &["dell"],
         shown: "Dell",
-        key: "F2",
-        place: "Boot Configuration, then Secure Boot",
+        key: "check-firmware-key-f2",
+        place: "check-firmware-place-boot-configuration",
     },
     Maker {
         names: &["hp", "hewlett"],
         shown: "HP",
-        key: "F10",
-        place: "Security or Advanced, then Secure Boot Configuration",
+        key: "check-firmware-key-f10",
+        place: "check-firmware-place-security-or-advanced",
     },
     Maker {
         names: &["asus"],
         shown: "ASUS",
-        key: "F2 or Delete",
-        place: "Security or Boot, then Secure Boot",
+        key: "check-firmware-key-f2-or-delete",
+        place: "check-firmware-place-security-or-boot",
     },
     Maker {
         names: &["acer"],
         shown: "Acer",
-        key: "F2",
-        place: "Boot, then Secure Boot",
+        key: "check-firmware-key-f2",
+        place: "check-firmware-place-boot",
     },
     Maker {
         names: &["micro-star", "msi"],
         shown: "MSI",
-        key: "Delete",
-        place: "Settings, then Security, then Secure Boot",
+        key: "check-firmware-key-delete",
+        place: "check-firmware-place-settings",
     },
     Maker {
         names: &["gigabyte"],
         shown: "Gigabyte",
-        key: "Delete",
-        place: "Boot, then Secure Boot",
+        key: "check-firmware-key-delete",
+        place: "check-firmware-place-boot",
     },
     Maker {
         names: &["microsoft"],
         shown: "Surface",
-        key: "volume up",
-        place: "Security, then Secure Boot",
+        key: "check-firmware-key-volume-up",
+        place: "check-firmware-place-security",
     },
 ];
 
@@ -165,13 +172,20 @@ fn maker(name: Option<&str>) -> Option<&'static Maker> {
 fn turning_on_secure_boot(machine: &Machine) -> String {
     let maker = maker(machine.maker.as_deref());
     match (machine.opens_settings, maker) {
-        (true, Some(maker)) => format!("Meet Luft can restart into the firmware settings, where it's under {}.", maker.place),
-        (true, None) => "Meet Luft can restart into the firmware settings, where it's usually under Security or Boot.".to_owned(),
-        (false, Some(maker)) => format!(
-            "To turn it on, restart and press {} as the {} logo appears, then go to {}.",
-            maker.key, maker.shown, maker.place
+        (true, Some(maker)) => t!(
+            L10N,
+            "check-secure-boot-restart-into",
+            place = L10N.t(maker.place)
         ),
-        (false, None) => "To turn it on, open the firmware settings while the computer starts and look under Security or Boot.".to_owned(),
+        (true, None) => t!(L10N, "check-secure-boot-restart-into-anywhere"),
+        (false, Some(maker)) => t!(
+            L10N,
+            "check-secure-boot-turn-on",
+            key = L10N.t(maker.key),
+            maker = maker.shown,
+            place = L10N.t(maker.place)
+        ),
+        (false, None) => t!(L10N, "check-secure-boot-turn-on-anywhere"),
     }
 }
 
@@ -180,19 +194,19 @@ pub fn secure_boot(machine: &Machine) -> Finding {
         Some(true) => finding(
             Topic::SecureBoot,
             Level::Fine,
-            "Secure Boot is on",
-            "It can stay on. Luft asks once, on a blue screen, to add its key.",
+            t!(L10N, "check-secure-boot-on"),
+            t!(L10N, "check-secure-boot-on-detail"),
         ),
         _ => {
-            let detail = format!(
-                "Luft works without it, though games with anti-cheat need it. {}",
-                turning_on_secure_boot(machine)
-            );
             let found = finding(
                 Topic::SecureBoot,
                 Level::Note,
-                "Secure Boot is off",
-                &detail,
+                t!(L10N, "check-secure-boot-off"),
+                t!(
+                    L10N,
+                    "check-secure-boot-off-detail",
+                    turningOn = turning_on_secure_boot(machine)
+                ),
             );
             if machine.opens_settings {
                 found.with(Action::FirmwareSettings)
@@ -209,13 +223,13 @@ pub fn tpm(machine: &Machine) -> Finding {
             Topic::Tpm,
             Level::Fine,
             "TPM 2.0",
-            "An encrypted Luft can unlock by itself when the computer starts.",
+            t!(L10N, "check-tpm-detail"),
         ),
         _ => finding(
             Topic::Tpm,
             Level::Note,
-            "No TPM 2.0",
-            "If you encrypt Luft, it asks for a passphrase each time it starts.",
+            t!(L10N, "check-tpm-missing"),
+            t!(L10N, "check-tpm-missing-detail"),
         ),
     }
 }
@@ -231,15 +245,19 @@ pub fn graphics(machine: &Machine) -> Finding {
         finding(
             Topic::Graphics,
             Level::Fine,
-            &names,
-            "Luft installs with NVIDIA's own driver.",
+            names,
+            t!(L10N, "check-graphics-nvidia"),
         )
     } else {
         finding(
             Topic::Graphics,
             Level::Fine,
-            if names.is_empty() { "Graphics" } else { &names },
-            "Works out of the box.",
+            if names.is_empty() {
+                t!(L10N, "check-graphics")
+            } else {
+                names
+            },
+            t!(L10N, "check-graphics-detail"),
         )
     }
 }
@@ -249,16 +267,21 @@ pub fn wifi(machine: &Machine) -> Finding {
         None => finding(
             Topic::Wifi,
             Level::Fine,
-            "No Wi-Fi",
-            "Use a network cable in Luft, or nothing at all.",
+            t!(L10N, "check-wifi-missing"),
+            t!(L10N, "check-wifi-missing-detail"),
         ),
         Some(device) if device.vendor == BROADCOM => finding(
             Topic::Wifi,
             Level::Note,
             &device.name,
-            "Some Broadcom Wi-Fi chips need a driver Luft doesn't include. Keep a network cable or a phone for USB tethering nearby.",
+            t!(L10N, "check-wifi-broadcom"),
         ),
-        Some(device) => finding(Topic::Wifi, Level::Fine, &device.name, "Works in Luft."),
+        Some(device) => finding(
+            Topic::Wifi,
+            Level::Fine,
+            &device.name,
+            t!(L10N, "check-wifi-detail"),
+        ),
     }
 }
 
@@ -269,8 +292,8 @@ pub fn download(live: Option<u64>) -> Option<Finding> {
         finding(
             Topic::Download,
             Level::Blocks,
-            "Luft can't be downloaded right now",
-            "Meet Luft downloads about 3 GB. Check that you’re online and check again, or use a Luft ISO you already have.",
+            t!(L10N, "check-download-unavailable"),
+            t!(L10N, "check-download-unavailable-detail"),
         )
         .with(Action::ChooseIso)
     })

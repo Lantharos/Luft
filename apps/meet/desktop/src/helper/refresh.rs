@@ -2,6 +2,7 @@ use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
 
+use luft_i18n::t;
 use luft_meet::Handoff;
 
 use super::drive::storage::{Layout, MSFT_Partition, Storage};
@@ -10,6 +11,7 @@ use super::drive::{record, state};
 use super::system::protected::Scratch;
 use super::system::start_entries;
 use super::{Context, live_system, prepare, undo};
+use crate::L10N;
 use crate::live::iso::Entry;
 use crate::live::source::Source;
 use crate::plan::layout::{self, Disk};
@@ -87,7 +89,7 @@ fn rebuild(
     .map_err(prepare::shortfall)?;
     let live = old[1]
         .volume_path()
-        .ok_or("Luft's partition has no volume")?;
+        .ok_or_else(|| t!(L10N, "drive-live-no-volume"))?;
     let logs = KeptLogs::take(&live)?;
     context.progress(Stage::Partitioning, 0, 2);
     start_entries::remove(&[handoff.boot_entry])?;
@@ -123,7 +125,7 @@ fn rebuild(
     let live = storage
         .refreshed(&created[1])?
         .volume_path()
-        .ok_or("Luft's new partition has no volume")?;
+        .ok_or_else(|| t!(L10N, "drive-new-live-no-volume"))?;
     if let Err(error) = logs.put_back(&live) {
         eprintln!("The logs from Try Luft couldn't be kept: {error}");
     }
@@ -136,22 +138,24 @@ pub fn refresh(context: &Context, source: &Source) -> Result<Prepared, String> {
     let layout = storage.layout(&drive.volume)?;
     let found = state::find(&layout);
     let (Some(handoff), Some(live)) = (found.handoff.clone(), found.live.clone()) else {
-        return Err("Make room for Luft first.".to_owned());
+        return Err(t!(L10N, "helper-no-room-yet"));
     };
     let made = handoff
         .made_partitions()
-        .ok_or("Luft's partitions are missing from Meet Luft's notes")?;
+        .ok_or_else(|| t!(L10N, "drive-partitions-not-noted"))?;
     let start = found
         .made_partition(&made.start)
         .cloned()
-        .ok_or("Luft's start partition is gone")?;
+        .ok_or_else(|| t!(L10N, "drive-start-partition-gone"))?;
     let entries = live_system::listing(source)?.entries;
     let [(_, start_needed), (_, live_needed)] = live_system::partitions(&entries);
     if fits(&start, start_needed) && fits(&live, live_needed) {
         let start_path = start
             .volume_path()
-            .ok_or("The start partition has no volume")?;
-        let live_path = live.volume_path().ok_or("Luft's partition has no volume")?;
+            .ok_or_else(|| t!(L10N, "drive-start-no-volume"))?;
+        let live_path = live
+            .volume_path()
+            .ok_or_else(|| t!(L10N, "drive-live-no-volume"))?;
         live_system::rewrite(context, source, &start_path, &live_path, &made.live)?;
     } else {
         rebuild(
@@ -165,6 +169,5 @@ pub fn refresh(context: &Context, source: &Source) -> Result<Prepared, String> {
         )?;
     }
     let layout = storage.layout(&drive.volume)?;
-    prepare::prepared(&state::find(&layout))
-        .ok_or_else(|| "Luft's partitions disappeared".to_owned())
+    prepare::prepared(&state::find(&layout)).ok_or_else(|| t!(L10N, "drive-partitions-gone"))
 }

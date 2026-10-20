@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import Volume2 from '@lucide/svelte/icons/volume-2';
 	import VolumeX from '@lucide/svelte/icons/volume-x';
 	import { Section, Select } from '@luft/ui';
@@ -30,7 +31,7 @@
 		>
 			{#snippet controls()}
 				{#if choices.length > 1}
-					<Select label="Play {app.name} on" options={choices} value={app.output} onchange={(output) => moveApp(app.index, output)} />
+					<Select label={t('settings-sound-app-output', { app: app.name })} options={choices} value={app.output} onchange={(output) => moveApp(app.index, output)} />
 				{/if}
 			{/snippet}
 		</VolumeRow>

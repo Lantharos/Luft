@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { onDestroy } from 'svelte';
 	import FolderOpen from '@lucide/svelte/icons/folder-open';
 	import ImagePlus from '@lucide/svelte/icons/image-plus';
@@ -23,14 +24,6 @@
 		'wallpaper-focus-chosen': Record<string, Focus>;
 	};
 
-	const FIT_OPTIONS = [
-		{ value: 'zoom', label: 'Fill' },
-		{ value: 'scaled', label: 'Fit' },
-		{ value: 'centered', label: 'Center' },
-		{ value: 'stretched', label: 'Stretch' },
-		{ value: 'wallpaper', label: 'Tile' },
-		{ value: 'spanned', label: 'Span displays' }
-	];
 
 	const background = useSettings<Background>('org.gnome.desktop.background', ['picture-uri', 'picture-uri-dark', 'picture-options']);
 	const kestrel = useSettings<Kestrel>('com.lantharos.kestrel', ['live-wallpaper', 'live-wallpaper-dark', 'wallpaper-focus', 'wallpaper-focus-dark', 'wallpaper-focus-chosen']);
@@ -38,6 +31,15 @@
 	const desktop = useSettings<{ 'color-scheme': string }>('org.gnome.desktop.interface', ['color-scheme']);
 
 	let found = $state<Wallpaper[] | null>(null);
+
+	let fitOptions = $derived([
+		{ value: 'zoom', label: t('settings-appearance-wallpaper-fill') },
+		{ value: 'scaled', label: t('settings-appearance-wallpaper-fit') },
+		{ value: 'centered', label: t('settings-appearance-wallpaper-center') },
+		{ value: 'stretched', label: t('settings-appearance-wallpaper-stretch') },
+		{ value: 'wallpaper', label: t('settings-appearance-wallpaper-tile') },
+		{ value: 'spanned', label: t('settings-appearance-wallpaper-span') }
+	]);
 
 	let dark = $derived(desktop.values['color-scheme'] === 'prefer-dark');
 	let pictureKey = $derived<'picture-uri' | 'picture-uri-dark'>(dark ? 'picture-uri-dark' : 'picture-uri');
@@ -51,7 +53,7 @@
 	let fill = $derived((background.values['picture-options'] ?? 'zoom') === 'zoom');
 	let available = $derived(
 		current && found && !found.some((wallpaper) => wallpaper.path === current)
-			? [{ path: current, name: 'Current wallpaper', live: !!live }, ...found]
+			? [{ path: current, name: t('settings-appearance-wallpaper-current'), live: !!live }, ...found]
 			: (found ?? [])
 	);
 
@@ -80,14 +82,14 @@
 	onDestroy(onWallpapersChanged((list) => (found = list)));
 </script>
 
-<Section title="Wallpaper" description={dark ? 'Shown while the dark style is on' : 'Shown while the light style is on'}>
+<Section title={t('settings-appearance-wallpaper')} description={dark ? t('settings-appearance-wallpaper-dark-description') : t('settings-appearance-wallpaper-light-description')}>
 	{#if current}
 		<div class="px-4 pt-4">
 			<WallpaperPreview path={current} {focus} {fill} shape={screen.aspect} onchange={reposition} />
 		</div>
 	{/if}
 	{#if found?.length === 0}
-		<p class="empty">Images and videos in the Wallpapers folder in your Pictures show up here.</p>
+		<p class="empty">{t('settings-appearance-wallpaper-empty')}</p>
 	{/if}
 	<div class="grid grid-cols-[repeat(auto-fill,minmax(var(--tile),1fr))] gap-3 p-4" style:--tile="{Math.round(120 * Math.sqrt(screen.aspect))}px">
 		{#each available as wallpaper (wallpaper.path)}
@@ -95,12 +97,12 @@
 		{/each}
 		<button type="button" class="add-tile" style:aspect-ratio={screen.aspect} onclick={addWallpapers}>
 			<ImagePlus size={22} />
-			<span>Add wallpapers</span>
+			<span>{t('settings-appearance-wallpaper-add')}</span>
 		</button>
 	</div>
-	<Row title="Wallpapers folder" description="Pictures › Wallpapers" icon={FolderOpen} onclick={openFolder} />
-	<Row title="Fit" description="For wallpapers that don’t match the display’s shape">
-		<Select label="Fit" options={FIT_OPTIONS} value={background.values['picture-options'] ?? 'zoom'} onchange={(value) => background.set('picture-options', value)} />
+	<Row title={t('settings-appearance-wallpaper-folder')} description={t('settings-appearance-wallpaper-folder-description')} icon={FolderOpen} onclick={openFolder} />
+	<Row title={t('settings-appearance-wallpaper-fit-title')} description={t('settings-appearance-wallpaper-fit-description')}>
+		<Select label={t('settings-appearance-wallpaper-fit-title')} options={fitOptions} value={background.values['picture-options'] ?? 'zoom'} onchange={(value) => background.set('picture-options', value)} />
 	</Row>
 	<LiveWallpaperOnBattery />
 </Section>

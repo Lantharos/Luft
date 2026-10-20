@@ -1,3 +1,5 @@
+import { t } from '@luft/i18n';
+
 export interface Strength {
 	level: 0 | 1 | 2 | 3;
 	label: string;
@@ -29,9 +31,9 @@ function predictable(password: string, names: string[]) {
 }
 
 export function measure(password: string, names: string[]): Strength {
-	if (password.length < MINIMUM_LENGTH) return { level: 0, label: `Use at least ${MINIMUM_LENGTH} characters` };
+	if (password.length < MINIMUM_LENGTH) return { level: 0, label: t('settings-users-password-minimum', { count: MINIMUM_LENGTH }) };
 	const bits = password.length * Math.log2(pool(password)) - (predictable(password, names) ? 24 : 0);
-	if (bits < 40) return { level: 1, label: 'Weak. Longer passwords with a mix of words are harder to guess.' };
-	if (bits < 60) return { level: 2, label: 'Fair. Adding a few more characters makes it stronger.' };
-	return { level: 3, label: 'Strong' };
+	if (bits < 40) return { level: 1, label: t('settings-users-password-weak') };
+	if (bits < 60) return { level: 2, label: t('settings-users-password-fair') };
+	return { level: 3, label: t('settings-users-password-strong') };
 }

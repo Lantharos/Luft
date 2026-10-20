@@ -1,3 +1,4 @@
+import { i18n } from '@luft/i18n';
 import { useSettings } from '#lib/state/gsettings.svelte.js';
 
 export type WeekStart = 'automatic' | 'monday' | 'sunday';
@@ -9,7 +10,7 @@ const DAY = 86_400_000;
 const regionLocale = (region: string) => region.split(/[.@]/)[0].replace('_', '-') || navigator.language;
 
 export const weekdayName = (day: number, style: 'long' | 'narrow') =>
-	new Intl.DateTimeFormat(undefined, { weekday: style, timeZone: 'UTC' }).format(SUNDAY + day * DAY);
+	new Intl.DateTimeFormat(i18n.formats, { weekday: style, timeZone: 'UTC' }).format(SUNDAY + day * DAY);
 
 export function useWeekStart() {
 	const kestrel = useSettings<{ 'week-start': WeekStart }>('com.lantharos.kestrel', ['week-start']);

@@ -4,9 +4,11 @@ use std::collections::HashMap;
 use gio::glib;
 use gio::prelude::*;
 use luft_app::Events;
+use luft_i18n::t;
 use serde::Serialize;
 
 use super::{Location, open};
+use crate::L10N;
 
 pub const SETTINGS_CHANGED: &str = "settings.changed";
 
@@ -58,7 +60,7 @@ impl Watcher {
         });
         watched
             .recv()
-            .map_err(|_| "The settings watcher stopped".to_owned())?
+            .map_err(|_| t!(L10N, "desktop-gsettings-watcher-stopped"))?
     }
 }
 

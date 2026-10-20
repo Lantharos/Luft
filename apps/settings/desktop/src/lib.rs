@@ -3,17 +3,12 @@ mod gsettings;
 mod panels;
 
 use luft_app::{Events, GlassWindow};
+use luft_i18n::{Localizer, localizer, t};
 use sabine::SabineWindow;
 
 use gsettings::Watcher;
 
-const GLASS_WINDOW: GlassWindow = GlassWindow {
-    title: "Settings",
-    size: (1040, 720),
-    min_size: (760, 520),
-    sidebar_width: 280,
-    single_instance: Some("com.lantharos.settings"),
-};
+pub static L10N: Localizer = localizer!("locales", ["desktop"]);
 
 pub fn run() {
     let given = |wanted: &str| std::env::args().any(|argument| argument == wanted);
@@ -37,6 +32,14 @@ fn run_app() -> ! {
 }
 
 fn build_window(window: SabineWindow, events: &Events, watcher: &Watcher) -> SabineWindow {
-    let window = app::register(GLASS_WINDOW.apply(window), events, watcher);
+    let title = t!(L10N, "desktop-app-name");
+    let glass = GlassWindow {
+        title: &title,
+        size: (1040, 720),
+        min_size: (760, 520),
+        sidebar_width: 280,
+        single_instance: Some("com.lantharos.settings"),
+    };
+    let window = app::register(glass.apply(window), events, watcher);
     panels::register(window, events)
 }

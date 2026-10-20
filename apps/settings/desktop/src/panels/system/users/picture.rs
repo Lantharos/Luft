@@ -7,6 +7,9 @@ use gio::prelude::*;
 use image::imageops::FilterType;
 use image::{DynamicImage, ImageDecoder, ImageReader};
 use luft_app::portal::{self, Filter};
+use luft_i18n::t;
+
+use crate::L10N;
 
 const EXTENSIONS: [&str; 4] = ["jpg", "jpeg", "png", "webp"];
 const SIZE: u32 = 512;
@@ -16,10 +19,12 @@ fn failed(error: impl std::fmt::Display) -> String {
 }
 
 pub async fn choose() -> Result<Option<PathBuf>, String> {
+    let title = t!(L10N, "desktop-picture-choose-title");
+    let filter = t!(L10N, "desktop-picture-filter");
     let Some(uri) = portal::open_file(
-        "Choose a Picture",
+        &title,
         Filter {
-            name: "Images",
+            name: &filter,
             patterns: EXTENSIONS
                 .iter()
                 .map(|extension| format!("*.{extension}"))
@@ -32,7 +37,7 @@ pub async fn choose() -> Result<Option<PathBuf>, String> {
     };
     let source = gio::File::for_uri(&uri)
         .path()
-        .ok_or("This picture can't be opened")?;
+        .ok_or_else(|| t!(L10N, "desktop-picture-unopenable"))?;
     tokio::task::spawn_blocking(move || square(&source))
         .await
         .map_err(failed)?
@@ -64,7 +69,7 @@ fn square(source: &Path) -> Result<PathBuf, String> {
         .map(|modified| modified.as_secs())
         .hash(&mut hasher);
     let cache = dirs::cache_dir()
-        .ok_or("There is no cache folder")?
+        .ok_or_else(|| t!(L10N, "desktop-no-cache-folder"))?
         .join("com.lantharos.settings")
         .join("pictures");
     let target = cache.join(format!("{:016x}.png", hasher.finish()));

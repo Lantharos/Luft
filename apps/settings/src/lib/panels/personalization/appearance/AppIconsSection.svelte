@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { AppIcon, appearance, Row, Section, type AppIconStyle } from '@luft/ui';
 	import Swatches from '#lib/components/Swatches.svelte';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
@@ -12,28 +13,31 @@
 
 	const PREVIEW_COUNT = 4;
 	const STYLES: { value: AppIconStyle; label: string }[] = [
-		{ value: 'default', label: 'Original' },
-		{ value: 'tinted', label: 'Tinted' },
-		{ value: 'clear', label: 'Clear' }
+		{ value: 'default', label: 'settings-appearance-icons-original' },
+		{ value: 'tinted', label: 'settings-appearance-icons-tinted' },
+		{ value: 'clear', label: 'settings-appearance-icons-clear' }
 	];
 	const TINTS = [
-		{ value: '#3584e4', label: 'Blue' },
-		{ value: '#2190a4', label: 'Teal' },
-		{ value: '#3a944a', label: 'Green' },
-		{ value: '#c88800', label: 'Yellow' },
-		{ value: '#ed5b00', label: 'Orange' },
-		{ value: '#e62d42', label: 'Red' },
-		{ value: '#d56199', label: 'Pink' },
-		{ value: '#9141ac', label: 'Purple' },
-		{ value: '#6f8396', label: 'Slate' }
-	].map((tint) => ({ ...tint, color: tint.value }));
+		{ value: '#3584e4', label: 'settings-appearance-tint-blue' },
+		{ value: '#2190a4', label: 'settings-appearance-tint-teal' },
+		{ value: '#3a944a', label: 'settings-appearance-tint-green' },
+		{ value: '#c88800', label: 'settings-appearance-tint-yellow' },
+		{ value: '#ed5b00', label: 'settings-appearance-tint-orange' },
+		{ value: '#e62d42', label: 'settings-appearance-tint-red' },
+		{ value: '#d56199', label: 'settings-appearance-tint-pink' },
+		{ value: '#9141ac', label: 'settings-appearance-tint-purple' },
+		{ value: '#6f8396', label: 'settings-appearance-tint-slate' }
+	];
 
 	const kestrel = useSettings<Kestrel>('com.lantharos.kestrel', ['app-icon-style', 'app-icon-tint', 'favorite-apps']);
 
 	let installed = $state<App[]>([]);
 	let style = $derived(kestrel.values['app-icon-style'] ?? 'tinted');
 	let tint = $derived(kestrel.values['app-icon-tint'] ?? '');
-	let tints = $derived([{ value: '', label: 'Accent color', color: appearance.accent ?? 'var(--accent)' }, ...TINTS]);
+	let tints = $derived([
+		{ value: '', label: t('settings-appearance-accent'), color: appearance.accent ?? 'var(--accent)' },
+		...TINTS.map((tint) => ({ value: tint.value, label: t(tint.label), color: tint.value }))
+	]);
 	let preview = $derived.by(() => {
 		const byId = new Map(installed.map((app) => [app.id, app]));
 		const favorites = (kestrel.values['favorite-apps'] ?? []).map((id) => byId.get(id)).filter((app) => app !== undefined);
@@ -45,7 +49,7 @@
 	});
 </script>
 
-<Section title="App icons">
+<Section title={t('settings-appearance-icons')}>
 	<div class="grid grid-cols-3 gap-3 px-4 py-3.5">
 		{#each STYLES as option (option.value)}
 			<button type="button" class="choice" class:selected={style === option.value} aria-pressed={style === option.value} onclick={() => kestrel.set('app-icon-style', option.value)}>
@@ -54,13 +58,13 @@
 						<AppIcon icon={app.icon} id={app.id} size={30} style={option.value} />
 					{/each}
 				</span>
-				<span class="text-sm">{option.label}</span>
+				<span class="text-sm">{t(option.label)}</span>
 			</button>
 		{/each}
 	</div>
 	{#if style === 'tinted'}
-		<Row title="Tint" description="The first color follows your accent color">
-			<Swatches label="Tint" options={tints} value={tint} onchange={(value) => kestrel.set('app-icon-tint', value)} />
+		<Row title={t('settings-appearance-tint')} description={t('settings-appearance-tint-description')}>
+			<Swatches label={t('settings-appearance-tint')} options={tints} value={tint} onchange={(value) => kestrel.set('app-icon-tint', value)} />
 		</Row>
 	{/if}
 </Section>

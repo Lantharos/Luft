@@ -1,7 +1,10 @@
 use luft_app::dbus::{self, service};
+use luft_i18n::t;
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 use zbus::{DynamicType, Type, Variant};
+
+use crate::L10N;
 
 pub const SERVICE: &str = "com.lantharos.Keyring1";
 pub const PATH: &str = "/com/lantharos/Keyring1";
@@ -39,9 +42,9 @@ impl From<zbus::Error> for Problem {
 impl From<Problem> for String {
     fn from(problem: Problem) -> Self {
         match problem {
-            Problem::Absent => "Your keyring isn’t running".to_owned(),
-            Problem::Denied => "Only the installed Settings app can change this".to_owned(),
-            Problem::Unsupported => "Your keyring can’t do this yet".to_owned(),
+            Problem::Absent => t!(L10N, "desktop-keyring-not-running"),
+            Problem::Denied => t!(L10N, "desktop-keyring-denied"),
+            Problem::Unsupported => t!(L10N, "desktop-keyring-unsupported"),
             Problem::Failed(message) => message,
         }
     }

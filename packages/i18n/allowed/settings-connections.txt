@@ -1,0 +1,14 @@
+apps/settings/src/lib/panels/connections/accounts/SignInDialog.svelte	you@icloud.com
+apps/settings/src/lib/panels/connections/network/ProxyDialog.svelte	http://example.com/proxy.pac
+apps/settings/src/lib/panels/connections/network/ProxyDialog.svelte	localhost, *.example.com
+apps/settings/src/lib/panels/connections/network/connection/AdvancedSection.svelte	12:34:56:78:9A:BC
+apps/settings/src/lib/panels/connections/network/connection/EnterpriseFields.svelte	MSCHAPv2
+apps/settings/src/lib/panels/connections/network/connection/EnterpriseFields.svelte	GTC
+apps/settings/src/lib/panels/connections/network/connection/EnterpriseFields.svelte	MD5
+apps/settings/src/lib/panels/connections/network/connection/EnterpriseFields.svelte	PAP
+apps/settings/src/lib/panels/connections/network/connection/EnterpriseFields.svelte	MSCHAP
+apps/settings/src/lib/panels/connections/network/connection/EnterpriseFields.svelte	CHAP
+apps/settings/src/lib/panels/connections/network/connection/EnterpriseFields.svelte	example.com
+apps/settings/src/lib/panels/connections/network/vpn/WireGuardDialog.svelte	vpn.example.com:51820
+apps/settings/src/lib/panels/connections/network/wifi/JoinDialog.svelte	WPA2
+apps/settings/src/lib/panels/connections/network/wifi/JoinDialog.svelte	WPA3

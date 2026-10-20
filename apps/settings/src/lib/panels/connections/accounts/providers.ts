@@ -17,11 +17,11 @@ export interface ProviderInfo {
 }
 
 export const PROVIDERS: ProviderInfo[] = [
-	{ id: 'icloud', name: 'iCloud Drive', description: 'Your Apple Account, confirmed with a code from your iPhone, iPad or Mac', icon: ICloudMark, signIn: 'apple' },
-	{ id: 'onedrive', name: 'OneDrive', description: 'A personal, work or school Microsoft account, in your browser', icon: Cloud, signIn: 'browser' },
-	{ id: 'dropbox', name: 'Dropbox', description: 'A Dropbox account, in your browser', icon: DropboxMark, signIn: 'browser' },
-	{ id: 'nextcloud', name: 'Nextcloud', description: 'Your own or your organization’s server', icon: NextcloudMark, signIn: 'nextcloud' },
-	{ id: 'webdav', name: 'WebDAV', description: 'Any server that speaks WebDAV', icon: Server, signIn: 'password' }
+	{ id: 'icloud', name: 'iCloud Drive', description: 'settings-accounts-provider-icloud', icon: ICloudMark, signIn: 'apple' },
+	{ id: 'onedrive', name: 'OneDrive', description: 'settings-accounts-provider-onedrive', icon: Cloud, signIn: 'browser' },
+	{ id: 'dropbox', name: 'Dropbox', description: 'settings-accounts-provider-dropbox', icon: DropboxMark, signIn: 'browser' },
+	{ id: 'nextcloud', name: 'Nextcloud', description: 'settings-accounts-provider-nextcloud', icon: NextcloudMark, signIn: 'nextcloud' },
+	{ id: 'webdav', name: 'WebDAV', description: 'settings-accounts-provider-webdav', icon: Server, signIn: 'password' }
 ];
 
 export const provider = (id: Provider) => PROVIDERS.find((entry) => entry.id === id)!;

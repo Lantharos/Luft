@@ -5,6 +5,7 @@ import BatteryCharging from '@lucide/svelte/icons/battery-charging';
 import Bluetooth from '@lucide/svelte/icons/bluetooth';
 import CalendarClock from '@lucide/svelte/icons/calendar-clock';
 import Cloud from '@lucide/svelte/icons/cloud';
+import Globe from '@lucide/svelte/icons/globe';
 import Info from '@lucide/svelte/icons/info';
 import Keyboard from '@lucide/svelte/icons/keyboard';
 import LayoutGrid from '@lucide/svelte/icons/layout-grid';
@@ -23,8 +24,10 @@ import Wifi from '@lucide/svelte/icons/wifi';
 import MousePointer2 from '@lucide/svelte/icons/mouse-pointer-2';
 import Plus from '@lucide/svelte/icons/plus';
 import Type from '@lucide/svelte/icons/type';
+import { t } from '@luft/i18n';
+import { english } from '#lib/state/english.svelte.js';
 import type { Hardware } from '#lib/state/hardware.svelte.js';
-import { PANEL_PAGES, SUBPAGES, type Page, type PageId, type PanelId } from './pages';
+import { PANEL_PAGES, pageKeywords, SUBPAGES, type Page, type PageId, type PanelId } from './pages';
 
 export type { PanelId };
 
@@ -36,13 +39,11 @@ interface Needs {
 interface View {
 	icon: Component;
 	load: () => Promise<{ default: Component }>;
-	title?: (hardware: Hardware) => string;
+	titleFor?: (hardware: Hardware) => string;
 	needs?: Needs;
 }
 
-export interface Panel extends Omit<Page, 'title'>, Omit<View, 'title'> {
-	title: string | ((hardware: Hardware) => string);
-}
+export interface Panel extends Page, View {}
 
 const appearance = () => import('./personalization/appearance/AppearancePanel.svelte');
 const accounts = () => import('./connections/accounts/AccountsPanel.svelte');
@@ -53,14 +54,14 @@ const VIEWS: Record<PageId, View> = {
 	bluetooth: {
 		icon: Bluetooth,
 		load: () => import('./connections/bluetooth/BluetoothPanel.svelte'),
-		needs: { present: (hardware) => hardware.bluetooth, missing: 'This computer has no Bluetooth adapter' }
+		needs: { present: (hardware) => hardware.bluetooth, missing: 'settings-bluetooth-missing' }
 	},
 	display: { icon: Monitor, load: () => import('./devices/display/DisplayPanel.svelte') },
 	sound: { icon: Volume2, load: () => import('./devices/sound/SoundPanel.svelte') },
 	power: {
 		icon: BatteryCharging,
 		load: () => import('./devices/power/PowerPanel.svelte'),
-		title: (hardware) => (hardware.battery ? 'Power & Battery' : 'Power')
+		titleFor: (hardware) => (hardware.battery ? 'settings-page-power' : 'settings-power-title')
 	},
 	appearance: { icon: Palette, load: appearance },
 	notifications: { icon: Bell, load: () => import('./personalization/notifications/NotificationsPanel.svelte') },
@@ -68,13 +69,14 @@ const VIEWS: Record<PageId, View> = {
 	mouse: {
 		icon: Mouse,
 		load: () => import('./devices/mouse/MousePanel.svelte'),
-		title: ({ mouse, touchpad }) => (mouse && touchpad ? 'Mouse & Touchpad' : touchpad ? 'Touchpad' : 'Mouse'),
-		needs: { present: (hardware) => hardware.mouse || hardware.touchpad, missing: 'No mouse or touchpad is connected' }
+		titleFor: ({ mouse, touchpad }) => (mouse && touchpad ? 'settings-page-mouse' : touchpad ? 'settings-touchpad-title' : 'settings-mouse-title'),
+		needs: { present: (hardware) => hardware.mouse || hardware.touchpad, missing: 'settings-mouse-missing' }
 	},
 	accessibility: { icon: Accessibility, load: () => import('./personalization/accessibility/AccessibilityPanel.svelte') },
 	apps: { icon: LayoutGrid, load: () => import('./system/apps/AppsPanel.svelte') },
 	privacy: { icon: Hand, load: () => import('./protection/privacy/PrivacyPanel.svelte') },
 	security: { icon: ShieldCheck, load: () => import('./protection/security/SecurityPanel.svelte') },
+	region: { icon: Globe, load: () => import('./system/region/RegionPanel.svelte') },
 	datetime: { icon: CalendarClock, load: () => import('./system/datetime/DateTimePanel.svelte') },
 	users: { icon: UserRound, load: () => import('./system/users/UsersPanel.svelte') },
 	accounts: { icon: Cloud, load: accounts },
@@ -88,10 +90,7 @@ const VIEWS: Record<PageId, View> = {
 	'accounts/add': { icon: Plus, load: accounts }
 };
 
-const panelOf = (page: Page): Panel => {
-	const view = VIEWS[page.id];
-	return { ...page, ...view, title: view.title ?? page.title };
-};
+const panelOf = (page: Page): Panel => ({ ...page, ...VIEWS[page.id] });
 
 const PANEL_GROUPS: Panel[][] = PANEL_PAGES.map((group) => group.map(panelOf));
 
@@ -116,7 +115,7 @@ export function resolveLink(target: string): Link | null {
 }
 
 export function titleOf(panel: Panel, hardware: Hardware) {
-	return typeof panel.title === 'string' ? panel.title : panel.title(hardware);
+	return t(panel.titleFor?.(hardware) ?? panel.title);
 }
 
 export function isShown(panel: Panel, hardware: Hardware) {
@@ -128,12 +127,11 @@ export function shownGroups(hardware: Hardware) {
 }
 
 export function searchPanels(query: string, hardware: Hardware): Panel[] {
-	const needle = query.trim().toLowerCase();
+	const needle = query.trim().toLocaleLowerCase();
+	const inEnglish = english.translate;
 	return [...PANELS, ...SUBPAGE_PANELS].filter(
 		(panel) =>
 			isShown(panel, hardware) &&
-			[titleOf(panel, hardware), ...panel.keywords, ...(hardware.copilotKey ? (panel.copilotKeyKeywords ?? []) : [])].some((term) =>
-				term.toLowerCase().includes(needle)
-			)
+			[titleOf(panel, hardware), ...pageKeywords(panel, hardware.copilotKey, t, inEnglish)].some((term) => term.toLocaleLowerCase().includes(needle))
 	);
 }

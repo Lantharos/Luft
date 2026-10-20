@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import Plus from '@lucide/svelte/icons/plus';
 	import { AppIcon, ItemRow, Row, Section, Switch } from '@luft/ui';
 	import ChooseAppDialog from './ChooseAppDialog.svelte';
@@ -29,22 +30,22 @@
 	void load();
 </script>
 
-<Section title="Startup" description="These apps open when you sign in">
+<Section title={t('settings-apps-startup')} description={t('settings-apps-startup-description')}>
 	{#each apps as app (app.id)}
 		<ItemRow title={app.name}>
 			{#snippet leading()}
 				<AppIcon icon={app.icon} id={app.id} />
 			{/snippet}
-			<Switch label="Open {app.name} when you sign in" checked={app.enabled} onchange={(enabled) => toggle(app, enabled)} />
+			<Switch label={t('settings-apps-startup-app', { app: app.name })} checked={app.enabled} onchange={(enabled) => toggle(app, enabled)} />
 		</ItemRow>
 	{/each}
-	<Row title="Add app" icon={Plus} onclick={() => (adding = true)} />
+	<Row title={t('settings-apps-startup-add')} icon={Plus} onclick={() => (adding = true)} />
 </Section>
 
 {#if adding}
 	<ChooseAppDialog
-		title="Add a startup app"
-		description="Choose an app to open every time you sign in."
+		title={t('settings-apps-startup-add-title')}
+		description={t('settings-apps-startup-add-description')}
 		exclude={apps.filter((app) => app.enabled).map((app) => app.id)}
 		onchoose={add}
 		onclose={() => (adding = false)}

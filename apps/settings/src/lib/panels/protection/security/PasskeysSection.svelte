@@ -3,14 +3,15 @@
 	import KeyRound from '@lucide/svelte/icons/key-round';
 	import Pencil from '@lucide/svelte/icons/pencil';
 	import Trash from '@lucide/svelte/icons/trash';
+	import { t } from '@luft/i18n';
 	import { ago, Dialog, IconButton, Row, Section } from '@luft/ui';
 	import { accountLabel, deletePasskey, onPasskeys, passkeys, siteLabel, type Passkey, type Passkeys } from './passkeys/api';
 	import RenameDialog from './passkeys/RenameDialog.svelte';
 
-	const SEALED = {
-		chip: 'Sealed by this computer’s security chip.',
-		password: 'Encrypted with your password.'
-	};
+	const PROTECTION = {
+		chip: { fingerprint: 'settings-passkeys-chip-fingerprint', password: 'settings-passkeys-chip-password' },
+		password: { fingerprint: 'settings-passkeys-password-fingerprint', password: 'settings-passkeys-password' }
+	} as const;
 
 	let { fingerprintReader }: { fingerprintReader: boolean } = $props();
 
@@ -31,13 +32,13 @@
 	}
 
 	function protection({ protection }: Passkeys) {
-		if (protection === 'unavailable') return 'Unlock your keyring to see your passkeys.';
-		return `${SEALED[protection]} Each sign-in asks for your ${fingerprintReader ? 'fingerprint or password' : 'password'}.`;
+		if (protection === 'unavailable') return t('settings-passkeys-unavailable');
+		return t(PROTECTION[protection][fingerprintReader ? 'fingerprint' : 'password']);
 	}
 
 	function details(passkey: Passkey) {
-		const parts = [accountLabel(passkey), passkey.used ? `Last used ${ago(passkey.used)}` : 'Never used'];
-		if (current?.protection === 'chip' && !passkey.chip) parts.push('Protected by your password');
+		const parts = [accountLabel(passkey), passkey.used ? t('settings-passkeys-last-used', { when: ago(passkey.used) }) : t('settings-passkeys-never-used')];
+		if (current?.protection === 'chip' && !passkey.chip) parts.push(t('settings-passkeys-password-only'));
 		return parts.filter(Boolean).join(' · ');
 	}
 
@@ -56,18 +57,18 @@
 </script>
 
 {#if current}
-	<Section title="Passkeys" description={protection(current)}>
+	<Section title={t('settings-passkeys-title')} description={protection(current)}>
 		{#if !current.ready && current.protection !== 'unavailable'}
-			<Row title="Browsers can’t reach your passkeys" description="They’re back once the passkey service is running" />
+			<Row title={t('settings-passkeys-unreachable')} description={t('settings-passkeys-unreachable-description')} />
 		{/if}
 		{#each sorted as passkey (passkey.id)}
 			<Row title={siteLabel(passkey)} description={details(passkey)} icon={KeyRound} truncate>
-				<IconButton icon={Pencil} label="Rename passkey for {siteLabel(passkey)}" onclick={() => (renaming = passkey)} />
-				<IconButton icon={Trash} label="Remove passkey for {siteLabel(passkey)}" onclick={() => (removing = passkey)} />
+				<IconButton icon={Pencil} label={t('settings-passkeys-rename-label', { site: siteLabel(passkey) })} onclick={() => (renaming = passkey)} />
+				<IconButton icon={Trash} label={t('settings-passkeys-remove-label', { site: siteLabel(passkey) })} onclick={() => (removing = passkey)} />
 			</Row>
 		{:else}
 			{#if current.protection !== 'unavailable'}
-				<Row title="No passkeys yet" description="Ones that sites create are saved here for every browser" />
+				<Row title={t('settings-passkeys-empty')} description={t('settings-passkeys-empty-description')} />
 			{/if}
 		{/each}
 	</Section>
@@ -84,13 +85,13 @@
 {#if removing}
 	{@const passkey = removing}
 	<Dialog
-		title="Remove this passkey?"
-		description="You won’t be able to sign in to {siteLabel(passkey)} with it anymore, so make sure you have another way in."
+		title={t('settings-passkeys-remove-title')}
+		description={t('settings-passkeys-remove-description', { site: siteLabel(passkey) })}
 		onclose={() => (removing = null)}
 	>
 		{#snippet actions()}
-			<button type="button" class="button" onclick={() => (removing = null)}>Cancel</button>
-			<button type="button" class="button danger" onclick={() => remove(passkey)}>Remove</button>
+			<button type="button" class="button" onclick={() => (removing = null)}>{t('settings-protection-cancel')}</button>
+			<button type="button" class="button danger" onclick={() => remove(passkey)}>{t('settings-protection-remove')}</button>
 		{/snippet}
 	</Dialog>
 {/if}

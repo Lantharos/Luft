@@ -1,16 +1,15 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { onDestroy } from 'svelte';
 	import { Row, Section, Slider } from '@luft/ui';
 	import { percent } from '#lib/format.js';
 	import { loadBrightness, onBrightnessChanged, setBrightness, type Brightness, type ExternalBrightness, type Monitor } from './api';
 
 	const SETUP: Partial<Record<ExternalBrightness, string>> = {
-		'missing-tool': 'Install ddcutil to change their brightness here',
-		'needs-restart': 'Restart to finish setting up their brightness',
-		'no-access': 'Sign out and back in to change their brightness here'
+		'missing-tool': 'settings-display-brightness-missing-tool',
+		'needs-restart': 'settings-display-brightness-needs-restart',
+		'no-access': 'settings-display-brightness-no-access'
 	};
-	const UNSUPPORTED = 'Turn on DDC/CI in the display’s menu to change it here';
-	const UNRESPONSIVE = 'Not responding right now, trying again shortly';
 	const SETTLED = 0.02;
 	const HOLD = 1500;
 
@@ -54,7 +53,7 @@
 </script>
 
 {#if shown.length || waiting.length}
-	<Section title="Brightness">
+	<Section title={t('settings-display-brightness')}>
 		{#each shown as monitor (monitor.connector)}
 			{@const control = brightness!.displays[monitor.connector]}
 			{#if control.state === 'ready'}
@@ -63,7 +62,7 @@
 					<span class="w-11 text-right tabular-nums">{percent(level)}</span>
 					{#snippet below()}
 						<Slider
-							label="{monitor.name} brightness"
+							label={t('settings-display-brightness-label', { name: monitor.name })}
 							value={level}
 							format={percent}
 							oninput={(value) => change(monitor.connector, value)}
@@ -72,11 +71,11 @@
 					{/snippet}
 				</Row>
 			{:else}
-				<Row title={monitor.name} description={control.state === 'unsupported' ? UNSUPPORTED : UNRESPONSIVE} />
+				<Row title={monitor.name} description={control.state === 'unsupported' ? t('settings-display-brightness-unsupported') : t('settings-display-brightness-unresponsive')} />
 			{/if}
 		{/each}
 		{#if waiting.length}
-			<Row title={waiting.length === 1 ? waiting[0].name : 'External displays'} description={setup} />
+			<Row title={waiting.length === 1 ? waiting[0].name : t('settings-display-brightness-external')} description={setup && t(setup)} />
 		{/if}
 	</Section>
 {/if}

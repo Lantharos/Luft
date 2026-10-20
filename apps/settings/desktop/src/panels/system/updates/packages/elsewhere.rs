@@ -1,7 +1,9 @@
 use luft_app::dbus;
+use luft_i18n::t;
 use luft_software::progress::Change;
 
 use super::super::state::{Activity, Elsewhere, Kind};
+use crate::L10N;
 
 const SETTINGS: &str = "settings";
 
@@ -35,7 +37,7 @@ pub fn display_name(command: &str) -> Option<String> {
         "pkcon" => "pkcon",
         "gnome-software" => "GNOME Software",
         "plasma-discover" => "Discover",
-        _ => "another app",
+        _ => return Some(t!(L10N, "desktop-updates-another-app")),
     };
     Some(name.into())
 }

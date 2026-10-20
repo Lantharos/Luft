@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { AppIcon, ItemRow, Section } from '@luft/ui';
 	import { forgetApp, type AppStore } from '../api';
 	import ConfirmDialog from '../ConfirmDialog.svelte';
@@ -7,21 +8,19 @@
 
 	let forgetting = $state<AppStore | null>(null);
 
-	const saved = (count: number) => (count === 1 ? '1 saved sign-in' : `${count} saved sign-ins`);
-
 	async function forget(store: AppStore) {
 		await forgetApp(store.key);
 		await refresh();
 	}
 </script>
 
-<Section title="App sign-ins" description="Sign-ins some apps keep here, where only that app can read them.">
+<Section title={t('settings-passwords-stores')} description={t('settings-passwords-stores-description')}>
 	{#each stores as store (store.key)}
-		<ItemRow title={store.name} description={saved(store.secrets)}>
+		<ItemRow title={store.name} description={t('settings-passwords-stores-count', { count: store.secrets })}>
 			{#snippet leading()}
 				<AppIcon icon={store.icon} id={store.id ?? undefined} />
 			{/snippet}
-			<button type="button" class="button" onclick={() => (forgetting = store)}>Forget</button>
+			<button type="button" class="button" onclick={() => (forgetting = store)}>{t('settings-passwords-forget')}</button>
 		</ItemRow>
 	{/each}
 </Section>
@@ -29,9 +28,9 @@
 {#if forgetting}
 	{@const store = forgetting}
 	<ConfirmDialog
-		title="Forget what {store.name} saved?"
-		description="{store.name} loses the sign-ins it kept here, so you may need to sign in to it again."
-		action="Forget"
+		title={t('settings-passwords-forget-title', { app: store.name })}
+		description={t('settings-passwords-forget-description', { app: store.name })}
+		action={t('settings-passwords-forget')}
 		run={() => forget(store)}
 		onclose={() => (forgetting = null)}
 	/>

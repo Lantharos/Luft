@@ -1,7 +1,8 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { ago, bytes, Row, Section } from '@luft/ui';
 	import { download, restart, rollback, type Activity, type ImageOverview, type Release } from '../api';
-	import { versionName } from '../headline';
+	import { named, versionName } from '../headline';
 	import NotesDialog from './NotesDialog.svelte';
 	import VariantRow from './VariantRow.svelte';
 
@@ -19,49 +20,49 @@
 	const next = $derived(overview.switching ? null : (overview.available ?? overview.staged));
 	const ready = $derived(next !== null && next === overview.staged);
 
-	const released = (release: Release) => (release.released ? `Released ${ago(release.released)}` : null);
+	const released = (release: Release) => (release.released ? t('settings-updates-released', { when: ago(release.released) }) : null);
 
-	const summary = (release: Release) => release.notes?.split('\n').find((line) => line.trim())?.trim() ?? 'Fixes and improvements across the system';
+	const summary = (release: Release) => release.notes?.split('\n').find((line) => line.trim())?.trim() ?? t('settings-updates-improvements');
 
 	function describeNext(release: Release) {
-		const size = ready || !overview.available?.size ? null : `${bytes(overview.available.size)} to download`;
-		const replaces = !ready && overview.staged ? `Replaces ${versionName(overview.staged).toLowerCase()}, which is waiting to install` : null;
+		const size = ready || !overview.available?.size ? null : t('settings-updates-download-size', { size: bytes(overview.available.size) });
+		const replaces = !ready && overview.staged ? named(overview.staged, 'settings-updates-replaces', 'settings-updates-replaces-new') : null;
 		return [versionName(release), released(release), size, replaces].filter(Boolean).join(' · ');
 	}
 </script>
 
 {#if overview.returning}
 	<Section>
-		<Row title={versionName(overview.returning)} description="The version you had before. Your files and settings stay as they are.">
-			<button type="button" class="button" disabled={busy} onclick={() => attempt(rollback)}>Stay on {overview.current.version ?? 'this version'}</button>
-			<button type="button" class="button primary" disabled={busy} onclick={() => attempt(restart)}>Restart</button>
+		<Row title={versionName(overview.returning)} description={t('settings-updates-returning-description')}>
+			<button type="button" class="button" disabled={busy} onclick={() => attempt(rollback)}>{named(overview.current, 'settings-updates-stay', 'settings-updates-stay-unversioned')}</button>
+			<button type="button" class="button primary" disabled={busy} onclick={() => attempt(restart)}>{t('settings-updates-restart')}</button>
 		</Row>
 	</Section>
 {:else if next}
 	<Section>
 		<Row title={summary(next)} description={describeNext(next)} truncate>
 			{#if ready}
-				<button type="button" class="button primary" disabled={busy} onclick={() => attempt(restart)}>Restart to install</button>
+				<button type="button" class="button primary" disabled={busy} onclick={() => attempt(restart)}>{t('settings-updates-restart-to-install')}</button>
 			{:else if activity.running !== 'download'}
-				<button type="button" class="button primary" disabled={busy} onclick={() => attempt(download)}>Download</button>
+				<button type="button" class="button primary" disabled={busy} onclick={() => attempt(download)}>{t('settings-updates-download')}</button>
 			{/if}
 		</Row>
 		{#if next.notes}
-			<Row title="See what's new" onclick={() => (notes = next)} />
+			<Row title={t('settings-updates-see-new')} onclick={() => (notes = next)} />
 		{/if}
 	</Section>
 {/if}
 
-<Section title="This computer">
-	<Row title="Installed version" description={[overview.current.version, released(overview.current)].filter(Boolean).join(' · ') || 'Unknown'}>
+<Section title={t('settings-updates-this-computer')}>
+	<Row title={t('settings-updates-installed-version')} description={[overview.current.version, released(overview.current)].filter(Boolean).join(' · ') || t('settings-updates-unknown')}>
 		{#if overview.current.notes}
-			<button type="button" class="button" onclick={() => (notes = overview.current)}>What's new</button>
+			<button type="button" class="button" onclick={() => (notes = overview.current)}>{t('settings-updates-whats-new')}</button>
 		{/if}
 	</Row>
 	<VariantRow {overview} {activity} {attempt} />
 	{#if overview.previous && !overview.returning}
-		<Row title="Go back to the previous version" description="{versionName(overview.previous)}. Your files and settings stay as they are.">
-			<button type="button" class="button" disabled={busy} onclick={() => attempt(rollback)}>Go back</button>
+		<Row title={t('settings-updates-go-back-title')} description={named(overview.previous, 'settings-updates-previous', 'settings-updates-previous-unversioned')}>
+			<button type="button" class="button" disabled={busy} onclick={() => attempt(rollback)}>{t('settings-updates-go-back')}</button>
 		</Row>
 	{/if}
 </Section>

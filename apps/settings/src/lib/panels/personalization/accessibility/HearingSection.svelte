@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Row, Section, Segmented, Switch } from '@luft/ui';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 
@@ -12,17 +13,17 @@
 	let flashing = $derived(bell.values['visual-bell'] ?? false);
 </script>
 
-<Section title="Hearing">
-	<Row title="Flash for alert sounds">
-		<Switch label="Flash for alert sounds" checked={flashing} onchange={(on) => bell.set('visual-bell', on)} />
+<Section title={t('settings-accessibility-hearing')}>
+	<Row title={t('settings-accessibility-flash')}>
+		<Switch label={t('settings-accessibility-flash')} checked={flashing} onchange={(on) => bell.set('visual-bell', on)} />
 	</Row>
 	{#if flashing}
-		<Row title="Flash">
+		<Row title={t('settings-accessibility-flash-type')}>
 			<Segmented
-				label="Flash"
+				label={t('settings-accessibility-flash-type')}
 				options={[
-					{ value: 'frame-flash', label: 'Window' },
-					{ value: 'fullscreen-flash', label: 'Screen' }
+					{ value: 'frame-flash', label: t('settings-accessibility-flash-window') },
+					{ value: 'fullscreen-flash', label: t('settings-accessibility-flash-screen') }
 				]}
 				value={bell.values['visual-bell-type'] === 'fullscreen-flash' ? 'fullscreen-flash' : 'frame-flash'}
 				onchange={(type) => bell.set('visual-bell-type', type)}

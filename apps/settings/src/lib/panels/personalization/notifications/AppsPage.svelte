@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { SearchField, Section } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
 	import { matches } from '../../system/apps/api';
@@ -21,15 +22,15 @@
 	let shown = $derived(apps.filter((app) => matches(app, query)));
 </script>
 
-<SubPage title="App notifications" back="Notifications" {onclose}>
+<SubPage title={t('settings-notifications-apps')} back={t('settings-notifications-back')} {onclose}>
 	{#if apps.length > SEARCH_THRESHOLD}
-		<SearchField label="Search apps" bind:value={query} />
+		<SearchField label={t('settings-notifications-search')} bind:value={query} />
 	{/if}
 	<Section>
 		{#each shown as app (app.path)}
 			<AppNotifications {app} {lockScreen} {hasRules} />
 		{:else}
-			<p class="px-4 py-5 text-center text-[13px] text-[var(--text-muted)]">No apps match your search</p>
+			<p class="px-4 py-5 text-center text-[13px] text-[var(--text-muted)]">{t('settings-notifications-no-match')}</p>
 		{/each}
 	</Section>
 </SubPage>

@@ -1,5 +1,7 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Row, Section } from '@luft/ui';
+	import { percent } from '#lib/format.js';
 	import { activate, deactivate, disconnect, type Link, type Network } from '../api';
 	import { bandLabel, detailRows, linkLabel, securityLabel, signalLabel, speedLabel, type DetailRow } from '../describe';
 	import type { Target } from './profile';
@@ -26,13 +28,13 @@
 			const wifi = network.wifi;
 			const found = wifi?.networks.find((candidate) => candidate.ssid === target.ssid);
 			if (!wifi || !found) return null;
-			const rows: DetailRow[] = [['Signal', `${signalLabel(found.strength)} (${found.strength}%)`]];
+			const rows: DetailRow[] = [[t('settings-network-detail-signal'), t('settings-network-signal', { quality: signalLabel(found.strength), strength: percent(found.strength / 100) })]];
 			if (found.radio) {
-				rows.push(['Band', bandLabel(found.radio.frequency)]);
-				if (found.radio.bitrate) rows.push(['Link speed', speedLabel(found.radio.bitrate)]);
-				rows.push(['Access point', found.radio.bssid]);
+				rows.push([t('settings-network-detail-band'), bandLabel(found.radio.frequency)]);
+				if (found.radio.bitrate) rows.push([t('settings-network-detail-speed'), speedLabel(found.radio.bitrate)]);
+				rows.push([t('settings-network-detail-access-point'), found.radio.bssid]);
 			}
-			rows.push(['Security', securityLabel(found.security)]);
+			rows.push([t('settings-network-detail-security'), securityLabel(found.security)]);
 			return {
 				state: found.state,
 				rows: found.details ? [...rows, ...detailRows(found.details)] : rows,
@@ -43,7 +45,7 @@
 		if (target.kind === 'wired') {
 			const wired = network.wired.find((candidate) => candidate.device === target.device);
 			if (!wired) return null;
-			const speed: DetailRow[] = wired.speed ? [['Link speed', speedLabel(wired.speed)]] : [];
+			const speed: DetailRow[] = wired.speed ? [[t('settings-network-detail-speed'), speedLabel(wired.speed)]] : [];
 			return {
 				state: wired.state,
 				rows: wired.details ? [...speed, ...detailRows(wired.details)] : speed,
@@ -76,9 +78,9 @@
 	<Section>
 		<Row title={linkLabel(current.state)}>
 			{#if current.state === 'disconnected'}
-				<button type="button" class="button" disabled={busy} onclick={() => run(current.connect)}>Connect</button>
+				<button type="button" class="button" disabled={busy} onclick={() => run(current.connect)}>{t('settings-network-connect')}</button>
 			{:else if current.state !== 'unplugged'}
-				<button type="button" class="button" disabled={busy} onclick={() => run(current.disconnect)}>Disconnect</button>
+				<button type="button" class="button" disabled={busy} onclick={() => run(current.disconnect)}>{t('settings-network-disconnect')}</button>
 			{/if}
 		</Row>
 		{#each current.rows as [label, value] (label)}

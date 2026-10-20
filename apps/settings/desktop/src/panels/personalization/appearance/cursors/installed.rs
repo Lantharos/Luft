@@ -2,8 +2,10 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use gio::glib;
+use luft_i18n::t;
 
 use super::themes;
+use crate::L10N;
 
 const RESERVED: [&str; 8] = [
     "hicolor",
@@ -18,7 +20,6 @@ const RESERVED: [&str; 8] = [
 const CURSOR_FOLDERS: [&str; 2] = ["cursors", "cursors_scalable"];
 const FALLBACK_NAME: &str = "cursors";
 const MAX_SUFFIX: u32 = 100;
-const NOT_REMOVABLE: &str = "This theme can't be removed";
 
 pub struct UserThemes {
     icons: PathBuf,
@@ -67,7 +68,7 @@ fn base_name(wanted: &str) -> String {
 
 impl UserThemes {
     pub fn new() -> Result<Self, String> {
-        let data = dirs::data_dir().ok_or("There is no data folder")?;
+        let data = dirs::data_dir().ok_or_else(|| t!(L10N, "desktop-no-data-folder"))?;
         let icons = data.join("icons");
         let neighbors = themes::search_path()
             .into_iter()
@@ -95,7 +96,7 @@ impl UserThemes {
     pub fn remove(&self, name: &str) -> Result<(), String> {
         let dir = self.icons.join(name);
         if !self.removable(&dir) {
-            return Err(NOT_REMOVABLE.into());
+            return Err(t!(L10N, "desktop-cursors-not-removable"));
         }
         fs::remove_dir_all(&dir).map_err(|error| error.to_string())
     }
@@ -115,7 +116,7 @@ impl UserThemes {
         std::iter::once(base.clone())
             .chain((2..=MAX_SUFFIX).map(|number| format!("{base}-{number}")))
             .find(|name| self.available(name))
-            .ok_or_else(|| format!("There's no free name for “{base}” in the icons folder"))
+            .ok_or_else(|| t!(L10N, "desktop-cursors-no-free-name", name = base.as_str()))
     }
 
     fn available(&self, name: &str) -> bool {

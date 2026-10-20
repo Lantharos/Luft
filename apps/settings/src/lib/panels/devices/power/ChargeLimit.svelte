@@ -1,5 +1,7 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Row, Switch } from '@luft/ui';
+	import { percent } from '#lib/format.js';
 	import { setChargeLimit, type ChargeLimit } from './api';
 
 	let { limit }: { limit: ChargeLimit } = $props();
@@ -9,13 +11,15 @@
 
 	let enabled = $derived(pending ?? limit.enabled);
 	let description = $derived.by(() => {
-		if (failed) return "The limit couldn't be changed. Try again.";
+		if (failed) return t('settings-power-limit-failed');
 		if (limit.elsewhere) {
-			if (limit.applied === null) return 'Another app turned it off, so the battery charges fully';
-			return enabled ? `Another app changed the limit to ${limit.applied}%` : `Another app stops charging at ${limit.applied}%`;
+			if (limit.applied === null) return t('settings-power-limit-elsewhere-off');
+			const level = { level: percent(limit.applied / 100) };
+			return enabled ? t('settings-power-limit-elsewhere-changed', level) : t('settings-power-limit-elsewhere-on', level);
 		}
-		if (enabled) return limit.stopsAt === null ? 'Your computer decides when to stop charging' : `Stops charging at ${limit.stopsAt}%`;
-		return limit.stopsAt === null ? 'Stops charging early to help the battery last longer' : `Stops at ${limit.stopsAt}% to help the battery last longer`;
+		if (limit.stopsAt === null) return enabled ? t('settings-power-limit-automatic') : t('settings-power-limit-description');
+		const level = { level: percent(limit.stopsAt / 100) };
+		return enabled ? t('settings-power-limit-stops-at', level) : t('settings-power-limit-description-at', level);
 	});
 
 	$effect(() => {
@@ -35,9 +39,9 @@
 </script>
 
 {#if limit.adjustable}
-	<Row title="Limit charging" {description}>
-		<Switch label="Limit charging" checked={enabled} onchange={toggle} />
+	<Row title={t('settings-power-limit')} {description}>
+		<Switch label={t('settings-power-limit')} checked={enabled} onchange={toggle} />
 	</Row>
 {:else if limit.applied !== null}
-	<Row title="Charging stops at {limit.applied}%" description="Set by another app on this computer" />
+	<Row title={t('settings-power-limit-applied', { level: percent(limit.applied / 100) })} description={t('settings-power-limit-applied-description')} />
 {/if}

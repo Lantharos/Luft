@@ -5,9 +5,12 @@ use futures_util::StreamExt;
 use luft_accounts::client::{self, Signal};
 use luft_accounts::types::{Account, Answer, Credentials, Drive, Provider};
 use luft_app::{Commands, Events, launch};
+use luft_i18n::t;
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
+
+use crate::L10N;
 
 const CHANGED: &str = "accounts.changed";
 const STEP: &str = "accounts.step";
@@ -96,7 +99,7 @@ async fn accounts(events: Events, _: Value) -> Result<Snapshot, String> {
 
 fn open(Address { url, token }: Address) -> Result<(), String> {
     if !url.starts_with("https://") && !url.starts_with("http://") {
-        return Err("That isn't a web address".to_owned());
+        return Err(t!(L10N, "desktop-accounts-not-web-address"));
     }
     launch::open(&url, token.as_deref()).map_err(|error| error.to_string())
 }

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Row, Section } from '@luft/ui';
 	import { app } from '#lib/state/app.svelte.js';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
@@ -32,8 +33,8 @@
 		<CopilotKeySection />
 	{/if}
 	<Section>
-		<Row title="Dictation" description={dictation.values.enabled ? 'On' : 'Off'} onclick={() => (app.section = 'dictation')} />
-		<Row title="Keyboard shortcuts" description="See and change shortcuts, or add your own" onclick={() => (browsing = true)} />
+		<Row title={t('settings-dictation-title')} description={dictation.values.enabled ? t('settings-keyboard-dictation-on') : t('settings-keyboard-dictation-off')} onclick={() => (app.section = 'dictation')} />
+		<Row title={t('settings-shortcuts-title')} description={t('settings-keyboard-shortcuts-description')} onclick={() => (browsing = true)} />
 	</Section>
 {/if}
 

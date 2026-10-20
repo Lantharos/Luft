@@ -1,6 +1,7 @@
 <script lang="ts">
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import { onMount, type Snippet } from 'svelte';
+	import { t } from '@luft/i18n';
 	import { IconButton } from '@luft/ui';
 
 	interface Props {
@@ -24,7 +25,7 @@
 
 <div bind:this={root} class="flex scroll-mt-4 flex-col gap-7">
 	<div class="-mb-2 flex items-center gap-3">
-		<IconButton icon={ArrowLeft} label="Back to {back}" onclick={onclose} />
+		<IconButton icon={ArrowLeft} label={t('settings-subpage-back', { page: back })} onclick={onclose} />
 		<h2 class="min-w-0 flex-1 truncate text-[17px] font-semibold">{title}</h2>
 		{@render actions?.()}
 	</div>

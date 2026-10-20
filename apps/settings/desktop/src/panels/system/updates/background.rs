@@ -5,12 +5,14 @@ use std::time::Duration;
 
 use futures_util::StreamExt;
 use luft_app::dbus::{self, failed};
+use luft_i18n::t;
 use zbus::message::Type;
 use zbus::{MatchRule, MessageStream, Variant};
 
 use super::backend::{self, Notice};
 use super::schedule;
 use super::store::Preferences;
+use crate::L10N;
 
 const NOTIFICATIONS: &str = "org.freedesktop.Notifications";
 const NOTIFICATIONS_PATH: &str = "/org/freedesktop/Notifications";
@@ -88,12 +90,15 @@ pub async fn notify(summary: &str, body: &str) -> Result<(), String> {
             Some(NOTIFICATIONS),
             "Notify",
             &(
-                "Settings",
+                t!(L10N, "desktop-app-name"),
                 0u32,
                 "com.lantharos.settings",
                 summary,
                 body,
-                vec!["default", "Open"],
+                vec![
+                    "default".to_owned(),
+                    t!(L10N, "desktop-updates-notification-open"),
+                ],
                 hints,
                 -1i32,
             ),
@@ -107,7 +112,9 @@ pub async fn notify(summary: &str, body: &str) -> Result<(), String> {
 
 fn check() -> Result<(), String> {
     match backend::current().check_in_background(Preferences::load().download)? {
-        Some(Notice { summary, body }) => luft_app::block_on(notify(summary, body)),
+        Some(Notice { summary, body }) => {
+            luft_app::block_on(notify(&t!(L10N, summary), &t!(L10N, body)))
+        }
         None => Ok(()),
     }
 }

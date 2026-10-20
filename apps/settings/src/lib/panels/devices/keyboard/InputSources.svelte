@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import ArrowDown from '@lucide/svelte/icons/arrow-down';
 	import ArrowUp from '@lucide/svelte/icons/arrow-up';
 	import Pencil from '@lucide/svelte/icons/pencil';
@@ -59,38 +60,38 @@
 
 <svelte:window onfocus={() => void refresh()} />
 
-<Section title="Input sources" description="The first one is used by default. Switch between them while you type.">
+<Section title={t('settings-keyboard-sources')} description={t('settings-keyboard-sources-description')}>
 	{#each sources as [type, id], index (`${type}:${id}`)}
 		{@const source = known.get(`${type}:${id}`)}
 		<Row title={source?.name ?? id}>
 			{#if keys && source?.link}
 				{@const link = source.link}
-				<IconButton icon={Pencil} label="Edit in Keys" onclick={() => void openKeys(link)} />
+				<IconButton icon={Pencil} label={t('settings-keyboard-source-edit')} onclick={() => void openKeys(link)} />
 			{/if}
-			<IconButton icon={ArrowUp} label="Move up" disabled={index === 0} onclick={() => move(index, -1)} />
-			<IconButton icon={ArrowDown} label="Move down" disabled={index === sources.length - 1} onclick={() => move(index, 1)} />
-			<IconButton icon={X} label="Remove" disabled={sources.length === 1} onclick={() => remove(index)} />
+			<IconButton icon={ArrowUp} label={t('settings-keyboard-source-up')} disabled={index === 0} onclick={() => move(index, -1)} />
+			<IconButton icon={ArrowDown} label={t('settings-keyboard-source-down')} disabled={index === sources.length - 1} onclick={() => move(index, 1)} />
+			<IconButton icon={X} label={t('settings-keyboard-source-remove')} disabled={sources.length === 1} onclick={() => remove(index)} />
 		</Row>
 	{/each}
 	<div class="p-2">
 		<button type="button" class="plain-button" onclick={() => (adding = true)}>
 			<Plus size={16} />
-			Add input source
+			{t('settings-keyboard-add-source-button')}
 		</button>
 	</div>
 </Section>
 
 {#if keys}
-	<Section title="Your own layouts and input methods">
-		<Row title="Make a layout" description="Start from a layout and change what its keys type" onclick={() => void openKeys(`kestrel-keys:layout/new?from=${encodeURIComponent(firstLayout)}`)} />
-		<Row title="Make an input method" description="Turn what you type into accents, other scripts or words to choose from" onclick={() => void openKeys('kestrel-keys:method/new')} />
-		<Row title="Open Keys" description="Edit the layouts and input methods you've made" onclick={() => void openKeys('kestrel-keys:')} />
+	<Section title={t('settings-keyboard-own')}>
+		<Row title={t('settings-keyboard-own-layout')} description={t('settings-keyboard-own-layout-description')} onclick={() => void openKeys(`kestrel-keys:layout/new?from=${encodeURIComponent(firstLayout)}`)} />
+		<Row title={t('settings-keyboard-own-method')} description={t('settings-keyboard-own-method-description')} onclick={() => void openKeys('kestrel-keys:method/new')} />
+		<Row title={t('settings-keyboard-own-open')} description={t('settings-keyboard-own-open-description')} onclick={() => void openKeys('kestrel-keys:')} />
 	</Section>
 {/if}
 
 {#if switcher && sources.length > 1}
 	<Section>
-		<Row title="Switch input source">
+		<Row title={t('settings-keyboard-switch-source')}>
 			<ShortcutButton accelerators={switcher.accelerators} label={switcher.name} onclick={() => onrecord(switcher)} />
 		</Row>
 	</Section>

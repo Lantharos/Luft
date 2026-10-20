@@ -6,6 +6,10 @@ use std::process::{Child, Command, Stdio};
 use std::ptr;
 use std::time::Duration;
 
+use luft_i18n::t;
+
+use crate::L10N;
+
 const READ_LIMIT: Duration = Duration::from_secs(30);
 
 pub struct Terminal {
@@ -78,7 +82,7 @@ impl Terminal {
         if ready == 0 {
             return Err(io::Error::new(
                 io::ErrorKind::TimedOut,
-                "passwd stopped responding",
+                t!(L10N, "desktop-users-password-timed-out"),
             ));
         }
         let mut buffer = [0; 1024];

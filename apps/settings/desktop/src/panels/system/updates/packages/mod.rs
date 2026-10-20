@@ -2,6 +2,7 @@ mod elsewhere;
 mod watch;
 
 use futures_util::future::join;
+use luft_i18n::t;
 use luft_software::packagekit::{self, Mode, PackageId, Results, Update, offline};
 use luft_software::progress::Progress;
 use luft_software::task::{Cancel, Task};
@@ -12,6 +13,7 @@ use super::backend::{AVAILABLE, Backend, Notice, READY};
 use super::overview::{Loaded, System};
 use super::state;
 use super::store::Checked;
+use crate::L10N;
 
 #[derive(Serialize, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -112,7 +114,7 @@ impl Backend for Packages {
     }
 
     fn rollback(&self, _: Task) -> Result<(), String> {
-        Err("This system can't go back to an earlier version.".into())
+        Err(t!(L10N, "desktop-updates-no-rollback"))
     }
 
     fn check_in_background(&self, download: bool) -> Result<Option<Notice>, String> {

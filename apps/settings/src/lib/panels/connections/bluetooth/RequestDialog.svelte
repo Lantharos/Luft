@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Dialog } from '@luft/ui';
 	import { answer, cancelPairing, type PairingRequest } from './api';
 
@@ -11,17 +12,37 @@
 
 	let value = $state('');
 
-	let name = $derived(request.name || 'the device');
+	let name = $derived(request.name || t('settings-bluetooth-request-unnamed'));
 	let asksForValue = $derived(request.kind === 'pin' || request.kind === 'passkey');
 	let ready = $derived(!asksForValue || (request.kind === 'passkey' ? /^\d{1,6}$/.test(value.trim()) : value.trim().length > 0));
 
 	let copy = $derived(
 		{
-			confirm: { title: `Pair with ${name}?`, description: `Make sure ${name} shows the same code.`, accept: 'Pair' },
-			authorize: { title: `Allow ${name} to pair?`, description: `${name} will be able to connect to this computer.`, accept: 'Allow' },
-			pin: { title: `Enter the PIN for ${name}`, description: "It's often 0000 or 1234. The device's manual will have it if neither works.", accept: 'Pair' },
-			passkey: { title: `Enter the code shown on ${name}`, description: 'Type the six digits exactly as they appear.', accept: 'Pair' },
-			display: { title: `Pair with ${name}`, description: `Type this code on ${name}, then press Enter.`, accept: null }
+			confirm: {
+				title: t('settings-bluetooth-request-confirm', { name }),
+				description: t('settings-bluetooth-request-confirm.description', { name }),
+				accept: t('settings-bluetooth-pair')
+			},
+			authorize: {
+				title: t('settings-bluetooth-request-authorize', { name }),
+				description: t('settings-bluetooth-request-authorize.description', { name }),
+				accept: t('settings-bluetooth-allow')
+			},
+			pin: {
+				title: t('settings-bluetooth-request-pin', { name }),
+				description: t('settings-bluetooth-request-pin.description'),
+				accept: t('settings-bluetooth-pair')
+			},
+			passkey: {
+				title: t('settings-bluetooth-request-passkey', { name }),
+				description: t('settings-bluetooth-request-passkey.description'),
+				accept: t('settings-bluetooth-pair')
+			},
+			display: {
+				title: t('settings-bluetooth-request-display', { name }),
+				description: t('settings-bluetooth-request-display.description', { name }),
+				accept: null
+			}
 		}[request.kind]
 	);
 
@@ -49,7 +70,7 @@
 		/>
 	{/if}
 	{#snippet actions()}
-		<button type="button" class="button" onclick={() => respond(false)}>Cancel</button>
+		<button type="button" class="button" onclick={() => respond(false)}>{t('settings-bluetooth-cancel')}</button>
 		{#if copy.accept}
 			<button type="button" class="button primary" disabled={!ready} onclick={() => respond(true)}>{copy.accept}</button>
 		{/if}

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { fileUrl } from '@lantharos/sabine';
 	import { Row, Section, Segmented } from '@luft/ui';
 	import { thumbnail } from '../../personalization/appearance/wallpaper/api';
@@ -28,27 +29,27 @@
 
 <Section>
 	<Row
-		title="Wallpaper"
-		description={wallpaper ? 'Everyone sees the same picture before they sign in' : 'Everyone sees their own wallpaper when they choose their account'}
+		title={t('settings-login-wallpaper')}
+		description={wallpaper ? t('settings-login-wallpaper-shared-description') : t('settings-login-wallpaper-own-description')}
 	>
 		<Segmented
-			label="Login screen wallpaper"
+			label={t('settings-login-wallpaper-label')}
 			options={[
-				{ value: 'own', label: 'Their own' },
-				{ value: 'shared', label: 'Same for everyone' }
+				{ value: 'own', label: t('settings-login-wallpaper-own') },
+				{ value: 'shared', label: t('settings-login-wallpaper-shared') }
 			]}
 			value={wallpaper ? 'shared' : 'own'}
 			onchange={pick}
 		/>
 	</Row>
 	{#if wallpaper}
-		<Row title="Picture" description="Shown behind the login screen">
+		<Row title={t('settings-login-picture')} description={t('settings-login-picture-description')}>
 			<span class="preview">
 				{#if preview}
 					<img src={preview} alt="" decoding="async" />
 				{/if}
 			</span>
-			<button type="button" class="button" onclick={onchoose}>Change</button>
+			<button type="button" class="button" onclick={onchoose}>{t('settings-login-picture-change')}</button>
 		</Row>
 	{/if}
 </Section>

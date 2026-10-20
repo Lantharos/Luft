@@ -5,9 +5,11 @@ use std::time::UNIX_EPOCH;
 
 use image::RgbaImage;
 use image::imageops::{self, FilterType};
+use luft_i18n::t;
 use serde::Deserialize;
 
 use super::xcursor;
+use crate::L10N;
 
 const CELL: u32 = 64;
 const CONTENT: u32 = 44;
@@ -49,7 +51,7 @@ fn cached_path(theme: &Path) -> Result<PathBuf, String> {
     theme.hash(&mut hasher);
     modified(&theme.join("cursors")).hash(&mut hasher);
     Ok(dirs::cache_dir()
-        .ok_or("There is no cache folder")?
+        .ok_or_else(|| t!(L10N, "desktop-no-cache-folder"))?
         .join("com.lantharos.settings")
         .join("cursors")
         .join(format!("{:016x}.png", hasher.finish())))
@@ -105,8 +107,13 @@ pub fn preview(Theme { path }: Theme) -> Result<String, String> {
     let theme = Path::new(&path);
     let target = cached_path(theme)?;
     if !target.exists() {
-        let strip = render(theme).ok_or("This theme has no cursors to show")?;
-        fs::create_dir_all(target.parent().ok_or("There is no cache folder")?).map_err(failed)?;
+        let strip = render(theme).ok_or_else(|| t!(L10N, "desktop-cursors-nothing-to-preview"))?;
+        fs::create_dir_all(
+            target
+                .parent()
+                .ok_or_else(|| t!(L10N, "desktop-no-cache-folder"))?,
+        )
+        .map_err(failed)?;
         strip.save(&target).map_err(failed)?;
     }
     Ok(target.to_string_lossy().into_owned())

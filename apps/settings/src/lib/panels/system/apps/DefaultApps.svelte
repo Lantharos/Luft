@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import type { Component } from 'svelte';
 	import Calendar from '@lucide/svelte/icons/calendar';
 	import FileText from '@lucide/svelte/icons/file-text';
@@ -12,14 +13,14 @@
 	import { defaults, setDefault, type Category, type Handler } from './api';
 
 	const CATEGORIES: Record<Category, { title: string; icon: Component }> = {
-		browser: { title: 'Web browser', icon: Globe },
-		email: { title: 'Email', icon: Mail },
-		calendar: { title: 'Calendar', icon: Calendar },
-		music: { title: 'Music', icon: Music },
-		video: { title: 'Videos', icon: Film },
-		photos: { title: 'Photos', icon: Image },
-		text: { title: 'Text editor', icon: FileText },
-		files: { title: 'Files', icon: Folder }
+		browser: { title: 'settings-apps-browser', icon: Globe },
+		email: { title: 'settings-apps-email', icon: Mail },
+		calendar: { title: 'settings-apps-calendar', icon: Calendar },
+		music: { title: 'settings-apps-music', icon: Music },
+		video: { title: 'settings-apps-videos', icon: Film },
+		photos: { title: 'settings-apps-photos', icon: Image },
+		text: { title: 'settings-apps-text-editor', icon: FileText },
+		files: { title: 'settings-apps-files', icon: Folder }
 	};
 
 	let handlers = $state<Handler[]>([]);
@@ -42,17 +43,17 @@
 	void load();
 </script>
 
-<Section title="Default apps" description="Used when you open links, files, and folders">
+<Section title={t('settings-apps-defaults')} description={t('settings-apps-defaults-description')}>
 	{#each choosable as handler (handler.category)}
 		{@const category = CATEGORIES[handler.category]}
 		{@const current = handler.apps.find((app) => app.id === handler.current)}
-		<Row title={category.title} icon={category.icon}>
+		<Row title={t(category.title)} icon={category.icon}>
 			{#if current}
 				<AppIcon icon={current.icon} id={current.id} size={24} />
 			{/if}
 			<Select
-				label={category.title}
-				placeholder="Choose"
+				label={t(category.title)}
+				placeholder={t('settings-apps-choose')}
 				options={handler.apps.map((app) => ({ value: app.id, label: app.name }))}
 				value={handler.current ?? ''}
 				onchange={(app) => choose(handler, app)}

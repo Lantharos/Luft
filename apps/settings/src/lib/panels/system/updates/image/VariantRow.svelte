@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { bytes, Row } from '@luft/ui';
 	import { restart, switchVariant, type Activity, type ImageOverview, type Variant, type VariantOffer } from '../api';
 
@@ -11,34 +12,34 @@
 	let { overview, activity, attempt }: Props = $props();
 
 	const TITLES: Record<Variant, string> = {
-		nvidia: "Use NVIDIA's driver",
-		standard: 'Switch to the standard image'
+		nvidia: 'settings-updates-variant-nvidia',
+		standard: 'settings-updates-variant-standard'
 	};
 
 	const READY: Record<Variant, string> = {
-		nvidia: "NVIDIA's driver is ready",
-		standard: 'The standard image is ready'
+		nvidia: 'settings-updates-nvidia-ready',
+		standard: 'settings-updates-standard-ready'
 	};
 
 	const REASONS: Record<Variant, string> = {
-		nvidia: 'Full speed from your NVIDIA graphics',
-		standard: 'Smaller, as this computer has no NVIDIA graphics'
+		nvidia: 'settings-updates-variant-nvidia-reason',
+		standard: 'settings-updates-variant-standard-reason'
 	};
 
 	const busy = $derived(activity.running !== null);
 
-	const describe = (offer: VariantOffer) => [REASONS[offer.to], offer.size ? `${bytes(offer.size)} to download` : null].filter(Boolean).join(' · ');
+	const describe = (offer: VariantOffer) => [t(REASONS[offer.to]), offer.size ? t('settings-updates-download-size', { size: bytes(offer.size) }) : null].filter(Boolean).join(' · ');
 </script>
 
 {#if overview.switching}
-	<Row title={TITLES[overview.switching]} description={READY[overview.switching]}>
-		<button type="button" class="button primary" disabled={busy} onclick={() => attempt(restart)}>Restart</button>
+	<Row title={t(TITLES[overview.switching])} description={t(READY[overview.switching])}>
+		<button type="button" class="button primary" disabled={busy} onclick={() => attempt(restart)}>{t('settings-updates-restart')}</button>
 	</Row>
 {:else if overview.offer && !overview.returning}
 	{@const offer = overview.offer}
-	<Row title={TITLES[offer.to]} description={describe(offer)} truncate>
+	<Row title={t(TITLES[offer.to])} description={describe(offer)} truncate>
 		{#if activity.running !== 'switch'}
-			<button type="button" class="button" disabled={busy} onclick={() => attempt(() => switchVariant(offer.to))}>Switch</button>
+			<button type="button" class="button" disabled={busy} onclick={() => attempt(() => switchVariant(offer.to))}>{t('settings-updates-switch')}</button>
 		{/if}
 	</Row>
 {/if}

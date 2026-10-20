@@ -7,9 +7,11 @@ export interface WallTime {
 	second: number;
 }
 
+import { i18n } from '@luft/i18n';
+
 const partsFormatters = new Map<string, Intl.DateTimeFormat>();
 const timeFormatters = new Map<string, Intl.DateTimeFormat>();
-const regions = new Intl.DisplayNames(undefined, { type: 'region' });
+const regionNames = new Map<string, Intl.DisplayNames>();
 
 function partsFormatter(zone: string) {
 	let formatter = partsFormatters.get(zone);
@@ -62,13 +64,28 @@ export function offsetLabel(minutes: number) {
 
 export const city = (zone: string) => zone.split('/').at(-1)!.replaceAll('_', ' ');
 
-export const country = (code: string | null) => (code ? (regions.of(code) ?? code) : null);
+function regions() {
+	let names = regionNames.get(i18n.formats);
+	if (!names) {
+		names = new Intl.DisplayNames(i18n.formats, { type: 'region' });
+		regionNames.set(i18n.formats, names);
+	}
+	return names;
+}
+
+export const country = (code: string | null) => (code ? (regions().of(code) ?? code) : null);
+
+export function dayPeriods(locale: string) {
+	const format = new Intl.DateTimeFormat(locale, { hour: 'numeric', hourCycle: 'h12', timeZone: 'UTC' });
+	const period = (hour: number) => format.formatToParts(Date.UTC(2023, 0, 1, hour)).find((part) => part.type === 'dayPeriod')!.value;
+	return { am: period(0), pm: period(12) };
+}
 
 export function shortTime(zone: string, epoch: number, hour12: boolean) {
-	const key = `${zone}|${hour12}`;
+	const key = `${i18n.formats}|${zone}|${hour12}`;
 	let formatter = timeFormatters.get(key);
 	if (!formatter) {
-		formatter = new Intl.DateTimeFormat(undefined, { timeZone: zone, hour: 'numeric', minute: '2-digit', hourCycle: hour12 ? 'h12' : 'h23' });
+		formatter = new Intl.DateTimeFormat(i18n.formats, { timeZone: zone, hour: 'numeric', minute: '2-digit', hourCycle: hour12 ? 'h12' : 'h23' });
 		timeFormatters.set(key, formatter);
 	}
 	return formatter.format(epoch);

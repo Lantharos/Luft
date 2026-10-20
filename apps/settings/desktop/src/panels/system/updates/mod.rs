@@ -25,7 +25,10 @@ use store::Preferences;
 
 pub use background::run as check_in_background;
 pub use graphics::{CHECK_GRAPHICS_ARGUMENT, run as check_graphics};
+use luft_i18n::t;
 pub use schedule::CHECK_ARGUMENT;
+
+use crate::L10N;
 
 const APP_UPDATES: &str = "schelf:updates";
 
@@ -83,7 +86,7 @@ fn download(_: Value) -> Result<(), String> {
     );
     started
         .then_some(())
-        .ok_or_else(|| "Something is already being downloaded.".into())
+        .ok_or_else(|| t!(L10N, "desktop-updates-already-downloading"))
 }
 
 fn rollback(_: Value) -> Result<(), String> {
@@ -97,7 +100,7 @@ fn rollback(_: Value) -> Result<(), String> {
     );
     started
         .then_some(())
-        .ok_or_else(|| "Something else is changing the system right now.".into())
+        .ok_or_else(|| t!(L10N, "desktop-updates-system-busy"))
 }
 
 fn switch(Switch { variant }: Switch) -> Result<(), String> {
@@ -115,7 +118,7 @@ fn switch(Switch { variant }: Switch) -> Result<(), String> {
     );
     started
         .then_some(())
-        .ok_or_else(|| "Something else is changing the system right now.".into())
+        .ok_or_else(|| t!(L10N, "desktop-updates-system-busy"))
 }
 
 fn install_firmware(Device { id }: Device) -> Result<(), String> {
@@ -126,7 +129,7 @@ fn install_firmware(Device { id }: Device) -> Result<(), String> {
     let started = state::start(activity, move |task| firmware::install(&id, task), scan);
     started
         .then_some(())
-        .ok_or_else(|| "Something is already being installed.".into())
+        .ok_or_else(|| t!(L10N, "desktop-updates-already-installing"))
 }
 
 async fn firmware_updates(_: Value) -> Result<Vec<Firmware>, String> {

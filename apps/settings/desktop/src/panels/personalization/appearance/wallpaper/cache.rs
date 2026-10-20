@@ -3,6 +3,10 @@ use std::hash::{DefaultHasher, Hash, Hasher};
 use std::path::{Path, PathBuf};
 use std::time::UNIX_EPOCH;
 
+use luft_i18n::t;
+
+use crate::L10N;
+
 pub fn failed(error: impl std::fmt::Display) -> String {
     error.to_string()
 }
@@ -19,13 +23,18 @@ pub fn cached_path(source: &Path, folder: &str, extension: &str) -> Result<PathB
         .map(|modified| modified.as_secs())
         .hash(&mut hasher);
     Ok(dirs::cache_dir()
-        .ok_or("There is no cache folder")?
+        .ok_or_else(|| t!(L10N, "desktop-no-cache-folder"))?
         .join("com.lantharos.settings")
         .join(folder)
         .join(format!("{:016x}.{extension}", hasher.finish())))
 }
 
 pub fn store(target: &Path, contents: &[u8]) -> Result<(), String> {
-    fs::create_dir_all(target.parent().ok_or("There is no cache folder")?).map_err(failed)?;
+    fs::create_dir_all(
+        target
+            .parent()
+            .ok_or_else(|| t!(L10N, "desktop-no-cache-folder"))?,
+    )
+    .map_err(failed)?;
     fs::write(target, contents).map_err(failed)
 }

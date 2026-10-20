@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import Check from '@lucide/svelte/icons/check';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import { tick } from 'svelte';
@@ -91,7 +92,7 @@
 
 {#if open && trigger}
 	<Popover anchor={trigger} {label} role="dialog" align="end" minWidth={WIDTH} maxHeight={ROW_HEIGHT * VISIBLE_ROWS + 64} onclose={close}>
-		<SearchField bind:this={field} bind:value={search} label="Search fonts" onkeydown={keydown} />
+		<SearchField bind:this={field} bind:value={search} label={t('settings-fonts-search')} onkeydown={keydown} />
 		{#if choices.length}
 			<VirtualScroller
 				bind:this={list}
@@ -115,7 +116,7 @@
 					>
 						<span class="truncate" style:font-family={face(name)}>{name}</span>
 						{#if name === defaultFamily}
-							<span class="default">Default</span>
+							<span class="default">{t('settings-fonts-default')}</span>
 						{/if}
 						{#if name === family}
 							<Check size={16} class="ml-auto shrink-0" />
@@ -124,7 +125,7 @@
 				{/snippet}
 			</VirtualScroller>
 		{:else if fontLibrary.families}
-			<p class="px-2.5 py-2 text-[13px] text-[var(--text-muted)]">No font is called that</p>
+			<p class="px-2.5 py-2 text-[13px] text-[var(--text-muted)]">{t('settings-fonts-no-match')}</p>
 		{/if}
 	</Popover>
 {/if}

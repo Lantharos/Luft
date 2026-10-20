@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	interface Props {
 		level: number;
 	}
@@ -10,7 +11,7 @@
 	let loudness = $derived(level > 0 ? Math.max(0, 1 - (20 * Math.log10(level)) / FLOOR_DECIBELS) : 0);
 </script>
 
-<div class="meter" role="meter" aria-label="Input level" aria-valuemin={0} aria-valuemax={1} aria-valuenow={loudness}>
+<div class="meter" role="meter" aria-label={t('settings-sound-input-level')} aria-valuemin={0} aria-valuemax={1} aria-valuenow={loudness}>
 	<div class="fill" style:transform="scaleX({loudness})"></div>
 </div>
 

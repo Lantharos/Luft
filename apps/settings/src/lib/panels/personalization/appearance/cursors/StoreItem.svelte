@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { i18n, t } from '@luft/i18n';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import Star from '@lucide/svelte/icons/star';
 	import { bytes, MenuButton, MenuItem } from '@luft/ui';
@@ -14,8 +15,9 @@
 	let { item, current, onuse }: Props = $props();
 
 	const ARCHIVE = /\.(tar\.(gz|bz2|xz)|tgz|tbz2?|txz|tar|zip)$/i;
-	const count = new Intl.NumberFormat(undefined, { notation: 'compact', maximumFractionDigits: 1 });
 
+	let count = $derived(new Intl.NumberFormat(i18n.formats, { notation: 'compact', maximumFractionDigits: 1 }));
+	let rating = $derived(new Intl.NumberFormat(i18n.formats, { minimumFractionDigits: 1, maximumFractionDigits: 1 }));
 	let install = $derived(cursors.installs[item.id]);
 	let installed = $derived(
 		install?.state === 'installed'
@@ -37,9 +39,9 @@
 		<span class="meta">
 			{item.author}
 			{#if item.rating}
-				<span class="rating"><Star size={12} aria-hidden="true" />{item.rating.toFixed(1)}</span>
+				<span class="rating"><Star size={12} aria-hidden="true" />{rating.format(item.rating)}</span>
 			{/if}
-			<span>{count.format(item.downloads)} downloads</span>
+			<span>{t('settings-cursors-downloads', { count: item.downloads, downloads: count.format(item.downloads) })}</span>
 		</span>
 		{#if install?.state === 'failed'}
 			<span class="error">{install.error}</span>
@@ -47,19 +49,19 @@
 	</div>
 	<div class="action">
 		{#if busy}
-			<span class="progress" role="progressbar" aria-label="Installing {item.name}" aria-valuenow={fraction === null ? undefined : Math.round(fraction * 100)}>
+			<span class="progress" role="progressbar" aria-label={t('settings-cursors-installing', { name: item.name })} aria-valuenow={fraction === null ? undefined : Math.round(fraction * 100)}>
 				<span class="bar progress-fill" class:waiting={fraction === null} style:--progress={fraction}></span>
 			</span>
 		{:else if installed && installed === current}
-			<span class="in-use">In use</span>
+			<span class="in-use">{t('settings-cursors-in-use')}</span>
 		{:else if installed}
-			<button type="button" class="button" onclick={() => onuse(installed)}>Use</button>
+			<button type="button" class="button" onclick={() => onuse(installed)}>{t('settings-cursors-use')}</button>
 		{:else if item.files.length === 1}
-			<button type="button" class="button" onclick={() => cursors.install(item.id, item.files[0].index)}>Get</button>
+			<button type="button" class="button" onclick={() => cursors.install(item.id, item.files[0].index)}>{t('settings-cursors-get')}</button>
 		{:else if item.files.length}
-			<MenuButton label="Choose a download for {item.name}" class="button" align="end" minWidth={260}>
+			<MenuButton label={t('settings-cursors-choose-download', { name: item.name })} class="button" align="end" minWidth={260}>
 				{#snippet trigger()}
-					Get
+					{t('settings-cursors-get')}
 					<ChevronDown size={15} />
 				{/snippet}
 				{#snippet children(close)}
@@ -77,7 +79,7 @@
 				{/snippet}
 			</MenuButton>
 		{:else}
-			<button type="button" class="plain-button" onclick={() => openStorePage(item.id)}>View online</button>
+			<button type="button" class="plain-button" onclick={() => openStorePage(item.id)}>{t('settings-cursors-view-online')}</button>
 		{/if}
 	</div>
 </div>

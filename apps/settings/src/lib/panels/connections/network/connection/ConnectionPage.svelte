@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { t } from '@luft/i18n';
 	import { Row, Section } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
 	import { forget, remove, type Network } from '../api';
@@ -87,9 +88,9 @@
 	});
 </script>
 
-<SubPage {title} back="Network" {onclose}>
+<SubPage {title} back={t('settings-page-network')} {onclose}>
 	{#snippet actions()}
-		<button type="button" class="button primary" disabled={!ready} onclick={save}>{saving ? 'Saving…' : 'Save'}</button>
+		<button type="button" class="button primary" disabled={!ready} onclick={save}>{saving ? t('settings-network-saving') : t('settings-network-save')}</button>
 	{/snippet}
 
 	{#if problem}
@@ -111,17 +112,17 @@
 		{#if target.kind === 'wifi'}
 			{@const ssid = target.ssid}
 			<Section>
-				<Row title="Forget this network" description="Removes its password and settings from this computer">
-					<button type="button" class="button danger" onclick={() => forgetNetwork(ssid)}>Forget</button>
+				<Row title={t('settings-network-forget')} description={t('settings-network-forget.description')}>
+					<button type="button" class="button danger" onclick={() => forgetNetwork(ssid)}>{t('settings-network-forget.button')}</button>
 				</Row>
 			</Section>
 		{:else}
 			<Section>
 				<Row
-					title={target.kind === 'vpn' ? 'Remove this VPN' : 'Remove this connection'}
-					description="Deletes its settings from this computer"
+					title={target.kind === 'vpn' ? t('settings-network-remove-vpn') : t('settings-network-remove-connection')}
+					description={t('settings-network-remove-description')}
 				>
-					<button type="button" class="button danger" onclick={removeConnection}>Remove</button>
+					<button type="button" class="button danger" onclick={removeConnection}>{t('settings-network-remove')}</button>
 				</Row>
 			</Section>
 		{/if}

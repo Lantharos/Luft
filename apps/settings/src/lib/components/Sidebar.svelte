@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { SearchField, selectionPill } from '@luft/ui';
 	import { searchPanels, shownGroups, titleOf, type Panel } from '#lib/panels/registry.js';
 	import { app } from '#lib/state/app.svelte.js';
@@ -33,7 +34,7 @@
 {/snippet}
 
 <aside class="glass-sidebar drag-region gap-3.5 px-3 py-4">
-	<SearchField variant="sidebar" label="Search settings" bind:value={app.query} onkeydown={openFirst} />
+	<SearchField variant="sidebar" label={t('settings-search')} bind:value={app.query} onkeydown={openFirst} />
 	<nav class="hidden-scroll scroll-fade flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto" {@attach selectionPill()}>
 		{#if present}
 			{#each results as group, index (index)}
@@ -45,7 +46,7 @@
 			{/each}
 		{/if}
 		{#if results.length === 1 && !results[0].length}
-			<p class="px-3 text-[13px] text-[var(--sidebar-text-muted)]">Nothing matches that.</p>
+			<p class="px-3 text-[13px] text-[var(--sidebar-text-muted)]">{t('settings-search-empty')}</p>
 		{/if}
 	</nav>
 </aside>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { fileUrl } from '@lantharos/sabine';
 	import Film from '@lucide/svelte/icons/film';
 	import { CENTER, objectPosition, thumbnail, wallpaperFocus, type Focus, type Wallpaper } from './api';
@@ -30,7 +31,7 @@
 	});
 </script>
 
-<button bind:this={tile} type="button" class="tile" class:selected style:aspect-ratio={shape} aria-label={wallpaper.live ? `${wallpaper.name}, video` : wallpaper.name} aria-pressed={selected} onclick={onselect}>
+<button bind:this={tile} type="button" class="tile" class:selected style:aspect-ratio={shape} aria-label={wallpaper.live ? t('settings-appearance-wallpaper-video', { name: wallpaper.name }) : wallpaper.name} aria-pressed={selected} onclick={onselect}>
 	{#if source}
 		<img src={source} alt="" decoding="async" style:object-position={objectPosition(focus ?? estimated ?? CENTER)} />
 	{/if}

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { fileUrl } from '@lantharos/sabine';
 	import Move from '@lucide/svelte/icons/move';
 	import { objectPosition, thumbnail, type Focus } from './api';
@@ -83,7 +84,7 @@
 		class:movable
 		class:dragging
 		role={movable ? 'application' : 'img'}
-		aria-label={movable ? 'Wallpaper position. Drag or use the arrow keys to show another part' : 'Wallpaper'}
+		aria-label={movable ? t('settings-appearance-wallpaper-position') : t('settings-appearance-wallpaper')}
 		tabindex={movable ? 0 : -1}
 		bind:clientWidth={width}
 		bind:clientHeight={height}
@@ -108,7 +109,7 @@
 			/>
 		{/if}
 		{#if movable}
-			<span class="hint" aria-hidden="true"><Move size={14} />Drag to reposition</span>
+			<span class="hint" aria-hidden="true"><Move size={14} />{t('settings-appearance-wallpaper-drag')}</span>
 		{/if}
 	</div>
 </div>

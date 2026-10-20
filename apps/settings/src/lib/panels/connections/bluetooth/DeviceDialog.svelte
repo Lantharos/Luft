@@ -1,5 +1,7 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Dialog, Switch } from '@luft/ui';
+	import { percent } from '#lib/format.js';
 	import type { Device } from './api';
 	import { KIND_LABELS } from './kinds';
 
@@ -15,28 +17,28 @@
 	let { device, busy, ontrust, ontoggle, onforget, onclose }: Props = $props();
 </script>
 
-<Dialog title={device.name} description={device.connected ? 'Connected' : undefined} {onclose}>
+<Dialog title={device.name} description={device.connected ? t('settings-bluetooth-connected') : undefined} {onclose}>
 	<dl class="details">
-		<dt>Type</dt>
-		<dd>{KIND_LABELS[device.kind]}</dd>
+		<dt>{t('settings-bluetooth-type')}</dt>
+		<dd>{t(KIND_LABELS[device.kind])}</dd>
 		{#if device.battery !== null}
-			<dt>Battery</dt>
-			<dd>{device.battery}%</dd>
+			<dt>{t('settings-bluetooth-battery')}</dt>
+			<dd>{percent(device.battery / 100)}</dd>
 		{/if}
-		<dt>Address</dt>
+		<dt>{t('settings-bluetooth-address')}</dt>
 		<dd class="select-text">{device.address}</dd>
 	</dl>
 	<div class="flex items-center justify-between gap-4 pt-1">
 		<div class="flex min-w-0 flex-col gap-0.5">
-			<span class="text-[14px] font-medium">Connect automatically</span>
-			<span class="text-[12.5px] text-[var(--text-muted)]">Whenever it’s nearby</span>
+			<span class="text-[14px] font-medium">{t('settings-bluetooth-autoconnect')}</span>
+			<span class="text-[12.5px] text-[var(--text-muted)]">{t('settings-bluetooth-autoconnect.description')}</span>
 		</div>
-		<Switch label="Connect automatically" checked={device.trusted} onchange={ontrust} />
+		<Switch label={t('settings-bluetooth-autoconnect')} checked={device.trusted} onchange={ontrust} />
 	</div>
 	{#snippet actions()}
-		<button type="button" class="button danger mr-auto" onclick={onforget}>Forget</button>
-		<button type="button" class="button" disabled={busy} onclick={ontoggle}>{device.connected ? 'Disconnect' : 'Connect'}</button>
-		<button type="button" class="button primary" onclick={onclose}>Done</button>
+		<button type="button" class="button danger mr-auto" onclick={onforget}>{t('settings-bluetooth-forget')}</button>
+		<button type="button" class="button" disabled={busy} onclick={ontoggle}>{device.connected ? t('settings-bluetooth-disconnect') : t('settings-bluetooth-connect')}</button>
+		<button type="button" class="button primary" onclick={onclose}>{t('settings-bluetooth-done')}</button>
 	{/snippet}
 </Dialog>
 

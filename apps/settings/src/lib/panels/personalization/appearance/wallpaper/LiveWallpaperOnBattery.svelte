@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Row, Switch } from '@luft/ui';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import { powerState } from '#lib/panels/devices/power/api.js';
@@ -11,9 +12,9 @@
 </script>
 
 {#if hasBattery}
-	<Row title="Play videos on battery" description="Otherwise video wallpapers pause until you plug in">
+	<Row title={t('settings-appearance-wallpaper-battery')} description={t('settings-appearance-wallpaper-battery-description')}>
 		<Switch
-			label="Play videos on battery"
+			label={t('settings-appearance-wallpaper-battery')}
 			checked={kestrel.values['live-wallpaper-on-battery'] ?? false}
 			onchange={(on) => kestrel.set('live-wallpaper-on-battery', on)}
 		/>

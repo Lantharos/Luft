@@ -1,7 +1,8 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import Fingerprint from '@lucide/svelte/icons/fingerprint';
 	import Trash from '@lucide/svelte/icons/trash';
-	import { deleteFingerprint, Dialog, FINGERS, fingerLabel, fingerprints, IconButton, Row, Section, type Fingerprints } from '@luft/ui';
+	import { deleteFingerprint, Dialog, FINGERS, fingerInSentence, fingerLabel, fingerprints, IconButton, Row, Section, type Fingerprints } from '@luft/ui';
 	import EnrollDialog from './EnrollDialog.svelte';
 
 	let prints = $state<Fingerprints | null>(null);
@@ -9,7 +10,7 @@
 	let removing = $state<string | null>(null);
 	let problem = $state('');
 
-	let available = $derived(prints ? FINGERS.filter(([finger]) => !prints!.enrolled.includes(finger)) : []);
+	let available = $derived(prints ? FINGERS.map(([finger]) => finger).filter((finger) => !prints!.enrolled.includes(finger)) : []);
 
 	async function load() {
 		prints = await fingerprints();
@@ -35,17 +36,17 @@
 </script>
 
 {#if prints}
-	<Section title="Fingerprints">
+	<Section title={t('settings-users-fingerprints')}>
 		{#each prints.enrolled as finger (finger)}
 			<Row title={fingerLabel(finger)} icon={Fingerprint}>
-				<IconButton icon={Trash} label="Remove {fingerLabel(finger)}" onclick={() => (removing = finger)} />
+				<IconButton icon={Trash} label={t('settings-users-fingerprint-remove', { finger: fingerLabel(finger) })} onclick={() => (removing = finger)} />
 			</Row>
 		{/each}
 		{#if available.length}
 			<Row
-				title="Add a fingerprint"
+				title={t('settings-users-fingerprint-add')}
 				icon={prints.enrolled.length ? undefined : Fingerprint}
-				description={prints.enrolled.length ? undefined : 'Sign in and unlock with your finger instead of typing your password'}
+				description={prints.enrolled.length ? undefined : t('settings-users-fingerprint-add-description')}
 				onclick={() => (enrolling = true)}
 			/>
 		{/if}
@@ -62,10 +63,10 @@
 
 {#if removing}
 	{@const finger = removing}
-	<Dialog title="Remove this fingerprint?" description="You won’t be able to use your {fingerLabel(finger).toLowerCase()} to sign in anymore." onclose={() => (removing = null)}>
+	<Dialog title={t('settings-users-fingerprint-remove-title')} description={t('settings-users-fingerprint-remove-description', { finger: fingerInSentence(finger) })} onclose={() => (removing = null)}>
 		{#snippet actions()}
-			<button type="button" class="button" onclick={() => (removing = null)}>Cancel</button>
-			<button type="button" class="button danger" onclick={() => remove(finger)}>Remove</button>
+			<button type="button" class="button" onclick={() => (removing = null)}>{t('settings-users-cancel')}</button>
+			<button type="button" class="button danger" onclick={() => remove(finger)}>{t('settings-users-remove')}</button>
 		{/snippet}
 	</Dialog>
 {/if}

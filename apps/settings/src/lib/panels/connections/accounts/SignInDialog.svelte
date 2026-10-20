@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onDestroy, untrack } from 'svelte';
+	import { t } from '@luft/i18n';
 	import { Choice, Dialog, PasswordField, TextField } from '@luft/ui';
 	import { cancel, signIn, signInAgain, type Account, type Credentials, type Step } from './api';
 	import { PROVIDERS, provider as providerOf, type ProviderInfo } from './providers';
@@ -30,7 +31,7 @@
 
 	let needsPassword = $derived(chosen?.signIn === 'password' || chosen?.signIn === 'apple' || (chosen?.signIn === 'nextcloud' && appPassword));
 	let canCode = $derived(step.step === 'code' && code.replace(/\D/g, '').length === 6);
-	let title = $derived(again ? `Sign in to ${again.name} again` : chosen ? chosen.name : 'Add an account');
+	let title = $derived(again ? t('settings-accounts-sign-in-again-title', { account: again.name }) : chosen ? chosen.name : t('settings-page-add-account'));
 	let description = $derived(again?.standing.kind === 'signInAgain' && stage !== 'flow' ? again.standing.reason : undefined);
 
 	$effect(() => {
@@ -65,9 +66,9 @@
 
 	function missing() {
 		const kind = chosen!.signIn;
-		if (!again && (kind === 'nextcloud' || kind === 'password') && !server.trim()) return 'Enter the server address';
-		if (!again && needsPassword && !user.trim()) return kind === 'apple' ? 'Enter your Apple Account email' : 'Enter the user name';
-		if (needsPassword && !password) return 'Enter the password';
+		if (!again && (kind === 'nextcloud' || kind === 'password') && !server.trim()) return t('settings-accounts-error-server');
+		if (!again && needsPassword && !user.trim()) return kind === 'apple' ? t('settings-accounts-error-apple-account') : t('settings-accounts-error-user');
+		if (needsPassword && !password) return t('settings-accounts-error-password');
 		return '';
 	}
 
@@ -108,29 +109,29 @@
 		{#if stage === 'choose'}
 			<div class="-mx-2 flex flex-col">
 				{#each PROVIDERS as info (info.id)}
-					<Choice icon={info.icon} title={info.name} description={info.description} onclick={() => choose(info)} />
+					<Choice icon={info.icon} title={info.name} description={t(info.description)} onclick={() => choose(info)} />
 				{/each}
 			</div>
 		{:else if stage === 'details' && chosen}
 			{#if chosen.signIn === 'browser'}
 				<p class="text-[14px] leading-relaxed text-[var(--text-soft)]">
-					Your browser opens so you can sign in with {chosen.id === 'onedrive' ? 'Microsoft' : 'Dropbox'}. Luft never sees your password.
+					{t('settings-accounts-browser', { provider: chosen.id === 'onedrive' ? 'Microsoft' : 'Dropbox' })}
 				</p>
 			{:else if chosen.signIn === 'apple'}
 				{#if again}
-					<p class="text-[14px] leading-relaxed text-[var(--text-soft)]">Enter the password for {again.user}.</p>
+					<p class="text-[14px] leading-relaxed text-[var(--text-soft)]">{t('settings-accounts-password-for', { user: again.user })}</p>
 				{:else}
-					<TextField bind:value={user} label="Apple Account" showLabel placeholder="you@icloud.com" inputmode="email" autocomplete="username" />
+					<TextField bind:value={user} label={t('settings-accounts-apple-account')} showLabel placeholder="you@icloud.com" inputmode="email" autocomplete="username" />
 				{/if}
-				<PasswordField bind:value={password} label="Password" showLabel autocomplete="current-password" />
+				<PasswordField bind:value={password} label={t('settings-accounts-password')} showLabel autocomplete="current-password" />
 				<p class="text-[12.5px] leading-relaxed text-[var(--text-muted)]">
-					Use your Apple Account password; app-specific passwords don’t work here. Apple then shows a code on your iPhone, iPad or Mac.
+					{t('settings-accounts-apple-note')}
 				</p>
 			{:else}
 				{#if !again}
 					<TextField
 						bind:value={server}
-						label="Server"
+						label={t('settings-accounts-server')}
 						showLabel
 						placeholder={chosen.signIn === 'nextcloud' ? 'cloud.example.com' : 'https://dav.example.com/files'}
 						type="url"
@@ -139,12 +140,12 @@
 				{/if}
 				{#if needsPassword}
 					{#if !again}
-						<TextField bind:value={user} label="User name" showLabel autocomplete="username" />
+						<TextField bind:value={user} label={t('settings-accounts-user')} showLabel autocomplete="username" />
 					{/if}
-					<PasswordField bind:value={password} label={chosen.signIn === 'nextcloud' ? 'App password' : 'Password'} showLabel autocomplete="current-password" />
+					<PasswordField bind:value={password} label={chosen.signIn === 'nextcloud' ? t('settings-accounts-app-password') : t('settings-accounts-password')} showLabel autocomplete="current-password" />
 				{:else}
-					<p class="text-[13px] leading-relaxed text-[var(--text-muted)]">Your browser opens so you can sign in to your server and allow Luft in.</p>
-					<button type="button" class="plain-button self-start" onclick={() => (appPassword = true)}>Use an app password instead</button>
+					<p class="text-[13px] leading-relaxed text-[var(--text-muted)]">{t('settings-accounts-nextcloud-browser')}</p>
+					<button type="button" class="plain-button self-start" onclick={() => (appPassword = true)}>{t('settings-accounts-use-app-password')}</button>
 				{/if}
 			{/if}
 		{:else if stage === 'flow'}
@@ -156,19 +157,19 @@
 	</div>
 	{#snippet actions()}
 		{#if stage === 'choose'}
-			<button type="button" class="button" onclick={onclose}>Cancel</button>
+			<button type="button" class="button" onclick={onclose}>{t('settings-accounts-cancel')}</button>
 		{:else if stage === 'details'}
-			<button type="button" class="button" onclick={again ? onclose : () => ((stage = 'choose'), (appPassword = false))}>{again ? 'Cancel' : 'Back'}</button>
+			<button type="button" class="button" onclick={again ? onclose : () => ((stage = 'choose'), (appPassword = false))}>{again ? t('settings-accounts-cancel') : t('settings-accounts-back')}</button>
 			<button type="button" class="button primary" onclick={start}>
-				{chosen?.signIn === 'browser' || (chosen?.signIn === 'nextcloud' && !appPassword) ? 'Continue in browser' : 'Sign in'}
+				{chosen?.signIn === 'browser' || (chosen?.signIn === 'nextcloud' && !appPassword) ? t('settings-accounts-continue-in-browser') : t('settings-accounts-sign-in')}
 			</button>
 		{:else if step.step === 'failed'}
-			<button type="button" class="button" onclick={again ? onclose : back}>{again ? 'Cancel' : 'Back'}</button>
-			<button type="button" class="button primary" onclick={retry}>Try again</button>
+			<button type="button" class="button" onclick={again ? onclose : back}>{again ? t('settings-accounts-cancel') : t('settings-accounts-back')}</button>
+			<button type="button" class="button primary" onclick={retry}>{t('settings-accounts-try-again')}</button>
 		{:else}
-			<button type="button" class="button" onclick={again ? onclose : back}>Cancel</button>
+			<button type="button" class="button" onclick={again ? onclose : back}>{t('settings-accounts-cancel')}</button>
 			{#if step.step === 'code'}
-				<button type="button" class="button primary" disabled={!canCode} onclick={() => flow?.submitCode()}>Continue</button>
+				<button type="button" class="button primary" disabled={!canCode} onclick={() => flow?.submitCode()}>{t('settings-accounts-continue')}</button>
 			{/if}
 		{/if}
 	{/snippet}

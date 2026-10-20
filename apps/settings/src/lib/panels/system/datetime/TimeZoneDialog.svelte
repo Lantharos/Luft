@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import Check from '@lucide/svelte/icons/check';
 	import { Dialog, SearchField } from '@luft/ui';
 	import { setTimezone, type Zone } from './api';
@@ -23,7 +24,7 @@
 			.map((zone) => {
 				const offset = offsetMinutes(zone.id, minute);
 				const name = city(zone.id);
-				const place = country(zone.country) ?? 'Coordinated Universal Time';
+				const place = country(zone.country) ?? t('settings-datetime-utc');
 				const label = offsetLabel(offset);
 				return { id: zone.id, name, place, offset, label, search: `${name} ${place} ${zone.id.replaceAll('_', ' ')} ${label}`.toLowerCase() };
 			})
@@ -49,13 +50,13 @@
 	}
 </script>
 
-<Dialog title="Time zone" {onclose}>
+<Dialog title={t('settings-datetime-zone')} {onclose}>
 	<SearchField
-		label="Search for a city or country"
+		label={t('settings-datetime-zone-search')}
 		bind:value={query}
 		onkeydown={(event) => event.key === 'Enter' && shown[0] && choose(shown[0].id)}
 	/>
-	<div bind:this={list} class="zones soft-scroll" role="listbox" aria-label="Time zones">
+	<div bind:this={list} class="zones soft-scroll" role="listbox" aria-label={t('settings-datetime-zones')}>
 		{#each shown as zone (zone.id)}
 			<button type="button" role="option" aria-selected={zone.id === current} class="zone" onclick={() => choose(zone.id)}>
 				<span class="flex min-w-0 flex-1 flex-col">
@@ -73,14 +74,14 @@
 				</span>
 			</button>
 		{:else}
-			<p class="px-3 py-6 text-center text-[13px] text-[var(--text-muted)]">No matching places</p>
+			<p class="px-3 py-6 text-center text-[13px] text-[var(--text-muted)]">{t('settings-datetime-zone-no-match')}</p>
 		{/each}
 	</div>
 	{#if failed}
-		<p class="text-[13px] text-[var(--danger)]">The time zone couldn't be changed.</p>
+		<p class="text-[13px] text-[var(--danger)]">{t('settings-datetime-zone-failed')}</p>
 	{/if}
 	{#snippet actions()}
-		<button type="button" class="button" onclick={onclose}>Cancel</button>
+		<button type="button" class="button" onclick={onclose}>{t('settings-datetime-cancel')}</button>
 	{/snippet}
 </Dialog>
 

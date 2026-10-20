@@ -4,10 +4,13 @@ use std::sync::Once;
 use futures_util::StreamExt;
 use luft_app::dbus::{self, explain, objects, service::absent};
 use luft_app::{Commands, Events};
+use luft_i18n::t;
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use zbus::{DynamicType, Proxy, Type};
+
+use crate::L10N;
 
 const SERVICE: &str = "com.lantharos.Passkeys";
 const PATH: &str = "/com/lantharos/Passkeys1";
@@ -79,7 +82,7 @@ fn unhex(text: &str) -> Result<Vec<u8>, String> {
                 .and_then(|pair| u8::from_str_radix(pair, 16).ok())
         })
         .collect::<Option<_>>()
-        .ok_or_else(|| "That passkey doesn't exist".to_owned())
+        .ok_or_else(|| t!(L10N, "desktop-passkeys-missing"))
 }
 
 async fn proxy() -> Result<Proxy<'static>, String> {

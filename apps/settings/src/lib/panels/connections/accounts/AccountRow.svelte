@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { bytes, plural, Row, TextField } from '@luft/ui';
+	import { t } from '@luft/i18n';
+	import { bytes, Row, TextField } from '@luft/ui';
 	import { remove, rename, type Account, type Drive } from './api';
 	import { provider } from './providers';
 
@@ -22,19 +23,19 @@
 	let folder = $derived(drive?.path.replace(/^\/(home|var\/home)\/[^/]+/, '~') ?? `~/Cloud/${account.name}`);
 
 	function status() {
-		if (account.standing.kind === 'signInAgain') return 'Sign in again to keep using it';
+		if (account.standing.kind === 'signInAgain') return t('settings-accounts-sign-in-again-needed');
 		if (!drive) return '';
-		if (drive.paused === 'metered') return 'Syncing paused on a metered connection';
-		if (drive.paused === 'battery') return 'Syncing paused while the battery is low';
+		if (drive.paused === 'metered') return t('settings-accounts-paused-metered');
+		if (drive.paused === 'battery') return t('settings-accounts-paused-battery');
 		switch (drive.state) {
 			case 'connecting':
-				return 'Connecting…';
+				return t('settings-accounts-connecting');
 			case 'offline':
-				return drive.kept.length ? 'Offline, kept files are still here' : 'Offline';
+				return drive.kept.length ? t('settings-accounts-offline-kept') : t('settings-accounts-offline');
 			case 'problem':
-				return drive.problem ?? 'Not connected';
+				return drive.problem ?? t('settings-accounts-not-connected');
 			default:
-				return drive.syncing ? `Syncing ${plural(drive.syncing, 'change')}` : '';
+				return drive.syncing ? t('settings-accounts-syncing', { count: drive.syncing }) : '';
 		}
 	}
 
@@ -69,40 +70,40 @@
 				{#if account.standing.kind === 'signInAgain'}
 					<p class="text-[13px] leading-relaxed text-[var(--danger)]">{account.standing.reason}</p>
 				{/if}
-				<TextField bind:value={name} label="Name" showLabel onkeydown={(event) => event.key === 'Enter' && void saveName()} />
+				<TextField bind:value={name} label={t('settings-accounts-name')} showLabel onkeydown={(event) => event.key === 'Enter' && void saveName()} />
 				<dl class="details">
-					<dt>Folder</dt>
+					<dt>{t('settings-accounts-folder')}</dt>
 					<dd>{folder}</dd>
 					{#if account.server}
-						<dt>Server</dt>
+						<dt>{t('settings-accounts-server')}</dt>
 						<dd>{account.server}</dd>
 					{/if}
 					{#if drive?.usage}
-						<dt>Storage</dt>
-						<dd>{bytes(drive.usage.used)} of {bytes(drive.usage.total)} used</dd>
+						<dt>{t('settings-accounts-storage')}</dt>
+						<dd>{t('settings-accounts-storage-used', { used: bytes(drive.usage.used), total: bytes(drive.usage.total) })}</dd>
 					{/if}
-					<dt>On this device</dt>
-					<dd>{drive?.kept.length ? `${plural(drive.kept.length, 'item')} kept, the rest downloads when opened` : 'Files download when you open them'}</dd>
+					<dt>{t('settings-accounts-on-device')}</dt>
+					<dd>{drive?.kept.length ? t('settings-accounts-kept', { count: drive.kept.length }) : t('settings-accounts-on-demand')}</dd>
 				</dl>
 				{#if problem}
 					<p class="text-[12.5px] text-[var(--danger)]">{problem}</p>
 				{/if}
 				<div class="flex flex-wrap items-center gap-2">
 					{#if signInAgain}
-						<button type="button" class="button primary" onclick={onsigninagain}>Sign in again</button>
+						<button type="button" class="button primary" onclick={onsigninagain}>{t('settings-accounts-sign-in-again')}</button>
 					{/if}
 					<span class="flex-1"></span>
 					{#if confirming}
-						<button type="button" class="button" onclick={() => (confirming = false)}>Keep</button>
+						<button type="button" class="button" onclick={() => (confirming = false)}>{t('settings-accounts-keep')}</button>
 						<button type="button" class="button danger" disabled={removing} onclick={forget}>
-							{removing ? 'Removing…' : 'Remove from this computer'}
+							{removing ? t('settings-accounts-removing') : t('settings-accounts-remove-confirm')}
 						</button>
 					{:else}
-						<button type="button" class="button danger" onclick={() => (confirming = true)}>Remove</button>
+						<button type="button" class="button danger" onclick={() => (confirming = true)}>{t('settings-accounts-remove')}</button>
 					{/if}
 				</div>
 				{#if confirming}
-					<p class="-mt-2 text-right text-[12.5px] text-[var(--text-muted)]">Your files stay in {info.name}. Changes made here are sent up first.</p>
+					<p class="-mt-2 text-right text-[12.5px] text-[var(--text-muted)]">{t('settings-accounts-remove-note', { provider: info.name })}</p>
 				{/if}
 			</div>
 		{/if}

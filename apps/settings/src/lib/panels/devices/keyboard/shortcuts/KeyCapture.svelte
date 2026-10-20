@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { appWindow } from '@lantharos/sabine';
 	import { fromEvent } from './accelerator';
 	import Keys from './Keys.svelte';
@@ -16,13 +17,13 @@
 
 	function modifiers(event: KeyboardEvent) {
 		return [
-			[event.metaKey, 'Super'],
-			[event.ctrlKey, 'Ctrl'],
-			[event.altKey, 'Alt'],
-			[event.shiftKey, 'Shift']
+			[event.metaKey, 'settings-keys-super'],
+			[event.ctrlKey, 'settings-keys-ctrl'],
+			[event.altKey, 'settings-keys-alt'],
+			[event.shiftKey, 'settings-keys-shift']
 		]
 			.filter(([down]) => down)
-			.map(([, label]) => label as string);
+			.map(([, label]) => t(label as string));
 	}
 
 	function keydown(event: KeyboardEvent) {
@@ -70,7 +71,7 @@
 
 <button type="button" class="capture" class:recording onclick={() => (recording = true)}>
 	{#if recording}
-		<span class="text-[13px] text-[var(--text-soft)]">{held.length ? `${held.join(' + ')} + …` : 'Press the keys you want'}</span>
+		<span class="text-[13px] text-[var(--text-soft)]">{held.length ? `${held.join(' + ')} + …` : t('settings-shortcuts-press-keys')}</span>
 	{:else}
 		<Keys {accelerators} />
 	{/if}

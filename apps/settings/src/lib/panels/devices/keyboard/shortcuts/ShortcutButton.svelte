@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import Keys from './Keys.svelte';
 
 	interface Props {
@@ -10,7 +11,7 @@
 	let { accelerators, label, onclick }: Props = $props();
 </script>
 
-<button type="button" class="shortcut" aria-label="Change shortcut for {label}" {onclick}>
+<button type="button" class="shortcut" aria-label={t('settings-shortcuts-change', { name: label })} {onclick}>
 	<Keys {accelerators} />
 </button>
 

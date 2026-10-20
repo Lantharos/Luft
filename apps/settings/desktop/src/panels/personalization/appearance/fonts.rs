@@ -4,8 +4,11 @@ use std::path::PathBuf;
 use gio::prelude::*;
 use luft_app::fonts::{self, Defaults, Face, Role};
 use luft_app::launch;
+use luft_i18n::t;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+
+use crate::L10N;
 
 const MAGPIE: &str = "com.lantharos.magpie.desktop";
 const REGULAR_STYLES: [&str; 4] = ["regular", "book", "normal", "roman"];
@@ -90,9 +93,14 @@ pub fn list(_: Value) -> Result<Vec<Family>, String> {
 }
 
 pub fn open(Open { file, token }: Open) -> Result<(), String> {
-    let magpie = gio_unix::DesktopAppInfo::new(MAGPIE).ok_or("Magpie isn't installed")?;
-    launch::open_files(magpie.upcast_ref(), &[gio::File::for_path(file)], token.as_deref())
-        .map_err(|error| error.to_string())
+    let magpie = gio_unix::DesktopAppInfo::new(MAGPIE)
+        .ok_or_else(|| t!(L10N, "desktop-fonts-magpie-missing"))?;
+    launch::open_files(
+        magpie.upcast_ref(),
+        &[gio::File::for_path(file)],
+        token.as_deref(),
+    )
+    .map_err(|error| error.to_string())
 }
 
 pub fn remove(Remove { family }: Remove) -> Result<(), String> {

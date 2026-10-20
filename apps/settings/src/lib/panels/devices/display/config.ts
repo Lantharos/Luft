@@ -1,3 +1,4 @@
+import { t } from '@luft/i18n';
 import type { Displays, LogicalConfig, Mode, Monitor } from './api';
 import { inRow, isValidLayout, normalized, type Rect } from './layout';
 
@@ -22,11 +23,11 @@ export interface Size {
 	height: number;
 }
 
-export const ORIENTATIONS = [
-	{ value: 0, label: 'Landscape' },
-	{ value: 1, label: 'Portrait right' },
-	{ value: 3, label: 'Portrait left' },
-	{ value: 2, label: 'Landscape, flipped' }
+export const orientations = () => [
+	{ value: 0, label: t('settings-display-orientation-landscape') },
+	{ value: 1, label: t('settings-display-orientation-portrait-right') },
+	{ value: 3, label: t('settings-display-orientation-portrait-left') },
+	{ value: 2, label: t('settings-display-orientation-landscape-flipped') }
 ];
 
 const sizeKey = ({ width, height }: Size) => `${width}x${height}`;
@@ -35,8 +36,6 @@ const byRefresh = (a: Mode, b: Mode) => b.refresh - a.refresh;
 
 export const monitorOf = (state: Displays, connector: string) => state.monitors.find((monitor) => monitor.connector === connector)!;
 export const modeOf = (state: Displays, output: Output) => monitorOf(state, output.connector).modes.find((mode) => mode.id === output.mode)!;
-const hertz = (refresh: number) => `${Number(refresh.toFixed(2))} Hz`;
-export const percentScale = (scale: number) => `${Math.round(scale * 100)}%`;
 
 export function draftFrom(state: Displays): Draft {
 	const outputs = state.monitors.map((monitor) => {
@@ -119,7 +118,7 @@ export function resolutions(modes: Mode[]) {
 	const sizes = new Map(modes.map((mode) => [sizeKey(mode), { width: mode.width, height: mode.height }]));
 	return [...sizes.values()]
 		.sort((a, b) => b.width * b.height - a.width * a.height || b.width - a.width)
-		.map((size) => ({ value: sizeKey(size), label: `${size.width} × ${size.height}`, size }));
+		.map((size) => ({ value: sizeKey(size), label: t('settings-display-resolution', { width: String(size.width), height: String(size.height) }), size }));
 }
 
 export function refreshRates(monitor: Monitor, size: Size) {
@@ -127,7 +126,7 @@ export function refreshRates(monitor: Monitor, size: Size) {
 	for (const mode of monitor.modes.filter((entry) => sizeKey(entry) === sizeKey(size)).sort(byRefresh)) {
 		if (!rates.some((rate) => sameRefresh(rate, mode.refresh))) rates.push(mode.refresh);
 	}
-	return rates.map((rate) => ({ value: rate, label: hertz(rate) }));
+	return rates.map((rate) => ({ value: rate, label: t('settings-display-refresh-rate', { rate }) }));
 }
 
 export function pickMode(monitor: Monitor, size: Size, refresh: number, variable: boolean) {

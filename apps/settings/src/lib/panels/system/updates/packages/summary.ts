@@ -5,16 +5,18 @@ export interface Area {
 	updates: Update[];
 }
 
+const KERNEL = /^kernel(-|$)/;
+const DRIVERS = /(^mesa-|nvidia|firmware|microcode|^xorg-x11-drv|^libdrm|^vulkan|^libva|^libinput)/;
 const AREAS: { title: string; pattern: RegExp }[] = [
-	{ title: 'Linux kernel', pattern: /^kernel(-|$)/ },
-	{ title: 'Drivers and firmware', pattern: /(^mesa-|nvidia|firmware|microcode|^xorg-x11-drv|^libdrm|^vulkan|^libva|^libinput)/ },
+	{ title: 'settings-updates-area-kernel', pattern: KERNEL },
+	{ title: 'settings-updates-area-drivers', pattern: DRIVERS },
 	{
-		title: 'Desktop',
+		title: 'settings-updates-area-desktop',
 		pattern: /^(gnome-|gtk|glib2|mutter|gdm|pipewire|wireplumber|NetworkManager|bluez|ibus|xdg-|fontconfig|freetype|harfbuzz|pango|cairo|libadwaita|flatpak|PackageKit|fwupd|plymouth|greetd|.*-fonts)/
 	},
-	{ title: 'Core system', pattern: /^(systemd|glibc|dnf|rpm|libdnf|bash|coreutils|util-linux|selinux|policycoreutils|openssl|ca-certificates|grub2|shim|dracut|sudo|polkit|dbus|kmod|filesystem|setup|fedora-|audit|pam|shadow-utils|crypto-policies)/ }
+	{ title: 'settings-updates-area-core', pattern: /^(systemd|glibc|dnf|rpm|libdnf|bash|coreutils|util-linux|selinux|policycoreutils|openssl|ca-certificates|grub2|shim|dracut|sudo|polkit|dbus|kmod|filesystem|setup|fedora-|audit|pam|shadow-utils|crypto-policies)/ }
 ];
-const OTHER = 'Libraries and tools';
+const OTHER = 'settings-updates-area-other';
 
 export function areas(updates: Update[]): Area[] {
 	const groups = new Map<string, Update[]>([...AREAS.map(({ title }) => [title, []] as [string, Update[]]), [OTHER, []]]);
@@ -27,16 +29,13 @@ export function areas(updates: Update[]): Area[] {
 		.map(([title, list]) => ({ title, updates: list.sort((a, b) => a.package.name.localeCompare(b.package.name)) }));
 }
 
-function list(parts: string[]) {
-	return parts.length < 2 ? parts.join('') : `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}`;
-}
-
-export function describe(updates: Update[]) {
+export function contents(updates: Update[]) {
 	const names = updates.map((update) => update.package.name);
-	const parts: string[] = [];
-	if (updates.some((update) => update.security)) parts.push('security fixes');
-	if (names.some((name) => AREAS[0].pattern.test(name))) parts.push('a new Linux kernel');
-	if (names.some((name) => AREAS[1].pattern.test(name))) parts.push('updated drivers');
-	if (!parts.length) return 'Fixes and improvements across the system';
-	return `Includes ${list(parts)}`;
+	return [
+		updates.some((update) => update.security) && 'security',
+		names.some((name) => KERNEL.test(name)) && 'kernel',
+		names.some((name) => DRIVERS.test(name)) && 'drivers'
+	]
+		.filter(Boolean)
+		.join('-');
 }

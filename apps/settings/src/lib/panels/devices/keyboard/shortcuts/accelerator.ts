@@ -1,3 +1,5 @@
+import { t } from '@luft/i18n';
+
 type Modifier = 'super' | 'ctrl' | 'alt' | 'shift' | 'meta' | 'hyper';
 
 const MODIFIERS: Record<string, Modifier> = {
@@ -14,22 +16,53 @@ const MODIFIERS: Record<string, Modifier> = {
 	hyper: 'hyper'
 };
 const MODIFIER_LABELS: [Modifier, string][] = [
-	['super', 'Super'],
-	['ctrl', 'Ctrl'],
-	['alt', 'Alt'],
-	['shift', 'Shift'],
-	['meta', 'Meta'],
-	['hyper', 'Hyper']
+	['super', 'settings-keys-super'],
+	['ctrl', 'settings-keys-ctrl'],
+	['alt', 'settings-keys-alt'],
+	['shift', 'settings-keys-shift'],
+	['meta', 'settings-keys-meta'],
+	['hyper', 'settings-keys-hyper']
 ];
 const KEY_LABELS: Record<string, string> = {
-	Print: 'Print Screen',
-	Page_Up: 'Page Up',
-	Page_Down: 'Page Down',
-	space: 'Space',
-	Return: 'Enter',
-	KP_Enter: 'Enter',
-	BackSpace: 'Backspace',
-	Escape: 'Esc',
+	Print: 'settings-keys-print-screen',
+	Page_Up: 'settings-keys-page-up',
+	Page_Down: 'settings-keys-page-down',
+	Home: 'settings-keys-home',
+	End: 'settings-keys-end',
+	Insert: 'settings-keys-insert',
+	Delete: 'settings-keys-delete',
+	Tab: 'settings-keys-tab',
+	space: 'settings-keys-space',
+	Return: 'settings-keys-enter',
+	KP_Enter: 'settings-keys-enter',
+	BackSpace: 'settings-keys-backspace',
+	Escape: 'settings-keys-escape',
+	Pause: 'settings-keys-pause',
+	Scroll_Lock: 'settings-keys-scroll-lock',
+	Caps_Lock: 'settings-keys-caps-lock',
+	Menu: 'settings-keys-menu',
+	XF86AudioRaiseVolume: 'settings-keys-volume-up',
+	XF86AudioLowerVolume: 'settings-keys-volume-down',
+	XF86AudioMute: 'settings-keys-mute',
+	XF86AudioMicMute: 'settings-keys-microphone-mute',
+	XF86AudioPlay: 'settings-keys-play',
+	XF86AudioPause: 'settings-keys-media-pause',
+	XF86AudioStop: 'settings-keys-stop',
+	XF86AudioNext: 'settings-keys-next-track',
+	XF86AudioPrev: 'settings-keys-previous-track',
+	XF86MonBrightnessUp: 'settings-keys-brightness-up',
+	XF86MonBrightnessDown: 'settings-keys-brightness-down',
+	XF86WWW: 'settings-keys-browser',
+	XF86HomePage: 'settings-keys-home-page',
+	XF86Search: 'settings-keys-search',
+	XF86Mail: 'settings-keys-mail',
+	XF86Calculator: 'settings-keys-calculator',
+	XF86Explorer: 'settings-keys-files',
+	XF86Eject: 'settings-keys-eject',
+	XF86PowerOff: 'settings-keys-power',
+	XF86ScreenSaver: 'settings-keys-lock'
+};
+const KEY_SYMBOLS: Record<string, string> = {
 	Above_Tab: '`',
 	grave: '`',
 	minus: '-',
@@ -47,21 +80,11 @@ const KEY_LABELS: Record<string, string> = {
 	Right: '→',
 	Up: '↑',
 	Down: '↓',
-	XF86AudioRaiseVolume: 'Volume Up',
-	XF86AudioLowerVolume: 'Volume Down',
-	XF86AudioMute: 'Mute',
-	XF86AudioMicMute: 'Microphone Mute',
-	XF86AudioPlay: 'Play',
-	XF86AudioPause: 'Pause',
-	XF86AudioStop: 'Stop',
-	XF86AudioNext: 'Next Track',
-	XF86AudioPrev: 'Previous Track',
-	XF86MonBrightnessUp: 'Brightness Up',
-	XF86MonBrightnessDown: 'Brightness Down',
-	XF86WWW: 'Browser',
-	XF86Explorer: 'Files',
-	XF86PowerOff: 'Power',
-	XF86ScreenSaver: 'Lock'
+	Add: '+',
+	Subtract: '−',
+	Multiply: '×',
+	Divide: '÷',
+	Decimal: '.'
 };
 const CODES: Record<string, string> = {
 	Space: 'space',
@@ -122,9 +145,10 @@ function parse(accelerator: string) {
 }
 
 function keyLabel(key: string): string {
-	if (KEY_LABELS[key]) return KEY_LABELS[key];
+	if (KEY_LABELS[key]) return t(KEY_LABELS[key]);
+	if (KEY_SYMBOLS[key]) return KEY_SYMBOLS[key];
 	if (key.length === 1) return key.toUpperCase();
-	if (key.startsWith('KP_')) return `Keypad ${keyLabel(key.slice(3))}`;
+	if (key.startsWith('KP_')) return t('settings-keys-keypad', { key: keyLabel(key.slice(3)) });
 	if (key.startsWith('XF86')) return key.slice(4).replace(/([a-z])([A-Z])/g, '$1 $2');
 	return key.replace(/_/g, ' ');
 }
@@ -144,7 +168,7 @@ export function canonical(accelerator: string) {
 
 export function labels(accelerator: string) {
 	const { modifiers, key } = parse(accelerator);
-	const held = MODIFIER_LABELS.filter(([modifier]) => modifiers.has(modifier)).map(([, label]) => label);
+	const held = MODIFIER_LABELS.filter(([modifier]) => modifiers.has(modifier)).map(([, label]) => t(label));
 	return key ? [...held, keyLabel(key)] : held;
 }
 

@@ -4,11 +4,14 @@ use std::os::fd::AsFd;
 
 use futures_util::future::join_all;
 use luft_app::dbus::{self, failed};
+use luft_i18n::t;
 use luft_software::http;
 use luft_software::task::Task;
 use serde::Serialize;
 use zbus::fdo::DBusProxy;
 use zbus::{Fd, OwnedVariant, Proxy, Variant};
+
+use crate::L10N;
 
 const SERVICE: &str = "org.freedesktop.fwupd";
 const UPDATABLE: u64 = 1 << 1;
@@ -80,7 +83,7 @@ async fn upgrade(proxy: &Proxy<'_>, device: &Map) -> Option<Firmware> {
     let release = releases.into_iter().next()?;
     let flags = number(device, "Flags");
     Some(Firmware {
-        name: text(device, "Name").unwrap_or_else(|| "Device firmware".into()),
+        name: text(device, "Name").unwrap_or_else(|| t!(L10N, "desktop-updates-firmware-unnamed")),
         vendor: text(device, "Vendor"),
         current: text(device, "Version"),
         version: text(&release, "Version")?,
@@ -116,10 +119,10 @@ pub fn install(id: &str, task: Task) -> Result<(), String> {
     let firmware = luft_app::block_on(updates())?
         .into_iter()
         .find(|firmware| firmware.id == id)
-        .ok_or("This device is already up to date.")?;
+        .ok_or_else(|| t!(L10N, "desktop-updates-firmware-current"))?;
     let url = firmware
         .location
-        .ok_or("This update can't be downloaded.")?;
+        .ok_or_else(|| t!(L10N, "desktop-updates-firmware-no-download"))?;
     let file = dirs::cache_dir()
         .unwrap_or_default()
         .join("com.lantharos.settings")

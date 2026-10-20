@@ -1,0 +1,2 @@
+apps/settings/src/lib/panels/protection/security/protections/KeyStepsDialog.svelte	Enroll MOK
+apps/settings/src/lib/panels/protection/security/protections/KeyStepsDialog.svelte	Delete MOK

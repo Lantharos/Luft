@@ -4,9 +4,11 @@ use std::path::{Path, PathBuf};
 use gio::glib;
 use gio::prelude::*;
 use luft_app::{Events, launch};
+use luft_i18n::t;
 use serde::Serialize;
 
 use super::cache::failed;
+use crate::L10N;
 
 const WALLPAPERS_CHANGED: &str = "appearance.wallpapers";
 const IMAGE_EXTENSIONS: [&str; 6] = ["jpg", "jpeg", "png", "webp", "jxl", "avif"];
@@ -53,7 +55,7 @@ fn display_name(path: &Path) -> String {
 fn folder() -> Result<PathBuf, String> {
     dirs::picture_dir()
         .map(|pictures| pictures.join("Wallpapers"))
-        .ok_or_else(|| "There is no Pictures folder".into())
+        .ok_or_else(|| t!(L10N, "desktop-wallpaper-no-pictures-folder"))
 }
 
 fn system_folders() -> Vec<PathBuf> {
@@ -105,7 +107,7 @@ pub fn add(uris: &[String]) -> Result<(), String> {
     for uri in uris {
         let source = gio::File::for_uri(uri)
             .path()
-            .ok_or("This file can't be opened")?;
+            .ok_or_else(|| t!(L10N, "desktop-wallpaper-unopenable"))?;
         if source.parent() != Some(folder.as_path()) {
             fs::copy(&source, free_path(&folder, &source)).map_err(failed)?;
         }

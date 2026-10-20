@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import type { Component, Snippet } from 'svelte';
 	import { Row, Slider } from '@luft/ui';
 	import { percent } from '#lib/format.js';
@@ -23,7 +24,7 @@
 <Row {title}>
 	{@render controls?.()}
 	<span class="w-11 text-right tabular-nums">{percent(volume)}</span>
-	<button type="button" class="mute" class:muted aria-pressed={muted} aria-label={muted ? `Unmute ${title}` : `Mute ${title}`} onclick={() => onmute(!muted)}>
+	<button type="button" class="mute" class:muted aria-pressed={muted} aria-label={muted ? t('settings-sound-unmute', { name: title }) : t('settings-sound-mute', { name: title })} onclick={() => onmute(!muted)}>
 		{#if muted}
 			<MutedIcon size={18} />
 		{:else}

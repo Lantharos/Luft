@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Clock from '@lucide/svelte/icons/clock';
+	import { i18n, t } from '@luft/i18n';
 	import { Popover } from '@luft/ui';
 
 	interface Props {
@@ -24,10 +25,15 @@
 	let hour = $derived(Math.floor(total / 60));
 	let minute = $derived(total % 60);
 
+	let timeFormat = $derived(
+		new Intl.DateTimeFormat(i18n.formats, twelveHour ? { hour: 'numeric', minute: '2-digit', hour12: true } : { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+	);
+	let hourFormat = $derived(new Intl.DateTimeFormat(i18n.formats, { hour: 'numeric', hour12: true }));
+
 	const pad = (number: number) => String(number).padStart(2, '0');
-	const meridiem = (hour: number) => (hour < 12 ? 'AM' : 'PM');
-	const hourLabel = (hour: number) => (twelveHour ? `${hour % 12 || 12} ${meridiem(hour)}` : pad(hour));
-	const timeLabel = (hour: number, minute: number) => (twelveHour ? `${hour % 12 || 12}:${pad(minute)} ${meridiem(hour)}` : `${pad(hour)}:${pad(minute)}`);
+	const at = (hour: number, minute = 0) => new Date(2000, 0, 1, hour, minute);
+	const hourLabel = (hour: number) => (twelveHour ? hourFormat.format(at(hour)) : pad(hour));
+	const timeLabel = (hour: number, minute: number) => timeFormat.format(at(hour, minute));
 
 	function set(minutes: number) {
 		const wrapped = (minutes + MINUTES_PER_DAY) % MINUTES_PER_DAY;
@@ -58,7 +64,7 @@
 	class:open
 	aria-haspopup="dialog"
 	aria-expanded={open}
-	aria-label="{label}, {timeLabel(hour, minute)}"
+	aria-label={t('settings-time-picker', { label, time: timeLabel(hour, minute) })}
 	onclick={() => (open = !open)}
 	onkeydown={keydown}
 >
@@ -69,14 +75,14 @@
 {#if open && trigger}
 	<Popover anchor={trigger} {label} role="dialog" maxHeight={POPOVER_HEIGHT} onclose={() => (open = false)}>
 		<div class="columns">
-			<div class="column soft-scroll" role="listbox" aria-label="Hour" {@attach centerSelected}>
+			<div class="column soft-scroll" role="listbox" aria-label={t('settings-time-picker-hour')} {@attach centerSelected}>
 				{#each HOURS as option (option)}
 					<button type="button" role="option" aria-selected={option === hour} onclick={() => set(option * 60 + minute)}>
 						{hourLabel(option)}
 					</button>
 				{/each}
 			</div>
-			<div class="column soft-scroll" role="listbox" aria-label="Minute" {@attach centerSelected}>
+			<div class="column soft-scroll" role="listbox" aria-label={t('settings-time-picker-minute')} {@attach centerSelected}>
 				{#each MINUTES as option (option)}
 					<button type="button" role="option" aria-selected={option === minute} onclick={() => set(hour * 60 + option)}>
 						{pad(option)}

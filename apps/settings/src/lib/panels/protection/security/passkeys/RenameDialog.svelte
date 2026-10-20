@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
+	import { t } from '@luft/i18n';
 	import { Dialog, TextField } from '@luft/ui';
 	import { accountLabel, renamePasskey, siteLabel, type Passkey } from './api';
 
@@ -22,9 +23,9 @@
 	}
 </script>
 
-<Dialog title="Rename passkey" description="Give your passkey for {siteLabel(passkey)} a name you’ll recognize." {onclose}>
+<Dialog title={t('settings-passkeys-rename-title')} description={t('settings-passkeys-rename-description', { site: siteLabel(passkey) })} {onclose}>
 	<TextField
-		label="Name"
+		label={t('settings-passkeys-name')}
 		bind:value={name}
 		placeholder={passkey.displayName || passkey.account || accountLabel(passkey)}
 		{error}
@@ -33,7 +34,7 @@
 		onkeydown={(event) => event.key === 'Enter' && save()}
 	/>
 	{#snippet actions()}
-		<button type="button" class="button" onclick={onclose}>Cancel</button>
-		<button type="button" class="button primary" disabled={busy} onclick={save}>Save</button>
+		<button type="button" class="button" onclick={onclose}>{t('settings-protection-cancel')}</button>
+		<button type="button" class="button primary" disabled={busy} onclick={save}>{t('settings-passkeys-save')}</button>
 	{/snippet}
 </Dialog>

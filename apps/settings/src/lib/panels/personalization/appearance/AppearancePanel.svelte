@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Row, Section, Slider, Switch } from '@luft/ui';
 	import { percent } from '#lib/format.js';
 	import { app } from '#lib/state/app.svelte.js';
@@ -36,19 +37,19 @@
 	<AppIconsSection />
 
 	<Section>
-		<Row title="Taskbar" onclick={() => (app.section = 'taskbar')} />
+		<Row title={t('settings-appearance-taskbar')} onclick={() => (app.section = 'taskbar')} />
 	</Section>
 
 	<CursorSection onbrowse={() => (app.section = 'cursors')} />
 
 	<FontsSection onbrowse={() => (app.section = 'fonts')} />
 
-	<Section title="Text and motion">
-		<Row title="Text size" description="Makes text larger or smaller across apps">
+	<Section title={t('settings-appearance-text-and-motion')}>
+		<Row title={t('settings-appearance-text-size')} description={t('settings-appearance-text-size-description')}>
 			<span class="w-12 text-right tabular-nums">{percent(desktop.values['text-scaling-factor'] ?? 1)}</span>
 			{#snippet below()}
 				<Slider
-					label="Text size"
+					label={t('settings-appearance-text-size')}
 					min={0.8}
 					max={1.6}
 					step={0.05}
@@ -58,8 +59,8 @@
 				/>
 			{/snippet}
 		</Row>
-		<Row title="Animations" description="Windows and menus move instead of appearing instantly">
-			<Switch label="Animations" checked={desktop.values['enable-animations'] ?? true} onchange={(on) => desktop.set('enable-animations', on)} />
+		<Row title={t('settings-appearance-animations')} description={t('settings-appearance-animations-description')}>
+			<Switch label={t('settings-appearance-animations')} checked={desktop.values['enable-animations'] ?? true} onchange={(on) => desktop.set('enable-animations', on)} />
 		</Row>
 	</Section>
 {/if}

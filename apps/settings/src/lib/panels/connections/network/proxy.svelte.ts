@@ -1,3 +1,4 @@
+import { t } from '@luft/i18n';
 import { useSettings } from '#lib/state/gsettings.svelte.js';
 
 export type Mode = 'none' | 'manual' | 'auto';
@@ -7,12 +8,12 @@ type Main = { mode: Mode; 'autoconfig-url': string; 'ignore-hosts': string[] };
 export type Server = { host: string; port: number };
 
 const MODE_LABELS: Record<Mode, string> = {
-	none: 'Off',
-	manual: 'Manual',
-	auto: 'Automatic'
+	none: 'settings-network-proxy-off',
+	manual: 'settings-network-proxy-manual',
+	auto: 'settings-network-automatic'
 };
 
-export const proxyLabel = (mode: Mode) => MODE_LABELS[mode];
+export const proxyLabel = (mode: Mode) => t(MODE_LABELS[mode]);
 
 export function useProxy() {
 	const main = useSettings<Main>('org.gnome.system.proxy', ['mode', 'autoconfig-url', 'ignore-hosts']);

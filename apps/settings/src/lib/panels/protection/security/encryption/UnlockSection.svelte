@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Row, Section, Switch } from '@luft/ui';
 	import { acceptSecureBootChange, problem, removeTpmUnlock, replaceRecoveryKey, setUpTpmUnlock, showRecoveryKey, type Trust } from '../api';
 	import RecoveryKeyDialog from '../keys/RecoveryKeyDialog.svelte';
@@ -33,7 +34,7 @@
 
 	function closeTpm(recoveryKey?: string) {
 		open = recoveryKey
-			? { kind: 'key', key: recoveryKey, fresh: true, description: 'Your disk didn’t have a recovery key yet. Keep this one somewhere other than this computer.' }
+			? { kind: 'key', key: recoveryKey, fresh: true, description: 'settings-encryption-new-key-description' }
 			: null;
 	}
 
@@ -51,42 +52,42 @@
 	}
 </script>
 
-<Section title="Unlocking your disk">
+<Section title={t('settings-encryption-unlocking')}>
 	{#if disk.secureBootChanged && tpmUnlocks}
-		<Row title="This computer starts differently now" description="Its Secure Boot settings changed, so the disk asked for its recovery key. If you made the change, confirm it to unlock by itself again">
-			<button type="button" class="button" disabled={busy} onclick={() => attempt(acceptSecureBootChange)}>Confirm</button>
+		<Row title={t('settings-encryption-starts-differently')} description={t('settings-encryption-starts-differently-description')}>
+			<button type="button" class="button" disabled={busy} onclick={() => attempt(acceptSecureBootChange)}>{t('settings-encryption-confirm')}</button>
 		</Row>
 	{:else if disk.tpmRefused && tpmUnlocks}
-		<Row title="Your disk asked for its recovery key" description="Link the security chip again so it unlocks by itself">
-			<button type="button" class="button" disabled={busy} onclick={relink}>Link again</button>
+		<Row title={t('settings-encryption-asked-recovery-key')} description={t('settings-encryption-relink-description')}>
+			<button type="button" class="button" disabled={busy} onclick={relink}>{t('settings-encryption-relink')}</button>
 		</Row>
 	{/if}
 
 	{#if tpmUnlocks}
-		<Row title="Unlock with the security chip" description="As long as nothing changes how this computer starts">
-			<Switch label="Unlock with the security chip" checked disabled={busy} onchange={() => (open = { kind: 'removeTpm' })} />
+		<Row title={t('settings-encryption-chip-unlock')} description={t('settings-encryption-chip-unlock-on')}>
+			<Switch label={t('settings-encryption-chip-unlock')} checked disabled={busy} onchange={() => (open = { kind: 'removeTpm' })} />
 		</Row>
 		{#if pinSet}
-			<Row title="PIN at startup" description="You type it before the disk unlocks">
-				<button type="button" class="button" onclick={() => (open = { kind: 'tpm', mode: 'change' })}>Change</button>
-				<button type="button" class="button" onclick={() => (open = { kind: 'removePin' })}>Remove</button>
+			<Row title={t('settings-encryption-pin')} description={t('settings-encryption-pin-description')}>
+				<button type="button" class="button" onclick={() => (open = { kind: 'tpm', mode: 'change' })}>{t('settings-encryption-change')}</button>
+				<button type="button" class="button" onclick={() => (open = { kind: 'removePin' })}>{t('settings-protection-remove')}</button>
 			</Row>
 		{:else}
-			<Row title="Add a PIN at startup" description="Keeps the disk locked even if the computer is taken">
-				<button type="button" class="button" onclick={() => (open = { kind: 'tpm', mode: 'add' })}>Add PIN</button>
+			<Row title={t('settings-encryption-add-pin-row')} description={t('settings-encryption-add-pin-row-description')}>
+				<button type="button" class="button" onclick={() => (open = { kind: 'tpm', mode: 'add' })}>{t('settings-encryption-add-pin')}</button>
 			</Row>
 		{/if}
 	{:else if trust.tpm.usable}
-		<Row title="Unlock with the security chip" description="So you don’t type a passphrase at startup">
-			<button type="button" class="button" onclick={() => (open = { kind: 'tpm', mode: 'setup' })}>Set up</button>
+		<Row title={t('settings-encryption-chip-unlock')} description={t('settings-encryption-chip-unlock-off')}>
+			<button type="button" class="button" onclick={() => (open = { kind: 'tpm', mode: 'setup' })}>{t('settings-protection-set-up')}</button>
 		</Row>
 	{/if}
 
-	<Row title="Recovery key" description="Gets you in if the disk can’t unlock by itself">
+	<Row title={t('settings-recovery-title')} description={t('settings-recovery-description')}>
 		{#if disk.recoveryKeyStored}
-			<button type="button" class="button" disabled={busy} onclick={showKey}>Show</button>
+			<button type="button" class="button" disabled={busy} onclick={showKey}>{t('settings-recovery-show')}</button>
 		{/if}
-		<button type="button" class="button" disabled={busy} onclick={() => (open = { kind: 'replaceKey' })}>Replace</button>
+		<button type="button" class="button" disabled={busy} onclick={() => (open = { kind: 'replaceKey' })}>{t('settings-recovery-replace')}</button>
 	</Row>
 </Section>
 
@@ -98,31 +99,29 @@
 	<TpmDialog mode={open.mode} onclose={closeTpm} />
 {:else if open?.kind === 'removeTpm'}
 	<ConfirmDialog
-		title="Stop unlocking with the security chip?"
-		description={disk.unlock.includes('passphrase')
-			? 'Your computer will ask for your passphrase every time it starts.'
-			: 'Your computer will ask for your recovery key every time it starts, so keep it close.'}
-		action="Stop unlocking"
+		title={t('settings-encryption-stop-chip-title')}
+		description={disk.unlock.includes('passphrase') ? t('settings-encryption-stop-chip-passphrase') : t('settings-encryption-stop-chip-recovery-key')}
+		action={t('settings-encryption-stop-chip')}
 		danger
 		run={async () => Boolean(await withUnlock(removeTpmUnlock))}
 		onclose={close}
 	/>
 {:else if open?.kind === 'removePin'}
 	<ConfirmDialog
-		title="Remove your PIN?"
-		description="The disk will unlock by itself again when the computer starts."
-		action="Remove PIN"
+		title={t('settings-encryption-remove-pin-title')}
+		description={t('settings-encryption-remove-pin-description')}
+		action={t('settings-encryption-remove-pin')}
 		run={async () => Boolean(await withUnlock(setUpTpmUnlock('')))}
 		onclose={close}
 	/>
 {:else if open?.kind === 'replaceKey'}
 	<ConfirmDialog
-		title="Replace your recovery key?"
-		description="Your current key stops working, and you’ll get a new one to save."
-		action="Replace key"
+		title={t('settings-recovery-replace-title')}
+		description={t('settings-recovery-replace-description')}
+		action={t('settings-recovery-replace-key')}
 		run={replaceKey}
 		onclose={close}
 	/>
 {:else if open?.kind === 'key'}
-	<RecoveryKeyDialog key={open.key} fresh={open.fresh} description={open.description} onclose={close} />
+	<RecoveryKeyDialog key={open.key} fresh={open.fresh} description={open.description && t(open.description)} onclose={close} />
 {/if}

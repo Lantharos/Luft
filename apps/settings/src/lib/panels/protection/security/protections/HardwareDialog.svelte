@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Dialog } from '@luft/ui';
 	import type { HostSecurity } from '../api';
 	import { byFix, levelSentence } from './hsi';
@@ -8,13 +9,17 @@
 	const groups = $derived(byFix(host.missing));
 </script>
 
-<Dialog title="Hardware security" description="{levelSentence(host)}, level {host.level} of {host.highest}." {onclose}>
+<Dialog
+	title={t('settings-security-hardware')}
+	description={t('settings-security-hardware-description', { summary: levelSentence(host), level: host.level, highest: host.highest })}
+	{onclose}
+>
 	{#if groups.length}
 		<div class="flex flex-col gap-2">
-			<h3 class="heading">For the next level</h3>
+			<h3 class="heading">{t('settings-security-hardware-next')}</h3>
 			{#each groups as group (group.fix)}
 				<div class="flex flex-col gap-1.5">
-					<p class="text-[12.5px] leading-relaxed text-[var(--text-muted)]">{group.sentence}:</p>
+					<p class="text-[12.5px] leading-relaxed text-[var(--text-muted)]">{group.sentence}</p>
 					<ul class="list">
 						{#each group.items as item (item.id)}
 							<li>{item.name}</li>
@@ -24,11 +29,11 @@
 			{/each}
 		</div>
 	{:else if host.level >= host.highest}
-		<p class="text-[13px] text-[var(--text-soft)]">This is the highest level there is.</p>
+		<p class="text-[13px] text-[var(--text-soft)]">{t('settings-security-hardware-highest')}</p>
 	{/if}
 	{#if host.runtime.length}
 		<div class="flex flex-col gap-1.5">
-			<h3 class="heading">Not active right now</h3>
+			<h3 class="heading">{t('settings-security-hardware-inactive')}</h3>
 			<ul class="list">
 				{#each host.runtime as item (item.id)}
 					<li>{item.name}</li>
@@ -37,7 +42,7 @@
 		</div>
 	{/if}
 	{#snippet actions()}
-		<button type="button" class="button" onclick={onclose}>Close</button>
+		<button type="button" class="button" onclick={onclose}>{t('settings-protection-close')}</button>
 	{/snippet}
 </Dialog>
 

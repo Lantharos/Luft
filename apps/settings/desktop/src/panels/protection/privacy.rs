@@ -7,10 +7,13 @@ use futures_util::StreamExt;
 use gio::prelude::*;
 use luft_app::dbus;
 use luft_app::{Commands, Events};
+use luft_i18n::t;
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use zbus::{OwnedVariant, Proxy};
+
+use crate::L10N;
 
 pub const PERMISSIONS_CHANGED: &str = "privacy.permissions";
 
@@ -194,7 +197,7 @@ async fn set_permission(Change { kind, app, allowed }: Change) -> Result<(), Str
 
 fn clear_history(_: Value) -> Result<(), String> {
     let history = dirs::data_dir()
-        .ok_or("There is no data folder")?
+        .ok_or_else(|| t!(L10N, "desktop-no-data-folder"))?
         .join("recently-used.xbel");
     match fs::remove_file(history) {
         Err(error) if error.kind() != ErrorKind::NotFound => Err(error.to_string()),

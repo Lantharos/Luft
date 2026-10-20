@@ -2,22 +2,23 @@ use std::fs::File;
 use std::io::{BufWriter, Read, Write};
 use std::path::Path;
 
+use luft_i18n::t;
+
 use super::install::Progress;
 use super::store;
+use crate::L10N;
 
 const MAX_DOWNLOAD_BYTES: u64 = 128 * 1024 * 1024;
 const REPORT_EVERY_BYTES: u64 = 256 * 1024;
-const TOO_LARGE: &str = "This download is larger than a cursor theme should be";
-const INTERRUPTED: &str = "The download stopped before it finished. Try again.";
 
 pub fn download(url: &str, into: &Path, report: &impl Fn(Progress)) -> Result<(), String> {
     let response = store::agent()
         .get(url)
         .call()
-        .map_err(|_| "GNOME-Look couldn't send this download. Try again later.".to_string())?;
+        .map_err(|_| t!(L10N, "desktop-cursors-download-refused"))?;
     let total = response.body().content_length();
     if total.is_some_and(|total| total > MAX_DOWNLOAD_BYTES) {
-        return Err(TOO_LARGE.into());
+        return Err(t!(L10N, "desktop-cursors-download-too-large"));
     }
     let mut body = response
         .into_body()
@@ -30,7 +31,7 @@ pub fn download(url: &str, into: &Path, report: &impl Fn(Progress)) -> Result<()
     loop {
         let read = body
             .read(&mut buffer)
-            .map_err(|_| INTERRUPTED.to_string())?;
+            .map_err(|_| t!(L10N, "desktop-cursors-download-interrupted"))?;
         if read == 0 {
             break;
         }

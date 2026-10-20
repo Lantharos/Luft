@@ -1,14 +1,13 @@
+use luft_i18n::t;
 use luft_software::image::Deployments;
 use luft_software::system::System;
 use luft_software::variant::{self, Variant};
 
 use super::background::notify;
 use super::store::GraphicsSeen;
+use crate::L10N;
 
 pub const CHECK_GRAPHICS_ARGUMENT: &str = "--check-graphics";
-
-const SUMMARY: &str = "Get the most out of your NVIDIA graphics";
-const BODY: &str = "Switch to NVIDIA's own driver in Settings.";
 
 async fn check() -> Result<(), String> {
     let cards = variant::nvidia_cards();
@@ -21,7 +20,13 @@ async fn check() -> Result<(), String> {
     let offer = Deployments::load().await?.variant_offer();
     GraphicsSeen { cards }.save()?;
     match offer {
-        Some(Variant::Nvidia) => notify(SUMMARY, BODY).await,
+        Some(Variant::Nvidia) => {
+            notify(
+                &t!(L10N, "desktop-updates-nvidia-summary"),
+                &t!(L10N, "desktop-updates-nvidia-body"),
+            )
+            .await
+        }
         _ => Ok(()),
     }
 }

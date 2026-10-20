@@ -2,12 +2,14 @@ use std::io::Read;
 use std::sync::OnceLock;
 use std::time::Duration;
 
+use luft_i18n::t;
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 use ureq::Agent;
 use ureq::tls::{RootCerts, TlsConfig};
 
 use super::archive;
+use crate::L10N;
 
 const API: &str = "https://api.gnome-look.org/ocs/v1/content";
 const PRODUCT_PAGE: &str = "https://www.gnome-look.org/p";
@@ -15,8 +17,6 @@ const IMAGE_CACHE: &str = "https://images.pling.com/cache/320x224-2/img/";
 const CURSOR_CATEGORY: u32 = 107;
 const PAGE_SIZE: u32 = 20;
 const USER_AGENT: &str = "Luft Settings";
-const UNREACHABLE: &str =
-    "GNOME-Look can't be reached right now. Check your connection and try again.";
 
 #[derive(Deserialize, Clone, Copy)]
 #[serde(rename_all = "camelCase")]
@@ -144,20 +144,24 @@ fn get(url: &str, query: &[(&str, &str)]) -> Result<Map<String, Value>, String> 
     let mut body = String::new();
     request
         .call()
-        .map_err(|_| UNREACHABLE.to_string())?
+        .map_err(|_| unreachable())?
         .into_body()
         .into_reader()
         .read_to_string(&mut body)
-        .map_err(|_| UNREACHABLE.to_string())?;
-    let response: Map<String, Value> =
-        serde_json::from_str(&body).map_err(|_| UNREACHABLE.to_string())?;
+        .map_err(|_| unreachable())?;
+    let response: Map<String, Value> = serde_json::from_str(&body).map_err(|_| unreachable())?;
     match response.get("status").and_then(Value::as_str) {
         Some("ok") => Ok(response),
-        _ => Err(format!(
-            "GNOME-Look couldn't answer: {}",
-            text(&response, "message")
+        _ => Err(t!(
+            L10N,
+            "desktop-cursors-store-failed",
+            reason = text(&response, "message")
         )),
     }
+}
+
+fn unreachable() -> String {
+    t!(L10N, "desktop-cursors-store-unreachable")
 }
 
 fn entries(response: &Map<String, Value>) -> impl Iterator<Item = &Map<String, Value>> {
@@ -202,11 +206,11 @@ pub fn download_link(id: u64, index: u32) -> Result<(String, String), String> {
     let response = get(&format!("{API}/data/{id}"), &[])?;
     let item = entries(&response)
         .next()
-        .ok_or("This theme is no longer available")?;
+        .ok_or_else(|| t!(L10N, "desktop-cursors-theme-gone"))?;
     let link = text(item, &format!("downloadlink{index}"));
     let name = text(item, &format!("downloadname{index}"));
     if link.is_empty() || archive::Format::of(&name).is_none() {
-        return Err("This download is no longer available".into());
+        return Err(t!(L10N, "desktop-cursors-download-gone"));
     }
     Ok((link, name))
 }

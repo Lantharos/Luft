@@ -1,9 +1,11 @@
 use luft_app::dbus::{self, error_name, failed};
+use luft_i18n::t;
 use zbus::{ObjectPath, Proxy};
 
 use super::network::airplane;
 use super::snapshot::Adapter;
 use super::{ADAPTER, DEVICE, SERVICE};
+use crate::L10N;
 
 async fn proxy<'a>(path: &'a str, interface: &'a str) -> Result<Proxy<'a>, String> {
     Proxy::new(dbus::system().await?, SERVICE, path, interface)
@@ -13,21 +15,19 @@ async fn proxy<'a>(path: &'a str, interface: &'a str) -> Result<Proxy<'a>, Strin
 
 fn explain(error: zbus::Error) -> String {
     let explanation = match error_name(&error).as_deref().unwrap_or_default() {
-        "org.bluez.Error.AuthenticationFailed" => "The code didn't match",
+        "org.bluez.Error.AuthenticationFailed" => "desktop-bluetooth-code-mismatch",
         "org.bluez.Error.AuthenticationCanceled" | "org.bluez.Error.AuthenticationRejected" => {
-            "Pairing was canceled"
+            "desktop-bluetooth-pairing-canceled"
         }
-        "org.bluez.Error.AuthenticationTimeout" => "The device took too long to respond",
+        "org.bluez.Error.AuthenticationTimeout" => "desktop-bluetooth-timed-out",
         "org.bluez.Error.ConnectionAttemptFailed"
         | "org.bluez.Error.Failed"
         | "org.bluez.Error.NotReady"
-        | "org.bluez.Error.NotAvailable" => {
-            "Couldn't reach the device. Make sure it's on and nearby."
-        }
-        "org.bluez.Error.InProgress" => "Still working on the last request",
-        _ => "Something went wrong. Try again.",
+        | "org.bluez.Error.NotAvailable" => "desktop-bluetooth-unreachable",
+        "org.bluez.Error.InProgress" => "desktop-bluetooth-busy",
+        _ => "desktop-bluetooth-failed",
     };
-    explanation.to_owned()
+    t!(L10N, explanation)
 }
 
 async fn device_call(path: &str, method: &str) -> Result<(), String> {
@@ -78,7 +78,9 @@ pub async fn pair(device: &str) -> Result<(), String> {
 }
 
 pub async fn forget(device: &str) -> Result<(), String> {
-    let (adapter, _) = device.rsplit_once('/').ok_or("Unknown device")?;
+    let (adapter, _) = device
+        .rsplit_once('/')
+        .ok_or_else(|| t!(L10N, "desktop-bluetooth-unknown-device"))?;
     proxy(adapter, ADAPTER)
         .await?
         .call_method(

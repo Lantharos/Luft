@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Row, Section } from '@luft/ui';
 	import { updates } from '#lib/state/updates.svelte.js';
 	import { downloading, fractionOf, showsProgress } from './activity';
@@ -9,6 +10,7 @@
 	import ImageUpdates from './image/ImageUpdates.svelte';
 	import PackageUpdates from './packages/PackageUpdates.svelte';
 	import ProgressTrack from '#lib/components/ProgressTrack.svelte';
+	import { percent } from '#lib/format.js';
 
 	let devices = $state<Firmware[]>([]);
 	let preferences = $state<Preferences | null>(null);
@@ -48,15 +50,15 @@
 			<span class="truncate text-[14px] text-[var(--text-muted)]">{subline(info, activity, failure)}</span>
 		</div>
 		{#if downloading(activity)}
-			<button type="button" class="button" onclick={() => attempt(cancel)}>Stop</button>
+			<button type="button" class="button" onclick={() => attempt(cancel)}>{t('settings-updates-stop')}</button>
 		{:else}
-			<button type="button" class="button" disabled={busy} onclick={() => attempt(check)}>{activity.running === 'check' ? 'Checking…' : 'Check now'}</button>
+			<button type="button" class="button" disabled={busy} onclick={() => attempt(check)}>{activity.running === 'check' ? t('settings-updates-checking-button') : t('settings-updates-check')}</button>
 		{/if}
 	</div>
 	{#if showsProgress(activity)}
 		<div class="flex items-center gap-3">
 			<ProgressTrack {fraction} class="h-1.5 flex-1 bg-[var(--control)]" />
-			<span class="w-10 text-right text-[12.5px] text-[var(--text-muted)] tabular-nums">{fraction === null ? '' : `${Math.round(fraction * 100)}%`}</span>
+			<span class="w-10 text-right text-[12.5px] text-[var(--text-muted)] tabular-nums">{fraction === null ? '' : percent(fraction)}</span>
 		</div>
 	{/if}
 </div>
@@ -71,10 +73,10 @@
 	<FirmwareSection {devices} {activity} />
 {/if}
 
-<Section title="Apps">
+<Section title={t('settings-updates-apps')}>
 	<Row
-		title="App updates"
-		description={apps === null ? 'Looking for updates to your apps…' : apps ? `${apps} ${apps === 1 ? 'app has an update' : 'apps have updates'} in Schelf` : 'Managed in Schelf'}
+		title={t('settings-updates-app-updates')}
+		description={apps === null ? t('settings-updates-apps-checking') : t('settings-updates-apps-count', { count: apps })}
 		onclick={openApps}
 	/>
 </Section>

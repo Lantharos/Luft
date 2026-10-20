@@ -1,6 +1,7 @@
 <script lang="ts">
 	import X from '@lucide/svelte/icons/x';
 	import { untrack } from 'svelte';
+	import { t } from '@luft/i18n';
 	import { IconButton, Row, Section, Select, Switch, TextField } from '@luft/ui';
 	import RouteRow from './RouteRow.svelte';
 	import { configurable, type Family, type Ip } from './profile';
@@ -13,13 +14,13 @@
 	}
 
 	const METHOD_LABELS: Record<string, string> = {
-		auto: 'Automatic',
-		dhcp: 'Automatic, addresses only',
-		manual: 'Manual',
-		'link-local': 'Link-local only',
-		shared: 'Shared with other devices',
-		ignore: 'Not managed',
-		disabled: 'Off'
+		auto: 'settings-network-automatic',
+		dhcp: 'settings-network-ip-dhcp',
+		manual: 'settings-network-ip-manual',
+		'link-local': 'settings-network-ip-link-local',
+		shared: 'settings-network-ip-shared',
+		ignore: 'settings-network-ip-ignore',
+		disabled: 'settings-network-ip-disabled'
 	};
 	const OFFERED = ['auto', 'manual', 'link-local', 'disabled'];
 
@@ -31,7 +32,7 @@
 	let title = $derived(family === 'ipv4' ? 'IPv4' : 'IPv6');
 	let example = $derived(family === 'ipv4' ? '192.168.1.20/24' : '2001:db8::20/64');
 	let automatic = $derived(ip.method === 'auto' || ip.method === 'dhcp');
-	let methods = $derived((OFFERED.includes(ip.method) ? OFFERED : [...OFFERED, ip.method]).map((value) => ({ value, label: METHOD_LABELS[value] ?? value })));
+	let methods = $derived((OFFERED.includes(ip.method) ? OFFERED : [...OFFERED, ip.method]).map((value) => ({ value, label: value in METHOD_LABELS ? t(METHOD_LABELS[value]) : value })));
 
 	function addRoute() {
 		ip.routes.push({ destination: '', gateway: '', metric: null });
@@ -39,69 +40,72 @@
 </script>
 
 <Section title={title}>
-	<Row title="Method">
-		<Select label="{title} method" options={methods} value={ip.method} onchange={(method) => (ip.method = method)} />
+	<Row title={t('settings-network-ip-method')}>
+		<Select label={t('settings-network-ip-method.label', { family: title })} options={methods} value={ip.method} onchange={(method) => (ip.method = method)} />
 	</Row>
 	{#if ip.method === 'manual'}
-		<Row title="Addresses" description="Each with its prefix, like {example}">
+		<Row title={t('settings-network-ip-addresses')} description={t('settings-network-ip-addresses.description', { example })}>
 			{#snippet below()}
 				{#each ip.addresses as _, index (index)}
 					<div class="flex items-start gap-2">
 						<div class="flex-1">
-							<TextField label="Address {index + 1}" bind:value={ip.addresses[index]} placeholder={example} error={errors[`${family}.address.${index}`]} />
+							<TextField label={t('settings-network-ip-address', { number: index + 1 })} bind:value={ip.addresses[index]} placeholder={example} error={errors[`${family}.address.${index}`]} />
 						</div>
-						<IconButton icon={X} label="Remove address" onclick={() => ip.addresses.splice(index, 1)} />
+						<IconButton icon={X} label={t('settings-network-ip-remove-address')} onclick={() => ip.addresses.splice(index, 1)} />
 					</div>
 				{/each}
 				{#if errors[`${family}.addresses`]}
 					<p class="text-[12.5px] text-[var(--danger)]">{errors[`${family}.addresses`]}</p>
 				{/if}
-				<button type="button" class="button self-start" onclick={() => ip.addresses.push('')}>Add address</button>
+				<button type="button" class="button self-start" onclick={() => ip.addresses.push('')}>{t('settings-network-ip-add-address')}</button>
 			{/snippet}
 		</Row>
-		<Row title="Router">
+		<Row title={t('settings-network-router')}>
 			<div class="w-[260px]">
-				<TextField label="{title} router" bind:value={ip.gateway} placeholder="Optional" error={errors[`${family}.gateway`]} />
+				<TextField label={t('settings-network-ip-router', { family: title })} bind:value={ip.gateway} placeholder={t('settings-network-optional')} error={errors[`${family}.gateway`]} />
 			</div>
 		</Row>
 	{/if}
 	{#if configurable(ip.method)}
 		{#if automatic}
-			<Row title="Automatic DNS" description="Use the DNS servers this network suggests">
-				<Switch label="Automatic DNS" checked={ip.automaticDns} onchange={(on) => (ip.automaticDns = on)} />
+			<Row title={t('settings-network-ip-automatic-dns')} description={t('settings-network-ip-automatic-dns.description')}>
+				<Switch label={t('settings-network-ip-automatic-dns')} checked={ip.automaticDns} onchange={(on) => (ip.automaticDns = on)} />
 			</Row>
 		{/if}
-		<Row title="DNS servers" description={automatic && ip.automaticDns ? 'Used before the suggested ones' : 'Separate addresses with commas'}>
+		<Row
+			title={t('settings-network-dns-servers')}
+			description={automatic && ip.automaticDns ? t('settings-network-ip-dns-first') : t('settings-network-ip-dns-separate')}
+		>
 			<div class="w-[260px]">
 				<TextField
-					label="{title} DNS servers"
+					label={t('settings-network-ip-dns-servers', { family: title })}
 					bind:value={() => dns, (text) => ((dns = text), (ip.dns = words(text)))}
-					placeholder={automatic ? 'Optional' : ''}
+					placeholder={automatic ? t('settings-network-optional') : ''}
 					error={errors[`${family}.dns`]}
 				/>
 			</div>
 		</Row>
-		<Row title="Search domains" description="Tried when a name has no domain, like “printer”">
+		<Row title={t('settings-network-ip-search-domains')} description={t('settings-network-ip-search-domains.description')}>
 			<div class="w-[260px]">
 				<TextField
-					label="{title} search domains"
+					label={t('settings-network-ip-search-domains.label', { family: title })}
 					bind:value={() => search, (text) => ((search = text), (ip.search = words(text)))}
-					placeholder="Optional"
+					placeholder={t('settings-network-optional')}
 					error={errors[`${family}.search`]}
 				/>
 			</div>
 		</Row>
 		{#if automatic}
-			<Row title="Automatic routes" description="Use the routes this network suggests">
-				<Switch label="Automatic routes" checked={ip.automaticRoutes} onchange={(on) => (ip.automaticRoutes = on)} />
+			<Row title={t('settings-network-ip-automatic-routes')} description={t('settings-network-ip-automatic-routes.description')}>
+				<Switch label={t('settings-network-ip-automatic-routes')} checked={ip.automaticRoutes} onchange={(on) => (ip.automaticRoutes = on)} />
 			</Row>
 		{/if}
-		<Row title="Routes" description="Send traffic for some networks through another router">
+		<Row title={t('settings-network-ip-routes')} description={t('settings-network-ip-routes.description')}>
 			{#snippet below()}
 				{#each ip.routes as route, index (route)}
 					<RouteRow bind:route={ip.routes[index]} {family} {index} {errors} onremove={() => ip.routes.splice(index, 1)} />
 				{/each}
-				<button type="button" class="button self-start" onclick={addRoute}>Add route</button>
+				<button type="button" class="button self-start" onclick={addRoute}>{t('settings-network-ip-add-route')}</button>
 			{/snippet}
 		</Row>
 	{/if}

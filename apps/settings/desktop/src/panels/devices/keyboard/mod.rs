@@ -1,15 +1,19 @@
 mod dictation;
 mod layouts;
 mod methods;
+mod names;
 mod shortcuts;
 
 use std::collections::HashMap;
 
 use gio::prelude::*;
 use luft_app::{Commands, Events, launch};
+use luft_i18n::t;
 use sabine::SabineWindow;
 use serde::Deserialize;
 use serde_json::Value;
+
+use crate::L10N;
 
 const KEYS: &str = "com.lantharos.keys.desktop";
 
@@ -25,7 +29,8 @@ struct Link {
 }
 
 fn open_keys(Link { link, token }: Link) -> Result<(), String> {
-    let keys = gio_unix::DesktopAppInfo::new(KEYS).ok_or("Keys isn't installed")?;
+    let keys = gio_unix::DesktopAppInfo::new(KEYS)
+        .ok_or_else(|| t!(L10N, "desktop-keyboard-keys-missing"))?;
     launch::start(keys.upcast_ref(), &[link.as_str()], token.as_deref())
         .map_err(|error| error.to_string())
 }

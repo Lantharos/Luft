@@ -1,10 +1,9 @@
 <script lang="ts">
 	import Power from '@lucide/svelte/icons/power';
+	import { t } from '@luft/i18n';
 	import { Row } from '@luft/ui';
 	import { cancelSigningKey, enrollSigningKey, installSignedStartup, problem, restart, type SigningKey, type Startup } from '../api';
 	import KeyStepsDialog from './KeyStepsDialog.svelte';
-
-	const PURPOSE = 'Only lets software signed for this computer start it';
 
 	let { key, startup }: { key: SigningKey; startup: Startup } = $props();
 
@@ -20,10 +19,10 @@
 	});
 
 	let description = $derived.by(() => {
-		if (step === 'restart') return 'Starts being used after you restart';
-		if (step === 'pending') return key.missed ? 'The key wasn’t added at the last restart' : 'Add the key on the blue screen when you restart';
-		if (step === 'enroll' && key.missed) return 'The key wasn’t added after a few restarts';
-		return PURPOSE;
+		if (step === 'restart') return t('settings-security-signed-startup-restart');
+		if (step === 'pending') return key.missed ? t('settings-security-signed-startup-missed') : t('settings-security-signed-startup-pending');
+		if (step === 'enroll' && key.missed) return t('settings-security-signed-startup-missed-often');
+		return t('settings-security-signed-startup-purpose');
 	});
 
 	async function attempt(action: () => Promise<unknown>) {
@@ -45,18 +44,18 @@
 {/snippet}
 
 {#if step === 'on'}
-	<Row title="Signed startup" description="The boot menu and system are signed for this computer" icon={Power} />
+	<Row title={t('settings-security-signed-startup')} description={t('settings-security-signed-startup-on')} icon={Power} />
 {:else if step}
-	<Row title="Signed startup" {description} icon={Power} below={error ? failure : undefined}>
+	<Row title={t('settings-security-signed-startup')} {description} icon={Power} below={error ? failure : undefined}>
 		{#if step === 'restart'}
-			<button type="button" class="button" disabled={busy} onclick={() => attempt(restart)}>Restart</button>
+			<button type="button" class="button" disabled={busy} onclick={() => attempt(restart)}>{t('settings-protection-restart')}</button>
 		{:else if step === 'install'}
-			<button type="button" class="button" disabled={busy} onclick={() => attempt(installSignedStartup)}>Turn on</button>
+			<button type="button" class="button" disabled={busy} onclick={() => attempt(installSignedStartup)}>{t('settings-protection-turn-on')}</button>
 		{:else if step === 'pending'}
-			<button type="button" class="button" disabled={busy} onclick={() => attempt(cancelSigningKey)}>Cancel</button>
-			<button type="button" class="button" disabled={busy} onclick={addKey}>Show steps</button>
+			<button type="button" class="button" disabled={busy} onclick={() => attempt(cancelSigningKey)}>{t('settings-protection-cancel')}</button>
+			<button type="button" class="button" disabled={busy} onclick={addKey}>{t('settings-security-show-steps')}</button>
 		{:else}
-			<button type="button" class="button" disabled={busy} onclick={addKey}>{key.missed ? 'Try again' : 'Set up'}</button>
+			<button type="button" class="button" disabled={busy} onclick={addKey}>{key.missed ? t('settings-security-try-again') : t('settings-protection-set-up')}</button>
 		{/if}
 	</Row>
 {/if}

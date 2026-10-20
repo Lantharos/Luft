@@ -3,11 +3,14 @@ use std::sync::Once;
 
 use futures_util::StreamExt;
 use luft_app::{Commands, Events, launch};
+use luft_i18n::t;
 use luft_speech::client;
 use luft_speech::types::Overview;
 use sabine::SabineWindow;
 use serde::Deserialize;
 use serde_json::Value;
+
+use crate::L10N;
 
 const CHANGED: &str = "dictation.changed";
 
@@ -26,7 +29,7 @@ struct Homepage {
 
 fn open_homepage(Homepage { url, token }: Homepage) -> Result<(), String> {
     if !url.starts_with("https://") {
-        return Err("That isn't a web address".to_owned());
+        return Err(t!(L10N, "desktop-dictation-not-web-address"));
     }
     launch::open(&url, token.as_deref()).map_err(|error| error.to_string())
 }

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Checkbox, Dialog, RecoveryKey } from '@luft/ui';
 	import { printRecoveryKey, saveRecoveryKey } from '../api';
 
@@ -9,22 +10,24 @@
 		onclose: () => void;
 	}
 
-	const SHOWN = 'Type it if your computer ever asks for a recovery key at startup. Keep a copy somewhere other than this computer.';
-	const FRESH = 'Your previous key no longer works. Keep this one on paper or in a password manager.';
-
-	let { key, fresh = false, description = fresh ? FRESH : SHOWN, onclose }: Props = $props();
+	let { key, fresh = false, description, onclose }: Props = $props();
 
 	let saved = $state(false);
 
 	const close = () => (!fresh || saved) && onclose();
 </script>
 
-<Dialog title={fresh ? 'Save your new recovery key' : 'Your recovery key'} {description} wide onclose={close}>
+<Dialog
+	title={fresh ? t('settings-recovery-fresh-title') : t('settings-recovery-shown-title')}
+	description={description ?? (fresh ? t('settings-recovery-fresh-description') : t('settings-recovery-shown-description'))}
+	wide
+	onclose={close}
+>
 	<RecoveryKey {key} onsave={() => saveRecoveryKey(key)} onprint={() => printRecoveryKey(key)} />
 	{#if fresh}
-		<Checkbox label="I’ve saved my recovery key" checked={saved} onchange={(checked) => (saved = checked)}>I’ve saved my recovery key</Checkbox>
+		<Checkbox label={t('settings-recovery-saved')} checked={saved} onchange={(checked) => (saved = checked)}>{t('settings-recovery-saved')}</Checkbox>
 	{/if}
 	{#snippet actions()}
-		<button type="button" class="button primary" disabled={fresh && !saved} onclick={onclose}>Done</button>
+		<button type="button" class="button primary" disabled={fresh && !saved} onclick={onclose}>{t('settings-protection-done')}</button>
 	{/snippet}
 </Dialog>

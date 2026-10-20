@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Usb from '@lucide/svelte/icons/usb';
+	import { t } from '@luft/i18n';
 	import { Row, Switch } from '@luft/ui';
 	import { problem, setUsbProtection, type UsbProtection } from '../api';
 	import type { SecurityState } from '../state.svelte';
@@ -26,6 +27,6 @@
 	<p class="pl-[34px] text-[12.5px] text-[var(--danger)]">{error}</p>
 {/snippet}
 
-<Row title="Hold back new USB devices" description="Ones plugged in while locked wait until you unlock" icon={Usb} below={error ? failure : undefined}>
-	<Switch label="Hold back new USB devices" checked={usb.enabled} disabled={busy} onchange={change} />
+<Row title={t('settings-usb-hold-back')} description={t('settings-usb-hold-back-description')} icon={Usb} below={error ? failure : undefined}>
+	<Switch label={t('settings-usb-hold-back')} checked={usb.enabled} disabled={busy} onchange={change} />
 </Row>

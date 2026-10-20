@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Row, Section, Switch } from '@luft/ui';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import DelayRow from './DelayRow.svelte';
@@ -31,43 +32,43 @@
 	const milliseconds = (seconds: number) => Math.round(seconds * 1000);
 </script>
 
-<Section title="Typing">
-	<Row title="On-screen keyboard">
+<Section title={t('settings-accessibility-typing')}>
+	<Row title={t('settings-accessibility-osk')}>
 		<Switch
-			label="On-screen keyboard"
+			label={t('settings-accessibility-osk')}
 			checked={applications.values['screen-keyboard-enabled'] ?? false}
 			onchange={(on) => applications.set('screen-keyboard-enabled', on)}
 		/>
 	</Row>
-	<Row title="Typing assist" {expanded} onclick={() => (opened = !expanded)}>
-		{assists ? `${assists} on` : 'Off'}
+	<Row title={t('settings-accessibility-typing-assist')} {expanded} onclick={() => (opened = !expanded)}>
+		{t('settings-accessibility-typing-assist-count', { count: assists })}
 	</Row>
 	{#if expanded}
-		<Row title="Sticky keys">
+		<Row title={t('settings-accessibility-sticky-keys')}>
 			<Switch
-				label="Sticky keys"
+				label={t('settings-accessibility-sticky-keys')}
 				checked={keyboard.values['stickykeys-enable'] ?? false}
 				onchange={(on) => keyboard.set('stickykeys-enable', on)}
 			/>
 		</Row>
-		<Row title="Slow keys">
-			<Switch label="Slow keys" checked={slow} onchange={(on) => keyboard.set('slowkeys-enable', on)} />
+		<Row title={t('settings-accessibility-slow-keys')}>
+			<Switch label={t('settings-accessibility-slow-keys')} checked={slow} onchange={(on) => keyboard.set('slowkeys-enable', on)} />
 		</Row>
 		{#if slow}
 			<DelayRow
-				title="Slow keys delay"
+				title={t('settings-accessibility-slow-keys-delay')}
 				seconds={seconds(keyboard.values['slowkeys-delay'])}
 				min={0.1}
 				max={2}
 				onchange={(value) => keyboard.set('slowkeys-delay', milliseconds(value))}
 			/>
 		{/if}
-		<Row title="Bounce keys">
-			<Switch label="Bounce keys" checked={bounce} onchange={(on) => keyboard.set('bouncekeys-enable', on)} />
+		<Row title={t('settings-accessibility-bounce-keys')}>
+			<Switch label={t('settings-accessibility-bounce-keys')} checked={bounce} onchange={(on) => keyboard.set('bouncekeys-enable', on)} />
 		</Row>
 		{#if bounce}
 			<DelayRow
-				title="Bounce keys delay"
+				title={t('settings-accessibility-bounce-keys-delay')}
 				seconds={seconds(keyboard.values['bouncekeys-delay'])}
 				min={0.1}
 				max={2}

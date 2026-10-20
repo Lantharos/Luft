@@ -12,12 +12,13 @@ use libpulse_binding::mainloop::events::io::FlagSet as IoFlags;
 use libpulse_binding::mainloop::standard::{IterateResult, Mainloop};
 use libpulse_binding::proplist::{Proplist, properties};
 use luft_app::Events;
+use luft_i18n::t;
 
 use super::pulse::Pulse;
 use super::{AlertVolume, Balance, DefaultDevice, Meter, MoveApp, Mute, Port, Profile, Volume};
+use crate::L10N;
 
 const APP_ID: &str = "com.lantharos.settings";
-const UNAVAILABLE: &str = "Sound isn't available right now";
 
 pub enum Command {
     Publish,
@@ -70,7 +71,9 @@ pub fn send(events: &Events, command: Command) -> Result<(), String> {
         None => command,
     };
     let service = Service::start(events.clone())?;
-    service.send(command).map_err(|_| UNAVAILABLE.to_owned())?;
+    service
+        .send(command)
+        .map_err(|_| t!(L10N, "desktop-sound-unavailable"))?;
     *slot = Some(service);
     Ok(())
 }
@@ -78,7 +81,7 @@ pub fn send(events: &Events, command: Command) -> Result<(), String> {
 fn client_properties() -> Option<Proplist> {
     let mut proplist = Proplist::new()?;
     proplist
-        .set_str(properties::APPLICATION_NAME, "Settings")
+        .set_str(properties::APPLICATION_NAME, &t!(L10N, "desktop-app-name"))
         .ok()?;
     proplist.set_str(properties::APPLICATION_ID, APP_ID).ok()?;
     proplist
@@ -96,9 +99,9 @@ fn run(events: Events, commands: Receiver<Command>, woken: UnixStream) {
     let Some(mut mainloop) = Mainloop::new() else {
         return;
     };
-    let Some(context) = client_properties()
-        .and_then(|proplist| Context::new_with_proplist(&mainloop, "Settings", &proplist))
-    else {
+    let Some(context) = client_properties().and_then(|proplist| {
+        Context::new_with_proplist(&mainloop, &t!(L10N, "desktop-app-name"), &proplist)
+    }) else {
         return;
     };
     let context = Rc::new(RefCell::new(context));

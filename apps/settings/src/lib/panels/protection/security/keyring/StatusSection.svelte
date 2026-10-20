@@ -1,8 +1,9 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Row, Section, Switch } from '@luft/ui';
 	import { app } from '#lib/state/app.svelte.js';
 	import { lock, reseal, setLockWithScreen, setPin, unlock, type Keyring } from './api';
-	import { askedApps, contents, protection, sealed } from './describe';
+	import { protection, sealed } from './describe';
 	import { Runner } from './runner.svelte';
 
 	interface Props {
@@ -22,37 +23,40 @@
 	let access = $derived(keyring.access);
 </script>
 
-<Section title="Passwords and keys">
-	<Row title={keyring.locked ? 'Locked' : contents(keyring.itemCount)} description={protection(keyring)}>
+<Section title={t('settings-passwords-title')}>
+	<Row title={keyring.locked ? t('settings-passwords-locked') : t('settings-passwords-contents', { count: keyring.itemCount })} description={protection(keyring)}>
 		{#if keyring.locked}
-			<button type="button" class="button" disabled={runner.busy} onclick={() => runner.run(unlock)}>Unlock</button>
+			<button type="button" class="button" disabled={runner.busy} onclick={() => runner.run(unlock)}>{t('settings-passwords-unlock')}</button>
 		{:else}
-			<button type="button" class="button" disabled={runner.busy} onclick={() => runner.run(lock)}>Lock</button>
+			<button type="button" class="button" disabled={runner.busy} onclick={() => runner.run(lock)}>{t('settings-passwords-lock')}</button>
 		{/if}
 	</Row>
 	{#if resealable}
-		<Row title="Seal with the security chip" description="Copies of them can’t be opened on another computer">
-			<button type="button" class="button" disabled={runner.busy || keyring.locked} onclick={() => runner.run(reseal)}>Seal</button>
+		<Row title={t('settings-passwords-seal-title')} description={t('settings-passwords-seal-description')}>
+			<button type="button" class="button" disabled={runner.busy || keyring.locked} onclick={() => runner.run(reseal)}>{t('settings-passwords-seal')}</button>
 		</Row>
 	{/if}
 	{#if fingerprints && keyring.fingerprintUnlock}
-		<Row title="Unlocks with your fingerprint" description="Signing in with it unlocks your passwords too" />
+		<Row title={t('settings-passwords-fingerprint-on')} description={t('settings-passwords-fingerprint-on-description')} />
 	{:else if fingerprints}
-		<Row title="Unlock with your fingerprint" description="Add a fingerprint in Users first" onclick={() => app.open('users')} />
+		<Row title={t('settings-passwords-fingerprint')} description={t('settings-passwords-fingerprint-description')} onclick={() => app.open('users')} />
 	{/if}
 	{#if fingerprints && (keyring.fingerprintUnlock || keyring.pin)}
-		<Row title="Ask for a PIN after the fingerprint" description={keyring.locked ? 'Unlock your keyring to change this' : 'So a fingerprint alone can’t unlock them'}>
+		<Row
+			title={t('settings-passwords-pin')}
+			description={keyring.locked ? t('settings-passwords-pin-locked') : t('settings-passwords-pin-description')}
+		>
 			<Switch
-				label="Ask for a PIN after the fingerprint"
+				label={t('settings-passwords-pin')}
 				checked={keyring.pin}
 				disabled={keyring.locked || runner.busy}
 				onchange={(enabled) => runner.run(() => setPin(enabled))}
 			/>
 		</Row>
 	{/if}
-	<Row title="Lock with the screen" description="They lock and unlock along with the screen">
+	<Row title={t('settings-passwords-lock-with-screen')} description={t('settings-passwords-lock-with-screen-description')}>
 		<Switch
-			label="Lock with the screen"
+			label={t('settings-passwords-lock-with-screen')}
 			checked={keyring.lockWithScreen}
 			disabled={keyring.locked || runner.busy}
 			onchange={(enabled) => runner.run(() => setLockWithScreen(enabled))}
@@ -60,8 +64,8 @@
 	</Row>
 	{#if access && (access.apps.length || access.stores.length || access.history.length)}
 		<Row
-			title="Apps with access"
-			description={keyring.locked ? 'Unlock your keyring to see them' : askedApps(access.apps.length)}
+			title={t('settings-passwords-apps')}
+			description={keyring.locked ? t('settings-passwords-apps-locked') : t('settings-passwords-apps-asked', { count: access.apps.length })}
 			disabled={keyring.locked}
 			onclick={onaccess}
 		/>

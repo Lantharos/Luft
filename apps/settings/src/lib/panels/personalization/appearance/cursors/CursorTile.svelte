@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { fileUrl } from '@lantharos/sabine';
 	import X from '@lucide/svelte/icons/x';
 	import { tooltip } from '@luft/ui';
@@ -40,7 +41,7 @@
 		<span class="name">{theme.title}</span>
 	</button>
 	{#if theme.removable}
-		<button type="button" class="remove" aria-label="Remove {theme.title}" {@attach tooltip('Remove')} onclick={onremove}>
+		<button type="button" class="remove" aria-label={t('settings-cursors-remove-theme', { theme: theme.title })} {@attach tooltip(t('settings-cursors-remove'))} onclick={onremove}>
 			<X size={14} />
 		</button>
 	{/if}

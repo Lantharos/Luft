@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Dialog } from '@luft/ui';
 	import { problem } from '../api';
 
@@ -33,7 +34,7 @@
 		<p class="text-[13px] text-[var(--danger)]">{error}</p>
 	{/if}
 	{#snippet actions()}
-		<button type="button" class="button" disabled={busy} onclick={onclose}>Cancel</button>
+		<button type="button" class="button" disabled={busy} onclick={onclose}>{t('settings-protection-cancel')}</button>
 		<button type="button" class="button {danger ? 'danger' : 'primary'}" disabled={busy} onclick={confirm}>{action}</button>
 	{/snippet}
 </Dialog>

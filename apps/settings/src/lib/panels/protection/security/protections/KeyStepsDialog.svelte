@@ -1,6 +1,9 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Dialog } from '@luft/ui';
 	import { problem, restart } from '../api';
+
+	const SCREEN = { enroll: 'Enroll MOK', remove: 'Delete MOK', next: 'Continue', yes: 'Yes', reboot: 'Reboot' };
 
 	let { code, removing = false, onclose }: { code: string; removing?: boolean; onclose: () => void } = $props();
 
@@ -8,6 +11,19 @@
 	let error = $state('');
 
 	const halves = $derived([code.slice(0, 4), code.slice(4)]);
+	const enter = $derived(t('settings-security-key-enter'));
+	const steps = $derived(
+		[
+			t('settings-security-key-step-choose', { option: removing ? SCREEN.remove : SCREEN.enroll, next: SCREEN.next }),
+			t('settings-security-key-step-confirm', { option: SCREEN.yes }),
+			t('settings-security-key-step-code', { key: enter }),
+			t('settings-security-key-step-reboot', { option: SCREEN.reboot })
+		].map((step) => emphasize(step, [...Object.values(SCREEN), enter]))
+	);
+
+	function emphasize(text: string, names: string[]) {
+		return text.split(new RegExp(`(${names.join('|')})`)).map((part) => ({ part, bold: names.includes(part) }));
+	}
 
 	async function restartNow() {
 		busy = true;
@@ -23,32 +39,32 @@
 </script>
 
 <Dialog
-	title={removing ? 'Remove the keys when you restart' : 'Add the key when you restart'}
-	description="After you restart, a blue screen asks about {removing ? 'removing keys' : 'a new key'}. It only waits 10 seconds, so press any key as soon as it appears."
+	title={removing ? t('settings-security-key-steps-remove') : t('settings-security-key-steps-add')}
+	description={removing ? t('settings-security-key-steps-remove-description') : t('settings-security-key-steps-add-description')}
 	onclose={() => !busy && onclose()}
 >
 	<ol class="flex flex-col gap-2.5">
-		<li class="step"><span class="number">1</span><span>Choose <b>{removing ? 'Delete MOK' : 'Enroll MOK'}</b>, then <b>Continue</b>.</span></li>
-		<li class="step"><span class="number">2</span><span>Choose <b>Yes</b>.</span></li>
-		<li class="step"><span class="number">3</span><span>Type the code below and press <b>Enter</b>.</span></li>
-		<li class="step"><span class="number">4</span><span>Choose <b>Reboot</b>.</span></li>
+		{#each steps as parts, index (index)}
+			<li class="step">
+				<span class="number">{index + 1}</span>
+				<span>{#each parts as piece, position (position)}{#if piece.bold}<b>{piece.part}</b>{:else}{piece.part}{/if}{/each}</span>
+			</li>
+		{/each}
 	</ol>
-	<div class="code" aria-label="Code {code}">
+	<div class="code" aria-label={t('settings-security-key-code', { code })}>
 		{#each halves as half, index (index)}
 			<span>{half}</span>
 		{/each}
 	</div>
 	<p class="text-[12.5px] leading-relaxed text-[var(--text-muted)]">
-		{removing
-			? 'If you miss it, your computer starts as usual and you can try again here.'
-			: 'If you miss it, your computer starts as usual and the steps show again at the next restart, with a new code.'}
+		{removing ? t('settings-security-key-steps-remove-missed') : t('settings-security-key-steps-add-missed')}
 	</p>
 	{#if error}
 		<p class="text-[13px] text-[var(--danger)]">{error}</p>
 	{/if}
 	{#snippet actions()}
-		<button type="button" class="button" disabled={busy} onclick={onclose}>Later</button>
-		<button type="button" class="button primary" disabled={busy} onclick={restartNow}>Restart now</button>
+		<button type="button" class="button" disabled={busy} onclick={onclose}>{t('settings-security-later')}</button>
+		<button type="button" class="button primary" disabled={busy} onclick={restartNow}>{t('settings-security-restart-now')}</button>
 	{/snippet}
 </Dialog>
 

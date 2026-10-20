@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
 	import Plus from '@lucide/svelte/icons/plus';
+	import { t } from '@luft/i18n';
 	import { ActionRow, Row, Section } from '@luft/ui';
 	import { app } from '#lib/state/app.svelte.js';
 	import AccountRow from './AccountRow.svelte';
@@ -26,15 +27,20 @@
 </script>
 
 {#if snapshot === null}
-	<Section title="Accounts">
-		<Row title="Accounts aren’t available" description="The accounts service isn’t installed on this computer" />
+	<Section title={t('settings-page-accounts')}>
+		<Row title={t('settings-accounts-unavailable')} description={t('settings-accounts-unavailable.description')} />
 	</Section>
 {:else if snapshot}
-	<Section title="Online accounts" description="Each account is a folder in Cloud, in your home folder, that every app can open. Files download when you open them.">
+	<Section title={t('settings-accounts-online')} description={t('settings-accounts-online.description')}>
 		{#each snapshot.accounts as account (account.id)}
 			<AccountRow {account} drive={snapshot.drives.find((drive) => drive.account === account.id)} onsigninagain={() => (again = account)} />
 		{/each}
-		<ActionRow title="Add an account" description="iCloud Drive, OneDrive, Dropbox, Nextcloud or WebDAV" icon={Plus} onclick={() => (adding = true)} />
+		<ActionRow
+			title={t('settings-page-add-account')}
+			description={t('settings-accounts-add-description')}
+			icon={Plus}
+			onclick={() => (adding = true)}
+		/>
 	</Section>
 {/if}
 

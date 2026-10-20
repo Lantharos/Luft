@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { labels } from './accelerator';
 
 	let { accelerators }: { accelerators: string[] } = $props();
@@ -8,7 +9,7 @@
 	<span class="flex items-center gap-2">
 		{#each accelerators as accelerator, index (accelerator)}
 			{#if index > 0}
-				<span class="text-[12px] text-[var(--text-muted)]">or</span>
+				<span class="text-[12px] text-[var(--text-muted)]">{t('settings-shortcuts-or')}</span>
 			{/if}
 			<span class="flex items-center gap-1">
 				{#each labels(accelerator) as label, position (position)}
@@ -18,7 +19,7 @@
 		{/each}
 	</span>
 {:else}
-	<span class="text-[13px] text-[var(--text-muted)]">Not set</span>
+	<span class="text-[13px] text-[var(--text-muted)]">{t('settings-shortcuts-not-set')}</span>
 {/if}
 
 <style>

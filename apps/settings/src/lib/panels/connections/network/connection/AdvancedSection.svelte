@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
+	import { t } from '@luft/i18n';
 	import { Row, Section, Select, TextField } from '@luft/ui';
 	import { macChoice, type MacChoice, type Profile } from './profile';
 	import type { Errors } from './validate';
@@ -10,19 +11,19 @@
 		errors: Errors;
 	}
 
-	const WIFI_CHOICES: { value: MacChoice; label: string }[] = [
-		{ value: 'random', label: 'New address each time' },
-		{ value: 'stable', label: 'Same address for this network' },
-		{ value: 'builtin', label: 'Off' }
-	];
-	const WIRED_CHOICES: { value: MacChoice; label: string }[] = [
-		{ value: 'builtin', label: 'Built-in address' },
-		{ value: 'random', label: 'New address each time' },
-		{ value: 'stable', label: 'Same address for this network' },
-		{ value: 'custom', label: 'Custom address' }
-	];
-
 	let { profile = $bindable(), custom = $bindable(), errors }: Props = $props();
+
+	let wifiChoices = $derived<{ value: MacChoice; label: string }[]>([
+		{ value: 'random', label: t('settings-network-mac-random') },
+		{ value: 'stable', label: t('settings-network-mac-stable') },
+		{ value: 'builtin', label: t('settings-network-mac-private-off') }
+	]);
+	let wiredChoices = $derived<{ value: MacChoice; label: string }[]>([
+		{ value: 'builtin', label: t('settings-network-mac-builtin') },
+		{ value: 'random', label: t('settings-network-mac-random') },
+		{ value: 'stable', label: t('settings-network-mac-stable') },
+		{ value: 'custom', label: t('settings-network-mac-custom') }
+	]);
 
 	const original = untrack(() => profile.mac);
 
@@ -43,26 +44,26 @@
 	}
 </script>
 
-<Section title="Advanced">
+<Section title={t('settings-network-advanced')}>
 	{#if wifi}
-		<Row title="Private address" description="Makes this computer harder to track on this network">
-			<Select label="Private address" options={WIFI_CHOICES} value={choice} onchange={choose} />
+		<Row title={t('settings-network-private-address')} description={t('settings-network-private-address.description')}>
+			<Select label={t('settings-network-private-address')} options={wifiChoices} value={choice} onchange={choose} />
 		</Row>
 	{:else}
-		<Row title="Hardware address" description="The address this computer shows to the network">
-			<Select label="Hardware address" options={WIRED_CHOICES} value={choice} onchange={choose} />
+		<Row title={t('settings-network-hardware-address')} description={t('settings-network-hardware-address.description')}>
+			<Select label={t('settings-network-hardware-address')} options={wiredChoices} value={choice} onchange={choose} />
 		</Row>
 		{#if choice === 'custom'}
-			<Row title="Custom address">
+			<Row title={t('settings-network-mac-custom')}>
 				<div class="w-[260px]">
-					<TextField label="Custom address" bind:value={profile.mac} placeholder="12:34:56:78:9A:BC" error={errors.mac} live />
+					<TextField label={t('settings-network-mac-custom')} bind:value={profile.mac} placeholder="12:34:56:78:9A:BC" error={errors.mac} live />
 				</div>
 			</Row>
 		{/if}
 	{/if}
-	<Row title="Largest packet size (MTU)" description="Leave empty unless your network needs a specific size">
+	<Row title={t('settings-network-mtu')} description={t('settings-network-mtu.description')}>
 		<div class="w-[120px]">
-			<TextField label="MTU" bind:value={() => mtu, setMtu} placeholder="Automatic" inputmode="numeric" error={errors.mtu} />
+			<TextField label={t('settings-network-mtu.label')} bind:value={() => mtu, setMtu} placeholder={t('settings-network-automatic')} inputmode="numeric" error={errors.mtu} />
 		</div>
 	</Row>
 </Section>

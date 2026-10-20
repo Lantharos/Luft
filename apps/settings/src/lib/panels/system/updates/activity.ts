@@ -1,3 +1,4 @@
+import { t } from '@luft/i18n';
 import type { Activity, Elsewhere } from './api';
 
 const capitalized = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
@@ -5,30 +6,30 @@ const capitalized = (text: string) => text.charAt(0).toUpperCase() + text.slice(
 function elsewhere({ by, change }: Elsewhere) {
 	switch (change) {
 		case 'refresh':
-			return by ? capitalized(`${by} is looking for updates`) : 'Looking for updates…';
+			return by ? capitalized(t('settings-updates-elsewhere-refresh-by', { app: by })) : t('settings-updates-checking');
 		case 'download':
-			return by ? `Updates are being downloaded by ${by}` : 'Downloading updates…';
+			return by ? t('settings-updates-elsewhere-download-by', { app: by }) : t('settings-updates-downloading');
 		case 'update':
-			return by ? `Updates are being installed by ${by}` : 'Updates are being installed';
+			return by ? t('settings-updates-elsewhere-update-by', { app: by }) : t('settings-updates-elsewhere-update');
 		case 'install':
-			return by ? `Software is being installed by ${by}` : 'Software is being installed';
+			return by ? t('settings-updates-elsewhere-install-by', { app: by }) : t('settings-updates-elsewhere-install');
 		case 'remove':
-			return by ? `Software is being removed by ${by}` : 'Software is being removed';
+			return by ? t('settings-updates-elsewhere-remove-by', { app: by }) : t('settings-updates-elsewhere-remove');
 		default:
-			return by ? `Software is being changed by ${by}` : 'Software is being changed';
+			return by ? t('settings-updates-elsewhere-change-by', { app: by }) : t('settings-updates-elsewhere-change');
 	}
 }
 
 export function describe(activity: Activity) {
 	switch (activity.running) {
 		case 'check':
-			return 'Looking for updates…';
+			return t('settings-updates-checking');
 		case 'download':
-			return 'Downloading updates…';
+			return t('settings-updates-downloading');
 		case 'rollback':
-			return 'Getting the earlier version ready…';
+			return t('settings-updates-rolling-back');
 		case 'switch':
-			return activity.target === 'nvidia' ? "Downloading NVIDIA's driver…" : 'Downloading the standard image…';
+			return activity.target === 'nvidia' ? t('settings-updates-switching-nvidia') : t('settings-updates-switching-standard');
 		case 'elsewhere':
 			return activity.elsewhere ? elsewhere(activity.elsewhere) : null;
 		default:

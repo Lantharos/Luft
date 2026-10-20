@@ -1,5 +1,6 @@
 <script lang="ts">
 	import LockKeyhole from '@lucide/svelte/icons/lock-keyhole';
+	import { t } from '@luft/i18n';
 	import { Row, Switch } from '@luft/ui';
 	import { problem, restart, type Disk, type Tpm } from '../api';
 	import { progressLine, unlockSummary } from './describe';
@@ -35,24 +36,24 @@
 {/snippet}
 
 {#if disk.state === 'encrypting'}
-	<Row title="Encrypting this device" description={progressLine(disk)} icon={LockKeyhole} below={progress} />
+	<Row title={t('settings-encryption-encrypting')} description={progressLine(disk)} icon={LockKeyhole} below={progress} />
 {:else if disk.state === 'decrypting'}
-	<Row title="Turning off device encryption" description={progressLine(disk)} icon={LockKeyhole} below={progress} />
+	<Row title={t('settings-encryption-decrypting')} description={progressLine(disk)} icon={LockKeyhole} below={progress} />
 {:else if disk.state === 'starting'}
-	<Row title="Device encryption" description="Starts the next time you restart" icon={LockKeyhole} below={error ? failure : undefined}>
-		<button type="button" class="button primary" disabled={busy} onclick={restartNow}>Restart</button>
+	<Row title={t('settings-encryption')} description={t('settings-encryption-starting')} icon={LockKeyhole} below={error ? failure : undefined}>
+		<button type="button" class="button primary" disabled={busy} onclick={restartNow}>{t('settings-protection-restart')}</button>
 	</Row>
 {:else if disk.state === 'on'}
-	<Row title="Device encryption" description={unlockSummary(disk)} icon={LockKeyhole}>
-		<Switch label="Device encryption" checked onchange={() => (open = 'off')} />
+	<Row title={t('settings-encryption')} description={unlockSummary(disk)} icon={LockKeyhole}>
+		<Switch label={t('settings-encryption')} checked onchange={() => (open = 'off')} />
 	</Row>
 {:else if disk.device}
 	<Row
-		title="Device encryption"
-		description={disk.state === 'failed' ? 'Didn’t start at the last restart, your files weren’t changed' : 'Keeps your files private if this computer is lost'}
+		title={t('settings-encryption')}
+		description={disk.state === 'failed' ? t('settings-encryption-failed') : t('settings-encryption-off')}
 		icon={LockKeyhole}
 	>
-		<button type="button" class="button" onclick={() => (open = 'on')}>Turn on</button>
+		<button type="button" class="button" onclick={() => (open = 'on')}>{t('settings-protection-turn-on')}</button>
 	</Row>
 {/if}
 

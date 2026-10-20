@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import Download from '@lucide/svelte/icons/download';
 	import FolderOpen from '@lucide/svelte/icons/folder-open';
 	import { Dialog, Row, Section, Select } from '@luft/ui';
@@ -6,7 +7,7 @@
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import { openCursorFolder, removeCursorTheme, type CursorTheme } from './api';
 	import { cursors } from './cursors.svelte';
-	import { CURSOR_SIZES } from './sizes';
+	import { cursorSizes } from './sizes';
 	import CursorTile from './CursorTile.svelte';
 
 	interface Props {
@@ -30,6 +31,7 @@
 
 	let current = $derived(desktop.values['cursor-theme'] ?? 'Adwaita');
 	let themes = $derived(cursors.themes ?? []);
+	let sizes = $derived(cursorSizes());
 	let shown = $derived.by(() => {
 		if (expanded) return themes;
 		const first = themes.slice(0, COLLAPSED);
@@ -54,7 +56,7 @@
 
 <svelte:window onfocus={() => cursors.load()} />
 
-<Section title="Cursor">
+<Section title={t('settings-cursors')}>
 	{#if problem}
 		<p class="px-4 pt-3.5 text-[13px] text-[var(--danger)]">{problem}</p>
 	{/if}
@@ -66,19 +68,19 @@
 	{#if themes.length > COLLAPSED}
 		<MoreRow hidden={themes.length - COLLAPSED} bind:expanded />
 	{/if}
-	<Row title="Size">
-		<Select label="Cursor size" options={CURSOR_SIZES} value={desktop.values['cursor-size'] ?? 24} onchange={(size) => desktop.set('cursor-size', size)} />
+	<Row title={t('settings-cursors-size')}>
+		<Select label={t('settings-cursors-size-label')} options={sizes} value={desktop.values['cursor-size'] ?? 24} onchange={(size) => desktop.set('cursor-size', size)} />
 	</Row>
-	<Row title="Get more cursors" description="Browse themes shared on GNOME-Look" icon={Download} onclick={onbrowse} />
-	<Row title="Cursors folder" description="Themes you put in Home › .local › share › icons show up here" icon={FolderOpen} onclick={openCursorFolder} />
+	<Row title={t('settings-cursors-get-more')} description={t('settings-cursors-get-more-description')} icon={Download} onclick={onbrowse} />
+	<Row title={t('settings-cursors-folder')} description={t('settings-cursors-folder-description')} icon={FolderOpen} onclick={openCursorFolder} />
 </Section>
 
 {#if removing}
 	{@const theme = removing}
-	<Dialog title="Remove {theme.title}?" description="The theme is deleted from your icons folder." onclose={() => (removing = null)}>
+	<Dialog title={t('settings-cursors-remove-title', { theme: theme.title })} description={t('settings-cursors-remove-description')} onclose={() => (removing = null)}>
 		{#snippet actions()}
-			<button type="button" class="button" onclick={() => (removing = null)}>Cancel</button>
-			<button type="button" class="button danger" onclick={() => remove(theme)}>Remove</button>
+			<button type="button" class="button" onclick={() => (removing = null)}>{t('settings-cursors-cancel')}</button>
+			<button type="button" class="button danger" onclick={() => remove(theme)}>{t('settings-cursors-remove')}</button>
 		{/snippet}
 	</Dialog>
 {/if}

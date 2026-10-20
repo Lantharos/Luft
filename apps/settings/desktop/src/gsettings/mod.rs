@@ -4,10 +4,13 @@ mod watch;
 use std::collections::HashMap;
 
 use gio::prelude::*;
+use luft_i18n::t;
 use serde::Deserialize;
 use serde_json::Value;
 
 pub use watch::Watcher;
+
+use crate::L10N;
 
 #[derive(Deserialize, Clone, PartialEq, Eq, Hash)]
 #[serde(rename_all = "camelCase")]
@@ -17,10 +20,15 @@ pub struct Location {
 }
 
 fn open(location: &Location) -> Result<gio::Settings, String> {
-    let source = gio::SettingsSchemaSource::default().ok_or("No settings are installed")?;
-    let schema = source
-        .lookup(&location.schema, true)
-        .ok_or_else(|| format!("{} is not installed", location.schema))?;
+    let source = gio::SettingsSchemaSource::default()
+        .ok_or_else(|| t!(L10N, "desktop-gsettings-none-installed"))?;
+    let schema = source.lookup(&location.schema, true).ok_or_else(|| {
+        t!(
+            L10N,
+            "desktop-gsettings-not-installed",
+            schema = location.schema.as_str()
+        )
+    })?;
     Ok(match &location.path {
         Some(path) => gio::Settings::new_full(&schema, None::<&gio::SettingsBackend>, Some(path)),
         None => gio::Settings::new_full(&schema, None::<&gio::SettingsBackend>, None),
@@ -37,7 +45,7 @@ pub fn read(location: &Location, keys: &[String]) -> Result<HashMap<String, Valu
     let settings = open(location)?;
     let schema = settings
         .settings_schema()
-        .ok_or("Settings have no schema")?;
+        .ok_or_else(|| t!(L10N, "desktop-gsettings-no-schema"))?;
     Ok(keys
         .iter()
         .filter(|key| schema.has_key(key))
@@ -49,7 +57,7 @@ pub fn write(location: &Location, key: &str, value: &Value) -> Result<(), String
     let settings = open(location)?;
     let schema = settings
         .settings_schema()
-        .ok_or("Settings have no schema")?;
+        .ok_or_else(|| t!(L10N, "desktop-gsettings-no-schema"))?;
     if !schema.has_key(key) {
         return Err(format!("{} has no setting called {key}", location.schema));
     }

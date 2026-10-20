@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Row, Section } from '@luft/ui';
 	import SshSection from './keyring/ssh/SshSection.svelte';
 	import type { KeyringState } from './keyring/state.svelte';
@@ -14,8 +15,8 @@
 </script>
 
 {#if keyring.current === null}
-	<Section title="Passwords and keys">
-		<Row title="Your keyring isn’t running" description="Your passwords and keys show up here once it starts" />
+	<Section title={t('settings-passwords-title')}>
+		<Row title={t('settings-passwords-not-running')} description={t('settings-passwords-not-running-description')} />
 	</Section>
 {:else if keyring.current}
 	<StatusSection keyring={keyring.current} {fingerprintReader} refresh={keyring.load} {onaccess} />

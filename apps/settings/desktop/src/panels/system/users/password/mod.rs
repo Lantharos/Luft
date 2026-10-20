@@ -1,8 +1,11 @@
 mod terminal;
 
+use luft_i18n::t;
 use serde::{Deserialize, Serialize};
 
 use terminal::Terminal;
+
+use crate::L10N;
 
 const PROGRAM: &str = "passwd";
 
@@ -94,7 +97,13 @@ fn step(output: &str, authenticated: bool) -> Step {
 }
 
 pub fn change(Change { current, password }: Change) -> Result<Outcome, String> {
-    let failed = |error: std::io::Error| format!("Couldn't change your password: {error}");
+    let failed = |error: std::io::Error| {
+        t!(
+            L10N,
+            "desktop-users-password-failed",
+            reason = error.to_string()
+        )
+    };
     let mut passwd = Terminal::spawn(PROGRAM).map_err(failed)?;
     let mut output = String::new();
     let mut authenticated = false;

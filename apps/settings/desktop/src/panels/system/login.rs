@@ -7,12 +7,14 @@ use futures_util::StreamExt;
 use luft_app::dbus::{self, error_message, error_name, failed, service::absent};
 use luft_app::portal::{self, Filter};
 use luft_app::{Commands, Events};
+use luft_i18n::t;
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use zbus::proxy::MethodFlags;
 use zbus::{DynamicType, Fd, OwnedVariant, Proxy};
 
+use crate::L10N;
 use crate::panels::personalization::appearance::wallpaper;
 
 pub const LOGIN_CHANGED: &str = "login.changed";
@@ -68,7 +70,7 @@ struct AutomaticLogin {
 fn explain(error: zbus::Error) -> String {
     let name = error_name(&error).unwrap_or_default();
     if name.ends_with("NotAuthorized") {
-        return "Administrator rights are needed to change this".to_owned();
+        return t!(L10N, "desktop-admin-required");
     }
     match error_message(&error) {
         Some(message) if name.starts_with(GREETER_ERROR) => message.to_owned(),
@@ -89,7 +91,7 @@ where
 {
     properties
         .remove(name)
-        .ok_or_else(|| format!("The login screen left out {name}"))?
+        .ok_or_else(|| t!(L10N, "desktop-login-missing-property", property = name))?
         .try_into()
         .map_err(failed)
 }
@@ -150,10 +152,12 @@ async fn change<B: Serialize + DynamicType>(method: &str, body: &B) -> Result<()
 }
 
 async fn choose_wallpaper(_: Value) -> Result<bool, String> {
+    let title = t!(L10N, "desktop-picture-choose-title");
+    let filter = t!(L10N, "desktop-picture-filter");
     let Some(uri) = portal::open_file(
-        "Choose a Picture",
+        &title,
         Filter {
-            name: "Images",
+            name: &filter,
             patterns: PICTURES
                 .iter()
                 .map(|extension| format!("*.{extension}"))
@@ -164,7 +168,7 @@ async fn choose_wallpaper(_: Value) -> Result<bool, String> {
     else {
         return Ok(false);
     };
-    let path = portal::uri_path(&uri).ok_or("This picture can't be opened")?;
+    let path = portal::uri_path(&uri).ok_or_else(|| t!(L10N, "desktop-picture-unopenable"))?;
     let picture = File::open(&path).map_err(failed)?;
     let focus: (f64, f64) = tokio::task::spawn_blocking(move || wallpaper::focus::of(&path))
         .await

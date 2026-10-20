@@ -6,6 +6,9 @@ use libpulse_binding::def::BufferAttr;
 use libpulse_binding::sample::{Format, Spec};
 use libpulse_binding::stream::{FlagSet, PeekResult, Stream};
 use luft_app::Events;
+use luft_i18n::t;
+
+use crate::L10N;
 
 const SOUND_LEVEL: &str = "sound.level";
 const UPDATES_PER_SECOND: u32 = 25;
@@ -24,7 +27,7 @@ impl Meter {
         };
         let stream = Rc::new(RefCell::new(Stream::new(
             context,
-            "Input level",
+            &t!(L10N, "desktop-sound-meter-stream"),
             &spec,
             None,
         )?));

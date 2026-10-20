@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { i18n, t } from '@luft/i18n';
 	import { onDestroy } from 'svelte';
 	import { Row, Section, Select, Switch } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
@@ -24,11 +25,6 @@
 	const SUPER_ALT = '<Super><Alt>';
 
 	const ENGINE_NAMES = { parakeet: 'Parakeet', whisper: 'Whisper' };
-	const ENGINES: { value: EngineChoice; label: string }[] = [
-		{ value: 'automatic', label: 'Automatic' },
-		{ value: 'parakeet', label: 'Parakeet' },
-		{ value: 'whisper', label: 'Whisper' }
-	];
 
 	const settings = useSettings<Dictation>('com.lantharos.kestrel.dictation', ['enabled', 'language', 'engine']);
 	const inputSources = useSettings<{ sources: [string, string][] }>('org.gnome.desktop.input-sources', ['sources']);
@@ -44,17 +40,20 @@
 		!accelerators.length ? 'off' : accelerators.length === 1 && canonical(accelerators[0]) === canonical(SUPER_ALT) ? 'chord' : 'custom'
 	);
 	let shortcutOptions = $derived<{ value: ShortcutChoice; label: string }[]>([
-		{ value: 'chord', label: 'Super + Alt' },
-		{ value: 'custom', label: shortcut === 'custom' ? 'My own shortcut' : 'Another shortcut…' },
-		{ value: 'off', label: 'Off' }
+		{ value: 'chord', label: labels(SUPER_ALT).join(' + ') },
+		{ value: 'custom', label: shortcut === 'custom' ? t('settings-dictation-shortcut-own') : t('settings-dictation-shortcut-another') },
+		{ value: 'off', label: t('settings-dictation-shortcut-off') }
 	]);
-	let ways = $derived(
-		[
-			shortcut === 'off' ? null : accelerators.map((accelerator) => labels(accelerator).join('+')).join(' or '),
-			hardware.present?.copilotKey && (copilotKey.values.hold ?? true) ? 'the Copilot key' : null
-		].filter(Boolean)
-	);
-	let holdWith = $derived(ways.join(' or '));
+	let engines = $derived<{ value: EngineChoice; label: string }[]>([
+		{ value: 'automatic', label: t('settings-dictation-engine-automatic') },
+		{ value: 'parakeet', label: ENGINE_NAMES.parakeet },
+		{ value: 'whisper', label: ENGINE_NAMES.whisper }
+	]);
+	let ways = $derived([
+		...(shortcut === 'off' ? [] : accelerators.map((accelerator) => labels(accelerator).join('+'))),
+		...(hardware.present?.copilotKey && (copilotKey.values.hold ?? true) ? [t('settings-dictation-copilot-key')] : [])
+	]);
+	let holdWith = $derived(new Intl.ListFormat(i18n.formats, { type: 'disjunction' }).format(ways));
 	let usable = $derived(info?.engines ?? []);
 	let spoken = $derived(info?.languages.find((language) => language.code === settings.values.language) ?? info?.language);
 	let engine = $derived.by(() => {
@@ -65,7 +64,10 @@
 	let model = $derived(info?.models.find((model) => model.id === info?.model));
 	let downloaded = $derived(info?.models.filter((other) => other !== model && (other.usage > 0 || other.download)) ?? []);
 	let languages = $derived([
-		{ value: '', label: info && !settings.values.language ? `Automatic (${info.language.name})` : 'Automatic' },
+		{
+			value: '',
+			label: info && !settings.values.language ? t('settings-dictation-language-automatic-current', { language: info.language.name }) : t('settings-dictation-language-automatic')
+		},
 		...(info?.languages
 			.filter((language) => usable.includes(language.engine))
 			.map((language) => ({ value: language.code, label: language.name })) ?? [])
@@ -73,8 +75,8 @@
 
 	function describeEngine() {
 		if (!engine || !spoken) return '';
-		const name = ENGINE_NAMES[engine];
-		return engine === 'whisper' ? `${name} recognizes ${spoken.name} on the graphics card` : `${name} recognizes ${spoken.name}`;
+		const args = { engine: ENGINE_NAMES[engine], language: spoken.name };
+		return engine === 'whisper' ? t('settings-dictation-engine-graphics-card', args) : t('settings-dictation-engine-description', args);
 	}
 
 	async function refresh() {
@@ -105,18 +107,20 @@
 	});
 </script>
 
-<SubPage title="Dictation" back="Keyboard" {onclose}>
+<SubPage title={t('settings-dictation-title')} back={t('settings-page-keyboard')} {onclose}>
 	<Section
-		description={holdWith
-			? `Hold ${holdWith} and talk to type what you say, in any app. Let go to finish, or press Escape to cancel. It all happens on this computer: your voice never leaves it and isn’t saved.`
-			: 'Choose a shortcut below to dictate. It all happens on this computer: your voice never leaves it and isn’t saved.'}
+		description={holdWith ? t('settings-dictation-description', { keys: holdWith }) : t('settings-dictation-description-no-shortcut')}
 	>
 		<Row
-			title="Dictation"
-			description={unavailable ? 'Dictation isn’t installed on this computer' : holdWith ? `Hold ${holdWith} to dictate` : 'Off until it has a shortcut'}
+			title={t('settings-dictation-title')}
+			description={unavailable
+				? t('settings-dictation-not-installed')
+				: holdWith
+					? t('settings-dictation-hold', { keys: holdWith })
+					: t('settings-dictation-needs-shortcut')}
 			disabled={unavailable}
 		>
-			<Switch label="Dictation" checked={enabled} disabled={unavailable} onchange={(on) => settings.set('enabled', on)} />
+			<Switch label={t('settings-dictation-title')} checked={enabled} disabled={unavailable} onchange={(on) => settings.set('enabled', on)} />
 		</Row>
 		{#if model && !unavailable}
 			<ModelRow {model} />
@@ -124,15 +128,15 @@
 	</Section>
 
 	<Section>
-		<Row title="Shortcut" description="Hold it to talk, or press it to listen until you press it again or stop talking">
-			<Select label="Shortcut" options={shortcutOptions} value={shortcut} disabled={!binding} onchange={pickShortcut} />
+		<Row title={t('settings-dictation-shortcut')} description={t('settings-dictation-shortcut-description')}>
+			<Select label={t('settings-dictation-shortcut')} options={shortcutOptions} value={shortcut} disabled={!binding} onchange={pickShortcut} />
 		</Row>
 		{#if shortcut === 'custom' && binding}
 			{@const own = binding}
-			<Row title="Keys">
+			<Row title={t('settings-dictation-keys')}>
 				<span class="flex items-center gap-3">
 					<Keys {accelerators} />
-					<button type="button" class="button" onclick={() => onrecord(own)}>Change</button>
+					<button type="button" class="button" onclick={() => onrecord(own)}>{t('settings-dictation-change')}</button>
 				</span>
 			</Row>
 		{/if}
@@ -140,29 +144,31 @@
 
 	{#if info}
 		{@const current = info}
-		<Section title="Language">
+		<Section title={t('settings-dictation-language')}>
 			<Row
-				title="Language"
-				description={available ? 'Automatic follows the keyboard layout you type with' : `${spoken?.name} isn’t available on this computer`}
+				title={t('settings-dictation-language')}
+				description={available
+					? t('settings-dictation-language-description')
+					: t('settings-dictation-language-unavailable', { language: spoken?.name ?? '' })}
 			>
-				<Select label="Language" options={languages} value={settings.values.language ?? ''} onchange={(code) => settings.set('language', code)} />
+				<Select label={t('settings-dictation-language')} options={languages} value={settings.values.language ?? ''} onchange={(code) => settings.set('language', code)} />
 			</Row>
 			{#if usable.length > 1}
-				<Row title="Speech recognizer" description={describeEngine()}>
-					<Select label="Speech recognizer" options={ENGINES} value={settings.values.engine ?? 'automatic'} onchange={(engine) => settings.set('engine', engine)} />
+				<Row title={t('settings-dictation-engine')} description={describeEngine()}>
+					<Select label={t('settings-dictation-engine')} options={engines} value={settings.values.engine ?? 'automatic'} onchange={(engine) => settings.set('engine', engine)} />
 				</Row>
 			{/if}
 		</Section>
 
 		{#if downloaded.length}
-			<Section title="Speech models" description="Models are downloaded once and kept on this computer.">
+			<Section title={t('settings-dictation-models')} description={t('settings-dictation-models-description')}>
 				{#each downloaded as model (model.id)}
 					<ModelRow {model} removable />
 				{/each}
 			</Section>
 		{/if}
 
-		<Section title="Credits">
+		<Section title={t('settings-dictation-credits')}>
 			{#each current.models as model (model.id)}
 				{@render credit(model)}
 			{/each}
@@ -171,7 +177,7 @@
 </SubPage>
 
 {#snippet credit(model: Model)}
-	<Row title={model.name} description="{model.credit}. Licensed under {model.licence}.">
-		<button type="button" class="button" onclick={() => openHomepage(model.homepage)}>Learn more</button>
+	<Row title={model.name} description={t('settings-dictation-credit', { credit: model.credit, licence: model.licence })}>
+		<button type="button" class="button" onclick={() => openHomepage(model.homepage)}>{t('settings-dictation-learn-more')}</button>
 	</Row>
 {/snippet}

@@ -1,7 +1,10 @@
 use luft_app::dbus::{self, failed};
+use luft_i18n::t;
 use serde::{Deserialize, Serialize};
 use zbus::Proxy;
 use zbus::proxy::MethodFlags;
+
+use crate::L10N;
 
 const SERVICE: &str = "com.lantharos.Windows1";
 const PATH: &str = "/com/lantharos/Windows1";
@@ -44,5 +47,5 @@ pub async fn import() -> Result<u32, String> {
         .call_with_flags::<_, _, u32>("ImportBluetooth", MethodFlags::ALLOW_INTERACTIVE_AUTH, &())
         .await
         .map_err(|error| dbus::explain(&error))?
-        .ok_or_else(|| "Windows' Bluetooth devices weren't brought over".to_owned())
+        .ok_or_else(|| t!(L10N, "desktop-bluetooth-windows-import-failed"))
 }

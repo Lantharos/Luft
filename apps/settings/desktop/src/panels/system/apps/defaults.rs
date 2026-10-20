@@ -2,6 +2,9 @@ use gio::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use luft_app::apps::{self, App};
+use luft_i18n::t;
+
+use crate::L10N;
 
 struct Category {
     id: &'static str,
@@ -121,8 +124,9 @@ pub fn set(Choice { category, app }: Choice) -> Result<(), String> {
     let category = CATEGORIES
         .iter()
         .find(|known| known.id == category)
-        .ok_or("This kind of app can't be chosen")?;
-    let app = gio_unix::DesktopAppInfo::new(&app).ok_or("This app is no longer installed")?;
+        .ok_or_else(|| t!(L10N, "desktop-apps-kind-not-choosable"))?;
+    let app =
+        gio_unix::DesktopAppInfo::new(&app).ok_or_else(|| t!(L10N, "desktop-apps-uninstalled"))?;
     let supported = app.supported_types();
     let failed = |error: gio::glib::Error| error.to_string();
     app.set_as_default_for_type(representative(category))

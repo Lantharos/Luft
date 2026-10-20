@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { untrack } from 'svelte';
 	import { AppIcon, ItemRow, Switch } from '@luft/ui';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
@@ -22,10 +23,10 @@
 		if (!enabled) return undefined;
 		const banners = options.values['show-banners'];
 		const locked = lockScreen && options.values['show-in-lock-screen'];
-		if (banners && locked) return 'Banners and lock screen';
-		if (banners) return 'Banners';
-		if (locked) return 'Lock screen';
-		return 'Notification list only';
+		if (banners && locked) return t('settings-notifications-summary-both');
+		if (banners) return t('settings-notifications-summary-banners');
+		if (locked) return t('settings-notifications-summary-lock-screen');
+		return t('settings-notifications-summary-list');
 	});
 </script>
 
@@ -33,7 +34,7 @@
 	{#snippet leading()}
 		<AppIcon icon={app.icon} id={app.id} />
 	{/snippet}
-	<Switch label="Notifications from {app.name}" checked={enabled} onchange={(on) => options.set('enable', on)} />
+	<Switch label={t('settings-notifications-from', { app: app.name })} checked={enabled} onchange={(on) => options.set('enable', on)} />
 </ItemRow>
 
 {#if open}

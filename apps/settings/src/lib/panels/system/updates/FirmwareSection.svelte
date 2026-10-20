@@ -1,5 +1,7 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { bytes, Row, Section } from '@luft/ui';
+	import { percent } from '#lib/format.js';
 	import type { Activity, Firmware } from './api';
 	import { installFirmware } from './api';
 
@@ -15,24 +17,24 @@
 	const busy = $derived(activity.running !== null);
 </script>
 
-<Section title="Firmware" description="Updates for the software built into your hardware">
+<Section title={t('settings-updates-firmware')} description={t('settings-updates-firmware-description')}>
 	{#each devices as device (device.id)}
 		{@const installing = activity.running === 'firmware' && activity.target === device.id}
 		<Row
 			title={device.vendor ? `${device.vendor} ${device.name}` : device.name}
-			description={[device.current ? `${device.current} → ${device.version}` : device.version, device.size ? bytes(device.size) : null, device.restart ? 'Finishes when you restart' : null]
+			description={[device.current ? `${device.current} → ${device.version}` : device.version, device.size ? bytes(device.size) : null, device.restart ? t('settings-updates-firmware-restart') : null]
 				.filter(Boolean)
 				.join(' · ')}
 			truncate
 		>
 			{#if installing}
-				<span>{activity.progress?.fraction != null ? `${Math.round(activity.progress.fraction * 100)}%` : 'Installing…'}</span>
+				<span>{activity.progress?.fraction != null ? percent(activity.progress.fraction) : t('settings-updates-firmware-installing')}</span>
 			{:else}
-				<button type="button" class="button" disabled={busy} onclick={() => install(device)}>Update</button>
+				<button type="button" class="button" disabled={busy} onclick={() => install(device)}>{t('settings-updates-firmware-update')}</button>
 			{/if}
 		</Row>
 	{/each}
 	{#if error}
-		<Row title="The firmware couldn't be updated" description={error} />
+		<Row title={t('settings-updates-firmware-failed')} description={error} />
 	{/if}
 </Section>

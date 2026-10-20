@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { i18n } from '@luft/i18n';
 	import { Row, Slider } from '@luft/ui';
 
 	interface Props {
@@ -11,7 +12,9 @@
 
 	let { title, seconds, min, max, onchange }: Props = $props();
 
-	const format = (value: number) => `${value.toFixed(1)} s`;
+	let duration = $derived(new Intl.NumberFormat(i18n.formats, { style: 'unit', unit: 'second', unitDisplay: 'narrow', minimumFractionDigits: 1, maximumFractionDigits: 1 }));
+
+	const format = (value: number) => duration.format(value);
 </script>
 
 <Row {title}>

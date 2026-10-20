@@ -3,9 +3,10 @@
 </script>
 
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Row } from '@luft/ui';
 
 	let { hidden, expanded = $bindable() }: { hidden: number; expanded: boolean } = $props();
 </script>
 
-<Row title={expanded ? 'Show fewer' : `Show ${hidden} more`} {expanded} onclick={() => (expanded = !expanded)} />
+<Row title={expanded ? t('settings-more-fewer') : t('settings-more-show', { count: hidden })} {expanded} onclick={() => (expanded = !expanded)} />

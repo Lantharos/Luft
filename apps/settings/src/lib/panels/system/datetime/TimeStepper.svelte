@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import ChevronUp from '@lucide/svelte/icons/chevron-up';
 
@@ -52,7 +53,7 @@
 </script>
 
 <div class="stepper">
-	<button type="button" class="arrow" tabindex="-1" aria-label="Increase {label}" onclick={() => step(1)}>
+	<button type="button" class="arrow" tabindex="-1" aria-label={t('settings-datetime-increase', { label })} onclick={() => step(1)}>
 		<ChevronUp size={18} />
 	</button>
 	<div
@@ -69,7 +70,7 @@
 	>
 		{String(value).padStart(2, '0')}
 	</div>
-	<button type="button" class="arrow" tabindex="-1" aria-label="Decrease {label}" onclick={() => step(-1)}>
+	<button type="button" class="arrow" tabindex="-1" aria-label={t('settings-datetime-decrease', { label })} onclick={() => step(-1)}>
 		<ChevronDown size={18} />
 	</button>
 </div>

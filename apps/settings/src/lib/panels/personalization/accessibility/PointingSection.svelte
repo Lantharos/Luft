@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Row, Section, Switch } from '@luft/ui';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import DelayRow from './DelayRow.svelte';
@@ -18,31 +19,31 @@
 	let secondary = $derived(mouse.values['secondary-click-enabled'] ?? false);
 </script>
 
-<Section title="Pointing">
-	<Row title="Mouse keys">
-		<Switch label="Mouse keys" checked={keyboard.values['mousekeys-enable'] ?? false} onchange={(on) => keyboard.set('mousekeys-enable', on)} />
+<Section title={t('settings-accessibility-pointing')}>
+	<Row title={t('settings-accessibility-mouse-keys')}>
+		<Switch label={t('settings-accessibility-mouse-keys')} checked={keyboard.values['mousekeys-enable'] ?? false} onchange={(on) => keyboard.set('mousekeys-enable', on)} />
 	</Row>
-	<Row title="Click by resting the pointer">
-		<Switch label="Click by resting the pointer" checked={dwell} onchange={(on) => mouse.set('dwell-click-enabled', on)} />
+	<Row title={t('settings-accessibility-dwell')}>
+		<Switch label={t('settings-accessibility-dwell')} checked={dwell} onchange={(on) => mouse.set('dwell-click-enabled', on)} />
 	</Row>
 	{#if dwell}
-		<DelayRow title="Rest for" seconds={mouse.values['dwell-time'] ?? 1.2} min={0.2} max={3} onchange={(value) => mouse.set('dwell-time', value)} />
+		<DelayRow title={t('settings-accessibility-dwell-time')} seconds={mouse.values['dwell-time'] ?? 1.2} min={0.2} max={3} onchange={(value) => mouse.set('dwell-time', value)} />
 	{/if}
-	<Row title="Hold to right-click">
-		<Switch label="Hold to right-click" checked={secondary} onchange={(on) => mouse.set('secondary-click-enabled', on)} />
+	<Row title={t('settings-accessibility-hold')}>
+		<Switch label={t('settings-accessibility-hold')} checked={secondary} onchange={(on) => mouse.set('secondary-click-enabled', on)} />
 	</Row>
 	{#if secondary}
 		<DelayRow
-			title="Hold for"
+			title={t('settings-accessibility-hold-time')}
 			seconds={mouse.values['secondary-click-time'] ?? 1.2}
 			min={0.5}
 			max={3}
 			onchange={(value) => mouse.set('secondary-click-time', value)}
 		/>
 	{/if}
-	<Row title="Press Ctrl to find the pointer">
+	<Row title={t('settings-accessibility-locate-pointer')}>
 		<Switch
-			label="Press Ctrl to find the pointer"
+			label={t('settings-accessibility-locate-pointer')}
 			checked={desktop.values['locate-pointer'] ?? false}
 			onchange={(on) => desktop.set('locate-pointer', on)}
 		/>

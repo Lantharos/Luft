@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { page, WindowControls } from '@luft/ui';
 	import { isShown, titleOf } from '#lib/panels/registry.js';
 	import { app } from '#lib/state/app.svelte.js';
@@ -29,7 +30,7 @@
 					{#if isShown(view.panel, present)}
 						<view.component />
 					{:else if view.panel.needs}
-						<p class="px-1.5 text-[14px] text-[var(--text-muted)]">{view.panel.needs.missing}</p>
+						<p class="px-1.5 text-[14px] text-[var(--text-muted)]">{t(view.panel.needs.missing)}</p>
 					{/if}
 				</div>
 			{/key}

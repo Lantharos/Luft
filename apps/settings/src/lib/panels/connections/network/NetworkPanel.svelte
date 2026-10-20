@@ -6,6 +6,7 @@
 	import Settings from '@lucide/svelte/icons/settings';
 	import WifiIcon from '@lucide/svelte/icons/wifi';
 	import { onMount } from 'svelte';
+	import { t } from '@luft/i18n';
 	import { IconButton, Row, Section, Switch } from '@luft/ui';
 	import ConnectionPage from './connection/ConnectionPage.svelte';
 	import type { Target } from './connection/profile';
@@ -22,8 +23,6 @@
 		title: string;
 	}
 
-	const CONNECT_FAILED = "Couldn't connect";
-
 	const proxy = useProxy();
 
 	let network = $state<Network | null>(null);
@@ -36,14 +35,14 @@
 	let empty = $derived(network && !network.wifi && !network.airplane && !network.wired.length);
 
 	function wifiSummary(wifi: Wifi) {
-		if (!wifi.hardwareEnabled) return 'Turned off by a hardware switch';
+		if (!wifi.hardwareEnabled) return t('settings-network-wifi-hardware-off');
 		const connected = wifi.enabled && wifi.networks.find((candidate) => candidate.state === 'connected');
-		return connected ? `Connected to ${connected.ssid}` : undefined;
+		return connected ? t('settings-network-wifi-connected', { network: connected.ssid }) : undefined;
 	}
 
 	function wiredSummary(wired: Wired) {
 		if (problems[wired.device]) return problems[wired.device];
-		if (wired.state === 'connected' && wired.speed) return `Connected · ${speedLabel(wired.speed)}`;
+		if (wired.state === 'connected' && wired.speed) return t('settings-network-wired-connected', { speed: speedLabel(wired.speed) });
 		return wired.state === 'disconnected' ? undefined : linkLabel(wired.state);
 	}
 
@@ -52,7 +51,7 @@
 		try {
 			await action();
 		} catch {
-			problems[key] = CONNECT_FAILED;
+			problems[key] = t('settings-network-connect-failed');
 		}
 	}
 
@@ -61,7 +60,7 @@
 	}
 
 	function wiredTitle(wired: Wired) {
-		return network!.wired.length > 1 ? `Ethernet (${wired.name})` : 'Ethernet';
+		return network!.wired.length > 1 ? t('settings-network-ethernet-named', { name: wired.name }) : t('settings-network-ethernet');
 	}
 
 	function toggleVpn(vpn: Vpn, on: boolean) {
@@ -74,7 +73,7 @@
 			const vpn = network?.vpns.find((candidate) => candidate.active === failure.path || candidate.name === failure.name);
 			const wired = network?.wired.find((candidate) => candidate.device === failure.path);
 			const key = wired?.device ?? vpn?.connection;
-			if (key) problems[key] = CONNECT_FAILED;
+			if (key) problems[key] = t('settings-network-connect-failed');
 		});
 		void open().then((initial) => (network = initial));
 		return () => {
@@ -93,25 +92,25 @@
 	{#if wifi || network.airplane || network.known.length}
 		<Section>
 			{#if wifi}
-				<Row title="Wi‑Fi" icon={WifiIcon} description={wifiSummary(wifi)} truncate>
-					<Switch label="Wi‑Fi" checked={wifi.enabled} disabled={!wifi.hardwareEnabled} onchange={setWifi} />
+				<Row title={t('settings-network-wifi')} icon={WifiIcon} description={wifiSummary(wifi)} truncate>
+					<Switch label={t('settings-network-wifi')} checked={wifi.enabled} disabled={!wifi.hardwareEnabled} onchange={setWifi} />
 				</Row>
 			{/if}
 			{#if network.airplane}
 				{@const airplane = network.airplane}
 				<Row
-					title="Airplane mode"
+					title={t('settings-network-airplane')}
 					icon={Plane}
-					description={airplane.hardware ? 'Turned on by a hardware switch' : 'Turns off every wireless connection'}
+					description={airplane.hardware ? t('settings-network-airplane-hardware') : t('settings-network-airplane.description')}
 				>
-					<Switch label="Airplane mode" checked={airplane.enabled || airplane.hardware} disabled={airplane.hardware} onchange={setAirplane} />
+					<Switch label={t('settings-network-airplane')} checked={airplane.enabled || airplane.hardware} disabled={airplane.hardware} onchange={setAirplane} />
 				</Row>
 			{/if}
 			{#if network.known.length}
 				<Row
-					title="Known networks"
+					title={t('settings-network-known')}
 					icon={History}
-					description={network.known.length === 1 ? '1 saved network' : `${network.known.length} saved networks`}
+					description={t('settings-network-known-count', { count: network.known.length })}
 					onclick={() => (browsingKnown = true)}
 				/>
 			{/if}
@@ -123,19 +122,19 @@
 	{/if}
 
 	{#if network.wired.length}
-		<Section title="Wired">
+		<Section title={t('settings-network-wired')}>
 			{#each network.wired as wired (wired.device)}
 				<Row title={wiredTitle(wired)} icon={EthernetPort} description={wiredSummary(wired)}>
 					{#if wired.connection}
 						{@const path = wired.connection}
 						<IconButton
 							icon={Settings}
-							label="Connection settings"
+							label={t('settings-network-connection-settings')}
 							onclick={() => (editing = { target: { kind: 'wired', path, device: wired.device }, title: wiredTitle(wired) })}
 						/>
 					{/if}
 					<Switch
-						label="Ethernet"
+						label={t('settings-network-ethernet')}
 						checked={wired.state === 'connected' || wired.state === 'connecting'}
 						disabled={wired.state === 'unplugged'}
 						onchange={(on) => toggleWired(wired, on)}
@@ -149,13 +148,13 @@
 
 	{#if empty}
 		<Section>
-			<Row title="No network connections" description="Plug in a network cable or a Wi‑Fi adapter to get online" />
+			<Row title={t('settings-network-empty')} description={t('settings-network-empty.description')} />
 		</Section>
 	{/if}
 
 	{#if proxy.available}
 		<Section>
-			<Row title="Proxy" icon={Globe} description={proxy.mode === 'none' ? undefined : proxyLabel(proxy.mode)} onclick={() => (proxying = true)} />
+			<Row title={t('settings-network-proxy')} icon={Globe} description={proxy.mode === 'none' ? undefined : proxyLabel(proxy.mode)} onclick={() => (proxying = true)} />
 		</Section>
 	{/if}
 {/if}

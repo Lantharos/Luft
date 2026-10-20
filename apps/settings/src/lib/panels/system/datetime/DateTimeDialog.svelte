@@ -1,10 +1,11 @@
 <script lang="ts">
+	import { i18n, t } from '@luft/i18n';
 	import { untrack } from 'svelte';
 	import { Dialog, Segmented } from '@luft/ui';
 	import { setTime } from './api';
 	import Calendar from './Calendar.svelte';
 	import TimeStepper from './TimeStepper.svelte';
-	import { toEpoch, wallTime } from './zones';
+	import { dayPeriods, toEpoch, wallTime } from './zones';
 
 	interface Props {
 		zone: string;
@@ -20,6 +21,7 @@
 	let failed = $state(false);
 
 	let afternoon = $derived(time.hour >= 12);
+	let periods = $derived(dayPeriods(i18n.formats));
 
 	function setHour(hour: number) {
 		time.hour = hour12 ? (hour % 12) + (afternoon ? 12 : 0) : hour;
@@ -40,7 +42,7 @@
 	}
 </script>
 
-<Dialog title="Set date and time" {onclose}>
+<Dialog title={t('settings-datetime-set-title')} {onclose}>
 	<Calendar
 		{firstWeekday}
 		year={time.year}
@@ -54,21 +56,21 @@
 	/>
 	<div class="flex items-center justify-center gap-2 pt-2">
 		<TimeStepper
-			label="Hour"
+			label={t('settings-datetime-hour')}
 			min={hour12 ? 1 : 0}
 			max={hour12 ? 12 : 23}
 			value={hour12 ? time.hour % 12 || 12 : time.hour}
 			onchange={setHour}
 		/>
 		<span class="pb-0.5 text-[26px] font-semibold text-[var(--text-muted)]">:</span>
-		<TimeStepper label="Minute" min={0} max={59} value={time.minute} onchange={(minute) => (time.minute = minute)} />
+		<TimeStepper label={t('settings-datetime-minute')} min={0} max={59} value={time.minute} onchange={(minute) => (time.minute = minute)} />
 		{#if hour12}
 			<div class="ml-3">
 				<Segmented
-					label="Morning or afternoon"
+					label={t('settings-datetime-day-period')}
 					options={[
-						{ value: 'am', label: 'AM' },
-						{ value: 'pm', label: 'PM' }
+						{ value: 'am', label: periods.am },
+						{ value: 'pm', label: periods.pm }
 					]}
 					value={afternoon ? 'pm' : 'am'}
 					onchange={(half) => (time.hour = (time.hour % 12) + (half === 'pm' ? 12 : 0))}
@@ -77,10 +79,10 @@
 		{/if}
 	</div>
 	{#if failed}
-		<p class="text-[13px] text-[var(--danger)]">The date and time couldn't be changed.</p>
+		<p class="text-[13px] text-[var(--danger)]">{t('settings-datetime-set-failed')}</p>
 	{/if}
 	{#snippet actions()}
-		<button type="button" class="button" onclick={onclose}>Cancel</button>
-		<button type="button" class="button primary" disabled={saving} onclick={save}>Set</button>
+		<button type="button" class="button" onclick={onclose}>{t('settings-datetime-cancel')}</button>
+		<button type="button" class="button primary" disabled={saving} onclick={save}>{t('settings-datetime-set')}</button>
 	{/snippet}
 </Dialog>

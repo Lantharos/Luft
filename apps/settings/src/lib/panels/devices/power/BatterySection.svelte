@@ -1,5 +1,7 @@
 <script lang="ts">
+	import { i18n, t } from '@luft/i18n';
 	import { Row, Section, Switch, watts } from '@luft/ui';
+	import { percent } from '#lib/format.js';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import type { Battery } from './api';
 	import ChargeLimit from './ChargeLimit.svelte';
@@ -16,48 +18,56 @@
 	let status = $derived.by(() => {
 		switch (battery.charge) {
 			case 'charging': {
-				const charging = power ? `Charging at ${power}` : 'Charging';
-				return battery.untilFull > 0 ? `${charging}, full in ${duration(battery.untilFull)}` : charging;
+				if (battery.untilFull <= 0) return power ? t('settings-power-charging-at', { power }) : t('settings-power-charging');
+				const time = duration(battery.untilFull);
+				return power ? t('settings-power-charging-at-until-full', { power, time }) : t('settings-power-charging-until-full', { time });
 			}
 			case 'discharging': {
-				const left = battery.untilEmpty > 0 ? `About ${duration(battery.untilEmpty)} left` : 'On battery';
-				return power ? `${left}, using ${power}` : left;
+				if (battery.untilEmpty <= 0) return power ? t('settings-power-on-battery-using', { power }) : t('settings-power-on-battery');
+				const time = duration(battery.untilEmpty);
+				return power ? t('settings-power-time-left-using', { power, time }) : t('settings-power-time-left', { time });
 			}
 			case 'full':
-				return 'Fully charged';
+				return t('settings-power-full');
 			case 'empty':
-				return 'Empty';
+				return t('settings-power-empty');
 			case 'not-charging':
-				return 'Plugged in, not charging';
+				return t('settings-power-not-charging');
 		}
 	});
-	let health = $derived(battery.capacity ? (battery.capacity.full / battery.capacity.design) * 100 : null);
+	let health = $derived(battery.capacity ? battery.capacity.full / battery.capacity.design : null);
 	let wear = $derived(
 		[
-			battery.capacity && `${wattHours(battery.capacity.full)} of ${wattHours(battery.capacity.design)} when new`,
-			battery.cycles.length && `${battery.cycles.join(' and ')} charge cycles`
+			battery.capacity && t('settings-power-capacity', { full: wattHours(battery.capacity.full), design: wattHours(battery.capacity.design) }),
+			battery.cycles.length && cycles(battery.cycles)
 		]
 			.filter(Boolean)
 			.join(' · ')
 	);
+
+	function cycles(counts: number[]) {
+		const number = new Intl.NumberFormat(i18n.formats);
+		const list = new Intl.ListFormat(i18n.formats).format(counts.map((count) => number.format(count)));
+		return t('settings-power-cycles', { cycles: list, count: counts[counts.length - 1] });
+	}
 </script>
 
-<Section title="Battery">
-	<Row title="{Math.round(battery.level)}%" description={status}>
+<Section title={t('settings-power-battery')}>
+	<Row title={percent(battery.level / 100)} description={status}>
 		{#snippet below()}
 			<Level level={battery.level} low={battery.charge === 'discharging' && battery.level <= LOW_LEVEL} />
 		{/snippet}
 	</Row>
 	{#if wear}
-		<Row title="Battery health" description={wear}>
+		<Row title={t('settings-power-health')} description={wear}>
 			{#if health !== null}
-				<span class="tabular-nums">{Math.round(Math.min(health, 100))}%</span>
+				<span class="tabular-nums">{percent(Math.min(health, 1))}</span>
 			{/if}
 		</Row>
 	{/if}
-	<Row title="Show percentage" description="Shows the battery level inside the battery icon">
+	<Row title={t('settings-power-show-percentage')} description={t('settings-power-show-percentage-description')}>
 		<Switch
-			label="Show percentage"
+			label={t('settings-power-show-percentage')}
 			checked={desktop.values['show-battery-percentage'] ?? false}
 			onchange={(on) => desktop.set('show-battery-percentage', on)}
 		/>

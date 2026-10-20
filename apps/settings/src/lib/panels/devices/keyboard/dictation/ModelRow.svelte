@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { bytes, Row } from '@luft/ui';
 	import ProgressTrack from '#lib/components/ProgressTrack.svelte';
 	import { cancelInstall, install, remove, type Model } from './api';
@@ -9,11 +10,11 @@
 	let downloading = $derived(!!download && !download.problem);
 
 	function describe() {
-		if (download?.problem) return `Couldn’t download: ${download.problem}`;
-		if (download) return `${bytes(download.received)} of ${bytes(download.total)}`;
-		if (model.installed) return `${bytes(model.usage)} on this computer`;
-		if (model.usage > 0) return `${bytes(model.usage)} of ${bytes(model.size)} downloaded`;
-		return `${bytes(model.size)} to download`;
+		if (download?.problem) return t('settings-dictation-model-failed', { reason: download.problem });
+		if (download) return t('settings-dictation-model-downloading', { received: bytes(download.received), total: bytes(download.total) });
+		if (model.installed) return t('settings-dictation-model-installed', { size: bytes(model.usage) });
+		if (model.usage > 0) return t('settings-dictation-model-partial', { received: bytes(model.usage), total: bytes(model.size) });
+		return t('settings-dictation-model-size', { size: bytes(model.size) });
 	}
 </script>
 
@@ -24,15 +25,15 @@
 <Row title={model.name} description={describe()} below={downloading ? progress : undefined}>
 	{#if download}
 		{#if download.problem}
-			<button type="button" class="button" onclick={() => install(model.id)}>Try again</button>
+			<button type="button" class="button" onclick={() => install(model.id)}>{t('settings-dictation-model-retry')}</button>
 		{/if}
-		<button type="button" class="button" onclick={() => cancelInstall(model.id)}>Cancel</button>
+		<button type="button" class="button" onclick={() => cancelInstall(model.id)}>{t('settings-dictation-model-cancel')}</button>
 	{:else}
 		{#if !model.installed}
-			<button type="button" class="button" onclick={() => install(model.id)}>{model.usage > 0 ? 'Resume' : 'Download'}</button>
+			<button type="button" class="button" onclick={() => install(model.id)}>{model.usage > 0 ? t('settings-dictation-model-resume') : t('settings-dictation-model-download')}</button>
 		{/if}
 		{#if removable}
-			<button type="button" class="button" onclick={() => remove(model.id)}>Remove</button>
+			<button type="button" class="button" onclick={() => remove(model.id)}>{t('settings-dictation-model-remove')}</button>
 		{/if}
 	{/if}
 </Row>

@@ -2,6 +2,7 @@
 	import Import from '@lucide/svelte/icons/import';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import { onMount } from 'svelte';
+	import { i18n, t } from '@luft/i18n';
 	import { ActionRow, Section } from '@luft/ui';
 	import { importFromWindows, pairedInWindows, type WindowsDevice } from './api';
 
@@ -10,8 +11,9 @@
 	let problem = $state('');
 
 	let names = $derived(devices.map((device) => device.name ?? device.device));
+	let list = $derived(new Intl.ListFormat(i18n.formats, { type: 'conjunction' }));
 	let summary = $derived(
-		names.length <= 2 ? names.join(' and ') : `${names.slice(0, 2).join(', ')} and ${names.length - 2} more`
+		list.format(names.length <= 2 ? names : [...names.slice(0, 2), t('settings-bluetooth-windows-more', { count: names.length - 2 })])
 	);
 
 	async function bring() {
@@ -38,8 +40,8 @@
 {#if devices.length}
 	<Section>
 		<ActionRow
-			title="Bring your devices from Windows"
-			description={problem || `${summary} ${devices.length === 1 ? 'is' : 'are'} paired in Windows. Use ${devices.length === 1 ? 'it' : 'them'} here without pairing again.`}
+			title={t('settings-bluetooth-windows')}
+			description={problem || t('settings-bluetooth-windows.description', { devices: summary, count: devices.length })}
 			alert={Boolean(problem)}
 			icon={Import}
 			onclick={bring}

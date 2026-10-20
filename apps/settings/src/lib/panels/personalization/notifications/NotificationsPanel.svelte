@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Row, Section, Switch } from '@luft/ui';
 	import { schemaInstalled, useSettings } from '#lib/state/gsettings.svelte.js';
 	import AppsPage from './AppsPage.svelte';
@@ -32,14 +33,14 @@
 	<AppsPage {apps} {lockScreen} {hasRules} onclose={() => (browsing = false)} />
 {:else}
 	<Section>
-		<Row title="Do not disturb" description="Banners and sounds stay off, except for apps you allow">
-			<Switch label="Do not disturb" checked={!(general.values['show-banners'] ?? true)} onchange={(on) => general.set('show-banners', !on)} />
+		<Row title={t('settings-notifications-dnd')} description={t('settings-notifications-dnd-description')}>
+			<Switch label={t('settings-notifications-dnd')} checked={!(general.values['show-banners'] ?? true)} onchange={(on) => general.set('show-banners', !on)} />
 		</Row>
 	</Section>
 
-	<Section title="Lock screen">
-		<Row title="Show notifications on the lock screen">
-			<Switch label="Show notifications on the lock screen" checked={lockScreen} onchange={(on) => general.set('show-in-lock-screen', on)} />
+	<Section title={t('settings-notifications-lock-screen')}>
+		<Row title={t('settings-notifications-show-lock-screen')}>
+			<Switch label={t('settings-notifications-show-lock-screen')} checked={lockScreen} onchange={(on) => general.set('show-in-lock-screen', on)} />
 		</Row>
 		{#if hasMessageContent}
 			<MessageContent {lockScreen} />
@@ -48,7 +49,7 @@
 
 	{#if apps.length && hasRules !== null}
 		<Section>
-			<Row title="App notifications" description="Choose how each app notifies you" onclick={() => (browsing = true)} />
+			<Row title={t('settings-notifications-apps')} description={t('settings-notifications-apps-description')} onclick={() => (browsing = true)} />
 		</Section>
 	{/if}
 {/if}

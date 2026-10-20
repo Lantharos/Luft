@@ -29,16 +29,16 @@ export const KIND_ICONS: Record<Kind, Component> = {
 };
 
 export const KIND_LABELS: Record<Kind, string> = {
-	headphones: 'Headphones',
-	speaker: 'Speaker',
-	mouse: 'Mouse',
-	keyboard: 'Keyboard',
-	gamepad: 'Game controller',
-	phone: 'Phone',
-	computer: 'Computer',
-	tablet: 'Tablet',
-	display: 'Display',
-	printer: 'Printer',
-	camera: 'Camera',
-	other: 'Other device'
+	headphones: 'settings-bluetooth-kind-headphones',
+	speaker: 'settings-bluetooth-kind-speaker',
+	mouse: 'settings-bluetooth-kind-mouse',
+	keyboard: 'settings-bluetooth-kind-keyboard',
+	gamepad: 'settings-bluetooth-kind-gamepad',
+	phone: 'settings-bluetooth-kind-phone',
+	computer: 'settings-bluetooth-kind-computer',
+	tablet: 'settings-bluetooth-kind-tablet',
+	display: 'settings-bluetooth-kind-display',
+	printer: 'settings-bluetooth-kind-printer',
+	camera: 'settings-bluetooth-kind-camera',
+	other: 'settings-bluetooth-kind-other'
 };

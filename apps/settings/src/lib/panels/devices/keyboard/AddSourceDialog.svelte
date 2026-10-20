@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { tick } from 'svelte';
 	import Check from '@lucide/svelte/icons/check';
 	import { Dialog, SearchField } from '@luft/ui';
@@ -37,9 +38,9 @@
 	}
 </script>
 
-<Dialog title="Add an input source" description="Pick the keyboard layout or input method you want to type with." {onclose}>
-	<SearchField label="Search languages, layouts and input methods" bind:value={query} onkeydown={keydown} />
-	<div bind:this={list} class="hidden-scroll scroll-fade -mx-2 flex h-[300px] flex-col gap-0.5 overflow-y-auto px-2" role="listbox" aria-label="Input sources">
+<Dialog title={t('settings-keyboard-add-source')} description={t('settings-keyboard-add-source-description')} {onclose}>
+	<SearchField label={t('settings-keyboard-add-source-search')} bind:value={query} onkeydown={keydown} />
+	<div bind:this={list} class="hidden-scroll scroll-fade -mx-2 flex h-[300px] flex-col gap-0.5 overflow-y-auto px-2" role="listbox" aria-label={t('settings-keyboard-sources')}>
 		{#each results as source (`${source.type}:${source.id}`)}
 			<button
 				type="button"
@@ -53,16 +54,16 @@
 				{#if selected === source}
 					<Check size={16} class="shrink-0" />
 				{:else if source.type === 'ibus'}
-					<span class="shrink-0 text-[12px] text-[var(--text-muted)]">Input method</span>
+					<span class="shrink-0 text-[12px] text-[var(--text-muted)]">{t('settings-keyboard-input-method')}</span>
 				{/if}
 			</button>
 		{:else}
-			<p class="px-2.5 py-2 text-[13px] text-[var(--text-muted)]">Nothing matches “{query.trim()}”</p>
+			<p class="px-2.5 py-2 text-[13px] text-[var(--text-muted)]">{t('settings-keyboard-add-source-no-match', { query: query.trim() })}</p>
 		{/each}
 	</div>
 	{#snippet actions()}
-		<button type="button" class="button" onclick={onclose}>Cancel</button>
-		<button type="button" class="button primary" disabled={!selected} onclick={() => selected && onadd(selected)}>Add</button>
+		<button type="button" class="button" onclick={onclose}>{t('settings-keyboard-cancel')}</button>
+		<button type="button" class="button primary" disabled={!selected} onclick={() => selected && onadd(selected)}>{t('settings-keyboard-add')}</button>
 	{/snippet}
 </Dialog>
 

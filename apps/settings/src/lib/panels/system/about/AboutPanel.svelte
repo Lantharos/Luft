@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { bytes, Dialog, Row, Section, TextField } from '@luft/ui';
 	import { binaryBytes } from '#lib/format.js';
 	import { about, openDisks, otherSystems, removeSystem, rename, type About, type OtherSystem } from './api';
@@ -31,8 +32,8 @@
 	}
 
 	function describe(system: OtherSystem) {
-		if (system.kind === 'old-system') return `Kept when Luft replaced it · ${bytes(system.size)}`;
-		return `Remove it to give its ${bytes(system.size)} to Luft`;
+		if (system.kind === 'old-system') return t('settings-about-old-system', { size: bytes(system.size) });
+		return t('settings-about-other-system', { size: bytes(system.size) });
 	}
 
 	void load();
@@ -46,27 +47,27 @@
 	</div>
 
 	<Section>
-		<Row title="Device name" description="How other devices see this computer">
+		<Row title={t('settings-about-device-name')} description={t('settings-about-device-name-description')}>
 			<span class="max-w-[220px] truncate">{info.deviceName}</span>
-			<button type="button" class="button" onclick={startRename}>Rename</button>
+			<button type="button" class="button" onclick={startRename}>{t('settings-about-rename')}</button>
 		</Row>
 	</Section>
 
-	<Section title="Hardware">
+	<Section title={t('settings-about-hardware')}>
 		{#if info.processor}
-			<Row title="Processor"><span class="value">{info.processor}</span></Row>
+			<Row title={t('settings-about-processor')}><span class="value">{info.processor}</span></Row>
 		{/if}
 		{#each info.graphics as adapter, index (adapter)}
-			<Row title={info.graphics.length > 1 ? `Graphics ${index + 1}` : 'Graphics'}><span class="value">{adapter}</span></Row>
+			<Row title={info.graphics.length > 1 ? t('settings-about-graphics-numbered', { number: index + 1 }) : t('settings-about-graphics')}><span class="value">{adapter}</span></Row>
 		{/each}
 		{#if info.memory}
-			<Row title="Memory"><span>{binaryBytes(info.memory)}</span></Row>
+			<Row title={t('settings-about-memory')}><span>{binaryBytes(info.memory)}</span></Row>
 		{/if}
 		{#if info.storage}
 			{@const storage = info.storage}
-			<Row title="Storage" description="{bytes(storage.free)} free of {bytes(storage.total)}">
+			<Row title={t('settings-about-storage')} description={t('settings-about-storage-free', { free: bytes(storage.free), total: bytes(storage.total) })}>
 				{#if storage.manageable}
-					<button type="button" class="button" onclick={openDisks}>Manage drives</button>
+					<button type="button" class="button" onclick={openDisks}>{t('settings-about-manage-drives')}</button>
 				{/if}
 				{#snippet below()}
 					<div class="h-1.5 overflow-hidden rounded-full bg-[var(--control)]">
@@ -77,27 +78,27 @@
 		{/if}
 		{#each others as system (system.id)}
 			<Row title={system.name} description={describe(system)}>
-				<button type="button" class="button" onclick={() => removeSystem(system.id)}>Remove</button>
+				<button type="button" class="button" onclick={() => removeSystem(system.id)}>{t('settings-about-remove')}</button>
 			</Row>
 		{/each}
 	</Section>
 
-	<Section title="Software">
-		<Row title="System"><span class="value">{info.system}</span></Row>
-		<Row title="Desktop"><span class="value">Kestrel</span></Row>
-		<Row title="Kernel"><span class="value">{info.kernel}</span></Row>
-		<Row title="Hostname"><span class="value">{info.hostname}</span></Row>
+	<Section title={t('settings-about-software')}>
+		<Row title={t('settings-about-system')}><span class="value">{info.system}</span></Row>
+		<Row title={t('settings-about-desktop')}><span class="value">Kestrel</span></Row>
+		<Row title={t('settings-about-kernel')}><span class="value">{info.kernel}</span></Row>
+		<Row title={t('settings-about-hostname')}><span class="value">{info.hostname}</span></Row>
 	</Section>
 
 	<RecentProblems />
 {/if}
 
 {#if renaming}
-	<Dialog title="Rename this device" description="Other devices nearby see this name." onclose={() => (renaming = false)}>
-		<TextField label="Device name" bind:value={draft} {error} live onkeydown={(event) => event.key === 'Enter' && draft.trim() && saveName()} />
+	<Dialog title={t('settings-about-rename-title')} description={t('settings-about-rename-description')} onclose={() => (renaming = false)}>
+		<TextField label={t('settings-about-device-name')} bind:value={draft} {error} live onkeydown={(event) => event.key === 'Enter' && draft.trim() && saveName()} />
 		{#snippet actions()}
-			<button type="button" class="button" onclick={() => (renaming = false)}>Cancel</button>
-			<button type="button" class="button primary" disabled={!draft.trim()} onclick={saveName}>Rename</button>
+			<button type="button" class="button" onclick={() => (renaming = false)}>{t('settings-about-cancel')}</button>
+			<button type="button" class="button primary" disabled={!draft.trim()} onclick={saveName}>{t('settings-about-rename')}</button>
 		{/snippet}
 	</Dialog>
 {/if}

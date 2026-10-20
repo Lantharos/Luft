@@ -9,10 +9,13 @@ use gio::prelude::*;
 use luft_app::dbus::{self, failed};
 use luft_app::launch::{self, Token};
 use luft_app::{Commands, Events};
+use luft_i18n::t;
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use zbus::Proxy;
+
+use crate::L10N;
 
 const DISKS: &str = "com.lantharos.disks.desktop";
 
@@ -193,7 +196,8 @@ async fn about(_: Value) -> Result<About, String> {
 }
 
 fn launch_disks(argument: &str, token: Option<&str>) -> Result<(), String> {
-    let disks = gio_unix::DesktopAppInfo::new(DISKS).ok_or("Disks isn't installed")?;
+    let disks = gio_unix::DesktopAppInfo::new(DISKS)
+        .ok_or_else(|| t!(L10N, "desktop-about-disks-missing"))?;
     launch::start(disks.upcast_ref(), &[argument], token).map_err(|error| error.to_string())
 }
 

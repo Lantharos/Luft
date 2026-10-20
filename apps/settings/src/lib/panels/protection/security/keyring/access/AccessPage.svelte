@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import SubPage from '#lib/components/SubPage.svelte';
 	import type { Access } from '../api';
 	import AppsSection from './AppsSection.svelte';
@@ -14,7 +15,7 @@
 	let { access, refresh, onclose }: Props = $props();
 </script>
 
-<SubPage title="Apps with access" back="Security" {onclose}>
+<SubPage title={t('settings-passwords-apps')} back={t('settings-passwords-access-back')} {onclose}>
 	<AppsSection apps={access.apps} {refresh} />
 
 	{#if access.stores.length}

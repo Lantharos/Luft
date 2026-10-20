@@ -4,6 +4,8 @@ use std::path::PathBuf;
 
 use serde::Serialize;
 
+use super::names;
+
 const SCHEMAS: [&str; 5] = [
     "org.gnome.desktop.wm.keybindings",
     "com.lantharos.kestrel.keybindings",
@@ -130,8 +132,14 @@ fn shortcut(
     }
     let (name, group) = match descriptions.get(&(schema_id.clone(), key.to_owned())) {
         Some(description) if description.hidden => return None,
-        Some(description) => (description.name.clone(), description.group.as_str()),
-        None if schema_id == KESTREL => (summary(&settings_key)?, ""),
+        Some(description) => (
+            names::translated(key).unwrap_or_else(|| description.name.clone()),
+            description.group.as_str(),
+        ),
+        None if schema_id == KESTREL => (
+            names::translated(key).or_else(|| summary(&settings_key))?,
+            "",
+        ),
         None => return None,
     };
     Some(Shortcut {

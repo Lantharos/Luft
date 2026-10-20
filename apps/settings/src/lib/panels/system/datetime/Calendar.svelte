@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { i18n, t } from '@luft/i18n';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 
@@ -12,10 +13,9 @@
 		onselect: (year: number, month: number, day: number) => void;
 	}
 
-	const monthTitle = new Intl.DateTimeFormat(undefined, { month: 'long', year: 'numeric', timeZone: 'UTC' });
-
 	let { firstWeekday, year, month, day, onselect }: Props = $props();
 
+	let monthTitle = $derived(new Intl.DateTimeFormat(i18n.formats, { month: 'long', year: 'numeric', timeZone: 'UTC' }));
 	let weekdays = $derived(Array.from({ length: 7 }, (_, index) => weekdayName((firstWeekday + index) % 7, 'narrow')));
 
 	let shift = $state(0);
@@ -35,11 +35,11 @@
 
 <div class="flex flex-col gap-2">
 	<div class="flex items-center justify-between">
-		<button type="button" class="plain-button nav" aria-label="Previous month" onclick={() => (shift -= 1)}>
+		<button type="button" class="plain-button nav" aria-label={t('settings-datetime-previous-month')} onclick={() => (shift -= 1)}>
 			<ChevronLeft size={18} />
 		</button>
 		<span class="text-[14px] font-semibold">{monthTitle.format(Date.UTC(shown.year, shown.month - 1, 1))}</span>
-		<button type="button" class="plain-button nav" aria-label="Next month" onclick={() => (shift += 1)}>
+		<button type="button" class="plain-button nav" aria-label={t('settings-datetime-next-month')} onclick={() => (shift += 1)}>
 			<ChevronRight size={18} />
 		</button>
 	</div>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Row, Switch } from '@luft/ui';
 	import { onPermissionsChanged, permissions, setPermission, type AppPermission, type PermissionKind } from './api';
 
@@ -32,7 +33,7 @@
 </script>
 
 {#if apps.length}
-	<Row title="Apps that asked" description="{allowed} of {apps.length} allowed" {disabled} {expanded} onclick={() => (expanded = !expanded)} />
+	<Row title={t('settings-privacy-apps-asked')} description={t('settings-privacy-apps-allowed', { allowed, total: apps.length })} {disabled} {expanded} onclick={() => (expanded = !expanded)} />
 	{#if expanded}
 		{#each apps as app (app.id)}
 			<Row title={app.name} {disabled}>

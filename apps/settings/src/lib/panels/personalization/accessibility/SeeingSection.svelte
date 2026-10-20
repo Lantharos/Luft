@@ -1,7 +1,8 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Row, Section, Select, Slider, Switch } from '@luft/ui';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
-	import { CURSOR_SIZES } from '../appearance/cursors/sizes';
+	import { cursorSizes } from '../appearance/cursors/sizes';
 	import { screenReaderInstalled } from './api';
 
 	type Applications = {
@@ -29,30 +30,32 @@
 	let readerInstalled = $state(false);
 	let zoomed = $derived(applications.values['screen-magnifier-enabled'] ?? false);
 
-	const times = (factor: number) => `${Number(factor.toFixed(2))}×`;
+	let sizes = $derived(cursorSizes());
+
+	const times = (factor: number) => t('settings-accessibility-zoom-factor', { factor });
 
 	void screenReaderInstalled().then((installed) => (readerInstalled = installed));
 </script>
 
-<Section title="Seeing">
+<Section title={t('settings-accessibility-seeing')}>
 	{#if readerInstalled}
-		<Row title="Screen reader">
+		<Row title={t('settings-accessibility-screen-reader')}>
 			<Switch
-				label="Screen reader"
+				label={t('settings-accessibility-screen-reader')}
 				checked={applications.values['screen-reader-enabled'] ?? false}
 				onchange={(on) => applications.set('screen-reader-enabled', on)}
 			/>
 		</Row>
 	{/if}
-	<Row title="Zoom">
-		<Switch label="Zoom" checked={zoomed} onchange={(on) => applications.set('screen-magnifier-enabled', on)} />
+	<Row title={t('settings-accessibility-zoom')}>
+		<Switch label={t('settings-accessibility-zoom')} checked={zoomed} onchange={(on) => applications.set('screen-magnifier-enabled', on)} />
 	</Row>
 	{#if zoomed}
-		<Row title="Zoom level">
+		<Row title={t('settings-accessibility-zoom-level')}>
 			<span class="w-12 text-right tabular-nums">{times(magnifier.values['mag-factor'] ?? 2)}</span>
 			{#snippet below()}
 				<Slider
-					label="Zoom level"
+					label={t('settings-accessibility-zoom-level')}
 					min={1.25}
 					max={8}
 					step={0.25}
@@ -63,24 +66,24 @@
 			{/snippet}
 		</Row>
 	{/if}
-	<Row title="Large text">
+	<Row title={t('settings-accessibility-large-text')}>
 		<Switch
-			label="Large text"
+			label={t('settings-accessibility-large-text')}
 			checked={(desktop.values['text-scaling-factor'] ?? 1) > 1}
 			onchange={(on) => (on ? desktop.set('text-scaling-factor', LARGE_TEXT) : desktop.reset('text-scaling-factor'))}
 		/>
 	</Row>
-	<Row title="High contrast">
-		<Switch label="High contrast" checked={a11y.values['high-contrast'] ?? false} onchange={(on) => a11y.set('high-contrast', on)} />
+	<Row title={t('settings-accessibility-high-contrast')}>
+		<Switch label={t('settings-accessibility-high-contrast')} checked={a11y.values['high-contrast'] ?? false} onchange={(on) => a11y.set('high-contrast', on)} />
 	</Row>
-	<Row title="Reduce motion" description="Fade instead of sliding and zooming">
+	<Row title={t('settings-accessibility-reduce-motion')} description={t('settings-accessibility-reduce-motion-description')}>
 		<Switch
-			label="Reduce motion"
+			label={t('settings-accessibility-reduce-motion')}
 			checked={a11y.values['reduced-motion'] === 'reduce'}
 			onchange={(on) => a11y.set('reduced-motion', on ? 'reduce' : 'no-preference')}
 		/>
 	</Row>
-	<Row title="Cursor size">
-		<Select label="Cursor size" options={CURSOR_SIZES} value={desktop.values['cursor-size'] ?? 24} onchange={(size) => desktop.set('cursor-size', size)} />
+	<Row title={t('settings-accessibility-cursor-size')}>
+		<Select label={t('settings-accessibility-cursor-size')} options={sizes} value={desktop.values['cursor-size'] ?? 24} onchange={(size) => desktop.set('cursor-size', size)} />
 	</Row>
 </Section>

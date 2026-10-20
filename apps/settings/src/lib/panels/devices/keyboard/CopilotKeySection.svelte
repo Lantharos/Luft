@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Row, Section, Select, Switch } from '@luft/ui';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import ChooseAppDialog from '../../system/apps/ChooseAppDialog.svelte';
@@ -8,9 +9,9 @@
 	type CopilotKey = { press: Press; app: string; hold: boolean };
 
 	const PRESSES: { value: Press; label: string }[] = [
-		{ value: 'search', label: 'Open Start' },
-		{ value: 'app', label: 'Open an app' },
-		{ value: 'nothing', label: 'Nothing' }
+		{ value: 'search', label: 'settings-keyboard-copilot-open-start' },
+		{ value: 'app', label: 'settings-keyboard-copilot-open-app' },
+		{ value: 'nothing', label: 'settings-keyboard-copilot-nothing' }
 	];
 
 	const key = useSettings<CopilotKey>('com.lantharos.kestrel.copilot-key', ['press', 'app', 'hold']);
@@ -35,23 +36,23 @@
 	}
 </script>
 
-<Section title="Copilot key">
-	<Row title="Press" description="What a quick press of the key does">
-		<Select label="Press" options={PRESSES} value={press} onchange={pick} />
+<Section title={t('settings-keyboard-copilot')}>
+	<Row title={t('settings-keyboard-copilot-press')} description={t('settings-keyboard-copilot-press-description')}>
+		<Select label={t('settings-keyboard-copilot-press')} options={PRESSES.map((option) => ({ ...option, label: t(option.label) }))} value={press} onchange={pick} />
 	</Row>
 	{#if press === 'app'}
-		<Row title="App" description={chosen?.name ?? 'No app chosen yet'}>
-			<button type="button" class="button" onclick={() => (choosing = true)}>{chosen ? 'Change' : 'Choose'}</button>
+		<Row title={t('settings-keyboard-copilot-app')} description={chosen?.name ?? t('settings-keyboard-copilot-no-app')}>
+			<button type="button" class="button" onclick={() => (choosing = true)}>{chosen ? t('settings-keyboard-copilot-change') : t('settings-keyboard-copilot-choose')}</button>
 		</Row>
 	{/if}
 	<Row
-		title="Hold to dictate"
-		description={dictation.values.enabled ? 'Hold the key and talk to type what you say' : 'Works once dictation is on'}
+		title={t('settings-keyboard-copilot-hold')}
+		description={dictation.values.enabled ? t('settings-keyboard-copilot-hold-description') : t('settings-keyboard-copilot-hold-off')}
 	>
-		<Switch label="Hold to dictate" checked={key.values.hold ?? true} onchange={(on) => key.set('hold', on)} />
+		<Switch label={t('settings-keyboard-copilot-hold')} checked={key.values.hold ?? true} onchange={(on) => key.set('hold', on)} />
 	</Row>
 </Section>
 
 {#if choosing}
-	<ChooseAppDialog title="Choose an app" description="Pressing the Copilot key opens it." onchoose={choose} onclose={() => (choosing = false)} />
+	<ChooseAppDialog title={t('settings-keyboard-copilot-choose-app')} description={t('settings-keyboard-copilot-choose-app-description')} onchoose={choose} onclose={() => (choosing = false)} />
 {/if}

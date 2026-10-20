@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
 	import { MenuButton, MenuItem, MenuSeparator, tooltip } from '@luft/ui';
 	import type { FontFamily, FontRole } from './api';
@@ -15,26 +16,26 @@
 </script>
 
 <div class="font-row" class:divided>
-	<button type="button" class="main" {@attach tooltip(`Open ${family.name}`)} onclick={onopen}>
+	<button type="button" class="main" {@attach tooltip(t('settings-fonts-open', { family: family.name }))} onclick={onopen}>
 		<span class="name">{family.name}</span>
-		<span class="sample" style:font-family="'{family.name}', var(--font-sans)" aria-hidden="true">The quick brown fox jumps over the lazy dog</span>
-		<span class="styles">{family.styles === 1 ? '1 style' : `${family.styles} styles`}</span>
+		<span class="sample" style:font-family="'{family.name}', var(--font-sans)" aria-hidden="true">{t('settings-fonts-sample')}</span>
+		<span class="styles">{t('settings-fonts-styles', { count: family.styles })}</span>
 	</button>
-	<MenuButton class="icon-button" label="More for {family.name}" align="end" {@attach tooltip('More')}>
+	<MenuButton class="icon-button" label={t('settings-fonts-more-for', { family: family.name })} align="end" {@attach tooltip(t('settings-fonts-more'))}>
 		{#snippet trigger()}<Ellipsis size={18} />{/snippet}
 		{#snippet children(close)}
 			<MenuItem
 				onclick={() => {
 					close();
 					onuse('interface');
-				}}>Use as system font</MenuItem
+				}}>{t('settings-fonts-use-interface')}</MenuItem
 			>
 			{#if family.monospace}
 				<MenuItem
 					onclick={() => {
 						close();
 						onuse('monospace');
-					}}>Use as monospace font</MenuItem
+					}}>{t('settings-fonts-use-monospace')}</MenuItem
 				>
 			{/if}
 			{#if family.removable}
@@ -44,7 +45,7 @@
 					onclick={() => {
 						close();
 						onremove();
-					}}>Remove</MenuItem
+					}}>{t('settings-fonts-remove')}</MenuItem
 				>
 			{/if}
 		{/snippet}

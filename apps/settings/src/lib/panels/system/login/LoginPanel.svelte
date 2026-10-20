@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { onDestroy } from 'svelte';
 	import { Avatar, ItemRow, Row, Section, Select, Switch } from '@luft/ui';
 	import { displayName, users, type User } from '../users/api';
@@ -23,10 +24,10 @@
 	let problem = $state<{ area: Area; message: string } | null>(null);
 
 	let sessions = $derived([
-		{ value: '', label: 'Automatic' },
+		{ value: '', label: t('settings-login-session-automatic') },
 		...(screen?.sessions ?? []).map((session) => ({ value: session.id, label: session.name }))
 	]);
-	let automaticLogins = $derived([{ value: '', label: 'Off' }, ...people.map((user) => ({ value: user.userName, label: displayName(user) }))]);
+	let automaticLogins = $derived([{ value: '', label: t('settings-login-automatic-off') }, ...people.map((user) => ({ value: user.userName, label: displayName(user) }))]);
 
 	function receive(next: LoginScreen | null) {
 		screen = next;
@@ -59,7 +60,7 @@
 {/snippet}
 
 {#if screen === null}
-	<p class="px-2 text-[14px] text-[var(--text-muted)]">The login screen can't be changed on this computer.</p>
+	<p class="px-2 text-[14px] text-[var(--text-muted)]">{t('settings-login-unavailable')}</p>
 {:else if screen}
 	{@const hidden = screen.hiddenUsers}
 	<WallpaperSection
@@ -70,32 +71,32 @@
 	/>
 	{@render trouble('wallpaper')}
 
-	<Section title="People">
-		<Row title="Show people on the login screen" description={screen.showUsers ? 'Choose an account from a list to sign in' : 'Everyone types their username to sign in'}>
-			<Switch label="Show people on the login screen" checked={screen.showUsers} onchange={(on) => attempt('people', () => setShowUsers(on))} />
+	<Section title={t('settings-login-people')}>
+		<Row title={t('settings-login-show-people')} description={screen.showUsers ? t('settings-login-show-people-on') : t('settings-login-show-people-off')}>
+			<Switch label={t('settings-login-show-people')} checked={screen.showUsers} onchange={(on) => attempt('people', () => setShowUsers(on))} />
 		</Row>
 		{#if screen.showUsers}
 			{#each people as user (user.userName)}
 				{@const shown = !hidden.includes(user.userName)}
-				<ItemRow title={displayName(user)} description={shown ? user.userName : 'Types their username to sign in'}>
+				<ItemRow title={displayName(user)} description={shown ? user.userName : t('settings-login-person-hidden')}>
 					{#snippet leading()}
 						<Avatar picture={user.picture} name={displayName(user)} size={36} />
 					{/snippet}
-					<Switch label="Show {displayName(user)}" checked={shown} onchange={(on) => attempt('people', () => showPerson(hidden, user.userName, on))} />
+					<Switch label={t('settings-login-show-person', { name: displayName(user) })} checked={shown} onchange={(on) => attempt('people', () => showPerson(hidden, user.userName, on))} />
 				</ItemRow>
 			{/each}
 		{/if}
 	</Section>
 	{@render trouble('people')}
 
-	<Section title="Signing in">
+	<Section title={t('settings-login-signing-in')}>
 		{#if screen.sessions.length > 1}
-			<Row title="Default session" description="Used unless someone picks another">
-				<Select label="Default session" options={sessions} value={screen.defaultSession} onchange={(session) => attempt('signing-in', () => setDefaultSession(session))} />
+			<Row title={t('settings-login-session')} description={t('settings-login-session-description')}>
+				<Select label={t('settings-login-session')} options={sessions} value={screen.defaultSession} onchange={(session) => attempt('signing-in', () => setDefaultSession(session))} />
 			</Row>
 		{/if}
-		<Row title="Automatic login" description="Signs in without a password at startup">
-			<Select label="Automatic login" options={automaticLogins} value={screen.automaticLogin} onchange={(user) => attempt('signing-in', () => setAutomaticLogin(user))} />
+		<Row title={t('settings-login-automatic')} description={t('settings-login-automatic-description')}>
+			<Select label={t('settings-login-automatic')} options={automaticLogins} value={screen.automaticLogin} onchange={(user) => attempt('signing-in', () => setAutomaticLogin(user))} />
 		</Row>
 	</Section>
 	{@render trouble('signing-in')}

@@ -5,6 +5,7 @@ mod watch;
 use std::sync::Once;
 
 use luft_app::{Commands, Events};
+use luft_i18n::t;
 use sabine::SabineWindow;
 use serde::Deserialize;
 use serde_json::Value;
@@ -12,6 +13,8 @@ use zbus::ObjectPath;
 
 use bus::{ACCESS, Problem, SSH, STATUS};
 use snapshot::Keyring;
+
+use crate::L10N;
 
 static WATCH: Once = Once::new();
 
@@ -57,9 +60,7 @@ async fn reseal(_: Value) -> Result<(), String> {
     bus::call(STATUS, "Reseal", &())
         .await
         .map_err(|problem| match problem {
-            Problem::Failed(_) => {
-                "The security chip couldn’t protect your keyring right now".to_owned()
-            }
+            Problem::Failed(_) => t!(L10N, "desktop-keyring-reseal-failed"),
             problem => problem.into(),
         })
 }

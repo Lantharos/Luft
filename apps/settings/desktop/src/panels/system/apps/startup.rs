@@ -8,6 +8,9 @@ use gio::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use luft_app::apps::{self, App};
+use luft_i18n::t;
+
+use crate::L10N;
 
 const GROUP: &str = "Desktop Entry";
 const HIDDEN: &str = "Hidden";
@@ -43,7 +46,7 @@ fn failed(error: impl std::fmt::Display) -> String {
 
 fn user_directory() -> Result<PathBuf, String> {
     Ok(dirs::config_dir()
-        .ok_or("There is no config folder")?
+        .ok_or_else(|| t!(L10N, "desktop-no-config-folder"))?
         .join("autostart"))
 }
 
@@ -175,7 +178,7 @@ pub fn set(Toggle { id, enabled }: Toggle) -> Result<(), String> {
     let source = if user.is_file() {
         user
     } else {
-        system.ok_or("This app no longer starts automatically")?
+        system.ok_or_else(|| t!(L10N, "desktop-apps-no-longer-starts"))?
     };
     let file = load(&source)?;
     file.set_boolean(GROUP, HIDDEN, !enabled);
@@ -186,11 +189,12 @@ pub fn set(Toggle { id, enabled }: Toggle) -> Result<(), String> {
 }
 
 pub fn add(Addition { app }: Addition) -> Result<(), String> {
-    let info = gio_unix::DesktopAppInfo::new(&app).ok_or("This app is no longer installed")?;
+    let info =
+        gio_unix::DesktopAppInfo::new(&app).ok_or_else(|| t!(L10N, "desktop-apps-uninstalled"))?;
     let file = load(
         &info
             .filename()
-            .ok_or("This app can't start automatically")?,
+            .ok_or_else(|| t!(L10N, "desktop-apps-cannot-autostart"))?,
     )?;
     file.set_boolean(GROUP, HIDDEN, false);
     file.set_boolean(GROUP, ENABLED, true);

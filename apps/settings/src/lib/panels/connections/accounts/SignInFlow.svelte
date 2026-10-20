@@ -4,6 +4,7 @@
 	import ExternalLink from '@lucide/svelte/icons/external-link';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import Smartphone from '@lucide/svelte/icons/smartphone';
+	import { t } from '@luft/i18n';
 	import { Choice, TextField } from '@luft/ui';
 	import { answer, onStep, openAddress, step as currentStep, type Step } from './api';
 
@@ -36,7 +37,7 @@
 
 	async function open(url: string) {
 		problem = '';
-		await openAddress(url).catch(() => (problem = 'No browser opened. Copy the link and open it in a browser.'));
+		await openAddress(url).catch(() => (problem = t('settings-accounts-no-browser')));
 	}
 
 	async function copy(url: string) {
@@ -69,41 +70,41 @@
 {#if step.step === 'working'}
 	<div class="flex items-center gap-3 py-2 text-[14px] text-[var(--text-soft)]">
 		<LoaderCircle size={18} class="animate-spin text-[var(--text-muted)]" />
-		Talking to {providerName}…
+		{t('settings-accounts-working', { provider: providerName })}
 	</div>
 {:else if step.step === 'browser'}
 	{@const url = step.url}
 	<p class="text-[14px] leading-relaxed text-[var(--text-soft)]">
-		Finish signing in with {providerName} in your browser. Luft never sees your password, and this updates on its own once you’re done.
+		{t('settings-accounts-finish-in-browser', { provider: providerName })}
 	</p>
 	<div class="flex flex-wrap gap-2">
-		<button type="button" class="plain-button" onclick={() => open(url)}><ExternalLink size={15} /> Open the page again</button>
-		<button type="button" class="plain-button" onclick={() => copy(url)}><Copy size={15} /> {copied ? 'Copied' : 'Copy the link'}</button>
+		<button type="button" class="plain-button" onclick={() => open(url)}><ExternalLink size={15} /> {t('settings-accounts-open-again')}</button>
+		<button type="button" class="plain-button" onclick={() => copy(url)}><Copy size={15} /> {copied ? t('settings-accounts-copied') : t('settings-accounts-copy-link')}</button>
 	</div>
 {:else if step.step === 'code'}
 	<p class="text-[14px] leading-relaxed text-[var(--text-soft)]">{step.prompt}</p>
 	<TextField
 		bind:value={code}
-		label="Verification code"
-		placeholder="6-digit code"
+		label={t('settings-accounts-code')}
+		placeholder={t('settings-accounts-code.placeholder')}
 		inputmode="numeric"
 		autocomplete="one-time-code"
 		onkeydown={(event) => event.key === 'Enter' && void submitCode()}
 	/>
 	{#if !step.texted}
-		<button type="button" class="plain-button self-start" onclick={textMe}>Text me a code instead</button>
+		<button type="button" class="plain-button self-start" onclick={textMe}>{t('settings-accounts-text-me')}</button>
 	{/if}
 {:else if step.step === 'phones'}
-	<p class="text-[14px] leading-relaxed text-[var(--text-soft)]">Which number should Apple text the code to?</p>
+	<p class="text-[14px] leading-relaxed text-[var(--text-soft)]">{t('settings-accounts-choose-phone')}</p>
 	<div class="-mx-2 flex flex-col">
 		{#each step.phones as phone (phone.id)}
-			<Choice icon={Smartphone} title={phone.number} description="Send a text message" onclick={() => choosePhone(phone.id)} />
+			<Choice icon={Smartphone} title={phone.number} description={t('settings-accounts-choose-phone.description')} onclick={() => choosePhone(phone.id)} />
 		{/each}
 	</div>
 {:else if step.step === 'approve'}
 	<div class="flex items-start gap-3 py-1 text-[14px] leading-relaxed text-[var(--text-soft)]">
 		<LoaderCircle size={18} class="mt-0.5 flex-none animate-spin text-[var(--text-muted)]" />
-		<span>Your Apple Account uses Advanced Data Protection. Approve the request on your iPhone, iPad or Mac to let this computer open iCloud Drive.</span>
+		<span>{t('settings-accounts-approve')}</span>
 	</div>
 {:else if step.step === 'failed'}
 	<p class="text-[14px] leading-relaxed text-[var(--danger)]">{step.message}</p>

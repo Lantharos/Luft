@@ -6,11 +6,14 @@ use std::path::Path;
 use futures_util::future::{try_join, try_join_all};
 use luft_app::dbus::{self, error_name, failed};
 use luft_app::{Commands, Events};
+use luft_i18n::t;
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use zbus::proxy::MethodFlags;
 use zbus::{DynamicType, OwnedObjectPath, Proxy};
+
+use crate::L10N;
 
 const ACCOUNTS: &str = "org.freedesktop.Accounts";
 const ACCOUNTS_PATH: &str = "/org/freedesktop/Accounts";
@@ -41,9 +44,7 @@ struct Rename {
 
 fn explain(error: zbus::Error) -> String {
     match error_name(&error) {
-        Some(name) if name.ends_with("PermissionDenied") => {
-            "Administrator rights are needed to change this".to_owned()
-        }
+        Some(name) if name.ends_with("PermissionDenied") => t!(L10N, "desktop-admin-required"),
         _ => error.to_string(),
     }
 }
@@ -69,7 +70,7 @@ async fn me() -> Result<OwnedObjectPath, String> {
         .map_err(explain)
 }
 
-async fn change<B: serde::Serialize + DynamicType>(method: &str, body: &B) -> Result<(), String> {
+pub(super) async fn change<B: serde::Serialize + DynamicType>(method: &str, body: &B) -> Result<(), String> {
     account(me().await?)
         .await?
         .call_with_flags::<_, _, ()>(method, MethodFlags::ALLOW_INTERACTIVE_AUTH, body)

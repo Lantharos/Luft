@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { AppIcon, Dialog, SearchField } from '@luft/ui';
 	import { installedApps, matches, type App } from './api';
 
@@ -21,7 +22,7 @@
 </script>
 
 <Dialog {title} {description} {onclose}>
-	<SearchField label="Search apps" bind:value={query} />
+	<SearchField label={t('settings-apps-search')} bind:value={query} />
 	<div class="list soft-scroll">
 		{#each shown as app (app.id)}
 			<button type="button" class="app" onclick={() => onchoose(app.id)}>
@@ -30,12 +31,12 @@
 			</button>
 		{:else}
 			{#if apps.length}
-				<p class="empty">No apps match your search</p>
+				<p class="empty">{t('settings-apps-no-match')}</p>
 			{/if}
 		{/each}
 	</div>
 	{#snippet actions()}
-		<button type="button" class="button" onclick={onclose}>Cancel</button>
+		<button type="button" class="button" onclick={onclose}>{t('settings-apps-cancel')}</button>
 	{/snippet}
 </Dialog>
 

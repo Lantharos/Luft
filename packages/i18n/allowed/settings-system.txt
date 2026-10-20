@@ -1,0 +1,1 @@
+apps/settings/src/lib/panels/system/about/AboutPanel.svelte	Kestrel

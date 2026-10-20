@@ -8,6 +8,7 @@ mod windows;
 use luft_app::dbus;
 use luft_app::dbus::objects::Objects;
 use luft_app::{Commands, Events};
+use luft_i18n::t;
 use sabine::SabineWindow;
 use serde::Deserialize;
 use serde_json::Value;
@@ -16,6 +17,8 @@ use zbus::names::BusName;
 
 use super::network;
 use snapshot::{Adapter, Bluetooth};
+
+use crate::L10N;
 
 const SERVICE: &str = "org.bluez";
 const ADAPTER: &str = "org.bluez.Adapter1";
@@ -80,7 +83,7 @@ async fn adapter() -> Result<Adapter, String> {
     bluetooth()
         .await?
         .adapter
-        .ok_or_else(|| "There is no Bluetooth adapter".to_owned())
+        .ok_or_else(|| t!(L10N, "desktop-bluetooth-no-adapter"))
 }
 
 async fn open(events: Events, _: Value) -> Result<Bluetooth, String> {

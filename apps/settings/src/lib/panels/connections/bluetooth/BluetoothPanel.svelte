@@ -4,8 +4,10 @@
 	import Info from '@lucide/svelte/icons/info';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import { onMount } from 'svelte';
+	import { t } from '@luft/i18n';
 	import { ActionRow, Dialog, IconButton, item, reorder, Row, Section, Select, Switch } from '@luft/ui';
 	import MoreRow, { COLLAPSED } from '#lib/components/MoreRow.svelte';
+	import { percent } from '#lib/format.js';
 	import DeviceDialog from './DeviceDialog.svelte';
 	import RequestDialog from './RequestDialog.svelte';
 	import WindowsDevices from './WindowsDevices.svelte';
@@ -32,17 +34,12 @@
 	type Busy = 'connecting' | 'disconnecting' | 'pairing';
 
 	const BUSY_LABELS: Record<Busy, string> = {
-		connecting: 'Connecting…',
-		disconnecting: 'Disconnecting…',
-		pairing: 'Pairing…'
+		connecting: 'settings-bluetooth-connecting',
+		disconnecting: 'settings-bluetooth-disconnecting',
+		pairing: 'settings-bluetooth-pairing'
 	};
 
-	const VISIBILITY = [
-		{ value: 180, label: 'For 3 minutes' },
-		{ value: 600, label: 'For 10 minutes' },
-		{ value: 1800, label: 'For 30 minutes' },
-		{ value: 0, label: 'Until turned off' }
-	];
+	const VISIBILITY = [180, 600, 1800, 0];
 
 	let bluetooth = $state<Bluetooth | null>(null);
 	let request = $state<PairingRequest | null>(null);
@@ -60,10 +57,14 @@
 		return reason instanceof Error ? reason.message : String(reason);
 	}
 
+	function visibilityLabel(timeout: number) {
+		return timeout ? t('settings-bluetooth-visible-for', { minutes: Math.round(timeout / 60) }) : t('settings-bluetooth-visible-until-off');
+	}
+
 	function visibilityOptions(adapter: Adapter) {
 		const timeout = adapter.discoverableTimeout;
-		if (VISIBILITY.some((option) => option.value === timeout)) return VISIBILITY;
-		return [...VISIBILITY, { value: timeout, label: `For ${Math.round(timeout / 60)} minutes` }];
+		const values = VISIBILITY.includes(timeout) ? VISIBILITY : [...VISIBILITY, timeout];
+		return values.map((value) => ({ value, label: visibilityLabel(value) }));
 	}
 
 	async function changeVisibility(visible: boolean, timeout: number) {
@@ -71,7 +72,7 @@
 		try {
 			await setVisible(visible, timeout);
 		} catch {
-			problems.visibility = "Couldn't change whether this computer is visible";
+			problems.visibility = t('settings-bluetooth-visible-failed');
 		}
 	}
 
@@ -90,9 +91,9 @@
 
 	function status(device: Device) {
 		if (problems[device.path]) return problems[device.path];
-		if (busy[device.path]) return BUSY_LABELS[busy[device.path]];
+		if (busy[device.path]) return t(BUSY_LABELS[busy[device.path]]);
 		if (!device.connected) return undefined;
-		return device.battery === null ? 'Connected' : `Connected · ${device.battery}% battery`;
+		return device.battery === null ? t('settings-bluetooth-connected') : t('settings-bluetooth-connected-battery', { battery: percent(device.battery / 100) });
 	}
 
 	async function perform(device: Device, state: Busy, action: (path: string) => Promise<void>) {
@@ -118,7 +119,7 @@
 		try {
 			await setPowered(enabled);
 		} catch {
-			problems.adapter = enabled ? "Couldn't turn Bluetooth on" : "Couldn't turn Bluetooth off";
+			problems.adapter = enabled ? t('settings-bluetooth-power-on-failed') : t('settings-bluetooth-power-off-failed');
 		}
 	}
 
@@ -152,32 +153,33 @@
 	{#if adapter}
 		<Section>
 			<Row
-				title="Bluetooth"
+				title={t('settings-page-bluetooth')}
 				icon={BluetoothIcon}
-				description={problems.adapter ?? (bluetooth.hardwareBlocked ? 'Turned off with a hardware switch' : undefined)}
+				description={problems.adapter ?? (bluetooth.hardwareBlocked ? t('settings-bluetooth-hardware-off') : undefined)}
 			>
-				<Switch label="Bluetooth" checked={adapter.powered} disabled={bluetooth.hardwareBlocked} onchange={power} />
+				<Switch label={t('settings-page-bluetooth')} checked={adapter.powered} disabled={bluetooth.hardwareBlocked} onchange={power} />
 			</Row>
 			{#if adapter.powered}
 				<Row
-					title="Visible to nearby devices"
+					title={t('settings-bluetooth-visible')}
 					icon={Eye}
-					description={problems.visibility ?? (adapter.discoverable ? `Shown as “${adapter.name}”` : 'Lets phones and computers find this one')}
+					description={problems.visibility ??
+						(adapter.discoverable ? t('settings-bluetooth-visible-as', { name: adapter.name }) : t('settings-bluetooth-visible.description'))}
 					truncate
 				>
 					<Select
-						label="Stay visible"
+						label={t('settings-bluetooth-visible-duration')}
 						options={visibilityOptions(adapter)}
 						value={adapter.discoverableTimeout}
 						onchange={(timeout) => changeVisibility(adapter.discoverable, timeout)}
 					/>
-					<Switch label="Visible to nearby devices" checked={adapter.discoverable} onchange={(on) => changeVisibility(on, adapter.discoverableTimeout)} />
+					<Switch label={t('settings-bluetooth-visible')} checked={adapter.discoverable} onchange={(on) => changeVisibility(on, adapter.discoverableTimeout)} />
 				</Row>
 			{/if}
 		</Section>
 
 		{#if bluetooth.paired.length}
-			<Section title="My devices">
+			<Section title={t('settings-bluetooth-paired')}>
 				{#each bluetooth.paired as device (device.path)}
 					<div class="row-slot" animate:reorder in:item out:item>
 						<ActionRow
@@ -194,7 +196,7 @@
 								{/if}
 							{/snippet}
 							{#snippet actions()}
-								<IconButton icon={Info} label="Device details" onclick={() => (inspecting = device.path)} />
+								<IconButton icon={Info} label={t('settings-bluetooth-details')} onclick={() => (inspecting = device.path)} />
 							{/snippet}
 						</ActionRow>
 					</div>
@@ -204,12 +206,12 @@
 
 		{#if adapter.powered}
 			<WindowsDevices />
-			<Section title="Nearby devices">
+			<Section title={t('settings-bluetooth-nearby')}>
 				{#each nearby as device (device.path)}
 					<div class="row-slot" animate:reorder in:item out:item>
 						<ActionRow
 							title={device.name}
-							description={problems[device.path] ?? (busy[device.path] ? BUSY_LABELS[busy[device.path]] : undefined)}
+							description={problems[device.path] ?? (busy[device.path] ? t(BUSY_LABELS[busy[device.path]]) : undefined)}
 							alert={Boolean(problems[device.path])}
 							icon={KIND_ICONS[device.kind]}
 							onclick={() => perform(device, 'pairing', pair)}
@@ -222,7 +224,7 @@
 						</ActionRow>
 					</div>
 				{:else}
-					<Row title="Looking for devices…" description="Put the device you want to add in pairing mode">
+					<Row title={t('settings-bluetooth-searching')} description={t('settings-bluetooth-searching.description')}>
 						<LoaderCircle size={16} class="animate-spin" />
 					</Row>
 				{/each}
@@ -233,7 +235,7 @@
 		{/if}
 	{:else if bluetooth.hardwareBlocked}
 		<Section>
-			<Row title="Bluetooth is off with a hardware switch" description="Use the switch or key on your computer to turn it on" icon={BluetoothIcon} />
+			<Row title={t('settings-bluetooth-blocked')} description={t('settings-bluetooth-blocked.description')} icon={BluetoothIcon} />
 		</Section>
 	{/if}
 {/if}
@@ -258,10 +260,14 @@
 
 {#if forgetting}
 	{@const device = forgetting}
-	<Dialog title="Forget “{device.name}”?" description="You'll need to pair it again to use it with this computer." onclose={() => (forgetting = null)}>
+	<Dialog
+		title={t('settings-bluetooth-forget-confirm', { name: device.name })}
+		description={t('settings-bluetooth-forget-confirm.description')}
+		onclose={() => (forgetting = null)}
+	>
 		{#snippet actions()}
-			<button type="button" class="button" onclick={() => (forgetting = null)}>Cancel</button>
-			<button type="button" class="button danger" onclick={() => confirmForget(device)}>Forget</button>
+			<button type="button" class="button" onclick={() => (forgetting = null)}>{t('settings-bluetooth-cancel')}</button>
+			<button type="button" class="button danger" onclick={() => confirmForget(device)}>{t('settings-bluetooth-forget')}</button>
 		{/snippet}
 	</Dialog>
 {/if}

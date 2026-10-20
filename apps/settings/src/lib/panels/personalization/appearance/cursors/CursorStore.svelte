@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import { Row, SearchField, Section, Segmented } from '@luft/ui';
@@ -15,11 +16,6 @@
 
 	const SEARCH_DELAY_MS = 350;
 	const PLACEHOLDERS = 6;
-	const ORDERS: { value: Order; label: string }[] = [
-		{ value: 'popular', label: 'Popular' },
-		{ value: 'rating', label: 'Top rated' },
-		{ value: 'newest', label: 'New' }
-	];
 
 	const desktop = useSettings<{ 'cursor-theme': string }>('org.gnome.desktop.interface', ['cursor-theme']);
 
@@ -32,6 +28,12 @@
 	let loading = $state(true);
 	let problem = $state('');
 	let request = 0;
+
+	let orders = $derived<{ value: Order; label: string }[]>([
+		{ value: 'popular', label: t('settings-cursors-order-popular') },
+		{ value: 'rating', label: t('settings-cursors-order-rating') },
+		{ value: 'newest', label: t('settings-cursors-order-newest') }
+	]);
 
 	async function load(query: string, order: Order, page: number) {
 		const current = ++request;
@@ -66,14 +68,14 @@
 	});
 </script>
 
-<SubPage bind:this={subPage} title="Get cursors" back="Appearance" {onclose}>
+<SubPage bind:this={subPage} title={t('settings-cursors-store')} back={t('settings-cursors-back')} {onclose}>
 	<div class="flex items-center gap-3">
 		<div class="min-w-0 flex-1">
-			<SearchField bind:value={search} label="Search cursors" />
+			<SearchField bind:value={search} label={t('settings-cursors-search')} />
 		</div>
 		<Segmented
-			label="Order"
-			options={ORDERS}
+			label={t('settings-cursors-order')}
+			options={orders}
 			value={order}
 			onchange={(value) => {
 				order = value;
@@ -84,16 +86,16 @@
 
 	{#if problem}
 		<Section>
-			<Row title="Cursors can't be loaded" description={problem}>
-				<button type="button" class="button" onclick={() => load(query, order, page)}>Try again</button>
+			<Row title={t('settings-cursors-load-failed')} description={problem}>
+				<button type="button" class="button" onclick={() => load(query, order, page)}>{t('settings-cursors-try-again')}</button>
 			</Row>
 		</Section>
 	{:else if result && !result.items.length && !loading}
 		<Section>
-			<Row title={query ? `Nothing matches “${query}”` : 'No cursors here yet'} description="Try a shorter search or another word" />
+			<Row title={query ? t('settings-cursors-no-match', { query }) : t('settings-cursors-empty')} description={t('settings-cursors-no-match-description')} />
 		</Section>
 	{:else}
-		<Section description="Themes shared by the GNOME-Look community">
+		<Section description={t('settings-cursors-store-description')}>
 			<div class="results" class:loading>
 				{#if result}
 					{#each result.items as item (item.id)}
@@ -112,11 +114,11 @@
 		<div class="-mt-3 flex items-center justify-center gap-2">
 			<button type="button" class="plain-button" disabled={page === 0 || loading} onclick={() => turn(page - 1)}>
 				<ChevronLeft size={16} />
-				Previous
+				{t('settings-cursors-previous')}
 			</button>
-			<span class="px-2 text-[13px] text-[var(--text-muted)] tabular-nums">Page {page + 1} of {result.pages}</span>
+			<span class="px-2 text-[13px] text-[var(--text-muted)] tabular-nums">{t('settings-cursors-page', { page: page + 1, pages: result.pages })}</span>
 			<button type="button" class="plain-button" disabled={page + 1 >= result.pages || loading} onclick={() => turn(page + 1)}>
-				Next
+				{t('settings-cursors-next')}
 				<ChevronRight size={16} />
 			</button>
 		</div>

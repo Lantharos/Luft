@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { SearchField } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
 	import CustomShortcuts from './CustomShortcuts.svelte';
@@ -16,10 +17,10 @@
 	let query = $state('');
 </script>
 
-<SubPage title="Keyboard shortcuts" back="Keyboard" {onclose}>
+<SubPage title={t('settings-shortcuts-title')} back={t('settings-page-keyboard')} {onclose}>
 	{#snippet actions()}
 		<div class="w-[260px]">
-			<SearchField label="Search shortcuts" bind:value={query} />
+			<SearchField label={t('settings-shortcuts-search')} bind:value={query} />
 		</div>
 	{/snippet}
 	<ShortcutsSection {store} {onrecord} {query} />

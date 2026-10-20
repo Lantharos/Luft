@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { onDestroy } from 'svelte';
 	import { Row, Section, Select, Switch } from '@luft/ui';
 	import { applyDisplays, loadDisplays, onDisplaysChanged, type Displays } from './api';
@@ -85,17 +86,17 @@
 				</div>
 			{/if}
 			{#if mirrorable}
-				<Row title="Mirror displays" description="Shows the same picture on every display">
-					<Switch label="Mirror displays" checked={draft.mirrored} onchange={setMirrored} />
+				<Row title={t('settings-display-mirror')} description={t('settings-display-mirror-description')}>
+					<Switch label={t('settings-display-mirror')} checked={draft.mirrored} onchange={setMirrored} />
 				</Row>
 			{/if}
 		</Section>
 	{/if}
 
-	<Section title={draft.mirrored ? 'Mirrored displays' : several ? undefined : monitorOf(displays, output.connector).name}>
+	<Section title={draft.mirrored ? t('settings-display-mirrored') : several ? undefined : monitorOf(displays, output.connector).name}>
 		{#if several && !draft.mirrored}
-			<Row title="Display">
-				<Select label="Display" options={choices} value={output.connector} onchange={(connector) => (selected = connector)} />
+			<Row title={t('settings-display-display')}>
+				<Select label={t('settings-display-display')} options={choices} value={output.connector} onchange={(connector) => (selected = connector)} />
 			</Row>
 		{/if}
 		<OutputSettings {displays} bind:draft {output} />
@@ -104,10 +105,10 @@
 	{#if changed}
 		<div class="apply-bar">
 			{#if failed}
-				<span class="px-2 text-[13px] text-[var(--danger)]">These settings didn't work. Try a different setup.</span>
+				<span class="px-2 text-[13px] text-[var(--danger)]">{t('settings-display-apply-failed')}</span>
 			{/if}
-			<button type="button" class="plain-button" disabled={applying} onclick={() => (draft = draftFrom(displays!))}>Reset</button>
-			<button type="button" class="button primary" disabled={applying} onclick={apply}>Apply</button>
+			<button type="button" class="plain-button" disabled={applying} onclick={() => (draft = draftFrom(displays!))}>{t('settings-display-reset')}</button>
+			<button type="button" class="button primary" disabled={applying} onclick={apply}>{t('settings-display-apply')}</button>
 		</div>
 	{/if}
 

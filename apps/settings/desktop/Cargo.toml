@@ -29,6 +29,7 @@ luft-accounts = { path = "../../../packages/accounts" }
 luft-app = { path = "../../../packages/app", features = ["apps", "fonts", "ibus", "launch", "recovery"] }
 luft-disks = { path = "../../../packages/disks" }
 luft-fingerprint = { path = "../../../packages/fingerprint" }
+luft-i18n = { path = "../../../packages/i18n" }
 luft-network = { path = "../../../packages/network" }
 luft-software = { path = "../../../packages/software" }
 luft-speech = { path = "../../../packages/speech" }

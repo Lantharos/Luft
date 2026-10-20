@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import BatteryFull from '@lucide/svelte/icons/battery-full';
 	import Volume2 from '@lucide/svelte/icons/volume-2';
 	import Wifi from '@lucide/svelte/icons/wifi';
@@ -51,7 +52,7 @@
 	});
 </script>
 
-<div class="screen" class:empty={!wallpaper} role="img" aria-label="Taskbar preview">
+<div class="screen" class:empty={!wallpaper} role="img" aria-label={t('settings-taskbar-preview')}>
 	{#if wallpaper}
 		<img src={wallpaper} alt="" decoding="async" />
 	{/if}

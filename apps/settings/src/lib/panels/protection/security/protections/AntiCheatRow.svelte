@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Gamepad2 from '@lucide/svelte/icons/gamepad-2';
+	import { t } from '@luft/i18n';
 	import { Row, tooltip } from '@luft/ui';
 	import { keepOtherKeys, problem, removeOtherKeys, restart, type AntiCheat, type SigningKey } from '../api';
 	import KeyStepsDialog from './KeyStepsDialog.svelte';
@@ -13,9 +14,9 @@
 	let missing = $derived(antiCheat.requirements.find((requirement) => !requirement.met)?.missing);
 
 	let description = $derived.by(() => {
-		if (key.removingOtherKeys) return 'Remove the other keys on the blue screen when you restart';
+		if (key.removingOtherKeys) return t('settings-security-anti-cheat-removing');
 		if (missing) return missing;
-		return antiCheat.usesLuftKey ? 'Epic still has to add Luft’s key to its list' : 'Games can check how this computer started';
+		return antiCheat.usesLuftKey ? t('settings-security-anti-cheat-luft-key') : t('settings-security-anti-cheat-ready-description');
 	});
 
 	async function attempt(action: () => Promise<unknown>) {
@@ -37,16 +38,16 @@
 {/snippet}
 
 <Row
-	title={missing ? 'Games with anti-cheat' : 'Ready for games with anti-cheat'}
+	title={missing ? t('settings-security-anti-cheat') : t('settings-security-anti-cheat-ready')}
 	{description}
 	icon={Gamepad2}
 	below={error ? failure : undefined}
 >
 	{#if key.removingOtherKeys}
-		<button type="button" class="button" disabled={busy} onclick={() => attempt(keepOtherKeys)}>Cancel</button>
-		<button type="button" class="button" disabled={busy} onclick={() => attempt(restart)}>Restart</button>
+		<button type="button" class="button" disabled={busy} onclick={() => attempt(keepOtherKeys)}>{t('settings-protection-cancel')}</button>
+		<button type="button" class="button" disabled={busy} onclick={() => attempt(restart)}>{t('settings-protection-restart')}</button>
 	{:else if key.otherKeys.length}
-		<button type="button" class="button" disabled={busy} {@attach tooltip(key.otherKeys.join(', '))} onclick={remove}>Remove</button>
+		<button type="button" class="button" disabled={busy} {@attach tooltip(key.otherKeys.join(', '))} onclick={remove}>{t('settings-protection-remove')}</button>
 	{/if}
 </Row>
 

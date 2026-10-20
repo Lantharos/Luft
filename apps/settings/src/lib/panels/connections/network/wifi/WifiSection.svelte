@@ -2,6 +2,7 @@
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import Lock from '@lucide/svelte/icons/lock';
 	import Settings from '@lucide/svelte/icons/settings';
+	import { t } from '@luft/i18n';
 	import { ActionRow, IconButton, item, reorder, Row, Section } from '@luft/ui';
 	import MoreRow, { COLLAPSED } from '#lib/components/MoreRow.svelte';
 	import type { Target } from '../connection/profile';
@@ -21,8 +22,6 @@
 		problem?: string;
 	}
 
-	const CONNECT_FAILED = "Couldn't connect to this network";
-
 	let { wifi, onconfigure }: Props = $props();
 
 	let joining = $state<Joining | null>(null);
@@ -35,8 +34,8 @@
 	function describe(network: WifiNetwork) {
 		if (problems[network.ssid]) return problems[network.ssid];
 		if (network.state !== 'disconnected') return linkLabel(network.state);
-		if (network.joined) return 'Saved';
-		if (network.security === 'enterprise') return 'Sign in with a work or school account';
+		if (network.joined) return t('settings-network-wifi-saved');
+		if (network.security === 'enterprise') return t('settings-network-wifi-enterprise');
 		return undefined;
 	}
 
@@ -50,7 +49,7 @@
 		try {
 			await action();
 		} catch {
-			problems[ssid] = CONNECT_FAILED;
+			problems[ssid] = t('settings-network-wifi-connect-failed');
 			attempt = null;
 		}
 	}
@@ -78,15 +77,15 @@
 			attempt = null;
 			const network = wifi.networks.find((candidate) => candidate.ssid === ssid);
 			if (failure.reason === 'password' && network && needsPassword(network.security)) {
-				joining = { ssid, security: network.security, replace: true, problem: "The saved password didn't work. Enter it again." };
+				joining = { ssid, security: network.security, replace: true, problem: t('settings-network-wifi-saved-password-failed') };
 			} else {
-				problems[ssid] = CONNECT_FAILED;
+				problems[ssid] = t('settings-network-wifi-connect-failed');
 			}
 		})
 	);
 </script>
 
-<Section title="Wi‑Fi networks">
+<Section title={t('settings-network-wifi-networks')}>
 	{#each shown as network (network.ssid)}
 		<div class="row-slot" animate:reorder in:item out:item>
 			<ActionRow
@@ -106,18 +105,18 @@
 				{/snippet}
 				{#snippet actions()}
 					{#if network.saved}
-						<IconButton icon={Settings} label="Network settings" onclick={() => configure(network)} />
+						<IconButton icon={Settings} label={t('settings-network-wifi-settings')} onclick={() => configure(network)} />
 					{/if}
 				{/snippet}
 			</ActionRow>
 		</div>
 	{:else}
-		<Row title="Looking for networks…" />
+		<Row title={t('settings-network-wifi-searching')} />
 	{/each}
 	{#if wifi.networks.length > COLLAPSED}
 		<MoreRow hidden={wifi.networks.length - COLLAPSED} bind:expanded />
 	{/if}
-	<Row title="Connect to a hidden network" onclick={() => (joining = {})} />
+	<Row title={t('settings-network-hidden')} onclick={() => (joining = {})} />
 </Section>
 
 {#if joining}

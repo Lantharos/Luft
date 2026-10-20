@@ -32,30 +32,30 @@ export const TASKBAR_KEYS: (keyof TaskbarSettings)[] = [
 ];
 
 export const ALIGNMENTS: { value: Alignment; label: string }[] = [
-	{ value: 'center', label: 'Center' },
-	{ value: 'left', label: 'Left' }
+	{ value: 'center', label: 'settings-taskbar-align-center' },
+	{ value: 'left', label: 'settings-taskbar-align-left' }
 ];
 
 export const LOOKS: { value: Look; label: string }[] = [
-	{ value: 'glass', label: 'Glass' },
-	{ value: 'solid', label: 'Solid' },
-	{ value: 'transparent', label: 'Transparent' },
-	{ value: 'accent', label: 'Accent' }
+	{ value: 'glass', label: 'settings-taskbar-look-glass' },
+	{ value: 'solid', label: 'settings-taskbar-look-solid' },
+	{ value: 'transparent', label: 'settings-taskbar-look-transparent' },
+	{ value: 'accent', label: 'settings-taskbar-look-accent' }
 ];
 
 export const STYLES: { value: Style; label: string }[] = [
-	{ value: 'bar', label: 'Edge to edge' },
-	{ value: 'floating', label: 'Floating' }
+	{ value: 'bar', label: 'settings-taskbar-shape-bar' },
+	{ value: 'floating', label: 'settings-taskbar-shape-floating' }
 ];
 
 export const SIZES: { value: Size; label: string }[] = [
-	{ value: 'compact', label: 'Small' },
-	{ value: 'normal', label: 'Medium' },
-	{ value: 'large', label: 'Large' }
+	{ value: 'compact', label: 'settings-taskbar-size-small' },
+	{ value: 'normal', label: 'settings-taskbar-size-medium' },
+	{ value: 'large', label: 'settings-taskbar-size-large' }
 ];
 
 export const AUTO_HIDE: { value: AutoHide; label: string }[] = [
-	{ value: 'never', label: 'Never' },
-	{ value: 'always', label: 'Always' },
-	{ value: 'windows', label: 'When a window touches it' }
+	{ value: 'never', label: 'settings-taskbar-hide-never' },
+	{ value: 'always', label: 'settings-taskbar-hide-always' },
+	{ value: 'windows', label: 'settings-taskbar-hide-windows' }
 ];

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { untrack } from 'svelte';
 	import { Dialog, TextField } from '@luft/ui';
 	import { typesText } from './accelerator';
@@ -28,7 +29,7 @@
 	function capture(captured: string | null) {
 		error = '';
 		if (captured && typesText(captured)) {
-			error = 'Add Ctrl, Alt, or Super so the shortcut doesn’t get in the way of typing.';
+			error = t('settings-shortcuts-needs-modifier');
 			return;
 		}
 		accelerator = captured ?? '';
@@ -53,25 +54,25 @@
 	}
 </script>
 
-<Dialog title={binding ? 'Edit shortcut' : 'Add shortcut'} {onclose}>
-	<TextField label="Name" showLabel bind:value={name} />
-	<TextField label="Command" showLabel bind:value={command} />
+<Dialog title={binding ? t('settings-shortcuts-edit') : t('settings-shortcuts-add')} {onclose}>
+	<TextField label={t('settings-shortcuts-custom-name')} showLabel bind:value={name} />
+	<TextField label={t('settings-shortcuts-custom-command')} showLabel bind:value={command} />
 	<div class="flex flex-col gap-1.5">
-		<span class="field-label">Shortcut</span>
+		<span class="field-label">{t('settings-shortcuts-custom-shortcut')}</span>
 		<KeyCapture accelerators={accelerator ? [accelerator] : []} bind:recording oncapture={capture} />
 	</div>
 	{#if taken}
-		<p class="text-[13px] leading-relaxed text-[var(--text-soft)]">Already used for “{taken.name}”. Saving turns it off there.</p>
+		<p class="text-[13px] leading-relaxed text-[var(--text-soft)]">{t('settings-shortcuts-custom-taken', { name: taken.name })}</p>
 	{/if}
 	{#if error}
 		<p class="text-[13px] text-[var(--danger)]">{error}</p>
 	{/if}
 	{#snippet actions()}
 		{#if binding}
-			<button type="button" class="button danger mr-auto" onclick={remove}>Remove</button>
+			<button type="button" class="button danger mr-auto" onclick={remove}>{t('settings-shortcuts-remove')}</button>
 		{/if}
-		<button type="button" class="button" onclick={onclose}>Cancel</button>
-		<button type="button" class="button primary" disabled={!ready} onclick={save}>{binding ? 'Save' : 'Add'}</button>
+		<button type="button" class="button" onclick={onclose}>{t('settings-shortcuts-cancel')}</button>
+		<button type="button" class="button primary" disabled={!ready} onclick={save}>{binding ? t('settings-shortcuts-save') : t('settings-shortcuts-add-button')}</button>
 	{/snippet}
 </Dialog>
 

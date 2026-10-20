@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Slider } from '@luft/ui';
 
 	interface Props {
@@ -14,7 +15,7 @@
 </script>
 
 <div class="flex items-center gap-3 text-[12.5px] text-[var(--text-muted)]">
-	<span>Slower</span>
+	<span>{t('settings-mouse-slower')}</span>
 	<Slider {label} {value} {disabled} {min} {max} step={0.05} {onchange} />
-	<span>Faster</span>
+	<span>{t('settings-mouse-faster')}</span>
 </div>

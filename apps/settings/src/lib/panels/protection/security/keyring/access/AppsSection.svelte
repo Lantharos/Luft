@@ -1,5 +1,6 @@
 <script lang="ts">
 	import X from '@lucide/svelte/icons/x';
+	import { t } from '@luft/i18n';
 	import { AppIcon, IconButton, Section } from '@luft/ui';
 	import { revoke, type AppAccess, type Item } from '../api';
 	import { Runner } from '../runner.svelte';
@@ -9,10 +10,10 @@
 	const runner = new Runner(() => refresh());
 
 	const removal = (app: AppAccess, item: Item) =>
-		item.allowed ? `Stop ${app.name} from using ${item.label}` : `Let ${app.name} ask for ${item.label} again`;
+		t(item.allowed ? 'settings-passwords-access-revoke' : 'settings-passwords-access-reset', { app: app.name, item: item.label });
 </script>
 
-<Section description="Removing one makes the app ask again next time.">
+<Section description={t('settings-passwords-access-description')}>
 	{#each apps as app (app.key)}
 		<div class="flex flex-col pb-2">
 			<div class="flex items-center gap-3.5 px-4 pt-3.5 pb-1.5">
@@ -23,14 +24,14 @@
 				<div class="flex min-h-9 items-center gap-3 pr-3 pl-[58px]">
 					<span class="min-w-0 flex-1 truncate text-[13px] text-[var(--text-soft)]">{item.label}</span>
 					{#if !item.allowed}
-						<span class="shrink-0 text-[12.5px] text-[var(--text-muted)]">Not allowed</span>
+						<span class="shrink-0 text-[12.5px] text-[var(--text-muted)]">{t('settings-passwords-access-not-allowed')}</span>
 					{/if}
 					<IconButton icon={X} label={removal(app, item)} disabled={runner.busy} onclick={() => runner.run(() => revoke(app.key, item.path))} />
 				</div>
 			{/each}
 		</div>
 	{:else}
-		<p class="px-4 py-3.5 text-[13px] text-[var(--text-muted)]">No apps have asked for your passwords yet</p>
+		<p class="px-4 py-3.5 text-[13px] text-[var(--text-muted)]">{t('settings-passwords-access-none')}</p>
 	{/each}
 </Section>
 

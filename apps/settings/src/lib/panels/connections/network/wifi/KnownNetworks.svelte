@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Settings from '@lucide/svelte/icons/settings';
+	import { t } from '@luft/i18n';
 	import { IconButton, Row, Section } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
 	import { remove, type Known, type Network } from '../api';
@@ -22,7 +23,7 @@
 	function describe(known: Known) {
 		const seen = nearby.get(known.ssid);
 		if (!seen) return undefined;
-		return seen.state === 'disconnected' ? 'In range' : linkLabel(seen.state);
+		return seen.state === 'disconnected' ? t('settings-network-known-in-range') : linkLabel(seen.state);
 	}
 
 	async function forget(known: Known) {
@@ -42,20 +43,20 @@
 	});
 </script>
 
-<SubPage title="Known networks" back="Network" {onclose}>
+<SubPage title={t('settings-network-known')} back={t('settings-page-network')} {onclose}>
 	{#if problem}
 		<p class="-my-3 px-2 text-[13px] text-[var(--danger)]">{problem}</p>
 	{/if}
 
-	<Section description="Networks this computer has joined before, nearby or not">
+	<Section description={t('settings-network-known.description')}>
 		{#each network.known as known (known.connection)}
 			<Row title={known.ssid} description={describe(known)}>
 				<IconButton
 					icon={Settings}
-					label="Network settings"
+					label={t('settings-network-wifi-settings')}
 					onclick={() => onconfigure({ kind: 'wifi', path: known.connection, ssid: known.ssid }, known.ssid)}
 				/>
-				<button type="button" class="button" disabled={forgetting === known.connection} onclick={() => forget(known)}>Forget</button>
+				<button type="button" class="button" disabled={forgetting === known.connection} onclick={() => forget(known)}>{t('settings-network-forget.button')}</button>
 			</Row>
 		{/each}
 	</Section>

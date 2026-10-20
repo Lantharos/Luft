@@ -4,10 +4,12 @@ use std::path::{Path, PathBuf};
 use gstreamer as gst;
 use gstreamer::prelude::*;
 use image::{DynamicImage, RgbImage};
+use luft_i18n::t;
 use serde::Deserialize;
 
 use super::cache::{cached_path, failed};
 use super::library::{extension, is_video};
+use crate::L10N;
 
 const THUMBNAIL_WIDTH: u32 = 480;
 const DECODABLE_IMAGES: [&str; 5] = ["jpg", "jpeg", "png", "webp", "jxl"];
@@ -62,18 +64,21 @@ fn first_frame(source: &Path) -> Result<RgbImage, String> {
         .ok()
         .and_then(|_| pipeline.emit_by_name::<Option<gst::Sample>>("convert-sample", &[&caps]));
     let _ = pipeline.set_state(gst::State::Null);
-    let sample = sample.ok_or("This video has no picture")?;
+    let sample = sample.ok_or_else(no_picture)?;
     let height = sample
         .caps()
         .and_then(|caps| caps.structure(0)?.get::<i32>("height").ok())
-        .ok_or("This video has no picture")?;
+        .ok_or_else(no_picture)?;
     let frame = sample
         .buffer()
-        .ok_or("This video has no picture")?
+        .ok_or_else(no_picture)?
         .map_readable()
         .map_err(failed)?;
-    RgbImage::from_raw(THUMBNAIL_WIDTH, height as u32, frame.to_vec())
-        .ok_or_else(|| "This video has no picture".into())
+    RgbImage::from_raw(THUMBNAIL_WIDTH, height as u32, frame.to_vec()).ok_or_else(no_picture)
+}
+
+fn no_picture() -> String {
+    t!(L10N, "desktop-wallpaper-video-no-picture")
 }
 
 pub fn thumbnail(Image { path }: Image) -> Result<String, String> {
@@ -91,7 +96,12 @@ pub fn preview(source: &Path) -> Result<PathBuf, String> {
         } else {
             shrink(decode_image(source)?)
         };
-        fs::create_dir_all(target.parent().ok_or("There is no cache folder")?).map_err(failed)?;
+        fs::create_dir_all(
+            target
+                .parent()
+                .ok_or_else(|| t!(L10N, "desktop-no-cache-folder"))?,
+        )
+        .map_err(failed)?;
         preview.save(&target).map_err(failed)?;
     }
     Ok(target)

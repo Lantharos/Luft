@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import Play from '@lucide/svelte/icons/play';
 	import { IconButton, Row, Section, Slider, Switch } from '@luft/ui';
 	import { percent } from '#lib/format.js';
@@ -19,14 +20,14 @@
 		volume: number | null;
 	}
 
-	const KINDS: { key: keyof Kinds; title: string; description: string; sound: string; preview: string }[] = [
-		{ key: 'notifications', title: 'Notifications', description: 'Quiet during Do Not Disturb, games and screen sharing', sound: 'message-new-instant', preview: 'Play the notification sound' },
-		{ key: 'devices', title: 'Devices and charging', description: 'Connecting a device or charger, and low battery', sound: 'device-added', preview: 'Play the device sound' },
-		{ key: 'volume-feedback', title: 'Volume feedback', description: 'A tick when you change the volume', sound: 'audio-volume-change', preview: 'Play the volume tick' },
-		{ key: 'screenshots', title: 'Screenshots', description: 'A shutter when a screenshot is saved', sound: 'screen-capture', preview: 'Play the shutter' },
-		{ key: 'recording', title: 'Recording', description: 'When screen recording, the camera or dictation starts and stops', sound: 'recording-started', preview: 'Play the recording sound' },
-		{ key: 'sign-in', title: 'Sign-in sound', description: 'When your desktop appears', sound: 'desktop-login', preview: 'Play the sign-in sound' },
-		{ key: 'keyboard', title: 'Keyboard taps', description: 'Each key on the on-screen keyboard', sound: 'keyboard-tap', preview: 'Play a keyboard tap' }
+	const KINDS: { key: keyof Kinds; title: string; description: string; preview: string; sound: string }[] = [
+		{ key: 'notifications', title: 'settings-sound-kind-notifications', description: 'settings-sound-kind-notifications.description', preview: 'settings-sound-kind-notifications.preview', sound: 'message-new-instant' },
+		{ key: 'devices', title: 'settings-sound-kind-devices', description: 'settings-sound-kind-devices.description', preview: 'settings-sound-kind-devices.preview', sound: 'device-added' },
+		{ key: 'volume-feedback', title: 'settings-sound-kind-volume', description: 'settings-sound-kind-volume.description', preview: 'settings-sound-kind-volume.preview', sound: 'audio-volume-change' },
+		{ key: 'screenshots', title: 'settings-sound-kind-screenshots', description: 'settings-sound-kind-screenshots.description', preview: 'settings-sound-kind-screenshots.preview', sound: 'screen-capture' },
+		{ key: 'recording', title: 'settings-sound-kind-recording', description: 'settings-sound-kind-recording.description', preview: 'settings-sound-kind-recording.preview', sound: 'recording-started' },
+		{ key: 'sign-in', title: 'settings-sound-kind-sign-in', description: 'settings-sound-kind-sign-in.description', preview: 'settings-sound-kind-sign-in.preview', sound: 'desktop-login' },
+		{ key: 'keyboard', title: 'settings-sound-kind-keyboard', description: 'settings-sound-kind-keyboard.description', preview: 'settings-sound-kind-keyboard.preview', sound: 'keyboard-tap' }
 	];
 
 	let { volume }: Props = $props();
@@ -37,23 +38,23 @@
 	let on = $derived(sound.values['event-sounds'] ?? true);
 </script>
 
-<Section title="System sounds">
-	<Row title="System sounds" description="Sounds for notifications, devices and other events">
-		<Switch label="System sounds" checked={on} onchange={(checked) => sound.set('event-sounds', checked)} />
+<Section title={t('settings-sound-system')}>
+	<Row title={t('settings-sound-system')} description={t('settings-sound-system-description')}>
+		<Switch label={t('settings-sound-system')} checked={on} onchange={(checked) => sound.set('event-sounds', checked)} />
 	</Row>
 	{#if on}
 		{#if volume !== null}
-			<Row title="Volume">
+			<Row title={t('settings-sound-volume')}>
 				<span class="w-11 text-right tabular-nums">{percent(volume)}</span>
 				{#snippet below()}
-					<Slider label="System sounds volume" value={volume!} format={percent} onchange={setAlertVolume} />
+					<Slider label={t('settings-sound-system-volume')} value={volume!} format={percent} onchange={setAlertVolume} />
 				{/snippet}
 			</Row>
 		{/if}
 		{#each KINDS as kind (kind.key)}
-			<Row title={kind.title} description={kind.description}>
-				<IconButton icon={Play} label={kind.preview} onclick={() => previewSound(kind.sound)} />
-				<Switch label={kind.title} checked={kinds.values[kind.key] ?? kind.key !== 'keyboard'} onchange={(checked) => kinds.set(kind.key, checked)} />
+			<Row title={t(kind.title)} description={t(kind.description)}>
+				<IconButton icon={Play} label={t(kind.preview)} onclick={() => previewSound(kind.sound)} />
+				<Switch label={t(kind.title)} checked={kinds.values[kind.key] ?? kind.key !== 'keyboard'} onchange={(checked) => kinds.set(kind.key, checked)} />
 			</Row>
 		{/each}
 	{/if}

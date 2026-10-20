@@ -1,24 +1,27 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Row, Select, Switch } from '@luft/ui';
 	import { powerOffAfter, setPowerOffAfter } from './api';
 
 	const HOUR = 60 * 60;
 	const DAY = 24 * HOUR;
-	const DELAYS = [
-		{ value: 12 * HOUR, label: '12 hours' },
-		{ value: DAY, label: '1 day' },
-		{ value: 2 * DAY, label: '2 days' },
-		{ value: 3 * DAY, label: '3 days' },
-		{ value: 7 * DAY, label: '1 week' }
-	];
+	const WEEK = 7 * DAY;
+	const DELAYS = [12 * HOUR, DAY, 2 * DAY, 3 * DAY, WEEK];
+
+	function delayLabel(value: number) {
+		if (value % WEEK === 0) return t('settings-power-long-sleep-weeks', { weeks: value / WEEK });
+		if (value % DAY === 0) return t('settings-power-long-sleep-days', { days: value / DAY });
+		return t('settings-power-long-sleep-hours', { hours: Math.round(value / HOUR) });
+	}
 
 	let seconds = $state<number | null>(null);
 	let failed = $state(false);
 
 	let options = $derived(
-		seconds === null || seconds === 0 || DELAYS.some((delay) => delay.value === seconds)
-			? DELAYS
-			: [...DELAYS, { value: seconds, label: `${Math.round(seconds / HOUR)} hours` }].sort((left, right) => left.value - right.value)
+		(seconds === null || seconds === 0 || DELAYS.includes(seconds) ? DELAYS : [...DELAYS, seconds].sort((left, right) => left - right)).map((value) => ({
+			value,
+			label: delayLabel(value)
+		}))
 	);
 
 	$effect(() => {
@@ -40,16 +43,14 @@
 
 {#if seconds !== null}
 	<Row
-		title="Shut down after a long sleep"
-		description={failed
-			? "This couldn't be changed. Try again."
-			: "Rather than letting the battery run flat while asleep, the computer shuts down when the battery gets low or after a long sleep on battery. Open windows aren't kept."}
+		title={t('settings-power-long-sleep')}
+		description={failed ? t('settings-power-long-sleep-failed') : t('settings-power-long-sleep-description')}
 	>
-		<Switch label="Shut down after a long sleep" checked={seconds > 0} onchange={(on) => choose(on ? DAY : 0)} />
+		<Switch label={t('settings-power-long-sleep')} checked={seconds > 0} onchange={(on) => choose(on ? DAY : 0)} />
 	</Row>
 	{#if seconds > 0}
-		<Row title="Shut down after">
-			<Select label="Shut down after" {options} value={seconds} onchange={choose} />
+		<Row title={t('settings-power-long-sleep-after')}>
+			<Select label={t('settings-power-long-sleep-after')} {options} value={seconds} onchange={choose} />
 		</Row>
 	{/if}
 {/if}

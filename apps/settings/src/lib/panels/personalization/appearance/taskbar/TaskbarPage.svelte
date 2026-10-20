@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { onDestroy } from 'svelte';
 	import SubPage from '#lib/components/SubPage.svelte';
 	import { fileUrl } from '@lantharos/sabine';
@@ -45,6 +46,16 @@
 		return apps.slice(0, showPinned ? PREVIEW_APPS : RUNNING_APPS);
 	});
 
+	function translated<T>(options: { value: T; label: string }[]) {
+		return options.map((option) => ({ value: option.value, label: t(option.label) }));
+	}
+
+	let alignments = $derived(translated(ALIGNMENTS));
+	let looks = $derived(translated(LOOKS));
+	let styles = $derived(translated(STYLES));
+	let sizes = $derived(translated(SIZES));
+	let autoHide = $derived(translated(AUTO_HIDE));
+
 	const receiveDisplays = (state: Displays) => (displays = state.logical.length);
 
 	$effect(() => {
@@ -66,7 +77,7 @@
 	onDestroy(onDisplaysChanged(receiveDisplays));
 </script>
 
-<SubPage title="Taskbar" back="Appearance" {onclose}>
+<SubPage title={t('settings-taskbar-title')} back={t('settings-taskbar-back')} {onclose}>
 	<TaskbarPreview
 		{wallpaper}
 		apps={previewApps}
@@ -78,41 +89,41 @@
 	/>
 
 	<Section>
-		<Row title="Alignment">
-			<Segmented label="Alignment" options={ALIGNMENTS} value={values['taskbar-alignment'] ?? 'center'} onchange={(value) => taskbar.set('taskbar-alignment', value)} />
+		<Row title={t('settings-taskbar-alignment')}>
+			<Segmented label={t('settings-taskbar-alignment')} options={alignments} value={values['taskbar-alignment'] ?? 'center'} onchange={(value) => taskbar.set('taskbar-alignment', value)} />
 		</Row>
-		<Row title="Look">
-			<Segmented label="Look" options={LOOKS} value={values['taskbar-look'] ?? 'glass'} onchange={(value) => taskbar.set('taskbar-look', value)} />
+		<Row title={t('settings-taskbar-look')}>
+			<Segmented label={t('settings-taskbar-look')} options={looks} value={values['taskbar-look'] ?? 'glass'} onchange={(value) => taskbar.set('taskbar-look', value)} />
 		</Row>
-		<Row title="Shape">
-			<Segmented label="Shape" options={STYLES} value={values['taskbar-style'] ?? 'bar'} onchange={(value) => taskbar.set('taskbar-style', value)} />
+		<Row title={t('settings-taskbar-shape')}>
+			<Segmented label={t('settings-taskbar-shape')} options={styles} value={values['taskbar-style'] ?? 'bar'} onchange={(value) => taskbar.set('taskbar-style', value)} />
 		</Row>
-		<Row title="Size">
-			<Segmented label="Size" options={SIZES} value={values['taskbar-size'] ?? 'normal'} onchange={(value) => taskbar.set('taskbar-size', value)} />
+		<Row title={t('settings-taskbar-size')}>
+			<Segmented label={t('settings-taskbar-size')} options={sizes} value={values['taskbar-size'] ?? 'normal'} onchange={(value) => taskbar.set('taskbar-size', value)} />
 		</Row>
-		<Row title="Hide automatically">
-			<Select label="Hide automatically" options={AUTO_HIDE} value={values['taskbar-auto-hide'] ?? 'never'} onchange={(value) => taskbar.set('taskbar-auto-hide', value)} />
+		<Row title={t('settings-taskbar-auto-hide')}>
+			<Select label={t('settings-taskbar-auto-hide')} options={autoHide} value={values['taskbar-auto-hide'] ?? 'never'} onchange={(value) => taskbar.set('taskbar-auto-hide', value)} />
 		</Row>
-		<Row title="More options" expanded={opened} onclick={() => (opened = !opened)} />
+		<Row title={t('settings-taskbar-more')} expanded={opened} onclick={() => (opened = !opened)} />
 		{#if opened}
-			<Row title="Show pinned apps">
-				<Switch label="Show pinned apps" checked={showPinned} onchange={(on) => taskbar.set('taskbar-show-pinned', on)} />
+			<Row title={t('settings-taskbar-show-pinned')}>
+				<Switch label={t('settings-taskbar-show-pinned')} checked={showPinned} onchange={(on) => taskbar.set('taskbar-show-pinned', on)} />
 			</Row>
-			<Row title="Only list windows on the current workspace">
+			<Row title={t('settings-taskbar-per-workspace')}>
 				<Switch
-					label="Only list windows on the current workspace"
+					label={t('settings-taskbar-per-workspace')}
 					checked={values['taskbar-windows-per-workspace'] ?? false}
 					onchange={(on) => taskbar.set('taskbar-windows-per-workspace', on)}
 				/>
 			</Row>
 			{#if displays > 1}
-				<Row title="Show on every display">
-					<Switch label="Show on every display" checked={everyDisplay} onchange={(on) => taskbar.set('taskbar-displays', on ? 'all' : 'primary')} />
+				<Row title={t('settings-taskbar-every-display')}>
+					<Switch label={t('settings-taskbar-every-display')} checked={everyDisplay} onchange={(on) => taskbar.set('taskbar-displays', on ? 'all' : 'primary')} />
 				</Row>
 				{#if everyDisplay}
-					<Row title="Only list windows on the same display">
+					<Row title={t('settings-taskbar-per-display')}>
 						<Switch
-							label="Only list windows on the same display"
+							label={t('settings-taskbar-per-display')}
 							checked={values['taskbar-windows-per-display'] ?? false}
 							onchange={(on) => taskbar.set('taskbar-windows-per-display', on)}
 						/>

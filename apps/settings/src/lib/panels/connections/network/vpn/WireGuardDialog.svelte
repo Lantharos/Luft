@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Dialog, PasswordField, Row, TextField } from '@luft/ui';
 	import { addWireGuard, wireGuardKeys, wireGuardPublicKey } from '../api';
 
@@ -48,13 +49,13 @@
 
 	function check() {
 		const errors: Record<string, string> = {};
-		if (!name.trim()) errors.name = 'Enter a name';
-		if (privateKey.trim().length !== KEY_LENGTH) errors.privateKey = 'Enter or generate a private key';
-		if (list(addresses).length === 0) errors.addresses = 'Enter at least one address';
-		if (serverKey.trim().length !== KEY_LENGTH) errors.serverKey = 'Enter the server’s public key';
-		if (!endpoint.trim()) errors.endpoint = 'Enter the server’s address and port';
-		if (list(allowedIps).length === 0) errors.allowedIps = 'Enter at least one range';
-		if (keepalive && !/^\d+$/.test(keepalive.trim())) errors.keepalive = 'Enter a number of seconds';
+		if (!name.trim()) errors.name = t('settings-network-error-name');
+		if (privateKey.trim().length !== KEY_LENGTH) errors.privateKey = t('settings-network-wireguard-error-private-key');
+		if (list(addresses).length === 0) errors.addresses = t('settings-network-wireguard-error-addresses');
+		if (serverKey.trim().length !== KEY_LENGTH) errors.serverKey = t('settings-network-wireguard-error-server-key');
+		if (!endpoint.trim()) errors.endpoint = t('settings-network-wireguard-error-endpoint');
+		if (list(allowedIps).length === 0) errors.allowedIps = t('settings-network-wireguard-error-allowed-ips');
+		if (keepalive && !/^\d+$/.test(keepalive.trim())) errors.keepalive = t('settings-network-wireguard-error-keepalive');
 		return errors;
 	}
 
@@ -98,45 +99,59 @@
 	}
 </script>
 
-<Dialog title="Set up WireGuard" description="Your VPN provider or the server’s owner can give you these details." wide {onclose}>
+<Dialog title={t('settings-network-wireguard')} description={t('settings-network-wireguard-dialog')} wide {onclose}>
 	<div class="fields">
-		<Row title="Name">
-			<div class="w-[260px]"><TextField label="Name" bind:value={name} placeholder="Home VPN" error={errors.name} /></div>
+		<Row title={t('settings-network-name')}>
+			<div class="w-[260px]">
+				<TextField label={t('settings-network-name')} bind:value={name} placeholder={t('settings-network-wireguard-name-example')} error={errors.name} />
+			</div>
 		</Row>
-		<Row title="Private key" description={publicKey ? `Public key ${publicKey}` : 'Its public key shows up here to share'} truncate>
+		<Row
+			title={t('settings-network-private-key')}
+			description={publicKey ? t('settings-network-wireguard-public-key', { key: publicKey }) : t('settings-network-wireguard-public-key-pending')}
+			truncate
+		>
 			<div class="flex w-[260px] flex-col items-end gap-2">
-				<PasswordField label="Private key" bind:value={privateKey} error={errors.privateKey} />
+				<PasswordField label={t('settings-network-private-key')} bind:value={privateKey} error={errors.privateKey} />
 				<div class="flex gap-2">
 					{#if publicKey}
-						<button type="button" class="button" onclick={copyPublicKey}>{copied ? 'Copied' : 'Copy public key'}</button>
+						<button type="button" class="button" onclick={copyPublicKey}>{copied ? t('settings-network-wireguard-copied') : t('settings-network-wireguard-copy')}</button>
 					{/if}
-					<button type="button" class="button" onclick={generate}>Generate a new key</button>
+					<button type="button" class="button" onclick={generate}>{t('settings-network-wireguard-generate')}</button>
 				</div>
 			</div>
 		</Row>
-		<Row title="Addresses" description="This computer’s addresses inside the VPN">
-			<div class="w-[260px]"><TextField label="Addresses" bind:value={addresses} placeholder="10.0.0.2/32" error={errors.addresses} /></div>
+		<Row title={t('settings-network-ip-addresses')} description={t('settings-network-wireguard-addresses')}>
+			<div class="w-[260px]"><TextField label={t('settings-network-ip-addresses')} bind:value={addresses} placeholder="10.0.0.2/32" error={errors.addresses} /></div>
 		</Row>
-		<Row title="DNS servers">
-			<div class="w-[260px]"><TextField label="DNS servers" bind:value={dns} placeholder="Optional" /></div>
+		<Row title={t('settings-network-dns-servers')}>
+			<div class="w-[260px]"><TextField label={t('settings-network-dns-servers')} bind:value={dns} placeholder={t('settings-network-optional')} /></div>
 		</Row>
-		<Row title="Server public key">
-			<div class="w-[260px]"><TextField label="Server public key" bind:value={serverKey} error={errors.serverKey} /></div>
+		<Row title={t('settings-network-wireguard-server-key')}>
+			<div class="w-[260px]"><TextField label={t('settings-network-wireguard-server-key')} bind:value={serverKey} error={errors.serverKey} /></div>
 		</Row>
-		<Row title="Server address">
+		<Row title={t('settings-network-wireguard-endpoint')}>
 			<div class="w-[260px]">
-				<TextField label="Server address" bind:value={endpoint} placeholder="vpn.example.com:51820" error={errors.endpoint} />
+				<TextField label={t('settings-network-wireguard-endpoint')} bind:value={endpoint} placeholder="vpn.example.com:51820" error={errors.endpoint} />
 			</div>
 		</Row>
-		<Row title="Allowed IPs" description="Traffic to these ranges goes through the VPN">
-			<div class="w-[260px]"><TextField label="Allowed IPs" bind:value={allowedIps} error={errors.allowedIps} /></div>
+		<Row title={t('settings-network-wireguard-allowed-ips')} description={t('settings-network-wireguard-allowed-ips.description')}>
+			<div class="w-[260px]"><TextField label={t('settings-network-wireguard-allowed-ips')} bind:value={allowedIps} error={errors.allowedIps} /></div>
 		</Row>
-		<Row title="Preshared key">
-			<div class="w-[260px]"><PasswordField label="Preshared key" bind:value={presharedKey} placeholder="Optional" /></div>
-		</Row>
-		<Row title="Keepalive" description="Helps the connection stay up behind a router">
+		<Row title={t('settings-network-wireguard-preshared-key')}>
 			<div class="w-[260px]">
-				<TextField label="Keepalive" bind:value={keepalive} placeholder="Optional, in seconds" inputmode="numeric" error={errors.keepalive} />
+				<PasswordField label={t('settings-network-wireguard-preshared-key')} bind:value={presharedKey} placeholder={t('settings-network-optional')} />
+			</div>
+		</Row>
+		<Row title={t('settings-network-wireguard-keepalive')} description={t('settings-network-wireguard-keepalive.description')}>
+			<div class="w-[260px]">
+				<TextField
+					label={t('settings-network-wireguard-keepalive')}
+					bind:value={keepalive}
+					placeholder={t('settings-network-wireguard-keepalive.placeholder')}
+					inputmode="numeric"
+					error={errors.keepalive}
+				/>
 			</div>
 		</Row>
 	</div>
@@ -144,8 +159,8 @@
 		<p class="text-[13px] text-[var(--danger)]">{problem}</p>
 	{/if}
 	{#snippet actions()}
-		<button type="button" class="button" onclick={onclose}>Cancel</button>
-		<button type="button" class="button primary" disabled={!ready} onclick={submit}>{busy ? 'Adding…' : 'Add'}</button>
+		<button type="button" class="button" onclick={onclose}>{t('settings-network-cancel')}</button>
+		<button type="button" class="button primary" disabled={!ready} onclick={submit}>{busy ? t('settings-network-wireguard-adding') : t('settings-network-wireguard-add')}</button>
 	{/snippet}
 </Dialog>
 

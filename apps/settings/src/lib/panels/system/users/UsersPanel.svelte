@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import Camera from '@lucide/svelte/icons/camera';
 	import { Avatar, Dialog, ItemRow, Row, Section, TextField, tooltip } from '@luft/ui';
 	import FingerprintSection from './FingerprintSection.svelte';
@@ -50,9 +51,9 @@
 {#if accounts}
 	{@const me = accounts.me}
 	<div class="flex items-center gap-5 px-2 pb-2">
-		<button type="button" class="picture" aria-label="Change your picture" {@attach tooltip('Change your picture')} onclick={() => attempt(choosePicture)}>
+		<button type="button" class="picture" aria-label={t('settings-users-picture')} {@attach tooltip(t('settings-users-picture'))} onclick={() => attempt(choosePicture)}>
 			<Avatar picture={me.picture} name={displayName(me)} size={76} {version} />
-			<span class="overlay">Edit</span>
+			<span class="overlay">{t('settings-users-picture-edit')}</span>
 			<span class="puck"><Camera size={13} /></span>
 		</button>
 		<div class="flex min-w-0 flex-col gap-1">
@@ -61,15 +62,15 @@
 		</div>
 	</div>
 
-	<Section title="Your account">
-		<Row title="Name" description="Shown when you sign in and on the lock screen">
+	<Section title={t('settings-users-account')}>
+		<Row title={t('settings-users-name')} description={t('settings-users-name-description')}>
 			<span class="max-w-[220px] truncate">{me.realName}</span>
-			<button type="button" class="button" onclick={startRename}>Change</button>
+			<button type="button" class="button" onclick={startRename}>{t('settings-users-change')}</button>
 		</Row>
-		<Row title="Password" description="Used to sign in and unlock this computer">
-			<button type="button" class="button" onclick={() => (changingPassword = true)}>{me.hasPassword ? 'Change' : 'Set password'}</button>
+		<Row title={t('settings-users-password')} description={t('settings-users-password-description')}>
+			<button type="button" class="button" onclick={() => (changingPassword = true)}>{me.hasPassword ? t('settings-users-change') : t('settings-users-password-set')}</button>
 		</Row>
-		<Row title="Account type"><span>{accountType(me)}</span></Row>
+		<Row title={t('settings-users-account-type')}><span>{accountType(me)}</span></Row>
 	</Section>
 
 	{#if problem}
@@ -79,7 +80,7 @@
 	<FingerprintSection />
 
 	{#if accounts.others.length}
-		<Section title="Other people on this computer">
+		<Section title={t('settings-users-others')}>
 			{#each accounts.others as user (user.userName)}
 				<ItemRow title={displayName(user)} description={accountType(user)}>
 					{#snippet leading()}
@@ -92,11 +93,11 @@
 {/if}
 
 {#if renaming}
-	<Dialog title="Change your name" description="This is how you appear when you sign in." onclose={() => (renaming = false)}>
-		<TextField label="Name" bind:value={draft} error={renameError} live onkeydown={(event) => event.key === 'Enter' && draft.trim() && saveName()} />
+	<Dialog title={t('settings-users-name-title')} description={t('settings-users-name-dialog-description')} onclose={() => (renaming = false)}>
+		<TextField label={t('settings-users-name')} bind:value={draft} error={renameError} live onkeydown={(event) => event.key === 'Enter' && draft.trim() && saveName()} />
 		{#snippet actions()}
-			<button type="button" class="button" onclick={() => (renaming = false)}>Cancel</button>
-			<button type="button" class="button primary" disabled={!draft.trim()} onclick={saveName}>Save</button>
+			<button type="button" class="button" onclick={() => (renaming = false)}>{t('settings-users-cancel')}</button>
+			<button type="button" class="button primary" disabled={!draft.trim()} onclick={saveName}>{t('settings-users-save')}</button>
 		{/snippet}
 	</Dialog>
 {/if}

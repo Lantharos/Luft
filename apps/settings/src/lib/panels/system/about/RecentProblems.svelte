@@ -1,17 +1,17 @@
 <script lang="ts">
+	import { i18n, t } from '@luft/i18n';
 	import MonitorX from '@lucide/svelte/icons/monitor-x';
 	import { ActionRow, Dialog, Section } from '@luft/ui';
 	import MoreRow, { COLLAPSED } from '#lib/components/MoreRow.svelte';
 	import { problems, restartToFirmware, type Problem } from './api';
 
 	const AFTERMATH: Record<Problem['restart'], string> = {
-		graceful: 'Apps were asked to save their work before the computer restarted.',
-		forced: 'Some apps didn’t close in time and were stopped before the computer restarted.',
-		emergency: 'The computer had to restart without waiting for apps.'
+		graceful: 'settings-about-problem-graceful',
+		forced: 'settings-about-problem-forced',
+		emergency: 'settings-about-problem-emergency'
 	};
 
-	const when = new Intl.DateTimeFormat(undefined, { month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' });
-
+	let when = $derived(new Intl.DateTimeFormat(i18n.formats, { month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' }));
 	let list = $state<Problem[]>([]);
 	let open = $state<Problem | null>(null);
 	let expanded = $state(false);
@@ -29,12 +29,12 @@
 </script>
 
 {#if list.length}
-	<Section title="Recent problems">
+	<Section title={t('settings-about-problems')}>
 		{#each expanded ? list : list.slice(0, COLLAPSED) as problem (problem.id)}
 			<ActionRow
 				icon={MonitorX}
-				title="The graphics driver stopped responding"
-				description="{when.format(problem.time * 1000)} · The computer restarted itself"
+				title={t('settings-about-problem-gpu')}
+				description={t('settings-about-problem-summary', { when: when.format(problem.time * 1000) })}
 				onclick={() => {
 					error = '';
 					open = problem;
@@ -50,15 +50,15 @@
 {#if open}
 	{@const problem = open}
 	<Dialog
-		title="The graphics driver stopped responding"
-		description="{when.format(problem.time * 1000)}. {AFTERMATH[problem.restart]}"
+		title={t('settings-about-problem-gpu')}
+		description={t(AFTERMATH[problem.restart], { when: when.format(problem.time * 1000) })}
 		wide
 		onclose={() => (open = null)}
 	>
 		<div class="flex flex-col gap-5">
 			{#if problem.suggestions.length}
 				<div class="flex flex-col gap-3">
-					<h3 class="text-[14px] font-semibold">What can help</h3>
+					<h3 class="text-[14px] font-semibold">{t('settings-about-problem-help')}</h3>
 					{#each problem.suggestions as suggestion (suggestion.step)}
 						<div class="flex flex-col gap-1">
 							<span class="text-[13.5px] font-medium">{suggestion.step}</span>
@@ -68,7 +68,7 @@
 				</div>
 			{/if}
 			<div class="flex flex-col gap-2">
-				<h3 class="text-[14px] font-semibold">What happened</h3>
+				<h3 class="text-[14px] font-semibold">{t('settings-about-problem-what')}</h3>
 				{#if problem.graphics.length}
 					<p class="text-[13px] text-[var(--text-muted)]">{problem.graphics.join(', ')}</p>
 				{/if}
@@ -78,7 +78,7 @@
 					{/each}
 				</ul>
 				<p class="text-[13px] leading-relaxed text-[var(--text-muted)]">
-					The full kernel log of that session stays in the system journal. Running nvidia-bug-report.sh as an administrator collects it for a driver bug report.
+					{t('settings-about-problem-log')}
 				</p>
 			</div>
 			{#if error}
@@ -87,9 +87,9 @@
 		</div>
 		{#snippet actions()}
 			{#if problem.suggestions.some((suggestion) => suggestion.action === 'firmware-settings')}
-				<button type="button" class="button" onclick={restart}>Restart into firmware settings</button>
+				<button type="button" class="button" onclick={restart}>{t('settings-about-problem-firmware')}</button>
 			{/if}
-			<button type="button" class="button primary" onclick={() => (open = null)}>Done</button>
+			<button type="button" class="button primary" onclick={() => (open = null)}>{t('settings-about-done')}</button>
 		{/snippet}
 	</Dialog>
 {/if}

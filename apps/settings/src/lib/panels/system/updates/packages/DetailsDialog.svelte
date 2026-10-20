@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { bytes, Dialog, VirtualScroller } from '@luft/ui';
 	import type { Update } from '../api';
 	import { areas } from './summary';
@@ -17,12 +18,12 @@
 	const version = (update: Update) => update.package.version.replace(/\.fc\d+$/, '');
 </script>
 
-<Dialog title="What's included" description="{updates.length} updates for the system, its drivers and its libraries" wide {onclose}>
+<Dialog title={t('settings-updates-included')} description={t('settings-updates-included-description', { count: updates.length })} wide {onclose}>
 	<VirtualScroller class="soft-scroll -mx-2 h-[420px]" items={lines} key={(line) => line.key} layout={{ itemHeight: 44 }}>
 		{#snippet children(line)}
 			{#if line.kind === 'area'}
 				<div class="flex h-full items-end justify-between px-2 pb-1.5 text-[13px] font-semibold text-[var(--text-soft)]">
-					<span>{line.title}</span>
+					<span>{t(line.title)}</span>
 					<span class="font-normal text-[var(--text-muted)]">{line.count}</span>
 				</div>
 			{:else}
@@ -31,7 +32,9 @@
 					<div class="flex min-w-0 flex-1 flex-col">
 						<span class="truncate text-[13.5px]">{update.package.name}</span>
 						<span class="truncate text-[12px] text-[var(--text-muted)]">
-							{update.installedVersion ? `${update.installedVersion.replace(/\.fc\d+$/, '')} → ` : ''}{version(update)}{update.security ? ' · Security fix' : ''}
+							{update.installedVersion ? `${update.installedVersion.replace(/\.fc\d+$/, '')} → ` : ''}{version(update)}{#if update.security}
+								{' · '}{t('settings-updates-security-fix')}
+							{/if}
 						</span>
 					</div>
 					{#if update.downloadSize}
@@ -42,6 +45,6 @@
 		{/snippet}
 	</VirtualScroller>
 	{#snippet actions()}
-		<button type="button" class="button" onclick={onclose}>Done</button>
+		<button type="button" class="button" onclick={onclose}>{t('settings-updates-done')}</button>
 	{/snippet}
 </Dialog>

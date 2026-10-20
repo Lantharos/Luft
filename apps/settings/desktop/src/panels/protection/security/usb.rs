@@ -1,7 +1,9 @@
 use luft_app::dbus::{error_message, failed};
+use luft_i18n::t;
 use serde::Serialize;
 
 use super::properties::{Service, absent, get};
+use crate::L10N;
 
 pub const USB_PROTECTION: Service = Service {
     name: "com.lantharos.UsbProtection1",
@@ -44,7 +46,7 @@ pub async fn set_enabled(enabled: bool) -> Result<(), String> {
         .await
         .map_err(|error| match error_message(&error) {
             Some(message) => message.to_owned(),
-            None if absent(&error) => "USB protection isn't available on this computer".into(),
+            None if absent(&error) => t!(L10N, "desktop-security-usb-unavailable"),
             None => failed(error),
         })
 }

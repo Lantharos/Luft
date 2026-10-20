@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { i18n, t } from '@luft/i18n';
 	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
 	import { IconButton, Row, Section } from '@luft/ui';
 	import type { Category } from '../api';
@@ -13,25 +14,28 @@
 	}
 
 	const CATEGORIES: [Category, string][] = [
-		['system', 'System'],
-		['windows', 'Windows'],
-		['workspaces', 'Workspaces'],
-		['screenshots', 'Screenshots'],
-		['media', 'Media']
+		['system', 'settings-shortcuts-category-system'],
+		['windows', 'settings-shortcuts-category-windows'],
+		['workspaces', 'settings-shortcuts-category-workspaces'],
+		['screenshots', 'settings-shortcuts-category-screenshots'],
+		['media', 'settings-shortcuts-category-media']
 	];
-	const collator = new Intl.Collator(undefined, { numeric: true });
 
 	let { store, onrecord, query }: Props = $props();
 
+	let collator = $derived(new Intl.Collator(i18n.formats, { numeric: true }));
 	let needle = $derived(query.trim().toLowerCase());
 
 	let categories = $derived(
-		CATEGORIES.map(([category, title]) => ({
-			title,
-			bindings: store.system
-				.filter((binding) => binding.category === category && matches(binding, title))
-				.sort((left, right) => collator.compare(left.name, right.name))
-		})).filter((group) => group.bindings.length)
+		CATEGORIES.map(([category, id]) => {
+			const title = t(id);
+			return {
+				title,
+				bindings: store.system
+					.filter((binding) => binding.category === category && matches(binding, title))
+					.sort((left, right) => collator.compare(left.name, right.name))
+			};
+		}).filter((group) => group.bindings.length)
 	);
 	let apps = $derived(
 		store.apps.filter((binding) => matches(binding, binding.appName)).sort((left, right) => collator.compare(left.appName, right.appName))
@@ -47,7 +51,7 @@
 		{#each group.bindings as binding (binding.id)}
 			<Row title={binding.name}>
 				{#if binding.changed}
-					<IconButton icon={RotateCcw} label="Reset to default" onclick={() => store.reset(binding)} />
+					<IconButton icon={RotateCcw} label={t('settings-shortcuts-reset')} onclick={() => store.reset(binding)} />
 				{/if}
 				<ShortcutButton accelerators={binding.accelerators} label={binding.name} onclick={() => onrecord(binding)} />
 			</Row>
@@ -56,7 +60,7 @@
 {/each}
 
 {#if apps.length}
-	<Section title="App shortcuts" description="Ones apps asked for, which work even when the app isn’t in front">
+	<Section title={t('settings-shortcuts-apps')} description={t('settings-shortcuts-apps-description')}>
 		{#each apps as binding (binding.id)}
 			<Row title={binding.name} description={binding.appName}>
 				<ShortcutButton accelerators={binding.accelerators} label={binding.name} onclick={() => onrecord(binding)} />
@@ -66,5 +70,5 @@
 {/if}
 
 {#if needle && !categories.length && !apps.length}
-	<p class="px-2 text-[14px] text-[var(--text-muted)]">No shortcuts match “{query.trim()}”</p>
+	<p class="px-2 text-[14px] text-[var(--text-muted)]">{t('settings-shortcuts-no-match', { query: query.trim() })}</p>
 {/if}

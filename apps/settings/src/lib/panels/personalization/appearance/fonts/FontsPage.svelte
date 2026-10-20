@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { SearchField, VirtualScroller } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
 	import { openFont, removeFont, type FontFamily } from './api';
@@ -43,8 +44,8 @@
 
 <svelte:window onfocus={() => fontLibrary.load()} />
 
-<SubPage title="Fonts" back="Appearance" {onclose}>
-	<SearchField bind:value={search} label="Search fonts" />
+<SubPage title={t('settings-fonts-all')} back={t('settings-fonts-back')} {onclose}>
+	<SearchField bind:value={search} label={t('settings-fonts-search')} />
 	{#if problem}
 		<p class="-my-3 px-1.5 text-[13px] text-[var(--danger)]">{problem}</p>
 	{/if}
@@ -69,7 +70,7 @@
 					{/snippet}
 				</VirtualScroller>
 			{:else}
-				<p class="px-4 py-3.5 text-[14px] text-[var(--text-muted)]">No font is called that</p>
+				<p class="px-4 py-3.5 text-[14px] text-[var(--text-muted)]">{t('settings-fonts-no-match')}</p>
 			{/if}
 		</div>
 	{/if}

@@ -1,10 +1,12 @@
 use futures_util::future::join;
 use luft_app::dbus::{error_message, error_name, failed};
+use luft_i18n::t;
 use serde::Serialize;
 use zbus::wire::DynamicDeserialize;
 use zbus::{DynamicType, OwnedVariant};
 
 use super::properties::{Map, Service, absent, get};
+use crate::L10N;
 
 pub const TRUST: Service = Service {
     name: "com.lantharos.Trust1",
@@ -225,10 +227,8 @@ fn explain(error: zbus::Error) -> String {
     let name = error_name(&error).unwrap_or_default();
     match error_message(&error) {
         Some(message) if name.starts_with(ERROR) => message.to_owned(),
-        _ if name.ends_with("NotAuthorized") => {
-            "Administrator rights are needed to change this".to_owned()
-        }
-        _ if absent(&error) => "Device security isn't available on this computer".to_owned(),
+        _ if name.ends_with("NotAuthorized") => t!(L10N, "desktop-admin-required"),
+        _ if absent(&error) => t!(L10N, "desktop-security-unavailable"),
         _ => failed(error),
     }
 }
@@ -250,7 +250,7 @@ where
         Ok(value) => Ok(Outcome::Done(value)),
         Err(error) if error_name(&error).as_deref() == Some(WRONG_KEY) => Ok(Outcome::WrongKey(
             error_message(&error)
-                .map_or_else(|| "That key didn't unlock the disk".into(), str::to_owned),
+                .map_or_else(|| t!(L10N, "desktop-security-wrong-key"), str::to_owned),
         )),
         Err(error) => Err(explain(error)),
     }

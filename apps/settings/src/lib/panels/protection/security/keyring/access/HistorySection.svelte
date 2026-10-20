@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { ago, Row, Section } from '@luft/ui';
 	import { clearHistory, type AccessEvent } from '../api';
 	import ConfirmDialog from '../ConfirmDialog.svelte';
@@ -19,7 +20,7 @@
 	}
 </script>
 
-<Section title="Recent access">
+<Section title={t('settings-passwords-history')}>
 	{#each shown as event, index (index)}
 		<div class="flex items-baseline gap-3 px-4 py-2.5">
 			<span class="min-w-0 flex-1 truncate text-[13px] text-[var(--text-soft)]">{happened(event)}</span>
@@ -27,18 +28,18 @@
 		</div>
 	{/each}
 	{#if history.length > COLLAPSED}
-		<Row title={expanded ? 'Show fewer' : `Show all ${history.length}`} onclick={() => (expanded = !expanded)} />
+		<Row title={expanded ? t('settings-passwords-history-fewer') : t('settings-passwords-history-all', { count: history.length })} onclick={() => (expanded = !expanded)} />
 	{/if}
-	<Row title="Clear history" description="Forget which apps used your keyring and when">
-		<button type="button" class="button" onclick={() => (clearing = true)}>Clear</button>
+	<Row title={t('settings-passwords-history-clear')} description={t('settings-passwords-history-clear-description')}>
+		<button type="button" class="button" onclick={() => (clearing = true)}>{t('settings-passwords-history-clear-button')}</button>
 	</Row>
 </Section>
 
 {#if clearing}
 	<ConfirmDialog
-		title="Clear recent access?"
-		description="The list of which apps used your keyring and when is erased. Your saved passwords and keys stay as they are."
-		action="Clear history"
+		title={t('settings-passwords-history-clear-title')}
+		description={t('settings-passwords-history-clear-confirm')}
+		action={t('settings-passwords-history-clear')}
 		run={clear}
 		onclose={() => (clearing = false)}
 	/>

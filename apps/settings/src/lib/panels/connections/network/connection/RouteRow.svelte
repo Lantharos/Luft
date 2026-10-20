@@ -1,6 +1,7 @@
 <script lang="ts">
 	import X from '@lucide/svelte/icons/x';
 	import { untrack } from 'svelte';
+	import { t } from '@luft/i18n';
 	import { IconButton, TextField } from '@luft/ui';
 	import type { Family, Route } from './profile';
 	import type { Errors } from './validate';
@@ -29,22 +30,28 @@
 <div class="flex flex-col gap-1.5">
 	<div class="route">
 		<TextField
-			label="Network"
+			label={t('settings-network-route-network')}
 			bind:value={route.destination}
 			bind:touched={touched.destination}
 			placeholder={family === 'ipv4' ? '10.0.0.0/8' : '2001:db8::/32'}
 			invalid={Boolean(errors[`${key}.destination`])}
 		/>
-		<TextField label="Router" bind:value={route.gateway} bind:touched={touched.gateway} placeholder="Router" invalid={Boolean(errors[`${key}.gateway`])} />
 		<TextField
-			label="Priority"
+			label={t('settings-network-router')}
+			bind:value={route.gateway}
+			bind:touched={touched.gateway}
+			placeholder={t('settings-network-router')}
+			invalid={Boolean(errors[`${key}.gateway`])}
+		/>
+		<TextField
+			label={t('settings-network-route-priority')}
 			bind:value={() => metric, setMetric}
 			bind:touched={touched.metric}
-			placeholder="Priority"
+			placeholder={t('settings-network-route-priority')}
 			inputmode="numeric"
 			invalid={Boolean(errors[`${key}.metric`])}
 		/>
-		<IconButton icon={X} label="Remove route" onclick={onremove} />
+		<IconButton icon={X} label={t('settings-network-route-remove')} onclick={onremove} />
 	</div>
 	{#if message}
 		<p class="px-3.5 text-[12.5px] text-[var(--danger)]">{message}</p>

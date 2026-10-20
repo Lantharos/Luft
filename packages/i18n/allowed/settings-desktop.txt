@@ -1,0 +1,8 @@
+apps/settings/desktop/src/gsettings/value.rs	Settings of type {} cannot be changed here
+apps/settings/desktop/src/panels/devices/display/brightness/ddcutil.rs	Invalid display
+apps/settings/desktop/src/panels/devices/keyboard/shortcuts.rs	Sound and Media
+apps/settings/desktop/src/panels/personalization/appearance/cursors/installed.rs	Icon Theme
+apps/settings/desktop/src/panels/personalization/appearance/cursors/themes.rs	Icon Theme
+apps/settings/desktop/src/panels/personalization/appearance/cursors/store.rs	Luft Settings
+apps/settings/desktop/src/panels/system/about/sample.rs	Luft Alizé
+apps/settings/desktop/src/panels/system/apps/startup.rs	Desktop Entry

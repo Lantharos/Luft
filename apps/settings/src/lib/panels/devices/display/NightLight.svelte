@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Row, Section, Segmented, Slider, Switch } from '@luft/ui';
 	import { percent } from '#lib/format.js';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
@@ -34,32 +35,32 @@
 </script>
 
 <Section>
-	<Row title="Night light" description="Warmer colors in the evening, easier on your eyes">
-		<Switch label="Night light" checked={enabled} onchange={(on) => color.set('enabled', on)} />
+	<Row title={t('settings-display-night-light')} description={t('settings-display-night-light-description')}>
+		<Switch label={t('settings-display-night-light')} checked={enabled} onchange={(on) => color.set('enabled', on)} />
 	</Row>
 	{#if enabled}
-		<Row title="Schedule">
+		<Row title={t('settings-display-night-light-schedule')}>
 			<Segmented
-				label="Schedule"
+				label={t('settings-display-night-light-schedule')}
 				options={[
-					{ value: 'automatic', label: 'Sunset to sunrise' },
-					{ value: 'custom', label: 'Custom' }
+					{ value: 'automatic', label: t('settings-display-night-light-automatic') },
+					{ value: 'custom', label: t('settings-display-night-light-custom') }
 				]}
 				value={automatic ? 'automatic' : 'custom'}
 				onchange={(schedule) => color.set('schedule-automatic', schedule === 'automatic')}
 			/>
 		</Row>
 		{#if !automatic}
-			<Row title="Turns on">
-				<TimePicker label="Turns on" {twelveHour} value={color.values['schedule-from'] ?? 20} onchange={(hours) => color.set('schedule-from', hours)} />
+			<Row title={t('settings-display-night-light-from')}>
+				<TimePicker label={t('settings-display-night-light-from')} {twelveHour} value={color.values['schedule-from'] ?? 20} onchange={(hours) => color.set('schedule-from', hours)} />
 			</Row>
-			<Row title="Turns off">
-				<TimePicker label="Turns off" {twelveHour} value={color.values['schedule-to'] ?? 6} onchange={(hours) => color.set('schedule-to', hours)} />
+			<Row title={t('settings-display-night-light-to')}>
+				<TimePicker label={t('settings-display-night-light-to')} {twelveHour} value={color.values['schedule-to'] ?? 6} onchange={(hours) => color.set('schedule-to', hours)} />
 			</Row>
 		{/if}
-		<Row title="Warmth">
+		<Row title={t('settings-display-night-light-warmth')}>
 			{#snippet below()}
-				<Slider label="Warmth" value={warmth} format={percent} oninput={setWarmth} onchange={setWarmth} />
+				<Slider label={t('settings-display-night-light-warmth')} value={warmth} format={percent} oninput={setWarmth} onchange={setWarmth} />
 			{/snippet}
 		</Row>
 	{/if}

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Row, Section, Segmented, Switch } from '@luft/ui';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import SpeedSlider from './SpeedSlider.svelte';
@@ -37,19 +38,19 @@
 	}
 </script>
 
-<Section title="Touchpad">
-	<Row title="Touchpad">
-		<Switch label="Touchpad" checked={!off} onchange={(on) => touchpad.set('send-events', on ? 'enabled' : 'disabled')} />
+<Section title={t('settings-mouse-touchpad')}>
+	<Row title={t('settings-mouse-touchpad')}>
+		<Switch label={t('settings-mouse-touchpad')} checked={!off} onchange={(on) => touchpad.set('send-events', on ? 'enabled' : 'disabled')} />
 	</Row>
-	<Row title="Pointer speed" disabled={off}>
+	<Row title={t('settings-mouse-speed')} disabled={off}>
 		{#snippet below()}
-			<SpeedSlider label="Touchpad pointer speed" value={touchpad.values.speed ?? 0} disabled={off} onchange={(speed) => touchpad.set('speed', speed)} />
+			<SpeedSlider label={t('settings-mouse-touchpad-speed')} value={touchpad.values.speed ?? 0} disabled={off} onchange={(speed) => touchpad.set('speed', speed)} />
 		{/snippet}
 	</Row>
-	<Row title="Scrolling speed" disabled={off}>
+	<Row title={t('settings-mouse-touchpad-scroll-speed')} disabled={off}>
 		{#snippet below()}
 			<SpeedSlider
-				label="Touchpad scrolling speed"
+				label={t('settings-mouse-touchpad-scroll-speed-label')}
 				value={Math.log2(touchpad.values['scroll-speed'] ?? 1)}
 				min={-SCROLL_SPEED_OCTAVES}
 				max={SCROLL_SPEED_OCTAVES}
@@ -58,46 +59,46 @@
 			/>
 		{/snippet}
 	</Row>
-	<Row title="Tap to click" description="Tap the touchpad instead of pressing it down" disabled={off}>
-		<Switch label="Tap to click" disabled={off} checked={touchpad.values['tap-to-click'] ?? false} onchange={(on) => touchpad.set('tap-to-click', on)} />
+	<Row title={t('settings-mouse-touchpad-tap')} description={t('settings-mouse-touchpad-tap-description')} disabled={off}>
+		<Switch label={t('settings-mouse-touchpad-tap')} disabled={off} checked={touchpad.values['tap-to-click'] ?? false} onchange={(on) => touchpad.set('tap-to-click', on)} />
 	</Row>
-	<Row title="Natural scrolling" description="Content moves in the same direction as your fingers" disabled={off}>
+	<Row title={t('settings-mouse-natural-scrolling')} description={t('settings-mouse-touchpad-natural-scrolling-description')} disabled={off}>
 		<Switch
-			label="Touchpad natural scrolling"
+			label={t('settings-mouse-touchpad-natural-scrolling')}
 			disabled={off}
 			checked={touchpad.values['natural-scroll'] ?? true}
 			onchange={(on) => touchpad.set('natural-scroll', on)}
 		/>
 	</Row>
-	<Row title="Scroll with" disabled={off}>
+	<Row title={t('settings-mouse-touchpad-scroll-with')} disabled={off}>
 		<div inert={off}>
 			<Segmented
-				label="Scroll with"
+				label={t('settings-mouse-touchpad-scroll-with')}
 				options={[
-					{ value: 'fingers', label: 'Two fingers' },
-					{ value: 'edge', label: 'Edge' }
+					{ value: 'fingers', label: t('settings-mouse-touchpad-two-fingers') },
+					{ value: 'edge', label: t('settings-mouse-touchpad-scroll-edge') }
 				]}
 				value={touchpad.values['edge-scrolling-enabled'] && !touchpad.values['two-finger-scrolling-enabled'] ? 'edge' : 'fingers'}
 				onchange={setScrolling}
 			/>
 		</div>
 	</Row>
-	<Row title="Secondary click" description="How to right-click without a separate button" disabled={off}>
+	<Row title={t('settings-mouse-touchpad-secondary-click')} description={t('settings-mouse-touchpad-secondary-click-description')} disabled={off}>
 		<div inert={off}>
 			<Segmented
-				label="Secondary click"
+				label={t('settings-mouse-touchpad-secondary-click')}
 				options={[
-					{ value: 'fingers', label: 'Two fingers' },
-					{ value: 'areas', label: 'Corner' }
+					{ value: 'fingers', label: t('settings-mouse-touchpad-two-fingers') },
+					{ value: 'areas', label: t('settings-mouse-touchpad-click-corner') }
 				]}
 				value={touchpad.values['click-method'] === 'areas' ? 'areas' : 'fingers'}
 				onchange={(method) => touchpad.set('click-method', method)}
 			/>
 		</div>
 	</Row>
-	<Row title="Disable while typing" description="So the pointer doesn’t jump while you type" disabled={off}>
+	<Row title={t('settings-mouse-touchpad-disable-typing')} description={t('settings-mouse-touchpad-disable-typing-description')} disabled={off}>
 		<Switch
-			label="Disable while typing"
+			label={t('settings-mouse-touchpad-disable-typing')}
 			disabled={off}
 			checked={touchpad.values['disable-while-typing'] ?? true}
 			onchange={(on) => touchpad.set('disable-while-typing', on)}

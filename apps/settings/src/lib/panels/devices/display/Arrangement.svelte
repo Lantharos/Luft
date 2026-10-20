@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { snap, type Rect } from './layout';
 
 	interface Item extends Rect {
@@ -99,7 +100,7 @@
 				class="display"
 				class:selected={item.id === selected}
 				class:dragging={drag?.id === item.id && drag.moved}
-				aria-label={item.primary ? `${item.name}, main display` : item.name}
+				aria-label={item.primary ? t('settings-display-arrangement-main', { name: item.name }) : item.name}
 				aria-pressed={item.id === selected}
 				style:transform="translate({box.left}px, {box.top}px)"
 				style:width="{box.width}px"

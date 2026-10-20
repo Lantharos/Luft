@@ -3,6 +3,10 @@ use std::io::{self, BufReader, Read};
 use std::os::unix::fs::symlink;
 use std::path::{Component, Path, PathBuf};
 
+use luft_i18n::t;
+
+use crate::L10N;
+
 const MAX_EXTRACTED_BYTES: u64 = 512 * 1024 * 1024;
 const MAX_ENTRIES: u32 = 50_000;
 const MAX_LINK_LENGTH: u64 = 4096;
@@ -16,8 +20,6 @@ const TAR_SUFFIXES: [(&str, Codec); 8] = [
     (".tar.xz", Codec::Xz),
     (".txz", Codec::Xz),
 ];
-const TOO_LARGE: &str = "This download unpacks to more than a cursor theme should need";
-const DAMAGED: &str = "This download is damaged or isn't an archive Settings can open";
 
 #[derive(Clone, Copy)]
 pub enum Codec {
@@ -46,8 +48,12 @@ impl Format {
     }
 }
 
-fn damaged(_: impl std::fmt::Display) -> String {
-    DAMAGED.into()
+fn too_large() -> String {
+    t!(L10N, "desktop-cursors-unpacks-too-large")
+}
+
+fn damaged() -> String {
+    t!(L10N, "desktop-cursors-archive-damaged")
 }
 
 fn relative(path: &Path) -> Option<PathBuf> {
@@ -79,7 +85,7 @@ impl Unpacker<'_> {
         self.entries += 1;
         (self.entries <= MAX_ENTRIES)
             .then_some(())
-            .ok_or_else(|| TOO_LARGE.into())
+            .ok_or_else(too_large)
     }
 
     fn directory(&self, relative: &Path) -> Result<PathBuf, String> {
@@ -88,7 +94,7 @@ impl Unpacker<'_> {
             path.push(part);
             match fs::symlink_metadata(&path) {
                 Ok(metadata) if metadata.is_dir() => {}
-                Ok(_) => return Err(DAMAGED.into()),
+                Ok(_) => return Err(damaged()),
                 Err(error) if error.kind() == io::ErrorKind::NotFound => {
                     fs::create_dir(&path).map_err(|error| error.to_string())?
                 }
@@ -100,7 +106,7 @@ impl Unpacker<'_> {
 
     fn slot(&self, relative: &Path) -> Result<PathBuf, String> {
         let parent = self.directory(relative.parent().unwrap_or(Path::new("")))?;
-        let path = parent.join(relative.file_name().ok_or(DAMAGED)?);
+        let path = parent.join(relative.file_name().ok_or_else(damaged)?);
         if fs::symlink_metadata(&path).is_ok_and(|metadata| !metadata.is_dir()) {
             fs::remove_file(&path).map_err(|error| error.to_string())?;
         }
@@ -114,11 +120,9 @@ impl Unpacker<'_> {
             &mut contents.take(budget + 1),
             &mut File::create(path).map_err(|error| error.to_string())?,
         )
-        .map_err(damaged)?;
+        .map_err(|_| damaged())?;
         self.written += copied;
-        (copied <= budget)
-            .then_some(())
-            .ok_or_else(|| TOO_LARGE.into())
+        (copied <= budget).then_some(()).ok_or_else(too_large)
     }
 
     fn link(&self, relative: &Path, target: &Path) -> Result<(), String> {
@@ -153,10 +157,10 @@ fn decoder<'a>(codec: Codec, reader: impl Read + 'a) -> Box<dyn Read + 'a> {
 
 fn unpack_tar(codec: Codec, archive: File, unpacker: &mut Unpacker) -> Result<(), String> {
     let mut tar = tar::Archive::new(decoder(codec, BufReader::new(archive)));
-    for entry in tar.entries().map_err(damaged)? {
-        let mut entry = entry.map_err(damaged)?;
+    for entry in tar.entries().map_err(|_| damaged())? {
+        let mut entry = entry.map_err(|_| damaged())?;
         unpacker.count()?;
-        let Some(path) = relative(&entry.path().map_err(damaged)?) else {
+        let Some(path) = relative(&entry.path().map_err(|_| damaged())?) else {
             continue;
         };
         let kind = entry.header().entry_type();
@@ -165,7 +169,7 @@ fn unpack_tar(codec: Codec, archive: File, unpacker: &mut Unpacker) -> Result<()
         } else if kind.is_file() {
             unpacker.file(&path, &mut entry)?;
         } else if kind.is_symlink() || kind.is_hard_link() {
-            let Some(target) = entry.link_name().map_err(damaged)? else {
+            let Some(target) = entry.link_name().map_err(|_| damaged())? else {
                 continue;
             };
             if kind.is_symlink() {
@@ -179,9 +183,9 @@ fn unpack_tar(codec: Codec, archive: File, unpacker: &mut Unpacker) -> Result<()
 }
 
 fn unpack_zip(archive: File, unpacker: &mut Unpacker) -> Result<(), String> {
-    let mut zip = zip::ZipArchive::new(BufReader::new(archive)).map_err(damaged)?;
+    let mut zip = zip::ZipArchive::new(BufReader::new(archive)).map_err(|_| damaged())?;
     for index in 0..zip.len() {
-        let mut entry = zip.by_index(index).map_err(damaged)?;
+        let mut entry = zip.by_index(index).map_err(|_| damaged())?;
         unpacker.count()?;
         let Some(path) = entry.enclosed_name().as_deref().and_then(relative) else {
             continue;
@@ -193,7 +197,7 @@ fn unpack_zip(archive: File, unpacker: &mut Unpacker) -> Result<(), String> {
             (&mut entry)
                 .take(MAX_LINK_LENGTH)
                 .read_to_string(&mut target)
-                .map_err(damaged)?;
+                .map_err(|_| damaged())?;
             unpacker.link(&path, Path::new(&target))?;
         } else {
             unpacker.file(&path, &mut entry)?;

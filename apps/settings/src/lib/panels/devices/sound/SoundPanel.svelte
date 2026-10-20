@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { onDestroy } from 'svelte';
 	import Mic from '@lucide/svelte/icons/mic';
 	import MicOff from '@lucide/svelte/icons/mic-off';
@@ -6,6 +7,7 @@
 	import VolumeX from '@lucide/svelte/icons/volume-x';
 	import { Row, Section, Select, Slider, Switch } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
+	import { percent } from '#lib/format.js';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import {
 		onInputLevel,
@@ -52,8 +54,9 @@
 	const choices = (devices: Device[]) => devices.map((device) => ({ value: device.name, label: device.description }));
 
 	function side(balance: number) {
-		if (Math.abs(balance) < 0.005) return 'Center';
-		return `${Math.round(Math.abs(balance) * 100)}% ${balance < 0 ? 'left' : 'right'}`;
+		if (Math.abs(balance) < 0.005) return t('settings-sound-balance-center');
+		const amount = { share: percent(Math.abs(balance)) };
+		return balance < 0 ? t('settings-sound-balance-left', amount) : t('settings-sound-balance-right', amount);
 	}
 
 	onDestroy(onSoundChanged((next) => (sound = next)));
@@ -70,14 +73,14 @@
 
 {#snippet devicePicker(direction: Direction, devices: Device[], current: Device)}
 	{#if devices.length > 1}
-		<Row title="Device">
-			<Select label="{direction === 'output' ? 'Output' : 'Input'} device" options={choices(devices)} value={current.name} onchange={(name) => setDefault(direction, name)} />
+		<Row title={t('settings-sound-device')}>
+			<Select label={direction === 'output' ? t('settings-sound-output-device') : t('settings-sound-input-device')} options={choices(devices)} value={current.name} onchange={(name) => setDefault(direction, name)} />
 		</Row>
 	{/if}
 	{#if current.ports.length > 1 && current.port}
-		<Row title="Connection">
+		<Row title={t('settings-sound-connection')}>
 			<Select
-				label="{direction === 'output' ? 'Output' : 'Input'} connection"
+				label={direction === 'output' ? t('settings-sound-output-connection') : t('settings-sound-input-connection')}
 				options={current.ports.map((port) => ({ value: port.name, label: port.description }))}
 				value={current.port}
 				onchange={(port) => setPort(direction, current.index, port)}
@@ -87,19 +90,19 @@
 {/snippet}
 
 {#if sound && page === 'apps'}
-	<SubPage title="App volumes" back="Sound" onclose={() => (page = null)}>
+	<SubPage title={t('settings-sound-apps')} back={t('settings-page-sound')} onclose={() => (page = null)}>
 		<AppsSection apps={sound.apps} outputs={sound.outputs} {max} />
 	</SubPage>
 {:else if sound && page === 'devices'}
-	<SubPage title="Device profiles" back="Sound" onclose={() => (page = null)}>
+	<SubPage title={t('settings-sound-profiles')} back={t('settings-page-sound')} onclose={() => (page = null)}>
 		<DevicesSection cards={sound.cards} />
 	</SubPage>
 {:else if sound}
 	{#if output}
-		<Section title="Output">
+		<Section title={t('settings-sound-output')}>
 			{@render devicePicker('output', sound.outputs, output)}
 			<VolumeRow
-				title="Volume"
+				title={t('settings-sound-volume')}
 				volume={output.volume}
 				muted={output.muted}
 				{max}
@@ -110,24 +113,24 @@
 				onmute={(muted) => setMute('output', output!.index, muted)}
 			/>
 			{#if output.balance !== null}
-				<Row title="Balance">
+				<Row title={t('settings-sound-balance')}>
 					<span>{side(output.balance)}</span>
 					{#snippet below()}
-						<Slider label="Balance" min={-1} max={1} value={output!.balance!} format={side} oninput={(balance) => setBalance(output!.index, balance)} onchange={(balance) => setBalance(output!.index, balance)} />
+						<Slider label={t('settings-sound-balance')} min={-1} max={1} value={output!.balance!} format={side} oninput={(balance) => setBalance(output!.index, balance)} onchange={(balance) => setBalance(output!.index, balance)} />
 					{/snippet}
 				</Row>
 			{/if}
-			<Row title="Allow louder than 100%" description="Sound can distort at higher volumes">
-				<Switch label="Allow louder than 100%" checked={max > 1} onchange={(on) => loudness.set('allow-volume-above-100-percent', on)} />
+			<Row title={t('settings-sound-louder')} description={t('settings-sound-louder-description')}>
+				<Switch label={t('settings-sound-louder')} checked={max > 1} onchange={(on) => loudness.set('allow-volume-above-100-percent', on)} />
 			</Row>
 		</Section>
 	{/if}
 
 	{#if input}
-		<Section title="Input">
+		<Section title={t('settings-sound-input')}>
 			{@render devicePicker('input', sound.inputs, input)}
 			<VolumeRow
-				title="Volume"
+				title={t('settings-sound-volume')}
 				volume={input.volume}
 				muted={input.muted}
 				{max}
@@ -144,10 +147,10 @@
 	{#if playing || sound.cards.length}
 		<Section>
 			{#if playing}
-				<Row title="App volumes" description="{playing} {playing === 1 ? 'app is' : 'apps are'} playing sound" onclick={() => (page = 'apps')} />
+				<Row title={t('settings-sound-apps')} description={t('settings-sound-apps-playing', { count: playing })} onclick={() => (page = 'apps')} />
 			{/if}
 			{#if sound.cards.length}
-				<Row title="Device profiles" description="Choose how each sound device is used" onclick={() => (page = 'devices')} />
+				<Row title={t('settings-sound-profiles')} description={t('settings-sound-profiles-row-description')} onclick={() => (page = 'devices')} />
 			{/if}
 		</Section>
 	{/if}

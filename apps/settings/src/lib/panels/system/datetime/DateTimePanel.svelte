@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { i18n, t } from '@luft/i18n';
 	import { Row, Section, Segmented, Switch } from '@luft/ui';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import { clock as readClock, onClockChanged, setAutomatic, zones as readZones, type Clock, type Zone } from './api';
@@ -26,11 +27,11 @@
 	let automaticZone = $derived(datetime.values['automatic-timezone'] ?? false);
 	let zone = $derived(clock?.timezone ?? 'UTC');
 	let timeFormat = $derived(
-		new Intl.DateTimeFormat(undefined, { timeZone: zone, hour: 'numeric', minute: '2-digit', second: seconds ? '2-digit' : undefined, hourCycle: hour12 ? 'h12' : 'h23' })
+		new Intl.DateTimeFormat(i18n.formats, { timeZone: zone, hour: 'numeric', minute: '2-digit', second: seconds ? '2-digit' : undefined, hourCycle: hour12 ? 'h12' : 'h23' })
 	);
-	let dateFormat = $derived(new Intl.DateTimeFormat(undefined, { timeZone: zone, weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }));
+	let dateFormat = $derived(new Intl.DateTimeFormat(i18n.formats, { timeZone: zone, weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }));
 	let shortFormat = $derived(
-		new Intl.DateTimeFormat(undefined, { timeZone: zone, month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hourCycle: hour12 ? 'h12' : 'h23' })
+		new Intl.DateTimeFormat(i18n.formats, { timeZone: zone, month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hourCycle: hour12 ? 'h12' : 'h23' })
 	);
 	let place = $derived(country(zones.find((entry) => entry.id === zone)?.country ?? null));
 	let minute = $derived(Math.floor(now / 60000) * 60000);
@@ -72,25 +73,25 @@
 
 <Section>
 	{#if clock?.canAutomatic}
-		<Row title="Set the time automatically" description="Keeps the clock accurate using the internet">
-			<Switch label="Set the time automatically" checked={clock.automatic} onchange={toggleAutomatic} />
+		<Row title={t('settings-datetime-automatic')} description={t('settings-datetime-automatic-description')}>
+			<Switch label={t('settings-datetime-automatic')} checked={clock.automatic} onchange={toggleAutomatic} />
 		</Row>
 	{/if}
-	<Row title="Date and time" disabled={!clock || clock.automatic} onclick={() => (editing = 'time')}>
+	<Row title={t('settings-datetime-date-and-time')} disabled={!clock || clock.automatic} onclick={() => (editing = 'time')}>
 		<span class="tabular-nums">{shortFormat.format(now)}</span>
 	</Row>
 </Section>
 
 <Section>
 	<Row
-		title="Set the time zone automatically"
-		description={automaticZone && !location.values.enabled ? 'Turn on location services in Privacy to use this' : 'Follows your location when you travel'}
+		title={t('settings-datetime-automatic-zone')}
+		description={automaticZone && !location.values.enabled ? t('settings-datetime-automatic-zone-location-off') : t('settings-datetime-automatic-zone-description')}
 	>
-		<Switch label="Set the time zone automatically" checked={automaticZone} onchange={(on) => datetime.set('automatic-timezone', on)} />
+		<Switch label={t('settings-datetime-automatic-zone')} checked={automaticZone} onchange={(on) => datetime.set('automatic-timezone', on)} />
 	</Row>
 	<Row
-		title="Time zone"
-		description={place ? `${place} · ${offset}` : offset}
+		title={t('settings-datetime-zone')}
+		description={place ? t('settings-datetime-zone-description', { place, offset }) : offset}
 		disabled={!clock || automaticZone}
 		onclick={() => (editing = 'zone')}
 	>
@@ -98,38 +99,41 @@
 	</Row>
 </Section>
 
-<Section title="Clock">
-	<Row title="Time format">
+<Section title={t('settings-datetime-clock')}>
+	<Row title={t('settings-datetime-time-format')}>
 		<Segmented
-			label="Time format"
+			label={t('settings-datetime-time-format')}
 			options={[
-				{ value: '24h', label: '24-hour' },
-				{ value: '12h', label: 'AM/PM' }
+				{ value: '24h', label: t('settings-datetime-format-24h') },
+				{ value: '12h', label: t('settings-datetime-format-12h') }
 			]}
 			value={hour12 ? '12h' : '24h'}
 			onchange={(format) => desktop.set('clock-format', format)}
 		/>
 	</Row>
-	<Row title="Show seconds">
-		<Switch label="Show seconds" checked={seconds} onchange={(on) => desktop.set('clock-show-seconds', on)} />
+	<Row title={t('settings-datetime-seconds')}>
+		<Switch label={t('settings-datetime-seconds')} checked={seconds} onchange={(on) => desktop.set('clock-show-seconds', on)} />
 	</Row>
-	<Row title="Show the day of the week">
+	<Row title={t('settings-datetime-weekday')}>
 		<Switch
-			label="Show the day of the week"
+			label={t('settings-datetime-weekday')}
 			checked={desktop.values['clock-show-weekday'] ?? false}
 			onchange={(on) => desktop.set('clock-show-weekday', on)}
 		/>
 	</Row>
 </Section>
 
-<Section title="Calendar">
-	<Row title="Week starts on" description={weekStart.choice === 'automatic' ? `${weekdayName(weekStart.regional, 'long')}, from your region` : undefined}>
+<Section title={t('settings-datetime-calendar')}>
+	<Row
+		title={t('settings-datetime-week-start')}
+		description={weekStart.choice === 'automatic' ? t('settings-datetime-week-start-regional', { day: weekdayName(weekStart.regional, 'long') }) : undefined}
+	>
 		<Segmented
-			label="Week starts on"
+			label={t('settings-datetime-week-start')}
 			options={[
-				{ value: 'automatic', label: 'Automatic' },
-				{ value: 'monday', label: 'Monday' },
-				{ value: 'sunday', label: 'Sunday' }
+				{ value: 'automatic', label: t('settings-datetime-week-start-automatic') },
+				{ value: 'monday', label: t('settings-datetime-week-start-monday') },
+				{ value: 'sunday', label: t('settings-datetime-week-start-sunday') }
 			]}
 			value={weekStart.choice}
 			onchange={weekStart.choose}

@@ -11,13 +11,13 @@ pub struct Notice {
 }
 
 pub const AVAILABLE: Notice = Notice {
-    summary: "System updates are available",
-    body: "Open Settings to download and install them.",
+    summary: "desktop-updates-available-summary",
+    body: "desktop-updates-available-body",
 };
 
 pub const READY: Notice = Notice {
-    summary: "Updates are ready to install",
-    body: "Restart when it suits you to install them.",
+    summary: "desktop-updates-ready-summary",
+    body: "desktop-updates-ready-body",
 };
 
 pub trait Backend: Sync {

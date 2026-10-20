@@ -3,6 +3,7 @@
 	import Microchip from '@lucide/svelte/icons/microchip';
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
+	import { t } from '@luft/i18n';
 	import { Row, Section } from '@luft/ui';
 	import { app } from '#lib/state/app.svelte.js';
 	import AntiCheatRow from './AntiCheatRow.svelte';
@@ -29,21 +30,21 @@
 			<DrivesRow drives={trust.drives} />
 		{/if}
 		{#if trust.secureBoot === 'on'}
-			<Row title="Secure Boot" description="Only trusted software can start this computer" icon={ShieldCheck} />
+			<Row title={t('settings-security-secure-boot')} description={t('settings-security-secure-boot-description')} icon={ShieldCheck} />
 		{/if}
 		<StartupRow key={trust.signingKey} startup={trust.startup} />
 		{#if trust.tpm.usable}
-			<Row title="Security chip" description="Keeps keys safe and checks how this computer started" icon={Microchip} />
+			<Row title={t('settings-security-chip')} description={t('settings-security-chip-description')} icon={Microchip} />
 		{/if}
 		<AntiCheatRow antiCheat={trust.antiCheat} key={trust.signingKey} />
 	{/if}
 	{#if security.host}
-		<Row title="Hardware security" description={levelSentence(security.host)} icon={CircuitBoard} onclick={() => (detailing = true)} />
+		<Row title={t('settings-security-hardware')} description={levelSentence(security.host)} icon={CircuitBoard} onclick={() => (detailing = true)} />
 	{/if}
 	{#if updates}
 		<Row
-			title="Firmware updates are ready"
-			description="{updates} {updates === 1 ? 'update' : 'updates'} for your hardware in Updates"
+			title={t('settings-firmware-updates-ready')}
+			description={t('settings-firmware-updates-count', { count: updates })}
 			icon={RefreshCw}
 			onclick={() => app.open('updates')}
 		/>

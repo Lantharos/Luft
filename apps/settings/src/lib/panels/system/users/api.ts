@@ -1,3 +1,4 @@
+import { t } from '@luft/i18n';
 import { invoke } from '#lib/bridge.js';
 
 const WAIT_FOR_PERMISSION = 300_000;
@@ -24,4 +25,4 @@ export const changePassword = (current: string | null, password: string) =>
 	invoke<PasswordOutcome>('users_change_password', { current, password }, { timeoutMs: WAIT_FOR_PERMISSION });
 
 export const displayName = (user: User) => user.realName || user.userName;
-export const accountType = (user: User) => (user.administrator ? 'Administrator' : 'Standard account');
+export const accountType = (user: User) => (user.administrator ? t('settings-users-administrator') : t('settings-users-standard'));

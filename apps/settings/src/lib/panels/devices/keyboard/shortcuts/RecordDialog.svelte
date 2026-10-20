@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Dialog } from '@luft/ui';
 	import { typesText } from './accelerator';
 	import KeyCapture from './KeyCapture.svelte';
@@ -30,7 +31,7 @@
 		error = '';
 		if (accelerator === null) return apply([]);
 		if (typesText(accelerator)) {
-			error = 'Add Ctrl, Alt, or Super so the shortcut doesn’t get in the way of typing.';
+			error = t('settings-shortcuts-needs-modifier');
 			recording = true;
 			return;
 		}
@@ -53,11 +54,11 @@
 	}
 </script>
 
-<Dialog title={binding.name} description="Press the new shortcut. Backspace turns it off, Escape cancels." {onclose}>
+<Dialog title={binding.name} description={t('settings-shortcuts-record-description')} {onclose}>
 	<KeyCapture accelerators={pending ? [pending] : binding.accelerators} bind:recording oncapture={capture} oncancel={onclose} />
 	{#if taken}
 		<p class="text-[13px] leading-relaxed text-[var(--text-soft)]">
-			This shortcut is already used for “{taken.name}”. Replacing it turns it off there.
+			{t('settings-shortcuts-record-taken', { name: taken.name })}
 		</p>
 	{/if}
 	{#if error}
@@ -65,10 +66,10 @@
 	{/if}
 	{#snippet actions()}
 		{#if taken}
-			<button type="button" class="button" onclick={retry}>Try another</button>
-			<button type="button" class="button primary" onclick={replace}>Replace</button>
+			<button type="button" class="button" onclick={retry}>{t('settings-shortcuts-try-another')}</button>
+			<button type="button" class="button primary" onclick={replace}>{t('settings-shortcuts-replace')}</button>
 		{:else}
-			<button type="button" class="button" onclick={onclose}>Cancel</button>
+			<button type="button" class="button" onclick={onclose}>{t('settings-shortcuts-cancel')}</button>
 		{/if}
 	{/snippet}
 </Dialog>

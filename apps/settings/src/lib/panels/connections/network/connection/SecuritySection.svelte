@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { PasswordField, Row, Section, Select } from '@luft/ui';
 	import { needsPassword, type Security } from '../api';
 	import { securityLabel } from '../describe';
@@ -28,14 +29,20 @@
 	}
 </script>
 
-<Section title="Security">
-	<Row title="Security type">
-		<Select label="Security type" {options} value={wireless.security} onchange={choose} />
+<Section title={t('settings-network-security')}>
+	<Row title={t('settings-network-security-type')}>
+		<Select label={t('settings-network-security-type')} {options} value={wireless.security} onchange={choose} />
 	</Row>
 	{#if needsPassword(wireless.security)}
-		<Row title="Password">
+		<Row title={t('settings-network-password')}>
 			<div class="w-[260px]">
-				<PasswordField label="Password" bind:value={password} placeholder={saved ? 'Saved password' : 'Password'} error={errors.password} onreveal={saved ? onreveal : undefined} />
+				<PasswordField
+					label={t('settings-network-password')}
+					bind:value={password}
+					placeholder={saved ? t('settings-network-password-saved') : t('settings-network-password')}
+					error={errors.password}
+					onreveal={saved ? onreveal : undefined}
+				/>
 			</div>
 		</Row>
 	{:else if wireless.security === 'enterprise' && wireless.enterprise}

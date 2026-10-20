@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { t } from '@luft/i18n';
 	import { Row, Section, Segmented, Select, Switch } from '@luft/ui';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import { onPowerChanged, powerState, setProfile, type PowerState } from './api';
@@ -23,14 +24,12 @@
 	const SCREEN_DELAYS = [1, 2, 3, 5, 10, 15].map((minutes) => minutes * MINUTE);
 	const SUSPEND_DELAYS = [15, 20, 30, 45, 60, 90, 120].map((minutes) => minutes * MINUTE);
 	const PROFILES = [
-		{ value: 'power-saver', label: 'Power saver', description: 'Slower, and uses less power' },
-		{ value: 'balanced', label: 'Balanced', description: 'Standard performance and power use' },
-		{ value: 'performance', label: 'Performance', description: 'Faster, and uses more power' }
+		{ value: 'power-saver', label: 'settings-power-profile-saver', description: 'settings-power-profile-saver.description' },
+		{ value: 'balanced', label: 'settings-power-profile-balanced', description: 'settings-power-profile-balanced.description' },
+		{ value: 'performance', label: 'settings-power-profile-performance', description: 'settings-power-profile-performance.description' }
 	];
-	const DEGRADED: Record<string, string> = {
-		'lap-detected': 'on your lap',
-		'high-operating-temperature': 'too hot'
-	};
+	const LAP = 'lap-detected';
+	const HOT = 'high-operating-temperature';
 
 	const session = useSettings<{ 'idle-delay': number }>('org.gnome.desktop.session', ['idle-delay']);
 	const power = useSettings<Power>('com.lantharos.kestrel.power', [
@@ -46,22 +45,29 @@
 	let state = $state<PowerState | null>(null);
 
 	let profiles = $derived(state?.profiles ?? null);
-	let profileOptions = $derived(PROFILES.filter((profile) => profiles?.available.includes(profile.value)));
+	let profileOptions = $derived(
+		PROFILES.filter((profile) => profiles?.available.includes(profile.value)).map((profile) => ({ value: profile.value, label: t(profile.label) }))
+	);
 	let profileDescription = $derived.by(() => {
 		if (!profiles) return undefined;
 		if (profiles.degraded.length && profiles.active === 'performance') return limitation(profiles.degraded);
-		return PROFILES.find((profile) => profile.value === profiles.active)?.description;
+		const active = PROFILES.find((profile) => profile.value === profiles.active);
+		return active && t(active.description);
 	});
 	let buttonActions = $derived([
-		{ value: 'suspend', label: 'Suspend' },
-		...(state?.canHibernate ? [{ value: 'hibernate', label: 'Hibernate' }] : []),
-		{ value: 'interactive', label: 'Ask what to do' },
-		{ value: 'nothing', label: 'Do nothing' }
+		{ value: 'suspend', label: t('settings-power-button-suspend') },
+		...(state?.canHibernate ? [{ value: 'hibernate', label: t('settings-power-button-hibernate') }] : []),
+		{ value: 'interactive', label: t('settings-power-button-ask') },
+		{ value: 'nothing', label: t('settings-power-button-nothing') }
 	]);
 
 	function limitation(reasons: string[]) {
-		const known = reasons.flatMap((reason) => DEGRADED[reason] ?? []);
-		return known.length ? `Performance is limited because the computer is ${known.join(' and ')}` : 'Performance is limited right now';
+		const lap = reasons.includes(LAP);
+		const hot = reasons.includes(HOT);
+		if (lap && hot) return t('settings-power-limited-lap-hot');
+		if (lap) return t('settings-power-limited-lap');
+		if (hot) return t('settings-power-limited-hot');
+		return t('settings-power-limited');
 	}
 
 	$effect(() => {
@@ -104,14 +110,14 @@
 {/if}
 
 {#if profiles && profileOptions.length > 1}
-	<Section title="Power mode">
-		<Row title="Mode" description={profileDescription} truncate>
-			<Segmented label="Power mode" options={profileOptions} value={profiles.active} onchange={chooseProfile} />
+	<Section title={t('settings-power-mode')}>
+		<Row title={t('settings-power-mode-row')} description={profileDescription} truncate>
+			<Segmented label={t('settings-power-mode')} options={profileOptions} value={profiles.active} onchange={chooseProfile} />
 		</Row>
 		{#if state?.battery}
-			<Row title="Power saver on low battery" description="Switches to power saver when the battery runs low">
+			<Row title={t('settings-power-saver-low-battery')} description={t('settings-power-saver-low-battery-description')}>
 				<Switch
-					label="Power saver on low battery"
+					label={t('settings-power-saver-low-battery')}
 					checked={power.values['power-saver-profile-on-low-battery'] ?? true}
 					onchange={(on) => power.set('power-saver-profile-on-low-battery', on)}
 				/>
@@ -124,33 +130,36 @@
 	<KeyboardSection keyboard={state.keyboard} />
 {/if}
 
-<Section title="Screen">
-	<Row title="Turn off the screen after" description="When you haven't used the computer for a while">
+<Section title={t('settings-power-screen')}>
+	<Row title={t('settings-power-screen-off')} description={t('settings-power-screen-off-description')}>
 		<Select
-			label="Turn off the screen after"
+			label={t('settings-power-screen-off')}
 			options={durationOptions(SCREEN_DELAYS, session.values['idle-delay'] ?? 0)}
 			value={session.values['idle-delay'] ?? 0}
 			onchange={(seconds) => session.set('idle-delay', seconds)}
 		/>
 	</Row>
-	<Row title="Dim when inactive" description="Lowers the brightness shortly before the screen turns off">
-		<Switch label="Dim when inactive" checked={power.values['idle-dim'] ?? true} onchange={(on) => power.set('idle-dim', on)} />
+	<Row title={t('settings-power-dim')} description={t('settings-power-dim-description')}>
+		<Switch label={t('settings-power-dim')} checked={power.values['idle-dim'] ?? true} onchange={(on) => power.set('idle-dim', on)} />
 	</Row>
 </Section>
 
-<Section title="Sleep">
-	<Row title={state?.battery ? 'Suspend when plugged in' : 'Suspend when inactive'} description="Puts the computer to sleep after a while without use">
+<Section title={t('settings-power-sleep')}>
+	<Row
+		title={state?.battery ? t('settings-power-suspend-plugged-in') : t('settings-power-suspend-inactive')}
+		description={t('settings-power-suspend-description')}
+	>
 		<Select
-			label="Suspend when plugged in"
+			label={state?.battery ? t('settings-power-suspend-plugged-in') : t('settings-power-suspend-inactive')}
 			options={durationOptions(SUSPEND_DELAYS, suspendDelay('ac'))}
 			value={suspendDelay('ac')}
 			onchange={(seconds) => setSuspendDelay('ac', seconds)}
 		/>
 	</Row>
 	{#if state?.battery}
-		<Row title="Suspend on battery">
+		<Row title={t('settings-power-suspend-battery')}>
 			<Select
-				label="Suspend on battery"
+				label={t('settings-power-suspend-battery')}
 				options={durationOptions(SUSPEND_DELAYS, suspendDelay('battery'))}
 				value={suspendDelay('battery')}
 				onchange={(seconds) => setSuspendDelay('battery', seconds)}
@@ -158,9 +167,9 @@
 		</Row>
 		<LongSleep />
 	{/if}
-	<Row title="Power button">
+	<Row title={t('settings-power-button')}>
 		<Select
-			label="Power button"
+			label={t('settings-power-button')}
 			options={buttonActions}
 			value={power.values['power-button-action'] ?? 'interactive'}
 			onchange={(action) => power.set('power-button-action', action)}

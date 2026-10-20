@@ -5,6 +5,7 @@
 	import Plus from '@lucide/svelte/icons/plus';
 	import Terminal from '@lucide/svelte/icons/terminal';
 	import Trash from '@lucide/svelte/icons/trash';
+	import { t } from '@luft/i18n';
 	import { ago, IconButton, Row, Section, Switch } from '@luft/ui';
 	import { problem, publicKey, removeKey, setConfirm, type Ssh, type SshKey } from '../api';
 	import AddKeyDialog from './AddKeyDialog.svelte';
@@ -25,8 +26,9 @@
 	let sorted = $derived([...ssh.keys].sort((a, b) => b.added - a.added));
 	let environment = $derived(`SSH_AUTH_SOCK=${ssh.socket}`);
 
-	const label = (key: SshKey) => key.name || 'Unnamed key';
-	const details = (key: SshKey) => [kind(key.kind), key.chip && 'Kept in the security chip', `Added ${ago(key.added)}`].filter(Boolean).join(' · ');
+	const label = (key: SshKey) => key.name || t('settings-passwords-ssh-unnamed');
+	const details = (key: SshKey) =>
+		[kind(key.kind), key.chip && t('settings-passwords-ssh-in-chip'), t('settings-passwords-ssh-added', { when: ago(key.added) })].filter(Boolean).join(' · ');
 
 	async function copy(id: string, text: () => Promise<string>) {
 		runner.error = '';
@@ -48,20 +50,20 @@
 	}
 </script>
 
-<Section title="SSH keys" description="Keys for signing in to servers, kept safe in your keyring.">
+<Section title={t('settings-passwords-ssh')} description={t('settings-passwords-ssh-description')}>
 	{#each sorted as key (key.fingerprint)}
 		<Row title={label(key)} description={details(key)} icon={KeyRound} truncate>
 			<IconButton
 				icon={copied === key.fingerprint ? Check : Copy}
-				label="Copy the public key of {label(key)}"
+				label={t('settings-passwords-ssh-copy', { name: label(key) })}
 				onclick={() => copy(key.fingerprint, () => publicKey(key.fingerprint))}
 			/>
-			<IconButton icon={Trash} label="Remove {label(key)}" onclick={() => (removing = key)} />
+			<IconButton icon={Trash} label={t('settings-passwords-ssh-remove', { name: label(key) })} onclick={() => (removing = key)} />
 			{#snippet below()}
 				<div class="flex items-center gap-3 pl-[34px]">
-					<span class="flex-1 text-[13px] text-[var(--text-soft)]">Ask before each use</span>
+					<span class="flex-1 text-[13px] text-[var(--text-soft)]">{t('settings-passwords-ssh-confirm')}</span>
 					<Switch
-						label="Ask before each use of {label(key)}"
+						label={t('settings-passwords-ssh-confirm-label', { name: label(key) })}
 						checked={key.confirm}
 						disabled={runner.busy}
 						onchange={(confirm) => runner.run(() => setConfirm(key.fingerprint, confirm))}
@@ -70,10 +72,10 @@
 			{/snippet}
 		</Row>
 	{/each}
-	<Row title="Add a key" icon={Plus} onclick={() => (adding = true)} />
+	<Row title={t('settings-passwords-ssh-add-row')} icon={Plus} onclick={() => (adding = true)} />
 	{#if ssh.socket}
-		<Row title="Use these keys with SSH" description="Copy the line that points SSH at them" icon={Terminal}>
-			<IconButton icon={copied === 'socket' ? Check : Copy} label="Copy {environment}" onclick={() => copy('socket', async () => `export ${environment}`)} />
+		<Row title={t('settings-passwords-ssh-use')} description={t('settings-passwords-ssh-use-description')} icon={Terminal}>
+			<IconButton icon={copied === 'socket' ? Check : Copy} label={t('settings-passwords-ssh-copy-line', { line: environment })} onclick={() => copy('socket', async () => `export ${environment}`)} />
 		</Row>
 	{/if}
 </Section>
@@ -89,11 +91,9 @@
 {#if removing}
 	{@const key = removing}
 	<ConfirmDialog
-		title="Remove “{label(key)}”?"
-		description={key.chip
-			? 'It only exists in this computer’s security chip, so it’s gone for good. Servers that only accept this key won’t let you in with it anymore.'
-			: 'Servers that only accept this key won’t let you in with it anymore. This can’t be undone.'}
-		action="Remove"
+		title={t('settings-passwords-ssh-remove-title', { name: label(key) })}
+		description={key.chip ? t('settings-passwords-ssh-remove-chip') : t('settings-passwords-ssh-remove-description')}
+		action={t('settings-protection-remove')}
 		run={() => remove(key)}
 		onclose={() => (removing = null)}
 	/>

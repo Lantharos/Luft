@@ -1,12 +1,14 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
+use luft_i18n::t;
 use serde::Serialize;
 
 use super::archive::{self, Format};
 use super::download::download;
 use super::installed::{UserThemes, only_cursors};
 use super::{store, themes};
+use crate::L10N;
 
 const MAX_SEARCH_DEPTH: usize = 6;
 
@@ -81,7 +83,7 @@ fn unpack_themes(
     let mut found = Vec::new();
     find_themes(&unpacked, 0, &mut found);
     if found.is_empty() {
-        return Err("This download doesn't include a cursor theme for Linux".into());
+        return Err(t!(L10N, "desktop-cursors-no-linux-theme"));
     }
     found
         .iter()
@@ -91,7 +93,7 @@ fn unpack_themes(
             } else {
                 theme
                     .file_name()
-                    .ok_or("This theme has no name")?
+                    .ok_or_else(|| t!(L10N, "desktop-cursors-theme-unnamed"))?
                     .to_string_lossy()
                     .into_owned()
             };
@@ -103,7 +105,7 @@ fn unpack_themes(
 pub fn install(id: u64, file: u32, report: &impl Fn(Progress)) -> Result<Vec<String>, String> {
     let (link, file_name) = store::download_link(id, file)?;
     let format =
-        Format::of(&file_name).ok_or("This download isn't an archive Settings can open")?;
+        Format::of(&file_name).ok_or_else(|| t!(L10N, "desktop-cursors-not-an-archive"))?;
     let user = UserThemes::new()?;
     let staging = staging(&user, &format!("{id}-{file}"))?;
     let archive_path = staging.0.join("download");

@@ -59,6 +59,30 @@ function forgetUnlessJoined(activeConnection) {
     settle();
 }
 
+const DEVICE_KINDS = new Map([
+    [NM.DeviceType.ETHERNET, 'network-device-wired'],
+    [NM.DeviceType.WIFI, 'network-menu-wifi'],
+    [NM.DeviceType.BT, 'network-menu-tether'],
+    [NM.DeviceType.MODEM, 'network-menu-mobile'],
+]);
+
+function deviceKind(device) {
+    const id = DEVICE_KINDS.get(device?.device_type);
+    return id ? KestrelUi.t(id) : device?.get_iface() ?? '';
+}
+
+function deviceNames(devices) {
+    const kinds = devices.map(deviceKind);
+    return devices.map((device, i) => kinds.indexOf(kinds[i]) === kinds.lastIndexOf(kinds[i])
+        ? kinds[i]
+        : KestrelUi.t('network-device-named', {kind: kinds[i], name: device.get_iface()}));
+}
+
+function connectionName(connection, fallback) {
+    const generated = connection.get_flags() & NM.SettingsConnectionFlags.NM_GENERATED;
+    return generated ? fallback : connection.get_id();
+}
+
 function ssidToLabel(ssid) {
     let label = NM.utils_ssid_to_utf8(ssid.get_data());
     if (!label)
@@ -403,7 +427,7 @@ const NMDeviceConnectionItem = GObject.registerClass({
 
     get name() {
         return this.radioMode
-            ?  this._connection.get_id()
+            ? connectionName(this._connection, this.deviceName)
             : this.deviceName;
     }
 });
@@ -1154,7 +1178,7 @@ const NMWirelessDeviceItem = GObject.registerClass({
         // Use connection name when connected to hidden AP
         const {activeConnection} = this._device;
         if (activeConnection)
-            return activeConnection.connection.get_id();
+            return connectionName(activeConnection.connection, this._deviceName);
 
         return this._deviceName;
     }
@@ -1658,8 +1682,12 @@ class NMDeviceToggle extends NMToggle {
 
     _getDefaultName() {
         const [dev] = this._nmDevices;
-        const [name] = NM.Device.disambiguate_names([dev]);
-        return name;
+        return deviceKind(dev);
+    }
+
+    _refreshLabels() {
+        this._syncDeviceNames();
+        super._refreshLabels();
     }
 
     _transformSubtitle(source) {
@@ -1698,7 +1726,7 @@ class NMDeviceToggle extends NMToggle {
 
     _syncDeviceNames() {
         const devices = [...this._nmDevices];
-        const names = NM.Device.disambiguate_names(devices);
+        const names = deviceNames(devices);
         this._deviceNames.clear();
         devices.forEach(
             (dev, i) => {
@@ -2150,8 +2178,9 @@ class Indicator extends SystemIndicator {
             isPortal ||= this._client.connectivity < NM.ConnectivityState.FULL;
 
         if (isPortal) {
+            const [device] = this._mainConnection.get_devices();
             this._portalHandler.addConnection(
-                this._mainConnection.get_id(),
+                connectionName(this._mainConnection.connection, deviceKind(device)),
                 this._mainConnection.get_path());
         } else {
             this._portalHandler.clear();

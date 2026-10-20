@@ -159,6 +159,10 @@ network-menu-mobile-open-menu = Open mobile connections menu
 network-menu-mobile-settings = Mobile Broadband Settings
 # Quick settings tile title, "Mobile" as in "Mobile Broadband"
 network-menu-mobile = Mobile
+# Quick settings tile title and menu item for a wired network adapter
+network-device-wired = Wired
+# A network adapter when there are several of the same kind. $kind is its kind, such as Wired; $name is its interface name, such as enp3s0
+network-device-named = { $kind } ({ $name })
 # Notification title shown when a network needs signing in on a web page
 network-menu-sign-in = Sign in to Network
 network-menu-failed-title = Connection failed

@@ -7,6 +7,8 @@ use crate::system::procfile::unescape_hex;
 
 const CHROMIUM_SCOPE: &str = "org.chromium.Chromium";
 const PSEUDO: &str = "unit:";
+const SABINE_RUNTIME_UNIT: &str = "sabine-runtime@";
+const SABINE_RUNTIME: &str = "sabine:runtime";
 
 #[derive(Serialize, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -95,6 +97,26 @@ impl Apps {
         });
         self.keys.insert(id.to_owned(), key.clone());
         key
+    }
+
+    /// The browser, GPU and network processes of the Chromium Sabine apps
+    /// share, whose pages count toward the apps that opened them.
+    pub fn sabine_runtime(&mut self, cgroup: &str) -> Option<String> {
+        cgroup
+            .rsplit('/')
+            .next()?
+            .strip_prefix(SABINE_RUNTIME_UNIT)?
+            .ends_with(".service")
+            .then(|| {
+                self.infos
+                    .entry(SABINE_RUNTIME.to_owned())
+                    .or_insert_with(|| AppInfo {
+                        key: SABINE_RUNTIME.to_owned(),
+                        name: "Sabine".to_owned(),
+                        icon: None,
+                    });
+                SABINE_RUNTIME.to_owned()
+            })
     }
 
     pub fn pseudo(&mut self, id: &str) -> String {

@@ -67,6 +67,9 @@ impl Scopes {
     }
 
     fn resolve(&mut self, name: &str, depth: usize) -> Option<String> {
+        if let Some(runtime) = self.apps.sabine_runtime(name) {
+            return Some(runtime);
+        }
         let unit = Unit::parse(name)?;
         if !unit.chromium()
             && let Some(app) = self.apps.resolve(&unit.id)

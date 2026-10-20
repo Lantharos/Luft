@@ -23,19 +23,19 @@ ApplyMonitorsConfig, SetBacklight and PowerSaveMode, refuse sandboxed
 callers. Property writes bypass method authorization, so a skeleton
 subclass checks them before the generated setter runs.
 ---
- src/backends/meta-dbus-access-checker.c     |  38 +++++++
- src/backends/meta-dbus-access-checker.h     |   3 +
- src/backends/meta-dbus-session-manager.c    |  44 ++++++++
- src/backends/meta-display-config-skeleton.c | 105 ++++++++++++++++++++
- src/backends/meta-display-config-skeleton.h |  12 +++
- src/backends/meta-monitor-manager.c         |   3 +-
+ src/backends/meta-dbus-access-checker.c     |  39 +++++++
+ src/backends/meta-dbus-access-checker.h     |   4 +
+ src/backends/meta-dbus-session-manager.c    |  45 ++++++++
+ src/backends/meta-display-config-skeleton.c | 113 ++++++++++++++++++++
+ src/backends/meta-display-config-skeleton.h |  13 +++
+ src/backends/meta-monitor-manager.c         |   4 +-
  src/meson.build                             |   2 +
- 7 files changed, 206 insertions(+), 1 deletion(-)
+ 7 files changed, 219 insertions(+), 1 deletion(-)
  create mode 100644 src/backends/meta-display-config-skeleton.c
  create mode 100644 src/backends/meta-display-config-skeleton.h
 
 diff --git a/src/backends/meta-dbus-access-checker.c b/src/backends/meta-dbus-access-checker.c
-index 0ace12607751be46508a315b9788c4ebd5fb791e..525cfd4e31c4a42526b3cfedbed8e6283142e6d5 100644
+index 0ace12607751be46508a315b9788c4ebd5fb791e..3b9e942c83d5bb87887dfa39d2de84b18fa92a9f 100644
 --- a/src/backends/meta-dbus-access-checker.c
 +++ b/src/backends/meta-dbus-access-checker.c
 @@ -21,7 +21,11 @@
@@ -50,13 +50,14 @@ index 0ace12607751be46508a315b9788c4ebd5fb791e..525cfd4e31c4a42526b3cfedbed8e628
  
  enum
  {
-@@ -210,3 +214,37 @@ meta_dbus_access_checker_is_sender_allowed (MetaDbusAccessChecker *self,
+@@ -210,3 +214,38 @@ meta_dbus_access_checker_is_sender_allowed (MetaDbusAccessChecker *self,
  
    return FALSE;
  }
 +
 +gboolean
-+meta_dbus_sender_is_unsandboxed (GDBusConnection *connection,
++meta_dbus_sender_is_unsandboxed (MetaContext     *context,
++                                 GDBusConnection *connection,
 +                                 const char      *sender_name)
 +{
 +  g_autoptr (GUnixFDList) fd_list = NULL;
@@ -86,21 +87,22 @@ index 0ace12607751be46508a315b9788c4ebd5fb791e..525cfd4e31c4a42526b3cfedbed8e628
 +    return FALSE;
 +
 +  pidfd = g_unix_fd_list_get (fd_list, pidfd_handle, NULL);
-+  return pidfd >= 0 && meta_process_is_unsandboxed (pidfd, pid);
++  return pidfd >= 0 && meta_process_is_unsandboxed (context, pidfd, pid);
 +}
 diff --git a/src/backends/meta-dbus-access-checker.h b/src/backends/meta-dbus-access-checker.h
-index acbb942c0c54ad74fe394f76f3a8137733f2cc90..4f96c041d42b6755ee6e340efe40efe4b2ebe70d 100644
+index acbb942c0c54ad74fe394f76f3a8137733f2cc90..64a1a2fe8ef534ec584d398da37b80743b90be60 100644
 --- a/src/backends/meta-dbus-access-checker.h
 +++ b/src/backends/meta-dbus-access-checker.h
-@@ -37,3 +37,6 @@ void meta_dbus_access_checker_allow_sender (MetaDbusAccessChecker *self,
+@@ -37,3 +37,7 @@ void meta_dbus_access_checker_allow_sender (MetaDbusAccessChecker *self,
  
  gboolean meta_dbus_access_checker_is_sender_allowed (MetaDbusAccessChecker *self,
                                                       const char            *sender_name);
 +
-+gboolean meta_dbus_sender_is_unsandboxed (GDBusConnection *connection,
++gboolean meta_dbus_sender_is_unsandboxed (MetaContext     *context,
++                                          GDBusConnection *connection,
 +                                          const char      *sender_name);
 diff --git a/src/backends/meta-dbus-session-manager.c b/src/backends/meta-dbus-session-manager.c
-index 3944bca391936fadcf020452937a533b82467773..eb5b353fee02716ccc4d333c882d64c4f92de110 100644
+index 3944bca391936fadcf020452937a533b82467773..655c0084781b86d698d87a2f7c83211aeef63dab 100644
 --- a/src/backends/meta-dbus-session-manager.c
 +++ b/src/backends/meta-dbus-session-manager.c
 @@ -23,8 +23,12 @@
@@ -125,7 +127,7 @@ index 3944bca391936fadcf020452937a533b82467773..eb5b353fee02716ccc4d333c882d64c4
  
    gboolean is_enabled;
  
-@@ -107,10 +113,38 @@ meta_dbus_session_manager_finalize (GObject *object)
+@@ -107,10 +113,39 @@ meta_dbus_session_manager_finalize (GObject *object)
    g_clear_pointer (&priv->service_path, g_free);
  
    g_clear_object (&priv->interface_skeleton);
@@ -150,7 +152,8 @@ index 3944bca391936fadcf020452937a533b82467773..eb5b353fee02716ccc4d333c882d64c4
 +    return TRUE;
 +
 +  if (meta_dbus_access_checker_is_sender_allowed (priv->screencast_checker, sender) &&
-+      meta_dbus_sender_is_unsandboxed (g_dbus_method_invocation_get_connection (invocation),
++      meta_dbus_sender_is_unsandboxed (meta_backend_get_context (priv->backend),
++                                       g_dbus_method_invocation_get_connection (invocation),
 +                                       sender))
 +    return TRUE;
 +
@@ -164,7 +167,7 @@ index 3944bca391936fadcf020452937a533b82467773..eb5b353fee02716ccc4d333c882d64c4
  static void
  on_bus_acquired (GDBusConnection *connection,
                   const char      *name,
-@@ -120,8 +154,18 @@ on_bus_acquired (GDBusConnection *connection,
+@@ -120,8 +155,18 @@ on_bus_acquired (GDBusConnection *connection,
      META_DBUS_SESSION_MANAGER (user_data);
    MetaDbusSessionManagerPrivate *priv =
      meta_dbus_session_manager_get_instance_private (session_manager);
@@ -185,10 +188,10 @@ index 3944bca391936fadcf020452937a533b82467773..eb5b353fee02716ccc4d333c882d64c4
                priv->service_name, priv->service_path);
 diff --git a/src/backends/meta-display-config-skeleton.c b/src/backends/meta-display-config-skeleton.c
 new file mode 100644
-index 0000000000000000000000000000000000000000..35e46a6e912ae75be82f020bfe289ed6aa4de0d1
+index 0000000000000000000000000000000000000000..7a106e709e5cf45029436de75e0b18d9a0d0b7e8
 --- /dev/null
 +++ b/src/backends/meta-display-config-skeleton.c
-@@ -0,0 +1,105 @@
+@@ -0,0 +1,113 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
 +#include "config.h"
 +
@@ -202,6 +205,7 @@ index 0000000000000000000000000000000000000000..35e46a6e912ae75be82f020bfe289ed6
 +{
 +  MetaDBusDisplayConfigSkeleton parent;
 +
++  MetaContext *context;
 +  GDBusInterfaceVTable vtable;
 +  GDBusInterfaceSetPropertyFunc set_property;
 +};
@@ -223,9 +227,12 @@ index 0000000000000000000000000000000000000000..35e46a6e912ae75be82f020bfe289ed6
 +authorize_method (GDBusInterfaceSkeleton *interface_skeleton,
 +                  GDBusMethodInvocation  *invocation)
 +{
++  MetaDisplayConfigSkeleton *skeleton = META_DISPLAY_CONFIG_SKELETON (interface_skeleton);
++
 +  if (!g_strv_contains (display_changing_methods,
 +                        g_dbus_method_invocation_get_method_name (invocation)) ||
-+      meta_dbus_sender_is_unsandboxed (g_dbus_method_invocation_get_connection (invocation),
++      meta_dbus_sender_is_unsandboxed (skeleton->context,
++                                       g_dbus_method_invocation_get_connection (invocation),
 +                                       g_dbus_method_invocation_get_sender (invocation)))
 +    return TRUE;
 +
@@ -248,7 +255,7 @@ index 0000000000000000000000000000000000000000..35e46a6e912ae75be82f020bfe289ed6
 +{
 +  MetaDisplayConfigSkeleton *skeleton = META_DISPLAY_CONFIG_SKELETON (user_data);
 +
-+  if (!meta_dbus_sender_is_unsandboxed (connection, sender))
++  if (!meta_dbus_sender_is_unsandboxed (skeleton->context, connection, sender))
 +    {
 +      g_set_error_literal (error, G_DBUS_ERROR, G_DBUS_ERROR_ACCESS_DENIED,
 +                           ACCESS_DENIED_MESSAGE);
@@ -290,20 +297,25 @@ index 0000000000000000000000000000000000000000..35e46a6e912ae75be82f020bfe289ed6
 +}
 +
 +MetaDBusDisplayConfig *
-+meta_display_config_skeleton_new (void)
++meta_display_config_skeleton_new (MetaContext *context)
 +{
-+  return g_object_new (META_TYPE_DISPLAY_CONFIG_SKELETON, NULL);
++  MetaDisplayConfigSkeleton *skeleton =
++    g_object_new (META_TYPE_DISPLAY_CONFIG_SKELETON, NULL);
++
++  skeleton->context = context;
++  return META_DBUS_DISPLAY_CONFIG (skeleton);
 +}
 diff --git a/src/backends/meta-display-config-skeleton.h b/src/backends/meta-display-config-skeleton.h
 new file mode 100644
-index 0000000000000000000000000000000000000000..37f21432bc7f474151a97f085b6322e875c2747b
+index 0000000000000000000000000000000000000000..29c903528d51f5dd4855ae396c4933c162954d32
 --- /dev/null
 +++ b/src/backends/meta-display-config-skeleton.h
-@@ -0,0 +1,12 @@
+@@ -0,0 +1,13 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
 +#pragma once
 +
 +#include "meta-dbus-display-config.h"
++#include "meta/types.h"
 +
 +#define META_TYPE_DISPLAY_CONFIG_SKELETON (meta_display_config_skeleton_get_type ())
 +G_DECLARE_FINAL_TYPE (MetaDisplayConfigSkeleton,
@@ -311,9 +323,9 @@ index 0000000000000000000000000000000000000000..37f21432bc7f474151a97f085b6322e8
 +                      META, DISPLAY_CONFIG_SKELETON,
 +                      MetaDBusDisplayConfigSkeleton)
 +
-+MetaDBusDisplayConfig * meta_display_config_skeleton_new (void);
++MetaDBusDisplayConfig * meta_display_config_skeleton_new (MetaContext *context);
 diff --git a/src/backends/meta-monitor-manager.c b/src/backends/meta-monitor-manager.c
-index 6aa88fc65cb5747350d1b22b4e31546e3518bcfe..ee8218c0010597f3694f25172083f4418869be8d 100644
+index 6aa88fc65cb5747350d1b22b4e31546e3518bcfe..4945ed209e94a934e0f846678246e4ec3220c48a 100644
 --- a/src/backends/meta-monitor-manager.c
 +++ b/src/backends/meta-monitor-manager.c
 @@ -49,6 +49,7 @@
@@ -324,12 +336,13 @@ index 6aa88fc65cb5747350d1b22b4e31546e3518bcfe..ee8218c0010597f3694f25172083f441
  #include "backends/meta-logical-monitor-private.h"
  #include "backends/meta-monitor-private.h"
  #include "backends/meta-monitor-config-manager.h"
-@@ -1448,7 +1449,7 @@ meta_monitor_manager_constructed (GObject *object)
+@@ -1448,7 +1449,8 @@ meta_monitor_manager_constructed (GObject *object)
  
    G_OBJECT_CLASS (meta_monitor_manager_parent_class)->constructed (object);
  
 -  manager->display_config = meta_dbus_display_config_skeleton_new ();
-+  manager->display_config = meta_display_config_skeleton_new ();
++  manager->display_config =
++    meta_display_config_skeleton_new (meta_backend_get_context (manager->backend));
  
    g_signal_connect_object (settings,
                             "privacy-screen-changed",

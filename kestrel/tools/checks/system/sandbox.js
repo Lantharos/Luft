@@ -3,10 +3,11 @@ import GLib from 'gi://GLib';
 import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {checks} from '../lib/check.js';
+import {withFullAccess} from '../lib/fullAccess.js';
 import {call, ownName, subscribe} from '../lib/dbus.js';
 import {pause} from '../lib/wait.js';
 import {lock, unlock} from '../lockScreen/lib/shield.js';
-import {sandboxedApp} from './lib/sandbox.js';
+import {SANDBOXED_APP, sandboxedApp} from './lib/sandbox.js';
 
 const {require, eventually} = checks('sandbox');
 const MANAGER = ['/org/gnome/SessionManager', 'org.gnome.SessionManager'];
@@ -162,11 +163,37 @@ async function checkScreencastImpostor() {
   }
 }
 
+async function refusedAsSandboxed(reply) {
+  try {
+    await reply;
+    return false;
+  } catch (error) {
+    return error.message.includes('Sandboxed apps');
+  }
+}
+
+async function checkFullAccess() {
+  const app = await sandboxedApp('org.gnome.Shell');
+  const dim = () => refusedAsSandboxed(app.call('/com/lantharos/Kestrel/Brightness', 'com.lantharos.Kestrel.Brightness', 'SetDimming', new GLib.Variant('(b)', [false])));
+  const arrange = () => refusedAsSandboxed(app.call('/org/gnome/Mutter/DisplayConfig', 'org.gnome.Mutter.DisplayConfig', 'ApplyMonitorsConfig',
+    new GLib.Variant('(uua(iiduba(ssa{sv}))a{sv})', [0, 0, [], {}])));
+  try {
+    await withFullAccess(SANDBOXED_APP, async () => {
+      require(!await dim(), 'apps with full access use Kestrel\'s services like apps outside a sandbox');
+      require(!await arrange(), 'apps with full access reach display settings like apps outside a sandbox');
+    });
+    require(await dim() && await arrange(), 'taking full access away refuses the app again');
+  } finally {
+    await app.close();
+  }
+}
+
 export async function run() {
   await checkSessionManager();
   await checkShellConnection();
   await checkScreenSaver();
   await checkTray();
   await checkMutter();
+  await checkFullAccess();
   await checkScreencastImpostor();
 }

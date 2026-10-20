@@ -67,4 +67,22 @@
       <arg name="step" type="s"/>
     </signal>
   </interface>
+
+  <!--
+    Flatpak apps with full access, kept one app ID per line in /etc/kestrel/trusted-apps. Kestrel,
+    Schelf and Luft's services treat them like apps installed on the system. Trust and Untrust need
+    com.lantharos.updater.trust-app and refuse anything that isn't a Flatpak app ID. List needs
+    nothing.
+  -->
+  <interface name="com.lantharos.Updater1.TrustedApps">
+    <method name="List">
+      <arg name="app_ids" type="as" direction="out"/>
+    </method>
+    <method name="Trust">
+      <arg name="app_id" type="s" direction="in"/>
+    </method>
+    <method name="Untrust">
+      <arg name="app_id" type="s" direction="in"/>
+    </method>
+  </interface>
 </node>

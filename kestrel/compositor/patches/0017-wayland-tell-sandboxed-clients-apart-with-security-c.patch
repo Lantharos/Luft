@@ -16,19 +16,29 @@ process inside a mount namespace of its own does. Clients that cannot be
 verified, because the process already exited or its mounts cannot be
 read, count as sandboxed.
 
+Flatpak apps given full access count as unsandboxed. Their app IDs are
+listed one per line in /etc/kestrel/trusted-apps, a file only root can
+change, which is watched and read again when it changes. A connection
+through a Flatpak security context with a listed app ID, and a process
+whose Flatpak info names a listed app, are unsandboxed.
+meta_context_is_app_trusted() lets the shell ask the same. Headless
+sessions read the list from $KESTREL_TRUSTED_APPS instead when it is
+set, so checks can change it.
+
 Only unsandboxed clients see the manager, so sandboxed apps can neither
 nest security contexts nor claim another app's ID. Protocols that should
 stay out of sandboxes filter their globals with
 meta_wayland_filter_unsandboxed().
 ---
- src/core/meta-sandbox.c             |  34 +++
- src/core/meta-sandbox.h             |   8 +
+ src/core/meta-sandbox.c             | 175 ++++++++++++
+ src/core/meta-sandbox.h             |  11 +
  src/meson.build                     |   5 +
- src/wayland/meta-wayland-sandbox.c  | 414 ++++++++++++++++++++++++++++
+ src/meta/meta-context.h             |   4 +
+ src/wayland/meta-wayland-sandbox.c  | 427 ++++++++++++++++++++++++++++
  src/wayland/meta-wayland-sandbox.h  |  18 ++
  src/wayland/meta-wayland-versions.h |   1 +
  src/wayland/meta-wayland.c          |   2 +
- 7 files changed, 482 insertions(+)
+ 8 files changed, 643 insertions(+)
  create mode 100644 src/core/meta-sandbox.c
  create mode 100644 src/core/meta-sandbox.h
  create mode 100644 src/wayland/meta-wayland-sandbox.c
@@ -36,20 +46,134 @@ meta_wayland_filter_unsandboxed().
 
 diff --git a/src/core/meta-sandbox.c b/src/core/meta-sandbox.c
 new file mode 100644
-index 0000000000000000000000000000000000000000..add2a9e60999ec0cb57f24133b425aa2e40d5421
+index 0000000000000000000000000000000000000000..b2883a224068ccb0daf4838fdad18199c1da05a0
 --- /dev/null
 +++ b/src/core/meta-sandbox.c
-@@ -0,0 +1,34 @@
+@@ -0,0 +1,175 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
 +#include "config.h"
 +
 +#include "core/meta-sandbox.h"
 +
 +#include <fcntl.h>
++#include <gio/gio.h>
 +#include <glib/gstdio.h>
 +#include <stdlib.h>
 +#include <sys/pidfd.h>
 +#include <unistd.h>
++
++#include "meta/meta-backend.h"
++#include "meta/meta-context.h"
++
++#define TRUSTED_APPS_PATH "/etc/kestrel/trusted-apps"
++#define TRUSTED_APPS_CHECK_PATH_VARIABLE "KESTREL_TRUSTED_APPS"
++#define TRUSTED_APPS_KEY "-meta-trusted-apps"
++
++typedef struct _TrustedApps
++{
++  char *path;
++  GFileMonitor *monitor;
++  GHashTable *app_ids;
++} TrustedApps;
++
++static void
++load_trusted_apps (TrustedApps *trusted)
++{
++  g_autofree char *contents = NULL;
++  g_auto (GStrv) lines = NULL;
++  char **line;
++
++  g_hash_table_remove_all (trusted->app_ids);
++  if (!g_file_get_contents (trusted->path, &contents, NULL, NULL))
++    return;
++
++  lines = g_strsplit (contents, "\n", -1);
++  for (line = lines; *line; line++)
++    {
++      g_strstrip (*line);
++      if (**line)
++        g_hash_table_add (trusted->app_ids, g_strdup (*line));
++    }
++}
++
++static void
++on_trusted_apps_changed (GFileMonitor      *monitor,
++                         GFile             *file,
++                         GFile             *other_file,
++                         GFileMonitorEvent  event,
++                         TrustedApps       *trusted)
++{
++  if (event != G_FILE_MONITOR_EVENT_CHANGED &&
++      event != G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED)
++    load_trusted_apps (trusted);
++}
++
++static void
++trusted_apps_free (TrustedApps *trusted)
++{
++  if (trusted->monitor)
++    g_signal_handlers_disconnect_by_data (trusted->monitor, trusted);
++  g_clear_object (&trusted->monitor);
++  g_hash_table_unref (trusted->app_ids);
++  g_free (trusted->path);
++  g_free (trusted);
++}
++
++static const char *
++trusted_apps_path (MetaContext *context)
++{
++  const char *check_path = g_getenv (TRUSTED_APPS_CHECK_PATH_VARIABLE);
++
++  if (check_path &&
++      meta_backend_is_headless (meta_context_get_backend (context)))
++    return check_path;
++
++  return TRUSTED_APPS_PATH;
++}
++
++static TrustedApps *
++trusted_apps_of (MetaContext *context)
++{
++  TrustedApps *trusted = g_object_get_data (G_OBJECT (context), TRUSTED_APPS_KEY);
++  g_autoptr (GFile) file = NULL;
++
++  if (trusted)
++    return trusted;
++
++  trusted = g_new0 (TrustedApps, 1);
++  trusted->path = g_strdup (trusted_apps_path (context));
++  trusted->app_ids = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
++
++  file = g_file_new_for_path (trusted->path);
++  trusted->monitor = g_file_monitor_file (file, G_FILE_MONITOR_NONE, NULL, NULL);
++  if (trusted->monitor)
++    {
++      g_signal_connect (trusted->monitor, "changed",
++                        G_CALLBACK (on_trusted_apps_changed), trusted);
++    }
++
++  load_trusted_apps (trusted);
++  g_object_set_data_full (G_OBJECT (context), TRUSTED_APPS_KEY, trusted,
++                          (GDestroyNotify) trusted_apps_free);
++  return trusted;
++}
++
++/**
++ * meta_context_is_app_trusted:
++ * @context: a #MetaContext
++ * @app_id: a Flatpak app ID
++ *
++ * Returns: whether the app was given full access, so it counts as unsandboxed
++ */
++gboolean
++meta_context_is_app_trusted (MetaContext *context,
++                             const char  *app_id)
++{
++  g_return_val_if_fail (META_IS_CONTEXT (context), FALSE);
++  g_return_val_if_fail (app_id, FALSE);
++
++  return g_hash_table_contains (trusted_apps_of (context)->app_ids, app_id);
++}
 +
 +static unsigned long
 +read_root_mount_id (const char *mountinfo)
@@ -63,31 +187,61 @@ index 0000000000000000000000000000000000000000..add2a9e60999ec0cb57f24133b425aa2
 +  return strtoul (line, NULL, 10);
 +}
 +
-+gboolean
-+meta_process_is_unsandboxed (int   pidfd,
-+                             pid_t pid)
++static char *
++flatpak_app_id_of (pid_t pid)
++{
++  g_autofree char *path = g_strdup_printf ("/proc/%d/root/.flatpak-info", pid);
++  g_autoptr (GKeyFile) info = g_key_file_new ();
++
++  if (!g_key_file_load_from_file (info, path, G_KEY_FILE_NONE, NULL))
++    return NULL;
++
++  return g_key_file_get_string (info, "Application", "name", NULL);
++}
++
++static gboolean
++shares_root_mount (pid_t pid)
 +{
 +  g_autofree char *mountinfo = g_strdup_printf ("/proc/%d/mountinfo", pid);
 +  unsigned long root_mount_id = read_root_mount_id ("/proc/self/mountinfo");
 +
-+  return root_mount_id != 0 &&
-+         read_root_mount_id (mountinfo) == root_mount_id &&
++  return root_mount_id != 0 && read_root_mount_id (mountinfo) == root_mount_id;
++}
++
++static gboolean
++runs_trusted_flatpak (MetaContext *context,
++                      pid_t        pid)
++{
++  g_autofree char *app_id = flatpak_app_id_of (pid);
++
++  return app_id && meta_context_is_app_trusted (context, app_id);
++}
++
++gboolean
++meta_process_is_unsandboxed (MetaContext *context,
++                             int          pidfd,
++                             pid_t        pid)
++{
++  return (shares_root_mount (pid) || runs_trusted_flatpak (context, pid)) &&
 +         pidfd_send_signal (pidfd, 0, NULL, 0) == 0;
 +}
 diff --git a/src/core/meta-sandbox.h b/src/core/meta-sandbox.h
 new file mode 100644
-index 0000000000000000000000000000000000000000..85b699d2d4e7e974a7fbbada3fad515b6147ac7c
+index 0000000000000000000000000000000000000000..4e6b6b23a162201b1e1b47bfdc75a19dbad544eb
 --- /dev/null
 +++ b/src/core/meta-sandbox.h
-@@ -0,0 +1,8 @@
+@@ -0,0 +1,11 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
 +#pragma once
 +
 +#include <glib.h>
 +#include <sys/types.h>
 +
-+gboolean meta_process_is_unsandboxed (int   pidfd,
-+                                      pid_t pid);
++#include "meta/types.h"
++
++gboolean meta_process_is_unsandboxed (MetaContext *context,
++                                      int          pidfd,
++                                      pid_t        pid);
 diff --git a/src/meson.build b/src/meson.build
 index bd726b0085107f71c56272551128b0ac693b4f46..a2bec5c5d450e8cda04b16648fe689b1386958a8 100644
 --- a/src/meson.build
@@ -118,12 +272,27 @@ index bd726b0085107f71c56272551128b0ac693b4f46..a2bec5c5d450e8cda04b16648fe689b1
    ['single-pixel-buffer', 'staging', 1, ],
    ['tablet', 'stable', 2, ],
    ['text-input', 'unstable', 3, ],
+diff --git a/src/meta/meta-context.h b/src/meta/meta-context.h
+index a9c7b53959cf0367a5d84d117f7cc35c67984f18..e3c33ccb525ffbc8e7dff5c746ad468faace2b86 100644
+--- a/src/meta/meta-context.h
++++ b/src/meta/meta-context.h
+@@ -33,6 +33,10 @@ MetaContext * meta_create_context (const char *name);
+ META_EXPORT
+ void meta_context_destroy (MetaContext *context);
+ 
++META_EXPORT
++gboolean meta_context_is_app_trusted (MetaContext *context,
++                                      const char  *app_id);
++
+ META_EXPORT
+ void meta_context_add_option_entries (MetaContext        *context,
+                                       const GOptionEntry *entries,
 diff --git a/src/wayland/meta-wayland-sandbox.c b/src/wayland/meta-wayland-sandbox.c
 new file mode 100644
-index 0000000000000000000000000000000000000000..48f3f19ed88c14a5835deec6874cca95f85de35f
+index 0000000000000000000000000000000000000000..0557ef9414317625c84c69f4d0fc2bce2fdc29cf
 --- /dev/null
 +++ b/src/wayland/meta-wayland-sandbox.c
-@@ -0,0 +1,414 @@
+@@ -0,0 +1,427 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
 +#include "config.h"
 +
@@ -135,6 +304,7 @@ index 0000000000000000000000000000000000000000..48f3f19ed88c14a5835deec6874cca95
 +#include <unistd.h>
 +
 +#include "core/meta-sandbox.h"
++#include "meta/meta-context.h"
 +#include "wayland/meta-wayland-private.h"
 +#include "wayland/meta-wayland-versions.h"
 +
@@ -159,6 +329,7 @@ index 0000000000000000000000000000000000000000..48f3f19ed88c14a5835deec6874cca95
 +
 +struct _MetaWaylandSandboxManager
 +{
++  MetaContext *context;
 +  struct wl_display *display;
 +  struct wl_listener client_created_listener;
 +  struct wl_listener display_destroy_listener;
@@ -225,7 +396,8 @@ index 0000000000000000000000000000000000000000..48f3f19ed88c14a5835deec6874cca95
 +}
 +
 +static gboolean
-+connected_from_outside_sandbox (struct wl_client *client)
++connected_from_outside_sandbox (MetaWaylandSandboxManager *manager,
++                                struct wl_client          *client)
 +{
 +  g_autofd int pidfd = -1;
 +  socklen_t length = sizeof (pidfd);
@@ -236,7 +408,16 @@ index 0000000000000000000000000000000000000000..48f3f19ed88c14a5835deec6874cca95
 +    return FALSE;
 +
 +  wl_client_get_credentials (client, &pid, NULL, NULL);
-+  return meta_process_is_unsandboxed (pidfd, pid);
++  return meta_process_is_unsandboxed (manager->context, pidfd, pid);
++}
++
++static gboolean
++is_trusted_flatpak (MetaWaylandSandboxManager *manager,
++                    ClientSandbox             *sandbox)
++{
++  return g_strcmp0 (sandbox->engine, FLATPAK_ENGINE) == 0 &&
++         sandbox->app_id &&
++         meta_context_is_app_trusted (manager->context, sandbox->app_id);
 +}
 +
 +static void
@@ -250,13 +431,13 @@ index 0000000000000000000000000000000000000000..48f3f19ed88c14a5835deec6874cca95
 +
 +  if (manager->accepting)
 +    {
-+      sandbox->sandboxed = TRUE;
 +      sandbox->engine = g_strdup (manager->accepting->engine);
 +      sandbox->app_id = g_strdup (manager->accepting->app_id);
++      sandbox->sandboxed = !is_trusted_flatpak (manager, sandbox);
 +    }
 +  else
 +    {
-+      sandbox->sandboxed = !connected_from_outside_sandbox (client);
++      sandbox->sandboxed = !connected_from_outside_sandbox (manager, client);
 +    }
 +
 +  sandbox->destroy_listener.notify = on_client_destroyed;
@@ -517,6 +698,7 @@ index 0000000000000000000000000000000000000000..48f3f19ed88c14a5835deec6874cca95
 +  struct wl_global *global;
 +
 +  manager = g_new0 (MetaWaylandSandboxManager, 1);
++  manager->context = meta_wayland_compositor_get_context (compositor);
 +  manager->display = compositor->wayland_display;
 +  wl_list_init (&manager->contexts);
 +

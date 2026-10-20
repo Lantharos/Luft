@@ -11,20 +11,18 @@ until they are replaced or destroyed. Setting no source clears the
 selection.
 
 This lets password managers copy a password and clear it again later
-without being focused. Clients that are not sandboxed can already read
-the clipboard through Xwayland, so they get the global. Sandboxed
-clients get it only when they connect through a Flatpak security context
-whose app ID is listed, one per line, in /etc/kestrel/clipboard-access-apps,
-or when that file is missing, when the app is 1Password, KeePassXC or
-Bitwarden. Apps cannot change that list from inside their sandbox, even
-with access to the settings database.
+without being focused. Clients that are not sandboxed, including Flatpak
+apps with full access, can already read the clipboard through Xwayland,
+so they get the global. Other sandboxed clients get it only when they
+connect through a Flatpak security context as 1Password, KeePassXC or
+Bitwarden.
 ---
  src/meson.build                         |   3 +
- src/wayland/meta-wayland-data-control.c | 521 ++++++++++++++++++++++++
+ src/wayland/meta-wayland-data-control.c | 499 ++++++++++++++++++++++++
  src/wayland/meta-wayland-data-control.h |   6 +
  src/wayland/meta-wayland-versions.h     |   1 +
  src/wayland/meta-wayland.c              |   2 +
- 5 files changed, 533 insertions(+)
+ 5 files changed, 511 insertions(+)
  create mode 100644 src/wayland/meta-wayland-data-control.c
  create mode 100644 src/wayland/meta-wayland-data-control.h
 
@@ -51,10 +49,10 @@ index ce589e3e21965d4ceeaa7f3343a7ef3a77363e0d..7e51861098aed187c1d45609340d8851
    ['fifo', 'staging', 1, ],
 diff --git a/src/wayland/meta-wayland-data-control.c b/src/wayland/meta-wayland-data-control.c
 new file mode 100644
-index 0000000000000000000000000000000000000000..846bc7356610794550fabd8f5bc55884c27bdfab
+index 0000000000000000000000000000000000000000..d8f5b3208a5bc6d2f3e0a2649e7dac69eae7af8c
 --- /dev/null
 +++ b/src/wayland/meta-wayland-data-control.c
-@@ -0,0 +1,521 @@
+@@ -0,0 +1,499 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
 +#include "config.h"
 +
@@ -75,9 +73,7 @@ index 0000000000000000000000000000000000000000..846bc7356610794550fabd8f5bc55884
 +
 +#include "ext-data-control-v1-server-protocol.h"
 +
-+#define BACKGROUND_ACCESS_APPS_PATH "/etc/kestrel/clipboard-access-apps"
-+
-+static const char * const default_background_access_apps[] = {
++static const char * const password_managers[] = {
 +  "com.onepassword.OnePassword",
 +  "org.keepassxc.KeePassXC",
 +  "com.bitwarden.desktop",
@@ -497,26 +493,6 @@ index 0000000000000000000000000000000000000000..846bc7356610794550fabd8f5bc55884
 +    }
 +}
 +
-+static gboolean
-+has_background_access (const char *app_id)
-+{
-+  g_autofree char *contents = NULL;
-+  g_auto (GStrv) lines = NULL;
-+  char **line;
-+
-+  if (!g_file_get_contents (BACKGROUND_ACCESS_APPS_PATH, &contents, NULL, NULL))
-+    return g_strv_contains (default_background_access_apps, app_id);
-+
-+  lines = g_strsplit (contents, "\n", -1);
-+  for (line = lines; *line; line++)
-+    {
-+      if (g_str_equal (g_strstrip (*line), app_id))
-+        return TRUE;
-+    }
-+
-+  return FALSE;
-+}
-+
 +static MetaWaylandAccess
 +data_control_filter (const struct wl_client *client,
 +                     const struct wl_global *global,
@@ -528,7 +504,7 @@ index 0000000000000000000000000000000000000000..846bc7356610794550fabd8f5bc55884
 +    return META_WAYLAND_ACCESS_ALLOWED;
 +
 +  app_id = meta_wayland_client_get_flatpak_app_id (client);
-+  if (app_id && has_background_access (app_id))
++  if (app_id && g_strv_contains (password_managers, app_id))
 +    return META_WAYLAND_ACCESS_ALLOWED;
 +
 +  return META_WAYLAND_ACCESS_DENIED;

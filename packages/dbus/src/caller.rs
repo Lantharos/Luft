@@ -1,4 +1,6 @@
-use std::ffi::CString;
+use std::ffi::{CStr, CString};
+use std::fs::File;
+use std::io::{ErrorKind, Read};
 use std::os::fd::{AsRawFd, FromRawFd, OwnedFd};
 
 use zbus::Connection;
@@ -6,7 +8,9 @@ use zbus::fdo::{self, DBusProxy};
 use zbus::message::Header;
 use zbus::names::BusName;
 
-const SANDBOX_INFO: &[u8] = b"root/.flatpak-info\0";
+use crate::trusted_apps;
+
+const SANDBOX_INFO: &CStr = c"root/.flatpak-info";
 
 fn process_folder(pid: u32) -> Option<OwnedFd> {
     let path = CString::new(format!("/proc/{pid}")).ok()?;
@@ -32,21 +36,31 @@ fn alive(pidfd: &zbus::OwnedFd) -> bool {
     sent == 0
 }
 
-fn may_be_sandboxed(folder: &OwnedFd) -> bool {
-    let mut status = std::mem::MaybeUninit::<libc::stat>::uninit();
-    let found = unsafe {
-        libc::fstatat(
+fn sandbox_info(folder: &OwnedFd) -> std::io::Result<String> {
+    let fd = unsafe {
+        libc::openat(
             folder.as_raw_fd(),
-            SANDBOX_INFO.as_ptr().cast(),
-            status.as_mut_ptr(),
-            0,
+            SANDBOX_INFO.as_ptr(),
+            libc::O_RDONLY | libc::O_NOFOLLOW | libc::O_CLOEXEC,
         )
     };
-    found == 0 || std::io::Error::last_os_error().raw_os_error() != Some(libc::ENOENT)
+    if fd < 0 {
+        return Err(std::io::Error::last_os_error());
+    }
+    let mut info = String::new();
+    unsafe { File::from_raw_fd(fd) }.read_to_string(&mut info)?;
+    Ok(info)
 }
 
-/// Refuses the call when it comes from an app in a Flatpak sandbox, or from
-/// a process the bus can't vouch for.
+fn sandboxed(folder: &OwnedFd) -> bool {
+    match sandbox_info(folder) {
+        Ok(info) => !trusted_apps::flatpak_app_id(&info).is_some_and(trusted_apps::is_trusted),
+        Err(error) => error.kind() != ErrorKind::NotFound,
+    }
+}
+
+/// Refuses the call when it comes from an app in a Flatpak sandbox that wasn't
+/// given full access, or from a process the bus can't vouch for.
 pub async fn refuse_sandboxed(connection: &Connection, header: &Header<'_>) -> fdo::Result<()> {
     let denied = || fdo::Error::AccessDenied("Sandboxed apps can't use this service.".into());
     let sender = header.sender().ok_or_else(denied)?;
@@ -59,7 +73,7 @@ pub async fn refuse_sandboxed(connection: &Connection, header: &Header<'_>) -> f
         .and_then(process_folder)
         .ok_or_else(denied)?;
     let current = credentials.process_fd().is_none_or(alive);
-    if current && !may_be_sandboxed(&folder) {
+    if current && !sandboxed(&folder) {
         Ok(())
     } else {
         Err(denied())

@@ -4,12 +4,12 @@ import GLib from 'gi://GLib';
 import {scratch, spawn, stop} from '../../lib/processes.js';
 import {waitUntil} from '../../lib/wait.js';
 
-const APP_ID = 'com.lantharos.KestrelChecks.Sandboxed';
+export const SANDBOXED_APP = 'com.lantharos.KestrelChecks.Sandboxed';
 
 function sandboxRoot() {
   const root = scratch('kestrel-sandbox');
   GLib.mkdir_with_parents(root, 0o700);
-  GLib.file_set_contents(GLib.build_filenamev([root, 'flatpak-info']), `[Application]\nname=${APP_ID}\n`);
+  GLib.file_set_contents(GLib.build_filenamev([root, 'flatpak-info']), `[Application]\nname=${SANDBOXED_APP}\n`);
   return root;
 }
 

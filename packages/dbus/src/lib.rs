@@ -1,6 +1,7 @@
 pub mod caller;
 pub mod objects;
 pub mod service;
+pub mod trusted_apps;
 
 use tokio::sync::OnceCell;
 use zbus::connection::Builder;

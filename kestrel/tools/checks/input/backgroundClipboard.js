@@ -4,6 +4,7 @@ import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 
 import {named, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
+import {withFullAccess} from '../lib/fullAccess.js';
 import {press} from '../lib/input.js';
 import {fixture, gjs, stop, waitForWindow} from '../lib/processes.js';
 import {bubblewrapped, launch, openSecurityContext, through} from '../lib/sandbox.js';
@@ -79,6 +80,15 @@ async function checkFlatpaks() {
     const untrusted = await startClient({socket: notes.socket});
     require(!untrusted.available, 'sandboxed apps cannot use the clipboard from the background');
     await stop(untrusted.process);
+
+    await withFullAccess(UNTRUSTED_APP, async () => {
+      const opened = await startClient({socket: notes.socket});
+      require(opened.available, 'apps with full access can use the clipboard from the background');
+      await stop(opened.process);
+    });
+    const closed = await startClient({socket: notes.socket});
+    require(!closed.available, 'taking full access away takes the clipboard away from the background again');
+    await stop(closed.process);
 
     const nested = await openSecurityContext(TRUSTED_APP, {socket: notes.socket});
     require(!nested.listening, 'sandboxed apps cannot open sockets that pass as another app');

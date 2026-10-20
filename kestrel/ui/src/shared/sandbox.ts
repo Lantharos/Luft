@@ -1,7 +1,11 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
+import type Meta from 'gi://Meta';
+import type Shell from 'gi://Shell';
 
 const decoder = new TextDecoder();
+
+type TrustingContext = Meta.Context & { is_app_trusted(appId: string): boolean };
 
 async function processOf(sender: string): Promise<number> {
   const reply = await Gio.DBus.session.call('org.freedesktop.DBus', '/org/freedesktop/DBus', 'org.freedesktop.DBus', 'GetConnectionUnixProcessID',
@@ -9,12 +13,23 @@ async function processOf(sender: string): Promise<number> {
   return (reply.deepUnpack() as [number])[0];
 }
 
-function inFlatpak(pid: number): boolean {
+function trusted(appId: string): boolean {
+  return ((global as unknown as Shell.Global).context as TrustingContext).is_app_trusted(appId);
+}
+
+function inUntrustedFlatpak(pid: number): boolean {
+  let contents: Uint8Array;
   try {
-    Gio.File.new_for_path(`/proc/${pid}/root/.flatpak-info`).query_info('standard::type', Gio.FileQueryInfoFlags.NONE, null);
-    return true;
+    [, contents] = Gio.File.new_for_path(`/proc/${pid}/root/.flatpak-info`).load_contents(null);
   } catch (error) {
     return !(error instanceof GLib.Error && error.matches(Gio.IOErrorEnum, Gio.IOErrorEnum.NOT_FOUND));
+  }
+  try {
+    const info = new GLib.KeyFile();
+    info.load_from_bytes(new GLib.Bytes(contents), GLib.KeyFileFlags.NONE);
+    return !trusted(info.get_string('Application', 'name'));
+  } catch {
+    return true;
   }
 }
 
@@ -27,7 +42,7 @@ function inSnap(pid: number): boolean {
 }
 
 export function sandboxedProcess(pid: number): boolean {
-  return inFlatpak(pid) || inSnap(pid);
+  return inUntrustedFlatpak(pid) || inSnap(pid);
 }
 
 export async function sandboxed(sender: string): Promise<boolean> {

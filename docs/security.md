@@ -106,6 +106,10 @@ It doesn't protect you when:
 - a trusted but vulnerable signed component is abused
 - memory is read physically while unlocked
 
+## Flatpak apps with full access
+
+Kestrel and Luft's services hold Flatpak apps to their sandbox: no background clipboard, no windows kept above others or out of the taskbar, no screen recording or display changes without the portal, and none of the shell's private services. Apps listed in `/etc/kestrel/trusted-apps` are treated like apps installed on the system instead, and Schelf also opens their sandbox for the account with a Flatpak override. The list belongs to root and changes only through the updater, after an administrator's password, so an app can't give itself full access, even one allowed to write to your home folder or settings. An app is recognised by the app ID Flatpak gives it, which an app inside a sandbox can't change. 1Password, KeePassXC and Bitwarden may use the clipboard in the background without full access.
+
 ## Passkeys
 
 [Luft Passkeys](../kestrel/passkeys/README.md) makes each private key inside the TPM when there is one, so it never leaves the chip; otherwise the keyring holds it and makes the signature itself. Passkeys never leave the computer and are never marked as backed up. Only `luft-passkeys` may use the Passkeys collection.

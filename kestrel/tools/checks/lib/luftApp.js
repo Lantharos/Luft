@@ -13,6 +13,7 @@ import {pause, settled, Timeout, waitUntil} from './wait.js';
 const FIRST_PAINT = 'browser.first_paint';
 const LIFECYCLE = /\blifecycle\.(active|suspended|frozen)\./;
 const LAUNCH_TIMEOUT = 30000;
+const SHOW_TIMEOUT = 5000;
 const LOG_LINES = 40;
 const SETTLE_TIMEOUT = 5000;
 const SETTLE_INTERVAL = 50;
@@ -123,14 +124,21 @@ export class LuftApp {
     return this._log.join('\n');
   }
 
+  get running() {
+    return !this._exited;
+  }
+
+  get residentMb() {
+    const [, status] = GLib.file_get_contents(`/proc/${this._process.get_identifier()}/status`);
+    return Number(/VmRSS:\s+(\d+)/.exec(new TextDecoder().decode(status))[1]) / 1024;
+  }
+
   async open() {
-    const started = GLib.get_monotonic_time();
     await this.waitUntil(() => this._painted || this._exited, `${this.name} paints`, LAUNCH_TIMEOUT);
     if (!this._painted) throw new Error(`${this.name} exited before it painted:\n${this.log}`);
-    this.window = global.get_window_actors().map(actor => actor.meta_window).find(window => window.get_wm_class() === this.id);
-    if (!this.window) throw new Error(`${this.name} painted without a window`);
+    this.window = await this.waitUntil(() => global.get_window_actors()
+      .find(actor => actor.mapped && actor.meta_window.get_wm_class() === this.id)?.meta_window, `${this.name} shows its window`, SHOW_TIMEOUT);
     this.window.activate(global.get_current_time());
-    return (GLib.get_monotonic_time() - started) / 1000;
   }
 
   at([x, y]) {

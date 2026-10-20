@@ -1,6 +1,7 @@
 {
 	"$schema": "./node_modules/wrangler/config-schema.json",
 	"name": "luft-site",
+	"account_id": "2e3bfcbc9512a7ab1ea3a9cb9a474b30",
 	"main": "./worker/index.ts",
 	"compatibility_date": "2026-10-17",
 	"routes": [{ "pattern": "luft.computer", "custom_domain": true }],

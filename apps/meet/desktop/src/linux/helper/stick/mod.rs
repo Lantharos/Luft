@@ -6,7 +6,6 @@ mod write;
 use std::path::Path;
 use std::process::Command;
 
-use super::machine;
 use crate::serving::Context;
 use crate::stick::copy::Room;
 use crate::stick::{Finished, Image, Sticks};
@@ -14,7 +13,6 @@ use crate::stick::{Finished, Image, Sticks};
 pub fn sticks(iso: Option<&Path>) -> Result<Sticks, String> {
     Ok(Sticks {
         sticks: list::sticks(iso)?,
-        variant: machine::variant(),
     })
 }
 

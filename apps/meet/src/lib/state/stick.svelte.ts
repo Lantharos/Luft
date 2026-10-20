@@ -1,6 +1,6 @@
 import { Failed, pickIso } from '#lib/api/meet.js';
 import * as api from '#lib/api/stick.js';
-import type { Edition, Finished, Offer, Room, Stick, Variant, Way } from '#lib/api/stick.js';
+import type { Finished, Offer, Room, Stick, Way } from '#lib/api/stick.js';
 import { session, type Failure, type Step } from '#lib/state/meet.svelte.js';
 
 const LOOK_EVERY = 2500;
@@ -11,10 +11,8 @@ export interface Made extends Finished {
 
 class StickState {
 	sticks = $state<Stick[] | null>(null);
-	variant = $state<Variant>('standard');
-	offers = $state<Offer[] | null>(null);
+	offer = $state<Offer | null>(null);
 	chosen = $state<string | null>(null);
-	edition = $state<Edition>('universal');
 	made = $state<Made | null>(null);
 	problem = $state<Failure | null>(null);
 	unavailable = $state<Failure | null>(null);
@@ -22,7 +20,6 @@ class StickState {
 	making = $state(false);
 
 	stick = $derived(this.sticks?.find((stick) => stick.id === this.chosen) ?? null);
-	offer = $derived(this.offers?.find((offer) => offer.edition === this.edition) ?? this.offers?.[0] ?? null);
 
 	private looking = false;
 	private offered = '';
@@ -48,9 +45,8 @@ class StickState {
 			const found = await api.sticks(this.iso());
 			this.problem = null;
 			this.sticks = found.sticks;
-			this.variant = found.variant;
 			if (!found.sticks.some((stick) => stick.id === this.chosen)) this.chosen = null;
-			await this.refreshOffers();
+			await this.refreshOffer();
 		} catch (error) {
 			console.error('Meet Luft couldn’t look for USB drives:', error);
 			this.problem = {
@@ -63,21 +59,20 @@ class StickState {
 		}
 	}
 
-	private async refreshOffers() {
-		const asked = JSON.stringify([$state.snapshot(session.source), this.variant]);
-		if (asked === this.offered && this.offers) return;
+	private async refreshOffer() {
+		const asked = JSON.stringify($state.snapshot(session.source));
+		if (asked === this.offered && this.offer) return;
 		this.offered = asked;
-		this.offers = null;
+		this.offer = null;
 		this.unavailable = null;
 		try {
-			const offers = await api.offers($state.snapshot(session.source), this.variant);
+			const offer = await api.offer($state.snapshot(session.source));
 			if (asked !== this.offered) return;
-			this.offers = offers;
-			if (!offers.some((offer) => offer.edition === this.edition)) this.edition = offers[0].edition;
+			this.offer = offer;
 		} catch (error) {
 			console.error('Luft can’t be downloaded right now:', error);
 			this.offered = '';
-			this.unavailable = { task: 'offers', declined: false, retry: () => this.look() };
+			this.unavailable = { task: 'offer', declined: false, retry: () => this.look() };
 		}
 	}
 
@@ -103,8 +98,6 @@ class StickState {
 	async make(stick: Stick, way: Way) {
 		const making = {
 			source: $state.snapshot(session.source),
-			edition: this.offer?.edition ?? 'universal',
-			variant: this.variant,
 			stick: stick.id,
 			way
 		};

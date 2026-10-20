@@ -1,5 +1,5 @@
 import { bytes } from '@luft/ui';
-import type { Stick, Variant } from '#lib/api/stick.js';
+import type { Stick } from '#lib/api/stick.js';
 
 const FILESYSTEMS: Record<string, string> = {
 	vfat: 'FAT',
@@ -18,8 +18,4 @@ function contents(stick: Stick) {
 export function detail(stick: Stick, needed: number) {
 	if (stick.size < needed) return `${bytes(stick.size)} · Too small for Luft`;
 	return `${bytes(stick.size)} · ${contents(stick)}`;
-}
-
-export function forThisComputer(variant: Variant, computer: string) {
-	return variant === 'nvidia' ? `Smaller, with NVIDIA’s driver for this ${computer}’s graphics.` : `Smaller, for computers without NVIDIA graphics, like this ${computer}.`;
 }

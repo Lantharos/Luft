@@ -4,7 +4,13 @@ How Meet Luft prepares a Windows or Linux computer for Luft, makes USB sticks an
 
 ## Which Luft it downloads
 
-Meet Luft only downloads the image the computer needs: `luft-latest-nvidia.iso` when it has an NVIDIA graphics card, hybrid laptops included, and `luft-latest-standard.iso` otherwise (`luft-nightly-…` for nightly builds), each with its `.sha256`. Until a build has its own image for that, it falls back to the universal `luft-latest.iso`. The size it shows is the real size of that download, and *Get the newest Luft* keeps to the same one.
+There is one Luft ISO for every computer. It starts the regular image and carries the one with NVIDIA's driver too, so Install Luft puts the right one on without a network. Releases are published on get.luft.computer in a folder per major version (`1/`), nightly builds in `nightly/`, each as `luft-<version>.iso` with its `.sha256` and [signature](#signatures). Each folder's `latest.json` names its newest ISO:
+
+```json
+{"name": "luft-1.20261020.57-nightly.iso", "version": "1.20261020.57-nightly", "size": 2147483648, "sha256": "…"}
+```
+
+Meet Luft reads it to find the ISO and its size, then takes the checksum from the signed `.sha256`, and refuses the download when the two checksums disagree. *Get the newest Luft* and *Make a USB stick* use the same ISO.
 
 ## On Windows
 
@@ -39,7 +45,7 @@ When a newer Luft is out than the one on its partition, Meet Luft offers *Get th
 
 *Make a USB stick*, on the first screen and next to *Try Luft* and *Install Luft*, puts Luft on a stick, on Windows and on Linux. It lists only USB drives that can be taken out, with each one's name, size and what's on it. Internal drives, read-only sticks, the drive the computer runs from and the drive holding a chosen ISO never show up. Sticks are looked for again every few seconds, so one plugged in later appears by itself.
 
-By default the stick gets the universal image, `luft-latest.iso` (`luft-nightly.iso` for nightly builds), since a stick is often used on other computers. *For this PC* picks the smaller image built for this computer's graphics instead, `luft-latest-standard.iso` or `luft-latest-nvidia.iso`. *Use an ISO I already have* writes that ISO, checked against a `.sha256` next to it when there is one.
+The stick gets the newest Luft ISO, which starts on any computer. *Use an ISO I already have* writes that ISO instead, checked against a `.sha256` next to it when there is one.
 
 Downloads are checked against their `.sha256` and kept, so the next stick doesn't download again: in `~/.cache/luft-meet` on Linux, and `%LOCALAPPDATA%\Lantharos\Meet Luft\Downloads` on Windows. A newer build replaces the one kept there. They can be deleted any time.
 
@@ -102,7 +108,7 @@ When a step doesn't finish, Meet Luft says which one and offers to try it again.
 
 ## On Linux
 
-Meet Luft for Linux is an AppImage. It needs UEFI and a GPT drive, and checks Secure Boot, the TPM, the graphics card (an NVIDIA card gets the image with NVIDIA's driver), the Wi-Fi chip, free space, the EFI system partition and how the system is laid out.
+Meet Luft for Linux is an AppImage. It needs UEFI and a GPT drive, and checks Secure Boot, the TPM, the graphics card, the Wi-Fi chip, free space, the EFI system partition and how the system is laid out.
 
 Nothing is repartitioned. Meet Luft keeps the live system as files in a folder, `/home/.luft-meet` on the drive that holds your home folder, or `/var/lib/luft-meet/live` when that one can't be used. The folder has to be on ext4, btrfs or XFS on a plain partition: Luft can't start from an encrypted drive, LVM or RAID yet, and Meet Luft says so. Next to the system's own boot files on the EFI system partition it adds `EFI/luft-meet` with Fedora's signed shim and GRUB, about 5 MB, and a start entry called *Meet Luft*. GRUB reads the kernel and initramfs straight from the folder, and the live system finds it with `root=luft-live:UUID=<file system>/<folder>` on the kernel command line, the folder being its path from the top of the file system (for btrfs, from the top-level subvolume). Restarting sets `BootNext` once, so the restart after that is back in the old system.
 
@@ -116,7 +122,7 @@ Meet Luft asks for your password through polkit once, when it first looks at the
 
 ## Signatures
 
-Every published `.sha256` can carry a [minisign](https://jedisct1.github.io/minisign/) signature next to it, `.sha256.minisig`, whose trusted comment is the name of the ISO it's for. Meet Luft has the public key built in, and once it has one, it only accepts checksums signed for the exact ISO it downloads, so an image for another channel or graphics card can't be passed off as the one it asked for. An ISO picked with *Use an ISO I already have* is the person's own choice and isn't checked against a signature.
+Every published `.sha256` can carry a [minisign](https://jedisct1.github.io/minisign/) signature next to it, `.sha256.minisig`, whose trusted comment is the name of the ISO it's for. Meet Luft has the public key built in, and once it has one, it only accepts checksums signed for the exact ISO it downloads, so an older or other ISO can't be passed off as the one it asked for. An ISO picked with *Use an ISO I already have* is the person's own choice and isn't checked against a signature.
 
 Turning it on:
 

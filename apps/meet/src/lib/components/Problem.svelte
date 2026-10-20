@@ -14,7 +14,7 @@
 		folders: 'Meet Luft couldn’t look through your folders.',
 		sticks: 'Meet Luft couldn’t look for USB drives.',
 		stick: 'Making the stick didn’t finish.',
-		offers: 'Luft can’t be downloaded right now. Check that you’re online, or use an ISO you already have.'
+		offer: 'Luft can’t be downloaded right now. Check that you’re online, or use an ISO you already have.'
 	};
 	const DECLINED = {
 		windows: 'Meet Luft needs your permission to work on the drive. Choose Yes when Windows asks.',

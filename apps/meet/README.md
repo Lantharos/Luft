@@ -37,7 +37,7 @@ vm/run.sh plain            # a copy of it to test in; delete vm/state/plain to s
 vm/control.py plain wait   # until Windows is up
 vm/control.py plain run 'Get-Partition'
 vm/control.py plain screenshot shot.png
-vm/iso.sh                  # Luft ISOs with this checkout's installer, Install Luft and trustd
+vm/iso.sh                  # a Luft ISO with this checkout's installer, Install Luft and trustd
 ```
 
 For Linux:
@@ -51,8 +51,6 @@ ISO=vm/state/luft-meet.iso vm/linux/run.sh try    # start Luft from a stick in i
 ISO=vm/state/luft-meet.iso MEMORY=4096 vm/linux/run.sh blank empty   # or on an empty drive
 vm/control.py try run 'lsblk'           # as root, through the guest agent
 ```
-
-`vm/iso.sh standard nvidia` builds the sticks with a single image instead. Their live session and the systems they install have the guest agent too.
 
 The Fedora VMs sign in as `ada` (password `meet-vm`, also root's). `SHARE=folder` shares a folder as 9p tag `share`.
 

@@ -78,8 +78,8 @@ fn window(window: SabineWindow, events: &Events) -> SabineWindow {
     let window = job::command(window, "meet_show_file", events, |_, path: String| {
         platform::show_file(&path).map(|()| Value::Null)
     });
-    let window = job::command(window, "meet_stick_offers", events, |_, asking| {
-        stick::offers(asking)
+    let window = job::command(window, "meet_stick_offer", events, |_, asking| {
+        stick::offer(asking)
     });
     let window = job::command(window, "meet_make_stick", events, |events, making| {
         stick::make(events, making, platform::call)

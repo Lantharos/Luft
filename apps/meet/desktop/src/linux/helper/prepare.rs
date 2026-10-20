@@ -60,8 +60,7 @@ pub fn check(source: &Source) -> Result<Report<LinuxFacts>, String> {
         esp_free,
         place: spot.describe(),
     };
-    let variant = facts.machine.variant();
-    let listing = build::listing(source, variant)
+    let listing = build::listing(source)
         .inspect_err(|error| eprintln!("Luft's download isn't reachable: {error}"))
         .ok();
     let live = listing
@@ -75,14 +74,13 @@ pub fn check(source: &Source) -> Result<Report<LinuxFacts>, String> {
         smallest_luft: 0,
         most_luft: 0,
         prepared: ready.map(|_| READY),
-        outdated: ready.is_some_and(|folder| build::outdated(folder, source, variant)),
+        outdated: ready.is_some_and(|folder| build::outdated(folder, source)),
         facts,
     })
 }
 
 fn spots<'a>(loader: &'a Path, spot: &'a Spot) -> Result<Spots<'a>, String> {
     Ok(Spots {
-        variant: machine::variant(),
         loader,
         folder: &spot.folder,
         filesystem: spot.uuid()?,

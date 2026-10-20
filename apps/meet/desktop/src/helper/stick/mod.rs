@@ -7,8 +7,6 @@ mod write;
 use std::path::Path;
 
 use super::Context;
-use super::system::facts;
-use crate::check::facts::variant_for;
 use crate::stick::copy::Room;
 use crate::stick::drives::windows::Disk;
 use crate::stick::{Finished, Image, Sticks};
@@ -16,7 +14,6 @@ use crate::stick::{Finished, Image, Sticks};
 pub fn sticks(iso: Option<&Path>) -> Result<Sticks, String> {
     Ok(Sticks {
         sticks: list::sticks(iso)?,
-        variant: variant_for(&facts::graphics()),
     })
 }
 

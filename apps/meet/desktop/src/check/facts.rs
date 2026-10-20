@@ -65,13 +65,9 @@ pub struct Machine {
     pub wifi: Vec<Device>,
 }
 
-pub fn variant_for(graphics: &[Device]) -> Variant {
-    Variant::for_vendors(graphics.iter().map(|device| device.vendor))
-}
-
 impl Machine {
     pub fn variant(&self) -> Variant {
-        variant_for(&self.graphics)
+        Variant::for_vendors(self.graphics.iter().map(|device| device.vendor))
     }
 }
 

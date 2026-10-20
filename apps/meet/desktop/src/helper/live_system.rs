@@ -2,11 +2,7 @@ use std::fs;
 use std::io;
 use std::path::Path;
 
-use luft_variant::Variant;
-
 use super::Context;
-use super::system::facts;
-use crate::check::facts::variant_for;
 pub use crate::live::build::unfinished;
 use crate::live::build::{self, Listing};
 use crate::live::download::{Hashing, format_checksum};
@@ -18,16 +14,12 @@ use crate::plan::layout::Role;
 use crate::plan::sizes;
 use crate::protocol::Stage;
 
-fn variant() -> Variant {
-    variant_for(&facts::graphics())
-}
-
 pub fn listing(source: &Source) -> Result<Listing, String> {
-    build::listing(source, variant())
+    build::listing(source)
 }
 
 pub fn outdated(live: &Path, source: &Source) -> bool {
-    build::outdated(live, source, variant())
+    build::outdated(live, source)
 }
 
 pub fn partitions(entries: &[Entry]) -> [(Role, u64); 2] {
@@ -50,11 +42,10 @@ pub fn write(
     live: &Path,
     live_guid: &str,
 ) -> Result<(), String> {
-    let variant = variant();
     let expected = source
-        .checksum(variant)
+        .checksum()
         .map_err(|error| format!("Luft's checksum couldn't be read: {error}"))?;
-    let opened = source.open(variant).map_err(|error| error.to_string())?;
+    let opened = source.open().map_err(|error| error.to_string())?;
     let total = opened.total;
     let mut hashing = Hashing::new(opened.reader, |read| {
         context.progress(Stage::Downloading, read, total)

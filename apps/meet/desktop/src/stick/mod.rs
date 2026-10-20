@@ -11,7 +11,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::live::download::parse_checksum;
 use drives::Stick;
-use luft_variant::Variant;
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -24,7 +23,6 @@ pub struct Image {
 #[serde(rename_all = "camelCase")]
 pub struct Sticks {
     pub sticks: Vec<Stick>,
-    pub variant: Variant,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug)]

@@ -9,17 +9,16 @@ image_name="${LUFT_IMAGE_NAME:-localhost/luft}"
 
 usage() {
   cat <<'USAGE'
-Usage: apps/meet/vm/iso.sh [EDITION...]
+Usage: apps/meet/vm/iso.sh
 
-Builds Luft ISOs with this checkout's installer, Install Luft, trustd, live start-up
+Builds a Luft ISO with this checkout's installer, Install Luft, trustd, live start-up
 and Toolbox builder on top of localhost/luft-system:45 and :45-nvidia (made by
 os/image/build.sh, and named after LUFT_IMAGE_NAME like it), so Meet Luft and
-Install Luft can be tried against them without building the whole image. They
-carry the QEMU guest agent, so apps/meet/vm/control.py can run commands in the live
-session and in what it installs. EDITION is universal (the default), standard or
-nvidia, as for os/iso/build.sh. Writes apps/meet/vm/state/luft-meet.iso,
-luft-meet-standard.iso and luft-meet-nvidia.iso with a .sha256 each (MEET_VM picks
-another folder), signed with the keys os/image/build.sh signs with.
+Install Luft can be tried against them without building the whole image. It
+carries the QEMU guest agent, so apps/meet/vm/control.py can run commands in the live
+session and in what it installs. Writes apps/meet/vm/state/luft-meet.iso with a
+.sha256 (MEET_VM picks another folder), signed with the keys os/image/build.sh
+signs with.
 USAGE
 }
 
@@ -64,12 +63,9 @@ stage_changes
 overlay ""
 overlay "-nvidia"
 rm -rf "$state/iso"
-LUFT_ISO="$state/iso" "$luft/os/iso/build.sh" "$image_name-meet:45" "$@"
-for built in "$state"/iso/luft-*.iso; do
-  edition="$(basename "$built" .iso | grep -oE -- '-(standard|nvidia)$' || true)"
-  named="luft-meet$edition.iso"
-  mv "$built" "$state/$named"
-  sed "s|$(basename "$built")|$named|" "$built.sha256" >"$state/$named.sha256"
-  rm "$built.sha256"
-  echo "$state/$named"
-done
+LUFT_ISO="$state/iso" "$luft/os/iso/build.sh" "$image_name-meet:45"
+built="$(echo "$state"/iso/luft-*.iso)"
+mv "$built" "$state/luft-meet.iso"
+sed "s|$(basename "$built")|luft-meet.iso|" "$built.sha256" >"$state/luft-meet.iso.sha256"
+rm "$built.sha256"
+echo "$state/luft-meet.iso"

@@ -9,12 +9,12 @@ Meet Luft is a small app for Windows and Linux. It checks your computer, puts Lu
 
 | | Download |
 | --- | --- |
-| Windows 10 or 11 | [meet-luft.exe](https://get.luft.computer/meet-luft.exe) ([checksum](https://get.luft.computer/meet-luft.exe.sha256)) |
-| Linux | [meet-luft.AppImage](https://get.luft.computer/meet-luft.AppImage) ([checksum](https://get.luft.computer/meet-luft.AppImage.sha256)) |
+| Windows 10 or 11 | [meet-luft.exe](https://get.luft.computer/meet/meet-luft.exe) ([checksum](https://get.luft.computer/meet/meet-luft.exe.sha256)) |
+| Linux | [meet-luft.AppImage](https://get.luft.computer/meet/meet-luft.AppImage) ([checksum](https://get.luft.computer/meet/meet-luft.AppImage.sha256)) |
 
 Meet Luft isn't code-signed, so Windows SmartScreen asks before it first starts: choose **More info**, then **Run anyway**.
 
-Meet Luft downloads only the Luft your computer needs: the image with NVIDIA's driver when it has an NVIDIA graphics card, hybrid laptops included, and the standard image otherwise. The size it shows is the real size of that download. If you already have a Luft ISO, **Use an ISO I already have** skips the download.
+Meet Luft downloads the newest Luft, which works with any graphics card and installs NVIDIA's driver when your computer needs it. If you already have a Luft ISO, **Use an ISO I already have** skips the download.
 
 ## On Windows
 
@@ -49,9 +49,7 @@ Meet Luft follows releases. To try the nightly builds instead, start it with `--
 
 **Make a USB stick** puts Luft on a stick, on Windows and on Linux. It lists only removable USB drives, with each one's name, size and what's on it, and finds a stick you plug in later by itself.
 
-- By default the stick gets the universal image, which installs on any computer.
-- **For this PC** writes the smaller image built for this computer's graphics.
-- **Use an ISO I already have** writes that ISO, checked against a `.sha256` file next to it when there is one.
+The stick gets the newest Luft, which starts and installs on any computer. **Use an ISO I already have** writes that ISO instead, checked against a `.sha256` file next to it when there is one.
 
 Meet Luft names the stick and asks before erasing it. After writing, it reads everything back and compares it with the ISO before ejecting the stick. Downloads are kept, so the next stick doesn't download again.
 

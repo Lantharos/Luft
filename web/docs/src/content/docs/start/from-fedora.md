@@ -9,7 +9,7 @@ Luft is built on Fedora, so moving over keeps most of what you're used to: the s
 
 ## The quickest way
 
-1. Download [Meet Luft for Linux](https://get.luft.computer/meet-luft.AppImage), make it executable and start it.
+1. Download [Meet Luft for Linux](https://get.luft.computer/meet/meet-luft.AppImage), make it executable and start it.
 2. It checks your computer and copies Luft into a folder, without touching your partitions.
 3. Choose **Replace** on *Luft is ready*. The computer restarts into the installer, which explains what stays and what changes. Nothing happens until you confirm.
 

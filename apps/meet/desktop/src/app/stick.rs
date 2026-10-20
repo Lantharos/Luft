@@ -9,8 +9,7 @@ use crate::live::cache;
 use crate::live::source::Source;
 use crate::protocol::{Call, Progress, Stage};
 use crate::stick::DAMAGED;
-use crate::stick::fetch::{self, Edition};
-use luft_variant::Variant;
+use crate::stick::fetch;
 
 const PROGRESS_INTERVAL: Duration = Duration::from_millis(250);
 
@@ -18,7 +17,6 @@ const PROGRESS_INTERVAL: Duration = Duration::from_millis(250);
 #[serde(rename_all = "camelCase")]
 pub struct Asking {
     source: Source,
-    variant: Variant,
 }
 
 #[derive(Deserialize)]
@@ -32,8 +30,6 @@ enum Way {
 #[serde(rename_all = "camelCase")]
 pub struct Making {
     source: Source,
-    edition: Edition,
-    variant: Variant,
     stick: String,
     way: Way,
 }
@@ -42,8 +38,8 @@ fn json(value: impl serde::Serialize) -> Result<Value, Failed> {
     serde_json::to_value(value).map_err(|error| Failed::from(error.to_string()))
 }
 
-pub fn offers(asking: Asking) -> Result<Value, Failed> {
-    json(fetch::offers(&asking.source, asking.variant)?)
+pub fn offer(asking: Asking) -> Result<Value, Failed> {
+    json(fetch::offer(&asking.source)?)
 }
 
 pub fn make(
@@ -52,24 +48,19 @@ pub fn make(
     call: impl Fn(&Events, Call) -> Result<Value, Failed>,
 ) -> Result<Value, Failed> {
     let mut last: Option<Instant> = None;
-    let image = fetch::fetch(
-        &making.source,
-        making.edition,
-        making.variant,
-        |done, total| {
-            if last.is_none_or(|at| at.elapsed() >= PROGRESS_INTERVAL) || done == total {
-                last = Some(Instant::now());
-                events.emit(
-                    PROGRESS,
-                    Progress {
-                        stage: Stage::Downloading,
-                        done,
-                        total,
-                    },
-                );
-            }
-        },
-    )?;
+    let image = fetch::fetch(&making.source, |done, total| {
+        if last.is_none_or(|at| at.elapsed() >= PROGRESS_INTERVAL) || done == total {
+            last = Some(Instant::now());
+            events.emit(
+                PROGRESS,
+                Progress {
+                    stage: Stage::Downloading,
+                    done,
+                    total,
+                },
+            );
+        }
+    })?;
     let request = match making.way {
         Way::Erase => Call::Flash {
             stick: making.stick,

@@ -3,7 +3,7 @@ import * as meet from '#lib/api/meet.js';
 import type { Action, Channel, Intent, Packing, Platform, Prepared, Progress, Report, Source, Stage, WindowsChoices } from '#lib/api/meet.js';
 
 export type Step = 'hello' | 'check' | 'room' | 'working' | 'ready' | 'box' | 'removed' | 'stick' | 'stickDone';
-export type Task = 'check' | 'room' | 'update' | 'download' | 'pack' | 'remove' | 'restart' | 'tidy' | 'firmware' | 'folders' | 'sticks' | 'stick' | 'offers';
+export type Task = 'check' | 'room' | 'update' | 'download' | 'pack' | 'remove' | 'restart' | 'tidy' | 'firmware' | 'folders' | 'sticks' | 'stick' | 'offer';
 
 export interface Failure {
 	task: Task;

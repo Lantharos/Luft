@@ -1,7 +1,5 @@
 import { call, start, type Source } from '#lib/api/meet.js';
 
-export type Variant = 'standard' | 'nvidia';
-export type Edition = 'universal' | 'thisComputer';
 export type Way = { kind: 'erase' } | { kind: 'ventoy'; replace: boolean };
 
 export interface Volume {
@@ -20,11 +18,9 @@ export interface Stick {
 
 export interface Sticks {
 	sticks: Stick[];
-	variant: Variant;
 }
 
 export interface Offer {
-	edition: Edition;
 	name: string;
 	size: number;
 	kept: boolean;
@@ -49,13 +45,11 @@ export interface Finished {
 
 export interface Making {
 	source: Source;
-	edition: Edition;
-	variant: Variant;
 	stick: string;
 	way: Way;
 }
 
 export const sticks = (iso: string | null) => call<Sticks>({ call: 'sticks', iso });
 export const room = (stick: string, needed: number) => call<Room>({ call: 'ventoyRoom', stick, needed });
-export const offers = (source: Source, variant: Variant) => start<Offer[]>('meet_stick_offers', { source, variant });
+export const offer = (source: Source) => start<Offer>('meet_stick_offer', { source });
 export const make = (making: Making) => start<Finished>('meet_make_stick', making);

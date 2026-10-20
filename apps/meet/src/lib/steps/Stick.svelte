@@ -1,29 +1,17 @@
 <script lang="ts">
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
-	import { bytes, Segmented } from '@luft/ui';
-	import type { Edition, Stick } from '#lib/api/stick.js';
+	import { bytes } from '@luft/ui';
+	import type { Stick } from '#lib/api/stick.js';
 	import Frame from '#lib/components/Frame.svelte';
 	import Problem from '#lib/components/Problem.svelte';
 	import Confirm from '#lib/stick/Confirm.svelte';
-	import { detail, forThisComputer } from '#lib/stick/describe.js';
+	import { detail } from '#lib/stick/describe.js';
 	import DriveRow from '#lib/stick/DriveRow.svelte';
 	import { session } from '#lib/state/meet.svelte.js';
 	import { maker } from '#lib/state/stick.svelte.js';
 
 	let confirming = $state<Stick | null>(null);
-	let computer = $derived(session.platform === 'linux' ? 'computer' : 'PC');
 	let needed = $derived(maker.offer?.size ?? 0);
-	let editions = $derived([
-		{ value: 'universal' as Edition, label: 'For any computer' },
-		{ value: 'thisComputer' as Edition, label: `For this ${computer}` }
-	]);
-	let caption = $derived(
-		!maker.offer
-			? ''
-			: maker.offers && maker.offers.length > 1
-				? `${bytes(maker.offer.size)}. ${maker.offer.edition === 'universal' ? 'Starts on any computer, with or without NVIDIA graphics.' : forThisComputer(maker.variant, computer)}`
-				: `${maker.offer.name}, ${bytes(maker.offer.size)}`
-	);
 	let ready = $derived(!!maker.stick && !!maker.offer && maker.stick.size >= needed && !session.busy);
 
 	$effect(() => maker.watch());
@@ -53,15 +41,8 @@
 			{/each}
 		</div>
 	{/if}
-	{#if maker.offers && maker.offers.length > 1}
-		<div class="mt-7 flex flex-col gap-2.5">
-			<div class="w-[320px]">
-				<Segmented options={editions} value={maker.edition} label="Which Luft" onchange={(edition) => (maker.edition = edition)} />
-			</div>
-			<p class="text-[13px] leading-snug text-[var(--text-muted)]">{caption}</p>
-		</div>
-	{:else if maker.offer}
-		<p class="mt-7 text-[13px] text-[var(--text-muted)]">{caption}</p>
+	{#if maker.offer}
+		<p class="mt-7 text-[13px] text-[var(--text-muted)]">{maker.offer.name}, {bytes(maker.offer.size)}</p>
 	{/if}
 	{#if session.failure}
 		<div class="mt-4"><Problem failure={session.failure} /></div>

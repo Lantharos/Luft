@@ -9,7 +9,6 @@ use crate::live::iso::{self, Entry};
 use crate::live::source::Source;
 use crate::protocol::Stage;
 use crate::serving::Context;
-use luft_variant::Variant;
 
 const SHIM: &str = "EFI/BOOT/BOOTX64.EFI";
 const LOADERS: &str = "EFI/BOOT/";
@@ -18,7 +17,6 @@ const GRUB_CONFIG: &str = "grub.cfg";
 const LIVE_FOLDERS: [&str; 2] = ["boot", "LiveOS"];
 
 pub struct Spots<'a> {
-    pub variant: Variant,
     pub loader: &'a Path,
     pub folder: &'a Path,
     pub filesystem: &'a str,
@@ -49,11 +47,9 @@ pub fn grub_config(filesystem: &str, on_filesystem: &str) -> String {
 
 pub fn write(context: &Context, source: &Source, spots: &Spots) -> Result<(), String> {
     let expected = source
-        .checksum(spots.variant)
+        .checksum()
         .map_err(|error| format!("Luft's checksum couldn't be read: {error}"))?;
-    let opened = source
-        .open(spots.variant)
-        .map_err(|error| error.to_string())?;
+    let opened = source.open().map_err(|error| error.to_string())?;
     let total = opened.total;
     let mut hashing = Hashing::new(opened.reader, |read| {
         context.progress(Stage::Downloading, read, total)

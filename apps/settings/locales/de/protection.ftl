@@ -89,7 +89,7 @@ settings-firmware-updates-count = { $count ->
 ## Security: signed startup
 
 settings-security-signed-startup = Signierter Start
-settings-security-signed-startup-on = Startmenü und System sind für diesen Computer signiert
+settings-security-signed-startup-on = Bootmenü und System sind für diesen Computer signiert
 settings-security-signed-startup-purpose = Lässt nur Software starten, die für diesen Computer signiert ist
 settings-security-signed-startup-restart = Wird nach einem Neustart verwendet
 settings-security-signed-startup-missed = Der Schlüssel wurde beim letzten Neustart nicht hinzugefügt

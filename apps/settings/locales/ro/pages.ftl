@@ -1,0 +1,57 @@
+## Panels
+
+settings-page-network = Rețea
+    .keywords = wifi, wi-fi, wireless, fără fir, ethernet, cablu, rețea cablată, vpn, internet, avion, mod avion, proxy, dns, adresă ip, adresă hardware, adresă mac, conexiune contorizată, date limitate
+settings-page-bluetooth = Bluetooth
+    .keywords = dispozitive, asociere, asociază, căști, difuzor, boxă, vizibil, vizibilitate, detectabil
+settings-page-display = Ecrane
+    .keywords = monitor, ecran, afișaj, rezoluție, scalare, mărime, rată de reîmprospătare, frecvență, lumină de noapte, aranjare, poziționare, luminozitate
+settings-page-sound = Sunet
+    .keywords = audio, volum, difuzoare, boxe, microfon, ieșire, intrare, alerte, sunete
+settings-page-power = Alimentare și baterie
+    .keywords = baterie, repaus, suspendare, mod de alimentare, economisire energie, oprire ecran, stingere ecran, capac, limită de încărcare, încărcare
+settings-page-appearance = Aspect
+    .keywords = imagine de fundal, fundal, tapet, întunecat, luminos, mod întunecat, stil, temă, culoare de accent, pictograme aplicații, pictograme colorate, cursor, indicator, indicatorul mouse-ului, mărime cursor, mărime text, dimensiune text, animații, fonturi, caractere, instalare fonturi
+settings-page-notifications = Notificări
+    .keywords = nu deranjați, bannere, ferestre pop-up, ecran de blocare, aplicații
+settings-page-keyboard = Tastatură
+    .keywords = surse de introducere, aranjament, aspect tastatură, comenzi rapide, scurtături, repetare, limbă, dictare, metodă de introducere
+    .copilot-key = tasta copilot
+settings-page-mouse = Mouse și touchpad
+    .keywords = mouse, indicator, cursor, viteză, derulare, defilare, derulare naturală, viteză de derulare, atingere pentru clic, clic prin atingere, touchpad, trackpad
+settings-page-accessibility = Accesibilitate
+    .keywords = a11y, acces universal, cititor de ecran, orca, zoom, lupă, mărire, text mare, contrast ridicat, contrast, reducere animații, reducere mișcare, mărime cursor, tastatură pe ecran, tastatură virtuală, taste adezive, taste lente, taste de respingere, taste mouse, clic prin staționare, clic la trecerea cursorului, clic dreapta, localizare cursor, găsire cursor, alerte vizuale, clipire, auz, vedere
+settings-page-apps = Aplicații
+    .keywords = aplicații implicite, aplicații prestabilite, browser, navigator, pornire, pornire automată, autostart
+settings-page-privacy = Confidențialitate
+    .keywords = blocare ecran, locație, localizare, cameră, microfon, fișiere recente, istoric fișiere, coș de gunoi, fișiere temporare
+settings-page-security = Securitate
+    .keywords = secure boot, pornire securizată, tpm, criptare, criptare disc, criptarea dispozitivului, bitlocker, luks, cheie de recuperare, pin, firmware, securitate hardware, cheie de semnare, usb, parole, portchei, chei de acces, passkey
+settings-page-region = Limbă și regiune
+    .keywords = limbă, traducere, localizare, regiune, formate, format dată, format numere, măsurare, unități de măsură, monedă, valută
+settings-page-datetime = Dată și oră
+    .keywords = fus orar, ceas, 24 de ore, oră, automat
+settings-page-users = Utilizatori
+    .keywords = cont, nume, imagine, poză, avatar, parolă, amprentă
+settings-page-accounts = Conturi
+    .keywords = conturi online, cloud, icloud, icloud drive, apple, onedrive, microsoft, dropbox, nextcloud, webdav, sincronizare, fișiere la cerere, conectare
+settings-page-login = Ecran de conectare
+    .keywords = ecran de întâmpinare, conectare, autentificare, conectare automată, autentificare automată, autologin, sesiune, imagine de fundal, utilizatori, ecran de blocare, utilizatori ascunși
+settings-page-updates = Actualizări
+    .keywords = actualizări software, actualizări de sistem, upgrade, versiune nouă, firmware, kernel, nucleu, repornire și instalare, pachete, actualizări automate, actualizări de securitate
+settings-page-about = Despre
+    .keywords = nume dispozitiv, numele computerului, sistem, hardware, memorie, ram, procesor, placă video, grafică, stocare, spațiu
+
+## Pages inside panels
+
+settings-page-taskbar = Bara de activități
+    .keywords = bară, panou, dock, ascundere automată, ascunde automat, plutitoare, transparentă, aplicații fixate, aliniere, butonul start, ecrane, spațiu de lucru, desktop, desktop virtual
+settings-page-fonts = Fonturi
+    .keywords = toate fonturile, caractere, familii de fonturi, instalare fonturi, eliminare fonturi
+settings-page-cursors = Teme de cursor
+    .keywords = cursoare, cursor, indicator, indicatorul mouse-ului, mai multe cursoare, descărcare cursoare
+settings-page-dictation = Dictare
+    .keywords = vorbire, voce, tastare vocală, scriere prin voce, transcriere, vorbire în text, microfon, parakeet, whisper, modele de vorbire, super alt
+    .copilot-key = tasta copilot
+settings-page-add-account = Adaugă un cont
+    .keywords = conectare, conturi online, icloud, onedrive, dropbox, nextcloud, webdav

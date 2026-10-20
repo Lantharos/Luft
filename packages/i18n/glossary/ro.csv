@@ -1,0 +1,125 @@
+source,target,explanation
+Luft,,"Not translated. Name of the operating system; avoid declining it, say sistemul Luft when needed"
+Kestrel,,Not translated. Name of Luft's desktop
+Rover,,"Not translated. App name, the file manager"
+Magpie,,"Not translated. App name, the viewer for photos, videos, music and PDFs"
+Mailman,,"Not translated. App name, the mail app"
+Draft,,"Not translated. App name, the text and code editor"
+Tern,,"Not translated. App name, the terminal"
+Schelf,,"Not translated. App name, the app store"
+Barometer,,"Not translated. App name, the system monitor"
+Keys,,"Not translated. App name, makes keyboard layouts and input methods"
+Meet Luft,,Not translated. Name of the Windows app that prepares a PC for Luft
+Helium,,Not translated. Name of the default browser
+Flatpak,,Not translated. App packaging format
+Secure Boot,,"Not translated. UEFI feature, named this way in every PC's firmware setup"
+TPM,,Not translated. Trusted Platform Module; in the interface usually called the security chip
+Bluetooth,,Not translated. Trademark
+Wi-Fi,,Not translated. Wireless network; Windows and Android say Wi-Fi too
+Settings,Setări,"App name and the general word for settings; feminine plural, articulated setările"
+Disks,Discuri,App name for the disk utility
+Install Luft,Instalează Luft,App name of the installer; imperative like a button
+Network Sign-In,Autentificare în rețea,App that opens the sign-in page of a public Wi-Fi
+File Manager,Manager de fișiere,Generic name of Rover
+Media Viewer,Vizualizator media,Generic name of Magpie
+Mail,E-mail,Generic name of Mailman
+Text Editor,Editor de text,Generic name of Draft
+App Store,Magazin de aplicații,Generic name of Schelf
+System Monitor,Monitor de sistem,Generic name of Barometer
+Keyboard Layouts,Aranjamente de tastatură,Generic name of Keys
+Start,Start,"The menu opened with Super or the Luft mark; a name; say meniul Start when it has to decline"
+board,tablă,"Mode that lays a workspace's windows side by side on an endless canvas; feminine, tabla, plural table"
+Quick settings,Setări rapide,"Panel of switches and sliders opened from the status icons; feminine plural, setările rapide"
+notification center,centru de notificări,"Panel with notifications, media and the calendar, opened from the clock; neuter, centrul de notificări"
+All windows,Toate ferestrele,"The task view: every window of a workspace and the workspaces, Super+Tab"
+snap,andoca,"verb a andoca, imperative andochează: put a window into a half, third or quarter of the screen; not fixa, which is pin"
+snap layout,aranjament de andocare,"One of the arrangements offered by Super+Z; neuter, plural aranjamente de andocare"
+snap group,grup andocat,"Windows snapped side by side that come back together; neuter, plural grupuri andocate"
+taskbar,bara de activități,"The bar along the bottom of the screen; feminine, write it articulated as Windows does"
+tray,tava de sistem,"Taskbar button holding the icons of apps running in the background; feminine"
+status icons,pictograme de stare,"Taskbar icons for network, sound and battery that open Quick settings; feminine plural"
+lock screen,ecran de blocare,"Screen shown while the session is locked; neuter, ecranul de blocare"
+login screen,ecran de conectare,"Screen listing the people on the computer before anyone signs in; neuter"
+workspace,spațiu de lucru,"One of up to ten separate desktops; neuter, plural spații de lucru"
+desktop,desktop,"The background area behind the windows; also the whole desktop environment; neuter, desktopul"
+wallpaper,imagine de fundal,"Picture behind the desktop; feminine, plural imagini de fundal"
+accent color,culoare de accent,"Color taken from the wallpaper and used for highlights; feminine"
+dark style,Mod întunecat,Quick settings tile that switches between light and dark
+Night light,Lumină de noapte,"Warmer screen colors in the evening; feminine"
+Do Not Disturb,Nu deranjați,"Holds back notification banners and sounds; formal imperative, as in Windows"
+Airplane mode,Mod avion,Turns off every radio
+Keep awake,Menține activ,Keeps the screen on for a while
+Power mode,Mod de alimentare,"Performanță, Echilibrat or Economisire energie"
+Power saver,Economisire energie,Power mode
+Dictation,Dictare,"Typing by speaking; feminine, dictarea"
+clipboard,clipboard,"Holds what was copied; neuter, clipboardul"
+clipboard history,istoricul clipboardului,"List of recently copied items, Super+V; as a title Istoric clipboard"
+emoji,emoji,"noun; neuter, plural emoji (unchanged)"
+screenshot,captură de ecran,"Picture of the screen; feminine, plural capturi de ecran"
+screen recording,înregistrare de ecran,"Video of the screen; feminine, plural înregistrări de ecran"
+privacy indicator,indicator de confidențialitate,"Taskbar icon shown while the camera, microphone, location or screen is in use; masculine"
+Full access,Acces complet,"Schelf switch that lets a Flatpak app leave its sandbox: all files, clipboard in the background, other apps' windows; neuter"
+sandbox,mediu izolat,"Isolation Flatpak apps run in; neuter, plural medii izolate"
+Keyring,Portchei,"Luft Keyring, which keeps passwords, tokens and keys; neuter, portcheiul; macOS's word"
+passkey,cheie de acces,"Sign-in key that replaces a password on websites; feminine, plural chei de acces"
+recovery key,cheie de recuperare,"Long code that unlocks an encrypted disk when the TPM can't; feminine"
+security chip,cip de securitate,"How the interface names the TPM; neuter, plural cipuri de securitate"
+device encryption,criptarea dispozitivului,Encryption of the whole disk
+encryption,criptare,"noun; feminine, criptarea"
+signed startup,pornire semnată,"Startup where every step is checked against Luft's signature; feminine"
+firmware,firmware,"Software built into the hardware; neuter, firmware-ul"
+window,fereastră,"noun; feminine, plural ferestre"
+pin,fixa,"verb a fixa, imperative fixează: keep an app on the taskbar or in Start"
+unpin,anula fixarea,"verb; menu item Anulează fixarea"
+Pin to taskbar,Fixează în bara de activități,Menu item
+open,deschide,"verb a deschide; button Deschide"
+close,închide,"verb a închide; button Închide"
+remove,elimina,"verb a elimina; button Elimină"
+delete,șterge,"verb a șterge; button Șterge"
+turn on,activa,"verb a activa, for a feature or setting; porni for a device or the computer"
+turn off,dezactiva,"verb a dezactiva, for a feature or setting; opri for a device or the computer"
+sign in,conecta,"verb a se conecta, as in Windows; noun conectare; imperative in text conectați-vă"
+sign out,deconecta,"verb a se deconecta, also Log out; power menu item Deconectare"
+restart,reporni,"verb a reporni; button Repornește"
+shut down,opri,"verb a opri, also Power off; button Oprește"
+suspend,Repaus,"verb and power menu item, also Sleep; the state starea de repaus"
+hibernate,Hibernare,verb and power menu item
+lock,bloca,"verb a bloca; button Blochează"
+unlock,debloca,"verb a debloca; button Deblochează"
+install,instala,"verb a instala; button Instalează"
+update,actualiza,"verb a actualiza; button Actualizează"
+updates,actualizări,"noun, new versions of Luft or apps; feminine plural; singular actualizare"
+cancel,Anulează,button
+save,salva,"verb a salva; button Salvează"
+allow,permite,"verb a permite; button Permite"
+forget,elimina,"verb, for a saved network or device; Elimină rețeaua reads better than Uită"
+share,partaja,"verb a partaja; button Partajează"
+search,căuta,"verb a căuta, button Caută; noun căutare"
+set up,configura,"verb a configura; button Configurează"
+try again,Încearcă din nou,"button; in running text Încercați din nou"
+undo,anula,"verb a anula; button Anulează, the same word as Cancel, as in GNOME"
+done,Gata,button
+next,Înainte,button that moves to the next step
+app,aplicație,"noun, also application; feminine, plural aplicații"
+file,fișier,"noun; neuter, plural fișiere"
+folder,folder,"noun; neuter, plural foldere; Windows' word"
+trash,Coș de gunoi,"Where deleted files wait; neuter, coșul de gunoi"
+device,dispozitiv,"noun; neuter, plural dispozitive"
+disk,disc,"noun, also drive; neuter, plural discuri; unitate for a drive you plug in"
+USB stick,stick USB,"noun; neuter, plural stickuri USB"
+computer,computer,"noun, also PC; neuter, plural computere"
+network,rețea,"noun; feminine, plural rețele"
+battery,baterie,"noun; feminine, plural baterii"
+power,Alimentare,Settings page and button for power
+display,ecran,"noun, a monitor or built-in screen; also screen; neuter, plural ecrane"
+sound,sunet,"noun, the Settings page and audio in general; neuter"
+notification,notificare,"noun; feminine, plural notificări"
+keyboard shortcut,comandă rapidă,"noun; feminine, plural comenzi rapide; add de la tastatură only where it's unclear"
+keyboard layout,aranjament de tastatură,"noun; neuter, plural aranjamente de tastatură"
+input method,metodă de introducere,"Turns what you type into something else, such as Compose sequences or word choices; feminine"
+touchpad,touchpad,"noun; neuter, plural touchpaduri"
+privacy,confidențialitate,noun; feminine
+security,securitate,noun; feminine
+account,cont,"noun, a user account or online account; neuter, plural conturi"
+password,parolă,"noun; feminine, plural parole"
+accessibility,accesibilitate,noun; feminine

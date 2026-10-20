@@ -1,0 +1,319 @@
+## Apps
+
+settings-apps-defaults = App predefinite
+settings-apps-defaults-description = Usate quando apri link, file e cartelle
+settings-apps-browser = Browser web
+settings-apps-email = Email
+settings-apps-calendar = Calendario
+settings-apps-music = Musica
+settings-apps-videos = Video
+settings-apps-photos = Foto
+settings-apps-text-editor = Editor di testo
+settings-apps-files = File
+settings-apps-choose = Scegli
+settings-apps-startup = Avvio
+settings-apps-startup-description = Queste app si aprono quando accedi
+settings-apps-startup-app = Apri { $app } all’accesso
+settings-apps-startup-add = Aggiungi app
+settings-apps-startup-add-title = Aggiungi un’app all’avvio
+settings-apps-startup-add-description = Scegli un’app da aprire ogni volta che accedi.
+settings-apps-search = Cerca app
+settings-apps-no-match = Nessuna app corrisponde alla ricerca
+settings-apps-cancel = Annulla
+
+## Date and time
+
+settings-datetime-automatic = Imposta l’ora automaticamente
+settings-datetime-automatic-description = Mantiene l’orologio preciso tramite internet
+settings-datetime-date-and-time = Data e ora
+settings-datetime-automatic-zone = Imposta il fuso orario automaticamente
+settings-datetime-automatic-zone-description = Segue la tua posizione quando viaggi
+settings-datetime-automatic-zone-location-off = Per usare questa opzione, attiva i servizi di localizzazione in Privacy
+settings-datetime-zone = Fuso orario
+settings-datetime-zone-description = { $place } · { $offset }
+settings-datetime-clock = Orologio
+settings-datetime-time-format = Formato dell’ora
+settings-datetime-format-24h = 24 ore
+settings-datetime-format-12h = AM/PM
+settings-datetime-seconds = Mostra i secondi
+settings-datetime-weekday = Mostra il giorno della settimana
+settings-datetime-calendar = Calendario
+settings-datetime-week-start = La settimana inizia di
+settings-datetime-week-start-automatic = Automatico
+settings-datetime-week-start-monday = Lunedì
+settings-datetime-week-start-sunday = Domenica
+settings-datetime-week-start-regional = Come nella tua regione: { $day }
+settings-datetime-set-title = Imposta data e ora
+settings-datetime-previous-month = Mese precedente
+settings-datetime-next-month = Mese successivo
+settings-datetime-hour = Ora
+settings-datetime-minute = Minuto
+settings-datetime-day-period = Mattina o pomeriggio
+settings-datetime-increase = Aumenta { $label }
+settings-datetime-decrease = Diminuisci { $label }
+settings-datetime-set-failed = Impossibile cambiare la data e l’ora.
+settings-datetime-cancel = Annulla
+settings-datetime-set = Imposta
+settings-datetime-zone-search = Cerca una città o un paese
+settings-datetime-zones = Fusi orari
+settings-datetime-utc = Tempo coordinato universale
+settings-datetime-zone-no-match = Nessun luogo corrispondente
+settings-datetime-zone-failed = Impossibile cambiare il fuso orario.
+
+## Users
+
+settings-users-picture = Cambia la tua immagine
+settings-users-picture-edit = Modifica
+settings-users-account = Il tuo account
+settings-users-name = Nome
+settings-users-name-description = Mostrato quando accedi e sulla schermata di blocco
+settings-users-change = Cambia
+settings-users-password = Password
+settings-users-password-description = Serve per accedere e sbloccare questo computer
+settings-users-password-set = Imposta password
+settings-users-account-type = Tipo di account
+settings-users-administrator = Amministratore
+settings-users-standard = Account standard
+settings-users-others = Altre persone su questo computer
+settings-users-name-title = Cambia il tuo nome
+settings-users-name-dialog-description = È il nome con cui compari quando accedi.
+settings-users-save = Salva
+settings-users-cancel = Annulla
+settings-users-close = Chiudi
+settings-users-done = Fine
+settings-users-try-again = Riprova
+settings-users-remove = Rimuovi
+settings-users-password-change-title = Cambia la tua password
+settings-users-password-set-title = Imposta una password
+settings-users-password-dialog-description = La userai per accedere e sbloccare questo computer.
+settings-users-password-current = Password attuale
+settings-users-password-new = Nuova password
+settings-users-password-new-placeholder = { $count ->
+    [one] Almeno { $count } carattere
+   *[other] Almeno { $count } caratteri
+}
+settings-users-password-confirm = Conferma
+settings-users-password-confirm-placeholder = Digitala di nuovo
+settings-users-password-change = Cambia password
+settings-users-password-changing = Modifica in corso…
+settings-users-password-wrong = Non è la tua password attuale
+settings-users-password-mismatch = Le password non corrispondono
+settings-users-password-too-short = Questa password è troppo corta
+settings-users-password-too-similar = È troppo simile alla tua password attuale
+settings-users-password-dictionary-word = È basata su una parola del dizionario. Prova qualcosa di meno comune.
+settings-users-password-too-simple = È troppo semplice. Allungala o usa più tipi di caratteri.
+settings-users-password-rejected = Questa password non è stata accettata. Provane un’altra.
+settings-users-password-minimum = { $count ->
+    [one] Usa almeno { $count } carattere
+   *[other] Usa almeno { $count } caratteri
+}
+settings-users-password-weak = Debole. Le password più lunghe, fatte di più parole, sono più difficili da indovinare.
+settings-users-password-fair = Discreta. Qualche carattere in più la rende più sicura.
+settings-users-password-strong = Sicura
+settings-users-fingerprints = Impronte digitali
+settings-users-fingerprint-add = Aggiungi un’impronta
+settings-users-fingerprint-add-description = Accedi e sblocca con il dito invece di digitare la password
+settings-users-fingerprint-choose = Scegli quale dito aggiungere.
+settings-users-finger = Dito
+settings-users-fingerprint-start = Inizia
+settings-users-fingerprint-another = Scegli un altro dito
+settings-users-fingerprint-remove = Rimuovi { $finger }
+settings-users-fingerprint-remove-title = Rimuovere questa impronta?
+settings-users-fingerprint-remove-description = Non potrai più usare { $finger } per accedere.
+
+## Login screen
+
+settings-login-unavailable = Non è possibile cambiare la schermata di accesso su questo computer.
+settings-login-wallpaper = Sfondo
+settings-login-wallpaper-label = Sfondo della schermata di accesso
+settings-login-wallpaper-shared-description = Tutti vedono la stessa immagine prima di accedere
+settings-login-wallpaper-own-description = Ognuno vede il proprio sfondo quando sceglie il suo account
+settings-login-wallpaper-own = Il proprio
+settings-login-wallpaper-shared = Uguale per tutti
+settings-login-picture = Immagine
+settings-login-picture-description = Mostrata dietro la schermata di accesso
+settings-login-picture-change = Cambia
+settings-login-people = Persone
+settings-login-show-people = Mostra le persone sulla schermata di accesso
+settings-login-show-people-on = Per accedere si sceglie un account da un elenco
+settings-login-show-people-off = Per accedere ognuno digita il proprio nome utente
+settings-login-person-hidden = Digita il nome utente per accedere
+settings-login-show-person = Mostra { $name }
+settings-login-signing-in = Accesso
+settings-login-session = Sessione predefinita
+settings-login-session-description = Usata se nessuno ne sceglie un’altra
+settings-login-session-automatic = Automatica
+settings-login-automatic = Accesso automatico
+settings-login-automatic-description = Accede senza password all’avvio
+settings-login-automatic-off = Disattivato
+
+## Updates
+
+settings-updates-checking = Ricerca di aggiornamenti…
+settings-updates-downloading = Download degli aggiornamenti…
+settings-updates-rolling-back = Preparazione della versione precedente…
+settings-updates-switching-nvidia = Download del driver NVIDIA…
+settings-updates-switching-standard = Download dell’immagine standard…
+settings-updates-elsewhere-refresh-by = { $app } sta cercando aggiornamenti
+settings-updates-elsewhere-download-by = { $app } sta scaricando gli aggiornamenti
+settings-updates-elsewhere-update-by = { $app } sta installando gli aggiornamenti
+settings-updates-elsewhere-update = Installazione degli aggiornamenti in corso
+settings-updates-elsewhere-install-by = { $app } sta installando del software
+settings-updates-elsewhere-install = Installazione di software in corso
+settings-updates-elsewhere-remove-by = { $app } sta rimuovendo del software
+settings-updates-elsewhere-remove = Rimozione di software in corso
+settings-updates-elsewhere-change-by = { $app } sta modificando del software
+settings-updates-elsewhere-change = Modifica di software in corso
+settings-updates-elsewhere-wait = Potrai cercare di nuovo gli aggiornamenti quando avrà finito
+settings-updates-ready = Gli aggiornamenti sono pronti per l’installazione
+settings-updates-available = { $count ->
+    [one] { $count } aggiornamento disponibile
+   *[other] { $count } aggiornamenti disponibili
+}
+settings-updates-up-to-date = Il sistema è aggiornato
+settings-updates-version = Versione { $version }
+settings-updates-version-new = Una nuova versione
+settings-updates-returning = Pronto a tornare alla versione { $version }
+settings-updates-returning-unversioned = Pronto a tornare alla versione precedente
+settings-updates-nvidia-ready = Il driver NVIDIA è pronto
+settings-updates-standard-ready = L’immagine standard è pronta
+settings-updates-version-available = La versione { $version } è disponibile
+settings-updates-version-available-new = È disponibile una nuova versione
+settings-updates-version-staged = La versione { $version } è pronta per l’installazione
+settings-updates-version-staged-new = Una nuova versione è pronta per l’installazione
+settings-updates-restart-install-them = Riavvia per installarli. Il computer sarà di nuovo pronto in pochi minuti.
+settings-updates-restart-return = Riavvia per completare il ritorno alla versione precedente.
+settings-updates-restart-switch = Riavvia per completare. Il computer sarà di nuovo pronto in pochi minuti.
+settings-updates-restart-install-it = Riavvia per installarla. Il computer sarà di nuovo pronto in pochi minuti.
+settings-updates-last-checked = Ultimo controllo: { $when }
+settings-updates-never-checked = Non ancora controllato
+settings-updates-installed-when = Aggiornamenti installati { $when }
+settings-updates-stop = Interrompi
+settings-updates-check = Controlla ora
+settings-updates-checking-button = Controllo…
+settings-updates-apps = App
+settings-updates-app-updates = Aggiornamenti delle app
+settings-updates-apps-checking = Ricerca di aggiornamenti per le tue app…
+settings-updates-apps-count = { $count ->
+    [0] Gestiti in Schelf
+    [one] { $count } app ha un aggiornamento in Schelf
+   *[other] { $count } app hanno aggiornamenti in Schelf
+}
+settings-updates-automatic = Aggiornamenti automatici
+settings-updates-look = Cerca aggiornamenti
+settings-updates-look-description = Anche quando l’app Impostazioni è chiusa
+settings-updates-schedule-daily = Ogni giorno
+settings-updates-schedule-weekly = Ogni settimana
+settings-updates-schedule-never = Solo quando controllo io
+settings-updates-background = Scarica in background
+settings-updates-background-label = Scarica gli aggiornamenti in background
+settings-updates-background-description = Gli aggiornamenti sono pronti da installare al prossimo riavvio
+settings-updates-firmware = Firmware
+settings-updates-firmware-description = Aggiornamenti per il software integrato nel tuo hardware
+settings-updates-firmware-restart = Termina al riavvio
+settings-updates-firmware-installing = Installazione…
+settings-updates-firmware-update = Aggiorna
+settings-updates-firmware-failed = Impossibile aggiornare il firmware
+settings-updates-failed = Impossibile installare gli ultimi aggiornamenti
+settings-updates-failed-description = Il sistema è rimasto com’era
+settings-updates-includes = { $parts ->
+    [security] Include correzioni di sicurezza
+    [kernel] Include un nuovo kernel Linux
+    [drivers] Include driver aggiornati
+    [security-kernel] Include correzioni di sicurezza e un nuovo kernel Linux
+    [security-drivers] Include correzioni di sicurezza e driver aggiornati
+    [kernel-drivers] Include un nuovo kernel Linux e driver aggiornati
+    [security-kernel-drivers] Include correzioni di sicurezza, un nuovo kernel Linux e driver aggiornati
+   *[other] Correzioni e miglioramenti in tutto il sistema
+}
+settings-updates-count-size = { $count ->
+    [one] { $count } aggiornamento · { $size }
+   *[other] { $count } aggiornamenti · { $size }
+}
+settings-updates-restart-and-install = Riavvia e installa
+settings-updates-download = Scarica
+settings-updates-see-included = Vedi cosa include
+settings-updates-included = Cosa include
+settings-updates-included-description = { $count ->
+    [one] { $count } aggiornamento per il sistema, i suoi driver e le sue librerie
+   *[other] { $count } aggiornamenti per il sistema, i suoi driver e le sue librerie
+}
+settings-updates-security-fix = Correzione di sicurezza
+settings-updates-done = Fine
+settings-updates-area-kernel = Kernel Linux
+settings-updates-area-drivers = Driver e firmware
+settings-updates-area-desktop = Desktop
+settings-updates-area-core = Sistema di base
+settings-updates-area-other = Librerie e strumenti
+settings-updates-released = Pubblicato { $when }
+settings-updates-improvements = Correzioni e miglioramenti in tutto il sistema
+settings-updates-download-size = { $size } da scaricare
+settings-updates-replaces = Sostituisce la versione { $version }, in attesa di installazione
+settings-updates-replaces-new = Sostituisce una nuova versione, in attesa di installazione
+settings-updates-returning-description = La versione che avevi prima. I tuoi file e le tue impostazioni restano come sono.
+settings-updates-stay = Resta alla versione { $version }
+settings-updates-stay-unversioned = Resta su questa versione
+settings-updates-restart = Riavvia
+settings-updates-restart-to-install = Riavvia per installare
+settings-updates-see-new = Vedi le novità
+settings-updates-this-computer = Questo computer
+settings-updates-installed-version = Versione installata
+settings-updates-unknown = Sconosciuta
+settings-updates-whats-new = Novità
+settings-updates-go-back-title = Torna alla versione precedente
+settings-updates-previous = Versione { $version }. I tuoi file e le tue impostazioni restano come sono.
+settings-updates-previous-unversioned = I tuoi file e le tue impostazioni restano come sono.
+settings-updates-go-back = Torna indietro
+settings-updates-notes-title = Novità della versione { $version }
+settings-updates-notes-title-new = Novità della nuova versione
+settings-updates-variant-nvidia = Usa il driver NVIDIA
+settings-updates-variant-standard = Passa all’immagine standard
+settings-updates-variant-nvidia-reason = Piena velocità dalla tua scheda video NVIDIA
+settings-updates-variant-standard-reason = Più leggera, perché questo computer non ha una scheda video NVIDIA
+settings-updates-switch = Passa
+
+## About
+
+settings-about-device-name = Nome del dispositivo
+settings-about-device-name-description = Come gli altri dispositivi vedono questo computer
+settings-about-rename = Rinomina
+settings-about-rename-title = Rinomina questo dispositivo
+settings-about-rename-description = I dispositivi vicini vedono questo nome.
+settings-about-cancel = Annulla
+settings-about-hardware = Hardware
+settings-about-processor = Processore
+settings-about-graphics = Grafica
+settings-about-graphics-numbered = Grafica { $number }
+settings-about-memory = Memoria
+settings-about-storage = Archiviazione
+settings-about-storage-free = Liberi: { $free } su { $total }
+settings-about-manage-drives = Gestisci le unità
+settings-about-old-system = Conservato quando Luft lo ha sostituito · { $size }
+settings-about-other-system = Rimuovilo per dare i suoi { $size } a Luft
+settings-about-remove = Rimuovi
+settings-about-software = Software
+settings-about-system = Sistema
+settings-about-desktop = Desktop
+settings-about-kernel = Kernel
+settings-about-hostname = Nome host
+settings-about-problems = Problemi recenti
+settings-about-problem-gpu = Il driver grafico ha smesso di rispondere
+settings-about-problem-summary = { $when } · Il computer si è riavviato da solo
+settings-about-problem-graceful = { $when }. Alle app è stato chiesto di salvare il lavoro prima del riavvio del computer.
+settings-about-problem-forced = { $when }. Alcune app non si sono chiuse in tempo e sono state interrotte prima del riavvio del computer.
+settings-about-problem-emergency = { $when }. Il computer ha dovuto riavviarsi senza aspettare le app.
+settings-about-problem-help = Cosa può aiutare
+settings-about-problem-what = Cosa è successo
+settings-about-problem-log = Il log completo del kernel di quella sessione resta nel journal di sistema. Eseguire nvidia-bug-report.sh come amministratore lo raccoglie per una segnalazione di bug del driver.
+settings-about-problem-firmware = Riavvia nelle impostazioni del firmware
+settings-about-done = Fine
+
+## Language & Region
+
+settings-region-language = Lingua
+settings-region-language-description = Kestrel e le app di Luft la usano subito
+settings-region-language-next-sign-in = Le app già aperte cambiano lingua dopo il riavvio, la schermata di accesso dopo che esci dall’account
+settings-region-formats-language = Come la lingua
+settings-region-formats = Formati
+settings-region-formats-description = Date, ore, numeri e misure
+settings-region-formats-next-sign-in = { $sample }, dal prossimo accesso

@@ -1,0 +1,249 @@
+## Appearance: style
+
+settings-appearance-style = Style
+settings-appearance-style-title = Apparence
+settings-appearance-style-description = Les applications qui suivent le système changent avec lui
+settings-appearance-style-light = Clair
+settings-appearance-style-dark = Sombre
+settings-appearance-schedule = Passer en sombre automatiquement
+settings-appearance-schedule-off = Jamais
+settings-appearance-schedule-sunset = Du coucher au lever du soleil
+settings-appearance-schedule-custom = Personnalisé
+settings-appearance-schedule-sunset-description = Suit le coucher et le lever du soleil là où vous êtes
+settings-appearance-schedule-custom-description = Le style choisi reste actif jusqu’au prochain changement
+settings-appearance-dark-from = Sombre à partir de
+settings-appearance-light-from = Clair à partir de
+settings-appearance-pure-black = Noir pur
+settings-appearance-pure-black-description = Arrière-plans sombres entièrement noirs, qui économisent l’énergie sur les écrans OLED
+settings-appearance-accent = Couleur d’accentuation
+settings-appearance-accent-wallpaper = Fond d’écran
+settings-appearance-accent-white = Blanc
+settings-appearance-accent-white-description = Blanc en mode sombre, noir en mode clair
+settings-appearance-accent-wallpaper-description = Tirée de votre fond d’écran
+settings-appearance-theme-apps = Accorder les autres applications au fond d’écran
+settings-appearance-theme-apps-description = Les autres applications et les terminaux prennent les mêmes couleurs
+
+## Appearance: wallpaper
+
+settings-appearance-wallpaper = Fond d’écran
+settings-appearance-wallpaper-light-description = Affiché en mode clair
+settings-appearance-wallpaper-dark-description = Affiché en mode sombre
+settings-appearance-wallpaper-position = Position du fond d’écran. Faites glisser ou utilisez les touches fléchées pour en afficher une autre partie
+settings-appearance-wallpaper-drag = Faire glisser pour repositionner
+settings-appearance-wallpaper-video = { $name }, vidéo
+settings-appearance-wallpaper-current = Fond d’écran actuel
+settings-appearance-wallpaper-empty = Les images et vidéos du dossier Wallpapers, dans vos Images, apparaissent ici.
+settings-appearance-wallpaper-add = Ajouter des fonds d’écran
+settings-appearance-wallpaper-folder = Dossier Wallpapers
+settings-appearance-wallpaper-folder-description = Images › Wallpapers
+settings-appearance-wallpaper-fit-title = Ajustement
+settings-appearance-wallpaper-fit-description = Pour les fonds d’écran qui n’ont pas les proportions de l’écran
+settings-appearance-wallpaper-fill = Remplir
+settings-appearance-wallpaper-fit = Ajuster
+settings-appearance-wallpaper-center = Centrer
+settings-appearance-wallpaper-stretch = Étirer
+settings-appearance-wallpaper-tile = Mosaïque
+settings-appearance-wallpaper-span = Étendre sur les écrans
+settings-appearance-wallpaper-battery = Lire les vidéos sur batterie
+settings-appearance-wallpaper-battery-description = Sinon, les fonds d’écran vidéo restent en pause jusqu’au branchement sur secteur
+
+## Appearance: app icons
+
+settings-appearance-icons = Icônes des applications
+settings-appearance-icons-original = Originales
+settings-appearance-icons-tinted = Teintées
+settings-appearance-icons-clear = Transparentes
+settings-appearance-tint = Teinte
+settings-appearance-tint-description = La première couleur suit votre couleur d’accentuation
+settings-appearance-tint-blue = Bleu
+settings-appearance-tint-teal = Bleu canard
+settings-appearance-tint-green = Vert
+settings-appearance-tint-yellow = Jaune
+settings-appearance-tint-orange = Orange
+settings-appearance-tint-red = Rouge
+settings-appearance-tint-pink = Rose
+settings-appearance-tint-purple = Violet
+settings-appearance-tint-slate = Ardoise
+
+## Appearance: text and motion
+
+settings-appearance-taskbar = Barre des tâches
+settings-appearance-text-and-motion = Texte et animations
+settings-appearance-text-size = Taille du texte
+settings-appearance-text-size-description = Agrandit ou réduit le texte dans les applications
+settings-appearance-animations = Animations
+settings-appearance-animations-description = Les fenêtres et les menus se déplacent au lieu d’apparaître d’un coup
+
+## Taskbar
+
+settings-taskbar-title = Barre des tâches
+settings-taskbar-back = Apparence
+settings-taskbar-preview = Aperçu de la barre des tâches
+settings-taskbar-alignment = Alignement
+settings-taskbar-align-center = Centré
+settings-taskbar-align-left = À gauche
+settings-taskbar-look = Aspect
+settings-taskbar-look-glass = Verre
+settings-taskbar-look-solid = Opaque
+settings-taskbar-look-transparent = Transparent
+settings-taskbar-look-accent = Accentuation
+settings-taskbar-shape = Forme
+settings-taskbar-shape-bar = Bord à bord
+settings-taskbar-shape-floating = Flottante
+settings-taskbar-size = Taille
+settings-taskbar-size-small = Petite
+settings-taskbar-size-medium = Moyenne
+settings-taskbar-size-large = Grande
+settings-taskbar-auto-hide = Masquer automatiquement
+settings-taskbar-hide-never = Jamais
+settings-taskbar-hide-always = Toujours
+settings-taskbar-hide-windows = Quand une fenêtre la touche
+settings-taskbar-more = Plus d’options
+settings-taskbar-show-pinned = Afficher les applications épinglées
+settings-taskbar-per-workspace = Lister uniquement les fenêtres de l’espace de travail actuel
+settings-taskbar-every-display = Afficher sur tous les écrans
+settings-taskbar-per-display = Lister uniquement les fenêtres du même écran
+
+## Fonts
+
+settings-fonts = Polices
+settings-fonts-interface = Interface
+settings-fonts-interface-description = Menus, boutons et texte du bureau et des applications
+settings-fonts-interface-label = Police de l’interface
+settings-fonts-monospace = Chasse fixe
+settings-fonts-monospace-description = Terminaux, code et tout ce qui s’aligne en colonnes
+settings-fonts-monospace-label = Police à chasse fixe
+settings-fonts-all = Toutes les polices
+settings-fonts-all-description = Prévisualisez les polices de cet ordinateur, utilisez-en une ou supprimez celles que vous avez ajoutées
+settings-fonts-back = Apparence
+settings-fonts-search = Rechercher des polices
+settings-fonts-no-match = Aucune police ne porte ce nom
+settings-fonts-default = Par défaut
+settings-fonts-sample = Portez ce vieux whisky au juge blond qui fume
+settings-fonts-open = Ouvrir { $family }
+settings-fonts-styles = { $count ->
+    [one] { $count } style
+   *[other] { $count } styles
+}
+settings-fonts-more-for = Plus d’options pour { $family }
+settings-fonts-more = Plus
+settings-fonts-use-interface = Utiliser comme police système
+settings-fonts-use-monospace = Utiliser comme police à chasse fixe
+settings-fonts-remove = Supprimer
+
+## Cursors
+
+settings-cursors = Curseur
+settings-cursors-size = Taille
+settings-cursors-size-label = Taille du curseur
+settings-cursors-size-default = Par défaut
+settings-cursors-size-medium = Moyenne
+settings-cursors-size-large = Grande
+settings-cursors-size-larger = Plus grande
+settings-cursors-size-largest = Très grande
+settings-cursors-get-more = Obtenir d’autres curseurs
+settings-cursors-get-more-description = Parcourez les thèmes partagés sur GNOME-Look
+settings-cursors-folder = Dossier des curseurs
+settings-cursors-folder-description = Les thèmes placés dans Dossier personnel › .local › share › icons apparaissent ici
+settings-cursors-remove-title = Supprimer { $theme } ?
+settings-cursors-remove-description = Le thème sera supprimé de votre dossier d’icônes.
+settings-cursors-cancel = Annuler
+settings-cursors-remove = Supprimer
+settings-cursors-remove-theme = Supprimer { $theme }
+settings-cursors-store = Obtenir des curseurs
+settings-cursors-back = Apparence
+settings-cursors-search = Rechercher des curseurs
+settings-cursors-order = Trier par
+settings-cursors-order-popular = Populaires
+settings-cursors-order-rating = Mieux notés
+settings-cursors-order-newest = Nouveautés
+settings-cursors-load-failed = Impossible de charger les curseurs
+settings-cursors-try-again = Réessayer
+settings-cursors-no-match = Aucun résultat pour « { $query } »
+settings-cursors-empty = Aucun curseur pour l’instant
+settings-cursors-no-match-description = Essayez une recherche plus courte ou un autre mot
+settings-cursors-store-description = Thèmes partagés par la communauté GNOME-Look
+settings-cursors-previous = Précédente
+settings-cursors-next = Suivante
+settings-cursors-page = Page { $page } sur { $pages }
+settings-cursors-downloads = { $count ->
+    [one] { $downloads } téléchargement
+   *[other] { $downloads } téléchargements
+}
+settings-cursors-installing = Installation de { $name }
+settings-cursors-in-use = Utilisé
+settings-cursors-use = Utiliser
+settings-cursors-get = Obtenir
+settings-cursors-choose-download = Choisir un téléchargement pour { $name }
+settings-cursors-view-online = Voir en ligne
+
+## Notifications
+
+settings-notifications-dnd = Ne pas déranger
+settings-notifications-dnd-description = Pas de bannières ni de sons, sauf pour les applications que vous autorisez
+settings-notifications-lock-screen = Écran de verrouillage
+settings-notifications-show-lock-screen = Afficher les notifications sur l’écran de verrouillage
+settings-notifications-content = Afficher le contenu des messages
+settings-notifications-content-description = Si désactivé, seul le nom de l’application s’affiche
+settings-notifications-content-lock-screen = Afficher le contenu des messages sur l’écran de verrouillage
+settings-notifications-apps = Notifications des applications
+settings-notifications-apps-description = Choisissez comment chaque application vous avertit
+settings-notifications-back = Notifications
+settings-notifications-search = Rechercher des applications
+settings-notifications-no-match = Aucune application ne correspond à votre recherche
+settings-notifications-from = Notifications de { $app }
+settings-notifications-summary-both = Bannières et écran de verrouillage
+settings-notifications-summary-banners = Bannières
+settings-notifications-summary-lock-screen = Écran de verrouillage
+settings-notifications-summary-list = Liste des notifications uniquement
+settings-notifications-allow = Autoriser les notifications
+settings-notifications-banners = Bannières
+settings-notifications-banners-description = S’affichent à l’écran à leur arrivée
+settings-notifications-sound = Émettre un son
+settings-notifications-dnd-allow = Autoriser en mode Ne pas déranger
+settings-notifications-dnd-allow-description = Urgentes : alarmes et appels
+settings-notifications-dnd-never = Jamais
+settings-notifications-dnd-urgent = Urgentes uniquement
+settings-notifications-dnd-always = Toujours
+settings-notifications-keep = Conserver dans la liste des notifications
+settings-notifications-keep-description = Sinon, elles disparaissent dès que leur bannière se ferme
+settings-notifications-app-lock-screen = Afficher sur l’écran de verrouillage
+settings-notifications-done = Terminé
+
+## Accessibility
+
+settings-accessibility-seeing = Vision
+settings-accessibility-screen-reader = Lecteur d’écran
+settings-accessibility-zoom = Zoom
+settings-accessibility-zoom-level = Niveau de zoom
+settings-accessibility-zoom-factor = { NUMBER($factor, maximumFractionDigits: 2) }×
+settings-accessibility-large-text = Grand texte
+settings-accessibility-high-contrast = Contraste élevé
+settings-accessibility-reduce-motion = Réduire les animations
+settings-accessibility-reduce-motion-description = Fondu au lieu de glissements et de zooms
+settings-accessibility-cursor-size = Taille du curseur
+settings-accessibility-typing = Saisie
+settings-accessibility-osk = Clavier visuel
+settings-accessibility-typing-assist = Aide à la saisie
+settings-accessibility-typing-assist-count = { $count ->
+    [0] Désactivée
+    [one] { $count } activée
+   *[other] { $count } activées
+}
+settings-accessibility-sticky-keys = Touches rémanentes
+settings-accessibility-slow-keys = Touches lentes
+settings-accessibility-slow-keys-delay = Délai des touches lentes
+settings-accessibility-bounce-keys = Touches à rebonds
+settings-accessibility-bounce-keys-delay = Délai des touches à rebonds
+settings-accessibility-pointing = Pointage
+settings-accessibility-mouse-keys = Touches de la souris
+settings-accessibility-dwell = Cliquer en immobilisant le pointeur
+settings-accessibility-dwell-time = Immobiliser pendant
+settings-accessibility-hold = Maintenir pour un clic droit
+settings-accessibility-hold-time = Maintenir pendant
+settings-accessibility-locate-pointer = Appuyer sur Ctrl pour localiser le pointeur
+settings-accessibility-hearing = Audition
+settings-accessibility-flash = Clignoter lors des alertes sonores
+settings-accessibility-flash-type = Clignotement
+settings-accessibility-flash-window = Fenêtre
+settings-accessibility-flash-screen = Écran

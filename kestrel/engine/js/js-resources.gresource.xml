@@ -130,11 +130,18 @@
     <file>ui/status/thunderbolt.js</file>
     <file>ui/status/volume.js</file>
     <file alias="locales/en.ftl">ui/locale-en.ftl</file>
-    <file alias="locales/de.ftl">ui/locale-de.ftl</file>
-    <file alias="locales/sq.ftl">ui/locale-sq.ftl</file>
-    <file alias="locales/hr.ftl">ui/locale-hr.ftl</file>
-    <file alias="locales/sr.ftl">ui/locale-sr.ftl</file>
-    <file alias="locales/sr-Latn.ftl">ui/locale-sr-Latn.ftl</file>
     <file alias="locales/bs.ftl">ui/locale-bs.ftl</file>
+    <file alias="locales/ca.ftl">ui/locale-ca.ftl</file>
+    <file alias="locales/de.ftl">ui/locale-de.ftl</file>
+    <file alias="locales/es.ftl">ui/locale-es.ftl</file>
+    <file alias="locales/fr.ftl">ui/locale-fr.ftl</file>
+    <file alias="locales/hr.ftl">ui/locale-hr.ftl</file>
+    <file alias="locales/it.ftl">ui/locale-it.ftl</file>
+    <file alias="locales/pt-BR.ftl">ui/locale-pt-BR.ftl</file>
+    <file alias="locales/pt.ftl">ui/locale-pt.ftl</file>
+    <file alias="locales/ro.ftl">ui/locale-ro.ftl</file>
+    <file alias="locales/sq.ftl">ui/locale-sq.ftl</file>
+    <file alias="locales/sr-Latn.ftl">ui/locale-sr-Latn.ftl</file>
+    <file alias="locales/sr.ftl">ui/locale-sr.ftl</file>
   </gresource>
 </gresources>

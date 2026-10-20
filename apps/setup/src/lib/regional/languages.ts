@@ -16,15 +16,32 @@ const LOCALES: [locale: string, country: string][] = [
 	['en_IN.UTF-8', 'IN'],
 	['en_ZA.UTF-8', 'ZA'],
 	['en_DK.UTF-8', 'DK'],
+	['bs_BA.UTF-8', 'BA'],
+	['ca_ES.UTF-8', 'ES'],
+	['ca_AD.UTF-8', 'AD'],
 	['de_DE.UTF-8', 'DE'],
 	['de_AT.UTF-8', 'AT'],
 	['de_CH.UTF-8', 'CH'],
+	['es_ES.UTF-8', 'ES'],
+	['es_MX.UTF-8', 'MX'],
+	['es_AR.UTF-8', 'AR'],
+	['es_CO.UTF-8', 'CO'],
+	['es_CL.UTF-8', 'CL'],
+	['fr_FR.UTF-8', 'FR'],
+	['fr_BE.UTF-8', 'BE'],
+	['fr_CH.UTF-8', 'CH'],
+	['fr_LU.UTF-8', 'LU'],
+	['fr_CA.UTF-8', 'CA'],
+	['hr_HR.UTF-8', 'HR'],
+	['it_IT.UTF-8', 'IT'],
+	['it_CH.UTF-8', 'CH'],
+	['pt_BR.UTF-8', 'BR'],
+	['pt_PT.UTF-8', 'PT'],
+	['ro_RO.UTF-8', 'RO'],
 	['sq_AL.UTF-8', 'AL'],
 	['sq_MK.UTF-8', 'MK'],
-	['hr_HR.UTF-8', 'HR'],
-	['bs_BA.UTF-8', 'BA'],
-	['sr_RS.UTF-8', 'RS'],
 	['sr_RS.UTF-8@latin', 'RS'],
+	['sr_RS.UTF-8', 'RS'],
 	['sr_ME.UTF-8', 'ME']
 ];
 
@@ -41,7 +58,10 @@ export const DEFAULT_LANGUAGE = LANGUAGES[0];
 export const languageTag = (language: Language) => bcp47(language.locale)!;
 
 export function languageFor(country: string | null): Language | null {
-	return LANGUAGES.find((language) => language.country === country) ?? null;
+	if (!country) return null;
+	const spoken = LANGUAGES.filter((language) => language.country === country);
+	const { language: main } = new Intl.Locale(`und-${country}`).maximize();
+	return spoken.find((language) => languageTag(language) === `${main}-${country}`) ?? spoken[0] ?? null;
 }
 
 export function languageNamed(locale: string | null): Language | null {
@@ -55,7 +75,8 @@ const KEYBOARDS: Record<string, string> = {
 	ES: 'es', PT: 'pt', BR: 'br', MX: 'latam', AR: 'latam', CL: 'latam', CO: 'latam',
 	IT: 'it', SE: 'se', NO: 'no', DK: 'dk', FI: 'fi', IS: 'is', EE: 'ee', LV: 'lv', LT: 'lt',
 	PL: 'pl', CZ: 'cz', SK: 'sk', HU: 'hu', SI: 'si', HR: 'hr', RS: 'rs', RO: 'ro', BG: 'bg',
-	GR: 'gr', TR: 'tr', RU: 'ru', UA: 'ua', IL: 'il', JP: 'jp', KR: 'kr', CN: 'cn', TW: 'tw', TH: 'th'
+	GR: 'gr', CY: 'gr', TR: 'tr', RU: 'ru', UA: 'ua', MK: 'mk', MT: 'mt', AD: 'es',
+	IL: 'il', JP: 'jp', KR: 'kr', CN: 'cn', TW: 'tw', TH: 'th'
 };
 
 export function keyboardFor(country: string | null): string | null {

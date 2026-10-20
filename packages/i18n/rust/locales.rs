@@ -2,7 +2,9 @@ use std::env;
 
 pub const SOURCE_LOCALE: &str = "en";
 pub const PSEUDO_LOCALE: &str = "en-XA";
-pub const LOCALES: [&str; 7] = ["en", "de", "sq", "hr", "sr", "sr-Latn", "bs"];
+pub const LOCALES: [&str; 14] = [
+    "en", "bs", "ca", "de", "es", "fr", "hr", "it", "pt-BR", "pt", "ro", "sq", "sr-Latn", "sr",
+];
 
 pub fn bcp47(locale: &str) -> Option<String> {
     let (base, modifier) = locale.split_once('@').unwrap_or((locale, ""));
@@ -27,23 +29,55 @@ pub fn bcp47(locale: &str) -> Option<String> {
     )
 }
 
+fn subtags(tag: &str) -> impl Iterator<Item = &str> {
+    tag.split('-').skip(1)
+}
+
 fn script_of(tag: &str) -> Option<&str> {
-    tag.split('-').find(|part| part.len() == 4)
+    subtags(tag).find(|part| part.len() == 4)
+}
+
+fn region_of(tag: &str) -> Option<String> {
+    subtags(tag)
+        .find(|part| {
+            (part.len() == 2 && part.chars().all(|c| c.is_ascii_alphabetic()))
+                || (part.len() == 3 && part.chars().all(|c| c.is_ascii_digit()))
+        })
+        .map(str::to_uppercase)
+}
+
+fn language_of(tag: &str) -> &str {
+    match tag.split('-').next().unwrap_or_default() {
+        "no" => "nb",
+        language => language,
+    }
 }
 
 pub fn matching(tag: &str) -> Option<&'static str> {
     if tag == PSEUDO_LOCALE {
         return Some(PSEUDO_LOCALE);
     }
-    let language = tag.split('-').next()?;
+    let language = language_of(tag);
     let script = script_of(tag);
+    let region = region_of(tag);
     let candidates: Vec<&'static str> = LOCALES
         .into_iter()
-        .filter(|locale| locale.split('-').next() == Some(language))
+        .filter(|locale| language_of(locale) == language)
         .collect();
-    candidates
+    let same_script: Vec<&'static str> = candidates
         .iter()
-        .find(|locale| script_of(locale) == script)
+        .copied()
+        .filter(|locale| script_of(locale) == script)
+        .collect();
+    same_script
+        .iter()
+        .find(|locale| region_of(locale) == region)
+        .or_else(|| {
+            same_script
+                .iter()
+                .find(|locale| region_of(locale).is_none())
+        })
+        .or(same_script.first())
         .or_else(|| {
             candidates
                 .iter()
@@ -109,7 +143,14 @@ mod tests {
         assert_eq!(negotiate(&["sr-Latn-RS"]), "sr-Latn");
         assert_eq!(negotiate(&["sr-RS"]), "sr");
         assert_eq!(negotiate(&["sr-Cyrl-BA"]), "sr");
-        assert_eq!(negotiate(&["fr-FR", "bs-BA"]), "bs");
-        assert_eq!(negotiate(&["fr-FR"]), "en");
+        assert_eq!(negotiate(&["ja-JP", "bs-BA"]), "bs");
+        assert_eq!(negotiate(&["ja-JP"]), "en");
+    }
+
+    #[test]
+    fn prefers_the_requested_region() {
+        assert_eq!(negotiate(&["pt-BR"]), "pt-BR");
+        assert_eq!(negotiate(&["pt-PT"]), "pt");
+        assert_eq!(negotiate(&["pt-AO"]), "pt");
     }
 }

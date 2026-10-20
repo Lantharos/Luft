@@ -119,12 +119,19 @@ macro_rules! localizer {
     ($dir:literal, [$($file:literal),+ $(,)?]) => {
         $crate::Localizer::new(&[
             $crate::localizer!(@locale $dir, "en", [$($file),+]),
-            $crate::localizer!(@locale $dir, "de", [$($file),+]),
-            $crate::localizer!(@locale $dir, "sq", [$($file),+]),
-            $crate::localizer!(@locale $dir, "hr", [$($file),+]),
-            $crate::localizer!(@locale $dir, "sr", [$($file),+]),
-            $crate::localizer!(@locale $dir, "sr-Latn", [$($file),+]),
             $crate::localizer!(@locale $dir, "bs", [$($file),+]),
+            $crate::localizer!(@locale $dir, "ca", [$($file),+]),
+            $crate::localizer!(@locale $dir, "de", [$($file),+]),
+            $crate::localizer!(@locale $dir, "es", [$($file),+]),
+            $crate::localizer!(@locale $dir, "fr", [$($file),+]),
+            $crate::localizer!(@locale $dir, "hr", [$($file),+]),
+            $crate::localizer!(@locale $dir, "it", [$($file),+]),
+            $crate::localizer!(@locale $dir, "pt-BR", [$($file),+]),
+            $crate::localizer!(@locale $dir, "pt", [$($file),+]),
+            $crate::localizer!(@locale $dir, "ro", [$($file),+]),
+            $crate::localizer!(@locale $dir, "sq", [$($file),+]),
+            $crate::localizer!(@locale $dir, "sr-Latn", [$($file),+]),
+            $crate::localizer!(@locale $dir, "sr", [$($file),+]),
         ])
     };
     (@locale $dir:literal, $locale:literal, [$($file:literal),+]) => {

@@ -1,0 +1,125 @@
+source,target,explanation
+Luft,,Not translated. Name of the operating system
+Kestrel,,Not translated. Name of Luft's desktop
+Rover,,"Not translated. App name, the file manager"
+Magpie,,"Not translated. App name, the viewer for photos, videos, music and PDFs"
+Mailman,,"Not translated. App name, the mail app"
+Draft,,"Not translated. App name, the text and code editor"
+Tern,,"Not translated. App name, the terminal"
+Schelf,,"Not translated. App name, the app store"
+Barometer,,"Not translated. App name, the system monitor"
+Keys,,"Not translated. App name, makes keyboard layouts and input methods"
+Meet Luft,,Not translated. Name of the Windows app that prepares a PC for Luft
+Helium,,Not translated. Name of the default browser
+Flatpak,,Not translated. App packaging format
+Secure Boot,,"Not translated. UEFI feature, named this way in every PC's firmware setup"
+TPM,,Not translated. Trusted Platform Module; in the interface usually called the security chip
+Bluetooth,,Not translated. Trademark
+Wi-Fi,Wi-Fi,"Wireless network; written Wi-Fi as Windows does; la xarxa Wi-Fi, and el Wi-Fi for the feature"
+Settings,Configuració,"App name and the general word for settings; f, singular, la Configuració; for a set of options use paràmetres (m, plural)"
+Disks,Discs,App name for the disk utility
+Install Luft,Instal·la Luft,App name of the installer; imperative like a button
+Network Sign-In,Inici de sessió a la xarxa,App that opens the sign-in page of a public Wi-Fi
+File Manager,Gestor de fitxers,Generic name of Rover
+Media Viewer,Visualitzador multimèdia,Generic name of Magpie
+Mail,Correu,Generic name of Mailman
+Text Editor,Editor de text,Generic name of Draft
+App Store,Botiga d’aplicacions,Generic name of Schelf
+System Monitor,Monitor del sistema,Generic name of Barometer
+Keyboard Layouts,Disposicions de teclat,Generic name of Keys
+Start,Inici,"The menu opened with Super or the Luft mark; a name, as in Catalan Windows; el menú Inici, cerca a Inici"
+board,tauler,Mode that lays a workspace's windows side by side on an endless canvas; m
+Quick settings,Configuració ràpida,"Panel of switches and sliders opened from the status icons; f, singular"
+notification center,centre de notificacions,"Panel with notifications, media and the calendar, opened from the clock; m"
+All windows,Totes les finestres,"The task view: every window of a workspace and the workspaces, Super+Tab"
+snap,ajustar,"verb: put a window into a half, third or quarter of the screen; button Ajusta"
+snap layout,disposició d’ajust,One of the arrangements offered by Super+Z; f
+snap group,grup d’ajust,Windows snapped side by side that come back together; m
+taskbar,barra de tasques,The bar along the bottom of the screen; f
+tray,safata del sistema,Taskbar button holding the icons of apps running in the background; f
+status icons,icones d’estat,"Taskbar icons for network, sound and battery that open Quick settings; icona is f"
+lock screen,pantalla de bloqueig,Screen shown while the session is locked; f
+login screen,pantalla d’inici de sessió,Screen listing the people on the computer before anyone signs in; f
+workspace,espai de treball,One of up to ten separate desktops; m
+desktop,escriptori,The background area behind the windows; also the whole desktop environment; m
+wallpaper,fons de pantalla,Picture behind the desktop; m
+accent color,color d’èmfasi,Color taken from the wallpaper and used for highlights; m
+dark style,Mode fosc,Quick settings tile that switches between light and dark
+Night light,Llum nocturna,Warmer screen colors in the evening; f
+Do Not Disturb,No molestis,Holds back notification banners and sounds
+Airplane mode,Mode d’avió,Turns off every radio
+Keep awake,Mantén actiu,Keeps the screen on for a while
+Power mode,Mode d’energia,"Performance, Balanced or Power saver"
+Power saver,Estalvi d’energia,Power mode
+Dictation,Dictat,Typing by speaking; m
+clipboard,porta-retalls,"Holds what was copied; m, invariable"
+clipboard history,historial del porta-retalls,"List of recently copied items, Super+V"
+emoji,emoji,"noun; m, plural emojis"
+screenshot,captura de pantalla,Picture of the screen; f
+screen recording,enregistrament de pantalla,Video of the screen; m
+privacy indicator,indicador de privadesa,"Taskbar icon shown while the camera, microphone, location or screen is in use; m"
+Full access,Accés complet,"Schelf switch that lets a Flatpak app leave its sandbox: all files, clipboard in the background, other apps' windows; m"
+sandbox,entorn aïllat,Isolation Flatpak apps run in; m
+Keyring,Clauer,"Luft Keyring, which keeps passwords, tokens and keys; m"
+passkey,clau d’accés,"Sign-in key that replaces a password on websites; f, plural claus d’accés"
+recovery key,clau de recuperació,Long code that unlocks an encrypted disk when the TPM can't; f
+security chip,xip de seguretat,How the interface names the TPM; m
+device encryption,xifratge del dispositiu,Encryption of the whole disk; m
+encryption,xifratge,"noun; m; verb xifrar, never encriptar"
+signed startup,arrencada signada,Startup where every step is checked against Luft's signature; f
+firmware,microprogramari,"Software built into the hardware; m; TERMCAT, GNOME and Windows"
+window,finestra,noun; f
+pin,fixar,"verb: keep an app on the taskbar or in Start; menu item Fixa a…"
+unpin,deixar de fixar,verb; menu item Deixa de fixar…
+Pin to taskbar,Fixa a la barra de tasques,Menu item
+open,obrir,verb; button Obre
+close,tancar,verb; button Tanca
+remove,treure,"verb, take something out of a list or place without destroying it; button Treu"
+delete,suprimir,"verb, destroy; button Suprimeix"
+turn on,activar,"verb, for a feature or setting; encendre only for a device's power"
+turn off,desactivar,"verb, for a feature or setting; apagar only for a device's power"
+sign in,iniciar la sessió,verb; button Inicia la sessió
+sign out,tancar la sessió,"verb, also Log out; button Tanca la sessió"
+restart,reiniciar,verb; button Reinicia
+shut down,apagar,"verb, also Power off; button Apaga"
+suspend,suspendre,"verb and power menu item, also Sleep; menu item Suspèn, the state suspensió"
+hibernate,hibernar,verb and power menu item Hiberna
+lock,bloquejar,verb; button Bloqueja
+unlock,desbloquejar,verb; button Desbloqueja
+install,instal·lar,verb; button Instal·la
+update,actualitzar,verb; button Actualitza
+updates,actualitzacions,"noun, new versions of Luft or apps; f, plural"
+cancel,Cancel·la,button
+save,desar,"verb; button Desa; never guardar, which is keep"
+allow,permetre,verb; button Permet
+forget,oblidar,"verb, for a saved network or device; button Oblida"
+share,compartir,verb; button Comparteix
+search,cercar,"verb and noun; noun: cerca, f; button Cerca"
+set up,configurar,verb; button Configura
+try again,Torna-ho a provar,"button; in running text with vós, Torneu-ho a provar"
+undo,desfer,verb; button: Desfés
+done,Fet,button
+next,Següent,button that moves to the next step
+app,aplicació,"noun, also application; f, plural aplicacions; app only where aplicació truly doesn't fit"
+file,fitxer,noun; m
+folder,carpeta,noun; f
+trash,paperera,Where deleted files wait; f
+device,dispositiu,noun; m
+disk,disc,"noun, also drive; m; unitat (f) for a drive you plug in"
+USB stick,memòria USB,noun; f
+computer,ordinador,"noun, also PC; m"
+network,xarxa,noun; f
+battery,bateria,noun; f
+power,energia,Settings page and button for power; f
+display,pantalla,"noun, a monitor or built-in screen; also screen; f"
+sound,so,"noun, the Settings page and audio in general; m, plural sons"
+notification,notificació,noun; f
+keyboard shortcut,drecera de teclat,noun; f; drecera alone when the context is clear
+keyboard layout,disposició de teclat,noun; f
+input method,mètode d’entrada,"Turns what you type into something else, such as Compose sequences or word choices; m"
+touchpad,ratolí tàctil,noun; m
+privacy,privadesa,"noun; f; TERMCAT's word, never privacitat"
+security,seguretat,noun; f
+account,compte,"noun, a user account or online account; m"
+password,contrasenya,noun; f
+accessibility,accessibilitat,noun; f

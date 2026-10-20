@@ -130,5 +130,12 @@
     <file>ui/status/rfkill.js</file>
     <file>ui/status/thunderbolt.js</file>
     <file>ui/status/volume.js</file>
+    <file alias="locales/en.ftl">ui/locale-en.ftl</file>
+    <file alias="locales/de.ftl">ui/locale-de.ftl</file>
+    <file alias="locales/sq.ftl">ui/locale-sq.ftl</file>
+    <file alias="locales/hr.ftl">ui/locale-hr.ftl</file>
+    <file alias="locales/sr.ftl">ui/locale-sr.ftl</file>
+    <file alias="locales/sr-Latn.ftl">ui/locale-sr-Latn.ftl</file>
+    <file alias="locales/bs.ftl">ui/locale-bs.ftl</file>
   </gresource>
 </gresources>

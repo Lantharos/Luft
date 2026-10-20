@@ -1,4 +1,5 @@
 import { events, listen, system } from '@lantharos/sabine';
+import { i18n, type Locale } from '@luft/i18n';
 
 import type { MotionPreference } from './motion';
 import type { TaskbarLooks } from './taskbar/looks';
@@ -55,6 +56,7 @@ export interface Appearance {
 	palette: Palette | null;
 	typography: Typography;
 	motion: MotionPreference;
+	locale?: Locale;
 }
 
 const kebab = (name: string) => name.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
@@ -80,6 +82,7 @@ class AppearanceState {
 		if (initial.palette) this.receive(initial.palette);
 		this.type(initial.typography);
 		this.move(initial.motion);
+		void i18n.start(initial.locale);
 		const stops = [
 			listen<Palette>(PALETTE_CHANGED, (palette) => this.receive(palette)),
 			events.appearanceChanged(({ colorScheme }) => (this.scheme = colorScheme)),

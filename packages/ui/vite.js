@@ -1,6 +1,8 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
+export { luftLocales } from '@luft/i18n/vite';
+
 const FONTS = fileURLToPath(new URL('./fonts/', import.meta.url));
 const FONT_FILES = readdirSync(FONTS);
 const SABINE_CHROMIUM = 'chrome151';

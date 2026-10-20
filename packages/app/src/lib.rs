@@ -2,6 +2,7 @@
 pub mod apps;
 mod bridge;
 pub use luft_dbus as dbus;
+pub use luft_i18n as i18n;
 mod desktop;
 pub mod file_manager;
 #[cfg(feature = "fonts")]

@@ -1,0 +1,15 @@
+[package]
+name = "luft-i18n"
+version = "0.1.0"
+description = "Fluent translations for Luft's Rust services and app backends"
+authors = ["Kristof"]
+license = "GPL-3.0-or-later"
+edition = "2024"
+rust-version = "1.98"
+
+[lib]
+path = "rust/lib.rs"
+
+[dependencies]
+fluent-bundle = "0.16.0"
+unic-langid = "0.9.6"

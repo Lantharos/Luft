@@ -7,6 +7,13 @@ kestrel_ui_js = custom_target('kestrel-ui',
   command: [bun, files('../../../ui/build.ts'), 'kestrelUi', '@OUTPUT@'],
 )
 
+kestrel_locales = custom_target('kestrel-locales',
+  input: files('../../../ui/locales.ts'),
+  output: ['locale-en.ftl', 'locale-de.ftl', 'locale-sq.ftl', 'locale-hr.ftl', 'locale-sr.ftl', 'locale-sr-Latn.ftl', 'locale-bs.ftl'],
+  depfile: 'kestrel-locales.d',
+  command: [bun, files('../../../ui/locales.ts'), '@OUTDIR@', '@DEPFILE@'],
+)
+
 custom_target('kestrel-session',
   input: files('../../../ui/src/session/main.ts', '../../../ui/build.ts'),
   output: 'kestrel-session.js',

@@ -74,10 +74,17 @@ impl GlassWindow<'_> {
 }
 
 #[derive(Serialize)]
+pub struct Locale {
+    languages: Vec<String>,
+    formats: String,
+}
+
+#[derive(Serialize)]
 pub struct Appearance {
     palette: Option<Palette>,
     typography: Typography,
     motion: Motion,
+    locale: Locale,
 }
 
 impl Appearance {
@@ -86,6 +93,10 @@ impl Appearance {
             palette: palette::palette().await,
             typography: Typography::current().await,
             motion: Motion::current().await,
+            locale: Locale {
+                languages: luft_i18n::requested(),
+                formats: luft_i18n::formats(),
+            },
         }
     }
 }

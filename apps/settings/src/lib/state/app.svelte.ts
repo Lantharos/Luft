@@ -1,4 +1,5 @@
 import type { Component } from 'svelte';
+import { i18n } from '@luft/i18n';
 import { appearance } from '@luft/ui';
 import { appState, onActivated } from '#lib/bridge.js';
 import { DEFAULT_PANEL, PANELS, resolveLink, type Panel, type PanelId } from '#lib/panels/registry.js';
@@ -19,6 +20,7 @@ class AppStore {
 	async start() {
 		const [state] = await Promise.all([appState(), hardware.start(), updates.start()]);
 		appearance.start(state);
+		await i18n.ready;
 		onActivated(({ arguments: args }) => {
 			const page = args.find((argument) => argument.startsWith('kestrel-settings:'));
 			if (page) this.open(page);

@@ -1,0 +1,30 @@
+{
+	"name": "@luft/i18n",
+	"version": "0.1.0",
+	"private": true,
+	"type": "module",
+	"license": "GPL-3.0-or-later",
+	"exports": {
+		".": {
+			"types": "./src/index.ts",
+			"svelte": "./src/index.ts",
+			"default": "./src/index.ts"
+		},
+		"./core": "./src/core.ts",
+		"./vite": "./vite.js"
+	},
+	"scripts": {
+		"check": "svelte-check --tsconfig ./tsconfig.json && bun tools/lint.ts"
+	},
+	"dependencies": {
+		"@fluent/bundle": "^0.19.1"
+	},
+	"devDependencies": {
+		"@fluent/syntax": "^0.19.0",
+		"@types/bun": "^1.4.3",
+		"svelte": "^5.57.1",
+		"svelte-check": "^4.7.6",
+		"typescript": "~6.0.3",
+		"vite": "^8.3.2"
+	}
+}

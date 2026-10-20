@@ -72,8 +72,9 @@
 	.line {
 		display: flex;
 		min-height: 28px;
+		flex-wrap: wrap;
 		align-items: center;
-		gap: 14px;
+		gap: 10px 14px;
 	}
 
 	.icon {
@@ -86,12 +87,11 @@
 	.text {
 		display: flex;
 		min-width: 0;
-		flex: 1;
+		flex: 1 1 14rem;
 		flex-direction: column;
 		gap: 2px;
 	}
 
-	.title,
 	.truncate {
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -99,6 +99,7 @@
 	}
 
 	.title {
+		overflow-wrap: break-word;
 		font-size: 14px;
 		font-weight: 500;
 		color: var(--text);
@@ -112,7 +113,9 @@
 
 	.trailing {
 		display: flex;
+		max-width: 100%;
 		flex: none;
+		margin-left: auto;
 		align-items: center;
 		gap: 10px;
 		font-size: 13px;

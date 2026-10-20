@@ -12,6 +12,13 @@ impl Error {
     pub fn not_authorized() -> Self {
         Self::NotAuthorized("You aren't allowed to do this.".to_owned())
     }
+
+    pub fn relayed(error: zbus::Error) -> Self {
+        match error {
+            zbus::Error::MethodError(_, Some(message), _) => Self::Failed(message),
+            error => Self::ZBus(error),
+        }
+    }
 }
 
 impl From<anyhow::Error> for Error {

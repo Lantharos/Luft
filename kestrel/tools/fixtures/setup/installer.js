@@ -1,3 +1,4 @@
+import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 const INSTALLER = `<node><interface name="com.lantharos.Installer1">
@@ -11,6 +12,11 @@ const INSTALLER = `<node><interface name="com.lantharos.Installer1">
   <method name="Configure"><arg type="s" direction="in"/></method>
   <method name="CreateAccount"><arg type="s" direction="in"/><arg type="s" direction="in"/><arg type="s" direction="in"/></method>
   <method name="FinishFirstBoot"/>
+  <method name="EnrollSigningKey"><arg type="s" direction="out"/></method>
+  <method name="TurnOnEncryption"><arg type="s" direction="in"/><arg type="s" direction="in"/></method>
+  <method name="EnrollFingerprint"><arg type="s" direction="in"/></method>
+  <method name="StopFingerprint"/>
+  <signal name="FingerprintStatus"><arg type="s"/><arg type="b"/></signal>
 </interface></node>`;
 const CONTROL = `<node><interface name="com.lantharos.KestrelChecks.Installer">
   <method name="SetPhase"><arg type="s" direction="in"/></method>
@@ -20,6 +26,9 @@ const CONTROL = `<node><interface name="com.lantharos.KestrelChecks.Installer">
 </interface></node>`;
 
 export const INSTALLER_NAME = 'com.lantharos.Installer1';
+const TRUST = ['com.lantharos.Trust1', '/com/lantharos/Trust1', 'com.lantharos.Trust1'];
+const FPRINT = 'net.reactivated.Fprint';
+const FPRINT_DEVICE = 'net.reactivated.Fprint.Device';
 
 const GB = 1e9;
 const MIB = 1024 ** 2;
@@ -63,11 +72,58 @@ const FROM_MEET = {
   meet: {drive: '/org/freedesktop/UDisks2/block_devices/nvme0n1', space: ROOM, intent: 'install', room: ROOM, movingBox: null},
 };
 
+function relay([name, path, iface], method, parameters = null) {
+  return new Promise((resolve, reject) => Gio.DBus.system.call(name, path, iface, method, parameters, null, Gio.DBusCallFlags.NONE, -1, null,
+    (bus, result) => {
+      try {
+        resolve(bus.call_finish(result));
+      } catch (error) {
+        reject(error);
+      }
+    }));
+}
+
+function answer(invocation, reply) {
+  reply.then(value => invocation.return_value(value), error => invocation.return_gerror(error));
+}
+
+function relayFingerprints(emit) {
+  let reader = null;
+  let watch = 0;
+  const device = () => [FPRINT, reader, FPRINT_DEVICE];
+  const stop = async () => {
+    if (!reader)
+      return;
+    Gio.DBus.system.signal_unsubscribe(watch);
+    await relay(device(), 'EnrollStop').catch(() => null);
+    await relay(device(), 'Release').catch(() => null);
+    reader = null;
+  };
+  const start = async finger => {
+    await stop();
+    [reader] = (await relay([FPRINT, '/net/reactivated/Fprint/Manager', 'net.reactivated.Fprint.Manager'], 'GetDefaultDevice')).deepUnpack();
+    watch = Gio.DBus.system.signal_subscribe(FPRINT, FPRINT_DEVICE, 'EnrollStatus', reader, null, Gio.DBusSignalFlags.NONE,
+      (_bus, _sender, _path, _iface, _signal, status) => {
+        emit(status);
+        if (status.deepUnpack()[1])
+          void stop();
+      });
+    await relay(device(), 'Claim', new GLib.Variant('(s)', ['']));
+    await relay(device(), 'EnrollStart', new GLib.Variant('(s)', [finger]));
+    return null;
+  };
+  return {start, stop: async () => {
+    await stop();
+    return null;
+  }};
+}
+
 export function publishInstaller(publish, calls) {
   const state = {Phase: 'live', Stage: 'idle', Progress: 0, Error: '', SecureBootCode: ''};
   const requests = [];
   let survey = SURVEY;
   let exported = null;
+  const fingerprints = relayFingerprints(status => exported.emit_signal('FingerprintStatus', status));
   const set = changes => {
     Object.assign(state, changes);
     for (const [name, value] of Object.entries(changes))
@@ -101,6 +157,11 @@ export function publishInstaller(publish, calls) {
     },
     CreateAccount: (name, fullName) => calls.push(`installer CreateAccount ${name} ${fullName}`),
     FinishFirstBoot: () => calls.push('installer FinishFirstBoot'),
+    EnrollSigningKeyAsync: (_parameters, invocation) => answer(invocation, relay(TRUST, 'EnrollSigningKey')),
+    TurnOnEncryptionAsync: ([recoveryKey, passphrase], invocation) =>
+      answer(invocation, relay(TRUST, 'TurnOnEncryption', new GLib.Variant('(sss)', [recoveryKey, '', passphrase]))),
+    EnrollFingerprintAsync: ([finger], invocation) => answer(invocation, fingerprints.start(finger)),
+    StopFingerprintAsync: (_parameters, invocation) => answer(invocation, fingerprints.stop()),
   }, '/com/lantharos/Installer1');
   publish(CONTROL, {
     SetPhase: phase => set({Phase: phase}),

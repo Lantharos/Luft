@@ -547,6 +547,7 @@ dependencies = [
  "access",
  "anyhow",
  "clap",
+ "futures-util",
  "libc",
  "luft-dbus",
  "luft-disks",

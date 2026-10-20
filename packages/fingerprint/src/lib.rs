@@ -10,7 +10,7 @@ use zbus::message::Type;
 use zbus::proxy::MethodFlags;
 use zbus::{DynamicType, MatchRule, MessageStream, OwnedObjectPath, Proxy};
 
-const PROGRESS: &str = "fingerprint.enroll";
+pub const PROGRESS: &str = "fingerprint.enroll";
 
 const SERVICE: &str = "net.reactivated.Fprint";
 const MANAGER_PATH: &str = "/net/reactivated/Fprint/Manager";
@@ -32,9 +32,9 @@ struct Finger {
 }
 
 #[derive(Serialize)]
-struct Progress {
-    result: String,
-    done: bool,
+pub struct Progress {
+    pub result: String,
+    pub done: bool,
 }
 
 static ENROLLING: Mutex<Option<Proxy<'static>>> = Mutex::new(None);
@@ -167,12 +167,16 @@ async fn listen(events: Events) {
     }
 }
 
-pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
+pub fn register_reader(window: SabineWindow) -> SabineWindow {
     window
         .command_async("fingerprint_reader", |_: Value| async {
             Ok(reader_present().await)
         })
         .command_async("fingerprint_list", list)
+}
+
+pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
+    register_reader(window)
         .with_async("fingerprint_enroll", events, enroll)
         .command_async("fingerprint_stop", |_: Value| async {
             stop().await;

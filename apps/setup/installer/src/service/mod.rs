@@ -1,5 +1,6 @@
 mod error;
 mod interface;
+mod setup;
 
 use std::sync::Arc;
 use std::time::Duration;

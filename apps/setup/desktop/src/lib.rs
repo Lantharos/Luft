@@ -1,3 +1,4 @@
+mod fingerprint;
 mod hardware;
 mod installer;
 mod regional;
@@ -52,7 +53,7 @@ async fn app_state(_: Value) -> Result<AppState, String> {
 fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     let window = window.command_async("app_state", app_state);
     let window = luft_network::register(window, events);
-    let window = luft_fingerprint::register(window, events);
+    let window = fingerprint::register(window, events);
     let window = installer::register(window);
     let window = trust::register(window);
     let window = regional::register(window);

@@ -1,0 +1,14 @@
+[Unit]
+Description=End first-run setup that's been open too long
+After=local-fs.target dbus.service
+Before=display-manager.service greetd.service
+ConditionPathExists=/var/lib/luft-installer/first-boot
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/luft-installer expire-setup
+SELinuxContext=system_u:system_r:install_t:s0
+SyslogIdentifier=luft-installer
+
+[Install]
+WantedBy=multi-user.target

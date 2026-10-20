@@ -17,6 +17,7 @@ fn main() -> ExitCode {
     let options = options::Options::parse();
     let result = match options.command {
         Some(Command::Reclaim) => meet::reclaim::run(&options.state_dir),
+        Some(Command::ExpireSetup) => first_boot::expire(&options.state_dir),
         None => service::run(options),
     };
     match result {

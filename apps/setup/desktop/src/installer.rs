@@ -8,7 +8,7 @@ use serde_json::Value;
 use zbus::DynamicType;
 use zbus::wire::DynamicDeserialize;
 
-const INSTALLER: Service = Service {
+pub const INSTALLER: Service = Service {
     name: "com.lantharos.Installer1",
     path: "/com/lantharos/Installer1",
     interface: "com.lantharos.Installer1",
@@ -61,7 +61,7 @@ fn explain(error: &zbus::Error) -> String {
     }
 }
 
-async fn call<B, R>(method: &str, body: &B) -> Result<R, String>
+pub async fn call<B, R>(method: &str, body: &B) -> Result<R, String>
 where
     B: Serialize + DynamicType,
     R: for<'d> DynamicDeserialize<'d>,

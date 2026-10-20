@@ -10,6 +10,7 @@ rust-version = "1.98"
 [dependencies]
 access = { path = "../../../security/crates/access" }
 anyhow = "1.0.104"
+futures-util = { version = "0.3.34", default-features = false }
 clap = { version = "4.6.7", features = ["derive"] }
 libc = "0.2.190"
 luft-dbus = { path = "../../../packages/dbus" }

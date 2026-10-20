@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
 use luft_variant::Variant;
@@ -7,6 +7,7 @@ use serde::Deserialize;
 
 const GIB: u64 = 1 << 30;
 const IMAGE_REFERENCE: &str = "/usr/share/luft/image-reference";
+const SETUP_APP: &str = "/usr/lib/sabine/com.lantharos.setup/setup";
 
 #[derive(Deserialize)]
 #[serde(rename_all = "kebab-case")]
@@ -15,6 +16,8 @@ pub struct Config {
     images: HashMap<String, Source>,
     #[serde(default = "smallest_system")]
     pub smallest_system: u64,
+    #[serde(default = "setup_app")]
+    pub setup_app: PathBuf,
 }
 
 #[derive(Deserialize)]
@@ -33,6 +36,10 @@ pub struct Image {
 
 fn smallest_system() -> u64 {
     32 * GIB
+}
+
+fn setup_app() -> PathBuf {
+    PathBuf::from(SETUP_APP)
 }
 
 impl Config {

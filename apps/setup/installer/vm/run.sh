@@ -29,13 +29,13 @@ place 644 "$installer/data/com.lantharos.Installer1.conf" /usr/share/dbus-1/syst
 place 644 "$installer/data/com.lantharos.Installer1.service" /usr/share/dbus-1/system-services/com.lantharos.Installer1.service
 place 644 "$installer/data/luft-installer.service" /usr/lib/systemd/system/luft-installer.service
 place 644 "$installer/data/com.lantharos.installer.policy" /usr/share/polkit-1/actions/com.lantharos.installer.policy
-place 644 "$installer/data/40-luft-setup.rules" /usr/share/polkit-1/rules.d/40-luft-setup.rules
+place 644 "$installer/data/luft-installer-expire-setup.service" /usr/lib/systemd/system/luft-installer-expire-setup.service
 place 755 "$here/check.sh" /usr/libexec/luft-installer-check
 place 644 "$here/luft-installer-check.service" /usr/lib/systemd/system/luft-installer-check.service
 place 644 "$here/check.rules" /etc/polkit-1/rules.d/50-luft-installer-check.rules
 printf 'kargs = ["console=ttyS0,115200"]\n' | install -Dm644 /dev/stdin "$stage/root/usr/lib/bootc/kargs.d/90-check.toml"
 size="$(podman image inspect --format '{{.Size}}' "$base")"
-printf '[images.%s]\nsource = "oci-archive:/run/luft-source/luft.ociarchive"\nsize = %s\n' "$carried" "$size" |
+printf 'setup-app = "/usr/bin/busctl"\n\n[images.%s]\nsource = "oci-archive:/run/luft-source/luft.ociarchive"\nsize = %s\n' "$carried" "$size" |
   install -Dm644 /dev/stdin "$stage/root/usr/lib/luft-installer/install.toml"
 cp "$here/Containerfile" "$stage/"
 podman build --quiet --build-arg "BASE=$base" --tag "$system" "$stage"

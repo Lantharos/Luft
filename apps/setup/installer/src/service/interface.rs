@@ -6,12 +6,15 @@ use access::Idle;
 use luft_meet::Handoff;
 use tokio::sync::watch;
 use zbus::message::Header;
-use zbus::object_server::{InterfaceRef, ObjectServer};
+use zbus::object_server::{InterfaceRef, ObjectServer, SignalEmitter};
 use zbus::{Connection, interface};
 
 use super::PATH;
 use super::error::Error;
+use super::setup::{self, Enrollment};
 use crate::config::Config;
+use crate::first_boot::fingerprint::Enrolling;
+use crate::first_boot::trust;
 use crate::install::drive::plan::{self, Request};
 use crate::install::windows::Windows;
 use crate::install::{self, Account, Answers, Destination, Job, Regional, Stage, Status};
@@ -20,6 +23,7 @@ use crate::{first_boot, meet, phase, survey};
 
 const INSTALL: &str = "com.lantharos.installer.install";
 const FINISH: &str = "com.lantharos.installer.finish-first-boot";
+const SET_UP: &str = "com.lantharos.installer.set-up";
 
 pub struct Installer {
     options: Arc<Options>,
@@ -29,6 +33,7 @@ pub struct Installer {
     answers: Arc<Answers>,
     started: AtomicBool,
     meet: Option<Handoff>,
+    enrollment: tokio::sync::Mutex<Option<Enrollment>>,
 }
 
 impl Installer {
@@ -41,6 +46,7 @@ impl Installer {
             status: Arc::new(Mutex::new(Status::idle())),
             answers: Arc::default(),
             started: AtomicBool::new(false),
+            enrollment: tokio::sync::Mutex::default(),
         }
     }
 
@@ -59,6 +65,22 @@ impl Installer {
         } else {
             Err(Error::not_authorized())
         }
+    }
+
+    async fn setup_app_user(
+        &self,
+        connection: &Connection,
+        header: &Header<'_>,
+    ) -> Result<String, Error> {
+        self.authorize(connection, header, SET_UP).await?;
+        setup::setup_app_user(
+            connection,
+            header,
+            &self.options.state_dir,
+            &self.config.setup_app,
+            uid_of,
+        )
+        .await
     }
 
     async fn blocking<T: Send + 'static>(
@@ -255,6 +277,79 @@ impl Installer {
             return Err(Error::not_authorized());
         }
         let _activity = self.idle.hold();
-        Self::blocking(move || first_boot::finish(&state_dir, &user)).await
+        Self::blocking(move || first_boot::finish(&state_dir)).await
     }
+
+    async fn enroll_signing_key(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+    ) -> Result<String, Error> {
+        self.setup_app_user(connection, &header).await?;
+        let _activity = self.idle.hold();
+        trust::enroll_signing_key(connection)
+            .await
+            .map_err(Error::relayed)
+    }
+
+    async fn turn_on_encryption(
+        &self,
+        recovery_key: String,
+        passphrase: String,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+    ) -> Result<(), Error> {
+        self.setup_app_user(connection, &header).await?;
+        let _activity = self.idle.hold();
+        trust::turn_on_encryption(connection, &recovery_key, &passphrase)
+            .await
+            .map_err(Error::relayed)
+    }
+
+    async fn enroll_fingerprint(
+        &self,
+        finger: String,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
+    ) -> Result<(), Error> {
+        let user = self.setup_app_user(connection, &header).await?;
+        let mut enrollment = self.enrollment.lock().await;
+        if let Some(previous) = enrollment.take() {
+            previous.end().await;
+        }
+        let enrolling = Enrolling::start(connection, &user, &finger)
+            .await
+            .map_err(Error::relayed)?;
+        *enrollment = Some(
+            setup::follow(
+                connection,
+                &header,
+                enrolling,
+                emitter.into_owned(),
+                self.idle.clone(),
+            )
+            .await?,
+        );
+        Ok(())
+    }
+
+    async fn stop_fingerprint(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+    ) -> Result<(), Error> {
+        self.setup_app_user(connection, &header).await?;
+        if let Some(enrollment) = self.enrollment.lock().await.take() {
+            enrollment.end().await;
+        }
+        Ok(())
+    }
+
+    #[zbus(signal)]
+    pub async fn fingerprint_status(
+        emitter: &SignalEmitter<'_>,
+        result: &str,
+        done: bool,
+    ) -> zbus::Result<()>;
 }

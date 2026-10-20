@@ -8,6 +8,8 @@ use serde_json::Value;
 use zbus::wire::DynamicDeserialize;
 use zbus::{DynamicType, OwnedVariant};
 
+use crate::installer;
+
 const TRUST: Service = Service {
     name: "com.lantharos.Trust1",
     path: "/com/lantharos/Trust1",
@@ -100,7 +102,7 @@ async fn checks(_: Value) -> Result<Vec<Check>, String> {
 }
 
 async fn enroll(_: Value) -> Result<String, String> {
-    call("EnrollSigningKey", &()).await
+    installer::call("EnrollSigningKey", &()).await
 }
 
 async fn recovery_key(_: Value) -> Result<String, String> {
@@ -121,7 +123,7 @@ async fn encrypt(
         passphrase,
     }: Encrypt,
 ) -> Result<(), String> {
-    call("TurnOnEncryption", &(recovery_key, "", passphrase)).await
+    installer::call("TurnOnEncryption", &(recovery_key, passphrase)).await
 }
 
 pub fn register(window: SabineWindow) -> SabineWindow {

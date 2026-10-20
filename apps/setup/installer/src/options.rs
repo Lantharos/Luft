@@ -25,4 +25,6 @@ pub struct Options {
 pub enum Command {
     /// Removes Meet Luft's partitions or folder and grows Luft into the space they used.
     Reclaim,
+    /// Counts this start toward first-run setup's limit, and ends setup once it's reached.
+    ExpireSetup,
 }

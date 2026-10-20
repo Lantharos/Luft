@@ -9,7 +9,9 @@
       account and regional settings), "configuring", "finished" or "failed" (Error says why).
     Progress: 0 to 1 over the whole install.
 
-    Everything except FinishFirstBoot needs com.lantharos.installer.install.
+    Survey, Install, Configure and CreateAccount need com.lantharos.installer.install. The rest only answer the
+    account setup is pending for: FinishFirstBoot, and, while setup is still open, the setup steps, which also
+    need com.lantharos.installer.set-up and have to come from Install Luft's own program.
   -->
   <interface name="com.lantharos.Installer1">
     <property name="Phase" type="s" access="read"/>
@@ -44,5 +46,25 @@
     </method>
     <!-- Only the account setup is pending for: stops signing in automatically. -->
     <method name="FinishFirstBoot"/>
+    <!-- Asks trustd to add Luft's key to shim, and gives the code to type when the computer restarts. -->
+    <method name="EnrollSigningKey">
+      <arg name="code" type="s" direction="out"/>
+    </method>
+    <!-- Asks trustd to encrypt the system drive with this recovery key and passphrase. -->
+    <method name="TurnOnEncryption">
+      <arg name="recovery_key" type="s" direction="in"/>
+      <arg name="passphrase" type="s" direction="in"/>
+    </method>
+    <!-- Starts adding a fingerprint for the account on the default reader; FingerprintStatus follows each
+         touch until done, then the reader is let go. -->
+    <method name="EnrollFingerprint">
+      <arg name="finger" type="s" direction="in"/>
+    </method>
+    <method name="StopFingerprint"/>
+    <!-- fprintd's EnrollStatus, for the fingerprint being added. -->
+    <signal name="FingerprintStatus">
+      <arg name="result" type="s"/>
+      <arg name="done" type="b"/>
+    </signal>
   </interface>
 </node>

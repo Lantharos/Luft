@@ -91,6 +91,7 @@ const TRUST = `<node><interface name="com.lantharos.Trust1">
   <property name="SecureBoot" type="s" access="read"/>
   <property name="SigningKey" type="a{sv}" access="read"/>
   <method name="EnrollSigningKey"><arg type="s" direction="out"/></method>
+  <method name="TurnOnEncryption"><arg type="s" direction="in"/><arg type="s" direction="in"/><arg type="s" direction="in"/></method>
 </interface></node>`;
 
 const trust = Gio.DBusExportedObject.wrapJSObject(TRUST, {
@@ -100,6 +101,7 @@ const trust = Gio.DBusExportedObject.wrapJSObject(TRUST, {
     GLib.file_set_contents(asked, code);
     return code;
   },
+  TurnOnEncryption: (recoveryKey, pin, passphrase) => GLib.file_set_contents(`${asked}.encryption`, `${recoveryKey} ${pin}${passphrase}`),
 });
 trust.export(Gio.DBus.system, '/com/lantharos/Trust1');
 Gio.bus_own_name_on_connection(Gio.DBus.system, 'com.lantharos.Trust1', Gio.BusNameOwnerFlags.NONE, null, null);
@@ -151,7 +153,6 @@ check_whole_drive() {
     fail "the partitions aren't EFI and root: $(lsblk -no PARTTYPE,FSTYPE /dev/vdb | xargs)"
   pass "the drive has an EFI system partition and Luft's btrfs"
   grep -q '^ada:.*:Ada Lovelace:/var/home/ada:' "$root/etc/passwd" && grep -q '^wheel:.*ada' "$root/etc/group" &&
-    grep -q '^luft-setup:.*:ada$' "$root/etc/group" &&
     grep -q '^ada:\$' "$root/etc/shadow" || fail "the account isn't in the new system"
   [[ "$(stat -c '%u %a' "$state/home/ada" 2>&1)" == "1000 700" ]] ||
     fail "the home folder is missing or not private: $(stat -c '%u %a' "$state/home/ada" 2>&1)"
@@ -257,6 +258,59 @@ check_alongside_windows() {
 }
 
 SETUP_ACTIONS=(com.lantharos.trust.manage-encryption com.lantharos.trust.manage-secure-boot net.reactivated.fprint.device.enroll)
+ADA=/run/luft-check/ada
+FINGERPRINTS=/run/luft-check/fingerprints
+
+write_fingerprint_stand_in() {
+  cat > /run/luft-check/fprint.js <<'FPRINT'
+import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
+import system from 'system';
+
+const [record] = system.programArgs;
+const MANAGER = `<node><interface name="net.reactivated.Fprint.Manager">
+  <method name="GetDefaultDevice"><arg type="o" direction="out"/></method>
+</interface></node>`;
+const DEVICE = `<node><interface name="net.reactivated.Fprint.Device">
+  <method name="Claim"><arg type="s" direction="in"/></method>
+  <method name="Release"/>
+  <method name="EnrollStart"><arg type="s" direction="in"/></method>
+  <method name="EnrollStop"/>
+  <signal name="EnrollStatus"><arg type="s"/><arg type="b"/></signal>
+</interface></node>`;
+const PATH = '/net/reactivated/Fprint/Device/0';
+const calls = [];
+const note = call => {
+  calls.push(call);
+  GLib.file_set_contents(record, calls.join(' '));
+};
+const manager = Gio.DBusExportedObject.wrapJSObject(MANAGER, {GetDefaultDevice: () => PATH});
+const device = Gio.DBusExportedObject.wrapJSObject(DEVICE, {
+  Claim: user => note(`Claim ${user}`),
+  Release: () => note('Release'),
+  EnrollStart: finger => {
+    note(`EnrollStart ${finger}`);
+    let scans = 0;
+    GLib.timeout_add(GLib.PRIORITY_DEFAULT, 300, () => {
+      scans += 1;
+      device.emit_signal('EnrollStatus', new GLib.Variant('(sb)', [scans < 2 ? 'enroll-stage-passed' : 'enroll-completed', scans >= 2]));
+      return scans < 2;
+    });
+  },
+  EnrollStop: () => note('EnrollStop'),
+});
+manager.export(Gio.DBus.system, '/net/reactivated/Fprint/Manager');
+device.export(Gio.DBus.system, PATH);
+Gio.bus_own_name_on_connection(Gio.DBus.system, 'net.reactivated.Fprint', Gio.BusNameOwnerFlags.NONE, null, null);
+new GLib.MainLoop(null, false).run();
+FPRINT
+  systemd-run --quiet --unit=luft-check-fprint gjs -m /run/luft-check/fprint.js "$FINGERPRINTS"
+  for _ in $(seq 20); do
+    busctl status net.reactivated.Fprint > /dev/null 2>&1 && return
+    sleep 0.5
+  done
+  fail "the stand-in for fprintd didn't start"
+}
 
 switch_to() {
   local console="$1" state="$2"
@@ -269,55 +323,103 @@ switch_to() {
 }
 
 sign_in_ada() {
-  systemd-run --quiet --unit=ada-session -p PAMName=login -p User=ada -p TTYPath=/dev/tty3 -p StandardInput=tty sleep infinity
+  install -d -o ada "$ADA" && mkfifo -m 600 "$ADA/in" && chown ada "$ADA/in"
+  systemd-run --quiet --unit=ada-session -p PAMName=login -p User=ada -p TTYPath=/dev/tty3 -p StandardInput=tty \
+    bash -c "while read -r command < $ADA/in; do eval \"\$command\" > $ADA/out 2>&1; echo \$? > $ADA/status.new; mv $ADA/status.new $ADA/status; done"
   switch_to 3 active
 }
 
-answers() {
-  local action="$1" pid
-  pid="$(systemctl show -p MainPID --value ada-session)"
-  pkcheck --action-id "$action" --process "$pid" > /dev/null 2>&1
-  echo $?
-}
-
-check_setup_needs_no_password() {
-  local action
-  for action in "${SETUP_ACTIONS[@]}"; do
-    [[ "$(answers "$action")" == 0 ]] || fail "$action asks for a password during setup"
+in_session() {
+  rm -f "$ADA/status"
+  echo "$*" > "$ADA/in"
+  for _ in $(seq 100); do
+    [[ -e "$ADA/status" ]] && break
+    sleep 0.1
   done
-  [[ "$(answers com.lantharos.trust.show-recovery-key)" == 2 ]] || fail "setup lets the new account see the recovery key without its password"
+  return "$(cat "$ADA/status")"
+}
+
+setup_step() {
+  in_session busctl call "${BUS[@]}" "$@"
+}
+
+check_setup_steps() {
+  [[ "$(pkcheck --action-id com.lantharos.trust.manage-encryption --process $$ > /dev/null 2>&1; echo $?)" == 0 ]] ||
+    fail "trustd would ask the installer for a password"
+  setup_step EnrollSigningKey && [[ "$(cat "$ADA/out")" == "s \"$CODE\"" ]] || fail "setup couldn't enroll Luft's key: $(cat "$ADA/out")"
+  setup_step TurnOnEncryption ss ABCD-EFGH correct-horse && [[ "$(cat "$ASKED.encryption")" == "ABCD-EFGH correct-horse" ]] ||
+    fail "setup couldn't turn on encryption: $(cat "$ADA/out")"
+  setup_step EnrollFingerprint s right-index-finger || fail "setup couldn't add a fingerprint: $(cat "$ADA/out")"
+  for _ in $(seq 20); do
+    [[ "$(xargs < "$FINGERPRINTS" 2> /dev/null)" == "Claim ada EnrollStart right-index-finger EnrollStop Release" ]] && break
+    sleep 0.5
+  done
+  [[ "$(xargs < "$FINGERPRINTS")" == "Claim ada EnrollStart right-index-finger EnrollStop Release" ]] ||
+    fail "the fingerprint wasn't added for ada and the reader let go: $(xargs < "$FINGERPRINTS")"
+  pass "setup turns on encryption, Secure Boot and fingerprints through the installer without asking for the new password"
+
+  install -m755 /usr/bin/busctl /run/luft-check/another-program
+  ! in_session /run/luft-check/another-program call "${BUS[@]}" EnrollSigningKey || fail "another program in ada's session got setup's exceptions"
+  ! runuser -u ada -- busctl call "${BUS[@]}" EnrollSigningKey > /dev/null 2>&1 || fail "setup's exceptions reach ada outside a session"
   switch_to 1 online
-  [[ "$(answers net.reactivated.fprint.device.enroll)" != 0 ]] || fail "setup's exceptions reach a session that isn't in front"
+  ! setup_step EnrollSigningKey || fail "setup's exceptions reach a session that isn't in front"
   switch_to 3 active
-  pass "setup turns on encryption, Secure Boot and fingerprints without asking for the new password"
+  pass "only Install Luft, in ada's session in front, gets setup's exceptions"
+}
+
+check_setup_expires() {
+  local marker=/var/lib/luft-installer/first-boot boots=/var/lib/luft-installer/first-boot-boots
+  touch -d '25 hours ago' "$marker"
+  ! setup_step EnrollSigningKey || fail "setup's exceptions last longer than a day"
+  touch "$marker"
+  rm -f "$boots"
+  /usr/libexec/luft-installer expire-setup && /usr/libexec/luft-installer expire-setup || fail "counting starts failed"
+  [[ "$(wc -l < "$boots")" == 1 && -e "$marker" ]] || fail "one start counts as $(wc -l < "$boots") or ended setup"
+  setup_step EnrollSigningKey || fail "setup's exceptions ended after one start"
+  seq 5 >> "$boots"
+  ! setup_step EnrollSigningKey || fail "setup's exceptions last more than five starts"
+  /usr/libexec/luft-installer expire-setup || fail "ending setup failed"
+  [[ ! -e "$marker" && ! -e "$boots" ]] || fail "setup is still pending after too many starts"
+  cmp -s /etc/greetd/config.toml /run/greetd.toml || fail "too many starts later, ada is still signed in by herself"
+  pass "setup's exceptions and signing in by itself end a day after installing or after five starts"
 }
 
 check_password_needed_after_setup() {
   local action
   for action in "${SETUP_ACTIONS[@]}"; do
-    [[ "$(answers "$action")" == 2 ]] || fail "$action still needs no password after setup"
+    [[ "$(pkcheck --action-id "$action" --process "$(systemctl show -p MainPID --value ada-session)" > /dev/null 2>&1; echo $?)" == 2 ]] ||
+      fail "$action needs no password for ada"
   done
-  pass "after setup, encryption, Secure Boot and fingerprints ask for the password again"
+  pass "encryption, Secure Boot and fingerprints ask ada for her password"
 }
 
-check_first_boot_finish() {
-  systemctl stop luft-installer
-  useradd ada
-  groupadd --system luft-setup
-  usermod --append --groups luft-setup ada
+pending_setup() {
   mkdir -p /var/lib/luft-installer
   echo ada > /var/lib/luft-installer/first-boot
   cp /etc/greetd/config.toml /run/greetd.toml
   printf '\n[initial_session]\nuser = "ada"\ncommand = "/usr/bin/kestrel-session"\n' >> /etc/greetd/config.toml
+}
+
+check_first_boot_finish() {
+  systemctl stop luft-installer
+  useradd --groups wheel ada
+  pending_setup
   [[ "$(busctl --json=short get-property "${BUS[@]}" Phase | jq -r .data)" == first-boot ]] || fail "the installed system doesn't know setup is pending"
   sign_in_ada
-  check_setup_needs_no_password
+  systemctl mask --runtime --now trustd.service
+  trust_says none
+  write_fingerprint_stand_in
+  check_setup_steps
+  check_password_needed_after_setup
+  check_setup_expires
+  pending_setup
   ! call FinishFirstBoot > /dev/null 2>&1 || fail "someone other than the new account could end setup"
   runuser -u ada -- busctl call "${BUS[@]}" FinishFirstBoot > /dev/null || fail "the new account couldn't end setup"
   [[ ! -e /var/lib/luft-installer/first-boot ]] || fail "setup would open again at the next sign-in"
   cmp -s /etc/greetd/config.toml /run/greetd.toml || fail "the next start would still sign ada in by itself"
   pass "only the new account ends setup"
-  check_password_needed_after_setup
+  ! setup_step EnrollSigningKey || fail "setup's exceptions outlast setup"
+  pass "after setup, nothing is done for ada without her password"
 }
 
 mkdir -p "$SOURCE" && mount -o ro LABEL=luft-source "$SOURCE" || fail "the source disk doesn't mount"

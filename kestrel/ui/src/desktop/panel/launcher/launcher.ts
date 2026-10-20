@@ -19,8 +19,8 @@ const svgIcon = (svg: string, fill: string) =>
   Gio.BytesIcon.new(new GLib.Bytes(new TextEncoder().encode(svg.replace('fill="white"', `fill="${fill}"`))));
 
 const LAYERS = [
-  { svg: secondary, direction: 1, pivot: [0.58, 0.69] },
-  { svg: primary, direction: -1, pivot: [0.4, 0.3] },
+  { svg: secondary, direction: 1, pivot: [0.58, 0.69], style: 'icon-shadow: none;' },
+  { svg: primary, direction: -1, pivot: [0.4, 0.3], style: null },
 ] as const;
 
 export interface Launcher {
@@ -45,8 +45,8 @@ function markPaint(button: St.Button, panel: St.Widget): () => string[] {
 function animatedMark(button: St.Button, panel: St.Widget): [St.Widget, (size: number) => void] {
   const mark = new St.Widget({ layout_manager: new Clutter.BinLayout() });
   let size = 0;
-  const icons = LAYERS.map(({ direction, pivot: [pivotX, pivotY] }) => {
-    const icon = new St.Icon();
+  const icons = LAYERS.map(({ direction, pivot: [pivotX, pivotY], style }) => {
+    const icon = new St.Icon({ style });
     icon.set_pivot_point(pivotX, pivotY);
     mark.add_child(icon);
     const update = () => {

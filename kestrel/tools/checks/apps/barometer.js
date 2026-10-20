@@ -2,7 +2,7 @@ import GLib from 'gi://GLib';
 
 import {checks} from '../lib/check.js';
 import {rest} from '../lib/input.js';
-import {windows} from '../lib/processes.js';
+import {spawn, windows} from '../lib/processes.js';
 import {pause} from '../lib/wait.js';
 import {changes, openApp, withApp} from './lib/apps.js';
 import {checkPalette, withPalette} from './lib/palette.js';
@@ -57,7 +57,8 @@ async function press(barometer, point) {
 }
 
 async function checkBackgroundApps() {
-  const mailman = await openApp('mailman', [], {}, {slice: `luft-checks-${GLib.random_int()}.slice`});
+  const slice = `luftcheck${GLib.random_int()}.slice`;
+  const mailman = await openApp('mailman', [], {}, {slice});
   try {
     const scope = scopeOf(mailman.pid);
     const barometer = await openApp('barometer', [], {LUFT_SAMPLE_SYSTEM: null, LUFT_APP_SLICE: GLib.path_get_dirname(scope)});
@@ -92,6 +93,7 @@ async function checkBackgroundApps() {
     }
   } finally {
     await mailman.close();
+    await spawn(['systemctl', '--user', 'stop', slice]).exited;
   }
 }
 

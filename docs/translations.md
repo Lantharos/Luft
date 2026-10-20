@@ -28,6 +28,9 @@ Luft is translated into Albanian, Bosnian, Bulgarian, Catalan, Croatian, Czech, 
 | setup | `apps/setup/locales/*/setup.ftl` | Install Luft and first-run setup |
 | setup-desktop | `apps/setup/desktop/locales/*/desktop.ftl` | messages from setup's native side |
 | setup-installer | `apps/setup/installer/locales/*/installer.ftl` | the installer service's errors and progress |
+| site | `web/site/locales/*/site.ftl` | the website's header, footer, language list and missing-page page |
+| site-home | `web/site/locales/*/home.ftl` | the website's home page |
+| site-download | `web/site/locales/*/download.ftl` | the website's download page |
 
 `packages/i18n/components.json` lists the same components with the code each one covers. Language folders use BCP 47 tags: `en`, `bs`, `ca`, `cs`, `da`, `de`, `et`, `es`, `fr`, `ga`, `hr`, `is`, `it`, `lv`, `lt`, `hu`, `mt`, `nl`, `nb`, `nn`, `pl`, `pt-BR`, `pt`, `ro`, `sq`, `sk`, `sl`, `sr-Latn`, `fi`, `sv`, `tr`, `el`, `bg`, `mk`, `ru`, `sr`, `uk`.
 
@@ -37,6 +40,7 @@ The glossary for each language is `packages/i18n/glossary/<language>.csv`, and i
 
 - **Kestrel** follows the account's language from AccountsService and switches as soon as it changes. Before anyone signs in, the login screen uses the system language from `/etc/locale.conf`.
 - **Apps** get the session's languages from `luft_app::Appearance` with their first state, so a translation loads with no extra round trip. An app started after the language changed uses the new one; apps already open keep theirs until they restart.
+- **The website** has a copy of every page per language: English at the root of luft.computer, the others under their tag in lower case, such as `/de` or `/pt-br`. On a first visit to the home page, the site's Worker sends the visitor to the language their browser asks for and remembers it in a `lang` cookie; picking a language in the footer replaces it.
 - **Rust services** read `LANGUAGE`, `LC_ALL`, `LC_MESSAGES` and `LANG`, in that order.
 - A message that isn't translated yet shows in English; the rest of the screen stays translated.
 - `sr` is Serbian in Cyrillic and `sr-Latn` Serbian in Latin script. The locale `sr_RS.UTF-8@latin` picks Latin, any other Serbian locale Cyrillic. Serbian is translated once, in Cyrillic: `bun run transliterate` in `packages/i18n` writes the Latin files from it, and the checker fails when they differ.
@@ -52,6 +56,7 @@ Message IDs are stable, semantic and start with the feature they belong to, such
 | --- | --- |
 | Svelte apps | `import { t, i18n } from '@luft/i18n'`, then `t('id', { count })`. `t` is reactive. Use `i18n.formats` as the locale of every `Intl` formatter |
 | Kestrel | `t`, `bindText(label, id)` and `localized(actor, apply)` from `kestrel/ui/src/shared/i18n`; the engine's JavaScript gets them through `kestrelUi.js`. Widgets that live all session use `bindText` or `localized` so they follow a language change, and `formatsLocale()` is the locale for `Intl` |
+| Website | `const { t } = localize(Astro)` from `web/site/src/i18n/pages`, then `t('id')`. A message with a link holds the `<a>` itself, with its address as a variable, and goes into the page with `set:html` |
 | Rust | `static L10N: Localizer = luft_i18n::localizer!("locales", ["desktop"]);` once per crate, then `t!(L10N, "id", count = n)` |
 
 - Never build a sentence from pieces. One sentence is one message, with placeables for what changes: `files-copied = Copied { $name } to { $folder }`.

@@ -15,6 +15,10 @@ bun run check        # type checks
 
 The ISO links go through the site's Worker ([`worker/index.ts`](worker/index.ts)): `/download/latest` and `/download/nightly`, with `.sha256`, `.sha256.minisig` and `.json` after them, read `1/latest.json` or `nightly/latest.json` from get.luft.computer when someone clicks and redirect to that ISO. `latest` is the newest release, or the newest nightly build until there is one. The download page shows the ISO's name and size from the `.json`, so nothing needs rebuilding when a new ISO is published. After changing `wrangler.jsonc`, run `bunx wrangler types worker/worker-configuration.d.ts`.
 
+## Languages
+
+Every page is built once per language, from the Fluent files in `locales/`; English lives at the root and the others under `/de`, `/pt-br` and so on. Copy goes through `t()` from `src/i18n`, and how translations work is in [docs/translations.md](../../docs/translations.md).
+
 ## Deploy
 
 The site is a Cloudflare Worker that only serves the files in `dist/` ([`wrangler.jsonc`](wrangler.jsonc)).

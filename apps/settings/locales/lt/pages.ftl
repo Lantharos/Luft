@@ -1,0 +1,57 @@
+## Panels
+
+settings-page-network = Tinklas
+    .keywords = wifi, wi-fi, belaidis, bevielis, ethernet, laidinis, kabelis, vpn, internetas, lėktuvo režimas, tarpinis serveris, proxy, dns, ip adresas, mac adresas, aparatinės įrangos adresas, matuojamas ryšys, ribotas duomenų kiekis
+settings-page-bluetooth = Bluetooth
+    .keywords = įrenginiai, susieti, susiejimas, ausinės, garsiakalbis, kolonėlė, matomas, aptinkamas
+settings-page-display = Ekranai
+    .keywords = monitorius, ekranas, skyra, raiška, mastelis, mastelio keitimas, atnaujinimo dažnis, kadrų dažnis, hercai, naktinė šviesa, išdėstymas, šviesumas, ryškumas
+settings-page-sound = Garsas
+    .keywords = garsas, audio, garsumas, garsiakalbiai, kolonėlės, mikrofonas, išvestis, įvestis, įspėjimai, sistemos garsai
+settings-page-power = Maitinimas ir akumuliatorius
+    .keywords = akumuliatorius, baterija, miego režimas, miegas, užmigdyti, užmigdymas, maitinimo režimas, ekrano išjungimas, dangtis, įkrovimo riba, įkrovimas, energija
+settings-page-appearance = Išvaizda
+    .keywords = fono paveikslėlis, fonas, ekrano fonas, darbalaukio fonas, tamsus, šviesus, tamsusis režimas, stilius, akcentas, akcento spalva, programų piktogramos, atspalvis, žymiklis, kursorius, pelės žymiklis, žymiklio dydis, teksto dydis, animacija, šriftai, šriftų diegimas, įdiegti šriftus
+settings-page-notifications = Pranešimai
+    .keywords = netrukdyti, iššokantieji pranešimai, reklamjuostės, užrakinimo ekranas, programos
+settings-page-keyboard = Klaviatūra
+    .keywords = įvesties šaltiniai, įvesties kalba, išdėstymas, klaviatūros išdėstymas, spartieji klavišai, kartojimas, klavišų kartojimas, kalba, diktavimas
+    .copilot-key = copilot klavišas, copilot
+settings-page-mouse = Pelė ir jutiklinis kilimėlis
+    .keywords = pelė, žymiklis, kursorius, greitis, slinkimas, natūralusis slinkimas, slinkimo greitis, bakstelėjimas spustelėti, spustelėjimas bakstelėjus, jutiklinis kilimėlis, jutiklinė planšetė, touchpad
+settings-page-accessibility = Prieinamumas
+    .keywords = a11y, pritaikymas neįgaliesiems, neįgaliesiems, universalioji prieiga, ekrano skaitytuvas, orca, didinimas, didintuvas, lupa, didelis tekstas, didelis kontrastas, kontrastas, mažinti animaciją, mažiau judesio, žymiklio dydis, ekrano klaviatūra, ekraninė klaviatūra, lipnieji klavišai, lėtieji klavišai, atmetimo klavišai, pelės klavišai, spustelėjimas užlaikius, spustelėjimas užvedus, dešinysis spustelėjimas, rasti žymiklį, žymiklio radimas, vaizdiniai įspėjimai, mirksėjimas, klausa, rega
+settings-page-apps = Programos
+    .keywords = numatytosios programos, naršyklė, paleistis, paleidimas, automatinis paleidimas, autostart
+settings-page-privacy = Privatumas
+    .keywords = ekrano užrakinimas, vieta, buvimo vieta, kamera, mikrofonas, naujausi failai, failų istorija, šiukšlinė, laikinieji failai
+settings-page-security = Sauga
+    .keywords = saugumas, secure boot, saugusis paleidimas, tpm, šifravimas, disko šifravimas, bitlocker, luks, atkūrimo raktas, pin, pin kodas, programinė aparatinė įranga, firmware, aparatinės įrangos sauga, pasirašymo raktas, usb, slaptažodžiai, raktinė, prieigos raktai, passkey
+settings-page-region = Kalba ir regionas
+    .keywords = kalba, vertimas, lokalė, regioniniai nustatymai, formatai, datos formatas, skaičių formatas, matavimo vienetai, vienetai, valiuta
+settings-page-datetime = Data ir laikas
+    .keywords = laiko juosta, laikrodis, 24 valandų, 24 val., automatinis, automatiškai
+settings-page-users = Naudotojai
+    .keywords = vartotojai, paskyra, vardas, nuotrauka, paveikslėlis, avataras, slaptažodis, piršto atspaudas, pirštų atspaudai
+settings-page-accounts = Paskyros
+    .keywords = internetinės paskyros, debesis, icloud, icloud drive, apple, onedrive, microsoft, dropbox, nextcloud, webdav, sinchronizavimas, sinchronizuoti, failai pagal poreikį, prisijungti, prisijungimas
+settings-page-login = Prisijungimo ekranas
+    .keywords = pasisveikinimo ekranas, greeter, prisijungti, automatinis prisijungimas, autologin, seansas, fono paveikslėlis, naudotojai, užrakinimo ekranas, paslėpti naudotojai
+settings-page-updates = Naujinimai
+    .keywords = atnaujinimai, programinės įrangos naujinimai, sistemos naujinimai, naujinimas, atnaujinti, programinė aparatinė įranga, firmware, branduolys, kernel, paleisti iš naujo ir įdiegti, paketai, automatiniai naujinimai, saugos naujinimai
+settings-page-about = Apie
+    .keywords = įrenginio pavadinimas, kompiuterio vardas, sistema, aparatinė įranga, atmintis, ram, procesorius, grafika, vaizdo plokštė, saugykla, diskas
+
+## Pages inside panels
+
+settings-page-taskbar = Užduočių juosta
+    .keywords = skydelis, dokas, automatiškai slėpti, slėpti automatiškai, plaukiojanti, permatoma, skaidri, prisegtos programos, lygiuotė, lygiavimas, mygtukas pradžia, pradžios mygtukas, start, ekranai, darbo sritis, darbalaukis, virtualus darbalaukis
+settings-page-fonts = Šriftai
+    .keywords = visi šriftai, garnitūros, šriftų šeimos, įdiegti šriftus, šriftų diegimas, pašalinti šriftus
+settings-page-cursors = Žymiklių temos
+    .keywords = žymikliai, žymiklis, kursorius, kursoriai, pelės žymiklis, gauti daugiau žymiklių
+settings-page-dictation = Diktavimas
+    .keywords = kalba, šneka, rinkimas balsu, balsas, kalbos atpažinimas, kalba į tekstą, kalbėti, mikrofonas, parakeet, whisper, kalbos modeliai, super alt
+    .copilot-key = copilot klavišas, copilot
+settings-page-add-account = Pridėti paskyrą
+    .keywords = prisijungti, internetinės paskyros, icloud, onedrive, dropbox, nextcloud, webdav

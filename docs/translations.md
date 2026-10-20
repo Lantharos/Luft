@@ -2,7 +2,7 @@
 
 Luft's desktop and apps are written in English and translated with [Project Fluent](https://projectfluent.org). Every translatable piece of Luft keeps its messages in `.ftl` files next to its code, one folder per language, with English as the source.
 
-Luft is translated into Albanian, Bosnian, Bulgarian, Catalan, Croatian, Czech, Danish, Dutch, French, German, Icelandic, Italian, Macedonian, Norwegian Bokmål, Norwegian Nynorsk, Polish, Portuguese (Portugal and Brazil), Romanian, Russian, Serbian (Cyrillic and Latin as separate languages), Slovak, Slovenian, Spanish, Swedish and Ukrainian. Translations are licensed GPL-3.0-or-later, like the rest of Luft.
+Luft is translated into Albanian, Bosnian, Bulgarian, Catalan, Croatian, Czech, Danish, Dutch, Estonian, Finnish, French, German, Hungarian, Icelandic, Italian, Latvian, Lithuanian, Macedonian, Norwegian Bokmål, Norwegian Nynorsk, Polish, Portuguese (Portugal and Brazil), Romanian, Russian, Serbian (Cyrillic and Latin as separate languages), Slovak, Slovenian, Spanish, Swedish and Ukrainian. Translations are licensed GPL-3.0-or-later, like the rest of Luft.
 
 ## Where the messages live
 
@@ -29,7 +29,7 @@ Luft is translated into Albanian, Bosnian, Bulgarian, Catalan, Croatian, Czech, 
 | setup-desktop | `apps/setup/desktop/locales/*/desktop.ftl` | messages from setup's native side |
 | setup-installer | `apps/setup/installer/locales/*/installer.ftl` | the installer service's errors and progress |
 
-`packages/i18n/components.json` lists the same components with the code each one covers. Language folders use BCP 47 tags: `en`, `bs`, `ca`, `cs`, `da`, `de`, `es`, `fr`, `hr`, `is`, `it`, `nl`, `nb`, `nn`, `pl`, `pt-BR`, `pt`, `ro`, `sq`, `sk`, `sl`, `sr-Latn`, `sv`, `bg`, `mk`, `ru`, `sr`, `uk`.
+`packages/i18n/components.json` lists the same components with the code each one covers. Language folders use BCP 47 tags: `en`, `bs`, `ca`, `cs`, `da`, `de`, `et`, `es`, `fr`, `hr`, `is`, `it`, `lv`, `lt`, `hu`, `nl`, `nb`, `nn`, `pl`, `pt-BR`, `pt`, `ro`, `sq`, `sk`, `sl`, `sr-Latn`, `fi`, `sv`, `bg`, `mk`, `ru`, `sr`, `uk`.
 
 The glossary for each language is `packages/i18n/glossary/<language>.csv`, and its style guide is `docs/translations/<language>.md`.
 

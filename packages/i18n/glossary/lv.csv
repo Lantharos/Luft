@@ -1,0 +1,125 @@
+source,target,explanation
+Luft,,Not translated. Name of the operating system
+Kestrel,,Not translated. Name of Luft's desktop
+Rover,,"Not translated. App name, the file manager"
+Magpie,,"Not translated. App name, the viewer for photos, videos, music and PDFs"
+Mailman,,"Not translated. App name, the mail app"
+Draft,,"Not translated. App name, the text and code editor"
+Tern,,"Not translated. App name, the terminal"
+Schelf,,"Not translated. App name, the app store"
+Barometer,,"Not translated. App name, the system monitor"
+Keys,,"Not translated. App name, makes keyboard layouts and input methods"
+Meet Luft,,Not translated. Name of the Windows app that prepares a PC for Luft
+Helium,,Not translated. Name of the default browser
+Flatpak,,Not translated. App packaging format
+Secure Boot,,"Not translated. UEFI feature, named this way in every PC's firmware setup"
+TPM,,Not translated. Trusted Platform Module; in the interface usually called the security chip
+Bluetooth,,Not translated. Trademark
+Wi-Fi,Wi-Fi,Wireless network; stays as in Windows and macOS. Not declined: Wi-Fi tīkls
+Settings,Iestatījumi,"App name and the general word for settings; masculine plural, genitive iestatījumu"
+Disks,Diski,App name for the disk utility; masculine plural
+Install Luft,Instalēt Luft,App name of the installer
+Network Sign-In,Pierakstīšanās tīklā,App that opens the sign-in page of a public Wi-Fi
+File Manager,Failu pārvaldnieks,Generic name of Rover
+Media Viewer,Multivides skatītājs,Generic name of Magpie
+Mail,Pasts,Generic name of Mailman
+Text Editor,Teksta redaktors,Generic name of Draft
+App Store,Lietotņu veikals,Generic name of Schelf
+System Monitor,Sistēmas pārraugs,Generic name of Barometer
+Keyboard Layouts,Tastatūras izkārtojumi,Generic name of Keys
+Start,Start,"The menu opened with Super or the Luft mark; a name, not declined; in sentences izvēlne Start"
+board,tāfele,"Mode that lays a workspace's windows side by side on an endless canvas; feminine, 5th declension"
+Quick settings,Ātrie iestatījumi,"Panel of switches and sliders opened from the status icons; masculine plural"
+notification center,paziņojumu centrs,"Panel with notifications, media and the calendar, opened from the clock; masculine"
+All windows,Visi logi,"The task view: every window of a workspace and the workspaces, Super+Tab"
+snap,piesaistīt,"verb: put a window into a half, third or quarter of the screen"
+snap layout,piesaistes izkārtojums,One of the arrangements offered by Super+Z; masculine
+snap group,piesaistes grupa,Windows snapped side by side that come back together; feminine
+taskbar,uzdevumjosla,The bar along the bottom of the screen; feminine
+tray,sistēmas tekne,Taskbar button holding the icons of apps running in the background; feminine
+status icons,statusa ikonas,"Taskbar icons for network, sound and battery that open Quick settings; feminine plural"
+lock screen,bloķēšanas ekrāns,Screen shown while the session is locked; masculine
+login screen,pierakstīšanās ekrāns,Screen listing the people on the computer before anyone signs in; masculine
+workspace,darbvieta,One of up to ten separate desktops; feminine
+desktop,darbvirsma,The background area behind the windows; also the whole desktop environment; feminine
+wallpaper,fona attēls,Picture behind the desktop; masculine
+accent color,akcenta krāsa,Color taken from the wallpaper and used for highlights; feminine
+dark style,Tumšais režīms,Quick settings tile that switches between light and dark
+Night light,Nakts gaisma,Warmer screen colors in the evening; feminine
+Do Not Disturb,Netraucēt,Holds back notification banners and sounds
+Airplane mode,Lidojuma režīms,Turns off every radio
+Keep awake,Neaizmigt,Keeps the screen on for a while
+Power mode,Enerģijas režīms,"Performance, Balanced or Power saver"
+Power saver,Enerģijas taupīšana,Power mode
+Dictation,Diktēšana,Typing by speaking; feminine
+clipboard,starpliktuve,Holds what was copied; feminine
+clipboard history,starpliktuves vēsture,"List of recently copied items, Super+V"
+emoji,emocijzīme,"noun; feminine, plural emocijzīmes"
+screenshot,ekrānuzņēmums,Picture of the screen; masculine
+screen recording,ekrāna ieraksts,Video of the screen; masculine
+privacy indicator,privātuma indikators,"Taskbar icon shown while the camera, microphone, location or screen is in use"
+Full access,Pilna piekļuve,"Schelf switch that lets a Flatpak app leave its sandbox: all files, clipboard in the background, other apps' windows; feminine"
+sandbox,smilškaste,Isolation Flatpak apps run in; feminine
+Keyring,atslēgu saišķis,"Luft Keyring, which keeps passwords, tokens and keys; masculine"
+passkey,piekļuves atslēga,"Sign-in key that replaces a password on websites; feminine, plural piekļuves atslēgas"
+recovery key,atkopšanas atslēga,Long code that unlocks an encrypted disk when the TPM can't; feminine
+security chip,drošības mikroshēma,How the interface names the TPM; feminine
+device encryption,ierīces šifrēšana,Encryption of the whole disk
+encryption,šifrēšana,noun; feminine
+signed startup,parakstīta startēšana,Startup where every step is checked against Luft's signature
+firmware,aparātprogrammatūra,Software built into the hardware; feminine
+window,logs,"noun; masculine, plural logi"
+pin,piespraust,verb: keep an app on the taskbar or in Start
+unpin,atspraust,verb
+Pin to taskbar,Piespraust uzdevumjoslai,Menu item
+open,atvērt,verb
+close,aizvērt,verb
+remove,noņemt,verb
+delete,dzēst,verb
+turn on,ieslēgt,"verb, for a feature or setting; iespējot for settings that are not switches"
+turn off,izslēgt,"verb, for a feature or setting; atspējot for settings that are not switches"
+sign in,pierakstīties,"verb, noun pierakstīšanās"
+sign out,izrakstīties,"verb, also Log out; noun izrakstīšanās"
+restart,restartēt,verb
+shut down,izslēgt,"verb, also Power off; the same word as turn off, as in Windows"
+suspend,Miega režīms,"verb and power menu item, also Sleep; menu item Miega režīms, verb pārslēgt miega režīmā"
+hibernate,Hibernēt,verb and power menu item; the state hibernācija
+lock,bloķēt,verb
+unlock,atbloķēt,verb
+install,instalēt,verb
+update,atjaunināt,verb
+updates,atjauninājumi,"noun, new versions of Luft or apps; masculine plural; singular atjauninājums"
+cancel,Atcelt,button
+save,saglabāt,verb
+allow,atļaut,verb
+forget,aizmirst,"verb, for a saved network or device, as in Windows"
+share,kopīgot,verb
+search,meklēt,verb and noun; noun: meklēšana
+set up,iestatīt,verb
+try again,Mēģināt vēlreiz,button
+undo,atsaukt,verb; button: Atsaukt
+done,Gatavs,button
+next,Tālāk,button that moves to the next step
+app,lietotne,"noun, also application; feminine, plural lietotnes"
+file,fails,"noun; masculine, plural faili"
+folder,mape,noun; feminine
+trash,atkritne,Where deleted files wait; feminine
+device,ierīce,noun; feminine
+disk,disks,"noun, also drive; masculine"
+USB stick,USB zibatmiņa,noun; feminine
+computer,dators,"noun, also PC; masculine"
+network,tīkls,noun; masculine
+battery,akumulators,noun; masculine
+power,barošana,Settings page and button for power; feminine
+display,displejs,"noun, a monitor or built-in screen; masculine; ekrāns for the screen surface"
+sound,skaņa,"noun, the Settings page and audio in general; feminine"
+notification,paziņojums,noun; masculine
+keyboard shortcut,īsinājumtaustiņš,"noun; masculine, plural īsinājumtaustiņi"
+keyboard layout,tastatūras izkārtojums,noun; masculine
+input method,ievades metode,"Turns what you type into something else, such as Compose sequences or word choices; feminine"
+touchpad,skārienpaliktnis,noun; masculine
+privacy,privātums,noun; masculine
+security,drošība,noun; feminine
+account,konts,"noun, a user account or online account; masculine"
+password,parole,noun; feminine
+accessibility,pieejamība,noun; feminine

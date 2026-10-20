@@ -39,7 +39,7 @@ runs:
       run: os/image/build.sh part "${{ inputs.part }}" --cache-from "$CACHE" --cache-to "$CACHE"
 
     - name: Keep the compiler caches
-      if: github.ref_type != 'tag'
+      if: always() && github.ref_type != 'tag'
       uses: actions/cache/save@v6
       with:
         path: |

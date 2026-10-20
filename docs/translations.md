@@ -75,10 +75,10 @@ Builds put each language in its own file: apps get one lazily loaded chunk per l
 
 ## Trying layouts with the pseudo-locale
 
-`LUFT_LOCALE` overrides the language everywhere. Set to `en-XA`, it shows English with accented letters and every vowel doubled, about a third longer, which shows clipped or overflowing text and strings that are still hard-coded:
+`LUFT_LOCALE` overrides the language everywhere, and nothing changes it while it's set. Set to `en-XA`, it shows English with accented letters and every vowel doubled, about a third longer, which shows clipped or overflowing text and strings that are still hard-coded:
 
 ```sh
-LUFT_LOCALE=en-XA KESTREL_DEV_APPS=settings kestrel/tools/session.sh capture --only panel,apps:settings
+LUFT_LOCALE=en-XA KESTREL_DEV_APPS=settings kestrel/tools/session.sh capture --only system:translations
 LUFT_LOCALE=de kestrel/tools/session.sh nested
 ```
 

@@ -39,6 +39,7 @@ The nested session copies the host's wallpaper, interface settings, keyboard lay
 | `KESTREL_CAPTURE_SECONDARY_SIZE` | none | Adds a second virtual monitor, such as `1280x720` |
 | `KESTREL_CAPTURE_SCHEME` | the host's | `light` or `dark`, to capture every surface in one style |
 | `KESTREL_CAPTURE_WALLPAPER` | the host's | An image used as the wallpaper for both styles, also behind the Luft apps in place of their test gradient, to check the glass on light and dark pictures |
+| `LUFT_LOCALE` | the host's | A language for Kestrel and the apps, such as `de` or the pseudo-locale `en-XA`. Most checks look for English text, so pair it with `--only system:translations`, which captures Kestrel's surfaces and every Settings page in any language |
 | `KESTREL_DEV_APPS` | none | Luft apps to test from their build folders instead of the installed ones, such as `rover,settings` (run `bun run desktop:build` in each first) |
 | `KESTREL_BUILD` | `kestrel/build` | Another Kestrel build to run, set up against `KESTREL_COMPOSITOR` |
 | `KESTREL_COMPOSITOR` | `kestrel/run/mutter-install` | Another Mutter install to run on, such as one from `kestrel/compositor/build.sh BUILD_DIR PREFIX` |

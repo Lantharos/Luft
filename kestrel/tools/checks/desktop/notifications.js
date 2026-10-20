@@ -11,7 +11,7 @@ import {checks} from '../lib/check.js';
 import {call, subscribe} from '../lib/dbus.js';
 import {centerOf, click, fingerScroll, liftFingers, moveTo, pressButton, releaseButton, rest, scroll} from '../lib/input.js';
 import {LuftApp} from '../lib/luftApp.js';
-import {gjs, stop, waitForWindow} from '../lib/processes.js';
+import {gjs, spawn, stop, waitForWindow} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {nextFrame, pause, settled, waitUntil} from '../lib/wait.js';
 import {clip} from '../../motion/film.js';
@@ -400,6 +400,18 @@ async function checkCenterSwipes(closed) {
   }
 }
 
+async function checkWindowlessApp() {
+  clearAll();
+  const sender = spawn(['notify-send', '--wait', '--app-name=Mail', '--hint=string:desktop-entry:com.lantharos.mailman',
+    '--category=email.arrived', 'Theo Brandt', 'Harbour photos']);
+  try {
+    await eventually(() => bannerOf('Theo Brandt'), 'mail from an app running without a window slides in as a banner');
+  } finally {
+    clearAll();
+    await stop(sender);
+  }
+}
+
 const pendingLaunches = () => Shell.WindowTracker.get_default().get_startup_sequences()
   .filter(sequence => sequence.get_application_id() && !sequence.get_completed());
 
@@ -452,6 +464,7 @@ export async function run() {
     clearAll();
     await checkCenter(replies);
     await checkBanner(replies);
+    await checkWindowlessApp();
     await checkUpdateWhileHiding();
     await checkAppRules();
     await checkCalendar();

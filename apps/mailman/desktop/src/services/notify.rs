@@ -16,7 +16,7 @@ use crate::store::Notable;
 const DESTINATION: &str = "org.freedesktop.Notifications";
 const PATH: &str = "/org/freedesktop/Notifications";
 const DEFAULT_ACTION: &str = "default";
-const LOW_URGENCY: u8 = 0;
+const NORMAL_URGENCY: u8 = 1;
 
 struct Activation {
     thread: Option<i64>,
@@ -46,7 +46,7 @@ async fn proxy() -> Result<Proxy<'static>, String> {
 async fn notify(title: &str, body: &str) -> Result<u32, String> {
     let hints = HashMap::from([
         ("desktop-entry", Variant::from(APP_ID)),
-        ("urgency", Variant::from(LOW_URGENCY)),
+        ("urgency", Variant::from(NORMAL_URGENCY)),
         ("category", Variant::from("email.arrived")),
     ]);
     proxy()

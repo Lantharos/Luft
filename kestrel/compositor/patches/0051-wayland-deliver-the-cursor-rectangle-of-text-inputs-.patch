@@ -1,0 +1,28 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Tue, 20 Oct 2026 17:49:41 +0200
+Subject: [PATCH 51/51] wayland: deliver the cursor rectangle of text inputs
+ focused after another
+
+A cursor rectangle waits for the surface's next state before it reaches
+the input method. When focus moved on before that, such as when the
+window closed, the handler stayed recorded on the old surface, so no
+text input focused afterwards ever told the input method where its
+cursor is. Drop the pending update when focus leaves the surface.
+---
+ src/wayland/meta-wayland-text-input.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/wayland/meta-wayland-text-input.c b/src/wayland/meta-wayland-text-input.c
+index 26834784b8c89780f3eb0430000df9dbad2217aa..138a7c5987c2d35435ed1b39df5ea9d065f6e333 100644
+--- a/src/wayland/meta-wayland-text-input.c
++++ b/src/wayland/meta-wayland-text-input.c
+@@ -574,6 +574,8 @@ meta_wayland_text_input_set_focus (MetaWaylandTextInput *text_input,
+           reset_text_input_focus (text_input);
+         }
+ 
++      g_clear_signal_handler (&text_input->cursor_update.signal_id,
++                              text_input->surface);
+       wl_list_remove (&text_input->surface_listener.link);
+       text_input->surface = NULL;
+       /* Wayland set_surrounding_text() does not support to set null string

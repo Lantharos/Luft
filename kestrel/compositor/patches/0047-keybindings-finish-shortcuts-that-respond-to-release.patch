@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Mon, 19 Oct 2026 03:09:02 +0200
-Subject: [PATCH 47/50] keybindings: finish shortcuts that respond to release
+Subject: [PATCH 47/51] keybindings: finish shortcuts that respond to release
  by their key
 
 A shortcut that responds to its release only noticed it while its

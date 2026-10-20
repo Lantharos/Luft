@@ -5,7 +5,7 @@ sidebar:
   order: 5
 ---
 
-Luft speaks English, German, Albanian, Croatian, Serbian in Cyrillic and in Latin script, and Bosnian. Translating it into one of these, or into a new language, needs no programming: everything goes through [Weblate](https://hosted.weblate.org/projects/luft/) in the browser.
+Luft speaks English, Albanian, Bosnian, Bulgarian, Catalan, Croatian, Czech, Danish, Dutch, Estonian, Finnish, French, German, Greek, Hungarian, Icelandic, Irish, Italian, Latvian, Lithuanian, Macedonian, Maltese, Norwegian (Bokmål and Nynorsk), Polish, Portuguese (Portugal and Brazil), Romanian, Russian, Serbian in Cyrillic and in Latin script, Slovak, Slovenian, Spanish, Swedish, Turkish and Ukrainian. Translating it into one of these, or into a new language, needs no programming: everything goes through [Weblate](https://hosted.weblate.org/projects/luft/) in the browser.
 
 ## Getting started
 
@@ -18,6 +18,7 @@ Weblate turns the work into pull requests on GitHub, and translations reach the 
 ## Before you translate
 
 - Read your language's style guide in [`docs/translations`](https://github.com/Lantharos/Luft/tree/main/docs/translations). It says how Luft addresses people in your language, how buttons are phrased and which words were chosen for Luft's own features.
+- If your language is already there, its list in [`docs/translations-review`](https://github.com/Lantharos/Luft/tree/main/docs/translations-review) names the strings that most need a native speaker's eye, and why.
 - Use the glossary. Start, Board, Quick Settings and the other names of Luft's features should read the same everywhere.
 - Keep the tone friendly but calm: short, plain sentences, no exclamation marks.
 - App names such as Rover, Mailman and Magpie stay as they are.

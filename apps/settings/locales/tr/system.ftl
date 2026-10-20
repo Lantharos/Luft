@@ -1,0 +1,319 @@
+## Apps
+
+settings-apps-defaults = Varsayılan uygulamalar
+settings-apps-defaults-description = Bağlantıları, dosyaları ve klasörleri açtığınızda kullanılır
+settings-apps-browser = Web tarayıcısı
+settings-apps-email = E-posta
+settings-apps-calendar = Takvim
+settings-apps-music = Müzik
+settings-apps-videos = Videolar
+settings-apps-photos = Fotoğraflar
+settings-apps-text-editor = Metin düzenleyici
+settings-apps-files = Dosyalar
+settings-apps-choose = Seçin
+settings-apps-startup = Başlangıç
+settings-apps-startup-description = Bu uygulamalar oturum açtığınızda açılır
+settings-apps-startup-app = Oturum açınca { $app } uygulamasını aç
+settings-apps-startup-add = Uygulama ekle
+settings-apps-startup-add-title = Başlangıç uygulaması ekle
+settings-apps-startup-add-description = Her oturum açtığınızda açılacak bir uygulama seçin.
+settings-apps-search = Uygulamalarda ara
+settings-apps-no-match = Aramanızla eşleşen uygulama yok
+settings-apps-cancel = İptal
+
+## Date and time
+
+settings-datetime-automatic = Saati otomatik olarak ayarla
+settings-datetime-automatic-description = Saati internet üzerinden doğru tutar
+settings-datetime-date-and-time = Tarih ve saat
+settings-datetime-automatic-zone = Saat dilimini otomatik olarak ayarla
+settings-datetime-automatic-zone-description = Seyahat ederken konumunuzu izler
+settings-datetime-automatic-zone-location-off = Bunu kullanmak için Gizlilik sayfasında konum hizmetlerini açın
+settings-datetime-zone = Saat dilimi
+settings-datetime-zone-description = { $place } · { $offset }
+settings-datetime-clock = Saat
+settings-datetime-time-format = Saat biçimi
+settings-datetime-format-24h = 24 saat
+settings-datetime-format-12h = ÖÖ/ÖS
+settings-datetime-seconds = Saniyeleri göster
+settings-datetime-weekday = Haftanın gününü göster
+settings-datetime-calendar = Takvim
+settings-datetime-week-start = Haftanın ilk günü
+settings-datetime-week-start-automatic = Otomatik
+settings-datetime-week-start-monday = Pazartesi
+settings-datetime-week-start-sunday = Pazar
+settings-datetime-week-start-regional = { $day }, bölgenize göre
+settings-datetime-set-title = Tarih ve saati ayarla
+settings-datetime-previous-month = Önceki ay
+settings-datetime-next-month = Sonraki ay
+settings-datetime-hour = Saat
+settings-datetime-minute = Dakika
+settings-datetime-day-period = Öğleden önce ya da sonra
+settings-datetime-increase = { $label } değerini artır
+settings-datetime-decrease = { $label } değerini azalt
+settings-datetime-set-failed = Tarih ve saat değiştirilemedi.
+settings-datetime-cancel = İptal
+settings-datetime-set = Ayarla
+settings-datetime-zone-search = Şehir ya da ülke arayın
+settings-datetime-zones = Saat dilimleri
+settings-datetime-utc = Eş Güdümlü Evrensel Saat
+settings-datetime-zone-no-match = Eşleşen yer yok
+settings-datetime-zone-failed = Saat dilimi değiştirilemedi.
+
+## Users
+
+settings-users-picture = Resminizi değiştirin
+settings-users-picture-edit = Düzenle
+settings-users-account = Hesabınız
+settings-users-name = Ad
+settings-users-name-description = Oturum açarken ve kilit ekranında gösterilir
+settings-users-change = Değiştir
+settings-users-password = Parola
+settings-users-password-description = Oturum açmak ve bu bilgisayarın kilidini açmak için kullanılır
+settings-users-password-set = Parola belirle
+settings-users-account-type = Hesap türü
+settings-users-administrator = Yönetici
+settings-users-standard = Standart hesap
+settings-users-others = Bu bilgisayardaki diğer kişiler
+settings-users-name-title = Adınızı değiştirin
+settings-users-name-dialog-description = Oturum açarken bu adla görünürsünüz.
+settings-users-save = Kaydet
+settings-users-cancel = İptal
+settings-users-close = Kapat
+settings-users-done = Bitti
+settings-users-try-again = Yeniden dene
+settings-users-remove = Kaldır
+settings-users-password-change-title = Parolanızı değiştirin
+settings-users-password-set-title = Parola belirleyin
+settings-users-password-dialog-description = Bunu oturum açmak ve bu bilgisayarın kilidini açmak için kullanacaksınız.
+settings-users-password-current = Geçerli parola
+settings-users-password-new = Yeni parola
+settings-users-password-new-placeholder = { $count ->
+    [one] En az { $count } karakter
+   *[other] En az { $count } karakter
+}
+settings-users-password-confirm = Doğrula
+settings-users-password-confirm-placeholder = Yeniden yazın
+settings-users-password-change = Parolayı değiştir
+settings-users-password-changing = Değiştiriliyor…
+settings-users-password-wrong = Geçerli parolanız bu değil
+settings-users-password-mismatch = Parolalar eşleşmiyor
+settings-users-password-too-short = Bu parola çok kısa
+settings-users-password-too-similar = Bu, geçerli parolanıza çok benziyor
+settings-users-password-dictionary-word = Bu, sözlükteki bir sözcüğe dayanıyor. Daha az yaygın bir şey deneyin.
+settings-users-password-too-simple = Bu çok basit. Uzatın ya da daha fazla türde karakter ekleyin.
+settings-users-password-rejected = Bu parola kabul edilmedi. Başka bir parola deneyin.
+settings-users-password-minimum = { $count ->
+    [one] En az { $count } karakter kullanın
+   *[other] En az { $count } karakter kullanın
+}
+settings-users-password-weak = Zayıf. Birkaç sözcükten oluşan uzun parolaları tahmin etmek daha zordur.
+settings-users-password-fair = Orta. Birkaç karakter daha eklemek parolayı güçlendirir.
+settings-users-password-strong = Güçlü
+settings-users-fingerprints = Parmak izleri
+settings-users-fingerprint-add = Parmak izi ekle
+settings-users-fingerprint-add-description = Parolanızı yazmak yerine parmağınızla oturum açın ve kilidi açın
+settings-users-fingerprint-choose = Eklenecek parmağı seçin.
+settings-users-finger = Parmak
+settings-users-fingerprint-start = Başla
+settings-users-fingerprint-another = Başka bir parmak seç
+settings-users-fingerprint-remove = Kaldır: { $finger }
+settings-users-fingerprint-remove-title = Bu parmak izi kaldırılsın mı?
+settings-users-fingerprint-remove-description = Artık oturum açmak için { $finger } kullanamazsınız.
+
+## Login screen
+
+settings-login-unavailable = Bu bilgisayarda oturum açma ekranı değiştirilemiyor.
+settings-login-wallpaper = Duvar kâğıdı
+settings-login-wallpaper-label = Oturum açma ekranı duvar kâğıdı
+settings-login-wallpaper-shared-description = Herkes oturum açmadan önce aynı resmi görür
+settings-login-wallpaper-own-description = Herkes hesabını seçtiğinde kendi duvar kâğıdını görür
+settings-login-wallpaper-own = Kişiye özel
+settings-login-wallpaper-shared = Herkes için aynı
+settings-login-picture = Resim
+settings-login-picture-description = Oturum açma ekranının arkasında gösterilir
+settings-login-picture-change = Değiştir
+settings-login-people = Kişiler
+settings-login-show-people = Kişileri oturum açma ekranında göster
+settings-login-show-people-on = Oturum açmak için listeden bir hesap seçilir
+settings-login-show-people-off = Herkes oturum açmak için kullanıcı adını yazar
+settings-login-person-hidden = Oturum açmak için kullanıcı adını yazar
+settings-login-show-person = Göster: { $name }
+settings-login-signing-in = Oturum açma
+settings-login-session = Varsayılan oturum
+settings-login-session-description = Başka biri seçilmedikçe kullanılır
+settings-login-session-automatic = Otomatik
+settings-login-automatic = Otomatik oturum açma
+settings-login-automatic-description = Başlangıçta parola olmadan oturum açar
+settings-login-automatic-off = Kapalı
+
+## Updates
+
+settings-updates-checking = Güncellemeler aranıyor…
+settings-updates-downloading = Güncellemeler indiriliyor…
+settings-updates-rolling-back = Önceki sürüm hazırlanıyor…
+settings-updates-switching-nvidia = NVIDIA sürücüsü indiriliyor…
+settings-updates-switching-standard = Standart sistem görüntüsü indiriliyor…
+settings-updates-elsewhere-refresh-by = { $app } güncellemeleri arıyor
+settings-updates-elsewhere-download-by = { $app } güncellemeleri indiriyor
+settings-updates-elsewhere-update-by = { $app } güncellemeleri yüklüyor
+settings-updates-elsewhere-update = Güncellemeler yükleniyor
+settings-updates-elsewhere-install-by = { $app } yazılım yüklüyor
+settings-updates-elsewhere-install = Yazılım yükleniyor
+settings-updates-elsewhere-remove-by = { $app } yazılım kaldırıyor
+settings-updates-elsewhere-remove = Yazılım kaldırılıyor
+settings-updates-elsewhere-change-by = { $app } yazılımda değişiklik yapıyor
+settings-updates-elsewhere-change = Yazılım değiştiriliyor
+settings-updates-elsewhere-wait = İşlem bittiğinde güncellemeleri yeniden arayabilirsiniz
+settings-updates-ready = Güncellemeler yüklenmeye hazır
+settings-updates-available = { $count ->
+    [one] { $count } güncelleme var
+   *[other] { $count } güncelleme var
+}
+settings-updates-up-to-date = Sisteminiz güncel
+settings-updates-version = Sürüm { $version }
+settings-updates-version-new = Yeni bir sürüm
+settings-updates-returning = { $version } sürümüne dönmeye hazır
+settings-updates-returning-unversioned = Önceki sürüme dönmeye hazır
+settings-updates-nvidia-ready = NVIDIA sürücüsü hazır
+settings-updates-standard-ready = Standart sistem görüntüsü hazır
+settings-updates-version-available = Sürüm { $version } kullanılabilir
+settings-updates-version-available-new = Yeni bir sürüm kullanılabilir
+settings-updates-version-staged = Sürüm { $version } yüklenmeye hazır
+settings-updates-version-staged-new = Yeni bir sürüm yüklenmeye hazır
+settings-updates-restart-install-them = Yüklemek için yeniden başlatın. Bilgisayarınız birkaç dakika içinde geri gelir.
+settings-updates-restart-return = Geri dönmeyi tamamlamak için yeniden başlatın.
+settings-updates-restart-switch = Tamamlamak için yeniden başlatın. Bilgisayarınız birkaç dakika içinde geri gelir.
+settings-updates-restart-install-it = Yüklemek için yeniden başlatın. Bilgisayarınız birkaç dakika içinde geri gelir.
+settings-updates-last-checked = Son denetim: { $when }
+settings-updates-never-checked = Henüz denetlenmedi
+settings-updates-installed-when = Güncellemeler yüklendi: { $when }
+settings-updates-stop = Durdur
+settings-updates-check = Şimdi denetle
+settings-updates-checking-button = Denetleniyor…
+settings-updates-apps = Uygulamalar
+settings-updates-app-updates = Uygulama güncellemeleri
+settings-updates-apps-checking = Uygulamalarınız için güncellemeler aranıyor…
+settings-updates-apps-count = { $count ->
+    [0] Schelf uygulamasında yönetilir
+    [one] Schelf uygulamasında { $count } uygulamanın güncellemesi var
+   *[other] Schelf uygulamasında { $count } uygulamanın güncellemesi var
+}
+settings-updates-automatic = Otomatik güncellemeler
+settings-updates-look = Güncellemeleri ara
+settings-updates-look-description = Ayarlar kapalıyken bile
+settings-updates-schedule-daily = Her gün
+settings-updates-schedule-weekly = Her hafta
+settings-updates-schedule-never = Yalnızca ben denetlediğimde
+settings-updates-background = Arka planda indir
+settings-updates-background-label = Güncellemeleri arka planda indir
+settings-updates-background-description = Güncellemeler bir sonraki yeniden başlatmada yüklenmeye hazır olur
+settings-updates-firmware = Üretici yazılımı
+settings-updates-firmware-description = Donanımınızın içindeki yazılım için güncellemeler
+settings-updates-firmware-restart = Yeniden başlattığınızda tamamlanır
+settings-updates-firmware-installing = Yükleniyor…
+settings-updates-firmware-update = Güncelle
+settings-updates-firmware-failed = Üretici yazılımı güncellenemedi
+settings-updates-failed = Son güncellemeler yüklenemedi
+settings-updates-failed-description = Sisteminiz olduğu gibi bırakıldı
+settings-updates-includes = { $parts ->
+    [security] Güvenlik düzeltmeleri içerir
+    [kernel] Yeni bir Linux çekirdeği içerir
+    [drivers] Güncellenmiş sürücüler içerir
+    [security-kernel] Güvenlik düzeltmeleri ve yeni bir Linux çekirdeği içerir
+    [security-drivers] Güvenlik düzeltmeleri ve güncellenmiş sürücüler içerir
+    [kernel-drivers] Yeni bir Linux çekirdeği ve güncellenmiş sürücüler içerir
+    [security-kernel-drivers] Güvenlik düzeltmeleri, yeni bir Linux çekirdeği ve güncellenmiş sürücüler içerir
+   *[other] Sistem genelinde düzeltmeler ve iyileştirmeler
+}
+settings-updates-count-size = { $count ->
+    [one] { $count } güncelleme · { $size }
+   *[other] { $count } güncelleme · { $size }
+}
+settings-updates-restart-and-install = Yeniden başlat ve yükle
+settings-updates-download = İndir
+settings-updates-see-included = Neler içerdiğini gör
+settings-updates-included = İçerik
+settings-updates-included-description = { $count ->
+    [one] Sistem, sürücüleri ve kitaplıkları için { $count } güncelleme
+   *[other] Sistem, sürücüleri ve kitaplıkları için { $count } güncelleme
+}
+settings-updates-security-fix = Güvenlik düzeltmesi
+settings-updates-done = Bitti
+settings-updates-area-kernel = Linux çekirdeği
+settings-updates-area-drivers = Sürücüler ve üretici yazılımı
+settings-updates-area-desktop = Masaüstü
+settings-updates-area-core = Temel sistem
+settings-updates-area-other = Kitaplıklar ve araçlar
+settings-updates-released = Yayımlanma: { $when }
+settings-updates-improvements = Sistem genelinde düzeltmeler ve iyileştirmeler
+settings-updates-download-size = İndirme boyutu: { $size }
+settings-updates-replaces = Yüklenmeyi bekleyen { $version } sürümünün yerini alır
+settings-updates-replaces-new = Yüklenmeyi bekleyen yeni bir sürümün yerini alır
+settings-updates-returning-description = Daha önce kullandığınız sürüm. Dosyalarınız ve ayarlarınız olduğu gibi kalır.
+settings-updates-stay = { $version } sürümünde kal
+settings-updates-stay-unversioned = Bu sürümde kal
+settings-updates-restart = Yeniden başlat
+settings-updates-restart-to-install = Yüklemek için yeniden başlat
+settings-updates-see-new = Yenilikleri gör
+settings-updates-this-computer = Bu bilgisayar
+settings-updates-installed-version = Yüklü sürüm
+settings-updates-unknown = Bilinmiyor
+settings-updates-whats-new = Yenilikler
+settings-updates-go-back-title = Önceki sürüme dön
+settings-updates-previous = Sürüm { $version }. Dosyalarınız ve ayarlarınız olduğu gibi kalır.
+settings-updates-previous-unversioned = Dosyalarınız ve ayarlarınız olduğu gibi kalır.
+settings-updates-go-back = Geri dön
+settings-updates-notes-title = { $version } sürümündeki yenilikler
+settings-updates-notes-title-new = Yeni sürümdeki yenilikler
+settings-updates-variant-nvidia = NVIDIA sürücüsünü kullan
+settings-updates-variant-standard = Standart sistem görüntüsüne geç
+settings-updates-variant-nvidia-reason = NVIDIA grafik kartınızdan tam performans
+settings-updates-variant-standard-reason = Daha küçük, çünkü bu bilgisayarda NVIDIA grafik kartı yok
+settings-updates-switch = Geç
+
+## About
+
+settings-about-device-name = Cihaz adı
+settings-about-device-name-description = Diğer cihazların bu bilgisayarı nasıl gördüğü
+settings-about-rename = Yeniden adlandır
+settings-about-rename-title = Bu cihazı yeniden adlandır
+settings-about-rename-description = Yakındaki diğer cihazlar bu adı görür.
+settings-about-cancel = İptal
+settings-about-hardware = Donanım
+settings-about-processor = İşlemci
+settings-about-graphics = Grafik
+settings-about-graphics-numbered = Grafik { $number }
+settings-about-memory = Bellek
+settings-about-storage = Depolama
+settings-about-storage-free = Toplam { $total }, { $free } boş
+settings-about-manage-drives = Sürücüleri yönet
+settings-about-old-system = Luft yerine geçtiğinde saklandı · { $size }
+settings-about-other-system = Kapladığı { $size } alanı Luft’a vermek için kaldırın
+settings-about-remove = Kaldır
+settings-about-software = Yazılım
+settings-about-system = Sistem
+settings-about-desktop = Masaüstü
+settings-about-kernel = Çekirdek
+settings-about-hostname = Ana makine adı
+settings-about-problems = Son sorunlar
+settings-about-problem-gpu = Grafik sürücüsü yanıt vermeyi durdurdu
+settings-about-problem-summary = { $when } · Bilgisayar kendiliğinden yeniden başladı
+settings-about-problem-graceful = { $when }. Bilgisayar yeniden başlamadan önce uygulamalardan çalışmalarını kaydetmeleri istendi.
+settings-about-problem-forced = { $when }. Bazı uygulamalar zamanında kapanmadı ve bilgisayar yeniden başlamadan önce durduruldu.
+settings-about-problem-emergency = { $when }. Bilgisayar, uygulamaları beklemeden yeniden başlamak zorunda kaldı.
+settings-about-problem-help = Neler yardımcı olabilir
+settings-about-problem-what = Ne oldu
+settings-about-problem-log = O oturumun tam çekirdek günlüğü sistem günlüğünde kalır. nvidia-bug-report.sh komutunu yönetici olarak çalıştırmak, sürücü hata raporu için bu günlüğü toplar.
+settings-about-problem-firmware = Üretici yazılımı ayarlarına yeniden başlat
+settings-about-done = Bitti
+
+## Language & Region
+
+settings-region-language = Dil
+settings-region-language-description = Kestrel ve Luft’un uygulamaları bunu hemen kullanır
+settings-region-language-next-sign-in = Açık uygulamalar yeniden başlatıldıktan sonra, oturum açma ekranı ise oturumu kapattıktan sonra değişir
+settings-region-formats-language = Dille aynı
+settings-region-formats = Biçimler
+settings-region-formats-description = Tarihler, saatler, sayılar ve ölçüler
+settings-region-formats-next-sign-in = { $sample }, bir sonraki oturum açmadan itibaren

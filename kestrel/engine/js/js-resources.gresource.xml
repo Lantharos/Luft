@@ -138,12 +138,14 @@
     <file alias="locales/et.ftl">ui/locale-et.ftl</file>
     <file alias="locales/es.ftl">ui/locale-es.ftl</file>
     <file alias="locales/fr.ftl">ui/locale-fr.ftl</file>
+    <file alias="locales/ga.ftl">ui/locale-ga.ftl</file>
     <file alias="locales/hr.ftl">ui/locale-hr.ftl</file>
     <file alias="locales/is.ftl">ui/locale-is.ftl</file>
     <file alias="locales/it.ftl">ui/locale-it.ftl</file>
     <file alias="locales/lv.ftl">ui/locale-lv.ftl</file>
     <file alias="locales/lt.ftl">ui/locale-lt.ftl</file>
     <file alias="locales/hu.ftl">ui/locale-hu.ftl</file>
+    <file alias="locales/mt.ftl">ui/locale-mt.ftl</file>
     <file alias="locales/nl.ftl">ui/locale-nl.ftl</file>
     <file alias="locales/nb.ftl">ui/locale-nb.ftl</file>
     <file alias="locales/nn.ftl">ui/locale-nn.ftl</file>
@@ -157,6 +159,8 @@
     <file alias="locales/sr-Latn.ftl">ui/locale-sr-Latn.ftl</file>
     <file alias="locales/fi.ftl">ui/locale-fi.ftl</file>
     <file alias="locales/sv.ftl">ui/locale-sv.ftl</file>
+    <file alias="locales/tr.ftl">ui/locale-tr.ftl</file>
+    <file alias="locales/el.ftl">ui/locale-el.ftl</file>
     <file alias="locales/bg.ftl">ui/locale-bg.ftl</file>
     <file alias="locales/mk.ftl">ui/locale-mk.ftl</file>
     <file alias="locales/ru.ftl">ui/locale-ru.ftl</file>

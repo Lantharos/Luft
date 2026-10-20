@@ -1,0 +1,125 @@
+source,target,explanation
+Luft,,"Not translated. Name of the operating system; neuter, το Luft, does not inflect"
+Kestrel,,"Not translated. Name of Luft's desktop; neuter, does not inflect"
+Rover,,"Not translated. App name, the file manager"
+Magpie,,"Not translated. App name, the viewer for photos, videos, music and PDFs"
+Mailman,,"Not translated. App name, the mail app"
+Draft,,"Not translated. App name, the text and code editor"
+Tern,,"Not translated. App name, the terminal"
+Schelf,,"Not translated. App name, the app store"
+Barometer,,"Not translated. App name, the system monitor"
+Keys,,"Not translated. App name, makes keyboard layouts and input methods"
+Meet Luft,,Not translated. Name of the Windows app that prepares a PC for Luft
+Helium,,Not translated. Name of the default browser
+Flatpak,,Not translated. App packaging format
+Secure Boot,,"Not translated. UEFI feature, named this way in every PC's firmware setup"
+TPM,,Not translated. Trusted Platform Module; in the interface usually called the security chip
+Bluetooth,,Not translated. Trademark
+Wi-Fi,,"Not translated. Wireless network; neuter, το Wi-Fi"
+Settings,Ρυθμίσεις,"App name and the general word for settings; feminine plural, οι Ρυθμίσεις"
+Disks,Δίσκοι,App name for the disk utility; masculine plural
+Install Luft,Εγκατάσταση Luft,"App name of the installer; a noun, like other Greek app names"
+Network Sign-In,Σύνδεση σε δίκτυο,App that opens the sign-in page of a public Wi-Fi
+File Manager,Διαχείριση αρχείων,Generic name of Rover
+Media Viewer,Προβολή πολυμέσων,Generic name of Magpie
+Mail,Αλληλογραφία,Generic name of Mailman
+Text Editor,Επεξεργαστής κειμένου,Generic name of Draft
+App Store,Κατάστημα εφαρμογών,Generic name of Schelf
+System Monitor,Παρακολούθηση συστήματος,Generic name of Barometer
+Keyboard Layouts,Διατάξεις πληκτρολογίου,Generic name of Keys
+Start,Start,"The menu opened with Super or the Luft mark; a name; neuter, το Start, or το μενού Start"
+board,πίνακας,"Mode that lays a workspace's windows side by side on an endless canvas; masculine, ο πίνακας, plural οι πίνακες"
+Quick settings,Γρήγορες ρυθμίσεις,"Panel of switches and sliders opened from the status icons; feminine plural, οι"
+notification center,κέντρο ειδοποιήσεων,"Panel with notifications, media and the calendar, opened from the clock; neuter, το"
+All windows,Όλα τα παράθυρα,"The task view: every window of a workspace and the workspaces, Super+Tab"
+snap,τακτοποίηση,"put a window into a half, third or quarter of the screen; verb τακτοποιώ, noun η τακτοποίηση; not καρφίτσωμα, which is pin"
+snap layout,διάταξη παραθύρων,"One of the arrangements offered by Super+Z; feminine, η"
+snap group,ομάδα παραθύρων,"Windows snapped side by side that come back together; feminine, η"
+taskbar,γραμμή εργασιών,"The bar along the bottom of the screen; feminine, η"
+tray,πλαίσιο συστήματος,"Taskbar button holding the icons of apps running in the background; neuter, το"
+status icons,εικονίδια κατάστασης,"Taskbar icons for network, sound and battery that open Quick settings; neuter plural"
+lock screen,οθόνη κλειδώματος,"Screen shown while the session is locked; feminine, η"
+login screen,οθόνη σύνδεσης,"Screen listing the people on the computer before anyone signs in; feminine, η"
+workspace,χώρος εργασίας,"One of up to ten separate desktops; masculine, ο, plural οι χώροι εργασίας"
+desktop,επιφάνεια εργασίας,"The background area behind the windows; also the whole desktop environment; feminine, η"
+wallpaper,ταπετσαρία,"Picture behind the desktop; feminine, η"
+accent color,χρώμα έμφασης,"Color taken from the wallpaper and used for highlights; neuter, το"
+dark style,Σκοτεινή λειτουργία,Quick settings tile that switches between light and dark
+Night light,Νυχτερινός φωτισμός,"Warmer screen colors in the evening; masculine, ο"
+Do Not Disturb,Μην ενοχλείτε,Holds back notification banners and sounds; neuter when used as a noun (το Μην ενοχλείτε)
+Airplane mode,Λειτουργία πτήσης,"Turns off every radio; feminine, η"
+Keep awake,Παραμονή σε εγρήγορση,Keeps the screen on for a while
+Power mode,Λειτουργία ενέργειας,"Performance, Balanced or Power saver"
+Power saver,Εξοικονόμηση ενέργειας,Power mode
+Dictation,Υπαγόρευση,"Typing by speaking; feminine, η"
+clipboard,πρόχειρο,"Holds what was copied; neuter, το, genitive του προχείρου"
+clipboard history,ιστορικό προχείρου,"List of recently copied items, Super+V"
+emoji,emoji,"noun; neuter, το emoji, plural τα emoji; does not inflect"
+screenshot,στιγμιότυπο οθόνης,"Picture of the screen; neuter, το"
+screen recording,εγγραφή οθόνης,"Video of the screen; feminine, η"
+privacy indicator,ένδειξη απορρήτου,"Taskbar icon shown while the camera, microphone, location or screen is in use; feminine, η"
+Full access,Πλήρης πρόσβαση,"Schelf switch that lets a Flatpak app leave its sandbox: all files, clipboard in the background, other apps' windows; feminine, η"
+sandbox,απομονωμένο περιβάλλον,"Isolation Flatpak apps run in; neuter, το"
+Keyring,κλειδοθήκη,"Luft Keyring, which keeps passwords, tokens and keys; feminine, η; lowercase in sentences: η κλειδοθήκη σας"
+passkey,κλειδί πρόσβασης,"Sign-in key that replaces a password on websites; neuter, το, plural τα κλειδιά πρόσβασης"
+recovery key,κλειδί αποκατάστασης,"Long code that unlocks an encrypted disk when the TPM can't; neuter, το"
+security chip,τσιπ ασφαλείας,"How the interface names the TPM; neuter, το, does not inflect"
+device encryption,κρυπτογράφηση συσκευής,Encryption of the whole disk
+encryption,κρυπτογράφηση,"noun; feminine, η"
+signed startup,υπογεγραμμένη εκκίνηση,Startup where every step is checked against Luft's signature
+firmware,υλικολογισμικό,"Software built into the hardware; neuter, το"
+window,παράθυρο,"noun; neuter, το, plural τα παράθυρα"
+pin,καρφιτσώνω,"verb: keep an app on the taskbar or in Start; on buttons and menu items the noun: Καρφίτσωμα"
+unpin,ξεκαρφιτσώνω,"verb; on buttons and menu items: Ξεκαρφίτσωμα"
+Pin to taskbar,Καρφίτσωμα στη γραμμή εργασιών,Menu item
+open,ανοίγω,verb; button: Άνοιγμα
+close,κλείνω,verb; button: Κλείσιμο
+remove,αφαιρώ,verb; button: Αφαίρεση
+delete,διαγράφω,verb; button: Διαγραφή
+turn on,ενεργοποιώ,"verb, for a feature or setting; button: Ενεργοποίηση; state: ενεργό"
+turn off,απενεργοποιώ,"verb, for a feature or setting; button: Απενεργοποίηση; state: ανενεργό"
+sign in,συνδέομαι,verb; button: Σύνδεση
+sign out,αποσυνδέομαι,"verb, also Log out; button: Αποσύνδεση"
+restart,επανεκκινώ,"verb; button: Επανεκκίνηση; in running text prefer κάνω επανεκκίνηση"
+shut down,τερματίζω,"verb, also Power off; button: Τερματισμός λειτουργίας"
+suspend,αναστολή λειτουργίας,"verb and power menu item, also Sleep; button: Αναστολή λειτουργίας"
+hibernate,αδρανοποίηση,verb and power menu item
+lock,κλειδώνω,verb; button: Κλείδωμα
+unlock,ξεκλειδώνω,verb; button: Ξεκλείδωμα
+install,εγκαθιστώ,verb; button: Εγκατάσταση
+update,ενημερώνω,verb; button: Ενημέρωση
+updates,ενημερώσεις,"noun, new versions of Luft or apps; feminine plural; singular η ενημέρωση"
+cancel,Ακύρωση,button
+save,αποθηκεύω,verb; button: Αποθήκευση
+allow,επιτρέπω,verb; button: Να επιτρέπεται
+forget,αφαιρώ,"verb, for a saved network or device; button: Αφαίρεση, which reads better than Λήθη"
+share,μοιράζομαι,verb; button: Κοινή χρήση
+search,αναζήτηση,verb and noun; verb αναζητώ
+set up,ρυθμίζω,verb; button: Ρύθμιση
+try again,Επανάληψη,button; in running text: Δοκιμάστε ξανά
+undo,αναιρώ,verb; button: Αναίρεση
+done,Τέλος,button
+next,Επόμενο,button that moves to the next step
+app,εφαρμογή,"noun, also application; feminine, η, plural οι εφαρμογές"
+file,αρχείο,"noun; neuter, το"
+folder,φάκελος,"noun; masculine, ο, plural οι φάκελοι"
+trash,κάδος απορριμμάτων,"Where deleted files wait; masculine, ο; κάδος alone where the context is clear"
+device,συσκευή,"noun; feminine, η"
+disk,δίσκος,"noun, also drive; masculine, ο; μονάδα δίσκου for a drive you plug in"
+USB stick,στικ USB,"noun; neuter, το, does not inflect"
+computer,υπολογιστής,"noun, also PC; masculine, ο"
+network,δίκτυο,"noun; neuter, το"
+battery,μπαταρία,"noun; feminine, η"
+power,ενέργεια,"Settings page and button for power; feminine, η"
+display,οθόνη,"noun, a monitor or built-in screen; also screen; feminine, η"
+sound,ήχος,"noun, the Settings page and audio in general; masculine, ο"
+notification,ειδοποίηση,"noun; feminine, η, plural οι ειδοποιήσεις"
+keyboard shortcut,συντόμευση πληκτρολογίου,"noun; feminine, η; συντόμευση alone where the context is clear"
+keyboard layout,διάταξη πληκτρολογίου,"noun; feminine, η"
+input method,μέθοδος εισαγωγής,"Turns what you type into something else, such as Compose sequences or word choices; feminine, η μέθοδος"
+touchpad,επιφάνεια αφής,"noun; feminine, η"
+privacy,απόρρητο,"noun; neuter, το"
+security,ασφάλεια,"noun; feminine, η"
+account,λογαριασμός,"noun, a user account or online account; masculine, ο"
+password,κωδικός πρόσβασης,"noun; masculine, ο; κωδικός alone where the context is clear"
+accessibility,προσβασιμότητα,"noun; feminine, η"

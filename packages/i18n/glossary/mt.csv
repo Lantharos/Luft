@@ -1,0 +1,125 @@
+source,target,explanation
+Luft,,"Not translated. Name of the operating system; no article, masculine agreement: Luft huwa aġġornat"
+Kestrel,,Not translated. Name of Luft's desktop
+Rover,,"Not translated. App name, the file manager"
+Magpie,,"Not translated. App name, the viewer for photos, videos, music and PDFs"
+Mailman,,"Not translated. App name, the mail app"
+Draft,,"Not translated. App name, the text and code editor"
+Tern,,"Not translated. App name, the terminal"
+Schelf,,"Not translated. App name, the app store"
+Barometer,,"Not translated. App name, the system monitor"
+Keys,,"Not translated. App name, makes keyboard layouts and input methods"
+Meet Luft,,Not translated. Name of the Windows app that prepares a PC for Luft
+Helium,,Not translated. Name of the default browser
+Flatpak,,Not translated. App packaging format
+Secure Boot,,"Not translated. UEFI feature, named this way in every PC's firmware setup"
+TPM,,Not translated. Trusted Platform Module; in the interface usually called the security chip
+Bluetooth,,Not translated. Trademark
+Wi-Fi,Wi-Fi,"Wireless network; kept as in Windows; masculine, il-Wi-Fi"
+Settings,Settings,"App name and the general word for settings, kept in English as in Windows in Maltese; plural, is-Settings"
+Disks,Diski,"App name for the disk utility; plural of diska"
+Install Luft,Installa Luft,App name of the installer
+Network Sign-In,Dħul fin-netwerk,App that opens the sign-in page of a public Wi-Fi
+File Manager,Maniġer tal-fajls,Generic name of Rover
+Media Viewer,Viewer tal-midja,Generic name of Magpie
+Mail,Posta,Generic name of Mailman
+Text Editor,Editur tat-test,Generic name of Draft
+App Store,Store tal-apps,"Generic name of Schelf; Store as in Microsoft Store"
+System Monitor,Monitor tas-sistema,Generic name of Barometer
+Keyboard Layouts,Tqassim tat-tastiera,"Generic name of Keys; tqassim is the same in singular and plural"
+Start,Start,"The menu opened with Super or the Luft mark; a name, not translated; il-menù Start when it needs an article"
+board,bord,"Mode that lays a workspace's windows side by side on an endless canvas; masculine, il-bord, plural bordijiet"
+Quick settings,Settings rapidi,"Panel of switches and sliders opened from the status icons; plural, is-Settings rapidi"
+notification center,ċentru tan-notifiki,"Panel with notifications, media and the calendar, opened from the clock; masculine, iċ-ċentru tan-notifiki"
+All windows,It-twieqi kollha,"The task view: every window of a workspace and the workspaces, Super+Tab"
+snap,allinja,"verb: put a window into a half, third or quarter of the screen; button form Allinja"
+snap layout,tqassim tal-allinjament,"One of the arrangements offered by Super+Z; masculine, plural the same"
+snap group,grupp ta’ allinjament,"Windows snapped side by side that come back together; masculine, plural gruppi ta’ allinjament"
+taskbar,taskbar,"The bar along the bottom of the screen; kept in English as in Windows; masculine, it-taskbar"
+tray,trej tas-sistema,"Taskbar button holding the icons of apps running in the background; masculine, it-trej tas-sistema"
+status icons,ikoni tal-istatus,"Taskbar icons for network, sound and battery that open Quick settings; feminine plural, singular ikona"
+lock screen,skrin imsakkar,"Screen shown while the session is locked; masculine, l-iskrin imsakkar"
+login screen,skrin tad-dħul,"Screen listing the people on the computer before anyone signs in; masculine"
+workspace,spazju tax-xogħol,"One of up to ten separate desktops; masculine, plural spazji tax-xogħol"
+desktop,desktop,"The background area behind the windows; also the whole desktop environment; masculine, id-desktop"
+wallpaper,sfond,"Picture behind the desktop; masculine, l-isfond, plural sfondi"
+accent color,kulur ta’ aċċent,"Color taken from the wallpaper and used for highlights; masculine, il-kulur ta’ aċċent"
+dark style,Modalità skura,"Quick settings tile that switches between light and dark; feminine"
+Night light,Dawl ta’ billejl,"Warmer screen colors in the evening; masculine, id-dawl ta’ billejl"
+Do Not Disturb,Tiddisturbax,"Holds back notification banners and sounds; a negative imperative used as a name, no article"
+Airplane mode,Modalità tal-ajruplan,"Turns off every radio; feminine"
+Keep awake,Żomm mixgħul,Keeps the screen on for a while
+Power mode,Modalità tal-enerġija,"Performance, Balanced or Power saver; feminine"
+Power saver,Iffrankar tal-enerġija,"Power mode; the others are Prestazzjoni and Bilanċjat"
+Dictation,Dettatura,"Typing by speaking; feminine, id-dettatura"
+clipboard,klibbord,"Holds what was copied; masculine, il-klibbord"
+clipboard history,storja tal-klibbord,"List of recently copied items, Super+V; feminine"
+emoji,emoji,"noun; masculine, l-emoji, plural the same"
+screenshot,screenshot,"Picture of the screen; masculine, plural screenshots"
+screen recording,rekordjar tal-iskrin,"Video of the screen; masculine"
+privacy indicator,indikatur tal-privatezza,"Taskbar icon shown while the camera, microphone, location or screen is in use; masculine"
+Full access,Aċċess sħiħ,"Schelf switch that lets a Flatpak app leave its sandbox: all files, clipboard in the background, other apps' windows; masculine"
+sandbox,sandbox,"Isolation Flatpak apps run in; masculine, is-sandbox"
+Keyring,Ċurkett taċ-ċwievet,"Luft Keyring, which keeps passwords, tokens and keys; masculine, iċ-ċurkett taċ-ċwievet ta’ Luft"
+passkey,passkey,"Sign-in key that replaces a password on websites; masculine, plural passkeys"
+recovery key,ċavetta tal-irkupru,"Long code that unlocks an encrypted disk when the TPM can't; feminine, plural ċwievet tal-irkupru"
+security chip,ċippa tas-sigurtà,"How the interface names the TPM; feminine, iċ-ċippa tas-sigurtà"
+device encryption,ċċifrar tal-apparat,Encryption of the whole disk; masculine
+encryption,ċċifrar,"noun; masculine, iċ-ċċifrar"
+signed startup,Startjar iffirmat,"Startup where every step is checked against Luft's signature; masculine"
+firmware,firmware,"Software built into the hardware; masculine, il-firmware"
+window,tieqa,"noun; feminine, it-tieqa, plural twieqi"
+pin,waħħal,"verb: keep an app on the taskbar or in Start; button form Waħħal"
+unpin,neħħi,"verb; Neħħi mit-taskbar, Neħħi minn Start"
+Pin to taskbar,Waħħal mat-taskbar,Menu item
+open,iftaħ,"verb; buttons and menu items use the imperative singular, as here"
+close,agħlaq,verb
+remove,neħħi,verb
+delete,ħassar,"verb; for removing permanently"
+turn on,ixgħel,"verb, for a feature or setting; attiva for settings that are not switches"
+turn off,itfi,"verb, for a feature or setting; iddiżattiva for settings that are not switches"
+sign in,idħol,"verb, also Log in; noun dħul"
+sign out,oħroġ,"verb, also Log out; noun ħruġ"
+restart,irristartja,verb
+shut down,itfi,"verb, also Power off; power menu item Itfi"
+suspend,Sospensjoni,"verb and power menu item, also Sleep; menu item Sospensjoni, the state modalità ta’ sospensjoni"
+hibernate,Ibernazzjoni,"verb and power menu item; feminine"
+lock,sakkar,verb
+unlock,żblokka,"verb; iftaħ is open"
+install,installa,verb
+update,aġġorna,verb
+updates,aġġornamenti,"noun, new versions of Luft or apps; plural; singular aġġornament, masculine"
+cancel,Ikkanċella,button
+save,issejvja,"verb, as in Windows"
+allow,ippermetti,verb
+forget,insa,"verb, for a saved network or device: Insa n-netwerk"
+share,ixxerja,verb
+search,fittex,"verb; noun tiftix, masculine"
+set up,issettja,verb
+try again,Erġa’ pprova,button
+undo,erġa’ lura,verb; button: Erġa’ lura
+done,Lest,button
+next,Li jmiss,button that moves to the next step
+app,app,"noun, also application; feminine, l-app, plural apps"
+file,fajl,"noun; masculine, il-fajl, plural fajls"
+folder,fowlder,"noun; masculine, il-fowlder, plural fowlders"
+trash,barmil,"Where deleted files wait; masculine, il-barmil"
+device,apparat,"noun; masculine, l-apparat, plural apparati"
+disk,diska,"noun, also drive; feminine, id-diska, plural diski; drajv for a drive you plug in"
+USB stick,drajv USB,"noun; masculine, plural drajvs USB"
+computer,kompjuter,"noun, also PC; masculine, il-kompjuter, plural kompjuters"
+network,netwerk,"noun; masculine, in-netwerk, plural netwerks"
+battery,batterija,"noun; feminine, il-batterija"
+power,Enerġija,"Settings page and button for power; feminine"
+display,skrin,"noun, a monitor or built-in screen; also screen; masculine, l-iskrin, plural skrins"
+sound,ħoss,"noun, the Settings page and audio in general; masculine, il-ħoss"
+notification,notifika,"noun; feminine, in-notifika, plural notifiki"
+keyboard shortcut,shortcut tat-tastiera,"noun; masculine, plural shortcuts tat-tastiera; shortcut alone where the keyboard is obvious"
+keyboard layout,tqassim tat-tastiera,"noun; masculine, plural the same"
+input method,metodu tal-input,"Turns what you type into something else, such as Compose sequences or word choices; masculine, plural metodi tal-input"
+touchpad,touchpad,"noun; masculine, it-touchpad"
+privacy,privatezza,"noun; feminine"
+security,sigurtà,"noun; feminine"
+account,kont,"noun, a user account or online account; masculine, il-kont, plural kontijiet"
+password,password,"noun; feminine, il-password, plural passwords"
+accessibility,aċċessibilità,"noun; feminine"

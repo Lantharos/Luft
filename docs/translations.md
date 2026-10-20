@@ -2,7 +2,7 @@
 
 Luft's desktop and apps are written in English and translated with [Project Fluent](https://projectfluent.org). Every translatable piece of Luft keeps its messages in `.ftl` files next to its code, one folder per language, with English as the source.
 
-Luft is translated into Albanian, Bosnian, Bulgarian, Catalan, Croatian, Czech, Danish, Dutch, Estonian, Finnish, French, German, Hungarian, Icelandic, Italian, Latvian, Lithuanian, Macedonian, Norwegian Bokmål, Norwegian Nynorsk, Polish, Portuguese (Portugal and Brazil), Romanian, Russian, Serbian (Cyrillic and Latin as separate languages), Slovak, Slovenian, Spanish, Swedish and Ukrainian. Translations are licensed GPL-3.0-or-later, like the rest of Luft.
+Luft is translated into Albanian, Bosnian, Bulgarian, Catalan, Croatian, Czech, Danish, Dutch, Estonian, Finnish, French, German, Greek, Hungarian, Icelandic, Irish, Italian, Latvian, Lithuanian, Macedonian, Maltese, Norwegian Bokmål, Norwegian Nynorsk, Polish, Portuguese (Portugal and Brazil), Romanian, Russian, Serbian (Cyrillic and Latin as separate languages), Slovak, Slovenian, Spanish, Swedish, Turkish and Ukrainian. Translations are licensed GPL-3.0-or-later, like the rest of Luft.
 
 ## Where the messages live
 
@@ -29,9 +29,9 @@ Luft is translated into Albanian, Bosnian, Bulgarian, Catalan, Croatian, Czech, 
 | setup-desktop | `apps/setup/desktop/locales/*/desktop.ftl` | messages from setup's native side |
 | setup-installer | `apps/setup/installer/locales/*/installer.ftl` | the installer service's errors and progress |
 
-`packages/i18n/components.json` lists the same components with the code each one covers. Language folders use BCP 47 tags: `en`, `bs`, `ca`, `cs`, `da`, `de`, `et`, `es`, `fr`, `hr`, `is`, `it`, `lv`, `lt`, `hu`, `nl`, `nb`, `nn`, `pl`, `pt-BR`, `pt`, `ro`, `sq`, `sk`, `sl`, `sr-Latn`, `fi`, `sv`, `bg`, `mk`, `ru`, `sr`, `uk`.
+`packages/i18n/components.json` lists the same components with the code each one covers. Language folders use BCP 47 tags: `en`, `bs`, `ca`, `cs`, `da`, `de`, `et`, `es`, `fr`, `ga`, `hr`, `is`, `it`, `lv`, `lt`, `hu`, `mt`, `nl`, `nb`, `nn`, `pl`, `pt-BR`, `pt`, `ro`, `sq`, `sk`, `sl`, `sr-Latn`, `fi`, `sv`, `tr`, `el`, `bg`, `mk`, `ru`, `sr`, `uk`.
 
-The glossary for each language is `packages/i18n/glossary/<language>.csv`, and its style guide is `docs/translations/<language>.md`.
+The glossary for each language is `packages/i18n/glossary/<language>.csv`, and its style guide is `docs/translations/<language>.md`. Strings a native speaker should look at first, with the reason for each, are listed in `docs/translations-review/<language>.md`; remove a note once someone fluent has checked it.
 
 ## How a language is picked
 
@@ -84,10 +84,11 @@ LUFT_LOCALE=de kestrel/tools/session.sh nested
 
 ## Adding a language
 
-1. Add it to `LANGUAGES` in `packages/i18n/src/locales.ts`, `LOCALES` in `packages/i18n/rust/locales.rs` and the `localizer!` macro in `packages/i18n/rust/lib.rs`.
-2. Add its file to the outputs of `kestrel-locales` in `kestrel/engine/js/ui/meson.build` and to `kestrel/engine/js/js-resources.gresource.xml`.
-3. Add its CEF locale to `languages` in `os/image/parts/stages/runtime.sh` if CEF ships one.
-4. Create its folder with an empty file for every component, a glossary and a style guide. Weblate does the first step for new languages added there.
+1. Add it to `LANGUAGES` in `packages/i18n/src/locales.ts`, `LOCALES` in `packages/i18n/rust/locales.rs` and the `localizer!` macro in `packages/i18n/rust/lib.rs`. `LANGUAGES` is what Settings offers; keep it sorted by the language's own name, English first.
+2. Add its locales, with the country each is spoken in, to `LOCALES` in `apps/setup/src/lib/regional/languages.ts`, which Install Luft offers, and to `FORMATS` in `apps/settings/src/lib/panels/system/region/formats.ts`.
+3. Add its file to the outputs of `kestrel-locales` in `kestrel/engine/js/ui/meson.build` and to `kestrel/engine/js/js-resources.gresource.xml`.
+4. Add its CEF locale to `languages` in `os/image/parts/stages/runtime.sh` if CEF ships one.
+5. Create its folder with an empty file for every component, a glossary and a style guide. Weblate does the first step for new languages added there.
 
 ## Setting up Weblate
 

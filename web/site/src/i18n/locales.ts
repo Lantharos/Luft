@@ -9,3 +9,5 @@ export const routedLocales = LANGUAGES.map(({ tag }) => tag);
 export const sitemapLocales = Object.fromEntries(LANGUAGES.map(({ tag }) => [pathOf(tag), tag]));
 
 export const localeParams = () => LANGUAGES.map(({ tag }) => ({ params: { locale: tag === SOURCE_LOCALE ? undefined : pathOf(tag) } }));
+
+export const translatedParams = () => LANGUAGES.filter(({ tag }) => tag !== SOURCE_LOCALE).map(({ tag }) => ({ params: { locale: pathOf(tag) } }));

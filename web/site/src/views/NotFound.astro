@@ -7,9 +7,9 @@ const { t, href } = localize(Astro);
 ---
 
 <Base title={t('site-not-found-title')} description={t('site-not-found-description')} credits={['Hush']} overFog>
-	<section class="relative isolate flex min-h-svh items-center overflow-hidden">
-		<Backdrop name="Hush" position="50% 60%" eager />
-		<div class="page text-ink scheme-light">
+	<section class="relative isolate flex min-h-svh items-start overflow-hidden">
+		<Backdrop name="Hush" position="50% 0%" narrowPosition="0% 50%" eager />
+		<div class="page pt-[clamp(6rem,35vw_-_22rem,14rem)] text-ink scheme-light">
 			<h1 class="enter text-[clamp(3rem,8vw,6.5rem)] leading-none font-semibold tracking-[-0.04em] text-balance">{t('site-not-found-heading')}</h1>
 			<p class="enter mt-5 max-w-md text-lede text-ink-soft" style="--order: 1">{t('site-not-found-text')}</p>
 			<a class="enter button button-primary mt-9" style="--order: 2" href={href('')}>{t('site-not-found-back')}</a>

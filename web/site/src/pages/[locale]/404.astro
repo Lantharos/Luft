@@ -1,0 +1,8 @@
+---
+import NotFound from '../../views/NotFound.astro';
+import { translatedParams } from '../../i18n/locales';
+
+export const getStaticPaths = translatedParams;
+---
+
+<NotFound />

@@ -5,11 +5,12 @@ import { wallpaper } from '../../data/wallpapers';
 interface Props {
 	name: string;
 	position?: string;
+	narrowPosition?: string;
 	eager?: boolean;
 	class?: string;
 }
 
-const { name, position = '50% 50%', eager = false, class: className } = Astro.props;
+const { name, position = '50% 50%', narrowPosition = position, eager = false, class: className } = Astro.props;
 const { image } = wallpaper(name);
 ---
 
@@ -24,7 +25,7 @@ const { image } = wallpaper(name);
 		quality={68}
 		loading={eager ? 'eager' : 'lazy'}
 		fetchpriority={eager ? 'high' : 'auto'}
-		class="size-full object-cover"
-		style={`object-position: ${position}`}
+		class="size-full object-cover object-(--narrow-position) md:object-(--position)"
+		style={`--position: ${position}; --narrow-position: ${narrowPosition}`}
 	/>
 </div>

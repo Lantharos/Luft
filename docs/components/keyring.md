@@ -13,7 +13,7 @@ Luft Keyring ([kestrel/keyring](../../kestrel/keyring)) keeps passwords, tokens 
 
 ## App access
 
-Each request is tied to the app that made it, by its Flatpak or app ID, launcher entry or program path. Luft apps are known by their system-wide install in `/usr/lib/sabine`; a copy in your own Sabine folder counts as any other app. An AppImage counts as the image file it runs from, whichever folder it is mounted at. An app can always use what it saved; anything else asks first, and Settings shows and revokes those choices along with the access history. Tools such as `secret-tool` and Seahorse are asked like any other app. A program that can't be identified is asked every time, and its answer is never remembered.
+Each request is tied to the app that made it, by its Flatpak or app ID, launcher entry or program path. Luft apps are known by their system-wide install in `/usr/lib/sabine`; a copy in your own Sabine folder counts as any other app. An AppImage counts as the image file it runs from, whichever folder it is mounted at. The Chromium that Sabine apps share counts as one app, Sabine apps, since it keeps every Sabine app's web data under a single key. An app can always use what it saved; anything else asks first, and Settings shows and revokes those choices along with the access history. Tools such as `secret-tool` and Seahorse are asked like any other app. A program that can't be identified is asked every time, and its answer is never remembered.
 
 Only Settings manages the keyring. A debug build of the keyring also lets a Settings build do so when `LUFT_KEYRING_DEVELOPMENT_SETTINGS` names that build's program.
 

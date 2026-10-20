@@ -21,6 +21,7 @@ use program::versionless;
 pub const UNBRANDED_CHROMIUM: &str = "chromium";
 const UNKNOWN: &str = "unknown";
 const FLATPAK: &str = "flatpak:";
+const SABINE_RUNTIME: &str = "sabine:runtime";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Kind {
@@ -94,7 +95,24 @@ impl App {
         }
     }
 
+    /// The Chromium Sabine apps share. It serves every Sabine app at once,
+    /// and Chromium protects all their profiles with one key, so the apps it
+    /// serves share one identity, which keeps that key to itself.
+    pub fn sabine_runtime(executable: String) -> Self {
+        Self {
+            key: SABINE_RUNTIME.into(),
+            name: "Sabine apps".into(),
+            executable,
+            chromium: true,
+            hosted: true,
+            ..Self::unknown()
+        }
+    }
+
     pub fn from_key(key: &str) -> Self {
+        if key == SABINE_RUNTIME {
+            return Self::sabine_runtime(String::new());
+        }
         match key.split_once(':') {
             Some(("flatpak", id)) => Self::flatpak(id),
             Some(("app", id)) => luft(id, String::new()),
@@ -198,6 +216,9 @@ fn classify(process: &Process) -> App {
         return App::flatpak(&id);
     }
     let executable = process.executable().unwrap_or_default();
+    if sabine::is_shared_runtime(process, &executable) {
+        return App::sabine_runtime(executable);
+    }
     if sabine::is_host(&executable) {
         return sabine::launcher(process).map_or_else(App::unknown, |launcher| App {
             hosted: true,

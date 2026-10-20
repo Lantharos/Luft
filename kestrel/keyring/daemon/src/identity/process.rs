@@ -180,15 +180,20 @@ impl Process {
             .ok()
     }
 
-    pub fn unit_app_id(&self) -> Option<String> {
+    pub fn unit(&self) -> Option<String> {
         let cgroup = String::from_utf8(self.read("cgroup")?).ok()?;
-        let unit = cgroup
-            .lines()
-            .find_map(|line| line.strip_prefix("0::"))?
-            .rsplit('/')
-            .next()?
-            .to_owned();
-        app_id_from_unit(&unit)
+        Some(
+            cgroup
+                .lines()
+                .find_map(|line| line.strip_prefix("0::"))?
+                .rsplit('/')
+                .next()?
+                .to_owned(),
+        )
+    }
+
+    pub fn unit_app_id(&self) -> Option<String> {
+        app_id_from_unit(&self.unit()?)
     }
 }
 

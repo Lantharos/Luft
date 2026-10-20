@@ -9,10 +9,10 @@ state="${LUFT_ISO:-$iso/state}"
 work="$state/work"
 store="$work/store"
 fedora=45
-label="Luft-$fedora"
-published=ghcr.io/lantharos/luft:$fedora
+major=1
+label="Luft-$major"
+published=ghcr.io/lantharos/luft:$major
 live_image=$image_name-live:$fedora
-live_system=$image_name-live-system:$fedora
 tools=$image_name-iso-tools
 initramfs_omitted=(
   ostree bootc plymouth trustd crypt systemd-cryptsetup lvm mdraid dmraid multipath resume btrfs nvdimm
@@ -24,40 +24,28 @@ initramfs_omitted_drivers=(nouveau nvidia amdgpu radeon i915 xe)
 
 usage() {
   cat <<'USAGE'
-Usage: os/iso/build.sh [IMAGE [EDITION...]]
+Usage: os/iso/build.sh [IMAGE]
 
-Builds Luft's live USB images from IMAGE (default localhost/luft:45) and
+Builds Luft's live USB image from IMAGE (default localhost/luft:45) and
 IMAGE-nvidia, pulling them when they aren't here yet. LUFT_IMAGE_NAME names
-its own images something other than localhost/luft. Each stick starts the
-regular image and installs without a network. EDITION picks what it carries:
+its own images something other than localhost/luft. The stick starts the
+regular image and carries both, so it installs the right one for the computer
+without a network.
 
-  universal   both images (the default)
-  standard    only IMAGE, for computers without NVIDIA graphics
-  nvidia      only IMAGE-nvidia
-
-Writes os/iso/state/luft-VERSION.iso, luft-VERSION-standard.iso and
-luft-VERSION-nvidia.iso, each with a .sha256 (LUFT_ISO picks another folder).
+Writes os/iso/state/luft-VERSION.iso with a .sha256 (LUFT_ISO picks another
+folder).
 USAGE
 }
 
 case "${1:-}" in
   -h | --help) usage; exit 0 ;;
 esac
-editions=("${@:2}")
-((${#editions[@]})) || editions=(universal)
 
 image_value() {
   podman image inspect --format "$2" "$1"
 }
 
-variants_of() {
-  case "$1" in
-    universal) echo default nvidia ;;
-    standard) echo default ;;
-    nvidia) echo nvidia ;;
-    *) usage >&2; exit 2 ;;
-  esac
-}
+variants=(default nvidia)
 
 image_of() {
   case "$1" in
@@ -74,50 +62,15 @@ published_of() {
 }
 
 iso_name() {
-  local version
-  version="$(image_value "$image" '{{index .Labels "org.opencontainers.image.version"}}')"
-  case "$1" in
-    universal) echo "luft-$version.iso" ;;
-    *) echo "luft-$version-$1.iso" ;;
-  esac
+  echo "luft-$(image_value "$image" '{{index .Labels "org.opencontainers.image.version"}}').iso"
 }
 
 ensure_images() {
-  local edition variant reference
-  for edition in "${editions[@]}"; do
-    for variant in $(variants_of "$edition"); do
-      reference="$(image_of "$variant")"
-      podman image exists "$reference" || podman pull "$reference"
-    done
+  local variant reference
+  for variant in "${variants[@]}"; do
+    reference="$(image_of "$variant")"
+    podman image exists "$reference" || podman pull "$reference"
   done
-  podman image exists "$image" || podman pull "$image"
-}
-
-unsealed() {
-  local sealed="$1" target="$2" copy="$work/unsealed" config
-  rm -rf "$copy"
-  podman unshare skopeo copy --quiet "containers-storage:$sealed" "dir:$copy"
-  config="$(jq -r '.config.digest | sub("sha256:"; "")' "$copy/manifest.json")"
-  jq -c '([.history | to_entries[] | select(.value.empty_layer != true) | .key] | last) as $top |
-    .rootfs.diff_ids |= .[:-1] | .history |= del(.[$top])' \
-    "$copy/$config" >"$copy/config.json"
-  rm "$copy/$config" "$copy/$(jq -r '.layers[-1].digest | sub("sha256:"; "")' "$copy/manifest.json")"
-  config="$(sha256sum "$copy/config.json" | cut -d' ' -f1)"
-  mv "$copy/config.json" "$copy/$config"
-  jq -c --arg digest "sha256:$config" --argjson size "$(stat -c %s "$copy/$config")" \
-    '.layers |= .[:-1] | .config.digest = $digest | .config.size = $size' "$copy/manifest.json" >"$copy/manifest.next"
-  mv "$copy/manifest.next" "$copy/manifest.json"
-  podman unshare skopeo copy --quiet "dir:$copy" "containers-storage:$target"
-  podman unshare rm -rf "$copy"
-}
-
-live_system() {
-  if [[ " ${editions[*]} " == *" nvidia "* ]]; then
-    unsealed "$image" "$live_system"
-    echo "$live_system"
-  else
-    echo "$image"
-  fi
 }
 
 install_images() {
@@ -172,13 +125,9 @@ ensure_images
 remove_work
 mkdir -p "$work"
 podman build --quiet --tag "$tools" "$iso" >/dev/null
-system="$(live_system)"
-build_live "$system"
+build_live "$image"
 make_initramfs
-for edition in "${editions[@]}"; do
-  read -ra variants <<<"$(variants_of "$edition")"
-  build_live "$system" "${variants[@]}"
-  fill_store "${variants[@]}"
-  pack "$(iso_name "$edition")"
-done
+build_live "$image" "${variants[@]}"
+fill_store "${variants[@]}"
+pack "$(iso_name)"
 remove_work

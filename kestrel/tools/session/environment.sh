@@ -91,6 +91,7 @@ use_fixture_desktop() {
   mkdir -p "$fixture/applications" "$drives/TRAVEL"
   mask_host_apps "$fixture"
   cp "$tools/fixtures/apps/"*.desktop "$fixture/applications/"
+  update-desktop-database "$fixture/applications"
   export XDG_DATA_DIRS="$fixture:$XDG_DATA_DIRS"
   printf '%s\n' "['com.lantharos.rover.desktop', 'com.lantharos.draft.desktop', 'com.lantharos.mailman.desktop', 'com.lantharos.tern.desktop', 'com.lantharos.schelf.desktop', 'com.lantharos.settings.desktop']" > "$session/favorites.txt"
   printf '/dev/luft/system / btrfs rw 0 0\n/dev/luft/travel %s exfat rw 0 0\n' "$drives/TRAVEL" > "$fixture/mounts"

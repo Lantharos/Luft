@@ -9,22 +9,33 @@ header_room=$((32 << 20))
 
 usage() {
   cat <<'USAGE'
-Usage: os/vm/encryption.sh meet|grown-back
+Usage: os/vm/encryption.sh meet|grown-back|tampered|secure-boot
 
 Checks device encryption on a copy of os/vm/state/disk.qcow2 (made by
 os/vm/disk.sh), which stays as it is:
 
-  meet        Meet Luft's partitions after Luft's are taken back at the first
-              start, before trustd or the login screen start, and encryption
-              turned on afterwards starts at the next restart.
-  grown-back  encryption is turned on, then the file system grows back over
-              the room kept for its header. The next start leaves the disk
-              unencrypted, says so, and turning it on again works.
+  meet         Meet Luft's partitions after Luft's are taken back at the first
+               start, before trustd or the login screen start, and encryption
+               turned on afterwards starts at the next restart.
+  grown-back   encryption is turned on, then the file system grows back over
+               the room kept for its header. The next start leaves the disk
+               unencrypted, says so, and turning it on again works.
+  tampered     plans changed on the EFI system partition are refused at the
+               restart: odd IDs, a header outside the plan's folder, another
+               partition, and a plan the TPM didn't seal. Each leaves the disk
+               unencrypted. An untouched plan encrypts it, and turning
+               encryption off with a changed plan asks for the recovery key
+               before the header is used.
+  secure-boot  with SECURE_BOOT=1 and Luft's key enrolled: the disk encrypts
+               and unlocks by itself. A change to PCR 7 Luft didn't predict
+               keeps the TPM sealed as it was, also after the restart that
+               needs the recovery key, until it's confirmed. Turning
+               encryption off then decrypts without a prompt.
 USAGE
 }
 
 case "${1:-}" in
-  meet | grown-back) scenario=$1 ;;
+  meet | grown-back | tampered | secure-boot) scenario=$1 ;;
   -h | --help) usage; exit 0 ;;
   *) usage >&2; exit 2 ;;
 esac
@@ -71,13 +82,15 @@ stop() {
 root_partition() { value "findmnt --noheadings --output SOURCE --target /sysroot"; }
 partition_size() { value "blockdev --getsize64 $1"; }
 file_system_size() { value "btrfs inspect-internal dump-super $1 | awk '/^dev_item.total_bytes/{print \$2}'"; }
-disk_state() { value "busctl --json=short get-property ${trust[*]} Disk | jq -r .data.State.data"; }
+disk_value() { value "busctl --json=short get-property ${trust[*]} Disk | jq -r .data.$1.data"; }
+disk_state() { disk_value State; }
 
 turn_on_encryption() {
   [[ "$(value "busctl --json=short get-property ${trust[*]} Tpm | jq -r .data.Usable.data")" == true ]] ||
     fail "the VM's TPM can't unlock the disk, so starting would wait for a passphrase"
-  in_vm "key=\$(busctl --json=short call ${trust[*]} GenerateRecoveryKey | jq -r '.data[0]') &&
-    busctl call ${trust[*]} TurnOnEncryption sss \"\$key\" '' ''" > /dev/null || fail "encryption didn't turn on"
+  recovery_key="$(value "busctl --json=short call ${trust[*]} GenerateRecoveryKey | jq -r '.data[0]'")"
+  [[ ${#recovery_key} == 71 ]] || fail "trustd didn't make a recovery key"
+  in_vm "busctl call ${trust[*]} TurnOnEncryption sss '$recovery_key' '' ''" > /dev/null || fail "encryption didn't turn on"
 }
 
 check_room_kept() {
@@ -153,6 +166,106 @@ check_grown_back() {
   check_encrypted
 }
 
+on_esp() {
+  in_vm "(esp=\$(lsblk --list --noheadings --paths --output PATH,PARTTYPE | awk '/c12a7328-f81f-11d2-ba4b-00a0c93ec93b/{print \$1}') &&
+    mkdir -p /run/esp-check && mount \"\$esp\" /run/esp-check && cd /run/esp-check/EFI/luft/encryption && { $1; }; status=\$?;
+    cd /; umount /run/esp-check; [ \$status = 0 ])"
+}
+
+restart_with_recovery_key() {
+  "$os/vm/control.py" shell 'systemctl reboot' --timeout 5 > /dev/null || true
+  sleep 30
+  for _ in $(seq 30); do
+    in_vm true 10 > /dev/null 2>&1 && return
+    "$os/vm/control.py" type "$recovery_key"
+    "$os/vm/control.py" key ret
+    sleep 15
+  done
+  fail "the VM didn't start after the recovery key"
+}
+
+wait_for_disk_state() {
+  for _ in $(seq 240); do
+    [[ "$(disk_state)" == "$1" ]] && return
+    sleep 10
+  done
+  fail "the disk never became $1: $(disk_state)"
+}
+
+refused_plan() {
+  local change="$1" journal="$2" root
+  turn_on_encryption
+  on_esp "jq -c '$change' plan.json > plan.changed && mv plan.changed plan.json" > /dev/null || fail "the plan couldn't be changed"
+  restart
+  root="$(root_partition)"
+  [[ "$(value "cryptsetup isLuks $root && echo encrypted")" == "" ]] || fail "a changed plan ($change) encrypted the disk"
+  [[ "$(value "journalctl -b -u trustd-encrypt --no-pager | grep -c \"$journal\"")" -ge 1 ]] ||
+    fail "the startup didn't say why it refused the plan ($change)"
+  [[ "$(disk_state)" == failed ]] || fail "Settings doesn't say encryption didn't start: $(disk_state)"
+  pass "a plan with $change is refused and Luft starts unencrypted"
+}
+
+check_tampered() {
+  local other
+  other="$(value "cat /proc/sys/kernel/random/uuid")"
+  refused_plan '.uuid = "../../../../run/systemd/system/trustd-check.service"' "didn't check out"
+  [[ "$(value "test -e /run/systemd/system/trustd-check.service && echo written")" == "" ]] || fail "the plan wrote outside its folder"
+  refused_plan '.header = "../../../../etc/passwd"' "didn't check out"
+  refused_plan ".partuuid = \"$other\"" "doesn't start from"
+  refused_plan ".uuid = \"$other\"" "isn't the one Luft sealed"
+  turn_on_encryption
+  restart
+  check_encrypted
+  wait_for_disk_state on
+  restart
+  [[ "$(disk_value TpmRefused)" == false ]] || fail "the TPM didn't unlock the encrypted disk"
+  pass "the TPM unlocks the encrypted disk"
+  in_vm "busctl call ${trust[*]} TurnOffEncryption s '' && systemctl mask --runtime --now trustd.service" > /dev/null ||
+    fail "encryption didn't turn off"
+  on_esp "jq . plan.json > plan.changed && mv plan.changed plan.json" > /dev/null || fail "the plan couldn't be changed"
+  restart_with_recovery_key
+  [[ "$(value "journalctl -b -u trustd-encrypt --no-pager | grep -c \"isn't the one Luft sealed\"")" -ge 1 ]] ||
+    fail "a changed decrypting plan was used without the recovery key"
+  wait_for_disk_state off
+  pass "a changed decrypting plan waits for the recovery key, then the disk decrypts"
+}
+
+sealed_to() { value "cat /var/lib/trustd/tpm-sealed-to"; }
+pcr7() { value "cat /sys/class/tpm/tpm0/pcr-sha256/7 | tr A-F a-f"; }
+
+check_secure_boot() {
+  local sealed
+  [[ "$(value "busctl --json=short get-property ${trust[*]} SecureBoot | jq -r .data")" == on ]] ||
+    fail "Secure Boot isn't on: start with SECURE_BOOT=1 and enroll Luft's key"
+  turn_on_encryption
+  restart
+  check_encrypted
+  wait_for_disk_state on
+  restart
+  [[ "$(disk_value TpmRefused)" == false ]] || fail "the TPM didn't unlock the encrypted disk"
+  pass "with Secure Boot on, the TPM unlocks the encrypted disk"
+  sealed="$(sealed_to)"
+  in_vm "/usr/lib/systemd/systemd-pcrextend --pcr=7 trustd-check && systemctl restart trustd" > /dev/null || fail "PCR 7 couldn't be changed"
+  [[ "$(disk_value SecureBootChanged)" == true ]] || fail "Settings doesn't say the startup changed"
+  [[ "$(sealed_to)" == "$sealed" ]] || fail "trustd sealed the disk key to an unexpected PCR 7 by itself"
+  pass "an unexpected PCR 7 leaves the disk key sealed as it was"
+  in_vm "busctl call ${trust[*]} AcceptSecureBootChange" > /dev/null || fail "the change couldn't be confirmed"
+  [[ "$(sealed_to)" == "$(pcr7)" && "$(disk_value SecureBootChanged)" == false ]] || fail "confirming didn't seal the disk key again"
+  restart_with_recovery_key
+  [[ "$(disk_value TpmRefused)" == true ]] || fail "the TPM unlocked a disk sealed to another PCR 7"
+  [[ "$(disk_value SecureBootChanged)" == true ]] || fail "Settings doesn't say the startup changed after the recovery key"
+  [[ "$(sealed_to)" != "$(pcr7)" ]] || fail "trustd sealed the disk key again after the recovery key without asking"
+  pass "after the recovery key, the disk key stays sealed until the change is confirmed"
+  in_vm "busctl call ${trust[*]} AcceptSecureBootChange" > /dev/null || fail "the change couldn't be confirmed"
+  restart
+  [[ "$(disk_value TpmRefused)" == false ]] || fail "confirming didn't let the TPM unlock the disk again"
+  pass "once confirmed, the TPM unlocks the disk again"
+  in_vm "busctl call ${trust[*]} TurnOffEncryption s ''" > /dev/null || fail "encryption didn't turn off"
+  restart
+  wait_for_disk_state off
+  pass "turning encryption off decrypts without a prompt"
+}
+
 rm -f "$disk"
 qemu-img create -q -f qcow2 -F qcow2 -b "$vm/disk.qcow2" "$disk"
 trap stop EXIT
@@ -160,5 +273,7 @@ start
 case "$scenario" in
   meet) check_meet ;;
   grown-back) check_grown_back ;;
+  tampered) check_tampered ;;
+  secure-boot) check_secure_boot ;;
 esac
 report DONE

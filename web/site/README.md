@@ -13,7 +13,7 @@ bun run preview      # build, then serve dist/ the way Cloudflare does
 bun run check        # type checks
 ```
 
-The download page reads `nightly/latest.json` and `1/latest.json` from get.luft.computer while building, and the ISO links switch from the newest nightly build to the newest release once one is published. Rebuild after a release, or after a few nightly builds, since only the newest few are kept.
+The ISO links go through the site's Worker ([`worker/index.ts`](worker/index.ts)): `/download/latest` and `/download/nightly`, with `.sha256`, `.sha256.minisig` and `.json` after them, read `1/latest.json` or `nightly/latest.json` from get.luft.computer when someone clicks and redirect to that ISO. `latest` is the newest release, or the newest nightly build until there is one. The download page shows the ISO's name and size from the `.json`, so nothing needs rebuilding when a new ISO is published. After changing `wrangler.jsonc`, run `bunx wrangler types worker/worker-configuration.d.ts`.
 
 ## Deploy
 

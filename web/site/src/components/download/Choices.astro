@@ -1,5 +1,5 @@
 ---
-import { formatSize, iso, meet, nightlyIso } from '../../data/downloads';
+import { formatSize, iso, meet } from '../../data/downloads';
 
 const sized = (size: number | null) => (size ? ` · ${formatSize(size)}` : '');
 ---
@@ -31,20 +31,34 @@ const sized = (size: number | null) => (size ? ` · ${formatSize(size)}` : '');
 			For a USB stick, a virtual machine, or a computer that starts from nothing. It installs offline, on any PC.
 		</p>
 		<div class="mt-8">
-			<a class="button button-primary only-other" href={iso.href}>Download ISO{sized(iso.size)}</a>
-			<a class="button button-quiet only-meet" href={iso.href}>Download ISO{sized(iso.size)}</a>
+			<a class="button button-primary only-other" href={iso.href}>Download ISO<span data-iso-size></span></a>
+			<a class="button button-quiet only-meet" href={iso.href}>Download ISO<span data-iso-size></span></a>
 		</div>
 		<p class="mt-5 text-sm text-ink-muted">
-			<span class="font-mono">{iso.file}</span> · <a class="link" href={iso.checksum}>checksum</a> · <a class="link" href={iso.signature}>signature</a>
+			<span class="font-mono" data-iso-name></span><a class="link" href={iso.checksum}>checksum</a> · <a class="link" href={iso.signature}>signature</a>
 		</p>
 		<div>
-			{
-				nightlyIso && (
-					<p class="mt-8 max-w-md text-sm text-ink-muted">
-						Testing something new? <a class="link" href={nightlyIso.href}>The nightly ISO</a> is built whenever Luft changes, and computers installed from it keep getting nightly updates.
-					</p>
-				)
-			}
+			<p class="mt-8 hidden max-w-md text-sm text-ink-muted" data-nightly>
+				Testing something new? <a class="link" href={iso.nightly}>The nightly ISO</a> is built whenever Luft changes, and computers installed from it keep getting nightly updates.
+			</p>
 		</div>
 	</div>
 </section>
+
+<script>
+	import { formatSize, iso } from '../../data/iso';
+
+	interface Published {
+		name: string;
+		size: number;
+		folder: string;
+	}
+
+	const response = await fetch(iso.details).catch(() => null);
+	if (response?.ok) {
+		const published: Published = await response.json();
+		for (const size of document.querySelectorAll('[data-iso-size]')) size.textContent = ` · ${formatSize(published.size)}`;
+		for (const name of document.querySelectorAll('[data-iso-name]')) name.textContent = `${published.name} · `;
+		if (published.folder !== 'nightly') document.querySelector('[data-nightly]')?.classList.remove('hidden');
+	}
+</script>

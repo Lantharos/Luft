@@ -15,6 +15,9 @@ const ENABLED: &str = "X-GNOME-Autostart-enabled";
 const HIDDEN_UNDER_SYSTEMD: &str = "X-GNOME-HiddenUnderSystemd";
 const PHASE: &str = "X-GNOME-Autostart-Phase";
 const FLATPAK: &str = "X-Flatpak";
+const EXEC: &str = "Exec";
+const STARTUP_NOTIFY: &str = "StartupNotify";
+const AUTOSTART_ARGUMENTS: &str = "X-Sabine-Autostart-Arguments";
 
 #[derive(Serialize)]
 pub struct Entry {
@@ -191,7 +194,27 @@ pub fn add(Addition { app }: Addition) -> Result<(), String> {
     )?;
     file.set_boolean(GROUP, HIDDEN, false);
     file.set_boolean(GROUP, ENABLED, true);
+    start_as_declared(&file);
     save(&file, &user_directory()?, &app)
+}
+
+fn start_as_declared(file: &glib::KeyFile) {
+    let (Ok(exec), Ok(arguments)) = (
+        file.string(GROUP, EXEC),
+        file.string(GROUP, AUTOSTART_ARGUMENTS),
+    ) else {
+        return;
+    };
+    let command: Vec<&str> = exec
+        .split(' ')
+        .filter(|word| !word.starts_with('%'))
+        .collect();
+    file.set_string(
+        GROUP,
+        EXEC,
+        &format!("{} {arguments}", command.join(" ").trim_end()),
+    );
+    file.set_boolean(GROUP, STARTUP_NOTIFY, false);
 }
 
 pub fn installed_apps() -> Vec<App> {

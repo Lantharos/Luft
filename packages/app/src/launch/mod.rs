@@ -15,6 +15,15 @@ pub use start::{open, open_files, start};
 
 pub const TOKEN_VARIABLES: [&str; 2] = ["XDG_ACTIVATION_TOKEN", "DESKTOP_STARTUP_ID"];
 
+/// What Sabine tells an app about itself, which the apps it opens must not
+/// take for their own.
+const IDENTITY_VARIABLES: [&str; 4] = [
+    "SABINE_MANIFEST_PATH",
+    "SABINE_APP_ID",
+    "SABINE_WEB_ENTRY",
+    "SABINE_DEV_URL",
+];
+
 const WEB_SCHEMES: [&str; 3] = ["http", "https", "mailto"];
 
 /// The parameters of a command that only hands the page's token on.
@@ -24,8 +33,11 @@ pub struct Token {
 }
 
 /// Gives a launched program the token, or none, so it never reuses the one
-/// this app was launched with.
+/// this app was launched with, and none of this app's Sabine identity.
 pub fn pass_token(command: &mut Command, token: Option<&str>) {
+    for variable in IDENTITY_VARIABLES {
+        command.env_remove(variable);
+    }
     for variable in TOKEN_VARIABLES {
         match token {
             Some(token) => command.env(variable, token),

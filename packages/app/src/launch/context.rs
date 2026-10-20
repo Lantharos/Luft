@@ -4,13 +4,16 @@ use std::ffi::c_char;
 use gio::glib::{self, prelude::*, subclass::prelude::*, translate::ToGlibPtr};
 use gio::prelude::*;
 
-use super::TOKEN_VARIABLES;
+use super::{IDENTITY_VARIABLES, TOKEN_VARIABLES};
 
 /// A launch context that hands `token` to the app it starts, in its
 /// environment and in the platform data of D-Bus activated apps.
 pub fn context(token: Option<&str>) -> gio::AppLaunchContext {
     let context = glib::Object::new::<TokenContext>();
     context.imp().token.replace(token.map(str::to_owned));
+    for variable in IDENTITY_VARIABLES {
+        context.unsetenv(variable);
+    }
     for variable in TOKEN_VARIABLES {
         match token {
             Some(token) => context.setenv(variable, token),

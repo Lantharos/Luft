@@ -32,6 +32,7 @@ const COPILOT = [KEY_LEFTMETA, KEY_LEFTSHIFT, KEY_F23];
 const SUPER_ALT = [KEY_LEFTMETA, KEY_LEFTALT];
 const ALT_SUPER = [KEY_RIGHTALT, KEY_RIGHTMETA];
 const HOLD_MS = 600;
+const SUPER_DOUBLE_TAP_MS = 250;
 const US_LAYOUT = new GLib.Variant('a(ss)', [['xkb', 'us']]);
 const WAV_HEADER = 44;
 const BYTES_PER_SECOND = 32000;
@@ -235,6 +236,7 @@ async function checkChordKeepsShortcuts() {
   require(!shown(indicator()) && !offeredSetup(), 'Alt+Tab followed by Super doesn’t dictate');
   tapKey(KEY_LEFTMETA);
   await eventually(() => shown(start()), 'a press of Super alone still opens Start');
+  await pause(SUPER_DOUBLE_TAP_MS);
   tapKey(KEY_LEFTMETA);
   await eventually(() => !start().visible, 'and closes it again');
 }

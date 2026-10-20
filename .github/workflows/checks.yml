@@ -16,57 +16,39 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  changes:
+    name: Affected checks
+    runs-on: ubuntu-slim
+    timeout-minutes: 10
+    outputs:
+      rust: ${{ steps.affected.outputs.rust }}
+      uefi: ${{ steps.affected.outputs.uefi }}
+      meet-windows: ${{ steps.affected.outputs.meet-windows }}
+      web: ${{ steps.affected.outputs.web }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          filter: blob:none
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - id: affected
+        run: bun .github/scripts/affected/index.ts
+
   rust:
     name: Rust ${{ matrix.crate }}
+    needs: changes
+    if: needs.changes.outputs.rust != '[]'
     runs-on: ubuntu-26.04
     timeout-minutes: 60
     container: fedora:45
     strategy:
       fail-fast: false
       matrix:
-        crate:
-          - apps/barometer/desktop
-          - apps/disks/desktop
-          - apps/draft/desktop
-          - apps/keys/desktop
-          - apps/magpie/desktop
-          - apps/mailman/desktop
-          - apps/meet/desktop
-          - apps/rover/desktop
-          - apps/schelf/desktop
-          - apps/settings/desktop
-          - apps/setup/desktop
-          - apps/setup/installer
-          - apps/signin/desktop
-          - apps/tern/desktop
-          - boot/sushi
-          - kestrel/greeter
-          - kestrel/keyring
-          - kestrel/openconnect
-          - kestrel/passkeys
-          - kestrel/peek
-          - kestrel/search
-          - kestrel/settings
-          - kestrel/watchdog
-          - packages/accounts
-          - packages/accounts/service
-          - packages/app
-          - packages/dbus
-          - packages/disks
-          - packages/fingerprint
-          - packages/i18n
-          - packages/meet
-          - packages/network
-          - packages/sleep/service
-          - packages/software
-          - packages/software/thumbnailer
-          - packages/software/updater
-          - packages/speech
-          - packages/speech/service
-          - packages/variant
-          - packages/windows
-          - packages/windows/service
-          - security
+        crate: ${{ fromJSON(needs.changes.outputs.rust) }}
     defaults:
       run:
         working-directory: ${{ matrix.crate }}
@@ -103,6 +85,8 @@ jobs:
 
   uefi:
     name: Rust UEFI ${{ matrix.crate }}
+    needs: changes
+    if: needs.changes.outputs.uefi == 'true'
     runs-on: ubuntu-26.04
     timeout-minutes: 30
     strategy:
@@ -133,6 +117,8 @@ jobs:
 
   meet-windows:
     name: Rust Meet Luft for Windows
+    needs: changes
+    if: needs.changes.outputs.meet-windows == 'true'
     runs-on: ubuntu-26.04
     timeout-minutes: 30
     container: fedora:45
@@ -163,9 +149,18 @@ jobs:
       - run: cargo clippy --all-targets --target x86_64-pc-windows-gnu -- -D warnings
 
   web:
-    name: TypeScript
+    name: TypeScript ${{ matrix.target }}
+    needs: changes
+    if: needs.changes.outputs.web != '[]'
     runs-on: ubuntu-26.04
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ${{ fromJSON(needs.changes.outputs.web) }}
+    defaults:
+      run:
+        working-directory: ${{ matrix.target }}
     steps:
       - uses: actions/checkout@v7
 
@@ -174,11 +169,18 @@ jobs:
           bun-version: latest
 
       - run: bun install --frozen-lockfile
+        working-directory: .
 
-      - run: bun install --frozen-lockfile
-        working-directory: kestrel/ui
-
-      - run: bun run --filter '*' check
+      - if: hashFiles(format('{0}/bun.lock', matrix.target)) != ''
+        run: bun install --frozen-lockfile
 
       - run: bun run check
-        working-directory: kestrel/ui
+
+  checks:
+    name: Checks
+    needs: [changes, rust, uefi, meet-windows, web]
+    if: always()
+    runs-on: ubuntu-slim
+    steps:
+      - if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: exit 1

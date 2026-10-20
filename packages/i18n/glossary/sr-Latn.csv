@@ -1,0 +1,125 @@
+source,target,explanation
+Luft,,Not translated. Name of the operating system
+Kestrel,,Not translated. Name of Luft's desktop
+Rover,,"Not translated. App name, the file manager"
+Magpie,,"Not translated. App name, the viewer for photos, videos, music and PDFs"
+Mailman,,"Not translated. App name, the mail app"
+Draft,,"Not translated. App name, the text and code editor"
+Tern,,"Not translated. App name, the terminal"
+Schelf,,"Not translated. App name, the app store"
+Barometer,,"Not translated. App name, the system monitor"
+Keys,,"Not translated. App name, makes keyboard layouts and input methods"
+Meet Luft,,Not translated. Name of the Windows app that prepares a PC for Luft
+Helium,,Not translated. Name of the default browser
+Flatpak,,Not translated. App packaging format
+Secure Boot,,"Not translated. UEFI feature, named this way in every PC's firmware setup"
+TPM,,Not translated. Trusted Platform Module; in the interface usually called the security chip
+Bluetooth,,Not translated. Trademark
+Wi-Fi,,Not translated. Wireless network
+Settings,Podešavanja,"App name and the general word for settings; plural, n"
+Disks,Diskovi,App name for the disk utility
+Install Luft,Instaliraj Luft,App name of the installer
+Network Sign-In,Prijava na mrežu,App that opens the sign-in page of a public Wi-Fi
+File Manager,Upravljač datotekama,Generic name of Rover
+Media Viewer,Pregledač medija,Generic name of Magpie
+Mail,Pošta,Generic name of Mailman
+Text Editor,Uređivač teksta,Generic name of Draft
+App Store,Prodavnica aplikacija,Generic name of Schelf
+System Monitor,Nadzor sistema,Generic name of Barometer
+Keyboard Layouts,Rasporedi tastature,Generic name of Keys
+Start,Start,The menu opened with Super or the Luft mark; a name; m
+board,tabla,Mode that lays a workspace's windows side by side on an endless canvas; f
+Quick settings,Brza podešavanja,Panel of switches and sliders opened from the status icons
+notification center,centar za obaveštenja,"Panel with notifications, media and the calendar, opened from the clock"
+All windows,Svi prozori,"The task view: every window of a workspace and the workspaces, Super+Tab"
+snap,poravnati,"verb: put a window into a half, third or quarter of the screen; not zakačiti, which is pin"
+snap layout,raspored prozora,One of the arrangements offered by Super+Z
+snap group,grupa prozora,Windows snapped side by side that come back together
+taskbar,traka zadataka,The bar along the bottom of the screen
+tray,sistemska paleta,Taskbar button holding the icons of apps running in the background
+status icons,ikone stanja,"Taskbar icons for network, sound and battery that open Quick settings"
+lock screen,zaključani ekran,Screen shown while the session is locked
+login screen,ekran za prijavu,Screen listing the people on the computer before anyone signs in
+workspace,radni prostor,One of up to ten separate desktops
+desktop,radna površina,The background area behind the windows; also the whole desktop environment
+wallpaper,pozadina,Picture behind the desktop
+accent color,boja za isticanje,Color taken from the wallpaper and used for highlights
+dark style,tamni režim,Quick settings tile that switches between light and dark
+Night light,Noćno svetlo,Warmer screen colors in the evening
+Do Not Disturb,Ne uznemiravaj,Holds back notification banners and sounds
+Airplane mode,Režim rada u avionu,Turns off every radio
+Keep awake,Drži budnim,Keeps the screen on for a while
+Power mode,Režim napajanja,"Performance, Balanced or Power saver"
+Power saver,Ušteda energije,Power mode
+Dictation,Diktiranje,Typing by speaking
+clipboard,ostava,Holds what was copied
+clipboard history,istorija ostave,"List of recently copied items, Super+V"
+emoji,emodži,"noun; m, does not inflect"
+screenshot,snimak ekrana,Picture of the screen
+screen recording,snimanje ekrana,Video of the screen; the finished file is video-snimak ekrana
+privacy indicator,pokazatelj privatnosti,"Taskbar icon shown while the camera, microphone, location or screen is in use"
+Full access,Puni pristup,"Schelf switch that lets a Flatpak app leave its sandbox: all files, clipboard in the background, other apps' windows"
+sandbox,izolovano okruženje,Isolation Flatpak apps run in
+Keyring,privezak ključeva,"Luft Keyring, which keeps passwords, tokens and keys"
+passkey,pristupni ključ,Sign-in key that replaces a password on websites
+recovery key,ključ za oporavak,Long code that unlocks an encrypted disk when the TPM can't
+security chip,bezbednosni čip,How the interface names the TPM
+device encryption,šifrovanje uređaja,Encryption of the whole disk
+encryption,šifrovanje,noun
+signed startup,potpisano pokretanje,Startup where every step is checked against Luft's signature
+firmware,firmver,Software built into the hardware
+window,prozor,noun
+pin,zakačiti,verb: keep an app on the taskbar or in Start
+unpin,otkačiti,verb
+Pin to taskbar,Zakači na traku zadataka,Menu item
+open,otvoriti,verb
+close,zatvoriti,verb
+remove,ukloniti,verb
+delete,izbrisati,verb
+turn on,uključiti,"verb, for a feature or setting"
+turn off,isključiti,"verb, for a feature or setting"
+sign in,prijaviti se,verb; noun on buttons: Prijava
+sign out,odjaviti se,"verb, also Log out; noun on buttons: Odjava"
+restart,ponovo pokrenuti,verb
+shut down,isključiti,"verb, also Power off"
+suspend,stanje spavanja,"verb and power menu item, also Sleep; menu item Spavanje"
+hibernate,hibernacija,verb and power menu item
+lock,zaključati,verb
+unlock,otključati,verb
+install,instalirati,verb
+update,ažurirati,verb
+updates,ažuriranja,"noun, new versions of Luft or apps"
+cancel,Otkaži,button
+save,sačuvati,verb; button: Sačuvaj
+allow,dozvoliti,verb
+forget,zaboraviti,"verb, for a saved network or device"
+share,deliti,verb; button: Podeli
+search,pretražiti,verb and noun; noun: pretraga
+set up,podesiti,verb
+try again,Pokušaj ponovo,button
+undo,opozvati,verb
+done,Gotovo,button
+next,Dalje,button that moves to the next step
+app,aplikacija,"noun, also application"
+file,datoteka,noun
+folder,fascikla,noun
+trash,smeće,Where deleted files wait
+device,uređaj,noun
+disk,disk,"noun, also drive"
+USB stick,USB fleš,noun
+computer,računar,"noun, also PC"
+network,mreža,noun
+battery,baterija,noun
+power,napajanje,Settings page and button for power
+display,ekran,"noun, a monitor or built-in screen; also screen"
+sound,zvuk,"noun, the Settings page and audio in general"
+notification,obaveštenje,noun; n
+keyboard shortcut,tasterska prečica,noun
+keyboard layout,raspored tastature,noun
+input method,metod unosa,"Turns what you type into something else, such as Compose sequences or word choices"
+touchpad,tačped,noun
+privacy,privatnost,noun
+security,bezbednost,noun
+account,nalog,"noun, a user account or online account"
+password,lozinka,noun
+accessibility,pristupačnost,noun

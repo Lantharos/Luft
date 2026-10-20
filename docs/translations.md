@@ -1,0 +1,117 @@
+# Translations
+
+Luft's desktop and apps are written in English and translated with [Project Fluent](https://projectfluent.org). Every translatable piece of Luft keeps its messages in `.ftl` files next to its code, one folder per language, with English as the source.
+
+Luft is translated into German, Albanian, Croatian, Serbian (Cyrillic and Latin as separate languages) and Bosnian. Translations are licensed GPL-3.0-or-later, like the rest of Luft.
+
+## Where the messages live
+
+| Component | Files | English source |
+| --- | --- | --- |
+| kestrel-desktop | `kestrel/ui/locales/*/desktop.ftl` | taskbar, tray, board, task view, snapping |
+| kestrel-surfaces | `kestrel/ui/locales/*/surfaces.ftl` | Start, quick settings, notifications, calendar, clipboard, emoji |
+| kestrel-shell | `kestrel/ui/locales/*/shell.ftl` | shared pieces such as key names and durations |
+| kestrel-system | `kestrel/ui/locales/*/system.ftl` | network sign-in, VPNs, dictation, system notices |
+| kestrel-auth | `kestrel/ui/locales/*/auth.ftl` | login screen, lock screen, keyring and passkey prompts |
+| kestrel-portal | `kestrel/ui/locales/*/portal.ftl` | printing, screen sharing, shortcuts and other app requests |
+| kestrel-session | `kestrel/ui/locales/*/session.ftl` | signing out, first-run setup mode |
+| kestrel-engine | `kestrel/engine/locales/*/engine.ftl` | dialogs and menus of Kestrel's engine |
+| ui | `packages/ui/locales/*/ui.ftl` | the UI kit every app shares |
+| settings | `apps/settings/locales/*/settings.ftl` | Settings' window, sidebar and search |
+| settings-pages | `apps/settings/locales/*/pages.ftl` | Settings' page names and search words, also used by Start |
+| settings-connections | `apps/settings/locales/*/connections.ftl` | Network, Bluetooth, Accounts |
+| settings-devices | `apps/settings/locales/*/devices.ftl` | Displays, Sound, Power, Keyboard, Mouse |
+| settings-personalization | `apps/settings/locales/*/personalization.ftl` | Appearance, Notifications, Accessibility |
+| settings-protection | `apps/settings/locales/*/protection.ftl` | Privacy, Security |
+| settings-system | `apps/settings/locales/*/system.ftl` | Apps, Language & Region, Date & Time, Users, Login Screen, Updates, About |
+| settings-desktop | `apps/settings/desktop/locales/*/desktop.ftl` | messages from Settings' native side |
+| setup | `apps/setup/locales/*/setup.ftl` | Install Luft and first-run setup |
+| setup-desktop | `apps/setup/desktop/locales/*/desktop.ftl` | messages from setup's native side |
+| setup-installer | `apps/setup/installer/locales/*/installer.ftl` | the installer service's errors and progress |
+
+`packages/i18n/components.json` lists the same components with the code each one covers. Language folders use BCP 47 tags: `en`, `de`, `sq`, `hr`, `sr`, `sr-Latn`, `bs`.
+
+The glossary for each language is `packages/i18n/glossary/<language>.csv`, and its style guide is `docs/translations/<language>.md`.
+
+## How a language is picked
+
+- **Kestrel** follows the account's language from AccountsService and switches as soon as it changes. Before anyone signs in, the login screen uses the system language from `/etc/locale.conf`.
+- **Apps** get the session's languages from `luft_app::Appearance` with their first state, so a translation loads with no extra round trip. An app started after the language changed uses the new one; apps already open keep theirs until they restart.
+- **Rust services** read `LANGUAGE`, `LC_ALL`, `LC_MESSAGES` and `LANG`, in that order.
+- A message that isn't translated yet shows in English; the rest of the screen stays translated.
+- `sr` is Serbian in Cyrillic and `sr-Latn` Serbian in Latin script. The locale `sr_RS.UTF-8@latin` picks Latin, any other Serbian locale Cyrillic. Serbian is translated once, in Cyrillic: `bun run transliterate` in `packages/i18n` writes the Latin files from it, and the checker fails when they differ.
+- Dates, numbers and units follow the formats locale: the region chosen in Settings, which the session applies as `LC_TIME`, `LC_NUMERIC`, `LC_MONETARY`, `LC_MEASUREMENT` and `LC_PAPER`, or else the language.
+
+Settings → Language & Region sets the account's language through AccountsService, like the language picked during setup. The new language reaches the login screen and the whole session at the next sign-in, and Kestrel and newly started apps right away.
+
+## Writing translatable code
+
+Message IDs are stable, semantic and start with the feature they belong to, such as `quick-settings-wifi-off`. They never come from the English text, and they always appear literally in the code, so the checker can find them.
+
+| Where | How |
+| --- | --- |
+| Svelte apps | `import { t, i18n } from '@luft/i18n'`, then `t('id', { count })`. `t` is reactive. Use `i18n.formats` as the locale of every `Intl` formatter |
+| Kestrel | `t`, `bindText(label, id)` and `localized(actor, apply)` from `kestrel/ui/src/shared/i18n`; the engine's JavaScript gets them through `kestrelUi.js`. Widgets that live all session use `bindText` or `localized` so they follow a language change, and `formatsLocale()` is the locale for `Intl` |
+| Rust | `static L10N: Localizer = luft_i18n::localizer!("locales", ["desktop"]);` once per crate, then `t!(L10N, "id", count = n)` |
+
+- Never build a sentence from pieces. One sentence is one message, with placeables for what changes: `files-copied = Copied { $name } to { $folder }`.
+- Anything counted gets a plural selector, even when English reads the same:
+
+  ```ftl
+  notifications-count = { $count ->
+      [one] { $count } notification
+     *[other] { $count } notifications
+  }
+  ```
+
+- Variables are camelCase. Pass numbers as numbers; Fluent formats them for the language.
+- Add a comment above a message when the English is ambiguous: whether "Open" is a verb, where the text shows, what a variable holds.
+- Keyboard shortcut labels are built from translatable key names, since German writes Strg for Ctrl.
+- Log messages and errors meant for developers stay in English.
+
+`bun run check` in `packages/i18n` runs the checker. It fails on messages that don't parse, IDs used in code that English doesn't define, English messages nothing uses, duplicate IDs within a bundle, translations using variables English doesn't have, and new interface text written straight into the code of these components. Strings that look like interface text but have to stay as they are, such as a font name, go in `packages/i18n/allowed/<component>.txt`, one per line as the path, a tab and the string. The checks workflow runs it with every other package's checks.
+
+Builds put each language in its own file: apps get one lazily loaded chunk per language with English filling the gaps, and Kestrel compiles one file per language into its resources and reads only the one in use.
+
+## Trying layouts with the pseudo-locale
+
+`LUFT_LOCALE` overrides the language everywhere. Set to `en-XA`, it shows English with accented letters and every vowel doubled, about a third longer, which shows clipped or overflowing text and strings that are still hard-coded:
+
+```sh
+LUFT_LOCALE=en-XA KESTREL_DEV_APPS=settings kestrel/tools/session.sh capture --only panel,apps:settings
+LUFT_LOCALE=de kestrel/tools/session.sh nested
+```
+
+## Adding a language
+
+1. Add it to `LANGUAGES` in `packages/i18n/src/locales.ts`, `LOCALES` in `packages/i18n/rust/locales.rs` and the `localizer!` macro in `packages/i18n/rust/lib.rs`.
+2. Add its file to the outputs of `kestrel-locales` in `kestrel/engine/js/ui/meson.build` and to `kestrel/engine/js/js-resources.gresource.xml`.
+3. Add its CEF locale to `languages` in `os/image/parts/stages/runtime.sh` if CEF ships one.
+4. Create its folder with an empty file for every component, a glossary and a style guide. Weblate does the first step for new languages added there.
+
+## Setting up Weblate
+
+Translations happen on [Hosted Weblate](https://hosted.weblate.org) under its free plan for libre projects. Weblate reads the `.ftl` files from GitHub and sends changes back as pull requests.
+
+1. Sign in to Hosted Weblate and ask for a libre project: **Add new translation project**, name **Luft**, URL slug `luft`, website `https://luft.computer`, and pick the **Libre** billing plan. Hosted Weblate reviews libre projects before they go public.
+2. In the project's settings: translation license **GPL-3.0-or-later**, source language **English**, and under **Workflow** turn on **Translation review** if every change should be reviewed first.
+3. Add the first component, **kestrel-desktop**, from **Add new translation component** → **From version control**:
+   - Version control system: **GitHub pull request**
+   - Source code repository: `https://github.com/Lantharos/Luft.git`, repository branch `main`
+   - Repository browser: `https://github.com/Lantharos/Luft/blob/{{branch}}/{{filename}}#L{{line}}`
+   - File format: **Fluent file**
+   - File mask: `kestrel/ui/locales/*/desktop.ftl`
+   - Monolingual base language file: `kestrel/ui/locales/en/desktop.ftl`, template for new translations left empty
+   - Edit base file: off, so English only changes through the code
+   - Language code style: **BCP style using hyphen as a separator**
+   - Language filter: `^(?!sr-Latn$).*$`, since the Latin Serbian files are generated from the Cyrillic ones
+   - License: **GPL-3.0-or-later**
+4. Add every other component from the table above the same way, with **From existing component** → repository `weblate://luft/kestrel-desktop`, so they share one clone and one pull request. Name each component as in the table, with its file mask and its `en` file as the base.
+5. Add a component named **Glossary**: file format **CSV file**, file mask `packages/i18n/glossary/*.csv`, no base file, and turn on **Use as a glossary**. Weblate then shows the agreed terms next to every string.
+6. On GitHub, under the repository's **Settings → Webhooks**, add `https://hosted.weblate.org/hooks/github/` with content type `application/json` and the push event, so Weblate pulls new strings as soon as they land on `main`.
+7. Weblate opens pull requests from its own fork. In the project's **Add-ons**, turn on **Squash Git commits** (per language) to keep them small.
+8. Each pull request runs the checks workflow, which fails if a translation doesn't parse or uses a variable English doesn't have. A pull request that changes Serbian also needs `bun run transliterate` in `packages/i18n`, committed to its branch, before it passes.
+
+Weblate doesn't remove messages from translations when they leave the English file, so whoever removes an English message removes it from every language in the same change; the checker insists on it.
+
+Hosted Weblate's documentation covers the details: [adding components](https://docs.weblate.org/en/latest/admin/projects.html), [the Fluent format](https://docs.weblate.org/en/latest/formats/fluent.html) and [continuous localization](https://docs.weblate.org/en/latest/admin/continuous.html).

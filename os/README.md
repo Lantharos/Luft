@@ -4,10 +4,10 @@ How Luft becomes an installable system: a [bootc](https://bootc-dev.github.io/bo
 
 | Image | For |
 | --- | --- |
-| `ghcr.io/lantharos/luft:45` | Any computer |
-| `ghcr.io/lantharos/luft:45-nvidia` | NVIDIA graphics, with the driver built for the image's kernel and signed with Luft's key |
+| `ghcr.io/lantharos/luft:1` | Any computer |
+| `ghcr.io/lantharos/luft:1-nvidia` | NVIDIA graphics, with the driver built for the image's kernel and signed with Luft's key |
 
-CI builds `:45-nightly` and `:45-nightly-nvidia` every night `main` changed, and the USB sticks with them. Pushing a tag such as `v45.20261014` builds and publishes a release as `:45` and `:45-nvidia`.
+Luft's versions start at 1, whatever Fedora release the image is built on. CI builds `:1-nightly` and `:1-nightly-nvidia` every night `main` changed, each also tagged with its version such as `:1.20261020.57-nightly`, and the USB stick with them. Pushing a tag such as `v1.20261101` builds and publishes a release as `:1` and `:1-nvidia`. Every image is signed with Luft's key.
 
 ## Build the image
 
@@ -38,19 +38,19 @@ Builds sign SushiBoot, the startup image and NVIDIA's driver with the keys in `L
 
 ```sh
 os/iso/build.sh                                         # from localhost/luft:45 and :45-nvidia
-os/iso/build.sh ghcr.io/lantharos/luft:45               # from the published images
-os/iso/build.sh localhost/luft:45 standard nvidia       # one image per stick
+os/iso/build.sh ghcr.io/lantharos/luft:1-nightly       # from the published images
 ```
 
 It writes `os/iso/state/luft-VERSION.iso` and its `.sha256`, in a few minutes and without root. The stick starts through Fedora's signed shim and GRUB, carries its images so installing needs no network, and runs the regular desktop when you choose to just try Luft. It also starts as a DVD and from [Ventoy](https://www.ventoy.net).
 
-| Published at [get.luft.computer](https://get.luft.computer/luft-nightly.iso) | Carries |
+| Published at get.luft.computer | Holds |
 | --- | --- |
-| `luft-nightly.iso`, `luft-latest.iso` | Both images, for any computer |
-| `luft-nightly-standard.iso`, `luft-latest-standard.iso` | The image for computers without NVIDIA graphics |
-| `luft-nightly-nvidia.iso`, `luft-latest-nvidia.iso` | The NVIDIA image |
+| `nightly/luft-VERSION.iso` | The newest few nightly sticks, such as `luft-1.20261020.57-nightly.iso` |
+| `1/luft-VERSION.iso` | Releases, from the first one on |
+| `…/latest.json` | The newest stick in that folder: its `name`, `version`, `size` and `sha256` |
+| `meet/` | Meet Luft for Windows and Linux |
 
-The `latest` files appear with the first release. Each version is also published under its own name.
+Every file has a `.sha256` next to it, and each stick's checksum is signed with minisign in a `.sha256.minisig`, with the stick's file name as the trusted comment. The public key is `RWRz9rCK/H8Drrze/f851hxNNOH/D42kpyTMpXV7DT7QoUdCZySZwRWA`.
 
 ## Try it in a VM
 

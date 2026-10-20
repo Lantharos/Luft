@@ -36,24 +36,25 @@ A new version gets three tries to reach the login screen. If it doesn't get ther
 
 | | Comes | Follows |
 | --- | --- | --- |
-| Releases | When a version is ready | `ghcr.io/lantharos/luft:45` |
-| Nightly builds | Every night, when something changed | `ghcr.io/lantharos/luft:45-nightly` |
+| Releases | When a version is ready | `ghcr.io/lantharos/luft:1` |
+| Nightly builds | Every night, when something changed | `ghcr.io/lantharos/luft:1-nightly` |
 
-A computer follows whatever it was installed from: a stick made from `luft-nightly.iso` keeps getting nightly builds. To move between them, run this in [Tern](/apps/tern/) and restart:
-
-```sh
-sudo bootc switch ghcr.io/lantharos/luft:45-nightly   # or :45 for releases
-```
-
-On a computer with NVIDIA graphics, add `-nvidia` to the end, such as `:45-nightly-nvidia`.
-
-Every image is signed with [Sigstore](https://www.sigstore.dev/) by the GitHub workflow that builds it, and the USB sticks are only made from images whose signature checks out. To check one yourself with [cosign](https://docs.sigstore.dev/cosign/system_config/installation/):
+There are no releases yet, so for now every computer follows the nightly builds. A computer follows whatever it was installed from: one installed from a nightly ISO keeps getting nightly builds. To move between them, run this in [Tern](/apps/tern/) and restart:
 
 ```sh
-cosign verify ghcr.io/lantharos/luft:45-nightly \
-  --certificate-identity-regexp '^https://github\.com/Lantharos/Luft/\.github/workflows/image\.yml@refs/(heads/main|tags/v.+)$' \
-  --certificate-oidc-issuer https://token.actions.githubusercontent.com
+sudo bootc switch ghcr.io/lantharos/luft:1-nightly   # or :1 for releases
 ```
+
+On a computer with NVIDIA graphics, add `-nvidia` to the end, such as `:1-nightly-nvidia`.
+
+Every image is signed with Luft's key, and Luft refuses an update that isn't. To check an image yourself with [cosign](https://docs.sigstore.dev/cosign/system_config/installation/):
+
+```sh
+cosign verify --key https://raw.githubusercontent.com/Lantharos/Luft/main/os/image/files/usr/share/pki/containers/luft.pub \
+  --insecure-ignore-tlog=true ghcr.io/lantharos/luft:1-nightly
+```
+
+The signatures aren't recorded in a public transparency log, which is why the check needs `--insecure-ignore-tlog=true`.
 
 ## Firmware and apps
 

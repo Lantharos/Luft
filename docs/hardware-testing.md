@@ -1,6 +1,6 @@
 # Testing on real hardware
 
-What to try when Luft goes on a new computer. Use [luft-nightly.iso](https://get.luft.computer/luft-nightly.iso) for the newest build, or [luft-latest.iso](https://get.luft.computer/luft-latest.iso) for the last release. Write down the computer's model, its graphics, and whether Windows is on it.
+What to try when Luft goes on a new computer. Use the newest nightly ISO, named in [nightly/latest.json](https://get.luft.computer/nightly/latest.json), or the ISO from [the download page](https://luft.computer/download#iso). Write down the computer's model, its graphics, and whether Windows is on it.
 
 ## Installing
 
@@ -23,7 +23,7 @@ What to try when Luft goes on a new computer. Use [luft-nightly.iso](https://get
 ## Updates and unlock
 
 - [ ] **Updates and rollback.** Settings finds an update, downloads it and restarts to install it. `bootc status` shows the new version. Then go back with Settings or `sudo bootc rollback`, and once more from SushiBoot's Previous versions menu (hold a key while starting).
-- [ ] **NVIDIA driver switch.** On a computer with an NVIDIA card installed with the standard image, for example with `sudo bootc switch ghcr.io/lantharos/luft:45`, a notification after signing in offers NVIDIA's driver. Switch in Settings, Updates, and restart. `bootc status` shows the `-nvidia` image, `nvidia-smi` sees the card with Secure Boot on, and going back with Settings starts the standard image again.
+- [ ] **NVIDIA driver switch.** On a computer with an NVIDIA card installed with the standard image, for example with `sudo bootc switch ghcr.io/lantharos/luft:1-nightly`, a notification after signing in offers NVIDIA's driver. Switch in Settings, Updates, and restart. `bootc status` shows the `-nvidia` image, `nvidia-smi` sees the card with Secure Boot on, and going back with Settings starts the standard image again.
 - [ ] **TPM unlock.** Turn on encryption in Settings, Security. After it finishes, restarts open the disk without a passphrase, also after an update. Keep the recovery key; turning Secure Boot off should make Luft ask for it.
 
 ## When something fails

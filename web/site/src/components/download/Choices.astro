@@ -1,10 +1,6 @@
 ---
 import { formatSize, iso, meet, nightlyIso } from '../../data/downloads';
 
-const variants = [
-	{ label: 'Without NVIDIA graphics', download: iso.standard },
-	{ label: 'With NVIDIA graphics', download: iso.nvidia }
-];
 const sized = (size: number | null) => (size ? ` · ${formatSize(size)}` : '');
 ---
 
@@ -35,35 +31,17 @@ const sized = (size: number | null) => (size ? ` · ${formatSize(size)}` : '');
 			For a USB stick, a virtual machine, or a computer that starts from nothing. It installs offline, on any PC.
 		</p>
 		<div class="mt-8">
-			<a class="button button-primary only-other" href={iso.universal.href}>Download ISO{sized(iso.universal.size)}</a>
-			<a class="button button-quiet only-meet" href={iso.universal.href}>Download ISO{sized(iso.universal.size)}</a>
+			<a class="button button-primary only-other" href={iso.href}>Download ISO{sized(iso.size)}</a>
+			<a class="button button-quiet only-meet" href={iso.href}>Download ISO{sized(iso.size)}</a>
 		</div>
 		<p class="mt-5 text-sm text-ink-muted">
-			<span class="font-mono">{iso.universal.file}</span> · <a class="link" href={iso.universal.checksum}>checksum</a>
+			<span class="font-mono">{iso.file}</span> · <a class="link" href={iso.checksum}>checksum</a> · <a class="link" href={iso.signature}>signature</a>
 		</p>
 		<div>
-			<div class="mt-10 border-t border-hairline pt-6">
-				<p class="text-sm text-ink-soft">Smaller ISOs that carry just the edition one computer needs:</p>
-				<ul class="mt-3 space-y-2 text-sm">
-					{
-						variants.map(({ label, download }) => (
-							<li class="flex flex-wrap items-baseline justify-between gap-x-4">
-								<a class="link font-medium" href={download.href}>
-									{label}
-								</a>
-								<span class="text-ink-muted">
-									<span class="font-mono">{download.file}</span>
-									{sized(download.size)} · <a class="link" href={download.checksum}>checksum</a>
-								</span>
-							</li>
-						))
-					}
-				</ul>
-			</div>
 			{
 				nightlyIso && (
-					<p class="mt-6 text-sm text-ink-muted">
-						Testing something new? <a class="link" href={nightlyIso.universal.href}>The nightly ISO</a> is built whenever Luft changes, and computers installed from it keep getting nightly updates.
+					<p class="mt-8 max-w-md text-sm text-ink-muted">
+						Testing something new? <a class="link" href={nightlyIso.href}>The nightly ISO</a> is built whenever Luft changes, and computers installed from it keep getting nightly updates.
 					</p>
 				)
 			}

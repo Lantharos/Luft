@@ -11,7 +11,7 @@ export const faq: Question[] = [
 	{
 		question: 'Will it run on my computer?',
 		answer:
-			'If it is a 64-bit PC with UEFI from the last ten years or so, very likely. Luft needs at least 32 GB of space. A TPM is optional and lets an encrypted disk unlock by itself. Computers with NVIDIA graphics get an edition with NVIDIA’s own driver.'
+			'If it is a 64-bit PC with UEFI from the last ten years or so, very likely. Luft needs at least 32 GB of space. A TPM is optional and lets an encrypted disk unlock by itself. Computers with NVIDIA graphics get NVIDIA’s own driver, set up while installing.'
 	},
 	{
 		question: 'Can I keep Windows?',

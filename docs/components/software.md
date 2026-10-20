@@ -27,7 +27,7 @@ PackageKit and the image updater are reached over D-Bus, so their functions are 
 `System::current()` tells them apart at runtime:
 
 - **Packages**: a regular Fedora install. Packages, updates and offline updates go through PackageKit.
-- **Image**: a sealed system started from a bootc image with the composefs backend, such as `ghcr.io/lantharos/luft:45`, recognised by `composefs=` on the kernel command line. System updates are new versions of the image, with the previous version kept to go back to. Nothing is layered on the image: apps come from Flatpak and AppImages, command-line tools from a Toolbox container, and the few Fedora packages that must be part of the system, such as services, are merged over it as a system extension.
+- **Image**: a sealed system started from a bootc image with the composefs backend, such as `ghcr.io/lantharos/luft:1`, recognised by `composefs=` on the kernel command line. System updates are new versions of the image, with the previous version kept to go back to. Nothing is layered on the image: apps come from Flatpak and AppImages, command-line tools from a Toolbox container, and the few Fedora packages that must be part of the system, such as services, are merged over it as a system extension.
 
 `LUFT_KERNEL_COMMAND_LINE` names a file to read in place of `/proc/cmdline`, to try either kind on any computer (see [Testing](../testing.md#image-systems)).
 

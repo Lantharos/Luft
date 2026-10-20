@@ -6,7 +6,7 @@ interface Props {
 	class?: string;
 }
 
-const { isoHref = iso.universal.href, class: className } = Astro.props;
+const { isoHref = iso.href, class: className } = Astro.props;
 ---
 
 <div class:list={['flex flex-wrap gap-3', className]}>

@@ -9,7 +9,7 @@ Luft is a Fedora system with its own desktop, apps, boot chain and security serv
 
 ## The image
 
-Luft ships as a [bootc](https://bootc-dev.github.io/bootc/) image built on `quay.io/fedora/fedora-bootc:45`, published as `ghcr.io/lantharos/luft:45` and `:45-nvidia`. Every build compiles Kestrel, the keyring, trustd, Sushi and the apps from the repository, and adds the codecs and NVIDIA's driver while it's built.
+Luft ships as a [bootc](https://bootc-dev.github.io/bootc/) image built on `quay.io/fedora/fedora-bootc:45`, published as `ghcr.io/lantharos/luft:1` and `:1-nvidia`, with nightly builds as `:1-nightly` and `:1-nightly-nvidia`. Luft's versions start at 1 and don't follow Fedora's. Every build compiles Kestrel, the keyring, trustd, Sushi and the apps from the repository, and adds the codecs and NVIDIA's driver while it's built.
 
 - The image is put together from **parts**, each an image named after a hash of its sources, so a build only remakes what changed.
 - It's split into **layers by package**, so an update downloads only the layers whose packages changed. The NVIDIA image is the standard one plus the driver, so they share every layer below it.

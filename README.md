@@ -30,7 +30,7 @@ Luft is an operating system for PCs, built on Fedora. It has its own desktop, it
 
 - **[luft.computer](https://luft.computer)** shows what Luft is like, and its [download page](https://luft.computer/download) has Meet Luft and the USB stick images.
 - **[docs.luft.computer](https://docs.luft.computer)** covers trying it, installing it and everything after.
-- **[get.luft.computer](https://get.luft.computer/luft-nightly.iso)** hosts the files themselves, each with a `.sha256` next to it.
+- **[get.luft.computer](https://get.luft.computer/nightly/latest.json)** hosts the files themselves, each with a `.sha256` next to it. `nightly/latest.json` names the newest ISO.
 
 Luft needs a 64-bit PC with UEFI. A TPM 2.0 is optional and lets an encrypted disk unlock without a password.
 

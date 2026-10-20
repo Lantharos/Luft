@@ -7,36 +7,42 @@ export interface Download {
 	size: number | null;
 }
 
-async function published(file: string): Promise<Download | null> {
-	const href = `${urls.downloads}/${file}`;
-	const response = await fetch(href, { method: 'HEAD' }).catch(() => null);
+export interface Iso extends Download {
+	signature: string;
+}
+
+interface Latest {
+	name: string;
+	size: number;
+}
+
+async function latestIso(channel: '1' | 'nightly'): Promise<Iso | null> {
+	const response = await fetch(`${urls.downloads}/${channel}/latest.json`).catch(() => null);
 	if (!response?.ok) return null;
-	return { file, href, checksum: `${href}.sha256`, size: Number(response.headers.get('content-length')) };
+	const { name, size }: Latest = await response.json();
+	const href = `${urls.downloads}/${channel}/${name}`;
+	return { file: name, href, size, checksum: `${href}.sha256`, signature: `${href}.sha256.minisig` };
 }
 
-async function download(file: string): Promise<Download> {
-	const href = `${urls.downloads}/${file}`;
-	return (await published(file)) ?? { file, href, checksum: `${href}.sha256`, size: null };
+async function meetDownload(file: string): Promise<Download> {
+	const href = `${urls.downloads}/meet/${file}`;
+	const response = await fetch(href, { method: 'HEAD' }).catch(() => null);
+	const size = response?.ok ? Number(response.headers.get('content-length')) : null;
+	return { file, href, checksum: `${href}.sha256`, size };
 }
-
-async function edition(channel: 'latest' | 'nightly', fetchFile: (file: string) => Promise<Download | null>) {
-	const [universal, standard, nvidia] = await Promise.all(
-		['', '-standard', '-nvidia'].map((variant) => fetchFile(`luft-${channel}${variant}.iso`))
-	);
-	return universal && standard && nvidia && { channel, universal, standard, nvidia };
-}
-
-export type Edition = NonNullable<Awaited<ReturnType<typeof edition>>>;
 
 const [release, nightly, windows, linux] = await Promise.all([
-	edition('latest', published),
-	edition('nightly', download),
-	download('meet-luft.exe'),
-	download('meet-luft.AppImage')
+	latestIso('1'),
+	latestIso('nightly'),
+	meetDownload('meet-luft.exe'),
+	meetDownload('meet-luft.AppImage')
 ]);
 
-export const iso: Edition = release ?? nightly!;
-export const nightlyIso: Edition | null = release ? nightly : null;
+const newest = release ?? nightly;
+if (!newest) throw new Error(`No ISO is published at ${urls.downloads}: neither 1/latest.json nor nightly/latest.json exists`);
+
+export const iso: Iso = newest;
+export const nightlyIso: Iso | null = release ? nightly : null;
 export const meet = { windows, linux };
 
 export function formatSize(bytes: number) {

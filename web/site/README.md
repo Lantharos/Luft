@@ -13,7 +13,7 @@ bun run preview      # build, then serve dist/ the way Cloudflare does
 bun run check        # type checks
 ```
 
-Download sizes on the download page are read from get.luft.computer while building, and the ISO links switch from the nightly builds to `luft-latest*.iso` once a release is published there. Rebuild after a release to pick it up.
+The download page reads `nightly/latest.json` and `1/latest.json` from get.luft.computer while building, and the ISO links switch from the newest nightly build to the newest release once one is published. Rebuild after a release, or after a few nightly builds, since only the newest few are kept.
 
 ## Deploy
 

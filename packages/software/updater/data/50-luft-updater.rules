@@ -1,8 +1,8 @@
-// Administrators can download and prepare system updates without a password,
-// so updates also arrive in the background. Going back to an earlier version
-// still asks.
+// Administrators at the computer can download and prepare system updates
+// without a password, so updates also arrive in the background. Going back to
+// an earlier version still asks.
 polkit.addRule(function (action, subject) {
-    if (action.id === "com.lantharos.updater.download" && subject.isInGroup("wheel")) {
+    if (action.id === "com.lantharos.updater.download" && subject.local && subject.active && subject.isInGroup("wheel")) {
         return polkit.Result.YES;
     }
     return polkit.Result.NOT_HANDLED;

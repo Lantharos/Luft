@@ -54,6 +54,7 @@ jobs:
           - packages/dbus
           - packages/disks
           - packages/fingerprint
+          - packages/i18n
           - packages/meet
           - packages/network
           - packages/sleep/service

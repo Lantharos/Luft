@@ -129,7 +129,7 @@ desktop-shortcut-panel-run-dialog = Show the run command prompt
 desktop-shortcut-restore-shortcuts = Restore the keyboard shortcuts
 desktop-shortcut-activate-window-menu = Activate the window menu
 desktop-shortcut-toggle-fullscreen = Toggle fullscreen mode
-desktop-shortcut-toggle-maximized = Toggle maximization state
+desktop-shortcut-toggle-maximized = Maximize or restore the window
 desktop-shortcut-maximize = Maximize window
 # Return a maximized window to its earlier size
 desktop-shortcut-unmaximize = Restore window
@@ -143,8 +143,8 @@ desktop-shortcut-raise = Raise window above other windows
 desktop-shortcut-lower = Lower window below other windows
 desktop-shortcut-maximize-vertically = Maximize window vertically
 desktop-shortcut-maximize-horizontally = Maximize window horizontally
-desktop-shortcut-toggle-tiled-left = View split on left
-desktop-shortcut-toggle-tiled-right = View split on right
+desktop-shortcut-toggle-tiled-left = Snap the window to the left half
+desktop-shortcut-toggle-tiled-right = Snap the window to the right half
 
 ## Sound
 # Name of the recording stream Settings opens to show the microphone level; other sound apps may list it

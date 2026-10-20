@@ -15,7 +15,7 @@ settings-display-apply = Apply
 settings-display-arrangement-main = { $name }, main display
 settings-display-use = Use this display
 settings-display-main = Main display
-settings-display-main-description = The top bar and new windows show up here
+settings-display-main-description = The taskbar and new windows show up here
 settings-display-resolution-title = Resolution
 # A screen resolution, width by height in pixels
 settings-display-resolution = { $width } × { $height }

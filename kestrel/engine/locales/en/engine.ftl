@@ -106,8 +106,8 @@ bluetooth-no-devices = No available or connected devices
 bluetooth-turn-on-hint = Turn on Bluetooth to connect to devices
 # Shown under the tile title when several devices are connected
 bluetooth-connected-count = { $count ->
-    [one] { $count } Connected
-   *[other] { $count } Connected
+    [one] { $count } connected
+   *[other] { $count } connected
 }
 
 ## Network menus in quick settings
@@ -178,9 +178,9 @@ location-dialog-grant = Grant Access
 ## Thunderbolt notifications
 
 thunderbolt-unknown-title = Unknown Thunderbolt device
-thunderbolt-unknown-body = New device has been detected while you were away. Please disconnect and reconnect the device to start using it.
+thunderbolt-unknown-body = A new device was connected while you were away. Unplug it and plug it in again to start using it.
 thunderbolt-unauthorized-title = Unauthorized Thunderbolt device
-thunderbolt-unauthorized-body = New device has been detected and needs to be authorized by an administrator
+thunderbolt-unauthorized-body = A new device was connected and needs an administrator’s approval
 thunderbolt-error-title = Thunderbolt authorization error
 # $reason is the system's error message, usually in English
 thunderbolt-error-body = Could not authorize the Thunderbolt device: { $reason }
@@ -213,7 +213,7 @@ window-resize-size = { $width } × { $height }
 ## App not responding
 
 # $appName is the name of the app that stopped responding
-close-dialog-title = “{ $appName }” Is Not Responding
+close-dialog-title = “{ $appName }” isn’t responding
 close-dialog-description = You may choose to wait a short while for it to continue or force the app to quit entirely
 # Button
 close-dialog-force-quit = Force Quit

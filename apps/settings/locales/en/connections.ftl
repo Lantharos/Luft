@@ -315,7 +315,7 @@ settings-network-wireguard-error-keepalive = Enter a number of seconds
 ## Bluetooth panel
 
 # Shown under the Bluetooth switch
-settings-bluetooth-hardware-off = Turned off with a hardware switch
+settings-bluetooth-hardware-off = Turned off by a hardware switch
 settings-bluetooth-power-on-failed = Couldn't turn Bluetooth on
 settings-bluetooth-power-off-failed = Couldn't turn Bluetooth off
 settings-bluetooth-visible = Visible to nearby devices
@@ -334,7 +334,7 @@ settings-bluetooth-paired = My devices
 settings-bluetooth-nearby = Nearby devices
 settings-bluetooth-searching = Looking for devices…
     .description = Put the device you want to add in pairing mode
-settings-bluetooth-blocked = Bluetooth is off with a hardware switch
+settings-bluetooth-blocked = Bluetooth is turned off by a hardware switch
     .description = Use the switch or key on your computer to turn it on
 # Screen-reader label of the button that opens a device's details
 settings-bluetooth-details = Device details

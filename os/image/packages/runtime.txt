@@ -82,9 +82,11 @@ pipewire
 pipewire-alsa
 pipewire-gstreamer
 pipewire-pulseaudio
+pipewire-utils
 plymouth
 polkit
 power-profiles-daemon
+pulseaudio-utils
 python3-gobject
 rclone
 shared-mime-info

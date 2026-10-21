@@ -69,6 +69,12 @@ refresh_caches() {
   update-mime-database /usr/share/mime
 }
 
+let_line_out_play_beside_headphones() {
+  local path=/usr/share/alsa-card-profile/mixer/paths/analog-output-lineout.conf
+  sed -i '/^\.include analog-output\.conf\.common$/i [Element Auto-Mute Mode]\nenumeration = select\n\n[Option Auto-Mute Mode:Disabled]\nname = analog-output-lineout\n' "$path"
+  grep -q '^\[Option Auto-Mute Mode:Disabled\]$' "$path" || { echo "$path no longer ends with the common include" >&2; exit 1; }
+}
+
 make_efi_mountpoint() {
   install -d -m 0755 /efi
 }
@@ -97,6 +103,7 @@ configure_toolbox
 configure_security
 check_typelibs
 refresh_caches
+let_line_out_play_beside_headphones
 make_efi_mountpoint
 leave_initramfs_to_the_startup_image
 clean_build_state

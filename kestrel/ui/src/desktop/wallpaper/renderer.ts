@@ -4,8 +4,8 @@ import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 
 import type { Monitor } from '../panel/panel.js';
-import { animateActor } from '../../shared/motion.js';
-import { helperProgram } from '../../shared/programs.js';
+import { animateActor } from '../../shared/motion/motion.js';
+import { helperProgram } from '../../shared/apps/programs.js';
 
 const FADE_DURATION = 400;
 const SIGTERM = 15;

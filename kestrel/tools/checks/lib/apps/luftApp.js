@@ -3,12 +3,12 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import IBus from 'gi://IBus';
 
-import {atSessionEnd} from '../../automation/runner.js';
+import {atSessionEnd} from '../../../automation/runner.js';
 import {prepareHome} from './home.js';
-import {click} from './input.js';
-import {repository, spawn} from './processes.js';
-import {captureFrame} from './screenshots.js';
-import {pause, settled, Timeout, waitUntil} from './wait.js';
+import {click} from '../input/input.js';
+import {repository, spawn} from '../processes.js';
+import {captureFrame} from '../screenshots.js';
+import {pause, settled, Timeout, waitUntil} from '../wait.js';
 
 const FIRST_PAINT = 'browser.first_paint';
 const LIFECYCLE = /\blifecycle\.(active|suspended|frozen)\./;

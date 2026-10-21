@@ -3,9 +3,9 @@ import Pango from 'gi://Pango';
 import Shell from 'gi://Shell';
 
 import {named, shown} from '../lib/actors.js';
-import {click} from '../lib/input.js';
+import {click} from '../lib/input/input.js';
 import {capture} from '../lib/screenshots.js';
-import {eventually, events, require} from './prompt.js';
+import {eventually, events, require} from './lib/prompt.js';
 
 function brightnessAtCenter() {
   const screenshot = new Shell.Screenshot();

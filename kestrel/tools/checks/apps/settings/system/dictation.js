@@ -1,11 +1,11 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-import {checks} from '../../lib/check.js';
-import {freePorts, listening} from '../../lib/ports.js';
-import {fixture, repository, scratch, spawn, stop} from '../../lib/processes.js';
-import {pause} from '../../lib/wait.js';
-import {show} from './navigation.js';
+import {checks} from '../../../lib/check.js';
+import {freePorts, listening} from '../../../lib/apps/ports.js';
+import {fixture, repository, scratch, spawn, stop} from '../../../lib/processes.js';
+import {pause} from '../../../lib/wait.js';
+import {show} from '../navigation.js';
 
 const {require, eventually} = checks('dictation settings');
 const SPEECH = 'com.lantharos.Speech1';

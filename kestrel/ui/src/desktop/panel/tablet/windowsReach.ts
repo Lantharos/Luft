@@ -1,7 +1,7 @@
 import GLib from 'gi://GLib';
 import type Meta from 'gi://Meta';
 
-import { Duration } from '../../../shared/motion.js';
+import { Duration } from '../../../shared/motion/motion.js';
 import type { Monitor } from '../panel.js';
 import { activeWorkspace } from '../taskbar/workspaceWindows.js';
 

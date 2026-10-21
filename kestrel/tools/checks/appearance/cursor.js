@@ -2,7 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import {checks} from '../lib/check.js';
-import {rest} from '../lib/input.js';
+import {rest} from '../lib/input/input.js';
 import {gjs} from '../lib/processes.js';
 
 Gio._promisify(Gio.DataInputStream.prototype, 'read_line_async');
@@ -89,7 +89,7 @@ export async function run() {
     choose({theme: THEME, size: 48});
     await eventually(() => spriteSize() === 48, 'the pointer takes the chosen size');
 
-    const client = gjs('clients/x11Cursor.js', [], {flags: Gio.SubprocessFlags.STDOUT_PIPE});
+    const client = gjs('clients/x11/x11Cursor.js', [], {flags: Gio.SubprocessFlags.STDOUT_PIPE});
     const lines = new Gio.DataInputStream({base_stream: client.get_stdout_pipe()});
     const started = await waitForState(lines, {theme: THEME, size: 48});
     require(started, 'X11 apps start with the same theme and size');

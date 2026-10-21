@@ -4,7 +4,7 @@ import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {shownStyled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {press} from '../lib/input.js';
+import {press} from '../lib/input/input.js';
 import {capture} from '../lib/screenshots.js';
 import {pause} from '../lib/wait.js';
 import {lockAndWake, showPrompt, unlock} from '../lockScreen/lib/shield.js';

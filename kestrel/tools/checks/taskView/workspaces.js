@@ -3,7 +3,7 @@ import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {hold, moveTo, press, release, scroll} from '../lib/input.js';
+import {hold, moveTo, press, release, scroll} from '../lib/input/input.js';
 import {gjs, stop, waitForWindows} from '../lib/processes.js';
 import {capture, captureFrame} from '../lib/screenshots.js';
 import {settled, waitUntil} from '../lib/wait.js';
@@ -16,7 +16,7 @@ const switchData = () => Main.wm._workspaceAnimation._switchData;
 const switchedTo = index => manager.get_active_workspace_index() === index && !switchData();
 
 async function openWindows() {
-  const app = gjs('clients/window.js', ['--multiple']);
+  const app = gjs('clients/windows/window.js', ['--multiple']);
   const windows = await waitForWindows(['Kestrel window check 1', 'Kestrel window check 2']);
   for (const window of windows) window.move_to_monitor(global.display.get_primary_monitor());
   return [app, windows];

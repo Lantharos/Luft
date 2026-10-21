@@ -2,7 +2,7 @@ import Gio from 'gi://Gio';
 import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
 
-import { stealFd } from '../../shared/processes.js';
+import { stealFd } from '../../shared/dbus/processes.js';
 import type { PromptQueue } from './queue.js';
 import { accessRequest, passwordRequest, type Options } from './request.js';
 

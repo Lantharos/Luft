@@ -2,7 +2,7 @@ import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import type St from 'gi://St';
 
-import { animateActor, Curve, Duration, rubberband, Spring, type SpringToken } from '../../../shared/motion.js';
+import { animateActor, Curve, Duration, rubberband, Spring, type SpringToken } from '../../../shared/motion/motion.js';
 import { STRIP_HEIGHT, taskbarPreferences } from '../preferences/taskbarPreferences.js';
 import { clampUnit } from '../../../shared/math.js';
 import { TabletStrip } from './strip.js';

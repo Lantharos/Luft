@@ -5,7 +5,7 @@ import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 import {touchpad} from '../board/lib/touchpad.js';
 import {named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {chord, rest} from '../lib/input.js';
+import {chord, rest} from '../lib/input/input.js';
 import {stopAll} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {nextFrame} from '../lib/wait.js';

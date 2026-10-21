@@ -3,7 +3,7 @@ import {dismissImmediately, toggleSurface} from 'resource:///com/lantharos/kestr
 
 import {descendants, firstStyled, named, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {centerOf, moveTo, rest} from '../lib/input.js';
+import {centerOf, moveTo, rest} from '../lib/input/input.js';
 import {gjs, spawn, stop, waitForWindow, waitForWindows} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {settled, waitUntil} from '../lib/wait.js';
@@ -83,7 +83,7 @@ async function checkOpening(panel) {
   const center = named('kestrel-panel-center');
   const widths = new Set([center.width]);
   const sample = global.stage.connect('after-paint', () => widths.add(center.width));
-  const app = gjs('clients/window.js');
+  const app = gjs('clients/windows/window.js');
   try {
     const window = await waitForWindow('Kestrel window check');
     await settled();
@@ -111,7 +111,7 @@ async function checkOpening(panel) {
 export async function run() {
   const panel = named('kestrel-panel');
   await checkOpening(panel);
-  const app = gjs('clients/window.js', ['--multiple']);
+  const app = gjs('clients/windows/window.js', ['--multiple']);
   const windows = await waitForWindows(TITLES);
   await checkIndicators(panel);
   await checkPeek(panel, windows);

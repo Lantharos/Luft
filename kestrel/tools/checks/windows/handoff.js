@@ -5,7 +5,7 @@ import GLib from 'gi://GLib';
 import {changes, openApp} from '../apps/lib/apps.js';
 import {exists, removeTree, write} from '../apps/lib/files.js';
 import {checks} from '../lib/check.js';
-import {press, type} from '../lib/input.js';
+import {press, type} from '../lib/input/input.js';
 import {findWindow, fixture, scratch, spawn, waitForWindow, windows} from '../lib/processes.js';
 import {pause, settled} from '../lib/wait.js';
 

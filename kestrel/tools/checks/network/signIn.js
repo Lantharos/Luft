@@ -3,7 +3,7 @@ import GLib from 'gi://GLib';
 
 import {checks} from '../lib/check.js';
 import {call} from '../lib/dbus.js';
-import {LuftApp, sabineService} from '../lib/luftApp.js';
+import {LuftApp, sabineService} from '../lib/apps/luftApp.js';
 import {firstLine, scratch, spawn, stop} from '../lib/processes.js';
 
 const {require, eventually} = checks('network sign-in');

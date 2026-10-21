@@ -2,12 +2,12 @@ import Gio from 'gi://Gio';
 
 import {checks} from '../lib/check.js';
 import {call, subscribe} from '../lib/dbus.js';
-import {moveBy} from '../lib/input.js';
+import {moveBy} from '../lib/input/input.js';
 import {fixture, outputLines, spawn, stop} from '../lib/processes.js';
-import {openSecurityContext, through} from '../lib/sandbox.js';
+import {openSecurityContext, through} from '../lib/access/sandbox.js';
 import {pause} from '../lib/wait.js';
 import {lock, unlock} from '../lockScreen/lib/shield.js';
-import {startSessionClient} from './lib/sessionClient.js';
+import {startSessionClient} from '../system/lib/sessionClient.js';
 
 const {require, eventually} = checks('idle');
 const SCREEN_SAVER = 'org.freedesktop.ScreenSaver';

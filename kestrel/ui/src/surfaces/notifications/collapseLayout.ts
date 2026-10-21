@@ -1,7 +1,7 @@
 import Clutter from 'gi://Clutter';
 import GObject from 'gi://GObject';
 
-import { animateActor, Spring } from '../../shared/motion.js';
+import { animateActor, Spring } from '../../shared/motion/motion.js';
 
 const collapsing = new WeakMap<Clutter.Actor, number>();
 

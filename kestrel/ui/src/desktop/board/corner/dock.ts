@@ -3,7 +3,7 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import { appIcon } from '../../../appearance/icons/appIcons.js';
-import { blurSurface } from '../../../shared/surface.js';
+import { blurSurface } from '../../../shared/layout/surface.js';
 import { localized, t } from '../../../shared/i18n/index.js';
 
 const ICON_SIZE = 20;

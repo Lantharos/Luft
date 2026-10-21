@@ -12,7 +12,7 @@ function readyClient() {
 }
 
 export async function startSessionClient(...flags) {
-  const client = gjs('clients/sessionClient.js', flags);
+  const client = gjs('clients/apps/sessionClient.js', flags);
   const pid = Number(client.get_identifier());
   await waitUntil(async () => await readyClient() === pid, 'the session client is ready', 10000);
   return client;

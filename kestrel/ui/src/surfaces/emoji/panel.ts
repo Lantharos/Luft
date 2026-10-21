@@ -2,10 +2,10 @@ import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
 
-import { blurSurface } from '../../shared/surface.js';
+import { blurSurface } from '../../shared/layout/surface.js';
 import { t } from '../../shared/i18n/index.js';
-import { animateActor } from '../../shared/motion.js';
-import { boxCenter, findAnchor, heightNear, placeNear, type Anchor, type Box } from '../../shared/placement.js';
+import { animateActor } from '../../shared/motion/motion.js';
+import { boxCenter, findAnchor, heightNear, placeNear, type Anchor, type Box } from '../../shared/layout/placement.js';
 import type { TextInput } from '../../shared/input/textInput.js';
 import { describe, withTone, type Catalog } from './catalog/catalog.js';
 import type { SearchIndex } from './catalog/search.js';

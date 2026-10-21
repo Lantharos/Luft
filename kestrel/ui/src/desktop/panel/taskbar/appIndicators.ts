@@ -1,7 +1,7 @@
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
-import { animateActor } from '../../../shared/motion.js';
+import { animateActor } from '../../../shared/motion/motion.js';
 import { clampUnit } from '../../../shared/math.js';
 import type { LauncherEntry } from './launcherEntries.js';
 

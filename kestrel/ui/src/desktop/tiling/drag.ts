@@ -1,6 +1,6 @@
 import Meta from 'gi://Meta';
 
-import type { Box } from '../../shared/placement.js';
+import type { Box } from '../../shared/layout/placement.js';
 import { boxOf } from '../windows/frames.js';
 import { contains } from './layouts/geometry.js';
 import type { Tiler } from './tiler.js';

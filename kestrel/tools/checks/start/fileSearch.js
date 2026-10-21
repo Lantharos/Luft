@@ -6,7 +6,7 @@ import {labelled, named} from '../lib/actors.js';
 import {resetBattery, setBattery} from '../lib/battery.js';
 import {checks} from '../lib/check.js';
 import {call} from '../lib/dbus.js';
-import {press, rightClick} from '../lib/input.js';
+import {press, rightClick} from '../lib/input/input.js';
 import {scratch} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {settled, waitUntil} from '../lib/wait.js';

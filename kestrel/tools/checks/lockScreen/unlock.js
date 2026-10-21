@@ -5,7 +5,7 @@ import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 import {showsText, shownStyled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {call} from '../lib/dbus.js';
-import {press, type} from '../lib/input.js';
+import {press, type} from '../lib/input/input.js';
 import {capture, captureFrame} from '../lib/screenshots.js';
 import {hint, lockAndWake, showPrompt, unlock} from './lib/shield.js';
 

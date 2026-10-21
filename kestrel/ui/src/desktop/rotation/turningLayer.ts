@@ -1,7 +1,7 @@
 import Clutter from 'gi://Clutter';
 
 import type { Monitor } from '../panel/panel.js';
-import { animateActor, Curve, Duration, Spring } from '../../shared/motion.js';
+import { animateActor, Curve, Duration, Spring } from '../../shared/motion/motion.js';
 
 interface Picture {
   content: Clutter.Content;

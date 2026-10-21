@@ -1,7 +1,7 @@
 import type Gio from 'gi://Gio';
 import GioUnix from 'gi://GioUnix';
 
-import { launchHistory } from '../../../shared/launchHistory.js';
+import { launchHistory } from '../../../shared/apps/launchHistory.js';
 import type { Ranked, SearchItem } from '../item.js';
 import { rank, searchable, type Query, type Searchable } from '../ranking.js';
 

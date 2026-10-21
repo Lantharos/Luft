@@ -1,9 +1,9 @@
 import Gio from 'gi://Gio';
 
-import {captureBottom} from '../../panel/taskbarOptions/taskbar.js';
-import {settled} from '../../lib/wait.js';
-import {useScheme} from '../lib/palette.js';
-import {show} from './navigation.js';
+import {captureBottom} from '../../../taskbar/taskbarOptions/taskbar.js';
+import {settled} from '../../../lib/wait.js';
+import {useScheme} from '../../lib/palette.js';
+import {show} from '../navigation.js';
 
 const LOOKS = ['glass', 'solid', 'transparent', 'accent'];
 const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});

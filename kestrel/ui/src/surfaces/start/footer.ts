@@ -5,7 +5,7 @@ import St from 'gi://St';
 import { Avatar } from 'resource:///com/lantharos/kestrel/ui/userWidget.js';
 
 import { t } from '../../shared/i18n/index.js';
-import { animateActor } from '../../shared/motion.js';
+import { animateActor } from '../../shared/motion/motion.js';
 import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
 import { LOCK, POWER_ACTIONS, bindAvailability, type SessionAction } from '../quickSettings/sessionActions.js';
 

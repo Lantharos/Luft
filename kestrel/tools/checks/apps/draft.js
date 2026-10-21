@@ -3,7 +3,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import {checks} from '../lib/check.js';
-import {press, type} from '../lib/input.js';
+import {press, type} from '../lib/input/input.js';
 import {changes, openApp, withApp} from './lib/apps.js';
 import {checkPalette, showDark, useScheme, withPalette} from './lib/palette.js';
 

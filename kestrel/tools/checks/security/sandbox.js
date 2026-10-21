@@ -3,11 +3,11 @@ import GLib from 'gi://GLib';
 import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {checks} from '../lib/check.js';
-import {withFullAccess} from '../lib/fullAccess.js';
+import {withFullAccess} from '../lib/access/fullAccess.js';
 import {call, ownName, subscribe} from '../lib/dbus.js';
 import {pause} from '../lib/wait.js';
 import {lock, unlock} from '../lockScreen/lib/shield.js';
-import {SANDBOXED_APP, sandboxedApp} from '../lib/sandbox.js';
+import {SANDBOXED_APP, sandboxedApp} from '../lib/access/sandbox.js';
 
 const {require, eventually} = checks('sandbox');
 const MANAGER = ['/org/gnome/SessionManager', 'org.gnome.SessionManager'];

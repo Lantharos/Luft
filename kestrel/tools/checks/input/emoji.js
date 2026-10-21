@@ -7,7 +7,7 @@ import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {descendants, firstStyled, named, shown, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {erase, press, type} from '../lib/input.js';
+import {erase, press, type} from '../lib/input/input.js';
 import {gjs, stop, waitForWindow} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 
@@ -43,7 +43,7 @@ async function pick(window, title, label) {
 }
 
 async function startEntry(env = {}) {
-  const process = gjs('clients/window.js', ['--entry'], {env});
+  const process = gjs('clients/windows/window.js', ['--entry'], {env});
   const window = await waitForWindow('Kestrel window check');
   await eventually(() => window.has_focus() && Main.inputMethod.caret, 'the text field takes the keyboard');
   return {process, window};

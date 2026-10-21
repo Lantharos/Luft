@@ -1,4 +1,4 @@
-import type { Box } from '../../../shared/placement.js';
+import type { Box } from '../../../shared/layout/placement.js';
 import { axisOf, clampRatio, forward, length, split, start, type Axis, type Direction } from './geometry.js';
 import type { TiledLayout } from './layout.js';
 

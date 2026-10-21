@@ -29,7 +29,7 @@ async function checkPerDisplay(windows, apps) {
 }
 
 export async function checkWorkspaceWindows() {
-  const processes = [gjs('clients/window.js', ['--multiple']), spawn(['gjs', '-c', SECOND_APP])];
+  const processes = [gjs('clients/windows/window.js', ['--multiple']), spawn(['gjs', '-c', SECOND_APP])];
   const windows = await waitForWindows(['Kestrel window check 1', 'Kestrel window check 2', 'Kestrel workspace check']);
   const [first, other, lone] = windows;
   for (const window of windows) window.move_to_monitor(primary().index);

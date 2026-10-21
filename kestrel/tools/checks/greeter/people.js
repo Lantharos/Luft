@@ -3,9 +3,9 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import {named, shown, styled} from '../lib/actors.js';
-import {click, press, type} from '../lib/input.js';
+import {click, press, type} from '../lib/input/input.js';
 import {capture} from '../lib/screenshots.js';
-import {eventually, events, lastSessionStart, promptState, require} from './prompt.js';
+import {eventually, events, lastSessionStart, promptState, require} from './lib/prompt.js';
 
 function accentStylesheet() {
   const file = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_runtime_dir(), 'kestrel', GLib.getenv('WAYLAND_DISPLAY'), 'greeter-accent-dark.css']));

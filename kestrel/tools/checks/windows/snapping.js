@@ -4,7 +4,7 @@ import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {moveTo, pressButton, releaseButton} from '../lib/input.js';
+import {moveTo, pressButton, releaseButton} from '../lib/input/input.js';
 import {gjs, spawn, stop, waitForWindow, waitForWindows} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {nextFrame, settled, waitUntil} from '../lib/wait.js';
@@ -81,7 +81,7 @@ async function checkGroups(left, right) {
 }
 
 export async function run() {
-  gjs('clients/window.js', ['--multiple']);
+  gjs('clients/windows/window.js', ['--multiple']);
   const [first, second] = await waitForWindows(['Kestrel window check 1', 'Kestrel window check 2']);
   const area = await checkLayouts(first);
   await checkCornerDrag(first, area);

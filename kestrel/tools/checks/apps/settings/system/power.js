@@ -1,10 +1,10 @@
 import Clutter from 'gi://Clutter';
 
-import {checks} from '../../lib/check.js';
-import {resetBattery, setBattery, UPOWER_STATE} from '../../lib/battery.js';
-import {scroll} from '../../lib/input.js';
-import {callLog} from '../../system/lib/systemCalls.js';
-import {show} from './navigation.js';
+import {checks} from '../../../lib/check.js';
+import {resetBattery, setBattery, UPOWER_STATE} from '../../../lib/battery.js';
+import {scroll} from '../../../lib/input/input.js';
+import {callLog} from '../../../system/lib/systemCalls.js';
+import {show} from '../navigation.js';
 
 const {eventually} = checks('Luft app');
 const ON_BATTERY = {IsPresent: true, OnBattery: true, State: UPOWER_STATE.discharging, Percentage: 64, TimeToEmpty: 4 * 60 * 60};

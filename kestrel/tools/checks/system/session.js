@@ -4,7 +4,7 @@ import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {checks} from '../lib/check.js';
 import {call, property, subscribe} from '../lib/dbus.js';
-import {moveBy} from '../lib/input.js';
+import {moveBy} from '../lib/input/input.js';
 import {stop} from '../lib/processes.js';
 import {startSessionClient} from './lib/sessionClient.js';
 

@@ -2,7 +2,7 @@ import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
 
-import type { Box } from '../../../shared/placement.js';
+import type { Box } from '../../../shared/layout/placement.js';
 import { centerOn, clampScale, copyView, fitView, FULL_SIZE, magnifiedScale, zoomAround, type View } from './geometry.js';
 
 export const CAMERA_DURATION = 360;

@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-import { ownOnItsOwnConnection } from '../../shared/dedicatedName.js';
+import { ownOnItsOwnConnection } from '../../shared/dbus/dedicatedName.js';
 import { busCall } from './bus.js';
 
 const WATCHER_INTERFACE = `<node>

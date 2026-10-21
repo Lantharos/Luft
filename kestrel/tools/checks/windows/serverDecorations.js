@@ -3,7 +3,7 @@ import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {withPalette, useScheme} from '../apps/lib/palette.js';
 import {checks} from '../lib/check.js';
-import {click, drag, moveTo, press, pressButton, releaseButton, rest} from '../lib/input.js';
+import {click, drag, moveTo, press, pressButton, releaseButton, rest} from '../lib/input/input.js';
 import {fixture, spawn, waitForWindow} from '../lib/processes.js';
 import {capture, captureFrame} from '../lib/screenshots.js';
 import {pause, settled} from '../lib/wait.js';

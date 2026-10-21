@@ -4,7 +4,7 @@ import GLib from 'gi://GLib';
 
 import {ScratchAppSecrets} from '../../../fixtures/services/appSecrets.js';
 import {checks} from '../../lib/check.js';
-import {press, type} from '../../lib/input.js';
+import {press, type} from '../../lib/input/input.js';
 import {fixture} from '../../lib/processes.js';
 import {pause, settled, Timeout, waitUntil} from '../../lib/wait.js';
 import {changes, withApp} from '../lib/apps.js';

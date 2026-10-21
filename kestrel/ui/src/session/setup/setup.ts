@@ -9,8 +9,8 @@ import { AppearanceService } from '../../appearance/service.js';
 import type { Rgb } from '../../appearance/color.js';
 import { LoginWallpaper } from '../../desktop/wallpaper/loginWallpaper.js';
 import { PortalBackend } from '../../portal/backend.js';
-import { terminateOnceShown } from '../../shared/handoff.js';
-import { animateActor } from '../../shared/motion.js';
+import { terminateOnceShown } from '../../shared/apps/handoff.js';
+import { animateActor } from '../../shared/motion/motion.js';
 import { centerOnArrival } from './placement.js';
 
 const APP = 'com.lantharos.setup.desktop';

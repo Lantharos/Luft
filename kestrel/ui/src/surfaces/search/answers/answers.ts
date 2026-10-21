@@ -1,5 +1,5 @@
 import { evaluate } from '../calculator/expression.js';
-import { dayNumber, type Day } from '../../../shared/days.js';
+import { dayNumber, type Day } from '../../../shared/time/days.js';
 import { addDays, addMonths, instantOf, parts, wallClock, type Parts } from './calendar.js';
 import { lexicon, lexiconSteps, parseDate, resolve, type DateSpec, type Lexicon } from './dates.js';
 import { count, Cursor, fold, tokenize } from './text.js';

@@ -2,7 +2,7 @@ import type Clutter from 'gi://Clutter';
 import type Meta from 'gi://Meta';
 
 import type { Keybindings } from '../../context.js';
-import type { Box } from '../../shared/placement.js';
+import type { Box } from '../../shared/layout/placement.js';
 import { TilingCommands } from './commands.js';
 import { TilingDrag } from './drag.js';
 import { TilingKeys } from './keys.js';

@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-import {freePorts, listening} from '../../lib/ports.js';
+import {freePorts, listening} from '../../lib/apps/ports.js';
 import {scratch, spawn, stop} from '../../lib/processes.js';
 import {waitUntil} from '../../lib/wait.js';
 import {removeTree, write} from '../lib/files.js';

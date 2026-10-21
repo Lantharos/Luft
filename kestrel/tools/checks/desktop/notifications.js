@@ -9,8 +9,8 @@ import * as MessageTray from 'resource:///com/lantharos/kestrel/ui/messageTray.j
 import {descendants, firstStyled, labelled, named, shown, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {call, subscribe} from '../lib/dbus.js';
-import {centerOf, click, fingerScroll, liftFingers, moveTo, pressButton, releaseButton, rest, scroll} from '../lib/input.js';
-import {LuftApp} from '../lib/luftApp.js';
+import {centerOf, click, fingerScroll, liftFingers, moveTo, pressButton, releaseButton, rest, scroll} from '../lib/input/input.js';
+import {LuftApp} from '../lib/apps/luftApp.js';
 import {gjs, spawn, stop, waitForWindow} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {nextFrame, pause, settled, waitUntil} from '../lib/wait.js';
@@ -420,7 +420,7 @@ async function checkActivation() {
   const unsubscribe = subscribe({iface: 'org.gtk.Notifications', member: 'ActionInvoked', path: '/org/gtk/Notifications'},
     (_signal, [, , , , platformData]) => tokens.push(platformData['activation-token']));
   const settings = new LuftApp('settings');
-  const other = gjs('clients/window.js');
+  const other = gjs('clients/windows/window.js');
   try {
     await settings.open();
     const app = Shell.AppSystem.get_default().lookup_app('com.lantharos.settings.desktop');

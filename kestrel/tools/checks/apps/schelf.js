@@ -1,7 +1,7 @@
 import Clutter from 'gi://Clutter';
 
 import {fixture} from '../lib/processes.js';
-import {rest, scroll} from '../lib/input.js';
+import {rest, scroll} from '../lib/input/input.js';
 import {withApp} from './lib/apps.js';
 import {checkPalette, showDark, withPalette} from './lib/palette.js';
 

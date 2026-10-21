@@ -4,8 +4,8 @@ import GLib from 'gi://GLib';
 
 import {ScratchKeyring} from '../../../fixtures/services/secretService.js';
 import {checks} from '../../lib/check.js';
-import {press, type} from '../../lib/input.js';
-import {freePorts, listening} from '../../lib/ports.js';
+import {press, type} from '../../lib/input/input.js';
+import {freePorts, listening} from '../../lib/apps/ports.js';
 import {scratch, spawn} from '../../lib/processes.js';
 import {waitUntil} from '../../lib/wait.js';
 import {changes, openApp} from '../lib/apps.js';

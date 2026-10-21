@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-import {shownStyled} from './actors.js';
+import {shownStyled} from '../actors.js';
 
 export const BACKEND = 'org.freedesktop.impl.portal.desktop.kestrel';
 export const PORTAL_PATH = '/org/freedesktop/portal/desktop';

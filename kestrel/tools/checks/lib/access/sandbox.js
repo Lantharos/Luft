@@ -1,8 +1,8 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-import {fixture, outputLines, scratch, spawn, stop} from './processes.js';
-import {waitUntil} from './wait.js';
+import {fixture, outputLines, scratch, spawn, stop} from '../processes.js';
+import {waitUntil} from '../wait.js';
 
 const SECURITY_CONTEXT = fixture('clients', 'wayland', 'securityContext.py');
 const FLATPAK = 'org.flatpak';

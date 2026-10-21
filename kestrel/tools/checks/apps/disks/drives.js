@@ -2,7 +2,7 @@ import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 
 import {checks} from '../../lib/check.js';
-import {type} from '../../lib/input.js';
+import {type} from '../../lib/input/input.js';
 import {scratch} from '../../lib/processes.js';
 import {exists} from '../lib/files.js';
 

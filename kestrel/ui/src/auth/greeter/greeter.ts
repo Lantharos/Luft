@@ -15,8 +15,8 @@ import { LockPages } from 'resource:///com/lantharos/kestrel/ui/lockScreen/pages
 import type { Rgb } from '../../appearance/color.js';
 import { ContextMenus } from '../../desktop/menus/contextMenus.js';
 import type { Monitor } from '../../desktop/panel/panel.js';
-import { terminateOnceShown } from '../../shared/handoff.js';
-import { animateActor } from '../../shared/motion.js';
+import { terminateOnceShown } from '../../shared/apps/handoff.js';
+import { animateActor } from '../../shared/motion/motion.js';
 import type { StartupSignals } from '../../system/health/startup.js';
 import { Accounts } from './accounts.js';
 import { LoginAppearance } from './appearance.js';

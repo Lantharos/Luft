@@ -1,6 +1,6 @@
 import Clutter from 'gi://Clutter';
 
-import { Gesture, projection, rubberband } from '../../shared/motion.js';
+import { Gesture, projection, rubberband } from '../../shared/motion/motion.js';
 
 const FINGERS = 4;
 const UNITS_PER_MM = 1000 / 25.4;

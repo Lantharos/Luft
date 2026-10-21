@@ -1,6 +1,6 @@
 import GLib from 'gi://GLib';
 
-import {waitUntil} from './wait.js';
+import {waitUntil} from '../wait.js';
 
 const TRUSTED_APPS = GLib.getenv('KESTREL_TRUSTED_APPS');
 

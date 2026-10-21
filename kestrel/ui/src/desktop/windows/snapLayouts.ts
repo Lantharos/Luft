@@ -3,7 +3,7 @@ import Meta from 'gi://Meta';
 import Mtk from 'gi://Mtk';
 import St from 'gi://St';
 
-import { blurSurface } from '../../shared/surface.js';
+import { blurSurface } from '../../shared/layout/surface.js';
 import { localized, t } from '../../shared/i18n/index.js';
 
 type Zone = [x: number, y: number, width: number, height: number];

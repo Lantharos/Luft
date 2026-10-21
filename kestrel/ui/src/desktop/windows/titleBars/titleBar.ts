@@ -4,7 +4,7 @@ import Meta from 'gi://Meta';
 import Pango from 'gi://Pango';
 import St from 'gi://St';
 
-import { animateActor, Duration } from '../../../shared/motion.js';
+import { animateActor, Duration } from '../../../shared/motion/motion.js';
 import { localized, t } from '../../../shared/i18n/index.js';
 import { ResizeArea } from './resizeArea.js';
 

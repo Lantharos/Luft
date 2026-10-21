@@ -3,7 +3,7 @@ import GObject from 'gi://GObject';
 import St from 'gi://St';
 
 import { localized, t } from '../../../shared/i18n/index.js';
-import { animateActor, Spring } from '../../../shared/motion.js';
+import { animateActor, Spring } from '../../../shared/motion/motion.js';
 import type { QuickControl } from '../quickControls.js';
 
 interface TileParts {

@@ -1,8 +1,8 @@
 import type Clutter from 'gi://Clutter';
 import type Meta from 'gi://Meta';
 
-import { animateActor, Curve, Duration, Spring } from '../../../shared/motion.js';
-import type { Box } from '../../../shared/placement.js';
+import { animateActor, Curve, Duration, Spring } from '../../../shared/motion/motion.js';
+import type { Box } from '../../../shared/layout/placement.js';
 import { banded, type SwipeTrack } from '../../gestures/fourFingers.js';
 import { clampUnit } from '../../../shared/math.js';
 import type { View } from './geometry.js';

@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
 import Meta from 'gi://Meta';
 
-import type { Box } from '../../shared/placement.js';
+import type { Box } from '../../shared/layout/placement.js';
 import { boxOf, setEdgesTiled, setUnconstrained } from '../windows/frames.js';
 import { TiledSpace } from './layouts/tiledSpace.js';
 import { FloatingMemory } from './memory.js';

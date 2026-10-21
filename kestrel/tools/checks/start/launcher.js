@@ -4,8 +4,8 @@ import {named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {renderedFrame} from '../lib/screenshots.js';
 import {settled} from '../lib/wait.js';
-import {areaOf} from './backdrops/coverage.js';
-import {sweepBackdrops} from './backdrops/sweep.js';
+import {areaOf} from '../panel/backdrops/coverage.js';
+import {sweepBackdrops} from '../panel/backdrops/sweep.js';
 import {measureMark} from './launcher/layers.js';
 
 const {require} = checks('Start button');

@@ -2,7 +2,7 @@ import Clutter from 'gi://Clutter';
 import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {checks} from '../lib/check.js';
-import {moveTo} from '../lib/input.js';
+import {moveTo} from '../lib/input/input.js';
 import {capture, renderedFrame} from '../lib/screenshots.js';
 import {settled, waitUntil} from '../lib/wait.js';
 import {board, boardResting, leaveBoard, onWholePixels, openWindows, showBoard, windowNamed} from './lib/board.js';

@@ -2,8 +2,8 @@ import Clutter from 'gi://Clutter';
 import Shell from 'gi://Shell';
 
 import {checks} from '../../lib/check.js';
-import {press} from '../../lib/input.js';
-import {LuftApp} from '../../lib/luftApp.js';
+import {press} from '../../lib/input/input.js';
+import {LuftApp} from '../../lib/apps/luftApp.js';
 import {windows} from '../../lib/processes.js';
 import {pause} from '../../lib/wait.js';
 import {openApp} from '../lib/apps.js';

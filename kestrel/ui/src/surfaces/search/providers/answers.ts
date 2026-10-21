@@ -4,7 +4,7 @@ import St from 'gi://St';
 import { formatsLocale, t } from '../../../shared/i18n/index.js';
 import { prewarmSoon } from '../../prewarm.js';
 import { answer, answerSteps, type Answer, type Location } from '../answers/answers.js';
-import type { Day } from '../../../shared/days.js';
+import type { Day } from '../../../shared/time/days.js';
 import { wallClock, zoneOffset, type Parts } from '../answers/calendar.js';
 import { knownZone } from '../answers/zones.js';
 import { themedIcon } from '../icons.js';

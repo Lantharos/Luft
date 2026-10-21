@@ -2,7 +2,7 @@ import Clutter from 'gi://Clutter';
 
 import {named, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {chord, drag, press} from '../lib/input.js';
+import {chord, drag, press} from '../lib/input/input.js';
 import {gjs, stop, waitForWindow} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {pause} from '../lib/wait.js';
@@ -48,7 +48,7 @@ async function checkTaskView(game) {
 }
 
 async function checkGame(backend, panel) {
-  const process = gjs('clients/game.js', [], {env: {GDK_BACKEND: backend}});
+  const process = gjs('clients/apps/game.js', [], {env: {GDK_BACKEND: backend}});
   const game = await waitForWindow(`Kestrel game ${backend}`);
   await eventually(() => game.is_fullscreen() && global.display.focus_window === game, `a ${backend} game goes fullscreen with focus`);
   await eventually(() => !panel.visible, `a fullscreen ${backend} game hides the taskbar`);

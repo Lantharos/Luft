@@ -8,7 +8,7 @@ import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {descendants, firstStyled, named, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {centerOf, drag, fingerScroll, keyboard, liftFingers, moveTo, rest} from '../lib/input.js';
+import {centerOf, drag, fingerScroll, keyboard, liftFingers, moveTo, rest} from '../lib/input/input.js';
 import {gjs, repository, scratch, spawn, stop, waitForWindow} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {pause, settled} from '../lib/wait.js';
@@ -118,7 +118,7 @@ async function checkPill() {
   const mixer = Shell.Mixer.get_default();
   const service = gjs('services/speech.js');
   await eventually(() => owned(SPEECH), 'the stand-in dictation service is on the session bus');
-  const entry = gjs('clients/window.js', ['--entry']);
+  const entry = gjs('clients/windows/window.js', ['--entry']);
   const window = await waitForWindow('Kestrel window check');
   await eventually(() => window.has_focus() && Main.inputMethod.currentFocus, 'the text field takes the keyboard');
 
@@ -162,7 +162,7 @@ async function checkPill() {
   await eventually(() => !privacy().visible, 'and goes once it stops');
   await stop(entry);
 
-  const x11 = gjs('clients/window.js', ['--entry'], {env: {GDK_BACKEND: 'x11', GTK_IM_MODULE: 'ibus'}});
+  const x11 = gjs('clients/windows/window.js', ['--entry'], {env: {GDK_BACKEND: 'x11', GTK_IM_MODULE: 'ibus'}});
   const x11Window = await waitForWindow('Kestrel window check');
   await eventually(() => x11Window.has_focus(), 'the X11 text field takes the keyboard');
   holdCopilot();
@@ -281,7 +281,7 @@ async function checkInputWhileHolding(window, {name, down, up}) {
 async function checkHoldLeavesInputAlone() {
   const service = gjs('services/speech.js');
   await eventually(() => owned(SPEECH), 'the stand-in dictation service is on the session bus');
-  const app = gjs('clients/window.js', ['--input']);
+  const app = gjs('clients/windows/window.js', ['--input']);
   const window = await waitForWindow('Kestrel window check');
   await eventually(() => window.has_focus(), 'the app takes the keyboard');
 
@@ -373,7 +373,7 @@ async function checkDictation(service, keybindings) {
   const expected = words(new TextDecoder().decode(GLib.file_get_contents(GLib.build_filenamev([RECORDING, 'speech.txt']))[1]));
   const size = Gio.File.new_for_path(GLib.build_filenamev([RECORDING, 'speech.wav'])).query_info('standard::size', Gio.FileQueryInfoFlags.NONE, null).get_size();
   const seconds = (size - WAV_HEADER) / BYTES_PER_SECOND;
-  const entry = gjs('clients/window.js', ['--entry']);
+  const entry = gjs('clients/windows/window.js', ['--entry']);
   const window = await waitForWindow('Kestrel window check');
   await eventually(() => window.has_focus() && Main.inputMethod.currentFocus, 'the text field takes the keyboard');
 
@@ -392,7 +392,7 @@ async function checkDictation(service, keybindings) {
   await checkShortcut(window, seconds, expected, keybindings);
   await stop(entry);
 
-  const x11 = gjs('clients/window.js', ['--entry'], {env: {GDK_BACKEND: 'x11', GTK_IM_MODULE: 'ibus'}});
+  const x11 = gjs('clients/windows/window.js', ['--entry'], {env: {GDK_BACKEND: 'x11', GTK_IM_MODULE: 'ibus'}});
   const x11Window = await waitForWindow('Kestrel window check');
   require(x11Window.get_client_type() === Meta.WindowClientType.X11, 'the second text field runs under Xwayland');
   await eventually(() => x11Window.has_focus(), 'the X11 text field takes the keyboard');

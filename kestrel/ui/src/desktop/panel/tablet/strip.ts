@@ -2,7 +2,7 @@ import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
 import { BatteryIndicator } from '../../../shared/battery/indicator.js';
-import { animateActor, Spring } from '../../../shared/motion.js';
+import { animateActor, Spring } from '../../../shared/motion/motion.js';
 import { localized, t } from '../../../shared/i18n/index.js';
 import { PanelClock } from '../widgets/clock.js';
 

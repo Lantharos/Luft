@@ -2,10 +2,10 @@ import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
 import { formatsLocale, t } from '../../../shared/i18n/index.js';
-import { animateActor, projection, Spring } from '../../../shared/motion.js';
+import { animateActor, projection, Spring } from '../../../shared/motion/motion.js';
 import { MonthScroll } from './monthScroll.js';
 import { weekRow, WeekStrip } from './weekStrip.js';
-import { dayNumber, dayOf } from '../../../shared/days.js';
+import { dayNumber, dayOf } from '../../../shared/time/days.js';
 import { dateOf, firstOfMonth, isoWeek, monthIndex, Weeks } from './weeks.js';
 import { WeekStart } from './weekStart.js';
 

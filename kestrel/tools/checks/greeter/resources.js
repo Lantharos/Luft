@@ -2,7 +2,7 @@ import GLib from 'gi://GLib';
 
 import {named, shown} from '../lib/actors.js';
 import {pause, settled} from '../lib/wait.js';
-import {require} from './prompt.js';
+import {require} from './lib/prompt.js';
 
 const CLOCK_TICKS = 100;
 const IDLE_SAMPLE = 5000;

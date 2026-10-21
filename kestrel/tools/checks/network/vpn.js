@@ -8,7 +8,7 @@ import {VpnSecrets} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 
 import {descendants, labelled, shownStyled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {click, press, type} from '../lib/input.js';
+import {click, press, type} from '../lib/input/input.js';
 import {fixture, firstLine, scratch, spawn} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {settled, waitUntil} from '../lib/wait.js';

@@ -4,7 +4,7 @@ import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {hold, moveTo, pressButton, release, releaseButton, scroll} from '../lib/input.js';
+import {hold, moveTo, pressButton, release, releaseButton, scroll} from '../lib/input/input.js';
 import {stop, waitForWindow} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {nextFrame, pause} from '../lib/wait.js';

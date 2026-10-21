@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
 import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
-import {rest} from '../../lib/input.js';
+import {rest} from '../../lib/input/input.js';
 import {captureFrame} from '../../lib/screenshots.js';
 import {waitUntil} from '../../lib/wait.js';
 import {WALLPAPERS} from './wallpapers.js';

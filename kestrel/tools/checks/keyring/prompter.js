@@ -5,7 +5,7 @@ import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {descendants, firstStyled, labelled, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {click, press, type} from '../lib/input.js';
+import {click, press, type} from '../lib/input/input.js';
 import {capture} from '../lib/screenshots.js';
 import {KeyringClient, SecretPipe, focusedEntry, handle, keyringDialog, openedDialog} from './lib/client.js';
 

@@ -1,5 +1,5 @@
-import {contrast, luminance} from '../../system/lib/colors.js';
-import {measureInk} from '../backdrops/coverage.js';
+import {contrast, luminance} from '../../lib/colors.js';
+import {measureInk} from '../../panel/backdrops/coverage.js';
 
 async function measureLayer(layers, index, area) {
   layers.forEach((layer, other) => (layer.opacity = other === index ? 255 : 0));

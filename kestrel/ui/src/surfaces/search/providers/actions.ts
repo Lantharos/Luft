@@ -1,5 +1,5 @@
 import { t } from '../../../shared/i18n/index.js';
-import { launchHistory } from '../../../shared/launchHistory.js';
+import { launchHistory } from '../../../shared/apps/launchHistory.js';
 import type { QuickControl, QuickSettingsSource } from '../../quickSettings/quickControls.js';
 import { LOCK, POWER_ACTIONS, isAvailable, type SessionAction } from '../../quickSettings/sessionActions.js';
 import { themedIcon } from '../icons.js';

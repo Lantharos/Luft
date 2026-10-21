@@ -1,6 +1,6 @@
 import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 
-import {moveTo} from '../../lib/input.js';
+import {moveTo} from '../../lib/input/input.js';
 import {gjs, stop, waitForWindow} from '../../lib/processes.js';
 import {bottomGap, eventually, FLOATING_MARGIN, HEIGHTS, panel, panelBox, primary, set} from './taskbar.js';
 
@@ -43,7 +43,7 @@ export async function checkAlways() {
 
 export async function checkWindows() {
   set('taskbar-auto-hide', 'windows');
-  const app = gjs('clients/window.js');
+  const app = gjs('clients/windows/window.js');
   const window = await waitForWindow('Kestrel window check');
   const monitor = primary();
   await eventually(() => panel().visible && bottomGap() === 0, 'the taskbar stays while no window touches it');

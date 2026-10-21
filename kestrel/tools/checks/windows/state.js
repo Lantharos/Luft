@@ -2,9 +2,9 @@ import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 
 import {checks} from '../lib/check.js';
-import {withFullAccess} from '../lib/fullAccess.js';
+import {withFullAccess} from '../lib/access/fullAccess.js';
 import {fixture, spawn, stop, waitForWindow} from '../lib/processes.js';
-import {launch, openSecurityContext, through} from '../lib/sandbox.js';
+import {launch, openSecurityContext, through} from '../lib/access/sandbox.js';
 
 const {require, eventually} = checks('window state');
 const CLIENT = fixture('clients', 'wayland', 'windowStateClient.py');

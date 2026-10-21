@@ -8,8 +8,8 @@ import {withApp} from '../apps/lib/apps.js';
 import {show} from '../apps/settings/navigation.js';
 import {firstStyled, named, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {centerOf, fingerScroll, liftFingers, moveTo, press, rest} from '../lib/input.js';
-import {appBinary} from '../lib/luftApp.js';
+import {centerOf, fingerScroll, liftFingers, moveTo, press, rest} from '../lib/input/input.js';
+import {appBinary} from '../lib/apps/luftApp.js';
 import {fixture, gjs, scratch, spawn, stop, waitForWindow} from '../lib/processes.js';
 import {captureFrame} from '../lib/screenshots.js';
 import {pause, settled} from '../lib/wait.js';
@@ -51,7 +51,7 @@ async function finish() {
 }
 
 async function checkGtk() {
-  const process = gjs('clients/window.js', ['--scroll']);
+  const process = gjs('clients/windows/window.js', ['--scroll']);
   const window = await waitForWindow('Kestrel window check');
   window.activate(global.get_current_time());
   await scrollOver(centerOf(window.get_compositor_private()));
@@ -62,7 +62,7 @@ async function checkGtk() {
 }
 
 async function checkShell() {
-  const process = gjs('clients/window.js', ['--entry']);
+  const process = gjs('clients/windows/window.js', ['--entry']);
   const window = await waitForWindow('Kestrel window check');
   await eventually(() => window.has_focus() && Main.inputMethod.caret, 'the text field takes the keyboard');
   press(Clutter.KEY_Super_L, Clutter.KEY_period);

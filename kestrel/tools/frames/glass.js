@@ -2,7 +2,7 @@ import {dismissImmediately, toggleSurface} from 'resource:///com/lantharos/kestr
 import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {named} from '../checks/lib/actors.js';
-import {rest, rightClick} from '../checks/lib/input.js';
+import {rest, rightClick} from '../checks/lib/input/input.js';
 import {settled, waitUntil} from '../checks/lib/wait.js';
 import {findWindow, fixture, spawn, waitForWindow} from '../checks/lib/processes.js';
 import {eachFrame} from './recorder.js';

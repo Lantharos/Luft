@@ -2,7 +2,7 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 
 import { formatsLocale, locale } from '../../shared/i18n/index.js';
-import { keyLabel } from '../../shared/keys.js';
+import { keyLabel } from '../../shared/input/keys.js';
 
 const MEDIA_KEYS = 'com.lantharos.kestrel.media-keys';
 const CUSTOM_KEYBINDINGS = 'custom-keybindings';

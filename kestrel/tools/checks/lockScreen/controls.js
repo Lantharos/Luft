@@ -5,7 +5,7 @@ import {battery} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 
 import {named, showsText, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {press} from '../lib/input.js';
+import {press} from '../lib/input/input.js';
 import {capture} from '../lib/screenshots.js';
 import {settled} from '../lib/wait.js';
 import {lockAndWake, showPrompt, unlock} from './lib/shield.js';

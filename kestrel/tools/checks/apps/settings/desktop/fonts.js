@@ -3,22 +3,20 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Pango from 'gi://Pango';
 
-import {firstStyled} from '../../lib/actors.js';
-import {checks} from '../../lib/check.js';
-import {press, scroll, type} from '../../lib/input.js';
-import {gjs, stop, waitForWindow} from '../../lib/processes.js';
-import {captureFrame, output} from '../../lib/screenshots.js';
-import {settled, waitUntil} from '../../lib/wait.js';
-import {changes, withApp} from '../lib/apps.js';
-import {show} from './navigation.js';
+import {firstStyled} from '../../../lib/actors.js';
+import {checks} from '../../../lib/check.js';
+import {press, type} from '../../../lib/input/input.js';
+import {gjs, stop, waitForWindow} from '../../../lib/processes.js';
+import {captureFrame, output} from '../../../lib/screenshots.js';
+import {settled, waitUntil} from '../../../lib/wait.js';
+import {changes, withApp} from '../../lib/apps.js';
+import {showEnd} from '../navigation.js';
 
 const {require, eventually} = checks('Luft app');
 const DEFAULTS = {'font-name': 'Open Runde', 'monospace-font-name': 'Maple Mono NF'};
 const CHOSEN = {'font-name': 'Noto Serif', 'monospace-font-name': 'Noto Sans Mono'};
 const SIZE = 11;
 const PICKERS = {'font-name': [900, 275], 'monospace-font-name': [900, 343]};
-const SCROLL_POINT = [650, 400];
-const SCROLL_STEPS = 5;
 const LARGER_TEXT = 1.25;
 const TERMINAL_TEXT = 'fn main() -> Result<(), Error> { 0x1F != 0o17 }  The quick brown fox 0123456789';
 const ZOOM = 4;
@@ -85,17 +83,6 @@ async function pick(app, key, family, shot = null) {
   press(Clutter.KEY_Return);
 }
 
-async function scrollToFonts(app) {
-  await show(app, 'appearance');
-  let before;
-  let after = await app.frame();
-  do {
-    before = after;
-    for (let step = 0; step < SCROLL_STEPS; step++) scroll(Clutter.ScrollDirection.DOWN, app.at(SCROLL_POINT));
-    after = await app.settle(frame => !frame.looksLike(before));
-  } while (!after.looksLike(before));
-}
-
 async function checkChoosing(app, surfaces, clock) {
   const shellFamily = () => Pango.FontDescription.from_string(clock.clutter_text.font_name).get_family();
   const titled = (match, font) => () => global.display.list_all_windows().find(textWindow(match))?.get_title().endsWith(`: ${font}`);
@@ -144,8 +131,8 @@ export async function checkFonts(app) {
   GLib.mkdir_with_parents(GLib.path_get_dirname(output('fonts/shell-default')), 0o755);
   let windows = [];
   try {
-    await scrollToFonts(app);
-    windows = [gjs('clients/textWindow.js', ['4.0']), gjs('clients/textWindow.js', ['3.0'], {env: {GDK_BACKEND: 'x11'}})];
+    await showEnd(app, 'appearance');
+    windows = [gjs('clients/windows/textWindow.js', ['4.0']), gjs('clients/windows/textWindow.js', ['3.0'], {env: {GDK_BACKEND: 'x11'}})];
     await withApp('tern', ['-e', 'sh', '-c', `printf '%s\\n' '${TERMINAL_TEXT}'; sleep 600`], async tern => {
       const [gtk4, xwayland] = await Promise.all(['4.0', '3.0'].map(version => waitForWindow(textWindow(version), `the GTK ${version} text window opens`)));
       const clock = firstStyled('kestrel-clock');

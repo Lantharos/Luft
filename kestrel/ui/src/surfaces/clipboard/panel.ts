@@ -6,8 +6,8 @@ import St from 'gi://St';
 
 import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
 import { localized, t } from '../../shared/i18n/index.js';
-import { blurSurface } from '../../shared/surface.js';
-import { boxCenter, findAnchor, heightNear, placeNear, type Anchor, type Box } from '../../shared/placement.js';
+import { blurSurface } from '../../shared/layout/surface.js';
+import { boxCenter, findAnchor, heightNear, placeNear, type Anchor, type Box } from '../../shared/layout/placement.js';
 import type { TextInput } from '../../shared/input/textInput.js';
 import { ClipboardHistory, TEXT_MIME_TYPES, type ClipboardEntry } from './history.js';
 import type { Thumbnail } from './thumbnail.js';

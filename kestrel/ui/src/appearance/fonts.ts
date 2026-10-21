@@ -1,7 +1,7 @@
 import type Clutter from 'gi://Clutter';
 import Shell from 'gi://Shell';
 
-import { FontconfigSerial } from '../shared/fontconfig.js';
+import { FontconfigSerial } from '../shared/display/fontconfig.js';
 
 const { fonts_refresh: refreshFonts } = Shell as unknown as { fonts_refresh(stage: Clutter.Actor, datadir: string): boolean };
 

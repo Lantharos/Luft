@@ -1,4 +1,4 @@
-import { dayNumber, fromDayNumber, type Day } from '../../../shared/days.js';
+import { dayNumber, fromDayNumber, type Day } from '../../../shared/time/days.js';
 import type { SpanUnit } from './vocabulary.js';
 
 export interface Parts {

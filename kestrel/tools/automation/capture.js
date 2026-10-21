@@ -3,7 +3,7 @@ import GLib from 'gi://GLib';
 import {dismissImmediately} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
-import {rest} from '../checks/lib/input.js';
+import {rest} from '../checks/lib/input/input.js';
 import {stopAll} from '../checks/lib/processes.js';
 import {settled} from '../checks/lib/wait.js';
 import {endSession, runGroup} from './runner.js';

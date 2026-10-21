@@ -5,7 +5,7 @@ import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {moveTo, press, pressButton, releaseButton, rest} from '../lib/input.js';
+import {moveTo, press, pressButton, releaseButton, rest} from '../lib/input/input.js';
 import {gjs, stop, waitForWindow} from '../lib/processes.js';
 import {capture, captureFrame} from '../lib/screenshots.js';
 import {nextFrame, settled} from '../lib/wait.js';
@@ -121,7 +121,7 @@ async function checkKeyboardMove(window, backend) {
 }
 
 async function checkBackend(backend) {
-  const client = gjs('clients/tiledWindow.js', [], {env: {GDK_BACKEND: backend}});
+  const client = gjs('clients/windows/tiledWindow.js', [], {env: {GDK_BACKEND: backend}});
   const window = await waitForWindow(candidate => candidate.get_title()?.startsWith(`Kestrel tiled ${backend}:`));
   try {
     window.move_to_monitor(global.display.get_primary_monitor());

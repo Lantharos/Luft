@@ -6,7 +6,7 @@ import {captureScreenshot} from 'resource:///com/lantharos/kestrel/ui/screenshot
 
 import {checks} from '../lib/check.js';
 import {call} from '../lib/dbus.js';
-import {press} from '../lib/input.js';
+import {press} from '../lib/input/input.js';
 import {gjs} from '../lib/processes.js';
 import {pause} from '../lib/wait.js';
 
@@ -48,7 +48,7 @@ async function takeScreenshot() {
 }
 
 function ringBell() {
-  return gjs('clients/bell.js').exited;
+  return gjs('clients/apps/bell.js').exited;
 }
 
 export async function run() {

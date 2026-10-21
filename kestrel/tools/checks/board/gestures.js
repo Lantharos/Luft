@@ -4,7 +4,7 @@ import {Spring, touchpad as handleTouchpad} from 'resource:///com/lantharos/kest
 import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {checks} from '../lib/check.js';
-import {moveTo, pinch, swipe as swipeOver} from '../lib/input.js';
+import {moveTo, pinch, swipe as swipeOver} from '../lib/input/input.js';
 import {stopAll} from '../lib/processes.js';
 import {nextFrame, pause, settled} from '../lib/wait.js';
 import {board, boardResting, boardWindows, leaveBoard, openWindows, showBoard, windowNamed} from './lib/board.js';

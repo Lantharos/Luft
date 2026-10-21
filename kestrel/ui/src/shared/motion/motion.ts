@@ -1,9 +1,9 @@
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
-import { Spring } from '../../../../packages/motion/src/index';
+import { Spring } from '../../../../../packages/motion/src/index';
 
-export { Curve, Duration, Gesture, projection, rubberband, Spring, type SpringToken } from '../../../../packages/motion/src/index';
+export { Curve, Duration, Gesture, projection, rubberband, Spring, type SpringToken } from '../../../../../packages/motion/src/index';
 
 interface EasingActor extends Clutter.Actor {
   ease(params: Record<string, unknown>): void;

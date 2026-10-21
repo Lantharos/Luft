@@ -4,7 +4,7 @@ import {getInputSourceManager} from 'resource:///com/lantharos/kestrel/ui/status
 
 import {named} from '../../lib/actors.js';
 import {checks} from '../../lib/check.js';
-import {click} from '../../lib/input.js';
+import {click} from '../../lib/input/input.js';
 import {changes, withApp} from '../lib/apps.js';
 import {exists, read, write} from '../lib/files.js';
 import {saveBothStyles} from '../lib/palette.js';

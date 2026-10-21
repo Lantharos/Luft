@@ -1,7 +1,7 @@
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
 
-import { afterMotion, dropAfterMotion } from '../../shared/afterMotion.js';
+import { afterMotion, dropAfterMotion } from '../../shared/motion/afterMotion.js';
 import { portalObject } from '../core/exported.js';
 import { SUCCESS, respond, type Invocation } from '../core/request.js';
 

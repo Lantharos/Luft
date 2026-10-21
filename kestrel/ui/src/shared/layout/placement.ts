@@ -1,4 +1,4 @@
-import { clamp } from './math.js';
+import { clamp } from '../math.js';
 
 export interface Box {
   x: number;

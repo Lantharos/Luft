@@ -4,8 +4,8 @@ import St from 'gi://St';
 
 import type { Context } from '../../../context.js';
 import { taskbarPreferences } from '../../../desktop/panel/preferences/taskbarPreferences.js';
-import { animateActor, Curve, Duration, reducedMotion, Spring } from '../../../shared/motion.js';
-import { blurSurface, SURFACE_GAP } from '../../../shared/surface.js';
+import { animateActor, Curve, Duration, reducedMotion, Spring } from '../../../shared/motion/motion.js';
+import { blurSurface, SURFACE_GAP } from '../../../shared/layout/surface.js';
 import { Waveform } from './waveform.js';
 
 const PILL = 999;

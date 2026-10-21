@@ -7,7 +7,7 @@ import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 
 import {named, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {press} from '../lib/input.js';
+import {press} from '../lib/input/input.js';
 import {gjs, waitForWindow} from '../lib/processes.js';
 import {capture, screenshot} from '../lib/screenshots.js';
 import {settled} from '../lib/wait.js';
@@ -83,7 +83,7 @@ async function checkScreenshot() {
 }
 
 async function checkPaste({shot, content}) {
-  gjs('clients/window.js', ['--paste']);
+  gjs('clients/windows/window.js', ['--paste']);
   const window = await waitForWindow('Kestrel window check');
   await eventually(() => window.has_focus(), 'the app takes the keyboard');
   clipboard.set_text(St.ClipboardType.CLIPBOARD, 'Copied after the screenshot');

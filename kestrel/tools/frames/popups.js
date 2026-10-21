@@ -3,7 +3,7 @@ import {dismissImmediately, toggleSurface} from 'resource:///com/lantharos/kestr
 import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {named, shown, shownStyled} from '../checks/lib/actors.js';
-import {press, rest} from '../checks/lib/input.js';
+import {press, rest} from '../checks/lib/input/input.js';
 import {gjs, stop, waitForWindow} from '../checks/lib/processes.js';
 import {settled, waitUntil} from '../checks/lib/wait.js';
 import {lock, unlock, wake} from '../checks/lockScreen/lib/shield.js';
@@ -15,7 +15,7 @@ let entry = null;
 
 async function focusEntry() {
   dismissImmediately();
-  entry ??= gjs('clients/window.js', ['--entry']);
+  entry ??= gjs('clients/windows/window.js', ['--entry']);
   const window = await waitForWindow(ENTRY_TITLE);
   window.activate(global.get_current_time());
   await waitUntil(() => window.has_focus() && Main.inputMethod.caret, 'the text field takes the keyboard');

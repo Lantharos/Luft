@@ -2,7 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import {checks} from '../../lib/check.js';
-import {call} from '../../lib/portal.js';
+import {call} from '../../lib/access/portal.js';
 import {makeVideo, wallpapers} from './video.js';
 
 const {require, eventually} = checks('live wallpaper');

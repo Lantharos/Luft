@@ -4,7 +4,7 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import type { Monitor } from '../../panel/panel.js';
-import type { Box } from '../../../shared/placement.js';
+import type { Box } from '../../../shared/layout/placement.js';
 import { clampUnit } from '../../../shared/math.js';
 import type { View } from './geometry.js';
 

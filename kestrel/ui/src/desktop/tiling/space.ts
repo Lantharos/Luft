@@ -1,6 +1,6 @@
 import type Meta from 'gi://Meta';
 
-import type { Box } from '../../shared/placement.js';
+import type { Box } from '../../shared/layout/placement.js';
 import type { Direction } from './layouts/geometry.js';
 
 export interface SpaceHost {

@@ -1,7 +1,7 @@
 import type Meta from 'gi://Meta';
 
-import type { Box } from '../../../shared/placement.js';
-import { projection, rubberband } from '../../../shared/motion.js';
+import type { Box } from '../../../shared/layout/placement.js';
+import { projection, rubberband } from '../../../shared/motion/motion.js';
 import { axisOf, forward, type Direction } from '../layouts/geometry.js';
 import { edgesMoved } from '../placement.js';
 import type { Space, SpaceHost } from '../space.js';

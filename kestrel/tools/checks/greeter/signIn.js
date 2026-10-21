@@ -1,10 +1,10 @@
 import Clutter from 'gi://Clutter';
 
 import {named, shown} from '../lib/actors.js';
-import {press, type} from '../lib/input.js';
+import {press, type} from '../lib/input/input.js';
 import {capture} from '../lib/screenshots.js';
 import {pause} from '../lib/wait.js';
-import {eventually, promptState} from './prompt.js';
+import {eventually, promptState} from './lib/prompt.js';
 
 const CLOSE_TIMEOUT = 5000;
 

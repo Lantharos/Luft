@@ -3,11 +3,11 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
-import {checks} from '../../lib/check.js';
-import {drag, moveTo, scroll} from '../../lib/input.js';
-import {repository} from '../../lib/processes.js';
-import {capture} from '../../lib/screenshots.js';
-import {show} from './navigation.js';
+import {checks} from '../../../lib/check.js';
+import {drag, moveTo, scroll} from '../../../lib/input/input.js';
+import {repository} from '../../../lib/processes.js';
+import {capture} from '../../../lib/screenshots.js';
+import {show} from '../navigation.js';
 
 const {eventually} = checks('Luft app');
 const SCROLL_POINT = [650, 400];

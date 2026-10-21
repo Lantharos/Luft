@@ -3,7 +3,7 @@ import Gio from 'gi://Gio';
 
 import {named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {click, press, rest, rightClick} from '../lib/input.js';
+import {click, press, rest, rightClick} from '../lib/input/input.js';
 import {capture} from '../lib/screenshots.js';
 
 const {eventually} = checks('pinning');

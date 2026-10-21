@@ -1,6 +1,6 @@
 import Gio from 'gi://Gio';
 
-import { refuseSandboxed } from '../../shared/sandbox.js';
+import { refuseSandboxed } from '../../shared/dbus/sandbox.js';
 import { soundPlayer } from './player.js';
 import { onlyErrors } from './situation.js';
 import { playNamedSound } from './sounds.js';

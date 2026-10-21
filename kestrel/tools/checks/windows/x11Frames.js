@@ -10,7 +10,7 @@ const WINDOWS = [['Field notes', '#e8e4da', 520, 300], ['Sketchbook', '#2e3a46',
 const TITLEBAR = {light: 'surfaceContainer', dark: 'surfaceDim'};
 
 async function open([title, background, x, y]) {
-  gjs('clients/x11Window.js', [title, background]);
+  gjs('clients/x11/x11Window.js', [title, background]);
   const window = await waitForWindow(title, `the X11 window ${title} opens`);
   window.move_frame(true, x, y);
   return window;

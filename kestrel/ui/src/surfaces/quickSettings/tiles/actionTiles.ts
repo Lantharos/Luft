@@ -8,7 +8,7 @@ import { BatteryIndicator } from '../../../shared/battery/indicator.js';
 import { LOCK, bindAvailability } from '../sessionActions.js';
 import { openSettings, type SettingsPageId } from '../../../system/settingsPages.js';
 import { actionTile, TILE_ICON_SIZE, type ActionTile } from './controlTile.js';
-import { shortDuration } from '../../../shared/duration.js';
+import { shortDuration } from '../../../shared/time/duration.js';
 
 export interface Tile {
   id: string;

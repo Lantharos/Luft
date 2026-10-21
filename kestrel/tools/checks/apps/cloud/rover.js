@@ -1,7 +1,7 @@
 import Clutter from 'gi://Clutter';
 
 import {checks} from '../../lib/check.js';
-import {press, type} from '../../lib/input.js';
+import {press, type} from '../../lib/input/input.js';
 import {waitUntil} from '../../lib/wait.js';
 import {changes} from '../lib/apps.js';
 import {keep, states} from './service.js';

@@ -1,7 +1,7 @@
 import GLib from 'gi://GLib';
 
 import {checks} from '../lib/check.js';
-import {rest} from '../lib/input.js';
+import {rest} from '../lib/input/input.js';
 import {spawn, windows} from '../lib/processes.js';
 import {pause} from '../lib/wait.js';
 import {changes, openApp, withApp} from './lib/apps.js';

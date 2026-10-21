@@ -8,7 +8,7 @@ import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 import {named, shown, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {call} from '../lib/dbus.js';
-import {centerOf, type} from '../lib/input.js';
+import {centerOf, type} from '../lib/input/input.js';
 import {gjs, stop} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {pause, settled} from '../lib/wait.js';

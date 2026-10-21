@@ -6,7 +6,7 @@ import St from 'gi://St';
 import {ScratchKeyring} from '../../fixtures/services/secretService.js';
 import {descendants, firstStyled, labelled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {click, press, type} from '../lib/input.js';
+import {click, press, type} from '../lib/input/input.js';
 import {repository, scratch, spawn} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {focusedEntry, keyringDialog, openedDialog} from './lib/client.js';

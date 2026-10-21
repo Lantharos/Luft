@@ -8,11 +8,11 @@ import type { WindowPreviews } from '../windowPreviews.js';
 import type { ContextMenus } from '../../menus/contextMenus.js';
 import { taskbarPreferences, type TaskbarMetrics } from '../preferences/taskbarPreferences.js';
 import { appIcon } from '../../../appearance/icons/appIcons.js';
-import { animateActor, liftIcon } from '../../../shared/motion.js';
+import { animateActor, liftIcon } from '../../../shared/motion/motion.js';
 import { TaskbarDrop } from './taskbarDrop.js';
 import { AppIndicators } from './appIndicators.js';
 import { launcherEntries } from './launcherEntries.js';
-import { appKey, launchHistory } from '../../../shared/launchHistory.js';
+import { appKey, launchHistory } from '../../../shared/apps/launchHistory.js';
 import * as DND from 'resource:///com/lantharos/kestrel/ui/dnd.js';
 
 const DOT_SIZE = 4;

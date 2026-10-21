@@ -1,7 +1,7 @@
 import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 
-import {nextFrame, pause} from './wait.js';
+import {nextFrame, pause} from '../wait.js';
 
 const DRAG_STEP = 16;
 const REST = [20, 20];

@@ -3,7 +3,7 @@ import {touchpad as handleTouchpad} from 'resource:///com/lantharos/kestrel/ui/k
 
 import {openBoardWindow, windowNamed} from '../checks/board/lib/board.js';
 import {touchpad} from '../checks/board/lib/touchpad.js';
-import {chord} from '../checks/lib/input.js';
+import {chord} from '../checks/lib/input/input.js';
 import {stop, waitForWindow} from '../checks/lib/processes.js';
 import {area, focus, resetTiling, restingTiles, useTiling} from '../checks/tiling/lib/tiling.js';
 import {eachFrame, measured} from './recorder.js';

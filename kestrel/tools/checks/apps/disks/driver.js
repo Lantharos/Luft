@@ -4,7 +4,7 @@ import GLib from 'gi://GLib';
 
 import {checks} from '../../lib/check.js';
 import {call} from '../../lib/dbus.js';
-import {hold, press, release, type} from '../../lib/input.js';
+import {hold, press, release, type} from '../../lib/input/input.js';
 import {changes} from '../lib/apps.js';
 
 const {eventually} = checks('Luft app');

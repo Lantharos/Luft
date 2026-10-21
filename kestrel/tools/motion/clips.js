@@ -4,7 +4,7 @@ import {dismissImmediately, switchWorkspace, toggleSurface, touchpad as handleTo
 
 import {leaveBoard, openBoardWindow, openWindows, showBoard} from '../checks/board/lib/board.js';
 import {touchpad} from '../checks/board/lib/touchpad.js';
-import {chord, rest, swipe} from '../checks/lib/input.js';
+import {chord, rest, swipe} from '../checks/lib/input/input.js';
 import {stop, stopAll, waitForWindow} from '../checks/lib/processes.js';
 import {nextFrame, pause, settled} from '../checks/lib/wait.js';
 

@@ -6,9 +6,9 @@ import {checks} from '../lib/check.js';
 import {gjs, stop} from '../lib/processes.js';
 import {renderedFrame} from '../lib/screenshots.js';
 import {settled} from '../lib/wait.js';
-import {contrast} from '../system/lib/colors.js';
-import {areaOf, measureInk} from './backdrops/coverage.js';
-import {sweepBackdrops} from './backdrops/sweep.js';
+import {contrast} from '../lib/colors.js';
+import {areaOf, measureInk} from '../panel/backdrops/coverage.js';
+import {sweepBackdrops} from '../panel/backdrops/sweep.js';
 
 const {require, eventually} = checks('taskbar ink');
 const TEXT_CONTRAST = 4.5;
@@ -42,7 +42,7 @@ async function measure(label) {
 }
 
 export async function run() {
-  const app = gjs('clients/trayApp.js', [TRAY_ICON]);
+  const app = gjs('clients/apps/trayApp.js', [TRAY_ICON]);
   const failures = [];
   battery.pin(BATTERY);
   try {

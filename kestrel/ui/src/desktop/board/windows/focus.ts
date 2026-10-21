@@ -1,7 +1,7 @@
 import Meta from 'gi://Meta';
 
-import { animateActor, Curve, Duration } from '../../../shared/motion.js';
-import type { Box } from '../../../shared/placement.js';
+import { animateActor, Curve, Duration } from '../../../shared/motion/motion.js';
+import type { Box } from '../../../shared/layout/placement.js';
 import { frameBox } from '../../windows/frames.js';
 import { CAMERA_DURATION, type Camera } from '../view/camera.js';
 import { boundsOf, copyView, fitView, nearestInDirection, type View } from '../view/geometry.js';

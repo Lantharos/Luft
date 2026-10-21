@@ -5,8 +5,8 @@ import Shell from 'gi://Shell';
 
 import {firstStyled, named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {centerOf, click, rest} from '../lib/input.js';
-import {LuftApp, sabineService} from '../lib/luftApp.js';
+import {centerOf, click, rest} from '../lib/input/input.js';
+import {LuftApp, sabineService} from '../lib/apps/luftApp.js';
 import {fixture, firstLine, gjs, spawn, waitForWindow} from '../lib/processes.js';
 import {pause, waitUntil} from '../lib/wait.js';
 
@@ -22,7 +22,7 @@ function install(name, backend) {
   const id = `com.lantharos.Kestrel.LateWindow${name}`;
   const title = `Kestrel late window: ${name}`;
   const desktop = GLib.build_filenamev([GLib.get_user_data_dir(), 'applications', `${id}.desktop`]);
-  const command = ['env', `GDK_BACKEND=${backend}`, 'gjs', '-m', fixture('clients', 'lateWindow.js'), id, `'${title}'`, `${DELAY}`].join(' ');
+  const command = ['env', `GDK_BACKEND=${backend}`, 'gjs', '-m', fixture('clients', 'windows', 'lateWindow.js'), id, `'${title}'`, `${DELAY}`].join(' ');
   GLib.mkdir_with_parents(GLib.path_get_dirname(desktop), 0o755);
   GLib.file_set_contents(desktop, `[Desktop Entry]\nType=Application\nName=Late ${name}\nExec=${command}\nStartupNotify=true\nStartupWMClass=${id}\n`);
   return {id: `${id}.desktop`, name, title, remove: () => Gio.File.new_for_path(desktop).delete(null)};
@@ -92,7 +92,7 @@ async function checkLaunches(current, entry) {
 }
 
 const startWithoutLaunch = (title, options = {}) =>
-  gjs('clients/lateWindow.js', ['com.lantharos.Kestrel.LateWindowAutostart', title, `${DELAY}`], {...options, env: NO_LAUNCH_TOKEN});
+  gjs('clients/windows/lateWindow.js', ['com.lantharos.Kestrel.LateWindowAutostart', title, `${DELAY}`], {...options, env: NO_LAUNCH_TOKEN});
 
 async function checkStartedWithoutLaunch(current) {
   const how = 'started without Kestrel, like an autostart app';
@@ -136,7 +136,7 @@ async function checkSabineLaunch(current, interact) {
 export async function run() {
   const entries = [install('Wayland', 'wayland'), install('X11', 'x11')];
   try {
-    spawn(['gjs', '-m', fixture('clients', 'window.js')]);
+    spawn(['gjs', '-m', fixture('clients', 'windows', 'window.js')]);
     const current = await waitForWindow('Kestrel window check');
     for (const entry of await installed(entries)) await checkLaunches(current, entry);
     await checkStartedWithoutLaunch(current);

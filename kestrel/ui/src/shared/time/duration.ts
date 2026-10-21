@@ -1,4 +1,4 @@
-import { locale } from './i18n/index.js';
+import { locale } from '../i18n/index.js';
 
 let cached: { locale: string; format: Intl.DurationFormat } | null = null;
 

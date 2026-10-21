@@ -4,10 +4,10 @@ import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 
 import {named, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {withFullAccess} from '../lib/fullAccess.js';
-import {press} from '../lib/input.js';
+import {withFullAccess} from '../lib/access/fullAccess.js';
+import {press} from '../lib/input/input.js';
 import {fixture, gjs, stop, waitForWindow} from '../lib/processes.js';
-import {bubblewrapped, launch, openSecurityContext, through} from '../lib/sandbox.js';
+import {bubblewrapped, launch, openSecurityContext, through} from '../lib/access/sandbox.js';
 import {settled} from '../lib/wait.js';
 
 const {require, eventually} = checks('background clipboard');
@@ -59,7 +59,7 @@ async function checkPasswordManager(client) {
 }
 
 async function checkX11(client) {
-  const app = gjs('clients/x11Window.js', ['Kestrel X11 copy', '#2f5d8a', 'Copied in X11']);
+  const app = gjs('clients/x11/x11Window.js', ['Kestrel X11 copy', '#2f5d8a', 'Copied in X11']);
   try {
     const window = await waitForWindow('Kestrel X11 copy');
     await eventually(async () => await client.send('paste', 'pasted') === 'Copied in X11', 'background apps read what X11 apps copy');

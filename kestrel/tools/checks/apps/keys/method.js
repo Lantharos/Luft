@@ -2,7 +2,7 @@ import GLib from 'gi://GLib';
 import * as IBusManager from 'resource:///com/lantharos/kestrel/misc/ibusManager.js';
 
 import {checks} from '../../lib/check.js';
-import {type} from '../../lib/input.js';
+import {type} from '../../lib/input/input.js';
 import {capture} from '../../lib/screenshots.js';
 import {settled} from '../../lib/wait.js';
 import {changes, withApp} from '../lib/apps.js';

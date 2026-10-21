@@ -1,7 +1,7 @@
 import Meta from 'gi://Meta';
 import type Mtk from 'gi://Mtk';
 
-import type { Box } from '../../shared/placement.js';
+import type { Box } from '../../shared/layout/placement.js';
 
 const ALL_EDGES = Meta.Direction.LEFT | Meta.Direction.RIGHT | Meta.Direction.TOP | Meta.Direction.BOTTOM;
 

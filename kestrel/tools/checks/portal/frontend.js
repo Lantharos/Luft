@@ -4,8 +4,8 @@ import GLib from 'gi://GLib';
 import {labelled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {call, subscribe} from '../lib/dbus.js';
-import {click} from '../lib/input.js';
-import {BACKEND, PORTAL_PATH, portalDialog} from '../lib/portal.js';
+import {click} from '../lib/input/input.js';
+import {BACKEND, PORTAL_PATH, portalDialog} from '../lib/access/portal.js';
 import {settled} from '../lib/wait.js';
 
 const {require, eventually} = checks('frontend');

@@ -3,7 +3,7 @@ import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 import St from 'gi://St';
 
-import { animateActor } from '../../../shared/motion.js';
+import { animateActor } from '../../../shared/motion/motion.js';
 import { localized, t } from '../../../shared/i18n/index.js';
 
 const PEEK_DELAY = 450;

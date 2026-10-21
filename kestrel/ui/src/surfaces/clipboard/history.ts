@@ -4,7 +4,7 @@ import Meta from 'gi://Meta';
 import St from 'gi://St';
 import System from 'system';
 
-import { whenGraphicsRestored } from '../../shared/graphics.js';
+import { whenGraphicsRestored } from '../../shared/display/graphics.js';
 import { ClipboardImageFiles } from './imageFiles.js';
 import { createThumbnail, type Thumbnail, type ThumbnailBounds } from './thumbnail.js';
 

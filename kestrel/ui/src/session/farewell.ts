@@ -2,7 +2,7 @@ import Clutter from 'gi://Clutter';
 import Cogl from 'gi://Cogl';
 import Gio from 'gi://Gio';
 
-import { animateActor } from '../shared/motion.js';
+import { animateActor } from '../shared/motion/motion.js';
 import { BUS_NAME, FAREWELL_DURATION, MANAGER_PATH } from './manager/interfaces.js';
 
 export class Blackout {

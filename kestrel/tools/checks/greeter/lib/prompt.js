@@ -1,8 +1,8 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-import {styled} from '../lib/actors.js';
-import {checks} from '../lib/check.js';
+import {styled} from '../../lib/actors.js';
+import {checks} from '../../lib/check.js';
 
 export const {require, eventually} = checks('login screen');
 

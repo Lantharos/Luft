@@ -11,7 +11,7 @@ import {property} from '../lib/dbus.js';
 import {scratch} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {pause} from '../lib/wait.js';
-import {contrast} from './lib/colors.js';
+import {contrast} from '../lib/colors.js';
 
 const {require, eventually} = checks('appearance');
 const ROLES = ['primary', 'onPrimary', 'secondary', 'tertiary', 'error', 'surface', 'onSurface', 'surfaceContainerHighest', 'onSurfaceVariant', 'outline'];

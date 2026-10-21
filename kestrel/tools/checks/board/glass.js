@@ -4,7 +4,7 @@ import {battery} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 
 import {descendants, named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {chord, click, press} from '../lib/input.js';
+import {chord, click, press} from '../lib/input/input.js';
 import {settled} from '../lib/wait.js';
 import {board, boardResting, fourFingerSwipe, leaveBoard, openWindows, windowNamed} from './lib/board.js';
 import {onScreen, zoomWithWheel} from './lib/pointer.js';

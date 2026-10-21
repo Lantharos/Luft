@@ -3,13 +3,13 @@ import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {named, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {centerOf, click, rest} from '../lib/input.js';
+import {centerOf, click, rest} from '../lib/input/input.js';
 import {gjs, stopAll, waitForWindow} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {pause, settled} from '../lib/wait.js';
 import {lock, unlock} from '../lockScreen/lib/shield.js';
 import {fold} from '../tablet/lib/touch.js';
-import {closeStart, rows, start} from './search/results.js';
+import {closeStart, rows, start} from '../start/search/results.js';
 
 const {require, eventually} = checks('Hidden taskbar');
 const shell = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
@@ -98,7 +98,7 @@ async function checkLocking() {
 }
 
 export async function run() {
-  gjs('clients/boardWindow.js', [WINDOW, '560', '360']);
+  gjs('clients/windows/boardWindow.js', [WINDOW, '560', '360']);
   try {
     await waitForWindow(WINDOW);
     await checkCorner();

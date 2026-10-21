@@ -4,7 +4,7 @@ import Meta from 'gi://Meta';
 import * as IBusManager from 'resource:///com/lantharos/kestrel/misc/ibusManager.js';
 
 import {checks} from '../../lib/check.js';
-import {type} from '../../lib/input.js';
+import {type} from '../../lib/input/input.js';
 import {fixture, scratch} from '../../lib/processes.js';
 import {within} from '../../lib/wait.js';
 import {changes, withApp} from '../lib/apps.js';

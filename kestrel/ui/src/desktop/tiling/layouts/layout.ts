@@ -1,4 +1,4 @@
-import type { Box } from '../../../shared/placement.js';
+import type { Box } from '../../../shared/layout/placement.js';
 import type { Direction } from './geometry.js';
 
 export type LayoutName = 'dwindle' | 'master';

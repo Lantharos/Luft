@@ -1,7 +1,7 @@
 import GLib from 'gi://GLib';
 
 import {checks} from '../lib/check.js';
-import {drag} from '../lib/input.js';
+import {drag} from '../lib/input/input.js';
 import {gjs, scratch, waitForWindow} from '../lib/processes.js';
 import {settled} from '../lib/wait.js';
 import {withApp} from './lib/apps.js';
@@ -23,7 +23,7 @@ async function checkDrop(app, palette) {
   const received = () => children(stashed).some(info => exists(GLib.build_filenamev([stashed, info.get_name(), 'Harbour photos.eml'])));
   try {
     await showDark(app, palette);
-    gjs('clients/fileDragSource.js', [message]);
+    gjs('clients/apps/fileDragSource.js', [message]);
     const source = await waitForWindow('Kestrel drag source');
     await settled();
     const {x, y, width, height} = app.window.get_frame_rect();

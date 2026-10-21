@@ -3,7 +3,7 @@ import GLib from 'gi://GLib';
 import St from 'gi://St';
 
 import type { Rgb } from '../../appearance/color.js';
-import { FontconfigSerial } from '../../shared/fontconfig.js';
+import { FontconfigSerial } from '../../shared/display/fontconfig.js';
 import { portalObject } from '../core/exported.js';
 
 const SETTINGS_XML = `<node><interface name="org.freedesktop.impl.portal.Settings">

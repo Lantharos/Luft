@@ -2,7 +2,7 @@ import { ensureActorVisibleInScrollView } from 'resource:///com/lantharos/kestre
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
-import { blurSurface } from '../../shared/surface.js';
+import { blurSurface } from '../../shared/layout/surface.js';
 import { isControlEnter } from '../../shared/input/keyboardNavigation.js';
 import { SearchEngine, type SearchHost } from '../search/engine.js';
 import { searchField } from '../search/field.js';

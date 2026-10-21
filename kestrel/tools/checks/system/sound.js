@@ -4,7 +4,7 @@ import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 
 import {labelled, named, shown, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {press} from '../lib/input.js';
+import {press} from '../lib/input/input.js';
 import {spawn, stop} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 

@@ -4,7 +4,7 @@ import type Meta from 'gi://Meta';
 
 import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
 import { t } from '../../shared/i18n/index.js';
-import { launchHistory } from '../../shared/launchHistory.js';
+import { launchHistory } from '../../shared/apps/launchHistory.js';
 import type { QuickSettingsSource } from '../quickSettings/quickControls.js';
 import { Calculator } from './calculator/calculator.js';
 import { CurrencyRates } from './calculator/rates.js';

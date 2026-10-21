@@ -5,8 +5,8 @@ import GLib from 'gi://GLib';
 import {firstStyled, labelled, shown, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {subscribe} from '../lib/dbus.js';
-import {click, hold, press, release} from '../lib/input.js';
-import {call, PORTAL_PATH, portalDialog, sessionHandle} from '../lib/portal.js';
+import {click, hold, press, release} from '../lib/input/input.js';
+import {call, PORTAL_PATH, portalDialog, sessionHandle} from '../lib/access/portal.js';
 import {capture} from '../lib/screenshots.js';
 import {settled} from '../lib/wait.js';
 

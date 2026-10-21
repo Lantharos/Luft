@@ -2,7 +2,7 @@ import GLib from 'gi://GLib';
 
 import {descendants, labelled, named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {click} from '../lib/input.js';
+import {click} from '../lib/input/input.js';
 import {findWindow, gjs, scratch, waitForWindow} from '../lib/processes.js';
 import {capture, output} from '../lib/screenshots.js';
 import {settled, waitUntil} from '../lib/wait.js';
@@ -104,7 +104,7 @@ async function checkHere() {
 }
 
 async function checkPrompt() {
-  gjs('clients/peekTarget.js', [OTHER]);
+  gjs('clients/apps/peekTarget.js', [OTHER]);
   const other = await waitForWindow(titled(OTHER));
   const id = String(other.get_id());
   const listed = JSON.parse((await peek('list', '--json')).stdout).find(candidate => candidate.id === other.get_id());

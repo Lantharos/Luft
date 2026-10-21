@@ -8,7 +8,7 @@ import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 import {descendants, named, shown, showsText, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {call} from '../lib/dbus.js';
-import {click, press, type} from '../lib/input.js';
+import {click, press, type} from '../lib/input/input.js';
 import {capture} from '../lib/screenshots.js';
 import {settled} from '../lib/wait.js';
 import {FakeWifi} from './lib/fakeWifi.js';

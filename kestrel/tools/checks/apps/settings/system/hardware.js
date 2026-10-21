@@ -1,5 +1,5 @@
-import {plugInBluetoothAdapter} from '../../../fixtures/system/bluetoothAdapter.js';
-import {checks} from '../../lib/check.js';
+import {plugInBluetoothAdapter} from '../../../../fixtures/system/bluetoothAdapter.js';
+import {checks} from '../../../lib/check.js';
 
 const {require} = checks('Luft app');
 const SIDEBAR = {x: 0, y: 0, width: 280};

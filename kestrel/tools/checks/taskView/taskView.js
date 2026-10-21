@@ -2,7 +2,7 @@ import Clutter from 'gi://Clutter';
 
 import {named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {chord, click, drag} from '../lib/input.js';
+import {chord, click, drag} from '../lib/input/input.js';
 import {gjs, waitForWindows} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {settled} from '../lib/wait.js';
@@ -11,7 +11,7 @@ const {eventually} = checks('task view');
 const manager = global.workspace_manager;
 
 export async function run() {
-  gjs('clients/window.js', ['--multiple']);
+  gjs('clients/windows/window.js', ['--multiple']);
   const windows = await waitForWindows(['Kestrel window check 1', 'Kestrel window check 2']);
   const view = named('kestrel-task-view');
   const cards = () => named('kestrel-task-windows').get_children();

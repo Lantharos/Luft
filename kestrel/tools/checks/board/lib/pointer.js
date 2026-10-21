@@ -1,6 +1,6 @@
 import Clutter from 'gi://Clutter';
 
-import {click, hold, moveTo, release, scroll} from '../../lib/input.js';
+import {click, hold, moveTo, release, scroll} from '../../lib/input/input.js';
 import {nextFrame, waitUntil} from '../../lib/wait.js';
 import {board, boardResting} from './board.js';
 

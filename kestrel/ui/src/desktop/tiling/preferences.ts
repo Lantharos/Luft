@@ -1,6 +1,6 @@
 import Gio from 'gi://Gio';
 
-import { SURFACE_GAP } from '../../shared/surface.js';
+import { SURFACE_GAP } from '../../shared/layout/surface.js';
 import type { LayoutName } from './layouts/layout.js';
 
 export type TilingMode = 'off' | 'tiling' | 'scrolling';

@@ -2,7 +2,7 @@ import Gio from 'gi://Gio';
 import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {checks} from '../lib/check.js';
-import {moveBy} from '../lib/input.js';
+import {moveBy} from '../lib/input/input.js';
 import {pause} from '../lib/wait.js';
 import {startSessionClient} from './lib/sessionClient.js';
 import {callLog, seenCalls, takeCalls} from './lib/systemCalls.js';

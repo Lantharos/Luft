@@ -1,6 +1,6 @@
 import type Gio from 'gi://Gio';
 
-import { callerProcess, readProcFile } from '../../shared/processes.js';
+import { callerProcess, readProcFile } from '../../shared/dbus/processes.js';
 
 const rootMountOf = (pid: number | 'self') => readProcFile(`/proc/${pid}/mountinfo`)?.split(' ', 1)[0] ?? null;
 

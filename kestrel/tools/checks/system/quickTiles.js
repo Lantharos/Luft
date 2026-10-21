@@ -9,11 +9,11 @@ import {accelerometer, toggleSurface} from 'resource:///com/lantharos/kestrel/ui
 import {descendants, named, shown, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {property} from '../lib/dbus.js';
-import {chord, click, drag, press, rest, rightClick} from '../lib/input.js';
+import {chord, click, drag, press, rest, rightClick} from '../lib/input/input.js';
 import {gjs, scratch, stop} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {settled, waitUntil} from '../lib/wait.js';
-import {contrast} from './lib/colors.js';
+import {contrast} from '../lib/colors.js';
 
 const {require, eventually} = checks('quick tile');
 const TILES = ['Keep Awake', 'Dark Style', 'Airplane Mode', 'Keyboard Backlight'];

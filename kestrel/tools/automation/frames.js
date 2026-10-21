@@ -4,7 +4,7 @@ import {dismissImmediately} from 'resource:///com/lantharos/kestrel/ui/kestrelUi
 import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {leaveBoard, openWindows} from '../checks/board/lib/board.js';
-import {rest} from '../checks/lib/input.js';
+import {rest} from '../checks/lib/input/input.js';
 import {stopAll} from '../checks/lib/processes.js';
 import {settled} from '../checks/lib/wait.js';
 import {boardInteractions} from '../frames/board.js';

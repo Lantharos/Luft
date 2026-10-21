@@ -2,7 +2,7 @@ import type Meta from 'gi://Meta';
 
 import type { Caller } from './access/callers.js';
 import type { Level } from './access/prompt.js';
-import type { PidFd } from '../../shared/processes.js';
+import type { PidFd } from '../../shared/dbus/processes.js';
 
 export interface Policy {
   readonly ownsTheSeat: boolean;

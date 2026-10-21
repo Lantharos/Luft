@@ -4,7 +4,7 @@ import GLib from 'gi://GLib';
 import {changes, openApp} from '../../apps/lib/apps.js';
 import {checks} from '../../lib/check.js';
 import {call} from '../../lib/dbus.js';
-import {rest, type} from '../../lib/input.js';
+import {rest, type} from '../../lib/input/input.js';
 import {capture} from '../../lib/screenshots.js';
 
 export const {require, eventually} = checks('setup');

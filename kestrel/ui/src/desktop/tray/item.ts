@@ -2,7 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import type { MenuEntry } from '../menus/contextMenus.js';
-import { whenGraphicsRestored } from '../../shared/graphics.js';
+import { whenGraphicsRestored } from '../../shared/display/graphics.js';
 import { busCall } from './bus.js';
 import { DBusMenu } from './dbusMenu.js';
 import { resolveGlyph, type TrayGlyph } from './icon.js';

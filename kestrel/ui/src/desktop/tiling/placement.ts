@@ -1,6 +1,6 @@
 import type Meta from 'gi://Meta';
 
-import type { Box } from '../../shared/placement.js';
+import type { Box } from '../../shared/layout/placement.js';
 import { setEdgesTiled, setUnconstrained, targetBox } from '../windows/frames.js';
 import { sameBox } from './layouts/geometry.js';
 import type { SpaceHost } from './space.js';

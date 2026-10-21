@@ -3,7 +3,7 @@ import Cogl from 'gi://Cogl';
 import Mtk from 'gi://Mtk';
 
 import type { Monitor } from '../panel/panel.js';
-import { animateActor, Curve, Duration, reducedMotion } from '../../shared/motion.js';
+import { animateActor, Curve, Duration, reducedMotion } from '../../shared/motion/motion.js';
 import { TurningLayer } from './turningLayer.js';
 
 const QUARTER = 90;

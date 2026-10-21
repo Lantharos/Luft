@@ -1,7 +1,7 @@
 import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {openBoardWindow} from '../checks/board/lib/board.js';
-import {moveTo, pressButton, releaseButton, rest} from '../checks/lib/input.js';
+import {moveTo, pressButton, releaseButton, rest} from '../checks/lib/input/input.js';
 import {stop, waitForWindow} from '../checks/lib/processes.js';
 import {pause, settled, waitUntil} from '../checks/lib/wait.js';
 import {eachFrame} from './recorder.js';

@@ -1,4 +1,4 @@
-import type { Box } from '../../../shared/placement.js';
+import type { Box } from '../../../shared/layout/placement.js';
 
 const SLIVER = 1;
 

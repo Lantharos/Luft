@@ -1,4 +1,4 @@
-import { readProcFile as read } from '../../../shared/processes.js';
+import { readProcFile as read } from '../../../shared/dbus/processes.js';
 
 const UNIT = /\.(?:scope|service)$/;
 

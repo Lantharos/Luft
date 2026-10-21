@@ -1,8 +1,8 @@
 import type Clutter from 'gi://Clutter';
 import type Meta from 'gi://Meta';
 
-import type { Box } from '../../../shared/placement.js';
-import { animateActor, Spring } from '../../../shared/motion.js';
+import type { Box } from '../../../shared/layout/placement.js';
+import { animateActor, Spring } from '../../../shared/motion/motion.js';
 import { setEdgesTiled, setUnconstrained, targetBox } from '../../windows/frames.js';
 import { sameBox } from '../layouts/geometry.js';
 import type { SpaceHost } from '../space.js';

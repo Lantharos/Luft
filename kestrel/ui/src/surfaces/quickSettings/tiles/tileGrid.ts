@@ -1,7 +1,7 @@
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
-import { animateActor } from '../../../shared/motion.js';
+import { animateActor } from '../../../shared/motion/motion.js';
 import type { ControlMenu } from '../quickControls.js';
 
 const GAP = 8;

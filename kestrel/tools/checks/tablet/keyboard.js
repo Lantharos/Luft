@@ -8,9 +8,9 @@ import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {descendants, labelled, named, shown, shownStyled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {inputMethodSettled} from '../lib/inputMethod.js';
-import {centerOf, hold, press, release} from '../lib/input.js';
-import {LuftApp} from '../lib/luftApp.js';
+import {inputMethodSettled} from '../lib/input/inputMethod.js';
+import {centerOf, hold, press, release} from '../lib/input/input.js';
+import {LuftApp} from '../lib/apps/luftApp.js';
 import {fixture, gjs, scratch, spawn, stop, waitForWindow} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {settled} from '../lib/wait.js';
@@ -51,7 +51,7 @@ async function hide(label, act) {
 }
 
 async function checkGtk() {
-  const app = gjs('clients/window.js', ['--form']);
+  const app = gjs('clients/windows/window.js', ['--form']);
   try {
     await waitForWindow('Kestrel window check');
     await settled();
@@ -221,7 +221,7 @@ export async function run() {
   try {
     await checkGtk();
     await checkToolkit('a GTK 3 window', () => gjs('clients/entries/gtk3Entry.js'), Meta.WindowClientType.WAYLAND);
-    await checkToolkit('an Xwayland window', () => gjs('clients/window.js', ['--entry'], {env: {GDK_BACKEND: 'x11', GTK_IM_MODULE: 'ibus'}}),
+    await checkToolkit('an Xwayland window', () => gjs('clients/windows/window.js', ['--entry'], {env: {GDK_BACKEND: 'x11', GTK_IM_MODULE: 'ibus'}}),
       Meta.WindowClientType.X11);
     await checkStart();
     await checkLayers();

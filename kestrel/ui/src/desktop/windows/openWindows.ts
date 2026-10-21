@@ -2,8 +2,8 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
 
-import { afterMotion, dropAfterMotion } from '../../shared/afterMotion.js';
-import { refuseSandboxed } from '../../shared/sandbox.js';
+import { afterMotion, dropAfterMotion } from '../../shared/motion/afterMotion.js';
+import { refuseSandboxed } from '../../shared/dbus/sandbox.js';
 
 const OPEN_WINDOWS_XML = `<node><interface name="com.lantharos.Kestrel.OpenWindows">
   <method name="List"><arg type="a{sau}" name="apps" direction="out"/></method>

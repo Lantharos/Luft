@@ -9,7 +9,7 @@ import St from 'gi://St';
 import { HeaderLayout } from 'resource:///com/lantharos/kestrel/ui/headerLayout.js';
 import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
 import { t } from '../../shared/i18n/index.js';
-import { blurSurface } from '../../shared/surface.js';
+import { blurSurface } from '../../shared/layout/surface.js';
 import { Calendar } from './calendar/calendar.js';
 import { MediaCard } from './media.js';
 

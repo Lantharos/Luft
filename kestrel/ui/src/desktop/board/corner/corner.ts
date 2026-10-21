@@ -3,8 +3,8 @@ import Meta from 'gi://Meta';
 import St from 'gi://St';
 
 import type { Monitor } from '../../panel/panel.js';
-import { animateActor, Curve, Duration } from '../../../shared/motion.js';
-import { blurSurface } from '../../../shared/surface.js';
+import { animateActor, Curve, Duration } from '../../../shared/motion/motion.js';
+import { blurSurface } from '../../../shared/layout/surface.js';
 import { localized, t } from '../../../shared/i18n/index.js';
 import { Dock, type DockActions } from './dock.js';
 import { CornerPill } from './pill.js';

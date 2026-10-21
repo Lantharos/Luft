@@ -9,7 +9,7 @@ import {checks} from '../lib/check.js';
 import {property} from '../lib/dbus.js';
 import {scratch} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
-import {contrast, luminance} from './lib/colors.js';
+import {contrast, luminance} from '../lib/colors.js';
 
 const {require, eventually} = checks('app icon');
 const WALLPAPERS = [['lavender', 'Night lavender.jpg', [88, 52, 140]], ['forest', 'Autumn forest bench.jpg', [62, 108, 40]]];

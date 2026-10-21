@@ -3,7 +3,7 @@ import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 
 import {descendants, named, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {click, press, rest} from '../lib/input.js';
+import {click, press, rest} from '../lib/input/input.js';
 import {capture} from '../lib/screenshots.js';
 import {settled} from '../lib/wait.js';
 

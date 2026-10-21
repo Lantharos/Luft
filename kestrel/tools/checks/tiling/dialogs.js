@@ -2,7 +2,7 @@ import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 
 import {checks} from '../lib/check.js';
-import {chord, rest} from '../lib/input.js';
+import {chord, rest} from '../lib/input/input.js';
 import {gjs, stop, stopAll, waitForWindow} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {focus, frame, near, openWindow, resetTiling, restingTiles, stateFile, tiledTightly, useTiling} from './lib/tiling.js';
@@ -26,7 +26,7 @@ function remembered() {
 }
 
 async function checkDialogs(notes) {
-  const client = gjs('clients/tilingWindows.js', ['--dialog', '--fixed']);
+  const client = gjs('clients/windows/tilingWindows.js', ['--dialog', '--fixed']);
   const [main, dialog, fixed] = await Promise.all(['Tiling main', 'Tiling dialog', 'Tiling fixed'].map(title => waitForWindow(title)));
   await eventually(() => tiled(main) && tiledTightly([notes, main]), 'the app window tiles next to the open window');
   require(!tiled(dialog) && !tiled(fixed), 'the dialog and the fixed-size window float');
@@ -41,7 +41,7 @@ async function checkDialogs(notes) {
 }
 
 async function checkRemembered(notes) {
-  let client = gjs('clients/tilingWindows.js');
+  let client = gjs('clients/windows/tilingWindows.js');
   let main = await waitForWindow('Tiling main');
   await eventually(() => tiled(main) && tiledTightly([notes, main]), 'a plain app window tiles');
   await focus(main);
@@ -49,7 +49,7 @@ async function checkRemembered(notes) {
   await eventually(() => !tiled(main) && remembered(), 'floating it is remembered for the app');
   await stop(client);
 
-  client = gjs('clients/tilingWindows.js');
+  client = gjs('clients/windows/tilingWindows.js');
   main = await waitForWindow('Tiling main');
   await restingTiles();
   require(!tiled(main) && tiledTightly([notes]), 'the app opens floating the next time');

@@ -10,7 +10,7 @@ import {loadPendingUpdates} from 'resource:///com/lantharos/kestrel/misc/pending
 import {descendants, named, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {call} from '../lib/dbus.js';
-import {press, rightClick} from '../lib/input.js';
+import {press, rightClick} from '../lib/input/input.js';
 import {capture} from '../lib/screenshots.js';
 import {nextFrame, waitUntil} from '../lib/wait.js';
 

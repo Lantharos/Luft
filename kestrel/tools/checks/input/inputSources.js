@@ -4,8 +4,8 @@ import GLib from 'gi://GLib';
 
 import {descendants, named, shown, shownStyled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {inputMethodSettled} from '../lib/inputMethod.js';
-import {click, hold, press, release, scroll} from '../lib/input.js';
+import {inputMethodSettled} from '../lib/input/inputMethod.js';
+import {click, hold, press, release, scroll} from '../lib/input/input.js';
 import {capture} from '../lib/screenshots.js';
 import {settled} from '../lib/wait.js';
 

@@ -29,7 +29,7 @@ export function noOverlap() {
 }
 
 export function openBoardWindow(title, width, height) {
-  return gjs('clients/boardWindow.js', [title, `${width}`, `${height}`]);
+  return gjs('clients/windows/boardWindow.js', [title, `${width}`, `${height}`]);
 }
 
 export async function openWindows() {

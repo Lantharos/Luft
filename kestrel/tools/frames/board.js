@@ -2,7 +2,7 @@ import Clutter from 'gi://Clutter';
 
 import {board, boardResting, leaveBoard, showBoard} from '../checks/board/lib/board.js';
 import {touchpad} from '../checks/board/lib/touchpad.js';
-import {hold, moveTo, release, scroll} from '../checks/lib/input.js';
+import {hold, moveTo, release, scroll} from '../checks/lib/input/input.js';
 import {eachFrame, measured} from './recorder.js';
 
 const PAN_STEPS = 60;

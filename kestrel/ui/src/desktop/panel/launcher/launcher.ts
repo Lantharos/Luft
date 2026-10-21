@@ -7,7 +7,7 @@ import { MARK_LAYERS, MARK_SCALE, markLayerSvg, PAINTED_MARK_SCALE, type MarkFil
 import { markFills } from './shade.js';
 import { taskbarBackdrops } from '../backdrop.js';
 import { appIcons } from '../../../appearance/icons/appIcons.js';
-import { animateActor, Spring } from '../../../shared/motion.js';
+import { animateActor, Spring } from '../../../shared/motion/motion.js';
 import { wallpaperFloor } from '../../wallpaper/floor.js';
 import { localized, t } from '../../../shared/i18n/index.js';
 

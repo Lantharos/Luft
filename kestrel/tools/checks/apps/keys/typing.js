@@ -9,7 +9,7 @@ import {getInputSourceManager} from 'resource:///com/lantharos/kestrel/ui/status
 
 import {checks} from '../../lib/check.js';
 import {call} from '../../lib/dbus.js';
-import {keyboard} from '../../lib/input.js';
+import {keyboard} from '../../lib/input/input.js';
 import {captureFrame} from '../../lib/screenshots.js';
 import {gjs, spawn, stop, waitForWindow, windows} from '../../lib/processes.js';
 import {settled, Timeout, waitUntil, within} from '../../lib/wait.js';
@@ -125,7 +125,7 @@ async function simpleEngineRuns() {
 
 export async function openEntry(argv, env = {}) {
   const before = new Set(windows());
-  const process = argv ? spawn(argv, {env}) : gjs('clients/window.js', ['--entry'], {env});
+  const process = argv ? spawn(argv, {env}) : gjs('clients/windows/window.js', ['--entry'], {env});
   const window = await waitForWindow(candidate => !before.has(candidate) && /^Kestrel (window check|entry)/.test(candidate.get_title() ?? ''),
     'the test entry opens');
   await focus(window);

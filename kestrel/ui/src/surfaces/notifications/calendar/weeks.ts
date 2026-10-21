@@ -1,4 +1,4 @@
-import { DAY_MS, dayNumber, dayOf, fromDayNumber } from '../../../shared/days.js';
+import { DAY_MS, dayNumber, dayOf, fromDayNumber } from '../../../shared/time/days.js';
 
 const EPOCH_WEEKDAY = 4;
 

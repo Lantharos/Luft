@@ -6,7 +6,7 @@ import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 import {named, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {call} from '../lib/dbus.js';
-import {press} from '../lib/input.js';
+import {press} from '../lib/input/input.js';
 import {capture} from '../lib/screenshots.js';
 import {unlock} from '../lockScreen/lib/shield.js';
 import {bestTitle, closeStart, descriptionOf, entry, openStart, row, rows, search, start, titleOf, withHandler} from './search/results.js';

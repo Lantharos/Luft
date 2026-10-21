@@ -4,7 +4,7 @@ import GLib from 'gi://GLib';
 
 import {checks} from '../lib/check.js';
 import {property, subscribe} from '../lib/dbus.js';
-import {press} from '../lib/input.js';
+import {press} from '../lib/input/input.js';
 import {gjs, scratch} from '../lib/processes.js';
 
 const {eventually} = checks('media key');
@@ -21,7 +21,7 @@ function startPlayer() {
       unsubscribe();
       playbackStatus().then(resolve, reject);
     });
-    gjs('clients/mediaPlayer.js');
+    gjs('clients/apps/mediaPlayer.js');
   });
 }
 

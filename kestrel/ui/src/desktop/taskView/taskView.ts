@@ -4,9 +4,9 @@ import type GObject from 'gi://GObject';
 import Meta from 'gi://Meta';
 import St from 'gi://St';
 
-import { animateActor, animateAdjustment, Curve, Duration, reducedMotion, Spring } from '../../shared/motion.js';
+import { animateActor, animateAdjustment, Curve, Duration, reducedMotion, Spring } from '../../shared/motion/motion.js';
 import type { Monitor } from '../panel/panel.js';
-import { blurSurface, raiseSurface } from '../../shared/surface.js';
+import { blurSurface, raiseSurface } from '../../shared/layout/surface.js';
 import { paintHidden } from '../../surfaces/prewarm.js';
 import { clampUnit } from '../../shared/math.js';
 import { windowSlots } from './grid.js';

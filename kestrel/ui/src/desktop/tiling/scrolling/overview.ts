@@ -1,7 +1,7 @@
 import Clutter from 'gi://Clutter';
 import type Meta from 'gi://Meta';
 
-import type { Box } from '../../../shared/placement.js';
+import type { Box } from '../../../shared/layout/placement.js';
 import type { ScrollingSpace } from './scrollingSpace.js';
 
 export interface OverviewSurroundings {

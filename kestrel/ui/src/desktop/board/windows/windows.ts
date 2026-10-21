@@ -1,7 +1,7 @@
 import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 
-import type { Box } from '../../../shared/placement.js';
+import type { Box } from '../../../shared/layout/placement.js';
 import { frameBox, setMagnification } from '../../windows/frames.js';
 import { FULL_SIZE, intersection, pushApart, screenBox, snapEdges, type View } from '../view/geometry.js';
 

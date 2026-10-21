@@ -2,7 +2,7 @@ import Clutter from 'gi://Clutter';
 
 import {descendants, named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {click, press} from '../lib/input.js';
+import {click, press} from '../lib/input/input.js';
 import {gjs, stop} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {settled, waitUntil} from '../lib/wait.js';
@@ -23,7 +23,7 @@ async function openApp(tray, menu) {
 }
 
 export async function run() {
-  const app = gjs('clients/trayApp.js');
+  const app = gjs('clients/apps/trayApp.js');
   const tray = named('kestrel-tray');
   await eventually(() => tray.visible && tray.child.get_n_children() === 1, 'the tray shows one grouped button with an app preview');
   await capture('tray');

@@ -6,7 +6,7 @@ import { accentColor, namedAccent, NEUTRAL, seedFromSamples, toHex, type Rgb, ty
 import { appearanceCss, appearanceJson, type Appearance } from './exports.js';
 import { userFile, writeText } from './files.js';
 import { buildPalette, type Palette } from './palette.js';
-import { isDark, watchScheme } from '../shared/scheme.js';
+import { isDark, watchScheme } from '../shared/display/scheme.js';
 import { appIcons } from './icons/appIcons.js';
 import { GlyphFiles } from './icons/glyphFiles.js';
 import { AccentStylesheet } from './stylesheet.js';

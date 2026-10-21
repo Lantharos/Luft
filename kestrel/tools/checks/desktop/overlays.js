@@ -6,7 +6,7 @@ import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {descendants, named, shown, shownStyled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {moveTo, press, rest} from '../lib/input.js';
+import {moveTo, press, rest} from '../lib/input/input.js';
 import {gjs, stop} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 
@@ -14,7 +14,7 @@ const {eventually} = checks('overlay');
 const COPIED = ['https://lantharos.dev/kestrel', 'Meet at the harbour at seven, the table is under Lindqvist.'];
 
 async function checkMediaControls() {
-  const player = gjs('clients/mediaPlayer.js');
+  const player = gjs('clients/apps/mediaPlayer.js');
   toggleSurface('notifications');
   const card = named('kestrel-notifications').get_first_child();
   await eventually(() => shown(card) && named('Pause', card), 'media controls appear for a playing app');

@@ -1,7 +1,7 @@
 import Clutter from 'gi://Clutter';
 import type Meta from 'gi://Meta';
 
-import { Gesture } from '../../../shared/motion.js';
+import { Gesture } from '../../../shared/motion/motion.js';
 import type { ScrollingSpace } from './scrollingSpace.js';
 
 const FINGERS = 3;

@@ -58,7 +58,7 @@ async function checkFingerprint(setup) {
 }
 
 async function checkHandoff(endSession) {
-  gjs('clients/window.js', [], {env: {GDK_BACKEND: 'x11'}});
+  gjs('clients/windows/window.js', [], {env: {GDK_BACKEND: 'x11'}});
   await waitForWindow('Kestrel window check', 'an X11 window is open next to setup when it finishes');
   await endSession();
   await call('com.lantharos.Kestrel.Setup', '/com/lantharos/Kestrel/Setup', 'com.lantharos.Kestrel.Setup', 'Finish', null, null,

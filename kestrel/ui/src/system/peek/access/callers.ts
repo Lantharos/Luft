@@ -3,7 +3,7 @@ import Shell from 'gi://Shell';
 
 import { t } from '../../../shared/i18n/index.js';
 import { PeekError } from '../errors.js';
-import { callerProcess, type PidFd } from '../../../shared/processes.js';
+import { callerProcess, type PidFd } from '../../../shared/dbus/processes.js';
 import { processUnit, statOf, unitName } from './processes.js';
 
 export interface Caller {

@@ -1,8 +1,8 @@
 import Gio from 'gi://Gio';
 
-import {checks} from '../../lib/check.js';
-import {changes} from '../lib/apps.js';
-import {show} from './navigation.js';
+import {checks} from '../../../lib/check.js';
+import {changes} from '../../lib/apps.js';
+import {show} from '../navigation.js';
 
 const {require, eventually} = checks('Luft app');
 const SWITCH_X = 959;

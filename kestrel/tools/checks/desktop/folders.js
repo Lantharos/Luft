@@ -3,7 +3,7 @@ import {dismissImmediately, toggleSurface} from 'resource:///com/lantharos/kestr
 
 import {descendants, named, shown, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {click, moveTo, pressButton, releaseButton} from '../lib/input.js';
+import {click, moveTo, pressButton, releaseButton} from '../lib/input/input.js';
 import {capture} from '../lib/screenshots.js';
 import {nextFrame, settled, waitUntil} from '../lib/wait.js';
 

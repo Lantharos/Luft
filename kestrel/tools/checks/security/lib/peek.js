@@ -27,7 +27,7 @@ export function peek(...args) {
 }
 
 export function runTarget(title, ...options) {
-  return peek('run', ...options, '--', 'gjs', '-m', fixture('clients', 'peekTarget.js'), title);
+  return peek('run', ...options, '--', 'gjs', '-m', fixture('clients', 'apps', 'peekTarget.js'), title);
 }
 
 export async function windowsOf(handle) {

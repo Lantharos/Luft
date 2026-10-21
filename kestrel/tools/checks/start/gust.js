@@ -7,7 +7,7 @@ import {formatsLocale} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 import {named, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {call} from '../lib/dbus.js';
-import {centerOf, chord, click, press, rest} from '../lib/input.js';
+import {centerOf, chord, click, press, rest} from '../lib/input/input.js';
 import {gjs, stopAll, waitForWindow} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {nextFrame, settled} from '../lib/wait.js';
@@ -143,7 +143,7 @@ export async function run() {
   GLib.file_set_contents(RATES, JSON.stringify({date: '2026-10-21', eur: {usd: 1.25, gbp: 0.85, jpy: 160}}));
   GLib.mkdir_with_parents(GLib.path_get_dirname(NOTES), 0o755);
   GLib.file_set_contents(NOTES, 'Seagulls circle the breakwater every morning.\n');
-  gjs('clients/boardWindow.js', [WINDOW, '640', '420']);
+  gjs('clients/windows/boardWindow.js', [WINDOW, '640', '420']);
   try {
     await waitForWindow(WINDOW);
     await checkOpening();

@@ -16,7 +16,7 @@ export async function run() {
   declaring('video', 'steam');
   declaring('none', 'steam');
   declaring('none');
-  gjs('clients/window.js');
+  gjs('clients/windows/window.js');
   const [game, steamVideo, steamGame, plain, app] = await waitForWindows(['Kestrel content type: game', 'Kestrel content type: video steam',
     'Kestrel content type: none steam', 'Kestrel content type: none', 'Kestrel window check']);
 

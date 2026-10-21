@@ -1,7 +1,7 @@
 import Clutter from 'gi://Clutter';
 
 import {checks} from '../lib/check.js';
-import {type} from '../lib/input.js';
+import {type} from '../lib/input/input.js';
 import {fixture, scratch, spawn, waitForWindow} from '../lib/processes.js';
 import {board, boardResting, leaveBoard, openWindows, showBoard} from './lib/board.js';
 import {clickAt, screenPoint, zoomWithWheel} from './lib/pointer.js';

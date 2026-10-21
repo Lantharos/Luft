@@ -5,7 +5,7 @@ import { WallClock } from 'resource:///com/lantharos/kestrel/misc/wallClock.js';
 
 import { BatteryIndicator } from '../../../shared/battery/indicator.js';
 import { localized, onLocaleChanged, t } from '../../../shared/i18n/index.js';
-import { blurSurface } from '../../../shared/surface.js';
+import { blurSurface } from '../../../shared/layout/surface.js';
 import { createLauncher, type Launcher } from '../launcher/launcher.js';
 import type { Monitor } from '../panel.js';
 import { taskbarPreferences } from '../preferences/taskbarPreferences.js';

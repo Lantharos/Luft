@@ -1,4 +1,4 @@
-import type { Box } from '../../../shared/placement.js';
+import type { Box } from '../../../shared/layout/placement.js';
 import { divide } from '../layouts/geometry.js';
 
 export const PRESET_WIDTHS = [1 / 3, 1 / 2, 2 / 3, 1];

@@ -3,7 +3,7 @@ import GLib from 'gi://GLib';
 import St from 'gi://St';
 
 import {checks} from '../lib/check.js';
-import {press} from '../lib/input.js';
+import {press} from '../lib/input/input.js';
 import {scratch} from '../lib/processes.js';
 import {changes, withApp} from './lib/apps.js';
 import {checkPalette, withPalette} from './lib/palette.js';

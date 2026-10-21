@@ -1,6 +1,6 @@
 import Clutter from 'gi://Clutter';
 
-import { animateActor, Duration, Gesture, rubberband, Spring } from '../../shared/motion.js';
+import { animateActor, Duration, Gesture, rubberband, Spring } from '../../shared/motion/motion.js';
 import { clampUnit } from '../../shared/math.js';
 
 const DISMISS_SHARE = 0.4;

@@ -3,7 +3,7 @@ import Gio from 'gi://Gio';
 import {dismissImmediately, toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 
 import {named} from '../checks/lib/actors.js';
-import {press, rest, type} from '../checks/lib/input.js';
+import {press, rest, type} from '../checks/lib/input/input.js';
 import {settled} from '../checks/lib/wait.js';
 import {eachFrame, measured} from './recorder.js';
 

@@ -4,7 +4,7 @@ import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {click, press} from '../lib/input.js';
+import {click, press} from '../lib/input/input.js';
 import {capture} from '../lib/screenshots.js';
 import {pause, settled} from '../lib/wait.js';
 import {board, boardResting, boardWindows, doubleTapSuper, leaveBoard, openWindows, sameView, showBoard, view, windowNamed} from './lib/board.js';

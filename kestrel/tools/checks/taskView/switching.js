@@ -4,7 +4,7 @@ import {SwitcherPopup} from 'resource:///com/lantharos/kestrel/ui/switcherPopup.
 
 import {shownStyled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {chord, hold, press, release} from '../lib/input.js';
+import {chord, hold, press, release} from '../lib/input/input.js';
 import {gjs, waitForWindows} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {nextFrame, waitUntil} from '../lib/wait.js';
@@ -43,7 +43,7 @@ async function checkShellFocus() {
 }
 
 export async function run() {
-  gjs('clients/window.js', ['--multiple']);
+  gjs('clients/windows/window.js', ['--multiple']);
   const windows = await waitForWindows(['Kestrel window check 1', 'Kestrel window check 2']);
   await checkAltTab(windows);
   await checkWindowMenu();

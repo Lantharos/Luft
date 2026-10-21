@@ -1,7 +1,7 @@
 import GLib from 'gi://GLib';
 import type Meta from 'gi://Meta';
 
-import type { Box } from '../../../shared/placement.js';
+import type { Box } from '../../../shared/layout/placement.js';
 import { boundsOf, fitView, freeSpot, intersection, screenBox, settle, type ExitPlan, type View } from '../view/geometry.js';
 import { fadeAway, glideFrom } from '../view/transitions.js';
 import { FIT_PADDING } from './focus.js';

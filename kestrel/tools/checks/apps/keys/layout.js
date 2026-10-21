@@ -3,7 +3,7 @@ import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 
 import {checks} from '../../lib/check.js';
-import {press, type} from '../../lib/input.js';
+import {press, type} from '../../lib/input/input.js';
 import {within} from '../../lib/wait.js';
 import {changes, followLink} from '../lib/apps.js';
 import {exists, read} from '../lib/files.js';

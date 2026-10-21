@@ -3,7 +3,7 @@ import GLib from 'gi://GLib';
 import Mtk from 'gi://Mtk';
 import St from 'gi://St';
 
-import { animateActor } from '../../../shared/motion.js';
+import { animateActor } from '../../../shared/motion/motion.js';
 import { taskbarPreferences } from '../preferences/taskbarPreferences.js';
 import type { Monitor } from '../panel.js';
 import type { WindowOverlap } from './windowOverlap.js';

@@ -1,8 +1,8 @@
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
-import { pixelScale, whenPixelScaleChanges } from '../../../shared/graphics.js';
-import { animateAdjustment } from '../../../shared/motion.js';
+import { pixelScale, whenPixelScaleChanges } from '../../../shared/display/graphics.js';
+import { animateAdjustment } from '../../../shared/motion/motion.js';
 import { withTone, type Item, type Tab } from '../catalog/catalog.js';
 import { CellView } from './cellView.js';
 import { GlyphImages, GlyphRenderer, type Glyph } from './images.js';

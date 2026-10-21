@@ -1,4 +1,4 @@
-import {LuftApp, sabineService} from '../../lib/luftApp.js';
+import {LuftApp, sabineService} from '../../lib/apps/luftApp.js';
 
 const LINK_TIMEOUT = 10000;
 

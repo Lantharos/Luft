@@ -2,7 +2,7 @@ import Clutter from 'gi://Clutter';
 import Meta from 'gi://Meta';
 
 import {checks} from '../lib/check.js';
-import {chord, moveTo, pressButton, releaseButton, rest} from '../lib/input.js';
+import {chord, moveTo, pressButton, releaseButton, rest} from '../lib/input/input.js';
 import {stopAll} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {nextFrame} from '../lib/wait.js';

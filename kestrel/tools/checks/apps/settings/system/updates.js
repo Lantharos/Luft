@@ -1,10 +1,12 @@
+import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-import {checks} from '../../lib/check.js';
-import {call} from '../../lib/dbus.js';
-import {followLink, openApp} from '../lib/apps.js';
-import {useScheme} from '../lib/palette.js';
+import {checks} from '../../../lib/check.js';
+import {call} from '../../../lib/dbus.js';
+import {scroll} from '../../../lib/input/input.js';
+import {followLink, openApp} from '../../lib/apps.js';
+import {useScheme} from '../../lib/palette.js';
 
 const {require, eventually} = checks('Luft app');
 const CHECKS = 'com.lantharos.KestrelChecks';
@@ -15,6 +17,8 @@ const ACCENT_TOLERANCE = 6;
 const DOWNLOAD = [1146, 198];
 const HEADER_PROGRESS = {x: 510, y: 130, width: 590, height: 45};
 const SIDEBAR = {x: 12, y: 60, width: 256};
+const SIDEBAR_POINT = [140, 500];
+const SIDEBAR_STEPS = 10;
 const LOOKS = ['refresh', 'updates'].map(role => `PackageKit ${role}`);
 const UPDATE_IDS = ['kernel;6.17.4-300.fc45;x86_64;updates', 'systemd;258.2-1.fc45;x86_64;updates'];
 
@@ -52,6 +56,10 @@ class Updates {
     if (ready) await this.app.settle(() => true);
   }
 
+  sidebarEnd() {
+    for (let step = 0; step < SIDEBAR_STEPS; step++) scroll(Clutter.ScrollDirection.DOWN, this.app.at(SIDEBAR_POINT));
+  }
+
   async progress(area) {
     return (await this.app.frame(this.app.area(area))).count([this.accent], ACCENT_TOLERANCE);
   }
@@ -73,7 +81,8 @@ async function checkDownload(updates) {
   await eventually(async () => (started = await updates.progress(HEADER_PROGRESS)) > 0, 'Updates shows the download progress');
   (await updates.app.frame()).save('settings-updates-downloading');
 
-  await followLink('settings', 'kestrel-settings:system/about');
+  await followLink('settings', 'kestrel-settings:accounts');
+  updates.sidebarEnd();
   let away = 0;
   await eventually(async () => (away = await updates.progress(SIDEBAR)) > 0, 'the Updates entry in the sidebar shows the download on another page');
   (await updates.app.frame()).save('settings-updates-sidebar-progress');

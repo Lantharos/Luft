@@ -1,7 +1,7 @@
 import GLib from 'gi://GLib';
 import St from 'gi://St';
 import { FluentNumber, t } from '../../shared/i18n/index.js';
-import { animateActor, Curve, Duration } from '../../shared/motion.js';
+import { animateActor, Curve, Duration } from '../../shared/motion/motion.js';
 
 const VISIBLE_AFTER_CHANGE_MS = 900;
 const BUBBLE_GAP = 6;

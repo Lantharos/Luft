@@ -4,7 +4,7 @@ import Shell from 'gi://Shell';
 import { LIBEXECDIR } from 'resource:///com/lantharos/kestrel/misc/config.js';
 
 import type { Context } from '../../context.js';
-import { refuseSandboxed } from '../../shared/sandbox.js';
+import { refuseSandboxed } from '../../shared/dbus/sandbox.js';
 import type { Account, Purpose, Request } from './copy.js';
 import { PasskeyPrompt } from './prompt.js';
 

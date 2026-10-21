@@ -2,7 +2,7 @@ import Clutter from 'gi://Clutter';
 import {dismissImmediately} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 
 import {named} from '../../lib/actors.js';
-import {press, rightClick} from '../../lib/input.js';
+import {press, rightClick} from '../../lib/input/input.js';
 import {gjs, stop, waitForWindow} from '../../lib/processes.js';
 import {capture} from '../../lib/screenshots.js';
 import {settled} from '../../lib/wait.js';
@@ -36,7 +36,7 @@ async function checkTaskbarDisplays(monitor) {
   const slots = () => secondary.get_first_child().get_children()[1].get_children().filter(slot => slot.width > 0);
   await settled();
   const pinned = slots().length;
-  const app = gjs('clients/window.js');
+  const app = gjs('clients/windows/window.js');
   await waitForWindow('Kestrel window check');
   await eventually(() => slots().length === pinned + 1, 'the other taskbar lists apps running on any display');
   set('taskbar-windows-per-display', true);

@@ -120,7 +120,7 @@ async function turn(name, transform, window) {
 }
 
 export async function run() {
-  const app = gjs('clients/window.js');
+  const app = gjs('clients/windows/window.js');
   try {
     const window = await waitForWindow('Kestrel window check');
     window.maximize();

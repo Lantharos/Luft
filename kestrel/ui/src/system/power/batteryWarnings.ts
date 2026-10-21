@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
 import * as MessageTray from 'resource:///com/lantharos/kestrel/ui/messageTray.js';
 
-import { shortDuration } from '../../shared/duration.js';
+import { shortDuration } from '../../shared/time/duration.js';
 import { formatsLocale, t } from '../../shared/i18n/index.js';
 import { playSound } from '../sounds/sounds.js';
 import { PowerDevices, type PowerDevice } from './powerDevices.js';

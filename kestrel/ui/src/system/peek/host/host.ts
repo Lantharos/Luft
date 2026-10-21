@@ -5,7 +5,7 @@ import type Meta from 'gi://Meta';
 
 import { t } from '../../../shared/i18n/index.js';
 import { identify, type Caller } from '../access/callers.js';
-import { PidFd } from '../../../shared/processes.js';
+import { PidFd } from '../../../shared/dbus/processes.js';
 import { cgroupOf } from '../access/processes.js';
 import type { Level } from '../access/prompt.js';
 import { listedWindows, waitForWindow } from '../control/windows.js';

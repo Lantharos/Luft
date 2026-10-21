@@ -1,4 +1,4 @@
-import { t } from './i18n/index.js';
+import { t } from '../i18n/index.js';
 
 const KEY_NAMES: Record<string, string> = {
   super: 'keys-super', ctrl: 'keys-ctrl', alt: 'keys-alt', shift: 'keys-shift', meta: 'keys-meta', hyper: 'keys-hyper',

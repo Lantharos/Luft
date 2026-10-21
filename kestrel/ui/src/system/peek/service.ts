@@ -4,8 +4,8 @@ import GLib from 'gi://GLib';
 import type Meta from 'gi://Meta';
 
 import { t } from '../../shared/i18n/index.js';
-import { sandboxed } from '../../shared/sandbox.js';
-import { PidFd, stealFd } from '../../shared/processes.js';
+import { sandboxed } from '../../shared/dbus/sandbox.js';
+import { PidFd, stealFd } from '../../shared/dbus/processes.js';
 import { identifiedProcess, type Caller } from './access/callers.js';
 import type { Level } from './access/prompt.js';
 import { captureScreen, captureWindow } from './control/capture.js';

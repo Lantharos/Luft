@@ -3,10 +3,10 @@ import GLib from 'gi://GLib';
 import {descendants, named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {call} from '../lib/dbus.js';
-import {click} from '../lib/input.js';
+import {click} from '../lib/input/input.js';
 import {stop} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
-import {startSessionClient} from './lib/sessionClient.js';
+import {startSessionClient} from '../system/lib/sessionClient.js';
 
 const {require, eventually} = checks('panel status');
 const SCREEN_CAST = 'org.gnome.Mutter.ScreenCast';

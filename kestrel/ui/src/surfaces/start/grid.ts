@@ -7,7 +7,7 @@ import { StartLayout } from './layout.js';
 import { GridDrag } from './drag.js';
 import { SearchResults } from '../search/results/searchResults.js';
 import type { SearchItem, SearchView } from '../search/item.js';
-import { animateActor, liftIcon } from '../../shared/motion.js';
+import { animateActor, liftIcon } from '../../shared/motion/motion.js';
 import { appIcon } from '../../appearance/icons/appIcons.js';
 import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
 import { t } from '../../shared/i18n/index.js';

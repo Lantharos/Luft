@@ -1,7 +1,7 @@
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
-import { animateActor, Curve, Duration, reducedMotion } from '../motion.js';
+import { animateActor, Curve, Duration, reducedMotion } from '../motion/motion.js';
 
 const CUE_SIZE = 44;
 const CUE_START = 0.4;

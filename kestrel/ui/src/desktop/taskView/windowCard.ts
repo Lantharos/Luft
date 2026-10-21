@@ -5,7 +5,7 @@ import St from 'gi://St';
 import * as DND from 'resource:///com/lantharos/kestrel/ui/dnd.js';
 
 import { windowIcon } from '../../appearance/icons/appIcons.js';
-import { animateActor, Duration } from '../../shared/motion.js';
+import { animateActor, Duration } from '../../shared/motion/motion.js';
 import { localized, t } from '../../shared/i18n/index.js';
 import type { Monitor } from '../panel/panel.js';
 import { clampUnit } from '../../shared/math.js';

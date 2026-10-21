@@ -42,7 +42,7 @@ async function animate(window, place) {
 }
 
 export async function run() {
-  const client = gjs('clients/stripedWindow.js', [TITLE, '900', '520']);
+  const client = gjs('clients/windows/stripedWindow.js', [TITLE, '900', '520']);
   const window = await waitForWindow(TITLE);
   await matchesRepaint('opening a window');
   for (const place of [{name: 'halfway under the taskbar', depth: 260}, {name: 'just under the top of the taskbar', depth: 6}])

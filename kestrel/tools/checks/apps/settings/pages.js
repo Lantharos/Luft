@@ -1,7 +1,7 @@
 import {useScheme} from '../lib/palette.js';
 import {show} from './navigation.js';
 
-const PAGES = ['network', 'network/wifi', 'network/ethernet', 'network/vpn', 'network/proxy', 'bluetooth', 'display', 'sound', 'power', 'input', 'input/shortcuts',
+const PAGES = ['bluetooth', 'network', 'network/ethernet', 'network/vpn', 'network/proxy', 'display', 'sound', 'power', 'input', 'input/shortcuts',
   'input/dictation', 'appearance', 'appearance/fonts', 'desktop', 'notifications', 'accessibility', 'apps', 'privacy', 'security', 'security/protections',
   'security/encryption', 'security/keyring', 'accounts', 'accounts/login', 'language', 'system', 'system/about'];
 

@@ -6,7 +6,7 @@ import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {firstStyled, named, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {centerOf} from '../lib/input.js';
+import {centerOf} from '../lib/input/input.js';
 import {gjs, stop, waitForWindow} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {pause, settled} from '../lib/wait.js';
@@ -178,7 +178,7 @@ export async function run() {
   const normal = geometry();
   const normalWorkBottom = workBottom();
   await capture('tablet-normal-before');
-  const app = gjs('clients/window.js');
+  const app = gjs('clients/windows/window.js');
   try {
     const window = await waitForWindow('Kestrel window check');
     window.maximize();

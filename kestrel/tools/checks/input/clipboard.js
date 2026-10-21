@@ -5,8 +5,8 @@ import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {named, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {inputMethodSettled} from '../lib/inputMethod.js';
-import {press} from '../lib/input.js';
+import {inputMethodSettled} from '../lib/input/inputMethod.js';
+import {press} from '../lib/input/input.js';
 import {gjs, waitForWindow} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {settled} from '../lib/wait.js';
@@ -27,7 +27,7 @@ export async function run() {
   const panel = named('kestrel-clipboard');
   await eventually(inputMethodSettled, 'IBus has settled with Xwayland', 15000);
   St.Clipboard.get_default().set_text(St.ClipboardType.CLIPBOARD, PASTED);
-  gjs('clients/window.js', ['--entry']);
+  gjs('clients/windows/window.js', ['--entry']);
   const window = await waitForWindow('Kestrel window check');
   const frame = window.get_frame_rect();
   await eventually(() => window.has_focus() && Main.inputMethod.caret && inside(Main.inputMethod.caret, frame), 'the text cursor of the focused field is known');

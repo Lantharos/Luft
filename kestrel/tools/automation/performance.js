@@ -241,7 +241,7 @@ async function measureClipboardImages() {
 
 async function measureTrayUpdates() {
   const tray = named('kestrel-tray');
-  const app = gjs('clients/trayApp.js', ['--animate']);
+  const app = gjs('clients/apps/trayApp.js', ['--animate']);
   try {
     await waitUntil(() => tray.visible, 'the tray shows the animated app');
     await settled();
@@ -258,7 +258,7 @@ async function measureTrayUpdates() {
 
 async function measureTaskViewAdd() {
   const titles = Array.from({length: TASK_VIEW_WINDOWS}, (_, index) => `Kestrel task view ${index + 1}`);
-  for (const title of titles) gjs('clients/stripedWindow.js', [title, '640', '400']);
+  for (const title of titles) gjs('clients/windows/stripedWindow.js', [title, '640', '400']);
   try {
     await waitForWindows(titles);
     await settled(MEASURE_SETTLE);
@@ -270,7 +270,7 @@ async function measureTaskViewAdd() {
     let desktopsCreated = 0;
     const signals = [[cards, cards.connect('child-added', () => cardsCreated++)], [desktops, desktops.connect('child-added', () => desktopsCreated++)]];
     const longestStallMs = await longestStall(async () => {
-      gjs('clients/stripedWindow.js', ['Kestrel task view added', '640', '400']);
+      gjs('clients/windows/stripedWindow.js', ['Kestrel task view added', '640', '400']);
       await waitForWindow('Kestrel task view added');
       await waitUntil(() => cards.get_n_children() === TASK_VIEW_WINDOWS + 1, 'the task view shows the added window');
       await settled(MEASURE_SETTLE);

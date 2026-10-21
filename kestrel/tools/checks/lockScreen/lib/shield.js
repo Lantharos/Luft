@@ -2,7 +2,7 @@ import Clutter from 'gi://Clutter';
 import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {named, shown, shownStyled, styled} from '../../lib/actors.js';
-import {moveBy, press} from '../../lib/input.js';
+import {moveBy, press} from '../../lib/input/input.js';
 import {settled, waitUntil} from '../../lib/wait.js';
 
 export const darkened = () => styled('lightbox', Main.uiGroup).some(actor => actor.visible);

@@ -2,7 +2,7 @@ import Atk from 'gi://Atk';
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
-import { animateActor, animateAdjustment } from '../../../shared/motion.js';
+import { animateActor, animateAdjustment } from '../../../shared/motion/motion.js';
 import type { Tab } from '../catalog/catalog.js';
 
 const INDICATOR_DURATION = 220;

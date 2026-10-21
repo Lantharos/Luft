@@ -1,6 +1,6 @@
 import type Meta from 'gi://Meta';
 
-import type { Box } from '../../../shared/placement.js';
+import type { Box } from '../../../shared/layout/placement.js';
 import { edgesMoved, place } from '../placement.js';
 import type { Space, SpaceHost } from '../space.js';
 import { Dwindle } from './dwindle.js';

@@ -2,7 +2,7 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import St from 'gi://St';
 
-import { blurSurface } from '../../shared/surface.js';
+import { blurSurface } from '../../shared/layout/surface.js';
 import { StartGrid } from './grid.js';
 import { StartFooter } from './footer.js';
 import { SearchEngine, type SearchHost } from '../search/engine.js';

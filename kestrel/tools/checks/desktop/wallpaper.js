@@ -47,7 +47,7 @@ async function checkPlaying(picture, darkPicture) {
 }
 
 async function checkCovered(actors) {
-  const app = gjs('clients/window.js');
+  const app = gjs('clients/windows/window.js');
   const window = await waitForWindow('Kestrel window check');
   const stack = global.get_window_actors();
   require(actors.every(actor => stack.indexOf(actor) < stack.indexOf(window.get_compositor_private())), 'app windows stay above the video');

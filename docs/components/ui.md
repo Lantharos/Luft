@@ -139,10 +139,14 @@ $effect(() => {
 | `fileDragStart(path)` | A `dragstart` handler that drags the file at `path` |
 | `pathsFromUriList`, `fileUrlPath` | Paths from `text/uri-list` contents and `file://` URLs |
 | `fileUri(path)` | A `file://` URL for a path |
-| `basename`, `isInside` | A path's last part, and whether a path is inside a folder |
+| `basename`, `parent`, `join`, `isInside` | A path's last part, its folder, a name inside a folder, and whether a path is inside a folder |
 | `bytes`, `memoryBytes` | Sizes in decimal and binary units |
 | `plural(count, singular, pluralForm?)` | `3 files` |
 | `ago(unixSeconds)` | Relative time such as `5 minutes ago` |
+| `date`, `dateTime`, `longDateTime`, `time`, `weekdayTime`, `month` | A moment in Unix seconds in the formats locale, from `October 21, 2026` to `Wednesday, October 21, 2026 at 12:53 PM` |
+| `relativeDay(unixSeconds)` | A short date for lists: the time today, the weekday and time this week, then the day and month, with the year once it's another year |
+| `duration(seconds)`, `longDuration(seconds)` | The two largest units of a duration, as `2h 5m` or `2 hours, 5 minutes` |
+| `errorText(error)` | The message of a failure, to show to the person |
 | `watts(value)` | Power such as `4.2 W` |
 | `formatClock(seconds)` | `1:05` or `1:02:05` |
 | `PaletteState` | What the `CommandPalette` shows: `show(source, query?)` opens it with a `PaletteSource`, whose `items(query)` returns the `PaletteItem`s for what's typed |

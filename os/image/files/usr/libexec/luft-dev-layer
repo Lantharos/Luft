@@ -1,0 +1,36 @@
+#!/usr/bin/bash
+set -euo pipefail
+
+state=/var/lib/luft/dev-layer
+dropped=/run/luft-dev-layer-dropped
+
+field() {
+  sed -n "s/^$1=//p" "$2"
+}
+
+booted() {
+  tr ' ' '\n' </proc/cmdline | sed -n 's/^composefs=?\{0,1\}//p'
+}
+
+link() {
+  if [[ "$(field LUFT_DEV_DEPLOYMENT "$state/release")" == "$(booted)" ]]; then
+    mkdir -p /run/extensions
+    ln -sfn "$state/luft-working-tree.raw" /run/extensions/luft-working-tree.raw
+    return
+  fi
+  install -m644 "$state/release" "$dropped"
+  rm -rf "$state"
+  echo "Took off the development build of $(field LUFT_DEV_COMMIT "$dropped"), made for another version of Luft"
+}
+
+notice() {
+  gdbus call --session --dest org.freedesktop.Notifications --object-path /org/freedesktop/Notifications \
+    --method org.freedesktop.Notifications.Notify -- Luft 0 computer "Development build taken off" \
+    "Luft updated, so the build of $(field LUFT_DEV_COMMIT "$dropped") no longer covers it. Apply it again to keep working on it." \
+    "[]" "{}" -1 >/dev/null
+}
+
+case "$1" in
+  link) link ;;
+  notice) notice ;;
+esac

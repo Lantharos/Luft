@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-variant="$1"
-version="$2"
-reference="$3"
 fedora="$(rpm -E %fedora)"
 codename="Alizé"
 
@@ -41,8 +38,9 @@ enable_units() {
   systemctl mask bootc-fetch-apply-updates.timer
 }
 
-write_image_reference() {
+write_image_references() {
   echo "$reference" | install -Dm644 /dev/stdin /usr/share/luft/image-reference
+  echo "$base" | install -Dm644 /dev/stdin /usr/share/luft/base-image
 }
 
 configure_toolbox() {
@@ -57,6 +55,10 @@ configure_security() {
   semodule "${modules[@]}"
   authselect enable-feature with-fingerprint
   systemd-sysusers /usr/lib/sysusers.d/luft-keyring.conf
+  give_keyring_its_group
+}
+
+give_keyring_its_group() {
   chgrp luft-keyring /usr/libexec/luft-keyring
   chmod 2755 /usr/libexec/luft-keyring
 }
@@ -96,8 +98,14 @@ clean_build_state() {
     /var/log/dnf5.log* /var/lib/dnf /var/cache/ibus /var/cache/ldconfig /var/cache/libX11 /var/cache/swcatalog
 }
 
+[[ "${BASH_SOURCE[0]}" == "$0" ]] || return 0
+
+variant="$1"
+version="$2"
+reference="$3"
+base="$4"
 write_os_release
-write_image_reference
+write_image_references
 enable_units
 configure_toolbox
 configure_security

@@ -1,0 +1,14 @@
+[Unit]
+Description=Tell that the development build was taken off after an update
+After=kestrel-session.target graphical-session.target
+PartOf=graphical-session.target
+ConditionPathExists=/run/luft-dev-layer-dropped
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/luft-dev-layer notice
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=kestrel-session.target

@@ -1,0 +1,14 @@
+[Unit]
+Description=Lay the development build over the version of Luft it was made for
+DefaultDependencies=no
+After=local-fs.target
+Before=systemd-sysext.service
+Wants=systemd-sysext.service
+ConditionPathExists=/var/lib/luft/dev-layer/release
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/luft-dev-layer link
+
+[Install]
+WantedBy=sysinit.target

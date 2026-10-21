@@ -20,7 +20,7 @@ Kestrel is Luft's desktop and login screen. It runs on its own patched Mutter 51
 | `openconnect` | `kestrel-openconnect`, OpenConnect VPN sign-in |
 | `watchdog` | `kestrel-watchdog`, restarts cleanly when the GPU hangs |
 | `peek` | `peek`, lets other programs see and use windows |
-| `tools` | Development sessions, checks and the install script |
+| `tools` | Development sessions and checks |
 
 ## Build and run
 
@@ -32,14 +32,14 @@ kestrel/tools/session.sh nested
 
 `kestrel/tools/session.sh capture` runs every check headless and saves a screenshot of every surface. The other modes and options are in [docs/testing.md](../docs/testing.md).
 
-To use a development build as your session on a regular Fedora install:
+To run your build as the real session on an installed Luft, lay it over the signed image:
 
 ```sh
-kestrel/tools/install.sh install     # into /opt/kestrel, with Luft Keyring, the login screen service and the watchdog
-sudo cp /opt/kestrel/share/kestrel/greetd.toml /etc/greetd/config.toml
-sudo systemctl disable gdm && sudo systemctl enable greetd
+os/dev/layer.sh apply      # build Kestrel the way the image does and lay it over /usr
+os/dev/layer.sh status     # what's laid over, and from which commit
+os/dev/layer.sh reset      # back to the signed image
 ```
 
-`kestrel/tools/install.sh remove` takes it out again. If the login screen doesn't appear after a restart, press Ctrl+Alt+F3, sign in, and check `journalctl -b -u greetd`.
+Log out and back in after `apply` to run it. It stays across restarts and is taken off when Luft updates. [Building Luft](https://docs.luft.computer/developers/building/#on-an-installed-luft) has the details.
 
 Its session services, settings schemas and `peek`, which lets programs see and use windows, are in [the Kestrel reference](../docs/components/kestrel.md).

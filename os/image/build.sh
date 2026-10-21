@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-luft="$(cd "$(dirname "$0")/../.." && pwd)"
+luft="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 image="$luft/os/image"
 state="${LUFT_IMAGE_STATE:-$image/state}"
 cache="${LUFT_IMAGE_CACHE:-${XDG_CACHE_HOME:-$HOME/.cache}/luft-image}"
@@ -292,6 +292,8 @@ plan() {
     printf '%s\t%s\t%s\t%s\n' "$name" "$ref" "$presence" "$signing"
   done < <(part_refs "${names[@]}")
 }
+
+[[ "${BASH_SOURCE[0]}" == "$0" ]] || return 0
 
 case "${1:-luft}" in
   -h | --help) usage ;;

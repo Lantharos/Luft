@@ -1,4 +1,4 @@
-const TOKEN = /\s*(\d+(?:[.,]\d+)?|[.,]\d+|\*\*|[-+*/^%×÷()√π]|[a-z]+)/y;
+const TOKEN = /\s*(\d{1,3}(?:[.,'\u00a0\u202f]\d{3})+(?:[.,]\d+)?|\d+(?:[.,]\d+)?|[.,]\d+|\*\*|[-+*/^%×÷()√π]|[a-z]+)/y;
 const ALIASES: Record<string, string> = { ',': '.', '×': '*', '÷': '/', '**': '^', x: '*' };
 const FUNCTIONS: Record<string, (value: number) => number> = {
   sqrt: Math.sqrt, '√': Math.sqrt, abs: Math.abs, round: Math.round, floor: Math.floor, ceil: Math.ceil, ln: Math.log, log: Math.log10,
@@ -20,7 +20,26 @@ interface Value {
 
 const plain = (number: number): Value => ({ number, percent: false });
 
-function tokenize(text: string): string[] | null {
+export type Decimal = '.' | ',';
+
+const MARKS = /[.,'\u00a0\u202f]/g;
+
+function decimalMark(token: string, decimal: Decimal): number {
+  const marks = [...token.matchAll(MARKS)];
+  const last = marks[marks.length - 1];
+  if (!last) return -1;
+  if (new Set(marks.map(([mark]) => mark)).size > 1) return last.index;
+  if (marks.length > 1) return -1;
+  const thousands = /^\d{1,3}.\d{3}$/.test(token);
+  return last[0] === decimal || !thousands ? last.index : -1;
+}
+
+function plainNumber(token: string, decimal: Decimal): string {
+  const mark = decimalMark(token, decimal);
+  return [...token].map((character, index) => index === mark ? '.' : /\d/.test(character) ? character : '').join('');
+}
+
+function tokenize(text: string, decimal: Decimal): string[] | null {
   const tokens: string[] = [];
   TOKEN.lastIndex = 0;
   while (TOKEN.lastIndex < text.length) {
@@ -28,7 +47,7 @@ function tokenize(text: string): string[] | null {
     const match = TOKEN.exec(text);
     if (!match) return text.slice(start).trim() ? null : tokens;
     const token = match[1];
-    tokens.push(/^[\d.,]/.test(token) ? token.replace(',', '.') : ALIASES[token] ?? token);
+    tokens.push(/^[\d.,]/.test(token) ? plainNumber(token, decimal) : ALIASES[token] ?? token);
   }
   return tokens;
 }
@@ -112,8 +131,8 @@ class Parser {
   }
 }
 
-export function evaluate(text: string, requireOperation: boolean): number | null {
-  const tokens = tokenize(text.toLocaleLowerCase());
+export function evaluate(text: string, requireOperation: boolean, decimal: Decimal = '.'): number | null {
+  const tokens = tokenize(text.toLocaleLowerCase(), decimal);
   if (!tokens?.length) return null;
   const parser = new Parser(tokens);
   const value = parser.parse();

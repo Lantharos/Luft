@@ -80,6 +80,14 @@ export class ClipboardPanel {
     return this.history.entries.length > 0;
   }
 
+  get entries(): readonly ClipboardEntry[] {
+    return this.history.entries;
+  }
+
+  keep(entry: ClipboardEntry): void {
+    void this.history.put(entry);
+  }
+
   open(): void {
     this.refresh();
     this.list.get_first_child()!.grab_key_focus();
@@ -148,7 +156,7 @@ export class ClipboardPanel {
     this.rows.set(row, entry);
     this.menus.bind(row, () => [
       { label: t('clipboard-paste'), run: () => this.paste(entry) },
-      { label: t('clipboard-copy'), run: () => { void this.history.put(entry); this.close(); } },
+      { label: t('clipboard-copy'), run: () => { this.keep(entry); this.close(); } },
       { label: t('clipboard-remove'), run: () => this.history.remove(entry) },
     ]);
     return row;
@@ -179,7 +187,7 @@ export class ClipboardPanel {
     else paste(() => {});
   }
 
-  private paste(entry: ClipboardEntry): void {
+  paste(entry: ClipboardEntry): void {
     this.close();
     void this.history.put(entry).then(() => this.sendPaste());
   }

@@ -3,8 +3,8 @@ import GLib from 'gi://GLib';
 import type Shell from 'gi://Shell';
 import St from 'gi://St';
 
-import type { MenuEntry } from '../../../../desktop/menus/contextMenus.js';
-import { t } from '../../../../shared/i18n/index.js';
+import type { MenuEntry } from '../../../desktop/menus/contextMenus.js';
+import { t } from '../../../shared/i18n/index.js';
 import { fileIcon } from '../icons.js';
 import type { SearchItem } from '../item.js';
 

@@ -16,6 +16,7 @@ interface Component {
 const ROOT = join(import.meta.dir, '../../..');
 const SHARED_BUNDLES: Record<string, string[]> = { settings: ['ui', 'settings-pages'], setup: ['ui'], meet: ['ui'], kestrel: ['settings-pages'] };
 const SOURCE_FILE = /\.(ts|js|svelte|astro|rs)$/;
+const TEST_FILE = /\.test\.ts$/;
 const ID = `([a-z][a-z0-9-]*)(?:\\.[a-z][a-z0-9-]*)?`;
 const REFERENCES = [
 	new RegExp(`(?:(?<![\\w.$])|KestrelUi\\.)t\\(\\s*['"\`]${ID}['"\`]`, 'g'),
@@ -40,7 +41,7 @@ const fileOf = (component: Component, locale: string) => join(ROOT, component.ma
 function walk(path: string): string[] {
 	const full = join(ROOT, path);
 	if (!existsSync(full)) return [];
-	if (!statSync(full).isDirectory()) return SOURCE_FILE.test(full) ? [full] : [];
+	if (!statSync(full).isDirectory()) return SOURCE_FILE.test(full) && !TEST_FILE.test(full) ? [full] : [];
 	return readdirSync(full).flatMap((name) => (name === 'node_modules' || name === 'target' ? [] : walk(join(path, name))));
 }
 

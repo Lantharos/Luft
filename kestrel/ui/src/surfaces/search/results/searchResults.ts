@@ -1,11 +1,11 @@
 import Clutter from 'gi://Clutter';
 import Pango from 'gi://Pango';
 import St from 'gi://St';
-import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
-import type { SearchItem, SearchView } from './search/item.js';
-import { appIcons, type IconApp } from '../../appearance/icons/appIcons.js';
-import { t } from '../../shared/i18n/index.js';
-import { isControlEnter } from '../../shared/input/keyboardNavigation.js';
+import type { ContextMenus } from '../../../desktop/menus/contextMenus.js';
+import type { SearchItem, SearchView } from '../item.js';
+import { appIcons, type IconApp } from '../../../appearance/icons/appIcons.js';
+import { t } from '../../../shared/i18n/index.js';
+import { isControlEnter } from '../../../shared/input/keyboardNavigation.js';
 
 const KEPT_ROWS = 64;
 
@@ -14,7 +14,7 @@ const isApp = (icon: SearchItem['icon']): icon is IconApp => 'get_id' in icon;
 interface Row {
   actor: St.Button;
   highlight: St.Widget;
-  icon: St.Icon;
+  icon: St.Icon | St.Label;
   title: St.Label;
   description: St.Label;
   item: SearchItem;
@@ -23,22 +23,33 @@ interface Row {
 export class SearchResults {
   private readonly rows = new Map<string, Row>();
   private readonly titles = new Map<string, St.Label>();
-  private readonly empty = new St.Label({ text: t('start-search-no-results'), style_class: 'kestrel-empty' });
+  private order: Row[] = [];
   private highlighted: Row | null = null;
+  private highlightedItem: SearchItem | null = null;
   private highlighting = true;
+  private chosen = false;
 
   constructor(
     private readonly menus: ContextMenus,
     private readonly reveal: (actor: St.Widget) => void,
+    private readonly steering: { highlighted(item: SearchItem | null): void } | null = null,
   ) {}
+
+  get current(): SearchItem | null {
+    return this.highlighted?.item ?? null;
+  }
 
   show(container: St.BoxLayout, view: SearchView): void {
     const used = new Set<string>();
     const actors: Clutter.Actor[] = [];
     const titled = view.groups.length + Number(!!view.best) > 1;
+    const previous = this.highlighted?.item.key;
+    this.order = [];
     const add = (item: SearchItem) => {
       used.add(item.key);
-      actors.push(this.row(item).actor);
+      const row = this.row(item);
+      this.order.push(row);
+      actors.push(row.actor);
     };
     if (view.best) {
       if (titled) actors.push(this.title(t('start-search-best-match')));
@@ -48,10 +59,27 @@ export class SearchResults {
       if (titled) actors.push(this.title(group.title));
       group.items.forEach(add);
     }
-    if (!actors.length && !view.pending) actors.push(this.empty);
     this.arrange(container, actors);
-    this.highlight(this.rows.get((view.best ?? view.groups[0]?.items[0])?.key ?? '') ?? null);
+    if (view.fresh) this.chosen = false;
+    const kept = this.chosen ? this.order.find(row => row.item.key === previous) : undefined;
+    this.highlight(kept ?? this.order[0] ?? null);
     if (this.rows.size > KEPT_ROWS) this.prune(used);
+  }
+
+  move(steps: number): void {
+    if (!this.order.length) return;
+    const index = this.highlighted ? this.order.indexOf(this.highlighted) : -1;
+    const next = this.order[Math.max(0, Math.min(this.order.length - 1, index + steps))];
+    this.chosen = true;
+    this.highlight(next);
+    this.reveal(next.actor);
+  }
+
+  openMenu(): void {
+    const row = this.highlighted;
+    if (!row) return;
+    const [x, y] = row.actor.get_transformed_position();
+    this.menus.open(row.actor, this.entries(row), x, y + row.actor.height);
   }
 
   setHighlighting(highlighting: boolean): void {
@@ -63,6 +91,7 @@ export class SearchResults {
     for (const { actor } of this.rows.values()) actor.destroy();
     this.rows.clear();
     this.highlighted = null;
+    this.highlightedItem = null;
   }
 
   private arrange(container: St.BoxLayout, actors: Clutter.Actor[]): void {
@@ -79,6 +108,14 @@ export class SearchResults {
     if (this.highlighted && this.highlighted !== row) this.highlighted.highlight.visible = false;
     this.highlighted = row;
     if (row) row.highlight.visible = this.highlighting;
+    const item = row?.item ?? null;
+    if (item === this.highlightedItem) return;
+    this.highlightedItem = item;
+    this.steering?.highlighted(item);
+  }
+
+  private entries(row: Row) {
+    return row.item.menu?.() ?? [{ label: t('start-open'), run: () => row.item.activate() }];
   }
 
   private prune(used: Set<string>): void {
@@ -105,7 +142,8 @@ export class SearchResults {
       this.rows.set(item.key, row);
     }
     row.item = item;
-    if (!isApp(item.icon)) row.icon.gicon = item.icon;
+    if (row.icon instanceof St.Label) row.icon.text = item.glyph ?? '';
+    else if (!isApp(item.icon)) row.icon.gicon = item.icon;
     if (row.title.text !== item.title) {
       row.title.text = item.title;
       row.actor.accessible_name = item.title;
@@ -119,8 +157,10 @@ export class SearchResults {
 
   private build(item: SearchItem): Row {
     const content = new St.BoxLayout({ style_class: 'kestrel-search-result-content', x_expand: true });
-    const icon = new St.Icon({ icon_size: 32, y_align: Clutter.ActorAlign.CENTER });
-    if (isApp(item.icon)) appIcons.bind(icon, item.icon);
+    const icon = item.glyph !== undefined
+      ? new St.Label({ style_class: 'kestrel-search-result-glyph', y_align: Clutter.ActorAlign.CENTER })
+      : new St.Icon({ icon_size: 32, y_align: Clutter.ActorAlign.CENTER });
+    if (icon instanceof St.Icon && isApp(item.icon)) appIcons.bind(icon, item.icon);
     content.add_child(icon);
     const text = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, x_expand: true, y_align: Clutter.ActorAlign.CENTER });
     const title = new St.Label({ style_class: 'kestrel-search-result-name' });
@@ -146,7 +186,12 @@ export class SearchResults {
       return Clutter.EVENT_STOP;
     });
     actor.connect('key-focus-in', () => this.reveal(actor));
-    this.menus.bind(actor, () => row.item.menu?.() ?? [{ label: t('start-open'), run: () => row.item.activate() }]);
+    if (this.steering) actor.connect('motion-event', () => {
+      this.chosen = true;
+      this.highlight(row);
+      return Clutter.EVENT_PROPAGATE;
+    });
+    this.menus.bind(actor, () => this.entries(row));
     return row;
   }
 }

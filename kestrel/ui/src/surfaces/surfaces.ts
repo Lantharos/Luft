@@ -21,17 +21,16 @@ import type { ClipboardPanel } from './clipboard/panel.js';
 import type { EmojiPanel } from './emoji/panel.js';
 import type { NotificationCenter } from './notifications/notificationCenter.js';
 import type { QuickSettings } from './quickSettings/quickSettings.js';
-import type { StartMenu } from './start/startMenu.js';
+import type { StartSurface } from './start/startSurface.js';
 
 export type Surface = 'start' | 'quick' | 'notifications' | 'clipboard' | 'emoji' | 'snap' | 'tasks';
 type PanelSurface = Exclude<Surface, 'tasks'>;
 
-const START_HEIGHT = 600;
 const EDGE_MARGIN = 12;
 const PANEL_SLIDE = 56;
 
 interface LazySurfaces {
-  start: StartMenu;
+  start: StartSurface;
   notifications: NotificationCenter;
   emoji: EmojiPanel;
   snapLayouts: SnapLayouts;
@@ -50,6 +49,8 @@ interface SurfaceParts extends SurfaceFactories {
   taskView: TaskView;
   canInteract: () => boolean;
   syncSession: () => void;
+  bottomClearance: () => number;
+  startReplaced: () => void;
 }
 
 export class Surfaces {
@@ -76,7 +77,7 @@ export class Surfaces {
     return this.current;
   }
 
-  get start(): StartMenu {
+  get start(): StartSurface {
     return this.ensure('start');
   }
 
@@ -100,6 +101,12 @@ export class Surfaces {
 
   monitorAt(x: number, y: number): Monitor | null {
     return this.parts.context.layoutManager.monitors.find(m => x >= m.x && x < m.x + m.width && y >= m.y && y < m.y + m.height) ?? null;
+  }
+
+  restyleStart(): void {
+    if (!this.created.start) return;
+    this.outdated.add('start');
+    this.dropOutdated(false);
   }
 
   dismissImmediately(): void {
@@ -127,15 +134,11 @@ export class Surfaces {
     this.cover.set_position(0, 0);
     const stage = (global as unknown as Shell.Global).stage;
     this.cover.set_size(stage.width, stage.height);
-    const startWidth = Math.min(660, monitor.width - 24);
-    const clearance = Math.max(board.shown ? board.cornerClearance : taskbarPreferences.clearance, this.keyboardHeight(monitor));
+    const clearance = Math.max(this.parts.bottomClearance(), this.keyboardHeight(monitor));
     const bottom = monitor.y + monitor.height - clearance - SURFACE_GAP;
     const available = monitor.height - clearance - 24;
-    const startHeight = Math.min(START_HEIGHT, available);
-    const startX = board.shown ? monitor.x + monitor.width - EDGE_MARGIN - startWidth : monitor.x + (monitor.width - startWidth) / 2;
     const { start, notifications, emoji, snapLayouts } = this.created;
-    start?.actor.set_size(startWidth, startHeight);
-    start?.actor.set_position(Math.round(startX), bottom - startHeight);
+    start?.place({ monitor, bottom, available, cornered: board.shown });
 
     for (const [actor, width, height] of [
       [quick.actor, 420, quick.preferredHeight(420, available)],
@@ -219,7 +222,7 @@ export class Surfaces {
     }
     this.reveal(actor);
 
-    if (surface === 'start' && !taskbarPreferences.touch) this.start.focus();
+    if (surface === 'start' && (!taskbarPreferences.touch || this.start.focusOnTouch)) this.start.focus();
     else if (!popup) actor.grab_key_focus();
   }
 
@@ -286,6 +289,7 @@ export class Surfaces {
       this.outdated.delete(name);
       delete this.created[name];
       actor.destroy();
+      if (name === 'start') this.parts.startReplaced();
     }
   }
 
@@ -337,8 +341,7 @@ export class Surfaces {
 
   private floor(): number {
     const monitor = this.surfaceMonitor();
-    const { board } = this.parts;
-    return board.shown ? monitor.y + monitor.height - board.cornerClearance : this.parts.panels().forMonitor(monitor).actor.y;
+    return monitor.y + monitor.height - this.parts.bottomClearance();
   }
 
   private popupFor(surface: Surface | null): CaretPopup | null {
@@ -371,6 +374,7 @@ export class Surfaces {
   }
 
   private slideDistance(actor: Clutter.Actor): number {
-    return this.popupActor(actor)?.slideDistance ?? PANEL_SLIDE;
+    const start = this.created.start;
+    return this.popupActor(actor)?.slideDistance ?? (actor === start?.actor ? start.slideDistance : PANEL_SLIDE);
   }
 }

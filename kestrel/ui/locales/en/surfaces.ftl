@@ -1,7 +1,7 @@
 ## Start
 
 # Placeholder of the search field at the top of Start
-start-search-placeholder = Search apps, settings and files
+start-search-placeholder = Search apps, files and more
 # Context menu of the Start search field
 start-search-cut = Cut
 start-search-copy = Copy
@@ -29,13 +29,26 @@ start-move-to-apps = Move to Apps
 ## Start search results
 
 start-search-best-match = Best match
-start-search-no-results = No results
 start-search-group-apps = Apps
+# Actions an app offers in its menu, such as "New private window"
+start-search-group-commands = App actions
+start-search-group-windows = Open windows
 start-search-group-actions = Actions
 start-search-group-settings = Settings
+start-search-group-clipboard = Clipboard
+start-search-group-emoji = Emoji
 start-search-group-files = Files
 # Files whose contents mention the search text
 start-search-group-contents = Inside files
+start-search-group-web = Web
+# $query is what was typed
+start-search-web = Search the web for “{ $query }”
+# Description of something copied earlier, found in the clipboard history
+start-search-clipboard-text = From the clipboard history
+# Comma-separated words people might type to list what they copied. They aren't shown
+start-search-clipboard-keywords = clipboard, copied, clipboard history, paste
+# Context menu of an emoji: puts it where you're typing
+start-search-emoji-insert = Insert
 # Description of a Settings page in search results
 start-search-settings-page = Settings
 # Description of a section inside a Settings page; $page is the page title, such as "Appearance"
@@ -47,6 +60,28 @@ start-search-file-copy-path = Copy path
 start-search-conversion = { $amount } { $from } in { $to }
 # Description of a calculation result; $expression is what was typed
 start-search-calculation = { $expression }, press Enter to copy
+
+## Answers in Start's search to questions about dates and times.
+## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
+
+# $date is a date, such as "27 March 2027"
+start-search-answer-until = Until { $date }
+start-search-answer-since = Since { $date }
+start-search-answer-between = Between { $from } and { $to }
+# The time somewhere else compared with here; $place is a city as typed, such as "Tokyo"
+start-search-answer-time-ahead = { $place }, { $hours ->
+    [one] { $hours } hour
+   *[other] { $hours } hours
+} ahead
+start-search-answer-time-behind = { $place }, { $hours ->
+    [one] { $hours } hour
+   *[other] { $hours } hours
+} behind
+start-search-answer-time-same = { $place }, the same time as here
+# Describes a converted time: the answer is the time in $place when it's $time in $from, such as "In New York when it's 22:00 in London"
+start-search-answer-converted = In { $place } when it's { $time } in { $from }
+start-search-answer-converted-here = Here when it's { $time } in { $from }
+start-search-answer-converted-from-here = In { $place } when it's { $time } here
 
 ## Start search actions
 ## The keyword messages are comma-separated words people might type to find the action.

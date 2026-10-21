@@ -1,33 +1,38 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
-import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import { blurSurface } from '../../shared/surface.js';
-import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
-import { blinkCaret } from '../../shared/input/caret.js';
-import { t } from '../../shared/i18n/index.js';
 import { StartGrid } from './grid.js';
 import { StartFooter } from './footer.js';
-import { StartSearch } from './search/search.js';
-import { appKey, launchHistory } from '../../shared/launchHistory.js';
+import { SearchEngine, type SearchHost } from '../search/engine.js';
+import { searchField } from '../search/field.js';
+import { watchInstalledApps } from '../search/installedApps.js';
+import { launchApp } from '../search/providers/apps.js';
 import { taskbarPreferences } from '../../desktop/panel/preferences/taskbarPreferences.js';
-import type { QuickSettingsSource } from '../quickSettings/quickControls.js';
 import { isControlEnter } from '../../shared/input/keyboardNavigation.js';
+import type { StartArea, StartSurface } from './startSurface.js';
 
-export class StartMenu {
+const WIDTH = 660;
+const HEIGHT = 600;
+const EDGE_MARGIN = 12;
+
+export class StartMenu implements StartSurface {
   readonly actor: St.BoxLayout;
   readonly search: St.Entry;
   readonly footer: StartFooter;
+  readonly slideDistance = 56;
+  readonly focusOnTouch = false;
   private readonly favorites = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
   private pinned = this.readPinned();
-  private readonly appSystem = Shell.AppSystem.get_default();
   private readonly browser: StartGrid;
-  private readonly searchProvider: StartSearch;
+  private readonly searchProvider: SearchEngine;
+  private readonly close: () => void;
   private apps: Gio.AppInfo[] = [];
-  private catalog = '';
 
-  constructor(private readonly close: () => void, menus: ContextMenus, quickSettings: QuickSettingsSource) {
+  constructor(host: SearchHost) {
+    const { menus } = host;
+    this.close = host.close;
     this.actor = new St.BoxLayout({
       name: 'kestrel-start',
       orientation: Clutter.Orientation.VERTICAL,
@@ -35,25 +40,7 @@ export class StartMenu {
       reactive: true, visible: false,
     });
     blurSurface(this.actor);
-    this.search = new St.Entry({
-      style_class: 'kestrel-search', hint_text: t('start-search-placeholder'),
-      can_focus: true, x_expand: true,
-      primary_icon: new St.Icon({ icon_name: 'edit-find-symbolic', icon_size: 16 }),
-    });
-    blinkCaret(this.search);
-    menus.bind(this.search, () => {
-      const text = this.search.clutter_text;
-      const clipboard = St.Clipboard.get_default();
-      const copy = () => clipboard.set_text(St.ClipboardType.CLIPBOARD, text.get_selection());
-      return [
-        { label: t('start-search-cut'), enabled: text.get_selection().length > 0, run: () => { copy(); text.delete_selection(); } },
-        { label: t('start-search-copy'), enabled: text.get_selection().length > 0, run: copy },
-        { label: t('start-search-paste'), run: () => clipboard.get_text(St.ClipboardType.CLIPBOARD, (_clipboard, value) => {
-          if (value) { text.delete_selection(); text.insert_text(value, text.cursor_position); }
-        }) },
-        { label: t('start-search-select-all'), run: () => text.set_selection(0, -1) },
-      ];
-    });
+    this.search = searchField(menus, 'kestrel-search', 16);
     this.search.clutter_text.connect('text-changed', () => this.searchProvider.setText(this.search.get_text()));
     this.search.clutter_text.connect('key-press-event', (_text, event) => {
       if (event.get_key_symbol() === Clutter.KEY_Down) return this.browser.focusFirst() ? Clutter.EVENT_STOP : Clutter.EVENT_PROPAGATE;
@@ -74,28 +61,31 @@ export class StartMenu {
       x_expand: true, y_expand: true,
     });
     this.browser = new StartGrid(scroller, menus, app => this.launch(app));
-    this.searchProvider = new StartSearch(menus, app => this.launch(app), close, quickSettings, view => this.browser.showResults(view));
+    this.searchProvider = new SearchEngine(host, view => this.browser.showResults(view));
     this.actor.add_child(this.browser.header);
     this.actor.connect('key-press-event', (_actor, event) => event.get_key_symbol() === Clutter.KEY_Escape && this.back() ? Clutter.EVENT_STOP : Clutter.EVENT_PROPAGATE);
     this.actor.add_child(scroller);
 
-    this.footer = new StartFooter(close, menus);
+    this.footer = new StartFooter(host.close, menus);
     this.actor.add_child(this.footer.actor);
 
-    const installedChanged = this.appSystem.connect('installed-changed', () => this.loadApps());
     const pinnedChanged = () => {
       this.pinned = this.readPinned();
       this.browser.update(this.apps, this.pinned);
     };
     const favoritesChanged = this.favorites.connect('changed::favorite-apps', pinnedChanged);
     const unwatchTaskbar = taskbarPreferences.watch(key => { if (key === 'taskbar-show-pinned') pinnedChanged(); });
+    const unwatchApps = watchInstalledApps(apps => {
+      this.apps = apps;
+      this.searchProvider.update(apps);
+      this.browser.update(apps, this.pinned);
+    });
     this.actor.connect('destroy', () => {
       this.searchProvider.destroy();
-      this.appSystem.disconnect(installedChanged);
+      unwatchApps();
       this.favorites.disconnect(favoritesChanged);
       unwatchTaskbar();
     });
-    this.loadApps();
   }
 
   private readPinned(): Set<string> {
@@ -104,6 +94,14 @@ export class StartMenu {
 
   focus(): void {
     this.search.grab_key_focus();
+  }
+
+  place({ monitor, bottom, available, cornered }: StartArea): void {
+    const width = Math.min(WIDTH, monitor.width - 2 * EDGE_MARGIN);
+    const height = Math.min(HEIGHT, available);
+    const x = cornered ? monitor.x + monitor.width - EDGE_MARGIN - width : monitor.x + (monitor.width - width) / 2;
+    this.actor.set_size(width, height);
+    this.actor.set_position(Math.round(x), bottom - height);
   }
   private back(): boolean {
     if (this.footer.sessionOpen) { this.footer.setOpen(false); this.focus(); return true; }
@@ -118,22 +116,8 @@ export class StartMenu {
     this.searchProvider.prepare();
   }
 
-  private loadApps(): void {
-    const apps = this.appSystem.get_installed().filter(app => app.should_show())
-      .sort((a, b) => a.get_display_name().localeCompare(b.get_display_name()));
-    const catalog = apps.map(app => [app.get_id(), app.get_display_name(), app.get_icon()?.to_string(), app.get_commandline()].join('\n')).join('\n\n');
-    if (catalog === this.catalog) return;
-    this.catalog = catalog;
-    this.apps = apps;
-    this.searchProvider.update(this.apps);
-    this.browser.update(this.apps, this.pinned);
-  }
-
   private launch(app: Gio.AppInfo): void {
-    launchHistory.record(appKey(app.get_id()!));
-    const shellApp = this.appSystem.lookup_app(app.get_id() ?? '');
-    if (shellApp) shellApp.activate();
-    else app.launch([], (global as unknown as Shell.Global).create_app_launch_context(0, -1));
+    launchApp(app);
     this.close();
   }
 }

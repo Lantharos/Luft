@@ -2,9 +2,9 @@ import Gio from 'gi://Gio';
 import GioUnix from 'gi://GioUnix';
 import Shell from 'gi://Shell';
 
-import type { ContextMenus } from '../../../../desktop/menus/contextMenus.js';
-import { t } from '../../../../shared/i18n/index.js';
-import { appKey } from '../../../../shared/launchHistory.js';
+import type { ContextMenus } from '../../../desktop/menus/contextMenus.js';
+import { t } from '../../../shared/i18n/index.js';
+import { appKey, launchHistory } from '../../../shared/launchHistory.js';
 import type { Ranked, SearchItem } from '../item.js';
 import { rank, searchable, type Query, type Searchable } from '../ranking.js';
 
@@ -21,10 +21,17 @@ function searchTerms(app: Gio.AppInfo): string[] {
   return genericName ? [genericName, ...keywords] : keywords;
 }
 
+export function launchApp(app: Gio.AppInfo): void {
+  launchHistory.record(appKey(app.get_id()!));
+  const shellApp = Shell.AppSystem.get_default().lookup_app(app.get_id() ?? '');
+  if (shellApp) shellApp.activate();
+  else app.launch([], (global as unknown as Shell.Global).create_app_launch_context(0, -1));
+}
+
 export class AppResults {
   private entries: AppEntry[] = [];
 
-  constructor(private readonly menus: ContextMenus, private readonly launch: (app: Gio.AppInfo) => void) {}
+  constructor(private readonly menus: ContextMenus, private readonly close: () => void) {}
 
   update(apps: Gio.AppInfo[]): void {
     this.entries = apps.map(app => searchable({ app }, appKey(app.get_id()!), app.get_display_name(), searchTerms(app)));
@@ -32,6 +39,19 @@ export class AppResults {
 
   find(search: Query, launches: (key: string) => number): Ranked[] {
     return rank(this.entries, search, 0, launches).slice(0, LIMIT).map(({ entry, score }) => ({ item: this.item(entry), score }));
+  }
+
+  frequent(launches: (key: string) => number, limit: number): SearchItem[] {
+    return this.entries.map(entry => ({ entry, weight: launches(entry.key) }))
+      .filter(({ weight }) => weight > 0)
+      .sort((a, b) => b.weight - a.weight)
+      .slice(0, limit)
+      .map(({ entry }) => this.item(entry));
+  }
+
+  private launch(app: Gio.AppInfo): void {
+    launchApp(app);
+    this.close();
   }
 
   private item({ app, key }: AppEntry): SearchItem {

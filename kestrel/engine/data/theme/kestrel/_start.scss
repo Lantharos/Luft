@@ -29,6 +29,19 @@
 .kestrel-search-result-content { padding: 8px 10px; spacing: 12px; }
 .kestrel-search-result-name { font-size: 14px; font-weight: 500; }
 .kestrel-search-result-description { font-size: 12px; color: ink(0.60); }
+.kestrel-search-result-glyph { font-size: 26px; min-width: 32px; text-align: center; }
+
+.kestrel-palette { padding: 8px; spacing: 4px; border-radius: 28px; }
+.kestrel-palette-search, .kestrel-palette-search:hover, .kestrel-palette-search:focus { background-color: transparent; padding: 14px 16px; font-size: 18px; }
+.kestrel-palette-search StIcon { padding-right: 10px; }
+.kestrel-palette-body { spacing: 8px; }
+.kestrel-palette .kestrel-search-group { padding: 10px 10px 2px; font-size: 12px; color: ink(0.65); }
+.kestrel-palette-preview { padding: 16px; spacing: 8px; border-radius: 20px; background-color: fill(0.05); }
+.kestrel-palette-picture { min-height: 120px; }
+.kestrel-palette-glyph { font-size: 88px; }
+.kestrel-palette-preview-heading { font-size: 15px; font-weight: 600; }
+.kestrel-palette-answer .kestrel-palette-preview-heading { font-size: 26px; }
+.kestrel-palette-preview-detail { font-size: 12px; color: ink(0.65); }
 
 .kestrel-footer { padding: 12px 0 0; spacing: 8px; }
 .kestrel-footer .kestrel-icon-button:checked { background-color: fill(0.14); }

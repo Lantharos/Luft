@@ -8,9 +8,9 @@ import { t } from '../../shared/i18n/index.js';
 import { animateActor } from '../../shared/motion.js';
 import { boxCenter, findAnchor, heightNear, placeNear, type Anchor, type Box } from '../../shared/placement.js';
 import type { TextInput } from '../../shared/input/textInput.js';
-import { annotate } from './catalog/annotations.js';
-import { Catalog, describe, withTone } from './catalog/catalog.js';
-import { SearchIndex } from './catalog/search.js';
+import { describe, withTone, type Catalog } from './catalog/catalog.js';
+import type { SearchIndex } from './catalog/search.js';
+import { emojiData } from './catalog/shared.js';
 import { SearchField } from './controls/searchField.js';
 import { TabStrip } from './controls/tabStrip.js';
 import { TonePicker } from './controls/tonePicker.js';
@@ -135,9 +135,9 @@ export class EmojiPanel {
 
   private prepare(): void {
     if (this.catalog) return;
-    const catalog = this.catalog = new Catalog();
-    annotate(catalog);
-    const index = this.index = new SearchIndex(catalog.items);
+    const { catalog, index } = emojiData();
+    this.catalog = catalog;
+    this.index = index;
     this.indexing = GLib.idle_add(GLib.PRIORITY_LOW, () => {
       index.extend(INDEX_CHUNK);
       if (!index.complete) return GLib.SOURCE_CONTINUE;

@@ -20,20 +20,28 @@ export function paintHidden(actor: Clutter.Actor, focused: St.Widget | null = nu
   actor.translation_y = translation;
 }
 
+export function prewarmSoon(steps: (() => void)[]): () => void {
+  let source = GLib.idle_add(GLib.PRIORITY_LOW, () => {
+    steps.shift()!();
+    if (steps.length) return GLib.SOURCE_CONTINUE;
+    source = 0;
+    return GLib.SOURCE_REMOVE;
+  });
+  return () => {
+    if (source) GLib.Source.remove(source);
+    source = 0;
+  };
+}
+
 export function prewarmAfterStartup(layoutManager: StartupSignals, steps: (() => void)[]): () => void {
-  let source = 0;
+  let cancel = () => {};
   let startup = layoutManager.connect('startup-complete', () => {
     layoutManager.disconnect(startup);
     startup = 0;
-    source = GLib.idle_add(GLib.PRIORITY_LOW, () => {
-      steps.shift()!();
-      if (steps.length) return GLib.SOURCE_CONTINUE;
-      source = 0;
-      return GLib.SOURCE_REMOVE;
-    });
+    cancel = prewarmSoon(steps);
   });
   return () => {
     if (startup) layoutManager.disconnect(startup);
-    if (source) GLib.Source.remove(source);
+    cancel();
   };
 }

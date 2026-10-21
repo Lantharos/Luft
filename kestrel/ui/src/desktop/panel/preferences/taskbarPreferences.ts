@@ -8,6 +8,7 @@ type TaskbarStyle = 'bar' | 'floating';
 type TaskbarSize = 'compact' | 'normal' | 'large';
 type TaskbarAutoHide = 'never' | 'always' | 'windows';
 type TaskbarDisplays = 'all' | 'primary';
+type StartStyle = 'menu' | 'palette';
 
 export interface TaskbarMetrics {
   height: number;
@@ -33,7 +34,7 @@ const TOUCH_SLOT_GAP = 10;
 export const STRIP_HEIGHT = 24;
 
 const KEYS = ['taskbar-alignment', 'taskbar-look', 'taskbar-style', 'taskbar-size', 'taskbar-auto-hide', 'taskbar-show-pinned',
-  'taskbar-displays', 'taskbar-windows-per-display', 'taskbar-windows-per-workspace', 'pure-black'] as const;
+  'taskbar-displays', 'taskbar-windows-per-display', 'taskbar-windows-per-workspace', 'start-style', 'pure-black'] as const;
 export type TaskbarKey = typeof KEYS[number] | 'tablet';
 
 class TaskbarPreferences {
@@ -56,6 +57,7 @@ class TaskbarPreferences {
   get style(): TaskbarStyle { return this.touch ? 'bar' : this.settings.get_string('taskbar-style') as TaskbarStyle; }
   get size(): TaskbarSize { return this.settings.get_string('taskbar-size') as TaskbarSize; }
   get autoHide(): TaskbarAutoHide { return this.touch ? 'never' : this.settings.get_string('taskbar-auto-hide') as TaskbarAutoHide; }
+  get startStyle(): StartStyle { return this.settings.get_string('start-style') as StartStyle; }
   get showPinned(): boolean { return this.settings.get_boolean('taskbar-show-pinned'); }
   get displays(): TaskbarDisplays { return this.settings.get_string('taskbar-displays') as TaskbarDisplays; }
   get windowsPerDisplay(): boolean { return this.settings.get_boolean('taskbar-windows-per-display'); }

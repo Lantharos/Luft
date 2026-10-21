@@ -6,3 +6,12 @@ Exec=true
 Icon=helium
 Categories=Network;WebBrowser;
 MimeType=text/html;x-scheme-handler/http;x-scheme-handler/https;
+Actions=new-window;new-private-window;
+
+[Desktop Action new-window]
+Name=New Window
+Exec=true
+
+[Desktop Action new-private-window]
+Name=New Private Window
+Exec=true

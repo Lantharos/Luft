@@ -1,8 +1,8 @@
 import Gio from 'gi://Gio';
 
-import { onLocaleChanged, t } from '../../../../shared/i18n/index.js';
-import { launchHistory } from '../../../../shared/launchHistory.js';
-import { openSettings, SETTINGS_PAGES, type SettingsPage, settingsPageKeywords, settingsPageTitle } from '../../../../system/settingsPages.js';
+import { onLocaleChanged, t } from '../../../shared/i18n/index.js';
+import { launchHistory } from '../../../shared/launchHistory.js';
+import { openSettings, SETTINGS_PAGES, type SettingsPage, settingsPageKeywords, settingsPageTitle } from '../../../system/settingsPages.js';
 import { themedIcon } from '../icons.js';
 import type { Ranked, SearchItem } from '../item.js';
 import { rank, searchable, type Query, type Searchable } from '../ranking.js';

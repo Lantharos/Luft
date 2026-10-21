@@ -733,6 +733,12 @@ export class WindowManager {
             Shell.ActionMode.POPUP,
             this._toggleQuickSettings.bind(this));
 
+        this.addKeybinding('toggle-start',
+            new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
+            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
+            Shell.ActionMode.NORMAL,
+            () => KestrelUi.toggleSurface('start'));
+
         this.addKeybinding('clipboard-history',
             new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
             Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,

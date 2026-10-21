@@ -1,8 +1,8 @@
-import { evaluate } from './expression.js';
+import { evaluate, type Decimal } from './expression.js';
 
-type Dimension = 'length' | 'mass' | 'temperature' | 'data' | 'time' | 'volume' | 'speed';
+export type Dimension = 'length' | 'mass' | 'temperature' | 'data' | 'time' | 'volume' | 'speed' | 'currency';
 
-interface Unit {
+export interface Unit {
   dimension: Dimension;
   symbol: string;
   scale: number;
@@ -20,11 +20,29 @@ export interface Conversion {
 const CONNECTORS = new Set(['to', 'in', 'into', 'as', '=', '->', '→']);
 const PATTERN = /^(.*?[\d)π])\s*([^\s\d()]+)(?:\s+(.*))?$/;
 
+const SYMBOL_FIRST = /^([$€£¥₺₹₽₴])\s*([\d.,]+)(.*)$/;
+
 const units = new Map<string, Unit>();
 
 function define(dimension: Dimension, symbol: string, scale: number, aliases: string[], partner?: string, offset = 0): void {
   const unit = { dimension, symbol, scale, offset, partner };
   for (const alias of [symbol.toLocaleLowerCase(), ...aliases]) units.set(alias, unit);
+}
+
+const currencyAliases: string[] = [];
+
+export function defineCurrencies(currencies: { code: string; perEuro: number; aliases: string[] }[], home: string): void {
+  for (const alias of currencyAliases.splice(0)) units.delete(alias);
+  const known = new Set(currencies.map(({ code }) => code));
+  const fallback = home === 'USD' ? 'EUR' : 'USD';
+  for (const { code, perEuro, aliases } of currencies) {
+    const unit: Unit = { dimension: 'currency', symbol: code, scale: 1 / perEuro, offset: 0, partner: code === home || !known.has(home) ? fallback : home };
+    for (const alias of [code.toLowerCase(), ...aliases]) {
+      if (units.has(alias)) continue;
+      units.set(alias, unit);
+      currencyAliases.push(alias);
+    }
+  }
 }
 
 define('length', 'mm', 0.001, ['millimeter', 'millimeters', 'millimetre', 'millimetres'], 'in');
@@ -106,14 +124,16 @@ function target(from: Unit, rest: string, base: number): Unit {
   return byMagnitude(from, base);
 }
 
-export function convert(text: string): Conversion | null {
-  const match = PATTERN.exec(text.trim().toLocaleLowerCase());
+export function convert(text: string, decimal: Decimal = '.'): Conversion | null {
+  const lowered = text.trim().toLocaleLowerCase();
+  const symbolFirst = SYMBOL_FIRST.exec(lowered);
+  const match = PATTERN.exec(symbolFirst ? `${symbolFirst[2]} ${symbolFirst[1]}${symbolFirst[3]}` : lowered);
   if (!match) return null;
   const [, amountText, unitText, rest = ''] = match;
   const [next = '', ...after] = rest.split(/\s+/);
   const single = lookup(unitText);
   const from = single ?? lookup(`${unitText} ${next}`);
-  const amount = from ? evaluate(amountText, false) : null;
+  const amount = from ? evaluate(amountText, false, decimal) : null;
   if (!from || amount === null) return null;
   const base = amount * from.scale + from.offset;
   const to = target(from, single ? rest : after.join(' '), base);

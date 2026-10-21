@@ -1,7 +1,7 @@
-import { t } from '../../../../shared/i18n/index.js';
-import { launchHistory } from '../../../../shared/launchHistory.js';
-import type { QuickControl, QuickSettingsSource } from '../../../quickSettings/quickControls.js';
-import { LOCK, POWER_ACTIONS, isAvailable, type SessionAction } from '../../../quickSettings/sessionActions.js';
+import { t } from '../../../shared/i18n/index.js';
+import { launchHistory } from '../../../shared/launchHistory.js';
+import type { QuickControl, QuickSettingsSource } from '../../quickSettings/quickControls.js';
+import { LOCK, POWER_ACTIONS, isAvailable, type SessionAction } from '../../quickSettings/sessionActions.js';
 import { themedIcon } from '../icons.js';
 import type { Ranked, SearchItem } from '../item.js';
 import { rank, searchable, type Query, type Searchable } from '../ranking.js';

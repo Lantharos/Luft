@@ -65,6 +65,21 @@
     <value nick="windows" value="2"/>
   </enum>
 
+  <enum id="com.lantharos.kestrel.StartStyle">
+    <value nick="menu" value="0"/>
+    <value nick="palette" value="1"/>
+  </enum>
+
+  <enum id="com.lantharos.kestrel.WebSearch">
+    <value nick="duckduckgo" value="0"/>
+    <value nick="google" value="1"/>
+    <value nick="bing" value="2"/>
+    <value nick="brave" value="3"/>
+    <value nick="ecosia" value="4"/>
+    <value nick="startpage" value="5"/>
+    <value nick="kagi" value="6"/>
+  </enum>
+
   <enum id="com.lantharos.kestrel.TaskbarDisplays">
     <value nick="all" value="0"/>
     <value nick="primary" value="1"/>
@@ -249,6 +264,19 @@
         “automatic” follows the region formats, from the region setting or LC_TIME.
       </description>
     </key>
+    <key name="start-style" enum="com.lantharos.kestrel.StartStyle">
+      <default>'menu'</default>
+      <summary>How Start looks</summary>
+      <description>
+        'menu' opens Start with its search, apps and folders above the
+        taskbar. 'palette' opens Gust, a search bar in the middle of the
+        screen. Super and the Start button open whichever is chosen.
+      </description>
+    </key>
+    <key name="search-web-engine" enum="com.lantharos.kestrel.WebSearch">
+      <default>'duckduckgo'</default>
+      <summary>Where Start's search looks up the web</summary>
+    </key>
     <key name="taskbar-alignment" enum="com.lantharos.kestrel.TaskbarAlignment">
       <default>'center'</default>
       <summary>Where Start and the apps sit on the taskbar</summary>
@@ -366,6 +394,13 @@
       <summary>Keybinding to toggle the visibility of the notification list</summary>
       <description>
         Keybinding to toggle the visibility of the notification list.
+      </description>
+    </key>
+    <key name="toggle-start" type="as">
+      <default>[]</default>
+      <summary>Open Start</summary>
+      <description>
+        Opens Start, or Gust when chosen, in addition to tapping Super.
       </description>
     </key>
     <key name="toggle-quick-settings" type="as">

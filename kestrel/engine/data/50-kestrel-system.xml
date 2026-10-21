@@ -5,6 +5,9 @@
                 wm_name="GNOME Shell"
                 package="gnome-shell">
 
+	<KeyListEntry name="toggle-start"
+                      description="Open Start"/>
+
 	<KeyListEntry name="toggle-message-tray"
                       description="Show the notification list"/>
 

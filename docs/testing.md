@@ -48,7 +48,7 @@ Optional tools widen the capture: with `rclone` installed Rover connects to loca
 
 ### Frame timing
 
-`frames` first opens Start, quick settings, the notification center, the overview, the emoji picker and the lock screen's password prompt once each, as they first open after signing in. Then it opens each of them again, types a search into Start, opens, closes and drags windows, slides windows under stacked glass and under a blurred app window, and enters, pans, pinches, zooms and leaves a board. Each of these runs three times for timing and twice more to time the GPU. For every interaction it prints the time until the first frame, the frames drawn, missed refreshes, frames slower than a refresh, CPU time per frame on the compositor thread and on the slowest frame, update time, layout time and GPU time after each frame, and saves them as `frames-WIDTHxHEIGHT@SCALE.json` in the capture folder.
+`frames` first opens Start, Gust, quick settings, the notification center, the overview, the emoji picker and the lock screen's password prompt once each, as they first open after signing in. Then it opens each of them again, types a search into Start and into Gust, opens, closes and drags windows, slides windows under stacked glass and under a blurred app window, and enters, pans, pinches, zooms and leaves a board. Each of these runs three times for timing and twice more to time the GPU. For every interaction it prints the time until the first frame, the frames drawn, missed refreshes, frames slower than a refresh, CPU time per frame on the compositor thread and on the slowest frame, update time, layout time and GPU time after each frame, and saves them as `frames-WIDTHxHEIGHT@SCALE.json` in the capture folder.
 
 | Variable | Purpose |
 | --- | --- |
@@ -67,7 +67,7 @@ Polkit, real network credentials, unlocking with the computer's own sign-in rule
 
 ## Apps and packages
 
-From an app's folder, `bun run check` type-checks its interface. The Rust side builds with `bun run desktop:build`. Shared Rust crates have their own `cargo test`.
+From an app's folder, `bun run check` type-checks its interface. In `kestrel/ui` it also runs the unit tests, such as those of the quick answers and conversions in Start's search. The Rust side builds with `bun run desktop:build`. Shared Rust crates have their own `cargo test`.
 
 ## NVIDIA graphics
 

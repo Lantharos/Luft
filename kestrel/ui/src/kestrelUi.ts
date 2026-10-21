@@ -31,8 +31,10 @@ import { ClipboardPanel } from './surfaces/clipboard/panel.js';
 import { EmojiPanel } from './surfaces/emoji/panel.js';
 import { NotificationCenter } from './surfaces/notifications/notificationCenter.js';
 import { QuickSettings } from './surfaces/quickSettings/quickSettings.js';
+import { Palette } from './surfaces/palette/palette.js';
+import type { SearchHost } from './surfaces/search/engine.js';
 import { StartMenu } from './surfaces/start/startMenu.js';
-import { paintHidden, prewarmAfterStartup } from './surfaces/prewarm.js';
+import { paintHidden, prewarmAfterStartup, prewarmSoon } from './surfaces/prewarm.js';
 import { Surfaces, type Surface } from './surfaces/surfaces.js';
 import { confirmStartupOnceSettled } from './system/health/startup.js';
 import { CopilotActions } from './system/dictation/copilotActions.js';
@@ -78,6 +80,7 @@ class KestrelUi {
   private focusSignals: (() => void)[] = [];
   private readonly disconnectors: (() => void)[] = [];
   private sessionSyncLater = 0;
+  private cancelStartPrewarm = () => {};
   private draggedWindow: Meta.Window | null = null;
   private readonly syncSessionAfterMotion = () => this.syncSession();
 
@@ -113,6 +116,14 @@ class KestrelUi {
       }, this.menus, () => this.takeScreenshot());
     const clipboard = new ClipboardPanel(this.menus, close, place, context.inputMethod);
     this.copilot = new CopilotActions(context, () => this.surfaces.toggle('start'), text => clipboard.pasteWithoutKeeping(text));
+    const searchHost: SearchHost = {
+      menus: this.menus,
+      quickSettings: context.quickSettings,
+      clipboard,
+      paste: text => clipboard.pasteWithoutKeeping(text),
+      activateWindow: context.activateWindow,
+      close,
+    };
     this.taskView = new TaskView(context.createBackground, workspace => this.board.frameOf(workspace), close, context.activateWindow);
     this.liveWallpaper = new LiveWallpaper(() => context.layoutManager.monitors);
     this.rotation = new RotationAnimation(context.layoutManager, context.createBackground);
@@ -122,7 +133,7 @@ class KestrelUi {
       previews: this.previews,
       panels: () => this.panels,
       board: this.board,
-      start: () => new StartMenu(close, this.menus, context.quickSettings),
+      start: () => taskbarPreferences.startStyle === 'palette' ? new Palette(searchHost) : new StartMenu(searchHost),
       quick: this.quick,
       notifications: () => new NotificationCenter(context.messageTray, this.menus, place, close),
       clipboard,
@@ -131,6 +142,8 @@ class KestrelUi {
       taskView: this.taskView,
       canInteract: () => this.canInteract(),
       syncSession: () => this.syncSession(),
+      bottomClearance: () => this.bottomClearance(),
+      startReplaced: () => this.prewarmStart(),
     });
 
     context.layoutManager.addTopChrome(this.menus.shield);
@@ -151,6 +164,7 @@ class KestrelUi {
     this.disconnectors.push(followUserLanguage(this.ownsTheScreen));
     this.disconnectors.push(taskbarPreferences.watch(key => {
       if (key === 'taskbar-style' || key === 'taskbar-size' || key === 'tablet') place();
+      if (key === 'start-style') this.surfaces.restyleStart();
     }));
 
     context.layoutManager.addTopChrome(this.surfaces.cover);
@@ -211,8 +225,7 @@ class KestrelUi {
     place();
     this.syncSession();
     this.disconnectors.push(prewarmAfterStartup(context.layoutManager, [
-      () => this.surfaces.start.reset(),
-      () => paintHidden(this.surfaces.start.actor, this.surfaces.start.search),
+      ...this.startPrewarm(),
       () => paintHidden(this.quick.actor, this.quick.actor),
       () => paintHidden(this.surfaces.notifications.actor, this.surfaces.notifications.actor),
       () => this.surfaces.emoji.prewarm(),
@@ -282,6 +295,22 @@ class KestrelUi {
     if (!available) this.dismissImmediately();
   }
 
+  private bottomClearance(): number {
+    return this.board.shown ? this.board.cornerClearance : taskbarPreferences.clearance;
+  }
+
+  private prewarmStart(): void {
+    this.cancelStartPrewarm();
+    this.cancelStartPrewarm = prewarmSoon(this.startPrewarm());
+  }
+
+  private startPrewarm(): (() => void)[] {
+    return [
+      () => this.surfaces.start.reset(),
+      () => paintHidden(this.surfaces.start.actor, this.surfaces.start.search),
+    ];
+  }
+
   private superTapped(): void {
     if (this.board.doubleTapped() && this.canInteract()) {
       this.dismissImmediately();
@@ -329,6 +358,7 @@ class KestrelUi {
 
   shutdown(): void {
     for (const disconnect of [...this.focusSignals, ...this.disconnectors]) disconnect();
+    this.cancelStartPrewarm();
     if (this.sessionSyncLater) (global as unknown as Shell.Global).compositor.get_laters().remove(this.sessionSyncLater);
     dropAfterMotion(this.syncSessionAfterMotion);
     this.panels.shutdown();

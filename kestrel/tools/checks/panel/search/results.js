@@ -7,7 +7,7 @@ import {named, shown} from '../../lib/actors.js';
 import {scratch} from '../../lib/processes.js';
 import {settled, waitUntil} from '../../lib/wait.js';
 
-export const start = () => named('kestrel-start');
+export const start = () => named('kestrel-start') ?? named('kestrel-palette');
 export const entry = () => start().get_first_child();
 const list = () => named('kestrel-search-results', start());
 

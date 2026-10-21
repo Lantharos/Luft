@@ -91,3 +91,7 @@ ui-fingerprint-failed = Šo pirksta nospiedumu neizdevās pievienot. Mēģiniet 
 
 ui-time-just-now = tikko
 ui-power-watts = { $watts } W
+
+## Dialog buttons
+
+ui-dialog-cancel = Atcelt

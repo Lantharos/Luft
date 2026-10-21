@@ -91,3 +91,7 @@ ui-fingerprint-failed = Kunne ikke legge til dette fingeravtrykket. Prøv igjen.
 
 ui-time-just-now = akkurat nå
 ui-power-watts = { $watts } W
+
+## Dialog buttons
+
+ui-dialog-cancel = Avbryt

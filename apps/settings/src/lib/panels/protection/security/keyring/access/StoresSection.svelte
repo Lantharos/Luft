@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { AppIcon, ItemRow, Section } from '@luft/ui';
+	import { AppIcon, ConfirmDialog, ItemRow, Section } from '@luft/ui';
 	import { forgetApp, type AppStore } from '../api';
-	import ConfirmDialog from '../ConfirmDialog.svelte';
 
 	let { stores, refresh }: { stores: AppStore[]; refresh: () => Promise<void> } = $props();
 
@@ -31,6 +30,7 @@
 		title={t('settings-passwords-forget-title', { app: store.name })}
 		description={t('settings-passwords-forget-description', { app: store.name })}
 		action={t('settings-passwords-forget')}
+		danger
 		run={() => forget(store)}
 		onclose={() => (forgetting = null)}
 	/>

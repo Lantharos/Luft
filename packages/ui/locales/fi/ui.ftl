@@ -91,3 +91,7 @@ ui-fingerprint-failed = Sormenjälkeä ei voitu lisätä. Yritä uudelleen.
 
 ui-time-just-now = juuri nyt
 ui-power-watts = { $watts } W
+
+## Dialog buttons
+
+ui-dialog-cancel = Peruuta

@@ -91,3 +91,7 @@ ui-fingerprint-failed = Не вдалося додати цей відбиток
 
 ui-time-just-now = щойно
 ui-power-watts = { $watts } Вт
+
+## Dialog buttons
+
+ui-dialog-cancel = Скасувати

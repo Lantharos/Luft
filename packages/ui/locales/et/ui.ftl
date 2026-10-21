@@ -91,3 +91,7 @@ ui-fingerprint-failed = Seda sõrmejälge ei õnnestunud lisada. Proovige uuesti
 
 ui-time-just-now = äsja
 ui-power-watts = { $watts } W
+
+## Dialog buttons
+
+ui-dialog-cancel = Loobu

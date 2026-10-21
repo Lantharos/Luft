@@ -91,3 +91,7 @@ ui-fingerprint-failed = Níorbh fhéidir an méarlorg seo a chur leis. Bain tria
 
 ui-time-just-now = anois díreach
 ui-power-watts = { $watts } W
+
+## Dialog buttons
+
+ui-dialog-cancel = Cealaigh

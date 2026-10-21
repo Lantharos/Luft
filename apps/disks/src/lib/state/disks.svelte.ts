@@ -1,5 +1,5 @@
 import { SvelteSet } from 'svelte/reactivity';
-import { appearance } from '@luft/ui';
+import { appearance, Toasts } from '@luft/ui';
 import * as api from '#lib/api.js';
 import type { Drive, ImageProgress, Protection, Segment, Support, Volume } from '#lib/api.js';
 import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
@@ -21,13 +21,11 @@ class Disks {
 	hovered = $state<string | null>(null);
 	image = $state.raw<ImageProgress | null>(null);
 	protection = $state.raw<Protection>({ available: false, autoUnlock: '', drives: {} });
-	notice = $state<string | null>(null);
 	loaded = $state(false);
 	readonly busy = new SvelteSet<string>();
+	readonly notices = new Toasts(NOTICE_MS);
 
 	drive = $derived(this.drives.find((drive) => drive.id === this.driveId) ?? this.drives[0] ?? null);
-
-	#noticeTimer: ReturnType<typeof setTimeout> | undefined;
 
 	async start() {
 		const state = await api.appState();
@@ -84,9 +82,7 @@ class Disks {
 	fail(caught: unknown) {
 		const message = errorText(caught);
 		if (message === api.CANCELLED) return;
-		this.notice = message;
-		clearTimeout(this.#noticeTimer);
-		this.#noticeTimer = setTimeout(() => (this.notice = null), NOTICE_MS);
+		this.notices.show(message, { failed: true });
 	}
 
 	#imageProgress(progress: ImageProgress) {

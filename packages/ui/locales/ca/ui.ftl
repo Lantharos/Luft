@@ -91,3 +91,7 @@ ui-fingerprint-failed = No s’ha pogut afegir aquesta empremta. Torneu-ho a pro
 
 ui-time-just-now = ara mateix
 ui-power-watts = { $watts } W
+
+## Dialog buttons
+
+ui-dialog-cancel = Cancel·la

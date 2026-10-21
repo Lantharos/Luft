@@ -107,6 +107,7 @@ $effect(() => {
 | `TextField`, `PasswordField` | Text inputs with `error`, `live`, `invalid` and bindable `touched`; `PasswordField` adds show and hide with `onreveal` |
 | `ProgressBar` | Thin bar for a `fraction` from 0 to 1, sliding back and forth while it's `null`; set its height and track color with classes and the fill with `--progress-color` |
 | `Dialog` | Modal with a title, description, body and `actions` snippet; `wide` for longer forms |
+| `ConfirmDialog` | Asks before an action; `run` closes it unless it answers `false`, and a failure shows in the dialog. `danger` for actions that can't be undone |
 | `IconButton` | Round button with a Lucide icon |
 | `Section`, `Row`, `ActionRow`, `ItemRow` | Grouped settings lists; `Row` takes `truncate` and `expanded` |
 | `AppIcon`, `Avatar` | App icon that follows the desktop's icon style when given the app's `id`, and a round user picture with initials |

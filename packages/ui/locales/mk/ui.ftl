@@ -91,3 +91,7 @@ ui-fingerprint-failed = Отпечатокот од прст не можеше �
 
 ui-time-just-now = токму сега
 ui-power-watts = { $watts } W
+
+## Dialog buttons
+
+ui-dialog-cancel = Откажи

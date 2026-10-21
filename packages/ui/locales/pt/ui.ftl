@@ -91,3 +91,7 @@ ui-fingerprint-failed = Não foi possível adicionar esta impressão digital. Te
 
 ui-time-just-now = agora mesmo
 ui-power-watts = { $watts } W
+
+## Dialog buttons
+
+ui-dialog-cancel = Cancelar

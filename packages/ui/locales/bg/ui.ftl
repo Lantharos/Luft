@@ -91,3 +91,7 @@ ui-fingerprint-failed = Отпечатъкът не можа да бъде до�
 
 ui-time-just-now = току-що
 ui-power-watts = { $watts } W
+
+## Dialog buttons
+
+ui-dialog-cancel = Отказ

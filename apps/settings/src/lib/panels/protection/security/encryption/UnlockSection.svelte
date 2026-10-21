@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { Row, Section, Switch } from '@luft/ui';
+	import { ConfirmDialog, Row, Section, Switch } from '@luft/ui';
 	import { acceptSecureBootChange, problem, removeTpmUnlock, replaceRecoveryKey, setUpTpmUnlock, showRecoveryKey, type Trust } from '../api';
 	import RecoveryKeyDialog from '../keys/RecoveryKeyDialog.svelte';
-	import ConfirmDialog from './ConfirmDialog.svelte';
 	import TpmDialog, { type TpmMode } from './TpmDialog.svelte';
 	import { withUnlock } from './unlock.svelte';
 

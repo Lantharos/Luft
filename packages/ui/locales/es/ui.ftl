@@ -91,3 +91,7 @@ ui-fingerprint-failed = No se ha podido añadir esta huella. Vuelve a intentarlo
 
 ui-time-just-now = ahora mismo
 ui-power-watts = { $watts } W
+
+## Dialog buttons
+
+ui-dialog-cancel = Cancelar

@@ -91,3 +91,7 @@ ui-fingerprint-failed = Nem sikerült hozzáadni ezt az ujjlenyomatot. Próbálj
 
 ui-time-just-now = épp most
 ui-power-watts = { $watts } W
+
+## Dialog buttons
+
+ui-dialog-cancel = Mégse

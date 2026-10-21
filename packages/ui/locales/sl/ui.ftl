@@ -91,3 +91,7 @@ ui-fingerprint-failed = Prstnega odtisa ni bilo mogoče dodati. Poskusite znova.
 
 ui-time-just-now = pravkar
 ui-power-watts = { $watts } W
+
+## Dialog buttons
+
+ui-dialog-cancel = Prekliči

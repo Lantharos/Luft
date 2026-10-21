@@ -91,3 +91,7 @@ ui-fingerprint-failed = Nepavyko pridėti šio piršto atspaudo. Bandykite dar k
 
 ui-time-just-now = ką tik
 ui-power-watts = { $watts } W
+
+## Dialog buttons
+
+ui-dialog-cancel = Atšaukti

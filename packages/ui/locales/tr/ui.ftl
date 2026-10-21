@@ -91,3 +91,7 @@ ui-fingerprint-failed = Bu parmak izi eklenemedi. Yeniden deneyin.
 
 ui-time-just-now = az önce
 ui-power-watts = { $watts } W
+
+## Dialog buttons
+
+ui-dialog-cancel = İptal

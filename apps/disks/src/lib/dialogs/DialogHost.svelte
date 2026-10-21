@@ -1,12 +1,11 @@
 <script lang="ts">
-	import { bytes } from '@luft/ui';
+	import { bytes, ConfirmDialog } from '@luft/ui';
 	import * as api from '#lib/api.js';
 	import { volumeName } from '#lib/format.js';
 	import { disks } from '#lib/state/disks.svelte.js';
 	import { space } from '#lib/state/space.svelte.js';
 	import { editor } from '#lib/editor/editor.svelte.js';
 	import type { Drive, Volume } from '#lib/api.js';
-	import ConfirmDialog from './ConfirmDialog.svelte';
 	import DriveDetails from './details/DriveDetails.svelte';
 	import HealthDialog from './details/HealthDialog.svelte';
 	import VolumeDetails from './details/VolumeDetails.svelte';
@@ -75,8 +74,9 @@
 	<ConfirmDialog
 		title="Discard the planned changes?"
 		description="Nothing on the drive has changed yet."
-		confirm="Discard"
-		onconfirm={async () => (editor.close(), true)}
+		action="Discard"
+		danger
+		run={async () => editor.close()}
 		onclose={dialogs.close}
 	/>
 {:else if dialog?.kind === 'label'}
@@ -96,8 +96,9 @@
 	<ConfirmDialog
 		title="Delete “{volumeName(volume)}”?"
 		description="The partition and all {bytes(volume.size)} on it will be removed from {drive.name}. This can't be undone."
-		confirm="Delete partition"
-		onconfirm={() => disks.run(volume.block, () => api.deletePartition(volume.block))}
+		action="Delete partition"
+		danger
+		run={() => disks.run(volume.block, () => api.deletePartition(volume.block))}
 		onclose={dialogs.close}
 	/>
 {:else if dialog?.kind === 'trash'}
@@ -105,8 +106,9 @@
 	<ConfirmDialog
 		title="Move “{name}” to the trash?"
 		description="{folder ? 'It and everything in it take' : 'It takes'} up {bytes(size)}, freed once the trash is emptied."
-		confirm="Move to trash"
-		onconfirm={() => space.trash(path).then(() => true, (caught) => (disks.fail(caught), false))}
+		action="Move to trash"
+		danger
+		run={() => space.trash(path)}
 		onclose={dialogs.close}
 	/>
 {:else if dialog?.kind === 'restore'}
@@ -114,8 +116,9 @@
 	<ConfirmDialog
 		title="Write “{image.name}”?"
 		description="Everything on {target === drive.name ? `${drive.name} (${bytes(drive.size)})` : `“${target}” on ${drive.name}`} will be replaced by the {bytes(image.size)} image. This can't be undone."
-		confirm="Erase and write"
-		onconfirm={() => disks.run(block, () => api.restoreImage(block, image.path))}
+		action="Erase and write"
+		danger
+		run={() => disks.run(block, () => api.restoreImage(block, image.path))}
 		onclose={dialogs.close}
 	/>
 {/if}

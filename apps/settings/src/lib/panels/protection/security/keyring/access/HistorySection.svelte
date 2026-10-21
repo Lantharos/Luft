@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { ago, Row, Section } from '@luft/ui';
+	import { ago, ConfirmDialog, Row, Section } from '@luft/ui';
 	import { clearHistory, type AccessEvent } from '../api';
-	import ConfirmDialog from '../ConfirmDialog.svelte';
 	import { happened } from '../describe';
 
 	const COLLAPSED = 5;
@@ -40,6 +39,7 @@
 		title={t('settings-passwords-history-clear-title')}
 		description={t('settings-passwords-history-clear-confirm')}
 		action={t('settings-passwords-history-clear')}
+		danger
 		run={clear}
 		onclose={() => (clearing = false)}
 	/>

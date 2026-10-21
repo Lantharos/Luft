@@ -91,3 +91,7 @@ ui-fingerprint-failed = Dodavanje ovog otiska prsta nije uspelo. Pokušajte pono
 
 ui-time-just-now = upravo sada
 ui-power-watts = { $watts } W
+
+## Dialog buttons
+
+ui-dialog-cancel = Otkaži

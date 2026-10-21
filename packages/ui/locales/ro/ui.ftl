@@ -91,3 +91,7 @@ ui-fingerprint-failed = Amprenta nu a putut fi adăugată. Încercați din nou.
 
 ui-time-just-now = chiar acum
 ui-power-watts = { $watts } W
+
+## Dialog buttons
+
+ui-dialog-cancel = Anulează

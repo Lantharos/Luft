@@ -1,12 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
-	import { appearance, GlassShell, WindowControls } from '@luft/ui';
+	import { appearance, GlassShell, Toast, WindowControls } from '@luft/ui';
 	import DriveView from '#lib/components/drive/DriveView.svelte';
 	import EditorActions from '#lib/components/editor/EditorActions.svelte';
 	import EditorView from '#lib/components/editor/EditorView.svelte';
 	import SpaceView from '#lib/components/space/SpaceView.svelte';
-	import Notice from '#lib/components/Notice.svelte';
 	import Sidebar from '#lib/components/Sidebar.svelte';
 	import DialogHost from '#lib/dialogs/DialogHost.svelte';
 	import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
@@ -59,6 +58,13 @@
 			</div>
 		</div>
 	</main>
-	<Notice />
+	<Toast
+		class="left-[calc(var(--sidebar-width)_+_(100vw_-_var(--sidebar-width))_/_2)]"
+		toast={disks.notices.current}
+		dismissible
+		ondismiss={disks.notices.dismiss}
+		onhold={disks.notices.hold}
+		onrelease={disks.notices.release}
+	/>
 	<DialogHost />
 </GlassShell>

@@ -91,3 +91,7 @@ ui-fingerprint-failed = Din il-marka tas-saba’ ma żdieditx. Erġa’ pprova.
 
 ui-time-just-now = issa stess
 ui-power-watts = { $watts } W
+
+## Dialog buttons
+
+ui-dialog-cancel = Ikkanċella

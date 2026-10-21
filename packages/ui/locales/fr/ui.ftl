@@ -91,3 +91,7 @@ ui-fingerprint-failed = Impossible d’ajouter cette empreinte. Réessayez.
 
 ui-time-just-now = à l’instant
 ui-power-watts = { $watts } W
+
+## Dialog buttons
+
+ui-dialog-cancel = Annuler

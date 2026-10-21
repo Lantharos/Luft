@@ -4,7 +4,6 @@ export { default as Choice } from './choices/Choice.svelte';
 export { default as SplitBar } from './choices/SplitBar.svelte';
 
 export { default as Checkbox } from './controls/Checkbox.svelte';
-export { default as Dialog } from './controls/Dialog.svelte';
 export { default as IconButton } from './controls/IconButton.svelte';
 export { default as PasswordField } from './controls/PasswordField.svelte';
 export { default as ProgressBar } from './controls/ProgressBar.svelte';
@@ -14,6 +13,9 @@ export { default as Select } from './controls/Select.svelte';
 export { default as Slider } from './controls/Slider.svelte';
 export { default as Switch } from './controls/Switch.svelte';
 export { default as TextField } from './controls/TextField.svelte';
+
+export { default as ConfirmDialog } from './dialogs/ConfirmDialog.svelte';
+export { default as Dialog } from './dialogs/Dialog.svelte';
 
 export { Curve, Gesture, projection, rubberband, Spring, SpringValue, type SpringToken } from './motion';
 

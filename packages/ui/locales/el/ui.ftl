@@ -91,3 +91,7 @@ ui-fingerprint-failed = Δεν ήταν δυνατή η προσθήκη αυτ�
 
 ui-time-just-now = μόλις τώρα
 ui-power-watts = { $watts } W
+
+## Dialog buttons
+
+ui-dialog-cancel = Ακύρωση

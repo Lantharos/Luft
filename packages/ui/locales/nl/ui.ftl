@@ -91,3 +91,7 @@ ui-fingerprint-failed = Kan deze vingerafdruk niet toevoegen. Probeer het opnieu
 
 ui-time-just-now = zojuist
 ui-power-watts = { $watts } W
+
+## Dialog buttons
+
+ui-dialog-cancel = Annuleren

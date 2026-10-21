@@ -109,3 +109,7 @@ ui-fingerprint-failed = Couldn’t add this fingerprint. Try again.
 ui-time-just-now = just now
 # Electrical power. $watts is an already formatted number, like "4.5"
 ui-power-watts = { $watts } W
+
+## Dialog buttons
+
+ui-dialog-cancel = Cancel

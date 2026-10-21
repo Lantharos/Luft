@@ -91,3 +91,7 @@ ui-fingerprint-failed = Ekki tókst að bæta þessu fingrafari við. Reyndu aft
 
 ui-time-just-now = rétt í þessu
 ui-power-watts = { $watts } W
+
+## Dialog buttons
+
+ui-dialog-cancel = Hætta við

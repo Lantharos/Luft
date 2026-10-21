@@ -91,3 +91,7 @@ ui-fingerprint-failed = Kjo gjurmë gishti nuk u shtua dot. Provo sërish.
 
 ui-time-just-now = tani
 ui-power-watts = { $watts } W
+
+## Dialog buttons
+
+ui-dialog-cancel = Anulo

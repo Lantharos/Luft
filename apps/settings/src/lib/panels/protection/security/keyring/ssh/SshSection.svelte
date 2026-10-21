@@ -6,10 +6,9 @@
 	import Terminal from '@lucide/svelte/icons/terminal';
 	import Trash from '@lucide/svelte/icons/trash';
 	import { t } from '@luft/i18n';
-	import { ago, IconButton, Row, Section, Switch } from '@luft/ui';
+	import { ago, ConfirmDialog, IconButton, Row, Section, Switch } from '@luft/ui';
 	import { problem, publicKey, removeKey, setConfirm, type Ssh, type SshKey } from '../api';
 	import AddKeyDialog from './AddKeyDialog.svelte';
-	import ConfirmDialog from '../ConfirmDialog.svelte';
 	import { kind } from '../describe';
 	import { Runner } from '../runner.svelte';
 
@@ -94,6 +93,7 @@
 		title={t('settings-passwords-ssh-remove-title', { name: label(key) })}
 		description={key.chip ? t('settings-passwords-ssh-remove-chip') : t('settings-passwords-ssh-remove-description')}
 		action={t('settings-protection-remove')}
+		danger
 		run={() => remove(key)}
 		onclose={() => (removing = null)}
 	/>

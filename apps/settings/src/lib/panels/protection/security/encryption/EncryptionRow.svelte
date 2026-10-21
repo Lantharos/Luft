@@ -1,7 +1,7 @@
 <script lang="ts">
 	import LockKeyhole from '@lucide/svelte/icons/lock-keyhole';
 	import { t } from '@luft/i18n';
-	import { errorText, Row, Switch } from '@luft/ui';
+	import { errorText, ProgressBar, Row, Switch } from '@luft/ui';
 	import { restart, type Disk, type Tpm } from '../api';
 	import { progressLine, unlockSummary } from './describe';
 	import TurnOffDialog from './TurnOffDialog.svelte';
@@ -26,9 +26,7 @@
 </script>
 
 {#snippet progress()}
-	<div class="h-1.5 overflow-hidden rounded-full bg-[var(--control)]">
-		<div class="progress-fill h-full rounded-full bg-[var(--accent)]" style:--progress={disk.progress}></div>
-	</div>
+	<ProgressBar fraction={disk.progress} />
 {/snippet}
 
 {#snippet failure()}

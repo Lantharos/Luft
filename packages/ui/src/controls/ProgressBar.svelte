@@ -18,5 +18,5 @@
 	aria-valuemax={100}
 	aria-valuenow={fraction === null ? undefined : Math.round(fraction * 100)}
 >
-	<span class="progress-fill" class:indeterminate={fraction === null} style:--progress={fraction}></span>
+	<span class:indeterminate={fraction === null} style:--progress={fraction}></span>
 </div>

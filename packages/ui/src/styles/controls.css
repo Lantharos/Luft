@@ -177,12 +177,6 @@
 		opacity: 1;
 	}
 
-	.progress-fill {
-		width: 100%;
-		translate: calc((var(--progress, 0) - 1) * 100%) 0;
-		transition: translate var(--spring-smooth-duration) var(--spring-smooth);
-	}
-
 	.progress-bar {
 		height: 6px;
 		overflow: hidden;
@@ -190,11 +184,14 @@
 		background: var(--control);
 	}
 
-	.progress-bar > .progress-fill {
+	.progress-bar > span {
 		display: block;
+		width: 100%;
 		height: 100%;
 		border-radius: inherit;
 		background: var(--progress-color, var(--accent));
+		translate: calc((var(--progress, 0) - 1) * 100%) 0;
+		transition: translate var(--spring-smooth-duration) var(--spring-smooth);
 	}
 
 	.progress-bar > .indeterminate {

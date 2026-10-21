@@ -1,11 +1,10 @@
 import Gio from 'gi://Gio';
-import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
 
-import { stealFd } from '../../../auth/keyring/prompter.js';
 import { t } from '../../../shared/i18n/index.js';
 import { PeekError } from '../errors.js';
-import { PidFd, processUnit, statOf, unitName } from './processes.js';
+import { callerProcess, type PidFd } from '../../../shared/processes.js';
+import { processUnit, statOf, unitName } from './processes.js';
 
 export interface Caller {
   readonly unit: string;
@@ -54,12 +53,8 @@ export function identify(pid: number, launchedBy: (unit: string) => Caller | nul
   return own ? unitCaller(own) : null;
 }
 
-export async function callerProcess(invocation: Gio.DBusMethodInvocation): Promise<PidFd> {
-  const [reply, fds] = await Gio.DBus.session.call_with_unix_fd_list('org.freedesktop.DBus', '/org/freedesktop/DBus', 'org.freedesktop.DBus',
-    'GetConnectionCredentials', new GLib.Variant('(s)', [invocation.get_sender()!]), new GLib.VariantType('(a{sv})'),
-    Gio.DBusCallFlags.NONE, -1, null, null);
-  const [credentials] = reply.deepUnpack() as [Record<string, GLib.Variant>];
-  const fd = credentials.ProcessFD ? stealFd(fds, credentials.ProcessFD.deepUnpack() as number) : null;
-  if (fd === null) throw new PeekError('Failed', t('peek-error-no-caller'));
-  return new PidFd(fd);
+export async function identifiedProcess(invocation: Gio.DBusMethodInvocation): Promise<PidFd> {
+  const process = await callerProcess(invocation);
+  if (!process) throw new PeekError('Failed', t('peek-error-no-caller'));
+  return process;
 }

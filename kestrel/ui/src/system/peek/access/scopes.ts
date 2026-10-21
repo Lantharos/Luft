@@ -3,7 +3,7 @@ import GLib from 'gi://GLib';
 
 import { t } from '../../../shared/i18n/index.js';
 import { PeekError } from '../errors.js';
-import type { PidFd } from './processes.js';
+import type { PidFd } from '../../../shared/processes.js';
 
 const SYSTEMD_PATH = '/org/freedesktop/systemd1';
 const MANAGER = 'org.freedesktop.systemd1.Manager';

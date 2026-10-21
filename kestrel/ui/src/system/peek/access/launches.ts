@@ -5,7 +5,8 @@ import { t } from '../../../shared/i18n/index.js';
 import { PeekError } from '../errors.js';
 import type { Caller } from './callers.js';
 import { watchUnit } from './lifetime.js';
-import { PidFd, processUnit, statOf, unitName } from './processes.js';
+import { PidFd } from '../../../shared/processes.js';
+import { processUnit, statOf, unitName } from './processes.js';
 import { Scopes } from './scopes.js';
 
 export interface Launch {

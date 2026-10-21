@@ -1,13 +1,13 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-import { refuseSandboxed, sandboxed } from '../../shared/sandbox.js';
 import { Clients } from './clients.js';
 import { EndSession, type EndAction } from './endSession.js';
 import { Inhibitors } from './inhibitors.js';
 import { BUS_NAME, InhibitFlags, MANAGER_PATH, MANAGER_XML } from './interfaces.js';
 import { Peers } from './peers.js';
 import { Presence } from './presence.js';
+import { sandboxed } from './sandbox.js';
 import { ScreenSaver } from './screenSaver.js';
 import { availability, exportEnvironment, perform, watchSession, type SessionState } from './system.js';
 
@@ -114,7 +114,10 @@ export class SessionManager {
   }
 
   private async setenv(name: string, value: string, invocation: Invocation): Promise<void> {
-    if (await refuseSandboxed(invocation, 'change the session environment')) return;
+    if (await sandboxed(invocation)) {
+      invocation.return_dbus_error('org.freedesktop.DBus.Error.AccessDenied', 'Sandboxed apps cannot change the session environment');
+      return;
+    }
     if (!this.initializing) {
       invocation.return_dbus_error('org.gnome.SessionManager.NotInInitialization', 'The session environment can only change while the session starts');
       return;
@@ -124,7 +127,7 @@ export class SessionManager {
   }
 
   private async logout(mode: number, invocation: Invocation): Promise<void> {
-    const confirmed = await sandboxed(invocation.get_sender()!) ? 0 : mode;
+    const confirmed = await sandboxed(invocation) ? 0 : mode;
     invocation.return_value(null);
     this.end('logout', confirmed);
   }

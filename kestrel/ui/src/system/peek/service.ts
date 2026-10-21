@@ -3,12 +3,11 @@ import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
 import type Meta from 'gi://Meta';
 
-import { stealFd } from '../../auth/keyring/prompter.js';
 import { t } from '../../shared/i18n/index.js';
-import { sandboxedProcess } from '../../shared/sandbox.js';
-import { callerProcess, type Caller } from './access/callers.js';
+import { sandboxed } from '../../shared/sandbox.js';
+import { PidFd, stealFd } from '../../shared/processes.js';
+import { identifiedProcess, type Caller } from './access/callers.js';
 import type { Level } from './access/prompt.js';
-import { PidFd } from './access/processes.js';
 import { captureScreen, captureWindow } from './control/capture.js';
 import { requireOpenScreen, screenGuarded, type Screen } from './control/guard.js';
 import { Injector } from './control/input.js';
@@ -206,9 +205,9 @@ export class PeekService {
   private async answer(invocation: Invocation, handle: Handler): Promise<void> {
     let process: PidFd | null = null;
     try {
-      process = await callerProcess(invocation);
+      if (await sandboxed(invocation)) throw new PeekError('Denied', t('peek-error-sandboxed'));
+      process = await identifiedProcess(invocation);
       const pid = process.pid;
-      if (pid && sandboxedProcess(pid)) throw new PeekError('Denied', t('peek-error-sandboxed'));
       const caller = pid ? this.policy.identify(pid) : null;
       if (!caller || process.pid !== pid) throw new PeekError('Denied', t('peek-error-unknown-caller'));
       this.policy.admit(caller);

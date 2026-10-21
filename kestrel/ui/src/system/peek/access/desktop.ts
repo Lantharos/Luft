@@ -4,7 +4,7 @@ import type { Policy } from '../policy.js';
 import { listedWindows, waitForWindow } from '../control/windows.js';
 import { identify, type Caller } from './callers.js';
 import { windowAccess } from './grants.js';
-import type { PidFd } from './processes.js';
+import type { PidFd } from '../../../shared/processes.js';
 import type { Level } from './prompt.js';
 
 export class DesktopPolicy implements Policy {

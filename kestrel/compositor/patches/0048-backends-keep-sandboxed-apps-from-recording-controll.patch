@@ -17,108 +17,44 @@ whose app ID falls under com.lantharos.Kestrel could own the screencast
 service's name, so that name only counts when the caller also runs
 outside a sandbox, judged from the process that owns the calling
 connection the same way Wayland clients are.
+meta_context_is_sender_unsandboxed() lets the shell judge its own
+D-Bus callers the same way.
 
 DisplayConfig methods and property writes that change displays, such as
 ApplyMonitorsConfig, SetBacklight and PowerSaveMode, refuse sandboxed
 callers. Property writes bypass method authorization, so a skeleton
 subclass checks them before the generated setter runs.
 ---
- src/backends/meta-dbus-access-checker.c     |  39 +++++++
- src/backends/meta-dbus-access-checker.h     |   4 +
- src/backends/meta-dbus-session-manager.c    |  45 ++++++++
- src/backends/meta-display-config-skeleton.c | 113 ++++++++++++++++++++
+ src/backends/meta-dbus-session-manager.c    |  46 ++++++++
+ src/backends/meta-display-config-skeleton.c | 113 +++++++++++++++++++
  src/backends/meta-display-config-skeleton.h |  13 +++
  src/backends/meta-monitor-manager.c         |   4 +-
+ src/core/meta-sandbox.c                     | 116 ++++++++++++++++++++
+ src/core/meta-sandbox.h                     |   6 +-
  src/meson.build                             |   2 +
- 7 files changed, 219 insertions(+), 1 deletion(-)
+ src/meta/meta-context.h                     |  15 ++-
+ 8 files changed, 312 insertions(+), 3 deletions(-)
  create mode 100644 src/backends/meta-display-config-skeleton.c
  create mode 100644 src/backends/meta-display-config-skeleton.h
 
-diff --git a/src/backends/meta-dbus-access-checker.c b/src/backends/meta-dbus-access-checker.c
-index 0ace12607751be46508a315b9788c4ebd5fb791e..3b9e942c83d5bb87887dfa39d2de84b18fa92a9f 100644
---- a/src/backends/meta-dbus-access-checker.c
-+++ b/src/backends/meta-dbus-access-checker.c
-@@ -21,7 +21,11 @@
- 
- #include "meta-dbus-access-checker.h"
- 
-+#include <gio/gunixfdlist.h>
-+#include <glib/gstdio.h>
-+
- #include "core/meta-context-private.h"
-+#include "core/meta-sandbox.h"
- 
- enum
- {
-@@ -210,3 +214,38 @@ meta_dbus_access_checker_is_sender_allowed (MetaDbusAccessChecker *self,
- 
-   return FALSE;
- }
-+
-+gboolean
-+meta_dbus_sender_is_unsandboxed (MetaContext     *context,
-+                                 GDBusConnection *connection,
-+                                 const char      *sender_name)
-+{
-+  g_autoptr (GUnixFDList) fd_list = NULL;
-+  g_autoptr (GVariant) reply = NULL;
-+  g_autoptr (GVariant) credentials = NULL;
-+  g_autofd int pidfd = -1;
-+  int32_t pidfd_handle;
-+  uint32_t pid;
-+
-+  reply = g_dbus_connection_call_with_unix_fd_list_sync (connection,
-+                                                         "org.freedesktop.DBus",
-+                                                         "/org/freedesktop/DBus",
-+                                                         "org.freedesktop.DBus",
-+                                                         "GetConnectionCredentials",
-+                                                         g_variant_new ("(s)", sender_name),
-+                                                         G_VARIANT_TYPE ("(a{sv})"),
-+                                                         G_DBUS_CALL_FLAGS_NONE,
-+                                                         -1, NULL, &fd_list,
-+                                                         NULL, NULL);
-+  if (!reply)
-+    return FALSE;
-+
-+  credentials = g_variant_get_child_value (reply, 0);
-+  if (!fd_list ||
-+      !g_variant_lookup (credentials, "ProcessFD", "h", &pidfd_handle) ||
-+      !g_variant_lookup (credentials, "ProcessID", "u", &pid))
-+    return FALSE;
-+
-+  pidfd = g_unix_fd_list_get (fd_list, pidfd_handle, NULL);
-+  return pidfd >= 0 && meta_process_is_unsandboxed (context, pidfd, pid);
-+}
-diff --git a/src/backends/meta-dbus-access-checker.h b/src/backends/meta-dbus-access-checker.h
-index acbb942c0c54ad74fe394f76f3a8137733f2cc90..64a1a2fe8ef534ec584d398da37b80743b90be60 100644
---- a/src/backends/meta-dbus-access-checker.h
-+++ b/src/backends/meta-dbus-access-checker.h
-@@ -37,3 +37,7 @@ void meta_dbus_access_checker_allow_sender (MetaDbusAccessChecker *self,
- 
- gboolean meta_dbus_access_checker_is_sender_allowed (MetaDbusAccessChecker *self,
-                                                      const char            *sender_name);
-+
-+gboolean meta_dbus_sender_is_unsandboxed (MetaContext     *context,
-+                                          GDBusConnection *connection,
-+                                          const char      *sender_name);
 diff --git a/src/backends/meta-dbus-session-manager.c b/src/backends/meta-dbus-session-manager.c
-index 3944bca391936fadcf020452937a533b82467773..655c0084781b86d698d87a2f7c83211aeef63dab 100644
+index 3944bca391936fadcf020452937a533b82467773..62531acc790ebf5f68f5162e4d3b53c4d530b187 100644
 --- a/src/backends/meta-dbus-session-manager.c
 +++ b/src/backends/meta-dbus-session-manager.c
-@@ -23,8 +23,12 @@
+@@ -23,7 +23,12 @@
  #include <gobject/gvaluecollector.h>
  
  #include "backends/meta-backend-private.h"
 +#include "backends/meta-dbus-access-checker.h"
  #include "backends/meta-dbus-session-watcher.h"
- 
++#include "core/meta-sandbox.h"
++
 +#define PORTAL_BACKEND_NAME "org.freedesktop.impl.portal.desktop.kestrel"
 +#define SCREENCAST_SERVICE_NAME "com.lantharos.Kestrel.Screencast"
-+
+ 
  enum
  {
-   ENABLED,
-@@ -60,6 +64,8 @@ typedef struct _MetaDbusSessionManagerPrivate
+@@ -60,6 +65,8 @@ typedef struct _MetaDbusSessionManagerPrivate
  
    guint dbus_name_id;
    GDBusInterfaceSkeleton *interface_skeleton;
@@ -127,7 +63,7 @@ index 3944bca391936fadcf020452937a533b82467773..655c0084781b86d698d87a2f7c83211a
  
    gboolean is_enabled;
  
-@@ -107,10 +113,39 @@ meta_dbus_session_manager_finalize (GObject *object)
+@@ -107,10 +114,39 @@ meta_dbus_session_manager_finalize (GObject *object)
    g_clear_pointer (&priv->service_path, g_free);
  
    g_clear_object (&priv->interface_skeleton);
@@ -167,7 +103,7 @@ index 3944bca391936fadcf020452937a533b82467773..655c0084781b86d698d87a2f7c83211a
  static void
  on_bus_acquired (GDBusConnection *connection,
                   const char      *name,
-@@ -120,8 +155,18 @@ on_bus_acquired (GDBusConnection *connection,
+@@ -120,8 +156,18 @@ on_bus_acquired (GDBusConnection *connection,
      META_DBUS_SESSION_MANAGER (user_data);
    MetaDbusSessionManagerPrivate *priv =
      meta_dbus_session_manager_get_instance_private (session_manager);
@@ -188,7 +124,7 @@ index 3944bca391936fadcf020452937a533b82467773..655c0084781b86d698d87a2f7c83211a
                priv->service_name, priv->service_path);
 diff --git a/src/backends/meta-display-config-skeleton.c b/src/backends/meta-display-config-skeleton.c
 new file mode 100644
-index 0000000000000000000000000000000000000000..7a106e709e5cf45029436de75e0b18d9a0d0b7e8
+index 0000000000000000000000000000000000000000..6e23ec6565c88c66a42dd0306cf98088e46b0f7a
 --- /dev/null
 +++ b/src/backends/meta-display-config-skeleton.c
 @@ -0,0 +1,113 @@
@@ -197,7 +133,7 @@ index 0000000000000000000000000000000000000000..7a106e709e5cf45029436de75e0b18d9
 +
 +#include "backends/meta-display-config-skeleton.h"
 +
-+#include "backends/meta-dbus-access-checker.h"
++#include "core/meta-sandbox.h"
 +
 +#define ACCESS_DENIED_MESSAGE "Sandboxed apps cannot change displays"
 +
@@ -346,6 +282,158 @@ index 6aa88fc65cb5747350d1b22b4e31546e3518bcfe..4945ed209e94a934e0f846678246e4ec
  
    g_signal_connect_object (settings,
                             "privacy-screen-changed",
+diff --git a/src/core/meta-sandbox.c b/src/core/meta-sandbox.c
+index b2883a224068ccb0daf4838fdad18199c1da05a0..9844e73e9f0a04dca7f765b5b13d9a382f548fdd 100644
+--- a/src/core/meta-sandbox.c
++++ b/src/core/meta-sandbox.c
+@@ -5,6 +5,7 @@
+ 
+ #include <fcntl.h>
+ #include <gio/gio.h>
++#include <gio/gunixfdlist.h>
+ #include <glib/gstdio.h>
+ #include <stdlib.h>
+ #include <sys/pidfd.h>
+@@ -173,3 +174,118 @@ meta_process_is_unsandboxed (MetaContext *context,
+   return (shares_root_mount (pid) || runs_trusted_flatpak (context, pid)) &&
+          pidfd_send_signal (pidfd, 0, NULL, 0) == 0;
+ }
++
++static gboolean
++credentials_are_unsandboxed (MetaContext *context,
++                             GVariant    *reply,
++                             GUnixFDList *fd_list)
++{
++  g_autoptr (GVariant) credentials = NULL;
++  g_autofd int pidfd = -1;
++  int32_t pidfd_handle;
++  uint32_t pid;
++
++  if (!reply || !fd_list)
++    return FALSE;
++
++  credentials = g_variant_get_child_value (reply, 0);
++  if (!g_variant_lookup (credentials, "ProcessFD", "h", &pidfd_handle) ||
++      !g_variant_lookup (credentials, "ProcessID", "u", &pid))
++    return FALSE;
++
++  pidfd = g_unix_fd_list_get (fd_list, pidfd_handle, NULL);
++  return pidfd >= 0 && meta_process_is_unsandboxed (context, pidfd, pid);
++}
++
++gboolean
++meta_dbus_sender_is_unsandboxed (MetaContext     *context,
++                                 GDBusConnection *connection,
++                                 const char      *sender_name)
++{
++  g_autoptr (GUnixFDList) fd_list = NULL;
++  g_autoptr (GVariant) reply = NULL;
++
++  reply = g_dbus_connection_call_with_unix_fd_list_sync (connection,
++                                                         "org.freedesktop.DBus",
++                                                         "/org/freedesktop/DBus",
++                                                         "org.freedesktop.DBus",
++                                                         "GetConnectionCredentials",
++                                                         g_variant_new ("(s)", sender_name),
++                                                         G_VARIANT_TYPE ("(a{sv})"),
++                                                         G_DBUS_CALL_FLAGS_NONE,
++                                                         -1, NULL, &fd_list,
++                                                         NULL, NULL);
++  return credentials_are_unsandboxed (context, reply, fd_list);
++}
++
++static void
++on_sender_credentials (GObject      *source,
++                       GAsyncResult *result,
++                       gpointer      user_data)
++{
++  g_autoptr (GTask) task = user_data;
++  g_autoptr (GUnixFDList) fd_list = NULL;
++  g_autoptr (GVariant) reply = NULL;
++
++  reply = g_dbus_connection_call_with_unix_fd_list_finish (G_DBUS_CONNECTION (source),
++                                                           &fd_list, result, NULL);
++  g_task_return_boolean (task,
++                         credentials_are_unsandboxed (g_task_get_source_object (task),
++                                                      reply, fd_list));
++}
++
++/**
++ * meta_context_is_sender_unsandboxed:
++ * @context: a #MetaContext
++ * @connection: the bus the sender is connected to
++ * @sender: the unique bus name of the sender
++ * @cancellable: (nullable): a #GCancellable
++ * @callback: called once the sender is judged
++ * @user_data: data for @callback
++ *
++ * Judges whether the process behind a D-Bus connection runs outside a
++ * sandbox, the same way Wayland clients are judged.
++ */
++void
++meta_context_is_sender_unsandboxed (MetaContext         *context,
++                                    GDBusConnection     *connection,
++                                    const char          *sender,
++                                    GCancellable        *cancellable,
++                                    GAsyncReadyCallback  callback,
++                                    gpointer             user_data)
++{
++  g_return_if_fail (META_IS_CONTEXT (context));
++  g_return_if_fail (G_IS_DBUS_CONNECTION (connection));
++  g_return_if_fail (sender);
++
++  g_dbus_connection_call_with_unix_fd_list (connection,
++                                            "org.freedesktop.DBus",
++                                            "/org/freedesktop/DBus",
++                                            "org.freedesktop.DBus",
++                                            "GetConnectionCredentials",
++                                            g_variant_new ("(s)", sender),
++                                            G_VARIANT_TYPE ("(a{sv})"),
++                                            G_DBUS_CALL_FLAGS_NONE,
++                                            -1, NULL, cancellable,
++                                            on_sender_credentials,
++                                            g_task_new (context, cancellable,
++                                                        callback, user_data));
++}
++
++/**
++ * meta_context_is_sender_unsandboxed_finish:
++ * @context: a #MetaContext
++ * @result: the result passed to the callback
++ * @error: return location for an error
++ *
++ * Returns: whether the sender runs outside a sandbox
++ */
++gboolean
++meta_context_is_sender_unsandboxed_finish (MetaContext   *context,
++                                           GAsyncResult  *result,
++                                           GError       **error)
++{
++  g_return_val_if_fail (g_task_is_valid (result, context), FALSE);
++
++  return g_task_propagate_boolean (G_TASK (result), error);
++}
+diff --git a/src/core/meta-sandbox.h b/src/core/meta-sandbox.h
+index 4e6b6b23a162201b1e1b47bfdc75a19dbad544eb..8d0b95b9433be2bc4065b18631e31539bcd6d9be 100644
+--- a/src/core/meta-sandbox.h
++++ b/src/core/meta-sandbox.h
+@@ -1,7 +1,7 @@
+ /* SPDX-License-Identifier: GPL-2.0-or-later */
+ #pragma once
+ 
+-#include <glib.h>
++#include <gio/gio.h>
+ #include <sys/types.h>
+ 
+ #include "meta/types.h"
+@@ -9,3 +9,7 @@
+ gboolean meta_process_is_unsandboxed (MetaContext *context,
+                                       int          pidfd,
+                                       pid_t        pid);
++
++gboolean meta_dbus_sender_is_unsandboxed (MetaContext     *context,
++                                          GDBusConnection *connection,
++                                          const char      *sender_name);
 diff --git a/src/meson.build b/src/meson.build
 index 7e51861098aed187c1d45609340d8851fd3b1cb7..436aef8fe6481fbb0e9b4fdf17ec95304c4b0007 100644
 --- a/src/meson.build
@@ -359,3 +447,36 @@ index 7e51861098aed187c1d45609340d8851fd3b1cb7..436aef8fe6481fbb0e9b4fdf17ec9530
    'backends/meta-dbus-session-manager.c',
    'backends/meta-dbus-session-manager.h',
    'backends/meta-dbus-session-watcher.c',
+diff --git a/src/meta/meta-context.h b/src/meta/meta-context.h
+index e3c33ccb525ffbc8e7dff5c746ad468faace2b86..6d7d8cbb341d9e8f8933421ca8dabfb2a752e9e6 100644
+--- a/src/meta/meta-context.h
++++ b/src/meta/meta-context.h
+@@ -18,7 +18,7 @@
+ 
+ #pragma once
+ 
+-#include <glib-object.h>
++#include <gio/gio.h>
+ 
+ #include "meta/common.h"
+ #include "meta/types.h"
+@@ -37,6 +37,19 @@ META_EXPORT
+ gboolean meta_context_is_app_trusted (MetaContext *context,
+                                       const char  *app_id);
+ 
++META_EXPORT
++void meta_context_is_sender_unsandboxed (MetaContext         *context,
++                                         GDBusConnection     *connection,
++                                         const char          *sender,
++                                         GCancellable        *cancellable,
++                                         GAsyncReadyCallback  callback,
++                                         gpointer             user_data);
++
++META_EXPORT
++gboolean meta_context_is_sender_unsandboxed_finish (MetaContext   *context,
++                                                    GAsyncResult  *result,
++                                                    GError       **error);
++
+ META_EXPORT
+ void meta_context_add_option_entries (MetaContext        *context,
+                                       const GOptionEntry *entries,

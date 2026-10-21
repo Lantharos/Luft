@@ -1,32 +1,10 @@
-import GLib from 'gi://GLib';
+import { readProcFile as read } from '../../../shared/processes.js';
 
-const decoder = new TextDecoder();
 const UNIT = /\.(?:scope|service)$/;
 
 export interface ProcessStat {
   readonly parent: number;
   readonly started: number;
-}
-
-function read(path: string): string | null {
-  try {
-    return decoder.decode(GLib.file_get_contents(path)[1]);
-  } catch {
-    return null;
-  }
-}
-
-export class PidFd {
-  constructor(readonly fd: number) {}
-
-  get pid(): number | null {
-    const pid = Number(/^Pid:\s*(-?\d+)$/m.exec(read(`/proc/self/fdinfo/${this.fd}`) ?? '')?.[1] ?? -1);
-    return pid > 0 ? pid : null;
-  }
-
-  close(): void {
-    GLib.close(this.fd);
-  }
 }
 
 export function cgroupOf(pid: number | 'self'): string | null {

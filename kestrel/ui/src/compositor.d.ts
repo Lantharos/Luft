@@ -1,4 +1,5 @@
 import type Clutter from 'gi://Clutter';
+import type Gio from 'gi://Gio';
 import type GObject from 'gi://GObject';
 import type Mtk from 'gi://Mtk';
 
@@ -23,6 +24,10 @@ declare module '@girs/meta-51/meta-51' {
       set_variable_refresh(variableRefresh: boolean): void;
       get_titlebar_height(): number;
       has_rounded_corners(): boolean;
+    }
+
+    interface Context {
+      is_sender_unsandboxed(connection: Gio.DBusConnection, sender: string, cancellable: Gio.Cancellable | null): Promise<boolean>;
     }
 
     namespace Display {

@@ -2,6 +2,7 @@ import Gio from 'gi://Gio';
 import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
 
+import { stealFd } from '../../shared/processes.js';
 import type { PromptQueue } from './queue.js';
 import { accessRequest, passwordRequest, type Options } from './request.js';
 
@@ -30,13 +31,6 @@ const PROMPTER_PATH = '/com/lantharos/Kestrel/KeyringPrompter';
 const SECRET_SERVICE = 'org.freedesktop.secrets';
 
 type Invocation = Gio.DBusMethodInvocation;
-
-export function stealFd(fdList: Gio.UnixFDList | null, index: number): number | null {
-  const fds = fdList?.steal_fds() ?? [];
-  for (const [position, fd] of fds.entries())
-    if (position !== index) GLib.close(fd);
-  return index < fds.length ? fds[index] : null;
-}
 
 export function promptKey(invocation: Invocation, handle: string): string {
   return `${invocation.get_sender()} ${handle}`;

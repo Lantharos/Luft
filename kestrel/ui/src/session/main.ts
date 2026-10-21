@@ -8,6 +8,7 @@ const SIGTERM = 15;
 const SIGINT = 2;
 
 Gio._promisify(Gio.DBusConnection.prototype, 'call');
+Gio._promisify(Gio.DBusConnection.prototype, 'call_with_unix_fd_list');
 
 const manager = new SessionManager();
 const loop = new GLib.MainLoop(null, false);

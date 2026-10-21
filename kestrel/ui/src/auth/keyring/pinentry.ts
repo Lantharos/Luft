@@ -1,7 +1,8 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-import { promptKey, stealFd } from './prompter.js';
+import { stealFd } from '../../shared/processes.js';
+import { promptKey } from './prompter.js';
 import type { PromptQueue } from './queue.js';
 import { accessRequest, passwordRequest, type Options } from './request.js';
 

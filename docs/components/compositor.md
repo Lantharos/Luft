@@ -31,7 +31,7 @@ Kestrel runs on its own build of Mutter 51 ([kestrel/compositor](../../kestrel/c
 
 ## Full access
 
-Flatpak apps given full access in Schelf are listed in `/etc/kestrel/trusted-apps`, one app ID per line. The file belongs to root, so no app can add itself, not even one allowed to change settings; Schelf changes it through the updater service, which asks for an administrator's password. Kestrel watches the file and treats a listed app like one installed on the system: in the Wayland protocols kept from sandboxes, in Mutter's screen recording and display services, and in the shell's own D-Bus services through `meta_context_is_app_trusted()`. Connections an app already made keep how they were sorted, so a change applies the next time the app starts.
+Flatpak apps given full access in Schelf are listed in `/etc/kestrel/trusted-apps`, one app ID per line. The file belongs to root, so no app can add itself, not even one allowed to change settings; Schelf changes it through the updater service, which asks for an administrator's password. Kestrel watches the file and treats a listed app like one installed on the system: in the Wayland protocols kept from sandboxes, in Mutter's screen recording and display services, and in the shell's own D-Bus services, which ask Mutter about each caller through `meta_context_is_sender_unsandboxed()`. Connections an app already made keep how they were sorted, so a change applies the next time the app starts.
 
 Headless sessions read the list from the file `KESTREL_TRUSTED_APPS` names instead, which the checks use to give a stand-in app full access and take it away again.
 

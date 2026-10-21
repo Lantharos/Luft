@@ -43,11 +43,11 @@ fn file_path(path: &str) -> Vec<u8> {
     node
 }
 
-pub fn encode(partition: &Partition, loader: &str) -> Vec<u8> {
+pub fn encode(partition: &Partition, loader: &str, description: &str) -> Vec<u8> {
     let device_path = [hard_drive(partition), file_path(loader), END.to_vec()].concat();
     let mut option = ACTIVE.to_le_bytes().to_vec();
     option.extend((device_path.len() as u16).to_le_bytes());
-    option.extend(utf16_with_nul(DESCRIPTION));
+    option.extend(utf16_with_nul(description));
     option.extend(device_path);
     option
 }
@@ -175,6 +175,29 @@ pub fn guid_bytes(text: &str) -> Option<[u8; 16]> {
     Some(bytes)
 }
 
+#[cfg(any(windows, test))]
+pub fn guid_text(bytes: &[u8; 16]) -> String {
+    format!(
+        "{:02x}{:02x}{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}{:02x}{:02x}{:02x}{:02x}",
+        bytes[3],
+        bytes[2],
+        bytes[1],
+        bytes[0],
+        bytes[5],
+        bytes[4],
+        bytes[7],
+        bytes[6],
+        bytes[8],
+        bytes[9],
+        bytes[10],
+        bytes[11],
+        bytes[12],
+        bytes[13],
+        bytes[14],
+        bytes[15]
+    )
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -187,8 +210,8 @@ mod tests {
             sectors: 1_228_800,
             guid: [7; 16],
         };
-        let fedora = encode(&partition, r"\EFI\fedora\shimx64.efi");
-        let ours = encode(&partition, r"\EFI\luft-meet\shimx64.efi");
+        let fedora = encode(&partition, r"\EFI\fedora\shimx64.efi", DESCRIPTION);
+        let ours = encode(&partition, r"\EFI\luft-meet\shimx64.efi", DESCRIPTION);
         assert!(starts(&ours, &partition, r"\EFI\luft-meet\shimx64.efi"));
         assert!(!starts(&fedora, &partition, r"\EFI\luft-meet\shimx64.efi"));
     }
@@ -205,6 +228,8 @@ mod tests {
             ]
         );
         assert_eq!(guid_bytes("not a guid"), None);
+        let esp = "c12a7328-f81f-11d2-ba4b-00a0c93ec93b";
+        assert_eq!(guid_text(&guid_bytes(esp).unwrap()), esp);
     }
 
     #[test]
@@ -218,6 +243,7 @@ mod tests {
                 guid,
             },
             LOADER,
+            DESCRIPTION,
         );
         assert_eq!(&option[..4], &[1, 0, 0, 0]);
         let description = utf16_with_nul(DESCRIPTION);
@@ -243,6 +269,7 @@ mod tests {
                 guid,
             },
             LOADER,
+            DESCRIPTION,
         );
         assert_eq!(
             decode(&option),
@@ -266,6 +293,7 @@ mod tests {
                 guid,
             },
             LOADER,
+            DESCRIPTION,
         );
         option.extend(b"WINDOWS\0");
         option.extend([1, 0, 0, 0, 0x88, 0, 0, 0]);

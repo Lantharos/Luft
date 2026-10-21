@@ -78,3 +78,5 @@ Strings in Luft's Romanian translation that a native speaker should check. Each 
 - `apps/meet/desktop/locales/ro/desktop.ftl` `check-fast-startup-on`: "Pornire rapidă este activată" — Windows' setting name used as a subject without an article; check it reads well.
 - `apps/meet/desktop/locales/ro/desktop.ftl` `check-space-short-windows`: "Curățare disc" — assumed to be the Romanian name of Disk Cleanup; verify.
 - `apps/meet/desktop/locales/ro/desktop.ftl` `check-firmware-key-volume-up`: "butonul de mărire a volumului" — inserted after „apăsați”; check it fits.
+- `apps/meet/locales/ro/meet.ftl` `luft-title`: "Luft pe acest PC" — "Your Luft" rephrased, since Luft takes no article or possessive ending and the style avoids „dumneavoastră”; check it works as the screen title.
+- `apps/meet/locales/ro/meet.ftl` `room-place-windows-free`, `room-place-free-detail`, `room-live-free`, `luft-bar-used`: "{ $size } sunt deja liberi", "{ $size } nefolosiți" — agreement follows „GB liberi” as in `check-space-free`; check it reads well with sizes like „1,5 TB”.

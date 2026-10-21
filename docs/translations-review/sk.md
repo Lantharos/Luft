@@ -70,3 +70,8 @@ Strings in Luft's Slovak translation that a native speaker should check, each li
 - `apps/meet/desktop/locales/sk/desktop.ftl` `check-start-entries`: "Stará položka spúšťania" — "start entry" (firmware boot menu entry) used throughout Meet Luft.
 - `apps/meet/desktop/locales/sk/desktop.ftl` `check-fast-startup-on-detail`: "…prejde do režimu dlhodobého spánku…" — follows the guide's „Dlhodobý spánok“ for hibernate; check it reads well in a sentence.
 - `apps/meet/desktop/locales/sk/desktop.ftl` `check-secure-boot-turn-on`: "…pri zobrazení loga { $maker } stlačte { $key } a prejdite do { $place }." — $key may be "tlačidlo zvýšenia hlasitosti" and $place an English menu path; check both fit.
+- `apps/meet/locales/sk/meet.ftl` `room-place-windows-free`: "Už je tam voľných { $size }" — genitive plural „voľných“ like `stick-full-description`; check it reads well with sizes such as „1,5 GB“ or „1 TB“.
+- `apps/meet/locales/sk/meet.ftl` `room-erase-bitlocker`: "Šifrovaný nástrojom BitLocker" — masculine to agree with the partition (oddiel) it labels; check it fits next to each listed volume.
+- `apps/meet/locales/sk/meet.ftl` `room-erase-understood`: "Viem, že časť z toho je šifrovaná nástrojom BitLocker a nebude sa dať obnoviť" — first person on a tick box, as in English; check the wording is natural for a confirmation.
+- `apps/meet/locales/sk/meet.ftl` `luft-resize-title`: "Zmeniť veľkosť systému Luft" — shortened from "change how much space Luft has"; check it still says the same thing.
+- `apps/meet/desktop/locales/sk/desktop.ftl` `helper-box-room-shortfall`: "V mieste pre Luft je voľných ešte { $available } GB…" — "Luft's room" rendered as the space made for Luft; check it's clear.

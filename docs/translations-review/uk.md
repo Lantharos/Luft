@@ -83,3 +83,6 @@ Strings in Luft's Ukrainian translation that a native speaker should check, each
 - `apps/meet/locales/uk/meet.ftl` `stick-keep`: "Залишити обидва" — uses an exact `[1]` variant, since the `one` category also covers 21, 31…; same for `stick-replace-description` and `check-start-entries`.
 - `apps/meet/desktop/locales/uk/desktop.ftl` `check-fast-startup-on-detail`: "…переходить у режим глибокого сну…" — hibernate; check against Ukrainian Windows' wording.
 - `apps/meet/desktop/locales/uk/desktop.ftl` `check-secure-boot-restart-into`: "…де цей параметр розташовано в { $place }." — $place is an English firmware menu path; check the preposition.
+- `apps/meet/locales/uk/meet.ftl` `room-place-free-detail`: "{ $size }, які більше нічим не зайняті" — the plural relative clause assumes sizes like «120 ГБ»; check it reads well with any size.
+- `apps/meet/locales/uk/meet.ftl` `luft-resize-title`: "Змінити розмір Luft" — shorter than the English "Change how much space Luft has"; check it reads as the title of the row.
+- `apps/meet/desktop/locales/uk/desktop.ftl` `helper-box-room-shortfall`: "У місці для Luft знайдеться ще { $available } ГБ, а вибраним речам потрібно { $needed } ГБ." — "Luft’s room can spare" is the space already set aside for Luft; check that comes across.

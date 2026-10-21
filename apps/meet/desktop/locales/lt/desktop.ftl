@@ -32,6 +32,9 @@ check-space-free = Laisva { $size } GB
 check-space-free-linux = Kol ją bandote, Luft užima apie { $size } GB.
 check-space-up-to = Iki { $size } GB sistemai Luft
 check-space-up-to-detail = Windows išsaugo savo failus ir vietos augti.
+check-space-free-already = Iš jos { $size } GB jau laisva, todėl Windows atiduoda mažiau.
+check-space-other-drive = Diske { $drive } jai yra vietos.
+check-space-erase-drive = Diske { $drive } jai bus vietos, kai tas diskas bus ištrintas.
 check-space-short = Nepakanka laisvos vietos
 check-space-short-windows = Luft reikia apie { $needed } GB, kuriuos Windows gali atiduoti. Atlaisvinkite sistemoje Windows { $missing } GB, pavyzdžiui, naudodami Disko valymą, tada patikrinkite dar kartą.
 check-space-short-linux = Luft pasileisti reikia apie { $needed } GB. Atlaisvinkite { $missing } GB, tada patikrinkite dar kartą.
@@ -130,7 +133,10 @@ helper-not-ready-to-start-linux = Luft dar neparuošta paleisti. Pirmiausia ją 
 helper-update-unfinished = Luft atnaujinimas nebaigtas. Pirmiausia atnaujinkite ją dar kartą.
 helper-room-too-small = Luft reikia daugiau vietos.
 helper-room-shortfall = Windows gali atiduoti { $available } GB, o Luft reikia { $needed } GB.
+helper-gap-shortfall = Toje vietoje telpa { $available } GB, o Luft reikia { $needed } GB.
+helper-place-gone = Ta vieta nebėra laisva. Patikrinkite dar kartą, kur Luft telpa.
 helper-box-shortfall = Windows gali atiduoti dar { $available } GB, o pasirinktiems daiktams reikia { $needed } GB.
+helper-box-room-shortfall = Luft vietoje galima skirti { $available } GB, o pasirinktiems daiktams reikia { $needed } GB.
 helper-bluetooth-unreadable = Nepavyko atidaryti Windows Bluetooth nustatymų
 helper-registry-not-opened = Nepavyko atidaryti registro rakto { $key }: { $error }
 helper-registry-not-changed = Nepavyko pakeisti registro reikšmės { $value }: { $error }
@@ -157,7 +163,6 @@ drive-windows-partition-missing = Windows skaidinys nerastas
 drive-volume-missing = Tomas { $path } nerastas
 drive-storage-error = { $what } (Windows saugyklos klaida { $code })
 drive-shrink-size-unknown = Windows nepavyko nustatyti, kiek galima sumažinti jos skaidinį
-drive-grow-size-unknown = Windows nepavyko nustatyti, kiek galima padidinti jos skaidinį
 drive-resize-failed = Windows nepavyko pakeisti savo skaidinio dydžio
 drive-create-failed = Windows nepavyko sukurti skaidinio sistemai Luft
 drive-hide-failed = Windows nepavyko paslėpti naujo skaidinio nuo Failų naršyklės
@@ -176,6 +181,9 @@ drive-new-live-no-volume = Naujas Luft skaidinys neturi tomo
 drive-partitions-not-noted = Luft skaidinių nėra Meet Luft užrašuose
 drive-partitions-gone = Luft skaidiniai dingo
 drive-partition-gone = Dingo skaidinys
+drive-gone = Dingo diskas
+drive-erase-failed = Windows nepavyko ištrinti disko
+drive-erased-no-room = Ištrintame diske nėra vietos sistemai Luft
 drive-start-partition-foreign = Luft paleidimo skaidinio nesukūrė Meet Luft
 drive-start-partition-gone = Luft paleidimo skaidinio nebėra
 drive-start-partition-not-listed = Luft paleidimo skaidinio nėra skaidinių lentelėje
@@ -188,6 +196,14 @@ drive-esp-no-guid = EFI sistemos skaidinys neturi GUID
 drive-no-uuid = Diskas, kuriame laikoma Luft, neturi UUID
 drive-folder-unreadable = Luft negali pasileisti iš disko, kuriame yra jūsų failai.
 drive-folder-not-startable = Iš { $folder } paleisti negalima
+
+## Errors while changing Luft once it's installed
+
+luft-gone = Luft šiame kompiuteryje nebėra
+luft-not-resizable = Luft dydžio šiuo metu negalima pakeisti iš Windows
+luft-size-not-allowed = Luft negali būti tokio dydžio
+luft-space-promised = Ta vieta atidėta sistemai Luft. Pirmiausia atšaukite pakeitimą.
+luft-no-start-entry = Luft paleidimo įrašas nerastas
 
 ## Errors while getting Luft
 

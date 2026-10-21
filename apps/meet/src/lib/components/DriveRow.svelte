@@ -1,19 +1,21 @@
 <script lang="ts">
+	import type { Component } from 'svelte';
 	import Usb from '@lucide/svelte/icons/usb';
 
 	interface Props {
+		icon?: Component<{ size?: number }>;
 		title: string;
 		detail: string;
 		selected: boolean;
-		disabled: boolean;
+		disabled?: boolean;
 		onclick: () => void;
 	}
 
-	let { title, detail, selected, disabled, onclick }: Props = $props();
+	let { icon: Icon = Usb, title, detail, selected, disabled = false, onclick }: Props = $props();
 </script>
 
 <button type="button" class="drive" class:selected role="radio" aria-checked={selected} {disabled} {onclick}>
-	<span class="icon"><Usb size={20} /></span>
+	<span class="icon"><Icon size={20} /></span>
 	<span class="flex min-w-0 flex-1 flex-col text-left">
 		<span class="truncate text-[15px] font-medium">{title}</span>
 		<span class="truncate text-[13px] text-[var(--text-muted)]">{detail}</span>

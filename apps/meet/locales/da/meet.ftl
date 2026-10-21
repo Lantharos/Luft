@@ -41,6 +41,10 @@ problem-folders = Meet Luft kunne ikke gennemgå dine mapper.
 problem-sticks = Meet Luft kunne ikke søge efter USB-drev.
 problem-stick = USB-stikket blev ikke lavet færdigt.
 problem-offer = Luft kan ikke hentes lige nu. Tjek, at du er online, eller brug en ISO-fil, du allerede har.
+problem-luft = Meet Luft kunne ikke undersøge Lufts drev.
+problem-resize = Ændringen af Lufts størrelse blev ikke færdig.
+problem-cancel = Meet Luft kunne ikke annullere ændringen.
+problem-give = Windows kunne ikke tage pladsen tilbage.
 problem-declined = { $platform ->
     [linux] Meet Luft skal have din tilladelse til at arbejde med drevet. Skriv din adgangskode, når du bliver spurgt.
    *[windows] Meet Luft skal have din tilladelse til at arbejde med drevet. Vælg Ja, når Windows spørger.
@@ -95,6 +99,35 @@ room-confirm-title = Vil du give Luft { $size }?
 room-confirm-file = Windows formindsker sit drev, og derefter kopierer Meet Luft Luft fra din ISO-fil. Hold pc’en tilsluttet strøm.
 room-confirm-download = Windows formindsker sit drev, og derefter henter Meet Luft Luft, cirka { $size }. Hold pc’en tilsluttet strøm og online.
 
+## Choosing where Luft goes, when there's more than one place
+## $drive is the name of a drive, like "Samsung SSD 990 PRO", and $size a size, like "120 GB"
+
+room-places-title = Hvor skal Luft være?
+room-places-description = Luft kan dele drev med Windows eller tage plads, som Windows ikke bruger.
+room-places-label = Steder til Luft
+room-place-windows = Ved siden af Windows
+room-place-windows-detail = Windows bliver mindre for at give plads til Luft
+room-place-windows-free = { $size } er allerede ledig der
+room-place-free = Ledig plads på { $drive }
+room-place-free-here = Ledig plads på Windows’ drev
+room-place-free-detail = { $size }, som intet andet bruger
+room-place-whole = Hele { $drive }
+room-place-whole-detail = Sletter dette drev på { $size } til Luft
+room-live-free = Heraf er { $free } allerede ledig, så Windows afgiver mindre og beholder plads til at vokse. Luft lægger også { $size } til side at starte fra og giver pladsen tilbage, når det er installeret.
+room-live-elsewhere = Luft får { $room } der og lægger { $size } mere til side at starte fra, som det giver tilbage, når det er installeret.
+room-confirm-free-title = Vil du give Luft { $size } ledig plads?
+room-confirm-free-file = Meet Luft kopierer Luft fra din ISO-fil derind. Intet andet på drevet ændres.
+room-confirm-free-download = Meet Luft henter Luft, cirka { $size }, derind. Intet andet på drevet ændres. Hold pc’en online.
+room-erase-title = Vil du slette { $drive }?
+room-erase-description = Alt på dette drev på { $size } slettes med det samme, før Luft starter. Det kan ikke fortrydes. Lige nu ligger der:
+room-erase-empty = Windows kan ikke læse noget på dette drev på { $size }, men alt, hvad der ligger på det, slettes med det samme. Det kan ikke fortrydes.
+room-erase-unnamed = Unavngiven partition
+room-erase-volume-name = { $name } ({ $letter })
+room-erase-volume = { $filesystem }, { $size }
+room-erase-bitlocker = Krypteret med BitLocker
+room-erase-understood = Jeg ved, at noget af det er krypteret med BitLocker og ikke kan hentes tilbage
+room-erase-confirm = Slet og gør plads
+
 ## Luft is ready on Windows
 
 ready-title = Luft er klar
@@ -107,6 +140,7 @@ ready-box-description = Pak dokumenter, fotos, wi-fi-netværk og mere, som Luft 
 ready-box-packed = Pakket, { $size }
 ready-install-title = Installer Luft
 ready-install-description = Genstart i installationsprogrammet. De { $size } ved siden af Windows venter allerede på det.
+ready-install-drive-description = Genstart i installationsprogrammet. De { $size } på { $drive } venter allerede på det.
 ready-stick-description = Læg Luft på et USB-stik for at starte det på enhver computer.
 ready-remove = Fjern Luft fra denne pc
 ready-restart-try = Gem først det, du arbejder på. Luft åbner om et minuts tid, og næste genstart fører dig tilbage til Windows.
@@ -133,6 +167,53 @@ linux-ready-restart-try = Gem først det, du arbejder på. Luft åbner om et min
 linux-ready-restart-replace = Gem først det, du arbejder på. Installationsprogrammet åbner med { $system } valgt til at blive erstattet og viser, hvad der bevares, før noget ændres.
 linux-ready-remove-title = Vil du fjerne Luft fra denne computer?
 linux-ready-remove-description = Meet Luft sletter Lufts filer, dets startfiler og dets startpost. Alt andet forbliver, som det er.
+
+## Luft is installed on this PC
+## $drive is the name of a drive, like "Samsung SSD 990 PRO", and $size a size, like "120 GB"
+
+luft-title = Dit Luft
+luft-looking = Meet Luft har fundet Luft på denne pc.
+luft-checking = Undersøger Lufts drev…
+luft-description-beside = Luft er installeret ved siden af Windows på denne pc.
+luft-description-drive = Luft er installeret på { $drive }.
+luft-bar-used = { $size }, { $used } brugt
+luft-resize-title = Ændr, hvor meget plads Luft har
+luft-resize-description = Giv Luft mere af Windows’ plads, eller giv noget tilbage til Windows.
+luft-resize-encrypted = Lufts drev er krypteret, så det ville kræve genoprettelsesnøglen at flytte det. Slå først enhedskryptering fra i Lufts Indstillinger, og kom så tilbage.
+luft-resize-apart = Der ligger en anden partition mellem Windows og Luft, så de kan ikke dele deres plads.
+luft-resize-unreadable = Meet Luft kunne ikke se, hvor fyldt Luft er.
+luft-pending-grow = Luft vokser, næste gang det starter
+luft-pending-grow-description = Genstart i Luft, og lad det være tændt i et par minutter, mens det flytter ind på den nye plads. Du kan bruge det imens.
+luft-pending-shrink = Luft gør plads, næste gang det starter
+luft-pending-shrink-description = Genstart i Luft, og lad det være tændt i et par minutter, mens det flytter sine filer. Åbn så Meet Luft i Windows igen for at give Windows pladsen.
+luft-windows-free-title = Giv Windows den ledige plads
+luft-windows-free-description = { $size } lige efter Windows bruges ikke af noget. Windows kan tage pladsen tilbage.
+luft-leftovers-title = Ryd op efter Prøv Luft
+luft-leftovers-description = De partitioner, Meet Luft lavede for at starte Luft, er her stadig. Luft har ikke brug for dem længere.
+luft-start = Genstart i Luft
+luft-cancel = Annuller ændringen
+luft-restart = Gem først det, du arbejder på. Luft starter om et minuts tid, og næste genstart fører dig tilbage til Windows.
+luft-restart-pending = Gem først det, du arbejder på. Luft starter om et minuts tid og flytter selv sine filer, hvilket tager et par minutter. Du kan bruge det imens.
+luft-remove = Fjern Luft fra denne pc
+luft-remove-title = Vil du fjerne Luft fra denne pc?
+luft-remove-description = Luft og alt i det slettes, { $size } i alt, og Windows får pladsen tilbage. Pc’en starter Windows som før. Det kan ikke fortrydes.
+luft-remove-drive-description = Luft og alt i det slettes fra { $drive }, { $size } i alt. Pc’en starter Windows som før. Det kan ikke fortrydes.
+luft-remove-confirm = Fjern Luft
+
+## Changing how much space Luft has
+## $size is a size, like "20 GB"
+
+resize-title = Hvor meget plads skal Luft have?
+resize-description = Træk for at fordele drevet mellem Windows og Luft. Luft foretager selv ændringen, næste gang det starter.
+resize-measuring = Windows regner ud, hvor meget plads det kan undvære. På et stort drev kan det tage et par minutter.
+resize-full = Luft er for fyldt til at blive flyttet, og Windows kan ikke undvære nok plads til det. Gør først lidt plads i Luft eller i Windows.
+resize-used = Lufts filer fylder { $size }.
+resize-least = Ændr størrelsen med mindst { $size }.
+resize-apply = Ændr
+resize-grow-title = Vil du give Luft { $size } mere?
+resize-grow-description = Windows bliver mindre med det samme. Luft flytter ind på den nye plads, næste gang det starter, hvilket tager et par minutter. Hold pc’en tilsluttet strøm.
+resize-shrink-title = Vil du give Windows { $size } tilbage?
+resize-shrink-description = Luft flytter sine filer, næste gang det starter, hvilket tager et par minutter. Åbn så Meet Luft igen, og Windows tager pladsen tilbage. Hold pc’en tilsluttet strøm.
 
 ## Packing things to take along to Luft (the moving box)
 
@@ -170,6 +251,8 @@ box-pack = Pak
 
 working-shrinking = Gør plads
     .description = Windows flytter sine filer for at gøre plads. Det kan tage et par minutter.
+working-erasing = Sletter drevet
+    .description = Windows rydder det, så Luft kan få det hele.
 working-partitioning = Indretter Lufts plads
     .description = Gør de partitioner klar, som Luft starter fra.
 working-downloading = Henter Luft over

@@ -15,7 +15,11 @@
 		folders: 'problem-folders',
 		sticks: 'problem-sticks',
 		stick: 'problem-stick',
-		offer: 'problem-offer'
+		offer: 'problem-offer',
+		luft: 'problem-luft',
+		resize: 'problem-resize',
+		cancel: 'problem-cancel',
+		give: 'problem-give'
 	};
 
 	let { failure }: { failure: Failure } = $props();

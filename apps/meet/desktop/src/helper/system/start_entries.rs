@@ -8,7 +8,7 @@ use super::firmware::Nvram;
 use super::programs;
 use crate::L10N;
 use crate::boot::entries;
-use crate::boot::load_option::{self, Decoded, Partition};
+use crate::boot::load_option::{self, DESCRIPTION, Decoded, Partition};
 use crate::check::facts::StartEntry;
 use crate::helper::drive::storage::MSFT_Partition;
 
@@ -17,7 +17,7 @@ const WINDOWS_LOADER: &str = r"\EFI\Microsoft\Boot\bootmgfw.efi";
 const LOADER: &str = r"\EFI\BOOT\BOOTX64.EFI";
 
 pub fn add(partition: &Partition) -> Result<u16, String> {
-    entries::add(&Nvram, partition, LOADER)
+    entries::add(&Nvram, partition, LOADER, DESCRIPTION)
 }
 
 pub fn ensure(partition: &Partition, number: u16) -> Result<u16, String> {

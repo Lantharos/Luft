@@ -32,6 +32,9 @@ check-space-free = { $size } ГБ свободни
 check-space-free-linux = Luft заема около { $size } ГБ, докато го пробвате.
 check-space-up-to = До { $size } ГБ за Luft
 check-space-up-to-detail = Windows запазва файловете си и място, за да расте.
+check-space-free-already = { $size } ГБ от тях вече са свободни, така че Windows отделя по-малко.
+check-space-other-drive = Има място за него на { $drive }.
+check-space-erase-drive = Има място за него на { $drive }, след като този диск бъде изтрит.
 check-space-short = Няма достатъчно свободно място
 check-space-short-windows = Luft се нуждае от около { $needed } ГБ, които Windows може да отдели. Освободете { $missing } ГБ в Windows, например с Почистване на диска, и проверете отново.
 check-space-short-linux = Luft се нуждае от около { $needed } ГБ, от които да стартира. Освободете { $missing } ГБ и проверете отново.
@@ -126,7 +129,10 @@ helper-not-ready-to-start-linux = Luft все още не е готов за с�
 helper-update-unfinished = Актуализирането на Luft не завърши. Първо го актуализирайте отново.
 helper-room-too-small = Luft се нуждае от повече място.
 helper-room-shortfall = Windows може да отдели { $available } ГБ, а Luft се нуждае от { $needed } ГБ.
+helper-gap-shortfall = Това място побира { $available } ГБ, а Luft се нуждае от { $needed } ГБ.
+helper-place-gone = Това място вече не е свободно. Проверете отново, за да видите къде се побира Luft.
 helper-box-shortfall = Windows може да отдели още { $available } ГБ, а за избраното са нужни { $needed } ГБ.
+helper-box-room-shortfall = Мястото на Luft може да отдели { $available } ГБ, а за избраното са нужни { $needed } ГБ.
 helper-bluetooth-unreadable = Настройките на Bluetooth в Windows не можаха да бъдат отворени
 helper-registry-not-opened = Ключът { $key } не можа да бъде отворен: { $error }
 helper-registry-not-changed = Стойността { $value } не можа да бъде променена: { $error }
@@ -153,7 +159,6 @@ drive-windows-partition-missing = Дялът на Windows не е намерен
 drive-volume-missing = Томът { $path } не е намерен
 drive-storage-error = { $what } (грешка на хранилището на Windows { $code })
 drive-shrink-size-unknown = Windows не можа да определи доколко може да се смали дялът му
-drive-grow-size-unknown = Windows не можа да определи доколко може да се увеличи дялът му
 drive-resize-failed = Windows не можа да промени размера на дяла си
 drive-create-failed = Windows не можа да създаде дял за Luft
 drive-hide-failed = Windows не можа да скрие новия дял от Explorer
@@ -172,6 +177,9 @@ drive-new-live-no-volume = Новият дял на Luft няма том
 drive-partitions-not-noted = Дяловете на Luft липсват в записките на Meet Luft
 drive-partitions-gone = Дяловете на Luft изчезнаха
 drive-partition-gone = Един дял изчезна
+drive-gone = Един диск изчезна
+drive-erase-failed = Windows не можа да изтрие диска
+drive-erased-no-room = На изтрития диск няма място за Luft
 drive-start-partition-foreign = Стартовият дял на Luft не е създаден от Meet Luft
 drive-start-partition-gone = Стартовият дял на Luft го няма
 drive-start-partition-not-listed = Стартовият дял на Luft не е в таблицата на дяловете
@@ -184,6 +192,14 @@ drive-esp-no-guid = Системният дял EFI няма GUID
 drive-no-uuid = Дискът, на който се пази Luft, няма UUID
 drive-folder-unreadable = Luft не може да стартира от диска, на който са файловете ви.
 drive-folder-not-startable = Не може да се стартира от { $folder }
+
+## Errors while changing Luft once it's installed
+
+luft-gone = Luft вече не е на този компютър
+luft-not-resizable = В момента размерът на Luft не може да бъде променен от Windows
+luft-size-not-allowed = Luft не може да бъде с такъв размер
+luft-space-promised = Това място е заделено за Luft. Първо отменете промяната.
+luft-no-start-entry = Записът за стартиране на Luft не е намерен
 
 ## Errors while getting Luft
 

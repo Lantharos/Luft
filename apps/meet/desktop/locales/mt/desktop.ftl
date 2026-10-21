@@ -32,6 +32,9 @@ check-space-free = { $size } GB ħielsa
 check-space-free-linux = Luft jieħu madwar { $size } GB waqt li tipprovah.
 check-space-up-to = Sa { $size } GB għal Luft
 check-space-up-to-detail = Windows iżomm il-fajls tiegħu u spazju biex jikber.
+check-space-free-already = { $size } GB minnu diġà ħielsa, għalhekk Windows iċedi inqas.
+check-space-other-drive = Hemm spazju għalih fuq { $drive }.
+check-space-erase-drive = Hemm spazju għalih fuq { $drive }, ladarba dak id-drajv jitħassar.
 check-space-short = M’hemmx biżżejjed spazju ħieles
 check-space-short-windows = Luft għandu bżonn madwar { $needed } GB li Windows jista’ jċedi. Ħeles { $missing } GB f’Windows, pereżempju b’Disk Cleanup, imbagħad erġa’ ċċekkja.
 check-space-short-linux = Luft għandu bżonn madwar { $needed } GB biex jibda minnhom. Ħeles { $missing } GB, imbagħad erġa’ ċċekkja.
@@ -132,7 +135,10 @@ helper-not-ready-to-start-linux = Luft għadu mhux lest biex jibda. L-ewwel ħej
 helper-update-unfinished = L-aġġornament ta’ Luft ma tlestiex. L-ewwel erġa’ aġġornah.
 helper-room-too-small = Luft għandu bżonn aktar spazju minn hekk.
 helper-room-shortfall = Windows jista’ jċedi { $available } GB, u Luft għandu bżonn { $needed } GB.
+helper-gap-shortfall = Dak l-ispazju fih { $available } GB, u Luft għandu bżonn { $needed } GB.
+helper-place-gone = Dak l-ispazju m’għadux ħieles. Erġa’ ċċekkja biex tara fejn joqgħod Luft.
 helper-box-shortfall = Windows jista’ jċedi { $available } GB oħra, u dawn għandhom bżonn { $needed } GB.
+helper-box-room-shortfall = L-ispazju ta’ Luft jista’ jċedi { $available } GB, u dawn għandhom bżonn { $needed } GB.
 helper-bluetooth-unreadable = Is-settings tal-Bluetooth ta’ Windows ma setgħux jinfetħu
 helper-registry-not-opened = Ma setax jinfetaħ { $key }: { $error }
 helper-registry-not-changed = Ma setax jinbidel { $value }: { $error }
@@ -159,7 +165,6 @@ drive-windows-partition-missing = Il-partizzjoni ta’ Windows ma nstabitx
 drive-volume-missing = Il-volum { $path } ma nstabx
 drive-storage-error = { $what } (żball tal-ħażna ta’ Windows { $code })
 drive-shrink-size-unknown = Windows ma setax jgħid kemm tista’ tiċkien il-partizzjoni tiegħu
-drive-grow-size-unknown = Windows ma setax jgħid kemm tista’ tikber il-partizzjoni tiegħu
 drive-resize-failed = Windows ma setax ibiddel id-daqs tal-partizzjoni tiegħu
 drive-create-failed = Windows ma setax jagħmel partizzjoni għal Luft
 drive-hide-failed = Windows ma setax iżomm il-partizzjoni l-ġdida barra minn File Explorer
@@ -178,6 +183,9 @@ drive-new-live-no-volume = Il-partizzjoni l-ġdida ta’ Luft m’għandhiex vol
 drive-partitions-not-noted = Il-partizzjonijiet ta’ Luft mhumiex fin-noti ta’ Meet Luft
 drive-partitions-gone = Il-partizzjonijiet ta’ Luft għebu
 drive-partition-gone = Partizzjoni għabet
+drive-gone = Drajv għab
+drive-erase-failed = Windows ma setax iħassar id-drajv
+drive-erased-no-room = Id-drajv imħassar m’għandux spazju għal Luft
 drive-start-partition-foreign = Il-partizzjoni tal-boot ta’ Luft mhix waħda li għamel Meet Luft
 drive-start-partition-gone = Il-partizzjoni tal-boot ta’ Luft m’għadhiex hemm
 drive-start-partition-not-listed = Il-partizzjoni tal-boot ta’ Luft mhix fit-tabella tal-partizzjonijiet
@@ -190,6 +198,14 @@ drive-esp-no-guid = Il-partizzjoni tas-sistema EFI m’għandhiex GUID
 drive-no-uuid = Id-drajv fejn jinżamm Luft m’għandux UUID
 drive-folder-unreadable = Luft ma jistax jibda mid-drajv fejn hemm il-fajls tiegħek.
 drive-folder-not-startable = Ma jistax jinbeda minn { $folder }
+
+## Errors while changing Luft once it's installed
+
+luft-gone = Luft m’għadux fuq dan il-PC
+luft-not-resizable = Id-daqs ta’ Luft ma jistax jinbidel minn Windows bħalissa
+luft-size-not-allowed = Luft ma jistax ikun ta’ dak id-daqs
+luft-space-promised = Dak l-ispazju huwa mwarrab għal Luft. L-ewwel ikkanċella l-bidla.
+luft-no-start-entry = L-entrata tal-boot ta’ Luft ma nstabitx
 
 ## Errors while getting Luft
 

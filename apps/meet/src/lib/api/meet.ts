@@ -2,7 +2,7 @@ import { invoke, listen } from '@lantharos/sabine';
 import type { Locale } from '@luft/i18n';
 
 export type Level = 'fine' | 'note' | 'blocks';
-export type Stage = 'shrinking' | 'partitioning' | 'downloading' | 'packing' | 'removing' | 'writing' | 'copying' | 'verifying';
+export type Stage = 'shrinking' | 'erasing' | 'partitioning' | 'downloading' | 'packing' | 'removing' | 'writing' | 'copying' | 'verifying';
 export type Intent = 'try' | 'install' | 'replace';
 export type Platform = 'windows' | 'linux';
 export type Layout = 'subvolumes' | 'separateHome' | 'single' | 'encrypted' | 'unknown';
@@ -23,6 +23,27 @@ export interface Finding {
 export interface Prepared {
 	room: number;
 	movingBox: number | null;
+	drive: string | null;
+}
+
+export type PlaceKind = 'windows' | 'free' | 'whole';
+
+export interface Contents {
+	label: string | null;
+	letter: string | null;
+	filesystem: string | null;
+	size: number;
+	bitlocker: boolean;
+}
+
+export interface Place {
+	id: string;
+	kind: PlaceKind;
+	drive: { name: string; size: number; windows: boolean };
+	free: number;
+	smallest: number;
+	most: number;
+	contents: Contents[];
 }
 
 export interface WindowsFacts {
@@ -33,6 +54,7 @@ export interface WindowsFacts {
 	fastStartup: boolean;
 	universalClock: boolean;
 	bluetooth: number;
+	places: Place[];
 }
 
 export interface LinuxFacts {
@@ -46,10 +68,32 @@ export interface Report {
 	findings: Finding[];
 	live: number;
 	download: number;
-	smallestLuft: number;
-	mostLuft: number;
 	prepared: Prepared | null;
 	outdated: boolean;
+}
+
+export type Blocked = 'busy' | 'encrypted' | 'elsewhere' | 'apart' | 'unreadable';
+export type Change = { change: 'grow' } | { change: 'shrink'; bytes: number };
+
+export interface Range {
+	smallest: number;
+	most: number;
+	leastGrow: number;
+	leastShrink: number;
+}
+
+export interface Installed {
+	drive: string;
+	besideWindows: boolean;
+	size: number;
+	allocated: number | null;
+	encrypted: boolean;
+	windowsSize: number;
+	windowsUsed: number;
+	blocked: Blocked | null;
+	pending: Change | null;
+	windowsFree: number;
+	leftovers: boolean;
 }
 
 export interface Progress {
@@ -139,13 +183,21 @@ export async function start<T>(command: string, request: unknown = {}): Promise<
 export const call = <T>(request: object) => start<T>('meet_call', request);
 
 export const check = (source: Source) => call<Report>({ call: 'check', source });
-export const prepare = (luft: number, source: Source) => call<Prepared>({ call: 'prepare', luft, source });
+export const prepare = (luft: number, source: Source, place: string) => call<Prepared>({ call: 'prepare', luft, source, place });
 export const refresh = (source: Source) => call<Prepared>({ call: 'refresh', source });
 export const pack = (belongings: Packing) => call<Prepared>({ call: 'pack', belongings });
 export const restart = (intent: Intent, windows: WindowsChoices) => call<null>({ call: 'restart', intent, windows });
 export const tidy = () => call<null>({ call: 'tidy' });
 export const firmwareSettings = () => call<null>({ call: 'firmwareSettings' });
 export const undo = () => call<null>({ call: 'undo' });
+export const luft = () => call<Installed | null>({ call: 'luft' });
+export const luftRange = () => call<Range | null>({ call: 'luftRange' });
+export const resizeLuft = (size: number) => call<Installed>({ call: 'resizeLuft', size });
+export const cancelResize = () => call<Installed>({ call: 'cancelResize' });
+export const giveWindows = () => call<Installed>({ call: 'giveWindows' });
+export const startLuft = () => call<null>({ call: 'startLuft' });
+export const removeLuft = () => call<null>({ call: 'removeLuft' });
+export const installed = () => start<boolean>('meet_installed');
 export const pickIso = () => start<string | null>('meet_pick_iso');
 export const saveLogs = () => start<string | null>('meet_save_logs');
 export const showFile = (path: string) => start<null>('meet_show_file', path);

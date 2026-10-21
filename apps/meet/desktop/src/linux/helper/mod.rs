@@ -44,7 +44,15 @@ fn handle(context: &Context, call: Call) -> Result<Value, String> {
             image,
             replace,
         } => serde_json::to_value(stick::add_to_ventoy(context, &stick, &image, replace)?),
-        Call::Pack { .. } | Call::Tidy => {
+        Call::Luft => serde_json::to_value(None::<()>),
+        Call::Pack { .. }
+        | Call::Tidy
+        | Call::LuftRange
+        | Call::ResizeLuft { .. }
+        | Call::CancelResize
+        | Call::GiveWindows
+        | Call::StartLuft
+        | Call::RemoveLuft => {
             return Err("Meet Luft doesn't do that on Linux.".to_owned());
         }
     };

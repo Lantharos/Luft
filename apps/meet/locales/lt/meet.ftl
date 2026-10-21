@@ -40,6 +40,10 @@ problem-folders = Meet Luft nepavyko peržiūrėti jūsų aplankų.
 problem-sticks = Meet Luft nepavyko ieškoti USB įrenginių.
 problem-stick = Atmintuko kūrimas nebaigtas.
 problem-offer = Luft šiuo metu negalima atsisiųsti. Patikrinkite interneto ryšį arba naudokite turimą ISO.
+problem-luft = Meet Luft nepavyko patikrinti Luft disko.
+problem-resize = Luft dydžio keitimas nebaigtas.
+problem-cancel = Meet Luft nepavyko atšaukti pakeitimo.
+problem-give = Windows nepavyko atsiimti vietos.
 problem-declined = { $platform ->
     [linux] Meet Luft reikia jūsų leidimo dirbti su disku. Kai paprašys, įveskite slaptažodį.
    *[windows] Meet Luft reikia jūsų leidimo dirbti su disku. Kai Windows paklaus, pasirinkite Taip.
@@ -94,6 +98,35 @@ room-confirm-title = Skirti sistemai Luft { $size }?
 room-confirm-file = Windows sumažina savo diską, tada Meet Luft nukopijuoja Luft iš jūsų ISO. Laikykite kompiuterį prijungtą prie maitinimo.
 room-confirm-download = Windows sumažina savo diską, tada Meet Luft atsisiunčia Luft (apie { $size }). Laikykite kompiuterį prijungtą prie maitinimo ir interneto.
 
+## Choosing where Luft goes, when there's more than one place
+## $drive is the name of a drive, like "Samsung SSD 990 PRO", and $size a size, like "120 GB"
+
+room-places-title = Kur įdiegti Luft?
+room-places-description = Luft gali dalytis Windows disku arba užimti vietą, kurios Windows nenaudoja.
+room-places-label = Vietos sistemai Luft
+room-place-windows = Šalia Windows
+room-place-windows-detail = Windows susimažina, kad atlaisvintų vietos sistemai Luft
+room-place-windows-free = Ten jau laisva { $size }
+room-place-free = Laisva vieta diske { $drive }
+room-place-free-here = Laisva vieta Windows diske
+room-place-free-detail = { $size }, kurių niekas kitas nenaudoja
+room-place-whole = Visas diskas { $drive }
+room-place-whole-detail = Ištrina šį diską ({ $size }) sistemai Luft
+room-live-free = Iš jos { $free } jau laisva, todėl Windows atiduoda mažiau ir lieka vietos augti. Luft dar atideda { $size } paleidimui ir, kai bus įdiegta, tą vietą grąžina.
+room-live-elsewhere = Luft ten gauna { $room } ir dar atideda { $size } paleidimui, o kai bus įdiegta, tą vietą grąžina.
+room-confirm-free-title = Skirti sistemai Luft { $size } laisvos vietos?
+room-confirm-free-file = Meet Luft į ją nukopijuoja Luft iš jūsų ISO. Niekas kitas diske nesikeičia.
+room-confirm-free-download = Meet Luft į ją atsisiunčia Luft (apie { $size }). Niekas kitas diske nesikeičia. Laikykite kompiuterį prijungtą prie interneto.
+room-erase-title = Ištrinti { $drive }?
+room-erase-description = Viskas šiame diske ({ $size }) ištrinama iš karto, dar prieš pasileidžiant Luft. Šio veiksmo anuliuoti negalima. Dabar jame yra:
+room-erase-empty = Windows negali nieko perskaityti šiame diske ({ $size }), bet viskas, kas jame yra, ištrinama iš karto. Šio veiksmo anuliuoti negalima.
+room-erase-unnamed = Skaidinys be pavadinimo
+room-erase-volume-name = { $name } ({ $letter })
+room-erase-volume = { $filesystem }, { $size }
+room-erase-bitlocker = Šifruota su BitLocker
+room-erase-understood = Suprantu, kad dalis duomenų šifruota su BitLocker ir jų nebus galima atkurti
+room-erase-confirm = Ištrinti ir atlaisvinti vietos
+
 ## Luft is ready on Windows
 
 ready-title = Luft paruošta
@@ -106,6 +139,7 @@ ready-box-description = Supakuokite dokumentus, nuotraukas, Wi-Fi tinklus ir kit
 ready-box-packed = Supakuota, { $size }
 ready-install-title = Įdiegti Luft
 ready-install-description = Paleisti iš naujo į diegimo programą. Vieta šalia Windows ({ $size }) jau jos laukia.
+ready-install-drive-description = Paleisti iš naujo į diegimo programą. Vieta diske { $drive } ({ $size }) jau jos laukia.
 ready-stick-description = Įrašykite Luft į atmintuką ir paleiskite ją bet kuriame kompiuteryje.
 ready-remove = Pašalinti Luft iš šio kompiuterio
 ready-restart-try = Pirmiausia įrašykite tai, su kuo dirbate. Luft atsidarys maždaug po minutės, o kitas paleidimas iš naujo grąžins jus į Windows.
@@ -131,6 +165,53 @@ linux-ready-restart-try = Pirmiausia įrašykite tai, su kuo dirbate. Luft atsid
 linux-ready-restart-replace = Pirmiausia įrašykite tai, su kuo dirbate. Diegimo programa atsidarys jau pasirinkusi pakeisti sistemą ({ $system }) ir prieš bet kokius pakeitimus parodys, kas liks.
 linux-ready-remove-title = Pašalinti Luft iš šio kompiuterio?
 linux-ready-remove-description = Meet Luft ištrina Luft failus, paleidimo failus ir paleidimo įrašą. Visa kita lieka kaip buvo.
+
+## Luft is installed on this PC
+## $drive is the name of a drive, like "Samsung SSD 990 PRO", and $size a size, like "120 GB"
+
+luft-title = Jūsų Luft
+luft-looking = Meet Luft rado Luft šiame kompiuteryje.
+luft-checking = Tikrinamas Luft diskas…
+luft-description-beside = Luft įdiegta šiame kompiuteryje šalia Windows.
+luft-description-drive = Luft įdiegta diske { $drive }.
+luft-bar-used = { $size }, naudojama { $used }
+luft-resize-title = Keisti Luft skirtą vietą
+luft-resize-description = Skirkite sistemai Luft daugiau Windows vietos arba dalį grąžinkite sistemai Windows.
+luft-resize-encrypted = Luft diskas šifruotas, todėl jam perkelti reikėtų atkūrimo rakto. Pirmiausia Luft Nustatymuose išjunkite įrenginio šifravimą, tada grįžkite.
+luft-resize-apart = Tarp Windows ir Luft yra kitas skaidinys, todėl jos negali dalytis vieta.
+luft-resize-unreadable = Meet Luft nepavyko nustatyti, kiek užpildyta Luft.
+luft-pending-grow = Luft padidės kitą kartą pasileidusi
+luft-pending-grow-description = Paleiskite iš naujo į Luft ir palikite ją įjungtą kelias minutes, kol ji persikels į naują vietą. Tuo metu ja galite naudotis.
+luft-pending-shrink = Luft atlaisvins vietos kitą kartą pasileidusi
+luft-pending-shrink-description = Paleiskite iš naujo į Luft ir palikite ją įjungtą kelias minutes, kol ji perkels savo failus. Tada sistemoje Windows vėl atidarykite Meet Luft, kad Windows gautų vietą.
+luft-windows-free-title = Atiduoti laisvą vietą sistemai Windows
+luft-windows-free-description = { $size } iškart po Windows niekas nenaudoja. Windows gali šią vietą atsiimti.
+luft-leftovers-title = Sutvarkyti po Luft bandymo
+luft-leftovers-description = Skaidiniai, kuriuos Meet Luft sukūrė Luft paleisti, vis dar yra. Luft jų nebereikia.
+luft-start = Paleisti iš naujo į Luft
+luft-cancel = Atšaukti pakeitimą
+luft-restart = Pirmiausia įrašykite tai, su kuo dirbate. Luft pasileis maždaug po minutės, o kitas paleidimas iš naujo grąžins jus į Windows.
+luft-restart-pending = Pirmiausia įrašykite tai, su kuo dirbate. Luft pasileis maždaug po minutės ir pati perkels savo failus, o tai užtrunka kelias minutes. Tuo metu ja galite naudotis.
+luft-remove = Pašalinti Luft iš šio kompiuterio
+luft-remove-title = Pašalinti Luft iš šio kompiuterio?
+luft-remove-description = Luft ir viskas, kas joje yra, ištrinama, iš viso { $size }, o Windows atgauna vietą. Kompiuteris paleis Windows kaip anksčiau. Šio veiksmo anuliuoti negalima.
+luft-remove-drive-description = Luft ir viskas, kas joje yra, ištrinama iš disko { $drive }, iš viso { $size }. Kompiuteris paleis Windows kaip anksčiau. Šio veiksmo anuliuoti negalima.
+luft-remove-confirm = Pašalinti Luft
+
+## Changing how much space Luft has
+## $size is a size, like "20 GB"
+
+resize-title = Kiek vietos skirti sistemai Luft?
+resize-description = Vilkite, kad padalytumėte diską tarp Windows ir Luft. Luft pati atliks pakeitimą kitą kartą pasileidusi.
+resize-measuring = Windows skaičiuoja, kiek vietos gali atiduoti. Dideliame diske tai gali užtrukti kelias minutes.
+resize-full = Luft per daug užpildyta, kad ją būtų galima perkelti, o Windows negali jai skirti pakankamai vietos. Pirmiausia atlaisvinkite vietos sistemoje Luft arba Windows.
+resize-used = Luft failai užima { $size }.
+resize-least = Pakeiskite bent { $size }.
+resize-apply = Pakeisti
+resize-grow-title = Skirti sistemai Luft dar { $size }?
+resize-grow-description = Windows iš karto susimažina. Luft persikels į naują vietą kitą kartą pasileidusi, o tai užtrunka kelias minutes. Laikykite kompiuterį prijungtą prie maitinimo.
+resize-shrink-title = Grąžinti sistemai Windows { $size }?
+resize-shrink-description = Luft perkels savo failus kitą kartą pasileidusi, o tai užtrunka kelias minutes. Tada vėl atidarykite Meet Luft, ir Windows atsiims vietą. Laikykite kompiuterį prijungtą prie maitinimo.
 
 ## Packing things to take along to Luft (the moving box)
 
@@ -173,6 +254,8 @@ box-pack = Supakuoti
 
 working-shrinking = Atlaisvinama vieta
     .description = Windows perkelia savo failus, kad atlaisvintų vietos. Tai gali užtrukti kelias minutes.
+working-erasing = Trinamas diskas
+    .description = Windows jį išvalo, kad Luft galėtų užimti visą diską.
 working-partitioning = Ruošiama vieta sistemai Luft
     .description = Ruošiami skaidiniai, iš kurių pasileidžia Luft.
 working-downloading = Perkeliama Luft

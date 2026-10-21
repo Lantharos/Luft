@@ -5,6 +5,7 @@
 	interface Props {
 		total: number;
 		used: number;
+		free?: number;
 		value: number;
 		min: number;
 		max: number;
@@ -12,7 +13,7 @@
 		onchange: (value: number) => void;
 	}
 
-	let { total, used, value, min, max, step, onchange }: Props = $props();
+	let { total, used, free = 0, value, min, max, step, onchange }: Props = $props();
 
 	let track = $state<HTMLDivElement>();
 	let dragging = $state(false);
@@ -68,7 +69,11 @@
 			<div class="used" style:width="{(used / kept) * 100}%"></div>
 		</div>
 		<div class="handle" style:left="{split}%"></div>
-		<div class="luft"></div>
+		<div class="luft">
+			{#if free > 0}
+				<div class="free" style:width="{(Math.min(free, value) / value) * 100}%"></div>
+			{/if}
+		</div>
 	</div>
 	<div class="flex justify-between text-[13.5px]">
 		<span><span class="font-semibold">Windows</span> <span class="text-[var(--text-soft)]">{windowsSize}</span></span>
@@ -105,9 +110,16 @@
 	}
 
 	.luft {
+		display: flex;
 		flex: 1;
+		justify-content: flex-end;
 		background: var(--accent);
 		opacity: 0.85;
+	}
+
+	.free {
+		height: 100%;
+		background: color-mix(in oklab, var(--accent-text) 28%, transparent);
 	}
 
 	.handle {

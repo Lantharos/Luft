@@ -89,3 +89,10 @@ Strings in Luft's Hungarian translation that a native speaker should check: term
 - `apps/meet/desktop/locales/hu/desktop.ftl` `check-secure-boot-turn-on`: "nyomja meg a következőt, amikor megjelenik a gyártó ({ $maker }) logója: { $key }" — reordered so the key and brand need no suffix; check it reads naturally.
 - `apps/meet/locales/hu/meet.ftl` `linux-ready-description`, `linux-ready-try-description`: "A rendszer ({ $system })" — the system name is put in parentheses to avoid an article and suffix.
 - `apps/meet/locales/hu/meet.ftl` `meet-nightly`, `meet-channel-nightly`: "Éjszakai buildek" — same informal term as on the website.
+- `apps/meet/locales/hu/meet.ftl` `luft-title`: "Az Ön Luftja" — check it doesn't sound stiff as a page title.
+- `apps/meet/locales/hu/meet.ftl` `room-place-free`, `room-place-whole`, `luft-description-drive`, `ready-install-drive-description`: the drive name follows a colon so it needs no article or suffix; check these read naturally.
+- `apps/meet/desktop/locales/hu/desktop.ftl` `check-space-erase-drive`: "Van hely a számára ezen a meghajtón, ha törlik: { $drive }." — reordered around the drive name; check it reads naturally.
+
+## Install Luft
+
+- `apps/setup/locales/hu/setup.ftl` `setup-destination-meet-drive-choice-description`, `setup-confirm-meet-drive-title`: "…ezen a lemezen: { $drive }", "Telepíti a Luftot erre a lemezre: { $drive }?" — the drive name goes after a colon so it never takes a suffix; check the choice line doesn't read too stiff.

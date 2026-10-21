@@ -1,6 +1,3 @@
-use std::fs::File;
-use std::io::{Read, Seek, SeekFrom};
-
 use luft_i18n::t;
 use windows::Win32::Foundation::{ERROR_ENVVAR_NOT_FOUND, ERROR_INVALID_FUNCTION};
 use windows::Win32::Security::{SE_SHUTDOWN_NAME, SE_SYSTEM_ENVIRONMENT_NAME};
@@ -19,6 +16,7 @@ use crate::boot::entries::Variables;
 use crate::boot::gpt;
 use crate::boot::load_option::{self, GLOBAL_VARIABLES, Partition};
 use crate::check::facts::Firmware;
+use crate::helper::drive::raw::RawDisk;
 
 const NON_VOLATILE: u32 = 0x1;
 const BOOT_SERVICE: u32 = 0x2;
@@ -34,12 +32,13 @@ pub fn firmware() -> Firmware {
     }
 }
 
-fn read(name: &str) -> Result<Option<Vec<u8>>, String> {
+pub fn read_variable(vendor: &str, name: &str) -> Result<Option<Vec<u8>>, String> {
+    enable(SE_SYSTEM_ENVIRONMENT_NAME)?;
     let mut buffer = vec![0u8; LARGEST_VARIABLE];
     let length = unsafe {
         GetFirmwareEnvironmentVariableExW(
             &HSTRING::from(name),
-            &HSTRING::from(GLOBAL_VARIABLES),
+            &HSTRING::from(vendor),
             Some(buffer.as_mut_ptr().cast()),
             buffer.len() as u32,
             None,
@@ -64,11 +63,12 @@ fn read(name: &str) -> Result<Option<Vec<u8>>, String> {
     Ok(Some(buffer))
 }
 
-fn write(name: &str, data: &[u8]) -> Result<(), String> {
+pub fn write_variable(vendor: &str, name: &str, data: &[u8]) -> Result<(), String> {
+    enable(SE_SYSTEM_ENVIRONMENT_NAME)?;
     unsafe {
         SetFirmwareEnvironmentVariableExW(
             &HSTRING::from(name),
-            &HSTRING::from(GLOBAL_VARIABLES),
+            &HSTRING::from(vendor),
             (!data.is_empty()).then_some(data.as_ptr().cast()),
             data.len() as u32,
             NON_VOLATILE | BOOT_SERVICE | RUNTIME,
@@ -85,11 +85,18 @@ fn write(name: &str, data: &[u8]) -> Result<(), String> {
 }
 
 pub fn secure_boot() -> Option<bool> {
-    enable(SE_SYSTEM_ENVIRONMENT_NAME).ok()?;
     read("SecureBoot")
         .ok()
         .flatten()
         .map(|value| value.first() == Some(&1))
+}
+
+fn read(name: &str) -> Result<Option<Vec<u8>>, String> {
+    read_variable(GLOBAL_VARIABLES, name)
+}
+
+fn write(name: &str, data: &[u8]) -> Result<(), String> {
+    write_variable(GLOBAL_VARIABLES, name, data)
 }
 
 fn indications(name: &str) -> Result<u64, String> {
@@ -101,12 +108,10 @@ fn indications(name: &str) -> Result<u64, String> {
 }
 
 pub fn opens_settings() -> bool {
-    enable(SE_SYSTEM_ENVIRONMENT_NAME).is_ok()
-        && indications("OsIndicationsSupported").is_ok_and(|bits| bits & BOOT_TO_SETTINGS != 0)
+    indications("OsIndicationsSupported").is_ok_and(|bits| bits & BOOT_TO_SETTINGS != 0)
 }
 
 pub fn restart_into_settings() -> Result<(), String> {
-    enable(SE_SYSTEM_ENVIRONMENT_NAME)?;
     let bits = indications("OsIndications")? | BOOT_TO_SETTINGS;
     write("OsIndications", &bits.to_le_bytes())?;
     restart()
@@ -114,37 +119,18 @@ pub fn restart_into_settings() -> Result<(), String> {
 
 pub fn partition_on_disk(disk: u32, sector: u64, guid: &str) -> Result<Partition, String> {
     let guid = load_option::guid_bytes(guid).ok_or_else(|| t!(L10N, "drive-guid-unreadable"))?;
-    let mut drive =
-        File::open(format!(r"\\.\PhysicalDrive{disk}")).map_err(|error| error.to_string())?;
-    let mut lba1 = vec![0u8; sector as usize];
-    drive
-        .seek(SeekFrom::Start(sector))
-        .map_err(|error| error.to_string())?;
-    drive
-        .read_exact(&mut lba1)
-        .map_err(|error| error.to_string())?;
-    let header = gpt::header(&lba1).ok_or_else(|| t!(L10N, "drive-not-gpt"))?;
-    let bytes = (header.count as u64 * header.entry_size as u64).div_ceil(sector) * sector;
-    let mut entries = vec![0u8; bytes as usize];
-    drive
-        .seek(SeekFrom::Start(header.entries_lba * sector))
-        .map_err(|error| error.to_string())?;
-    drive
-        .read_exact(&mut entries)
-        .map_err(|error| error.to_string())?;
-    gpt::find(&header, &entries, &guid).ok_or_else(|| t!(L10N, "drive-start-partition-not-listed"))
+    let (header, table) = RawDisk::open(disk, sector as u32)?.table()?;
+    gpt::find(&header, &table, &guid).ok_or_else(|| t!(L10N, "drive-start-partition-not-listed"))
 }
 
 pub struct Nvram;
 
 impl Variables for Nvram {
     fn read(&self, name: &str) -> Result<Option<Vec<u8>>, String> {
-        enable(SE_SYSTEM_ENVIRONMENT_NAME)?;
         read(name)
     }
 
     fn write(&self, name: &str, data: &[u8]) -> Result<(), String> {
-        enable(SE_SYSTEM_ENVIRONMENT_NAME)?;
         write(name, data)
     }
 }

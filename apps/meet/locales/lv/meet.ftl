@@ -40,6 +40,10 @@ problem-folders = Meet Luft nevarēja pārskatīt jūsu mapes.
 problem-sticks = Meet Luft nevarēja meklēt USB diskus.
 problem-stick = Zibatmiņas izveide netika pabeigta.
 problem-offer = Luft pašlaik nevar lejupielādēt. Pārbaudiet interneta savienojumu vai izmantojiet esošu ISO.
+problem-luft = Meet Luft nevarēja pārbaudīt Luft disku.
+problem-resize = Luft lieluma maiņa netika pabeigta.
+problem-cancel = Meet Luft nevarēja atcelt izmaiņu.
+problem-give = Windows nevarēja paņemt vietu atpakaļ.
 problem-declined = { $platform ->
     [linux] Meet Luft vajadzīga jūsu atļauja darbam ar disku. Ievadiet paroli, kad tā tiek prasīta.
    *[windows] Meet Luft vajadzīga jūsu atļauja darbam ar disku. Kad Windows jautā, izvēlieties Jā.
@@ -94,6 +98,35 @@ room-confirm-title = Vai atvēlēt sistēmai Luft { $size }?
 room-confirm-file = Windows samazina savu disku, pēc tam Meet Luft nokopē Luft no jūsu ISO. Turiet datoru pievienotu strāvai.
 room-confirm-download = Windows samazina savu disku, pēc tam Meet Luft lejupielādē Luft (aptuveni { $size }). Turiet datoru pievienotu strāvai un internetam.
 
+## Choosing where Luft goes, when there's more than one place
+## $drive is the name of a drive, like "Samsung SSD 990 PRO", and $size a size, like "120 GB"
+
+room-places-title = Kur novietot Luft?
+room-places-description = Luft var dalīt Windows disku vai aizņemt vietu, ko Windows neizmanto.
+room-places-label = Vietas sistēmai Luft
+room-place-windows = Blakus Windows
+room-place-windows-detail = Windows samazina sevi, lai atbrīvotu vietu sistēmai Luft
+room-place-windows-free = Tur jau ir brīvi { $size }
+room-place-free = Brīvā vieta diskā { $drive }
+room-place-free-here = Brīvā vieta Windows diskā
+room-place-free-detail = { $size }, ko nekas cits neizmanto
+room-place-whole = Viss disks { $drive }
+room-place-whole-detail = Izdzēš šo disku ({ $size }) sistēmai Luft
+room-live-free = No tās { $free } jau ir brīvi, tāpēc Windows atdod mazāk un patur vietu augšanai. Luft papildus rezervē { $size } startēšanai, ko pēc instalēšanas atdod atpakaļ.
+room-live-elsewhere = Luft tur saņem { $room } un papildus rezervē vēl { $size } startēšanai, ko pēc instalēšanas atdod atpakaļ.
+room-confirm-free-title = Vai atvēlēt sistēmai Luft { $size } brīvās vietas?
+room-confirm-free-file = Meet Luft tajā nokopē Luft no jūsu ISO. Nekas cits diskā nemainās.
+room-confirm-free-download = Meet Luft tajā lejupielādē Luft (aptuveni { $size }). Nekas cits diskā nemainās. Turiet datoru pievienotu internetam.
+room-erase-title = Vai izdzēst { $drive }?
+room-erase-description = Viss šajā diskā ({ $size }) tiek izdzēsts uzreiz, pirms Luft startē. To nevar atsaukt. Tajā pašlaik ir:
+room-erase-empty = Windows nevar nolasīt neko šajā diskā ({ $size }), taču viss, kas tajā ir, tiek izdzēsts uzreiz. To nevar atsaukt.
+room-erase-unnamed = Nodalījums bez nosaukuma
+room-erase-volume-name = { $name } ({ $letter })
+room-erase-volume = { $filesystem }, { $size }
+room-erase-bitlocker = Šifrēts ar BitLocker
+room-erase-understood = Es saprotu, ka daļa no tā ir šifrēta ar BitLocker un to nevarēs atgūt
+room-erase-confirm = Izdzēst un atbrīvot vietu
+
 ## Luft is ready on Windows
 
 ready-title = Luft ir gatava
@@ -106,6 +139,7 @@ ready-box-description = Sapakojiet dokumentus, fotoattēlus, Wi-Fi tīklus un ci
 ready-box-packed = Sapakots, { $size }
 ready-install-title = Instalēt Luft
 ready-install-description = Restartēt instalētājā. Vieta blakus Windows ({ $size }) to jau gaida.
+ready-install-drive-description = Restartēt instalētājā. Vieta diskā { $drive } ({ $size }) to jau gaida.
 ready-stick-description = Ierakstiet Luft zibatmiņā, lai to startētu jebkurā datorā.
 ready-remove = Noņemt Luft no šī datora
 ready-restart-try = Vispirms saglabājiet iesākto darbu. Luft atvērsies aptuveni pēc minūtes, un nākamā restartēšana jūs atgriezīs sistēmā Windows.
@@ -131,6 +165,53 @@ linux-ready-restart-try = Vispirms saglabājiet iesākto darbu. Luft atvērsies 
 linux-ready-restart-replace = Vispirms saglabājiet iesākto darbu. Instalētājs atvērsies ar aizstāšanai izvēlētu sistēmu ({ $system }) un pirms jebkādām izmaiņām parādīs, kas paliek.
 linux-ready-remove-title = Vai noņemt Luft no šī datora?
 linux-ready-remove-description = Meet Luft izdzēš Luft failus, startēšanas failus un startēšanas ierakstu. Viss pārējais paliek kā bijis.
+
+## Luft is installed on this PC
+## $drive is the name of a drive, like "Samsung SSD 990 PRO", and $size a size, like "120 GB"
+
+luft-title = Jūsu Luft
+luft-looking = Meet Luft atrada Luft šajā datorā.
+luft-checking = Notiek Luft diska pārbaude…
+luft-description-beside = Luft ir instalēta šajā datorā blakus Windows.
+luft-description-drive = Luft ir instalēta diskā { $drive }.
+luft-bar-used = { $size }, izmantoti { $used }
+luft-resize-title = Mainīt Luft vietas apjomu
+luft-resize-description = Atvēliet sistēmai Luft vairāk Windows vietas vai atdodiet daļu atpakaļ sistēmai Windows.
+luft-resize-encrypted = Luft disks ir šifrēts, tāpēc tā pārvietošanai būtu vajadzīga atkopšanas atslēga. Vispirms izslēdziet ierīces šifrēšanu Luft Iestatījumos un pēc tam atgriezieties.
+luft-resize-apart = Starp Windows un Luft atrodas cits nodalījums, tāpēc tās nevar dalīt savu vietu.
+luft-resize-unreadable = Meet Luft nevarēja noteikt, cik pilna ir Luft.
+luft-pending-grow = Luft palielināsies nākamajā startēšanas reizē
+luft-pending-grow-description = Restartējiet sistēmā Luft un atstājiet to ieslēgtu dažas minūtes, kamēr tā pārceļas uz jauno vietu. Tikmēr to var turpināt lietot.
+luft-pending-shrink = Luft atbrīvos vietu nākamajā startēšanas reizē
+luft-pending-shrink-description = Restartējiet sistēmā Luft un atstājiet to ieslēgtu dažas minūtes, kamēr tā pārvieto savus failus. Pēc tam sistēmā Windows atkal atveriet Meet Luft, lai Windows saņemtu vietu.
+luft-windows-free-title = Atdot brīvo vietu sistēmai Windows
+luft-windows-free-description = { $size } tieši aiz Windows netiek izmantoti. Windows var to paņemt atpakaļ.
+luft-leftovers-title = Sakārtot pēc Luft izmēģināšanas
+luft-leftovers-description = Nodalījumi, ko Meet Luft izveidoja Luft startēšanai, joprojām ir šeit. Luft tie vairs nav vajadzīgi.
+luft-start = Restartēt sistēmā Luft
+luft-cancel = Atcelt izmaiņu
+luft-restart = Vispirms saglabājiet iesākto darbu. Luft startēs aptuveni pēc minūtes, un nākamā restartēšana jūs atgriezīs sistēmā Windows.
+luft-restart-pending = Vispirms saglabājiet iesākto darbu. Luft startēs aptuveni pēc minūtes un pati pārvietos savus failus, kas aizņem dažas minūtes. Tikmēr to var lietot.
+luft-remove = Noņemt Luft no šī datora
+luft-remove-title = Vai noņemt Luft no šī datora?
+luft-remove-description = Luft un viss tajā tiek izdzēsts, kopā { $size }, un Windows saņem vietu atpakaļ. Dators startē Windows tāpat kā iepriekš. To nevar atsaukt.
+luft-remove-drive-description = Luft un viss tajā tiek izdzēsts no diska { $drive }, kopā { $size }. Dators startē Windows tāpat kā iepriekš. To nevar atsaukt.
+luft-remove-confirm = Noņemt Luft
+
+## Changing how much space Luft has
+## $size is a size, like "20 GB"
+
+resize-title = Cik vietas atvēlēt sistēmai Luft?
+resize-description = Velciet, lai sadalītu disku starp Windows un Luft. Luft pati veiks izmaiņu nākamajā startēšanas reizē.
+resize-measuring = Windows aprēķina, cik daudz vietas tā var atvēlēt. Lielā diskā tas var aizņemt dažas minūtes.
+resize-full = Luft ir pārāk pilna, lai to pārvietotu, un Windows nevar tai atvēlēt pietiekami daudz vietas. Vispirms atbrīvojiet vietu sistēmā Luft vai Windows.
+resize-used = Luft faili aizņem { $size }.
+resize-least = Mainiet vismaz par { $size }.
+resize-apply = Mainīt
+resize-grow-title = Vai atvēlēt sistēmai Luft vēl { $size }?
+resize-grow-description = Windows uzreiz samazina sevi. Luft pārcelsies uz jauno vietu nākamajā startēšanas reizē, kas aizņem dažas minūtes. Turiet datoru pievienotu strāvai.
+resize-shrink-title = Vai atdot sistēmai Windows { $size }?
+resize-shrink-description = Luft pārvietos savus failus nākamajā startēšanas reizē, kas aizņem dažas minūtes. Pēc tam vēlreiz atveriet Meet Luft, un Windows paņems vietu atpakaļ. Turiet datoru pievienotu strāvai.
 
 ## Packing things to take along to Luft (the moving box)
 
@@ -170,6 +251,8 @@ box-pack = Sapakot
 
 working-shrinking = Notiek vietas atbrīvošana
     .description = Windows pārvieto savus failus, lai atbrīvotu vietu. Tas var aizņemt dažas minūtes.
+working-erasing = Notiek diska dzēšana
+    .description = Windows to iztīra, lai Luft varētu aizņemt visu disku.
 working-partitioning = Notiek Luft vietas iestatīšana
     .description = Tiek sagatavoti nodalījumi, no kuriem startē Luft.
 working-downloading = Notiek Luft pārnešana

@@ -60,11 +60,18 @@ setup-destination-replace-title = Replace { $system }
 setup-destination-replace-description = Luft takes its place and keeps what’s yours.
 setup-destination-meet-title = Next to Windows
 setup-destination-meet-description = Meet Luft already made this room, so Windows stays just as it is.
+# $drive is a drive name, like "Samsung SSD 980"
+setup-destination-meet-drive-title = On { $drive }
+setup-destination-meet-drive-description = Meet Luft already made this room on another drive, and Luft starts from there with start files of its own.
 setup-destination-looking = Looking at your drives…
 
 setup-destination-meet-choice = Alongside Windows
 # $size is a size like "120 GB"
 setup-destination-meet-choice-description = Use the { $size } Meet Luft made next to Windows.
+# $drive is a drive name, like "Samsung SSD 980"
+setup-destination-meet-drive-choice = On { $drive }
+# $size is a size like "120 GB", and $drive a drive name
+setup-destination-meet-drive-choice-description = Use the { $size } Meet Luft made on { $drive }.
 # $windows is the Windows version, like "Windows 11"
 setup-destination-alongside-choice = Alongside { $windows }
 setup-destination-alongside-choice-description = Keep Windows and its files, and give Luft part of its drive.
@@ -93,6 +100,7 @@ setup-confirm-erase-title = Erase { $drive }?
 # $size is the size Windows keeps, like "200 GB"
 setup-confirm-shrink-title = Shrink Windows to { $size }?
 setup-confirm-meet-title = Install Luft next to Windows?
+setup-confirm-meet-drive-title = Install Luft on { $drive }?
 setup-confirm-free-title = Install Luft in the free space?
 setup-confirm-replace-keep-old = Luft starts copying right away. The old system won’t start anymore, and its files stay until you remove them.
 setup-confirm-replace-erase-old = Luft starts copying right away. The old system is erased for good, and your files stay where they are.

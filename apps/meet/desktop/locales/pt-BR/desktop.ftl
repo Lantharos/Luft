@@ -33,6 +33,9 @@ check-space-free = { $size } GB livres
 check-space-free-linux = O Luft ocupa cerca de { $size } GB enquanto você o experimenta.
 check-space-up-to = Até { $size } GB para o Luft
 check-space-up-to-detail = O Windows mantém os arquivos dele e espaço para crescer.
+check-space-free-already = Já há { $size } GB livres, então o Windows cede menos.
+check-space-other-drive = Há espaço para ele em { $drive }.
+check-space-erase-drive = Há espaço para ele em { $drive }, depois que esse disco for apagado.
 check-space-short = Espaço livre insuficiente
 check-space-short-windows = O Luft precisa de cerca de { $needed } GB que o Windows possa ceder. Libere { $missing } GB no Windows, por exemplo com a Limpeza de Disco, e verifique de novo.
 check-space-short-linux = O Luft precisa de cerca de { $needed } GB para iniciar. Libere { $missing } GB e verifique de novo.
@@ -130,7 +133,10 @@ helper-not-ready-to-start-linux = O Luft ainda não está pronto para iniciar. P
 helper-update-unfinished = A atualização do Luft não terminou. Atualize-o de novo primeiro.
 helper-room-too-small = O Luft precisa de mais espaço que isso.
 helper-room-shortfall = O Windows pode ceder { $available } GB, e o Luft precisa de { $needed } GB.
+helper-gap-shortfall = Esse espaço tem { $available } GB, e o Luft precisa de { $needed } GB.
+helper-place-gone = Esse espaço não está mais livre. Verifique de novo para ver onde o Luft cabe.
 helper-box-shortfall = O Windows pode ceder mais { $available } GB, e os itens escolhidos precisam de { $needed } GB.
+helper-box-room-shortfall = O espaço do Luft pode ceder { $available } GB, e os itens escolhidos precisam de { $needed } GB.
 helper-bluetooth-unreadable = Não foi possível abrir as configurações de Bluetooth do Windows
 helper-registry-not-opened = Não foi possível abrir { $key }: { $error }
 helper-registry-not-changed = Não foi possível alterar { $value }: { $error }
@@ -159,7 +165,6 @@ drive-windows-partition-missing = A partição do Windows não foi encontrada
 drive-volume-missing = O volume { $path } não foi encontrado
 drive-storage-error = { $what } (erro de armazenamento do Windows { $code })
 drive-shrink-size-unknown = O Windows não conseguiu saber o quanto a partição dele pode diminuir
-drive-grow-size-unknown = O Windows não conseguiu saber o quanto a partição dele pode crescer
 drive-resize-failed = O Windows não conseguiu alterar o tamanho da partição dele
 drive-create-failed = O Windows não conseguiu criar uma partição para o Luft
 drive-hide-failed = O Windows não conseguiu esconder a nova partição do Explorador de Arquivos
@@ -178,6 +183,9 @@ drive-new-live-no-volume = A nova partição do Luft não tem volume
 drive-partitions-not-noted = As partições do Luft não estão nos registros do Meet Luft
 drive-partitions-gone = As partições do Luft sumiram
 drive-partition-gone = Uma partição sumiu
+drive-gone = Um disco sumiu
+drive-erase-failed = O Windows não conseguiu apagar o disco
+drive-erased-no-room = O disco apagado não tem espaço para o Luft
 drive-start-partition-foreign = A partição de inicialização do Luft não foi criada pelo Meet Luft
 drive-start-partition-gone = A partição de inicialização do Luft não existe mais
 drive-start-partition-not-listed = A partição de inicialização do Luft não está na tabela de partições
@@ -190,6 +198,14 @@ drive-esp-no-guid = A partição de sistema EFI não tem GUID
 drive-no-uuid = O disco onde o Luft fica não tem UUID
 drive-folder-unreadable = O Luft não consegue iniciar a partir do disco onde estão seus arquivos.
 drive-folder-not-startable = Não é possível iniciar a partir de { $folder }
+
+## Errors while changing Luft once it's installed
+
+luft-gone = O Luft não está mais neste PC
+luft-not-resizable = Não é possível alterar o tamanho do Luft pelo Windows agora
+luft-size-not-allowed = O Luft não pode ter esse tamanho
+luft-space-promised = Esse espaço está reservado para o Luft. Cancele a alteração primeiro.
+luft-no-start-entry = A entrada de inicialização do Luft não foi encontrada
 
 ## Errors while getting Luft
 

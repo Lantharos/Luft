@@ -40,6 +40,10 @@ problem-folders = Το Meet Luft δεν μπόρεσε να εξετάσει τ�
 problem-sticks = Το Meet Luft δεν μπόρεσε να αναζητήσει μονάδες USB.
 problem-stick = Η δημιουργία του στικ δεν ολοκληρώθηκε.
 problem-offer = Δεν είναι δυνατή η λήψη του Luft αυτήν τη στιγμή. Ελέγξτε ότι είστε συνδεδεμένοι ή χρησιμοποιήστε ένα ISO που ήδη έχετε.
+problem-luft = Το Meet Luft δεν μπόρεσε να εξετάσει τον δίσκο του Luft.
+problem-resize = Η αλλαγή μεγέθους του Luft δεν ολοκληρώθηκε.
+problem-cancel = Το Meet Luft δεν μπόρεσε να ακυρώσει την αλλαγή.
+problem-give = Τα Windows δεν μπόρεσαν να πάρουν πίσω τον χώρο.
 problem-declined = { $platform ->
     [linux] Το Meet Luft χρειάζεται την άδειά σας για να εργαστεί στον δίσκο. Πληκτρολογήστε τον κωδικό πρόσβασής σας όταν σας ζητηθεί.
    *[windows] Το Meet Luft χρειάζεται την άδειά σας για να εργαστεί στον δίσκο. Επιλέξτε «Ναι» όταν ρωτήσουν τα Windows.
@@ -94,6 +98,35 @@ room-confirm-title = Διάθεση { $size } στο Luft;
 room-confirm-file = Τα Windows μικραίνουν τον δίσκο τους και μετά το Meet Luft αντιγράφει το Luft από το ISO σας. Κρατήστε το PC στην πρίζα.
 room-confirm-download = Τα Windows μικραίνουν τον δίσκο τους και μετά το Meet Luft κατεβάζει το Luft, περίπου { $size }. Κρατήστε το PC στην πρίζα και συνδεδεμένο στο διαδίκτυο.
 
+## Choosing where Luft goes, when there's more than one place
+## $drive is the name of a drive, like "Samsung SSD 990 PRO", and $size a size, like "120 GB"
+
+room-places-title = Πού να μπει το Luft;
+room-places-description = Το Luft μπορεί να μοιραστεί τον δίσκο των Windows ή να πάρει χώρο που τα Windows δεν χρησιμοποιούν.
+room-places-label = Θέσεις για το Luft
+room-place-windows = Δίπλα στα Windows
+room-place-windows-detail = Τα Windows μικραίνουν για να κάνουν χώρο στο Luft
+room-place-windows-free = Εκεί είναι ήδη ελεύθερα { $size }
+room-place-free = Ελεύθερος χώρος στο { $drive }
+room-place-free-here = Ελεύθερος χώρος στον δίσκο των Windows
+room-place-free-detail = { $size } που δεν χρησιμοποιεί τίποτε άλλο
+room-place-whole = Ολόκληρο το { $drive }
+room-place-whole-detail = Διαγράφει αυτόν τον δίσκο των { $size } για το Luft
+room-live-free = Από αυτόν τον χώρο, τα { $free } είναι ήδη ελεύθερα, οπότε τα Windows παραχωρούν λιγότερα και κρατούν χώρο για να μεγαλώσουν. Το Luft δεσμεύει επίσης { $size } για να ξεκινά, τα οποία επιστρέφει μόλις εγκατασταθεί.
+room-live-elsewhere = Το Luft παίρνει εκεί { $room } και δεσμεύει ακόμη { $size } για να ξεκινά, τα οποία επιστρέφει μόλις εγκατασταθεί.
+room-confirm-free-title = Διάθεση { $size } ελεύθερου χώρου στο Luft;
+room-confirm-free-file = Το Meet Luft αντιγράφει εκεί το Luft από το ISO σας. Τίποτε άλλο στον δίσκο δεν αλλάζει.
+room-confirm-free-download = Το Meet Luft κατεβάζει εκεί το Luft, περίπου { $size }. Τίποτε άλλο στον δίσκο δεν αλλάζει. Κρατήστε το PC συνδεδεμένο στο διαδίκτυο.
+room-erase-title = Διαγραφή του { $drive };
+room-erase-description = Όλο το περιεχόμενο αυτού του δίσκου των { $size } διαγράφεται αμέσως, πριν ξεκινήσει το Luft. Δεν είναι δυνατή η αναίρεση. Αυτήν τη στιγμή περιέχει:
+room-erase-empty = Τα Windows δεν μπορούν να διαβάσουν τίποτα σε αυτόν τον δίσκο των { $size }, αλλά ό,τι υπάρχει σε αυτόν διαγράφεται αμέσως. Δεν είναι δυνατή η αναίρεση.
+room-erase-unnamed = Διαμέρισμα χωρίς όνομα
+room-erase-volume-name = { $name } ({ $letter })
+room-erase-volume = { $filesystem }, { $size }
+room-erase-bitlocker = Κρυπτογραφημένο με BitLocker
+room-erase-understood = Γνωρίζω ότι ένα μέρος του είναι κρυπτογραφημένο με BitLocker και δεν μπορεί να ανακτηθεί
+room-erase-confirm = Διαγραφή και δημιουργία χώρου
+
 ## Luft is ready on Windows
 
 ready-title = Το Luft είναι έτοιμο
@@ -106,6 +139,7 @@ ready-box-description = Πακετάρετε έγγραφα, φωτογραφί�
 ready-box-packed = Πακεταρισμένα, { $size }
 ready-install-title = Εγκατάσταση Luft
 ready-install-description = Επανεκκίνηση στο πρόγραμμα εγκατάστασης. Ο χώρος των { $size } δίπλα στα Windows το περιμένει ήδη.
+ready-install-drive-description = Επανεκκίνηση στο πρόγραμμα εγκατάστασης. Ο χώρος των { $size } στο { $drive } το περιμένει ήδη.
 ready-stick-description = Βάλτε το Luft σε ένα στικ για να το ξεκινάτε σε οποιονδήποτε υπολογιστή.
 ready-remove = Αφαίρεση του Luft από αυτό το PC
 ready-restart-try = Αποθηκεύστε πρώτα ό,τι κάνετε. Το Luft ανοίγει σε περίπου ένα λεπτό, και η επόμενη επανεκκίνηση σας επιστρέφει στα Windows.
@@ -131,6 +165,53 @@ linux-ready-restart-try = Αποθηκεύστε πρώτα ό,τι κάνετε
 linux-ready-restart-replace = Αποθηκεύστε πρώτα ό,τι κάνετε. Το πρόγραμμα εγκατάστασης ανοίγει έτοιμο να αντικαταστήσει { $system } και δείχνει τι μένει πριν αλλάξει οτιδήποτε.
 linux-ready-remove-title = Αφαίρεση του Luft από αυτόν τον υπολογιστή;
 linux-ready-remove-description = Το Meet Luft διαγράφει τα αρχεία του Luft, τα αρχεία εκκίνησής του και την καταχώριση εκκίνησής του. Όλα τα άλλα μένουν ως έχουν.
+
+## Luft is installed on this PC
+## $drive is the name of a drive, like "Samsung SSD 990 PRO", and $size a size, like "120 GB"
+
+luft-title = Το Luft σας
+luft-looking = Το Meet Luft βρήκε το Luft σε αυτό το PC.
+luft-checking = Έλεγχος του δίσκου του Luft…
+luft-description-beside = Το Luft είναι εγκατεστημένο δίπλα στα Windows σε αυτό το PC.
+luft-description-drive = Το Luft είναι εγκατεστημένο στο { $drive }.
+luft-bar-used = { $size }, σε χρήση { $used }
+luft-resize-title = Αλλαγή του χώρου του Luft
+luft-resize-description = Δώστε στο Luft περισσότερο από τον χώρο των Windows ή επιστρέψτε λίγο στα Windows.
+luft-resize-encrypted = Ο δίσκος του Luft είναι κρυπτογραφημένος, οπότε η μετακίνησή του θα χρειαζόταν το κλειδί αποκατάστασης. Απενεργοποιήστε πρώτα την κρυπτογράφηση συσκευής στις Ρυθμίσεις του Luft και μετά επιστρέψτε.
+luft-resize-apart = Ανάμεσα στα Windows και στο Luft υπάρχει άλλο διαμέρισμα, οπότε δεν μπορούν να μοιραστούν τον χώρο τους.
+luft-resize-unreadable = Το Meet Luft δεν μπόρεσε να διαπιστώσει πόσο γεμάτο είναι το Luft.
+luft-pending-grow = Το Luft μεγαλώνει την επόμενη φορά που θα ξεκινήσει
+luft-pending-grow-description = Κάντε επανεκκίνηση στο Luft και αφήστε το ανοιχτό για μερικά λεπτά, όσο μεταφέρεται στον νέο χώρο. Στο μεταξύ μπορείτε να το χρησιμοποιείτε.
+luft-pending-shrink = Το Luft κάνει χώρο την επόμενη φορά που θα ξεκινήσει
+luft-pending-shrink-description = Κάντε επανεκκίνηση στο Luft και αφήστε το ανοιχτό για μερικά λεπτά, όσο μετακινεί τα αρχεία του. Μετά ανοίξτε ξανά το Meet Luft στα Windows για να δώσετε τον χώρο στα Windows.
+luft-windows-free-title = Διάθεση του ελεύθερου χώρου στα Windows
+luft-windows-free-description = Τα { $size } ακριβώς μετά τα Windows δεν χρησιμοποιούνται από τίποτα. Τα Windows μπορούν να τα πάρουν πίσω.
+luft-leftovers-title = Καθαρισμός μετά τη δοκιμή του Luft
+luft-leftovers-description = Τα διαμερίσματα που δημιούργησε το Meet Luft για να ξεκινήσει το Luft είναι ακόμη εδώ. Το Luft δεν τα χρειάζεται πια.
+luft-start = Επανεκκίνηση στο Luft
+luft-cancel = Ακύρωση της αλλαγής
+luft-restart = Αποθηκεύστε πρώτα ό,τι κάνετε. Το Luft ξεκινά σε περίπου ένα λεπτό, και η επόμενη επανεκκίνηση σας επιστρέφει στα Windows.
+luft-restart-pending = Αποθηκεύστε πρώτα ό,τι κάνετε. Το Luft ξεκινά σε περίπου ένα λεπτό και μετακινεί μόνο του τα αρχεία του, κάτι που παίρνει μερικά λεπτά. Στο μεταξύ μπορείτε να το χρησιμοποιείτε.
+luft-remove = Αφαίρεση του Luft από αυτό το PC
+luft-remove-title = Αφαίρεση του Luft από αυτό το PC;
+luft-remove-description = Το Luft και ό,τι περιέχει διαγράφονται, { $size } συνολικά, και τα Windows παίρνουν πίσω τον χώρο. Το PC ξεκινά τα Windows όπως πριν. Δεν είναι δυνατή η αναίρεση.
+luft-remove-drive-description = Το Luft και ό,τι περιέχει διαγράφονται από το { $drive }, { $size } συνολικά. Το PC ξεκινά τα Windows όπως πριν. Δεν είναι δυνατή η αναίρεση.
+luft-remove-confirm = Αφαίρεση του Luft
+
+## Changing how much space Luft has
+## $size is a size, like "20 GB"
+
+resize-title = Πόσος χώρος για το Luft;
+resize-description = Σύρετε για να μοιράσετε τον δίσκο ανάμεσα στα Windows και στο Luft. Το Luft κάνει μόνο του την αλλαγή την επόμενη φορά που θα ξεκινήσει.
+resize-measuring = Τα Windows υπολογίζουν πόσο χώρο μπορούν να διαθέσουν. Σε μεγάλο δίσκο αυτό μπορεί να πάρει μερικά λεπτά.
+resize-full = Το Luft είναι πολύ γεμάτο για να μετακινηθεί και τα Windows δεν μπορούν να διαθέσουν αρκετό χώρο γι’ αυτό. Κάντε πρώτα λίγο χώρο στο Luft ή στα Windows.
+resize-used = Τα αρχεία του Luft πιάνουν { $size }.
+resize-least = Αλλάξτε το κατά τουλάχιστον { $size }.
+resize-apply = Αλλαγή
+resize-grow-title = Διάθεση ακόμη { $size } στο Luft;
+resize-grow-description = Τα Windows μικραίνουν αμέσως. Το Luft μεταφέρεται στον νέο χώρο την επόμενη φορά που θα ξεκινήσει, κάτι που παίρνει μερικά λεπτά. Κρατήστε το PC στην πρίζα.
+resize-shrink-title = Επιστροφή { $size } στα Windows;
+resize-shrink-description = Το Luft μετακινεί τα αρχεία του την επόμενη φορά που θα ξεκινήσει, κάτι που παίρνει μερικά λεπτά. Μετά ανοίξτε ξανά το Meet Luft και τα Windows παίρνουν πίσω τον χώρο. Κρατήστε το PC στην πρίζα.
 
 ## Packing things to take along to Luft (the moving box)
 
@@ -167,6 +248,8 @@ box-pack = Πακετάρισμα
 
 working-shrinking = Δημιουργία χώρου
     .description = Τα Windows μετακινούν τα αρχεία τους για να ελευθερώσουν χώρο. Αυτό μπορεί να πάρει μερικά λεπτά.
+working-erasing = Διαγραφή του δίσκου
+    .description = Τα Windows τον αδειάζουν, ώστε το Luft να πάρει ολόκληρο τον δίσκο.
 working-partitioning = Προετοιμασία του χώρου του Luft
     .description = Προετοιμάζονται τα διαμερίσματα από τα οποία ξεκινά το Luft.
 working-downloading = Μεταφορά του Luft

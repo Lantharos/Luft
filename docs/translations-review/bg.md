@@ -77,3 +77,6 @@ Strings in Luft's Bulgarian translation that a native speaker should check. Each
 - `apps/meet/locales/bg/meet.ftl` `check-action-tidy`: "Разчисти" — tidying old start entries; check it's clear as a button.
 - `apps/meet/desktop/locales/bg/desktop.ftl` `check-secure-boot-turn-on`: "натиснете { $key }" — with `check-firmware-key-volume-up` as "бутона за увеличаване на звука"; check the sentence reads well with both a key name and the button.
 - `apps/meet/desktop/locales/bg/desktop.ftl` `check-fast-startup-on`: "Бързо стартиране е включено" — the setting's name is neuter by its sense (стартиране); confirm the agreement.
+- `apps/meet/locales/bg/meet.ftl` `room-places-title`: "Къде да се настани Luft?" — echoes „да се настани“ from check-blocked-description; check it doesn’t sound too figurative for choosing a drive.
+- `apps/meet/locales/bg/meet.ftl` `room-place-windows-free`: "Там вече има { $size } свободни" — plural agreement assumes sizes like „120 GB“.
+- `apps/meet/desktop/locales/bg/desktop.ftl` `helper-box-room-shortfall`: "Мястото на Luft може да отдели { $available } ГБ, а за избраното са нужни { $needed } ГБ." — "Luft’s room can spare" is the space already set aside for Luft; check that comes across.

@@ -69,3 +69,8 @@ Strings in Luft's Slovenian translation that a native speaker should check: term
 - `apps/meet/locales/sl/meet.ftl` `stick-done-eject`: "Pred odstranitvijo ga izvrzite." — check against Windows' Slovenian wording for ejecting a drive.
 - `apps/meet/desktop/locales/sl/desktop.ftl` `drive-storage-error`: "napaka shrambe sistema Windows { $code }" — no settled term for "Windows storage error".
 - `apps/meet/desktop/locales/sl/desktop.ftl` `check-wifi-broadcom`: "telefon za internetno povezavo prek USB" — paraphrase of USB tethering; check Android's Slovenian term („Internet prek USB-ja“).
+- `apps/meet/locales/sl/meet.ftl` `room-live-free`: "Prostega je že { $free }, …" — partitive genitive chosen so the sentence works for any size; check it reads naturally.
+- `apps/meet/locales/sl/meet.ftl` `room-erase-bitlocker`: "Šifrirano z BitLockerjem" — neuter status form under a partition's name in the list; "Šifrirana" (agreeing with particija) is the alternative.
+- `apps/meet/locales/sl/meet.ftl` `room-erase-understood`: "Vem, da je del tega šifriran z BitLockerjem in ga ni mogoče obnoviti" — tick box text in first person; check "del tega" reads clearly as "some of what is on the drive".
+- `apps/meet/locales/sl/meet.ftl` `luft-windows-free-title`: "Prepusti prosti prostor sistemu Windows" — check "prepusti" is the most natural verb for handing free space over.
+- `apps/meet/desktop/locales/sl/desktop.ftl` `check-space-free-already`: "Od tega je že prostih { $size } GB …" — "prostih" fits 5 and more and decimals; for 1–4 GB the agreement would be off.

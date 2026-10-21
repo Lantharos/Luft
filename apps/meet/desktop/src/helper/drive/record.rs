@@ -13,6 +13,7 @@ use crate::live::durable;
 pub struct Made {
     pub partitions: Vec<String>,
     pub boot_entry: Option<u16>,
+    pub windows_size: Option<u64>,
 }
 
 fn path() -> Result<PathBuf, String> {
@@ -30,7 +31,7 @@ impl Made {
 
     fn save(&self) -> Result<(), String> {
         let path = path()?;
-        if self.partitions.is_empty() && self.boot_entry.is_none() {
+        if self.partitions.is_empty() && self.boot_entry.is_none() && self.windows_size.is_none() {
             return match fs::remove_file(&path) {
                 Err(error) if error.kind() != std::io::ErrorKind::NotFound => {
                     Err(error.to_string())
@@ -60,6 +61,35 @@ pub fn made_partition(guid: &str) -> Result<(), String> {
 pub fn removed_partition(guid: &str) -> Result<(), String> {
     let mut made = Made::read();
     made.partitions.retain(|known| known != guid);
+    made.save()
+}
+
+pub fn forget_missing(partitions: &[String], boot_entry_exists: bool) -> Result<(), String> {
+    let mut made = Made::read();
+    let before = (made.partitions.len(), made.boot_entry);
+    made.partitions
+        .retain(|guid| partitions.iter().any(|existing| existing == guid));
+    if !boot_entry_exists {
+        made.boot_entry = None;
+    }
+    if (made.partitions.len(), made.boot_entry) == before {
+        return Ok(());
+    }
+    made.save()
+}
+
+pub fn windows_shrinks_from(size: u64) -> Result<(), String> {
+    let mut made = Made::read();
+    if made.windows_size.is_some() {
+        return Ok(());
+    }
+    made.windows_size = Some(size);
+    made.save()
+}
+
+pub fn forget_windows_size() -> Result<(), String> {
+    let mut made = Made::read();
+    made.windows_size = None;
     made.save()
 }
 

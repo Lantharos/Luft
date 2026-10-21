@@ -72,3 +72,4 @@ Strings in Luft's Nynorsk translation that a native speaker should check: terms 
 - `apps/meet/desktop/locales/nn/desktop.ftl` `check-start-entries-detail`: "Ho kan ryddast bort." — «oppstartsoppføring» taken as feminine (ei føring); check the pronoun.
 - `apps/meet/desktop/locales/nn/desktop.ftl` `check-encryption-on-detail`: "for sikkerheits skuld" — fixed phrase kept although the guide prefers «tryggleik»; check it doesn't read as Bokmål.
 - `apps/meet/desktop/locales/nn/desktop.ftl` `check-secure-boot-off-detail`: "spel med juksevern" — no settled Nynorsk term for anti-cheat.
+- `apps/meet/locales/nn/meet.ftl` `luft-title`: "Ditt Luft" — Nynorsk usually puts the possessive after the noun, which a name without a definite ending can't take; check it reads naturally as a title.

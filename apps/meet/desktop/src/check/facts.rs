@@ -1,6 +1,9 @@
 use luft_variant::Variant;
 use serde::{Deserialize, Serialize};
 
+#[cfg(any(windows, test))]
+use crate::plan::places::Place;
+
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum Architecture {
@@ -86,4 +89,5 @@ pub struct Facts {
     pub windows_size: u64,
     pub windows_used: u64,
     pub most_room: u64,
+    pub places: Vec<Place>,
 }

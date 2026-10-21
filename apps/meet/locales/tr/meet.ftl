@@ -40,6 +40,10 @@ problem-folders = Meet Luft klasörlerinize göz atamadı.
 problem-sticks = Meet Luft USB bellekleri arayamadı.
 problem-stick = USB bellek hazırlama işlemi tamamlanmadı.
 problem-offer = Luft şu anda indirilemiyor. İnternete bağlı olduğunuzu denetleyin ya da elinizdeki bir ISO’yu kullanın.
+problem-luft = Meet Luft, Luft’un diskini inceleyemedi.
+problem-resize = Luft’un boyutunu değiştirme işlemi tamamlanmadı.
+problem-cancel = Meet Luft değişikliği iptal edemedi.
+problem-give = Windows alanı geri alamadı.
 problem-declined = { $platform ->
     [linux] Meet Luft’un diskte çalışmak için izninize ihtiyacı var. Sorulduğunda parolanızı girin.
    *[windows] Meet Luft’un diskte çalışmak için izninize ihtiyacı var. Windows sorduğunda Evet’i seçin.
@@ -94,6 +98,35 @@ room-confirm-title = Luft’a { $size } verilsin mi?
 room-confirm-file = Windows diskini küçültür, ardından Meet Luft, Luft’u ISO’nuzdan kopyalar. Bilgisayarı prize takılı tutun.
 room-confirm-download = Windows diskini küçültür, ardından Meet Luft yaklaşık { $size } boyutundaki Luft’u indirir. Bilgisayarı prize takılı ve internete bağlı tutun.
 
+## Choosing where Luft goes, when there's more than one place
+## $drive is the name of a drive, like "Samsung SSD 990 PRO", and $size a size, like "120 GB"
+
+room-places-title = Luft nereye yerleşsin?
+room-places-description = Luft, Windows’un diskini paylaşabilir ya da Windows’un kullanmadığı bir alanı alabilir.
+room-places-label = Luft için yerler
+room-place-windows = Windows’un yanına
+room-place-windows-detail = Windows, Luft’a yer açmak için kendini küçültür
+room-place-windows-free = Orada zaten { $size } boş
+room-place-free = { $drive } diskindeki boş alan
+room-place-free-here = Windows’un diskindeki boş alan
+room-place-free-detail = Başka hiçbir şeyin kullanmadığı { $size }
+room-place-whole = { $drive } diskinin tamamı
+room-place-whole-detail = Bu { $size } diski Luft için siler
+room-live-free = Bunun { $free } kadarı zaten boş, bu yüzden Windows daha az yer verir ve büyümek için yer ayırır. Luft da başlangıç için { $size } ayırır ve yüklendikten sonra bu alanı geri verir.
+room-live-elsewhere = Luft orada { $room } alır ve başlangıç için { $size } daha ayırır; bu alanı yüklendikten sonra geri verir.
+room-confirm-free-title = Luft’a { $size } boş alan verilsin mi?
+room-confirm-free-file = Meet Luft, Luft’u ISO’nuzdan oraya kopyalar. Diskteki başka hiçbir şey değişmez.
+room-confirm-free-download = Meet Luft yaklaşık { $size } boyutundaki Luft’u oraya indirir. Diskteki başka hiçbir şey değişmez. Bilgisayarı internete bağlı tutun.
+room-erase-title = { $drive } diski silinsin mi?
+room-erase-description = Bu { $size } diskteki her şey, Luft başlamadan önce hemen silinir. Bu işlem geri alınamaz. Şu anda üzerinde olanlar:
+room-erase-empty = Windows bu { $size } diskte hiçbir şey okuyamıyor, ancak üzerinde ne varsa hemen silinir. Bu işlem geri alınamaz.
+room-erase-unnamed = Adsız bölüm
+room-erase-volume-name = { $name } ({ $letter })
+room-erase-volume = { $filesystem }, { $size }
+room-erase-bitlocker = BitLocker ile şifrelenmiş
+room-erase-understood = Bir kısmının BitLocker ile şifrelendiğini ve geri getirilemeyeceğini biliyorum
+room-erase-confirm = Sil ve yer aç
+
 ## Luft is ready on Windows
 
 ready-title = Luft hazır
@@ -106,6 +139,7 @@ ready-box-description = Belgeleri, fotoğrafları, Wi-Fi ağlarını ve daha faz
 ready-box-packed = Paketlendi: { $size }
 ready-install-title = Luft’u yükle
 ready-install-description = Yükleyicide yeniden başlatın. Windows’un yanındaki { $size } alan onu bekliyor.
+ready-install-drive-description = Yükleyicide yeniden başlatın. { $drive } diskindeki { $size } alan onu bekliyor.
 ready-stick-description = Herhangi bir bilgisayarda başlatmak için Luft’u bir USB belleğe yazın.
 ready-remove = Luft’u bu bilgisayardan kaldır
 ready-restart-try = Önce üzerinde çalıştığınız her şeyi kaydedin. Luft yaklaşık bir dakika içinde açılır, bir sonraki yeniden başlatma sizi Windows’a döndürür.
@@ -131,6 +165,53 @@ linux-ready-restart-try = Önce üzerinde çalıştığınız her şeyi kaydedin
 linux-ready-restart-replace = Önce üzerinde çalıştığınız her şeyi kaydedin. Yükleyici, yerine yüklenecek sistem seçili olarak açılır ({ $system }) ve bir şey değişmeden önce neyin kalacağını gösterir.
 linux-ready-remove-title = Luft bu bilgisayardan kaldırılsın mı?
 linux-ready-remove-description = Meet Luft, Luft’un dosyalarını, önyükleme dosyalarını ve önyükleme girdisini siler. Geri kalan her şey olduğu gibi kalır.
+
+## Luft is installed on this PC
+## $drive is the name of a drive, like "Samsung SSD 990 PRO", and $size a size, like "120 GB"
+
+luft-title = Luft’unuz
+luft-looking = Meet Luft bu bilgisayarda Luft’u buldu.
+luft-checking = Luft’un diski inceleniyor…
+luft-description-beside = Luft bu bilgisayarda Windows’un yanında yüklü.
+luft-description-drive = Luft, { $drive } diskinde yüklü.
+luft-bar-used = { $size }, { $used } kullanılıyor
+luft-resize-title = Luft’un alanını değiştir
+luft-resize-description = Luft’a Windows’un alanından daha fazlasını verin ya da bir kısmını Windows’a geri verin.
+luft-resize-encrypted = Luft’un diski şifreli, bu yüzden taşınması için kurtarma anahtarı gerekir. Önce Luft’un Ayarlar uygulamasında cihaz şifrelemeyi kapatın, sonra geri gelin.
+luft-resize-apart = Windows ile Luft arasında başka bir bölüm var, bu yüzden alanlarını paylaşamazlar.
+luft-resize-unreadable = Meet Luft, Luft’un ne kadar dolu olduğunu anlayamadı.
+luft-pending-grow = Luft bir sonraki başlangıçta büyür
+luft-pending-grow-description = Luft’ta yeniden başlatın ve yeni alana yerleşirken birkaç dakika açık bırakın. Bu sırada onu kullanmaya devam edebilirsiniz.
+luft-pending-shrink = Luft bir sonraki başlangıçta yer açar
+luft-pending-shrink-description = Luft’ta yeniden başlatın ve dosyalarını taşırken birkaç dakika açık bırakın. Ardından alanı Windows’a vermek için Windows’ta Meet Luft’u yeniden açın.
+luft-windows-free-title = Boş alanı Windows’a ver
+luft-windows-free-description = Windows’un hemen ardındaki { $size } alanı hiçbir şey kullanmıyor. Windows bu alanı geri alabilir.
+luft-leftovers-title = Luft denemesinden kalanları temizle
+luft-leftovers-description = Meet Luft’un Luft’u başlatmak için oluşturduğu bölümler hâlâ duruyor. Luft’un artık bunlara ihtiyacı yok.
+luft-start = Luft’ta yeniden başlat
+luft-cancel = Değişikliği iptal et
+luft-restart = Önce üzerinde çalıştığınız her şeyi kaydedin. Luft yaklaşık bir dakika içinde başlar, bir sonraki yeniden başlatma sizi Windows’a döndürür.
+luft-restart-pending = Önce üzerinde çalıştığınız her şeyi kaydedin. Luft yaklaşık bir dakika içinde başlar ve dosyalarını kendisi taşır; bu birkaç dakika sürer. Bu sırada onu kullanabilirsiniz.
+luft-remove = Luft’u bu bilgisayardan kaldır
+luft-remove-title = Luft bu bilgisayardan kaldırılsın mı?
+luft-remove-description = Luft ve içindeki her şey, toplam { $size }, silinir ve alan Windows’a geri verilir. Bilgisayar Windows’u eskisi gibi başlatır. Bu işlem geri alınamaz.
+luft-remove-drive-description = Luft ve içindeki her şey { $drive } diskinden silinir, toplam { $size }. Bilgisayar Windows’u eskisi gibi başlatır. Bu işlem geri alınamaz.
+luft-remove-confirm = Luft’u kaldır
+
+## Changing how much space Luft has
+## $size is a size, like "20 GB"
+
+resize-title = Luft’a ne kadar yer?
+resize-description = Diski Windows ile Luft arasında paylaştırmak için sürükleyin. Luft değişikliği bir sonraki başlangıçta kendisi yapar.
+resize-measuring = Windows ne kadar yer ayırabileceğini hesaplıyor. Büyük bir diskte bu birkaç dakika sürebilir.
+resize-full = Luft taşınamayacak kadar dolu ve Windows ona yeterli yer ayıramıyor. Önce Luft’ta ya da Windows’ta yer açın.
+resize-used = Luft’un dosyaları { $size } yer kaplıyor.
+resize-least = En az { $size } değiştirin.
+resize-apply = Değiştir
+resize-grow-title = Luft’a { $size } daha verilsin mi?
+resize-grow-description = Windows hemen küçülür. Luft bir sonraki başlangıçta yeni alana yerleşir; bu birkaç dakika sürer. Bilgisayarı prize takılı tutun.
+resize-shrink-title = Windows’a { $size } geri verilsin mi?
+resize-shrink-description = Luft bir sonraki başlangıçta dosyalarını taşır; bu birkaç dakika sürer. Ardından Meet Luft’u yeniden açın, Windows alanı geri alır. Bilgisayarı prize takılı tutun.
 
 ## Packing things to take along to Luft (the moving box)
 
@@ -167,6 +248,8 @@ box-pack = Paketle
 
 working-shrinking = Yer açılıyor
     .description = Windows yer açmak için dosyalarını taşıyor. Bu birkaç dakika sürebilir.
+working-erasing = Disk siliniyor
+    .description = Windows, Luft’un tamamını kullanabilmesi için diski temizliyor.
 working-partitioning = Luft’un alanı hazırlanıyor
     .description = Luft’un başlayacağı bölümler hazırlanıyor.
 working-downloading = Luft getiriliyor

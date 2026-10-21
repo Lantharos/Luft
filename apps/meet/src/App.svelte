@@ -7,6 +7,7 @@
 	import { appearance, GlassShell, Toast } from '@luft/ui';
 	import WindowButtons from '#lib/components/WindowButtons.svelte';
 	import * as meet from '#lib/api/meet.js';
+	import { luft } from '#lib/state/luft.svelte.js';
 	import { session } from '#lib/state/meet.svelte.js';
 	import Check from '#lib/steps/Check.svelte';
 	import Hello from '#lib/steps/Hello.svelte';
@@ -14,12 +15,26 @@
 	import MovingBox from '#lib/steps/MovingBox.svelte';
 	import Ready from '#lib/steps/Ready.svelte';
 	import Removed from '#lib/steps/Removed.svelte';
+	import Resize from '#lib/steps/Resize.svelte';
 	import Room from '#lib/steps/Room.svelte';
 	import Stick from '#lib/steps/Stick.svelte';
 	import StickDone from '#lib/steps/StickDone.svelte';
 	import Working from '#lib/steps/Working.svelte';
+	import YourLuft from '#lib/steps/YourLuft.svelte';
 
-	const STEPS = { hello: Hello, check: Check, room: Room, working: Working, ready: Ready, box: MovingBox, removed: Removed, stick: Stick, stickDone: StickDone };
+	const STEPS = {
+		hello: Hello,
+		luft: YourLuft,
+		resize: Resize,
+		check: Check,
+		room: Room,
+		working: Working,
+		ready: Ready,
+		box: MovingBox,
+		removed: Removed,
+		stick: Stick,
+		stickDone: StickDone
+	};
 	const SLIDE = 28;
 
 	const SHORTCUTS: Record<string, () => unknown> = {
@@ -40,6 +55,9 @@
 			return;
 		}
 		const stops = [session.listen()];
+		void meet.installed().then((installed) => {
+			if (installed && session.step === 'hello') void luft.open();
+		});
 		void meet.locale().then((locale) => {
 			stops.push(appearance.start({ palette: null, typography: { interface: null, monospace: null, textScale: 1 }, motion: 'full', locale }));
 		});

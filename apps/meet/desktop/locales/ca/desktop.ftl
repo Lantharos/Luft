@@ -33,6 +33,9 @@ check-space-free = { $size } GB lliures
 check-space-free-linux = Luft ocupa uns { $size } GB mentre el proveu.
 check-space-up-to = Fins a { $size } GB per a Luft
 check-space-up-to-detail = Windows conserva els seus fitxers i espai per créixer.
+check-space-free-already = Ja hi ha { $size } GB lliures, així que Windows en cedeix menys.
+check-space-other-drive = Hi ha espai per a Luft a { $drive }.
+check-space-erase-drive = Hi ha espai per a Luft a { $drive }, un cop esborrat aquest disc.
 check-space-short = No hi ha prou espai lliure
 check-space-short-windows = Luft necessita uns { $needed } GB que Windows pugui cedir. Allibereu { $missing } GB a Windows, per exemple amb la Neteja de disc, i torneu a comprovar.
 check-space-short-linux = Luft necessita uns { $needed } GB per iniciar-se. Allibereu { $missing } GB i torneu a comprovar.
@@ -130,7 +133,10 @@ helper-not-ready-to-start-linux = Luft encara no està a punt per iniciar-se. Pr
 helper-update-unfinished = No s’ha acabat d’actualitzar Luft. Primer torneu-lo a actualitzar.
 helper-room-too-small = Luft necessita més espai.
 helper-room-shortfall = Windows pot cedir { $available } GB, i Luft necessita { $needed } GB.
+helper-gap-shortfall = Aquest espai té { $available } GB, i Luft necessita { $needed } GB.
+helper-place-gone = Aquest espai ja no és lliure. Torneu a comprovar on hi cap Luft.
 helper-box-shortfall = Windows pot cedir { $available } GB més, i el que heu triat necessita { $needed } GB.
+helper-box-room-shortfall = L’espai de Luft pot cedir { $available } GB, i el que heu triat necessita { $needed } GB.
 helper-bluetooth-unreadable = No s’ha pogut obrir la configuració Bluetooth de Windows
 helper-registry-not-opened = No s’ha pogut obrir { $key }: { $error }
 helper-registry-not-changed = No s’ha pogut canviar { $value }: { $error }
@@ -159,7 +165,6 @@ drive-windows-partition-missing = No s’ha trobat la partició de Windows
 drive-volume-missing = No s’ha trobat el volum { $path }
 drive-storage-error = { $what } (error d’emmagatzematge de Windows { $code })
 drive-shrink-size-unknown = Windows no ha pogut saber fins a quin punt pot reduir la seva partició
-drive-grow-size-unknown = Windows no ha pogut saber fins a quin punt pot ampliar la seva partició
 drive-resize-failed = Windows no ha pogut canviar la mida de la seva partició
 drive-create-failed = Windows no ha pogut crear una partició per a Luft
 drive-hide-failed = Windows no ha pogut amagar la partició nova a l’Explorador de fitxers
@@ -178,6 +183,9 @@ drive-new-live-no-volume = La partició nova de Luft no té cap volum
 drive-partitions-not-noted = Les particions de Luft no consten a les notes de Meet Luft
 drive-partitions-gone = Les particions de Luft han desaparegut
 drive-partition-gone = Ha desaparegut una partició
+drive-gone = Ha desaparegut un disc
+drive-erase-failed = Windows no ha pogut esborrar el disc
+drive-erased-no-room = El disc esborrat no té espai per a Luft
 drive-start-partition-foreign = La partició d’arrencada de Luft no l’ha creada Meet Luft
 drive-start-partition-gone = La partició d’arrencada de Luft ja no hi és
 drive-start-partition-not-listed = La partició d’arrencada de Luft no és a la taula de particions
@@ -190,6 +198,14 @@ drive-esp-no-guid = La partició del sistema EFI no té GUID
 drive-no-uuid = El disc on es guarda Luft no té UUID
 drive-folder-unreadable = Luft no es pot iniciar des del disc on hi ha els vostres fitxers.
 drive-folder-not-startable = No es pot iniciar des de { $folder }
+
+## Errors while changing Luft once it's installed
+
+luft-gone = Luft ja no és en aquest ordinador
+luft-not-resizable = Ara mateix no es pot canviar la mida de Luft des de Windows
+luft-size-not-allowed = Luft no pot tenir aquesta mida
+luft-space-promised = Aquest espai està reservat per a Luft. Primer cancel·leu el canvi.
+luft-no-start-entry = No s’ha trobat l’entrada d’arrencada de Luft
 
 ## Errors while getting Luft
 

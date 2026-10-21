@@ -40,6 +40,10 @@ problem-folders = Meet Luft не можеше да ги прегледа ваш�
 problem-sticks = Meet Luft не можеше да бара USB-мемории.
 problem-stick = Правењето на USB-меморијата не заврши.
 problem-offer = Luft моментално не може да се преземе. Проверете дали сте поврзани на интернет или користете ISO што веќе го имате.
+problem-luft = Meet Luft не можеше да го прегледа дискот на Luft.
+problem-resize = Менувањето на големината на Luft не заврши.
+problem-cancel = Meet Luft не можеше да ја откаже промената.
+problem-give = Windows не можеше да си го врати просторот.
 problem-declined = { $platform ->
     [linux] На Meet Luft му е потребна ваша дозвола за да работи на дискот. Внесете ја лозинката кога ќе ве праша.
    *[windows] На Meet Luft му е потребна ваша дозвола за да работи на дискот. Изберете Да кога Windows ќе праша.
@@ -94,6 +98,35 @@ room-confirm-title = Да се дадат { $size } на Luft?
 room-confirm-file = Windows го намалува својот диск, а потоа Meet Luft го копира Luft од вашето ISO. Држете го компјутерот приклучен на струја.
 room-confirm-download = Windows го намалува својот диск, а потоа Meet Luft го презема Luft, околу { $size }. Држете го компјутерот приклучен на струја и на интернет.
 
+## Choosing where Luft goes, when there's more than one place
+## $drive is the name of a drive, like "Samsung SSD 990 PRO", and $size a size, like "120 GB"
+
+room-places-title = Каде да се всели Luft?
+room-places-description = Luft може да го дели дискот на Windows или да заземе простор што Windows не го користи.
+room-places-label = Места за Luft
+room-place-windows = Покрај Windows
+room-place-windows-detail = Windows се намалува за да му даде простор на Luft
+room-place-windows-free = Таму веќе се слободни { $size }
+room-place-free = Слободен простор на { $drive }
+room-place-free-here = Слободен простор на дискот на Windows
+room-place-free-detail = { $size } што ништо друго не ги користи
+room-place-whole = Целиот диск { $drive }
+room-place-whole-detail = Го брише овој диск од { $size } за Luft
+room-live-free = Од нив { $free } веќе се слободни, па Windows отстапува помалку и задржува простор за раст. Luft одвојува уште { $size } за стартување и ги враќа штом ќе биде инсталиран.
+room-live-elsewhere = Luft добива { $room } таму и одвојува уште { $size } за стартување, што ги враќа штом ќе биде инсталиран.
+room-confirm-free-title = Да се дадат { $size } слободен простор на Luft?
+room-confirm-free-file = Meet Luft го копира Luft таму од вашето ISO. Ништо друго на дискот не се менува.
+room-confirm-free-download = Meet Luft го презема Luft таму, околу { $size }. Ништо друго на дискот не се менува. Држете го компјутерот приклучен на интернет.
+room-erase-title = Да се избрише { $drive }?
+room-erase-description = Сè на овој диск од { $size } се брише веднаш, пред да се стартува Luft. Ова не може да се врати. Моментално на него има:
+room-erase-empty = Windows не може да прочита ништо на овој диск од { $size }, но што и да има на него, се брише веднаш. Ова не може да се врати.
+room-erase-unnamed = Партиција без име
+room-erase-volume-name = { $name } ({ $letter })
+room-erase-volume = { $filesystem }, { $size }
+room-erase-bitlocker = Шифрирана со BitLocker
+room-erase-understood = Знам дека дел од ова е шифрирано со BitLocker и не може да се врати
+room-erase-confirm = Избриши и направи место
+
 ## Luft is ready on Windows
 
 ready-title = Luft е подготвен
@@ -106,6 +139,7 @@ ready-box-description = Спакувајте документи, фотогра�
 ready-box-packed = Спакувано, { $size }
 ready-install-title = Инсталирај Luft
 ready-install-description = Рестартирајте во инсталаторот. Просторот од { $size } покрај Windows веќе го чека.
+ready-install-drive-description = Рестартирајте во инсталаторот. Просторот од { $size } на { $drive } веќе го чека.
 ready-stick-description = Ставете го Luft на USB-меморија за да го стартувате на кој било компјутер.
 ready-remove = Отстрани го Luft од овој компјутер
 ready-restart-try = Најпрвин зачувајте сè на што работите. Luft се отвора за околу една минута, а следното рестартирање ве враќа во Windows.
@@ -131,6 +165,53 @@ linux-ready-restart-try = Најпрвин зачувајте сè на што �
 linux-ready-restart-replace = Најпрвин зачувајте сè на што работите. Инсталаторот се отвора со { $system } избран за замена и покажува што останува пред да се смени нешто.
 linux-ready-remove-title = Да се отстрани Luft од овој компјутер?
 linux-ready-remove-description = Meet Luft ги брише датотеките на Luft, неговите датотеки за стартување и неговиот запис за стартување. Сè друго останува какво што е.
+
+## Luft is installed on this PC
+## $drive is the name of a drive, like "Samsung SSD 990 PRO", and $size a size, like "120 GB"
+
+luft-title = Вашиот Luft
+luft-looking = Meet Luft го пронајде Luft на овој компјутер.
+luft-checking = Се прегледува дискот на Luft…
+luft-description-beside = Luft е инсталиран покрај Windows на овој компјутер.
+luft-description-drive = Luft е инсталиран на { $drive }.
+luft-bar-used = { $size }, искористени { $used }
+luft-resize-title = Менување на просторот за Luft
+luft-resize-description = Дајте му на Luft повеќе од просторот на Windows или вратете му дел на Windows.
+luft-resize-encrypted = Дискот на Luft е шифриран, па за да се премести потребен е неговиот клуч за обновување. Најпрвин исклучете го шифрирањето на уредот во Поставките на Luft, па вратете се.
+luft-resize-apart = Меѓу Windows и Luft има друга партиција, па тие не можат да го делат својот простор.
+luft-resize-unreadable = Meet Luft не можеше да утврди колку е полн Luft.
+luft-pending-grow = Luft се зголемува при следното стартување
+luft-pending-grow-description = Рестартирајте во Luft и оставете го вклучен неколку минути додека се преместува во новиот простор. Во меѓувреме можете да го користите.
+luft-pending-shrink = Luft прави место при следното стартување
+luft-pending-shrink-description = Рестартирајте во Luft и оставете го вклучен неколку минути додека ги преместува своите датотеки. Потоа повторно отворете го Meet Luft во Windows за да му го дадете просторот на Windows.
+luft-windows-free-title = Дај му го слободниот простор на Windows
+luft-windows-free-description = { $size } веднаш по Windows не ги користи ништо. Windows може да си ги врати.
+luft-leftovers-title = Расчисти по пробувањето на Luft
+luft-leftovers-description = Партициите што Meet Luft ги направи за да го стартува Luft сè уште се тука. На Luft веќе не му требаат.
+luft-start = Рестартирај во Luft
+luft-cancel = Откажи ја промената
+luft-restart = Најпрвин зачувајте сè на што работите. Luft се стартува за околу една минута, а следното рестартирање ве враќа во Windows.
+luft-restart-pending = Најпрвин зачувајте сè на што работите. Luft се стартува за околу една минута и сам ги преместува своите датотеки, што трае неколку минути. Во меѓувреме можете да го користите.
+luft-remove = Отстрани го Luft од овој компјутер
+luft-remove-title = Да се отстрани Luft од овој компјутер?
+luft-remove-description = Luft и сè во него се брише, вкупно { $size }, а Windows го добива просторот назад. Компјутерот го стартува Windows како досега. Ова не може да се врати.
+luft-remove-drive-description = Luft и сè во него се брише од { $drive }, вкупно { $size }. Компјутерот го стартува Windows како досега. Ова не може да се врати.
+luft-remove-confirm = Отстрани го Luft
+
+## Changing how much space Luft has
+## $size is a size, like "20 GB"
+
+resize-title = Колку простор за Luft?
+resize-description = Повлечете за да го поделите дискот меѓу Windows и Luft. Luft сам ја прави промената при следното стартување.
+resize-measuring = Windows пресметува колку простор може да одвои. На голем диск ова може да трае неколку минути.
+resize-full = Luft е преполн за да се премести, а Windows не може да одвои доволно простор за него. Најпрвин направете место во Luft или во Windows.
+resize-used = Датотеките на Luft заземаат { $size }.
+resize-least = Сменете го за најмалку { $size }.
+resize-apply = Смени
+resize-grow-title = Да му се дадат на Luft уште { $size }?
+resize-grow-description = Windows веднаш се намалува. Luft се преместува во новиот простор при следното стартување, што трае неколку минути. Држете го компјутерот приклучен на струја.
+resize-shrink-title = Да му се вратат { $size } на Windows?
+resize-shrink-description = Luft ги преместува своите датотеки при следното стартување, што трае неколку минути. Потоа повторно отворете го Meet Luft, и Windows го зема просторот назад. Држете го компјутерот приклучен на струја.
 
 ## Packing things to take along to Luft (the moving box)
 
@@ -167,6 +248,8 @@ box-pack = Спакувај
 
 working-shrinking = Се прави место
     .description = Windows ги преместува своите датотеки за да направи простор. Ова може да трае неколку минути.
+working-erasing = Се брише дискот
+    .description = Windows го чисти за Luft да може да го добие целиот.
 working-partitioning = Се поставува просторот за Luft
     .description = Се подготвуваат партициите од кои се стартува Luft.
 working-downloading = Luft се пренесува

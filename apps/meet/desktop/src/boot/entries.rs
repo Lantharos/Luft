@@ -1,6 +1,6 @@
 use luft_i18n::t;
 
-use super::load_option::{self, Partition};
+use super::load_option::{self, DESCRIPTION, Partition};
 use crate::L10N;
 
 pub trait Variables {
@@ -43,7 +43,12 @@ fn set_order(variables: &impl Variables, order: &[u8]) -> Result<(), String> {
     variables.write("BootOrder", order)
 }
 
-pub fn add(variables: &impl Variables, partition: &Partition, loader: &str) -> Result<u16, String> {
+pub fn add(
+    variables: &impl Variables,
+    partition: &Partition,
+    loader: &str,
+    description: &str,
+) -> Result<u16, String> {
     let number = match listed(variables)?
         .iter()
         .find(|(_, option)| load_option::starts(option, partition, loader))
@@ -51,7 +56,11 @@ pub fn add(variables: &impl Variables, partition: &Partition, loader: &str) -> R
         Some((number, _)) => *number,
         None => free_number(variables)?,
     };
-    set_entry(variables, number, &load_option::encode(partition, loader))?;
+    set_entry(
+        variables,
+        number,
+        &load_option::encode(partition, loader, description),
+    )?;
     set_order(
         variables,
         &load_option::appended(&order(variables)?, number),
@@ -65,13 +74,13 @@ pub fn ensure(
     loader: &str,
     number: u16,
 ) -> Result<u16, String> {
-    let wanted = load_option::encode(partition, loader);
+    let wanted = load_option::encode(partition, loader, DESCRIPTION);
     match entry(variables, number)? {
         Some(option) if option == wanted => {}
         Some(option) if load_option::starts(&option, partition, loader) => {
             set_entry(variables, number, &wanted)?
         }
-        _ => return add(variables, partition, loader),
+        _ => return add(variables, partition, loader, DESCRIPTION),
     }
     let order = order(variables)?;
     if !load_option::numbers(&order).any(|listed| listed == number) {

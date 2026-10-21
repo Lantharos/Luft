@@ -11,7 +11,7 @@ use super::live::{self, Spots};
 use super::machine;
 use super::place::{self, Spot};
 use crate::L10N;
-use crate::boot::entries;
+use crate::boot::{entries, load_option};
 use crate::check::linux::{self, LinuxFacts, Readable, START_FILES};
 use crate::linux::record::Made;
 use crate::live::build;
@@ -23,6 +23,7 @@ use crate::serving::Context;
 const READY: Prepared = Prepared {
     room: 0,
     moving_box: None,
+    drive: None,
 };
 
 pub fn read_handoff(folder: &Path) -> Option<Handoff> {
@@ -72,8 +73,6 @@ pub fn check(source: &Source) -> Result<Report<LinuxFacts>, String> {
         findings: linux::evaluate(&facts, live),
         live: live.unwrap_or(0),
         download: listing.map_or(0, |listing| listing.download),
-        smallest_luft: 0,
-        most_luft: 0,
         prepared: ready.map(|_| READY),
         outdated: ready.is_some_and(|folder| build::outdated(folder, source)),
         facts,
@@ -101,7 +100,12 @@ fn build(context: &Context, source: &Source, blocks: &[Block], spot: &Spot) -> R
         made.esp = Some(esp.partuuid.clone());
     })?;
     live::write(context, source, &spots(&loader, spot)?)?;
-    let boot_entry = entries::add(&Efivars, &esp.partition()?, esp::LOADER)?;
+    let boot_entry = entries::add(
+        &Efivars,
+        &esp.partition()?,
+        esp::LOADER,
+        load_option::DESCRIPTION,
+    )?;
     Made::update(|made| made.boot_entry = Some(boot_entry))?;
     let handoff = Handoff {
         intent: Intent::Try,

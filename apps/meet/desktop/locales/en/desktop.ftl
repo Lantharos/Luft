@@ -41,6 +41,12 @@ check-space-free-linux = Luft takes about { $size } GB while you try it.
 # $size is a number of gigabytes
 check-space-up-to = Up to { $size } GB for Luft
 check-space-up-to-detail = Windows keeps its files and room to grow.
+# $size is a number of gigabytes
+check-space-free-already = { $size } GB of it is free already, so Windows gives up less.
+# $drive is the name of a drive, like "Samsung SSD 990 PRO"
+check-space-other-drive = There's room for it on { $drive }.
+# $drive is the name of a drive, like "Samsung SSD 990 PRO"
+check-space-erase-drive = There's room for it on { $drive }, once that drive is erased.
 check-space-short = Not enough free space
 # $needed and $missing are numbers of gigabytes
 check-space-short-windows = Luft needs about { $needed } GB that Windows can give up. Free up { $missing } GB in Windows, for example with Disk Cleanup, then check again.
@@ -155,8 +161,13 @@ helper-update-unfinished = Updating Luft didn't finish. Update it again first.
 helper-room-too-small = Luft needs more room than that.
 # $available and $needed are numbers of gigabytes
 helper-room-shortfall = Windows can give up { $available } GB, and Luft needs { $needed } GB.
+# $available and $needed are numbers of gigabytes
+helper-gap-shortfall = That space holds { $available } GB, and Luft needs { $needed } GB.
+helper-place-gone = That space isn't free anymore. Check again to see where Luft fits.
 # $available and $needed are numbers of gigabytes. "These" are the things chosen to pack.
 helper-box-shortfall = Windows can give up { $available } GB more, and these need { $needed } GB.
+# $available and $needed are numbers of gigabytes. "These" are the things chosen to pack.
+helper-box-room-shortfall = Luft’s room can spare { $available } GB, and these need { $needed } GB.
 helper-bluetooth-unreadable = Windows' Bluetooth settings couldn't be opened
 # $key is a place in the Windows registry
 helper-registry-not-opened = Couldn't open { $key }: { $error }
@@ -194,7 +205,6 @@ drive-volume-missing = The volume { $path } wasn't found
 # $what is one of the messages below, $code a number
 drive-storage-error = { $what } (Windows storage error { $code })
 drive-shrink-size-unknown = Windows couldn't tell how small its partition can get
-drive-grow-size-unknown = Windows couldn't tell how large its partition can get
 drive-resize-failed = Windows couldn't change the size of its partition
 drive-create-failed = Windows couldn't make a partition for Luft
 drive-hide-failed = Windows couldn't keep the new partition out of Explorer
@@ -213,6 +223,9 @@ drive-new-live-no-volume = Luft's new partition has no volume
 drive-partitions-not-noted = Luft's partitions are missing from Meet Luft's notes
 drive-partitions-gone = Luft's partitions disappeared
 drive-partition-gone = A partition disappeared
+drive-gone = A drive disappeared
+drive-erase-failed = Windows couldn't erase the drive
+drive-erased-no-room = The erased drive has no room for Luft
 drive-start-partition-foreign = Luft's start partition isn't one Meet Luft made
 drive-start-partition-gone = Luft's start partition is gone
 drive-start-partition-not-listed = Luft's start partition isn't in the partition table
@@ -227,6 +240,14 @@ drive-no-uuid = The drive Luft is kept on has no UUID
 drive-folder-unreadable = Luft can't start from the drive your files are on.
 # $folder is a folder's path
 drive-folder-not-startable = { $folder } can't be started from
+
+## Errors while changing Luft once it's installed
+
+luft-gone = Luft isn't on this PC anymore
+luft-not-resizable = Luft's size can't be changed from Windows right now
+luft-size-not-allowed = Luft can't be that size
+luft-space-promised = That space is set aside for Luft. Cancel the change first.
+luft-no-start-entry = Luft's start entry wasn't found
 
 ## Errors while getting Luft
 

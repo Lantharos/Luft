@@ -77,3 +77,6 @@ Strings in Luft's Estonian translation that a native speaker should check. Each 
 - `apps/meet/desktop/locales/et/desktop.ftl` `check-fast-startup-on`, `ready-fast-startup-title`: "kiirkäivitus" — taken from Setup; check against Estonian Windows' name for Fast Startup.
 - `apps/meet/desktop/locales/et/desktop.ftl` `check-space-short-windows`: "kettapuhastusega" — Disk Cleanup's Estonian name from memory.
 - `apps/meet/locales/et/meet.ftl` `problem-check`, `hello-check`, `check-ready-title`: both platform variants say "arvuti", since Estonian Windows doesn't use "PC" here.
+- `apps/meet/locales/et/meet.ftl` `room-places-label`: "Lufti asukohad" — screen-reader name of the list of places; "asukoht" may suggest a folder path rather than a place on a drive.
+- `apps/meet/locales/et/meet.ftl` `luft-resize-title`: "Muuda Lufti ruumi suurust" — check it reads naturally as a row title.
+- `apps/meet/locales/et/meet.ftl` `room-erase-understood`: "Saan aru, et osa sellest on BitLockeriga krüptitud ja seda ei saa taastada" — tick box label in the first person; check the tone fits.

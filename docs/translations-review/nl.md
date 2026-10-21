@@ -74,3 +74,4 @@ Strings in Luft's Dutch translation that a native speaker should check: terms wh
 - `apps/meet/locales/nl/meet.ftl` `stick-drives-label`: "Usb-schijven" — "USB drives" kept apart from "usb-stick"; check whether "usb-sticks" is simply clearer (also problem-sticks, stick-looking).
 - `apps/meet/desktop/locales/nl/desktop.ftl` `check-startup-bios-linux`: "Schakel het in de firmware-instellingen in, samen met het systeem dat hier al staat" — the English is vague about what happens to the existing system; check the meaning comes across.
 - `apps/meet/desktop/locales/nl/desktop.ftl` `check-firmware-key-volume-up`: "de knop volume omhoog" — inserted after "druk je op"; check it reads well in that sentence.
+- `apps/meet/locales/nl/meet.ftl` `room-place-whole`: "Heel { $drive }" — "All of" before a drive name like "Samsung SSD 990 PRO"; check it reads naturally, or whether "{ $drive } helemaal" is better.

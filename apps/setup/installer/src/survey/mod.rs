@@ -20,6 +20,7 @@ pub use room::ALIGNMENT;
 pub struct MeetSurvey {
     pub drive: String,
     pub space: Option<Space>,
+    pub other_drive: bool,
     #[serde(flatten)]
     pub summary: meet::Summary,
 }
@@ -48,6 +49,7 @@ fn meet_survey(drives: &[Drive], handoff: &Handoff, scratch: &Path) -> Option<Me
     Some(MeetSurvey {
         drive: drive.block.clone(),
         space,
+        other_drive: handoff.room().is_some_and(|room| room.other_drive),
         summary: meet::summarize(handoff, scratch),
     })
 }

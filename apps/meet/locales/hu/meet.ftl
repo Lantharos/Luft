@@ -40,6 +40,10 @@ problem-folders = A Meet Luft nem tudta átnézni a mappáit.
 problem-sticks = A Meet Luft nem tudott USB-meghajtókat keresni.
 problem-stick = A pendrive elkészítése nem fejeződött be.
 problem-offer = A Luft most nem tölthető le. Ellenőrizze, hogy van-e internetkapcsolat, vagy használjon egy meglévő ISO-t.
+problem-luft = A Meet Luft nem tudta átnézni a Luft meghajtóját.
+problem-resize = A Luft méretének módosítása nem fejeződött be.
+problem-cancel = A Meet Luft nem tudta visszavonni a módosítást.
+problem-give = A Windows nem tudta visszavenni a helyet.
 problem-declined = { $platform ->
     [linux] A Meet Luftnak engedély kell a meghajtó módosításához. Adja meg a jelszavát, amikor kéri.
    *[windows] A Meet Luftnak engedély kell a meghajtó módosításához. Válassza az Igen gombot, amikor a Windows rákérdez.
@@ -94,6 +98,35 @@ room-confirm-title = { $size } helyet ad a Luftnak?
 room-confirm-file = A Windows zsugorítja a meghajtóját, majd a Meet Luft átmásolja a Luftot az ISO-ból. A PC maradjon áramforráshoz csatlakoztatva.
 room-confirm-download = A Windows zsugorítja a meghajtóját, majd a Meet Luft letölti a Luftot (kb. { $size }). A PC maradjon áramforráshoz és az internethez csatlakoztatva.
 
+## Choosing where Luft goes, when there's more than one place
+## $drive is the name of a drive, like "Samsung SSD 990 PRO", and $size a size, like "120 GB"
+
+room-places-title = Hová kerüljön a Luft?
+room-places-description = A Luft osztozhat a Windows meghajtóján, vagy elfoglalhat olyan helyet, amelyet a Windows nem használ.
+room-places-label = Helyek a Luft számára
+room-place-windows = A Windows mellett
+room-place-windows-detail = A Windows kisebbre zsugorítja magát, hogy helyet adjon a Luftnak
+room-place-windows-free = Ott már { $size } szabad
+room-place-free = Szabad hely: { $drive }
+room-place-free-here = Szabad hely a Windows meghajtóján
+room-place-free-detail = { $size }, amelyet semmi más nem használ
+room-place-whole = A teljes meghajtó: { $drive }
+room-place-whole-detail = Törli ezt a { $size } méretű meghajtót a Luft számára
+room-live-free = Ebből { $free } már szabad, így a Windows kevesebbet ad át, és marad helye a bővülésre. A Luft ezen felül félretesz { $size } helyet az induláshoz, amelyet a telepítés után visszaad.
+room-live-elsewhere = A Luft ott { $room } helyet kap, és még { $size } helyet félretesz az induláshoz, amelyet a telepítés után visszaad.
+room-confirm-free-title = { $size } szabad helyet ad a Luftnak?
+room-confirm-free-file = A Meet Luft oda másolja a Luftot az ISO-ból. A meghajtón semmi más nem változik.
+room-confirm-free-download = A Meet Luft oda tölti le a Luftot (kb. { $size }). A meghajtón semmi más nem változik. A PC maradjon az internethez csatlakoztatva.
+room-erase-title = Törli ezt a meghajtót: { $drive }?
+room-erase-description = Ezen a { $size } méretű meghajtón azonnal minden törlődik, még a Luft indulása előtt. Ez nem vonható vissza. Jelenleg ezek vannak rajta:
+room-erase-empty = A Windows semmit sem tud olvasni erről a { $size } méretű meghajtóról, de bármi van rajta, azonnal törlődik. Ez nem vonható vissza.
+room-erase-unnamed = Névtelen partíció
+room-erase-volume-name = { $name } ({ $letter })
+room-erase-volume = { $filesystem }, { $size }
+room-erase-bitlocker = BitLockerrel titkosítva
+room-erase-understood = Tudomásul veszem, hogy egy része BitLockerrel titkosított, és nem állítható vissza
+room-erase-confirm = Törlés és helycsinálás
+
 ## Luft is ready on Windows
 
 ready-title = A Luft készen áll
@@ -106,6 +139,7 @@ ready-box-description = Csomagolja be dokumentumait, fotóit, Wi-Fi-hálózatait
 ready-box-packed = Becsomagolva, { $size }
 ready-install-title = Luft telepítése
 ready-install-description = Újraindítás a telepítőbe. A Windows melletti { $size } hely már várja.
+ready-install-drive-description = Újraindítás a telepítőbe. A hely ({ $size }) már várja ezen a meghajtón: { $drive }.
 ready-stick-description = Tegye a Luftot pendrive-ra, hogy bármelyik számítógépen elindíthassa.
 ready-remove = A Luft eltávolítása erről a PC-ről
 ready-restart-try = Előbb mentse, amin dolgozik. A Luft nagyjából egy perc múlva megnyílik, a következő újraindítás pedig visszaviszi a Windowsba.
@@ -131,6 +165,53 @@ linux-ready-restart-try = Előbb mentse, amin dolgozik. A Luft nagyjából egy p
 linux-ready-restart-replace = Előbb mentse, amin dolgozik. A telepítő úgy nyílik meg, hogy a lecserélendő rendszer már ki van választva ({ $system }), és minden változtatás előtt megmutatja, mi marad meg.
 linux-ready-remove-title = Eltávolítja a Luftot erről a számítógépről?
 linux-ready-remove-description = A Meet Luft törli a Luft fájljait, indítófájljait és indítási bejegyzését. Minden más változatlan marad.
+
+## Luft is installed on this PC
+## $drive is the name of a drive, like "Samsung SSD 990 PRO", and $size a size, like "120 GB"
+
+luft-title = Az Ön Luftja
+luft-looking = A Meet Luft megtalálta a Luftot ezen a PC-n.
+luft-checking = A Luft meghajtójának átnézése…
+luft-description-beside = A Luft a Windows mellé van telepítve ezen a PC-n.
+luft-description-drive = A Luft telepítési helye: { $drive }.
+luft-bar-used = { $size }, ebből { $used } foglalt
+luft-resize-title = A Luft helyének módosítása
+luft-resize-description = Adjon a Luftnak több helyet a Windowséból, vagy adjon vissza belőle a Windowsnak.
+luft-resize-encrypted = A Luft meghajtója titkosított, ezért az áthelyezéséhez szükség lenne a helyreállítási kulcsra. Előbb kapcsolja ki az eszköztitkosítást a Luft Beállításaiban, majd térjen vissza.
+luft-resize-apart = A Windows és a Luft között egy másik partíció van, ezért nem tudnak osztozni a helyükön.
+luft-resize-unreadable = A Meet Luft nem tudta megállapítani, mennyire telt meg a Luft.
+luft-pending-grow = A Luft a következő indításkor megnő
+luft-pending-grow-description = Indítsa újra a gépet a Luftba, és hagyja bekapcsolva néhány percig, amíg beköltözik az új helyre. Közben nyugodtan használhatja.
+luft-pending-shrink = A Luft a következő indításkor helyet csinál
+luft-pending-shrink-description = Indítsa újra a gépet a Luftba, és hagyja bekapcsolva néhány percig, amíg áthelyezi a fájljait. Utána nyissa meg újra a Meet Luftot a Windowsban, hogy a Windows megkapja a helyet.
+luft-windows-free-title = A szabad hely átadása a Windowsnak
+luft-windows-free-description = Közvetlenül a Windows után { $size } hely semmire sincs használva. A Windows visszaveheti.
+luft-leftovers-title = Rendrakás a Luft kipróbálása után
+luft-leftovers-description = Azok a partíciók, amelyeket a Meet Luft a Luft indításához készített, még megvannak. A Luftnak már nincs rájuk szüksége.
+luft-start = Újraindítás a Luftba
+luft-cancel = Módosítás visszavonása
+luft-restart = Előbb mentse, amin dolgozik. A Luft nagyjából egy perc múlva elindul, a következő újraindítás pedig visszaviszi a Windowsba.
+luft-restart-pending = Előbb mentse, amin dolgozik. A Luft nagyjából egy perc múlva elindul, és magától áthelyezi a fájljait, ami néhány percig tart. Közben használhatja.
+luft-remove = A Luft eltávolítása erről a PC-ről
+luft-remove-title = Eltávolítja a Luftot erről a PC-ről?
+luft-remove-description = A Luft és minden, ami rajta van, törlődik, összesen { $size }, és a Windows visszakapja a helyet. A PC ugyanúgy a Windowst indítja, mint korábban. Ez nem vonható vissza.
+luft-remove-drive-description = A Luft és minden, ami rajta van, törlődik erről a meghajtóról: { $drive }, összesen { $size }. A PC ugyanúgy a Windowst indítja, mint korábban. Ez nem vonható vissza.
+luft-remove-confirm = Luft eltávolítása
+
+## Changing how much space Luft has
+## $size is a size, like "20 GB"
+
+resize-title = Mennyi hely jusson a Luftnak?
+resize-description = Húzással ossza fel a meghajtót a Windows és a Luft között. A módosítást a Luft maga végzi el a következő indításkor.
+resize-measuring = A Windows kiszámolja, mennyi helyet tud átadni. Nagy meghajtón ez néhány percig is eltarthat.
+resize-full = A Luft túl tele van ahhoz, hogy áthelyezhető legyen, és a Windows nem tud neki elég helyet átadni. Előbb csináljon helyet a Luftban vagy a Windowsban.
+resize-used = A Luft fájljai { $size } helyet foglalnak.
+resize-least = Legalább { $size } változtatás szükséges.
+resize-apply = Módosítás
+resize-grow-title = Még { $size } helyet ad a Luftnak?
+resize-grow-description = A Windows azonnal kisebbre zsugorítja magát. A Luft a következő indításkor költözik be az új helyre, ami néhány percig tart. A PC maradjon áramforráshoz csatlakoztatva.
+resize-shrink-title = Visszaad { $size } helyet a Windowsnak?
+resize-shrink-description = A Luft a következő indításkor áthelyezi a fájljait, ami néhány percig tart. Utána nyissa meg újra a Meet Luftot, és a Windows visszaveszi a helyet. A PC maradjon áramforráshoz csatlakoztatva.
 
 ## Packing things to take along to Luft (the moving box)
 
@@ -167,6 +248,8 @@ box-pack = Becsomagolás
 
 working-shrinking = Helycsinálás
     .description = A Windows áthelyezi a fájljait, hogy helyet csináljon. Ez eltarthat néhány percig.
+working-erasing = A meghajtó törlése
+    .description = A Windows kiüríti, hogy a Luft az egészet megkaphassa.
 working-partitioning = A Luft helyének beállítása
     .description = Azoknak a partícióknak az előkészítése, amelyekről a Luft indul.
 working-downloading = A Luft áthozása

@@ -32,6 +32,9 @@ check-space-free = { $size } GB boş
 check-space-free-linux = Luft, siz denerken yaklaşık { $size } GB yer kaplar.
 check-space-up-to = Luft için en fazla { $size } GB
 check-space-up-to-detail = Windows dosyalarını ve büyümek için yer ayırır.
+check-space-free-already = Bunun { $size } GB kadarı zaten boş, bu yüzden Windows daha az yer verir.
+check-space-other-drive = { $drive } diskinde ona yer var.
+check-space-erase-drive = { $drive } diski silinirse o diskte ona yer var.
 check-space-short = Yeterli boş alan yok
 check-space-short-windows = Luft’un, Windows’un ayırabileceği yaklaşık { $needed } GB alana ihtiyacı var. Windows’ta örneğin Disk Temizleme ile { $missing } GB yer açın ve yeniden denetleyin.
 check-space-short-linux = Luft’un başlayabilmesi için yaklaşık { $needed } GB alan gerekir. { $missing } GB yer açın ve yeniden denetleyin.
@@ -126,7 +129,10 @@ helper-not-ready-to-start-linux = Luft henüz başlamaya hazır değil. Önce ha
 helper-update-unfinished = Luft güncellemesi tamamlanmadı. Önce yeniden güncelleyin.
 helper-room-too-small = Luft’un bundan daha fazla alana ihtiyacı var.
 helper-room-shortfall = Windows { $available } GB ayırabilir, Luft’un ise { $needed } GB alana ihtiyacı var.
+helper-gap-shortfall = O alanda { $available } GB var, Luft’un ise { $needed } GB alana ihtiyacı var.
+helper-place-gone = O alan artık boş değil. Luft’un nereye sığacağını görmek için yeniden denetleyin.
 helper-box-shortfall = Windows { $available } GB daha ayırabilir, seçtikleriniz ise { $needed } GB gerektiriyor.
+helper-box-room-shortfall = Luft’un alanında { $available } GB ayrılabilir, seçtikleriniz ise { $needed } GB gerektiriyor.
 helper-bluetooth-unreadable = Windows’un Bluetooth ayarları açılamadı
 helper-registry-not-opened = Açılamadı: { $key } ({ $error })
 helper-registry-not-changed = Değiştirilemedi: { $value } ({ $error })
@@ -153,7 +159,6 @@ drive-windows-partition-missing = Windows bölümü bulunamadı
 drive-volume-missing = Birim bulunamadı: { $path }
 drive-storage-error = { $what } (Windows depolama hatası { $code })
 drive-shrink-size-unknown = Windows, bölümünün ne kadar küçülebileceğini belirleyemedi
-drive-grow-size-unknown = Windows, bölümünün ne kadar büyüyebileceğini belirleyemedi
 drive-resize-failed = Windows bölümünün boyutunu değiştiremedi
 drive-create-failed = Windows, Luft için bir bölüm oluşturamadı
 drive-hide-failed = Windows yeni bölümü Dosya Gezgini’nden gizleyemedi
@@ -172,6 +177,9 @@ drive-new-live-no-volume = Luft’un yeni bölümünün birimi yok
 drive-partitions-not-noted = Luft’un bölümleri Meet Luft’un notlarında yok
 drive-partitions-gone = Luft’un bölümleri kayboldu
 drive-partition-gone = Bir bölüm kayboldu
+drive-gone = Bir disk kayboldu
+drive-erase-failed = Windows diski silemedi
+drive-erased-no-room = Silinen diskte Luft için yer yok
 drive-start-partition-foreign = Luft’un önyükleme bölümü Meet Luft’un oluşturduğu bir bölüm değil
 drive-start-partition-gone = Luft’un önyükleme bölümü yok olmuş
 drive-start-partition-not-listed = Luft’un önyükleme bölümü bölüm tablosunda yok
@@ -184,6 +192,14 @@ drive-esp-no-guid = EFI sistem bölümünün GUID’i yok
 drive-no-uuid = Luft’un tutulduğu sürücünün UUID’si yok
 drive-folder-unreadable = Luft, dosyalarınızın bulunduğu sürücüden başlayamaz.
 drive-folder-not-startable = Bu klasörden başlatılamaz: { $folder }
+
+## Errors while changing Luft once it's installed
+
+luft-gone = Luft artık bu bilgisayarda değil
+luft-not-resizable = Luft’un boyutu şu anda Windows’tan değiştirilemiyor
+luft-size-not-allowed = Luft bu boyutta olamaz
+luft-space-promised = Bu alan Luft için ayrıldı. Önce değişikliği iptal edin.
+luft-no-start-entry = Luft’un önyükleme girdisi bulunamadı
 
 ## Errors while getting Luft
 

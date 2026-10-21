@@ -32,6 +32,9 @@ check-space-free = { $size } Go libres
 check-space-free-linux = Luft occupe environ { $size } Go pendant l’essai.
 check-space-up-to = Jusqu’à { $size } Go pour Luft
 check-space-up-to-detail = Windows conserve ses fichiers et de la place pour évoluer.
+check-space-free-already = { $size } Go sont déjà libres, Windows en cède donc moins.
+check-space-other-drive = Il y a de la place pour lui sur { $drive }.
+check-space-erase-drive = Il y a de la place pour lui sur { $drive }, une fois ce disque effacé.
 check-space-short = Espace libre insuffisant
 check-space-short-windows = Luft a besoin d’environ { $needed } Go que Windows peut libérer. Libérez { $missing } Go dans Windows, par exemple avec le Nettoyage de disque, puis vérifiez de nouveau.
 check-space-short-linux = Luft a besoin d’environ { $needed } Go pour démarrer. Libérez { $missing } Go, puis vérifiez de nouveau.
@@ -126,7 +129,10 @@ helper-not-ready-to-start-linux = Luft n’est pas encore prêt à démarrer. Pr
 helper-update-unfinished = La mise à jour de Luft n’a pas abouti. Relancez-la d’abord.
 helper-room-too-small = Luft a besoin de plus d’espace que cela.
 helper-room-shortfall = Windows peut libérer { $available } Go, et Luft a besoin de { $needed } Go.
+helper-gap-shortfall = Cet espace offre { $available } Go, et Luft a besoin de { $needed } Go.
+helper-place-gone = Cet espace n’est plus libre. Vérifiez de nouveau pour voir où Luft peut s’installer.
 helper-box-shortfall = Windows peut encore libérer { $available } Go, et ces éléments ont besoin de { $needed } Go.
+helper-box-room-shortfall = L’espace de Luft peut encore accueillir { $available } Go, et ces éléments ont besoin de { $needed } Go.
 helper-bluetooth-unreadable = Les paramètres Bluetooth de Windows n’ont pas pu être ouverts
 helper-registry-not-opened = Impossible d’ouvrir { $key } : { $error }
 helper-registry-not-changed = Impossible de modifier { $value } : { $error }
@@ -153,7 +159,6 @@ drive-windows-partition-missing = La partition de Windows est introuvable
 drive-volume-missing = Le volume { $path } est introuvable
 drive-storage-error = { $what } (erreur de stockage Windows { $code })
 drive-shrink-size-unknown = Windows n’a pas pu déterminer jusqu’où sa partition peut être réduite
-drive-grow-size-unknown = Windows n’a pas pu déterminer jusqu’où sa partition peut être agrandie
 drive-resize-failed = Windows n’a pas pu modifier la taille de sa partition
 drive-create-failed = Windows n’a pas pu créer de partition pour Luft
 drive-hide-failed = Windows n’a pas pu masquer la nouvelle partition dans l’Explorateur de fichiers
@@ -172,6 +177,9 @@ drive-new-live-no-volume = La nouvelle partition de Luft n’a pas de volume
 drive-partitions-not-noted = Les partitions de Luft ne figurent pas dans les notes de Meet Luft
 drive-partitions-gone = Les partitions de Luft ont disparu
 drive-partition-gone = Une partition a disparu
+drive-gone = Un disque a disparu
+drive-erase-failed = Windows n’a pas pu effacer le disque
+drive-erased-no-room = Le disque effacé n’a pas assez de place pour Luft
 drive-start-partition-foreign = La partition de démarrage de Luft n’a pas été créée par Meet Luft
 drive-start-partition-gone = La partition de démarrage de Luft a disparu
 drive-start-partition-not-listed = La partition de démarrage de Luft ne figure pas dans la table de partitions
@@ -184,6 +192,14 @@ drive-esp-no-guid = La partition système EFI n’a pas de GUID
 drive-no-uuid = Le disque où Luft est conservé n’a pas d’UUID
 drive-folder-unreadable = Luft ne peut pas démarrer depuis le disque où se trouvent vos fichiers.
 drive-folder-not-startable = Impossible de démarrer depuis { $folder }
+
+## Errors while changing Luft once it's installed
+
+luft-gone = Luft n’est plus sur ce PC
+luft-not-resizable = La taille de Luft ne peut pas être modifiée depuis Windows pour le moment
+luft-size-not-allowed = Luft ne peut pas avoir cette taille
+luft-space-promised = Cet espace est réservé à Luft. Annulez d’abord la modification.
+luft-no-start-entry = L’entrée de démarrage de Luft est introuvable
 
 ## Errors while getting Luft
 

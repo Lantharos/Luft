@@ -83,3 +83,9 @@ Strings in Luft's Lithuanian translation that a native speaker should check: ter
 - `apps/meet/desktop/locales/lt/desktop.ftl` `check-space-short-windows`, `drive-hide-failed`, `check-encryption-changing-detail`: "Disko valymą", "Failų naršyklės", "Parametruose" — Windows names from memory; check against Lithuanian Windows 11.
 - `apps/meet/locales/lt/meet.ftl` `stick-keep`: "Palikti abi", "Palikti visas" — feminine, agreeing with "Luft" as a system.
 - `apps/meet/locales/lt/meet.ftl` `problem-check`, `hello-check`: both platform variants say "kompiuteris".
+- `apps/meet/locales/lt/meet.ftl` `room-places-title`: "Kur įdiegti Luft?" — the English asks where Luft should go; "įdiegti" is used because Luft is installed there afterwards, but at this step it is only tried. Check against "Kur dėti Luft?".
+- `apps/meet/locales/lt/meet.ftl` `resize-least`: "Pakeiskite bent { $size }." — check it reads as "by at least" and not "to at least".
+
+## Install Luft
+
+- `apps/setup/locales/lt/setup.ftl` `setup-destination-meet-drive-description`: "o Luft pasileidžia iš ten su savo paleidimo failais" — reflexive verb chosen so it needs no gender agreement with Luft; check it doesn't read too informal next to "sistema Luft" elsewhere.

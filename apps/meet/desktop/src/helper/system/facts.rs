@@ -13,6 +13,7 @@ use crate::helper::drive::bitlocker::BitLocker;
 use crate::helper::drive::state::Found;
 use crate::helper::drive::storage::{Layout, Storage};
 use crate::plan::layout::{Windows, most_room};
+use crate::plan::places::Place;
 
 const BIOS: &str = r"HARDWARE\DESCRIPTION\System\BIOS";
 const NATIVE_WIFI: u32 = 9;
@@ -111,6 +112,7 @@ pub fn gather(
     windows: &Windows,
     drive: &str,
     found: &Found,
+    places: Vec<Place>,
 ) -> Facts {
     Facts {
         machine: Machine {
@@ -138,5 +140,6 @@ pub fn gather(
         windows_size: windows.partition.size,
         windows_used: windows.used,
         most_room: most_room(&layout.plan_disk(), windows),
+        places,
     }
 }

@@ -77,3 +77,6 @@ Strings in Luft's Macedonian translation that a native speaker should check. Eac
 - `apps/meet/locales/mk/meet.ftl` `linux-ready-replace-title`: "Замени го { $system }" — `$system` is a Latin name or the fallback „овој систем“, so no „системот“ before it.
 - `apps/meet/desktop/locales/mk/desktop.ftl` `check-fast-startup-on`: "Брзо стартување е вклучено" — assumes Windows' Macedonian name for Fast Startup; same for „Чистење на дискот“ and „Шифрирање на уредот“.
 - `apps/meet/desktop/locales/mk/desktop.ftl` `check-firmware-key-volume-up`: "копчето за зголемување на звукот" — check it fits after „притиснете“.
+- `apps/meet/locales/mk/meet.ftl` `room-place-free-detail`: "{ $size } што ништо друго не ги користи" — the plural clitic „ги“ assumes sizes like „120 GB“; same in luft-windows-free-description.
+- `apps/meet/locales/mk/meet.ftl` `room-places-title`: "Каде да се всели Luft?" — echoes „да се всели“ from check-blocked-description; check it doesn’t sound too figurative for choosing a drive.
+- `apps/meet/desktop/locales/mk/desktop.ftl` `helper-box-room-shortfall`: "Просторот на Luft може да одвои { $available } GB, а на избраното му требаат { $needed } GB." — "Luft’s room can spare" is the space already set aside for Luft; check that comes across.

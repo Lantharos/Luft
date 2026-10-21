@@ -41,6 +41,10 @@ problem-folders = Meet Luft konnte deine Ordner nicht durchsehen.
 problem-sticks = Meet Luft konnte nicht nach USB-Laufwerken suchen.
 problem-stick = Das Erstellen des Sticks wurde nicht abgeschlossen.
 problem-offer = Luft kann gerade nicht heruntergeladen werden. Prüf, ob du online bist, oder verwende eine vorhandene ISO.
+problem-luft = Meet Luft konnte den Datenträger von Luft nicht prüfen.
+problem-resize = Das Ändern der Größe von Luft wurde nicht abgeschlossen.
+problem-cancel = Meet Luft konnte die Änderung nicht zurücknehmen.
+problem-give = Windows konnte den Platz nicht zurücknehmen.
 problem-declined = { $platform ->
     [linux] Meet Luft braucht deine Erlaubnis, um am Datenträger zu arbeiten. Gib dein Passwort ein, wenn danach gefragt wird.
    *[windows] Meet Luft braucht deine Erlaubnis, um am Datenträger zu arbeiten. Wähl „Ja“, wenn Windows fragt.
@@ -95,6 +99,35 @@ room-confirm-title = Luft { $size } geben?
 room-confirm-file = Windows verkleinert seinen Datenträger, dann kopiert Meet Luft Luft aus deiner ISO. Lass den PC am Strom.
 room-confirm-download = Windows verkleinert seinen Datenträger, dann lädt Meet Luft Luft herunter, etwa { $size }. Lass den PC am Strom und online.
 
+## Choosing where Luft goes, when there's more than one place
+## $drive is the name of a drive, like "Samsung SSD 990 PRO", and $size a size, like "120 GB"
+
+room-places-title = Wohin soll Luft?
+room-places-description = Luft kann sich den Datenträger mit Windows teilen oder Platz nehmen, den Windows nicht nutzt.
+room-places-label = Orte für Luft
+room-place-windows = Neben Windows
+room-place-windows-detail = Windows verkleinert sich, um Luft Platz zu machen
+room-place-windows-free = Dort sind schon { $size } frei
+room-place-free = Freier Speicherplatz auf { $drive }
+room-place-free-here = Freier Speicherplatz auf dem Datenträger von Windows
+room-place-free-detail = { $size }, die sonst nichts nutzt
+room-place-whole = { $drive } komplett
+room-place-whole-detail = Löscht diesen { $size }-Datenträger für Luft
+room-live-free = Davon sind schon { $free } frei, also gibt Windows weniger ab und behält Platz zum Wachsen. Luft legt außerdem { $size } zum Starten zurück und gibt sie nach der Installation wieder frei.
+room-live-elsewhere = Luft bekommt dort { $room } und legt zusätzlich { $size } zum Starten zurück, die es nach der Installation wieder freigibt.
+room-confirm-free-title = Luft { $size } freien Speicherplatz geben?
+room-confirm-free-file = Meet Luft kopiert Luft aus deiner ISO dorthin. Sonst ändert sich nichts auf dem Datenträger.
+room-confirm-free-download = Meet Luft lädt Luft, etwa { $size }, dorthin herunter. Sonst ändert sich nichts auf dem Datenträger. Lass den PC online.
+room-erase-title = { $drive } löschen?
+room-erase-description = Alles auf diesem { $size }-Datenträger wird sofort gelöscht, noch bevor Luft startet. Das lässt sich nicht rückgängig machen. Derzeit darauf:
+room-erase-empty = Windows kann auf diesem { $size }-Datenträger nichts lesen, aber alles, was darauf ist, wird sofort gelöscht. Das lässt sich nicht rückgängig machen.
+room-erase-unnamed = Unbenannte Partition
+room-erase-volume-name = { $name } ({ $letter })
+room-erase-volume = { $filesystem }, { $size }
+room-erase-bitlocker = Mit BitLocker verschlüsselt
+room-erase-understood = Ich weiß, dass ein Teil davon mit BitLocker verschlüsselt ist und sich nicht wiederherstellen lässt
+room-erase-confirm = Löschen und Platz schaffen
+
 ## Luft is ready on Windows
 
 ready-title = Luft ist bereit
@@ -107,6 +140,7 @@ ready-box-description = Pack Dokumente, Fotos, WLAN-Netzwerke und mehr ein, dami
 ready-box-packed = Eingepackt, { $size }
 ready-install-title = Luft installieren
 ready-install-description = In das Installationsprogramm neu starten. Die { $size } neben Windows warten schon darauf.
+ready-install-drive-description = In das Installationsprogramm neu starten. Die { $size } auf { $drive } warten schon darauf.
 ready-stick-description = Bring Luft auf einen Stick, um es auf jedem Computer zu starten.
 ready-remove = Luft von diesem PC entfernen
 ready-restart-try = Speichere vorher alles, woran du gerade arbeitest. Luft öffnet sich in etwa einer Minute, und der nächste Neustart bringt dich zurück zu Windows.
@@ -133,6 +167,53 @@ linux-ready-restart-try = Speichere vorher alles, woran du gerade arbeitest. Luf
 linux-ready-restart-replace = Speichere vorher alles, woran du gerade arbeitest. Das Installationsprogramm öffnet sich mit { $system } als zu ersetzendem System und zeigt, was bleibt, bevor sich etwas ändert.
 linux-ready-remove-title = Luft von diesem Computer entfernen?
 linux-ready-remove-description = Meet Luft löscht die Dateien von Luft, seine Startdateien und seinen Starteintrag. Alles andere bleibt, wie es ist.
+
+## Luft is installed on this PC
+## $drive is the name of a drive, like "Samsung SSD 990 PRO", and $size a size, like "120 GB"
+
+luft-title = Dein Luft
+luft-looking = Meet Luft hat Luft auf diesem PC gefunden.
+luft-checking = Der Datenträger von Luft wird geprüft …
+luft-description-beside = Luft ist neben Windows auf diesem PC installiert.
+luft-description-drive = Luft ist auf { $drive } installiert.
+luft-bar-used = { $size }, { $used } belegt
+luft-resize-title = Speicherplatz von Luft ändern
+luft-resize-description = Gib Luft mehr vom Platz von Windows oder gib Windows etwas zurück.
+luft-resize-encrypted = Der Datenträger von Luft ist verschlüsselt, daher bräuchte das Verschieben seinen Wiederherstellungsschlüssel. Schalte zuerst die Geräteverschlüsselung in den Einstellungen von Luft aus und komm dann zurück.
+luft-resize-apart = Zwischen Windows und Luft liegt eine andere Partition, daher können sie sich ihren Platz nicht teilen.
+luft-resize-unreadable = Meet Luft konnte nicht feststellen, wie voll Luft ist.
+luft-pending-grow = Luft wächst beim nächsten Start
+luft-pending-grow-description = Starte in Luft neu und lass es ein paar Minuten laufen, während es in den neuen Platz umzieht. Du kannst es währenddessen weiter benutzen.
+luft-pending-shrink = Luft schafft beim nächsten Start Platz
+luft-pending-shrink-description = Starte in Luft neu und lass es ein paar Minuten laufen, während es seine Dateien verschiebt. Öffne danach Meet Luft in Windows erneut, damit Windows den Platz bekommt.
+luft-windows-free-title = Windows den freien Platz geben
+luft-windows-free-description = { $size } direkt hinter Windows werden von nichts genutzt. Windows kann sie zurücknehmen.
+luft-leftovers-title = Nach dem Ausprobieren aufräumen
+luft-leftovers-description = Die Partitionen, die Meet Luft zum Starten von Luft angelegt hat, sind noch da. Luft braucht sie nicht mehr.
+luft-start = In Luft neu starten
+luft-cancel = Änderung abbrechen
+luft-restart = Speichere vorher alles, woran du gerade arbeitest. Luft startet in etwa einer Minute, und der nächste Neustart bringt dich zurück zu Windows.
+luft-restart-pending = Speichere vorher alles, woran du gerade arbeitest. Luft startet in etwa einer Minute und verschiebt seine Dateien selbst, was ein paar Minuten dauert. Du kannst es währenddessen benutzen.
+luft-remove = Luft von diesem PC entfernen
+luft-remove-title = Luft von diesem PC entfernen?
+luft-remove-description = Luft und alles darin wird gelöscht, insgesamt { $size }, und Windows bekommt den Platz zurück. Der PC startet Windows wie vorher. Das lässt sich nicht rückgängig machen.
+luft-remove-drive-description = Luft und alles darin wird von { $drive } gelöscht, insgesamt { $size }. Der PC startet Windows wie vorher. Das lässt sich nicht rückgängig machen.
+luft-remove-confirm = Luft entfernen
+
+## Changing how much space Luft has
+## $size is a size, like "20 GB"
+
+resize-title = Wie viel Platz für Luft?
+resize-description = Zieh, um den Datenträger zwischen Windows und Luft aufzuteilen. Luft nimmt die Änderung beim nächsten Start selbst vor.
+resize-measuring = Windows ermittelt, wie viel Platz es abgeben kann. Auf einem großen Datenträger kann das ein paar Minuten dauern.
+resize-full = Luft ist zu voll zum Verschieben, und Windows kann nicht genug Platz dafür abgeben. Schaff zuerst Platz in Luft oder in Windows.
+resize-used = Die Dateien von Luft belegen { $size }.
+resize-least = Ändere die Größe um mindestens { $size }.
+resize-apply = Ändern
+resize-grow-title = Luft { $size } mehr geben?
+resize-grow-description = Windows verkleinert sich sofort. Luft zieht beim nächsten Start in den neuen Platz um, was ein paar Minuten dauert. Lass den PC am Strom.
+resize-shrink-title = Windows { $size } zurückgeben?
+resize-shrink-description = Luft verschiebt seine Dateien beim nächsten Start, was ein paar Minuten dauert. Öffne danach Meet Luft erneut, und Windows nimmt sich den Platz zurück. Lass den PC am Strom.
 
 ## Packing things to take along to Luft (the moving box)
 
@@ -170,6 +251,8 @@ box-pack = Einpacken
 
 working-shrinking = Platz wird geschaffen
     .description = Windows verschiebt seine Dateien, um Platz zu machen. Das kann ein paar Minuten dauern.
+working-erasing = Datenträger wird gelöscht
+    .description = Windows leert ihn, damit Luft ihn ganz bekommt.
 working-partitioning = Platz für Luft wird eingerichtet
     .description = Die Partitionen, von denen Luft startet, werden vorbereitet.
 working-downloading = Luft wird geholt

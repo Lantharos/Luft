@@ -6,6 +6,7 @@ use super::common::{
 };
 use super::facts::{Encryption, Facts, Firmware};
 use crate::L10N;
+use crate::plan::places::{Kind, Place};
 use crate::plan::sizes::smallest_luft;
 
 fn startup(facts: &Facts) -> Finding {
@@ -72,8 +73,35 @@ fn fast_startup(facts: &Facts) -> Finding {
     }
 }
 
+fn elsewhere(place: &Place) -> String {
+    match place.kind {
+        Kind::Whole => t!(
+            L10N,
+            "check-space-erase-drive",
+            drive = place.drive.name.as_str()
+        ),
+        Kind::Windows | Kind::Free => {
+            t!(
+                L10N,
+                "check-space-other-drive",
+                drive = place.drive.name.as_str()
+            )
+        }
+    }
+}
+
 fn space(facts: &Facts, live: u64) -> Finding {
     let needed = smallest_luft(facts.esp_size) + live;
+    let free = facts
+        .places
+        .iter()
+        .find(|place| place.kind == Kind::Windows)
+        .map_or(0, |place| place.free);
+    let other = facts
+        .places
+        .iter()
+        .filter(|place| place.kind != Kind::Windows)
+        .max_by_key(|place| (place.kind == Kind::Free, place.most));
     if facts.most_room >= needed {
         finding(
             Topic::Space,
@@ -83,7 +111,18 @@ fn space(facts: &Facts, live: u64) -> Finding {
                 "check-space-up-to",
                 size = gib(facts.most_room - live)
             ),
-            t!(L10N, "check-space-up-to-detail"),
+            if free > 0 {
+                t!(L10N, "check-space-free-already", size = gib(free))
+            } else {
+                t!(L10N, "check-space-up-to-detail")
+            },
+        )
+    } else if let Some(place) = other {
+        finding(
+            Topic::Space,
+            Level::Fine,
+            t!(L10N, "check-space-up-to", size = gib(place.most)),
+            elsewhere(place),
         )
     } else {
         finding(
@@ -141,6 +180,7 @@ pub fn evaluate(facts: &Facts, live: Option<u64>) -> Vec<Finding> {
 mod tests {
     use super::super::facts::{Architecture, Device, Machine, Platform};
     use super::*;
+    use crate::plan::places::Drive;
     use crate::plan::sizes::GIB;
 
     fn laptop() -> Facts {
@@ -172,6 +212,7 @@ mod tests {
             windows_size: 475 * GIB,
             windows_used: 120 * GIB,
             most_room: 300 * GIB,
+            places: Vec::new(),
         }
     }
 
@@ -217,6 +258,32 @@ mod tests {
             level(&evaluate(&facts, Some(4 * GIB)), Topic::Space),
             Level::Blocks
         );
+    }
+
+    #[test]
+    fn a_full_windows_is_fine_when_another_drive_has_room() {
+        let mut facts = laptop();
+        facts.most_room = 10 * GIB;
+        facts.places = vec![Place {
+            id: "whole:3".into(),
+            kind: Kind::Whole,
+            drive: Drive {
+                name: "WDC WD20EZBX".into(),
+                size: 2000 * GIB,
+                windows: false,
+            },
+            free: 0,
+            smallest: 1990 * GIB,
+            most: 1990 * GIB,
+            contents: Vec::new(),
+        }];
+        let findings = evaluate(&facts, Some(4 * GIB));
+        let space = findings
+            .iter()
+            .find(|finding| finding.topic == Topic::Space)
+            .unwrap();
+        assert_eq!(space.level, Level::Fine);
+        assert!(space.detail.contains("WDC WD20EZBX"));
     }
 
     #[test]

@@ -16,11 +16,23 @@ Meet Luft reads it to find the ISO and its size, then takes the checksum from th
 
 The steps people see are in [Try Luft with Meet Luft](https://docs.luft.computer/start/meet-luft/). Underneath:
 
-- Windows shrinks its own partition through its storage service, as Disk Management does, so it works with BitLocker on. Luft's room and Meet Luft's partitions go right after Windows, in front of a recovery partition at the end of the drive.
+- Windows shrinks its own partition through its storage service, as Disk Management does, so it works with BitLocker on. Luft's room and Meet Luft's partitions go right after Windows, in front of a recovery partition at the end of the drive, unless Luft goes somewhere else (see [Where Luft goes](#where-luft-goes)).
 - The download is checked against its `.sha256` as it arrives, and the `.sha256` against its [signature](#signatures). The live system is copied out of the ISO under temporary names, and only takes their place once the whole ISO matched.
 - The start entry *Meet Luft* goes at the end of the firmware's list, and the firmware is asked to use it once (`BootNext`). Some firmware drops entries it doesn't know, so Meet Luft puts it back before each restart. Luft starts through Fedora's signed shim and GRUB, like the stick.
 - The clock (`RealTimeIsUniversal`) and Fast Startup are changed in Windows itself, so they work with BitLocker on, where Luft can't read Windows' drive.
 - The moving box holds folders from the Windows account, the wallpaper, name and account picture, Bluetooth pairings, and Wi-Fi networks with their passwords when ticked.
+
+### Where Luft goes
+
+Meet Luft looks at every drive and offers each place Luft fits, the one next to Windows first:
+
+- **Next to Windows.** Windows gives up part of its partition. Free space right after Windows, left by an earlier install or by shrinking Windows in Disk Management, counts first, so Windows only gives what's missing. The space step shows that part lighter, and the room can't be smaller than it.
+- **Free space.** A gap no partition uses, on Windows' drive or on another drive, that holds Luft and Meet Luft's partitions. Luft gets all of it and nothing else changes.
+- **Another drive, erased.** Meet Luft clears the drive through the storage service (`MSFT_Disk.Clear`, then `Initialize` as GPT, which may add a small *Microsoft reserved* partition) and uses it like free space. Before that, it names the drive and lists every partition on it with its label, drive letter, file system, size and whether BitLocker protects it. When anything on it is BitLocker-protected, erasing also takes a tick confirming it's gone for good.
+
+Drives that are never offered: the one Windows starts from or that holds its EFI system partition (`IsBoot` or `IsSystem`), USB, SD, MMC, virtual and Storage Spaces drives, and drives that are read-only or offline. The drive holding an ISO picked with *Use an ISO I already have* is never offered for erasing. Free space on an MBR drive isn't offered, since Install Luft makes GPT partitions; erasing one makes it GPT.
+
+Wherever the room is, Meet Luft's partitions go right after it on the same drive, so Install Luft finds the room next to them and Luft grows into their space at its first start. The moving box goes in between: next to Windows, Windows gives up its space; anywhere else, it comes off the end of the room. On a drive without an EFI system partition, Install Luft makes one, and the firmware starts Luft from that drive; on a drive that has one, it shares it like it shares Windows' own. While Install Luft copies Luft next to Meet Luft's start partition, that partition briefly stops being an EFI system partition, so Luft's start files go on the one Install Luft made. `meet.json` notes `otherDrive` in the room, and Install Luft then names the drive instead of saying the room is next to Windows.
 
 ### Partitions
 
@@ -40,6 +52,35 @@ At Luft's first start after installing, before the login screen, it removes the 
 ### Getting a newer Luft
 
 When a newer Luft is out than the one on its partition, Meet Luft offers *Get the newest Luft* next to *Try Luft*. Newer means a different checksum than the build it copied, from the releases or nightly builds Meet Luft is using, or from an ISO picked with *Use an ISO I already have*; an ISO without a `.sha256` next to it always counts as newer. It downloads the new build in place of the old one and keeps the room, the moving box and the logs from Try Luft. When the new build fits the partitions Meet Luft already made, only their files change. Otherwise it makes them again at the size the new build needs, taking what's missing from Windows, and adds the start entry back. Meet Luft remembers which build it copied by its checksum in `LiveOS\iso.sha256`. If an update stops halfway, Meet Luft won't restart into Luft until the update is done.
+
+### Once Luft is installed
+
+When Meet Luft opens on a PC with Luft installed, which it tells by a partition of the root type `4f68bce3-e8cd-4db1-96e7-fbcaf984b709` named *Luft*, it shows *Your Luft* instead of the first screen. It reads the partition's first bytes to tell whether Luft is encrypted (a LUKS header) and, when it isn't, how much of its btrfs is taken (the superblock's allocated bytes). From there:
+
+- **Change how much space Luft has** splits the drive between Windows and Luft. It's offered when Luft sits right after Windows on the same drive, possibly with its startup partition in front, and isn't encrypted.
+- **Give Windows the free space** extends Windows into free space right after it.
+- **Clean up after trying Luft** removes Meet Luft's own partitions when Luft's first start didn't.
+- **Remove Luft from this PC** deletes Luft's partitions, its start files and its start entries, and gives Windows the space back.
+- **Restart into Luft** sets `BootNext` to Luft's start entry, adding one when the firmware lost it.
+
+#### Changing Luft's size
+
+btrfs can only change size from the system that has it mounted, and Windows can only grow into space right after it, so Luft moves itself:
+
+1. For more space, Windows shrinks right away. For less, nothing changes in Windows yet.
+2. Meet Luft writes the request into the UEFI variable `LuftResize` with Luft's vendor GUID `b6a4c1e2-3f5d-4c8a-9e71-2d0f6a8b5c3e`: `{"change":"grow","partition":"…"}` or `{"change":"shrink","bytes":…,"partition":"…"}`, the partition being Luft's own. *Your Luft* shows a change that's waiting and can call it off; calling off a grow gives Windows its space back.
+3. At Luft's next start, `luft-installer-resize.service` plans the move and runs it in the background, step by step: it makes a new partition, adds it to Luft's btrfs, hands it the root type, lets btrfs move everything off the old partition (`btrfs device remove`), deletes the old one and grows the new one to the end. The startup partition moves first when Luft grows and last when it shrinks, copied to a new FAT partition with the same serial. At the end Luft's partition gets its old partition UUID back, so nothing measured into the TPM changes.
+4. When Luft gave space back, the next time Meet Luft opens it offers to extend Windows into it.
+
+Every step is noted in `/var/lib/luft-installer/resize.json` before the next one starts, and at every point Luft still starts: while both partitions belong to the file system, the startup finds it through either. After a power cut the service carries on at the next start, and it gives up on a step that fails three times in a row.
+
+Luft's files have to fit wherever they move, with 10% and 1 GB to spare. When the new space is smaller than that, Luft moves twice, first to the far end of its own partition and then into the new space, which needs it to be less than half full. Meet Luft works out the same limits from the superblock before offering a size, and Luft checks them again before it starts.
+
+An encrypted Luft can't move this way: its startup only opens one encrypted partition, so a second one would need the recovery key. *Your Luft* says so and suggests turning off device encryption in Luft first. Removing an encrypted Luft needs no key, and nothing is left in the TPM, since Luft keeps its sealed keys in the LUKS header and on the EFI system partition.
+
+#### Removing Luft
+
+Meet Luft removes the firmware start entries for `\EFI\luft\` and `\EFI\luft-start\`, and Windows' copies of them. On every EFI system partition with Luft's files it deletes `EFI\luft` and `EFI\luft-start`, the boot loader entries naming Luft with their images, and puts Windows' boot manager back as `EFI\Boot\BOOTX64.EFI` when Luft's shim had taken its place. An EFI system partition Install Luft made on another drive, with only Luft's files on it, is deleted whole. Then it deletes Luft's startup and root partitions and anything left from trying Luft, and extends Windows when the space is right after it.
 
 ## Making a USB stick
 
@@ -98,7 +139,7 @@ Copy-Item -LiteralPath "${luft}Luft logs" -Destination "$env:TEMP\Luft logs" -Re
 
 ### Taking it back out
 
-*Remove Luft from this PC* deletes the start entry and every partition Meet Luft made, moving box included, and gives Windows all of its space back. Once Luft is installed, its partition is Luft's own: remove it from Windows' Disk Management if you go back.
+*Remove Luft from this PC* deletes the start entry and every partition Meet Luft made, moving box included, and gives Windows all of its space back. A drive Meet Luft erased stays empty. Once Luft is installed, [*Your Luft*](#once-luft-is-installed) removes it.
 
 ### Running it
 

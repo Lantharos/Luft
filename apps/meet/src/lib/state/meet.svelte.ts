@@ -1,10 +1,27 @@
 import { t } from '@luft/i18n';
 import { Toasts } from '@luft/ui';
 import * as meet from '#lib/api/meet.js';
-import type { Action, Channel, Intent, Packing, Platform, Prepared, Progress, Report, Source, Stage, WindowsChoices } from '#lib/api/meet.js';
+import type { Action, Channel, Intent, Packing, PlaceKind, Platform, Prepared, Progress, Report, Source, Stage, WindowsChoices } from '#lib/api/meet.js';
 
-export type Step = 'hello' | 'check' | 'room' | 'working' | 'ready' | 'box' | 'removed' | 'stick' | 'stickDone';
-export type Task = 'check' | 'room' | 'update' | 'download' | 'pack' | 'remove' | 'restart' | 'tidy' | 'firmware' | 'folders' | 'sticks' | 'stick' | 'offer';
+export type Step = 'hello' | 'luft' | 'resize' | 'check' | 'room' | 'working' | 'ready' | 'box' | 'removed' | 'stick' | 'stickDone';
+export type Task =
+	| 'check'
+	| 'room'
+	| 'update'
+	| 'download'
+	| 'pack'
+	| 'remove'
+	| 'restart'
+	| 'tidy'
+	| 'firmware'
+	| 'folders'
+	| 'sticks'
+	| 'stick'
+	| 'offer'
+	| 'luft'
+	| 'resize'
+	| 'cancel'
+	| 'give';
 
 export interface Failure {
 	task: Task;
@@ -13,7 +30,7 @@ export interface Failure {
 	retry: () => unknown;
 }
 
-const ORDER: Step[] = ['hello', 'check', 'room', 'working', 'ready', 'box', 'stick', 'stickDone', 'removed'];
+const ORDER: Step[] = ['hello', 'luft', 'resize', 'check', 'room', 'working', 'ready', 'box', 'stick', 'stickDone', 'removed'];
 const GIB = 1024 ** 3;
 const SHARE = 0.4;
 const NOTE_SHOWN = 6000;
@@ -31,6 +48,7 @@ class MeetState {
 	progress = $state<Progress | null>(null);
 	source = $state<Source>({ kind: 'download', channel: 'latest' });
 	luft = $state(0);
+	place = $state('windows');
 	busy = $state(false);
 	failure = $state<Failure | null>(null);
 	readonly notes = new Toasts(NOTE_SHOWN);
@@ -39,6 +57,8 @@ class MeetState {
 	linux = $derived(this.report?.facts.platform === 'linux' ? this.report.facts : null);
 	blocked = $derived(this.report?.findings.some((finding) => finding.level === 'blocks') ?? false);
 	nightly = $derived(this.source.kind === 'download' && this.source.channel === 'nightly');
+	places = $derived(this.windows?.places ?? []);
+	chosen = $derived(this.places.find((place) => place.id === this.place) ?? this.places[0] ?? null);
 
 	private inspection = 0;
 
@@ -75,8 +95,13 @@ class MeetState {
 		this.report = report;
 		this.prepared = report.prepared;
 		if (report.facts.platform === 'windows') {
-			const suggested = Math.round((report.facts.windowsSize * SHARE) / GIB) * GIB;
-			this.luft = Math.min(report.mostLuft, Math.max(report.smallestLuft, suggested));
+			const { places, windowsSize } = report.facts;
+			if (!places.some((place) => place.id === this.place)) this.place = places[0]?.id ?? 'windows';
+			const beside = places.find((place) => place.kind === 'windows');
+			if (beside) {
+				const suggested = Math.round((windowsSize * SHARE) / GIB) * GIB;
+				this.luft = Math.min(beside.most, Math.max(beside.smallest, suggested));
+			}
 		}
 		return report;
 	}
@@ -138,10 +163,11 @@ class MeetState {
 	}
 
 	async makeRoom() {
+		const first: Record<PlaceKind, Stage> = { windows: 'shrinking', free: 'partitioning', whole: 'erasing' };
 		const prepared = await this.working(
 			'room',
-			'shrinking',
-			() => meet.prepare(this.luft, $state.snapshot(this.source)),
+			first[this.chosen?.kind ?? 'windows'],
+			() => meet.prepare(this.luft, $state.snapshot(this.source), this.place),
 			() => this.makeRoom(),
 			'ready',
 			'room'
@@ -153,7 +179,7 @@ class MeetState {
 		const prepared = await this.working(
 			'room',
 			'downloading',
-			() => meet.prepare(0, $state.snapshot(this.source)),
+			() => meet.prepare(0, $state.snapshot(this.source), ''),
 			() => this.getReady(),
 			'ready',
 			'check'

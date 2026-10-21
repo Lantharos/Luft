@@ -69,3 +69,6 @@ Strings in Luft's Russian translation that a native speaker should check, each l
 - `apps/meet/desktop/locales/ru/desktop.ftl` `check-start-entries`: "Старая загрузочная запись" — "start entry" (firmware boot menu entry), matching Setup's «загрузочные файлы».
 - `apps/meet/locales/ru/meet.ftl` `stick-keep`: "Оставить оба" — uses an exact `[1]` variant, since the `one` category also covers 21, 31…; same for `stick-replace-description` and `check-start-entries`.
 - `apps/meet/desktop/locales/ru/desktop.ftl` `check-encryption-changing-detail`: "…в Параметрах Windows, в разделе «Шифрование устройства»." — Windows' Settings app is «Параметры» in Russian, unlike Luft's «Настройки».
+- `apps/meet/locales/ru/meet.ftl` `room-place-free-detail`: "{ $size }, которые больше ничем не заняты" — the plural relative clause assumes sizes like «120 ГБ»; check it reads well with any size.
+- `apps/meet/locales/ru/meet.ftl` `luft-resize-title`: "Изменить размер Luft" — shorter than the English "Change how much space Luft has"; check it reads as the title of the row.
+- `apps/meet/desktop/locales/ru/desktop.ftl` `helper-box-room-shortfall`: "В месте для Luft найдётся ещё { $available } ГБ, а выбранным вещам нужно { $needed } ГБ." — "Luft’s room can spare" is the space already set aside for Luft; check that comes across.

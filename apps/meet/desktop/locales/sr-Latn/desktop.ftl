@@ -32,6 +32,9 @@ check-space-free = Slobodno: { $size } GB
 check-space-free-linux = Dok ga isprobavate, Luft zauzima oko { $size } GB.
 check-space-up-to = Do { $size } GB za Luft
 check-space-up-to-detail = Windows zadržava svoje datoteke i prostor za rast.
+check-space-free-already = Od toga je već slobodno { $size } GB, pa Windows ustupa manje.
+check-space-other-drive = Za njega ima mesta na disku { $drive }.
+check-space-erase-drive = Za njega ima mesta na disku { $drive }, kad se taj disk izbriše.
 check-space-short = Nema dovoljno slobodnog prostora
 check-space-short-windows = Sistemu Luft treba oko { $needed } GB koje Windows može da ustupi. Oslobodite { $missing } GB u sistemu Windows, na primer pomoću Čišćenja diska, pa ponovo proverite.
 check-space-short-linux = Sistemu Luft za pokretanje treba oko { $needed } GB. Oslobodite { $missing } GB, pa ponovo proverite.
@@ -128,7 +131,10 @@ helper-not-ready-to-start-linux = Luft još nije spreman za pokretanje. Prvo ga 
 helper-update-unfinished = Ažuriranje sistema Luft nije završeno. Prvo ga ponovo ažurirajte.
 helper-room-too-small = Sistemu Luft treba više prostora od toga.
 helper-room-shortfall = Windows može da ustupi { $available } GB, a sistemu Luft treba { $needed } GB.
+helper-gap-shortfall = Taj prostor ima { $available } GB, a sistemu Luft treba { $needed } GB.
+helper-place-gone = Taj prostor više nije slobodan. Ponovo proverite da biste videli gde Luft može da stane.
 helper-box-shortfall = Windows može da ustupi još { $available } GB, a za izabrano je potrebno { $needed } GB.
+helper-box-room-shortfall = Prostor sistema Luft može da ustupi { $available } GB, a za izabrano je potrebno { $needed } GB.
 helper-bluetooth-unreadable = Bluetooth podešavanja sistema Windows nisu mogla da se otvore
 helper-registry-not-opened = Nije moguće otvoriti { $key }: { $error }
 helper-registry-not-changed = Nije moguće promeniti { $value }: { $error }
@@ -155,7 +161,6 @@ drive-windows-partition-missing = Particija sistema Windows nije pronađena
 drive-volume-missing = Volumen { $path } nije pronađen
 drive-storage-error = { $what } (greška skladišta u sistemu Windows { $code })
 drive-shrink-size-unknown = Windows nije mogao da utvrdi koliko njegova particija može da se smanji
-drive-grow-size-unknown = Windows nije mogao da utvrdi koliko njegova particija može da se poveća
 drive-resize-failed = Windows nije mogao da promeni veličinu svoje particije
 drive-create-failed = Windows nije mogao da napravi particiju za Luft
 drive-hide-failed = Windows nije mogao da sakrije novu particiju iz Istraživača datoteka
@@ -174,6 +179,9 @@ drive-new-live-no-volume = Nova particija sistema Luft nema volumen
 drive-partitions-not-noted = Particija sistema Luft nema u beleškama aplikacije Meet Luft
 drive-partitions-gone = Particije sistema Luft su nestale
 drive-partition-gone = Jedna particija je nestala
+drive-gone = Jedan disk je nestao
+drive-erase-failed = Windows nije mogao da izbriše disk
+drive-erased-no-room = Na izbrisanom disku nema mesta za Luft
 drive-start-partition-foreign = Particiju za pokretanje sistema Luft nije napravila aplikacija Meet Luft
 drive-start-partition-gone = Particije za pokretanje sistema Luft više nema
 drive-start-partition-not-listed = Particije za pokretanje sistema Luft nema u tabeli particija
@@ -186,6 +194,14 @@ drive-esp-no-guid = EFI sistemska particija nema GUID
 drive-no-uuid = Disk na kom se čuva Luft nema UUID
 drive-folder-unreadable = Luft ne može da se pokrene sa diska na kom su vaše datoteke.
 drive-folder-not-startable = Sa fascikle { $folder } nije moguće pokretanje
+
+## Errors while changing Luft once it's installed
+
+luft-gone = Luft više nije na ovom računaru
+luft-not-resizable = Veličina sistema Luft trenutno ne može da se promeni iz sistema Windows
+luft-size-not-allowed = Luft ne može da ima tu veličinu
+luft-space-promised = Taj prostor je odvojen za Luft. Prvo otkažite promenu.
+luft-no-start-entry = Stavka za pokretanje sistema Luft nije pronađena
 
 ## Errors while getting Luft
 

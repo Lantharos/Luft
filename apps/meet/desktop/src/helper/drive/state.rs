@@ -12,11 +12,11 @@ use crate::protocol::WindowsChoices;
 use super::bitlocker::BitLocker;
 use super::record::{self, Made};
 use super::storage::{Layout, MSFT_Partition, Storage};
-use super::windows_drive;
 use crate::boot::entries;
 use crate::helper::live_system;
 use crate::helper::system::{firmware, settings, start_entries};
 use crate::live::durable;
+use crate::plan::layout::Span;
 
 const LIVE_FOLDER: &str = "LiveOS";
 
@@ -35,6 +35,24 @@ impl Found {
 
     pub fn made_partition(&self, guid: &str) -> Option<&MSFT_Partition> {
         made_partition(&self.made, guid)
+    }
+
+    pub fn room(&self) -> Option<Span> {
+        let room = self.handoff.as_ref()?.room()?;
+        Some(Span {
+            offset: room.offset,
+            size: room.size,
+        })
+    }
+
+    pub fn beside_windows(&self, layout: &Layout) -> bool {
+        let windows = &layout.windows;
+        self.live
+            .as_ref()
+            .is_some_and(|live| live.DiskNumber == windows.DiskNumber)
+            && self
+                .room()
+                .is_some_and(|room| room.offset == windows.Offset + windows.Size)
     }
 }
 
@@ -58,10 +76,9 @@ pub fn write_handoff(live: &Path, handoff: &Handoff) -> Result<(), String> {
         .map_err(|error| error.to_string())
 }
 
-pub fn find(layout: &Layout) -> Found {
+pub fn find(partitions: &[MSFT_Partition]) -> Found {
     let record = Made::read();
-    let made: Vec<MSFT_Partition> = layout
-        .partitions
+    let made: Vec<MSFT_Partition> = partitions
         .iter()
         .filter(|partition| {
             partition
@@ -94,9 +111,7 @@ pub fn find(layout: &Layout) -> Found {
 
 pub fn restart(intent: Intent, windows: WindowsChoices, hints: Hints) -> Result<(), String> {
     let storage = Storage::open()?;
-    let drive = windows_drive::find()?;
-    let layout = storage.layout(&drive.volume)?;
-    let found = find(&layout);
+    let found = find(&storage.all_partitions()?);
     let (Some(mut handoff), Some(live)) = (found.handoff.clone(), found.live_path()) else {
         return Err(t!(L10N, "helper-not-ready-to-start-windows"));
     };
@@ -106,14 +121,12 @@ pub fn restart(intent: Intent, windows: WindowsChoices, hints: Hints) -> Result<
     let made = handoff
         .made_partitions()
         .ok_or_else(|| t!(L10N, "drive-partitions-not-noted"))?;
-    found
+    let start = found
         .made_partition(&made.start)
         .ok_or_else(|| t!(L10N, "drive-start-partition-foreign"))?;
-    let start = firmware::partition_on_disk(
-        layout.disk.Number,
-        layout.disk.LogicalSectorSize as u64,
-        &made.start,
-    )?;
+    let disk = storage.disk(start.DiskNumber)?;
+    let start =
+        firmware::partition_on_disk(disk.Number, disk.LogicalSectorSize as u64, &made.start)?;
     let bitlocker = BitLocker::open()?;
     for path in found.made.iter().filter_map(MSFT_Partition::volume_path) {
         bitlocker.keep_readable(&path)?;

@@ -4,6 +4,7 @@ mod install;
 mod meet;
 mod options;
 mod phase;
+mod resize;
 mod service;
 mod survey;
 mod system;
@@ -20,6 +21,7 @@ fn main() -> ExitCode {
     let options = options::Options::parse();
     let result = match options.command {
         Some(Command::Reclaim) => meet::reclaim::run(&options.state_dir),
+        Some(Command::Resize) => resize::run(&options.state_dir),
         Some(Command::ExpireSetup) => first_boot::expire(&options.state_dir),
         None => service::run(options),
     };

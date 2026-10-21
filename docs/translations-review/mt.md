@@ -89,3 +89,11 @@ Strings in Luft's Maltese translation that a native speaker should check: places
 - `apps/meet/locales/mt/meet.ftl` `problem-declined`: "Agħżel Iva meta jistaqsik Windows" — I assume Windows' Maltese UAC prompt shows "Iva"; confirm. Fast Startup, Disk Cleanup and File Explorer are kept in English, as in Setup.
 - `apps/meet/desktop/locales/mt/desktop.ftl` `helper-not-started`: "L-għajnuna ta’ Meet Luft" — "helper", the part that works on the drive; check that it reads as a program and not as help.
 - `apps/meet/desktop/locales/mt/desktop.ftl` `check-encryption-changing-detail`: "taħt Ċċifrar tal-apparat" — the Device encryption page name in Windows' Maltese Settings is unverified.
+- `apps/meet/locales/mt/meet.ftl` `luft-title`: "Luft fuq dan il-PC" — "Your Luft" can't take an article or possessive without breaking the rule that names stay bare; check the reworded title.
+- `apps/meet/locales/mt/meet.ftl` `room-place-whole`: "{ $drive } kollu" — "kollu" is masculine, agreeing with drajv; check it reads naturally after a drive name.
+- `apps/meet/locales/mt/meet.ftl` `room-erase-title`, `working-erasing`: "Tħassar", "inaddfu" — erase as delete, and the description says Windows cleans the drive; check "inaddfu" isn't too casual.
+- `apps/meet/locales/mt/meet.ftl` `resize-least`, `resize-apply`: "Ibdlu b’mill-inqas { $size }.", "Ibdlu" — check the button reads well on its own.
+
+## Install Luft
+
+- `apps/setup/locales/mt/setup.ftl` `setup-destination-meet-drive-description`: "u Luft jibda minn hemm bil-fajls tal-istartjar tiegħu" — "jibda" for starting up a system, and "fajls tal-istartjar" taken from the replace step; check both sound natural together.

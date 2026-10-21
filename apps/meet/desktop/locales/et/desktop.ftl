@@ -32,6 +32,9 @@ check-space-free = Vaba { $size } GB
 check-space-free-linux = Proovimise ajal võtab Luft umbes { $size } GB.
 check-space-up-to = Luftile kuni { $size } GB
 check-space-up-to-detail = Windows jätab alles oma failid ja kasvuruumi.
+check-space-free-already = Sellest { $size } GB on juba vaba, nii et Windows loovutab vähem.
+check-space-other-drive = Kettal { $drive } on selle jaoks ruumi.
+check-space-erase-drive = Kettal { $drive } on selle jaoks ruumi, kui see ketas kustutada.
 check-space-short = Pole piisavalt vaba ruumi
 check-space-short-windows = Luft vajab umbes { $needed } GB, mille Windows saab loovutada. Vabastage Windowsis { $missing } GB, näiteks kettapuhastusega, ja kontrollige siis uuesti.
 check-space-short-linux = Luft vajab käivitumiseks umbes { $needed } GB. Vabastage { $missing } GB ja kontrollige siis uuesti.
@@ -126,7 +129,10 @@ helper-not-ready-to-start-linux = Luft pole veel käivitamiseks valmis. Valmista
 helper-update-unfinished = Lufti värskendamine jäi pooleli. Värskendage see esmalt uuesti.
 helper-room-too-small = Luft vajab rohkem ruumi.
 helper-room-shortfall = Windows saab loovutada { $available } GB, kuid Luft vajab { $needed } GB.
+helper-gap-shortfall = Selles ruumis on { $available } GB, kuid Luft vajab { $needed } GB.
+helper-place-gone = See ruum pole enam vaba. Kontrollige uuesti, kuhu Luft mahub.
 helper-box-shortfall = Windows saab loovutada veel { $available } GB, kuid valitud asjad vajavad { $needed } GB.
+helper-box-room-shortfall = Lufti ruumist saab loovutada { $available } GB, kuid valitud asjad vajavad { $needed } GB.
 helper-bluetooth-unreadable = Windowsi Bluetoothi sätteid ei saanud avada
 helper-registry-not-opened = Registrivõtit { $key } ei saanud avada: { $error }
 helper-registry-not-changed = Registriväärtust { $value } ei saanud muuta: { $error }
@@ -153,7 +159,6 @@ drive-windows-partition-missing = Windowsi partitsiooni ei leitud
 drive-volume-missing = Köidet { $path } ei leitud
 drive-storage-error = { $what } (Windowsi salvestusviga { $code })
 drive-shrink-size-unknown = Windows ei suutnud öelda, kui väikeseks selle partitsiooni teha saab
-drive-grow-size-unknown = Windows ei suutnud öelda, kui suureks selle partitsiooni teha saab
 drive-resize-failed = Windows ei saanud oma partitsiooni suurust muuta
 drive-create-failed = Windows ei saanud Luftile partitsiooni luua
 drive-hide-failed = Windows ei saanud uut partitsiooni Failihaldurist peita
@@ -172,6 +177,9 @@ drive-new-live-no-volume = Lufti uuel partitsioonil pole köidet
 drive-partitions-not-noted = Lufti partitsioonid puuduvad Meet Lufti märkmetest
 drive-partitions-gone = Lufti partitsioonid kadusid
 drive-partition-gone = Üks partitsioon kadus
+drive-gone = Üks ketas kadus
+drive-erase-failed = Windows ei saanud ketast kustutada
+drive-erased-no-room = Kustutatud kettal pole Luftile ruumi
 drive-start-partition-foreign = Lufti käivituspartitsioon pole Meet Lufti tehtud
 drive-start-partition-gone = Lufti käivituspartitsioon on kadunud
 drive-start-partition-not-listed = Lufti käivituspartitsiooni pole partitsioonitabelis
@@ -184,6 +192,14 @@ drive-esp-no-guid = EFI-süsteemipartitsioonil pole GUID-i
 drive-no-uuid = Kettal, millel Lufti hoitakse, pole UUID-d
 drive-folder-unreadable = Luft ei saa käivituda kettalt, millel on teie failid.
 drive-folder-not-startable = Kaustast { $folder } ei saa käivitada
+
+## Errors while changing Luft once it's installed
+
+luft-gone = Lufti pole enam selles arvutis
+luft-not-resizable = Lufti suurust ei saa praegu Windowsist muuta
+luft-size-not-allowed = Luft ei saa sellise suurusega olla
+luft-space-promised = See ruum on Luftile reserveeritud. Tühistage esmalt muudatus.
+luft-no-start-entry = Lufti käivituskirjet ei leitud
 
 ## Errors while getting Luft
 

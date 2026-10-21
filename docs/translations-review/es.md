@@ -63,3 +63,4 @@ Strings in Luft's Spanish translation that a native speaker should check: terms 
 - `apps/meet/desktop/locales/es/desktop.ftl` `check-space-short-windows`: "con Liberador de espacio en disco" — Windows' Spanish name for Disk Cleanup from memory; confirm against a Spanish Windows 11.
 - `apps/meet/desktop/locales/es/desktop.ftl` `check-firmware-key-volume-up`: "subir volumen" — check this reads right inside "pulsa { $key } cuando aparezca el logotipo".
 - `apps/meet/desktop/locales/es/desktop.ftl` `helper-not-started`: "El asistente de Meet Luft" — "helper" as "asistente", which can also suggest a wizard; check whether "proceso auxiliar" is clearer.
+- `apps/meet/desktop/locales/es/desktop.ftl` `helper-box-room-shortfall`: "El espacio de Luft puede ceder { $available } GB…" — "Luft's room" is the space set aside for Luft, which holds the moving box; check «ceder» reads right here, where Windows is not the one giving.

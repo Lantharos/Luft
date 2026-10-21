@@ -76,3 +76,6 @@ Strings in Luft's Turkish translation that a native speaker should check: terms 
 - `apps/meet/locales/tr/meet.ftl` `meet-keep-it`: "Kalsın" — the button that keeps Luft instead of removing it; check that it reads clearly as a button.
 - `apps/meet/desktop/locales/tr/desktop.ftl` `helper-registry-not-opened`: "Açılamadı: { $key } ({ $error })" — rebuilt as a colon form so the placeable needs no suffix; same pattern in several helper-, live- and stick- errors.
 - `apps/meet/desktop/locales/tr/desktop.ftl` `check-secure-boot-off-detail`: "hile önleyicili oyunlar" — "games with anti-cheat"; gamers may expect "anti-cheat".
+- `apps/meet/locales/tr/meet.ftl` `room-places-title`: "Luft nereye yerleşsin?" — echoes “yerleşmeden” from check-blocked-description; check it suits a choice between drives.
+- `apps/meet/desktop/locales/tr/desktop.ftl` `check-space-erase-drive`: "{ $drive } diski silinirse o diskte ona yer var." — the conditional reads a little stiff; check the word order.
+- `apps/meet/desktop/locales/tr/desktop.ftl` `helper-box-room-shortfall`: "Luft’un alanında { $available } GB ayrılabilir, seçtikleriniz ise { $needed } GB gerektiriyor." — "Luft’s room can spare" is the space already set aside for Luft; check that comes across.

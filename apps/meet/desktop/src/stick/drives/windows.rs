@@ -17,6 +17,7 @@ pub struct Disk {
     pub IsBoot: bool,
     pub IsReadOnly: bool,
     pub IsOffline: bool,
+    pub PartitionStyle: u16,
     pub LogicalSectorSize: u32,
     pub UniqueId: Option<String>,
     pub Path: Option<String>,
@@ -27,6 +28,7 @@ pub struct Partition {
     pub DiskNumber: u32,
     pub Offset: u64,
     pub Size: u64,
+    pub GptType: Option<String>,
     pub IsSystem: bool,
     pub IsBoot: bool,
     pub AccessPaths: Option<Vec<String>>,
@@ -72,6 +74,14 @@ impl Disk {
             self.UniqueId.as_deref().unwrap_or_default()
         )
     }
+
+    pub fn shown_name(&self) -> String {
+        let friendly = self
+            .FriendlyName
+            .as_deref()
+            .map(|name| name.trim_end_matches(DEVICE_SUFFIX));
+        name(None, friendly)
+    }
 }
 
 impl Storage {
@@ -85,7 +95,7 @@ impl Storage {
         partitions
     }
 
-    fn volume_of(&self, partition: &Partition) -> Option<&Volume> {
+    pub fn volume_of(&self, partition: &Partition) -> Option<&Volume> {
         let path = partition.volume_path()?;
         self.volumes.iter().find(|volume| {
             volume
@@ -133,13 +143,9 @@ impl Storage {
                 },
             );
         }
-        let friendly = disk
-            .FriendlyName
-            .as_deref()
-            .map(|name| name.trim_end_matches(DEVICE_SUFFIX));
         Stick {
             id: disk.id(),
-            name: name(None, friendly),
+            name: disk.shown_name(),
             size: disk.Size,
             volumes,
             ventoy,

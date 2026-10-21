@@ -23,6 +23,8 @@ pub enum Call {
     Prepare {
         luft: u64,
         source: Source,
+        #[serde(default)]
+        place: String,
     },
     Refresh {
         source: Source,
@@ -39,6 +41,15 @@ pub enum Call {
     Tidy,
     FirmwareSettings,
     Undo,
+    Luft,
+    LuftRange,
+    ResizeLuft {
+        size: u64,
+    },
+    CancelResize,
+    GiveWindows,
+    StartLuft,
+    RemoveLuft,
     Sticks {
         iso: Option<PathBuf>,
     },
@@ -90,6 +101,7 @@ pub struct Request {
 #[serde(rename_all = "camelCase")]
 pub enum Stage {
     Shrinking,
+    Erasing,
     Partitioning,
     Downloading,
     Packing,
@@ -120,6 +132,7 @@ pub enum Reply {
 pub struct Prepared {
     pub room: u64,
     pub moving_box: Option<u64>,
+    pub drive: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -129,8 +142,6 @@ pub struct Report<F> {
     pub findings: Vec<Finding>,
     pub live: u64,
     pub download: u64,
-    pub smallest_luft: u64,
-    pub most_luft: u64,
     pub prepared: Option<Prepared>,
     pub outdated: bool,
 }

@@ -77,3 +77,10 @@ Strings in Luft's Icelandic translation that a native speaker should check: term
 - `apps/meet/desktop/locales/is/desktop.ftl` `check-fast-startup-on`: "Kveikt er á flýtiræsingu" — „flýtiræsing” as in Setup; couldn't verify Windows' Icelandic name for Fast Startup, nor „Diskhreinsun” for Disk Cleanup and „Dulritun tækis” for Device encryption.
 - `apps/meet/desktop/locales/is/desktop.ftl` `helper-not-started`: "Hjálparforrit Meet Luft…" — "helper" as „hjálparforrit”.
 - `apps/meet/desktop/locales/is/desktop.ftl` `drive-volume-missing`: "Gagnasvæðið { $path }…" — "volume" as „gagnasvæði”; no settled term.
+- `apps/meet/locales/is/meet.ftl` `luft-title`: "Luft hjá þér" — "Your Luft" reworded because Luft isn't inflected; check it works as a screen title.
+- `apps/meet/locales/is/meet.ftl` `room-place-whole`: "Allur diskurinn { $drive }" — "diskurinn" put first so the drive name stays uninflected; check it reads well with names like "Samsung SSD 990 PRO".
+- `apps/meet/locales/is/meet.ftl` `room-place-windows-free`: "Þar eru { $size } þegar laus" — plural agreement assumes a size like "40 GB"; check it reads right with any size.
+
+## Install Luft
+
+- `apps/setup/locales/is/setup.ftl` `setup-destination-meet-drive-description`: "Luft ræsist þaðan með eigin ræsiskrám" — check "ræsist" reads as the system starting from that drive.

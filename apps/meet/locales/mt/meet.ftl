@@ -40,6 +40,10 @@ problem-folders = Meet Luft ma setax iħares lejn il-fowlders tiegħek.
 problem-sticks = Meet Luft ma setax ifittex drajvs USB.
 problem-stick = Il-preparazzjoni tad-drajv USB ma tlestietx.
 problem-offer = Luft ma jistax jitniżżel bħalissa. Iċċekkja li int online, jew uża ISO li diġà għandek.
+problem-luft = Meet Luft ma setax iħares lejn id-drajv ta’ Luft.
+problem-resize = It-tibdil tad-daqs ta’ Luft ma tlestiex.
+problem-cancel = Meet Luft ma setax jikkanċella l-bidla.
+problem-give = Windows ma setax jieħu l-ispazju lura.
 problem-declined = { $platform ->
     [linux] Meet Luft għandu bżonn il-permess tiegħek biex jaħdem fuq id-drajv. Daħħal il-password meta jitolbok.
    *[windows] Meet Luft għandu bżonn il-permess tiegħek biex jaħdem fuq id-drajv. Agħżel Iva meta jistaqsik Windows.
@@ -94,6 +98,35 @@ room-confirm-title = Tagħti { $size } lil Luft?
 room-confirm-file = Windows iċekken id-drajv tiegħu, imbagħad Meet Luft jikkopja lil Luft mill-ISO tiegħek. Żomm il-PC imqabbad mad-dawl.
 room-confirm-download = Windows iċekken id-drajv tiegħu, imbagħad Meet Luft iniżżel lil Luft, madwar { $size }. Żomm il-PC imqabbad mad-dawl u online.
 
+## Choosing where Luft goes, when there's more than one place
+## $drive is the name of a drive, like "Samsung SSD 990 PRO", and $size a size, like "120 GB"
+
+room-places-title = Fejn għandu jmur Luft?
+room-places-description = Luft jista’ jaqsam id-drajv ta’ Windows, jew jieħu spazju li Windows ma jużax.
+room-places-label = Postijiet għal Luft
+room-place-windows = Ħdejn Windows
+room-place-windows-detail = Windows jiċċekken biex jagħti spazju lil Luft
+room-place-windows-free = Diġà hemm { $size } ħielsa hemmhekk
+room-place-free = Spazju ħieles fuq { $drive }
+room-place-free-here = Spazju ħieles fuq id-drajv ta’ Windows
+room-place-free-detail = { $size } li xejn ieħor ma jużahom
+room-place-whole = { $drive } kollu
+room-place-whole-detail = Iħassar dan id-drajv ta’ { $size } għal Luft
+room-live-free = { $free } minnu diġà ħielsa, għalhekk Windows iċedi inqas u jżomm spazju biex jikber. Luft iwarrab ukoll { $size } biex jibda minnhom, u jroddhom lura ladarba jiġi installat.
+room-live-elsewhere = Luft jieħu { $room } hemmhekk, u jwarrab { $size } oħra biex jibda minnhom, li jroddhom lura ladarba jiġi installat.
+room-confirm-free-title = Tagħti { $size } ta’ spazju ħieles lil Luft?
+room-confirm-free-file = Meet Luft jikkopja lil Luft mill-ISO tiegħek fih. Xejn ieħor fuq id-drajv ma jinbidel.
+room-confirm-free-download = Meet Luft iniżżel lil Luft fih, madwar { $size }. Xejn ieħor fuq id-drajv ma jinbidel. Żomm il-PC online.
+room-erase-title = Tħassar { $drive }?
+room-erase-description = Kollox fuq dan id-drajv ta’ { $size } jitħassar minnufih, qabel ma jibda Luft. Dan ma jistax jitreġġa’ lura. Bħalissa fuqu hemm:
+room-erase-empty = Windows ma jista’ jaqra xejn fuq dan id-drajv ta’ { $size }, imma kull ma hemm fuqu jitħassar minnufih. Dan ma jistax jitreġġa’ lura.
+room-erase-unnamed = Partizzjoni mingħajr isem
+room-erase-volume-name = { $name } ({ $letter })
+room-erase-volume = { $filesystem }, { $size }
+room-erase-bitlocker = Iċċifrata b’BitLocker
+room-erase-understood = Naf li parti minnu hija ċċifrata b’BitLocker u ma tistax tinġieb lura
+room-erase-confirm = Ħassar u agħmel spazju
+
 ## Luft is ready on Windows
 
 ready-title = Luft lest
@@ -106,6 +139,7 @@ ready-box-description = Ippakkja dokumenti, ritratti, netwerks Wi-Fi u aktar, bi
 ready-box-packed = Ippakkjat, { $size }
 ready-install-title = Installa Luft
 ready-install-description = Irristartja fl-installatur. L-ispazju ta’ { $size } ħdejn Windows diġà qed jistennieh.
+ready-install-drive-description = Irristartja fl-installatur. L-ispazju ta’ { $size } fuq { $drive } diġà qed jistennieh.
 ready-stick-description = Poġġi lil Luft fuq drajv USB biex tibdieh fuq kwalunkwe kompjuter.
 ready-remove = Neħħi lil Luft minn dan il-PC
 ready-restart-try = L-ewwel issejvja dak li qed taħdem fuqu. Luft jinfetaħ f’xi minuta, u r-restart li jmiss iġibek lura f’Windows.
@@ -131,6 +165,53 @@ linux-ready-restart-try = L-ewwel issejvja dak li qed taħdem fuqu. Luft jinfeta
 linux-ready-restart-replace = L-ewwel issejvja dak li qed taħdem fuqu. L-installatur jinfetaħ b’{ $system } magħżula biex tinbidel, u juri x’jibqa’ qabel ma jinbidel xejn.
 linux-ready-remove-title = Tneħħi lil Luft minn dan il-kompjuter?
 linux-ready-remove-description = Meet Luft iħassar il-fajls ta’ Luft, il-fajls tal-boot tiegħu u l-entrata tal-boot tiegħu. Kull ħaġa oħra tibqa’ kif inhi.
+
+## Luft is installed on this PC
+## $drive is the name of a drive, like "Samsung SSD 990 PRO", and $size a size, like "120 GB"
+
+luft-title = Luft fuq dan il-PC
+luft-looking = Meet Luft sab lil Luft fuq dan il-PC.
+luft-checking = Qed jiġi ċċekkjat id-drajv ta’ Luft…
+luft-description-beside = Luft huwa installat ħdejn Windows fuq dan il-PC.
+luft-description-drive = Luft huwa installat fuq { $drive }.
+luft-bar-used = { $size }, { $used } użati
+luft-resize-title = Ibdel kemm għandu spazju Luft
+luft-resize-description = Agħti lil Luft aktar mill-ispazju ta’ Windows, jew agħti ftit lura lil Windows.
+luft-resize-encrypted = Id-drajv ta’ Luft huwa ċċifrat, għalhekk biex jiċċaqlaq ikun hemm bżonn iċ-ċavetta tal-irkupru tiegħu. L-ewwel itfi ċ-ċċifrar tal-apparat fis-Settings ta’ Luft, imbagħad erġa’ ejja.
+luft-resize-apart = Hemm partizzjoni oħra bejn Windows u Luft, għalhekk ma jistgħux jaqsmu l-ispazju tagħhom.
+luft-resize-unreadable = Meet Luft ma setax jgħid kemm hu mimli Luft.
+luft-pending-grow = Luft jikber id-darba li jmiss li jibda
+luft-pending-grow-description = Irristartja f’Luft u ħallih mixgħul għal ftit minuti waqt li jidħol fl-ispazju l-ġdid. Tista’ tibqa’ tużah sadanittant.
+luft-pending-shrink = Luft jagħmel spazju id-darba li jmiss li jibda
+luft-pending-shrink-description = Irristartja f’Luft u ħallih mixgħul għal ftit minuti waqt li jċaqlaq il-fajls tiegħu. Imbagħad erġa’ iftaħ Meet Luft f’Windows biex Windows jieħu l-ispazju.
+luft-windows-free-title = Agħti l-ispazju ħieles lil Windows
+luft-windows-free-description = { $size } eżatt wara Windows mhuma użati minn xejn. Windows jista’ jeħodhom lura.
+luft-leftovers-title = Naddaf wara li pprovajt Luft
+luft-leftovers-description = Il-partizzjonijiet li għamel Meet Luft biex jibda lil Luft għadhom hawn. Luft m’għandux bżonnhom aktar.
+luft-start = Irristartja f’Luft
+luft-cancel = Ikkanċella l-bidla
+luft-restart = L-ewwel issejvja dak li qed taħdem fuqu. Luft jibda f’xi minuta, u r-restart li jmiss iġibek lura f’Windows.
+luft-restart-pending = L-ewwel issejvja dak li qed taħdem fuqu. Luft jibda f’xi minuta u jċaqlaq il-fajls tiegħu waħdu, u dan jieħu ftit minuti. Tista’ tużah sadanittant.
+luft-remove = Neħħi lil Luft minn dan il-PC
+luft-remove-title = Tneħħi lil Luft minn dan il-PC?
+luft-remove-description = Luft u kull ma fih jitħassru, { $size } b’kollox, u Windows jieħu l-ispazju lura. Il-PC jibda Windows bħal qabel. Dan ma jistax jitreġġa’ lura.
+luft-remove-drive-description = Luft u kull ma fih jitħassru minn { $drive }, { $size } b’kollox. Il-PC jibda Windows bħal qabel. Dan ma jistax jitreġġa’ lura.
+luft-remove-confirm = Neħħi lil Luft
+
+## Changing how much space Luft has
+## $size is a size, like "20 GB"
+
+resize-title = Kemm spazju għal Luft?
+resize-description = Kaxkar biex taqsam id-drajv bejn Windows u Luft. Luft jagħmel il-bidla hu stess id-darba li jmiss li jibda.
+resize-measuring = Windows qed jikkalkula kemm jista’ jagħti spazju. Fuq drajv kbir dan jista’ jieħu ftit minuti.
+resize-full = Luft huwa mimli wisq biex jiċċaqlaq, u Windows ma jistax jagħtih biżżejjed spazju. L-ewwel agħmel ftit spazju f’Luft jew f’Windows.
+resize-used = Il-fajls ta’ Luft jieħdu { $size }.
+resize-least = Ibdlu b’mill-inqas { $size }.
+resize-apply = Ibdlu
+resize-grow-title = Tagħti { $size } oħra lil Luft?
+resize-grow-description = Windows jiċċekken minnufih. Luft jidħol fl-ispazju l-ġdid id-darba li jmiss li jibda, u dan jieħu ftit minuti. Żomm il-PC imqabbad mad-dawl.
+resize-shrink-title = Tagħti { $size } lura lil Windows?
+resize-shrink-description = Luft iċaqlaq il-fajls tiegħu id-darba li jmiss li jibda, u dan jieħu ftit minuti. Imbagħad erġa’ iftaħ Meet Luft, u Windows jieħu l-ispazju lura. Żomm il-PC imqabbad mad-dawl.
 
 ## Packing things to take along to Luft (the moving box)
 
@@ -176,6 +257,8 @@ box-pack = Ippakkja
 
 working-shrinking = Qed isir l-ispazju
     .description = Windows qed iċaqlaq il-fajls tiegħu biex jagħmel spazju. Dan jista’ jieħu ftit minuti.
+working-erasing = Qed jitħassar id-drajv
+    .description = Windows qed inaddfu biex Luft ikollu kollu.
 working-partitioning = Qed jitħejja l-ispazju ta’ Luft
     .description = Qed jitħejjew il-partizzjonijiet li minnhom jibda Luft.
 working-downloading = Qed jinġieb Luft

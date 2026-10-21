@@ -40,6 +40,10 @@ problem-folders = Meet Luft nuk mundi t’i shikonte dosjet e tua.
 problem-sticks = Meet Luft nuk mundi të kërkonte memorie USB.
 problem-stick = Krijimi i memories USB nuk përfundoi.
 problem-offer = Luft nuk mund të shkarkohet tani. Kontrollo që je në internet ose përdor një ISO që e ke tashmë.
+problem-luft = Meet Luft nuk mundi ta shikonte diskun e Luft.
+problem-resize = Ndryshimi i madhësisë së Luft nuk përfundoi.
+problem-cancel = Meet Luft nuk mundi ta anulonte ndryshimin.
+problem-give = Windows nuk mundi ta merrte hapësirën mbrapsht.
 problem-declined = { $platform ->
     [linux] Meet Luft ka nevojë për lejen tënde për të punuar në disk. Shkruaj fjalëkalimin kur ta kërkojë.
    *[windows] Meet Luft ka nevojë për lejen tënde për të punuar në disk. Zgjidh “Po” kur ta pyesë Windows.
@@ -94,6 +98,35 @@ room-confirm-title = T’i jepen Luft { $size }?
 room-confirm-file = Windows zvogëlon diskun e tij, pastaj Meet Luft kopjon Luft nga ISO-ja jote. Mbaje PC-në në prizë.
 room-confirm-download = Windows zvogëlon diskun e tij, pastaj Meet Luft shkarkon Luft, rreth { $size }. Mbaje PC-në në prizë dhe në internet.
 
+## Choosing where Luft goes, when there's more than one place
+## $drive is the name of a drive, like "Samsung SSD 990 PRO", and $size a size, like "120 GB"
+
+room-places-title = Ku të shkojë Luft?
+room-places-description = Luft mund ta ndajë diskun me Windows ose të marrë hapësirë që Windows nuk e përdor.
+room-places-label = Vende për Luft
+room-place-windows = Pranë Windows
+room-place-windows-detail = Windows zvogëlohet për t’i bërë vend Luft
+room-place-windows-free = Aty janë të lira tashmë { $size }
+room-place-free = Hapësirë e lirë në { $drive }
+room-place-free-here = Hapësirë e lirë në diskun e Windows
+room-place-free-detail = { $size } që nuk i përdor asgjë tjetër
+room-place-whole = I gjithë disku { $drive }
+room-place-whole-detail = E fshin këtë disk prej { $size } për Luft
+room-live-free = { $free } prej tyre janë të lira tashmë, ndaj Windows jep më pak dhe mban vend për t’u rritur. Luft lë mënjanë edhe { $size } për të nisur, të cilat i kthen pasi të instalohet.
+room-live-elsewhere = Luft merr aty { $room } dhe lë mënjanë edhe { $size } për të nisur, të cilat i kthen pasi të instalohet.
+room-confirm-free-title = T’i jepen Luft { $size } hapësirë të lirë?
+room-confirm-free-file = Meet Luft kopjon aty Luft nga ISO-ja jote. Asgjë tjetër në disk nuk ndryshon.
+room-confirm-free-download = Meet Luft shkarkon aty Luft, rreth { $size }. Asgjë tjetër në disk nuk ndryshon. Mbaje PC-në në internet.
+room-erase-title = Të fshihet { $drive }?
+room-erase-description = Gjithçka në këtë disk prej { $size } fshihet menjëherë, para se të niset Luft. Kjo nuk mund të zhbëhet. Tani në të ka:
+room-erase-empty = Windows nuk mund të lexojë asgjë në këtë disk prej { $size }, por çfarëdo që ka në të fshihet menjëherë. Kjo nuk mund të zhbëhet.
+room-erase-unnamed = Ndarje pa emër
+room-erase-volume-name = { $name } ({ $letter })
+room-erase-volume = { $filesystem }, { $size }
+room-erase-bitlocker = E enkriptuar me BitLocker
+room-erase-understood = E di që një pjesë e tij është e enkriptuar me BitLocker dhe nuk mund të rikthehet
+room-erase-confirm = Fshi dhe bëj vend
+
 ## Luft is ready on Windows
 
 ready-title = Luft është gati
@@ -106,6 +139,7 @@ ready-box-description = Paketo dokumente, foto, rrjete Wi-Fi e më shumë, që L
 ready-box-packed = Paketuar, { $size }
 ready-install-title = Instalo Luft
 ready-install-description = Rinis te instaluesi. { $size } pranë Windows po e presin tashmë.
+ready-install-drive-description = Rinis te instaluesi. { $size } në { $drive } po e presin tashmë.
 ready-stick-description = Vendose Luft në një memorie USB për ta nisur në çdo kompjuter.
 ready-remove = Hiq Luft nga ky PC
 ready-restart-try = Ruaj fillimisht çfarëdo që po bën. Luft hapet për një minutë a më pak, dhe rinisja e ardhshme të kthen te Windows.
@@ -131,6 +165,53 @@ linux-ready-restart-try = Ruaj fillimisht çfarëdo që po bën. Luft hapet për
 linux-ready-restart-replace = Ruaj fillimisht çfarëdo që po bën. Instaluesi hapet me { $system } të zgjedhur për t’u zëvendësuar dhe të tregon çfarë mbetet para se të ndryshojë diçka.
 linux-ready-remove-title = Të hiqet Luft nga ky kompjuter?
 linux-ready-remove-description = Meet Luft fshin skedarët e Luft, skedarët e tij të nisjes dhe hyrjen e tij të nisjes. Gjithçka tjetër mbetet siç është.
+
+## Luft is installed on this PC
+## $drive is the name of a drive, like "Samsung SSD 990 PRO", and $size a size, like "120 GB"
+
+luft-title = Luft-i yt
+luft-looking = Meet Luft gjeti Luft në këtë PC.
+luft-checking = Po shikohet disku i Luft…
+luft-description-beside = Luft është instaluar pranë Windows në këtë PC.
+luft-description-drive = Luft është instaluar në { $drive }.
+luft-bar-used = { $size }, { $used } të përdorura
+luft-resize-title = Ndrysho sa hapësirë ka Luft
+luft-resize-description = Jepi Luft më shumë nga hapësira e Windows, ose ktheji Windows një pjesë.
+luft-resize-encrypted = Disku i Luft është i enkriptuar, ndaj zhvendosja e tij do të kërkonte çelësin e rikuperimit. Çaktivizo fillimisht enkriptimin e pajisjes te Cilësimet e Luft, pastaj kthehu.
+luft-resize-apart = Mes Windows dhe Luft ndodhet një ndarje tjetër, ndaj ata nuk mund ta ndajnë hapësirën.
+luft-resize-unreadable = Meet Luft nuk mundi të përcaktonte sa i mbushur është Luft.
+luft-pending-grow = Luft zgjerohet herën tjetër që niset
+luft-pending-grow-description = Rinis në Luft dhe lëre ndezur për disa minuta, ndërsa zhvendoset në hapësirën e re. Ndërkohë mund ta përdorësh.
+luft-pending-shrink = Luft bën vend herën tjetër që niset
+luft-pending-shrink-description = Rinis në Luft dhe lëre ndezur për disa minuta, ndërsa zhvendos skedarët e vet. Pastaj hap sërish Meet Luft në Windows për t’ia dhënë hapësirën Windows.
+luft-windows-free-title = Jepi Windows hapësirën e lirë
+luft-windows-free-description = { $size } menjëherë pas Windows nuk përdoren nga asgjë. Windows mund t’i marrë mbrapsht.
+luft-leftovers-title = Pastro pas provës së Luft
+luft-leftovers-description = Ndarjet që krijoi Meet Luft për të nisur Luft janë ende këtu. Luft nuk ka më nevojë për to.
+luft-start = Rinis në Luft
+luft-cancel = Anulo ndryshimin
+luft-restart = Ruaj fillimisht çfarëdo që po bën. Luft niset për një minutë a më pak, dhe rinisja e ardhshme të kthen te Windows.
+luft-restart-pending = Ruaj fillimisht çfarëdo që po bën. Luft niset për një minutë a më pak dhe i zhvendos vetë skedarët e tij, gjë që zgjat disa minuta. Ndërkohë mund ta përdorësh.
+luft-remove = Hiq Luft nga ky PC
+luft-remove-title = Të hiqet Luft nga ky PC?
+luft-remove-description = Luft dhe gjithçka në të fshihen, { $size } gjithsej, dhe Windows e merr hapësirën mbrapsht. PC-ja nis Windows si më parë. Kjo nuk mund të zhbëhet.
+luft-remove-drive-description = Luft dhe gjithçka në të fshihen nga { $drive }, { $size } gjithsej. PC-ja nis Windows si më parë. Kjo nuk mund të zhbëhet.
+luft-remove-confirm = Hiq Luft
+
+## Changing how much space Luft has
+## $size is a size, like "20 GB"
+
+resize-title = Sa hapësirë për Luft?
+resize-description = Tërhiq për ta ndarë diskun mes Windows dhe Luft. Luft e bën vetë ndryshimin herën tjetër që niset.
+resize-measuring = Windows po llogarit sa vend mund të lirojë. Në një disk të madh kjo mund të zgjasë disa minuta.
+resize-full = Luft është shumë i mbushur për t’u zhvendosur, dhe Windows nuk mund të lirojë vend të mjaftueshëm për të. Bëj fillimisht pak vend në Luft ose në Windows.
+resize-used = Skedarët e Luft zënë { $size }.
+resize-least = Ndryshoje të paktën me { $size }.
+resize-apply = Ndryshoje
+resize-grow-title = T’i jepen Luft edhe { $size }?
+resize-grow-description = Windows zvogëlohet menjëherë. Luft zhvendoset në hapësirën e re herën tjetër që niset, gjë që zgjat disa minuta. Mbaje PC-në në prizë.
+resize-shrink-title = T’i kthehen Windows { $size }?
+resize-shrink-description = Luft i zhvendos skedarët e tij herën tjetër që niset, gjë që zgjat disa minuta. Pastaj hap sërish Meet Luft, dhe Windows e merr hapësirën mbrapsht. Mbaje PC-në në prizë.
 
 ## Packing things to take along to Luft (the moving box)
 
@@ -167,6 +248,8 @@ box-pack = Paketo
 
 working-shrinking = Po bëhet vend
     .description = Windows po zhvendos skedarët e tij për të liruar hapësirë. Kjo mund të zgjasë disa minuta.
+working-erasing = Po fshihet disku
+    .description = Windows po e pastron që Luft ta ketë të tërin.
 working-partitioning = Po përgatitet hapësira e Luft
     .description = Po përgatiten ndarjet nga të cilat niset Luft.
 working-downloading = Po sillet Luft

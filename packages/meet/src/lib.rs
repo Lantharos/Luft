@@ -1,6 +1,7 @@
 pub mod handoff;
 pub mod moving_box;
 pub mod regional;
+pub mod resize;
 pub mod system;
 pub mod wifi;
 

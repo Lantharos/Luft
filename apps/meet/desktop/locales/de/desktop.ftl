@@ -33,6 +33,9 @@ check-space-free = { $size } GB frei
 check-space-free-linux = Luft belegt beim Ausprobieren etwa { $size } GB.
 check-space-up-to = Bis zu { $size } GB für Luft
 check-space-up-to-detail = Windows behält seine Dateien und Platz zum Wachsen.
+check-space-free-already = Davon sind schon { $size } GB frei, also gibt Windows weniger ab.
+check-space-other-drive = Auf { $drive } ist Platz dafür.
+check-space-erase-drive = Auf { $drive } ist Platz dafür, sobald dieser Datenträger gelöscht ist.
 check-space-short = Nicht genug freier Speicherplatz
 check-space-short-windows = Luft braucht etwa { $needed } GB, die Windows abgeben kann. Gib in Windows { $missing } GB frei, zum Beispiel mit der Datenträgerbereinigung, und prüf dann erneut.
 check-space-short-linux = Luft braucht etwa { $needed } GB zum Starten. Gib { $missing } GB frei und prüf dann erneut.
@@ -130,7 +133,10 @@ helper-not-ready-to-start-linux = Luft ist noch nicht startbereit. Bereite es zu
 helper-update-unfinished = Das Aktualisieren von Luft wurde nicht abgeschlossen. Aktualisiere es zuerst erneut.
 helper-room-too-small = Luft braucht mehr Platz.
 helper-room-shortfall = Windows kann { $available } GB abgeben, und Luft braucht { $needed } GB.
+helper-gap-shortfall = Dieser Bereich fasst { $available } GB, und Luft braucht { $needed } GB.
+helper-place-gone = Dieser Platz ist nicht mehr frei. Prüf erneut, um zu sehen, wo Luft hinpasst.
 helper-box-shortfall = Windows kann noch { $available } GB abgeben, und deine Auswahl braucht { $needed } GB.
+helper-box-room-shortfall = Im Platz von Luft sind noch { $available } GB übrig, und deine Auswahl braucht { $needed } GB.
 helper-bluetooth-unreadable = Die Bluetooth-Einstellungen von Windows konnten nicht geöffnet werden
 helper-registry-not-opened = { $key } konnte nicht geöffnet werden: { $error }
 helper-registry-not-changed = { $value } konnte nicht geändert werden: { $error }
@@ -159,7 +165,6 @@ drive-windows-partition-missing = Die Partition von Windows wurde nicht gefunden
 drive-volume-missing = Das Volume { $path } wurde nicht gefunden
 drive-storage-error = { $what } (Windows-Speicherfehler { $code })
 drive-shrink-size-unknown = Windows konnte nicht ermitteln, wie klein seine Partition werden kann
-drive-grow-size-unknown = Windows konnte nicht ermitteln, wie groß seine Partition werden kann
 drive-resize-failed = Windows konnte die Größe seiner Partition nicht ändern
 drive-create-failed = Windows konnte keine Partition für Luft anlegen
 drive-hide-failed = Windows konnte die neue Partition nicht aus dem Explorer heraushalten
@@ -178,6 +183,9 @@ drive-new-live-no-volume = Die neue Partition von Luft hat kein Volume
 drive-partitions-not-noted = Die Partitionen von Luft fehlen in den Notizen von Meet Luft
 drive-partitions-gone = Die Partitionen von Luft sind verschwunden
 drive-partition-gone = Eine Partition ist verschwunden
+drive-gone = Ein Datenträger ist verschwunden
+drive-erase-failed = Windows konnte den Datenträger nicht löschen
+drive-erased-no-room = Auf dem gelöschten Datenträger ist kein Platz für Luft
 drive-start-partition-foreign = Die Startpartition von Luft wurde nicht von Meet Luft angelegt
 drive-start-partition-gone = Die Startpartition von Luft ist weg
 drive-start-partition-not-listed = Die Startpartition von Luft steht nicht in der Partitionstabelle
@@ -190,6 +198,14 @@ drive-esp-no-guid = Die EFI-Systempartition hat keine GUID
 drive-no-uuid = Der Datenträger, auf dem Luft liegt, hat keine UUID
 drive-folder-unreadable = Luft kann nicht von dem Datenträger starten, auf dem deine Dateien liegen.
 drive-folder-not-startable = Von { $folder } kann nicht gestartet werden
+
+## Errors while changing Luft once it's installed
+
+luft-gone = Luft ist nicht mehr auf diesem PC
+luft-not-resizable = Die Größe von Luft lässt sich gerade nicht von Windows aus ändern
+luft-size-not-allowed = So groß oder klein kann Luft nicht sein
+luft-space-promised = Dieser Platz ist für Luft zurückgelegt. Brich zuerst die Änderung ab.
+luft-no-start-entry = Der Starteintrag von Luft wurde nicht gefunden
 
 ## Errors while getting Luft
 

@@ -70,3 +70,7 @@ Strings in Luft's Polish translation that a native speaker should check, each li
 - `apps/meet/locales/pl/meet.ftl` `check-action-tidy`: "Uporządkuj" — button for removing stale boot entries; check it's clear enough next to the explanation.
 - `apps/meet/desktop/locales/pl/desktop.ftl` `check-secure-boot-restart-into`: "…gdzie ta opcja jest w { $place }" — $place is an English firmware menu path ("Security, a potem Secure Boot"); check the preposition reads well with it.
 - `apps/meet/desktop/locales/pl/desktop.ftl` `helper-pipe-hijacked`: "{ $pipe } otworzyło coś innego niż pomocnik Meet Luft" — word order chosen so $pipe needs no case.
+- `apps/meet/locales/pl/meet.ftl` `room-erase-bitlocker`: "Szyfrowanie BitLocker" — a noun instead of "Zaszyfrowana funkcją BitLocker", so it fits next to any partition without gender agreement; check it reads as a state on the partition row.
+- `apps/meet/locales/pl/meet.ftl` `room-place-free-detail`: "{ $size } miejsca, którego nic innego nie używa" — "miejsca" added so the relative clause doesn't depend on the number in $size; check it isn't too long for a detail line.
+- `apps/meet/locales/pl/meet.ftl` `luft-bar-used`: "{ $size }, zajęte: { $used }" — colon form keeps $used in the nominative; check it reads naturally under the space bar.
+- `apps/meet/desktop/locales/pl/desktop.ftl` `helper-box-room-shortfall`: "Miejsce systemu Luft pomieści jeszcze { $available } GB…" — "Luft’s room" rendered as the space set aside for Luft; check it's clear this is the room Meet Luft made.

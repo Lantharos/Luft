@@ -21,6 +21,7 @@ changes, so tests can start over by deleting state/NAME.
 
   HEADLESS=0        show a window
   MEMORY=8192       memory in MB
+  SECOND=64G        add an empty second drive of that size, kept in state/NAME
 
 Control it with apps/meet/vm/control.py NAME.
 USAGE
@@ -60,7 +61,15 @@ prepare() {
   fi
 }
 
+second_drive() {
+  second=()
+  [[ -n "${SECOND:-}" ]] || return 0
+  [[ -f "$vm/second.qcow2" ]] || qemu-img create -q -f qcow2 "$vm/second.qcow2" "$SECOND"
+  second=(-drive "if=none,id=second,format=qcow2,cache=unsafe,discard=unmap,file=$vm/second.qcow2" -device "nvme,serial=MEETVM0002,drive=second")
+}
+
 prepare
+second_drive
 
 mkdir -p "$sockets"
 rm -f "$sockets"/*.sock
@@ -77,6 +86,7 @@ qemu-system-x86_64 -machine q35,accel=kvm,smm=on -cpu host,-svm,-vmx,hv_relaxed,
   -drive "if=pflash,format=qcow2,readonly=on,file=$ovmf/OVMF_CODE_4M.secboot.qcow2" \
   -drive "if=pflash,format=qcow2,file=$vm/vars.qcow2" \
   -drive "if=none,id=nvme,format=qcow2,cache=unsafe,discard=unmap,file=$vm/disk.qcow2" -device "nvme,serial=MEETVM0001,drive=nvme$disk_boot" \
+  "${second[@]}" \
   -chardev "socket,id=tpm,path=$sockets/tpm.sock" -tpmdev emulator,id=tpm,chardev=tpm -device tpm-tis,tpmdev=tpm \
   -device qemu-xhci,id=usb -device usb-tablet,bus=usb.0 -device usb-kbd,bus=usb.0 \
   "${installer[@]}" \

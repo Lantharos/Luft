@@ -32,6 +32,9 @@ check-space-free = Brīvi { $size } GB
 check-space-free-linux = Izmēģinājuma laikā Luft aizņem aptuveni { $size } GB.
 check-space-up-to = Līdz { $size } GB sistēmai Luft
 check-space-up-to-detail = Windows patur savus failus un vietu augšanai.
+check-space-free-already = No tās { $size } GB jau ir brīvi, tāpēc Windows atdod mazāk.
+check-space-other-drive = Diskā { $drive } tai ir vieta.
+check-space-erase-drive = Diskā { $drive } tai ir vieta, kad šis disks būs izdzēsts.
 check-space-short = Nepietiek brīvas vietas
 check-space-short-windows = Luft vajag aptuveni { $needed } GB, ko Windows var atvēlēt. Atbrīvojiet sistēmā Windows { $missing } GB, piemēram, ar Diska tīrīšanu, un pēc tam pārbaudiet vēlreiz.
 check-space-short-linux = Luft startēšanai vajag aptuveni { $needed } GB. Atbrīvojiet { $missing } GB un pēc tam pārbaudiet vēlreiz.
@@ -128,7 +131,10 @@ helper-not-ready-to-start-linux = Luft vēl nav gatava startēšanai. Vispirms s
 helper-update-unfinished = Luft atjaunināšana netika pabeigta. Vispirms atjauniniet to vēlreiz.
 helper-room-too-small = Luft vajag vairāk vietas.
 helper-room-shortfall = Windows var atvēlēt { $available } GB, bet Luft vajag { $needed } GB.
+helper-gap-shortfall = Šajā vietā ir { $available } GB, bet Luft vajag { $needed } GB.
+helper-place-gone = Šī vieta vairs nav brīva. Pārbaudiet vēlreiz, kur Luft ietilpst.
 helper-box-shortfall = Windows var atvēlēt vēl { $available } GB, bet izvēlētajām lietām vajag { $needed } GB.
+helper-box-room-shortfall = Luft vietā var atvēlēt { $available } GB, bet izvēlētajām lietām vajag { $needed } GB.
 helper-bluetooth-unreadable = Windows Bluetooth iestatījumus nevarēja atvērt
 helper-registry-not-opened = Nevarēja atvērt reģistra atslēgu { $key }: { $error }
 helper-registry-not-changed = Nevarēja mainīt reģistra vērtību { $value }: { $error }
@@ -155,7 +161,6 @@ drive-windows-partition-missing = Windows nodalījums netika atrasts
 drive-volume-missing = Sējums { $path } netika atrasts
 drive-storage-error = { $what } (Windows krātuves kļūda { $code })
 drive-shrink-size-unknown = Windows nevarēja noteikt, cik mazu var padarīt savu nodalījumu
-drive-grow-size-unknown = Windows nevarēja noteikt, cik lielu var padarīt savu nodalījumu
 drive-resize-failed = Windows nevarēja mainīt sava nodalījuma lielumu
 drive-create-failed = Windows nevarēja izveidot nodalījumu sistēmai Luft
 drive-hide-failed = Windows nevarēja paslēpt jauno nodalījumu no Failu pārlūka
@@ -174,6 +179,9 @@ drive-new-live-no-volume = Luft jaunajam nodalījumam nav sējuma
 drive-partitions-not-noted = Luft nodalījumu nav Meet Luft piezīmēs
 drive-partitions-gone = Luft nodalījumi pazuda
 drive-partition-gone = Viens nodalījums pazuda
+drive-gone = Viens disks pazuda
+drive-erase-failed = Windows nevarēja izdzēst disku
+drive-erased-no-room = Izdzēstajā diskā nav vietas sistēmai Luft
 drive-start-partition-foreign = Luft startēšanas nodalījumu nav izveidojusi Meet Luft
 drive-start-partition-gone = Luft startēšanas nodalījuma vairs nav
 drive-start-partition-not-listed = Luft startēšanas nodalījuma nav nodalījumu tabulā
@@ -186,6 +194,14 @@ drive-esp-no-guid = EFI sistēmas nodalījumam nav GUID
 drive-no-uuid = Diskam, kurā glabājas Luft, nav UUID
 drive-folder-unreadable = Luft nevar startēt no diska, kurā ir jūsu faili.
 drive-folder-not-startable = No { $folder } nevar startēt
+
+## Errors while changing Luft once it's installed
+
+luft-gone = Luft vairs nav šajā datorā
+luft-not-resizable = Luft lielumu pašlaik nevar mainīt no Windows
+luft-size-not-allowed = Luft nevar būt šādā lielumā
+luft-space-promised = Šī vieta ir rezervēta sistēmai Luft. Vispirms atceliet izmaiņu.
+luft-no-start-entry = Luft startēšanas ieraksts netika atrasts
 
 ## Errors while getting Luft
 

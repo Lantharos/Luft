@@ -68,3 +68,4 @@ Strings in Luft's Danish translation that a native speaker should check: terms w
 - `apps/meet/locales/da/meet.ftl` `box-folder-downloads`: "Overførsler" — Windows' Danish name for the Downloads folder; check it is still what current Windows 11 shows.
 - `apps/meet/desktop/locales/da/desktop.ftl` `check-secure-boot-off-detail`: "spil med anti-snyd kræver det" — »anti-cheat« is often left in English by Danish gamers.
 - `apps/meet/desktop/locales/da/desktop.ftl` `drive-volume-missing`: "Diskenheden { $path } blev ikke fundet" — »volume« as Windows' »diskenhed«; check it reads naturally in these error lines.
+- `apps/meet/locales/da/meet.ftl` `luft-title`: "Dit Luft" — the installed system as neuter, while a build is »den nyeste Luft«; check the gender doesn't jar next to it.

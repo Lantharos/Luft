@@ -83,6 +83,7 @@ export interface Hints {
 export interface MeetSurvey {
 	drive: string;
 	space: Space | null;
+	otherDrive: boolean;
 	intent: Intent;
 	movingBox: { bytes: number; fullName: string | null; userName: string | null } | null;
 }

@@ -35,6 +35,7 @@ stage_changes() {
   rm -rf "$stage"
   mkdir -p "$stage/root"
   install -Dm755 "$installer/target/release/luft-installer" "$stage/root/usr/libexec/luft-installer"
+  install -Dm644 -t "$stage/root/usr/lib/systemd/system" "$installer"/data/luft-installer*.service
   "$luft/security/scripts/build.sh" "$stage/root"
   (cd "$luft" && bun install --frozen-lockfile)
   sabine install --bundle --system-wide --root "$stage/root" "$luft/apps/setup"
@@ -45,6 +46,7 @@ ARG BASE
 FROM ${BASE}
 COPY root/ /
 RUN systemctl --global enable luft-carried-tools.service && \
+    systemctl enable luft-installer-reclaim.service luft-installer-resize.service luft-installer-expire-setup.service && \
     dnf install -y qemu-guest-agent && dnf clean all && \
     echo '(typepermissive virt_qemu_ga_t)' >/tmp/guest-agent.cil && semodule -i /tmp/guest-agent.cil && rm /tmp/guest-agent.cil
 CONTAINERFILE

@@ -41,6 +41,10 @@ problem-folders = Meet Luft no ha podido revisar tus carpetas.
 problem-sticks = Meet Luft no ha podido buscar unidades USB.
 problem-stick = No se ha podido terminar de crear la memoria.
 problem-offer = Ahora mismo no se puede descargar Luft. Comprueba que tienes conexión o usa una ISO que ya tengas.
+problem-luft = Meet Luft no ha podido examinar el disco de Luft.
+problem-resize = No se ha podido terminar de cambiar el tamaño de Luft.
+problem-cancel = Meet Luft no ha podido cancelar el cambio.
+problem-give = Windows no ha podido recuperar el espacio.
 problem-declined = { $platform ->
     [linux] Meet Luft necesita tu permiso para trabajar en el disco. Escribe tu contraseña cuando te la pida.
    *[windows] Meet Luft necesita tu permiso para trabajar en el disco. Elige Sí cuando Windows te lo pregunte.
@@ -95,6 +99,35 @@ room-confirm-title = ¿Dar { $size } a Luft?
 room-confirm-file = Windows reduce su disco y luego Meet Luft copia Luft desde tu ISO. Mantén el PC enchufado.
 room-confirm-download = Windows reduce su disco y luego Meet Luft descarga Luft, unos { $size }. Mantén el PC enchufado y con conexión.
 
+## Choosing where Luft goes, when there's more than one place
+## $drive is the name of a drive, like "Samsung SSD 990 PRO", and $size a size, like "120 GB"
+
+room-places-title = ¿Dónde quieres poner Luft?
+room-places-description = Luft puede compartir el disco de Windows o usar espacio que Windows no utiliza.
+room-places-label = Ubicaciones para Luft
+room-place-windows = Junto a Windows
+room-place-windows-detail = Windows se reduce para dejar espacio a Luft
+room-place-windows-free = Ya hay { $size } libres
+room-place-free = Espacio libre en { $drive }
+room-place-free-here = Espacio libre en el disco de Windows
+room-place-free-detail = { $size } que no usa nada más
+room-place-whole = Todo el disco { $drive }
+room-place-whole-detail = Borra este disco de { $size } para Luft
+room-live-free = Ya hay { $free } libres, así que Windows cede menos y conserva espacio para crecer. Luft también reserva { $size } para arrancar, que devuelve una vez instalado.
+room-live-elsewhere = Luft obtiene ahí { $room } y reserva { $size } más para arrancar, que devuelve una vez instalado.
+room-confirm-free-title = ¿Dar a Luft { $size } de espacio libre?
+room-confirm-free-file = Meet Luft copia Luft en él desde tu ISO. No cambia nada más en el disco.
+room-confirm-free-download = Meet Luft descarga Luft en él, unos { $size }. No cambia nada más en el disco. Mantén el PC con conexión.
+room-erase-title = ¿Borrar { $drive }?
+room-erase-description = Todo lo que hay en este disco de { $size } se borra de inmediato, antes de que arranque Luft. No se puede deshacer. Ahora contiene:
+room-erase-empty = Windows no puede leer nada en este disco de { $size }, pero lo que haya en él se borra de inmediato. No se puede deshacer.
+room-erase-unnamed = Partición sin nombre
+room-erase-volume-name = { $name } ({ $letter })
+room-erase-volume = { $filesystem }, { $size }
+room-erase-bitlocker = Cifrada con BitLocker
+room-erase-understood = Sé que una parte está cifrada con BitLocker y no se podrá recuperar
+room-erase-confirm = Borrar y hacer sitio
+
 ## Luft is ready on Windows
 
 ready-title = Luft está listo
@@ -107,6 +140,7 @@ ready-box-description = Empaqueta documentos, fotos, redes Wi-Fi y más, para qu
 ready-box-packed = Empaquetado, { $size }
 ready-install-title = Instalar Luft
 ready-install-description = Reinicia en el instalador. Los { $size } junto a Windows ya lo están esperando.
+ready-install-drive-description = Reinicia en el instalador. Los { $size } de { $drive } ya lo están esperando.
 ready-stick-description = Pon Luft en una memoria USB para arrancarlo en cualquier ordenador.
 ready-remove = Quitar Luft de este PC
 ready-restart-try = Guarda antes lo que estés haciendo. Luft se abre en un minuto más o menos, y el siguiente reinicio te devuelve a Windows.
@@ -133,6 +167,53 @@ linux-ready-restart-try = Guarda antes lo que estés haciendo. Luft se abre en u
 linux-ready-restart-replace = Guarda antes lo que estés haciendo. El instalador se abre con { $system } elegido para sustituirlo, y te muestra lo que se conserva antes de cambiar nada.
 linux-ready-remove-title = ¿Quitar Luft de este ordenador?
 linux-ready-remove-description = Meet Luft elimina los archivos de Luft, sus archivos de arranque y su entrada de arranque. Todo lo demás se queda como está.
+
+## Luft is installed on this PC
+## $drive is the name of a drive, like "Samsung SSD 990 PRO", and $size a size, like "120 GB"
+
+luft-title = Tu Luft
+luft-looking = Meet Luft ha encontrado Luft en este PC.
+luft-checking = Examinando el disco de Luft…
+luft-description-beside = Luft está instalado junto a Windows en este PC.
+luft-description-drive = Luft está instalado en { $drive }.
+luft-bar-used = { $size }, { $used } en uso
+luft-resize-title = Cambiar el espacio de Luft
+luft-resize-description = Da a Luft más espacio de Windows o devuelve una parte a Windows.
+luft-resize-encrypted = El disco de Luft está cifrado, así que para moverlo haría falta su clave de recuperación. Desactiva antes el cifrado de dispositivo en la Configuración de Luft y vuelve después.
+luft-resize-apart = Hay otra partición entre Windows y Luft, así que no pueden compartir su espacio.
+luft-resize-unreadable = Meet Luft no ha podido saber cuánto espacio ocupa Luft.
+luft-pending-grow = Luft crecerá la próxima vez que arranque
+luft-pending-grow-description = Reinicia en Luft y déjalo encendido unos minutos mientras se instala en el nuevo espacio. Mientras tanto puedes seguir usándolo.
+luft-pending-shrink = Luft hará sitio la próxima vez que arranque
+luft-pending-shrink-description = Reinicia en Luft y déjalo encendido unos minutos mientras mueve sus archivos. Después vuelve a abrir Meet Luft en Windows para darle el espacio a Windows.
+luft-windows-free-title = Dar el espacio libre a Windows
+luft-windows-free-description = Justo después de Windows hay { $size } que no usa nada. Windows puede recuperarlos.
+luft-leftovers-title = Limpiar lo que quedó al probar Luft
+luft-leftovers-description = Las particiones que Meet Luft creó para arrancar Luft siguen aquí. Luft ya no las necesita.
+luft-start = Reiniciar en Luft
+luft-cancel = Cancelar el cambio
+luft-restart = Guarda antes lo que estés haciendo. Luft arranca en un minuto más o menos, y el siguiente reinicio te devuelve a Windows.
+luft-restart-pending = Guarda antes lo que estés haciendo. Luft arranca en un minuto más o menos y mueve sus archivos por sí solo, lo que tarda unos minutos. Mientras tanto puedes usarlo.
+luft-remove = Quitar Luft de este PC
+luft-remove-title = ¿Quitar Luft de este PC?
+luft-remove-description = Se elimina Luft con todo lo que contiene, { $size } en total, y Windows recupera el espacio. El PC arranca Windows como antes. No se puede deshacer.
+luft-remove-drive-description = Se elimina Luft de { $drive } con todo lo que contiene, { $size } en total. El PC arranca Windows como antes. No se puede deshacer.
+luft-remove-confirm = Quitar Luft
+
+## Changing how much space Luft has
+## $size is a size, like "20 GB"
+
+resize-title = ¿Cuánto espacio para Luft?
+resize-description = Arrastra para repartir el disco entre Windows y Luft. Luft hace el cambio por sí mismo la próxima vez que arranque.
+resize-measuring = Windows está calculando cuánto espacio puede ceder. En un disco grande puede tardar unos minutos.
+resize-full = Luft está demasiado lleno para moverlo y Windows no puede ceder suficiente espacio. Haz antes algo de sitio en Luft o en Windows.
+resize-used = Los archivos de Luft ocupan { $size }.
+resize-least = Cambia el tamaño en al menos { $size }.
+resize-apply = Cambiar
+resize-grow-title = ¿Dar { $size } más a Luft?
+resize-grow-description = Windows se reduce de inmediato. Luft se instala en el nuevo espacio la próxima vez que arranque, lo que tarda unos minutos. Mantén el PC enchufado.
+resize-shrink-title = ¿Devolver { $size } a Windows?
+resize-shrink-description = Luft mueve sus archivos la próxima vez que arranque, lo que tarda unos minutos. Después vuelve a abrir Meet Luft y Windows recuperará el espacio. Mantén el PC enchufado.
 
 ## Packing things to take along to Luft (the moving box)
 
@@ -170,6 +251,8 @@ box-pack = Empaquetar
 
 working-shrinking = Haciendo sitio
     .description = Windows está moviendo sus archivos para dejar espacio. Puede tardar unos minutos.
+working-erasing = Borrando el disco
+    .description = Windows lo vacía para que Luft pueda usarlo entero.
 working-partitioning = Preparando el espacio de Luft
     .description = Preparando las particiones desde las que arranca Luft.
 working-downloading = Trayendo Luft

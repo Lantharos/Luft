@@ -32,6 +32,9 @@ check-space-free = Вільно { $size } ГБ
 check-space-free-linux = Поки ви пробуєте Luft, він займає приблизно { $size } ГБ.
 check-space-up-to = До { $size } ГБ для Luft
 check-space-up-to-detail = Windows зберігає свої файли й місце для зростання.
+check-space-free-already = З них { $size } ГБ уже вільно, тож Windows віддає менше.
+check-space-other-drive = Для нього є місце на диску { $drive }.
+check-space-erase-drive = Для нього є місце на диску { $drive }, якщо стерти цей диск.
 check-space-short = Недостатньо вільного місця
 check-space-short-windows = Luft потрібно приблизно { $needed } ГБ, які може віддати Windows. Звільніть у Windows { $missing } ГБ, наприклад за допомогою «Очищення диска», а потім перевірте знову.
 check-space-short-linux = Для запуску Luft потрібно приблизно { $needed } ГБ. Звільніть { $missing } ГБ, а потім перевірте знову.
@@ -132,7 +135,10 @@ helper-not-ready-to-start-linux = Luft ще не готовий до запус�
 helper-update-unfinished = Не вдалося завершити оновлення Luft. Спершу оновіть його ще раз.
 helper-room-too-small = Luft потрібно більше місця.
 helper-room-shortfall = Windows може віддати { $available } ГБ, а Luft потрібно { $needed } ГБ.
+helper-gap-shortfall = У цьому місці { $available } ГБ, а Luft потрібно { $needed } ГБ.
+helper-place-gone = Це місце вже не вільне. Перевірте знову, щоб дізнатися, де поміститься Luft.
 helper-box-shortfall = Windows може віддати ще { $available } ГБ, а вибраним речам потрібно { $needed } ГБ.
+helper-box-room-shortfall = У місці для Luft знайдеться ще { $available } ГБ, а вибраним речам потрібно { $needed } ГБ.
 helper-bluetooth-unreadable = Не вдалося відкрити параметри Bluetooth у Windows
 helper-registry-not-opened = Не вдалося відкрити { $key }: { $error }
 helper-registry-not-changed = Не вдалося змінити { $value }: { $error }
@@ -159,7 +165,6 @@ drive-windows-partition-missing = Розділ Windows не знайдено
 drive-volume-missing = Том { $path } не знайдено
 drive-storage-error = { $what } (помилка сховища Windows { $code })
 drive-shrink-size-unknown = Windows не може визначити, наскільки можна зменшити її розділ
-drive-grow-size-unknown = Windows не може визначити, наскільки можна збільшити її розділ
 drive-resize-failed = Windows не може змінити розмір свого розділу
 drive-create-failed = Windows не може створити розділ для Luft
 drive-hide-failed = Windows не може приховати новий розділ у Провіднику файлів
@@ -178,6 +183,9 @@ drive-new-live-no-volume = У нового розділу Luft немає том
 drive-partitions-not-noted = У записах Meet Luft немає розділів Luft
 drive-partitions-gone = Розділи Luft зникли
 drive-partition-gone = Розділ зник
+drive-gone = Диск зник
+drive-erase-failed = Windows не може стерти диск
+drive-erased-no-room = На стертому диску немає місця для Luft
 drive-start-partition-foreign = Розділ запуску Luft створено не за допомогою Meet Luft
 drive-start-partition-gone = Розділ запуску Luft зник
 drive-start-partition-not-listed = Розділу запуску Luft немає в таблиці розділів
@@ -190,6 +198,14 @@ drive-esp-no-guid = У системного розділу EFI немає GUID
 drive-no-uuid = У диска, на якому зберігається Luft, немає UUID
 drive-folder-unreadable = Luft не може запуститися з диска, на якому зберігаються ваші файли.
 drive-folder-not-startable = З { $folder } не можна запуститися
+
+## Errors while changing Luft once it's installed
+
+luft-gone = Luft більше немає на цьому ПК
+luft-not-resizable = Зараз розмір Luft не можна змінити з Windows
+luft-size-not-allowed = Luft не може мати такий розмір
+luft-space-promised = Це місце зарезервовано для Luft. Спершу скасуйте зміну.
+luft-no-start-entry = Запис запуску Luft не знайдено
 
 ## Errors while getting Luft
 

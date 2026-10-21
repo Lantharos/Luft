@@ -34,6 +34,7 @@ To run the Windows build, put `meet.exe` in a folder with a `resources` folder h
 ```sh
 vm/run.sh base             # installs Windows 11 from vm/state/windows11-eval.iso, unattended
 vm/run.sh plain            # a copy of it to test in; delete vm/state/plain to start over
+SECOND=64G vm/run.sh two   # with an empty second drive
 vm/control.py plain wait   # until Windows is up
 vm/control.py plain run 'Get-Partition'
 vm/control.py plain screenshot shot.png

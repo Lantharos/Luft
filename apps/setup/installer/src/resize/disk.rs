@@ -1,0 +1,209 @@
+use std::path::Path;
+
+use anyhow::{Context, Result};
+use luft_disks::mounting;
+use luft_disks::udisks::snapshot::{self, Drive};
+use luft_disks::udisks::volumes::{Segment, Volume};
+use luft_disks::udisks::{self, PARTITION, TABLE, no_options};
+
+use super::plan::Span;
+use crate::system::command::Tool;
+use crate::system::wait;
+
+const PHYSICAL_ROOT: &str = "/sysroot";
+const STARTUP_FILESYSTEM: &str = "vfat";
+
+pub struct Part {
+    pub span: Span,
+    pub block: String,
+    pub device: String,
+    pub kind: String,
+    pub label: String,
+    pub fs_uuid: String,
+    pub uuid: String,
+    pub filesystem: String,
+    pub encrypted: bool,
+}
+
+pub struct Disk {
+    pub id: String,
+    pub table: String,
+    pub parts: Vec<Part>,
+    pub free: Vec<Span>,
+}
+
+fn canonical(device: &str) -> String {
+    std::fs::canonicalize(device)
+        .map_or_else(|_| device.to_owned(), |path| path.display().to_string())
+}
+
+fn part(volume: &Volume) -> Part {
+    Part {
+        span: Span {
+            offset: volume.offset,
+            size: volume.size,
+        },
+        block: volume.block.clone(),
+        device: canonical(&volume.device),
+        kind: volume
+            .partition_type
+            .clone()
+            .unwrap_or_default()
+            .to_ascii_lowercase(),
+        label: volume.label.clone(),
+        fs_uuid: volume.uuid.clone(),
+        uuid: volume.partition_uuid.to_ascii_lowercase(),
+        filesystem: volume.fs_type.clone(),
+        encrypted: volume.encryption.is_some(),
+    }
+}
+
+fn describe(drive: &Drive) -> Disk {
+    let mut parts = Vec::new();
+    let mut free = Vec::new();
+    for segment in &drive.segments {
+        match segment {
+            Segment::Volume(volume) => parts.push(part(volume)),
+            Segment::Free { offset, size } => free.push(Span {
+                offset: *offset,
+                size: *size,
+            }),
+        }
+    }
+    Disk {
+        id: drive.id.clone(),
+        table: drive.block.clone(),
+        parts,
+        free,
+    }
+}
+
+fn drives() -> Result<Vec<Drive>> {
+    let objects = wait(udisks::objects()).map_err(anyhow::Error::msg)?;
+    Ok(snapshot::build(&objects).drives)
+}
+
+fn beneath_mapping(device: &str) -> Option<String> {
+    let name = Path::new(device).file_name()?.to_str()?;
+    let mut below = std::fs::read_dir(format!("/sys/class/block/{name}/slaves")).ok()?;
+    let partition = below.next()?.ok()?.file_name();
+    below
+        .next()
+        .is_none()
+        .then(|| format!("/dev/{}", partition.to_string_lossy()))
+}
+
+pub fn root_device() -> Result<String> {
+    let source = Tool::new("findmnt")
+        .args([
+            "--noheadings",
+            "--nofsroot",
+            "--output",
+            "SOURCE",
+            "--target",
+        ])
+        .arg(PHYSICAL_ROOT)
+        .output()?;
+    let device = canonical(source.trim());
+    Ok(beneath_mapping(&device).unwrap_or(device))
+}
+
+pub fn holding(device: &str) -> Result<Disk> {
+    drives()?
+        .iter()
+        .map(describe)
+        .find(|disk| disk.parts.iter().any(|part| part.device == device))
+        .context("Luft's partition isn't on any drive")
+}
+
+pub fn read(id: &str) -> Result<Disk> {
+    drives()?
+        .iter()
+        .find(|drive| drive.id == id)
+        .map(describe)
+        .with_context(|| format!("The drive {id} is gone"))
+}
+
+impl Disk {
+    pub fn at(&self, offset: u64) -> Option<&Part> {
+        self.parts.iter().find(|part| part.span.offset == offset)
+    }
+
+    pub fn holding(&self, device: &str) -> Option<&Part> {
+        self.parts.iter().find(|part| part.device == device)
+    }
+
+    pub fn before(&self, offset: u64) -> Option<&Part> {
+        self.parts.iter().find(|part| part.span.end() == offset)
+    }
+
+    pub fn free_before(&self, offset: u64) -> Option<Span> {
+        self.free.iter().copied().find(|span| span.end() == offset)
+    }
+
+    pub fn create(&self, span: Span, kind: &str, name: &str) -> Result<()> {
+        wait(udisks::created(
+            &self.table,
+            TABLE,
+            "CreatePartition",
+            &(span.offset, span.size, kind, name, no_options()),
+        ))
+        .map_err(anyhow::Error::msg)
+        .with_context(|| format!("A partition couldn't be made at {}", span.offset))?;
+        Ok(())
+    }
+}
+
+impl Part {
+    fn changed(&self, result: Result<(), String>) -> Result<()> {
+        result
+            .map_err(anyhow::Error::msg)
+            .with_context(|| format!("{} couldn't be changed", self.device))
+    }
+
+    fn set(&self, method: &str, value: &str) -> Result<()> {
+        self.changed(wait(udisks::run(
+            &self.block,
+            PARTITION,
+            method,
+            &(value, no_options()),
+        )))
+    }
+
+    pub fn resize(&self, size: u64) -> Result<()> {
+        self.changed(wait(udisks::run(
+            &self.block,
+            PARTITION,
+            "Resize",
+            &(size, no_options()),
+        )))
+    }
+
+    pub fn set_type(&self, kind: &str) -> Result<()> {
+        if self.kind == kind {
+            return Ok(());
+        }
+        self.set("SetType", kind)
+    }
+
+    pub fn set_uuid(&self, uuid: &str) -> Result<()> {
+        if self.uuid == uuid {
+            return Ok(());
+        }
+        self.set("SetUUID", uuid)
+    }
+
+    pub fn delete(&self) -> Result<()> {
+        if self.filesystem == STARTUP_FILESYSTEM {
+            wait(mounting::release(&self.block)).map_err(anyhow::Error::msg)?;
+        }
+        wait(udisks::run(
+            &self.block,
+            PARTITION,
+            "Delete",
+            &(no_options(),),
+        ))
+        .map_err(anyhow::Error::msg)
+        .with_context(|| format!("{} couldn't be removed", self.device))
+    }
+}

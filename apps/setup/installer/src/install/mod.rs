@@ -28,7 +28,7 @@ use crate::survey::linux;
 use crate::system::wait;
 
 use crate::L10N;
-use crate::meet::{self, reclaim, unpack};
+use crate::meet::{self, reclaim, start, unpack};
 
 const PREPARED: f64 = 0.04;
 const COPIED: f64 = 0.96;
@@ -202,6 +202,10 @@ fn install(job: &Job, report: &impl Fn(Status)) -> Result<()> {
         COPIED
     };
     report(Status::at(Stage::Copying, PREPARED));
+    let hidden = match &job.destination {
+        Destination::Partitions(plan) => start::Hidden::while_copying(job.meet.as_ref(), plan)?,
+        Destination::Replace(_) => None,
+    };
     copy::run(job.image, &mounted, |done| {
         report(Status::at(
             Stage::Copying,
@@ -209,6 +213,7 @@ fn install(job: &Job, report: &impl Fn(Status)) -> Result<()> {
         ))
     })
     .with_context(|| t!(L10N, "installer-copy-failed"))?;
+    drop(hidden);
     startup::place(&mounted, &job.target.with_extension("esp"))?;
     report(Status::at(Stage::Waiting, copied));
     let (regional, account) = job

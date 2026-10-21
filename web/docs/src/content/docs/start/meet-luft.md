@@ -19,7 +19,13 @@ Meet Luft downloads the newest Luft, which works with any graphics card and inst
 ## On Windows
 
 1. **It checks the PC.** Luft needs a 64-bit Intel or AMD processor, UEFI and a GPT drive. Meet Luft also looks at Secure Boot, the TPM, BitLocker, Fast Startup, free space, the graphics card and the Wi-Fi chip, and says what each means for you. When Secure Boot is off, it explains where to turn it on for your PC's maker and can restart straight into the firmware settings. Start entries left behind by systems you removed long ago, such as an old Ubuntu, can be tidied away here too.
-2. **It makes room.** Windows makes its own partition smaller, the same way Disk Management does, so this works with BitLocker on. Then Meet Luft downloads Luft, checks it against its checksum, and unpacks it as it arrives.
+2. **It makes room.** Windows makes its own partition smaller, the same way Disk Management does, so this works with BitLocker on. Free space right after Windows counts first, so Windows only gives up what's missing. Then Meet Luft downloads Luft, checks it against its checksum, and unpacks it as it arrives.
+
+   When there's another place for Luft, Meet Luft lets you pick it instead:
+   - **Free space** that nothing uses, on Windows' drive or another one. Luft gets all of it and nothing else changes.
+   - **Another drive**, erased for Luft. Meet Luft names the drive and lists what's on it, with labels, drive letters, sizes and BitLocker, and asks before erasing anything. The drive Windows starts from and USB drives are never offered.
+
+   On a drive of its own, Luft gets its own start files, so your PC starts it from that drive.
 3. **It restarts into Luft.** Luft starts through Fedora's signed boot loader, so Secure Boot can stay on. The restart after that goes back to Windows.
    - **Try Luft** opens the desktop. Nothing is installed.
    - **Install Luft** opens the installer with **Alongside Windows** already chosen, in the room Meet Luft made, and your language, time zone and keyboard already filled in from Windows. **More options** shows the other ways to install. Nothing on the drive changes until you confirm there.
@@ -38,6 +44,14 @@ It asks for your password once, when it first looks at the computer. When Luft i
 - **Try Luft** opens the desktop.
 - **Replace** opens the installer with your current system chosen, explains what stays and what changes, and does nothing until you confirm. See [Replacing another Linux](/start/replace-linux/).
 - **Install Luft** opens the installer to put Luft on another drive or in free space.
+
+## Once Luft is installed
+
+When you open Meet Luft on a PC that has Luft, it shows **Your Luft**:
+
+- **Change how much space Luft has** gives Luft more of Windows' space, or gives some back. Windows makes itself smaller right away; Luft moves into the space the next time it starts and takes a few minutes, while you can keep using it. To give space back, Luft moves its files first, then Meet Luft hands the space to Windows when you open it again. Luft needs some free room to move, and an encrypted Luft can't be moved from Windows: turn off device encryption in Luft first.
+- **Give Windows the free space** extends Windows into unused space right after it.
+- **Remove Luft from this PC** deletes Luft, its start files and its start entry, and gives Windows the space back. It asks first, and doesn't need a recovery key even when Luft is encrypted.
 
 ## Getting a newer Luft
 
@@ -65,4 +79,4 @@ When Luft runs from Meet Luft, it saves its logs where Meet Luft keeps it, so a 
 
 ## Taking it back out
 
-**Remove Luft from this PC** deletes everything Meet Luft added and gives Windows its space back. On Linux, **Remove Luft from this computer** deletes the folder and the start entry. Once Luft is installed and you sign in for the first time, it removes Meet Luft's leftovers itself and grows into their space.
+**Remove Luft from this PC** deletes everything Meet Luft added and gives Windows its space back. On Linux, **Remove Luft from this computer** deletes the folder and the start entry. Once Luft is installed and you sign in for the first time, it removes Meet Luft's leftovers itself and grows into their space. To take out an installed Luft, see [Once Luft is installed](#once-luft-is-installed).

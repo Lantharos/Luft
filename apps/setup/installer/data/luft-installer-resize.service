@@ -1,0 +1,16 @@
+[Unit]
+Description=Change Luft's size the way Meet Luft asked from Windows
+After=local-fs.target dbus.service
+ConditionPathExists=|/sys/firmware/efi/efivars/LuftResize-b6a4c1e2-3f5d-4c8a-9e71-2d0f6a8b5c3e
+ConditionPathExists=|/var/lib/luft-installer/resize.json
+ConditionPathExists=!/var/lib/trustd/encryption.json
+
+[Service]
+Type=exec
+ExecStart=/usr/libexec/luft-installer resize
+SELinuxContext=system_u:system_r:install_t:s0
+SyslogIdentifier=luft-installer
+TimeoutStopSec=1min
+
+[Install]
+WantedBy=multi-user.target

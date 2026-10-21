@@ -33,6 +33,9 @@ check-space-free = { $size } GB ledig
 check-space-free-linux = Luft tek om lag { $size } GB medan du prøver det.
 check-space-up-to = Opptil { $size } GB til Luft
 check-space-up-to-detail = Windows held på filene sine og plass til å vekse.
+check-space-free-already = Av dette er { $size } GB alt ledig, så Windows gjev frå seg mindre.
+check-space-other-drive = Det er plass til det på { $drive }.
+check-space-erase-drive = Det er plass til det på { $drive } når den disken er sletta.
 check-space-short = Ikkje nok ledig plass
 check-space-short-windows = Luft treng om lag { $needed } GB som Windows kan gje frå seg. Frigjer { $missing } GB i Windows, til dømes med Diskopprydding, og sjekk igjen.
 check-space-short-linux = Luft treng om lag { $needed } GB å starte frå. Frigjer { $missing } GB, og sjekk igjen.
@@ -131,7 +134,10 @@ helper-not-ready-to-start-linux = Luft er ikkje klart til å starte enno. Gjer d
 helper-update-unfinished = Oppdateringa av Luft vart ikkje fullført. Oppdater det på nytt først.
 helper-room-too-small = Luft treng meir plass enn det.
 helper-room-shortfall = Windows kan gje frå seg { $available } GB, og Luft treng { $needed } GB.
+helper-gap-shortfall = Den plassen har { $available } GB, og Luft treng { $needed } GB.
+helper-place-gone = Den plassen er ikkje ledig lenger. Sjekk igjen for å sjå kvar Luft får plass.
 helper-box-shortfall = Windows kan gje frå seg { $available } GB til, og dette treng { $needed } GB.
+helper-box-room-shortfall = Plassen til Luft kan gje frå seg { $available } GB, og dette treng { $needed } GB.
 helper-bluetooth-unreadable = Bluetooth-innstillingane i Windows kunne ikkje opnast
 helper-registry-not-opened = Kunne ikkje opne { $key }: { $error }
 helper-registry-not-changed = Kunne ikkje endre { $value }: { $error }
@@ -160,7 +166,6 @@ drive-windows-partition-missing = Fann ikkje partisjonen til Windows
 drive-volume-missing = Fann ikkje volumet { $path }
 drive-storage-error = { $what } (lagringsfeil { $code } i Windows)
 drive-shrink-size-unknown = Windows kunne ikkje finne ut kor liten partisjonen kan bli
-drive-grow-size-unknown = Windows kunne ikkje finne ut kor stor partisjonen kan bli
 drive-resize-failed = Windows kunne ikkje endre storleiken på partisjonen sin
 drive-create-failed = Windows kunne ikkje lage ein partisjon til Luft
 drive-hide-failed = Windows kunne ikkje halde den nye partisjonen utanfor Filutforsker
@@ -179,6 +184,9 @@ drive-new-live-no-volume = Den nye partisjonen til Luft har ikkje noko volum
 drive-partitions-not-noted = Partisjonane til Luft manglar i notata til Meet Luft
 drive-partitions-gone = Partisjonane til Luft har forsvunne
 drive-partition-gone = Ein partisjon har forsvunne
+drive-gone = Ein disk har forsvunne
+drive-erase-failed = Windows kunne ikkje slette disken
+drive-erased-no-room = Den sletta disken har ikkje plass til Luft
 drive-start-partition-foreign = Oppstartspartisjonen til Luft er ikkje laga av Meet Luft
 drive-start-partition-gone = Oppstartspartisjonen til Luft er borte
 drive-start-partition-not-listed = Oppstartspartisjonen til Luft står ikkje i partisjonstabellen
@@ -191,6 +199,14 @@ drive-esp-no-guid = EFI-systempartisjonen har ingen GUID
 drive-no-uuid = Disken som Luft ligg på, har ingen UUID
 drive-folder-unreadable = Luft kan ikkje starte frå disken som filene dine ligg på.
 drive-folder-not-startable = { $folder } kan ikkje startast frå
+
+## Errors while changing Luft once it's installed
+
+luft-gone = Luft er ikkje lenger på denne datamaskinen
+luft-not-resizable = Storleiken på Luft kan ikkje endrast frå Windows akkurat no
+luft-size-not-allowed = Luft kan ikkje ha den storleiken
+luft-space-promised = Den plassen er sett av til Luft. Avbryt endringa først.
+luft-no-start-entry = Fann ikkje oppstartsoppføringa til Luft
 
 ## Errors while getting Luft
 

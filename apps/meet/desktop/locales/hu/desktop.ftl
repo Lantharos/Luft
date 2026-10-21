@@ -32,6 +32,9 @@ check-space-free = { $size } GB szabad
 check-space-free-linux = A Luft a kipróbálás alatt nagyjából { $size } GB-ot foglal.
 check-space-up-to = Legfeljebb { $size } GB a Luftnak
 check-space-up-to-detail = A Windows megtartja a fájljait és a bővüléshez szükséges helyet.
+check-space-free-already = Ebből { $size } GB már szabad, így a Windows kevesebbet ad át.
+check-space-other-drive = Van hely a számára ezen a meghajtón: { $drive }.
+check-space-erase-drive = Van hely a számára ezen a meghajtón, ha törlik: { $drive }.
 check-space-short = Nincs elég szabad hely
 check-space-short-windows = A Luftnak nagyjából { $needed } GB kell, amelyet a Windows át tud adni. Szabadítson fel { $missing } GB-ot a Windowsban, például a Lemezkarbantartóval, majd ellenőrizze újra.
 check-space-short-linux = A Luftnak nagyjából { $needed } GB kell az induláshoz. Szabadítson fel { $missing } GB-ot, majd ellenőrizze újra.
@@ -126,7 +129,10 @@ helper-not-ready-to-start-linux = A Luft még nem áll készen az indulásra. El
 helper-update-unfinished = A Luft frissítése nem fejeződött be. Előbb frissítse újra.
 helper-room-too-small = A Luftnak ennél több hely kell.
 helper-room-shortfall = A Windows { $available } GB-ot tud átadni, a Luftnak pedig { $needed } GB kell.
+helper-gap-shortfall = Azon a helyen { $available } GB fér el, a Luftnak pedig { $needed } GB kell.
+helper-place-gone = Az a hely már nem szabad. Ellenőrizze újra, hová fér a Luft.
 helper-box-shortfall = A Windows még { $available } GB-ot tud átadni, a kiválasztott elemeknek pedig { $needed } GB kell.
+helper-box-room-shortfall = A Luft helyéből { $available } GB adható át, a kiválasztott elemeknek pedig { $needed } GB kell.
 helper-bluetooth-unreadable = A Windows Bluetooth-beállításai nem nyithatók meg
 helper-registry-not-opened = Nem nyitható meg: { $key } ({ $error })
 helper-registry-not-changed = Nem módosítható: { $value } ({ $error })
@@ -153,7 +159,6 @@ drive-windows-partition-missing = A Windows partíciója nem található
 drive-volume-missing = A kötet nem található: { $path }
 drive-storage-error = { $what } (Windows-tárolási hiba: { $code })
 drive-shrink-size-unknown = A Windows nem tudta megállapítani, mennyire kicsinyíthető a partíciója
-drive-grow-size-unknown = A Windows nem tudta megállapítani, mennyire nagyobbítható a partíciója
 drive-resize-failed = A Windows nem tudta átméretezni a partícióját
 drive-create-failed = A Windows nem tudott partíciót létrehozni a Luftnak
 drive-hide-failed = A Windows nem tudta elrejteni az új partíciót a Fájlkezelő elől
@@ -172,6 +177,9 @@ drive-new-live-no-volume = A Luft új partíciójának nincs kötete
 drive-partitions-not-noted = A Luft partíciói hiányoznak a Meet Luft feljegyzéseiből
 drive-partitions-gone = A Luft partíciói eltűntek
 drive-partition-gone = Egy partíció eltűnt
+drive-gone = Egy meghajtó eltűnt
+drive-erase-failed = A Windows nem tudta törölni a meghajtót
+drive-erased-no-room = A törölt meghajtón nincs hely a Luftnak
 drive-start-partition-foreign = A Luft indítópartícióját nem a Meet Luft hozta létre
 drive-start-partition-gone = A Luft indítópartíciója eltűnt
 drive-start-partition-not-listed = A Luft indítópartíciója nincs a partíciós táblában
@@ -184,6 +192,14 @@ drive-esp-no-guid = Az EFI-rendszerpartíciónak nincs GUID-ja
 drive-no-uuid = A meghajtónak, amelyen a Luft van, nincs UUID-ja
 drive-folder-unreadable = A Luft nem tud arról a meghajtóról indulni, amelyen a fájljai vannak.
 drive-folder-not-startable = Erről nem lehet indítani: { $folder }
+
+## Errors while changing Luft once it's installed
+
+luft-gone = A Luft már nincs ezen a PC-n
+luft-not-resizable = A Luft mérete most nem módosítható a Windowsból
+luft-size-not-allowed = A Luft nem lehet ekkora
+luft-space-promised = Ez a hely a Luftnak van félretéve. Előbb vonja vissza a módosítást.
+luft-no-start-entry = A Luft indítási bejegyzése nem található
 
 ## Errors while getting Luft
 

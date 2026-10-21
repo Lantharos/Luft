@@ -32,6 +32,9 @@ check-space-free = Voľné miesto: { $size } GB
 check-space-free-linux = Počas skúšania zaberie Luft asi { $size } GB.
 check-space-up-to = Až { $size } GB pre Luft
 check-space-up-to-detail = Windows si ponechá svoje súbory aj miesto na rast.
+check-space-free-already = Z toho je už voľných { $size } GB, takže Windows uvoľní menej.
+check-space-other-drive = Miesto preň je na disku { $drive }.
+check-space-erase-drive = Miesto preň je na disku { $drive }, keď sa tento disk vymaže.
 check-space-short = Nedostatok voľného miesta
 check-space-short-windows = Luft potrebuje asi { $needed } GB, ktoré môže Windows uvoľniť. Uvoľnite vo Windows { $missing } GB, napríklad pomocou Čistenia disku, a potom skontrolujte znova.
 check-space-short-linux = Luft potrebuje na spustenie asi { $needed } GB. Uvoľnite { $missing } GB a potom skontrolujte znova.
@@ -130,7 +133,10 @@ helper-not-ready-to-start-linux = Luft ešte nie je pripravený na spustenie. Na
 helper-update-unfinished = Aktualizáciu systému Luft sa nepodarilo dokončiť. Najprv ho aktualizujte znova.
 helper-room-too-small = Luft potrebuje viac miesta.
 helper-room-shortfall = Windows môže uvoľniť { $available } GB a Luft potrebuje { $needed } GB.
+helper-gap-shortfall = Toto miesto má { $available } GB a Luft potrebuje { $needed } GB.
+helper-place-gone = Toto miesto už nie je voľné. Skontrolujte znova, kam sa Luft zmestí.
 helper-box-shortfall = Windows môže uvoľniť ešte { $available } GB a vybrané veci potrebujú { $needed } GB.
+helper-box-room-shortfall = V mieste pre Luft je voľných ešte { $available } GB a vybrané veci potrebujú { $needed } GB.
 helper-bluetooth-unreadable = Nastavenia Bluetooth vo Windows sa nepodarilo otvoriť
 helper-registry-not-opened = Nepodarilo sa otvoriť { $key }: { $error }
 helper-registry-not-changed = Nepodarilo sa zmeniť { $value }: { $error }
@@ -157,7 +163,6 @@ drive-windows-partition-missing = Oddiel systému Windows sa nenašiel
 drive-volume-missing = Zväzok { $path } sa nenašiel
 drive-storage-error = { $what } (chyba úložiska Windows { $code })
 drive-shrink-size-unknown = Windows nevie zistiť, ako veľmi sa dá jeho oddiel zmenšiť
-drive-grow-size-unknown = Windows nevie zistiť, ako veľmi sa dá jeho oddiel zväčšiť
 drive-resize-failed = Windows nevie zmeniť veľkosť svojho oddielu
 drive-create-failed = Windows nevie vytvoriť oddiel pre Luft
 drive-hide-failed = Windows nevie skryť nový oddiel v Prieskumníkovi
@@ -176,6 +181,9 @@ drive-new-live-no-volume = Nový oddiel systému Luft nemá zväzok
 drive-partitions-not-noted = Oddiely systému Luft chýbajú v záznamoch aplikácie Meet Luft
 drive-partitions-gone = Oddiely systému Luft zmizli
 drive-partition-gone = Oddiel zmizol
+drive-gone = Disk zmizol
+drive-erase-failed = Windows nevie vymazať disk
+drive-erased-no-room = Na vymazanom disku nie je miesto pre Luft
 drive-start-partition-foreign = Spúšťací oddiel systému Luft nevytvorila aplikácia Meet Luft
 drive-start-partition-gone = Spúšťací oddiel systému Luft zmizol
 drive-start-partition-not-listed = Spúšťací oddiel systému Luft nie je v tabuľke oddielov
@@ -188,6 +196,14 @@ drive-esp-no-guid = Systémový oddiel EFI nemá GUID
 drive-no-uuid = Disk, na ktorom je Luft uložený, nemá UUID
 drive-folder-unreadable = Luft sa nemôže spustiť z disku, na ktorom sú vaše súbory.
 drive-folder-not-startable = Z { $folder } sa nedá spustiť systém
+
+## Errors while changing Luft once it's installed
+
+luft-gone = Luft už v tomto počítači nie je
+luft-not-resizable = Veľkosť systému Luft sa teraz nedá zmeniť z Windows
+luft-size-not-allowed = Luft nemôže mať takú veľkosť
+luft-space-promised = Toto miesto je vyhradené pre Luft. Najprv zrušte zmenu.
+luft-no-start-entry = Položka spúšťania systému Luft sa nenašla
 
 ## Errors while getting Luft
 

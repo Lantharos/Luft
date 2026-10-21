@@ -32,6 +32,9 @@ check-space-free = Wolne: { $size } GB
 check-space-free-linux = Podczas wypróbowywania Luft zajmuje około { $size } GB.
 check-space-up-to = Do { $size } GB dla systemu Luft
 check-space-up-to-detail = Windows zachowuje swoje pliki i miejsce na rozwój.
+check-space-free-already = Wolne jest już { $size } GB, więc Windows oddaje mniej.
+check-space-other-drive = Na dysku { $drive } jest miejsce dla systemu Luft.
+check-space-erase-drive = Po wymazaniu dysku { $drive } będzie na nim miejsce dla systemu Luft.
 check-space-short = Za mało wolnego miejsca
 check-space-short-windows = Luft potrzebuje około { $needed } GB, które Windows może oddać. Zwolnij { $missing } GB w systemie Windows, na przykład za pomocą Oczyszczania dysku, a potem sprawdź ponownie.
 check-space-short-linux = Luft potrzebuje około { $needed } GB, aby się uruchomić. Zwolnij { $missing } GB, a potem sprawdź ponownie.
@@ -130,7 +133,10 @@ helper-not-ready-to-start-linux = Luft nie jest jeszcze gotowy do uruchomienia. 
 helper-update-unfinished = Nie udało się dokończyć aktualizacji systemu Luft. Najpierw zaktualizuj go ponownie.
 helper-room-too-small = Luft potrzebuje więcej miejsca.
 helper-room-shortfall = Windows może oddać { $available } GB, a Luft potrzebuje { $needed } GB.
+helper-gap-shortfall = To miejsce ma { $available } GB, a Luft potrzebuje { $needed } GB.
+helper-place-gone = To miejsce nie jest już wolne. Sprawdź ponownie, gdzie zmieści się Luft.
 helper-box-shortfall = Windows może oddać jeszcze { $available } GB, a wybrane rzeczy potrzebują { $needed } GB.
+helper-box-room-shortfall = Miejsce systemu Luft pomieści jeszcze { $available } GB, a wybrane rzeczy potrzebują { $needed } GB.
 helper-bluetooth-unreadable = Nie udało się otworzyć ustawień Bluetooth systemu Windows
 helper-registry-not-opened = Nie udało się otworzyć { $key }: { $error }
 helper-registry-not-changed = Nie udało się zmienić { $value }: { $error }
@@ -157,7 +163,6 @@ drive-windows-partition-missing = Nie znaleziono partycji systemu Windows
 drive-volume-missing = Nie znaleziono woluminu { $path }
 drive-storage-error = { $what } (błąd magazynu systemu Windows { $code })
 drive-shrink-size-unknown = Windows nie może ustalić, do jakiego rozmiaru można zmniejszyć jego partycję
-drive-grow-size-unknown = Windows nie może ustalić, do jakiego rozmiaru można powiększyć jego partycję
 drive-resize-failed = Windows nie może zmienić rozmiaru swojej partycji
 drive-create-failed = Windows nie może utworzyć partycji dla systemu Luft
 drive-hide-failed = Windows nie może ukryć nowej partycji w Eksploratorze plików
@@ -176,6 +181,9 @@ drive-new-live-no-volume = Nowa partycja systemu Luft nie ma woluminu
 drive-partitions-not-noted = W zapiskach Meet Luft brakuje partycji systemu Luft
 drive-partitions-gone = Partycje systemu Luft zniknęły
 drive-partition-gone = Partycja zniknęła
+drive-gone = Dysk zniknął
+drive-erase-failed = Windows nie może wymazać dysku
+drive-erased-no-room = Na wymazanym dysku nie ma miejsca na Luft
 drive-start-partition-foreign = Partycja rozruchowa systemu Luft nie została utworzona przez Meet Luft
 drive-start-partition-gone = Partycja rozruchowa systemu Luft zniknęła
 drive-start-partition-not-listed = Partycji rozruchowej systemu Luft nie ma w tablicy partycji
@@ -188,6 +196,14 @@ drive-esp-no-guid = Partycja systemowa EFI nie ma identyfikatora GUID
 drive-no-uuid = Dysk, na którym jest przechowywany Luft, nie ma identyfikatora UUID
 drive-folder-unreadable = Luft nie może uruchomić się z dysku, na którym są twoje pliki.
 drive-folder-not-startable = Nie można uruchomić systemu z { $folder }
+
+## Errors while changing Luft once it's installed
+
+luft-gone = Systemu Luft nie ma już na tym komputerze
+luft-not-resizable = Nie można teraz zmienić rozmiaru systemu Luft z poziomu systemu Windows
+luft-size-not-allowed = Luft nie może mieć takiego rozmiaru
+luft-space-promised = To miejsce jest zarezerwowane dla systemu Luft. Najpierw anuluj zmianę.
+luft-no-start-entry = Nie znaleziono wpisu rozruchowego systemu Luft
 
 ## Errors while getting Luft
 

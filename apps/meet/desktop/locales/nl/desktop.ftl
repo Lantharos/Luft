@@ -33,6 +33,9 @@ check-space-free = { $size } GB vrij
 check-space-free-linux = Luft neemt ongeveer { $size } GB in beslag terwijl je het uitprobeert.
 check-space-up-to = Tot { $size } GB voor Luft
 check-space-up-to-detail = Windows houdt zijn bestanden en ruimte om te groeien.
+check-space-free-already = Daarvan is al { $size } GB vrij, dus Windows levert minder in.
+check-space-other-drive = Er is ruimte voor op { $drive }.
+check-space-erase-drive = Er is ruimte voor op { $drive }, zodra die schijf is gewist.
 check-space-short = Niet genoeg vrije ruimte
 check-space-short-windows = Luft heeft ongeveer { $needed } GB nodig die Windows kan missen. Maak { $missing } GB vrij in Windows, bijvoorbeeld met Schijfopruiming, en controleer daarna opnieuw.
 check-space-short-linux = Luft heeft ongeveer { $needed } GB nodig om vanaf te starten. Maak { $missing } GB vrij en controleer daarna opnieuw.
@@ -130,7 +133,10 @@ helper-not-ready-to-start-linux = Luft is nog niet klaar om te starten. Zet het 
 helper-update-unfinished = Luft bijwerken is niet afgerond. Werk het eerst opnieuw bij.
 helper-room-too-small = Luft heeft meer ruimte nodig.
 helper-room-shortfall = Windows kan { $available } GB missen, en Luft heeft { $needed } GB nodig.
+helper-gap-shortfall = Die ruimte is { $available } GB groot, en Luft heeft { $needed } GB nodig.
+helper-place-gone = Die ruimte is niet meer vrij. Controleer opnieuw om te zien waar Luft past.
 helper-box-shortfall = Windows kan nog { $available } GB missen, en deze onderdelen hebben { $needed } GB nodig.
+helper-box-room-shortfall = De ruimte van Luft kan { $available } GB missen, en deze onderdelen hebben { $needed } GB nodig.
 helper-bluetooth-unreadable = De Bluetooth-instellingen van Windows konden niet worden geopend
 helper-registry-not-opened = Kon { $key } niet openen: { $error }
 helper-registry-not-changed = Kon { $value } niet wijzigen: { $error }
@@ -159,7 +165,6 @@ drive-windows-partition-missing = De partitie van Windows is niet gevonden
 drive-volume-missing = Het volume { $path } is niet gevonden
 drive-storage-error = { $what } (Windows-opslagfout { $code })
 drive-shrink-size-unknown = Windows kon niet bepalen hoe klein zijn partitie kan worden
-drive-grow-size-unknown = Windows kon niet bepalen hoe groot zijn partitie kan worden
 drive-resize-failed = Windows kon de grootte van zijn partitie niet wijzigen
 drive-create-failed = Windows kon geen partitie voor Luft maken
 drive-hide-failed = Windows kon de nieuwe partitie niet uit Verkenner houden
@@ -178,6 +183,9 @@ drive-new-live-no-volume = De nieuwe partitie van Luft heeft geen volume
 drive-partitions-not-noted = De partities van Luft ontbreken in de notities van Meet Luft
 drive-partitions-gone = De partities van Luft zijn verdwenen
 drive-partition-gone = Er is een partitie verdwenen
+drive-gone = Er is een schijf verdwenen
+drive-erase-failed = Windows kon de schijf niet wissen
+drive-erased-no-room = Op de gewiste schijf is geen ruimte voor Luft
 drive-start-partition-foreign = De opstartpartitie van Luft is niet door Meet Luft gemaakt
 drive-start-partition-gone = De opstartpartitie van Luft is weg
 drive-start-partition-not-listed = De opstartpartitie van Luft staat niet in de partitietabel
@@ -190,6 +198,14 @@ drive-esp-no-guid = De EFI-systeempartitie heeft geen GUID
 drive-no-uuid = De schijf waarop Luft staat, heeft geen UUID
 drive-folder-unreadable = Luft kan niet starten vanaf de schijf waarop je bestanden staan.
 drive-folder-not-startable = Er kan niet worden gestart vanaf { $folder }
+
+## Errors while changing Luft once it's installed
+
+luft-gone = Luft staat niet meer op deze pc
+luft-not-resizable = De grootte van Luft kan nu niet vanuit Windows worden gewijzigd
+luft-size-not-allowed = Luft kan niet zo groot of zo klein zijn
+luft-space-promised = Die ruimte is gereserveerd voor Luft. Annuleer eerst de wijziging.
+luft-no-start-entry = De opstartvermelding van Luft is niet gevonden
 
 ## Errors while getting Luft
 

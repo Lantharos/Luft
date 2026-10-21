@@ -118,7 +118,7 @@ $effect(() => {
 | `NativeVideoSurface` | Plays `src` through Sabine's native video for formats Chromium can't decode; bind `player`, handle `onfail` |
 | `RecoveryKey` | Recovery key in groups of eight with copy, `onsave` and `onprint` |
 | `Choice` | Large option button with an icon, title, description and optional `note` |
-| `SplitBar` | Draggable bar that splits a drive's space between two parts |
+| `SplitBar` | Draggable bar that splits a drive's space between two parts, with `free` showing the part of the second that's free already |
 | `FingerprintDial` | Progress ring and prompt for a `FingerprintEnrollment` |
 
 ## Helpers

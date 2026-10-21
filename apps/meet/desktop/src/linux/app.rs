@@ -15,6 +15,10 @@ pub fn call(events: &Events, call: Call) -> Result<Value, Failed> {
     link::call(events, call)
 }
 
+pub fn luft_installed() -> bool {
+    false
+}
+
 pub fn belongings() -> Result<Value, Failed> {
     Err(Failed::from(
         "Luft keeps your files in place on Linux, so there's nothing to pack.".to_owned(),

@@ -91,3 +91,7 @@ Strings in Luft's Irish translation that a native speaker should check: terms wi
 - `apps/meet/desktop/locales/ga/desktop.ftl` `helper-not-started`: "cúntóir Meet Luft" — "helper" as „cúntóir”.
 - `apps/meet/desktop/locales/ga/desktop.ftl` `check-start-entries`: "{ $count } sheaniontráil tosaithe" — mutation of a compound with „sean-” after numbers; check the forms.
 - `apps/meet/desktop/locales/ga/desktop.ftl` `check-wifi-broadcom`: "teatharáil USB" — tethering has no settled Irish term.
+- `apps/meet/locales/ga/meet.ftl` `room-live-free`, `apps/meet/desktop/locales/ga/desktop.ftl` `check-space-free-already`: "Tá { $free } de saor cheana féin" — "de" as "of it" right before "saor" may read ambiguously; check against "Tá { $free } den spás sin saor".
+- `apps/meet/locales/ga/meet.ftl` `room-erase-understood`: "Tuigim go bhfuil cuid de criptithe le BitLocker agus nach féidir í a fháil ar ais" — check the pronoun agreement with "cuid".
+- `apps/meet/locales/ga/meet.ftl` `room-erase-title`, `working-erasing`: "Glan", "Ag glanadh an tiomántáin" — "glan" follows the stick screens for erase; check it's strong enough for wiping a whole internal drive, against "scrios".
+- `apps/meet/desktop/locales/ga/desktop.ftl` `helper-box-room-shortfall`: "Is féidir le spás Luft { $available } GB a spáráil" — "spáráil" for "spare"; check it reads naturally.

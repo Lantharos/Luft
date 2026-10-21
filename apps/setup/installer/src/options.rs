@@ -25,6 +25,8 @@ pub struct Options {
 pub enum Command {
     /// Removes Meet Luft's partitions or folder and grows Luft into the space they used.
     Reclaim,
+    /// Grows Luft into space Windows gave it, or moves Luft to give Windows space back, as Meet Luft asked.
+    Resize,
     /// Counts this start toward first-run setup's limit, and ends setup once it's reached.
     ExpireSetup,
 }

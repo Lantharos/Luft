@@ -32,6 +32,9 @@ check-space-free = { $size } GB ελεύθερα
 check-space-free-linux = Το Luft πιάνει περίπου { $size } GB όσο το δοκιμάζετε.
 check-space-up-to = Έως { $size } GB για το Luft
 check-space-up-to-detail = Τα Windows κρατούν τα αρχεία τους και χώρο για να μεγαλώσουν.
+check-space-free-already = Από αυτά, τα { $size } GB είναι ήδη ελεύθερα, οπότε τα Windows παραχωρούν λιγότερα.
+check-space-other-drive = Υπάρχει χώρος γι’ αυτό στο { $drive }.
+check-space-erase-drive = Υπάρχει χώρος γι’ αυτό στο { $drive }, αφού διαγραφεί αυτός ο δίσκος.
 check-space-short = Δεν υπάρχει αρκετός ελεύθερος χώρος
 check-space-short-windows = Το Luft χρειάζεται περίπου { $needed } GB που μπορούν να διαθέσουν τα Windows. Ελευθερώστε { $missing } GB στα Windows, για παράδειγμα με την Εκκαθάριση δίσκου, και ελέγξτε ξανά.
 check-space-short-linux = Το Luft χρειάζεται περίπου { $needed } GB για να ξεκινήσει. Ελευθερώστε { $missing } GB και ελέγξτε ξανά.
@@ -126,7 +129,10 @@ helper-not-ready-to-start-linux = Το Luft δεν είναι ακόμη έτο�
 helper-update-unfinished = Η ενημέρωση του Luft δεν ολοκληρώθηκε. Ενημερώστε το ξανά πρώτα.
 helper-room-too-small = Το Luft χρειάζεται περισσότερο χώρο.
 helper-room-shortfall = Τα Windows μπορούν να διαθέσουν { $available } GB και το Luft χρειάζεται { $needed } GB.
+helper-gap-shortfall = Αυτός ο χώρος έχει { $available } GB και το Luft χρειάζεται { $needed } GB.
+helper-place-gone = Αυτός ο χώρος δεν είναι πια ελεύθερος. Ελέγξτε ξανά για να δείτε πού χωράει το Luft.
 helper-box-shortfall = Τα Windows μπορούν να διαθέσουν ακόμη { $available } GB και αυτά χρειάζονται { $needed } GB.
+helper-box-room-shortfall = Ο χώρος του Luft μπορεί να διαθέσει { $available } GB και αυτά χρειάζονται { $needed } GB.
 helper-bluetooth-unreadable = Δεν ήταν δυνατό το άνοιγμα των ρυθμίσεων Bluetooth των Windows
 helper-registry-not-opened = Δεν ήταν δυνατό το άνοιγμα του { $key }: { $error }
 helper-registry-not-changed = Δεν ήταν δυνατή η αλλαγή του { $value }: { $error }
@@ -153,7 +159,6 @@ drive-windows-partition-missing = Το διαμέρισμα των Windows δε�
 drive-volume-missing = Ο τόμος { $path } δεν βρέθηκε
 drive-storage-error = { $what } (σφάλμα αποθήκευσης των Windows { $code })
 drive-shrink-size-unknown = Τα Windows δεν μπόρεσαν να υπολογίσουν πόσο μπορεί να μικρύνει το διαμέρισμά τους
-drive-grow-size-unknown = Τα Windows δεν μπόρεσαν να υπολογίσουν πόσο μπορεί να μεγαλώσει το διαμέρισμά τους
 drive-resize-failed = Τα Windows δεν μπόρεσαν να αλλάξουν το μέγεθος του διαμερίσματός τους
 drive-create-failed = Τα Windows δεν μπόρεσαν να δημιουργήσουν διαμέρισμα για το Luft
 drive-hide-failed = Τα Windows δεν μπόρεσαν να κρύψουν το νέο διαμέρισμα από την Εξερεύνηση αρχείων
@@ -172,6 +177,9 @@ drive-new-live-no-volume = Το νέο διαμέρισμα του Luft δεν �
 drive-partitions-not-noted = Τα διαμερίσματα του Luft λείπουν από τις σημειώσεις του Meet Luft
 drive-partitions-gone = Τα διαμερίσματα του Luft εξαφανίστηκαν
 drive-partition-gone = Ένα διαμέρισμα εξαφανίστηκε
+drive-gone = Ένας δίσκος εξαφανίστηκε
+drive-erase-failed = Τα Windows δεν μπόρεσαν να διαγράψουν τον δίσκο
+drive-erased-no-room = Ο δίσκος που διαγράφηκε δεν έχει χώρο για το Luft
 drive-start-partition-foreign = Το διαμέρισμα εκκίνησης του Luft δεν το δημιούργησε το Meet Luft
 drive-start-partition-gone = Το διαμέρισμα εκκίνησης του Luft δεν υπάρχει πια
 drive-start-partition-not-listed = Το διαμέρισμα εκκίνησης του Luft δεν υπάρχει στον πίνακα διαμερισμάτων
@@ -184,6 +192,14 @@ drive-esp-no-guid = Το διαμέρισμα συστήματος EFI δεν έ
 drive-no-uuid = Ο δίσκος όπου φυλάσσεται το Luft δεν έχει UUID
 drive-folder-unreadable = Το Luft δεν μπορεί να ξεκινήσει από τον δίσκο όπου βρίσκονται τα αρχεία σας.
 drive-folder-not-startable = Δεν είναι δυνατή η εκκίνηση από τον φάκελο { $folder }
+
+## Errors while changing Luft once it's installed
+
+luft-gone = Το Luft δεν υπάρχει πια σε αυτό το PC
+luft-not-resizable = Το μέγεθος του Luft δεν μπορεί να αλλάξει από τα Windows αυτήν τη στιγμή
+luft-size-not-allowed = Το Luft δεν μπορεί να έχει αυτό το μέγεθος
+luft-space-promised = Αυτός ο χώρος είναι δεσμευμένος για το Luft. Ακυρώστε πρώτα την αλλαγή.
+luft-no-start-entry = Η καταχώριση εκκίνησης του Luft δεν βρέθηκε
 
 ## Errors while getting Luft
 

@@ -68,3 +68,6 @@ Strings in Luft's Czech translation that a native speaker should check: term cho
 - `apps/meet/locales/cs/meet.ftl` `check-blocked-description`: "Postup najdete níže." — free rendering of "Here's what to do."
 - Windows is treated as plural throughout Meet Luft ("Windows zmenší", "Windows nedokážou"), while Setup mixes "systém Windows" singular; check which a reviewer prefers.
 - `apps/meet/desktop/locales/cs/desktop.ftl` `check-secure-boot-turn-on`: "…při zobrazení loga { $maker } stisknete { $key } a přejdete do { $place }." — $key may be "tlačítko zesílení hlasitosti" and $place an English menu path; check both fit.
+- `apps/meet/locales/cs/meet.ftl` `room-erase-understood`: "Beru na vědomí, že část dat je šifrovaná nástrojem BitLocker a nepůjde obnovit" — tick-box wording in the first person; check it reads naturally next to the box.
+- `apps/meet/locales/cs/meet.ftl` `luft-resize-title`: "Změnit velikost systému Luft" — English "Change how much space Luft has"; shortened to the size of Luft, matching problem-resize.
+- `apps/meet/desktop/locales/cs/desktop.ftl` `helper-box-room-shortfall`: "Místo pro Luft může uvolnit { $available } GB a vybrané věci potřebují { $needed } GB." — "Luft's room" rendered as místo pro Luft; check the moving box shortfall is clear.

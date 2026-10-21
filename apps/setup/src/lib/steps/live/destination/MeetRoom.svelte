@@ -8,9 +8,10 @@
 		drive: Drive;
 		space: Space;
 		packed: number | null;
+		elsewhere: boolean;
 	}
 
-	let { drive, space, packed }: Props = $props();
+	let { drive, space, packed, elsewhere }: Props = $props();
 
 	let luftSize = $derived(t('setup-meet-room-luft', { size: bytes(space.size) }));
 	let windows = $derived(drive.windows && !drive.windows.blocked ? drive.windows : null);
@@ -18,7 +19,9 @@
 
 <div class="flex flex-col gap-6">
 	<div class="flex h-16 gap-1.5">
-		<div class="windows flex min-w-28 basis-0 items-end rounded-[16px] p-3 text-[13px] font-medium" style:flex-grow={drive.windows?.size ?? drive.size - space.size}>Windows</div>
+		{#if !elsewhere}
+			<div class="windows flex min-w-28 basis-0 items-end rounded-[16px] p-3 text-[13px] font-medium" style:flex-grow={drive.windows?.size ?? drive.size - space.size}>Windows</div>
+		{/if}
 		<div class="luft flex min-w-36 basis-0 items-end rounded-[16px] p-3 text-[13px] font-medium" style:flex-grow={space.size}>{luftSize}</div>
 	</div>
 	{#if packed}

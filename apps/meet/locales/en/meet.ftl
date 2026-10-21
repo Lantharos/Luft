@@ -54,6 +54,10 @@ problem-folders = Meet Luft couldn’t look through your folders.
 problem-sticks = Meet Luft couldn’t look for USB drives.
 problem-stick = Making the stick didn’t finish.
 problem-offer = Luft can’t be downloaded right now. Check that you’re online, or use an ISO you already have.
+problem-luft = Meet Luft couldn’t look at Luft’s drive.
+problem-resize = Changing Luft’s size didn’t finish.
+problem-cancel = Meet Luft couldn’t call off the change.
+problem-give = Windows couldn’t take the space back.
 # Shown when the permission prompt was turned down
 problem-declined = { $platform ->
     [linux] Meet Luft needs your permission to work on the drive. Enter your password when it asks.
@@ -115,6 +119,42 @@ room-confirm-file = Windows shrinks its drive, then Meet Luft copies Luft from y
 # $size is the download size, like "2.1 GB"
 room-confirm-download = Windows shrinks its drive, then Meet Luft downloads Luft, about { $size }. Keep the PC plugged in and online.
 
+## Choosing where Luft goes, when there's more than one place
+## $drive is the name of a drive, like "Samsung SSD 990 PRO", and $size a size, like "120 GB"
+
+room-places-title = Where should Luft go?
+room-places-description = Luft can share Windows’ drive, or take space Windows doesn’t use.
+# Screen-reader label of the list of places
+room-places-label = Places for Luft
+room-place-windows = Next to Windows
+room-place-windows-detail = Windows makes itself smaller to give Luft space
+room-place-windows-free = { $size } is free there already
+room-place-free = Free space on { $drive }
+room-place-free-here = Free space on Windows’ drive
+room-place-free-detail = { $size } that nothing else uses
+room-place-whole = All of { $drive }
+room-place-whole-detail = Erases this { $size } drive for Luft
+# $free and $size are sizes
+room-live-free = { $free } of it is free already, so Windows gives up less and keeps room to grow. Luft also sets aside { $size } to start from, which it gives back once it’s installed.
+# $room and $size are sizes
+room-live-elsewhere = Luft gets { $room } there, and sets aside { $size } more to start from, which it gives back once it’s installed.
+room-confirm-free-title = Give Luft { $size } of free space?
+room-confirm-free-file = Meet Luft copies Luft from your ISO into it. Nothing else on the drive changes.
+# $size is the download size, like "2.1 GB"
+room-confirm-free-download = Meet Luft downloads Luft, about { $size }, into it. Nothing else on the drive changes. Keep the PC online.
+room-erase-title = Erase { $drive }?
+room-erase-description = Everything on this { $size } drive is deleted right away, before Luft starts. This can’t be undone. On it now:
+room-erase-empty = Windows can’t read anything on this { $size } drive, but whatever is on it is deleted right away. This can’t be undone.
+# A partition without a name
+room-erase-unnamed = Unnamed partition
+# $name is a partition's name, like "Data", and $letter its drive letter, like "D:"
+room-erase-volume-name = { $name } ({ $letter })
+# $filesystem is like "NTFS", and $size a size, like "1.8 TB"
+room-erase-volume = { $filesystem }, { $size }
+room-erase-bitlocker = Encrypted with BitLocker
+room-erase-understood = I know some of it is encrypted with BitLocker and can’t be brought back
+room-erase-confirm = Erase and make room
+
 ## Luft is ready on Windows
 
 ready-title = Luft is ready
@@ -129,6 +169,8 @@ ready-box-packed = Packed, { $size }
 ready-install-title = Install Luft
 # $size is the space waiting for Luft, like "120 GB"
 ready-install-description = Restart into the installer. The { $size } next to Windows is already waiting for it.
+# $size is the space waiting for Luft, like "120 GB", and $drive the name of the drive it's on
+ready-install-drive-description = Restart into the installer. The { $size } on { $drive } is already waiting for it.
 ready-stick-description = Put Luft on a stick to start it on any computer.
 ready-remove = Remove Luft from this PC
 ready-restart-try = Save anything you’re working on first. Luft opens in a minute or so, and the next restart brings you back to Windows.
@@ -158,6 +200,57 @@ linux-ready-restart-try = Save anything you’re working on first. Luft opens in
 linux-ready-restart-replace = Save anything you’re working on first. The installer opens with { $system } chosen to replace, and shows what stays before anything changes.
 linux-ready-remove-title = Remove Luft from this computer?
 linux-ready-remove-description = Meet Luft deletes Luft’s files, its start files and its start entry. Everything else stays as it is.
+
+## Luft is installed on this PC
+## $drive is the name of a drive, like "Samsung SSD 990 PRO", and $size a size, like "120 GB"
+
+luft-title = Your Luft
+luft-looking = Meet Luft found Luft on this PC.
+luft-checking = Looking at Luft’s drive…
+luft-description-beside = Luft is installed next to Windows on this PC.
+luft-description-drive = Luft is installed on { $drive }.
+# $size is a partition's size and $used how much of it is taken, like "120 GB, 38 GB used"
+luft-bar-used = { $size }, { $used } used
+luft-resize-title = Change how much space Luft has
+luft-resize-description = Give Luft more of Windows’ space, or give some back to Windows.
+luft-resize-encrypted = Luft’s drive is encrypted, so moving it would need its recovery key. Turn off device encryption in Luft’s Settings first, then come back.
+luft-resize-apart = Another partition sits between Windows and Luft, so they can’t share their space.
+luft-resize-unreadable = Meet Luft couldn’t tell how full Luft is.
+luft-pending-grow = Luft grows the next time it starts
+luft-pending-grow-description = Restart into Luft and leave it on for a few minutes while it moves into the new space. You can keep using it meanwhile.
+luft-pending-shrink = Luft makes room the next time it starts
+luft-pending-shrink-description = Restart into Luft and leave it on for a few minutes while it moves its files. Then open Meet Luft in Windows again to give Windows the space.
+luft-windows-free-title = Give Windows the free space
+luft-windows-free-description = { $size } right after Windows isn’t used by anything. Windows can take it back.
+luft-leftovers-title = Clean up after trying Luft
+luft-leftovers-description = The partitions Meet Luft made to start Luft are still here. Luft doesn’t need them anymore.
+# Button, verb: restarts into Luft
+luft-start = Restart into Luft
+# Button that calls off a change Luft hasn't made yet
+luft-cancel = Cancel the change
+luft-restart = Save anything you’re working on first. Luft starts in a minute or so, and the next restart brings you back to Windows.
+luft-restart-pending = Save anything you’re working on first. Luft starts in a minute or so and moves its files on its own, which takes a few minutes. You can use it meanwhile.
+luft-remove = Remove Luft from this PC
+luft-remove-title = Remove Luft from this PC?
+luft-remove-description = Luft and everything in it is deleted, { $size } in all, and Windows gets the space back. The PC starts Windows as before. This can’t be undone.
+luft-remove-drive-description = Luft and everything in it is deleted from { $drive }, { $size } in all. The PC starts Windows as before. This can’t be undone.
+luft-remove-confirm = Remove Luft
+
+## Changing how much space Luft has
+## $size is a size, like "20 GB"
+
+resize-title = How much space for Luft?
+resize-description = Drag to share the drive between Windows and Luft. Luft makes the change itself the next time it starts.
+resize-measuring = Windows is working out how much room it can spare. On a big drive this can take a few minutes.
+resize-full = Luft is too full to move, and Windows can’t spare enough room for it. Make some room in Luft or in Windows first.
+resize-used = Luft’s files take up { $size }.
+resize-least = Change it by at least { $size }.
+# Button, verb
+resize-apply = Change it
+resize-grow-title = Give Luft { $size } more?
+resize-grow-description = Windows makes itself smaller right away. Luft moves into the new space the next time it starts, which takes a few minutes. Keep the PC plugged in.
+resize-shrink-title = Give Windows { $size } back?
+resize-shrink-description = Luft moves its files the next time it starts, which takes a few minutes. Then open Meet Luft again, and Windows takes the space back. Keep the PC plugged in.
 
 ## Packing things to take along to Luft (the moving box)
 
@@ -198,6 +291,8 @@ box-pack = Pack
 
 working-shrinking = Making room
     .description = Windows is moving its files to make space. This can take a few minutes.
+working-erasing = Erasing the drive
+    .description = Windows clears it so Luft can have all of it.
 working-partitioning = Setting up Luft’s space
     .description = Preparing the partitions Luft starts from.
 working-downloading = Bringing Luft over

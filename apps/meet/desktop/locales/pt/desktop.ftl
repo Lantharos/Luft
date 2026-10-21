@@ -33,6 +33,9 @@ check-space-free = { $size } GB livres
 check-space-free-linux = O Luft ocupa cerca de { $size } GB enquanto o experimenta.
 check-space-up-to = Até { $size } GB para o Luft
 check-space-up-to-detail = O Windows mantém os ficheiros e espaço para crescer.
+check-space-free-already = Já há { $size } GB livres, por isso o Windows cede menos.
+check-space-other-drive = Há espaço para o Luft em { $drive }.
+check-space-erase-drive = Há espaço para o Luft em { $drive }, depois de esse disco ser apagado.
 check-space-short = Não há espaço livre suficiente
 check-space-short-windows = O Luft precisa de cerca de { $needed } GB que o Windows possa dispensar. Liberte { $missing } GB no Windows, por exemplo com a Limpeza do Disco, e verifique novamente.
 check-space-short-linux = O Luft precisa de cerca de { $needed } GB para arrancar. Liberte { $missing } GB e verifique novamente.
@@ -130,7 +133,10 @@ helper-not-ready-to-start-linux = O Luft ainda não está pronto para arrancar. 
 helper-update-unfinished = A atualização do Luft não terminou. Atualize-o novamente primeiro.
 helper-room-too-small = O Luft precisa de mais espaço do que isso.
 helper-room-shortfall = O Windows pode dispensar { $available } GB e o Luft precisa de { $needed } GB.
+helper-gap-shortfall = Esse espaço tem { $available } GB e o Luft precisa de { $needed } GB.
+helper-place-gone = Esse espaço já não está livre. Verifique novamente para ver onde cabe o Luft.
 helper-box-shortfall = O Windows pode dispensar mais { $available } GB e estes itens precisam de { $needed } GB.
+helper-box-room-shortfall = O espaço do Luft pode dispensar { $available } GB e estes itens precisam de { $needed } GB.
 helper-bluetooth-unreadable = Não foi possível abrir as definições de Bluetooth do Windows
 helper-registry-not-opened = Não foi possível abrir { $key }: { $error }
 helper-registry-not-changed = Não foi possível alterar { $value }: { $error }
@@ -159,7 +165,6 @@ drive-windows-partition-missing = A partição do Windows não foi encontrada
 drive-volume-missing = O volume { $path } não foi encontrado
 drive-storage-error = { $what } (erro de armazenamento do Windows { $code })
 drive-shrink-size-unknown = O Windows não conseguiu determinar até onde a partição pode ser reduzida
-drive-grow-size-unknown = O Windows não conseguiu determinar até onde a partição pode crescer
 drive-resize-failed = O Windows não conseguiu alterar o tamanho da partição
 drive-create-failed = O Windows não conseguiu criar uma partição para o Luft
 drive-hide-failed = O Windows não conseguiu esconder a nova partição do Explorador de Ficheiros
@@ -178,6 +183,9 @@ drive-new-live-no-volume = A nova partição do Luft não tem volume
 drive-partitions-not-noted = As partições do Luft não constam dos registos do Meet Luft
 drive-partitions-gone = As partições do Luft desapareceram
 drive-partition-gone = Uma partição desapareceu
+drive-gone = Um disco desapareceu
+drive-erase-failed = O Windows não conseguiu apagar o disco
+drive-erased-no-room = O disco apagado não tem espaço para o Luft
 drive-start-partition-foreign = A partição de arranque do Luft não foi criada pelo Meet Luft
 drive-start-partition-gone = A partição de arranque do Luft já não existe
 drive-start-partition-not-listed = A partição de arranque do Luft não está na tabela de partições
@@ -190,6 +198,14 @@ drive-esp-no-guid = A partição de sistema EFI não tem GUID
 drive-no-uuid = O disco onde o Luft está guardado não tem UUID
 drive-folder-unreadable = O Luft não consegue arrancar a partir do disco onde estão os seus ficheiros.
 drive-folder-not-startable = Não é possível arrancar a partir de { $folder }
+
+## Errors while changing Luft once it's installed
+
+luft-gone = O Luft já não está neste PC
+luft-not-resizable = Neste momento não é possível alterar o tamanho do Luft a partir do Windows
+luft-size-not-allowed = O Luft não pode ter esse tamanho
+luft-space-promised = Esse espaço está reservado para o Luft. Cancele primeiro a alteração.
+luft-no-start-entry = A entrada de arranque do Luft não foi encontrada
 
 ## Errors while getting Luft
 

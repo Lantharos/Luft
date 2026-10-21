@@ -72,3 +72,6 @@ Strings in Luft's Latvian translation that a native speaker should check: terms 
 - `apps/meet/desktop/locales/lv/desktop.ftl` `check-space-short-windows`, `drive-hide-failed`: "Diska tīrīšana", "Failu pārlūks" — Windows tool names from memory; check against Latvian Windows.
 - `apps/meet/locales/lv/meet.ftl` `stick-keep`: "Paturēt abas", "Paturēt visas" — feminine, agreeing with "Luft" as a system; check it reads right for builds on a stick.
 - `apps/meet/locales/lv/meet.ftl` `problem-check`, `hello-check`: both platform variants say "dators".
+- `apps/meet/locales/lv/meet.ftl` `luft-resize-title`: "Mainīt Luft vietas apjomu" — check it reads naturally as a row title.
+- `apps/meet/locales/lv/meet.ftl` `luft-windows-free-description`: "{ $size } tieši aiz Windows netiek izmantoti." — the verb is plural to agree with a number of gigabytes; check it reads right with every size.
+- `apps/meet/desktop/locales/lv/desktop.ftl` `luft-size-not-allowed`: "Luft nevar būt šādā lielumā" — check against "Luft nevar būt tik liela".

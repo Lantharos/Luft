@@ -11,15 +11,17 @@ use luft_meet::moving_box::{
     WALLPAPER, WIFI,
 };
 
-use super::drive::storage::{BASIC_TYPE, MSFT_Partition, Storage};
+use super::drive::state::Found;
+use super::drive::storage::{self, BASIC_TYPE, MSFT_Disk, MSFT_Partition, Storage};
 use super::drive::windows_drive::{self, WindowsDrive};
 use super::drive::{record, state};
 use super::system::protected::Scratch;
 use super::system::{bluetooth, programs};
-use super::{Context, prepare};
+use super::{Context, prepare, room, windows_space};
 use crate::L10N;
 use crate::folders::{Item, verbatim, walk};
-use crate::plan::layout::{self, Role};
+use crate::plan::gap::{self, Head};
+use crate::plan::layout::{self, Plan, Role};
 use crate::plan::sizes::{self, BOX_CLUSTER};
 use crate::protocol::{Belongings, Prepared, Stage};
 
@@ -134,11 +136,59 @@ fn take_back(
     Ok(())
 }
 
+fn plan_box(
+    storage: &Storage,
+    drive: &WindowsDrive,
+    found: &Found,
+    size: u64,
+) -> Result<(Plan, MSFT_Disk), String> {
+    let room = found.room().ok_or_else(|| t!(L10N, "helper-no-room-yet"))?;
+    let layout = storage.layout(&drive.volume)?;
+    let short = |message: &str, available: u64| {
+        t!(
+            L10N,
+            message,
+            available = available >> 30,
+            needed = size.div_ceil(1 << 30)
+        )
+    };
+    if found.beside_windows(&layout) {
+        let windows = storage.windows_plan(&layout, &drive.volume)?;
+        let plan = layout::plan(
+            &layout.plan_disk(),
+            &windows,
+            room.size,
+            &[(Role::MovingBox, size)],
+        )
+        .map_err(|shortfall| {
+            short(
+                "helper-box-shortfall",
+                shortfall.available.saturating_sub(room.size),
+            )
+        })?;
+        return Ok((plan, layout.disk));
+    }
+    let disk = storage.disk(found.live.as_ref().map_or(0, |live| live.DiskNumber))?;
+    let partitions = storage.partitions_of(disk.Number)?;
+    let smallest = sizes::smallest_luft(storage::esp_size(&partitions, &found.made));
+    let gap = gap::gaps(&room::disk_plan(&disk, &partitions))
+        .into_iter()
+        .find(|gap| gap.offset <= room.offset && room.offset < gap.end())
+        .unwrap_or(room);
+    let plan =
+        gap::inside(gap, Head::Room { smallest }, &[(Role::MovingBox, size)]).map_err(|_| {
+            short(
+                "helper-box-room-shortfall",
+                gap.size.saturating_sub(smallest),
+            )
+        })?;
+    Ok((plan, disk))
+}
+
 pub fn pack(context: &Context, belongings: &Belongings) -> Result<Prepared, String> {
     let storage = Storage::open()?;
     let drive = windows_drive::find()?;
-    let layout = storage.layout(&drive.volume)?;
-    let found = state::find(&layout);
+    let found = state::find(&storage.all_partitions()?);
     let (Some(mut handoff), Some(live)) = (found.handoff.clone(), found.live_path()) else {
         return Err(t!(L10N, "helper-no-room-yet"));
     };
@@ -219,32 +269,14 @@ pub fn pack(context: &Context, belongings: &Belongings) -> Result<Prepared, Stri
     items.extend(bluetooth_names);
     let total: u64 = items.iter().map(|item| item.size).sum();
 
-    let layout = storage.layout(&drive.volume)?;
-    let windows = storage.windows_plan(&layout, &drive.volume)?;
-    let windows_before = layout.windows.Size;
-    let room = handoff.room().map_or(0, |room| room.size);
+    let windows_before = storage.layout(&drive.volume)?.windows.Size;
     let size = sizes::moving_box(items.len() as u64, total);
-    let plan = layout::plan(
-        &layout.plan_disk(),
-        &windows,
-        room,
-        &[(Role::MovingBox, size)],
-    )
-    .map_err(|shortfall| {
-        t!(
-            L10N,
-            "helper-box-shortfall",
-            available = shortfall.available.saturating_sub(room) >> 30,
-            needed = size.div_ceil(1 << 30)
-        )
-    })?;
-    if plan.windows_size < layout.windows.Size {
-        context.progress(Stage::Shrinking, 0, 1);
-        storage.resize(&layout.windows, plan.windows_size)?;
-        context.progress(Stage::Shrinking, 1, 1);
+    let (plan, disk) = plan_box(&storage, &drive, &found, size)?;
+    if let Some(size) = plan.windows_size {
+        let windows = storage.layout(&drive.volume)?.windows;
+        windows_space::shrink(context, &storage, &windows, size)?;
     }
-    let layout = storage.layout(&drive.volume)?;
-    let partition = storage.create(&layout, plan.partitions[0].span, BASIC_TYPE)?;
+    let partition = storage.create(&disk, plan.partitions[0].span, BASIC_TYPE)?;
     record::made_partition(
         &partition
             .guid()
@@ -259,12 +291,12 @@ pub fn pack(context: &Context, belongings: &Belongings) -> Result<Prepared, Stri
     drop(staging);
     if let Some(made) = handoff.partitions_mut() {
         made.moving_box = partition.guid();
-        made.room = Some(luft_meet::Room {
+        made.room = made.room.map(|room| luft_meet::Room {
             offset: plan.room.offset,
             size: plan.room.size,
+            ..room
         });
     }
     state::write_handoff(&live, &handoff)?;
-    let layout = storage.layout(&drive.volume)?;
-    prepare::prepared(&state::find(&layout)).ok_or_else(|| t!(L10N, "drive-partitions-gone"))
+    prepare::now_prepared(&storage)
 }

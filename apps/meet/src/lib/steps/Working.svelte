@@ -7,6 +7,7 @@
 
 	const TITLES: Record<Stage, string> = {
 		shrinking: 'working-shrinking',
+		erasing: 'working-erasing',
 		partitioning: 'working-partitioning',
 		downloading: 'working-downloading',
 		packing: 'working-packing',

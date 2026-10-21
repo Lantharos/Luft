@@ -7,7 +7,7 @@
 	import Problem from '#lib/components/Problem.svelte';
 	import Confirm from '#lib/stick/Confirm.svelte';
 	import { detail } from '#lib/stick/describe.js';
-	import DriveRow from '#lib/stick/DriveRow.svelte';
+	import DriveRow from '#lib/components/DriveRow.svelte';
 	import { session } from '#lib/state/meet.svelte.js';
 	import { maker } from '#lib/state/stick.svelte.js';
 

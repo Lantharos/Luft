@@ -3,6 +3,8 @@ mod belongings;
 pub mod calls;
 #[cfg(windows)]
 mod dialog;
+#[cfg(windows)]
+mod installed;
 pub mod job;
 #[cfg(windows)]
 mod link;
@@ -72,6 +74,9 @@ fn window(window: SabineWindow, events: &Events) -> SabineWindow {
         });
     let window = job::command(window, "meet_call", events, |events, call: Call| {
         platform::call(events, call.with_hints(platform::hints))
+    });
+    let window = job::command(window, "meet_installed", events, |_, _: Value| {
+        Ok(Value::Bool(platform::luft_installed()))
     });
     let window = job::command(window, "meet_belongings", events, |_, _: Value| {
         platform::belongings()

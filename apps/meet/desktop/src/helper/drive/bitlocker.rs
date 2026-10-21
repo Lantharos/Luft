@@ -12,12 +12,20 @@ const NAMESPACE: &str = r"ROOT\CIMV2\Security\MicrosoftVolumeEncryption";
 const FULLY_DECRYPTED: u32 = 0;
 const FULLY_ENCRYPTED: u32 = 1;
 const DECRYPTING: u32 = 3;
+const PROTECTION_OFF: u32 = 0;
 const POLL: Duration = Duration::from_millis(500);
 
 #[derive(Deserialize)]
 struct Win32_EncryptableVolume {
     __Path: String,
     ConversionStatus: Option<u32>,
+}
+
+#[derive(Deserialize)]
+struct Protection {
+    DeviceID: String,
+    ConversionStatus: Option<u32>,
+    ProtectionStatus: Option<u32>,
 }
 
 #[derive(Deserialize)]
@@ -58,6 +66,25 @@ impl BitLocker {
             Some(FULLY_ENCRYPTED) => Encryption::On,
             Some(_) => Encryption::Changing,
         }
+    }
+
+    pub fn protected(&self) -> Vec<String> {
+        self.wmi
+            .raw_query::<Protection>(
+                "SELECT DeviceID, ConversionStatus, ProtectionStatus FROM Win32_EncryptableVolume",
+            )
+            .unwrap_or_default()
+            .into_iter()
+            .filter(|volume| {
+                volume
+                    .ProtectionStatus
+                    .is_some_and(|status| status != PROTECTION_OFF)
+                    || volume
+                        .ConversionStatus
+                        .is_some_and(|status| status != FULLY_DECRYPTED)
+            })
+            .map(|volume| volume.DeviceID)
+            .collect()
     }
 
     pub fn keep_readable(&self, volume_path: &Path) -> Result<(), String> {

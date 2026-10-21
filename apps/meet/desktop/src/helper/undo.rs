@@ -1,8 +1,8 @@
-use super::Context;
 use super::drive::storage::{MSFT_Partition, Storage};
 use super::drive::windows_drive::{self, WindowsDrive};
 use super::drive::{record, state};
 use super::system::start_entries;
+use super::{Context, windows_space};
 use crate::protocol::Stage;
 
 pub fn give_back(
@@ -20,11 +20,7 @@ pub fn give_back(
             record::removed_partition(&guid)?;
         }
     }
-    let windows = storage.layout(&drive.volume)?.windows;
-    let largest = storage.largest_windows(&windows)?;
-    if largest > windows.Size {
-        storage.resize(&windows, largest)?;
-    }
+    windows_space::give_back(storage, drive)?;
     context.progress(Stage::Removing, steps, steps);
     Ok(())
 }
@@ -32,8 +28,7 @@ pub fn give_back(
 pub fn undo(context: &Context) -> Result<(), String> {
     let storage = Storage::open()?;
     let drive = windows_drive::find()?;
-    let layout = storage.layout(&drive.volume)?;
-    let found = state::find(&layout);
+    let found = state::find(&storage.all_partitions()?);
     if let Some(number) = found.boot_entry {
         start_entries::remove(&[number])?;
         record::set_boot_entry(None)?;

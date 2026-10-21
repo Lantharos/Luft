@@ -75,7 +75,9 @@
 		<Choice
 			icon={HardDriveDownload}
 			title={t('ready-install-title')}
-			description={t('ready-install-description', { size: bytes(prepared?.room ?? 0) })}
+			description={prepared?.drive
+				? t('ready-install-drive-description', { size: bytes(prepared.room), drive: prepared.drive })
+				: t('ready-install-description', { size: bytes(prepared?.room ?? 0) })}
 			onclick={() => (restarting = 'install')}
 		/>
 		<Choice icon={Usb} title={t('stick-title')} description={t('ready-stick-description')} onclick={() => maker.open()} />

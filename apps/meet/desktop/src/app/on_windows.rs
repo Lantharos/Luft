@@ -1,5 +1,6 @@
 use serde_json::Value;
 
+pub use super::installed::luft_installed;
 use super::job::Failed;
 pub use super::regional::hints;
 use super::{Events, belongings, dialog, link, logs};

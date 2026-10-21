@@ -32,6 +32,9 @@ check-space-free = { $size } Gt vapaana
 check-space-free-linux = Luft vie kokeilun ajan noin { $size } Gt.
 check-space-up-to = Enintään { $size } Gt Luftille
 check-space-up-to-detail = Windows säilyttää tiedostonsa ja kasvunvaraa.
+check-space-free-already = Siitä { $size } Gt on jo vapaana, joten Windows luovuttaa vähemmän.
+check-space-other-drive = Levyllä { $drive } on sille tilaa.
+check-space-erase-drive = Levyllä { $drive } on sille tilaa, kun levy on tyhjennetty.
 check-space-short = Vapaata tilaa ei ole tarpeeksi
 check-space-short-windows = Luft tarvitsee noin { $needed } Gt, jonka Windows voi luovuttaa. Vapauta Windowsissa { $missing } Gt esimerkiksi Levyn puhdistuksella ja tarkista sitten uudelleen.
 check-space-short-linux = Luft tarvitsee noin { $needed } Gt käynnistyäkseen. Vapauta { $missing } Gt ja tarkista sitten uudelleen.
@@ -126,7 +129,10 @@ helper-not-ready-to-start-linux = Luft ei ole vielä valmis käynnistymään. Va
 helper-update-unfinished = Luftin päivitys jäi kesken. Päivitä se ensin uudelleen.
 helper-room-too-small = Luft tarvitsee enemmän tilaa.
 helper-room-shortfall = Windows voi luovuttaa { $available } Gt, ja Luft tarvitsee { $needed } Gt.
+helper-gap-shortfall = Tilassa on { $available } Gt, ja Luft tarvitsee { $needed } Gt.
+helper-place-gone = Tila ei ole enää vapaana. Tarkista uudelleen, mihin Luft mahtuu.
 helper-box-shortfall = Windows voi luovuttaa vielä { $available } Gt, ja valitut asiat tarvitsevat { $needed } Gt.
+helper-box-room-shortfall = Luftin tilasta riittää { $available } Gt, ja valitut asiat tarvitsevat { $needed } Gt.
 helper-bluetooth-unreadable = Windowsin Bluetooth-asetuksia ei voitu avata
 helper-registry-not-opened = Rekisteriavainta { $key } ei voitu avata: { $error }
 helper-registry-not-changed = Rekisteriarvoa { $value } ei voitu muuttaa: { $error }
@@ -153,7 +159,6 @@ drive-windows-partition-missing = Windowsin osiota ei löytynyt
 drive-volume-missing = Taltiota { $path } ei löytynyt
 drive-storage-error = { $what } (Windowsin tallennusvirhe { $code })
 drive-shrink-size-unknown = Windows ei pystynyt kertomaan, kuinka pieneksi sen osion voi pienentää
-drive-grow-size-unknown = Windows ei pystynyt kertomaan, kuinka suureksi sen osion voi kasvattaa
 drive-resize-failed = Windows ei voinut muuttaa osionsa kokoa
 drive-create-failed = Windows ei voinut luoda osiota Luftille
 drive-hide-failed = Windows ei voinut piilottaa uutta osiota Resurssienhallinnasta
@@ -172,6 +177,9 @@ drive-new-live-no-volume = Luftin uudella osiolla ei ole taltiota
 drive-partitions-not-noted = Luftin osioita ei ole Meet Luftin muistiinpanoissa
 drive-partitions-gone = Luftin osiot katosivat
 drive-partition-gone = Osio katosi
+drive-gone = Levy katosi
+drive-erase-failed = Windows ei voinut tyhjentää levyä
+drive-erased-no-room = Tyhjennetyllä levyllä ei ole tilaa Luftille
 drive-start-partition-foreign = Luftin käynnistysosio ei ole Meet Luftin tekemä
 drive-start-partition-gone = Luftin käynnistysosio on poissa
 drive-start-partition-not-listed = Luftin käynnistysosio puuttuu osiotaulusta
@@ -184,6 +192,14 @@ drive-esp-no-guid = EFI-järjestelmäosiolla ei ole GUID-tunnusta
 drive-no-uuid = Levyllä, jolla Luftia säilytetään, ei ole UUID-tunnusta
 drive-folder-unreadable = Luft ei voi käynnistyä levyltä, jolla tiedostosi ovat.
 drive-folder-not-startable = Kansiosta { $folder } ei voi käynnistää
+
+## Errors while changing Luft once it's installed
+
+luft-gone = Luft ei ole enää tässä PC:ssä
+luft-not-resizable = Luftin kokoa ei voi muuttaa Windowsista juuri nyt
+luft-size-not-allowed = Luft ei voi olla tuon kokoinen
+luft-space-promised = Tila on varattu Luftille. Peru ensin muutos.
+luft-no-start-entry = Luftin käynnistysmerkintää ei löytynyt
 
 ## Errors while getting Luft
 

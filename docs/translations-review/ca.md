@@ -77,3 +77,4 @@ Strings in Luft’s Catalan translation that a native speaker should check: term
 - `apps/meet/locales/ca/meet.ftl` `box-total-slow`: "{ $size }, que es triga aproximadament { $minutes } minuts a empaquetar" — check it reads well after the size placeable.
 - `apps/meet/desktop/locales/ca/desktop.ftl` `check-secure-boot-turn-on`: "quan aparegui el logotip de la marca { $maker }" — «de la marca» added so brands starting with a vowel (Acer, ASUS) don’t need «d’»; check it isn’t too wordy.
 - `apps/meet/desktop/locales/ca/desktop.ftl` `helper-not-started`: "L’auxiliar de Meet Luft" — helper rendered as «l’auxiliar»; check whether «el procés auxiliar» is clearer.
+- `apps/meet/locales/ca/meet.ftl` `luft-title`: "El vostre Luft" — Luft normally takes no article; the possessive needs one here, as in «la vostra memòria de Luft»; check it reads naturally as a title.

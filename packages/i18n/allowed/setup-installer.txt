@@ -5,6 +5,32 @@ apps/setup/installer/src/install/drive/layout.rs	Luft startup
 apps/setup/installer/src/meet/reclaim.rs	Couldn't remove {}
 apps/setup/installer/src/meet/reclaim.rs	Luft couldn't grow into the space Meet Luft used
 apps/setup/installer/src/meet/reclaim.rs	Meet Luft's copy of Luft couldn't be removed
+apps/setup/installer/src/resize/btrfs.rs	Luft's file system couldn't change its size
+apps/setup/installer/src/resize/btrfs.rs	Luft's file system didn't say how full it is
+apps/setup/installer/src/resize/btrfs.rs	Luft's files couldn't move off {device}
+apps/setup/installer/src/resize/disk.rs	Luft's partition isn't on any drive
+apps/setup/installer/src/resize/disk.rs	The drive {id} is gone
+apps/setup/installer/src/resize/mod.rs	Luft didn't change its size
+apps/setup/installer/src/resize/mod.rs	Luft gave up changing its size
+apps/setup/installer/src/resize/mod.rs	Luft's file system already spans more than one partition
+apps/setup/installer/src/resize/mod.rs	Luft's partition is encrypted, so it can't move
+apps/setup/installer/src/resize/mod.rs	Luft's partition isn't on its drive
+apps/setup/installer/src/resize/mod.rs	The request is for another Luft
+apps/setup/installer/src/resize/plan.rs	Luft is too full to move this way
+apps/setup/installer/src/resize/plan.rs	Luft wouldn't have room for its files
+apps/setup/installer/src/resize/plan.rs	That's too little to give back
+apps/setup/installer/src/resize/plan.rs	The free space is too small
+apps/setup/installer/src/resize/plan.rs	There's no free space right before Luft
+apps/setup/installer/src/resize/request.rs	Luft's resize request couldn't be read
+apps/setup/installer/src/resize/request.rs	Luft's resize request couldn't be removed
+apps/setup/installer/src/resize/request.rs	Luft's resize request couldn't be unlocked
+apps/setup/installer/src/resize/request.rs	Luft's resize request isn't readable
+apps/setup/installer/src/resize/startup.rs	Luft startup
+apps/setup/installer/src/resize/startup.rs	Luft's new startup partition couldn't be formatted
+apps/setup/installer/src/resize/startup.rs	Luft's new startup partition disappeared
+apps/setup/installer/src/resize/startup.rs	Luft's startup files couldn't be copied
+apps/setup/installer/src/resize/steps.rs	The grown partition isn't part of Luft's file system
+apps/setup/installer/src/resize/steps.rs	The partition at {at} is gone
 apps/setup/installer/src/survey/windows/hints.rs	All Users
 apps/setup/installer/src/survey/windows/hints.rs	Control Panel\Desktop
 apps/setup/installer/src/survey/windows/hints.rs	Control Panel\Desktop\MuiCached

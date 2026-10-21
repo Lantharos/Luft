@@ -51,9 +51,12 @@ pub enum Intent {
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
 pub struct Room {
     pub offset: u64,
     pub size: u64,
+    #[serde(default)]
+    pub other_drive: bool,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -208,13 +211,14 @@ mod tests {
         let handoff = Handoff::parse(
             r#"{"intent":"install","start":"{0A1B2C3D-0000-4000-8000-00000000AAAA}",
                 "live":"0a1b2c3d-0000-4000-8000-00000000bbbb","movingBox":null,
-                "room":{"offset":1048576,"size":68719476736},"bootEntry":7,
+                "room":{"offset":1048576,"size":68719476736,"otherDrive":true},"bootEntry":7,
                 "hints":{"timezone":"Europe/Vienna","keyboards":[{"layout":"ch","variant":"fr"}]}}"#,
         )
         .unwrap();
         let made = handoff.made_partitions().unwrap();
         assert_eq!(made.start, "0a1b2c3d-0000-4000-8000-00000000aaaa");
         assert_eq!(handoff.partitions().count(), 2);
+        assert!(handoff.room().unwrap().other_drive);
         assert_eq!(handoff.hints.timezone.as_deref(), Some("Europe/Vienna"));
         assert_eq!(handoff.hints.keyboards[0].variant, "fr");
         assert_eq!(Handoff::parse(&handoff.to_json()).unwrap(), handoff);

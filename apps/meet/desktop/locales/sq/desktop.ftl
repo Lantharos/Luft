@@ -32,6 +32,9 @@ check-space-free = { $size } GB të lira
 check-space-free-linux = Luft zë rreth { $size } GB ndërsa e provon.
 check-space-up-to = Deri në { $size } GB për Luft
 check-space-up-to-detail = Windows mban skedarët e vet dhe vend për t’u rritur.
+check-space-free-already = { $size } GB prej tyre janë të lira tashmë, ndaj Windows jep më pak.
+check-space-other-drive = Ka vend për të në { $drive }.
+check-space-erase-drive = Ka vend për të në { $drive }, pasi të fshihet ai disk.
 check-space-short = Nuk ka hapësirë të mjaftueshme
 check-space-short-windows = Luft ka nevojë për rreth { $needed } GB që Windows mund t’i lirojë. Liro { $missing } GB në Windows, për shembull me Disk Cleanup, pastaj kontrollo sërish.
 check-space-short-linux = Luft ka nevojë për rreth { $needed } GB për t’u nisur. Liro { $missing } GB, pastaj kontrollo sërish.
@@ -126,7 +129,10 @@ helper-not-ready-to-start-linux = Luft nuk është ende gati për t’u nisur. P
 helper-update-unfinished = Përditësimi i Luft nuk përfundoi. Përditësoje sërish fillimisht.
 helper-room-too-small = Luft ka nevojë për më shumë vend se kaq.
 helper-room-shortfall = Windows mund të lirojë { $available } GB, ndërsa Luft ka nevojë për { $needed } GB.
+helper-gap-shortfall = Ajo hapësirë ka { $available } GB, ndërsa Luft ka nevojë për { $needed } GB.
+helper-place-gone = Ajo hapësirë nuk është më e lirë. Kontrollo sërish për të parë ku nxë Luft.
 helper-box-shortfall = Windows mund të lirojë edhe { $available } GB, ndërsa këto kanë nevojë për { $needed } GB.
+helper-box-room-shortfall = Vendi i Luft mund të lirojë { $available } GB, ndërsa këto kanë nevojë për { $needed } GB.
 helper-bluetooth-unreadable = Cilësimet Bluetooth të Windows nuk mund të hapeshin
 helper-registry-not-opened = Nuk mund të hapej { $key }: { $error }
 helper-registry-not-changed = Nuk mund të ndryshohej { $value }: { $error }
@@ -153,7 +159,6 @@ drive-windows-partition-missing = Ndarja e Windows nuk u gjet
 drive-volume-missing = Vëllimi { $path } nuk u gjet
 drive-storage-error = { $what } (gabim ruajtjeje i Windows { $code })
 drive-shrink-size-unknown = Windows nuk mundi të përcaktonte sa e vogël mund të bëhet ndarja e tij
-drive-grow-size-unknown = Windows nuk mundi të përcaktonte sa e madhe mund të bëhet ndarja e tij
 drive-resize-failed = Windows nuk mundi të ndryshonte madhësinë e ndarjes së tij
 drive-create-failed = Windows nuk mundi të krijonte një ndarje për Luft
 drive-hide-failed = Windows nuk mundi ta mbante ndarjen e re jashtë Explorer
@@ -172,6 +177,9 @@ drive-new-live-no-volume = Ndarja e re e Luft nuk ka vëllim
 drive-partitions-not-noted = Ndarjet e Luft mungojnë në shënimet e Meet Luft
 drive-partitions-gone = Ndarjet e Luft u zhdukën
 drive-partition-gone = Një ndarje u zhduk
+drive-gone = Një disk u zhduk
+drive-erase-failed = Windows nuk mundi ta fshinte diskun
+drive-erased-no-room = Disku i fshirë nuk ka vend për Luft
 drive-start-partition-foreign = Ndarja e nisjes së Luft nuk është krijuar nga Meet Luft
 drive-start-partition-gone = Ndarja e nisjes së Luft nuk është më
 drive-start-partition-not-listed = Ndarja e nisjes së Luft nuk është në tabelën e ndarjeve
@@ -184,6 +192,14 @@ drive-esp-no-guid = Ndarja e sistemit EFI nuk ka GUID
 drive-no-uuid = Disku ku mbahet Luft nuk ka UUID
 drive-folder-unreadable = Luft nuk mund të niset nga disku ku janë skedarët e tu.
 drive-folder-not-startable = Nuk mund të niset nga { $folder }
+
+## Errors while changing Luft once it's installed
+
+luft-gone = Luft nuk është më në këtë PC
+luft-not-resizable = Madhësia e Luft nuk mund të ndryshohet nga Windows tani
+luft-size-not-allowed = Luft nuk mund të ketë këtë madhësi
+luft-space-promised = Ajo hapësirë është lënë mënjanë për Luft. Anulo fillimisht ndryshimin.
+luft-no-start-entry = Hyrja e nisjes së Luft nuk u gjet
 
 ## Errors while getting Luft
 

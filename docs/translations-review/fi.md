@@ -81,3 +81,10 @@ Strings in Luft's Finnish translation that a native speaker should check. Each i
 - `apps/meet/locales/fi/meet.ftl` `stick-none`, `stick-erase-description`: "vähintään { $size }:n USB-tikku" — genitive ending added after the size placeable ("4 Gt:n"); check it reads well.
 - `apps/meet/desktop/locales/fi/desktop.ftl` `check-secure-boot-turn-on`: "painamalla { $key }, kun valmistajan { $maker } logo tulee näkyviin" — the volume-up key name is written in the partitive to fit; check the sentence with both key forms.
 - `apps/meet/locales/fi/meet.ftl` `problem-check`, `hello-check`: Windows variants say "PC", Linux "tietokone", following the English; Finnish Windows mostly says "tietokone", so both could be the same.
+- `apps/meet/locales/fi/meet.ftl` `room-place-whole-detail`, `room-erase-description`, `room-erase-empty`: "tämän { $size }:n levyn" — genitive ending added after the size placeable, as on the stick screens; check it reads well with every unit.
+- `apps/meet/locales/fi/meet.ftl` `luft-title`: "Luftisi" — possessive suffix on the name; check it doesn't feel odd as a page title, against "Oma Luft".
+- `apps/meet/locales/fi/meet.ftl` `luft-resize-title`: "Muuta Luftin kokoa" — shorter than the English "Change how much space Luft has"; check it is clear that it's about disk space.
+
+## Install Luft
+
+- `apps/setup/locales/fi/setup.ftl` `setup-destination-meet-drive-choice-description`, `setup-confirm-meet-drive-title`: "levylle { $drive }" — the drive name stands uninflected after "levylle"; check it reads naturally with names like "Samsung SSD 980".

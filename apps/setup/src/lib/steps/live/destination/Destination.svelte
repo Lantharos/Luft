@@ -47,6 +47,7 @@
 	let windowsDrive = $derived(install.windowsDrive as (Drive & { windows: WindowsVolume }) | null);
 	let meet = $derived(install.meet);
 	let meetDrive = $derived(meet ? install.drive(meet.drive) : null);
+	let meetElsewhere = $derived(!!meet?.otherDrive && !!meetDrive);
 	let target = $derived.by((): Target | null => {
 		if (view === 'alongside' && meet?.space) return { kind: 'free', drive: meet.drive, offset: meet.space.offset };
 		if (view === 'alongside' && windowsDrive && size > 0) return { kind: 'alongside', drive: windowsDrive.block, size };
@@ -69,6 +70,9 @@
 	};
 
 	let [title, description] = $derived.by(() => {
+		if (view === 'alongside' && meet?.space && meetElsewhere) {
+			return [t('setup-destination-meet-drive-title', { drive: meetDrive!.name }), t('setup-destination-meet-drive-description')];
+		}
 		if (view === 'alongside' && meet?.space) return [t('setup-destination-meet-title'), t('setup-destination-meet-description')];
 		if (view === 'replace') return [t('setup-destination-replace-title', { system: chosenSystem?.name ?? 'Linux' }), t('setup-destination-replace-description')];
 		return TITLES[view].map((id) => t(id));
@@ -79,6 +83,7 @@
 		if (target.kind === 'replace') return t('setup-confirm-replace-title', { system: chosenSystem?.name ?? 'Linux' });
 		if (target.kind === 'whole') return t('setup-confirm-erase-title', { drive: chosenDrive.name });
 		if (target.kind === 'alongside') return t('setup-confirm-shrink-title', { size: bytes(chosenDrive.windows!.size - target.size) });
+		if (meet?.space && meetElsewhere) return t('setup-confirm-meet-drive-title', { drive: chosenDrive.name });
 		return t(meet?.space ? 'setup-confirm-meet-title' : 'setup-confirm-free-title');
 	});
 
@@ -124,9 +129,11 @@
 		<div class="-mx-2 flex flex-col gap-1">
 			{#if meet?.space}
 				<Choice
-					icon={LayoutPanelLeft}
-					title={t('setup-destination-meet-choice')}
-					description={t('setup-destination-meet-choice-description', { size: bytes(meet.space.size) })}
+					icon={meetElsewhere ? HardDrive : LayoutPanelLeft}
+					title={meetElsewhere ? t('setup-destination-meet-drive-choice', { drive: meetDrive!.name }) : t('setup-destination-meet-choice')}
+					description={meetElsewhere
+						? t('setup-destination-meet-drive-choice-description', { size: bytes(meet.space.size), drive: meetDrive!.name })
+						: t('setup-destination-meet-choice-description', { size: bytes(meet.space.size) })}
 					onclick={() => open('alongside')}
 				/>
 			{:else if windowsDrive}
@@ -160,7 +167,7 @@
 			<Choice icon={SlidersHorizontal} title={t('setup-destination-custom-choice')} description={t('setup-destination-custom-choice-description')} onclick={() => open('custom')} />
 		</div>
 	{:else if view === 'alongside' && meet?.space && meetDrive}
-		<MeetRoom drive={meetDrive} space={meet.space} packed={meet.movingBox?.bytes ?? null} />
+		<MeetRoom drive={meetDrive} space={meet.space} packed={meet.movingBox?.bytes ?? null} elsewhere={meetElsewhere} />
 	{:else if view === 'alongside' && windowsDrive}
 		<Alongside drive={windowsDrive} smallest={survey.smallestSystem} onsize={(next) => (size = next)} />
 	{:else if view === 'whole'}

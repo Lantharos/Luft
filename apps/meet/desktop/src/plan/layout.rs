@@ -44,7 +44,7 @@ pub struct NewPartition {
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct Plan {
-    pub windows_size: u64,
+    pub windows_size: Option<u64>,
     pub partitions: Vec<NewPartition>,
     pub room: Span,
 }
@@ -55,7 +55,7 @@ pub struct Shortfall {
     pub available: u64,
 }
 
-fn free_end(disk: &Disk, after: u64) -> u64 {
+pub fn free_end(disk: &Disk, after: u64) -> u64 {
     disk.partitions
         .iter()
         .map(|partition| partition.offset)
@@ -111,7 +111,7 @@ pub fn plan(
         })
         .collect();
     Ok(Plan {
-        windows_size,
+        windows_size: (windows_size < windows.partition.size).then_some(windows_size),
         partitions,
         room: Span {
             offset: windows_end,
@@ -168,7 +168,7 @@ mod tests {
         .unwrap();
         assert_eq!(
             plan.room.offset,
-            windows.partition.offset + plan.windows_size
+            windows.partition.offset + plan.windows_size.unwrap()
         );
         assert_eq!(plan.room.size, 100 * GIB);
         assert_eq!(plan.partitions[0].span.offset, plan.room.end());
@@ -199,7 +199,7 @@ mod tests {
         .unwrap();
         let shrunk = Windows {
             partition: Span {
-                size: first.windows_size,
+                size: first.windows_size.unwrap(),
                 ..windows.partition
             },
             ..windows
@@ -208,7 +208,10 @@ mod tests {
         disk.partitions
             .extend(first.partitions.iter().map(|new| new.span));
         let second = plan(&disk, &shrunk, 100 * GIB, &[(Role::MovingBox, 20 * GIB)]).unwrap();
-        assert_eq!(second.windows_size, first.windows_size - 20 * GIB);
+        assert_eq!(
+            second.windows_size.unwrap(),
+            first.windows_size.unwrap() - 20 * GIB
+        );
         assert_eq!(
             second.partitions[0].span.end(),
             first.partitions[0].span.offset
@@ -222,7 +225,7 @@ mod tests {
         windows.partition.size -= 50 * GIB;
         disk.partitions[2] = windows.partition;
         let plan = plan(&disk, &windows, 40 * GIB, &[(Role::Live, 3 * GIB)]).unwrap();
-        assert_eq!(plan.windows_size, windows.partition.size);
+        assert_eq!(plan.windows_size, None);
         assert!(plan.room.size >= 40 * GIB);
     }
 

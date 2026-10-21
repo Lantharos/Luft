@@ -1,6 +1,6 @@
+import { appWindow } from '@lantharos/sabine';
 import { isInside } from '@luft/ui';
 import * as api from '#lib/api.js';
-import { closeWindow } from '#lib/runtime.js';
 import { parentPath } from '#lib/utils/paths.js';
 import type { FileManager } from './manager.svelte';
 
@@ -11,7 +11,7 @@ export class FileActions {
 		this.#manager = manager;
 	}
 
-	closeWindow = () => closeWindow();
+	closeWindow = () => appWindow.close();
 
 	copy = () => {
 		const items = this.#manager.selectedEntries;

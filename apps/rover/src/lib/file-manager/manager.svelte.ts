@@ -1,7 +1,6 @@
 import { SvelteSet } from 'svelte/reactivity';
 import { appearance, basename } from '@luft/ui';
 import * as api from '#lib/api.js';
-import { isDesktopRuntime } from '#lib/runtime.js';
 import { settings } from '#lib/state/settings.svelte.js';
 import { Tabs } from '#lib/state/tabs.svelte.js';
 import type {
@@ -32,7 +31,6 @@ import { sortedEntries, visibleEntries } from './listing/entries';
 import { groupEntries } from './listing/groups';
 import { DelayedLoading } from './listing/loading.svelte';
 import { viewModeForPath } from './listing/view-modes';
-import { previewDrives, previewEntries, previewRecent, previewTrash, previewUserDirs } from './preview';
 
 export type ContextMenuState = { x: number; y: number; target: FileEntry | null };
 export type SidebarPlace =
@@ -184,15 +182,7 @@ export class FileManager {
 		await this.loadDirectory(path);
 	};
 
-	startPreview = () => {
-		this.userDirs = previewUserDirs;
-		this.drives.list = previewDrives;
-		this.tabs.open(this.#homeEntry(previewUserDirs.home));
-		this.#showListing(previewUserDirs.home, previewEntries(previewUserDirs.home));
-	};
-
 	loadDirectory = async (path: string) => {
-		if (!isDesktopRuntime()) return this.#showListing(path, previewEntries(path));
 		const token = this.loading.start();
 		this.error = null;
 		try {
@@ -220,10 +210,6 @@ export class FileManager {
 	};
 
 	loadTrash = async () => {
-		if (!isDesktopRuntime()) {
-			this.trash = { items: previewTrash, locations: [{ name: 'Home', path: previewTrash[0].trash_path }] };
-			return;
-		}
 		const token = this.loading.start();
 		this.error = null;
 		try {
@@ -244,7 +230,7 @@ export class FileManager {
 		const token = this.loading.start();
 		this.entries = [];
 		try {
-			const recent = isDesktopRuntime() ? await api.recentFiles() : previewRecent;
+			const recent = await api.recentFiles();
 			if (!this.loading.isCurrent(token)) return;
 			this.entries = recent;
 			this.#arrive('');

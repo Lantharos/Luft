@@ -1,7 +1,6 @@
 import { isInside } from '@luft/ui';
 import { SvelteSet } from 'svelte/reactivity';
 import * as api from '#lib/api.js';
-import { isDesktopRuntime } from '#lib/runtime.js';
 import type { DriveInfo, WindowsDrive } from '#lib/types/index.js';
 
 export class DrivesState {
@@ -14,7 +13,6 @@ export class DrivesState {
 	ordered = $derived(this.list.toSorted((a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name)));
 
 	load = async () => {
-		if (!isDesktopRuntime()) return;
 		const [list, windows] = await Promise.all([api.listDrives().catch(() => this.list), api.listWindows().catch(() => [])]);
 		this.list = list;
 		this.windows = windows;

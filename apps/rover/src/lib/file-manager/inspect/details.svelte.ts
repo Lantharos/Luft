@@ -1,5 +1,4 @@
 import * as api from '#lib/api.js';
-import { isDesktopRuntime } from '#lib/runtime.js';
 import type { FileEntry } from '#lib/types/index.js';
 import type { FileDetails, OpenWithApps } from '#lib/types/details.js';
 
@@ -20,7 +19,7 @@ export class EntryDetails {
 		this.details = null;
 		this.apps = NO_APPS;
 		this.media = null;
-		if (!entry || !isDesktopRuntime()) return;
+		if (!entry) return;
 		void api.fileDetails(entry.path).then((details) => this.#settle(key, () => (this.details = details)), () => undefined);
 		if (!entry.is_dir) {
 			void api.appsForFile(entry.path).then((apps) => this.#settle(key, () => (this.apps = apps)), () => undefined);

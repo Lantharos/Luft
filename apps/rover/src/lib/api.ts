@@ -1,4 +1,4 @@
-import { invoke, listen } from '@lantharos/sabine';
+import { fileUrl, invoke, listen } from '@lantharos/sabine';
 import { activationToken } from '@luft/ui';
 import type {
 	AppState,
@@ -57,6 +57,8 @@ export const openInBrowser = async (path: string) =>
 	invoke<void>('cloud_open_in_browser', { path, token: await activationToken() }, { timeoutMs: 60_000 });
 export const dismissConflict = (account: string, copy: string) => invoke<void>('cloud_dismiss_conflict', { account, copy });
 export const addCloudAccount = async () => invoke<void>('cloud_add_account', { token: await activationToken() });
+
+export const localFileSource = (path: string, modified: number | null) => `${fileUrl(path)}?v=${modified ?? 0}`;
 
 export const recentFiles = () => invoke<FileEntry[]>('recent_files');
 export const trashCount = () => invoke<number>('trash_count');

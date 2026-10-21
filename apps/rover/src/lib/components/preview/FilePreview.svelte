@@ -9,10 +9,10 @@
 <script lang="ts">
 	import { fileUrl } from '@lantharos/sabine';
 	import { canPlayNatively, decodeFailed, MediaControls } from '@luft/ui';
+	import { localFileSource } from '#lib/api.js';
 	import EntryIcon from '#lib/components/pane/EntryIcon.svelte';
 	import type { MediaInfo } from '#lib/file-manager/inspect/details.svelte.js';
 	import { thumbnailOf } from '#lib/file-manager/listing/thumbnails.js';
-	import { isDesktopRuntime, localFileSource } from '#lib/runtime.js';
 	import type { FileEntry } from '#lib/types/index.js';
 	import { entryIcon, mayBeTransparent } from '#lib/utils/file-kinds.js';
 	import { previewKind } from '#lib/utils/kinds.js';
@@ -32,7 +32,7 @@
 	let currentTime = $state(0);
 	let duration = $state(0);
 	let muted = $state(false);
-	let kind = $derived(isDesktopRuntime() && !failed ? previewKind(entry) : 'none');
+	let kind = $derived(failed ? 'none' : previewKind(entry));
 	let source = $derived(localFileSource(entry.path, entry.modified));
 	let iconSize = $derived(full ? 144 : 96);
 

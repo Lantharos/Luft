@@ -8,7 +8,6 @@
 	import { history } from '#lib/features/history.svelte.js';
 	import { search } from '#lib/features/search.svelte.js';
 	import { thumbnailSize, thumbnails } from '#lib/features/onscreen/thumbnails.svelte.js';
-	import { isDesktopRuntime } from '#lib/runtime.js';
 	import { settings } from '#lib/state/settings.svelte.js';
 	import type { FileEntry } from '#lib/types/index.js';
 	import CompressDialog from './archive/CompressDialog.svelte';
@@ -35,7 +34,6 @@
 	let pixels = $derived((manager.viewMode === 'grid' ? settings.value.gridSize : LIST_ICON_PIXELS) * window.devicePixelRatio);
 
 	onMount(() => {
-		if (!isDesktopRuntime()) return;
 		const unsubscribe = [
 			features.events.history(history.receive),
 			features.events.thumbnails(thumbnails.receive),

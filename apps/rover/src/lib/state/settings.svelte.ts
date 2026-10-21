@@ -1,5 +1,4 @@
 import * as api from '#lib/api.js';
-import { isDesktopRuntime } from '#lib/runtime.js';
 import type { ListColumn, Settings } from '#lib/types/index.js';
 
 export const DEFAULT_LIST_COLUMNS: ListColumn[] = [
@@ -30,7 +29,7 @@ class SettingsState {
 
 	update(change: (current: Settings) => Settings) {
 		this.value = change(this.value);
-		if (isDesktopRuntime()) void this.#persist();
+		void this.#persist();
 	}
 
 	async #persist() {

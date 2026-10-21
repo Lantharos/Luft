@@ -16,7 +16,7 @@ bun run desktop:bundle   # Sabine bundle
 sabine install --bundle .
 ```
 
-Thumbnails only load from the packaged app, so they show in builds and bundles, not against the Vite dev server. Opening the Vite server in a regular browser shows the interface with sample data.
+Thumbnails only load from the packaged app, so they show in builds and bundles, not against the Vite dev server.
 
 The desktop entry opens folders, and `sftp://`, `smb://`, `dav://`, `davs://` and `nfs://` links. If Rover is running, a path opens in a new tab.
 

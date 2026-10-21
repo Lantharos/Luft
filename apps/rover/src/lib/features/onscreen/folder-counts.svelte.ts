@@ -1,6 +1,4 @@
 import { SvelteMap } from 'svelte/reactivity';
-import { previewEntries } from '#lib/file-manager/preview.js';
-import { isDesktopRuntime } from '#lib/runtime.js';
 import { settings } from '#lib/state/settings.svelte.js';
 import type { FileEntry } from '#lib/types/index.js';
 import * as api from '../api';
@@ -29,7 +27,6 @@ class FolderCounts {
 	};
 
 	count(entry: FileEntry) {
-		if (!isDesktopRuntime()) return previewEntries(entry.path).length;
 		this.#screen.watch(entry);
 		const counted = this.#counted.get(entry.path);
 		return counted && this.#current(entry, counted) ? counted.count : null;

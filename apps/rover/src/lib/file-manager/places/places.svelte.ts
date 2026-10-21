@@ -1,9 +1,7 @@
 import { basename } from '@luft/ui';
 import * as api from '#lib/api.js';
 import type { IconName } from '#lib/components/Icon.svelte';
-import { isDesktopRuntime } from '#lib/runtime.js';
 import type { Operation, UserDirs } from '#lib/types/index.js';
-import { previewTrash } from '../preview';
 
 export type Place = { path: string; label: string; icon: IconName };
 
@@ -29,7 +27,6 @@ export class TrashCounter {
 	#settled = new Set<string>();
 
 	refresh = async () => {
-		if (!isDesktopRuntime()) return void (this.count = previewTrash.length);
 		this.count = await api.trashCount().catch(() => this.count);
 	};
 

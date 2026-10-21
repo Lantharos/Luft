@@ -25,7 +25,6 @@
 	import { TrashCounter } from '#lib/file-manager/places/places.svelte.js';
 	import { setEntryContext } from '#lib/file-manager/view/entry-props.js';
 	import { ViewState } from '#lib/file-manager/view/view-state.svelte.js';
-	import { isDesktopRuntime } from '#lib/runtime.js';
 	import { VcsState } from '#lib/vcs/state.svelte.js';
 
 	const manager = new FileManager();
@@ -50,7 +49,6 @@
 	});
 
 	onMount(() => {
-		if (!isDesktopRuntime()) return manager.startPreview();
 		const unsubscribe = [
 			api.events.operations((operations) => {
 				manager.receiveOperations(operations);

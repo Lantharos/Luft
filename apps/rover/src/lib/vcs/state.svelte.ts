@@ -1,5 +1,4 @@
 import * as api from '#lib/api.js';
-import { isDesktopRuntime } from '#lib/runtime.js';
 import { errorMessage } from '#lib/utils/format.js';
 import { absolutePath, relativePath } from '#lib/utils/paths.js';
 import { groupChangedFiles, statusOrder } from './format';
@@ -34,7 +33,6 @@ export class VcsState {
 
 	open = async (path: string) => {
 		this.#path = path;
-		if (!isDesktopRuntime()) return;
 		const root = await api.vcsRoot(path).catch(() => null);
 		if (this.#path !== path) return;
 		if (!root) return this.clear();

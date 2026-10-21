@@ -1,7 +1,6 @@
 import { isInside } from '@luft/ui';
 import { SvelteSet } from 'svelte/reactivity';
 import * as api from '#lib/api.js';
-import { isDesktopRuntime } from '#lib/runtime.js';
 import { settings } from '#lib/state/settings.svelte.js';
 import type { NetworkAsk, NetworkLocation, NetworkPlace } from '#lib/types/index.js';
 import { addressName, normalizeAddress, sameAddress } from '../location/addresses';
@@ -33,7 +32,6 @@ export class NetworkState {
 	});
 
 	load = async () => {
-		if (!isDesktopRuntime()) return;
 		this.locations = await api.networkLocations().catch(() => this.locations);
 	};
 

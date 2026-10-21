@@ -1,6 +1,6 @@
 import { fileUrl } from '@lantharos/sabine';
 import { SvelteMap } from 'svelte/reactivity';
-import { isDesktopRuntime, localFileSource } from '#lib/runtime.js';
+import { localFileSource } from '#lib/api.js';
 import type { FileEntry } from '#lib/types/index.js';
 import { isImage } from '#lib/utils/file-kinds.js';
 import * as api from '../api';
@@ -52,7 +52,6 @@ class Thumbnails {
 
 	source(entry: FileEntry) {
 		if (!entry.is_file || this.#skip(entry.path)) return null;
-		if (!isDesktopRuntime()) return isImage(entry) ? localFileSource(entry.path, entry.modified) : null;
 		this.#screen.watch(entry);
 		const ready = this.#ready.get(entry.path);
 		if (!ready || ready.modified !== entry.modified) return null;

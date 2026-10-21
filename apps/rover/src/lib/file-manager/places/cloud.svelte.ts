@@ -1,6 +1,5 @@
 import { basename, isInside } from '@luft/ui';
 import * as api from '#lib/api.js';
-import { isDesktopRuntime } from '#lib/runtime.js';
 import type { CloudConflict, CloudDrive, FileState } from '#lib/types/cloud.js';
 import { parentPath } from '#lib/utils/paths.js';
 
@@ -11,7 +10,6 @@ export class CloudState {
 	folder = $state('');
 
 	load = async () => {
-		if (!isDesktopRuntime()) return;
 		try {
 			this.drives = await api.cloudDrives();
 			this.available = true;

@@ -1,7 +1,5 @@
 import * as api from '#lib/api.js';
-import { isDesktopRuntime } from '#lib/runtime.js';
 import { settings } from '#lib/state/settings.svelte.js';
-import { previewEntries } from '../preview';
 import { expandHome } from './expand';
 
 const collator = new Intl.Collator(undefined, { sensitivity: 'base', numeric: true });
@@ -78,9 +76,7 @@ export class PathCompletion {
 	#list(folder: string) {
 		let folders = this.#folders.get(folder);
 		if (!folders) {
-			folders = isDesktopRuntime()
-				? api.listFolders(folder).catch(() => [])
-				: Promise.resolve(previewEntries(folder.replace(/\/+$/, '') || '/').filter((entry) => entry.is_dir).map((entry) => entry.name));
+			folders = api.listFolders(folder).catch(() => []);
 			this.#folders.set(folder, folders);
 		}
 		return folders;

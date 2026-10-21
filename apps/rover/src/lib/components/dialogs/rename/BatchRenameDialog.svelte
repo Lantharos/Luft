@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { tick } from 'svelte';
-	import { Checkbox, Dialog, plural, Segmented, TextField, tooltip } from '@luft/ui';
+	import { Checkbox, Dialog, errorText, plural, Segmented, TextField, tooltip } from '@luft/ui';
 	import * as features from '#lib/features/api.js';
 	import { previewRenames, type Casing, type RenameMode, type RenameOptions } from '#lib/features/rename.js';
 	import type { FileEntry } from '#lib/types/index.js';
-	import { errorMessage } from '#lib/utils/format.js';
 
 	interface Props {
 		entries: FileEntry[];
@@ -59,7 +58,7 @@
 			await features.batchRename(changed.map((item) => ({ path: item.entry.path, name: item.name })));
 			onclose();
 		} catch (caught) {
-			error = errorMessage(caught);
+			error = errorText(caught);
 			busy = false;
 		}
 	}

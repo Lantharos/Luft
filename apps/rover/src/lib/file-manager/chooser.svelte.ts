@@ -1,6 +1,6 @@
+import { join } from '@luft/ui';
 import * as api from '#lib/api.js';
 import type { ChooserConfig, FileEntry, PinnedFolder } from '#lib/types/index.js';
-import { joinPath } from '#lib/utils/paths.js';
 import type { FileManager } from './manager.svelte';
 import { bookmarkTarget } from './places/bookmarks';
 
@@ -71,12 +71,12 @@ export class ChooserState {
 		const folder = manager.currentPath || this.config.current_folder || manager.homePath;
 		if (this.config.mode === 'save') {
 			const name = this.saveName.trim();
-			return name ? [joinPath(folder, name)] : [];
+			return name ? [join(folder, name)] : [];
 		}
 		const selected = manager.entries.filter((entry) => manager.selection.has(entry.path));
 		if (this.config.mode === 'save_files') {
 			const target = selected.find((entry) => entry.isDir)?.path ?? manager.currentPath;
-			return target ? this.config.files.map((name) => joinPath(target, name)) : [];
+			return target ? this.config.files.map((name) => join(target, name)) : [];
 		}
 		const paths = selected.filter(this.accepts).map((entry) => entry.path);
 		return this.config.multiple ? paths : paths.slice(0, 1);

@@ -1,5 +1,5 @@
 import { SvelteSet } from 'svelte/reactivity';
-import { appearance, basename } from '@luft/ui';
+import { appearance, basename, errorText, parent } from '@luft/ui';
 import * as api from '#lib/api.js';
 import { settings } from '#lib/state/settings.svelte.js';
 import { Tabs } from '#lib/state/tabs.svelte.js';
@@ -21,8 +21,7 @@ import type {
 	ViewMemory,
 	ViewMode
 } from '#lib/types/index.js';
-import { errorMessage } from '#lib/utils/format.js';
-import { parentPath, pathSegments, trimTrailingSlash } from '#lib/utils/paths.js';
+import { pathSegments, trimTrailingSlash } from '#lib/utils/paths.js';
 import { FileActions } from './actions';
 import { CloudState } from './places/cloud.svelte';
 import { DrivesState } from './places/drives.svelte';
@@ -121,7 +120,7 @@ export class FileManager {
 	};
 
 	notify = (caught: unknown) => {
-		this.notice = errorMessage(caught);
+		this.notice = errorText(caught);
 		clearTimeout(this.#noticeTimer);
 		this.#noticeTimer = setTimeout(() => (this.notice = null), NOTICE_MS);
 	};
@@ -193,7 +192,7 @@ export class FileManager {
 		} catch (caught) {
 			if (!this.loading.isCurrent(token)) return;
 			this.#showListing(path, []);
-			this.error = errorMessage(caught);
+			this.error = errorText(caught);
 		} finally {
 			this.loading.finish(token);
 		}
@@ -220,7 +219,7 @@ export class FileManager {
 		} catch (caught) {
 			if (!this.loading.isCurrent(token)) return;
 			this.trash = EMPTY_TRASH;
-			this.error = errorMessage(caught);
+			this.error = errorText(caught);
 		} finally {
 			this.loading.finish(token);
 		}
@@ -235,7 +234,7 @@ export class FileManager {
 			this.entries = recent;
 			this.#arrive('');
 		} catch (caught) {
-			if (this.loading.isCurrent(token)) this.error = errorMessage(caught);
+			if (this.loading.isCurrent(token)) this.error = errorText(caught);
 		} finally {
 			this.loading.finish(token);
 		}
@@ -293,7 +292,7 @@ export class FileManager {
 	};
 
 	goUp = () => {
-		if (this.currentPath && this.currentPath !== '/') void this.navigate(parentPath(this.currentPath));
+		if (this.currentPath && this.currentPath !== '/') void this.navigate(parent(this.currentPath));
 	};
 
 	refresh = async () => {

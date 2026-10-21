@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { bytes, plural, VirtualScroller } from '@luft/ui';
+	import { bytes, parent, plural, relativeDay, VirtualScroller } from '@luft/ui';
 	import type { Attachment } from 'svelte/attachments';
 	import EntryIcon from '#lib/components/pane/EntryIcon.svelte';
 	import CloudMark from '#lib/components/cloud/CloudMark.svelte';
@@ -12,8 +12,6 @@
 	import { EntrySurface, isGroupRow } from '#lib/file-manager/view/surface.svelte.js';
 	import type { FileEntry, ListColumnId } from '#lib/types/index.js';
 	import { fileKind, kindLabel } from '#lib/utils/kinds.js';
-	import { formatDate } from '#lib/utils/format.js';
-	import { parentPath } from '#lib/utils/paths.js';
 	import EntryName from '../EntryName.svelte';
 	import ColumnsMenu from './ColumnsMenu.svelte';
 	import ListHeader from './ListHeader.svelte';
@@ -38,7 +36,7 @@
 	};
 
 	function location(entry: FileEntry) {
-		const folder = parentPath(entry.path);
+		const folder = parent(entry.path);
 		return folder === home ? 'Home' : folder.startsWith(`${home}/`) ? `~${folder.slice(home.length)}` : folder;
 	}
 
@@ -49,7 +47,7 @@
 	}
 
 	function cell(entry: FileEntry, id: ListColumnId) {
-		if (id === 'date') return formatDate(entry.modified);
+		if (id === 'date') return entry.modified ? relativeDay(entry.modified) : '';
 		if (id === 'size') return size(entry);
 		return recent ? location(entry) : kindLabel(entry);
 	}

@@ -1,7 +1,6 @@
-import { basename, isInside } from '@luft/ui';
+import { basename, isInside, parent } from '@luft/ui';
 import * as api from '#lib/api.js';
 import type { CloudConflict, CloudDrive, FileState } from '#lib/types/cloud.js';
-import { parentPath } from '#lib/utils/paths.js';
 
 export class CloudState {
 	available = $state(false);
@@ -31,14 +30,14 @@ export class CloudState {
 	}
 
 	stateOf(path: string): FileState | undefined {
-		return parentPath(path) === this.folder ? this.states[basename(path)] : undefined;
+		return parent(path) === this.folder ? this.states[basename(path)] : undefined;
 	}
 
 	conflictsIn(folder: string): { drive: CloudDrive; conflict: CloudConflict }[] {
 		const drive = this.holding(folder);
 		if (!drive) return [];
 		return drive.conflicts
-			.filter((conflict) => parentPath(`${drive.path}/${conflict.copy}`) === folder)
+			.filter((conflict) => parent(`${drive.path}/${conflict.copy}`) === folder)
 			.map((conflict) => ({ drive, conflict }));
 	}
 

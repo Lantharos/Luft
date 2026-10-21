@@ -1,5 +1,5 @@
+import { errorText } from '@luft/ui';
 import * as api from '#lib/api.js';
-import { errorMessage } from '#lib/utils/format.js';
 import { absolutePath, relativePath } from '#lib/utils/paths.js';
 import { groupChangedFiles, statusOrder } from './format';
 import type { VcsBusyState, VcsChangedFile, VcsFileStatus, VcsProject, VcsStatusEvent } from './types';
@@ -83,7 +83,7 @@ export class VcsState {
 			this.diff = await api.vcsDiff(this.project.root, path && absolutePath(this.project.root, path));
 		} catch (caught) {
 			this.diff = '';
-			this.error = errorMessage(caught);
+			this.error = errorText(caught);
 		} finally {
 			this.isDiffLoading = false;
 		}
@@ -115,7 +115,7 @@ export class VcsState {
 			await action();
 			if (this.project) await this.#load(this.project.root);
 		} catch (caught) {
-			this.error = errorMessage(caught);
+			this.error = errorText(caught);
 		} finally {
 			this.busy = null;
 		}

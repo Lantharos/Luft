@@ -1,8 +1,6 @@
-import { bytes, formatClock, plural } from '@luft/ui';
+import { bytes, dateTime, formatClock, parent, plural } from '@luft/ui';
 import type { FileEntry } from '#lib/types/index.js';
 import type { FileDetails } from '#lib/types/details.js';
-import { formatFullDate } from '#lib/utils/format.js';
-import { parentPath } from '#lib/utils/paths.js';
 import { statusLabel } from '#lib/vcs/format.js';
 import type { VcsState } from '#lib/vcs/state.svelte.js';
 import type { MediaInfo } from './details.svelte';
@@ -32,9 +30,9 @@ export function detailRows({ entry, details, media, vcs, home, reveal }: RowSour
 			: { label: 'Size', value: bytes(entry.size) },
 		dimensions(details, media),
 		media?.duration ? { label: 'Duration', value: formatClock(media.duration) } : null,
-		details?.created ? { label: 'Created', value: formatFullDate(details.created) } : null,
-		entry.modified ? { label: 'Modified', value: formatFullDate(entry.modified) } : null,
-		{ label: 'Where', value: tildePath(parentPath(entry.path), home), action: () => reveal(entry) },
+		details?.created ? { label: 'Created', value: dateTime(details.created) } : null,
+		entry.modified ? { label: 'Modified', value: dateTime(entry.modified) } : null,
+		{ label: 'Where', value: tildePath(parent(entry.path), home), action: () => reveal(entry) },
 		details?.linkTarget ? { label: 'Points to', value: details.linkTarget } : null,
 		versionControl(entry, vcs)
 	];

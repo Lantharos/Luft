@@ -1,7 +1,6 @@
 import { appWindow } from '@lantharos/sabine';
-import { isInside } from '@luft/ui';
+import { isInside, parent } from '@luft/ui';
 import * as api from '#lib/api.js';
-import { parentPath } from '#lib/utils/paths.js';
 import type { FileManager } from './manager.svelte';
 
 export class FileActions {
@@ -34,7 +33,7 @@ export class FileActions {
 	transfer = async (sources: string[], destination: string, move: boolean) => {
 		const manager = this.#manager;
 		if (sources.length === 0 || sources.some((source) => isInside(destination, source))) return;
-		if (move && sources.every((source) => parentPath(source) === destination)) return;
+		if (move && sources.every((source) => parent(source) === destination)) return;
 		try {
 			if (move) {
 				await api.moveItems(sources, destination);

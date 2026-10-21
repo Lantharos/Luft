@@ -1,3 +1,4 @@
+import { month } from '@luft/ui';
 import type { FileEntry, GroupBy } from '#lib/types/index.js';
 import { fileKind, type FileKind } from '#lib/utils/kinds.js';
 
@@ -20,7 +21,6 @@ const KINDS: [FileKind, string][] = [
 ];
 const KIND_RANK = new Map(KINDS.map(([kind], index) => [kind, index]));
 const KIND_LABEL = new Map(KINDS);
-const month = new Intl.DateTimeFormat(undefined, { month: 'long' });
 
 export function groupEntries(entries: FileEntry[], groupBy: GroupBy, oldestFirst: boolean): Grouped {
 	if (groupBy === 'none') return { entries, sections: null };
@@ -64,7 +64,7 @@ function dateBucket(oldestFirst: boolean) {
 		const year = date.getFullYear();
 		if (year === thisYear) {
 			const start = new Date(year, date.getMonth(), 1).getTime();
-			return { key: `month-${date.getMonth()}`, label: month.format(date), rank: start * direction };
+			return { key: `month-${date.getMonth()}`, label: month(entry.modified), rank: start * direction };
 		}
 		return { key: `year-${year}`, label: String(year), rank: new Date(year, 0, 1).getTime() * direction };
 	};

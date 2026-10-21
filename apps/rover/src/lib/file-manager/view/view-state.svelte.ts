@@ -1,8 +1,8 @@
-import { isInside } from '@luft/ui';
+import { isInside, join } from '@luft/ui';
 import { tick } from 'svelte';
 import { settings } from '#lib/state/settings.svelte.js';
 import type { Arrival, FileEntry, ViewMemory } from '#lib/types/index.js';
-import { joinPath, trimTrailingSlash } from '#lib/utils/paths.js';
+import { trimTrailingSlash } from '#lib/utils/paths.js';
 import type { ChooserState } from '../chooser.svelte';
 import type { FileManager } from '../manager.svelte';
 import { ListMotion } from './motion.svelte';
@@ -192,7 +192,7 @@ export class ViewState {
 		const base = trimTrailingSlash(current);
 		if (previous === current || !isInside(previous, base)) return;
 		const [child] = previous.slice(base.length).split('/').filter(Boolean);
-		const path = child && joinPath(base, child);
+		const path = child && join(base, child);
 		const index = path ? this.indexByPath.get(path) : undefined;
 		if (index === undefined) return;
 		this.select([path]);

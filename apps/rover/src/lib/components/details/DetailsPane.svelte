@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { basename, bytes, plural } from '@luft/ui';
+	import { basename, bytes, parent, plural } from '@luft/ui';
 	import { cubicOut } from 'svelte/easing';
 	import EntryIcon from '#lib/components/pane/EntryIcon.svelte';
 	import FilePreview from '#lib/components/preview/FilePreview.svelte';
@@ -9,7 +9,6 @@
 	import { entryContext } from '#lib/file-manager/view/entry-props.js';
 	import type { FileEntry } from '#lib/types/index.js';
 	import { fileKind, kindLabel } from '#lib/utils/kinds.js';
-	import { parentPath } from '#lib/utils/paths.js';
 	import OpenWith from './OpenWith.svelte';
 
 	const context = entryContext();
@@ -35,7 +34,7 @@
 	$effect(() => inspected.load(entry));
 
 	function reveal(target: FileEntry) {
-		const folder = parentPath(target.path);
+		const folder = parent(target.path);
 		const select = () => view.select([target.path]);
 		if (manager.view === 'home' && manager.currentPath === folder) return select();
 		void manager.navigate(folder).then(select);

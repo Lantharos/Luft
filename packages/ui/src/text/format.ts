@@ -17,7 +17,6 @@ const DATE_STYLES = {
 	dateTime: { dateStyle: 'medium', timeStyle: 'short' },
 	longDateTime: { dateStyle: 'full', timeStyle: 'short' },
 	time: { timeStyle: 'short' },
-	weekday: { weekday: 'short' },
 	weekdayTime: { weekday: 'short', hour: 'numeric', minute: '2-digit' },
 	month: { month: 'long' },
 	monthDay: { month: 'short', day: 'numeric' },
@@ -131,7 +130,7 @@ export function relativeDay(unixSeconds: number) {
 	const then = new Date(unixSeconds * 1000);
 	const days = Math.round((new Date(now).setHours(0, 0, 0, 0) - new Date(then).setHours(0, 0, 0, 0)) / DAY_MS);
 	if (days <= 0) return time(unixSeconds);
-	if (days < 7) return formatDate('weekday', unixSeconds);
+	if (days < 7) return weekdayTime(unixSeconds);
 	return formatDate(then.getFullYear() === now.getFullYear() ? 'monthDay' : 'shortDate', unixSeconds);
 }
 

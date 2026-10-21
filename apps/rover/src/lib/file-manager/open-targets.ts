@@ -1,6 +1,6 @@
+import { parent } from '@luft/ui';
 import * as api from '#lib/api.js';
 import type { SingleInstanceActivation } from '#lib/api.js';
-import { parentPath } from '#lib/utils/paths.js';
 import { looksRemote } from './location/addresses';
 import type { FileManager } from './manager.svelte';
 
@@ -18,6 +18,6 @@ async function open(manager: FileManager, path: string, show: (folder: string) =
 	if (looksRemote(path)) return manager.openAddress(path, show);
 	const entry = await api.getFileInfo(path).catch(() => null);
 	if (!entry || entry.isDir) return show(path);
-	await show(parentPath(entry.path));
+	await show(parent(entry.path));
 	manager.selectOnly(entry.path);
 }

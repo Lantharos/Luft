@@ -1,15 +1,7 @@
+import { join } from '@luft/ui';
+
 export function trimTrailingSlash(path: string) {
 	return path === '/' ? path : path.replace(/\/+$/, '') || '/';
-}
-
-export function parentPath(path: string) {
-	const trimmed = trimTrailingSlash(path);
-	const lastSlash = trimmed.lastIndexOf('/');
-	return lastSlash <= 0 ? '/' : trimmed.slice(0, lastSlash);
-}
-
-export function joinPath(folder: string, name: string) {
-	return `${folder.replace(/\/+$/, '')}/${name.replace(/^\/+/, '')}`;
 }
 
 export function pathSegments(path: string) {
@@ -28,5 +20,5 @@ export function relativePath(root: string, path: string) {
 }
 
 export function absolutePath(root: string, path: string) {
-	return path.startsWith('/') ? path : joinPath(root, path);
+	return path.startsWith('/') ? path : join(root, path);
 }

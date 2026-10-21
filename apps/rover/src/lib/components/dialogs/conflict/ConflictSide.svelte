@@ -1,10 +1,8 @@
 <script lang="ts">
-	import { basename, bytes, tooltip } from '@luft/ui';
+	import { basename, bytes, dateTime, parent, relativeDay, tooltip } from '@luft/ui';
 	import File from '@lucide/svelte/icons/file';
 	import Folder from '@lucide/svelte/icons/folder';
 	import type { ConflictItem } from '#lib/features/types.js';
-	import { formatDate, formatFullDate } from '#lib/utils/format.js';
-	import { parentPath } from '#lib/utils/paths.js';
 
 	interface Props {
 		heading: string;
@@ -26,8 +24,8 @@
 		</span>
 		<div class="min-w-0">
 			<div class="truncate text-[14px] font-medium" {@attach tooltip(item.name)}>{item.name}</div>
-			<div class="truncate text-[12px] text-[var(--text-muted)]" {@attach tooltip(parentPath(item.path))}>
-				In {basename(parentPath(item.path)) || '/'}
+			<div class="truncate text-[12px] text-[var(--text-muted)]" {@attach tooltip(parent(item.path))}>
+				In {basename(parent(item.path)) || '/'}
 			</div>
 		</div>
 	</div>
@@ -35,8 +33,8 @@
 		<dt class="text-[var(--text-muted)]">Size</dt>
 		<dd class={['truncate text-right', larger ? 'text-[var(--text)]' : 'text-[var(--text-soft)]']}>{bytes(item.size)}</dd>
 		<dt class="text-[var(--text-muted)]">Modified</dt>
-		<dd class={['truncate text-right', newer ? 'text-[var(--accent)]' : 'text-[var(--text-soft)]']} {@attach tooltip(formatFullDate(item.modified))}>
-			{formatDate(item.modified) || 'Unknown'}
+		<dd class={['truncate text-right', newer ? 'text-[var(--accent)]' : 'text-[var(--text-soft)]']} {@attach tooltip(item.modified ? dateTime(item.modified) : '')}>
+			{item.modified ? relativeDay(item.modified) : 'Unknown'}
 		</dd>
 	</dl>
 </div>

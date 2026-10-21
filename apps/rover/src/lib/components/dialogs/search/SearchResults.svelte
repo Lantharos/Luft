@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { tooltip } from '@luft/ui';
+	import { parent, tooltip } from '@luft/ui';
 	import { KIND_ICONS } from '#lib/components/pane/kind-icons.js';
 	import type { SearchResult } from '#lib/features/types.js';
 	import { fileKind } from '#lib/utils/kinds.js';
-	import { parentPath } from '#lib/utils/paths.js';
 
 	interface Props {
 		results: SearchResult[];
@@ -22,7 +21,7 @@
 	});
 
 	function location(result: SearchResult) {
-		const folder = parentPath(result.path);
+		const folder = parent(result.path);
 		if (folder === root) return '';
 		return folder.startsWith(`${root}/`) ? folder.slice(root.length + 1) : folder;
 	}
@@ -46,7 +45,7 @@
 						<span class="block truncate text-[12px] text-[var(--text-soft)]">{result.snippet}</span>
 					{/if}
 				</span>
-				<span class="max-w-[40%] shrink-0 truncate text-[12px] text-[var(--text-muted)]" {@attach tooltip(parentPath(result.path))}>
+				<span class="max-w-[40%] shrink-0 truncate text-[12px] text-[var(--text-muted)]" {@attach tooltip(parent(result.path))}>
 					{location(result)}
 				</span>
 			</button>

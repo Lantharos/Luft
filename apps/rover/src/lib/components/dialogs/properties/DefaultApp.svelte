@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { AppIcon, Select } from '@luft/ui';
+	import { AppIcon, errorText, Select } from '@luft/ui';
 	import * as api from '#lib/api.js';
 	import * as features from '#lib/features/api.js';
 	import type { OpenWithApps } from '#lib/types/details.js';
-	import { errorMessage } from '#lib/utils/format.js';
 
 	interface Props {
 		path: string;
@@ -31,7 +30,7 @@
 			await features.setDefaultApp(path, id);
 			await load(path);
 		} catch (caught) {
-			error = errorMessage(caught);
+			error = errorText(caught);
 		}
 	}
 </script>

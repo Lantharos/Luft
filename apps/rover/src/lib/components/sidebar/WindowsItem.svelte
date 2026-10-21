@@ -1,7 +1,7 @@
 <script lang="ts">
 	import HardDrive from '@lucide/svelte/icons/hard-drive';
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
-	import { Dialog } from '@luft/ui';
+	import { Dialog, errorText } from '@luft/ui';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 	import type { WindowsDrive } from '#lib/types/index.js';
 	import SidebarItem from './SidebarItem.svelte';
@@ -24,7 +24,7 @@
 		try {
 			await manager.navigate(await manager.drives.open(drive, readOnly));
 		} catch (reason) {
-			problem = reason instanceof Error ? reason.message : String(reason);
+			problem = errorText(reason);
 		}
 	}
 </script>

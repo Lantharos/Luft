@@ -1,11 +1,10 @@
 <script lang="ts">
 	import { tick } from 'svelte';
-	import { basename, Dialog, plural, SearchField } from '@luft/ui';
+	import { basename, Dialog, parent, plural, SearchField } from '@luft/ui';
 	import * as api from '#lib/api.js';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 	import { search } from '#lib/features/search.svelte.js';
 	import type { SearchResult } from '#lib/features/types.js';
-	import { parentPath } from '#lib/utils/paths.js';
 	import SearchFilters from './SearchFilters.svelte';
 	import SearchResults from './SearchResults.svelte';
 
@@ -40,7 +39,7 @@
 
 	async function reveal(result: SearchResult) {
 		search.close();
-		await manager.navigate(parentPath(result.path));
+		await manager.navigate(parent(result.path));
 		manager.selectOnly(result.path);
 	}
 

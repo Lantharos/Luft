@@ -1,12 +1,10 @@
 <script lang="ts">
-	import { bytes, Dialog, plural } from '@luft/ui';
+	import { bytes, dateTime, Dialog, errorText, parent, plural } from '@luft/ui';
 	import * as api from '#lib/api.js';
 	import * as features from '#lib/features/api.js';
 	import type { Measurement, Ownership } from '#lib/features/types.js';
 	import type { DriveInfo, FileEntry } from '#lib/types/index.js';
 	import type { FileDetails } from '#lib/types/details.js';
-	import { errorMessage, formatFullDate } from '#lib/utils/format.js';
-	import { parentPath } from '#lib/utils/paths.js';
 	import DefaultApp from './DefaultApp.svelte';
 	import PermissionGrid from './PermissionGrid.svelte';
 
@@ -25,7 +23,7 @@
 
 	let single = $derived(entries.length === 1 ? entries[0] : null);
 	let measured = $derived(!drive && (entries.some((entry) => entry.isDir) || entries.length > 1));
-	let locations = $derived(new Set(entries.map((entry) => parentPath(entry.path))));
+	let locations = $derived(new Set(entries.map((entry) => parent(entry.path))));
 	let title = $derived(drive?.name ?? single?.name ?? plural(entries.length, 'item'));
 	let kind = $derived(drive ? 'Drive' : single ? (details?.kind ?? '') : describeMix(entries));
 	let octal = $derived(ownership ? (ownership.mode & 0o777).toString(8).padStart(3, '0') : '');
@@ -79,7 +77,7 @@
 			await features.setPermissions(single.path, mode);
 		} catch (caught) {
 			ownership = previous;
-			error = errorMessage(caught);
+			error = errorText(caught);
 		}
 	}
 </script>
@@ -100,9 +98,9 @@
 		{#if single}
 			{@render row('Points to', details?.linkTarget ?? '')}
 			{@render row('Dimensions', details?.dimensions ? `${details.dimensions[0]} × ${details.dimensions[1]} pixels` : '')}
-			{@render row('Created', formatFullDate(details?.created ?? null))}
-			{@render row('Modified', formatFullDate(single.modified))}
-			{@render row('Opened', formatFullDate(details?.accessed ?? null))}
+			{@render row('Created', details?.created ? dateTime(details.created) : '')}
+			{@render row('Modified', single.modified ? dateTime(single.modified) : '')}
+			{@render row('Opened', details?.accessed ? dateTime(details.accessed) : '')}
 			{#if ownership}
 				{@render row('Owner', `${ownership.owner} · group ${ownership.group}`)}
 			{/if}

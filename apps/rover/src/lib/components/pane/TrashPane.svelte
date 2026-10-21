@@ -1,13 +1,11 @@
 <script lang="ts">
 	import Trash from '@lucide/svelte/icons/trash';
-	import { bytes, plural, Segmented, VirtualScroller } from '@luft/ui';
+	import { bytes, parent, plural, relativeDay, Segmented, VirtualScroller } from '@luft/ui';
 	import EntryIcon from '#lib/components/pane/EntryIcon.svelte';
 	import { dialogs } from '#lib/features/dialogs.svelte.js';
 	import EmptyState from '#lib/components/pane/EmptyState.svelte';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 	import type { TrashItem } from '#lib/types/index.js';
-	import { formatDate } from '#lib/utils/format.js';
-	import { parentPath } from '#lib/utils/paths.js';
 
 	interface Props {
 		manager: FileManager;
@@ -65,10 +63,10 @@
 					<EntryIcon kind={item.isDir ? 'folder' : 'file'} size={24} />
 					<span class="flex min-w-0 flex-col">
 						<span class="truncate">{item.name}</span>
-						<span class="truncate text-[12px] text-[var(--text-muted)]">{parentPath(item.originalPath)}</span>
+						<span class="truncate text-[12px] text-[var(--text-muted)]">{parent(item.originalPath)}</span>
 					</span>
 				</span>
-				<span class="list-cell list-date">{formatDate(item.deletedAt)}</span>
+				<span class="list-cell list-date">{relativeDay(item.deletedAt)}</span>
 				<span class="list-cell list-size">{item.isDir ? '' : bytes(item.size)}</span>
 			</div>
 		{/snippet}

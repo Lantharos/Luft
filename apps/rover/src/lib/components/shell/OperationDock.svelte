@@ -8,10 +8,9 @@
 	import Upload from '@lucide/svelte/icons/upload';
 	import Usb from '@lucide/svelte/icons/usb';
 	import X from '@lucide/svelte/icons/x';
-	import { basename, bytes, plural } from '@luft/ui';
+	import { basename, bytes, duration, plural } from '@luft/ui';
 	import * as api from '#lib/api.js';
 	import type { Operation } from '#lib/types/index.js';
-	import { formatDuration } from '#lib/utils/format.js';
 
 	interface Props {
 		operations: Operation[];
@@ -106,7 +105,7 @@
 		return [
 			`${bytes(operation.bytesProcessed)} of ${bytes(operation.totalBytes)}`,
 			rate > 0 && `${bytes(rate)}/s`,
-			rate > 0 && remaining > 0 && `${formatDuration(remaining / rate)} left`
+			rate > 0 && remaining > 0 && `${duration(remaining / rate)} left`
 		]
 			.filter(Boolean)
 			.join(' · ');

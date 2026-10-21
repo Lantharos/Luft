@@ -19,6 +19,7 @@ with a TPM whose state stays in os/vm/state/tpm.
   DISK=path         start from another virtual disk
   SECURE_BOOT=1     firmware with Secure Boot on and Microsoft's keys enrolled
   NETWORK=0         no network card
+  AUDIO=out.wav     an Intel HD Audio card whose playback is recorded to out.wav
   MEMORY=4096       memory in MB (default 8192)
   HEADLESS=1        no window
 USAGE
@@ -60,6 +61,9 @@ fi
 network=(-nic "user,model=virtio-net-pci")
 [[ "${NETWORK:-1}" == 0 ]] && network=(-nic none)
 
+audio=()
+[[ -n "${AUDIO:-}" ]] && audio=(-audiodev "wav,id=sound,path=$AUDIO" -device ich9-intel-hda -device "hda-output,audiodev=sound")
+
 display=(-display "${DISPLAY_BACKEND:-gtk},show-cursor=on")
 [[ "${HEADLESS:-0}" == 1 ]] && display=(-display none)
 
@@ -81,6 +85,7 @@ qemu-system-x86_64 -machine "$machine" -cpu host -smp 4 -m "${MEMORY:-8192}" "${
   -device "virtio-vga,bus=display-port,x-pcie-pm-no-soft-reset=on,xres=${XRES:-1920},yres=${YRES:-1080}" \
   -device virtio-keyboard-pci -device virtio-tablet-pci \
   "${network[@]}" \
+  "${audio[@]}" \
   -serial "unix:$vm/serial.sock,server=on,wait=off" \
   -qmp "unix:$vm/qmp.sock,server=on,wait=off" \
   -pidfile "$vm/qemu.pid" \

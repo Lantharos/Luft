@@ -1,6 +1,6 @@
 ## Start
 
-start-search-placeholder = Cuardaigh aipeanna, socruithe agus comhaid
+start-search-placeholder = Cuardaigh aipeanna, comhaid agus tuilleadh
 start-search-cut = Gearr
 start-search-copy = Cóipeáil
 start-search-paste = Greamaigh
@@ -19,18 +19,51 @@ start-move-to-apps = Bog chuig Aipeanna
 ## Start search results
 
 start-search-best-match = An rogha is fearr
-start-search-no-results = Gan torthaí
 start-search-group-apps = Aipeanna
+start-search-group-commands = Gníomhartha aipeanna
+start-search-group-windows = Fuinneoga oscailte
 start-search-group-actions = Gníomhartha
 start-search-group-settings = Socruithe
+start-search-group-clipboard = Gearrthaisce
+start-search-group-emoji = Emojithe
 start-search-group-files = Comhaid
 start-search-group-contents = Taobh istigh de chomhaid
+start-search-group-web = Gréasán
+start-search-web = Cuardaigh an gréasán do “{ $query }”
+start-search-clipboard-text = Ó stair na gearrthaisce
+start-search-clipboard-keywords = gearrthaisce, cóipeáilte, cóipeáil, stair na gearrthaisce, greamaigh, clipboard
+start-search-emoji-insert = Ionsáigh
 start-search-settings-page = Socruithe
 start-search-settings-section = Socruithe: { $page }
 start-search-file-reveal = Taispeáin i { $fileManager }
 start-search-file-copy-path = Cóipeáil an chonair
 start-search-conversion = { $amount } { $from } mar { $to }
 start-search-calculation = { $expression }, brúigh Enter chun é a chóipeáil
+
+## Answers in Start's search to questions about dates and times.
+## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
+
+start-search-answer-until = Go dtí { $date }
+start-search-answer-since = Ó { $date }
+start-search-answer-between = Idir { $from } agus { $to }
+start-search-answer-time-ahead = { $place }, { $hours ->
+    [one] { $hours } uair an chloig
+    [two] { $hours } uair an chloig
+    [few] { $hours } huaire an chloig
+    [many] { $hours } n-uaire an chloig
+   *[other] { $hours } uair an chloig
+} chun tosaigh
+start-search-answer-time-behind = { $place }, { $hours ->
+    [one] { $hours } uair an chloig
+    [two] { $hours } uair an chloig
+    [few] { $hours } huaire an chloig
+    [many] { $hours } n-uaire an chloig
+   *[other] { $hours } uair an chloig
+} ar gcúl
+start-search-answer-time-same = { $place }, an t-am céanna is atá anseo
+start-search-answer-converted = { $place }, nuair atá sé { $time } ({ $from })
+start-search-answer-converted-here = Anseo, nuair atá sé { $time } ({ $from })
+start-search-answer-converted-from-here = { $place }, nuair atá sé { $time } anseo
 
 ## Start search actions
 ## The keyword messages are comma-separated words people might type to find the action.

@@ -76,9 +76,21 @@ settings-appearance-animations-description = Fönster och menyer glider fram i s
 
 ## Taskbar
 
-settings-taskbar-title = Aktivitetsfält
+settings-taskbar-title = Aktivitetsfält och Start
 settings-taskbar-back = Utseende
 settings-taskbar-preview = Förhandsvisning av aktivitetsfältet
+settings-start-section = Start
+settings-start-style = Stil
+settings-start-style-menu = Meny
+settings-start-style-palette = Gust
+settings-start-style-menu-description = Sökning, appar och mappar ovanför aktivitetsfältet
+settings-start-style-palette-description = Ett sökfält mitt på skärmen för appar, fönster, filer och svar
+settings-start-button = Visa Start-knappen
+settings-start-button-description = Super öppnar Start i båda fallen
+settings-start-web = Sök på webben med
+settings-taskbar-section = Aktivitetsfält
+settings-taskbar-shown = Visa aktivitetsfältet
+settings-taskbar-hidden-description = Klockan och statusikonerna stannar i ett hörn, och Super öppnar Start
 settings-taskbar-alignment = Justering
 settings-taskbar-align-center = Centrerat
 settings-taskbar-align-left = Vänster

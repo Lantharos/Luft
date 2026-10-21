@@ -44,8 +44,8 @@ settings-page-about = Rreth
 
 ## Pages inside panels
 
-settings-page-taskbar = Shiriti i detyrave
-    .keywords = panel, dok, fshihe automatikisht, fshihu automatikisht, pluskues, i tejdukshëm, transparent, aplikacione të fiksuara, rreshtim, butoni i fillimit, fillimi, ekranet, hapësirë pune, desktop, desktop virtual
+settings-page-taskbar = Shiriti i detyrave dhe Fillimi
+    .keywords = panel, dok, fshihe automatikisht, fshihu automatikisht, fshih shiritin e detyrave, pluskues, i tejdukshëm, transparent, aplikacione të fiksuara, rreshtim, butoni i fillimit, fillimi, menyja e fillimit, start menu, gust, shiriti i kërkimit, nisës, launcher, kërkim në ueb, motor kërkimi, ekranet, hapësirë pune, desktop, desktop virtual
 settings-page-fonts = Shkronjat
     .keywords = të gjitha shkronjat, fonte, lloje shkronjash, familje shkronjash, instalo shkronja, hiq shkronja
 settings-page-cursors = Temat e kursorit

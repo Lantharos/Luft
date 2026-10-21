@@ -1,6 +1,6 @@
 ## Start
 
-start-search-placeholder = Cerca aplicacions, configuració i fitxers
+start-search-placeholder = Cerca aplicacions, fitxers i més
 start-search-cut = Retalla
 start-search-copy = Copia
 start-search-paste = Enganxa
@@ -19,18 +19,45 @@ start-move-to-apps = Mou a Aplicacions
 ## Start search results
 
 start-search-best-match = Millor coincidència
-start-search-no-results = No hi ha resultats
 start-search-group-apps = Aplicacions
+start-search-group-commands = Accions d’aplicacions
+start-search-group-windows = Finestres obertes
 start-search-group-actions = Accions
 start-search-group-settings = Configuració
+start-search-group-clipboard = Porta-retalls
+start-search-group-emoji = Emojis
 start-search-group-files = Fitxers
 start-search-group-contents = Dins dels fitxers
+start-search-group-web = Web
+start-search-web = Cerca «{ $query }» al web
+start-search-clipboard-text = De l’historial del porta-retalls
+start-search-clipboard-keywords = porta-retalls, copiat, copiats, historial del porta-retalls, enganxar, enganxa, clipboard
+start-search-emoji-insert = Insereix
 start-search-settings-page = Configuració
 start-search-settings-section = Configuració: { $page }
 start-search-file-reveal = Mostra a { $fileManager }
 start-search-file-copy-path = Copia el camí
 start-search-conversion = { $amount } { $from } en { $to }
 start-search-calculation = { $expression }, premeu Retorn per copiar
+
+## Answers in Start's search to questions about dates and times.
+## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
+
+start-search-answer-until = Fins al { $date }
+start-search-answer-since = Des del { $date }
+start-search-answer-between = Entre el { $from } i el { $to }
+start-search-answer-time-ahead = { $place }, { $hours ->
+    [one] { $hours } hora
+   *[other] { $hours } hores
+} més
+start-search-answer-time-behind = { $place }, { $hours ->
+    [one] { $hours } hora
+   *[other] { $hours } hores
+} menys
+start-search-answer-time-same = { $place }, la mateixa hora que aquí
+start-search-answer-converted = A { $place } quan són les { $time } a { $from }
+start-search-answer-converted-here = Aquí quan són les { $time } a { $from }
+start-search-answer-converted-from-here = A { $place } quan aquí són les { $time }
 
 ## Start search actions
 ## The keyword messages are comma-separated words people might type to find the action.

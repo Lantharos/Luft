@@ -1,6 +1,6 @@
 ## Start
 
-start-search-placeholder = Ieškoti programų, nustatymų ir failų
+start-search-placeholder = Ieškoti programų, failų ir daugiau
 start-search-cut = Iškirpti
 start-search-copy = Kopijuoti
 start-search-paste = Įklijuoti
@@ -19,18 +19,49 @@ start-move-to-apps = Perkelti į Programas
 ## Start search results
 
 start-search-best-match = Geriausias atitikmuo
-start-search-no-results = Rezultatų nėra
 start-search-group-apps = Programos
+start-search-group-commands = Programų veiksmai
+start-search-group-windows = Atidaryti langai
 start-search-group-actions = Veiksmai
 start-search-group-settings = Nustatymai
+start-search-group-clipboard = Iškarpinė
+start-search-group-emoji = Jaustukai
 start-search-group-files = Failai
 start-search-group-contents = Failų turinyje
+start-search-group-web = Žiniatinklis
+start-search-web = Ieškoti žiniatinklyje „{ $query }“
+start-search-clipboard-text = Iš iškarpinės istorijos
+start-search-clipboard-keywords = iškarpinė, iskarpine, nukopijuota, kopijuota, iškarpinės istorija, įklijuoti, clipboard
+start-search-emoji-insert = Įterpti
 start-search-settings-page = Nustatymai
 start-search-settings-section = Nustatymai: { $page }
 start-search-file-reveal = Rodyti programoje { $fileManager }
 start-search-file-copy-path = Kopijuoti kelią
 start-search-conversion = { $amount } { $from } į { $to }
 start-search-calculation = { $expression }, paspauskite Enter, kad nukopijuotumėte
+
+## Answers in Start's search to questions about dates and times.
+## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
+
+start-search-answer-until = Iki { $date }
+start-search-answer-since = Nuo { $date }
+start-search-answer-between = Nuo { $from } iki { $to }
+start-search-answer-time-ahead = { $place }, { $hours ->
+    [one] { $hours } valandą
+    [few] { $hours } valandas
+    [many] { $hours } valandos
+   *[other] { $hours } valandų
+} į priekį
+start-search-answer-time-behind = { $place }, { $hours ->
+    [one] { $hours } valandą
+    [few] { $hours } valandas
+    [many] { $hours } valandos
+   *[other] { $hours } valandų
+} atgal
+start-search-answer-time-same = { $place }, toks pat laikas kaip čia
+start-search-answer-converted = { $place }, kai { $from } – { $time }
+start-search-answer-converted-here = Čia, kai { $from } – { $time }
+start-search-answer-converted-from-here = { $place }, kai čia { $time }
 
 ## Start search actions
 ## The keyword messages are comma-separated words people might type to find the action.

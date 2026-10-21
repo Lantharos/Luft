@@ -44,8 +44,8 @@ settings-page-about = O sistemu
 
 ## Pages inside panels
 
-settings-page-taskbar = Opravilna vrstica
-    .keywords = plošča, panel, dok, samodejno skrivanje, samodejno skrij, plavajoča, prosojna, pripete aplikacije, poravnava, gumb start, zasloni, delovna površina, namizje, navidezno namizje
+settings-page-taskbar = Opravilna vrstica in meni Start
+    .keywords = plošča, panel, dok, samodejno skrivanje, samodejno skrij, skrij opravilno vrstico, plavajoča, prosojna, pripete aplikacije, poravnava, gumb start, meni start, start menu, gust, iskalna vrstica, zaganjalnik, launcher, spletno iskanje, iskalnik, search engine, zasloni, delovna površina, namizje, navidezno namizje
 settings-page-fonts = Pisave
     .keywords = vse pisave, družine pisav, tipografija, črke, namestitev pisav, odstranitev pisav
 settings-page-cursors = Teme kazalca

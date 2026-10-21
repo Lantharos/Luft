@@ -25,6 +25,7 @@ desktop-dictation-not-web-address = See pole veebiaadress
 
 ## Keyboard shortcuts
 desktop-shortcut-toggle-message-tray = Kuva teavituste loend
+desktop-shortcut-toggle-start = Ava menüü Start
 desktop-shortcut-toggle-quick-settings = Ava kiirsätted
 desktop-shortcut-focus-active-notification = Fookusta aktiivne teavitus
 desktop-shortcut-clipboard-history = Kuva lõikelaua ajalugu

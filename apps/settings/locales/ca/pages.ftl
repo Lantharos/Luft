@@ -44,8 +44,8 @@ settings-page-about = Quant a
 
 ## Pages inside panels
 
-settings-page-taskbar = Barra de tasques
-    .keywords = tauler, dock, amagar automàticament, ocultació automàtica, flotant, transparent, aplicacions fixades, alineació, botó d’inici, inici, pantalles, espai de treball, escriptori, escriptori virtual
+settings-page-taskbar = Barra de tasques i Inici
+    .keywords = tauler, dock, amagar automàticament, ocultació automàtica, amagar la barra de tasques, flotant, transparent, aplicacions fixades, alineació, botó d’inici, inici, menú inici, gust, barra de cerca, llançador, launcher, cerca al web, cerca web, motor de cerca, cercador, pantalles, espai de treball, escriptori, escriptori virtual
 settings-page-fonts = Tipus de lletra
     .keywords = tots els tipus de lletra, lletres, fonts, famílies tipogràfiques, instal·lar tipus de lletra, suprimir tipus de lletra
 settings-page-cursors = Temes de cursor

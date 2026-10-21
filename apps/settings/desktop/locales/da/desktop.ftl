@@ -25,6 +25,7 @@ desktop-dictation-not-web-address = Det er ikke en webadresse
 
 ## Keyboard shortcuts
 desktop-shortcut-toggle-message-tray = Vis listen over notifikationer
+desktop-shortcut-toggle-start = Åbn Start
 desktop-shortcut-toggle-quick-settings = Åbn hurtige indstillinger
 desktop-shortcut-focus-active-notification = Fokuser på den aktive notifikation
 desktop-shortcut-clipboard-history = Vis udklipsholderhistorik

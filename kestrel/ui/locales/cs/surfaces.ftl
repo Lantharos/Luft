@@ -1,6 +1,6 @@
 ## Start
 
-start-search-placeholder = Hledat aplikace, nastavení a soubory
+start-search-placeholder = Hledat aplikace, soubory a další
 start-search-cut = Vyjmout
 start-search-copy = Kopírovat
 start-search-paste = Vložit
@@ -19,18 +19,49 @@ start-move-to-apps = Přesunout do aplikací
 ## Start search results
 
 start-search-best-match = Nejlepší shoda
-start-search-no-results = Žádné výsledky
 start-search-group-apps = Aplikace
+start-search-group-commands = Akce aplikací
+start-search-group-windows = Otevřená okna
 start-search-group-actions = Akce
 start-search-group-settings = Nastavení
+start-search-group-clipboard = Schránka
+start-search-group-emoji = Emoji
 start-search-group-files = Soubory
 start-search-group-contents = Obsah souborů
+start-search-group-web = Web
+start-search-web = Hledat na webu „{ $query }“
+start-search-clipboard-text = Z historie schránky
+start-search-clipboard-keywords = schránka, zkopírováno, zkopírované, historie schránky, vložit, clipboard
+start-search-emoji-insert = Vložit
 start-search-settings-page = Nastavení
 start-search-settings-section = Nastavení: { $page }
 start-search-file-reveal = Zobrazit v aplikaci { $fileManager }
 start-search-file-copy-path = Kopírovat cestu
 start-search-conversion = { $amount } { $from } na { $to }
 start-search-calculation = { $expression }, zkopírujete klávesou Enter
+
+## Answers in Start's search to questions about dates and times.
+## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
+
+start-search-answer-until = Do { $date }
+start-search-answer-since = Od { $date }
+start-search-answer-between = Od { $from } do { $to }
+start-search-answer-time-ahead = { $place }, { $hours ->
+    [one] o { $hours } hodinu napřed
+    [few] o { $hours } hodiny napřed
+    [many] o { $hours } hodiny napřed
+   *[other] o { $hours } hodin napřed
+}
+start-search-answer-time-behind = { $place }, { $hours ->
+    [one] o { $hours } hodinu pozadu
+    [few] o { $hours } hodiny pozadu
+    [many] o { $hours } hodiny pozadu
+   *[other] o { $hours } hodin pozadu
+}
+start-search-answer-time-same = { $place }, stejný čas jako tady
+start-search-answer-converted = { $place }, když je { $time } ({ $from })
+start-search-answer-converted-here = Tady, když je { $time } ({ $from })
+start-search-answer-converted-from-here = { $place }, když je tady { $time }
 
 ## Start search actions
 ## The keyword messages are comma-separated words people might type to find the action.

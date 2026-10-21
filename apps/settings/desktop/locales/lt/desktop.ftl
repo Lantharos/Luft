@@ -25,6 +25,7 @@ desktop-dictation-not-web-address = Tai nėra žiniatinklio adresas
 
 ## Keyboard shortcuts
 desktop-shortcut-toggle-message-tray = Rodyti pranešimų sąrašą
+desktop-shortcut-toggle-start = Atidaryti meniu Pradžia
 desktop-shortcut-toggle-quick-settings = Atidaryti sparčiuosius nustatymus
 desktop-shortcut-focus-active-notification = Pereiti į aktyvų pranešimą
 desktop-shortcut-clipboard-history = Rodyti iškarpinės istoriją

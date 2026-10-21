@@ -25,6 +25,7 @@ desktop-dictation-not-web-address = Це не веб-адреса
 
 ## Keyboard shortcuts
 desktop-shortcut-toggle-message-tray = Показати список сповіщень
+desktop-shortcut-toggle-start = Відкрити меню Пуск
 desktop-shortcut-toggle-quick-settings = Відкрити швидкі параметри
 desktop-shortcut-focus-active-notification = Перейти до активного сповіщення
 desktop-shortcut-clipboard-history = Показати журнал буфера обміну

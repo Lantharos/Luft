@@ -76,9 +76,21 @@ settings-appearance-animations-description = It-twieqi u l-menus jiċċaqilqu mi
 
 ## Taskbar
 
-settings-taskbar-title = Taskbar
+settings-taskbar-title = Taskbar u Start
 settings-taskbar-back = Dehra
 settings-taskbar-preview = Dehra tat-taskbar
+settings-start-section = Start
+settings-start-style = Stil
+settings-start-style-menu = Menù
+settings-start-style-palette = Gust
+settings-start-style-menu-description = Tiftix, apps u fowlders fuq it-taskbar
+settings-start-style-palette-description = Bar tat-tiftix f’nofs l-iskrin għal apps, twieqi, fajls u tweġibiet
+settings-start-button = Uri l-buttuna Start
+settings-start-button-description = Super jiftaħ Start xorta waħda
+settings-start-web = Fittex fuq il-web permezz ta’
+settings-taskbar-section = Taskbar
+settings-taskbar-shown = Uri t-taskbar
+settings-taskbar-hidden-description = L-arloġġ u l-ikoni tal-istatus jibqgħu f’kantuniera, u Super jiftaħ Start
 settings-taskbar-alignment = Allinjament
 settings-taskbar-align-center = Fin-nofs
 settings-taskbar-align-left = Xellug

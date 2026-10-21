@@ -1,6 +1,6 @@
 ## Start
 
-start-search-placeholder = Apps, Einstellungen und Dateien suchen
+start-search-placeholder = Apps, Dateien und mehr suchen
 start-search-cut = Ausschneiden
 start-search-copy = Kopieren
 start-search-paste = Einfügen
@@ -19,18 +19,45 @@ start-move-to-apps = Zu „Apps“ verschieben
 ## Start search results
 
 start-search-best-match = Beste Übereinstimmung
-start-search-no-results = Keine Ergebnisse
 start-search-group-apps = Apps
+start-search-group-commands = App-Aktionen
+start-search-group-windows = Geöffnete Fenster
 start-search-group-actions = Aktionen
 start-search-group-settings = Einstellungen
+start-search-group-clipboard = Zwischenablage
+start-search-group-emoji = Emojis
 start-search-group-files = Dateien
 start-search-group-contents = In Dateien
+start-search-group-web = Web
+start-search-web = Im Web nach „{ $query }“ suchen
+start-search-clipboard-text = Aus dem Verlauf der Zwischenablage
+start-search-clipboard-keywords = zwischenablage, kopiert, verlauf der zwischenablage, einfügen, clipboard
+start-search-emoji-insert = Einfügen
 start-search-settings-page = Einstellungen
 start-search-settings-section = Einstellungen › { $page }
 start-search-file-reveal = In { $fileManager } anzeigen
 start-search-file-copy-path = Pfad kopieren
 start-search-conversion = { $amount } { $from } in { $to }
 start-search-calculation = { $expression }, Eingabetaste zum Kopieren
+
+## Answers in Start's search to questions about dates and times.
+## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
+
+start-search-answer-until = Bis { $date }
+start-search-answer-since = Seit { $date }
+start-search-answer-between = Zwischen { $from } und { $to }
+start-search-answer-time-ahead = { $place }, { $hours ->
+    [one] { $hours } Stunde
+   *[other] { $hours } Stunden
+} voraus
+start-search-answer-time-behind = { $place }, { $hours ->
+    [one] { $hours } Stunde
+   *[other] { $hours } Stunden
+} zurück
+start-search-answer-time-same = { $place }, dieselbe Uhrzeit wie hier
+start-search-answer-converted = In { $place }, wenn es in { $from } { $time } ist
+start-search-answer-converted-here = Hier, wenn es in { $from } { $time } ist
+start-search-answer-converted-from-here = In { $place }, wenn es hier { $time } ist
 
 ## Start search actions
 ## The keyword messages are comma-separated words people might type to find the action.

@@ -76,9 +76,21 @@ settings-appearance-animations-description = Prozori i meniji se pokreću umesto
 
 ## Taskbar
 
-settings-taskbar-title = Traka zadataka
+settings-taskbar-title = Traka zadataka i Start
 settings-taskbar-back = Izgled
 settings-taskbar-preview = Pregled trake zadataka
+settings-start-section = Start
+settings-start-style = Stil
+settings-start-style-menu = Meni
+settings-start-style-palette = Gust
+settings-start-style-menu-description = Pretraga, aplikacije i fascikle iznad trake zadataka
+settings-start-style-palette-description = Traka za pretragu na sredini ekrana za aplikacije, prozore, datoteke i odgovore
+settings-start-button = Prikaži dugme Start
+settings-start-button-description = Super svejedno otvara Start
+settings-start-web = Pretraži veb pomoću
+settings-taskbar-section = Traka zadataka
+settings-taskbar-shown = Prikaži traku zadataka
+settings-taskbar-hidden-description = Sat i ikone statusa ostaju u uglu, a Super otvara Start
 settings-taskbar-alignment = Poravnanje
 settings-taskbar-align-center = Po sredini
 settings-taskbar-align-left = Levo

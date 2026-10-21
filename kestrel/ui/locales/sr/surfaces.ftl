@@ -1,6 +1,6 @@
 ## Start
 
-start-search-placeholder = Претражите апликације, подешавања и датотеке
+start-search-placeholder = Претражите апликације, датотеке и друго
 start-search-cut = Исеци
 start-search-copy = Копирај
 start-search-paste = Налепи
@@ -19,18 +19,47 @@ start-move-to-apps = Премести у Апликације
 ## Start search results
 
 start-search-best-match = Најбоље подударање
-start-search-no-results = Нема резултата
 start-search-group-apps = Апликације
+start-search-group-commands = Радње апликација
+start-search-group-windows = Отворени прозори
 start-search-group-actions = Радње
 start-search-group-settings = Подешавања
+start-search-group-clipboard = Остава
+start-search-group-emoji = Емоџи
 start-search-group-files = Датотеке
 start-search-group-contents = У датотекама
+start-search-group-web = Веб
+start-search-web = Претражи „{ $query }“ на вебу
+start-search-clipboard-text = Из историје оставе
+start-search-clipboard-keywords = остава, копирано, историја оставе, налепи, клипборд, clipboard
+start-search-emoji-insert = Уметни
 start-search-settings-page = Подешавања
 start-search-settings-section = Подешавања: { $page }
 start-search-file-reveal = Прикажи у апликацији { $fileManager }
 start-search-file-copy-path = Копирај путању
 start-search-conversion = { $amount } { $from } у { $to }
 start-search-calculation = { $expression }, притисните Enter да бисте копирали
+
+## Answers in Start's search to questions about dates and times.
+## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
+
+start-search-answer-until = До { $date }
+start-search-answer-since = Од { $date }
+start-search-answer-between = Од { $from } до { $to }
+start-search-answer-time-ahead = { $place }, { $hours ->
+    [one] { $hours } сат
+    [few] { $hours } сата
+   *[other] { $hours } сати
+} испред
+start-search-answer-time-behind = { $place }, { $hours ->
+    [one] { $hours } сат
+    [few] { $hours } сата
+   *[other] { $hours } сати
+} иза
+start-search-answer-time-same = { $place }, исто време као овде
+start-search-answer-converted = { $place }, кад је { $time } у граду { $from }
+start-search-answer-converted-here = Овде, кад је { $time } у граду { $from }
+start-search-answer-converted-from-here = { $place }, кад је овде { $time }
 
 ## Start search actions
 ## The keyword messages are comma-separated words people might type to find the action.

@@ -44,8 +44,8 @@ settings-page-about = Dwar
 
 ## Pages inside panels
 
-settings-page-taskbar = Taskbar
-    .keywords = panew, dock, aħbi awtomatikament, auto-hide, moħbi, floating, trasparenti, apps imwaħħla, allinjament, buttuna Start, skrins, spazju tax-xogħol, desktop, desktop virtwali
+settings-page-taskbar = Taskbar u Start
+    .keywords = panew, dock, aħbi awtomatikament, auto-hide, moħbi, aħbi t-taskbar, hide taskbar, floating, trasparenti, apps imwaħħla, allinjament, buttuna Start, menù Start, start menu, gust, bar tat-tiftix, search bar, launcher, tiftix fuq il-web, web search, magna tat-tiftix, search engine, skrins, spazju tax-xogħol, desktop, desktop virtwali
 settings-page-fonts = Fonts
     .keywords = il-fonts kollha, tipi ta’ ittri, familji tal-fonts, installa fonts, neħħi fonts
 settings-page-cursors = Temi tal-kerser

@@ -1,6 +1,6 @@
 ## Start
 
-start-search-placeholder = Fittex apps, settings u fajls
+start-search-placeholder = Fittex apps, fajls u aktar
 start-search-cut = Aqta’
 start-search-copy = Ikkopja
 start-search-paste = Ippejstja
@@ -19,18 +19,51 @@ start-move-to-apps = Ressaq lejn Apps
 ## Start search results
 
 start-search-best-match = L-aħjar riżultat
-start-search-no-results = L-ebda riżultat
 start-search-group-apps = Apps
+start-search-group-commands = Azzjonijiet tal-apps
+start-search-group-windows = Twieqi miftuħa
 start-search-group-actions = Azzjonijiet
 start-search-group-settings = Settings
+start-search-group-clipboard = Klibbord
+start-search-group-emoji = Emoji
 start-search-group-files = Fajls
 start-search-group-contents = Ġewwa l-fajls
+start-search-group-web = Web
+start-search-web = Fittex fuq il-web għal “{ $query }”
+start-search-clipboard-text = Mill-istorja tal-klibbord
+start-search-clipboard-keywords = klibbord, ikkopjat, kkopjat, storja tal-klibbord, ippejstja, clipboard
+start-search-emoji-insert = Daħħal
 start-search-settings-page = Settings
 start-search-settings-section = Settings: { $page }
 start-search-file-reveal = Uri f’{ $fileManager }
 start-search-file-copy-path = Ikkopja l-post tal-fajl
 start-search-conversion = { $amount } { $from } f’{ $to }
 start-search-calculation = { $expression }, agħfas Enter biex tikkopja
+
+## Answers in Start's search to questions about dates and times.
+## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
+
+start-search-answer-until = Sa { $date }
+start-search-answer-since = Minn { $date }
+start-search-answer-between = Bejn { $from } u { $to }
+start-search-answer-time-ahead = { $place }, { $hours ->
+    [one] { $hours } siegħa
+    [two] { $hours } sigħat
+    [few] { $hours } sigħat
+    [many] { $hours } siegħa
+   *[other] { $hours } siegħa
+} ’il quddiem
+start-search-answer-time-behind = { $place }, { $hours ->
+    [one] { $hours } siegħa
+    [two] { $hours } sigħat
+    [few] { $hours } sigħat
+    [many] { $hours } siegħa
+   *[other] { $hours } siegħa
+} lura
+start-search-answer-time-same = { $place }, l-istess ħin bħal hawn
+start-search-answer-converted = F’{ $place } meta jkun { $time } f’{ $from }
+start-search-answer-converted-here = Hawn meta jkun { $time } f’{ $from }
+start-search-answer-converted-from-here = F’{ $place } meta jkun { $time } hawn
 
 ## Start search actions
 ## The keyword messages are comma-separated words people might type to find the action.

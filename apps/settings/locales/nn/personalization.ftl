@@ -76,9 +76,21 @@ settings-appearance-animations-description = Vindauge og menyar glir fram i stad
 
 ## Taskbar
 
-settings-taskbar-title = Oppgåvelinje
+settings-taskbar-title = Oppgåvelinje og Start
 settings-taskbar-back = Utsjånad
 settings-taskbar-preview = Førehandsvising av oppgåvelinja
+settings-start-section = Start
+settings-start-style = Stil
+settings-start-style-menu = Meny
+settings-start-style-palette = Gust
+settings-start-style-menu-description = Søk, appar og mapper over oppgåvelinja
+settings-start-style-palette-description = Eit søkjefelt midt på skjermen for appar, vindauge, filer og svar
+settings-start-button = Vis Start-knappen
+settings-start-button-description = Super opnar Start uansett
+settings-start-web = Søk på nettet med
+settings-taskbar-section = Oppgåvelinje
+settings-taskbar-shown = Vis oppgåvelinja
+settings-taskbar-hidden-description = Klokka og statusikona blir verande i eit hjørne, og Super opnar Start
 settings-taskbar-alignment = Justering
 settings-taskbar-align-center = Midtstilt
 settings-taskbar-align-left = Venstre

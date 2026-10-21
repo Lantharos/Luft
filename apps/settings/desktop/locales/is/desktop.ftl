@@ -25,6 +25,7 @@ desktop-dictation-not-web-address = Þetta er ekki vefslóð
 
 ## Keyboard shortcuts
 desktop-shortcut-toggle-message-tray = Sýna tilkynningalistann
+desktop-shortcut-toggle-start = Opna upphafsvalmynd
 desktop-shortcut-toggle-quick-settings = Opna flýtistillingar
 desktop-shortcut-focus-active-notification = Færa fókus á virku tilkynninguna
 desktop-shortcut-clipboard-history = Sýna feril klippiborðs

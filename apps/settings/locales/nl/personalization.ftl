@@ -76,9 +76,21 @@ settings-appearance-animations-description = Vensters en menu’s bewegen in pla
 
 ## Taskbar
 
-settings-taskbar-title = Taakbalk
+settings-taskbar-title = Taakbalk en Start
 settings-taskbar-back = Uiterlijk
 settings-taskbar-preview = Voorbeeld van de taakbalk
+settings-start-section = Start
+settings-start-style = Stijl
+settings-start-style-menu = Menu
+settings-start-style-palette = Gust
+settings-start-style-menu-description = Zoeken, apps en mappen boven de taakbalk
+settings-start-style-palette-description = Een zoekbalk midden in het scherm voor apps, vensters, bestanden en antwoorden
+settings-start-button = Startknop tonen
+settings-start-button-description = Super opent Start in beide gevallen
+settings-start-web = Op het web zoeken met
+settings-taskbar-section = Taakbalk
+settings-taskbar-shown = Taakbalk tonen
+settings-taskbar-hidden-description = De klok en statuspictogrammen blijven in een hoek, en Super opent Start
 settings-taskbar-alignment = Uitlijning
 settings-taskbar-align-center = Midden
 settings-taskbar-align-left = Links

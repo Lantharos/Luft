@@ -1,6 +1,6 @@
 ## Start
 
-start-search-placeholder = Apps, instellingen en bestanden zoeken
+start-search-placeholder = Apps, bestanden en meer zoeken
 start-search-cut = Knippen
 start-search-copy = Kopiëren
 start-search-paste = Plakken
@@ -19,18 +19,45 @@ start-move-to-apps = Verplaatsen naar Apps
 ## Start search results
 
 start-search-best-match = Beste overeenkomst
-start-search-no-results = Geen resultaten
 start-search-group-apps = Apps
+start-search-group-commands = Acties van apps
+start-search-group-windows = Geopende vensters
 start-search-group-actions = Acties
 start-search-group-settings = Instellingen
+start-search-group-clipboard = Klembord
+start-search-group-emoji = Emoji
 start-search-group-files = Bestanden
 start-search-group-contents = In bestanden
+start-search-group-web = Web
+start-search-web = Op het web zoeken naar “{ $query }”
+start-search-clipboard-text = Uit de klembordgeschiedenis
+start-search-clipboard-keywords = klembord, gekopieerd, kopiëren, klembordgeschiedenis, plakken, clipboard
+start-search-emoji-insert = Invoegen
 start-search-settings-page = Instellingen
 start-search-settings-section = Instellingen voor { $page }
 start-search-file-reveal = Tonen in { $fileManager }
 start-search-file-copy-path = Pad kopiëren
 start-search-conversion = { $amount } { $from } in { $to }
 start-search-calculation = { $expression }, druk op Enter om te kopiëren
+
+## Answers in Start's search to questions about dates and times.
+## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
+
+start-search-answer-until = Tot { $date }
+start-search-answer-since = Sinds { $date }
+start-search-answer-between = Tussen { $from } en { $to }
+start-search-answer-time-ahead = { $place }, { $hours ->
+    [one] { $hours } uur
+   *[other] { $hours } uur
+} voor
+start-search-answer-time-behind = { $place }, { $hours ->
+    [one] { $hours } uur
+   *[other] { $hours } uur
+} achter
+start-search-answer-time-same = { $place }, dezelfde tijd als hier
+start-search-answer-converted = In { $place } als het { $time } is in { $from }
+start-search-answer-converted-here = Hier als het { $time } is in { $from }
+start-search-answer-converted-from-here = In { $place } als het hier { $time } is
 
 ## Start search actions
 ## The keyword messages are comma-separated words people might type to find the action.

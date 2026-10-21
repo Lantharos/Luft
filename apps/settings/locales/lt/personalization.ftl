@@ -76,9 +76,21 @@ settings-appearance-animations-description = Langai ir meniu atsiranda judėdami
 
 ## Taskbar
 
-settings-taskbar-title = Užduočių juosta
+settings-taskbar-title = Užduočių juosta ir Pradžia
 settings-taskbar-back = Išvaizda
 settings-taskbar-preview = Užduočių juostos peržiūra
+settings-start-section = Pradžia
+settings-start-style = Stilius
+settings-start-style-menu = Meniu
+settings-start-style-palette = Gust
+settings-start-style-menu-description = Paieška, programos ir aplankai virš užduočių juostos
+settings-start-style-palette-description = Paieškos juosta ekrano viduryje programoms, langams, failams ir atsakymams rasti
+settings-start-button = Rodyti mygtuką Pradžia
+settings-start-button-description = Super bet kuriuo atveju atidaro meniu Pradžia
+settings-start-web = Žiniatinklio paieškos sistema
+settings-taskbar-section = Užduočių juosta
+settings-taskbar-shown = Rodyti užduočių juostą
+settings-taskbar-hidden-description = Laikrodis ir būsenos piktogramos lieka kampe, o Super atidaro meniu Pradžia
 settings-taskbar-alignment = Lygiuotė
 settings-taskbar-align-center = Centre
 settings-taskbar-align-left = Kairėje

@@ -1,6 +1,6 @@
 ## Start
 
-start-search-placeholder = Alkalmazások, beállítások és fájlok keresése
+start-search-placeholder = Alkalmazások, fájlok és egyebek keresése
 start-search-cut = Kivágás
 start-search-copy = Másolás
 start-search-paste = Beillesztés
@@ -19,18 +19,45 @@ start-move-to-apps = Áthelyezés az Alkalmazások közé
 ## Start search results
 
 start-search-best-match = Legjobb találat
-start-search-no-results = Nincs találat
 start-search-group-apps = Alkalmazások
+start-search-group-commands = Alkalmazásműveletek
+start-search-group-windows = Megnyitott ablakok
 start-search-group-actions = Műveletek
 start-search-group-settings = Beállítások
+start-search-group-clipboard = Vágólap
+start-search-group-emoji = Emodzsik
 start-search-group-files = Fájlok
 start-search-group-contents = Fájlok tartalmában
+start-search-group-web = Web
+start-search-web = „{ $query }” keresése a weben
+start-search-clipboard-text = A vágólapelőzményekből
+start-search-clipboard-keywords = vágólap, másolt, másolás, vágólapelőzmények, beillesztés, clipboard
+start-search-emoji-insert = Beszúrás
 start-search-settings-page = Beállítások
 start-search-settings-section = Beállítások: { $page }
 start-search-file-reveal = Megjelenítés itt: { $fileManager }
 start-search-file-copy-path = Elérési út másolása
 start-search-conversion = { $amount } { $from } átváltva: { $to }
 start-search-calculation = { $expression }, a másoláshoz nyomja meg az Enter billentyűt
+
+## Answers in Start's search to questions about dates and times.
+## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
+
+start-search-answer-until = Eddig: { $date }
+start-search-answer-since = Ettől: { $date }
+start-search-answer-between = Időszak: { $from } – { $to }
+start-search-answer-time-ahead = { $place }, { $hours ->
+    [one] { $hours } órával előrébb jár
+   *[other] { $hours } órával előrébb jár
+}
+start-search-answer-time-behind = { $place }, { $hours ->
+    [one] { $hours } órával hátrébb jár
+   *[other] { $hours } órával hátrébb jár
+}
+start-search-answer-time-same = { $place }, ugyanannyi az idő, mint itt
+start-search-answer-converted = { $place }, amikor { $time } van ({ $from })
+start-search-answer-converted-here = Itt, amikor { $time } van ({ $from })
+start-search-answer-converted-from-here = { $place }, amikor itt { $time } van
 
 ## Start search actions
 ## The keyword messages are comma-separated words people might type to find the action.

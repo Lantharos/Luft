@@ -25,6 +25,7 @@ desktop-dictation-not-web-address = Isso não é um endereço da web
 
 ## Keyboard shortcuts
 desktop-shortcut-toggle-message-tray = Mostrar a lista de notificações
+desktop-shortcut-toggle-start = Abrir o menu Start
 desktop-shortcut-toggle-quick-settings = Abrir as Configurações rápidas
 desktop-shortcut-focus-active-notification = Focar a notificação ativa
 desktop-shortcut-clipboard-history = Mostrar o histórico da área de transferência

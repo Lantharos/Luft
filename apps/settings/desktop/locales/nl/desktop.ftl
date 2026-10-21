@@ -25,6 +25,7 @@ desktop-dictation-not-web-address = Dat is geen webadres
 
 ## Keyboard shortcuts
 desktop-shortcut-toggle-message-tray = Meldingenlijst tonen
+desktop-shortcut-toggle-start = Start openen
 desktop-shortcut-toggle-quick-settings = Snelle instellingen openen
 desktop-shortcut-focus-active-notification = Focus naar de actieve melding verplaatsen
 desktop-shortcut-clipboard-history = Klembordgeschiedenis tonen

@@ -25,6 +25,7 @@ desktop-dictation-not-web-address = Αυτή δεν είναι διεύθυνσ�
 
 ## Keyboard shortcuts
 desktop-shortcut-toggle-message-tray = Εμφάνιση λίστας ειδοποιήσεων
+desktop-shortcut-toggle-start = Άνοιγμα του Start
 desktop-shortcut-toggle-quick-settings = Άνοιγμα γρήγορων ρυθμίσεων
 desktop-shortcut-focus-active-notification = Εστίαση στην ενεργή ειδοποίηση
 desktop-shortcut-clipboard-history = Εμφάνιση ιστορικού προχείρου

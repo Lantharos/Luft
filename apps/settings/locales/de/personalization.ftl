@@ -76,9 +76,21 @@ settings-appearance-animations-description = Fenster und Menüs bewegen sich, st
 
 ## Taskbar
 
-settings-taskbar-title = Taskleiste
+settings-taskbar-title = Taskleiste und Start
 settings-taskbar-back = Erscheinungsbild
 settings-taskbar-preview = Vorschau der Taskleiste
+settings-start-section = Start
+settings-start-style = Stil
+settings-start-style-menu = Menü
+settings-start-style-palette = Gust
+settings-start-style-menu-description = Suche, Apps und Ordner über der Taskleiste
+settings-start-style-palette-description = Eine Suchleiste in der Bildschirmmitte für Apps, Fenster, Dateien und Antworten
+settings-start-button = Start-Schaltfläche anzeigen
+settings-start-button-description = Super öffnet Start auch ohne sie
+settings-start-web = Im Web suchen mit
+settings-taskbar-section = Taskleiste
+settings-taskbar-shown = Taskleiste anzeigen
+settings-taskbar-hidden-description = Uhr und Statussymbole bleiben in einer Ecke, und Super öffnet Start
 settings-taskbar-alignment = Ausrichtung
 settings-taskbar-align-center = Mitte
 settings-taskbar-align-left = Links

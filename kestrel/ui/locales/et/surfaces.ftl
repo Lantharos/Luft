@@ -1,6 +1,6 @@
 ## Start
 
-start-search-placeholder = Otsi rakendusi, sätteid ja faile
+start-search-placeholder = Otsi rakendusi, faile ja muud
 start-search-cut = Lõika
 start-search-copy = Kopeeri
 start-search-paste = Kleebi
@@ -19,18 +19,45 @@ start-move-to-apps = Teisalda rakenduste hulka
 ## Start search results
 
 start-search-best-match = Parim vaste
-start-search-no-results = Tulemusi pole
 start-search-group-apps = Rakendused
+start-search-group-commands = Rakenduste toimingud
+start-search-group-windows = Avatud aknad
 start-search-group-actions = Toimingud
 start-search-group-settings = Sätted
+start-search-group-clipboard = Lõikelaud
+start-search-group-emoji = Emojid
 start-search-group-files = Failid
 start-search-group-contents = Failide sisu
+start-search-group-web = Veeb
+start-search-web = Otsi veebist „{ $query }“
+start-search-clipboard-text = Lõikelaua ajaloost
+start-search-clipboard-keywords = lõikelaud, kopeeritud, lõikelaua ajalugu, kleebi, kleepimine, clipboard
+start-search-emoji-insert = Sisesta
 start-search-settings-page = Sätted
 start-search-settings-section = Sätted: { $page }
 start-search-file-reveal = Kuva rakenduses { $fileManager }
 start-search-file-copy-path = Kopeeri asukoht
 start-search-conversion = { $amount } { $from } → { $to }
 start-search-calculation = { $expression }, kopeerimiseks vajutage Enter
+
+## Answers in Start's search to questions about dates and times.
+## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
+
+start-search-answer-until = Kuni kuupäevani { $date }
+start-search-answer-since = Alates kuupäevast { $date }
+start-search-answer-between = Vahemik { $from } – { $to }
+start-search-answer-time-ahead = { $place }, { $hours ->
+    [one] { $hours } tund ees
+   *[other] { $hours } tundi ees
+}
+start-search-answer-time-behind = { $place }, { $hours ->
+    [one] { $hours } tund taga
+   *[other] { $hours } tundi taga
+}
+start-search-answer-time-same = { $place }, sama aeg mis siin
+start-search-answer-converted = { $place }, kui kell on { $time } ({ $from })
+start-search-answer-converted-here = Siin, kui kell on { $time } ({ $from })
+start-search-answer-converted-from-here = { $place }, kui siin on kell { $time }
 
 ## Start search actions
 ## The keyword messages are comma-separated words people might type to find the action.

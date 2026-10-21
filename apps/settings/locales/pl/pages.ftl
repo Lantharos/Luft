@@ -44,8 +44,8 @@ settings-page-about = Informacje
 
 ## Pages inside panels
 
-settings-page-taskbar = Pasek zadań
-    .keywords = panel, dok, dock, autoukrywanie, automatyczne ukrywanie, pływający, przezroczysty, przezroczystość, przypięte aplikacje, wyrównanie, przycisk start, ekrany, obszar roboczy, pulpit, pulpit wirtualny
+settings-page-taskbar = Pasek zadań i menu Start
+    .keywords = panel, dok, dock, autoukrywanie, automatyczne ukrywanie, ukryj pasek zadań, pływający, przezroczysty, przezroczystość, przypięte aplikacje, wyrównanie, przycisk start, menu start, start menu, gust, pasek wyszukiwania, program uruchamiający, launcher, wyszukiwanie w internecie, wyszukiwarka, search engine, ekrany, obszar roboczy, pulpit, pulpit wirtualny
 settings-page-fonts = Czcionki
     .keywords = wszystkie czcionki, kroje pisma, rodziny czcionek, instaluj czcionki, usuń czcionki
 settings-page-cursors = Motywy kursora

@@ -44,8 +44,8 @@ settings-page-about = O računaru
 
 ## Pages inside panels
 
-settings-page-taskbar = Traka zadataka
-    .keywords = panel, dok, automatsko skrivanje, sakrij automatski, plutajuća, providna, zakačene aplikacije, poravnanje, dugme start, ekrani, radni prostor, radna površina, virtuelna radna površina
+settings-page-taskbar = Traka zadataka i Start
+    .keywords = panel, dok, automatsko skrivanje, sakrij automatski, sakrij traku zadataka, plutajuća, providna, zakačene aplikacije, poravnanje, dugme start, meni start, start menu, gust, traka za pretragu, pokretač, launcher, veb pretraga, pretraživač, ekrani, radni prostor, radna površina, virtuelna radna površina
 settings-page-fonts = Fontovi
     .keywords = svi fontovi, slova, porodice fontova, instaliranje fontova, uklanjanje fontova
 settings-page-cursors = Teme kursora

@@ -44,8 +44,8 @@ settings-page-about = Tietoja
 
 ## Pages inside panels
 
-settings-page-taskbar = Tehtäväpalkki
-    .keywords = paneeli, telakka, dock, piilota automaattisesti, automaattinen piilotus, kelluva, läpinäkyvä, kiinnitetyt sovellukset, tasaus, start-painike, näytöt, työtila, työpöytä, virtuaalityöpöytä
+settings-page-taskbar = Tehtäväpalkki ja Start
+    .keywords = paneeli, telakka, dock, piilota automaattisesti, automaattinen piilotus, piilota tehtäväpalkki, kelluva, läpinäkyvä, kiinnitetyt sovellukset, tasaus, start-painike, start-valikko, aloitusvalikko, gust, hakupalkki, hakukenttä, käynnistin, launcher, verkkohaku, hae verkosta, hakukone, näytöt, työtila, työpöytä, virtuaalityöpöytä
 settings-page-fonts = Fontit
     .keywords = kaikki fontit, kirjasimet, kirjasintyypit, fonttiperheet, asenna fontteja, poista fontteja
 settings-page-cursors = Osoitinteemat

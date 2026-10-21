@@ -1,6 +1,6 @@
 ## Start
 
-start-search-placeholder = Αναζήτηση εφαρμογών, ρυθμίσεων και αρχείων
+start-search-placeholder = Αναζήτηση εφαρμογών, αρχείων και άλλων
 start-search-cut = Αποκοπή
 start-search-copy = Αντιγραφή
 start-search-paste = Επικόλληση
@@ -19,18 +19,45 @@ start-move-to-apps = Μετακίνηση στις Εφαρμογές
 ## Start search results
 
 start-search-best-match = Καλύτερη αντιστοιχία
-start-search-no-results = Δεν υπάρχουν αποτελέσματα
 start-search-group-apps = Εφαρμογές
+start-search-group-commands = Ενέργειες εφαρμογών
+start-search-group-windows = Ανοιχτά παράθυρα
 start-search-group-actions = Ενέργειες
 start-search-group-settings = Ρυθμίσεις
+start-search-group-clipboard = Πρόχειρο
+start-search-group-emoji = Emoji
 start-search-group-files = Αρχεία
 start-search-group-contents = Μέσα σε αρχεία
+start-search-group-web = Διαδίκτυο
+start-search-web = Αναζήτηση στο διαδίκτυο για «{ $query }»
+start-search-clipboard-text = Από το ιστορικό προχείρου
+start-search-clipboard-keywords = πρόχειρο, αντιγραμμένα, αντιγραφή, ιστορικό προχείρου, επικόλληση, clipboard
+start-search-emoji-insert = Εισαγωγή
 start-search-settings-page = Ρυθμίσεις
 start-search-settings-section = Ρυθμίσεις: { $page }
 start-search-file-reveal = Εμφάνιση στο { $fileManager }
 start-search-file-copy-path = Αντιγραφή διαδρομής
 start-search-conversion = { $amount } { $from } σε { $to }
 start-search-calculation = { $expression }, πατήστε Enter για αντιγραφή
+
+## Answers in Start's search to questions about dates and times.
+## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
+
+start-search-answer-until = Έως { $date }
+start-search-answer-since = Από { $date }
+start-search-answer-between = Από { $from } έως { $to }
+start-search-answer-time-ahead = { $place }, { $hours ->
+    [one] { $hours } ώρα
+   *[other] { $hours } ώρες
+} μπροστά
+start-search-answer-time-behind = { $place }, { $hours ->
+    [one] { $hours } ώρα
+   *[other] { $hours } ώρες
+} πίσω
+start-search-answer-time-same = { $place }, ίδια ώρα με εδώ
+start-search-answer-converted = { $place }, όταν είναι { $time } ({ $from })
+start-search-answer-converted-here = Εδώ, όταν είναι { $time } ({ $from })
+start-search-answer-converted-from-here = { $place }, όταν είναι { $time } εδώ
 
 ## Start search actions
 ## The keyword messages are comma-separated words people might type to find the action.

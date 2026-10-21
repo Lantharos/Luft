@@ -44,8 +44,8 @@ settings-page-about = Névjegy
 
 ## Pages inside panels
 
-settings-page-taskbar = Tálca
-    .keywords = panel, dokk, dock, automatikus elrejtés, elrejtés, lebegő, átlátszó, rögzített alkalmazások, igazítás, start gomb, kijelzők, munkaterület, asztal, virtuális asztal
+settings-page-taskbar = Tálca és Start menü
+    .keywords = panel, dokk, dock, automatikus elrejtés, elrejtés, tálca elrejtése, lebegő, átlátszó, rögzített alkalmazások, igazítás, start gomb, start menü, start menu, gust, keresősáv, indító, launcher, webes keresés, keresőmotor, search engine, kijelzők, munkaterület, asztal, virtuális asztal
 settings-page-fonts = Betűtípusok
     .keywords = összes betűtípus, betűk, betűcsaládok, betűtípus telepítése, betűtípus eltávolítása, fontok
 settings-page-cursors = Kurzortémák

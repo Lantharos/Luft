@@ -76,9 +76,21 @@ settings-appearance-animations-description = Aknad ja menüüd liiguvad, selle a
 
 ## Taskbar
 
-settings-taskbar-title = Tegumiriba
+settings-taskbar-title = Tegumiriba ja Start
 settings-taskbar-back = Välimus
 settings-taskbar-preview = Tegumiriba eelvaade
+settings-start-section = Start
+settings-start-style = Stiil
+settings-start-style-menu = Menüü
+settings-start-style-palette = Gust
+settings-start-style-menu-description = Otsing, rakendused ja kaustad tegumiriba kohal
+settings-start-style-palette-description = Otsinguriba ekraani keskel rakenduste, akende, failide ja vastuste jaoks
+settings-start-button = Kuva nupp Start
+settings-start-button-description = Klahv Super avab menüü Start igal juhul
+settings-start-web = Otsingumootor
+settings-taskbar-section = Tegumiriba
+settings-taskbar-shown = Kuva tegumiriba
+settings-taskbar-hidden-description = Kell ja olekuikoonid jäävad nurka ning klahv Super avab menüü Start
 settings-taskbar-alignment = Joondus
 settings-taskbar-align-center = Keskel
 settings-taskbar-align-left = Vasakul

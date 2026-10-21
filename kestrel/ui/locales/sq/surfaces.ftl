@@ -1,6 +1,6 @@
 ## Start
 
-start-search-placeholder = Kërko aplikacione, cilësime dhe skedarë
+start-search-placeholder = Kërko aplikacione, skedarë dhe më shumë
 start-search-cut = Prit
 start-search-copy = Kopjo
 start-search-paste = Ngjit
@@ -19,18 +19,45 @@ start-move-to-apps = Zhvendos te Aplikacionet
 ## Start search results
 
 start-search-best-match = Përputhja më e mirë
-start-search-no-results = Asnjë rezultat
 start-search-group-apps = Aplikacionet
+start-search-group-commands = Veprimet e aplikacioneve
+start-search-group-windows = Dritaret e hapura
 start-search-group-actions = Veprimet
 start-search-group-settings = Cilësimet
+start-search-group-clipboard = Kujtesa e fragmenteve
+start-search-group-emoji = Emoji
 start-search-group-files = Skedarët
 start-search-group-contents = Brenda skedarëve
+start-search-group-web = Uebi
+start-search-web = Kërko në ueb për “{ $query }”
+start-search-clipboard-text = Nga historiku i kujtesës së fragmenteve
+start-search-clipboard-keywords = kujtesa e fragmenteve, kopjuar, të kopjuara, historiku i kujtesës, ngjit, clipboard
+start-search-emoji-insert = Fut
 start-search-settings-page = Cilësimet
 start-search-settings-section = Cilësimet – { $page }
 start-search-file-reveal = Shfaq në { $fileManager }
 start-search-file-copy-path = Kopjo shtegun
 start-search-conversion = { $amount } { $from } në { $to }
 start-search-calculation = { $expression }, shtyp Enter për ta kopjuar
+
+## Answers in Start's search to questions about dates and times.
+## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
+
+start-search-answer-until = Deri më { $date }
+start-search-answer-since = Që nga { $date }
+start-search-answer-between = Nga { $from } deri më { $to }
+start-search-answer-time-ahead = { $place }, { $hours ->
+    [one] { $hours } orë
+   *[other] { $hours } orë
+} përpara
+start-search-answer-time-behind = { $place }, { $hours ->
+    [one] { $hours } orë
+   *[other] { $hours } orë
+} prapa
+start-search-answer-time-same = { $place }, e njëjta orë si këtu
+start-search-answer-converted = Në { $place } kur në { $from } është ora { $time }
+start-search-answer-converted-here = Këtu kur në { $from } është ora { $time }
+start-search-answer-converted-from-here = Në { $place } kur këtu është ora { $time }
 
 ## Start search actions
 ## The keyword messages are comma-separated words people might type to find the action.

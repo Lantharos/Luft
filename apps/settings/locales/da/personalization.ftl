@@ -76,9 +76,21 @@ settings-appearance-animations-description = Vinduer og menuer glider frem i ste
 
 ## Taskbar
 
-settings-taskbar-title = Proceslinje
+settings-taskbar-title = Proceslinje og Start
 settings-taskbar-back = Udseende
 settings-taskbar-preview = Eksempel på proceslinjen
+settings-start-section = Start
+settings-start-style = Stil
+settings-start-style-menu = Menu
+settings-start-style-palette = Gust
+settings-start-style-menu-description = Søgning, apps og mapper over proceslinjen
+settings-start-style-palette-description = En søgelinje midt på skærmen til apps, vinduer, filer og svar
+settings-start-button = Vis Start-knappen
+settings-start-button-description = Super åbner Start uanset hvad
+settings-start-web = Søg på nettet med
+settings-taskbar-section = Proceslinje
+settings-taskbar-shown = Vis proceslinjen
+settings-taskbar-hidden-description = Uret og statusikonerne bliver i et hjørne, og Super åbner Start
 settings-taskbar-alignment = Justering
 settings-taskbar-align-center = Midten
 settings-taskbar-align-left = Venstre

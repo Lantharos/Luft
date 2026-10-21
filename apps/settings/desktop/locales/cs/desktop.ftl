@@ -25,6 +25,7 @@ desktop-dictation-not-web-address = Toto není webová adresa
 
 ## Keyboard shortcuts
 desktop-shortcut-toggle-message-tray = Zobrazit seznam oznámení
+desktop-shortcut-toggle-start = Otevřít nabídku Start
 desktop-shortcut-toggle-quick-settings = Otevřít Rychlé nastavení
 desktop-shortcut-focus-active-notification = Přejít na aktivní oznámení
 desktop-shortcut-clipboard-history = Zobrazit historii schránky

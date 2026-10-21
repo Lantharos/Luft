@@ -25,6 +25,7 @@ desktop-dictation-not-web-address = Dak mhuwiex indirizz tal-web
 
 ## Keyboard shortcuts
 desktop-shortcut-toggle-message-tray = Uri l-lista tan-notifiki
+desktop-shortcut-toggle-start = Iftaħ Start
 desktop-shortcut-toggle-quick-settings = Iftaħ is-Settings rapidi
 desktop-shortcut-focus-active-notification = Iffoka fuq in-notifika attiva
 desktop-shortcut-clipboard-history = Uri l-istorja tal-klibbord

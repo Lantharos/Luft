@@ -44,8 +44,8 @@ settings-page-about = Om
 
 ## Pages inside panels
 
-settings-page-taskbar = Oppgåvelinje
-    .keywords = panel, dokk, gøym automatisk, skjul automatisk, flytande, gjennomsiktig, festa appar, justering, startknapp, start, skjermar, arbeidsområde, skrivebord, virtuelt skrivebord
+settings-page-taskbar = Oppgåvelinje og Start
+    .keywords = panel, dokk, gøym automatisk, skjul automatisk, gøym oppgåvelinja, flytande, gjennomsiktig, festa appar, justering, startknapp, start, startmeny, gust, søkjefelt, søkefelt, launcher, appstartar, nettsøk, søk på nettet, søkjemotor, søkemotor, skjermar, arbeidsområde, skrivebord, virtuelt skrivebord
 settings-page-fonts = Skrifttypar
     .keywords = alle skrifter, skrifter, skrifttypar, skriftfamiliar, installer skrifter, fjern skrifter
 settings-page-cursors = Peikartema

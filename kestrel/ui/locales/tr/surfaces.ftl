@@ -1,6 +1,6 @@
 ## Start
 
-start-search-placeholder = Uygulama, ayar ve dosya ara
+start-search-placeholder = Uygulama, dosya ve daha fazlasını ara
 start-search-cut = Kes
 start-search-copy = Kopyala
 start-search-paste = Yapıştır
@@ -19,18 +19,45 @@ start-move-to-apps = Uygulamalar’a taşı
 ## Start search results
 
 start-search-best-match = En iyi eşleşme
-start-search-no-results = Sonuç yok
 start-search-group-apps = Uygulamalar
+start-search-group-commands = Uygulama eylemleri
+start-search-group-windows = Açık pencereler
 start-search-group-actions = Eylemler
 start-search-group-settings = Ayarlar
+start-search-group-clipboard = Pano
+start-search-group-emoji = Emoji
 start-search-group-files = Dosyalar
 start-search-group-contents = Dosyaların içinde
+start-search-group-web = Web
+start-search-web = Web’de “{ $query }” ara
+start-search-clipboard-text = Pano geçmişinden
+start-search-clipboard-keywords = pano, kopyalanan, kopyalananlar, pano geçmişi, yapıştır, clipboard
+start-search-emoji-insert = Ekle
 start-search-settings-page = Ayarlar
 start-search-settings-section = { $page } ayarları
 start-search-file-reveal = { $fileManager } uygulamasında göster
 start-search-file-copy-path = Yolu kopyala
 start-search-conversion = { $amount } { $from }, { $to } cinsinden
 start-search-calculation = { $expression }, kopyalamak için Enter’a basın
+
+## Answers in Start's search to questions about dates and times.
+## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
+
+start-search-answer-until = { $date } tarihine kadar
+start-search-answer-since = { $date } tarihinden beri
+start-search-answer-between = { $from } ile { $to } arası
+start-search-answer-time-ahead = { $place }, { $hours ->
+    [one] { $hours } saat
+   *[other] { $hours } saat
+} ileride
+start-search-answer-time-behind = { $place }, { $hours ->
+    [one] { $hours } saat
+   *[other] { $hours } saat
+} geride
+start-search-answer-time-same = { $place }, burayla aynı saat
+start-search-answer-converted = { $place }, { $from } saati { $time } iken
+start-search-answer-converted-here = Burası, { $from } saati { $time } iken
+start-search-answer-converted-from-here = { $place }, burada saat { $time } iken
 
 ## Start search actions
 ## The keyword messages are comma-separated words people might type to find the action.

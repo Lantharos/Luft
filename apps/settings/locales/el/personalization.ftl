@@ -76,9 +76,21 @@ settings-appearance-animations-description = Τα παράθυρα και τα �
 
 ## Taskbar
 
-settings-taskbar-title = Γραμμή εργασιών
+settings-taskbar-title = Γραμμή εργασιών και Start
 settings-taskbar-back = Εμφάνιση
 settings-taskbar-preview = Προεπισκόπηση γραμμής εργασιών
+settings-start-section = Start
+settings-start-style = Στυλ
+settings-start-style-menu = Μενού
+settings-start-style-palette = Gust
+settings-start-style-menu-description = Αναζήτηση, εφαρμογές και φάκελοι πάνω από τη γραμμή εργασιών
+settings-start-style-palette-description = Μια γραμμή αναζήτησης στη μέση της οθόνης για εφαρμογές, παράθυρα, αρχεία και απαντήσεις
+settings-start-button = Εμφάνιση κουμπιού Start
+settings-start-button-description = Το Super ανοίγει το Start σε κάθε περίπτωση
+settings-start-web = Αναζήτηση στο διαδίκτυο με
+settings-taskbar-section = Γραμμή εργασιών
+settings-taskbar-shown = Εμφάνιση γραμμής εργασιών
+settings-taskbar-hidden-description = Το ρολόι και τα εικονίδια κατάστασης μένουν σε μια γωνία και το Super ανοίγει το Start
 settings-taskbar-alignment = Στοίχιση
 settings-taskbar-align-center = Στο κέντρο
 settings-taskbar-align-left = Αριστερά

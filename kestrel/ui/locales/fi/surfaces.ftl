@@ -1,6 +1,6 @@
 ## Start
 
-start-search-placeholder = Hae sovelluksia, asetuksia ja tiedostoja
+start-search-placeholder = Hae sovelluksia, tiedostoja ja muuta
 start-search-cut = Leikkaa
 start-search-copy = Kopioi
 start-search-paste = Liitä
@@ -19,18 +19,45 @@ start-move-to-apps = Siirrä sovelluksiin
 ## Start search results
 
 start-search-best-match = Paras vastine
-start-search-no-results = Ei tuloksia
 start-search-group-apps = Sovellukset
+start-search-group-commands = Sovellusten toiminnot
+start-search-group-windows = Avoimet ikkunat
 start-search-group-actions = Toiminnot
 start-search-group-settings = Asetukset
+start-search-group-clipboard = Leikepöytä
+start-search-group-emoji = Emojit
 start-search-group-files = Tiedostot
 start-search-group-contents = Tiedostojen sisältö
+start-search-group-web = Verkko
+start-search-web = Hae verkosta ”{ $query }”
+start-search-clipboard-text = Leikepöydän historiasta
+start-search-clipboard-keywords = leikepöytä, kopioitu, kopioi, leikepöydän historia, liitä, clipboard
+start-search-emoji-insert = Lisää
 start-search-settings-page = Asetukset
 start-search-settings-section = Asetukset: { $page }
 start-search-file-reveal = Näytä { $fileManager } -sovelluksessa
 start-search-file-copy-path = Kopioi polku
 start-search-conversion = { $amount } { $from } yksikkönä { $to }
 start-search-calculation = { $expression }, kopioi painamalla Enter
+
+## Answers in Start's search to questions about dates and times.
+## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
+
+start-search-answer-until = { $date } asti
+start-search-answer-since = { $date } lähtien
+start-search-answer-between = Aikaväli { $from } – { $to }
+start-search-answer-time-ahead = { $place }, { $hours ->
+    [one] { $hours } tunti
+   *[other] { $hours } tuntia
+} edellä
+start-search-answer-time-behind = { $place }, { $hours ->
+    [one] { $hours } tunti
+   *[other] { $hours } tuntia
+} jäljessä
+start-search-answer-time-same = { $place }, sama aika kuin täällä
+start-search-answer-converted = { $place }, kun kello on { $time } kohteessa { $from }
+start-search-answer-converted-here = Täällä, kun kello on { $time } kohteessa { $from }
+start-search-answer-converted-from-here = { $place }, kun kello on täällä { $time }
 
 ## Start search actions
 ## The keyword messages are comma-separated words people might type to find the action.

@@ -76,9 +76,21 @@ settings-appearance-animations-description = Okná a ponuky sa plynulo presúvaj
 
 ## Taskbar
 
-settings-taskbar-title = Panel úloh
+settings-taskbar-title = Panel úloh a ponuka Start
 settings-taskbar-back = Vzhľad
 settings-taskbar-preview = Ukážka panela úloh
+settings-start-section = Start
+settings-start-style = Štýl
+settings-start-style-menu = Ponuka
+settings-start-style-palette = Gust
+settings-start-style-menu-description = Vyhľadávanie, aplikácie a priečinky nad panelom úloh
+settings-start-style-palette-description = Vyhľadávacie pole v strede obrazovky pre aplikácie, okná, súbory a odpovede
+settings-start-button = Zobrazovať tlačidlo Start
+settings-start-button-description = Kláves Super otvorí ponuku Start v každom prípade
+settings-start-web = Webový vyhľadávač
+settings-taskbar-section = Panel úloh
+settings-taskbar-shown = Zobrazovať panel úloh
+settings-taskbar-hidden-description = Hodiny a stavové ikony zostanú v rohu a kláves Super otvorí ponuku Start
 settings-taskbar-alignment = Zarovnanie
 settings-taskbar-align-center = Na stred
 settings-taskbar-align-left = Vľavo

@@ -76,9 +76,21 @@ settings-appearance-animations-description = Ikkunat ja valikot liukuvat esiin e
 
 ## Taskbar
 
-settings-taskbar-title = Tehtäväpalkki
+settings-taskbar-title = Tehtäväpalkki ja Start
 settings-taskbar-back = Ulkoasu
 settings-taskbar-preview = Tehtäväpalkin esikatselu
+settings-start-section = Start
+settings-start-style = Tyyli
+settings-start-style-menu = Valikko
+settings-start-style-palette = Gust
+settings-start-style-menu-description = Haku, sovellukset ja kansiot tehtäväpalkin yläpuolella
+settings-start-style-palette-description = Hakupalkki näytön keskellä sovelluksille, ikkunoille, tiedostoille ja vastauksille
+settings-start-button = Näytä Start-painike
+settings-start-button-description = Super avaa Start-valikon joka tapauksessa
+settings-start-web = Hae verkosta hakukoneella
+settings-taskbar-section = Tehtäväpalkki
+settings-taskbar-shown = Näytä tehtäväpalkki
+settings-taskbar-hidden-description = Kello ja tilakuvakkeet pysyvät kulmassa, ja Super avaa Start-valikon
 settings-taskbar-alignment = Tasaus
 settings-taskbar-align-center = Keskelle
 settings-taskbar-align-left = Vasemmalle

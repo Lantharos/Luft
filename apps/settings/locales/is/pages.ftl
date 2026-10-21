@@ -44,8 +44,8 @@ settings-page-about = Um tölvuna
 
 ## Pages inside panels
 
-settings-page-taskbar = Verkstika
-    .keywords = spjald, dokka, fela sjálfkrafa, fljótandi, gegnsæ, fest forrit, jöfnun, staðsetning, upphafshnappur, upphaf, start, skjáir, vinnusvæði, skjáborð, sýndarskjáborð
+settings-page-taskbar = Verkstika og Upphaf
+    .keywords = spjald, dokka, fela sjálfkrafa, fela verkstiku, fljótandi, gegnsæ, fest forrit, jöfnun, staðsetning, upphafshnappur, upphaf, upphafsvalmynd, start, start menu, gust, leitarstika, leitarreitur, ræsiforrit, launcher, vefleit, leita á vefnum, leitarvél, skjáir, vinnusvæði, skjáborð, sýndarskjáborð
 settings-page-fonts = Letur
     .keywords = öll letur, leturgerðir, leturfjölskyldur, setja upp letur, fjarlægja letur
 settings-page-cursors = Bendlaþemu

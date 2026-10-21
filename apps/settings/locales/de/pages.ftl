@@ -44,8 +44,8 @@ settings-page-about = Info
 
 ## Pages inside panels
 
-settings-page-taskbar = Taskleiste
-    .keywords = leiste, dock, automatisch ausblenden, ausblenden, schwebend, transparent, angeheftete apps, ausrichtung, startschaltfläche, start-schaltfläche, bildschirme, arbeitsfläche, desktop, virtueller desktop
+settings-page-taskbar = Taskleiste und Start
+    .keywords = leiste, dock, automatisch ausblenden, ausblenden, taskleiste ausblenden, schwebend, transparent, angeheftete apps, ausrichtung, startschaltfläche, start-schaltfläche, startmenü, start menu, gust, suchleiste, launcher, websuche, im web suchen, suchmaschine, bildschirme, arbeitsfläche, desktop, virtueller desktop
 settings-page-fonts = Schriftarten
     .keywords = alle schriftarten, schriften, schriftfamilien, schriftarten installieren, schriftarten entfernen
 settings-page-cursors = Zeigerdesigns

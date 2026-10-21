@@ -76,9 +76,21 @@ settings-appearance-animations-description = Pencereler ve menüler bir anda bel
 
 ## Taskbar
 
-settings-taskbar-title = Görev çubuğu
+settings-taskbar-title = Görev çubuğu ve Başlat
 settings-taskbar-back = Görünüm
 settings-taskbar-preview = Görev çubuğu önizlemesi
+settings-start-section = Başlat
+settings-start-style = Stil
+settings-start-style-menu = Menü
+settings-start-style-palette = Gust
+settings-start-style-menu-description = Görev çubuğunun üstünde arama, uygulamalar ve klasörler
+settings-start-style-palette-description = Ekranın ortasında uygulamalar, pencereler, dosyalar ve yanıtlar için bir arama çubuğu
+settings-start-button = Başlat düğmesini göster
+settings-start-button-description = Super her durumda Başlat menüsünü açar
+settings-start-web = Web arama motoru
+settings-taskbar-section = Görev çubuğu
+settings-taskbar-shown = Görev çubuğunu göster
+settings-taskbar-hidden-description = Saat ve durum simgeleri bir köşede kalır, Super de Başlat menüsünü açar
 settings-taskbar-alignment = Hizalama
 settings-taskbar-align-center = Orta
 settings-taskbar-align-left = Sol

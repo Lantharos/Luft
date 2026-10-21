@@ -1,6 +1,6 @@
 ## Start
 
-start-search-placeholder = Leita að forritum, stillingum og skrám
+start-search-placeholder = Leita að forritum, skrám og fleiru
 start-search-cut = Klippa
 start-search-copy = Afrita
 start-search-paste = Líma
@@ -19,18 +19,45 @@ start-move-to-apps = Færa í Forrit
 ## Start search results
 
 start-search-best-match = Besta samsvörun
-start-search-no-results = Engar niðurstöður
 start-search-group-apps = Forrit
+start-search-group-commands = Aðgerðir í forritum
+start-search-group-windows = Opnir gluggar
 start-search-group-actions = Aðgerðir
 start-search-group-settings = Stillingar
+start-search-group-clipboard = Klippiborð
+start-search-group-emoji = Tjákn
 start-search-group-files = Skrár
 start-search-group-contents = Í skrám
+start-search-group-web = Vefurinn
+start-search-web = Leita á vefnum að „{ $query }“
+start-search-clipboard-text = Úr ferli klippiborðs
+start-search-clipboard-keywords = klippiborð, afritað, afrita, ferill klippiborðs, líma, clipboard
+start-search-emoji-insert = Setja inn
 start-search-settings-page = Stillingar
 start-search-settings-section = { $page } í Stillingum
 start-search-file-reveal = Sýna í { $fileManager }
 start-search-file-copy-path = Afrita slóð
 start-search-conversion = { $amount } { $from } í { $to }
 start-search-calculation = { $expression }, ýttu á Enter til að afrita
+
+## Answers in Start's search to questions about dates and times.
+## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
+
+start-search-answer-until = Til { $date }
+start-search-answer-since = Frá { $date }
+start-search-answer-between = Milli { $from } og { $to }
+start-search-answer-time-ahead = { $place }, { $hours ->
+    [one] { $hours } klukkustund
+   *[other] { $hours } klukkustundum
+} á undan
+start-search-answer-time-behind = { $place }, { $hours ->
+    [one] { $hours } klukkustund
+   *[other] { $hours } klukkustundum
+} á eftir
+start-search-answer-time-same = { $place }, sami tími og hér
+start-search-answer-converted = Í { $place } þegar klukkan er { $time } í { $from }
+start-search-answer-converted-here = Hér þegar klukkan er { $time } í { $from }
+start-search-answer-converted-from-here = Í { $place } þegar klukkan er { $time } hér
 
 ## Start search actions
 ## The keyword messages are comma-separated words people might type to find the action.

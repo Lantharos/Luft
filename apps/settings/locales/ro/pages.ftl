@@ -44,8 +44,8 @@ settings-page-about = Despre
 
 ## Pages inside panels
 
-settings-page-taskbar = Bara de activități
-    .keywords = bară, panou, dock, ascundere automată, ascunde automat, plutitoare, transparentă, aplicații fixate, aliniere, butonul start, ecrane, spațiu de lucru, desktop, desktop virtual
+settings-page-taskbar = Bara de activități și Start
+    .keywords = bară, panou, dock, ascundere automată, ascunde automat, ascunde bara de activități, plutitoare, transparentă, aplicații fixate, aliniere, butonul start, meniul start, meniu start, gust, bară de căutare, lansator, launcher, căutare pe web, căutare web, motor de căutare, ecrane, spațiu de lucru, desktop, desktop virtual
 settings-page-fonts = Fonturi
     .keywords = toate fonturile, caractere, familii de fonturi, instalare fonturi, eliminare fonturi
 settings-page-cursors = Teme de cursor

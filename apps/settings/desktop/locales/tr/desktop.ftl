@@ -25,6 +25,7 @@ desktop-dictation-not-web-address = Bu bir web adresi değil
 
 ## Keyboard shortcuts
 desktop-shortcut-toggle-message-tray = Bildirim listesini göster
+desktop-shortcut-toggle-start = Başlat menüsünü aç
 desktop-shortcut-toggle-quick-settings = Hızlı ayarlar menüsünü aç
 desktop-shortcut-focus-active-notification = Etkin bildirime odaklan
 desktop-shortcut-clipboard-history = Pano geçmişini göster

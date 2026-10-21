@@ -25,6 +25,7 @@ desktop-dictation-not-web-address = Tā nav tīmekļa adrese
 
 ## Keyboard shortcuts
 desktop-shortcut-toggle-message-tray = Rādīt paziņojumu sarakstu
+desktop-shortcut-toggle-start = Atvērt izvēlni Start
 desktop-shortcut-toggle-quick-settings = Atvērt ātros iestatījumus
 desktop-shortcut-focus-active-notification = Fokusēt aktīvo paziņojumu
 desktop-shortcut-clipboard-history = Rādīt starpliktuves vēsturi

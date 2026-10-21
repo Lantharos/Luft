@@ -1,6 +1,6 @@
 ## Start
 
-start-search-placeholder = Sök efter appar, inställningar och filer
+start-search-placeholder = Sök efter appar, filer med mera
 start-search-cut = Klipp ut
 start-search-copy = Kopiera
 start-search-paste = Klistra in
@@ -19,18 +19,45 @@ start-move-to-apps = Flytta till Appar
 ## Start search results
 
 start-search-best-match = Bästa träff
-start-search-no-results = Inga träffar
 start-search-group-apps = Appar
+start-search-group-commands = Appåtgärder
+start-search-group-windows = Öppna fönster
 start-search-group-actions = Åtgärder
 start-search-group-settings = Inställningar
+start-search-group-clipboard = Urklipp
+start-search-group-emoji = Emoji
 start-search-group-files = Filer
 start-search-group-contents = I filer
+start-search-group-web = Webben
+start-search-web = Sök på webben efter ”{ $query }”
+start-search-clipboard-text = Från urklippshistoriken
+start-search-clipboard-keywords = urklipp, kopierat, kopiera, urklippshistorik, klistra in, clipboard
+start-search-emoji-insert = Infoga
 start-search-settings-page = Inställningar
 start-search-settings-section = Inställningar för { $page }
 start-search-file-reveal = Visa i { $fileManager }
 start-search-file-copy-path = Kopiera sökväg
 start-search-conversion = { $amount } { $from } i { $to }
 start-search-calculation = { $expression }, tryck på Enter för att kopiera
+
+## Answers in Start's search to questions about dates and times.
+## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
+
+start-search-answer-until = Till { $date }
+start-search-answer-since = Sedan { $date }
+start-search-answer-between = Mellan { $from } och { $to }
+start-search-answer-time-ahead = { $place }, { $hours ->
+    [one] { $hours } timme
+   *[other] { $hours } timmar
+} före
+start-search-answer-time-behind = { $place }, { $hours ->
+    [one] { $hours } timme
+   *[other] { $hours } timmar
+} efter
+start-search-answer-time-same = { $place }, samma tid som här
+start-search-answer-converted = I { $place } när klockan är { $time } i { $from }
+start-search-answer-converted-here = Här när klockan är { $time } i { $from }
+start-search-answer-converted-from-here = I { $place } när klockan är { $time } här
 
 ## Start search actions
 ## The keyword messages are comma-separated words people might type to find the action.

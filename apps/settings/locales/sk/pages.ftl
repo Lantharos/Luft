@@ -44,8 +44,8 @@ settings-page-about = Informácie
 
 ## Pages inside panels
 
-settings-page-taskbar = Panel úloh
-    .keywords = panel, lišta, dok, automatické skrývanie, automaticky skryť, plávajúci, priehľadný, pripnuté aplikácie, zarovnanie, tlačidlo start, tlačidlo štart, obrazovky, pracovný priestor, pracovná plocha, virtuálna plocha
+settings-page-taskbar = Panel úloh a ponuka Start
+    .keywords = panel, lišta, dok, automatické skrývanie, automaticky skryť, skryť panel úloh, plávajúci, priehľadný, pripnuté aplikácie, zarovnanie, tlačidlo start, tlačidlo štart, ponuka start, ponuka štart, start menu, gust, vyhľadávacie pole, spúšťač, launcher, vyhľadávanie na webe, vyhľadávač, search engine, obrazovky, pracovný priestor, pracovná plocha, virtuálna plocha
 settings-page-fonts = Písma
     .keywords = všetky písma, písmo, fonty, rodiny písiem, inštalovať písma, odstrániť písma
 settings-page-cursors = Motívy kurzora

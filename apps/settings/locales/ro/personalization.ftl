@@ -76,9 +76,21 @@ settings-appearance-animations-description = Ferestrele și meniurile se mișcă
 
 ## Taskbar
 
-settings-taskbar-title = Bara de activități
+settings-taskbar-title = Bara de activități și Start
 settings-taskbar-back = Aspect
 settings-taskbar-preview = Previzualizarea barei de activități
+settings-start-section = Start
+settings-start-style = Stil
+settings-start-style-menu = Meniu
+settings-start-style-palette = Gust
+settings-start-style-menu-description = Căutare, aplicații și foldere deasupra barei de activități
+settings-start-style-palette-description = O bară de căutare în mijlocul ecranului pentru aplicații, ferestre, fișiere și răspunsuri
+settings-start-button = Afișează butonul Start
+settings-start-button-description = Super deschide oricum meniul Start
+settings-start-web = Caută pe web cu
+settings-taskbar-section = Bara de activități
+settings-taskbar-shown = Afișează bara de activități
+settings-taskbar-hidden-description = Ceasul și pictogramele de stare rămân într-un colț, iar Super deschide meniul Start
 settings-taskbar-alignment = Aliniere
 settings-taskbar-align-center = Centru
 settings-taskbar-align-left = Stânga

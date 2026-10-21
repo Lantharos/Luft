@@ -76,9 +76,21 @@ settings-appearance-animations-description = Las ventanas y los menús se despla
 
 ## Taskbar
 
-settings-taskbar-title = Barra de tareas
+settings-taskbar-title = Barra de tareas e Inicio
 settings-taskbar-back = Apariencia
 settings-taskbar-preview = Vista previa de la barra de tareas
+settings-start-section = Inicio
+settings-start-style = Estilo
+settings-start-style-menu = Menú
+settings-start-style-palette = Gust
+settings-start-style-menu-description = Búsqueda, aplicaciones y carpetas encima de la barra de tareas
+settings-start-style-palette-description = Una barra de búsqueda en el centro de la pantalla para aplicaciones, ventanas, archivos y respuestas
+settings-start-button = Mostrar el botón Inicio
+settings-start-button-description = Super abre Inicio de todos modos
+settings-start-web = Buscar en la web con
+settings-taskbar-section = Barra de tareas
+settings-taskbar-shown = Mostrar la barra de tareas
+settings-taskbar-hidden-description = El reloj y los iconos de estado se quedan en una esquina, y Super abre Inicio
 settings-taskbar-alignment = Alineación
 settings-taskbar-align-center = Centro
 settings-taskbar-align-left = Izquierda

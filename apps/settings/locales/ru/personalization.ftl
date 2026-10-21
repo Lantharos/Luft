@@ -76,9 +76,21 @@ settings-appearance-animations-description = Окна и меню плавно �
 
 ## Taskbar
 
-settings-taskbar-title = Панель задач
+settings-taskbar-title = Панель задач и Пуск
 settings-taskbar-back = Оформление
 settings-taskbar-preview = Предпросмотр панели задач
+settings-start-section = Пуск
+settings-start-style = Стиль
+settings-start-style-menu = Меню
+settings-start-style-palette = Gust
+settings-start-style-menu-description = Поиск, приложения и папки над панелью задач
+settings-start-style-palette-description = Строка поиска в центре экрана для приложений, окон, файлов и ответов
+settings-start-button = Показывать кнопку «Пуск»
+settings-start-button-description = Super в любом случае открывает меню «Пуск»
+settings-start-web = Искать в интернете с помощью
+settings-taskbar-section = Панель задач
+settings-taskbar-shown = Показывать панель задач
+settings-taskbar-hidden-description = Часы и значки состояния остаются в углу, а Super открывает меню «Пуск»
 settings-taskbar-alignment = Выравнивание
 settings-taskbar-align-center = По центру
 settings-taskbar-align-left = По левому краю

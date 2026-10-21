@@ -25,6 +25,7 @@ desktop-dictation-not-web-address = Ní seoladh gréasáin é sin
 
 ## Keyboard shortcuts
 desktop-shortcut-toggle-message-tray = Taispeáin liosta na bhfógraí
+desktop-shortcut-toggle-start = Oscail Tosaigh
 desktop-shortcut-toggle-quick-settings = Oscail na socruithe tapa
 desktop-shortcut-focus-active-notification = Dírigh ar an bhfógra gníomhach
 desktop-shortcut-clipboard-history = Taispeáin stair na gearrthaisce

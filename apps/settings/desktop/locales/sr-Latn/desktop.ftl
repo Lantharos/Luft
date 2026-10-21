@@ -25,6 +25,7 @@ desktop-dictation-not-web-address = To nije veb adresa
 
 ## Keyboard shortcuts
 desktop-shortcut-toggle-message-tray = Prikaži listu obaveštenja
+desktop-shortcut-toggle-start = Otvori meni Start
 desktop-shortcut-toggle-quick-settings = Otvori meni brzih podešavanja
 desktop-shortcut-focus-active-notification = Fokusiraj aktivno obaveštenje
 desktop-shortcut-clipboard-history = Prikaži istoriju ostave

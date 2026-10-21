@@ -76,9 +76,21 @@ settings-appearance-animations-description = Az ablakok és menük mozgással je
 
 ## Taskbar
 
-settings-taskbar-title = Tálca
+settings-taskbar-title = Tálca és Start menü
 settings-taskbar-back = Megjelenés
 settings-taskbar-preview = A tálca előnézete
+settings-start-section = Start
+settings-start-style = Stílus
+settings-start-style-menu = Menü
+settings-start-style-palette = Gust
+settings-start-style-menu-description = Keresés, alkalmazások és mappák a tálca fölött
+settings-start-style-palette-description = Keresősáv a képernyő közepén alkalmazásokhoz, ablakokhoz, fájlokhoz és válaszokhoz
+settings-start-button = Start gomb megjelenítése
+settings-start-button-description = A Super billentyű így is megnyitja a Start menüt
+settings-start-web = Webes keresőmotor
+settings-taskbar-section = Tálca
+settings-taskbar-shown = Tálca megjelenítése
+settings-taskbar-hidden-description = Az óra és az állapotikonok egy sarokban maradnak, a Super billentyű pedig megnyitja a Start menüt
 settings-taskbar-alignment = Igazítás
 settings-taskbar-align-center = Középre
 settings-taskbar-align-left = Balra

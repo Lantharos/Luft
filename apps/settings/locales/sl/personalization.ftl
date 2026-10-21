@@ -76,9 +76,21 @@ settings-appearance-animations-description = Okna in meniji se premikajo, namest
 
 ## Taskbar
 
-settings-taskbar-title = Opravilna vrstica
+settings-taskbar-title = Opravilna vrstica in meni Start
 settings-taskbar-back = Videz
 settings-taskbar-preview = Predogled opravilne vrstice
+settings-start-section = Start
+settings-start-style = Slog
+settings-start-style-menu = Meni
+settings-start-style-palette = Gust
+settings-start-style-menu-description = Iskanje, aplikacije in mape nad opravilno vrstico
+settings-start-style-palette-description = Iskalna vrstica na sredini zaslona za aplikacije, okna, datoteke in odgovore
+settings-start-button = Pokaži gumb Start
+settings-start-button-description = Tipka Super v vsakem primeru odpre meni Start
+settings-start-web = Spletni iskalnik
+settings-taskbar-section = Opravilna vrstica
+settings-taskbar-shown = Pokaži opravilno vrstico
+settings-taskbar-hidden-description = Ura in ikone stanja ostanejo v kotu, tipka Super pa odpre meni Start
 settings-taskbar-alignment = Poravnava
 settings-taskbar-align-center = Na sredini
 settings-taskbar-align-left = Levo

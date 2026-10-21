@@ -76,9 +76,21 @@ settings-appearance-animations-description = Прозорците и мениј�
 
 ## Taskbar
 
-settings-taskbar-title = Лента со задачи
+settings-taskbar-title = Лента со задачи и Старт
 settings-taskbar-back = Изглед
 settings-taskbar-preview = Преглед на лентата со задачи
+settings-start-section = Старт
+settings-start-style = Стил
+settings-start-style-menu = Мени
+settings-start-style-palette = Gust
+settings-start-style-menu-description = Пребарување, апликации и папки над лентата со задачи
+settings-start-style-palette-description = Лента за пребарување на средината на екранот за апликации, прозорци, датотеки и одговори
+settings-start-button = Прикажи го копчето Старт
+settings-start-button-description = Super секако го отвора менито Старт
+settings-start-web = Пребарувај на вебот со
+settings-taskbar-section = Лента со задачи
+settings-taskbar-shown = Прикажи ја лентата со задачи
+settings-taskbar-hidden-description = Часовникот и иконите за статус остануваат во аголот, а Super го отвора менито Старт
 settings-taskbar-alignment = Порамнување
 settings-taskbar-align-center = Центар
 settings-taskbar-align-left = Лево

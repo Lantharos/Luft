@@ -25,6 +25,7 @@ desktop-dictation-not-web-address = Ez nem webcím
 
 ## Keyboard shortcuts
 desktop-shortcut-toggle-message-tray = Értesítések listájának megjelenítése
+desktop-shortcut-toggle-start = Start menü megnyitása
 desktop-shortcut-toggle-quick-settings = Gyorsbeállítások megnyitása
 desktop-shortcut-focus-active-notification = Fókusz az aktív értesítésre
 desktop-shortcut-clipboard-history = Vágólapelőzmények megjelenítése

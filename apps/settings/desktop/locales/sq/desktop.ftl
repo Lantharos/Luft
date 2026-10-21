@@ -25,6 +25,7 @@ desktop-dictation-not-web-address = Kjo nuk është adresë uebi
 
 ## Keyboard shortcuts
 desktop-shortcut-toggle-message-tray = Shfaq listën e njoftimeve
+desktop-shortcut-toggle-start = Hap Fillimin
 desktop-shortcut-toggle-quick-settings = Hap cilësimet e shpejta
 desktop-shortcut-focus-active-notification = Fokuso njoftimin aktiv
 desktop-shortcut-clipboard-history = Shfaq historikun e kujtesës së fragmenteve

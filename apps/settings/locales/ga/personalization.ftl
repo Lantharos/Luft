@@ -76,9 +76,21 @@ settings-appearance-animations-description = Bogann fuinneoga agus roghchláir i
 
 ## Taskbar
 
-settings-taskbar-title = Tascbharra
+settings-taskbar-title = Tascbharra agus Tosaigh
 settings-taskbar-back = Cuma
 settings-taskbar-preview = Réamhamharc ar an tascbharra
+settings-start-section = Tosaigh
+settings-start-style = Stíl
+settings-start-style-menu = Roghchlár
+settings-start-style-palette = Gust
+settings-start-style-menu-description = Cuardach, aipeanna agus fillteáin os cionn an tascbharra
+settings-start-style-palette-description = Barra cuardaigh i lár an scáileáin d’aipeanna, d’fhuinneoga, do chomhaid agus d’fhreagraí
+settings-start-button = Taispeáin an cnaipe Tosaigh
+settings-start-button-description = Osclaíonn Super an roghchlár Tosaigh pé scéal é
+settings-start-web = Cuardaigh an gréasán le
+settings-taskbar-section = Tascbharra
+settings-taskbar-shown = Taispeáin an tascbharra
+settings-taskbar-hidden-description = Fanann an clog agus na deilbhíní stádais i gcúinne, agus osclaíonn Super an roghchlár Tosaigh
 settings-taskbar-alignment = Ailíniú
 settings-taskbar-align-center = Lár
 settings-taskbar-align-left = Clé

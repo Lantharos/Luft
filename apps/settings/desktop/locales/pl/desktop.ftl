@@ -25,6 +25,7 @@ desktop-dictation-not-web-address = To nie jest adres internetowy
 
 ## Keyboard shortcuts
 desktop-shortcut-toggle-message-tray = Pokaż listę powiadomień
+desktop-shortcut-toggle-start = Otwórz menu Start
 desktop-shortcut-toggle-quick-settings = Otwórz szybkie ustawienia
 desktop-shortcut-focus-active-notification = Przejdź do aktywnego powiadomienia
 desktop-shortcut-clipboard-history = Pokaż historię schowka

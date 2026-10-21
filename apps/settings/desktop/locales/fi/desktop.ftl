@@ -25,6 +25,7 @@ desktop-dictation-not-web-address = Tämä ei ole verkko-osoite
 
 ## Keyboard shortcuts
 desktop-shortcut-toggle-message-tray = Näytä ilmoitusluettelo
+desktop-shortcut-toggle-start = Avaa Start-valikko
 desktop-shortcut-toggle-quick-settings = Avaa pika-asetukset
 desktop-shortcut-focus-active-notification = Kohdista aktiiviseen ilmoitukseen
 desktop-shortcut-clipboard-history = Näytä leikepöydän historia

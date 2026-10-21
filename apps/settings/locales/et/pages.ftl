@@ -44,8 +44,8 @@ settings-page-about = Teave
 
 ## Pages inside panels
 
-settings-page-taskbar = Tegumiriba
-    .keywords = paneel, riba, dokk, automaatne peitmine, peida automaatselt, hõljuv, läbipaistev, kinnitatud rakendused, joondus, start-nupp, nupp start, kuvarid, tööala, töölaud, virtuaalne töölaud
+settings-page-taskbar = Tegumiriba ja Start
+    .keywords = paneel, riba, dokk, automaatne peitmine, peida automaatselt, peida tegumiriba, hõljuv, läbipaistev, kinnitatud rakendused, joondus, start-nupp, nupp start, menüü start, start-menüü, start menu, gust, otsinguriba, käivitaja, launcher, veebiotsing, otsingumootor, search engine, kuvarid, tööala, töölaud, virtuaalne töölaud
 settings-page-fonts = Fondid
     .keywords = kõik fondid, kirjatüübid, šriftid, fondiperekonnad, fontide installimine, fontide eemaldamine
 settings-page-cursors = Kursoriteemad

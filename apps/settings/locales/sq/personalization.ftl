@@ -76,9 +76,21 @@ settings-appearance-animations-description = Dritaret dhe menytë lëvizin në v
 
 ## Taskbar
 
-settings-taskbar-title = Shiriti i detyrave
+settings-taskbar-title = Shiriti i detyrave dhe Fillimi
 settings-taskbar-back = Pamja
 settings-taskbar-preview = Pamje paraprake e shiritit të detyrave
+settings-start-section = Fillimi
+settings-start-style = Stili
+settings-start-style-menu = Menyja
+settings-start-style-palette = Gust
+settings-start-style-menu-description = Kërkimi, aplikacionet dhe dosjet mbi shiritin e detyrave
+settings-start-style-palette-description = Një shirit kërkimi në mes të ekranit për aplikacione, dritare, skedarë dhe përgjigje
+settings-start-button = Shfaq butonin e Fillimit
+settings-start-button-description = Super e hap Fillimin gjithsesi
+settings-start-web = Kërko në ueb me
+settings-taskbar-section = Shiriti i detyrave
+settings-taskbar-shown = Shfaq shiritin e detyrave
+settings-taskbar-hidden-description = Ora dhe ikonat e gjendjes mbeten në një qoshe, dhe Super hap Fillimin
 settings-taskbar-alignment = Rreshtimi
 settings-taskbar-align-center = Në qendër
 settings-taskbar-align-left = Majtas

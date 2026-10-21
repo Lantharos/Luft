@@ -25,6 +25,7 @@ desktop-dictation-not-web-address = Aceasta nu este o adresă web
 
 ## Keyboard shortcuts
 desktop-shortcut-toggle-message-tray = Afișează lista de notificări
+desktop-shortcut-toggle-start = Deschide meniul Start
 desktop-shortcut-toggle-quick-settings = Deschide meniul Setări rapide
 desktop-shortcut-focus-active-notification = Focalizează notificarea activă
 desktop-shortcut-clipboard-history = Afișează istoricul clipboardului

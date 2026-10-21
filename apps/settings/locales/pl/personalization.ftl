@@ -76,9 +76,21 @@ settings-appearance-animations-description = Okna i menu przesuwają się płynn
 
 ## Taskbar
 
-settings-taskbar-title = Pasek zadań
+settings-taskbar-title = Pasek zadań i menu Start
 settings-taskbar-back = Wygląd
 settings-taskbar-preview = Podgląd paska zadań
+settings-start-section = Start
+settings-start-style = Styl
+settings-start-style-menu = Menu
+settings-start-style-palette = Gust
+settings-start-style-menu-description = Wyszukiwanie, aplikacje i foldery nad paskiem zadań
+settings-start-style-palette-description = Pasek wyszukiwania na środku ekranu do aplikacji, okien, plików i odpowiedzi
+settings-start-button = Pokazuj przycisk Start
+settings-start-button-description = Klawisz Super i tak otwiera menu Start
+settings-start-web = Wyszukiwarka internetowa
+settings-taskbar-section = Pasek zadań
+settings-taskbar-shown = Pokazuj pasek zadań
+settings-taskbar-hidden-description = Zegar i ikony stanu zostają w rogu, a klawisz Super otwiera menu Start
 settings-taskbar-alignment = Wyrównanie
 settings-taskbar-align-center = Do środka
 settings-taskbar-align-left = Do lewej

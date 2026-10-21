@@ -1,6 +1,6 @@
 ## Start
 
-start-search-placeholder = Пошук програм, параметрів і файлів
+start-search-placeholder = Пошук програм, файлів та іншого
 start-search-cut = Вирізати
 start-search-copy = Копіювати
 start-search-paste = Вставити
@@ -19,18 +19,49 @@ start-move-to-apps = Перемістити до програм
 ## Start search results
 
 start-search-best-match = Найкращий збіг
-start-search-no-results = Нічого не знайдено
 start-search-group-apps = Програми
+start-search-group-commands = Дії програм
+start-search-group-windows = Відкриті вікна
 start-search-group-actions = Дії
 start-search-group-settings = Параметри
+start-search-group-clipboard = Буфер обміну
+start-search-group-emoji = Емодзі
 start-search-group-files = Файли
 start-search-group-contents = У вмісті файлів
+start-search-group-web = Інтернет
+start-search-web = Шукати в інтернеті «{ $query }»
+start-search-clipboard-text = З журналу буфера обміну
+start-search-clipboard-keywords = буфер обміну, скопійоване, скопійовано, журнал буфера обміну, історія буфера обміну, вставити, clipboard
+start-search-emoji-insert = Вставити
 start-search-settings-page = Параметри
 start-search-settings-section = Параметри: { $page }
 start-search-file-reveal = Показати в { $fileManager }
 start-search-file-copy-path = Копіювати шлях
 start-search-conversion = { $amount } { $from } у { $to }
 start-search-calculation = { $expression }, натисніть Enter, щоб скопіювати
+
+## Answers in Start's search to questions about dates and times.
+## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
+
+start-search-answer-until = До { $date }
+start-search-answer-since = З { $date }
+start-search-answer-between = Між { $from } і { $to }
+start-search-answer-time-ahead = { $place }, на { $hours ->
+    [one] { $hours } годину
+    [few] { $hours } години
+    [many] { $hours } годин
+   *[other] { $hours } години
+} вперед
+start-search-answer-time-behind = { $place }, на { $hours ->
+    [one] { $hours } годину
+    [few] { $hours } години
+    [many] { $hours } годин
+   *[other] { $hours } години
+} назад
+start-search-answer-time-same = { $place }, той самий час, що й тут
+start-search-answer-converted = { $place }, коли { $time } ({ $from })
+start-search-answer-converted-here = Тут, коли { $time } ({ $from })
+start-search-answer-converted-from-here = { $place }, коли тут { $time }
 
 ## Start search actions
 ## The keyword messages are comma-separated words people might type to find the action.

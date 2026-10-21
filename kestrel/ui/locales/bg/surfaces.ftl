@@ -1,6 +1,6 @@
 ## Start
 
-start-search-placeholder = Търсене на приложения, настройки и файлове
+start-search-placeholder = Търсене на приложения, файлове и още
 start-search-cut = Изрежи
 start-search-copy = Копирай
 start-search-paste = Постави
@@ -19,18 +19,45 @@ start-move-to-apps = Премести в Приложения
 ## Start search results
 
 start-search-best-match = Най-добро съвпадение
-start-search-no-results = Няма резултати
 start-search-group-apps = Приложения
+start-search-group-commands = Действия в приложенията
+start-search-group-windows = Отворени прозорци
 start-search-group-actions = Действия
 start-search-group-settings = Настройки
+start-search-group-clipboard = Клипборд
+start-search-group-emoji = Емоджи
 start-search-group-files = Файлове
 start-search-group-contents = В съдържанието на файлове
+start-search-group-web = Уеб
+start-search-web = Търси „{ $query }“ в интернет
+start-search-clipboard-text = От историята на клипборда
+start-search-clipboard-keywords = клипборд, копирано, история на клипборда, постави, буфер, clipboard
+start-search-emoji-insert = Вмъкни
 start-search-settings-page = Настройки
 start-search-settings-section = Настройки – { $page }
 start-search-file-reveal = Покажи в { $fileManager }
 start-search-file-copy-path = Копирай пътя
 start-search-conversion = { $amount } { $from } в { $to }
 start-search-calculation = { $expression }, натиснете Enter, за да копирате
+
+## Answers in Start's search to questions about dates and times.
+## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
+
+start-search-answer-until = До { $date }
+start-search-answer-since = От { $date }
+start-search-answer-between = От { $from } до { $to }
+start-search-answer-time-ahead = { $place }, { $hours ->
+    [one] { $hours } час
+   *[other] { $hours } часа
+} напред
+start-search-answer-time-behind = { $place }, { $hours ->
+    [one] { $hours } час
+   *[other] { $hours } часа
+} назад
+start-search-answer-time-same = { $place }, същото време като тук
+start-search-answer-converted = В { $place }, когато в { $from } е { $time }
+start-search-answer-converted-here = Тук, когато в { $from } е { $time }
+start-search-answer-converted-from-here = В { $place }, когато тук е { $time }
 
 ## Start search actions
 ## The keyword messages are comma-separated words people might type to find the action.

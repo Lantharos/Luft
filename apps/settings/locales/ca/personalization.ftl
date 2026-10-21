@@ -76,9 +76,21 @@ settings-appearance-animations-description = Les finestres i els menús es mouen
 
 ## Taskbar
 
-settings-taskbar-title = Barra de tasques
+settings-taskbar-title = Barra de tasques i Inici
 settings-taskbar-back = Aparença
 settings-taskbar-preview = Previsualització de la barra de tasques
+settings-start-section = Inici
+settings-start-style = Estil
+settings-start-style-menu = Menú
+settings-start-style-palette = Gust
+settings-start-style-menu-description = Cerca, aplicacions i carpetes damunt de la barra de tasques
+settings-start-style-palette-description = Una barra de cerca al mig de la pantalla per a aplicacions, finestres, fitxers i respostes
+settings-start-button = Mostra el botó Inici
+settings-start-button-description = Super obre Inici igualment
+settings-start-web = Cerca al web amb
+settings-taskbar-section = Barra de tasques
+settings-taskbar-shown = Mostra la barra de tasques
+settings-taskbar-hidden-description = El rellotge i les icones d’estat es queden en un racó, i Super obre Inici
 settings-taskbar-alignment = Alineació
 settings-taskbar-align-center = Al centre
 settings-taskbar-align-left = A l’esquerra

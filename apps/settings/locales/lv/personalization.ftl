@@ -76,9 +76,21 @@ settings-appearance-animations-description = Logi un izvēlnes kustas, nevis par
 
 ## Taskbar
 
-settings-taskbar-title = Uzdevumjosla
+settings-taskbar-title = Uzdevumjosla un izvēlne Start
 settings-taskbar-back = Izskats
 settings-taskbar-preview = Uzdevumjoslas priekšskatījums
+settings-start-section = Start
+settings-start-style = Stils
+settings-start-style-menu = Izvēlne
+settings-start-style-palette = Gust
+settings-start-style-menu-description = Meklēšana, lietotnes un mapes virs uzdevumjoslas
+settings-start-style-palette-description = Meklēšanas josla ekrāna vidū lietotnēm, logiem, failiem un atbildēm
+settings-start-button = Rādīt pogu Start
+settings-start-button-description = Taustiņš Super jebkurā gadījumā atver izvēlni Start
+settings-start-web = Tīmekļa meklētājs
+settings-taskbar-section = Uzdevumjosla
+settings-taskbar-shown = Rādīt uzdevumjoslu
+settings-taskbar-hidden-description = Pulkstenis un statusa ikonas paliek stūrī, un taustiņš Super atver izvēlni Start
 settings-taskbar-alignment = Līdzinājums
 settings-taskbar-align-center = Centrā
 settings-taskbar-align-left = Pa kreisi

@@ -44,8 +44,8 @@ settings-page-about = Info
 
 ## Pages inside panels
 
-settings-page-taskbar = Taakbalk
-    .keywords = paneel, dock, automatisch verbergen, verbergen, zwevend, transparant, vastgemaakte apps, uitlijning, startknop, beeldschermen, werkblad, werkbladen, bureaublad, virtueel bureaublad
+settings-page-taskbar = Taakbalk en Start
+    .keywords = paneel, dock, automatisch verbergen, verbergen, taakbalk verbergen, zwevend, transparant, vastgemaakte apps, uitlijning, startknop, startmenu, menu Start, gust, zoekbalk, launcher, starter, op het web zoeken, webzoekopdracht, zoekmachine, beeldschermen, werkblad, werkbladen, bureaublad, virtueel bureaublad
 settings-page-fonts = Lettertypen
     .keywords = alle lettertypen, lettertypes, fonts, lettertypefamilies, lettertypen installeren, lettertypen verwijderen
 settings-page-cursors = Cursorthema’s

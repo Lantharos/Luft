@@ -1,6 +1,6 @@
 ## Start
 
-start-search-placeholder = Meklēt lietotnes, iestatījumus un failus
+start-search-placeholder = Meklēt lietotnes, failus un citu
 start-search-cut = Izgriezt
 start-search-copy = Kopēt
 start-search-paste = Ielīmēt
@@ -19,18 +19,47 @@ start-move-to-apps = Pārvietot uz lietotnēm
 ## Start search results
 
 start-search-best-match = Labākā atbilstība
-start-search-no-results = Nav rezultātu
 start-search-group-apps = Lietotnes
+start-search-group-commands = Lietotņu darbības
+start-search-group-windows = Atvērtie logi
 start-search-group-actions = Darbības
 start-search-group-settings = Iestatījumi
+start-search-group-clipboard = Starpliktuve
+start-search-group-emoji = Emocijzīmes
 start-search-group-files = Faili
 start-search-group-contents = Failu saturā
+start-search-group-web = Tīmeklis
+start-search-web = Meklēt tīmeklī „{ $query }“
+start-search-clipboard-text = No starpliktuves vēstures
+start-search-clipboard-keywords = starpliktuve, nokopēts, kopēts, starpliktuves vēsture, ielīmēt, clipboard
+start-search-emoji-insert = Ievietot
 start-search-settings-page = Iestatījumi
 start-search-settings-section = Iestatījumi: { $page }
 start-search-file-reveal = Rādīt lietotnē { $fileManager }
 start-search-file-copy-path = Kopēt ceļu
 start-search-conversion = { $amount } { $from } uz { $to }
 start-search-calculation = { $expression }, nospiediet Enter, lai kopētu
+
+## Answers in Start's search to questions about dates and times.
+## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.
+
+start-search-answer-until = Līdz: { $date }
+start-search-answer-since = Kopš: { $date }
+start-search-answer-between = Periods: { $from } – { $to }
+start-search-answer-time-ahead = { $place }, { $hours ->
+    [zero] par { $hours } stundām uz priekšu
+    [one] par { $hours } stundu uz priekšu
+   *[other] par { $hours } stundām uz priekšu
+}
+start-search-answer-time-behind = { $place }, { $hours ->
+    [zero] par { $hours } stundām atpakaļ
+    [one] par { $hours } stundu atpakaļ
+   *[other] par { $hours } stundām atpakaļ
+}
+start-search-answer-time-same = { $place }, tāds pats laiks kā šeit
+start-search-answer-converted = { $place }, kad ir { $time } ({ $from })
+start-search-answer-converted-here = Šeit, kad ir { $time } ({ $from })
+start-search-answer-converted-from-here = { $place }, kad šeit ir { $time }
 
 ## Start search actions
 ## The keyword messages are comma-separated words people might type to find the action.

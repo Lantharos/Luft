@@ -44,8 +44,8 @@ settings-page-about = Par sistēmu
 
 ## Pages inside panels
 
-settings-page-taskbar = Uzdevumjosla
-    .keywords = panelis, josla, dock, automātiski paslēpt, paslēpt, peldoša, caurspīdīga, piespraustās lietotnes, līdzinājums, start poga, displeji, darbvieta, darbvirsma, virtuālā darbvirsma
+settings-page-taskbar = Uzdevumjosla un izvēlne Start
+    .keywords = panelis, josla, dock, automātiski paslēpt, paslēpt, paslēpt uzdevumjoslu, peldoša, caurspīdīga, piespraustās lietotnes, līdzinājums, start poga, izvēlne start, start izvēlne, start menu, gust, meklēšanas josla, palaidējs, launcher, meklēšana tīmeklī, meklētājs, search engine, displeji, darbvieta, darbvirsma, virtuālā darbvirsma
 settings-page-fonts = Fonti
     .keywords = visi fonti, šrifti, burtveidoli, fontu saimes, instalēt fontus, noņemt fontus
 settings-page-cursors = Kursoru motīvi

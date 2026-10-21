@@ -44,8 +44,8 @@ settings-page-about = Acerca de
 
 ## Pages inside panels
 
-settings-page-taskbar = Barra de tarefas
-    .keywords = painel, dock, ocultar automaticamente, flutuante, transparente, aplicações afixadas, alinhamento, botão start, botão iniciar, ecrãs, área de trabalho, ambiente de trabalho, ambiente de trabalho virtual
+settings-page-taskbar = Barra de tarefas e Start
+    .keywords = painel, dock, ocultar automaticamente, ocultar a barra de tarefas, flutuante, transparente, aplicações afixadas, alinhamento, botão start, botão iniciar, menu start, menu iniciar, gust, barra de pesquisa, iniciador, launcher, pesquisa na web, pesquisa web, motor de pesquisa, ecrãs, área de trabalho, ambiente de trabalho, ambiente de trabalho virtual
 settings-page-fonts = Tipos de letra
     .keywords = todos os tipos de letra, fontes, famílias de tipos de letra, instalar tipos de letra, remover tipos de letra
 settings-page-cursors = Temas de cursor

@@ -76,9 +76,21 @@ settings-appearance-animations-description = Прозорците и менют�
 
 ## Taskbar
 
-settings-taskbar-title = Лента на задачите
+settings-taskbar-title = Лента на задачите и Старт
 settings-taskbar-back = Облик
 settings-taskbar-preview = Преглед на лентата на задачите
+settings-start-section = Старт
+settings-start-style = Стил
+settings-start-style-menu = Меню
+settings-start-style-palette = Gust
+settings-start-style-menu-description = Търсене, приложения и папки над лентата на задачите
+settings-start-style-palette-description = Лента за търсене в средата на екрана за приложения, прозорци, файлове и отговори
+settings-start-button = Показване на бутона Старт
+settings-start-button-description = Super отваря менюто Старт и без него
+settings-start-web = Търсене в интернет чрез
+settings-taskbar-section = Лента на задачите
+settings-taskbar-shown = Показване на лентата на задачите
+settings-taskbar-hidden-description = Часовникът и иконите за състояние остават в ъгъла, а Super отваря менюто Старт
 settings-taskbar-alignment = Подравняване
 settings-taskbar-align-center = В центъра
 settings-taskbar-align-left = Отляво

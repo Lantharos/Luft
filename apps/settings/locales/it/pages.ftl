@@ -44,8 +44,8 @@ settings-page-about = Informazioni
 
 ## Pages inside panels
 
-settings-page-taskbar = Barra delle applicazioni
-    .keywords = pannello, dock, nascondi automaticamente, nascondi, mobile, flottante, trasparente, app aggiunte, allineamento, pulsante start, schermi, spazio di lavoro, desktop, desktop virtuale
+settings-page-taskbar = Barra delle applicazioni e Start
+    .keywords = pannello, dock, nascondi automaticamente, nascondi, nascondi la barra delle applicazioni, mobile, flottante, trasparente, app aggiunte, allineamento, pulsante start, menu start, gust, barra di ricerca, avvio app, launcher, ricerca web, cerca sul web, motore di ricerca, schermi, spazio di lavoro, desktop, desktop virtuale
 settings-page-fonts = Font
     .keywords = tutti i font, caratteri, tipi di carattere, famiglie di caratteri, installa font, rimuovi font
 settings-page-cursors = Temi del cursore

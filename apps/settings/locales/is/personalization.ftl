@@ -76,9 +76,21 @@ settings-appearance-animations-description = Gluggar og valmyndir hreyfast í st
 
 ## Taskbar
 
-settings-taskbar-title = Verkstika
+settings-taskbar-title = Verkstika og Upphaf
 settings-taskbar-back = Útlit
 settings-taskbar-preview = Forskoðun verkstiku
+settings-start-section = Upphaf
+settings-start-style = Stíll
+settings-start-style-menu = Valmynd
+settings-start-style-palette = Gust
+settings-start-style-menu-description = Leit, forrit og möppur fyrir ofan verkstikuna
+settings-start-style-palette-description = Leitarstika á miðjum skjánum fyrir forrit, glugga, skrár og svör
+settings-start-button = Sýna upphafshnapp
+settings-start-button-description = Super opnar upphafsvalmyndina hvort sem er
+settings-start-web = Leita á vefnum með
+settings-taskbar-section = Verkstika
+settings-taskbar-shown = Sýna verkstiku
+settings-taskbar-hidden-description = Klukkan og stöðutáknin haldast í horni og Super opnar upphafsvalmyndina
 settings-taskbar-alignment = Jöfnun
 settings-taskbar-align-center = Miðja
 settings-taskbar-align-left = Vinstri

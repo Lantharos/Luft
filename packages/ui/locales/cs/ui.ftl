@@ -91,6 +91,7 @@ ui-fingerprint-failed = Tento otisk prstu se nepodařilo přidat. Zkuste to znov
 ## Sizes and times
 
 ui-time-just-now = právě teď
+ui-time-yesterday = Včera { $time }
 ui-power-watts = { $watts } W
 
 ## Dialog buttons

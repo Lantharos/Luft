@@ -130,6 +130,7 @@ export function relativeDay(unixSeconds: number) {
 	const then = new Date(unixSeconds * 1000);
 	const days = Math.round((new Date(now).setHours(0, 0, 0, 0) - new Date(then).setHours(0, 0, 0, 0)) / DAY_MS);
 	if (days <= 0) return time(unixSeconds);
+	if (days === 1) return t('ui-time-yesterday', { time: time(unixSeconds) });
 	if (days < 7) return weekdayTime(unixSeconds);
 	return formatDate(then.getFullYear() === now.getFullYear() ? 'monthDay' : 'shortDate', unixSeconds);
 }

@@ -91,6 +91,7 @@ ui-fingerprint-failed = Seda sõrmejälge ei õnnestunud lisada. Proovige uuesti
 ## Sizes and times
 
 ui-time-just-now = äsja
+ui-time-yesterday = Eile, { $time }
 ui-power-watts = { $watts } W
 
 ## Dialog buttons

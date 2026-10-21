@@ -91,6 +91,7 @@ ui-fingerprint-failed = Nem sikerült hozzáadni ezt az ujjlenyomatot. Próbálj
 ## Sizes and times
 
 ui-time-just-now = épp most
+ui-time-yesterday = Tegnap { $time }
 ui-power-watts = { $watts } W
 
 ## Dialog buttons

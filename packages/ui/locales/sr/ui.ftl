@@ -91,6 +91,7 @@ ui-fingerprint-failed = Додавање овог отиска прста ниј
 ## Sizes and times
 
 ui-time-just-now = управо сада
+ui-time-yesterday = Јуче, { $time }
 ui-power-watts = { $watts } W
 
 ## Dialog buttons

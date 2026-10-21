@@ -91,6 +91,7 @@ ui-fingerprint-failed = Δεν ήταν δυνατή η προσθήκη αυτ�
 ## Sizes and times
 
 ui-time-just-now = μόλις τώρα
+ui-time-yesterday = Χθες, { $time }
 ui-power-watts = { $watts } W
 
 ## Dialog buttons

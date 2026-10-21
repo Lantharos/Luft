@@ -91,6 +91,7 @@ ui-fingerprint-failed = Не удалось добавить этот отпеч
 ## Sizes and times
 
 ui-time-just-now = только что
+ui-time-yesterday = Вчера, { $time }
 ui-power-watts = { $watts } Вт
 
 ## Dialog buttons

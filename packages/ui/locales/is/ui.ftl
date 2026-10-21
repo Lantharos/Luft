@@ -91,6 +91,7 @@ ui-fingerprint-failed = Ekki tókst að bæta þessu fingrafari við. Reyndu aft
 ## Sizes and times
 
 ui-time-just-now = rétt í þessu
+ui-time-yesterday = Í gær kl. { $time }
 ui-power-watts = { $watts } W
 
 ## Dialog buttons

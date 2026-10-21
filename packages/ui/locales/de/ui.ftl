@@ -91,6 +91,7 @@ ui-fingerprint-failed = Dieser Fingerabdruck konnte nicht hinzugefügt werden. V
 ## Sizes and times
 
 ui-time-just-now = gerade eben
+ui-time-yesterday = Gestern, { $time }
 ui-power-watts = { $watts } W
 
 ## Dialog buttons

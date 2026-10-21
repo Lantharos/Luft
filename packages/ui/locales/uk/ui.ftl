@@ -91,6 +91,7 @@ ui-fingerprint-failed = Не вдалося додати цей відбиток
 ## Sizes and times
 
 ui-time-just-now = щойно
+ui-time-yesterday = Учора, { $time }
 ui-power-watts = { $watts } Вт
 
 ## Dialog buttons

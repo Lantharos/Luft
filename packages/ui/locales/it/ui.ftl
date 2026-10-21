@@ -91,6 +91,7 @@ ui-fingerprint-failed = Impossibile aggiungere questa impronta. Riprova.
 ## Sizes and times
 
 ui-time-just-now = adesso
+ui-time-yesterday = Ieri, { $time }
 ui-power-watts = { $watts } W
 
 ## Dialog buttons

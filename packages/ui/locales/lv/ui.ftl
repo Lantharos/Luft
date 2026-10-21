@@ -91,6 +91,7 @@ ui-fingerprint-failed = Šo pirksta nospiedumu neizdevās pievienot. Mēģiniet 
 ## Sizes and times
 
 ui-time-just-now = tikko
+ui-time-yesterday = Vakar { $time }
 ui-power-watts = { $watts } W
 
 ## Dialog buttons

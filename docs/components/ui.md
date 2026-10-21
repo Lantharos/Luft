@@ -144,7 +144,7 @@ $effect(() => {
 | `plural(count, singular, pluralForm?)` | `3 files` |
 | `ago(unixSeconds)` | Relative time such as `5 minutes ago` |
 | `date`, `dateTime`, `longDateTime`, `time`, `weekdayTime`, `month` | A moment in Unix seconds in the formats locale, from `October 21, 2026` to `Wednesday, October 21, 2026 at 12:53 PM` |
-| `relativeDay(unixSeconds)` | A short date for lists: the time today, the weekday and time this week, then the day and month, with the year once it's another year |
+| `relativeDay(unixSeconds)` | A short date for lists: the time today, yesterday with its time, the weekday and time this week, then the day and month, with the year once it's another year |
 | `duration(seconds)`, `longDuration(seconds)` | The two largest units of a duration, as `2h 5m` or `2 hours, 5 minutes` |
 | `errorText(error)` | The message of a failure, to show to the person |
 | `watts(value)` | Power such as `4.2 W` |

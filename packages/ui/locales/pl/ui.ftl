@@ -91,6 +91,7 @@ ui-fingerprint-failed = Nie udało się dodać tego odcisku palca. Spróbuj pono
 ## Sizes and times
 
 ui-time-just-now = przed chwilą
+ui-time-yesterday = Wczoraj, { $time }
 ui-power-watts = { $watts } W
 
 ## Dialog buttons

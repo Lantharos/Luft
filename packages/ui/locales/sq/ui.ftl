@@ -91,6 +91,7 @@ ui-fingerprint-failed = Kjo gjurmë gishti nuk u shtua dot. Provo sërish.
 ## Sizes and times
 
 ui-time-just-now = tani
+ui-time-yesterday = Dje, { $time }
 ui-power-watts = { $watts } W
 
 ## Dialog buttons

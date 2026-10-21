@@ -91,6 +91,7 @@ ui-fingerprint-failed = Níorbh fhéidir an méarlorg seo a chur leis. Bain tria
 ## Sizes and times
 
 ui-time-just-now = anois díreach
+ui-time-yesterday = Inné, { $time }
 ui-power-watts = { $watts } W
 
 ## Dialog buttons

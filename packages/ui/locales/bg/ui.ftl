@@ -91,6 +91,7 @@ ui-fingerprint-failed = Отпечатъкът не можа да бъде до�
 ## Sizes and times
 
 ui-time-just-now = току-що
+ui-time-yesterday = Вчера, { $time }
 ui-power-watts = { $watts } W
 
 ## Dialog buttons

@@ -91,6 +91,7 @@ ui-fingerprint-failed = Nepavyko pridėti šio piršto atspaudo. Bandykite dar k
 ## Sizes and times
 
 ui-time-just-now = ką tik
+ui-time-yesterday = Vakar { $time }
 ui-power-watts = { $watts } W
 
 ## Dialog buttons

@@ -91,6 +91,7 @@ ui-fingerprint-failed = No se ha podido añadir esta huella. Vuelve a intentarlo
 ## Sizes and times
 
 ui-time-just-now = ahora mismo
+ui-time-yesterday = Ayer, { $time }
 ui-power-watts = { $watts } W
 
 ## Dialog buttons

@@ -91,6 +91,7 @@ ui-fingerprint-failed = Impossible d’ajouter cette empreinte. Réessayez.
 ## Sizes and times
 
 ui-time-just-now = à l’instant
+ui-time-yesterday = Hier à { $time }
 ui-power-watts = { $watts } W
 
 ## Dialog buttons

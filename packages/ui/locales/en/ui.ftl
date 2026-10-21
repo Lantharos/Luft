@@ -109,6 +109,8 @@ ui-fingerprint-failed = Couldn’t add this fingerprint. Try again.
 
 # A moment ago, used instead of "0 seconds ago"
 ui-time-just-now = just now
+# A date in a list for yesterday; $time is the time of day, already formatted
+ui-time-yesterday = Yesterday, { $time }
 # Electrical power. $watts is an already formatted number, like "4.5"
 ui-power-watts = { $watts } W
 

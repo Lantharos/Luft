@@ -91,6 +91,7 @@ ui-fingerprint-failed = Kan deze vingerafdruk niet toevoegen. Probeer het opnieu
 ## Sizes and times
 
 ui-time-just-now = zojuist
+ui-time-yesterday = Gisteren, { $time }
 ui-power-watts = { $watts } W
 
 ## Dialog buttons

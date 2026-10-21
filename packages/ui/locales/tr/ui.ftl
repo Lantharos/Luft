@@ -91,6 +91,7 @@ ui-fingerprint-failed = Bu parmak izi eklenemedi. Yeniden deneyin.
 ## Sizes and times
 
 ui-time-just-now = az önce
+ui-time-yesterday = Dün { $time }
 ui-power-watts = { $watts } W
 
 ## Dialog buttons

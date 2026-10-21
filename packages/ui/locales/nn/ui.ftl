@@ -91,6 +91,7 @@ ui-fingerprint-failed = Kunne ikkje leggje til dette fingeravtrykket. Prøv igje
 ## Sizes and times
 
 ui-time-just-now = akkurat no
+ui-time-yesterday = I går kl. { $time }
 ui-power-watts = { $watts } W
 
 ## Dialog buttons

@@ -91,6 +91,7 @@ ui-fingerprint-failed = Não foi possível adicionar esta impressão digital. Te
 ## Sizes and times
 
 ui-time-just-now = agora mesmo
+ui-time-yesterday = Ontem, { $time }
 ui-power-watts = { $watts } W
 
 ## Dialog buttons

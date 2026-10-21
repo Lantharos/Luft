@@ -91,6 +91,7 @@ ui-fingerprint-failed = Din il-marka tas-saba’ ma żdieditx. Erġa’ pprova.
 ## Sizes and times
 
 ui-time-just-now = issa stess
+ui-time-yesterday = Ilbieraħ, { $time }
 ui-power-watts = { $watts } W
 
 ## Dialog buttons

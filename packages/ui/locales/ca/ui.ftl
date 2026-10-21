@@ -91,6 +91,7 @@ ui-fingerprint-failed = No s’ha pogut afegir aquesta empremta. Torneu-ho a pro
 ## Sizes and times
 
 ui-time-just-now = ara mateix
+ui-time-yesterday = Ahir, { $time }
 ui-power-watts = { $watts } W
 
 ## Dialog buttons

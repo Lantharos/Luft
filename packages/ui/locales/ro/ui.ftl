@@ -91,6 +91,7 @@ ui-fingerprint-failed = Amprenta nu a putut fi adăugată. Încercați din nou.
 ## Sizes and times
 
 ui-time-just-now = chiar acum
+ui-time-yesterday = Ieri, { $time }
 ui-power-watts = { $watts } W
 
 ## Dialog buttons

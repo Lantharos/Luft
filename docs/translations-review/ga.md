@@ -21,8 +21,8 @@ Strings in Luft's Irish translation that a native speaker should check: terms wi
 - `packages/ui/locales/ga/ui.ftl` `ui-edit-select-all`: "Roghnaigh uile" — Microsoft's form; "Roghnaigh gach rud" is the alternative.
 - `packages/ui/locales/ga/ui.ftl` `ui-media-position`: "Suíomh" — also means location and website; check it reads as the playback position.
 - `packages/ui/locales/ga/ui.ftl` `ui-split-windows-size`: "{ $size }, { $used } in úsáid" — check it reads as how much of Windows' share is used.
-- `apps/settings/locales/ga/pages.ftl` `settings-page-about`: "Eolas" — Windows says "Maidir le", which reads as unfinished on its own; check the choice.
-- `apps/settings/locales/ga/pages.ftl` `settings-page-display`: "Scáileáin" — Windows' page is "Taispeáint"; check which people look for.
+- `packages/settings-pages/locales/ga/pages.ftl` `settings-page-about`: "Eolas" — Windows says "Maidir le", which reads as unfinished on its own; check the choice.
+- `packages/settings-pages/locales/ga/pages.ftl` `settings-page-display`: "Scáileáin" — Windows' page is "Taispeáint"; check which people look for.
 - `kestrel/ui/locales/ga/shell.ftl` `keys-space`: "Spás" — the space bar has no printed name; check it reads well in shortcuts like Ctrl+Spás.
 - `kestrel/ui/locales/ga/shell.ftl` `battery-level` `[plugged]`: "Ceallra { $percentage }%, plugáilte isteach" — check it conveys plugged in but not charging.
 - `packages/i18n/glossary/ga.csv` `dark style`: "Stíl dhorcha" — used on the Quick settings tile and in running text so it matches the Stíl row in Settings; Irish Windows may say "Mód dorcha", so check the tile still reads as a switch.

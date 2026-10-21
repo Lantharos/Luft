@@ -18,8 +18,8 @@ Strings in Luft’s Catalan translation that a native speaker should check: term
 - `packages/ui/locales/ca/ui.ftl` `ui-recovery-key-saved`: "Desada" — feminine, agreeing with clau; check it’s only ever shown next to the recovery key.
 - `packages/ui/locales/ca/ui.ftl` `ui-fingerprint-place`: "Col·loqueu el { $finger } sobre el sensor." — the article sits in the sentence, so every finger’s .inline form must be masculine (they all are: dit, polze).
 - `packages/ui/locales/ca/ui.ftl` `ui-finger-right-little`: "Dit petit dret" — «dit petit» is the everyday word; «menovell» or «auricular» are more formal.
-- `apps/settings/locales/ca/pages.ftl` `settings-page-mouse`: "Ratolí i ratolí tàctil" — repetitive and long in the sidebar.
-- `apps/settings/locales/ca/pages.ftl` `settings-page-region`: "Llengua i regió" — Windows says «Idioma i regió»; check which people expect.
+- `packages/settings-pages/locales/ca/pages.ftl` `settings-page-mouse`: "Ratolí i ratolí tàctil" — repetitive and long in the sidebar.
+- `packages/settings-pages/locales/ca/pages.ftl` `settings-page-region`: "Llengua i regió" — Windows says «Idioma i regió»; check which people expect.
 - `kestrel/ui/locales/ca/shell.ftl` `battery-level`: "Bateria al { $percentage } %, endollada" — check «endollada» for plugged in but not charging.
 - `kestrel/ui/locales/ca/shell.ftl` `keys-shift`: "Maj" — Catalan software writes Maj, while Spanish-layout keyboards often print Mayús or only an arrow.
 

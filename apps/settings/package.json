@@ -18,6 +18,7 @@
 		"@lucide/svelte": "^1.51.0",
 		"@luft/i18n": "workspace:*",
 		"@luft/network": "workspace:*",
+		"@luft/settings-pages": "workspace:*",
 		"@luft/ui": "workspace:*",
 		"@sveltejs/vite-plugin-svelte": "^7.3.1",
 		"@tailwindcss/vite": "^4.3.3",

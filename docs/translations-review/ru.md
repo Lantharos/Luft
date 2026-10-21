@@ -19,8 +19,8 @@ Strings in Luft's Russian translation that a native speaker should check, each l
 - `packages/ui/locales/ru/ui.ftl` `ui-fingerprint-place`: "Прикоснитесь к сканеру { $finger }." — .inline is instrumental ("правым указательным пальцем") so both fingerprint sentences fit it; check the word order reads naturally.
 - `packages/ui/locales/ru/ui.ftl` `ui-select-placeholder`: "Выберите" — an instruction rather than the infinitive buttons use; check it fits as a dropdown placeholder.
 - `apps/settings/locales/ru/settings.ftl` `settings-subpage-back`: "Назад: { $page }" — colon form keeps $page in the nominative; check it sounds right to screen-reader users.
-- `apps/settings/locales/ru/pages.ftl` `settings-page-mouse`: "Мышь и сенсорная панель" — long for a sidebar entry; check it doesn't clip.
-- `apps/settings/locales/ru/pages.ftl` `settings-page-appearance`: "Оформление" — GNOME says "Внешний вид"; check which reads better as a page name.
+- `packages/settings-pages/locales/ru/pages.ftl` `settings-page-mouse`: "Мышь и сенсорная панель" — long for a sidebar entry; check it doesn't clip.
+- `packages/settings-pages/locales/ru/pages.ftl` `settings-page-appearance`: "Оформление" — GNOME says "Внешний вид"; check which reads better as a page name.
 - `kestrel/ui/locales/ru/shell.ftl` `battery-level`: "Батарея: { $percentage } %, питание подключено" — the [plugged] state means plugged in but not charging; check it reads that way.
 
 ## Kestrel and setup

@@ -193,6 +193,7 @@
         "@lucide/svelte": "^1.51.0",
         "@luft/i18n": "workspace:*",
         "@luft/network": "workspace:*",
+        "@luft/settings-pages": "workspace:*",
         "@luft/ui": "workspace:*",
         "@sveltejs/vite-plugin-svelte": "^7.3.1",
         "@tailwindcss/vite": "^4.3.3",
@@ -298,6 +299,10 @@
       "devDependencies": {
         "typescript": "~6.0.3",
       },
+    },
+    "packages/settings-pages": {
+      "name": "@luft/settings-pages",
+      "version": "0.1.0",
     },
     "packages/ui": {
       "name": "@luft/ui",
@@ -726,6 +731,8 @@
     "@luft/motion": ["@luft/motion@workspace:packages/motion"],
 
     "@luft/network": ["@luft/network@workspace:packages/network"],
+
+    "@luft/settings-pages": ["@luft/settings-pages@workspace:packages/settings-pages"],
 
     "@luft/site": ["@luft/site@workspace:web/site"],
 
@@ -1718,6 +1725,8 @@
     "rover/@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#1701400", {}, "Lantharos-Sabine-1701400", "sha512-/Z8QVHsvxv0EU6jS1JG5RSGZkFaHwsQIe+o7pQgx39+uiTJZa1P0CbyQ8/Ls0ZHT2D/WV/rcvDz0GVKEu/Ekqw=="],
 
     "schelf/@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#1701400", {}, "Lantharos-Sabine-1701400", "sha512-/Z8QVHsvxv0EU6jS1JG5RSGZkFaHwsQIe+o7pQgx39+uiTJZa1P0CbyQ8/Ls0ZHT2D/WV/rcvDz0GVKEu/Ekqw=="],
+
+    "setup/@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#3c4c462", {}, "Lantharos-Sabine-3c4c462", "sha512-2bJIoxeBsAKZ3ZLTVVhatIk8EJmSyGpbvzKpzYABG4IMhTDbheSyVMZfmkhCOlSItGzK27lF7KpAIxYVefUy7A=="],
 
     "signin/@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#1701400", {}, "Lantharos-Sabine-1701400", "sha512-/Z8QVHsvxv0EU6jS1JG5RSGZkFaHwsQIe+o7pQgx39+uiTJZa1P0CbyQ8/Ls0ZHT2D/WV/rcvDz0GVKEu/Ekqw=="],
 

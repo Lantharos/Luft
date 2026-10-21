@@ -1,7 +1,7 @@
 import { i18n } from '@luft/i18n';
 import { Catalog } from '@luft/i18n/core';
 import { load } from 'virtual:luft-locales';
-import type { Translate } from '#lib/panels/pages.js';
+import type { Translate } from '@luft/settings-pages';
 
 class EnglishStore {
 	private catalog = $state.raw<Catalog | null>(null);

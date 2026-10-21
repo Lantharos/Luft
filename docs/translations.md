@@ -18,7 +18,7 @@ Luft is translated into Albanian, Bosnian, Bulgarian, Catalan, Croatian, Czech, 
 | kestrel-engine | `kestrel/engine/locales/*/engine.ftl` | dialogs and menus of Kestrel's engine |
 | ui | `packages/ui/locales/*/ui.ftl` | the UI kit every app shares |
 | settings | `apps/settings/locales/*/settings.ftl` | Settings' window, sidebar and its groups, and search |
-| settings-pages | `apps/settings/locales/*/pages.ftl` | Settings' page names and search words, also used by Start |
+| settings-pages | `packages/settings-pages/locales/*/pages.ftl` | Settings' page names and search words, also used by Start |
 | settings-connections | `apps/settings/locales/*/connections.ftl` | Network, Bluetooth |
 | settings-devices | `apps/settings/locales/*/devices.ftl` | Displays, Sound, Power, Input |
 | settings-personalization | `apps/settings/locales/*/personalization.ftl` | Appearance, Desktop, Notifications, Accessibility |

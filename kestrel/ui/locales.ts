@@ -14,14 +14,13 @@ if (!output || !depfile) {
 const folders = [
   join(import.meta.dir, 'locales'),
   join(import.meta.dir, '../engine/locales'),
-  { dir: join(import.meta.dir, '../../apps/settings/locales'), files: ['pages'] },
+  join(import.meta.dir, '../../packages/settings-pages/locales'),
 ];
 const outputs = LOCALES.map(locale => join(output, `locale-${locale}.ftl`));
 
 await Promise.all(LOCALES.map((locale, index) => writeFile(outputs[index], merged(folders, locale))));
 
-const folderOf = (source: (typeof folders)[number]) => (typeof source === 'string' ? source : source.dir);
 const sources = folders
-  .flatMap(source => [folderOf(source), ...LOCALES.flatMap(locale => [join(folderOf(source), locale), ...localeFiles(source, locale)])])
+  .flatMap(folder => [folder, ...LOCALES.flatMap(locale => [join(folder, locale), ...localeFiles(folder, locale)])])
   .filter(path => existsSync(path));
 await writeFile(depfile, `${outputs.join(' ')}: ${sources.join(' ')}\n`);

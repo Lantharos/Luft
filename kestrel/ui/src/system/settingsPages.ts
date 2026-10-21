@@ -1,9 +1,9 @@
 import Gio from 'gi://Gio';
 
-import { type Page, pageKeywords, type PageId } from '../../../../apps/settings/src/lib/panels/pages.js';
+import { type Page, pageKeywords, type PageId } from '../../../../packages/settings-pages/pages.js';
 import { inEnglish, locale, t } from '../shared/i18n/index.js';
 
-export { PAGES as SETTINGS_PAGES, type Page as SettingsPage, type PageId as SettingsPageId, pageTitle as settingsPageTitle } from '../../../../apps/settings/src/lib/panels/pages.js';
+export { PAGES as SETTINGS_PAGES, type Page as SettingsPage, type PageId as SettingsPageId, pageTitle as settingsPageTitle } from '../../../../packages/settings-pages/pages.js';
 
 export const settingsPageKeywords = (page: Page, copilotKey: boolean): string[] =>
   pageKeywords(page, copilotKey, t, locale() === 'en' ? undefined : inEnglish);

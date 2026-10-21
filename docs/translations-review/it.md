@@ -15,7 +15,7 @@ Strings in Luft's Italian translation that a native speaker should check: terms 
 - `packages/ui/locales/it/ui.ftl` `ui-time-just-now`: "adesso" — check it fits wherever relative times appear (it may need "poco fa").
 - `packages/ui/locales/it/ui.ftl` `ui-toast-dismiss`: "Ignora" — Windows' label for dismissing a notification; "Chiudi" is the alternative.
 - `apps/settings/locales/it/settings.ftl` `settings-more-show`: "Mostra ancora { $count }" / "Mostra altri { $count }" — the items' gender is unknown, so the singular avoids agreement.
-- `apps/settings/locales/it/pages.ftl` `settings-page-region`: "Lingua e regione" — Windows says "Lingua e area geografica", which is longer; check it fits the sidebar.
+- `packages/settings-pages/locales/it/pages.ftl` `settings-page-region`: "Lingua e regione" — Windows says "Lingua e area geografica", which is longer; check it fits the sidebar.
 - `kestrel/ui/locales/it/shell.ftl` `keys-page-up` / `keys-page-down`: "Pag su" / "Pag giù" — Italian keyboards print arrows or "Pag"; check the shortcut labels look right.
 - `kestrel/ui/locales/it/shell.ftl` `keys-backspace`: "Backspace" — Italian keyboards print only an arrow; Microsoft's Italian docs use "Backspace".
 

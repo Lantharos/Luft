@@ -4,15 +4,12 @@ import { Comment, GroupComment, Junk, parse, Resource, ResourceComment, serializ
 
 export const SOURCE_LOCALE = 'en';
 
-/** @typedef {string | { dir: string, files: string[] }} Source */
-
-/** @param {Source} source @param {string} locale */
-export function localeFiles(source, locale) {
-	const { dir, files } = typeof source === 'string' ? { dir: source, files: null } : source;
+/** @param {string} dir @param {string} locale */
+export function localeFiles(dir, locale) {
 	const folder = join(dir, locale);
 	if (!existsSync(folder)) return [];
 	return readdirSync(folder)
-		.filter((name) => name.endsWith('.ftl') && (!files || files.includes(name.slice(0, -4))))
+		.filter((name) => name.endsWith('.ftl'))
 		.sort()
 		.map((name) => join(folder, name));
 }
@@ -32,7 +29,7 @@ const idOf = (entry) => `${entry.type === 'Term' ? '-' : ''}${entry.id.name}`;
 /**
  * One Fluent source for a locale: its own messages from every folder, and the
  * English ones for whatever it hasn't translated yet.
- * @param {Source[]} dirs
+ * @param {string[]} dirs
  * @param {string} locale
  */
 export function merged(dirs, locale) {
@@ -44,13 +41,12 @@ export function merged(dirs, locale) {
 	return serialize(new Resource(body), {});
 }
 
-/** @param {Source[]} dirs */
+/** @param {string[]} dirs */
 export function locales(dirs) {
 	const found = new Set([SOURCE_LOCALE]);
-	for (const source of dirs) {
-		const dir = typeof source === 'string' ? source : source.dir;
+	for (const dir of dirs) {
 		if (!existsSync(dir)) continue;
-		for (const name of readdirSync(dir)) if (localeFiles(source, name).length) found.add(name);
+		for (const name of readdirSync(dir)) if (localeFiles(dir, name).length) found.add(name);
 	}
 	return [...found].sort();
 }

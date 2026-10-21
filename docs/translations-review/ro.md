@@ -16,7 +16,7 @@ Strings in Luft's Romanian translation that a native speaker should check. Each 
 - `packages/ui/locales/ro/ui.ftl` `ui-split-windows-size`: "{ $size }, ocupat: { $used }" — rephrased to avoid agreement with the size; check it reads naturally.
 - `packages/ui/locales/ro/ui.ftl` `ui-recovery-key-saved`: "Salvată" — feminine to agree with "cheie"; check it's clear on its own.
 - `packages/ui/locales/ro/ui.ftl` `ui-select-placeholder`: "Alege" — imperative singular as a dropdown placeholder; "Selectați" may read better.
-- `apps/settings/locales/ro/pages.ftl` `settings-page-accessibility`: "taste de respingere" for bounce keys — check the term Windows uses.
+- `packages/settings-pages/locales/ro/pages.ftl` `settings-page-accessibility`: "taste de respingere" for bounce keys — check the term Windows uses.
 - `kestrel/ui/locales/ro/shell.ftl` `battery-level`: "Baterie { $percentage }%" — percent sign with no space, as in Windows; check against the preferred norm.
 
 ## Kestrel and setup

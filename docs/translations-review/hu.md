@@ -14,8 +14,8 @@ Strings in Luft's Hungarian translation that a native speaker should check: term
 - `packages/i18n/glossary/hu.csv` `emoji`: "emodzsi" — Microsoft's spelling; many people write "emoji".
 - `packages/i18n/glossary/hu.csv` `USB stick`: "pendrive" — everyday word, but the hyphenated suffixes (pendrive-ot) may look odd in some sentences.
 - `docs/translations/hu.md` Names: the guide forbids „a(z)”; check that sentences such as „{ $app } alkalmazásban” without an article read acceptably, since many Hungarian programs use „a(z)” there instead.
-- `apps/settings/locales/hu/pages.ftl` `settings-page-power`: "Tápellátás és akkumulátor" — long for the sidebar; may clip.
-- `apps/settings/locales/hu/pages.ftl` `settings-page-cursors`: "Kurzortémák" — check against "Egérmutató-témák".
+- `packages/settings-pages/locales/hu/pages.ftl` `settings-page-power`: "Tápellátás és akkumulátor" — long for the sidebar; may clip.
+- `packages/settings-pages/locales/hu/pages.ftl` `settings-page-cursors`: "Kurzortémák" — check against "Egérmutató-témák".
 - `packages/ui/locales/hu/ui.ftl` `ui-window-minimize`: "Kis méret" / `ui-window-maximize`: "Teljes méret" — Windows' tooltips; check they suit screen readers.
 - `packages/ui/locales/hu/ui.ftl` `ui-select-placeholder`: "Válasszon" — the only imperative used as a label; "Kiválasztás" is the alternative.
 - `packages/ui/locales/hu/ui.ftl` `ui-finger-right-index` .inline: "a jobb mutatóujját" — the inline forms carry the article and the accusative possessive for „Helyezze { $finger } az érzékelőre.” and „Húzza végig { $finger } az érzékelőn.”; check both sentences with every finger.

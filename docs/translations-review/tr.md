@@ -20,7 +20,7 @@ Strings in Luft's Turkish translation that a native speaker should check: terms 
 - `packages/ui/locales/tr/ui.ftl` `ui-split-windows-size`: "{ $size }, { $used } dolu" — check "dolu" reads clearly for space holding files.
 - `packages/ui/locales/tr/ui.ftl` `ui-fingerprint-duplicate`: "Bu parmak okuyucuda zaten kayıtlı, büyük olasılıkla Windows ya da başka bir hesap tarafından." — check the elliptic second clause reads naturally.
 - `apps/settings/locales/tr/settings.ftl` `settings-subpage-back`: "{ $page } sayfasına dön" — avoids a suffix on the page name; check it doesn't sound stiff for a screen reader.
-- `apps/settings/locales/tr/pages.ftl` `settings-page-mouse`: "Fare ve dokunmatik yüzey" — long for the sidebar; may clip.
+- `packages/settings-pages/locales/tr/pages.ftl` `settings-page-mouse`: "Fare ve dokunmatik yüzey" — long for the sidebar; may clip.
 - `kestrel/ui/locales/tr/shell.ftl` `battery-level`: "Pil %{ $percentage }, prize takılı" — for the plugged-in-but-not-charging state; check the wording.
 - `kestrel/ui/locales/tr/shell.ftl` `keys-space`: "Boşluk" — the only translated key name; Windows docs sometimes say "Ara çubuğu".
 

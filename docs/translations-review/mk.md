@@ -19,8 +19,8 @@ Strings in Luft's Macedonian translation that a native speaker should check. Eac
 - `packages/ui/locales/mk/ui.ftl` `ui-fingerprint-place`: "Ставете го { $finger } на сензорот." — the doubled "го" fits only masculine finger names, which all current ones are.
 - `packages/ui/locales/mk/ui.ftl` `ui-finger-right-ring`: "Десен прстенест прст" — "домал прст" is the alternative; check which is more common.
 - `packages/ui/locales/mk/ui.ftl` `ui-toast-dismiss`: "Отфрли" — screen-reader label for closing a notification bubble; "Затвори" would also work.
-- `apps/settings/locales/mk/pages.ftl` `settings-page-about`: "За системот" — check against Windows' "За" page name.
-- `apps/settings/locales/mk/pages.ftl` `settings-page-add-account`: "Додавање сметка" — verbal noun as a page name, per the heading rule.
+- `packages/settings-pages/locales/mk/pages.ftl` `settings-page-about`: "За системот" — check against Windows' "За" page name.
+- `packages/settings-pages/locales/mk/pages.ftl` `settings-page-add-account`: "Додавање сметка" — verbal noun as a page name, per the heading rule.
 - `kestrel/ui/locales/mk/shell.ftl` `keys-space`: "Празно место" — the space bar has no printed label; check what Macedonian users call it ("Space" is also common).
 
 ## Kestrel and setup

@@ -16,7 +16,7 @@ Strings in Luft's Spanish translation that a native speaker should check: terms 
 - `packages/ui/locales/es/ui.ftl` `ui-fingerprint-place`: "Coloca el { $finger } en el sensor." — the article sits in the sentence, so every finger's .inline form must be masculine (they all are).
 - `packages/ui/locales/es/ui.ftl` `ui-finger-right-middle`: "Dedo corazón derecho" — corazón is Spain's word; Latin America says medio.
 - `kestrel/ui/locales/es/shell.ftl` `battery-level`: "Batería al { $percentage } %, conectada" — check "conectada" for plugged in but not charging; Quick settings and Settings say "Enchufado", which can't agree with batería here.
-- `apps/settings/locales/es/pages.ftl` `settings-page-about`: "Información" — Windows' and macOS' word; GNOME says Acerca de, which is in the keywords.
+- `packages/settings-pages/locales/es/pages.ftl` `settings-page-about`: "Información" — Windows' and macOS' word; GNOME says Acerca de, which is in the keywords.
 
 ## Kestrel and setup
 

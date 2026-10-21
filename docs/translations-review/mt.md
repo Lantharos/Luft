@@ -25,8 +25,8 @@ Strings in Luft's Maltese translation that a native speaker should check: places
 - `packages/ui/locales/mt/ui.ftl` `ui-recovery-key-saved` / `ui-recovery-key-copied`: "Issejvjata" / "Ikkopjata" — feminine to agree with ċavetta; check they read well standing alone.
 - `packages/ui/locales/mt/ui.ftl` `ui-window-minimize` / `ui-window-maximize`: "Imminimizza" / "Immassimizza" — imperatives of Windows' verbs; check the spelling.
 - `apps/settings/locales/mt/settings.ftl` `settings-more-show`: "Uri { $count } aktar" — "aktar" avoids agreeing with items of unknown gender and number; check it reads well for every count.
-- `apps/settings/locales/mt/pages.ftl` `settings-page-display`: "Skrins" — Windows' "displej" is the alternative; check the plural fits the sidebar.
-- `apps/settings/locales/mt/pages.ftl` `settings-page-appearance`: "Dehra" — check it is the word people expect for the appearance page ("Personalizzazzjoni" is Windows').
+- `packages/settings-pages/locales/mt/pages.ftl` `settings-page-display`: "Skrins" — Windows' "displej" is the alternative; check the plural fits the sidebar.
+- `packages/settings-pages/locales/mt/pages.ftl` `settings-page-appearance`: "Dehra" — check it is the word people expect for the appearance page ("Personalizzazzjoni" is Windows').
 - `kestrel/ui/locales/mt/shell.ftl` `keys-space`: "Spacebar" — as in Microsoft's Maltese key names; check it looks right in shortcut labels such as "Ctrl+Spacebar".
 
 ## Kestrel and setup

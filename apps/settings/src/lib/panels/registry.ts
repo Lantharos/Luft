@@ -28,7 +28,7 @@ import Wifi from '@lucide/svelte/icons/wifi';
 import { t } from '@luft/i18n';
 import { english } from '#lib/state/english.svelte.js';
 import type { Hardware } from '#lib/state/hardware.svelte.js';
-import { PANEL_PAGES, pageKeywords, SUBPAGES, type Page, type PageId, type PanelId } from './pages';
+import { PANEL_PAGES, pageKeywords, SUBPAGES, type Page, type PageId, type PanelId } from '@luft/settings-pages';
 
 export type { PanelId };
 

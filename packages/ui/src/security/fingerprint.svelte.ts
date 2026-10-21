@@ -1,3 +1,4 @@
+import { errorText } from '../text/errors';
 import { invoke, listen } from '@lantharos/sabine';
 import { t } from '@luft/i18n';
 
@@ -108,7 +109,7 @@ export class FingerprintEnrollment {
 			await invoke<void>('fingerprint_enroll', { finger }, { timeoutMs: WAIT_FOR_PERMISSION });
 		} catch (reason) {
 			this.phase = 'failed';
-			const message = reason instanceof Error ? reason.message : String(reason);
+			const message = errorText(reason);
 			this.describe = () => message;
 		}
 	}

@@ -1,5 +1,6 @@
 import { LanguageDescription, type LanguageSupport } from '@codemirror/language';
 import { languages as known } from '@codemirror/language-data';
+import { basename } from '../text/paths';
 
 const markdown = LanguageDescription.of({
 	name: 'Markdown',
@@ -24,10 +25,6 @@ export const languages: readonly LanguageDescription[] = [
 	svelte,
 	log
 ].sort((a, b) => a.name.localeCompare(b.name));
-
-function basename(path: string) {
-	return path.slice(path.lastIndexOf('/') + 1);
-}
 
 export function findLanguage(nameOrPath: string): LanguageDescription | null {
 	return LanguageDescription.matchLanguageName(languages, nameOrPath, false) ?? LanguageDescription.matchFilename(languages, basename(nameOrPath));

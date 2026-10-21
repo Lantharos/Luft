@@ -1,3 +1,5 @@
+import { errorText } from '../text/errors';
+
 export interface ToastAction {
 	label: string;
 	run: () => unknown;
@@ -41,7 +43,7 @@ export class Toasts {
 		void action?.run();
 	};
 
-	fail = (error: unknown) => this.show(error instanceof Error ? error.message : String(error), { failed: true });
+	fail = (error: unknown) => this.show(errorText(error), { failed: true });
 
 	dismiss = () => {
 		clearTimeout(this.#timer);

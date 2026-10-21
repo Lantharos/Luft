@@ -68,10 +68,11 @@ export type { GlassShading, Shadow, TaskbarHalos, TaskbarLook, TaskbarLookPaint,
 export { default as Toast } from './notices/Toast.svelte';
 export { Toasts, type ToastMessage } from './notices/toasts.svelte';
 
-export { ago, bytes, memoryBytes, plural, watts } from './text/format';
+export { errorText } from './text/errors';
+export { ago, bytes, date, dateTime, duration, longDateTime, longDuration, memoryBytes, month, plural, relativeDay, time, watts, weekdayTime } from './text/format';
 export { renderMarkdown } from './text/markdown';
 export { default as RemoteImagesNotice } from './text/RemoteImagesNotice.svelte';
-export { basename, fileUri, fileUrlPath, isInside, pathsFromUriList } from './text/paths';
+export { basename, fileUri, fileUrlPath, isInside, join, parent, pathsFromUriList } from './text/paths';
 
 export { activationToken } from './shell/activation';
 export { dragFiles, fileDragStart } from './shell/fileDrag';

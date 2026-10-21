@@ -16,11 +16,11 @@ use serde::{Deserialize, Serialize};
 
 use crate::system::command::Tool;
 use crate::system::files::write;
+use crate::system::system_disk;
 use plan::{Layout, Step};
 
 const STATE: &str = "resize.json";
 const ATTEMPTS: u32 = 3;
-const ENCRYPTING: &str = "/var/lib/trustd/encryption.json";
 
 #[derive(Serialize, Deserialize)]
 struct State {
@@ -105,9 +105,9 @@ fn resize(state_dir: &Path) -> Result<()> {
     if let Err(error) = space::report() {
         eprintln!("Luft couldn't tell Windows how full it is: {error:#}");
     }
-    if Path::new(ENCRYPTING).exists() {
+    let Some(_change) = system_disk::change_unless_encrypting()? else {
         return Ok(());
-    }
+    };
     let path = state_file(state_dir);
     let mut state = match State::load(&path) {
         Some(state) => state,

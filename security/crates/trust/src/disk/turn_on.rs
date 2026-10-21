@@ -1,5 +1,6 @@
 use std::path::Path;
 
+use access::DiskChange;
 use anyhow::{Context, Result, bail};
 
 use super::room::HEADER_ROOM;
@@ -57,6 +58,9 @@ fn keep_for_later(
 }
 
 pub fn turn_on(recovery_key: &Secret, pin: &Secret, passphrase: &Secret) -> Result<()> {
+    let _change =
+        DiskChange::begin(|| eprintln!("Waiting for Luft to finish changing the system disk."))
+            .context("The system disk's lock couldn't be taken.")?;
     if Plan::load().is_some() {
         bail!(crate::errors::Busy);
     }

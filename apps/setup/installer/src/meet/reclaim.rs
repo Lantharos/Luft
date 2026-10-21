@@ -10,6 +10,7 @@ use luft_meet::{Folder, Handoff};
 use crate::system::command::Tool;
 use crate::system::files::{remove_beneath, write};
 use crate::system::mount::{self, Mounted};
+use crate::system::system_disk;
 use crate::system::wait;
 
 const RECORD: &str = "meet.json";
@@ -181,6 +182,9 @@ pub fn run(state_dir: &Path) -> Result<()> {
 
 fn reclaim(state_dir: &Path) -> Result<()> {
     let Ok(text) = std::fs::read_to_string(record(state_dir)) else {
+        return Ok(());
+    };
+    let Some(_change) = system_disk::change_unless_encrypting()? else {
         return Ok(());
     };
     let handoff = Handoff::parse(&text).map_err(anyhow::Error::msg)?;

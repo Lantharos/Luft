@@ -15,7 +15,7 @@ use super::storage::{Layout, MSFT_Partition, Storage};
 use crate::boot::entries;
 use crate::live::durable;
 use crate::plan::layout::Span;
-use crate::windows::helper::live_system;
+use crate::windows::helper::setup::live_system;
 use crate::windows::helper::system::{firmware, settings, start_entries};
 
 const LIVE_FOLDER: &str = "LiveOS";

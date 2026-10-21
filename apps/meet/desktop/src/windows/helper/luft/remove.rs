@@ -8,9 +8,9 @@ use crate::boot::load_option;
 use crate::check::facts::StartEntry;
 use crate::protocol::Stage;
 use crate::serving::Context;
+use crate::windows::helper::setup::undo;
 use crate::windows::helper::system::firmware::Nvram;
 use crate::windows::helper::system::start_entries;
-use crate::windows::helper::undo;
 
 const LOADERS: [&str; 2] = [r"\EFI\luft\", r"\EFI\luft-start\"];
 

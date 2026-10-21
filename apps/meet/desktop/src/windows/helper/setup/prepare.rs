@@ -3,10 +3,7 @@ use luft_meet::handoff::{LIVE_LABEL, START_LABEL};
 use luft_meet::regional::Hints;
 use luft_meet::{Handoff, Intent, Made, Partitions, Room};
 
-use super::drive::storage::{BASIC_TYPE, ESP_TYPE, MSFT_Disk, MSFT_Partition, Storage};
-use super::drive::{record, state, windows_drive};
-use super::system::{facts, firmware, start_entries};
-use super::{Context, live_system, room, undo};
+use super::{live_system, room, undo};
 use crate::L10N;
 use crate::check::common::LIVE_ESTIMATE;
 use crate::check::facts::Facts;
@@ -15,6 +12,12 @@ use crate::live::source::Source;
 use crate::plan::layout::{self, Role};
 use crate::plan::places;
 use crate::protocol::{Prepared, Report, Stage};
+use crate::windows::helper::Context;
+use crate::windows::helper::drive::storage::{
+    BASIC_TYPE, ESP_TYPE, MSFT_Disk, MSFT_Partition, Storage,
+};
+use crate::windows::helper::drive::{record, state, windows_drive};
+use crate::windows::helper::system::{facts, firmware, start_entries};
 
 const FAT32: &str = "FAT32";
 const EXFAT: &str = "exFAT";

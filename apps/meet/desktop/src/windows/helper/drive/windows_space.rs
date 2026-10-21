@@ -1,8 +1,8 @@
-use super::Context;
-use super::drive::record::{self, Made};
-use super::drive::storage::{MSFT_Partition, Storage};
-use super::drive::windows_drive::WindowsDrive;
+use super::record::{self, Made};
+use super::storage::{MSFT_Partition, Storage};
+use super::windows_drive::WindowsDrive;
 use crate::protocol::Stage;
+use crate::windows::helper::Context;
 
 pub fn shrink(
     context: &Context,

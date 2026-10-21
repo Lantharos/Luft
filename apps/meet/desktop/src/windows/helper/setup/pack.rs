@@ -11,19 +11,23 @@ use luft_meet::moving_box::{
     WALLPAPER, WIFI,
 };
 
-use super::drive::state::Found;
-use super::drive::storage::{self, BASIC_TYPE, MSFT_Disk, MSFT_Partition, Storage};
-use super::drive::windows_drive::{self, WindowsDrive};
-use super::drive::{record, state};
-use super::system::protected::Scratch;
-use super::system::{bluetooth, programs};
-use super::{Context, prepare, room, windows_space};
+use super::{prepare, room};
 use crate::L10N;
 use crate::plan::gap::{self, Head};
 use crate::plan::layout::{self, Plan, Role};
 use crate::plan::sizes::{self, BOX_CLUSTER};
 use crate::protocol::{Belongings, Prepared, Stage};
 use crate::windows::folders::{Item, verbatim, walk};
+use crate::windows::helper::Context;
+use crate::windows::helper::drive::state::Found;
+use crate::windows::helper::drive::storage::{
+    self, BASIC_TYPE, MSFT_Disk, MSFT_Partition, Storage,
+};
+use crate::windows::helper::drive::windows_drive::{self, WindowsDrive};
+use crate::windows::helper::drive::windows_space;
+use crate::windows::helper::drive::{record, state};
+use crate::windows::helper::system::protected::Scratch;
+use crate::windows::helper::system::{bluetooth, programs};
 
 const EXFAT: &str = "exFAT";
 const NO_WINDOW: u32 = 0x0800_0000;

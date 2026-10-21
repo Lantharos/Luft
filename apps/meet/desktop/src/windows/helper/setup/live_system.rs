@@ -4,7 +4,6 @@ use std::path::Path;
 
 use luft_i18n::t;
 
-use super::Context;
 use crate::L10N;
 pub use crate::live::build::unfinished;
 use crate::live::build::{self, Listing};
@@ -16,6 +15,7 @@ use crate::live::source::Source;
 use crate::plan::layout::Role;
 use crate::plan::sizes;
 use crate::protocol::Stage;
+use crate::windows::helper::Context;
 
 pub fn listing(source: &Source) -> Result<Listing, String> {
     build::listing(source)

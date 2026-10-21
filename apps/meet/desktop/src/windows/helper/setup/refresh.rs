@@ -4,13 +4,7 @@ use std::path::{Path, PathBuf};
 
 use luft_i18n::t;
 
-use super::drive::state::Found;
-use super::drive::storage::{self, MSFT_Disk, MSFT_Partition, Storage};
-use super::drive::windows_drive::{self, WindowsDrive};
-use super::drive::{record, state};
-use super::system::protected::Scratch;
-use super::system::start_entries;
-use super::{Context, live_system, prepare, room, undo, windows_space};
+use super::{live_system, prepare, room, undo};
 use crate::L10N;
 use crate::live::iso::Entry;
 use crate::live::source::Source;
@@ -18,6 +12,14 @@ use crate::plan::gap::{self, Head};
 use crate::plan::layout::{self, Disk, Plan, Role};
 use crate::plan::sizes;
 use crate::protocol::{Prepared, Stage};
+use crate::windows::helper::Context;
+use crate::windows::helper::drive::state::Found;
+use crate::windows::helper::drive::storage::{self, MSFT_Disk, MSFT_Partition, Storage};
+use crate::windows::helper::drive::windows_drive::{self, WindowsDrive};
+use crate::windows::helper::drive::windows_space;
+use crate::windows::helper::drive::{record, state};
+use crate::windows::helper::system::protected::Scratch;
+use crate::windows::helper::system::start_entries;
 
 const LOGS: &str = "Luft logs";
 

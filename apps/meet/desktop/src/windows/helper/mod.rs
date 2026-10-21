@@ -1,14 +1,8 @@
 mod drive;
-mod live_system;
 mod luft;
-mod pack;
-mod prepare;
-mod refresh;
-mod room;
+mod setup;
 mod stick;
 mod system;
-mod undo;
-mod windows_space;
 
 use std::fs::{File, OpenOptions};
 use std::os::windows::io::AsRawHandle;
@@ -19,6 +13,7 @@ use windows::Win32::System::Pipes::GetNamedPipeServerProcessId;
 
 use crate::protocol::Call;
 pub use crate::serving::Context;
+use setup::{pack, prepare, refresh, undo};
 
 pub const ARGUMENT: &str = "--meet-helper";
 

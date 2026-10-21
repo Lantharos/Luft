@@ -1,9 +1,10 @@
-use super::drive::storage::{MSFT_Partition, Storage};
-use super::drive::windows_drive::{self, WindowsDrive};
-use super::drive::{record, state};
-use super::system::start_entries;
-use super::{Context, windows_space};
 use crate::protocol::Stage;
+use crate::windows::helper::Context;
+use crate::windows::helper::drive::storage::{MSFT_Partition, Storage};
+use crate::windows::helper::drive::windows_drive::{self, WindowsDrive};
+use crate::windows::helper::drive::windows_space;
+use crate::windows::helper::drive::{record, state};
+use crate::windows::helper::system::start_entries;
 
 pub fn give_back(
     context: &Context,

@@ -2,11 +2,7 @@ use std::path::Path;
 
 use luft_i18n::t;
 
-use super::drive::bitlocker::BitLocker;
-use super::drive::snapshot;
-use super::drive::storage::{self, Layout, MSFT_Disk, MSFT_Partition, Storage};
-use super::drive::windows_drive::WindowsDrive;
-use super::{Context, prepare, undo, windows_space};
+use super::{prepare, undo};
 use crate::L10N;
 use crate::live::source::Source;
 use crate::plan::gap::{self, Head};
@@ -14,6 +10,12 @@ use crate::plan::layout::{self, Disk, Role, Shortfall, Span, Windows};
 use crate::plan::places::{self, Inputs, Place, Target};
 use crate::plan::sizes;
 use crate::protocol::{Prepared, Stage};
+use crate::windows::helper::Context;
+use crate::windows::helper::drive::bitlocker::BitLocker;
+use crate::windows::helper::drive::snapshot;
+use crate::windows::helper::drive::storage::{self, Layout, MSFT_Disk, MSFT_Partition, Storage};
+use crate::windows::helper::drive::windows_drive::WindowsDrive;
+use crate::windows::helper::drive::windows_space;
 
 pub struct Survey<'a> {
     pub storage: &'a Storage,

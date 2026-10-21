@@ -49,8 +49,8 @@ settings-page-about = About
 
 ## Pages inside panels
 
-settings-page-taskbar = Taskbar
-    .keywords = panel, dock, auto-hide, hide automatically, floating, transparent, pinned apps, alignment, start button, displays, workspace, desktop, virtual desktop
+settings-page-taskbar = Taskbar and Start
+    .keywords = panel, dock, auto-hide, hide automatically, hide taskbar, floating, transparent, pinned apps, alignment, start button, start menu, gust, search bar, launcher, web search, search engine, displays, workspace, desktop, virtual desktop
 settings-page-fonts = Fonts
     .keywords = all fonts, typefaces, font families, install fonts, remove fonts
 settings-page-cursors = Cursor themes

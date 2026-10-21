@@ -15,9 +15,11 @@
 		style: Style;
 		size: Size;
 		autoHide: AutoHide;
+		shown: boolean;
+		startButton: boolean;
 	}
 
-	let { wallpaper, apps, alignment, look, style, size, autoHide }: Props = $props();
+	let { wallpaper, apps, alignment, look, style, size, autoHide, shown, startButton }: Props = $props();
 
 	const METRICS: Record<Size, { height: number; button: number; icon: number }> = {
 		compact: { height: 26, button: 22, icon: 14 },
@@ -31,6 +33,7 @@
 	let metrics = $derived(METRICS[size]);
 	let floating = $derived(style === 'floating');
 	let paint = $derived(appearance.taskbar?.[look]);
+	let cornerPaint = $derived(appearance.taskbar?.glass);
 	let markSize = $derived(Math.round(metrics.button * MARK_SCALE));
 	let markIcon = $derived(Math.round(markSize * ((appearance.appIcons?.style ?? 'default') === 'default' ? 1 : PAINTED_MARK_SCALE)));
 	let time = $state(clock());
@@ -58,6 +61,7 @@
 	{/if}
 	<div
 		class="bar"
+		class:gone={!shown}
 		class:floating
 		class:left={alignment === 'left'}
 		class:hides={autoHide === 'always'}
@@ -76,7 +80,7 @@
 		style:--dot-halo={boxShadow(paint?.status.dot ?? null)}
 	>
 		<div class="apps">
-			<span class="slot" aria-hidden="true">
+			<span class="slot" class:hidden={!startButton} aria-hidden="true">
 				<span class="mark" style:width="{markSize}px" style:height="{markSize}px">
 					{#each MARK_LAYERS as layer, index (index)}
 						<svg viewBox="0 0 {MARK_WIDTH} {MARK_HEIGHT}" width={markIcon} height={markIcon} class:halo={layer.halo} fill={paint?.mark[layer.fill]}>
@@ -100,6 +104,31 @@
 			<BatteryFull size={metrics.icon * 0.62} />
 			<span class="time">{time}</span>
 		</div>
+	</div>
+	<div
+		class="corner"
+		class:shown={!shown}
+		style:--surface={cornerPaint?.surface}
+		style:--backdrop={backdrop(cornerPaint?.glass ?? null)}
+		style:--ink={cornerPaint?.ink}
+	>
+		{#if startButton}
+			<span class="pill round" aria-hidden="true">
+				<span class="mark">
+					{#each MARK_LAYERS as layer, index (index)}
+						<svg viewBox="0 0 {MARK_WIDTH} {MARK_HEIGHT}" width={14} height={14} class:halo={layer.halo} fill={cornerPaint?.mark[layer.fill]}>
+							<path d={layer.path} />
+						</svg>
+					{/each}
+				</span>
+			</span>
+		{/if}
+		<span class="pill">
+			<Wifi size={11} />
+			<Volume2 size={11} />
+			<BatteryFull size={11} />
+		</span>
+		<span class="pill time">{time}</span>
 	</div>
 </div>
 
@@ -138,6 +167,53 @@
 			border-radius var(--spring-snappy-duration) var(--spring-snappy),
 			background-color var(--motion-tap) var(--ease-decelerate),
 			transform var(--spring-snappy-duration) var(--spring-snappy);
+	}
+
+	.bar.gone {
+		transform: translateY(calc(100% + var(--margin) + 4px));
+	}
+
+	.slot.hidden {
+		display: none;
+	}
+
+	.corner {
+		position: absolute;
+		right: 8px;
+		bottom: 8px;
+		display: flex;
+		gap: 5px;
+		opacity: 0;
+		transform: translateY(8px);
+		transition:
+			opacity var(--motion-tap) var(--ease-decelerate),
+			transform var(--spring-snappy-duration) var(--spring-snappy);
+	}
+
+	.corner.shown {
+		opacity: 1;
+		transform: none;
+	}
+
+	.pill {
+		display: flex;
+		height: 23px;
+		align-items: center;
+		gap: 6px;
+		padding: 0 9px;
+		border-radius: 999px;
+		background: var(--surface);
+		backdrop-filter: var(--backdrop);
+		color: var(--ink);
+		font-size: 10px;
+		font-weight: 500;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.pill.round {
+		width: 23px;
+		justify-content: center;
+		padding: 0;
 	}
 
 	.bar.floating {

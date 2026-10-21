@@ -1,0 +1,7 @@
+apps/settings/src/lib/panels/personalization/appearance/taskbar/options.ts	DuckDuckGo
+apps/settings/src/lib/panels/personalization/appearance/taskbar/options.ts	Google
+apps/settings/src/lib/panels/personalization/appearance/taskbar/options.ts	Bing
+apps/settings/src/lib/panels/personalization/appearance/taskbar/options.ts	Brave Search
+apps/settings/src/lib/panels/personalization/appearance/taskbar/options.ts	Ecosia
+apps/settings/src/lib/panels/personalization/appearance/taskbar/options.ts	Startpage
+apps/settings/src/lib/panels/personalization/appearance/taskbar/options.ts	Kagi

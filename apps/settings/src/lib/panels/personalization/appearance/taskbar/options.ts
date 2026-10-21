@@ -4,6 +4,8 @@ export type Style = 'bar' | 'floating';
 export type Size = 'compact' | 'normal' | 'large';
 export type AutoHide = 'never' | 'always' | 'windows';
 export type Displays = 'all' | 'primary';
+export type StartStyle = 'menu' | 'palette';
+export type WebSearch = 'duckduckgo' | 'google' | 'bing' | 'brave' | 'ecosia' | 'startpage' | 'kagi';
 
 export type TaskbarSettings = {
 	'taskbar-alignment': Alignment;
@@ -15,6 +17,10 @@ export type TaskbarSettings = {
 	'taskbar-displays': Displays;
 	'taskbar-windows-per-display': boolean;
 	'taskbar-windows-per-workspace': boolean;
+	'taskbar-shown': boolean;
+	'taskbar-start-button': boolean;
+	'start-style': StartStyle;
+	'search-web-engine': WebSearch;
 	'favorite-apps': string[];
 };
 
@@ -28,7 +34,26 @@ export const TASKBAR_KEYS: (keyof TaskbarSettings)[] = [
 	'taskbar-displays',
 	'taskbar-windows-per-display',
 	'taskbar-windows-per-workspace',
+	'taskbar-shown',
+	'taskbar-start-button',
+	'start-style',
+	'search-web-engine',
 	'favorite-apps'
+];
+
+export const START_STYLES: { value: StartStyle; label: string }[] = [
+	{ value: 'menu', label: 'settings-start-style-menu' },
+	{ value: 'palette', label: 'settings-start-style-palette' }
+];
+
+export const WEB_SEARCH: { value: WebSearch; label: string }[] = [
+	{ value: 'duckduckgo', label: 'DuckDuckGo' },
+	{ value: 'google', label: 'Google' },
+	{ value: 'bing', label: 'Bing' },
+	{ value: 'brave', label: 'Brave Search' },
+	{ value: 'ecosia', label: 'Ecosia' },
+	{ value: 'startpage', label: 'Startpage' },
+	{ value: 'kagi', label: 'Kagi' }
 ];
 
 export const ALIGNMENTS: { value: Alignment; label: string }[] = [

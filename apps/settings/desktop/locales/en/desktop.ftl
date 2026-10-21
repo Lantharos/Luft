@@ -30,6 +30,7 @@ desktop-dictation-not-web-address = That isn't a web address
 ## Keyboard shortcuts
 # Names of actions in the list of keyboard shortcuts. Each describes what pressing the shortcut does.
 desktop-shortcut-toggle-message-tray = Show the notification list
+desktop-shortcut-toggle-start = Open Start
 desktop-shortcut-toggle-quick-settings = Open the quick settings menu
 desktop-shortcut-focus-active-notification = Focus the active notification
 desktop-shortcut-clipboard-history = Show clipboard history

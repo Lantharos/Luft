@@ -8,6 +8,7 @@ fn workspace(key: &str, prefix: &str) -> Option<u32> {
 
 fn message(key: &str) -> Option<&'static str> {
     Some(match key {
+        "toggle-start" => "desktop-shortcut-toggle-start",
         "toggle-message-tray" => "desktop-shortcut-toggle-message-tray",
         "toggle-quick-settings" => "desktop-shortcut-toggle-quick-settings",
         "focus-active-notification" => "desktop-shortcut-focus-active-notification",

@@ -20,7 +20,13 @@ export async function checkTaskbarLooks(app) {
         await captureBottom(`taskbar-${look}-${scheme}`);
       }
     }
+    for (const [style, shown] of [['palette', true], ['menu', false]]) {
+      kestrel.set_string('start-style', style);
+      kestrel.set_boolean('taskbar-shown', shown);
+      await settled();
+      (await app.settle(() => true)).save(`settings-taskbar-${style}${shown ? '' : '-hidden'}`);
+    }
   } finally {
-    kestrel.reset('taskbar-look');
+    for (const key of ['taskbar-look', 'start-style', 'taskbar-shown']) kestrel.reset(key);
   }
 }

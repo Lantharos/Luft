@@ -87,11 +87,26 @@ settings-appearance-animations-description = Windows and menus move instead of a
 
 ## Taskbar
 
-settings-taskbar-title = Taskbar
+settings-taskbar-title = Taskbar and Start
 # Back button to the Appearance page
 settings-taskbar-back = Appearance
 # Screen-reader label of the taskbar preview picture
 settings-taskbar-preview = Taskbar preview
+settings-start-section = Start
+# How Start looks: the menu, or Gust, a search bar
+settings-start-style = Style
+settings-start-style-menu = Menu
+# Gust is the name of Start's search bar style, keep it as is
+settings-start-style-palette = Gust
+settings-start-style-menu-description = Search, apps and folders above the taskbar
+settings-start-style-palette-description = A search bar in the middle of the screen for apps, windows, files and answers
+settings-start-button = Show the Start button
+settings-start-button-description = Super opens Start either way
+# Followed by a list of search engines
+settings-start-web = Search the web with
+settings-taskbar-section = Taskbar
+settings-taskbar-shown = Show the taskbar
+settings-taskbar-hidden-description = The clock and status icons stay in a corner, and Super opens Start
 settings-taskbar-alignment = Alignment
 settings-taskbar-align-center = Center
 settings-taskbar-align-left = Left

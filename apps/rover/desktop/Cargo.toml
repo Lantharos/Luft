@@ -17,7 +17,6 @@ serde = { version = "1.0.229", features = ["derive"] }
 tokio = { version = "1.53.3", features = ["process"] }
 walkdir = "2.5.0"
 dirs = "7.0.0"
-mime_guess = "2.0.5"
 chrono = "0.4.45"
 parking_lot = "0.12.5"
 libc = "0.2"

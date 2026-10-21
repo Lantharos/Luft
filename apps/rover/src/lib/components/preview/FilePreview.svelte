@@ -14,8 +14,7 @@
 	import type { MediaInfo } from '#lib/file-manager/inspect/details.svelte.js';
 	import { thumbnailOf } from '#lib/file-manager/listing/thumbnails.js';
 	import type { FileEntry } from '#lib/types/index.js';
-	import { entryIcon, mayBeTransparent } from '#lib/utils/file-kinds.js';
-	import { previewKind } from '#lib/utils/kinds.js';
+	import { fileKind, mayBeTransparent, previewKind } from '#lib/utils/kinds.js';
 	import NativePreview from './NativePreview.svelte';
 
 	interface Props {
@@ -78,7 +77,7 @@
 	</div>
 {:else if kind === 'audio'}
 	<div class="preview-stack">
-		<EntryIcon name="music" size={iconSize} />
+		<EntryIcon kind="audio" size={iconSize} />
 		<audio
 			src={source}
 			autoplay={full}
@@ -101,6 +100,6 @@
 	<iframe class="preview-document" src={fileUrl(entry.path)} title={entry.name}></iframe>
 {:else}
 	<div class="preview-stack">
-		<EntryIcon name={entryIcon(entry)} size={iconSize} {...thumbnailOf(entry)} fit="contain" />
+		<EntryIcon kind={fileKind(entry)} size={iconSize} {...thumbnailOf(entry)} fit="contain" />
 	</div>
 {/if}

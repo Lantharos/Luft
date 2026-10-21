@@ -1,5 +1,5 @@
 import type { FileEntry, GroupBy } from '#lib/types/index.js';
-import { entryIcon, type EntryIconName } from '#lib/utils/file-kinds.js';
+import { fileKind, type FileKind } from '#lib/utils/kinds.js';
 
 export type Section = { key: string; label: string; count: number };
 export type Grouped = { entries: FileEntry[]; sections: Section[] | null };
@@ -7,18 +7,18 @@ export type Grouped = { entries: FileEntry[]; sections: Section[] | null };
 type Bucket = { key: string; label: string; rank: number; entries: FileEntry[] };
 
 const DAY_MS = 86_400_000;
-const KINDS: [EntryIconName, string][] = [
+const KINDS: [FileKind, string][] = [
 	['folder', 'Folders'],
-	['file-text', 'Documents'],
+	['document', 'Documents'],
 	['image', 'Images'],
 	['video', 'Videos'],
-	['music', 'Audio'],
+	['audio', 'Audio'],
 	['code', 'Text and code'],
 	['archive', 'Archives'],
 	['package', 'Apps and packages'],
 	['file', 'Other']
 ];
-const KIND_RANK = new Map(KINDS.map(([icon], index) => [icon, index]));
+const KIND_RANK = new Map(KINDS.map(([kind], index) => [kind, index]));
 const KIND_LABEL = new Map(KINDS);
 const month = new Intl.DateTimeFormat(undefined, { month: 'long' });
 
@@ -40,8 +40,8 @@ export function groupEntries(entries: FileEntry[], groupBy: GroupBy, oldestFirst
 }
 
 function kindBucket(entry: FileEntry) {
-	const icon = entryIcon(entry);
-	return { key: icon, label: KIND_LABEL.get(icon)!, rank: KIND_RANK.get(icon)! };
+	const kind = fileKind(entry);
+	return { key: kind, label: KIND_LABEL.get(kind)!, rank: KIND_RANK.get(kind)! };
 }
 
 function dateBucket(oldestFirst: boolean) {

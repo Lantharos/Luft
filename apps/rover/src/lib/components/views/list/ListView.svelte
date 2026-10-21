@@ -11,9 +11,8 @@
 	import { ListColumns } from '#lib/file-manager/view/list-columns.svelte.js';
 	import { EntrySurface, isGroupRow } from '#lib/file-manager/view/surface.svelte.js';
 	import type { FileEntry, ListColumnId } from '#lib/types/index.js';
-	import { entryIcon } from '#lib/utils/file-kinds.js';
+	import { fileKind, kindLabel } from '#lib/utils/kinds.js';
 	import { formatDate } from '#lib/utils/format.js';
-	import { kindLabel } from '#lib/utils/kinds.js';
 	import { parentPath } from '#lib/utils/paths.js';
 	import EntryName from '../EntryName.svelte';
 	import ColumnsMenu from './ColumnsMenu.svelte';
@@ -100,7 +99,7 @@
 		{:else}
 			<div class={[entryClasses(row, context), 'list-grid list-row']} {...entryProps(row, context)}>
 				<span class="list-name">
-					<EntryIcon name={entryIcon(row)} size={24} {...thumbnailOf(row)} />
+					<EntryIcon kind={fileKind(row)} size={24} {...thumbnailOf(row)} />
 					<EntryName entry={row} {manager} class="truncate" />
 					<CloudMark state={manager.cloud.stateOf(row.path)} />
 					<VcsBadge status={vcs.statusFor(row.path, row.isDir)} />

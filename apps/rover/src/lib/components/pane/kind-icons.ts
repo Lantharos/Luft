@@ -8,16 +8,16 @@ import Music from '@lucide/svelte/icons/music';
 import Package from '@lucide/svelte/icons/package';
 import Video from '@lucide/svelte/icons/video';
 import type { Component } from 'svelte';
-import type { EntryIconName } from '#lib/utils/file-kinds.js';
+import type { FileKind } from '#lib/utils/kinds.js';
 
-export const KIND_ICONS: Record<EntryIconName, Component> = {
+export const KIND_ICONS: Record<FileKind, Component> = {
 	folder: Folder,
 	file: File,
 	image: Image,
 	video: Video,
-	music: Music,
+	audio: Music,
 	archive: Archive,
 	code: Code,
-	'file-text': FileText,
+	document: FileText,
 	package: Package
 };

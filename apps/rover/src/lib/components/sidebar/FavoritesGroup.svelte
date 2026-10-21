@@ -10,6 +10,7 @@
 	import type { FileManager, SidebarPlace } from '#lib/file-manager/manager.svelte.js';
 	import { settings } from '#lib/state/settings.svelte.js';
 	import type { PinnedFolder } from '#lib/types/index.js';
+	import type { FileKind } from '#lib/utils/kinds.js';
 	import SidebarItem from './SidebarItem.svelte';
 
 	interface Props {
@@ -34,7 +35,7 @@
 	}
 
 	function icon(bookmark: PinnedFolder) {
-		return KIND_ICONS[bookmark.icon ?? (bookmark.is_dir ? 'folder' : 'file')];
+		return KIND_ICONS[bookmark.icon as FileKind] ?? KIND_ICONS[bookmark.is_dir ? 'folder' : 'file'];
 	}
 
 	function open(bookmark: PinnedFolder) {

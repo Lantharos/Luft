@@ -219,34 +219,20 @@ pub(crate) fn file_entry(path: &Path) -> std::io::Result<FileEntry> {
 }
 
 fn mime_type(path: &Path) -> Option<String> {
-    match mime_guess::from_path(path).first() {
-        Some(mime) if mime.essence_str() != "application/octet-stream" => Some(mime.to_string()),
-        _ => sniff_image_mime(path).map(str::to_string),
+    let (guess, _) = gio::content_type_guess(Some(path), None);
+    let content_type = if gio::content_type_is_unknown(&guess) {
+        sniffed_content_type(path)?
+    } else {
+        guess
+    };
+    if gio::content_type_is_unknown(&content_type) {
+        return None;
     }
+    gio::content_type_get_mime_type(&content_type).map(String::from)
 }
 
-fn sniff_image_mime(path: &Path) -> Option<&'static str> {
+fn sniffed_content_type(path: &Path) -> Option<gio::glib::GString> {
     let mut bytes = [0_u8; 512];
     let read = fs::File::open(path).ok()?.read(&mut bytes).ok()?;
-    let bytes = &bytes[..read];
-    if bytes.starts_with(b"\x89PNG\r\n\x1a\n") {
-        Some("image/png")
-    } else if bytes.starts_with(b"\xff\xd8\xff") {
-        Some("image/jpeg")
-    } else if bytes.starts_with(b"GIF87a") || bytes.starts_with(b"GIF89a") {
-        Some("image/gif")
-    } else if bytes.starts_with(b"BM") {
-        Some("image/bmp")
-    } else if bytes.starts_with(&[0, 0, 1, 0]) {
-        Some("image/x-icon")
-    } else if bytes.len() >= 12 && bytes.starts_with(b"RIFF") && &bytes[8..12] == b"WEBP" {
-        Some("image/webp")
-    } else if String::from_utf8_lossy(bytes)
-        .trim_start()
-        .starts_with("<svg")
-    {
-        Some("image/svg+xml")
-    } else {
-        None
-    }
+    Some(gio::content_type_guess(Some(path), Some(&bytes[..read])).0)
 }

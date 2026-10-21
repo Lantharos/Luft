@@ -8,8 +8,7 @@
 	import { thumbnailOf } from '#lib/file-manager/listing/thumbnails.js';
 	import { entryContext } from '#lib/file-manager/view/entry-props.js';
 	import type { FileEntry } from '#lib/types/index.js';
-	import { entryIcon } from '#lib/utils/file-kinds.js';
-	import { kindLabel } from '#lib/utils/kinds.js';
+	import { fileKind, kindLabel } from '#lib/utils/kinds.js';
 	import { parentPath } from '#lib/utils/paths.js';
 	import OpenWith from './OpenWith.svelte';
 
@@ -81,7 +80,7 @@
 		<div class="details-preview details-stack">
 			{#each selected.slice(0, STACK_SIZE) as item, index (item.path)}
 				<span class="details-stack__item" style:--index={index}>
-					<EntryIcon name={entryIcon(item)} size={88} {...thumbnailOf(item)} />
+					<EntryIcon kind={fileKind(item)} size={88} {...thumbnailOf(item)} />
 				</span>
 			{/each}
 		</div>
@@ -96,7 +95,7 @@
 		{@render metadata(totalSize > 0 ? [{ label: 'Size', value: bytes(totalSize) }] : [])}
 	{:else}
 		<div class="details-preview">
-			<EntryIcon name={manager.view === 'recent' ? 'file' : 'folder'} size={96} />
+			<EntryIcon kind={manager.view === 'recent' ? 'file' : 'folder'} size={96} />
 		</div>
 		<div class="details-heading-block">
 			<h2 class="details-title">{folderTitle}</h2>

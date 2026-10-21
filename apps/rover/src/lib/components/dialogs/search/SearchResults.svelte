@@ -2,7 +2,7 @@
 	import { tooltip } from '@luft/ui';
 	import { KIND_ICONS } from '#lib/components/pane/kind-icons.js';
 	import type { SearchResult } from '#lib/features/types.js';
-	import { entryIcon } from '#lib/utils/file-kinds.js';
+	import { fileKind } from '#lib/utils/kinds.js';
 	import { parentPath } from '#lib/utils/paths.js';
 
 	interface Props {
@@ -30,7 +30,7 @@
 
 <ol bind:this={list} class="flex flex-col" role="listbox" aria-label="Results">
 	{#each results as result, index (result.path)}
-		{@const Icon = KIND_ICONS[entryIcon(result)]}
+		{@const Icon = KIND_ICONS[fileKind(result)]}
 		<li role="option" aria-selected={index === highlighted}>
 			<button
 				type="button"

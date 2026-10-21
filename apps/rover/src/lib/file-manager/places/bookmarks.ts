@@ -1,7 +1,7 @@
 import * as api from '#lib/api.js';
 import { settings } from '#lib/state/settings.svelte.js';
 import type { FileEntry, PinnedFolder } from '#lib/types/index.js';
-import { entryIcon } from '#lib/utils/file-kinds.js';
+import { fileKind } from '#lib/utils/kinds.js';
 
 export function isPinned(path: string) {
 	return settings.value.pinnedFolders.some((bookmark) => bookmark.path === path);
@@ -49,5 +49,5 @@ export function bookmarkTarget(bookmark: PinnedFolder) {
 }
 
 function bookmarkFor(entry: FileEntry): PinnedFolder {
-	return { name: entry.name, path: entry.path, is_dir: entry.isDir, icon: entryIcon(entry) };
+	return { name: entry.name, path: entry.path, is_dir: entry.isDir, icon: fileKind(entry) };
 }

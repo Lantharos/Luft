@@ -6,8 +6,7 @@
 	import EntryIcon from '#lib/components/pane/EntryIcon.svelte';
 	import { entryContext } from '#lib/file-manager/view/entry-props.js';
 	import { thumbnailOf } from '#lib/file-manager/listing/thumbnails.js';
-	import { entryIcon } from '#lib/utils/file-kinds.js';
-	import { kindLabel } from '#lib/utils/kinds.js';
+	import { fileKind, kindLabel } from '#lib/utils/kinds.js';
 	import FilePreview from './FilePreview.svelte';
 
 	const { manager, view } = entryContext();
@@ -34,7 +33,7 @@
 	>
 		<div class="quicklook" role="dialog" aria-label={`Preview of ${entry.name}`} in:pop out:fade={{ duration: 120 }}>
 			<header class="quicklook-header">
-				<EntryIcon name={entryIcon(entry)} size={28} {...thumbnailOf(entry)} />
+				<EntryIcon kind={fileKind(entry)} size={28} {...thumbnailOf(entry)} />
 				<div class="min-w-0 flex-1">
 					<p class="truncate text-[14px] font-medium text-[var(--text)]">{entry.name}</p>
 					<p class="truncate text-[12px] text-[var(--text-muted)]">

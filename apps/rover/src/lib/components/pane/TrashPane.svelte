@@ -62,7 +62,7 @@
 				onkeydown={(event) => event.key === 'Enter' && manager.toggleSelected(item.id)}
 			>
 				<span class="list-name">
-					<EntryIcon name={item.isDir ? 'folder' : 'file'} size={24} />
+					<EntryIcon kind={item.isDir ? 'folder' : 'file'} size={24} />
 					<span class="flex min-w-0 flex-col">
 						<span class="truncate">{item.name}</span>
 						<span class="truncate text-[12px] text-[var(--text-muted)]">{parentPath(item.originalPath)}</span>

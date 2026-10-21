@@ -1,9 +1,9 @@
 <script lang="ts">
+	import type { FileKind } from '#lib/utils/kinds.js';
 	import { KIND_ICONS } from './kind-icons';
-	import type { EntryIconName } from '#lib/utils/file-kinds.js';
 
 	interface Props {
-		name: EntryIconName;
+		kind: FileKind;
 		size: number;
 		thumbnail?: string | null;
 		backdrop?: boolean;
@@ -11,26 +11,26 @@
 		fit?: 'cover' | 'contain';
 	}
 
-	let { name, size, thumbnail = null, backdrop = false, app = false, fit = 'cover' }: Props = $props();
+	let { kind, size, thumbnail = null, backdrop = false, app = false, fit = 'cover' }: Props = $props();
 	let failedThumbnail = $state<string | null>(null);
 
-	const TONES: Partial<Record<EntryIconName, string>> = {
+	const TONES: Partial<Record<FileKind, string>> = {
 		folder: 'folder',
 		image: 'media',
 		video: 'media',
-		music: 'media',
+		audio: 'media',
 		archive: 'archive',
 		package: 'package',
 		code: 'code'
 	};
 
-	let Icon = $derived(KIND_ICONS[name]);
+	let Icon = $derived(KIND_ICONS[kind]);
 	let showThumbnail = $derived(Boolean(thumbnail) && failedThumbnail !== thumbnail);
 	let artwork = $derived(app ? 'entry-icon--app' : `entry-icon--thumbnail entry-icon--${fit}`);
 </script>
 
 <span
-	class={['entry-icon', showThumbnail ? artwork : `entry-icon--${TONES[name] ?? 'file'}`]}
+	class={['entry-icon', showThumbnail ? artwork : `entry-icon--${TONES[kind] ?? 'file'}`]}
 	style:--icon-size="{size}px"
 	aria-hidden="true"
 >

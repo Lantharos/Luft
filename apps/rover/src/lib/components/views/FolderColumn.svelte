@@ -9,7 +9,7 @@
 	import { entryClasses, entryContext, entryProps } from '#lib/file-manager/view/entry-props.js';
 	import { EntrySurface } from '#lib/file-manager/view/surface.svelte.js';
 	import type { FileEntry } from '#lib/types/index.js';
-	import { entryIcon } from '#lib/utils/file-kinds.js';
+	import { fileKind } from '#lib/utils/kinds.js';
 	import EntryName from './EntryName.svelte';
 
 	interface Props {
@@ -67,7 +67,7 @@
 >
 	{#snippet children(entry)}
 		<div class={[classes(entry), 'column-row']} {...entryProps(entry, context, select)}>
-			<EntryIcon name={entryIcon(entry)} size={20} {...thumbnailOf(entry)} />
+			<EntryIcon kind={fileKind(entry)} size={20} {...thumbnailOf(entry)} />
 			<EntryName {entry} manager={manager} class="truncate" />
 			<CloudMark state={manager.cloud.stateOf(entry.path)} />
 			<VcsBadge status={vcs.statusFor(entry.path, entry.isDir)} />

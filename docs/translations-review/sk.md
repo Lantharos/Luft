@@ -14,9 +14,9 @@ Strings in Luft's Slovak translation that a native speaker should check, each li
 - `packages/i18n/glossary/sk.csv` `Start`: "Start" — Slovak Windows writes „Štart“; Luft keeps the name unchanged.
 - `apps/settings/locales/sk/settings.ftl` `settings-subpage-back`: "Späť na stránku { $page }" — page titles stay in the nominative after „stránku“; check it sounds natural with titles like „Klávesnica“.
 - `apps/settings/locales/sk/settings.ftl` `settings-more-show`: "Zobraziť ešte { $count }" — identical in every plural form to avoid guessing the hidden noun's gender.
-- `packages/ui/locales/sk/ui.ftl` `ui-select-placeholder`: "Vybrať" — infinitive like buttons; „Vyberte“ might read better as a placeholder.
-- `packages/ui/locales/sk/ui.ftl` `ui-split-windows-size`: "{ $size }, využité { $used }" — check the word order reads well.
-- `packages/ui/locales/sk/ui.ftl` `ui-fingerprint-swipe`: "Potiahnite { $finger } po snímači." — check the verb for swipe readers.
+- `packages/web/ui/locales/sk/ui.ftl` `ui-select-placeholder`: "Vybrať" — infinitive like buttons; „Vyberte“ might read better as a placeholder.
+- `packages/web/ui/locales/sk/ui.ftl` `ui-split-windows-size`: "{ $size }, využité { $used }" — check the word order reads well.
+- `packages/web/ui/locales/sk/ui.ftl` `ui-fingerprint-swipe`: "Potiahnite { $finger } po snímači." — check the verb for swipe readers.
 - `kestrel/ui/locales/sk/shell.ftl` `keys-space`: "Medzerník" — the only key name translated; others stay as printed on Slovak keyboards.
 
 ## Kestrel and setup
@@ -45,7 +45,7 @@ Strings in Luft's Slovak translation that a native speaker should check, each li
 - `apps/settings/locales/sk/devices.ftl` `settings-keys-keypad`: "Num { $key }" — Slovak keyboards print nothing for this; check the abbreviation is clear.
 - `apps/settings/locales/sk/devices.ftl` `settings-keys-volume-up` (and the other media keys): "Zvýšiť hlasitosť" — verb-like key names; check against Windows' Slovak shortcut labels.
 - `apps/settings/desktop/locales/sk/desktop.ftl` `desktop-shortcut-focus-active-notification`: "Presunúť fokus na aktívne oznámenie" — "fokus" is common in GNOME Slovak but informal; check.
-- `packages/ui/locales/sk/ui.ftl` `ui-passphrase-field`: "Prístupová fráza" — passphrase isn't in the glossary; chosen to stay distinct from „heslo“. Check it reads naturally next to BitLocker/GNOME wording.
+- `packages/web/ui/locales/sk/ui.ftl` `ui-passphrase-field`: "Prístupová fráza" — passphrase isn't in the glossary; chosen to stay distinct from „heslo“. Check it reads naturally next to BitLocker/GNOME wording.
 - `apps/settings/locales/sk/protection.ftl` `settings-encryption-pin`: "PIN pri spustení" — „PIN“ alone in short labels and buttons, „kód PIN“ in sentences; check the mix is acceptable.
 - `apps/settings/locales/sk/protection.ftl` `settings-passwords-access-revoke`: "Zakázať aplikácii { $app } používať { $item }" — $item is a saved item's name in accusative position; may not fit every value.
 - `apps/settings/locales/sk/protection.ftl` `settings-passwords-ssh-copy`: "Kopírovať verejný kľúč pre { $name }" — avoids „verejný kľúč kľúča“; check it's natural.

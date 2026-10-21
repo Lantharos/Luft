@@ -18,4 +18,4 @@ With `LUFT_SAMPLE_SYSTEM` set, Barometer shows sample hardware and processes ins
 
 ## License
 
-MIT. Open Runde and Maple Mono are under the SIL Open Font License, in `packages/ui/fonts`.
+MIT. Open Runde and Maple Mono are under the SIL Open Font License, in `packages/web/ui/fonts`.

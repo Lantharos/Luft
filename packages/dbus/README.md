@@ -3,7 +3,7 @@
 Async D-Bus helpers on zbus 6, shared by Luft's apps and system services. Apps get it through `luft_app::dbus`; services that don't open windows depend on it directly.
 
 ```toml
-luft-dbus = { path = "../../../packages/dbus" }
+luft-dbus.workspace = true
 ```
 
 | Item | Use |

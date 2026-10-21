@@ -36,28 +36,28 @@ members = [
     "kestrel/search",
     "kestrel/settings",
     "kestrel/watchdog",
-    "packages/accounts",
-    "packages/accounts/service",
     "packages/app",
     "packages/dbus",
-    "packages/disks",
-    "packages/fingerprint",
     "packages/i18n",
-    "packages/meet",
-    "packages/network",
-    "packages/sleep/service",
-    "packages/software",
-    "packages/software/thumbnailer",
-    "packages/software/updater",
-    "packages/speech",
-    "packages/speech/service",
-    "packages/trust",
-    "packages/variant",
-    "packages/windows",
-    "packages/windows/service",
+    "packages/system/accounts",
+    "packages/system/disks",
+    "packages/system/fingerprint",
+    "packages/system/meet",
+    "packages/system/network",
+    "packages/system/software",
+    "packages/system/speech",
+    "packages/system/trust",
+    "packages/system/variant",
+    "packages/system/windows",
     "security/crates/access",
     "security/crates/trust",
     "security/crates/usb",
+    "services/accounts",
+    "services/sleep",
+    "services/speech",
+    "services/thumbnailer",
+    "services/updater",
+    "services/windows",
 ]
 default-members = [
     "apps/barometer/desktop",
@@ -93,28 +93,28 @@ default-members = [
     "kestrel/search",
     "kestrel/settings",
     "kestrel/watchdog",
-    "packages/accounts",
-    "packages/accounts/service",
     "packages/app",
     "packages/dbus",
-    "packages/disks",
-    "packages/fingerprint",
     "packages/i18n",
-    "packages/meet",
-    "packages/network",
-    "packages/sleep/service",
-    "packages/software",
-    "packages/software/thumbnailer",
-    "packages/software/updater",
-    "packages/speech",
-    "packages/speech/service",
-    "packages/trust",
-    "packages/variant",
-    "packages/windows",
-    "packages/windows/service",
+    "packages/system/accounts",
+    "packages/system/disks",
+    "packages/system/fingerprint",
+    "packages/system/meet",
+    "packages/system/network",
+    "packages/system/software",
+    "packages/system/speech",
+    "packages/system/trust",
+    "packages/system/variant",
+    "packages/system/windows",
     "security/crates/access",
     "security/crates/trust",
     "security/crates/usb",
+    "services/accounts",
+    "services/sleep",
+    "services/speech",
+    "services/thumbnailer",
+    "services/updater",
+    "services/windows",
 ]
 
 [workspace.package]
@@ -127,21 +127,21 @@ repository = "https://github.com/Lantharos/Luft"
 [workspace.dependencies]
 access = { path = "security/crates/access" }
 ctap = { path = "kestrel/passkeys/crates/ctap" }
-luft-accounts = { path = "packages/accounts" }
+luft-accounts = { path = "packages/system/accounts" }
 luft-app = { path = "packages/app" }
 luft-dbus = { path = "packages/dbus" }
-luft-disks = { path = "packages/disks" }
-luft-fingerprint = { path = "packages/fingerprint" }
+luft-disks = { path = "packages/system/disks" }
+luft-fingerprint = { path = "packages/system/fingerprint" }
 luft-i18n = { path = "packages/i18n" }
 luft-keyring-vault = { path = "kestrel/keyring/vault" }
 luft-keyring-wire = { path = "kestrel/keyring/wire" }
-luft-meet = { path = "packages/meet" }
-luft-network = { path = "packages/network" }
-luft-software = { path = "packages/software" }
-luft-speech = { path = "packages/speech" }
-luft-trust = { path = "packages/trust" }
-luft-variant = { path = "packages/variant" }
-luft-windows = { path = "packages/windows" }
+luft-meet = { path = "packages/system/meet" }
+luft-network = { path = "packages/system/network" }
+luft-software = { path = "packages/system/software" }
+luft-speech = { path = "packages/system/speech" }
+luft-trust = { path = "packages/system/trust" }
+luft-variant = { path = "packages/system/variant" }
+luft-windows = { path = "packages/system/windows" }
 sushi = { path = "boot/sushi/crates/sushi" }
 sushi-scene = { path = "boot/sushi/crates/sushi-scene" }
 

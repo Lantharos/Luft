@@ -12,10 +12,10 @@ Strings in Luft's Polish translation that a native speaker should check, each li
 - `packages/i18n/glossary/pl.csv` `signed startup`: "podpisane uruchamianie" — no established term; check it doesn't read oddly next to Secure Boot.
 - `packages/i18n/glossary/pl.csv` `security`: "bezpieczeństwo" — Windows names its page "Zabezpieczenia"; check which reads better as the Settings page name.
 - `packages/i18n/glossary/pl.csv` `remove`, `delete`: both "usunąć" — Polish has no common pair; check the cases where both appear on one screen.
-- `packages/ui/locales/pl/ui.ftl` `ui-fingerprint-place`: "Przyłóż { $finger } do czytnika." — relies on .inline being accusative, which equals the nominative for every finger name; check it reads naturally.
-- `packages/ui/locales/pl/ui.ftl` `ui-toast-dismiss`: "Odrzuć" — Windows' word for dismissing a notification; "Zamknij" is the alternative.
+- `packages/web/ui/locales/pl/ui.ftl` `ui-fingerprint-place`: "Przyłóż { $finger } do czytnika." — relies on .inline being accusative, which equals the nominative for every finger name; check it reads naturally.
+- `packages/web/ui/locales/pl/ui.ftl` `ui-toast-dismiss`: "Odrzuć" — Windows' word for dismissing a notification; "Zamknij" is the alternative.
 - `apps/settings/locales/pl/settings.ftl` `settings-subpage-back`: "Wróć do strony { $page }" — $page stays in the nominative after "strony"; check it reads well with titles like "Zasilanie i bateria".
-- `packages/settings-pages/locales/pl/pages.ftl` `settings-page-display`: "Ekrany" — plural because there can be several; Windows says "Ekran".
+- `packages/web/settings-pages/locales/pl/pages.ftl` `settings-page-display`: "Ekrany" — plural because there can be several; Windows says "Ekran".
 - `kestrel/ui/locales/pl/shell.ftl` `keys-delete`: "Delete" — many Polish keyboards print "Del"; check which is more familiar in shortcut labels.
 
 ## Kestrel and setup
@@ -45,7 +45,7 @@ Strings in Luft's Polish translation that a native speaker should check, each li
 - `apps/settings/locales/pl/devices.ftl` `settings-keys-keypad`: "Num { $key }" — chosen for keypad keys (Num 5, Num Enter); check against common Polish usage.
 - `apps/settings/locales/pl/system.ftl` `settings-updates-elsewhere-download-by`: "Aktualizacje pobiera { $app }" — object-first word order keeps { $app } in the nominative, so both an app name and the fallback „inna aplikacja” fit; the other `-by` messages are built the same way. Check it reads naturally.
 - `apps/settings/locales/pl/protection.ftl` `settings-privacy-screen-off-after`: "Po { $duration } bezczynności" — built so $duration stays in the nominative ("5 minut bezczynności"); check it reads well with every duration value, e.g. "1 minuta".
-- `packages/ui/locales/pl/ui.ftl` `ui-passphrase-field`: "Fraza hasła" — chosen for "passphrase" to keep it distinct from the account "hasło"; not in the glossary, check it against what Polish disk-encryption UIs use.
+- `packages/web/ui/locales/pl/ui.ftl` `ui-passphrase-field`: "Fraza hasła" — chosen for "passphrase" to keep it distinct from the account "hasło"; not in the glossary, check it against what Polish disk-encryption UIs use.
 - `apps/settings/locales/pl/protection.ftl` `settings-encryption-unlocks-security-key`: "Odblokowywany kluczem zabezpieczeń przy uruchamianiu" — "klucz zabezpieczeń" (Windows' term for a hardware security key) is not in the glossary.
 - `apps/settings/locales/pl/protection.ftl` `settings-security-anti-cheat`: "Gry z ochroną przed oszustwami" — Polish gamers often just say "anti-cheat"; check which is more recognizable.
 - `apps/settings/locales/pl/protection.ftl` `settings-passwords-stores`: "Dane logowania aplikacji" — "sign-in" as a countable noun has no good Polish equivalent, so the count message uses "Zapisane dane logowania: { $count }".

@@ -5,7 +5,7 @@ import { localeFiles, locales, merged } from './tools/merge.js';
 
 const MODULE = 'virtual:luft-locales';
 const RESOLVED = `\0${MODULE}`;
-const UI_LOCALES = fileURLToPath(new URL('../ui/locales', import.meta.url));
+const UI_LOCALES = fileURLToPath(new URL('../web/ui/locales', import.meta.url));
 
 /**
  * Bundles an app's Fluent files, one lazily loaded chunk per locale with the

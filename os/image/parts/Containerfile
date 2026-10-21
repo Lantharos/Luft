@@ -18,11 +18,11 @@ ENV CARGO_HOME=/var/cache/cargo CARGO_TARGET_DIR=/var/cache/luft-part/target LUF
 FROM builder AS kestrel-build
 COPY Cargo.toml Cargo.lock package.json bun.lock /src/
 COPY kestrel /src/kestrel
-COPY packages/motion /src/packages/motion
-COPY packages/ui/src/taskbar /src/packages/ui/src/taskbar
+COPY packages/web/motion /src/packages/web/motion
+COPY packages/web/ui/src/taskbar /src/packages/web/ui/src/taskbar
 COPY packages/i18n/src /src/packages/i18n/src
 COPY packages/i18n/tools /src/packages/i18n/tools
-COPY packages/settings-pages /src/packages/settings-pages
+COPY packages/web/settings-pages /src/packages/web/settings-pages
 COPY os/image/parts/stages/kestrel.sh os/image/parts/stages/needed.sh os/image/parts/stages/source-times.ts os/image/parts/stages/workspace.ts \
   /src/os/image/parts/stages/
 RUN --mount=type=cache,from=work,target=/var/cache/luft-part,sharing=locked \
@@ -105,8 +105,12 @@ COPY --from=helium-build /stage /stage
 FROM builder AS services-build
 COPY Cargo.toml Cargo.lock /src/
 COPY .cargo /src/.cargo
-COPY packages /src/packages
-COPY security/crates /src/security/crates
+COPY services /src/services
+COPY packages/app /src/packages/app
+COPY packages/dbus /src/packages/dbus
+COPY packages/i18n /src/packages/i18n
+COPY packages/system /src/packages/system
+COPY security/crates/access /src/security/crates/access
 COPY apps/setup/installer /src/apps/setup/installer
 COPY os/image/parts/stages/services.sh os/image/parts/stages/needed.sh os/image/parts/stages/source-times.ts os/image/parts/stages/workspace.ts \
   /src/os/image/parts/stages/

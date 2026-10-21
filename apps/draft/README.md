@@ -24,4 +24,4 @@ Opening files needs a build or bundle, since Sabine's local file access only wor
 
 ## License
 
-MIT. Open Runde and Maple Mono are under the SIL Open Font License, in `packages/ui/fonts`.
+MIT. Open Runde and Maple Mono are under the SIL Open Font License, in `packages/web/ui/fonts`.

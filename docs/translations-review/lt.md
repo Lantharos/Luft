@@ -17,12 +17,12 @@ Strings in Luft's Lithuanian translation that a native speaker should check: ter
 - `packages/i18n/glossary/lt.csv` `accessibility`: "Prieinamumas" — Windows, Android and iOS say "Pritaikymas neįgaliesiems"; chosen for length
 - `packages/i18n/glossary/lt.csv` `System Monitor`: "Sistemos monitorius" — GNOME may use a different generic name
 - `packages/i18n/glossary/lt.csv` `Media Viewer`: "Medijos žiūryklė" — no settled generic name
-- `packages/ui/locales/lt/ui.ftl` `ui-window-maximize`: "Maksimizuoti" — check against Windows' title bar tooltips ("Padidinti" is also seen); same for "Minimizuoti"
-- `packages/ui/locales/lt/ui.ftl` `ui-fingerprint-swipe`: "Perbraukite { $finger } per jutiklį." — check the accusative .inline forms fit this verb as well as "Uždėkite"
-- `packages/ui/locales/lt/ui.ftl` `ui-fingerprint-duplicate`: "Šis pirštas skaitytuve jau įrašytas, tikriausiai per Windows ar kitą paskyrą." — check the "per" construction reads naturally
+- `packages/web/ui/locales/lt/ui.ftl` `ui-window-maximize`: "Maksimizuoti" — check against Windows' title bar tooltips ("Padidinti" is also seen); same for "Minimizuoti"
+- `packages/web/ui/locales/lt/ui.ftl` `ui-fingerprint-swipe`: "Perbraukite { $finger } per jutiklį." — check the accusative .inline forms fit this verb as well as "Uždėkite"
+- `packages/web/ui/locales/lt/ui.ftl` `ui-fingerprint-duplicate`: "Šis pirštas skaitytuve jau įrašytas, tikriausiai per Windows ar kitą paskyrą." — check the "per" construction reads naturally
 - `apps/settings/locales/lt/settings.ftl` `settings-subpage-back`: "Atgal: { $page }" — avoids declining the page name after "į"; check it sounds right to screen-reader users
-- `packages/settings-pages/locales/lt/pages.ftl` `settings-page-power`: "Maitinimas ir akumuliatorius" — Windows' title, but long for the sidebar
-- `packages/settings-pages/locales/lt/pages.ftl` `settings-page-mouse`: "Pelė ir jutiklinis kilimėlis" — long for the sidebar
+- `packages/web/settings-pages/locales/lt/pages.ftl` `settings-page-power`: "Maitinimas ir akumuliatorius" — Windows' title, but long for the sidebar
+- `packages/web/settings-pages/locales/lt/pages.ftl` `settings-page-mouse`: "Pelė ir jutiklinis kilimėlis" — long for the sidebar
 - `kestrel/ui/locales/lt/shell.ftl` `keys-space`: "Tarpas" — every other key keeps its printed English label; confirm this mix is what Lithuanian users expect
 
 ## Kestrel and setup
@@ -59,7 +59,7 @@ Strings in Luft's Lithuanian translation that a native speaker should check: ter
 - `apps/settings/locales/lt/devices.ftl` `settings-power-long-sleep-hours`: "{ $hours } valandos" (genitive after "Išjungti po") — days and weeks likewise; these only work after "po".
 - `apps/settings/locales/lt/devices.ftl` `settings-keys-keypad`: "Num { $key }" — no settled Lithuanian name for number-pad keys in shortcut labels.
 - `apps/settings/locales/lt/protection.ftl` `settings-privacy-screen-off-after`: "Po: { $duration }" — "po" needs the genitive ("po 5 minučių") but the duration arrives in an unknown case, so a colon was used; check whether it reads acceptably or the duration format allows a natural phrase.
-- `packages/ui/locales/lt/ui.ftl` `ui-passphrase-field`: "Slaptafrazė" — used throughout for "passphrase" (GNOME's term) to keep it distinct from "slaptažodis"; confirm it is understood.
+- `packages/web/ui/locales/lt/ui.ftl` `ui-passphrase-field`: "Slaptafrazė" — used throughout for "passphrase" (GNOME's term) to keep it distinct from "slaptažodis"; confirm it is understood.
 - `apps/settings/locales/lt/protection.ftl` `settings-passwords-seal-title`: "Užplombuoti saugos lustu" — "seal" has no settled OS term; check "užplombuoti" vs "užsandarinti".
 - `apps/settings/locales/lt/protection.ftl` `settings-security-anti-cheat`: "Žaidimai su apsauga nuo sukčiavimo" — anti-cheat has no settled term; gamers may just say "anti-cheat".
 - `apps/settings/locales/lt/protection.ftl` `settings-passwords-ssh-added`: "Pridėtas { $when }" — assumes the relative time reads as "prieš 3 dienas" / "vakar"; same for `settings-passkeys-last-used`, `settings-updates-last-checked`, `settings-updates-released`.

@@ -14,12 +14,12 @@ Strings in Luft's Hungarian translation that a native speaker should check: term
 - `packages/i18n/glossary/hu.csv` `emoji`: "emodzsi" — Microsoft's spelling; many people write "emoji".
 - `packages/i18n/glossary/hu.csv` `USB stick`: "pendrive" — everyday word, but the hyphenated suffixes (pendrive-ot) may look odd in some sentences.
 - `docs/translations/hu.md` Names: the guide forbids „a(z)”; check that sentences such as „{ $app } alkalmazásban” without an article read acceptably, since many Hungarian programs use „a(z)” there instead.
-- `packages/settings-pages/locales/hu/pages.ftl` `settings-page-power`: "Tápellátás és akkumulátor" — long for the sidebar; may clip.
-- `packages/settings-pages/locales/hu/pages.ftl` `settings-page-cursors`: "Kurzortémák" — check against "Egérmutató-témák".
-- `packages/ui/locales/hu/ui.ftl` `ui-window-minimize`: "Kis méret" / `ui-window-maximize`: "Teljes méret" — Windows' tooltips; check they suit screen readers.
-- `packages/ui/locales/hu/ui.ftl` `ui-select-placeholder`: "Válasszon" — the only imperative used as a label; "Kiválasztás" is the alternative.
-- `packages/ui/locales/hu/ui.ftl` `ui-finger-right-index` .inline: "a jobb mutatóujját" — the inline forms carry the article and the accusative possessive for „Helyezze { $finger } az érzékelőre.” and „Húzza végig { $finger } az érzékelőn.”; check both sentences with every finger.
-- `packages/ui/locales/hu/ui.ftl` `ui-time-just-now`: "épp most" — check it fits wherever relative times show; "az imént" is the alternative.
+- `packages/web/settings-pages/locales/hu/pages.ftl` `settings-page-power`: "Tápellátás és akkumulátor" — long for the sidebar; may clip.
+- `packages/web/settings-pages/locales/hu/pages.ftl` `settings-page-cursors`: "Kurzortémák" — check against "Egérmutató-témák".
+- `packages/web/ui/locales/hu/ui.ftl` `ui-window-minimize`: "Kis méret" / `ui-window-maximize`: "Teljes méret" — Windows' tooltips; check they suit screen readers.
+- `packages/web/ui/locales/hu/ui.ftl` `ui-select-placeholder`: "Válasszon" — the only imperative used as a label; "Kiválasztás" is the alternative.
+- `packages/web/ui/locales/hu/ui.ftl` `ui-finger-right-index` .inline: "a jobb mutatóujját" — the inline forms carry the article and the accusative possessive for „Helyezze { $finger } az érzékelőre.” and „Húzza végig { $finger } az érzékelőn.”; check both sentences with every finger.
+- `packages/web/ui/locales/hu/ui.ftl` `ui-time-just-now`: "épp most" — check it fits wherever relative times show; "az imént" is the alternative.
 - `apps/settings/locales/hu/settings.ftl` `settings-subpage-back`: "Vissza ide: { $page }" — avoids a suffix on the page name; check it doesn't sound stiff for a screen reader.
 - `kestrel/ui/locales/hu/shell.ftl` `battery-level`: "Akkumulátor: { $percentage }%, töltő csatlakoztatva" — for the plugged-in-but-not-charging state.
 
@@ -64,7 +64,7 @@ Strings in Luft's Hungarian translation that a native speaker should check: term
 - `apps/settings/locales/hu/personalization.ftl` `settings-appearance-dark-from`: "Sötét mód kezdete" — rewritten as a noun to sit before the time picker; check it reads well next to the time.
 - `apps/settings/locales/hu/personalization.ftl` `settings-accessibility-dwell-time`: "Várakozás" — label before a duration slider; check it is clear enough (also `settings-accessibility-hold-time` "Nyomva tartás").
 - `apps/settings/locales/hu/personalization.ftl` `settings-appearance-icons-clear`: "Áttetsző" — icon style "Clear"; check it isn't read as "Törlés".
-- `packages/ui/locales/hu/ui.ftl` `ui-passphrase-field`: "Jelmondat" — passphrase term, not in the glossary; used throughout the disk-unlock strings.
+- `packages/web/ui/locales/hu/ui.ftl` `ui-passphrase-field`: "Jelmondat" — passphrase term, not in the glossary; used throughout the disk-unlock strings.
 - `apps/settings/locales/hu/protection.ftl` `settings-security-hardware-description`: "{ $summary }. Szint: { $level }/{ $highest }." — restructured to avoid suffixes on numbers; check it reads naturally.
 - `apps/settings/locales/hu/protection.ftl` `settings-passwords-access-revoke`: "{ $app } nem használhatja ezt: { $item }" — screen-reader label of a remove button phrased as a statement; check whether an action noun reads better.
 - `apps/settings/locales/hu/protection.ftl` `settings-passwords-forget-title`: "Elfelejti ennek az alkalmazásnak a mentett adatait: { $app }?" — colon form to avoid an article before the app name; check it isn't too stiff.

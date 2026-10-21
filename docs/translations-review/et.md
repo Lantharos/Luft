@@ -16,10 +16,10 @@ Strings in Luft's Estonian translation that a native speaker should check. Each 
 - `packages/i18n/glossary/et.csv` `Do Not Disturb`: "Ära sega" — Windows may say "Mitte segada"; check.
 - `packages/i18n/glossary/et.csv` `Power saver`: "Energiasääst" — check it fits next to the other power modes.
 - `docs/translations/et.md` Typography: inner quotes ‚…‘ — check against current EKI recommendation.
-- `packages/ui/locales/et/ui.ftl` `ui-fingerprint-place`: "Asetage oma { $finger } andurile." — relies on the imperative object being nominative; check it reads naturally with every finger name.
-- `packages/ui/locales/et/ui.ftl` `ui-finger-right-little`: "Parem väike sõrm" — "väikesõrm" is also used; check.
-- `packages/ui/locales/et/ui.ftl` `ui-time-just-now`: "äsja" — shown where "N sekundit tagasi" would be; check it fits.
-- `packages/ui/locales/et/ui.ftl` `ui-split-windows-size`: "{ $size }, kasutusel { $used }" — check word order.
+- `packages/web/ui/locales/et/ui.ftl` `ui-fingerprint-place`: "Asetage oma { $finger } andurile." — relies on the imperative object being nominative; check it reads naturally with every finger name.
+- `packages/web/ui/locales/et/ui.ftl` `ui-finger-right-little`: "Parem väike sõrm" — "väikesõrm" is also used; check.
+- `packages/web/ui/locales/et/ui.ftl` `ui-time-just-now`: "äsja" — shown where "N sekundit tagasi" would be; check it fits.
+- `packages/web/ui/locales/et/ui.ftl` `ui-split-windows-size`: "{ $size }, kasutusel { $used }" — check word order.
 - `kestrel/ui/locales/et/shell.ftl` `keys-backspace`, `keys-delete`, `keys-page-up`: English names kept — check what keyboards sold in Estonia print (possibly Del, PgUp).
 - `kestrel/ui/locales/et/shell.ftl` `battery-level`: "Aku { $percentage }%, laeb" — check "laeb" versus "laadimisel".
 - `apps/settings/locales/et/settings.ftl` `settings-subpage-back`: "Tagasi: { $page }" — colon keeps the page name in the nominative; check for screen readers.
@@ -55,7 +55,7 @@ Strings in Luft's Estonian translation that a native speaker should check. Each 
 - `apps/settings/locales/et/devices.ftl` `settings-dictation-engine-description`: "{ $engine }, keel: { $language }" — terse to keep the language name in the nominative; check it is clear.
 - `apps/settings/locales/et/devices.ftl` `settings-keys-keypad`: "Numbriplokk { $key }" — may be long on shortcut labels; a shorter form like "Num { $key }" could be preferable.
 - `apps/settings/locales/et/protection.ftl` `settings-privacy-screen-off-after`: "Pärast { $duration }" — assumes $duration arrives as a partitive phrase like „5 minutit“; check it reads naturally with the real value (genitive „5 minuti pärast“ would be more idiomatic but can't be built around a placeable).
-- `packages/ui/locales/et/ui.ftl` `ui-passphrase-field`: "Paroolifraas" — used for passphrase everywhere, to keep it apart from „parool“; confirm against GNOME Disks usage.
+- `packages/web/ui/locales/et/ui.ftl` `ui-passphrase-field`: "Paroolifraas" — used for passphrase everywhere, to keep it apart from „parool“; confirm against GNOME Disks usage.
 - `apps/settings/locales/et/protection.ftl` `settings-security-anti-cheat`: "Petmisvastase kaitsega mängud" — no settled Estonian term for anti-cheat; many gamers just say „anti-cheat“.
 - `apps/settings/locales/et/system.ftl` `settings-users-fingerprint-remove-description`: "Edaspidi ei sobi { $finger } enam sisselogimiseks." — built so the finger name stays the nominative subject; check it reads naturally with every finger name.
 - `apps/settings/locales/et/system.ftl` `settings-updates-switching-standard`: "Tavalise tõmmise allalaadimine…" — „tõmmis“ for system image; check whether „kujutis“ reads better.

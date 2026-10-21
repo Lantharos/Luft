@@ -12,9 +12,9 @@ Strings in Luft's Swedish translation that a native speaker should check: terms 
 - `packages/i18n/glossary/sv.csv` `accessibility`: "Hjälpmedel" — Windows and GNOME; macOS says "Tillgänglighet", which is in the search keywords.
 - `kestrel/ui/locales/sv/shell.ftl` `keys-shift`, `keys-tab`, `keys-space`, `keys-backspace`: "Skift", "Tabb", "Blanksteg", "Backsteg" — Swedish keyboards print symbols for these; check that the Windows names are the right ones to show in shortcut labels.
 - `kestrel/ui/locales/sv/shell.ftl` `battery-level` [plugged]: "Batteri { $percentage } %, laddare ansluten" — the English "plugged in" has no short Swedish participle that agrees with "batteri".
-- `packages/ui/locales/sv/ui.ftl` `ui-finger-*` .inline: the possessive is part of the inline form ("ditt högra pekfinger", "din högra tumme") because it agrees with the finger's gender; check every sentence that uses `{ $finger }` reads right without its own "din"/"ditt".
-- `packages/ui/locales/sv/ui.ftl` `ui-time-just-now`: "nyss" — Windows shows "Just nu"; check which fits where the timestamp appears.
-- `packages/ui/locales/sv/ui.ftl` `ui-split-windows-size`: "{ $size }, varav { $used } används" — check it reads well next to the slider.
+- `packages/web/ui/locales/sv/ui.ftl` `ui-finger-*` .inline: the possessive is part of the inline form ("ditt högra pekfinger", "din högra tumme") because it agrees with the finger's gender; check every sentence that uses `{ $finger }` reads right without its own "din"/"ditt".
+- `packages/web/ui/locales/sv/ui.ftl` `ui-time-just-now`: "nyss" — Windows shows "Just nu"; check which fits where the timestamp appears.
+- `packages/web/ui/locales/sv/ui.ftl` `ui-split-windows-size`: "{ $size }, varav { $used } används" — check it reads well next to the slider.
 
 ## Kestrel and setup
 

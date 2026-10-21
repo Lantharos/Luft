@@ -4,10 +4,10 @@ The native side every Luft app starts from, on top of Sabine: a frameless glass 
 
 ## Setup
 
-Add it to an app's `desktop/Cargo.toml` by path, with the features the app needs:
+Add it to an app's `desktop/Cargo.toml`, with the features the app needs; the root `Cargo.toml` says where it lives:
 
 ```toml
-luft-app = { path = "../../../packages/app", features = ["apps", "thumbnails"] }
+luft-app = { workspace = true, features = ["apps", "thumbnails"] }
 ```
 
 Opening the window, bridge commands, the exports and the optional features are in [the app shell reference](../../docs/components/app.md).

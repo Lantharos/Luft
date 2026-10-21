@@ -13,10 +13,10 @@ Strings in Luft's Bulgarian translation that a native speaker should check. Each
 - `packages/i18n/glossary/bg.csv` `Install Luft`: "Инсталиране на Luft" — a verbal noun as the app name; the imperative "Инсталирай Luft" would match buttons instead.
 - `docs/translations/bg.md` quotation marks: "‚…‘" for inner quotes — check against current Bulgarian typographic practice.
 - `docs/translations/bg.md` percent sign: "57 %" with a space — follows the orthographic dictionary; check it matches what users expect in battery labels.
-- `packages/ui/locales/bg/ui.ftl` `ui-window-minimize`: "Минимизирай" — imperative per the button rule; Windows uses "Минимизиране" for its title bar buttons.
-- `packages/ui/locales/bg/ui.ftl` `ui-select-placeholder`: "Изберете" — placeholder in a dropdown; check the polite form reads well there.
-- `packages/ui/locales/bg/ui.ftl` `ui-split-windows-size`: "{ $size }, заети { $used }" — check the order reads naturally with sizes like "120 GB".
-- `packages/ui/locales/bg/ui.ftl` `ui-finger-right-little`: "Дясно кутре" — "кутре" is neuter, so the .inline form is "дясното кутре"; check it isn't too informal next to "показалец".
+- `packages/web/ui/locales/bg/ui.ftl` `ui-window-minimize`: "Минимизирай" — imperative per the button rule; Windows uses "Минимизиране" for its title bar buttons.
+- `packages/web/ui/locales/bg/ui.ftl` `ui-select-placeholder`: "Изберете" — placeholder in a dropdown; check the polite form reads well there.
+- `packages/web/ui/locales/bg/ui.ftl` `ui-split-windows-size`: "{ $size }, заети { $used }" — check the order reads naturally with sizes like "120 GB".
+- `packages/web/ui/locales/bg/ui.ftl` `ui-finger-right-little`: "Дясно кутре" — "кутре" is neuter, so the .inline form is "дясното кутре"; check it isn't too informal next to "показалец".
 - `kestrel/ui/locales/bg/shell.ftl` `keys-space`: "Интервал" — the space bar has no printed label; the other keys keep their English names as printed on Bulgarian keyboards.
 
 ## Kestrel and setup
@@ -57,7 +57,7 @@ Strings in Luft's Bulgarian translation that a native speaker should check. Each
 - `apps/settings/locales/bg/personalization.ftl` `settings-appearance-icons-clear`: "Прозрачни" — assumes "Clear" means glass-like transparent icons, not "remove".
 - `apps/settings/locales/bg/protection.ftl` `settings-security-anti-cheat`: "Игри със защита срещу измами" — anti-cheat has no settled Bulgarian term; gamers may simply say "анти-чийт".
 - `apps/settings/locales/bg/system.ftl` `settings-datetime-increase`: "Увеличи: { $label }" — colon used so the case of Час/Минута doesn't matter.
-- `packages/ui/locales/bg/ui.ftl` `ui-passphrase-field`: "Парола за диска" — used for passphrase in Settings and in setup, to keep it apart from the account password; check it reads naturally everywhere.
+- `packages/web/ui/locales/bg/ui.ftl` `ui-passphrase-field`: "Парола за диска" — used for passphrase in Settings and in setup, to keep it apart from the account password; check it reads naturally everywhere.
 - `apps/settings/locales/bg/personalization.ftl` `settings-appearance-wallpaper-folder-description`: "Снимки › Wallpapers" — "Снимки" is used for the Pictures folder throughout; check it matches the folder name Bulgarian systems actually create (some use "Изображения").
 
 ## Website

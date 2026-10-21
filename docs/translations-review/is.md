@@ -18,9 +18,9 @@ Strings in Luft's Icelandic translation that a native speaker should check: term
 - `kestrel/ui/locales/is/shell.ftl` `keys-space`: "Bilslá" — the other keys keep the English names printed on Icelandic keyboards; check that this mix reads right in shortcut labels.
 - `kestrel/ui/locales/is/shell.ftl` `battery-level` [plugged]: "Rafhlaða { $percentage }%, tengd við rafmagn" — check the wording and the percent sign without a space.
 - `apps/settings/locales/is/settings.ftl` `settings-subpage-back`: "Til baka á síðuna { $page }" — "síðuna" keeps the page name in the nominative; check it isn't too long for a screen-reader label.
-- `packages/settings-pages/locales/is/pages.ftl` `settings-page-about`: "Um tölvuna" — Windows says only "Um"; check which fits the sidebar.
-- `packages/ui/locales/is/ui.ftl` `ui-finger-*` .inline: accusative forms ("hægri löngutöng", "hægri litlafingur") for "Leggðu …" and "Dragðu …"; check every sentence using `{ $finger }` takes the accusative.
-- `packages/ui/locales/is/ui.ftl` `ui-toast-dismiss`: "Hunsa" — Windows' word for dismissing a notification; "Loka" would also work.
+- `packages/web/settings-pages/locales/is/pages.ftl` `settings-page-about`: "Um tölvuna" — Windows says only "Um"; check which fits the sidebar.
+- `packages/web/ui/locales/is/ui.ftl` `ui-finger-*` .inline: accusative forms ("hægri löngutöng", "hægri litlafingur") for "Leggðu …" and "Dragðu …"; check every sentence using `{ $finger }` takes the accusative.
+- `packages/web/ui/locales/is/ui.ftl` `ui-toast-dismiss`: "Hunsa" — Windows' word for dismissing a notification; "Loka" would also work.
 
 ## Kestrel and setup
 

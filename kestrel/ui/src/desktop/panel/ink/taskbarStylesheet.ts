@@ -3,7 +3,7 @@ import type { Colors, Palette } from '../../../appearance/palette.js';
 import { rgba } from '../../../appearance/stylesheet.js';
 import { wallpaperFloor } from '../../wallpaper/floor.js';
 import { backdropsBehind, type PanelSurface } from '../backdrop.js';
-import type { TaskbarLook } from '../../../../../../packages/ui/src/taskbar/looks';
+import type { TaskbarLook } from '../../../../../../packages/web/ui/src/taskbar/looks';
 import { schemeThemes, type Halo, type Scheme, type SchemeTheme } from './schemeThemes.js';
 
 const TEXT_CONTRAST = 4.5;

@@ -24,7 +24,7 @@ mkdir -p "$vm"
 vm="$(cd "$vm" && pwd)"
 rm -rf "$stage"
 LIBEXECDIR=/usr/libexec "$luft/security/scripts/build.sh" "$stage/root"
-cargo build --release --quiet --manifest-path "$luft/packages/disks/Cargo.toml" --example other-systems
+cargo build --release --quiet --manifest-path "$luft/packages/system/disks/Cargo.toml" --example other-systems
 place 755 "${CARGO_TARGET_DIR:-$luft/target}/release/examples/other-systems" /usr/libexec/luft-other-systems
 place 755 "$here/prepare.sh" /usr/libexec/luft-remove-prepare
 place 755 "$here/check.sh" /usr/libexec/luft-remove-check

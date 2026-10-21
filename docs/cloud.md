@@ -1,6 +1,6 @@
 # Cloud drives
 
-How `luft-accounts` turns online accounts into folders in `~/Cloud`. Using them is described in [Accounts and cloud drives](https://docs.luft.computer/files/cloud-drives/), and the service itself in [packages/accounts](../packages/accounts/README.md).
+How `luft-accounts` turns online accounts into folders in `~/Cloud`. Using them is described in [Accounts and cloud drives](https://docs.luft.computer/files/cloud-drives/), and the service itself in [packages/system/accounts](../packages/system/accounts/README.md).
 
 ## Where things are
 
@@ -25,14 +25,14 @@ Then build `luft-accounts` with the IDs and secrets in the environment, as CI do
 ```sh
 LUFT_ONEDRIVE_CLIENT_ID=… LUFT_ONEDRIVE_CLIENT_SECRET=… \
 LUFT_DROPBOX_CLIENT_ID=… LUFT_DROPBOX_CLIENT_SECRET=… \
-cargo build --release --manifest-path packages/accounts/service/Cargo.toml
+cargo build --release --manifest-path services/accounts/Cargo.toml
 ```
 
 An account keeps the registration it signed in with until it signs in again. iCloud Drive, Nextcloud and WebDAV need no registration.
 
 ## Testing
 
-`cargo test` in `packages/accounts/service` covers token exchange against a stand-in server, filters, conflict names and how errors read.
+`cargo test` in `services/accounts` covers token exchange against a stand-in server, filters, conflict names and how errors read.
 
 `kestrel/tools/session.sh capture --only apps:cloud`, with `rclone` installed and Settings and Rover built, signs in to a local WebDAV server from `rclone serve webdav` with a scratch keyring, keeps a folder, and captures Accounts in Settings and the drive in Rover.
 

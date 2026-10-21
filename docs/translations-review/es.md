@@ -12,11 +12,11 @@ Strings in Luft's Spanish translation that a native speaker should check: terms 
 - `packages/i18n/glossary/es.csv` `Keep awake`: "Mantener activo" — the screen is feminine; check it reads right as a Quick settings tile.
 - `packages/i18n/glossary/es.csv` `signed startup`: "arranque firmado" — no settled term.
 - `packages/i18n/glossary/es.csv` `computer`: "ordenador" — Spain-only; Windows uses the neutral equipo.
-- `packages/ui/locales/es/ui.ftl` `ui-recovery-key-saved`: "Guardada" — feminine, agreeing with clave; check it's only ever shown next to the recovery key.
-- `packages/ui/locales/es/ui.ftl` `ui-fingerprint-place`: "Coloca el { $finger } en el sensor." — the article sits in the sentence, so every finger's .inline form must be masculine (they all are).
-- `packages/ui/locales/es/ui.ftl` `ui-finger-right-middle`: "Dedo corazón derecho" — corazón is Spain's word; Latin America says medio.
+- `packages/web/ui/locales/es/ui.ftl` `ui-recovery-key-saved`: "Guardada" — feminine, agreeing with clave; check it's only ever shown next to the recovery key.
+- `packages/web/ui/locales/es/ui.ftl` `ui-fingerprint-place`: "Coloca el { $finger } en el sensor." — the article sits in the sentence, so every finger's .inline form must be masculine (they all are).
+- `packages/web/ui/locales/es/ui.ftl` `ui-finger-right-middle`: "Dedo corazón derecho" — corazón is Spain's word; Latin America says medio.
 - `kestrel/ui/locales/es/shell.ftl` `battery-level`: "Batería al { $percentage } %, conectada" — check "conectada" for plugged in but not charging; Quick settings and Settings say "Enchufado", which can't agree with batería here.
-- `packages/settings-pages/locales/es/pages.ftl` `settings-page-about`: "Información" — Windows' and macOS' word; GNOME says Acerca de, which is in the keywords.
+- `packages/web/settings-pages/locales/es/pages.ftl` `settings-page-about`: "Información" — Windows' and macOS' word; GNOME says Acerca de, which is in the keywords.
 
 ## Kestrel and setup
 

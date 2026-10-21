@@ -14,12 +14,12 @@ Strings in Luft’s Catalan translation that a native speaker should check: term
 - `packages/i18n/glossary/ca.csv` `USB stick`: "memòria USB" — Windows says «unitat flaix USB»; check the everyday word.
 - `packages/i18n/glossary/ca.csv` `Power saver`: "Estalvi d’energia" — check it doesn’t read as Windows’ «Estalvi de bateria», a different feature.
 - `docs/translations/ca.md` address: vós in running text with tu imperatives on buttons follows Softcatalà, while Catalan Windows and macOS now use tu throughout; check the mix still reads natural.
-- `packages/ui/locales/ca/ui.ftl` `ui-select-placeholder`: "Trieu" — short vós imperative in a dropdown; check it doesn’t look abrupt.
-- `packages/ui/locales/ca/ui.ftl` `ui-recovery-key-saved`: "Desada" — feminine, agreeing with clau; check it’s only ever shown next to the recovery key.
-- `packages/ui/locales/ca/ui.ftl` `ui-fingerprint-place`: "Col·loqueu el { $finger } sobre el sensor." — the article sits in the sentence, so every finger’s .inline form must be masculine (they all are: dit, polze).
-- `packages/ui/locales/ca/ui.ftl` `ui-finger-right-little`: "Dit petit dret" — «dit petit» is the everyday word; «menovell» or «auricular» are more formal.
-- `packages/settings-pages/locales/ca/pages.ftl` `settings-page-mouse`: "Ratolí i ratolí tàctil" — repetitive and long in the sidebar.
-- `packages/settings-pages/locales/ca/pages.ftl` `settings-page-region`: "Llengua i regió" — Windows says «Idioma i regió»; check which people expect.
+- `packages/web/ui/locales/ca/ui.ftl` `ui-select-placeholder`: "Trieu" — short vós imperative in a dropdown; check it doesn’t look abrupt.
+- `packages/web/ui/locales/ca/ui.ftl` `ui-recovery-key-saved`: "Desada" — feminine, agreeing with clau; check it’s only ever shown next to the recovery key.
+- `packages/web/ui/locales/ca/ui.ftl` `ui-fingerprint-place`: "Col·loqueu el { $finger } sobre el sensor." — the article sits in the sentence, so every finger’s .inline form must be masculine (they all are: dit, polze).
+- `packages/web/ui/locales/ca/ui.ftl` `ui-finger-right-little`: "Dit petit dret" — «dit petit» is the everyday word; «menovell» or «auricular» are more formal.
+- `packages/web/settings-pages/locales/ca/pages.ftl` `settings-page-mouse`: "Ratolí i ratolí tàctil" — repetitive and long in the sidebar.
+- `packages/web/settings-pages/locales/ca/pages.ftl` `settings-page-region`: "Llengua i regió" — Windows says «Idioma i regió»; check which people expect.
 - `kestrel/ui/locales/ca/shell.ftl` `battery-level`: "Bateria al { $percentage } %, endollada" — check «endollada» for plugged in but not charging.
 - `kestrel/ui/locales/ca/shell.ftl` `keys-shift`: "Maj" — Catalan software writes Maj, while Spanish-layout keyboards often print Mayús or only an arrow.
 

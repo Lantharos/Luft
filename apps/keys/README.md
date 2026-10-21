@@ -20,4 +20,4 @@ Where your layouts and input methods are kept, and the input method format, are 
 
 ## License
 
-MIT. Open Runde and Maple Mono are under the SIL Open Font License, in `packages/ui/fonts`.
+MIT. Open Runde and Maple Mono are under the SIL Open Font License, in `packages/web/ui/fonts`.

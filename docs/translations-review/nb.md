@@ -14,8 +14,8 @@ Strings in Luft's Norwegian Bokmål translation that a native speaker should che
 - `packages/i18n/glossary/nb.csv` `accent color`: "aksentfarge" — Windows says «uthevingsfarge»; check which people know better.
 - `packages/i18n/glossary/nb.csv` `passkey`: "tilgangsnøkkel" — Apple uses «passnøkkel»; check which is more widespread.
 - `kestrel/ui/locales/nb/shell.ftl` `keys-backspace`: "Tilbake" — Norwegian keyboards print an arrow; check whether «Backspace» is the more familiar shortcut label.
-- `packages/ui/locales/nb/ui.ftl` `ui-fingerprint-retry`: "Det ble ikke lest skikkelig. Prøv igjen." — check it sounds natural.
-- `packages/ui/locales/nb/ui.ftl` `ui-media-unmute`: "Slå på lyd" — check it is clear next to «Demp».
+- `packages/web/ui/locales/nb/ui.ftl` `ui-fingerprint-retry`: "Det ble ikke lest skikkelig. Prøv igjen." — check it sounds natural.
+- `packages/web/ui/locales/nb/ui.ftl` `ui-media-unmute`: "Slå på lyd" — check it is clear next to «Demp».
 - `apps/settings/locales/nb/settings.ftl` `settings-more-show`: "Vis { $count } til" — check «til» vs «flere» after a number.
 
 ## Kestrel and setup

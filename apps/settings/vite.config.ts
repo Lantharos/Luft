@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-	plugins: [luftFonts(), luftLocales({ dirs: ['locales', '../../packages/settings-pages/locales'] }), sabineTarget(), tailwindcss(), svelte()],
+	plugins: [luftFonts(), luftLocales({ dirs: ['locales', '../../packages/web/settings-pages/locales'] }), sabineTarget(), tailwindcss(), svelte()],
 	clearScreen: false,
 	server: {
 		port: 5174,

@@ -1,6 +1,6 @@
 # UI kit
 
-`@luft/ui` ([packages/ui](../../packages/ui)) is the shared look of Luft's Svelte apps: design tokens, base styles, the Open Runde and Maple Mono fonts, window chrome, controls and code highlighting. Components ship as Svelte source and compile with the app.
+`@luft/ui` ([packages/web/ui](../../packages/web/ui)) is the shared look of Luft's Svelte apps: design tokens, base styles, the Open Runde and Maple Mono fonts, window chrome, controls and code highlighting. Components ship as Svelte source and compile with the app.
 
 ## Setup
 

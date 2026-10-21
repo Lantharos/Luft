@@ -4,8 +4,8 @@ on:
   push:
     branches: [main]
     paths:
-      - packages/speech/data/models.json
-      - packages/speech/mirror/**
+      - services/speech/data/models.json
+      - services/speech/mirror/**
   workflow_dispatch:
 
 concurrency:
@@ -31,7 +31,7 @@ jobs:
       - name: Fetch, quantize and check the models
         run: |
           mkdir -p "$RUNNER_TEMP/models"
-          docker run --rm -v "$PWD/packages/speech:/speech:ro" -v "$RUNNER_TEMP/models:/models" "$PYTHON_IMAGE" sh -c '
+          docker run --rm -v "$PWD/services/speech:/speech:ro" -v "$RUNNER_TEMP/models:/models" "$PYTHON_IMAGE" sh -c '
             apt-get update -qq && apt-get install -qq --yes curl jq > /dev/null &&
             pip install --quiet --no-deps --requirement /speech/mirror/requirements.txt &&
             /speech/mirror/mirror.sh /speech/data/models.json /models'

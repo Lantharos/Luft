@@ -45,7 +45,8 @@ Luft is young. There's no stable release yet: the downloads are nightly builds o
 | [`os`](os/README.md) | The system image, the USB stick and VMs to try them in |
 | [`kestrel`](kestrel/README.md) | The desktop, login screen, keyring, passkeys and session services |
 | [`apps`](apps) | Luft's apps, one folder each, and Install Luft and Meet Luft |
-| [`packages`](packages) | Code the apps and services share: the UI kit, native app shell, disks, network, software and more |
+| [`packages`](packages) | Code the apps and services share: the native app shell, D-Bus and translations, libraries for the system's parts in `system` and the UI kit in `web` |
+| [`services`](services) | Luft's own system and session services: updates, sleep, online accounts, dictation, Windows next to Luft and app thumbnails |
 | [`boot`](boot/sushi/README.md) | The Sushi boot splash and the SushiBoot boot menu |
 | [`security`](security/README.md) | Secure Boot, TPM unlock, disk encryption and USB protection |
 | [`web`](web) | The [website](web/site/README.md), the [docs](web/docs/README.md) and what they [share](web/shared/README.md) |
@@ -62,6 +63,6 @@ Each folder's README says what it is and how to build it.
 Luft is licensed under the GNU General Public License, version 3 or later ([`LICENSE`](LICENSE)). Kestrel's engine comes from [GNOME Shell](https://gitlab.gnome.org/GNOME/gnome-shell) and the patches to [Mutter](https://gitlab.gnome.org/GNOME/mutter) follow Mutter, so both stay GPL-2.0-or-later (`kestrel/engine/COPYING`).
 
 - Luft is built on [Fedora](https://fedoraproject.org) and [bootc](https://bootc-dev.github.io/bootc/), and its apps on [Sabine](https://github.com/Lantharos/Sabine).
-- [Open Runde](https://github.com/lauridskern/open-runde) and [Maple Mono](https://github.com/subframe7536/maple-font) are under the SIL Open Font License, in `packages/ui/fonts`.
+- [Open Runde](https://github.com/lauridskern/open-runde) and [Maple Mono](https://github.com/subframe7536/maple-font) are under the SIL Open Font License, in `packages/web/ui/fonts`.
 - [Helium](https://helium.computer), the default browser, is GPL-3.0 and comes unchanged from [its releases](https://github.com/imputnet/helium-linux/releases).
 - The wallpapers are photos from [Unsplash](https://unsplash.com/license), credited in [`CREDITS`](os/image/files/usr/share/backgrounds/luft/CREDITS).

@@ -16,16 +16,16 @@ Luft is translated into Albanian, Bosnian, Bulgarian, Catalan, Croatian, Czech, 
 | kestrel-portal | `kestrel/ui/locales/*/portal.ftl` | printing, screen sharing, shortcuts and other app requests |
 | kestrel-session | `kestrel/ui/locales/*/session.ftl` | signing out, first-run setup mode |
 | kestrel-engine | `kestrel/engine/locales/*/engine.ftl` | dialogs and menus of Kestrel's engine |
-| ui | `packages/ui/locales/*/ui.ftl` | the UI kit every app shares |
+| ui | `packages/web/ui/locales/*/ui.ftl` | the UI kit every app shares |
 | settings | `apps/settings/locales/*/settings.ftl` | Settings' window, sidebar and its groups, and search |
-| settings-pages | `packages/settings-pages/locales/*/pages.ftl` | Settings' page names and search words, also used by Start |
+| settings-pages | `packages/web/settings-pages/locales/*/pages.ftl` | Settings' page names and search words, also used by Start |
 | settings-connections | `apps/settings/locales/*/connections.ftl` | Network, Bluetooth |
 | settings-devices | `apps/settings/locales/*/devices.ftl` | Displays, Sound, Power, Input |
 | settings-personalization | `apps/settings/locales/*/personalization.ftl` | Appearance, Desktop, Notifications, Accessibility |
 | settings-protection | `apps/settings/locales/*/protection.ftl` | Apps, Privacy, Security |
 | settings-system | `apps/settings/locales/*/system.ftl` | Accounts, Language & time, System |
 | settings-desktop | `apps/settings/desktop/locales/*/desktop.ftl` | messages from Settings' native side |
-| trust | `packages/trust/locales/*/trust.ftl` | errors from the security service, shared by Disks, Settings and Install Luft |
+| trust | `packages/system/trust/locales/*/trust.ftl` | errors from the security service, shared by Disks, Settings and Install Luft |
 | setup | `apps/setup/locales/*/setup.ftl` | Install Luft and first-run setup |
 | setup-desktop | `apps/setup/desktop/locales/*/desktop.ftl` | messages from setup's native side |
 | setup-installer | `apps/setup/installer/locales/*/installer.ftl` | the installer service's errors and progress |

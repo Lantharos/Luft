@@ -4,10 +4,10 @@
 
 ## Setup
 
-Add it to an app's `desktop/Cargo.toml` by path, with the features the app needs:
+Add it to an app's `desktop/Cargo.toml`, with the features the app needs; the root `Cargo.toml` says where it lives:
 
 ```toml
-luft-app = { path = "../../../packages/app", features = ["apps", "thumbnails"] }
+luft-app = { workspace = true, features = ["apps", "thumbnails"] }
 ```
 
 ```rust

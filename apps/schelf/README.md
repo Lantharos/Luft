@@ -1,6 +1,6 @@
 # Schelf
 
-Schelf is where you get apps on Luft. It finds, installs, updates and removes apps from Flathub and AppImages, and command-line tools from Fedora in a Toolbox container. System updates live in Settings, so Schelf only shows apps. Using it is described in [the docs](https://docs.luft.computer/apps/schelf/), and the code it shares with Settings is in [packages/software](../../packages/software/README.md).
+Schelf is where you get apps on Luft. It finds, installs, updates and removes apps from Flathub and AppImages, and command-line tools from Fedora in a Toolbox container. System updates live in Settings, so Schelf only shows apps. Using it is described in [the docs](https://docs.luft.computer/apps/schelf/), and the code it shares with Settings is in [packages/system/software](../../packages/system/software/README.md).
 
 | Source | Installed for |
 |--------|---------------|
@@ -30,6 +30,6 @@ Installing makes Schelf the app for `.flatpakref`, `.flatpakrepo`, `.rpm` and `.
 
 The same binary is the `schelf` command, with `sch` linked to it in Luft's image: `install`, `remove`, `search`, `update`, `list`, `info`, `trust`, `untrust` and `repo`, described in [the docs](https://docs.luft.computer/system/software/#in-the-terminal). Its code is in `desktop/src/cli`, with each place software comes from in `cli/sources`.
 
-While the app runs, it owns `com.lantharos.Schelf` on the session bus. The `com.lantharos.Schelf1` interface at `/com/lantharos/Schelf` takes an operation as JSON with `Start` (a key, title and job, as Schelf's own pages send them) and stops it with `Cancel`; `Changed` and `Finished` signals report on it. Apps in a Flatpak sandbox can't call it unless they have full access. The command hands its work to the app this way, so both share one queue. Without the app, it runs the work itself. Either way every job holds the account's software lock from `packages/software` while it changes anything.
+While the app runs, it owns `com.lantharos.Schelf` on the session bus. The `com.lantharos.Schelf1` interface at `/com/lantharos/Schelf` takes an operation as JSON with `Start` (a key, title and job, as Schelf's own pages send them) and stops it with `Cancel`; `Changed` and `Finished` signals report on it. Apps in a Flatpak sandbox can't call it unless they have full access. The command hands its work to the app this way, so both share one queue. Without the app, it runs the work itself. Either way every job holds the account's software lock from `packages/system/software` while it changes anything.
 
 How Schelf adds the preinstalled apps and keeps apps updated in the background is in [the Schelf reference](../../docs/components/schelf.md).

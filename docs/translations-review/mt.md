@@ -17,16 +17,16 @@ Strings in Luft's Maltese translation that a native speaker should check: places
 - `packages/i18n/glossary/mt.csv` `unlock`: "żblokka" — chosen to keep "iftaħ" for open; check it pairs naturally with "sakkar".
 - `packages/i18n/glossary/mt.csv` `folder`: "fowlder" — Windows' spelling; check it isn't felt as odd next to the English "folder".
 - `packages/i18n/glossary/mt.csv` `taskbar`: "taskbar", masculine — check the gender people use (it-taskbar huwa / hija).
-- `packages/ui/locales/mt/ui.ftl` `ui-finger-*` `.inline`: "s-saba’ l-werrej tal-lemin" … — written without the euphonic i because both sentences put it after a verb ending in a vowel (Poġġi, Għaddi); check all ten read well in both sentences.
-- `packages/ui/locales/mt/ui.ftl` `ui-finger-right-thumb`: "Is-saba’ l-kbir tal-lemin" — check "saba’ l-kbir" is the usual word for thumb here.
-- `packages/ui/locales/mt/ui.ftl` `ui-media-play` / `ui-media-pause`: "Doqq" / "Pawża" — a verb next to a noun, as media players commonly label them; check they feel natural.
-- `packages/ui/locales/mt/ui.ftl` `ui-toast-dismiss`: "Warrab" — "Agħlaq" is the alternative.
-- `packages/ui/locales/mt/ui.ftl` `ui-time-just-now`: "issa stess" — check it fits wherever relative times appear ("ftit ilu" is the alternative).
-- `packages/ui/locales/mt/ui.ftl` `ui-recovery-key-saved` / `ui-recovery-key-copied`: "Issejvjata" / "Ikkopjata" — feminine to agree with ċavetta; check they read well standing alone.
-- `packages/ui/locales/mt/ui.ftl` `ui-window-minimize` / `ui-window-maximize`: "Imminimizza" / "Immassimizza" — imperatives of Windows' verbs; check the spelling.
+- `packages/web/ui/locales/mt/ui.ftl` `ui-finger-*` `.inline`: "s-saba’ l-werrej tal-lemin" … — written without the euphonic i because both sentences put it after a verb ending in a vowel (Poġġi, Għaddi); check all ten read well in both sentences.
+- `packages/web/ui/locales/mt/ui.ftl` `ui-finger-right-thumb`: "Is-saba’ l-kbir tal-lemin" — check "saba’ l-kbir" is the usual word for thumb here.
+- `packages/web/ui/locales/mt/ui.ftl` `ui-media-play` / `ui-media-pause`: "Doqq" / "Pawża" — a verb next to a noun, as media players commonly label them; check they feel natural.
+- `packages/web/ui/locales/mt/ui.ftl` `ui-toast-dismiss`: "Warrab" — "Agħlaq" is the alternative.
+- `packages/web/ui/locales/mt/ui.ftl` `ui-time-just-now`: "issa stess" — check it fits wherever relative times appear ("ftit ilu" is the alternative).
+- `packages/web/ui/locales/mt/ui.ftl` `ui-recovery-key-saved` / `ui-recovery-key-copied`: "Issejvjata" / "Ikkopjata" — feminine to agree with ċavetta; check they read well standing alone.
+- `packages/web/ui/locales/mt/ui.ftl` `ui-window-minimize` / `ui-window-maximize`: "Imminimizza" / "Immassimizza" — imperatives of Windows' verbs; check the spelling.
 - `apps/settings/locales/mt/settings.ftl` `settings-more-show`: "Uri { $count } aktar" — "aktar" avoids agreeing with items of unknown gender and number; check it reads well for every count.
-- `packages/settings-pages/locales/mt/pages.ftl` `settings-page-display`: "Skrins" — Windows' "displej" is the alternative; check the plural fits the sidebar.
-- `packages/settings-pages/locales/mt/pages.ftl` `settings-page-appearance`: "Dehra" — check it is the word people expect for the appearance page ("Personalizzazzjoni" is Windows').
+- `packages/web/settings-pages/locales/mt/pages.ftl` `settings-page-display`: "Skrins" — Windows' "displej" is the alternative; check the plural fits the sidebar.
+- `packages/web/settings-pages/locales/mt/pages.ftl` `settings-page-appearance`: "Dehra" — check it is the word people expect for the appearance page ("Personalizzazzjoni" is Windows').
 - `kestrel/ui/locales/mt/shell.ftl` `keys-space`: "Spacebar" — as in Microsoft's Maltese key names; check it looks right in shortcut labels such as "Ctrl+Spacebar".
 
 ## Kestrel and setup
@@ -66,7 +66,7 @@ Strings in Luft's Maltese translation that a native speaker should check: places
 - `apps/settings/locales/mt/personalization.ftl` `settings-accessibility-bounce-keys`: "Bounce keys" — kept in English as in the page keywords; a Maltese term may exist.
 - `apps/settings/locales/mt/personalization.ftl` `settings-accessibility-typing-assist-count`: "{ $count } mixgħula" — feminine agreement with an implied “għajnuna”; check it reads well.
 - `apps/settings/locales/mt/protection.ftl` `settings-privacy-screen-lock`: "Sakkar l-iskrin" — heading is a verb phrase; Maltese lacks a common noun for locking the screen.
-- `packages/ui/locales/mt/ui.ftl` `ui-passphrase-field`: "Passphrase" — kept in English and feminine, distinct from password; no glossary term exists.
+- `packages/web/ui/locales/mt/ui.ftl` `ui-passphrase-field`: "Passphrase" — kept in English and feminine, distinct from password; no glossary term exists.
 - `apps/settings/locales/mt/protection.ftl` `settings-encryption-unlocks-chip`: "Tiżblokka waħedha biċ-ċippa tas-sigurtà" — feminine verbs assume the implied subject is id-diska; check it reads right under the Device encryption title.
 - `apps/settings/locales/mt/protection.ftl` `settings-passwords-history-read`: "{ $app } uża “{ $item }”" — bare app names take masculine verbs per the style guide's “Rover huwa”; check this across the history messages.
 - `apps/settings/locales/mt/system.ftl` `settings-users-fingerprint-remove`: "Neħħi { $finger }" — the title form of the finger name starts with a capital (Is-saba’ …) mid-sentence; screen-reader label only.

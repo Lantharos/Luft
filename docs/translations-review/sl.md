@@ -15,8 +15,8 @@ Strings in Luft's Slovenian translation that a native speaker should check: term
 - `packages/i18n/glossary/sl.csv` `firmware`: "vdelana programska oprema" — long for labels; check whether a shorter form is acceptable where space is tight.
 - `docs/translations/sl.md` Address and tone: says macOS uses vi in Slovenian — confirm how Apple's Slovenian addresses the reader.
 - `apps/settings/locales/sl/settings.ftl` `settings-subpage-back`: "Nazaj na stran { $page }" — stran keeps the page name in the nominative; check it reads naturally for every panel.
-- `packages/settings-pages/locales/sl/pages.ftl` `settings-page-about`: "O sistemu" — Windows says Vizitka; check which fits a Settings sidebar better.
-- `packages/ui/locales/sl/ui.ftl` `ui-media-pause`: "Začasno ustavi" — Windows' wording; "Premor" is shorter if this ever shows as a visible label.
+- `packages/web/settings-pages/locales/sl/pages.ftl` `settings-page-about`: "O sistemu" — Windows says Vizitka; check which fits a Settings sidebar better.
+- `packages/web/ui/locales/sl/ui.ftl` `ui-media-pause`: "Začasno ustavi" — Windows' wording; "Premor" is shorter if this ever shows as a visible label.
 - `kestrel/ui/locales/sl/shell.ftl` `battery-level`: "Baterija { $percentage } %, priključena na napajanje" — check the plugged-in but not charging state reads clearly.
 
 ## Kestrel and setup
@@ -44,7 +44,7 @@ Strings in Luft's Slovenian translation that a native speaker should check: term
 - `apps/settings/locales/sl/system.ftl` `settings-accounts-apple-account`: "Račun Apple" — Apple has no Slovenian localization; chose the modifier-after-noun order from the style guide.
 - `apps/settings/locales/sl/devices.ftl` `settings-power-duration-minutes`: "{ $minutes } minuto …" — durations are in the accusative (they follow „čez“, „zdrži še“); verify every sentence and picker using them takes the accusative, such as „Zdrži še približno { $time }“.
 - `apps/settings/locales/sl/devices.ftl` `settings-keys-keypad`: "Številčnica { $key }" — check whether keyboards/OSes say Num or something else for keypad keys.
-- `packages/ui/locales/sl/ui.ftl` `ui-passphrase-field`: "Šifrirno geslo" — used for the passphrase in setup and Settings alike; check it reads as distinct from the account "geslo" and matches what GNOME Disks uses in Slovenian.
+- `packages/web/ui/locales/sl/ui.ftl` `ui-passphrase-field`: "Šifrirno geslo" — used for the passphrase in setup and Settings alike; check it reads as distinct from the account "geslo" and matches what GNOME Disks uses in Slovenian.
 - `apps/settings/locales/sl/protection.ftl` `settings-privacy-screen-off-after`: "{ $duration } nedejavnosti" — rebuilt as "5 minut nedejavnosti" so the duration's case never changes; check it reads well as a row value under "Zaslon se izklopi".
 - `apps/settings/locales/sl/protection.ftl` `settings-security-hardware-fix-maker` (and the other fix-* messages): "Obe lahko doda …" for two — check that "obe" referring to listed protections (zaščite, f) reads naturally.
 - `apps/settings/locales/sl/protection.ftl` `settings-passwords-history-signed`: "Aplikacija { $app } je podpisala s ključem „{ $item }“" — the item may be a password rather than a key; check "s ključem" fits.

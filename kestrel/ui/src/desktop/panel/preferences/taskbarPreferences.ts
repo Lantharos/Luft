@@ -1,6 +1,6 @@
 import Gio from 'gi://Gio';
 
-import type { TaskbarLook } from '../../../../../../packages/ui/src/taskbar/looks';
+import type { TaskbarLook } from '../../../../../../packages/web/ui/src/taskbar/looks';
 import { tabletMode } from '../tablet/tabletMode.js';
 
 type TaskbarAlignment = 'center' | 'left';

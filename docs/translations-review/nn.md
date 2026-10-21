@@ -17,9 +17,9 @@ Strings in Luft's Nynorsk translation that a native speaker should check: terms 
 - `packages/i18n/glossary/nn.csv` `search`: "søkje" — the norm also allows «søke»; the guide picks the classic -je forms (leggje, setje, søkje), check that's the preferred house style.
 - `kestrel/ui/locales/nn/shell.ftl` `keys-backspace`: "Tilbaketast" — Norwegian keyboards print an arrow; check whether «Backspace» is the more familiar shortcut label.
 - `kestrel/ui/locales/nn/shell.ftl` `battery-level`: "Batteri { $percentage } %, fullada" — check «fullada» vs «fulladd» for the participle.
-- `packages/ui/locales/nn/ui.ftl` `ui-fingerprint-retry`: "Fingeren vart ikkje lesen godt nok. Prøv igjen." — check it sounds natural.
-- `packages/ui/locales/nn/ui.ftl` `ui-fingerprint-place`: "Legg { $finger } på sensoren." — the finger name is indefinite without «din»; check «Legg høgre peikefinger på sensoren» reads naturally.
-- `packages/ui/locales/nn/ui.ftl` `ui-finger-right-little`: "Høgre veslefinger" — chosen over «litlefinger»; check which is more common.
+- `packages/web/ui/locales/nn/ui.ftl` `ui-fingerprint-retry`: "Fingeren vart ikkje lesen godt nok. Prøv igjen." — check it sounds natural.
+- `packages/web/ui/locales/nn/ui.ftl` `ui-fingerprint-place`: "Legg { $finger } på sensoren." — the finger name is indefinite without «din»; check «Legg høgre peikefinger på sensoren» reads naturally.
+- `packages/web/ui/locales/nn/ui.ftl` `ui-finger-right-little`: "Høgre veslefinger" — chosen over «litlefinger»; check which is more common.
 - `apps/settings/locales/nn/settings.ftl` `settings-more-show`: "Vis { $count } til" — check «til» vs «fleire» after a number.
 
 ## Kestrel and setup

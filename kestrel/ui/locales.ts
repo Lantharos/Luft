@@ -14,7 +14,7 @@ if (!output || !depfile) {
 const folders = [
   join(import.meta.dir, 'locales'),
   join(import.meta.dir, '../engine/locales'),
-  join(import.meta.dir, '../../packages/settings-pages/locales'),
+  join(import.meta.dir, '../../packages/web/settings-pages/locales'),
 ];
 const outputs = LOCALES.map(locale => join(output, `locale-${locale}.ftl`));
 

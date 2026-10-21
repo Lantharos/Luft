@@ -1,10 +1,10 @@
 # Speech
 
-Dictation in Luft comes from `luft-speech` ([packages/speech](../../packages/speech)), a session service that listens and recognizes speech on the computer.
+Dictation in Luft comes from `luft-speech` ([services/speech](../../services/speech)), a session service that listens and recognizes speech on the computer.
 
 ## The service
 
-`luft-speech` owns `com.lantharos.Speech1` (see `packages/speech/service/data/com.lantharos.Speech1.xml`). The session bus starts it when Kestrel or Settings needs it, and it exits after half a minute with nothing to do. Only Kestrel may call `Start`, `Stop` and `Cancel`, while Settings manages models through `com.lantharos.Speech1.Models`. It records from the default microphone through PipeWire only between `Start` and `Stop`, keeps the audio in memory, and recognizes it with one of two engines:
+`luft-speech` owns `com.lantharos.Speech1` (see `services/speech/data/com.lantharos.Speech1.xml`). The session bus starts it when Kestrel or Settings needs it, and it exits after half a minute with nothing to do. Only Kestrel may call `Start`, `Stop` and `Cancel`, while Settings manages models through `com.lantharos.Speech1.Models`. It records from the default microphone through PipeWire only between `Start` and `Stop`, keeps the audio in memory, and recognizes it with one of two engines:
 
 | Engine | Runs on | Model |
 | --- | --- | --- |
@@ -15,15 +15,15 @@ Parakeet covers 25 European languages; Whisper covers the rest. Silero VAD (MIT,
 
 ## Models
 
-Models live in `~/.local/share/luft-speech/models`, one folder each. `packages/speech/data/models.json` lists every file with its size and SHA-256; downloads resume where they stopped and are checked before they're used. While dictation is on, the service follows the language and engine chosen in Settings: it downloads the model they need and stops downloading the other.
+Models live in `~/.local/share/luft-speech/models`, one folder each. `services/speech/data/models.json` lists every file with its size and SHA-256; downloads resume where they stopped and are checked before they're used. While dictation is on, the service follows the language and engine chosen in Settings: it downloads the model they need and stops downloading the other.
 
 ## Files
 
-| File in `packages/speech/service/data` | Goes to |
+| File in `services/speech/data` | Goes to |
 | --- | --- |
 | `com.lantharos.Speech1.service` | `/usr/share/dbus-1/services/` |
 | `luft-speech.service` | `/usr/lib/systemd/user/` |
 
 ## Mirror
 
-`get.luft.computer/models` mirrors the models. `.github/workflows/models.yml` runs `packages/speech/mirror/mirror.sh` whenever `packages/speech/data/models.json` changes: it downloads each file from the pinned upstream revision, quantizes the Parakeet encoder with `packages/speech/mirror/quantize.py` in a pinned Python environment, checks every file against the list and uploads it.
+`get.luft.computer/models` mirrors the models. `.github/workflows/models.yml` runs `services/speech/mirror/mirror.sh` whenever `services/speech/data/models.json` changes: it downloads each file from the pinned upstream revision, quantizes the Parakeet encoder with `services/speech/mirror/quantize.py` in a pinned Python environment, checks every file against the list and uploads it.

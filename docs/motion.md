@@ -1,6 +1,6 @@
 # Motion
 
-Kestrel and the Luft apps share one set of motion tokens, so the shell and the apps move at the same pace. They live in [`packages/motion/tokens.json`](../packages/motion/tokens.json); Kestrel reads them when it is built, and `packages/ui` turns them into CSS.
+Kestrel and the Luft apps share one set of motion tokens, so the shell and the apps move at the same pace. They live in [`packages/web/motion/tokens.json`](../packages/web/motion/tokens.json); Kestrel reads them when it is built, and `packages/web/ui` turns them into CSS.
 
 The rules of thumb:
 
@@ -48,7 +48,7 @@ A spring ends once it is within half a device pixel of its target and moving les
 | `deceleration` | 0.997 | Where a fling would come to rest, per millisecond, to decide which page or workspace it lands on |
 | `directionLock` | 10 px | How far a swipe moves before it commits to a direction |
 
-After changing `tokens.json`, run `bun run generate` in `packages/motion` to update the apps' CSS and the shell theme's `sass/_motion.scss`; `bun run check` there tells whether they are up to date.
+After changing `tokens.json`, run `bun run generate` in `packages/web/motion` to update the apps' CSS and the shell theme's `sass/_motion.scss`; `bun run check` there tells whether they are up to date.
 
 ## In Kestrel
 

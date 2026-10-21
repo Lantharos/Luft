@@ -13,10 +13,10 @@ Strings in Luft's Dutch translation that a native speaker should check: terms wh
 - `packages/i18n/glossary/nl.csv` `App Store`: "Appstore" — one word as Dutch compounds go; check it isn't read as Apple's store.
 - `packages/i18n/glossary/nl.csv` `Media Viewer`: "Mediaviewer" — loanword; "Mediaweergave" is the alternative.
 - `packages/i18n/glossary/nl.csv` `done`: "Klaar" — macOS; Windows uses "Gereed".
-- `packages/settings-pages/locales/nl/pages.ftl` `settings-page-appearance`: "Uiterlijk" — GNOME and KDE; macOS says "Weergave". Check which Dutch users expect.
-- `packages/settings-pages/locales/nl/pages.ftl` `settings-page-about`: "Info" — follows Windows and macOS; "Over" is the alternative.
-- `packages/ui/locales/nl/ui.ftl` `ui-select-placeholder`: "Selecteren" — dropdown placeholder; "Kies een optie" may read better if space allows.
-- `packages/ui/locales/nl/ui.ftl` `ui-fingerprint-stage-passed`: "Goed. Til je vinger op en leg hem opnieuw neer." — check the tone of "Goed." at the start.
+- `packages/web/settings-pages/locales/nl/pages.ftl` `settings-page-appearance`: "Uiterlijk" — GNOME and KDE; macOS says "Weergave". Check which Dutch users expect.
+- `packages/web/settings-pages/locales/nl/pages.ftl` `settings-page-about`: "Info" — follows Windows and macOS; "Over" is the alternative.
+- `packages/web/ui/locales/nl/ui.ftl` `ui-select-placeholder`: "Selecteren" — dropdown placeholder; "Kies een optie" may read better if space allows.
+- `packages/web/ui/locales/nl/ui.ftl` `ui-fingerprint-stage-passed`: "Goed. Til je vinger op en leg hem opnieuw neer." — check the tone of "Goed." at the start.
 - `kestrel/ui/locales/nl/shell.ftl` `keys-space`: "Spatie" — the only translated key name; check it matches how Dutch shortcut lists write the space bar.
 
 ## Kestrel and setup

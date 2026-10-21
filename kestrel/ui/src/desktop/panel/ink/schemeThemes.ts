@@ -2,7 +2,7 @@ import Gio from 'gi://Gio';
 import GObject from 'gi://GObject';
 import St from 'gi://St';
 
-import type { Shadow, TaskbarHalos } from '../../../../../../packages/ui/src/taskbar/looks';
+import type { Shadow, TaskbarHalos } from '../../../../../../packages/web/ui/src/taskbar/looks';
 import { panelSurface, type PanelSurface } from '../backdrop.js';
 import type { Rgb } from '../../../appearance/color.js';
 

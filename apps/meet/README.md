@@ -12,7 +12,7 @@ Meet Luft is an app for Windows and Linux that gets a computer ready for Luft wi
 | `desktop` | Its native side. It runs as you, and starts itself a second time with administrator rights (UAC on Windows, `pkexec` on Linux) for the disk and firmware work |
 | `vm` | A Windows 11 VM, and Fedora VMs in `vm/linux`, with Secure Boot and a TPM to try it in |
 
-What Meet Luft leaves on the drive for Install Luft, and the moving box's format, are in [packages/meet](../../packages/meet).
+What Meet Luft leaves on the drive for Install Luft, and the moving box's format, are in [packages/system/meet](../../packages/system/meet).
 
 ## Build
 

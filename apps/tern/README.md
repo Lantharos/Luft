@@ -27,4 +27,4 @@ Tern starts your login shell with `TERM=xterm-256color` and `COLORTERM=truecolor
 
 ## License
 
-MIT. Open Runde and Maple Mono are under the SIL Open Font License, in [`packages/ui/fonts`](../../packages/ui/fonts).
+MIT. Open Runde and Maple Mono are under the SIL Open Font License, in [`packages/web/ui/fonts`](../../packages/web/ui/fonts).

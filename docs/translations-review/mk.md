@@ -15,12 +15,12 @@ Strings in Luft's Macedonian translation that a native speaker should check. Eac
 - `packages/i18n/glossary/mk.csv` `USB stick`: "USB-меморија" — "USB-стик" and "флеш" are also common.
 - `docs/translations/mk.md` percent sign: "57%" with no space — check against current Macedonian orthography and what users expect in battery labels.
 - `docs/translations/mk.md` count form: "два диска" but "два прозорци" — check the rule on which masculine nouns take the count form.
-- `packages/ui/locales/mk/ui.ftl` `ui-split-windows-size`: "{ $size }, зафатени { $used }" — check the order reads naturally with sizes like "120 GB".
-- `packages/ui/locales/mk/ui.ftl` `ui-fingerprint-place`: "Ставете го { $finger } на сензорот." — the doubled "го" fits only masculine finger names, which all current ones are.
-- `packages/ui/locales/mk/ui.ftl` `ui-finger-right-ring`: "Десен прстенест прст" — "домал прст" is the alternative; check which is more common.
-- `packages/ui/locales/mk/ui.ftl` `ui-toast-dismiss`: "Отфрли" — screen-reader label for closing a notification bubble; "Затвори" would also work.
-- `packages/settings-pages/locales/mk/pages.ftl` `settings-page-about`: "За системот" — check against Windows' "За" page name.
-- `packages/settings-pages/locales/mk/pages.ftl` `settings-page-add-account`: "Додавање сметка" — verbal noun as a page name, per the heading rule.
+- `packages/web/ui/locales/mk/ui.ftl` `ui-split-windows-size`: "{ $size }, зафатени { $used }" — check the order reads naturally with sizes like "120 GB".
+- `packages/web/ui/locales/mk/ui.ftl` `ui-fingerprint-place`: "Ставете го { $finger } на сензорот." — the doubled "го" fits only masculine finger names, which all current ones are.
+- `packages/web/ui/locales/mk/ui.ftl` `ui-finger-right-ring`: "Десен прстенест прст" — "домал прст" is the alternative; check which is more common.
+- `packages/web/ui/locales/mk/ui.ftl` `ui-toast-dismiss`: "Отфрли" — screen-reader label for closing a notification bubble; "Затвори" would also work.
+- `packages/web/settings-pages/locales/mk/pages.ftl` `settings-page-about`: "За системот" — check against Windows' "За" page name.
+- `packages/web/settings-pages/locales/mk/pages.ftl` `settings-page-add-account`: "Додавање сметка" — verbal noun as a page name, per the heading rule.
 - `kestrel/ui/locales/mk/shell.ftl` `keys-space`: "Празно место" — the space bar has no printed label; check what Macedonian users call it ("Space" is also common).
 
 ## Kestrel and setup
@@ -52,7 +52,7 @@ Strings in Luft's Macedonian translation that a native speaker should check. Eac
 - `apps/settings/locales/mk/devices.ftl` `settings-sound-mute`: "Исклучи звук – { $name }" — screen-reader label; `$name` is „Јачина на звук“ or an app name, the dash avoids case agreement.
 - `apps/settings/locales/mk/devices.ftl` `settings-keys-keypad`: "Нумерички { $key }" — keypad keys have no printed name; check whether „Num { $key }“ is more familiar.
 - `apps/settings/locales/mk/devices.ftl` `settings-display-mirror`: "Огледално прикажување" — Windows uses „Дуплирај“; check which is more familiar.
-- `packages/ui/locales/mk/ui.ftl` `ui-passphrase-field`: "Тајна фраза" — passphrase has no settled Macedonian term; chosen to stay distinct from лозинка and used for every passphrase in Settings and setup.
+- `packages/web/ui/locales/mk/ui.ftl` `ui-passphrase-field`: "Тајна фраза" — passphrase has no settled Macedonian term; chosen to stay distinct from лозинка and used for every passphrase in Settings and setup.
 - `apps/settings/locales/mk/protection.ftl` `settings-encryption-pin`: "PIN при стартување" — PIN kept in Latin (PIN-от, PIN-овите); a reviewer may prefer ПИН as on bank cards.
 - `apps/settings/locales/mk/personalization.ftl` `settings-fonts-monospace`: "Еднаква ширина" — monospace has no common short term; check it is understood.
 - `apps/settings/locales/mk/personalization.ftl` `settings-accessibility-typing-assist-count`: "{ $count } вклучена / вклучени" — feminine agreement assumes a hidden „функција“; check it reads well next to the row title.

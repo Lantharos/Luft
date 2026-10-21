@@ -3,7 +3,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
 
-import { MARK_LAYERS, MARK_SCALE, markLayerSvg, PAINTED_MARK_SCALE, type MarkFills, type MarkLayer } from '../../../../../../packages/ui/src/taskbar/mark';
+import { MARK_LAYERS, MARK_SCALE, markLayerSvg, PAINTED_MARK_SCALE, type MarkFills, type MarkLayer } from '../../../../../../packages/web/ui/src/taskbar/mark';
 import { markFills } from './shade.js';
 import { taskbarBackdrops } from '../backdrop.js';
 import { appIcons } from '../../../appearance/icons/appIcons.js';

@@ -34,4 +34,4 @@ The install flags point at the executable that ran them, so they work from a bun
 
 ## License
 
-MIT. Open Runde and Maple Mono are under the SIL Open Font License, in [`packages/ui/fonts`](../../packages/ui/fonts).
+MIT. Open Runde and Maple Mono are under the SIL Open Font License, in [`packages/web/ui/fonts`](../../packages/web/ui/fonts).

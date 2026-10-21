@@ -34,7 +34,7 @@ kestrel/tools/session.sh setup
 
 runs the setup checks in a headless Kestrel in setup mode, against stand-ins for the installer, NetworkManager, trustd and logind, and saves a screenshot of every step.
 
-`cargo test` in `installer` covers the partition layout, the files written into the new system and reading Windows from an NTFS image; changing Windows is tested in [packages/windows](../../packages/windows/README.md).
+`cargo test` in `installer` covers the partition layout, the files written into the new system and reading Windows from an NTFS image; changing Windows is tested in [packages/system/windows](../../packages/system/windows/README.md).
 
 ```sh
 installer/vm/run.sh

@@ -13,8 +13,8 @@ Strings in Luft's Danish translation that a native speaker should check: terms w
 - `packages/i18n/glossary/da.csv` `sign in`: "log ind / log ud" — chosen over Windows' »log på / log af«.
 - `kestrel/ui/locales/da/shell.ftl` `keys-backspace`: "Tilbage" — Danish keyboards print an arrow; check whether »Backspace« is the more familiar shortcut label.
 - `kestrel/ui/locales/da/shell.ftl` `keys-shift`: "Skift" — Microsoft's Danish name; check it against what keyboards and people use.
-- `packages/ui/locales/da/ui.ftl` `ui-fingerprint-retry`: "Det kunne ikke aflæses ordentligt. Prøv igen." — check it sounds natural.
-- `packages/ui/locales/da/ui.ftl` `ui-toast-dismiss`: "Afvis" — screen-reader label for closing a notification bubble; »Luk« may be clearer.
+- `packages/web/ui/locales/da/ui.ftl` `ui-fingerprint-retry`: "Det kunne ikke aflæses ordentligt. Prøv igen." — check it sounds natural.
+- `packages/web/ui/locales/da/ui.ftl` `ui-toast-dismiss`: "Afvis" — screen-reader label for closing a notification bubble; »Luk« may be clearer.
 - `apps/settings/locales/da/settings.ftl` `settings-more-show`: "Vis { $count } mere" — check »mere« vs »til« after a number.
 
 ## Kestrel and setup
@@ -49,7 +49,7 @@ Strings in Luft's Danish translation that a native speaker should check: terms w
 - `apps/settings/locales/da/personalization.ftl` `settings-accessibility-sticky-keys` / `slow-keys` / `bounce-keys`: "Klæbende taster", "Langsomme taster", "Afvisningstaster" — GNOME's Danish names, also used in the keyboard notifications; Windows calls Sticky Keys »Træge taster« and Filter Keys »Filtertaster«, check which Danes recognise.
 - `apps/settings/locales/da/personalization.ftl` `settings-accessibility-pointing`: "Mus og markør" — section heading for pointing aids; English "Pointing" has no settled Danish noun.
 - `apps/settings/locales/da/personalization.ftl` `settings-fonts-styles`: "{ $count } snit" — "snit" is the typographer's word for a font style; check it's understood by ordinary users.
-- `packages/ui/locales/da/ui.ftl` `ui-passphrase-field`: "Adgangsfrase" — used in setup and Settings to stay distinct from "adgangskode"; no settled OS term, check it.
+- `packages/web/ui/locales/da/ui.ftl` `ui-passphrase-field`: "Adgangsfrase" — used in setup and Settings to stay distinct from "adgangskode"; no settled OS term, check it.
 - `apps/settings/locales/da/system.ftl` `settings-updates-variant-standard`: "Skift til standardudgaven" — "standard image" rendered as "standard edition" here and in the installer's errors, to avoid "aftryk"; check it fits the NVIDIA/standard choice.
 - `apps/settings/locales/da/system.ftl` `settings-datetime-week-start-regional`: "{ $day }, ifølge dit område" — assumes $day arrives as a lowercase weekday that reads fine at the start of the label.
 

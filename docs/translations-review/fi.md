@@ -13,16 +13,16 @@ Strings in Luft's Finnish translation that a native speaker should check. Each i
 - `kestrel/ui/locales/fi/shell.ftl` `keys-shift`, `keys-tab`, `keys-space`, `keys-backspace`: "Vaihto", "Sarkain", "Välilyönti", "Askelpalautin" — follow Microsoft's Finnish shortcut names; Finnish keyboards mostly print arrows on these keys, so check that people prefer these to Shift and Tab.
 - `kestrel/ui/locales/fi/shell.ftl` `keys-delete`, `keys-insert`, `keys-home`, `keys-end`, `keys-page-up`, `keys-page-down`, `keys-print-screen`: kept in English as printed on Finnish keyboards — check against the abbreviations (Del, Ins, PgUp, PrtSc) some keyboards print.
 - `kestrel/ui/locales/fi/shell.ftl` `battery-level`: "Akku { $percentage } %, kytketty verkkovirtaan" — the plugged-in state without charging; check that it doesn't suggest charging.
-- `packages/ui/locales/fi/ui.ftl` `ui-fingerprint-swipe`: "Vedä { $finger } anturin yli." — the finger name stays in the nominative; check that "vedä" reads right for swipe readers, against "pyyhkäise … sormella", which would need another case.
-- `packages/ui/locales/fi/ui.ftl` `ui-media-pause`: "Keskeytä" — some players say "Tauko"; check which is expected.
-- `packages/ui/locales/fi/ui.ftl` `ui-split-space`: "Tila Luftille" — slider label for disk space; check against "Luftin tila", which may read as a status.
-- `packages/ui/locales/fi/ui.ftl` `ui-recovery-key-label`: "Palautusavain { $key }" — read out by screen readers before the key itself.
+- `packages/web/ui/locales/fi/ui.ftl` `ui-fingerprint-swipe`: "Vedä { $finger } anturin yli." — the finger name stays in the nominative; check that "vedä" reads right for swipe readers, against "pyyhkäise … sormella", which would need another case.
+- `packages/web/ui/locales/fi/ui.ftl` `ui-media-pause`: "Keskeytä" — some players say "Tauko"; check which is expected.
+- `packages/web/ui/locales/fi/ui.ftl` `ui-split-space`: "Tila Luftille" — slider label for disk space; check against "Luftin tila", which may read as a status.
+- `packages/web/ui/locales/fi/ui.ftl` `ui-recovery-key-label`: "Palautusavain { $key }" — read out by screen readers before the key itself.
 - `apps/settings/locales/fi/settings.ftl` `settings-subpage-back`: "Takaisin sivulle { $page }" — keeps the page name in the nominative; check it reads naturally with every panel title.
 - `apps/settings/locales/fi/settings.ftl` `settings-more-show`: "Näytä { $count } lisää" — same in both plural forms; check it fits every list it ends.
-- `packages/settings-pages/locales/fi/pages.ftl` `settings-page-appearance`: "Ulkoasu" — GNOME's word; Windows says Mukauttaminen.
-- `packages/settings-pages/locales/fi/pages.ftl` `settings-page-security`: "Suojaus" — see the glossary note on security.
-- `packages/settings-pages/locales/fi/pages.ftl` `settings-page-cursors`: "Osoitinteemat" — the page holds mouse cursor themes; check against "Kohdistinteemat".
-- `packages/settings-pages/locales/fi/pages.ftl` `settings-page-accessibility` `.keywords`: the Finnish names of sticky, slow, bounce and mouse keys and of dwell click vary between Windows and GNOME; check that the common ones are there.
+- `packages/web/settings-pages/locales/fi/pages.ftl` `settings-page-appearance`: "Ulkoasu" — GNOME's word; Windows says Mukauttaminen.
+- `packages/web/settings-pages/locales/fi/pages.ftl` `settings-page-security`: "Suojaus" — see the glossary note on security.
+- `packages/web/settings-pages/locales/fi/pages.ftl` `settings-page-cursors`: "Osoitinteemat" — the page holds mouse cursor themes; check against "Kohdistinteemat".
+- `packages/web/settings-pages/locales/fi/pages.ftl` `settings-page-accessibility` `.keywords`: the Finnish names of sticky, slow, bounce and mouse keys and of dwell click vary between Windows and GNOME; check that the common ones are there.
 
 ## Kestrel and setup
 

@@ -11,9 +11,9 @@ Strings in Luft's European Portuguese translation that a native speaker should c
 - `packages/i18n/glossary/pt.csv` `sandbox`: "ambiente isolado" — Flatpak material in Portuguese often keeps "sandbox".
 - `packages/i18n/glossary/pt.csv` `passkey`: "chave de acesso" — Apple in Portugal may use a different term; check what people actually see on websites.
 - `packages/i18n/glossary/pt.csv` `Install Luft`: "Instalar o Luft" — check whether the app name reads better without the article.
-- `packages/ui/locales/pt/ui.ftl` `ui-recovery-key-saved`: "Guardada" — feminine to agree with "chave"; check it reads right where it appears.
-- `packages/ui/locales/pt/ui.ftl` `ui-finger-right-little`: "Mindinho direito" — "Dedo mínimo direito" is more formal; check the register.
-- `packages/ui/locales/pt/ui.ftl` `ui-media-pause`: "Pausa" — noun, as Windows uses; "Pausar" is the alternative.
+- `packages/web/ui/locales/pt/ui.ftl` `ui-recovery-key-saved`: "Guardada" — feminine to agree with "chave"; check it reads right where it appears.
+- `packages/web/ui/locales/pt/ui.ftl` `ui-finger-right-little`: "Mindinho direito" — "Dedo mínimo direito" is more formal; check the register.
+- `packages/web/ui/locales/pt/ui.ftl` `ui-media-pause`: "Pausa" — noun, as Windows uses; "Pausar" is the alternative.
 - `apps/settings/locales/pt/settings.ftl` `settings-subpage-back`: "Voltar à página { $page }" — avoids the article before the page name; check it doesn't sound heavy.
 - `kestrel/ui/locales/pt/shell.ftl` `battery-level`: "Bateria a { $percentage }%" — no space before %, following Windows; some style guides in Portugal prefer "57 %".
 - `kestrel/ui/locales/pt/shell.ftl` `keys-backspace`: "Retrocesso" — Portuguese keyboards print an arrow; check whether "Backspace" is more familiar.

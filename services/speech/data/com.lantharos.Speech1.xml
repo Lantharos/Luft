@@ -1,0 +1,67 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+ "https://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node name="/com/lantharos/Speech1">
+  <!--
+    Dictation, run in the session and started on demand. It exits after half a minute with nothing to
+    do, and unloads the model three minutes after the last dictation. Audio is only recorded between
+    Start and Stop or Cancel, and is never written anywhere.
+  -->
+  <interface name="com.lantharos.Speech1">
+    <!-- Opens the microphone and starts listening. The layout is the keyboard layout being typed with,
+         such as "ch+fr", which picks the language unless one is chosen in Settings; empty uses the
+         first one. Fails with com.lantharos.Speech1.Error.NotInstalled, naming the model, when the
+         model for the language isn't downloaded, and with com.lantharos.Speech1.Error.Unsupported,
+         naming the language, when the processor can't run the engine the language needs. -->
+    <method name="Start">
+      <arg name="layout" type="s" direction="in"/>
+    </method>
+    <!-- Closes the microphone and answers with the rest of what was said, once it's recognized and
+         after every Typed signal before it. -->
+    <method name="Stop">
+      <arg name="text" type="s" direction="out"/>
+    </method>
+    <!-- Closes the microphone and forgets what was heard and not typed yet. -->
+    <method name="Cancel"/>
+    <!-- A stretch of speech that ended with a pause, or ran long, recognized for good: type it now.
+         Every one after the first starts with a space. -->
+    <signal name="Typed">
+      <arg name="text" type="s"/>
+    </signal>
+    <!-- The stretch still being spoken, which may change until it's typed; empty when there's none.
+         Like Typed, it starts with a space when something was typed before it. -->
+    <signal name="Partial">
+      <arg name="text" type="s"/>
+    </signal>
+    <!-- Nobody has spoken for a while: three seconds after the last speech, or eight seconds from
+         the start when nothing was said. Sent once each time listening starts. -->
+    <signal name="Quiet"/>
+    <!-- How loud the microphone is, from 0 to 1, about twenty times a second while listening. -->
+    <signal name="Level">
+      <arg name="level" type="d"/>
+    </signal>
+  </interface>
+
+  <interface name="com.lantharos.Speech1.Models">
+    <!-- JSON, the Overview in packages/system/speech/src/types.rs: every model with its size, whether it's
+         downloaded, the space it takes and any download in progress; every language with the engine
+         that listens for it; the language, engine and model dictation uses now; and the engines this
+         computer's processor can run. While dictation is on, the model it uses downloads by itself, and
+         downloads of other models stop when the language or engine changes. -->
+    <method name="Overview">
+      <arg name="overview" type="s" direction="out"/>
+    </method>
+    <!-- Starts downloading a model, or picks up a download that stopped. -->
+    <method name="Install">
+      <arg name="model" type="s" direction="in"/>
+    </method>
+    <method name="CancelInstall">
+      <arg name="model" type="s" direction="in"/>
+    </method>
+    <!-- Deletes a downloaded model, or what there is of one. -->
+    <method name="Remove">
+      <arg name="model" type="s" direction="in"/>
+    </method>
+    <!-- A model was downloaded or removed, or a download moved on; ask for the Overview again. -->
+    <signal name="Changed"/>
+  </interface>
+</node>

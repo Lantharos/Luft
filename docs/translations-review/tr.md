@@ -15,12 +15,12 @@ Strings in Luft's Turkish translation that a native speaker should check: terms 
 - `packages/i18n/glossary/tr.csv` `trash`: "Çöp kutusu" — Windows says "Geri Dönüşüm Kutusu", macOS "Çöp Sepeti", GNOME "Çöp"; check the choice.
 - `packages/i18n/glossary/tr.csv` `System Monitor`: "Sistem izleyici" — GNOME says "Sistem Gözetmeni".
 - `packages/i18n/glossary/tr.csv` `set up`: "kur" — "ayarla" fits some contexts better (setting up an account versus installing).
-- `packages/ui/locales/tr/ui.ftl` `ui-fingerprint-place`: "Sensöre { $finger } yerleştirin." — the .inline forms carry the possessive and accusative (sağ işaret parmağınızı); check both sentences with every finger.
-- `packages/ui/locales/tr/ui.ftl` `ui-select-placeholder`: "Seçin" — the only polite imperative used as a label; "Seçiniz" or "Seçim yapın" are the alternatives.
-- `packages/ui/locales/tr/ui.ftl` `ui-split-windows-size`: "{ $size }, { $used } dolu" — check "dolu" reads clearly for space holding files.
-- `packages/ui/locales/tr/ui.ftl` `ui-fingerprint-duplicate`: "Bu parmak okuyucuda zaten kayıtlı, büyük olasılıkla Windows ya da başka bir hesap tarafından." — check the elliptic second clause reads naturally.
+- `packages/web/ui/locales/tr/ui.ftl` `ui-fingerprint-place`: "Sensöre { $finger } yerleştirin." — the .inline forms carry the possessive and accusative (sağ işaret parmağınızı); check both sentences with every finger.
+- `packages/web/ui/locales/tr/ui.ftl` `ui-select-placeholder`: "Seçin" — the only polite imperative used as a label; "Seçiniz" or "Seçim yapın" are the alternatives.
+- `packages/web/ui/locales/tr/ui.ftl` `ui-split-windows-size`: "{ $size }, { $used } dolu" — check "dolu" reads clearly for space holding files.
+- `packages/web/ui/locales/tr/ui.ftl` `ui-fingerprint-duplicate`: "Bu parmak okuyucuda zaten kayıtlı, büyük olasılıkla Windows ya da başka bir hesap tarafından." — check the elliptic second clause reads naturally.
 - `apps/settings/locales/tr/settings.ftl` `settings-subpage-back`: "{ $page } sayfasına dön" — avoids a suffix on the page name; check it doesn't sound stiff for a screen reader.
-- `packages/settings-pages/locales/tr/pages.ftl` `settings-page-mouse`: "Fare ve dokunmatik yüzey" — long for the sidebar; may clip.
+- `packages/web/settings-pages/locales/tr/pages.ftl` `settings-page-mouse`: "Fare ve dokunmatik yüzey" — long for the sidebar; may clip.
 - `kestrel/ui/locales/tr/shell.ftl` `battery-level`: "Pil %{ $percentage }, prize takılı" — for the plugged-in-but-not-charging state; check the wording.
 - `kestrel/ui/locales/tr/shell.ftl` `keys-space`: "Boşluk" — the only translated key name; Windows docs sometimes say "Ara çubuğu".
 

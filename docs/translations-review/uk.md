@@ -17,12 +17,12 @@ Strings in Luft's Ukrainian translation that a native speaker should check, each
 - `packages/i18n/glossary/uk.csv` `undo`: "скасувати" — collides with Cancel; "Повернути" is the fallback where both appear.
 - `packages/i18n/glossary/uk.csv` `signed startup`: "підписаний запуск" — no established term; check it doesn't read oddly next to Secure Boot.
 - `packages/i18n/glossary/uk.csv` `security chip`: "процесор безпеки" — Windows' name for the TPM, though it is a chip; check people recognize it.
-- `packages/ui/locales/uk/ui.ftl` `ui-fingerprint-place`: "Прикладіть { $finger } до сканера." — relies on .inline being accusative, which equals the nominative for every finger name; check it reads naturally.
-- `packages/ui/locales/uk/ui.ftl` `ui-media-pause`: "Пауза" — a noun among infinitive buttons, as media players usually label it; "Призупинити" is the alternative.
-- `packages/ui/locales/uk/ui.ftl` `ui-select-placeholder`: "Вибрати" — placeholder of an empty dropdown; check whether "Не вибрано" reads better.
+- `packages/web/ui/locales/uk/ui.ftl` `ui-fingerprint-place`: "Прикладіть { $finger } до сканера." — relies on .inline being accusative, which equals the nominative for every finger name; check it reads naturally.
+- `packages/web/ui/locales/uk/ui.ftl` `ui-media-pause`: "Пауза" — a noun among infinitive buttons, as media players usually label it; "Призупинити" is the alternative.
+- `packages/web/ui/locales/uk/ui.ftl` `ui-select-placeholder`: "Вибрати" — placeholder of an empty dropdown; check whether "Не вибрано" reads better.
 - `apps/settings/locales/uk/settings.ftl` `settings-subpage-back`: "Назад до сторінки { $page }" — $page stays in the nominative after "сторінки"; check it reads well with titles like "Живлення й акумулятор".
-- `packages/settings-pages/locales/uk/pages.ftl` `settings-page-appearance`: "Вигляд" — GNOME's word; Windows calls the page "Персоналізація".
-- `packages/settings-pages/locales/uk/pages.ftl` `settings-page-display`: "Дисплеї" — plural because there can be several; Windows says "Дисплей".
+- `packages/web/settings-pages/locales/uk/pages.ftl` `settings-page-appearance`: "Вигляд" — GNOME's word; Windows calls the page "Персоналізація".
+- `packages/web/settings-pages/locales/uk/pages.ftl` `settings-page-display`: "Дисплеї" — plural because there can be several; Windows says "Дисплей".
 - `kestrel/ui/locales/uk/shell.ftl` `battery-level`: "Акумулятор { $percentage }%, повністю заряджено" — impersonal forms after a masculine noun; check "повністю заряджений" doesn't read better.
 
 ## Kestrel and setup

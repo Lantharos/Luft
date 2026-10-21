@@ -21,7 +21,7 @@ install -Dm644 -t "$destdir/usr/share/selinux/packages" "$installer/data/luft-in
 printf 'enable luft-installer-%s.service\n' reclaim resize expire-setup |
   install -Dm644 /dev/stdin "$destdir/usr/lib/systemd/system-preset/40-luft-installer.preset"
 
-updater="$luft/packages/software/updater"
+updater="$luft/services/updater"
 install -Dm755 "$release/luft-updater" "$destdir/usr/libexec/luft-updater"
 install -Dm644 -t "$destdir/usr/share/dbus-1/system.d" "$updater/data/com.lantharos.Updater1.conf"
 install -Dm644 -t "$destdir/usr/share/dbus-1/system-services" "$updater/data/com.lantharos.Updater1.service"
@@ -33,11 +33,11 @@ install -Dm644 -t "$destdir/usr/share/polkit-1/rules.d" "$updater/data/50-luft-u
 printf 'enable luft-system-packages-%s.service\n' link settle |
   install -Dm644 /dev/stdin "$destdir/usr/lib/systemd/system-preset/40-luft-system-packages.preset"
 
-thumbnailer="$luft/packages/software/thumbnailer"
+thumbnailer="$luft/services/thumbnailer"
 install -Dm755 "$release/luft-thumbnailer" "$destdir/usr/libexec/luft-thumbnailer"
 install -Dm644 -t "$destdir/usr/share/thumbnailers" "$thumbnailer/data/luft-apps.thumbnailer"
 
-windows="$luft/packages/windows/service"
+windows="$luft/services/windows"
 install -Dm755 "$release/luft-windows" "$destdir/usr/libexec/luft-windows"
 install -Dm644 -t "$destdir/usr/share/dbus-1/system.d" "$windows/data/com.lantharos.Windows1.conf"
 install -Dm644 -t "$destdir/usr/share/dbus-1/system-services" "$windows/data/com.lantharos.Windows1.service"
@@ -49,7 +49,7 @@ printf 'enable luft-windows-boot.service\n' |
 printf 'enable luft-windows-notice.service\n' |
   install -Dm644 /dev/stdin "$destdir/usr/lib/systemd/user-preset/40-luft-windows.preset"
 
-sleep="$luft/packages/sleep/service"
+sleep="$luft/services/sleep"
 install -Dm755 "$release/luft-sleep" "$destdir/usr/libexec/luft-sleep"
 install -Dm644 -t "$destdir/usr/share/dbus-1/system.d" "$sleep/data/com.lantharos.Sleep1.conf"
 install -Dm644 -t "$destdir/usr/share/dbus-1/system-services" "$sleep/data/com.lantharos.Sleep1.service"
@@ -57,14 +57,14 @@ install -Dm644 -t "$destdir/usr/lib/systemd/system" "$sleep/data/luft-sleep.serv
 install -Dm644 "$sleep/data/systemd-suspend-luft.conf" "$destdir/usr/lib/systemd/system/systemd-suspend.service.d/luft-sleep.conf"
 install -Dm644 -t "$destdir/usr/share/polkit-1/actions" "$sleep/data/com.lantharos.sleep.policy"
 
-accounts="$luft/packages/accounts/service"
+accounts="$luft/services/accounts"
 install -Dm755 "$release/luft-accounts" "$destdir/usr/libexec/luft-accounts"
 install -Dm644 -t "$destdir/usr/share/dbus-1/services" "$accounts/data/com.lantharos.Accounts1.service"
 install -Dm644 -t "$destdir/usr/lib/systemd/user" "$accounts/data/luft-accounts.service"
 printf 'enable luft-accounts.service\n' |
   install -Dm644 /dev/stdin "$destdir/usr/lib/systemd/user-preset/40-luft-accounts.preset"
 
-speech="$luft/packages/speech/service"
+speech="$luft/services/speech"
 install -Dm755 "$release/luft-speech" "$destdir/usr/libexec/luft-speech"
 install -Dm644 -t "$destdir/usr/share/dbus-1/services" "$speech/data/com.lantharos.Speech1.service"
 install -Dm644 -t "$destdir/usr/lib/systemd/user" "$speech/data/luft-speech.service"

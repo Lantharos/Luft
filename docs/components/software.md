@@ -1,13 +1,13 @@
 # Software library
 
-`luft-software` ([packages/software](../../packages/software)) is the software handling Schelf and Settings share: which installed packages are apps and which are part of the system, system updates for both kinds of Luft installs, Flatpak, AppImages and command-line tools in a Toolbox container.
+`luft-software` ([packages/system/software](../../packages/system/software)) is the software handling Schelf and Settings share: which installed packages are apps and which are part of the system, system updates for both kinds of Luft installs, Flatpak, AppImages and command-line tools in a Toolbox container.
 
 ## Setup
 
-Add it to an app's `desktop/Cargo.toml` by path:
+Add it to an app's `desktop/Cargo.toml`; the root `Cargo.toml` says where it lives:
 
 ```toml
-luft-software = { path = "../../../packages/software" }
+luft-software.workspace = true
 ```
 
 ```rust
@@ -31,7 +31,7 @@ PackageKit and the image updater are reached over D-Bus, so their functions are 
 
 `LUFT_KERNEL_COMMAND_LINE` names a file to read in place of `/proc/cmdline`, to try either kind on any computer (see [Testing](../testing.md#image-systems)).
 
-Changing the image needs root, so the image side talks to `luft-updater` (in [`updater/`](../../packages/software/updater)), a small service started on demand over D-Bus that runs `bootc` for it. Updates are found by comparing the image's layers with the registry's through `skopeo inspect`, so checking needs no administrator rights.
+Changing the image needs root, so the image side talks to `luft-updater` (in [`services/updater`](../../services/updater)), a small service started on demand over D-Bus that runs `bootc` for it. Updates are found by comparing the image's layers with the registry's through `skopeo inspect`, so checking needs no administrator rights.
 
 ## Apps and the system
 
@@ -46,7 +46,7 @@ Changing the image needs root, so the image side talks to `luft-updater` (in [`u
 | `system` | `System::current()`, `Packages` or `Image` |
 | `packages` | Installing, removing and updating Fedora packages through PackageKit |
 | `image` | `Deployments` (`load`, `status`, `check`, `lacks`, `variant_offer`, `switch_size`), `download`, `switch`, `rollback`, and `downloading`, `follow` and `changes` for a download started anywhere |
-| `variant` | [`luft-variant`](../../packages/variant/README.md), which image suits this computer |
+| `variant` | [`luft-variant`](../../packages/system/variant/README.md), which image suits this computer |
 | `system_packages` | `list`, `install`, `install_file` and `remove` packages merged over an image system as a system extension, through `luft-updater`, and `describe`, `add_repository` and `remove_repository` for the software sources they come from besides Fedora |
 | `repositories` | `fetch` gets a repository file from the address of a `.repo` file, `copr:owner/project` or a vendor in `KNOWN`, with the keys it names, as a `Draft`; `bundled` reads the one a package file ships or its scriptlets write, `desktop_entry` the menu entry a package file brings, and `added_ids` and `is_added` what's added already |
 | `toolbox` | `available` lists Fedora's packages, or those of the added software sources; `install`, `install_file`, `remove`, `installed`, `updates` and `update` manage them in the default Toolbox container, with their commands in `~/.local/bin` |
@@ -78,11 +78,11 @@ Versions and release notes come from the image's labels:
 | `org.opencontainers.image.version` | The version, such as 45.2 |
 | `com.lantharos.release-notes` | What's new, as plain text |
 
-`updater/data` has the service's D-Bus, systemd and polkit files, and `com.lantharos.Updater1.xml` describes its interface. Administrators signed in at the computer can download and install updates, and switch images, without a password, also in the background; going back to the previous version asks. Its `TrustedApps` interface keeps `/etc/kestrel/trusted-apps`, the Flatpak apps with full access, and asks an administrator's password to change it.
+`services/updater/data` has the service's D-Bus, systemd and polkit files, and `com.lantharos.Updater1.xml` describes its interface. Administrators signed in at the computer can download and install updates, and switch images, without a password, also in the background; going back to the previous version asks. Its `TrustedApps` interface keeps `/etc/kestrel/trusted-apps`, the Flatpak apps with full access, and asks an administrator's password to change it.
 
 ## Thumbnails
 
-`luft-thumbnailer` (in [`thumbnailer/`](../../packages/software/thumbnailer)) is a freedesktop thumbnailer that shows the app's own icon for AppImages, Flatpak bundles and `.flatpakref` files, in Rover and anything else that reads the shared thumbnail cache. It reads an AppImage's icons from its squashfs without running or unpacking it, a bundle's from its header, and a reference's from the icons Flatpak already downloaded for its remotes, so it never goes online. SVG icons are drawn at the size asked for, with only the images embedded in them, never files they point to.
+`luft-thumbnailer` (in [`services/thumbnailer`](../../services/thumbnailer)) is a freedesktop thumbnailer that shows the app's own icon for AppImages, Flatpak bundles and `.flatpakref` files, in Rover and anything else that reads the shared thumbnail cache. It reads an AppImage's icons from its squashfs without running or unpacking it, a bundle's from its header, and a reference's from the icons Flatpak already downloaded for its remotes, so it never goes online. SVG icons are drawn at the size asked for, with only the images embedded in them, never files they point to.
 
 ## Command-line tools
 

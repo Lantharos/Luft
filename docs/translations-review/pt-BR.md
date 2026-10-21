@@ -12,9 +12,9 @@ Strings in Luft's Brazilian Portuguese translation that a native speaker should 
 - `packages/i18n/glossary/pt-BR.csv` `sandbox`: "sandbox" (feminine) — usage varies between "a sandbox" and "o sandbox".
 - `packages/i18n/glossary/pt-BR.csv` `login screen`: "tela de login" — Windows says "tela de entrada"; check which reads better.
 - `packages/i18n/glossary/pt-BR.csv` `Start`: "Start" — kept as a name; Brazilians know Windows' "Iniciar", so check that "menu Start" doesn't feel odd.
-- `packages/ui/locales/pt-BR/ui.ftl` `ui-recovery-key-saved`: "Salva" — feminine to agree with "chave"; check it reads well alone on the button.
-- `packages/ui/locales/pt-BR/ui.ftl` `ui-fingerprint-place`: "Coloque o { $finger } no sensor." — every .inline finger name is masculine; check the sentence with "polegar" and "dedo mínimo".
-- `packages/ui/locales/pt-BR/ui.ftl` `ui-time-just-now`: "agora mesmo" — lowercase because it may follow other text; check where it shows.
+- `packages/web/ui/locales/pt-BR/ui.ftl` `ui-recovery-key-saved`: "Salva" — feminine to agree with "chave"; check it reads well alone on the button.
+- `packages/web/ui/locales/pt-BR/ui.ftl` `ui-fingerprint-place`: "Coloque o { $finger } no sensor." — every .inline finger name is masculine; check the sentence with "polegar" and "dedo mínimo".
+- `packages/web/ui/locales/pt-BR/ui.ftl` `ui-time-just-now`: "agora mesmo" — lowercase because it may follow other text; check where it shows.
 - `kestrel/ui/locales/pt-BR/shell.ftl` `keys-backspace`: "Backspace" — ABNT2 keyboards often print only an arrow; check whether "Backspace" is the usual name.
 - `apps/settings/locales/pt-BR/settings.ftl` `settings-more-show`: "Mostrar mais { $count }" — check against "Mostrar outros { $count }".
 
@@ -48,7 +48,7 @@ Strings in Luft's Brazilian Portuguese translation that a native speaker should 
 - `apps/settings/locales/pt-BR/personalization.ftl` `settings-accessibility-typing-assist-count`: "Desativada / { $count } ativa / { $count } ativas" — agrees with "Assistência de digitação" (feminine); check it reads well as a row value.
 - `apps/settings/locales/pt-BR/personalization.ftl` `settings-accessibility-pointing`: "Ponteiro" — section heading for pointing aids; "Apontar e clicar" is GNOME's alternative if this feels too narrow.
 - `apps/settings/locales/pt-BR/personalization.ftl` `settings-fonts-sample`: "Um pequeno jabuti xereta viu dez cegonhas felizes" — classic Brazilian pangram (misses k, w, y); check it is the preferred one.
-- `packages/ui/locales/pt-BR/ui.ftl` `ui-passphrase-field`: "Frase secreta" — used for "passphrase" throughout to keep it apart from "senha"; GNOME's term, Windows BitLocker just says "senha".
+- `packages/web/ui/locales/pt-BR/ui.ftl` `ui-passphrase-field`: "Frase secreta" — used for "passphrase" throughout to keep it apart from "senha"; GNOME's term, Windows BitLocker just says "senha".
 - `apps/settings/locales/pt-BR/protection.ftl` `settings-passwords-history-read`: "{ $app } usou “{ $item }”" — app names start the sentence without the article the style guide asks for (o Rover), since $app can be any app; same in the other history lines, `settings-passwords-forget-*` and `settings-updates-elsewhere-*-by`.
 - `apps/settings/locales/pt-BR/protection.ftl` `settings-security-anti-cheat`: "Jogos com antitrapaça" — "anti-cheat" is often left in English by Brazilian gamers; check which reads more natural.
 - `apps/settings/locales/pt-BR/system.ftl` `settings-updates-installed-when`: "Atualizações instaladas { $when }" — relies on $when being "há 3 dias" / "ontem"; same in `settings-updates-released`, `settings-passwords-ssh-added`, `settings-passkeys-last-used`.

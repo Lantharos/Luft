@@ -1,5 +1,5 @@
-packages/ui/src/choices/SplitBar.svelte	Windows
-packages/ui/src/choices/SplitBar.svelte	Luft
-packages/ui/src/notices/swipe.ts	${x}px 0
-packages/ui/src/virtual/VirtualScroller.svelte	{#each placed as                 (key(item))}
-packages/ui/src/virtual/motion.ts	${dx}px ${dy}px
+packages/web/ui/src/choices/SplitBar.svelte	Windows
+packages/web/ui/src/choices/SplitBar.svelte	Luft
+packages/web/ui/src/notices/swipe.ts	${x}px 0
+packages/web/ui/src/virtual/VirtualScroller.svelte	{#each placed as                 (key(item))}
+packages/web/ui/src/virtual/motion.ts	${dx}px ${dy}px

@@ -1,4 +1,4 @@
-import type { TaskbarLookPaint, TaskbarLooks } from '../../../../../../packages/ui/src/taskbar/looks';
+import type { TaskbarLookPaint, TaskbarLooks } from '../../../../../../packages/web/ui/src/taskbar/looks';
 import { toHex, type Seed } from '../../../appearance/color.js';
 import type { Paint } from '../../../appearance/icons/paint.js';
 import type { Palette } from '../../../appearance/palette.js';

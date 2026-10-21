@@ -39,4 +39,4 @@ Signing in to Gmail and Outlook through the browser needs OAuth client IDs, read
 
 ## License
 
-MIT. Open Runde is under the SIL Open Font License, in [`packages/ui/fonts/OFL.txt`](../../packages/ui/fonts/OFL.txt).
+MIT. Open Runde is under the SIL Open Font License, in [`packages/web/ui/fonts/OFL.txt`](../../packages/web/ui/fonts/OFL.txt).

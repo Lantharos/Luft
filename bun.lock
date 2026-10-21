@@ -311,11 +311,11 @@
         "vite": "^8.3.2",
       },
     },
-    "packages/motion": {
+    "packages/web/motion": {
       "name": "@luft/motion",
       "version": "0.1.0",
     },
-    "packages/network": {
+    "packages/web/network": {
       "name": "@luft/network",
       "version": "0.1.0",
       "dependencies": {
@@ -325,11 +325,11 @@
         "typescript": "~6.0.3",
       },
     },
-    "packages/settings-pages": {
+    "packages/web/settings-pages": {
       "name": "@luft/settings-pages",
       "version": "0.1.0",
     },
-    "packages/ui": {
+    "packages/web/ui": {
       "name": "@luft/ui",
       "version": "0.1.0",
       "dependencies": {
@@ -825,15 +825,15 @@
 
     "@luft/kestrel-ui": ["@luft/kestrel-ui@workspace:kestrel/ui"],
 
-    "@luft/motion": ["@luft/motion@workspace:packages/motion"],
+    "@luft/motion": ["@luft/motion@workspace:packages/web/motion"],
 
-    "@luft/network": ["@luft/network@workspace:packages/network"],
+    "@luft/network": ["@luft/network@workspace:packages/web/network"],
 
-    "@luft/settings-pages": ["@luft/settings-pages@workspace:packages/settings-pages"],
+    "@luft/settings-pages": ["@luft/settings-pages@workspace:packages/web/settings-pages"],
 
     "@luft/site": ["@luft/site@workspace:web/site"],
 
-    "@luft/ui": ["@luft/ui@workspace:packages/ui"],
+    "@luft/ui": ["@luft/ui@workspace:packages/web/ui"],
 
     "@luft/web": ["@luft/web@workspace:web/shared"],
 
@@ -1795,35 +1795,17 @@
 
     "anymatch/picomatch": ["picomatch@2.3.2", "", {}, "sha512-V7+vQEJ06Z+c5tSye8S+nHUfI51xoXIXjHQ99cQtKUkQqqO1kO/KCJUfZXuB47h/YBlDhah2H3hdUGXn8ie0oA=="],
 
-    "barometer/@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#1701400", {}, "Lantharos-Sabine-1701400", "sha512-/Z8QVHsvxv0EU6jS1JG5RSGZkFaHwsQIe+o7pQgx39+uiTJZa1P0CbyQ8/Ls0ZHT2D/WV/rcvDz0GVKEu/Ekqw=="],
-
     "cliui/string-width": ["string-width@7.2.0", "", { "dependencies": { "emoji-regex": "^10.3.0", "get-east-asian-width": "^1.0.0", "strip-ansi": "^7.1.0" } }, "sha512-tsaTIkKW9b4N+AEj+SVA+WhJzV7/zMhcSu78mLKWSk7cXMOSHsBKFWUs0fWwq8QyK3MgJBQRX6Gbi4kYbdvGkQ=="],
 
     "csso/css-tree": ["css-tree@2.2.1", "", { "dependencies": { "mdn-data": "2.0.28", "source-map-js": "^1.0.1" } }, "sha512-OA0mILzGc1kCOCSJerOeqDxDQ4HOh+G8NbOJFOTgOCzpw7fCBubk0fEyxp8AgOL/jvLgYA/uV0cMbe43ElF1JA=="],
 
-    "disks/@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#1701400", {}, "Lantharos-Sabine-1701400", "sha512-/Z8QVHsvxv0EU6jS1JG5RSGZkFaHwsQIe+o7pQgx39+uiTJZa1P0CbyQ8/Ls0ZHT2D/WV/rcvDz0GVKEu/Ekqw=="],
-
     "dom-serializer/entities": ["entities@4.5.0", "", {}, "sha512-V0hjH4dGPh9Ao5p0MoRY6BVqtwCjhz6vI5LT8AJ55H+4g9/4vbHx1I54fS0XuclLhDHArPQCiMjDxjaL8fPxhw=="],
 
-    "draft/@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#1701400", {}, "Lantharos-Sabine-1701400", "sha512-/Z8QVHsvxv0EU6jS1JG5RSGZkFaHwsQIe+o7pQgx39+uiTJZa1P0CbyQ8/Ls0ZHT2D/WV/rcvDz0GVKEu/Ekqw=="],
-
     "js-yaml/argparse": ["argparse@2.0.1", "", {}, "sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q=="],
-
-    "keys/@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#1701400", {}, "Lantharos-Sabine-1701400", "sha512-/Z8QVHsvxv0EU6jS1JG5RSGZkFaHwsQIe+o7pQgx39+uiTJZa1P0CbyQ8/Ls0ZHT2D/WV/rcvDz0GVKEu/Ekqw=="],
-
-    "magpie/@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#1701400", {}, "Lantharos-Sabine-1701400", "sha512-/Z8QVHsvxv0EU6jS1JG5RSGZkFaHwsQIe+o7pQgx39+uiTJZa1P0CbyQ8/Ls0ZHT2D/WV/rcvDz0GVKEu/Ekqw=="],
-
-    "mailman/@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#1701400", {}, "Lantharos-Sabine-1701400", "sha512-/Z8QVHsvxv0EU6jS1JG5RSGZkFaHwsQIe+o7pQgx39+uiTJZa1P0CbyQ8/Ls0ZHT2D/WV/rcvDz0GVKEu/Ekqw=="],
-
-    "meet/@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#1701400", {}, "Lantharos-Sabine-1701400", "sha512-/Z8QVHsvxv0EU6jS1JG5RSGZkFaHwsQIe+o7pQgx39+uiTJZa1P0CbyQ8/Ls0ZHT2D/WV/rcvDz0GVKEu/Ekqw=="],
 
     "parse-entities/@types/unist": ["@types/unist@2.0.11", "", {}, "sha512-CmBKiL6NNo/OqgmMn95Fk9Whlp2mtvIv+KNpQKN2F4SjvrEesubTRWGYSg+BnWZOnlCaSTU1sMpsBOzgbYhnsA=="],
 
     "parse5/entities": ["entities@6.0.1", "", {}, "sha512-aN97NXWF6AWBTahfVOIrB/NShkzi5H7F9r1s9mD3cDj4Ko5f2qhhVoYMibXF7GlLveb/D2ioWay8lxI97Ven3g=="],
-
-    "schelf/@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#1701400", {}, "Lantharos-Sabine-1701400", "sha512-/Z8QVHsvxv0EU6jS1JG5RSGZkFaHwsQIe+o7pQgx39+uiTJZa1P0CbyQ8/Ls0ZHT2D/WV/rcvDz0GVKEu/Ekqw=="],
-
-    "signin/@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#1701400", {}, "Lantharos-Sabine-1701400", "sha512-/Z8QVHsvxv0EU6jS1JG5RSGZkFaHwsQIe+o7pQgx39+uiTJZa1P0CbyQ8/Ls0ZHT2D/WV/rcvDz0GVKEu/Ekqw=="],
 
     "sitemap/@types/node": ["@types/node@24.19.2", "", { "dependencies": { "undici-types": ">=7.24.0 <7.24.7" } }, "sha512-93d49wCWJkCyN87MxLpNN6KXPCwFw7bVUg79mGUV1OS40JGWwVCr8n61DXCSqz7CV6/VfPkb7xec7uP2M+QHWQ=="],
 
@@ -1832,8 +1814,6 @@
     "svelte/devalue": ["devalue@5.9.4", "", {}, "sha512-sPAT4pztbu6586/hrhOnMKS17IJrvg12mXiSPSS3W5qDeN2RGgvZ0diZCm31dBbnevfVmujNO3IM2wrS4Y2Rhg=="],
 
     "svelte/magic-string": ["magic-string@0.30.21", "", { "dependencies": { "@jridgewell/sourcemap-codec": "^1.5.5" } }, "sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ=="],
-
-    "tern/@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#1701400", {}, "Lantharos-Sabine-1701400", "sha512-/Z8QVHsvxv0EU6jS1JG5RSGZkFaHwsQIe+o7pQgx39+uiTJZa1P0CbyQ8/Ls0ZHT2D/WV/rcvDz0GVKEu/Ekqw=="],
 
     "unifont/undici": ["undici@8.12.2", "", {}, "sha512-XtuDWVdqTLr3NAxm2ly9/hU6kUsJOgGh1RASzMBbsw6aWCOaQzHdW+QQDfdERjfJ2V5vL5pRPa4RetO9UfivDg=="],
 

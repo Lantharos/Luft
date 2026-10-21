@@ -1,6 +1,6 @@
 import type St from 'gi://St';
 
-import type { GlassShading } from '../../../../../packages/ui/src/taskbar/looks';
+import type { GlassShading } from '../../../../../packages/web/ui/src/taskbar/looks';
 import type { Rgb } from '../../appearance/color.js';
 import type { WallpaperFloor } from '../wallpaper/floor.js';
 import { clampUnit } from '../../shared/math.js';

@@ -1,4 +1,4 @@
-import type { MarkFills } from '../../../../../../packages/ui/src/taskbar/mark';
+import type { MarkFills } from '../../../../../../packages/web/ui/src/taskbar/mark';
 import { atTone, contrast, fromHex, seedFromColor, toHex, toneOf, type Rgb } from '../../../appearance/color.js';
 import type { Paint } from '../../../appearance/icons/paint.js';
 

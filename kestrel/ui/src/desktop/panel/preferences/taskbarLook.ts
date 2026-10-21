@@ -3,7 +3,7 @@ import type St from 'gi://St';
 import { blurBackdrop } from 'resource:///com/lantharos/kestrel/ui/kestrelGlass.js';
 
 import { isDark, watchScheme } from '../../../shared/display/scheme.js';
-import type { TaskbarLook } from '../../../../../../packages/ui/src/taskbar/looks';
+import type { TaskbarLook } from '../../../../../../packages/web/ui/src/taskbar/looks';
 import { taskbarPreferences } from './taskbarPreferences.js';
 
 const BLURRED: TaskbarLook[] = ['glass', 'accent'];

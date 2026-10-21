@@ -22,4 +22,4 @@ Formats beyond what Chromium shows, such as HEIC and JPEG XL, need the `glycin-l
 
 ## License
 
-MIT. Open Runde is under the SIL Open Font License, in `packages/ui/fonts/OFL.txt`.
+MIT. Open Runde is under the SIL Open Font License, in `packages/web/ui/fonts/OFL.txt`.

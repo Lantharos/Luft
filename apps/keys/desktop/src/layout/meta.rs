@@ -1,6 +1,7 @@
 use std::fs;
 use std::path::PathBuf;
 
+use luft_app::files;
 use serde::{Deserialize, Serialize};
 
 use super::dead::DeadKey;
@@ -120,7 +121,7 @@ pub fn load(id: &str) -> Option<Meta> {
 
 pub fn save(id: &str, meta: &Meta) -> Result<(), String> {
     let text = toml::to_string(meta).map_err(|error| error.to_string())?;
-    paths::write(&file(id), &text)
+    files::replace(&file(id), text.as_bytes()).map_err(|error| error.to_string())
 }
 
 pub fn remove(id: &str) {

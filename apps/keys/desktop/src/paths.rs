@@ -1,5 +1,4 @@
-use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 pub const SYSTEM_XKB: &str = "/usr/share/X11/xkb";
 
@@ -51,15 +50,6 @@ pub fn scratch() -> PathBuf {
     dirs::runtime_dir()
         .unwrap_or_else(std::env::temp_dir)
         .join(format!("keys-{}", std::process::id()))
-}
-
-pub fn write(path: &Path, contents: &str) -> Result<(), String> {
-    if let Some(parent) = path.parent() {
-        fs::create_dir_all(parent).map_err(|error| error.to_string())?;
-    }
-    let partial = path.with_extension("partial");
-    fs::write(&partial, contents).map_err(|error| error.to_string())?;
-    fs::rename(&partial, path).map_err(|error| error.to_string())
 }
 
 pub fn slug(name: &str) -> String {

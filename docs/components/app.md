@@ -72,6 +72,7 @@ window
 | `file_manager` | `show_in_folder(path, token)` opens the folder with the file selected, `show_folder(path, token)` opens the folder itself |
 | `launch` | `pass_token` gives a launched program the activation token a page got from `activationToken()` in `@luft/ui`, or clears the one the app was started with; `Token` takes a command's `token` alone |
 | `secrets` | `store`, `load` and `delete` for the app's own secrets in Luft Keyring |
+| `files` | `replace(path, bytes)` writes a file in one step, so readers never see it half written |
 
 ## Features
 
@@ -82,6 +83,7 @@ window
 | `ibus` | `ibus` | `address()` finds the session's IBus daemon, to connect to with `dbus::at` |
 | `launch` | `launch::context` | A launch context that hands the page's activation token to the app it starts, so its window comes to the front |
 | `recovery` | `recovery` | `Sheet` saves or prints a recovery key; `computer()` names this computer |
+| `settings` | `settings` | `load` and `save` a JSON file in the user's configuration folder, such as `"tern/settings.json"` |
 | `thumbnails` | `thumbnails` | `Thumbnails` makes thumbnails in the shared freedesktop cache and sends them to the page in batches |
 
 ## Examples

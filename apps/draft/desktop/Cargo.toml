@@ -15,7 +15,7 @@ chardetng = "1.0.0"
 dirs = "7.0.0"
 encoding_rs = "0.8.42"
 ignore = "0.4.33"
-luft-app = { path = "../../../packages/app" }
+luft-app = { path = "../../../packages/app", features = ["settings"] }
 notify = { version = "8.2.0", default-features = false }
 parking_lot = "0.12.5"
 sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.51" }

@@ -5,6 +5,8 @@ pub mod user;
 
 use std::fs;
 
+use luft_app::files;
+
 use crate::paths;
 pub use ibus::Reloader;
 
@@ -43,7 +45,7 @@ pub fn update(id: &str, sequences: &str, reloader: &Reloader) -> Result<(), Stri
     if after == before || (before.is_empty() && sections.is_empty()) {
         return Ok(());
     }
-    paths::write(&file, &after)?;
+    files::replace(&file, after.as_bytes()).map_err(|error| error.to_string())?;
     user::include(&file)?;
     reloader.reload();
     Ok(())

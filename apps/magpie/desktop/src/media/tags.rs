@@ -104,9 +104,7 @@ fn embedded_art(tag: &Tag) -> Option<String> {
     let folder = cache::folder("art").ok()?;
     let target = folder.join(format!("{}.{extension}", cache::digest(picture.data())));
     if !target.exists() {
-        let partial = target.with_extension("partial");
-        fs::write(&partial, picture.data()).ok()?;
-        fs::rename(&partial, &target).ok()?;
+        luft_app::files::replace(&target, picture.data()).ok()?;
     }
     Some(target.to_string_lossy().into_owned())
 }

@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
 
+use luft_app::files;
 use serde::{Deserialize, Serialize};
 
 use super::compile::{self, Keys};
@@ -223,7 +224,8 @@ pub fn create(mut draft: Draft, reloader: &Reloader) -> Result<Layout, String> {
 pub fn save(layout: &Layout, reloader: &Reloader) -> Result<(), String> {
     let text = symbols::write(layout);
     compile::symbols(&text)?;
-    paths::write(&paths::user_symbols().join(&layout.id), &text)?;
+    files::replace(&paths::user_symbols().join(&layout.id), text.as_bytes())
+        .map_err(|error| error.to_string())?;
     meta::save(
         &layout.id,
         &Meta {

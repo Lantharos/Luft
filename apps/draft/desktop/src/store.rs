@@ -32,19 +32,12 @@ fn failed(error: impl std::fmt::Display) -> String {
     error.to_string()
 }
 
-fn config() -> Result<PathBuf, String> {
-    Ok(dirs::config_dir()
-        .ok_or("Could not find the configuration folder")?
-        .join("draft"))
-}
-
-fn path(name: Name) -> Result<PathBuf, String> {
-    let file = match name {
-        Name::Settings => "settings.json",
-        Name::Session => "session.json",
-        Name::Files => "files-session.json",
-    };
-    Ok(config()?.join(file))
+fn file(name: Name) -> &'static str {
+    match name {
+        Name::Settings => "draft/settings.json",
+        Name::Session => "draft/session.json",
+        Name::Files => "draft/files-session.json",
+    }
 }
 
 pub fn backups() -> Result<PathBuf, String> {
@@ -57,19 +50,11 @@ pub fn backups() -> Result<PathBuf, String> {
 }
 
 pub fn read(Read { name }: Read) -> Result<Value, String> {
-    Ok(fs::read(path(name)?)
-        .ok()
-        .and_then(|bytes| serde_json::from_slice(&bytes).ok())
-        .unwrap_or(Value::Null))
+    Ok(luft_app::settings::load(file(name)).unwrap_or(Value::Null))
 }
 
 pub fn write(Write { name, value }: Write) -> Result<(), String> {
-    let path = path(name)?;
-    fs::create_dir_all(config()?).map_err(failed)?;
-    let staging = path.with_extension("json.partial");
-    fs::write(&staging, serde_json::to_vec(&value).map_err(failed)?)
-        .and_then(|()| fs::rename(&staging, &path))
-        .map_err(failed)
+    luft_app::settings::save(file(name), &value)
 }
 
 pub fn remove_backup(Backup { name }: Backup) -> Result<(), String> {

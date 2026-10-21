@@ -11,12 +11,11 @@ rust-version = "1.98"
 name = "barometer_lib"
 
 [dependencies]
-dirs = "7.0.0"
 futures-util = { version = "0.3.34", default-features = false }
 gio = "0.22.10"
 gio-unix = "0.22.8"
 libc = "0.2.190"
-luft-app = { path = "../../../packages/app", features = ["apps", "launch"] }
+luft-app = { path = "../../../packages/app", features = ["apps", "launch", "settings"] }
 nvml-wrapper = "0.13.0"
 parking_lot = "0.12.5"
 sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.51" }

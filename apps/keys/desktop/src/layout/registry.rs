@@ -3,6 +3,7 @@ use std::fs;
 use std::path::Path;
 use std::sync::OnceLock;
 
+use luft_app::files;
 use roxmltree::{Document, Node, ParsingOptions};
 use serde::Serialize;
 
@@ -124,5 +125,5 @@ pub fn write(entries: &[Entry]) -> Result<(), String> {
         xml.push_str("      </configItem>\n    </layout>\n");
     }
     xml.push_str("  </layoutList>\n</xkbConfigRegistry>\n");
-    paths::write(&paths::user_rules(), &xml)
+    files::replace(&paths::user_rules(), xml.as_bytes()).map_err(|error| error.to_string())
 }

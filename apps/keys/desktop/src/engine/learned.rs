@@ -2,6 +2,8 @@ use std::collections::HashMap;
 use std::fs;
 use std::path::PathBuf;
 
+use luft_app::files;
+
 use crate::paths;
 
 const SAVE_EVERY: u32 = 8;
@@ -69,7 +71,7 @@ impl Learned {
             })
             .collect();
         if let Ok(json) = serde_json::to_string(&entries)
-            && paths::write(file, &json).is_ok()
+            && files::replace(file, json.as_bytes()).is_ok()
         {
             self.unsaved = 0;
         }

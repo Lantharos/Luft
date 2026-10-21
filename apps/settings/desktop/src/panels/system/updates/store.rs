@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use luft_app::files;
 use luft_software::image::Update;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
@@ -62,11 +63,8 @@ fn load<T: DeserializeOwned + Default>(file: PathBuf) -> T {
 }
 
 fn save(file: PathBuf, value: &impl Serialize) -> Result<(), String> {
-    if let Some(folder) = file.parent() {
-        std::fs::create_dir_all(folder).map_err(|error| error.to_string())?;
-    }
-    let text = serde_json::to_string_pretty(value).map_err(|error| error.to_string())?;
-    std::fs::write(file, text).map_err(|error| error.to_string())
+    let text = serde_json::to_vec_pretty(value).map_err(|error| error.to_string())?;
+    files::replace(&file, &text).map_err(|error| error.to_string())
 }
 
 impl Preferences {

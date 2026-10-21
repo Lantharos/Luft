@@ -7,13 +7,14 @@ mod store;
 use std::path::Path;
 
 use luft_app::Commands;
+use luft_app::files;
 use luft_app::portal::{self, FileChooser, Filter};
 use sabine::SabineWindow;
 use serde::Deserialize;
 use serde_json::Value;
 use tokio::task::spawn_blocking;
 
-use crate::{paths, sources};
+use crate::sources;
 use definition::Method;
 pub use host::SERVE_FLAG;
 use preview::Preview;
@@ -73,10 +74,11 @@ async fn export(Id { id }: Id) -> Result<bool, String> {
     let Some(path) = chosen.as_deref().and_then(portal::uri_path) else {
         return Ok(false);
     };
-    spawn_blocking(move || paths::write(&path, &text))
+    spawn_blocking(move || files::replace(&path, text.as_bytes()))
         .await
         .map_err(|error| error.to_string())?
         .map(|()| true)
+        .map_err(|error| error.to_string())
 }
 
 pub fn register(window: SabineWindow) -> SabineWindow {

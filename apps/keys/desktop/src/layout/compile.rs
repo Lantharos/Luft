@@ -3,6 +3,7 @@ use std::fs;
 use std::path::Path;
 use std::sync::atomic::{AtomicU32, Ordering};
 
+use luft_app::files;
 use xkbcommon::xkb;
 
 use super::keys::{EDITABLE, LEVELS};
@@ -54,7 +55,11 @@ pub fn layout(id: &str) -> Result<Compiled, String> {
 pub fn symbols(text: &str) -> Result<Compiled, String> {
     let directory =
         paths::scratch().join(format!("xkb-{}", SCRATCHES.fetch_add(1, Ordering::Relaxed)));
-    paths::write(&directory.join("symbols").join(SCRATCH_LAYOUT), text)?;
+    files::replace(
+        &directory.join("symbols").join(SCRATCH_LAYOUT),
+        text.as_bytes(),
+    )
+    .map_err(|error| error.to_string())?;
     let keymap = from_names(&context(Some(&directory)), SCRATCH_LAYOUT, "");
     let _ = fs::remove_dir_all(&directory);
     keymap

@@ -1,5 +1,6 @@
 use std::fs;
 
+use luft_app::files;
 use serde::{Deserialize, Serialize};
 
 use super::definition::{self, Method};
@@ -99,7 +100,7 @@ pub fn create(mut method: Method) -> Result<Stored, String> {
 pub fn save(stored: &Stored) -> Result<(), String> {
     let file = definition::file(&stored.id);
     let before = fs::read_to_string(&file).ok().as_deref().and_then(header);
-    paths::write(&file, &stored.method.to_text())?;
+    files::replace(&file, stored.method.to_text().as_bytes()).map_err(|error| error.to_string())?;
     let listed = before.is_some_and(|before| {
         before.name == stored.method.name
             && before.label == stored.method.label

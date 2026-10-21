@@ -3,6 +3,8 @@ use std::io::ErrorKind;
 use std::process::{Command, Stdio};
 use std::thread;
 
+use luft_app::files;
+
 use super::store::Summary;
 use crate::paths;
 
@@ -26,7 +28,7 @@ pub fn refresh(methods: &[Summary]) -> Result<(), String> {
     let executable = std::env::current_exe().map_err(|error| error.to_string())?;
     let wanted = entry(&executable.to_string_lossy());
     if fs::read_to_string(&autostart).ok().as_deref() != Some(wanted.as_str()) {
-        paths::write(&autostart, &wanted)?;
+        files::replace(&autostart, wanted.as_bytes()).map_err(|error| error.to_string())?;
     }
     let mut host = Command::new(executable)
         .arg(SERVE_FLAG)

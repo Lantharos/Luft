@@ -4,6 +4,8 @@ use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::time::SystemTime;
 
+use luft_app::files;
+
 use crate::paths;
 
 const LOCALE: &str = "include \"%L\"\n";
@@ -65,7 +67,8 @@ pub fn include(file: &Path) -> Result<(), String> {
     let line = include_line(file);
     let main = main_file();
     if !main.exists() {
-        paths::write(&main, &format!("{LOCALE}{line}"))?;
+        files::replace(&main, format!("{LOCALE}{line}").as_bytes())
+            .map_err(|error| error.to_string())?;
     }
     for target in std::iter::once(main).chain(shadowing()) {
         let contents = fs::read_to_string(&target).unwrap_or_default();

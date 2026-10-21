@@ -42,12 +42,6 @@ impl Entry {
     }
 
     pub fn store(&self, text: &str) {
-        let Some(parent) = self.0.parent() else {
-            return;
-        };
-        let staging = self.0.with_extension("part");
-        if fs::create_dir_all(parent).is_ok() && fs::write(&staging, text).is_ok() {
-            let _ = fs::rename(staging, &self.0);
-        }
+        let _ = luft_app::files::replace(&self.0, text.as_bytes());
     }
 }

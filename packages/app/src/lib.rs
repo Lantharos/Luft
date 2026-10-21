@@ -5,6 +5,7 @@ pub use luft_dbus as dbus;
 pub use luft_i18n as i18n;
 mod desktop;
 pub mod file_manager;
+pub mod files;
 #[cfg(feature = "fonts")]
 pub mod fonts;
 #[cfg(feature = "ibus")]
@@ -15,6 +16,8 @@ pub mod portal;
 pub mod recovery;
 mod sample;
 pub mod secrets;
+#[cfg(feature = "settings")]
+pub mod settings;
 mod tasks;
 #[cfg(feature = "thumbnails")]
 pub mod thumbnails;

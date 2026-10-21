@@ -7,7 +7,7 @@ use std::process::Command;
 
 use anyhow::{Context, Result};
 
-use super::build::LIBRARY_CACHE;
+use super::build::{LIBRARY_CACHE, selinux};
 use super::manifest::{Build, Placed};
 use super::{IMAGE, NAME};
 use crate::command::{run, text};
@@ -136,6 +136,9 @@ pub fn settle(build: &Build) -> Result<()> {
         run(Command::new("udevadm").args(["control", "--reload"]))?;
         run(Command::new("udevadm").args(["trigger", "--action=change"]))?;
     }
+    if !build.selinux_modules.is_empty() {
+        selinux::load_shipped()?;
+    }
     Ok(())
 }
 
@@ -249,6 +252,9 @@ pub fn after_removal(old: Option<&Build>, new: Option<&Build>) -> Result<()> {
     }
     if had(|build| build.udev_rules) {
         run(Command::new("udevadm").args(["control", "--reload"]))?;
+    }
+    if had(|build| !build.selinux_modules.is_empty()) {
+        selinux::load_own()?;
     }
     Ok(())
 }

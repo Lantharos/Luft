@@ -12,7 +12,7 @@ The system stays the signed image it always is. The packages someone asks for be
 | `/var/lib/luft/system-packages/files/NAME.rpm` | Package files installed by themselves |
 | `/var/lib/luft/system-packages/builds/DIGEST/` | `luft-system-packages.raw` and `build.json`, for the version whose composefs digest is `DIGEST` |
 | `/var/lib/luft/system-packages/footprint.json` | What the packages created in `/etc` and `/var`, and the users and groups, that wasn't there before |
-| `/var/cache/luft/system-packages` | dnf's metadata and downloads |
+| `/var/cache/luft/system-packages` | dnf's metadata and the packages the current list needs, readable only by root |
 | `/run/extensions/luft-system-packages.raw` | A link to this version's build, made at every start |
 
 When the list becomes empty, all of these go. Software sources stay:
@@ -29,7 +29,7 @@ Luft's image leaves both folders empty, so everything in them was added this way
 `luft-updater` builds on a thread of its own in a private mount namespace, so nothing it mounts is seen elsewhere:
 
 1. Mount the version's system read-only from the composefs repository with `bootc internals cfs mount`, which checks every file against the digest like the startup image does, and put a writable overlay over it.
-2. Copy the software sources and their keys into the build root, and `dnf --installroot install --downloadonly` against that version's own package database, Fedora's repositories in `/usr/share/dnf5/repos.d` and the added ones, without weak dependencies. Package files installed by themselves are named by their path, so dnf brings what they need. The downloads are collected from dnf's cache, whose folders name the repository each package came from, which `build.json` keeps.
+2. Copy the software sources and their keys into the build root, and `dnf --installroot install --store` against that version's own package database, Fedora's repositories in `/usr/share/dnf5/repos.d` and the added ones, without weak dependencies. Package files installed by themselves are named by their path, so dnf brings what they need. The stored transaction names every package and the repository it came from, which `build.json` keeps. Its packages are linked back into dnf's cache and everything else there is deleted, so the next build only downloads what changed; they're checked again when they're installed, like any download.
 3. Refuse what can't be a system package (below).
 4. Give the build root the computer's users and groups from `/etc/passwd` and `/etc/group`, without passwords, so what scriptlets add gets IDs that are free on the computer. Those an earlier build made are renamed, keeping their IDs taken, so the packages make them again and the build learns they're still wanted.
 5. Import Fedora's keys from `/usr/share/pki/rpm-gpg` and the added sources' keys, and install with `rpm --install` and `_pkgverify_level all`, so every package must carry a valid signature from one of them. Package files installed by themselves follow in a second transaction with `_pkgverify_level digest`, like dnf treats a local file. `rpm` runs in a bubblewrap sandbox whose whole filesystem is the build root, so its scriptlets can't reach anything else: no network, their own process, IPC and host name namespaces, a fresh `/tmp` and `/run`, a `/dev` with only the harmless devices, no `/proc` or `/sys`, and only the capabilities that write files (owners, modes, file capabilities, switching users), with the bounding set narrowed to those so a file capability they set can't hand more back.
@@ -38,7 +38,8 @@ Luft's image leaves both folders empty, so everything in them was added this way
 8. Take along what scriptlets made in `/usr` and `/opt` that's new to the system, such as the `/usr/bin` links Electron apps and 1Password make to their programs in `/opt`, and the polkit policy 1Password fills in. Scriptlets' changes to what the packages own, such as `chmod 4755` on Chromium's sandbox or 1Password's setgid helper, are kept since files are copied from the build root. Everything else scriptlets change stays in the build root.
 9. Declare the users and groups the packages made, by sysusers.d or a scriptlet's `useradd` and `groupadd`, in the extension's `/usr/lib/sysusers.d/00-luft-system-packages.conf`, with the IDs they have on the computer, and move the extension's files to those IDs where the build root gave others. Being first, these lines decide over the packages' own sysusers.d entries.
 10. Turn services on with `systemctl preset` in the build root. Fedora's presets decide for packages they mention (Docker's socket, libvirt's sockets, CUPS); the services of requested packages they don't mention, such as tailscaled, are turned on, while dependencies they don't mention, such as containerd, stay off until something starts them. The links go into the extension's `/usr/lib/systemd/system`, so they leave with it.
-11. Label everything with that version's SELinux `file_contexts` and make the EROFS image, which keeps the labels.
+11. When scriptlets loaded SELinux policy modules, build the policy again (below).
+12. Label everything with the build root's SELinux `file_contexts`, which includes what the modules add, and make the EROFS image, which keeps the labels.
 
 `/opt` is part of Luft's image, an empty folder, and `systemd-sysext` merges `/usr` and `/opt`, so apps that install into `/opt`, such as 1Password, Chrome and Electron apps, are part of the extension like everything in `/usr`. Extensions are merged without `nosuid`, so setuid and setgid programs work.
 
@@ -64,6 +65,12 @@ Before a build is merged, `footprint.json` notes every path it declares that doe
 
 Installing libvirt, running a virtual machine with an emulated TPM on its default network and removing it leaves `/etc`, `/var`, users and groups exactly as before. Installing tailscale and Docker, running a container and removing both leaves `/etc`, `/var`, users and groups as before, except for what a daemon makes on its own where nothing names it: Docker's containerd leaves an empty `/etc/cni/net.d`. Deleting such paths by guesswork, such as every path a package's programs mention, would sooner or later delete something another program put there (containerd also mentions `/etc/cdi`, where NVIDIA's container toolkit keeps its files), so they stay. Network state such as Docker's bridge and firewall rules lasts until the next restart.
 
+## SELinux policy
+
+On Luft the policy's module store is in `/etc/selinux/targeted/active`, part of the image. Luft's modules sit at priority 400, Fedora's at 100 and 200, and `semodule` loads a module at 400 unless told otherwise. Running `semodule` on the computer would rebuild the policy in `/etc`, and the changed files would then win bootc's three-way merge at every update, so the image's policy would stop being updated.
+
+Instead, scriptlets see SELinux as on in the sandbox, so `semodule -i`, as in Docker CE's scriptlet or a `-selinux` package's, writes into the build root's copy of that version's store. The computer's own customisations, the `*.local` files such as booleans set with `setsebool -P`, are copied in first. When modules were added, `semodule -B` builds the binary policy, and it goes into the extension as `/usr/lib/luft-system-packages/selinux-policy`. Settling loads it into the kernel through `/sys/fs/selinux/load`; when a build without modules replaces one with them, `load_policy` loads `/etc`'s again. Nothing in `/etc` changes, and each version's build is made from that version's own store, so the image's policy updates keep arriving, with the modules on top. A module someone adds by hand with `semodule`, or a later `setsebool -P`, reloads `/etc`'s policy without the packages' modules until the next start.
+
 ## Software sources
 
 Schelf fetches a source as the user, from the address of a `.repo` file, `copr:owner/project` (the COPR's file for this Fedora release) or a vendor it knows by name, along with every key `gpgkey` names over HTTPS. `DescribeRepository` checks it without changing anything, and Schelf shows the result before anyone is asked for a password:
@@ -87,11 +94,10 @@ Going back needs nothing: the previous version keeps its build. If the list chan
 ## What's refused
 
 - **Kernel modules.** Luft starts with Secure Boot and `lockdown=integrity`, so the kernel enforces module signatures (`module.sig_enforce` is on). Modules would have to be signed with a key enrolled in shim, and the only enrolled key is Luft's, whose private half isn't on the computer. Luft has no way to enroll a local key.
-- **SELinux policy modules.** `semodule` rebuilds the binary policy from the module store in `/var/lib/selinux`, which on a bootc system is only written when it's installed, while policy updates arrive precompiled in the image's `/etc/selinux`. Adding a module would rebuild an outdated policy, and the locally changed files would then win bootc's three-way merge of `/etc` at every update, so the image's policy updates would stop arriving. Luft's image carries swtpm and `swtpm-selinux` for that reason, since libvirt's QEMU driver needs swtpm, and with it the policy.
+- **SELinux modules that replace or remove one of Luft's own**, at any priority.
 - **Packages Luft already has, or newer versions of them.** The extension would hide part of the system. dnf's resolution against the version's own package database leaves these out unless something needs a newer version, which usually works after the next update.
 - **Files outside `/usr`, `/opt`, `/etc`, `/var` and `/run`**, such as `/boot`.
 - **Sources that don't sign their packages**, such as Stripe's, whose `.repo` file turns `gpgcheck` off and whose packages carry no signature.
-- **SELinux modules a scriptlet loads.** Docker CE's scriptlet loads two modules that deny containers some socket families; `semodule` can't reach the policy from the sandbox, the scriptlet carries on, and Docker works without them.
 
 ## Security
 

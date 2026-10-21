@@ -52,6 +52,7 @@ pub struct Build {
     pub declared: Declared,
     pub udev_rules: bool,
     pub libraries: bool,
+    pub selinux_modules: Vec<String>,
 }
 
 impl Build {

@@ -5,7 +5,6 @@ use anyhow::{Result, bail};
 use super::rpm::Rpm;
 
 const KERNEL_MODULES: [&str; 2] = ["/usr/lib/modules/", "/lib/modules/"];
-const SELINUX_POLICY: &str = "/usr/share/selinux/packages/";
 const MERGED: [&str; 2] = ["/usr/", "/opt/"];
 const PLACED: [&str; 2] = ["/etc/", "/var/"];
 const RUNTIME: [&str; 4] = ["/run/", "/var/run/", "/var/lock/", "/tmp/"];
@@ -55,12 +54,6 @@ pub fn check(requested: &BTreeSet<String>, rpms: &[Rpm], base: &BTreeSet<String>
                 "{name} adds drivers to the kernel. With Secure Boot, the kernel only loads drivers \
                  signed with a key the computer trusts, and they can't be signed on the computer, \
                  so {name} can't be a system package."
-            );
-        }
-        if has(SELINUX_POLICY) {
-            bail!(
-                "{name} changes the SELinux security policy, which would keep Luft's own policy \
-                 from being updated, so it can't be a system package."
             );
         }
         if let Some(file) = rpm.files.iter().find(|file| place(&file.path).is_none()) {
@@ -115,15 +108,6 @@ mod tests {
             &["/usr/lib/modules/7.2.9/extra/v4l2loopback.ko.xz"],
         )];
         assert!(refused(&rpms).contains("drivers"));
-    }
-
-    #[test]
-    fn refuses_selinux_policy_modules() {
-        let rpms = [rpm(
-            "swtpm-selinux",
-            &["/usr/share/selinux/packages/swtpm.pp"],
-        )];
-        assert!(refused(&rpms).contains("SELinux"));
     }
 
     #[test]

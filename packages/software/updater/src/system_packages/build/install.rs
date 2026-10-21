@@ -6,6 +6,7 @@ use std::process::Command;
 use anyhow::{Context, Result, bail};
 
 use super::rpm::Rpm;
+use super::selinux;
 use crate::command::run;
 use crate::system_packages::manifest::Origin;
 
@@ -58,6 +59,7 @@ fn sandboxed(root: &Path, packages: &Path) -> Command {
         .arg(packages)
         .arg(PACKAGES)
         .args(["--dev", "/dev"])
+        .args(selinux::seen_as_on(root))
         .args([
             "--unshare-net",
             "--unshare-pid",
@@ -95,6 +97,13 @@ fn transaction(root: &Path, packages: &Path, level: &str, rpms: &[&Rpm]) -> Resu
         })))
     .context("Installing the packages")
     .map(drop)
+}
+
+/// Builds the build root's policy again from its store, with the packages' modules.
+pub fn rebuild_policy(root: &Path, packages: &Path) -> Result<()> {
+    run(sandboxed(root, packages).args(["semodule", "-B"]))
+        .context("Building the security policy with the packages' modules")
+        .map(drop)
 }
 
 /// Installs the packages into the build root, those from Fedora and the added repositories

@@ -4,6 +4,7 @@ mod download;
 mod install;
 mod made;
 mod rpm;
+pub mod selinux;
 mod stage;
 mod units;
 
@@ -11,6 +12,7 @@ use std::collections::BTreeSet;
 use std::ffi::CString;
 use std::fs;
 use std::os::unix::ffi::OsStrExt;
+use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
@@ -124,8 +126,8 @@ fn release(stage: &Path, os: &OsRelease) -> Result<()> {
     Ok(())
 }
 
-fn label(tree: &Path, stage: &Path) -> Result<()> {
-    let contexts = tree.join("etc/selinux/targeted/contexts/files/file_contexts");
+fn label(root: &Path, stage: &Path) -> Result<()> {
+    let contexts = root.join(selinux::FILE_CONTEXTS);
     run(Command::new("setfiles")
         .args(["-F", "-r"])
         .arg(stage)
@@ -178,7 +180,9 @@ pub fn build(
         work.folder("overlay")?,
         work.folder("root")?,
     );
-    let (rpms_folder, stage_folder) = (work.folder("rpms")?, work.folder("stage")?);
+    let stage_folder = work.folder("stage")?;
+    let store = work.path.join("store");
+    let rpms_folder = store.join("packages");
     deployment::mount(digest, &tree)?;
     work.mounted(&tree);
     run(Command::new("mount")
@@ -193,6 +197,7 @@ pub fn build(
     work.mounted(&root);
     let cache = root.join("var/cache/libdnf5");
     fs::create_dir_all(CACHE)?;
+    fs::set_permissions(CACHE, fs::Permissions::from_mode(0o700))?;
     fs::create_dir_all(&cache)?;
     run(Command::new("mount").arg("--bind").arg(CACHE).arg(&cache))?;
     work.mounted(&cache);
@@ -200,7 +205,7 @@ pub fn build(
     let os = os_release(&tree)?;
     download::offer(&root, sources)?;
     step(Step::Downloading);
-    let origins = download::download(&root, &os.version_id, requested, sources, &rpms_folder)?;
+    let origins = download::download(&root, &os.version_id, requested, sources, &store)?;
     let mut rpms = origins
         .into_iter()
         .map(|(path, origin)| rpm::query(&path).map(|rpm| rpm::Rpm { origin, ..rpm }))
@@ -212,6 +217,7 @@ pub fn build(
     step(Step::Building);
     let made_before = super::footprint()?;
     let seeded = accounts::seed(&root, made_before.users(), made_before.groups())?;
+    let policy_before = selinux::before(&root)?;
     install::install(&root, &os.version_id, &rpms_folder, &rpms)?;
     let accounts = accounts::collect(&root, &seeded)?;
     let layout = Layout {
@@ -225,6 +231,9 @@ pub fn build(
     let placed = stage::placed(&layout, &rpms)?;
     made::made(&layout, &rpms)?;
     accounts::settle(&stage_folder, &accounts, &seeded)?;
+    let selinux_modules = selinux::ship(&policy_before, &root, &stage_folder, || {
+        install::rebuild_policy(&root, &rpms_folder)
+    })?;
     release(&stage_folder, &os)?;
     let names = rpms
         .iter()
@@ -269,10 +278,11 @@ pub fn build(
         tmpfiles: entries(&stage_folder.join("usr/lib/tmpfiles.d"), "conf"),
         udev_rules: !entries(&stage_folder.join("usr/lib/udev/rules.d"), "rules").is_empty(),
         libraries,
+        selinux_modules,
         placed,
         declared,
     };
-    label(&tree, &stage_folder)?;
+    label(&root, &stage_folder)?;
     image(&stage_folder, image_path)?;
     Ok(build)
 }

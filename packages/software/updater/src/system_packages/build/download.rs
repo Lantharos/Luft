@@ -1,9 +1,10 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
 use anyhow::{Context, Result, anyhow};
+use serde::Deserialize;
 
 use super::CACHE;
 use crate::command::failure;
@@ -36,25 +37,62 @@ pub fn offer(root: &Path, sources: &Sources) -> Result<()> {
     Ok(())
 }
 
-fn downloaded() -> impl Iterator<Item = (String, PathBuf)> {
+#[derive(Deserialize)]
+struct Stored {
+    rpms: Vec<StoredRpm>,
+}
+
+#[derive(Deserialize)]
+struct StoredRpm {
+    repo_id: String,
+    package_path: String,
+}
+
+const STORED: &str = "@stored_transaction(";
+const COMMAND_LINE: &str = "@commandline";
+
+/// The folder dnf keeps a repository's metadata and packages in, named after its ID and a
+/// hash of its settings.
+fn cache_folder(repository: &str) -> Option<PathBuf> {
+    fs::read_dir(CACHE).ok()?.flatten().find_map(|entry| {
+        let name = entry.file_name().into_string().ok()?;
+        let hash = name.strip_prefix(repository)?.strip_prefix('-')?;
+        (hash.len() == 16 && hash.chars().all(|character| character.is_ascii_hexdigit()))
+            .then(|| entry.path())
+    })
+}
+
+fn cached() -> impl Iterator<Item = PathBuf> {
     fs::read_dir(CACHE)
         .into_iter()
         .flatten()
         .flatten()
-        .filter_map(|entry| {
-            let name = entry.file_name().into_string().ok()?;
-            let (repository, _) = name.rsplit_once('-')?;
-            let packages = fs::read_dir(entry.path().join(PACKAGES)).ok()?;
-            Some(
-                packages
-                    .flatten()
-                    .map(|package| package.path())
-                    .filter(|path| path.extension().is_some_and(|found| found == "rpm"))
-                    .map(|path| (repository.to_owned(), path))
-                    .collect::<Vec<_>>(),
-            )
-        })
+        .filter_map(|entry| fs::read_dir(entry.path().join(PACKAGES)).ok())
         .flatten()
+        .flatten()
+        .map(|package| package.path())
+        .filter(|path| path.extension().is_some_and(|found| found == "rpm"))
+}
+
+/// Keeps the packages of this build in dnf's cache for the next one, and only those.
+fn keep(downloads: &[(String, PathBuf)]) -> Result<()> {
+    let mut kept = HashSet::new();
+    for (repository, package) in downloads {
+        let Some(folder) = cache_folder(repository) else {
+            continue;
+        };
+        let folder = folder.join(PACKAGES);
+        fs::create_dir_all(&folder)?;
+        let target = folder.join(package.file_name().unwrap_or_default());
+        if !target.exists() {
+            fs::hard_link(package, &target).context("Keeping the downloaded packages")?;
+        }
+        kept.insert(target);
+    }
+    for stale in cached().filter(|path| !kept.contains(path)) {
+        fs::remove_file(stale)?;
+    }
+    Ok(())
 }
 
 /// Runs dnf, naming the package it couldn't find when that's why it failed.
@@ -78,18 +116,16 @@ fn resolve(command: &mut Command) -> Result<()> {
     }
 }
 
-/// Downloads the packages in `requested` and what they need into `into`, resolved against the
-/// build root's own packages, and says where each came from.
+/// Downloads the packages in `requested` and what they need into `store`, resolved against the
+/// build root's own packages, and says where each came from. Packages kept from earlier builds
+/// aren't downloaded again; rpm checks them like any other when it installs them.
 pub fn download(
     root: &Path,
     release: &str,
     requested: &Requested,
     sources: &Sources,
-    into: &Path,
+    store: &Path,
 ) -> Result<HashMap<PathBuf, Origin>> {
-    for (_, stale) in downloaded() {
-        fs::remove_file(stale)?;
-    }
     let wanted = requested.iter().map(|name| match sources.files.get(name) {
         Some(file) => file.as_os_str().to_owned(),
         None => name.into(),
@@ -108,26 +144,36 @@ pub fn download(
                 "--assumeyes",
                 "--quiet",
                 "install",
-                "--downloadonly",
             ])
+            .arg(format!("--store={}", store.display()))
             .args(wanted),
+    )?;
+    let stored: Stored = serde_json::from_slice(
+        &fs::read(store.join("transaction.json")).context("Reading the planned packages")?,
     )?;
     let owners = repositories::owners(&sources.repositories);
     let mut origins = HashMap::new();
-    for (repository, path) in downloaded() {
-        let target = into.join(path.file_name().unwrap_or_default());
-        fs::rename(&path, &target).context("Collecting the downloaded packages")?;
-        let origin = owners
-            .get(&repository)
-            .map_or(Origin::Fedora, |file| Origin::Repository(file.clone()));
-        origins.insert(target, origin);
-    }
-    for name in requested {
-        if let Some(file) = sources.files.get(name) {
-            let target = into.join(format!("{name}.rpm"));
-            fs::hard_link(file, &target).context("Collecting the package files")?;
-            origins.insert(target, Origin::File);
+    let mut downloads = Vec::new();
+    for rpm in stored.rpms {
+        let path = store.join(&rpm.package_path);
+        let repository = rpm
+            .repo_id
+            .strip_prefix(STORED)
+            .and_then(|rest| rest.strip_suffix(')'))
+            .unwrap_or(&rpm.repo_id)
+            .to_owned();
+        let origin = if repository == COMMAND_LINE {
+            Origin::File
+        } else if let Some(file) = owners.get(&repository) {
+            Origin::Repository(file.clone())
+        } else {
+            Origin::Fedora
+        };
+        if origin != Origin::File {
+            downloads.push((repository, path.clone()));
         }
+        origins.insert(path, origin);
     }
+    keep(&downloads)?;
     Ok(origins)
 }

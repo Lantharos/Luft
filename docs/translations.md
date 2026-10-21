@@ -46,7 +46,7 @@ The glossary for each language is `packages/i18n/glossary/<language>.csv`, and i
 - **Rust services** read `LANGUAGE`, `LC_ALL`, `LC_MESSAGES` and `LANG`, in that order.
 - A message that isn't translated yet shows in English; the rest of the screen stays translated.
 - `sr` is Serbian in Cyrillic and `sr-Latn` Serbian in Latin script. The locale `sr_RS.UTF-8@latin` picks Latin, any other Serbian locale Cyrillic. Serbian is translated once, in Cyrillic: `bun run transliterate` in `packages/i18n` writes the Latin files from it, and the checker fails when they differ.
-- Dates, numbers and units follow the formats locale: the region chosen in Settings, which the session applies as `LC_TIME`, `LC_NUMERIC`, `LC_MONETARY`, `LC_MEASUREMENT` and `LC_PAPER`, or else the language.
+- Dates, numbers and units follow the formats locale: the region chosen in Settings, or else the account's language. The session applies it as `LC_TIME`, `LC_NUMERIC`, `LC_MONETARY`, `LC_MEASUREMENT` and `LC_PAPER`, and Kestrel follows a change to either right away and hands it to apps started afterwards. Setup only picks formats for the time zone's country when they are in the person's language and script, so English in Serbia keeps following English.
 
 Settings → Language & Region sets the account's language through AccountsService, like the language picked during setup. The new language reaches the login screen and the whole session at the next sign-in, and Kestrel and newly started apps right away.
 

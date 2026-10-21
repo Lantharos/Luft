@@ -3,7 +3,7 @@
 	import { Row, Section, Select } from '@luft/ui';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import { setLanguage } from './api';
-	import { FORMATS, formatsName, formatsSample } from './formats';
+	import { FORMATS, formatsName, formatsSample, formatsTag } from './formats';
 
 	const locale = useSettings<{ region: string }>('org.gnome.system.locale', ['region']);
 
@@ -18,17 +18,24 @@
 		...FORMATS.map((value) => ({ value, label: formatsName(value, i18n.locale) }))
 	]);
 
+	const formatsFor = (chosenRegion: string, tag: string) => (chosenRegion ? formatsTag(chosenRegion) : tag);
+
 	async function chooseLanguage(posix: string) {
 		const chosen = LANGUAGES.find((entry) => entry.posix === posix);
 		if (!chosen) return;
 		problem = '';
 		try {
 			await setLanguage(posix);
-			await i18n.use(chosen.tag);
+			await i18n.use(chosen.tag, formatsFor(region, chosen.tag));
 			changed = true;
 		} catch (error) {
 			problem = String(error);
 		}
+	}
+
+	async function chooseFormats(value: string) {
+		locale.set('region', value);
+		await i18n.use(language.tag, formatsFor(value, language.tag));
 	}
 </script>
 
@@ -37,6 +44,6 @@
 		<Select label={t('settings-region-language')} options={languages} value={language.posix} onchange={chooseLanguage} />
 	</Row>
 	<Row title={t('settings-region-formats')} description={region ? t('settings-region-formats-next-sign-in', { sample: formatsSample(region) }) : t('settings-region-formats-description')}>
-		<Select label={t('settings-region-formats')} options={formats} value={region} onchange={(value) => locale.set('region', value)} />
+		<Select label={t('settings-region-formats')} options={formats} value={region} onchange={chooseFormats} />
 	</Row>
 </Section>

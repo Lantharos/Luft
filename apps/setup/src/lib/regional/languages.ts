@@ -112,6 +112,17 @@ export function keyboardFor(country: string | null): string | null {
 }
 
 export function countryOf(tag: string | null): string | null {
-	const region = tag?.split(/[-_.@]/)[1];
-	return region && /^[A-Za-z]{2}$/.test(region) ? region.toUpperCase() : null;
+	const region = tag?.split(/[-_.@]/).slice(1).find((part) => /^[A-Za-z]{2}$/.test(part));
+	return region?.toUpperCase() ?? null;
+}
+
+function writtenAs(tag: string): string {
+	const { language, script } = new Intl.Locale(tag).maximize();
+	return `${language}-${script}`;
+}
+
+export function formatsIn(tag: string, country: string): string | null {
+	if (countryOf(tag) === country) return null;
+	const written = writtenAs(tag);
+	return LANGUAGES.find((language) => language.country === country && writtenAs(languageTag(language)) === written)?.locale ?? null;
 }

@@ -3,7 +3,7 @@ import { catalog, formatsCountry, locate, setFormats, useKeyboard, useLanguage, 
 import type { Hints, Keyboard } from '#lib/api/installer.js';
 import { describe, outranks, type Field, type Guesses, type Source } from '#lib/regional/guesses.js';
 import { namedZones } from '#lib/regional/zones.js';
-import { countryOf, DEFAULT_LANGUAGE, keyboardFor, languageFor, languageNamed, LANGUAGES, languageTag, type Language } from '#lib/regional/languages.js';
+import { countryOf, DEFAULT_LANGUAGE, formatsIn, keyboardFor, languageFor, languageNamed, LANGUAGES, languageTag, type Language } from '#lib/regional/languages.js';
 
 const FALLBACK_ZONE = 'UTC';
 
@@ -49,9 +49,8 @@ class RegionalState {
 
 	async adoptFormats() {
 		const country = await formatsCountry();
-		if (!country || countryOf(navigator.language) === country) return;
-		const { language } = new Intl.Locale(`und-${country}`).maximize();
-		await setFormats(`${language}_${country}.UTF-8`);
+		const formats = country && formatsIn(i18n.formats, country);
+		if (formats) await setFormats(formats);
 	}
 
 	chooseLanguage(language: Language) {

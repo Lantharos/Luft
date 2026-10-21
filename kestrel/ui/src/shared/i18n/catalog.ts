@@ -10,6 +10,7 @@ const RESOURCES = '/com/lantharos/kestrel/locales';
 const decoder = new TextDecoder();
 const listeners = new Set<() => void>();
 let chosen = '';
+let chosenFormats = '';
 let catalog: Catalog | null = null;
 let english: Catalog | null = null;
 
@@ -36,8 +37,8 @@ export const inEnglish = (id: string, args?: Args): string => (english ??= load(
 export function formatsLocale(): string {
   const override = GLib.getenv('LUFT_LOCALE');
   if (override) return override;
-  const name = GLib.getenv('LC_ALL') || GLib.getenv('LC_TIME') || GLib.getenv('LANG');
-  return (name && bcp47(name)) || locale();
+  const named = chosenFormats || chosen || GLib.getenv('LC_ALL') || GLib.getenv('LC_TIME') || GLib.getenv('LANG');
+  return (named && bcp47(named)) || locale();
 }
 
 export function onLocaleChanged(listener: () => void): () => void {
@@ -45,12 +46,12 @@ export function onLocaleChanged(listener: () => void): () => void {
   return () => listeners.delete(listener);
 }
 
-export function chooseLanguage(language: string): boolean {
-  const previous = current().locale;
+export function chooseLocale(language: string, formats: string): void {
+  const [previousLocale, previousFormats] = [current().locale, formatsLocale()];
   chosen = language;
+  chosenFormats = formats;
   const next = negotiate(requested());
-  if (next === previous) return false;
-  catalog = load(next);
+  if (next !== previousLocale) catalog = load(next);
+  if (next === previousLocale && formatsLocale() === previousFormats) return;
   for (const listener of [...listeners]) listener();
-  return true;
 }

@@ -22,8 +22,9 @@ mkdir -p "${DCONF_PROFILE%/*}"
 export DCONF_PROFILE
 
 region="$(gsettings get org.gnome.system.locale region 2> /dev/null | tr -d "'")"
-if [ -n "$region" ]; then
-  export LC_TIME="$region" LC_NUMERIC="$region" LC_MONETARY="$region" LC_MEASUREMENT="$region" LC_PAPER="$region"
+formats="${region:-$LANG}"
+if [ -n "$formats" ]; then
+  export LC_TIME="$formats" LC_NUMERIC="$formats" LC_MONETARY="$formats" LC_MEASUREMENT="$formats" LC_PAPER="$formats"
 fi
 
 systemctl --user reset-failed

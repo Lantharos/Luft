@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { bytes, Checkbox, Dialog } from '@luft/ui';
-	import type { Place } from '#lib/api/meet.js';
+	import type { Place } from '#lib/bridge/meet.js';
 	import { volumeDetail, volumeName } from './describe.js';
 
 	interface Props {

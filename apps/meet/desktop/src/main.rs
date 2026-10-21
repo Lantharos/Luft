@@ -1,15 +1,8 @@
 #![cfg_attr(target_os = "windows", windows_subsystem = "windows")]
-#![cfg_attr(all(test, not(windows)), allow(dead_code))]
 mod app;
 mod boot;
 mod check;
-#[cfg(windows)]
-mod folders;
-#[cfg(windows)]
-mod helper;
 mod language;
-#[cfg(windows)]
-mod libraries;
 #[cfg(target_os = "linux")]
 mod linux;
 mod live;
@@ -18,6 +11,8 @@ mod plan;
 mod protocol;
 mod serving;
 mod stick;
+#[cfg(windows)]
+mod windows;
 
 use luft_i18n::Localizer;
 
@@ -25,10 +20,10 @@ static L10N: Localizer = luft_i18n::localizer!("locales", ["desktop"]);
 
 fn main() {
     #[cfg(windows)]
-    if let Some(link) = helper::requested() {
-        if libraries::only_from_system32() {
+    if let Some(link) = windows::helper::requested() {
+        if windows::libraries::only_from_system32() {
             L10N.use_locale(&link.locale);
-            helper::serve(link);
+            windows::helper::serve(link);
         }
         return;
     }

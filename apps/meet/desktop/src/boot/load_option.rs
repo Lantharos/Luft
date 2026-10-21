@@ -1,5 +1,3 @@
-#[cfg(any(windows, test))]
-pub const GLOBAL_VARIABLES: &str = "{8BE4DF61-93CA-11D2-AA0D-00E098032B8C}";
 pub const DESCRIPTION: &str = "Meet Luft";
 const ACTIVE: u32 = 1;
 const MEDIA: u8 = 0x04;

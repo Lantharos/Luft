@@ -13,7 +13,7 @@ const START_FILES: [&str; 6] = [
     "boot/menu.cfg",
 ];
 const LIVE_FOLDER: &str = "LiveOS/";
-#[cfg(any(windows, test))]
+#[cfg(windows)]
 const GRUB_CONFIGS: [&str; 2] = ["EFI/BOOT/grub.cfg", "EFI/fedora/grub.cfg"];
 pub const BUILD_RECORD: &str = "LiveOS/iso.sha256";
 pub const UPDATING: &str = "updating";
@@ -54,7 +54,7 @@ pub fn grub_config(live_partition: &str) -> String {
     format!("set medium='PARTUUID={live_partition}'\nexport medium\nsource /boot/menu.cfg\n")
 }
 
-#[cfg(any(windows, test))]
+#[cfg(windows)]
 pub fn write_grub_configs(start: &Path, live_partition: &str) -> io::Result<()> {
     for config in GRUB_CONFIGS {
         let path = start.join(config);
@@ -69,7 +69,7 @@ pub fn on(root: &Path, path: &str) -> PathBuf {
         .fold(root.to_owned(), |target, part| target.join(part))
 }
 
-#[cfg(any(windows, test))]
+#[cfg(windows)]
 fn gone(result: io::Result<()>) -> io::Result<()> {
     match result {
         Err(error) if error.kind() == io::ErrorKind::NotFound => Ok(()),
@@ -77,7 +77,7 @@ fn gone(result: io::Result<()>) -> io::Result<()> {
     }
 }
 
-#[cfg(any(windows, test))]
+#[cfg(windows)]
 pub fn clear(start: &Path, live: &Path) -> io::Result<()> {
     for file in START_FILES {
         gone(fs::remove_file(on(start, file)))?;
@@ -85,7 +85,7 @@ pub fn clear(start: &Path, live: &Path) -> io::Result<()> {
     gone(fs::remove_dir_all(on(live, LIVE_FOLDER)))
 }
 
-#[cfg(any(windows, test))]
+#[cfg(windows)]
 pub fn split(start: PathBuf, live: PathBuf) -> impl Fn(&str) -> PathBuf {
     move |path| {
         let root = match place(path) {

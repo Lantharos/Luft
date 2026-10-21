@@ -1,6 +1,6 @@
-import { Failed, pickIso } from '#lib/api/meet.js';
-import * as api from '#lib/api/stick.js';
-import type { Finished, Offer, Room, Stick, Way } from '#lib/api/stick.js';
+import { Failed, pickIso } from '#lib/bridge/meet.js';
+import * as api from '#lib/bridge/stick.js';
+import type { Finished, Offer, Room, Stick, Way } from '#lib/bridge/stick.js';
 import { session, type Failure, type Step } from '#lib/state/meet.svelte.js';
 
 const LOOK_EVERY = 2500;

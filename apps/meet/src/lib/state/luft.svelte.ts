@@ -1,5 +1,5 @@
-import * as meet from '#lib/api/meet.js';
-import type { Installed, Range } from '#lib/api/meet.js';
+import * as meet from '#lib/bridge/meet.js';
+import type { Installed, Range } from '#lib/bridge/meet.js';
 import { session } from './meet.svelte.js';
 
 class LuftState {

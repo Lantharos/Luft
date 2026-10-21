@@ -1,6 +1,6 @@
 import { t } from '@luft/i18n';
 import { bytes } from '@luft/ui';
-import type { Contents, Place } from '#lib/api/meet.js';
+import type { Contents, Place } from '#lib/bridge/meet.js';
 
 export function placeTitle(place: Place): string {
 	if (place.kind === 'windows') return t('room-place-windows');

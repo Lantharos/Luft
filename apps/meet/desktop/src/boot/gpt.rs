@@ -87,6 +87,7 @@ mod tests {
         lba1[80..84].copy_from_slice(&128u32.to_le_bytes());
         lba1[84..88].copy_from_slice(&128u32.to_le_bytes());
         let header = header(&lba1).unwrap();
+        assert_eq!(header.entries_lba, 2);
         let mut entries = vec![0u8; 128 * 128];
         let guid = [7u8; 16];
         let third = &mut entries[2 * 128..3 * 128];

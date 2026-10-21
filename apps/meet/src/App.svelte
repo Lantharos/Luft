@@ -4,21 +4,21 @@
 	import { cubicOut } from 'svelte/easing';
 	import { t } from '@luft/i18n';
 	import { appearance, GlassShell, Toast, WindowControls } from '@luft/ui';
-	import * as meet from '#lib/api/meet.js';
+	import * as meet from '#lib/bridge/meet.js';
 	import { luft } from '#lib/state/luft.svelte.js';
 	import { session } from '#lib/state/meet.svelte.js';
-	import Check from '#lib/steps/Check.svelte';
-	import Hello from '#lib/steps/Hello.svelte';
-	import LinuxReady from '#lib/steps/LinuxReady.svelte';
-	import MovingBox from '#lib/steps/MovingBox.svelte';
-	import Ready from '#lib/steps/Ready.svelte';
-	import Removed from '#lib/steps/Removed.svelte';
-	import Resize from '#lib/steps/Resize.svelte';
-	import Room from '#lib/steps/Room.svelte';
-	import Stick from '#lib/steps/Stick.svelte';
-	import StickDone from '#lib/steps/StickDone.svelte';
 	import Working from '#lib/steps/Working.svelte';
-	import YourLuft from '#lib/steps/YourLuft.svelte';
+	import Removed from '#lib/steps/luft/Removed.svelte';
+	import Resize from '#lib/steps/luft/Resize.svelte';
+	import YourLuft from '#lib/steps/luft/YourLuft.svelte';
+	import LinuxReady from '#lib/steps/prepare/LinuxReady.svelte';
+	import MovingBox from '#lib/steps/prepare/MovingBox.svelte';
+	import Ready from '#lib/steps/prepare/Ready.svelte';
+	import Room from '#lib/steps/prepare/Room.svelte';
+	import Check from '#lib/steps/start/Check.svelte';
+	import Hello from '#lib/steps/start/Hello.svelte';
+	import Stick from '#lib/steps/stick/Stick.svelte';
+	import StickDone from '#lib/steps/stick/StickDone.svelte';
 
 	const STEPS = {
 		hello: Hello,

@@ -18,8 +18,10 @@ pub struct Disk {
     pub IsReadOnly: bool,
     pub IsOffline: bool,
     pub PartitionStyle: u16,
+    #[cfg(windows)]
     pub LogicalSectorSize: u32,
     pub UniqueId: Option<String>,
+    #[cfg(windows)]
     pub Path: Option<String>,
 }
 

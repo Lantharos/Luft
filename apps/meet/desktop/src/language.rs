@@ -6,7 +6,7 @@ use serde::Serialize;
 
 use crate::L10N;
 #[cfg(windows)]
-use crate::app::regional::{formats, preferred};
+use crate::windows::regional::{formats, preferred};
 
 const ENGLISH: &str = "en-US";
 

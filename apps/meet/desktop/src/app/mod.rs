@@ -1,21 +1,5 @@
-#[cfg(windows)]
-mod belongings;
 pub mod calls;
-#[cfg(windows)]
-mod dialog;
-#[cfg(windows)]
-mod installed;
 pub mod job;
-#[cfg(windows)]
-mod link;
-#[cfg(windows)]
-mod logs;
-#[cfg(windows)]
-mod on_windows;
-#[cfg(windows)]
-pub mod regional;
-#[cfg(windows)]
-mod registry;
 mod stick;
 
 use std::sync::{Arc, OnceLock};
@@ -30,10 +14,10 @@ use crate::live::download::Channel;
 use crate::live::source::Source;
 use crate::protocol::Call;
 #[cfg(windows)]
-use on_windows as platform;
+use crate::windows::app as platform;
 
 const APP_ID: &str = "com.lantharos.meet";
-const TITLE: &str = "Meet Luft";
+pub const TITLE: &str = "Meet Luft";
 const SIZE: (u32, u32) = (900, 620);
 const NIGHTLY: &str = "--nightly";
 pub const PROGRESS: &str = "meet.progress";

@@ -1,7 +1,7 @@
 import { t } from '@luft/i18n';
 import { Toasts } from '@luft/ui';
-import * as meet from '#lib/api/meet.js';
-import type { Action, Channel, Intent, Packing, PlaceKind, Platform, Prepared, Progress, Report, Source, Stage, WindowsChoices } from '#lib/api/meet.js';
+import * as meet from '#lib/bridge/meet.js';
+import type { Action, Channel, Intent, Packing, PlaceKind, Platform, Prepared, Progress, Report, Source, Stage, WindowsChoices } from '#lib/bridge/meet.js';
 
 export type Step = 'hello' | 'luft' | 'resize' | 'check' | 'room' | 'working' | 'ready' | 'box' | 'removed' | 'stick' | 'stickDone';
 export type Task =

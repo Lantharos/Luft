@@ -5,8 +5,8 @@
 	import SubPage from '#lib/components/SubPage.svelte';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import { hardware } from '#lib/state/hardware.svelte.js';
-	import { canonical, labels } from '../shortcuts/accelerator';
-	import Keys from '../shortcuts/Keys.svelte';
+	import { canonical, labels } from '../shortcuts/keys/accelerator';
+	import Keys from '../shortcuts/keys/Keys.svelte';
 	import type { Binding, ShortcutStore } from '../shortcuts/store.svelte';
 	import ModelRow from './ModelRow.svelte';
 	import { onOverview, openHomepage, overview, type EngineChoice, type Model, type Overview } from './api';

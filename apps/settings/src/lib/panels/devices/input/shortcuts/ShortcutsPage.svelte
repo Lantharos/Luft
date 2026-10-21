@@ -2,7 +2,7 @@
 	import { t } from '@luft/i18n';
 	import { SearchField } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
-	import CustomShortcuts from './CustomShortcuts.svelte';
+	import CustomShortcuts from './custom/CustomShortcuts.svelte';
 	import ShortcutsSection from './ShortcutsSection.svelte';
 	import type { Binding, ShortcutStore } from './store.svelte';
 

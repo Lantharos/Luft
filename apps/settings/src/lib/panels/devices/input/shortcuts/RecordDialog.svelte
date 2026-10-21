@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Dialog } from '@luft/ui';
-	import { typesText } from './accelerator';
-	import KeyCapture from './KeyCapture.svelte';
+	import { typesText } from './keys/accelerator';
+	import KeyCapture from './keys/KeyCapture.svelte';
 	import type { Binding, ShortcutStore } from './store.svelte';
 
 	interface Props {

@@ -9,7 +9,7 @@
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import AddSourceDialog from './AddSourceDialog.svelte';
 	import { inputMethods, keysInstalled, layouts as readLayouts, openKeys } from './api';
-	import ShortcutButton from '../shortcuts/ShortcutButton.svelte';
+	import ShortcutButton from '../shortcuts/keys/ShortcutButton.svelte';
 	import type { Binding, ShortcutStore } from '../shortcuts/store.svelte';
 	import { fromLayout, fromMethod, type Source } from './sources';
 

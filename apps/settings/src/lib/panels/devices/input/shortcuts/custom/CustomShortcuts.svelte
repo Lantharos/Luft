@@ -3,8 +3,8 @@
 	import Plus from '@lucide/svelte/icons/plus';
 	import { item, reorder, Row, Section } from '@luft/ui';
 	import CustomDialog from './CustomDialog.svelte';
-	import Keys from './Keys.svelte';
-	import type { CustomBinding, ShortcutStore } from './store.svelte';
+	import Keys from '../keys/Keys.svelte';
+	import type { CustomBinding, ShortcutStore } from '../store.svelte';
 
 	let { store }: { store: ShortcutStore } = $props();
 

@@ -2,9 +2,9 @@
 	import { t } from '@luft/i18n';
 	import { untrack } from 'svelte';
 	import { Dialog, TextField } from '@luft/ui';
-	import { typesText } from './accelerator';
-	import KeyCapture from './KeyCapture.svelte';
-	import type { CustomBinding, ShortcutStore } from './store.svelte';
+	import { typesText } from '../keys/accelerator';
+	import KeyCapture from '../keys/KeyCapture.svelte';
+	import type { CustomBinding, ShortcutStore } from '../store.svelte';
 
 	interface Props {
 		store: ShortcutStore;

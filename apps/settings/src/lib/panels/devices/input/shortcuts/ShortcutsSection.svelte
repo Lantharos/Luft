@@ -3,8 +3,8 @@
 	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
 	import { IconButton, Row, Section } from '@luft/ui';
 	import type { Category } from './api';
-	import { labels } from './accelerator';
-	import ShortcutButton from './ShortcutButton.svelte';
+	import { labels } from './keys/accelerator';
+	import ShortcutButton from './keys/ShortcutButton.svelte';
 	import type { Binding, ShortcutStore } from './store.svelte';
 
 	interface Props {

@@ -1,7 +1,7 @@
 import { onDestroy, untrack } from 'svelte';
 import { KESTREL_SCHEMA, SettingsGroup } from '#lib/state/gsettings.svelte.js';
 import { appNames, resetSetting, shortcutEntries, writeSetting, type Category, type ShortcutEntry } from './api';
-import { canonical, sameAccelerators } from './accelerator';
+import { canonical, sameAccelerators } from './keys/accelerator';
 
 const MEDIA_KEYS = 'com.lantharos.kestrel.media-keys';
 const CUSTOM_SCHEMA = 'com.lantharos.kestrel.custom-keybinding';

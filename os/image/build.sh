@@ -33,8 +33,8 @@ the driver, so the two images share every layer below it.
 The image is put together from parts: Kestrel, the boot services, the patched
 bootc, the web runtime, Helium, the system services, each app and NVIDIA's
 driver. Each part is an image named after a hash of everything it's built from,
-in LUFT_PARTS (default localhost/luft-parts), so a build only makes the parts
-that changed. LUFT_REBUILD=1 makes every part again. Compilers keep their caches in
+the Fedora image's digest included, in LUFT_PARTS (default localhost/luft-parts),
+so a build only makes the parts that changed. LUFT_REBUILD=1 makes every part again. Compilers keep their caches in
 LUFT_IMAGE_CACHE (default ~/.cache/luft-image), shared by every checkout.
 
 plan lists each part with its image and whether it's missing, part builds one

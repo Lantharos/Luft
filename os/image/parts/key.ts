@@ -138,7 +138,7 @@ function key(target: string, given: Record<string, string>) {
 
   for (const stage of chain) {
     const { values } = copies(stage, given);
-    hash.update(`FROM ${stage.image} AS ${stage.name}\n`);
+    hash.update(`FROM ${expand(stage.image, { ...defaults, ...given })} AS ${stage.name}\n`);
     for (const line of stage.instructions) {
       hash.update(`${line}\n`);
       const [keyword, ...words] = line.split(' ');

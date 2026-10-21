@@ -1,0 +1,72 @@
+---
+title: Window tiling
+description: Let windows arrange themselves, side by side or as columns on a scrolling strip.
+sidebar:
+  order: 4
+---
+
+import Shot from '../../../components/Shot.astro';
+
+Windows normally float where you put them, and you [snap](/windows/snap-layouts/) them into place yourself. Turn on tiling and they arrange themselves instead: every window gets its own part of the screen, and nothing overlaps.
+
+Choose how in Settings, under Appearance, **Window tiling**:
+
+- **Off**: windows float, with snapping and snap layouts.
+- **Tiling**: new windows share the screen with the ones already open.
+- **Scrolling**: each window opens as a column on a strip that runs sideways past the edges of the screen.
+
+<Shot name="settings-appearance-tiling" alt="Window tiling in Settings, with a preview of the layout" />
+
+You can switch at any time. Open windows rearrange themselves straight away, and turning tiling off puts each window back where it floated before.
+
+## Tiling
+
+Every new window takes part of the space of the window you're using. There are two layouts:
+
+<Shot name="tiling" alt="Four windows tiled in a spiral, one on the left and three sharing the right" />
+
+- **Spiral** splits the focused window in two, side by side when it's wide and one above the other when it's tall.
+- **Main and stack** keeps one large window on the left and stacks the others on the right.
+
+**New windows open** decides whether a new window lands next to the one you're using or after the last one. **Gaps** sets the space between windows and around the edges of the screen; with no gaps, windows sit edge to edge and lose their rounded corners.
+
+### Moving around
+
+| Shortcut | Does |
+| --- | --- |
+| <kbd>Super</kbd>+arrows | Focus the window in that direction, also on another display |
+| <kbd>Super</kbd>+<kbd>Shift</kbd>+arrows | Swap the window with its neighbour, or move it to the next display at the edge |
+| <kbd>Super</kbd>+<kbd>Ctrl</kbd>+arrows | Move the edge between windows |
+| <kbd>Super</kbd>+<kbd>F</kbd> | Let the window float, or tile it again |
+
+With the mouse, drag a window onto another to swap them, or onto another display to move it there. Dragging the edge of a window resizes its neighbours along with it.
+
+Dialogs, windows that can't be resized and windows on every workspace always float. When you let an app's window float, Luft remembers it and opens that app floating next time; tiling it again forgets that. Floating windows stay above the tiled ones.
+
+Maximize and full screen work as usual, and the window goes back into its place afterwards. Each display and each workspace keeps its own layout.
+
+## Scrolling
+
+Each window opens as a column to the right of the one you're using, half as wide as the screen. The strip scrolls so the column you're working in is always in full view, and the columns around it peek in from the sides.
+
+| Shortcut | Does |
+| --- | --- |
+| <kbd>Super</kbd>+<kbd>Left</kbd> / <kbd>Right</kbd> | Focus the next column, scrolling to it |
+| <kbd>Super</kbd>+<kbd>Up</kbd> / <kbd>Down</kbd> | Focus the window above or below in a column |
+| <kbd>Super</kbd>+<kbd>Shift</kbd>+arrows | Move the column, or the window within its column |
+| <kbd>Super</kbd>+<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Left</kbd> / <kbd>Right</kbd> | Stack the window into the column next to it, or take it out into a column of its own |
+| <kbd>Super</kbd>+<kbd>R</kbd> | Switch the column between a third, half, two thirds and the full width |
+| <kbd>Super</kbd>+<kbd>Ctrl</kbd>+<kbd>Left</kbd> / <kbd>Right</kbd> | Make the column narrower or wider |
+| <kbd>Super</kbd>+<kbd>C</kbd> | Center the column |
+| <kbd>Super</kbd>+<kbd>W</kbd> | Zoom out to see the whole strip; click a window to go to it |
+| <kbd>Super</kbd>+<kbd>F</kbd> | Let the window float, or put it back on the strip |
+
+<Shot name="scrolling-overview" alt="A strip of three columns, zoomed out to fit the screen" />
+
+On a touchpad, swipe sideways with three fingers to scroll the strip; when you let go it settles on a column and focuses it. Four fingers sideways still switch workspaces.
+
+Each display has its own strip, and a column that peeks over the edge to another display is cut off there instead of spilling onto it.
+
+## Shortcuts
+
+All of these can be changed in Settings, under Keyboard, **Keyboard shortcuts**, in the Tiling section. While tiling is on, the arrow shortcuts take over from snapping with <kbd>Super</kbd>+<kbd>Left</kbd> and <kbd>Right</kbd>, maximizing with <kbd>Super</kbd>+<kbd>Up</kbd> and moving windows between displays with <kbd>Super</kbd>+<kbd>Shift</kbd>+arrows; with tiling off, those work as before.

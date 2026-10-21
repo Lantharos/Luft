@@ -2,7 +2,7 @@
 title: Workspaces
 description: Spread your windows over up to ten workspaces.
 sidebar:
-  order: 4
+  order: 5
 ---
 
 Workspaces are separate desktops, each with its own windows. You never have to make one: there's always an empty workspace after the last one in use, and workspaces you empty disappear, up to ten in all.

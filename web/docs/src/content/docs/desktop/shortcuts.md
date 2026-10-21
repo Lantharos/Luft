@@ -51,6 +51,21 @@ sidebar:
 | <kbd>Alt</kbd>+<kbd>F10</kbd> | Maximize or restore |
 | <kbd>Alt</kbd>+<kbd>Space</kbd> | The window menu |
 
+## Window tiling
+
+While [window tiling](/windows/tiling/) is on, these replace snapping with the arrow keys.
+
+| Shortcut | Does |
+| --- | --- |
+| <kbd>Super</kbd>+arrows | Focus the window in that direction |
+| <kbd>Super</kbd>+<kbd>Shift</kbd>+arrows | Move the window, or its column, in that direction |
+| <kbd>Super</kbd>+<kbd>Ctrl</kbd>+arrows | Move the edge between windows |
+| <kbd>Super</kbd>+<kbd>F</kbd> | Let the window float, or tile it again |
+| <kbd>Super</kbd>+<kbd>R</kbd> | While scrolling, change the column width |
+| <kbd>Super</kbd>+<kbd>C</kbd> | While scrolling, center the column |
+| <kbd>Super</kbd>+<kbd>W</kbd> | While scrolling, zoom out to the whole strip |
+| <kbd>Super</kbd>+<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Left</kbd> / <kbd>Right</kbd> | While scrolling, stack the window into the next column, or take it out |
+
 ## Workspaces
 
 | Shortcut | Does |
@@ -105,7 +120,7 @@ The volume, mute, microphone, play, pause, next and previous, brightness, keyboa
 
 | Gesture | Does |
 | --- | --- |
-| Three fingers sideways | Next or previous workspace, following your fingers. A quick flick goes further |
+| Three fingers sideways | Next or previous workspace, following your fingers. A quick flick goes further. While [scrolling](/windows/tiling/#scrolling), this scrolls the strip instead and four fingers switch workspaces |
 | Four fingers up | Turn the workspace into a board, or close All windows |
 | Four fingers down | All windows, or leave the board |
 | Two fingers with <kbd>Super</kbd> held | Scroll between workspaces |

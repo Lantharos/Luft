@@ -1,0 +1,14 @@
+FROM quay.io/fedora/fedora:45
+
+RUN dnf install --assumeyes --setopt=install_weak_deps=False \
+      git rustup gcc gcc-c++ clang-devel cmake pkgconf-pkg-config zstd \
+      glib2-devel gstreamer1-devel pipewire-devel pulseaudio-libs-devel \
+      fontconfig-devel wayland-devel libxkbcommon-devel libdrm-devel \
+      pam-devel systemd-devel libseccomp-devel tpm2-tss-devel sqlite-devel \
+      onnxruntime-devel vulkan-headers vulkan-loader-devel glslc swtpm mingw64-gcc && \
+    dnf clean all
+
+ENV RUSTUP_HOME=/usr/local/rustup CARGO_HOME=/usr/local/cargo PATH=/usr/local/cargo/bin:$PATH
+
+RUN rustup-init -y --no-modify-path --profile minimal --component clippy \
+      --target x86_64-unknown-uefi --target x86_64-pc-windows-gnu

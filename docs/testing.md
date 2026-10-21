@@ -70,6 +70,8 @@ Polkit, real network credentials, unlocking with the computer's own sign-in rule
 
 From an app's folder, `bun run check` type-checks its interface. In `kestrel/ui` it also runs the unit tests, such as those of the quick answers and conversions in Start's search. The Rust side builds with `bun run desktop:build`. Every Rust crate in the repository belongs to one Cargo workspace at its root, with one `Cargo.lock` and the versions of shared dependencies in its `Cargo.toml`; `cargo clippy --all-targets` and `cargo test` there check them all, and `-p NAME` picks one. Programs land in the root `target` folder.
 
+On every push and pull request, `.github/workflows/checks.yml` runs Clippy and the tests of only the crates a change can reach, through their own files, the crates they depend on, the shared dependency entries they use or the locked packages they build with, and `bun run check` for the interface packages it touches. The Rust checks run in `ghcr.io/lantharos/luft-ci`, a Fedora image with the build dependencies and Rust toolchains made from `.github/ci`, rebuilt every week and whenever that folder changes.
+
 ## NVIDIA graphics
 
 Install Luft and Settings find NVIDIA graphics by reading `/sys/bus/pci/devices`. Pointing `LUFT_PCI_DEVICES` at another folder laid out the same way, each device a folder with `class`, `vendor` and `device` files, makes them read that instead, to try NVIDIA's offers on a computer or VM without an NVIDIA card:

@@ -10,7 +10,7 @@ use crate::shared::system::LoginProxy;
 
 const DATETIME: &str = "org.gnome.desktop.datetime";
 const LOCATION: &str = "org.gnome.system.location";
-const DESKTOP_ID: &str = "gnome-datetime-panel";
+const DESKTOP_ID: &str = "com.lantharos.Settings.TimeZone";
 const SETTINGS_ACTION: &str = "settings";
 
 #[proxy(

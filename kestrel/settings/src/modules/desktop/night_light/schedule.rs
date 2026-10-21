@@ -13,6 +13,12 @@ pub struct Sun {
     pub sunset: f64,
 }
 
+pub enum Daylight {
+    Sun(Sun),
+    PolarDay,
+    PolarNight,
+}
+
 pub fn now() -> glib::DateTime {
     let zone = location::timezone()
         .and_then(|identifier| glib::TimeZone::from_identifier(Some(&identifier)))
@@ -34,7 +40,7 @@ pub fn is_between(value: f64, start: f64, end: f64) -> bool {
     value >= start && value < end
 }
 
-pub fn sun(time: &glib::DateTime, at: Coordinates) -> Option<Sun> {
+pub fn daylight(time: &glib::DateTime, at: Coordinates) -> Daylight {
     let offset = time.utc_offset().as_seconds() as f64 / 3600.0;
     let days_since_1900 = (time.to_unix() as f64 / 86400.0 + 25569.0).floor();
     let julian_day = days_since_1900 + 2415018.5 - offset / 24.0;
@@ -63,15 +69,17 @@ pub fn sun(time: &glib::DateTime, at: Coordinates) -> Option<Sun> {
             - 1.25 * eccentricity * eccentricity * (2.0 * anomaly).sin())
         .to_degrees();
     let latitude = at.latitude.to_radians();
-    let hour_angle = (90.833_f64.to_radians().cos() / (latitude.cos() * declination.cos())
-        - latitude.tan() * declination.tan())
-    .acos()
-    .to_degrees();
-    if hour_angle.is_nan() {
-        return None;
+    let hour_angle_cosine = 90.833_f64.to_radians().cos() / (latitude.cos() * declination.cos())
+        - latitude.tan() * declination.tan();
+    if hour_angle_cosine > 1.0 {
+        return Daylight::PolarNight;
     }
+    if hour_angle_cosine < -1.0 {
+        return Daylight::PolarDay;
+    }
+    let hour_angle = hour_angle_cosine.acos().to_degrees();
     let solar_noon = (720.0 - 4.0 * at.longitude - equation_of_time + offset * 60.0) / 1440.0;
-    Some(Sun {
+    Daylight::Sun(Sun {
         sunrise: (solar_noon - hour_angle * 4.0 / 1440.0) * 24.0,
         sunset: (solar_noon + hour_angle * 4.0 / 1440.0) * 24.0,
     })

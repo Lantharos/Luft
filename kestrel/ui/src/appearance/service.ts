@@ -6,7 +6,6 @@ import { accentColor, namedAccent, NEUTRAL, seedFromSamples, toHex, type Rgb, ty
 import { appearanceCss, appearanceJson, type Appearance } from './exports.js';
 import { userFile, writeText } from './files.js';
 import { buildPalette, type Palette } from './palette.js';
-import { DarkSchedule } from './schedule/darkSchedule.js';
 import { isDark, watchScheme } from '../shared/scheme.js';
 import { appIcons } from './icons/appIcons.js';
 import { GlyphFiles } from './icons/glyphFiles.js';
@@ -50,7 +49,6 @@ export class AppearanceService {
   private readonly nameId: number;
   private readonly signalIds: [Gio.Settings, number][];
   private readonly themes = new AppThemes();
-  private readonly schedule: DarkSchedule;
   private readonly glyphFiles = new GlyphFiles();
   private readonly unwatchIcons = appIcons.watch(() => {
     this.emitChanged('AppIcons');
@@ -73,7 +71,6 @@ export class AppearanceService {
       [this.settings, this.settings.connect('changed::accent', () => this.update())],
       [this.settings, this.settings.connect('changed::theme-apps', () => this.schedulePersist())],
     ];
-    this.schedule = new DarkSchedule(this.settings, this.interfaceSettings);
     setSolidSurfaces(this.PureBlack && isDark());
   }
 
@@ -177,7 +174,6 @@ export class AppearanceService {
   destroy(): void {
     if (this.persistId) GLib.source_remove(this.persistId);
     for (const [settings, id] of this.signalIds) settings.disconnect(id);
-    this.schedule.destroy();
     this.glyphFiles.destroy();
     this.unwatchIcons();
     this.unwatchScheme();

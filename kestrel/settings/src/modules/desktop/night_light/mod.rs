@@ -1,4 +1,5 @@
 mod color;
+mod dark;
 mod schedule;
 
 use std::time::Duration;
@@ -14,11 +15,12 @@ use crate::shared::location::{self, Coordinates};
 use crate::shared::settings::Schemas;
 use crate::shared::system::LoginProxy;
 use color::{Color, Command};
-use schedule::{NEUTRAL, Sun, Window};
+use dark::DarkSchedule;
+use schedule::{Daylight, NEUTRAL, Sun, Window};
 
 const SCHEMA: &str = "com.lantharos.kestrel.night-light";
 const LOCATION: &str = "org.gnome.system.location";
-const DESKTOP_ID: &str = "gnome-color-panel";
+const DESKTOP_ID: &str = "com.lantharos.Settings.Daylight";
 const CHECK_INTERVAL: Duration = Duration::from_secs(60);
 const TRANSITION: Duration = Duration::from_secs(5);
 const TRANSITION_STEP: Duration = Duration::from_millis(50);
@@ -37,14 +39,15 @@ struct NightLight {
     located: mpsc::UnboundedSender<Coordinates>,
     active: bool,
     temperature: f64,
-    sun: Option<Sun>,
+    daylight: Option<Daylight>,
+    dark: DarkSchedule,
     zone: Option<(String, Option<Coordinates>)>,
     paused_at: Option<glib::DateTime>,
     transition: Option<Transition>,
 }
 
 pub async fn start(context: &Context) -> zbus::Result<()> {
-    let Some(settings) = context.settings.watch(&[SCHEMA, LOCATION]).await else {
+    let Some(settings) = context.settings.watch(&[SCHEMA, LOCATION, dark::SCHEMA, dark::INTERFACE]).await else {
         return Ok(());
     };
     let (located, mut locations) = mpsc::unbounded_channel();
@@ -54,14 +57,13 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
         located,
         active: false,
         temperature: NEUTRAL,
-        sun: None,
+        daylight: None,
+        dark: DarkSchedule::default(),
         zone: None,
         paused_at: None,
         transition: None,
     };
-    let (active, temperature) = light.target(&schedule::now());
-    light.active = active;
-    light.temperature = temperature;
+    light.update(false);
     let (commands, mut requests) = mpsc::unbounded_channel();
     let server = context.session.object_server();
     server.at(color::PATH, light.published(commands)).await?;
@@ -80,7 +82,10 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
             let smooth = tokio::select! {
                 _ = check.tick() => true,
                 (schema, key) = light.settings.changed() => {
-                    if schema == LOCATION || key == "enabled" || key == "schedule-automatic" {
+                    if dark::is_schedule_key(schema, &key) {
+                        light.dark.restart();
+                    }
+                    if schema == LOCATION || key == "enabled" || key == "schedule-automatic" || key == "dark-schedule" {
                         light.locate();
                     }
                     true
@@ -105,9 +110,7 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
                     continue;
                 }
             };
-            let (active, temperature) = light.target(&schedule::now());
-            light.active = active;
-            light.retarget(temperature, smooth);
+            light.update(smooth);
             light.publish(&color).await;
         }
     });
@@ -132,9 +135,10 @@ impl NightLight {
     }
 
     fn locate(&self) {
-        let wanted = self.settings.get::<bool>(SCHEMA, "enabled")
-            && self.settings.get::<bool>(SCHEMA, "schedule-automatic")
-            && self.settings.get::<bool>(LOCATION, "enabled");
+        let night_light_follows_sun = self.settings.get::<bool>(SCHEMA, "enabled")
+            && self.settings.get::<bool>(SCHEMA, "schedule-automatic");
+        let wanted = self.settings.get::<bool>(LOCATION, "enabled")
+            && (night_light_follows_sun || dark::follows_sun(&self.settings));
         if !wanted {
             return;
         }
@@ -159,8 +163,24 @@ impl NightLight {
         }
     }
 
+    fn sun(&self) -> Option<&Sun> {
+        match &self.daylight {
+            Some(Daylight::Sun(sun)) => Some(sun),
+            _ => None,
+        }
+    }
+
+    fn update(&mut self, smooth: bool) {
+        let now = schedule::now();
+        self.daylight = self.coordinates().map(|at| schedule::daylight(&now, at));
+        self.dark.update(&self.settings, &now, self.daylight.as_ref());
+        let (active, temperature) = self.target(&now);
+        self.active = active;
+        self.retarget(temperature, smooth);
+    }
+
     fn window(&self) -> Window {
-        match &self.sun {
+        match self.sun() {
             Some(sun) if self.settings.get(SCHEMA, "schedule-automatic") => Window {
                 from: sun.sunset,
                 to: sun.sunrise,
@@ -174,7 +194,6 @@ impl NightLight {
 
     fn target(&mut self, now: &glib::DateTime) -> (bool, f64) {
         let warm = f64::from(self.settings.get::<u32>(SCHEMA, "temperature"));
-        self.sun = self.coordinates().and_then(|at| schedule::sun(now, at));
         if !self.settings.get::<bool>(SCHEMA, "enabled") {
             return (false, NEUTRAL);
         }
@@ -237,8 +256,8 @@ impl NightLight {
             active: self.active,
             temperature: self.temperature.round() as u32,
             paused: self.paused_at.is_some(),
-            sunrise: self.sun.as_ref().map_or(-1.0, |sun| sun.sunrise),
-            sunset: self.sun.as_ref().map_or(-1.0, |sun| sun.sunset),
+            sunrise: self.sun().map_or(-1.0, |sun| sun.sunrise),
+            sunset: self.sun().map_or(-1.0, |sun| sun.sunset),
             commands,
         }
     }

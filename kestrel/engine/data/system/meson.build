@@ -8,3 +8,4 @@ configure_file(
 )
 
 install_data('kestrel-authenticate.socket', install_dir: systemunitdir)
+install_data('geoclue.conf', install_dir: get_option('sysconfdir') / 'geoclue' / 'conf.d', rename: '90-kestrel.conf')

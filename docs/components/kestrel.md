@@ -28,6 +28,8 @@ Kestrel plays the `luft` sound theme from `kestrel/engine/data/sounds/luft`, whi
 
 Kestrel's settings live in the `com.lantharos.kestrel` schemas, and Settings changes most of them. Keyboard shortcuts are in `com.lantharos.kestrel.keybindings` and `.media-keys`, with window management in GNOME's `org.gnome.desktop.wm.keybindings`; every one is listed in [Keyboard shortcuts](https://docs.luft.computer/desktop/shortcuts/). The wallpaper palette Kestrel shares with apps is described in [Appearance](../appearance.md), and its own dialogs for the keyring and GnuPG in [Prompts](../prompts.md).
 
+`kestrel-settings` follows the dark style schedule in `dark-schedule` together with the night light, from the same sunrise and sunset, so both change at the same moment.
+
 ## Session services
 
 | Service | Role |

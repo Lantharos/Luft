@@ -190,8 +190,6 @@ desktop-passkeys-missing = Šāda piekļuves atslēga nepastāv
 
 ## Device security
 desktop-security-recovery-file-name = Atkopšanas atslēga.txt
-desktop-security-unavailable = Ierīces drošība šajā datorā nav pieejama
-desktop-security-wrong-key = Ar šo atslēgu disku neizdevās atbloķēt
 desktop-security-usb-unavailable = USB aizsardzība šajā datorā nav pieejama
 
 ## Shared

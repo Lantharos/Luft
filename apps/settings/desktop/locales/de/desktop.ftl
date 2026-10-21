@@ -190,8 +190,6 @@ desktop-passkeys-missing = Diesen Passkey gibt es nicht
 
 ## Device security
 desktop-security-recovery-file-name = Wiederherstellungsschlüssel.txt
-desktop-security-unavailable = Gerätesicherheit ist auf diesem Computer nicht verfügbar
-desktop-security-wrong-key = Dieser Schlüssel hat den Datenträger nicht entsperrt
 desktop-security-usb-unavailable = Der USB-Schutz ist auf diesem Computer nicht verfügbar
 
 ## Shared

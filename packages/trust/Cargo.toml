@@ -1,0 +1,14 @@
+[package]
+name = "luft-trust"
+version = "0.1.0"
+description = "Calls to trustd, Luft's security service, shared by Disks, Settings and Install Luft"
+authors = ["Kristof"]
+license = "GPL-3.0-or-later"
+edition = "2024"
+rust-version = "1.98"
+
+[dependencies]
+luft-dbus = { path = "../dbus" }
+luft-i18n = { path = "../i18n" }
+serde = { version = "1.0.229", features = ["derive"] }
+zbus = { version = "6.0.0", default-features = false, features = ["proxy", "tokio"] }

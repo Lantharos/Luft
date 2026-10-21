@@ -1,9 +1,8 @@
 use std::path::Path;
 
+use luft_trust::{TRUST, get, group};
 use serde::Deserialize;
-use zbus::{OwnedVariant, Proxy};
-
-use crate::trust::{self, Map, TRUST};
+use zbus::Proxy;
 
 const OLD_SYSTEM: &str = "/var/lib/luft-installer/old-system.json";
 const PHYSICAL_ROOTS: [&str; 2] = ["/sysroot", "/"];
@@ -59,18 +58,17 @@ struct WindowsFound {
 type Listed = (String, String, String, Vec<(u16, String)>, Vec<String>);
 
 async fn luft_starts() -> bool {
-    let startup = trust::read(TRUST)
+    TRUST
+        .read()
         .await
         .ok()
         .flatten()
-        .and_then(|properties| trust::get::<OwnedVariant>(&properties, "Startup"))
-        .and_then(|value| Map::try_from(value).ok())
-        .unwrap_or_default();
-    trust::get::<bool>(&startup, "Installed").unwrap_or(false)
+        .and_then(|properties| get::<bool>(&group(&properties, "Startup"), "Installed"))
+        .unwrap_or(false)
 }
 
 async fn startups() -> Vec<OtherStartup> {
-    trust::call::<_, Vec<Listed>>(TRUST, "OtherStartups", &())
+    luft_trust::call::<_, Vec<Listed>>(&TRUST, "OtherStartups", &())
         .await
         .inspect_err(|error| eprintln!("Other systems' startups couldn't be read: {error}"))
         .unwrap_or_default()

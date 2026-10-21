@@ -16,6 +16,7 @@
 	{"name": "settings-protection", "bundle": "settings", "mask": "apps/settings/locales/*/protection.ftl", "sources": ["apps/settings/src/lib/panels/protection"]},
 	{"name": "settings-system", "bundle": "settings", "mask": "apps/settings/locales/*/system.ftl", "sources": ["apps/settings/src/lib/panels/system"]},
 	{"name": "settings-desktop", "bundle": "settings-desktop", "mask": "apps/settings/desktop/locales/*/desktop.ftl", "sources": ["apps/settings/desktop/src"]},
+	{"name": "trust", "bundle": "trust", "mask": "packages/trust/locales/*/trust.ftl", "sources": ["packages/trust/src"]},
 	{"name": "setup", "bundle": "setup", "mask": "apps/setup/locales/*/setup.ftl", "sources": ["apps/setup/src"]},
 	{"name": "setup-desktop", "bundle": "setup-desktop", "mask": "apps/setup/desktop/locales/*/desktop.ftl", "sources": ["apps/setup/desktop/src"]},
 	{"name": "setup-installer", "bundle": "setup-installer", "mask": "apps/setup/installer/locales/*/installer.ftl", "sources": ["apps/setup/installer/src"]},

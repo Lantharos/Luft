@@ -25,6 +25,7 @@ Luft is translated into Albanian, Bosnian, Bulgarian, Catalan, Croatian, Czech, 
 | settings-protection | `apps/settings/locales/*/protection.ftl` | Apps, Privacy, Security |
 | settings-system | `apps/settings/locales/*/system.ftl` | Accounts, Language & time, System |
 | settings-desktop | `apps/settings/desktop/locales/*/desktop.ftl` | messages from Settings' native side |
+| trust | `packages/trust/locales/*/trust.ftl` | errors from the security service, shared by Disks, Settings and Install Luft |
 | setup | `apps/setup/locales/*/setup.ftl` | Install Luft and first-run setup |
 | setup-desktop | `apps/setup/desktop/locales/*/desktop.ftl` | messages from setup's native side |
 | setup-installer | `apps/setup/installer/locales/*/installer.ftl` | the installer service's errors and progress |

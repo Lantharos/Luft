@@ -190,8 +190,6 @@ desktop-passkeys-missing = Die toegangssleutel bestaat niet
 
 ## Device security
 desktop-security-recovery-file-name = Herstelsleutel.txt
-desktop-security-unavailable = Apparaatbeveiliging is niet beschikbaar op deze computer
-desktop-security-wrong-key = Die sleutel heeft de schijf niet ontgrendeld
 desktop-security-usb-unavailable = Usb-beveiliging is niet beschikbaar op deze computer
 
 ## Shared

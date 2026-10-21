@@ -190,8 +190,6 @@ desktop-passkeys-missing = Αυτό το κλειδί πρόσβασης δεν 
 
 ## Device security
 desktop-security-recovery-file-name = Κλειδί αποκατάστασης.txt
-desktop-security-unavailable = Η ασφάλεια συσκευής δεν είναι διαθέσιμη σε αυτόν τον υπολογιστή
-desktop-security-wrong-key = Αυτό το κλειδί δεν ξεκλείδωσε τον δίσκο
 desktop-security-usb-unavailable = Η προστασία USB δεν είναι διαθέσιμη σε αυτόν τον υπολογιστή
 
 ## Shared

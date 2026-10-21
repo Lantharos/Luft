@@ -190,8 +190,6 @@ desktop-passkeys-missing = Tätä pääsyavainta ei ole olemassa
 
 ## Device security
 desktop-security-recovery-file-name = Palautusavain.txt
-desktop-security-unavailable = Laitteen suojaus ei ole käytettävissä tässä tietokoneessa
-desktop-security-wrong-key = Avain ei avannut levyn lukitusta
 desktop-security-usb-unavailable = USB-suojaus ei ole käytettävissä tässä tietokoneessa
 
 ## Shared

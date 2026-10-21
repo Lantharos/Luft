@@ -60,6 +60,7 @@ Luft's apps are built with [Sabine](https://github.com/Lantharos/Sabine): a Svel
 | `packages/software` | System updates, Flatpak, AppImages and Toolbox, shared by Settings and Schelf |
 | `packages/accounts` | Online accounts and the cloud drives they bring |
 | `packages/disks`, `network`, `fingerprint`, `windows`, `variant`, `meet` | Drives, networking, fingerprints, Windows on the same computer, choosing the image, and Meet Luft's plans |
+| `packages/trust` | Calls to trustd, the security service, with its errors translated |
 
 Apps reach the system through D-Bus services that run with only the rights they need: `com.lantharos.Updater1` for updates, `com.lantharos.Trust1` for trustd, `com.lantharos.Installer1` for the installer, `com.lantharos.Accounts1` for cloud drives, and `com.lantharos.Windows1` for Windows on the same computer. Each checks polkit for what it changes.
 

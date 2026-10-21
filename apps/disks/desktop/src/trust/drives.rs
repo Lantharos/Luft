@@ -5,7 +5,7 @@ use serde::Serialize;
 use crate::actions::formatting::{self, Format};
 use crate::actions::mounting;
 use crate::udisks::{self, BLOCK, FILESYSTEM, bytes_text};
-use luft_disks::trust::{self as client, DRIVES, Outcome, TRUST};
+use luft_trust::{self as client, DRIVES, Outcome, TRUST};
 
 const EXPLANATION: [&str; 3] = [
     "If this drive asks for a recovery key, type this key to unlock it.",
@@ -19,16 +19,8 @@ const MOUNT_TRIES: usize = 50;
 #[serde(rename_all = "camelCase")]
 pub struct Check {
     method: String,
-    checks: Vec<Item>,
+    checks: Vec<client::Check>,
     auto_unlock: String,
-}
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Item {
-    id: String,
-    passed: bool,
-    sentence: String,
 }
 
 async fn device_of(block: &str) -> Result<String, String> {
@@ -42,23 +34,16 @@ async fn device_of(block: &str) -> Result<String, String> {
 
 pub async fn check(block: &str) -> Result<Check, String> {
     let (method, checks, auto_unlock): (String, Vec<(String, bool, String)>, String) =
-        client::call(DRIVES, "Check", &(device_of(block).await?,)).await?;
+        client::call(&DRIVES, "Check", &(device_of(block).await?,)).await?;
     Ok(Check {
         method,
-        checks: checks
-            .into_iter()
-            .map(|(id, passed, sentence)| Item {
-                id,
-                passed,
-                sentence,
-            })
-            .collect(),
+        checks: checks.into_iter().map(client::Check::from).collect(),
         auto_unlock,
     })
 }
 
 pub async fn recovery_key() -> Result<String, String> {
-    client::call(TRUST, "GenerateRecoveryKey", &()).await
+    client::call(&TRUST, "GenerateRecoveryKey", &()).await
 }
 
 async fn mounted(block: &str) -> bool {
@@ -99,7 +84,7 @@ pub async fn encrypt(
     let was_mounted = mounted(block).await;
     mounting::release(block).await?;
     let _: String = client::call(
-        DRIVES,
+        &DRIVES,
         "Encrypt",
         &(device, recovery, passphrase, auto_unlock),
     )
@@ -132,7 +117,7 @@ pub async fn format(
     )
     .await?;
     client::call(
-        DRIVES,
+        &DRIVES,
         "SetUpUnlocking",
         &(device, unlock, recovery, auto_unlock),
     )
@@ -140,7 +125,7 @@ pub async fn format(
 }
 
 pub async fn decrypt(block: &str, unlock: &str) -> Result<Outcome<()>, String> {
-    client::unlocking(DRIVES, "Decrypt", &(device_of(block).await?, unlock)).await
+    client::unlocking(&DRIVES, "Decrypt", &(device_of(block).await?, unlock)).await
 }
 
 pub async fn set_up_unlocking(
@@ -150,7 +135,7 @@ pub async fn set_up_unlocking(
     auto_unlock: bool,
 ) -> Result<Outcome<()>, String> {
     client::unlocking(
-        DRIVES,
+        &DRIVES,
         "SetUpUnlocking",
         &(device_of(block).await?, unlock, recovery, auto_unlock),
     )
@@ -158,15 +143,15 @@ pub async fn set_up_unlocking(
 }
 
 pub async fn pause(uuid: &str) -> Result<(), String> {
-    client::call(DRIVES, "Pause", &(uuid,)).await
+    client::call(&DRIVES, "Pause", &(uuid,)).await
 }
 
 pub async fn resume(uuid: &str, unlock: &str) -> Result<Outcome<()>, String> {
-    client::unlocking(DRIVES, "Resume", &(uuid, unlock)).await
+    client::unlocking(&DRIVES, "Resume", &(uuid, unlock)).await
 }
 
 pub async fn show_recovery_key(uuid: &str) -> Result<String, String> {
-    client::call(DRIVES, "ShowRecoveryKey", &(uuid,)).await
+    client::call(&DRIVES, "ShowRecoveryKey", &(uuid,)).await
 }
 
 fn sheet<'a>(key: &'a str, name: &str) -> luft_app::recovery::Sheet<'a> {

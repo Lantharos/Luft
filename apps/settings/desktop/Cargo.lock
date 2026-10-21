@@ -2098,6 +2098,7 @@ dependencies = [
  "futures-util",
  "libc",
  "luft-dbus",
+ "luft-trust",
  "serde",
  "serde_json",
  "zbus",
@@ -2167,6 +2168,16 @@ dependencies = [
  "luft-dbus",
  "serde",
  "serde_json",
+ "zbus",
+]
+
+[[package]]
+name = "luft-trust"
+version = "0.1.0"
+dependencies = [
+ "luft-dbus",
+ "luft-i18n",
+ "serde",
  "zbus",
 ]
 
@@ -3530,6 +3541,7 @@ dependencies = [
  "luft-network",
  "luft-software",
  "luft-speech",
+ "luft-trust",
  "roxmltree 0.21.1",
  "sabine",
  "serde",

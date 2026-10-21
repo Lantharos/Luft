@@ -1693,6 +1693,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "luft-trust"
+version = "0.1.0"
+dependencies = [
+ "luft-dbus",
+ "luft-i18n",
+ "serde",
+ "zbus",
+]
+
+[[package]]
 name = "luft-variant"
 version = "0.1.0"
 dependencies = [
@@ -2910,6 +2920,7 @@ dependencies = [
  "luft-i18n",
  "luft-meet",
  "luft-network",
+ "luft-trust",
  "luft-variant",
  "roxmltree 0.21.1",
  "sabine",

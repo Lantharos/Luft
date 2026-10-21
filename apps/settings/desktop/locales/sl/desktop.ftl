@@ -190,8 +190,6 @@ desktop-passkeys-missing = Ta ključ za dostop ne obstaja
 
 ## Device security
 desktop-security-recovery-file-name = Obnovitveni ključ.txt
-desktop-security-unavailable = Varnost naprave v tem računalniku ni na voljo
-desktop-security-wrong-key = Ta ključ ni odklenil diska
 desktop-security-usb-unavailable = Zaščita USB v tem računalniku ni na voljo
 
 ## Shared

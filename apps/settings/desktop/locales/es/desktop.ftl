@@ -190,8 +190,6 @@ desktop-passkeys-missing = Esa llave de acceso no existe
 
 ## Device security
 desktop-security-recovery-file-name = Clave de recuperación.txt
-desktop-security-unavailable = La seguridad del dispositivo no está disponible en este ordenador
-desktop-security-wrong-key = Esa clave no ha desbloqueado el disco
 desktop-security-usb-unavailable = La protección USB no está disponible en este ordenador
 
 ## Shared

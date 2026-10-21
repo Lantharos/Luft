@@ -20,6 +20,7 @@ libc = "0.2.191"
 luft-i18n = { path = "../../../packages/i18n" }
 luft-meet = { path = "../../../packages/meet" }
 luft-network = { path = "../../../packages/network" }
+luft-trust = { path = "../../../packages/trust" }
 luft-variant = { path = "../../../packages/variant" }
 roxmltree = "0.21.1"
 sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.51" }

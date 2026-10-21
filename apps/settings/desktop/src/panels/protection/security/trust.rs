@@ -1,27 +1,6 @@
 use futures_util::future::join;
-use luft_app::dbus::{error_message, error_name, failed};
-use luft_i18n::t;
+use luft_trust::{DRIVES, Map, TRUST, get, group};
 use serde::Serialize;
-use zbus::wire::DynamicDeserialize;
-use zbus::{DynamicType, OwnedVariant};
-
-use super::properties::{Map, Service, absent, get};
-use crate::L10N;
-
-pub const TRUST: Service = Service {
-    name: "com.lantharos.Trust1",
-    path: "/com/lantharos/Trust1",
-    interface: "com.lantharos.Trust1",
-};
-
-const DRIVES: Service = Service {
-    name: "com.lantharos.Trust1",
-    path: "/com/lantharos/Trust1",
-    interface: "com.lantharos.Trust1.Drives",
-};
-
-const ERROR: &str = "com.lantharos.Trust1.Error.";
-const WRONG_KEY: &str = "com.lantharos.Trust1.Error.WrongKey";
 
 #[derive(Serialize, Default)]
 #[serde(rename_all = "camelCase")]
@@ -105,33 +84,12 @@ pub struct Trust {
     anti_cheat: AntiCheat,
 }
 
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Check {
-    id: String,
-    passed: bool,
-    sentence: String,
-}
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-pub enum Outcome<T> {
-    Done(T),
-    WrongKey(String),
-}
-
 fn text(map: &Map, key: &str) -> String {
     get(map, key).unwrap_or_default()
 }
 
 fn flag(map: &Map, key: &str) -> bool {
     get(map, key).unwrap_or_default()
-}
-
-fn group(properties: &Map, name: &str) -> Map {
-    get::<OwnedVariant>(properties, name)
-        .and_then(|value| Map::try_from(value).ok())
-        .unwrap_or_default()
 }
 
 fn tpm(map: &Map) -> Tpm {
@@ -221,49 +179,4 @@ pub async fn read() -> Result<Option<Trust>, String> {
         disk: disk(&group(&properties, "Disk")),
         anti_cheat: anti_cheat(&group(&properties, "AntiCheat")),
     }))
-}
-
-fn explain(error: zbus::Error) -> String {
-    let name = error_name(&error).unwrap_or_default();
-    match error_message(&error) {
-        Some(message) if name.starts_with(ERROR) => message.to_owned(),
-        _ if name.ends_with("NotAuthorized") => t!(L10N, "desktop-admin-required"),
-        _ if absent(&error) => t!(L10N, "desktop-security-unavailable"),
-        _ => failed(error),
-    }
-}
-
-pub async fn call<B, R>(method: &str, body: &B) -> Result<R, String>
-where
-    B: Serialize + DynamicType,
-    R: for<'d> DynamicDeserialize<'d>,
-{
-    TRUST.change(method, body).await.map_err(explain)
-}
-
-pub async fn unlocking<B, R>(method: &str, body: &B) -> Result<Outcome<R>, String>
-where
-    B: Serialize + DynamicType,
-    R: for<'d> DynamicDeserialize<'d>,
-{
-    match TRUST.change(method, body).await {
-        Ok(value) => Ok(Outcome::Done(value)),
-        Err(error) if error_name(&error).as_deref() == Some(WRONG_KEY) => Ok(Outcome::WrongKey(
-            error_message(&error)
-                .map_or_else(|| t!(L10N, "desktop-security-wrong-key"), str::to_owned),
-        )),
-        Err(error) => Err(explain(error)),
-    }
-}
-
-pub async fn checks() -> Result<Vec<Check>, String> {
-    let checks: Vec<(String, bool, String)> = call("CheckEncryption", &()).await?;
-    Ok(checks
-        .into_iter()
-        .map(|(id, passed, sentence)| Check {
-            id,
-            passed,
-            sentence,
-        })
-        .collect())
 }

@@ -12,8 +12,9 @@ use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
+use luft_trust::TRUST;
 use properties::Service;
-use trust::{TRUST, Trust};
+use trust::Trust;
 use usb::{USB_PROTECTION, UsbProtection};
 
 const TRUST_CHANGED: &str = "security.trust";
@@ -105,9 +106,9 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .command_async("security_set_usb", |Enabled { enabled }| {
             usb::set_enabled(enabled)
         })
-        .command_async("security_check_encryption", |_: Value| trust::checks())
+        .command_async("security_check_encryption", |_: Value| luft_trust::checks())
         .command_async("security_generate_key", |_: Value| {
-            trust::call::<_, String>("GenerateRecoveryKey", &())
+            luft_trust::call::<_, String>(&TRUST, "GenerateRecoveryKey", &())
         })
         .command_async(
             "security_turn_on",
@@ -116,44 +117,49 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
                  pin,
                  passphrase,
              }| async move {
-                trust::call::<_, ()>("TurnOnEncryption", &(recovery_key, pin, passphrase)).await
+                luft_trust::call::<_, ()>(
+                    &TRUST,
+                    "TurnOnEncryption",
+                    &(recovery_key, pin, passphrase),
+                )
+                .await
             },
         )
         .command_async("security_turn_off", |Unlock { unlock }| async move {
-            trust::unlocking::<_, ()>("TurnOffEncryption", &unlock).await
+            luft_trust::unlocking::<_, ()>(&TRUST, "TurnOffEncryption", &unlock).await
         })
         .command_async(
             "security_set_up_tpm",
             |TpmUnlock { unlock, pin }| async move {
-                trust::unlocking::<_, String>("SetUpTpmUnlock", &(unlock, pin)).await
+                luft_trust::unlocking::<_, String>(&TRUST, "SetUpTpmUnlock", &(unlock, pin)).await
             },
         )
         .command_async("security_remove_tpm", |Unlock { unlock }| async move {
-            trust::unlocking::<_, ()>("RemoveTpmUnlock", &unlock).await
+            luft_trust::unlocking::<_, ()>(&TRUST, "RemoveTpmUnlock", &unlock).await
         })
         .command_async("security_show_key", |_: Value| {
-            trust::call::<_, String>("ShowRecoveryKey", &())
+            luft_trust::call::<_, String>(&TRUST, "ShowRecoveryKey", &())
         })
         .command_async("security_accept_secure_boot", |_: Value| {
-            trust::call::<_, ()>("AcceptSecureBootChange", &())
+            luft_trust::call::<_, ()>(&TRUST, "AcceptSecureBootChange", &())
         })
         .command_async("security_replace_key", |Unlock { unlock }| async move {
-            trust::unlocking::<_, String>("ReplaceRecoveryKey", &unlock).await
+            luft_trust::unlocking::<_, String>(&TRUST, "ReplaceRecoveryKey", &unlock).await
         })
         .command_async("security_enroll_key", |_: Value| {
-            trust::call::<_, String>("EnrollSigningKey", &())
+            luft_trust::call::<_, String>(&TRUST, "EnrollSigningKey", &())
         })
         .command_async("security_cancel_enrollment", |_: Value| {
-            trust::call::<_, ()>("CancelSigningKeyEnrollment", &())
+            luft_trust::call::<_, ()>(&TRUST, "CancelSigningKeyEnrollment", &())
         })
         .command_async("security_remove_other_keys", |_: Value| {
-            trust::call::<_, String>("RemoveOtherKeys", &())
+            luft_trust::call::<_, String>(&TRUST, "RemoveOtherKeys", &())
         })
         .command_async("security_keep_other_keys", |_: Value| {
-            trust::call::<_, ()>("KeepOtherKeys", &())
+            luft_trust::call::<_, ()>(&TRUST, "KeepOtherKeys", &())
         })
         .command_async("security_install_startup", |_: Value| {
-            trust::call::<_, ()>("InstallSignedStartup", &())
+            luft_trust::call::<_, ()>(&TRUST, "InstallSignedStartup", &())
         })
         .command_async("security_save_key", |Key { key }| async move {
             recovery::save(&key).await

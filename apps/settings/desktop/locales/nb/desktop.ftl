@@ -190,8 +190,6 @@ desktop-passkeys-missing = Den tilgangsnøkkelen finnes ikke
 
 ## Device security
 desktop-security-recovery-file-name = Gjenopprettingsnøkkel.txt
-desktop-security-unavailable = Enhetssikkerhet er ikke tilgjengelig på denne datamaskinen
-desktop-security-wrong-key = Den nøkkelen låste ikke opp disken
 desktop-security-usb-unavailable = USB-beskyttelse er ikke tilgjengelig på denne datamaskinen
 
 ## Shared

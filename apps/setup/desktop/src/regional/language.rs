@@ -31,6 +31,7 @@ async fn remember_for_account(language: &str) -> Result<(), String> {
 pub async fn use_language(Language { language }: Language) -> Result<(), String> {
     let tag = luft_i18n::bcp47(&language).unwrap_or_else(|| luft_i18n::SOURCE_LOCALE.to_owned());
     L10N.use_locale(&tag);
+    luft_trust::L10N.use_locale(&tag);
     installer::call::<_, ()>("UseLanguage", &(tag,)).await?;
     remember_for_account(&language).await
 }

@@ -5,6 +5,7 @@ use std::sync::{Arc, Mutex};
 use access::Idle;
 use luft_i18n::t;
 use luft_meet::Handoff;
+use luft_trust::TRUST;
 use tokio::sync::watch;
 use zbus::message::Header;
 use zbus::object_server::{InterfaceRef, ObjectServer, SignalEmitter};
@@ -17,7 +18,6 @@ use super::setup::{self, Enrollment};
 use crate::L10N;
 use crate::config::Config;
 use crate::first_boot::fingerprint::Enrolling;
-use crate::first_boot::trust;
 use crate::install::drive::plan::{self, Request};
 use crate::install::windows::Windows;
 use crate::install::{self, Account, Answers, Destination, Job, Regional, Stage, Status};
@@ -27,6 +27,7 @@ use crate::{first_boot, meet, phase, survey};
 const INSTALL: &str = "com.lantharos.installer.install";
 const FINISH: &str = "com.lantharos.installer.finish-first-boot";
 const SET_UP: &str = "com.lantharos.installer.set-up";
+const NO_PIN: &str = "";
 
 pub struct Installer {
     options: Arc<Options>,
@@ -300,9 +301,9 @@ impl Installer {
     ) -> Result<String, Error> {
         self.setup_app_user(connection, &header).await?;
         let _activity = self.idle.hold();
-        trust::enroll_signing_key(connection)
+        luft_trust::call(&TRUST, "EnrollSigningKey", &())
             .await
-            .map_err(Error::relayed)
+            .map_err(Error::Failed)
     }
 
     async fn turn_on_encryption(
@@ -314,9 +315,13 @@ impl Installer {
     ) -> Result<(), Error> {
         self.setup_app_user(connection, &header).await?;
         let _activity = self.idle.hold();
-        trust::turn_on_encryption(connection, &recovery_key, &passphrase)
-            .await
-            .map_err(Error::relayed)
+        luft_trust::call(
+            &TRUST,
+            "TurnOnEncryption",
+            &(recovery_key, NO_PIN, passphrase),
+        )
+        .await
+        .map_err(Error::Failed)
     }
 
     async fn enroll_fingerprint(

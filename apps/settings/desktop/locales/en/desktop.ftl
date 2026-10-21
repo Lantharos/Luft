@@ -219,8 +219,6 @@ desktop-passkeys-missing = That passkey doesn't exist
 ## Device security
 # Suggested file name when saving the disk recovery key
 desktop-security-recovery-file-name = Recovery key.txt
-desktop-security-unavailable = Device security isn't available on this computer
-desktop-security-wrong-key = That key didn't unlock the disk
 desktop-security-usb-unavailable = USB protection isn't available on this computer
 
 ## Shared

@@ -190,8 +190,6 @@ desktop-passkeys-missing = Bu geçiş anahtarı yok
 
 ## Device security
 desktop-security-recovery-file-name = Kurtarma anahtarı.txt
-desktop-security-unavailable = Cihaz güvenliği bu bilgisayarda kullanılamıyor
-desktop-security-wrong-key = Bu anahtar diskin kilidini açmadı
 desktop-security-usb-unavailable = USB koruması bu bilgisayarda kullanılamıyor
 
 ## Shared

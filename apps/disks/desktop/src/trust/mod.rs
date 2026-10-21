@@ -5,9 +5,8 @@ use std::collections::HashMap;
 use futures_util::StreamExt;
 use luft_app::Events;
 use serde::Serialize;
-use zbus::OwnedVariant;
 
-use luft_disks::trust::{self as client, DRIVES, Map, TRUST, get};
+use luft_trust::{DRIVES, Map, TRUST, get, group};
 
 pub const CHANGED: &str = "disks.trust";
 const NEEDS_DEVICE_ENCRYPTION: &str = "Turn on device encryption in Settings first. This computer keeps the drive's key on its own disk, so that disk has to be encrypted too.";
@@ -43,10 +42,10 @@ fn drive(map: &Map) -> DriveState {
 }
 
 async fn system_disk() -> Result<Map, String> {
-    Ok(client::read(TRUST)
+    Ok(TRUST
+        .read()
         .await?
-        .and_then(|properties| get::<OwnedVariant>(&properties, "Disk"))
-        .and_then(|value| Map::try_from(value).ok())
+        .map(|properties| group(&properties, "Disk"))
         .unwrap_or_default())
 }
 
@@ -61,7 +60,7 @@ pub async fn system_encryption_starting() -> Result<bool, String> {
 }
 
 pub async fn state() -> Result<Protection, String> {
-    let Some(properties) = client::read(DRIVES).await? else {
+    let Some(properties) = DRIVES.read().await? else {
         return Ok(Protection::default());
     };
     let drives: HashMap<String, Map> = get(&properties, "Drives").unwrap_or_default();
@@ -81,7 +80,7 @@ pub async fn state() -> Result<Protection, String> {
 
 pub fn watch(events: Events) {
     luft_app::spawn(async move {
-        let Ok(mut changes) = client::changes().await else {
+        let Ok(mut changes) = TRUST.changes().await else {
             return;
         };
         while changes.next().await.is_some() {

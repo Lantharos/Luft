@@ -190,8 +190,6 @@ desktop-passkeys-missing = Tento přístupový klíč neexistuje
 
 ## Device security
 desktop-security-recovery-file-name = Obnovovací klíč.txt
-desktop-security-unavailable = Zabezpečení zařízení není v tomto počítači k dispozici
-desktop-security-wrong-key = Tento klíč disk neodemkl
 desktop-security-usb-unavailable = Ochrana USB není v tomto počítači k dispozici
 
 ## Shared

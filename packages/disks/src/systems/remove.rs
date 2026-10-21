@@ -1,8 +1,8 @@
+use luft_trust::{Outcome, TRUST};
 use serde::Serialize;
 
 use super::{Kind, Role, System, find};
 use crate::partitions;
-use crate::trust::{self, Outcome, TRUST};
 use crate::udisks;
 use crate::udisks::snapshot::{self, Drive};
 use crate::udisks::volumes::{Segment, Volume};
@@ -93,7 +93,7 @@ async fn remove_startups(system: &System) -> Result<(), String> {
         .iter()
         .map(|part| part.partition_uuid.clone())
         .collect();
-    trust::call::<_, ()>(TRUST, "RemoveStartups", &(folders, partitions)).await
+    luft_trust::call::<_, ()>(&TRUST, "RemoveStartups", &(folders, partitions)).await
 }
 
 pub async fn remove_old_system_startups() -> Result<(), String> {
@@ -108,7 +108,7 @@ pub async fn remove_old_system_startups() -> Result<(), String> {
 }
 
 pub async fn grow(unlock: &str) -> Result<Outcome<u64>, String> {
-    trust::unlocking(TRUST, "GrowSystem", &(unlock,)).await
+    luft_trust::unlocking(&TRUST, "GrowSystem", &(unlock,)).await
 }
 
 pub async fn remove(id: &str, step: impl Fn(Step)) -> Result<Removed, String> {
@@ -131,7 +131,7 @@ pub async fn remove(id: &str, step: impl Fn(Step)) -> Result<Removed, String> {
     }
     if system.kind == Kind::OldSystem {
         step(Step::OldSystem);
-        trust::call::<_, ()>(TRUST, "RemoveOldSystem", &()).await?;
+        luft_trust::call::<_, ()>(&TRUST, "RemoveOldSystem", &()).await?;
     }
     let mut removed = Removed {
         grown: 0,

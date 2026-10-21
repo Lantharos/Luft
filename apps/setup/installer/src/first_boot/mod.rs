@@ -1,6 +1,5 @@
 pub mod caller;
 pub mod fingerprint;
-pub mod trust;
 pub mod window;
 
 use std::path::Path;

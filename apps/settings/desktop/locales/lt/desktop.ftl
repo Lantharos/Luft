@@ -190,8 +190,6 @@ desktop-passkeys-missing = Tokio prieigos rakto nėra
 
 ## Device security
 desktop-security-recovery-file-name = Atkūrimo raktas.txt
-desktop-security-unavailable = Įrenginio sauga šiame kompiuteryje nepasiekiama
-desktop-security-wrong-key = Šiuo raktu disko atrakinti nepavyko
 desktop-security-usb-unavailable = USB apsauga šiame kompiuteryje nepasiekiama
 
 ## Shared

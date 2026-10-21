@@ -190,8 +190,6 @@ desktop-passkeys-missing = Seda pääsuvõtit pole olemas
 
 ## Device security
 desktop-security-recovery-file-name = Taastevõti.txt
-desktop-security-unavailable = Seadme turve pole selles arvutis saadaval
-desktop-security-wrong-key = See võti ei avanud ketast
 desktop-security-usb-unavailable = USB-kaitse pole selles arvutis saadaval
 
 ## Shared

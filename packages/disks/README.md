@@ -13,6 +13,5 @@ luft-disks = { path = "../../../packages/disks" }
 | `resize` | Grow or shrink a partition and its file system in the right order |
 | `partitions` | Delete a partition after releasing it |
 | `systems` | Other systems on the drives (Windows, other Linux, the old system Luft replaced) and removing one, with trustd for start entries, boot files and growing Luft |
-| `trust` | Calls to trustd |
 
 `cargo run --example other-systems -- list` prints the other systems as JSON; `remove ID` removes one.

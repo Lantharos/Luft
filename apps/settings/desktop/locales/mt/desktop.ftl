@@ -190,8 +190,6 @@ desktop-passkeys-missing = Dak il-passkey ma jeżistix
 
 ## Device security
 desktop-security-recovery-file-name = Ċavetta tal-irkupru.txt
-desktop-security-unavailable = Is-sigurtà tal-apparat mhix disponibbli f’dan il-kompjuter
-desktop-security-wrong-key = Dik iċ-ċavetta ma żblokkatx id-diska
 desktop-security-usb-unavailable = Il-protezzjoni tal-USB mhix disponibbli f’dan il-kompjuter
 
 ## Shared

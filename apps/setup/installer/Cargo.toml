@@ -17,6 +17,7 @@ luft-dbus = { path = "../../../packages/dbus" }
 luft-disks = { path = "../../../packages/disks" }
 luft-i18n = { path = "../../../packages/i18n" }
 luft-meet = { path = "../../../packages/meet" }
+luft-trust = { path = "../../../packages/trust" }
 luft-variant = { path = "../../../packages/variant" }
 luft-windows = { path = "../../../packages/windows" }
 serde = { version = "1.0.229", features = ["derive"] }

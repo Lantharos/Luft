@@ -190,8 +190,6 @@ desktop-passkeys-missing = Такого ключа доступа нет
 
 ## Device security
 desktop-security-recovery-file-name = Ключ восстановления.txt
-desktop-security-unavailable = Защита устройства недоступна на этом компьютере
-desktop-security-wrong-key = Этот ключ не разблокировал диск
 desktop-security-usb-unavailable = Защита USB недоступна на этом компьютере
 
 ## Shared

@@ -190,8 +190,6 @@ desktop-passkeys-missing = Ky çelës kalimi nuk ekziston
 
 ## Device security
 desktop-security-recovery-file-name = Çelësi i rikuperimit.txt
-desktop-security-unavailable = Siguria e pajisjes nuk ofrohet në këtë kompjuter
-desktop-security-wrong-key = Ky çelës nuk e zhbllokoi diskun
 desktop-security-usb-unavailable = Mbrojtja USB nuk ofrohet në këtë kompjuter
 
 ## Shared

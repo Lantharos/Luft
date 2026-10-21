@@ -33,6 +33,7 @@ luft-i18n = { path = "../../../packages/i18n" }
 luft-network = { path = "../../../packages/network" }
 luft-software = { path = "../../../packages/software" }
 luft-speech = { path = "../../../packages/speech" }
+luft-trust = { path = "../../../packages/trust" }
 roxmltree = "0.21.1"
 sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.51" }
 serde = { version = "1.0.229", features = ["derive"] }

@@ -190,8 +190,6 @@ desktop-passkeys-missing = Þessi aðgangslykill er ekki til
 
 ## Device security
 desktop-security-recovery-file-name = Endurheimtarlykill.txt
-desktop-security-unavailable = Öryggi tækis er ekki í boði á þessari tölvu
-desktop-security-wrong-key = Þessi lykill tók diskinn ekki úr lás
 desktop-security-usb-unavailable = USB-vörn er ekki í boði á þessari tölvu
 
 ## Shared

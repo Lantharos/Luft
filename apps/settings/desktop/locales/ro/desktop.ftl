@@ -190,8 +190,6 @@ desktop-passkeys-missing = Această cheie de acces nu există
 
 ## Device security
 desktop-security-recovery-file-name = Cheie de recuperare.txt
-desktop-security-unavailable = Securitatea dispozitivului nu este disponibilă pe acest computer
-desktop-security-wrong-key = Această cheie nu a deblocat discul
 desktop-security-usb-unavailable = Protecția USB nu este disponibilă pe acest computer
 
 ## Shared

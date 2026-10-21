@@ -190,8 +190,6 @@ desktop-passkeys-missing = Níl an eochair rochtana sin ann
 
 ## Device security
 desktop-security-recovery-file-name = Eochair athshlánaithe.txt
-desktop-security-unavailable = Níl slándáil gléis ar fáil ar an ríomhaire seo
-desktop-security-wrong-key = Níor dhíghlasáil an eochair sin an diosca
 desktop-security-usb-unavailable = Níl cosaint USB ar fáil ar an ríomhaire seo
 
 ## Shared

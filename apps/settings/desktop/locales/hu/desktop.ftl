@@ -190,8 +190,6 @@ desktop-passkeys-missing = Ez a jelkulcs nem létezik
 
 ## Device security
 desktop-security-recovery-file-name = Helyreállítási kulcs.txt
-desktop-security-unavailable = Az eszközbiztonság nem érhető el ezen a számítógépen
-desktop-security-wrong-key = Ez a kulcs nem oldotta fel a lemezt
 desktop-security-usb-unavailable = Az USB-védelem nem érhető el ezen a számítógépen
 
 ## Shared

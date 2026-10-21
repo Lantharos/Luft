@@ -2,10 +2,8 @@
 	import { onMount } from 'svelte';
 	import { fly } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
-	import { isAvailable } from '@lantharos/sabine';
-	import { i18n, t } from '@luft/i18n';
-	import { appearance, GlassShell, Toast } from '@luft/ui';
-	import WindowButtons from '#lib/components/WindowButtons.svelte';
+	import { t } from '@luft/i18n';
+	import { appearance, GlassShell, Toast, WindowControls } from '@luft/ui';
 	import * as meet from '#lib/api/meet.js';
 	import { luft } from '#lib/state/luft.svelte.js';
 	import { session } from '#lib/state/meet.svelte.js';
@@ -50,10 +48,6 @@
 	}
 
 	onMount(() => {
-		if (!isAvailable()) {
-			void i18n.start();
-			return;
-		}
 		const stops = [session.listen()];
 		void meet.installed().then((installed) => {
 			if (installed && session.step === 'hello') void luft.open();
@@ -77,7 +71,7 @@
 	<main class="relative flex min-w-0 flex-1 flex-col overflow-hidden">
 		<div class="drag-region absolute inset-x-0 top-0 z-10 flex h-12 items-center justify-between pr-3 pl-14">
 			<span class="text-[12.5px] text-[var(--text-muted)]">{session.nightly ? t('meet-nightly') : ''}</span>
-			<WindowButtons closable={session.step !== 'working'} />
+			<WindowControls maximizable={false} closable={session.step !== 'working'} />
 		</div>
 		{#key session.step}
 			<div class="absolute inset-0" in:fly={{ x: SLIDE * session.direction, duration: 260, easing: cubicOut }} out:fly={{ x: -SLIDE * session.direction, duration: 160 }}>

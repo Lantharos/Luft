@@ -72,3 +72,12 @@ Strings in Luft's Finnish translation that a native speaker should check. Each i
 - `web/site/locales/fi/home.ftl` `home-question-ready-answer`: "Yökäännöksiä", "yökäännösten päivitykset" — no settled Finnish term for nightly builds; "yöversio" is the alternative.
 - `web/site/locales/fi/home.ftl` `home-motion-heading`: "Liikettä, jossa on tarkoitus." — free rendering of "It moves like it means it"; check it sounds natural as a heading.
 - `web/site/locales/fi/site.ftl` `site-footer-photos`: "Kuvat: { $photographers }, Unsplash." — built so the joined list of names stays in the nominative.
+
+## Meet Luft
+
+- `apps/meet/locales/fi/meet.ftl` `ready-remove-description`, `working-packing`: "muuttolaatikko" — the moving box; check it reads naturally as a name for the packed data.
+- `apps/meet/desktop/locales/fi/desktop.ftl` `check-start-entries`, `problem-tidy`: "käynnistysmerkintä" — no settled Finnish term for a firmware boot entry.
+- `apps/meet/desktop/locales/fi/desktop.ftl` `check-space-short-windows`: "Levyn puhdistuksella" — Disk Cleanup's Finnish name from memory; check against current Windows.
+- `apps/meet/locales/fi/meet.ftl` `stick-none`, `stick-erase-description`: "vähintään { $size }:n USB-tikku" — genitive ending added after the size placeable ("4 Gt:n"); check it reads well.
+- `apps/meet/desktop/locales/fi/desktop.ftl` `check-secure-boot-turn-on`: "painamalla { $key }, kun valmistajan { $maker } logo tulee näkyviin" — the volume-up key name is written in the partitive to fit; check the sentence with both key forms.
+- `apps/meet/locales/fi/meet.ftl` `problem-check`, `hello-check`: Windows variants say "PC", Linux "tietokone", following the English; Finnish Windows mostly says "tietokone", so both could be the same.

@@ -53,3 +53,13 @@ Strings in Luft's Spanish translation that a native speaker should check: terms 
 - `web/site/locales/es/home.ftl` `home-wallpapers-text`: "el color de énfasis, el cristal y todas las aplicaciones toman sus colores" — "el cristal" for the desktop's glass material; check it reads naturally.
 - `web/site/locales/es/home.ftl` `home-question-ready-answer`: "Las versiones nightly salen cada vez que algo cambia" — "nightly" kept in English as most Spanish projects do; check whether «versiones diarias» reads better.
 - `web/site/locales/es/download.ftl` `download-meet-note`: "Más información y luego Ejecutar de todas formas" — SmartScreen's Spanish labels from memory; confirm against a Spanish Windows 11.
+
+## Meet Luft
+
+- `apps/meet/locales/es/meet.ftl` `ready-remove-description`: "incluida la caja de mudanza" — "caja de mudanza" for the moving box is new here (setup avoids naming it); check it reads naturally (also in `working-packing` .description and `drive-box-no-guid` in desktop.ftl).
+- `apps/meet/locales/es/meet.ftl` `meet-logs-saved`: "los registros de la prueba de Luft" — "Try Luft" rendered as "la prueba de Luft" so it fits the sentence; check it's clear it means the Try Luft session (same in `meet-logs-none`, `meet-logs-failed`, `logs-not-saved`).
+- `apps/meet/locales/es/meet.ftl` `meet-channel-latest`: "Meet Luft volverá a usar las versiones normales" — "releases" as "versiones normales" to contrast with nightly; check a better word exists.
+- `apps/meet/locales/es/meet.ftl` `check-get-ready-file`: "No se cambian las particiones" — for "Nothing is repartitioned"; check it's clear nothing on the disk layout changes (also `check-folder-fine` in desktop.ftl).
+- `apps/meet/desktop/locales/es/desktop.ftl` `check-space-short-windows`: "con Liberador de espacio en disco" — Windows' Spanish name for Disk Cleanup from memory; confirm against a Spanish Windows 11.
+- `apps/meet/desktop/locales/es/desktop.ftl` `check-firmware-key-volume-up`: "subir volumen" — check this reads right inside "pulsa { $key } cuando aparezca el logotipo".
+- `apps/meet/desktop/locales/es/desktop.ftl` `helper-not-started`: "El asistente de Meet Luft" — "helper" as "asistente", which can also suggest a wizard; check whether "proceso auxiliar" is clearer.

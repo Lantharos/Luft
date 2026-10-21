@@ -53,3 +53,12 @@ Strings in Luft's Norwegian Bokmål translation that a native speaker should che
 - `web/site/locales/nb/home.ftl` `home-app-mailman-detail`: "en sortering av nye avsendere" — "screener" has no settled Norwegian term.
 - `web/site/locales/nb/home.ftl` `home-question-ready-answer`: "Nattlige bygg" — "nightly builds"; check whether "nattbygg" or the English term is more familiar.
 - `web/site/locales/nb/home.ftl` `home-app-disks`: "Disker og stasjoner" — describes the Disks app ("Drives"); check it isn't too long under the app name.
+
+## Meet Luft
+
+- `apps/meet/locales/nb/meet.ftl` `ready-remove-description`: "også flytteesken" — «flytteeske» for the moving box partition; check it reads as Meet Luft's packed bundle, not a literal box.
+- `apps/meet/locales/nb/meet.ftl` `hello-check`: "Sjekk denne datamaskinen" — the Windows variant uses «datamaskin» per the glossary, though Windows itself says «denne PC-en»; check which feels more natural in a Windows app.
+- `apps/meet/locales/nb/meet.ftl` `meet-logs-saved`: "Loggene fra å prøve Luft er lagret på skrivebordet ditt" — "logs from Try Luft" rephrased; check «fra å prøve Luft» reads naturally.
+- `apps/meet/desktop/locales/nb/desktop.ftl` `check-start-entries`: "En gammel oppstartsoppføring" — «oppstartsoppføring» for a firmware boot entry; check against what Windows/firmware tools say.
+- `apps/meet/locales/nb/meet.ftl` `stick-replace-description`: "Den nye versjonen av Luft kan ta plassen." — "the new Luft" rephrased to avoid a definite form on the name.
+- `apps/meet/desktop/locales/nb/desktop.ftl` `check-secure-boot-off-detail`: "spill med juksebeskyttelse" — same «juksebeskyttelse» as Settings; gamers may expect «anti-cheat».

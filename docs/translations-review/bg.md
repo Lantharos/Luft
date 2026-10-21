@@ -66,3 +66,14 @@ Strings in Luft's Bulgarian translation that a native speaker should check. Each
 - `web/site/locales/bg/home.ftl` `home-description`: "Спокойна и бърза работна среда" — "desktop" in the sense of the whole environment, per the glossary's работна среда; check it reads well as the tagline.
 - `web/site/locales/bg/home.ftl` `home-app-disks`: "Съхранение" — the kind shown under Дискове; needed a word other than the app name.
 - `web/site/locales/bg/download.ftl` `download-needs-space-value`: "32 ГБ или повече" — Cyrillic unit as Windows writes it; check against how other Bulgarian strings in Luft show sizes.
+
+## Meet Luft
+
+- `apps/meet/locales/bg/meet.ftl` `meet-logs-saved`: "Журналите от пробването на Luft…" — logs as "журнали"; Windows says "регистрационни файлове" and many people say "логове".
+- `apps/meet/locales/bg/meet.ftl` `ready-remove-description`: "кашона за преместване" — the moving box; check it reads as a container for packed things and not too literally.
+- `apps/meet/locales/bg/meet.ftl` `box-pack`: "Опаковай" — pack/unpack as опаковам/разопаковам, while Setup says "Нещата, които събрахте"; check whether събирам fits better.
+- `apps/meet/locales/bg/meet.ftl` `hello-check`: "Провери този компютър" — PC and computer are both "компютър", as Bulgarian Windows says; the $platform variants are identical.
+- `apps/meet/locales/bg/meet.ftl` `linux-ready-restart-replace`: "Инсталаторът се отваря с { $system } като система за замяна" — phrased to avoid gender agreement with the system name.
+- `apps/meet/locales/bg/meet.ftl` `check-action-tidy`: "Разчисти" — tidying old start entries; check it's clear as a button.
+- `apps/meet/desktop/locales/bg/desktop.ftl` `check-secure-boot-turn-on`: "натиснете { $key }" — with `check-firmware-key-volume-up` as "бутона за увеличаване на звука"; check the sentence reads well with both a key name and the button.
+- `apps/meet/desktop/locales/bg/desktop.ftl` `check-fast-startup-on`: "Бързо стартиране е включено" — the setting's name is neuter by its sense (стартиране); confirm the agreement.

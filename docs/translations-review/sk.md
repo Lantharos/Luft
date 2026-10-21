@@ -63,3 +63,10 @@ Strings in Luft's Slovak translation that a native speaker should check, each li
 - `web/site/locales/sk/home.ftl` `home-motion-heading`: "Pohyb, ktorý dáva zmysel." — free rendering of "It moves like it means it"; check the tone.
 - `web/site/locales/sk/home.ftl` `home-app-mailman-detail`: "preverovanie nových odosielateľov" — "screener" has no settled Slovak term.
 - `web/site/locales/sk/site.ftl` `site-footer-made`: "Vytvára { $lantharos }." — Lantharos as the subject avoids declining the name; check it reads naturally as a credit line.
+
+## Meet Luft
+
+- `apps/meet/locales/sk/meet.ftl` `meet-logs-saved`: "Denníky zo skúšania systému Luft sú uložené na pracovnej ploche" — "logs" as „denníky“ and "Try Luft" described rather than named; check both.
+- `apps/meet/desktop/locales/sk/desktop.ftl` `check-start-entries`: "Stará položka spúšťania" — "start entry" (firmware boot menu entry) used throughout Meet Luft.
+- `apps/meet/desktop/locales/sk/desktop.ftl` `check-fast-startup-on-detail`: "…prejde do režimu dlhodobého spánku…" — follows the guide's „Dlhodobý spánok“ for hibernate; check it reads well in a sentence.
+- `apps/meet/desktop/locales/sk/desktop.ftl` `check-secure-boot-turn-on`: "…pri zobrazení loga { $maker } stlačte { $key } a prejdite do { $place }." — $key may be "tlačidlo zvýšenia hlasitosti" and $place an English menu path; check both fit.

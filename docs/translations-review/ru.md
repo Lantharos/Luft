@@ -62,3 +62,10 @@ Strings in Luft's Russian translation that a native speaker should check, each l
 - `web/site/locales/ru/home.ftl` `home-intro`: "ядро, которое само следит за своей целостностью" — "a core that keeps itself in one piece"; check it doesn't read as the Linux kernel.
 - `web/site/locales/ru/home.ftl` `home-security-heading`: "Безопасность по замыслу, а не по настройкам." — free rendering of "Safe by design, not by settings"; check it sounds natural.
 - `web/site/locales/ru/site.ftl` `site-footer-made`: "…на основе { $fedora }." — relies on Fedora staying undeclined after «на основе».
+
+## Meet Luft
+
+- `apps/meet/locales/ru/meet.ftl` `meet-logs-saved`: "Журналы пробного запуска Luft сохранены на рабочем столе" — "Try Luft" rendered as «пробный запуск»; check it reads naturally.
+- `apps/meet/desktop/locales/ru/desktop.ftl` `check-start-entries`: "Старая загрузочная запись" — "start entry" (firmware boot menu entry), matching Setup's «загрузочные файлы».
+- `apps/meet/locales/ru/meet.ftl` `stick-keep`: "Оставить оба" — uses an exact `[1]` variant, since the `one` category also covers 21, 31…; same for `stick-replace-description` and `check-start-entries`.
+- `apps/meet/desktop/locales/ru/desktop.ftl` `check-encryption-changing-detail`: "…в Параметрах Windows, в разделе «Шифрование устройства»." — Windows' Settings app is «Параметры» in Russian, unlike Luft's «Настройки».

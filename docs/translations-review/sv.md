@@ -60,3 +60,13 @@ Strings in Luft's Swedish translation that a native speaker should check: terms 
 - `web/site/locales/sv/home.ftl` `home-app-mailman-detail`: "en sållning av nya avsändare" — "screener" has no settled Swedish term; check it's understood.
 - `web/site/locales/sv/home.ftl` `home-question-ready-answer`: "Nattliga byggen" — "nightly builds"; check whether "nightly-versioner" or "nattbyggen" is more familiar.
 - `web/site/locales/sv/home.ftl` `home-motion-heading`: "Rörelse med mening." — free rendering of "It moves like it means it"; check it lands as a heading.
+
+## Meet Luft
+
+- `apps/meet/locales/sv/meet.ftl` `meet-channel-latest`: "Meet Luft använder vanliga versioner igen" — "releases" as opposed to nightly builds; check whether "utgåvor" or "stabila versioner" reads better.
+- `apps/meet/locales/sv/meet.ftl` `ready-description`: "Välj hur du vill möta det." — keeps the "meet" of Meet Luft; check it doesn't sound odd for trying or installing a system.
+- `apps/meet/locales/sv/meet.ftl` `problem-room`: "Det gick inte att göra plats för Luft." — the "didn't finish" errors all use "Det gick inte att …", which loses the sense of being interrupted halfway.
+- `apps/meet/locales/sv/meet.ftl` `stick-done-title`: "Ditt Luft-minne är klart" — "Luft-minne" for a Luft USB stick; check it isn't read as some kind of memory.
+- `apps/meet/locales/sv/meet.ftl` `working-downloading`: "För över Luft" — "Bringing Luft over"; kept apart from "Hämtar Luft", which the stick download uses.
+- `apps/meet/desktop/locales/sv/desktop.ftl` `check-firmware-key-volume-up`: "volymknappen upp" — fills "tryck på { $key }"; check against what Swedish tablet guides call the volume-up button.
+- `apps/meet/desktop/locales/sv/desktop.ftl` `check-startup-bios-linux`: "… och ställ om systemet som redan finns här …" — free rendering of "along with the system already here"; check the meaning is clear.

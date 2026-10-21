@@ -75,3 +75,11 @@ Strings in Luft's Lithuanian translation that a native speaker should check: ter
 - `web/site/locales/lt/home.ftl` `home-question-ready-answer`: "Naktinės versijos" — no settled Lithuanian term for nightly builds.
 - `web/site/locales/lt/download.ftl` `download-meet-for-windows`: "Atsisiųsti Meet Luft <span>skirtą Windows</span>" — check the agreement of "skirtą" with Meet Luft.
 - `web/site/locales/lt/home.ftl` `home-start-heading`: "Pradžia žino, kur kas yra." — Start as a bare subject (Pradžia) at the start of a heading; check it's understood as the menu.
+
+## Meet Luft
+
+- `apps/meet/locales/lt/meet.ftl` `ready-remove-description`, `working-packing`: "persikraustymo dėžė" — the moving box; check it reads naturally.
+- `apps/meet/desktop/locales/lt/desktop.ftl` `check-start-entries`, `problem-tidy`: "paleidimo įrašas" — no settled Lithuanian term for a firmware boot entry.
+- `apps/meet/desktop/locales/lt/desktop.ftl` `check-space-short-windows`, `drive-hide-failed`, `check-encryption-changing-detail`: "Disko valymą", "Failų naršyklės", "Parametruose" — Windows names from memory; check against Lithuanian Windows 11.
+- `apps/meet/locales/lt/meet.ftl` `stick-keep`: "Palikti abi", "Palikti visas" — feminine, agreeing with "Luft" as a system.
+- `apps/meet/locales/lt/meet.ftl` `problem-check`, `hello-check`: both platform variants say "kompiuteris".

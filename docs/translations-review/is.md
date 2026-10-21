@@ -68,3 +68,12 @@ Strings in Luft's Icelandic translation that a native speaker should check: term
 - `web/site/locales/is/home.ftl` `home-app-tern`: "Útstöð" — GNOME's word for terminal; „Skipanalína” is the other candidate.
 - `web/site/locales/is/home.ftl` `home-app-rover-detail`: "flýtiskoðun" — coinage for Quick Look, which has no Icelandic name.
 - `web/site/locales/is/home.ftl` `home-question-ready-answer`: "Næturútgáfur … næturuppfærslur" — no settled term for nightly builds.
+
+## Meet Luft
+
+- `apps/meet/locales/is/meet.ftl` `ready-remove-description`: "flutningakassanum" — the moving box; no settled term.
+- `apps/meet/locales/is/meet.ftl` `meet-logs-saved`: "Atvikaskrár úr prufukeyrslu Luft…" — "Try Luft" as „prufukeyrsla”, and logs as „atvikaskrár”; check both.
+- `apps/meet/locales/is/meet.ftl` `problem-declined`: "Veldu Já þegar Windows spyr." — assumes the UAC button in the Icelandic language pack is „Já”.
+- `apps/meet/desktop/locales/is/desktop.ftl` `check-fast-startup-on`: "Kveikt er á flýtiræsingu" — „flýtiræsing” as in Setup; couldn't verify Windows' Icelandic name for Fast Startup, nor „Diskhreinsun” for Disk Cleanup and „Dulritun tækis” for Device encryption.
+- `apps/meet/desktop/locales/is/desktop.ftl` `helper-not-started`: "Hjálparforrit Meet Luft…" — "helper" as „hjálparforrit”.
+- `apps/meet/desktop/locales/is/desktop.ftl` `drive-volume-missing`: "Gagnasvæðið { $path }…" — "volume" as „gagnasvæði”; no settled term.

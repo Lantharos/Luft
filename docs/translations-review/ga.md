@@ -81,3 +81,13 @@ Strings in Luft's Irish translation that a native speaker should check: terms wi
 - `web/site/locales/ga/home.ftl` `home-wallpapers-text`: "Tagann { $count } ghrianghraf leis" — counting forms follow the style guide; check the [other] form reads well for 11–19.
 - `web/site/locales/ga/home.ftl` `home-question-ready-answer`: "leaganacha oíche" — no settled term for nightly builds.
 - `web/site/locales/ga/site.ftl` `site-nav-docs`: "Doiciméadú" — check against „Cáipéisíocht” for documentation.
+
+## Meet Luft
+
+- `apps/meet/locales/ga/meet.ftl` `problem-declined`: "Roghnaigh Tá nuair a fhiafraíonn Windows." — couldn't verify the UAC Yes button in the Irish language pack.
+- `apps/meet/locales/ga/meet.ftl` `ready-remove-description`: "an bosca imirce" — the moving box; no settled term.
+- `apps/meet/locales/ga/meet.ftl` `meet-logs-saved`: "na logaí ó thriail Luft" — "Try Luft" written as an ordinary phrase rather than a name.
+- `apps/meet/desktop/locales/ga/desktop.ftl` `check-space-short-windows`: "Glantachán Diosca" — assumed Irish name of Disk Cleanup; also „Criptiú gléis” for the Device encryption page; verify both.
+- `apps/meet/desktop/locales/ga/desktop.ftl` `helper-not-started`: "cúntóir Meet Luft" — "helper" as „cúntóir”.
+- `apps/meet/desktop/locales/ga/desktop.ftl` `check-start-entries`: "{ $count } sheaniontráil tosaithe" — mutation of a compound with „sean-” after numbers; check the forms.
+- `apps/meet/desktop/locales/ga/desktop.ftl` `check-wifi-broadcom`: "teatharáil USB" — tethering has no settled Irish term.

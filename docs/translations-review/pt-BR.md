@@ -61,3 +61,13 @@ Strings in Luft's Brazilian Portuguese translation that a native speaker should 
 - `web/site/locales/pt-BR/home.ftl` `home-motion-heading`: "Cada movimento tem intenção." — free rendering of "It moves like it means it"; check it works as a heading.
 - `web/site/locales/pt-BR/home.ftl` `home-question-ready-answer`: "As versões nightly saem sempre que algo muda" — "nightly" kept in English as most Brazilian projects do.
 - `web/site/locales/pt-BR/download.ftl` `download-meet-note`: "Mais informações e depois Executar assim mesmo" — SmartScreen's Brazilian labels from memory; confirm against a pt-BR Windows 11.
+
+## Meet Luft
+
+- `apps/meet/locales/pt-BR/meet.ftl` `linux-ready-this-system`: "sistema atual" — the fallback goes after an article ("o { $system }") in every sentence, so it is "sistema atual" without "este"; check the sentences read well with both a real name like Fedora Linux 42 and the fallback.
+- `apps/meet/locales/pt-BR/meet.ftl` `meet-channel-latest`: "O Meet Luft vai voltar a usar as versões estáveis" — "releases" as opposed to nightly builds; "estáveis" may overpromise while no stable release exists yet.
+- `apps/meet/locales/pt-BR/meet.ftl` `meet-logs-saved`: "Os logs de quando você experimentou o Luft foram salvos na área de trabalho" — "Try Luft" as a mode name doesn't fit inside a sentence, so it is paraphrased here and in the other log messages; long for a notice.
+- `apps/meet/desktop/locales/pt-BR/desktop.ftl` `check-secure-boot-turn-on`: "quando o logotipo da { $maker } aparecer" — assumes every brand takes the feminine article (a Lenovo, a Dell, a HP).
+- `apps/meet/desktop/locales/pt-BR/desktop.ftl` `helper-not-started`: "O auxiliar do Meet Luft não iniciou" — "auxiliar" for "helper" (the elevated process); "assistente" would read as a wizard.
+- `apps/meet/desktop/locales/pt-BR/desktop.ftl` `check-encryption-changing-detail`: "em Configurações, em Criptografia do dispositivo" — page name from memory of pt-BR Windows 11; Fast Startup follows setup's "Inicialização rápida", Disk Cleanup is "Limpeza de Disco", Explorer "Explorador de Arquivos".
+- `apps/meet/locales/pt-BR/meet.ftl` `box-folder-music`: "Músicas" (and "Imagens", "Área de trabalho") — meant to match the folder names Windows shows in Portuguese (Brazil).

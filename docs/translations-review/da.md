@@ -58,3 +58,13 @@ Strings in Luft's Danish translation that a native speaker should check: terms w
 - `web/site/locales/da/home.ftl` `home-security-sealed-text`: "Hele systemet er ét signeret aftryk" — the style guide avoids "aftryk", but "udgave" doesn't carry "signed image" here; check for a better word.
 - `web/site/locales/da/home.ftl` `home-app-mailman-detail`: "en sortering af nye afsendere" — "screener" has no settled Danish term.
 - `web/site/locales/da/home.ftl` `home-question-ready-answer`: "Natlige builds … en natlig build" — check the gender of "build" and whether "nightly-builds" is more familiar.
+
+## Meet Luft
+
+- `apps/meet/locales/da/meet.ftl` `ready-update-title`: "Hent den nyeste Luft" — a build of Luft is treated as common gender (»den nyeste Luft«, »den nye Luft«) while the system itself is »det«; check it doesn't jar.
+- `apps/meet/locales/da/meet.ftl` `meet-nightly`: "Natlige builds" — same open question as on the website: gender of »build« and whether »nightly builds« is more familiar.
+- `apps/meet/locales/da/meet.ftl` `problem-room`: "Arbejdet med at gøre plads til Luft blev ikke færdigt." — English "Making room … didn't finish" has no neat Danish noun; check for something shorter.
+- `apps/meet/locales/da/meet.ftl` `check-tidy-title`: "Vil du fjerne de gamle startposter?" — "start entry" rendered as »startpost«; check that Danes recognise it next to »bootpost« or »boot-indgang«.
+- `apps/meet/locales/da/meet.ftl` `box-folder-downloads`: "Overførsler" — Windows' Danish name for the Downloads folder; check it is still what current Windows 11 shows.
+- `apps/meet/desktop/locales/da/desktop.ftl` `check-secure-boot-off-detail`: "spil med anti-snyd kræver det" — »anti-cheat« is often left in English by Danish gamers.
+- `apps/meet/desktop/locales/da/desktop.ftl` `drive-volume-missing`: "Diskenheden { $path } blev ikke fundet" — »volume« as Windows' »diskenhed«; check it reads naturally in these error lines.

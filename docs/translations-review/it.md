@@ -62,3 +62,14 @@ Strings in Luft's Italian translation that a native speaker should check: terms 
 - `web/site/locales/it/home.ftl` `home-wallpapers-text`: "il colore principale, il vetro e ogni app prendono i suoi colori" — "il vetro" for the desktop's glass material; check it reads well.
 - `web/site/locales/it/home.ftl` `home-question-ready-answer`: "Le build nightly escono ogni volta che cambia qualcosa" — "build nightly" kept in English as in most Italian software projects.
 - `web/site/locales/it/download.ftl` `download-meet-note`: "Ulteriori informazioni, poi Esegui comunque" — SmartScreen's Italian labels from memory; confirm against an Italian Windows 11.
+
+## Meet Luft
+
+- `apps/meet/locales/it/meet.ftl` `box-pack`: "Imballa" — "pack" rendered with the moving metaphor (imballare, imballaggio, "Nello scatolone: { $size }"); setup.ftl says "Quello che hai preparato", so check whether "Prepara" reads more naturally.
+- `apps/meet/locales/it/meet.ftl` `ready-box-description`: "Metti in uno scatolone documenti, foto, reti Wi-Fi e altro: Luft lo disfa una volta installato." — "disfare lo scatolone" for unpacking; check it doesn't sound too playful.
+- `apps/meet/locales/it/meet.ftl` `ready-install-description`: "Riavvia nel programma di installazione." — "the installer" as programma di installazione rather than the app name Installa Luft; same in ready-restart-install and the linux-ready messages.
+- `apps/meet/locales/it/meet.ftl` `meet-channel-latest`: "Meet Luft userà di nuovo le versioni ufficiali" — "releases" as versioni ufficiali, against "build nightly"; check whether "release" is preferred.
+- `apps/meet/desktop/locales/it/desktop.ftl` `check-encryption-changing-detail`: "in Impostazioni, sotto Crittografia dispositivo" — Windows' Italian page name from memory; setup.ftl uses the lowercase "crittografia del dispositivo" in running text.
+- `apps/meet/desktop/locales/it/desktop.ftl` `check-space-short-windows`: "ad esempio con Pulizia disco" — Windows' Italian name for Disk Cleanup from memory; also "Esplora file" in drive-hide-failed.
+- `apps/meet/desktop/locales/it/desktop.ftl` `helper-not-started`: "Il processo di supporto di Meet Luft …" — "helper" rendered as processo di supporto in all helper-* errors; check it's clear to non-technical readers.
+- `apps/meet/desktop/locales/it/desktop.ftl` `check-startup-bios-linux`: "Attivalo nelle impostazioni del firmware, adattando anche il sistema già presente" — English "along with the system already here" is ambiguous; this reads it as the existing system needing to switch to UEFI too.

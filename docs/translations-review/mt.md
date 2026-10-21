@@ -80,3 +80,12 @@ Strings in Luft's Maltese translation that a native speaker should check: places
 - `web/site/locales/mt/home.ftl` `home-essentials-text`: "madum" — "tiles" for the quick settings tiles; check it isn't read too literally as floor tiles.
 - `web/site/locales/mt/home.ftl` `home-app-disks-detail`: "drajvs USB magħmula minn image" — "image" kept in English for a disk image, as in the security section; check it reads naturally.
 - `web/site/locales/mt/home.ftl` `home-motion-text`: "molol" — "springs"; check the image of motion on springs comes across.
+
+## Meet Luft
+
+- `apps/meet/locales/mt/meet.ftl` `linux-ready-description`: "{ $system } jibqa’ jibda bħas-soltu…" — the verb is masculine, which fits system names such as "Fedora Linux 42" but not the feminine fallback "din is-sistema"; same in linux-ready-try-description, linux-ready-restart-try and check-startup-uefi-linux.
+- `apps/meet/locales/mt/meet.ftl` `ready-remove-description`: "il-kaxxa tal-ġarr" — "moving box"; check that the image comes across, or whether there's a more natural phrase.
+- `apps/meet/locales/mt/meet.ftl` `problem-tidy`: "entrati tal-boot" — "start entries" in the firmware boot menu; no settled Maltese term.
+- `apps/meet/locales/mt/meet.ftl` `problem-declined`: "Agħżel Iva meta jistaqsik Windows" — I assume Windows' Maltese UAC prompt shows "Iva"; confirm. Fast Startup, Disk Cleanup and File Explorer are kept in English, as in Setup.
+- `apps/meet/desktop/locales/mt/desktop.ftl` `helper-not-started`: "L-għajnuna ta’ Meet Luft" — "helper", the part that works on the drive; check that it reads as a program and not as help.
+- `apps/meet/desktop/locales/mt/desktop.ftl` `check-encryption-changing-detail`: "taħt Ċċifrar tal-apparat" — the Device encryption page name in Windows' Maltese Settings is unverified.

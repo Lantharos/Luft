@@ -64,3 +64,13 @@ Strings in Luft's Dutch translation that a native speaker should check: terms wh
 - `web/site/locales/nl/home.ftl` `home-security-sealed-text`: "één ondertekende image" — "image" for the system image has no settled Dutch word; check gender and whether "systeemimage" is clearer.
 - `web/site/locales/nl/download.ftl` `download-meet-windows-checksum`: "Windows-checksum" — kept the loanword over "controlesom"; check which reads better on a download page.
 - `web/site/locales/nl/home.ftl` `home-motion-heading`: "Beweging met een bedoeling." — free rendering of "It moves like it means it"; check it lands as a heading.
+
+## Meet Luft
+
+- `apps/meet/locales/nl/meet.ftl` `meet-logs-saved`: "De logboeken van het uitproberen van Luft staan op je bureaublad" — "Try Luft" as a session has no short Dutch name; check that "het uitproberen van Luft" reads naturally (also meet-logs-none, meet-logs-failed, logs-not-saved).
+- `apps/meet/locales/nl/meet.ftl` `problem-tidy`: "De oude opstartvermeldingen konden niet worden verwijderd." — "opstartvermelding" for a firmware boot entry; check whether "opstartitem" is what Dutch users know from Windows.
+- `apps/meet/locales/nl/meet.ftl` `ready-remove-description`: "…ook de verhuisdoos…" — the moving box as "verhuisdoos"; check the metaphor lands, also in drive-box-no-guid.
+- `apps/meet/locales/nl/meet.ftl` `meet-iso-use`: "Een iso gebruiken die ik al heb" — lowercase "iso" and "Luft-iso" follow the website; check against "ISO".
+- `apps/meet/locales/nl/meet.ftl` `stick-drives-label`: "Usb-schijven" — "USB drives" kept apart from "usb-stick"; check whether "usb-sticks" is simply clearer (also problem-sticks, stick-looking).
+- `apps/meet/desktop/locales/nl/desktop.ftl` `check-startup-bios-linux`: "Schakel het in de firmware-instellingen in, samen met het systeem dat hier al staat" — the English is vague about what happens to the existing system; check the meaning comes across.
+- `apps/meet/desktop/locales/nl/desktop.ftl` `check-firmware-key-volume-up`: "de knop volume omhoog" — inserted after "druk je op"; check it reads well in that sentence.

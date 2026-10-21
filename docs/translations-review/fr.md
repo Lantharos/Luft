@@ -59,3 +59,13 @@ Strings in Luft's French translation that a native speaker should check: terms w
 - `web/site/locales/fr/home.ftl` `home-wallpapers-text`: "la couleur d’accentuation, le verre et chaque application prennent ses couleurs" — "le verre" for the desktop's glass material; check it reads naturally.
 - `web/site/locales/fr/home.ftl` `home-question-ready-answer`: "Des versions nightly sortent à chaque changement" — "nightly" kept in English as most French projects do; check whether « versions quotidiennes » reads better.
 - `web/site/locales/fr/download.ftl` `download-meet-note`: "Informations complémentaires, puis Exécuter quand même" — SmartScreen's French labels from memory; confirm against a French Windows 11.
+
+## Meet Luft
+
+- `apps/meet/locales/fr/meet.ftl` `box-pack`: "Emballer" — packing for the moving box is « emballer / déballer » throughout Meet Luft (carton de déménagement); Setup's `setup-meet-room-packed` says « préparé », so check both read as the same thing.
+- `apps/meet/locales/fr/meet.ftl` `ready-box-packed`: "Emballé, { $size }" — agrees with the box (masculine); check it reads well as the status under the moving box.
+- `apps/meet/locales/fr/meet.ftl` `check-action-tidy`: "Faire le ménage" — button that removes stale start entries; check it isn't too casual next to « Ouvrir les paramètres du micrologiciel ».
+- `apps/meet/locales/fr/meet.ftl` `stick-done-ventoy-key`: "…d’enregistrer sa propre clé de signature" — « clé » already means the USB stick on this screen; check « clé de signature » avoids the confusion.
+- `apps/meet/desktop/locales/fr/desktop.ftl` `check-startup-bios-linux`: "…et faites aussi passer le système déjà présent en UEFI…" — the English "along with the system already here" is loose; check the meaning.
+- `apps/meet/desktop/locales/fr/desktop.ftl` `check-firmware-key-volume-up`: "Volume +" — tablet button; check it is the usual way to name it.
+- `apps/meet/locales/fr/meet.ftl` `meet-nightly`: "Versions nightly" — same choice as the website; check it fits the title bar.

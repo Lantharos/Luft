@@ -67,3 +67,12 @@ Strings in Luft's Turkish translation that a native speaker should check: terms 
 - `web/site/locales/tr/download.ftl` `download-meet-for-windows`: "<span>Windows için</span> Meet Luft’u indir" — the hidden part moved to the front for natural word order; check it reads well with the span dimmed.
 - `web/site/locales/tr/home.ftl` `home-question-ready-answer`: "gecelik sürümler" — for "nightly builds"; developers may expect "nightly" kept in English.
 - `web/site/locales/tr/home.ftl` `home-motion-heading`: "Her hareketi yerinde." — free rendering of "It moves like it means it"; check it lands as a heading.
+
+## Meet Luft
+
+- `apps/meet/locales/tr/meet.ftl` `linux-ready-description`: "…her zamanki gibi başlayan sistem: { $system }." — a colon so the name needs no suffix and the fallback «bu sistem» isn't lowercase at the start of a sentence; the same in the other linux-ready lines and check-startup-uefi-linux. Check that it doesn't sound stiff.
+- `apps/meet/locales/tr/meet.ftl` `ready-remove-description`: "taşınma kutusu" — "moving box"; check that the image comes across.
+- `apps/meet/locales/tr/meet.ftl` `problem-tidy`: "önyükleme girdileri" — "start entries" in the firmware boot menu; check it against what firmware and Windows tools say.
+- `apps/meet/locales/tr/meet.ftl` `meet-keep-it`: "Kalsın" — the button that keeps Luft instead of removing it; check that it reads clearly as a button.
+- `apps/meet/desktop/locales/tr/desktop.ftl` `helper-registry-not-opened`: "Açılamadı: { $key } ({ $error })" — rebuilt as a colon form so the placeable needs no suffix; same pattern in several helper-, live- and stick- errors.
+- `apps/meet/desktop/locales/tr/desktop.ftl` `check-secure-boot-off-detail`: "hile önleyicili oyunlar" — "games with anti-cheat"; gamers may expect "anti-cheat".

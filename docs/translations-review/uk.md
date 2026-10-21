@@ -75,3 +75,11 @@ Strings in Luft's Ukrainian translation that a native speaker should check, each
 - `web/site/locales/uk/home.ftl` `home-app-mailman-detail`: "перевірка нових відправників" — "screener" has no settled Ukrainian term.
 - `web/site/locales/uk/home.ftl` `home-intro`: "ядро, яке саме стежить за своєю цілісністю" — "a core that keeps itself in one piece"; check it doesn't read as the Linux kernel.
 - `web/site/locales/uk/site.ftl` `site-footer-made`: "…на основі { $fedora }." — relies on Fedora staying undeclined after «на основі».
+
+## Meet Luft
+
+- `apps/meet/locales/uk/meet.ftl` `meet-logs-saved`: "Журнали пробного запуску Luft збережено на робочому столі" — "Try Luft" rendered as „пробний запуск“; check it matches how the mode reads elsewhere.
+- `apps/meet/desktop/locales/uk/desktop.ftl` `check-start-entries`: "Старий запис запуску" — "start entry" (firmware boot menu entry) as „запис запуску“, matching Setup's „файли запуску“; some may expect „запис завантаження“.
+- `apps/meet/locales/uk/meet.ftl` `stick-keep`: "Залишити обидва" — uses an exact `[1]` variant, since the `one` category also covers 21, 31…; same for `stick-replace-description` and `check-start-entries`.
+- `apps/meet/desktop/locales/uk/desktop.ftl` `check-fast-startup-on-detail`: "…переходить у режим глибокого сну…" — hibernate; check against Ukrainian Windows' wording.
+- `apps/meet/desktop/locales/uk/desktop.ftl` `check-secure-boot-restart-into`: "…де цей параметр розташовано в { $place }." — $place is an English firmware menu path; check the preposition.

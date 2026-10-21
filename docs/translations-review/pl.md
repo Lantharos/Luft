@@ -62,3 +62,11 @@ Strings in Luft's Polish translation that a native speaker should check, each li
 - `web/site/locales/pl/home.ftl` `home-app-mailman-detail`: "sito dla nowych nadawców" — "screener" has no settled Polish term; check it reads clearly.
 - `web/site/locales/pl/home.ftl` `home-app-disks`: "Zarządzanie dyskami" — "Drives" as the kind, chosen so it doesn't repeat the app name Dyski in "Dyski (Dyski)".
 - `web/site/locales/pl/site.ftl` `site-footer-made`: "Tworzy { $lantharos }." — Lantharos as the subject avoids declining the name; check it reads naturally as a credit line.
+
+## Meet Luft
+
+- `apps/meet/locales/pl/meet.ftl` `meet-logs-saved`: "Dzienniki z wypróbowywania systemu Luft zapisano na pulpicie" — "Try Luft" as a mode has no fixed Polish name, so it's described; check it reads naturally in all three logs messages.
+- `apps/meet/desktop/locales/pl/desktop.ftl` `check-start-entries`: "Stary wpis rozruchowy" — "start entry" (a firmware boot menu entry) rendered as wpis rozruchowy, used throughout Meet Luft.
+- `apps/meet/locales/pl/meet.ftl` `check-action-tidy`: "Uporządkuj" — button for removing stale boot entries; check it's clear enough next to the explanation.
+- `apps/meet/desktop/locales/pl/desktop.ftl` `check-secure-boot-restart-into`: "…gdzie ta opcja jest w { $place }" — $place is an English firmware menu path ("Security, a potem Secure Boot"); check the preposition reads well with it.
+- `apps/meet/desktop/locales/pl/desktop.ftl` `helper-pipe-hijacked`: "{ $pipe } otworzyło coś innego niż pomocnik Meet Luft" — word order chosen so $pipe needs no case.

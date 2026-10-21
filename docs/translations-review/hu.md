@@ -80,3 +80,12 @@ Strings in Luft's Hungarian translation that a native speaker should check: term
 - `web/site/locales/hu/home.ftl` `home-motion-heading`: "Minden mozdulatnak célja van." — free rendering of "It moves like it means it".
 - `web/site/locales/hu/home.ftl` `home-get`, `home-look`: "A Luft beszerzése", "Körülnézés" — action-noun button form; check they read well as hero buttons.
 - `web/site/locales/hu/home.ftl` `home-security-sealed-text`: "aláírt lemezkép" — the signed system image; check the term.
+
+## Meet Luft
+
+- `apps/meet/locales/hu/meet.ftl` `ready-remove-description`, `working-packing`: "költözési doboz" — the moving box; check it reads naturally.
+- `apps/meet/desktop/locales/hu/desktop.ftl` `check-start-entries`, `problem-tidy`: "indítási bejegyzés" — no settled Hungarian term for a firmware boot entry.
+- `apps/meet/desktop/locales/hu/desktop.ftl` `check-encryption-changing-detail`: "a Gépházban, az Eszköztitkosítás résznél" — check that Windows 11 still calls Settings "Gépház" in Hungarian.
+- `apps/meet/desktop/locales/hu/desktop.ftl` `check-secure-boot-turn-on`: "nyomja meg a következőt, amikor megjelenik a gyártó ({ $maker }) logója: { $key }" — reordered so the key and brand need no suffix; check it reads naturally.
+- `apps/meet/locales/hu/meet.ftl` `linux-ready-description`, `linux-ready-try-description`: "A rendszer ({ $system })" — the system name is put in parentheses to avoid an article and suffix.
+- `apps/meet/locales/hu/meet.ftl` `meet-nightly`, `meet-channel-nightly`: "Éjszakai buildek" — same informal term as on the website.

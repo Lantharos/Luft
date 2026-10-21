@@ -67,3 +67,13 @@ Strings in Luft’s Catalan translation that a native speaker should check: term
 - `web/site/locales/ca/home.ftl` `home-meet-restart`: "Reinicia a Luft" — step heading written as a button-style imperative; check whether a noun («Reinici a Luft») suits the card better.
 - `web/site/locales/ca/home.ftl` `home-question-ready-answer`: "Les versions nightly surten cada vegada que canvia alguna cosa" — "nightly" kept in English; check whether «versions diàries» reads better.
 - `web/site/locales/ca/download.ftl` `download-meet-note`: "Més informació i després Executa igualment" — SmartScreen's Catalan labels could not be verified; confirm against a Catalan Windows 11.
+
+## Meet Luft
+
+- `apps/meet/desktop/locales/ca/desktop.ftl` `check-space-short-windows`: "per exemple amb la Neteja de disc" — the Catalan Windows name of Disk Cleanup could not be verified; confirm against a Catalan Windows 11.
+- `apps/meet/locales/ca/meet.ftl` `meet-logs-saved`: "els registres de la prova de Luft" — Try Luft rendered as «la prova de Luft» in running text, since the button form «Prova Luft» doesn’t fit after «de»; check it is still recognisable as the same mode.
+- `apps/meet/locales/ca/meet.ftl` `ready-box-description`: "la caixa de mudança" — moving box rendered literally (also in `working-packing` and `drive-box-no-guid`); check it reads naturally.
+- `apps/meet/locales/ca/meet.ftl` `meet-channel-latest`: "Meet Luft tornarà a fer servir les versions publicades" — «releases» as opposed to nightly builds; «versions estables» was avoided because there are no stable releases yet.
+- `apps/meet/locales/ca/meet.ftl` `box-total-slow`: "{ $size }, que es triga aproximadament { $minutes } minuts a empaquetar" — check it reads well after the size placeable.
+- `apps/meet/desktop/locales/ca/desktop.ftl` `check-secure-boot-turn-on`: "quan aparegui el logotip de la marca { $maker }" — «de la marca» added so brands starting with a vowel (Acer, ASUS) don’t need «d’»; check it isn’t too wordy.
+- `apps/meet/desktop/locales/ca/desktop.ftl` `helper-not-started`: "L’auxiliar de Meet Luft" — helper rendered as «l’auxiliar»; check whether «el procés auxiliar» is clearer.

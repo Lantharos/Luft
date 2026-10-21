@@ -63,3 +63,12 @@ Strings in Luft's Greek translation that a native speaker should check: terms wi
 - `web/site/locales/el/site.ftl` `site-footer-made`: "Δημιουργία: { $lantharos }." — colon form avoids giving Lantharos an article and gender; check it doesn't read too terse in a footer.
 - `web/site/locales/el/home.ftl` `home-question-ready-answer`: "Νυχτερινές εκδόσεις" — translates "nightly builds"; Greek developers may expect "nightly" in Latin letters.
 - `web/site/locales/el/home.ftl` `home-motion-heading`: "Κινείται με σκοπό." — free rendering of "It moves like it means it"; check it sounds natural as a heading.
+
+## Meet Luft
+
+- `apps/meet/locales/el/meet.ftl` `linux-ready-description`: "…θα ξεκινά κανονικά { $system }." — the system name comes after the verb with no article, so the fallback «αυτό το σύστημα» also fits; the same pattern is used in linux-ready-try-description, linux-ready-restart-try, linux-ready-restart-replace and check-startup-uefi-linux. Check that it reads naturally with names like «Fedora Linux 42».
+- `apps/meet/locales/el/meet.ftl` `linux-ready-replace-title`: "Αντικατάσταση: { $system }" — Setup writes «Αντικατάσταση του { $system }». I used a colon here because the fallback «αυτό το σύστημα» can't follow «του».
+- `apps/meet/locales/el/meet.ftl` `ready-remove-description`: "κούτα μετακόμισης" — "moving box"; check that the image comes across, or whether «κιβώτιο μεταφοράς» is clearer.
+- `apps/meet/locales/el/meet.ftl` `problem-tidy`: "καταχωρίσεις εκκίνησης" — "start entries" in the firmware boot menu; no settled Greek term.
+- `apps/meet/desktop/locales/el/desktop.ftl` `helper-not-started`: "βοηθητική διεργασία" — "helper"; check that it isn't too technical.
+- `apps/meet/desktop/locales/el/desktop.ftl` `check-firmware-place-security`: "Security › Secure Boot" — I used › instead of "then", since it's inserted after «στο»; check that it reads well inside the sentence.

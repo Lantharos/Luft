@@ -63,3 +63,12 @@ Strings in Luft's Nynorsk translation that a native speaker should check: terms 
 - `web/site/locales/nn/home.ftl` `home-app-mailman-detail`: "ei sortering av nye avsendarar" — "screener" has no settled Nynorsk term.
 - `web/site/locales/nn/home.ftl` `home-meet-room`: "Han lagar plass" — Meet Luft referred to as "han" (ein app); check it reads naturally as a step heading.
 - `web/site/locales/nn/home.ftl` `home-question-ready-answer`: "Nattlege bygg" — "nightly builds"; check whether another term is more familiar.
+
+## Meet Luft
+
+- `apps/meet/desktop/locales/nn/desktop.ftl` `check-encryption-changing-detail`: "i Innstillinger, under Enhetskryptering" — Bokmål page names, because Windows ships no Nynorsk; setup.ftl says «einingskryptering» in running text, so check the mix reads right.
+- `apps/meet/locales/nn/meet.ftl` `ready-remove-description`: "òg flytteeska" — «flytteeske» for the moving box partition; check it reads as Meet Luft's packed bundle.
+- `apps/meet/locales/nn/meet.ftl` `meet-logs-saved`: "Loggane frå då du prøvde Luft, er lagra på skrivebordet ditt" — "logs from Try Luft" rephrased; check it isn't too long for a notice.
+- `apps/meet/desktop/locales/nn/desktop.ftl` `check-start-entries-detail`: "Ho kan ryddast bort." — «oppstartsoppføring» taken as feminine (ei føring); check the pronoun.
+- `apps/meet/desktop/locales/nn/desktop.ftl` `check-encryption-on-detail`: "for sikkerheits skuld" — fixed phrase kept although the guide prefers «tryggleik»; check it doesn't read as Bokmål.
+- `apps/meet/desktop/locales/nn/desktop.ftl` `check-secure-boot-off-detail`: "spel med juksevern" — no settled Nynorsk term for anti-cheat.

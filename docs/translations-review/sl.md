@@ -60,3 +60,12 @@ Strings in Luft's Slovenian translation that a native speaker should check: term
 - `web/site/locales/sl/home.ftl` `home-intro`: "temelj, ki sam ostaja nedotaknjen" — free rendering of "a core that keeps itself in one piece"; check it reads naturally.
 - `web/site/locales/sl/home.ftl` `home-app-disks`: "Pogoni" — the kind shown under Diski; needed a word other than the app name.
 - `web/site/locales/sl/home.ftl` `home-motion-text`: "zato si lahko sredi giba premisli brez sunka" — the spring metaphor; check it doesn't read oddly.
+
+## Meet Luft
+
+- `apps/meet/locales/sl/meet.ftl` `linux-ready-description`: "… se kot običajno še naprej zaganja { $system }." — { $system } can be „ta sistem“, so Linux sentences keep it out of the sentence start; check the word order reads naturally.
+- `apps/meet/locales/sl/meet.ftl` `linux-ready-restart-replace`: "Namestitveni program se odpre z že izbrano zamenjavo za { $system } …" — rebuilt to avoid declining the system name; check it isn't stiff.
+- `apps/meet/locales/sl/meet.ftl` `check-found-description`: "To je ugotovila aplikacija Meet Luft." — messages avoid giving Meet Luft a gender by using „aplikacija Meet Luft“ or impersonal „ni bilo mogoče …“; check that's the right call.
+- `apps/meet/locales/sl/meet.ftl` `stick-done-eject`: "Pred odstranitvijo ga izvrzite." — check against Windows' Slovenian wording for ejecting a drive.
+- `apps/meet/desktop/locales/sl/desktop.ftl` `drive-storage-error`: "napaka shrambe sistema Windows { $code }" — no settled term for "Windows storage error".
+- `apps/meet/desktop/locales/sl/desktop.ftl` `check-wifi-broadcom`: "telefon za internetno povezavo prek USB" — paraphrase of USB tethering; check Android's Slovenian term („Internet prek USB-ja“).

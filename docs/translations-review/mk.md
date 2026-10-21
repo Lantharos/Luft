@@ -67,3 +67,13 @@ Strings in Luft's Macedonian translation that a native speaker should check. Eac
 - `web/site/locales/mk/home.ftl` `home-intro`: "основа што сама останува неоштетена" — free rendering of "a core that keeps itself in one piece".
 - `web/site/locales/mk/home.ftl` `home-app-disks`: "Складирање" — the kind shown under Дискови; needed a word other than the app name.
 - `web/site/locales/mk/home.ftl` `home-meet-usb`: "запишете го ISO-то сами" — check whether „ISO-то“ or „ISO-сликата“ is the usual form.
+
+## Meet Luft
+
+- `apps/meet/locales/mk/meet.ftl` `meet-logs-saved`: "Дневниците од пробувањето на Luft…" — logs as „дневници“ and Try Luft as „пробувањето на Luft“; check both read naturally.
+- `apps/meet/locales/mk/meet.ftl` `meet-channel-latest`: "…редовни изданија" — releases as opposed to nightly builds; no settled term.
+- `apps/meet/locales/mk/meet.ftl` `room-confirm-title`: "Да се дадат { $size } на Luft?" — plural verb assumes sizes like „120 GB“.
+- `apps/meet/locales/mk/meet.ftl` `stick-keep`: "Задржи ги двата" — masculine „двата“ for two Luft builds; check against „двете“.
+- `apps/meet/locales/mk/meet.ftl` `linux-ready-replace-title`: "Замени го { $system }" — `$system` is a Latin name or the fallback „овој систем“, so no „системот“ before it.
+- `apps/meet/desktop/locales/mk/desktop.ftl` `check-fast-startup-on`: "Брзо стартување е вклучено" — assumes Windows' Macedonian name for Fast Startup; same for „Чистење на дискот“ and „Шифрирање на уредот“.
+- `apps/meet/desktop/locales/mk/desktop.ftl` `check-firmware-key-volume-up`: "копчето за зголемување на звукот" — check it fits after „притиснете“.

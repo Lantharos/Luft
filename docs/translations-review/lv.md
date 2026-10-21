@@ -64,3 +64,11 @@ Strings in Luft's Latvian translation that a native speaker should check: terms 
 - `web/site/locales/lv/home.ftl` `home-question-ready-answer`: "Nakts būvējumi" — no settled Latvian term for nightly builds.
 - `web/site/locales/lv/download.ftl` `download-meet-for-windows`: "Lejupielādēt Meet Luft <span>operētājsistēmai Windows</span>" — check the hidden part isn't too long on wide buttons.
 - `web/site/locales/lv/home.ftl` `home-motion-heading`: "Kustība ar nodomu." — free rendering of "It moves like it means it".
+
+## Meet Luft
+
+- `apps/meet/locales/lv/meet.ftl` `ready-remove-description`, `working-packing`: "pārcelšanās kaste" — the moving box; check it reads naturally.
+- `apps/meet/desktop/locales/lv/desktop.ftl` `check-start-entries`, `problem-tidy`: "startēšanas ieraksts" — no settled Latvian term for a firmware boot entry.
+- `apps/meet/desktop/locales/lv/desktop.ftl` `check-space-short-windows`, `drive-hide-failed`: "Diska tīrīšana", "Failu pārlūks" — Windows tool names from memory; check against Latvian Windows.
+- `apps/meet/locales/lv/meet.ftl` `stick-keep`: "Paturēt abas", "Paturēt visas" — feminine, agreeing with "Luft" as a system; check it reads right for builds on a stick.
+- `apps/meet/locales/lv/meet.ftl` `problem-check`, `hello-check`: both platform variants say "dators".

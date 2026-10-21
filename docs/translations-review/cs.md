@@ -60,3 +60,11 @@ Strings in Luft's Czech translation that a native speaker should check: term cho
 - `web/site/locales/cs/home.ftl` `home-app-mailman-detail`: "prověřování nových odesílatelů" — "screener" has no settled Czech term.
 - `web/site/locales/cs/home.ftl` `home-app-magpie-detail`: "zbytek složky máte na šipce" — colloquial for "an arrow key away"; check it is clear.
 - `web/site/locales/cs/site.ftl` `site-footer-made`: "Vytváří { $lantharos }." — Lantharos as the subject avoids declining the name; check it reads naturally as a credit line.
+
+## Meet Luft
+
+- `apps/meet/locales/cs/meet.ftl` `meet-logs-saved`: "Protokoly ze zkoušení systému Luft jsou uložené na ploše" — "Try Luft" as a mode is described rather than named; check all three logs messages.
+- `apps/meet/desktop/locales/cs/desktop.ftl` `check-start-entries`: "Stará spouštěcí položka" — "start entry" (firmware boot menu entry) used throughout Meet Luft.
+- `apps/meet/locales/cs/meet.ftl` `check-blocked-description`: "Postup najdete níže." — free rendering of "Here's what to do."
+- Windows is treated as plural throughout Meet Luft ("Windows zmenší", "Windows nedokážou"), while Setup mixes "systém Windows" singular; check which a reviewer prefers.
+- `apps/meet/desktop/locales/cs/desktop.ftl` `check-secure-boot-turn-on`: "…při zobrazení loga { $maker } stisknete { $key } a přejdete do { $place }." — $key may be "tlačítko zesílení hlasitosti" and $place an English menu path; check both fit.

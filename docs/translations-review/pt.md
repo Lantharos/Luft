@@ -63,3 +63,13 @@ Strings in Luft's European Portuguese translation that a native speaker should c
 - `web/site/locales/pt/home.ftl` `home-start-text`: "quando lho pede" — European contraction; check it doesn't read too formal for marketing copy.
 - `web/site/locales/pt/home.ftl` `home-question-ready-answer`: "As versões nightly saem sempre que algo muda" — "nightly" kept in English; check whether «versões diárias» reads better.
 - `web/site/locales/pt/download.ftl` `download-meet-note`: "Mais informações e depois Executar mesmo assim" — SmartScreen's labels for Portugal from memory, not verified; confirm against a pt-PT Windows 11.
+
+## Meet Luft
+
+- `apps/meet/desktop/locales/pt/desktop.ftl` `check-encryption-changing-detail`: "nas Definições, em Encriptação de dispositivos" — the Windows Settings page name for Portugal from memory; setup.ftl uses the lowercase «encriptação do dispositivo» in running text. Confirm against a pt-PT Windows 11.
+- `apps/meet/desktop/locales/pt/desktop.ftl` `check-space-short-windows`: "com a Limpeza do Disco" — Disk Cleanup's pt-PT name, likewise `drive-hide-failed` «Explorador de Ficheiros»; check both against Windows.
+- `apps/meet/locales/pt/meet.ftl` `linux-ready-description`: "Até decidir o contrário, { $system } continua a arrancar normalmente." — $system has no article because it can also be «este sistema»; «Fedora Linux 42 continua» without «o» may read slightly bare. Same in the other linux-ready-* messages.
+- `apps/meet/locales/pt/meet.ftl` `meet-logs-saved`: "Os registos da experiência com o Luft foram guardados no ambiente de trabalho" — "logs from Try Luft" rendered as «registos da experiência com o Luft»; check it is clear.
+- `apps/meet/locales/pt/meet.ftl` `meet-channel-latest`: "O Meet Luft volta a utilizar as versões normais" — "releases" as opposed to nightly builds; «versões estáveis» is the alternative, but there are no stable releases yet.
+- `apps/meet/desktop/locales/pt/desktop.ftl` `helper-not-started`: "O processo auxiliar do Meet Luft não arrancou" — "helper" as «processo auxiliar»; check it isn't too technical for an error line.
+- `apps/meet/desktop/locales/pt/desktop.ftl` `check-secure-boot-turn-on`: "quando aparecer o logótipo { $maker }" — built without an article so any brand fits; check it reads naturally with «Lenovo», «HP», «Dell».

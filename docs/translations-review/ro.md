@@ -69,3 +69,12 @@ Strings in Luft's Romanian translation that a native speaker should check. Each 
 - `web/site/locales/ro/home.ftl` `home-intro`: "o bază care se menține singură intactă" — English "a core that keeps itself in one piece"; „nucleu” was avoided because it reads as the kernel.
 - `web/site/locales/ro/home.ftl` `home-app-rover-detail`: "File, previzualizare rapidă…" — „File” for browser-style tabs next to the Fișiere label may be ambiguous; Quick Look has no Romanian name.
 - `web/site/locales/ro/home.ftl` `home-question-ready-answer`: "Versiunile nightly…" — kept "nightly" as the loanword; check whether „zilnice” reads better.
+
+## Meet Luft
+
+- `apps/meet/locales/ro/meet.ftl` `ready-remove-description`: "cutia de mutare" — the moving box; no settled term, check it reads naturally.
+- `apps/meet/locales/ro/meet.ftl` `meet-logs-saved`: "Jurnalele din sesiunea de încercare Luft…" — "Try Luft" rendered as „sesiunea de încercare” instead of a name; check it's clear.
+- `apps/meet/desktop/locales/ro/desktop.ftl` `helper-not-started`: "Asistentul Meet Luft…" — "helper" (the elevated process) as „asistent”; may read like a wizard.
+- `apps/meet/desktop/locales/ro/desktop.ftl` `check-fast-startup-on`: "Pornire rapidă este activată" — Windows' setting name used as a subject without an article; check it reads well.
+- `apps/meet/desktop/locales/ro/desktop.ftl` `check-space-short-windows`: "Curățare disc" — assumed to be the Romanian name of Disk Cleanup; verify.
+- `apps/meet/desktop/locales/ro/desktop.ftl` `check-firmware-key-volume-up`: "butonul de mărire a volumului" — inserted after „apăsați”; check it fits.

@@ -69,3 +69,11 @@ Strings in Luft's Estonian translation that a native speaker should check. Each 
 - `web/site/locales/et/home.ftl` `home-question-ready-answer`: "Öiseid järke", "öisest järgust" — no settled Estonian term for nightly builds.
 - `web/site/locales/et/home.ftl` `home-meet-restart`: "Taaskäivitage Lufti" — step heading for "Restart into Luft"; check the illative reads naturally.
 - `web/site/locales/et/home.ftl` `home-motion-heading`: "Liigub nii, nagu peab." — free rendering of "It moves like it means it".
+
+## Meet Luft
+
+- `apps/meet/locales/et/meet.ftl` `ready-remove-description`, `working-packing`: "kolimiskast" — the moving box; check it reads naturally.
+- `apps/meet/desktop/locales/et/desktop.ftl` `check-start-entries`, `problem-tidy`: "käivituskirje" — no settled Estonian term for a firmware boot entry.
+- `apps/meet/desktop/locales/et/desktop.ftl` `check-fast-startup-on`, `ready-fast-startup-title`: "kiirkäivitus" — taken from Setup; check against Estonian Windows' name for Fast Startup.
+- `apps/meet/desktop/locales/et/desktop.ftl` `check-space-short-windows`: "kettapuhastusega" — Disk Cleanup's Estonian name from memory.
+- `apps/meet/locales/et/meet.ftl` `problem-check`, `hello-check`, `check-ready-title`: both platform variants say "arvuti", since Estonian Windows doesn't use "PC" here.

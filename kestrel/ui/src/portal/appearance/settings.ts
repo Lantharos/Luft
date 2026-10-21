@@ -27,7 +27,6 @@ const SHARED_SCHEMAS = [
   'org.gnome.desktop.privacy',
   'org.gnome.desktop.sound',
   'org.gnome.desktop.wm.preferences',
-  'org.gnome.settings-daemon.plugins.xsettings',
 ];
 const COLOR_SCHEMES: Record<string, number> = { 'prefer-dark': 1, 'prefer-light': 2 };
 
@@ -47,9 +46,7 @@ export class SettingsPortal {
   private accent: Rgb | null = null;
 
   constructor() {
-    const source = Gio.SettingsSchemaSource.get_default()!;
     for (const id of SHARED_SCHEMAS) {
-      if (!source.lookup(id, true)) continue;
       const settings = new Gio.Settings({ schema_id: id });
       settings.connect('changed', (_settings, key) => this.changed(id, key));
       this.schemas.set(id, settings);
@@ -116,7 +113,7 @@ export class SettingsPortal {
   }
 
   private highContrast(): boolean {
-    return this.schemas.get(A11Y_INTERFACE)?.get_boolean('high-contrast') ?? false;
+    return this.schemas.get(A11Y_INTERFACE)!.get_boolean('high-contrast');
   }
 
   private changed(namespace: string, key: string): void {

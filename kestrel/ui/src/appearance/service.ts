@@ -19,10 +19,7 @@ const APPEARANCE_INTERFACE = `<node>
   <interface name="com.lantharos.Kestrel.Appearance">
     <property name="AccentColor" type="s" access="read"/>
     <property name="WallpaperAccentColor" type="s" access="read"/>
-    <property name="Dark" type="b" access="read"/>
     <property name="PureBlack" type="b" access="read"/>
-    <property name="Colors" type="a{ss}" access="read"/>
-    <property name="TerminalColors" type="a{ss}" access="read"/>
     <property name="LightColors" type="a{ss}" access="read"/>
     <property name="DarkColors" type="a{ss}" access="read"/>
     <property name="LightTerminalColors" type="a{ss}" access="read"/>
@@ -33,9 +30,8 @@ const APPEARANCE_INTERFACE = `<node>
 </node>`;
 
 const PROPERTIES: [string, string][] = [
-  ['AccentColor', 's'], ['WallpaperAccentColor', 's'], ['Dark', 'b'], ['PureBlack', 'b'], ['Colors', 'a{ss}'], ['TerminalColors', 'a{ss}'],
-  ['LightColors', 'a{ss}'], ['DarkColors', 'a{ss}'], ['LightTerminalColors', 'a{ss}'], ['DarkTerminalColors', 'a{ss}'],
-  ['AppIcons', 'a{ss}'], ['Taskbar', 's'],
+  ['AccentColor', 's'], ['WallpaperAccentColor', 's'], ['PureBlack', 'b'], ['LightColors', 'a{ss}'], ['DarkColors', 'a{ss}'],
+  ['LightTerminalColors', 'a{ss}'], ['DarkTerminalColors', 'a{ss}'], ['AppIcons', 'a{ss}'], ['Taskbar', 's'],
 ];
 const PERSIST_DELAY = 400;
 
@@ -78,16 +74,9 @@ export class AppearanceService {
     return this.appearance?.palette ?? null;
   }
 
-  private get current() {
-    return this.appearance && (this.appearance.dark ? this.appearance.palette.dark : this.appearance.palette.light);
-  }
-
   get AccentColor(): string { return this.appearance?.accentColor ?? ''; }
   get WallpaperAccentColor(): string { return this.wallpaperSeed ? toHex(accentColor(this.wallpaperSeed)) : ''; }
-  get Dark(): boolean { return this.interfaceSettings.get_string('color-scheme') === 'prefer-dark'; }
   get PureBlack(): boolean { return this.settings.get_boolean('pure-black'); }
-  get Colors(): Record<string, string> { return this.current?.colors ?? {}; }
-  get TerminalColors(): Record<string, string> { return this.current?.terminal ?? {}; }
   get LightColors(): Record<string, string> { return this.palette?.light.colors ?? {}; }
   get DarkColors(): Record<string, string> { return this.palette?.dark.colors ?? {}; }
   get LightTerminalColors(): Record<string, string> { return this.palette?.light.terminal ?? {}; }
@@ -134,7 +123,7 @@ export class AppearanceService {
     this.appearance = {
       accentColor: toHex(accent),
       accentName: namedAccent(seed),
-      dark: this.Dark,
+      dark: this.interfaceSettings.get_string('color-scheme') === 'prefer-dark',
       pureBlack: this.PureBlack,
       palette: buildPalette(seed, this.PureBlack),
     };

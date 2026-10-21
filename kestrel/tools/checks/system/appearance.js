@@ -30,12 +30,13 @@ function write(file, contents) {
 }
 
 async function checkPalette() {
-  const colors = await appearance('Colors');
+  const scheme = getStyleVariant() === 'dark' ? 'Dark' : 'Light';
+  const colors = await appearance(`${scheme}Colors`);
   require(ROLES.every(role => /^#[0-9a-f]{6}$/.test(colors[role] ?? '')), 'apps get the full wallpaper palette');
   require(contrast(colors.onSurface, colors.surface) >= 4.5 && contrast(colors.onPrimary, colors.primary) >= 4.5 &&
     contrast(colors.onSurfaceVariant, colors.surfaceContainerHighest) >= 4.5 && contrast(colors.outline, colors.surface) >= 3,
   'palette text and outlines stay readable');
-  const terminal = await appearance('TerminalColors');
+  const terminal = await appearance(`${scheme}TerminalColors`);
   require(Array.from({length: 16}, (_, index) => terminal[`color${index}`]).every(Boolean) && terminal.background === colors.surface,
     'terminals get sixteen colors on the palette background');
   const saved = JSON.parse(read(configFile('kestrel', 'appearance.json')));

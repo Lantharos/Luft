@@ -1,5 +1,4 @@
-use std::path::Path;
-
+use luft_app::Activation;
 use serde::Serialize;
 
 const DIRECTORY_FLAG: &str = "--working-directory";
@@ -12,15 +11,9 @@ pub struct LaunchRequest {
 }
 
 impl LaunchRequest {
-    pub fn current_process() -> Self {
-        let args: Vec<String> = std::env::args().skip(1).collect();
-        let cwd = std::env::current_dir().unwrap_or_else(|_| "/".into());
-        Self::parse(&args, &cwd)
-    }
-
-    pub fn parse(args: &[String], cwd: &Path) -> Self {
+    pub fn parse(activation: &Activation) -> Self {
         let mut request = Self::default();
-        let mut remaining = args.iter();
+        let mut remaining = activation.arguments().iter();
         while let Some(arg) = remaining.next() {
             if COMMAND_FLAGS.contains(&arg.as_str()) {
                 let command: Vec<String> = remaining.cloned().collect();
@@ -33,7 +26,7 @@ impl LaunchRequest {
                 None => None,
             };
             if let Some(directory) = directory {
-                let path = cwd.join(directory);
+                let path = activation.working_directory().join(directory);
                 request.directory = Some(path.to_string_lossy().into_owned());
             }
         }

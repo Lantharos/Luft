@@ -2,9 +2,9 @@ mod connectivity;
 mod link;
 mod profile;
 
-use luft_app::{Appearance, Commands, Events, GlassWindow};
+use luft_app::{Activation, Appearance, Commands, Events, GlassWindow};
 use sabine::SabineWindow;
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use serde_json::Value;
 
 use link::Target;
@@ -25,21 +25,15 @@ struct AppState {
     target: Option<Target>,
 }
 
-#[derive(Deserialize)]
-struct Activation {
-    arguments: Vec<String>,
-}
-
 async fn app_state(_: Value) -> Result<AppState, String> {
-    let arguments: Vec<String> = std::env::args().collect();
     Ok(AppState {
         appearance: Appearance::current().await,
-        target: link::verified(&arguments).await,
+        target: link::verified(Activation::current_process().arguments()).await,
     })
 }
 
-async fn activation_target(Activation { arguments }: Activation) -> Result<Option<Target>, String> {
-    Ok(link::verified(&arguments).await)
+async fn activation_target(activation: Activation) -> Result<Option<Target>, String> {
+    Ok(link::verified(activation.arguments()).await)
 }
 
 pub fn run_app() -> ! {

@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use luft_app::thumbnails::Thumbnails;
-use luft_app::{Appearance, Events};
+use luft_app::{Activation, Appearance, Events};
 use serde::Serialize;
 
 use crate::app::events::THUMBNAILS_READY;
@@ -33,7 +33,7 @@ impl MagpieState {
             thumbnails: Thumbnails::new(events.clone(), THUMBNAILS_READY),
             folders: FolderWatcher::new(events.clone()),
             mpris: Mpris::new(events.clone()),
-            launch_paths: Arc::new(launch::current_process()),
+            launch_paths: Arc::new(launch::resolve(&Activation::current_process())),
             events,
         }
     }

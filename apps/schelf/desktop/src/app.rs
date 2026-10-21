@@ -1,7 +1,4 @@
-use std::path::PathBuf;
-
-use gio::prelude::*;
-use luft_app::{Appearance, Commands, launch};
+use luft_app::{Activation, Appearance, Commands, launch};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -20,24 +17,9 @@ struct AppState {
     fedora: bool,
 }
 
-#[derive(Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct Activation {
-    arguments: Vec<String>,
-    working_directory: Option<String>,
-}
-
-fn files(arguments: &[String], working_directory: Option<&str>) -> Vec<String> {
-    let cwd = working_directory
-        .map(PathBuf::from)
-        .or_else(|| std::env::current_dir().ok())
-        .unwrap_or_else(|| PathBuf::from("/"));
-    arguments
-        .iter()
-        .filter(|argument| {
-            !argument.is_empty() && !argument.starts_with('-') && !argument.starts_with(PAGE_SCHEME)
-        })
-        .filter_map(|argument| gio::File::for_commandline_arg_and_cwd(argument, &cwd).path())
+fn files(activation: &Activation) -> Vec<String> {
+    activation
+        .paths()
         .filter(|path| path.is_file())
         .map(|path| path.to_string_lossy().into_owned())
         .collect()
@@ -57,13 +39,15 @@ fn open_url(Link { url, token }: Link) -> Result<(), String> {
 }
 
 async fn state(_: Value) -> Result<AppState, String> {
-    let arguments: Vec<String> = std::env::args().skip(1).collect();
+    let activation = Activation::current_process();
     Ok(AppState {
         appearance: Appearance::current().await,
-        files: files(&arguments, None),
-        page: arguments
-            .into_iter()
-            .find(|argument| argument.starts_with(PAGE_SCHEME)),
+        files: files(&activation),
+        page: activation
+            .arguments()
+            .iter()
+            .find(|argument| argument.starts_with(PAGE_SCHEME))
+            .cloned(),
         fedora: fedora::available(),
     })
 }
@@ -72,10 +56,7 @@ pub fn register(window: SabineWindow) -> SabineWindow {
     window
         .command_async("app_state", state)
         .command("app_activation_files", |activation: Activation| {
-            Ok(files(
-                &activation.arguments,
-                activation.working_directory.as_deref(),
-            ))
+            Ok(files(&activation))
         })
         .command("app_open_url", open_url)
 }

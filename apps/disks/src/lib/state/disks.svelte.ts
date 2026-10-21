@@ -1,7 +1,7 @@
 import { SvelteSet } from 'svelte/reactivity';
 import { appearance, errorText, Toasts } from '@luft/ui';
 import * as api from '#lib/bridge/index.js';
-import type { Drive, ImageProgress, Protection, Segment, Support, Volume } from '#lib/bridge/index.js';
+import type { Activation, Drive, ImageProgress, Protection, Segment, Support, Volume } from '#lib/bridge/index.js';
 import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
 import { space } from './space.svelte';
 import { systems } from './systems.svelte';
@@ -36,14 +36,14 @@ class Disks {
 		api.events.image((progress) => this.#imageProgress(progress));
 		space.listen();
 		api.events.trust((protection) => (this.protection = protection));
-		api.events.activated(({ arguments: args }) => void this.#locate(args));
+		api.events.activated((activation) => void this.#locate(activation));
 		const [{ drives }, formats, protection] = await Promise.all([api.snapshot(), api.formats(), api.trust.state().catch(() => this.protection)]);
 		this.drives = drives;
 		systems.follow(drives);
 		this.formats = formats;
 		this.protection = protection;
 		this.loaded = true;
-		await this.#locate(state.arguments);
+		await this.#locate(state.activation);
 	}
 
 	select(drive: string, segment: string | null = null) {
@@ -101,8 +101,8 @@ class Disks {
 		dialogs.open({ kind: 'remove-system', system });
 	}
 
-	async #locate(args: string[]) {
-		const located = await api.locate(args).catch(() => null);
+	async #locate(activation: Activation) {
+		const located = await api.locate(activation).catch(() => null);
 		if (located?.target) this.select(located.target.drive, located.target.block);
 		if (located?.image) dialogs.open({ kind: 'write-image', image: located.image });
 		if (located?.system) void this.#offerRemoval(located.system);

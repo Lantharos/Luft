@@ -1,7 +1,7 @@
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
-use luft_app::{Appearance, Events};
+use luft_app::{Activation, Appearance, Events};
 use parking_lot::RwLock;
 use serde::Serialize;
 
@@ -39,7 +39,7 @@ impl TernState {
             events: Events::default(),
             sessions: Sessions::default(),
             settings: Arc::new(RwLock::new(settings)),
-            launch: Arc::new(LaunchRequest::current_process()),
+            launch: Arc::new(LaunchRequest::parse(&Activation::current_process())),
         }
     }
 

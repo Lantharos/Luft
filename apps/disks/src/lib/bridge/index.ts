@@ -132,8 +132,13 @@ export type PlanStep =
 	| { kind: 'format'; block: string; filesystem: string; label: string }
 	| { kind: 'change'; block: string; partitionType: string | null; name: string | null; flags: number[] | null; label: string | null };
 
-export interface AppState extends Appearance {
+export type Activation = {
 	arguments: string[];
+	workingDirectory: string | null;
+};
+
+export interface AppState extends Appearance {
+	activation: Activation;
 }
 
 export interface DriveEncryption {
@@ -199,8 +204,8 @@ const WAIT = { timeoutMs: 2_147_483_647 };
 
 export const appState = () => invoke<AppState>('app_state');
 export const snapshot = () => invoke<{ drives: Drive[] }>('disks_snapshot');
-export const locate = (args: string[]) =>
-	invoke<{ target: Target | null; image: ChosenImage | null; space: string | null; system: string | null }>('disks_locate', { arguments: args });
+export const locate = (activation: Activation) =>
+	invoke<{ target: Target | null; image: ChosenImage | null; space: string | null; system: string | null }>('disks_locate', activation);
 export const formats = () => invoke<Support[]>('disks_formats');
 
 export const mount = (block: string) => invoke<string>('disks_mount', { block }, WAIT);
@@ -274,5 +279,5 @@ export const events = {
 	space: (callback: (update: SpaceUpdate) => void) => listen('space.update', callback),
 	trust: (callback: (protection: Protection) => void) => listen('disks.trust', callback),
 	system: (callback: (step: SystemStep) => void) => listen('disks.system', callback),
-	activated: (callback: (activation: { arguments: string[] }) => void) => listen('singleInstance.activate', callback)
+	activated: (callback: (activation: Activation) => void) => listen('singleInstance.activate', callback)
 };

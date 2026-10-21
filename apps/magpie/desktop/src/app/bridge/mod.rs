@@ -4,7 +4,7 @@ use std::path::Path as FilePath;
 
 use gio::prelude::*;
 use luft_app::portal::{self, FileChooser, Filter};
-use luft_app::{Commands, file_manager};
+use luft_app::{Activation, Commands, file_manager};
 use sabine::SabineWindow;
 
 use crate::app::state::MagpieState;
@@ -26,19 +26,9 @@ fn register_app(window: SabineWindow, state: &MagpieState) -> SabineWindow {
         .with_async("app_state", state, |state, Empty {}| async move {
             Ok(state.app_state().await)
         })
-        .command(
-            "resolve_arguments",
-            |Arguments {
-                 arguments,
-                 working_directory,
-             }| {
-                let cwd = working_directory.unwrap_or_else(|| "/".to_string());
-                Ok(launch::resolve(
-                    arguments.get(1..).unwrap_or_default(),
-                    FilePath::new(&cwd),
-                ))
-            },
-        )
+        .command("resolve_arguments", |activation: Activation| {
+            Ok(launch::resolve(&activation))
+        })
         .command_async("choose_file", |Empty {}| async {
             let filter = Filter {
                 name: "Photos, videos, music, documents and fonts",

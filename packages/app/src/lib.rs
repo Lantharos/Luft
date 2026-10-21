@@ -1,3 +1,4 @@
+mod activation;
 #[cfg(feature = "apps")]
 pub mod apps;
 mod bridge;
@@ -25,6 +26,7 @@ pub mod thumbnails;
 pub mod watch;
 mod window;
 
+pub use activation::Activation;
 pub use bridge::Commands;
 pub use bridge::events::Events;
 pub use sample::sample_system;

@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use luft_app::thumbnails::Thumbnails;
-use luft_app::{Appearance, Events};
+use luft_app::{Activation, Appearance, Events};
 use parking_lot::RwLock;
 use serde::Serialize;
 
@@ -61,7 +61,7 @@ impl RoverState {
             watcher: DirectoryWatcher::new(events.clone()),
             settings: Arc::new(RwLock::new(Settings::load())),
             chooser: ChooserSession::from_environment().map(Arc::new),
-            launch_paths: Arc::new(launch_args::current_process()),
+            launch_paths: Arc::new(launch_args::resolve(&Activation::current_process())),
             user_dirs: Arc::new(user_dirs),
             events,
         }

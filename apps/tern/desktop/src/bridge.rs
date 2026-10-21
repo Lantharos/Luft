@@ -1,8 +1,6 @@
-use std::path::Path;
-
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
-use luft_app::Commands;
+use luft_app::{Activation, Commands};
 use sabine::SabineWindow;
 use serde::Deserialize;
 
@@ -39,13 +37,6 @@ struct Resize {
     id: u32,
     #[serde(flatten)]
     size: Size,
-}
-
-#[derive(Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct Activation {
-    arguments: Vec<String>,
-    working_directory: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -105,19 +96,9 @@ fn register_app(window: SabineWindow, state: &TernState) -> SabineWindow {
         .with_async("app_state", state, |state, Empty {}| async move {
             Ok(state.app_state().await)
         })
-        .command(
-            "resolve_launch",
-            |Activation {
-                 arguments,
-                 working_directory,
-             }| {
-                let cwd = working_directory.unwrap_or_else(|| "/".to_string());
-                Ok(LaunchRequest::parse(
-                    arguments.get(1..).unwrap_or_default(),
-                    Path::new(&cwd),
-                ))
-            },
-        )
+        .command("resolve_launch", |activation: Activation| {
+            Ok(LaunchRequest::parse(&activation))
+        })
         .with(
             "update_settings",
             state,

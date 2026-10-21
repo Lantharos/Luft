@@ -1,5 +1,6 @@
 use std::path::{Path, PathBuf};
 
+use luft_app::Activation;
 use serde::Serialize;
 
 use crate::images::ChosenImage;
@@ -25,16 +26,9 @@ pub struct Launch {
 const SPACE: &str = "disks-space://";
 const SYSTEM: &str = "disks-system://";
 
-pub fn resolve(arguments: &[String], snapshot: &Snapshot) -> Launch {
-    let paths: Vec<PathBuf> = arguments
-        .iter()
-        .filter(|argument| {
-            !argument.starts_with("--")
-                && !argument.starts_with(SPACE)
-                && !argument.starts_with(SYSTEM)
-        })
-        .filter_map(|argument| path_of(argument))
-        .collect();
+pub fn resolve(activation: &Activation, snapshot: &Snapshot) -> Launch {
+    let arguments = activation.arguments();
+    let paths: Vec<PathBuf> = activation.paths().collect();
     Launch {
         system: arguments
             .iter()
@@ -51,13 +45,6 @@ pub fn resolve(arguments: &[String], snapshot: &Snapshot) -> Launch {
             .filter(|path| !ChosenImage::is_image(path))
             .find_map(|path| locate(path, snapshot)),
     }
-}
-
-fn path_of(argument: &str) -> Option<PathBuf> {
-    if argument.starts_with("file://") {
-        return luft_app::portal::uri_path(argument);
-    }
-    argument.starts_with('/').then(|| PathBuf::from(argument))
 }
 
 fn locate(path: &Path, snapshot: &Snapshot) -> Option<Target> {

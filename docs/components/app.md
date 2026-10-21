@@ -28,7 +28,7 @@ pub fn run_app() -> ! {
 ```
 
 - `sidebar_width` must match the page's `--sidebar-width`.
-- With `single_instance` set, launching the app again focuses the running window and sends the new arguments as a `singleInstance.activate` event.
+- With `single_instance` set, launching the app again focuses the running window and sends the new arguments as a `singleInstance.activate` event. Bridge commands take that event as an `Activation`, the same type `Activation::current_process()` gives for the app's own launch.
 - `apply_with_page_close` instead of `apply` hands the close button to the page, so `WindowControls`' `onclose` decides when to close.
 - `run` connects `Events` to the page and watches Kestrel's palette and the desktop's fonts. The last closure runs at the same point, for the app's own watchers.
 
@@ -72,6 +72,7 @@ window
 | `file_manager` | `show_in_folder(path, token)` opens the folder with the file selected, `show_folder(path, token)` opens the folder itself |
 | `launch` | `pass_token` gives a launched program the activation token a page got from `activationToken()` in `@luft/ui`, or clears the one the app was started with; `Token` takes a command's `token` alone |
 | `secrets` | `store`, `load` and `delete` for the app's own secrets in Luft Keyring |
+| `Activation` | A launch's command line: `arguments` after the program name, its `working_directory`, and `paths` for the arguments that name local files, resolved against it |
 | `files` | `replace(path, bytes)` writes a file in one step, so readers never see it half written |
 
 ## Features

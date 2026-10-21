@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 use luft_app::portal;
-use luft_app::{Appearance, Commands};
+use luft_app::{Activation, Appearance, Commands};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -42,7 +42,8 @@ fn open_file(reloader: &Reloader, OpenFile { path }: OpenFile) -> Result<Opened,
 }
 
 async fn app_state(_: Value) -> Result<AppState, String> {
-    let arguments: Vec<String> = std::env::args().skip(1).collect();
+    let activation = Activation::current_process();
+    let arguments = activation.arguments();
     Ok(AppState {
         appearance: Appearance::current().await,
         link: arguments
@@ -50,8 +51,9 @@ async fn app_state(_: Value) -> Result<AppState, String> {
             .find(|argument| argument.starts_with(LINK_SCHEME))
             .cloned(),
         files: arguments
-            .into_iter()
+            .iter()
             .filter(|argument| !argument.starts_with(LINK_SCHEME) && !argument.starts_with('-'))
+            .cloned()
             .collect(),
     })
 }

@@ -109,13 +109,6 @@ pub struct VcsSave {
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Arguments {
-    pub arguments: Vec<String>,
-    pub working_directory: Option<String>,
-}
-
-#[derive(Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct WindowsDevice {
     pub device: String,
     pub read_only: bool,

@@ -1,7 +1,7 @@
 use std::path::Path;
 
 use gio::prelude::*;
-use luft_app::{Appearance, Commands, Events};
+use luft_app::{Activation, Appearance, Commands, Events};
 use sabine::SabineWindow;
 use serde::Serialize;
 use serde_json::Value;
@@ -14,10 +14,9 @@ use crate::trust::{self, drives as encryption_drives};
 use crate::udisks::{self, snapshot};
 use luft_disks::{partitions, systems};
 use requests::{
-    Arguments, Block, ChangePassphrase, CreateImage, CreatePartition, Drive, Encrypt, Folder,
-    FormatDrive, FormatEncrypted, FormatVolume, Grow, Handoff, KeySheet, Label, Place, PlanStep,
-    Remove, RestoreImage, Resume, Selftest, Shown, Startup, SystemId, Unlock, Unlocked, Unlocking,
-    Uuid,
+    Block, ChangePassphrase, CreateImage, CreatePartition, Drive, Encrypt, Folder, FormatDrive,
+    FormatEncrypted, FormatVolume, Grow, Handoff, KeySheet, Label, Place, PlanStep, Remove,
+    RestoreImage, Resume, Selftest, Shown, Startup, SystemId, Unlock, Unlocked, Unlocking, Uuid,
 };
 
 mod requests;
@@ -33,7 +32,7 @@ pub struct State {
 
 #[derive(Serialize)]
 struct AppState {
-    arguments: Vec<String>,
+    activation: Activation,
     #[serde(flatten)]
     appearance: Appearance,
 }
@@ -165,16 +164,16 @@ fn register_volumes(window: SabineWindow) -> SabineWindow {
     window
         .command_async("app_state", |_: Value| async {
             Ok(AppState {
-                arguments: std::env::args().skip(1).collect(),
+                activation: Activation::current_process(),
                 appearance: Appearance::current().await,
             })
         })
         .command_async("disks_snapshot", |_: Value| async {
             Ok(snapshot::build(&udisks::objects().await?))
         })
-        .command_async("disks_locate", |Arguments { arguments }| async move {
+        .command_async("disks_locate", |activation: Activation| async move {
             Ok(launch::resolve(
-                &arguments,
+                &activation,
                 &snapshot::build(&udisks::objects().await?),
             ))
         })

@@ -4,11 +4,6 @@ use crate::actions::formatting::Format;
 use crate::actions::plan;
 
 #[derive(Deserialize)]
-pub struct Arguments {
-    pub arguments: Vec<String>,
-}
-
-#[derive(Deserialize)]
 pub struct Block {
     pub block: String,
 }

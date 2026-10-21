@@ -1,7 +1,7 @@
 mod params;
 mod tools;
 
-use luft_app::Commands;
+use luft_app::{Activation, Commands};
 use sabine::SabineWindow;
 
 use crate::app::settings;
@@ -169,19 +169,9 @@ fn register_app(window: SabineWindow, state: &RoverState) -> SabineWindow {
         .with_async("app_state", state, |state, Empty {}| async move {
             Ok(state.app_state().await)
         })
-        .command(
-            "resolve_arguments",
-            |Arguments {
-                 arguments,
-                 working_directory,
-             }| {
-                let cwd = working_directory.unwrap_or_else(|| "/".to_string());
-                Ok(launch_args::resolve(
-                    arguments.get(1..).unwrap_or_default(),
-                    std::path::Path::new(&cwd),
-                ))
-            },
-        )
+        .command("resolve_arguments", |activation: Activation| {
+            Ok(launch_args::resolve(&activation))
+        })
         .with(
             "update_settings",
             state,

@@ -31,11 +31,12 @@
 		working = true;
 		error = '';
 		try {
-			await api.changePassphrase(volume.block, current, next);
-			onclose();
+			const outcome = await api.changePassphrase(volume.block, current, next);
+			if ('wrongKey' in outcome) error = 'The current passphrase isn’t right';
+			else onclose();
 		} catch (caught) {
 			const message = errorText(caught);
-			if (message !== api.CANCELLED) error = /passphrase|key/i.test(message) ? 'The current passphrase isn’t right' : message;
+			if (message !== api.CANCELLED) error = message;
 		} finally {
 			working = false;
 		}

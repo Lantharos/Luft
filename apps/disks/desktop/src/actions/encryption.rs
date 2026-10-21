@@ -1,9 +1,15 @@
 use std::collections::HashMap;
 
+use luft_trust::Outcome;
 use zbus::{OwnedObjectPath, OwnedVariant};
 
 use super::passphrases;
 use crate::udisks::{self, BLOCK, ENCRYPTED, no_options};
+
+const WRONG_PASSPHRASE: [&str; 2] = [
+    "Incorrect passphrase.",
+    "No keyslot with given passphrase found.",
+];
 
 async fn text_of(block: &str, property: &str) -> Option<String> {
     udisks::objects()
@@ -72,47 +78,70 @@ async fn known_passphrase(block: &str) -> Option<String> {
     has_key_file(block).await.then(String::new)
 }
 
+fn outcome<T>(result: Result<T, String>) -> Result<Outcome<T>, String> {
+    match result {
+        Ok(value) => Ok(Outcome::Done(value)),
+        Err(message)
+            if WRONG_PASSPHRASE
+                .iter()
+                .any(|ending| message.ends_with(ending)) =>
+        {
+            Ok(Outcome::WrongKey(message))
+        }
+        Err(message) => Err(message),
+    }
+}
+
 pub async fn unlock(
     block: &str,
     passphrase: Option<&str>,
     remember_it: bool,
-) -> Result<bool, String> {
+) -> Result<Outcome<bool>, String> {
     let passphrase = match passphrase {
         Some(passphrase) => Some(passphrase.to_owned()),
         None => known_passphrase(block).await,
     };
     let Some(passphrase) = passphrase else {
-        return Ok(false);
+        return Ok(Outcome::Done(false));
     };
-    let _: OwnedObjectPath = udisks::call(
-        block,
-        ENCRYPTED,
-        "Unlock",
-        &(passphrase.as_str(), no_options()),
-    )
-    .await?;
-    if remember_it {
+    let unlocked = outcome(
+        udisks::call::<OwnedObjectPath>(
+            block,
+            ENCRYPTED,
+            "Unlock",
+            &(passphrase.as_str(), no_options()),
+        )
+        .await
+        .map(|_| true),
+    )?;
+    if remember_it && matches!(unlocked, Outcome::Done(true)) {
         remember(block, &passphrase).await?;
     }
-    Ok(true)
+    Ok(unlocked)
 }
 
 pub async fn lock(block: &str) -> Result<(), String> {
     super::mounting::release(block).await
 }
 
-pub async fn change_passphrase(block: &str, current: &str, next: &str) -> Result<(), String> {
-    udisks::run(
-        block,
-        ENCRYPTED,
-        "ChangePassphrase",
-        &(current, next, no_options()),
-    )
-    .await?;
-    if remembered(block).await.is_some() {
+pub async fn change_passphrase(
+    block: &str,
+    current: &str,
+    next: &str,
+) -> Result<Outcome<()>, String> {
+    let changed = outcome(
+        udisks::run(
+            block,
+            ENCRYPTED,
+            "ChangePassphrase",
+            &(current, next, no_options()),
+        )
+        .await,
+    )?;
+    if matches!(changed, Outcome::Done(())) && remembered(block).await.is_some() {
         remember(block, next).await?;
     }
-    Ok(())
+    Ok(changed)
 }
 
 pub async fn is_remembered(block: &str) -> bool {

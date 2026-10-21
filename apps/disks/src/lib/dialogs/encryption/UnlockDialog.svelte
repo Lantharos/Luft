@@ -27,11 +27,12 @@
 		working = true;
 		error = '';
 		try {
-			await api.unlock(volume.block, passphrase, remember);
-			onclose();
+			const outcome = await api.unlock(volume.block, passphrase, remember);
+			if ('wrongKey' in outcome) error = 'That passphrase isn’t right';
+			else onclose();
 		} catch (caught) {
 			const message = errorText(caught);
-			if (message !== api.CANCELLED) error = /passphrase|not permitted|key/i.test(message) ? 'That passphrase isn’t right' : message;
+			if (message !== api.CANCELLED) error = message;
 		} finally {
 			working = false;
 		}

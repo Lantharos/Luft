@@ -20,7 +20,8 @@ function act(volume: Volume, action: () => Promise<unknown>) {
 
 function unlock(volume: Volume) {
 	void disks.run(volume.block, async () => {
-		if (!(await api.unlock(volume.block, null, false))) dialogs.open({ kind: 'unlock', volume });
+		const outcome = await api.unlock(volume.block, null, false);
+		if (!('done' in outcome && outcome.done)) dialogs.open({ kind: 'unlock', volume });
 	});
 }
 

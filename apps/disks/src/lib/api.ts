@@ -219,10 +219,10 @@ export const deletePartition = (block: string) => invoke<void>('disks_delete_par
 export const planStep = (step: PlanStep) => invoke<string | null>('disks_plan_step', { step }, WAIT);
 
 export const unlock = (block: string, passphrase: string | null, remember: boolean) =>
-	invoke<boolean>('disks_unlock', { block, passphrase, remember }, WAIT);
+	invoke<Outcome<boolean>>('disks_unlock', { block, passphrase, remember }, WAIT);
 export const lock = (block: string) => invoke<void>('disks_lock', { block }, WAIT);
 export const changePassphrase = (block: string, current: string, next: string) =>
-	invoke<void>('disks_change_passphrase', { block, current, next }, WAIT);
+	invoke<Outcome<null>>('disks_change_passphrase', { block, current, next }, WAIT);
 export const remembered = (block: string) => invoke<boolean>('disks_remembered', { block });
 export const forgetPassphrase = (block: string) => invoke<void>('disks_forget_passphrase', { block }, WAIT);
 

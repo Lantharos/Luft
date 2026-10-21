@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { ConfirmDialog, RecoveryKeyDialog, Row, Section, Switch } from '@luft/ui';
+	import { ConfirmDialog, errorText, RecoveryKeyDialog, Row, Section, Switch } from '@luft/ui';
 	import {
 		acceptSecureBootChange,
 		printRecoveryKey,
-		problem,
 		removeTpmUnlock,
 		replaceRecoveryKey,
 		saveRecoveryKey,
@@ -33,7 +32,7 @@
 		try {
 			await action();
 		} catch (reason) {
-			error = problem(reason);
+			error = errorText(reason);
 		}
 		busy = false;
 	}

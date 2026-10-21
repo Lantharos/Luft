@@ -8,7 +8,6 @@
 		confirmation: string;
 		minimum: number;
 		onsubmit?: () => void;
-		/** Shown under the passphrase, such as how strong it is. */
 		children?: Snippet;
 	}
 

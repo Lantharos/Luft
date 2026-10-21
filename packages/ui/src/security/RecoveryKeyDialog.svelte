@@ -8,7 +8,6 @@
 		key: string;
 		title: string;
 		description: string;
-		/** Asks to confirm the key was kept before the dialog closes. */
 		fresh?: boolean;
 		onsave: () => Promise<boolean>;
 		onprint: () => Promise<boolean>;

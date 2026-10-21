@@ -1,8 +1,8 @@
 <script lang="ts">
 	import Gamepad2 from '@lucide/svelte/icons/gamepad-2';
 	import { t } from '@luft/i18n';
-	import { Row, tooltip } from '@luft/ui';
-	import { keepOtherKeys, problem, removeOtherKeys, restart, type AntiCheat, type SigningKey } from '../api';
+	import { errorText, Row, tooltip } from '@luft/ui';
+	import { keepOtherKeys, removeOtherKeys, restart, type AntiCheat, type SigningKey } from '../api';
 	import KeyStepsDialog from './KeyStepsDialog.svelte';
 
 	let { antiCheat, key }: { antiCheat: AntiCheat; key: SigningKey } = $props();
@@ -25,7 +25,7 @@
 		try {
 			await action();
 		} catch (reason) {
-			error = problem(reason);
+			error = errorText(reason);
 		}
 		busy = false;
 	}

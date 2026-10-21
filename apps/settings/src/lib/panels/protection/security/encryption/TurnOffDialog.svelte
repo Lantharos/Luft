@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { Dialog } from '@luft/ui';
-	import { problem, turnOffEncryption } from '../api';
+	import { Dialog, errorText } from '@luft/ui';
+	import { turnOffEncryption } from '../api';
 	import { withUnlock } from './unlocking/unlock.svelte';
 
 	let { onclose }: { onclose: () => void } = $props();
@@ -15,7 +15,7 @@
 		try {
 			if (await withUnlock(turnOffEncryption)) onclose();
 		} catch (reason) {
-			error = problem(reason);
+			error = errorText(reason);
 		}
 		busy = false;
 	}

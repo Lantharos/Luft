@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { t } from '@luft/i18n';
-	import { Dialog, Switch, TextField } from '@luft/ui';
-	import { generateKey, problem } from '../api';
+	import { Dialog, errorText, Switch, TextField } from '@luft/ui';
+	import { generateKey } from '../api';
 
 	interface Props {
 		chipKeys: boolean;
@@ -28,7 +28,7 @@
 			await refresh();
 			onclose();
 		} catch (reason) {
-			error = problem(reason);
+			error = errorText(reason);
 			busy = false;
 		}
 	}

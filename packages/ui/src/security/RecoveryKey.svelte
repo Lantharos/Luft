@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { errorText } from '../text/errors';
 	import Copy from '@lucide/svelte/icons/copy';
 	import Printer from '@lucide/svelte/icons/printer';
 	import Save from '@lucide/svelte/icons/save';
@@ -24,7 +25,7 @@
 			if (!(await action())) return;
 			done = outcome;
 		} catch (reason) {
-			error = reason instanceof Error ? reason.message : String(reason);
+			error = errorText(reason);
 		}
 	}
 

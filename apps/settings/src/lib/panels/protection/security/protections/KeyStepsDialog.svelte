@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { Dialog } from '@luft/ui';
-	import { problem, restart } from '../api';
+	import { Dialog, errorText } from '@luft/ui';
+	import { restart } from '../api';
 
 	const SCREEN = { enroll: 'Enroll MOK', remove: 'Delete MOK', next: 'Continue', yes: 'Yes', reboot: 'Reboot' };
 
@@ -32,7 +32,7 @@
 			await restart();
 			onclose();
 		} catch (reason) {
-			error = problem(reason);
+			error = errorText(reason);
 		}
 		busy = false;
 	}

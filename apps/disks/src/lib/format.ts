@@ -141,7 +141,3 @@ export function driveKindName(drive: Drive) {
 export function driveSummary(drive: Drive) {
 	return `${bytes(drive.size)} ${KINDS[drive.kind]}`;
 }
-
-export function errorText(caught: unknown) {
-	return caught instanceof Error ? caught.message : String(caught);
-}

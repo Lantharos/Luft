@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { errorText } from '../text/errors';
 	import { t } from '@luft/i18n';
 	import Dialog from './Dialog.svelte';
 
@@ -7,7 +8,6 @@
 		description: string;
 		action: string;
 		danger?: boolean;
-		/** Closes the dialog unless it answers false. */
 		run: () => Promise<boolean | void>;
 		onclose: () => void;
 	}
@@ -23,7 +23,7 @@
 		try {
 			if ((await run()) !== false) return onclose();
 		} catch (reason) {
-			error = reason instanceof Error ? reason.message : String(reason);
+			error = errorText(reason);
 		}
 		busy = false;
 	}

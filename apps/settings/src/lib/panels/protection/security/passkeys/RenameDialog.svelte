@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { t } from '@luft/i18n';
-	import { Dialog, TextField } from '@luft/ui';
+	import { Dialog, errorText, TextField } from '@luft/ui';
 	import { accountLabel, renamePasskey, siteLabel, type Passkey } from './api';
 
 	let { passkey, onclose }: { passkey: Passkey; onclose: () => void } = $props();
@@ -17,7 +17,7 @@
 			await renamePasskey(passkey.id, name);
 			onclose();
 		} catch (reason) {
-			error = reason instanceof Error ? reason.message : String(reason);
+			error = errorText(reason);
 			busy = false;
 		}
 	}

@@ -4,8 +4,8 @@
 
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { Dialog, Switch } from '@luft/ui';
-	import { problem, setUpTpmUnlock } from '../../api';
+	import { Dialog, errorText, Switch } from '@luft/ui';
+	import { setUpTpmUnlock } from '../../api';
 	import PinFields from './PinFields.svelte';
 	import { pinReady } from './pin';
 	import { withUnlock } from './unlock.svelte';
@@ -58,7 +58,7 @@
 			const outcome = await withUnlock(setUpTpmUnlock(asking ? pin : ''));
 			if (outcome) return onclose(outcome.done || undefined);
 		} catch (reason) {
-			error = problem(reason);
+			error = errorText(reason);
 		}
 		busy = false;
 	}

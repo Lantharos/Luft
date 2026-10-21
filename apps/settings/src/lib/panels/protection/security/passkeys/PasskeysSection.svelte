@@ -4,7 +4,7 @@
 	import Pencil from '@lucide/svelte/icons/pencil';
 	import Trash from '@lucide/svelte/icons/trash';
 	import { t } from '@luft/i18n';
-	import { ago, Dialog, IconButton, Row, Section } from '@luft/ui';
+	import { ago, Dialog, errorText, IconButton, Row, Section } from '@luft/ui';
 	import { accountLabel, deletePasskey, onPasskeys, passkeys, siteLabel, type Passkey, type Passkeys } from './api';
 	import RenameDialog from './RenameDialog.svelte';
 
@@ -48,7 +48,7 @@
 		try {
 			await deletePasskey(passkey.id);
 		} catch (reason) {
-			problem = reason instanceof Error ? reason.message : String(reason);
+			problem = errorText(reason);
 		}
 		await load();
 	}

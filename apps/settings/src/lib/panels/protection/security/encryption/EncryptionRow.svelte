@@ -1,8 +1,8 @@
 <script lang="ts">
 	import LockKeyhole from '@lucide/svelte/icons/lock-keyhole';
 	import { t } from '@luft/i18n';
-	import { Row, Switch } from '@luft/ui';
-	import { problem, restart, type Disk, type Tpm } from '../api';
+	import { errorText, Row, Switch } from '@luft/ui';
+	import { restart, type Disk, type Tpm } from '../api';
 	import { progressLine, unlockSummary } from './describe';
 	import TurnOffDialog from './TurnOffDialog.svelte';
 	import TurnOnDialog from './TurnOnDialog.svelte';
@@ -19,7 +19,7 @@
 		try {
 			await restart();
 		} catch (reason) {
-			error = problem(reason);
+			error = errorText(reason);
 		}
 		busy = false;
 	}

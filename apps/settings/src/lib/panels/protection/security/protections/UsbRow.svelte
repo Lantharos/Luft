@@ -1,8 +1,8 @@
 <script lang="ts">
 	import Usb from '@lucide/svelte/icons/usb';
 	import { t } from '@luft/i18n';
-	import { Row, Switch } from '@luft/ui';
-	import { problem, setUsbProtection, type UsbProtection } from '../api';
+	import { errorText, Row, Switch } from '@luft/ui';
+	import { setUsbProtection, type UsbProtection } from '../api';
 	import type { SecurityState } from '../state.svelte';
 
 	let { security, usb }: { security: SecurityState; usb: UsbProtection } = $props();
@@ -17,7 +17,7 @@
 			await setUsbProtection(enabled);
 			security.usb = { ...usb, enabled };
 		} catch (reason) {
-			error = problem(reason);
+			error = errorText(reason);
 		}
 		busy = false;
 	}

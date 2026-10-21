@@ -88,7 +88,6 @@ export interface UsbProtection {
 
 export type Outcome<T> = { done: T } | { wrongKey: string };
 
-export const problem = (reason: unknown) => (reason instanceof Error ? reason.message : String(reason));
 
 export const trust = () => invoke<Trust | null>('security_trust');
 export const onTrust = (callback: (trust: Trust) => void) => listen<Trust>('security.trust', callback);

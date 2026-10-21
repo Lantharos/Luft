@@ -1,6 +1,6 @@
+import { errorText } from '@luft/ui';
 import * as api from '#lib/api.js';
 import type { PlanStep } from '#lib/api.js';
-import { errorText } from '#lib/format.js';
 import { disks } from '#lib/state/disks.svelte.js';
 import { describePlan } from './describe';
 import { apply, layoutOf, type Layout, type Step } from './model';

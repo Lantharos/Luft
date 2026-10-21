@@ -15,6 +15,7 @@
 	import { t } from '@luft/i18n';
 	import Checkbox from '../controls/Checkbox.svelte';
 	import Dialog from '../dialogs/Dialog.svelte';
+	import { errorText } from '../text/errors';
 	import RecoveryKey from './RecoveryKey.svelte';
 
 	interface Props {
@@ -22,7 +23,6 @@
 		descriptions: Partial<Record<EncryptionStep, string>>;
 		check: () => Promise<EncryptionCheck[]>;
 		blocked: boolean;
-		/** Shown under the checks once they all pass. */
 		advice?: string;
 		recoveryKey: () => Promise<string>;
 		onsave: (key: string) => Promise<boolean>;
@@ -34,7 +34,6 @@
 		finishing: string;
 		danger?: boolean;
 		onfinish: (key: string) => Promise<void>;
-		/** The sentence shown for a failure, or nothing for one the person chose, like a dismissed password prompt. */
 		explain?: (reason: unknown) => string;
 		onclose: () => void;
 	}
@@ -55,7 +54,7 @@
 		finishing,
 		danger = false,
 		onfinish,
-		explain = (reason) => (reason instanceof Error ? reason.message : String(reason)),
+		explain = errorText,
 		onclose
 	}: Props = $props();
 

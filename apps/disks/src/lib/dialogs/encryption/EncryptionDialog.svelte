@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { Dialog } from '@luft/ui';
+	import { Dialog, errorText } from '@luft/ui';
 	import * as api from '#lib/api.js';
 	import type { Drive, Volume } from '#lib/api.js';
 	import { changing, KeyRequest, progressSentence } from '#lib/encryption.svelte.js';
-	import { errorText, volumeName } from '#lib/format.js';
+	import { volumeName } from '#lib/format.js';
 	import { disks } from '#lib/state/disks.svelte.js';
 	import { dialogs } from '../dialogs.svelte';
 	import KeyPrompt from './KeyPrompt.svelte';

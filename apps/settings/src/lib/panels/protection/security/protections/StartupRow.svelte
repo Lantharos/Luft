@@ -1,8 +1,8 @@
 <script lang="ts">
 	import Power from '@lucide/svelte/icons/power';
 	import { t } from '@luft/i18n';
-	import { Row } from '@luft/ui';
-	import { cancelSigningKey, enrollSigningKey, installSignedStartup, problem, restart, type SigningKey, type Startup } from '../api';
+	import { errorText, Row } from '@luft/ui';
+	import { cancelSigningKey, enrollSigningKey, installSignedStartup, restart, type SigningKey, type Startup } from '../api';
 	import KeyStepsDialog from './KeyStepsDialog.svelte';
 
 	let { key, startup }: { key: SigningKey; startup: Startup } = $props();
@@ -31,7 +31,7 @@
 		try {
 			await action();
 		} catch (reason) {
-			error = problem(reason);
+			error = errorText(reason);
 		}
 		busy = false;
 	}

@@ -1,4 +1,4 @@
-import { problem } from './api';
+import { errorText } from '@luft/ui';
 
 export class Runner {
 	busy = $state(false);
@@ -12,7 +12,7 @@ export class Runner {
 		try {
 			await work();
 		} catch (reason) {
-			this.error = problem(reason);
+			this.error = errorText(reason);
 		}
 		await this.refresh();
 		this.busy = false;

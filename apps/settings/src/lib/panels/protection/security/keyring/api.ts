@@ -67,7 +67,6 @@ export interface Keyring {
 	ssh: Ssh | null;
 }
 
-export const problem = (reason: unknown) => (reason instanceof Error ? reason.message : String(reason));
 
 export const keyring = () => invoke<Keyring | null>('keyring');
 export const onKeyring = (callback: (keyring: Keyring) => void) => listen<Keyring>('keyring.changed', callback);

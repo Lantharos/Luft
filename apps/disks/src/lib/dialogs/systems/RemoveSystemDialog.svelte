@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { bytes, Dialog } from '@luft/ui';
+	import { bytes, Dialog, errorText } from '@luft/ui';
 	import * as api from '#lib/api.js';
 	import type { OtherSystem, Removed } from '#lib/api.js';
 	import { KeyRequest } from '#lib/encryption.svelte.js';
-	import { errorText, inner } from '#lib/format.js';
+	import { inner } from '#lib/format.js';
 	import { disks } from '#lib/state/disks.svelte.js';
 	import { systems } from '#lib/state/systems.svelte.js';
 	import { GROW_STEP, plannedSteps, shortName, stepKey } from '#lib/systems.js';

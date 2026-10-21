@@ -6,8 +6,8 @@
 	import Terminal from '@lucide/svelte/icons/terminal';
 	import Trash from '@lucide/svelte/icons/trash';
 	import { t } from '@luft/i18n';
-	import { ago, ConfirmDialog, IconButton, Row, Section, Switch } from '@luft/ui';
-	import { problem, publicKey, removeKey, setConfirm, type Ssh, type SshKey } from '../api';
+	import { ago, ConfirmDialog, errorText, IconButton, Row, Section, Switch } from '@luft/ui';
+	import { publicKey, removeKey, setConfirm, type Ssh, type SshKey } from '../api';
 	import AddKeyDialog from './AddKeyDialog.svelte';
 	import { kind } from '../describe';
 	import { Runner } from '../runner.svelte';
@@ -34,7 +34,7 @@
 		try {
 			await navigator.clipboard.writeText(await text());
 		} catch (reason) {
-			runner.error = problem(reason);
+			runner.error = errorText(reason);
 			return;
 		}
 		copied = id;

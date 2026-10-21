@@ -25,7 +25,7 @@
 		<MenuItem onclick={() => create('folder', close)}>
 			<FolderPlus size={16} />
 			<span class="flex-1">New folder</span>
-			<span class="menu-shortcut">Ctrl+Shift+N</span>
+			<span class="text-[11.5px] text-[var(--text-muted)] tabular-nums">Ctrl+Shift+N</span>
 		</MenuItem>
 		<MenuItem onclick={() => create('file', close)}>
 			<FilePlus size={16} />

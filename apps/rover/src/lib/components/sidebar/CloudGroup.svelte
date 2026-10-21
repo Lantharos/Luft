@@ -35,7 +35,7 @@
 	}
 </script>
 
-<div class="sidebar-group" role="group" aria-label="Cloud">
+<div class="flex flex-none flex-col gap-px" role="group" aria-label="Cloud">
 	<div class="sidebar-heading">
 		<span>Cloud</span>
 		{#if adding}
@@ -68,3 +68,23 @@
 		</SidebarItem>
 	{/each}
 </div>
+
+<style>
+	.sidebar-heading {
+		display: flex;
+		min-height: 30px;
+		align-items: center;
+		justify-content: space-between;
+		padding-left: 12px;
+		color: var(--sidebar-text-muted);
+		font-size: 12.5px;
+		font-weight: 500;
+	}
+
+	.sidebar-item__status {
+		display: grid;
+		margin-right: 12px;
+		place-items: center;
+		color: var(--sidebar-text-muted);
+	}
+</style>

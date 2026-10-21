@@ -103,3 +103,52 @@
 		<EntryIcon kind={fileKind(entry)} size={iconSize} {...thumbnailOf(entry)} fit="contain" />
 	</div>
 {/if}
+
+<style>
+	.preview-image {
+		max-height: 100%;
+		max-width: 100%;
+		object-fit: contain;
+	}
+
+	.preview-image.has-backdrop {
+		border-radius: 8px;
+		background: var(--thumbnail-backdrop);
+	}
+
+	.preview-stack {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 20px;
+	}
+
+	.preview-audio {
+		width: min(480px, 80vw);
+	}
+
+	.preview-player {
+		display: flex;
+		height: 100%;
+		width: 100%;
+		min-height: 0;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 12px;
+		padding: 16px;
+	}
+
+	.preview-player .preview-image {
+		min-height: 0;
+		flex: 0 1 auto;
+		border-radius: 8px;
+	}
+
+	.preview-document {
+		height: 100%;
+		width: 100%;
+		border: 0;
+		background: white;
+	}
+</style>

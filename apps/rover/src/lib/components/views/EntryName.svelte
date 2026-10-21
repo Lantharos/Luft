@@ -33,3 +33,10 @@
 {:else}
 	<span class={['entry-name', className]}>{entry.name}</span>
 {/if}
+
+<style>
+	.entry-name {
+		min-width: 0;
+		flex: 1;
+	}
+</style>

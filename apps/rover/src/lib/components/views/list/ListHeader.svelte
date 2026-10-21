@@ -136,3 +136,71 @@
 		</button>
 	{/each}
 </div>
+
+<style>
+	.list-header {
+		height: 34px;
+		margin-inline: 10px;
+		background: var(--content);
+		color: var(--text-muted);
+		font-size: 12px;
+		box-shadow: 0 1px 0 var(--hairline);
+	}
+
+	.list-heading {
+		display: flex;
+		height: 100%;
+		min-width: 0;
+		align-items: center;
+		gap: 4px;
+		transition: color var(--motion-tap) var(--ease-decelerate);
+	}
+
+	.list-heading:hover:not(:disabled),
+	.list-heading.is-active {
+		color: var(--text);
+	}
+
+	.list-heading.list-size {
+		justify-content: flex-end;
+	}
+
+	.list-heading[data-column] {
+		position: relative;
+		cursor: grab;
+	}
+
+	.list-heading.is-moving {
+		z-index: 1;
+		cursor: grabbing;
+		color: var(--text);
+		background: var(--content);
+	}
+
+	.list-resize {
+		position: absolute;
+		top: 7px;
+		bottom: 7px;
+		left: -14px;
+		width: 12px;
+		cursor: col-resize;
+	}
+
+	.list-resize::after {
+		content: '';
+		position: absolute;
+		inset: 0 5px;
+		border-radius: var(--radius-pill);
+		background: var(--hairline);
+		opacity: 0;
+		transition: opacity var(--motion-tap) var(--ease-decelerate);
+	}
+
+	.list-header:hover .list-resize::after {
+		opacity: 1;
+	}
+
+	.list-resize:hover::after {
+		background: var(--text-muted);
+	}
+</style>

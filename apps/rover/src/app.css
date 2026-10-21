@@ -1,10 +1,8 @@
 @import 'tailwindcss';
 @import '@luft/ui/styles.css';
 @import './styles/entries.css';
-@import './styles/views.css';
-@import './styles/chrome.css';
+@import './styles/list.css';
 @import './styles/sidebar.css';
-@import './styles/details.css';
 
 :root {
 	--folder: var(--accent);

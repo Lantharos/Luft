@@ -48,3 +48,43 @@
 		{/if}
 	</section>
 {/if}
+
+<style>
+	.details-section {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+
+	.details-heading {
+		padding-bottom: 6px;
+		color: var(--text-muted);
+		font-size: 12.5px;
+	}
+
+	.open-with__app {
+		display: flex;
+		min-height: 36px;
+		align-items: center;
+		gap: 10px;
+		border-radius: 10px;
+		padding-inline: 8px;
+		margin-inline: -8px;
+		color: var(--text-soft);
+		font-size: 13px;
+		text-align: left;
+		transition:
+			background-color var(--motion-tap) var(--ease-decelerate),
+			color var(--motion-tap) var(--ease-decelerate);
+	}
+
+	.open-with__app:hover {
+		background: var(--surface-hover);
+		color: var(--text);
+	}
+
+	.open-with__app.is-default {
+		min-height: 44px;
+		color: var(--text);
+	}
+</style>

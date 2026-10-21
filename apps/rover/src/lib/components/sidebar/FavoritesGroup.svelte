@@ -109,7 +109,7 @@
 </script>
 
 <div
-	class={['sidebar-group sidebar-favorites', receiving && 'is-receiving']}
+	class={['sidebar-favorites flex flex-col gap-px', receiving && 'is-receiving']}
 	role="group"
 	aria-label="Favorites"
 	ondragenter={groupDragOver}
@@ -151,3 +151,25 @@
 		<p class="sidebar-hint">Drop to add to Favorites</p>
 	{/if}
 </div>
+
+<style>
+	.sidebar-favorites {
+		min-height: 36px;
+		flex: 1 0 auto;
+		border-radius: 14px;
+		transition:
+			background-color var(--motion-tap) var(--ease-decelerate),
+			box-shadow var(--motion-tap) var(--ease-decelerate);
+	}
+
+	.sidebar-favorites.is-receiving {
+		background: var(--sidebar-control);
+		box-shadow: inset 0 0 0 1px var(--accent-line);
+	}
+
+	.sidebar-hint {
+		padding: 8px 12px;
+		color: var(--sidebar-text-muted);
+		font-size: 12.5px;
+	}
+</style>

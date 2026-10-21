@@ -54,7 +54,7 @@
 
 <VirtualScroller
 	bind:this={surface.scroller}
-	class={['folder-column soft-scroll', column.current && 'is-current']}
+	class="soft-scroll min-h-0 w-64 flex-none shadow-[inset_-1px_0_0_var(--hairline)]"
 	items={column.current ? surface.items : entries}
 	key={(entry) => entry.path}
 	layout={LAYOUT}
@@ -72,8 +72,18 @@
 			<CloudMark state={manager.cloud.stateOf(entry.path)} />
 			<VcsBadge status={vcs.statusFor(entry.path, entry.isDir)} />
 			{#if entry.isDir}
-				<ChevronRight size={14} class="column-chevron" />
+				<ChevronRight size={14} class="flex-none text-[var(--text-muted)]" />
 			{/if}
 		</div>
 	{/snippet}
 </VirtualScroller>
+
+<style>
+	.column-row {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding-inline: 8px;
+		font-size: 13px;
+	}
+</style>

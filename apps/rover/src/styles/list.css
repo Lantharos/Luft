@@ -1,0 +1,38 @@
+@layer components {
+	.list-grid {
+		display: grid;
+		grid-template-columns: var(--list-columns);
+		align-items: center;
+		column-gap: 16px;
+		padding-inline: 10px;
+	}
+
+	.list-row {
+		font-size: 13px;
+	}
+
+	.list-name {
+		display: flex;
+		min-width: 0;
+		align-items: center;
+		gap: 10px;
+	}
+
+	.list-cell {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		color: var(--text-muted);
+		font-size: 12.5px;
+		font-variant-numeric: tabular-nums;
+		transition: color var(--motion-tap) var(--ease-decelerate);
+	}
+
+	.list-cell.list-size {
+		text-align: right;
+	}
+
+	.entry.is-selected .list-cell {
+		color: var(--text-soft);
+	}
+}

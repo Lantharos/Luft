@@ -78,3 +78,36 @@
 		</div>
 	{/snippet}
 </VirtualScroller>
+
+<style>
+	.grid-tile {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 8px;
+		padding: 7px 6px 6px;
+		border-radius: 14px;
+		text-align: center;
+	}
+
+	.grid-art {
+		position: relative;
+		display: grid;
+		width: 100%;
+		flex: none;
+		place-items: center;
+	}
+
+	.grid-tile :global(.grid-name) {
+		display: -webkit-box;
+		max-width: 100%;
+		flex: none;
+		overflow: hidden;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
+		line-clamp: 2;
+		overflow-wrap: anywhere;
+		font-size: 12.5px;
+		line-height: 16px;
+	}
+</style>

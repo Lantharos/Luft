@@ -158,7 +158,7 @@
 			{#each crumbs as crumb, index (crumb.path || crumb.label)}
 				{@const accepts = acceptsDrops && Boolean(crumb.path) && drag.canDropOn(crumb.path)}
 				{#if index > 0}
-					<ChevronRight size={14} class="path-separator" />
+					<ChevronRight size={14} class="flex-none text-[var(--text-muted)] opacity-55" />
 				{/if}
 				<button
 					class={['path-crumb', index === crumbs.length - 1 && 'is-current', drag.target?.key === segmentKey(crumb.path) && 'is-drop-target']}
@@ -180,3 +180,149 @@
 		{/if}
 	{/if}
 </div>
+
+<style>
+	.path-bar {
+		position: relative;
+		display: flex;
+		height: 34px;
+		min-width: 0;
+		flex: 1;
+		align-items: center;
+		border-radius: var(--radius-pill);
+		background: var(--surface);
+		transition:
+			background-color var(--motion-tap) var(--ease-decelerate),
+			box-shadow var(--motion-tap) var(--ease-decelerate);
+	}
+
+	.path-bar:hover {
+		background: var(--surface-hover);
+	}
+
+	.path-bar.is-editing {
+		background: var(--control);
+		box-shadow: inset 0 0 0 1.5px var(--accent-line);
+	}
+
+	.path-trail {
+		display: flex;
+		min-width: 0;
+		max-width: 100%;
+		align-items: center;
+		gap: 1px;
+		overflow-x: auto;
+		padding-inline: 4px;
+	}
+
+	.path-trail.is-clipped {
+		mask-image: linear-gradient(to right, transparent, black 32px);
+	}
+
+	.path-crumb {
+		display: inline-flex;
+		height: 26px;
+		max-width: 200px;
+		flex: none;
+		align-items: center;
+		gap: 6px;
+		border-radius: var(--radius-pill);
+		padding-inline: 9px;
+		color: var(--text-muted);
+		font-size: 13px;
+		transition:
+			background-color var(--motion-tap) var(--ease-decelerate),
+			color var(--motion-tap) var(--ease-decelerate),
+			box-shadow var(--motion-tap) var(--ease-decelerate);
+	}
+
+	.path-crumb:hover {
+		background: var(--surface-hover);
+		color: var(--text);
+	}
+
+	.path-crumb.is-current {
+		color: var(--text);
+		font-weight: 500;
+	}
+
+	.path-crumb.is-drop-target {
+		background: var(--accent-soft);
+		color: var(--text);
+		box-shadow: inset 0 0 0 1.5px var(--accent-line);
+	}
+
+
+	.path-edit-area {
+		min-width: 24px;
+		flex: 1;
+		align-self: stretch;
+		cursor: text;
+	}
+
+	.path-input {
+		height: 100%;
+		min-width: 0;
+		flex: 1;
+		background: transparent;
+		padding-inline: 14px;
+		color: var(--text);
+		font-size: 13px;
+		outline: none;
+	}
+
+	.path-candidates {
+		position: absolute;
+		top: calc(100% + 6px);
+		left: 0;
+		z-index: 40;
+		display: flex;
+		max-height: 280px;
+		width: min(360px, 100%);
+		flex-direction: column;
+		overflow-y: auto;
+		padding: 4px;
+		border-radius: 18px;
+		background: var(--popover);
+		box-shadow: 0 12px 40px var(--shadow-soft);
+		animation: candidates-in var(--motion-standard) var(--ease-decelerate);
+	}
+
+	.path-candidate {
+		display: flex;
+		min-height: 32px;
+		flex: none;
+		align-items: center;
+		gap: 9px;
+		border-radius: var(--radius-pill);
+		padding-inline: 11px;
+		color: var(--text-soft);
+		font-size: 13px;
+		text-align: left;
+		transition:
+			background-color var(--motion-tap) var(--ease-decelerate),
+			color var(--motion-tap) var(--ease-decelerate);
+	}
+
+	.path-candidate:hover {
+		background: var(--surface-hover);
+		color: var(--text);
+	}
+
+	.path-candidate.is-active {
+		background: var(--selection);
+		color: var(--text);
+	}
+
+	.path-candidate :global(svg) {
+		flex: none;
+		color: var(--folder);
+	}
+
+	@keyframes candidates-in {
+		from {
+			opacity: 0;
+			translate: 0 -4px;
+		}
+	}
+</style>

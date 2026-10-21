@@ -55,3 +55,52 @@
 		</div>
 	</div>
 {/if}
+
+<style>
+	.quicklook-backdrop {
+		position: fixed;
+		inset: 0;
+		z-index: 70;
+		display: grid;
+		place-items: center;
+		background: rgba(0, 0, 0, 0.42);
+	}
+
+	.quicklook {
+		display: flex;
+		height: min(780px, calc(100dvh - 72px));
+		width: min(1120px, calc(100vw - 96px));
+		flex-direction: column;
+		overflow: hidden;
+		border-radius: 20px;
+		background: var(--raised);
+		box-shadow: 0 30px 90px rgba(0, 0, 0, 0.5);
+	}
+
+	.quicklook-header {
+		display: flex;
+		min-height: 60px;
+		flex: none;
+		align-items: center;
+		gap: 12px;
+		padding: 0 12px 0 18px;
+		box-shadow: 0 1px 0 var(--hairline);
+	}
+
+	.quicklook-body {
+		position: relative;
+		display: grid;
+		min-height: 0;
+		flex: 1;
+		background: var(--content);
+	}
+
+	.quicklook-content {
+		display: grid;
+		min-height: 0;
+		min-width: 0;
+		grid-area: 1 / 1;
+		place-items: center;
+		overflow: hidden;
+	}
+</style>

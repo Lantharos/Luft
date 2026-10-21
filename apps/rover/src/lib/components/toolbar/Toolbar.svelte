@@ -110,3 +110,40 @@
 
 	<WindowControls />
 </header>
+
+<style>
+	.toolbar {
+		display: flex;
+		height: 52px;
+		flex: none;
+		align-items: center;
+		gap: 10px;
+		padding-inline: 10px 16px;
+	}
+
+	.icon-button.is-on {
+		background: var(--surface-hover);
+		color: var(--text);
+	}
+
+	.vcs-chip {
+		display: inline-flex;
+		height: 30px;
+		max-width: 180px;
+		align-items: center;
+		gap: 6px;
+		border-radius: var(--radius-pill);
+		padding-inline: 10px;
+		color: var(--text-soft);
+		font-size: 12.5px;
+		transition:
+			background-color var(--motion-tap) var(--ease-decelerate),
+			color var(--motion-tap) var(--ease-decelerate);
+	}
+
+	.vcs-chip:hover,
+	.vcs-chip.is-on {
+		background: var(--surface-hover);
+		color: var(--text);
+	}
+</style>

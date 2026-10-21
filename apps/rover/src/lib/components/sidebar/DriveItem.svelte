@@ -65,3 +65,25 @@
 		{/if}
 	{/snippet}
 </SidebarItem>
+
+<style>
+	.drive-usage {
+		display: block;
+		height: 3px;
+		overflow: hidden;
+		border-radius: var(--radius-pill);
+		background: var(--sidebar-control-hover);
+	}
+
+	.drive-usage__fill {
+		display: block;
+		height: 100%;
+		border-radius: inherit;
+		background: var(--accent);
+		transform-origin: left center;
+	}
+
+	.drive-usage__fill.is-full {
+		background: var(--danger);
+	}
+</style>

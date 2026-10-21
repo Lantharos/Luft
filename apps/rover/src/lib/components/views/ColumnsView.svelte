@@ -19,3 +19,14 @@
 		<FolderColumn {column} entries={column.current ? manager.displayEntries : data.entries(column.path)} />
 	{/each}
 </div>
+
+<style>
+	.columns-strip {
+		display: flex;
+		min-height: 0;
+		min-width: 0;
+		flex: 1;
+		overflow-x: auto;
+		overflow-y: hidden;
+	}
+</style>

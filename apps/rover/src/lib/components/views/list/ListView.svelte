@@ -115,3 +115,22 @@
 {#if menu}
 	<ColumnsMenu at={menu} {columns} {recent} onclose={() => (menu = null)} />
 {/if}
+
+<style>
+	.list-group {
+		display: flex;
+		height: 100%;
+		align-items: flex-end;
+		gap: 8px;
+		padding: 0 10px 7px;
+		color: var(--text-soft);
+		font-size: 12.5px;
+		font-weight: 500;
+	}
+
+	.list-group__count {
+		color: var(--text-muted);
+		font-weight: 400;
+		font-variant-numeric: tabular-nums;
+	}
+</style>

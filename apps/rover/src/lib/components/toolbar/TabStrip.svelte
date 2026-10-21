@@ -77,3 +77,77 @@
 		</button>
 	</div>
 {/if}
+
+<style>
+	.tab-strip {
+		display: flex;
+		height: 38px;
+		flex: none;
+		align-items: center;
+		gap: 4px;
+		padding: 0 12px 6px;
+	}
+
+	.tab {
+		display: flex;
+		height: 30px;
+		min-width: 0;
+		max-width: 240px;
+		flex: 1 1 0;
+		align-items: center;
+		border-radius: 10px;
+		color: var(--text-muted);
+		transition:
+			background-color var(--motion-tap) var(--ease-decelerate),
+			color var(--motion-tap) var(--ease-decelerate);
+	}
+
+	.tab:hover {
+		background: var(--surface-hover);
+		color: var(--text-soft);
+	}
+
+	.tab.is-active {
+		background: var(--control);
+		color: var(--text);
+	}
+
+	.tab.is-drop-target {
+		background: var(--accent-soft);
+		color: var(--text);
+	}
+
+	.tab-main {
+		display: flex;
+		height: 100%;
+		min-width: 0;
+		flex: 1;
+		align-items: center;
+		gap: 7px;
+		padding-left: 12px;
+		font-size: 13px;
+	}
+
+	.tab-close {
+		display: grid;
+		height: 22px;
+		width: 22px;
+		margin-right: 5px;
+		flex: none;
+		place-items: center;
+		border-radius: var(--radius-pill);
+		opacity: 0;
+		transition:
+			opacity var(--motion-tap) var(--ease-decelerate),
+			background-color var(--motion-tap) var(--ease-decelerate);
+	}
+
+	.tab:hover .tab-close,
+	.tab.is-active .tab-close {
+		opacity: 1;
+	}
+
+	.tab-close:hover {
+		background: var(--surface-hover);
+	}
+</style>

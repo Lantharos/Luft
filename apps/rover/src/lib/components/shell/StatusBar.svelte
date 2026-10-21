@@ -48,3 +48,19 @@
 		{/if}
 	</span>
 </footer>
+
+<style>
+	.status-bar {
+		display: flex;
+		height: 30px;
+		flex: none;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+		padding-inline: 18px;
+		color: var(--text-muted);
+		font-size: 12px;
+		font-variant-numeric: tabular-nums;
+		box-shadow: 0 -1px 0 var(--hairline);
+	}
+</style>

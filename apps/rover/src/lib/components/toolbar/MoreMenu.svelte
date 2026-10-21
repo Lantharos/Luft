@@ -42,7 +42,7 @@
 </script>
 
 {#snippet shortcut(keys: string)}
-	<span class="menu-shortcut">{keys}</span>
+	<span class="text-[11.5px] text-[var(--text-muted)] tabular-nums">{keys}</span>
 {/snippet}
 
 <MenuButton label="More" class="icon-button" align="end" minWidth={236} {@attach tooltip('More')}>

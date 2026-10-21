@@ -78,7 +78,7 @@
 	</div>
 
 	<nav class="sidebar-scroll hidden-scroll scroll-fade" aria-label="Places" {@attach selectionPill('.sidebar-item.is-active')}>
-		<div class="sidebar-group">
+		<div class="flex flex-none flex-col gap-px">
 			{#if showHome}
 				<SidebarItem icon={House} label="Home" {...folderItem(manager.homePath)} />
 			{/if}
@@ -118,7 +118,7 @@
 		<FavoritesGroup {manager} {drag} {chooser} hidden={placePaths} onopentab={openInTab} onmenu={showMenu} />
 
 		{#if manager.drives.ordered.length > 0 || manager.drives.windows.length > 0}
-			<div class="sidebar-group">
+			<div class="flex flex-none flex-col gap-px">
 				{#each manager.drives.ordered as drive (drive.mountPoint)}
 					<DriveItem {drive} {manager} {drag} active={activeDrive === drive.mountPoint} onopentab={openInTab} onmenu={showMenu} />
 				{/each}
@@ -133,7 +133,7 @@
 		{/if}
 
 		{#if manager.network.entries.length > 0}
-			<div class="sidebar-group">
+			<div class="flex flex-none flex-col gap-px">
 				{#each manager.network.entries as entry (entry.place.uri)}
 					<NetworkItem {entry} {manager} {drag} onopentab={openInTab} onmenu={showMenu} />
 				{/each}
@@ -141,3 +141,30 @@
 		{/if}
 	</nav>
 </aside>
+
+<style>
+	.sidebar {
+		padding: 12px 10px 12px;
+	}
+
+	.sidebar-search {
+		padding: 2px 2px 12px;
+	}
+
+	.sidebar-scroll {
+		display: flex;
+		min-height: 0;
+		flex: 1;
+		flex-direction: column;
+		gap: 12px;
+		overflow-y: auto;
+	}
+
+	.sidebar-item__count {
+		margin-right: 14px;
+		color: var(--sidebar-text-muted);
+		font-size: 12px;
+		font-weight: 400;
+		font-variant-numeric: tabular-nums;
+	}
+</style>

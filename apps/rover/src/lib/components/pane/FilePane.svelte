@@ -86,3 +86,41 @@
 		{/key}
 	{/if}
 </section>
+
+<style>
+	.pane-stack {
+		position: relative;
+		display: grid;
+		min-height: 0;
+		min-width: 0;
+		flex: 1;
+	}
+
+	.pane-layer {
+		display: flex;
+		min-height: 0;
+		min-width: 0;
+		flex-direction: column;
+		grid-area: 1 / 1;
+	}
+
+	.loading-rows {
+		display: grid;
+		gap: 8px;
+		padding: 40px 20px 0;
+		animation: empty-in var(--motion-standard) var(--ease-decelerate) both;
+	}
+
+	.loading-rows span {
+		height: 26px;
+		border-radius: 8px;
+		background: var(--surface-hover);
+	}
+
+	@keyframes empty-in {
+		from {
+			opacity: 0;
+			scale: 0.98;
+		}
+	}
+</style>

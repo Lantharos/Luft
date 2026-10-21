@@ -66,3 +66,28 @@
 	onmousedown={stop}
 	onpointerdown={stop}
 />
+
+<style>
+	.inline-name-field {
+		min-width: 0;
+		flex: 1;
+		border-radius: 6px;
+		background: var(--content);
+		padding: 2px 6px;
+		margin-inline: -6px;
+		color: var(--text);
+		font-size: inherit;
+		caret-color: var(--accent);
+		outline: none;
+		box-shadow: inset 0 0 0 1.5px var(--accent-line);
+	}
+
+	.inline-name-field--grid {
+		width: 100%;
+		flex: none;
+		margin-inline: 0;
+		text-align: center;
+		font-size: 12.5px;
+		line-height: 16px;
+	}
+</style>

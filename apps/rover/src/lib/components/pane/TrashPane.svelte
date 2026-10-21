@@ -74,3 +74,31 @@
 		{/snippet}
 	</VirtualScroller>
 {/if}
+
+<style>
+	.trash-bar {
+		display: flex;
+		min-height: 48px;
+		flex: none;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+		padding: 4px 20px 6px;
+		color: var(--text-muted);
+		font-size: 13px;
+	}
+
+	.trash-row {
+		grid-template-columns: minmax(0, 1fr) 150px 76px;
+	}
+
+	@container (max-width: 460px) {
+		.trash-row {
+			grid-template-columns: minmax(0, 1fr) 76px;
+		}
+
+		.trash-row .list-date {
+			display: none;
+		}
+	}
+</style>

@@ -18,7 +18,7 @@ const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 
 async function measure(label, style, scheme) {
   await settled();
-  const button = named('Start');
+  const button = named('Start', named('kestrel-panel'));
   const area = areaOf(button);
   (await renderedFrame(area)).saveZoomed(`launcher-${label}`, CROP_ZOOM);
   const mark = await measureMark(button.child.get_children(), area);

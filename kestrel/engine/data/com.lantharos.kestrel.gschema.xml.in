@@ -277,6 +277,22 @@
       <default>'duckduckgo'</default>
       <summary>Where Start's search looks up the web</summary>
     </key>
+    <key name="taskbar-shown" type="b">
+      <default>true</default>
+      <summary>Show the taskbar</summary>
+      <description>
+        When disabled, the taskbar is gone and a small corner with the
+        clock and status icons opens quick settings and notifications.
+        Tablet mode always shows the taskbar.
+      </description>
+    </key>
+    <key name="taskbar-start-button" type="b">
+      <default>true</default>
+      <summary>Show the Start button</summary>
+      <description>
+        When disabled, Super still opens Start.
+      </description>
+    </key>
     <key name="taskbar-alignment" enum="com.lantharos.kestrel.TaskbarAlignment">
       <default>'center'</default>
       <summary>Where Start and the apps sit on the taskbar</summary>

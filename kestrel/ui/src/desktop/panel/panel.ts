@@ -105,6 +105,7 @@ export class KestrelPanel {
       y_align: Clutter.ActorAlign.CENTER,
     });
     this.launcher = createLauncher(actions.start, taskbarPreferences.metrics.button, this.actor);
+    this.launcher.button.visible = taskbarPreferences.startButton;
     center.add_child(this.launcher.button);
     center.add_child(this.taskbar.actor);
     this.actor.add_child(center);
@@ -299,6 +300,7 @@ export class KestrelPanel {
     if (key === 'taskbar-alignment' || SHAPE_KEYS.includes(key)) this.layout.ease();
     if (key === 'tablet') this.syncTablet();
     if (key === 'taskbar-windows-per-workspace') this.syncWorkspaceWindows();
+    if (key === 'taskbar-start-button' || key === 'tablet') this.launcher.button.visible = taskbarPreferences.startButton;
     if (APP_KEYS.includes(key)) this.refreshApps();
   }
 

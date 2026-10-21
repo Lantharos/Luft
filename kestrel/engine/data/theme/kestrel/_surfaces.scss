@@ -56,20 +56,23 @@
 .kestrel-task-workspace-label { font-size: 12px; }
 
 .kestrel-board-tint { background-color: pick(rgba(246, 246, 248, 0.40), rgba(12, 12, 16, 0.36)); }
-.kestrel-board-corner { spacing: 8px; }
-.kestrel-board-pill.kestrel-glass, .kestrel-board-overview.kestrel-glass, .kestrel-board-dock.kestrel-glass { border-radius: 999px; transition-duration: $motion-tap; }
-.kestrel-board-pill.kestrel-glass { height: 36px; padding: 0 14px; }
-.kestrel-board-overview.kestrel-glass { width: 36px; height: 36px; padding: 0; }
+.kestrel-board-corner, .kestrel-status-corner { spacing: 8px; }
+.kestrel-board-pill.kestrel-glass, .kestrel-board-overview.kestrel-glass, .kestrel-board-dock.kestrel-glass,
+.kestrel-corner-pill.kestrel-glass, .kestrel-corner-start.kestrel-glass { border-radius: 999px; transition-duration: $motion-tap; }
+.kestrel-board-pill.kestrel-glass, .kestrel-corner-pill.kestrel-glass { height: 36px; padding: 0 14px; }
+.kestrel-board-overview.kestrel-glass, .kestrel-corner-start.kestrel-glass { width: 36px; height: 36px; padding: 0; }
 .kestrel-board-dock.kestrel-glass { height: 36px; padding: 0 3px; spacing: 6px; }
 .kestrel-board-dock-apps { spacing: 2px; }
 .kestrel-board-dock-button { width: 30px; height: 30px; margin: 3px 0; padding: 0; border-radius: 999px; transition-duration: $motion-tap; }
 .kestrel-board-pill.kestrel-glass:hover, .kestrel-board-pill.kestrel-glass:focus,
 .kestrel-board-overview.kestrel-glass:hover, .kestrel-board-overview.kestrel-glass:focus,
+.kestrel-corner-pill.kestrel-glass:hover, .kestrel-corner-pill.kestrel-glass:focus,
+.kestrel-corner-start.kestrel-glass:hover, .kestrel-corner-start.kestrel-glass:focus,
 .kestrel-board-dock-button:hover, .kestrel-board-dock-button:focus { background-color: fill(0.12); }
-.kestrel-board-dock-button:checked { background-color: fill(0.18); }
-.kestrel-board-pill-box, .kestrel-board-pill-status { spacing: 10px; }
+.kestrel-board-dock-button:checked, .kestrel-corner-pill.kestrel-glass:active, .kestrel-corner-start.kestrel-glass:active { background-color: fill(0.18); }
+.kestrel-board-pill-box, .kestrel-board-pill-status, .kestrel-corner-status { spacing: 10px; }
 .kestrel-board-pill-icon { icon-size: 16px; }
-.kestrel-board-pill-time { font-size: 13px; font-weight: 500; font-feature-settings: "tnum"; }
+.kestrel-board-pill-time, .kestrel-corner-time { font-size: 13px; font-weight: 500; font-feature-settings: "tnum"; }
 
 .screenshot-ui-tooltip { background-color: pick(rgba(248, 248, 250, 0.7), rgba(20, 20, 24, 0.25)); color: ink(); border-radius: 999px; box-shadow: none; }
 .screenshot-ui-panel.kestrel-glass { padding: 8px; border-radius: 999px; }

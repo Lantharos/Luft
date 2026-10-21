@@ -111,7 +111,7 @@ class KestrelUi {
     });
     this.quick = new QuickSettings(context.quickSettings, place, close,
       icons => {
-        this.panels.primary.updateStatus(icons);
+        this.panels.updateStatus(icons);
         this.board.showStatus(icons);
       }, this.menus, () => this.takeScreenshot());
     const clipboard = new ClipboardPanel(this.menus, close, place, context.inputMethod);
@@ -290,13 +290,16 @@ class KestrelUi {
     const available = this.desktopAvailable();
     const covered = coveredMonitors(this.context.layoutManager.monitors);
     for (const panel of this.panels.all)
-      panel.autoHide.setAllowed(!!panel.monitor && available && !this.taskView.visible && !covered.has(panel.monitor.index));
+      panel.autoHide.setAllowed(taskbarPreferences.shown && !!panel.monitor && available && !this.taskView.visible && !covered.has(panel.monitor.index));
+    const primary = this.context.layoutManager.primaryMonitor;
+    this.panels.showCorner(!taskbarPreferences.shown && !!primary && available && !this.taskView.visible && !this.board.shown && !covered.has(primary.index));
     this.liveWallpaper.sync(available && !this.taskView.visible && !this.board.shown);
     if (!available) this.dismissImmediately();
   }
 
   private bottomClearance(): number {
-    return this.board.shown ? this.board.cornerClearance : taskbarPreferences.clearance;
+    if (this.board.shown) return this.board.cornerClearance;
+    return taskbarPreferences.shown ? taskbarPreferences.clearance : this.panels.cornerClearance;
   }
 
   private prewarmStart(): void {

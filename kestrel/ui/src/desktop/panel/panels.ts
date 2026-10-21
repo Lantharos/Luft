@@ -6,6 +6,7 @@ import type { WindowPreviews } from './windowPreviews.js';
 import { taskbarPreferences, type TaskbarKey } from './preferences/taskbarPreferences.js';
 import { WindowOverlap } from './autoHide/windowOverlap.js';
 import { EdgeSwipe } from './tablet/edgeSwipe.js';
+import { StatusCorner } from './widgets/statusCorner.js';
 
 interface PanelLayoutManager {
   primaryMonitor: Monitor | null;
@@ -16,6 +17,7 @@ interface PanelLayoutManager {
 
 export class PanelSet {
   readonly primary: KestrelPanel;
+  private readonly corner: StatusCorner;
   private secondary: KestrelPanel[] = [];
   private overlap: WindowOverlap | null = null;
   private edgeSwipe: EdgeSwipe | null = null;
@@ -30,6 +32,9 @@ export class PanelSet {
     private readonly changed: () => void,
   ) {
     this.primary = this.create(() => layoutManager.primaryMonitor!, layoutManager.primaryMonitor, true);
+    this.corner = new StatusCorner(actions(() => layoutManager.primaryMonitor!));
+    layoutManager.addChrome(this.corner.actor);
+    navigateWithKeyboard(this.corner.actor);
     this.unwatchPreferences = taskbarPreferences.watch(key => this.preferenceChanged(key));
     this.syncAutoHide();
     this.syncEdgeSwipe();
@@ -52,11 +57,25 @@ export class PanelSet {
     return !!actor && this.all.some(panel => panel.actor.contains(actor));
   }
 
+  get cornerClearance(): number {
+    return this.corner.clearance;
+  }
+
+  showCorner(shown: boolean): void {
+    this.corner.setShown(shown);
+  }
+
+  updateStatus(iconNames: string[]): void {
+    this.primary.updateStatus(iconNames);
+    this.corner.showStatus(iconNames);
+  }
+
   sync(): void {
     const primary = this.layoutManager.primaryMonitor;
     if (!primary) return;
     this.primary.monitor = primary;
     this.primary.place();
+    this.corner.place(primary);
     for (const panel of this.secondary) {
       this.remove(panel);
       panel.destroy();
@@ -71,6 +90,7 @@ export class PanelSet {
 
   setActive(surface: string | null, monitor: Monitor | null): void {
     for (const panel of this.all) panel.setActive(monitor && panel.monitor?.index === monitor.index ? surface : null);
+    this.corner.setActive(surface);
   }
 
   suppress(suppressed: boolean): void {
@@ -88,6 +108,7 @@ export class PanelSet {
     this.overlap = null;
     this.edgeSwipe?.destroy();
     this.edgeSwipe = null;
+    this.corner.destroy();
     for (const panel of this.all) panel.shutdown();
   }
 
@@ -96,8 +117,8 @@ export class PanelSet {
       this.sync();
       this.changed();
     }
-    if (key === 'taskbar-auto-hide' || key === 'tablet') this.syncAutoHide();
-    if (key === 'tablet') {
+    if (key === 'taskbar-auto-hide' || key === 'taskbar-shown' || key === 'tablet') this.syncAutoHide();
+    if (key === 'tablet' || key === 'taskbar-shown') {
       this.syncEdgeSwipe();
       this.changed();
     }
@@ -131,7 +152,7 @@ export class PanelSet {
 
   private syncStrut(panel: KestrelPanel): void {
     const reserved = panel.strut.get_parent() !== null;
-    const wanted = taskbarPreferences.autoHide === 'never';
+    const wanted = taskbarPreferences.shown && taskbarPreferences.autoHide === 'never';
     if (wanted && !reserved) this.layoutManager.addChrome(panel.strut, { affectsStruts: true });
     if (!wanted && reserved) this.layoutManager.removeChrome(panel.strut);
   }

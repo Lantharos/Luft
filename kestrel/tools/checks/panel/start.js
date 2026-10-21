@@ -32,7 +32,7 @@ async function checkOpening(start) {
   require(hintPositions.size === 1, 'the search placeholder stays put while Start opens');
   await capture('start');
 
-  const launcher = named('Start');
+  const launcher = named('Start', named('kestrel-panel'));
   const [launcherX, launcherY] = launcher.get_transformed_position();
   moveTo([launcherX + 20, launcherY + 20]);
   await eventually(() => launcher.hover, 'the Start button reacts to the pointer');

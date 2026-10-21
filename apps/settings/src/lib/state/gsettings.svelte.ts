@@ -1,6 +1,8 @@
 import { onDestroy } from 'svelte';
 import { invoke, listen } from '#lib/bridge.js';
 
+export const KESTREL_SCHEMA = 'com.lantharos.kestrel';
+
 type Values = Record<string, unknown>;
 
 interface Change {
@@ -73,5 +75,3 @@ export function useSettings<T extends Values>(schema: string, keys: (keyof T & s
 	onDestroy(() => group.destroy());
 	return group;
 }
-
-export const schemaInstalled = (schema: string) => invoke<boolean>('settings_installed', { schema });

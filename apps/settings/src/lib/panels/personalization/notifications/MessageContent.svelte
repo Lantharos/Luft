@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Row, Switch } from '@luft/ui';
-	import { useSettings } from '#lib/state/gsettings.svelte.js';
-	import { KESTREL_SCHEMA } from './api';
+	import { KESTREL_SCHEMA, useSettings } from '#lib/state/gsettings.svelte.js';
 
 	interface Props {
 		lockScreen: boolean;

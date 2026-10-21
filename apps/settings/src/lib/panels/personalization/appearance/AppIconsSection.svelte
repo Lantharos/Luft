@@ -2,7 +2,7 @@
 	import { t } from '@luft/i18n';
 	import { AppIcon, appearance, Row, Section, type AppIconStyle } from '@luft/ui';
 	import Swatches from '#lib/components/Swatches.svelte';
-	import { useSettings } from '#lib/state/gsettings.svelte.js';
+	import { KESTREL_SCHEMA, useSettings } from '#lib/state/gsettings.svelte.js';
 	import { installedApps, type App } from '../../protection/apps/api';
 
 	type Kestrel = {
@@ -29,7 +29,7 @@
 		{ value: '#6f8396', label: 'settings-appearance-tint-slate' }
 	];
 
-	const kestrel = useSettings<Kestrel>('com.lantharos.kestrel', ['app-icon-style', 'app-icon-tint', 'favorite-apps']);
+	const kestrel = useSettings<Kestrel>(KESTREL_SCHEMA, ['app-icon-style', 'app-icon-tint', 'favorite-apps']);
 
 	let installed = $state<App[]>([]);
 	let style = $derived(kestrel.values['app-icon-style'] ?? 'tinted');

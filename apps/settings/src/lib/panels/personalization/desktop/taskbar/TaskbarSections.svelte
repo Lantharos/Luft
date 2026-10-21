@@ -2,7 +2,7 @@
 	import { t } from '@luft/i18n';
 	import { onDestroy } from 'svelte';
 	import { Row, Section, Segmented, Select, Switch } from '@luft/ui';
-	import { useSettings } from '#lib/state/gsettings.svelte.js';
+	import { KESTREL_SCHEMA, useSettings } from '#lib/state/gsettings.svelte.js';
 	import { installedApps, type App } from '../../../protection/apps/api';
 	import { loadDisplays, onDisplaysChanged, type Displays } from '../../../devices/display/api';
 	import { currentWallpaper } from '../../appearance/wallpaper/current.svelte';
@@ -12,7 +12,7 @@
 	const PREVIEW_APPS = 5;
 	const RUNNING_APPS = 2;
 
-	const taskbar = useSettings<TaskbarSettings>('com.lantharos.kestrel', TASKBAR_KEYS);
+	const taskbar = useSettings<TaskbarSettings>(KESTREL_SCHEMA, TASKBAR_KEYS);
 	const wallpaper = currentWallpaper();
 
 	let installed = $state<App[]>([]);

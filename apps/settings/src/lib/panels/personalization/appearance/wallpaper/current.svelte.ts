@@ -1,12 +1,12 @@
 import { fileUrl } from '@lantharos/sabine';
-import { useSettings } from '#lib/state/gsettings.svelte.js';
+import { KESTREL_SCHEMA, useSettings } from '#lib/state/gsettings.svelte.js';
 import { thumbnail, uriToPath } from './api';
 
 type Background = { 'picture-uri': string; 'picture-uri-dark': string };
 type Wallpapers = { 'live-wallpaper': string; 'live-wallpaper-dark': string };
 
 export function currentWallpaper() {
-	const wallpapers = useSettings<Wallpapers>('com.lantharos.kestrel', ['live-wallpaper', 'live-wallpaper-dark']);
+	const wallpapers = useSettings<Wallpapers>(KESTREL_SCHEMA, ['live-wallpaper', 'live-wallpaper-dark']);
 	const background = useSettings<Background>('org.gnome.desktop.background', ['picture-uri', 'picture-uri-dark']);
 	const desktop = useSettings<{ 'color-scheme': string }>('org.gnome.desktop.interface', ['color-scheme']);
 	const current = $state<{ url: string | null }>({ url: null });

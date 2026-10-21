@@ -42,11 +42,6 @@ struct Key {
     key: String,
 }
 
-#[derive(Deserialize)]
-struct Schema {
-    schema: String,
-}
-
 pub fn register(window: SabineWindow, events: &Events, watcher: &Watcher) -> SabineWindow {
     let watch_events = events.clone();
     let watcher = watcher.clone();
@@ -75,9 +70,6 @@ pub fn register(window: SabineWindow, events: &Events, watcher: &Watcher) -> Sab
         )
         .command("settings_reset", |Key { location, key }| {
             gsettings::reset(&location, &key)
-        })
-        .command("settings_installed", |Schema { schema }| {
-            Ok(gsettings::installed(&schema))
         })
         .bridge_typed("settings_watch", move |location: Location| {
             watcher

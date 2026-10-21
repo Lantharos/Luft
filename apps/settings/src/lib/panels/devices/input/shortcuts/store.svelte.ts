@@ -1,5 +1,5 @@
 import { onDestroy, untrack } from 'svelte';
-import { SettingsGroup, schemaInstalled } from '#lib/state/gsettings.svelte.js';
+import { KESTREL_SCHEMA, SettingsGroup } from '#lib/state/gsettings.svelte.js';
 import { appNames, resetSetting, shortcutEntries, writeSetting, type Category, type ShortcutEntry } from './api';
 import { canonical, sameAccelerators } from './accelerator';
 
@@ -7,7 +7,6 @@ const MEDIA_KEYS = 'com.lantharos.kestrel.media-keys';
 const CUSTOM_SCHEMA = 'com.lantharos.kestrel.custom-keybinding';
 const CUSTOM_ROOT = '/com/lantharos/kestrel/media-keys/custom-keybindings/';
 const CUSTOM_KEYS = ['name', 'command', 'binding'] as const;
-const KESTREL = 'com.lantharos.kestrel';
 const REPLACED_WHILE_TILING = new Set([
 	'toggle-tiled-left',
 	'toggle-tiled-right',
@@ -44,13 +43,13 @@ export class ShortcutStore {
 	entries = $state.raw<ShortcutEntry[]>([]);
 	groups = $state.raw<Record<string, SettingsGroup<Accelerators>>>({});
 	customs = $state.raw<Record<string, SettingsGroup<Custom>>>({});
-	registry = $state.raw<SettingsGroup<{ 'global-shortcuts': string }> | null>(null);
 	names = $state.raw<Record<string, string>>({});
 
 	private media = new SettingsGroup<{ 'custom-keybindings': string[] }>(MEDIA_KEYS, ['custom-keybindings']);
+	private registry = new SettingsGroup<{ 'global-shortcuts': string }>(KESTREL_SCHEMA, ['global-shortcuts']);
 
 	customPaths = $derived(this.media.values['custom-keybindings'] ?? []);
-	registered = $derived<Registered>(JSON.parse(this.registry?.values['global-shortcuts'] ?? '{}'));
+	registered = $derived<Registered>(JSON.parse(this.registry.values['global-shortcuts'] ?? '{}'));
 	appIds = $derived(Object.keys(this.registered).sort().join(' '));
 
 	system = $derived<SystemBinding[]>(
@@ -125,7 +124,6 @@ export class ShortcutStore {
 			])
 		);
 		this.entries = entries;
-		if (await schemaInstalled(KESTREL)) this.registry = new SettingsGroup(KESTREL, ['global-shortcuts']);
 	}
 
 	private syncCustom(paths: string[]) {
@@ -154,7 +152,7 @@ export class ShortcutStore {
 			...this.registered,
 			[binding.app]: { ...shortcuts, [binding.shortcut]: { ...shortcuts[binding.shortcut], shortcuts: accelerators } }
 		};
-		await this.registry!.set('global-shortcuts', JSON.stringify(next));
+		await this.registry.set('global-shortcuts', JSON.stringify(next));
 	}
 
 	async release(accelerator: string, binding: Binding) {
@@ -185,6 +183,6 @@ export class ShortcutStore {
 	}
 
 	private destroy() {
-		for (const group of [...Object.values(this.groups), ...Object.values(this.customs), this.media, this.registry]) group?.destroy();
+		for (const group of [...Object.values(this.groups), ...Object.values(this.customs), this.media, this.registry]) group.destroy();
 	}
 }

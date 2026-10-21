@@ -9,13 +9,12 @@
 	interface Props {
 		app: NotifyingApp;
 		lockScreen: boolean;
-		hasRules: boolean;
 	}
 
-	let { app, lockScreen, hasRules }: Props = $props();
+	let { app, lockScreen }: Props = $props();
 
 	const options = useSettings<AppOptions>(APP_SCHEMA, APP_KEYS, untrack(() => app.path));
-	const rules = untrack(() => hasRules) ? useSettings<AppRules>(RULES_SCHEMA, RULES_KEYS, untrack(() => app.rulesPath)) : null;
+	const rules = useSettings<AppRules>(RULES_SCHEMA, RULES_KEYS, untrack(() => app.rulesPath));
 
 	let open = $state(false);
 	let enabled = $derived(options.values.enable ?? true);

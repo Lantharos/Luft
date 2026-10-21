@@ -3,7 +3,7 @@
 	import { appearance, Row, Section, Segmented, Switch } from '@luft/ui';
 	import Swatches from '#lib/components/Swatches.svelte';
 	import TimePicker from '#lib/components/TimePicker.svelte';
-	import { useSettings } from '#lib/state/gsettings.svelte.js';
+	import { KESTREL_SCHEMA, useSettings } from '#lib/state/gsettings.svelte.js';
 
 	type Schedule = 'off' | 'sunset' | 'custom';
 	type Accent = 'wallpaper' | 'white';
@@ -27,7 +27,7 @@
 	};
 
 	const desktop = useSettings<Interface>('org.gnome.desktop.interface', ['color-scheme', 'clock-format']);
-	const kestrel = useSettings<Kestrel>('com.lantharos.kestrel', ['accent', 'dark-schedule', 'dark-schedule-from', 'dark-schedule-to', 'pure-black', 'theme-apps']);
+	const kestrel = useSettings<Kestrel>(KESTREL_SCHEMA, ['accent', 'dark-schedule', 'dark-schedule-from', 'dark-schedule-to', 'pure-black', 'theme-apps']);
 
 	let dark = $derived(desktop.values['color-scheme'] === 'prefer-dark');
 	let schedule = $derived(kestrel.values['dark-schedule'] ?? 'off');

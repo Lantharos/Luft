@@ -2,12 +2,12 @@
 	import { t } from '@luft/i18n';
 	import { Row, Section, Segmented, Select } from '@luft/ui';
 	import { app } from '#lib/state/app.svelte.js';
-	import { useSettings } from '#lib/state/gsettings.svelte.js';
+	import { KESTREL_SCHEMA, useSettings } from '#lib/state/gsettings.svelte.js';
 	import { currentWallpaper } from '../../appearance/wallpaper/current.svelte';
 	import { GAPS, LAYOUTS, MODES, NEW_WINDOWS, TILING_KEYS, type TilingSettings } from './options';
 	import TilingPreview from './TilingPreview.svelte';
 
-	const tiling = useSettings<TilingSettings>('com.lantharos.kestrel', TILING_KEYS);
+	const tiling = useSettings<TilingSettings>(KESTREL_SCHEMA, TILING_KEYS);
 	const wallpaper = currentWallpaper();
 
 	let mode = $derived(tiling.values['window-tiling'] ?? 'off');

@@ -7,7 +7,7 @@
 	interface Props {
 		app: NotifyingApp;
 		options: SettingsGroup<AppOptions>;
-		rules: SettingsGroup<AppRules> | null;
+		rules: SettingsGroup<AppRules>;
 		lockScreen: boolean;
 		onclose: () => void;
 	}
@@ -38,25 +38,23 @@
 		<Row title={t('settings-notifications-sound')} disabled={off}>
 			{@render toggle('enable-sound-alerts', t('settings-notifications-sound'), off)}
 		</Row>
-		{#if rules}
-			<Row title={t('settings-notifications-dnd-allow')} description={t('settings-notifications-dnd-allow-description')} disabled={off}>
-				<Select
-					label={t('settings-notifications-dnd-allow')}
-					options={doNotDisturb}
-					value={rules.values['during-do-not-disturb'] ?? 'urgent'}
-					disabled={off}
-					onchange={(value) => rules.set('during-do-not-disturb', value)}
-				/>
-			</Row>
-			<Row title={t('settings-notifications-keep')} description={t('settings-notifications-keep-description')} disabled={off}>
-				<Switch
-					label={t('settings-notifications-keep')}
-					disabled={off}
-					checked={rules.values['keep-in-list'] ?? true}
-					onchange={(on) => rules.set('keep-in-list', on)}
-				/>
-			</Row>
-		{/if}
+		<Row title={t('settings-notifications-dnd-allow')} description={t('settings-notifications-dnd-allow-description')} disabled={off}>
+			<Select
+				label={t('settings-notifications-dnd-allow')}
+				options={doNotDisturb}
+				value={rules.values['during-do-not-disturb'] ?? 'urgent'}
+				disabled={off}
+				onchange={(value) => rules.set('during-do-not-disturb', value)}
+			/>
+		</Row>
+		<Row title={t('settings-notifications-keep')} description={t('settings-notifications-keep-description')} disabled={off}>
+			<Switch
+				label={t('settings-notifications-keep')}
+				disabled={off}
+				checked={rules.values['keep-in-list'] ?? true}
+				onchange={(on) => rules.set('keep-in-list', on)}
+			/>
+		</Row>
 		<Row title={t('settings-notifications-app-lock-screen')} disabled={off || !lockScreen}>
 			{@render toggle('show-in-lock-screen', t('settings-notifications-app-lock-screen'), off || !lockScreen)}
 		</Row>

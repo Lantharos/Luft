@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Row, Section, Switch } from '@luft/ui';
-	import { schemaInstalled, useSettings } from '#lib/state/gsettings.svelte.js';
+	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import AppsPage from './AppsPage.svelte';
 	import MessageContent from './MessageContent.svelte';
-	import { KESTREL_SCHEMA, RULES_SCHEMA, notifyingApps, type NotifyingApp } from './api';
+	import { notifyingApps, type NotifyingApp } from './api';
 
 	type General = {
 		'show-banners': boolean;
@@ -14,8 +14,6 @@
 
 	const general = useSettings<General>('org.gnome.desktop.notifications', ['show-banners', 'show-in-lock-screen', 'application-children']);
 
-	let hasMessageContent = $state(false);
-	let hasRules = $state<boolean | null>(null);
 	let apps = $state<NotifyingApp[]>([]);
 	let browsing = $state(false);
 
@@ -25,12 +23,10 @@
 		if (general.values['application-children']) void notifyingApps().then((list) => (apps = list));
 	});
 
-	void schemaInstalled(KESTREL_SCHEMA).then((installed) => (hasMessageContent = installed));
-	void schemaInstalled(RULES_SCHEMA).then((installed) => (hasRules = installed));
 </script>
 
-{#if browsing && hasRules !== null}
-	<AppsPage {apps} {lockScreen} {hasRules} onclose={() => (browsing = false)} />
+{#if browsing}
+	<AppsPage {apps} {lockScreen} onclose={() => (browsing = false)} />
 {:else}
 	<Section>
 		<Row title={t('settings-notifications-dnd')} description={t('settings-notifications-dnd-description')}>
@@ -42,12 +38,10 @@
 		<Row title={t('settings-notifications-show-lock-screen')}>
 			<Switch label={t('settings-notifications-show-lock-screen')} checked={lockScreen} onchange={(on) => general.set('show-in-lock-screen', on)} />
 		</Row>
-		{#if hasMessageContent}
-			<MessageContent {lockScreen} />
-		{/if}
+		<MessageContent {lockScreen} />
 	</Section>
 
-	{#if apps.length && hasRules !== null}
+	{#if apps.length}
 		<Section>
 			<Row title={t('settings-notifications-apps')} description={t('settings-notifications-apps-description')} onclick={() => (browsing = true)} />
 		</Section>

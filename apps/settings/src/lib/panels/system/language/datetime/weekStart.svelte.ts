@@ -1,5 +1,5 @@
 import { i18n } from '@luft/i18n';
-import { useSettings } from '#lib/state/gsettings.svelte.js';
+import { KESTREL_SCHEMA, useSettings } from '#lib/state/gsettings.svelte.js';
 
 export type WeekStart = 'automatic' | 'monday' | 'sunday';
 
@@ -13,7 +13,7 @@ export const weekdayName = (day: number, style: 'long' | 'narrow') =>
 	new Intl.DateTimeFormat(i18n.formats, { weekday: style, timeZone: 'UTC' }).format(SUNDAY + day * DAY);
 
 export function useWeekStart() {
-	const kestrel = useSettings<{ 'week-start': WeekStart }>('com.lantharos.kestrel', ['week-start']);
+	const kestrel = useSettings<{ 'week-start': WeekStart }>(KESTREL_SCHEMA, ['week-start']);
 	const locale = useSettings<{ region: string }>('org.gnome.system.locale', ['region']);
 	const regional = $derived(new Intl.Locale(regionLocale(locale.values.region ?? '')).getWeekInfo().firstDay % 7);
 

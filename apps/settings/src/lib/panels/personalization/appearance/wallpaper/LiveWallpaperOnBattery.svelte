@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Row, Switch } from '@luft/ui';
-	import { useSettings } from '#lib/state/gsettings.svelte.js';
+	import { KESTREL_SCHEMA, useSettings } from '#lib/state/gsettings.svelte.js';
 	import { powerState } from '#lib/panels/devices/power/api.js';
 
-	const kestrel = useSettings<{ 'live-wallpaper-on-battery': boolean }>('com.lantharos.kestrel', ['live-wallpaper-on-battery']);
+	const kestrel = useSettings<{ 'live-wallpaper-on-battery': boolean }>(KESTREL_SCHEMA, ['live-wallpaper-on-battery']);
 
 	let hasBattery = $state(false);
 

@@ -35,12 +35,6 @@ fn open(location: &Location) -> Result<gio::Settings, String> {
     })
 }
 
-pub fn installed(schema: &str) -> bool {
-    gio::SettingsSchemaSource::default()
-        .and_then(|source| source.lookup(schema, true))
-        .is_some()
-}
-
 pub fn read(location: &Location, keys: &[String]) -> Result<HashMap<String, Value>, String> {
     let settings = open(location)?;
     let schema = settings

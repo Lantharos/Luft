@@ -2,7 +2,7 @@
 	import { t } from '@luft/i18n';
 	import { Row, Select, Switch } from '@luft/ui';
 	import { percent } from '#lib/format.js';
-	import { useSettings } from '#lib/state/gsettings.svelte.js';
+	import { KESTREL_SCHEMA, useSettings } from '#lib/state/gsettings.svelte.js';
 	import type { Displays } from './api';
 	import {
 		commonResolutions,
@@ -34,7 +34,7 @@
 	type VariableRefresh = 'off' | 'games' | 'fullscreen';
 
 
-	const kestrel = useSettings<{ 'variable-refresh': Exclude<VariableRefresh, 'off'> }>('com.lantharos.kestrel', ['variable-refresh']);
+	const kestrel = useSettings<{ 'variable-refresh': Exclude<VariableRefresh, 'off'> }>(KESTREL_SCHEMA, ['variable-refresh']);
 
 	let monitor = $derived(monitorOf(displays, output.connector));
 	let mode = $derived(modeOf(displays, output));

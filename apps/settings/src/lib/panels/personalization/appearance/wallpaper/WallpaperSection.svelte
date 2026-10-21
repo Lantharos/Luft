@@ -4,7 +4,7 @@
 	import FolderOpen from '@lucide/svelte/icons/folder-open';
 	import ImagePlus from '@lucide/svelte/icons/image-plus';
 	import { Row, Section, Select } from '@luft/ui';
-	import { useSettings } from '#lib/state/gsettings.svelte.js';
+	import { KESTREL_SCHEMA, useSettings } from '#lib/state/gsettings.svelte.js';
 	import { addWallpapers, CENTER, onWallpapersChanged, openFolder, pathToUri, uriToPath, wallpaperFocus, wallpapers, type Focus, type Wallpaper } from './api';
 	import LiveWallpaperOnBattery from './LiveWallpaperOnBattery.svelte';
 	import { useScreenShape } from './screen.svelte.js';
@@ -26,7 +26,7 @@
 
 
 	const background = useSettings<Background>('org.gnome.desktop.background', ['picture-uri', 'picture-uri-dark', 'picture-options']);
-	const kestrel = useSettings<Kestrel>('com.lantharos.kestrel', ['live-wallpaper', 'live-wallpaper-dark', 'wallpaper-focus', 'wallpaper-focus-dark', 'wallpaper-focus-chosen']);
+	const kestrel = useSettings<Kestrel>(KESTREL_SCHEMA, ['live-wallpaper', 'live-wallpaper-dark', 'wallpaper-focus', 'wallpaper-focus-dark', 'wallpaper-focus-chosen']);
 	const screen = useScreenShape();
 	const desktop = useSettings<{ 'color-scheme': string }>('org.gnome.desktop.interface', ['color-scheme']);
 

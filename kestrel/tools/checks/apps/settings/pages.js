@@ -1,8 +1,9 @@
 import {useScheme} from '../lib/palette.js';
 import {show} from './navigation.js';
 
-const PAGES = ['bluetooth', 'display', 'sound', 'power', 'appearance', 'appearance/fonts', 'appearance/taskbar', 'appearance/tiling', 'notifications', 'keyboard', 'keyboard/dictation', 'keyboard/shortcuts', 'mouse',
-  'accessibility', 'apps', 'privacy', 'security', 'region', 'datetime', 'users', 'login', 'updates', 'about'];
+const PAGES = ['network', 'network/wifi', 'network/ethernet', 'network/vpn', 'network/proxy', 'bluetooth', 'display', 'sound', 'power', 'input', 'input/shortcuts',
+  'input/dictation', 'appearance', 'appearance/fonts', 'desktop', 'notifications', 'accessibility', 'apps', 'privacy', 'security', 'security/protections',
+  'security/encryption', 'security/keyring', 'accounts', 'accounts/login', 'language', 'system', 'system/about'];
 
 async function visit(app, scheme) {
   useScheme(scheme);

@@ -1,26 +1,3 @@
-## Apps
-
-settings-apps-defaults = Програми за замовчуванням
-settings-apps-defaults-description = Використовуються, коли ви відкриваєте посилання, файли й папки
-settings-apps-browser = Браузер
-settings-apps-email = Електронна пошта
-settings-apps-calendar = Календар
-settings-apps-music = Музика
-settings-apps-videos = Відео
-settings-apps-photos = Фото
-settings-apps-text-editor = Текстовий редактор
-settings-apps-files = Файли
-settings-apps-choose = Вибрати
-settings-apps-startup = Автозапуск
-settings-apps-startup-description = Ці програми відкриваються, коли ви входите в систему
-settings-apps-startup-app = Відкривати { $app } під час входу
-settings-apps-startup-add = Додати програму
-settings-apps-startup-add-title = Додати програму до автозапуску
-settings-apps-startup-add-description = Виберіть програму, яка відкриватиметься щоразу, коли ви входите в систему.
-settings-apps-search = Пошук програм
-settings-apps-no-match = Немає програм, що відповідають запиту
-settings-apps-cancel = Скасувати
-
 ## Date and time
 
 settings-datetime-automatic = Автоматично встановлювати час
@@ -37,7 +14,6 @@ settings-datetime-format-24h = 24-годинний
 settings-datetime-format-12h = 12-годинний
 settings-datetime-seconds = Показувати секунди
 settings-datetime-weekday = Показувати день тижня
-settings-datetime-calendar = Календар
 settings-datetime-week-start = Перший день тижня
 settings-datetime-week-start-automatic = Автоматично
 settings-datetime-week-start-monday = Понеділок
@@ -329,3 +305,89 @@ settings-region-formats-language = Як мова
 settings-region-formats = Формати
 settings-region-formats-description = Дати, час, числа й одиниці вимірювання
 settings-region-formats-next-sign-in = { $sample }, з наступного входу
+
+## Accounts panel
+
+settings-accounts-unavailable = Облікові записи недоступні
+    .description = Службу облікових записів не встановлено на цьому комп’ютері
+settings-accounts-online = Онлайн-облікові записи
+    .description = Кожен обліковий запис — це папка всередині Cloud у вашій домашній папці, яку може відкрити будь-яка програма. Файли завантажуються, коли ви їх відкриваєте.
+settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud або WebDAV
+
+## Accounts: an account's row
+
+settings-accounts-sign-in-again-needed = Увійдіть знову, щоб і далі ним користуватися
+settings-accounts-paused-metered = Синхронізацію призупинено через лімітне з’єднання
+settings-accounts-paused-battery = Синхронізацію призупинено через низький заряд акумулятора
+settings-accounts-connecting = Під’єднання…
+settings-accounts-offline = Офлайн
+settings-accounts-offline-kept = Офлайн, збережені файли доступні
+settings-accounts-not-connected = Не під’єднано
+settings-accounts-syncing = { $count ->
+        [one] Синхронізація { $count } зміни
+        [few] Синхронізація { $count } змін
+        [many] Синхронізація { $count } змін
+       *[other] Синхронізація { $count } зміни
+    }
+settings-accounts-name = Назва
+settings-accounts-folder = Папка
+settings-accounts-server = Сервер
+settings-accounts-storage = Сховище
+settings-accounts-storage-used = Використано { $used } з { $total }
+settings-accounts-on-device = На цьому пристрої
+settings-accounts-kept = { $count ->
+        [one] Збережено { $count } елемент, решта завантажується під час відкриття
+        [few] Збережено { $count } елементи, решта завантажується під час відкриття
+        [many] Збережено { $count } елементів, решта завантажується під час відкриття
+       *[other] Збережено { $count } елемента, решта завантажується під час відкриття
+    }
+settings-accounts-on-demand = Файли завантажуються, коли ви їх відкриваєте
+settings-accounts-sign-in-again = Увійти знову
+settings-accounts-keep = Залишити
+settings-accounts-remove = Вилучити
+settings-accounts-remove-confirm = Вилучити з цього комп’ютера
+settings-accounts-removing = Вилучення…
+settings-accounts-remove-note = Ваші файли залишаться в сервісі { $provider }. Зміни, зроблені тут, спершу буде вивантажено.
+
+## Accounts: providers
+
+settings-accounts-provider-icloud = Ваш обліковий запис Apple, підтверджений кодом з iPhone, iPad або Mac
+settings-accounts-provider-onedrive = Особистий, робочий або навчальний обліковий запис Microsoft, у браузері
+settings-accounts-provider-dropbox = Обліковий запис Dropbox, у браузері
+settings-accounts-provider-nextcloud = Ваш власний сервер або сервер вашої організації
+settings-accounts-provider-webdav = Будь-який сервер із підтримкою WebDAV
+
+## Accounts: signing in
+
+settings-accounts-sign-in-again-title = Повторний вхід у { $account }
+settings-accounts-browser = Відкриється браузер, щоб ви могли увійти через { $provider }. Luft ніколи не бачить вашого пароля.
+settings-accounts-password-for = Введіть пароль для { $user }.
+settings-accounts-apple-account = Обліковий запис Apple
+settings-accounts-password = Пароль
+settings-accounts-app-password = Пароль програми
+settings-accounts-user = Ім’я користувача
+settings-accounts-apple-note = Використовуйте пароль облікового запису Apple; паролі для програм тут не працюють. Потім Apple покаже код на вашому iPhone, iPad або Mac.
+settings-accounts-nextcloud-browser = Відкриється браузер, щоб ви могли увійти на свій сервер і надати доступ системі Luft.
+settings-accounts-use-app-password = Використати пароль програми
+settings-accounts-error-server = Введіть адресу сервера
+settings-accounts-error-apple-account = Введіть електронну адресу облікового запису Apple
+settings-accounts-error-user = Введіть ім’я користувача
+settings-accounts-error-password = Введіть пароль
+settings-accounts-cancel = Скасувати
+settings-accounts-back = Назад
+settings-accounts-continue-in-browser = Продовжити в браузері
+settings-accounts-sign-in = Увійти
+settings-accounts-try-again = Спробувати ще раз
+settings-accounts-continue = Продовжити
+settings-accounts-working = Зв’язок із { $provider }…
+settings-accounts-finish-in-browser = Завершіть вхід через { $provider } у браузері. Luft ніколи не бачить вашого пароля, а це вікно оновиться саме, щойно ви закінчите.
+settings-accounts-no-browser = Браузер не відкрився. Скопіюйте посилання й відкрийте його в браузері.
+settings-accounts-open-again = Відкрити сторінку ще раз
+settings-accounts-copy-link = Копіювати посилання
+settings-accounts-copied = Скопійовано
+settings-accounts-code = Код підтвердження
+    .placeholder = 6-значний код
+settings-accounts-text-me = Надіслати код у SMS
+settings-accounts-choose-phone = На який номер Apple має надіслати код?
+    .description = Надіслати текстове повідомлення
+settings-accounts-approve = Ваш обліковий запис Apple використовує розширений захист даних. Підтвердьте запит на iPhone, iPad або Mac, щоб цей комп’ютер міг відкрити iCloud Drive.

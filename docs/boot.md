@@ -26,7 +26,7 @@ While Luft runs, the partition with the startup images and entries is at `/boot`
 
 ### Switching between the standard and NVIDIA images
 
-When a computer running the standard image has an NVIDIA graphics card, hybrid laptops included, Luft offers NVIDIA's driver in Settings, Updates, and once with a notification after signing in. That happens again only when a different NVIDIA card turns up. The other way round, on the NVIDIA image without an NVIDIA card, Settings offers the smaller standard image without a notification.
+When a computer running the standard image has an NVIDIA graphics card, hybrid laptops included, Luft offers NVIDIA's driver in Settings, System, and once with a notification after signing in. That happens again only when a different NVIDIA card turns up. The other way round, on the NVIDIA image without an NVIDIA card, Settings offers the smaller standard image without a notification.
 
 Switching stays on the same channel and version: `:1` becomes `:1-nvidia`, `:1-nightly` becomes `:1-nightly-nvidia`, and a pinned version such as `:1.20261020.57-nightly` becomes `:1.20261020.57-nightly-nvidia`. Settings shows the download size, which counts only the parts of the image the computer doesn't have yet, and the switch waits for the next restart like an update. The image it came from stays as the previous version to go back to. NVIDIA's driver is signed with the same Luft key as the startup images, so Secure Boot needs nothing new.
 
@@ -84,6 +84,6 @@ Every startup image has a Rescue profile, under the newest version in the menu. 
 
 ## Graphics driver stopped responding
 
-When the whole GPU hangs, `kestrel-watchdog` restarts the computer cleanly once the kernel confirms a GPU failure, and saves a report to `/var/lib/kestrel-watchdog/incidents`, readable only by administrators. At the next start Sushi explains what happened with suggestions for the computer, and Settings lists the last ten incidents under About, Recent problems.
+When the whole GPU hangs, `kestrel-watchdog` restarts the computer cleanly once the kernel confirms a GPU failure, and saves a report to `/var/lib/kestrel-watchdog/incidents`, readable only by administrators. At the next start Sushi explains what happened with suggestions for the computer, and Settings lists the last ten incidents under System, About, Recent problems.
 
 On NVIDIA cards with Resizable BAR off, the 256 MB BAR1 window can fill up and hang the driver. Turn on Above 4G Decoding and Resizable BAR in the firmware, or add `options nvidia NVreg_EnableResizableBar=1` to a file in `/etc/modprobe.d`; a full shutdown may be needed before the new size applies. `nvidia-smi -q -d MEMORY` shows the window size under BAR1 Memory Usage.

@@ -1,26 +1,3 @@
-## Apps
-
-settings-apps-defaults = App predefinite
-settings-apps-defaults-description = Usate quando apri link, file e cartelle
-settings-apps-browser = Browser web
-settings-apps-email = Email
-settings-apps-calendar = Calendario
-settings-apps-music = Musica
-settings-apps-videos = Video
-settings-apps-photos = Foto
-settings-apps-text-editor = Editor di testo
-settings-apps-files = File
-settings-apps-choose = Scegli
-settings-apps-startup = Avvio
-settings-apps-startup-description = Queste app si aprono quando accedi
-settings-apps-startup-app = Apri { $app } all’accesso
-settings-apps-startup-add = Aggiungi app
-settings-apps-startup-add-title = Aggiungi un’app all’avvio
-settings-apps-startup-add-description = Scegli un’app da aprire ogni volta che accedi.
-settings-apps-search = Cerca app
-settings-apps-no-match = Nessuna app corrisponde alla ricerca
-settings-apps-cancel = Annulla
-
 ## Date and time
 
 settings-datetime-automatic = Imposta l’ora automaticamente
@@ -37,7 +14,6 @@ settings-datetime-format-24h = 24 ore
 settings-datetime-format-12h = AM/PM
 settings-datetime-seconds = Mostra i secondi
 settings-datetime-weekday = Mostra il giorno della settimana
-settings-datetime-calendar = Calendario
 settings-datetime-week-start = La settimana inizia di
 settings-datetime-week-start-automatic = Automatico
 settings-datetime-week-start-monday = Lunedì
@@ -317,3 +293,85 @@ settings-region-formats-language = Come la lingua
 settings-region-formats = Formati
 settings-region-formats-description = Date, ore, numeri e misure
 settings-region-formats-next-sign-in = { $sample }, dal prossimo accesso
+
+## Accounts panel
+
+settings-accounts-unavailable = Account non disponibili
+    .description = Il servizio degli account non è installato su questo computer
+settings-accounts-online = Account online
+    .description = Ogni account è una cartella dentro Cloud, nella tua cartella home, che tutte le app possono aprire. I file vengono scaricati quando li apri.
+settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud o WebDAV
+
+## Accounts: an account's row
+
+settings-accounts-sign-in-again-needed = Accedi di nuovo per continuare a usarlo
+settings-accounts-paused-metered = Sincronizzazione in pausa su una connessione a consumo
+settings-accounts-paused-battery = Sincronizzazione in pausa con la batteria scarica
+settings-accounts-connecting = Connessione…
+settings-accounts-offline = Offline
+settings-accounts-offline-kept = Offline, i file conservati sono ancora qui
+settings-accounts-not-connected = Non connesso
+settings-accounts-syncing = { $count ->
+        [one] Sincronizzazione di { $count } modifica
+       *[other] Sincronizzazione di { $count } modifiche
+    }
+settings-accounts-name = Nome
+settings-accounts-folder = Cartella
+settings-accounts-server = Server
+settings-accounts-storage = Spazio di archiviazione
+settings-accounts-storage-used = { $used } di { $total } in uso
+settings-accounts-on-device = Su questo dispositivo
+settings-accounts-kept = { $count ->
+        [one] { $count } elemento conservato, il resto viene scaricato all’apertura
+       *[other] { $count } elementi conservati, il resto viene scaricato all’apertura
+    }
+settings-accounts-on-demand = I file vengono scaricati quando li apri
+settings-accounts-sign-in-again = Accedi di nuovo
+settings-accounts-keep = Mantieni
+settings-accounts-remove = Rimuovi
+settings-accounts-remove-confirm = Rimuovi da questo computer
+settings-accounts-removing = Rimozione…
+settings-accounts-remove-note = I tuoi file restano su { $provider }. Le modifiche fatte qui vengono caricate prima.
+
+## Accounts: providers
+
+settings-accounts-provider-icloud = Il tuo account Apple, confermato con un codice dal tuo iPhone, iPad o Mac
+settings-accounts-provider-onedrive = Un account Microsoft personale, di lavoro o della scuola, nel browser
+settings-accounts-provider-dropbox = Un account Dropbox, nel browser
+settings-accounts-provider-nextcloud = Il tuo server o quello della tua organizzazione
+settings-accounts-provider-webdav = Qualsiasi server che supporta WebDAV
+
+## Accounts: signing in
+
+settings-accounts-sign-in-again-title = Accedi di nuovo a { $account }
+settings-accounts-browser = Si apre il browser per accedere con { $provider }. Luft non vede mai la tua password.
+settings-accounts-password-for = Inserisci la password per { $user }.
+settings-accounts-apple-account = Account Apple
+settings-accounts-password = Password
+settings-accounts-app-password = Password per app
+settings-accounts-user = Nome utente
+settings-accounts-apple-note = Usa la password del tuo account Apple: le password specifiche per app qui non funzionano. Apple mostrerà poi un codice sul tuo iPhone, iPad o Mac.
+settings-accounts-nextcloud-browser = Si apre il browser per accedere al tuo server e consentire l’accesso a Luft.
+settings-accounts-use-app-password = Usa invece una password per app
+settings-accounts-error-server = Inserisci l’indirizzo del server
+settings-accounts-error-apple-account = Inserisci l’email del tuo account Apple
+settings-accounts-error-user = Inserisci il nome utente
+settings-accounts-error-password = Inserisci la password
+settings-accounts-cancel = Annulla
+settings-accounts-back = Indietro
+settings-accounts-continue-in-browser = Continua nel browser
+settings-accounts-sign-in = Accedi
+settings-accounts-try-again = Riprova
+settings-accounts-continue = Continua
+settings-accounts-working = Comunicazione con { $provider }…
+settings-accounts-finish-in-browser = Completa l’accesso con { $provider } nel browser. Luft non vede mai la tua password e questa pagina si aggiorna da sola quando hai finito.
+settings-accounts-no-browser = Non si è aperto nessun browser. Copia il link e aprilo in un browser.
+settings-accounts-open-again = Apri di nuovo la pagina
+settings-accounts-copy-link = Copia il link
+settings-accounts-copied = Copiato
+settings-accounts-code = Codice di verifica
+    .placeholder = Codice di 6 cifre
+settings-accounts-text-me = Inviami invece un codice via SMS
+settings-accounts-choose-phone = A quale numero deve inviare il codice Apple?
+    .description = Invia un SMS
+settings-accounts-approve = Il tuo account Apple usa la Protezione avanzata dei dati. Approva la richiesta sul tuo iPhone, iPad o Mac per consentire a questo computer di aprire iCloud Drive.

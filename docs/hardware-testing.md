@@ -14,7 +14,7 @@ What to try when Luft goes on a new computer. Use the newest nightly ISO, named 
 - [ ] **Suspend and resume screen.** Waking up shows the lock screen straight away, on every connected display, without the desktop showing first.
 - [ ] **Sound.** Speakers, headphones, the microphone and HDMI or DisplayPort audio. Then start Windows, shut it down normally (with Fast Startup on), start Luft and check again.
 - [ ] **Wi-Fi and Bluetooth.** Connect, sleep, wake and reconnect. Devices paired in Windows before installing connect in Luft without pairing again, and so do ones brought over later from Settings.
-- [ ] **Touchpad and fingerprint.** Tap to click, two-finger scrolling and gestures work. When there's a reader, add a finger in Settings, Users, and unlock with it.
+- [ ] **Touchpad and fingerprint.** Tap to click, two-finger scrolling and gestures work. When there's a reader, add a finger in Settings, Accounts, and unlock with it.
 - [ ] **Display scaling.** The picked scale looks right on the built-in screen and on an external monitor, and nothing is blurry after changing it.
 - [ ] **Brightness keys and battery.** The keys change brightness and show the indicator. The battery percentage and time left look plausible, and charging is noticed when plugging in.
 - [ ] **Video playback.** A 4K H.264, HEVC and AV1 video plays smoothly in the browser and in the video player. `vainfo` lists the codecs; while playing, the processor stays mostly idle.

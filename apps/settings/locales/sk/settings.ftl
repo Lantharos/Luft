@@ -3,16 +3,21 @@
 settings-search = Hľadať v nastaveniach
 settings-search-empty = Nič sa nenašlo.
 
+## Sidebar groups
+
+settings-group-connections = Pripojenia
+settings-group-devices = Zariadenia
+settings-group-look = Vzhľad a správanie
+settings-group-protection = Ochrana
+settings-group-system = Systém
+
 ## Panel titles that depend on the hardware
 
 settings-power-title = Napájanie
-settings-mouse-title = Myš
-settings-touchpad-title = Touchpad
 
 ## Missing hardware
 
 settings-bluetooth-missing = Tento počítač nemá adaptér Bluetooth
-settings-mouse-missing = Nie je pripojená žiadna myš ani touchpad
 
 ## Shared pieces
 

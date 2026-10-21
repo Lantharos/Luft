@@ -75,7 +75,6 @@ settings-network-known-count = { $count ->
        *[other] { $count } netwerk issejvjat
     }
 settings-network-known-in-range = Fil-medda
-settings-network-wired = Bil-wajer
 settings-network-ethernet = Ethernet
 settings-network-ethernet-named = Ethernet ({ $name })
 settings-network-wired-connected = Ikkonnettjat · { $speed }
@@ -372,91 +371,3 @@ settings-bluetooth-windows-more = { $count ->
         [many] { $count } oħrajn
        *[other] { $count } oħrajn
     }
-
-## Accounts panel
-
-settings-accounts-unavailable = Il-kontijiet mhumiex disponibbli
-    .description = Is-servizz tal-kontijiet mhuwiex installat f’dan il-kompjuter
-settings-accounts-online = Kontijiet online
-    .description = Kull kont huwa fowlder f’Cloud, fil-fowlder personali, li kull app tista’ tiftaħ. Il-fajls jitniżżlu meta tiftaħhom.
-settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud jew WebDAV
-
-## Accounts: an account's row
-
-settings-accounts-sign-in-again-needed = Erġa’ idħol biex tibqa’ tużah
-settings-accounts-paused-metered = Sinkronizzazzjoni pawżata fuq konnessjoni bil-miter
-settings-accounts-paused-battery = Sinkronizzazzjoni pawżata għax il-batterija baxxa
-settings-accounts-connecting = Qed jikkonnettja…
-settings-accounts-offline = Offline
-settings-accounts-offline-kept = Offline, il-fajls miżmuma għadhom hawn
-settings-accounts-not-connected = Mhux ikkonnettjat
-settings-accounts-syncing = { $count ->
-        [one] Sinkronizzazzjoni ta’ { $count } bidla
-        [two] Sinkronizzazzjoni ta’ { $count } bidliet
-        [few] Sinkronizzazzjoni ta’ { $count } bidliet
-        [many] Sinkronizzazzjoni ta’ { $count } bidla
-       *[other] Sinkronizzazzjoni ta’ { $count } bidla
-    }
-settings-accounts-name = Isem
-settings-accounts-folder = Fowlder
-settings-accounts-server = Server
-settings-accounts-storage = Ħażna
-settings-accounts-storage-used = { $used } minn { $total } użati
-settings-accounts-on-device = Fuq dan l-apparat
-settings-accounts-kept = { $count ->
-        [one] { $count } oġġett miżmum, il-bqija jitniżżel meta jinfetaħ
-        [two] { $count } oġġetti miżmuma, il-bqija jitniżżel meta jinfetaħ
-        [few] { $count } oġġetti miżmuma, il-bqija jitniżżel meta jinfetaħ
-        [many] { $count } oġġett miżmum, il-bqija jitniżżel meta jinfetaħ
-       *[other] { $count } oġġett miżmum, il-bqija jitniżżel meta jinfetaħ
-    }
-settings-accounts-on-demand = Il-fajls jitniżżlu meta tiftaħhom
-settings-accounts-sign-in-again = Erġa’ idħol
-settings-accounts-keep = Żomm
-settings-accounts-remove = Neħħi
-settings-accounts-remove-confirm = Neħħi minn dan il-kompjuter
-settings-accounts-removing = Qed jitneħħa…
-settings-accounts-remove-note = Il-fajls jibqgħu f’{ $provider }. Il-bidliet li saru hawn jintbagħtu l-ewwel.
-
-## Accounts: providers
-
-settings-accounts-provider-icloud = Apple Account, ikkonfermat b’kodiċi mill-iPhone, l-iPad jew il-Mac
-settings-accounts-provider-onedrive = Kont Microsoft personali, tax-xogħol jew tal-iskola, fil-browser
-settings-accounts-provider-dropbox = Kont Dropbox, fil-browser
-settings-accounts-provider-nextcloud = Is-server tiegħek jew tal-organizzazzjoni
-settings-accounts-provider-webdav = Kwalunkwe server li jaħdem b’WebDAV
-
-## Accounts: signing in
-
-settings-accounts-sign-in-again-title = Erġa’ idħol f’{ $account }
-settings-accounts-browser = Il-browser jinfetaħ biex tidħol b’{ $provider }. Luft qatt ma jara l-password.
-settings-accounts-password-for = Daħħal il-password għal { $user }.
-settings-accounts-apple-account = Apple Account
-settings-accounts-password = Password
-settings-accounts-app-password = Password tal-app
-settings-accounts-user = Isem tal-utent
-settings-accounts-apple-note = Uża l-password tal-Apple Account; il-passwords speċifiċi għall-apps ma jaħdmux hawn. Imbagħad Apple turi kodiċi fuq l-iPhone, l-iPad jew il-Mac.
-settings-accounts-nextcloud-browser = Il-browser jinfetaħ biex tidħol fis-server u tħalli lil Luft jidħol.
-settings-accounts-use-app-password = Uża password tal-app minflok
-settings-accounts-error-server = Daħħal l-indirizz tas-server
-settings-accounts-error-apple-account = Daħħal l-email tal-Apple Account
-settings-accounts-error-user = Daħħal l-isem tal-utent
-settings-accounts-error-password = Daħħal il-password
-settings-accounts-cancel = Ikkanċella
-settings-accounts-back = Lura
-settings-accounts-continue-in-browser = Kompli fil-browser
-settings-accounts-sign-in = Idħol
-settings-accounts-try-again = Erġa’ pprova
-settings-accounts-continue = Kompli
-settings-accounts-working = Qed jikkomunika ma’ { $provider }…
-settings-accounts-finish-in-browser = Lesti d-dħul b’{ $provider } fil-browser. Luft qatt ma jara l-password, u din il-paġna tinbidel waħedha meta tlesti.
-settings-accounts-no-browser = Ma nfetaħ l-ebda browser. Ikkopja l-link u iftħu f’browser.
-settings-accounts-open-again = Erġa’ iftaħ il-paġna
-settings-accounts-copy-link = Ikkopja l-link
-settings-accounts-copied = Ikkopjat
-settings-accounts-code = Kodiċi ta’ verifika
-    .placeholder = Kodiċi ta’ 6 ċifri
-settings-accounts-text-me = Ibgħatli kodiċi b’SMS minflok
-settings-accounts-choose-phone = Għal liema numru għandha Apple tibgħat il-kodiċi?
-    .description = Ibgħat SMS
-settings-accounts-approve = L-Apple Account juża Advanced Data Protection. Approva t-talba fuq l-iPhone, l-iPad jew il-Mac biex dan il-kompjuter ikun jista’ jiftaħ iCloud Drive.

@@ -28,7 +28,6 @@ settings-privacy-location-services = Seirbhísí suímh
 settings-privacy-location-services-hint = Ligeann sé d’aipeanna d’áit a aimsiú, le haghaidh léarscáileanna, na haimsire agus criosanna ama
 settings-privacy-camera = Ceamara
 settings-privacy-camera-allow = Lig d’aipeanna an ceamara a úsáid
-settings-privacy-microphone = Micreafón
 settings-privacy-microphone-allow = Lig d’aipeanna an micreafón a úsáid
 settings-privacy-apps-asked = Aipeanna a d’iarr
 settings-privacy-apps-allowed = { $allowed } as { $total } ceadaithe
@@ -384,7 +383,6 @@ settings-passwords-apps-asked = { $count ->
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-back = Slándáil
 settings-passwords-access-description = Má bhaineann tú ceann, iarrfaidh an aip arís an chéad uair eile.
 settings-passwords-access-not-allowed = Gan cead
 settings-passwords-access-none = Níor iarr aon aip do phasfhocail fós
@@ -480,3 +478,26 @@ settings-passkeys-rename-title = Athainmnigh an eochair rochtana
 settings-passkeys-rename-description = Tabhair ainm a aithneoidh tú ar d’eochair rochtana le haghaidh { $site }.
 settings-passkeys-name = Ainm
 settings-passkeys-save = Sábháil
+
+## Apps
+
+settings-apps-defaults = Aipeanna réamhshocraithe
+settings-apps-defaults-description = Úsáidtear iad nuair a osclaíonn tú naisc, comhaid agus fillteáin
+settings-apps-browser = Brabhsálaí gréasáin
+settings-apps-email = Ríomhphost
+settings-apps-calendar = Féilire
+settings-apps-music = Ceol
+settings-apps-videos = Físeáin
+settings-apps-photos = Grianghraif
+settings-apps-text-editor = Eagarthóir téacs
+settings-apps-files = Comhaid
+settings-apps-choose = Roghnaigh
+settings-apps-startup = Tosú
+settings-apps-startup-description = Osclaítear na haipeanna seo nuair a shíníonn tú isteach
+settings-apps-startup-app = Oscail { $app } nuair a shíníonn tú isteach
+settings-apps-startup-add = Cuir aip leis
+settings-apps-startup-add-title = Cuir aip tosaithe leis
+settings-apps-startup-add-description = Roghnaigh aip le hoscailt gach uair a shíníonn tú isteach.
+settings-apps-search = Cuardaigh aipeanna
+settings-apps-no-match = Níl aon aip ag teacht le do chuardach
+settings-apps-cancel = Cealaigh

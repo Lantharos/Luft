@@ -74,7 +74,6 @@ settings-network-known-count = { $count ->
        *[other] { $count } сохранённой сети
     }
 settings-network-known-in-range = В зоне действия
-settings-network-wired = Проводная сеть
 settings-network-ethernet = Ethernet
 settings-network-ethernet-named = Ethernet ({ $name })
 settings-network-wired-connected = Подключено · { $speed }
@@ -367,89 +366,3 @@ settings-bluetooth-windows-more = { $count ->
         [many] ещё { $count }
        *[other] ещё { $count }
     }
-
-## Accounts panel
-
-settings-accounts-unavailable = Учётные записи недоступны
-    .description = Служба учётных записей не установлена на этом компьютере
-settings-accounts-online = Сетевые учётные записи
-    .description = Каждая учётная запись — это папка внутри Cloud в домашней папке, и её может открыть любое приложение. Файлы скачиваются, когда вы их открываете.
-settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud или WebDAV
-
-## Accounts: an account's row
-
-settings-accounts-sign-in-again-needed = Войдите снова, чтобы продолжить
-settings-accounts-paused-metered = Синхронизация приостановлена на лимитном подключении
-settings-accounts-paused-battery = Синхронизация приостановлена из-за низкого заряда батареи
-settings-accounts-connecting = Подключение…
-settings-accounts-offline = Не в сети
-settings-accounts-offline-kept = Не в сети, сохранённые файлы доступны
-settings-accounts-not-connected = Не подключено
-settings-accounts-syncing = { $count ->
-        [one] Синхронизация: { $count } изменение
-        [few] Синхронизация: { $count } изменения
-        [many] Синхронизация: { $count } изменений
-       *[other] Синхронизация: { $count } изменения
-    }
-settings-accounts-name = Имя
-settings-accounts-folder = Папка
-settings-accounts-server = Сервер
-settings-accounts-storage = Хранилище
-settings-accounts-storage-used = Занято: { $used } из { $total }
-settings-accounts-on-device = На этом устройстве
-settings-accounts-kept = { $count ->
-        [one] Сохранён { $count } объект, остальное скачивается при открытии
-        [few] Сохранено { $count } объекта, остальное скачивается при открытии
-        [many] Сохранено { $count } объектов, остальное скачивается при открытии
-       *[other] Сохранено { $count } объекта, остальное скачивается при открытии
-    }
-settings-accounts-on-demand = Файлы скачиваются, когда вы их открываете
-settings-accounts-sign-in-again = Войти снова
-settings-accounts-keep = Оставить
-settings-accounts-remove = Удалить
-settings-accounts-remove-confirm = Удалить с этого компьютера
-settings-accounts-removing = Удаление…
-settings-accounts-remove-note = Ваши файлы останутся в { $provider }. Сначала туда будут отправлены изменения, сделанные здесь.
-
-## Accounts: providers
-
-settings-accounts-provider-icloud = Ваш Аккаунт Apple, подтверждённый кодом с iPhone, iPad или Mac
-settings-accounts-provider-onedrive = Личная, рабочая или учебная учётная запись Microsoft, через браузер
-settings-accounts-provider-dropbox = Учётная запись Dropbox, через браузер
-settings-accounts-provider-nextcloud = Ваш собственный сервер или сервер вашей организации
-settings-accounts-provider-webdav = Любой сервер с поддержкой WebDAV
-
-## Accounts: signing in
-
-settings-accounts-sign-in-again-title = Повторный вход: { $account }
-settings-accounts-browser = Откроется браузер, чтобы вы вошли через { $provider }. Luft никогда не видит ваш пароль.
-settings-accounts-password-for = Введите пароль для { $user }.
-settings-accounts-apple-account = Аккаунт Apple
-settings-accounts-password = Пароль
-settings-accounts-app-password = Пароль приложения
-settings-accounts-user = Имя пользователя
-settings-accounts-apple-note = Используйте пароль Аккаунта Apple: пароли для приложений здесь не работают. Затем Apple покажет код на вашем iPhone, iPad или Mac.
-settings-accounts-nextcloud-browser = Откроется браузер, чтобы вы вошли на свой сервер и разрешили доступ Luft.
-settings-accounts-use-app-password = Использовать пароль приложения
-settings-accounts-error-server = Введите адрес сервера
-settings-accounts-error-apple-account = Введите адрес электронной почты Аккаунта Apple
-settings-accounts-error-user = Введите имя пользователя
-settings-accounts-error-password = Введите пароль
-settings-accounts-cancel = Отмена
-settings-accounts-back = Назад
-settings-accounts-continue-in-browser = Продолжить в браузере
-settings-accounts-sign-in = Войти
-settings-accounts-try-again = Повторить
-settings-accounts-continue = Продолжить
-settings-accounts-working = Связь с { $provider }…
-settings-accounts-finish-in-browser = Завершите вход через { $provider } в браузере. Luft никогда не видит ваш пароль, а эта страница обновится сама, когда вы закончите.
-settings-accounts-no-browser = Браузер не открылся. Скопируйте ссылку и откройте её в браузере.
-settings-accounts-open-again = Открыть страницу снова
-settings-accounts-copy-link = Копировать ссылку
-settings-accounts-copied = Скопировано
-settings-accounts-code = Код подтверждения
-    .placeholder = 6-значный код
-settings-accounts-text-me = Получить код в SMS
-settings-accounts-choose-phone = На какой номер Apple отправить код?
-    .description = Отправить SMS
-settings-accounts-approve = В вашем Аккаунте Apple включена расширенная защита данных. Подтвердите запрос на iPhone, iPad или Mac, чтобы этот компьютер мог открыть iCloud Drive.

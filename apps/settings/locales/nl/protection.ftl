@@ -28,7 +28,6 @@ settings-privacy-location-services = Locatievoorzieningen
 settings-privacy-location-services-hint = Laat apps zien waar je bent, voor kaarten, weer en tijdzones
 settings-privacy-camera = Camera
 settings-privacy-camera-allow = Apps toegang geven tot de camera
-settings-privacy-microphone = Microfoon
 settings-privacy-microphone-allow = Apps toegang geven tot de microfoon
 settings-privacy-apps-asked = Apps die erom vroegen
 settings-privacy-apps-allowed = { $allowed } van { $total } toegestaan
@@ -345,7 +344,6 @@ settings-passwords-apps-asked = { $count ->
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-back = Beveiliging
 settings-passwords-access-description = Als je er een verwijdert, vraagt de app de volgende keer opnieuw.
 settings-passwords-access-not-allowed = Niet toegestaan
 settings-passwords-access-none = Nog geen apps hebben om je wachtwoorden gevraagd
@@ -435,3 +433,26 @@ settings-passkeys-rename-title = Toegangssleutel hernoemen
 settings-passkeys-rename-description = Geef je toegangssleutel voor { $site } een naam die je herkent.
 settings-passkeys-name = Naam
 settings-passkeys-save = Opslaan
+
+## Apps
+
+settings-apps-defaults = Standaard-apps
+settings-apps-defaults-description = Gebruikt als je links, bestanden en mappen opent
+settings-apps-browser = Webbrowser
+settings-apps-email = E-mail
+settings-apps-calendar = Agenda
+settings-apps-music = Muziek
+settings-apps-videos = Video’s
+settings-apps-photos = Foto’s
+settings-apps-text-editor = Teksteditor
+settings-apps-files = Bestanden
+settings-apps-choose = Kiezen
+settings-apps-startup = Opstarten
+settings-apps-startup-description = Deze apps openen als je je aanmeldt
+settings-apps-startup-app = { $app } openen als je je aanmeldt
+settings-apps-startup-add = App toevoegen
+settings-apps-startup-add-title = Opstart-app toevoegen
+settings-apps-startup-add-description = Kies een app die elke keer opent als je je aanmeldt.
+settings-apps-search = Apps zoeken
+settings-apps-no-match = Geen apps gevonden
+settings-apps-cancel = Annuleren

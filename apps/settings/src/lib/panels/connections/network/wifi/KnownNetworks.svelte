@@ -43,7 +43,7 @@
 	});
 </script>
 
-<SubPage title={t('settings-network-known')} back={t('settings-page-network')} {onclose}>
+<SubPage title={t('settings-network-known')} back={t('settings-page-wifi')} {onclose}>
 	{#if problem}
 		<p class="-my-3 px-2 text-[13px] text-[var(--danger)]">{problem}</p>
 	{/if}

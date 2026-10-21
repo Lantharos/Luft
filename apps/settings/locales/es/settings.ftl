@@ -3,16 +3,21 @@
 settings-search = Buscar en Configuración
 settings-search-empty = No hay resultados.
 
+## Sidebar groups
+
+settings-group-connections = Conexiones
+settings-group-devices = Dispositivos
+settings-group-look = Aspecto
+settings-group-protection = Protección
+settings-group-system = Sistema
+
 ## Panel titles that depend on the hardware
 
 settings-power-title = Energía
-settings-mouse-title = Ratón
-settings-touchpad-title = Panel táctil
 
 ## Missing hardware
 
 settings-bluetooth-missing = Este ordenador no tiene adaptador Bluetooth
-settings-mouse-missing = No hay ningún ratón ni panel táctil conectado
 
 ## Shared pieces
 

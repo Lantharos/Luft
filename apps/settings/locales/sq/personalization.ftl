@@ -67,7 +67,6 @@ settings-appearance-tint-slate = Gri plumbi
 
 ## Appearance: text and motion
 
-settings-appearance-taskbar = Shiriti i detyrave
 settings-appearance-text-and-motion = Teksti dhe lëvizja
 settings-appearance-text-size = Madhësia e tekstit
 settings-appearance-text-size-description = Zmadhon ose zvogëlon tekstin në të gjitha aplikacionet
@@ -76,8 +75,6 @@ settings-appearance-animations-description = Dritaret dhe menytë lëvizin në v
 
 ## Taskbar
 
-settings-taskbar-title = Shiriti i detyrave dhe Fillimi
-settings-taskbar-back = Pamja
 settings-taskbar-preview = Pamje paraprake e shiritit të detyrave
 settings-start-section = Fillimi
 settings-start-style = Stili
@@ -226,7 +223,6 @@ settings-notifications-done = U krye
 
 settings-tiling-preview = Paraparje e renditjes së dritareve
 settings-tiling-title = Renditja e dritareve krah për krah
-settings-tiling-back = Pamja
 settings-tiling-mode = Rendit dritaret
 settings-tiling-mode-off = Joaktive
 settings-tiling-mode-tiling = Krah për krah

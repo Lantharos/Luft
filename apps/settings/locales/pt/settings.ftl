@@ -3,16 +3,21 @@
 settings-search = Pesquisar definições
 settings-search-empty = Nada corresponde à pesquisa.
 
+## Sidebar groups
+
+settings-group-connections = Ligações
+settings-group-devices = Dispositivos
+settings-group-look = Aspeto e estilo
+settings-group-protection = Proteção
+settings-group-system = Sistema
+
 ## Panel titles that depend on the hardware
 
 settings-power-title = Energia
-settings-mouse-title = Rato
-settings-touchpad-title = Painel tátil
 
 ## Missing hardware
 
 settings-bluetooth-missing = Este computador não tem adaptador Bluetooth
-settings-mouse-missing = Não há nenhum rato nem painel tátil ligado
 
 ## Shared pieces
 

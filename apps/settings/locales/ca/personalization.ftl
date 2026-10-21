@@ -67,7 +67,6 @@ settings-appearance-tint-slate = Pissarra
 
 ## Appearance: text and motion
 
-settings-appearance-taskbar = Barra de tasques
 settings-appearance-text-and-motion = Text i moviment
 settings-appearance-text-size = Mida del text
 settings-appearance-text-size-description = Fa el text més gran o més petit a totes les aplicacions
@@ -76,8 +75,6 @@ settings-appearance-animations-description = Les finestres i els menús es mouen
 
 ## Taskbar
 
-settings-taskbar-title = Barra de tasques i Inici
-settings-taskbar-back = Aparença
 settings-taskbar-preview = Previsualització de la barra de tasques
 settings-start-section = Inici
 settings-start-style = Estil
@@ -226,7 +223,6 @@ settings-notifications-done = Fet
 
 settings-tiling-preview = Previsualització de la disposició de finestres
 settings-tiling-title = Mosaic de finestres
-settings-tiling-back = Aparença
 settings-tiling-mode = Organitza les finestres
 settings-tiling-mode-off = Desactivat
 settings-tiling-mode-tiling = Mosaic

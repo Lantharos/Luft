@@ -52,7 +52,7 @@ async function checkMenu(id) {
 
 export async function checkShowLayout(palette, id) {
   await useSources([['xkb', id], ['ibus', ENGINE]]);
-  await withApp('settings', ['kestrel-settings:keyboard'], async settings => {
+  await withApp('settings', ['kestrel-settings:input'], async settings => {
     await settings.settle(() => true);
     await saveBothStyles(settings, palette, 'settings-keyboard-keys');
   });

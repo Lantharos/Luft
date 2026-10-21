@@ -28,7 +28,6 @@ settings-privacy-location-services = Asukohateenused
 settings-privacy-location-services-hint = Rakendused saavad teie asukoha teada kaartide, ilma ja ajavööndite jaoks
 settings-privacy-camera = Kaamera
 settings-privacy-camera-allow = Luba rakendustel kaamerat kasutada
-settings-privacy-microphone = Mikrofon
 settings-privacy-microphone-allow = Luba rakendustel mikrofoni kasutada
 settings-privacy-apps-asked = Luba küsinud rakendused
 settings-privacy-apps-allowed = Lubatud { $allowed }/{ $total }
@@ -345,7 +344,6 @@ settings-passwords-apps-asked = { $count ->
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-back = Turve
 settings-passwords-access-description = Eemaldamise järel küsib rakendus järgmisel korral uuesti.
 settings-passwords-access-not-allowed = Pole lubatud
 settings-passwords-access-none = Ükski rakendus pole veel teie paroole küsinud
@@ -435,3 +433,26 @@ settings-passkeys-rename-title = Pääsuvõtme ümbernimetamine
 settings-passkeys-rename-description = Andke saidi { $site } pääsuvõtmele nimi, mille ära tunnete.
 settings-passkeys-name = Nimi
 settings-passkeys-save = Salvesta
+
+## Apps
+
+settings-apps-defaults = Vaikerakendused
+settings-apps-defaults-description = Kasutatakse linkide, failide ja kaustade avamisel
+settings-apps-browser = Veebibrauser
+settings-apps-email = E-post
+settings-apps-calendar = Kalender
+settings-apps-music = Muusika
+settings-apps-videos = Videod
+settings-apps-photos = Fotod
+settings-apps-text-editor = Tekstiredaktor
+settings-apps-files = Failid
+settings-apps-choose = Vali
+settings-apps-startup = Käivitus
+settings-apps-startup-description = Need rakendused avatakse sisselogimisel
+settings-apps-startup-app = Ava { $app } sisselogimisel
+settings-apps-startup-add = Lisa rakendus
+settings-apps-startup-add-title = Käivitusrakenduse lisamine
+settings-apps-startup-add-description = Valige rakendus, mis avatakse igal sisselogimisel.
+settings-apps-search = Otsi rakendusi
+settings-apps-no-match = Otsingule ei vasta ükski rakendus
+settings-apps-cancel = Loobu

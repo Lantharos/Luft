@@ -28,7 +28,6 @@ settings-privacy-location-services = Konum hizmetleri
 settings-privacy-location-services-hint = Uygulamaların haritalar, hava durumu ve saat dilimleri için konumunuzu bulmasını sağlar
 settings-privacy-camera = Kamera
 settings-privacy-camera-allow = Uygulamaların kamerayı kullanmasına izin ver
-settings-privacy-microphone = Mikrofon
 settings-privacy-microphone-allow = Uygulamaların mikrofonu kullanmasına izin ver
 settings-privacy-apps-asked = İzin isteyen uygulamalar
 settings-privacy-apps-allowed = { $allowed }/{ $total } izinli
@@ -345,7 +344,6 @@ settings-passwords-apps-asked = { $count ->
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-back = Güvenlik
 settings-passwords-access-description = Birini kaldırırsanız uygulama bir dahaki sefere yeniden sorar.
 settings-passwords-access-not-allowed = İzin verilmedi
 settings-passwords-access-none = Henüz hiçbir uygulama parolalarınızı istemedi
@@ -435,3 +433,26 @@ settings-passkeys-rename-title = Geçiş anahtarını yeniden adlandır
 settings-passkeys-rename-description = { $site } için geçiş anahtarınıza tanıyacağınız bir ad verin.
 settings-passkeys-name = Ad
 settings-passkeys-save = Kaydet
+
+## Apps
+
+settings-apps-defaults = Varsayılan uygulamalar
+settings-apps-defaults-description = Bağlantıları, dosyaları ve klasörleri açtığınızda kullanılır
+settings-apps-browser = Web tarayıcısı
+settings-apps-email = E-posta
+settings-apps-calendar = Takvim
+settings-apps-music = Müzik
+settings-apps-videos = Videolar
+settings-apps-photos = Fotoğraflar
+settings-apps-text-editor = Metin düzenleyici
+settings-apps-files = Dosyalar
+settings-apps-choose = Seçin
+settings-apps-startup = Başlangıç
+settings-apps-startup-description = Bu uygulamalar oturum açtığınızda açılır
+settings-apps-startup-app = Oturum açınca { $app } uygulamasını aç
+settings-apps-startup-add = Uygulama ekle
+settings-apps-startup-add-title = Başlangıç uygulaması ekle
+settings-apps-startup-add-description = Her oturum açtığınızda açılacak bir uygulama seçin.
+settings-apps-search = Uygulamalarda ara
+settings-apps-no-match = Aramanızla eşleşen uygulama yok
+settings-apps-cancel = İptal

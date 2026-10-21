@@ -72,7 +72,6 @@ settings-network-known-count = { $count ->
        *[other] { $count } salvestatud võrku
     }
 settings-network-known-in-range = Levialas
-settings-network-wired = Juhtmega
 settings-network-ethernet = Ethernet
 settings-network-ethernet-named = Ethernet ({ $name })
 settings-network-wired-connected = Ühendatud · { $speed }
@@ -357,85 +356,3 @@ settings-bluetooth-windows-more = { $count ->
         [one] veel { $count }
        *[other] veel { $count }
     }
-
-## Accounts panel
-
-settings-accounts-unavailable = Kontod pole saadaval
-    .description = Kontode teenust pole sellesse arvutisse installitud
-settings-accounts-online = Võrgukontod
-    .description = Iga konto on kaust teie kodukaustas olevas kaustas Cloud ja seda saab avada iga rakendus. Failid laaditakse alla, kui need avate.
-settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud või WebDAV
-
-## Accounts: an account's row
-
-settings-accounts-sign-in-again-needed = Kasutamise jätkamiseks logige uuesti sisse
-settings-accounts-paused-metered = Sünkroonimine on mahupõhise ühenduse tõttu peatatud
-settings-accounts-paused-battery = Sünkroonimine on peatatud, sest aku on tühjenemas
-settings-accounts-connecting = Ühendamine…
-settings-accounts-offline = Võrguühenduseta
-settings-accounts-offline-kept = Võrguühenduseta, alles hoitud failid on endiselt siin
-settings-accounts-not-connected = Pole ühendatud
-settings-accounts-syncing = { $count ->
-        [one] Sünkroonitakse { $count } muudatus
-       *[other] Sünkroonitakse { $count } muudatust
-    }
-settings-accounts-name = Nimi
-settings-accounts-folder = Kaust
-settings-accounts-server = Server
-settings-accounts-storage = Salvestusruum
-settings-accounts-storage-used = Kasutusel { $used }, kokku { $total }
-settings-accounts-on-device = Selles seadmes
-settings-accounts-kept = { $count ->
-        [one] Alles hoitud { $count } üksus, ülejäänu laaditakse alla avamisel
-       *[other] Alles hoitud { $count } üksust, ülejäänu laaditakse alla avamisel
-    }
-settings-accounts-on-demand = Failid laaditakse alla, kui need avate
-settings-accounts-sign-in-again = Logi uuesti sisse
-settings-accounts-keep = Säilita
-settings-accounts-remove = Eemalda
-settings-accounts-remove-confirm = Eemalda sellest arvutist
-settings-accounts-removing = Eemaldamine…
-settings-accounts-remove-note = Teie failid jäävad teenusesse { $provider }. Siin tehtud muudatused saadetakse enne üles.
-
-## Accounts: providers
-
-settings-accounts-provider-icloud = Teie Apple’i konto, kinnitatud koodiga teie iPhone’ist, iPadist või Macist
-settings-accounts-provider-onedrive = Microsofti isiklik, töö- või koolikonto, brauseri kaudu
-settings-accounts-provider-dropbox = Dropboxi konto, brauseri kaudu
-settings-accounts-provider-nextcloud = Teie enda või teie organisatsiooni server
-settings-accounts-provider-webdav = Mis tahes server, mis toetab WebDAV-i
-
-## Accounts: signing in
-
-settings-accounts-sign-in-again-title = Uuesti sisselogimine: { $account }
-settings-accounts-browser = Avaneb brauser, kus saate sisse logida teenuse { $provider } kontoga. Luft ei näe kunagi teie parooli.
-settings-accounts-password-for = Sisestage konto { $user } parool.
-settings-accounts-apple-account = Apple’i konto
-settings-accounts-password = Parool
-settings-accounts-app-password = Rakenduse parool
-settings-accounts-user = Kasutajanimi
-settings-accounts-apple-note = Kasutage oma Apple’i konto parooli, rakendusepõhised paroolid siin ei tööta. Seejärel kuvab Apple koodi teie iPhone’is, iPadis või Macis.
-settings-accounts-nextcloud-browser = Avaneb brauser, kus saate oma serverisse sisse logida ja Luftile juurdepääsu anda.
-settings-accounts-use-app-password = Kasuta hoopis rakenduse parooli
-settings-accounts-error-server = Sisestage serveri aadress
-settings-accounts-error-apple-account = Sisestage oma Apple’i konto e-posti aadress
-settings-accounts-error-user = Sisestage kasutajanimi
-settings-accounts-error-password = Sisestage parool
-settings-accounts-cancel = Loobu
-settings-accounts-back = Tagasi
-settings-accounts-continue-in-browser = Jätka brauseris
-settings-accounts-sign-in = Logi sisse
-settings-accounts-try-again = Proovi uuesti
-settings-accounts-continue = Jätka
-settings-accounts-working = Ühendumine: { $provider }…
-settings-accounts-finish-in-browser = Lõpetage brauseris sisselogimine teenuse { $provider } kontoga. Luft ei näe kunagi teie parooli ja see vaade värskendub ise, kui olete valmis.
-settings-accounts-no-browser = Brauser ei avanenud. Kopeerige link ja avage see brauseris.
-settings-accounts-open-again = Ava leht uuesti
-settings-accounts-copy-link = Kopeeri link
-settings-accounts-copied = Kopeeritud
-settings-accounts-code = Kinnituskood
-    .placeholder = 6-kohaline kood
-settings-accounts-text-me = Saada kood hoopis SMS-iga
-settings-accounts-choose-phone = Millisele numbrile peaks Apple koodi saatma?
-    .description = Saada SMS
-settings-accounts-approve = Teie Apple’i konto kasutab täpsemat andmekaitset. Kinnitage taotlus oma iPhone’is, iPadis või Macis, et see arvuti saaks iCloud Drive’i avada.

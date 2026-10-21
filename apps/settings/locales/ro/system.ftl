@@ -1,26 +1,3 @@
-## Apps
-
-settings-apps-defaults = Aplicații implicite
-settings-apps-defaults-description = Folosite când deschideți linkuri, fișiere și foldere
-settings-apps-browser = Browser web
-settings-apps-email = E-mail
-settings-apps-calendar = Calendar
-settings-apps-music = Muzică
-settings-apps-videos = Videoclipuri
-settings-apps-photos = Fotografii
-settings-apps-text-editor = Editor de text
-settings-apps-files = Fișiere
-settings-apps-choose = Alege
-settings-apps-startup = Pornire
-settings-apps-startup-description = Aceste aplicații se deschid când vă conectați
-settings-apps-startup-app = Deschide { $app } la conectare
-settings-apps-startup-add = Adaugă o aplicație
-settings-apps-startup-add-title = Adăugați o aplicație la pornire
-settings-apps-startup-add-description = Alegeți o aplicație care să se deschidă de fiecare dată când vă conectați.
-settings-apps-search = Caută aplicații
-settings-apps-no-match = Nicio aplicație nu corespunde căutării
-settings-apps-cancel = Anulează
-
 ## Date and time
 
 settings-datetime-automatic = Setează ora automat
@@ -37,7 +14,6 @@ settings-datetime-format-24h = 24 de ore
 settings-datetime-format-12h = AM/PM
 settings-datetime-seconds = Afișează secundele
 settings-datetime-weekday = Afișează ziua săptămânii
-settings-datetime-calendar = Calendar
 settings-datetime-week-start = Săptămâna începe
 settings-datetime-week-start-automatic = Automat
 settings-datetime-week-start-monday = Luni
@@ -323,3 +299,87 @@ settings-region-formats-language = La fel ca limba
 settings-region-formats = Formate
 settings-region-formats-description = Date calendaristice, ore, numere și unități de măsură
 settings-region-formats-next-sign-in = { $sample }, de la următoarea conectare
+
+## Accounts panel
+
+settings-accounts-unavailable = Conturile nu sunt disponibile
+    .description = Serviciul de conturi nu este instalat pe acest computer
+settings-accounts-online = Conturi online
+    .description = Fiecare cont este un folder în Cloud, în folderul personal, pe care îl poate deschide orice aplicație. Fișierele se descarcă atunci când le deschideți.
+settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud sau WebDAV
+
+## Accounts: an account's row
+
+settings-accounts-sign-in-again-needed = Conectați-vă din nou pentru a-l folosi în continuare
+settings-accounts-paused-metered = Sincronizarea este întreruptă pe o conexiune contorizată
+settings-accounts-paused-battery = Sincronizarea este întreruptă cât timp bateria este descărcată
+settings-accounts-connecting = Se conectează…
+settings-accounts-offline = Offline
+settings-accounts-offline-kept = Offline, fișierele păstrate sunt în continuare aici
+settings-accounts-not-connected = Neconectat
+settings-accounts-syncing = { $count ->
+        [one] Se sincronizează { $count } modificare
+        [few] Se sincronizează { $count } modificări
+       *[other] Se sincronizează { $count } de modificări
+    }
+settings-accounts-name = Nume
+settings-accounts-folder = Folder
+settings-accounts-server = Server
+settings-accounts-storage = Stocare
+settings-accounts-storage-used = Ocupat: { $used } din { $total }
+settings-accounts-on-device = Pe acest dispozitiv
+settings-accounts-kept = { $count ->
+        [one] { $count } element păstrat, restul se descarcă la deschidere
+        [few] { $count } elemente păstrate, restul se descarcă la deschidere
+       *[other] { $count } de elemente păstrate, restul se descarcă la deschidere
+    }
+settings-accounts-on-demand = Fișierele se descarcă atunci când le deschideți
+settings-accounts-sign-in-again = Conectează-te din nou
+settings-accounts-keep = Păstrează
+settings-accounts-remove = Elimină
+settings-accounts-remove-confirm = Elimină de pe acest computer
+settings-accounts-removing = Se elimină…
+settings-accounts-remove-note = Fișierele rămân în { $provider }. Modificările făcute aici sunt trimise mai întâi.
+
+## Accounts: providers
+
+settings-accounts-provider-icloud = Contul Apple, confirmat cu un cod de pe iPhone, iPad sau Mac
+settings-accounts-provider-onedrive = Un cont Microsoft personal, de la serviciu sau de la școală, în browser
+settings-accounts-provider-dropbox = Un cont Dropbox, în browser
+settings-accounts-provider-nextcloud = Serverul propriu sau al organizației
+settings-accounts-provider-webdav = Orice server care folosește WebDAV
+
+## Accounts: signing in
+
+settings-accounts-sign-in-again-title = Conectați-vă din nou la { $account }
+settings-accounts-browser = Se deschide browserul, ca să vă conectați cu { $provider }. Luft nu vede niciodată parola.
+settings-accounts-password-for = Introduceți parola pentru { $user }.
+settings-accounts-apple-account = Cont Apple
+settings-accounts-password = Parolă
+settings-accounts-app-password = Parolă de aplicație
+settings-accounts-user = Nume de utilizator
+settings-accounts-apple-note = Folosiți parola contului Apple; parolele specifice aplicațiilor nu funcționează aici. Apple afișează apoi un cod pe iPhone, iPad sau Mac.
+settings-accounts-nextcloud-browser = Se deschide browserul, ca să vă conectați la server și să permiteți accesul sistemului Luft.
+settings-accounts-use-app-password = Folosește o parolă de aplicație
+settings-accounts-error-server = Introduceți adresa serverului
+settings-accounts-error-apple-account = Introduceți adresa de e-mail a contului Apple
+settings-accounts-error-user = Introduceți numele de utilizator
+settings-accounts-error-password = Introduceți parola
+settings-accounts-cancel = Anulează
+settings-accounts-back = Înapoi
+settings-accounts-continue-in-browser = Continuă în browser
+settings-accounts-sign-in = Conectează-te
+settings-accounts-try-again = Încearcă din nou
+settings-accounts-continue = Continuă
+settings-accounts-working = Se comunică cu { $provider }…
+settings-accounts-finish-in-browser = Finalizați conectarea cu { $provider } în browser. Luft nu vede niciodată parola, iar această pagină se actualizează singură după ce terminați.
+settings-accounts-no-browser = Nu s-a deschis niciun browser. Copiați linkul și deschideți-l într-un browser.
+settings-accounts-open-again = Deschide din nou pagina
+settings-accounts-copy-link = Copiază linkul
+settings-accounts-copied = Copiat
+settings-accounts-code = Cod de verificare
+    .placeholder = Cod din 6 cifre
+settings-accounts-text-me = Trimite-mi codul prin SMS
+settings-accounts-choose-phone = La ce număr să trimită Apple codul?
+    .description = Trimite un SMS
+settings-accounts-approve = Contul Apple folosește Protecția avansată a datelor. Aprobați solicitarea pe iPhone, iPad sau Mac pentru ca acest computer să poată deschide iCloud Drive.

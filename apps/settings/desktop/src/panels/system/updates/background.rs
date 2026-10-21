@@ -16,7 +16,7 @@ use crate::L10N;
 
 const NOTIFICATIONS: &str = "org.freedesktop.Notifications";
 const NOTIFICATIONS_PATH: &str = "/org/freedesktop/Notifications";
-const PAGE: &str = "kestrel-settings:updates";
+const PAGE: &str = "kestrel-settings:system";
 const WAIT_FOR_CLICK: Duration = Duration::from_secs(6 * 60 * 60);
 
 type Properties<'a> = Vec<(&'a str, Variant<'a>)>;

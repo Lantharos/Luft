@@ -67,7 +67,6 @@ settings-appearance-tint-slate = Ardoise
 
 ## Appearance: text and motion
 
-settings-appearance-taskbar = Barre des tâches
 settings-appearance-text-and-motion = Texte et animations
 settings-appearance-text-size = Taille du texte
 settings-appearance-text-size-description = Agrandit ou réduit le texte dans les applications
@@ -76,8 +75,6 @@ settings-appearance-animations-description = Les fenêtres et les menus se dépl
 
 ## Taskbar
 
-settings-taskbar-title = Barre des tâches et Start
-settings-taskbar-back = Apparence
 settings-taskbar-preview = Aperçu de la barre des tâches
 settings-start-section = Start
 settings-start-style = Style
@@ -226,7 +223,6 @@ settings-notifications-done = Terminé
 
 settings-tiling-preview = Aperçu de la disposition des fenêtres
 settings-tiling-title = Pavage des fenêtres
-settings-tiling-back = Apparence
 settings-tiling-mode = Disposer les fenêtres
 settings-tiling-mode-off = Désactivé
 settings-tiling-mode-tiling = Pavage

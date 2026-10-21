@@ -9,7 +9,7 @@ const LOOKS = ['glass', 'solid', 'transparent', 'accent'];
 const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 
 export async function checkTaskbarLooks(app) {
-  await show(app, 'appearance/taskbar');
+  await show(app, 'desktop');
   try {
     for (const scheme of ['light', 'dark']) {
       useScheme(scheme);

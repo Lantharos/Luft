@@ -1,4 +1,4 @@
-## Panels
+## Pages in the sidebar
 
 settings-page-network = Võrk
     .keywords = wifi, wi-fi, traadita, juhtmeta, wlan, ethernet, kaabel, juhtmega, vpn, internet, lennukirežiim, proxy, puhverserver, dns, ip-aadress, mac-aadress, riistvara aadress, mahupõhine, andmepiirang
@@ -10,15 +10,12 @@ settings-page-sound = Heli
     .keywords = audio, helitugevus, kõlarid, mikrofon, väljund, sisend, märguanded, süsteemihelid
 settings-page-power = Toide ja aku
     .keywords = aku, patarei, uni, unerežiim, talveuni, toiterežiim, ekraani väljalülitus, kaas, laadimispiirang, laadimine
+settings-page-input = Sisestus
 settings-page-appearance = Välimus
     .keywords = taustapilt, taust, tume, hele, tume režiim, stiil, rõhuvärv, rakenduste ikoonid, toonitud, kursor, osuti, hiirekursor, kursori suurus, teksti suurus, kirja suurus, animatsioonid, fondid, kirjatüübid, šriftid, fontide installimine
+settings-page-desktop = Töölaud
 settings-page-notifications = Teavitused
     .keywords = ära sega, bännerid, hüpikteated, teated, märguanded, lukustuskuva, rakendused
-settings-page-keyboard = Klaviatuur
-    .keywords = sisendallikad, klaviatuuripaigutus, paigutus, kiirklahvid, klahvikombinatsioonid, kordus, klahvikordus, keel, dikteerimine
-    .copilot-key = copiloti klahv, copilot-klahv
-settings-page-mouse = Hiir ja puuteplaat
-    .keywords = hiir, osuti, kursor, kiirus, kerimine, loomulik kerimine, kerimiskiirus, puudutusega klõpsamine, toksamine, puuteplaat, touchpad
 settings-page-accessibility = Hõlbustus
     .keywords = juurdepääsetavus, ligipääsetavus, erivajadused, ekraanilugeja, orca, suum, suurendus, luup, suur tekst, suur kiri, kõrge kontrast, kontrast, vähenda animatsioone, vähenda liikumist, kursori suurus, ekraaniklaviatuur, kleepklahvid, aeglased klahvid, põrkeklahvid, hiireklahvid, viibimisklõps, hõljumisklõps, paremklõps, osuti leidmine, kursori leidmine, visuaalsed märguanded, vilkumine, kuulmine, nägemine
 settings-page-apps = Rakendused
@@ -27,33 +24,51 @@ settings-page-privacy = Privaatsus
     .keywords = ekraanilukk, asukoht, kaamera, mikrofon, hiljutised failid, failiajalugu, prügikast, ajutised failid
 settings-page-security = Turve
     .keywords = turvalisus, secure boot, turvaline algkäivitus, tpm, turvakiip, krüptimine, krüpteerimine, ketta krüptimine, seadme krüptimine, bitlocker, luks, taastevõti, pin, püsivara, firmware, riistvara turve, allkirjastusvõti, usb, paroolid, võtmerõngas, pääsuvõtmed, passkey
+settings-page-accounts = Kontod
+    .keywords = võrgukontod, veebikontod, pilv, icloud, icloud drive, apple, onedrive, microsoft, dropbox, nextcloud, webdav, sünkroonimine, sünk, failid vajadusel, sisselogimine
+settings-page-language = Keel ja aeg
+settings-page-system = Süsteem
+
+## Pages inside other pages
+
+settings-page-wifi = Wi-Fi
+settings-page-ethernet = Ethernet
+settings-page-vpn = VPN
+settings-page-proxy = Puhverserver
+settings-page-shortcuts = Kiirklahvid
+settings-page-dictation = Dikteerimine
+    .keywords = kõne, häälsisestus, kõnesisestus, kõne tekstiks, kõnetuvastus, rääkimine, mikrofon, parakeet, whisper, kõnemudelid, super alt
+    .copilot-key = copiloti klahv, copilot-klahv
+settings-page-protections = Kaitsed
+settings-page-encryption = Seadme krüptimine
+settings-page-keyring = Paroolid ja võtmed
+settings-page-login = Sisselogimiskuva
+    .keywords = sisselogimine, sisse logimine, automaatne sisselogimine, autologin, seanss, taustapilt, kasutajad, lukustuskuva, peidetud kasutajad
+settings-page-add-account = Lisa konto
+    .keywords = sisselogimine, logi sisse, võrgukontod, veebikontod, icloud, onedrive, dropbox, nextcloud, webdav
+settings-page-about = Teave
+    .keywords = seadme nimi, arvuti nimi, süsteem, riistvara, mälu, ram, protsessor, cpu, graafika, videokaart, salvestusruum, kettaruum
+
+## Search terms for parts of pages
+
+settings-page-keyboard = Klaviatuur
+    .keywords = sisendallikad, klaviatuuripaigutus, paigutus, kiirklahvid, klahvikombinatsioonid, kordus, klahvikordus, keel, dikteerimine
+    .copilot-key = copiloti klahv, copilot-klahv
+settings-page-mouse = Hiir ja puuteplaat
+    .keywords = hiir, osuti, kursor, kiirus, kerimine, loomulik kerimine, kerimiskiirus, puudutusega klõpsamine, toksamine, puuteplaat, touchpad
+settings-page-fonts = Fondid
+    .keywords = kõik fondid, kirjatüübid, šriftid, fondiperekonnad, fontide installimine, fontide eemaldamine
+settings-page-cursors = Kursoriteemad
+    .keywords = kursorid, osuti, hiirekursor, rohkem kursoreid, hangi kursoreid
+settings-page-taskbar = Tegumiriba ja Start
+    .keywords = paneel, riba, dokk, automaatne peitmine, peida automaatselt, peida tegumiriba, hõljuv, läbipaistev, kinnitatud rakendused, joondus, start-nupp, nupp start, menüü start, start-menüü, start menu, gust, otsinguriba, käivitaja, launcher, veebiotsing, otsingumootor, search engine, kuvarid, tööala, töölaud, virtuaalne töölaud
+settings-page-tiling = Akende paanimine
+    .keywords = paanimine, paanitud aknad, tiling, kerimine, veerud, vahed, spiraal, dwindle, põhiaken ja virn, master, ujuvad aknad, akende paigutus, multitegumtöö
 settings-page-region = Keel ja piirkond
     .keywords = keel, tõlge, lokaat, keeleseaded, vormingud, kuupäevavorming, arvuvorming, mõõtühikud, ühikud, valuuta, regioon
 settings-page-datetime = Kuupäev ja kellaaeg
     .keywords = ajavöönd, kell, kellaaeg, aeg, 24-tunnine, automaatne
 settings-page-users = Kasutajad
     .keywords = konto, kasutajakonto, nimi, pilt, profiilipilt, avatar, parool, sõrmejälg
-settings-page-accounts = Kontod
-    .keywords = võrgukontod, veebikontod, pilv, icloud, icloud drive, apple, onedrive, microsoft, dropbox, nextcloud, webdav, sünkroonimine, sünk, failid vajadusel, sisselogimine
-settings-page-login = Sisselogimiskuva
-    .keywords = sisselogimine, sisse logimine, automaatne sisselogimine, autologin, seanss, taustapilt, kasutajad, lukustuskuva, peidetud kasutajad
 settings-page-updates = Värskendused
     .keywords = uuendused, tarkvaravärskendused, süsteemivärskendused, uuendamine, versiooniuuendus, upgrade, püsivara, tuum, kernel, taaskäivita ja installi, paketid, automaatsed värskendused, turbevärskendused
-settings-page-about = Teave
-    .keywords = seadme nimi, arvuti nimi, süsteem, riistvara, mälu, ram, protsessor, cpu, graafika, videokaart, salvestusruum, kettaruum
-
-## Pages inside panels
-
-settings-page-taskbar = Tegumiriba ja Start
-    .keywords = paneel, riba, dokk, automaatne peitmine, peida automaatselt, peida tegumiriba, hõljuv, läbipaistev, kinnitatud rakendused, joondus, start-nupp, nupp start, menüü start, start-menüü, start menu, gust, otsinguriba, käivitaja, launcher, veebiotsing, otsingumootor, search engine, kuvarid, tööala, töölaud, virtuaalne töölaud
-settings-page-tiling = Akende paanimine
-    .keywords = paanimine, paanitud aknad, tiling, kerimine, veerud, vahed, spiraal, dwindle, põhiaken ja virn, master, ujuvad aknad, akende paigutus, multitegumtöö
-settings-page-fonts = Fondid
-    .keywords = kõik fondid, kirjatüübid, šriftid, fondiperekonnad, fontide installimine, fontide eemaldamine
-settings-page-cursors = Kursoriteemad
-    .keywords = kursorid, osuti, hiirekursor, rohkem kursoreid, hangi kursoreid
-settings-page-dictation = Dikteerimine
-    .keywords = kõne, häälsisestus, kõnesisestus, kõne tekstiks, kõnetuvastus, rääkimine, mikrofon, parakeet, whisper, kõnemudelid, super alt
-    .copilot-key = copiloti klahv, copilot-klahv
-settings-page-add-account = Lisa konto
-    .keywords = sisselogimine, logi sisse, võrgukontod, veebikontod, icloud, onedrive, dropbox, nextcloud, webdav

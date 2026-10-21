@@ -67,7 +67,6 @@ settings-appearance-tint-slate = Slinn
 
 ## Appearance: text and motion
 
-settings-appearance-taskbar = Tascbharra
 settings-appearance-text-and-motion = Téacs agus gluaiseacht
 settings-appearance-text-size = Méid an téacs
 settings-appearance-text-size-description = Déanann sé an téacs níos mó nó níos lú sna haipeanna go léir
@@ -76,8 +75,6 @@ settings-appearance-animations-description = Bogann fuinneoga agus roghchláir i
 
 ## Taskbar
 
-settings-taskbar-title = Tascbharra agus Tosaigh
-settings-taskbar-back = Cuma
 settings-taskbar-preview = Réamhamharc ar an tascbharra
 settings-start-section = Tosaigh
 settings-start-style = Stíl
@@ -232,7 +229,6 @@ settings-notifications-done = Déanta
 
 settings-tiling-preview = Réamhamharc ar shocrú na bhfuinneog
 settings-tiling-title = Tíleáil fuinneog
-settings-tiling-back = Cuma
 settings-tiling-mode = Socraigh fuinneoga
 settings-tiling-mode-off = As
 settings-tiling-mode-tiling = Tíleáil

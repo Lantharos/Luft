@@ -3,16 +3,21 @@
 settings-search = Caută în setări
 settings-search-empty = Nu s-a găsit nimic.
 
+## Sidebar groups
+
+settings-group-connections = Conexiuni
+settings-group-devices = Dispozitive
+settings-group-look = Aspect și stil
+settings-group-protection = Protecție
+settings-group-system = Sistem
+
 ## Panel titles that depend on the hardware
 
 settings-power-title = Alimentare
-settings-mouse-title = Mouse
-settings-touchpad-title = Touchpad
 
 ## Missing hardware
 
 settings-bluetooth-missing = Acest computer nu are adaptor Bluetooth
-settings-mouse-missing = Nu este conectat niciun mouse sau touchpad
 
 ## Shared pieces
 

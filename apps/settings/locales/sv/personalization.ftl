@@ -67,7 +67,6 @@ settings-appearance-tint-slate = Skiffergrå
 
 ## Appearance: text and motion
 
-settings-appearance-taskbar = Aktivitetsfält
 settings-appearance-text-and-motion = Text och rörelse
 settings-appearance-text-size = Textstorlek
 settings-appearance-text-size-description = Gör texten större eller mindre i alla appar
@@ -76,8 +75,6 @@ settings-appearance-animations-description = Fönster och menyer glider fram i s
 
 ## Taskbar
 
-settings-taskbar-title = Aktivitetsfält och Start
-settings-taskbar-back = Utseende
 settings-taskbar-preview = Förhandsvisning av aktivitetsfältet
 settings-start-section = Start
 settings-start-style = Stil
@@ -226,7 +223,6 @@ settings-notifications-done = Klar
 
 settings-tiling-preview = Förhandsvisning av fönsterarrangemang
 settings-tiling-title = Fönsterplattor
-settings-tiling-back = Utseende
 settings-tiling-mode = Ordna fönster
 settings-tiling-mode-off = Av
 settings-tiling-mode-tiling = Plattor

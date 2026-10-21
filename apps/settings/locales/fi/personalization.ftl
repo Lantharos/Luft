@@ -67,7 +67,6 @@ settings-appearance-tint-slate = Siniharmaa
 
 ## Appearance: text and motion
 
-settings-appearance-taskbar = Tehtäväpalkki
 settings-appearance-text-and-motion = Teksti ja liike
 settings-appearance-text-size = Tekstin koko
 settings-appearance-text-size-description = Suurentaa tai pienentää tekstiä kaikissa sovelluksissa
@@ -76,8 +75,6 @@ settings-appearance-animations-description = Ikkunat ja valikot liukuvat esiin e
 
 ## Taskbar
 
-settings-taskbar-title = Tehtäväpalkki ja Start
-settings-taskbar-back = Ulkoasu
 settings-taskbar-preview = Tehtäväpalkin esikatselu
 settings-start-section = Start
 settings-start-style = Tyyli
@@ -226,7 +223,6 @@ settings-notifications-done = Valmis
 
 settings-tiling-preview = Ikkunoiden järjestelyn esikatselu
 settings-tiling-title = Ikkunoiden laatoitus
-settings-tiling-back = Ulkoasu
 settings-tiling-mode = Järjestä ikkunat
 settings-tiling-mode-off = Pois
 settings-tiling-mode-tiling = Laatoitus

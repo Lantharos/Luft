@@ -67,7 +67,6 @@ settings-appearance-tint-slate = Leisteen
 
 ## Appearance: text and motion
 
-settings-appearance-taskbar = Taakbalk
 settings-appearance-text-and-motion = Tekst en beweging
 settings-appearance-text-size = Tekstgrootte
 settings-appearance-text-size-description = Maakt tekst in alle apps groter of kleiner
@@ -76,8 +75,6 @@ settings-appearance-animations-description = Vensters en menu’s bewegen in pla
 
 ## Taskbar
 
-settings-taskbar-title = Taakbalk en Start
-settings-taskbar-back = Uiterlijk
 settings-taskbar-preview = Voorbeeld van de taakbalk
 settings-start-section = Start
 settings-start-style = Stijl
@@ -226,7 +223,6 @@ settings-notifications-done = Klaar
 
 settings-tiling-preview = Voorbeeld van de vensterindeling
 settings-tiling-title = Vensters tegelen
-settings-tiling-back = Uiterlijk
 settings-tiling-mode = Vensters indelen
 settings-tiling-mode-off = Uit
 settings-tiling-mode-tiling = Tegelen

@@ -3,16 +3,21 @@
 settings-search = Kërko te cilësimet
 settings-search-empty = Asgjë nuk përputhet me këtë.
 
+## Sidebar groups
+
+settings-group-connections = Lidhjet
+settings-group-devices = Pajisjet
+settings-group-look = Pamja dhe ndjesia
+settings-group-protection = Mbrojtja
+settings-group-system = Sistemi
+
 ## Panel titles that depend on the hardware
 
 settings-power-title = Energjia
-settings-mouse-title = Miu
-settings-touchpad-title = Blloku i prekjes
 
 ## Missing hardware
 
 settings-bluetooth-missing = Ky kompjuter nuk ka përshtatës Bluetooth
-settings-mouse-missing = Nuk është lidhur asnjë mi apo bllok prekjeje
 
 ## Shared pieces
 

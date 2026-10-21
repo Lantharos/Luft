@@ -1,26 +1,3 @@
-## Apps
-
-settings-apps-defaults = Standardappar
-settings-apps-defaults-description = Används när du öppnar länkar, filer och mappar
-settings-apps-browser = Webbläsare
-settings-apps-email = E-post
-settings-apps-calendar = Kalender
-settings-apps-music = Musik
-settings-apps-videos = Videor
-settings-apps-photos = Foton
-settings-apps-text-editor = Textredigerare
-settings-apps-files = Filer
-settings-apps-choose = Välj
-settings-apps-startup = Autostart
-settings-apps-startup-description = De här apparna öppnas när du loggar in
-settings-apps-startup-app = Öppna { $app } när du loggar in
-settings-apps-startup-add = Lägg till app
-settings-apps-startup-add-title = Lägg till en autostartapp
-settings-apps-startup-add-description = Välj en app som ska öppnas varje gång du loggar in.
-settings-apps-search = Sök efter appar
-settings-apps-no-match = Inga appar matchar sökningen
-settings-apps-cancel = Avbryt
-
 ## Date and time
 
 settings-datetime-automatic = Ställ in tiden automatiskt
@@ -37,7 +14,6 @@ settings-datetime-format-24h = 24 timmar
 settings-datetime-format-12h = FM/EM
 settings-datetime-seconds = Visa sekunder
 settings-datetime-weekday = Visa veckodag
-settings-datetime-calendar = Kalender
 settings-datetime-week-start = Veckan börjar på
 settings-datetime-week-start-automatic = Automatiskt
 settings-datetime-week-start-monday = Måndag
@@ -317,3 +293,85 @@ settings-region-formats-language = Samma som språket
 settings-region-formats = Format
 settings-region-formats-description = Datum, tider, tal och måttenheter
 settings-region-formats-next-sign-in = { $sample }, från nästa inloggning
+
+## Accounts panel
+
+settings-accounts-unavailable = Konton är inte tillgängliga
+    .description = Kontotjänsten är inte installerad på den här datorn
+settings-accounts-online = Onlinekonton
+    .description = Varje konto är en mapp i Cloud i din hemmapp, som alla appar kan öppna. Filerna hämtas när du öppnar dem.
+settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud eller WebDAV
+
+## Accounts: an account's row
+
+settings-accounts-sign-in-again-needed = Logga in igen för att fortsätta använda det
+settings-accounts-paused-metered = Synkroniseringen är pausad på en anslutning med datapriser
+settings-accounts-paused-battery = Synkroniseringen är pausad medan batterinivån är låg
+settings-accounts-connecting = Ansluter …
+settings-accounts-offline = Offline
+settings-accounts-offline-kept = Offline, sparade filer finns kvar
+settings-accounts-not-connected = Inte anslutet
+settings-accounts-syncing = { $count ->
+        [one] Synkroniserar { $count } ändring
+       *[other] Synkroniserar { $count } ändringar
+    }
+settings-accounts-name = Namn
+settings-accounts-folder = Mapp
+settings-accounts-server = Server
+settings-accounts-storage = Lagring
+settings-accounts-storage-used = { $used } av { $total } används
+settings-accounts-on-device = På den här enheten
+settings-accounts-kept = { $count ->
+        [one] { $count } objekt sparat, resten hämtas när det öppnas
+       *[other] { $count } objekt sparade, resten hämtas när det öppnas
+    }
+settings-accounts-on-demand = Filerna hämtas när du öppnar dem
+settings-accounts-sign-in-again = Logga in igen
+settings-accounts-keep = Behåll
+settings-accounts-remove = Ta bort
+settings-accounts-remove-confirm = Ta bort från den här datorn
+settings-accounts-removing = Tar bort …
+settings-accounts-remove-note = Dina filer finns kvar i { $provider }. Ändringar som gjorts här skickas upp först.
+
+## Accounts: providers
+
+settings-accounts-provider-icloud = Ditt Apple-konto, bekräftat med en kod från din iPhone, iPad eller Mac
+settings-accounts-provider-onedrive = Ett personligt Microsoft-konto eller ett jobb- eller skolkonto, i webbläsaren
+settings-accounts-provider-dropbox = Ett Dropbox-konto, i webbläsaren
+settings-accounts-provider-nextcloud = Din egen eller din organisations server
+settings-accounts-provider-webdav = Alla servrar som använder WebDAV
+
+## Accounts: signing in
+
+settings-accounts-sign-in-again-title = Logga in på { $account } igen
+settings-accounts-browser = Webbläsaren öppnas så att du kan logga in med { $provider }. Luft ser aldrig ditt lösenord.
+settings-accounts-password-for = Ange lösenordet för { $user }.
+settings-accounts-apple-account = Apple-konto
+settings-accounts-password = Lösenord
+settings-accounts-app-password = Applösenord
+settings-accounts-user = Användarnamn
+settings-accounts-apple-note = Använd lösenordet för ditt Apple-konto, appspecifika lösenord fungerar inte här. Apple visar sedan en kod på din iPhone, iPad eller Mac.
+settings-accounts-nextcloud-browser = Webbläsaren öppnas så att du kan logga in på din server och ge Luft åtkomst.
+settings-accounts-use-app-password = Använd ett applösenord i stället
+settings-accounts-error-server = Ange serveradressen
+settings-accounts-error-apple-account = Ange e-postadressen för ditt Apple-konto
+settings-accounts-error-user = Ange användarnamnet
+settings-accounts-error-password = Ange lösenordet
+settings-accounts-cancel = Avbryt
+settings-accounts-back = Tillbaka
+settings-accounts-continue-in-browser = Fortsätt i webbläsaren
+settings-accounts-sign-in = Logga in
+settings-accounts-try-again = Försök igen
+settings-accounts-continue = Fortsätt
+settings-accounts-working = Kontaktar { $provider } …
+settings-accounts-finish-in-browser = Slutför inloggningen med { $provider } i webbläsaren. Luft ser aldrig ditt lösenord, och det här uppdateras av sig självt när du är klar.
+settings-accounts-no-browser = Ingen webbläsare öppnades. Kopiera länken och öppna den i en webbläsare.
+settings-accounts-open-again = Öppna sidan igen
+settings-accounts-copy-link = Kopiera länken
+settings-accounts-copied = Kopierad
+settings-accounts-code = Verifieringskod
+    .placeholder = 6-siffrig kod
+settings-accounts-text-me = Skicka en kod via sms i stället
+settings-accounts-choose-phone = Till vilket nummer ska Apple skicka koden?
+    .description = Skicka ett sms
+settings-accounts-approve = Ditt Apple-konto använder Avancerat dataskydd. Godkänn begäran på din iPhone, iPad eller Mac så att den här datorn kan öppna iCloud Drive.

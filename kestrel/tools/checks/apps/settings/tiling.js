@@ -7,7 +7,7 @@ const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 const SHOWN = [['tiling', 'dwindle'], ['tiling', 'master'], ['scrolling', 'dwindle']];
 
 export async function checkTiling(app) {
-  await show(app, 'appearance/tiling');
+  await show(app, 'desktop');
   try {
     for (const [mode, layout] of SHOWN) {
       kestrel.set_string('tiling-layout', layout);

@@ -4,23 +4,31 @@ export type PanelId =
 	| 'display'
 	| 'sound'
 	| 'power'
+	| 'input'
 	| 'appearance'
+	| 'desktop'
 	| 'notifications'
-	| 'keyboard'
-	| 'mouse'
 	| 'accessibility'
 	| 'apps'
 	| 'privacy'
 	| 'security'
-	| 'region'
-	| 'datetime'
-	| 'users'
 	| 'accounts'
-	| 'login'
-	| 'updates'
-	| 'about';
+	| 'language'
+	| 'system';
 
-export type SubpageId = 'appearance/taskbar' | 'appearance/tiling' | 'appearance/fonts' | 'appearance/cursors' | 'keyboard/dictation' | 'accounts/add';
+export type SubpageId =
+	| 'network/wifi'
+	| 'network/ethernet'
+	| 'network/vpn'
+	| 'network/proxy'
+	| 'input/shortcuts'
+	| 'input/dictation'
+	| 'security/protections'
+	| 'security/encryption'
+	| 'security/keyring'
+	| 'accounts/login'
+	| 'accounts/add'
+	| 'system/about';
 
 export type PageId = PanelId | SubpageId;
 
@@ -28,27 +36,42 @@ export interface Page<Id extends PageId = PageId> {
 	id: Id;
 	title: string;
 	symbol: string;
-	copilotKey?: boolean;
+	keywords: string[];
+	copilotKey?: string;
+}
+
+interface Search {
+	keywords?: string[];
+	copilotKey?: string;
 }
 
 export type Translate = (id: string) => string;
 
-const page = <Id extends PageId>(id: Id, title: string, symbol: string, copilotKey?: boolean): Page<Id> => ({ id, title, symbol, copilotKey });
+const page = <Id extends PageId>(id: Id, title: string, symbol: string, { keywords = [title], copilotKey }: Search = {}): Page<Id> => ({
+	id,
+	title,
+	symbol,
+	keywords,
+	copilotKey
+});
 
 export const PANEL_PAGES: Page<PanelId>[][] = [
 	[page('network', 'settings-page-network', 'network-wireless-symbolic'), page('bluetooth', 'settings-page-bluetooth', 'bluetooth-active-symbolic')],
 	[
 		page('display', 'settings-page-display', 'video-display-symbolic'),
 		page('sound', 'settings-page-sound', 'audio-speakers-symbolic'),
-		page('power', 'settings-page-power', 'battery-full-charging-symbolic')
+		page('power', 'settings-page-power', 'battery-full-charging-symbolic'),
+		page('input', 'settings-page-input', 'input-keyboard-symbolic', {
+			keywords: ['settings-page-keyboard', 'settings-page-mouse'],
+			copilotKey: 'settings-page-keyboard'
+		})
 	],
 	[
-		page('appearance', 'settings-page-appearance', 'preferences-desktop-appearance-symbolic'),
-		page('notifications', 'settings-page-notifications', 'preferences-system-notifications-symbolic')
-	],
-	[
-		page('keyboard', 'settings-page-keyboard', 'input-keyboard-symbolic', true),
-		page('mouse', 'settings-page-mouse', 'input-mouse-symbolic'),
+		page('appearance', 'settings-page-appearance', 'preferences-desktop-appearance-symbolic', {
+			keywords: ['settings-page-appearance', 'settings-page-fonts', 'settings-page-cursors']
+		}),
+		page('desktop', 'settings-page-desktop', 'user-desktop-symbolic', { keywords: ['settings-page-taskbar', 'settings-page-tiling'] }),
+		page('notifications', 'settings-page-notifications', 'preferences-system-notifications-symbolic'),
 		page('accessibility', 'settings-page-accessibility', 'preferences-desktop-accessibility-symbolic')
 	],
 	[
@@ -57,23 +80,25 @@ export const PANEL_PAGES: Page<PanelId>[][] = [
 		page('security', 'settings-page-security', 'security-high-symbolic')
 	],
 	[
-		page('region', 'settings-page-region', 'preferences-desktop-locale-symbolic'),
-		page('datetime', 'settings-page-datetime', 'preferences-system-time-symbolic'),
-		page('users', 'settings-page-users', 'system-users-symbolic'),
-		page('accounts', 'settings-page-accounts', 'folder-remote-symbolic'),
-		page('login', 'settings-page-login', 'system-lock-screen-symbolic'),
-		page('updates', 'settings-page-updates', 'software-update-available-symbolic'),
-		page('about', 'settings-page-about', 'help-about-symbolic')
+		page('accounts', 'settings-page-accounts', 'system-users-symbolic', { keywords: ['settings-page-users', 'settings-page-accounts'] }),
+		page('language', 'settings-page-language', 'preferences-desktop-locale-symbolic', { keywords: ['settings-page-region', 'settings-page-datetime'] }),
+		page('system', 'settings-page-system', 'software-update-available-symbolic', { keywords: ['settings-page-updates'] })
 	]
 ];
 
 export const SUBPAGES: Page<SubpageId>[] = [
-	page('appearance/taskbar', 'settings-page-taskbar', 'user-desktop-symbolic'),
-	page('appearance/tiling', 'settings-page-tiling', 'view-dual-symbolic'),
-	page('appearance/fonts', 'settings-page-fonts', 'preferences-desktop-font-symbolic'),
-	page('appearance/cursors', 'settings-page-cursors', 'input-mouse-symbolic'),
-	page('keyboard/dictation', 'settings-page-dictation', 'audio-input-microphone-symbolic', true),
-	page('accounts/add', 'settings-page-add-account', 'list-add-symbolic')
+	page('network/wifi', 'settings-page-wifi', 'network-wireless-symbolic', { keywords: [] }),
+	page('network/ethernet', 'settings-page-ethernet', 'network-wired-symbolic', { keywords: [] }),
+	page('network/vpn', 'settings-page-vpn', 'network-vpn-symbolic', { keywords: [] }),
+	page('network/proxy', 'settings-page-proxy', 'preferences-system-network-proxy-symbolic', { keywords: [] }),
+	page('input/shortcuts', 'settings-page-shortcuts', 'preferences-desktop-keyboard-shortcuts-symbolic', { keywords: [] }),
+	page('input/dictation', 'settings-page-dictation', 'audio-input-microphone-symbolic', { copilotKey: 'settings-page-dictation' }),
+	page('security/protections', 'settings-page-protections', 'security-high-symbolic', { keywords: [] }),
+	page('security/encryption', 'settings-page-encryption', 'drive-harddisk-symbolic', { keywords: [] }),
+	page('security/keyring', 'settings-page-keyring', 'dialog-password-symbolic', { keywords: [] }),
+	page('accounts/login', 'settings-page-login', 'system-lock-screen-symbolic'),
+	page('accounts/add', 'settings-page-add-account', 'list-add-symbolic'),
+	page('system/about', 'settings-page-about', 'help-about-symbolic')
 ];
 
 export const PAGES: Page[] = [...PANEL_PAGES.flat(), ...SUBPAGES];
@@ -87,8 +112,8 @@ const terms = (text: string) =>
 		.filter(Boolean);
 
 const keywordsIn = (page: Page, copilotKey: boolean, t: Translate) => [
-	...terms(t(`${page.title}.keywords`)),
-	...(copilotKey && page.copilotKey ? terms(t(`${page.title}.copilot-key`)) : [])
+	...page.keywords.flatMap((source) => [...(source === page.title ? [] : [t(source)]), ...terms(t(`${source}.keywords`))]),
+	...(copilotKey && page.copilotKey ? terms(t(`${page.copilotKey}.copilot-key`)) : [])
 ];
 
 export function pageKeywords(page: Page, copilotKey: boolean, t: Translate, english?: Translate): string[] {

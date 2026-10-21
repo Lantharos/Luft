@@ -72,7 +72,6 @@ settings-network-known-count = { $count ->
        *[other] { $count } rrjete të ruajtura
     }
 settings-network-known-in-range = Në rreze
-settings-network-wired = Me kabllo
 settings-network-ethernet = Ethernet
 settings-network-ethernet-named = Ethernet ({ $name })
 settings-network-wired-connected = Lidhur · { $speed }
@@ -357,85 +356,3 @@ settings-bluetooth-windows-more = { $count ->
         [one] { $count } tjetër
        *[other] { $count } të tjera
     }
-
-## Accounts panel
-
-settings-accounts-unavailable = Llogaritë nuk janë të disponueshme
-    .description = Shërbimi i llogarive nuk është instaluar në këtë kompjuter
-settings-accounts-online = Llogaritë në internet
-    .description = Çdo llogari është një dosje te Cloud, në dosjen tënde kryesore, që mund ta hapë çdo aplikacion. Skedarët shkarkohen kur i hap.
-settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud ose WebDAV
-
-## Accounts: an account's row
-
-settings-accounts-sign-in-again-needed = Hyr sërish për ta përdorur më tej
-settings-accounts-paused-metered = Sinkronizimi është ndalur në një lidhje me matje
-settings-accounts-paused-battery = Sinkronizimi është ndalur ndërsa bateria është e ulët
-settings-accounts-connecting = Po lidhet…
-settings-accounts-offline = Jashtë linje
-settings-accounts-offline-kept = Jashtë linje, skedarët e mbajtur janë ende këtu
-settings-accounts-not-connected = Jo e lidhur
-settings-accounts-syncing = { $count ->
-        [one] Po sinkronizohet { $count } ndryshim
-       *[other] Po sinkronizohen { $count } ndryshime
-    }
-settings-accounts-name = Emri
-settings-accounts-folder = Dosja
-settings-accounts-server = Serveri
-settings-accounts-storage = Hapësira
-settings-accounts-storage-used = { $used } nga { $total } të përdorura
-settings-accounts-on-device = Në këtë pajisje
-settings-accounts-kept = { $count ->
-        [one] { $count } element i mbajtur, pjesa tjetër shkarkohet kur hapet
-       *[other] { $count } elemente të mbajtura, pjesa tjetër shkarkohet kur hapet
-    }
-settings-accounts-on-demand = Skedarët shkarkohen kur i hap
-settings-accounts-sign-in-again = Hyr sërish
-settings-accounts-keep = Mbaje
-settings-accounts-remove = Hiq
-settings-accounts-remove-confirm = Hiq nga ky kompjuter
-settings-accounts-removing = Po hiqet…
-settings-accounts-remove-note = Skedarët e tu mbeten në { $provider }. Ndryshimet e bëra këtu dërgohen më parë.
-
-## Accounts: providers
-
-settings-accounts-provider-icloud = Llogaria jote Apple, e konfirmuar me një kod nga iPhone, iPad ose Mac
-settings-accounts-provider-onedrive = Një llogari Microsoft personale, pune ose shkolle, në shfletues
-settings-accounts-provider-dropbox = Një llogari Dropbox, në shfletues
-settings-accounts-provider-nextcloud = Serveri yt ose i organizatës tënde
-settings-accounts-provider-webdav = Çdo server që përdor WebDAV
-
-## Accounts: signing in
-
-settings-accounts-sign-in-again-title = Hyr sërish në { $account }
-settings-accounts-browser = Shfletuesi hapet që të hysh me { $provider }. Luft nuk e sheh kurrë fjalëkalimin tënd.
-settings-accounts-password-for = Shkruaj fjalëkalimin për { $user }.
-settings-accounts-apple-account = Llogaria Apple
-settings-accounts-password = Fjalëkalimi
-settings-accounts-app-password = Fjalëkalim aplikacioni
-settings-accounts-user = Emri i përdoruesit
-settings-accounts-apple-note = Përdor fjalëkalimin e llogarisë Apple; fjalëkalimet specifike për aplikacione nuk funksionojnë këtu. Më pas Apple shfaq një kod në iPhone, iPad ose Mac.
-settings-accounts-nextcloud-browser = Shfletuesi hapet që të hysh në serverin tënd dhe t’i japësh leje Luft.
-settings-accounts-use-app-password = Përdor një fjalëkalim aplikacioni
-settings-accounts-error-server = Shkruaj adresën e serverit
-settings-accounts-error-apple-account = Shkruaj email-in e llogarisë Apple
-settings-accounts-error-user = Shkruaj emrin e përdoruesit
-settings-accounts-error-password = Shkruaj fjalëkalimin
-settings-accounts-cancel = Anulo
-settings-accounts-back = Prapa
-settings-accounts-continue-in-browser = Vazhdo në shfletues
-settings-accounts-sign-in = Hyr
-settings-accounts-try-again = Provo sërish
-settings-accounts-continue = Vazhdo
-settings-accounts-working = Po komunikohet me { $provider }…
-settings-accounts-finish-in-browser = Përfundo hyrjen me { $provider } në shfletues. Luft nuk e sheh kurrë fjalëkalimin tënd dhe kjo përditësohet vetë sapo të mbarosh.
-settings-accounts-no-browser = Nuk u hap asnjë shfletues. Kopjo lidhjen dhe hape në një shfletues.
-settings-accounts-open-again = Hap sërish faqen
-settings-accounts-copy-link = Kopjo lidhjen
-settings-accounts-copied = U kopjua
-settings-accounts-code = Kodi i verifikimit
-    .placeholder = Kod me 6 shifra
-settings-accounts-text-me = Më dërgo kodin me SMS
-settings-accounts-choose-phone = Në cilin numër ta dërgojë Apple kodin?
-    .description = Dërgo një SMS
-settings-accounts-approve = Llogaria jote Apple përdor Mbrojtjen e avancuar të të dhënave. Mirato kërkesën në iPhone, iPad ose Mac që ky kompjuter të hapë iCloud Drive.

@@ -73,7 +73,6 @@ settings-network-known-count = { $count ->
        *[other] { $count } saglabāti tīkli
     }
 settings-network-known-in-range = Pieejams
-settings-network-wired = Vadu
 settings-network-ethernet = Ethernet
 settings-network-ethernet-named = Ethernet ({ $name })
 settings-network-wired-connected = Savienots · { $speed }
@@ -362,87 +361,3 @@ settings-bluetooth-windows-more = { $count ->
         [one] vēl { $count }
        *[other] vēl { $count }
     }
-
-## Accounts panel
-
-settings-accounts-unavailable = Konti nav pieejami
-    .description = Šajā datorā nav instalēts kontu pakalpojums
-settings-accounts-online = Tiešsaistes konti
-    .description = Katrs konts ir mape Cloud jūsu mājas mapē, ko var atvērt jebkura lietotne. Faili tiek lejupielādēti, kad tos atverat.
-settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud vai WebDAV
-
-## Accounts: an account's row
-
-settings-accounts-sign-in-again-needed = Pierakstieties vēlreiz, lai turpinātu to izmantot
-settings-accounts-paused-metered = Sinhronizēšana apturēta limitētā savienojumā
-settings-accounts-paused-battery = Sinhronizēšana apturēta, jo akumulatora uzlādes līmenis ir zems
-settings-accounts-connecting = Notiek savienošana…
-settings-accounts-offline = Bezsaistē
-settings-accounts-offline-kept = Bezsaistē, paturētie faili joprojām ir pieejami
-settings-accounts-not-connected = Nav savienots
-settings-accounts-syncing = { $count ->
-        [zero] Sinhronizē { $count } izmaiņas
-        [one] Sinhronizē { $count } izmaiņu
-       *[other] Sinhronizē { $count } izmaiņas
-    }
-settings-accounts-name = Nosaukums
-settings-accounts-folder = Mape
-settings-accounts-server = Serveris
-settings-accounts-storage = Krātuve
-settings-accounts-storage-used = Izmantoti { $used } no { $total }
-settings-accounts-on-device = Šajā ierīcē
-settings-accounts-kept = { $count ->
-        [zero] Paturēti { $count } vienumi, pārējie tiek lejupielādēti, kad tos atver
-        [one] Paturēts { $count } vienums, pārējie tiek lejupielādēti, kad tos atver
-       *[other] Paturēti { $count } vienumi, pārējie tiek lejupielādēti, kad tos atver
-    }
-settings-accounts-on-demand = Faili tiek lejupielādēti, kad tos atverat
-settings-accounts-sign-in-again = Pierakstīties vēlreiz
-settings-accounts-keep = Paturēt
-settings-accounts-remove = Noņemt
-settings-accounts-remove-confirm = Noņemt no šī datora
-settings-accounts-removing = Noņem…
-settings-accounts-remove-note = Jūsu faili paliek pakalpojumā { $provider }. Vispirms tiek augšupielādētas šeit veiktās izmaiņas.
-
-## Accounts: providers
-
-settings-accounts-provider-icloud = Jūsu Apple konts, apstiprināts ar kodu no iPhone, iPad vai Mac
-settings-accounts-provider-onedrive = Personisks, darba vai mācību iestādes Microsoft konts, pārlūkā
-settings-accounts-provider-dropbox = Dropbox konts, pārlūkā
-settings-accounts-provider-nextcloud = Jūsu vai jūsu organizācijas serveris
-settings-accounts-provider-webdav = Jebkurš serveris, kas atbalsta WebDAV
-
-## Accounts: signing in
-
-settings-accounts-sign-in-again-title = Vēlreiz pierakstīties kontā { $account }
-settings-accounts-browser = Tiks atvērts pārlūks, lai jūs varētu pierakstīties pakalpojumā { $provider }. Luft nekad neredz jūsu paroli.
-settings-accounts-password-for = Ievadiet paroli lietotājam { $user }.
-settings-accounts-apple-account = Apple konts
-settings-accounts-password = Parole
-settings-accounts-app-password = Lietotnes parole
-settings-accounts-user = Lietotājvārds
-settings-accounts-apple-note = Izmantojiet sava Apple konta paroli – lietotnēm specifiskās paroles šeit nedarbojas. Pēc tam Apple parādīs kodu jūsu iPhone, iPad vai Mac ierīcē.
-settings-accounts-nextcloud-browser = Tiks atvērts pārlūks, lai jūs varētu pierakstīties savā serverī un piešķirt piekļuvi sistēmai Luft.
-settings-accounts-use-app-password = Izmantot lietotnes paroli
-settings-accounts-error-server = Ievadiet servera adresi
-settings-accounts-error-apple-account = Ievadiet sava Apple konta e-pasta adresi
-settings-accounts-error-user = Ievadiet lietotājvārdu
-settings-accounts-error-password = Ievadiet paroli
-settings-accounts-cancel = Atcelt
-settings-accounts-back = Atpakaļ
-settings-accounts-continue-in-browser = Turpināt pārlūkā
-settings-accounts-sign-in = Pierakstīties
-settings-accounts-try-again = Mēģināt vēlreiz
-settings-accounts-continue = Turpināt
-settings-accounts-working = Sazinās ar pakalpojumu { $provider }…
-settings-accounts-finish-in-browser = Pabeidziet pierakstīšanos pakalpojumā { $provider } savā pārlūkā. Luft nekad neredz jūsu paroli, un šī lapa atjaunināsies pati, kad pierakstīšanās būs pabeigta.
-settings-accounts-no-browser = Pārlūks netika atvērts. Nokopējiet saiti un atveriet to pārlūkā.
-settings-accounts-open-again = Atvērt lapu vēlreiz
-settings-accounts-copy-link = Kopēt saiti
-settings-accounts-copied = Nokopēta
-settings-accounts-code = Verifikācijas kods
-    .placeholder = 6 ciparu kods
-settings-accounts-text-me = Sūtīt kodu īsziņā
-settings-accounts-choose-phone = Uz kuru numuru Apple jāsūta kods?
-    .description = Sūtīt īsziņu
-settings-accounts-approve = Jūsu Apple kontam ir ieslēgta papildu datu aizsardzība. Apstipriniet pieprasījumu savā iPhone, iPad vai Mac ierīcē, lai šis dators varētu atvērt iCloud Drive.

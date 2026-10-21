@@ -67,7 +67,6 @@ settings-appearance-tint-slate = Skrilasta
 
 ## Appearance: text and motion
 
-settings-appearance-taskbar = Opravilna vrstica
 settings-appearance-text-and-motion = Besedilo in gibanje
 settings-appearance-text-size = Velikost besedila
 settings-appearance-text-size-description = Poveča ali pomanjša besedilo v vseh aplikacijah
@@ -76,8 +75,6 @@ settings-appearance-animations-description = Okna in meniji se premikajo, namest
 
 ## Taskbar
 
-settings-taskbar-title = Opravilna vrstica in meni Start
-settings-taskbar-back = Videz
 settings-taskbar-preview = Predogled opravilne vrstice
 settings-start-section = Start
 settings-start-style = Slog
@@ -230,7 +227,6 @@ settings-notifications-done = Končano
 
 settings-tiling-preview = Predogled razporeditve oken
 settings-tiling-title = Tlakovanje oken
-settings-tiling-back = Videz
 settings-tiling-mode = Razporedi okna
 settings-tiling-mode-off = Izklopljeno
 settings-tiling-mode-tiling = Tlakovanje

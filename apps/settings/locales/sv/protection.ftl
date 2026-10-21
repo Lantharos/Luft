@@ -28,7 +28,6 @@ settings-privacy-location-services = Platstjänster
 settings-privacy-location-services-hint = Låter appar se var du är, för kartor, väder och tidszoner
 settings-privacy-camera = Kamera
 settings-privacy-camera-allow = Tillåt att appar använder kameran
-settings-privacy-microphone = Mikrofon
 settings-privacy-microphone-allow = Tillåt att appar använder mikrofonen
 settings-privacy-apps-asked = Appar som har frågat
 settings-privacy-apps-allowed = { $allowed } av { $total } tillåtna
@@ -345,7 +344,6 @@ settings-passwords-apps-asked = { $count ->
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-back = Säkerhet
 settings-passwords-access-description = Om du tar bort en app frågar den igen nästa gång.
 settings-passwords-access-not-allowed = Inte tillåten
 settings-passwords-access-none = Inga appar har frågat efter dina lösenord än
@@ -435,3 +433,26 @@ settings-passkeys-rename-title = Byt namn på lösennyckeln
 settings-passkeys-rename-description = Ge lösennyckeln för { $site } ett namn som du känner igen.
 settings-passkeys-name = Namn
 settings-passkeys-save = Spara
+
+## Apps
+
+settings-apps-defaults = Standardappar
+settings-apps-defaults-description = Används när du öppnar länkar, filer och mappar
+settings-apps-browser = Webbläsare
+settings-apps-email = E-post
+settings-apps-calendar = Kalender
+settings-apps-music = Musik
+settings-apps-videos = Videor
+settings-apps-photos = Foton
+settings-apps-text-editor = Textredigerare
+settings-apps-files = Filer
+settings-apps-choose = Välj
+settings-apps-startup = Autostart
+settings-apps-startup-description = De här apparna öppnas när du loggar in
+settings-apps-startup-app = Öppna { $app } när du loggar in
+settings-apps-startup-add = Lägg till app
+settings-apps-startup-add-title = Lägg till en autostartapp
+settings-apps-startup-add-description = Välj en app som ska öppnas varje gång du loggar in.
+settings-apps-search = Sök efter appar
+settings-apps-no-match = Inga appar matchar sökningen
+settings-apps-cancel = Avbryt

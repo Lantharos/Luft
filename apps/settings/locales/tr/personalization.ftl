@@ -67,7 +67,6 @@ settings-appearance-tint-slate = Arduvaz
 
 ## Appearance: text and motion
 
-settings-appearance-taskbar = Görev çubuğu
 settings-appearance-text-and-motion = Metin ve hareket
 settings-appearance-text-size = Metin boyutu
 settings-appearance-text-size-description = Uygulamalardaki metni büyütür ya da küçültür
@@ -76,8 +75,6 @@ settings-appearance-animations-description = Pencereler ve menüler bir anda bel
 
 ## Taskbar
 
-settings-taskbar-title = Görev çubuğu ve Başlat
-settings-taskbar-back = Görünüm
 settings-taskbar-preview = Görev çubuğu önizlemesi
 settings-start-section = Başlat
 settings-start-style = Stil
@@ -226,7 +223,6 @@ settings-notifications-done = Bitti
 
 settings-tiling-preview = Pencere düzeni önizlemesi
 settings-tiling-title = Pencere döşeme
-settings-tiling-back = Görünüm
 settings-tiling-mode = Pencereleri düzenle
 settings-tiling-mode-off = Kapalı
 settings-tiling-mode-tiling = Döşeme

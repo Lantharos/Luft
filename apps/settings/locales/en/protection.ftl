@@ -1,4 +1,4 @@
-# Settings: the Privacy and Security pages.
+# Settings: the Apps, Privacy and Security pages.
 #
 # Terms used throughout:
 # "security chip" is how these pages name the computer's TPM (Trusted Platform Module). Use a plain-language
@@ -46,7 +46,6 @@ settings-privacy-location-services = Location services
 settings-privacy-location-services-hint = Lets apps find where you are, for maps, weather and time zones
 settings-privacy-camera = Camera
 settings-privacy-camera-allow = Allow apps to use the camera
-settings-privacy-microphone = Microphone
 settings-privacy-microphone-allow = Allow apps to use the microphone
 # Expandable row listing the apps that asked for location or camera access
 settings-privacy-apps-asked = Apps that asked
@@ -400,8 +399,6 @@ settings-passwords-apps-asked = { $count ->
 
 ## Passwords and keys: apps with access
 
-# Back button that returns to the Security page
-settings-passwords-access-back = Security
 settings-passwords-access-description = Removing one makes the app ask again next time.
 settings-passwords-access-not-allowed = Not allowed
 settings-passwords-access-none = No apps have asked for your passwords yet
@@ -501,3 +498,28 @@ settings-passkeys-rename-title = Rename passkey
 settings-passkeys-rename-description = Give your passkey for { $site } a name you’ll recognize.
 settings-passkeys-name = Name
 settings-passkeys-save = Save
+
+## Apps
+
+settings-apps-defaults = Default apps
+settings-apps-defaults-description = Used when you open links, files, and folders
+settings-apps-browser = Web browser
+settings-apps-email = Email
+settings-apps-calendar = Calendar
+settings-apps-music = Music
+settings-apps-videos = Videos
+settings-apps-photos = Photos
+settings-apps-text-editor = Text editor
+settings-apps-files = Files
+# Placeholder of the app list when no default app is chosen
+settings-apps-choose = Choose
+settings-apps-startup = Startup
+settings-apps-startup-description = These apps open when you sign in
+# Screen-reader label of a switch; $app is an app name
+settings-apps-startup-app = Open { $app } when you sign in
+settings-apps-startup-add = Add app
+settings-apps-startup-add-title = Add a startup app
+settings-apps-startup-add-description = Choose an app to open every time you sign in.
+settings-apps-search = Search apps
+settings-apps-no-match = No apps match your search
+settings-apps-cancel = Cancel

@@ -28,7 +28,6 @@ settings-privacy-location-services = Posisjonstjenester
 settings-privacy-location-services-hint = Lar apper finne ut hvor du er, for kart, vær og tidssoner
 settings-privacy-camera = Kamera
 settings-privacy-camera-allow = Tillat at apper bruker kameraet
-settings-privacy-microphone = Mikrofon
 settings-privacy-microphone-allow = Tillat at apper bruker mikrofonen
 settings-privacy-apps-asked = Apper som har spurt
 settings-privacy-apps-allowed = { $allowed } av { $total } tillatt
@@ -345,7 +344,6 @@ settings-passwords-apps-asked = { $count ->
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-back = Sikkerhet
 settings-passwords-access-description = Hvis du fjerner en, spør appen igjen neste gang.
 settings-passwords-access-not-allowed = Ikke tillatt
 settings-passwords-access-none = Ingen apper har bedt om passordene dine ennå
@@ -435,3 +433,26 @@ settings-passkeys-rename-title = Gi nytt navn til tilgangsnøkkel
 settings-passkeys-rename-description = Gi tilgangsnøkkelen for { $site } et navn du kjenner igjen.
 settings-passkeys-name = Navn
 settings-passkeys-save = Lagre
+
+## Apps
+
+settings-apps-defaults = Standardapper
+settings-apps-defaults-description = Brukes når du åpner lenker, filer og mapper
+settings-apps-browser = Nettleser
+settings-apps-email = E-post
+settings-apps-calendar = Kalender
+settings-apps-music = Musikk
+settings-apps-videos = Videoer
+settings-apps-photos = Bilder
+settings-apps-text-editor = Tekstredigering
+settings-apps-files = Filer
+settings-apps-choose = Velg
+settings-apps-startup = Oppstart
+settings-apps-startup-description = Disse appene åpnes når du logger inn
+settings-apps-startup-app = Åpne { $app } når du logger inn
+settings-apps-startup-add = Legg til app
+settings-apps-startup-add-title = Legg til en oppstartsapp
+settings-apps-startup-add-description = Velg en app som skal åpnes hver gang du logger inn.
+settings-apps-search = Søk i apper
+settings-apps-no-match = Ingen apper samsvarer med søket
+settings-apps-cancel = Avbryt

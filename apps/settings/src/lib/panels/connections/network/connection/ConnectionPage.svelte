@@ -15,11 +15,12 @@
 	interface Props {
 		target: Target;
 		title: string;
+		back: string;
 		network: Network;
 		onclose: () => void;
 	}
 
-	let { target, title, network, onclose }: Props = $props();
+	let { target, title, back, network, onclose }: Props = $props();
 
 	let profile = $state<Profile | null>(null);
 	let original = $state('');
@@ -88,7 +89,7 @@
 	});
 </script>
 
-<SubPage {title} back={t('settings-page-network')} {onclose}>
+<SubPage {title} {back} {onclose}>
 	{#snippet actions()}
 		<button type="button" class="button primary" disabled={!ready} onclick={save}>{saving ? t('settings-network-saving') : t('settings-network-save')}</button>
 	{/snippet}

@@ -46,7 +46,7 @@ class Updates {
   }
 
   async open({ready = true} = {}) {
-    this.app = await openApp('settings', ['kestrel-settings:updates']);
+    this.app = await openApp('settings', ['kestrel-settings:system']);
     this.app.window.maximize();
     await eventually(() => this.app.window.is_maximized(), 'settings maximizes');
     if (ready) await this.app.settle(() => true);
@@ -73,13 +73,13 @@ async function checkDownload(updates) {
   await eventually(async () => (started = await updates.progress(HEADER_PROGRESS)) > 0, 'Updates shows the download progress');
   (await updates.app.frame()).save('settings-updates-downloading');
 
-  await followLink('settings', 'kestrel-settings:about');
+  await followLink('settings', 'kestrel-settings:system/about');
   let away = 0;
   await eventually(async () => (away = await updates.progress(SIDEBAR)) > 0, 'the Updates entry in the sidebar shows the download on another page');
   (await updates.app.frame()).save('settings-updates-sidebar-progress');
   await eventually(async () => await updates.progress(SIDEBAR) > away, 'the Updates entry in the sidebar shows the download advancing');
 
-  await followLink('settings', 'kestrel-settings:updates');
+  await followLink('settings', 'kestrel-settings:system');
   await eventually(async () => await updates.progress(SIDEBAR) === 0, 'the sidebar leaves the progress to the Updates page while it is open');
   let back = 0;
   await eventually(async () => (back = await updates.progress(HEADER_PROGRESS)) > started,

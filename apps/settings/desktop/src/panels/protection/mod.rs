@@ -1,3 +1,4 @@
+pub mod apps;
 pub mod keyring;
 pub mod passkeys;
 pub mod privacy;

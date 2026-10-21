@@ -3,16 +3,21 @@
 settings-search = Cuardaigh socruithe
 settings-search-empty = Níl aon rud ag teacht leis sin.
 
+## Sidebar groups
+
+settings-group-connections = Naisc
+settings-group-devices = Gléasanna
+settings-group-look = Cuma agus mothú
+settings-group-protection = Cosaint
+settings-group-system = Córas
+
 ## Panel titles that depend on the hardware
 
 settings-power-title = Cumhacht
-settings-mouse-title = Luch
-settings-touchpad-title = Ceap tadhaill
 
 ## Missing hardware
 
 settings-bluetooth-missing = Níl cuibheoir Bluetooth ar an ríomhaire seo
-settings-mouse-missing = Níl luch ná ceap tadhaill ceangailte
 
 ## Shared pieces
 

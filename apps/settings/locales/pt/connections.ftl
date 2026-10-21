@@ -73,7 +73,6 @@ settings-network-known-count = { $count ->
        *[other] { $count } redes guardadas
     }
 settings-network-known-in-range = Ao alcance
-settings-network-wired = Com fios
 settings-network-ethernet = Ethernet
 settings-network-ethernet-named = Ethernet ({ $name })
 settings-network-wired-connected = Ligado · { $speed }
@@ -358,86 +357,3 @@ settings-bluetooth-windows-more = { $count ->
         [one] mais { $count }
        *[other] mais { $count }
     }
-
-## Accounts panel
-
-settings-accounts-unavailable = As contas não estão disponíveis
-    .description = O serviço de contas não está instalado neste computador
-settings-accounts-online = Contas online
-    .description = Cada conta é uma pasta em Cloud, na sua pasta pessoal, que todas as aplicações podem abrir. Os ficheiros são transferidos quando os abre.
-settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud ou WebDAV
-
-## Accounts: an account's row
-
-settings-accounts-sign-in-again-needed = Inicie sessão novamente para continuar a utilizá-la
-settings-accounts-paused-metered = Sincronização em pausa numa ligação tarifada
-settings-accounts-paused-battery = Sincronização em pausa enquanto a bateria estiver fraca
-settings-accounts-connecting = A ligar…
-settings-accounts-offline = Offline
-settings-accounts-offline-kept = Offline, os ficheiros mantidos continuam aqui
-settings-accounts-not-connected = Sem ligação
-settings-accounts-syncing = { $count ->
-        [one] A sincronizar { $count } alteração
-       *[other] A sincronizar { $count } alterações
-    }
-settings-accounts-name = Nome
-settings-accounts-folder = Pasta
-settings-accounts-server = Servidor
-settings-accounts-storage = Armazenamento
-settings-accounts-storage-used = { $used } de { $total } utilizados
-settings-accounts-on-device = Neste dispositivo
-settings-accounts-kept = { $count ->
-        [0] Nenhum item mantido, o resto é transferido ao abrir
-        [one] { $count } item mantido, o resto é transferido ao abrir
-       *[other] { $count } itens mantidos, o resto é transferido ao abrir
-    }
-settings-accounts-on-demand = Os ficheiros são transferidos quando os abre
-settings-accounts-sign-in-again = Iniciar sessão novamente
-settings-accounts-keep = Manter
-settings-accounts-remove = Remover
-settings-accounts-remove-confirm = Remover deste computador
-settings-accounts-removing = A remover…
-settings-accounts-remove-note = Os seus ficheiros ficam no { $provider }. As alterações feitas aqui são enviadas primeiro.
-
-## Accounts: providers
-
-settings-accounts-provider-icloud = A sua Conta Apple, confirmada com um código do iPhone, iPad ou Mac
-settings-accounts-provider-onedrive = Uma conta Microsoft pessoal, de trabalho ou escolar, no browser
-settings-accounts-provider-dropbox = Uma conta Dropbox, no browser
-settings-accounts-provider-nextcloud = Um servidor próprio ou da sua organização
-settings-accounts-provider-webdav = Qualquer servidor compatível com WebDAV
-
-## Accounts: signing in
-
-settings-accounts-sign-in-again-title = Iniciar sessão novamente em { $account }
-settings-accounts-browser = O browser abre-se para iniciar sessão na conta { $provider }. O Luft nunca vê a sua palavra-passe.
-settings-accounts-password-for = Introduza a palavra-passe de { $user }.
-settings-accounts-apple-account = Conta Apple
-settings-accounts-password = Palavra-passe
-settings-accounts-app-password = Palavra-passe de aplicação
-settings-accounts-user = Nome de utilizador
-settings-accounts-apple-note = Utilize a palavra-passe da sua Conta Apple; as palavras-passe específicas de aplicações não funcionam aqui. Em seguida, a Apple mostra um código no seu iPhone, iPad ou Mac.
-settings-accounts-nextcloud-browser = O browser abre-se para iniciar sessão no seu servidor e dar acesso ao Luft.
-settings-accounts-use-app-password = Utilizar antes uma palavra-passe de aplicação
-settings-accounts-error-server = Introduza o endereço do servidor
-settings-accounts-error-apple-account = Introduza o e-mail da sua Conta Apple
-settings-accounts-error-user = Introduza o nome de utilizador
-settings-accounts-error-password = Introduza a palavra-passe
-settings-accounts-cancel = Cancelar
-settings-accounts-back = Voltar
-settings-accounts-continue-in-browser = Continuar no browser
-settings-accounts-sign-in = Iniciar sessão
-settings-accounts-try-again = Tentar novamente
-settings-accounts-continue = Continuar
-settings-accounts-working = A comunicar com { $provider }…
-settings-accounts-finish-in-browser = Conclua o início de sessão na conta { $provider } no browser. O Luft nunca vê a sua palavra-passe, e esta página atualiza-se sozinha quando terminar.
-settings-accounts-no-browser = Nenhum browser foi aberto. Copie a ligação e abra-a num browser.
-settings-accounts-open-again = Abrir a página novamente
-settings-accounts-copy-link = Copiar a ligação
-settings-accounts-copied = Copiada
-settings-accounts-code = Código de verificação
-    .placeholder = Código de 6 algarismos
-settings-accounts-text-me = Receber antes um código por SMS
-settings-accounts-choose-phone = Para que número deve a Apple enviar o código?
-    .description = Enviar uma mensagem de texto
-settings-accounts-approve = A sua Conta Apple utiliza a Proteção avançada de dados. Aprove o pedido no iPhone, iPad ou Mac para permitir que este computador abra o iCloud Drive.

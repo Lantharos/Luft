@@ -51,7 +51,7 @@ export async function checkWallpaper(app) {
     for (const key of ['picture-uri', 'picture-uri-dark']) background.set_string(key, uri);
     background.set_string('picture-options', 'zoom');
     for (const key of ['wallpaper-focus', 'wallpaper-focus-dark']) kestrel.set_value(key, new GLib.Variant('(dd)', [0.5, 0.5]));
-    await show(app, 'about');
+    await show(app, 'system/about');
     const top = await show(app, 'appearance');
     for (let step = 0; step < SCROLL_STEPS; step++) scroll(Clutter.ScrollDirection.DOWN, app.at(SCROLL_POINT));
     await app.settle(frame => !frame.looksLike(top));

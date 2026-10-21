@@ -5,14 +5,20 @@
 	import { app } from '#lib/state/app.svelte.js';
 	import { hardware, type Hardware } from '#lib/state/hardware.svelte.js';
 	import { updates } from '#lib/state/updates.svelte.js';
-	import SidebarProgress from '#lib/panels/system/updates/SidebarProgress.svelte';
+	import SidebarProgress from '#lib/panels/system/system/updates/SidebarProgress.svelte';
 
+	let nav = $state<HTMLElement>();
 	let present = $derived(hardware.present);
-	let results = $derived(present ? (app.query.trim() ? [searchPanels(app.query, present)] : shownGroups(present)) : []);
+	let results = $derived(present ? (app.query.trim() ? [{ title: '', panels: searchPanels(app.query, present) }] : shownGroups(present)) : []);
+
+	$effect(() => {
+		void app.query;
+		nav?.scrollTo({ top: 0 });
+	});
 
 	function openFirst(event: KeyboardEvent) {
 		if (event.key !== 'Enter') return;
-		const [first] = results.flat();
+		const [first] = results.flatMap((group) => group.panels);
 		if (first) app.open(first.id);
 	}
 </script>
@@ -27,7 +33,7 @@
 	>
 		<panel.icon size={18} />
 		<span class="truncate">{titleOf(panel, present)}</span>
-		{#if panel.id === 'updates' && app.panel !== 'updates' && updates.activity.running}
+		{#if panel.id === 'system' && app.panel !== 'system' && updates.activity.running}
 			<SidebarProgress activity={updates.activity} />
 		{/if}
 	</button>
@@ -35,17 +41,20 @@
 
 <aside class="glass-sidebar drag-region gap-3.5 px-3 py-4">
 	<SearchField variant="sidebar" label={t('settings-search')} bind:value={app.query} onkeydown={openFirst} />
-	<nav class="hidden-scroll scroll-fade flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto" {@attach selectionPill()}>
+	<nav bind:this={nav} class="hidden-scroll scroll-fade flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto" {@attach selectionPill()}>
 		{#if present}
 			{#each results as group, index (index)}
-				<div class="flex flex-col gap-0.5">
-					{#each group as panel (panel.id)}
+				<section class="flex flex-col gap-0.5">
+					{#if group.title}
+						<h2 class="flex h-8 items-center px-3 text-[13px] font-medium text-[var(--sidebar-text-muted)]">{group.title}</h2>
+					{/if}
+					{#each group.panels as panel (panel.id)}
 						{@render item(panel, present)}
 					{/each}
-				</div>
+				</section>
 			{/each}
 		{/if}
-		{#if results.length === 1 && !results[0].length}
+		{#if results.length === 1 && !results[0].panels.length}
 			<p class="px-3 text-[13px] text-[var(--sidebar-text-muted)]">{t('settings-search-empty')}</p>
 		{/if}
 	</nav>

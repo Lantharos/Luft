@@ -227,7 +227,7 @@ class LanguageSelectionPopup extends NoGrabPopup {
         }
 
         this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        item = this.addSettingsAction(KestrelUi.t('osk-keyboard-settings'), 'keyboard');
+        item = this.addSettingsAction(KestrelUi.t('osk-keyboard-settings'), 'input');
         item.can_focus = false;
     }
 }

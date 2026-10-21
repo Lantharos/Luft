@@ -47,7 +47,7 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
                 Some(signal) = resumes.next() => signal.args().is_ok_and(|args| !args.start),
                 Some(action) = actions.next() => {
                     if action.args().is_ok_and(|args| args.id == notification && args.action_key == SETTINGS_ACTION) {
-                        notify::open_settings("datetime");
+                        notify::open_settings("language");
                     }
                     false
                 }

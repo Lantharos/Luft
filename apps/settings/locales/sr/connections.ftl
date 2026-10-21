@@ -73,7 +73,6 @@ settings-network-known-count = { $count ->
        *[other] { $count } сачуваних мрежа
     }
 settings-network-known-in-range = У домету
-settings-network-wired = Жична веза
 settings-network-ethernet = Етернет
 settings-network-ethernet-named = Етернет ({ $name })
 settings-network-wired-connected = Повезано · { $speed }
@@ -359,87 +358,3 @@ settings-bluetooth-windows-more = { $count ->
         [few] још { $count }
        *[other] још { $count }
     }
-
-## Accounts panel
-
-settings-accounts-unavailable = Налози нису доступни
-    .description = Услуга за налоге није инсталирана на овом рачунару
-settings-accounts-online = Онлајн налози
-    .description = Сваки налог је фасцикла у фасцикли Cloud у вашој личној фасцикли, коју свака апликација може да отвори. Датотеке се преузимају када их отворите.
-settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud или WebDAV
-
-## Accounts: an account's row
-
-settings-accounts-sign-in-again-needed = Пријавите се поново да бисте наставили да га користите
-settings-accounts-paused-metered = Синхронизација је паузирана на ограниченој вези
-settings-accounts-paused-battery = Синхронизација је паузирана док је батерија при крају
-settings-accounts-connecting = Повезивање…
-settings-accounts-offline = Ван мреже
-settings-accounts-offline-kept = Ван мреже, задржане датотеке су и даље ту
-settings-accounts-not-connected = Није повезано
-settings-accounts-syncing = { $count ->
-        [one] Синхронизује се { $count } промена
-        [few] Синхронизују се { $count } промене
-       *[other] Синхронизује се { $count } промена
-    }
-settings-accounts-name = Назив
-settings-accounts-folder = Фасцикла
-settings-accounts-server = Сервер
-settings-accounts-storage = Простор
-settings-accounts-storage-used = Искоришћено: { $used } од { $total }
-settings-accounts-on-device = На овом уређају
-settings-accounts-kept = { $count ->
-        [one] { $count } ставка је задржана, остало се преузима при отварању
-        [few] { $count } ставке су задржане, остало се преузима при отварању
-       *[other] { $count } ставки је задржано, остало се преузима при отварању
-    }
-settings-accounts-on-demand = Датотеке се преузимају када их отворите
-settings-accounts-sign-in-again = Пријави се поново
-settings-accounts-keep = Задржи
-settings-accounts-remove = Уклони
-settings-accounts-remove-confirm = Уклони са овог рачунара
-settings-accounts-removing = Уклањање…
-settings-accounts-remove-note = Ваше датотеке остају у услузи { $provider }. Измене направљене овде прво се отпремају.
-
-## Accounts: providers
-
-settings-accounts-provider-icloud = Ваш Apple налог, потврђен кодом са уређаја iPhone, iPad или Mac
-settings-accounts-provider-onedrive = Лични, пословни или школски Microsoft налог, у прегледачу
-settings-accounts-provider-dropbox = Dropbox налог, у прегледачу
-settings-accounts-provider-nextcloud = Ваш сервер или сервер ваше организације
-settings-accounts-provider-webdav = Било који сервер који подржава WebDAV
-
-## Accounts: signing in
-
-settings-accounts-sign-in-again-title = Поновна пријава: { $account }
-settings-accounts-browser = Отвориће се прегледач да бисте се пријавили преко услуге { $provider }. Luft никада не види вашу лозинку.
-settings-accounts-password-for = Унесите лозинку за { $user }.
-settings-accounts-apple-account = Apple налог
-settings-accounts-password = Лозинка
-settings-accounts-app-password = Лозинка апликације
-settings-accounts-user = Корисничко име
-settings-accounts-apple-note = Користите лозинку Apple налога, лозинке за одређене апликације овде не раде. Apple ће затим приказати код на вашем уређају iPhone, iPad или Mac.
-settings-accounts-nextcloud-browser = Отвориће се прегледач да бисте се пријавили на сервер и дозволили приступ систему Luft.
-settings-accounts-use-app-password = Користи лозинку апликације
-settings-accounts-error-server = Унесите адресу сервера
-settings-accounts-error-apple-account = Унесите имејл адресу Apple налога
-settings-accounts-error-user = Унесите корисничко име
-settings-accounts-error-password = Унесите лозинку
-settings-accounts-cancel = Откажи
-settings-accounts-back = Назад
-settings-accounts-continue-in-browser = Настави у прегледачу
-settings-accounts-sign-in = Пријава
-settings-accounts-try-again = Покушај поново
-settings-accounts-continue = Настави
-settings-accounts-working = Повезивање са услугом { $provider }…
-settings-accounts-finish-in-browser = Завршите пријаву преко услуге { $provider } у прегледачу. Luft никада не види вашу лозинку, а ово ће се само ажурирати када завршите.
-settings-accounts-no-browser = Прегледач се није отворио. Копирајте везу и отворите је у прегледачу.
-settings-accounts-open-again = Поново отвори страницу
-settings-accounts-copy-link = Копирај везу
-settings-accounts-copied = Копирано
-settings-accounts-code = Верификациони код
-    .placeholder = Код од 6 цифара
-settings-accounts-text-me = Пошаљи ми код у SMS поруци
-settings-accounts-choose-phone = На који број Apple треба да пошаље код?
-    .description = Пошаљи SMS поруку
-settings-accounts-approve = Ваш Apple налог користи напредну заштиту података. Одобрите захтев на уређају iPhone, iPad или Mac да би овај рачунар могао да отвори iCloud Drive.

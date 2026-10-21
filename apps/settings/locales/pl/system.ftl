@@ -1,26 +1,3 @@
-## Apps
-
-settings-apps-defaults = Aplikacje domyślne
-settings-apps-defaults-description = Używane do otwierania linków, plików i folderów
-settings-apps-browser = Przeglądarka internetowa
-settings-apps-email = Poczta e-mail
-settings-apps-calendar = Kalendarz
-settings-apps-music = Muzyka
-settings-apps-videos = Wideo
-settings-apps-photos = Zdjęcia
-settings-apps-text-editor = Edytor tekstu
-settings-apps-files = Pliki
-settings-apps-choose = Wybierz
-settings-apps-startup = Autostart
-settings-apps-startup-description = Te aplikacje otwierają się po zalogowaniu
-settings-apps-startup-app = Otwieraj aplikację { $app } po zalogowaniu
-settings-apps-startup-add = Dodaj aplikację
-settings-apps-startup-add-title = Dodaj aplikację do autostartu
-settings-apps-startup-add-description = Wybierz aplikację, która będzie się otwierać po każdym zalogowaniu.
-settings-apps-search = Szukaj aplikacji
-settings-apps-no-match = Brak aplikacji pasujących do wyszukiwania
-settings-apps-cancel = Anuluj
-
 ## Date and time
 
 settings-datetime-automatic = Ustawiaj godzinę automatycznie
@@ -37,7 +14,6 @@ settings-datetime-format-24h = 24-godzinny
 settings-datetime-format-12h = AM/PM
 settings-datetime-seconds = Pokazuj sekundy
 settings-datetime-weekday = Pokazuj dzień tygodnia
-settings-datetime-calendar = Kalendarz
 settings-datetime-week-start = Pierwszy dzień tygodnia
 settings-datetime-week-start-automatic = Automatycznie
 settings-datetime-week-start-monday = Poniedziałek
@@ -329,3 +305,89 @@ settings-region-formats-language = Taki sam jak język
 settings-region-formats = Formaty
 settings-region-formats-description = Daty, godziny, liczby i jednostki miary
 settings-region-formats-next-sign-in = { $sample }, od następnego logowania
+
+## Accounts panel
+
+settings-accounts-unavailable = Konta są niedostępne
+    .description = Usługa kont nie jest zainstalowana na tym komputerze
+settings-accounts-online = Konta online
+    .description = Każde konto ma swój folder w folderze Cloud w folderze domowym i każda aplikacja może go otworzyć. Pliki pobierają się, gdy je otwierasz.
+settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud lub WebDAV
+
+## Accounts: an account's row
+
+settings-accounts-sign-in-again-needed = Zaloguj się ponownie, aby dalej z niego korzystać
+settings-accounts-paused-metered = Synchronizacja wstrzymana przy połączeniu taryfowym
+settings-accounts-paused-battery = Synchronizacja wstrzymana z powodu niskiego poziomu baterii
+settings-accounts-connecting = Łączenie…
+settings-accounts-offline = Offline
+settings-accounts-offline-kept = Offline, zachowane pliki są nadal dostępne
+settings-accounts-not-connected = Brak połączenia
+settings-accounts-syncing = { $count ->
+        [one] Synchronizowanie { $count } zmiany
+        [few] Synchronizowanie { $count } zmian
+        [many] Synchronizowanie { $count } zmian
+       *[other] Synchronizowanie { $count } zmiany
+    }
+settings-accounts-name = Nazwa
+settings-accounts-folder = Folder
+settings-accounts-server = Serwer
+settings-accounts-storage = Miejsce
+settings-accounts-storage-used = Zajęte: { $used } z { $total }
+settings-accounts-on-device = Na tym urządzeniu
+settings-accounts-kept = { $count ->
+        [one] Zachowano { $count } element, reszta pobiera się po otwarciu
+        [few] Zachowano { $count } elementy, reszta pobiera się po otwarciu
+        [many] Zachowano { $count } elementów, reszta pobiera się po otwarciu
+       *[other] Zachowano { $count } elementu, reszta pobiera się po otwarciu
+    }
+settings-accounts-on-demand = Pliki pobierają się, gdy je otwierasz
+settings-accounts-sign-in-again = Zaloguj się ponownie
+settings-accounts-keep = Zachowaj
+settings-accounts-remove = Usuń
+settings-accounts-remove-confirm = Usuń z tego komputera
+settings-accounts-removing = Usuwanie…
+settings-accounts-remove-note = Twoje pliki pozostaną w usłudze { $provider }. Zmiany wprowadzone tutaj zostaną najpierw wysłane.
+
+## Accounts: providers
+
+settings-accounts-provider-icloud = Twoje konto Apple, potwierdzone kodem z iPhone’a, iPada lub Maca
+settings-accounts-provider-onedrive = Osobiste, służbowe lub szkolne konto Microsoft, w przeglądarce
+settings-accounts-provider-dropbox = Konto Dropbox, w przeglądarce
+settings-accounts-provider-nextcloud = Twój własny serwer lub serwer twojej organizacji
+settings-accounts-provider-webdav = Dowolny serwer obsługujący WebDAV
+
+## Accounts: signing in
+
+settings-accounts-sign-in-again-title = Zaloguj się ponownie: { $account }
+settings-accounts-browser = Otworzy się przeglądarka, w której zalogujesz się w usłudze { $provider }. Luft nigdy nie widzi twojego hasła.
+settings-accounts-password-for = Wpisz hasło dla { $user }.
+settings-accounts-apple-account = Konto Apple
+settings-accounts-password = Hasło
+settings-accounts-app-password = Hasło aplikacji
+settings-accounts-user = Nazwa użytkownika
+settings-accounts-apple-note = Użyj hasła do konta Apple; hasła do aplikacji tu nie działają. Apple wyświetli potem kod na iPhonie, iPadzie lub Macu.
+settings-accounts-nextcloud-browser = Otworzy się przeglądarka, w której zalogujesz się na swój serwer i zezwolisz na dostęp dla Luft.
+settings-accounts-use-app-password = Użyj zamiast tego hasła aplikacji
+settings-accounts-error-server = Wpisz adres serwera
+settings-accounts-error-apple-account = Wpisz adres e-mail konta Apple
+settings-accounts-error-user = Wpisz nazwę użytkownika
+settings-accounts-error-password = Wpisz hasło
+settings-accounts-cancel = Anuluj
+settings-accounts-back = Wstecz
+settings-accounts-continue-in-browser = Kontynuuj w przeglądarce
+settings-accounts-sign-in = Zaloguj się
+settings-accounts-try-again = Spróbuj ponownie
+settings-accounts-continue = Kontynuuj
+settings-accounts-working = Łączenie z usługą { $provider }…
+settings-accounts-finish-in-browser = Dokończ logowanie w usłudze { $provider } w przeglądarce. Luft nigdy nie widzi twojego hasła, a ten widok odświeży się sam, gdy skończysz.
+settings-accounts-no-browser = Nie otworzyła się żadna przeglądarka. Skopiuj link i otwórz go w przeglądarce.
+settings-accounts-open-again = Otwórz stronę ponownie
+settings-accounts-copy-link = Kopiuj link
+settings-accounts-copied = Skopiowano
+settings-accounts-code = Kod weryfikacyjny
+    .placeholder = Kod 6-cyfrowy
+settings-accounts-text-me = Wyślij mi kod SMS-em
+settings-accounts-choose-phone = Na który numer Apple ma wysłać kod?
+    .description = Wyślij SMS
+settings-accounts-approve = Twoje konto Apple używa zaawansowanej ochrony danych. Zatwierdź prośbę na iPhonie, iPadzie lub Macu, aby ten komputer mógł otworzyć iCloud Drive.

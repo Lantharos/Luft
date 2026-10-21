@@ -11,12 +11,21 @@ Apps and scripts can open Settings and Keys at a specific page with a link, thro
 
 | Link | Opens |
 | --- | --- |
-| `kestrel-settings:<page>` | A page: `network`, `bluetooth`, `display`, `sound`, `power`, `appearance`, `notifications`, `keyboard`, `mouse`, `accessibility`, `apps`, `privacy`, `security`, `datetime`, `users`, `accounts`, `login`, `updates`, `about` |
+| `kestrel-settings:<page>` | A page: `network`, `bluetooth`, `display`, `sound`, `power`, `input`, `appearance`, `desktop`, `notifications`, `accessibility`, `apps`, `privacy`, `security`, `accounts`, `language`, `system` |
+| `kestrel-settings:network/wifi` | Wi-Fi |
+| `kestrel-settings:network/ethernet` | Ethernet |
+| `kestrel-settings:network/vpn` | VPN |
+| `kestrel-settings:network/proxy` | Proxy |
+| `kestrel-settings:input/shortcuts` | Keyboard shortcuts |
+| `kestrel-settings:input/dictation` | Dictation |
 | `kestrel-settings:appearance/fonts` | All fonts |
 | `kestrel-settings:appearance/cursors` | Cursor themes |
-| `kestrel-settings:appearance/taskbar` | Taskbar |
-| `kestrel-settings:keyboard/dictation` | Dictation |
+| `kestrel-settings:security/protections` | Protections such as Secure Boot and USB protection |
+| `kestrel-settings:security/encryption` | Device encryption |
+| `kestrel-settings:security/keyring` | Passwords and keys |
+| `kestrel-settings:accounts/login` | The login screen |
 | `kestrel-settings:accounts/add` | Adding an account |
+| `kestrel-settings:system/about` | About this computer |
 
 A link to a page for missing hardware, such as Bluetooth without an adapter, explains that instead.
 

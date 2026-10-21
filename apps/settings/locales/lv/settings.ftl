@@ -3,16 +3,21 @@
 settings-search = Meklēt iestatījumos
 settings-search-empty = Nekas netika atrasts.
 
+## Sidebar groups
+
+settings-group-connections = Savienojumi
+settings-group-devices = Ierīces
+settings-group-look = Izskats un sajūta
+settings-group-protection = Aizsardzība
+settings-group-system = Sistēma
+
 ## Panel titles that depend on the hardware
 
 settings-power-title = Barošana
-settings-mouse-title = Pele
-settings-touchpad-title = Skārienpaliktnis
 
 ## Missing hardware
 
 settings-bluetooth-missing = Šim datoram nav Bluetooth adaptera
-settings-mouse-missing = Nav pievienota ne pele, ne skārienpaliktnis
 
 ## Shared pieces
 

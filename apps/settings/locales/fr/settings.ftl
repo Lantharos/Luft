@@ -3,16 +3,21 @@
 settings-search = Rechercher un paramètre
 settings-search-empty = Aucun paramètre ne correspond.
 
+## Sidebar groups
+
+settings-group-connections = Connexions
+settings-group-devices = Appareils
+settings-group-look = Apparence et confort
+settings-group-protection = Protection
+settings-group-system = Système
+
 ## Panel titles that depend on the hardware
 
 settings-power-title = Alimentation
-settings-mouse-title = Souris
-settings-touchpad-title = Pavé tactile
 
 ## Missing hardware
 
 settings-bluetooth-missing = Cet ordinateur n’a pas d’adaptateur Bluetooth
-settings-mouse-missing = Aucune souris ni aucun pavé tactile n’est connecté
 
 ## Shared pieces
 

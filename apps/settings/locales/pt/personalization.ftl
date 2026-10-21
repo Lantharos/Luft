@@ -67,7 +67,6 @@ settings-appearance-tint-slate = Ardósia
 
 ## Appearance: text and motion
 
-settings-appearance-taskbar = Barra de tarefas
 settings-appearance-text-and-motion = Texto e movimento
 settings-appearance-text-size = Tamanho do texto
 settings-appearance-text-size-description = Aumenta ou reduz o texto em todas as aplicações
@@ -76,8 +75,6 @@ settings-appearance-animations-description = As janelas e os menus deslizam em v
 
 ## Taskbar
 
-settings-taskbar-title = Barra de tarefas e Start
-settings-taskbar-back = Aparência
 settings-taskbar-preview = Pré-visualização da barra de tarefas
 settings-start-section = Start
 settings-start-style = Estilo
@@ -227,7 +224,6 @@ settings-notifications-done = Concluído
 
 settings-tiling-preview = Pré-visualização da disposição das janelas
 settings-tiling-title = Mosaico de janelas
-settings-tiling-back = Aparência
 settings-tiling-mode = Organizar janelas
 settings-tiling-mode-off = Desligado
 settings-tiling-mode-tiling = Mosaico

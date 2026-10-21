@@ -28,7 +28,7 @@ Right after something goes wrong, these show the most. Run them in [Tern](/apps/
 
 ## Recent problems
 
-Settings, under About, lists the last ten times the graphics driver stopped responding, with what happened and what can help. On NVIDIA graphics, NVIDIA's own `nvidia-bug-report.sh` collects a full report.
+Settings, under System, **About**, lists the last ten times the graphics driver stopped responding, with what happened and what can help. On NVIDIA graphics, NVIDIA's own `nvidia-bug-report.sh` collects a full report.
 
 ## Logs from Try Luft
 

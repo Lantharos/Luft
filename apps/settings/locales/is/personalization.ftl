@@ -67,7 +67,6 @@ settings-appearance-tint-slate = Grár
 
 ## Appearance: text and motion
 
-settings-appearance-taskbar = Verkstika
 settings-appearance-text-and-motion = Texti og hreyfing
 settings-appearance-text-size = Textastærð
 settings-appearance-text-size-description = Stækkar eða minnkar texta í öllum forritum
@@ -76,8 +75,6 @@ settings-appearance-animations-description = Gluggar og valmyndir hreyfast í st
 
 ## Taskbar
 
-settings-taskbar-title = Verkstika og Upphaf
-settings-taskbar-back = Útlit
 settings-taskbar-preview = Forskoðun verkstiku
 settings-start-section = Upphaf
 settings-start-style = Stíll
@@ -226,7 +223,6 @@ settings-notifications-done = Lokið
 
 settings-tiling-preview = Forskoðun gluggaröðunar
 settings-tiling-title = Flísalagning glugga
-settings-tiling-back = Útlit
 settings-tiling-mode = Raða gluggum
 settings-tiling-mode-off = Slökkt
 settings-tiling-mode-tiling = Flísar

@@ -5,7 +5,7 @@ sidebar:
   order: 5
 ---
 
-Once Luft starts the computer, you can remove the other systems on it and give their space to Luft. Disks shows them on each drive, below its partitions, and Settings lists them under About, **Other systems**.
+Once Luft starts the computer, you can remove the other systems on it and give their space to Luft. Disks shows them on each drive, below its partitions, and Settings lists them under System, About, **Other systems**.
 
 **Remove** names everything that goes and how big it is, and offers to open the system's files in [Rover](/apps/rover/) first, so you can copy what you still need.
 

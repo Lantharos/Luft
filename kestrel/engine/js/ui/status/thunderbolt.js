@@ -269,7 +269,7 @@ class Indicator extends SystemIndicator {
         this._notification.connect('destroy', () => {
             this._notification = null;
         });
-        this._notification.connect('activated', () => Util.openSettings('security'));
+        this._notification.connect('activated', () => Util.openSettings('security/protections'));
         source.addNotification(this._notification);
     }
 

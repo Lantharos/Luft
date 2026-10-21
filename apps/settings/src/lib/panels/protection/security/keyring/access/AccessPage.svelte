@@ -15,7 +15,7 @@
 	let { access, refresh, onclose }: Props = $props();
 </script>
 
-<SubPage title={t('settings-passwords-apps')} back={t('settings-passwords-access-back')} {onclose}>
+<SubPage title={t('settings-passwords-apps')} back={t('settings-passwords-title')} {onclose}>
 	<AppsSection apps={access.apps} {refresh} />
 
 	{#if access.stores.length}

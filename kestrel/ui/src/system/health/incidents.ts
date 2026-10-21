@@ -69,6 +69,6 @@ export async function notifyAboutIncidents(): Promise<void> {
     gicon: new Gio.ThemedIcon({ name: 'video-display-symbolic' }),
     privacyScope: MessageTray.PrivacyScope.SYSTEM,
   });
-  notification.addAction(t('health-gpu-reset-details'), () => openSettings('about'));
+  notification.addAction(t('health-gpu-reset-details'), () => openSettings('system/about'));
   source.addNotification(notification);
 }

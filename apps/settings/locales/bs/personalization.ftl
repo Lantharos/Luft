@@ -67,7 +67,6 @@ settings-appearance-tint-slate = Škriljac
 
 ## Appearance: text and motion
 
-settings-appearance-taskbar = Programska traka
 settings-appearance-text-and-motion = Tekst i pokret
 settings-appearance-text-size = Veličina teksta
 settings-appearance-text-size-description = Povećava ili smanjuje tekst u svim aplikacijama
@@ -76,8 +75,6 @@ settings-appearance-animations-description = Prozori i meniji se kreću umjesto 
 
 ## Taskbar
 
-settings-taskbar-title = Programska traka i Start
-settings-taskbar-back = Izgled
 settings-taskbar-preview = Pregled programske trake
 settings-start-section = Start
 settings-start-style = Stil
@@ -228,7 +225,6 @@ settings-notifications-done = Gotovo
 
 settings-tiling-preview = Pregled rasporeda prozora
 settings-tiling-title = Popločavanje prozora
-settings-tiling-back = Izgled
 settings-tiling-mode = Raspored prozora
 settings-tiling-mode-off = Isključeno
 settings-tiling-mode-tiling = Popločavanje

@@ -28,7 +28,6 @@ settings-privacy-location-services = Posisjonstenester
 settings-privacy-location-services-hint = Lèt appar finne ut kvar du er, for kart, vêr og tidssoner
 settings-privacy-camera = Kamera
 settings-privacy-camera-allow = Tillat appar å bruke kameraet
-settings-privacy-microphone = Mikrofon
 settings-privacy-microphone-allow = Tillat appar å bruke mikrofonen
 settings-privacy-apps-asked = Appar som har spurt
 settings-privacy-apps-allowed = { $allowed } av { $total } har løyve
@@ -345,7 +344,6 @@ settings-passwords-apps-asked = { $count ->
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-back = Tryggleik
 settings-passwords-access-description = Fjernar du ein, spør appen på nytt neste gong.
 settings-passwords-access-not-allowed = Ikkje tillate
 settings-passwords-access-none = Ingen appar har spurt etter passorda dine enno
@@ -435,3 +433,26 @@ settings-passkeys-rename-title = Gje tilgangsnøkkelen nytt namn
 settings-passkeys-rename-description = Gje tilgangsnøkkelen for { $site } eit namn du kjenner att.
 settings-passkeys-name = Namn
 settings-passkeys-save = Lagre
+
+## Apps
+
+settings-apps-defaults = Standardappar
+settings-apps-defaults-description = Blir brukte når du opnar lenkjer, filer og mapper
+settings-apps-browser = Nettlesar
+settings-apps-email = E-post
+settings-apps-calendar = Kalender
+settings-apps-music = Musikk
+settings-apps-videos = Videoar
+settings-apps-photos = Bilete
+settings-apps-text-editor = Tekstredigerar
+settings-apps-files = Filer
+settings-apps-choose = Vel
+settings-apps-startup = Oppstart
+settings-apps-startup-description = Desse appane blir opna når du loggar inn
+settings-apps-startup-app = Opne { $app } når du loggar inn
+settings-apps-startup-add = Legg til app
+settings-apps-startup-add-title = Legg til ein oppstartsapp
+settings-apps-startup-add-description = Vel ein app som skal opnast kvar gong du loggar inn.
+settings-apps-search = Søk i appar
+settings-apps-no-match = Ingen appar passar til søket
+settings-apps-cancel = Avbryt

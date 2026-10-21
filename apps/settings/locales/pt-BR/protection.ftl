@@ -28,7 +28,6 @@ settings-privacy-location-services = Serviços de localização
 settings-privacy-location-services-hint = Permite que os apps saibam onde você está, para mapas, clima e fusos horários
 settings-privacy-camera = Câmera
 settings-privacy-camera-allow = Permitir que os apps usem a câmera
-settings-privacy-microphone = Microfone
 settings-privacy-microphone-allow = Permitir que os apps usem o microfone
 settings-privacy-apps-asked = Apps que pediram acesso
 settings-privacy-apps-allowed = { $allowed } de { $total } permitidos
@@ -345,7 +344,6 @@ settings-passwords-apps-asked = { $count ->
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-back = Segurança
 settings-passwords-access-description = Se você remover um, o app vai pedir de novo na próxima vez.
 settings-passwords-access-not-allowed = Não permitido
 settings-passwords-access-none = Nenhum app pediu suas senhas ainda
@@ -435,3 +433,26 @@ settings-passkeys-rename-title = Renomear chave de acesso
 settings-passkeys-rename-description = Dê à chave de acesso de { $site } um nome que você reconheça.
 settings-passkeys-name = Nome
 settings-passkeys-save = Salvar
+
+## Apps
+
+settings-apps-defaults = Apps padrão
+settings-apps-defaults-description = Usados ao abrir links, arquivos e pastas
+settings-apps-browser = Navegador
+settings-apps-email = E-mail
+settings-apps-calendar = Calendário
+settings-apps-music = Música
+settings-apps-videos = Vídeos
+settings-apps-photos = Fotos
+settings-apps-text-editor = Editor de texto
+settings-apps-files = Arquivos
+settings-apps-choose = Escolher
+settings-apps-startup = Inicialização
+settings-apps-startup-description = Estes apps abrem quando você entra
+settings-apps-startup-app = Abrir { $app } quando você entrar
+settings-apps-startup-add = Adicionar app
+settings-apps-startup-add-title = Adicionar um app de inicialização
+settings-apps-startup-add-description = Escolha um app para abrir sempre que você entrar.
+settings-apps-search = Pesquisar apps
+settings-apps-no-match = Nenhum app corresponde à pesquisa
+settings-apps-cancel = Cancelar

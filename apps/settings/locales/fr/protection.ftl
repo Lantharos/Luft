@@ -28,7 +28,6 @@ settings-privacy-location-services = Services de localisation
 settings-privacy-location-services-hint = Permet aux applications de savoir où vous êtes, pour les cartes, la météo et les fuseaux horaires
 settings-privacy-camera = Caméra
 settings-privacy-camera-allow = Autoriser les applications à utiliser la caméra
-settings-privacy-microphone = Microphone
 settings-privacy-microphone-allow = Autoriser les applications à utiliser le microphone
 settings-privacy-apps-asked = Applications ayant demandé l’accès
 settings-privacy-apps-allowed = { $allowed } sur { $total } autorisées
@@ -345,7 +344,6 @@ settings-passwords-apps-asked = { $count ->
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-back = Sécurité
 settings-passwords-access-description = Si vous en retirez une, l’application redemandera l’accès la prochaine fois.
 settings-passwords-access-not-allowed = Non autorisée
 settings-passwords-access-none = Aucune application n’a encore demandé vos mots de passe
@@ -435,3 +433,26 @@ settings-passkeys-rename-title = Renommer la clé d’accès
 settings-passkeys-rename-description = Donnez à votre clé d’accès pour { $site } un nom que vous reconnaîtrez.
 settings-passkeys-name = Nom
 settings-passkeys-save = Enregistrer
+
+## Apps
+
+settings-apps-defaults = Applications par défaut
+settings-apps-defaults-description = Utilisées pour ouvrir les liens, les fichiers et les dossiers
+settings-apps-browser = Navigateur web
+settings-apps-email = E-mail
+settings-apps-calendar = Calendrier
+settings-apps-music = Musique
+settings-apps-videos = Vidéos
+settings-apps-photos = Photos
+settings-apps-text-editor = Éditeur de texte
+settings-apps-files = Fichiers
+settings-apps-choose = Choisir
+settings-apps-startup = Démarrage
+settings-apps-startup-description = Ces applications s’ouvrent quand vous vous connectez
+settings-apps-startup-app = Ouvrir { $app } à la connexion
+settings-apps-startup-add = Ajouter une application
+settings-apps-startup-add-title = Ajouter une application au démarrage
+settings-apps-startup-add-description = Choisissez une application à ouvrir à chaque connexion.
+settings-apps-search = Rechercher des applications
+settings-apps-no-match = Aucune application ne correspond à votre recherche
+settings-apps-cancel = Annuler

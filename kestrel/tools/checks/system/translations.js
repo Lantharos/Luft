@@ -6,8 +6,8 @@ import {capture} from '../lib/screenshots.js';
 import {settled} from '../lib/wait.js';
 
 const SURFACES = ['start', 'quick', 'notifications', 'emoji'];
-const SETTINGS_PAGES = ['bluetooth', 'display', 'sound', 'power', 'appearance', 'appearance/taskbar', 'notifications', 'keyboard', 'mouse',
-  'accessibility', 'apps', 'privacy', 'security', 'region', 'datetime', 'users', 'login', 'updates', 'about', 'network'];
+const SETTINGS_PAGES = ['bluetooth', 'display', 'sound', 'power', 'input', 'appearance', 'desktop', 'notifications', 'accessibility', 'apps', 'privacy', 'security',
+  'accounts', 'language', 'system', 'system/about', 'network'];
 
 export const timeout = 240000;
 

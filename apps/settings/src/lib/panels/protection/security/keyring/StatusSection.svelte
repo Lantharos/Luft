@@ -23,7 +23,7 @@
 	let access = $derived(keyring.access);
 </script>
 
-<Section title={t('settings-passwords-title')}>
+<Section>
 	<Row title={keyring.locked ? t('settings-passwords-locked') : t('settings-passwords-contents', { count: keyring.itemCount })} description={protection(keyring)}>
 		{#if keyring.locked}
 			<button type="button" class="button" disabled={runner.busy} onclick={() => runner.run(unlock)}>{t('settings-passwords-unlock')}</button>
@@ -39,7 +39,7 @@
 	{#if fingerprints && keyring.fingerprintUnlock}
 		<Row title={t('settings-passwords-fingerprint-on')} description={t('settings-passwords-fingerprint-on-description')} />
 	{:else if fingerprints}
-		<Row title={t('settings-passwords-fingerprint')} description={t('settings-passwords-fingerprint-description')} onclick={() => app.open('users')} />
+		<Row title={t('settings-passwords-fingerprint')} description={t('settings-passwords-fingerprint-description')} onclick={() => app.open('accounts')} />
 	{/if}
 	{#if fingerprints && (keyring.fingerprintUnlock || keyring.pin)}
 		<Row

@@ -28,7 +28,6 @@ settings-privacy-location-services = Shërbimet e vendndodhjes
 settings-privacy-location-services-hint = U lejon aplikacioneve të gjejnë ku je, për hartat, motin dhe zonat kohore
 settings-privacy-camera = Kamera
 settings-privacy-camera-allow = Lejo aplikacionet të përdorin kamerën
-settings-privacy-microphone = Mikrofoni
 settings-privacy-microphone-allow = Lejo aplikacionet të përdorin mikrofonin
 settings-privacy-apps-asked = Aplikacionet që kërkuan
 settings-privacy-apps-allowed = { $allowed } nga { $total } të lejuara
@@ -345,7 +344,6 @@ settings-passwords-apps-asked = { $count ->
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-back = Siguria
 settings-passwords-access-description = Nëse heq një, aplikacioni pyet sërish herën tjetër.
 settings-passwords-access-not-allowed = Nuk lejohet
 settings-passwords-access-none = Asnjë aplikacion nuk i ka kërkuar ende fjalëkalimet e tua
@@ -435,3 +433,26 @@ settings-passkeys-rename-title = Riemërto çelësin e kalimit
 settings-passkeys-rename-description = Jepi çelësit të kalimit për { $site } një emër që do ta njohësh.
 settings-passkeys-name = Emri
 settings-passkeys-save = Ruaj
+
+## Apps
+
+settings-apps-defaults = Aplikacionet e parazgjedhura
+settings-apps-defaults-description = Përdoren kur hap lidhje, skedarë dhe dosje
+settings-apps-browser = Shfletuesi i uebit
+settings-apps-email = Posta elektronike
+settings-apps-calendar = Kalendari
+settings-apps-music = Muzika
+settings-apps-videos = Videot
+settings-apps-photos = Fotot
+settings-apps-text-editor = Redaktori i tekstit
+settings-apps-files = Skedarët
+settings-apps-choose = Zgjidh
+settings-apps-startup = Nisja
+settings-apps-startup-description = Këto aplikacione hapen kur hyn
+settings-apps-startup-app = Hap { $app } kur hyn
+settings-apps-startup-add = Shto aplikacion
+settings-apps-startup-add-title = Shto një aplikacion në nisje
+settings-apps-startup-add-description = Zgjidh një aplikacion që hapet sa herë hyn.
+settings-apps-search = Kërko aplikacione
+settings-apps-no-match = Asnjë aplikacion nuk përputhet me kërkimin
+settings-apps-cancel = Anulo

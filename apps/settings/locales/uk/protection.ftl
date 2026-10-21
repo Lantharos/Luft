@@ -28,7 +28,6 @@ settings-privacy-location-services = Служби розташування
 settings-privacy-location-services-hint = Дає програмам змогу визначати, де ви, для карт, погоди й часових поясів
 settings-privacy-camera = Камера
 settings-privacy-camera-allow = Дозволити програмам використовувати камеру
-settings-privacy-microphone = Мікрофон
 settings-privacy-microphone-allow = Дозволити програмам використовувати мікрофон
 settings-privacy-apps-asked = Програми, що запитували доступ
 settings-privacy-apps-allowed = Дозволено: { $allowed } з { $total }
@@ -371,7 +370,6 @@ settings-passwords-apps-asked = { $count ->
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-back = Безпека
 settings-passwords-access-description = Якщо вилучити програму, наступного разу вона запитає знову.
 settings-passwords-access-not-allowed = Заборонено
 settings-passwords-access-none = Програми ще не запитували доступу до ваших паролів
@@ -465,3 +463,26 @@ settings-passkeys-rename-title = Перейменувати ключ досту�
 settings-passkeys-rename-description = Дайте ключу доступу для { $site } назву, яку ви впізнаєте.
 settings-passkeys-name = Назва
 settings-passkeys-save = Зберегти
+
+## Apps
+
+settings-apps-defaults = Програми за замовчуванням
+settings-apps-defaults-description = Використовуються, коли ви відкриваєте посилання, файли й папки
+settings-apps-browser = Браузер
+settings-apps-email = Електронна пошта
+settings-apps-calendar = Календар
+settings-apps-music = Музика
+settings-apps-videos = Відео
+settings-apps-photos = Фото
+settings-apps-text-editor = Текстовий редактор
+settings-apps-files = Файли
+settings-apps-choose = Вибрати
+settings-apps-startup = Автозапуск
+settings-apps-startup-description = Ці програми відкриваються, коли ви входите в систему
+settings-apps-startup-app = Відкривати { $app } під час входу
+settings-apps-startup-add = Додати програму
+settings-apps-startup-add-title = Додати програму до автозапуску
+settings-apps-startup-add-description = Виберіть програму, яка відкриватиметься щоразу, коли ви входите в систему.
+settings-apps-search = Пошук програм
+settings-apps-no-match = Немає програм, що відповідають запиту
+settings-apps-cancel = Скасувати

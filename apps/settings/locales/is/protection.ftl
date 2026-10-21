@@ -28,7 +28,6 @@ settings-privacy-location-services = Staðsetningarþjónusta
 settings-privacy-location-services-hint = Leyfir forritum að finna hvar þú ert, fyrir kort, veður og tímabelti
 settings-privacy-camera = Myndavél
 settings-privacy-camera-allow = Leyfa forritum að nota myndavélina
-settings-privacy-microphone = Hljóðnemi
 settings-privacy-microphone-allow = Leyfa forritum að nota hljóðnemann
 settings-privacy-apps-asked = Forrit sem báðu um aðgang
 settings-privacy-apps-allowed = { $allowed } af { $total } leyfð
@@ -345,7 +344,6 @@ settings-passwords-apps-asked = { $count ->
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-back = Öryggi
 settings-passwords-access-description = Ef þú fjarlægir forrit biður það aftur um aðgang næst.
 settings-passwords-access-not-allowed = Ekki leyft
 settings-passwords-access-none = Engin forrit hafa beðið um lykilorðin þín enn
@@ -435,3 +433,26 @@ settings-passkeys-rename-title = Endurnefna aðgangslykil
 settings-passkeys-rename-description = Gefðu aðgangslyklinum fyrir { $site } heiti sem þú þekkir.
 settings-passkeys-name = Heiti
 settings-passkeys-save = Vista
+
+## Apps
+
+settings-apps-defaults = Sjálfgefin forrit
+settings-apps-defaults-description = Notuð þegar þú opnar tengla, skrár og möppur
+settings-apps-browser = Vafri
+settings-apps-email = Tölvupóstur
+settings-apps-calendar = Dagatal
+settings-apps-music = Tónlist
+settings-apps-videos = Myndskeið
+settings-apps-photos = Ljósmyndir
+settings-apps-text-editor = Textaritill
+settings-apps-files = Skrár
+settings-apps-choose = Veldu
+settings-apps-startup = Ræsing
+settings-apps-startup-description = Þessi forrit opnast þegar þú skráir þig inn
+settings-apps-startup-app = Opna { $app } við innskráningu
+settings-apps-startup-add = Bæta við forriti
+settings-apps-startup-add-title = Bæta við ræsiforriti
+settings-apps-startup-add-description = Veldu forrit sem opnast í hvert sinn sem þú skráir þig inn.
+settings-apps-search = Leita að forritum
+settings-apps-no-match = Engin forrit passa við leitina
+settings-apps-cancel = Hætta við

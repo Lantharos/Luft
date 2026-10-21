@@ -67,7 +67,6 @@ settings-appearance-tint-slate = Ardezie
 
 ## Appearance: text and motion
 
-settings-appearance-taskbar = Bara de activități
 settings-appearance-text-and-motion = Text și mișcare
 settings-appearance-text-size = Mărime text
 settings-appearance-text-size-description = Mărește sau micșorează textul în toate aplicațiile
@@ -76,8 +75,6 @@ settings-appearance-animations-description = Ferestrele și meniurile se mișcă
 
 ## Taskbar
 
-settings-taskbar-title = Bara de activități și Start
-settings-taskbar-back = Aspect
 settings-taskbar-preview = Previzualizarea barei de activități
 settings-start-section = Start
 settings-start-style = Stil
@@ -228,7 +225,6 @@ settings-notifications-done = Gata
 
 settings-tiling-preview = Previzualizarea aranjării ferestrelor
 settings-tiling-title = Așezarea ferestrelor în mozaic
-settings-tiling-back = Aspect
 settings-tiling-mode = Aranjează ferestrele
 settings-tiling-mode-off = Dezactivat
 settings-tiling-mode-tiling = Mozaic

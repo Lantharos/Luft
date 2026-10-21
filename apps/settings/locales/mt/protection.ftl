@@ -28,7 +28,6 @@ settings-privacy-location-services = Servizzi tal-post
 settings-privacy-location-services-hint = Iħalli l-apps isibu fejn tinsab, għall-mapep, it-temp u ż-żoni tal-ħin
 settings-privacy-camera = Kamera
 settings-privacy-camera-allow = Ħalli l-apps jużaw il-kamera
-settings-privacy-microphone = Mikrofonu
 settings-privacy-microphone-allow = Ħalli l-apps jużaw il-mikrofonu
 settings-privacy-apps-asked = Apps li talbu
 settings-privacy-apps-allowed = { $allowed } minn { $total } permessi
@@ -384,7 +383,6 @@ settings-passwords-apps-asked = { $count ->
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-back = Sigurtà
 settings-passwords-access-description = Jekk tneħħi waħda, l-app terġa’ titlob il-darba li jmiss.
 settings-passwords-access-not-allowed = Mhux permess
 settings-passwords-access-none = Għadha ebda app ma talbet għall-passwords
@@ -480,3 +478,26 @@ settings-passkeys-rename-title = Semmi mill-ġdid il-passkey
 settings-passkeys-rename-description = Agħti lill-passkey għal { $site } isem li tagħrfu.
 settings-passkeys-name = Isem
 settings-passkeys-save = Issejvja
+
+## Apps
+
+settings-apps-defaults = Apps default
+settings-apps-defaults-description = Jintużaw meta tiftaħ links, fajls u fowlders
+settings-apps-browser = Web browser
+settings-apps-email = Email
+settings-apps-calendar = Kalendarju
+settings-apps-music = Mużika
+settings-apps-videos = Vidjows
+settings-apps-photos = Ritratti
+settings-apps-text-editor = Editur tat-test
+settings-apps-files = Fajls
+settings-apps-choose = Agħżel
+settings-apps-startup = Startjar
+settings-apps-startup-description = Dawn l-apps jinfetħu meta tidħol
+settings-apps-startup-app = Iftaħ { $app } meta tidħol
+settings-apps-startup-add = Żid app
+settings-apps-startup-add-title = Żid app tal-istartjar
+settings-apps-startup-add-description = Agħżel app li tinfetaħ kull darba li tidħol.
+settings-apps-search = Fittex apps
+settings-apps-no-match = L-ebda app ma taqbel mat-tfittxija
+settings-apps-cancel = Ikkanċella

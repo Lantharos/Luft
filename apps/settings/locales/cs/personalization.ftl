@@ -67,7 +67,6 @@ settings-appearance-tint-slate = Břidlicová
 
 ## Appearance: text and motion
 
-settings-appearance-taskbar = Hlavní panel
 settings-appearance-text-and-motion = Text a pohyb
 settings-appearance-text-size = Velikost textu
 settings-appearance-text-size-description = Zvětší nebo zmenší text ve všech aplikacích
@@ -76,8 +75,6 @@ settings-appearance-animations-description = Okna a nabídky se plynule pohybuj�
 
 ## Taskbar
 
-settings-taskbar-title = Hlavní panel a nabídka Start
-settings-taskbar-back = Vzhled
 settings-taskbar-preview = Náhled hlavního panelu
 settings-start-section = Start
 settings-start-style = Styl
@@ -230,7 +227,6 @@ settings-notifications-done = Hotovo
 
 settings-tiling-preview = Náhled uspořádání oken
 settings-tiling-title = Dlaždicové uspořádání oken
-settings-tiling-back = Vzhled
 settings-tiling-mode = Uspořádání oken
 settings-tiling-mode-off = Vypnuto
 settings-tiling-mode-tiling = Dlaždice

@@ -3,16 +3,21 @@
 settings-search = Αναζήτηση ρυθμίσεων
 settings-search-empty = Δεν βρέθηκε τίποτα.
 
+## Sidebar groups
+
+settings-group-connections = Συνδέσεις
+settings-group-devices = Συσκευές
+settings-group-look = Εμφάνιση και αίσθηση
+settings-group-protection = Προστασία
+settings-group-system = Σύστημα
+
 ## Panel titles that depend on the hardware
 
 settings-power-title = Ενέργεια
-settings-mouse-title = Ποντίκι
-settings-touchpad-title = Επιφάνεια αφής
 
 ## Missing hardware
 
 settings-bluetooth-missing = Αυτός ο υπολογιστής δεν διαθέτει προσαρμογέα Bluetooth
-settings-mouse-missing = Δεν είναι συνδεδεμένο ποντίκι ή επιφάνεια αφής
 
 ## Shared pieces
 

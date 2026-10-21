@@ -4,7 +4,6 @@
 	import { app } from '#lib/state/app.svelte.js';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import { clearHistory } from './api';
-	import AppPermissions from './AppPermissions.svelte';
 	import { days, duration, including } from './format';
 
 	type Screensaver = { 'lock-enabled': boolean; 'lock-delay': number };
@@ -19,7 +18,6 @@
 		'remove-old-temp-files': boolean;
 		'old-files-age': number;
 	};
-
 
 	const screensaver = useSettings<Screensaver>('org.gnome.desktop.screensaver', ['lock-enabled', 'lock-delay']);
 	const session = useSettings<Session>('org.gnome.desktop.session', ['idle-delay']);
@@ -77,21 +75,13 @@
 	</Row>
 </Section>
 
-<Section title={t('settings-privacy-location')}>
+<Section>
 	<Row title={t('settings-privacy-location-services')} description={t('settings-privacy-location-services-hint')}>
 		<Switch label={t('settings-privacy-location-services')} checked={locating} onchange={(on) => location.set('enabled', on)} />
 	</Row>
-	<AppPermissions kind="location" disabled={!locating} />
-</Section>
-
-<Section title={t('settings-privacy-camera')}>
 	<Row title={t('settings-privacy-camera-allow')}>
 		<Switch label={t('settings-privacy-camera-allow')} checked={camera} onchange={(on) => privacy.set('disable-camera', !on)} />
 	</Row>
-	<AppPermissions kind="camera" disabled={!camera} />
-</Section>
-
-<Section title={t('settings-privacy-microphone')}>
 	<Row title={t('settings-privacy-microphone-allow')}>
 		<Switch
 			label={t('settings-privacy-microphone-allow')}

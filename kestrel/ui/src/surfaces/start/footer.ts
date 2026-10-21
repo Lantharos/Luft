@@ -47,7 +47,7 @@ export class StartFooter {
     this.powerButton.connect('clicked', () => this.setOpen(!this.open));
     this.actor.add_child(this.powerButton);
 
-    menus.bind(this.account, () => [{ label: t('start-account-settings'), run: () => menus.settings('users') }]);
+    menus.bind(this.account, () => [{ label: t('start-account-settings'), run: () => menus.settings('accounts') }]);
   }
 
   get sessionOpen(): boolean { return this.open; }

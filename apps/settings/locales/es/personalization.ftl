@@ -67,7 +67,6 @@ settings-appearance-tint-slate = Pizarra
 
 ## Appearance: text and motion
 
-settings-appearance-taskbar = Barra de tareas
 settings-appearance-text-and-motion = Texto y movimiento
 settings-appearance-text-size = Tamaño del texto
 settings-appearance-text-size-description = Agranda o reduce el texto en todas las aplicaciones
@@ -76,8 +75,6 @@ settings-appearance-animations-description = Las ventanas y los menús se despla
 
 ## Taskbar
 
-settings-taskbar-title = Barra de tareas e Inicio
-settings-taskbar-back = Apariencia
 settings-taskbar-preview = Vista previa de la barra de tareas
 settings-start-section = Inicio
 settings-start-style = Estilo
@@ -226,7 +223,6 @@ settings-notifications-done = Listo
 
 settings-tiling-preview = Vista previa de la disposición de ventanas
 settings-tiling-title = Mosaico de ventanas
-settings-tiling-back = Apariencia
 settings-tiling-mode = Organizar ventanas
 settings-tiling-mode-off = Desactivado
 settings-tiling-mode-tiling = Mosaico

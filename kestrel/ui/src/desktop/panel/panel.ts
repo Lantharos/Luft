@@ -124,7 +124,7 @@ export class KestrelPanel {
         const keys = this.appSystem.lookup_app(KEYS_APP);
         return [
           ...keys && layout ? [{ label: t('taskbar-show-keyboard-layout'), run: () => showLayout(keys, layout) }] : [],
-          { label: t('taskbar-keyboard-settings'), run: () => menus.settings('keyboard') },
+          { label: t('taskbar-keyboard-settings'), run: () => menus.settings('input') },
         ];
       });
       right.add_child(this.inputSource.actor);
@@ -168,11 +168,11 @@ export class KestrelPanel {
       return [
         { label: t('taskbar-show-desktop'), run: () => this.peek.toggleDesktop() },
         ...monitor ? [{ label: t('taskbar-system-monitor'), run: () => monitor.activate() }] : [],
-        { label: t('taskbar-settings'), run: () => menus.settings('appearance/taskbar') },
+        { label: t('taskbar-settings'), run: () => menus.settings('desktop') },
       ];
     });
     menus.bind(this.clockButton, () => [
-      { label: t('taskbar-date-time-settings'), run: () => menus.settings('datetime') },
+      { label: t('taskbar-date-time-settings'), run: () => menus.settings('language') },
     ]);
     this.syncWorkspaceWindows();
     this.refreshApps();

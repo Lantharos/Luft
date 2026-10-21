@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { PasswordField } from '@luft/ui';
-	import StrengthMeter from '#lib/panels/system/users/StrengthMeter.svelte';
-	import { MINIMUM_LENGTH, measure } from '#lib/panels/system/users/strength.js';
+	import StrengthMeter from '#lib/panels/system/accounts/users/StrengthMeter.svelte';
+	import { MINIMUM_LENGTH, measure } from '#lib/panels/system/accounts/users/strength.js';
 
 	interface Props {
 		passphrase: string;

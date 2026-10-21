@@ -1,1 +1,2 @@
-apps/settings/src/lib/panels/system/about/AboutPanel.svelte	Kestrel
+apps/settings/src/lib/panels/system/system/about/AboutPage.svelte	Kestrel
+apps/settings/src/lib/panels/system/accounts/online/SignInDialog.svelte	you@icloud.com

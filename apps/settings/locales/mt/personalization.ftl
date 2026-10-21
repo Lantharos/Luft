@@ -67,7 +67,6 @@ settings-appearance-tint-slate = Griż blu
 
 ## Appearance: text and motion
 
-settings-appearance-taskbar = Taskbar
 settings-appearance-text-and-motion = Test u moviment
 settings-appearance-text-size = Daqs tat-test
 settings-appearance-text-size-description = Ikabbar jew iċekken it-test fl-apps kollha
@@ -76,8 +75,6 @@ settings-appearance-animations-description = It-twieqi u l-menus jiċċaqilqu mi
 
 ## Taskbar
 
-settings-taskbar-title = Taskbar u Start
-settings-taskbar-back = Dehra
 settings-taskbar-preview = Dehra tat-taskbar
 settings-start-section = Start
 settings-start-style = Stil
@@ -232,7 +229,6 @@ settings-notifications-done = Lest
 
 settings-tiling-preview = Dehra minn qabel tal-arranġament tat-twieqi
 settings-tiling-title = Tqegħid tat-twieqi ħdejn xulxin
-settings-tiling-back = Dehra
 settings-tiling-mode = Irranġa t-twieqi
 settings-tiling-mode-off = Mitfi
 settings-tiling-mode-tiling = Ħdejn xulxin

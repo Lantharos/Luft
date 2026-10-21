@@ -67,7 +67,6 @@ settings-appearance-tint-slate = Schiefer
 
 ## Appearance: text and motion
 
-settings-appearance-taskbar = Taskleiste
 settings-appearance-text-and-motion = Text und Bewegung
 settings-appearance-text-size = Textgröße
 settings-appearance-text-size-description = Macht Text in allen Apps größer oder kleiner
@@ -76,8 +75,6 @@ settings-appearance-animations-description = Fenster und Menüs bewegen sich, st
 
 ## Taskbar
 
-settings-taskbar-title = Taskleiste und Start
-settings-taskbar-back = Erscheinungsbild
 settings-taskbar-preview = Vorschau der Taskleiste
 settings-start-section = Start
 settings-start-style = Stil
@@ -226,7 +223,6 @@ settings-notifications-done = Fertig
 
 settings-tiling-preview = Vorschau der Fensteranordnung
 settings-tiling-title = Fenster kacheln
-settings-tiling-back = Darstellung
 settings-tiling-mode = Fenster anordnen
 settings-tiling-mode-off = Aus
 settings-tiling-mode-tiling = Kacheln

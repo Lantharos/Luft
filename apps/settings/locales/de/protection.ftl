@@ -28,7 +28,6 @@ settings-privacy-location-services = Ortungsdienste
 settings-privacy-location-services-hint = Lässt Apps herausfinden, wo du bist – für Karten, Wetter und Zeitzonen
 settings-privacy-camera = Kamera
 settings-privacy-camera-allow = Apps die Kamera verwenden lassen
-settings-privacy-microphone = Mikrofon
 settings-privacy-microphone-allow = Apps das Mikrofon verwenden lassen
 settings-privacy-apps-asked = Apps, die gefragt haben
 settings-privacy-apps-allowed = { $allowed } von { $total } zugelassen
@@ -345,7 +344,6 @@ settings-passwords-apps-asked = { $count ->
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-back = Sicherheit
 settings-passwords-access-description = Wenn du eine entfernst, fragt die App beim nächsten Mal erneut.
 settings-passwords-access-not-allowed = Nicht zugelassen
 settings-passwords-access-none = Noch keine App hat nach deinen Passwörtern gefragt
@@ -435,3 +433,26 @@ settings-passkeys-rename-title = Passkey umbenennen
 settings-passkeys-rename-description = Gib deinem Passkey für { $site } einen Namen, den du wiedererkennst.
 settings-passkeys-name = Name
 settings-passkeys-save = Speichern
+
+## Apps
+
+settings-apps-defaults = Standard-Apps
+settings-apps-defaults-description = Werden verwendet, wenn du Links, Dateien und Ordner öffnest
+settings-apps-browser = Webbrowser
+settings-apps-email = E-Mail
+settings-apps-calendar = Kalender
+settings-apps-music = Musik
+settings-apps-videos = Videos
+settings-apps-photos = Fotos
+settings-apps-text-editor = Texteditor
+settings-apps-files = Dateien
+settings-apps-choose = Auswählen
+settings-apps-startup = Autostart
+settings-apps-startup-description = Diese Apps öffnen sich, wenn du dich anmeldest
+settings-apps-startup-app = { $app } bei der Anmeldung öffnen
+settings-apps-startup-add = App hinzufügen
+settings-apps-startup-add-title = Autostart-App hinzufügen
+settings-apps-startup-add-description = Wähl eine App, die sich bei jeder Anmeldung öffnet.
+settings-apps-search = Apps suchen
+settings-apps-no-match = Keine Apps passen zu deiner Suche
+settings-apps-cancel = Abbrechen

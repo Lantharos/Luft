@@ -72,7 +72,6 @@ settings-network-known-count = { $count ->
        *[other] { $count } tallennettua verkkoa
     }
 settings-network-known-in-range = Kantaman sisällä
-settings-network-wired = Kiinteä
 settings-network-ethernet = Ethernet
 settings-network-ethernet-named = Ethernet ({ $name })
 settings-network-wired-connected = Yhdistetty · { $speed }
@@ -357,85 +356,3 @@ settings-bluetooth-windows-more = { $count ->
         [one] { $count } muu
        *[other] { $count } muuta
     }
-
-## Accounts panel
-
-settings-accounts-unavailable = Tilit eivät ole käytettävissä
-    .description = Tilipalvelua ei ole asennettu tähän tietokoneeseen
-settings-accounts-online = Verkkotilit
-    .description = Jokainen tili on kansio kotikansiosi Cloud-kansiossa, ja kaikki sovellukset voivat avata sen. Tiedostot ladataan, kun avaat ne.
-settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud tai WebDAV
-
-## Accounts: an account's row
-
-settings-accounts-sign-in-again-needed = Kirjaudu uudelleen, jotta voit jatkaa käyttöä
-settings-accounts-paused-metered = Synkronointi keskeytetty käytön mukaan laskutettavassa yhteydessä
-settings-accounts-paused-battery = Synkronointi keskeytetty, koska akun varaus on vähissä
-settings-accounts-connecting = Yhdistetään…
-settings-accounts-offline = Offline-tilassa
-settings-accounts-offline-kept = Offline-tilassa, säilytetyt tiedostot ovat yhä käytettävissä
-settings-accounts-not-connected = Ei yhdistetty
-settings-accounts-syncing = { $count ->
-        [one] Synkronoidaan { $count } muutos
-       *[other] Synkronoidaan { $count } muutosta
-    }
-settings-accounts-name = Nimi
-settings-accounts-folder = Kansio
-settings-accounts-server = Palvelin
-settings-accounts-storage = Tallennustila
-settings-accounts-storage-used = { $used } / { $total } käytössä
-settings-accounts-on-device = Tällä laitteella
-settings-accounts-kept = { $count ->
-        [one] { $count } kohde säilytetty, loput ladataan avattaessa
-       *[other] { $count } kohdetta säilytetty, loput ladataan avattaessa
-    }
-settings-accounts-on-demand = Tiedostot ladataan, kun avaat ne
-settings-accounts-sign-in-again = Kirjaudu uudelleen
-settings-accounts-keep = Säilytä
-settings-accounts-remove = Poista
-settings-accounts-remove-confirm = Poista tästä tietokoneesta
-settings-accounts-removing = Poistetaan…
-settings-accounts-remove-note = Tiedostosi pysyvät palvelussa { $provider }. Täällä tehdyt muutokset lähetetään ensin.
-
-## Accounts: providers
-
-settings-accounts-provider-icloud = Apple-tilisi, vahvistus koodilla iPhonesta, iPadista tai Macista
-settings-accounts-provider-onedrive = Henkilökohtainen, työpaikan tai koulun Microsoft-tili selaimessa
-settings-accounts-provider-dropbox = Dropbox-tili selaimessa
-settings-accounts-provider-nextcloud = Oma tai organisaatiosi palvelin
-settings-accounts-provider-webdav = Mikä tahansa WebDAV-palvelin
-
-## Accounts: signing in
-
-settings-accounts-sign-in-again-title = Kirjaudu uudelleen: { $account }
-settings-accounts-browser = { $provider } -kirjautuminen avautuu selaimeen. Luft ei koskaan näe salasanaasi.
-settings-accounts-password-for = Anna tilin { $user } salasana.
-settings-accounts-apple-account = Apple-tili
-settings-accounts-password = Salasana
-settings-accounts-app-password = Sovelluksen salasana
-settings-accounts-user = Käyttäjänimi
-settings-accounts-apple-note = Käytä Apple-tilisi salasanaa; sovelluskohtaiset salasanat eivät toimi tässä. Apple näyttää sen jälkeen koodin iPhonessa, iPadissa tai Macissa.
-settings-accounts-nextcloud-browser = Selain avautuu, jotta voit kirjautua palvelimellesi ja antaa Luftille pääsyn.
-settings-accounts-use-app-password = Käytä sen sijaan sovelluksen salasanaa
-settings-accounts-error-server = Anna palvelimen osoite
-settings-accounts-error-apple-account = Anna Apple-tilisi sähköpostiosoite
-settings-accounts-error-user = Anna käyttäjänimi
-settings-accounts-error-password = Anna salasana
-settings-accounts-cancel = Peruuta
-settings-accounts-back = Takaisin
-settings-accounts-continue-in-browser = Jatka selaimessa
-settings-accounts-sign-in = Kirjaudu sisään
-settings-accounts-try-again = Yritä uudelleen
-settings-accounts-continue = Jatka
-settings-accounts-working = Yhdistetään palveluun { $provider }…
-settings-accounts-finish-in-browser = Viimeistele { $provider } -kirjautuminen selaimessa. Luft ei koskaan näe salasanaasi, ja tämä näkymä päivittyy itsestään, kun olet valmis.
-settings-accounts-no-browser = Selain ei avautunut. Kopioi linkki ja avaa se selaimessa.
-settings-accounts-open-again = Avaa sivu uudelleen
-settings-accounts-copy-link = Kopioi linkki
-settings-accounts-copied = Kopioitu
-settings-accounts-code = Vahvistuskoodi
-    .placeholder = 6-numeroinen koodi
-settings-accounts-text-me = Lähetä koodi tekstiviestinä
-settings-accounts-choose-phone = Mihin numeroon Apple lähettää koodin?
-    .description = Lähetä tekstiviesti
-settings-accounts-approve = Apple-tilisi käyttää edistynyttä tietosuojaa. Hyväksy pyyntö iPhonessa, iPadissa tai Macissa, jotta tämä tietokone voi avata iCloud Driven.

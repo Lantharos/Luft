@@ -1,26 +1,3 @@
-## Apps
-
-settings-apps-defaults = Varsayılan uygulamalar
-settings-apps-defaults-description = Bağlantıları, dosyaları ve klasörleri açtığınızda kullanılır
-settings-apps-browser = Web tarayıcısı
-settings-apps-email = E-posta
-settings-apps-calendar = Takvim
-settings-apps-music = Müzik
-settings-apps-videos = Videolar
-settings-apps-photos = Fotoğraflar
-settings-apps-text-editor = Metin düzenleyici
-settings-apps-files = Dosyalar
-settings-apps-choose = Seçin
-settings-apps-startup = Başlangıç
-settings-apps-startup-description = Bu uygulamalar oturum açtığınızda açılır
-settings-apps-startup-app = Oturum açınca { $app } uygulamasını aç
-settings-apps-startup-add = Uygulama ekle
-settings-apps-startup-add-title = Başlangıç uygulaması ekle
-settings-apps-startup-add-description = Her oturum açtığınızda açılacak bir uygulama seçin.
-settings-apps-search = Uygulamalarda ara
-settings-apps-no-match = Aramanızla eşleşen uygulama yok
-settings-apps-cancel = İptal
-
 ## Date and time
 
 settings-datetime-automatic = Saati otomatik olarak ayarla
@@ -37,7 +14,6 @@ settings-datetime-format-24h = 24 saat
 settings-datetime-format-12h = ÖÖ/ÖS
 settings-datetime-seconds = Saniyeleri göster
 settings-datetime-weekday = Haftanın gününü göster
-settings-datetime-calendar = Takvim
 settings-datetime-week-start = Haftanın ilk günü
 settings-datetime-week-start-automatic = Otomatik
 settings-datetime-week-start-monday = Pazartesi
@@ -317,3 +293,85 @@ settings-region-formats-language = Dille aynı
 settings-region-formats = Biçimler
 settings-region-formats-description = Tarihler, saatler, sayılar ve ölçüler
 settings-region-formats-next-sign-in = { $sample }, bir sonraki oturum açmadan itibaren
+
+## Accounts panel
+
+settings-accounts-unavailable = Hesaplar kullanılamıyor
+    .description = Hesaplar hizmeti bu bilgisayarda yüklü değil
+settings-accounts-online = Çevrimiçi hesaplar
+    .description = Her hesap, ev klasörünüzdeki Cloud klasöründe bir klasördür ve her uygulama onu açabilir. Dosyalar, açtığınızda indirilir.
+settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud ya da WebDAV
+
+## Accounts: an account's row
+
+settings-accounts-sign-in-again-needed = Kullanmaya devam etmek için yeniden oturum açın
+settings-accounts-paused-metered = Tarifeli bağlantıda eşitleme duraklatıldı
+settings-accounts-paused-battery = Pil azken eşitleme duraklatıldı
+settings-accounts-connecting = Bağlanıyor…
+settings-accounts-offline = Çevrimdışı
+settings-accounts-offline-kept = Çevrimdışı, saklanan dosyalar hâlâ burada
+settings-accounts-not-connected = Bağlı değil
+settings-accounts-syncing = { $count ->
+        [one] { $count } değişiklik eşitleniyor
+       *[other] { $count } değişiklik eşitleniyor
+    }
+settings-accounts-name = Ad
+settings-accounts-folder = Klasör
+settings-accounts-server = Sunucu
+settings-accounts-storage = Depolama
+settings-accounts-storage-used = Kullanılan: { $used } / { $total }
+settings-accounts-on-device = Bu cihazda
+settings-accounts-kept = { $count ->
+        [one] { $count } öge saklanıyor, gerisi açıldığında indirilir
+       *[other] { $count } öge saklanıyor, gerisi açıldığında indirilir
+    }
+settings-accounts-on-demand = Dosyalar, açtığınızda indirilir
+settings-accounts-sign-in-again = Yeniden oturum aç
+settings-accounts-keep = Sakla
+settings-accounts-remove = Kaldır
+settings-accounts-remove-confirm = Bu bilgisayardan kaldır
+settings-accounts-removing = Kaldırılıyor…
+settings-accounts-remove-note = Dosyalarınız { $provider } hesabınızda kalır. Burada yapılan değişiklikler önce oraya gönderilir.
+
+## Accounts: providers
+
+settings-accounts-provider-icloud = iPhone, iPad ya da Mac’inize gelen kodla doğrulanan Apple Hesabınız
+settings-accounts-provider-onedrive = Kişisel, iş ya da okul Microsoft hesabı, tarayıcınızda
+settings-accounts-provider-dropbox = Dropbox hesabı, tarayıcınızda
+settings-accounts-provider-nextcloud = Kendi sunucunuz ya da kurumunuzun sunucusu
+settings-accounts-provider-webdav = WebDAV destekleyen herhangi bir sunucu
+
+## Accounts: signing in
+
+settings-accounts-sign-in-again-title = Yeniden oturum aç: { $account }
+settings-accounts-browser = { $provider } ile oturum açabilmeniz için tarayıcınız açılır. Luft parolanızı hiçbir zaman görmez.
+settings-accounts-password-for = { $user } hesabının parolasını girin.
+settings-accounts-apple-account = Apple Hesabı
+settings-accounts-password = Parola
+settings-accounts-app-password = Uygulama parolası
+settings-accounts-user = Kullanıcı adı
+settings-accounts-apple-note = Apple Hesabı parolanızı kullanın; uygulamaya özel parolalar burada çalışmaz. Ardından Apple, iPhone, iPad ya da Mac’inizde bir kod gösterir.
+settings-accounts-nextcloud-browser = Sunucunuzda oturum açıp Luft’a izin vermeniz için tarayıcınız açılır.
+settings-accounts-use-app-password = Bunun yerine uygulama parolası kullan
+settings-accounts-error-server = Sunucu adresini girin
+settings-accounts-error-apple-account = Apple Hesabınızın e-posta adresini girin
+settings-accounts-error-user = Kullanıcı adını girin
+settings-accounts-error-password = Parolayı girin
+settings-accounts-cancel = İptal
+settings-accounts-back = Geri
+settings-accounts-continue-in-browser = Tarayıcıda devam et
+settings-accounts-sign-in = Oturum aç
+settings-accounts-try-again = Yeniden dene
+settings-accounts-continue = Devam et
+settings-accounts-working = { $provider } ile iletişim kuruluyor…
+settings-accounts-finish-in-browser = Tarayıcınızda { $provider } ile oturum açmayı tamamlayın. Luft parolanızı hiçbir zaman görmez; işiniz bittiğinde bu sayfa kendiliğinden güncellenir.
+settings-accounts-no-browser = Tarayıcı açılmadı. Bağlantıyı kopyalayıp bir tarayıcıda açın.
+settings-accounts-open-again = Sayfayı yeniden aç
+settings-accounts-copy-link = Bağlantıyı kopyala
+settings-accounts-copied = Kopyalandı
+settings-accounts-code = Doğrulama kodu
+    .placeholder = 6 haneli kod
+settings-accounts-text-me = Bunun yerine kodu SMS ile gönder
+settings-accounts-choose-phone = Apple kodu hangi numaraya göndersin?
+    .description = SMS gönder
+settings-accounts-approve = Apple Hesabınız İleri Düzey Veri Koruması’nı kullanıyor. Bu bilgisayarın iCloud Drive’ı açabilmesi için iPhone, iPad ya da Mac’inizde isteği onaylayın.

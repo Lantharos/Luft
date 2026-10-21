@@ -3,16 +3,21 @@
 settings-search = Hae asetuksista
 settings-search-empty = Ei tuloksia.
 
+## Sidebar groups
+
+settings-group-connections = Yhteydet
+settings-group-devices = Laitteet
+settings-group-look = Ulkoasu ja tuntuma
+settings-group-protection = Suojaus
+settings-group-system = Järjestelmä
+
 ## Panel titles that depend on the hardware
 
 settings-power-title = Virta
-settings-mouse-title = Hiiri
-settings-touchpad-title = Kosketuslevy
 
 ## Missing hardware
 
 settings-bluetooth-missing = Tässä tietokoneessa ei ole Bluetooth-sovitinta
-settings-mouse-missing = Hiirtä tai kosketuslevyä ei ole liitetty
 
 ## Shared pieces
 

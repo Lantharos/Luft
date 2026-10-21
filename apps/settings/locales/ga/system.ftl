@@ -1,26 +1,3 @@
-## Apps
-
-settings-apps-defaults = Aipeanna réamhshocraithe
-settings-apps-defaults-description = Úsáidtear iad nuair a osclaíonn tú naisc, comhaid agus fillteáin
-settings-apps-browser = Brabhsálaí gréasáin
-settings-apps-email = Ríomhphost
-settings-apps-calendar = Féilire
-settings-apps-music = Ceol
-settings-apps-videos = Físeáin
-settings-apps-photos = Grianghraif
-settings-apps-text-editor = Eagarthóir téacs
-settings-apps-files = Comhaid
-settings-apps-choose = Roghnaigh
-settings-apps-startup = Tosú
-settings-apps-startup-description = Osclaítear na haipeanna seo nuair a shíníonn tú isteach
-settings-apps-startup-app = Oscail { $app } nuair a shíníonn tú isteach
-settings-apps-startup-add = Cuir aip leis
-settings-apps-startup-add-title = Cuir aip tosaithe leis
-settings-apps-startup-add-description = Roghnaigh aip le hoscailt gach uair a shíníonn tú isteach.
-settings-apps-search = Cuardaigh aipeanna
-settings-apps-no-match = Níl aon aip ag teacht le do chuardach
-settings-apps-cancel = Cealaigh
-
 ## Date and time
 
 settings-datetime-automatic = Socraigh an t-am go huathoibríoch
@@ -37,7 +14,6 @@ settings-datetime-format-24h = 24 uair
 settings-datetime-format-12h = r.n./i.n.
 settings-datetime-seconds = Taispeáin soicindí
 settings-datetime-weekday = Taispeáin lá na seachtaine
-settings-datetime-calendar = Féilire
 settings-datetime-week-start = Tosaíonn an tseachtain ar
 settings-datetime-week-start-automatic = Uathoibríoch
 settings-datetime-week-start-monday = Dé Luain
@@ -335,3 +311,91 @@ settings-region-formats-language = Mar an gcéanna leis an teanga
 settings-region-formats = Formáidí
 settings-region-formats-description = Dátaí, amanna, uimhreacha agus tomhais
 settings-region-formats-next-sign-in = { $sample }, ón gcéad síniú isteach eile
+
+## Accounts panel
+
+settings-accounts-unavailable = Níl cuntais ar fáil
+    .description = Níl an tseirbhís cuntas suiteáilte ar an ríomhaire seo
+settings-accounts-online = Cuntais ar líne
+    .description = Is fillteán san fhillteán Cloud i d’fhillteán baile é gach cuntas, agus is féidir le gach aip é a oscailt. Íoslódáiltear comhaid nuair a osclaíonn tú iad.
+settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud nó WebDAV
+
+## Accounts: an account's row
+
+settings-accounts-sign-in-again-needed = Sínigh isteach arís chun leanúint ar aghaidh ag úsáid an chuntais
+settings-accounts-paused-metered = Sioncrónú curtha ar sos ar cheangal méadraithe
+settings-accounts-paused-battery = Sioncrónú curtha ar sos fad atá an ceallra íseal
+settings-accounts-connecting = Ag ceangal…
+settings-accounts-offline = As líne
+settings-accounts-offline-kept = As líne, tá na comhaid choinnithe fós anseo
+settings-accounts-not-connected = Gan cheangal
+settings-accounts-syncing = { $count ->
+        [one] { $count } athrú á shioncrónú
+        [two] { $count } athrú á sioncrónú
+        [few] { $count } athrú á sioncrónú
+        [many] { $count } n-athrú á sioncrónú
+       *[other] { $count } athrú á sioncrónú
+    }
+settings-accounts-name = Ainm
+settings-accounts-folder = Fillteán
+settings-accounts-server = Freastalaí
+settings-accounts-storage = Stóras
+settings-accounts-storage-used = { $used } as { $total } in úsáid
+settings-accounts-on-device = Ar an ngléas seo
+settings-accounts-kept = { $count ->
+        [one] Coinníodh { $count } mhír, íoslódáiltear an chuid eile nuair a osclaítear iad
+        [two] Coinníodh { $count } mhír, íoslódáiltear an chuid eile nuair a osclaítear iad
+        [few] Coinníodh { $count } mhír, íoslódáiltear an chuid eile nuair a osclaítear iad
+        [many] Coinníodh { $count } mír, íoslódáiltear an chuid eile nuair a osclaítear iad
+       *[other] Coinníodh { $count } mír, íoslódáiltear an chuid eile nuair a osclaítear iad
+    }
+settings-accounts-on-demand = Íoslódáiltear comhaid nuair a osclaíonn tú iad
+settings-accounts-sign-in-again = Sínigh isteach arís
+settings-accounts-keep = Coinnigh
+settings-accounts-remove = Bain
+settings-accounts-remove-confirm = Bain den ríomhaire seo
+settings-accounts-removing = Á bhaint…
+settings-accounts-remove-note = Fanann do chomhaid ar { $provider }. Seoltar suas na hathruithe a rinneadh anseo ar dtús.
+
+## Accounts: providers
+
+settings-accounts-provider-icloud = Do chuntas Apple, deimhnithe le cód ó d’iPhone, d’iPad nó do Mac
+settings-accounts-provider-onedrive = Cuntas Microsoft pearsanta, oibre nó scoile, i do bhrabhsálaí
+settings-accounts-provider-dropbox = Cuntas Dropbox, i do bhrabhsálaí
+settings-accounts-provider-nextcloud = D’fhreastalaí féin nó freastalaí d’eagraíochta
+settings-accounts-provider-webdav = Aon fhreastalaí a labhraíonn WebDAV
+
+## Accounts: signing in
+
+settings-accounts-sign-in-again-title = Sínigh isteach ar { $account } arís
+settings-accounts-browser = Osclófar do bhrabhsálaí ionas gur féidir leat síniú isteach le { $provider }. Ní fheiceann Luft do phasfhocal riamh.
+settings-accounts-password-for = Cuir isteach an pasfhocal do { $user }.
+settings-accounts-apple-account = Cuntas Apple
+settings-accounts-password = Pasfhocal
+settings-accounts-app-password = Pasfhocal aipe
+settings-accounts-user = Ainm úsáideora
+settings-accounts-apple-note = Úsáid pasfhocal do chuntais Apple; ní oibríonn pasfhocail aipe-shonracha anseo. Taispeánfaidh Apple cód ansin ar d’iPhone, d’iPad nó do Mac.
+settings-accounts-nextcloud-browser = Osclófar do bhrabhsálaí ionas gur féidir leat síniú isteach ar d’fhreastalaí agus cead a thabhairt do Luft.
+settings-accounts-use-app-password = Úsáid pasfhocal aipe ina ionad
+settings-accounts-error-server = Cuir isteach seoladh an fhreastalaí
+settings-accounts-error-apple-account = Cuir isteach ríomhphost do chuntais Apple
+settings-accounts-error-user = Cuir isteach an t-ainm úsáideora
+settings-accounts-error-password = Cuir isteach an pasfhocal
+settings-accounts-cancel = Cealaigh
+settings-accounts-back = Ar ais
+settings-accounts-continue-in-browser = Lean ar aghaidh sa bhrabhsálaí
+settings-accounts-sign-in = Sínigh isteach
+settings-accounts-try-again = Bain triail eile as
+settings-accounts-continue = Lean ar aghaidh
+settings-accounts-working = Ag caint leis an tseirbhís { $provider }…
+settings-accounts-finish-in-browser = Críochnaigh an síniú isteach ar { $provider } i do bhrabhsálaí. Ní fheiceann Luft do phasfhocal riamh, agus nuashonrófar é seo leis féin nuair a bheidh tú réidh.
+settings-accounts-no-browser = Níor osclaíodh aon bhrabhsálaí. Cóipeáil an nasc agus oscail é i mbrabhsálaí.
+settings-accounts-open-again = Oscail an leathanach arís
+settings-accounts-copy-link = Cóipeáil an nasc
+settings-accounts-copied = Cóipeáilte
+settings-accounts-code = Cód fíoraithe
+    .placeholder = Cód 6 dhigit
+settings-accounts-text-me = Seol cód chugam i dteachtaireacht téacs ina ionad
+settings-accounts-choose-phone = Cén uimhir ar cheart do Apple an cód a sheoladh chuici?
+    .description = Seol teachtaireacht téacs
+settings-accounts-approve = Úsáideann do chuntas Apple Advanced Data Protection. Ceadaigh an t-iarratas ar d’iPhone, d’iPad nó do Mac ionas gur féidir leis an ríomhaire seo iCloud Drive a oscailt.

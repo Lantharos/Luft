@@ -72,7 +72,6 @@ settings-network-known-count = { $count ->
        *[other] { $count } gespeicherte Netzwerke
     }
 settings-network-known-in-range = In Reichweite
-settings-network-wired = Kabelgebunden
 settings-network-ethernet = Ethernet
 settings-network-ethernet-named = Ethernet ({ $name })
 settings-network-wired-connected = Verbunden · { $speed }
@@ -357,85 +356,3 @@ settings-bluetooth-windows-more = { $count ->
         [one] { $count } weiteres
        *[other] { $count } weitere
     }
-
-## Accounts panel
-
-settings-accounts-unavailable = Konten sind nicht verfügbar
-    .description = Der Kontodienst ist auf diesem Computer nicht installiert
-settings-accounts-online = Onlinekonten
-    .description = Jedes Konto ist ein Ordner unter Cloud in deinem persönlichen Ordner, den jede App öffnen kann. Dateien werden heruntergeladen, wenn du sie öffnest.
-settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud oder WebDAV
-
-## Accounts: an account's row
-
-settings-accounts-sign-in-again-needed = Melde dich erneut an, um es weiter zu nutzen
-settings-accounts-paused-metered = Synchronisierung bei getakteter Verbindung pausiert
-settings-accounts-paused-battery = Synchronisierung bei niedrigem Akkustand pausiert
-settings-accounts-connecting = Wird verbunden …
-settings-accounts-offline = Offline
-settings-accounts-offline-kept = Offline, behaltene Dateien sind weiterhin da
-settings-accounts-not-connected = Nicht verbunden
-settings-accounts-syncing = { $count ->
-        [one] { $count } Änderung wird synchronisiert
-       *[other] { $count } Änderungen werden synchronisiert
-    }
-settings-accounts-name = Name
-settings-accounts-folder = Ordner
-settings-accounts-server = Server
-settings-accounts-storage = Speicherplatz
-settings-accounts-storage-used = { $used } von { $total } belegt
-settings-accounts-on-device = Auf diesem Gerät
-settings-accounts-kept = { $count ->
-        [one] { $count } Element behalten, der Rest wird beim Öffnen heruntergeladen
-       *[other] { $count } Elemente behalten, der Rest wird beim Öffnen heruntergeladen
-    }
-settings-accounts-on-demand = Dateien werden beim Öffnen heruntergeladen
-settings-accounts-sign-in-again = Erneut anmelden
-settings-accounts-keep = Behalten
-settings-accounts-remove = Entfernen
-settings-accounts-remove-confirm = Von diesem Computer entfernen
-settings-accounts-removing = Wird entfernt …
-settings-accounts-remove-note = Deine Dateien bleiben in { $provider }. Änderungen von hier werden vorher hochgeladen.
-
-## Accounts: providers
-
-settings-accounts-provider-icloud = Dein Apple Account, bestätigt mit einem Code von deinem iPhone, iPad oder Mac
-settings-accounts-provider-onedrive = Ein privates, Arbeits- oder Schulkonto von Microsoft, im Browser
-settings-accounts-provider-dropbox = Ein Dropbox-Konto, im Browser
-settings-accounts-provider-nextcloud = Dein eigener Server oder der deiner Organisation
-settings-accounts-provider-webdav = Jeder Server, der WebDAV unterstützt
-
-## Accounts: signing in
-
-settings-accounts-sign-in-again-title = Erneut bei { $account } anmelden
-settings-accounts-browser = Dein Browser öffnet sich, damit du dich bei { $provider } anmelden kannst. Luft sieht dein Passwort nie.
-settings-accounts-password-for = Gib das Passwort für { $user } ein.
-settings-accounts-apple-account = Apple Account
-settings-accounts-password = Passwort
-settings-accounts-app-password = App-Passwort
-settings-accounts-user = Benutzername
-settings-accounts-apple-note = Verwende das Passwort deines Apple Accounts; app-spezifische Passwörter funktionieren hier nicht. Apple zeigt dann einen Code auf deinem iPhone, iPad oder Mac an.
-settings-accounts-nextcloud-browser = Dein Browser öffnet sich, damit du dich bei deinem Server anmelden und Luft Zugriff geben kannst.
-settings-accounts-use-app-password = Stattdessen ein App-Passwort verwenden
-settings-accounts-error-server = Gib die Serveradresse ein
-settings-accounts-error-apple-account = Gib die E-Mail-Adresse deines Apple Accounts ein
-settings-accounts-error-user = Gib den Benutzernamen ein
-settings-accounts-error-password = Gib das Passwort ein
-settings-accounts-cancel = Abbrechen
-settings-accounts-back = Zurück
-settings-accounts-continue-in-browser = Im Browser fortfahren
-settings-accounts-sign-in = Anmelden
-settings-accounts-try-again = Erneut versuchen
-settings-accounts-continue = Weiter
-settings-accounts-working = Verbindung mit { $provider } …
-settings-accounts-finish-in-browser = Schließ die Anmeldung bei { $provider } in deinem Browser ab. Luft sieht dein Passwort nie, und diese Ansicht aktualisiert sich von selbst, sobald du fertig bist.
-settings-accounts-no-browser = Es wurde kein Browser geöffnet. Kopier den Link und öffne ihn in einem Browser.
-settings-accounts-open-again = Seite erneut öffnen
-settings-accounts-copy-link = Link kopieren
-settings-accounts-copied = Kopiert
-settings-accounts-code = Bestätigungscode
-    .placeholder = 6-stelliger Code
-settings-accounts-text-me = Code stattdessen per SMS senden
-settings-accounts-choose-phone = An welche Nummer soll Apple den Code senden?
-    .description = SMS senden
-settings-accounts-approve = Dein Apple Account verwendet den erweiterten Datenschutz. Bestätige die Anfrage auf deinem iPhone, iPad oder Mac, damit dieser Computer iCloud Drive öffnen kann.

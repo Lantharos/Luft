@@ -1,26 +1,3 @@
-## Apps
-
-settings-apps-defaults = Aplicacions predeterminades
-settings-apps-defaults-description = S’utilitzen quan obriu enllaços, fitxers i carpetes
-settings-apps-browser = Navegador web
-settings-apps-email = Correu electrònic
-settings-apps-calendar = Calendari
-settings-apps-music = Música
-settings-apps-videos = Vídeos
-settings-apps-photos = Fotos
-settings-apps-text-editor = Editor de text
-settings-apps-files = Fitxers
-settings-apps-choose = Trieu
-settings-apps-startup = Arrencada
-settings-apps-startup-description = Aquestes aplicacions s’obren quan inicieu la sessió
-settings-apps-startup-app = Obre { $app } en iniciar la sessió
-settings-apps-startup-add = Afegeix una aplicació
-settings-apps-startup-add-title = Afegiu una aplicació d’arrencada
-settings-apps-startup-add-description = Trieu una aplicació que s’obri cada vegada que inicieu la sessió.
-settings-apps-search = Cerca aplicacions
-settings-apps-no-match = Cap aplicació no coincideix amb la cerca
-settings-apps-cancel = Cancel·la
-
 ## Date and time
 
 settings-datetime-automatic = Defineix l’hora automàticament
@@ -37,7 +14,6 @@ settings-datetime-format-24h = 24 hores
 settings-datetime-format-12h = a. m./p. m.
 settings-datetime-seconds = Mostra els segons
 settings-datetime-weekday = Mostra el dia de la setmana
-settings-datetime-calendar = Calendari
 settings-datetime-week-start = La setmana comença el
 settings-datetime-week-start-automatic = Automàtic
 settings-datetime-week-start-monday = Dilluns
@@ -317,3 +293,85 @@ settings-region-formats-language = Els mateixos que la llengua
 settings-region-formats = Formats
 settings-region-formats-description = Dates, hores, números i mesures
 settings-region-formats-next-sign-in = { $sample }, a partir del pròxim inici de sessió
+
+## Accounts panel
+
+settings-accounts-unavailable = Els comptes no estan disponibles
+    .description = El servei de comptes no està instal·lat en aquest ordinador
+settings-accounts-online = Comptes en línia
+    .description = Cada compte és una carpeta dins de Cloud, a la vostra carpeta personal, que qualsevol aplicació pot obrir. Els fitxers es baixen quan els obriu.
+settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud o WebDAV
+
+## Accounts: an account's row
+
+settings-accounts-sign-in-again-needed = Torneu a iniciar la sessió per continuar fent-lo servir
+settings-accounts-paused-metered = Sincronització en pausa en una connexió amb límit de dades
+settings-accounts-paused-battery = Sincronització en pausa mentre la bateria és baixa
+settings-accounts-connecting = S’està connectant…
+settings-accounts-offline = Fora de línia
+settings-accounts-offline-kept = Fora de línia, els fitxers conservats continuen aquí
+settings-accounts-not-connected = No connectat
+settings-accounts-syncing = { $count ->
+        [one] S’està sincronitzant { $count } canvi
+       *[other] S’estan sincronitzant { $count } canvis
+    }
+settings-accounts-name = Nom
+settings-accounts-folder = Carpeta
+settings-accounts-server = Servidor
+settings-accounts-storage = Emmagatzematge
+settings-accounts-storage-used = { $used } de { $total } en ús
+settings-accounts-on-device = En aquest dispositiu
+settings-accounts-kept = { $count ->
+        [one] { $count } element conservat, la resta es baixa quan s’obre
+       *[other] { $count } elements conservats, la resta es baixa quan s’obre
+    }
+settings-accounts-on-demand = Els fitxers es baixen quan els obriu
+settings-accounts-sign-in-again = Torna a iniciar la sessió
+settings-accounts-keep = Conserva
+settings-accounts-remove = Treu
+settings-accounts-remove-confirm = Treu d’aquest ordinador
+settings-accounts-removing = S’està traient…
+settings-accounts-remove-note = Els fitxers es queden a { $provider }. Abans s’hi envien els canvis fets aquí.
+
+## Accounts: providers
+
+settings-accounts-provider-icloud = El vostre compte d’Apple, confirmat amb un codi de l’iPhone, l’iPad o el Mac
+settings-accounts-provider-onedrive = Un compte de Microsoft personal, de la feina o de l’escola, al navegador
+settings-accounts-provider-dropbox = Un compte de Dropbox, al navegador
+settings-accounts-provider-nextcloud = Un servidor propi o de la vostra organització
+settings-accounts-provider-webdav = Qualsevol servidor compatible amb WebDAV
+
+## Accounts: signing in
+
+settings-accounts-sign-in-again-title = Torneu a iniciar la sessió a { $account }
+settings-accounts-browser = S’obrirà el navegador perquè inicieu la sessió amb { $provider }. Luft no veu mai la vostra contrasenya.
+settings-accounts-password-for = Introduïu la contrasenya de { $user }.
+settings-accounts-apple-account = Compte d’Apple
+settings-accounts-password = Contrasenya
+settings-accounts-app-password = Contrasenya d’aplicació
+settings-accounts-user = Nom d’usuari
+settings-accounts-apple-note = Feu servir la contrasenya del compte d’Apple; aquí no funcionen les contrasenyes específiques d’aplicació. Després, Apple mostrarà un codi a l’iPhone, l’iPad o el Mac.
+settings-accounts-nextcloud-browser = S’obrirà el navegador perquè inicieu la sessió al servidor i hi doneu accés a Luft.
+settings-accounts-use-app-password = Fes servir una contrasenya d’aplicació
+settings-accounts-error-server = Introduïu l’adreça del servidor
+settings-accounts-error-apple-account = Introduïu l’adreça electrònica del compte d’Apple
+settings-accounts-error-user = Introduïu el nom d’usuari
+settings-accounts-error-password = Introduïu la contrasenya
+settings-accounts-cancel = Cancel·la
+settings-accounts-back = Enrere
+settings-accounts-continue-in-browser = Continua al navegador
+settings-accounts-sign-in = Inicia la sessió
+settings-accounts-try-again = Torna-ho a provar
+settings-accounts-continue = Continua
+settings-accounts-working = S’està connectant amb { $provider }…
+settings-accounts-finish-in-browser = Acabeu d’iniciar la sessió amb { $provider } al navegador. Luft no veu mai la vostra contrasenya, i això s’actualitzarà sol quan hàgiu acabat.
+settings-accounts-no-browser = No s’ha obert cap navegador. Copieu l’enllaç i obriu-lo en un navegador.
+settings-accounts-open-again = Torna a obrir la pàgina
+settings-accounts-copy-link = Copia l’enllaç
+settings-accounts-copied = Copiat
+settings-accounts-code = Codi de verificació
+    .placeholder = Codi de 6 dígits
+settings-accounts-text-me = Envia’m un codi per SMS
+settings-accounts-choose-phone = A quin número ha d’enviar Apple el codi?
+    .description = Envia un SMS
+settings-accounts-approve = El vostre compte d’Apple fa servir la protecció de dades avançada. Aproveu la sol·licitud a l’iPhone, l’iPad o el Mac perquè aquest ordinador pugui obrir l’iCloud Drive.

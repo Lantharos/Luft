@@ -3,16 +3,21 @@
 settings-search = Søg i indstillinger
 settings-search-empty = Ingen resultater.
 
+## Sidebar groups
+
+settings-group-connections = Forbindelser
+settings-group-devices = Enheder
+settings-group-look = Udseende og fornemmelse
+settings-group-protection = Beskyttelse
+settings-group-system = System
+
 ## Panel titles that depend on the hardware
 
 settings-power-title = Strøm
-settings-mouse-title = Mus
-settings-touchpad-title = Touchpad
 
 ## Missing hardware
 
 settings-bluetooth-missing = Denne computer har ingen Bluetooth-adapter
-settings-mouse-missing = Ingen mus eller touchpad er tilsluttet
 
 ## Shared pieces
 

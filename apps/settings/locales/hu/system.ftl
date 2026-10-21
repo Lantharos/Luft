@@ -1,26 +1,3 @@
-## Apps
-
-settings-apps-defaults = Alapértelmezett alkalmazások
-settings-apps-defaults-description = Hivatkozások, fájlok és mappák megnyitásakor használatosak
-settings-apps-browser = Webböngésző
-settings-apps-email = E-mail
-settings-apps-calendar = Naptár
-settings-apps-music = Zene
-settings-apps-videos = Videók
-settings-apps-photos = Fényképek
-settings-apps-text-editor = Szövegszerkesztő
-settings-apps-files = Fájlok
-settings-apps-choose = Válasszon
-settings-apps-startup = Indítás
-settings-apps-startup-description = Ezek az alkalmazások bejelentkezéskor megnyílnak
-settings-apps-startup-app = Megnyitás bejelentkezéskor: { $app }
-settings-apps-startup-add = Alkalmazás hozzáadása
-settings-apps-startup-add-title = Indítási alkalmazás hozzáadása
-settings-apps-startup-add-description = Válassza ki, melyik alkalmazás nyíljon meg minden bejelentkezéskor.
-settings-apps-search = Alkalmazások keresése
-settings-apps-no-match = Egy alkalmazás sem felel meg a keresésnek
-settings-apps-cancel = Mégse
-
 ## Date and time
 
 settings-datetime-automatic = Idő automatikus beállítása
@@ -37,7 +14,6 @@ settings-datetime-format-24h = 24 órás
 settings-datetime-format-12h = De./du.
 settings-datetime-seconds = Másodpercek megjelenítése
 settings-datetime-weekday = A hét napjának megjelenítése
-settings-datetime-calendar = Naptár
 settings-datetime-week-start = A hét első napja
 settings-datetime-week-start-automatic = Automatikus
 settings-datetime-week-start-monday = Hétfő
@@ -317,3 +293,85 @@ settings-region-formats-language = Ugyanaz, mint a nyelv
 settings-region-formats = Formátumok
 settings-region-formats-description = Dátumok, időpontok, számok és mértékegységek
 settings-region-formats-next-sign-in = { $sample }, a következő bejelentkezéstől
+
+## Accounts panel
+
+settings-accounts-unavailable = A fiókok nem érhetők el
+    .description = A fiókszolgáltatás nincs telepítve ezen a számítógépen
+settings-accounts-online = Online fiókok
+    .description = Minden fiók egy mappa a Saját mappában lévő Cloud mappán belül, amelyet bármely alkalmazás megnyithat. A fájlok megnyitáskor töltődnek le.
+settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud vagy WebDAV
+
+## Accounts: an account's row
+
+settings-accounts-sign-in-again-needed = A további használathoz jelentkezzen be újra
+settings-accounts-paused-metered = A szinkronizálás szünetel forgalomkorlátos kapcsolaton
+settings-accounts-paused-battery = A szinkronizálás szünetel, amíg alacsony az akkumulátor töltöttsége
+settings-accounts-connecting = Csatlakozás…
+settings-accounts-offline = Offline
+settings-accounts-offline-kept = Offline, a megtartott fájlok továbbra is elérhetők
+settings-accounts-not-connected = Nincs csatlakozva
+settings-accounts-syncing = { $count ->
+        [one] { $count } módosítás szinkronizálása
+       *[other] { $count } módosítás szinkronizálása
+    }
+settings-accounts-name = Név
+settings-accounts-folder = Mappa
+settings-accounts-server = Kiszolgáló
+settings-accounts-storage = Tárhely
+settings-accounts-storage-used = Foglalt: { $used } / { $total }
+settings-accounts-on-device = Ezen az eszközön
+settings-accounts-kept = { $count ->
+        [one] { $count } elem megtartva, a többi megnyitáskor töltődik le
+       *[other] { $count } elem megtartva, a többi megnyitáskor töltődik le
+    }
+settings-accounts-on-demand = A fájlok megnyitáskor töltődnek le
+settings-accounts-sign-in-again = Újbóli bejelentkezés
+settings-accounts-keep = Megtartás
+settings-accounts-remove = Eltávolítás
+settings-accounts-remove-confirm = Eltávolítás erről a számítógépről
+settings-accounts-removing = Eltávolítás…
+settings-accounts-remove-note = A fájlok megmaradnak itt: { $provider }. Az itt végzett módosítások előbb feltöltődnek.
+
+## Accounts: providers
+
+settings-accounts-provider-icloud = Apple-fiókja, iPhone-on, iPaden vagy Macen kapott kóddal megerősítve
+settings-accounts-provider-onedrive = Személyes, munkahelyi vagy iskolai Microsoft-fiók, a böngészőben
+settings-accounts-provider-dropbox = Dropbox-fiók, a böngészőben
+settings-accounts-provider-nextcloud = Saját vagy a szervezete kiszolgálója
+settings-accounts-provider-webdav = Bármely WebDAV-kiszolgáló
+
+## Accounts: signing in
+
+settings-accounts-sign-in-again-title = Újbóli bejelentkezés: { $account }
+settings-accounts-browser = Megnyílik a böngésző, ahol bejelentkezhet { $provider } fiókjával. A Luft sosem látja a jelszavát.
+settings-accounts-password-for = Adja meg a jelszót ehhez: { $user }.
+settings-accounts-apple-account = Apple-fiók
+settings-accounts-password = Jelszó
+settings-accounts-app-password = Alkalmazásjelszó
+settings-accounts-user = Felhasználónév
+settings-accounts-apple-note = Apple-fiókja jelszavát használja; az alkalmazásspecifikus jelszavak itt nem működnek. Ezután az Apple egy kódot jelenít meg iPhone-ján, iPadjén vagy Macjén.
+settings-accounts-nextcloud-browser = Megnyílik a böngésző, ahol bejelentkezhet a kiszolgálójára, és hozzáférést adhat a Luftnak.
+settings-accounts-use-app-password = Inkább alkalmazásjelszó használata
+settings-accounts-error-server = Adja meg a kiszolgáló címét
+settings-accounts-error-apple-account = Adja meg Apple-fiókja e-mail-címét
+settings-accounts-error-user = Adja meg a felhasználónevet
+settings-accounts-error-password = Adja meg a jelszót
+settings-accounts-cancel = Mégse
+settings-accounts-back = Vissza
+settings-accounts-continue-in-browser = Folytatás a böngészőben
+settings-accounts-sign-in = Bejelentkezés
+settings-accounts-try-again = Újra
+settings-accounts-continue = Tovább
+settings-accounts-working = Kapcsolódás ehhez: { $provider }…
+settings-accounts-finish-in-browser = Fejezze be a bejelentkezést { $provider } fiókjával a böngészőben. A Luft sosem látja a jelszavát, és ez az oldal magától frissül, amint végzett.
+settings-accounts-no-browser = Nem nyílt meg böngésző. Másolja ki a hivatkozást, és nyissa meg egy böngészőben.
+settings-accounts-open-again = Oldal újbóli megnyitása
+settings-accounts-copy-link = Hivatkozás másolása
+settings-accounts-copied = Másolva
+settings-accounts-code = Ellenőrző kód
+    .placeholder = 6 számjegyű kód
+settings-accounts-text-me = Inkább SMS-ben kérem a kódot
+settings-accounts-choose-phone = Melyik telefonszámra küldje az Apple a kódot?
+    .description = SMS küldése
+settings-accounts-approve = Apple-fiókjában be van kapcsolva a Speciális adatvédelem. Hagyja jóvá a kérést iPhone-ján, iPadjén vagy Macjén, hogy ez a számítógép megnyithassa az iCloud Drive-ot.

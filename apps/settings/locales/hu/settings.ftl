@@ -3,16 +3,21 @@
 settings-search = Keresés a beállításokban
 settings-search-empty = Nincs találat.
 
+## Sidebar groups
+
+settings-group-connections = Kapcsolatok
+settings-group-devices = Eszközök
+settings-group-look = Megjelenés és élmény
+settings-group-protection = Védelem
+settings-group-system = Rendszer
+
 ## Panel titles that depend on the hardware
 
 settings-power-title = Tápellátás
-settings-mouse-title = Egér
-settings-touchpad-title = Érintőpad
 
 ## Missing hardware
 
 settings-bluetooth-missing = Ebben a számítógépben nincs Bluetooth-adapter
-settings-mouse-missing = Nincs csatlakoztatva egér vagy érintőpad
 
 ## Shared pieces
 

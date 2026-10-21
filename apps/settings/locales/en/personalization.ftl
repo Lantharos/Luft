@@ -78,7 +78,6 @@ settings-appearance-tint-slate = Slate
 
 ## Appearance: text and motion
 
-settings-appearance-taskbar = Taskbar
 settings-appearance-text-and-motion = Text and motion
 settings-appearance-text-size = Text size
 settings-appearance-text-size-description = Makes text larger or smaller across apps
@@ -87,9 +86,6 @@ settings-appearance-animations-description = Windows and menus move instead of a
 
 ## Taskbar
 
-settings-taskbar-title = Taskbar and Start
-# Back button to the Appearance page
-settings-taskbar-back = Appearance
 # Screen-reader label of the taskbar preview picture
 settings-taskbar-preview = Taskbar preview
 settings-start-section = Start
@@ -263,7 +259,6 @@ settings-notifications-done = Done
 
 settings-tiling-preview = Window arrangement preview
 settings-tiling-title = Window tiling
-settings-tiling-back = Appearance
 settings-tiling-mode = Arrange windows
 settings-tiling-mode-off = Off
 settings-tiling-mode-tiling = Tiling

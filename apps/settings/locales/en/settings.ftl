@@ -5,19 +5,23 @@ settings-search = Search settings
 # Shown in the sidebar when a search finds no settings
 settings-search-empty = Nothing matches that.
 
+## Sidebar groups
+
+# Headings above the groups of pages in the Settings sidebar
+settings-group-connections = Connections
+settings-group-devices = Devices
+settings-group-look = Look & feel
+settings-group-protection = Protection
+settings-group-system = System
+
 ## Panel titles that depend on the hardware
 
 # Sidebar and page title on computers without a battery
 settings-power-title = Power
-# Sidebar and page title when only a mouse is connected
-settings-mouse-title = Mouse
-# Sidebar and page title when only a touchpad is present
-settings-touchpad-title = Touchpad
 
 ## Missing hardware
 
 settings-bluetooth-missing = This computer has no Bluetooth adapter
-settings-mouse-missing = No mouse or touchpad is connected
 
 ## Shared pieces
 

@@ -3,16 +3,21 @@
 settings-search = Ayarlarda ara
 settings-search-empty = Eşleşen bir şey yok.
 
+## Sidebar groups
+
+settings-group-connections = Bağlantılar
+settings-group-devices = Cihazlar
+settings-group-look = Görünüm ve his
+settings-group-protection = Koruma
+settings-group-system = Sistem
+
 ## Panel titles that depend on the hardware
 
 settings-power-title = Güç
-settings-mouse-title = Fare
-settings-touchpad-title = Dokunmatik yüzey
 
 ## Missing hardware
 
 settings-bluetooth-missing = Bu bilgisayarda Bluetooth bağdaştırıcısı yok
-settings-mouse-missing = Bağlı fare ya da dokunmatik yüzey yok
 
 ## Shared pieces
 

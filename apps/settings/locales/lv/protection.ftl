@@ -28,7 +28,6 @@ settings-privacy-location-services = Atrašanās vietas pakalpojumi
 settings-privacy-location-services-hint = Ļauj lietotnēm noteikt jūsu atrašanās vietu kartēm, laikapstākļiem un laika joslām
 settings-privacy-camera = Kamera
 settings-privacy-camera-allow = Atļaut lietotnēm izmantot kameru
-settings-privacy-microphone = Mikrofons
 settings-privacy-microphone-allow = Atļaut lietotnēm izmantot mikrofonu
 settings-privacy-apps-asked = Lietotnes, kas pieprasīja piekļuvi
 settings-privacy-apps-allowed = Atļauts: { $allowed } no { $total }
@@ -358,7 +357,6 @@ settings-passwords-apps-asked = { $count ->
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-back = Drošība
 settings-passwords-access-description = Ja noņemsiet kādu lietotni, tā nākamreiz jautās vēlreiz.
 settings-passwords-access-not-allowed = Nav atļauts
 settings-passwords-access-none = Neviena lietotne vēl nav pieprasījusi jūsu paroles
@@ -450,3 +448,26 @@ settings-passkeys-rename-title = Pārdēvēt piekļuves atslēgu
 settings-passkeys-rename-description = Piešķiriet vietnes { $site } piekļuves atslēgai nosaukumu, ko atpazīsiet.
 settings-passkeys-name = Nosaukums
 settings-passkeys-save = Saglabāt
+
+## Apps
+
+settings-apps-defaults = Noklusējuma lietotnes
+settings-apps-defaults-description = Tiek izmantotas, atverot saites, failus un mapes
+settings-apps-browser = Tīmekļa pārlūks
+settings-apps-email = E-pasts
+settings-apps-calendar = Kalendārs
+settings-apps-music = Mūzika
+settings-apps-videos = Video
+settings-apps-photos = Fotoattēli
+settings-apps-text-editor = Teksta redaktors
+settings-apps-files = Faili
+settings-apps-choose = Izvēlēties
+settings-apps-startup = Palaišana
+settings-apps-startup-description = Šīs lietotnes tiek atvērtas, kad pierakstāties
+settings-apps-startup-app = Atvērt lietotni { $app }, kad pierakstāties
+settings-apps-startup-add = Pievienot lietotni
+settings-apps-startup-add-title = Pievienot palaišanas lietotni
+settings-apps-startup-add-description = Izvēlieties lietotni, kas tiks atvērta katru reizi, kad pierakstāties.
+settings-apps-search = Meklēt lietotnes
+settings-apps-no-match = Neviena lietotne neatbilst meklētajam
+settings-apps-cancel = Atcelt

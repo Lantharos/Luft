@@ -1,26 +1,3 @@
-## Apps
-
-settings-apps-defaults = Zadane aplikacije
-settings-apps-defaults-description = Koriste se kad otvarate poveznice, datoteke i mape
-settings-apps-browser = Web-preglednik
-settings-apps-email = E-pošta
-settings-apps-calendar = Kalendar
-settings-apps-music = Glazba
-settings-apps-videos = Videozapisi
-settings-apps-photos = Fotografije
-settings-apps-text-editor = Uređivač teksta
-settings-apps-files = Datoteke
-settings-apps-choose = Odaberi
-settings-apps-startup = Pokretanje
-settings-apps-startup-description = Ove se aplikacije otvaraju kad se prijavite
-settings-apps-startup-app = Otvori aplikaciju { $app } pri prijavi
-settings-apps-startup-add = Dodaj aplikaciju
-settings-apps-startup-add-title = Dodajte aplikaciju pri pokretanju
-settings-apps-startup-add-description = Odaberite aplikaciju koja će se otvoriti pri svakoj prijavi.
-settings-apps-search = Pretraži aplikacije
-settings-apps-no-match = Nijedna aplikacija ne odgovara pretraživanju
-settings-apps-cancel = Odustani
-
 ## Date and time
 
 settings-datetime-automatic = Automatski postavi vrijeme
@@ -37,7 +14,6 @@ settings-datetime-format-24h = 24-satni
 settings-datetime-format-12h = AM/PM
 settings-datetime-seconds = Prikaži sekunde
 settings-datetime-weekday = Prikaži dan u tjednu
-settings-datetime-calendar = Kalendar
 settings-datetime-week-start = Prvi dan u tjednu
 settings-datetime-week-start-automatic = Automatski
 settings-datetime-week-start-monday = Ponedjeljak
@@ -323,3 +299,87 @@ settings-region-formats-language = Isto kao jezik
 settings-region-formats = Formati
 settings-region-formats-description = Datumi, vremena, brojevi i mjerne jedinice
 settings-region-formats-next-sign-in = { $sample }, od sljedeće prijave
+
+## Accounts panel
+
+settings-accounts-unavailable = Računi nisu dostupni
+    .description = Usluga računa nije instalirana na ovom računalu
+settings-accounts-online = Mrežni računi
+    .description = Svaki račun je mapa u mapi Cloud u vašoj osobnoj mapi, koju može otvoriti svaka aplikacija. Datoteke se preuzimaju kad ih otvorite.
+settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud ili WebDAV
+
+## Accounts: an account's row
+
+settings-accounts-sign-in-again-needed = Ponovno se prijavite da biste ga nastavili koristiti
+settings-accounts-paused-metered = Sinkronizacija je pauzirana na ograničenoj vezi
+settings-accounts-paused-battery = Sinkronizacija je pauzirana dok je baterija pri kraju
+settings-accounts-connecting = Povezivanje…
+settings-accounts-offline = Izvan mreže
+settings-accounts-offline-kept = Izvan mreže, zadržane datoteke i dalje su dostupne
+settings-accounts-not-connected = Nije povezano
+settings-accounts-syncing = { $count ->
+        [one] Sinkronizira se { $count } promjena
+        [few] Sinkroniziraju se { $count } promjene
+       *[other] Sinkronizira se { $count } promjena
+    }
+settings-accounts-name = Naziv
+settings-accounts-folder = Mapa
+settings-accounts-server = Poslužitelj
+settings-accounts-storage = Pohrana
+settings-accounts-storage-used = Iskorišteno { $used } od { $total }
+settings-accounts-on-device = Na ovom uređaju
+settings-accounts-kept = { $count ->
+        [one] Zadržana je { $count } stavka, ostalo se preuzima pri otvaranju
+        [few] Zadržane su { $count } stavke, ostalo se preuzima pri otvaranju
+       *[other] Zadržano je { $count } stavki, ostalo se preuzima pri otvaranju
+    }
+settings-accounts-on-demand = Datoteke se preuzimaju kad ih otvorite
+settings-accounts-sign-in-again = Ponovno se prijavi
+settings-accounts-keep = Zadrži
+settings-accounts-remove = Ukloni
+settings-accounts-remove-confirm = Ukloni s ovog računala
+settings-accounts-removing = Uklanjanje…
+settings-accounts-remove-note = Vaše datoteke ostaju u usluzi { $provider }. Promjene napravljene ovdje najprije se šalju onamo.
+
+## Accounts: providers
+
+settings-accounts-provider-icloud = Vaš Apple račun, potvrđen kodom s iPhonea, iPada ili Maca
+settings-accounts-provider-onedrive = Osobni, poslovni ili školski Microsoftov račun, u pregledniku
+settings-accounts-provider-dropbox = Dropbox račun, u pregledniku
+settings-accounts-provider-nextcloud = Vaš vlastiti poslužitelj ili poslužitelj vaše organizacije
+settings-accounts-provider-webdav = Bilo koji poslužitelj koji podržava WebDAV
+
+## Accounts: signing in
+
+settings-accounts-sign-in-again-title = Ponovna prijava: { $account }
+settings-accounts-browser = Otvorit će se preglednik da biste se prijavili putem usluge { $provider }. Luft nikad ne vidi vašu lozinku.
+settings-accounts-password-for = Unesite lozinku za { $user }.
+settings-accounts-apple-account = Apple račun
+settings-accounts-password = Lozinka
+settings-accounts-app-password = Lozinka aplikacije
+settings-accounts-user = Korisničko ime
+settings-accounts-apple-note = Upotrijebite lozinku Apple računa; lozinke za određene aplikacije ovdje ne rade. Apple će zatim prikazati kod na vašem iPhoneu, iPadu ili Macu.
+settings-accounts-nextcloud-browser = Otvorit će se preglednik da biste se prijavili na svoj poslužitelj i dopustili pristup Luftu.
+settings-accounts-use-app-password = Upotrijebi lozinku aplikacije
+settings-accounts-error-server = Unesite adresu poslužitelja
+settings-accounts-error-apple-account = Unesite e-adresu Apple računa
+settings-accounts-error-user = Unesite korisničko ime
+settings-accounts-error-password = Unesite lozinku
+settings-accounts-cancel = Odustani
+settings-accounts-back = Natrag
+settings-accounts-continue-in-browser = Nastavi u pregledniku
+settings-accounts-sign-in = Prijava
+settings-accounts-try-again = Pokušaj ponovno
+settings-accounts-continue = Nastavi
+settings-accounts-working = Povezivanje s uslugom { $provider }…
+settings-accounts-finish-in-browser = Dovršite prijavu putem usluge { $provider } u pregledniku. Luft nikad ne vidi vašu lozinku, a ovo će se samo ažurirati kad završite.
+settings-accounts-no-browser = Preglednik se nije otvorio. Kopirajte poveznicu i otvorite je u pregledniku.
+settings-accounts-open-again = Ponovno otvori stranicu
+settings-accounts-copy-link = Kopiraj poveznicu
+settings-accounts-copied = Kopirano
+settings-accounts-code = Kod za potvrdu
+    .placeholder = Šesteroznamenkasti kod
+settings-accounts-text-me = Pošalji mi kod SMS-om
+settings-accounts-choose-phone = Na koji broj Apple treba poslati kod?
+    .description = Pošalji SMS
+settings-accounts-approve = Vaš Apple račun koristi naprednu zaštitu podataka. Odobrite zahtjev na iPhoneu, iPadu ili Macu kako bi ovo računalo moglo otvoriti iCloud Drive.

@@ -1,5 +1,5 @@
 import { invoke } from '#lib/bridge.js';
-import type { App } from '../../system/apps/api';
+import type { App } from '../../protection/apps/api';
 
 export interface NotifyingApp extends App {
 	path: string;

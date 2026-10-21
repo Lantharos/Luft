@@ -1,6 +1,5 @@
-apps/settings/src/lib/panels/connections/accounts/SignInDialog.svelte	you@icloud.com
-apps/settings/src/lib/panels/connections/network/ProxyDialog.svelte	http://example.com/proxy.pac
-apps/settings/src/lib/panels/connections/network/ProxyDialog.svelte	localhost, *.example.com
+apps/settings/src/lib/panels/connections/network/proxy/ProxyPage.svelte	http://example.com/proxy.pac
+apps/settings/src/lib/panels/connections/network/proxy/ProxyPage.svelte	localhost, *.example.com
 apps/settings/src/lib/panels/connections/network/connection/AdvancedSection.svelte	12:34:56:78:9A:BC
 apps/settings/src/lib/panels/connections/network/connection/EnterpriseFields.svelte	MSCHAPv2
 apps/settings/src/lib/panels/connections/network/connection/EnterpriseFields.svelte	GTC

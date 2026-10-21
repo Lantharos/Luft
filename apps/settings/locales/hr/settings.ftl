@@ -3,16 +3,21 @@
 settings-search = Pretraži postavke
 settings-search-empty = Nema rezultata.
 
+## Sidebar groups
+
+settings-group-connections = Veze
+settings-group-devices = Uređaji
+settings-group-look = Izgled i doživljaj
+settings-group-protection = Zaštita
+settings-group-system = Sustav
+
 ## Panel titles that depend on the hardware
 
 settings-power-title = Napajanje
-settings-mouse-title = Miš
-settings-touchpad-title = Dodirna pločica
 
 ## Missing hardware
 
 settings-bluetooth-missing = Ovo računalo nema Bluetooth adapter
-settings-mouse-missing = Nije povezan miš ni dodirna pločica
 
 ## Shared pieces
 

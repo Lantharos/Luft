@@ -1,26 +1,3 @@
-## Apps
-
-settings-apps-defaults = Standardappar
-settings-apps-defaults-description = Blir brukte når du opnar lenkjer, filer og mapper
-settings-apps-browser = Nettlesar
-settings-apps-email = E-post
-settings-apps-calendar = Kalender
-settings-apps-music = Musikk
-settings-apps-videos = Videoar
-settings-apps-photos = Bilete
-settings-apps-text-editor = Tekstredigerar
-settings-apps-files = Filer
-settings-apps-choose = Vel
-settings-apps-startup = Oppstart
-settings-apps-startup-description = Desse appane blir opna når du loggar inn
-settings-apps-startup-app = Opne { $app } når du loggar inn
-settings-apps-startup-add = Legg til app
-settings-apps-startup-add-title = Legg til ein oppstartsapp
-settings-apps-startup-add-description = Vel ein app som skal opnast kvar gong du loggar inn.
-settings-apps-search = Søk i appar
-settings-apps-no-match = Ingen appar passar til søket
-settings-apps-cancel = Avbryt
-
 ## Date and time
 
 settings-datetime-automatic = Still inn klokka automatisk
@@ -37,7 +14,6 @@ settings-datetime-format-24h = 24 timar
 settings-datetime-format-12h = AM/PM
 settings-datetime-seconds = Vis sekund
 settings-datetime-weekday = Vis vekedagen
-settings-datetime-calendar = Kalender
 settings-datetime-week-start = Veka byrjar på
 settings-datetime-week-start-automatic = Automatisk
 settings-datetime-week-start-monday = Måndag
@@ -317,3 +293,85 @@ settings-region-formats-language = Same som språket
 settings-region-formats = Format
 settings-region-formats-description = Datoar, klokkeslett, tal og mål
 settings-region-formats-next-sign-in = { $sample }, frå neste innlogging
+
+## Accounts panel
+
+settings-accounts-unavailable = Kontoar er ikkje tilgjengelege
+    .description = Kontotenesta er ikkje installert på denne datamaskinen
+settings-accounts-online = Nettkontoar
+    .description = Kvar konto er ei mappe i Cloud, i heimemappa di, som alle appar kan opne. Filer blir lasta ned når du opnar dei.
+settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud eller WebDAV
+
+## Accounts: an account's row
+
+settings-accounts-sign-in-again-needed = Logg inn på nytt for å bruke kontoen vidare
+settings-accounts-paused-metered = Synkroniseringa er sett på pause på ei forbruksmålt tilkopling
+settings-accounts-paused-battery = Synkroniseringa er sett på pause medan batteriet er lågt
+settings-accounts-connecting = Koplar til …
+settings-accounts-offline = Fråkopla
+settings-accounts-offline-kept = Fråkopla, lokale filer er framleis tilgjengelege
+settings-accounts-not-connected = Ikkje tilkopla
+settings-accounts-syncing = { $count ->
+        [one] Synkroniserer { $count } endring
+       *[other] Synkroniserer { $count } endringar
+    }
+settings-accounts-name = Namn
+settings-accounts-folder = Mappe
+settings-accounts-server = Tenar
+settings-accounts-storage = Lagring
+settings-accounts-storage-used = { $used } av { $total } brukt
+settings-accounts-on-device = På denne eininga
+settings-accounts-kept = { $count ->
+        [one] { $count } element er lagra her, resten blir lasta ned når du opnar det
+       *[other] { $count } element er lagra her, resten blir lasta ned når du opnar det
+    }
+settings-accounts-on-demand = Filer blir lasta ned når du opnar dei
+settings-accounts-sign-in-again = Logg inn på nytt
+settings-accounts-keep = Behald
+settings-accounts-remove = Fjern
+settings-accounts-remove-confirm = Fjern frå denne datamaskinen
+settings-accounts-removing = Fjernar …
+settings-accounts-remove-note = Filene dine blir verande i { $provider }. Endringar du har gjort her, blir sende opp først.
+
+## Accounts: providers
+
+settings-accounts-provider-icloud = Apple-kontoen din, stadfesta med ein kode frå iPhone, iPad eller Mac
+settings-accounts-provider-onedrive = Ein personleg Microsoft-konto eller ein jobb- eller skulekonto, i nettlesaren
+settings-accounts-provider-dropbox = Ein Dropbox-konto, i nettlesaren
+settings-accounts-provider-nextcloud = Din eigen tenar eller tenaren til organisasjonen din
+settings-accounts-provider-webdav = Alle tenarar som støttar WebDAV
+
+## Accounts: signing in
+
+settings-accounts-sign-in-again-title = Logg inn på { $account } på nytt
+settings-accounts-browser = Nettlesaren blir opna så du kan logge inn hos { $provider }. Luft ser aldri passordet ditt.
+settings-accounts-password-for = Skriv inn passordet for { $user }.
+settings-accounts-apple-account = Apple-konto
+settings-accounts-password = Passord
+settings-accounts-app-password = App-passord
+settings-accounts-user = Brukarnamn
+settings-accounts-apple-note = Bruk passordet til Apple-kontoen din. Appspesifikke passord fungerer ikkje her. Apple viser deretter ein kode på iPhone, iPad eller Mac.
+settings-accounts-nextcloud-browser = Nettlesaren blir opna så du kan logge inn på tenaren og gje Luft tilgang.
+settings-accounts-use-app-password = Bruk eit app-passord i staden
+settings-accounts-error-server = Skriv inn tenaradressa
+settings-accounts-error-apple-account = Skriv inn e-postadressa til Apple-kontoen din
+settings-accounts-error-user = Skriv inn brukarnamnet
+settings-accounts-error-password = Skriv inn passordet
+settings-accounts-cancel = Avbryt
+settings-accounts-back = Tilbake
+settings-accounts-continue-in-browser = Hald fram i nettlesaren
+settings-accounts-sign-in = Logg inn
+settings-accounts-try-again = Prøv igjen
+settings-accounts-continue = Hald fram
+settings-accounts-working = Kontaktar { $provider } …
+settings-accounts-finish-in-browser = Fullfør innlogginga hos { $provider } i nettlesaren. Luft ser aldri passordet ditt, og denne sida blir oppdatert av seg sjølv når du er ferdig.
+settings-accounts-no-browser = Ingen nettlesar vart opna. Kopier lenkja og opne ho i ein nettlesar.
+settings-accounts-open-again = Opne sida på nytt
+settings-accounts-copy-link = Kopier lenkja
+settings-accounts-copied = Kopiert
+settings-accounts-code = Stadfestingskode
+    .placeholder = 6-sifra kode
+settings-accounts-text-me = Send meg ein kode på SMS i staden
+settings-accounts-choose-phone = Kva nummer skal Apple sende koden til?
+    .description = Send ein SMS
+settings-accounts-approve = Apple-kontoen din brukar avansert datavern. Godkjenn førespurnaden på iPhone, iPad eller Mac for å la denne datamaskinen opne iCloud Drive.

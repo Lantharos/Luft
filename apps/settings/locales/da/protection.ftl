@@ -28,7 +28,6 @@ settings-privacy-location-services = Placeringstjenester
 settings-privacy-location-services-hint = Lader apps finde ud af, hvor du er, til kort, vejr og tidszoner
 settings-privacy-camera = Kamera
 settings-privacy-camera-allow = Tillad apps at bruge kameraet
-settings-privacy-microphone = Mikrofon
 settings-privacy-microphone-allow = Tillad apps at bruge mikrofonen
 settings-privacy-apps-asked = Apps, der har spurgt
 settings-privacy-apps-allowed = { $allowed } af { $total } tilladt
@@ -345,7 +344,6 @@ settings-passwords-apps-asked = { $count ->
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-back = Sikkerhed
 settings-passwords-access-description = Hvis du fjerner en, spørger appen igen næste gang.
 settings-passwords-access-not-allowed = Ikke tilladt
 settings-passwords-access-none = Ingen apps har bedt om dine adgangskoder endnu
@@ -435,3 +433,26 @@ settings-passkeys-rename-title = Omdøb adgangsnøgle
 settings-passkeys-rename-description = Giv din adgangsnøgle til { $site } et navn, du kan genkende.
 settings-passkeys-name = Navn
 settings-passkeys-save = Gem
+
+## Apps
+
+settings-apps-defaults = Standardapps
+settings-apps-defaults-description = Bruges, når du åbner links, filer og mapper
+settings-apps-browser = Webbrowser
+settings-apps-email = E-mail
+settings-apps-calendar = Kalender
+settings-apps-music = Musik
+settings-apps-videos = Videoer
+settings-apps-photos = Fotos
+settings-apps-text-editor = Teksteditor
+settings-apps-files = Filer
+settings-apps-choose = Vælg
+settings-apps-startup = Opstart
+settings-apps-startup-description = Disse apps åbnes, når du logger ind
+settings-apps-startup-app = Åbn { $app }, når du logger ind
+settings-apps-startup-add = Tilføj app
+settings-apps-startup-add-title = Tilføj en opstartsapp
+settings-apps-startup-add-description = Vælg en app, der skal åbnes, hver gang du logger ind.
+settings-apps-search = Søg efter apps
+settings-apps-no-match = Ingen apps matcher din søgning
+settings-apps-cancel = Annuller

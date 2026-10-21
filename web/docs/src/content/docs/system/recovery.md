@@ -19,7 +19,7 @@ From a running Luft, holding <kbd>Alt</kbd> in the Restart dialog shows **Boot O
 ## Something broke after an update
 
 - If the new version doesn't reach the login screen in three tries, Luft goes back to the version that last worked by itself, and says so before the login screen.
-- If it starts but something's wrong, go back in Settings, under Updates, **Go back to the previous version**, or pick the previous version in the boot menu.
+- If it starts but something's wrong, go back in Settings, under System, **Go back to the previous version**, or pick the previous version in the boot menu.
 
 Your files and settings stay as they are either way. See [How updates work](/system/updates/#going-back).
 
@@ -58,7 +58,7 @@ Hold <kbd>Esc</kbd> while the stick starts and choose **Luft with basic graphics
 
 ## The graphics stopped responding
 
-When the graphics card hangs entirely, Luft restarts cleanly and explains what happened at the next start, with suggestions for the computer. Settings lists these under About, **Recent problems**. See [NVIDIA graphics](/system/nvidia/#when-the-graphics-driver-stops-responding) for a common cause on NVIDIA cards.
+When the graphics card hangs entirely, Luft restarts cleanly and explains what happened at the next start, with suggestions for the computer. Settings lists these under System, About, **Recent problems**. See [NVIDIA graphics](/system/nvidia/#when-the-graphics-driver-stops-responding) for a common cause on NVIDIA cards.
 
 ## An app misbehaves
 

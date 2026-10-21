@@ -28,7 +28,6 @@ settings-privacy-location-services = Υπηρεσίες τοποθεσίας
 settings-privacy-location-services-hint = Οι εφαρμογές μπορούν να βρουν πού βρίσκεστε, για χάρτες, καιρό και ζώνες ώρας
 settings-privacy-camera = Κάμερα
 settings-privacy-camera-allow = Να επιτρέπεται στις εφαρμογές η χρήση της κάμερας
-settings-privacy-microphone = Μικρόφωνο
 settings-privacy-microphone-allow = Να επιτρέπεται στις εφαρμογές η χρήση του μικροφώνου
 settings-privacy-apps-asked = Εφαρμογές που ζήτησαν πρόσβαση
 settings-privacy-apps-allowed = Επιτρέπονται { $allowed } από { $total }
@@ -345,7 +344,6 @@ settings-passwords-apps-asked = { $count ->
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-back = Ασφάλεια
 settings-passwords-access-description = Αν αφαιρέσετε μία, η εφαρμογή θα ρωτήσει ξανά την επόμενη φορά.
 settings-passwords-access-not-allowed = Δεν επιτρέπεται
 settings-passwords-access-none = Καμία εφαρμογή δεν έχει ζητήσει ακόμη τους κωδικούς πρόσβασής σας
@@ -435,3 +433,26 @@ settings-passkeys-rename-title = Μετονομασία κλειδιού πρό�
 settings-passkeys-rename-description = Δώστε στο κλειδί πρόσβασης για { $site } ένα όνομα που θα αναγνωρίζετε.
 settings-passkeys-name = Όνομα
 settings-passkeys-save = Αποθήκευση
+
+## Apps
+
+settings-apps-defaults = Προεπιλεγμένες εφαρμογές
+settings-apps-defaults-description = Χρησιμοποιούνται όταν ανοίγετε συνδέσμους, αρχεία και φακέλους
+settings-apps-browser = Πρόγραμμα περιήγησης
+settings-apps-email = Email
+settings-apps-calendar = Ημερολόγιο
+settings-apps-music = Μουσική
+settings-apps-videos = Βίντεο
+settings-apps-photos = Φωτογραφίες
+settings-apps-text-editor = Επεξεργαστής κειμένου
+settings-apps-files = Αρχεία
+settings-apps-choose = Επιλογή
+settings-apps-startup = Εκκίνηση
+settings-apps-startup-description = Αυτές οι εφαρμογές ανοίγουν όταν συνδέεστε
+settings-apps-startup-app = Άνοιγμα της εφαρμογής { $app } κατά τη σύνδεση
+settings-apps-startup-add = Προσθήκη εφαρμογής
+settings-apps-startup-add-title = Προσθήκη εφαρμογής εκκίνησης
+settings-apps-startup-add-description = Επιλέξτε μια εφαρμογή που θα ανοίγει κάθε φορά που συνδέεστε.
+settings-apps-search = Αναζήτηση εφαρμογών
+settings-apps-no-match = Καμία εφαρμογή δεν ταιριάζει με την αναζήτηση
+settings-apps-cancel = Ακύρωση

@@ -28,7 +28,6 @@ settings-privacy-location-services = Vietos nustatymo paslaugos
 settings-privacy-location-services-hint = Leidžia programoms nustatyti, kur esate, žemėlapiams, orams ir laiko juostoms
 settings-privacy-camera = Kamera
 settings-privacy-camera-allow = Leisti programoms naudoti kamerą
-settings-privacy-microphone = Mikrofonas
 settings-privacy-microphone-allow = Leisti programoms naudoti mikrofoną
 settings-privacy-apps-asked = Prašiusios programos
 settings-privacy-apps-allowed = Leidžiama { $allowed } iš { $total }
@@ -371,7 +370,6 @@ settings-passwords-apps-asked = { $count ->
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-back = Sauga
 settings-passwords-access-description = Pašalinus programą, kitą kartą ji paprašys vėl.
 settings-passwords-access-not-allowed = Neleidžiama
 settings-passwords-access-none = Kol kas jūsų slaptažodžių neprašė jokia programa
@@ -465,3 +463,26 @@ settings-passkeys-rename-title = Pervardyti prieigos raktą
 settings-passkeys-rename-description = Suteikite svetainės { $site } prieigos raktui pavadinimą, kurį lengvai atpažinsite.
 settings-passkeys-name = Pavadinimas
 settings-passkeys-save = Įrašyti
+
+## Apps
+
+settings-apps-defaults = Numatytosios programos
+settings-apps-defaults-description = Naudojamos atidarant nuorodas, failus ir aplankus
+settings-apps-browser = Žiniatinklio naršyklė
+settings-apps-email = El. paštas
+settings-apps-calendar = Kalendorius
+settings-apps-music = Muzika
+settings-apps-videos = Vaizdo įrašai
+settings-apps-photos = Nuotraukos
+settings-apps-text-editor = Teksto rengyklė
+settings-apps-files = Failai
+settings-apps-choose = Pasirinkite
+settings-apps-startup = Paleidimas
+settings-apps-startup-description = Šios programos atsidaro jums prisijungus
+settings-apps-startup-app = Atidaryti programą { $app } prisijungus
+settings-apps-startup-add = Pridėti programą
+settings-apps-startup-add-title = Pridėti paleidžiamą programą
+settings-apps-startup-add-description = Pasirinkite programą, kuri atsidarys kaskart jums prisijungus.
+settings-apps-search = Ieškoti programų
+settings-apps-no-match = Nerasta jokių programų
+settings-apps-cancel = Atšaukti

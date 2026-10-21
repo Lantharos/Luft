@@ -9,7 +9,7 @@ const {require} = checks('Luft app');
 const ANTIALIASING = 8;
 const PREVIEW_CLOCK = {x: 880, y: 364, width: 118, height: 30};
 const CHANGES = [
-  {name: 'taskbar-alignment', page: 'appearance/taskbar', schema: 'com.lantharos.kestrel', key: 'taskbar-alignment', value: new GLib.Variant('s', 'left'),
+  {name: 'taskbar-alignment', page: 'desktop', schema: 'com.lantharos.kestrel', key: 'taskbar-alignment', value: new GLib.Variant('s', 'left'),
     ignore: PREVIEW_CLOCK},
   {name: 'dark-style', page: 'appearance', schema: 'org.gnome.desktop.interface', key: 'color-scheme', value: new GLib.Variant('s', 'prefer-light')},
   {name: 'reduce-motion', page: 'accessibility', schema: 'org.gnome.desktop.a11y.interface', key: 'reduced-motion', value: new GLib.Variant('s', 'reduce')},
@@ -42,7 +42,7 @@ async function follow(app, {name, page, schema, key, value, ignore}) {
     await changes(app, `settings follows ${schema} ${key}`, () => settings.set_value(key, value));
     (await app.settle(() => true)).save(`settings-live-${name}`);
     const followed = await look(app, ignore);
-    await show(app, 'about');
+    await show(app, 'system/about');
     const opened = await show(app, page);
     const same = alike(followed, await look(app, ignore));
     if (!same) opened.save(`settings-live-${name}-opened`);

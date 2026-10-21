@@ -1,4 +1,4 @@
-## Panels
+## Pages in the sidebar
 
 settings-page-network = Net
     .keywords = wifi, wi-fi, þráðlaust net, þráðlaust, ethernet, snúrutenging, nettenging, vpn, internet, netið, flugstilling, proxy, milliþjónn, dns, ip-tala, vélbúnaðarvistfang, mac-vistfang, mæld tenging, gagnamagn
@@ -10,15 +10,12 @@ settings-page-sound = Hljóð
     .keywords = hljóðstyrkur, hátalarar, hljóðnemi, úttak, inntak, viðvaranir, hljóðmerki
 settings-page-power = Orka og rafhlaða
     .keywords = rafhlaða, svefn, dvali, orkustilling, orkusparnaður, slökkva á skjá, skjáhvíla, lok, hleðslumörk, hleðsla
+settings-page-input = Inntak
 settings-page-appearance = Útlit
     .keywords = bakgrunnsmynd, bakgrunnur, dökkt, ljóst, stíll, þema, áherslulitur, forritatákn, litað, bendill, músarbendill, stærð bendils, textastærð, hreyfingar, hreyfimyndir, letur, leturgerðir, setja upp letur
+settings-page-desktop = Skjáborð
 settings-page-notifications = Tilkynningar
     .keywords = ekki trufla, borðar, sprettitilkynningar, læsiskjár, forrit
-settings-page-keyboard = Lyklaborð
-    .keywords = inntaksgjafar, innsláttaraðferðir, innsláttur, uppsetning, lyklaborðsuppsetning, flýtilyklar, endurtekning, tungumál, raddinnsláttur, tal í texta
-    .copilot-key = copilot-lykill, copilot
-settings-page-mouse = Mús og snertiflötur
-    .keywords = mús, bendill, hraði, skrun, fletta, náttúrulegt skrun, skrunhraði, ýta til að smella, snerta til að smella, snertiflötur, touchpad
 settings-page-accessibility = Aðgengi
     .keywords = a11y, aðgengi, skjálesari, orca, aðdráttur, stækkun, stækkunargler, stór texti, mikil birtuskil, birtuskil, draga úr hreyfingum, minni hreyfing, stærð bendils, skjályklaborð, lyklaborð á skjá, klístraðir lyklar, hægir lyklar, endurkastslyklar, músarlyklar, smella með bið, sveimsmellur, hægrismella, finna bendil, sýnilegar viðvaranir, blikk, heyrn, sjón
 settings-page-apps = Forrit
@@ -27,33 +24,51 @@ settings-page-privacy = Persónuvernd
     .keywords = skjálás, læsa skjá, staðsetning, myndavél, hljóðnemi, nýlegar skrár, skráaferill, ruslafata, bráðabirgðaskrár, tímabundnar skrár
 settings-page-security = Öryggi
     .keywords = secure boot, örugg ræsing, tpm, öryggiskubbur, dulritun, dulkóðun, dulritun disks, bitlocker, luks, endurheimtarlykill, pin, pin-númer, fastbúnaður, vélbúnaðaröryggi, undirritunarlykill, usb, lykilorð, lyklakippa, aðgangslyklar, passkey
+settings-page-accounts = Aðgangar
+    .keywords = netaðgangar, ský, icloud, icloud drive, apple, onedrive, microsoft, dropbox, nextcloud, webdav, samstilling, skrár eftir þörfum, innskráning, skrá inn
+settings-page-language = Tungumál og tími
+settings-page-system = Kerfi
+
+## Pages inside other pages
+
+settings-page-wifi = Wi-Fi
+settings-page-ethernet = Ethernet
+settings-page-vpn = VPN
+settings-page-proxy = Milliþjónn
+settings-page-shortcuts = Flýtilyklar
+settings-page-dictation = Raddinnsláttur
+    .keywords = tal, rödd, tal í texta, tala, hljóðnemi, parakeet, whisper, talgreining, talmálslíkön, super alt
+    .copilot-key = copilot-lykill, copilot
+settings-page-protections = Varnir
+settings-page-encryption = Dulritun tækis
+settings-page-keyring = Lykilorð og lyklar
+settings-page-login = Innskráningarskjár
+    .keywords = innskráning, skrá inn, sjálfvirk innskráning, autologin, seta, bakgrunnsmynd, notendur, læsiskjár, faldir notendur
+settings-page-add-account = Bæta við aðgangi
+    .keywords = skrá inn, innskráning, netaðgangar, icloud, onedrive, dropbox, nextcloud, webdav
+settings-page-about = Um tölvuna
+    .keywords = um, heiti tækis, nafn tölvu, kerfi, vélbúnaður, minni, vinnsluminni, örgjörvi, skjákort, grafík, geymslurými, diskur
+
+## Search terms for parts of pages
+
+settings-page-keyboard = Lyklaborð
+    .keywords = inntaksgjafar, innsláttaraðferðir, innsláttur, uppsetning, lyklaborðsuppsetning, flýtilyklar, endurtekning, tungumál, raddinnsláttur, tal í texta
+    .copilot-key = copilot-lykill, copilot
+settings-page-mouse = Mús og snertiflötur
+    .keywords = mús, bendill, hraði, skrun, fletta, náttúrulegt skrun, skrunhraði, ýta til að smella, snerta til að smella, snertiflötur, touchpad
+settings-page-fonts = Letur
+    .keywords = öll letur, leturgerðir, leturfjölskyldur, setja upp letur, fjarlægja letur
+settings-page-cursors = Bendlaþemu
+    .keywords = bendlar, bendill, músarbendill, sækja fleiri bendla
+settings-page-taskbar = Verkstika og Upphaf
+    .keywords = spjald, dokka, fela sjálfkrafa, fela verkstiku, fljótandi, gegnsæ, fest forrit, jöfnun, staðsetning, upphafshnappur, upphaf, upphafsvalmynd, start, start menu, gust, leitarstika, leitarreitur, ræsiforrit, launcher, vefleit, leita á vefnum, leitarvél, skjáir, vinnusvæði, skjáborð, sýndarskjáborð
+settings-page-tiling = Flísalagning glugga
+    .keywords = flísar, flísalagðir gluggar, tiling, skrun, dálkar, bil, spírall, dwindle, aðalgluggi og stafli, master, fljótandi gluggar, gluggaröðun, fjölverkavinnsla
 settings-page-region = Tungumál og svæði
     .keywords = tungumál, þýðing, staðfærsla, snið, dagsetningarsnið, talnasnið, mælieiningar, einingar, gjaldmiðill
 settings-page-datetime = Dagsetning og tími
     .keywords = tímabelti, klukka, 24 tíma, sjálfvirkt
 settings-page-users = Notendur
     .keywords = aðgangur, notandi, nafn, mynd, notandamynd, lykilorð, fingrafar
-settings-page-accounts = Aðgangar
-    .keywords = netaðgangar, ský, icloud, icloud drive, apple, onedrive, microsoft, dropbox, nextcloud, webdav, samstilling, skrár eftir þörfum, innskráning, skrá inn
-settings-page-login = Innskráningarskjár
-    .keywords = innskráning, skrá inn, sjálfvirk innskráning, autologin, seta, bakgrunnsmynd, notendur, læsiskjár, faldir notendur
 settings-page-updates = Uppfærslur
     .keywords = hugbúnaðaruppfærslur, kerfisuppfærslur, uppfæra, fastbúnaður, kjarni, kernel, endurræsa og setja upp, pakkar, sjálfvirkar uppfærslur, öryggisuppfærslur
-settings-page-about = Um tölvuna
-    .keywords = um, heiti tækis, nafn tölvu, kerfi, vélbúnaður, minni, vinnsluminni, örgjörvi, skjákort, grafík, geymslurými, diskur
-
-## Pages inside panels
-
-settings-page-taskbar = Verkstika og Upphaf
-    .keywords = spjald, dokka, fela sjálfkrafa, fela verkstiku, fljótandi, gegnsæ, fest forrit, jöfnun, staðsetning, upphafshnappur, upphaf, upphafsvalmynd, start, start menu, gust, leitarstika, leitarreitur, ræsiforrit, launcher, vefleit, leita á vefnum, leitarvél, skjáir, vinnusvæði, skjáborð, sýndarskjáborð
-settings-page-tiling = Flísalagning glugga
-    .keywords = flísar, flísalagðir gluggar, tiling, skrun, dálkar, bil, spírall, dwindle, aðalgluggi og stafli, master, fljótandi gluggar, gluggaröðun, fjölverkavinnsla
-settings-page-fonts = Letur
-    .keywords = öll letur, leturgerðir, leturfjölskyldur, setja upp letur, fjarlægja letur
-settings-page-cursors = Bendlaþemu
-    .keywords = bendlar, bendill, músarbendill, sækja fleiri bendla
-settings-page-dictation = Raddinnsláttur
-    .keywords = tal, rödd, tal í texta, tala, hljóðnemi, parakeet, whisper, talgreining, talmálslíkön, super alt
-    .copilot-key = copilot-lykill, copilot
-settings-page-add-account = Bæta við aðgangi
-    .keywords = skrá inn, innskráning, netaðgangar, icloud, onedrive, dropbox, nextcloud, webdav

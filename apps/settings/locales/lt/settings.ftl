@@ -3,16 +3,21 @@
 settings-search = Ieškoti nustatymų
 settings-search-empty = Nieko nerasta.
 
+## Sidebar groups
+
+settings-group-connections = Ryšiai
+settings-group-devices = Įrenginiai
+settings-group-look = Išvaizda ir pojūtis
+settings-group-protection = Apsauga
+settings-group-system = Sistema
+
 ## Panel titles that depend on the hardware
 
 settings-power-title = Maitinimas
-settings-mouse-title = Pelė
-settings-touchpad-title = Jutiklinis kilimėlis
 
 ## Missing hardware
 
 settings-bluetooth-missing = Šiame kompiuteryje nėra Bluetooth adapterio
-settings-mouse-missing = Neprijungta nei pelė, nei jutiklinis kilimėlis
 
 ## Shared pieces
 

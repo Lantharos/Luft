@@ -67,7 +67,6 @@ settings-appearance-tint-slate = Сланцевый
 
 ## Appearance: text and motion
 
-settings-appearance-taskbar = Панель задач
 settings-appearance-text-and-motion = Текст и анимация
 settings-appearance-text-size = Размер текста
 settings-appearance-text-size-description = Увеличивает или уменьшает текст во всех приложениях
@@ -76,8 +75,6 @@ settings-appearance-animations-description = Окна и меню плавно �
 
 ## Taskbar
 
-settings-taskbar-title = Панель задач и Пуск
-settings-taskbar-back = Оформление
 settings-taskbar-preview = Предпросмотр панели задач
 settings-start-section = Пуск
 settings-start-style = Стиль
@@ -230,7 +227,6 @@ settings-notifications-done = Готово
 
 settings-tiling-preview = Предпросмотр расположения окон
 settings-tiling-title = Мозаичное расположение окон
-settings-tiling-back = Оформление
 settings-tiling-mode = Расположение окон
 settings-tiling-mode-off = Выключено
 settings-tiling-mode-tiling = Мозаика

@@ -3,16 +3,21 @@
 settings-search = Cerca a la configuració
 settings-search-empty = No hi ha cap coincidència.
 
+## Sidebar groups
+
+settings-group-connections = Connexions
+settings-group-devices = Dispositius
+settings-group-look = Aspecte i sensació
+settings-group-protection = Protecció
+settings-group-system = Sistema
+
 ## Panel titles that depend on the hardware
 
 settings-power-title = Energia
-settings-mouse-title = Ratolí
-settings-touchpad-title = Ratolí tàctil
 
 ## Missing hardware
 
 settings-bluetooth-missing = Aquest ordinador no té adaptador Bluetooth
-settings-mouse-missing = No hi ha cap ratolí ni ratolí tàctil connectat
 
 ## Shared pieces
 

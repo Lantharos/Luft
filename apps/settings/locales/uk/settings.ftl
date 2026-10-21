@@ -3,16 +3,21 @@
 settings-search = Пошук у параметрах
 settings-search-empty = Нічого не знайдено.
 
+## Sidebar groups
+
+settings-group-connections = Підключення
+settings-group-devices = Пристрої
+settings-group-look = Вигляд і поведінка
+settings-group-protection = Захист
+settings-group-system = Система
+
 ## Panel titles that depend on the hardware
 
 settings-power-title = Живлення
-settings-mouse-title = Миша
-settings-touchpad-title = Сенсорна панель
 
 ## Missing hardware
 
 settings-bluetooth-missing = На цьому комп’ютері немає адаптера Bluetooth
-settings-mouse-missing = Не під’єднано ні миші, ні сенсорної панелі
 
 ## Shared pieces
 

@@ -72,7 +72,6 @@ settings-network-known-count = { $count ->
        *[other] { $count } opgeslagen netwerken
     }
 settings-network-known-in-range = Binnen bereik
-settings-network-wired = Bekabeld
 settings-network-ethernet = Ethernet
 settings-network-ethernet-named = Ethernet ({ $name })
 settings-network-wired-connected = Verbonden · { $speed }
@@ -357,85 +356,3 @@ settings-bluetooth-windows-more = { $count ->
         [one] nog { $count }
        *[other] nog { $count }
     }
-
-## Accounts panel
-
-settings-accounts-unavailable = Accounts zijn niet beschikbaar
-    .description = De accountservice is niet geïnstalleerd op deze computer
-settings-accounts-online = Onlineaccounts
-    .description = Elk account is een map in Cloud, in je persoonlijke map, die elke app kan openen. Bestanden worden gedownload wanneer je ze opent.
-settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud of WebDAV
-
-## Accounts: an account's row
-
-settings-accounts-sign-in-again-needed = Meld je opnieuw aan om het te blijven gebruiken
-settings-accounts-paused-metered = Synchronisatie gepauzeerd op een verbinding met datalimiet
-settings-accounts-paused-battery = Synchronisatie gepauzeerd zolang de batterij bijna leeg is
-settings-accounts-connecting = Verbinden…
-settings-accounts-offline = Offline
-settings-accounts-offline-kept = Offline, bewaarde bestanden zijn nog beschikbaar
-settings-accounts-not-connected = Niet verbonden
-settings-accounts-syncing = { $count ->
-        [one] { $count } wijziging synchroniseren
-       *[other] { $count } wijzigingen synchroniseren
-    }
-settings-accounts-name = Naam
-settings-accounts-folder = Map
-settings-accounts-server = Server
-settings-accounts-storage = Opslag
-settings-accounts-storage-used = { $used } van { $total } gebruikt
-settings-accounts-on-device = Op dit apparaat
-settings-accounts-kept = { $count ->
-        [one] { $count } item bewaard, de rest wordt gedownload bij het openen
-       *[other] { $count } items bewaard, de rest wordt gedownload bij het openen
-    }
-settings-accounts-on-demand = Bestanden worden gedownload wanneer je ze opent
-settings-accounts-sign-in-again = Opnieuw aanmelden
-settings-accounts-keep = Behouden
-settings-accounts-remove = Verwijderen
-settings-accounts-remove-confirm = Verwijderen van deze computer
-settings-accounts-removing = Verwijderen…
-settings-accounts-remove-note = Je bestanden blijven in { $provider }. Wijzigingen die je hier hebt gemaakt, worden eerst geüpload.
-
-## Accounts: providers
-
-settings-accounts-provider-icloud = Je Apple Account, bevestigd met een code van je iPhone, iPad of Mac
-settings-accounts-provider-onedrive = Een persoonlijk Microsoft-account of een account van werk of school, in je browser
-settings-accounts-provider-dropbox = Een Dropbox-account, in je browser
-settings-accounts-provider-nextcloud = Je eigen server of die van je organisatie
-settings-accounts-provider-webdav = Elke server die WebDAV ondersteunt
-
-## Accounts: signing in
-
-settings-accounts-sign-in-again-title = Opnieuw aanmelden bij { $account }
-settings-accounts-browser = Je browser wordt geopend, zodat je je kunt aanmelden bij { $provider }. Luft ziet je wachtwoord nooit.
-settings-accounts-password-for = Voer het wachtwoord voor { $user } in.
-settings-accounts-apple-account = Apple Account
-settings-accounts-password = Wachtwoord
-settings-accounts-app-password = App-wachtwoord
-settings-accounts-user = Gebruikersnaam
-settings-accounts-apple-note = Gebruik het wachtwoord van je Apple Account; app-specifieke wachtwoorden werken hier niet. Apple toont daarna een code op je iPhone, iPad of Mac.
-settings-accounts-nextcloud-browser = Je browser wordt geopend, zodat je je kunt aanmelden bij je server en Luft toegang kunt geven.
-settings-accounts-use-app-password = Liever een app-wachtwoord gebruiken
-settings-accounts-error-server = Voer het serveradres in
-settings-accounts-error-apple-account = Voer het e-mailadres van je Apple Account in
-settings-accounts-error-user = Voer de gebruikersnaam in
-settings-accounts-error-password = Voer het wachtwoord in
-settings-accounts-cancel = Annuleren
-settings-accounts-back = Terug
-settings-accounts-continue-in-browser = Doorgaan in browser
-settings-accounts-sign-in = Aanmelden
-settings-accounts-try-again = Opnieuw proberen
-settings-accounts-continue = Doorgaan
-settings-accounts-working = Verbinden met { $provider }…
-settings-accounts-finish-in-browser = Rond het aanmelden bij { $provider } af in je browser. Luft ziet je wachtwoord nooit, en dit wordt vanzelf bijgewerkt zodra je klaar bent.
-settings-accounts-no-browser = Er is geen browser geopend. Kopieer de link en open die in een browser.
-settings-accounts-open-again = Pagina opnieuw openen
-settings-accounts-copy-link = Link kopiëren
-settings-accounts-copied = Gekopieerd
-settings-accounts-code = Verificatiecode
-    .placeholder = Code van 6 cijfers
-settings-accounts-text-me = Stuur me liever een code per sms
-settings-accounts-choose-phone = Naar welk nummer moet Apple de code sturen?
-    .description = Sms sturen
-settings-accounts-approve = Je Apple Account gebruikt Geavanceerde gegevensbescherming. Keur het verzoek goed op je iPhone, iPad of Mac zodat deze computer iCloud Drive kan openen.

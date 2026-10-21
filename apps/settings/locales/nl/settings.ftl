@@ -3,16 +3,21 @@
 settings-search = Instellingen zoeken
 settings-search-empty = Niets gevonden.
 
+## Sidebar groups
+
+settings-group-connections = Verbindingen
+settings-group-devices = Apparaten
+settings-group-look = Uiterlijk & gevoel
+settings-group-protection = Bescherming
+settings-group-system = Systeem
+
 ## Panel titles that depend on the hardware
 
 settings-power-title = Energie
-settings-mouse-title = Muis
-settings-touchpad-title = Touchpad
 
 ## Missing hardware
 
 settings-bluetooth-missing = Deze computer heeft geen Bluetooth-adapter
-settings-mouse-missing = Er is geen muis of touchpad aangesloten
 
 ## Shared pieces
 

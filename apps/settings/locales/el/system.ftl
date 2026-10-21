@@ -1,26 +1,3 @@
-## Apps
-
-settings-apps-defaults = Προεπιλεγμένες εφαρμογές
-settings-apps-defaults-description = Χρησιμοποιούνται όταν ανοίγετε συνδέσμους, αρχεία και φακέλους
-settings-apps-browser = Πρόγραμμα περιήγησης
-settings-apps-email = Email
-settings-apps-calendar = Ημερολόγιο
-settings-apps-music = Μουσική
-settings-apps-videos = Βίντεο
-settings-apps-photos = Φωτογραφίες
-settings-apps-text-editor = Επεξεργαστής κειμένου
-settings-apps-files = Αρχεία
-settings-apps-choose = Επιλογή
-settings-apps-startup = Εκκίνηση
-settings-apps-startup-description = Αυτές οι εφαρμογές ανοίγουν όταν συνδέεστε
-settings-apps-startup-app = Άνοιγμα της εφαρμογής { $app } κατά τη σύνδεση
-settings-apps-startup-add = Προσθήκη εφαρμογής
-settings-apps-startup-add-title = Προσθήκη εφαρμογής εκκίνησης
-settings-apps-startup-add-description = Επιλέξτε μια εφαρμογή που θα ανοίγει κάθε φορά που συνδέεστε.
-settings-apps-search = Αναζήτηση εφαρμογών
-settings-apps-no-match = Καμία εφαρμογή δεν ταιριάζει με την αναζήτηση
-settings-apps-cancel = Ακύρωση
-
 ## Date and time
 
 settings-datetime-automatic = Αυτόματη ρύθμιση ώρας
@@ -37,7 +14,6 @@ settings-datetime-format-24h = 24ωρη
 settings-datetime-format-12h = π.μ./μ.μ.
 settings-datetime-seconds = Εμφάνιση δευτερολέπτων
 settings-datetime-weekday = Εμφάνιση ημέρας της εβδομάδας
-settings-datetime-calendar = Ημερολόγιο
 settings-datetime-week-start = Πρώτη ημέρα της εβδομάδας
 settings-datetime-week-start-automatic = Αυτόματα
 settings-datetime-week-start-monday = Δευτέρα
@@ -317,3 +293,85 @@ settings-region-formats-language = Ίδιες με τη γλώσσα
 settings-region-formats = Μορφές
 settings-region-formats-description = Ημερομηνίες, ώρες, αριθμοί και μονάδες μέτρησης
 settings-region-formats-next-sign-in = { $sample }, από την επόμενη σύνδεση
+
+## Accounts panel
+
+settings-accounts-unavailable = Οι λογαριασμοί δεν είναι διαθέσιμοι
+    .description = Η υπηρεσία λογαριασμών δεν είναι εγκατεστημένη σε αυτόν τον υπολογιστή
+settings-accounts-online = Διαδικτυακοί λογαριασμοί
+    .description = Κάθε λογαριασμός είναι ένας φάκελος μέσα στον φάκελο Cloud του προσωπικού σας φακέλου, που μπορεί να ανοίξει κάθε εφαρμογή. Τα αρχεία λαμβάνονται όταν τα ανοίγετε.
+settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud ή WebDAV
+
+## Accounts: an account's row
+
+settings-accounts-sign-in-again-needed = Συνδεθείτε ξανά για να συνεχίσετε να τον χρησιμοποιείτε
+settings-accounts-paused-metered = Ο συγχρονισμός διακόπηκε προσωρινά λόγω σύνδεσης με χρέωση
+settings-accounts-paused-battery = Ο συγχρονισμός διακόπηκε προσωρινά λόγω χαμηλής μπαταρίας
+settings-accounts-connecting = Σύνδεση…
+settings-accounts-offline = Εκτός σύνδεσης
+settings-accounts-offline-kept = Εκτός σύνδεσης, τα διατηρημένα αρχεία παραμένουν διαθέσιμα
+settings-accounts-not-connected = Μη συνδεδεμένος
+settings-accounts-syncing = { $count ->
+        [one] Συγχρονισμός { $count } αλλαγής
+       *[other] Συγχρονισμός { $count } αλλαγών
+    }
+settings-accounts-name = Όνομα
+settings-accounts-folder = Φάκελος
+settings-accounts-server = Διακομιστής
+settings-accounts-storage = Αποθηκευτικός χώρος
+settings-accounts-storage-used = { $used } από { $total } σε χρήση
+settings-accounts-on-device = Σε αυτήν τη συσκευή
+settings-accounts-kept = { $count ->
+        [one] { $count } στοιχείο διατηρείται, τα υπόλοιπα λαμβάνονται όταν ανοιχτούν
+       *[other] { $count } στοιχεία διατηρούνται, τα υπόλοιπα λαμβάνονται όταν ανοιχτούν
+    }
+settings-accounts-on-demand = Τα αρχεία λαμβάνονται όταν τα ανοίγετε
+settings-accounts-sign-in-again = Νέα σύνδεση
+settings-accounts-keep = Διατήρηση
+settings-accounts-remove = Αφαίρεση
+settings-accounts-remove-confirm = Αφαίρεση από αυτόν τον υπολογιστή
+settings-accounts-removing = Αφαίρεση…
+settings-accounts-remove-note = Τα αρχεία σας παραμένουν στο { $provider }. Οι αλλαγές που έγιναν εδώ αποστέλλονται πρώτα.
+
+## Accounts: providers
+
+settings-accounts-provider-icloud = Ο λογαριασμός Apple σας, με επιβεβαίωση μέσω κωδικού από iPhone, iPad ή Mac
+settings-accounts-provider-onedrive = Προσωπικός, εταιρικός ή σχολικός λογαριασμός Microsoft, στο πρόγραμμα περιήγησης
+settings-accounts-provider-dropbox = Λογαριασμός Dropbox, στο πρόγραμμα περιήγησης
+settings-accounts-provider-nextcloud = Ο δικός σας διακομιστής ή του οργανισμού σας
+settings-accounts-provider-webdav = Οποιοσδήποτε διακομιστής υποστηρίζει WebDAV
+
+## Accounts: signing in
+
+settings-accounts-sign-in-again-title = Νέα σύνδεση στον λογαριασμό { $account }
+settings-accounts-browser = Θα ανοίξει το πρόγραμμα περιήγησης για να συνδεθείτε με { $provider }. Το Luft δεν βλέπει ποτέ τον κωδικό πρόσβασής σας.
+settings-accounts-password-for = Εισαγάγετε τον κωδικό πρόσβασης για { $user }.
+settings-accounts-apple-account = Λογαριασμός Apple
+settings-accounts-password = Κωδικός πρόσβασης
+settings-accounts-app-password = Κωδικός πρόσβασης εφαρμογής
+settings-accounts-user = Όνομα χρήστη
+settings-accounts-apple-note = Χρησιμοποιήστε τον κωδικό πρόσβασης του λογαριασμού Apple σας. Οι κωδικοί πρόσβασης για συγκεκριμένες εφαρμογές δεν λειτουργούν εδώ. Στη συνέχεια, η Apple εμφανίζει έναν κωδικό στο iPhone, το iPad ή το Mac σας.
+settings-accounts-nextcloud-browser = Θα ανοίξει το πρόγραμμα περιήγησης για να συνδεθείτε στον διακομιστή σας και να επιτρέψετε την πρόσβαση στο Luft.
+settings-accounts-use-app-password = Χρήση κωδικού πρόσβασης εφαρμογής
+settings-accounts-error-server = Εισαγάγετε τη διεύθυνση του διακομιστή
+settings-accounts-error-apple-account = Εισαγάγετε το email του λογαριασμού Apple σας
+settings-accounts-error-user = Εισαγάγετε το όνομα χρήστη
+settings-accounts-error-password = Εισαγάγετε τον κωδικό πρόσβασης
+settings-accounts-cancel = Ακύρωση
+settings-accounts-back = Πίσω
+settings-accounts-continue-in-browser = Συνέχεια στο πρόγραμμα περιήγησης
+settings-accounts-sign-in = Σύνδεση
+settings-accounts-try-again = Επανάληψη
+settings-accounts-continue = Συνέχεια
+settings-accounts-working = Επικοινωνία με { $provider }…
+settings-accounts-finish-in-browser = Ολοκληρώστε τη σύνδεση με { $provider } στο πρόγραμμα περιήγησης. Το Luft δεν βλέπει ποτέ τον κωδικό πρόσβασής σας και αυτή η σελίδα θα ενημερωθεί μόλις τελειώσετε.
+settings-accounts-no-browser = Δεν άνοιξε πρόγραμμα περιήγησης. Αντιγράψτε τον σύνδεσμο και ανοίξτε τον σε ένα πρόγραμμα περιήγησης.
+settings-accounts-open-again = Άνοιγμα της σελίδας ξανά
+settings-accounts-copy-link = Αντιγραφή συνδέσμου
+settings-accounts-copied = Αντιγράφηκε
+settings-accounts-code = Κωδικός επαλήθευσης
+    .placeholder = Εξαψήφιος κωδικός
+settings-accounts-text-me = Αποστολή κωδικού με SMS
+settings-accounts-choose-phone = Σε ποιον αριθμό να στείλει η Apple τον κωδικό;
+    .description = Αποστολή μηνύματος κειμένου
+settings-accounts-approve = Ο λογαριασμός Apple σας χρησιμοποιεί την Προηγμένη προστασία δεδομένων. Εγκρίνετε το αίτημα στο iPhone, το iPad ή το Mac σας για να επιτρέψετε σε αυτόν τον υπολογιστή να ανοίξει το iCloud Drive.

@@ -28,7 +28,6 @@ settings-privacy-location-services = Usluge lokacije
 settings-privacy-location-services-hint = Omogućava aplikacijama da saznaju gdje se nalazite, za mape, vremensku prognozu i vremenske zone
 settings-privacy-camera = Kamera
 settings-privacy-camera-allow = Dozvoli aplikacijama da koriste kameru
-settings-privacy-microphone = Mikrofon
 settings-privacy-microphone-allow = Dozvoli aplikacijama da koriste mikrofon
 settings-privacy-apps-asked = Aplikacije koje su tražile pristup
 settings-privacy-apps-allowed = Dozvoljeno: { $allowed } od { $total }
@@ -354,7 +353,6 @@ settings-passwords-apps-asked = { $count ->
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-back = Sigurnost
 settings-passwords-access-description = Ako uklonite neku, aplikacija će sljedeći put ponovo pitati.
 settings-passwords-access-not-allowed = Nije dozvoljeno
 settings-passwords-access-none = Još nijedna aplikacija nije tražila vaše lozinke
@@ -446,3 +444,26 @@ settings-passkeys-rename-title = Preimenuj pristupni ključ
 settings-passkeys-rename-description = Dajte pristupnom ključu za { $site } naziv koji ćete prepoznati.
 settings-passkeys-name = Naziv
 settings-passkeys-save = Sačuvaj
+
+## Apps
+
+settings-apps-defaults = Zadane aplikacije
+settings-apps-defaults-description = Koriste se kad otvarate linkove, fajlove i foldere
+settings-apps-browser = Web preglednik
+settings-apps-email = E-pošta
+settings-apps-calendar = Kalendar
+settings-apps-music = Muzika
+settings-apps-videos = Videozapisi
+settings-apps-photos = Fotografije
+settings-apps-text-editor = Uređivač teksta
+settings-apps-files = Fajlovi
+settings-apps-choose = Odaberi
+settings-apps-startup = Pokretanje
+settings-apps-startup-description = Ove aplikacije se otvaraju kad se prijavite
+settings-apps-startup-app = Otvori aplikaciju { $app } pri prijavi
+settings-apps-startup-add = Dodaj aplikaciju
+settings-apps-startup-add-title = Dodajte aplikaciju pri pokretanju
+settings-apps-startup-add-description = Odaberite aplikaciju koja će se otvarati pri svakoj prijavi.
+settings-apps-search = Pretraži aplikacije
+settings-apps-no-match = Nijedna aplikacija ne odgovara pretrazi
+settings-apps-cancel = Otkaži

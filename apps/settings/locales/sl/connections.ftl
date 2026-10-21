@@ -74,7 +74,6 @@ settings-network-known-count = { $count ->
        *[other] { $count } shranjenih omrežij
     }
 settings-network-known-in-range = V dosegu
-settings-network-wired = Žično
 settings-network-ethernet = Ethernet
 settings-network-ethernet-named = Ethernet ({ $name })
 settings-network-wired-connected = Povezano · { $speed }
@@ -367,89 +366,3 @@ settings-bluetooth-windows-more = { $count ->
         [few] še { $count }
        *[other] še { $count }
     }
-
-## Accounts panel
-
-settings-accounts-unavailable = Računi niso na voljo
-    .description = Storitev za račune v tem računalniku ni nameščena
-settings-accounts-online = Spletni računi
-    .description = Vsak račun je mapa v mapi Cloud v vaši domači mapi in jo lahko odpre vsaka aplikacija. Datoteke se prenesejo, ko jih odprete.
-settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud ali WebDAV
-
-## Accounts: an account's row
-
-settings-accounts-sign-in-again-needed = Za nadaljnjo uporabo se znova prijavite
-settings-accounts-paused-metered = Sinhronizacija je med merjeno povezavo zaustavljena
-settings-accounts-paused-battery = Sinhronizacija je zaustavljena, ker je baterija skoraj prazna
-settings-accounts-connecting = Povezovanje …
-settings-accounts-offline = Brez povezave
-settings-accounts-offline-kept = Brez povezave, ohranjene datoteke so še vedno tu
-settings-accounts-not-connected = Ni povezano
-settings-accounts-syncing = { $count ->
-        [one] Sinhronizacija { $count } spremembe
-        [two] Sinhronizacija { $count } sprememb
-        [few] Sinhronizacija { $count } sprememb
-       *[other] Sinhronizacija { $count } sprememb
-    }
-settings-accounts-name = Ime
-settings-accounts-folder = Mapa
-settings-accounts-server = Strežnik
-settings-accounts-storage = Shramba
-settings-accounts-storage-used = Porabljeno { $used } od { $total }
-settings-accounts-on-device = V tej napravi
-settings-accounts-kept = { $count ->
-        [one] { $count } ohranjen element, ostalo se prenese ob odpiranju
-        [two] { $count } ohranjena elementa, ostalo se prenese ob odpiranju
-        [few] { $count } ohranjeni elementi, ostalo se prenese ob odpiranju
-       *[other] { $count } ohranjenih elementov, ostalo se prenese ob odpiranju
-    }
-settings-accounts-on-demand = Datoteke se prenesejo, ko jih odprete
-settings-accounts-sign-in-again = Znova se prijavi
-settings-accounts-keep = Obdrži
-settings-accounts-remove = Odstrani
-settings-accounts-remove-confirm = Odstrani iz tega računalnika
-settings-accounts-removing = Odstranjevanje …
-settings-accounts-remove-note = Vaše datoteke ostanejo v storitvi { $provider }. Spremembe, narejene tukaj, se najprej pošljejo tja.
-
-## Accounts: providers
-
-settings-accounts-provider-icloud = Vaš račun Apple, potrjen s kodo iz naprave iPhone, iPad ali Mac
-settings-accounts-provider-onedrive = Osebni, službeni ali šolski račun Microsoft, v brskalniku
-settings-accounts-provider-dropbox = Račun Dropbox, v brskalniku
-settings-accounts-provider-nextcloud = Vaš strežnik ali strežnik vaše organizacije
-settings-accounts-provider-webdav = Kateri koli strežnik, ki podpira WebDAV
-
-## Accounts: signing in
-
-settings-accounts-sign-in-again-title = Vnovična prijava: { $account }
-settings-accounts-browser = Odpre se brskalnik, da se prijavite s storitvijo { $provider }. Luft vašega gesla nikoli ne vidi.
-settings-accounts-password-for = Vnesite geslo za { $user }.
-settings-accounts-apple-account = Račun Apple
-settings-accounts-password = Geslo
-settings-accounts-app-password = Geslo za aplikacijo
-settings-accounts-user = Uporabniško ime
-settings-accounts-apple-note = Uporabite geslo za račun Apple; gesla za posamezne aplikacije tu ne delujejo. Apple nato prikaže kodo v napravi iPhone, iPad ali Mac.
-settings-accounts-nextcloud-browser = Odpre se brskalnik, da se prijavite v svoj strežnik in Luftu dovolite dostop.
-settings-accounts-use-app-password = Raje uporabi geslo za aplikacijo
-settings-accounts-error-server = Vnesite naslov strežnika
-settings-accounts-error-apple-account = Vnesite e-poštni naslov računa Apple
-settings-accounts-error-user = Vnesite uporabniško ime
-settings-accounts-error-password = Vnesite geslo
-settings-accounts-cancel = Prekliči
-settings-accounts-back = Nazaj
-settings-accounts-continue-in-browser = Nadaljuj v brskalniku
-settings-accounts-sign-in = Prijava
-settings-accounts-try-again = Poskusi znova
-settings-accounts-continue = Nadaljuj
-settings-accounts-working = Povezovanje s storitvijo { $provider } …
-settings-accounts-finish-in-browser = Prijavo s storitvijo { $provider } dokončajte v brskalniku. Luft vašega gesla nikoli ne vidi, ta stran pa se samodejno posodobi, ko končate.
-settings-accounts-no-browser = Brskalnik se ni odprl. Kopirajte povezavo in jo odprite v brskalniku.
-settings-accounts-open-again = Znova odpri stran
-settings-accounts-copy-link = Kopiraj povezavo
-settings-accounts-copied = Kopirano
-settings-accounts-code = Koda za preverjanje
-    .placeholder = 6-mestna koda
-settings-accounts-text-me = Raje mi pošlji kodo v sporočilu SMS
-settings-accounts-choose-phone = Na katero številko naj Apple pošlje kodo?
-    .description = Pošlji sporočilo SMS
-settings-accounts-approve = Vaš račun Apple uporablja napredno zaščito podatkov. Odobrite zahtevo v napravi iPhone, iPad ali Mac, da bo ta računalnik lahko odprl iCloud Drive.

@@ -3,16 +3,21 @@
 settings-search = Пребарај поставки
 settings-search-empty = Ништо не одговара на пребарувањето.
 
+## Sidebar groups
+
+settings-group-connections = Врски
+settings-group-devices = Уреди
+settings-group-look = Изглед и чувство
+settings-group-protection = Заштита
+settings-group-system = Систем
+
 ## Panel titles that depend on the hardware
 
 settings-power-title = Напојување
-settings-mouse-title = Глувче
-settings-touchpad-title = Тачпед
 
 ## Missing hardware
 
 settings-bluetooth-missing = Овој компјутер нема Bluetooth-адаптер
-settings-mouse-missing = Нема поврзано глувче или тачпед
 
 ## Shared pieces
 

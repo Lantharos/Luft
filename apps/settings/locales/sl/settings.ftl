@@ -3,16 +3,21 @@
 settings-search = Iskanje nastavitev
 settings-search-empty = Ni zadetkov.
 
+## Sidebar groups
+
+settings-group-connections = Povezave
+settings-group-devices = Naprave
+settings-group-look = Videz in občutek
+settings-group-protection = Zaščita
+settings-group-system = Sistem
+
 ## Panel titles that depend on the hardware
 
 settings-power-title = Napajanje
-settings-mouse-title = Miška
-settings-touchpad-title = Sledilna ploščica
 
 ## Missing hardware
 
 settings-bluetooth-missing = Ta računalnik nima vmesnika Bluetooth
-settings-mouse-missing = Ni priključene miške ali sledilne ploščice
 
 ## Shared pieces
 

@@ -37,7 +37,7 @@ export async function checkDictation(app) {
   try {
     await eventually(() => listening(port), 'the stand-in model mirror is up');
     preferences.set_string('language', 'ja');
-    await show(app, 'keyboard/dictation');
+    await show(app, 'input/dictation');
     await eventually(async () => (await overview()).model === WHISPER, 'Japanese needs Whisper', 15000);
     require(!(await overview())[WHISPER].download, 'nothing downloads while dictation is off');
     await saved(app, 'off', () => true);

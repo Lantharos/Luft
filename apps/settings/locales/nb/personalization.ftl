@@ -67,7 +67,6 @@ settings-appearance-tint-slate = Skifergrå
 
 ## Appearance: text and motion
 
-settings-appearance-taskbar = Oppgavelinje
 settings-appearance-text-and-motion = Tekst og bevegelse
 settings-appearance-text-size = Tekststørrelse
 settings-appearance-text-size-description = Gjør teksten større eller mindre i alle apper
@@ -76,8 +75,6 @@ settings-appearance-animations-description = Vinduer og menyer glir frem i stede
 
 ## Taskbar
 
-settings-taskbar-title = Oppgavelinje og Start
-settings-taskbar-back = Utseende
 settings-taskbar-preview = Forhåndsvisning av oppgavelinjen
 settings-start-section = Start
 settings-start-style = Stil
@@ -226,7 +223,6 @@ settings-notifications-done = Ferdig
 
 settings-tiling-preview = Forhåndsvisning av vindusoppsett
 settings-tiling-title = Flislegging av vinduer
-settings-tiling-back = Utseende
 settings-tiling-mode = Ordne vinduer
 settings-tiling-mode-off = Av
 settings-tiling-mode-tiling = Fliser

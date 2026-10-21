@@ -5,7 +5,7 @@ sidebar:
   order: 8
 ---
 
-<kbd>Super</kbd> is the key with the Windows logo on most keyboards. Settings, under Keyboard, **Keyboard shortcuts**, changes any of these and adds your own.
+<kbd>Super</kbd> is the key with the Windows logo on most keyboards. Settings, under Input, **Keyboard shortcuts**, changes any of these and adds your own.
 
 ## The desktop
 

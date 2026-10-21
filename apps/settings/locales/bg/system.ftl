@@ -1,26 +1,3 @@
-## Apps
-
-settings-apps-defaults = Приложения по подразбиране
-settings-apps-defaults-description = Използват се, когато отваряте връзки, файлове и папки
-settings-apps-browser = Уеб браузър
-settings-apps-email = Имейл
-settings-apps-calendar = Календар
-settings-apps-music = Музика
-settings-apps-videos = Видео
-settings-apps-photos = Снимки
-settings-apps-text-editor = Текстов редактор
-settings-apps-files = Файлове
-settings-apps-choose = Изберете
-settings-apps-startup = Стартиране
-settings-apps-startup-description = Тези приложения се отварят, когато влезете
-settings-apps-startup-app = Отваряне на { $app } при вход
-settings-apps-startup-add = Добави приложение
-settings-apps-startup-add-title = Добавяне на приложение при стартиране
-settings-apps-startup-add-description = Изберете приложение, което да се отваря при всеки вход.
-settings-apps-search = Търсене на приложения
-settings-apps-no-match = Няма приложения, които отговарят на търсенето
-settings-apps-cancel = Отказ
-
 ## Date and time
 
 settings-datetime-automatic = Автоматично задаване на часа
@@ -37,7 +14,6 @@ settings-datetime-format-24h = 24-часов
 settings-datetime-format-12h = 12-часов
 settings-datetime-seconds = Показване на секундите
 settings-datetime-weekday = Показване на деня от седмицата
-settings-datetime-calendar = Календар
 settings-datetime-week-start = Първи ден от седмицата
 settings-datetime-week-start-automatic = Автоматично
 settings-datetime-week-start-monday = Понеделник
@@ -317,3 +293,85 @@ settings-region-formats-language = Като езика
 settings-region-formats = Формати
 settings-region-formats-description = Дати, часове, числа и мерни единици
 settings-region-formats-next-sign-in = { $sample }, от следващия вход
+
+## Accounts panel
+
+settings-accounts-unavailable = Акаунтите не са налични
+    .description = Услугата за акаунти не е инсталирана на този компютър
+settings-accounts-online = Онлайн акаунти
+    .description = Всеки акаунт е папка в Cloud в личната ви папка, която всяко приложение може да отвори. Файловете се изтеглят, когато ги отворите.
+settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud или WebDAV
+
+## Accounts: an account's row
+
+settings-accounts-sign-in-again-needed = Влезте отново, за да продължите да го използвате
+settings-accounts-paused-metered = Синхронизирането е на пауза при връзка с отчитане
+settings-accounts-paused-battery = Синхронизирането е на пауза, докато батерията е слаба
+settings-accounts-connecting = Свързване…
+settings-accounts-offline = Офлайн
+settings-accounts-offline-kept = Офлайн, запазените файлове са налични
+settings-accounts-not-connected = Няма връзка
+settings-accounts-syncing = { $count ->
+        [one] Синхронизиране на { $count } промяна
+       *[other] Синхронизиране на { $count } промени
+    }
+settings-accounts-name = Име
+settings-accounts-folder = Папка
+settings-accounts-server = Сървър
+settings-accounts-storage = Хранилище
+settings-accounts-storage-used = Използвани { $used } от { $total }
+settings-accounts-on-device = На това устройство
+settings-accounts-kept = { $count ->
+        [one] { $count } запазен елемент, останалото се изтегля при отваряне
+       *[other] { $count } запазени елемента, останалото се изтегля при отваряне
+    }
+settings-accounts-on-demand = Файловете се изтеглят, когато ги отворите
+settings-accounts-sign-in-again = Влез отново
+settings-accounts-keep = Остави
+settings-accounts-remove = Премахни
+settings-accounts-remove-confirm = Премахни от компютъра
+settings-accounts-removing = Премахване…
+settings-accounts-remove-note = Файловете ви остават в { $provider }. Промените, направени тук, първо се качват.
+
+## Accounts: providers
+
+settings-accounts-provider-icloud = Вашият акаунт в Apple, потвърден с код от iPhone, iPad или Mac
+settings-accounts-provider-onedrive = Личен, служебен или училищен акаунт в Microsoft, в браузъра
+settings-accounts-provider-dropbox = Акаунт в Dropbox, в браузъра
+settings-accounts-provider-nextcloud = Ваш собствен сървър или сървърът на организацията ви
+settings-accounts-provider-webdav = Всеки сървър, който поддържа WebDAV
+
+## Accounts: signing in
+
+settings-accounts-sign-in-again-title = Повторен вход в { $account }
+settings-accounts-browser = Браузърът ви ще се отвори, за да влезете с { $provider }. Luft никога не вижда паролата ви.
+settings-accounts-password-for = Въведете паролата за { $user }.
+settings-accounts-apple-account = Акаунт в Apple
+settings-accounts-password = Парола
+settings-accounts-app-password = Парола за приложение
+settings-accounts-user = Потребителско име
+settings-accounts-apple-note = Използвайте паролата за акаунта си в Apple. Паролите за отделни приложения не работят тук. След това Apple показва код на вашия iPhone, iPad или Mac.
+settings-accounts-nextcloud-browser = Браузърът ви ще се отвори, за да влезете в сървъра си и да разрешите достъп на Luft.
+settings-accounts-use-app-password = Използвай парола за приложение
+settings-accounts-error-server = Въведете адреса на сървъра
+settings-accounts-error-apple-account = Въведете имейла на акаунта си в Apple
+settings-accounts-error-user = Въведете потребителското име
+settings-accounts-error-password = Въведете паролата
+settings-accounts-cancel = Отказ
+settings-accounts-back = Назад
+settings-accounts-continue-in-browser = Продължи в браузъра
+settings-accounts-sign-in = Вход
+settings-accounts-try-again = Опитай отново
+settings-accounts-continue = Продължи
+settings-accounts-working = Връзка с { $provider }…
+settings-accounts-finish-in-browser = Завършете влизането с { $provider } в браузъра си. Luft никога не вижда паролата ви, а тази страница ще се обнови сама, щом приключите.
+settings-accounts-no-browser = Браузърът не се отвори. Копирайте връзката и я отворете в браузър.
+settings-accounts-open-again = Отвори страницата отново
+settings-accounts-copy-link = Копирай връзката
+settings-accounts-copied = Копирано
+settings-accounts-code = Код за потвърждение
+    .placeholder = 6-цифрен код
+settings-accounts-text-me = Изпрати ми код с SMS
+settings-accounts-choose-phone = На кой номер Apple да изпрати кода?
+    .description = Изпращане на SMS
+settings-accounts-approve = Акаунтът ви в Apple използва Разширена защита на данните. Одобрете заявката на вашия iPhone, iPad или Mac, за да може този компютър да отваря iCloud Drive.

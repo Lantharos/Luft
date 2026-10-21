@@ -1,4 +1,4 @@
-### Network, Bluetooth and Accounts panels
+### Network and Bluetooth panels
 
 ## Network: shared words
 
@@ -88,7 +88,6 @@ settings-network-known-count = { $count ->
     }
 # A known network that is nearby but not connected
 settings-network-known-in-range = In range
-settings-network-wired = Wired
 settings-network-ethernet = Ethernet
 # Used when the computer has several network cables; $name is the network card's name
 settings-network-ethernet-named = Ethernet ({ $name })
@@ -410,102 +409,3 @@ settings-bluetooth-windows-more = { $count ->
         [one] { $count } more
        *[other] { $count } more
     }
-
-## Accounts panel
-
-settings-accounts-unavailable = Accounts aren’t available
-    .description = The accounts service isn’t installed on this computer
-settings-accounts-online = Online accounts
-    .description = Each account is a folder in Cloud, in your home folder, that every app can open. Files download when you open them.
-settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud or WebDAV
-
-## Accounts: an account's row
-
-settings-accounts-sign-in-again-needed = Sign in again to keep using it
-settings-accounts-paused-metered = Syncing paused on a metered connection
-settings-accounts-paused-battery = Syncing paused while the battery is low
-settings-accounts-connecting = Connecting…
-settings-accounts-offline = Offline
-settings-accounts-offline-kept = Offline, kept files are still here
-settings-accounts-not-connected = Not connected
-settings-accounts-syncing = { $count ->
-        [one] Syncing { $count } change
-       *[other] Syncing { $count } changes
-    }
-settings-accounts-name = Name
-settings-accounts-folder = Folder
-settings-accounts-server = Server
-settings-accounts-storage = Storage
-# $used and $total are sizes, like "2 GB"
-settings-accounts-storage-used = { $used } of { $total } used
-settings-accounts-on-device = On this device
-settings-accounts-kept = { $count ->
-        [one] { $count } item kept, the rest downloads when opened
-       *[other] { $count } items kept, the rest downloads when opened
-    }
-settings-accounts-on-demand = Files download when you open them
-# Button
-settings-accounts-sign-in-again = Sign in again
-# Button that cancels removing an account
-settings-accounts-keep = Keep
-# Button
-settings-accounts-remove = Remove
-# Button that confirms removing an account
-settings-accounts-remove-confirm = Remove from this computer
-settings-accounts-removing = Removing…
-# $provider is the service's name, like "OneDrive"
-settings-accounts-remove-note = Your files stay in { $provider }. Changes made here are sent up first.
-
-## Accounts: providers
-
-settings-accounts-provider-icloud = Your Apple Account, confirmed with a code from your iPhone, iPad or Mac
-settings-accounts-provider-onedrive = A personal, work or school Microsoft account, in your browser
-settings-accounts-provider-dropbox = A Dropbox account, in your browser
-settings-accounts-provider-nextcloud = Your own or your organization’s server
-settings-accounts-provider-webdav = Any server that speaks WebDAV
-
-## Accounts: signing in
-
-# Dialog title; $account is the account's name
-settings-accounts-sign-in-again-title = Sign in to { $account } again
-# $provider is Microsoft or Dropbox
-settings-accounts-browser = Your browser opens so you can sign in with { $provider }. Luft never sees your password.
-# $user is the account's email address
-settings-accounts-password-for = Enter the password for { $user }.
-settings-accounts-apple-account = Apple Account
-settings-accounts-password = Password
-settings-accounts-app-password = App password
-settings-accounts-user = User name
-settings-accounts-apple-note = Use your Apple Account password; app-specific passwords don’t work here. Apple then shows a code on your iPhone, iPad or Mac.
-settings-accounts-nextcloud-browser = Your browser opens so you can sign in to your server and allow Luft in.
-settings-accounts-use-app-password = Use an app password instead
-settings-accounts-error-server = Enter the server address
-settings-accounts-error-apple-account = Enter your Apple Account email
-settings-accounts-error-user = Enter the user name
-settings-accounts-error-password = Enter the password
-# Button
-settings-accounts-cancel = Cancel
-# Button
-settings-accounts-back = Back
-# Button
-settings-accounts-continue-in-browser = Continue in browser
-# Button
-settings-accounts-sign-in = Sign in
-# Button
-settings-accounts-try-again = Try again
-# Button
-settings-accounts-continue = Continue
-# $provider is the service's name, like "iCloud Drive"
-settings-accounts-working = Talking to { $provider }…
-# $provider is the service's name, like "OneDrive"
-settings-accounts-finish-in-browser = Finish signing in with { $provider } in your browser. Luft never sees your password, and this updates on its own once you’re done.
-settings-accounts-no-browser = No browser opened. Copy the link and open it in a browser.
-settings-accounts-open-again = Open the page again
-settings-accounts-copy-link = Copy the link
-settings-accounts-copied = Copied
-settings-accounts-code = Verification code
-    .placeholder = 6-digit code
-settings-accounts-text-me = Text me a code instead
-settings-accounts-choose-phone = Which number should Apple text the code to?
-    .description = Send a text message
-settings-accounts-approve = Your Apple Account uses Advanced Data Protection. Approve the request on your iPhone, iPad or Mac to let this computer open iCloud Drive.

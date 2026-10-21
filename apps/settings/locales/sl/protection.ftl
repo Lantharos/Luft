@@ -28,7 +28,6 @@ settings-privacy-location-services = Lokacijske storitve
 settings-privacy-location-services-hint = Aplikacije lahko ugotovijo, kje ste, za zemljevide, vreme in časovne pasove
 settings-privacy-camera = Kamera
 settings-privacy-camera-allow = Dovoli aplikacijam uporabo kamere
-settings-privacy-microphone = Mikrofon
 settings-privacy-microphone-allow = Dovoli aplikacijam uporabo mikrofona
 settings-privacy-apps-asked = Aplikacije, ki so zahtevale dostop
 settings-privacy-apps-allowed = Dovoljeno: { $allowed } od { $total }
@@ -371,7 +370,6 @@ settings-passwords-apps-asked = { $count ->
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-back = Varnost
 settings-passwords-access-description = Če aplikacijo odstranite, bo naslednjič znova vprašala.
 settings-passwords-access-not-allowed = Ni dovoljeno
 settings-passwords-access-none = Nobena aplikacija še ni zahtevala vaših gesel
@@ -465,3 +463,26 @@ settings-passkeys-rename-title = Preimenujte ključ za dostop
 settings-passkeys-rename-description = Ključu za dostop za { $site } dajte ime, ki ga boste prepoznali.
 settings-passkeys-name = Ime
 settings-passkeys-save = Shrani
+
+## Apps
+
+settings-apps-defaults = Privzete aplikacije
+settings-apps-defaults-description = Uporabijo se, ko odprete povezave, datoteke in mape
+settings-apps-browser = Spletni brskalnik
+settings-apps-email = E-pošta
+settings-apps-calendar = Koledar
+settings-apps-music = Glasba
+settings-apps-videos = Videoposnetki
+settings-apps-photos = Fotografije
+settings-apps-text-editor = Urejevalnik besedil
+settings-apps-files = Datoteke
+settings-apps-choose = Izberite
+settings-apps-startup = Zagon
+settings-apps-startup-description = Te aplikacije se odprejo, ko se prijavite
+settings-apps-startup-app = Odpri aplikacijo { $app } ob prijavi
+settings-apps-startup-add = Dodaj aplikacijo
+settings-apps-startup-add-title = Dodajte aplikacijo ob zagonu
+settings-apps-startup-add-description = Izberite aplikacijo, ki se bo odprla ob vsaki prijavi.
+settings-apps-search = Iskanje aplikacij
+settings-apps-no-match = Nobena aplikacija se ne ujema z iskanjem
+settings-apps-cancel = Prekliči

@@ -67,7 +67,6 @@ settings-appearance-tint-slate = Γκρι
 
 ## Appearance: text and motion
 
-settings-appearance-taskbar = Γραμμή εργασιών
 settings-appearance-text-and-motion = Κείμενο και κίνηση
 settings-appearance-text-size = Μέγεθος κειμένου
 settings-appearance-text-size-description = Μεγαλώνει ή μικραίνει το κείμενο σε όλες τις εφαρμογές
@@ -76,8 +75,6 @@ settings-appearance-animations-description = Τα παράθυρα και τα �
 
 ## Taskbar
 
-settings-taskbar-title = Γραμμή εργασιών και Start
-settings-taskbar-back = Εμφάνιση
 settings-taskbar-preview = Προεπισκόπηση γραμμής εργασιών
 settings-start-section = Start
 settings-start-style = Στυλ
@@ -226,7 +223,6 @@ settings-notifications-done = Τέλος
 
 settings-tiling-preview = Προεπισκόπηση διάταξης παραθύρων
 settings-tiling-title = Παράθεση παραθύρων
-settings-tiling-back = Εμφάνιση
 settings-tiling-mode = Τακτοποίηση παραθύρων
 settings-tiling-mode-off = Ανενεργό
 settings-tiling-mode-tiling = Παράθεση

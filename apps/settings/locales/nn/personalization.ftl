@@ -67,7 +67,6 @@ settings-appearance-tint-slate = Skifergrå
 
 ## Appearance: text and motion
 
-settings-appearance-taskbar = Oppgåvelinje
 settings-appearance-text-and-motion = Tekst og rørsle
 settings-appearance-text-size = Tekststorleik
 settings-appearance-text-size-description = Gjer teksten større eller mindre i alle appar
@@ -76,8 +75,6 @@ settings-appearance-animations-description = Vindauge og menyar glir fram i stad
 
 ## Taskbar
 
-settings-taskbar-title = Oppgåvelinje og Start
-settings-taskbar-back = Utsjånad
 settings-taskbar-preview = Førehandsvising av oppgåvelinja
 settings-start-section = Start
 settings-start-style = Stil
@@ -226,7 +223,6 @@ settings-notifications-done = Ferdig
 
 settings-tiling-preview = Førehandsvising av vindaugsoppsett
 settings-tiling-title = Flislegging av vindauge
-settings-tiling-back = Utsjånad
 settings-tiling-mode = Ordne vindauge
 settings-tiling-mode-off = Av
 settings-tiling-mode-tiling = Fliser

@@ -28,7 +28,6 @@ settings-privacy-location-services = Helymeghatározás
 settings-privacy-location-services-hint = Az alkalmazások megtudhatják, hol tartózkodik, például térképekhez, időjáráshoz és időzónákhoz
 settings-privacy-camera = Kamera
 settings-privacy-camera-allow = Kamerahasználat engedélyezése az alkalmazásoknak
-settings-privacy-microphone = Mikrofon
 settings-privacy-microphone-allow = Mikrofonhasználat engedélyezése az alkalmazásoknak
 settings-privacy-apps-asked = Hozzáférést kérő alkalmazások
 settings-privacy-apps-allowed = { $allowed }/{ $total } engedélyezve
@@ -345,7 +344,6 @@ settings-passwords-apps-asked = { $count ->
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-back = Biztonság
 settings-passwords-access-description = Ha eltávolít egyet, az alkalmazás legközelebb újra engedélyt kér.
 settings-passwords-access-not-allowed = Nem engedélyezett
 settings-passwords-access-none = Még egy alkalmazás sem kért hozzáférést a jelszavaihoz
@@ -435,3 +433,26 @@ settings-passkeys-rename-title = Jelkulcs átnevezése
 settings-passkeys-rename-description = Adjon felismerhető nevet a jelkulcsnak ehhez: { $site }.
 settings-passkeys-name = Név
 settings-passkeys-save = Mentés
+
+## Apps
+
+settings-apps-defaults = Alapértelmezett alkalmazások
+settings-apps-defaults-description = Hivatkozások, fájlok és mappák megnyitásakor használatosak
+settings-apps-browser = Webböngésző
+settings-apps-email = E-mail
+settings-apps-calendar = Naptár
+settings-apps-music = Zene
+settings-apps-videos = Videók
+settings-apps-photos = Fényképek
+settings-apps-text-editor = Szövegszerkesztő
+settings-apps-files = Fájlok
+settings-apps-choose = Válasszon
+settings-apps-startup = Indítás
+settings-apps-startup-description = Ezek az alkalmazások bejelentkezéskor megnyílnak
+settings-apps-startup-app = Megnyitás bejelentkezéskor: { $app }
+settings-apps-startup-add = Alkalmazás hozzáadása
+settings-apps-startup-add-title = Indítási alkalmazás hozzáadása
+settings-apps-startup-add-description = Válassza ki, melyik alkalmazás nyíljon meg minden bejelentkezéskor.
+settings-apps-search = Alkalmazások keresése
+settings-apps-no-match = Egy alkalmazás sem felel meg a keresésnek
+settings-apps-cancel = Mégse

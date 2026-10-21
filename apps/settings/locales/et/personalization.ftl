@@ -67,7 +67,6 @@ settings-appearance-tint-slate = Hallikassinine
 
 ## Appearance: text and motion
 
-settings-appearance-taskbar = Tegumiriba
 settings-appearance-text-and-motion = Tekst ja liikumine
 settings-appearance-text-size = Teksti suurus
 settings-appearance-text-size-description = Muudab teksti rakendustes suuremaks või väiksemaks
@@ -76,8 +75,6 @@ settings-appearance-animations-description = Aknad ja menüüd liiguvad, selle a
 
 ## Taskbar
 
-settings-taskbar-title = Tegumiriba ja Start
-settings-taskbar-back = Välimus
 settings-taskbar-preview = Tegumiriba eelvaade
 settings-start-section = Start
 settings-start-style = Stiil
@@ -226,7 +223,6 @@ settings-notifications-done = Valmis
 
 settings-tiling-preview = Akende paigutuse eelvaade
 settings-tiling-title = Akende paanimine
-settings-tiling-back = Välimus
 settings-tiling-mode = Akende paigutus
 settings-tiling-mode-off = Väljas
 settings-tiling-mode-tiling = Paanid

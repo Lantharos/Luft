@@ -20,7 +20,7 @@ Install Luft picks the NVIDIA image when the computer has an NVIDIA card, and [M
 
 ## Switching
 
-If you add an NVIDIA card later, or installed the standard image on a computer with one, Luft notices. It offers NVIDIA's driver in Settings, under Updates, and once in a notification after you sign in. It offers again only if a different NVIDIA card turns up.
+If you add an NVIDIA card later, or installed the standard image on a computer with one, Luft notices. It offers NVIDIA's driver in Settings, under System, and once in a notification after you sign in. It offers again only if a different NVIDIA card turns up.
 
 The other way round, on the NVIDIA image without an NVIDIA card, Settings offers the smaller standard image, without a notification.
 
@@ -28,6 +28,6 @@ Switching works like an update. Settings shows how much it downloads, which coun
 
 ## When the graphics driver stops responding
 
-If the graphics card stops responding entirely, Luft restarts the computer cleanly once the kernel confirms the failure, and explains what happened at the next start, with suggestions for that computer. Settings lists the last ten under About, **Recent problems**.
+If the graphics card stops responding entirely, Luft restarts the computer cleanly once the kernel confirms the failure, and explains what happened at the next start, with suggestions for that computer. Settings lists the last ten under System, About, **Recent problems**.
 
 On NVIDIA cards with Resizable BAR off, the driver can run out of room and stop responding. Turn on **Above 4G Decoding** and **Resizable BAR** in the firmware settings. A full shutdown may be needed before the change applies.

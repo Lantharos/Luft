@@ -1,7 +1,4 @@
 pub mod about;
-pub mod apps;
-pub mod datetime;
-pub mod login;
-pub mod region;
+pub mod accounts;
+pub mod language;
 pub mod updates;
-pub mod users;

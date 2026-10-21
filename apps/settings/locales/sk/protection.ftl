@@ -28,7 +28,6 @@ settings-privacy-location-services = Služby určovania polohy
 settings-privacy-location-services-hint = Aplikácie môžu zistiť, kde ste, pre mapy, počasie a časové pásma
 settings-privacy-camera = Kamera
 settings-privacy-camera-allow = Povoliť aplikáciám používať kameru
-settings-privacy-microphone = Mikrofón
 settings-privacy-microphone-allow = Povoliť aplikáciám používať mikrofón
 settings-privacy-apps-asked = Aplikácie, ktoré požiadali o prístup
 settings-privacy-apps-allowed = Povolené: { $allowed } z { $total }
@@ -371,7 +370,6 @@ settings-passwords-apps-asked = { $count ->
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-back = Zabezpečenie
 settings-passwords-access-description = Keď aplikáciu odstránite, nabudúce sa opýta znova.
 settings-passwords-access-not-allowed = Nepovolené
 settings-passwords-access-none = O vaše heslá zatiaľ nepožiadala žiadna aplikácia
@@ -465,3 +463,26 @@ settings-passkeys-rename-title = Premenovať prístupový kľúč
 settings-passkeys-rename-description = Pomenujte prístupový kľúč pre { $site } tak, aby ste ho spoznali.
 settings-passkeys-name = Názov
 settings-passkeys-save = Uložiť
+
+## Apps
+
+settings-apps-defaults = Predvolené aplikácie
+settings-apps-defaults-description = Používajú sa pri otváraní odkazov, súborov a priečinkov
+settings-apps-browser = Webový prehliadač
+settings-apps-email = E-mail
+settings-apps-calendar = Kalendár
+settings-apps-music = Hudba
+settings-apps-videos = Videá
+settings-apps-photos = Fotky
+settings-apps-text-editor = Textový editor
+settings-apps-files = Súbory
+settings-apps-choose = Vybrať
+settings-apps-startup = Po spustení
+settings-apps-startup-description = Tieto aplikácie sa otvoria po prihlásení
+settings-apps-startup-app = Otvoriť aplikáciu { $app } po prihlásení
+settings-apps-startup-add = Pridať aplikáciu
+settings-apps-startup-add-title = Pridať aplikáciu po spustení
+settings-apps-startup-add-description = Vyberte aplikáciu, ktorá sa otvorí pri každom prihlásení.
+settings-apps-search = Hľadať aplikácie
+settings-apps-no-match = Hľadaniu nezodpovedajú žiadne aplikácie
+settings-apps-cancel = Zrušiť

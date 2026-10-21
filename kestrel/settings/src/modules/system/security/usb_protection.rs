@@ -38,7 +38,7 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
                 }
                 Some(action) = actions.next() => {
                     if action.args().is_ok_and(|args| args.id == notification && args.action_key == SETTINGS_ACTION) {
-                        notify::open_settings("security");
+                        notify::open_settings("security/protections");
                     }
                 }
             }

@@ -67,7 +67,6 @@ settings-appearance-tint-slate = Grafitowy
 
 ## Appearance: text and motion
 
-settings-appearance-taskbar = Pasek zadań
 settings-appearance-text-and-motion = Tekst i ruch
 settings-appearance-text-size = Rozmiar tekstu
 settings-appearance-text-size-description = Powiększa lub pomniejsza tekst we wszystkich aplikacjach
@@ -76,8 +75,6 @@ settings-appearance-animations-description = Okna i menu przesuwają się płynn
 
 ## Taskbar
 
-settings-taskbar-title = Pasek zadań i menu Start
-settings-taskbar-back = Wygląd
 settings-taskbar-preview = Podgląd paska zadań
 settings-start-section = Start
 settings-start-style = Styl
@@ -230,7 +227,6 @@ settings-notifications-done = Gotowe
 
 settings-tiling-preview = Podgląd układu okien
 settings-tiling-title = Kafelkowanie okien
-settings-tiling-back = Wygląd
 settings-tiling-mode = Układanie okien
 settings-tiling-mode-off = Wyłączone
 settings-tiling-mode-tiling = Kafelki

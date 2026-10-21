@@ -28,7 +28,6 @@ settings-privacy-location-services = Услуги за локација
 settings-privacy-location-services-hint = Им дозволува на апликациите да откријат каде сте, за мапи, временска прогноза и временски зони
 settings-privacy-camera = Камера
 settings-privacy-camera-allow = Дозволи им на апликациите да ја користат камерата
-settings-privacy-microphone = Микрофон
 settings-privacy-microphone-allow = Дозволи им на апликациите да го користат микрофонот
 settings-privacy-apps-asked = Апликации што побарале пристап
 settings-privacy-apps-allowed = Дозволени { $allowed } од { $total }
@@ -345,7 +344,6 @@ settings-passwords-apps-asked = { $count ->
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-back = Безбедност
 settings-passwords-access-description = Ако отстраните некоја, апликацијата повторно ќе праша следниот пат.
 settings-passwords-access-not-allowed = Не е дозволено
 settings-passwords-access-none = Сè уште ниедна апликација не ги побарала вашите лозинки
@@ -435,3 +433,26 @@ settings-passkeys-rename-title = Преименување клуч за прис
 settings-passkeys-rename-description = Дајте му на клучот за пристап за { $site } име што ќе го препознаете.
 settings-passkeys-name = Име
 settings-passkeys-save = Зачувај
+
+## Apps
+
+settings-apps-defaults = Стандардни апликации
+settings-apps-defaults-description = Се користат кога отворате врски, датотеки и папки
+settings-apps-browser = Веб-прелистувач
+settings-apps-email = Е-пошта
+settings-apps-calendar = Календар
+settings-apps-music = Музика
+settings-apps-videos = Видеа
+settings-apps-photos = Фотографии
+settings-apps-text-editor = Уредувач на текст
+settings-apps-files = Датотеки
+settings-apps-choose = Изберете
+settings-apps-startup = Стартување
+settings-apps-startup-description = Овие апликации се отвораат кога ќе се најавите
+settings-apps-startup-app = Отвори { $app } при најава
+settings-apps-startup-add = Додај апликација
+settings-apps-startup-add-title = Додавање апликација при стартување
+settings-apps-startup-add-description = Изберете апликација што ќе се отвора секогаш кога ќе се најавите.
+settings-apps-search = Пребарај апликации
+settings-apps-no-match = Ниедна апликација не одговара на пребарувањето
+settings-apps-cancel = Откажи

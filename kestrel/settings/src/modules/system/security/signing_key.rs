@@ -92,7 +92,7 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
                 .args()
                 .is_ok_and(|args| args.id == shown && args.action_key == SETTINGS_ACTION)
             {
-                notify::open_settings("security");
+                notify::open_settings("security/protections");
             }
         }
     });

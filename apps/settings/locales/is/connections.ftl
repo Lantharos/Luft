@@ -72,7 +72,6 @@ settings-network-known-count = { $count ->
        *[other] { $count } vistuð net
     }
 settings-network-known-in-range = Í færi
-settings-network-wired = Snúrutenging
 settings-network-ethernet = Ethernet
 settings-network-ethernet-named = Ethernet ({ $name })
 settings-network-wired-connected = Tengt · { $speed }
@@ -357,85 +356,3 @@ settings-bluetooth-windows-more = { $count ->
         [one] { $count } í viðbót
        *[other] { $count } í viðbót
     }
-
-## Accounts panel
-
-settings-accounts-unavailable = Aðgangar eru ekki í boði
-    .description = Aðgangaþjónustan er ekki uppsett á þessari tölvu
-settings-accounts-online = Netaðgangar
-    .description = Hver aðgangur er mappa í Cloud, í heimamöppunni þinni, sem öll forrit geta opnað. Skrár eru sóttar þegar þú opnar þær.
-settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud eða WebDAV
-
-## Accounts: an account's row
-
-settings-accounts-sign-in-again-needed = Skráðu þig inn aftur til að halda áfram að nota hann
-settings-accounts-paused-metered = Samstilling í bið á mældri tengingu
-settings-accounts-paused-battery = Samstilling í bið meðan rafhlaðan er lág
-settings-accounts-connecting = Tengist…
-settings-accounts-offline = Ótengt
-settings-accounts-offline-kept = Ótengt, geymdar skrár eru enn hér
-settings-accounts-not-connected = Ekki tengt
-settings-accounts-syncing = { $count ->
-        [one] Samstillir { $count } breytingu
-       *[other] Samstillir { $count } breytingar
-    }
-settings-accounts-name = Heiti
-settings-accounts-folder = Mappa
-settings-accounts-server = Netþjónn
-settings-accounts-storage = Geymslurými
-settings-accounts-storage-used = { $used } af { $total } í notkun
-settings-accounts-on-device = Á þessu tæki
-settings-accounts-kept = { $count ->
-        [one] { $count } atriði geymt, afgangurinn er sóttur við opnun
-       *[other] { $count } atriði geymd, afgangurinn er sóttur við opnun
-    }
-settings-accounts-on-demand = Skrár eru sóttar þegar þú opnar þær
-settings-accounts-sign-in-again = Skrá inn aftur
-settings-accounts-keep = Halda
-settings-accounts-remove = Fjarlægja
-settings-accounts-remove-confirm = Fjarlægja af þessari tölvu
-settings-accounts-removing = Fjarlægir…
-settings-accounts-remove-note = Skrárnar þínar verða áfram í { $provider }. Breytingar sem gerðar eru hér eru fyrst sendar upp.
-
-## Accounts: providers
-
-settings-accounts-provider-icloud = Apple-aðgangurinn þinn, staðfestur með kóða frá iPhone, iPad eða Mac
-settings-accounts-provider-onedrive = Microsoft-aðgangur til einkanota eða frá vinnustað eða skóla, í vafranum
-settings-accounts-provider-dropbox = Dropbox-aðgangur, í vafranum
-settings-accounts-provider-nextcloud = Þinn eigin netþjónn eða netþjónn fyrirtækisins þíns
-settings-accounts-provider-webdav = Hvaða netþjónn sem er sem styður WebDAV
-
-## Accounts: signing in
-
-settings-accounts-sign-in-again-title = Skrá aftur inn á { $account }
-settings-accounts-browser = Vafrinn opnast svo þú getir skráð þig inn hjá { $provider }. Luft sér aldrei lykilorðið þitt.
-settings-accounts-password-for = Sláðu inn lykilorðið fyrir { $user }.
-settings-accounts-apple-account = Apple-aðgangur
-settings-accounts-password = Lykilorð
-settings-accounts-app-password = Forritalykilorð
-settings-accounts-user = Notandanafn
-settings-accounts-apple-note = Notaðu lykilorð Apple-aðgangsins; forritasértæk lykilorð virka ekki hér. Apple sýnir svo kóða á iPhone, iPad eða Mac.
-settings-accounts-nextcloud-browser = Vafrinn opnast svo þú getir skráð þig inn á netþjóninn og veitt Luft aðgang.
-settings-accounts-use-app-password = Nota forritalykilorð í staðinn
-settings-accounts-error-server = Sláðu inn vistfang netþjónsins
-settings-accounts-error-apple-account = Sláðu inn netfang Apple-aðgangsins
-settings-accounts-error-user = Sláðu inn notandanafnið
-settings-accounts-error-password = Sláðu inn lykilorðið
-settings-accounts-cancel = Hætta við
-settings-accounts-back = Til baka
-settings-accounts-continue-in-browser = Halda áfram í vafra
-settings-accounts-sign-in = Skrá inn
-settings-accounts-try-again = Reyna aftur
-settings-accounts-continue = Halda áfram
-settings-accounts-working = Hefur samband við { $provider }…
-settings-accounts-finish-in-browser = Ljúktu innskráningu hjá { $provider } í vafranum. Luft sér aldrei lykilorðið þitt og þetta uppfærist sjálfkrafa þegar því er lokið.
-settings-accounts-no-browser = Enginn vafri opnaðist. Afritaðu tengilinn og opnaðu hann í vafra.
-settings-accounts-open-again = Opna síðuna aftur
-settings-accounts-copy-link = Afrita tengilinn
-settings-accounts-copied = Afritað
-settings-accounts-code = Staðfestingarkóði
-    .placeholder = 6 stafa kóði
-settings-accounts-text-me = Fá kóða með SMS í staðinn
-settings-accounts-choose-phone = Í hvaða númer á Apple að senda kóðann?
-    .description = Senda SMS
-settings-accounts-approve = Apple-aðgangurinn þinn notar Advanced Data Protection. Samþykktu beiðnina á iPhone, iPad eða Mac til að leyfa þessari tölvu að opna iCloud Drive.

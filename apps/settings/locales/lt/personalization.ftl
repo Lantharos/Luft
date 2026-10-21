@@ -67,7 +67,6 @@ settings-appearance-tint-slate = Pilkšva
 
 ## Appearance: text and motion
 
-settings-appearance-taskbar = Užduočių juosta
 settings-appearance-text-and-motion = Tekstas ir judesys
 settings-appearance-text-size = Teksto dydis
 settings-appearance-text-size-description = Padidina arba sumažina tekstą visose programose
@@ -76,8 +75,6 @@ settings-appearance-animations-description = Langai ir meniu atsiranda judėdami
 
 ## Taskbar
 
-settings-taskbar-title = Užduočių juosta ir Pradžia
-settings-taskbar-back = Išvaizda
 settings-taskbar-preview = Užduočių juostos peržiūra
 settings-start-section = Pradžia
 settings-start-style = Stilius
@@ -230,7 +227,6 @@ settings-notifications-done = Atlikta
 
 settings-tiling-preview = Langų išdėstymo peržiūra
 settings-tiling-title = Langų išklotinė
-settings-tiling-back = Išvaizda
 settings-tiling-mode = Langų išdėstymas
 settings-tiling-mode-off = Išjungta
 settings-tiling-mode-tiling = Išklotinė

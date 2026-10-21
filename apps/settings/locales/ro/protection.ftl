@@ -28,7 +28,6 @@ settings-privacy-location-services = Servicii de localizare
 settings-privacy-location-services-hint = Permite aplicațiilor să afle unde vă aflați, pentru hărți, vreme și fusuri orare
 settings-privacy-camera = Cameră
 settings-privacy-camera-allow = Permite aplicațiilor să folosească camera
-settings-privacy-microphone = Microfon
 settings-privacy-microphone-allow = Permite aplicațiilor să folosească microfonul
 settings-privacy-apps-asked = Aplicații care au cerut acces
 settings-privacy-apps-allowed = Permise: { $allowed } din { $total }
@@ -358,7 +357,6 @@ settings-passwords-apps-asked = { $count ->
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-back = Securitate
 settings-passwords-access-description = Dacă eliminați una, aplicația va cere din nou acces data viitoare.
 settings-passwords-access-not-allowed = Nepermis
 settings-passwords-access-none = Nicio aplicație nu a cerut încă parolele
@@ -450,3 +448,26 @@ settings-passkeys-rename-title = Redenumiți cheia de acces
 settings-passkeys-rename-description = Dați cheii de acces pentru { $site } un nume pe care să-l recunoașteți.
 settings-passkeys-name = Nume
 settings-passkeys-save = Salvează
+
+## Apps
+
+settings-apps-defaults = Aplicații implicite
+settings-apps-defaults-description = Folosite când deschideți linkuri, fișiere și foldere
+settings-apps-browser = Browser web
+settings-apps-email = E-mail
+settings-apps-calendar = Calendar
+settings-apps-music = Muzică
+settings-apps-videos = Videoclipuri
+settings-apps-photos = Fotografii
+settings-apps-text-editor = Editor de text
+settings-apps-files = Fișiere
+settings-apps-choose = Alege
+settings-apps-startup = Pornire
+settings-apps-startup-description = Aceste aplicații se deschid când vă conectați
+settings-apps-startup-app = Deschide { $app } la conectare
+settings-apps-startup-add = Adaugă o aplicație
+settings-apps-startup-add-title = Adăugați o aplicație la pornire
+settings-apps-startup-add-description = Alegeți o aplicație care să se deschidă de fiecare dată când vă conectați.
+settings-apps-search = Caută aplicații
+settings-apps-no-match = Nicio aplicație nu corespunde căutării
+settings-apps-cancel = Anulează

@@ -67,7 +67,6 @@ settings-appearance-tint-slate = Šīferpelēka
 
 ## Appearance: text and motion
 
-settings-appearance-taskbar = Uzdevumjosla
 settings-appearance-text-and-motion = Teksts un kustība
 settings-appearance-text-size = Teksta lielums
 settings-appearance-text-size-description = Palielina vai samazina tekstu visās lietotnēs
@@ -76,8 +75,6 @@ settings-appearance-animations-description = Logi un izvēlnes kustas, nevis par
 
 ## Taskbar
 
-settings-taskbar-title = Uzdevumjosla un izvēlne Start
-settings-taskbar-back = Izskats
 settings-taskbar-preview = Uzdevumjoslas priekšskatījums
 settings-start-section = Start
 settings-start-style = Stils
@@ -228,7 +225,6 @@ settings-notifications-done = Gatavs
 
 settings-tiling-preview = Logu izkārtojuma priekšskatījums
 settings-tiling-title = Logu flīzēšana
-settings-tiling-back = Izskats
 settings-tiling-mode = Kārtot logus
 settings-tiling-mode-off = Izslēgts
 settings-tiling-mode-tiling = Flīzes

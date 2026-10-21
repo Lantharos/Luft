@@ -74,7 +74,6 @@ settings-network-known-count = { $count ->
        *[other] { $count } uložených sítí
     }
 settings-network-known-in-range = V dosahu
-settings-network-wired = Kabelové připojení
 settings-network-ethernet = Ethernet
 settings-network-ethernet-named = Ethernet ({ $name })
 settings-network-wired-connected = Připojeno · { $speed }
@@ -367,89 +366,3 @@ settings-bluetooth-windows-more = { $count ->
         [many] { $count } dalšího
        *[other] { $count } dalších
     }
-
-## Accounts panel
-
-settings-accounts-unavailable = Účty nejsou k dispozici
-    .description = Služba účtů není v tomto počítači nainstalovaná
-settings-accounts-online = Online účty
-    .description = Každý účet má vlastní složku ve složce Cloud ve vaší domovské složce a otevře ji každá aplikace. Soubory se stáhnou, až je otevřete.
-settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud nebo WebDAV
-
-## Accounts: an account's row
-
-settings-accounts-sign-in-again-needed = Pro další používání se znovu přihlaste
-settings-accounts-paused-metered = Synchronizace je na měřeném připojení pozastavená
-settings-accounts-paused-battery = Synchronizace je pozastavená kvůli slabé baterii
-settings-accounts-connecting = Připojování…
-settings-accounts-offline = Offline
-settings-accounts-offline-kept = Offline, uložené soubory jsou stále k dispozici
-settings-accounts-not-connected = Nepřipojeno
-settings-accounts-syncing = { $count ->
-        [one] Synchronizuje se { $count } změna
-        [few] Synchronizují se { $count } změny
-        [many] Synchronizuje se { $count } změny
-       *[other] Synchronizuje se { $count } změn
-    }
-settings-accounts-name = Název
-settings-accounts-folder = Složka
-settings-accounts-server = Server
-settings-accounts-storage = Úložiště
-settings-accounts-storage-used = Využito { $used } z { $total }
-settings-accounts-on-device = V tomto zařízení
-settings-accounts-kept = { $count ->
-        [one] Uchovává se { $count } položka, zbytek se stáhne při otevření
-        [few] Uchovávají se { $count } položky, zbytek se stáhne při otevření
-        [many] Uchovává se { $count } položky, zbytek se stáhne při otevření
-       *[other] Uchovává se { $count } položek, zbytek se stáhne při otevření
-    }
-settings-accounts-on-demand = Soubory se stáhnou, až je otevřete
-settings-accounts-sign-in-again = Znovu se přihlásit
-settings-accounts-keep = Ponechat
-settings-accounts-remove = Odebrat
-settings-accounts-remove-confirm = Odebrat z tohoto počítače
-settings-accounts-removing = Odebírání…
-settings-accounts-remove-note = Vaše soubory zůstanou ve službě { $provider }. Změny provedené tady se nejdřív odešlou.
-
-## Accounts: providers
-
-settings-accounts-provider-icloud = Váš účet Apple, potvrzený kódem z iPhonu, iPadu nebo Macu
-settings-accounts-provider-onedrive = Osobní, pracovní nebo školní účet Microsoft, v prohlížeči
-settings-accounts-provider-dropbox = Účet Dropbox, v prohlížeči
-settings-accounts-provider-nextcloud = Váš vlastní server nebo server vaší organizace
-settings-accounts-provider-webdav = Libovolný server, který podporuje WebDAV
-
-## Accounts: signing in
-
-settings-accounts-sign-in-again-title = Znovu se přihlásit k účtu { $account }
-settings-accounts-browser = Otevře se prohlížeč, kde se přihlásíte přes { $provider }. Luft vaše heslo nikdy neuvidí.
-settings-accounts-password-for = Zadejte heslo pro { $user }.
-settings-accounts-apple-account = Účet Apple
-settings-accounts-password = Heslo
-settings-accounts-app-password = Heslo aplikace
-settings-accounts-user = Uživatelské jméno
-settings-accounts-apple-note = Použijte heslo k účtu Apple, hesla pro konkrétní aplikace tu nefungují. Apple pak zobrazí kód na vašem iPhonu, iPadu nebo Macu.
-settings-accounts-nextcloud-browser = Otevře se prohlížeč, kde se přihlásíte ke svému serveru a povolíte Luftu přístup.
-settings-accounts-use-app-password = Použít místo toho heslo aplikace
-settings-accounts-error-server = Zadejte adresu serveru
-settings-accounts-error-apple-account = Zadejte e-mail účtu Apple
-settings-accounts-error-user = Zadejte uživatelské jméno
-settings-accounts-error-password = Zadejte heslo
-settings-accounts-cancel = Zrušit
-settings-accounts-back = Zpět
-settings-accounts-continue-in-browser = Pokračovat v prohlížeči
-settings-accounts-sign-in = Přihlásit se
-settings-accounts-try-again = Zkusit znovu
-settings-accounts-continue = Pokračovat
-settings-accounts-working = Komunikace se službou { $provider }…
-settings-accounts-finish-in-browser = Dokončete přihlášení přes { $provider } v prohlížeči. Luft vaše heslo nikdy neuvidí a až budete hotovi, tato stránka se sama aktualizuje.
-settings-accounts-no-browser = Prohlížeč se neotevřel. Zkopírujte odkaz a otevřete ho v prohlížeči.
-settings-accounts-open-again = Znovu otevřít stránku
-settings-accounts-copy-link = Kopírovat odkaz
-settings-accounts-copied = Zkopírováno
-settings-accounts-code = Ověřovací kód
-    .placeholder = Šestimístný kód
-settings-accounts-text-me = Poslat kód raději v SMS
-settings-accounts-choose-phone = Na které číslo má Apple poslat kód?
-    .description = Poslat SMS
-settings-accounts-approve = Váš účet Apple používá rozšířenou ochranu dat. Schvalte žádost na iPhonu, iPadu nebo Macu, aby tento počítač mohl otevřít iCloud Drive.

@@ -188,7 +188,7 @@ export class Dictation {
       body: t('dictation-setup-body'),
       gicon: new Gio.ThemedIcon({ name: 'audio-input-microphone-symbolic' }),
     });
-    notification.addAction(t('dictation-setup-action'), () => openSettings('keyboard/dictation'));
+    notification.addAction(t('dictation-setup-action'), () => openSettings('input/dictation'));
     source.addNotification(notification);
   }
 
@@ -202,7 +202,7 @@ export class Dictation {
       body: t('dictation-unsupported-body', { language }),
       gicon: new Gio.ThemedIcon({ name: 'audio-input-microphone-symbolic' }),
     });
-    notification.addAction(t('dictation-settings-action'), () => openSettings('keyboard/dictation'));
+    notification.addAction(t('dictation-settings-action'), () => openSettings('input/dictation'));
     source.addNotification(notification);
   }
 

@@ -51,13 +51,13 @@ async function checkCalculator() {
 async function checkSettings() {
   search('night light');
   await eventually(() => row('setting:display'), 'a keyword finds its Settings page');
-  search('fonts');
-  await eventually(() => row('setting:appearance/fonts') && descriptionOf(row('setting:appearance/fonts')) === 'Appearance settings',
-    'search finds Settings sections and names their page');
+  search('vpn');
+  await eventually(() => row('setting:network/vpn') && descriptionOf(row('setting:network/vpn')) === 'Network settings',
+    'search finds pages inside Settings pages and names their page');
   await capture('search-settings');
   await withHandler(LINK_SCHEME, 'Settings Link Check', async opened => {
-    row('setting:appearance/fonts').emit('clicked', 1);
-    await eventually(() => opened().includes('kestrel-settings:appearance/fonts'), 'a Settings result opens its exact page');
+    row('setting:network/vpn').emit('clicked', 1);
+    await eventually(() => opened().includes('kestrel-settings:network/vpn'), 'a Settings result opens its exact page');
   });
   await openStart();
 }

@@ -72,7 +72,6 @@ settings-network-known-count = { $count ->
        *[other] { $count } gemte netværk
     }
 settings-network-known-in-range = Inden for rækkevidde
-settings-network-wired = Kablet
 settings-network-ethernet = Ethernet
 settings-network-ethernet-named = Ethernet ({ $name })
 settings-network-wired-connected = Forbundet · { $speed }
@@ -357,85 +356,3 @@ settings-bluetooth-windows-more = { $count ->
         [one] { $count } mere
        *[other] { $count } mere
     }
-
-## Accounts panel
-
-settings-accounts-unavailable = Konti er ikke tilgængelige
-    .description = Kontotjenesten er ikke installeret på denne computer
-settings-accounts-online = Onlinekonti
-    .description = Hver konto er en mappe i Cloud i din hjemmemappe, som alle apps kan åbne. Filer hentes, når du åbner dem.
-settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud eller WebDAV
-
-## Accounts: an account's row
-
-settings-accounts-sign-in-again-needed = Log ind igen for at blive ved med at bruge den
-settings-accounts-paused-metered = Synkronisering sat på pause på en forbrugsafregnet forbindelse
-settings-accounts-paused-battery = Synkronisering sat på pause, mens batteriet er lavt
-settings-accounts-connecting = Opretter forbindelse…
-settings-accounts-offline = Offline
-settings-accounts-offline-kept = Offline, gemte filer er her stadig
-settings-accounts-not-connected = Ikke forbundet
-settings-accounts-syncing = { $count ->
-        [one] Synkroniserer { $count } ændring
-       *[other] Synkroniserer { $count } ændringer
-    }
-settings-accounts-name = Navn
-settings-accounts-folder = Mappe
-settings-accounts-server = Server
-settings-accounts-storage = Lagerplads
-settings-accounts-storage-used = { $used } af { $total } brugt
-settings-accounts-on-device = På denne enhed
-settings-accounts-kept = { $count ->
-        [one] { $count } element gemt lokalt, resten hentes ved åbning
-       *[other] { $count } elementer gemt lokalt, resten hentes ved åbning
-    }
-settings-accounts-on-demand = Filer hentes, når du åbner dem
-settings-accounts-sign-in-again = Log ind igen
-settings-accounts-keep = Behold
-settings-accounts-remove = Fjern
-settings-accounts-remove-confirm = Fjern fra denne computer
-settings-accounts-removing = Fjerner…
-settings-accounts-remove-note = Dine filer bliver i { $provider }. Ændringer foretaget her sendes op først.
-
-## Accounts: providers
-
-settings-accounts-provider-icloud = Din Apple-konto, bekræftet med en kode fra din iPhone, iPad eller Mac
-settings-accounts-provider-onedrive = En personlig Microsoft-konto eller en arbejds- eller skolekonto, i din browser
-settings-accounts-provider-dropbox = En Dropbox-konto, i din browser
-settings-accounts-provider-nextcloud = Din egen eller din organisations server
-settings-accounts-provider-webdav = Enhver server, der understøtter WebDAV
-
-## Accounts: signing in
-
-settings-accounts-sign-in-again-title = Log ind på { $account } igen
-settings-accounts-browser = Din browser åbnes, så du kan logge ind hos { $provider }. Luft ser aldrig din adgangskode.
-settings-accounts-password-for = Indtast adgangskoden til { $user }.
-settings-accounts-apple-account = Apple-konto
-settings-accounts-password = Adgangskode
-settings-accounts-app-password = Appadgangskode
-settings-accounts-user = Brugernavn
-settings-accounts-apple-note = Brug adgangskoden til din Apple-konto. Appspecifikke adgangskoder virker ikke her. Apple viser derefter en kode på din iPhone, iPad eller Mac.
-settings-accounts-nextcloud-browser = Din browser åbnes, så du kan logge ind på din server og give Luft adgang.
-settings-accounts-use-app-password = Brug en appadgangskode i stedet
-settings-accounts-error-server = Indtast serveradressen
-settings-accounts-error-apple-account = Indtast e-mailadressen til din Apple-konto
-settings-accounts-error-user = Indtast brugernavnet
-settings-accounts-error-password = Indtast adgangskoden
-settings-accounts-cancel = Annuller
-settings-accounts-back = Tilbage
-settings-accounts-continue-in-browser = Fortsæt i browseren
-settings-accounts-sign-in = Log ind
-settings-accounts-try-again = Prøv igen
-settings-accounts-continue = Fortsæt
-settings-accounts-working = Kontakter { $provider }…
-settings-accounts-finish-in-browser = Afslut login hos { $provider } i din browser. Luft ser aldrig din adgangskode, og dette opdateres af sig selv, når du er færdig.
-settings-accounts-no-browser = Der blev ikke åbnet nogen browser. Kopier linket, og åbn det i en browser.
-settings-accounts-open-again = Åbn siden igen
-settings-accounts-copy-link = Kopier linket
-settings-accounts-copied = Kopieret
-settings-accounts-code = Bekræftelseskode
-    .placeholder = 6-cifret kode
-settings-accounts-text-me = Send mig en kode via sms i stedet
-settings-accounts-choose-phone = Hvilket nummer skal Apple sende koden til?
-    .description = Send en sms
-settings-accounts-approve = Din Apple-konto bruger Avanceret databeskyttelse. Godkend anmodningen på din iPhone, iPad eller Mac for at give denne computer adgang til iCloud Drive.

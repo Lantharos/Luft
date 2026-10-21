@@ -28,7 +28,6 @@ settings-privacy-location-services = Serviços de localização
 settings-privacy-location-services-hint = Permite que as aplicações saibam onde está, para mapas, meteorologia e fusos horários
 settings-privacy-camera = Câmara
 settings-privacy-camera-allow = Permitir que as aplicações utilizem a câmara
-settings-privacy-microphone = Microfone
 settings-privacy-microphone-allow = Permitir que as aplicações utilizem o microfone
 settings-privacy-apps-asked = Aplicações que pediram acesso
 settings-privacy-apps-allowed = { $allowed } de { $total } permitidas
@@ -346,7 +345,6 @@ settings-passwords-apps-asked = { $count ->
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-back = Segurança
 settings-passwords-access-description = Ao remover uma, a aplicação volta a pedir acesso da próxima vez.
 settings-passwords-access-not-allowed = Não permitido
 settings-passwords-access-none = Ainda nenhuma aplicação pediu as palavras-passe
@@ -437,3 +435,26 @@ settings-passkeys-rename-title = Mudar o nome da chave de acesso
 settings-passkeys-rename-description = Dê à chave de acesso de { $site } um nome que reconheça.
 settings-passkeys-name = Nome
 settings-passkeys-save = Guardar
+
+## Apps
+
+settings-apps-defaults = Aplicações predefinidas
+settings-apps-defaults-description = Utilizadas para abrir ligações, ficheiros e pastas
+settings-apps-browser = Browser
+settings-apps-email = Correio eletrónico
+settings-apps-calendar = Calendário
+settings-apps-music = Música
+settings-apps-videos = Vídeos
+settings-apps-photos = Fotografias
+settings-apps-text-editor = Editor de texto
+settings-apps-files = Ficheiros
+settings-apps-choose = Escolher
+settings-apps-startup = Arranque
+settings-apps-startup-description = Estas aplicações abrem quando inicia sessão
+settings-apps-startup-app = Abrir { $app } ao iniciar sessão
+settings-apps-startup-add = Adicionar aplicação
+settings-apps-startup-add-title = Adicionar uma aplicação de arranque
+settings-apps-startup-add-description = Escolha uma aplicação para abrir sempre que iniciar sessão.
+settings-apps-search = Pesquisar aplicações
+settings-apps-no-match = Nenhuma aplicação corresponde à pesquisa
+settings-apps-cancel = Cancelar

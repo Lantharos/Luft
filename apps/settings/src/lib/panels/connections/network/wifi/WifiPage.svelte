@@ -1,0 +1,38 @@
+<script lang="ts">
+	import History from '@lucide/svelte/icons/history';
+	import WifiIcon from '@lucide/svelte/icons/wifi';
+	import { t } from '@luft/i18n';
+	import { Row, Section, Switch } from '@luft/ui';
+	import SubPage from '#lib/components/SubPage.svelte';
+	import { setWifi, type Wifi } from '../api';
+	import type { Target } from '../connection/profile';
+	import type { NetworkState } from '../state.svelte';
+	import WifiSection from './WifiSection.svelte';
+
+	interface Props {
+		connections: NetworkState;
+		wifi: Wifi;
+		onbrowse: () => void;
+		onconfigure: (target: Target, title: string) => void;
+		onclose: () => void;
+	}
+
+	let { connections, wifi, onbrowse, onconfigure, onclose }: Props = $props();
+
+	let known = $derived(connections.network?.known.length ?? 0);
+</script>
+
+<SubPage title={t('settings-page-wifi')} back={t('settings-page-network')} {onclose}>
+	<Section>
+		<Row title={t('settings-network-wifi')} icon={WifiIcon} description={connections.wifiSummary(wifi)} truncate>
+			<Switch label={t('settings-network-wifi')} checked={wifi.enabled} disabled={!wifi.hardwareEnabled} onchange={setWifi} />
+		</Row>
+		{#if known}
+			<Row title={t('settings-network-known')} icon={History} description={t('settings-network-known-count', { count: known })} onclick={onbrowse} />
+		{/if}
+	</Section>
+
+	{#if wifi.enabled}
+		<WifiSection {wifi} {onconfigure} />
+	{/if}
+</SubPage>

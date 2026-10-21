@@ -3,16 +3,21 @@
 settings-search = Fittex fis-Settings
 settings-search-empty = Ma nstab xejn.
 
+## Sidebar groups
+
+settings-group-connections = Konnessjonijiet
+settings-group-devices = Apparati
+settings-group-look = Dehra u ħass
+settings-group-protection = Protezzjoni
+settings-group-system = Sistema
+
 ## Panel titles that depend on the hardware
 
 settings-power-title = Enerġija
-settings-mouse-title = Maws
-settings-touchpad-title = Touchpad
 
 ## Missing hardware
 
 settings-bluetooth-missing = Dan il-kompjuter m’għandux adapter tal-Bluetooth
-settings-mouse-missing = M’hemm l-ebda maws jew touchpad imqabbad
 
 ## Shared pieces
 

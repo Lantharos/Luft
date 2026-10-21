@@ -28,7 +28,6 @@ settings-privacy-location-services = Услуги за местоположен�
 settings-privacy-location-services-hint = Позволява на приложенията да определят къде се намирате – за карти, времето и часови зони
 settings-privacy-camera = Камера
 settings-privacy-camera-allow = Достъп на приложенията до камерата
-settings-privacy-microphone = Микрофон
 settings-privacy-microphone-allow = Достъп на приложенията до микрофона
 settings-privacy-apps-asked = Приложения, поискали достъп
 settings-privacy-apps-allowed = Разрешени: { $allowed } от { $total }
@@ -345,7 +344,6 @@ settings-passwords-apps-asked = { $count ->
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-back = Сигурност
 settings-passwords-access-description = Ако премахнете приложение, то ще поиска отново следващия път.
 settings-passwords-access-not-allowed = Не е разрешено
 settings-passwords-access-none = Още никое приложение не е поискало паролите ви
@@ -435,3 +433,26 @@ settings-passkeys-rename-title = Преименуване на ключ за д�
 settings-passkeys-rename-description = Дайте на ключа си за достъп за { $site } име, което ще разпознаете.
 settings-passkeys-name = Име
 settings-passkeys-save = Запази
+
+## Apps
+
+settings-apps-defaults = Приложения по подразбиране
+settings-apps-defaults-description = Използват се, когато отваряте връзки, файлове и папки
+settings-apps-browser = Уеб браузър
+settings-apps-email = Имейл
+settings-apps-calendar = Календар
+settings-apps-music = Музика
+settings-apps-videos = Видео
+settings-apps-photos = Снимки
+settings-apps-text-editor = Текстов редактор
+settings-apps-files = Файлове
+settings-apps-choose = Изберете
+settings-apps-startup = Стартиране
+settings-apps-startup-description = Тези приложения се отварят, когато влезете
+settings-apps-startup-app = Отваряне на { $app } при вход
+settings-apps-startup-add = Добави приложение
+settings-apps-startup-add-title = Добавяне на приложение при стартиране
+settings-apps-startup-add-description = Изберете приложение, което да се отваря при всеки вход.
+settings-apps-search = Търсене на приложения
+settings-apps-no-match = Няма приложения, които отговарят на търсенето
+settings-apps-cancel = Отказ

@@ -3,16 +3,21 @@
 settings-search = Otsi sätetest
 settings-search-empty = Midagi ei leitud.
 
+## Sidebar groups
+
+settings-group-connections = Ühendused
+settings-group-devices = Seadmed
+settings-group-look = Välimus ja tunnetus
+settings-group-protection = Kaitse
+settings-group-system = Süsteem
+
 ## Panel titles that depend on the hardware
 
 settings-power-title = Toide
-settings-mouse-title = Hiir
-settings-touchpad-title = Puuteplaat
 
 ## Missing hardware
 
 settings-bluetooth-missing = Selles arvutis pole Bluetoothi adapterit
-settings-mouse-missing = Hiirt ega puuteplaati pole ühendatud
 
 ## Shared pieces
 

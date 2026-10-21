@@ -28,7 +28,6 @@ settings-privacy-location-services = Serveis d’ubicació
 settings-privacy-location-services-hint = Permet que les aplicacions sàpiguen on sou, per als mapes, el temps i la zona horària
 settings-privacy-camera = Càmera
 settings-privacy-camera-allow = Permet que les aplicacions facin servir la càmera
-settings-privacy-microphone = Micròfon
 settings-privacy-microphone-allow = Permet que les aplicacions facin servir el micròfon
 settings-privacy-apps-asked = Aplicacions que ho han demanat
 settings-privacy-apps-allowed = { $allowed } de { $total } amb permís
@@ -345,7 +344,6 @@ settings-passwords-apps-asked = { $count ->
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-back = Seguretat
 settings-passwords-access-description = Si en traieu una, l’aplicació ho tornarà a demanar la pròxima vegada.
 settings-passwords-access-not-allowed = Sense permís
 settings-passwords-access-none = Encara cap aplicació no ha demanat les vostres contrasenyes
@@ -435,3 +433,26 @@ settings-passkeys-rename-title = Canvieu el nom de la clau d’accés
 settings-passkeys-rename-description = Doneu a la clau d’accés de { $site } un nom que reconegueu.
 settings-passkeys-name = Nom
 settings-passkeys-save = Desa
+
+## Apps
+
+settings-apps-defaults = Aplicacions predeterminades
+settings-apps-defaults-description = S’utilitzen quan obriu enllaços, fitxers i carpetes
+settings-apps-browser = Navegador web
+settings-apps-email = Correu electrònic
+settings-apps-calendar = Calendari
+settings-apps-music = Música
+settings-apps-videos = Vídeos
+settings-apps-photos = Fotos
+settings-apps-text-editor = Editor de text
+settings-apps-files = Fitxers
+settings-apps-choose = Trieu
+settings-apps-startup = Arrencada
+settings-apps-startup-description = Aquestes aplicacions s’obren quan inicieu la sessió
+settings-apps-startup-app = Obre { $app } en iniciar la sessió
+settings-apps-startup-add = Afegeix una aplicació
+settings-apps-startup-add-title = Afegiu una aplicació d’arrencada
+settings-apps-startup-add-description = Trieu una aplicació que s’obri cada vegada que inicieu la sessió.
+settings-apps-search = Cerca aplicacions
+settings-apps-no-match = Cap aplicació no coincideix amb la cerca
+settings-apps-cancel = Cancel·la

@@ -67,7 +67,6 @@ settings-appearance-tint-slate = Palaszürke
 
 ## Appearance: text and motion
 
-settings-appearance-taskbar = Tálca
 settings-appearance-text-and-motion = Szöveg és mozgás
 settings-appearance-text-size = Szövegméret
 settings-appearance-text-size-description = Nagyobbá vagy kisebbé teszi a szöveget az alkalmazásokban
@@ -76,8 +75,6 @@ settings-appearance-animations-description = Az ablakok és menük mozgással je
 
 ## Taskbar
 
-settings-taskbar-title = Tálca és Start menü
-settings-taskbar-back = Megjelenés
 settings-taskbar-preview = A tálca előnézete
 settings-start-section = Start
 settings-start-style = Stílus
@@ -226,7 +223,6 @@ settings-notifications-done = Kész
 
 settings-tiling-preview = Az ablakelrendezés előnézete
 settings-tiling-title = Ablakok csempézése
-settings-tiling-back = Megjelenés
 settings-tiling-mode = Ablakok elrendezése
 settings-tiling-mode-off = Ki
 settings-tiling-mode-tiling = Csempézés

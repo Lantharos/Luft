@@ -67,7 +67,6 @@ settings-appearance-tint-slate = Сивоплава
 
 ## Appearance: text and motion
 
-settings-appearance-taskbar = Трака задатака
 settings-appearance-text-and-motion = Текст и покрет
 settings-appearance-text-size = Величина текста
 settings-appearance-text-size-description = Повећава или смањује текст у апликацијама
@@ -76,8 +75,6 @@ settings-appearance-animations-description = Прозори и менији се
 
 ## Taskbar
 
-settings-taskbar-title = Трака задатака и Старт
-settings-taskbar-back = Изглед
 settings-taskbar-preview = Преглед траке задатака
 settings-start-section = Старт
 settings-start-style = Стил
@@ -228,7 +225,6 @@ settings-notifications-done = Готово
 
 settings-tiling-preview = Преглед распореда прозора
 settings-tiling-title = Поплочавање прозора
-settings-tiling-back = Изглед
 settings-tiling-mode = Распоред прозора
 settings-tiling-mode-off = Искључено
 settings-tiling-mode-tiling = Поплочавање

@@ -3,7 +3,7 @@
 	import CircleCheck from '@lucide/svelte/icons/circle-check';
 	import { t } from '@luft/i18n';
 	import { Checkbox, Dialog, RecoveryKey, Switch } from '@luft/ui';
-	import { MINIMUM_LENGTH } from '#lib/panels/system/users/strength.js';
+	import { MINIMUM_LENGTH } from '#lib/panels/system/accounts/users/strength.js';
 	import { checkEncryption, generateRecoveryKey, printRecoveryKey, problem, restart, saveRecoveryKey, turnOnEncryption, type Check, type Tpm } from '../api';
 	import PassphraseFields from '../keys/PassphraseFields.svelte';
 	import PinFields from '../keys/PinFields.svelte';

@@ -1556,7 +1556,7 @@ class NMVpnToggle extends NMToggle {
     constructor() {
         super();
 
-        KestrelUi.bindText(this.menu.addSettingsAction('', 'network').label, 'network-menu-vpn-settings');
+        KestrelUi.bindText(this.menu.addSettingsAction('', 'network/vpn').label, 'network-menu-vpn-settings');
         KestrelUi.localized(this, () => {
             this.menu.setHeader('network-vpn-symbolic', KestrelUi.t('network-menu-vpn'));
             this.menuButtonAccessibleName = KestrelUi.t('network-menu-vpn-open-menu');
@@ -1825,7 +1825,7 @@ class NMWirelessToggle extends NMDeviceToggle {
         }, this);
 
         this.menu.addHeaderSuffix(this._scanningSpinner);
-        KestrelUi.bindText(this.menu.addSettingsAction('', 'network').label, 'network-menu-wifi-settings');
+        KestrelUi.bindText(this.menu.addSettingsAction('', 'network/wifi').label, 'network-menu-wifi-settings');
         KestrelUi.localized(this, () => {
             this.menu.setHeader('network-wireless-symbolic', KestrelUi.t('network-menu-wifi'));
             this.menuButtonAccessibleName = KestrelUi.t('network-menu-wifi-open-menu');
@@ -1939,7 +1939,7 @@ class NMWiredToggle extends NMDeviceToggle {
     constructor() {
         super(NM.DeviceType.ETHERNET);
 
-        KestrelUi.bindText(this.menu.addSettingsAction('', 'network').label, 'network-menu-wired-settings');
+        KestrelUi.bindText(this.menu.addSettingsAction('', 'network/ethernet').label, 'network-menu-wired-settings');
         KestrelUi.localized(this, () => {
             this.menu.setHeader('network-wired-symbolic', KestrelUi.t('network-menu-wired'));
             this.menuButtonAccessibleName = KestrelUi.t('network-menu-wired-open-menu');

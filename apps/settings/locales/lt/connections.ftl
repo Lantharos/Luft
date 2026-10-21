@@ -74,7 +74,6 @@ settings-network-known-count = { $count ->
        *[other] { $count } įrašytų tinklų
     }
 settings-network-known-in-range = Pasiekiamas
-settings-network-wired = Laidinis
 settings-network-ethernet = Ethernet
 settings-network-ethernet-named = Ethernet ({ $name })
 settings-network-wired-connected = Prisijungta · { $speed }
@@ -367,89 +366,3 @@ settings-bluetooth-windows-more = { $count ->
         [many] dar { $count }
        *[other] dar { $count }
     }
-
-## Accounts panel
-
-settings-accounts-unavailable = Paskyros nepasiekiamos
-    .description = Paskyrų tarnyba šiame kompiuteryje neįdiegta
-settings-accounts-online = Internetinės paskyros
-    .description = Kiekviena paskyra – tai aplankas, esantis aplanke Cloud jūsų namų aplanke, ir jį gali atidaryti bet kuri programa. Failai atsisiunčiami, kai juos atidarote.
-settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud arba WebDAV
-
-## Accounts: an account's row
-
-settings-accounts-sign-in-again-needed = Prisijunkite iš naujo, kad galėtumėte toliau naudotis
-settings-accounts-paused-metered = Sinchronizavimas pristabdytas, nes ryšys matuojamas
-settings-accounts-paused-battery = Sinchronizavimas pristabdytas, nes akumuliatorius beveik išsikrovęs
-settings-accounts-connecting = Jungiamasi…
-settings-accounts-offline = Neprisijungta
-settings-accounts-offline-kept = Neprisijungta, išlaikyti failai vis tiek pasiekiami
-settings-accounts-not-connected = Neprisijungta
-settings-accounts-syncing = { $count ->
-        [one] Sinchronizuojamas { $count } pakeitimas
-        [few] Sinchronizuojami { $count } pakeitimai
-        [many] Sinchronizuojama { $count } pakeitimo
-       *[other] Sinchronizuojama { $count } pakeitimų
-    }
-settings-accounts-name = Pavadinimas
-settings-accounts-folder = Aplankas
-settings-accounts-server = Serveris
-settings-accounts-storage = Saugykla
-settings-accounts-storage-used = Naudojama { $used } iš { $total }
-settings-accounts-on-device = Šiame įrenginyje
-settings-accounts-kept = { $count ->
-        [one] Išlaikytas { $count } elementas, kiti atsisiunčiami atidarius
-        [few] Išlaikyti { $count } elementai, kiti atsisiunčiami atidarius
-        [many] Išlaikyta { $count } elemento, kiti atsisiunčiami atidarius
-       *[other] Išlaikyta { $count } elementų, kiti atsisiunčiami atidarius
-    }
-settings-accounts-on-demand = Failai atsisiunčiami, kai juos atidarote
-settings-accounts-sign-in-again = Prisijungti iš naujo
-settings-accounts-keep = Palikti
-settings-accounts-remove = Pašalinti
-settings-accounts-remove-confirm = Pašalinti iš šio kompiuterio
-settings-accounts-removing = Šalinama…
-settings-accounts-remove-note = Jūsų failai lieka tarnyboje { $provider }. Čia atlikti pakeitimai pirmiausia išsiunčiami.
-
-## Accounts: providers
-
-settings-accounts-provider-icloud = Jūsų Apple paskyra, patvirtinama kodu iš iPhone, iPad arba Mac
-settings-accounts-provider-onedrive = Asmeninė, darbo ar mokymo įstaigos Microsoft paskyra, naršyklėje
-settings-accounts-provider-dropbox = Dropbox paskyra, naršyklėje
-settings-accounts-provider-nextcloud = Jūsų ar jūsų organizacijos serveris
-settings-accounts-provider-webdav = Bet kuris serveris, palaikantis WebDAV
-
-## Accounts: signing in
-
-settings-accounts-sign-in-again-title = Prisijungti prie paskyros { $account } iš naujo
-settings-accounts-browser = Atsidarys naršyklė, kad galėtumėte prisijungti per { $provider }. Luft niekada nemato jūsų slaptažodžio.
-settings-accounts-password-for = Įveskite paskyros { $user } slaptažodį.
-settings-accounts-apple-account = Apple paskyra
-settings-accounts-password = Slaptažodis
-settings-accounts-app-password = Programos slaptažodis
-settings-accounts-user = Naudotojo vardas
-settings-accounts-apple-note = Naudokite Apple paskyros slaptažodį; konkrečiai programai skirti slaptažodžiai čia netinka. Tada Apple parodys kodą jūsų iPhone, iPad arba Mac.
-settings-accounts-nextcloud-browser = Atsidarys naršyklė, kad galėtumėte prisijungti prie savo serverio ir suteikti Luft prieigą.
-settings-accounts-use-app-password = Verčiau naudoti programos slaptažodį
-settings-accounts-error-server = Įveskite serverio adresą
-settings-accounts-error-apple-account = Įveskite Apple paskyros el. pašto adresą
-settings-accounts-error-user = Įveskite naudotojo vardą
-settings-accounts-error-password = Įveskite slaptažodį
-settings-accounts-cancel = Atšaukti
-settings-accounts-back = Atgal
-settings-accounts-continue-in-browser = Tęsti naršyklėje
-settings-accounts-sign-in = Prisijungti
-settings-accounts-try-again = Bandyti dar kartą
-settings-accounts-continue = Tęsti
-settings-accounts-working = Susisiekiama su { $provider }…
-settings-accounts-finish-in-browser = Baikite prisijungti per { $provider } naršyklėje. Luft niekada nemato jūsų slaptažodžio, o kai baigsite, šis langas atsinaujins pats.
-settings-accounts-no-browser = Naršyklė neatsidarė. Nukopijuokite nuorodą ir atidarykite ją naršyklėje.
-settings-accounts-open-again = Atidaryti puslapį dar kartą
-settings-accounts-copy-link = Kopijuoti nuorodą
-settings-accounts-copied = Nukopijuota
-settings-accounts-code = Patvirtinimo kodas
-    .placeholder = 6 skaitmenų kodas
-settings-accounts-text-me = Verčiau atsiųsti kodą SMS žinute
-settings-accounts-choose-phone = Kokiu numeriu Apple turėtų atsiųsti kodą?
-    .description = Siųsti SMS žinutę
-settings-accounts-approve = Jūsų Apple paskyrai įjungta išplėstinė duomenų apsauga. Patvirtinkite užklausą savo iPhone, iPad arba Mac, kad šis kompiuteris galėtų atidaryti iCloud Drive.

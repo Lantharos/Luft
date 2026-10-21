@@ -28,7 +28,6 @@ settings-privacy-location-services = Sijaintipalvelut
 settings-privacy-location-services-hint = Sovellukset voivat selvittää sijaintisi karttoja, säätä ja aikavyöhykkeitä varten
 settings-privacy-camera = Kamera
 settings-privacy-camera-allow = Salli sovellusten käyttää kameraa
-settings-privacy-microphone = Mikrofoni
 settings-privacy-microphone-allow = Salli sovellusten käyttää mikrofonia
 settings-privacy-apps-asked = Pyytäneet sovellukset
 settings-privacy-apps-allowed = { $allowed }/{ $total } sallittu
@@ -345,7 +344,6 @@ settings-passwords-apps-asked = { $count ->
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-back = Suojaus
 settings-passwords-access-description = Jos poistat sovelluksen, se kysyy luvan uudelleen ensi kerralla.
 settings-passwords-access-not-allowed = Ei sallittu
 settings-passwords-access-none = Mikään sovellus ei ole vielä pyytänyt salasanojasi
@@ -435,3 +433,26 @@ settings-passkeys-rename-title = Nimeä pääsyavain uudelleen
 settings-passkeys-rename-description = Anna sivuston { $site } pääsyavaimelle nimi, jonka tunnistat.
 settings-passkeys-name = Nimi
 settings-passkeys-save = Tallenna
+
+## Apps
+
+settings-apps-defaults = Oletussovellukset
+settings-apps-defaults-description = Käytetään, kun avaat linkkejä, tiedostoja ja kansioita
+settings-apps-browser = Verkkoselain
+settings-apps-email = Sähköposti
+settings-apps-calendar = Kalenteri
+settings-apps-music = Musiikki
+settings-apps-videos = Videot
+settings-apps-photos = Valokuvat
+settings-apps-text-editor = Tekstieditori
+settings-apps-files = Tiedostot
+settings-apps-choose = Valitse
+settings-apps-startup = Käynnistys
+settings-apps-startup-description = Nämä sovellukset avautuvat, kun kirjaudut sisään
+settings-apps-startup-app = Avaa { $app } kirjautuessa
+settings-apps-startup-add = Lisää sovellus
+settings-apps-startup-add-title = Lisää käynnistyssovellus
+settings-apps-startup-add-description = Valitse sovellus, joka avautuu aina, kun kirjaudut sisään.
+settings-apps-search = Hae sovelluksia
+settings-apps-no-match = Haulla ei löytynyt sovelluksia
+settings-apps-cancel = Peruuta

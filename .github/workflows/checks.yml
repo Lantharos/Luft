@@ -24,7 +24,6 @@ jobs:
     timeout-minutes: 10
     outputs:
       rust: ${{ steps.affected.outputs.rust }}
-      rust-tests: ${{ steps.affected.outputs.rust-tests }}
       uefi: ${{ steps.affected.outputs.uefi }}
       meet-windows: ${{ steps.affected.outputs.meet-windows }}
       web: ${{ steps.affected.outputs.web }}
@@ -41,31 +40,10 @@ jobs:
       - id: affected
         run: bun .github/scripts/affected/index.ts
 
-  clippy:
-    name: Rust Clippy
+  rust:
+    name: Rust ${{ matrix.check }} ${{ matrix.group.name }}
     needs: changes
-    if: needs.changes.outputs.rust != ''
-    runs-on: ubuntu-26.04
-    timeout-minutes: 60
-    container:
-      image: ghcr.io/lantharos/luft-ci:latest
-      credentials:
-        username: ${{ github.actor }}
-        password: ${{ github.token }}
-    steps:
-      - uses: actions/checkout@v7
-
-      - uses: Swatinem/rust-cache@v2
-        with:
-          shared-key: clippy
-          cache-bin: false
-
-      - run: cargo clippy --locked --all-targets ${{ needs.changes.outputs.rust }} -- -D warnings
-
-  tests:
-    name: Rust tests ${{ matrix.group }}
-    needs: changes
-    if: needs.changes.outputs.rust-tests != '[]'
+    if: needs.changes.outputs.rust != '[]'
     runs-on: ubuntu-26.04
     timeout-minutes: 60
     container:
@@ -76,16 +54,21 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include: ${{ fromJSON(needs.changes.outputs.rust-tests) }}
+        check: [clippy, test]
+        group: ${{ fromJSON(needs.changes.outputs.rust) }}
     steps:
       - uses: actions/checkout@v7
 
       - uses: Swatinem/rust-cache@v2
         with:
-          shared-key: tests-${{ matrix.group }}
+          shared-key: ${{ matrix.check }}-${{ matrix.group.name }}
           cache-bin: false
 
-      - run: cargo test --locked ${{ matrix.packages }}
+      - if: matrix.check == 'clippy'
+        run: cargo clippy --locked --all-targets ${{ matrix.group.packages }} -- -D warnings
+
+      - if: matrix.check == 'test'
+        run: cargo test --locked ${{ matrix.group.packages }}
 
   uefi:
     name: Rust UEFI
@@ -162,7 +145,7 @@ jobs:
 
   checks:
     name: Checks
-    needs: [changes, clippy, tests, uefi, meet-windows, web]
+    needs: [changes, rust, uefi, meet-windows, web]
     if: always()
     runs-on: ubuntu-slim
     steps:

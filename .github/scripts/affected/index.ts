@@ -26,13 +26,12 @@ function plan(changes: { base: string; files: string[] } | undefined): { crates:
 
 const runs = plan(changedFiles(resolveRange(process.argv.slice(2))));
 const linux = runs.crates.filter((crate) => !crate.targetsUefi);
-const testGroups = [
-	{ group: 'apps', packages: packageArguments(linux.filter((crate) => crate.buildsOnSabine)) },
-	{ group: 'system', packages: packageArguments(linux.filter((crate) => !crate.buildsOnSabine)) },
-].filter((tests) => tests.packages);
+const groups = [
+	{ name: 'apps', packages: packageArguments(linux.filter((crate) => crate.buildsOnSabine)) },
+	{ name: 'system', packages: packageArguments(linux.filter((crate) => !crate.buildsOnSabine)) },
+].filter((group) => group.packages);
 const outputs = {
-	rust: packageArguments(linux),
-	'rust-tests': JSON.stringify(testGroups),
+	rust: JSON.stringify(groups),
 	uefi: packageArguments(runs.crates.filter((crate) => crate.targetsUefi)),
 	'meet-windows': String(runs.crates.some((crate) => crate.targetsWindows)),
 	web: JSON.stringify(runs.web),

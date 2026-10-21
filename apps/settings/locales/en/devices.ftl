@@ -74,6 +74,8 @@ settings-sound-input-device = Input device
 settings-sound-connection = Connection
 settings-sound-output-connection = Output connection
 settings-sound-input-connection = Input connection
+# A jack the computer doesn't sense anything plugged into; people can still pick it
+settings-sound-connection-undetected = { $name } (nothing detected)
 settings-sound-volume = Volume
 # Button label. $name is what the volume belongs to, such as "Volume" or an app's name.
 settings-sound-mute = Mute { $name }

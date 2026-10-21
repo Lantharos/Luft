@@ -5,6 +5,10 @@ export interface Choice {
 	description: string;
 }
 
+export interface Port extends Choice {
+	detected: boolean;
+}
+
 export interface Device {
 	index: number;
 	name: string;
@@ -13,7 +17,7 @@ export interface Device {
 	muted: boolean;
 	balance: number | null;
 	port: string | null;
-	ports: Choice[];
+	ports: Port[];
 }
 
 export interface App {

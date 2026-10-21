@@ -7,7 +7,7 @@ use libpulse_binding::proplist::properties;
 use libpulse_binding::volume::{ChannelVolumes, Volume};
 use serde::Serialize;
 
-use super::card::{Card, CardView, Choice, Ports};
+use super::card::{Card, CardView, Port, Ports};
 
 pub const ALERT_STREAM: &str = "sink-input-by-media-role:event";
 
@@ -67,7 +67,7 @@ struct DeviceView<'a> {
     muted: bool,
     balance: Option<f32>,
     port: Option<&'a str>,
-    ports: &'a [Choice],
+    ports: &'a [Port],
 }
 
 #[derive(Serialize)]

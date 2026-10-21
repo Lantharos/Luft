@@ -23,25 +23,29 @@ pub struct CardView<'a> {
     profiles: &'a [Choice],
 }
 
-pub struct Ports {
-    pub active: Option<String>,
-    pub choices: Vec<Choice>,
+#[derive(Serialize)]
+pub struct Port {
+    #[serde(flatten)]
+    choice: Choice,
+    detected: bool,
 }
 
-fn choice(
-    name: Option<&str>,
-    description: Option<&str>,
-    usable: bool,
-    active: Option<&str>,
-) -> Option<Choice> {
-    let name = name.filter(|name| !name.is_empty())?;
-    (usable || active == Some(name)).then(|| Choice {
-        name: name.to_owned(),
-        description: description
-            .filter(|description| !description.is_empty())
-            .unwrap_or(name)
-            .to_owned(),
-    })
+pub struct Ports {
+    pub active: Option<String>,
+    pub choices: Vec<Port>,
+}
+
+impl Choice {
+    fn new(name: Option<&str>, description: Option<&str>) -> Option<Self> {
+        let name = name.filter(|name| !name.is_empty())?;
+        Some(Self {
+            name: name.to_owned(),
+            description: description
+                .filter(|description| !description.is_empty())
+                .unwrap_or(name)
+                .to_owned(),
+        })
+    }
 }
 
 impl Ports {
@@ -52,7 +56,10 @@ impl Ports {
         Self {
             choices: ports
                 .filter_map(|(name, description, available)| {
-                    choice(name, description, available != PortAvailable::No, active)
+                    Some(Port {
+                        choice: Choice::new(name, description)?,
+                        detected: available != PortAvailable::No,
+                    })
                 })
                 .collect(),
             active: active.map(str::to_owned),
@@ -101,13 +108,9 @@ impl Card {
             profiles: info
                 .profiles
                 .iter()
+                .filter(|option| option.available || option.name.as_deref() == profile)
                 .filter_map(|option| {
-                    choice(
-                        option.name.as_deref(),
-                        option.description.as_deref(),
-                        option.available,
-                        profile,
-                    )
+                    Choice::new(option.name.as_deref(), option.description.as_deref())
                 })
                 .collect(),
             profile: profile.map(str::to_owned),

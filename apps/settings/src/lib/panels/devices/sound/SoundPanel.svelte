@@ -22,6 +22,7 @@
 		startSound,
 		type Device,
 		type Direction,
+		type Port,
 		type Sound
 	} from './api';
 	import AppsSection from './AppsSection.svelte';
@@ -52,6 +53,7 @@
 	});
 
 	const choices = (devices: Device[]) => devices.map((device) => ({ value: device.name, label: device.description }));
+	const connection = (port: Port) => (port.detected ? port.description : t('settings-sound-connection-undetected', { name: port.description }));
 
 	function side(balance: number) {
 		if (Math.abs(balance) < 0.005) return t('settings-sound-balance-center');
@@ -81,7 +83,7 @@
 		<Row title={t('settings-sound-connection')}>
 			<Select
 				label={direction === 'output' ? t('settings-sound-output-connection') : t('settings-sound-input-connection')}
-				options={current.ports.map((port) => ({ value: port.name, label: port.description }))}
+				options={current.ports.map((port) => ({ value: port.name, label: connection(port) }))}
 				value={current.port}
 				onchange={(port) => setPort(direction, current.index, port)}
 			/>

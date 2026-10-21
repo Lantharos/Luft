@@ -33,6 +33,25 @@ The play button next to each kind plays it once, so you can hear it before choos
 - The lock screen only plays errors, such as a wrong password.
 - Each app's notifications can be kept silent: in Settings, under Notifications, choose the app and turn off **Play a sound**.
 
+## When nothing plays
+
+1. Check that the volume in [quick settings](/desktop/quick-settings/) isn't at zero or muted.
+2. In Settings, under **Sound**, look at **Device** under Output. A monitor or TV connected over HDMI or DisplayPort is a device of its own, and many monitors have no speakers.
+3. Look at **Connection** just below it. A computer with several jacks lists each one: on a desktop, **Line Out** is usually the green jack at the back and **Headphones** the jack on the front. Choose the one your speakers or headphones are plugged into. A jack where nothing is sensed shows *nothing detected*, but you can still choose it, since some computers don't report every jack.
+4. Move the volume slider. Luft plays a tick on the output you chose.
+5. If the device says **Off**, open **Device profiles** and pick a stereo or surround profile for it.
+6. If Windows is on the same computer, shut it down fully before starting Luft: with Fast Startup, sound chips can start in the state Windows left them. [Installing alongside Windows](/start/alongside-windows/) shows how to turn it off.
+
+Still silent? Run these in [Tern](/apps/tern/) and send us what they print, along with the computer's model:
+
+```sh
+wpctl status
+pactl list cards
+alsa-info.sh --no-upload
+```
+
+The last one saves a full report of the sound hardware and says where it put it.
+
 ## For apps
 
 Luft's sounds are a standard sound theme named `luft`, so apps that play theme sounds use them. Apps choose a notification's sound with the `sound-name`, `sound-file` and `suppress-sound` hints, or the `sound` option of the notification portal. Apps outside a sandbox can play a sound from the theme by calling `Play` on `com.lantharos.Kestrel.Sounds` at `/com/lantharos/Kestrel/Sounds` on the session bus, with names such as `dialog-warning` or `message-sent-email`; the switches above still apply.

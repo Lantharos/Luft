@@ -21,7 +21,7 @@ const LINK_SCHEME = 'x-scheme-handler/kestrel-settings';
 const LINKS = new Map([
   ['Sound Settings', 'kestrel-settings:sound'],
   ['Power Settings', 'kestrel-settings:power'],
-  ['All Networks', 'kestrel-settings:network'],
+  ['All Networks', 'kestrel-settings:network/wifi'],
 ]);
 
 const ACCENT_WALLPAPERS = [['yellow', 0xe8c020ff], ['blue', 0x1838a8ff]];

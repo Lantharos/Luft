@@ -81,7 +81,7 @@ async function checkResults() {
   await eventually(() => shown(preview()), 'a window shows a preview');
   await capture('gust-windows');
   search('fonts');
-  await eventually(() => row('setting:appearance/fonts'), 'Settings pages are found');
+  await eventually(() => row('setting:appearance'), 'Settings pages are found');
   search('dark mode');
   await eventually(() => row('action:dark-style'), 'system actions are found');
   search('2*(3+18)');

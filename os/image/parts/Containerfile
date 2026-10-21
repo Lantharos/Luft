@@ -1,4 +1,5 @@
 ARG BASE=quay.io/fedora/fedora-bootc:45
+ARG APP_SOURCES=app-sources
 
 FROM ${BASE} AS builder
 ARG BUN_VERSION=1.4.2
@@ -114,15 +115,18 @@ FROM scratch AS services
 COPY --from=services-build /stage /stage
 COPY --from=services-build /out/ /
 
-FROM sabine AS app-build
+FROM sabine AS app-sources
 ARG APP
 COPY package.json bun.lock /src/
 COPY packages /src/packages
-COPY security/Cargo.toml security/Cargo.lock /src/security/
-COPY security/crates /src/security/crates
-COPY kestrel/engine/data/characters.json kestrel/engine/data/emoji.json /src/kestrel/engine/data/
 COPY apps/${APP} /src/apps/${APP}
 COPY os/image/parts/stages/needed.sh os/image/parts/stages/user-units.sh os/image/parts/stages/source-times.ts /src/os/image/parts/stages/
+
+FROM app-sources AS keys-sources
+COPY kestrel/engine/data/characters.json kestrel/engine/data/emoji.json /src/kestrel/engine/data/
+
+FROM ${APP_SOURCES} AS app-build
+ARG APP
 RUN --mount=type=cache,from=work,target=/var/cache/luft-part,sharing=locked \
     --mount=type=cache,from=cache,source=cargo,target=/var/cache/cargo \
     --mount=type=cache,from=cache,source=sccache,target=/var/cache/sccache \

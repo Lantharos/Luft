@@ -105,6 +105,7 @@ base_bootc() {
 
 part_target() {
   case "$1" in
+    app-keys) echo "app APP=keys APP_SOURCES=keys-sources" ;;
     app-*) echo "app APP=${1#app-}" ;;
     bootc) echo "bootc BOOTC=$(base_bootc)" ;;
     boot | nvidia) echo "$1 SIGNED_BY=$(signed_by)" ;;

@@ -47,17 +47,21 @@ function instructions(text: string) {
 
 function parse(text: string) {
   const stages = new Map<string, Stage>();
+  const defaults: Record<string, string> = {};
   let current: Stage | undefined;
   for (const line of instructions(text)) {
     const [keyword, ...words] = line.split(' ');
     if (keyword.toUpperCase() === 'FROM') {
       current = { name: words[2] ?? '', image: words[0], instructions: [] };
       stages.set(current.name, current);
-    } else {
-      current?.instructions.push(line);
+    } else if (current) {
+      current.instructions.push(line);
+    } else if (keyword.toUpperCase() === 'ARG') {
+      const [argument, fallback = ''] = words[0].split('=');
+      defaults[argument] = fallback;
     }
   }
-  return stages;
+  return { stages, defaults };
 }
 
 function expand(text: string, values: Record<string, string>) {
@@ -74,7 +78,7 @@ function flags(words: string[]) {
   return { values, rest };
 }
 
-const stages = parse(await Bun.file(containerfile).text());
+const { stages, defaults } = parse(await Bun.file(containerfile).text());
 const tree = workingTree();
 const objects = new Map<string, string>();
 const globals = parseAssignments(assignments);
@@ -94,7 +98,8 @@ function key(target: string, given: Record<string, string>) {
     if (!stage) throw new Error(`${containerfile} has no stage ${name}`);
     if (visited.has(name)) return;
     visited.add(name);
-    if (stages.has(stage.image)) visit(stage.image);
+    const image = expand(stage.image, { ...defaults, ...given });
+    if (stages.has(image)) visit(image);
 
     const values: Record<string, string> = {};
     hash.update(`FROM ${stage.image} AS ${name}\n`);

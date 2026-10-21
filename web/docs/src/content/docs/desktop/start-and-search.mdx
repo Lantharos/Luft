@@ -1,13 +1,13 @@
 ---
 title: Start and search
-description: Your apps and folders, and a search that finds apps, settings, files, calculations, conversions and actions.
+description: Your apps and folders, and a search that finds apps, windows, settings, files, answers, conversions and actions.
 sidebar:
   order: 3
 ---
 
 import Shot from '../../../components/Shot.astro';
 
-Press <kbd>Super</kbd> or click the Luft mark on the taskbar to open Start. It has a search field at the top, your apps below it, and your account and power buttons at the bottom.
+Press <kbd>Super</kbd> or click the Luft mark on the taskbar to open Start. It has a search field at the top, your apps below it, and your account and power buttons at the bottom. If you'd rather have only a search bar in the middle of the screen, choose [Gust](/desktop/gust/) instead. Settings, Keyboard, **Keyboard shortcuts** can add a shortcut for **Open Start** next to <kbd>Super</kbd>.
 
 <Shot name="start" alt="Start with apps and folders" />
 
@@ -31,15 +31,21 @@ Start searches as you type. The best match sits on top and <kbd>Enter</kbd> open
 | What | Examples |
 | --- | --- |
 | Apps, by name, kind and keywords | `mail`, `files`, `terminal`. Apps you open often rank higher |
+| What apps can do, from their menus | `private window`, `new window` |
+| Open windows, by title or app | Picking one switches to it |
 | Calculations | `2*(3+18)`, `15% of 80`, `80 + 15%`, `2^10`, `sqrt(16)`, `7 mod 3`. <kbd>Enter</kbd> copies the result |
-| Unit conversions | `10 km to mi`, `100 f`, `1.5 GB in MiB`, `90 min`. Without a target unit, Start picks the usual one |
+| Answers about dates and times | `days until christmas`, `what day is 14 feb 2027`, `time in tokyo`, see [quick answers](/desktop/gust/#quick-answers) |
+| Unit and currency conversions | `10 km to mi`, `100 f`, `1.5 GB in MiB`, `90 min`, `100 usd in eur`. Without a target unit, Start picks the usual one |
 | Actions | `dark mode`, `night light`, `dnd`, `wifi off`, `bluetooth`, `airplane mode`, `keep awake`, `lock`, `sleep`, `sign out`, `restart`, `shut down` |
 | Settings pages and sections | `night light`, `fonts`, `taskbar` |
 | Recent files | The same list as Recent in Rover |
 | Files and folders in your home folder | Several words narrow it down by folder, so `garden readme` finds `garden-planner/README.md` |
 | Text inside files | Plain text, Markdown, code and other text files up to 1 MB, and the first 40 pages of PDFs. The matching line shows under the file |
+| Clipboard history | Text you copied, by what it says, or everything with `clipboard`. Picking it pastes it |
+| Emoji | `grinning`, `thumbs up`. Picking one types it |
+| The web | Always last, and first when nothing else matches. Settings chooses the search engine |
 
-Conversions cover length, mass, temperature, data sizes, time, volume and speed. Currencies aren't included, since they'd need a network lookup. Log out, restart and power off still ask first.
+Conversions cover length, mass, temperature, data sizes, time, volume, speed and currencies. Currencies use the day's reference rates, downloaded the first time you convert one on a given day and kept for offline use. Log out, restart and power off still ask first.
 
 | Key | Does |
 | --- | --- |

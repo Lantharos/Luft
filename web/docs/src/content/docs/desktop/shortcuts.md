@@ -11,7 +11,7 @@ sidebar:
 
 | Shortcut | Does |
 | --- | --- |
-| <kbd>Super</kbd> | Start |
+| <kbd>Super</kbd> | Start, or [Gust](/desktop/gust/) when chosen. **Open Start** in Settings adds a shortcut of your own |
 | <kbd>Super</kbd> twice | Turn the workspace into a [board](/windows/board/), or back |
 | <kbd>Super</kbd>+<kbd>Tab</kbd> | [All windows](/windows/task-view/) |
 | <kbd>Super</kbd>+<kbd>S</kbd> | Quick settings |

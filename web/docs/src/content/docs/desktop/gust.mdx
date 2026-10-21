@@ -1,0 +1,52 @@
+---
+title: Gust
+description: A search bar in the middle of the screen that opens apps, switches windows, finds files and answers questions about dates, times and numbers.
+sidebar:
+  order: 3.5
+---
+
+import Shot from '../../../components/Shot.astro';
+
+Gust is the other way Start can look: instead of the menu above the taskbar, a single search bar opens in the middle of the screen. Choose it in Settings, Appearance, **Taskbar and Start**, under Start. From then on, <kbd>Super</kbd> and the Start button open Gust.
+
+<Shot name="gust" alt="Gust finding an open window, with a preview of it" />
+
+Gust searches the same things as [Start's search](/desktop/start-and-search/#search), with the same order of results. Before you type, it shows the apps you open most and your open windows.
+
+## Keys
+
+| Key | Does |
+| --- | --- |
+| <kbd>Up</kbd> and <kbd>Down</kbd>, <kbd>Page Up</kbd> and <kbd>Page Down</kbd> | Move through the results. The search field keeps the keyboard |
+| <kbd>Enter</kbd> | Opens the highlighted result |
+| <kbd>Ctrl</kbd>+<kbd>Enter</kbd> | Shows the highlighted file in Rover |
+| <kbd>Menu</kbd> or <kbd>Shift</kbd>+<kbd>F10</kbd> | More for the highlighted result, such as **Copy path** |
+| <kbd>Esc</kbd> | Clears the search, then closes Gust |
+
+The highlighted result shows a preview on the right when it has one: a live picture of a window, an emoji at full size, a picture or text from the clipboard history, or the answer to a question.
+
+## Quick answers
+
+Ask about dates, times and numbers in plain words. The answer comes up first, and <kbd>Enter</kbd> copies it. Start's search answers the same questions.
+
+<Shot name="gust-answers" alt="Gust answering what time 10pm in London is in New York" />
+
+| Ask | Examples |
+| --- | --- |
+| How long until or since a day | `how many days until march 27th 2027`, `days since 1 jan`, `months until christmas`, `years since 14 feb 2000` |
+| How long between two days | `weeks between 1 may and 1 sep`, `days from 1 may to 1 september` |
+| Which day a date is | `what day is 14 feb 2027`, `14.02.2027`, `tomorrow` |
+| A day counted from another | `3 weeks from today`, `in 10 days`, `10 days ago`, `2 months after 31 jan` |
+| The time somewhere else | `time in tokyo`, `tokyo time`, `10pm london in new york`, `9:30 in tokyo`, `3pm est in cet` |
+| Percentages | `25% of 340`, `17 is what percent of 340` |
+| Currencies | `100 usd in eur`, `$20`, `50 euro to lek` |
+
+Months, weekdays and words such as today or tomorrow work in the language Luft uses, and in English. Questions can also be asked in German, Albanian, Croatian, Serbian and Bosnian, such as `Tage bis zum 27. März`, `sa ditë deri më 27 mars`, `koliko dana do 27. ožujka` or `колико дана до 27. марта`. Numbers follow your region, so `1.234,5` works where a comma marks decimals. A year left out means the next time that day comes, or the last time when you ask how long since.
+
+Places are cities and their time zones as you'd write them, including common abbreviations such as EST, CET and UTC. Currencies use the day's reference rates, which Luft downloads the first time you convert a currency on a given day and keeps for offline use. Nothing is downloaded until then.
+
+## Without the taskbar
+
+The same page in Settings can take away the Start button or the whole taskbar. Without the taskbar, a small corner at the bottom right keeps the clock and status icons: the icons open quick settings, the clock opens notifications, and the Luft mark, unless you took it away too, opens Start. Windows switch with <kbd>Alt</kbd>+<kbd>Tab</kbd>, from [all windows](/windows/task-view/) or from Gust, which lists them as soon as it opens.
+
+In [tablet mode](/desktop/tablet-mode/), the taskbar and its Start button always come back, since there may be no keyboard to press <kbd>Super</kbd> on.

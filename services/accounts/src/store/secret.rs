@@ -67,10 +67,17 @@ mod tests {
 
     #[test]
     fn refreshed_tokens_and_cookies_are_kept() {
-        let mut token = Secret::Token { token: "old".into() };
+        let mut token = Secret::Token {
+            token: "old".into(),
+        };
         let live = json!({"token": "new", "type": "onedrive"});
         assert!(token.absorb(live.as_object().unwrap()));
-        assert_eq!(token, Secret::Token { token: "new".into() });
+        assert_eq!(
+            token,
+            Secret::Token {
+                token: "new".into()
+            }
+        );
         assert!(!token.absorb(live.as_object().unwrap()));
 
         let mut apple = Secret::Apple {
@@ -80,7 +87,12 @@ mod tests {
         };
         let live = json!({"password": "obscured", "trust_token": "trust", "cookies": "a=2"});
         assert!(apple.absorb(live.as_object().unwrap()));
-        let Secret::Apple { password, cookies, .. } = apple else { unreachable!() };
+        let Secret::Apple {
+            password, cookies, ..
+        } = apple
+        else {
+            unreachable!()
+        };
         assert_eq!((password.as_str(), cookies.as_str()), ("secret", "a=2"));
     }
 }

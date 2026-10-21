@@ -21,7 +21,13 @@ impl Accounts {
 #[interface(name = "com.lantharos.Accounts1")]
 impl Accounts {
     fn accounts(&self) -> String {
-        let accounts: Vec<Account> = self.hub.records().all().iter().map(|record| record.account()).collect();
+        let accounts: Vec<Account> = self
+            .hub
+            .records()
+            .all()
+            .iter()
+            .map(|record| record.account())
+            .collect();
         json(&accounts)
     }
 

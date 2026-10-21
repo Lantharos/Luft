@@ -63,14 +63,23 @@ pub async fn add(hub: &Arc<Hub>, account: NewAccount, replacing: Option<String>)
     let account = id.clone();
     tokio::spawn(async move {
         if drives::attach(&attaching, &account).await.is_ok() {
-            drives::report(&attaching, &account, drives::sync(&attaching, &account, false).await).await;
+            drives::report(
+                &attaching,
+                &account,
+                drives::sync(&attaching, &account, false).await,
+            )
+            .await;
         }
     });
     Ok(id)
 }
 
 pub async fn rename(hub: &Arc<Hub>, id: &str, wanted: &str) -> Result<()> {
-    let record = hub.records().get(id).cloned().context("That account isn't here anymore")?;
+    let record = hub
+        .records()
+        .get(id)
+        .cloned()
+        .context("That account isn't here anymore")?;
     let name = hub.records().unique_name(wanted, Some(id));
     if name == record.name {
         return Ok(());
@@ -81,7 +90,11 @@ pub async fn rename(hub: &Arc<Hub>, id: &str, wanted: &str) -> Result<()> {
 }
 
 pub async fn remove(hub: &Arc<Hub>, id: &str) -> Result<()> {
-    let record = hub.records().get(id).cloned().context("That account isn't here anymore")?;
+    let record = hub
+        .records()
+        .get(id)
+        .cloned()
+        .context("That account isn't here anymore")?;
     drives::report(hub, id, drives::sync(hub, id, true).await).await;
     drives::detach(hub, &record).await;
     hub.keyring.delete(id).await?;

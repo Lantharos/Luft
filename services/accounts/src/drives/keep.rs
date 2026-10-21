@@ -33,7 +33,9 @@ pub async fn keep(hub: &Arc<Hub>, paths: Vec<PathBuf>) -> Result<()> {
         })?;
         hub.drives_changed().await;
         let hub = hub.clone();
-        tokio::spawn(async move { report(&hub, &account, sync(&hub, &account, false).await).await });
+        tokio::spawn(
+            async move { report(&hub, &account, sync(&hub, &account, false).await).await },
+        );
     }
     Ok(())
 }
@@ -41,7 +43,9 @@ pub async fn keep(hub: &Arc<Hub>, paths: Vec<PathBuf>) -> Result<()> {
 pub async fn free(hub: &Arc<Hub>, paths: Vec<PathBuf>) -> Result<()> {
     for (account, relatives) in group(hub, &paths)? {
         if !hub.conditions().online {
-            bail!("Connect to the internet first, so changes made on this computer reach the cloud before the space is freed");
+            bail!(
+                "Connect to the internet first, so changes made on this computer reach the cloud before the space is freed"
+            );
         }
         sync(hub, &account, true).await?;
         let lock = hub.drives.lock(&account);
@@ -59,7 +63,9 @@ pub async fn free(hub: &Arc<Hub>, paths: Vec<PathBuf>) -> Result<()> {
         hub.drives_changed().await;
         drop(_freeing);
         let hub = hub.clone();
-        tokio::spawn(async move { report(&hub, &account, sync(&hub, &account, false).await).await });
+        tokio::spawn(
+            async move { report(&hub, &account, sync(&hub, &account, false).await).await },
+        );
     }
     Ok(())
 }
@@ -76,7 +82,11 @@ pub async fn sync(hub: &Arc<Hub>, account: &str, force: bool) -> Result<()> {
     }
     let conditions = hub.conditions();
     let live = hub.drives.get(account);
-    if !conditions.online || conditions.pause.is_some() && !force || live.state != DriveState::Ready || live.fallback {
+    if !conditions.online
+        || conditions.pause.is_some() && !force
+        || live.state != DriveState::Ready
+        || live.fallback
+    {
         return Ok(());
     }
     hub.drives.update(account, |live| {
@@ -96,14 +106,24 @@ async fn exchange(hub: &Hub, record: &Record) -> Result<()> {
     let filters_path = hub.paths.filters(account);
     let rules = filters::render(&record.kept, &record.skipped);
     let workdir = hub.paths.bisync(account);
-    let reshaped = fs::read_to_string(&filters_path).ok().as_deref() != Some(rules.as_str()) || !workdir.exists();
+    let reshaped = fs::read_to_string(&filters_path).ok().as_deref() != Some(rules.as_str())
+        || !workdir.exists();
     if let Some(folder) = filters_path.parent() {
         fs::create_dir_all(folder)?;
     }
     fs::write(&filters_path, &rules)?;
     fs::create_dir_all(&workdir)?;
-    let mut outcome = bisync(hub, account, if reshaped { Run::Resync } else { Run::Normal }).await;
-    let failure = outcome.as_ref().err().map(ToString::to_string).unwrap_or_default();
+    let mut outcome = bisync(
+        hub,
+        account,
+        if reshaped { Run::Resync } else { Run::Normal },
+    )
+    .await;
+    let failure = outcome
+        .as_ref()
+        .err()
+        .map(ToString::to_string)
+        .unwrap_or_default();
     if failure.contains("resync") {
         outcome = bisync(hub, account, Run::Resync).await;
     } else if failure.contains("too many deletes") && holds_files(&hub.paths.kept(account)) {
@@ -157,7 +177,8 @@ pub async fn report(hub: &Hub, account: &str, outcome: Result<()>) {
     match trouble::classify(record.provider, &message) {
         Trouble::SignInAgain(reason) => {
             attach::ask_to_sign_in(hub, &record, &reason).await;
-            hub.drives.update(account, |live| live.state = DriveState::SignInAgain);
+            hub.drives
+                .update(account, |live| live.state = DriveState::SignInAgain);
         }
         Trouble::Offline => hub.drives.update(account, |live| {
             live.state = DriveState::Offline;
@@ -181,9 +202,13 @@ fn forget_history(hub: &Hub, account: &str) {
 }
 
 fn holds_files(folder: &Path) -> bool {
-    fs::read_dir(folder).into_iter().flatten().flatten().any(|entry| {
-        entry.file_type().is_ok_and(|kind| !kind.is_dir()) || holds_files(&entry.path())
-    })
+    fs::read_dir(folder)
+        .into_iter()
+        .flatten()
+        .flatten()
+        .any(|entry| {
+            entry.file_type().is_ok_and(|kind| !kind.is_dir()) || holds_files(&entry.path())
+        })
 }
 
 fn remove_local(path: &Path) -> Result<()> {
@@ -206,7 +231,10 @@ fn group(hub: &Hub, paths: &[PathBuf]) -> Result<BTreeMap<String, Vec<String>>> 
     let mut grouped: BTreeMap<String, Vec<String>> = BTreeMap::new();
     for path in paths {
         let located = locate(hub, path)?;
-        grouped.entry(located.record.id).or_default().push(located.relative);
+        grouped
+            .entry(located.record.id)
+            .or_default()
+            .push(located.relative);
     }
     Ok(grouped)
 }

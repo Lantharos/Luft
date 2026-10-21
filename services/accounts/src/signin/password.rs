@@ -31,7 +31,10 @@ pub async fn nextcloud_login(flow: &mut Flow) -> Result<String> {
         let server = server.clone();
         tokio::task::spawn_blocking(move || nextcloud::start_login(&server)).await??
     };
-    flow.show(Step::Browser { url: login.url.clone() }).await;
+    flow.show(Step::Browser {
+        url: login.url.clone(),
+    })
+    .await;
     let login = std::sync::Arc::new(login);
     let granted = tokio::time::timeout(LOGIN_TIMEOUT, async {
         loop {
@@ -58,7 +61,10 @@ async fn finish(flow: &mut Flow, server: String, user: String, password: String)
     };
     let options = BTreeMap::from([
         ("url".to_owned(), url),
-        ("vendor".to_owned(), if nextcloud { "nextcloud" } else { "other" }.to_owned()),
+        (
+            "vendor".to_owned(),
+            if nextcloud { "nextcloud" } else { "other" }.to_owned(),
+        ),
         ("user".to_owned(), user.clone()),
     ]);
     let secret = Secret::Password { password };
@@ -79,11 +85,19 @@ async fn finish(flow: &mut Flow, server: String, user: String, password: String)
 
 async fn verify(flow: &Flow, options: &BTreeMap<String, String>, secret: &Secret) -> Result<()> {
     let name = format!("check{}", flow.session);
-    let mut parameters: Map<String, Value> = options.iter().map(|(key, value)| (key.clone(), value.clone().into())).collect();
+    let mut parameters: Map<String, Value> = options
+        .iter()
+        .map(|(key, value)| (key.clone(), value.clone().into()))
+        .collect();
     parameters.extend(secret.parameters());
     let rclone = &flow.hub.rclone;
     rclone
-        .configure(&name, "webdav", parameters, json!({"obscure": true, "nonInteractive": true}))
+        .configure(
+            &name,
+            "webdav",
+            parameters,
+            json!({"obscure": true, "nonInteractive": true}),
+        )
         .await?;
     let reached = rclone.list_top(&format!("{name}:")).await;
     let _ = rclone.forget_remote(&name).await;

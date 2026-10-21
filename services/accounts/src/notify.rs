@@ -28,12 +28,27 @@ impl Notifier {
             let notifications = Proxy::new(&self.session, NAME, PATH, NAME).await?;
             let hints = HashMap::from([("desktop-entry", Variant::from("com.lantharos.settings"))]);
             notifications
-                .call::<_, _, u32>("Notify", &("Cloud", 0u32, "folder-remote", summary, body, vec![OPEN, "Open"], hints, -1i32))
+                .call::<_, _, u32>(
+                    "Notify",
+                    &(
+                        "Cloud",
+                        0u32,
+                        "folder-remote",
+                        summary,
+                        body,
+                        vec![OPEN, "Open"],
+                        hints,
+                        -1i32,
+                    ),
+                )
                 .await
         };
         match sent.await {
             Ok(id) => {
-                self.targets.lock().expect("never poisoned").insert(id, target.to_owned());
+                self.targets
+                    .lock()
+                    .expect("never poisoned")
+                    .insert(id, target.to_owned());
             }
             Err(error) => eprintln!("Couldn't show a notification: {error}"),
         }
@@ -59,7 +74,10 @@ impl Notifier {
 }
 
 pub fn open(target: &str) {
-    if let Err(error) = tokio::process::Command::new("gio").args(["open", target]).spawn() {
+    if let Err(error) = tokio::process::Command::new("gio")
+        .args(["open", target])
+        .spawn()
+    {
         eprintln!("Couldn't open {target}: {error}");
     }
 }

@@ -57,7 +57,9 @@ impl Hub {
     }
 
     pub fn records(&self) -> MutexGuard<'_, Records> {
-        self.records.lock().expect("the account list is never poisoned")
+        self.records
+            .lock()
+            .expect("the account list is never poisoned")
     }
 
     pub fn conditions(&self) -> Conditions {

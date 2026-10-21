@@ -43,7 +43,11 @@ pub fn parameters(record: &Record, secret: &Secret) -> Map<String, Value> {
 
 pub fn encode_path(path: &str) -> String {
     path.split('/')
-        .map(|part| url::form_urlencoded::byte_serialize(part.as_bytes()).collect::<String>().replace('+', "%20"))
+        .map(|part| {
+            url::form_urlencoded::byte_serialize(part.as_bytes())
+                .collect::<String>()
+                .replace('+', "%20")
+        })
         .collect::<Vec<_>>()
         .join("/")
 }

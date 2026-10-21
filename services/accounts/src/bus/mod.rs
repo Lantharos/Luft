@@ -31,5 +31,6 @@ pub fn json<T: serde::Serialize>(value: &T) -> String {
 }
 
 pub fn parse<T: for<'de> serde::Deserialize<'de>>(text: &str) -> Result<T, Error> {
-    serde_json::from_str(text).map_err(|error| Error::Failed(format!("That request couldn't be read: {error}")))
+    serde_json::from_str(text)
+        .map_err(|error| Error::Failed(format!("That request couldn't be read: {error}")))
 }

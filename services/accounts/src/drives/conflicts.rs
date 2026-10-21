@@ -8,7 +8,10 @@ use luft_accounts::types::{Conflict, Side};
 use crate::hub::Hub;
 use crate::store::Record;
 
-const MARKS: [(&str, Side); 2] = [(".luft-device", Side::ThisDevice), (".luft-cloud", Side::Cloud)];
+const MARKS: [(&str, Side); 2] = [
+    (".luft-device", Side::ThisDevice),
+    (".luft-cloud", Side::Cloud),
+];
 
 struct Found {
     original: String,
@@ -44,26 +47,43 @@ fn copy_name(found: &Found, cloud: &str, number: u32) -> String {
         Side::ThisDevice => "this device",
         Side::Cloud => cloud,
     };
-    let number = if number > 1 { format!(" {number}") } else { String::new() };
-    format!("{} (copy from {from}{number}){}", found.stem, found.extension)
+    let number = if number > 1 {
+        format!(" {number}")
+    } else {
+        String::new()
+    };
+    format!(
+        "{} (copy from {from}{number}){}",
+        found.stem, found.extension
+    )
 }
 
 pub async fn settle(hub: &Hub, record: &Record) -> Result<bool> {
     let kept = hub.paths.kept(&record.id);
     let mut found = Vec::new();
     walk(&kept, "", &mut found)?;
-    let now = SystemTime::now().duration_since(UNIX_EPOCH).map_or(0, |elapsed| elapsed.as_secs());
+    let now = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map_or(0, |elapsed| elapsed.as_secs());
     let cloud = record.provider.name();
     let mut settled = Vec::new();
     for (folder, name) in found {
-        let Some(conflict) = parse(&name) else { continue };
+        let Some(conflict) = parse(&name) else {
+            continue;
+        };
         let directory = kept.join(&folder);
         let free = (1..)
             .map(|number| copy_name(&conflict, cloud, number))
             .find(|candidate| !directory.join(candidate).exists())
             .expect("some number is free");
         fs::rename(directory.join(&name), directory.join(&free))?;
-        let join = |name: &str| if folder.is_empty() { name.to_owned() } else { format!("{folder}/{name}") };
+        let join = |name: &str| {
+            if folder.is_empty() {
+                name.to_owned()
+            } else {
+                format!("{folder}/{name}")
+            }
+        };
         settled.push(Conflict {
             path: join(&conflict.original),
             copy: join(&free),
@@ -77,7 +97,11 @@ pub async fn settle(hub: &Hub, record: &Record) -> Result<bool> {
     for conflict in &settled {
         let name = conflict.path.rsplit('/').next().unwrap_or(&conflict.path);
         let copy = conflict.copy.rsplit('/').next().unwrap_or(&conflict.copy);
-        let folder = hub.paths.cloud.join(&record.name).join(super::keep::parent(&conflict.path));
+        let folder = hub
+            .paths
+            .cloud
+            .join(&record.name)
+            .join(super::keep::parent(&conflict.path));
         hub.notifier
             .send(
                 &format!("Both versions of {name} were kept"),
@@ -86,7 +110,8 @@ pub async fn settle(hub: &Hub, record: &Record) -> Result<bool> {
             )
             .await;
     }
-    hub.records().edit(&record.id, |record| record.conflicts.extend(settled))?;
+    hub.records()
+        .edit(&record.id, |record| record.conflicts.extend(settled))?;
     hub.drives_changed().await;
     Ok(true)
 }
@@ -97,7 +122,11 @@ fn walk(root: &Path, folder: &str, found: &mut Vec<(String, String)>) -> Result<
     };
     for entry in entries.flatten() {
         let name = entry.file_name().to_string_lossy().into_owned();
-        let relative = if folder.is_empty() { name.clone() } else { format!("{folder}/{name}") };
+        let relative = if folder.is_empty() {
+            name.clone()
+        } else {
+            format!("{folder}/{name}")
+        };
         if entry.file_type()?.is_dir() {
             walk(root, &relative, found)?;
         } else if name.contains(".luft-") {
@@ -112,9 +141,16 @@ pub async fn prune(hub: &Hub, record: &Record) -> bool {
         return false;
     }
     let drive = hub.paths.cloud.join(&record.name);
-    let copies: Vec<String> = record.conflicts.iter().map(|conflict| conflict.copy.clone()).collect();
+    let copies: Vec<String> = record
+        .conflicts
+        .iter()
+        .map(|conflict| conflict.copy.clone())
+        .collect();
     let Ok(gone) = tokio::task::spawn_blocking(move || {
-        copies.into_iter().filter(|copy| !drive.join(copy).exists()).collect::<Vec<_>>()
+        copies
+            .into_iter()
+            .filter(|copy| !drive.join(copy).exists())
+            .collect::<Vec<_>>()
     })
     .await
     else {
@@ -124,7 +160,11 @@ pub async fn prune(hub: &Hub, record: &Record) -> bool {
         return false;
     }
     hub.records()
-        .edit(&record.id, |record| record.conflicts.retain(|conflict| !gone.contains(&conflict.copy)))
+        .edit(&record.id, |record| {
+            record
+                .conflicts
+                .retain(|conflict| !gone.contains(&conflict.copy))
+        })
         .is_ok()
 }
 
@@ -139,9 +179,15 @@ mod tests {
         let found = parse("report.luft-cloud1.docx").unwrap();
         assert_eq!(found.original, "report.docx");
         assert_eq!(found.side, Side::Cloud);
-        assert_eq!(copy_name(&found, "OneDrive", 1), "report (copy from OneDrive).docx");
+        assert_eq!(
+            copy_name(&found, "OneDrive", 1),
+            "report (copy from OneDrive).docx"
+        );
         let found = parse("notes.luft-device2").unwrap();
-        assert_eq!(copy_name(&found, "Dropbox", 2), "notes (copy from this device 2)");
+        assert_eq!(
+            copy_name(&found, "Dropbox", 2),
+            "notes (copy from this device 2)"
+        );
         assert!(parse("report.luft-cloud.docx").is_none());
         assert!(parse("plain.txt").is_none());
     }

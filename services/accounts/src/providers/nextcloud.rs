@@ -52,7 +52,8 @@ pub fn server_address(typed: &str) -> Result<String> {
     } else {
         format!("https://{typed}")
     };
-    let url = Url::parse(&with_scheme).map_err(|_| anyhow!("That doesn't look like a server address"))?;
+    let url =
+        Url::parse(&with_scheme).map_err(|_| anyhow!("That doesn't look like a server address"))?;
     if !matches!(url.scheme(), "http" | "https") || url.host_str().is_none() {
         bail!("That doesn't look like a server address");
     }
@@ -100,14 +101,16 @@ impl LoginFlow {
 }
 
 pub fn share_link(server: &str, user: &str, password: &str, path: &str) -> Result<String> {
-    let shared: Ocs = ureq::post(&format!("{server}/ocs/v2.php/apps/files_sharing/api/v1/shares?format=json"))
-        .header("OCS-APIRequest", "true")
-        .header("Authorization", &basic(user, password))
-        .send_form([("path", format!("/{path}").as_str()), ("shareType", "3")])
-        .map_err(|error| anyhow!("The server didn't make a link: {error}"))?
-        .body_mut()
-        .read_json()
-        .context("The server's answer couldn't be read")?;
+    let shared: Ocs = ureq::post(&format!(
+        "{server}/ocs/v2.php/apps/files_sharing/api/v1/shares?format=json"
+    ))
+    .header("OCS-APIRequest", "true")
+    .header("Authorization", &basic(user, password))
+    .send_form([("path", format!("/{path}").as_str()), ("shareType", "3")])
+    .map_err(|error| anyhow!("The server didn't make a link: {error}"))?
+    .body_mut()
+    .read_json()
+    .context("The server's answer couldn't be read")?;
     Ok(shared.ocs.data.url)
 }
 
@@ -117,8 +120,10 @@ pub fn web_address(server: &str, path: &str, folder: bool) -> String {
         Some((parent, name)) => (parent, Some(name)),
         None => ("", Some(path)),
     };
-    let mut url = Url::parse(&format!("{server}/index.php/apps/files/")).expect("the server address was checked");
-    url.query_pairs_mut().append_pair("dir", &format!("/{folder_path}"));
+    let mut url = Url::parse(&format!("{server}/index.php/apps/files/"))
+        .expect("the server address was checked");
+    url.query_pairs_mut()
+        .append_pair("dir", &format!("/{folder_path}"));
     if let Some(file) = file {
         url.query_pairs_mut().append_pair("scrollto", file);
     }
@@ -139,8 +144,14 @@ mod tests {
 
     #[test]
     fn addresses_are_completed() {
-        assert_eq!(server_address("cloud.example.com/").unwrap(), "https://cloud.example.com");
-        assert_eq!(server_address("http://127.0.0.1:8089").unwrap(), "http://127.0.0.1:8089");
+        assert_eq!(
+            server_address("cloud.example.com/").unwrap(),
+            "https://cloud.example.com"
+        );
+        assert_eq!(
+            server_address("http://127.0.0.1:8089").unwrap(),
+            "http://127.0.0.1:8089"
+        );
         assert!(server_address("ftp://example.com").is_err());
         assert_eq!(
             files_address("https://cloud.example.com", "ada lovelace"),

@@ -38,10 +38,18 @@ impl Keyring {
         let feeding = tokio::task::spawn_blocking(move || writer.write_all(&encoded));
         let stored = self
             .connection
-            .call_method(Some(NAME), PATH, Some(INTERFACE), "Store", &(key(account), Fd::from(&reader)))
+            .call_method(
+                Some(NAME),
+                PATH,
+                Some(INTERFACE),
+                "Store",
+                &(key(account), Fd::from(&reader)),
+            )
             .await;
         drop(reader);
-        feeding.await?.context("The secret couldn't be handed to Luft Keyring")?;
+        feeding
+            .await?
+            .context("The secret couldn't be handed to Luft Keyring")?;
         stored.map_err(explain)?;
         Ok(())
     }
@@ -55,7 +63,13 @@ impl Keyring {
         });
         let found = self
             .connection
-            .call_method(Some(NAME), PATH, Some(INTERFACE), "Load", &(key(account), Fd::from(&writer)))
+            .call_method(
+                Some(NAME),
+                PATH,
+                Some(INTERFACE),
+                "Load",
+                &(key(account), Fd::from(&writer)),
+            )
             .await;
         drop(writer);
         let bytes = draining.await??;
@@ -63,12 +77,20 @@ impl Keyring {
         if !found {
             return Ok(None);
         }
-        Ok(Some(serde_json::from_slice(&bytes).context("The saved sign-in is damaged")?))
+        Ok(Some(
+            serde_json::from_slice(&bytes).context("The saved sign-in is damaged")?,
+        ))
     }
 
     pub async fn delete(&self, account: &str) -> Result<()> {
         self.connection
-            .call_method(Some(NAME), PATH, Some(INTERFACE), "Delete", &(key(account),))
+            .call_method(
+                Some(NAME),
+                PATH,
+                Some(INTERFACE),
+                "Delete",
+                &(key(account),),
+            )
             .await
             .map_err(explain)?;
         Ok(())

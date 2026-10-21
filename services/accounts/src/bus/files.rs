@@ -52,9 +52,9 @@ impl Files {
     }
 
     async fn dismiss_conflict(&self, account: String, copy: String) -> Result<(), Error> {
-        self.hub
-            .records()
-            .edit(&account, |record| record.conflicts.retain(|conflict| conflict.copy != copy))?;
+        self.hub.records().edit(&account, |record| {
+            record.conflicts.retain(|conflict| conflict.copy != copy)
+        })?;
         self.hub.drives_changed().await;
         Ok(())
     }

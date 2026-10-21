@@ -107,7 +107,10 @@ pub fn union(account: &str) -> String {
 }
 
 pub fn offers_links(provider: Provider) -> bool {
-    matches!(provider, Provider::Onedrive | Provider::Dropbox | Provider::Nextcloud)
+    matches!(
+        provider,
+        Provider::Onedrive | Provider::Dropbox | Provider::Nextcloud
+    )
 }
 
 pub fn snapshot(hub: &Hub) -> Vec<Drive> {
@@ -118,7 +121,12 @@ pub fn snapshot(hub: &Hub) -> Vec<Drive> {
         .map(|record| {
             let live = hub.drives.get(&record.id);
             Drive {
-                path: hub.paths.cloud.join(&record.name).to_string_lossy().into_owned(),
+                path: hub
+                    .paths
+                    .cloud
+                    .join(&record.name)
+                    .to_string_lossy()
+                    .into_owned(),
                 state: if record.sign_in_again.is_some() {
                     DriveState::SignInAgain
                 } else {
@@ -164,12 +172,20 @@ pub fn locate(hub: &Hub, path: &Path) -> Result<Located> {
         .find(|record| record.name == name)
         .cloned()
         .context("That cloud drive isn't here anymore")?;
-    let relative = parts.as_path().to_string_lossy().trim_matches('/').to_owned();
+    let relative = parts
+        .as_path()
+        .to_string_lossy()
+        .trim_matches('/')
+        .to_owned();
     Ok(Located { record, relative })
 }
 
 pub fn covers(parent: &str, path: &str) -> bool {
-    parent.is_empty() || path == parent || path.strip_prefix(parent).is_some_and(|rest| rest.starts_with('/'))
+    parent.is_empty()
+        || path == parent
+        || path
+            .strip_prefix(parent)
+            .is_some_and(|rest| rest.starts_with('/'))
 }
 
 #[cfg(test)]

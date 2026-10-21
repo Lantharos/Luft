@@ -22,7 +22,9 @@ pub fn email(access: &str) -> Result<String> {
 
 pub fn web_address(path: &str, folder: bool) -> String {
     match path.rsplit_once('/') {
-        _ if folder || path.is_empty() => format!("https://www.dropbox.com/home/{}", encode_path(path)),
+        _ if folder || path.is_empty() => {
+            format!("https://www.dropbox.com/home/{}", encode_path(path))
+        }
         Some((parent, name)) => format!(
             "https://www.dropbox.com/home/{}?preview={}",
             encode_path(parent),

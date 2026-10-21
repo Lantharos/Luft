@@ -75,7 +75,13 @@ impl Rclone {
         self.logs.subscribe()
     }
 
-    pub async fn configure(&self, name: &str, kind: &str, parameters: Map<String, Value>, opt: Value) -> Result<Question> {
+    pub async fn configure(
+        &self,
+        name: &str,
+        kind: &str,
+        parameters: Map<String, Value>,
+        opt: Value,
+    ) -> Result<Question> {
         let answer = self
             .rc
             .call(
@@ -86,11 +92,23 @@ impl Rclone {
         Ok(serde_json::from_value(answer)?)
     }
 
-    pub async fn continue_configuring(&self, name: &str, state: &str, result: &str) -> Result<Question> {
-        self.update_configuring(name, Map::new(), state, result).await
+    pub async fn continue_configuring(
+        &self,
+        name: &str,
+        state: &str,
+        result: &str,
+    ) -> Result<Question> {
+        self.update_configuring(name, Map::new(), state, result)
+            .await
     }
 
-    pub async fn update_configuring(&self, name: &str, parameters: Map<String, Value>, state: &str, result: &str) -> Result<Question> {
+    pub async fn update_configuring(
+        &self,
+        name: &str,
+        parameters: Map<String, Value>,
+        state: &str,
+        result: &str,
+    ) -> Result<Question> {
         let answer = self
             .rc
             .call(
@@ -133,7 +151,9 @@ impl Rclone {
     }
 
     pub async fn unmount(&self, at: &Path) -> Result<()> {
-        self.rc.call("mount/unmount", json!({"mountPoint": at})).await?;
+        self.rc
+            .call("mount/unmount", json!({"mountPoint": at}))
+            .await?;
         Ok(())
     }
 
@@ -149,7 +169,10 @@ impl Rclone {
 
     pub async fn hold_upload(&self, fs: &str, id: i64, seconds: f64) -> Result<()> {
         self.rc
-            .call("vfs/queue-set-expiry", json!({"fs": fs, "id": id, "expiry": seconds}))
+            .call(
+                "vfs/queue-set-expiry",
+                json!({"fs": fs, "id": id, "expiry": seconds}),
+            )
             .await?;
         Ok(())
     }
@@ -174,7 +197,10 @@ impl Rclone {
 
     pub async fn list_top(&self, fs: &str) -> Result<()> {
         self.rc
-            .call("operations/list", json!({"fs": fs, "remote": "", "opt": {"dirsOnly": true}}))
+            .call(
+                "operations/list",
+                json!({"fs": fs, "remote": "", "opt": {"dirsOnly": true}}),
+            )
             .await?;
         Ok(())
     }

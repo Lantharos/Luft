@@ -23,8 +23,15 @@ pub struct Process {
 }
 
 impl Process {
-    pub fn prepare(runtime: PathBuf, socket: PathBuf, cache: PathBuf) -> Result<(Self, broadcast::Sender<String>, watch::Receiver<u64>)> {
-        DirBuilder::new().recursive(true).mode(0o700).create(&runtime)?;
+    pub fn prepare(
+        runtime: PathBuf,
+        socket: PathBuf,
+        cache: PathBuf,
+    ) -> Result<(Self, broadcast::Sender<String>, watch::Receiver<u64>)> {
+        DirBuilder::new()
+            .recursive(true)
+            .mode(0o700)
+            .create(&runtime)?;
         fs::create_dir_all(&cache)?;
         let (logs, _) = broadcast::channel(256);
         let (started, starts) = watch::channel(0);
@@ -70,7 +77,12 @@ impl Process {
         let mut child = Command::new("rclone")
             .arg("rcd")
             .arg(format!("--rc-addr=unix://{}", self.socket.display()))
-            .args(["--rc-no-auth", "--config=/notfound", "--log-level=INFO", "--use-mmap"])
+            .args([
+                "--rc-no-auth",
+                "--config=/notfound",
+                "--log-level=INFO",
+                "--use-mmap",
+            ])
             .arg(format!("--cache-dir={}", self.cache.display()))
             .stdin(Stdio::null())
             .stdout(Stdio::null())

@@ -18,8 +18,14 @@ const fn configured(built: Option<&'static str>, fallback: &'static str) -> &'st
 }
 
 pub const ONEDRIVE: App = App {
-    client_id: configured(option_env!("LUFT_ONEDRIVE_CLIENT_ID"), "b15665d9-eda6-4092-8539-0eec376afd59"),
-    client_secret: configured(option_env!("LUFT_ONEDRIVE_CLIENT_SECRET"), "qtyfaBBYA403=unZUP40~_#"),
+    client_id: configured(
+        option_env!("LUFT_ONEDRIVE_CLIENT_ID"),
+        "b15665d9-eda6-4092-8539-0eec376afd59",
+    ),
+    client_secret: configured(
+        option_env!("LUFT_ONEDRIVE_CLIENT_SECRET"),
+        "qtyfaBBYA403=unZUP40~_#",
+    ),
     authorize: "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
     token: "https://login.microsoftonline.com/common/oauth2/v2.0/token",
     scope: "openid email profile offline_access Files.Read Files.ReadWrite Files.Read.All Files.ReadWrite.All Sites.Read.All",
@@ -32,5 +38,8 @@ pub const DROPBOX: App = App {
     authorize: "https://www.dropbox.com/oauth2/authorize",
     token: "https://api.dropboxapi.com/oauth2/token",
     scope: "files.metadata.write files.content.write files.content.read sharing.write account_info.read",
-    extra: &[("token_access_type", "offline"), ("force_reapprove", "true")],
+    extra: &[
+        ("token_access_type", "offline"),
+        ("force_reapprove", "true"),
+    ],
 };

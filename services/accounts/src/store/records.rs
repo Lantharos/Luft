@@ -97,9 +97,9 @@ impl Records {
 
     pub fn unique_name(&self, wanted: &str, except: Option<&str>) -> String {
         let taken = |name: &str| {
-            self.all
-                .iter()
-                .any(|record| Some(record.id.as_str()) != except && record.name.eq_ignore_ascii_case(name))
+            self.all.iter().any(|record| {
+                Some(record.id.as_str()) != except && record.name.eq_ignore_ascii_case(name)
+            })
         };
         let base = folder_name(wanted);
         (1..)
@@ -112,7 +112,10 @@ impl Records {
     }
 
     fn save(&self) -> Result<()> {
-        let folder = self.path.parent().context("The account list has no folder")?;
+        let folder = self
+            .path
+            .parent()
+            .context("The account list has no folder")?;
         fs::create_dir_all(folder)?;
         let temporary = self.path.with_extension("json.new");
         fs::write(&temporary, serde_json::to_vec_pretty(&self.all)?)?;
@@ -125,7 +128,13 @@ fn folder_name(wanted: &str) -> String {
     let cleaned: String = wanted
         .trim()
         .chars()
-        .map(|character| if character == '/' || character.is_control() { ' ' } else { character })
+        .map(|character| {
+            if character == '/' || character.is_control() {
+                ' '
+            } else {
+                character
+            }
+        })
         .collect();
     let cleaned = cleaned.trim().trim_start_matches('.').trim();
     if cleaned.is_empty() {

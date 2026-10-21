@@ -44,7 +44,10 @@ impl Flow {
     }
 
     pub async fn answer(&mut self) -> Result<Answer> {
-        self.answers.recv().await.ok_or_else(|| anyhow!("Signing in was stopped"))
+        self.answers
+            .recv()
+            .await
+            .ok_or_else(|| anyhow!("Signing in was stopped"))
     }
 }
 
@@ -54,17 +57,28 @@ impl SignIns {
     }
 
     pub fn step(&self, session: &str) -> Option<Step> {
-        self.sessions().get(session).map(|session| session.step.clone())
+        self.sessions()
+            .get(session)
+            .map(|session| session.step.clone())
     }
 
     pub fn answer(&self, session: &str, answer: Answer) -> Result<()> {
         let sessions = self.sessions();
-        let session = sessions.get(session).ok_or_else(|| anyhow!("That sign-in has ended"))?;
-        session.answers.send(answer).map_err(|_| anyhow!("That sign-in has ended"))
+        let session = sessions
+            .get(session)
+            .ok_or_else(|| anyhow!("That sign-in has ended"))?;
+        session
+            .answers
+            .send(answer)
+            .map_err(|_| anyhow!("That sign-in has ended"))
     }
 
     pub fn cancel(&self, session: &str) {
-        if let Some(task) = self.sessions().remove(session).and_then(|session| session.task) {
+        if let Some(task) = self
+            .sessions()
+            .remove(session)
+            .and_then(|session| session.task)
+        {
             task.abort();
         }
     }
@@ -90,9 +104,17 @@ fn uses_browser(provider: Provider, credentials: &Credentials) -> bool {
     }
 }
 
-pub async fn start(hub: &Arc<Hub>, provider: Provider, credentials: Credentials, account: Option<String>) -> Result<String> {
+pub async fn start(
+    hub: &Arc<Hub>,
+    provider: Provider,
+    credentials: Credentials,
+    account: Option<String>,
+) -> Result<String> {
     if let Some(account) = &account
-        && hub.records().get(account).is_none_or(|record| record.provider != provider)
+        && hub
+            .records()
+            .get(account)
+            .is_none_or(|record| record.provider != provider)
     {
         bail!("That account isn't here anymore");
     }
@@ -132,7 +154,9 @@ async fn run(mut flow: Flow) {
     let provider = flow.provider;
     let outcome = match provider {
         Provider::Onedrive | Provider::Dropbox => oauth::run(&mut flow).await,
-        Provider::Nextcloud if flow.credentials.password.is_none() => password::nextcloud_login(&mut flow).await,
+        Provider::Nextcloud if flow.credentials.password.is_none() => {
+            password::nextcloud_login(&mut flow).await
+        }
         Provider::Nextcloud | Provider::Webdav => password::run(&mut flow).await,
         Provider::Icloud => icloud::run(&mut flow).await,
     };

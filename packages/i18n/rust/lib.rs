@@ -10,7 +10,9 @@ use fluent_bundle::{FluentMessage, FluentResource};
 use unic_langid::LanguageIdentifier;
 
 pub use fluent_bundle::{FluentArgs, FluentValue};
-pub use locales::{LOCALES, PSEUDO_LOCALE, SOURCE_LOCALE, bcp47, formats, negotiate, overridden, requested};
+pub use locales::{
+    LOCALES, PSEUDO_LOCALE, SOURCE_LOCALE, bcp47, formats, negotiate, overridden, requested,
+};
 pub use system::SystemCatalog;
 
 type Bundle = FluentBundle<FluentResource>;

@@ -42,13 +42,16 @@ pub fn remove(kept: &mut Vec<String>, skipped: &mut Vec<String>, path: &str) {
 }
 
 fn escape(path: &str) -> String {
-    path.chars().fold(String::with_capacity(path.len()), |mut escaped, character| {
-        if matches!(character, '*' | '?' | '[' | ']' | '{' | '}' | '\\') {
-            escaped.push('\\');
-        }
-        escaped.push(character);
-        escaped
-    })
+    path.chars().fold(
+        String::with_capacity(path.len()),
+        |mut escaped, character| {
+            if matches!(character, '*' | '?' | '[' | ']' | '{' | '}' | '\\') {
+                escaped.push('\\');
+            }
+            escaped.push(character);
+            escaped
+        },
+    )
 }
 
 #[cfg(test)]
@@ -73,6 +76,9 @@ mod tests {
     #[test]
     fn filters_escape_names() {
         let rules = render(&["Photos [2024]".into()], &["Photos [2024]/raw".into()]);
-        assert_eq!(rules, "- /Photos \\[2024\\]/raw\n- /Photos \\[2024\\]/raw/**\n+ /Photos \\[2024\\]\n+ /Photos \\[2024\\]/**\n- **\n");
+        assert_eq!(
+            rules,
+            "- /Photos \\[2024\\]/raw\n- /Photos \\[2024\\]/raw/**\n+ /Photos \\[2024\\]\n+ /Photos \\[2024\\]/**\n- **\n"
+        );
     }
 }

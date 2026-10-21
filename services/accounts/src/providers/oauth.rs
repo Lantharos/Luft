@@ -111,18 +111,20 @@ impl Pending {
         let app = self.app;
         let verifier = self.verifier;
         let tokens = match code {
-            Ok(code) => tokio::task::spawn_blocking(move || {
-                exchange(
-                    app,
-                    &[
-                        ("grant_type", "authorization_code"),
-                        ("code", &code),
-                        ("redirect_uri", REDIRECT),
-                        ("code_verifier", &verifier),
-                    ],
-                )
-            })
-            .await?,
+            Ok(code) => {
+                tokio::task::spawn_blocking(move || {
+                    exchange(
+                        app,
+                        &[
+                            ("grant_type", "authorization_code"),
+                            ("code", &code),
+                            ("redirect_uri", REDIRECT),
+                            ("code_verifier", &verifier),
+                        ],
+                    )
+                })
+                .await?
+            }
             Err(error) => Err(error),
         };
         let page = if tokens.is_ok() { FINISHED } else { FAILED };
@@ -151,7 +153,10 @@ impl Pending {
     }
 }
 
-async fn read_redirect(mut stream: TcpStream, state: &str) -> Result<Option<(Result<String>, TcpStream)>> {
+async fn read_redirect(
+    mut stream: TcpStream,
+    state: &str,
+) -> Result<Option<(Result<String>, TcpStream)>> {
     let mut request = vec![0; 8192];
     let read = tokio::time::timeout(Duration::from_secs(10), stream.read(&mut request))
         .await
@@ -166,7 +171,9 @@ async fn read_redirect(mut stream: TcpStream, state: &str) -> Result<Option<(Res
         Some(outcome) => Ok(Some((outcome, stream))),
         None => {
             stream
-                .write_all(b"HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\nConnection: close\r\n\r\n")
+                .write_all(
+                    b"HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\nConnection: close\r\n\r\n",
+                )
                 .await?;
             Ok(None)
         }
@@ -209,14 +216,21 @@ pub fn exchange(app: &App, form: &[(&str, &str)]) -> Result<Tokens> {
             .error_description
             .or(refusal.error)
             .unwrap_or_else(|| answer.status().to_string());
-        bail!("Signing in didn't finish: {}", reason.lines().next().unwrap_or_default());
+        bail!(
+            "Signing in didn't finish: {}",
+            reason.lines().next().unwrap_or_default()
+        );
     }
-    let response: TokenResponse = answer.body_mut().read_json().context("The sign-in answer couldn't be read")?;
+    let response: TokenResponse = answer
+        .body_mut()
+        .read_json()
+        .context("The sign-in answer couldn't be read")?;
     let refresh = response
         .refresh_token
         .as_deref()
         .context("The service didn't allow staying signed in")?;
-    let expires = OffsetDateTime::now_utc() + time::Duration::seconds(response.expires_in.unwrap_or(TOKEN_LIFETIME));
+    let expires = OffsetDateTime::now_utc()
+        + time::Duration::seconds(response.expires_in.unwrap_or(TOKEN_LIFETIME));
     let rclone = serde_json::to_string(&RcloneToken {
         access_token: &response.access_token,
         token_type: response.token_type.as_deref().unwrap_or("Bearer"),
@@ -250,9 +264,23 @@ mod tests {
     fn only_the_matching_redirect_counts() {
         assert!(redirect_outcome("/favicon.ico", "abc").is_none());
         assert!(redirect_outcome("/?code=1&state=other", "abc").is_none());
-        assert_eq!(redirect_outcome("/?code=xyz&state=abc", "abc").unwrap().unwrap(), "xyz");
-        let refused = redirect_outcome("/?error=access_denied&error_description=No+thanks&state=abc", "abc");
-        assert!(refused.unwrap().unwrap_err().to_string().contains("No thanks"));
+        assert_eq!(
+            redirect_outcome("/?code=xyz&state=abc", "abc")
+                .unwrap()
+                .unwrap(),
+            "xyz"
+        );
+        let refused = redirect_outcome(
+            "/?error=access_denied&error_description=No+thanks&state=abc",
+            "abc",
+        );
+        assert!(
+            refused
+                .unwrap()
+                .unwrap_err()
+                .to_string()
+                .contains("No thanks")
+        );
     }
 
     #[test]
@@ -277,8 +305,16 @@ mod tests {
             std::io::Read::read_exact(&mut reader, &mut body).unwrap();
             let body = String::from_utf8(body).unwrap();
             assert!(body.contains("code=fake-code") && body.contains("client_id=test-client"));
-            let id_token = format!("x.{}.y", base64::Engine::encode(&base64::engine::general_purpose::URL_SAFE_NO_PAD, br#"{"email":"ada@example.com"}"#));
-            let reply = format!(r#"{{"access_token":"fake-access","refresh_token":"fake-refresh","expires_in":3600,"token_type":"Bearer","id_token":"{id_token}"}}"#);
+            let id_token = format!(
+                "x.{}.y",
+                base64::Engine::encode(
+                    &base64::engine::general_purpose::URL_SAFE_NO_PAD,
+                    br#"{"email":"ada@example.com"}"#
+                )
+            );
+            let reply = format!(
+                r#"{{"access_token":"fake-access","refresh_token":"fake-refresh","expires_in":3600,"token_type":"Bearer","id_token":"{id_token}"}}"#
+            );
             write!(stream, "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\n\r\n{reply}", reply.len()).unwrap();
         });
         let token = format!("http://{address}/token");
@@ -290,7 +326,11 @@ mod tests {
             scope: "files",
             extra: &[],
         };
-        let tokens = exchange(&app, &[("grant_type", "authorization_code"), ("code", "fake-code")]).unwrap();
+        let tokens = exchange(
+            &app,
+            &[("grant_type", "authorization_code"), ("code", "fake-code")],
+        )
+        .unwrap();
         serving.join().unwrap();
         let rclone: serde_json::Value = serde_json::from_str(&tokens.rclone).unwrap();
         assert_eq!(rclone["refresh_token"], "fake-refresh");

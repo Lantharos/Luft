@@ -84,7 +84,11 @@ pub async fn run(hub: Arc<Hub>) {
 }
 
 fn accounts(hub: &Hub) -> Vec<String> {
-    hub.records().all().iter().map(|record| record.id.clone()).collect()
+    hub.records()
+        .all()
+        .iter()
+        .map(|record| record.id.clone())
+        .collect()
 }
 
 fn spawn_attach(hub: &Arc<Hub>, account: String) {
@@ -98,7 +102,9 @@ fn spawn_attach(hub: &Arc<Hub>, account: String) {
 
 fn spawn_sync(hub: &Arc<Hub>, account: String) {
     let hub = hub.clone();
-    tokio::spawn(async move { keep::report(&hub, &account, sync(&hub, &account, false).await).await });
+    tokio::spawn(
+        async move { keep::report(&hub, &account, sync(&hub, &account, false).await).await },
+    );
 }
 
 fn sync_all(hub: &Arc<Hub>) {
@@ -112,7 +118,9 @@ fn sync_settled(hub: &Arc<Hub>) {
         .drives
         .live()
         .iter()
-        .filter(|(_, live)| live.dirty.is_some_and(|since| since.elapsed() >= SETTLE) && !live.syncing)
+        .filter(|(_, live)| {
+            live.dirty.is_some_and(|since| since.elapsed() >= SETTLE) && !live.syncing
+        })
         .map(|(account, _)| account.clone())
         .collect();
     for account in settled {
@@ -124,7 +132,9 @@ async fn retry_unready(hub: &Arc<Hub>) {
     let records = hub.records().all().to_vec();
     for record in records {
         let live = hub.drives.get(&record.id);
-        if record.sign_in_again.is_some() || !matches!(live.state, DriveState::Offline | DriveState::Problem) {
+        if record.sign_in_again.is_some()
+            || !matches!(live.state, DriveState::Offline | DriveState::Problem)
+        {
             continue;
         }
         if live.mounted.is_some() && !live.fallback {
@@ -167,8 +177,13 @@ pub async fn check(hub: &Hub, account: &str) {
     }
     let fs = remote(account);
     let usage = match hub.rclone.about(&fs).await {
-        Ok(about) => Ok(about["total"].as_u64().zip(about["used"].as_u64()).map(|(total, used)| Usage { used, total })),
-        Err(error) if error.to_string().contains("doesn't support about") => hub.rclone.list_top(&fs).await.map(|_| None),
+        Ok(about) => Ok(about["total"]
+            .as_u64()
+            .zip(about["used"].as_u64())
+            .map(|(total, used)| Usage { used, total })),
+        Err(error) if error.to_string().contains("doesn't support about") => {
+            hub.rclone.list_top(&fs).await.map(|_| None)
+        }
         Err(error) => Err(error),
     };
     match usage {
@@ -187,7 +202,10 @@ pub async fn check(hub: &Hub, account: &str) {
                     attach::ask_to_sign_in(hub, &record, &reason).await;
                     (DriveState::SignInAgain, reason)
                 }
-                Trouble::Offline => (DriveState::Offline, trouble::explain(record.provider, &message)),
+                Trouble::Offline => (
+                    DriveState::Offline,
+                    trouble::explain(record.provider, &message),
+                ),
                 Trouble::Other(problem) => (DriveState::Problem, problem),
             };
             hub.drives.update(account, |live| {
@@ -228,7 +246,9 @@ async fn follow_uploads(hub: &Hub, release: bool) {
     let mut changed = false;
     for account in mounted {
         let fs = union(&account);
-        let Ok(queue) = hub.rclone.queue(&fs).await else { continue };
+        let Ok(queue) = hub.rclone.queue(&fs).await else {
+            continue;
+        };
         for item in queue.iter().filter(|item| !item.uploading) {
             let expiry = if paused && item.expiry < HOLD_WHEN_BELOW {
                 Some(HOLD)
@@ -242,7 +262,9 @@ async fn follow_uploads(hub: &Hub, release: bool) {
             }
         }
         let uploads: HashSet<String> = queue.into_iter().map(|item| item.name).collect();
-        let Some(record) = hub.records().get(&account).cloned() else { continue };
+        let Some(record) = hub.records().get(&account).cloned() else {
+            continue;
+        };
         changed |= hub.drives.update(&account, |live| {
             let landed_in_kept = live
                 .uploads

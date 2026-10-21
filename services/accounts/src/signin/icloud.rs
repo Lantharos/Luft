@@ -38,10 +38,22 @@ pub async fn run(flow: &mut Flow) -> Result<String> {
 }
 
 async fn identity(flow: &Flow) -> Result<(String, String)> {
-    let typed_user = flow.credentials.user.clone().filter(|user| !user.trim().is_empty());
-    let typed_password = flow.credentials.password.clone().filter(|password| !password.is_empty());
+    let typed_user = flow
+        .credentials
+        .user
+        .clone()
+        .filter(|user| !user.trim().is_empty());
+    let typed_password = flow
+        .credentials
+        .password
+        .clone()
+        .filter(|password| !password.is_empty());
     if let Some(account) = &flow.account {
-        let user = flow.hub.records().get(account).map(|record| record.user.clone());
+        let user = flow
+            .hub
+            .records()
+            .get(account)
+            .map(|record| record.user.clone());
         let saved = match flow.hub.keyring.load(account).await? {
             Some(Secret::Apple { password, .. }) => Some(password),
             _ => None,
@@ -62,7 +74,12 @@ async fn converse(flow: &mut Flow, remote: &str, apple_id: &str, password: &str)
     parameters.insert("apple_id".into(), Value::String(apple_id.to_owned()));
     parameters.insert("password".into(), Value::String(password.to_owned()));
     let mut question = rclone
-        .configure(remote, BACKEND, parameters, json!({"obscure": true, "nonInteractive": true}))
+        .configure(
+            remote,
+            BACKEND,
+            parameters,
+            json!({"obscure": true, "nonInteractive": true}),
+        )
         .await?;
     let mut wrong = false;
     while !question.state.is_empty() {
@@ -75,21 +92,33 @@ async fn converse(flow: &mut Flow, remote: &str, apple_id: &str, password: &str)
             Answer::Phone { .. } => bail!("That phone number isn't on this Apple Account"),
         };
         flow.show(Step::Working).await;
-        match rclone.continue_configuring(remote, &question.state, &result).await {
+        match rclone
+            .continue_configuring(remote, &question.state, &result)
+            .await
+        {
             Ok(next) => {
                 wrong = !next.error.is_empty();
                 if !wrong {
                     question = next;
                 }
             }
-            Err(error) if question.state == "2fa_do" && error.to_string().contains("validate2FACode") => wrong = true,
+            Err(error)
+                if question.state == "2fa_do" && error.to_string().contains("validate2FACode") =>
+            {
+                wrong = true
+            }
             Err(error) if error.to_string().contains("validateSMSCode") => bail!(WRONG_TEXTED_CODE),
             Err(error) => return Err(error),
         }
     }
     open_drive(flow, remote).await?;
     let live = rclone.remote(remote).await?;
-    let field = |key: &str| live.get(key).and_then(Value::as_str).unwrap_or_default().to_owned();
+    let field = |key: &str| {
+        live.get(key)
+            .and_then(Value::as_str)
+            .unwrap_or_default()
+            .to_owned()
+    };
     let trust_token = field("trust_token");
     if trust_token.is_empty() {
         bail!("Apple didn't confirm this computer. Try again.");
@@ -102,7 +131,10 @@ async fn converse(flow: &mut Flow, remote: &str, apple_id: &str, password: &str)
 }
 
 fn step_for(question: &Question, wrong: bool) -> Result<(Step, Vec<String>)> {
-    let option = question.option.as_ref().context("Apple asked for something Luft doesn't know")?;
+    let option = question
+        .option
+        .as_ref()
+        .context("Apple asked for something Luft doesn't know")?;
     let step = match option.name.as_str() {
         DEVICE_CODE => Step::Code {
             prompt: if wrong { WRONG_CODE } else { DEVICE_PROMPT }.to_owned(),
@@ -112,7 +144,12 @@ fn step_for(question: &Question, wrong: bool) -> Result<(Step, Vec<String>)> {
             prompt: if wrong {
                 WRONG_CODE.to_owned()
             } else {
-                option.help.replace("verification code", "code").trim().to_owned() + "."
+                option
+                    .help
+                    .replace("verification code", "code")
+                    .trim()
+                    .to_owned()
+                    + "."
             },
             texted: true,
         },

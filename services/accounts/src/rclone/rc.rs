@@ -62,7 +62,14 @@ fn parse(response: &[u8]) -> Result<(u16, Vec<u8>)> {
         let line = line.to_ascii_lowercase();
         line.starts_with("transfer-encoding:") && line.contains("chunked")
     });
-    Ok((status, if chunked { dechunk(body)? } else { body.to_vec() }))
+    Ok((
+        status,
+        if chunked {
+            dechunk(body)?
+        } else {
+            body.to_vec()
+        },
+    ))
 }
 
 fn dechunk(mut body: &[u8]) -> Result<Vec<u8>> {

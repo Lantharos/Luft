@@ -44,11 +44,18 @@ impl Watcher {
     }
 
     pub fn follow(&self, account: &str, root: &Path) {
-        let Ok(metadata) = fs::metadata(root) else { return };
+        let Ok(metadata) = fs::metadata(root) else {
+            return;
+        };
         if !metadata.is_dir() {
             return;
         }
-        match self.watches.lock().expect("never poisoned").add(root, CHANGES) {
+        match self
+            .watches
+            .lock()
+            .expect("never poisoned")
+            .add(root, CHANGES)
+        {
             Ok(descriptor) => {
                 self.folders.lock().expect("never poisoned").insert(
                     descriptor,
@@ -74,7 +81,12 @@ impl Watcher {
 pub async fn follow_changes(hub: Arc<Hub>, mut changes: Changes) {
     while let Some(Ok(event)) = changes.next().await {
         if event.mask.contains(EventMask::IGNORED) {
-            hub.drives.watcher.folders.lock().expect("never poisoned").remove(&event.wd);
+            hub.drives
+                .watcher
+                .folders
+                .lock()
+                .expect("never poisoned")
+                .remove(&event.wd);
             continue;
         }
         let folder = hub
@@ -85,12 +97,15 @@ pub async fn follow_changes(hub: Arc<Hub>, mut changes: Changes) {
             .expect("never poisoned")
             .get(&event.wd)
             .map(|folder| (folder.account.clone(), folder.path.clone()));
-        let Some((account, path)) = folder else { continue };
+        let Some((account, path)) = folder else {
+            continue;
+        };
         if event.mask.contains(EventMask::ISDIR | EventMask::CREATE)
             && let Some(name) = event.name
         {
             hub.drives.watcher.follow(&account, &path.join(name));
         }
-        hub.drives.update(&account, |live| live.dirty = Some(Instant::now()));
+        hub.drives
+            .update(&account, |live| live.dirty = Some(Instant::now()));
     }
 }

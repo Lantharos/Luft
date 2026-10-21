@@ -12,6 +12,9 @@ target/
 dist/
 node_modules/
 __pycache__/
+.astro/
+.wrangler/
 .svelte-check/
 vite.config.*.timestamp-*
-/.claude/worktrees/
+/.claude/
+/web/site/worker/worker-configuration.d.ts

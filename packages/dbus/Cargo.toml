@@ -3,13 +3,16 @@ name = "luft-dbus"
 version = "0.1.0"
 description = "Shared D-Bus connections, ObjectManager snapshots and service properties for Luft's apps and services"
 authors = ["Kristof"]
-license = "GPL-3.0-or-later"
-edition = "2024"
-rust-version = "1.98"
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
 
 [dependencies]
-futures-util = { version = "0.3.34", default-features = false }
-libc = "0.2.191"
-serde = "1.0.229"
-tokio = { version = "1.53.3", default-features = false, features = ["sync", "time"] }
-zbus = { version = "6.0.0", default-features = false, features = ["proxy", "tokio"] }
+futures-util.workspace = true
+libc.workspace = true
+serde.workspace = true
+tokio = { workspace = true, features = ["sync", "time"] }
+zbus = { workspace = true, features = ["proxy", "tokio"] }
+
+[lints]
+workspace = true

@@ -3,27 +3,25 @@ name = "barometer"
 version = "0.1.0"
 description = "System monitor for Luft"
 authors = ["Kristof"]
-license = "GPL-3.0-or-later"
-edition = "2024"
-rust-version = "1.98"
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
 
 [lib]
 name = "barometer_lib"
 
 [dependencies]
-futures-util = { version = "0.3.34", default-features = false }
-gio = "0.22.10"
-gio-unix = "0.22.8"
-libc = "0.2.190"
-luft-app = { path = "../../../packages/app", features = ["apps", "launch", "settings"] }
-nvml-wrapper = "0.13.0"
-parking_lot = "0.12.5"
-sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.51" }
-serde = { version = "1.0.229", features = ["derive"] }
-serde_json = "1.0.154"
-zbus = { version = "6.0.0", default-features = false, features = ["proxy", "tokio"] }
+futures-util.workspace = true
+gio.workspace = true
+gio-unix.workspace = true
+libc.workspace = true
+luft-app = { workspace = true, features = ["apps", "launch", "settings"] }
+nvml-wrapper.workspace = true
+parking_lot.workspace = true
+sabine.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+zbus = { workspace = true, features = ["proxy", "tokio"] }
 
-[profile.release]
-lto = "fat"
-codegen-units = 1
-strip = true
+[lints]
+workspace = true

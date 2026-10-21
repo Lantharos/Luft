@@ -16,19 +16,21 @@ ENV CARGO_HOME=/var/cache/cargo CARGO_TARGET_DIR=/var/cache/luft-part/target LUF
     CCACHE_DIR=/var/cache/ccache CCACHE_MAXSIZE=1G
 
 FROM builder AS kestrel-build
-COPY package.json bun.lock /src/
+COPY Cargo.toml Cargo.lock package.json bun.lock /src/
 COPY kestrel /src/kestrel
 COPY packages/motion /src/packages/motion
 COPY packages/ui/src/taskbar /src/packages/ui/src/taskbar
 COPY packages/i18n/src /src/packages/i18n/src
 COPY packages/i18n/tools /src/packages/i18n/tools
 COPY packages/settings-pages /src/packages/settings-pages
-COPY os/image/parts/stages/kestrel.sh os/image/parts/stages/needed.sh os/image/parts/stages/source-times.ts /src/os/image/parts/stages/
+COPY os/image/parts/stages/kestrel.sh os/image/parts/stages/needed.sh os/image/parts/stages/source-times.ts os/image/parts/stages/workspace.ts \
+  /src/os/image/parts/stages/
 RUN --mount=type=cache,from=work,target=/var/cache/luft-part,sharing=locked \
     --mount=type=cache,from=cache,source=cargo,target=/var/cache/cargo \
     --mount=type=cache,from=cache,source=sccache,target=/var/cache/sccache \
     --mount=type=cache,from=cache,source=ccache,target=/var/cache/ccache \
     --mount=type=cache,from=cache,source=bun,target=/var/cache/bun \
+    bun /src/os/image/parts/stages/workspace.ts /src && \
     bun /src/os/image/parts/stages/source-times.ts /var/cache/luft-part/sources.json /src && \
     /src/os/image/parts/stages/kestrel.sh /stage /out && \
     /src/os/image/parts/stages/needed.sh /stage /out
@@ -38,10 +40,12 @@ COPY --from=kestrel-build /stage /stage
 COPY --from=kestrel-build /out/ /
 
 FROM builder AS boot-build
+COPY Cargo.toml Cargo.lock /src/
 COPY boot/sushi /src/boot/sushi
 COPY security /src/security
 COPY kestrel/engine/data/fonts /src/kestrel/engine/data/fonts
-COPY os/image/parts/stages/boot.sh os/image/parts/stages/needed.sh os/image/parts/stages/source-times.ts /src/os/image/parts/stages/
+COPY os/image/parts/stages/boot.sh os/image/parts/stages/needed.sh os/image/parts/stages/source-times.ts os/image/parts/stages/workspace.ts \
+  /src/os/image/parts/stages/
 ARG SIGNED_BY
 RUN --mount=type=cache,from=work,target=/var/cache/luft-part,sharing=locked \
     --mount=type=cache,from=cache,source=cargo,target=/var/cache/cargo \
@@ -49,6 +53,7 @@ RUN --mount=type=cache,from=work,target=/var/cache/luft-part,sharing=locked \
     --mount=type=secret,id=secureboot-key \
     --mount=type=secret,id=secureboot-cert \
     : "signed by ${SIGNED_BY}" && \
+    bun /src/os/image/parts/stages/workspace.ts /src && \
     bun /src/os/image/parts/stages/source-times.ts /var/cache/luft-part/sources.json /src && \
     /src/os/image/parts/stages/boot.sh /stage /run/secrets/secureboot-key /run/secrets/secureboot-cert && \
     /src/os/image/parts/stages/needed.sh /stage /out
@@ -98,14 +103,17 @@ FROM scratch AS helium
 COPY --from=helium-build /stage /stage
 
 FROM builder AS services-build
+COPY Cargo.toml Cargo.lock /src/
+COPY .cargo /src/.cargo
 COPY packages /src/packages
-COPY security/Cargo.toml security/Cargo.lock /src/security/
 COPY security/crates /src/security/crates
 COPY apps/setup/installer /src/apps/setup/installer
-COPY os/image/parts/stages/services.sh os/image/parts/stages/needed.sh os/image/parts/stages/source-times.ts /src/os/image/parts/stages/
+COPY os/image/parts/stages/services.sh os/image/parts/stages/needed.sh os/image/parts/stages/source-times.ts os/image/parts/stages/workspace.ts \
+  /src/os/image/parts/stages/
 RUN --mount=type=cache,from=work,target=/var/cache/luft-part,sharing=locked \
     --mount=type=cache,from=cache,source=cargo,target=/var/cache/cargo \
     --mount=type=cache,from=cache,source=sccache,target=/var/cache/sccache \
+    bun /src/os/image/parts/stages/workspace.ts /src && \
     bun /src/os/image/parts/stages/source-times.ts /var/cache/luft-part/sources.json /src && \
     /src/os/image/parts/stages/services.sh /stage && \
     /src/os/image/parts/stages/needed.sh /stage /out
@@ -116,10 +124,11 @@ COPY --from=services-build /out/ /
 
 FROM sabine AS app-sources
 ARG APP
-COPY package.json bun.lock /src/
+COPY Cargo.toml Cargo.lock package.json bun.lock /src/
 COPY packages /src/packages
 COPY apps/${APP} /src/apps/${APP}
-COPY os/image/parts/stages/needed.sh os/image/parts/stages/app-data.sh os/image/parts/stages/source-times.ts /src/os/image/parts/stages/
+COPY os/image/parts/stages/needed.sh os/image/parts/stages/app-data.sh os/image/parts/stages/source-times.ts os/image/parts/stages/workspace.ts \
+  /src/os/image/parts/stages/
 
 FROM app-sources AS keys-sources
 COPY kestrel/engine/data/characters.json kestrel/engine/data/emoji.json /src/kestrel/engine/data/
@@ -130,6 +139,7 @@ RUN --mount=type=cache,from=work,target=/var/cache/luft-part,sharing=locked \
     --mount=type=cache,from=cache,source=cargo,target=/var/cache/cargo \
     --mount=type=cache,from=cache,source=sccache,target=/var/cache/sccache \
     --mount=type=cache,from=cache,source=bun,target=/var/cache/bun \
+    bun /src/os/image/parts/stages/workspace.ts /src && \
     bun /src/os/image/parts/stages/source-times.ts "/var/cache/luft-part/sources-${APP}.json" /src && \
     (cd /src && bun install --frozen-lockfile) && \
     sabine install --bundle --system-wide --root /stage "/src/apps/${APP}" && \

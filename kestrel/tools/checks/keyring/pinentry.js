@@ -12,7 +12,7 @@ import {capture} from '../lib/screenshots.js';
 import {focusedEntry, keyringDialog, openedDialog} from './lib/client.js';
 
 const {require, eventually} = checks('pinentry');
-const PINENTRY = repository('kestrel/keyring/target/release/luft-pinentry');
+const PINENTRY = repository('target/release/luft-pinentry');
 const PASSPHRASE = 'correct horse 7';
 const USER_ID = 'Kestrel Check <check@lantharos.com>';
 const BAD_PASSPHRASE_TIMEOUT = 5000;

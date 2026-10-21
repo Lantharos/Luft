@@ -18,9 +18,8 @@ Private keys are made inside the TPM when there is one, and passkeys stay bound 
 ## Development
 
 ```sh
-cd kestrel/passkeys
-cargo test
-cargo clippy --all-targets -- -D warnings
+cargo test -p luft-passkeys -p ctap -p luft-passkeys-relay
+cargo clippy -p luft-passkeys -p ctap -p luft-passkeys-relay --all-targets -- -D warnings
 ```
 
 `tools/check` runs Chromium and Firefox against Luft Passkeys in the Sushi VM, with a stand-in fingerprint reader:

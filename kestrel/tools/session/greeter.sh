@@ -45,7 +45,7 @@ DBUS_SYSTEM_BUS_ADDRESS="$(head -n1 "$run/system-bus")"
 export DBUS_SYSTEM_BUS_ADDRESS
 
 start gjs -m "$fixtures/systemServices.js" "$run/images" "$events"
-start "$root/kestrel/greeter/target/release/kestrel-greeter-service" --unprivileged \
+start "$root/target/release/kestrel-greeter-service" --unprivileged \
   --state-dir "$run/state" --greetd-config "$run/greetd.toml"
 start gjs -m "$fixtures/greetd.js" "$socket" "$events"
 wait_until "the accounts service" gdbus introspect --system --dest org.freedesktop.Accounts --object-path /org/freedesktop/Accounts

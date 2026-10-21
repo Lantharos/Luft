@@ -9,7 +9,7 @@ import type { Field, Step } from './vpnDialog.js';
 Gio._promisify(Gio.DataInputStream.prototype, 'read_line_async');
 Gio._promisify(Gio.OutputStream.prototype, 'write_all_async');
 
-const HELPER = helperProgram('kestrel-openconnect', '../../openconnect/target/release/kestrel-openconnect');
+const HELPER = helperProgram('kestrel-openconnect', '../../../target/release/kestrel-openconnect');
 
 interface HelperField {
   name: string;

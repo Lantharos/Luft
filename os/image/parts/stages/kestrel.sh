@@ -91,10 +91,8 @@ build_engine() {
 }
 
 build_services() {
-  local project program
-  for project in settings search openconnect peek greeter keyring watchdog passkeys; do
-    cargo build --release --locked --manifest-path "$kestrel/$project/Cargo.toml"
-  done
+  local program
+  cargo build --release --locked --manifest-path "$luft/Cargo.toml"
   install -Dm755 "$release/peek" "$destdir/usr/bin/peek"
   for program in kestrel-settings kestrel-search kestrel-openconnect kestrel-greeter-service kestrel-watchdog \
     luft-keyring luft-keyring-unlock luft-pinentry luft-passkeys luft-passkeys-relay; do

@@ -3,17 +3,20 @@ name = "luft-accounts"
 version = "0.1.0"
 description = "Online accounts and the cloud drives they bring, shared by Settings, Rover and Luft's other apps"
 authors = ["Kristof"]
-license = "GPL-3.0-or-later"
-edition = "2024"
-rust-version = "1.98"
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
 
 [features]
 default = ["client"]
 client = ["dep:futures-util", "dep:luft-dbus", "dep:serde_json", "dep:zbus"]
 
 [dependencies]
-futures-util = { version = "0.3.34", default-features = false, optional = true }
-luft-dbus = { path = "../dbus", optional = true }
-serde = { version = "1.0.229", features = ["derive"] }
-serde_json = { version = "1.0.154", optional = true }
-zbus = { version = "6.0.0", default-features = false, features = ["proxy", "tokio"], optional = true }
+futures-util = { workspace = true, optional = true }
+luft-dbus = { workspace = true, optional = true }
+serde.workspace = true
+serde_json = { workspace = true, optional = true }
+zbus = { workspace = true, features = ["proxy", "tokio"], optional = true }
+
+[lints]
+workspace = true

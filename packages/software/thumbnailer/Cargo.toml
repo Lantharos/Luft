@@ -3,27 +3,19 @@ name = "luft-thumbnailer"
 version = "0.1.0"
 description = "Shows the app icon of AppImages, Flatpak bundles and Flatpak references as their thumbnail"
 authors = ["Kristof"]
-license = "GPL-3.0-or-later"
-edition = "2024"
-rust-version = "1.98"
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
 
 [dependencies]
-dirs = "7.0.0"
-fast_image_resize = "6.1.0"
-flate2 = "1.1.10"
-glib = "0.22.10"
-image = { version = "0.25.10", default-features = false, features = ["png"] }
-luft-software = { path = "..", default-features = false }
-memmap2 = "0.9.11"
-resvg = "0.48.1"
+dirs.workspace = true
+fast_image_resize.workspace = true
+flate2 = { workspace = true, features = ["default"] }
+glib.workspace = true
+image.workspace = true
+luft-software.workspace = true
+memmap2.workspace = true
+resvg.workspace = true
 
-[lints.rust]
-unsafe_op_in_unsafe_fn = "deny"
-
-[lints.clippy]
-all = { level = "warn", priority = -1 }
-
-[profile.release]
-lto = true
-codegen-units = 1
-strip = true
+[lints]
+workspace = true

@@ -1,30 +1,33 @@
 [package]
 name = "luft-keyring"
 description = "Luft's secret store"
-version.workspace = true
+version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 
 [dependencies]
-aes = "0.9.3"
-base64 = "0.23.1"
-cbc = { version = "0.2.1", features = ["alloc"] }
-crypto-bigint = "0.7.5"
-ed25519-dalek = "3.0.0"
-futures-util = { version = "0.3.34", default-features = false }
+aes.workspace = true
+base64.workspace = true
+cbc.workspace = true
+crypto-bigint.workspace = true
+ed25519-dalek.workspace = true
+futures-util.workspace = true
 getrandom.workspace = true
-hkdf = "0.13.0"
-hmac = "0.13.0"
-libc = "0.2.190"
-p256 = { version = "0.14.0", default-features = false, features = ["ecdsa", "std"] }
+hkdf.workspace = true
+hmac.workspace = true
+libc.workspace = true
+p256 = { workspace = true, features = ["ecdsa", "std"] }
 postcard.workspace = true
-rustix.workspace = true
+rustix = { workspace = true, features = ["fs", "mm", "net", "pipe", "process"] }
 serde.workspace = true
-serde_json = "1.0.154"
+serde_json.workspace = true
 luft-keyring-vault.workspace = true
 luft-keyring-wire = { workspace = true, features = ["tokio"] }
-sha2 = "0.11.1"
-tokio.workspace = true
-zbus.workspace = true
-zeroize.workspace = true
+sha2.workspace = true
+tokio = { workspace = true, features = ["fs", "io-util", "macros", "net", "rt", "signal", "sync", "time"] }
+zbus = { workspace = true, features = ["proxy", "service", "tokio"] }
+zeroize = { workspace = true, features = ["derive", "serde"] }
+
+[lints]
+workspace = true

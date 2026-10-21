@@ -68,7 +68,7 @@ Polkit, real network credentials, unlocking with the computer's own sign-in rule
 
 ## Apps and packages
 
-From an app's folder, `bun run check` type-checks its interface. In `kestrel/ui` it also runs the unit tests, such as those of the quick answers and conversions in Start's search. The Rust side builds with `bun run desktop:build`. Shared Rust crates have their own `cargo test`.
+From an app's folder, `bun run check` type-checks its interface. In `kestrel/ui` it also runs the unit tests, such as those of the quick answers and conversions in Start's search. The Rust side builds with `bun run desktop:build`. Every Rust crate in the repository belongs to one Cargo workspace at its root, with one `Cargo.lock` and the versions of shared dependencies in its `Cargo.toml`; `cargo clippy --all-targets` and `cargo test` there check them all, and `-p NAME` picks one. Programs land in the root `target` folder.
 
 ## NVIDIA graphics
 

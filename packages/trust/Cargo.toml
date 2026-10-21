@@ -3,12 +3,15 @@ name = "luft-trust"
 version = "0.1.0"
 description = "Calls to trustd, Luft's security service, shared by Disks, Settings and Install Luft"
 authors = ["Kristof"]
-license = "GPL-3.0-or-later"
-edition = "2024"
-rust-version = "1.98"
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
 
 [dependencies]
-luft-dbus = { path = "../dbus" }
-luft-i18n = { path = "../i18n" }
-serde = { version = "1.0.229", features = ["derive"] }
-zbus = { version = "6.0.0", default-features = false, features = ["proxy", "tokio"] }
+luft-dbus.workspace = true
+luft-i18n.workspace = true
+serde.workspace = true
+zbus = { workspace = true, features = ["proxy", "tokio"] }
+
+[lints]
+workspace = true

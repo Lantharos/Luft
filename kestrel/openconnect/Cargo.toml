@@ -2,19 +2,17 @@
 name = "kestrel-openconnect"
 description = "Signs in to OpenConnect VPNs for Kestrel"
 version = "0.1.0"
-edition = "2024"
-rust-version = "1.98"
-license = "GPL-3.0-or-later"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
 
 [dependencies]
-libloading = "0.9.0"
-serde = { version = "1.0.229", features = ["derive"] }
-serde_json = "1.0.154"
+libloading.workspace = true
+serde.workspace = true
+serde_json.workspace = true
 
 [build-dependencies]
-cc = "1.8.0"
+cc.workspace = true
 
-[profile.release]
-lto = true
-codegen-units = 1
-strip = true
+[lints]
+workspace = true

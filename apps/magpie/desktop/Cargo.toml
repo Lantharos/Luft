@@ -3,33 +3,31 @@ name = "magpie"
 version = "0.1.0"
 description = "Photos, videos, music and documents for Luft"
 authors = ["Kristof"]
-license = "GPL-3.0-or-later"
-edition = "2024"
-rust-version = "1.98"
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
 
 [lib]
 name = "magpie_lib"
 
 [dependencies]
-dirs = "7.0.0"
-gio = "0.22.10"
-gio-unix = "0.22.8"
-glycin = { version = "4.0.3", default-features = false, features = ["tokio"] }
-imagesize = "0.15.0"
-kamadak-exif = "0.6.1"
-lofty = "0.25.4"
-luft-app = { path = "../../../packages/app", features = ["apps", "fonts", "launch", "thumbnails", "watch"] }
-matroska-demuxer = "0.8.1"
-parking_lot = "0.12.5"
-sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.51" }
-serde = { version = "1.0.229", features = ["derive"] }
-skrifa = "0.48"
-tokio = { version = "1.53.3", default-features = false, features = ["sync"] }
-write-fonts = "0.54"
-wuff = "0.2.9"
-zbus = { version = "6.0.0", default-features = false, features = ["service", "tokio"] }
+dirs.workspace = true
+gio.workspace = true
+gio-unix.workspace = true
+glycin = { workspace = true, features = ["tokio"] }
+imagesize.workspace = true
+kamadak-exif.workspace = true
+lofty.workspace = true
+luft-app = { workspace = true, features = ["apps", "fonts", "launch", "thumbnails", "watch"] }
+matroska-demuxer.workspace = true
+parking_lot.workspace = true
+sabine.workspace = true
+serde.workspace = true
+skrifa.workspace = true
+tokio = { workspace = true, features = ["sync"] }
+write-fonts.workspace = true
+wuff.workspace = true
+zbus = { workspace = true, features = ["service", "tokio"] }
 
-[profile.release]
-lto = "fat"
-codegen-units = 1
-strip = true
+[lints]
+workspace = true

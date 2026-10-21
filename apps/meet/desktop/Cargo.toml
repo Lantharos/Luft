@@ -3,32 +3,32 @@ name = "meet"
 version = "0.1.0"
 description = "Meet Luft: gets a Windows or Linux computer ready for Luft and starts it without a USB stick"
 authors = ["Kristof"]
-license = "GPL-3.0-or-later"
-edition = "2024"
-rust-version = "1.98"
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
 
 [dependencies]
-luft-i18n = { path = "../../../packages/i18n" }
-luft-meet = { path = "../../../packages/meet" }
-luft-variant = { path = "../../../packages/variant" }
-minisign-verify = "0.3.0"
-sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.51" }
-sabine-runtime = { git = "https://github.com/Lantharos/Sabine", tag = "v0.51" }
-serde = { version = "1.0.229", features = ["derive"] }
-serde_json = "1.0.154"
-sha2 = "0.11.1"
-ureq = { version = "3.4.2", features = ["platform-verifier"] }
+luft-i18n.workspace = true
+luft-meet.workspace = true
+luft-variant.workspace = true
+minisign-verify.workspace = true
+sabine.workspace = true
+sabine-runtime.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+ureq.workspace = true
 
 [target.'cfg(any(windows, target_os = "linux"))'.dependencies]
-rfd = "0.17.2"
+rfd.workspace = true
 
 [target.'cfg(target_os = "linux")'.dependencies]
-libc = "0.2.190"
+libc.workspace = true
 
 [target.'cfg(windows)'.dependencies]
-raw-window-handle = "0.6.2"
-wmi = { version = "0.18.4", default-features = false }
-windows = { version = "0.62.2", features = [
+raw-window-handle.workspace = true
+wmi.workspace = true
+windows = { workspace = true, features = [
   "Win32_Devices_DeviceAndDriverInstallation",
   "Win32_Devices_Properties",
   "Win32_Foundation",
@@ -57,16 +57,8 @@ windows = { version = "0.62.2", features = [
   "Win32_UI_WindowsAndMessaging",
 ] }
 
-[lints.rust]
-unsafe_op_in_unsafe_fn = "deny"
-
-[lints.clippy]
-all = { level = "warn", priority = -1 }
-
-[profile.release]
-lto = true
-codegen-units = 1
-strip = true
-
 [build-dependencies]
-embed-resource = "3.0.12"
+embed-resource.workspace = true
+
+[lints]
+workspace = true

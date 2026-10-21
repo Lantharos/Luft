@@ -36,7 +36,7 @@ def main(root: Path, data: Path) -> None:
     icons.mkdir(parents=True, exist_ok=True)
     for manifest in sorted(root.glob('apps/*/Sabine.toml')):
         folder = manifest.parent
-        binary = folder / 'desktop/target/release' / folder.name
+        binary = root / 'target/release' / folder.name
         if not binary.is_file():
             continue
         app = tomllib.loads(manifest.read_text())['app']

@@ -1,16 +1,19 @@
 [package]
 name = "luft-passkeys"
 description = "Keeps passkeys in Luft Keyring and answers browsers through the passkey relay"
-version.workspace = true
+version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 
 [dependencies]
-ctap = { path = "../ctap" }
-libc = "0.2.190"
-serde = { version = "1.0.229", features = ["derive"] }
-serde_json = "1.0.154"
-tokio = { version = "1.53.3", default-features = false, features = ["rt", "macros", "time", "sync", "net", "io-util"] }
-zbus = { version = "6.0.0", default-features = false, features = ["tokio", "proxy", "service"] }
-zeroize = "1.9.1"
+ctap.workspace = true
+libc.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio = { workspace = true, features = ["io-util", "macros", "net", "rt", "sync", "time"] }
+zbus = { workspace = true, features = ["proxy", "service", "tokio"] }
+zeroize.workspace = true
+
+[lints]
+workspace = true

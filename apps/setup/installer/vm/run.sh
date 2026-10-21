@@ -24,7 +24,7 @@ place() {
 cargo build --release --manifest-path "$installer/Cargo.toml"
 rm -rf "$stage"
 mkdir -p "$stage" "$vm"
-place 755 "$installer/target/release/luft-installer" /usr/libexec/luft-installer
+place 755 "${CARGO_TARGET_DIR:-$luft/target}/release/luft-installer" /usr/libexec/luft-installer
 place 644 "$installer/data/com.lantharos.Installer1.conf" /usr/share/dbus-1/system.d/com.lantharos.Installer1.conf
 place 644 "$installer/data/com.lantharos.Installer1.service" /usr/share/dbus-1/system-services/com.lantharos.Installer1.service
 place 644 "$installer/data/luft-installer.service" /usr/lib/systemd/system/luft-installer.service

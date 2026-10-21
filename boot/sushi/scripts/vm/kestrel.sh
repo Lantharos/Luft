@@ -27,12 +27,11 @@ fi
 meson compile -C "$build/engine"
 meson install -C "$build/engine" --no-rebuild --quiet
 glib-compile-schemas "$prefix/share/glib-2.0/schemas"
-cargo build --release --manifest-path "$luft/kestrel/greeter/Cargo.toml"
-install -Dm755 "$luft/kestrel/greeter/target/release/kestrel-greeter-service" "$prefix/libexec/kestrel-greeter-service"
-cargo build --release --manifest-path "$luft/kestrel/settings/Cargo.toml"
-install -Dm755 "$luft/kestrel/settings/target/release/kestrel-settings" "$prefix/libexec/kestrel-settings"
-cargo build --release --manifest-path "$luft/kestrel/watchdog/Cargo.toml"
-install -Dm755 "$luft/kestrel/watchdog/target/release/kestrel-watchdog" "$prefix/libexec/kestrel-watchdog"
+cargo build --release --manifest-path "$luft/Cargo.toml" -p kestrel-greeter-service -p kestrel-settings -p kestrel-watchdog
+release="${CARGO_TARGET_DIR:-$luft/target}/release"
+install -Dm755 "$release/kestrel-greeter-service" "$prefix/libexec/kestrel-greeter-service"
+install -Dm755 "$release/kestrel-settings" "$prefix/libexec/kestrel-settings"
+install -Dm755 "$release/kestrel-watchdog" "$prefix/libexec/kestrel-watchdog"
 
 libraries="$(find "$prefix" -type f \( -name '*.so*' -o -path '*/bin/*' -o -path '*/libexec/*' \) -exec sh -c 'file "$1" | grep -q ELF && ldd "$1"' _ {} \; 2>/dev/null |
   awk '/=> \//{print $3}' | grep -v "^$prefix" | sort -u)"

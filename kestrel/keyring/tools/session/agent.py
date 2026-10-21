@@ -49,7 +49,7 @@ def signs(environment, folder, public_key, name):
     return verified.returncode == 0
 
 
-SETTINGS_BUILD = "apps/settings/desktop/target/debug/settings"
+SETTINGS_BUILD = "target/debug/settings"
 
 
 def settings_build(root):

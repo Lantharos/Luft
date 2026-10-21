@@ -2,6 +2,7 @@
 set -euo pipefail
 
 here="$(cd "$(dirname "$0")" && pwd)"
+luft="$(cd "$here/../../.." && pwd)"
 windows="$(dirname "$here")"
 service="$windows/service"
 vm="${LUFT_WINDOWS_VM:-$windows/target/vm}"
@@ -14,7 +15,7 @@ place() {
 }
 
 cargo build --release --manifest-path "$service/Cargo.toml"
-service_target="${CARGO_TARGET_DIR:-$service/target}"
+service_target="${CARGO_TARGET_DIR:-$luft/target}"
 rm -rf "$stage"
 mkdir -p "$stage" "$vm"
 cargo run --quiet --manifest-path "$windows/Cargo.toml" --features testing --example fake-windows -- \

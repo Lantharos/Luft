@@ -3,47 +3,45 @@ name = "rover"
 version = "0.1.0"
 description = "A modern file manager for Linux"
 authors = ["Kristof"]
-license = "GPL-3.0-or-later"
-edition = "2024"
-rust-version = "1.98"
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
 
 [lib]
 name = "rover_lib"
 
 [dependencies]
-sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.51" }
-serde_json = "1.0.154"
-serde = { version = "1.0.229", features = ["derive"] }
-tokio = { version = "1.53.3", features = ["process"] }
-walkdir = "2.5.0"
-dirs = "7.0.0"
-chrono = "0.4.45"
-parking_lot = "0.12.5"
-libc = "0.2"
-luft-accounts = { path = "../../../packages/accounts" }
-luft-app = { path = "../../../packages/app", features = ["apps", "launch", "settings", "thumbnails", "watch"] }
-gio = "0.22.10"
-gio-unix = "0.22.8"
-imagesize = "0.15.0"
-roxmltree = "0.21.1"
-zbus = { version = "6.0.0", default-features = false, features = ["proxy", "service", "tokio"] }
-futures-util = { version = "0.3.34", default-features = false }
-url = "2.5.8"
-percent-encoding = "2.3.2"
-ignore = "0.4.33"
-regex = "1.13.1"
-rustc-hash = "2.1.3"
-memchr = "2.8.3"
-zip = { version = "9.0.4", default-features = false, features = ["deflate-flate2-zlib-rs", "deflate64", "bzip2", "zstd", "lzma", "xz", "chrono"] }
-tar = "0.4.46"
-zstd = { version = "0.14.3", features = ["zstdmt"] }
-flate2 = { version = "1.1.10", default-features = false, features = ["zlib-rs"] }
-bzip2 = "0.6.1"
-liblzma = "0.4.8"
-sevenz-rust2 = { version = "0.24.0", default-features = false, features = ["bzip2", "deflate", "ppmd", "util", "zstd"] }
-uzers = "0.12.2"
+sabine.workspace = true
+serde_json.workspace = true
+serde.workspace = true
+tokio = { workspace = true, features = ["default", "process"] }
+walkdir.workspace = true
+dirs.workspace = true
+chrono.workspace = true
+parking_lot.workspace = true
+libc.workspace = true
+luft-accounts = { workspace = true, features = ["default"] }
+luft-app = { workspace = true, features = ["apps", "launch", "settings", "thumbnails", "watch"] }
+gio.workspace = true
+gio-unix.workspace = true
+imagesize.workspace = true
+roxmltree.workspace = true
+zbus = { workspace = true, features = ["proxy", "service", "tokio"] }
+futures-util.workspace = true
+url.workspace = true
+percent-encoding.workspace = true
+ignore.workspace = true
+regex.workspace = true
+rustc-hash.workspace = true
+memchr.workspace = true
+zip = { workspace = true, features = ["bzip2", "chrono", "lzma", "xz", "zstd"] }
+tar.workspace = true
+zstd = { workspace = true, features = ["zstdmt"] }
+flate2 = { workspace = true, features = ["zlib-rs"] }
+bzip2.workspace = true
+liblzma.workspace = true
+sevenz-rust2 = { workspace = true, features = ["bzip2", "deflate", "ppmd", "util", "zstd"] }
+uzers.workspace = true
 
-[profile.release]
-lto = "fat"
-codegen-units = 1
-strip = true
+[lints]
+workspace = true

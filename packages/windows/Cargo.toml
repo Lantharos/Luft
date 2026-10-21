@@ -3,27 +3,24 @@ name = "luft-windows"
 version = "0.1.0"
 description = "Reads and carefully changes a Windows installation on the same computer, for Luft's installer and the Windows service"
 authors = ["Kristof"]
-license = "GPL-3.0-or-later"
-edition = "2024"
-rust-version = "1.98"
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
 
 [features]
 testing = []
 
 [dependencies]
-anyhow = "1.0.104"
-libc = "0.2.190"
-nt-hive = "0.3.0"
-ntfs = "0.4.0"
-regf-rs = "0.1.1"
-serde = { version = "1.0.229", features = ["derive"] }
-
-[lints.rust]
-unsafe_op_in_unsafe_fn = "deny"
-
-[lints.clippy]
-all = { level = "warn", priority = -1 }
+anyhow.workspace = true
+libc.workspace = true
+nt-hive.workspace = true
+ntfs.workspace = true
+regf-rs.workspace = true
+serde.workspace = true
 
 [[example]]
 name = "fake-windows"
 required-features = ["testing"]
+
+[lints]
+workspace = true

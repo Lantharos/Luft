@@ -4,7 +4,6 @@ set -euo pipefail
 check="$(cd "$(dirname "$0")" && pwd)"
 passkeys="$(cd "$check/../.." && pwd)"
 luft="$(cd "$passkeys/../.." && pwd)"
-keyring="$luft/kestrel/keyring"
 vm="${SUSHI_VM:?Set SUSHI_VM to the folder of the virtual machine}"
 tree="$vm/tree"
 stage="$vm/passkeys"
@@ -21,8 +20,9 @@ if [[ "$(cat "$vm/.passkeys-packages" 2>/dev/null)" != "${packages[*]}" ]]; then
 fi
 
 rm -rf "$stage"
-cargo build --release --manifest-path "$passkeys/Cargo.toml"
-install -Dm755 -t "$stage$libexec" "$passkeys/target/release/luft-passkeys" "$passkeys/target/release/luft-passkeys-relay"
+release="${CARGO_TARGET_DIR:-$luft/target}/release"
+cargo build --release --manifest-path "$luft/Cargo.toml" -p luft-passkeys -p luft-passkeys-relay
+install -Dm755 -t "$stage$libexec" "$release/luft-passkeys" "$release/luft-passkeys-relay"
 passkeys_unit() {
   sed "s|@libexecdir@|$libexec|g" "$passkeys/data/$1" | install -Dm644 /dev/stdin "$stage$2/$1"
 }
@@ -31,9 +31,9 @@ passkeys_unit luft-passkeys-relay@.service /usr/local/lib/systemd/system
 passkeys_unit luft-passkeys.service /usr/local/lib/systemd/user
 passkeys_unit com.lantharos.Passkeys.service /usr/local/share/dbus-1/services
 
-cargo build --release --manifest-path "$keyring/Cargo.toml"
-install -Dm755 -t "$stage$libexec" "$keyring/target/release/luft-keyring" "$keyring/target/release/luft-keyring-unlock"
-install -Dm755 "$keyring/target/release/libpam_luft_keyring.so" "$stage/usr/lib64/security/pam_luft_keyring.so"
+cargo build --release --manifest-path "$luft/Cargo.toml" -p luft-keyring -p luft-keyring-unlock -p pam_luft_keyring
+install -Dm755 -t "$stage$libexec" "$release/luft-keyring" "$release/luft-keyring-unlock"
+install -Dm755 "$release/libpam_luft_keyring.so" "$stage/usr/lib64/security/pam_luft_keyring.so"
 
 stand_in() {
   sed "s|@libexecdir@|$libexec|g" "$check/stand-ins/$1" | install -Dm644 /dev/stdin "$stage$2"

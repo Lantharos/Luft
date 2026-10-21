@@ -34,7 +34,7 @@ stage_changes() {
   cargo build --release --manifest-path "$installer/Cargo.toml"
   rm -rf "$stage"
   mkdir -p "$stage/root"
-  install -Dm755 "$installer/target/release/luft-installer" "$stage/root/usr/libexec/luft-installer"
+  install -Dm755 "${CARGO_TARGET_DIR:-$luft/target}/release/luft-installer" "$stage/root/usr/libexec/luft-installer"
   install -Dm644 -t "$stage/root/usr/lib/systemd/system" "$installer"/data/luft-installer*.service
   "$luft/security/scripts/build.sh" "$stage/root"
   (cd "$luft" && bun install --frozen-lockfile)

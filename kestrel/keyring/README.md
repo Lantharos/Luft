@@ -21,8 +21,8 @@ Run from `kestrel/keyring`:
 
 | Command | Covers |
 | --- | --- |
-| `cargo test` | Vault format, and TPM sealing, PIN lockout and chip-held keys against `swtpm` |
-| `dbus-run-session -- python3 tools/session/session.py target/debug/luft-keyring` | The daemon on a private bus with a scratch home: items, app access (including AppImages and Flatpaks across launches), portal, SSH agent |
+| `cargo test -p luft-keyring -p luft-keyring-vault -p luft-keyring-unlock` | Vault format, and TPM sealing, PIN lockout and chip-held keys against `swtpm` |
+| `dbus-run-session -- python3 tools/session/session.py ../../target/debug/luft-keyring` | The daemon on a private bus with a scratch home: items, app access (including AppImages and Flatpaks across launches), portal, SSH agent |
 | `tools/vm/build.sh`, then `tools/vm/run.sh tpm`, `gone` or `none` | Sign-in, lock screen, `sudo`, Secure Boot changes and PINs in a Fedora VM with SELinux enforcing, with a software TPM, after the TPM is removed, and without one |
 
 Where it keeps its files, how apps are given access, app secrets, the SSH agent and GnuPG are in [the keyring reference](../../docs/components/keyring.md).

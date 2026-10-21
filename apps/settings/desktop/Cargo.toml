@@ -3,51 +3,49 @@ name = "settings"
 version = "0.1.0"
 description = "Settings for Luft"
 authors = ["Kristof"]
-license = "GPL-3.0-or-later"
-edition = "2024"
-rust-version = "1.98"
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
 
 [lib]
 name = "settings_lib"
 
 [dependencies]
-bzip2 = "0.6.1"
-deunicode = "1.6.2"
-dirs = "7.0.0"
-flate2 = { version = "1.1.10", default-features = false, features = ["zlib-rs"] }
-futures-util = { version = "0.3.34", default-features = false }
-gio = "0.22.10"
-gio-unix = "0.22.8"
-gstreamer = "0.25.4"
-image = { version = "0.25.10", default-features = false, features = ["jpeg", "png", "webp"] }
-inotify = "0.11.5"
-jxl-oxide = { version = "0.12.6", features = ["image"] }
-libc = "0.2.190"
-liblzma = "0.4.8"
-libpulse-binding = "2.30.1"
-luft-accounts = { path = "../../../packages/accounts" }
-luft-app = { path = "../../../packages/app", features = ["apps", "fonts", "ibus", "launch", "recovery", "watch"] }
-luft-disks = { path = "../../../packages/disks" }
-luft-fingerprint = { path = "../../../packages/fingerprint" }
-luft-i18n = { path = "../../../packages/i18n" }
-luft-network = { path = "../../../packages/network" }
-luft-software = { path = "../../../packages/software" }
-luft-speech = { path = "../../../packages/speech" }
-luft-trust = { path = "../../../packages/trust" }
-roxmltree = "0.21.1"
-sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.51" }
-serde = { version = "1.0.229", features = ["derive"] }
-serde_json = "1.0.154"
-tar = "0.4.46"
-tokio = { version = "1.53.3", default-features = false, features = ["net", "rt", "sync", "time"] }
-ureq = { version = "3.4.2", features = ["platform-verifier"] }
-zbus = { version = "6.0.0", default-features = false, features = ["proxy", "service", "tokio"] }
-zip = { version = "9.0.4", default-features = false, features = ["deflate-flate2-zlib-rs", "deflate64"] }
-
-[profile.release]
-lto = "fat"
-codegen-units = 1
-strip = true
+bzip2.workspace = true
+deunicode.workspace = true
+dirs.workspace = true
+flate2 = { workspace = true, features = ["zlib-rs"] }
+futures-util.workspace = true
+gio.workspace = true
+gio-unix.workspace = true
+gstreamer.workspace = true
+image = { workspace = true, features = ["jpeg", "webp"] }
+inotify = { workspace = true, features = ["default"] }
+jxl-oxide.workspace = true
+libc.workspace = true
+liblzma.workspace = true
+libpulse-binding.workspace = true
+luft-accounts = { workspace = true, features = ["default"] }
+luft-app = { workspace = true, features = ["apps", "fonts", "ibus", "launch", "recovery", "watch"] }
+luft-disks.workspace = true
+luft-fingerprint.workspace = true
+luft-i18n.workspace = true
+luft-network.workspace = true
+luft-software = { workspace = true, features = ["default"] }
+luft-speech = { workspace = true, features = ["default"] }
+luft-trust.workspace = true
+roxmltree.workspace = true
+sabine.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tar.workspace = true
+tokio = { workspace = true, features = ["net", "rt", "sync", "time"] }
+ureq.workspace = true
+zbus = { workspace = true, features = ["proxy", "service", "tokio"] }
+zip.workspace = true
 
 [dev-dependencies]
-tempfile = "3.27.0"
+tempfile.workspace = true
+
+[lints]
+workspace = true

@@ -3,30 +3,28 @@ name = "schelf"
 version = "0.1.0"
 description = "Apps for Luft"
 authors = ["Kristof"]
-license = "GPL-3.0-or-later"
-edition = "2024"
-rust-version = "1.98"
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
 
 [lib]
 name = "schelf_lib"
 
 [dependencies]
-dirs = "7.0.0"
-flate2 = { version = "1.1.10", default-features = false, features = ["zlib-rs"] }
-futures-util = { version = "0.3.34", default-features = false }
-gio = "0.22.10"
-gio-unix = "0.22.8"
-libc = "0.2.190"
-luft-app = { path = "../../../packages/app", features = ["apps", "launch"] }
-luft-software = { path = "../../../packages/software" }
-quick-xml = "0.42.0"
-sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.51" }
-serde = { version = "1.0.229", features = ["derive"] }
-serde_json = { version = "1.0.154", features = ["raw_value"] }
-tokio = { version = "1.53.3", default-features = false, features = ["macros", "rt", "signal", "sync"] }
-zbus = { version = "6.0.0", default-features = false, features = ["proxy", "service", "tokio"] }
+dirs.workspace = true
+flate2 = { workspace = true, features = ["zlib-rs"] }
+futures-util.workspace = true
+gio.workspace = true
+gio-unix.workspace = true
+libc.workspace = true
+luft-app = { workspace = true, features = ["apps", "launch"] }
+luft-software = { workspace = true, features = ["default"] }
+quick-xml.workspace = true
+sabine.workspace = true
+serde.workspace = true
+serde_json = { workspace = true, features = ["raw_value"] }
+tokio = { workspace = true, features = ["macros", "rt", "signal", "sync"] }
+zbus = { workspace = true, features = ["proxy", "service", "tokio"] }
 
-[profile.release]
-lto = "fat"
-codegen-units = 1
-strip = true
+[lints]
+workspace = true

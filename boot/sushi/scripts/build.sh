@@ -2,6 +2,7 @@
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
+luft="$(cd "$root/../.." && pwd)"
 
 usage() {
   cat <<'USAGE'
@@ -18,16 +19,16 @@ esac
 (($# <= 1)) || { usage >&2; exit 2; }
 destdir="${1:-}"
 
-cargo build --release --manifest-path "$root/Cargo.toml"
-cargo build --release --manifest-path "$root/Cargo.toml" -p sushiboot --target x86_64-unknown-uefi
+cargo build --profile release-abort --manifest-path "$luft/Cargo.toml" -p sushid -p sushictl
+cargo build --release --manifest-path "$luft/Cargo.toml" -p sushiboot --target x86_64-unknown-uefi
 
 [[ -n "$destdir" ]] || exit 0
 
-release="${CARGO_TARGET_DIR:-$root/target}/release"
+target="${CARGO_TARGET_DIR:-$luft/target}"
 units="$destdir/usr/lib/systemd/system"
-install -Dm755 "$release/sushid" "$destdir/usr/bin/sushid"
-install -Dm755 "$release/sushictl" "$destdir/usr/bin/sushictl"
-install -Dm644 "${CARGO_TARGET_DIR:-$root/target}/x86_64-unknown-uefi/release/sushiboot.efi" "$destdir/usr/lib/sushi/efi/SushiBoot.efi"
+install -Dm755 "$target/release-abort/sushid" "$destdir/usr/bin/sushid"
+install -Dm755 "$target/release-abort/sushictl" "$destdir/usr/bin/sushictl"
+install -Dm644 "$target/x86_64-unknown-uefi/release/sushiboot.efi" "$destdir/usr/lib/sushi/efi/SushiBoot.efi"
 for unit in "$root"/data/systemd/*.service; do
   install -Dm644 "$unit" "$units/$(basename "$unit")"
 done

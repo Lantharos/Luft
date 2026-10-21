@@ -36,11 +36,12 @@ podman run --rm --security-opt label=disable --rootfs "$tree" sh -c "
 [[ "${DRIVER:-}" == system ]] && podman unshare sh -c "printf '%s\n' 'blacklist nvidia_drm' 'blacklist bochs' > '$deferred'"
 podman unshare setfiles -F -r "$tree" "$contexts/file_contexts" "$tree"
 
-cargo build --release --manifest-path "$root/scripts/vm/display/Cargo.toml" --target x86_64-unknown-uefi --target-dir "$root/target"
+cargo build --release --manifest-path "$root/scripts/vm/display/Cargo.toml" --target x86_64-unknown-uefi
+uefi="${CARGO_TARGET_DIR:-$root/../../target}/x86_64-unknown-uefi/release"
 rm -rf "$esp"
 mkdir -p "$esp/EFI/BOOT" "$esp/EFI/sushi" "$esp/loader/entries"
-cp "$root/target/x86_64-unknown-uefi/release/vm-display.efi" "$esp/EFI/BOOT/BOOTX64.EFI"
-cp "$root/target/x86_64-unknown-uefi/release/sushiboot.efi" "$esp/EFI/sushi/SushiBoot.efi"
+cp "$uefi/vm-display.efi" "$esp/EFI/BOOT/BOOTX64.EFI"
+cp "$uefi/sushiboot.efi" "$esp/EFI/sushi/SushiBoot.efi"
 podman unshare sh -c "cat '$tree/lib/modules/$kernel/vmlinuz' > '$esp/vmlinuz'; cat '$tree/boot/initramfs-$kernel.img' > '$esp/initramfs.img'"
 
 rm -f "$disk"

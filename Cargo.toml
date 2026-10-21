@@ -1,0 +1,297 @@
+[workspace]
+resolver = "3"
+members = [
+    "apps/barometer/desktop",
+    "apps/disks/desktop",
+    "apps/draft/desktop",
+    "apps/keys/desktop",
+    "apps/magpie/desktop",
+    "apps/mailman/desktop",
+    "apps/meet/desktop",
+    "apps/rover/desktop",
+    "apps/schelf/desktop",
+    "apps/settings/desktop",
+    "apps/setup/desktop",
+    "apps/setup/installer",
+    "apps/signin/desktop",
+    "apps/tern/desktop",
+    "boot/sushi/crates/sushi",
+    "boot/sushi/crates/sushi-scene",
+    "boot/sushi/crates/sushiboot",
+    "boot/sushi/crates/sushictl",
+    "boot/sushi/crates/sushid",
+    "boot/sushi/scripts/vm/display",
+    "kestrel/greeter",
+    "kestrel/keyring/daemon",
+    "kestrel/keyring/pam",
+    "kestrel/keyring/pinentry",
+    "kestrel/keyring/unlock",
+    "kestrel/keyring/vault",
+    "kestrel/keyring/wire",
+    "kestrel/openconnect",
+    "kestrel/passkeys/crates/agent",
+    "kestrel/passkeys/crates/ctap",
+    "kestrel/passkeys/crates/relay",
+    "kestrel/peek",
+    "kestrel/search",
+    "kestrel/settings",
+    "kestrel/watchdog",
+    "packages/accounts",
+    "packages/accounts/service",
+    "packages/app",
+    "packages/dbus",
+    "packages/disks",
+    "packages/fingerprint",
+    "packages/i18n",
+    "packages/meet",
+    "packages/network",
+    "packages/sleep/service",
+    "packages/software",
+    "packages/software/thumbnailer",
+    "packages/software/updater",
+    "packages/speech",
+    "packages/speech/service",
+    "packages/trust",
+    "packages/variant",
+    "packages/windows",
+    "packages/windows/service",
+    "security/crates/access",
+    "security/crates/trust",
+    "security/crates/usb",
+]
+default-members = [
+    "apps/barometer/desktop",
+    "apps/disks/desktop",
+    "apps/draft/desktop",
+    "apps/keys/desktop",
+    "apps/magpie/desktop",
+    "apps/mailman/desktop",
+    "apps/meet/desktop",
+    "apps/rover/desktop",
+    "apps/schelf/desktop",
+    "apps/settings/desktop",
+    "apps/setup/desktop",
+    "apps/setup/installer",
+    "apps/signin/desktop",
+    "apps/tern/desktop",
+    "boot/sushi/crates/sushi",
+    "boot/sushi/crates/sushi-scene",
+    "boot/sushi/crates/sushictl",
+    "boot/sushi/crates/sushid",
+    "kestrel/greeter",
+    "kestrel/keyring/daemon",
+    "kestrel/keyring/pam",
+    "kestrel/keyring/pinentry",
+    "kestrel/keyring/unlock",
+    "kestrel/keyring/vault",
+    "kestrel/keyring/wire",
+    "kestrel/openconnect",
+    "kestrel/passkeys/crates/agent",
+    "kestrel/passkeys/crates/ctap",
+    "kestrel/passkeys/crates/relay",
+    "kestrel/peek",
+    "kestrel/search",
+    "kestrel/settings",
+    "kestrel/watchdog",
+    "packages/accounts",
+    "packages/accounts/service",
+    "packages/app",
+    "packages/dbus",
+    "packages/disks",
+    "packages/fingerprint",
+    "packages/i18n",
+    "packages/meet",
+    "packages/network",
+    "packages/sleep/service",
+    "packages/software",
+    "packages/software/thumbnailer",
+    "packages/software/updater",
+    "packages/speech",
+    "packages/speech/service",
+    "packages/trust",
+    "packages/variant",
+    "packages/windows",
+    "packages/windows/service",
+    "security/crates/access",
+    "security/crates/trust",
+    "security/crates/usb",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.98"
+license = "GPL-3.0-or-later"
+repository = "https://github.com/Lantharos/Luft"
+
+[workspace.dependencies]
+access = { path = "security/crates/access" }
+ctap = { path = "kestrel/passkeys/crates/ctap" }
+luft-accounts = { path = "packages/accounts" }
+luft-app = { path = "packages/app" }
+luft-dbus = { path = "packages/dbus" }
+luft-disks = { path = "packages/disks" }
+luft-fingerprint = { path = "packages/fingerprint" }
+luft-i18n = { path = "packages/i18n" }
+luft-keyring-vault = { path = "kestrel/keyring/vault" }
+luft-keyring-wire = { path = "kestrel/keyring/wire" }
+luft-meet = { path = "packages/meet" }
+luft-network = { path = "packages/network" }
+luft-software = { path = "packages/software" }
+luft-speech = { path = "packages/speech" }
+luft-trust = { path = "packages/trust" }
+luft-variant = { path = "packages/variant" }
+luft-windows = { path = "packages/windows" }
+sushi = { path = "boot/sushi/crates/sushi" }
+sushi-scene = { path = "boot/sushi/crates/sushi-scene" }
+
+ab_glyph = { version = "0.2.32", default-features = false }
+aes = "0.9.3"
+ammonia = "4.2.4"
+anyhow = "1.0.104"
+argon2 = { version = "0.6.0", default-features = false, features = ["zeroize"] }
+backhand = { version = "0.25.5", default-features = false }
+base64 = "0.23.1"
+bzip2 = "0.6.1"
+cbc = { version = "0.2.1", features = ["alloc"] }
+cc = "1.9.0"
+chacha20poly1305 = { version = "0.11.0", default-features = false }
+chardetng = "1.0.0"
+chrono = "0.4.45"
+ciborium = "0.2.2"
+clap = { version = "4.6.7", features = ["derive"] }
+crossbeam-channel = "0.5.17"
+crypto-bigint = "0.7.5"
+deunicode = "1.6.2"
+dirs = "7.0.0"
+drm = "0.15.0"
+drm-ffi = "0.9.1"
+ed25519-dalek = "3.0.0"
+embed-resource = "3.0.12"
+encoding_rs = "0.8.42"
+fast_image_resize = "6.1.0"
+flate2 = { version = "1.1.10", default-features = false }
+fluent-bundle = "0.16.0"
+futures-util = { version = "0.3.34", default-features = false }
+getrandom = "0.4.3"
+gio = "0.22.10"
+gio-unix = "0.22.8"
+glib = "0.22.10"
+glob = "0.3.4"
+glycin = { version = "4.0.3", default-features = false }
+gstreamer = "0.25.4"
+hickory-resolver = "0.26.3"
+hkdf = "0.13.0"
+hmac = "0.13.0"
+icu_locale_core = "2.3.0"
+icu_time = { version = "2.3.0", default-features = false }
+ignore = "0.4.33"
+image = { version = "0.25.10", default-features = false, features = ["png"] }
+imagesize = "0.15.0"
+inotify = { version = "0.11.5", default-features = false }
+jiff = "0.2.38"
+jpeg-encoder = "0.7.1"
+jxl-oxide = { version = "0.12.6", features = ["image"] }
+kamadak-exif = "0.6.1"
+lettre = { version = "0.11.23", default-features = false }
+libc = "0.2.191"
+libloading = "0.9.0"
+liblzma = "0.4.9"
+libm = "0.2.16"
+libpulse-binding = "2.30.1"
+lofty = "0.25.4"
+log = "0.4.34"
+lol_html = "3.0.1"
+mail-builder = "1.0.0"
+mail-parser = "0.11.9"
+matroska-demuxer = "0.8.1"
+md-5 = "0.11.0"
+memchr = "2.8.3"
+memmap2 = "0.9.11"
+minisign-verify = "0.3.0"
+nix = "0.31.3"
+nt-hive = "0.3.0"
+ntfs = "0.4.0"
+nvml-wrapper = "0.13.0"
+ort = { version = "2.0.0-rc.15", default-features = false }
+p256 = { version = "0.14.0", default-features = false }
+parking_lot = "0.13.0"
+percent-encoding = "2.3.2"
+pipewire = "0.10.1"
+png = "0.18.1"
+pollster = "1.0.1"
+postcard = { version = "1.1.3", default-features = false, features = ["use-std"] }
+pulseaudio = "0.3.2"
+quick-xml = "0.42.0"
+rand = "0.10.3"
+raw-window-handle = "0.6.2"
+rayon = "1.12.0"
+regex = "1.13.1"
+regf-rs = "0.1.1"
+resvg = "0.48.1"
+rfd = "0.17.2"
+roxmltree = "0.21.1"
+rusqlite = "0.40.2"
+rustc-hash = "2.1.3"
+rustix = "1.1.5"
+rustls = { version = "0.23.46", default-features = false }
+rustls-platform-verifier = "0.7.1"
+sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.51" }
+sabine-runtime = { git = "https://github.com/Lantharos/Sabine", tag = "v0.51" }
+sabine-service = { git = "https://github.com/Lantharos/Sabine", tag = "v0.51" }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.154"
+sevenz-rust2 = { version = "0.24.1", default-features = false }
+sha1 = "0.11.0"
+sha2 = "0.11.1"
+signal-hook = "0.4.5"
+skrifa = "0.48.0"
+socket2 = "0.6.5"
+tar = "0.4.46"
+tempfile = "3.27.0"
+time = "0.3.55"
+tiny-skia = { version = "0.12.0", default-features = false }
+tokio = { version = "1.54.0", default-features = false }
+toml = "1.1.8"
+toml_edit = "0.25.17"
+tss-esapi = "7.7.0"
+tzf-rs = { version = "2.1.3", default-features = false }
+uefi = { version = "0.41.0", features = ["alloc", "global_allocator", "panic_handler"] }
+unic-langid = "0.9.6"
+ureq = { version = "3.4.2", features = ["platform-verifier"] }
+url = "2.5.8"
+uzers = "0.12.2"
+walkdir = "2.5.0"
+whisper-rs = "0.16.0"
+windows = "0.62.2"
+wmi = { version = "0.18.4", default-features = false }
+write-fonts = "0.54.1"
+wuff = "0.2.9"
+x11rb = "0.14.0"
+x25519-dalek = { version = "3.0.0", default-features = false }
+xkbcommon = { version = "0.9.0", default-features = false }
+zbus = { version = "6.0.0", default-features = false }
+zeroize = "1.9.1"
+zip = { version = "9.0.5", default-features = false, features = ["deflate-flate2-zlib-rs", "deflate64"] }
+zstd = "0.14.3"
+
+[workspace.lints.rust]
+unsafe_op_in_unsafe_fn = "deny"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true
+
+[profile.release-abort]
+inherits = "release"
+panic = "abort"
+
+[profile.dev.package.argon2]
+opt-level = 3
+
+[profile.dev.package.blake2]
+opt-level = 3

@@ -31,8 +31,8 @@ export function resolveRange(args: string[]): Range {
 	return eventRange(JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH!, 'utf8')));
 }
 
-export function changedFiles({ base, head }: Range): string[] | undefined {
+export function changedFiles({ base, head }: Range): { base: string; files: string[] } | undefined {
 	const mergeBase = git('merge-base', base, head);
 	if (!mergeBase || mergeBase === git('rev-parse', head)) return undefined;
-	return git('diff', '--name-only', '--no-renames', mergeBase, head)!.split('\n').filter(Boolean);
+	return { base: mergeBase, files: git('diff', '--name-only', '--no-renames', mergeBase, head)!.split('\n').filter(Boolean) };
 }

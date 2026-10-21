@@ -3,29 +3,27 @@ name = "keys"
 version = "0.1.0"
 description = "Keyboard layouts and input methods for Luft"
 authors = ["Kristof"]
-license = "GPL-3.0-or-later"
-edition = "2024"
-rust-version = "1.98"
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
 
 [lib]
 name = "keys_lib"
 
 [dependencies]
-dirs = "7.0.0"
-futures-util = { version = "0.3.34", default-features = false }
-gio = "0.22.10"
-libc = "0.2.190"
-luft-app = { path = "../../../packages/app", features = ["ibus", "watch"] }
-roxmltree = "0.21.1"
-sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.51" }
-serde = { version = "1.0.229", features = ["derive"] }
-serde_json = "1.0.154"
-tokio = { version = "1.53.3", default-features = false, features = ["fs", "macros", "rt", "sync", "time"] }
-toml = "1.1.8"
-xkbcommon = { version = "0.9.0", default-features = false }
-zbus = { version = "6.0.0", default-features = false, features = ["proxy", "service", "tokio"] }
+dirs.workspace = true
+futures-util.workspace = true
+gio.workspace = true
+libc.workspace = true
+luft-app = { workspace = true, features = ["ibus", "watch"] }
+roxmltree.workspace = true
+sabine.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio = { workspace = true, features = ["fs", "macros", "rt", "sync", "time"] }
+toml.workspace = true
+xkbcommon.workspace = true
+zbus = { workspace = true, features = ["proxy", "service", "tokio"] }
 
-[profile.release]
-lto = "fat"
-codegen-units = 1
-strip = true
+[lints]
+workspace = true

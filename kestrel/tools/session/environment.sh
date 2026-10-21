@@ -32,14 +32,8 @@ require_build() {
 
 build_helpers() {
   glib-compile-schemas "$build/data"
-  cargo build --release --quiet --manifest-path "$root/kestrel/settings/Cargo.toml"
-  cargo build --release --quiet --manifest-path "$root/kestrel/search/Cargo.toml"
-  cargo build --release --quiet --manifest-path "$root/kestrel/keyring/Cargo.toml" -p luft-pinentry
-  cargo build --release --quiet --manifest-path "$root/kestrel/openconnect/Cargo.toml"
-  cargo build --release --quiet --manifest-path "$root/kestrel/greeter/Cargo.toml"
-  cargo build --release --quiet --manifest-path "$root/kestrel/peek/Cargo.toml"
-  cargo build --release --quiet --manifest-path "$root/packages/accounts/service/Cargo.toml"
-  (cd "$root/packages/speech/service" && cargo build --release --quiet)
+  (cd "$root" && cargo build --release --quiet -p kestrel-settings -p kestrel-search -p luft-pinentry \
+    -p kestrel-openconnect -p kestrel-greeter-service -p peek -p luft-accounts-service -p luft-speech-service)
 }
 
 dbus_service() {

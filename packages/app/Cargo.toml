@@ -3,9 +3,9 @@ name = "luft-app"
 version = "0.1.0"
 description = "Native bootstrap shared by Luft apps"
 authors = ["Kristof"]
-license = "GPL-3.0-or-later"
-edition = "2024"
-rust-version = "1.98"
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
 
 [features]
 apps = ["dep:dirs", "dep:gio", "dep:gio-unix"]
@@ -27,23 +27,36 @@ thumbnails = [
 watch = ["dep:inotify", "dep:libc", "dep:parking_lot"]
 
 [dependencies]
-dirs = { version = "7.0.0", optional = true }
-fast_image_resize = { version = "6.1.0", optional = true }
-futures-util = { version = "0.3.34", default-features = false }
-gio = { version = "0.22.10", optional = true }
-gio-unix = { version = "0.22.8", optional = true }
-image = { version = "0.25.10", optional = true, default-features = false, features = ["png", "jpeg", "gif", "webp", "bmp", "ico", "tiff", "qoi", "tga", "pnm"] }
-inotify = { version = "0.11.5", optional = true, default-features = false }
-libc = { version = "0.2.190", optional = true }
-luft-dbus = { path = "../dbus" }
-luft-i18n = { path = "../i18n" }
-md-5 = { version = "0.11.0", optional = true }
-memmap2 = { version = "0.9.11", optional = true }
-parking_lot = { version = "0.12.5", optional = true }
-png = { version = "0.18.1", optional = true }
-sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.51" }
-skrifa = { version = "0.48", optional = true }
-serde = { version = "1.0.229", features = ["derive"] }
-serde_json = "1.0.154"
-tokio = { version = "1.53.3", default-features = false, features = ["rt"] }
-zbus = { version = "6.0.0", default-features = false, features = ["proxy", "tokio"] }
+dirs = { workspace = true, optional = true }
+fast_image_resize = { workspace = true, optional = true }
+futures-util.workspace = true
+gio = { workspace = true, optional = true }
+gio-unix = { workspace = true, optional = true }
+image = { workspace = true, features = [
+  "bmp",
+  "gif",
+  "ico",
+  "jpeg",
+  "pnm",
+  "qoi",
+  "tga",
+  "tiff",
+  "webp",
+], optional = true }
+inotify = { workspace = true, optional = true }
+libc = { workspace = true, optional = true }
+luft-dbus.workspace = true
+luft-i18n.workspace = true
+md-5 = { workspace = true, optional = true }
+memmap2 = { workspace = true, optional = true }
+parking_lot = { workspace = true, optional = true }
+png = { workspace = true, optional = true }
+sabine.workspace = true
+skrifa = { workspace = true, optional = true }
+serde.workspace = true
+serde_json.workspace = true
+tokio = { workspace = true, features = ["rt"] }
+zbus = { workspace = true, features = ["proxy", "tokio"] }
+
+[lints]
+workspace = true

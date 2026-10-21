@@ -6,7 +6,6 @@
 /kestrel/build/
 /kestrel/install/
 /kestrel/run/
-/packages/*/Cargo.lock
 
 target/
 dist/

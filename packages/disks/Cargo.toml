@@ -3,18 +3,21 @@ name = "luft-disks"
 version = "0.1.0"
 description = "Drives, partitions, mounting and resizing through UDisks, shared by Disks and Luft's installer"
 authors = ["Kristof"]
-license = "GPL-3.0-or-later"
-edition = "2024"
-rust-version = "1.98"
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
 
 [dependencies]
-futures-util = { version = "0.3.34", default-features = false }
-libc = "0.2.190"
-luft-dbus = { path = "../dbus" }
-luft-trust = { path = "../trust" }
-serde = { version = "1.0.229", features = ["derive"] }
-serde_json = "1.0.154"
-zbus = { version = "6.0.0", default-features = false, features = ["proxy", "tokio"] }
+futures-util.workspace = true
+libc.workspace = true
+luft-dbus.workspace = true
+luft-trust.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+zbus = { workspace = true, features = ["proxy", "tokio"] }
 
 [dev-dependencies]
-tokio = { version = "1.53.3", default-features = false, features = ["macros", "rt"] }
+tokio = { workspace = true, features = ["macros", "rt"] }
+
+[lints]
+workspace = true

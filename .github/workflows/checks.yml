@@ -39,22 +39,14 @@ jobs:
         run: bun .github/scripts/affected/index.ts
 
   rust:
-    name: Rust ${{ matrix.crate }}
+    name: Rust
     needs: changes
-    if: needs.changes.outputs.rust != '[]'
+    if: needs.changes.outputs.rust != ''
     runs-on: ubuntu-26.04
     timeout-minutes: 60
     container: fedora:45
-    strategy:
-      fail-fast: false
-      matrix:
-        crate: ${{ fromJSON(needs.changes.outputs.rust) }}
-    defaults:
-      run:
-        working-directory: ${{ matrix.crate }}
     steps:
       - name: Install build dependencies
-        working-directory: /
         run: >-
           dnf install --assumeyes --setopt=install_weak_deps=False
           git rustup gcc gcc-c++ clang-devel cmake pkgconf-pkg-config
@@ -70,50 +62,30 @@ jobs:
           rustup-init -y --profile minimal --component clippy
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
 
-      - name: Locate the shared build directory
-        id: build
-        run: echo "dir=$(realpath --relative-to=. "$GITHUB_WORKSPACE/target")" >> "$GITHUB_OUTPUT"
-
       - uses: Swatinem/rust-cache@v2
         with:
-          workspaces: ${{ matrix.crate }} -> ${{ steps.build.outputs.dir }}
-          key: ${{ matrix.crate }}
+          shared-key: linux
 
-      - run: cargo clippy --all-targets -- -D warnings
+      - run: cargo clippy --locked --all-targets ${{ needs.changes.outputs.rust }} -- -D warnings
 
-      - run: cargo test
+      - run: cargo test --locked ${{ needs.changes.outputs.rust }}
 
   uefi:
-    name: Rust UEFI ${{ matrix.crate }}
+    name: Rust UEFI
     needs: changes
-    if: needs.changes.outputs.uefi == 'true'
+    if: needs.changes.outputs.uefi != ''
     runs-on: ubuntu-26.04
     timeout-minutes: 30
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - crate: boot/sushi
-            args: -p sushiboot
-          - crate: boot/sushi/scripts/vm/display
-    defaults:
-      run:
-        working-directory: ${{ matrix.crate }}
     steps:
       - uses: actions/checkout@v7
 
       - run: rustup toolchain install stable --profile minimal --component clippy --target x86_64-unknown-uefi
 
-      - name: Locate the shared build directory
-        id: build
-        run: echo "dir=$(realpath --relative-to=. "$GITHUB_WORKSPACE/target")" >> "$GITHUB_OUTPUT"
-
       - uses: Swatinem/rust-cache@v2
         with:
-          workspaces: ${{ matrix.crate }} -> ${{ steps.build.outputs.dir }}
-          key: uefi-${{ matrix.crate }}
+          shared-key: uefi
 
-      - run: cargo clippy ${{ matrix.args }} --target x86_64-unknown-uefi -- -D warnings
+      - run: cargo clippy --locked ${{ needs.changes.outputs.uefi }} --target x86_64-unknown-uefi -- -D warnings
 
   meet-windows:
     name: Rust Meet Luft for Windows
@@ -122,12 +94,8 @@ jobs:
     runs-on: ubuntu-26.04
     timeout-minutes: 30
     container: fedora:45
-    defaults:
-      run:
-        working-directory: apps/meet/desktop
     steps:
       - name: Install build dependencies
-        working-directory: /
         run: dnf install --assumeyes --setopt=install_weak_deps=False git rustup gcc mingw64-gcc
 
       - uses: actions/checkout@v7
@@ -137,16 +105,11 @@ jobs:
           rustup-init -y --profile minimal --component clippy --target x86_64-pc-windows-gnu
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
 
-      - name: Locate the shared build directory
-        id: build
-        run: echo "dir=$(realpath --relative-to=. "$GITHUB_WORKSPACE/target")" >> "$GITHUB_OUTPUT"
-
       - uses: Swatinem/rust-cache@v2
         with:
-          workspaces: apps/meet/desktop -> ${{ steps.build.outputs.dir }}
-          key: windows
+          shared-key: windows
 
-      - run: cargo clippy --all-targets --target x86_64-pc-windows-gnu -- -D warnings
+      - run: cargo clippy --locked -p meet --all-targets --target x86_64-pc-windows-gnu -- -D warnings
 
   web:
     name: TypeScript ${{ matrix.target }}

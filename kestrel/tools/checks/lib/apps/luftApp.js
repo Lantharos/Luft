@@ -41,7 +41,7 @@ function environment(manifest = null) {
 
 function command(name) {
   const app = repository('apps', name);
-  return {path: GLib.build_filenamev([app, 'desktop/target/release', name]), manifest: GLib.build_filenamev([app, 'Sabine.toml'])};
+  return {path: repository('target/release', name), manifest: GLib.build_filenamev([app, 'Sabine.toml'])};
 }
 
 export const appBinary = name => command(name).path;

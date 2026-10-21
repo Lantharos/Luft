@@ -81,7 +81,7 @@ resolve_base() {
 }
 
 sabine_tag() {
-  sed -n 's|^sabine = { git = "https://github.com/Lantharos/Sabine", tag = "\([^"]*\)" }$|\1|p' "$luft/packages/app/Cargo.toml"
+  sed -n 's|^sabine = { git = "https://github.com/Lantharos/Sabine", tag = "\([^"]*\)" }$|\1|p' "$luft/Cargo.toml"
 }
 
 is_signed() {
@@ -130,8 +130,8 @@ part_refs() {
   for name in "$@"; do
     echo "$name $(part_target "$name")"
   done | podman run "${retries[@]}" --quiet --rm --interactive --network none --security-opt label=disable \
-    --volume "$image/parts/key.ts:/key.ts:ro" --volume "$image/parts/Containerfile:/Containerfile:ro" \
-    --volume "$tree:/tree:ro" "$bun" /key.ts /Containerfile /tree "${globals[@]}" |
+    --volume "$luft:/luft:ro" --volume "$tree:/tree:ro" \
+    "$bun" /luft/os/image/parts/key.ts /luft/os/image/parts/Containerfile /tree /luft "${globals[@]}" |
     while read -r name key; do echo "$name $registry:$name-$key"; done
   rm "$tree"
 }

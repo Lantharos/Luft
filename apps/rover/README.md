@@ -25,9 +25,9 @@ The desktop entry opens folders, and `sftp://`, `smb://`, `dav://`, `davs://` an
 Kestrel already prefers Rover for file dialogs. Elsewhere, register it for your account:
 
 ```sh
-desktop/target/debug/rover --install-file-chooser-portal   # the xdg-desktop-portal FileChooser backend
+../../target/debug/rover --install-file-chooser-portal   # the xdg-desktop-portal FileChooser backend
 systemctl --user restart xdg-desktop-portal.service
-desktop/target/debug/rover --install-file-manager-bus      # org.freedesktop.FileManager1
+../../target/debug/rover --install-file-manager-bus      # org.freedesktop.FileManager1
 ```
 
 The install flags point at the executable that ran them, so they work from a bundle or a local build. On other desktops, also add `org.freedesktop.impl.portal.FileChooser=rover;*` under `[preferred]` in `~/.config/xdg-desktop-portal/portals.conf`.

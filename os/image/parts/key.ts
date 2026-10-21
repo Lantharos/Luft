@@ -1,9 +1,16 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+import { prunedWorkspace } from './stages/workspace';
+
 type Stage = { name: string; image: string; instructions: string[] };
 
-const [containerfile, tree, ...assignments] = process.argv.slice(2);
+const WORKSPACE_FILES = new Set(['Cargo.toml', 'Cargo.lock']);
 
-if (!containerfile || !tree) {
-  throw new Error('Usage: key.ts CONTAINERFILE TREE [NAME=VALUE...] < "PART TARGET [NAME=VALUE...]" lines');
+const [containerfile, tree, checkout, ...assignments] = process.argv.slice(2);
+
+if (!containerfile || !tree || !checkout) {
+  throw new Error('Usage: key.ts CONTAINERFILE TREE CHECKOUT [NAME=VALUE...] < "PART TARGET [NAME=VALUE...]" lines');
 }
 
 function parseAssignments(list: string[]) {
@@ -79,43 +86,77 @@ function object(path: string) {
   return id;
 }
 
-function key(target: string, given: Record<string, string>) {
-  const hash = new Bun.CryptoHasher('sha256');
-  const visited = new Set<string>();
-
+function stagesOf(target: string, given: Record<string, string>) {
+  const order: Stage[] = [];
   function visit(name: string) {
     const stage = stages.get(name);
     if (!stage) throw new Error(`${containerfile} has no stage ${name}`);
-    if (visited.has(name)) return;
-    visited.add(name);
+    if (order.includes(stage)) return;
+    order.push(stage);
     const image = expand(stage.image, { ...defaults, ...given });
     if (stages.has(image)) visit(image);
+    for (const line of stage.instructions) {
+      const [keyword, ...words] = line.split(' ');
+      const from = keyword.toUpperCase() === 'COPY' ? flags(words).values.from : undefined;
+      if (from) visit(from);
+    }
+  }
+  visit(target);
+  return order;
+}
 
-    const values: Record<string, string> = {};
-    hash.update(`FROM ${stage.image} AS ${name}\n`);
+function copies(stage: Stage, given: Record<string, string>) {
+  const values: Record<string, string> = {};
+  const sources: string[] = [];
+  for (const line of stage.instructions) {
+    const [keyword, ...words] = line.split(' ');
+    const instruction = keyword.toUpperCase();
+    if (instruction === 'ARG') {
+      const [argument, fallback] = words[0].split('=');
+      values[argument] = given[argument] ?? fallback ?? '';
+    } else if (instruction === 'COPY') {
+      const { values: copyFlags, rest } = flags(words);
+      if (!copyFlags.from) sources.push(...rest.slice(0, -1).map((source) => expand(source, values)));
+    }
+  }
+  return { values, sources };
+}
+
+function workspaceFiles(sources: string[]) {
+  const copied = (path: string) => objects.has(path) && sources.some((source) => path === source || path.startsWith(`${source}/`));
+  const read = (path: string) => readFileSync(join(checkout, path), 'utf8');
+  const memberManifest = (dir: string) => (copied(`${dir}/Cargo.toml`) ? read(`${dir}/Cargo.toml`) : undefined);
+  const workspace = prunedWorkspace(read('Cargo.toml'), read('Cargo.lock'), memberManifest);
+  return { 'Cargo.toml': workspace.manifest, 'Cargo.lock': workspace.lock } as Record<string, string>;
+}
+
+function key(target: string, given: Record<string, string>) {
+  const hash = new Bun.CryptoHasher('sha256');
+  const chain = stagesOf(target, given);
+  const sources = chain.flatMap((stage) => copies(stage, given).sources);
+  const workspace = sources.some((source) => WORKSPACE_FILES.has(source)) ? workspaceFiles(sources) : {};
+
+  for (const stage of chain) {
+    const { values } = copies(stage, given);
+    hash.update(`FROM ${stage.image} AS ${stage.name}\n`);
     for (const line of stage.instructions) {
       hash.update(`${line}\n`);
       const [keyword, ...words] = line.split(' ');
       const instruction = keyword.toUpperCase();
       if (instruction === 'ARG') {
-        const [argument, fallback] = words[0].split('=');
-        values[argument] = given[argument] ?? fallback ?? '';
+        const [argument] = words[0].split('=');
         hash.update(`${argument}=${values[argument]}\n`);
       } else if (instruction === 'COPY') {
         const { values: copyFlags, rest } = flags(words);
-        if (copyFlags.from) {
-          visit(copyFlags.from);
-          continue;
-        }
+        if (copyFlags.from) continue;
         for (const source of rest.slice(0, -1)) {
           const path = expand(source, values);
-          hash.update(`${path} ${object(path)}\n`);
+          hash.update(`${path} ${workspace[path] ?? object(path)}\n`);
         }
       }
     }
   }
 
-  visit(target);
   return hash.digest('hex').slice(0, 32);
 }
 

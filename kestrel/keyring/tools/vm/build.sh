@@ -37,8 +37,8 @@ if [[ "$(cat "$vm/.packages" 2>/dev/null)" != "${packages[*]}" ]]; then
   echo "${packages[*]}" > "$vm/.packages"
 fi
 
-PKG_CONFIG_PATH="${PKG_CONFIG_PATH:-}" cargo build --release --manifest-path "$keyring/Cargo.toml"
-built="$keyring/target/release"
+PKG_CONFIG_PATH="${PKG_CONFIG_PATH:-}" cargo build --release --manifest-path "$luft/Cargo.toml" -p luft-keyring -p luft-keyring-unlock -p pam_luft_keyring
+built="${CARGO_TARGET_DIR:-$luft/target}/release"
 stage="$vm/stage"
 rm -rf "$stage"
 fill() {

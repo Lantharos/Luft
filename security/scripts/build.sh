@@ -20,11 +20,11 @@ esac
 (($# <= 1)) || { usage >&2; exit 2; }
 destdir="${1:-}"
 
-cargo build --release --manifest-path "$root/Cargo.toml"
+cargo build --release --manifest-path "$root/../Cargo.toml" -p trustd -p luft-usb-protection
 
 [[ -n "$destdir" ]] || exit 0
 
-release="${CARGO_TARGET_DIR:-$root/target}/release"
+release="${CARGO_TARGET_DIR:-$root/../target}/release"
 place() {
   sed "s|@libexecdir@|$libexecdir|g" "$1" | install -Dm644 /dev/stdin "$destdir$2"
 }

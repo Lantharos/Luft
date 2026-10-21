@@ -2,6 +2,7 @@
 set -euo pipefail
 
 here="$(cd "$(dirname "$0")" && pwd)"
+luft="$(cd "$here/../../.." && pwd)"
 service="$(dirname "$here")/service"
 vm="${LUFT_SLEEP_VM:-$service/target/vm}"
 image=localhost/luft-sleep-check
@@ -14,7 +15,7 @@ place() {
 }
 
 cargo build --release --manifest-path "$service/Cargo.toml"
-release="${CARGO_TARGET_DIR:-$service/target}/release"
+release="${CARGO_TARGET_DIR:-$luft/target}/release"
 rm -rf "$stage"
 mkdir -p "$stage" "$vm"
 place 755 "$release/luft-sleep" /usr/libexec/luft-sleep

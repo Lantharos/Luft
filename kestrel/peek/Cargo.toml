@@ -2,18 +2,16 @@
 name = "peek"
 description = "Sees and uses windows on Luft"
 version = "0.1.0"
-edition = "2024"
-rust-version = "1.98"
-license = "GPL-3.0-or-later"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
 
 [dependencies]
-clap = { version = "4.6.7", features = ["derive", "wrap_help"] }
-rustix = { version = "1.1.5", features = ["event", "fs", "pipe", "process", "stdio"] }
-serde_json = "1.0.154"
-signal-hook = "0.4.5"
-zbus = { version = "6.0.0", default-features = false, features = ["default-rt", "proxy"] }
+clap = { workspace = true, features = ["wrap_help"] }
+rustix = { workspace = true, features = ["event", "fs", "pipe", "process", "stdio"] }
+serde_json.workspace = true
+signal-hook.workspace = true
+zbus = { workspace = true, features = ["default-rt", "proxy"] }
 
-[profile.release]
-lto = true
-codegen-units = 1
-strip = true
+[lints]
+workspace = true

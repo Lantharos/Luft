@@ -82,10 +82,10 @@ gdbus wait --session --timeout 10 com.lantharos.KestrelChecks.Authenticator
 wait_until "the sound server" test -S "$PULSE_RUNTIME_PATH/native"
 start "$fixtures/session/soundDefaults.sh"
 wait_until "the print server" printer_ready
-DBUS_SYSTEM_BUS_ADDRESS="$KESTREL_SYSTEM_BUS" GIO_USE_VFS=local start "$root/kestrel/settings/target/release/kestrel-settings" \
+DBUS_SYSTEM_BUS_ADDRESS="$KESTREL_SYSTEM_BUS" GIO_USE_VFS=local start "$root/target/release/kestrel-settings" \
   --modules a11y,housekeeping,keyboard,night-light,power,printers,sound,timezone,watchdog,xsettings
 gdbus wait --session --timeout 10 com.lantharos.Settings
-DBUS_SYSTEM_BUS_ADDRESS="$KESTREL_SYSTEM_BUS" start "$root/kestrel/search/target/release/kestrel-search"
+DBUS_SYSTEM_BUS_ADDRESS="$KESTREL_SYSTEM_BUS" start "$root/target/release/kestrel-search"
 gdbus wait --session --timeout 10 com.lantharos.Search
 start python3 "$fixtures/session/portalFrontend.py" "$KESTREL_READY_SOCK" /usr/libexec/xdg-desktop-portal
 wait_until "the readiness socket" test -S "$KESTREL_READY_SOCK"

@@ -1,21 +1,24 @@
 [package]
 name = "luft-keyring-unlock"
 description = "Hands the keyring key to a person's own keyring after they sign in"
-version.workspace = true
+version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 
 [dependencies]
 getrandom.workspace = true
-libc = "0.2.190"
+libc.workspace = true
 luft-keyring-wire = { workspace = true, features = ["tokio"] }
 postcard.workspace = true
 serde.workspace = true
-sha2 = "0.11.1"
-tokio.workspace = true
-tss-esapi = "7.7.0"
-zeroize.workspace = true
+sha2.workspace = true
+tokio = { workspace = true, features = ["fs", "io-util", "macros", "net", "rt", "signal", "sync", "time"] }
+tss-esapi.workspace = true
+zeroize = { workspace = true, features = ["derive", "serde"] }
 
 [dev-dependencies]
-tempfile = "3.27.0"
+tempfile.workspace = true
+
+[lints]
+workspace = true

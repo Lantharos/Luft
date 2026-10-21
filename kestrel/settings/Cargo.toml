@@ -1,22 +1,31 @@
 [package]
 name = "kestrel-settings"
 version = "0.1.0"
-edition = "2024"
-rust-version = "1.98"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
 
 [dependencies]
-futures-util = { version = "0.3.34", default-features = false, features = ["std"] }
-gio = "0.22.10"
-glib = { version = "0.22.10", features = ["v2_68"] }
-pulseaudio = "0.3.2"
-rustix = { version = "1.1.5", features = ["fs", "process"] }
-serde = { version = "1.0.229", features = ["derive"] }
-tokio = { version = "1.53.3", default-features = false, features = ["rt", "macros", "time", "sync", "signal", "net", "io-util", "process", "fs"] }
-tzf-rs = { version = "2.1.3", default-features = false, features = ["bundled"] }
-x11rb = "0.14.0"
-zbus = { version = "6.0.0", default-features = false, features = ["tokio", "proxy", "service"] }
+futures-util = { workspace = true, features = ["std"] }
+gio.workspace = true
+glib = { workspace = true, features = ["v2_68"] }
+pulseaudio.workspace = true
+rustix = { workspace = true, features = ["fs", "process"] }
+serde.workspace = true
+tokio = { workspace = true, features = [
+  "fs",
+  "io-util",
+  "macros",
+  "net",
+  "process",
+  "rt",
+  "signal",
+  "sync",
+  "time",
+] }
+tzf-rs = { workspace = true, features = ["bundled"] }
+x11rb.workspace = true
+zbus = { workspace = true, features = ["proxy", "service", "tokio"] }
 
-[profile.release]
-lto = true
-codegen-units = 1
-strip = true
+[lints]
+workspace = true

@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Sat, 17 Oct 2026 21:30:51 +0200
-Subject: [PATCH 35/52] backends: follow the touchpad scroll speed setting
+Subject: [PATCH 35/53] backends: follow the touchpad scroll speed setting
 
 Scale finger scrolling from touchpads by the scroll-speed key of
 org.gnome.desktop.peripherals.touchpad, which gsettings-desktop-schemas

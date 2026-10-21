@@ -1,4 +1,6 @@
 import Clutter from 'gi://Clutter';
+import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 import St from 'gi://St';
 import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
@@ -6,9 +8,10 @@ import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {descendants, labelled, named, shown, shownStyled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {centerOf, press} from '../lib/input.js';
+import {inputMethodSettled} from '../lib/inputMethod.js';
+import {centerOf, hold, press, release} from '../lib/input.js';
 import {LuftApp} from '../lib/luftApp.js';
-import {gjs, stop, waitForWindow} from '../lib/processes.js';
+import {fixture, gjs, scratch, spawn, stop, waitForWindow} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {settled} from '../lib/wait.js';
 import {darkened, lock, unlock} from '../lockScreen/lib/shield.js';
@@ -16,6 +19,9 @@ import {fold, tap} from './lib/touch.js';
 
 const {require, eventually} = checks('on-screen keyboard');
 const ROVER_SEARCH = [142, 32];
+const BROWSER_OPEN_TIMEOUT = 60000;
+const WORD = 'luft';
+const SERBIAN = new GLib.Variant('a(ss)', [['xkb', 'rs+latin'], ['xkb', 'rs']]);
 
 const keyboard = () => Main.keyboard.keyboardActor;
 const settledKeyboard = () => !keyboard()?.get_transition('translation-y') && !keyboard()?.get_transition('opacity');
@@ -73,6 +79,76 @@ async function checkToolkit(window, start, clientType) {
     await hide(`${window} closes`, () => stop(process));
   } finally {
     await stop(process);
+  }
+}
+
+async function typeOnKeyboard(word) {
+  for (const letter of word) {
+    await tap(centerOf(labelled(letter, keyboard())));
+    await settled();
+  }
+}
+
+async function checkChromium(label, argv, clientType, env = {}) {
+  const page = `file://${fixture('pages', 'entry.html')}`;
+  const process = spawn([...argv, page], {env: {TMPDIR: scratch(), ...env}});
+  try {
+    const window = await waitForWindow(candidate => candidate.get_title()?.startsWith('Kestrel field'), `${label} opens the page`, BROWSER_OPEN_TIMEOUT);
+    require(window.get_client_type() === clientType, `${label} runs as the expected kind of client`);
+    window.maximize();
+    await settled();
+    await tapsOpen(`a field in ${label}`, centerOf(window.get_compositor_private()));
+    await typeOnKeyboard(WORD);
+    await eventually(() => window.get_title().startsWith(`Kestrel typed: ${WORD}`), `typing on the on-screen keyboard writes into the field in ${label}`);
+    await capture(`tablet-keyboard-${label.replace(/\W+/g, '-').toLowerCase()}`);
+    await hide(`${label} closes`, () => stop(process));
+  } finally {
+    await stop(process);
+  }
+}
+
+async function checkChromiumApps() {
+  const chromium = ['--no-first-run', '--no-default-browser-check', '--password-store=basic'];
+  const helium = GLib.getenv('KESTREL_HELIUM');
+  if (helium) {
+    await checkChromium('Helium', [helium, `--user-data-dir=${scratch('kestrel-helium')}`, ...chromium], Meta.WindowClientType.WAYLAND, {APPIMAGE_EXTRACT_AND_RUN: '1'});
+    await checkChromium('Helium on Xwayland', [helium, `--user-data-dir=${scratch('kestrel-helium-x11')}`, '--ozone-platform=x11', ...chromium], Meta.WindowClientType.X11, {APPIMAGE_EXTRACT_AND_RUN: '1'});
+  } else {
+    console.log('Kestrel on-screen keyboard: Helium skipped without KESTREL_HELIUM');
+  }
+  const electron = GLib.getenv('KESTREL_ELECTRON');
+  if (electron) {
+    await checkChromium('Electron', [electron, `--user-data-dir=${scratch('kestrel-electron')}`], Meta.WindowClientType.WAYLAND);
+    await checkChromium('Electron on Xwayland', [electron, `--user-data-dir=${scratch('kestrel-electron-x11')}`, '--ozone-platform=x11'], Meta.WindowClientType.X11);
+  } else {
+    console.log('Kestrel on-screen keyboard: Electron skipped without KESTREL_ELECTRON');
+  }
+}
+
+const showsLatin = () => labelled('q', keyboard()) && !labelled('љ', keyboard());
+const showsCyrillic = () => labelled('љ', keyboard()) && !labelled('q', keyboard());
+
+function switchInputSource() {
+  hold(Clutter.KEY_Super_L);
+  press(Clutter.KEY_space);
+  release(Clutter.KEY_Super_L);
+}
+
+async function checkLayouts() {
+  const settings = new Gio.Settings({schema_id: 'org.gnome.desktop.input-sources'});
+  const saved = {sources: settings.get_value('sources'), mru: settings.get_value('mru-sources')};
+  await eventually(inputMethodSettled, 'IBus has settled and can switch input sources', 15000);
+  try {
+    settings.set_value('mru-sources', SERBIAN);
+    settings.set_value('sources', SERBIAN);
+    await eventually(showsLatin, 'the on-screen keyboard shows Latin letters while Serbian Latin is the input source');
+    switchInputSource();
+    await eventually(showsCyrillic, 'the on-screen keyboard switches to Cyrillic with the input source');
+    switchInputSource();
+    await eventually(showsLatin, 'the on-screen keyboard switches back to Latin with the input source');
+  } finally {
+    settings.set_value('sources', saved.sources);
+    settings.set_value('mru-sources', saved.mru);
   }
 }
 
@@ -151,6 +227,8 @@ export async function run() {
     await checkLayers();
     await checkLockScreen();
     await checkSabine();
+    await checkLayouts();
+    await checkChromiumApps();
   } finally {
     await fold(false);
   }

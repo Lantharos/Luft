@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Sat, 17 Oct 2026 16:47:44 +0200
-Subject: [PATCH 32/52] clutter: pick an offscreen effect's texture filter as
+Subject: [PATCH 32/53] clutter: pick an offscreen effect's texture filter as
  soon as it has a pipeline
 
 The filter for the resource scale was applied to the previous pipeline,

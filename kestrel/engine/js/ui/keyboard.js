@@ -33,6 +33,7 @@ const KEY_SIZE = 2;
 
 const KEY_RELEASE_TIMEOUT = 50;
 const BACKSPACE_WORD_DELETE_THRESHOLD = 50;
+const LATIN_LAYOUTS = {rs: 'hr'};
 
 function tapSound(key, commitString) {
     if (key.action === 'delete')
@@ -351,6 +352,15 @@ const Key = GObject.registerClass({
             this.keyButton.remove_style_pseudo_class('latched');
     }
 });
+
+function layoutCandidates(groupName) {
+    const [layout, variant] = groupName.split('+');
+    if (!variant)
+        return [layout, 'us'];
+    if (variant.startsWith('latin'))
+        return [groupName, LATIN_LAYOUTS[layout] ?? 'us', 'us'];
+    return [groupName, layout, 'us'];
+}
 
 class KeyboardModel {
     constructor(groupName) {
@@ -1088,6 +1098,7 @@ export const Keyboard = GObject.registerClass({
         }
 
         this._clearShowIdle();
+        this._stopWaitingForSurrounding();
         this._liftFocusedChrome(false);
 
         this._keyboardController.setOskCompletion(false);
@@ -1157,6 +1168,7 @@ export const Keyboard = GObject.registerClass({
 
     _onContentHintsChanged(controller, contentHints) {
         this._contentHints = contentHints;
+        this._stopWaitingForSurrounding();
 
         if (this.visible &&
             (contentHints & Clutter.InputContentHintFlags.INHIBIT_OSK) !== 0) {
@@ -1217,8 +1229,7 @@ export const Keyboard = GObject.registerClass({
                             this._setActiveLevel('default');
                     }
 
-                    Main.inputMethod.disconnect(this._surroundingTextId);
-                    this._surroundingTextId = 0;
+                    this._stopWaitingForSurrounding();
                 });
             Main.inputMethod.request_surrounding();
             return;
@@ -1226,6 +1237,13 @@ export const Keyboard = GObject.registerClass({
 
         if (userInputHappened && this._currentPage === this._layers['shift'])
             this._setActiveLevel('default');
+    }
+
+    _stopWaitingForSurrounding() {
+        if (!this._surroundingTextId)
+            return;
+        Main.inputMethod.disconnect(this._surroundingTextId);
+        this._surroundingTextId = 0;
     }
 
     _onKeyFocusChanged() {
@@ -1272,10 +1290,7 @@ export const Keyboard = GObject.registerClass({
         } else if (purpose === Clutter.InputContentPurpose.URL) {
             keyboardModel = new KeyboardModel('url');
         } else {
-            let groups = [groupName];
-            if (groupName.includes('+'))
-                groups.push(groupName.replace(/\+.*/, ''));
-            groups.push('us');
+            let groups = layoutCandidates(groupName);
 
             if (purpose === Clutter.InputContentPurpose.TERMINAL)
                 groups = groups.map(g => `${g}-extended`);

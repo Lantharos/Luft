@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { dragFiles } from '@luft/ui';
+	import { dragFiles, tooltip } from '@luft/ui';
 	import X from '@lucide/svelte/icons/x';
 	import { useApp } from '#lib/app/context.js';
 	import type { Document } from '#lib/documents/document.svelte.js';
@@ -43,7 +43,7 @@
 				class="tab-main"
 				role="tab"
 				aria-selected={active}
-				title={document.path ?? document.name}
+				{@attach tooltip(document.path ?? document.name)}
 				onclick={() => workspace.activate(document)}
 				onauxclick={(event) => event.button === 1 && void workspace.close(document)}
 			>

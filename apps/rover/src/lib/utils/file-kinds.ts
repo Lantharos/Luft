@@ -47,21 +47,21 @@ function extensionOf(name: string) {
 	return dot > 0 ? name.slice(dot + 1).toLowerCase() : '';
 }
 
-export function isImage(entry: Pick<FileEntry, 'name' | 'mime_type'>) {
-	return entry.mime_type?.startsWith('image/') || ICON_BY_EXTENSION.get(extensionOf(entry.name)) === 'image';
+export function isImage(entry: Pick<FileEntry, 'name' | 'mimeType'>) {
+	return entry.mimeType?.startsWith('image/') || ICON_BY_EXTENSION.get(extensionOf(entry.name)) === 'image';
 }
 
-export function mayBeTransparent(entry: Pick<FileEntry, 'name' | 'mime_type'>) {
-	return Boolean(entry.mime_type?.startsWith('font/')) || TRANSPARENT_EXTENSIONS.has(extensionOf(entry.name));
+export function mayBeTransparent(entry: Pick<FileEntry, 'name' | 'mimeType'>) {
+	return Boolean(entry.mimeType?.startsWith('font/')) || TRANSPARENT_EXTENSIONS.has(extensionOf(entry.name));
 }
 
-export function isAppBundle(entry: Pick<FileEntry, 'name' | 'mime_type'>) {
-	return APP_BUNDLE_MIME_TYPES.has(entry.mime_type ?? '') || APP_BUNDLE_EXTENSIONS.has(extensionOf(entry.name));
+export function isAppBundle(entry: Pick<FileEntry, 'name' | 'mimeType'>) {
+	return APP_BUNDLE_MIME_TYPES.has(entry.mimeType ?? '') || APP_BUNDLE_EXTENSIONS.has(extensionOf(entry.name));
 }
 
-export function entryIcon(entry: Pick<FileEntry, 'name' | 'is_dir' | 'mime_type'>): EntryIconName {
-	if (entry.is_dir) return 'folder';
+export function entryIcon(entry: Pick<FileEntry, 'name' | 'isDir' | 'mimeType'>): EntryIconName {
+	if (entry.isDir) return 'folder';
 	if (isImage(entry)) return 'image';
-	if (entry.mime_type && PACKAGE_MIME_TYPES.has(entry.mime_type)) return 'package';
+	if (entry.mimeType && PACKAGE_MIME_TYPES.has(entry.mimeType)) return 'package';
 	return ICON_BY_EXTENSION.get(extensionOf(entry.name)) ?? 'file';
 }

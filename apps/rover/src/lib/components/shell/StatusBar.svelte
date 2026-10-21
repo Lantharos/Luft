@@ -14,7 +14,7 @@
 
 	let count = $derived(manager.view === 'trash' ? manager.trash.items.length : manager.displayEntries.length);
 	let selectedSize = $derived(
-		manager.selection.size === 0 ? 0 : manager.selectedEntries.reduce((total, entry) => total + (entry.is_dir ? 0 : entry.size), 0)
+		manager.selection.size === 0 ? 0 : manager.selectedEntries.reduce((total, entry) => total + (entry.isDir ? 0 : entry.size), 0)
 	);
 	let summary = $derived.by(() => {
 		if (manager.selection.size === 0) return plural(count, 'item');
@@ -43,7 +43,7 @@
 			{#if cloudDrive}
 				<span class="truncate">{describe(cloudDrive)}</span>
 			{:else if drive}
-				<span class="shrink-0">{bytes(drive.available_space)} free</span>
+				<span class="shrink-0">{bytes(drive.availableSpace)} free</span>
 			{/if}
 		{/if}
 	</span>

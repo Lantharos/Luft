@@ -5,7 +5,7 @@ export type Resolution = 'replace' | 'merge' | 'skip' | 'keepBoth';
 export interface ConflictItem {
 	path: string;
 	name: string;
-	is_dir: boolean;
+	isDir: boolean;
 	size: number;
 	modified: number | null;
 }

@@ -8,12 +8,12 @@ export function withDraft(entries: FileEntry[], draft: InlineDraft | null): File
 	const placeholder: FileEntry = {
 		name: draft.value,
 		path: DRAFT_PATH,
-		is_dir: folder,
-		is_file: !folder,
-		is_hidden: false,
+		isDir: folder,
+		isFile: !folder,
+		isHidden: false,
 		size: 0,
 		modified: null,
-		mime_type: null,
+		mimeType: null,
 		extension: null
 	};
 	return [placeholder, ...entries];

@@ -21,7 +21,7 @@ export class EntryDetails {
 		this.media = null;
 		if (!entry) return;
 		void api.fileDetails(entry.path).then((details) => this.#settle(key, () => (this.details = details)), () => undefined);
-		if (!entry.is_dir) {
+		if (!entry.isDir) {
 			void api.appsForFile(entry.path).then((apps) => this.#settle(key, () => (this.apps = apps)), () => undefined);
 		}
 	};

@@ -25,7 +25,7 @@
 		label={draft.itemType === 'folder' ? 'Folder name' : 'File name'}
 		unchangedValue={creating ? defaultName(draft.itemType) : entry.name}
 		placeholder={creating ? defaultName(draft.itemType) : ''}
-		selectStem={entry.is_file}
+		selectStem={entry.isFile}
 		onInput={manager.updateDraft}
 		onConfirm={manager.commitDraft}
 		onCancel={manager.cancelDraft}

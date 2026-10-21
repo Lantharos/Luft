@@ -72,7 +72,7 @@
 			<span class="grid-art" style:height="{size}px">
 				<EntryIcon name={entryIcon(entry)} {size} {...thumbnailOf(entry)} fit="contain" />
 				<CloudMark state={context.manager.cloud.stateOf(entry.path)} density="grid" />
-				<VcsBadge status={vcs.statusFor(entry.path, entry.is_dir)} density="grid" />
+				<VcsBadge status={vcs.statusFor(entry.path, entry.isDir)} density="grid" />
 			</span>
 			<EntryName {entry} manager={context.manager} class="grid-name" fieldClass="inline-name-field--grid" />
 		</div>

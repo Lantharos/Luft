@@ -25,7 +25,7 @@ export function tildePath(path: string, home: string) {
 
 export function detailRows({ entry, details, media, vcs, home, reveal }: RowSources): DetailRow[] {
 	const rows: (DetailRow | null)[] = [
-		entry.is_dir
+		entry.isDir
 			? details?.itemCount != null
 				? { label: 'Contains', value: plural(details.itemCount, 'item') }
 				: null
@@ -49,7 +49,7 @@ function dimensions(details: FileDetails | null, media: MediaInfo | null): Detai
 function versionControl(entry: FileEntry, vcs: VcsState): DetailRow | null {
 	const project = vcs.project;
 	if (!project) return null;
-	const status = vcs.statusFor(entry.path, entry.is_dir);
+	const status = vcs.statusFor(entry.path, entry.isDir);
 	const state = status && status !== 'ignored' ? statusLabel(status) : status === 'ignored' ? 'Ignored' : 'Unchanged';
 	const where = project.branch ? ` on ${project.branch}` : '';
 	return { label: 'Git', value: `${state}${where}` };

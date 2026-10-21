@@ -43,7 +43,7 @@ function viewKeyAction(event: KeyboardEvent, { manager, view, chooser }: ViewKey
 
 	const direction = DIRECTIONS[key];
 	if (direction) return moveAction(direction, event.shiftKey, manager, view);
-	if (key === 'Enter' && !event.shiftKey) return chooser && !view.focused?.is_dir ? null : view.openFocused;
+	if (key === 'Enter' && !event.shiftKey) return chooser && !view.focused?.isDir ? null : view.openFocused;
 	if (key === ' ' && !view.typeSelect.active) return view.toggleQuickLook;
 	if (key.length === 1) return () => view.typeAhead(key);
 	return null;

@@ -16,6 +16,7 @@ pub(crate) use locations::trash_locations;
 pub use put::{Trashed, put, restore as restore_item};
 
 #[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct TrashItem {
     pub id: String,
     pub name: String,

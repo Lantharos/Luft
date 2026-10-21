@@ -14,6 +14,7 @@ use crate::history::{History, Step};
 use crate::locations::drives;
 
 #[derive(Debug, Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct FileEntry {
     pub name: String,
     pub path: String,

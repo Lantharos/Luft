@@ -3,7 +3,7 @@ import { entryIcon } from './file-kinds';
 
 export type PreviewKind = 'folder' | 'image' | 'video' | 'audio' | 'markdown' | 'text' | 'pdf' | 'none';
 
-type KindSource = Pick<FileEntry, 'name' | 'is_dir' | 'mime_type' | 'extension'>;
+type KindSource = Pick<FileEntry, 'name' | 'isDir' | 'mimeType' | 'extension'>;
 
 const PREVIEWS: Partial<Record<PreviewKind, string[]>> = {
 	image: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'ico', 'avif'],
@@ -57,16 +57,16 @@ function extensionOf(entry: KindSource) {
 }
 
 export function previewKind(entry: KindSource): PreviewKind {
-	if (entry.is_dir) return 'folder';
+	if (entry.isDir) return 'folder';
 	const byExtension = PREVIEW_BY_EXTENSION.get(extensionOf(entry));
 	if (byExtension) return byExtension;
-	const mime = entry.mime_type ?? '';
+	const mime = entry.mimeType ?? '';
 	if (mime.startsWith('text/') || PLAIN_TEXT_NAMES.has(entry.name.toLowerCase())) return 'text';
 	return 'none';
 }
 
 export function kindLabel(entry: KindSource) {
-	if (entry.is_dir) return 'Folder';
+	if (entry.isDir) return 'Folder';
 	const extension = extensionOf(entry);
 	const named = NAMED_KINDS[extension];
 	if (named) return named;

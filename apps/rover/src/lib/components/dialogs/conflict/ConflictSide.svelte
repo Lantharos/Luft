@@ -15,7 +15,7 @@
 
 	let { heading, item, newer, larger }: Props = $props();
 
-	let Icon = $derived(item.is_dir ? Folder : File);
+	let Icon = $derived(item.isDir ? Folder : File);
 </script>
 
 <div class="flex min-w-0 flex-1 flex-col gap-3 rounded-[18px] bg-[var(--surface)] p-4">

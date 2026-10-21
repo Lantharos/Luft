@@ -144,14 +144,14 @@ export class ViewState {
 		if (chooser) return chooser.open(target);
 		if (selected.length <= 1) return manager.openEntry(target);
 		for (const entry of selected) {
-			if (entry.is_dir) void manager.openTab(entry.path);
+			if (entry.isDir) void manager.openTab(entry.path);
 			else manager.openEntry(entry);
 		}
 	};
 
 	enterFocused = async () => {
 		const target = this.focused;
-		if (!target?.is_dir) return;
+		if (!target?.isDir) return;
 		await this.#manager.navigate(target.path);
 		this.focusIndex(0);
 	};

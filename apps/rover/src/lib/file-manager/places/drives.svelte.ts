@@ -29,32 +29,32 @@ export class DrivesState {
 	};
 
 	eject = async (drive: DriveInfo) => {
-		if (this.ejecting.has(drive.mount_point)) return;
-		this.ejecting.add(drive.mount_point);
+		if (this.ejecting.has(drive.mountPoint)) return;
+		this.ejecting.add(drive.mountPoint);
 		try {
-			await api.ejectDrive(drive.mount_point);
+			await api.ejectDrive(drive.mountPoint);
 		} finally {
-			this.ejecting.delete(drive.mount_point);
+			this.ejecting.delete(drive.mountPoint);
 			await this.load();
 		}
 	};
 
 	containing(path: string) {
 		return this.list
-			.filter((drive) => drive.mount_point !== '/' && isInside(path, drive.mount_point))
-			.sort((a, b) => b.mount_point.length - a.mount_point.length)[0];
+			.filter((drive) => drive.mountPoint !== '/' && isInside(path, drive.mountPoint))
+			.sort((a, b) => b.mountPoint.length - a.mountPoint.length)[0];
 	}
 
 	holding(path: string) {
-		return this.containing(path) ?? this.list.find((drive) => drive.mount_point === '/');
+		return this.containing(path) ?? this.list.find((drive) => drive.mountPoint === '/');
 	}
 
 	isMounted(drive: DriveInfo) {
-		return this.list.some((candidate) => candidate.mount_point === drive.mount_point);
+		return this.list.some((candidate) => candidate.mountPoint === drive.mountPoint);
 	}
 }
 
 function rank(drive: DriveInfo) {
-	if (drive.mount_point === '/') return 0;
-	return drive.is_removable ? 2 : 1;
+	if (drive.mountPoint === '/') return 0;
+	return drive.isRemovable ? 2 : 1;
 }

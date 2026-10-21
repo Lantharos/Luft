@@ -44,7 +44,7 @@
 	}
 
 	function size(entry: FileEntry) {
-		if (!entry.is_dir) return bytes(entry.size);
+		if (!entry.isDir) return bytes(entry.size);
 		const count = entry.path === DRAFT_PATH ? null : folderCounts.count(entry);
 		return count === null ? '' : plural(count, 'item');
 	}
@@ -103,7 +103,7 @@
 					<EntryIcon name={entryIcon(row)} size={24} {...thumbnailOf(row)} />
 					<EntryName entry={row} {manager} class="truncate" />
 					<CloudMark state={manager.cloud.stateOf(row.path)} />
-					<VcsBadge status={vcs.statusFor(row.path, row.is_dir)} />
+					<VcsBadge status={vcs.statusFor(row.path, row.isDir)} />
 				</span>
 				{#each columns.shown as column (column.id)}
 					<span class={['list-cell', `list-${column.id}`]}>{cell(row, column.id)}</span>

@@ -51,7 +51,7 @@ class Thumbnails {
 	};
 
 	source(entry: FileEntry) {
-		if (!entry.is_file || this.#skip(entry.path)) return null;
+		if (!entry.isFile || this.#skip(entry.path)) return null;
 		this.#screen.watch(entry);
 		const ready = this.#ready.get(entry.path);
 		if (!ready || ready.modified !== entry.modified) return null;

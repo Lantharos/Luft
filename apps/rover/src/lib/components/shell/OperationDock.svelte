@@ -40,23 +40,23 @@
 	}
 
 	function lingerEnded(operation: Operation) {
-		if (operation.completed_at === null) return false;
+		if (operation.completedAt === null) return false;
 		const linger = operation.phase === 'SafeToEject' ? SAFE_TO_EJECT_LINGER_MS : COMPLETED_LINGER_MS;
-		return now - operation.completed_at >= linger;
+		return now - operation.completedAt >= linger;
 	}
 
 	function shouldShow(operation: Operation) {
 		if (lingerEnded(operation)) return false;
 		if (operation.status === 'Failed' || operation.status === 'Cancelled') return true;
-		return (operation.completed_at ?? now) - operation.started_at >= ATTENTION_DELAY_MS;
+		return (operation.completedAt ?? now) - operation.startedAt >= ATTENTION_DELAY_MS;
 	}
 
 	function title(operation: Operation) {
-		const destination = operation.destination_label ? ` to ${operation.destination_label}` : '';
+		const destination = operation.destinationLabel ? ` to ${operation.destinationLabel}` : '';
 		if (operation.status === 'Completed') {
 			if (operation.phase === 'SafeToEject') return 'Safe to eject';
 			return { Copy: 'Copied', Move: 'Moved', Trash: 'Moved to trash', Delete: 'Deleted', Compress: 'Compressed', Extract: 'Extracted' }[
-				operation.op_type
+				operation.opType
 			];
 		}
 		if (operation.phase === 'Finalizing') return `Finalizing writes${destination}`;
@@ -68,43 +68,43 @@
 			Delete: 'Deleting',
 			Compress: 'Compressing',
 			Extract: 'Extracting'
-		}[operation.op_type];
+		}[operation.opType];
 	}
 
 	function icon(operation: Operation) {
 		if (operation.phase === 'SafeToEject') return Check;
-		if (operation.op_type === 'Compress' || operation.op_type === 'Extract') return Archive;
-		if (operation.phase === 'Finalizing' && operation.destination_is_removable) return Usb;
-		if (operation.op_type === 'Delete' || operation.op_type === 'Trash') return Trash2;
-		return operation.op_type === 'Move' ? Upload : Copy;
+		if (operation.opType === 'Compress' || operation.opType === 'Extract') return Archive;
+		if (operation.phase === 'Finalizing' && operation.destinationIsRemovable) return Usb;
+		if (operation.opType === 'Delete' || operation.opType === 'Trash') return Trash2;
+		return operation.opType === 'Move' ? Upload : Copy;
 	}
 
 	function subject(operation: Operation) {
 		if (!isActive(operation)) return operation.status === 'Failed' ? 'Failed' : 'Done';
-		if (operation.phase === 'Finalizing') return operation.destination_is_removable ? 'Do not unplug yet' : 'Finishing writes';
-		return operation.current_file ? basename(operation.current_file) : 'Preparing';
+		if (operation.phase === 'Finalizing') return operation.destinationIsRemovable ? 'Do not unplug yet' : 'Finishing writes';
+		return operation.currentFile ? basename(operation.currentFile) : 'Preparing';
 	}
 
 	function speed(operation: Operation) {
-		if (operation.status !== 'InProgress' || operation.phase === 'Finalizing' || operation.bytes_processed <= 0) return 0;
-		return operation.bytes_processed / Math.max(0.75, (now - operation.started_at) / 1000);
+		if (operation.status !== 'InProgress' || operation.phase === 'Finalizing' || operation.bytesProcessed <= 0) return 0;
+		return operation.bytesProcessed / Math.max(0.75, (now - operation.startedAt) / 1000);
 	}
 
 	function detail(operation: Operation) {
 		if (operation.status === 'Completed') {
-			if (operation.phase === 'SafeToEject') return operation.op_type === 'Move' ? 'Moved successfully' : 'Copied successfully';
-			return operation.total_items === 1 ? 'Finished' : `${plural(operation.total_items, 'item')} finished`;
+			if (operation.phase === 'SafeToEject') return operation.opType === 'Move' ? 'Moved successfully' : 'Copied successfully';
+			return operation.totalItems === 1 ? 'Finished' : `${plural(operation.totalItems, 'item')} finished`;
 		}
 		if (operation.status === 'Failed') return operation.error ?? 'Failed';
 		if (operation.status === 'Cancelled') return 'Cancelled';
 		if (operation.phase === 'Finalizing') {
-			return operation.destination_is_removable ? 'Finalizing writes. Do not unplug yet.' : 'Finalizing writes';
+			return operation.destinationIsRemovable ? 'Finalizing writes. Do not unplug yet.' : 'Finalizing writes';
 		}
-		if (operation.total_bytes === 0) return `${operation.items_processed} of ${plural(operation.total_items, 'item')}`;
+		if (operation.totalBytes === 0) return `${operation.itemsProcessed} of ${plural(operation.totalItems, 'item')}`;
 		const rate = speed(operation);
-		const remaining = operation.total_bytes - operation.bytes_processed;
+		const remaining = operation.totalBytes - operation.bytesProcessed;
 		return [
-			`${bytes(operation.bytes_processed)} of ${bytes(operation.total_bytes)}`,
+			`${bytes(operation.bytesProcessed)} of ${bytes(operation.totalBytes)}`,
 			rate > 0 && `${bytes(rate)}/s`,
 			rate > 0 && remaining > 0 && `${formatDuration(remaining / rate)} left`
 		]

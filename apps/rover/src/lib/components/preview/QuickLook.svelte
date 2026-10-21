@@ -38,7 +38,7 @@
 				<div class="min-w-0 flex-1">
 					<p class="truncate text-[14px] font-medium text-[var(--text)]">{entry.name}</p>
 					<p class="truncate text-[12px] text-[var(--text-muted)]">
-						{kindLabel(entry)}{entry.is_dir ? '' : ` · ${bytes(entry.size)}`} · {position} of {count}
+						{kindLabel(entry)}{entry.isDir ? '' : ` · ${bytes(entry.size)}`} · {position} of {count}
 					</p>
 				</div>
 				<button class="button" type="button" onclick={() => manager.openEntry(entry)}>Open</button>

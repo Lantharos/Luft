@@ -44,6 +44,10 @@ export function reorder(sourcePath: string, targetPath: string | null) {
 	});
 }
 
+export function bookmarkTarget(bookmark: PinnedFolder) {
+	return { path: bookmark.path, isDir: bookmark.is_dir };
+}
+
 function bookmarkFor(entry: FileEntry): PinnedFolder {
-	return { name: entry.name, path: entry.path, is_dir: entry.is_dir, icon: entryIcon(entry) };
+	return { name: entry.name, path: entry.path, is_dir: entry.isDir, icon: entryIcon(entry) };
 }

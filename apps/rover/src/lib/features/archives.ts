@@ -11,9 +11,9 @@ export function isArchive(name: string) {
 	return SUFFIXES.some((suffix) => lowered.endsWith(suffix) && lowered.length > suffix.length);
 }
 
-export function archiveName(entries: Pick<FileEntry, 'name' | 'is_dir'>[]) {
+export function archiveName(entries: Pick<FileEntry, 'name' | 'isDir'>[]) {
 	if (entries.length !== 1) return 'Archive';
-	const [{ name, is_dir }] = entries;
+	const [{ name, isDir }] = entries;
 	const dot = name.lastIndexOf('.');
-	return is_dir || dot <= 0 ? name : name.slice(0, dot);
+	return isDir || dot <= 0 ? name : name.slice(0, dot);
 }

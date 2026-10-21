@@ -35,7 +35,7 @@
 	let activeDrive = $derived.by(() => {
 		const path = manager.currentPath;
 		if (!browsing || placePaths.has(path) || isInside(path, manager.homePath) || manager.network.holding(path)) return null;
-		return manager.drives.holding(path)?.mount_point ?? null;
+		return manager.drives.holding(path)?.mountPoint ?? null;
 	});
 
 	export function focusSearch() {
@@ -119,8 +119,8 @@
 
 		{#if manager.drives.ordered.length > 0 || manager.drives.windows.length > 0}
 			<div class="sidebar-group">
-				{#each manager.drives.ordered as drive (drive.mount_point)}
-					<DriveItem {drive} {manager} {drag} active={activeDrive === drive.mount_point} onopentab={openInTab} onmenu={showMenu} />
+				{#each manager.drives.ordered as drive (drive.mountPoint)}
+					<DriveItem {drive} {manager} {drag} active={activeDrive === drive.mountPoint} onopentab={openInTab} onmenu={showMenu} />
 				{/each}
 				{#each manager.drives.windows as drive (drive.device)}
 					<WindowsItem {drive} {manager} />

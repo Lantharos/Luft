@@ -2,6 +2,7 @@ import * as api from '#lib/api.js';
 import type { ChooserConfig, FileEntry, PinnedFolder } from '#lib/types/index.js';
 import { joinPath } from '#lib/utils/paths.js';
 import type { FileManager } from './manager.svelte';
+import { bookmarkTarget } from './places/bookmarks';
 
 export class ChooserState {
 	readonly config: ChooserConfig;
@@ -18,14 +19,14 @@ export class ChooserState {
 		this.saveName = config.current_name ?? '';
 	}
 
-	accepts = (entry: Pick<FileEntry, 'is_dir'>) => {
+	accepts = (entry: Pick<FileEntry, 'isDir'>) => {
 		if (this.config.mode === 'save') return true;
-		if (this.config.mode === 'save_files' || this.config.directory) return entry.is_dir;
-		return !entry.is_dir;
+		if (this.config.mode === 'save_files' || this.config.directory) return entry.isDir;
+		return !entry.isDir;
 	};
 
 	select = (entry: FileEntry, event: MouseEvent) => {
-		if (!this.accepts(entry) && !entry.is_dir) return;
+		if (!this.accepts(entry) && !entry.isDir) return;
 		if ((event.ctrlKey || event.metaKey) && this.config.multiple && this.accepts(entry)) {
 			this.#manager.toggleSelected(entry.path);
 		} else {
@@ -34,13 +35,13 @@ export class ChooserState {
 	};
 
 	open = (entry: FileEntry) => {
-		if (entry.is_dir) return void this.#manager.navigate(entry.path);
+		if (entry.isDir) return void this.#manager.navigate(entry.path);
 		if (this.accepts(entry)) void this.submit([entry.path]);
 	};
 
 	openFavorite = (favorite: PinnedFolder) => {
 		if (favorite.is_dir) return void this.#manager.navigate(favorite.path);
-		if (this.accepts(favorite)) void this.submit([favorite.path]);
+		if (this.accepts(bookmarkTarget(favorite))) void this.submit([favorite.path]);
 	};
 
 	selectRange = (paths: string[]) => {
@@ -74,7 +75,7 @@ export class ChooserState {
 		}
 		const selected = manager.entries.filter((entry) => manager.selection.has(entry.path));
 		if (this.config.mode === 'save_files') {
-			const target = selected.find((entry) => entry.is_dir)?.path ?? manager.currentPath;
+			const target = selected.find((entry) => entry.isDir)?.path ?? manager.currentPath;
 			return target ? this.config.files.map((name) => joinPath(target, name)) : [];
 		}
 		const paths = selected.filter(this.accepts).map((entry) => entry.path);

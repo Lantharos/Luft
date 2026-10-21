@@ -23,26 +23,26 @@
 
 	const NEARLY_FULL = 0.9;
 
-	let ejecting = $derived(manager.drives.ejecting.has(drive.mount_point));
-	let used = $derived(drive.total_space === 0 ? 0 : Math.min(1, drive.used_space / drive.total_space));
-	let key = $derived(dropKey('sidebar', drive.mount_point));
-	let summary = $derived(`${bytes(drive.available_space)} free of ${bytes(drive.total_space)}`);
+	let ejecting = $derived(manager.drives.ejecting.has(drive.mountPoint));
+	let used = $derived(drive.totalSpace === 0 ? 0 : Math.min(1, drive.usedSpace / drive.totalSpace));
+	let key = $derived(dropKey('sidebar', drive.mountPoint));
+	let summary = $derived(`${bytes(drive.availableSpace)} free of ${bytes(drive.totalSpace)}`);
 </script>
 
 <SidebarItem
 	class="sidebar-item--drive"
-	icon={ejecting ? RefreshCw : drive.is_removable ? Usb : HardDrive}
+	icon={ejecting ? RefreshCw : drive.isRemovable ? Usb : HardDrive}
 	spinning={ejecting}
 	label={ejecting ? `${drive.name} · Ejecting` : drive.name}
 	{active}
 	dropping={drag.target?.key === key}
 	disabled={ejecting}
-	onclick={() => manager.navigate(drive.mount_point)}
-	onauxclick={(event) => onopentab(event, () => manager.openTab(drive.mount_point))}
+	onclick={() => manager.navigate(drive.mountPoint)}
+	onauxclick={(event) => onopentab(event, () => manager.openTab(drive.mountPoint))}
 	oncontextmenu={(event) => onmenu(event, { kind: 'drive', drive })}
-	ondragover={(event) => drag.overPath(event, drive.mount_point, key)}
+	ondragover={(event) => drag.overPath(event, drive.mountPoint, key)}
 	ondragleave={drag.leave}
-	ondrop={(event) => drag.drop(event, drive.mount_point)}
+	ondrop={(event) => drag.drop(event, drive.mountPoint)}
 	{@attach tooltip(summary)}
 >
 	{#snippet detail()}
@@ -51,7 +51,7 @@
 		</span>
 	{/snippet}
 	{#snippet trailing()}
-		{#if drive.is_removable}
+		{#if drive.isRemovable}
 			<button
 				class="sidebar-item__action"
 				type="button"

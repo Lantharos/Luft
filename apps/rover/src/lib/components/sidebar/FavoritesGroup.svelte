@@ -39,7 +39,7 @@
 
 	function open(bookmark: PinnedFolder) {
 		if (chooser) chooser.openFavorite(bookmark);
-		else manager.openEntry(bookmark);
+		else manager.openEntry(bookmarks.bookmarkTarget(bookmark));
 	}
 
 	function groupDragOver(event: DragEvent) {
@@ -125,7 +125,7 @@
 			dropping={bookmark.is_dir && drag.target?.key === key(bookmark.path)}
 			draggable="true"
 			onclick={() => open(bookmark)}
-			onauxclick={(event) => onopentab(event, () => (bookmark.is_dir ? manager.openTab(bookmark.path) : manager.openEntry(bookmark)))}
+			onauxclick={(event) => onopentab(event, () => (bookmark.is_dir ? manager.openTab(bookmark.path) : manager.openEntry(bookmarks.bookmarkTarget(bookmark))))}
 			oncontextmenu={(event) => onmenu(event, { kind: 'favorite', bookmark })}
 			ondragstart={(event) => startMoving(event, bookmark.path)}
 			ondragover={(event) => rowDragOver(event, bookmark)}

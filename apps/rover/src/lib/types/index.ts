@@ -5,12 +5,12 @@ import type { EntryIconName } from '#lib/utils/file-kinds.js';
 export interface FileEntry {
 	name: string;
 	path: string;
-	is_dir: boolean;
-	is_file: boolean;
-	is_hidden: boolean;
+	isDir: boolean;
+	isFile: boolean;
+	isHidden: boolean;
 	size: number;
 	modified: number | null;
-	mime_type: string | null;
+	mimeType: string | null;
 	extension: string | null;
 }
 
@@ -39,11 +39,11 @@ export interface UserDirs {
 
 export interface DriveInfo {
 	name: string;
-	mount_point: string;
-	total_space: number;
-	available_space: number;
-	used_space: number;
-	is_removable: boolean;
+	mountPoint: string;
+	totalSpace: number;
+	availableSpace: number;
+	usedSpace: number;
+	isRemovable: boolean;
 }
 
 export interface WindowsDrive {
@@ -60,11 +60,11 @@ export interface TrashLocation {
 export interface TrashItem {
 	id: string;
 	name: string;
-	original_path: string;
-	trash_path: string;
-	deleted_at: number;
+	originalPath: string;
+	trashPath: string;
+	deletedAt: number;
 	size: number;
-	is_dir: boolean;
+	isDir: boolean;
 }
 
 export interface TrashContents {
@@ -87,21 +87,21 @@ export type OperationPhase =
 
 export interface Operation {
 	id: string;
-	op_type: OperationType;
+	opType: OperationType;
 	status: OperationStatus;
 	phase: OperationPhase;
-	destination_label: string | null;
-	destination_is_removable: boolean;
+	destinationLabel: string | null;
+	destinationIsRemovable: boolean;
 	progress: number;
-	current_file: string | null;
-	bytes_processed: number;
-	total_bytes: number;
-	items_processed: number;
-	total_items: number;
+	currentFile: string | null;
+	bytesProcessed: number;
+	totalBytes: number;
+	itemsProcessed: number;
+	totalItems: number;
 	conflict: Conflict | null;
 	error: string | null;
-	started_at: number;
-	completed_at: number | null;
+	startedAt: number;
+	completedAt: number | null;
 }
 
 export type ChooserMode = 'open' | 'save' | 'save_files';

@@ -37,7 +37,7 @@ export class TrashCounter {
 	};
 
 	receiveOperations = (operations: Operation[]) => {
-		const settled = operations.filter((operation) => operation.completed_at !== null).map((operation) => operation.id);
+		const settled = operations.filter((operation) => operation.completedAt !== null).map((operation) => operation.id);
 		const fresh = settled.some((id) => !this.#settled.has(id));
 		this.#settled = new Set(settled);
 		if (fresh) void this.refresh();

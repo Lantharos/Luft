@@ -17,7 +17,7 @@ export async function openActivation(manager: FileManager, activation: SingleIns
 async function open(manager: FileManager, path: string, show: (folder: string) => Promise<void>) {
 	if (looksRemote(path)) return manager.openAddress(path, show);
 	const entry = await api.getFileInfo(path).catch(() => null);
-	if (!entry || entry.is_dir) return show(path);
+	if (!entry || entry.isDir) return show(path);
 	await show(parentPath(entry.path));
 	manager.selectOnly(entry.path);
 }

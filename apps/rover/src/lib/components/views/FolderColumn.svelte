@@ -48,7 +48,7 @@
 
 	function classes(entry: FileEntry) {
 		if (column.current) return entryClasses(entry, context);
-		return ['entry', column.trail === entry.path && 'is-trail', entry.is_hidden && 'is-hidden-file'];
+		return ['entry', column.trail === entry.path && 'is-trail', entry.isHidden && 'is-hidden-file'];
 	}
 </script>
 
@@ -70,8 +70,8 @@
 			<EntryIcon name={entryIcon(entry)} size={20} {...thumbnailOf(entry)} />
 			<EntryName {entry} manager={manager} class="truncate" />
 			<CloudMark state={manager.cloud.stateOf(entry.path)} />
-			<VcsBadge status={vcs.statusFor(entry.path, entry.is_dir)} />
-			{#if entry.is_dir}
+			<VcsBadge status={vcs.statusFor(entry.path, entry.isDir)} />
+			{#if entry.isDir}
 				<ChevronRight size={14} class="column-chevron" />
 			{/if}
 		</div>

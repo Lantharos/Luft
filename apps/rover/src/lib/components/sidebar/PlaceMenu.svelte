@@ -33,7 +33,7 @@
 	function folderOf(place: SidebarPlace) {
 		if (place.kind === 'folder') return place.path;
 		if (place.kind === 'favorite') return place.bookmark.path;
-		if (place.kind === 'drive') return place.drive.mount_point;
+		if (place.kind === 'drive') return place.drive.mountPoint;
 		if (place.kind === 'network') return place.entry.location?.path ?? null;
 		return null;
 	}
@@ -45,7 +45,7 @@
 
 	function open() {
 		if (place.kind === 'recent' || place.kind === 'trash') return manager.showView(place.kind);
-		if (place.kind === 'favorite') return manager.openEntry(place.bookmark);
+		if (place.kind === 'favorite') return manager.openEntry(bookmarks.bookmarkTarget(place.bookmark));
 		if (place.kind === 'network' && !path) return manager.openAddress(place.entry.place.uri);
 		return manager.navigate(path!);
 	}
@@ -73,13 +73,13 @@
 	{#if opensFolder}
 		{@render item(Plus, 'Open in new tab', openInTab)}
 	{/if}
-	{#if place.kind === 'drive' && place.drive.is_removable}
+	{#if place.kind === 'drive' && place.drive.isRemovable}
 		{@const drive = place.drive}
-		{@render item(Eject, 'Eject', () => manager.ejectDrive(drive), false, manager.drives.ejecting.has(drive.mount_point))}
+		{@render item(Eject, 'Eject', () => manager.ejectDrive(drive), false, manager.drives.ejecting.has(drive.mountPoint))}
 	{/if}
 	{#if place.kind === 'drive' && manager.drives.manageable}
 		{@const drive = place.drive}
-		{@render item(HardDrive, 'Manage drive…', () => api.manageDrive(drive.mount_point).catch(manager.notify))}
+		{@render item(HardDrive, 'Manage drive…', () => api.manageDrive(drive.mountPoint).catch(manager.notify))}
 	{/if}
 	{#if place.kind === 'network'}
 		{@const entry = place.entry}

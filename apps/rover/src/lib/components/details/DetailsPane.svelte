@@ -26,8 +26,8 @@
 			? detailRows({ entry, details: inspected.details, media: inspected.media, vcs, home: manager.homePath, reveal })
 			: []
 	);
-	let totalSize = $derived(selected.reduce((total, item) => total + (item.is_dir ? 0 : item.size), 0));
-	let folderCount = $derived(selected.filter((item) => item.is_dir).length);
+	let totalSize = $derived(selected.reduce((total, item) => total + (item.isDir ? 0 : item.size), 0));
+	let folderCount = $derived(selected.filter((item) => item.isDir).length);
 	let drive = $derived(manager.view === 'home' ? manager.drives.holding(manager.currentPath) : undefined);
 	let folderTitle = $derived(
 		manager.view === 'recent' ? 'Recent' : manager.currentPath === manager.homePath ? 'Home' : basename(manager.currentPath) || '/'
@@ -74,7 +74,7 @@
 			<p class="details-subtitle">{inspected.details?.kind ?? kindLabel(entry)}</p>
 		</div>
 		{@render metadata(rows)}
-		{#if !entry.is_dir && !context.chooser}
+		{#if !entry.isDir && !context.chooser}
 			<OpenWith apps={inspected.apps} path={entry.path} {manager} />
 		{/if}
 	{:else if selected.length > 1}
@@ -104,7 +104,7 @@
 		</div>
 		{@render metadata([
 			...(manager.view === 'home' ? [{ label: 'Where', value: tildePath(manager.currentPath, manager.homePath) }] : []),
-			...(drive ? [{ label: 'Free space', value: `${bytes(drive.available_space)} of ${bytes(drive.total_space)}` }] : [])
+			...(drive ? [{ label: 'Free space', value: `${bytes(drive.availableSpace)} of ${bytes(drive.totalSpace)}` }] : [])
 		])}
 	{/if}
 </aside>

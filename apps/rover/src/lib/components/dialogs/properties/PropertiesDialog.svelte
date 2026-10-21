@@ -24,7 +24,7 @@
 	let error = $state<string | null>(null);
 
 	let single = $derived(entries.length === 1 ? entries[0] : null);
-	let measured = $derived(!drive && (entries.some((entry) => entry.is_dir) || entries.length > 1));
+	let measured = $derived(!drive && (entries.some((entry) => entry.isDir) || entries.length > 1));
 	let locations = $derived(new Set(entries.map((entry) => parentPath(entry.path))));
 	let title = $derived(drive?.name ?? single?.name ?? plural(entries.length, 'item'));
 	let kind = $derived(drive ? 'Drive' : single ? (details?.kind ?? '') : describeMix(entries));
@@ -56,13 +56,13 @@
 	});
 
 	function describeMix(items: FileEntry[]) {
-		const folders = items.filter((item) => item.is_dir).length;
+		const folders = items.filter((item) => item.isDir).length;
 		const files = items.length - folders;
 		return [folders && plural(folders, 'folder'), files && plural(files, 'file')].filter(Boolean).join(' and ');
 	}
 
 	function sizeText() {
-		if (drive) return `${bytes(drive.used_space)} used of ${bytes(drive.total_space)}`;
+		if (drive) return `${bytes(drive.usedSpace)} used of ${bytes(drive.totalSpace)}`;
 		if (!measured) return single ? `${bytes(single.size)} (${single.size.toLocaleString()} bytes)` : '';
 		if (!measurement) return 'Measuring…';
 		const contents = plural(measurement.files, 'file');
@@ -95,7 +95,7 @@
 	<dl class="grid grid-cols-[112px_minmax(0,1fr)] gap-x-4 gap-y-2.5 text-[13px]">
 		{@render row('Kind', kind)}
 		{@render row('Size', sizeText())}
-		{@render row('Free', drive ? bytes(drive.available_space) : '')}
+		{@render row('Free', drive ? bytes(drive.availableSpace) : '')}
 		{@render row('Location', locations.size === 1 ? [...locations][0] : 'Several folders')}
 		{#if single}
 			{@render row('Points to', details?.linkTarget ?? '')}
@@ -115,14 +115,14 @@
 				<span class="font-medium">Permissions</span>
 				<span class="font-mono text-[12px] text-[var(--text-muted)]">{octal}</span>
 			</div>
-			<PermissionGrid mode={ownership.mode} folder={single.is_dir} editable={ownership.editable} onchange={changeMode} />
+			<PermissionGrid mode={ownership.mode} folder={single.isDir} editable={ownership.editable} onchange={changeMode} />
 			{#if !ownership.editable}
 				<p class="text-[12px] text-[var(--text-muted)]">Only {ownership.owner} can change these.</p>
 			{/if}
 		</div>
 	{/if}
 
-	{#if single && !single.is_dir}
+	{#if single && !single.isDir}
 		<div class="flex flex-col gap-2 pt-2 text-[13px]">
 			<span class="font-medium">Opens with</span>
 			<DefaultApp path={single.path} />

@@ -46,11 +46,11 @@
 
 	let target = $derived(menu.target);
 	let isPinned = $derived(Boolean(target && bookmarks.isPinned(target.path)));
-	let offersVcs = $derived(Boolean(vcs.project && (!target || target.is_dir || vcs.statusFor(target.path, false))));
+	let offersVcs = $derived(Boolean(vcs.project && (!target || target.isDir || vcs.statusFor(target.path, false))));
 	let targets = $derived(target ? tools.targetsOf(manager, target) : []);
 	let cloudDrive = $derived(target ? manager.cloud.holding(target.path) : undefined);
 	let kept = $derived(cloud.keptEverywhere(manager, targets));
-	let archives = $derived(targets.length > 0 && targets.every((entry) => !entry.is_dir && isArchive(entry.name)));
+	let archives = $derived(targets.length > 0 && targets.every((entry) => !entry.isDir && isArchive(entry.name)));
 
 	function close() {
 		manager.contextMenu = null;
@@ -63,11 +63,11 @@
 
 	function viewChanges(entry: FileEntry | null) {
 		vcs.panelOpen = true;
-		if (entry && !entry.is_dir) void vcs.loadDiff(vcs.relativePath(entry.path));
+		if (entry && !entry.isDir) void vcs.loadDiff(vcs.relativePath(entry.path));
 	}
 
 	function saveChanges(entry: FileEntry | null) {
-		vcs.openSaveDialog(entry && !entry.is_dir ? [vcs.relativePath(entry.path)] : null);
+		vcs.openSaveDialog(entry && !entry.isDir ? [vcs.relativePath(entry.path)] : null);
 	}
 </script>
 
@@ -81,14 +81,14 @@
 <ContextMenu at={menu} onclose={close}>
 	{#if target}
 		{@render item(ExternalLink, 'Open', () => manager.openEntry(target))}
-		{#if !target.is_dir}
+		{#if !target.isDir}
 			{@render item(Eye, 'Quick Look', view.toggleQuickLook)}
 		{/if}
 		{#if offersVcs}
-			{@render item(Code, target.is_dir ? 'View project changes' : 'View changes', () => viewChanges(target))}
-			{@render item(Check, target.is_dir ? 'Commit changes' : 'Commit this file', () => saveChanges(target))}
+			{@render item(Code, target.isDir ? 'View project changes' : 'View changes', () => viewChanges(target))}
+			{@render item(Check, target.isDir ? 'Commit changes' : 'Commit this file', () => saveChanges(target))}
 		{/if}
-		{#if target.is_dir}
+		{#if target.isDir}
 			{@render item(Plus, 'Open in tab', () => manager.openTab(target.path))}
 		{/if}
 		{@render item(Star, isPinned ? 'Remove from Favorites' : 'Add to Favorites', () => bookmarks.togglePinned(target))}
@@ -117,7 +117,7 @@
 		{#if archives}
 			{@render item(PackageOpen, 'Extract here', () => tools.extract(manager, targets))}
 		{/if}
-		{#if target.is_dir}
+		{#if target.isDir}
 			{@render item(Terminal, 'Open in terminal', () => tools.openTerminal(manager, target.path))}
 			{#if manager.drives.manageable}
 				{@render item(ChartPie, 'See what’s using space', () => tools.exploreSpace(manager, target.path))}

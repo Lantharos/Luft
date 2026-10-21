@@ -29,13 +29,13 @@ export function entryClasses(entry: FileEntry, { manager, drag, view }: EntryCon
 		drag.target?.key === dropKey('entry', entry.path) && 'is-drop-target',
 		drag.dragging && selected && 'is-dragging',
 		manager.cuttingPaths.has(entry.path) && 'is-cut',
-		entry.is_hidden && 'is-hidden-file'
+		entry.isHidden && 'is-hidden-file'
 	];
 }
 
 export function entryProps(entry: FileEntry, { manager, drag, view, chooser }: EntryContext, select: Select = view.click) {
 	if (entry.path === DRAFT_PATH) return {};
-	const key = entry.is_dir ? dropKey('entry', entry.path) : undefined;
+	const key = entry.isDir ? dropKey('entry', entry.path) : undefined;
 	const blocked = (event: Event) => event.preventDefault();
 	return {
 		role: 'option',
@@ -45,7 +45,7 @@ export function entryProps(entry: FileEntry, { manager, drag, view, chooser }: E
 		onclick: (event: MouseEvent) => select(entry, event),
 		ondblclick: () => (chooser ? chooser.open(entry) : manager.openEntry(entry)),
 		onauxclick: (event: MouseEvent) => {
-			if (!chooser && event.button === 1 && entry.is_dir) void manager.openTab(entry.path);
+			if (!chooser && event.button === 1 && entry.isDir) void manager.openTab(entry.path);
 		},
 		oncontextmenu: (event: MouseEvent) => (chooser ? blocked(event) : manager.openContextMenu(event, entry)),
 		ondragstart: (event: DragEvent) => (chooser ? blocked(event) : drag.start(event, entry)),
@@ -53,7 +53,7 @@ export function entryProps(entry: FileEntry, { manager, drag, view, chooser }: E
 		ondragover: (event: DragEvent) => (chooser ? blocked(event) : drag.overEntry(event, entry, key)),
 		ondragleave: drag.leave,
 		ondrop: (event: DragEvent) => {
-			if (entry.is_dir && !chooser) void drag.drop(event, entry.path);
+			if (entry.isDir && !chooser) void drag.drop(event, entry.path);
 		}
 	};
 }

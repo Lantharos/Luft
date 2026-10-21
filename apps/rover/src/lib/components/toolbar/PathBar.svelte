@@ -49,7 +49,7 @@
 		if (remote) return { path: remote.path, label: remote.name, icon: remote.device ? Smartphone : Server };
 		const drive = manager.drives.holding(path);
 		if (!drive) return { path: '/', label: 'Computer', icon: HardDrive };
-		return { path: drive.mount_point, label: drive.name, icon: drive.is_removable ? Usb : HardDrive };
+		return { path: drive.mountPoint, label: drive.name, icon: drive.isRemovable ? Usb : HardDrive };
 	});
 	let crumbs = $derived.by((): Crumb[] => {
 		if (manager.view !== 'home') return [VIEW_CRUMBS[manager.view]];

@@ -45,7 +45,7 @@ function problemFor(name: string, counts: Map<string, number>, taken: Set<string
 
 function splitName(entry: FileEntry): [string, string] {
 	const dot = entry.name.lastIndexOf('.');
-	return entry.is_dir || dot <= 0 ? [entry.name, ''] : [entry.name.slice(0, dot), entry.name.slice(dot)];
+	return entry.isDir || dot <= 0 ? [entry.name, ''] : [entry.name.slice(0, dot), entry.name.slice(dot)];
 }
 
 function transform(stem: string, index: number, options: RenameOptions) {

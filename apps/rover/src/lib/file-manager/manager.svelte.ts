@@ -49,7 +49,7 @@ function placeKey(place: SidebarPlace): string {
 		case 'favorite':
 			return `favorite:${place.bookmark.path}`;
 		case 'drive':
-			return `drive:${place.drive.mount_point}`;
+			return `drive:${place.drive.mountPoint}`;
 		case 'network':
 			return `network:${place.entry.place.uri}`;
 		default:
@@ -128,7 +128,7 @@ export class FileManager {
 
 	receiveOperations = (operations: Operation[]) => {
 		this.operations = operations;
-		const finished = operations.filter((operation) => operation.completed_at !== null);
+		const finished = operations.filter((operation) => operation.completedAt !== null);
 		const settled = finished.some((operation) => !this.#finishedOperations.has(operation.id));
 		this.#finishedOperations = new Set(finished.map((operation) => operation.id));
 		if (settled) void this.refreshListing(this.currentPath);
@@ -338,8 +338,8 @@ export class FileManager {
 		if (!this.selection.delete(path)) this.selection.add(path);
 	};
 
-	openEntry = (entry: Pick<FileEntry, 'path' | 'is_dir'>) => {
-		if (entry.is_dir) void this.navigate(entry.path);
+	openEntry = (entry: Pick<FileEntry, 'path' | 'isDir'>) => {
+		if (entry.isDir) void this.navigate(entry.path);
 		else if (this.cloud.unreachable(entry.path)) this.notify('Connect to the internet to open files that aren’t kept on this device');
 		else api.openWithDefault(entry.path).catch(this.notify);
 	};
@@ -396,7 +396,7 @@ export class FileManager {
 	startRename = (entry: FileEntry) => {
 		this.draft = {
 			mode: 'rename',
-			itemType: entry.is_dir ? 'folder' : 'file',
+			itemType: entry.isDir ? 'folder' : 'file',
 			targetPath: entry.path,
 			value: entry.name,
 			originalName: entry.name

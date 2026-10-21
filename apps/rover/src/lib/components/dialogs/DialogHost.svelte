@@ -48,7 +48,7 @@
 	$effect(() => thumbnails.resize(thumbnailSize(pixels)));
 
 	function driveAt(entries: FileEntry[]) {
-		return entries.length === 1 ? manager.drives.list.find((drive) => drive.mount_point === entries[0].path) : undefined;
+		return entries.length === 1 ? manager.drives.list.find((drive) => drive.mountPoint === entries[0].path) : undefined;
 	}
 </script>
 

@@ -23,6 +23,7 @@ pub use windows::{closed_windows, open_windows};
 const DISKS: &str = "com.lantharos.disks.desktop";
 
 #[derive(Debug, Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct DriveInfo {
     pub name: String,
     pub mount_point: String,

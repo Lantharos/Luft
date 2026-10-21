@@ -54,7 +54,7 @@ export class DragController {
 
 	overEntry = (event: DragEvent, entry?: FileEntry, key?: string) => {
 		if (!this.#carriesPaths(event)) return;
-		if (entry && (!entry.is_dir || (this.dragging && this.paths.includes(entry.path)))) return;
+		if (entry && (!entry.isDir || (this.dragging && this.paths.includes(entry.path)))) return;
 		const path = entry?.path ?? this.#manager.currentPath;
 		this.#accept(event, { path, key: key ?? dropKey('path', path) }, this.#dropEffect(event));
 	};

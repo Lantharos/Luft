@@ -27,7 +27,7 @@ export class ColumnsData {
 		this.preview = $derived.by(() => {
 			if (manager.selection.size !== 1) return null;
 			const [path] = manager.selection;
-			return manager.entries.find((entry) => entry.path === path && entry.is_dir)?.path ?? null;
+			return manager.entries.find((entry) => entry.path === path && entry.isDir)?.path ?? null;
 		});
 		this.columns = $derived.by(() => {
 			const current = manager.currentPath;

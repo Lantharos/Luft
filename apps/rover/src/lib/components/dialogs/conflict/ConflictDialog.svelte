@@ -15,7 +15,7 @@
 	let answering = $state(false);
 
 	let conflict = $derived(operation.conflict!);
-	let folders = $derived(conflict.source.is_dir && conflict.target.is_dir);
+	let folders = $derived(conflict.source.isDir && conflict.target.isDir);
 	let incomingNewer = $derived((conflict.source.modified ?? 0) > (conflict.target.modified ?? 0));
 	let existingNewer = $derived((conflict.target.modified ?? 0) > (conflict.source.modified ?? 0));
 	let title = $derived(`${folders ? 'A folder' : 'An item'} named “${conflict.target.name}” is already here`);
@@ -45,7 +45,7 @@
 			larger={conflict.target.size > conflict.source.size}
 		/>
 		<ConflictSide
-			heading={operation.op_type === 'Move' ? 'Being moved' : 'Being copied'}
+			heading={operation.opType === 'Move' ? 'Being moved' : 'Being copied'}
 			item={conflict.source}
 			newer={incomingNewer}
 			larger={conflict.source.size > conflict.target.size}

@@ -45,7 +45,7 @@
 	}
 
 	function open(result: SearchResult) {
-		if (result.is_dir) {
+		if (result.isDir) {
 			search.close();
 			void manager.navigate(result.path);
 		} else {

@@ -23,7 +23,7 @@
 	let activeLocation = $derived(
 		locations.find((location) => location.path === chosenLocation)?.path ?? locations[0]?.path ?? null
 	);
-	let items = $derived(manager.trash.items.filter((item) => item.trash_path === activeLocation));
+	let items = $derived(manager.trash.items.filter((item) => item.trashPath === activeLocation));
 	let selectedIds = $derived(items.filter((item) => manager.selection.has(item.id)).map((item) => item.id));
 	let locationOptions = $derived(
 		locations.map((location) => ({ value: location.path, label: location.name === 'Home' ? 'Home' : location.name }))
@@ -62,14 +62,14 @@
 				onkeydown={(event) => event.key === 'Enter' && manager.toggleSelected(item.id)}
 			>
 				<span class="list-name">
-					<EntryIcon name={item.is_dir ? 'folder' : 'file'} size={24} />
+					<EntryIcon name={item.isDir ? 'folder' : 'file'} size={24} />
 					<span class="flex min-w-0 flex-col">
 						<span class="truncate">{item.name}</span>
-						<span class="truncate text-[12px] text-[var(--text-muted)]">{parentPath(item.original_path)}</span>
+						<span class="truncate text-[12px] text-[var(--text-muted)]">{parentPath(item.originalPath)}</span>
 					</span>
 				</span>
-				<span class="list-cell list-date">{formatDate(item.deleted_at)}</span>
-				<span class="list-cell list-size">{item.is_dir ? '' : bytes(item.size)}</span>
+				<span class="list-cell list-date">{formatDate(item.deletedAt)}</span>
+				<span class="list-cell list-size">{item.isDir ? '' : bytes(item.size)}</span>
 			</div>
 		{/snippet}
 	</VirtualScroller>

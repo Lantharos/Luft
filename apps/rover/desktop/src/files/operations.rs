@@ -47,6 +47,7 @@ pub enum OperationPhase {
 }
 
 #[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ConflictItem {
     pub path: String,
     pub name: String,
@@ -77,6 +78,7 @@ pub struct Decision {
 }
 
 #[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Operation {
     pub id: String,
     pub op_type: OperationType,

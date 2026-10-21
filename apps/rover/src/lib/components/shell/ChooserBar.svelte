@@ -26,7 +26,7 @@
 		if (selectedCount > 0) return `${selectedCount} selected`;
 		return config.directory ? 'Select a folder' : 'Select a file';
 	});
-	let acceptLabel = $derived(config.accept_label.trim() || (config.mode === 'save' ? 'Save' : config.mode === 'save_files' ? 'Select' : 'Open'));
+	let acceptLabel = $derived(config.acceptLabel.trim() || (config.mode === 'save' ? 'Save' : config.mode === 'save_files' ? 'Select' : 'Open'));
 	let Icon = $derived(config.mode === 'save' ? Save : config.directory || config.mode === 'save_files' ? FolderOpen : File);
 
 	function focusName(input: HTMLInputElement) {

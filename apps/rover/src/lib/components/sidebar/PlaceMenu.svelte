@@ -28,7 +28,7 @@
 
 	let place = $derived(menu.place);
 	let path = $derived(folderOf(place));
-	let opensFolder = $derived(place.kind !== 'favorite' || place.bookmark.is_dir);
+	let opensFolder = $derived(place.kind !== 'favorite' || place.bookmark.isDir);
 
 	function folderOf(place: SidebarPlace) {
 		if (place.kind === 'folder') return place.path;
@@ -45,7 +45,7 @@
 
 	function open() {
 		if (place.kind === 'recent' || place.kind === 'trash') return manager.showView(place.kind);
-		if (place.kind === 'favorite') return manager.openEntry(bookmarks.bookmarkTarget(place.bookmark));
+		if (place.kind === 'favorite') return manager.openEntry(place.bookmark);
 		if (place.kind === 'network' && !path) return manager.openAddress(place.entry.place.uri);
 		return manager.navigate(path!);
 	}

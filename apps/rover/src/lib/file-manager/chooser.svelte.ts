@@ -2,7 +2,6 @@ import { join } from '@luft/ui';
 import * as api from '#lib/bridge/index.js';
 import type { ChooserConfig, FileEntry, PinnedFolder } from '#lib/types/index.js';
 import type { FileManager } from './manager.svelte';
-import { bookmarkTarget } from './places/bookmarks';
 
 export class ChooserState {
 	readonly config: ChooserConfig;
@@ -16,7 +15,7 @@ export class ChooserState {
 	constructor(config: ChooserConfig, manager: FileManager) {
 		this.config = config;
 		this.#manager = manager;
-		this.saveName = config.current_name ?? '';
+		this.saveName = config.currentName ?? '';
 	}
 
 	accepts = (entry: Pick<FileEntry, 'isDir'>) => {
@@ -40,8 +39,8 @@ export class ChooserState {
 	};
 
 	openFavorite = (favorite: PinnedFolder) => {
-		if (favorite.is_dir) return void this.#manager.navigate(favorite.path);
-		if (this.accepts(bookmarkTarget(favorite))) void this.submit([favorite.path]);
+		if (favorite.isDir) return void this.#manager.navigate(favorite.path);
+		if (this.accepts(favorite)) void this.submit([favorite.path]);
 	};
 
 	selectRange = (paths: string[]) => {
@@ -68,7 +67,7 @@ export class ChooserState {
 
 	#acceptPaths() {
 		const manager = this.#manager;
-		const folder = manager.currentPath || this.config.current_folder || manager.homePath;
+		const folder = manager.currentPath || this.config.currentFolder || manager.homePath;
 		if (this.config.mode === 'save') {
 			const name = this.saveName.trim();
 			return name ? [join(folder, name)] : [];

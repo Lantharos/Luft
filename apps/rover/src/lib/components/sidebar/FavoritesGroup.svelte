@@ -35,12 +35,12 @@
 	}
 
 	function icon(bookmark: PinnedFolder) {
-		return KIND_ICONS[bookmark.icon as FileKind] ?? KIND_ICONS[bookmark.is_dir ? 'folder' : 'file'];
+		return KIND_ICONS[bookmark.icon as FileKind] ?? KIND_ICONS[bookmark.isDir ? 'folder' : 'file'];
 	}
 
 	function open(bookmark: PinnedFolder) {
 		if (chooser) chooser.openFavorite(bookmark);
-		else manager.openEntry(bookmarks.bookmarkTarget(bookmark));
+		else manager.openEntry(bookmark);
 	}
 
 	function groupDragOver(event: DragEvent) {
@@ -73,7 +73,7 @@
 
 	function rowDragOver(event: DragEvent, bookmark: PinnedFolder) {
 		if (!moving) {
-			if (bookmark.is_dir) drag.overPath(event, bookmark.path, key(bookmark.path));
+			if (bookmark.isDir) drag.overPath(event, bookmark.path, key(bookmark.path));
 			return;
 		}
 		if (moving === bookmark.path) return;
@@ -85,7 +85,7 @@
 
 	function rowDrop(event: DragEvent, bookmark: PinnedFolder) {
 		if (!moving) {
-			if (bookmark.is_dir) void drag.drop(event, bookmark.path);
+			if (bookmark.isDir) void drag.drop(event, bookmark.path);
 			return;
 		}
 		if (moving === bookmark.path) return;
@@ -123,10 +123,10 @@
 			icon={icon(bookmark)}
 			label={bookmark.name}
 			active={manager.view === 'home' && manager.currentPath === bookmark.path}
-			dropping={bookmark.is_dir && drag.target?.key === key(bookmark.path)}
+			dropping={bookmark.isDir && drag.target?.key === key(bookmark.path)}
 			draggable="true"
 			onclick={() => open(bookmark)}
-			onauxclick={(event) => onopentab(event, () => (bookmark.is_dir ? manager.openTab(bookmark.path) : manager.openEntry(bookmarks.bookmarkTarget(bookmark))))}
+			onauxclick={(event) => onopentab(event, () => (bookmark.isDir ? manager.openTab(bookmark.path) : manager.openEntry(bookmark)))}
 			oncontextmenu={(event) => onmenu(event, { kind: 'favorite', bookmark })}
 			ondragstart={(event) => startMoving(event, bookmark.path)}
 			ondragover={(event) => rowDragOver(event, bookmark)}

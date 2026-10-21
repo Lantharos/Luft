@@ -108,18 +108,18 @@ export type ChooserMode = 'open' | 'save' | 'save_files';
 export interface ChooserConfig {
 	mode: ChooserMode;
 	title: string;
-	accept_label: string;
+	acceptLabel: string;
 	directory: boolean;
 	multiple: boolean;
-	current_folder: string | null;
-	current_name: string | null;
+	currentFolder: string | null;
+	currentName: string | null;
 	files: string[];
 }
 
 export interface PinnedFolder {
 	name: string;
 	path: string;
-	is_dir: boolean;
+	isDir: boolean;
 	icon: string | null;
 }
 

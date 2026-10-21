@@ -81,7 +81,7 @@
 	async function start() {
 		const state = await api.appState();
 		chooser = state.chooser && new ChooserState(state.chooser, manager);
-		await manager.start(state, state.chooser?.current_folder ?? undefined);
+		await manager.start(state, state.chooser?.currentFolder ?? undefined);
 		if (!state.chooser) await openLaunchPaths(manager, state.launchPaths);
 		const operations = await api.listOperations();
 		manager.receiveOperations(operations);

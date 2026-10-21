@@ -46,6 +46,7 @@ impl ChooserMode {
 }
 
 #[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ChooserConfig {
     pub mode: ChooserMode,
     pub title: String,

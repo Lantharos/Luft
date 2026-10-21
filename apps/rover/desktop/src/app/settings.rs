@@ -44,6 +44,7 @@ pub struct ListColumn {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct PinnedFolder {
     pub name: String,
     pub path: String,

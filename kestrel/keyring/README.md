@@ -13,11 +13,7 @@ How secrets are encrypted, unlocked and what that protects against is in [docs/s
 | `wire` | Messages exchanged between the three programs above |
 | `pinentry` | `luft-pinentry`, GnuPG's passphrase and PIN prompt |
 | `data` | Units, D-Bus, portal, PAM and SELinux files |
-| `tools` | Install script and tests |
-
-## Install
-
-Luft's image carries the keyring. On a regular Fedora install, `kestrel/tools/install.sh install` installs it with Kestrel (building needs `tpm2-tss-devel`), along with its PAM rules, units, its `luft-keyring` group and a small SELinux module. Sign out and in once with your password afterwards to set up the keyring and seal it to the TPM. `kestrel/tools/install.sh remove` leaves your data in place.
+| `tools` | Tests |
 
 ## Testing
 

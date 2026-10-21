@@ -21,24 +21,7 @@ make build   # release build, including SushiBoot
 make check   # rustfmt, clippy for Linux and UEFI, tests
 ```
 
-The VM used to test boots, hand-overs and updates is described in [docs/testing.md](../../docs/testing.md#boot-vm).
-
-## Install on Fedora
-
-The Luft image carries Sushi. On a regular Fedora install it goes next to Plymouth:
-
-```sh
-boot/sushi/scripts/install.sh install   # build, install and rebuild the initramfs
-boot/sushi/scripts/install.sh enable    # use Sushi on every boot
-boot/sushi/scripts/install.sh disable   # go back to Plymouth
-boot/sushi/scripts/install.sh remove    # uninstall
-```
-
-Keep the `plymouth` package installed: updaters such as `dnf5 offline`, PackageKit and fwupd report progress through its tool, and Sushi answers it. `enable` adds the `sushi` kernel argument along with the ones that keep the kernel, systemd and the console quiet.
-
-- Display managers other than greetd need to run `sushictl deactivate` before starting their compositor, or rely on `sushi-quit.service`.
-- greetd should run on the seventh virtual terminal (`vt = 7`), as Kestrel's `greetd.toml` does.
-- With NVIDIA, keep `nvidia-drm.fbdev=1`, the default with current drivers.
+The VM used to test boots and hand-overs is described in [docs/testing.md](../../docs/testing.md#boot-vm).
 
 Its configuration, `sushictl` and SushiBoot's menu and entries are in [the Sushi reference](../../docs/components/sushi.md).
 

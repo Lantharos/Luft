@@ -2,99 +2,128 @@
 set -euo pipefail
 
 luft="$(cd "$(dirname "$0")/../../../.." && pwd)"
+kestrel="$luft/kestrel"
 destdir="$1"
 out="$2"
 work="${LUFT_BUILD:-/var/tmp/luft-build}/kestrel"
-
-# shellcheck source=../../../../kestrel/tools/install.sh
-source "$luft/kestrel/tools/install.sh"
 prefix=/usr
-keyring_pam=/usr/lib64/security
+libexec=/usr/libexec
 export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-$work/cargo}"
 release="$CARGO_TARGET_DIR/release"
+compositor_extras=(
+  bin/mutter share/GConf/gsettings/mutter-schemas.convert share/man/man1/gdctl.1
+  share/man/man1/gnome-service-client.1 share/man/man1/mutter.1
+)
 
-image_path() {
-  case "$1" in
-    /usr/local/*) echo "/usr/${1#/usr/local/}" ;;
-    /etc/dbus-1/*) echo "/usr/share/dbus-1/${1#/etc/dbus-1/}" ;;
-    *) echo "$1" ;;
-  esac
+greeter_files() {
+  echo "com.lantharos.Greeter1.conf /usr/share/dbus-1/system.d/com.lantharos.Greeter1.conf"
+  echo "com.lantharos.Greeter1.service /usr/share/dbus-1/system-services/com.lantharos.Greeter1.service"
+  echo "kestrel-greeter.service /usr/lib/systemd/system/kestrel-greeter.service"
+  echo "com.lantharos.greeter.policy /usr/share/polkit-1/actions/com.lantharos.greeter.policy"
+  echo "kestrel-greeter.tmpfiles /usr/lib/tmpfiles.d/kestrel-greeter.conf"
+  echo "greetd.toml /etc/greetd/config.toml"
+}
+
+keyring_files() {
+  echo "system/luft-keyring.sysusers /usr/lib/sysusers.d/luft-keyring.conf"
+  echo "system/luft-keyring-unlock.socket /usr/lib/systemd/system/luft-keyring-unlock.socket"
+  echo "system/luft-keyring-unlock.service /usr/lib/systemd/system/luft-keyring-unlock.service"
+  echo "user/luft-keyring.service /usr/lib/systemd/user/luft-keyring.service"
+  echo "user/luft-keyring.socket /usr/lib/systemd/user/luft-keyring.socket"
+  echo "dbus/org.freedesktop.secrets.service /usr/share/dbus-1/services/org.freedesktop.secrets.service"
+  echo "dbus/com.lantharos.Keyring1.service /usr/share/dbus-1/services/com.lantharos.Keyring1.service"
+  echo "dbus/luft-keyring.portal /usr/share/xdg-desktop-portal/portals/luft-keyring.portal"
+  echo "pam/kestrel-unlock /etc/pam.d/kestrel-unlock"
+  echo "pam/kestrel-unlock-fingerprint /etc/pam.d/kestrel-unlock-fingerprint"
+  echo "pam/greetd /etc/pam.d/greetd"
+}
+
+watchdog_files() {
+  echo "com.lantharos.Kestrel.Watchdog1.conf /usr/share/dbus-1/system.d/com.lantharos.Kestrel.Watchdog1.conf"
+  echo "com.lantharos.Kestrel.Watchdog1.service /usr/share/dbus-1/system-services/com.lantharos.Kestrel.Watchdog1.service"
+  echo "kestrel-watchdog.service /usr/lib/systemd/system/kestrel-watchdog.service"
+  echo "kestrel-incident.service /usr/lib/systemd/system/kestrel-incident.service"
+}
+
+passkeys_files() {
+  echo "luft-passkeys-relay.socket /usr/lib/systemd/system/luft-passkeys-relay.socket"
+  echo "luft-passkeys-relay@.service /usr/lib/systemd/system/luft-passkeys-relay@.service"
+  echo "luft-passkeys.service /usr/lib/systemd/user/luft-passkeys.service"
+  echo "com.lantharos.Passkeys.service /usr/share/dbus-1/services/com.lantharos.Passkeys.service"
 }
 
 place() {
-  install -Dm"$2" /dev/stdin "$destdir$(image_path "$1")"
+  install -Dm"$2" /dev/stdin "$destdir$1"
+}
+
+fill() {
+  sed -e "s|@libexecdir@|$libexec|g" -e "s|@bindir@|$prefix/bin|g" -e "s|@pamdir@|/usr/lib64/security|g" "$1"
+}
+
+stage_files() {
+  local data="$1" source target
+  while read -r source target; do
+    fill "$data/$source" | place "$target" 644
+  done
 }
 
 keep_sources_in_work() {
   mkdir -p "$work/run"
-  ln -sfn "$work/run" "$luft/kestrel/run"
+  ln -sfn "$work/run" "$kestrel/run"
 }
 
 build_compositor() {
-  "$luft/kestrel/compositor/build.sh" "$work/compositor" "$prefix"
+  local extra
+  "$kestrel/compositor/build.sh" "$work/compositor" "$prefix"
   DESTDIR="$destdir" meson install -C "$work/compositor" --no-rebuild --quiet
-  compositor_extras | while read -r file; do rm -f "$destdir$prefix/$file"; done
+  for extra in "${compositor_extras[@]}"; do rm -f "$destdir$prefix/$extra"; done
 }
 
 build_engine() {
   local setup=()
   [[ -f "$work/engine/build.ninja" ]] && setup+=(--reconfigure)
   (cd "$luft" && bun install --frozen-lockfile --filter @luft/kestrel-ui)
-  export NODE_PATH="$luft/kestrel/ui/node_modules"
-  meson setup "${setup[@]}" "$work/engine" "$luft/kestrel/engine" \
+  export NODE_PATH="$kestrel/ui/node_modules"
+  meson setup "${setup[@]}" "$work/engine" "$kestrel/engine" \
     -Dpkg_config_path="$prefix/lib/pkgconfig" --prefix="$prefix" --buildtype=release
   meson compile -C "$work/engine"
   DESTDIR="$destdir" meson install -C "$work/engine" --no-rebuild --quiet
 }
 
 build_services() {
-  local project
-  for project in settings search openconnect peek greeter keyring watchdog; do
-    cargo build --release --locked --manifest-path "$luft/kestrel/$project/Cargo.toml"
+  local project program
+  for project in settings search openconnect peek greeter keyring watchdog passkeys; do
+    cargo build --release --locked --manifest-path "$kestrel/$project/Cargo.toml"
   done
-  install -Dm755 "$release/kestrel-settings" "$destdir/usr/libexec/kestrel-settings"
-  install -Dm755 "$release/kestrel-search" "$destdir/usr/libexec/kestrel-search"
-  install -Dm755 "$release/kestrel-openconnect" "$destdir/usr/libexec/kestrel-openconnect"
   install -Dm755 "$release/peek" "$destdir/usr/bin/peek"
-  install -Dm755 "$release/kestrel-greeter-service" "$destdir/usr/libexec/kestrel-greeter-service"
-  install -Dm755 "$release/kestrel-watchdog" "$destdir/usr/libexec/kestrel-watchdog"
-  for program in luft-keyring luft-keyring-unlock luft-pinentry; do
-    install -Dm755 "$release/$program" "$destdir/usr/libexec/$program"
+  for program in kestrel-settings kestrel-search kestrel-openconnect kestrel-greeter-service kestrel-watchdog \
+    luft-keyring luft-keyring-unlock luft-pinentry luft-passkeys luft-passkeys-relay; do
+    install -Dm755 "$release/$program" "$destdir$libexec/$program"
   done
-  install -Dm755 "$release/libpam_luft_keyring.so" "$destdir$keyring_pam/pam_luft_keyring.so"
+  install -Dm755 "$release/libpam_luft_keyring.so" "$destdir/usr/lib64/security/pam_luft_keyring.so"
 }
 
 stage_service_files() {
-  local source target
-  greeter_files | while read -r source target; do
-    sed -e "s|@libexecdir@|$prefix/libexec|g" -e "s|@bindir@|$prefix/bin|g" "$greeter_data/$source" | place "$target" 644
-  done
-  sed "s|@bindir@|$prefix/bin|g" "$greeter_data/greetd.toml" | place /etc/greetd/config.toml 644
-  { keyring_system_files; keyring_user_files; } | while read -r source target; do
-    keyring_fill "$source" | place "$target" 644
-  done
-  place /usr/share/selinux/packages/luft-keyring.cil 644 < "$keyring_data/selinux/luft-keyring.cil"
-  echo "pinentry-program $prefix/libexec/luft-pinentry" | place /etc/gnupg/gpg-agent.conf 644
-  watchdog_files | while read -r source target; do
-    sed "s|@libexecdir@|$prefix/libexec|g" "$watchdog_root/data/$source" | place "$target" 644
-  done
+  greeter_files | stage_files "$kestrel/greeter/data"
+  keyring_files | stage_files "$kestrel/keyring/data"
+  watchdog_files | stage_files "$kestrel/watchdog/data"
+  passkeys_files | stage_files "$kestrel/passkeys/data"
+  place /usr/share/selinux/packages/luft-keyring.cil 644 < "$kestrel/keyring/data/selinux/luft-keyring.cil"
+  echo "pinentry-program $libexec/luft-pinentry" | place /etc/gnupg/gpg-agent.conf 644
   install -d "$destdir/usr/share/fonts"
   ln -sfn ../kestrel/fonts "$destdir/usr/share/fonts/luft"
 }
 
 stage_presets() {
-  {
-    echo "enable greetd.service"
-    authenticator_units | grep -v '@' | sed 's/^/enable /'
-    echo "enable luft-keyring-unlock.socket"
-    echo "enable kestrel-incident.service"
-  } | place /usr/lib/systemd/system-preset/40-luft-kestrel.preset 644
+  printf 'enable %s\n' greetd.service kestrel-authenticate.socket luft-keyring-unlock.socket kestrel-incident.service \
+    luft-passkeys-relay.socket | place /usr/lib/systemd/system-preset/40-luft-kestrel.preset 644
   printf 'enable %s\n' luft-keyring.socket luft-keyring.service |
     place /usr/lib/systemd/user-preset/40-luft-keyring.preset 644
+  printf 'enable luft-passkeys.service\n' | place /usr/lib/systemd/user-preset/40-luft-passkeys.preset 644
 }
 
 list_typelibs() {
-  grep -rhoE "gi://[A-Za-z0-9]+" "$luft/kestrel/engine/js" "$luft/kestrel/ui/src" | cut -d/ -f3 | sort -u
+  grep -rhoE "gi://[A-Za-z0-9]+" "$kestrel/engine/js" "$kestrel/ui/src" | cut -d/ -f3 | sort -u
 }
 
 keep_sources_in_work

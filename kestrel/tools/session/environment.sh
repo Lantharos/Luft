@@ -23,10 +23,6 @@ wait_until() {
   exit 1
 }
 
-system_data_dirs() {
-  tr ':' '\n' <<< "${XDG_DATA_DIRS:-/usr/local/share:/usr/share}" | grep -v '^/opt/kestrel' | paste -sd:
-}
-
 require_build() {
   if [[ ! -f "$compositor/libmutter-51.so" ]]; then
     echo "Build Kestrel's compositor first: kestrel/compositor/build.sh" >&2
@@ -116,7 +112,7 @@ prepare_session() {
   dconf dump /org/gnome/desktop/input-sources/ > "$session/input-sources.ini"
   dconf read /com/lantharos/kestrel/favorite-apps > "$session/favorites.txt"
 
-  export XDG_DATA_DIRS="${XDG_DATA_HOME:-$HOME/.local/share}:$compositor_data:$(system_data_dirs)"
+  export XDG_DATA_DIRS="${XDG_DATA_HOME:-$HOME/.local/share}:$compositor_data:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
   export XDG_CONFIG_HOME="$session/config" XDG_DATA_HOME="$session/data" XDG_STATE_HOME="$session/state"
   cache_link="${XDG_RUNTIME_DIR:-/tmp}/kestrel-cache-$(session_hash "$session" 12)"
   ln -sfn "$session/cache" "$cache_link"

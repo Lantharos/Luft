@@ -87,7 +87,7 @@ mod tests {
 vt = 1 # the first console
 
 [default_session]
-command = \"/opt/kestrel/bin/kestrel-greeter\"
+command = \"/usr/bin/kestrel-greeter\"
 user = \"greetd\"
 ";
 

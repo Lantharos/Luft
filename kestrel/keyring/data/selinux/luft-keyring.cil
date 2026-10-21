@@ -14,8 +14,6 @@
 (typeattributeset non_security_file_type (luft_keyring_unlock_exec_t))
 (typeattributeset non_auth_file_type (luft_keyring_unlock_exec_t))
 (filecon "/usr/libexec/luft-keyring-unlock" file (system_u object_r luft_keyring_unlock_exec_t ((s0) (s0))))
-(filecon "/usr/local/libexec/luft-keyring-unlock" file (system_u object_r luft_keyring_unlock_exec_t ((s0) (s0))))
-(filecon "/opt/kestrel/libexec/luft-keyring-unlock" file (system_u object_r luft_keyring_unlock_exec_t ((s0) (s0))))
 
 (type luft_keyring_unlock_t)
 (roletype system_r luft_keyring_unlock_t)

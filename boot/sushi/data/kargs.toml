@@ -1,0 +1,1 @@
+kargs = ["sushi", "plymouth.enable=0", "quiet", "loglevel=3", "systemd.show_status=false", "rd.udev.log_level=3", "udev.log_level=3", "vt.global_cursor_default=0", "fbcon=vc:0-5"]

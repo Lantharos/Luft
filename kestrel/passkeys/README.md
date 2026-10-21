@@ -15,15 +15,6 @@ Browsers see Luft Passkeys as a USB security key, so Chrome, Chromium-based brow
 
 Private keys are made inside the TPM when there is one, and passkeys stay bound to the computer. Browsers treat it as a security key, so they don't offer passkeys in autofill until the [Credentials portal](https://github.com/flatpak/xdg-desktop-portal/pull/1889) lands. Using it is described in [Keyring and passkeys](https://docs.luft.computer/files/keyring-and-passkeys/).
 
-## Install
-
-Luft's image carries Luft Passkeys. On a regular Fedora system, after `kestrel/tools/install.sh install`:
-
-```sh
-kestrel/passkeys/install.sh install   # build, install into /opt/kestrel and enable
-kestrel/passkeys/install.sh remove    # disable and remove; saved passkeys stay in the keyring
-```
-
 ## Development
 
 ```sh

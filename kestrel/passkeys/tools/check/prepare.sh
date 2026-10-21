@@ -21,7 +21,15 @@ if [[ "$(cat "$vm/.passkeys-packages" 2>/dev/null)" != "${packages[*]}" ]]; then
 fi
 
 rm -rf "$stage"
-DESTDIR="$stage" "$passkeys/install.sh" install "$prefix"
+cargo build --release --manifest-path "$passkeys/Cargo.toml"
+install -Dm755 -t "$stage$libexec" "$passkeys/target/release/luft-passkeys" "$passkeys/target/release/luft-passkeys-relay"
+passkeys_unit() {
+  sed "s|@libexecdir@|$libexec|g" "$passkeys/data/$1" | install -Dm644 /dev/stdin "$stage$2/$1"
+}
+passkeys_unit luft-passkeys-relay.socket /usr/local/lib/systemd/system
+passkeys_unit luft-passkeys-relay@.service /usr/local/lib/systemd/system
+passkeys_unit luft-passkeys.service /usr/local/lib/systemd/user
+passkeys_unit com.lantharos.Passkeys.service /usr/local/share/dbus-1/services
 
 cargo build --release --manifest-path "$keyring/Cargo.toml"
 install -Dm755 -t "$stage$libexec" "$keyring/target/release/luft-keyring" "$keyring/target/release/luft-keyring-unlock"

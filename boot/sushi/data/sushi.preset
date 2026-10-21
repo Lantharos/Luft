@@ -1,0 +1,5 @@
+enable sushi.service
+enable sushi-quit.service
+enable sushi-shutdown.service
+enable sushi-drivers.service
+enable sushi-integrity.service

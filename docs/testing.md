@@ -119,7 +119,6 @@ Everything lives in `boot/sushi/vm`; set `SUSHI_VM` to use another folder. The `
 | --- | --- |
 | `LUKS=1` | Encrypts the root disk |
 | `MENU_TIMEOUT=3` | Shows SushiBoot's menu |
-| `LAYOUT=fedora` | Lays the disk out like Fedora's installer, with shim and GRUB |
 | `DRIVER=initramfs` (default) | Sushi loads the graphics driver itself in the initramfs, as with NVIDIA. Use with `GPU=vga` |
 | `DRIVER=system` | The driver isn't in the initramfs, as right after a kernel update |
 | `DRIVER=udev` | udev loads the driver, which switches the screen off on its own |
@@ -141,13 +140,4 @@ Recording boots frame by frame:
 scripts/vm/record.py /tmp/frames --seconds 40 --type "16:sushi-vm"   # type the passphrase at 16 s
 scripts/vm/frames.py /tmp/frames                                     # when the screen went black, froze or changed mode
 scripts/vm/journal.sh -b 0 -u sushi                                  # the VM's journal, after it shuts down
-```
-
-To watch an offline update:
-
-```sh
-scripts/vm/update.sh
-scripts/vm/disk.sh
-scripts/vm/record.py /tmp/frames --seconds 60 \
-  --serial "login: =>root" --serial "Password: =>sushi-vm" --serial "]# =>dnf5 offline reboot -y"
 ```

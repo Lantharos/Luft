@@ -14,10 +14,6 @@ options=(
   -Dcogl_tests=false -Dclutter_tests=false -Dmutter_tests=false -Dinstalled_tests=false
 )
 
-as_owner() {
-  if [[ -w "$(dirname "$1")" ]]; then "${@:2}"; else sudo "${@:2}"; fi
-}
-
 fingerprint() {
   {
     printf '%s\n' "${options[@]}"
@@ -39,5 +35,5 @@ if [[ -f "$build_dir/build.ninja" ]]; then
 fi
 meson setup "${setup[@]}" "$build_dir" "$source_dir" "${options[@]}"
 meson compile -C "$build_dir"
-as_owner "$prefix" meson install -C "$build_dir" --no-rebuild
+meson install -C "$build_dir" --no-rebuild
 echo "$current" > "$stamp"

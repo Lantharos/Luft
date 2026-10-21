@@ -39,7 +39,6 @@ COPY --from=kestrel-build /out/ /
 FROM builder AS boot-build
 COPY boot/sushi /src/boot/sushi
 COPY security /src/security
-COPY kestrel/passkeys /src/kestrel/passkeys
 COPY kestrel/engine/data/fonts /src/kestrel/engine/data/fonts
 COPY os/image/parts/stages/boot.sh os/image/parts/stages/needed.sh os/image/parts/stages/source-times.ts /src/os/image/parts/stages/
 ARG SIGNED_BY

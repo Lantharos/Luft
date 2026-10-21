@@ -3,7 +3,6 @@
 settings-protection-cancel = Loobu
 settings-protection-continue = Jätka
 settings-protection-close = Sulge
-settings-protection-done = Valmis
 settings-protection-restart = Taaskäivita
 settings-protection-remove = Eemalda
 settings-protection-turn-on = Lülita sisse
@@ -201,7 +200,6 @@ settings-encryption-turn-on-title = Seadme krüptimise sisselülitamine
 settings-encryption-turn-on-description = Teie failid jäävad privaatseks, kui arvuti kaob või varastatakse. Ilma õige võtmeta ei saa keegi ketast lugeda.
 settings-encryption-blocked-title = Seadme krüptimist ei saa veel sisse lülitada
 settings-encryption-blocked-description = Lahendage allpool märgitud probleemid ja proovige siis uuesti.
-settings-encryption-checking = Arvuti kontrollimine…
 settings-encryption-backup = Enne alustamist veenduge, et teie olulistest failidest on varukoopia.
 settings-encryption-key-title = Salvestage taastevõti
 settings-encryption-key-description = Kui ketas ei saa kunagi iseenesest avaneda, näiteks pärast remonti, pääsete selle võtmega uuesti sisse. Hoidke seda kusagil mujal kui selles arvutis.
@@ -217,7 +215,6 @@ settings-encryption-step-background = Ülejäänu toimub taustal, samal ajal kui
 settings-encryption-step-plugged-in = Hoidke arvuti vooluvõrgus, kuni krüptimine on lõpetatud.
 settings-encryption-ask-pin = Küsi ka PIN-koodi
 settings-encryption-ask-pin-description = Hoiab ketta lukus ka siis, kui keegi arvuti ära viib. Seda küsitakse pärast krüptimise lõppu.
-settings-encryption-back = Tagasi
 settings-encryption-starting-button = Alustamine…
 settings-encryption-restart-and-encrypt = Taaskäivita ja krüpti
 
@@ -285,12 +282,6 @@ settings-encryption-pin-too-long = { $max ->
 settings-encryption-pins-differ = PIN-koodid ei ühti
 settings-encryption-confirm-field = Kinnita
 settings-encryption-type-again = Tippige uuesti
-settings-encryption-passphrase-field = Paroolifraas
-settings-encryption-passphrase-length = { $min ->
-    [one] Vähemalt { $min } märk
-   *[other] Vähemalt { $min } märki
-}
-settings-encryption-passphrases-differ = Paroolifraasid ei ühti
 
 ## Recovery key
 
@@ -305,7 +296,6 @@ settings-recovery-shown-title = Teie taastevõti
 settings-recovery-shown-description = Tippige see, kui arvuti küsib käivitamisel kunagi taastevõtit. Hoidke koopiat kusagil mujal kui selles arvutis.
 settings-recovery-fresh-title = Salvestage uus taastevõti
 settings-recovery-fresh-description = Eelmine võti enam ei tööta. Hoidke see paberil või paroolihalduris.
-settings-recovery-saved = Olen taastevõtme salvestanud
 
 ## Passwords and keys (the keyring)
 

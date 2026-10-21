@@ -57,7 +57,7 @@ Strings in Luft's Bulgarian translation that a native speaker should check. Each
 - `apps/settings/locales/bg/personalization.ftl` `settings-appearance-icons-clear`: "Прозрачни" — assumes "Clear" means glass-like transparent icons, not "remove".
 - `apps/settings/locales/bg/protection.ftl` `settings-security-anti-cheat`: "Игри със защита срещу измами" — anti-cheat has no settled Bulgarian term; gamers may simply say "анти-чийт".
 - `apps/settings/locales/bg/system.ftl` `settings-datetime-increase`: "Увеличи: { $label }" — colon used so the case of Час/Минута doesn't matter.
-- `apps/settings/locales/bg/protection.ftl` `settings-encryption-passphrase-field`: "Парола за диска" — used for passphrase in Settings and in setup, to keep it apart from the account password; check it reads naturally everywhere.
+- `packages/ui/locales/bg/ui.ftl` `ui-passphrase-field`: "Парола за диска" — used for passphrase in Settings and in setup, to keep it apart from the account password; check it reads naturally everywhere.
 - `apps/settings/locales/bg/personalization.ftl` `settings-appearance-wallpaper-folder-description`: "Снимки › Wallpapers" — "Снимки" is used for the Pictures folder throughout; check it matches the folder name Bulgarian systems actually create (some use "Изображения").
 
 ## Website

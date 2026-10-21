@@ -46,6 +46,7 @@ ui-recovery-key-copy = Αντιγραφή
 ui-recovery-key-saved = Αποθηκεύτηκε
 ui-recovery-key-printing = Στάλθηκε στον εκτυπωτή
 ui-recovery-key-copied = Αντιγράφηκε
+ui-recovery-key-kept = Αποθήκευσα το κλειδί αποκατάστασης
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside
@@ -95,3 +96,22 @@ ui-power-watts = { $watts } W
 ## Dialog buttons
 
 ui-dialog-cancel = Ακύρωση
+ui-dialog-close = Κλείσιμο
+ui-dialog-back = Πίσω
+ui-dialog-continue = Συνέχεια
+ui-dialog-done = Τέλος
+
+## Passphrases
+
+ui-passphrase-field = Φράση πρόσβασης
+ui-passphrase-confirm = Επιβεβαίωση
+ui-passphrase-type-again = Πληκτρολογήστε το ξανά
+ui-passphrase-length = { $min ->
+    [one] Τουλάχιστον { $min } χαρακτήρας
+   *[other] Τουλάχιστον { $min } χαρακτήρες
+}
+ui-passphrase-mismatch = Οι φράσεις πρόσβασης δεν ταιριάζουν
+
+## Encryption
+
+ui-encryption-checking = Έλεγχος…

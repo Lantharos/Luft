@@ -2,7 +2,7 @@
 	import { t } from '@luft/i18n';
 	import { Dialog } from '@luft/ui';
 	import { problem, turnOffEncryption } from '../api';
-	import { withUnlock } from './unlock.svelte';
+	import { withUnlock } from './unlocking/unlock.svelte';
 
 	let { onclose }: { onclose: () => void } = $props();
 

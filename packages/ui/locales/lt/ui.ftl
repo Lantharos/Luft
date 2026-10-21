@@ -46,6 +46,7 @@ ui-recovery-key-copy = Kopijuoti
 ui-recovery-key-saved = Įrašyta
 ui-recovery-key-printing = Nusiųsta į spausdintuvą
 ui-recovery-key-copied = Nukopijuota
+ui-recovery-key-kept = Atkūrimo raktą įrašiau
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside
@@ -95,3 +96,24 @@ ui-power-watts = { $watts } W
 ## Dialog buttons
 
 ui-dialog-cancel = Atšaukti
+ui-dialog-close = Uždaryti
+ui-dialog-back = Atgal
+ui-dialog-continue = Tęsti
+ui-dialog-done = Atlikta
+
+## Passphrases
+
+ui-passphrase-field = Slaptafrazė
+ui-passphrase-confirm = Patvirtinti
+ui-passphrase-type-again = Įveskite dar kartą
+ui-passphrase-length = { $min ->
+    [one] Bent { $min } simbolis
+    [few] Bent { $min } simboliai
+    [many] Bent { $min } simbolio
+   *[other] Bent { $min } simbolių
+}
+ui-passphrase-mismatch = Slaptafrazės nesutampa
+
+## Encryption
+
+ui-encryption-checking = Tikrinama…

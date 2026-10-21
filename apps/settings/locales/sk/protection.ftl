@@ -3,7 +3,6 @@
 settings-protection-cancel = Zrušiť
 settings-protection-continue = Pokračovať
 settings-protection-close = Zavrieť
-settings-protection-done = Hotovo
 settings-protection-restart = Reštartovať
 settings-protection-remove = Odstrániť
 settings-protection-turn-on = Zapnúť
@@ -217,7 +216,6 @@ settings-encryption-turn-on-title = Zapnúť šifrovanie zariadenia
 settings-encryption-turn-on-description = Vaše súbory zostanú súkromné, aj keď sa počítač stratí alebo ho niekto ukradne. Bez správneho kľúča disk nikto neprečíta.
 settings-encryption-blocked-title = Šifrovanie zariadenia sa zatiaľ nedá zapnúť
 settings-encryption-blocked-description = Vyriešte to, čo je označené nižšie, a skúste to znova.
-settings-encryption-checking = Kontroluje sa počítač…
 settings-encryption-backup = Pred začatím sa uistite, že máte zálohované dôležité súbory.
 settings-encryption-key-title = Uložte si kľúč na obnovenie
 settings-encryption-key-description = Ak sa disk niekedy nebude môcť odomknúť sám, napríklad po oprave, týmto kľúčom sa k nemu znova dostanete. Uchovajte ho niekde mimo tohto počítača.
@@ -233,7 +231,6 @@ settings-encryption-step-background = Zvyšok prebehne na pozadí, kým budete �
 settings-encryption-step-plugged-in = Kým sa to nedokončí, nechajte počítač pripojený k napájaniu.
 settings-encryption-ask-pin = Vyžadovať aj kód PIN
 settings-encryption-ask-pin-description = Disk zostane zamknutý, aj keď niekto vezme počítač. Kód PIN sa nastaví po dokončení šifrovania.
-settings-encryption-back = Späť
 settings-encryption-starting-button = Spúšťa sa…
 settings-encryption-restart-and-encrypt = Reštartovať a šifrovať
 
@@ -305,14 +302,6 @@ settings-encryption-pin-too-long = { $max ->
 settings-encryption-pins-differ = Kódy PIN sa nezhodujú
 settings-encryption-confirm-field = Potvrdenie
 settings-encryption-type-again = Zadajte ho znova
-settings-encryption-passphrase-field = Prístupová fráza
-settings-encryption-passphrase-length = { $min ->
-    [one] Aspoň { $min } znak
-    [few] Aspoň { $min } znaky
-    [many] Aspoň { $min } znaku
-   *[other] Aspoň { $min } znakov
-}
-settings-encryption-passphrases-differ = Prístupové frázy sa nezhodujú
 
 ## Recovery key
 
@@ -327,7 +316,6 @@ settings-recovery-shown-title = Váš kľúč na obnovenie
 settings-recovery-shown-description = Zadajte ho, ak si počítač niekedy pri spustení vyžiada kľúč na obnovenie. Kópiu si uchovajte niekde mimo tohto počítača.
 settings-recovery-fresh-title = Uložte si nový kľúč na obnovenie
 settings-recovery-fresh-description = Predchádzajúci kľúč už nefunguje. Tento si uchovajte na papieri alebo v správcovi hesiel.
-settings-recovery-saved = Kľúč na obnovenie mám uložený
 
 ## Passwords and keys (the keyring)
 

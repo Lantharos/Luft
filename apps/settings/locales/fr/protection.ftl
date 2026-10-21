@@ -3,7 +3,6 @@
 settings-protection-cancel = Annuler
 settings-protection-continue = Continuer
 settings-protection-close = Fermer
-settings-protection-done = Terminé
 settings-protection-restart = Redémarrer
 settings-protection-remove = Supprimer
 settings-protection-turn-on = Activer
@@ -201,7 +200,6 @@ settings-encryption-turn-on-title = Activer le chiffrement de l’appareil
 settings-encryption-turn-on-description = Vos fichiers restent privés si cet ordinateur est perdu ou volé. Sans la bonne clé, personne ne peut lire le disque.
 settings-encryption-blocked-title = Le chiffrement de l’appareil ne peut pas encore être activé
 settings-encryption-blocked-description = Réglez les points signalés ci-dessous, puis réessayez.
-settings-encryption-checking = Vérification de votre ordinateur…
 settings-encryption-backup = Avant de commencer, assurez-vous que vos fichiers importants sont sauvegardés.
 settings-encryption-key-title = Enregistrez votre clé de récupération
 settings-encryption-key-description = Si le disque ne peut plus se déverrouiller tout seul, par exemple après une réparation, cette clé vous permet d’y accéder. Conservez-la ailleurs que sur cet ordinateur.
@@ -217,7 +215,6 @@ settings-encryption-step-background = Le reste se fait en arrière-plan pendant 
 settings-encryption-step-plugged-in = Laissez l’ordinateur branché jusqu’à la fin.
 settings-encryption-ask-pin = Demander aussi un code PIN
 settings-encryption-ask-pin-description = Le disque reste verrouillé même si quelqu’un prend l’ordinateur. Le code sera demandé une fois le chiffrement terminé.
-settings-encryption-back = Retour
 settings-encryption-starting-button = Démarrage…
 settings-encryption-restart-and-encrypt = Redémarrer et chiffrer
 
@@ -285,12 +282,6 @@ settings-encryption-pin-too-long = { $max ->
 settings-encryption-pins-differ = Les codes PIN ne correspondent pas
 settings-encryption-confirm-field = Confirmation
 settings-encryption-type-again = Répétez la saisie
-settings-encryption-passphrase-field = Phrase secrète
-settings-encryption-passphrase-length = { $min ->
-    [one] Au moins { $min } caractère
-   *[other] Au moins { $min } caractères
-}
-settings-encryption-passphrases-differ = Les phrases secrètes ne correspondent pas
 
 ## Recovery key
 
@@ -305,7 +296,6 @@ settings-recovery-shown-title = Votre clé de récupération
 settings-recovery-shown-description = Tapez-la si votre ordinateur demande une clé de récupération au démarrage. Conservez-en une copie ailleurs que sur cet ordinateur.
 settings-recovery-fresh-title = Enregistrez votre nouvelle clé de récupération
 settings-recovery-fresh-description = Votre ancienne clé ne fonctionne plus. Conservez celle-ci sur papier ou dans un gestionnaire de mots de passe.
-settings-recovery-saved = J’ai enregistré ma clé de récupération
 
 ## Passwords and keys (the keyring)
 

@@ -3,7 +3,6 @@
 settings-protection-cancel = Annuleren
 settings-protection-continue = Doorgaan
 settings-protection-close = Sluiten
-settings-protection-done = Klaar
 settings-protection-restart = Opnieuw opstarten
 settings-protection-remove = Verwijderen
 settings-protection-turn-on = Inschakelen
@@ -201,7 +200,6 @@ settings-encryption-turn-on-title = Apparaatversleuteling inschakelen
 settings-encryption-turn-on-description = Je bestanden blijven privé als deze computer kwijtraakt of wordt gestolen. Zonder de juiste sleutel kan niemand de schijf lezen.
 settings-encryption-blocked-title = Apparaatversleuteling kan nog niet worden ingeschakeld
 settings-encryption-blocked-description = Los op wat hieronder is gemarkeerd en probeer het dan opnieuw.
-settings-encryption-checking = Je computer wordt gecontroleerd…
 settings-encryption-backup = Zorg voordat je begint dat er een back-up van je belangrijke bestanden is.
 settings-encryption-key-title = Je herstelsleutel bewaren
 settings-encryption-key-description = Als de schijf ooit niet vanzelf kan ontgrendelen, bijvoorbeeld na een reparatie, kom je met deze sleutel weer binnen. Bewaar hem ergens anders dan op deze computer.
@@ -217,7 +215,6 @@ settings-encryption-step-background = De rest gebeurt op de achtergrond terwijl 
 settings-encryption-step-plugged-in = Houd de computer aan de stroom tot het klaar is.
 settings-encryption-ask-pin = Ook om een pincode vragen
 settings-encryption-ask-pin-description = Houdt de schijf vergrendeld, zelfs als iemand de computer meeneemt. Er wordt om gevraagd zodra het versleutelen klaar is.
-settings-encryption-back = Terug
 settings-encryption-starting-button = Starten…
 settings-encryption-restart-and-encrypt = Opnieuw opstarten en versleutelen
 
@@ -285,12 +282,6 @@ settings-encryption-pin-too-long = { $max ->
 settings-encryption-pins-differ = De pincodes komen niet overeen
 settings-encryption-confirm-field = Bevestigen
 settings-encryption-type-again = Typ hem opnieuw
-settings-encryption-passphrase-field = Wachtwoordzin
-settings-encryption-passphrase-length = { $min ->
-    [one] Minstens { $min } teken
-   *[other] Minstens { $min } tekens
-}
-settings-encryption-passphrases-differ = De wachtwoordzinnen komen niet overeen
 
 ## Recovery key
 
@@ -305,7 +296,6 @@ settings-recovery-shown-title = Je herstelsleutel
 settings-recovery-shown-description = Typ hem als je computer bij het opstarten ooit om een herstelsleutel vraagt. Bewaar een kopie ergens anders dan op deze computer.
 settings-recovery-fresh-title = Je nieuwe herstelsleutel bewaren
 settings-recovery-fresh-description = Je vorige sleutel werkt niet meer. Bewaar deze op papier of in een wachtwoordbeheerder.
-settings-recovery-saved = Ik heb mijn herstelsleutel bewaard
 
 ## Passwords and keys (the keyring)
 

@@ -3,7 +3,6 @@
 settings-protection-cancel = Avbryt
 settings-protection-continue = Hald fram
 settings-protection-close = Lukk
-settings-protection-done = Ferdig
 settings-protection-restart = Start på nytt
 settings-protection-remove = Fjern
 settings-protection-turn-on = Slå på
@@ -201,7 +200,6 @@ settings-encryption-turn-on-title = Slå på einingskryptering
 settings-encryption-turn-on-description = Filene dine blir verande private om denne datamaskinen blir borte eller stolen. Utan rett nøkkel kan ingen lese disken.
 settings-encryption-blocked-title = Einingskryptering kan ikkje slåast på enno
 settings-encryption-blocked-description = Ordne det som er merkt nedanfor, og prøv igjen.
-settings-encryption-checking = Kontrollerer datamaskinen …
 settings-encryption-backup = Før du byrjar, sjå til at du har sikkerheitskopi av dei viktige filene dine.
 settings-encryption-key-title = Lagre gjenopprettingsnøkkelen
 settings-encryption-key-description = Om disken ein gong ikkje kan låsast opp av seg sjølv, til dømes etter ein reparasjon, får du tilgang att med denne nøkkelen. Ta vare på han ein annan stad enn på denne datamaskinen.
@@ -217,7 +215,6 @@ settings-encryption-step-background = Resten skjer i bakgrunnen medan du held fr
 settings-encryption-step-plugged-in = Ha datamaskinen kopla til straum til det er ferdig.
 settings-encryption-ask-pin = Spør òg etter ein PIN-kode
 settings-encryption-ask-pin-description = Held disken låst sjølv om nokon tek datamaskinen. Du blir beden om han når krypteringa er ferdig.
-settings-encryption-back = Tilbake
 settings-encryption-starting-button = Startar …
 settings-encryption-restart-and-encrypt = Start på nytt og krypter
 
@@ -285,12 +282,6 @@ settings-encryption-pin-too-long = { $max ->
 settings-encryption-pins-differ = PIN-kodane er ikkje like
 settings-encryption-confirm-field = Stadfest
 settings-encryption-type-again = Skriv han inn igjen
-settings-encryption-passphrase-field = Passfrase
-settings-encryption-passphrase-length = { $min ->
-    [one] Minst { $min } teikn
-   *[other] Minst { $min } teikn
-}
-settings-encryption-passphrases-differ = Passfrasane er ikkje like
 
 ## Recovery key
 
@@ -305,7 +296,6 @@ settings-recovery-shown-title = Gjenopprettingsnøkkelen din
 settings-recovery-shown-description = Skriv han inn dersom datamaskinen ein gong spør etter ein gjenopprettingsnøkkel ved oppstart. Ta vare på ein kopi ein annan stad enn på denne datamaskinen.
 settings-recovery-fresh-title = Lagre den nye gjenopprettingsnøkkelen
 settings-recovery-fresh-description = Den førre nøkkelen verkar ikkje lenger. Ta vare på denne på papir eller i ein passordhandsamar.
-settings-recovery-saved = Eg har lagra gjenopprettingsnøkkelen
 
 ## Passwords and keys (the keyring)
 

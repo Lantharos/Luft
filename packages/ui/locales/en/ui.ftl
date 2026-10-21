@@ -60,6 +60,8 @@ ui-recovery-key-saved = Saved
 ui-recovery-key-printing = Sent to the printer
 # Shown after the key was copied to the clipboard
 ui-recovery-key-copied = Copied
+# Checkbox confirming the recovery key was written down or saved
+ui-recovery-key-kept = I’ve saved my recovery key
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside
@@ -113,3 +115,28 @@ ui-power-watts = { $watts } W
 ## Dialog buttons
 
 ui-dialog-cancel = Cancel
+# Closes a dialog
+ui-dialog-close = Close
+# Goes to the previous step of a dialog
+ui-dialog-back = Back
+ui-dialog-continue = Continue
+ui-dialog-done = Done
+
+## Passphrases
+
+ui-passphrase-field = Passphrase
+# Label of the field where the passphrase is typed a second time
+ui-passphrase-confirm = Confirm
+# Placeholder of the field where the passphrase is typed a second time
+ui-passphrase-type-again = Type it again
+# Placeholder of the passphrase field. $min is the shortest allowed length
+ui-passphrase-length = { $min ->
+    [one] At least { $min } character
+   *[other] At least { $min } characters
+}
+ui-passphrase-mismatch = The passphrases don’t match
+
+## Encryption
+
+# Shown while checking whether a disk can be encrypted
+ui-encryption-checking = Checking…

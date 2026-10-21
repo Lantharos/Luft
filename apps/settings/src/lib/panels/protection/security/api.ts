@@ -1,3 +1,4 @@
+import type { EncryptionCheck } from '@luft/ui';
 import { invoke, listen } from '#lib/bridge.js';
 
 const WAIT_FOR_PERMISSION = { timeoutMs: 300_000 };
@@ -64,12 +65,6 @@ export interface Trust {
 	antiCheat: AntiCheat;
 }
 
-export interface Check {
-	id: string;
-	passed: boolean;
-	sentence: string;
-}
-
 export type Fix = 'maker' | 'firmware' | 'system' | 'unknown';
 
 export interface Protection {
@@ -104,7 +99,7 @@ export const usbProtection = () => invoke<UsbProtection | null>('security_usb');
 export const onUsbProtection = (callback: (usb: UsbProtection) => void) => listen<UsbProtection>('security.usb', callback);
 export const setUsbProtection = (enabled: boolean) => invoke<void>('security_set_usb', { enabled }, WAIT_FOR_PERMISSION);
 
-export const checkEncryption = () => invoke<Check[]>('security_check_encryption', {}, WAIT_FOR_PERMISSION);
+export const checkEncryption = () => invoke<EncryptionCheck[]>('security_check_encryption', {}, WAIT_FOR_PERMISSION);
 export const generateRecoveryKey = () => invoke<string>('security_generate_key', {}, WAIT_FOR_PERMISSION);
 export const turnOnEncryption = (recoveryKey: string, pin: string, passphrase: string) =>
 	invoke<void>('security_turn_on', { recoveryKey, pin, passphrase }, WAIT_FOR_PERMISSION);

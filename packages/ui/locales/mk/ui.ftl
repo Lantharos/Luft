@@ -46,6 +46,7 @@ ui-recovery-key-copy = Копирај
 ui-recovery-key-saved = Зачувано
 ui-recovery-key-printing = Испратено до печатачот
 ui-recovery-key-copied = Копирано
+ui-recovery-key-kept = Го зачував клучот за обновување
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside
@@ -95,3 +96,22 @@ ui-power-watts = { $watts } W
 ## Dialog buttons
 
 ui-dialog-cancel = Откажи
+ui-dialog-close = Затвори
+ui-dialog-back = Назад
+ui-dialog-continue = Продолжи
+ui-dialog-done = Готово
+
+## Passphrases
+
+ui-passphrase-field = Тајна фраза
+ui-passphrase-confirm = Потврда
+ui-passphrase-type-again = Внесете го повторно
+ui-passphrase-length = { $min ->
+    [one] Најмалку { $min } знак
+   *[other] Најмалку { $min } знаци
+}
+ui-passphrase-mismatch = Тајните фрази не се совпаѓаат
+
+## Encryption
+
+ui-encryption-checking = Се проверува…

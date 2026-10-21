@@ -3,7 +3,6 @@
 settings-protection-cancel = Atcelt
 settings-protection-continue = Turpināt
 settings-protection-close = Aizvērt
-settings-protection-done = Gatavs
 settings-protection-restart = Restartēt
 settings-protection-remove = Noņemt
 settings-protection-turn-on = Ieslēgt
@@ -209,7 +208,6 @@ settings-encryption-turn-on-title = Ieslēgt ierīces šifrēšanu
 settings-encryption-turn-on-description = Jūsu faili paliek privāti, ja dators tiek pazaudēts vai nozagts. Bez pareizās atslēgas neviens nevar nolasīt disku.
 settings-encryption-blocked-title = Ierīces šifrēšanu vēl nevar ieslēgt
 settings-encryption-blocked-description = Novērsiet tālāk atzīmēto un mēģiniet vēlreiz.
-settings-encryption-checking = Pārbauda datoru…
 settings-encryption-backup = Pirms sākat, pārliecinieties, ka svarīgajiem failiem ir rezerves kopijas.
 settings-encryption-key-title = Saglabājiet atkopšanas atslēgu
 settings-encryption-key-description = Ja disks kādreiz nevar atbloķēties pats, piemēram, pēc remonta, ar šo atslēgu varēsiet piekļūt. Glabājiet to kaut kur citur, ne šajā datorā.
@@ -225,7 +223,6 @@ settings-encryption-step-background = Pārējais notiek fonā, kamēr turpināt 
 settings-encryption-step-plugged-in = Neatvienojiet datoru no barošanas, līdz viss ir pabeigts.
 settings-encryption-ask-pin = Prasīt arī PIN
 settings-encryption-ask-pin-description = Disks paliek bloķēts, pat ja kāds paņem datoru. PIN tiks prasīts, kad šifrēšana būs pabeigta.
-settings-encryption-back = Atpakaļ
 settings-encryption-starting-button = Sāk…
 settings-encryption-restart-and-encrypt = Restartēt un šifrēt
 
@@ -295,13 +292,6 @@ settings-encryption-pin-too-long = { $max ->
 settings-encryption-pins-differ = PIN kodi nesakrīt
 settings-encryption-confirm-field = Apstiprināt
 settings-encryption-type-again = Ievadiet vēlreiz
-settings-encryption-passphrase-field = Paroles frāze
-settings-encryption-passphrase-length = { $min ->
-    [zero] Vismaz { $min } rakstzīmes
-    [one] Vismaz { $min } rakstzīme
-   *[other] Vismaz { $min } rakstzīmes
-}
-settings-encryption-passphrases-differ = Paroles frāzes nesakrīt
 
 ## Recovery key
 
@@ -316,7 +306,6 @@ settings-recovery-shown-title = Jūsu atkopšanas atslēga
 settings-recovery-shown-description = Ievadiet to, ja dators startēšanas laikā kādreiz prasa atkopšanas atslēgu. Glabājiet kopiju kaut kur citur, ne šajā datorā.
 settings-recovery-fresh-title = Saglabājiet jauno atkopšanas atslēgu
 settings-recovery-fresh-description = Iepriekšējā atslēga vairs nedarbojas. Glabājiet šo uz papīra vai paroļu pārvaldniekā.
-settings-recovery-saved = Atkopšanas atslēga ir saglabāta
 
 ## Passwords and keys (the keyring)
 

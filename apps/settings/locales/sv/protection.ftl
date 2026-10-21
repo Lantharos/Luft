@@ -3,7 +3,6 @@
 settings-protection-cancel = Avbryt
 settings-protection-continue = Fortsätt
 settings-protection-close = Stäng
-settings-protection-done = Klar
 settings-protection-restart = Starta om
 settings-protection-remove = Ta bort
 settings-protection-turn-on = Slå på
@@ -201,7 +200,6 @@ settings-encryption-turn-on-title = Slå på enhetskryptering
 settings-encryption-turn-on-description = Dina filer förblir privata om datorn kommer bort eller blir stulen. Utan rätt nyckel kan ingen läsa disken.
 settings-encryption-blocked-title = Det går inte att slå på enhetskryptering än
 settings-encryption-blocked-description = Åtgärda det som är markerat nedan och försök sedan igen.
-settings-encryption-checking = Kontrollerar datorn …
 settings-encryption-backup = Se till att du har säkerhetskopior av dina viktiga filer innan du börjar.
 settings-encryption-key-title = Spara återställningsnyckeln
 settings-encryption-key-description = Om disken någon gång inte kan låsas upp av sig själv, till exempel efter en reparation, kommer du in med den här nyckeln. Förvara den någon annanstans än på den här datorn.
@@ -217,7 +215,6 @@ settings-encryption-step-background = Resten sker i bakgrunden medan du fortsät
 settings-encryption-step-plugged-in = Låt datorn vara ansluten till laddaren tills det är klart.
 settings-encryption-ask-pin = Fråga också efter en PIN-kod
 settings-encryption-ask-pin-description = Håller disken låst även om någon tar datorn. Du ombeds ange den när krypteringen är klar.
-settings-encryption-back = Tillbaka
 settings-encryption-starting-button = Startar …
 settings-encryption-restart-and-encrypt = Starta om och kryptera
 
@@ -285,12 +282,6 @@ settings-encryption-pin-too-long = { $max ->
 settings-encryption-pins-differ = PIN-koderna matchar inte
 settings-encryption-confirm-field = Bekräfta
 settings-encryption-type-again = Skriv den igen
-settings-encryption-passphrase-field = Lösenfras
-settings-encryption-passphrase-length = { $min ->
-    [one] Minst { $min } tecken
-   *[other] Minst { $min } tecken
-}
-settings-encryption-passphrases-differ = Lösenfraserna matchar inte
 
 ## Recovery key
 
@@ -305,7 +296,6 @@ settings-recovery-shown-title = Din återställningsnyckel
 settings-recovery-shown-description = Skriv den om datorn någon gång frågar efter en återställningsnyckel vid start. Förvara en kopia någon annanstans än på den här datorn.
 settings-recovery-fresh-title = Spara den nya återställningsnyckeln
 settings-recovery-fresh-description = Den tidigare nyckeln fungerar inte längre. Förvara den här på papper eller i en lösenordshanterare.
-settings-recovery-saved = Jag har sparat min återställningsnyckel
 
 ## Passwords and keys (the keyring)
 

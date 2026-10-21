@@ -3,7 +3,6 @@
 settings-protection-cancel = Hætta við
 settings-protection-continue = Halda áfram
 settings-protection-close = Loka
-settings-protection-done = Lokið
 settings-protection-restart = Endurræsa
 settings-protection-remove = Fjarlægja
 settings-protection-turn-on = Kveikja
@@ -201,7 +200,6 @@ settings-encryption-turn-on-title = Kveikja á dulritun tækis
 settings-encryption-turn-on-description = Skrárnar þínar eru áfram lokaðar öðrum ef tölvan týnist eða henni er stolið. Án rétta lykilsins getur enginn lesið diskinn.
 settings-encryption-blocked-title = Ekki er hægt að kveikja á dulritun tækis strax
 settings-encryption-blocked-description = Leystu það sem er merkt hér fyrir neðan og reyndu svo aftur.
-settings-encryption-checking = Athugar tölvuna…
 settings-encryption-backup = Áður en þú byrjar skaltu ganga úr skugga um að mikilvægar skrár séu afritaðar.
 settings-encryption-key-title = Vistaðu endurheimtarlykilinn
 settings-encryption-key-description = Ef diskurinn getur einhvern tímann ekki opnast sjálfkrafa, til dæmis eftir viðgerð, kemstu inn með þessum lykli. Geymdu hann annars staðar en á þessari tölvu.
@@ -217,7 +215,6 @@ settings-encryption-step-background = Afgangurinn gerist í bakgrunni á meðan 
 settings-encryption-step-plugged-in = Hafðu tölvuna tengda við rafmagn þar til þessu er lokið.
 settings-encryption-ask-pin = Biðja einnig um PIN-númer
 settings-encryption-ask-pin-description = Heldur diskinum læstum jafnvel þótt einhver taki tölvuna. Beðið er um það þegar dulrituninni lýkur.
-settings-encryption-back = Til baka
 settings-encryption-starting-button = Byrjar…
 settings-encryption-restart-and-encrypt = Endurræsa og dulrita
 
@@ -285,12 +282,6 @@ settings-encryption-pin-too-long = { $max ->
 settings-encryption-pins-differ = PIN-númerin passa ekki saman
 settings-encryption-confirm-field = Staðfesta
 settings-encryption-type-again = Sláðu það inn aftur
-settings-encryption-passphrase-field = Lykilsetning
-settings-encryption-passphrase-length = { $min ->
-    [one] Að minnsta kosti { $min } stafur
-   *[other] Að minnsta kosti { $min } stafir
-}
-settings-encryption-passphrases-differ = Lykilsetningarnar passa ekki saman
 
 ## Recovery key
 
@@ -305,7 +296,6 @@ settings-recovery-shown-title = Endurheimtarlykillinn þinn
 settings-recovery-shown-description = Sláðu hann inn ef tölvan biður einhvern tímann um endurheimtarlykil við ræsingu. Geymdu afrit annars staðar en á þessari tölvu.
 settings-recovery-fresh-title = Vistaðu nýja endurheimtarlykilinn
 settings-recovery-fresh-description = Fyrri lykillinn virkar ekki lengur. Geymdu þennan á pappír eða í lykilorðastjóra.
-settings-recovery-saved = Ég hef vistað endurheimtarlykilinn
 
 ## Passwords and keys (the keyring)
 

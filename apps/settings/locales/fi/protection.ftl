@@ -3,7 +3,6 @@
 settings-protection-cancel = Peruuta
 settings-protection-continue = Jatka
 settings-protection-close = Sulje
-settings-protection-done = Valmis
 settings-protection-restart = Käynnistä uudelleen
 settings-protection-remove = Poista
 settings-protection-turn-on = Ota käyttöön
@@ -201,7 +200,6 @@ settings-encryption-turn-on-title = Ota laitteen salaus käyttöön
 settings-encryption-turn-on-description = Tiedostosi pysyvät yksityisinä, vaikka tietokone katoaisi tai varastettaisiin. Ilman oikeaa avainta kukaan ei voi lukea levyä.
 settings-encryption-blocked-title = Laitteen salausta ei voi vielä ottaa käyttöön
 settings-encryption-blocked-description = Korjaa alla merkityt kohdat ja yritä sitten uudelleen.
-settings-encryption-checking = Tarkistetaan tietokonetta…
 settings-encryption-backup = Varmista ennen aloittamista, että tärkeistä tiedostoistasi on varmuuskopio.
 settings-encryption-key-title = Tallenna palautusavain
 settings-encryption-key-description = Jos levyn lukitus ei joskus avaudu itsestään, esimerkiksi korjauksen jälkeen, pääset tällä avaimella takaisin sisään. Säilytä sitä muualla kuin tässä tietokoneessa.
@@ -217,7 +215,6 @@ settings-encryption-step-background = Loput tapahtuu taustalla, kun jatkat työs
 settings-encryption-step-plugged-in = Pidä tietokone kytkettynä laturiin, kunnes salaus on valmis.
 settings-encryption-ask-pin = Kysy myös PIN-koodia
 settings-encryption-ask-pin-description = Pitää levyn lukittuna, vaikka joku veisi tietokoneen. PIN-koodi kysytään, kun salaus on valmis.
-settings-encryption-back = Takaisin
 settings-encryption-starting-button = Aloitetaan…
 settings-encryption-restart-and-encrypt = Käynnistä uudelleen ja salaa
 
@@ -285,12 +282,6 @@ settings-encryption-pin-too-long = { $max ->
 settings-encryption-pins-differ = PIN-koodit eivät täsmää
 settings-encryption-confirm-field = Vahvista
 settings-encryption-type-again = Kirjoita uudelleen
-settings-encryption-passphrase-field = Tunnuslause
-settings-encryption-passphrase-length = { $min ->
-    [one] Vähintään { $min } merkki
-   *[other] Vähintään { $min } merkkiä
-}
-settings-encryption-passphrases-differ = Tunnuslauseet eivät täsmää
 
 ## Recovery key
 
@@ -305,7 +296,6 @@ settings-recovery-shown-title = Palautusavaimesi
 settings-recovery-shown-description = Kirjoita se, jos tietokone joskus kysyy palautusavainta käynnistyksessä. Säilytä kopiota muualla kuin tässä tietokoneessa.
 settings-recovery-fresh-title = Tallenna uusi palautusavain
 settings-recovery-fresh-description = Edellinen avaimesi ei enää toimi. Säilytä tätä paperilla tai salasanojen hallintasovelluksessa.
-settings-recovery-saved = Olen tallentanut palautusavaimeni
 
 ## Passwords and keys (the keyring)
 

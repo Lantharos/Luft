@@ -46,6 +46,7 @@ ui-recovery-key-copy = Afrita
 ui-recovery-key-saved = Vistað
 ui-recovery-key-printing = Sent í prentara
 ui-recovery-key-copied = Afritað
+ui-recovery-key-kept = Ég hef vistað endurheimtarlykilinn
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside
@@ -95,3 +96,22 @@ ui-power-watts = { $watts } W
 ## Dialog buttons
 
 ui-dialog-cancel = Hætta við
+ui-dialog-close = Loka
+ui-dialog-back = Til baka
+ui-dialog-continue = Halda áfram
+ui-dialog-done = Lokið
+
+## Passphrases
+
+ui-passphrase-field = Lykilsetning
+ui-passphrase-confirm = Staðfesta
+ui-passphrase-type-again = Sláðu það inn aftur
+ui-passphrase-length = { $min ->
+    [one] Að minnsta kosti { $min } stafur
+   *[other] Að minnsta kosti { $min } stafir
+}
+ui-passphrase-mismatch = Lykilsetningarnar passa ekki saman
+
+## Encryption
+
+ui-encryption-checking = Athugar…

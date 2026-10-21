@@ -3,7 +3,6 @@
 settings-protection-cancel = Ikkanċella
 settings-protection-continue = Kompli
 settings-protection-close = Agħlaq
-settings-protection-done = Lest
 settings-protection-restart = Irristartja
 settings-protection-remove = Neħħi
 settings-protection-turn-on = Ixgħel
@@ -225,7 +224,6 @@ settings-encryption-turn-on-title = Ixgħel iċ-ċċifrar tal-apparat
 settings-encryption-turn-on-description = Il-fajls jibqgħu privati jekk dan il-kompjuter jintilef jew jinsteraq. Mingħajr iċ-ċavetta t-tajba, ħadd ma jista’ jaqra d-diska.
 settings-encryption-blocked-title = Iċ-ċċifrar tal-apparat għadu ma jistax jinxtegħel
 settings-encryption-blocked-description = Irranġa dak li hu mmarkat hawn taħt, imbagħad erġa’ pprova.
-settings-encryption-checking = Qed jiġi ċċekkjat il-kompjuter…
 settings-encryption-backup = Qabel tibda, kun ċert li għandek backup tal-fajls importanti.
 settings-encryption-key-title = Issejvja ċ-ċavetta tal-irkupru
 settings-encryption-key-description = Jekk xi darba d-diska ma tkunx tista’ tiżblokka waħedha, bħal wara tiswija, din iċ-ċavetta ddaħħlek lura. Żommha x’imkien għajr f’dan il-kompjuter.
@@ -241,7 +239,6 @@ settings-encryption-step-background = Il-bqija jsir fl-isfond waqt li tkompli ta
 settings-encryption-step-plugged-in = Żomm il-kompjuter imqabbad mal-elettriku sakemm jispiċċa.
 settings-encryption-ask-pin = Itlob ukoll PIN
 settings-encryption-ask-pin-description = Iżżomm id-diska msakkra anke jekk xi ħadd jieħu l-kompjuter. Jintalab ladarba jispiċċa ċ-ċċifrar.
-settings-encryption-back = Lura
 settings-encryption-starting-button = Qed jibda…
 settings-encryption-restart-and-encrypt = Irristartja u ċċifra
 
@@ -315,15 +312,6 @@ settings-encryption-pin-too-long = { $max ->
 settings-encryption-pins-differ = Il-PINs ma jaqblux
 settings-encryption-confirm-field = Ikkonferma
 settings-encryption-type-again = Erġa’ ittajpjah
-settings-encryption-passphrase-field = Passphrase
-settings-encryption-passphrase-length = { $min ->
-    [one] Mill-inqas { $min } karattru
-    [two] Mill-inqas { $min } karattri
-    [few] Mill-inqas { $min } karattri
-    [many] Mill-inqas { $min } karattru
-   *[other] Mill-inqas { $min } karattru
-}
-settings-encryption-passphrases-differ = Il-passphrases ma jaqblux
 
 ## Recovery key
 
@@ -338,7 +326,6 @@ settings-recovery-shown-title = Iċ-ċavetta tal-irkupru
 settings-recovery-shown-description = Ittajpjaha jekk xi darba l-kompjuter jitlob ċavetta tal-irkupru meta jistartja. Żomm kopja x’imkien għajr f’dan il-kompjuter.
 settings-recovery-fresh-title = Issejvja ċ-ċavetta tal-irkupru l-ġdida
 settings-recovery-fresh-description = Iċ-ċavetta ta’ qabel ma tibqax taħdem. Żomm din fuq il-karta jew f’password manager.
-settings-recovery-saved = Issejvjajt iċ-ċavetta tal-irkupru
 
 ## Passwords and keys (the keyring)
 

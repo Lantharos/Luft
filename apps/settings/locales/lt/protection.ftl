@@ -3,7 +3,6 @@
 settings-protection-cancel = Atšaukti
 settings-protection-continue = Tęsti
 settings-protection-close = Uždaryti
-settings-protection-done = Atlikta
 settings-protection-restart = Paleisti iš naujo
 settings-protection-remove = Pašalinti
 settings-protection-turn-on = Įjungti
@@ -217,7 +216,6 @@ settings-encryption-turn-on-title = Įjungti įrenginio šifravimą
 settings-encryption-turn-on-description = Jūsų failai liks privatūs, jei šis kompiuteris bus pamestas ar pavogtas. Be tinkamo rakto niekas negalės perskaityti disko.
 settings-encryption-blocked-title = Įrenginio šifravimo kol kas įjungti negalima
 settings-encryption-blocked-description = Sutvarkykite toliau pažymėtus dalykus ir bandykite dar kartą.
-settings-encryption-checking = Tikrinamas jūsų kompiuteris…
 settings-encryption-backup = Prieš pradėdami įsitikinkite, kad svarbių failų atsarginės kopijos padarytos.
 settings-encryption-key-title = Įrašykite atkūrimo raktą
 settings-encryption-key-description = Jei diskas kada nors negalės atsirakinti savaime, pavyzdžiui, po remonto, šis raktas padės vėl patekti į sistemą. Laikykite jį ne šiame kompiuteryje.
@@ -233,7 +231,6 @@ settings-encryption-step-background = Visa kita vyks fone, kol jūs dirbsite tol
 settings-encryption-step-plugged-in = Kol bus baigta, laikykite kompiuterį prijungtą prie maitinimo.
 settings-encryption-ask-pin = Taip pat prašyti PIN kodo
 settings-encryption-ask-pin-description = Diskas liks užrakintas, net jei kas nors paims kompiuterį. Jo bus paprašyta, kai šifravimas baigsis.
-settings-encryption-back = Atgal
 settings-encryption-starting-button = Pradedama…
 settings-encryption-restart-and-encrypt = Paleisti iš naujo ir šifruoti
 
@@ -305,14 +302,6 @@ settings-encryption-pin-too-long = { $max ->
 settings-encryption-pins-differ = PIN kodai nesutampa
 settings-encryption-confirm-field = Patvirtinti
 settings-encryption-type-again = Įveskite dar kartą
-settings-encryption-passphrase-field = Slaptafrazė
-settings-encryption-passphrase-length = { $min ->
-    [one] Bent { $min } simbolis
-    [few] Bent { $min } simboliai
-    [many] Bent { $min } simbolio
-   *[other] Bent { $min } simbolių
-}
-settings-encryption-passphrases-differ = Slaptafrazės nesutampa
 
 ## Recovery key
 
@@ -327,7 +316,6 @@ settings-recovery-shown-title = Jūsų atkūrimo raktas
 settings-recovery-shown-description = Įveskite jį, jei kompiuteris paleidžiant kada nors paprašys atkūrimo rakto. Kopiją laikykite ne šiame kompiuteryje.
 settings-recovery-fresh-title = Įrašykite naująjį atkūrimo raktą
 settings-recovery-fresh-description = Ankstesnis raktas nebeveikia. Šį laikykite popieriuje arba slaptažodžių tvarkytuvėje.
-settings-recovery-saved = Atkūrimo raktą įrašiau
 
 ## Passwords and keys (the keyring)
 

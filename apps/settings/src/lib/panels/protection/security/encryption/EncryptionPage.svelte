@@ -5,7 +5,7 @@
 	import type { Trust } from '../api';
 	import DrivesRow from './DrivesRow.svelte';
 	import EncryptionRow from './EncryptionRow.svelte';
-	import UnlockSection from './UnlockSection.svelte';
+	import UnlockSection from './unlocking/UnlockSection.svelte';
 
 	let { trust, onclose }: { trust: Trust; onclose: () => void } = $props();
 

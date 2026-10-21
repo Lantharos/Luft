@@ -3,7 +3,6 @@
 settings-protection-cancel = Отмена
 settings-protection-continue = Продолжить
 settings-protection-close = Закрыть
-settings-protection-done = Готово
 settings-protection-restart = Перезагрузить
 settings-protection-remove = Удалить
 settings-protection-turn-on = Включить
@@ -217,7 +216,6 @@ settings-encryption-turn-on-title = Включить шифрование уст
 settings-encryption-turn-on-description = Ваши файлы останутся недоступны посторонним, если компьютер потеряется или его украдут. Без нужного ключа никто не сможет прочитать диск.
 settings-encryption-blocked-title = Шифрование устройства пока нельзя включить
 settings-encryption-blocked-description = Устраните то, что отмечено ниже, и попробуйте ещё раз.
-settings-encryption-checking = Проверка компьютера…
 settings-encryption-backup = Перед началом убедитесь, что у важных файлов есть резервные копии.
 settings-encryption-key-title = Сохраните ключ восстановления
 settings-encryption-key-description = Если диск не сможет разблокироваться сам, например после ремонта, этот ключ вернёт вам доступ. Храните его не на этом компьютере.
@@ -233,7 +231,6 @@ settings-encryption-step-background = Остальное происходит в
 settings-encryption-step-plugged-in = Не отключайте компьютер от сети до завершения.
 settings-encryption-ask-pin = Также запрашивать PIN-код
 settings-encryption-ask-pin-description = Диск останется заблокированным, даже если компьютер украдут. PIN-код будет запрошен после завершения шифрования.
-settings-encryption-back = Назад
 settings-encryption-starting-button = Запуск…
 settings-encryption-restart-and-encrypt = Перезагрузить и зашифровать
 
@@ -305,14 +302,6 @@ settings-encryption-pin-too-long = { $max ->
 settings-encryption-pins-differ = PIN-коды не совпадают
 settings-encryption-confirm-field = Подтверждение
 settings-encryption-type-again = Введите ещё раз
-settings-encryption-passphrase-field = Парольная фраза
-settings-encryption-passphrase-length = { $min ->
-    [one] Не менее { $min } символа
-    [few] Не менее { $min } символов
-    [many] Не менее { $min } символов
-   *[other] Не менее { $min } символа
-}
-settings-encryption-passphrases-differ = Парольные фразы не совпадают
 
 ## Recovery key
 
@@ -327,7 +316,6 @@ settings-recovery-shown-title = Ваш ключ восстановления
 settings-recovery-shown-description = Введите его, если компьютер при запуске запросит ключ восстановления. Храните копию не на этом компьютере.
 settings-recovery-fresh-title = Сохраните новый ключ восстановления
 settings-recovery-fresh-description = Прежний ключ больше не работает. Храните этот на бумаге или в менеджере паролей.
-settings-recovery-saved = Ключ восстановления сохранён
 
 ## Passwords and keys (the keyring)
 

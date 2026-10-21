@@ -119,6 +119,9 @@ $effect(() => {
 | `SeekBar`, `VolumeControl` | The position and volume parts on their own; `onseek` and `onscrub` |
 | `NativeVideoSurface` | Plays `src` through Sabine's native video for formats Chromium can't decode; bind `player`, handle `onfail` |
 | `RecoveryKey` | Recovery key in groups of eight with copy, `onsave` and `onprint` |
+| `RecoveryKeyDialog` | A recovery key in a dialog; `fresh` keeps it open until the person confirms they kept the key |
+| `EncryptionWizard` | Turning on encryption in four steps: checks, the recovery key, how it unlocks (the `unlock` snippet) and a `summary`, then `onfinish` |
+| `PassphraseFields` | A new passphrase typed twice, with a `minimum` length and room for a strength meter as `children` |
 | `Choice` | Large option button with an icon, title, description and optional `note` |
 | `SplitBar` | Draggable bar that splits a drive's space between two parts, with `free` showing the part of the second that's free already |
 | `FingerprintDial` | Progress ring and prompt for a `FingerprintEnrollment` |

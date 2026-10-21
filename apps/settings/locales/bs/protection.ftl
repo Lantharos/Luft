@@ -3,7 +3,6 @@
 settings-protection-cancel = Otkaži
 settings-protection-continue = Nastavi
 settings-protection-close = Zatvori
-settings-protection-done = Gotovo
 settings-protection-restart = Ponovo pokreni
 settings-protection-remove = Ukloni
 settings-protection-turn-on = Uključi
@@ -205,7 +204,6 @@ settings-encryption-turn-on-title = Uključi šifriranje uređaja
 settings-encryption-turn-on-description = Vaši fajlovi ostaju privatni ako se ovaj računar izgubi ili ukrade. Bez pravog ključa niko ne može čitati disk.
 settings-encryption-blocked-title = Šifriranje uređaja se još ne može uključiti
 settings-encryption-blocked-description = Riješite ono što je označeno ispod, pa pokušajte ponovo.
-settings-encryption-checking = Provjera računara…
 settings-encryption-backup = Prije nego što počnete, provjerite imate li sigurnosnu kopiju važnih fajlova.
 settings-encryption-key-title = Sačuvajte ključ za oporavak
 settings-encryption-key-description = Ako se disk ikad ne može sam otključati, na primjer nakon popravke, ovaj ključ vam vraća pristup. Čuvajte ga negdje drugdje, ne na ovom računaru.
@@ -221,7 +219,6 @@ settings-encryption-step-background = Ostalo se odvija u pozadini dok vi nastavl
 settings-encryption-step-plugged-in = Držite računar priključen na napajanje dok se ne završi.
 settings-encryption-ask-pin = Traži i PIN
 settings-encryption-ask-pin-description = Disk ostaje zaključan čak i ako neko uzme računar. Traži se kad se šifriranje završi.
-settings-encryption-back = Nazad
 settings-encryption-starting-button = Pokretanje…
 settings-encryption-restart-and-encrypt = Ponovo pokreni i šifriraj
 
@@ -291,13 +288,6 @@ settings-encryption-pin-too-long = { $max ->
 settings-encryption-pins-differ = PIN-ovi se ne podudaraju
 settings-encryption-confirm-field = Potvrda
 settings-encryption-type-again = Upišite ponovo
-settings-encryption-passphrase-field = Pristupna fraza
-settings-encryption-passphrase-length = { $min ->
-    [one] Najmanje { $min } znak
-    [few] Najmanje { $min } znaka
-   *[other] Najmanje { $min } znakova
-}
-settings-encryption-passphrases-differ = Pristupne fraze se ne podudaraju
 
 ## Recovery key
 
@@ -312,7 +302,6 @@ settings-recovery-shown-title = Vaš ključ za oporavak
 settings-recovery-shown-description = Upišite ga ako računar ikad pri pokretanju zatraži ključ za oporavak. Čuvajte kopiju negdje drugdje, ne na ovom računaru.
 settings-recovery-fresh-title = Sačuvajte novi ključ za oporavak
 settings-recovery-fresh-description = Vaš prethodni ključ više ne radi. Čuvajte ovaj na papiru ili u upravitelju lozinki.
-settings-recovery-saved = Ključ za oporavak je sačuvan
 
 ## Passwords and keys (the keyring)
 

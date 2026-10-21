@@ -46,6 +46,7 @@ ui-recovery-key-copy = Kopier
 ui-recovery-key-saved = Lagra
 ui-recovery-key-printing = Sendt til skrivaren
 ui-recovery-key-copied = Kopiert
+ui-recovery-key-kept = Eg har lagra gjenopprettingsnøkkelen
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside
@@ -95,3 +96,22 @@ ui-power-watts = { $watts } W
 ## Dialog buttons
 
 ui-dialog-cancel = Avbryt
+ui-dialog-close = Lukk
+ui-dialog-back = Tilbake
+ui-dialog-continue = Hald fram
+ui-dialog-done = Ferdig
+
+## Passphrases
+
+ui-passphrase-field = Passfrase
+ui-passphrase-confirm = Stadfest
+ui-passphrase-type-again = Skriv han inn igjen
+ui-passphrase-length = { $min ->
+    [one] Minst { $min } teikn
+   *[other] Minst { $min } teikn
+}
+ui-passphrase-mismatch = Passfrasane er ikkje like
+
+## Encryption
+
+ui-encryption-checking = Sjekkar …

@@ -1,8 +1,17 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { ConfirmDialog, Row, Section, Switch } from '@luft/ui';
-	import { acceptSecureBootChange, problem, removeTpmUnlock, replaceRecoveryKey, setUpTpmUnlock, showRecoveryKey, type Trust } from '../api';
-	import RecoveryKeyDialog from '../keys/RecoveryKeyDialog.svelte';
+	import { ConfirmDialog, RecoveryKeyDialog, Row, Section, Switch } from '@luft/ui';
+	import {
+		acceptSecureBootChange,
+		printRecoveryKey,
+		problem,
+		removeTpmUnlock,
+		replaceRecoveryKey,
+		saveRecoveryKey,
+		setUpTpmUnlock,
+		showRecoveryKey,
+		type Trust
+	} from '../../api';
 	import TpmDialog, { type TpmMode } from './TpmDialog.svelte';
 	import { withUnlock } from './unlock.svelte';
 
@@ -32,9 +41,7 @@
 	const close = () => (open = null);
 
 	function closeTpm(recoveryKey?: string) {
-		open = recoveryKey
-			? { kind: 'key', key: recoveryKey, fresh: true, description: 'settings-encryption-new-key-description' }
-			: null;
+		open = recoveryKey ? { kind: 'key', key: recoveryKey, fresh: true, description: t('settings-encryption-new-key-description') } : null;
 	}
 
 	function relink() {
@@ -122,5 +129,14 @@
 		onclose={close}
 	/>
 {:else if open?.kind === 'key'}
-	<RecoveryKeyDialog key={open.key} fresh={open.fresh} description={open.description && t(open.description)} onclose={close} />
+	{@const { key, fresh } = open}
+	<RecoveryKeyDialog
+		{key}
+		{fresh}
+		title={fresh ? t('settings-recovery-fresh-title') : t('settings-recovery-shown-title')}
+		description={open.description ?? (fresh ? t('settings-recovery-fresh-description') : t('settings-recovery-shown-description'))}
+		onsave={() => saveRecoveryKey(key)}
+		onprint={() => printRecoveryKey(key)}
+		onclose={close}
+	/>
 {/if}

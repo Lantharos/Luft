@@ -3,7 +3,6 @@
 settings-protection-cancel = İptal
 settings-protection-continue = Devam et
 settings-protection-close = Kapat
-settings-protection-done = Bitti
 settings-protection-restart = Yeniden başlat
 settings-protection-remove = Kaldır
 settings-protection-turn-on = Aç
@@ -201,7 +200,6 @@ settings-encryption-turn-on-title = Cihaz şifrelemeyi aç
 settings-encryption-turn-on-description = Bu bilgisayar kaybolsa ya da çalınsa da dosyalarınız gizli kalır. Doğru anahtar olmadan diski kimse okuyamaz.
 settings-encryption-blocked-title = Cihaz şifreleme henüz açılamıyor
 settings-encryption-blocked-description = Aşağıda işaretlenenleri halledip yeniden deneyin.
-settings-encryption-checking = Bilgisayarınız denetleniyor…
 settings-encryption-backup = Başlamadan önce önemli dosyalarınızın yedeklendiğinden emin olun.
 settings-encryption-key-title = Kurtarma anahtarınızı kaydedin
 settings-encryption-key-description = Disk bir gün, örneğin bir onarımdan sonra, kendiliğinden açılamazsa bu anahtarla yeniden erişebilirsiniz. Anahtarı bu bilgisayar dışında bir yerde saklayın.
@@ -217,7 +215,6 @@ settings-encryption-step-background = Gerisi siz çalışmaya devam ederken arka
 settings-encryption-step-plugged-in = İşlem bitene kadar bilgisayarı prize takılı tutun.
 settings-encryption-ask-pin = PIN de iste
 settings-encryption-ask-pin-description = Biri bilgisayarı alsa bile disk kilitli kalır. Şifreleme bittiğinde sorulur.
-settings-encryption-back = Geri
 settings-encryption-starting-button = Başlatılıyor…
 settings-encryption-restart-and-encrypt = Yeniden başlat ve şifrele
 
@@ -285,12 +282,6 @@ settings-encryption-pin-too-long = { $max ->
 settings-encryption-pins-differ = PIN’ler eşleşmiyor
 settings-encryption-confirm-field = Doğrula
 settings-encryption-type-again = Yeniden yazın
-settings-encryption-passphrase-field = Disk parolası
-settings-encryption-passphrase-length = { $min ->
-    [one] En az { $min } karakter
-   *[other] En az { $min } karakter
-}
-settings-encryption-passphrases-differ = Disk parolaları eşleşmiyor
 
 ## Recovery key
 
@@ -305,7 +296,6 @@ settings-recovery-shown-title = Kurtarma anahtarınız
 settings-recovery-shown-description = Bilgisayarınız başlangıçta kurtarma anahtarı isterse bunu yazın. Bir kopyasını bu bilgisayar dışında bir yerde saklayın.
 settings-recovery-fresh-title = Yeni kurtarma anahtarınızı kaydedin
 settings-recovery-fresh-description = Önceki anahtarınız artık çalışmıyor. Bunu kâğıt üzerinde ya da bir parola yöneticisinde saklayın.
-settings-recovery-saved = Kurtarma anahtarımı kaydettim
 
 ## Passwords and keys (the keyring)
 

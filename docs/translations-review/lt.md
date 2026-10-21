@@ -59,7 +59,7 @@ Strings in Luft's Lithuanian translation that a native speaker should check: ter
 - `apps/settings/locales/lt/devices.ftl` `settings-power-long-sleep-hours`: "{ $hours } valandos" (genitive after "Išjungti po") — days and weeks likewise; these only work after "po".
 - `apps/settings/locales/lt/devices.ftl` `settings-keys-keypad`: "Num { $key }" — no settled Lithuanian name for number-pad keys in shortcut labels.
 - `apps/settings/locales/lt/protection.ftl` `settings-privacy-screen-off-after`: "Po: { $duration }" — "po" needs the genitive ("po 5 minučių") but the duration arrives in an unknown case, so a colon was used; check whether it reads acceptably or the duration format allows a natural phrase.
-- `apps/settings/locales/lt/protection.ftl` `settings-encryption-passphrase-field`: "Slaptafrazė" — used throughout for "passphrase" (GNOME's term) to keep it distinct from "slaptažodis"; confirm it is understood.
+- `packages/ui/locales/lt/ui.ftl` `ui-passphrase-field`: "Slaptafrazė" — used throughout for "passphrase" (GNOME's term) to keep it distinct from "slaptažodis"; confirm it is understood.
 - `apps/settings/locales/lt/protection.ftl` `settings-passwords-seal-title`: "Užplombuoti saugos lustu" — "seal" has no settled OS term; check "užplombuoti" vs "užsandarinti".
 - `apps/settings/locales/lt/protection.ftl` `settings-security-anti-cheat`: "Žaidimai su apsauga nuo sukčiavimo" — anti-cheat has no settled term; gamers may just say "anti-cheat".
 - `apps/settings/locales/lt/protection.ftl` `settings-passwords-ssh-added`: "Pridėtas { $when }" — assumes the relative time reads as "prieš 3 dienas" / "vakar"; same for `settings-passkeys-last-used`, `settings-updates-last-checked`, `settings-updates-released`.

@@ -46,6 +46,7 @@ ui-recovery-key-copy = Kopiëren
 ui-recovery-key-saved = Opgeslagen
 ui-recovery-key-printing = Naar de printer gestuurd
 ui-recovery-key-copied = Gekopieerd
+ui-recovery-key-kept = Ik heb mijn herstelsleutel bewaard
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside
@@ -95,3 +96,22 @@ ui-power-watts = { $watts } W
 ## Dialog buttons
 
 ui-dialog-cancel = Annuleren
+ui-dialog-close = Sluiten
+ui-dialog-back = Terug
+ui-dialog-continue = Doorgaan
+ui-dialog-done = Klaar
+
+## Passphrases
+
+ui-passphrase-field = Wachtwoordzin
+ui-passphrase-confirm = Bevestigen
+ui-passphrase-type-again = Typ hem opnieuw
+ui-passphrase-length = { $min ->
+    [one] Minstens { $min } teken
+   *[other] Minstens { $min } tekens
+}
+ui-passphrase-mismatch = De wachtwoordzinnen komen niet overeen
+
+## Encryption
+
+ui-encryption-checking = Controleren…

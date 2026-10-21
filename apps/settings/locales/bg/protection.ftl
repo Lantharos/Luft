@@ -3,7 +3,6 @@
 settings-protection-cancel = Отказ
 settings-protection-continue = Продължи
 settings-protection-close = Затвори
-settings-protection-done = Готово
 settings-protection-restart = Рестартирай
 settings-protection-remove = Премахни
 settings-protection-turn-on = Включи
@@ -201,7 +200,6 @@ settings-encryption-turn-on-title = Включване на шифрованет
 settings-encryption-turn-on-description = Файловете ви остават поверителни, ако компютърът бъде изгубен или откраднат. Без правилния ключ никой не може да прочете диска.
 settings-encryption-blocked-title = Шифроването на устройството все още не може да се включи
 settings-encryption-blocked-description = Погрижете се за отбелязаното по-долу и опитайте отново.
-settings-encryption-checking = Компютърът се проверява…
 settings-encryption-backup = Преди да започнете, се уверете, че важните ви файлове имат резервно копие.
 settings-encryption-key-title = Запазете ключа за възстановяване
 settings-encryption-key-description = Ако дискът някога не може да се отключи сам, например след ремонт, този ключ ще ви върне достъпа. Пазете го на място извън този компютър.
@@ -217,7 +215,6 @@ settings-encryption-step-background = Останалото става във ф�
 settings-encryption-step-plugged-in = Дръжте компютъра включен в захранването, докато приключи.
 settings-encryption-ask-pin = Искане и на ПИН
 settings-encryption-ask-pin-description = Дискът остава заключен, дори ако някой вземе компютъра. ПИН се иска, след като шифроването приключи.
-settings-encryption-back = Назад
 settings-encryption-starting-button = Започване…
 settings-encryption-restart-and-encrypt = Рестартирай и шифровай
 
@@ -285,12 +282,6 @@ settings-encryption-pin-too-long = { $max ->
 settings-encryption-pins-differ = ПИН кодовете не съвпадат
 settings-encryption-confirm-field = Потвърждение
 settings-encryption-type-again = Въведете отново
-settings-encryption-passphrase-field = Парола за диска
-settings-encryption-passphrase-length = { $min ->
-    [one] Поне { $min } знак
-   *[other] Поне { $min } знака
-}
-settings-encryption-passphrases-differ = Паролите за диска не съвпадат
 
 ## Recovery key
 
@@ -305,7 +296,6 @@ settings-recovery-shown-title = Вашият ключ за възстановя�
 settings-recovery-shown-description = Въведете го, ако компютърът някога поиска ключ за възстановяване при стартиране. Пазете копие на място извън този компютър.
 settings-recovery-fresh-title = Запазете новия ключ за възстановяване
 settings-recovery-fresh-description = Предишният ви ключ вече не работи. Пазете този на хартия или в мениджър на пароли.
-settings-recovery-saved = Запазих ключа за възстановяване
 
 ## Passwords and keys (the keyring)
 

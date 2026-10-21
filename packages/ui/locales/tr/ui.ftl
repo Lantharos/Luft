@@ -46,6 +46,7 @@ ui-recovery-key-copy = Kopyala
 ui-recovery-key-saved = Kaydedildi
 ui-recovery-key-printing = Yazıcıya gönderildi
 ui-recovery-key-copied = Kopyalandı
+ui-recovery-key-kept = Kurtarma anahtarımı kaydettim
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside
@@ -95,3 +96,22 @@ ui-power-watts = { $watts } W
 ## Dialog buttons
 
 ui-dialog-cancel = İptal
+ui-dialog-close = Kapat
+ui-dialog-back = Geri
+ui-dialog-continue = Devam et
+ui-dialog-done = Bitti
+
+## Passphrases
+
+ui-passphrase-field = Disk parolası
+ui-passphrase-confirm = Doğrula
+ui-passphrase-type-again = Yeniden yazın
+ui-passphrase-length = { $min ->
+    [one] En az { $min } karakter
+   *[other] En az { $min } karakter
+}
+ui-passphrase-mismatch = Disk parolaları eşleşmiyor
+
+## Encryption
+
+ui-encryption-checking = Denetleniyor…

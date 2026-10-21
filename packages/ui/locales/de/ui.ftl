@@ -46,6 +46,7 @@ ui-recovery-key-copy = Kopieren
 ui-recovery-key-saved = Gespeichert
 ui-recovery-key-printing = An den Drucker gesendet
 ui-recovery-key-copied = Kopiert
+ui-recovery-key-kept = Ich habe meinen Wiederherstellungsschlüssel gespeichert
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside
@@ -95,3 +96,22 @@ ui-power-watts = { $watts } W
 ## Dialog buttons
 
 ui-dialog-cancel = Abbrechen
+ui-dialog-close = Schließen
+ui-dialog-back = Zurück
+ui-dialog-continue = Weiter
+ui-dialog-done = Fertig
+
+## Passphrases
+
+ui-passphrase-field = Passphrase
+ui-passphrase-confirm = Bestätigen
+ui-passphrase-type-again = Erneut eingeben
+ui-passphrase-length = { $min ->
+    [one] Mindestens { $min } Zeichen
+   *[other] Mindestens { $min } Zeichen
+}
+ui-passphrase-mismatch = Die Passphrasen stimmen nicht überein
+
+## Encryption
+
+ui-encryption-checking = Wird geprüft …

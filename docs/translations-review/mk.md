@@ -52,7 +52,7 @@ Strings in Luft's Macedonian translation that a native speaker should check. Eac
 - `apps/settings/locales/mk/devices.ftl` `settings-sound-mute`: "Исклучи звук – { $name }" — screen-reader label; `$name` is „Јачина на звук“ or an app name, the dash avoids case agreement.
 - `apps/settings/locales/mk/devices.ftl` `settings-keys-keypad`: "Нумерички { $key }" — keypad keys have no printed name; check whether „Num { $key }“ is more familiar.
 - `apps/settings/locales/mk/devices.ftl` `settings-display-mirror`: "Огледално прикажување" — Windows uses „Дуплирај“; check which is more familiar.
-- `apps/settings/locales/mk/protection.ftl` `settings-encryption-passphrase-field`: "Тајна фраза" — passphrase has no settled Macedonian term; chosen to stay distinct from лозинка and used for every passphrase in Settings and setup.
+- `packages/ui/locales/mk/ui.ftl` `ui-passphrase-field`: "Тајна фраза" — passphrase has no settled Macedonian term; chosen to stay distinct from лозинка and used for every passphrase in Settings and setup.
 - `apps/settings/locales/mk/protection.ftl` `settings-encryption-pin`: "PIN при стартување" — PIN kept in Latin (PIN-от, PIN-овите); a reviewer may prefer ПИН as on bank cards.
 - `apps/settings/locales/mk/personalization.ftl` `settings-fonts-monospace`: "Еднаква ширина" — monospace has no common short term; check it is understood.
 - `apps/settings/locales/mk/personalization.ftl` `settings-accessibility-typing-assist-count`: "{ $count } вклучена / вклучени" — feminine agreement assumes a hidden „функција“; check it reads well next to the row title.

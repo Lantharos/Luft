@@ -3,7 +3,6 @@
 settings-protection-cancel = Cancelar
 settings-protection-continue = Continuar
 settings-protection-close = Fechar
-settings-protection-done = Concluído
 settings-protection-restart = Reiniciar
 settings-protection-remove = Remover
 settings-protection-turn-on = Ativar
@@ -202,7 +201,6 @@ settings-encryption-turn-on-title = Ativar a encriptação do dispositivo
 settings-encryption-turn-on-description = Os ficheiros ficam privados se este computador for perdido ou roubado. Sem a chave certa, ninguém consegue ler o disco.
 settings-encryption-blocked-title = Ainda não é possível ativar a encriptação do dispositivo
 settings-encryption-blocked-description = Resolva o que está assinalado abaixo e tente novamente.
-settings-encryption-checking = A verificar o computador…
 settings-encryption-backup = Antes de começar, confirme que tem cópias de segurança dos ficheiros importantes.
 settings-encryption-key-title = Guarde a chave de recuperação
 settings-encryption-key-description = Se algum dia o disco não conseguir desbloquear-se sozinho, por exemplo depois de uma reparação, esta chave permite-lhe voltar a entrar. Guarde-a noutro sítio que não este computador.
@@ -218,7 +216,6 @@ settings-encryption-step-background = O resto acontece em segundo plano enquanto
 settings-encryption-step-plugged-in = Mantenha o computador ligado à corrente até terminar.
 settings-encryption-ask-pin = Pedir também um PIN
 settings-encryption-ask-pin-description = Mantém o disco bloqueado mesmo que alguém leve o computador. É pedido quando a encriptação terminar.
-settings-encryption-back = Voltar
 settings-encryption-starting-button = A iniciar…
 settings-encryption-restart-and-encrypt = Reiniciar e encriptar
 
@@ -286,12 +283,6 @@ settings-encryption-pin-too-long = { $max ->
 settings-encryption-pins-differ = Os PINs não coincidem
 settings-encryption-confirm-field = Confirmar
 settings-encryption-type-again = Escreva-o novamente
-settings-encryption-passphrase-field = Frase de acesso
-settings-encryption-passphrase-length = { $min ->
-    [one] Pelo menos { $min } caráter
-   *[other] Pelo menos { $min } carateres
-}
-settings-encryption-passphrases-differ = As frases de acesso não coincidem
 
 ## Recovery key
 
@@ -306,7 +297,6 @@ settings-recovery-shown-title = Chave de recuperação
 settings-recovery-shown-description = Introduza-a se algum dia o computador pedir uma chave de recuperação no arranque. Guarde uma cópia noutro sítio que não este computador.
 settings-recovery-fresh-title = Guarde a nova chave de recuperação
 settings-recovery-fresh-description = A chave anterior já não funciona. Guarde esta em papel ou num gestor de palavras-passe.
-settings-recovery-saved = Já guardei a chave de recuperação
 
 ## Passwords and keys (the keyring)
 

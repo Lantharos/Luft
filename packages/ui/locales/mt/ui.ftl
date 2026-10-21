@@ -46,6 +46,7 @@ ui-recovery-key-copy = Ikkopja
 ui-recovery-key-saved = Issejvjata
 ui-recovery-key-printing = Intbagħtet lill-printer
 ui-recovery-key-copied = Ikkopjata
+ui-recovery-key-kept = Issejvjajt iċ-ċavetta tal-irkupru
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside
@@ -95,3 +96,25 @@ ui-power-watts = { $watts } W
 ## Dialog buttons
 
 ui-dialog-cancel = Ikkanċella
+ui-dialog-close = Agħlaq
+ui-dialog-back = Lura
+ui-dialog-continue = Kompli
+ui-dialog-done = Lest
+
+## Passphrases
+
+ui-passphrase-field = Passphrase
+ui-passphrase-confirm = Ikkonferma
+ui-passphrase-type-again = Erġa’ ittajpjah
+ui-passphrase-length = { $min ->
+    [one] Mill-inqas { $min } karattru
+    [two] Mill-inqas { $min } karattri
+    [few] Mill-inqas { $min } karattri
+    [many] Mill-inqas { $min } karattru
+   *[other] Mill-inqas { $min } karattru
+}
+ui-passphrase-mismatch = Il-passphrases ma jaqblux
+
+## Encryption
+
+ui-encryption-checking = Qed jiċċekkja…

@@ -46,6 +46,7 @@ ui-recovery-key-copy = Kopiraj
 ui-recovery-key-saved = Shranjeno
 ui-recovery-key-printing = Poslano tiskalniku
 ui-recovery-key-copied = Kopirano
+ui-recovery-key-kept = Obnovitveni ključ je shranjen
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside
@@ -95,3 +96,24 @@ ui-power-watts = { $watts } W
 ## Dialog buttons
 
 ui-dialog-cancel = Prekliči
+ui-dialog-close = Zapri
+ui-dialog-back = Nazaj
+ui-dialog-continue = Nadaljuj
+ui-dialog-done = Končano
+
+## Passphrases
+
+ui-passphrase-field = Šifrirno geslo
+ui-passphrase-confirm = Potrditev
+ui-passphrase-type-again = Vnesite ga znova
+ui-passphrase-length = { $min ->
+    [one] Vsaj { $min } znak
+    [two] Vsaj { $min } znaka
+    [few] Vsaj { $min } znaki
+   *[other] Vsaj { $min } znakov
+}
+ui-passphrase-mismatch = Šifrirni gesli se ne ujemata
+
+## Encryption
+
+ui-encryption-checking = Preverjanje …

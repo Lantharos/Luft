@@ -58,7 +58,10 @@ export {
 	type Fingerprints
 } from './security/fingerprint.svelte';
 export { default as FingerprintDial } from './security/FingerprintDial.svelte';
+export { default as EncryptionWizard, type EncryptionCheck, type EncryptionStep } from './security/EncryptionWizard.svelte';
+export { default as PassphraseFields } from './security/PassphraseFields.svelte';
 export { default as RecoveryKey } from './security/RecoveryKey.svelte';
+export { default as RecoveryKeyDialog } from './security/RecoveryKeyDialog.svelte';
 
 export { springTiming } from './motion/easing';
 export { reorder } from './motion/lists';

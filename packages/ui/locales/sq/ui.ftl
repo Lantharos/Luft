@@ -46,6 +46,7 @@ ui-recovery-key-copy = Kopjo
 ui-recovery-key-saved = U ruajt
 ui-recovery-key-printing = U dërgua te printeri
 ui-recovery-key-copied = U kopjua
+ui-recovery-key-kept = E kam ruajtur çelësin e rikuperimit
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside
@@ -95,3 +96,22 @@ ui-power-watts = { $watts } W
 ## Dialog buttons
 
 ui-dialog-cancel = Anulo
+ui-dialog-close = Mbyll
+ui-dialog-back = Prapa
+ui-dialog-continue = Vazhdo
+ui-dialog-done = U krye
+
+## Passphrases
+
+ui-passphrase-field = Frazëkalimi
+ui-passphrase-confirm = Konfirmo
+ui-passphrase-type-again = Shkruaje sërish
+ui-passphrase-length = { $min ->
+    [one] Të paktën { $min } karakter
+   *[other] Të paktën { $min } karaktere
+}
+ui-passphrase-mismatch = Frazëkalimet nuk përputhen
+
+## Encryption
+
+ui-encryption-checking = Po kontrollohet…

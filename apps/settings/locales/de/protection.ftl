@@ -3,7 +3,6 @@
 settings-protection-cancel = Abbrechen
 settings-protection-continue = Weiter
 settings-protection-close = Schließen
-settings-protection-done = Fertig
 settings-protection-restart = Neu starten
 settings-protection-remove = Entfernen
 settings-protection-turn-on = Einschalten
@@ -201,7 +200,6 @@ settings-encryption-turn-on-title = Geräteverschlüsselung einschalten
 settings-encryption-turn-on-description = Deine Dateien bleiben privat, falls dieser Computer verloren geht oder gestohlen wird. Ohne den richtigen Schlüssel kann niemand den Datenträger lesen.
 settings-encryption-blocked-title = Die Geräteverschlüsselung kann noch nicht eingeschaltet werden
 settings-encryption-blocked-description = Kümmere dich um das, was unten markiert ist, und versuch es dann erneut.
-settings-encryption-checking = Dein Computer wird geprüft …
 settings-encryption-backup = Sorg vor dem Start dafür, dass deine wichtigen Dateien gesichert sind.
 settings-encryption-key-title = Speichere deinen Wiederherstellungsschlüssel
 settings-encryption-key-description = Falls sich der Datenträger einmal nicht von selbst entsperren kann, etwa nach einer Reparatur, kommst du mit diesem Schlüssel wieder hinein. Bewahre ihn nicht auf diesem Computer auf.
@@ -217,7 +215,6 @@ settings-encryption-step-background = Der Rest passiert im Hintergrund, während
 settings-encryption-step-plugged-in = Lass den Computer am Netzteil, bis alles fertig ist.
 settings-encryption-ask-pin = Zusätzlich nach einer PIN fragen
 settings-encryption-ask-pin-description = Hält den Datenträger gesperrt, selbst wenn jemand den Computer mitnimmt. Danach wird sie abgefragt, sobald die Verschlüsselung fertig ist.
-settings-encryption-back = Zurück
 settings-encryption-starting-button = Wird gestartet …
 settings-encryption-restart-and-encrypt = Neu starten und verschlüsseln
 
@@ -285,12 +282,6 @@ settings-encryption-pin-too-long = { $max ->
 settings-encryption-pins-differ = Die PINs stimmen nicht überein
 settings-encryption-confirm-field = Bestätigen
 settings-encryption-type-again = Erneut eingeben
-settings-encryption-passphrase-field = Passphrase
-settings-encryption-passphrase-length = { $min ->
-    [one] Mindestens { $min } Zeichen
-   *[other] Mindestens { $min } Zeichen
-}
-settings-encryption-passphrases-differ = Die Passphrasen stimmen nicht überein
 
 ## Recovery key
 
@@ -305,7 +296,6 @@ settings-recovery-shown-title = Dein Wiederherstellungsschlüssel
 settings-recovery-shown-description = Gib ihn ein, falls dein Computer beim Start einmal nach einem Wiederherstellungsschlüssel fragt. Bewahre eine Kopie nicht auf diesem Computer auf.
 settings-recovery-fresh-title = Speichere deinen neuen Wiederherstellungsschlüssel
 settings-recovery-fresh-description = Dein bisheriger Schlüssel funktioniert nicht mehr. Bewahre diesen auf Papier oder in einem Passwortmanager auf.
-settings-recovery-saved = Ich habe meinen Wiederherstellungsschlüssel gespeichert
 
 ## Passwords and keys (the keyring)
 

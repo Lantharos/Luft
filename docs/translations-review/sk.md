@@ -45,7 +45,7 @@ Strings in Luft's Slovak translation that a native speaker should check, each li
 - `apps/settings/locales/sk/devices.ftl` `settings-keys-keypad`: "Num { $key }" — Slovak keyboards print nothing for this; check the abbreviation is clear.
 - `apps/settings/locales/sk/devices.ftl` `settings-keys-volume-up` (and the other media keys): "Zvýšiť hlasitosť" — verb-like key names; check against Windows' Slovak shortcut labels.
 - `apps/settings/desktop/locales/sk/desktop.ftl` `desktop-shortcut-focus-active-notification`: "Presunúť fokus na aktívne oznámenie" — "fokus" is common in GNOME Slovak but informal; check.
-- `apps/settings/locales/sk/protection.ftl` `settings-encryption-passphrase-field`: "Prístupová fráza" — passphrase isn't in the glossary; chosen to stay distinct from „heslo“. Check it reads naturally next to BitLocker/GNOME wording.
+- `packages/ui/locales/sk/ui.ftl` `ui-passphrase-field`: "Prístupová fráza" — passphrase isn't in the glossary; chosen to stay distinct from „heslo“. Check it reads naturally next to BitLocker/GNOME wording.
 - `apps/settings/locales/sk/protection.ftl` `settings-encryption-pin`: "PIN pri spustení" — „PIN“ alone in short labels and buttons, „kód PIN“ in sentences; check the mix is acceptable.
 - `apps/settings/locales/sk/protection.ftl` `settings-passwords-access-revoke`: "Zakázať aplikácii { $app } používať { $item }" — $item is a saved item's name in accusative position; may not fit every value.
 - `apps/settings/locales/sk/protection.ftl` `settings-passwords-ssh-copy`: "Kopírovať verejný kľúč pre { $name }" — avoids „verejný kľúč kľúča“; check it's natural.

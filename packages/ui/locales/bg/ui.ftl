@@ -46,6 +46,7 @@ ui-recovery-key-copy = Копирай
 ui-recovery-key-saved = Запазено
 ui-recovery-key-printing = Изпратено към принтера
 ui-recovery-key-copied = Копирано
+ui-recovery-key-kept = Запазих ключа за възстановяване
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside
@@ -95,3 +96,22 @@ ui-power-watts = { $watts } W
 ## Dialog buttons
 
 ui-dialog-cancel = Отказ
+ui-dialog-close = Затвори
+ui-dialog-back = Назад
+ui-dialog-continue = Продължи
+ui-dialog-done = Готово
+
+## Passphrases
+
+ui-passphrase-field = Парола за диска
+ui-passphrase-confirm = Потвърждение
+ui-passphrase-type-again = Въведете отново
+ui-passphrase-length = { $min ->
+    [one] Поне { $min } знак
+   *[other] Поне { $min } знака
+}
+ui-passphrase-mismatch = Паролите за диска не съвпадат
+
+## Encryption
+
+ui-encryption-checking = Проверка…

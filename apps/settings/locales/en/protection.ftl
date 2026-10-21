@@ -14,7 +14,6 @@
 settings-protection-cancel = Cancel
 settings-protection-continue = Continue
 settings-protection-close = Close
-settings-protection-done = Done
 # Button that restarts the computer
 settings-protection-restart = Restart
 # Button that removes the item in the row
@@ -243,7 +242,6 @@ settings-encryption-turn-on-title = Turn on device encryption
 settings-encryption-turn-on-description = Your files stay private if this computer is lost or stolen. Without the right key, nobody can read the disk.
 settings-encryption-blocked-title = Device encryption can’t be turned on yet
 settings-encryption-blocked-description = Take care of what’s marked below, then try again.
-settings-encryption-checking = Checking your computer…
 settings-encryption-backup = Before you start, make sure your important files are backed up.
 settings-encryption-key-title = Save your recovery key
 settings-encryption-key-description = If the disk ever can’t unlock by itself, such as after a repair, this key gets you back in. Keep it somewhere other than this computer.
@@ -260,8 +258,6 @@ settings-encryption-step-background = The rest happens in the background while y
 settings-encryption-step-plugged-in = Keep the computer plugged in until it’s done.
 settings-encryption-ask-pin = Also ask for a PIN
 settings-encryption-ask-pin-description = Keeps the disk locked even if someone takes the computer. It’s asked once encryption finishes.
-# Button: go back to the previous step
-settings-encryption-back = Back
 settings-encryption-starting-button = Starting…
 settings-encryption-restart-and-encrypt = Restart and encrypt
 
@@ -334,12 +330,6 @@ settings-encryption-pins-differ = The PINs don’t match
 # Label of the field where the PIN or passphrase is typed a second time
 settings-encryption-confirm-field = Confirm
 settings-encryption-type-again = Type it again
-settings-encryption-passphrase-field = Passphrase
-settings-encryption-passphrase-length = { $min ->
-    [one] At least { $min } character
-   *[other] At least { $min } characters
-}
-settings-encryption-passphrases-differ = The passphrases don’t match
 
 ## Recovery key
 
@@ -356,7 +346,6 @@ settings-recovery-shown-title = Your recovery key
 settings-recovery-shown-description = Type it if your computer ever asks for a recovery key at startup. Keep a copy somewhere other than this computer.
 settings-recovery-fresh-title = Save your new recovery key
 settings-recovery-fresh-description = Your previous key no longer works. Keep this one on paper or in a password manager.
-settings-recovery-saved = I’ve saved my recovery key
 
 ## Passwords and keys (the keyring)
 

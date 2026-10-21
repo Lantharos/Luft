@@ -55,7 +55,7 @@ Strings in Luft's Estonian translation that a native speaker should check. Each 
 - `apps/settings/locales/et/devices.ftl` `settings-dictation-engine-description`: "{ $engine }, keel: { $language }" — terse to keep the language name in the nominative; check it is clear.
 - `apps/settings/locales/et/devices.ftl` `settings-keys-keypad`: "Numbriplokk { $key }" — may be long on shortcut labels; a shorter form like "Num { $key }" could be preferable.
 - `apps/settings/locales/et/protection.ftl` `settings-privacy-screen-off-after`: "Pärast { $duration }" — assumes $duration arrives as a partitive phrase like „5 minutit“; check it reads naturally with the real value (genitive „5 minuti pärast“ would be more idiomatic but can't be built around a placeable).
-- `apps/settings/locales/et/protection.ftl` `settings-encryption-passphrase-field`: "Paroolifraas" — used for passphrase everywhere, to keep it apart from „parool“; confirm against GNOME Disks usage.
+- `packages/ui/locales/et/ui.ftl` `ui-passphrase-field`: "Paroolifraas" — used for passphrase everywhere, to keep it apart from „parool“; confirm against GNOME Disks usage.
 - `apps/settings/locales/et/protection.ftl` `settings-security-anti-cheat`: "Petmisvastase kaitsega mängud" — no settled Estonian term for anti-cheat; many gamers just say „anti-cheat“.
 - `apps/settings/locales/et/system.ftl` `settings-users-fingerprint-remove-description`: "Edaspidi ei sobi { $finger } enam sisselogimiseks." — built so the finger name stays the nominative subject; check it reads naturally with every finger name.
 - `apps/settings/locales/et/system.ftl` `settings-updates-switching-standard`: "Tavalise tõmmise allalaadimine…" — „tõmmis“ for system image; check whether „kujutis“ reads better.

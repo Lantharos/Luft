@@ -64,7 +64,7 @@ Strings in Luft's Hungarian translation that a native speaker should check: term
 - `apps/settings/locales/hu/personalization.ftl` `settings-appearance-dark-from`: "Sötét mód kezdete" — rewritten as a noun to sit before the time picker; check it reads well next to the time.
 - `apps/settings/locales/hu/personalization.ftl` `settings-accessibility-dwell-time`: "Várakozás" — label before a duration slider; check it is clear enough (also `settings-accessibility-hold-time` "Nyomva tartás").
 - `apps/settings/locales/hu/personalization.ftl` `settings-appearance-icons-clear`: "Áttetsző" — icon style "Clear"; check it isn't read as "Törlés".
-- `apps/settings/locales/hu/protection.ftl` `settings-encryption-passphrase-field`: "Jelmondat" — passphrase term, not in the glossary; used throughout the disk-unlock strings.
+- `packages/ui/locales/hu/ui.ftl` `ui-passphrase-field`: "Jelmondat" — passphrase term, not in the glossary; used throughout the disk-unlock strings.
 - `apps/settings/locales/hu/protection.ftl` `settings-security-hardware-description`: "{ $summary }. Szint: { $level }/{ $highest }." — restructured to avoid suffixes on numbers; check it reads naturally.
 - `apps/settings/locales/hu/protection.ftl` `settings-passwords-access-revoke`: "{ $app } nem használhatja ezt: { $item }" — screen-reader label of a remove button phrased as a statement; check whether an action noun reads better.
 - `apps/settings/locales/hu/protection.ftl` `settings-passwords-forget-title`: "Elfelejti ennek az alkalmazásnak a mentett adatait: { $app }?" — colon form to avoid an article before the app name; check it isn't too stiff.

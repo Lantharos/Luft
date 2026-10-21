@@ -3,7 +3,6 @@
 settings-protection-cancel = Cealaigh
 settings-protection-continue = Lean ar aghaidh
 settings-protection-close = Dún
-settings-protection-done = Déanta
 settings-protection-restart = Atosaigh
 settings-protection-remove = Bain
 settings-protection-turn-on = Cas air
@@ -225,7 +224,6 @@ settings-encryption-turn-on-title = Cas air criptiú gléis
 settings-encryption-turn-on-description = Fanann do chomhaid príobháideach má chailltear nó má ghoidtear an ríomhaire seo. Gan an eochair cheart, ní féidir le duine ar bith an diosca a léamh.
 settings-encryption-blocked-title = Ní féidir criptiú gléis a chasadh air fós
 settings-encryption-blocked-description = Réitigh a bhfuil marcáilte thíos, ansin bain triail eile as.
-settings-encryption-checking = Do ríomhaire á sheiceáil…
 settings-encryption-backup = Sula dtosaíonn tú, cinntigh go bhfuil cúltaca de do chomhaid thábhachtacha agat.
 settings-encryption-key-title = Sábháil d’eochair athshlánaithe
 settings-encryption-key-description = Mura féidir leis an diosca é féin a dhíghlasáil am éigin, mar shampla tar éis deisiúcháin, ligfidh an eochair seo isteach arís thú. Coinnigh í áit éigin seachas ar an ríomhaire seo.
@@ -241,7 +239,6 @@ settings-encryption-step-background = Tarlóidh an chuid eile sa chúlra agus t�
 settings-encryption-step-plugged-in = Coinnigh an ríomhaire plugáilte isteach go dtí go mbeidh sé críochnaithe.
 settings-encryption-ask-pin = Iarr UAP freisin
 settings-encryption-ask-pin-description = Coinníonn sé an diosca faoi ghlas fiú má thógann duine an ríomhaire. Iarrfar ort é a shocrú nuair a bheidh an criptiú críochnaithe.
-settings-encryption-back = Ar ais
 settings-encryption-starting-button = Á thosú…
 settings-encryption-restart-and-encrypt = Atosaigh agus criptigh
 
@@ -315,15 +312,6 @@ settings-encryption-pin-too-long = { $max ->
 settings-encryption-pins-differ = Níl na UAPanna mar a chéile
 settings-encryption-confirm-field = Deimhnigh
 settings-encryption-type-again = Clóscríobh arís é
-settings-encryption-passphrase-field = Frása faire
-settings-encryption-passphrase-length = { $min ->
-    [one] { $min } charachtar ar a laghad
-    [two] { $min } charachtar ar a laghad
-    [few] { $min } charachtar ar a laghad
-    [many] { $min } gcarachtar ar a laghad
-   *[other] { $min } carachtar ar a laghad
-}
-settings-encryption-passphrases-differ = Níl na frásaí faire mar a chéile
 
 ## Recovery key
 
@@ -338,7 +326,6 @@ settings-recovery-shown-title = D’eochair athshlánaithe
 settings-recovery-shown-description = Clóscríobh í má iarrann do ríomhaire eochair athshlánaithe ort ag an tosú. Coinnigh cóip áit éigin seachas ar an ríomhaire seo.
 settings-recovery-fresh-title = Sábháil d’eochair athshlánaithe nua
 settings-recovery-fresh-description = Ní oibríonn d’eochair roimhe seo a thuilleadh. Coinnigh an ceann seo ar pháipéar nó i mbainisteoir pasfhocal.
-settings-recovery-saved = Tá m’eochair athshlánaithe sábháilte agam
 
 ## Passwords and keys (the keyring)
 

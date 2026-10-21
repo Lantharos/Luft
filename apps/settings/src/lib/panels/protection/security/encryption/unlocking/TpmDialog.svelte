@@ -5,9 +5,9 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Dialog, Switch } from '@luft/ui';
-	import { problem, setUpTpmUnlock } from '../api';
-	import PinFields from '../keys/PinFields.svelte';
-	import { pinReady } from '../keys/pin';
+	import { problem, setUpTpmUnlock } from '../../api';
+	import PinFields from './PinFields.svelte';
+	import { pinReady } from './pin';
 	import { withUnlock } from './unlock.svelte';
 
 	interface Props {

@@ -3,7 +3,6 @@
 settings-protection-cancel = Anulo
 settings-protection-continue = Vazhdo
 settings-protection-close = Mbyll
-settings-protection-done = U krye
 settings-protection-restart = Rinis
 settings-protection-remove = Hiq
 settings-protection-turn-on = Aktivizo
@@ -201,7 +200,6 @@ settings-encryption-turn-on-title = Aktivizo enkriptimin e pajisjes
 settings-encryption-turn-on-description = Skedarët e tu mbeten privatë nëse ky kompjuter humbet ose vidhet. Pa çelësin e duhur, askush nuk mund ta lexojë diskun.
 settings-encryption-blocked-title = Enkriptimi i pajisjes nuk mund të aktivizohet ende
 settings-encryption-blocked-description = Rregullo atë që është shënuar më poshtë, pastaj provo sërish.
-settings-encryption-checking = Po kontrollohet kompjuteri yt…
 settings-encryption-backup = Para se të nisësh, sigurohu që skedarët e rëndësishëm të kenë një kopje rezervë.
 settings-encryption-key-title = Ruaj çelësin e rikuperimit
 settings-encryption-key-description = Nëse disku nuk mund të zhbllokohet ndonjëherë vetë, për shembull pas një riparimi, ky çelës të kthen brenda. Mbaje diku tjetër, jo në këtë kompjuter.
@@ -217,7 +215,6 @@ settings-encryption-step-background = Pjesa tjetër ndodh në sfond ndërsa vazh
 settings-encryption-step-plugged-in = Mbaje kompjuterin të lidhur në korrent derisa të përfundojë.
 settings-encryption-ask-pin = Kërko edhe një PIN
 settings-encryption-ask-pin-description = E mban diskun të bllokuar edhe nëse dikush e merr kompjuterin. Kërkohet sapo të përfundojë enkriptimi.
-settings-encryption-back = Prapa
 settings-encryption-starting-button = Po niset…
 settings-encryption-restart-and-encrypt = Rinis dhe enkripto
 
@@ -285,12 +282,6 @@ settings-encryption-pin-too-long = { $max ->
 settings-encryption-pins-differ = PIN-et nuk përputhen
 settings-encryption-confirm-field = Konfirmo
 settings-encryption-type-again = Shkruaje sërish
-settings-encryption-passphrase-field = Frazëkalimi
-settings-encryption-passphrase-length = { $min ->
-    [one] Të paktën { $min } karakter
-   *[other] Të paktën { $min } karaktere
-}
-settings-encryption-passphrases-differ = Frazëkalimet nuk përputhen
 
 ## Recovery key
 
@@ -305,7 +296,6 @@ settings-recovery-shown-title = Çelësi yt i rikuperimit
 settings-recovery-shown-description = Shkruaje nëse kompjuteri të kërkon ndonjëherë çelës rikuperimi në nisje. Mbaj një kopje diku tjetër, jo në këtë kompjuter.
 settings-recovery-fresh-title = Ruaj çelësin e ri të rikuperimit
 settings-recovery-fresh-description = Çelësi yt i mëparshëm nuk funksionon më. Mbaje këtë në letër ose në një menaxher fjalëkalimesh.
-settings-recovery-saved = E kam ruajtur çelësin e rikuperimit
 
 ## Passwords and keys (the keyring)
 

@@ -3,7 +3,6 @@
 settings-protection-cancel = Cancel·la
 settings-protection-continue = Continua
 settings-protection-close = Tanca
-settings-protection-done = Fet
 settings-protection-restart = Reinicia
 settings-protection-remove = Treu
 settings-protection-turn-on = Activa
@@ -201,7 +200,6 @@ settings-encryption-turn-on-title = Activeu el xifratge del dispositiu
 settings-encryption-turn-on-description = Els fitxers es mantenen privats si perdeu aquest ordinador o us el roben. Sense la clau correcta, ningú no pot llegir el disc.
 settings-encryption-blocked-title = Encara no es pot activar el xifratge del dispositiu
 settings-encryption-blocked-description = Resoleu el que s’indica a continuació i torneu-ho a provar.
-settings-encryption-checking = S’està comprovant l’ordinador…
 settings-encryption-backup = Abans de començar, assegureu-vos que teniu una còpia de seguretat dels fitxers importants.
 settings-encryption-key-title = Deseu la clau de recuperació
 settings-encryption-key-description = Si mai el disc no es pot desbloquejar sol, per exemple després d’una reparació, aquesta clau us hi permetrà tornar a entrar. Guardeu-la en algun lloc que no sigui aquest ordinador.
@@ -217,7 +215,6 @@ settings-encryption-step-background = La resta es fa en segon pla mentre continu
 settings-encryption-step-plugged-in = Mantingueu l’ordinador endollat fins que acabi.
 settings-encryption-ask-pin = Demana també un PIN
 settings-encryption-ask-pin-description = Manté el disc bloquejat encara que algú s’endugui l’ordinador. Es demana quan acaba el xifratge.
-settings-encryption-back = Enrere
 settings-encryption-starting-button = S’està iniciant…
 settings-encryption-restart-and-encrypt = Reinicia i xifra
 
@@ -285,12 +282,6 @@ settings-encryption-pin-too-long = { $max ->
 settings-encryption-pins-differ = Els PIN no coincideixen
 settings-encryption-confirm-field = Confirmació
 settings-encryption-type-again = Torneu-lo a escriure
-settings-encryption-passphrase-field = Frase de pas
-settings-encryption-passphrase-length = { $min ->
-    [one] Com a mínim { $min } caràcter
-   *[other] Com a mínim { $min } caràcters
-}
-settings-encryption-passphrases-differ = Les frases de pas no coincideixen
 
 ## Recovery key
 
@@ -305,7 +296,6 @@ settings-recovery-shown-title = La vostra clau de recuperació
 settings-recovery-shown-description = Escriviu-la si mai l’ordinador us demana una clau de recuperació en arrencar. Guardeu-ne una còpia en algun lloc que no sigui aquest ordinador.
 settings-recovery-fresh-title = Deseu la clau de recuperació nova
 settings-recovery-fresh-description = La clau anterior ja no funciona. Guardeu aquesta en paper o en un gestor de contrasenyes.
-settings-recovery-saved = He desat la clau de recuperació
 
 ## Passwords and keys (the keyring)
 

@@ -3,7 +3,6 @@
 settings-protection-cancel = Откажи
 settings-protection-continue = Продолжи
 settings-protection-close = Затвори
-settings-protection-done = Готово
 settings-protection-restart = Рестартирај
 settings-protection-remove = Отстрани
 settings-protection-turn-on = Вклучи
@@ -201,7 +200,6 @@ settings-encryption-turn-on-title = Вклучување шифрирање на
 settings-encryption-turn-on-description = Вашите датотеки остануваат приватни ако овој компјутер се изгуби или биде украден. Без вистинскиот клуч, никој не може да го прочита дискот.
 settings-encryption-blocked-title = Шифрирањето на уредот сè уште не може да се вклучи
 settings-encryption-blocked-description = Средете го она што е означено подолу, па обидете се повторно.
-settings-encryption-checking = Се проверува вашиот компјутер…
 settings-encryption-backup = Пред да започнете, проверете дали имате резервна копија од важните датотеки.
 settings-encryption-key-title = Зачувајте го клучот за обновување
 settings-encryption-key-description = Ако дискот некогаш не може да се отклучи сам, на пример по поправка, овој клуч ќе ви овозможи пристап. Чувајте го на друго место, не на овој компјутер.
@@ -217,7 +215,6 @@ settings-encryption-step-background = Остатокот се одвива во 
 settings-encryption-step-plugged-in = Држете го компјутерот приклучен на струја додека не заврши.
 settings-encryption-ask-pin = Барај и PIN
 settings-encryption-ask-pin-description = Го држи дискот заклучен дури и ако некој го земе компјутерот. Се бара откако ќе заврши шифрирањето.
-settings-encryption-back = Назад
 settings-encryption-starting-button = Се започнува…
 settings-encryption-restart-and-encrypt = Рестартирај и шифрирај
 
@@ -285,12 +282,6 @@ settings-encryption-pin-too-long = { $max ->
 settings-encryption-pins-differ = PIN-овите не се совпаѓаат
 settings-encryption-confirm-field = Потврда
 settings-encryption-type-again = Внесете го повторно
-settings-encryption-passphrase-field = Тајна фраза
-settings-encryption-passphrase-length = { $min ->
-    [one] Најмалку { $min } знак
-   *[other] Најмалку { $min } знаци
-}
-settings-encryption-passphrases-differ = Тајните фрази не се совпаѓаат
 
 ## Recovery key
 
@@ -305,7 +296,6 @@ settings-recovery-shown-title = Вашиот клуч за обновување
 settings-recovery-shown-description = Внесете го ако компјутерот некогаш побара клуч за обновување при стартување. Чувајте копија на друго место, не на овој компјутер.
 settings-recovery-fresh-title = Зачувајте го новиот клуч за обновување
 settings-recovery-fresh-description = Претходниот клуч повеќе не работи. Чувајте го овој на хартија или во управувач со лозинки.
-settings-recovery-saved = Го зачував клучот за обновување
 
 ## Passwords and keys (the keyring)
 

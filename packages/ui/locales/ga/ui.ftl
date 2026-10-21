@@ -46,6 +46,7 @@ ui-recovery-key-copy = Cóipeáil
 ui-recovery-key-saved = Sábháilte
 ui-recovery-key-printing = Seolta chuig an bprintéir
 ui-recovery-key-copied = Cóipeáilte
+ui-recovery-key-kept = Tá m’eochair athshlánaithe sábháilte agam
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside
@@ -95,3 +96,25 @@ ui-power-watts = { $watts } W
 ## Dialog buttons
 
 ui-dialog-cancel = Cealaigh
+ui-dialog-close = Dún
+ui-dialog-back = Ar ais
+ui-dialog-continue = Lean ar aghaidh
+ui-dialog-done = Déanta
+
+## Passphrases
+
+ui-passphrase-field = Frása faire
+ui-passphrase-confirm = Deimhnigh
+ui-passphrase-type-again = Clóscríobh arís é
+ui-passphrase-length = { $min ->
+    [one] { $min } charachtar ar a laghad
+    [two] { $min } charachtar ar a laghad
+    [few] { $min } charachtar ar a laghad
+    [many] { $min } gcarachtar ar a laghad
+   *[other] { $min } carachtar ar a laghad
+}
+ui-passphrase-mismatch = Níl na frásaí faire mar a chéile
+
+## Encryption
+
+ui-encryption-checking = Á sheiceáil…

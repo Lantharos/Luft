@@ -46,6 +46,7 @@ ui-recovery-key-copy = Kopēt
 ui-recovery-key-saved = Saglabāta
 ui-recovery-key-printing = Nosūtīta printerim
 ui-recovery-key-copied = Nokopēta
+ui-recovery-key-kept = Atkopšanas atslēga ir saglabāta
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside
@@ -95,3 +96,23 @@ ui-power-watts = { $watts } W
 ## Dialog buttons
 
 ui-dialog-cancel = Atcelt
+ui-dialog-close = Aizvērt
+ui-dialog-back = Atpakaļ
+ui-dialog-continue = Turpināt
+ui-dialog-done = Gatavs
+
+## Passphrases
+
+ui-passphrase-field = Paroles frāze
+ui-passphrase-confirm = Apstiprināt
+ui-passphrase-type-again = Ievadiet vēlreiz
+ui-passphrase-length = { $min ->
+    [zero] Vismaz { $min } rakstzīmes
+    [one] Vismaz { $min } rakstzīme
+   *[other] Vismaz { $min } rakstzīmes
+}
+ui-passphrase-mismatch = Paroles frāzes nesakrīt
+
+## Encryption
+
+ui-encryption-checking = Notiek pārbaude…

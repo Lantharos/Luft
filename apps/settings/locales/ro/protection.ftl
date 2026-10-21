@@ -3,7 +3,6 @@
 settings-protection-cancel = Anulează
 settings-protection-continue = Continuă
 settings-protection-close = Închide
-settings-protection-done = Gata
 settings-protection-restart = Repornește
 settings-protection-remove = Elimină
 settings-protection-turn-on = Activează
@@ -209,7 +208,6 @@ settings-encryption-turn-on-title = Activați criptarea dispozitivului
 settings-encryption-turn-on-description = Fișierele rămân private dacă acest computer este pierdut sau furat. Fără cheia potrivită, nimeni nu poate citi discul.
 settings-encryption-blocked-title = Criptarea dispozitivului nu poate fi activată încă
 settings-encryption-blocked-description = Rezolvați ce este marcat mai jos, apoi încercați din nou.
-settings-encryption-checking = Se verifică computerul…
 settings-encryption-backup = Înainte de a începe, asigurați-vă că aveți o copie de rezervă a fișierelor importante.
 settings-encryption-key-title = Salvați cheia de recuperare
 settings-encryption-key-description = Dacă discul nu se mai poate debloca singur, de exemplu după o reparație, această cheie vă redă accesul. Păstrați-o în alt loc decât pe acest computer.
@@ -225,7 +223,6 @@ settings-encryption-step-background = Restul se face în fundal, în timp ce luc
 settings-encryption-step-plugged-in = Țineți computerul conectat la priză până la final.
 settings-encryption-ask-pin = Cere și un PIN
 settings-encryption-ask-pin-description = Discul rămâne blocat chiar dacă cineva ia computerul. Codul este cerut după ce se termină criptarea.
-settings-encryption-back = Înapoi
 settings-encryption-starting-button = Se pornește…
 settings-encryption-restart-and-encrypt = Repornește și criptează
 
@@ -295,13 +292,6 @@ settings-encryption-pin-too-long = { $max ->
 settings-encryption-pins-differ = Codurile PIN nu coincid
 settings-encryption-confirm-field = Confirmare
 settings-encryption-type-again = Tastați din nou
-settings-encryption-passphrase-field = Frază de acces
-settings-encryption-passphrase-length = { $min ->
-    [one] Cel puțin { $min } caracter
-    [few] Cel puțin { $min } caractere
-   *[other] Cel puțin { $min } de caractere
-}
-settings-encryption-passphrases-differ = Frazele de acces nu coincid
 
 ## Recovery key
 
@@ -316,7 +306,6 @@ settings-recovery-shown-title = Cheia de recuperare
 settings-recovery-shown-description = Tastați-o dacă la pornire computerul cere vreodată o cheie de recuperare. Păstrați o copie în alt loc decât pe acest computer.
 settings-recovery-fresh-title = Salvați noua cheie de recuperare
 settings-recovery-fresh-description = Cheia anterioară nu mai funcționează. Păstrați-o pe aceasta pe hârtie sau într-un manager de parole.
-settings-recovery-saved = Am salvat cheia de recuperare
 
 ## Passwords and keys (the keyring)
 

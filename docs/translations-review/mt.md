@@ -66,7 +66,7 @@ Strings in Luft's Maltese translation that a native speaker should check: places
 - `apps/settings/locales/mt/personalization.ftl` `settings-accessibility-bounce-keys`: "Bounce keys" — kept in English as in the page keywords; a Maltese term may exist.
 - `apps/settings/locales/mt/personalization.ftl` `settings-accessibility-typing-assist-count`: "{ $count } mixgħula" — feminine agreement with an implied “għajnuna”; check it reads well.
 - `apps/settings/locales/mt/protection.ftl` `settings-privacy-screen-lock`: "Sakkar l-iskrin" — heading is a verb phrase; Maltese lacks a common noun for locking the screen.
-- `apps/settings/locales/mt/protection.ftl` `settings-encryption-passphrase-field`: "Passphrase" — kept in English and feminine, distinct from password; no glossary term exists.
+- `packages/ui/locales/mt/ui.ftl` `ui-passphrase-field`: "Passphrase" — kept in English and feminine, distinct from password; no glossary term exists.
 - `apps/settings/locales/mt/protection.ftl` `settings-encryption-unlocks-chip`: "Tiżblokka waħedha biċ-ċippa tas-sigurtà" — feminine verbs assume the implied subject is id-diska; check it reads right under the Device encryption title.
 - `apps/settings/locales/mt/protection.ftl` `settings-passwords-history-read`: "{ $app } uża “{ $item }”" — bare app names take masculine verbs per the style guide's “Rover huwa”; check this across the history messages.
 - `apps/settings/locales/mt/system.ftl` `settings-users-fingerprint-remove`: "Neħħi { $finger }" — the title form of the finger name starts with a capital (Is-saba’ …) mid-sentence; screen-reader label only.

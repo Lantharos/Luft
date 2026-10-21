@@ -2,8 +2,8 @@
 	import { onDestroy } from 'svelte';
 	import { app } from '#lib/state/app.svelte.js';
 	import EncryptionPage from './encryption/EncryptionPage.svelte';
-	import UnlockDialog from './encryption/UnlockDialog.svelte';
-	import { unlockPrompt } from './encryption/unlock.svelte';
+	import UnlockDialog from './encryption/unlocking/UnlockDialog.svelte';
+	import { unlockPrompt } from './encryption/unlocking/unlock.svelte';
 	import KeyringPage from './keyring/KeyringPage.svelte';
 	import { KeyringState } from './keyring/state.svelte';
 	import Overview from './Overview.svelte';

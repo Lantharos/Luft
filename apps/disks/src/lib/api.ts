@@ -1,5 +1,5 @@
 import { invoke, listen } from '@lantharos/sabine';
-import { activationToken, type Appearance } from '@luft/ui';
+import { activationToken, type Appearance, type EncryptionCheck } from '@luft/ui';
 
 export type Kind = 'nvme' | 'ssd' | 'hdd' | 'usb' | 'card' | 'optical' | 'image';
 export type Filesystem = 'ext4' | 'btrfs' | 'exfat' | 'ntfs' | 'vfat';
@@ -151,9 +151,9 @@ export interface Protection {
 	drives: Record<string, DriveEncryption>;
 }
 
-export interface EncryptionCheck {
+export interface DriveCheck {
 	method: 'in-place' | 'reformat' | 'none';
-	checks: { id: string; passed: boolean; sentence: string }[];
+	checks: EncryptionCheck[];
 	autoUnlock: string;
 }
 
@@ -243,7 +243,7 @@ export const cancelImage = () => invoke<void>('disks_image_cancel');
 
 export const trust = {
 	state: () => invoke<Protection>('trust_state'),
-	check: (block: string) => invoke<EncryptionCheck>('trust_check', { block }, WAIT),
+	check: (block: string) => invoke<DriveCheck>('trust_check', { block }, WAIT),
 	recoveryKey: () => invoke<string>('trust_recovery_key'),
 	encrypt: (block: string, recoveryKey: string, passphrase: string, autoUnlock: boolean) =>
 		invoke<void>('trust_encrypt', { block, recoveryKey, passphrase, autoUnlock }, WAIT),

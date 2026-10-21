@@ -1,4 +1,4 @@
-import type { Outcome } from '../api';
+import type { Outcome } from '../../api';
 
 interface Request {
 	rejected: string | null;

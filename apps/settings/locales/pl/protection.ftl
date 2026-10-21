@@ -3,7 +3,6 @@
 settings-protection-cancel = Anuluj
 settings-protection-continue = Dalej
 settings-protection-close = Zamknij
-settings-protection-done = Gotowe
 settings-protection-restart = Uruchom ponownie
 settings-protection-remove = Usuń
 settings-protection-turn-on = Włącz
@@ -217,7 +216,6 @@ settings-encryption-turn-on-title = Włącz szyfrowanie urządzenia
 settings-encryption-turn-on-description = Twoje pliki pozostaną prywatne, jeśli komputer zostanie zgubiony lub skradziony. Bez właściwego klucza nikt nie odczyta dysku.
 settings-encryption-blocked-title = Nie można jeszcze włączyć szyfrowania urządzenia
 settings-encryption-blocked-description = Zajmij się tym, co zaznaczono poniżej, i spróbuj ponownie.
-settings-encryption-checking = Sprawdzanie komputera…
 settings-encryption-backup = Zanim zaczniesz, upewnij się, że masz kopię zapasową ważnych plików.
 settings-encryption-key-title = Zapisz klucz odzyskiwania
 settings-encryption-key-description = Jeśli dysk kiedyś nie odblokuje się samodzielnie, na przykład po naprawie, ten klucz pozwoli ci się do niego dostać. Przechowuj go w innym miejscu niż ten komputer.
@@ -233,7 +231,6 @@ settings-encryption-step-background = Reszta odbywa się w tle, a ty możesz dal
 settings-encryption-step-plugged-in = Nie odłączaj komputera od zasilania, dopóki szyfrowanie się nie zakończy.
 settings-encryption-ask-pin = Pytaj też o kod PIN
 settings-encryption-ask-pin-description = Dysk pozostaje zablokowany, nawet jeśli ktoś zabierze komputer. Kod PIN zostanie ustawiony po zakończeniu szyfrowania.
-settings-encryption-back = Wstecz
 settings-encryption-starting-button = Rozpoczynanie…
 settings-encryption-restart-and-encrypt = Uruchom ponownie i szyfruj
 
@@ -305,14 +302,6 @@ settings-encryption-pin-too-long = { $max ->
 settings-encryption-pins-differ = Kody PIN nie są zgodne
 settings-encryption-confirm-field = Potwierdź
 settings-encryption-type-again = Wpisz ponownie
-settings-encryption-passphrase-field = Fraza hasła
-settings-encryption-passphrase-length = { $min ->
-    [one] Co najmniej { $min } znak
-    [few] Co najmniej { $min } znaki
-    [many] Co najmniej { $min } znaków
-   *[other] Co najmniej { $min } znaku
-}
-settings-encryption-passphrases-differ = Frazy hasła nie są zgodne
 
 ## Recovery key
 
@@ -327,7 +316,6 @@ settings-recovery-shown-title = Twój klucz odzyskiwania
 settings-recovery-shown-description = Wpisz go, jeśli komputer kiedyś poprosi o klucz odzyskiwania przy uruchamianiu. Przechowuj kopię w innym miejscu niż ten komputer.
 settings-recovery-fresh-title = Zapisz nowy klucz odzyskiwania
 settings-recovery-fresh-description = Poprzedni klucz już nie działa. Przechowuj go na papierze lub w menedżerze haseł.
-settings-recovery-saved = Klucz odzyskiwania jest zapisany
 
 ## Passwords and keys (the keyring)
 

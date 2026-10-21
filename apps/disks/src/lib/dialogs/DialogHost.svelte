@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { bytes, ConfirmDialog } from '@luft/ui';
+	import { bytes, ConfirmDialog, RecoveryKeyDialog } from '@luft/ui';
 	import * as api from '#lib/api.js';
 	import { volumeName } from '#lib/format.js';
 	import { disks } from '#lib/state/disks.svelte.js';
@@ -12,7 +12,6 @@
 	import CreateDialog from './format/CreateDialog.svelte';
 	import ApplyDialog from './editor/ApplyDialog.svelte';
 	import EncryptionDialog from './encryption/EncryptionDialog.svelte';
-	import RecoveryKeyDialog from './encryption/RecoveryKeyDialog.svelte';
 	import TurnOffDialog from './encryption/TurnOffDialog.svelte';
 	import TurnOnDialog from './encryption/TurnOnDialog.svelte';
 	import { dialogs } from './dialogs.svelte';
@@ -61,7 +60,15 @@
 {:else if dialog?.kind === 'remove-system'}
 	<RemoveSystemDialog system={dialog.system} onclose={dialogs.close} />
 {:else if dialog?.kind === 'recovery-key'}
-	<RecoveryKeyDialog key={dialog.key} name={dialog.name} onclose={dialogs.close} />
+	{@const { key, name } = dialog}
+	<RecoveryKeyDialog
+		{key}
+		title="Recovery key for “{name}”"
+		description="Keep a copy somewhere other than this drive and computer."
+		onsave={() => api.trust.saveKey(key, name)}
+		onprint={() => api.trust.printKey(key, name)}
+		onclose={dialogs.close}
+	/>
 {:else if dialog?.kind === 'format-volume'}
 	<FormatDialog drive={dialog.drive} volume={dialog.volume} onclose={dialogs.close} />
 {:else if dialog?.kind === 'format-drive'}

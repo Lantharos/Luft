@@ -46,6 +46,7 @@ ui-recovery-key-copy = Másolás
 ui-recovery-key-saved = Mentve
 ui-recovery-key-printing = Elküldve a nyomtatóra
 ui-recovery-key-copied = Másolva
+ui-recovery-key-kept = Elmentettem a helyreállítási kulcsot
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside
@@ -95,3 +96,22 @@ ui-power-watts = { $watts } W
 ## Dialog buttons
 
 ui-dialog-cancel = Mégse
+ui-dialog-close = Bezárás
+ui-dialog-back = Vissza
+ui-dialog-continue = Tovább
+ui-dialog-done = Kész
+
+## Passphrases
+
+ui-passphrase-field = Jelmondat
+ui-passphrase-confirm = Megerősítés
+ui-passphrase-type-again = Írja be újra
+ui-passphrase-length = { $min ->
+    [one] Legalább { $min } karakter
+   *[other] Legalább { $min } karakter
+}
+ui-passphrase-mismatch = A jelmondatok nem egyeznek
+
+## Encryption
+
+ui-encryption-checking = Ellenőrzés…

@@ -3,7 +3,6 @@
 settings-protection-cancel = Mégse
 settings-protection-continue = Tovább
 settings-protection-close = Bezárás
-settings-protection-done = Kész
 settings-protection-restart = Újraindítás
 settings-protection-remove = Eltávolítás
 settings-protection-turn-on = Bekapcsolás
@@ -201,7 +200,6 @@ settings-encryption-turn-on-title = Eszköztitkosítás bekapcsolása
 settings-encryption-turn-on-description = A fájlok privátak maradnak akkor is, ha a számítógép elveszik vagy ellopják. A megfelelő kulcs nélkül senki sem tudja olvasni a lemezt.
 settings-encryption-blocked-title = Az eszköztitkosítás még nem kapcsolható be
 settings-encryption-blocked-description = Rendezze az alább megjelölt dolgokat, majd próbálja újra.
-settings-encryption-checking = A számítógép ellenőrzése…
 settings-encryption-backup = Mielőtt elkezdi, győződjön meg róla, hogy a fontos fájljairól van biztonsági másolat.
 settings-encryption-key-title = A helyreállítási kulcs mentése
 settings-encryption-key-description = Ha a lemez egyszer nem tud magától feloldódni, például egy javítás után, ezzel a kulccsal férhet hozzá újra. Ne ezen a számítógépen tárolja.
@@ -217,7 +215,6 @@ settings-encryption-step-background = A többi a háttérben történik, miközb
 settings-encryption-step-plugged-in = A befejezésig tartsa a számítógépet töltőn.
 settings-encryption-ask-pin = PIN-kód kérése is
 settings-encryption-ask-pin-description = A lemez zárolva marad akkor is, ha valaki elviszi a számítógépet. A titkosítás befejezése után kell megadni.
-settings-encryption-back = Vissza
 settings-encryption-starting-button = Indítás…
 settings-encryption-restart-and-encrypt = Újraindítás és titkosítás
 
@@ -285,12 +282,6 @@ settings-encryption-pin-too-long = { $max ->
 settings-encryption-pins-differ = A PIN-kódok nem egyeznek
 settings-encryption-confirm-field = Megerősítés
 settings-encryption-type-again = Írja be újra
-settings-encryption-passphrase-field = Jelmondat
-settings-encryption-passphrase-length = { $min ->
-    [one] Legalább { $min } karakter
-   *[other] Legalább { $min } karakter
-}
-settings-encryption-passphrases-differ = A jelmondatok nem egyeznek
 
 ## Recovery key
 
@@ -305,7 +296,6 @@ settings-recovery-shown-title = A helyreállítási kulcs
 settings-recovery-shown-description = Írja be, ha a számítógép indításkor helyreállítási kulcsot kér. Tartson róla egy másolatot máshol, ne ezen a számítógépen.
 settings-recovery-fresh-title = Az új helyreállítási kulcs mentése
 settings-recovery-fresh-description = Az előző kulcs már nem működik. Ezt tartsa papíron vagy egy jelszókezelőben.
-settings-recovery-saved = Elmentettem a helyreállítási kulcsot
 
 ## Passwords and keys (the keyring)
 

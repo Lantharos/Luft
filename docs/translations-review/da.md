@@ -49,7 +49,7 @@ Strings in Luft's Danish translation that a native speaker should check: terms w
 - `apps/settings/locales/da/personalization.ftl` `settings-accessibility-sticky-keys` / `slow-keys` / `bounce-keys`: "Klæbende taster", "Langsomme taster", "Afvisningstaster" — GNOME's Danish names, also used in the keyboard notifications; Windows calls Sticky Keys »Træge taster« and Filter Keys »Filtertaster«, check which Danes recognise.
 - `apps/settings/locales/da/personalization.ftl` `settings-accessibility-pointing`: "Mus og markør" — section heading for pointing aids; English "Pointing" has no settled Danish noun.
 - `apps/settings/locales/da/personalization.ftl` `settings-fonts-styles`: "{ $count } snit" — "snit" is the typographer's word for a font style; check it's understood by ordinary users.
-- `apps/settings/locales/da/protection.ftl` `settings-encryption-passphrase-field`: "Adgangsfrase" — used in setup and Settings to stay distinct from "adgangskode"; no settled OS term, check it.
+- `packages/ui/locales/da/ui.ftl` `ui-passphrase-field`: "Adgangsfrase" — used in setup and Settings to stay distinct from "adgangskode"; no settled OS term, check it.
 - `apps/settings/locales/da/system.ftl` `settings-updates-variant-standard`: "Skift til standardudgaven" — "standard image" rendered as "standard edition" here and in the installer's errors, to avoid "aftryk"; check it fits the NVIDIA/standard choice.
 - `apps/settings/locales/da/system.ftl` `settings-datetime-week-start-regional`: "{ $day }, ifølge dit område" — assumes $day arrives as a lowercase weekday that reads fine at the start of the label.
 

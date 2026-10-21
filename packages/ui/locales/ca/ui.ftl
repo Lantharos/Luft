@@ -46,6 +46,7 @@ ui-recovery-key-copy = Copia
 ui-recovery-key-saved = Desada
 ui-recovery-key-printing = S’ha enviat a la impressora
 ui-recovery-key-copied = Copiada
+ui-recovery-key-kept = He desat la clau de recuperació
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside
@@ -95,3 +96,22 @@ ui-power-watts = { $watts } W
 ## Dialog buttons
 
 ui-dialog-cancel = Cancel·la
+ui-dialog-close = Tanca
+ui-dialog-back = Enrere
+ui-dialog-continue = Continua
+ui-dialog-done = Fet
+
+## Passphrases
+
+ui-passphrase-field = Frase de pas
+ui-passphrase-confirm = Confirmació
+ui-passphrase-type-again = Torneu-lo a escriure
+ui-passphrase-length = { $min ->
+    [one] Com a mínim { $min } caràcter
+   *[other] Com a mínim { $min } caràcters
+}
+ui-passphrase-mismatch = Les frases de pas no coincideixen
+
+## Encryption
+
+ui-encryption-checking = S’està comprovant…

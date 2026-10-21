@@ -46,6 +46,7 @@ ui-recovery-key-copy = Copiază
 ui-recovery-key-saved = Salvată
 ui-recovery-key-printing = Trimisă la imprimantă
 ui-recovery-key-copied = Copiată
+ui-recovery-key-kept = Am salvat cheia de recuperare
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside
@@ -95,3 +96,23 @@ ui-power-watts = { $watts } W
 ## Dialog buttons
 
 ui-dialog-cancel = Anulează
+ui-dialog-close = Închide
+ui-dialog-back = Înapoi
+ui-dialog-continue = Continuă
+ui-dialog-done = Gata
+
+## Passphrases
+
+ui-passphrase-field = Frază de acces
+ui-passphrase-confirm = Confirmare
+ui-passphrase-type-again = Tastați din nou
+ui-passphrase-length = { $min ->
+    [one] Cel puțin { $min } caracter
+    [few] Cel puțin { $min } caractere
+   *[other] Cel puțin { $min } de caractere
+}
+ui-passphrase-mismatch = Frazele de acces nu coincid
+
+## Encryption
+
+ui-encryption-checking = Se verifică…

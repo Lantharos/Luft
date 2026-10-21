@@ -46,6 +46,7 @@ ui-recovery-key-copy = Kopioi
 ui-recovery-key-saved = Tallennettu
 ui-recovery-key-printing = Lähetetty tulostimeen
 ui-recovery-key-copied = Kopioitu
+ui-recovery-key-kept = Olen tallentanut palautusavaimeni
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside
@@ -95,3 +96,22 @@ ui-power-watts = { $watts } W
 ## Dialog buttons
 
 ui-dialog-cancel = Peruuta
+ui-dialog-close = Sulje
+ui-dialog-back = Takaisin
+ui-dialog-continue = Jatka
+ui-dialog-done = Valmis
+
+## Passphrases
+
+ui-passphrase-field = Tunnuslause
+ui-passphrase-confirm = Vahvista
+ui-passphrase-type-again = Kirjoita uudelleen
+ui-passphrase-length = { $min ->
+    [one] Vähintään { $min } merkki
+   *[other] Vähintään { $min } merkkiä
+}
+ui-passphrase-mismatch = Tunnuslauseet eivät täsmää
+
+## Encryption
+
+ui-encryption-checking = Tarkistetaan…

@@ -3,7 +3,6 @@
 settings-protection-cancel = Ακύρωση
 settings-protection-continue = Συνέχεια
 settings-protection-close = Κλείσιμο
-settings-protection-done = Τέλος
 settings-protection-restart = Επανεκκίνηση
 settings-protection-remove = Αφαίρεση
 settings-protection-turn-on = Ενεργοποίηση
@@ -201,7 +200,6 @@ settings-encryption-turn-on-title = Ενεργοποίηση κρυπτογρά�
 settings-encryption-turn-on-description = Τα αρχεία σας μένουν ιδιωτικά αν ο υπολογιστής χαθεί ή κλαπεί. Χωρίς το σωστό κλειδί, κανείς δεν μπορεί να διαβάσει τον δίσκο.
 settings-encryption-blocked-title = Η κρυπτογράφηση συσκευής δεν μπορεί να ενεργοποιηθεί ακόμη
 settings-encryption-blocked-description = Τακτοποιήστε όσα επισημαίνονται παρακάτω και δοκιμάστε ξανά.
-settings-encryption-checking = Έλεγχος του υπολογιστή σας…
 settings-encryption-backup = Πριν ξεκινήσετε, βεβαιωθείτε ότι έχετε αντίγραφα ασφαλείας των σημαντικών αρχείων σας.
 settings-encryption-key-title = Αποθήκευση του κλειδιού αποκατάστασης
 settings-encryption-key-description = Αν ποτέ ο δίσκος δεν μπορεί να ξεκλειδώσει μόνος του, για παράδειγμα μετά από επισκευή, αυτό το κλειδί σάς επιτρέπει να μπείτε ξανά. Φυλάξτε το κάπου αλλού, όχι σε αυτόν τον υπολογιστή.
@@ -217,7 +215,6 @@ settings-encryption-step-background = Τα υπόλοιπα γίνονται σ�
 settings-encryption-step-plugged-in = Κρατήστε τον υπολογιστή στο ρεύμα μέχρι να ολοκληρωθεί.
 settings-encryption-ask-pin = Να ζητείται και PIN
 settings-encryption-ask-pin-description = Ο δίσκος μένει κλειδωμένος ακόμη κι αν κάποιος πάρει τον υπολογιστή. Θα σας ζητηθεί μόλις ολοκληρωθεί η κρυπτογράφηση.
-settings-encryption-back = Πίσω
 settings-encryption-starting-button = Έναρξη…
 settings-encryption-restart-and-encrypt = Επανεκκίνηση και κρυπτογράφηση
 
@@ -285,12 +282,6 @@ settings-encryption-pin-too-long = { $max ->
 settings-encryption-pins-differ = Τα PIN δεν ταιριάζουν
 settings-encryption-confirm-field = Επιβεβαίωση
 settings-encryption-type-again = Πληκτρολογήστε το ξανά
-settings-encryption-passphrase-field = Φράση πρόσβασης
-settings-encryption-passphrase-length = { $min ->
-    [one] Τουλάχιστον { $min } χαρακτήρας
-   *[other] Τουλάχιστον { $min } χαρακτήρες
-}
-settings-encryption-passphrases-differ = Οι φράσεις πρόσβασης δεν ταιριάζουν
 
 ## Recovery key
 
@@ -305,7 +296,6 @@ settings-recovery-shown-title = Το κλειδί αποκατάστασής σ�
 settings-recovery-shown-description = Πληκτρολογήστε το αν ο υπολογιστής σας ζητήσει ποτέ κλειδί αποκατάστασης κατά την εκκίνηση. Φυλάξτε ένα αντίγραφο κάπου αλλού, όχι σε αυτόν τον υπολογιστή.
 settings-recovery-fresh-title = Αποθήκευση του νέου κλειδιού αποκατάστασης
 settings-recovery-fresh-description = Το προηγούμενο κλειδί σας δεν λειτουργεί πια. Φυλάξτε αυτό σε χαρτί ή σε μια εφαρμογή διαχείρισης κωδικών πρόσβασης.
-settings-recovery-saved = Αποθήκευσα το κλειδί αποκατάστασης
 
 ## Passwords and keys (the keyring)
 

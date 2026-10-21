@@ -7,7 +7,7 @@
 	import Usb from '@lucide/svelte/icons/usb';
 	import { t } from '@luft/i18n';
 	import { bytes, Choice, Dialog } from '@luft/ui';
-	import type { Blocked } from '#lib/api/meet.js';
+	import type { Blocked, Change } from '#lib/api/meet.js';
 	import Frame from '#lib/components/Frame.svelte';
 	import Problem from '#lib/components/Problem.svelte';
 	import SpaceBar from '#lib/components/SpaceBar.svelte';
@@ -16,17 +16,26 @@
 	import { maker } from '#lib/state/stick.svelte.js';
 
 	const GIB = 1024 ** 3;
-	const HELD: Record<Exclude<Blocked, 'busy' | 'elsewhere'>, string> = {
-		encrypted: 'luft-resize-encrypted',
+	const HELD: Record<Exclude<Blocked, 'busy'>, string> = {
+		reencrypting: 'luft-resize-reencrypting',
+		passphrase: 'luft-resize-passphrase',
 		apart: 'luft-resize-apart',
-		unreadable: 'luft-resize-unreadable'
+		unreadable: 'luft-resize-start-first'
+	};
+	const PENDING: Record<Change['change'], [string, string]> = {
+		grow: ['luft-pending-grow', 'luft-pending-grow-description'],
+		shrink: ['luft-pending-shrink', 'luft-pending-shrink-description'],
+		trim: ['luft-pending-trim', 'luft-pending-trim-description']
 	};
 
 	let restarting = $state(false);
 	let removing = $state(false);
 	let installed = $derived(luft.installed);
 	let pending = $derived(installed?.pending ?? null);
-	let held = $derived(installed?.blocked && installed.blocked !== 'busy' && installed.blocked !== 'elsewhere' ? HELD[installed.blocked] : null);
+	let held = $derived(installed?.blocked && installed.blocked !== 'busy' ? HELD[installed.blocked] : null);
+	let resizing = $derived(
+		!installed ? '' : installed.besideWindows ? t('luft-resize-description') : t('luft-resize-drive-description', { drive: installed.drive })
+	);
 
 	let description = $derived(
 		!installed ? t('luft-looking') : installed.besideWindows ? t('luft-description-beside') : t('luft-description-drive', { drive: installed.drive })
@@ -60,15 +69,15 @@
 			{#if pending}
 				<Choice
 					icon={Hourglass}
-					title={pending.change === 'grow' ? t('luft-pending-grow') : t('luft-pending-shrink')}
-					description={pending.change === 'grow' ? t('luft-pending-grow-description') : t('luft-pending-shrink-description')}
+					title={t(PENDING[pending.change][0])}
+					description={t(PENDING[pending.change][1])}
 					onclick={() => (restarting = true)}
 				/>
-			{:else if installed.besideWindows}
+			{:else}
 				<Choice
 					icon={ArrowLeftRight}
 					title={t('luft-resize-title')}
-					description={held ? t(held) : t('luft-resize-description')}
+					description={held ? t(held) : resizing}
 					disabled={!!held}
 					onclick={() => luft.measure()}
 				/>

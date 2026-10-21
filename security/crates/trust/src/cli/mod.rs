@@ -108,6 +108,26 @@ enum EncryptionAction {
     Off,
     /// The step that runs at startup before the system disk is mounted
     Initrd,
+    /// Copy the system disk's encryption onto a partition and open it there, to move the system onto it
+    CopyTo {
+        device: PathBuf,
+    },
+    /// Close a partition the system moved off and wipe its encryption
+    Retire {
+        device: PathBuf,
+    },
+    /// Give a partition the system moved onto the system disk's own LUKS UUID
+    Settle {
+        device: PathBuf,
+        uuid: String,
+    },
+    /// Fit the open encryption on a partition to the partition, or to SIZE bytes of it
+    Fit {
+        device: PathBuf,
+        size: Option<u64>,
+    },
+    /// The step at startup that opens both partitions while the system moves
+    InitrdMove,
 }
 
 impl Command {
@@ -241,6 +261,14 @@ fn encryption(action: EncryptionAction) -> Result<()> {
             Ok(())
         }
         EncryptionAction::Initrd => disk::run_in_initrd(),
+        EncryptionAction::CopyTo { device } => {
+            println!("{}", disk::moving::copy_to(&device)?.display());
+            Ok(())
+        }
+        EncryptionAction::Retire { device } => disk::moving::retire(&device),
+        EncryptionAction::Settle { device, uuid } => disk::moving::settle(&device, &uuid),
+        EncryptionAction::Fit { device, size } => disk::moving::fit(&device, size),
+        EncryptionAction::InitrdMove => disk::moving::open_in_initrd(),
     }
 }
 

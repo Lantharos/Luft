@@ -6,7 +6,7 @@ use super::layout::{self, Part, Startup};
 use crate::L10N;
 use crate::install::Destination;
 use crate::install::windows::Choices;
-use crate::survey::{self, ALIGNMENT, Drive, Survey};
+use crate::survey::{self, Drive, Survey};
 
 #[derive(Deserialize)]
 #[serde(
@@ -119,7 +119,9 @@ fn partitions(survey: &Survey, target: &Target) -> Result<Plan> {
             let Some(space) = drive.free.iter().find(|space| space.offset == *offset) else {
                 bail!(t!(L10N, "installer-space-gone"));
             };
-            if space.size < survey.smallest_system + startup.space() + ALIGNMENT {
+            let usable = survey::room::align_down(space.offset + space.size)
+                .saturating_sub(survey::room::align_up(space.offset));
+            if usable < survey.smallest_system + startup.space() {
                 bail!(t!(L10N, "installer-space-too-small"));
             }
             Ok(Plan {

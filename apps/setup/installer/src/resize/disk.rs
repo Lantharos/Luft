@@ -22,7 +22,8 @@ pub struct Part {
     pub fs_uuid: String,
     pub uuid: String,
     pub filesystem: String,
-    pub encrypted: bool,
+    pub luks_uuid: Option<String>,
+    pub mapped: Option<String>,
 }
 
 pub struct Disk {
@@ -38,6 +39,11 @@ fn canonical(device: &str) -> String {
 }
 
 fn part(volume: &Volume) -> Part {
+    let cleartext = volume
+        .encryption
+        .as_ref()
+        .and_then(|encryption| encryption.cleartext.as_deref());
+    let contents = cleartext.unwrap_or(volume);
     Part {
         span: Span {
             offset: volume.offset,
@@ -50,11 +56,12 @@ fn part(volume: &Volume) -> Part {
             .clone()
             .unwrap_or_default()
             .to_ascii_lowercase(),
-        label: volume.label.clone(),
-        fs_uuid: volume.uuid.clone(),
+        label: contents.label.clone(),
+        fs_uuid: contents.uuid.clone(),
         uuid: volume.partition_uuid.to_ascii_lowercase(),
-        filesystem: volume.fs_type.clone(),
-        encrypted: volume.encryption.is_some(),
+        filesystem: contents.fs_type.clone(),
+        luks_uuid: volume.encryption.is_some().then(|| volume.uuid.clone()),
+        mapped: cleartext.map(|cleartext| canonical(&cleartext.device)),
     }
 }
 
@@ -91,6 +98,16 @@ fn beneath_mapping(device: &str) -> Option<String> {
         .next()
         .is_none()
         .then(|| format!("/dev/{}", partition.to_string_lossy()))
+}
+
+pub fn mapper_name(device: &str) -> Result<String> {
+    let name = Path::new(device)
+        .file_name()
+        .and_then(|name| name.to_str())
+        .context("An open disk has no name")?;
+    let mapped = std::fs::read_to_string(format!("/sys/class/block/{name}/dm/name"))
+        .with_context(|| format!("{device} isn't an open disk"))?;
+    Ok(mapped.trim().to_owned())
 }
 
 pub fn root_device() -> Result<String> {
@@ -141,6 +158,10 @@ impl Disk {
         self.free.iter().copied().find(|span| span.end() == offset)
     }
 
+    pub fn free_after(&self, offset: u64) -> Option<Span> {
+        self.free.iter().copied().find(|span| span.offset == offset)
+    }
+
     pub fn create(&self, span: Span, kind: &str, name: &str) -> Result<()> {
         wait(udisks::created(
             &self.table,
@@ -155,6 +176,10 @@ impl Disk {
 }
 
 impl Part {
+    pub fn filesystem_device(&self) -> &str {
+        self.mapped.as_deref().unwrap_or(&self.device)
+    }
+
     fn changed(&self, result: Result<(), String>) -> Result<()> {
         result
             .map_err(anyhow::Error::msg)

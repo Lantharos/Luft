@@ -26,7 +26,12 @@ fn measured() -> Result<Survey, String> {
 }
 
 pub fn range() -> Result<Option<Range>, String> {
-    let survey = measured()?;
+    let quick = found()?;
+    let survey = if quick.beside_windows() {
+        measured()?
+    } else {
+        quick
+    };
     Ok(survey
         .range()
         .filter(|_| survey.describe().blocked.is_none()))
@@ -55,17 +60,30 @@ pub fn details() -> Result<Option<Installed>, String> {
 pub fn resize(context: &Context, size: u64) -> Result<Installed, String> {
     let quick = found()?;
     let current = quick.luft.root.size;
-    let survey = if size > current { measured()? } else { quick };
+    let survey = if size > current && quick.beside_windows() {
+        measured()?
+    } else {
+        quick
+    };
     let range = survey
         .range()
         .filter(|_| survey.describe().blocked.is_none());
-    let (Some(range), Some(gap)) = (range, survey.gap()) else {
+    let Some(range) = range else {
         return Err(t!(L10N, "luft-not-resizable"));
     };
+    let gap = survey.gap().unwrap_or(0);
     if !range.allows(current, size) {
         return Err(t!(L10N, "luft-size-not-allowed"));
     }
-    let change = if size > current {
+    let change = if !survey.beside_windows() {
+        if size > current {
+            Change::Grow
+        } else {
+            Change::Trim {
+                bytes: current - size,
+            }
+        }
+    } else if size > current {
         let taken = align_up((size - current).saturating_sub(gap));
         if taken > 0 {
             context.progress(Stage::Shrinking, 0, 1);

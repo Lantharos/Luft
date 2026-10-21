@@ -1,6 +1,7 @@
 mod details;
 mod esp;
 mod found;
+mod luks;
 mod remove;
 mod request;
 mod resize;

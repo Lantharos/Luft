@@ -8,23 +8,27 @@ apps/setup/installer/src/meet/reclaim.rs	Meet Luft's copy of Luft couldn't be re
 apps/setup/installer/src/resize/btrfs.rs	Luft's file system couldn't change its size
 apps/setup/installer/src/resize/btrfs.rs	Luft's file system didn't say how full it is
 apps/setup/installer/src/resize/btrfs.rs	Luft's files couldn't move off {device}
+apps/setup/installer/src/resize/disk.rs	An open disk has no name
 apps/setup/installer/src/resize/disk.rs	Luft's partition isn't on any drive
 apps/setup/installer/src/resize/disk.rs	The drive {id} is gone
+apps/setup/installer/src/resize/luks.rs	Luft's drive is still being encrypted or decrypted, so it can't move until that's done
+apps/setup/installer/src/resize/luks.rs	Luft's drive only opens with a passphrase, which Luft can't type for itself
+apps/setup/installer/src/resize/luks.rs	Luft's encryption didn't say where its data starts
+apps/setup/installer/src/resize/luks.rs	Luft's encryption header isn't readable
 apps/setup/installer/src/resize/mod.rs	Luft didn't change its size
 apps/setup/installer/src/resize/mod.rs	Luft gave up changing its size
 apps/setup/installer/src/resize/mod.rs	Luft's file system already spans more than one partition
-apps/setup/installer/src/resize/mod.rs	Luft's partition is encrypted, so it can't move
+apps/setup/installer/src/resize/mod.rs	Luft's partition doesn't hold btrfs
 apps/setup/installer/src/resize/mod.rs	Luft's partition isn't on its drive
 apps/setup/installer/src/resize/mod.rs	The request is for another Luft
 apps/setup/installer/src/resize/plan.rs	Luft is too full to move this way
 apps/setup/installer/src/resize/plan.rs	Luft wouldn't have room for its files
 apps/setup/installer/src/resize/plan.rs	That's too little to give back
 apps/setup/installer/src/resize/plan.rs	The free space is too small
+apps/setup/installer/src/resize/plan.rs	There's no free space next to Luft
 apps/setup/installer/src/resize/plan.rs	There's no free space right before Luft
-apps/setup/installer/src/resize/request.rs	Luft's resize request couldn't be read
-apps/setup/installer/src/resize/request.rs	Luft's resize request couldn't be removed
-apps/setup/installer/src/resize/request.rs	Luft's resize request couldn't be unlocked
 apps/setup/installer/src/resize/request.rs	Luft's resize request isn't readable
+apps/setup/installer/src/resize/space.rs	Luft's partition isn't on its drive
 apps/setup/installer/src/resize/startup.rs	Luft startup
 apps/setup/installer/src/resize/startup.rs	Luft's new startup partition couldn't be formatted
 apps/setup/installer/src/resize/startup.rs	Luft's new startup partition disappeared

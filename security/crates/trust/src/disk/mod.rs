@@ -3,6 +3,7 @@ mod initrd;
 pub mod keys;
 pub mod luks;
 pub mod mask;
+pub mod moving;
 pub mod old_system;
 mod preflight;
 pub mod reencrypt;

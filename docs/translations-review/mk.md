@@ -80,3 +80,4 @@ Strings in Luft's Macedonian translation that a native speaker should check. Eac
 - `apps/meet/locales/mk/meet.ftl` `room-place-free-detail`: "{ $size } што ништо друго не ги користи" — the plural clitic „ги“ assumes sizes like „120 GB“; same in luft-windows-free-description.
 - `apps/meet/locales/mk/meet.ftl` `room-places-title`: "Каде да се всели Luft?" — echoes „да се всели“ from check-blocked-description; check it doesn’t sound too figurative for choosing a drive.
 - `apps/meet/desktop/locales/mk/desktop.ftl` `helper-box-room-shortfall`: "Просторот на Luft може да одвои { $available } GB, а на избраното му требаат { $needed } GB." — "Luft’s room can spare" is the space already set aside for Luft; check that comes across.
+- `apps/meet/locales/mk/meet.ftl` `resize-drive-free`: "{ $size } слободни на { $drive }" — plural adjective assumes sizes like „20 GB“, as in room-confirm-title.

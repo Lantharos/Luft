@@ -52,6 +52,15 @@ pub fn slaves(name: &str) -> Vec<String> {
         .collect()
 }
 
+pub fn holders(name: &str) -> Vec<String> {
+    std::fs::read_dir(class(name).join("holders"))
+        .into_iter()
+        .flatten()
+        .flatten()
+        .map(|entry| entry.file_name().to_string_lossy().into_owned())
+        .collect()
+}
+
 pub fn dm_uuid(name: &str) -> Option<String> {
     std::fs::read_to_string(class(name).join("dm/uuid"))
         .ok()

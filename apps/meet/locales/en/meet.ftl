@@ -213,13 +213,18 @@ luft-description-drive = Luft is installed on { $drive }.
 luft-bar-used = { $size }, { $used } used
 luft-resize-title = Change how much space Luft has
 luft-resize-description = Give Luft more of Windows’ space, or give some back to Windows.
-luft-resize-encrypted = Luft’s drive is encrypted, so moving it would need its recovery key. Turn off device encryption in Luft’s Settings first, then come back.
+# $drive is the name of a drive, like "Samsung SSD 990 PRO"
+luft-resize-drive-description = Give Luft more of the free space on { $drive }, or leave some of it free.
+luft-resize-reencrypting = Luft is still encrypting or decrypting its drive. Once it’s done, its size can change.
+luft-resize-passphrase = Luft’s drive opens only with a passphrase, and Luft can’t type it for itself while it moves.
+luft-resize-start-first = Start Luft once, so it can tell Meet Luft how full it is, then come back.
 luft-resize-apart = Another partition sits between Windows and Luft, so they can’t share their space.
-luft-resize-unreadable = Meet Luft couldn’t tell how full Luft is.
 luft-pending-grow = Luft grows the next time it starts
 luft-pending-grow-description = Restart into Luft and leave it on for a few minutes while it moves into the new space. You can keep using it meanwhile.
 luft-pending-shrink = Luft makes room the next time it starts
 luft-pending-shrink-description = Restart into Luft and leave it on for a few minutes while it moves its files. Then open Meet Luft in Windows again to give Windows the space.
+luft-pending-trim = Luft gets smaller the next time it starts
+luft-pending-trim-description = Restart into Luft, and it makes itself smaller within a minute or so.
 luft-windows-free-title = Give Windows the free space
 luft-windows-free-description = { $size } right after Windows isn’t used by anything. Windows can take it back.
 luft-leftovers-title = Clean up after trying Luft
@@ -243,12 +248,21 @@ resize-title = How much space for Luft?
 resize-description = Drag to share the drive between Windows and Luft. Luft makes the change itself the next time it starts.
 resize-measuring = Windows is working out how much room it can spare. On a big drive this can take a few minutes.
 resize-full = Luft is too full to move, and Windows can’t spare enough room for it. Make some room in Luft or in Windows first.
+# $drive is the name of a drive, like "Samsung SSD 990 PRO"
+resize-drive-description = Drag to choose how much of { $drive } Luft takes. Luft makes the change itself the next time it starts.
+# $size is a size, like "20 GB", and $drive the name of a drive
+resize-drive-free = { $size } free on { $drive }
 resize-used = Luft’s files take up { $size }.
 resize-least = Change it by at least { $size }.
 # Button, verb
 resize-apply = Change it
 resize-grow-title = Give Luft { $size } more?
 resize-grow-description = Windows makes itself smaller right away. Luft moves into the new space the next time it starts, which takes a few minutes. Keep the PC plugged in.
+# $drive is the name of a drive
+resize-grow-drive-description = Luft takes the free space on { $drive } the next time it starts, which takes a moment.
+resize-trim-title = Make Luft { $size } smaller?
+# $drive is the name of a drive
+resize-trim-description = Luft makes itself smaller the next time it starts, and the space stays free on { $drive }.
 resize-shrink-title = Give Windows { $size } back?
 resize-shrink-description = Luft moves its files the next time it starts, which takes a few minutes. Then open Meet Luft again, and Windows takes the space back. Keep the PC plugged in.
 

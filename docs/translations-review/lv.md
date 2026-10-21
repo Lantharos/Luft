@@ -75,3 +75,4 @@ Strings in Luft's Latvian translation that a native speaker should check: terms 
 - `apps/meet/locales/lv/meet.ftl` `luft-resize-title`: "Mainīt Luft vietas apjomu" — check it reads naturally as a row title.
 - `apps/meet/locales/lv/meet.ftl` `luft-windows-free-description`: "{ $size } tieši aiz Windows netiek izmantoti." — the verb is plural to agree with a number of gigabytes; check it reads right with every size.
 - `apps/meet/desktop/locales/lv/desktop.ftl` `luft-size-not-allowed`: "Luft nevar būt šādā lielumā" — check against "Luft nevar būt tik liela".
+- `apps/meet/locales/lv/meet.ftl` `luft-resize-start-first`: "paziņot programmai Meet Luft" — “programmai” added so the dative reads clearly; check it fits.

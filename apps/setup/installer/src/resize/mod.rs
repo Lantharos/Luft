@@ -1,9 +1,12 @@
 mod btrfs;
 mod disk;
+mod luks;
 mod plan;
 mod request;
+mod space;
 mod startup;
 mod steps;
+mod variables;
 
 use std::path::{Path, PathBuf};
 
@@ -17,6 +20,7 @@ use plan::{Layout, Step};
 
 const STATE: &str = "resize.json";
 const ATTEMPTS: u32 = 3;
+const ENCRYPTING: &str = "/var/lib/trustd/encryption.json";
 
 #[derive(Serialize, Deserialize)]
 struct State {
@@ -49,8 +53,11 @@ fn layout(request: &Request) -> Result<(String, Layout)> {
     if root.uuid != request.partition {
         bail!("The request is for another Luft");
     }
-    if root.encrypted || root.filesystem != "btrfs" {
-        bail!("Luft's partition is encrypted, so it can't move");
+    if root.filesystem != "btrfs" {
+        bail!("Luft's partition doesn't hold btrfs");
+    }
+    if root.luks_uuid.is_some() {
+        luks::check(&root.device)?;
     }
     if btrfs::devices(&root.fs_uuid) != 1 {
         bail!("Luft's file system already spans more than one partition");
@@ -65,7 +72,9 @@ fn layout(request: &Request) -> Result<(String, Layout)> {
     let layout = Layout {
         root: root.span,
         root_uuid: root.uuid.clone(),
+        luks_uuid: root.luks_uuid.clone(),
         free_before: disk.free_before(block),
+        free_after: disk.free_after(root.span.end()),
         allocated: btrfs::allocated(&root.fs_uuid)?,
         startup,
     };
@@ -93,6 +102,12 @@ fn begin() -> Result<Option<State>> {
 }
 
 fn resize(state_dir: &Path) -> Result<()> {
+    if let Err(error) = space::report() {
+        eprintln!("Luft couldn't tell Windows how full it is: {error:#}");
+    }
+    if Path::new(ENCRYPTING).exists() {
+        return Ok(());
+    }
     let path = state_file(state_dir);
     let mut state = match State::load(&path) {
         Some(state) => state,

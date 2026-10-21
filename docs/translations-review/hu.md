@@ -92,6 +92,7 @@ Strings in Luft's Hungarian translation that a native speaker should check: term
 - `apps/meet/locales/hu/meet.ftl` `luft-title`: "Az Ön Luftja" — check it doesn't sound stiff as a page title.
 - `apps/meet/locales/hu/meet.ftl` `room-place-free`, `room-place-whole`, `luft-description-drive`, `ready-install-drive-description`: the drive name follows a colon so it needs no article or suffix; check these read naturally.
 - `apps/meet/desktop/locales/hu/desktop.ftl` `check-space-erase-drive`: "Van hely a számára ezen a meghajtón, ha törlik: { $drive }." — reordered around the drive name; check it reads naturally.
+- `apps/meet/locales/hu/meet.ftl` `resize-trim-title`: "Csökkenti a Luft méretét { $size } értékkel?" — “értékkel” keeps the size uninflected; check it doesn't read too technical next to resize-grow-title.
 
 ## Install Luft
 

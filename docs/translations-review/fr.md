@@ -72,3 +72,4 @@ Strings in Luft's French translation that a native speaker should check: terms w
 - `apps/meet/locales/fr/meet.ftl` `room-place-windows-free`: "Espace déjà libre : { $size }" — rephrased so nothing agrees with the size; check it reads well as the detail line under « À côté de Windows ».
 - `apps/meet/locales/fr/meet.ftl` `room-live-free`: "Une partie de cet espace ({ $free }) est déjà libre : Windows en cède donc moins…" — size in parentheses to avoid agreement with « 20 Go »; check it reads naturally.
 - `apps/meet/locales/fr/meet.ftl` `luft-bar-used`: "{ $size }, dont { $used } utilisés" — same wording and the same plural issue as `ui-split-windows-size`.
+- `apps/meet/locales/fr/meet.ftl` `luft-resize-passphrase`: "pendant qu’il se déplace" — "while it moves" (Luft moving into its new space at startup); check it is understood, or whether « pendant qu’il change de taille » is clearer.

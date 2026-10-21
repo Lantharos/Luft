@@ -1,0 +1,14 @@
+[Unit]
+Description=Open both halves of the system disk while Luft moves it
+DefaultDependencies=no
+ConditionPathExists=/sys/firmware/efi/efivars/LuftMove-b6a4c1e2-3f5d-4c8a-9e71-2d0f6a8b5c3e
+Wants=tpm2.target
+After=systemd-udev-trigger.service tpm2.target systemd-pcrphase-initrd.service
+Before=cryptsetup.target initrd-root-device.target sysroot.mount
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/trustctl encryption initrd-move
+SyslogIdentifier=trustd
+TimeoutSec=infinity

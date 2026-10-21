@@ -38,8 +38,16 @@ pub fn members() -> Result<Vec<Member>> {
     Ok(parse(&listing))
 }
 
+fn canonical(device: &str) -> String {
+    std::fs::canonicalize(device)
+        .map_or_else(|_| device.to_owned(), |path| path.display().to_string())
+}
+
 pub fn member(device: &str) -> Result<Option<Member>> {
-    Ok(members()?.into_iter().find(|member| member.path == device))
+    let device = canonical(device);
+    Ok(members()?
+        .into_iter()
+        .find(|member| canonical(&member.path) == device))
 }
 
 pub fn add(device: &str) -> Result<()> {

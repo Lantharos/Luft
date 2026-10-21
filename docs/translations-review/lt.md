@@ -85,6 +85,7 @@ Strings in Luft's Lithuanian translation that a native speaker should check: ter
 - `apps/meet/locales/lt/meet.ftl` `problem-check`, `hello-check`: both platform variants say "kompiuteris".
 - `apps/meet/locales/lt/meet.ftl` `room-places-title`: "Kur įdiegti Luft?" — the English asks where Luft should go; "įdiegti" is used because Luft is installed there afterwards, but at this step it is only tried. Check against "Kur dėti Luft?".
 - `apps/meet/locales/lt/meet.ftl` `resize-least`: "Pakeiskite bent { $size }." — check it reads as "by at least" and not "to at least".
+- `apps/meet/locales/lt/meet.ftl` `luft-resize-start-first`: "pranešti programai Meet Luft" — “programai” added so the dative reads clearly; check it fits.
 
 ## Install Luft
 

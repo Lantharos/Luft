@@ -1,12 +1,14 @@
-use luft_meet::resize::{ROOT_NAME, ROOT_TYPE, STARTUP_TYPE};
+use luft_meet::resize::{ROOT_NAME, ROOT_TYPE, SPACE, STARTUP_TYPE, Space, VENDOR};
+
+use super::luks::{self, Encryption};
 
 use crate::boot::gpt::Entry;
 use crate::boot::load_option::{guid_bytes, guid_text};
 use crate::helper::drive::raw::RawDisk;
 use crate::helper::drive::storage::{MSFT_Disk, MSFT_Partition, Storage};
+use crate::helper::system::firmware;
 use crate::plan::layout::Span;
 
-const LUKS: &[u8] = b"LUKS\xba\xbe";
 const SUPERBLOCK: u64 = 0x10000;
 const BTRFS: &[u8] = b"_BHRfS_M";
 const MAGIC: usize = 0x40;
@@ -18,7 +20,7 @@ pub struct Luft {
     pub root: Span,
     pub partition: String,
     pub startup: Option<Span>,
-    pub encrypted: bool,
+    pub encryption: Option<Encryption>,
     pub allocated: Option<u64>,
 }
 
@@ -68,6 +70,13 @@ fn allocated(raw: &mut RawDisk, root: Span) -> Option<u64> {
     number(&superblock, DEVICE_ALLOCATED)
 }
 
+fn reported(partition: &str) -> Option<u64> {
+    let bytes = firmware::read_variable(&format!("{{{VENDOR}}}"), SPACE).ok()??;
+    Space::parse(&bytes)
+        .filter(|space| space.partition == partition)
+        .map(|space| space.allocated)
+}
+
 fn on_disk(disk: MSFT_Disk) -> Option<Luft> {
     let mut raw = RawDisk::open(disk.Number, disk.LogicalSectorSize).ok()?;
     let entries = raw.entries().ok()?;
@@ -81,16 +90,15 @@ fn on_disk(disk: MSFT_Disk) -> Option<Luft> {
         .filter(|other| other.kind == startup_type)
         .map(|other| span(other, raw.sector))
         .find(|startup| startup.end() == root.offset);
-    let head = raw.read(root.offset, LUKS.len()).ok()?;
-    let encrypted = head == LUKS;
+    let encryption = luks::read(&mut raw, root.offset)?;
+    let partition = guid_text(&entry.guid);
     Some(Luft {
-        allocated: if encrypted {
-            None
-        } else {
-            allocated(&mut raw, root)
+        allocated: match encryption {
+            Some(_) => reported(&partition),
+            None => allocated(&mut raw, root),
         },
-        encrypted,
-        partition: guid_text(&entry.guid),
+        encryption,
+        partition,
         root,
         startup,
         disk,

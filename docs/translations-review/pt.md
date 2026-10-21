@@ -73,3 +73,4 @@ Strings in Luft's European Portuguese translation that a native speaker should c
 - `apps/meet/locales/pt/meet.ftl` `meet-channel-latest`: "O Meet Luft volta a utilizar as versões normais" — "releases" as opposed to nightly builds; «versões estáveis» is the alternative, but there are no stable releases yet.
 - `apps/meet/desktop/locales/pt/desktop.ftl` `helper-not-started`: "O processo auxiliar do Meet Luft não arrancou" — "helper" as «processo auxiliar»; check it isn't too technical for an error line.
 - `apps/meet/desktop/locales/pt/desktop.ftl` `check-secure-boot-turn-on`: "quando aparecer o logótipo { $maker }" — built without an article so any brand fits; check it reads naturally with «Lenovo», «HP», «Dell».
+- `apps/meet/locales/pt/meet.ftl` `luft-resize-passphrase`: "enquanto se desloca" — "while it moves" (Luft moving into its new space at startup); check it is understood, or whether «enquanto muda de tamanho» is clearer.

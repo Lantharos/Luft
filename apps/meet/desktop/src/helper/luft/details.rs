@@ -6,15 +6,16 @@ use super::request;
 use crate::helper::drive::state;
 use crate::helper::drive::storage::{Layout, MSFT_Partition, Storage};
 use crate::helper::drive::windows_drive;
-use crate::plan::layout::Windows;
-use crate::plan::resize::{Geometry, Range};
+use crate::plan::gap;
+use crate::plan::layout::{Disk, Windows};
+use crate::plan::resize::{Geometry, InPlace, Range};
 
 #[derive(Serialize, Clone, Copy, Debug, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub enum Blocked {
     Busy,
-    Encrypted,
-    Elsewhere,
+    Reencrypting,
+    Passphrase,
     Apart,
     Unreadable,
 }
@@ -26,7 +27,7 @@ pub struct Installed {
     pub beside_windows: bool,
     pub size: u64,
     pub allocated: Option<u64>,
-    pub encrypted: bool,
+    pub free_after: u64,
     pub windows_size: u64,
     pub windows_used: u64,
     pub blocked: Option<Blocked>,
@@ -105,18 +106,43 @@ impl Survey {
         })
     }
 
+    pub fn free_after(&self) -> u64 {
+        let disk = Disk {
+            size: self.luft.disk.Size,
+            partitions: self
+                .partitions
+                .iter()
+                .filter(|partition| partition.DiskNumber == self.luft.disk.Number)
+                .map(MSFT_Partition::span)
+                .collect(),
+        };
+        gap::gaps(&disk)
+            .into_iter()
+            .find(|gap| gap.offset == self.luft.root.end())
+            .map_or(0, |gap| gap.size)
+    }
+
     pub fn range(&self) -> Option<Range> {
+        if !self.beside_windows() {
+            return InPlace {
+                root: self.luft.root.size,
+                after: self.free_after(),
+                allocated: self.luft.allocated?,
+            }
+            .range();
+        }
         self.geometry()?.range()
     }
 
     fn blocked(&self, pending: Option<Change>) -> Option<Blocked> {
+        let encryption = self.luft.encryption;
         if pending.is_some() {
             Some(Blocked::Busy)
-        } else if self.luft.encrypted {
-            Some(Blocked::Encrypted)
-        } else if !self.beside_windows() {
-            Some(Blocked::Elsewhere)
-        } else if self.gap().is_none() {
+        } else if encryption.is_some_and(|encryption| encryption.reencrypting) {
+            Some(Blocked::Reencrypting)
+        } else if encryption.is_some_and(|encryption| !encryption.tpm) {
+            Some(Blocked::Passphrase)
+        } else if self.beside_windows() && self.gap().is_none() {
             Some(Blocked::Apart)
         } else if self.luft.allocated.is_none() {
             Some(Blocked::Unreadable)
@@ -140,7 +166,7 @@ impl Survey {
             beside_windows: self.beside_windows(),
             size: self.luft.root.size,
             allocated: self.luft.allocated,
-            encrypted: self.luft.encrypted,
+            free_after: self.free_after(),
             windows_size: self.windows.partition.size,
             windows_used: self.windows.used,
             blocked,

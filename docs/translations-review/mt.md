@@ -93,6 +93,7 @@ Strings in Luft's Maltese translation that a native speaker should check: places
 - `apps/meet/locales/mt/meet.ftl` `room-place-whole`: "{ $drive } kollu" — "kollu" is masculine, agreeing with drajv; check it reads naturally after a drive name.
 - `apps/meet/locales/mt/meet.ftl` `room-erase-title`, `working-erasing`: "Tħassar", "inaddfu" — erase as delete, and the description says Windows cleans the drive; check "inaddfu" isn't too casual.
 - `apps/meet/locales/mt/meet.ftl` `resize-least`, `resize-apply`: "Ibdlu b’mill-inqas { $size }.", "Ibdlu" — check the button reads well on its own.
+- `apps/meet/locales/mt/meet.ftl` `resize-drive-free`: "{ $size } ħielsa fuq { $drive }" — plural agreement with sizes like “20 GB”, matching luft-windows-free-description; check it reads naturally.
 
 ## Install Luft
 

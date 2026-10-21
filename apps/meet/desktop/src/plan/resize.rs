@@ -1,7 +1,9 @@
 use serde::{Deserialize, Serialize};
 
+use luft_meet::resize::needed;
+
 use super::layout::Windows;
-use super::sizes::{GIB, SMALLEST_SYSTEM, align_down, align_up};
+use super::sizes::{GIB, SMALLEST_SYSTEM, align_down};
 
 pub struct Geometry {
     pub windows: Windows,
@@ -20,8 +22,34 @@ pub struct Range {
     pub least_shrink: u64,
 }
 
-pub fn needed(allocated: u64) -> u64 {
-    align_up(allocated + allocated / 10 + GIB)
+pub struct InPlace {
+    pub root: u64,
+    pub after: u64,
+    pub allocated: u64,
+}
+
+impl InPlace {
+    pub fn range(&self) -> Option<Range> {
+        let shrink = align_down(
+            self.root
+                .saturating_sub(SMALLEST_SYSTEM.max(needed(self.allocated))),
+        );
+        let grow = align_down(self.after);
+        (shrink >= GIB || grow >= GIB).then(|| Range {
+            smallest: if shrink >= GIB {
+                self.root - shrink
+            } else {
+                self.root
+            },
+            most: if grow >= GIB {
+                self.root + grow
+            } else {
+                self.root
+            },
+            least_grow: GIB,
+            least_shrink: GIB,
+        })
+    }
 }
 
 impl Geometry {
@@ -122,6 +150,20 @@ mod tests {
         assert_eq!(range.least_grow, needed(60 * GIB));
         assert!(!range.allows(100 * GIB, 110 * GIB));
         assert!(range.allows(100 * GIB, 100 * GIB + needed(60 * GIB)));
+    }
+
+    #[test]
+    fn luft_on_a_drive_of_its_own_changes_size_in_place() {
+        let range = InPlace {
+            root: 60 * GIB,
+            after: 20 * GIB,
+            allocated: 30 * GIB,
+        }
+        .range()
+        .unwrap();
+        assert_eq!(range.smallest, needed(30 * GIB));
+        assert_eq!(range.most, 80 * GIB);
+        assert_eq!(range.least_shrink, GIB);
     }
 
     #[test]

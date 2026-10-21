@@ -55,9 +55,9 @@ When a newer Luft is out than the one on its partition, Meet Luft offers *Get th
 
 ### Once Luft is installed
 
-When Meet Luft opens on a PC with Luft installed, which it tells by a partition of the root type `4f68bce3-e8cd-4db1-96e7-fbcaf984b709` named *Luft*, it shows *Your Luft* instead of the first screen. It reads the partition's first bytes to tell whether Luft is encrypted (a LUKS header) and, when it isn't, how much of its btrfs is taken (the superblock's allocated bytes). From there:
+When Meet Luft opens on a PC with Luft installed, which it tells by a partition of the root type `4f68bce3-e8cd-4db1-96e7-fbcaf984b709` named *Luft*, it shows *Your Luft* instead of the first screen. It reads the partition's first bytes to tell whether Luft is encrypted. Unencrypted, the btrfs superblock says how much of Luft is taken. Encrypted, the LUKS2 header says whether it's still being encrypted or decrypted and whether the TPM opens it, and Luft itself reports how much is taken: at every start `luft-installer-resize.service` writes `{"partition":"…","allocated":…}` into the UEFI variable `LuftSpace`, whenever it changed by a gigabyte or more. From there:
 
-- **Change how much space Luft has** splits the drive between Windows and Luft. It's offered when Luft sits right after Windows on the same drive, possibly with its startup partition in front, and isn't encrypted.
+- **Change how much space Luft has** splits the drive between Windows and Luft when Luft sits right after Windows on the same drive, possibly with its startup partition in front. On a drive of its own, it lets Luft take the free space right after it or leave some free.
 - **Give Windows the free space** extends Windows into free space right after it.
 - **Clean up after trying Luft** removes Meet Luft's own partitions when Luft's first start didn't.
 - **Remove Luft from this PC** deletes Luft's partitions, its start files and its start entries, and gives Windows the space back.
@@ -68,15 +68,28 @@ When Meet Luft opens on a PC with Luft installed, which it tells by a partition 
 btrfs can only change size from the system that has it mounted, and Windows can only grow into space right after it, so Luft moves itself:
 
 1. For more space, Windows shrinks right away. For less, nothing changes in Windows yet.
-2. Meet Luft writes the request into the UEFI variable `LuftResize` with Luft's vendor GUID `b6a4c1e2-3f5d-4c8a-9e71-2d0f6a8b5c3e`: `{"change":"grow","partition":"…"}` or `{"change":"shrink","bytes":…,"partition":"…"}`, the partition being Luft's own. *Your Luft* shows a change that's waiting and can call it off; calling off a grow gives Windows its space back.
+2. Meet Luft writes the request into the UEFI variable `LuftResize` with Luft's vendor GUID `b6a4c1e2-3f5d-4c8a-9e71-2d0f6a8b5c3e`: `{"change":"grow","partition":"…"}`, `{"change":"shrink","bytes":…,"partition":"…"}` to free space in front of Luft, or `{"change":"trim","bytes":…,"partition":"…"}` to free it at Luft's end, the partition being Luft's own. *Your Luft* shows a change that's waiting and can call it off; calling off a grow gives Windows its space back.
 3. At Luft's next start, `luft-installer-resize.service` plans the move and runs it in the background, step by step: it makes a new partition, adds it to Luft's btrfs, hands it the root type, lets btrfs move everything off the old partition (`btrfs device remove`), deletes the old one and grows the new one to the end. The startup partition moves first when Luft grows and last when it shrinks, copied to a new FAT partition with the same serial. At the end Luft's partition gets its old partition UUID back, so nothing measured into the TPM changes.
 4. When Luft gave space back, the next time Meet Luft opens it offers to extend Windows into it.
 
 Every step is noted in `/var/lib/luft-installer/resize.json` before the next one starts, and at every point Luft still starts: while both partitions belong to the file system, the startup finds it through either. After a power cut the service carries on at the next start, and it gives up on a step that fails three times in a row.
 
+Free space right after Luft needs no move: Luft grows its partition, its encryption and its btrfs where they are, and trimming shrinks them in the opposite order.
+
 Luft's files have to fit wherever they move, with 10% and 1 GB to spare. When the new space is smaller than that, Luft moves twice, first to the far end of its own partition and then into the new space, which needs it to be less than half full. Meet Luft works out the same limits from the superblock before offering a size, and Luft checks them again before it starts.
 
-An encrypted Luft can't move this way: its startup only opens one encrypted partition, so a second one would need the recovery key. *Your Luft* says so and suggests turning off device encryption in Luft first. Removing an encrypted Luft needs no key, and nothing is left in the TPM, since Luft keeps its sealed keys in the LUKS header and on the EFI system partition.
+#### An encrypted Luft
+
+An encrypted Luft moves the same way, with `trustctl encryption` doing the parts that need its keys:
+
+- **copy-to** copies the LUKS2 header onto the new partition with `luksHeaderBackup` and `luksHeaderRestore`, so the copy has every keyslot and token: the recovery key, the TPM and a PIN or passphrase. It gets a temporary LUKS UUID, the partition UUIDs of both halves are added to the UEFI variable `LuftMove`, and it's opened as `luft-move-<partition>` with the recovery key the TPM keeps for Luft.
+- **retire**, once btrfs has moved off a partition, closes it, wipes its LUKS header, trims it and clears `LuftMove`.
+- **settle** gives the partition Luft ends up on the original LUKS UUID, so the TPM's measurements stay the same.
+- **fit** resizes the open encryption to its partition, for growing and shrinking in place.
+
+While `LuftMove` is set, `trustd-move.service` in Luft's startup opens every half it names except the one the startup already opens as the system disk (the partition that carries the root type at that moment), with the TPM token or a typed key. Which half carries the root type changes partway through the move, so both halves of the file system are there after a power cut at any step, even between the two type changes.
+
+A drive that's still being encrypted or decrypted waits until that's done, and one that only opens with a passphrase can't move, since there's no key Luft could use by itself; *Your Luft* says which. Removing an encrypted Luft needs no key, and nothing is left in the TPM, since Luft keeps its sealed keys in the LUKS header and on the EFI system partition.
 
 #### Removing Luft
 

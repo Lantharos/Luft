@@ -114,6 +114,15 @@ Someone who can start another system can still make a TPM-sealed plan of their o
 
 Only root can read the EFI system partition and the startup partition, so other accounts can't copy the header or the sealed recovery key and try passphrases against them elsewhere.
 
+### Moving the encrypted system
+
+When Meet Luft asks Luft to change its size and Luft has to move to a new partition, the new partition gets a copy of the system disk's LUKS2 header (see [Meet Luft](meet.md#an-encrypted-luft)). Both containers then use the same volume key and the same keyslots, only while btrfs moves the files across:
+
+- No key leaves Luft: the header copy holds the keyslots as they are, and the copy is opened with the recovery key the TPM keeps for Luft, which never leaves memory.
+- Encrypting different data at different places on two devices with one XTS key reveals nothing more than one disk written over time does.
+- The old partition's header is wiped, and the partition trimmed, once btrfs no longer uses it. On a drive that doesn't erase trimmed blocks, its old contents stay readable to whoever has the volume key until Windows writes over them, the same as blocks freed inside one encrypted disk.
+- `LuftMove` sits in a UEFI variable another system could change, so the startup only opens partitions named by plain partition UUIDs, through their own LUKS headers. A container someone made elsewhere can't join the system's file system without knowing its ID, which is inside the encryption, the same as a planted root partition today.
+
 ## Other drives
 
 Disks can encrypt other drives in place through `trustd`. Partitions the system needs, swap, LVM and RAID are refused.

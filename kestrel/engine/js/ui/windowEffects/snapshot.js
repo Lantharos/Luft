@@ -39,11 +39,12 @@ export class WindowSnapshot {
             offscreen_redirect: 0,
         });
         const texture = content.get_texture();
-        const scale = texture.get_width() / rect.width;
+        const scaleX = texture.get_width() / rect.width;
+        const scaleY = texture.get_height() / rect.height;
         const edgeX = Math.floor(Math.min(EDGE, rect.width / 3));
         const edgeY = Math.floor(Math.min(EDGE, rect.height / 3));
-        const columns = [0, edgeX, rect.width - edgeX, rect.width].map(x => Math.round(x * scale));
-        const rows = [0, edgeY, rect.height - edgeY, rect.height].map(y => Math.round(y * scale));
+        const columns = [0, edgeX, rect.width - edgeX, rect.width].map(x => Math.round(x * scaleX));
+        const rows = [0, edgeY, rect.height - edgeY, rect.height].map(y => Math.round(y * scaleY));
         for (let row = 0; row < 3; row++) {
             for (let column = 0; column < 3; column++) {
                 const clip = new Mtk.Rectangle({

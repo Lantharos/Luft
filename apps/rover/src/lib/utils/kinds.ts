@@ -51,6 +51,15 @@ const TEXT_APPLICATIONS = new Set([
 	'application/vnd.dart'
 ]);
 
+const PROGRAMS = new Set([
+	'application/x-executable',
+	'application/x-pie-executable',
+	'application/x-sharedlib',
+	'application/x-msdownload',
+	'application/x-ms-dos-executable',
+	'application/x-ms-ne-executable'
+]);
+
 const TRANSPARENT_IMAGES = new Set([
 	'image/png',
 	'image/apng',
@@ -115,7 +124,7 @@ export function fileKind({ isDir, mimeType }: KindSource): FileKind {
 	if (PACKAGES.has(mimeType)) return 'package';
 	if (ARCHIVES.has(mimeType)) return 'archive';
 	if (isDocument(mimeType)) return 'document';
-	if (isText(mimeType)) return 'code';
+	if (isText(mimeType) || PROGRAMS.has(mimeType)) return 'code';
 	return 'file';
 }
 

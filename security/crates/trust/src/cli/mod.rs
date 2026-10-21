@@ -251,7 +251,10 @@ fn encryption(action: EncryptionAction) -> Result<()> {
             } else {
                 (Secret::default(), ask::new_passphrase()?)
             };
-            disk::turn_on(&key, &pin, &passphrase)?;
+            if disk::turn_on(&key, &pin, &passphrase)? == disk::TurnedOn::AfterDiskChanges {
+                println!("Luft is still changing its size. Encryption waits until that's done.");
+                disk::finish_waiting()?;
+            }
             println!("Restart to start encrypting. The rest happens in the background afterwards.");
             Ok(())
         }

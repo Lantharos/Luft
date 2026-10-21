@@ -245,6 +245,7 @@ setup-protect-tpm = Encriptar este computador para que ninguém possa ler os seu
 setup-protect-passphrase = Encriptar este computador para que ninguém possa ler os seus ficheiros sem a frase de acesso, mesmo que o perca.
 setup-protect-staged-title = Os seus ficheiros vão ser encriptados
 setup-protect-staged-description = A encriptação começa sozinha depois do reinício no fim da configuração, e pode continuar a utilizar o computador enquanto decorre.
+setup-protect-waiting-description = O Luft ainda está a mudar de tamanho. Quando terminar, a encriptação começa no próximo reinício e pode continuar a usar o computador entretanto.
 setup-protect-keep-safe = Guarde esta chave de recuperação num lugar seguro, longe deste computador. Vai precisar dela se o computador não conseguir desbloquear-se sozinho.
 setup-protect-passphrase-label = Frase de acesso
 setup-protect-repeat = Escreva-a novamente

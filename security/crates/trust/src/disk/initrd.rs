@@ -17,6 +17,7 @@ const ATTEMPTS: usize = 5;
 const RESULT: &str = "/run/trustd/encryption-result";
 const STARTED: &str = "started";
 const FAILED: &str = "failed";
+const REFUSED: &str = "refused";
 const ESP: &str = "/run/trustd/esp";
 const ROOT_PARTITION: &str = "/dev/luft-root-partition";
 const PLAN_REFUSED: &str = "The encryption plan on the EFI system partition didn't check out, so the disk was left as it was";
@@ -160,6 +161,14 @@ fn current_uuid(device: &Path) -> Option<String> {
 fn record(result: &str) {
     let _ = paths::ensure_private(paths::RUNTIME);
     let _ = std::fs::write(RESULT, result);
+}
+
+pub fn record_refused() {
+    record(REFUSED);
+}
+
+pub fn refused() -> bool {
+    std::fs::read_to_string(RESULT).is_ok_and(|result| result == REFUSED)
 }
 
 pub fn start_failed() -> bool {

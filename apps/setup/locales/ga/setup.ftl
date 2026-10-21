@@ -263,6 +263,7 @@ setup-protect-tpm = Criptigh an ríomhaire seo ionas nach féidir le haon duine 
 setup-protect-passphrase = Criptigh an ríomhaire seo ionas nach féidir le haon duine do chomhaid a léamh gan d’fhrása faire, fiú má chailltear é.
 setup-protect-staged-title = Cripteofar do chomhaid
 setup-protect-staged-description = Tosóidh an criptiú leis féin tar éis an atosaithe ag deireadh an tsocraithe, agus is féidir leat leanúint ar aghaidh ag úsáid do ríomhaire fad atá sé ag obair.
+setup-protect-waiting-description = Tá Luft fós ag athrú a mhéide. Nuair a bheidh sin déanta, tosóidh an criptiú ag an gcéad atosú eile, agus is féidir leat leanúint ar aghaidh ag úsáid do ríomhaire idir an dá linn.
 setup-protect-keep-safe = Coinnigh an eochair athshlánaithe seo in áit shábháilte, i bhfad ón ríomhaire seo. Beidh sí ag teastáil uait mura féidir leis an ríomhaire é féin a dhíghlasáil choíche.
 setup-protect-passphrase-label = Frása faire
 setup-protect-repeat = Clóscríobh arís é

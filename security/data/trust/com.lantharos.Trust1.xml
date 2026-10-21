@@ -20,7 +20,8 @@
     Startup: Installed (b, shim and Luft's boot menu are on the EFI system partition),
       Measured (b, this boot came through them and recorded what started), Available (b), Reason (s).
 
-    Disk: Device (s), Encrypted (b), State (s: "off", "starting" until the restart, "encrypting",
+    Disk: Device (s), Encrypted (b), State (s: "off", "waiting" while Luft changes its size, "starting" until the
+      restart, "failed" when the restart didn't start it, "refused" when the checks failed after waiting, "encrypting",
       "decrypting", "on"), Progress (d, 0 to 1 while encrypting or decrypting), Remaining (t, seconds, 0 when unknown),
       Unlock (as, any of "tpm", "pin", "passphrase", "recovery-key", "security-key"),
       RecoveryKeyStored (b, the recovery key can be shown again), TpmRefused (b, the TPM didn't unlock the disk

@@ -34,8 +34,10 @@
 
 	function encryptionSummary(disk: Disk) {
 		if (disk.state === 'encrypting' || disk.state === 'decrypting') return progressLine(disk);
+		if (disk.state === 'waiting') return t('settings-encryption-waiting');
 		if (disk.state === 'starting') return t('settings-encryption-starting');
 		if (disk.state === 'failed') return t('settings-encryption-failed');
+		if (disk.state === 'refused') return t('settings-encryption-refused');
 		return disk.state === 'on' ? unlockSummary(disk) : t('settings-encryption-off');
 	}
 

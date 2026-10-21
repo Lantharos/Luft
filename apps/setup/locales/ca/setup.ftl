@@ -245,6 +245,7 @@ setup-protect-tpm = Xifreu aquest ordinador perquè ningú pugui llegir els vost
 setup-protect-passphrase = Xifreu aquest ordinador perquè ningú pugui llegir els vostres fitxers sense la vostra frase de pas, encara que el perdeu.
 setup-protect-staged-title = Els vostres fitxers es xifraran
 setup-protect-staged-description = El xifratge comença sol després del reinici del final de la configuració, i podeu continuar fent servir l’ordinador mentrestant.
+setup-protect-waiting-description = Luft encara està canviant de mida. Quan acabi, el xifratge començarà en el pròxim reinici, i mentrestant podeu continuar fent servir l’ordinador.
 setup-protect-keep-safe = Guardeu aquesta clau de recuperació en un lloc segur, lluny d’aquest ordinador. La necessitareu si algun dia l’ordinador no es pot desbloquejar sol.
 setup-protect-passphrase-label = Frase de pas
 setup-protect-repeat = Torneu-la a escriure

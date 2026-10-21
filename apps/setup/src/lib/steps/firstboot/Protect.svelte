@@ -2,7 +2,7 @@
 	import LockKeyhole from '@lucide/svelte/icons/lock-keyhole';
 	import { t } from '@luft/i18n';
 	import { Checkbox, PasswordField, RecoveryKey } from '@luft/ui';
-	import { encrypt, encryptionChecks, printKey, recoveryKey, saveKey, type Check } from '#lib/bridge/system.js';
+	import { encrypt, encryptionChecks, printKey, recoveryKey, saveKey, trustState, type Check } from '#lib/bridge/system.js';
 	import StepFrame from '#lib/components/StepFrame.svelte';
 	import { flow } from '#lib/state/flow.svelte.js';
 	import { setup } from '#lib/state/setup.svelte.js';
@@ -17,6 +17,7 @@
 
 	let tpm = $derived(setup.trust?.tpm ?? false);
 	let staged = $derived(setup.stagedRecoveryKey);
+	let waiting = $derived(setup.trust?.encryption === 'waiting');
 	let ready = $derived(kept && (tpm || (passphrase.length > 0 && passphrase === repeated)));
 
 	async function attempt(action: () => Promise<void>) {
@@ -41,7 +42,8 @@
 		attempt(async () => {
 			await encrypt(key, tpm ? '' : passphrase);
 			setup.stagedRecoveryKey = key;
-			flow.next();
+			setup.trust = await trustState().catch(() => setup.trust);
+			if (!waiting) flow.next();
 		});
 </script>
 
@@ -55,7 +57,7 @@
 {#if staged}
 	<StepFrame
 		title={t('setup-protect-staged-title')}
-		description={t('setup-protect-staged-description')}
+		description={t(waiting ? 'setup-protect-waiting-description' : 'setup-protect-staged-description')}
 	>
 		<div class="flex max-w-[560px] flex-col gap-5">
 			{@render keepSafe(staged)}

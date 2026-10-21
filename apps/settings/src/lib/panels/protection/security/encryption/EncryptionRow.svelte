@@ -13,6 +13,12 @@
 	let busy = $state(false);
 	let error = $state('');
 
+	function offDescription() {
+		if (disk.state === 'failed') return t('settings-encryption-failed');
+		if (disk.state === 'refused') return t('settings-encryption-refused');
+		return t('settings-encryption-off');
+	}
+
 	async function restartNow() {
 		busy = true;
 		error = '';
@@ -37,6 +43,8 @@
 	<Row title={t('settings-encryption-encrypting')} description={progressLine(disk)} icon={LockKeyhole} below={progress} />
 {:else if disk.state === 'decrypting'}
 	<Row title={t('settings-encryption-decrypting')} description={progressLine(disk)} icon={LockKeyhole} below={progress} />
+{:else if disk.state === 'waiting'}
+	<Row title={t('settings-encryption')} description={t('settings-encryption-waiting')} icon={LockKeyhole} />
 {:else if disk.state === 'starting'}
 	<Row title={t('settings-encryption')} description={t('settings-encryption-starting')} icon={LockKeyhole} below={error ? failure : undefined}>
 		<button type="button" class="button primary" disabled={busy} onclick={restartNow}>{t('settings-protection-restart')}</button>
@@ -48,7 +56,7 @@
 {:else if disk.device}
 	<Row
 		title={t('settings-encryption')}
-		description={disk.state === 'failed' ? t('settings-encryption-failed') : t('settings-encryption-off')}
+		description={offDescription()}
 		icon={LockKeyhole}
 	>
 		<button type="button" class="button" onclick={() => (open = 'on')}>{t('settings-protection-turn-on')}</button>

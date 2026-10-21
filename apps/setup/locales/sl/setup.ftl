@@ -257,6 +257,7 @@ setup-protect-tpm = Šifrirajte ta računalnik, da nihče ne more brati vaših d
 setup-protect-passphrase = Šifrirajte ta računalnik, da nihče ne more brati vaših datotek brez vašega šifrirnega gesla, tudi če računalnik izgubite.
 setup-protect-staged-title = Vaše datoteke bodo šifrirane
 setup-protect-staged-description = Šifriranje se začne samo po vnovičnem zagonu ob koncu nastavitve, računalnik pa lahko medtem uporabljate naprej.
+setup-protect-waiting-description = Luft še spreminja svojo velikost. Ko bo končano, se bo šifriranje začelo ob naslednjem zagonu, računalnik pa lahko medtem uporabljate naprej.
 setup-protect-keep-safe = Ta obnovitveni ključ shranite na varno mesto, ločeno od tega računalnika. Potrebovali ga boste, če se računalnik kdaj ne bo mogel odkleniti sam.
 setup-protect-passphrase-label = Šifrirno geslo
 setup-protect-repeat = Vnesite ga znova

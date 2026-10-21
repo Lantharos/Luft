@@ -245,6 +245,7 @@ setup-protect-tpm = Verschlüssle diesen Computer, damit niemand deine Dateien o
 setup-protect-passphrase = Verschlüssle diesen Computer, damit niemand deine Dateien ohne deine Passphrase lesen kann, selbst wenn er verloren geht.
 setup-protect-staged-title = Deine Dateien werden verschlüsselt
 setup-protect-staged-description = Die Verschlüsselung startet nach dem Neustart am Ende der Einrichtung von selbst, und du kannst deinen Computer währenddessen weiter nutzen.
+setup-protect-waiting-description = Luft ändert noch seine Größe. Sobald das fertig ist, beginnt die Verschlüsselung beim nächsten Neustart, und du kannst deinen Computer währenddessen weiter nutzen.
 setup-protect-keep-safe = Bewahre diesen Wiederherstellungsschlüssel an einem sicheren Ort auf, nicht bei diesem Computer. Du brauchst ihn, falls sich der Computer einmal nicht von selbst entsperren kann.
 setup-protect-passphrase-label = Passphrase
 setup-protect-repeat = Erneut eingeben

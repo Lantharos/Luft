@@ -257,6 +257,7 @@ setup-protect-tpm = Zašifrujte tento počítač, aby nikdo nemohl číst vaše 
 setup-protect-passphrase = Zašifrujte tento počítač, aby nikdo nemohl číst vaše soubory bez hesla k disku, ani když počítač ztratíte.
 setup-protect-staged-title = Vaše soubory budou zašifrovány
 setup-protect-staged-description = Šifrování začne samo po restartu na konci nastavení a počítač můžete mezitím dál používat.
+setup-protect-waiting-description = Luft ještě mění svou velikost. Až to dokončí, šifrování se spustí při příštím restartu a počítač můžete mezitím dál používat.
 setup-protect-keep-safe = Uložte si tento obnovovací klíč na bezpečné místo mimo tento počítač. Budete ho potřebovat, kdyby se počítač někdy nedokázal odemknout sám.
 setup-protect-passphrase-label = Heslo k disku
 setup-protect-repeat = Zadejte ho znovu

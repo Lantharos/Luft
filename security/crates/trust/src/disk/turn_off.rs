@@ -8,7 +8,7 @@ use crate::system::secret::Secret;
 use crate::system::{blocks, keyring};
 
 pub fn turn_off(typed: &Secret) -> Result<()> {
-    if Plan::load().is_some() {
+    if Plan::load().is_some() || Plan::waiting().is_some() {
         bail!(Busy);
     }
     let disk = SystemDisk::find()?;

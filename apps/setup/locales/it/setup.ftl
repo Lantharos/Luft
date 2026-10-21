@@ -245,6 +245,7 @@ setup-protect-tpm = Crittografa questo computer, così nessuno può leggere i tu
 setup-protect-passphrase = Crittografa questo computer, così nessuno può leggere i tuoi file senza la tua passphrase, anche se lo perdi.
 setup-protect-staged-title = I tuoi file verranno crittografati
 setup-protect-staged-description = La crittografia inizia da sola dopo il riavvio al termine della configurazione, e nel frattempo puoi continuare a usare il computer.
+setup-protect-waiting-description = Luft sta ancora cambiando dimensione. Al termine, la crittografia partirà al prossimo riavvio e nel frattempo puoi continuare a usare il computer.
 setup-protect-keep-safe = Conserva questa chiave di ripristino in un posto sicuro, lontano da questo computer. Ti serve se il computer non riesce a sbloccarsi da solo.
 setup-protect-passphrase-label = Passphrase
 setup-protect-repeat = Digitala di nuovo

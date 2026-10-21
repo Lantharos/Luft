@@ -3,7 +3,7 @@
 	import { EncryptionWizard, PassphraseFields, Switch, type EncryptionCheck } from '@luft/ui';
 	import StrengthMeter from '#lib/panels/system/accounts/users/StrengthMeter.svelte';
 	import { MINIMUM_LENGTH, measure } from '#lib/panels/system/accounts/users/strength.js';
-	import { checkEncryption, generateRecoveryKey, printRecoveryKey, restart, saveRecoveryKey, turnOnEncryption, type Tpm } from '../api';
+	import { checkEncryption, generateRecoveryKey, printRecoveryKey, restart, saveRecoveryKey, trust, turnOnEncryption, type Tpm } from '../api';
 	import PinFields from './unlocking/PinFields.svelte';
 	import { pinReady } from './unlocking/pin';
 
@@ -50,7 +50,7 @@
 
 	async function encrypt(key: string) {
 		await turnOnEncryption(key, tpm.usable && usePin ? pin : '', tpm.usable ? '' : passphrase);
-		await restart();
+		if ((await trust())?.disk.state === 'starting') await restart();
 	}
 </script>
 

@@ -263,6 +263,7 @@ setup-protect-tpm = Iċċifra dan il-kompjuter biex ħadd ma jkun jista’ jaqra
 setup-protect-passphrase = Iċċifra dan il-kompjuter biex ħadd ma jkun jista’ jaqra l-fajls mingħajr il-passphrase, anke jekk jintilef.
 setup-protect-staged-title = Il-fajls se jiġu ċċifrati
 setup-protect-staged-description = Iċ-ċċifrar jibda waħdu wara r-restart fl-aħħar tas-setup, u tista’ tibqa’ tuża l-kompjuter waqt li jaħdem.
+setup-protect-waiting-description = Luft għadu qed jibdel id-daqs tiegħu. Meta jispiċċa, iċ-ċċifrar jibda fir-restart li jmiss, u sadanittant tista’ tkompli tuża l-kompjuter.
 setup-protect-keep-safe = Żomm din iċ-ċavetta tal-irkupru x’imkien sigur, ’il bogħod minn dan il-kompjuter. Ikollok bżonnha jekk xi darba l-kompjuter ma jkunx jista’ jiżblokka waħdu.
 setup-protect-passphrase-label = Passphrase
 setup-protect-repeat = Erġa’ ttajpjaha

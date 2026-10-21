@@ -245,6 +245,7 @@ setup-protect-tpm = Chiffrez cet ordinateur pour que personne ne puisse lire vos
 setup-protect-passphrase = Chiffrez cet ordinateur pour que personne ne puisse lire vos fichiers sans votre phrase secrète, même en cas de perte.
 setup-protect-staged-title = Vos fichiers seront chiffrés
 setup-protect-staged-description = Le chiffrement démarre tout seul après le redémarrage qui termine la configuration, et vous pouvez continuer à utiliser votre ordinateur pendant ce temps.
+setup-protect-waiting-description = Luft change encore de taille. Une fois terminé, le chiffrement commencera au prochain redémarrage, et vous pouvez continuer à utiliser votre ordinateur en attendant.
 setup-protect-keep-safe = Conservez cette clé de récupération en lieu sûr, loin de cet ordinateur. Vous en aurez besoin si l’ordinateur ne parvient plus à se déverrouiller tout seul.
 setup-protect-passphrase-label = Phrase secrète
 setup-protect-repeat = Saisissez-la de nouveau

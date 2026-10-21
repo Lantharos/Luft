@@ -245,6 +245,7 @@ setup-protect-tpm = Salaa tämä tietokone, jotta kukaan ei voi lukea tiedostoja
 setup-protect-passphrase = Salaa tämä tietokone, jotta kukaan ei voi lukea tiedostojasi ilman tunnuslausettasi, vaikka tietokone katoaisi.
 setup-protect-staged-title = Tiedostosi salataan
 setup-protect-staged-description = Salaus alkaa itsestään käyttöönoton lopuksi tehtävän uudelleenkäynnistyksen jälkeen, ja voit käyttää tietokonetta sen aikana.
+setup-protect-waiting-description = Luft muuttaa vielä kokoaan. Kun se on valmis, salaus alkaa seuraavassa uudelleenkäynnistyksessä, ja voit käyttää tietokonetta sillä välin.
 setup-protect-keep-safe = Säilytä tämä palautusavain turvallisessa paikassa erillään tästä tietokoneesta. Tarvitset sitä, jos tietokone ei joskus pysty avaamaan lukitusta itse.
 setup-protect-passphrase-label = Tunnuslause
 setup-protect-repeat = Kirjoita se uudelleen

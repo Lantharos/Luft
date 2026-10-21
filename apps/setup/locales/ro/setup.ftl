@@ -251,6 +251,7 @@ setup-protect-tpm = Criptați acest computer ca nimeni să nu vă poată citi fi
 setup-protect-passphrase = Criptați acest computer ca nimeni să nu vă poată citi fișierele fără fraza de acces, chiar dacă îl pierdeți.
 setup-protect-staged-title = Fișierele vor fi criptate
 setup-protect-staged-description = Criptarea începe singură după repornirea de la finalul configurării și puteți folosi computerul în timpul ei.
+setup-protect-waiting-description = Luft încă își schimbă dimensiunea. După ce termină, criptarea pornește la următoarea repornire, iar între timp puteți folosi calculatorul în continuare.
 setup-protect-keep-safe = Păstrați această cheie de recuperare într-un loc sigur, departe de acest computer. Veți avea nevoie de ea dacă computerul nu se mai poate debloca singur.
 setup-protect-passphrase-label = Frază de acces
 setup-protect-repeat = Introduceți-o din nou

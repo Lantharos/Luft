@@ -257,6 +257,7 @@ setup-protect-tpm = Zaszyfruj ten komputer, aby nikt nie mógł odczytać twoich
 setup-protect-passphrase = Zaszyfruj ten komputer, aby nikt nie mógł odczytać twoich plików bez twojej frazy hasła, nawet jeśli komputer zginie.
 setup-protect-staged-title = Twoje pliki zostaną zaszyfrowane
 setup-protect-staged-description = Szyfrowanie rozpocznie się samo po ponownym uruchomieniu na końcu konfiguracji. W tym czasie możesz normalnie korzystać z komputera.
+setup-protect-waiting-description = System Luft wciąż zmienia swój rozmiar. Gdy skończy, szyfrowanie rozpocznie się przy następnym uruchomieniu, a w tym czasie możesz dalej korzystać z komputera.
 setup-protect-keep-safe = Przechowuj ten klucz odzyskiwania w bezpiecznym miejscu, z dala od tego komputera. Będzie potrzebny, jeśli komputer kiedyś nie odblokuje się sam.
 setup-protect-passphrase-label = Fraza hasła
 setup-protect-repeat = Wpisz ponownie

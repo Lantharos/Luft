@@ -28,7 +28,7 @@ use state::{Change, Plan};
 pub use initrd::run as run_in_initrd;
 pub use preflight::{Check, check};
 pub use turn_off::turn_off;
-pub use turn_on::turn_on;
+pub use turn_on::{TurnedOn, finish_waiting, turn_on};
 
 const PHYSICAL_ROOTS: [&str; 2] = ["/sysroot", "/"];
 
@@ -119,7 +119,9 @@ pub fn status() -> Option<DiskStatus> {
     let header = disk.header().ok().flatten();
     let plan = Plan::load();
     let (state, progress) = match (&plan, &header) {
+        (None, None) if Plan::waiting().is_some() => ("waiting", 0.0),
         (_, None) if initrd::start_failed() => ("failed", 0.0),
+        (_, None) if initrd::refused() => ("refused", 0.0),
         (Some(plan), None) if plan.change == Change::Encrypt => ("starting", 0.0),
         (Some(plan), Some(header)) => (
             match plan.change {

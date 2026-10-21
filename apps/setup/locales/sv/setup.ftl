@@ -245,6 +245,7 @@ setup-protect-tpm = Kryptera datorn så att ingen kan läsa dina filer utan att 
 setup-protect-passphrase = Kryptera datorn så att ingen kan läsa dina filer utan din lösenfras, även om den kommer bort.
 setup-protect-staged-title = Dina filer kommer att krypteras
 setup-protect-staged-description = Krypteringen startar av sig själv efter omstarten i slutet av installationen, och du kan använda datorn under tiden.
+setup-protect-waiting-description = Luft ändrar fortfarande sin storlek. När det är klart startar krypteringen vid nästa omstart, och du kan använda datorn under tiden.
 setup-protect-keep-safe = Förvara återställningsnyckeln på ett säkert ställe, inte tillsammans med datorn. Du behöver den om datorn någon gång inte kan låsa upp sig själv.
 setup-protect-passphrase-label = Lösenfras
 setup-protect-repeat = Skriv den igen

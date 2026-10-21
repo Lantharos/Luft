@@ -4,7 +4,7 @@ import { invoke, listen } from '#lib/bridge/index.js';
 const WAIT_FOR_PERMISSION = { timeoutMs: 300_000 };
 
 export type SecureBoot = 'on' | 'off' | 'setup' | 'unsupported';
-export type DiskState = 'off' | 'starting' | 'failed' | 'encrypting' | 'decrypting' | 'on';
+export type DiskState = 'off' | 'waiting' | 'starting' | 'failed' | 'refused' | 'encrypting' | 'decrypting' | 'on';
 export type UnlockMethod = 'tpm' | 'pin' | 'passphrase' | 'recovery-key' | 'security-key';
 
 export interface Tpm {

@@ -251,6 +251,7 @@ setup-protect-tpm = Šifrirajte ovo računalo kako nitko ne bi mogao čitati va�
 setup-protect-passphrase = Šifrirajte ovo računalo kako nitko ne bi mogao čitati vaše datoteke bez vaše lozinke za šifriranje, čak ni ako se izgubi.
 setup-protect-staged-title = Vaše će datoteke biti šifrirane
 setup-protect-staged-description = Šifriranje počinje samo od sebe nakon ponovnog pokretanja na kraju postavljanja, a dok traje, možete nastaviti koristiti računalo.
+setup-protect-waiting-description = Luft još mijenja svoju veličinu. Kad to završi, šifriranje počinje pri sljedećem ponovnom pokretanju, a vi u međuvremenu možete nastaviti koristiti računalo.
 setup-protect-keep-safe = Čuvajte ovaj ključ za oporavak na sigurnom mjestu, odvojeno od ovog računala. Trebat će vam ako se računalo ikad ne može samo otključati.
 setup-protect-passphrase-label = Lozinka za šifriranje
 setup-protect-repeat = Upišite je ponovno

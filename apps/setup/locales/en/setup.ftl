@@ -289,6 +289,7 @@ setup-protect-tpm = Encrypt this computer so nobody can read your files without 
 setup-protect-passphrase = Encrypt this computer so nobody can read your files without your passphrase, even if it’s lost.
 setup-protect-staged-title = Your files will be encrypted
 setup-protect-staged-description = Encrypting starts by itself after the restart at the end of setup, and you can keep using your computer while it works.
+setup-protect-waiting-description = Luft is still changing its size. Once that’s done, encrypting starts at the next restart, and you can keep using your computer meanwhile.
 setup-protect-keep-safe = Keep this recovery key somewhere safe, away from this computer. You need it if the computer ever can’t unlock by itself.
 setup-protect-passphrase-label = Passphrase
 setup-protect-repeat = Type it again

@@ -245,6 +245,7 @@ setup-protect-tpm = Cifra este ordenador para que nadie pueda leer tus archivos 
 setup-protect-passphrase = Cifra este ordenador para que nadie pueda leer tus archivos sin tu frase de contraseña, aunque lo pierdas.
 setup-protect-staged-title = Tus archivos se cifrarán
 setup-protect-staged-description = El cifrado empieza solo tras el reinicio al final de la configuración, y puedes seguir usando el ordenador mientras tanto.
+setup-protect-waiting-description = Luft todavía está cambiando de tamaño. Cuando termine, el cifrado empezará en el próximo reinicio y puedes seguir usando el ordenador mientras tanto.
 setup-protect-keep-safe = Guarda esta clave de recuperación en un lugar seguro, lejos de este ordenador. La necesitarás si algún día el ordenador no puede desbloquearse solo.
 setup-protect-passphrase-label = Frase de contraseña
 setup-protect-repeat = Vuelve a escribirla

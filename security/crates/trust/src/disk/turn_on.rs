@@ -14,6 +14,7 @@ use crate::system::secret::Secret;
 use crate::system::{tpm, uuid};
 
 const SHORTEST_PASSPHRASE: usize = 8;
+const LOCK: &str = "The system disk's lock couldn't be taken.";
 
 fn make_room(disk: &SystemDisk) -> Result<()> {
     let uuid = blocks::fs_uuid(&disk.partition).context("The file system has no UUID.")?;
@@ -57,13 +58,13 @@ fn keep_for_later(
     }
 }
 
-pub fn turn_on(recovery_key: &Secret, pin: &Secret, passphrase: &Secret) -> Result<()> {
-    let _change =
-        DiskChange::begin(|| eprintln!("Waiting for Luft to finish changing the system disk."))
-            .context("The system disk's lock couldn't be taken.")?;
-    if Plan::load().is_some() {
-        bail!(crate::errors::Busy);
-    }
+#[derive(PartialEq, Eq)]
+pub enum TurnedOn {
+    AtNextRestart,
+    AfterDiskChanges,
+}
+
+fn refuse_failed_checks() -> Result<()> {
     let failed: Vec<String> = preflight::check()
         .into_iter()
         .filter(|check| !check.passed)
@@ -71,6 +72,32 @@ pub fn turn_on(recovery_key: &Secret, pin: &Secret, passphrase: &Secret) -> Resu
         .collect();
     if !failed.is_empty() {
         bail!(Unsupported(failed.join(" ")));
+    }
+    Ok(())
+}
+
+fn abandon() {
+    stage::remove();
+    keys::forget_escrow();
+    keys::forget_kept_pin();
+    keys::forget_kept_passphrase();
+    Plan::finish();
+    Plan::stop_waiting();
+}
+
+fn arm(plan: &Plan, disk: &SystemDisk) -> Result<()> {
+    make_room(disk)?;
+    plan.save()?;
+    stage::arm()
+}
+
+pub fn turn_on(recovery_key: &Secret, pin: &Secret, passphrase: &Secret) -> Result<TurnedOn> {
+    if Plan::load().is_some() || Plan::waiting().is_some() {
+        bail!(crate::errors::Busy);
+    }
+    let change = DiskChange::try_begin().context(LOCK)?;
+    if change.is_some() {
+        refuse_failed_checks()?;
     }
     let recovery_key = keys::normalize(recovery_key);
     if !keys::is_recovery_key(&recovery_key) {
@@ -107,15 +134,52 @@ pub fn turn_on(recovery_key: &Secret, pin: &Secret, passphrase: &Secret) -> Resu
         (mode == Mode::Passphrase).then_some(passphrase),
     )
     .and_then(|()| keep_for_later(mode, &recovery_key, pin, passphrase))
-    .and_then(|()| make_room(&disk))
-    .and_then(|()| plan.save())
-    .and_then(|()| stage::arm());
+    .and_then(|()| match change {
+        Some(_) => arm(&plan, &disk),
+        None => plan.wait(),
+    });
     if prepared.is_err() {
-        stage::remove();
-        keys::forget_escrow();
-        keys::forget_kept_pin();
-        keys::forget_kept_passphrase();
-        Plan::finish();
+        abandon();
     }
-    prepared
+    prepared?;
+    Ok(match change {
+        Some(_) => TurnedOn::AtNextRestart,
+        None => TurnedOn::AfterDiskChanges,
+    })
+}
+
+fn on_this_partition(waiting: Plan, disk: &SystemDisk) -> Result<Plan> {
+    let partuuid =
+        blocks::partuuid(&disk.partition).context("The system partition has no PARTUUID.")?;
+    if partuuid == waiting.partuuid {
+        return Ok(waiting);
+    }
+    let plan = Plan {
+        partuuid,
+        ..waiting
+    };
+    let recovery_key = keys::escrowed()
+        .filter(|_| plan.mode == Mode::Tpm)
+        .context("Luft moved to another partition while encryption waited, and only the passphrase could prepare it again.")?;
+    stage::write(&plan, &recovery_key, None)?;
+    Ok(plan)
+}
+
+pub fn finish_waiting() -> Result<()> {
+    let _change = DiskChange::wait().context(LOCK)?;
+    let Some(waiting) = Plan::waiting() else {
+        return Ok(());
+    };
+    let finished = refuse_failed_checks().and_then(|()| {
+        let disk = SystemDisk::find()?;
+        arm(&on_this_partition(waiting, &disk)?, &disk)
+    });
+    match finished {
+        Ok(()) => Plan::stop_waiting(),
+        Err(_) => {
+            abandon();
+            initrd::record_refused();
+        }
+    }
+    finished
 }

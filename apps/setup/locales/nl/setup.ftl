@@ -245,6 +245,7 @@ setup-protect-tpm = Versleutel deze computer, zodat niemand je bestanden kan lez
 setup-protect-passphrase = Versleutel deze computer, zodat niemand je bestanden kan lezen zonder je wachtwoordzin, ook niet als je de computer kwijtraakt.
 setup-protect-staged-title = Je bestanden worden versleuteld
 setup-protect-staged-description = Het versleutelen begint vanzelf na de herstart aan het eind van de installatie, en je kunt je computer ondertussen gewoon gebruiken.
+setup-protect-waiting-description = Luft wijzigt nog zijn grootte. Zodra dat klaar is, begint het versleutelen bij de volgende herstart, en je kunt je computer intussen gewoon gebruiken.
 setup-protect-keep-safe = Bewaar deze herstelsleutel op een veilige plek, niet bij deze computer. Je hebt hem nodig als de computer zichzelf ooit niet kan ontgrendelen.
 setup-protect-passphrase-label = Wachtwoordzin
 setup-protect-repeat = Typ hem opnieuw

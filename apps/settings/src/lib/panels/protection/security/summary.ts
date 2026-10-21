@@ -14,10 +14,14 @@ export function summarize({ disk, secureBoot }: Trust, firmwareUpdates: number):
 			return { headline: t('settings-security-encrypting'), sentence: t('settings-security-encrypting-progress', { progress: progressLine(disk) }), safe: true };
 		case 'decrypting':
 			return { headline: t('settings-security-decrypting'), sentence: t('settings-security-encrypting-progress', { progress: progressLine(disk) }), safe: false };
+		case 'waiting':
+			return { headline: t('settings-security-waiting-to-encrypt'), sentence: t('settings-security-waiting-to-encrypt-description'), safe: false };
 		case 'starting':
 			return { headline: t('settings-security-restart-to-encrypt'), sentence: t('settings-security-restart-to-encrypt-description'), safe: false };
 		case 'failed':
 			return { headline: t('settings-security-encryption-failed'), sentence: t('settings-security-encryption-failed-description'), safe: false };
+		case 'refused':
+			return { headline: t('settings-security-encryption-failed'), sentence: t('settings-security-encryption-refused-description'), safe: false };
 		case 'off':
 			return disk.device ? { headline: t('settings-security-could-be-safer'), sentence: t('settings-security-could-be-safer-description'), safe: false } : null;
 	}

@@ -245,6 +245,7 @@ setup-protect-tpm = Dulritaðu tölvuna svo enginn geti lesið skrárnar þínar
 setup-protect-passphrase = Dulritaðu tölvuna svo enginn geti lesið skrárnar þínar án lykilsetningarinnar, jafnvel þótt hún týnist.
 setup-protect-staged-title = Skrárnar þínar verða dulritaðar
 setup-protect-staged-description = Dulritunin hefst sjálfkrafa eftir endurræsinguna í lok uppsetningar og þú getur notað tölvuna á meðan.
+setup-protect-waiting-description = Luft er enn að breyta stærð sinni. Þegar því lýkur hefst dulritun við næstu endurræsingu og þú getur notað tölvuna á meðan.
 setup-protect-keep-safe = Geymdu þennan endurheimtarlykil á öruggum stað, fjarri tölvunni. Þú þarft hann ef tölvan getur einhvern tímann ekki tekið sig sjálf úr lás.
 setup-protect-passphrase-label = Lykilsetning
 setup-protect-repeat = Sláðu hana inn aftur

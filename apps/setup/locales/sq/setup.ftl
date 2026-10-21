@@ -245,6 +245,7 @@ setup-protect-tpm = Enkripto këtë kompjuter që askush të mos lexojë skedar�
 setup-protect-passphrase = Enkripto këtë kompjuter që askush të mos lexojë skedarët e tu pa frazëkalimin tënd, edhe nëse humbet.
 setup-protect-staged-title = Skedarët e tu do të enkriptohen
 setup-protect-staged-description = Enkriptimi nis vetë pas rinisjes në fund të konfigurimit dhe mund ta përdorësh kompjuterin ndërkohë.
+setup-protect-waiting-description = Luft ende po ndryshon madhësinë. Sapo të mbarojë, enkriptimi nis në rinisjen e ardhshme dhe ndërkohë mund ta përdorësh kompjuterin.
 setup-protect-keep-safe = Ruaje këtë çelës rikuperimi diku të sigurt, larg këtij kompjuteri. Të duhet nëse kompjuteri ndonjëherë nuk zhbllokohet dot vetë.
 setup-protect-passphrase-label = Frazëkalimi
 setup-protect-repeat = Shkruaje sërish

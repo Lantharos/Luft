@@ -245,6 +245,7 @@ setup-protect-tpm = Krüptige see arvuti, et keegi ei saaks teie faile ilma siss
 setup-protect-passphrase = Krüptige see arvuti, et keegi ei saaks teie faile ilma teie paroolifraasita lugeda, isegi kui arvuti kaob.
 setup-protect-staged-title = Teie failid krüptitakse
 setup-protect-staged-description = Krüptimine algab iseenesest pärast seadistamise lõpus toimuvat taaskäivitust ja arvutit saab selle ajal edasi kasutada.
+setup-protect-waiting-description = Luft muudab veel oma suurust. Kui see on tehtud, algab krüptimine järgmisel taaskäivitusel ja saate seni arvutit edasi kasutada.
 setup-protect-keep-safe = Hoidke see taastevõti turvalises kohas, sellest arvutist eraldi. Seda on vaja, kui arvuti ei peaks kunagi suutma iseenesest avaneda.
 setup-protect-passphrase-label = Paroolifraas
 setup-protect-repeat = Tippige uuesti

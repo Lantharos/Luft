@@ -245,6 +245,7 @@ setup-protect-tpm = Titkosítsa a számítógépet, hogy bejelentkezés nélkül
 setup-protect-passphrase = Titkosítsa a számítógépet, hogy a jelmondata nélkül senki se olvashassa a fájljait, akkor sem, ha elveszíti.
 setup-protect-staged-title = A fájljai titkosítva lesznek
 setup-protect-staged-description = A titkosítás a beállítás végi újraindítás után magától elindul, és közben tovább használhatja a számítógépet.
+setup-protect-waiting-description = A Luft még módosítja a méretét. Ha ez kész, a titkosítás a következő újraindításkor indul el, addig is nyugodtan használhatja a számítógépet.
 setup-protect-keep-safe = Tartsa ezt a helyreállítási kulcsot biztonságos helyen, a számítógéptől távol. Akkor lesz rá szüksége, ha a számítógép egyszer nem tudja magától feloldani a titkosítást.
 setup-protect-passphrase-label = Jelmondat
 setup-protect-repeat = Jelmondat még egyszer

@@ -7,6 +7,7 @@ use crate::paths;
 use crate::system::uuid;
 
 const FILE: &str = "encryption.json";
+const WAITING: &str = "encryption-waiting.json";
 pub const MAPPING: &str = "root";
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Debug)]
@@ -47,18 +48,38 @@ impl Plan {
         Ok(plan)
     }
 
+    fn load_from(file: &str) -> Option<Self> {
+        Self::parse(&std::fs::read(paths::state(file)).ok()?).ok()
+    }
+
+    fn save_to(&self, file: &str) -> Result<()> {
+        paths::ensure_private(paths::STATE)?;
+        paths::write_private(&paths::state(file), &serde_json::to_vec(self)?)?;
+        Ok(())
+    }
+
     pub fn load() -> Option<Self> {
-        Self::parse(&std::fs::read(paths::state(FILE)).ok()?).ok()
+        Self::load_from(FILE)
     }
 
     pub fn save(&self) -> Result<()> {
-        paths::ensure_private(paths::STATE)?;
-        paths::write_private(&paths::state(FILE), &serde_json::to_vec(self)?)?;
-        Ok(())
+        self.save_to(FILE)
     }
 
     pub fn finish() {
         let _ = std::fs::remove_file(paths::state(FILE));
+    }
+
+    pub fn waiting() -> Option<Self> {
+        Self::load_from(WAITING)
+    }
+
+    pub fn wait(&self) -> Result<()> {
+        self.save_to(WAITING)
+    }
+
+    pub fn stop_waiting() {
+        let _ = std::fs::remove_file(paths::state(WAITING));
     }
 
     pub fn header_name(&self) -> Option<String> {

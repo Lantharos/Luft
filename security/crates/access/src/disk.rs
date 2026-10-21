@@ -9,13 +9,22 @@ pub struct DiskChange {
     _held: File,
 }
 
+fn locked(operation: FlockOperation) -> io::Result<DiskChange> {
+    let file = File::create(LOCK)?;
+    flock(&file, operation)?;
+    Ok(DiskChange { _held: file })
+}
+
 impl DiskChange {
-    pub fn begin(waiting: impl FnOnce()) -> io::Result<Self> {
-        let file = File::create(LOCK)?;
-        if flock(&file, FlockOperation::NonBlockingLockExclusive).is_err() {
-            waiting();
-            flock(&file, FlockOperation::LockExclusive)?;
+    pub fn try_begin() -> io::Result<Option<Self>> {
+        match locked(FlockOperation::NonBlockingLockExclusive) {
+            Ok(change) => Ok(Some(change)),
+            Err(error) if error.kind() == io::ErrorKind::WouldBlock => Ok(None),
+            Err(error) => Err(error),
         }
-        Ok(Self { _held: file })
+    }
+
+    pub fn wait() -> io::Result<Self> {
+        locked(FlockOperation::LockExclusive)
     }
 }

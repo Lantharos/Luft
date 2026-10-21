@@ -97,7 +97,7 @@ Requirements, checked first by `trustctl encryption check`:
 Steps:
 
 1. Save the recovery key.
-2. If Luft is still taking back Meet Luft's space or changing its size, turning encryption on waits until that's done. Then the file system shrinks by 32 MB for the header, and the plan waits on the EFI system partition, with the recovery key sealed to the TPM (or to the passphrase without one). The plan's fingerprint is sealed with it, so a plan changed on the EFI system partition doesn't open.
+2. If Luft is still taking back Meet Luft's space or changing its size, encryption waits until that's done, also across restarts, and Settings says so. Then the checks run again, the file system shrinks by 32 MB for the header, and the plan waits on the EFI system partition, with the recovery key sealed to the TPM (or to the passphrase without one). The plan's fingerprint is sealed with it, so a plan changed on the EFI system partition doesn't open.
 3. At the next restart Sushi shows "Encrypting your device" for a few seconds while the header is written. If the file system no longer leaves the 32 MB free, the disk isn't touched: Luft starts unencrypted and Settings says encryption didn't start. Disks won't resize the system's partition while encryption waits for the restart.
 4. The rest is encrypted in the background at idle priority, pausing on battery. A crash or power cut loses nothing.
 5. When it finishes, the TPM is linked and the disk unlocks without a prompt.

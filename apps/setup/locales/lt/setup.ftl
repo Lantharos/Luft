@@ -258,6 +258,7 @@ setup-protect-tpm = Užšifruokite šį kompiuterį, kad niekas negalėtų persk
 setup-protect-passphrase = Užšifruokite šį kompiuterį, kad niekas negalėtų perskaityti jūsų failų be slaptafrazės, net jei kompiuterį pamestumėte.
 setup-protect-staged-title = Jūsų failai bus užšifruoti
 setup-protect-staged-description = Šifravimas prasidės savaime po paleidimo iš naujo sąrankos pabaigoje, o kol jis vyksta, galėsite naudotis kompiuteriu.
+setup-protect-waiting-description = Sistema Luft dar keičia savo dydį. Kai tai bus baigta, šifravimas prasidės kitą kartą paleidus iš naujo, o kompiuteriu galite toliau naudotis.
 setup-protect-keep-safe = Laikykite šį atkūrimo raktą saugioje vietoje, ne šalia kompiuterio. Jo prireiks, jei kompiuteris kada nors negalės atsirakinti pats.
 setup-protect-passphrase-label = Slaptafrazė
 setup-protect-repeat = Pakartokite

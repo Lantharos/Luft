@@ -52,3 +52,4 @@ apps/setup/installer/src/survey/windows/tests.rs	Windows 10 Home
 apps/setup/installer/src/survey/windows/tests.rs	Windows 10 Pro
 apps/setup/installer/src/system/files.rs	Couldn't open {}
 apps/setup/installer/src/system/files.rs	There's nothing to remove
+apps/setup/installer/src/system/system_disk.rs	The system disk's lock couldn't be taken

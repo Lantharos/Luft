@@ -15,6 +15,7 @@ use super::properties::{self, Dict};
 use super::shown::Shown;
 use super::status::{self, Status};
 use crate::boot::{attempts, other_systems, startup};
+use crate::disk::state::Plan;
 use crate::disk::worker::{self, Progress};
 use crate::disk::{self, grow, keys, old_system};
 use crate::keys::{mok, others};
@@ -113,8 +114,24 @@ type OtherStartup = (String, String, String, Vec<(u16, String)>, Vec<String>);
 
 pub async fn continue_disk_work(connection: &Connection) -> zbus::Result<()> {
     let trust: InterfaceRef<Trust> = connection.object_server().interface(PATH).await?;
+    if Plan::waiting().is_some() {
+        finish_when_disk_is_free(trust.clone());
+    }
     start_worker(trust);
     Ok(())
+}
+
+fn finish_when_disk_is_free(trust: InterfaceRef<Trust>) {
+    tokio::spawn(async move {
+        let idle = trust.get().await.idle.clone();
+        let _activity = idle.hold();
+        if let Ok(Err(error)) = tokio::task::spawn_blocking(disk::finish_waiting).await {
+            eprintln!("Encryption couldn't start after the disk changes: {error:#}");
+        }
+        let inner = trust.get().await;
+        inner.forget_status();
+        inner.announce(trust.signal_emitter()).await;
+    });
 }
 
 fn start_worker(trust: InterfaceRef<Trust>) {
@@ -235,10 +252,15 @@ impl Trust {
             Secret::from(pin),
             Secret::from(passphrase),
         );
-        self.run(&emitter, move || {
-            disk::turn_on(&recovery_key, &pin, &passphrase)
-        })
-        .await
+        let turned_on = self
+            .run(&emitter, move || {
+                disk::turn_on(&recovery_key, &pin, &passphrase)
+            })
+            .await?;
+        if turned_on == disk::TurnedOn::AfterDiskChanges {
+            finish_when_disk_is_free(connection.object_server().interface(PATH).await?);
+        }
+        Ok(())
     }
 
     async fn turn_off_encryption(

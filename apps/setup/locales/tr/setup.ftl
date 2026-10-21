@@ -245,6 +245,7 @@ setup-protect-tpm = Bu bilgisayarı şifreleyin. Böylece kaybolsa bile oturum a
 setup-protect-passphrase = Bu bilgisayarı şifreleyin. Böylece kaybolsa bile disk parolanız olmadan kimse dosyalarınızı okuyamaz.
 setup-protect-staged-title = Dosyalarınız şifrelenecek
 setup-protect-staged-description = Şifreleme, kurulumun sonundaki yeniden başlatmadan sonra kendiliğinden başlar. Bu sırada bilgisayarınızı kullanmaya devam edebilirsiniz.
+setup-protect-waiting-description = Luft hâlâ boyutunu değiştiriyor. Bu bittiğinde şifreleme bir sonraki yeniden başlatmada başlar ve bu arada bilgisayarınızı kullanmaya devam edebilirsiniz.
 setup-protect-keep-safe = Bu kurtarma anahtarını bu bilgisayardan uzakta, güvenli bir yerde saklayın. Bilgisayarın kilidi bir gün kendiliğinden açılamazsa anahtara ihtiyacınız olur.
 setup-protect-passphrase-label = Disk parolası
 setup-protect-repeat = Yeniden yazın

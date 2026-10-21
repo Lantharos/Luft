@@ -1,0 +1,146 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Sat, 17 Oct 2026 19:18:54 +0200
+Subject: [PATCH 32/51] wayland: let the shell keep touchpad pinches and swipes
+ from clients
+
+Add meta_wayland_compositor_keep_touchpad_gestures(). While it is on,
+pinches and swipes reach only the shell, and one a client is in the
+middle of is cancelled for it. Holds still reach clients, which use them
+to stop kinetic scrolling.
+
+Gesture updates and ends now only go to a client that got the gesture's
+start, so a client never sees half of a pinch or swipe that began while
+the shell kept them, or before the pointer moved onto it.
+---
+ src/meta/meta-wayland-compositor.h |  4 +++
+ src/wayland/meta-wayland-pointer.c | 42 ++++++++++++++++++++++++++++--
+ src/wayland/meta-wayland-pointer.h |  3 +++
+ src/wayland/meta-wayland.c         | 17 ++++++++++++
+ 4 files changed, 64 insertions(+), 2 deletions(-)
+
+diff --git a/src/meta/meta-wayland-compositor.h b/src/meta/meta-wayland-compositor.h
+index 7f4a507057c3c24cc02ade297dcdf724e671b795..bda0da6651643d0c223bdaebd2c90b5fcbfed18b 100644
+--- a/src/meta/meta-wayland-compositor.h
++++ b/src/meta/meta-wayland-compositor.h
+@@ -37,4 +37,8 @@ MetaWaylandCompositor *meta_context_get_wayland_compositor (MetaContext *context
+ META_EXPORT
+ struct wl_display *meta_wayland_compositor_get_wayland_display (MetaWaylandCompositor *compositor);
+ 
++META_EXPORT
++void meta_wayland_compositor_keep_touchpad_gestures (MetaWaylandCompositor *compositor,
++                                                    gboolean               keep);
++
+ G_END_DECLS
+diff --git a/src/wayland/meta-wayland-pointer.c b/src/wayland/meta-wayland-pointer.c
+index 409d31157e076d05d1528f483f0b82b7196733e4..2cdcc8b48197796707b7158c6d18ba391402b41c 100644
+--- a/src/wayland/meta-wayland-pointer.c
++++ b/src/wayland/meta-wayland-pointer.c
+@@ -121,6 +121,8 @@ struct _MetaWaylandPointer
+   gulong implicit_grab_surface_destroyed_handler_id;
+ 
+   guint32 button_count;
++
++  gboolean gestures_kept;
+ };
+ 
+ G_DEFINE_TYPE (MetaWaylandPointer, meta_wayland_pointer,
+@@ -970,6 +972,40 @@ handle_scroll_event (MetaWaylandPointer *pointer,
+   meta_wayland_pointer_broadcast_frame (pointer);
+ }
+ 
++static gboolean
++gesture_reaches_focus_client (MetaWaylandPointer *pointer,
++                              const ClutterEvent *event)
++{
++  if (clutter_event_get_gesture_phase (event) ==
++      CLUTTER_TOUCHPAD_GESTURE_PHASE_BEGIN)
++    return !pointer->gestures_kept;
++
++  return pointer->focus_client &&
++         pointer->focus_client->active_touchpad_gesture ==
++         clutter_event_type (event);
++}
++
++void
++meta_wayland_pointer_keep_gestures (MetaWaylandPointer *pointer,
++                                    gboolean            keep)
++{
++  MetaWaylandInputDevice *input_device = META_WAYLAND_INPUT_DEVICE (pointer);
++  MetaWaylandPointerClient *pointer_client = pointer->focus_client;
++
++  pointer->gestures_kept = keep;
++
++  if (!keep || !pointer_client)
++    return;
++
++  if (pointer_client->active_touchpad_gesture == CLUTTER_TOUCHPAD_SWIPE ||
++      pointer_client->active_touchpad_gesture == CLUTTER_TOUCHPAD_PINCH)
++    {
++      meta_wayland_pointer_client_maybe_cancel_gesture (pointer,
++                                                        pointer_client,
++                                                        meta_wayland_input_device_next_serial (input_device));
++    }
++}
++
+ gboolean
+ meta_wayland_pointer_handle_event (MetaWaylandPointer *pointer,
+                                    const ClutterEvent *event)
+@@ -993,11 +1029,13 @@ meta_wayland_pointer_handle_event (MetaWaylandPointer *pointer,
+         CLUTTER_EVENT_STOP : CLUTTER_EVENT_PROPAGATE;
+ 
+     case CLUTTER_TOUCHPAD_SWIPE:
+-      meta_wayland_pointer_gesture_swipe_handle_event (pointer, event);
++      if (gesture_reaches_focus_client (pointer, event))
++        meta_wayland_pointer_gesture_swipe_handle_event (pointer, event);
+       return CLUTTER_EVENT_PROPAGATE;
+ 
+     case CLUTTER_TOUCHPAD_PINCH:
+-      meta_wayland_pointer_gesture_pinch_handle_event (pointer, event);
++      if (gesture_reaches_focus_client (pointer, event))
++        meta_wayland_pointer_gesture_pinch_handle_event (pointer, event);
+       return CLUTTER_EVENT_PROPAGATE;
+ 
+     case CLUTTER_TOUCHPAD_HOLD:
+diff --git a/src/wayland/meta-wayland-pointer.h b/src/wayland/meta-wayland-pointer.h
+index 0c9ed1c1c8a194b8845df1a77a4f24e49044f589..acbed45996bacbbbba3a4f85baf881a0854aafca 100644
+--- a/src/wayland/meta-wayland-pointer.h
++++ b/src/wayland/meta-wayland-pointer.h
+@@ -56,6 +56,9 @@ void meta_wayland_pointer_update (MetaWaylandPointer *pointer,
+ gboolean meta_wayland_pointer_handle_event (MetaWaylandPointer *pointer,
+                                             const ClutterEvent *event);
+ 
++void meta_wayland_pointer_keep_gestures (MetaWaylandPointer *pointer,
++                                         gboolean            keep);
++
+ void meta_wayland_pointer_send_relative_motion (MetaWaylandPointer *pointer,
+                                                 const ClutterEvent *event);
+ 
+diff --git a/src/wayland/meta-wayland.c b/src/wayland/meta-wayland.c
+index 45cf648888aec321e14d80ce594d0775b9926407..13b231e7ae34a877f8237409ee9538bff712c552 100644
+--- a/src/wayland/meta-wayland.c
++++ b/src/wayland/meta-wayland.c
+@@ -1243,6 +1243,23 @@ meta_wayland_compositor_get_wayland_display (MetaWaylandCompositor *compositor)
+   return compositor->wayland_display;
+ }
+ 
++/**
++ * meta_wayland_compositor_keep_touchpad_gestures:
++ * @compositor: The #MetaWaylandCompositor
++ * @keep: Whether touchpad pinches and swipes stay with the shell
++ *
++ * While @keep is %TRUE, touchpad pinches and swipes reach only the
++ * shell, and a pinch or swipe a client is in the middle of is
++ * cancelled for it. Holds still reach clients, which use them to stop
++ * kinetic scrolling.
++ */
++void
++meta_wayland_compositor_keep_touchpad_gestures (MetaWaylandCompositor *compositor,
++                                                gboolean               keep)
++{
++  meta_wayland_pointer_keep_gestures (compositor->seat->pointer, keep);
++}
++
+ MetaWaylandFilterManager *
+ meta_wayland_compositor_get_filter_manager (MetaWaylandCompositor *compositor)
+ {

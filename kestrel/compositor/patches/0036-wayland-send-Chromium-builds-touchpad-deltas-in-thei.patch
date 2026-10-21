@@ -1,0 +1,311 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Sun, 18 Oct 2026 04:53:53 +0200
+Subject: [PATCH 36/51] wayland: send Chromium builds touchpad deltas in their
+ own units
+
+Chromium multiplies every finger and continuous scroll delta it gets on
+Wayland by 12, treating 10 pixels as one 120-unit wheel notch, so pages
+and Electron apps scroll about twelve times as far as the fingers move.
+Chromium 154 added the WaylandUnscaledTouchpadScrolling feature to stop
+doing that, but it is off unless something turns it on, and Electron
+apps have no way for people to turn it on.
+
+When a client's executable sits beside chrome_100_percent.pak, read the
+Chromium release from the V8 version in its snapshot and, for releases
+that scale, divide its finger and continuous deltas by 12. Releases
+before 154 always scale, except 143, which shipped without the scaling.
+From 154 on, browsers keep their deltas, since their flags files enable
+the feature, while Electron apps, recognised by the app in resources/
+beside the executable, keep them only when the last --enable-features
+on their command line names the feature. Each client is checked once,
+when it first asks for a pointer, and kinetic scrolling follows because
+Chromium derives it from the same deltas.
+---
+ src/meson.build                     |   2 +
+ src/wayland/meta-wayland-chromium.c | 186 ++++++++++++++++++++++++++++
+ src/wayland/meta-wayland-chromium.h |   7 ++
+ src/wayland/meta-wayland-pointer.c  |  12 +-
+ src/wayland/meta-wayland-pointer.h  |   1 +
+ 5 files changed, 206 insertions(+), 2 deletions(-)
+ create mode 100644 src/wayland/meta-wayland-chromium.c
+ create mode 100644 src/wayland/meta-wayland-chromium.h
+
+diff --git a/src/meson.build b/src/meson.build
+index 483ef3c0a7257d8f28c6e82d5af0e1968bde9538..80e25ab5d37032a9eadb2132e5ac58d6b23ee288 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -560,6 +560,8 @@ mutter_sources += [
+   'wayland/meta-wayland-linux-drm-syncobj.h',
+   'wayland/meta-wayland-outputs.c',
+   'wayland/meta-wayland-outputs.h',
++  'wayland/meta-wayland-chromium.c',
++  'wayland/meta-wayland-chromium.h',
+   'wayland/meta-wayland-pointer.c',
+   'wayland/meta-wayland-pointer-constraints.c',
+   'wayland/meta-wayland-pointer-constraints.h',
+diff --git a/src/wayland/meta-wayland-chromium.c b/src/wayland/meta-wayland-chromium.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..3f4adf1e2900605ecd494b84145cafe0f50ac4ad
+--- /dev/null
++++ b/src/wayland/meta-wayland-chromium.c
+@@ -0,0 +1,186 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#include "config.h"
++
++#include "wayland/meta-wayland-chromium.h"
++
++#include <fcntl.h>
++#include <stdio.h>
++#include <string.h>
++#include <unistd.h>
++
++#define V8_VERSION_OFFSET 16
++#define V8_VERSION_LENGTH 64
++#define RELEASE_WITH_UNSCALED_SCROLLING 143
++#define RELEASE_WITH_TOUCHPAD_SCROLLING_FEATURE 154
++#define CHROMIUM_DELTAS_PER_PIXEL (120.0 / 10.0)
++#define TOUCHPAD_SCROLLING_FEATURE "WaylandUnscaledTouchpadScrolling"
++#define ENABLE_FEATURES "--enable-features="
++
++static const char * const v8_snapshots[] = {
++  "v8_context_snapshot.bin",
++  "snapshot_blob.bin",
++};
++
++static const char * const electron_apps[] = {
++  "resources/app.asar",
++  "resources/app",
++  "resources/default_app.asar",
++};
++
++static int
++read_release (const char *snapshot)
++{
++  char version[V8_VERSION_LENGTH + 1] = { 0 };
++  int fd, major, minor;
++  ssize_t length;
++
++  fd = open (snapshot, O_RDONLY | O_CLOEXEC);
++  if (fd < 0)
++    return 0;
++
++  length = pread (fd, version, V8_VERSION_LENGTH, V8_VERSION_OFFSET);
++  close (fd);
++
++  if (length <= 0 || sscanf (version, "%d.%d.", &major, &minor) != 2)
++    return 0;
++
++  return major * 10 + minor;
++}
++
++static int
++chromium_release (const char *folder)
++{
++  int release;
++  size_t i;
++
++  for (i = 0; i < G_N_ELEMENTS (v8_snapshots); i++)
++    {
++      g_autofree char *snapshot = g_build_filename (folder, v8_snapshots[i], NULL);
++
++      release = read_release (snapshot);
++      if (release)
++        return release;
++    }
++
++  return 0;
++}
++
++static char *
++executable_folder (pid_t pid)
++{
++  g_autofree char *link = g_strdup_printf ("/proc/%d/exe", pid);
++  g_autofree char *root = g_strdup_printf ("/proc/%d/root", pid);
++  g_autofree char *executable = g_file_read_link (link, NULL);
++  g_autofree char *folder = NULL;
++
++  if (!executable)
++    return NULL;
++
++  folder = g_path_get_dirname (executable);
++  return g_build_filename (root, folder, NULL);
++}
++
++static gboolean
++is_electron (const char *folder)
++{
++  size_t i;
++
++  for (i = 0; i < G_N_ELEMENTS (electron_apps); i++)
++    {
++      g_autofree char *app = g_build_filename (folder, electron_apps[i], NULL);
++
++      if (g_file_test (app, G_FILE_TEST_EXISTS))
++        return TRUE;
++    }
++
++  return FALSE;
++}
++
++static char *
++last_enabled_features (char  *command_line,
++                       gsize  length)
++{
++  g_auto (GStrv) arguments = NULL;
++  const char *features = NULL;
++  size_t i;
++
++  for (i = 0; i < length; i++)
++    {
++      if (command_line[i] == '\0')
++        command_line[i] = ' ';
++    }
++
++  arguments = g_strsplit (command_line, " ", -1);
++  for (i = 0; arguments[i]; i++)
++    {
++      if (g_str_has_prefix (arguments[i], ENABLE_FEATURES))
++        features = arguments[i] + strlen (ENABLE_FEATURES);
++    }
++
++  return g_strdup (features);
++}
++
++static gboolean
++enables_touchpad_scrolling (pid_t pid)
++{
++  g_autofree char *path = g_strdup_printf ("/proc/%d/cmdline", pid);
++  g_autofree char *command_line = NULL;
++  g_autofree char *enabled = NULL;
++  g_auto (GStrv) features = NULL;
++  gsize length;
++  size_t i;
++
++  if (!g_file_get_contents (path, &command_line, &length, NULL))
++    return FALSE;
++
++  enabled = last_enabled_features (command_line, length);
++  if (!enabled)
++    return FALSE;
++
++  features = g_strsplit (enabled, ",", -1);
++  for (i = 0; features[i]; i++)
++    {
++      size_t name = strcspn (features[i], ":<");
++
++      if (name == strlen (TOUCHPAD_SCROLLING_FEATURE) &&
++          strncmp (features[i], TOUCHPAD_SCROLLING_FEATURE, name) == 0)
++        return TRUE;
++    }
++
++  return FALSE;
++}
++
++static gboolean
++scales_touchpad_scrolling (pid_t       pid,
++                           const char *folder)
++{
++  int release = chromium_release (folder);
++
++  if (release == 0 || release == RELEASE_WITH_UNSCALED_SCROLLING)
++    return FALSE;
++
++  if (release < RELEASE_WITH_TOUCHPAD_SCROLLING_FEATURE)
++    return TRUE;
++
++  return is_electron (folder) && !enables_touchpad_scrolling (pid);
++}
++
++double
++meta_wayland_chromium_smooth_scroll_scale (struct wl_client *client)
++{
++  g_autofree char *folder = NULL;
++  g_autofree char *resources = NULL;
++  pid_t pid;
++
++  wl_client_get_credentials (client, &pid, NULL, NULL);
++  folder = executable_folder (pid);
++  if (!folder)
++    return 1.0;
++
++  resources = g_build_filename (folder, "chrome_100_percent.pak", NULL);
++  if (!g_file_test (resources, G_FILE_TEST_EXISTS) ||
++      !scales_touchpad_scrolling (pid, folder))
++    return 1.0;
++
++  return 1.0 / CHROMIUM_DELTAS_PER_PIXEL;
++}
+diff --git a/src/wayland/meta-wayland-chromium.h b/src/wayland/meta-wayland-chromium.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..c709fed435f3aa21a4281369e459783d57cd341e
+--- /dev/null
++++ b/src/wayland/meta-wayland-chromium.h
+@@ -0,0 +1,7 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#pragma once
++
++#include <glib.h>
++#include <wayland-server-core.h>
++
++double meta_wayland_chromium_smooth_scroll_scale (struct wl_client *client);
+diff --git a/src/wayland/meta-wayland-pointer.c b/src/wayland/meta-wayland-pointer.c
+index 2cdcc8b48197796707b7158c6d18ba391402b41c..9e0867f0b72a694ef5c3fe73b42ab4f7a17557d1 100644
+--- a/src/wayland/meta-wayland-pointer.c
++++ b/src/wayland/meta-wayland-pointer.c
+@@ -57,6 +57,7 @@
+ #include "meta/meta-cursor-tracker.h"
+ #include "wayland/meta-cursor-wayland.h"
+ #include "wayland/meta-wayland-buffer.h"
++#include "wayland/meta-wayland-chromium.h"
+ #include "wayland/meta-wayland-cursor-surface.h"
+ #include "wayland/meta-wayland-data-device.h"
+ #include "wayland/meta-wayland-pointer.h"
+@@ -154,11 +155,13 @@ backend_from_pointer (MetaWaylandPointer *pointer)
+ }
+ 
+ static MetaWaylandPointerClient *
+-meta_wayland_pointer_client_new (void)
++meta_wayland_pointer_client_new (struct wl_client *client)
+ {
+   MetaWaylandPointerClient *pointer_client;
+ 
+   pointer_client = g_new0 (MetaWaylandPointerClient, 1);
++  pointer_client->smooth_scroll_scale =
++    meta_wayland_chromium_smooth_scroll_scale (client);
+   wl_list_init (&pointer_client->pointer_resources);
+   wl_list_init (&pointer_client->swipe_gesture_resources);
+   wl_list_init (&pointer_client->pinch_gesture_resources);
+@@ -276,7 +279,7 @@ meta_wayland_pointer_ensure_pointer_client (MetaWaylandPointer *pointer,
+   if (pointer_client)
+     return pointer_client;
+ 
+-  pointer_client = meta_wayland_pointer_client_new ();
++  pointer_client = meta_wayland_pointer_client_new (client);
+   g_hash_table_insert (pointer->pointer_clients, client, pointer_client);
+ 
+   if (!pointer->focus_client &&
+@@ -863,6 +866,11 @@ handle_scroll_event (MetaWaylandPointer *pointer,
+          * in pointer motion event space, multiply the vector with the 10. */
+         const double factor = 10.0;
+         clutter_event_get_scroll_delta (event, &dx, &dy);
++        if (source != WL_POINTER_AXIS_SOURCE_WHEEL)
++          {
++            dx *= client->smooth_scroll_scale;
++            dy *= client->smooth_scroll_scale;
++          }
+         x_value = wl_fixed_from_double (dx * factor);
+         y_value = wl_fixed_from_double (dy * factor);
+ 
+diff --git a/src/wayland/meta-wayland-pointer.h b/src/wayland/meta-wayland-pointer.h
+index acbed45996bacbbbba3a4f85baf881a0854aafca..0fbd189037455eb04a6457d0b62572f5273ba222 100644
+--- a/src/wayland/meta-wayland-pointer.h
++++ b/src/wayland/meta-wayland-pointer.h
+@@ -44,6 +44,7 @@ struct _MetaWaylandPointerClient
+   struct wl_list hold_gesture_resources;
+   struct wl_list relative_pointer_resources;
+   ClutterEventType active_touchpad_gesture;
++  double smooth_scroll_scale;
+ };
+ 
+ void meta_wayland_pointer_enable (MetaWaylandPointer *pointer);

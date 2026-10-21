@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Wed, 21 Oct 2026 06:11:56 +0200
+Subject: [PATCH 51/51] compositor: don't cull with actors that clip what they
+ paint
+
+A shell can clip a window actor to one monitor while the window reaches
+past it, such as a column of a scrolling layout that peeks out at a
+monitor edge shared with another monitor. Culling took the window's
+opaque region as covering the part the clip hides, so the windows and
+the wallpaper underneath stopped being drawn there and the area showed
+garbage.
+
+Actors with a clip are now left out of culling, like actors with
+effects: they paint fully and hide nothing below them.
+---
+ src/compositor/meta-cullable.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/compositor/meta-cullable.c b/src/compositor/meta-cullable.c
+index 6e55809ec62a3c38d389f4215bd16497cbc73bf2..ad6e22d4ac20b533762bfe2df44810d49924de77 100644
+--- a/src/compositor/meta-cullable.c
++++ b/src/compositor/meta-cullable.c
+@@ -118,6 +118,11 @@ cull_out_children_common (MetaCullable    *cullable,
+       if (needs_culling && has_active_effects (child))
+         needs_culling = FALSE;
+ 
++      /* A clip hides parts of the actor that its opaque region still
++       * claims to cover, so it can't tell what it obscures either. */
++      if (needs_culling && clutter_actor_has_clip (child))
++        needs_culling = FALSE;
++
+       if (needs_culling)
+         {
+           g_autoptr (MtkRegion) actor_region = NULL;

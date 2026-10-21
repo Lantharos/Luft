@@ -1,0 +1,256 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Mon, 19 Oct 2026 03:08:16 +0200
+Subject: [PATCH 44/51] backends: let the shell treat held modifiers as used up
+
+Add clutter_seat_consume_held_modifiers(). A shortcut made of modifiers
+alone, such as one held to dictate, can call it once it takes effect:
+the modifiers held at that moment stop counting until their keys are
+pressed again, so pointer, touchpad and keyboard input, the key symbols
+it produces and the keyboard state clients see behave as if they weren't
+held. The native seat clears them from its xkb state and queues a key
+state event, which now also sends the new modifiers to Wayland clients.
+---
+ clutter/clutter/clutter-seat.c         | 18 +++++++
+ clutter/clutter/clutter-seat.h         |  6 +++
+ src/backends/native/meta-seat-impl.c   | 70 ++++++++++++++++++++++++++
+ src/backends/native/meta-seat-impl.h   |  1 +
+ src/backends/native/meta-seat-native.c |  9 ++++
+ src/wayland/meta-wayland-keyboard.c    | 12 ++++-
+ src/wayland/meta-wayland-keyboard.h    |  3 ++
+ src/wayland/meta-wayland-seat.c        |  5 ++
+ 8 files changed, 123 insertions(+), 1 deletion(-)
+
+diff --git a/clutter/clutter/clutter-seat.c b/clutter/clutter/clutter-seat.c
+index f9ab9a707438cb72a8d10c82c6c297003518f198..0639a471ec9ecef8df76b2b428c8f10e270c8240 100644
+--- a/clutter/clutter/clutter-seat.c
++++ b/clutter/clutter/clutter-seat.c
+@@ -636,6 +636,24 @@ clutter_seat_warp_pointer (ClutterSeat *seat,
+   CLUTTER_SEAT_GET_CLASS (seat)->warp_pointer (seat, x, y);
+ }
+ 
++/**
++ * clutter_seat_consume_held_modifiers:
++ * @seat: a #ClutterSeat
++ *
++ * Treats the modifier keys held right now as used up, for example by a
++ * shortcut made of modifiers alone that is still held. Until their keys
++ * are pressed again, events, key symbols and the keyboard state clients
++ * see leave those modifiers out, so the rest of the input behaves as if
++ * they weren't held.
++ */
++void
++clutter_seat_consume_held_modifiers (ClutterSeat *seat)
++{
++  g_return_if_fail (CLUTTER_IS_SEAT (seat));
++
++  CLUTTER_SEAT_GET_CLASS (seat)->consume_held_modifiers (seat);
++}
++
+ void
+ clutter_seat_init_pointer_position (ClutterSeat *seat,
+                                     float        x,
+diff --git a/clutter/clutter/clutter-seat.h b/clutter/clutter/clutter-seat.h
+index bb9e20a210213aadd1e5e6db661bba5eef231038..9836267644154ceb1e1a72a76190fdaf6cd182a7 100644
+--- a/clutter/clutter/clutter-seat.h
++++ b/clutter/clutter/clutter-seat.h
+@@ -104,6 +104,8 @@ struct _ClutterSeatClass
+   ClutterVirtualDeviceType (* get_supported_virtual_device_types) (ClutterSeat *seat);
+ 
+   ClutterInputDevice * (* get_virtual_source_pointer) (ClutterSeat *seat);
++
++  void (* consume_held_modifiers) (ClutterSeat *seat);
+ };
+ 
+ CLUTTER_EXPORT
+@@ -152,6 +154,10 @@ CLUTTER_EXPORT
+ void clutter_seat_warp_pointer (ClutterSeat *seat,
+                                 int          x,
+                                 int          y);
++
++CLUTTER_EXPORT
++void clutter_seat_consume_held_modifiers (ClutterSeat *seat);
++
+ CLUTTER_EXPORT
+ gboolean clutter_seat_get_touch_mode (ClutterSeat *seat);
+ 
+diff --git a/src/backends/native/meta-seat-impl.c b/src/backends/native/meta-seat-impl.c
+index dfc60e1934091b2e029874d083f8bb39e7aa0762..8238e77dd6feb6d1dc6eeb798c81c76f86784ce9 100644
+--- a/src/backends/native/meta-seat-impl.c
++++ b/src/backends/native/meta-seat-impl.c
+@@ -3511,6 +3511,76 @@ meta_seat_impl_warp_pointer (MetaSeatImpl *seat_impl,
+   g_object_unref (task);
+ }
+ 
++static ClutterInputDevice *
++find_keyboard (MetaSeatImpl *seat_impl)
++{
++  GSList *l;
++
++  for (l = seat_impl->devices; l; l = l->next)
++    {
++      ClutterInputDevice *device = l->data;
++
++      if (clutter_input_device_get_capabilities (device) &
++          CLUTTER_INPUT_CAPABILITY_KEYBOARD)
++        return device;
++    }
++
++  return NULL;
++}
++
++static gboolean
++consume_held_modifiers_in_impl (GTask *task)
++{
++  MetaSeatImpl *seat_impl = g_task_get_source_object (task);
++  ClutterInputDevice *keyboard = find_keyboard (seat_impl);
++  xkb_mod_mask_t latched_mods;
++  xkb_mod_mask_t locked_mods;
++  xkb_layout_index_t layout_index;
++
++  g_task_return_boolean (task, TRUE);
++
++  if (!keyboard ||
++      !xkb_state_serialize_mods (seat_impl->xkb, XKB_STATE_MODS_DEPRESSED))
++    return G_SOURCE_REMOVE;
++
++  g_rw_lock_writer_lock (&seat_impl->state_lock);
++
++  latched_mods =
++    xkb_state_serialize_mods (seat_impl->xkb, XKB_STATE_MODS_LATCHED);
++  locked_mods =
++    xkb_state_serialize_mods (seat_impl->xkb, XKB_STATE_MODS_LOCKED);
++  layout_index =
++    xkb_state_serialize_layout (seat_impl->xkb, XKB_STATE_LAYOUT_EFFECTIVE);
++  xkb_state_update_mask (seat_impl->xkb,
++                         0,
++                         latched_mods,
++                         locked_mods,
++                         0, 0, layout_index);
++  meta_keymap_native_update_in_impl (seat_impl->keymap, seat_impl->xkb);
++
++  g_rw_lock_writer_unlock (&seat_impl->state_lock);
++
++  queue_event (seat_impl,
++               meta_key_state_event_new (keyboard,
++                                         CLUTTER_EVENT_NONE,
++                                         seat_impl->xkb,
++                                         seat_impl->button_state,
++                                         g_get_monotonic_time ()));
++
++  return G_SOURCE_REMOVE;
++}
++
++void
++meta_seat_impl_consume_held_modifiers (MetaSeatImpl *seat_impl)
++{
++  GTask *task;
++
++  task = g_task_new (seat_impl, NULL, NULL, NULL);
++  meta_seat_impl_run_input_task (seat_impl, task,
++                                 (GSourceFunc) consume_held_modifiers_in_impl);
++  g_object_unref (task);
++}
++
+ typedef struct
+ {
+   graphene_point_t position;
+diff --git a/src/backends/native/meta-seat-impl.h b/src/backends/native/meta-seat-impl.h
+index 5e5d6ad6ab7df231987624235eb8303fc71f50d4..18438847a8f30369af992bcfc8d3f3e7d6b3674d 100644
+--- a/src/backends/native/meta-seat-impl.h
++++ b/src/backends/native/meta-seat-impl.h
+@@ -229,6 +229,7 @@ void meta_seat_impl_set_viewports (MetaSeatImpl     *seat_impl,
+ void meta_seat_impl_warp_pointer (MetaSeatImpl *seat_impl,
+                                   int           x,
+                                   int           y);
++void meta_seat_impl_consume_held_modifiers (MetaSeatImpl *seat_impl);
+ void meta_seat_impl_init_pointer_position (MetaSeatImpl *seat_impl,
+                                            float         x,
+                                            float         y);
+diff --git a/src/backends/native/meta-seat-native.c b/src/backends/native/meta-seat-native.c
+index 6c2441f22a11a0aff6836e7472542f3859b73128..0e10ac581c300dec211261fd49142e34a31ff4ec 100644
+--- a/src/backends/native/meta-seat-native.c
++++ b/src/backends/native/meta-seat-native.c
+@@ -431,6 +431,14 @@ meta_seat_native_warp_pointer (ClutterSeat *seat,
+   meta_seat_impl_warp_pointer (seat_native->impl, x, y);
+ }
+ 
++static void
++meta_seat_native_consume_held_modifiers (ClutterSeat *seat)
++{
++  MetaSeatNative *seat_native = META_SEAT_NATIVE (seat);
++
++  meta_seat_impl_consume_held_modifiers (seat_native->impl);
++}
++
+ static void
+ meta_seat_native_init_pointer_position (ClutterSeat *seat,
+                                         float        x,
+@@ -524,6 +532,7 @@ meta_seat_native_class_init (MetaSeatNativeClass *klass)
+   seat_class->is_unfocus_inhibited_changed =
+     meta_seat_native_is_unfocus_inhibited_changed;
+   seat_class->get_virtual_source_pointer = meta_seat_native_get_virtual_source_pointer;
++  seat_class->consume_held_modifiers = meta_seat_native_consume_held_modifiers;
+ 
+   props[PROP_SEAT_ID] =
+     g_param_spec_string ("seat-id", NULL, NULL,
+diff --git a/src/wayland/meta-wayland-keyboard.c b/src/wayland/meta-wayland-keyboard.c
+index 0b50eb6e301a2b8b5f84d27a7861372b4cc06f2f..bb81288f7c8f7a18d2982100533f91f477d0f14e 100644
+--- a/src/wayland/meta-wayland-keyboard.c
++++ b/src/wayland/meta-wayland-keyboard.c
+@@ -577,7 +577,9 @@ maybe_update_modifiers_from_event (MetaWaylandKeyboard *keyboard,
+ 
+   event_type = clutter_event_type (event);
+ 
+-  if (event_type != CLUTTER_KEY_PRESS && event_type != CLUTTER_KEY_RELEASE)
++  if (event_type != CLUTTER_KEY_PRESS &&
++      event_type != CLUTTER_KEY_RELEASE &&
++      event_type != CLUTTER_KEY_STATE)
+     return FALSE;
+ 
+   clutter_event_get_key_state (event,
+@@ -606,6 +608,14 @@ meta_wayland_keyboard_update (MetaWaylandKeyboard   *keyboard,
+                         is_press ? XKB_KEY_DOWN : XKB_KEY_UP);
+ }
+ 
++void
++meta_wayland_keyboard_update_state (MetaWaylandKeyboard *keyboard,
++                                    const ClutterEvent  *event)
++{
++  if (maybe_update_modifiers_from_event (keyboard, event))
++    notify_modifiers (keyboard);
++}
++
+ gboolean
+ meta_wayland_keyboard_handle_event (MetaWaylandKeyboard   *keyboard,
+                                     const ClutterKeyEvent *event)
+diff --git a/src/wayland/meta-wayland-keyboard.h b/src/wayland/meta-wayland-keyboard.h
+index 1f953e477cd91e9ce0506f0c23fe484683ae8a47..4257b45cc7c32016458bedf7089d2386bf753ac4 100644
+--- a/src/wayland/meta-wayland-keyboard.h
++++ b/src/wayland/meta-wayland-keyboard.h
+@@ -62,6 +62,9 @@ void meta_wayland_keyboard_disable (MetaWaylandKeyboard *keyboard);
+ void meta_wayland_keyboard_update (MetaWaylandKeyboard *keyboard,
+                                    const ClutterKeyEvent *event);
+ 
++void meta_wayland_keyboard_update_state (MetaWaylandKeyboard *keyboard,
++                                         const ClutterEvent  *event);
++
+ gboolean meta_wayland_keyboard_handle_event (MetaWaylandKeyboard *keyboard,
+                                              const ClutterKeyEvent *event);
+ 
+diff --git a/src/wayland/meta-wayland-seat.c b/src/wayland/meta-wayland-seat.c
+index 7b7dff8df15dd4b1df7a5053ab3d90ca898080f9..a04ff7953f01a6c87e528ebb33f5f7391588d938 100644
+--- a/src/wayland/meta-wayland-seat.c
++++ b/src/wayland/meta-wayland-seat.c
+@@ -477,6 +477,11 @@ meta_wayland_seat_update (MetaWaylandSeat    *seat,
+         meta_wayland_keyboard_update (seat->keyboard, (const ClutterKeyEvent *) event);
+       break;
+ 
++    case CLUTTER_KEY_STATE:
++      if (meta_wayland_seat_has_keyboard (seat))
++        meta_wayland_keyboard_update_state (seat->keyboard, event);
++      break;
++
+     case CLUTTER_TOUCH_BEGIN:
+     case CLUTTER_TOUCH_UPDATE:
+     case CLUTTER_TOUCH_END:

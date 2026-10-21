@@ -1,0 +1,472 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Sat, 17 Oct 2026 19:19:33 +0200
+Subject: [PATCH 38/51] backends: let virtual input devices pinch, swipe and
+ flip the tablet mode switch
+
+Add clutter_virtual_input_device_notify_touchpad_pinch(),
+notify_touchpad_swipe() and notify_tablet_mode(), implemented by the
+native backend. Pinches and swipes start at the pointer and go through
+the same path as a real touchpad's, and the device that flips the
+tablet mode switch counts as the seat's switch, so touch mode follows
+it exactly as it follows a convertible's hinge. Programs that drive the
+desktop, such as Kestrel's checks, can pinch and swipe over windows and
+fold a computer into a tablet and back.
+---
+ .../clutter/clutter-virtual-input-device.c    |  84 +++++++++
+ .../clutter/clutter-virtual-input-device.h    |  41 +++++
+ .../native/meta-input-device-native.h         |   2 +
+ src/backends/native/meta-seat-impl.c          |  40 +++++
+ src/backends/native/meta-seat-impl.h          |  20 +++
+ .../native/meta-virtual-input-device-native.c | 161 ++++++++++++++++++
+ 6 files changed, 348 insertions(+)
+
+diff --git a/clutter/clutter/clutter-virtual-input-device.c b/clutter/clutter/clutter-virtual-input-device.c
+index 4ebefff93aa9bbd8a33abacdc3e03cccd0ef3173..2d8ec8fd37becf8de171a0fefafa2aaa0893b15e 100644
+--- a/clutter/clutter/clutter-virtual-input-device.c
++++ b/clutter/clutter/clutter-virtual-input-device.c
+@@ -193,6 +193,90 @@ clutter_virtual_input_device_notify_touch_up (ClutterVirtualInputDevice *virtual
+                           slot);
+ }
+ 
++/**
++ * clutter_virtual_input_device_notify_touchpad_pinch:
++ * @virtual_device: a virtual pointer device
++ * @time_us: the time of the event, in microseconds
++ * @phase: the phase of the pinch
++ * @fingers: how many fingers pinch
++ * @dx: how far the fingers' center moved horizontally
++ * @dy: how far the fingers' center moved vertically
++ * @angle_delta: how far the fingers turned since the last update, in degrees
++ * @scale: the distance between the fingers relative to the start
++ *
++ * Sends a touchpad pinch at the pointer, as a touchpad would.
++ */
++void
++clutter_virtual_input_device_notify_touchpad_pinch (ClutterVirtualInputDevice   *virtual_device,
++                                                    uint64_t                     time_us,
++                                                    ClutterTouchpadGesturePhase  phase,
++                                                    uint32_t                     fingers,
++                                                    double                       dx,
++                                                    double                       dy,
++                                                    double                       angle_delta,
++                                                    double                       scale)
++{
++  ClutterVirtualInputDeviceClass *klass =
++    CLUTTER_VIRTUAL_INPUT_DEVICE_GET_CLASS (virtual_device);
++
++  g_return_if_fail (CLUTTER_IS_VIRTUAL_INPUT_DEVICE (virtual_device));
++  g_return_if_fail (klass->notify_touchpad_pinch != NULL);
++
++  klass->notify_touchpad_pinch (virtual_device, time_us, phase, fingers,
++                                dx, dy, angle_delta, scale);
++}
++
++/**
++ * clutter_virtual_input_device_notify_touchpad_swipe:
++ * @virtual_device: a virtual pointer device
++ * @time_us: the time of the event, in microseconds
++ * @phase: the phase of the swipe
++ * @fingers: how many fingers swipe
++ * @dx: how far the fingers moved horizontally
++ * @dy: how far the fingers moved vertically
++ *
++ * Sends a touchpad swipe at the pointer, as a touchpad would.
++ */
++void
++clutter_virtual_input_device_notify_touchpad_swipe (ClutterVirtualInputDevice   *virtual_device,
++                                                    uint64_t                     time_us,
++                                                    ClutterTouchpadGesturePhase  phase,
++                                                    uint32_t                     fingers,
++                                                    double                       dx,
++                                                    double                       dy)
++{
++  ClutterVirtualInputDeviceClass *klass =
++    CLUTTER_VIRTUAL_INPUT_DEVICE_GET_CLASS (virtual_device);
++
++  g_return_if_fail (CLUTTER_IS_VIRTUAL_INPUT_DEVICE (virtual_device));
++  g_return_if_fail (klass->notify_touchpad_swipe != NULL);
++
++  klass->notify_touchpad_swipe (virtual_device, time_us, phase, fingers,
++                                dx, dy);
++}
++
++/**
++ * clutter_virtual_input_device_notify_tablet_mode:
++ * @virtual_device: a virtual input device
++ * @tablet_mode: whether the device is folded or detached into a tablet
++ *
++ * Flips a tablet mode switch on the device, as a convertible's hinge or
++ * keyboard dock would. The device counts as the seat's tablet mode switch
++ * from then on.
++ */
++void
++clutter_virtual_input_device_notify_tablet_mode (ClutterVirtualInputDevice *virtual_device,
++                                                 gboolean                   tablet_mode)
++{
++  ClutterVirtualInputDeviceClass *klass =
++    CLUTTER_VIRTUAL_INPUT_DEVICE_GET_CLASS (virtual_device);
++
++  g_return_if_fail (CLUTTER_IS_VIRTUAL_INPUT_DEVICE (virtual_device));
++  g_return_if_fail (klass->notify_tablet_mode != NULL);
++
++  klass->notify_tablet_mode (virtual_device, tablet_mode);
++}
++
+ int
+ clutter_virtual_input_device_get_device_type (ClutterVirtualInputDevice *virtual_device)
+ {
+diff --git a/clutter/clutter/clutter-virtual-input-device.h b/clutter/clutter/clutter-virtual-input-device.h
+index 2799ade17fc3f015be4bb3f61099137e24d3272d..1c1a8fa1ac24fe9aa2961c30a70a3bbcf13473c7 100644
+--- a/clutter/clutter/clutter-virtual-input-device.h
++++ b/clutter/clutter/clutter-virtual-input-device.h
+@@ -105,6 +105,25 @@ struct _ClutterVirtualInputDeviceClass
+   void (*notify_touch_up) (ClutterVirtualInputDevice *virtual_device,
+                            uint64_t                   time_us,
+                            int                        slot);
++
++  void (*notify_touchpad_pinch) (ClutterVirtualInputDevice   *virtual_device,
++                                 uint64_t                     time_us,
++                                 ClutterTouchpadGesturePhase  phase,
++                                 uint32_t                     fingers,
++                                 double                       dx,
++                                 double                       dy,
++                                 double                       angle_delta,
++                                 double                       scale);
++
++  void (*notify_touchpad_swipe) (ClutterVirtualInputDevice   *virtual_device,
++                                 uint64_t                     time_us,
++                                 ClutterTouchpadGesturePhase  phase,
++                                 uint32_t                     fingers,
++                                 double                       dx,
++                                 double                       dy);
++
++  void (*notify_tablet_mode) (ClutterVirtualInputDevice *virtual_device,
++                              gboolean                   tablet_mode);
+ };
+ 
+ CLUTTER_EXPORT
+@@ -170,6 +189,28 @@ void clutter_virtual_input_device_notify_touch_up (ClutterVirtualInputDevice *vi
+                                                    uint64_t                   time_us,
+                                                    int                        slot);
+ 
++CLUTTER_EXPORT
++void clutter_virtual_input_device_notify_touchpad_pinch (ClutterVirtualInputDevice   *virtual_device,
++                                                         uint64_t                     time_us,
++                                                         ClutterTouchpadGesturePhase  phase,
++                                                         uint32_t                     fingers,
++                                                         double                       dx,
++                                                         double                       dy,
++                                                         double                       angle_delta,
++                                                         double                       scale);
++
++CLUTTER_EXPORT
++void clutter_virtual_input_device_notify_touchpad_swipe (ClutterVirtualInputDevice   *virtual_device,
++                                                         uint64_t                     time_us,
++                                                         ClutterTouchpadGesturePhase  phase,
++                                                         uint32_t                     fingers,
++                                                         double                       dx,
++                                                         double                       dy);
++
++CLUTTER_EXPORT
++void clutter_virtual_input_device_notify_tablet_mode (ClutterVirtualInputDevice *virtual_device,
++                                                      gboolean                   tablet_mode);
++
+ CLUTTER_EXPORT
+ int clutter_virtual_input_device_get_device_type (ClutterVirtualInputDevice *virtual_device);
+ 
+diff --git a/src/backends/native/meta-input-device-native.h b/src/backends/native/meta-input-device-native.h
+index ac43ef640ef56c949be9b44820513e63d726e910..f8c183b51b1c6f98420a4263bf29b5790ba5a55d 100644
+--- a/src/backends/native/meta-input-device-native.h
++++ b/src/backends/native/meta-input-device-native.h
+@@ -89,6 +89,8 @@ struct _MetaInputDeviceNative
+ 
+   double scroll_speed;
+ 
++  gboolean virtual_tablet_switch;
++
+   /* When the client doesn't support high-resolution scroll, accumulate deltas
+    * until we can notify a discrete event.
+    * Some mice have a free spinning wheel, making possible to lock the wheel
+diff --git a/src/backends/native/meta-seat-impl.c b/src/backends/native/meta-seat-impl.c
+index 10b596bb403d893c41084866b6c997e22c63fe13..dfc60e1934091b2e029874d083f8bb39e7aa0762 100644
+--- a/src/backends/native/meta-seat-impl.c
++++ b/src/backends/native/meta-seat-impl.c
+@@ -1746,6 +1746,32 @@ notify_hold_gesture_event (ClutterInputDevice          *input_device,
+   queue_event (seat_impl, event);
+ }
+ 
++void
++meta_seat_impl_notify_touchpad_pinch_in_impl (ClutterInputDevice          *input_device,
++                                              uint64_t                     time_us,
++                                              ClutterTouchpadGesturePhase  phase,
++                                              uint32_t                     n_fingers,
++                                              double                       dx,
++                                              double                       dy,
++                                              double                       angle_delta,
++                                              double                       scale)
++{
++  notify_pinch_gesture_event (input_device, phase, time_us,
++                              dx, dy, dx, dy, angle_delta, scale, n_fingers);
++}
++
++void
++meta_seat_impl_notify_touchpad_swipe_in_impl (ClutterInputDevice          *input_device,
++                                              uint64_t                     time_us,
++                                              ClutterTouchpadGesturePhase  phase,
++                                              uint32_t                     n_fingers,
++                                              double                       dx,
++                                              double                       dy)
++{
++  notify_swipe_gesture_event (input_device, phase, time_us, n_fingers,
++                              dx, dy, dx, dy);
++}
++
+ static void
+ notify_proximity (ClutterInputDevice *input_device,
+                   uint64_t            time_us,
+@@ -1928,6 +1954,9 @@ has_pointer (MetaSeatImpl *seat_impl)
+ static gboolean
+ device_is_tablet_switch (MetaInputDeviceNative *device_native)
+ {
++  if (device_native->virtual_tablet_switch)
++    return TRUE;
++
+   if (!device_native->libinput_device)
+     return FALSE;
+ 
+@@ -1988,6 +2017,17 @@ update_touch_mode (MetaSeatImpl *seat_impl)
+     }
+ }
+ 
++void
++meta_seat_impl_notify_tablet_mode_in_impl (MetaSeatImpl       *seat_impl,
++                                           ClutterInputDevice *input_device,
++                                           gboolean            tablet_mode)
++{
++  META_INPUT_DEVICE_NATIVE (input_device)->virtual_tablet_switch = TRUE;
++  seat_impl->has_tablet_switch = TRUE;
++  seat_impl->tablet_mode_switch_state = tablet_mode;
++  update_touch_mode (seat_impl);
++}
++
+ static void
+ meta_seat_impl_take_device (MetaSeatImpl       *seat_impl,
+                             ClutterInputDevice *device)
+diff --git a/src/backends/native/meta-seat-impl.h b/src/backends/native/meta-seat-impl.h
+index 8b2eb6199d22efe11cb0983087f3f3d0816d5d5f..5e5d6ad6ab7df231987624235eb8303fc71f50d4 100644
+--- a/src/backends/native/meta-seat-impl.h
++++ b/src/backends/native/meta-seat-impl.h
+@@ -174,6 +174,26 @@ void meta_seat_impl_notify_touch_event_in_impl (MetaSeatImpl       *seat_impl,
+                                                 float               x,
+                                                 float               y);
+ 
++void meta_seat_impl_notify_touchpad_pinch_in_impl (ClutterInputDevice          *input_device,
++                                                   uint64_t                     time_us,
++                                                   ClutterTouchpadGesturePhase  phase,
++                                                   uint32_t                     n_fingers,
++                                                   double                       dx,
++                                                   double                       dy,
++                                                   double                       angle_delta,
++                                                   double                       scale);
++
++void meta_seat_impl_notify_touchpad_swipe_in_impl (ClutterInputDevice          *input_device,
++                                                   uint64_t                     time_us,
++                                                   ClutterTouchpadGesturePhase  phase,
++                                                   uint32_t                     n_fingers,
++                                                   double                       dx,
++                                                   double                       dy);
++
++void meta_seat_impl_notify_tablet_mode_in_impl (MetaSeatImpl       *seat_impl,
++                                                ClutterInputDevice *input_device,
++                                                gboolean            tablet_mode);
++
+ void meta_seat_impl_sync_leds_in_impl (MetaSeatImpl *seat_impl);
+ 
+ void meta_seat_impl_update_xkb_state_in_impl (MetaSeatImpl *seat_impl);
+diff --git a/src/backends/native/meta-virtual-input-device-native.c b/src/backends/native/meta-virtual-input-device-native.c
+index 0d6b8f269f45309022aec474f249fa4679b8c2e4..b8c4001a6c4d960c895351abaea466103b2e3c40 100644
+--- a/src/backends/native/meta-virtual-input-device-native.c
++++ b/src/backends/native/meta-virtual-input-device-native.c
+@@ -96,6 +96,17 @@ typedef struct
+   double y;
+ } MetaVirtualEventTouch;
+ 
++typedef struct
++{
++  uint64_t time_us;
++  ClutterTouchpadGesturePhase phase;
++  uint32_t fingers;
++  double dx;
++  double dy;
++  double angle_delta;
++  double scale;
++} MetaVirtualEventGesture;
++
+ G_DEFINE_TYPE (MetaVirtualInputDeviceNative,
+                meta_virtual_input_device_native,
+                CLUTTER_TYPE_VIRTUAL_INPUT_DEVICE)
+@@ -971,6 +982,153 @@ meta_virtual_input_device_native_notify_touch_up (ClutterVirtualInputDevice *vir
+   g_object_unref (task);
+ }
+ 
++static gboolean
++notify_touchpad_pinch_in_impl (GTask *task)
++{
++  MetaVirtualInputDeviceNative *virtual_native =
++    g_task_get_source_object (task);
++  MetaVirtualEventGesture *event = g_task_get_task_data (task);
++
++  if (event->time_us == CLUTTER_CURRENT_TIME)
++    event->time_us = g_get_monotonic_time ();
++
++  meta_seat_impl_notify_touchpad_pinch_in_impl (virtual_native->impl_state->device,
++                                                event->time_us,
++                                                event->phase,
++                                                event->fingers,
++                                                event->dx, event->dy,
++                                                event->angle_delta,
++                                                event->scale);
++
++  g_task_return_boolean (task, TRUE);
++  return G_SOURCE_REMOVE;
++}
++
++static gboolean
++notify_touchpad_swipe_in_impl (GTask *task)
++{
++  MetaVirtualInputDeviceNative *virtual_native =
++    g_task_get_source_object (task);
++  MetaVirtualEventGesture *event = g_task_get_task_data (task);
++
++  if (event->time_us == CLUTTER_CURRENT_TIME)
++    event->time_us = g_get_monotonic_time ();
++
++  meta_seat_impl_notify_touchpad_swipe_in_impl (virtual_native->impl_state->device,
++                                                event->time_us,
++                                                event->phase,
++                                                event->fingers,
++                                                event->dx, event->dy);
++
++  g_task_return_boolean (task, TRUE);
++  return G_SOURCE_REMOVE;
++}
++
++static void
++run_gesture_task (MetaVirtualInputDeviceNative *virtual_native,
++                  MetaVirtualEventGesture      *event,
++                  GSourceFunc                   func)
++{
++  MetaSeatNative *seat_native =
++    meta_virtual_input_device_native_get_seat_native (virtual_native);
++  GTask *task;
++
++  task = g_task_new (virtual_native, NULL, NULL, NULL);
++  g_task_set_task_data (task, event, g_free);
++  meta_seat_impl_run_input_task (seat_native->impl, task, func);
++  g_object_unref (task);
++}
++
++static void
++meta_virtual_input_device_native_notify_touchpad_pinch (ClutterVirtualInputDevice   *virtual_device,
++                                                        uint64_t                     time_us,
++                                                        ClutterTouchpadGesturePhase  phase,
++                                                        uint32_t                     fingers,
++                                                        double                       dx,
++                                                        double                       dy,
++                                                        double                       angle_delta,
++                                                        double                       scale)
++{
++  MetaVirtualInputDeviceNative *virtual_native =
++    META_VIRTUAL_INPUT_DEVICE_NATIVE (virtual_device);
++  MetaVirtualEventGesture *event;
++
++  g_return_if_fail (virtual_native->impl_state != NULL);
++
++  event = g_new0 (MetaVirtualEventGesture, 1);
++  event->time_us = time_us;
++  event->phase = phase;
++  event->fingers = fingers;
++  event->dx = dx;
++  event->dy = dy;
++  event->angle_delta = angle_delta;
++  event->scale = scale;
++
++  run_gesture_task (virtual_native, event,
++                    (GSourceFunc) notify_touchpad_pinch_in_impl);
++}
++
++static void
++meta_virtual_input_device_native_notify_touchpad_swipe (ClutterVirtualInputDevice   *virtual_device,
++                                                        uint64_t                     time_us,
++                                                        ClutterTouchpadGesturePhase  phase,
++                                                        uint32_t                     fingers,
++                                                        double                       dx,
++                                                        double                       dy)
++{
++  MetaVirtualInputDeviceNative *virtual_native =
++    META_VIRTUAL_INPUT_DEVICE_NATIVE (virtual_device);
++  MetaVirtualEventGesture *event;
++
++  g_return_if_fail (virtual_native->impl_state != NULL);
++
++  event = g_new0 (MetaVirtualEventGesture, 1);
++  event->time_us = time_us;
++  event->phase = phase;
++  event->fingers = fingers;
++  event->dx = dx;
++  event->dy = dy;
++
++  run_gesture_task (virtual_native, event,
++                    (GSourceFunc) notify_touchpad_swipe_in_impl);
++}
++
++static gboolean
++notify_tablet_mode_in_impl (GTask *task)
++{
++  MetaVirtualInputDeviceNative *virtual_native =
++    g_task_get_source_object (task);
++  MetaSeatNative *seat_native =
++    meta_virtual_input_device_native_get_seat_native (virtual_native);
++  gboolean tablet_mode = GPOINTER_TO_INT (g_task_get_task_data (task));
++
++  meta_seat_impl_notify_tablet_mode_in_impl (seat_native->impl,
++                                             virtual_native->impl_state->device,
++                                             tablet_mode);
++
++  g_task_return_boolean (task, TRUE);
++  return G_SOURCE_REMOVE;
++}
++
++static void
++meta_virtual_input_device_native_notify_tablet_mode (ClutterVirtualInputDevice *virtual_device,
++                                                     gboolean                   tablet_mode)
++{
++  MetaVirtualInputDeviceNative *virtual_native =
++    META_VIRTUAL_INPUT_DEVICE_NATIVE (virtual_device);
++  MetaSeatNative *seat_native =
++    meta_virtual_input_device_native_get_seat_native (virtual_native);
++  GTask *task;
++
++  g_return_if_fail (virtual_native->impl_state != NULL);
++
++  task = g_task_new (virtual_native, NULL, NULL, NULL);
++  g_task_set_task_data (task, GINT_TO_POINTER (tablet_mode), NULL);
++  meta_seat_impl_run_input_task (seat_native->impl, task,
++                                 (GSourceFunc) notify_tablet_mode_in_impl);
++  g_object_unref (task);
++}
++
+ static void
+ meta_virtual_input_device_native_get_property (GObject    *object,
+                                                guint       prop_id,
+@@ -1128,6 +1286,9 @@ meta_virtual_input_device_native_class_init (MetaVirtualInputDeviceNativeClass *
+   virtual_input_device_class->notify_touch_down = meta_virtual_input_device_native_notify_touch_down;
+   virtual_input_device_class->notify_touch_motion = meta_virtual_input_device_native_notify_touch_motion;
+   virtual_input_device_class->notify_touch_up = meta_virtual_input_device_native_notify_touch_up;
++  virtual_input_device_class->notify_touchpad_pinch = meta_virtual_input_device_native_notify_touchpad_pinch;
++  virtual_input_device_class->notify_touchpad_swipe = meta_virtual_input_device_native_notify_touchpad_swipe;
++  virtual_input_device_class->notify_tablet_mode = meta_virtual_input_device_native_notify_tablet_mode;
+ 
+   obj_props[PROP_SLOT_BASE] = g_param_spec_uint ("slot-base", NULL, NULL,
+                                                  0, G_MAXUINT, 0,

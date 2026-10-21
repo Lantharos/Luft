@@ -1,0 +1,141 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Fri, 16 Oct 2026 22:26:12 +0200
+Subject: [PATCH 27/51] core: let the shell mark windows it tiles itself
+
+The shell snaps windows into corners and layout cells by moving and
+resizing them, so neither clients nor the compositor knew those windows
+were tiled. They kept rounded corners and shadows.
+
+meta_window_set_tiled_edges() records the work area edges such a window
+sits against. While the window is not maximized, fullscreen or tiled by
+mutter, those edges get monitor edge constraints, the same ones a mutter
+half tile has against the screen. xdg-toplevel then reports them as tiled
+and constrained, X11 clients get them through _GTK_EDGE_CONSTRAINTS, and
+everything else that follows edge constraints, such as window corners,
+treats the window as tiled.
+---
+ src/core/window-private.h |  2 ++
+ src/core/window.c         | 64 ++++++++++++++++++++++++++++++++++++---
+ src/meta/window.h         |  7 +++++
+ 3 files changed, 69 insertions(+), 4 deletions(-)
+
+diff --git a/src/core/window-private.h b/src/core/window-private.h
+index 915ce9aef128e33a59d4e8af2c68d94d204cc8d8..b66a07ddefa84f765a3f9b3e04bb4e0f057c315d 100644
+--- a/src/core/window-private.h
++++ b/src/core/window-private.h
+@@ -287,6 +287,8 @@ struct _MetaWindow
+     MetaEdgeConstraint left;
+   } edge_constraints;
+ 
++  MetaDirection tiled_edges;
++
+   MetaLogicalMonitorId *preferred_logical_monitor;
+ 
+   /* Area to cover when in fullscreen mode.  If _NET_WM_FULLSCREEN_MONITORS has
+diff --git a/src/core/window.c b/src/core/window.c
+index 6d93a6328a8463440532c5abe8650b8150c04377..ab606c8c328b3ad3e99ae740bdb571a9f52c4ade 100644
+--- a/src/core/window.c
++++ b/src/core/window.c
+@@ -3326,16 +3326,24 @@ meta_window_update_tile_fraction (MetaWindow *window,
+     }
+ }
+ 
++static MetaEdgeConstraint
++tiled_edge_constraint (MetaWindow    *window,
++                       MetaDirection  edge)
++{
++  return window->tiled_edges & edge ? META_EDGE_CONSTRAINT_MONITOR
++                                    : META_EDGE_CONSTRAINT_NONE;
++}
++
+ static void
+ update_edge_constraints (MetaWindow *window)
+ {
+   switch (meta_window_config_get_tile_mode (window->config))
+     {
+     case META_TILE_NONE:
+-      window->edge_constraints.top = META_EDGE_CONSTRAINT_NONE;
+-      window->edge_constraints.right = META_EDGE_CONSTRAINT_NONE;
+-      window->edge_constraints.bottom = META_EDGE_CONSTRAINT_NONE;
+-      window->edge_constraints.left = META_EDGE_CONSTRAINT_NONE;
++      window->edge_constraints.top = tiled_edge_constraint (window, META_DIRECTION_TOP);
++      window->edge_constraints.right = tiled_edge_constraint (window, META_DIRECTION_RIGHT);
++      window->edge_constraints.bottom = tiled_edge_constraint (window, META_DIRECTION_BOTTOM);
++      window->edge_constraints.left = tiled_edge_constraint (window, META_DIRECTION_LEFT);
+       break;
+ 
+     case META_TILE_MAXIMIZED:
+@@ -3495,6 +3503,54 @@ apply_tile_config (MetaWindow       *window,
+     untile_window (window, config);
+ }
+ 
++/**
++ * meta_window_set_tiled_edges:
++ * @window: a #MetaWindow
++ * @edges: the work area edges the window is placed against
++ *
++ * Marks a window that the shell arranged against some edges of the work
++ * area as tiled there. While the window is not maximized, fullscreen or
++ * tiled by mutter itself, clients and the compositor treat those edges
++ * like the edges of a mutter tile. Pass 0 when the window floats again.
++ */
++void
++meta_window_set_tiled_edges (MetaWindow    *window,
++                             MetaDirection  edges)
++{
++  g_return_if_fail (META_IS_WINDOW (window));
++  g_return_if_fail (!window->override_redirect);
++
++  edges &= (META_DIRECTION_LEFT | META_DIRECTION_RIGHT |
++            META_DIRECTION_TOP | META_DIRECTION_BOTTOM);
++  if (window->tiled_edges == edges)
++    return;
++
++  window->tiled_edges = edges;
++  update_edge_constraints (window);
++
++  if (meta_window_config_is_floating (window->config))
++    meta_window_move_resize (window,
++                             (META_MOVE_RESIZE_MOVE_ACTION |
++                              META_MOVE_RESIZE_RESIZE_ACTION |
++                              META_MOVE_RESIZE_STATE_CHANGED |
++                              META_MOVE_RESIZE_CONSTRAIN),
++                             window->unconstrained_rect);
++}
++
++/**
++ * meta_window_get_tiled_edges:
++ * @window: a #MetaWindow
++ *
++ * Returns: the edges set with meta_window_set_tiled_edges()
++ */
++MetaDirection
++meta_window_get_tiled_edges (MetaWindow *window)
++{
++  g_return_val_if_fail (META_IS_WINDOW (window), 0);
++
++  return window->tiled_edges;
++}
++
+ void
+ meta_window_tile (MetaWindow   *window,
+                   MetaTileMode  tile_mode)
+diff --git a/src/meta/window.h b/src/meta/window.h
+index 8e684a1a0c5b986a8a6feaad33ccdbf90e2c2ce0..01ff51d918eaf78fef7c87e6a9e10daec15ce305 100644
+--- a/src/meta/window.h
++++ b/src/meta/window.h
+@@ -379,6 +379,13 @@ MetaFrameType meta_window_get_frame_type (MetaWindow *window);
+ META_EXPORT
+ MetaWindow *meta_window_get_tile_match (MetaWindow *window);
+ 
++META_EXPORT
++void        meta_window_set_tiled_edges (MetaWindow    *window,
++                                         MetaDirection  edges);
++
++META_EXPORT
++MetaDirection meta_window_get_tiled_edges (MetaWindow *window);
++
+ META_EXPORT
+ void        meta_window_make_fullscreen    (MetaWindow  *window);
+ 

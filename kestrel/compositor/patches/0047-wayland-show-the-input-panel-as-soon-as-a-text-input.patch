@@ -1,0 +1,224 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Tue, 20 Oct 2026 15:10:25 +0200
+Subject: [PATCH 47/51] wayland: show the input panel as soon as a text input
+ asks or is tapped
+
+show_input_panel and hide_input_panel aren't double-buffered in
+text-input-v3, but they only took effect on the client's next commit.
+GTK 4 asks for the panel when a finger lifts from a field and doesn't
+commit afterwards, so tapping a field never brought up the on-screen
+keyboard. Apply them right away when the asking client has the focused
+text input, and keep them for the next commit otherwise.
+
+Clients that bind text-input-v3 below version 2, like Chromium and
+Electron, can't ask for the input panel. Mutter only showed it when such
+a client enabled a text input that was already focused, which GTK 3 does
+to ask for the panel, but Chromium enables its text input once, after
+the tap that focuses a field, and never again while the field keeps
+focus. Show the panel for these clients when they enable a text input
+right after a press or touch on the focused surface, and when such a
+press lands on it while their text input is enabled.
+---
+ src/wayland/meta-wayland-text-input.c | 133 +++++++++++++++++---------
+ 1 file changed, 89 insertions(+), 44 deletions(-)
+
+diff --git a/src/wayland/meta-wayland-text-input.c b/src/wayland/meta-wayland-text-input.c
+index ef1866aea1c13adcc1817c8dd5f3de64187ec5b8..1bb12147be4edf1bae3e7fe8d99e83dc2c4c74ee 100644
+--- a/src/wayland/meta-wayland-text-input.c
++++ b/src/wayland/meta-wayland-text-input.c
+@@ -99,6 +99,7 @@ struct _MetaWaylandTextInput
+   ClutterInputActionFlags available_actions;
+   gboolean show_panel;
+   gboolean enabled;
++  gboolean pressed;
+ 
+   struct
+   {
+@@ -555,6 +556,7 @@ meta_wayland_text_input_set_focus (MetaWaylandTextInput *text_input,
+     return;
+ 
+   text_input->pending_state = META_WAYLAND_PENDING_STATE_NONE;
++  text_input->pressed = FALSE;
+ 
+   if (text_input->surface)
+     {
+@@ -858,12 +860,21 @@ text_input_commit_state (struct wl_client   *client,
+       if (text_input->enabled)
+         {
+           gboolean can_show_preedit;
++          gboolean asks_for_panel =
++            wl_resource_get_version (resource) >=
++            ZWP_TEXT_INPUT_V3_SHOW_INPUT_PANEL_SINCE_VERSION;
+ 
+           if (!clutter_input_focus_is_focused (focus))
+-            clutter_input_method_focus_in (input_method, focus);
+-          else if (wl_resource_get_version (resource) <
+-                   ZWP_TEXT_INPUT_V3_SHOW_INPUT_PANEL_SINCE_VERSION)
+-            enable_panel_v1 = TRUE;
++            {
++              clutter_input_method_focus_in (input_method, focus);
++              enable_panel_v1 = text_input->pressed && !asks_for_panel;
++            }
++          else if (!asks_for_panel)
++            {
++              enable_panel_v1 = TRUE;
++            }
++
++          text_input->pressed = FALSE;
+ 
+           can_show_preedit =
+             wl_resource_get_version (resource) <
+@@ -1011,24 +1022,38 @@ text_input_set_available_actions (struct wl_client   *client,
+   text_input->pending_state |= META_WAYLAND_PENDING_STATE_ACTIONS;
+ }
+ 
++static void
++set_input_panel_visibility (MetaWaylandTextInput *text_input,
++                            struct wl_client     *client,
++                            gboolean              show)
++{
++  ClutterInputPanelState panel_state =
++    show ? CLUTTER_INPUT_PANEL_STATE_ON : CLUTTER_INPUT_PANEL_STATE_OFF;
++
++  text_input->show_panel = show;
++
++  if (client_matches_focus (text_input, client) &&
++      clutter_input_focus_is_focused (text_input->input_focus))
++    clutter_input_focus_set_input_panel_state (text_input->input_focus,
++                                               panel_state);
++  else
++    text_input->pending_state |= META_WAYLAND_PENDING_STATE_PANEL_VISIBILITY;
++}
++
+ static void
+ text_input_show_input_panel (struct wl_client   *client,
+                              struct wl_resource *resource)
+ {
+-  MetaWaylandTextInput *text_input = wl_resource_get_user_data (resource);
+-
+-  text_input->show_panel = TRUE;
+-  text_input->pending_state |= META_WAYLAND_PENDING_STATE_PANEL_VISIBILITY;
++  set_input_panel_visibility (wl_resource_get_user_data (resource),
++                              client, TRUE);
+ }
+ 
+ static void
+ text_input_hide_input_panel (struct wl_client   *client,
+                              struct wl_resource *resource)
+ {
+-  MetaWaylandTextInput *text_input = wl_resource_get_user_data (resource);
+-
+-  text_input->show_panel = FALSE;
+-  text_input->pending_state |= META_WAYLAND_PENDING_STATE_PANEL_VISIBILITY;
++  set_input_panel_visibility (wl_resource_get_user_data (resource),
++                              client, FALSE);
+ }
+ 
+ static struct zwp_text_input_v3_interface meta_text_input_interface = {
+@@ -1189,53 +1214,73 @@ meta_wayland_text_input_update (MetaWaylandTextInput *text_input,
+   return FALSE;
+ }
+ 
++static gboolean
++press_lands_on_focus (MetaWaylandTextInput *text_input,
++                      const ClutterEvent   *event)
++{
++  MetaBackend *backend = backend_from_text_input (text_input);
++  ClutterStage *stage = CLUTTER_STAGE (meta_backend_get_stage (backend));
++  ClutterContext *context = meta_backend_get_clutter_context (backend);
++  ClutterBackend *clutter_backend = clutter_context_get_backend (context);
++  ClutterSprite *sprite;
++  ClutterActor *actor;
++
++  sprite = clutter_backend_get_sprite (clutter_backend, stage, event);
++  actor = clutter_focus_get_current_actor (CLUTTER_FOCUS (sprite));
++
++  return META_IS_SURFACE_ACTOR_WAYLAND (actor) &&
++         meta_surface_actor_wayland_get_surface (META_SURFACE_ACTOR_WAYLAND (actor)) ==
++         text_input->surface;
++}
++
++static gboolean
++focus_asks_for_panel (MetaWaylandTextInput *text_input)
++{
++  struct wl_resource *resource;
++
++  wl_resource_for_each (resource, &text_input->focus_resource_list)
++    {
++      if (wl_resource_get_version (resource) >=
++          ZWP_TEXT_INPUT_V3_SHOW_INPUT_PANEL_SINCE_VERSION)
++        return TRUE;
++    }
++
++  return FALSE;
++}
++
+ gboolean
+ meta_wayland_text_input_handle_event (MetaWaylandTextInput *text_input,
+                                       const ClutterEvent   *event)
+ {
+   ClutterEventType event_type;
++  gboolean pressed;
+   gboolean retval;
+ 
+-  if (!text_input->surface ||
+-      !clutter_input_focus_is_focused (text_input->input_focus))
++  if (!text_input->surface)
+     return FALSE;
+ 
+   event_type = clutter_event_type (event);
+-
+-  retval = clutter_input_focus_process_event (text_input->input_focus, event);
++  pressed = (event_type == CLUTTER_BUTTON_PRESS ||
++             event_type == CLUTTER_TOUCH_BEGIN) &&
++            press_lands_on_focus (text_input, event);
+ 
+   if (event_type == CLUTTER_BUTTON_PRESS ||
+       event_type == CLUTTER_TOUCH_BEGIN)
+-    {
+-      MetaWaylandSurface *surface = NULL;
+-      MetaBackend *backend;
+-      ClutterContext *context;
+-      ClutterBackend *clutter_backend;
+-      ClutterStage *stage;
+-      ClutterActor *actor;
+-      ClutterSprite *sprite;
+-
+-      backend = backend_from_text_input (text_input);
+-      stage = CLUTTER_STAGE (meta_backend_get_stage (backend));
+-      context = meta_backend_get_clutter_context (backend);
+-      clutter_backend = clutter_context_get_backend (context);
+-
+-      sprite = clutter_backend_get_sprite (clutter_backend, stage, event);
+-      actor = clutter_focus_get_current_actor (CLUTTER_FOCUS (sprite));
+-
+-      if (META_IS_SURFACE_ACTOR_WAYLAND (actor))
+-        {
+-          MetaSurfaceActorWayland *actor_wayland =
+-            META_SURFACE_ACTOR_WAYLAND (actor);
++    text_input->pressed = pressed;
+ 
+-          surface = meta_surface_actor_wayland_get_surface (actor_wayland);
++  if (!clutter_input_focus_is_focused (text_input->input_focus))
++    return FALSE;
+ 
+-          if (surface == text_input->surface)
+-            {
+-              clutter_input_focus_reset (text_input->input_focus);
+-              meta_wayland_text_input_focus_flush_done (text_input->input_focus);
+-            }
+-        }
++  retval = clutter_input_focus_process_event (text_input->input_focus, event);
++
++  if (pressed)
++    {
++      clutter_input_focus_reset (text_input->input_focus);
++      meta_wayland_text_input_focus_flush_done (text_input->input_focus);
++
++      if (!focus_asks_for_panel (text_input))
++        clutter_input_focus_set_input_panel_state (text_input->input_focus,
++                                                   CLUTTER_INPUT_PANEL_STATE_ON);
+     }
+ 
+   return retval;

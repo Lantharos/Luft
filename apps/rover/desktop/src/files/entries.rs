@@ -285,6 +285,10 @@ fn sniffed_mime_type(path: &Path) -> Option<&'static str> {
         None
     } else {
         let text = std::str::from_utf8(bytes).ok()?;
-        Some(if text.trim_start().starts_with("<svg") { "image/svg+xml" } else { "text/plain" })
+        Some(if text.trim_start().starts_with("<svg") {
+            "image/svg+xml"
+        } else {
+            "text/plain"
+        })
     }
 }

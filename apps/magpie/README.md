@@ -16,7 +16,7 @@ sabine install --bundle .
 
 Installing registers Magpie for the image, video, audio, PDF and font types it can show.
 
-Local files are only readable from the packaged app, so media shows up in builds and bundles, not in the Vite dev server. `bun run dev` in a regular browser reads real files instead: set `MAGPIE_OPEN` to a file to open it, or `MAGPIE_PLACES` to a folder to browse.
+Local files are only readable from the packaged app, so media shows up in builds and bundles, not in the Vite dev server.
 
 Formats beyond what Chromium shows, such as HEIC and JPEG XL, need the `glycin-loaders` package and `bwrap`. Videos Chromium can't decode play through GStreamer.
 

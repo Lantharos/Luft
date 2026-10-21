@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { isAvailable } from '@lantharos/sabine';
 	import { appearance, WindowControls } from '@luft/ui';
 	import Lock from '@lucide/svelte/icons/lock';
 	import LockOpen from '@lucide/svelte/icons/lock-open';
@@ -12,7 +11,6 @@
 	onMount(() => {
 		const resize = new ResizeObserver(() => signIn.place(page.getBoundingClientRect()));
 		resize.observe(page);
-		if (!isAvailable()) return () => resize.disconnect();
 		const stopping = signIn.start();
 		return () => {
 			resize.disconnect();

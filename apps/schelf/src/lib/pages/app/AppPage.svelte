@@ -6,7 +6,7 @@
 	import Description from '#lib/components/Description.svelte';
 	import Screenshots from '#lib/components/Screenshots.svelte';
 	import { fedora } from '#lib/fedora/fedora.svelte.js';
-	import { backend } from '#lib/state/backend.js';
+	import { backend } from '#lib/bridge/index.js';
 	import { navigation, type AppTarget } from '#lib/state/navigation.svelte.js';
 	import AppActions from './AppActions.svelte';
 	import AppFacts from './AppFacts.svelte';
@@ -38,7 +38,7 @@
 		const app = installed;
 		localPermissions = null;
 		if (app?.source !== 'flatpak' || !app.installation || !app.reference) return;
-		void backend()
+		void backend
 			.permissions(app.installation, app.reference)
 			.then((result) => (localPermissions = result))
 			.catch(() => {});

@@ -1,4 +1,4 @@
-import { appWindow, isAvailable, region } from '@lantharos/sabine';
+import { appWindow, region } from '@lantharos/sabine';
 import { opened } from './launch.svelte';
 
 const FULL_SIDEBAR_FROM = 1200;
@@ -21,7 +21,6 @@ export const layout = new Layout();
 
 export function followSidebarRegions() {
 	$effect(() => {
-		if (!isAvailable()) return;
 		const width = layout.sidebarWidth;
 		void appWindow.setRegions({
 			blur: width ? region.roundedLeft(width, WINDOW_RADIUS) : region.empty(),

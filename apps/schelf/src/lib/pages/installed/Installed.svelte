@@ -4,7 +4,7 @@
 	import type { InstalledApp, Source } from '#lib/bridge/types.js';
 	import RemoveDialog from '#lib/components/RemoveDialog.svelte';
 	import { fedora } from '#lib/fedora/fedora.svelte.js';
-	import { backend } from '#lib/state/backend.js';
+	import { backend } from '#lib/bridge/index.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
 	import InstalledRow from './InstalledRow.svelte';
@@ -29,7 +29,7 @@
 	const noun = $derived((NOUNS[filter] ?? ['app', 'apps'])[shown.length === 1 ? 0 : 1]);
 
 	async function addAppImage() {
-		const path = await backend().chooseAppImage();
+		const path = await backend.chooseAppImage();
 		if (path) navigation.push({ page: 'file', path });
 	}
 

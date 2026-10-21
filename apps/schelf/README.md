@@ -17,15 +17,12 @@ Everything for regular Fedora installs lives in `desktop/src/fedora` and `src/li
 Install dependencies once from the repository root with `bun install`, then from this folder:
 
 ```sh
-bun run dev              # the interface in a browser, with sample apps and Flathub's real catalog
 bun run desktop:dev      # Vite dev server and the native window
 bun run check            # svelte-check
 bun run desktop:build    # production web build and release binary
 bun run desktop:bundle   # Sabine bundle
 sabine install --bundle .
 ```
-
-In the browser, `?scheme=light` shows the light style, `?system=image` an image-based install, `?file=/path` the page for an opened file and `?page=schelf:updates` Updates.
 
 Installing makes Schelf the app for `.flatpakref`, `.flatpakrepo`, `.rpm` and `.AppImage` files and for `schelf:` links (`schelf:updates`, `schelf:installed`, `schelf:search?<query>`).
 

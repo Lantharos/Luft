@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { appWindow, isAvailable } from '@lantharos/sabine';
+	import { appWindow } from '@lantharos/sabine';
 	import { appearance, GlassShell } from '@luft/ui';
 	import PanelStage from '#lib/components/PanelStage.svelte';
 	import Sidebar from '#lib/components/Sidebar.svelte';
 	import { app } from '#lib/state/app.svelte.js';
 
 	onMount(() => {
-		if (isAvailable()) appWindow.revealWhen(app.start());
+		appWindow.revealWhen(app.start());
 	});
 
 	$effect(() => {

@@ -5,7 +5,7 @@
 	import Description from '#lib/components/Description.svelte';
 	import ProgressButton from '#lib/components/ProgressButton.svelte';
 	import { fedora } from '#lib/fedora/fedora.svelte.js';
-	import { backend } from '#lib/state/backend.js';
+	import { backend } from '#lib/bridge/index.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
 	import { operations } from '#lib/state/operations.svelte.js';
@@ -37,7 +37,7 @@
 		file = null;
 		error = null;
 		started = false;
-		backend()
+		backend
 			.inspectFile(current)
 			.then((result) => current === path && (file = result))
 			.catch((reason) => current === path && (error = String(reason)));
@@ -84,7 +84,7 @@
 					{#if operation && operation.state !== 'failed'}
 						<ProgressButton {operation} large />
 					{:else if installed?.desktop && (finished || file.kind !== 'appImage')}
-						<button type="button" class="button primary large" onclick={() => backend().launch(installed.desktop!)}>Open</button>
+						<button type="button" class="button primary large" onclick={() => backend.launch(installed.desktop!)}>Open</button>
 					{:else if finished && file.kind === 'flatpakRepo'}
 						<button type="button" class="button large" onclick={() => navigation.open({ page: 'discover' })}>Done</button>
 					{:else if file.kind === 'package' && file.installed}

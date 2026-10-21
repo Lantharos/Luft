@@ -1,4 +1,4 @@
-import { app, events as sabine, invoke, isAvailable, listen } from '@lantharos/sabine';
+import { app, events as sabine, invoke, listen } from '@lantharos/sabine';
 import { activationToken, fileUrlPath } from '@luft/ui';
 import type {
 	Account,
@@ -35,10 +35,6 @@ function call<T>(name: string, params: Record<string, unknown> = {}, timeoutMs?:
 	return invoke<T>(name, params, timeoutMs ? { timeoutMs } : undefined);
 }
 
-function on<T>(name: string, callback: (payload: T) => void): () => void {
-	return isAvailable() ? listen<T>(name, callback) : () => {};
-}
-
 export type Secret = { kind: 'password'; password: string } | { kind: 'oAuth'; provider: Provider };
 
 export const appState = () => call<AppState>('app_state');
@@ -49,8 +45,7 @@ function launch(url: string): Launch | null {
 	return path === null ? null : { kind: 'message', path };
 }
 
-export const takeLaunches = async () =>
-	isAvailable() ? (await app.takeOpenUrls()).map(launch).filter((launch) => launch !== null) : [];
+export const takeLaunches = async () => (await app.takeOpenUrls()).map(launch).filter((launch) => launch !== null);
 export const takeOpening = () => call<{ thread: number | null } | null>('take_opening');
 export const quit = () => call<void>('quit');
 export const setFocused = (focused: boolean) => call<void>('set_focused', { focused });
@@ -101,12 +96,12 @@ export const saveTemplate = (id: number | null, name: string, body: string) => c
 export const deleteTemplate = (id: number) => call<void>('delete_template', { id });
 
 export const events = {
-	changed: (callback: (account: number) => void) => on('mailman.changed', callback),
-	status: (callback: (status: Status) => void) => on('mailman.status', callback),
-	open: (callback: () => void) => on('mailman.open', callback),
-	outbox: (callback: (event: OutboxEvent) => void) => on('mailman.outbox', callback),
-	body: (callback: (arrived: { id: number; error: string | null }) => void) => on('mailman.body', callback),
-	images: (callback: (images: [string, string | null][]) => void) => on('mailman.images', callback),
-	identities: (callback: (account: number) => void) => on('mailman.identities', callback),
-	launched: (callback: () => void) => (isAvailable() ? sabine.openUrlsAvailable(callback) : () => {})
+	changed: (callback: (account: number) => void) => listen('mailman.changed', callback),
+	status: (callback: (status: Status) => void) => listen('mailman.status', callback),
+	open: (callback: () => void) => listen('mailman.open', callback),
+	outbox: (callback: (event: OutboxEvent) => void) => listen('mailman.outbox', callback),
+	body: (callback: (arrived: { id: number; error: string | null }) => void) => listen('mailman.body', callback),
+	images: (callback: (images: [string, string | null][]) => void) => listen('mailman.images', callback),
+	identities: (callback: (account: number) => void) => listen('mailman.identities', callback),
+	launched: (callback: () => void) => sabine.openUrlsAvailable(callback)
 };

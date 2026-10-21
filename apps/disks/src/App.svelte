@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { isAvailable } from '@lantharos/sabine';
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import { appearance, GlassShell, WindowControls } from '@luft/ui';
 	import DriveView from '#lib/components/drive/DriveView.svelte';
@@ -16,7 +15,7 @@
 	import { space } from '#lib/state/space.svelte.js';
 
 	onMount(() => {
-		if (isAvailable()) void disks.start();
+		void disks.start();
 	});
 
 	$effect(() => {

@@ -1,15 +1,15 @@
 import { untrack } from 'svelte';
 import { SvelteMap } from 'svelte/reactivity';
 import type { Job, Operation } from '#lib/bridge/types.js';
-import { backend } from './backend';
+import { backend } from '#lib/bridge/index.js';
 
 class Operations {
 	list = $state<Operation[]>([]);
 	#inline = new SvelteMap<number, number>();
 
 	async start() {
-		backend().onOperations((operations) => (this.list = operations));
-		this.list = await backend().operations();
+		backend.onOperations((operations) => (this.list = operations));
+		this.list = await backend.operations();
 	}
 
 	forKey(key: string) {
@@ -39,11 +39,11 @@ class Operations {
 	}
 
 	run(key: string, title: string, job: Job, members: string[] = []) {
-		return backend().start(key, title, job, members);
+		return backend.start(key, title, job, members);
 	}
 
 	cancel(id: number) {
-		return backend().cancel(id);
+		return backend.cancel(id);
 	}
 }
 

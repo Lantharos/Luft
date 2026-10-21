@@ -261,9 +261,12 @@ export interface AppState extends Appearance {
 	settings: Record<string, unknown> | null;
 }
 
-export interface Backend {
+export interface Backend extends SystemBackend {
 	appState(): Promise<AppState>;
 	saveSettings(settings: Record<string, unknown>): Promise<void>;
+}
+
+export interface SystemBackend {
 	view(view: View): Promise<void>;
 	configure(interval: number, history: number): Promise<void>;
 	snapshot(after: number): Promise<Snapshot>;

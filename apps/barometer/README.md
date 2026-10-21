@@ -14,7 +14,7 @@ bun run desktop:bundle   # release bundle
 sabine install --bundle .
 ```
 
-`bun run dev` serves the interface in a regular browser with sample data. Preferences are saved to `~/.config/barometer/settings.json`.
+With `LUFT_SAMPLE_SYSTEM` set, Barometer shows sample hardware and processes instead of this computer's. Preferences are saved to `~/.config/barometer/settings.json`.
 
 ## License
 

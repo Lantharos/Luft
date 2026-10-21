@@ -42,8 +42,6 @@ bun run check            # type checks
 bun run desktop:build    # a release build
 ```
 
-Some apps, such as Rover and Schelf, also show their interface in a regular browser with sample data through `bun run dev`. Each app's README has its details.
-
 ## Test sessions
 
 `kestrel/tools/session.sh capture` runs every check headless, in isolated sessions with their own D-Bus buses and stand-ins for system services, and saves a screenshot of every surface. Other modes measure frame times, record animations frame by frame, and check the login screen and first-run setup. [Testing](/reference/testing/) covers every mode and option.

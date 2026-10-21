@@ -1,4 +1,4 @@
-import type { Backend } from '#lib/bridge/types.js';
+import type { Backend } from '#lib/bridge/index.js';
 import { debounce } from '#lib/utils/debounce.js';
 
 export interface Settings {

@@ -2,7 +2,7 @@
 	import type { ToolSummary } from '#lib/bridge/types.js';
 	import AppArt from '#lib/components/AppArt.svelte';
 	import ProgressButton from '#lib/components/ProgressButton.svelte';
-	import { backend } from '#lib/state/backend.js';
+	import { backend } from '#lib/bridge/index.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
 	import { operations } from '#lib/state/operations.svelte.js';
@@ -16,7 +16,7 @@
 		const current = query;
 		tools = null;
 		error = null;
-		backend()
+		backend
 			.searchTools(current)
 			.then((result) => {
 				if (current === query) tools = result;

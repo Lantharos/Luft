@@ -9,13 +9,6 @@ export default defineConfig({
 	server: {
 		port: 5179,
 		strictPort: true,
-		proxy: {
-			'/flathub': {
-				target: 'https://flathub.org',
-				changeOrigin: true,
-				rewrite: (path) => path.replace(/^\/flathub/, '/api/v2')
-			}
-		},
 		watch: {
 			ignored: ['**/desktop/**']
 		}

@@ -1,4 +1,4 @@
-import { appWindow, isAvailable } from '@lantharos/sabine';
+import { appWindow } from '@lantharos/sabine';
 import { appearance } from '@luft/ui';
 import { connect } from '#lib/backend/index.js';
 import type { Backend, Devices } from '#lib/backend/types.js';
@@ -23,7 +23,7 @@ class AppStore {
 	async start() {
 		const backend = await connect();
 		const state = await backend.appState();
-		if (isAvailable()) appearance.start(state);
+		appearance.start(state);
 		settings.load(backend, state.settings);
 		processes.start(backend);
 		usage.start(backend);
@@ -66,13 +66,8 @@ class AppStore {
 	}
 
 	#watchVisibility() {
-		if (isAvailable()) {
-			this.#shown = appWindow.visible;
-			appWindow.onVisibilityChanged(({ visible }) => (this.#shown = visible));
-			return;
-		}
-		this.#shown = document.visibilityState === 'visible';
-		document.addEventListener('visibilitychange', () => (this.#shown = document.visibilityState === 'visible'));
+		this.#shown = appWindow.visible;
+		appWindow.onVisibilityChanged(({ visible }) => (this.#shown = visible));
 	}
 }
 

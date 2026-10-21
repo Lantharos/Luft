@@ -1,5 +1,5 @@
 import type { InstalledApp, Updates } from '#lib/bridge/types.js';
-import { backend } from './backend';
+import { backend } from '#lib/bridge/index.js';
 
 class Library {
 	installed = $state<InstalledApp[]>([]);
@@ -9,7 +9,7 @@ class Library {
 	error = $state<string | null>(null);
 
 	async start() {
-		backend().onLibraryChanged(({ keys, action, succeeded }) => {
+		backend.onLibraryChanged(({ keys, action, succeeded }) => {
 			if (succeeded && action !== 'install') this.forget(keys);
 			void this.refresh();
 		});
@@ -18,7 +18,7 @@ class Library {
 	}
 
 	async refresh() {
-		this.installed = await backend().installed();
+		this.installed = await backend.installed();
 		this.loaded = true;
 	}
 
@@ -26,7 +26,7 @@ class Library {
 		if (this.checking) return;
 		this.checking = true;
 		try {
-			this.updates = await backend().checkUpdates();
+			this.updates = await backend.checkUpdates();
 			this.error = this.updates.error;
 		} catch (reason) {
 			this.error = String(reason);

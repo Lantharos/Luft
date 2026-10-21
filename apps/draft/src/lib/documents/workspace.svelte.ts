@@ -1,7 +1,7 @@
 import { countColumn } from '@codemirror/state';
 import type { ViewUpdate } from '@codemirror/view';
 import { tick } from 'svelte';
-import type { Backend } from '#lib/bridge/types.js';
+import type { Backend } from '#lib/bridge/index.js';
 import { Editor } from '#lib/editor/editor.js';
 import { FolderTree } from '#lib/files/tree.svelte.js';
 import type { SettingsStore } from '#lib/app/settings.svelte.js';

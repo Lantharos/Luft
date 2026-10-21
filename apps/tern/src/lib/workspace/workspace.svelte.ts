@@ -1,4 +1,4 @@
-import { appWindow, isAvailable } from '@lantharos/sabine';
+import { appWindow } from '@lantharos/sabine';
 import { settings } from '#lib/state/settings.svelte.js';
 import type { FinishedCommand } from '#lib/terminal/integration.js';
 import { pasteRisks } from '#lib/terminal/paste.js';
@@ -138,7 +138,7 @@ export class Workspace {
 		const index = this.tabs.indexOf(tab);
 		this.tabs.splice(index, 1);
 		if (this.tabs.length === 0) {
-			if (isAvailable()) appWindow.close();
+			appWindow.close();
 			return;
 		}
 		if (this.active === tab) this.select(this.tabs[Math.min(index, this.tabs.length - 1)]);

@@ -1,7 +1,7 @@
-import { appWindow, isAvailable } from '@lantharos/sabine';
+import { appWindow } from '@lantharos/sabine';
 import { appearance } from '@luft/ui';
 import { tick } from 'svelte';
-import type { Backend } from '#lib/bridge/types.js';
+import type { Backend } from '#lib/bridge/index.js';
 import { buildCommands, type Command } from '#lib/commands/registry.js';
 import { checkAll, filesChanged, watchedFolders } from '#lib/documents/disk.js';
 import type { Document } from '#lib/documents/document.svelte.js';
@@ -48,7 +48,7 @@ export class App {
 		this.workspace.browsing = state.folders.length > 0 || opened.length === 0;
 		this.configured = true;
 		const session = await this.backend.readStore<Session>(sessionName(this.workspace.browsing));
-		if (isAvailable()) appearance.start(state);
+		appearance.start(state);
 		this.workspace.editor.setWrap(this.settings.value.wrap);
 		this.workspace.home = state.home;
 		this.workspace.backups.folder = state.backups;
@@ -146,6 +146,6 @@ export class App {
 		this.#persist.cancel();
 		await workspace.backups.flush();
 		await Promise.all([writeSession(workspace), this.settings.save()]);
-		if (isAvailable()) appWindow.close();
+		appWindow.close();
 	}
 }

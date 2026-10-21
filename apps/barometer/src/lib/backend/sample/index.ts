@@ -1,5 +1,5 @@
 import { encode } from '../rows';
-import type { AppUsage, Backend, Catalog, Details, Devices, Signal, Tick, View } from '../types';
+import type { AppUsage, Catalog, Details, Devices, Signal, SystemBackend, Tick, View } from '../types';
 import { advance, apps, createProcesses } from './processes';
 import { devices, tick } from './system';
 
@@ -9,7 +9,6 @@ let interval = 1000;
 let history = 60;
 let view: View = { page: '', visible: false, reset: false, expanded: [], disk: true, gpu: true };
 let timer: ReturnType<typeof setInterval> | undefined;
-let settings: Record<string, unknown> | null = null;
 const ticks: Tick[] = [];
 const processes = createProcesses(Date.now());
 const background = new Set(['com.lantharos.mailman.desktop']);
@@ -123,9 +122,7 @@ function details(pid: number): Details {
 	};
 }
 
-export const sample: Backend = {
-	appState: async () => ({ palette: null, typography: { interface: null, monospace: null, textScale: 1 }, motion: 'full', settings }),
-	saveSettings: async (value) => void (settings = value),
+export const sample: SystemBackend = {
 	view: async (next) => {
 		view = next;
 		if (!view.visible || (view.page !== 'apps' && view.page !== 'processes')) return;

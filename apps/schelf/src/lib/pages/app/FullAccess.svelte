@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Row, Switch } from '@luft/ui';
 	import type { InstalledApp } from '#lib/bridge/types.js';
-	import { backend } from '#lib/state/backend.js';
+	import { backend } from '#lib/bridge/index.js';
 	import FullAccessDialog from './FullAccessDialog.svelte';
 
 	let { app, on = $bindable(false) }: { app: InstalledApp; on?: boolean } = $props();
@@ -14,7 +14,7 @@
 		const id = app.id;
 		on = false;
 		error = null;
-		void backend()
+		void backend
 			.fullAccess(id)
 			.then((trusted) => {
 				if (app.id === id) on = trusted;
@@ -27,7 +27,7 @@
 		busy = true;
 		error = null;
 		try {
-			await backend().setFullAccess(app.id, wanted);
+			await backend.setFullAccess(app.id, wanted);
 			on = wanted;
 		} catch (reason) {
 			error = String(reason);

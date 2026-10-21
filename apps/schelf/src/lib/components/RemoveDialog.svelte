@@ -2,7 +2,7 @@
 	import { Dialog } from '@luft/ui';
 	import type { InstalledApp } from '#lib/bridge/types.js';
 	import { removeJob } from '#lib/app/jobs.js';
-	import { backend } from '#lib/state/backend.js';
+	import { backend } from '#lib/bridge/index.js';
 	import { operations } from '#lib/state/operations.svelte.js';
 
 	let { app, onclose }: { app: InstalledApp; onclose: () => void } = $props();
@@ -13,7 +13,7 @@
 		const name = app.source === 'package' ? app.package : null;
 		alsoRemoved = [];
 		if (name)
-			void backend()
+			void backend
 				.fedoraRemovalPlan(name)
 				.then((names) => (alsoRemoved = names))
 				.catch(() => {});

@@ -1,7 +1,7 @@
 import { SvelteMap } from 'svelte/reactivity';
 import type { Item, ThumbnailBatch } from '#lib/bridge/api.js';
 import * as api from '#lib/bridge/api.js';
-import { fileSource, isDesktop } from '#lib/bridge/index.js';
+import { fileSource } from '#lib/bridge/index.js';
 import { OnScreen } from './onscreen';
 
 const SIZE = 'large';
@@ -28,7 +28,6 @@ class Thumbnails {
 	};
 
 	source(item: Item) {
-		if (!isDesktop()) return item.kind === 'image' ? fileSource(item.path, item.modified) : null;
 		this.#screen.watch(item);
 		const ready = this.#ready.get(item.path);
 		return ready && current(ready, item) ? ready.url : null;

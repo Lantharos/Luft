@@ -14,7 +14,7 @@ bun run desktop:bundle   # release bundle
 sabine install --bundle .
 ```
 
-Opening files needs a build or bundle, since Sabine's local file access only works from the packaged app. `bun run dev` serves the interface in a regular browser with a sample project; add `?log=50` to the address to include a generated 50 MB log.
+Opening files needs a build or bundle, since Sabine's local file access only works from the packaged app.
 
 | Path | Contents |
 |------|----------|

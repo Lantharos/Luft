@@ -1,4 +1,4 @@
-import { fileUrl, isAvailable } from '@lantharos/sabine';
+import { fileUrl } from '@lantharos/sabine';
 
 const EXTERNAL = /^[a-z][a-z0-9+.-]*:/i;
 const REMOTE = /^https?:/i;
@@ -41,7 +41,7 @@ async function create() {
 			render.heldBack = true;
 			tokens[index].attrs = tokens[index].attrs!.filter(([name]) => name !== 'src');
 			tokens[index].attrSet('data-remote', source);
-		} else if (isAvailable() && render.path && source && !EXTERNAL.test(source)) tokens[index].attrSet('src', fileUrl(besideDocument(source, render.path)));
+		} else if (render.path && source && !EXTERNAL.test(source)) tokens[index].attrSet('src', fileUrl(besideDocument(source, render.path)));
 		return image(tokens, index, options, env, self);
 	};
 	return markdown;

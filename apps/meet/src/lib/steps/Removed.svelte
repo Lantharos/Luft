@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { appWindow, isAvailable } from '@lantharos/sabine';
+	import { appWindow } from '@lantharos/sabine';
 	import { session } from '#lib/state/meet.svelte.js';
 </script>
 
@@ -10,6 +10,6 @@
 		{t('removed-description', { platform: session.platform })}
 	</p>
 	<div class="mt-9">
-		<button type="button" class="button large px-6" onclick={() => isAvailable() && appWindow.close()}>{t('meet-close')}</button>
+		<button type="button" class="button large px-6" onclick={() => appWindow.close()}>{t('meet-close')}</button>
 	</div>
 </section>

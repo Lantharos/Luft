@@ -3,7 +3,7 @@
 	import type { InstalledApp } from '#lib/bridge/types.js';
 	import type { AppDetails } from '#lib/catalog/types.js';
 	import { date, sourceName } from '#lib/format.js';
-	import { backend } from '#lib/state/backend.js';
+	import { backend } from '#lib/bridge/index.js';
 
 	let { details, installed }: { details: AppDetails | null; installed: InstalledApp | null } = $props();
 
@@ -52,7 +52,7 @@
 	{#if details?.homepage}
 		{@const homepage = details.homepage}
 		<Row title="Website" description={new URL(homepage).host}>
-			<button type="button" class="button" onclick={() => backend().openUrl(homepage)}>Visit</button>
+			<button type="button" class="button" onclick={() => backend.openUrl(homepage)}>Visit</button>
 		</Row>
 	{/if}
 </Section>

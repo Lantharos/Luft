@@ -1,4 +1,4 @@
-import { call, on } from './index';
+import { invoke, listen } from '@lantharos/sabine';
 import { activationToken, type Appearance } from '@luft/ui';
 
 export type Kind = 'image' | 'video' | 'audio' | 'document' | 'font';
@@ -174,38 +174,38 @@ export interface Activation {
 	workingDirectory: string | null;
 }
 
-export const appState = () => call<AppState>('app_state');
-export const resolveArguments = (activation: Activation) => call<string[]>('resolve_arguments', { ...activation });
-export const chooseFolder = () => call<string | null>('choose_folder', {}, { timeoutMs: 24 * 60 * 60 * 1000 });
-export const places = () => call<Location[]>('places');
-export const chooseFile = () => call<string | null>('choose_file', {}, { timeoutMs: 24 * 60 * 60 * 1000 });
+export const appState = () => invoke<AppState>('app_state');
+export const resolveArguments = (activation: Activation) => invoke<string[]>('resolve_arguments', { ...activation });
+export const chooseFolder = () => invoke<string | null>('choose_folder', {}, { timeoutMs: 24 * 60 * 60 * 1000 });
+export const places = () => invoke<Location[]>('places');
+export const chooseFile = () => invoke<string | null>('choose_file', {}, { timeoutMs: 24 * 60 * 60 * 1000 });
 
-export const openFolder = (path: string) => call<Listing>('open_folder', { path });
-export const requestThumbnails = (paths: string[], size: ThumbnailSize) => call<void>('request_thumbnails', { paths, size });
-export const imageDetails = (path: string) => call<ImageDetails>('image_details', { path });
-export const decodeImage = (path: string) => call<Pixels>('decode_image', { path });
-export const setWallpaper = (path: string) => call<'light' | 'dark'>('set_wallpaper', { path });
-export const otherApps = (path: string) => call<App[]>('other_apps', { path });
-export const openWith = async (path: string, app: string) => call<void>('open_with', { path, app, token: await activationToken() });
-export const openUri = async (uri: string) => call<void>('open_uri', { uri, token: await activationToken() });
-export const showInFolder = async (path: string) => call<void>('show_in_folder', { path, token: await activationToken() });
+export const openFolder = (path: string) => invoke<Listing>('open_folder', { path });
+export const requestThumbnails = (paths: string[], size: ThumbnailSize) => invoke<void>('request_thumbnails', { paths, size });
+export const imageDetails = (path: string) => invoke<ImageDetails>('image_details', { path });
+export const decodeImage = (path: string) => invoke<Pixels>('decode_image', { path });
+export const setWallpaper = (path: string) => invoke<'light' | 'dark'>('set_wallpaper', { path });
+export const otherApps = (path: string) => invoke<App[]>('other_apps', { path });
+export const openWith = async (path: string, app: string) => invoke<void>('open_with', { path, app, token: await activationToken() });
+export const openUri = async (uri: string) => invoke<void>('open_uri', { uri, token: await activationToken() });
+export const showInFolder = async (path: string) => invoke<void>('show_in_folder', { path, token: await activationToken() });
 
-export const fontInfo = (path: string) => call<FontFile>('font_info', { path });
-export const fontSource = (path: string, index: number) => call<string>('font_source', { path, index });
-export const fontStatus = (path: string) => call<FontStatus>('font_status', { path });
-export const installFont = (path: string) => call<FontStatus>('font_install', { path });
-export const removeFont = (path: string) => call<FontStatus>('font_remove', { path });
-export const useFont = (path: string, role: FontRole) => call<FontStatus>('font_use', { path, role });
+export const fontInfo = (path: string) => invoke<FontFile>('font_info', { path });
+export const fontSource = (path: string, index: number) => invoke<string>('font_source', { path, index });
+export const fontStatus = (path: string) => invoke<FontStatus>('font_status', { path });
+export const installFont = (path: string) => invoke<FontStatus>('font_install', { path });
+export const removeFont = (path: string) => invoke<FontStatus>('font_remove', { path });
+export const useFont = (path: string, role: FontRole) => invoke<FontStatus>('font_use', { path, role });
 
-export const audioTags = (paths: string[]) => call<Tags[]>('audio_tags', { paths });
-export const videoInfo = (path: string) => call<VideoInfo>('video_info', { path });
-export const subtitleCues = (path: string, id: string) => call<Cue[]>('subtitle_cues', { path, id }, { timeoutMs: 5 * 60 * 1000 });
-export const mediaUpdate = (playback: Playback) => call<void>('media_update', { ...playback });
-export const mediaClear = () => call<void>('media_clear', {});
+export const audioTags = (paths: string[]) => invoke<Tags[]>('audio_tags', { paths });
+export const videoInfo = (path: string) => invoke<VideoInfo>('video_info', { path });
+export const subtitleCues = (path: string, id: string) => invoke<Cue[]>('subtitle_cues', { path, id }, { timeoutMs: 5 * 60 * 1000 });
+export const mediaUpdate = (playback: Playback) => invoke<void>('media_update', { ...playback });
+export const mediaClear = () => invoke<void>('media_clear', {});
 
 export const events = {
-	folder: (callback: (listing: Listing) => void) => on('magpie.folder', callback),
-	thumbnails: (callback: (batch: ThumbnailBatch) => void) => on('magpie.thumbnails', callback),
-	media: (callback: (action: MediaAction) => void) => on('magpie.media', callback),
-	activation: (callback: (activation: Activation) => void) => on('singleInstance.activate', callback)
+	folder: (callback: (listing: Listing) => void) => listen('magpie.folder', callback),
+	thumbnails: (callback: (batch: ThumbnailBatch) => void) => listen('magpie.thumbnails', callback),
+	media: (callback: (action: MediaAction) => void) => listen('magpie.media', callback),
+	activation: (callback: (activation: Activation) => void) => listen('singleInstance.activate', callback)
 };

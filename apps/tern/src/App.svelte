@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount, untrack } from 'svelte';
-	import { activity, isAvailable } from '@lantharos/sabine';
+	import { activity } from '@lantharos/sabine';
 	import { GlassShell, appearance } from '@luft/ui';
 	import * as api from '#lib/api.js';
 	import CloseDialog from '#lib/components/dialogs/CloseDialog.svelte';
@@ -18,7 +18,6 @@
 	let dialogOpen = $derived(Boolean(workspace.pasteReview || workspace.closeReview || workspace.preferencesOpen));
 
 	onMount(() => {
-		if (!isAvailable()) return;
 		const stops = [
 			api.events.activation(async (activation) => workspace.openTab(await api.resolveLaunch(activation)))
 		];
@@ -34,7 +33,7 @@
 	}
 
 	$effect(() => {
-		if (!isAvailable() || !workspace.busy) return;
+		if (!workspace.busy) return;
 		const running = activity.begin({ name: 'Running commands' });
 		return () => void running.then((handle) => handle.end());
 	});

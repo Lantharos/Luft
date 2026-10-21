@@ -1,8 +1,6 @@
-import { isAvailable } from '@lantharos/sabine';
 import { appearance } from '@luft/ui';
-import { connect } from '#lib/bridge/index.js';
+import { backend } from '#lib/bridge/index.js';
 import { fedora } from '#lib/fedora/fedora.svelte.js';
-import { setBackend } from './backend';
 import { library } from './library.svelte';
 import { navigation, type Route } from './navigation.svelte';
 import { operations } from './operations.svelte';
@@ -31,12 +29,9 @@ function openPage(argumentsList: (string | null)[]) {
 }
 
 export async function start() {
-	const backend = await connect();
-	setBackend(backend);
 	const state = await backend.appState();
 	fedora.available = state.fedora;
-	if (isAvailable()) appearance.start(state);
-	else appearance.scheme = new URLSearchParams(location.search).get('scheme') === 'light' ? 'light' : 'dark';
+	appearance.start(state);
 	openPage([state.page]);
 	openFiles(state.files);
 	backend.onActivated(async ({ arguments: list, workingDirectory }) => {

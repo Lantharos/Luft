@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { isAvailable } from '@lantharos/sabine';
 	import { appearance, GlassShell, Toast } from '@luft/ui';
 	import LayoutEditor from '#lib/layout/LayoutEditor.svelte';
 	import NewLayoutDialog from '#lib/layout/NewLayoutDialog.svelte';
@@ -13,7 +12,7 @@
 	import { toast } from '#lib/state/toast.svelte.js';
 
 	onMount(() => {
-		if (isAvailable()) void app.start();
+		void app.start();
 	});
 
 	$effect(() => {

@@ -1,7 +1,6 @@
 import { appWindow } from '@lantharos/sabine';
 import type { MediaAction, Playback } from '#lib/bridge/api.js';
 import * as api from '#lib/bridge/api.js';
-import { isDesktop } from '#lib/bridge/index.js';
 
 export interface MediaOwner {
 	playback(): Playback;
@@ -32,7 +31,7 @@ class MediaSession {
 
 	receive = (action: MediaAction) => {
 		if (action.action === 'raise') {
-			if (isDesktop()) appWindow.focus();
+			appWindow.focus();
 			return;
 		}
 		this.#owner?.handle(action);

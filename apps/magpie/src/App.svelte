@@ -6,7 +6,6 @@
 	import { openPaths } from '#lib/app/actions.js';
 	import { chrome } from '#lib/app/chrome.svelte.js';
 	import { handleKeydown } from '#lib/app/keyboard.js';
-	import { isDesktop } from '#lib/bridge/index.js';
 	import Gallery from '#lib/browse/Gallery.svelte';
 	import Sidebar from '#lib/browse/Sidebar.svelte';
 	import DocumentActions from '#lib/document/DocumentActions.svelte';
@@ -70,7 +69,7 @@
 
 	async function start() {
 		const state = await api.appState();
-		if (isDesktop()) appearance.start(state);
+		appearance.start(state);
 		chrome.start(state.launchPaths.length ? 'viewer' : 'library');
 		if (viewer) return openPaths(state.launchPaths);
 		library.places = await api.places();

@@ -1,8 +1,8 @@
-import { isAvailable, NativeVideo } from '@lantharos/sabine';
+import { NativeVideo } from '@lantharos/sabine';
 
 /** Whether this window can play video natively when Chromium cannot decode it. */
 export function canPlayNatively() {
-	return isAvailable() && NativeVideo.isSupported();
+	return NativeVideo.isSupported();
 }
 
 /** Whether a media element failed because Chromium cannot decode its source. */

@@ -1,6 +1,5 @@
 import { appWindow } from '@lantharos/sabine';
 import { Toasts } from '@luft/ui';
-import { isDesktop } from '#lib/bridge/index.js';
 
 const IDLE_MS = 2200;
 const TOAST_MS = 2600;
@@ -65,9 +64,7 @@ class Chrome {
 	setFullscreen(fullscreen: boolean) {
 		if (fullscreen === this.fullscreen) return;
 		this.fullscreen = fullscreen;
-		if (isDesktop()) appWindow.setFullscreen(fullscreen);
-		else if (fullscreen) void document.documentElement.requestFullscreen();
-		else if (document.fullscreenElement) void document.exitFullscreen();
+		appWindow.setFullscreen(fullscreen);
 	}
 
 	notify(text: string) {

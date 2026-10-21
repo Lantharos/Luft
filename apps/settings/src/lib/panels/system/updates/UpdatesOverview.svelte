@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import Info from '@lucide/svelte/icons/info';
-	import { ActionRow, Row, Section } from '@luft/ui';
+	import { ActionRow, ProgressBar, Row, Section } from '@luft/ui';
 	import { updates } from '#lib/state/updates.svelte.js';
 	import { downloading, fractionOf, showsProgress } from './activity';
 	import { cancel, check, firmware, load, openApps, preferences as loadPreferences, type Activity, type Firmware, type Preferences } from './api';
@@ -12,7 +12,6 @@
 	import VersionRows from './image/VersionRows.svelte';
 	import PackageUpdates from './packages/PackageUpdates.svelte';
 	import { about } from '../about/api';
-	import ProgressTrack from '#lib/components/ProgressTrack.svelte';
 	import { percent } from '#lib/format.js';
 
 	let { onabout }: { onabout: () => void } = $props();
@@ -64,7 +63,7 @@
 	</div>
 	{#if showsProgress(activity)}
 		<div class="flex items-center gap-3">
-			<ProgressTrack {fraction} class="h-1.5 flex-1 bg-[var(--control)]" />
+			<ProgressBar {fraction} class="flex-1" />
 			<span class="w-10 text-right text-[12.5px] text-[var(--text-muted)] tabular-nums">{fraction === null ? '' : percent(fraction)}</span>
 		</div>
 	{/if}

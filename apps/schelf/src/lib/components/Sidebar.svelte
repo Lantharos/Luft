@@ -3,7 +3,7 @@
 	import Compass from '@lucide/svelte/icons/compass';
 	import HardDrive from '@lucide/svelte/icons/hard-drive';
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
-	import { SearchField, selectionPill } from '@luft/ui';
+	import { ProgressBar, SearchField, selectionPill } from '@luft/ui';
 	import { CATEGORIES } from '#lib/catalog/categories.js';
 	import { activity, percent } from '#lib/format.js';
 	import { library } from '#lib/state/library.svelte.js';
@@ -76,7 +76,7 @@
 					<span class="tabular-nums text-[var(--sidebar-text-muted)]">{value}%</span>
 				{/if}
 			</div>
-			<div class="track"><span class="progress-fill" class:indeterminate={value === null} style:--progress={value === null ? undefined : value / 100}></span></div>
+			<ProgressBar fraction={running.progress?.fraction ?? null} class="h-1 bg-[var(--sidebar-control)]" />
 			{#if remaining > 1}
 				<span class="text-[12px] text-[var(--sidebar-text-muted)]">{remaining - 1} more waiting</span>
 			{/if}
@@ -125,34 +125,5 @@
 		gap: 8px;
 		padding: 4px 12px;
 		font-size: 13px;
-	}
-
-	.track {
-		height: 4px;
-		overflow: hidden;
-		border-radius: var(--radius-pill);
-		background: var(--sidebar-control);
-	}
-
-	.track span {
-		display: block;
-		height: 100%;
-		border-radius: inherit;
-		background: var(--accent);
-	}
-
-	.track .indeterminate {
-		width: 30%;
-		translate: none;
-		animation: slide 1.4s var(--ease-point) infinite;
-	}
-
-	@keyframes slide {
-		from {
-			transform: translateX(-100%);
-		}
-		to {
-			transform: translateX(340%);
-		}
 	}
 </style>

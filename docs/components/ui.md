@@ -105,6 +105,7 @@ $effect(() => {
 | `Switch`, `Checkbox`, `Slider`, `Select`, `Segmented` | Form controls with a `label` and `onchange`; `Segmented` takes an `item` snippet for icons |
 | `SearchField` | Search input; `variant="sidebar"`, `large`, and `focus()` |
 | `TextField`, `PasswordField` | Text inputs with `error`, `live`, `invalid` and bindable `touched`; `PasswordField` adds show and hide with `onreveal` |
+| `ProgressBar` | Thin bar for a `fraction` from 0 to 1, sliding back and forth while it's `null`; set its height and track color with classes and the fill with `--progress-color` |
 | `Dialog` | Modal with a title, description, body and `actions` snippet; `wide` for longer forms |
 | `IconButton` | Round button with a Lucide icon |
 | `Section`, `Row`, `ActionRow`, `ItemRow` | Grouped settings lists; `Row` takes `truncate` and `expanded` |

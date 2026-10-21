@@ -11,10 +11,9 @@
 	import Speaker from '@lucide/svelte/icons/speaker';
 	import SquareMousePointer from '@lucide/svelte/icons/square-mouse-pointer';
 	import Tablet from '@lucide/svelte/icons/tablet';
-	import { Row, Section } from '@luft/ui';
+	import { ProgressBar, Row, Section } from '@luft/ui';
 	import { percent } from '#lib/format.js';
 	import type { Device, DeviceKind } from './api';
-	import Level from './Level.svelte';
 
 	const KINDS: Record<DeviceKind, { icon: Component; label: string }> = {
 		mouse: { icon: Mouse, label: 'settings-power-device-mouse' },
@@ -36,7 +35,7 @@
 	{#each devices as device (device.id)}
 		{@const kind = KINDS[device.kind]}
 		<Row title={device.name ?? t(kind.label)} description={device.charging ? t('settings-power-charging') : undefined} icon={kind.icon}>
-			<div class="w-16"><Level level={device.level} /></div>
+			<ProgressBar fraction={device.level / 100} class="w-16" />
 			<span class="w-10 text-right tabular-nums">{percent(device.level / 100)}</span>
 		</Row>
 	{/each}

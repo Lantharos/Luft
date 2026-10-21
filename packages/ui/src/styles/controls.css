@@ -182,4 +182,33 @@
 		translate: calc((var(--progress, 0) - 1) * 100%) 0;
 		transition: translate var(--spring-smooth-duration) var(--spring-smooth);
 	}
+
+	.progress-bar {
+		height: 6px;
+		overflow: hidden;
+		border-radius: var(--radius-pill);
+		background: var(--control);
+	}
+
+	.progress-bar > .progress-fill {
+		display: block;
+		height: 100%;
+		border-radius: inherit;
+		background: var(--progress-color, var(--accent));
+	}
+
+	.progress-bar > .indeterminate {
+		width: 30%;
+		translate: none;
+		animation: progress-slide 1.4s var(--ease-point) infinite;
+	}
+}
+
+@keyframes progress-slide {
+	from {
+		transform: translateX(-100%);
+	}
+	to {
+		transform: translateX(340%);
+	}
 }

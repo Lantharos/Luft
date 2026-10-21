@@ -1,12 +1,11 @@
 <script lang="ts">
 	import { i18n, t } from '@luft/i18n';
-	import { Row, Section, Switch, watts } from '@luft/ui';
+	import { ProgressBar, Row, Section, Switch, watts } from '@luft/ui';
 	import { percent } from '#lib/format.js';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import type { Battery } from './api';
 	import ChargeLimit from './ChargeLimit.svelte';
 	import { duration, wattHours } from './format';
-	import Level from './Level.svelte';
 
 	const LOW_LEVEL = 10;
 
@@ -55,7 +54,7 @@
 <Section title={t('settings-power-battery')}>
 	<Row title={percent(battery.level / 100)} description={status}>
 		{#snippet below()}
-			<Level level={battery.level} low={battery.charge === 'discharging' && battery.level <= LOW_LEVEL} />
+			<ProgressBar fraction={battery.level / 100} class={[battery.charge === 'discharging' && battery.level <= LOW_LEVEL && '[--progress-color:var(--danger)]']} />
 		{/snippet}
 	</Row>
 	{#if wear}

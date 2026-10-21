@@ -1,6 +1,6 @@
 <script lang="ts">
 	import X from '@lucide/svelte/icons/x';
-	import { tooltip } from '@luft/ui';
+	import { ProgressBar, tooltip } from '@luft/ui';
 	import type { Operation } from '#lib/bridge/types.js';
 	import { activity, percent } from '#lib/format.js';
 	import { operations } from '#lib/state/operations.svelte.js';
@@ -11,8 +11,8 @@
 	$effect(() => operations.showInline(operation.id));
 </script>
 
-<div class="progress" class:large role="progressbar" aria-label={operation.title} aria-valuenow={value ?? undefined} aria-valuemin={0} aria-valuemax={100}>
-	<span class="fill progress-fill" class:indeterminate={value === null} style:--progress={value === null ? undefined : value / 100}></span>
+<div class="progress" class:large>
+	<ProgressBar fraction={operation.progress?.fraction ?? null} label={operation.title} class="absolute inset-0 h-auto rounded-none bg-transparent [--progress-color:var(--accent-soft)]" />
 	<span class="label">{activity(operation)}{value === null ? '…' : ` ${value}%`}</span>
 	<button type="button" class="cancel" aria-label="Cancel" {@attach tooltip('Cancel')} onclick={() => operations.cancel(operation.id)}>
 		<X size={14} />
@@ -39,19 +39,6 @@
 		min-width: 200px;
 	}
 
-	.fill {
-		position: absolute;
-		inset: 0;
-		background: var(--accent-soft);
-	}
-
-	.fill.indeterminate {
-		right: auto;
-		width: 30%;
-		translate: none;
-		animation: slide 1.4s var(--ease-point) infinite;
-	}
-
 	.label {
 		position: relative;
 		flex: 1;
@@ -73,14 +60,5 @@
 	.cancel:hover {
 		background: var(--surface-hover);
 		color: var(--text);
-	}
-
-	@keyframes slide {
-		from {
-			transform: translateX(-100%);
-		}
-		to {
-			transform: translateX(340%);
-		}
 	}
 </style>

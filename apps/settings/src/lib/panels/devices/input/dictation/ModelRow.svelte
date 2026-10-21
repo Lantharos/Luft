@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { bytes, Row } from '@luft/ui';
-	import ProgressTrack from '#lib/components/ProgressTrack.svelte';
+	import { bytes, ProgressBar, Row } from '@luft/ui';
 	import { cancelInstall, install, remove, type Model } from './api';
 
 	let { model, removable = false }: { model: Model; removable?: boolean } = $props();
@@ -19,7 +18,7 @@
 </script>
 
 {#snippet progress()}
-	<ProgressTrack fraction={download?.total ? download.received / download.total : null} class="h-1.5 bg-[var(--control)]" />
+	<ProgressBar fraction={download?.total ? download.received / download.total : null} />
 {/snippet}
 
 <Row title={model.name} description={describe()} below={downloading ? progress : undefined}>

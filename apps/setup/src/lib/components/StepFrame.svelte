@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { ProgressBar } from '@luft/ui';
 	import type { Snippet } from 'svelte';
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import { FluentNumber, t } from '@luft/i18n';
@@ -38,10 +39,8 @@
 			{/if}
 		</div>
 		{#if installing}
-			<div class="flex items-center gap-3 text-[13px] text-[var(--text-muted)]" role="progressbar" aria-label={t('setup-installing-label')} aria-valuenow={percent}>
-				<div class="h-1.5 w-28 overflow-hidden rounded-full bg-[var(--surface-hover)]">
-					<div class="progress-fill h-full rounded-full bg-[var(--accent)]" style:--progress={percent / 100}></div>
-				</div>
+			<div class="flex items-center gap-3 text-[13px] text-[var(--text-muted)]">
+				<ProgressBar fraction={percent / 100} label={t('setup-installing-label')} class="w-28 bg-[var(--surface-hover)]" />
 				{progress}
 			</div>
 		{:else}

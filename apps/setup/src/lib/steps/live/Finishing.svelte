@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { i18n, t } from '@luft/i18n';
+	import { ProgressBar } from '@luft/ui';
 	import { restart, finishSetup } from '#lib/api/system.js';
 	import StepFrame from '#lib/components/StepFrame.svelte';
 	import EnrollSteps from '#lib/components/trust/EnrollSteps.svelte';
@@ -70,9 +71,7 @@
 				<span class="font-medium">{t(STAGES[status?.stage ?? 'idle'])}</span>
 				<span class="text-[var(--text-muted)] tabular-nums">{percentFormat.format(percent / 100)}</span>
 			</div>
-			<div class="h-2 overflow-hidden rounded-full bg-[var(--surface-hover)]">
-				<div class="progress-fill h-full rounded-full bg-[var(--accent)]" style:--progress={percent / 100}></div>
-			</div>
+			<ProgressBar fraction={percent / 100} label={t(STAGES[status?.stage ?? 'idle'])} class="h-2 bg-[var(--surface-hover)]" />
 			{#if setup.hardware.portable && setup.hardware.onBattery}
 				<p class="mt-2 text-[13.5px] text-[var(--text-soft)]">{t('setup-finishing-plug-in')}</p>
 			{/if}

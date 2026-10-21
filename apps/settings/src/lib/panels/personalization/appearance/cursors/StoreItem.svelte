@@ -2,7 +2,7 @@
 	import { i18n, t } from '@luft/i18n';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import Star from '@lucide/svelte/icons/star';
-	import { bytes, MenuButton, MenuItem } from '@luft/ui';
+	import { bytes, MenuButton, MenuItem, ProgressBar } from '@luft/ui';
 	import { openStorePage, type StoreItem } from './api';
 	import { cursors } from './cursors.svelte';
 
@@ -49,9 +49,7 @@
 	</div>
 	<div class="action">
 		{#if busy}
-			<span class="progress" role="progressbar" aria-label={t('settings-cursors-installing', { name: item.name })} aria-valuenow={fraction === null ? undefined : Math.round(fraction * 100)}>
-				<span class="bar progress-fill" class:waiting={fraction === null} style:--progress={fraction}></span>
-			</span>
+			<ProgressBar {fraction} label={t('settings-cursors-installing', { name: item.name })} class="w-[72px]" />
 		{:else if installed && installed === current}
 			<span class="in-use">{t('settings-cursors-in-use')}</span>
 		{:else if installed}
@@ -154,37 +152,5 @@
 	.in-use {
 		font-size: 13px;
 		color: var(--text-muted);
-	}
-
-	.progress {
-		position: relative;
-		height: 6px;
-		width: 72px;
-		overflow: hidden;
-		border-radius: 999px;
-		background: var(--control);
-	}
-
-	.bar {
-		position: absolute;
-		inset-block: 0;
-		left: 0;
-		border-radius: inherit;
-		background: var(--accent);
-	}
-
-	.bar.waiting {
-		width: 40%;
-		translate: none;
-		animation: slide 1.1s var(--ease-point) infinite;
-	}
-
-	@keyframes slide {
-		from {
-			transform: translateX(-100%);
-		}
-		to {
-			transform: translateX(250%);
-		}
 	}
 </style>

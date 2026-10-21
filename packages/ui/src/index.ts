@@ -7,6 +7,7 @@ export { default as Checkbox } from './controls/Checkbox.svelte';
 export { default as Dialog } from './controls/Dialog.svelte';
 export { default as IconButton } from './controls/IconButton.svelte';
 export { default as PasswordField } from './controls/PasswordField.svelte';
+export { default as ProgressBar } from './controls/ProgressBar.svelte';
 export { default as SearchField } from './controls/SearchField.svelte';
 export { default as Segmented } from './controls/Segmented.svelte';
 export { default as Select } from './controls/Select.svelte';

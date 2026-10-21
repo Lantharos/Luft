@@ -14,11 +14,3 @@ The Android layouts were last published in CLDR 43, in <https://www.unicode.org/
 ## Layout names
 
 CLDR names layouts by language, XKB by its own identifiers. The script matches them by comparing the layout descriptions, whole or word by word, with those in `/usr/share/X11/xkb/rules/evdev.xml`. When that picks the wrong layout, or it warns "failed to find XKB mapping", add an entry to `LOCALE_TO_XKB_OVERRIDES` at the top of the script.
-
-## Testing
-
-From this folder:
-
-```sh
-python3 -m unittest test.test_cldr2json
-```

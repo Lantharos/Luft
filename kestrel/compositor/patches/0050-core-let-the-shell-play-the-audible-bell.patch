@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Tue, 20 Oct 2026 15:43:34 +0200
-Subject: [PATCH 50/53] core: let the shell play the audible bell
+Subject: [PATCH 50/55] core: let the shell play the audible bell
 
 Emit MetaDisplay::bell before playing the bell through the sound
 player, so a shell with its own sound player can play it instead.

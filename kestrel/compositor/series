@@ -51,3 +51,5 @@
 0051-wayland-deliver-the-cursor-rectangle-of-text-inputs-.patch
 0052-x11-give-up-on-selection-owners-that-stop-answering.patch
 0053-wayland-show-the-input-panel-when-a-text-input-is-ta.patch
+0054-keybindings-let-shell-bindings-win-over-built-in-one.patch
+0055-compositor-don-t-cull-with-actors-that-clip-what-the.patch

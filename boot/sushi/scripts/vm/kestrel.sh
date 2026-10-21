@@ -20,7 +20,7 @@ fi
 meson compile -C "$build/compositor"
 meson install -C "$build/compositor" --no-rebuild --quiet
 
-(cd "$luft/kestrel/ui" && bun install --frozen-lockfile)
+(cd "$luft" && bun install --frozen-lockfile --filter @luft/kestrel-ui)
 if [[ ! -f "$build/engine/build.ninja" ]]; then
   meson setup "$build/engine" "$luft/kestrel/engine" -Dpkg_config_path="$prefix/lib/pkgconfig" --prefix="$prefix" --buildtype=release
 fi

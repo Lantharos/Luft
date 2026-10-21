@@ -22,7 +22,6 @@ Build Kestrel into `kestrel/build` and try it in a window:
 
 ```sh
 bun install
-(cd kestrel/ui && bun install --frozen-lockfile)
 kestrel/compositor/build.sh
 meson setup kestrel/build kestrel/engine -Dpkg_config_path="$PWD/kestrel/run/mutter-install/lib/pkgconfig" --prefix="$PWD/kestrel/install"
 meson compile -C kestrel/build

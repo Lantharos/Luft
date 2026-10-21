@@ -177,9 +177,6 @@ jobs:
       - run: bun install --frozen-lockfile
         working-directory: .
 
-      - if: hashFiles(format('{0}/bun.lock', matrix.target)) != ''
-        run: bun install --frozen-lockfile
-
       - run: bun run check
 
   checks:

@@ -35,6 +35,7 @@ export class SnapLayouts {
     private readonly workArea: (monitorIndex: number) => Mtk.Rectangle,
     private readonly snap: (window: Meta.Window, rect: Mtk.Rectangle) => void,
     private readonly close: () => void,
+    private readonly allowed: () => boolean,
   ) {
     blurSurface(this.actor);
     this.actor.style = `spacing: ${CARD_GAP}px;`;
@@ -59,7 +60,7 @@ export class SnapLayouts {
 
   get available(): boolean {
     const window = (global as unknown as Shell.Global).display.focus_window;
-    return !!window && window.window_type === Meta.WindowType.NORMAL && window.allows_resize();
+    return this.allowed() && !!window && window.window_type === Meta.WindowType.NORMAL && window.allows_resize();
   }
 
   prepareOpen(): void {

@@ -25,7 +25,7 @@ The end session dialog is served for gnome-session at `/org/gnome/SessionManager
 
 | Path | Contents |
 | --- | --- |
-| `~/.local/state/kestrel` | What the shell remembers between sessions, such as brightness and notifications |
+| `~/.local/state/kestrel` | What the shell remembers between sessions, such as brightness, notifications and the apps whose windows float while tiling |
 | `~/.cache/kestrel/backgrounds` | Decoded wallpapers, reused between sessions |
 | `$XDG_RUNTIME_DIR/kestrel` | Runtime state for the current session |
 

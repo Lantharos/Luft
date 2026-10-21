@@ -497,7 +497,7 @@ export class WindowManager {
 
         this._shellwm.connect('switch-workspace', this._switchWorkspace.bind(this));
         this._tileRequest = null;
-        this._cornerSnap = new CornerSnap(this._showCornerPreview.bind(this), this._morphWindow.bind(this));
+        this._cornerSnap = new CornerSnap(this._showCornerPreview.bind(this), this.morphWindow.bind(this));
         this._shellwm.connect('show-tile-preview', this._showTilePreview.bind(this));
         this._shellwm.connect('hide-tile-preview', this._hideTilePreview.bind(this));
         this._shellwm.connect('show-window-menu', this._showWindowMenu.bind(this));
@@ -1145,7 +1145,7 @@ export class WindowManager {
             completed();
     }
 
-    _morphWindow(window) {
+    morphWindow(window) {
         const actor = window.get_compositor_private();
         if (actor && this._shouldAnimateActor(actor, [Meta.WindowType.NORMAL]))
             this._morphs.begin(actor, window.get_frame_rect(), () => {});

@@ -56,6 +56,7 @@ keybinding_files = [
   '50-kestrel-screenshots.xml',
   '50-kestrel-sound-media.xml',
   '50-kestrel-system.xml',
+  '50-kestrel-tiling.xml',
 ]
 
 install_data(keybinding_files, install_dir: keysdir)

@@ -3,6 +3,7 @@ import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 import Mtk from 'gi://Mtk';
 
+import * as KestrelUi from './kestrelUi.js';
 import * as Main from './main.js';
 
 const CORNER_REACH = 96;
@@ -127,7 +128,7 @@ export class CornerSnap {
     }
 
     _begin(window, op) {
-        if (!window || window.unconstrained)
+        if (!window || window.unconstrained || !KestrelUi.snappingAllowed())
             return;
         if (op === Meta.GrabOp.KEYBOARD_MOVING)
             this._release(window);

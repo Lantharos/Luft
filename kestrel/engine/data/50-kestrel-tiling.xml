@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<KeyListEntries schema="com.lantharos.kestrel.keybindings"
+                group="tiling"
+                name="Tiling"
+                wm_name="GNOME Shell"
+                package="gnome-shell">
+
+	<KeyListEntry name="tiling-focus-left"
+                      description="Focus the tiled window to the left"/>
+
+	<KeyListEntry name="tiling-focus-right"
+                      description="Focus the tiled window to the right"/>
+
+	<KeyListEntry name="tiling-focus-up"
+                      description="Focus the tiled window above"/>
+
+	<KeyListEntry name="tiling-focus-down"
+                      description="Focus the tiled window below"/>
+
+	<KeyListEntry name="tiling-move-left"
+                      description="Move the tiled window left"/>
+
+	<KeyListEntry name="tiling-move-right"
+                      description="Move the tiled window right"/>
+
+	<KeyListEntry name="tiling-move-up"
+                      description="Move the tiled window up"/>
+
+	<KeyListEntry name="tiling-move-down"
+                      description="Move the tiled window down"/>
+
+	<KeyListEntry name="tiling-resize-left"
+                      description="Move the edge between tiled windows left"/>
+
+	<KeyListEntry name="tiling-resize-right"
+                      description="Move the edge between tiled windows right"/>
+
+	<KeyListEntry name="tiling-resize-up"
+                      description="Move the edge between tiled windows up"/>
+
+	<KeyListEntry name="tiling-resize-down"
+                      description="Move the edge between tiled windows down"/>
+
+	<KeyListEntry name="tiling-toggle-floating"
+                      description="Let the focused window float or tile it"/>
+
+	<KeyListEntry name="tiling-cycle-width"
+                      description="Change the width of the focused column"/>
+
+	<KeyListEntry name="tiling-center-column"
+                      description="Center the focused column"/>
+
+	<KeyListEntry name="tiling-overview"
+                      description="Zoom out to the whole strip"/>
+
+	<KeyListEntry name="tiling-stack-left"
+                      description="Stack the window into the column on the left"/>
+
+	<KeyListEntry name="tiling-stack-right"
+                      description="Stack the window into the column on the right"/>
+
+</KeyListEntries>

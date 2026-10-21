@@ -332,6 +332,7 @@ async function _initializeUI() {
             layoutManager, messageTray, quickSettings, sessionMode, screenShield,
             canInteract: () => actionMode === Shell.ActionMode.NORMAL,
             snapWindow: (window, rect) => wm.snapWindow(window, rect),
+            morphWindow: window => wm.morphWindow(window),
             showWindowMenu: (window, rect) => wm.showWindowMenu(window, rect),
             swipeWorkspaces: event => wm.swipeWorkspaces(event),
             activateWindow: window => wm.activateWithSnapGroup(window),
@@ -344,6 +345,7 @@ async function _initializeUI() {
             keyboard,
             keybindings: {
                 add: (name, settings, flags, modes, handler) => wm.addKeybinding(name, settings, flags, modes, handler),
+                remove: name => global.display.remove_keybinding(name),
                 allow: (name, modes) => wm.allowKeybinding(name, modes),
             },
             showOsd: (icon, label, level, maxLevel) => osdWindowManager.showAll(icon, label, level, maxLevel),

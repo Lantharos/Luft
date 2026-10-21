@@ -36,6 +36,29 @@
     <value nick="sunday" value="2"/>
   </enum>
 
+  <enum id="com.lantharos.kestrel.WindowTiling">
+    <value nick="off" value="0"/>
+    <value nick="tiling" value="1"/>
+    <value nick="scrolling" value="2"/>
+  </enum>
+
+  <enum id="com.lantharos.kestrel.TilingLayout">
+    <value nick="dwindle" value="0"/>
+    <value nick="master" value="1"/>
+  </enum>
+
+  <enum id="com.lantharos.kestrel.TilingGaps">
+    <value nick="none" value="0"/>
+    <value nick="small" value="1"/>
+    <value nick="medium" value="2"/>
+    <value nick="large" value="3"/>
+  </enum>
+
+  <enum id="com.lantharos.kestrel.TilingNewWindows">
+    <value nick="beside-focused" value="0"/>
+    <value nick="at-end" value="1"/>
+  </enum>
+
   <enum id="com.lantharos.kestrel.TaskbarAlignment">
     <value nick="center" value="0"/>
     <value nick="left" value="1"/>
@@ -349,6 +372,38 @@
         and clicks use only those windows.
       </description>
     </key>
+    <key name="window-tiling" enum="com.lantharos.kestrel.WindowTiling">
+      <default>'off'</default>
+      <summary>How windows are arranged</summary>
+      <description>
+        'off' lets windows float, with snapping, corner snap and snap
+        layouts. 'tiling' places new windows next to each other so they
+        fill the screen. 'scrolling' opens each window as a column on a
+        strip that scrolls sideways.
+      </description>
+    </key>
+    <key name="tiling-layout" enum="com.lantharos.kestrel.TilingLayout">
+      <default>'dwindle'</default>
+      <summary>How tiled windows share the screen</summary>
+      <description>
+        'dwindle' splits the focused window's space in two for every new
+        window. 'master' keeps one large window on the left and stacks the
+        others on the right.
+      </description>
+    </key>
+    <key name="tiling-gaps" enum="com.lantharos.kestrel.TilingGaps">
+      <default>'medium'</default>
+      <summary>Space between tiled windows and around them</summary>
+    </key>
+    <key name="tiling-new-windows" enum="com.lantharos.kestrel.TilingNewWindows">
+      <default>'beside-focused'</default>
+      <summary>Where new tiled windows open</summary>
+      <description>
+        'beside-focused' opens them next to the focused window, or as the
+        column to its right while scrolling. 'at-end' opens them after the
+        last window or column.
+      </description>
+    </key>
     <key name="taskbar-windows-per-workspace" type="b">
       <default>false</default>
       <summary>Show only the current workspace's windows on the taskbar</summary>
@@ -456,6 +511,78 @@
     <key name="board-enter-window" type="as">
       <default>["&lt;Super&gt;Return","&lt;Super&gt;KP_Enter"]</default>
       <summary>Enter the focused window on the board</summary>
+    </key>
+    <key name="tiling-focus-left" type="as">
+      <default>["&lt;Super&gt;Left"]</default>
+      <summary>Focus the tiled window to the left</summary>
+    </key>
+    <key name="tiling-focus-right" type="as">
+      <default>["&lt;Super&gt;Right"]</default>
+      <summary>Focus the tiled window to the right</summary>
+    </key>
+    <key name="tiling-focus-up" type="as">
+      <default>["&lt;Super&gt;Up"]</default>
+      <summary>Focus the tiled window above</summary>
+    </key>
+    <key name="tiling-focus-down" type="as">
+      <default>["&lt;Super&gt;Down"]</default>
+      <summary>Focus the tiled window below</summary>
+    </key>
+    <key name="tiling-move-left" type="as">
+      <default>["&lt;Super&gt;&lt;Shift&gt;Left"]</default>
+      <summary>Move the tiled window left</summary>
+    </key>
+    <key name="tiling-move-right" type="as">
+      <default>["&lt;Super&gt;&lt;Shift&gt;Right"]</default>
+      <summary>Move the tiled window right</summary>
+    </key>
+    <key name="tiling-move-up" type="as">
+      <default>["&lt;Super&gt;&lt;Shift&gt;Up"]</default>
+      <summary>Move the tiled window up</summary>
+    </key>
+    <key name="tiling-move-down" type="as">
+      <default>["&lt;Super&gt;&lt;Shift&gt;Down"]</default>
+      <summary>Move the tiled window down</summary>
+    </key>
+    <key name="tiling-resize-left" type="as">
+      <default>["&lt;Super&gt;&lt;Control&gt;Left"]</default>
+      <summary>Move the edge between tiled windows left</summary>
+    </key>
+    <key name="tiling-resize-right" type="as">
+      <default>["&lt;Super&gt;&lt;Control&gt;Right"]</default>
+      <summary>Move the edge between tiled windows right</summary>
+    </key>
+    <key name="tiling-resize-up" type="as">
+      <default>["&lt;Super&gt;&lt;Control&gt;Up"]</default>
+      <summary>Move the edge between tiled windows up</summary>
+    </key>
+    <key name="tiling-resize-down" type="as">
+      <default>["&lt;Super&gt;&lt;Control&gt;Down"]</default>
+      <summary>Move the edge between tiled windows down</summary>
+    </key>
+    <key name="tiling-toggle-floating" type="as">
+      <default>["&lt;Super&gt;f"]</default>
+      <summary>Let the focused window float or tile it again</summary>
+    </key>
+    <key name="tiling-cycle-width" type="as">
+      <default>["&lt;Super&gt;r"]</default>
+      <summary>Switch the focused column between a third, half, two thirds and the full width</summary>
+    </key>
+    <key name="tiling-center-column" type="as">
+      <default>["&lt;Super&gt;c"]</default>
+      <summary>Center the focused column</summary>
+    </key>
+    <key name="tiling-overview" type="as">
+      <default>["&lt;Super&gt;w"]</default>
+      <summary>Zoom out to see the whole strip of columns</summary>
+    </key>
+    <key name="tiling-stack-left" type="as">
+      <default>["&lt;Super&gt;&lt;Control&gt;&lt;Shift&gt;Left","&lt;Super&gt;bracketleft"]</default>
+      <summary>Stack the focused window into the column on the left, or take it out of its column</summary>
+    </key>
+    <key name="tiling-stack-right" type="as">
+      <default>["&lt;Super&gt;&lt;Control&gt;&lt;Shift&gt;Right","&lt;Super&gt;bracketright"]</default>
+      <summary>Stack the focused window into the column on the right, or take it out of its column</summary>
     </key>
     <key name="dictate" type="as">
       <default>["&lt;Super&gt;&lt;Alt&gt;"]</default>

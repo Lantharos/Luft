@@ -43,6 +43,7 @@ export interface ScreenKeyboard {
 
 export interface Keybindings {
   add(name: string, settings: Gio.Settings, flags: Meta.KeyBindingFlags, modes: Shell.ActionMode, handler: () => void): void;
+  remove(name: string): void;
   allow(name: string, modes: Shell.ActionMode): void;
 }
 
@@ -54,6 +55,7 @@ export interface Context {
   screenShield: { active: boolean; connect(signal: string, callback: () => void): number; disconnect(id: number): void } | null;
   canInteract(): boolean;
   snapWindow(window: Meta.Window, rect: Mtk.Rectangle): void;
+  morphWindow(window: Meta.Window): void;
   showWindowMenu(window: Meta.Window, rect: Mtk.Rectangle): void;
   swipeWorkspaces(event: Clutter.Event): boolean;
   activateWindow(window: Meta.Window): void;

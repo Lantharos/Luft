@@ -20,6 +20,7 @@ import { WindowPreviews } from './desktop/panel/windowPreviews.js';
 import { TaskView } from './desktop/taskView/taskView.js';
 import { wallpaperFloor } from './desktop/wallpaper/floor.js';
 import { LiveWallpaper } from './desktop/wallpaper/liveWallpaper.js';
+import { Tiling } from './desktop/tiling/tiling.js';
 import { SnapLayouts } from './desktop/windows/snapLayouts.js';
 import { Workspaces } from './desktop/windows/workspaces.js';
 import { RotationAnimation } from './desktop/rotation/rotation.js';
@@ -73,6 +74,7 @@ class KestrelUi {
   private readonly taskView: TaskView;
   private readonly surfaces: Surfaces;
   readonly board: Board;
+  private readonly tiling: Tiling;
   private readonly liveWallpaper: LiveWallpaper;
   private readonly rotation: RotationAnimation;
   private readonly copilot: CopilotActions;
@@ -109,6 +111,18 @@ class KestrelUi {
       changed: () => this.syncSession(),
       canInteract: () => this.canInteract() && !this.surfaces.active,
     });
+    this.tiling = new Tiling({
+      monitors: () => context.layoutManager.monitors.map(({ x, y, width, height }) => ({ x, y, width, height })),
+      primaryIndex: () => context.layoutManager.primaryMonitor?.index ?? 0,
+      workArea: index => context.layoutManager.getWorkAreaForMonitor(index),
+      morph: window => context.morphWindow(window),
+      activate: window => context.activateWindow(window),
+      keybindings: context.keybindings,
+      board: this.board,
+      addChrome: actor => context.layoutManager.addChrome(actor),
+      removeChrome: actor => context.layoutManager.removeChrome(actor),
+      canInteract: () => this.canInteract(),
+    });
     this.quick = new QuickSettings(context.quickSettings, place, close,
       icons => {
         this.panels.updateStatus(icons);
@@ -138,7 +152,7 @@ class KestrelUi {
       notifications: () => new NotificationCenter(context.messageTray, this.menus, place, close),
       clipboard,
       emoji: () => new EmojiPanel(context.inputMethod, close, text => clipboard.pasteWithoutKeeping(text)),
-      snapLayouts: () => new SnapLayouts(index => context.layoutManager.getWorkAreaForMonitor(index), context.snapWindow, close),
+      snapLayouts: () => new SnapLayouts(index => context.layoutManager.getWorkAreaForMonitor(index), context.snapWindow, close, () => this.snappingAllowed()),
       taskView: this.taskView,
       canInteract: () => this.canInteract(),
       syncSession: () => this.syncSession(),
@@ -219,6 +233,7 @@ class KestrelUi {
       this.panels.sync();
       this.liveWallpaper.monitorsChanged();
       this.board.monitorsChanged();
+      this.tiling.monitorsChanged();
       place();
       this.syncSession();
     });
@@ -287,6 +302,7 @@ class KestrelUi {
   }
 
   private syncSession(): void {
+    this.tiling.syncBoard();
     const available = this.desktopAvailable();
     const covered = coveredMonitors(this.context.layoutManager.monitors);
     for (const panel of this.panels.all)
@@ -356,7 +372,11 @@ class KestrelUi {
   taskViewProgress(): number { return this.taskView.progress; }
 
   touchpad(event: Clutter.Event): boolean {
-    return this.fourFingers.handle(event) || this.board.input.handle(event);
+    return this.fourFingers.handle(event) || this.tiling.touchpad(event) || this.board.input.handle(event);
+  }
+
+  snappingAllowed(): boolean {
+    return this.tiling.mode === 'off';
   }
 
   shutdown(): void {
@@ -368,6 +388,7 @@ class KestrelUi {
     this.liveWallpaper.destroy();
     this.rotation.destroy();
     this.copilot.destroy();
+    this.tiling.destroy();
     this.board.destroy();
     this.services.destroy();
   }
@@ -441,6 +462,8 @@ export function taskbarClearance(): number { return taskbarPreferences.clearance
 export function taskbarOwnsBottomEdge(): boolean { return currentUi !== null && taskbarPreferences.touch; }
 
 export function taskViewOpen(): boolean { return currentUi?.taskViewOpen() ?? false; }
+
+export function snappingAllowed(): boolean { return currentUi?.snappingAllowed() ?? true; }
 
 export function taskViewProgress(): number { return currentUi?.taskViewProgress() ?? 0; }
 

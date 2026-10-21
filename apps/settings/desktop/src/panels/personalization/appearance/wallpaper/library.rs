@@ -1,8 +1,10 @@
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::time::Duration;
 
 use gio::glib;
 use gio::prelude::*;
+use luft_app::watch::{FolderWatcher, Report, Watch, WatchMask};
 use luft_app::{Events, launch};
 use luft_i18n::t;
 use serde::Serialize;
@@ -121,35 +123,24 @@ pub fn open_folder(token: Option<&str>) -> Result<(), String> {
     launch::open(&gio::File::for_path(&folder).uri(), token).map_err(failed)
 }
 
-fn changes_listing(event: gio::FileMonitorEvent) -> bool {
-    matches!(
-        event,
-        gio::FileMonitorEvent::ChangesDoneHint
-            | gio::FileMonitorEvent::Deleted
-            | gio::FileMonitorEvent::Renamed
-            | gio::FileMonitorEvent::MovedIn
-            | gio::FileMonitorEvent::MovedOut
-    )
-}
-
 pub fn watch(events: Events) {
-    std::thread::spawn(move || {
-        let context = glib::MainContext::new();
-        let _ = context.with_thread_default(|| {
-            let Ok(folder) = folder() else {
-                return;
-            };
-            let Ok(monitor) = gio::File::for_path(folder)
-                .monitor_directory(gio::FileMonitorFlags::WATCH_MOVES, gio::Cancellable::NONE)
-            else {
-                return;
-            };
-            monitor.connect_changed(move |_, _, _, event| {
-                if let (true, Ok(wallpapers)) = (changes_listing(event), list()) {
-                    events.emit(WALLPAPERS_CHANGED, wallpapers);
-                }
-            });
-            glib::MainLoop::new(Some(&context), false).run();
-        });
+    let watch = Watch {
+        events: WatchMask::CLOSE_WRITE
+            | WatchMask::DELETE
+            | WatchMask::MOVED_FROM
+            | WatchMask::MOVED_TO,
+        report: Report::Folders,
+        quiet: Duration::from_millis(150),
+        latest: Duration::from_millis(600),
+    };
+    let watcher = FolderWatcher::spawn(watch, move |_| {
+        if let Ok(wallpapers) = list() {
+            events.emit(WALLPAPERS_CHANGED, wallpapers);
+        }
     });
+    if let (Ok(watcher), Ok(folder)) = (watcher, folder())
+        && fs::create_dir_all(&folder).is_ok()
+    {
+        let _ = watcher.watch([folder]);
+    }
 }

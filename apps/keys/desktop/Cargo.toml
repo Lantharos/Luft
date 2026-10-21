@@ -14,9 +14,8 @@ name = "keys_lib"
 dirs = "7.0.0"
 futures-util = { version = "0.3.34", default-features = false }
 gio = "0.22.10"
-inotify = "0.11.5"
 libc = "0.2.190"
-luft-app = { path = "../../../packages/app", features = ["ibus"] }
+luft-app = { path = "../../../packages/app", features = ["ibus", "watch"] }
 roxmltree = "0.21.1"
 sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.51" }
 serde = { version = "1.0.229", features = ["derive"] }

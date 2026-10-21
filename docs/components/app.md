@@ -85,6 +85,7 @@ window
 | `recovery` | `recovery` | `Sheet` saves or prints a recovery key; `computer()` names this computer |
 | `settings` | `settings` | `load` and `save` a JSON file in the user's configuration folder, such as `"tern/settings.json"` |
 | `thumbnails` | `thumbnails` | `Thumbnails` makes thumbnails in the shared freedesktop cache and sends them to the page in batches |
+| `watch` | `watch` | `FolderWatcher` follows a set of folders and reports their changes once they settle |
 
 ## Examples
 
@@ -112,3 +113,18 @@ thumbnails.request(paths, ThumbnailSize::Large);
 Each `request` replaces the previous one, so asking for the files on screen keeps the queue short while scrolling. Batches arrive under the given event name as `{ items }`, each item with the file's `path`, its `thumbnail` path or `null`, and its `modified` time.
 
 Files that need one of the system's thumbnailers from `/usr/share/thumbnailers` are handed to it inside a bubblewrap sandbox that sees only `/usr`, the file itself and a private folder for the result, with no network and no way to open new user namespaces. GStreamer keeps its plugin cache for these runs in `~/.cache/com.lantharos.thumbnailers`.
+
+```rust
+use luft_app::watch::{FolderWatcher, Report, Watch, WatchMask};
+
+let watch = Watch {
+    events: WatchMask::CREATE | WatchMask::DELETE | WatchMask::MOVED_FROM | WatchMask::MOVED_TO,
+    report: Report::Folders,
+    quiet: Duration::from_millis(150),
+    latest: Duration::from_millis(600),
+};
+let watcher = FolderWatcher::spawn(watch, move |folders| refresh(folders))?;
+watcher.watch([folder])?;
+```
+
+`watch` replaces the folders being followed; their subfolders aren't included. Changes arrive on the watcher's own thread once the folders have been quiet for `quiet`, or after `latest` while they keep changing. `Report::Folders` names the folders that changed and `Report::Entries` the files and folders inside them. If the system drops events under heavy load, every watched folder is reported.

@@ -21,6 +21,8 @@ pub mod settings;
 mod tasks;
 #[cfg(feature = "thumbnails")]
 pub mod thumbnails;
+#[cfg(feature = "watch")]
+pub mod watch;
 mod window;
 
 pub use bridge::Commands;

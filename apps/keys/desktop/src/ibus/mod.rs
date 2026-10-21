@@ -7,7 +7,8 @@ use std::fs::{self, File, TryLockError};
 use std::time::Duration;
 
 use futures_util::StreamExt;
-use inotify::{EventStream, Inotify, WatchMask};
+use luft_app::watch::{FolderWatcher, Report, Watch, WatchMask};
+use tokio::sync::mpsc::{self, UnboundedReceiver};
 use zbus::object_server::ObjectServer;
 use zbus::{Connection, MessageStream, OwnedObjectPath, connection, fdo, interface};
 
@@ -21,6 +22,7 @@ const ENGINE_PATH: &str = "/org/freedesktop/IBus/Engine";
 const IBUS: &str = "org.freedesktop.IBus";
 const IBUS_PATH: &str = "/org/freedesktop/IBus";
 const SETTLE: Duration = Duration::from_millis(300);
+const SETTLE_AT_MOST: Duration = Duration::from_secs(1);
 const RECONNECT: Duration = Duration::from_secs(1);
 const RECONNECT_TRIES: u32 = 10;
 
@@ -104,7 +106,7 @@ async fn register(methods: &[Summary]) -> Result<Connection, String> {
 
 async fn session(
     methods: &[Summary],
-    changes: &mut EventStream<[u8; 1024]>,
+    changes: &mut UnboundedReceiver<()>,
 ) -> Result<Ended, String> {
     let connection = register(methods).await?;
     let disconnected = async {
@@ -112,18 +114,10 @@ async fn session(
         while messages.next().await.is_some() {}
     };
     tokio::pin!(disconnected);
-    let settled = tokio::time::sleep(Duration::ZERO);
-    tokio::pin!(settled);
-    let mut pending = false;
     loop {
         tokio::select! {
             () = &mut disconnected => return Ok(Ended::Disconnected),
-            Some(_) = changes.next() => {
-                pending = true;
-                settled.as_mut().reset(tokio::time::Instant::now() + SETTLE);
-            }
-            () = &mut settled, if pending => {
-                pending = false;
+            Some(()) = changes.recv() => {
                 if method::list() != methods {
                     return Ok(Ended::Changed);
                 }
@@ -132,23 +126,25 @@ async fn session(
     }
 }
 
-fn watch() -> Result<EventStream<[u8; 1024]>, String> {
+fn watch() -> Result<UnboundedReceiver<()>, String> {
     let folder = paths::methods();
     fs::create_dir_all(&folder).map_err(|error| error.to_string())?;
-    let inotify = Inotify::init().map_err(|error| error.to_string())?;
-    inotify
-        .watches()
-        .add(
-            &folder,
-            WatchMask::CLOSE_WRITE
-                | WatchMask::MOVED_TO
-                | WatchMask::MOVED_FROM
-                | WatchMask::DELETE,
-        )
-        .map_err(|error| error.to_string())?;
-    inotify
-        .into_event_stream([0; 1024])
-        .map_err(|error| error.to_string())
+    let (sender, changes) = mpsc::unbounded_channel();
+    let watch = Watch {
+        events: WatchMask::CLOSE_WRITE
+            | WatchMask::MOVED_TO
+            | WatchMask::MOVED_FROM
+            | WatchMask::DELETE,
+        report: Report::Folders,
+        quiet: SETTLE,
+        latest: SETTLE_AT_MOST,
+    };
+    let watcher = FolderWatcher::spawn(watch, move |_| {
+        let _ = sender.send(());
+    })
+    .map_err(|error| error.to_string())?;
+    watcher.watch([folder]).map_err(|error| error.to_string())?;
+    Ok(changes)
 }
 
 fn lock() -> Result<Option<File>, String> {

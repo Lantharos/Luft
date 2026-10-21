@@ -1296,10 +1296,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4cc00ea907cab49550b7da656f80ebb97be1b997d931fbcd28d39734e17ce592"
 dependencies = [
  "bitflags",
- "futures-util",
  "inotify-sys",
  "libc",
- "tokio",
 ]
 
 [[package]]
@@ -1438,7 +1436,6 @@ dependencies = [
  "dirs",
  "futures-util",
  "gio",
- "inotify",
  "libc",
  "luft-app",
  "roxmltree 0.21.1",
@@ -1569,8 +1566,11 @@ version = "0.1.0"
 dependencies = [
  "dirs",
  "futures-util",
+ "inotify",
+ "libc",
  "luft-dbus",
  "luft-i18n",
+ "parking_lot",
  "sabine",
  "serde",
  "serde_json",

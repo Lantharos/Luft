@@ -44,4 +44,4 @@ Its configuration, `sushictl` and SushiBoot's menu and entries are in [the Sushi
 
 ## License
 
-MIT
+GPL-3.0-or-later

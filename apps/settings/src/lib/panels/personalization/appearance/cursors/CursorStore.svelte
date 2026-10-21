@@ -2,7 +2,7 @@
 	import { t } from '@luft/i18n';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
-	import { Row, SearchField, Section, Segmented } from '@luft/ui';
+	import { errorText, Row, SearchField, Section, Segmented } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import { browseCursors, type Order, type StorePage } from './api';
@@ -43,7 +43,7 @@
 			const next = await browseCursors(query, order, page);
 			if (current === request) result = next;
 		} catch (reason) {
-			if (current === request) problem = reason instanceof Error ? reason.message : String(reason);
+			if (current === request) problem = errorText(reason);
 		} finally {
 			if (current === request) loading = false;
 		}

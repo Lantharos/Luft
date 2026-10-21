@@ -4,7 +4,7 @@
 	import Settings from '@lucide/svelte/icons/settings';
 	import Shield from '@lucide/svelte/icons/shield';
 	import { t } from '@luft/i18n';
-	import { IconButton, Row, Section, Switch } from '@luft/ui';
+	import { errorText, IconButton, Row, Section, Switch } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
 	import { importVpn, type Vpn } from '@luft/network';
 	import type { Target } from '../connection/profile';
@@ -30,7 +30,7 @@
 		try {
 			await importVpn();
 		} catch (reason) {
-			importProblem = reason instanceof Error ? reason.message : String(reason);
+			importProblem = errorText(reason);
 		} finally {
 			importing = false;
 		}

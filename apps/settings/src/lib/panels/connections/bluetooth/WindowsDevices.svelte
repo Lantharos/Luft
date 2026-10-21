@@ -3,7 +3,7 @@
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import { onMount } from 'svelte';
 	import { i18n, t } from '@luft/i18n';
-	import { ActionRow, Section } from '@luft/ui';
+	import { ActionRow, errorText, Section } from '@luft/ui';
 	import { importFromWindows, pairedInWindows, type WindowsDevice } from './api';
 
 	let devices = $state<WindowsDevice[]>([]);
@@ -24,7 +24,7 @@
 			await importFromWindows();
 			devices = await pairedInWindows();
 		} catch (reason) {
-			problem = reason instanceof Error ? reason.message : String(reason);
+			problem = errorText(reason);
 		} finally {
 			importing = false;
 		}

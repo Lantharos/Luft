@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Settings from '@lucide/svelte/icons/settings';
 	import { t } from '@luft/i18n';
-	import { IconButton, Row, Section } from '@luft/ui';
+	import { errorText, IconButton, Row, Section } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
 	import { remove, type Known, type Network } from '@luft/network';
 	import type { Target } from '../connection/profile';
@@ -32,7 +32,7 @@
 		try {
 			await remove(known.connection);
 		} catch (reason) {
-			problem = reason instanceof Error ? reason.message : String(reason);
+			problem = errorText(reason);
 		} finally {
 			forgetting = null;
 		}

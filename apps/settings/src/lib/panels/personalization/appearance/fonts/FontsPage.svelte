@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { SearchField, VirtualScroller } from '@luft/ui';
+	import { errorText, SearchField, VirtualScroller } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
 	import { openFont, removeFont, type FontFamily } from './api';
 	import FontRow from './FontRow.svelte';
@@ -28,7 +28,7 @@
 		try {
 			await action();
 		} catch (reason) {
-			problem = reason instanceof Error ? reason.message : String(reason);
+			problem = errorText(reason);
 		}
 	}
 

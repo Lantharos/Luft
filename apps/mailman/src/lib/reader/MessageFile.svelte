@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Avatar } from '@luft/ui';
+	import { Avatar, errorText } from '@luft/ui';
 	import Reply from '@lucide/svelte/icons/reply';
 	import * as api from '#lib/api/index.js';
 	import type { OpenedFile } from '#lib/api/index.js';
@@ -26,7 +26,7 @@
 		void api
 			.openMessageFile(path)
 			.then((file) => (opened = file))
-			.catch((error: unknown) => (failure = error instanceof Error ? error.message : String(error)));
+			.catch((error: unknown) => (failure = errorText(error)));
 	});
 
 	function reply() {

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { Dialog, PasswordField, Row, TextField } from '@luft/ui';
+	import { Dialog, errorText, PasswordField, Row, TextField } from '@luft/ui';
 	import { addWireGuard, wireGuardKeys, wireGuardPublicKey } from '@luft/network';
 
 	interface Props {
@@ -93,7 +93,7 @@
 			});
 			onclose();
 		} catch (reason) {
-			problem = reason instanceof Error ? reason.message : String(reason);
+			problem = errorText(reason);
 			busy = false;
 		}
 	}

@@ -1,3 +1,4 @@
+import { errorText } from '@luft/ui';
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 import * as api from '#lib/api/index.js';
 import type { Message, Rendered } from '#lib/api/index.js';
@@ -75,7 +76,7 @@ class Reader {
 				return rendered;
 			})
 			.catch((error: unknown) => {
-				this.failures.set(id, error instanceof Error ? error.message : String(error));
+				this.failures.set(id, errorText(error));
 				return null;
 			})
 			.finally(() => this.loading.delete(id));

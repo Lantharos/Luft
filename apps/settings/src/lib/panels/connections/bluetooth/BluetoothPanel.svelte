@@ -5,7 +5,7 @@
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import { onMount } from 'svelte';
 	import { t } from '@luft/i18n';
-	import { ActionRow, Dialog, IconButton, item, reorder, Row, Section, Select, Switch } from '@luft/ui';
+	import { ActionRow, Dialog, errorText, IconButton, item, reorder, Row, Section, Select, Switch } from '@luft/ui';
 	import MoreRow, { COLLAPSED } from '#lib/components/MoreRow.svelte';
 	import { percent } from '#lib/format.js';
 	import DeviceDialog from './DeviceDialog.svelte';
@@ -53,10 +53,6 @@
 	let inspected = $derived(bluetooth?.paired.find((device) => device.path === inspecting));
 	let nearby = $derived(bluetooth ? (expanded ? bluetooth.nearby : bluetooth.nearby.slice(0, COLLAPSED)) : []);
 
-	function explain(reason: unknown) {
-		return reason instanceof Error ? reason.message : String(reason);
-	}
-
 	function visibilityLabel(timeout: number) {
 		return timeout ? t('settings-bluetooth-visible-for', { minutes: Math.round(timeout / 60) }) : t('settings-bluetooth-visible-until-off');
 	}
@@ -80,7 +76,7 @@
 		try {
 			await setTrusted(device.path, trusted);
 		} catch (reason) {
-			problems[device.path] = explain(reason);
+			problems[device.path] = errorText(reason);
 		}
 	}
 
@@ -103,7 +99,7 @@
 		try {
 			await action(device.path);
 		} catch (reason) {
-			problems[device.path] = explain(reason);
+			problems[device.path] = errorText(reason);
 		} finally {
 			delete busy[device.path];
 			if (request?.device === device.path) request = null;
@@ -133,7 +129,7 @@
 		try {
 			await forget(device.path);
 		} catch (reason) {
-			problems[device.path] = explain(reason);
+			problems[device.path] = errorText(reason);
 		}
 	}
 

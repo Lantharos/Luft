@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { AppIcon, Dialog, memoryBytes } from '@luft/ui';
+	import { AppIcon, Dialog, errorText, memoryBytes } from '@luft/ui';
 	import type { Details } from '#lib/backend/types.js';
 	import { count, cpuTime, date, duration, percent, rate } from '#lib/format.js';
 	import { app } from '#lib/state/app.svelte.js';
@@ -27,7 +27,7 @@
 		app.backend
 			?.details(pid)
 			.then((loaded) => (details = loaded))
-			.catch((error) => (failure = error instanceof Error ? error.message : String(error)));
+			.catch((error) => (failure = errorText(error)));
 	});
 
 	function rows(details: Details) {

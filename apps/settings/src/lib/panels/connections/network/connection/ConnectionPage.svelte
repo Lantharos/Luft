@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { t } from '@luft/i18n';
-	import { Row, Section } from '@luft/ui';
+	import { errorText, Row, Section } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
 	import { forget, loadProfile, loadSecret, remove, saveProfile, type Network, type Profile } from '@luft/network';
 	import AdvancedSection from './AdvancedSection.svelte';
@@ -36,17 +36,13 @@
 	let changed = $derived(Boolean(profile) && (JSON.stringify(profile) !== original || password !== savedPassword));
 	let ready = $derived(changed && !saving && Object.keys(errors).length === 0);
 
-	function explain(reason: unknown) {
-		return reason instanceof Error ? reason.message : String(reason);
-	}
-
 	async function reveal() {
 		if (savedPassword || passwordNeeded) return;
 		try {
 			savedPassword = (await loadSecret(target.path)) ?? '';
 			if (!password) password = savedPassword;
 		} catch (reason) {
-			problem = explain(reason);
+			problem = errorText(reason);
 		}
 	}
 
@@ -58,7 +54,7 @@
 			await saveProfile(target.path, prepare($state.snapshot(profile)), password === savedPassword ? null : password);
 			onclose();
 		} catch (reason) {
-			problem = explain(reason);
+			problem = errorText(reason);
 			saving = false;
 		}
 	}
@@ -74,7 +70,7 @@
 			await remove(target.path);
 			onclose();
 		} catch (reason) {
-			problem = explain(reason);
+			problem = errorText(reason);
 		}
 	}
 
@@ -85,7 +81,7 @@
 				customMac = macChoice(loaded.kind, loaded.mac) === 'custom';
 				profile = loaded;
 			})
-			.catch((reason) => (problem = explain(reason)));
+			.catch((reason) => (problem = errorText(reason)));
 	});
 </script>
 

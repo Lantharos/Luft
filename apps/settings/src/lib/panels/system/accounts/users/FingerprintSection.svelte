@@ -2,7 +2,7 @@
 	import { t } from '@luft/i18n';
 	import Fingerprint from '@lucide/svelte/icons/fingerprint';
 	import Trash from '@lucide/svelte/icons/trash';
-	import { deleteFingerprint, Dialog, FINGERS, fingerInSentence, fingerLabel, fingerprints, IconButton, Row, Section, type Fingerprints } from '@luft/ui';
+	import { deleteFingerprint, Dialog, errorText, fingerInSentence, fingerLabel, fingerprints, type Fingerprints, FINGERS, IconButton, Row, Section } from '@luft/ui';
 	import EnrollDialog from './EnrollDialog.svelte';
 
 	let prints = $state<Fingerprints | null>(null);
@@ -22,7 +22,7 @@
 		try {
 			await deleteFingerprint(finger);
 		} catch (reason) {
-			problem = reason instanceof Error ? reason.message : String(reason);
+			problem = errorText(reason);
 		}
 		await load();
 	}

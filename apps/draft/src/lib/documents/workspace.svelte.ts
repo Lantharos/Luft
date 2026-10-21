@@ -1,3 +1,4 @@
+import { errorText } from '@luft/ui';
 import { countColumn } from '@codemirror/state';
 import type { ViewUpdate } from '@codemirror/view';
 import { tick } from 'svelte';
@@ -150,7 +151,7 @@ export class Workspace {
 	}
 
 	report(error: unknown) {
-		this.notice = error instanceof Error ? error.message : String(error);
+		this.notice = errorText(error);
 	}
 
 	changed() {

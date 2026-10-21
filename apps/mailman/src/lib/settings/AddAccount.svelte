@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Dialog, PasswordField, Segmented, TextField } from '@luft/ui';
+	import { Dialog, errorText, PasswordField, Segmented, TextField } from '@luft/ui';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import * as api from '#lib/api/index.js';
 	import type { AccountConfig, Provider, Server } from '#lib/api/index.js';
@@ -39,7 +39,7 @@
 		busy = true;
 		const found = await api
 			.discover(email.trim())
-			.catch((failure: unknown) => ((error = failure instanceof Error ? failure.message : String(failure)), null))
+			.catch((failure: unknown) => ((error = errorText(failure)), null))
 			.finally(() => (busy = false));
 		if (!found) return;
 		username = found.username || email.trim();
@@ -73,7 +73,7 @@
 			toasts.show(`${account.email} is ready`);
 			onclose();
 		} catch (failure) {
-			error = failure instanceof Error ? failure.message : String(failure);
+			error = errorText(failure);
 		} finally {
 			busy = false;
 		}

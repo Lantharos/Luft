@@ -1,11 +1,10 @@
+import { errorText } from '@luft/ui';
 import type { FontFace, FontFile, FontInstance, FontRole, FontStatus } from '#lib/bridge/api.js';
 import * as api from '#lib/bridge/api.js';
 import { chrome } from '#lib/app/chrome.svelte.js';
 import { loadFont } from './faces';
 
 export type Tab = 'preview' | 'characters' | 'details';
-
-const explain = (reason: unknown) => (reason instanceof Error ? reason.message : String(reason));
 
 class FontState {
 	path = $state<string | null>(null);
@@ -38,7 +37,7 @@ class FontState {
 			this.status = status;
 			await this.selectFace(0);
 		} catch (reason) {
-			if (this.path === path) this.problem = explain(reason);
+			if (this.path === path) this.problem = errorText(reason);
 		}
 	}
 
@@ -79,7 +78,7 @@ class FontState {
 			if (this.path === path) this.status = status;
 			chrome.notify(done(this.face?.family ?? 'The font'));
 		} catch (reason) {
-			chrome.notify(explain(reason));
+			chrome.notify(errorText(reason));
 		} finally {
 			this.busy = false;
 		}

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { Dialog, PasswordField } from '@luft/ui';
+	import { Dialog, errorText, PasswordField } from '@luft/ui';
 	import { changePassword, type PasswordOutcome, type User } from './api';
 	import StrengthMeter from './StrengthMeter.svelte';
 	import { MINIMUM_LENGTH, measure } from './strength';
@@ -44,7 +44,7 @@
 			if (outcome === 'wrongPassword') rejectedCurrent = current;
 			else rejection = { password, message: REJECTIONS[outcome] };
 		} catch (reason) {
-			problem = reason instanceof Error ? reason.message : String(reason);
+			problem = errorText(reason);
 		}
 		busy = false;
 	}

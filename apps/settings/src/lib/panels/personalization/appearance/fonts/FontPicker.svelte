@@ -3,7 +3,7 @@
 	import Check from '@lucide/svelte/icons/check';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import { tick } from 'svelte';
-	import { Popover, SearchField, VirtualScroller } from '@luft/ui';
+	import { errorText, Popover, SearchField, VirtualScroller } from '@luft/ui';
 	import type { FontRole } from './api';
 	import { fontLibrary } from './library.svelte';
 
@@ -61,7 +61,7 @@
 		try {
 			await fontLibrary.choose(role, name);
 		} catch (reason) {
-			onerror(reason instanceof Error ? reason.message : String(reason));
+			onerror(errorText(reason));
 		}
 	}
 

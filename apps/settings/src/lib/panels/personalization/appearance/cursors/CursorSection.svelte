@@ -2,7 +2,7 @@
 	import { t } from '@luft/i18n';
 	import Download from '@lucide/svelte/icons/download';
 	import FolderOpen from '@lucide/svelte/icons/folder-open';
-	import { Dialog, Row, Section, Select } from '@luft/ui';
+	import { Dialog, errorText, Row, Section, Select } from '@luft/ui';
 	import MoreRow from '#lib/components/MoreRow.svelte';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import { openCursorFolder, removeCursorTheme, type CursorTheme } from './api';
@@ -47,7 +47,7 @@
 			await removeCursorTheme(theme.name);
 			await cursors.load();
 		} catch (reason) {
-			problem = reason instanceof Error ? reason.message : String(reason);
+			problem = errorText(reason);
 		}
 	}
 

@@ -1,5 +1,5 @@
 import { appearance } from '@luft/ui';
-import { appState, inputSources, onActivated, openFile, type Source } from '#lib/bridge/index.js';
+import { activationTargets, appState, inputSources, onActivated, openFile, type Source, type Targets } from '#lib/bridge/index.js';
 import { listLayouts, type Entry } from '#lib/layout/api.js';
 import { ENGINE_PREFIX, listMethods, type Summary } from '#lib/method/api.js';
 import { toast } from './toast.svelte';
@@ -21,9 +21,9 @@ class AppStore {
 		const [state] = await Promise.all([appState(), this.refresh()]);
 		appearance.start(state);
 		this.selection ??= this.first();
-		await this.arrive(state.link ? [state.link, ...state.files] : state.files);
+		await this.arrive(state);
 		this.focused = this.selection?.kind === 'view';
-		onActivated(({ arguments: args }) => void this.arrive(args.slice(1).filter((argument) => !argument.startsWith('-'))));
+		onActivated(async (activation) => void this.arrive(await activationTargets(activation)));
 		window.addEventListener('focus', () => void this.refreshSources());
 	}
 
@@ -57,11 +57,9 @@ class AppStore {
 		this.selection = this.first();
 	}
 
-	async arrive(targets: string[]) {
-		for (const target of targets) {
-			if (target.startsWith(LINK_SCHEME)) this.follow(target.slice(LINK_SCHEME.length));
-			else await this.open(target);
-		}
+	async arrive({ link, files }: Targets) {
+		if (link) this.follow(link.slice(LINK_SCHEME.length));
+		for (const file of files) await this.open(file);
 	}
 
 	follow(link: string) {

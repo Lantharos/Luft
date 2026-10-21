@@ -16,8 +16,30 @@ pub const LINK_SCHEME: &str = "kestrel-keys:";
 struct AppState {
     #[serde(flatten)]
     appearance: Appearance,
+    #[serde(flatten)]
+    targets: Targets,
+}
+
+#[derive(Serialize)]
+struct Targets {
     link: Option<String>,
-    files: Vec<String>,
+    files: Vec<PathBuf>,
+}
+
+impl From<&Activation> for Targets {
+    fn from(activation: &Activation) -> Self {
+        let (links, files): (Vec<&String>, Vec<&String>) = activation
+            .arguments()
+            .iter()
+            .partition(|argument| argument.starts_with(LINK_SCHEME));
+        Self {
+            link: links.first().map(|link| link.to_string()),
+            files: files
+                .into_iter()
+                .filter_map(|argument| activation.path(argument))
+                .collect(),
+        }
+    }
 }
 
 #[derive(Deserialize)]
@@ -42,25 +64,18 @@ fn open_file(reloader: &Reloader, OpenFile { path }: OpenFile) -> Result<Opened,
 }
 
 async fn app_state(_: Value) -> Result<AppState, String> {
-    let activation = Activation::current_process();
-    let arguments = activation.arguments();
     Ok(AppState {
         appearance: Appearance::current().await,
-        link: arguments
-            .iter()
-            .find(|argument| argument.starts_with(LINK_SCHEME))
-            .cloned(),
-        files: arguments
-            .iter()
-            .filter(|argument| !argument.starts_with(LINK_SCHEME) && !argument.starts_with('-'))
-            .cloned()
-            .collect(),
+        targets: Targets::from(&Activation::current_process()),
     })
 }
 
 pub fn register(window: SabineWindow, reloader: &Reloader) -> SabineWindow {
     window
         .command_async("app_state", app_state)
+        .command("activation_targets", |activation: Activation| {
+            Ok(Targets::from(&activation))
+        })
         .with("open_file", reloader, open_file)
         .command("characters", |_: Value| Ok(characters::all()))
         .command("input_sources", |_: Value| sources::list())

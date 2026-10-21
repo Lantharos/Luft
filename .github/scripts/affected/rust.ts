@@ -18,6 +18,7 @@ export type Crate = {
 	inherits: string[];
 	targetsUefi: boolean;
 	targetsWindows: boolean;
+	buildsOnSabine: boolean;
 };
 
 const DEPENDENCY_KINDS = ['dependencies', 'dev-dependencies', 'build-dependencies'];
@@ -37,6 +38,7 @@ export function buildRust(graph: Graph, files: string[]): Crate[] {
 		Object.entries(root.workspace!.dependencies).flatMap(([name, spec]) => (typeof spec === 'object' && 'path' in spec ? [[name, String(spec.path)]] : [])),
 	);
 
+	const lock = readFileSync('Cargo.lock', 'utf8');
 	const crates = root.workspace!.members.map((dir) => {
 		const manifest = parse(readFileSync(join(dir, 'Cargo.toml'), 'utf8'));
 		const inherits = dependencyNames(manifest);
@@ -47,6 +49,7 @@ export function buildRust(graph: Graph, files: string[]): Crate[] {
 			inherits,
 			targetsUefi: inherits.includes('uefi'),
 			targetsWindows: Object.keys(manifest.target ?? {}).some((cfg) => cfg.includes('windows')),
+			buildsOnSabine: [...lockedPackages(lock, [manifest.package!.name])].some((id) => id.startsWith('sabine ')),
 		};
 	});
 

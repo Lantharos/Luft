@@ -24,6 +24,7 @@ jobs:
     timeout-minutes: 10
     outputs:
       rust: ${{ steps.affected.outputs.rust }}
+      rust-tests: ${{ steps.affected.outputs.rust-tests }}
       uefi: ${{ steps.affected.outputs.uefi }}
       meet-windows: ${{ steps.affected.outputs.meet-windows }}
       web: ${{ steps.affected.outputs.web }}
@@ -40,8 +41,8 @@ jobs:
       - id: affected
         run: bun .github/scripts/affected/index.ts
 
-  rust:
-    name: Rust
+  clippy:
+    name: Rust Clippy
     needs: changes
     if: needs.changes.outputs.rust != ''
     runs-on: ubuntu-26.04
@@ -56,12 +57,35 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
         with:
-          shared-key: linux
+          shared-key: clippy
           cache-bin: false
 
       - run: cargo clippy --locked --all-targets ${{ needs.changes.outputs.rust }} -- -D warnings
 
-      - run: cargo test --locked ${{ needs.changes.outputs.rust }}
+  tests:
+    name: Rust tests ${{ matrix.group }}
+    needs: changes
+    if: needs.changes.outputs.rust-tests != '[]'
+    runs-on: ubuntu-26.04
+    timeout-minutes: 60
+    container:
+      image: ghcr.io/lantharos/luft-ci:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.changes.outputs.rust-tests) }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: tests-${{ matrix.group }}
+          cache-bin: false
+
+      - run: cargo test --locked ${{ matrix.packages }}
 
   uefi:
     name: Rust UEFI
@@ -138,7 +162,7 @@ jobs:
 
   checks:
     name: Checks
-    needs: [changes, rust, uefi, meet-windows, web]
+    needs: [changes, clippy, tests, uefi, meet-windows, web]
     if: always()
     runs-on: ubuntu-slim
     steps:

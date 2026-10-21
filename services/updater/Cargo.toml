@@ -8,7 +8,6 @@ edition.workspace = true
 rust-version.workspace = true
 
 [dependencies]
-access.workspace = true
 anyhow.workspace = true
 libc.workspace = true
 luft-dbus.workspace = true

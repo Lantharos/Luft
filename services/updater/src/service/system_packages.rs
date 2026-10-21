@@ -3,7 +3,7 @@ use std::fs::File;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 
-use access::Idle;
+use luft_dbus::idle::Idle;
 use tokio::sync::mpsc;
 use zbus::OwnedFd;
 use zbus::message::Header;
@@ -38,7 +38,7 @@ impl SystemPackages {
         header: &Header<'_>,
         action: &str,
     ) -> Result<(), Error> {
-        if access::is_authorized(connection, header, action).await? {
+        if luft_dbus::polkit::is_authorized(connection, header, action).await? {
             Ok(())
         } else {
             Err(Error::not_authorized())

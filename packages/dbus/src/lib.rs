@@ -1,5 +1,8 @@
 pub mod caller;
+pub mod disk_lock;
+pub mod idle;
 pub mod objects;
+pub mod polkit;
 pub mod service;
 pub mod trusted_apps;
 

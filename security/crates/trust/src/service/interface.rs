@@ -1,7 +1,7 @@
 use std::sync::{Arc, Mutex as SyncMutex};
 use std::time::{Duration, Instant};
 
-use access::Idle;
+use luft_dbus::idle::Idle;
 use tokio::sync::Mutex;
 use zbus::message::Header;
 use zbus::object_server::{InterfaceRef, SignalEmitter};
@@ -76,7 +76,7 @@ impl Trust {
         header: &Header<'_>,
         action: &str,
     ) -> Result<(), Error> {
-        if access::is_authorized(connection, header, action).await? {
+        if luft_dbus::polkit::is_authorized(connection, header, action).await? {
             Ok(())
         } else {
             Err(Error::not_authorized())

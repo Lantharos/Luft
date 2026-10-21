@@ -2,7 +2,7 @@ use std::ffi::CString;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 
-use access::Idle;
+use luft_dbus::idle::Idle;
 use luft_i18n::t;
 use luft_meet::Handoff;
 use luft_trust::TRUST;
@@ -64,7 +64,7 @@ impl Installer {
         header: &Header<'_>,
         action: &str,
     ) -> Result<(), Error> {
-        if access::is_authorized(connection, header, action).await? {
+        if luft_dbus::polkit::is_authorized(connection, header, action).await? {
             Ok(())
         } else {
             Err(Error::not_authorized())
@@ -287,7 +287,7 @@ impl Installer {
             return Err(Error::not_authorized());
         };
         let pending = uid_of(&user);
-        if pending.is_none() || pending != access::caller_uid(connection, &header).await? {
+        if pending.is_none() || pending != luft_dbus::caller::uid(connection, &header).await? {
             return Err(Error::not_authorized());
         }
         let _activity = self.idle.hold();

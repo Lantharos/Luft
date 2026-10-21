@@ -2,8 +2,8 @@ use std::os::fd::AsFd;
 use std::path::Path;
 use std::sync::Arc;
 
-use access::Idle;
 use futures_util::StreamExt;
+use luft_dbus::idle::Idle;
 use tokio::sync::Notify;
 use tokio::task::JoinHandle;
 use zbus::Connection;

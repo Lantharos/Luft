@@ -1,9 +1,8 @@
 mod logind;
-mod polkit;
 
 use zbus::Connection;
 use zbus::fdo::{ConnectionCredentials, DBusProxy};
-use zbus::message::{Flags, Header};
+use zbus::message::Header;
 use zbus::names::{BusName, UniqueName};
 
 use crate::error::Error;
@@ -33,11 +32,11 @@ impl Access {
     ) -> Result<(), Error> {
         match self {
             Self::Polkit => {
-                let interactive = header
-                    .primary()
-                    .flags()
-                    .contains(Flags::ALLOW_INTERACTIVE_AUTH);
-                polkit::check(connection, sender(header), action, interactive).await
+                if luft_dbus::polkit::is_authorized(connection, header, action).await? {
+                    Ok(())
+                } else {
+                    Err(Error::not_authorized())
+                }
             }
             Self::SameUser(uid) => require_user(connection, header, *uid).await,
         }

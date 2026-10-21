@@ -63,7 +63,7 @@ impl UsbProtection {
         #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
         enabled: bool,
     ) -> Result<(), Error> {
-        if !access::is_authorized(connection, &header, CONFIGURE).await? {
+        if !luft_dbus::polkit::is_authorized(connection, &header, CONFIGURE).await? {
             return Err(Error::not_authorized());
         }
         let change = self.protection.lock().await.set_enabled(enabled)?;
@@ -75,7 +75,7 @@ impl UsbProtection {
         #[zbus(connection)] connection: &Connection,
         #[zbus(header)] header: Header<'_>,
     ) -> Result<Vec<Device>, Error> {
-        let caller = access::caller_uid(connection, &header).await?;
+        let caller = luft_dbus::caller::uid(connection, &header).await?;
         if caller.is_none() || caller != seat::active_user(connection).await? {
             return Err(Error::not_authorized());
         }

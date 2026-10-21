@@ -1,7 +1,7 @@
 use std::path::Path;
 
-use access::DiskChange;
 use anyhow::{Context, Result, bail};
+use luft_dbus::disk_lock::DiskChange;
 
 use super::room::HEADER_ROOM;
 use super::state::{Change, Mode, Plan};

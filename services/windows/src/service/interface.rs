@@ -2,8 +2,8 @@ use std::path::Path;
 use std::process::Command;
 use std::sync::Arc;
 
-use access::Idle;
 use anyhow::{Context, bail};
+use luft_dbus::idle::Idle;
 use luft_windows::bluetooth::bluez;
 use luft_windows::change::{self, Change};
 use serde::Serialize;
@@ -40,7 +40,7 @@ impl Windows {
         header: &Header<'_>,
         action: &str,
     ) -> Result<(), Error> {
-        if access::is_authorized(connection, header, action).await? {
+        if luft_dbus::polkit::is_authorized(connection, header, action).await? {
             Ok(())
         } else {
             Err(Error::not_authorized())

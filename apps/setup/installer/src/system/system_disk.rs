@@ -1,7 +1,7 @@
 use std::path::Path;
 
-use access::DiskChange;
 use anyhow::{Context, Result};
+use luft_dbus::disk_lock::DiskChange;
 
 const ENCRYPTING: &str = "/var/lib/trustd/encryption.json";
 

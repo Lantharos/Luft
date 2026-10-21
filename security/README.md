@@ -8,7 +8,6 @@ How the pieces protect the computer is in [docs/security.md](../docs/security.md
 | --- | --- |
 | `crates/trust` | `trustd` and `trustctl` |
 | `crates/usb` | `luft-usb-protection` |
-| `crates/access` | Shared polkit and idle-exit helpers |
 
 ## Build
 

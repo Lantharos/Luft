@@ -8,7 +8,6 @@ edition.workspace = true
 rust-version.workspace = true
 
 [dependencies]
-access.workspace = true
 anyhow.workspace = true
 futures-util.workspace = true
 clap.workspace = true

@@ -23,15 +23,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "access"
-version = "0.1.0"
-dependencies = [
- "rustix",
- "tokio",
- "zbus 6.0.0",
-]
-
-[[package]]
 name = "adler2"
 version = "2.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3761,6 +3752,7 @@ dependencies = [
  "image",
  "jpeg-encoder",
  "jxl-oxide",
+ "luft-dbus",
  "nix",
  "serde",
  "serde_json",
@@ -4235,6 +4227,7 @@ version = "0.1.0"
 dependencies = [
  "futures-util",
  "libc",
+ "rustix",
  "serde",
  "tokio",
  "zbus 6.0.0",
@@ -4278,7 +4271,6 @@ dependencies = [
 name = "luft-installer"
 version = "0.1.0"
 dependencies = [
- "access",
  "anyhow",
  "clap",
  "futures-util",
@@ -4432,8 +4424,8 @@ dependencies = [
 name = "luft-sleep"
 version = "0.1.0"
 dependencies = [
- "access",
  "anyhow",
+ "luft-dbus",
  "rustix",
  "tempfile",
  "tokio",
@@ -4518,7 +4510,6 @@ dependencies = [
 name = "luft-updater"
 version = "0.1.0"
 dependencies = [
- "access",
  "anyhow",
  "libc",
  "luft-dbus",
@@ -4534,9 +4525,9 @@ dependencies = [
 name = "luft-usb-protection"
 version = "0.1.0"
 dependencies = [
- "access",
  "anyhow",
  "futures-util",
+ "luft-dbus",
  "rustix",
  "tokio",
  "zbus 6.0.0",
@@ -4565,10 +4556,10 @@ dependencies = [
 name = "luft-windows-service"
 version = "0.1.0"
 dependencies = [
- "access",
  "anyhow",
  "futures-util",
  "libc",
+ "luft-dbus",
  "luft-windows",
  "serde",
  "serde_json",
@@ -8019,13 +8010,13 @@ dependencies = [
 name = "trustd"
 version = "0.1.0"
 dependencies = [
- "access",
  "anyhow",
  "argon2",
  "chacha20poly1305",
  "clap",
  "getrandom 0.4.3",
  "libc",
+ "luft-dbus",
  "rustix",
  "serde",
  "serde_json",

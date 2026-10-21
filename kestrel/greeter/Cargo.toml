@@ -10,6 +10,7 @@ fast_image_resize = { workspace = true, features = ["image"] }
 image = { workspace = true, features = ["bmp", "gif", "jpeg", "tiff", "webp"] }
 jpeg-encoder = { workspace = true, features = ["simd"] }
 jxl-oxide.workspace = true
+luft-dbus.workspace = true
 nix = { workspace = true, features = ["user"] }
 serde.workspace = true
 serde_json.workspace = true

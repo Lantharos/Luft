@@ -8,8 +8,8 @@ edition.workspace = true
 rust-version.workspace = true
 
 [dependencies]
-access.workspace = true
 anyhow.workspace = true
+luft-dbus.workspace = true
 rustix = { workspace = true, features = ["time"] }
 tokio = { workspace = true, features = ["macros", "rt", "sync", "time"] }
 zbus = { workspace = true, features = ["tokio"] }

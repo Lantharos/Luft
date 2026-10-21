@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use std::time::Duration;
 
-use access::Idle;
+use luft_dbus::idle::Idle;
 use zbus::message::Header;
 use zbus::object_server::SignalEmitter;
 use zbus::{Connection, interface};
@@ -31,7 +31,7 @@ impl Sleep {
         #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
     ) -> Result<(), Error> {
         let _activity = self.idle.hold();
-        if !access::is_authorized(connection, &header, CONFIGURE).await? {
+        if !luft_dbus::polkit::is_authorized(connection, &header, CONFIGURE).await? {
             return Err(Error::NotAuthorized(
                 "You aren't allowed to change how the computer sleeps.".to_owned(),
             ));

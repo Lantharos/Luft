@@ -79,3 +79,14 @@ pub async fn refuse_sandboxed(connection: &Connection, header: &Header<'_>) -> f
         Err(denied())
     }
 }
+
+pub async fn uid(connection: &Connection, header: &Header<'_>) -> zbus::Result<Option<u32>> {
+    let Some(sender) = header.sender() else {
+        return Ok(None);
+    };
+    Ok(DBusProxy::new(connection)
+        .await?
+        .get_connection_credentials(BusName::Unique(sender.to_owned()))
+        .await?
+        .unix_user_id())
+}

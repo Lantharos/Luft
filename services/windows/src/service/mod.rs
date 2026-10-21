@@ -4,7 +4,7 @@ mod interface;
 use std::sync::Arc;
 use std::time::Duration;
 
-use access::Idle;
+use luft_dbus::idle::Idle;
 
 use interface::Windows;
 

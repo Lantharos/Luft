@@ -8,13 +8,13 @@ repository.workspace = true
 rust-version.workspace = true
 
 [dependencies]
-access.workspace = true
 anyhow.workspace = true
 argon2 = { workspace = true, features = ["alloc", "parallel"] }
 chacha20poly1305 = { workspace = true, features = ["default"] }
 clap.workspace = true
 getrandom.workspace = true
 libc.workspace = true
+luft-dbus.workspace = true
 rustix = { workspace = true, features = ["fs", "process", "stdio", "termios"] }
 serde.workspace = true
 serde_json.workspace = true

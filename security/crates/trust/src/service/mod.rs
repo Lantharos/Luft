@@ -10,7 +10,7 @@ pub(crate) mod status;
 use std::sync::Arc;
 use std::time::Duration;
 
-use access::Idle;
+use luft_dbus::idle::Idle;
 
 use crate::{boot, disk, keys, system};
 

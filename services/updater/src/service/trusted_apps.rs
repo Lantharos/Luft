@@ -5,8 +5,8 @@ use std::os::unix::fs::{OpenOptionsExt, PermissionsExt};
 use std::path::Path;
 use std::sync::Arc;
 
-use access::Idle;
 use anyhow::Context;
+use luft_dbus::idle::Idle;
 use luft_dbus::trusted_apps::{self, PATH};
 use zbus::message::Header;
 use zbus::{Connection, interface};
@@ -35,7 +35,7 @@ impl TrustedApps {
             return Err(Error::Failed(format!("{app_id} isn't an app ID.")));
         }
         let _activity = self.idle.hold();
-        if !access::is_authorized(connection, header, CHANGE).await? {
+        if !luft_dbus::polkit::is_authorized(connection, header, CHANGE).await? {
             return Err(Error::not_authorized());
         }
         let mut apps = trusted_apps::read();

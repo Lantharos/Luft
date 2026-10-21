@@ -1,7 +1,7 @@
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
 
-use access::Idle;
+use luft_dbus::idle::Idle;
 use luft_variant::Variant;
 use tokio::sync::mpsc;
 use zbus::message::Header;
@@ -41,7 +41,7 @@ impl Updater {
         header: &Header<'_>,
         action: &str,
     ) -> Result<(), Error> {
-        if access::is_authorized(connection, header, action).await? {
+        if luft_dbus::polkit::is_authorized(connection, header, action).await? {
             Ok(())
         } else {
             Err(Error::not_authorized())

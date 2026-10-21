@@ -3,7 +3,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex as SyncMutex};
 use std::time::Duration;
 
-use access::Idle;
+use luft_dbus::idle::Idle;
 use tokio::sync::Mutex;
 use zbus::message::Header;
 use zbus::object_server::InterfaceRef;
@@ -141,7 +141,7 @@ impl Drives {
         header: &Header<'_>,
         action: &str,
     ) -> Result<(), Error> {
-        if access::is_authorized(connection, header, action).await? {
+        if luft_dbus::polkit::is_authorized(connection, header, action).await? {
             Ok(())
         } else {
             Err(Error::not_authorized())
@@ -382,7 +382,7 @@ impl Drives {
         #[zbus(connection)] connection: &Connection,
         #[zbus(header)] header: Header<'_>,
     ) -> Result<(), Error> {
-        if access::caller_uid(connection, &header).await? != Some(0) {
+        if luft_dbus::caller::uid(connection, &header).await? != Some(0) {
             return Err(Error::not_authorized());
         }
         let _activity = self.idle.hold();

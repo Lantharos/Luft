@@ -18,6 +18,7 @@ ENV CARGO_HOME=/var/cache/cargo CARGO_TARGET_DIR=/var/cache/luft-part/target LUF
 FROM builder AS kestrel-build
 COPY Cargo.toml Cargo.lock package.json bun.lock /src/
 COPY kestrel /src/kestrel
+COPY packages/dbus /src/packages/dbus
 COPY packages/web/motion /src/packages/web/motion
 COPY packages/web/ui/src/taskbar /src/packages/web/ui/src/taskbar
 COPY packages/i18n/src /src/packages/i18n/src
@@ -43,6 +44,7 @@ FROM builder AS boot-build
 COPY Cargo.toml Cargo.lock /src/
 COPY boot/sushi /src/boot/sushi
 COPY security /src/security
+COPY packages/dbus /src/packages/dbus
 COPY kestrel/engine/data/fonts /src/kestrel/engine/data/fonts
 COPY os/image/parts/stages/boot.sh os/image/parts/stages/needed.sh os/image/parts/stages/source-times.ts os/image/parts/stages/workspace.ts \
   /src/os/image/parts/stages/
@@ -110,7 +112,6 @@ COPY packages/app /src/packages/app
 COPY packages/dbus /src/packages/dbus
 COPY packages/i18n /src/packages/i18n
 COPY packages/system /src/packages/system
-COPY security/crates/access /src/security/crates/access
 COPY apps/setup/installer /src/apps/setup/installer
 COPY os/image/parts/stages/services.sh os/image/parts/stages/needed.sh os/image/parts/stages/source-times.ts os/image/parts/stages/workspace.ts \
   /src/os/image/parts/stages/

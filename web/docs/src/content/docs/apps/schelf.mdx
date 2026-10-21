@@ -22,11 +22,11 @@ Schelf is where you get apps: from Flathub, as AppImages, and command-line tools
 ## Installing and updating
 
 - Downloads queue up, show their progress and can be cancelled.
-- **Installed** lists every app with its size and where it came from. Under System are the [system packages](/system/software/#system-packages), with the services they run.
+- **Installed** lists every app with its size and where it came from. Under System are the [system packages](/system/software/#system-packages), with the services they run, and **Software sources**, where vendors' package repositories are added and removed.
 - **Updates** updates every app in one go. Flatpak runtimes are listed separately, as app platforms.
 - AppImages update by themselves a few minutes after you sign in, and every six hours after that.
 
-Opening a `.flatpakref`, `.AppImage` or `.rpm` file shows a page explaining it, and where it would go, before anything is installed. [Installing software](/system/software/) explains where each kind goes.
+Opening a `.flatpakref`, `.AppImage` or `.rpm` file shows a page explaining it, and where it would go, before anything is installed. A desktop app's `.rpm`, such as 1Password's or Chrome's, becomes a system package, and when it comes with its vendor's repository, Schelf shows that repository and its key and adds it, so the app keeps getting updates. [Installing software](/system/software/) explains where each kind goes.
 
 ## Command-line tools
 
@@ -34,4 +34,4 @@ Search for a tool, such as `ffmpeg` or `htop`, and Schelf installs it from Fedor
 
 ## In the terminal
 
-`schelf install`, `remove`, `search`, `update`, `list`, `info`, `trust` and `untrust` do the same from [Tern](/apps/tern/), and `sch` is short for `schelf`. While the app is open, what you start in the terminal shows up in its queue too. [Installing software](/system/software/#in-the-terminal) has the details.
+`schelf install`, `remove`, `search`, `update`, `list`, `info`, `trust`, `untrust` and `repo` do the same from [Tern](/apps/tern/), and `sch` is short for `schelf`. While the app is open, what you start in the terminal shows up in its queue too. [Installing software](/system/software/#in-the-terminal) has the details.

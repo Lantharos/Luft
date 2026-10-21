@@ -3,7 +3,9 @@ use std::path::{Path, PathBuf};
 use crate::cli::perform::{Plan, Verb};
 use crate::fedora;
 use crate::files::{self, Opened};
+use crate::library::sources::Bundled;
 use crate::operations::{Job, Request};
+use luft_software::repositories::Described;
 
 const EXTENSIONS: [&str; 4] = [".rpm", ".appimage", ".flatpakref", ".flatpakrepo"];
 
@@ -19,6 +21,7 @@ pub fn named(target: &str) -> bool {
 pub struct Prepared {
     pub plan: Plan,
     pub installed: bool,
+    pub trust: Option<Described>,
 }
 
 fn job(opened: &Opened) -> Job {
@@ -31,6 +34,17 @@ fn job(opened: &Opened) -> Job {
         Opened::Package { path, .. } if fedora::available() => {
             Job::Fedora(fedora::Job::InstallPackageFile { path: path.clone() })
         }
+        Opened::Package {
+            path,
+            package,
+            system: true,
+            repository,
+            ..
+        } => Job::InstallSystemPackageFile {
+            path: path.clone(),
+            package: package.clone(),
+            repository: repository.as_ref().map(|bundled| bundled.draft.clone()),
+        },
         Opened::Package { path, .. } => Job::InstallToolFile { path: path.clone() },
         Opened::AppImage { path, .. } => Job::InstallAppImage { path: path.into() },
     }
@@ -67,7 +81,29 @@ pub fn prepare(target: &str) -> Result<Prepared, String> {
         .file_name()
         .filter(|_| !matches!(opened, Opened::FlatpakRef { .. }))
         .map(|name| name.to_string_lossy().into_owned());
+    let trust = match &opened {
+        Opened::Package {
+            repository:
+                Some(Bundled {
+                    described,
+                    added: false,
+                    ..
+                }),
+            ..
+        } => Some(described.clone()),
+        _ => None,
+    };
+    if let Opened::Package {
+        repository_error: Some(error),
+        ..
+    } = &opened
+    {
+        eprintln!(
+            "It brings a software source Luft can't use, so it's installed by itself and won't get updates. {error}"
+        );
+    }
     Ok(Prepared {
+        trust,
         plan: Plan {
             request: Request {
                 key: format!("file:{shown}"),

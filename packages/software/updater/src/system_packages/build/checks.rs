@@ -95,6 +95,7 @@ mod tests {
                     ghost: false,
                 })
                 .collect(),
+            origin: crate::system_packages::manifest::Origin::Fedora,
         }
     }
 

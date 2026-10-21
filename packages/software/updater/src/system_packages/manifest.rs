@@ -5,6 +5,16 @@ use std::path::Path;
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 
+/// Where a package came from: Fedora, a repository file that was added, or a package file
+/// installed by itself.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub enum Origin {
+    Fedora,
+    Repository(String),
+    File,
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct Package {
     pub name: String,
@@ -13,6 +23,8 @@ pub struct Package {
     pub summary: String,
     pub requested: bool,
     pub units: Vec<String>,
+    pub apps: Vec<String>,
+    pub origin: Origin,
 }
 
 #[derive(Serialize, Deserialize, Default, Clone, Debug, PartialEq, Eq)]

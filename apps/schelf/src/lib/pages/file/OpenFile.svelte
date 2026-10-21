@@ -4,6 +4,7 @@
 	import AppArt from '#lib/components/AppArt.svelte';
 	import Description from '#lib/components/Description.svelte';
 	import ProgressButton from '#lib/components/ProgressButton.svelte';
+	import TrustDialog from '#lib/components/TrustDialog.svelte';
 	import { fedora } from '#lib/fedora/fedora.svelte.js';
 	import { backend } from '#lib/bridge/index.js';
 	import { library } from '#lib/state/library.svelte.js';
@@ -15,6 +16,7 @@
 	let file = $state<OpenedFile | null>(null);
 	let error = $state<string | null>(null);
 	let started = $state(false);
+	let trusting = $state(false);
 
 	const key = $derived(`file:${path}`);
 	const operation = $derived(operations.forKey(key));
@@ -26,11 +28,13 @@
 	const installed = $derived.by((): InstalledApp | null => {
 		if (!file) return null;
 		if (file.kind === 'flatpakRef') return library.flatpak(file.id);
+		if (file.kind === 'package' && file.system) return library.system(file.package);
 		if (file.kind === 'package') return fedora.available ? library.package(file.package) : library.tool(file.package);
 		if (file.kind === 'appImage' && started) return library.installed.find((app) => app.source === 'appImage' && app.name === name) ?? null;
 		return null;
 	});
 	const finished = $derived(started && !operation);
+	const desktop = $derived(installed?.desktop ?? (installed && file?.kind === 'package' ? file.desktop : null));
 
 	$effect(() => {
 		const current = path;
@@ -46,12 +50,19 @@
 	function job(opened: OpenedFile): Job {
 		if (opened.kind === 'flatpakRef') return { kind: 'installFlatpakRef', path: opened.path };
 		if (opened.kind === 'flatpakRepo') return { kind: 'addFlatpakRepo', path: opened.path, name: opened.name };
+		if (opened.kind === 'package' && opened.system)
+			return { kind: 'installSystemPackageFile', path: opened.path, package: opened.package, repository: opened.repository?.draft ?? null };
 		if (opened.kind === 'package') return fedora.available ? { kind: 'installPackageFile', path: opened.path } : { kind: 'installToolFile', path: opened.path };
 		return { kind: 'installAppImage', path: opened.path };
 	}
 
 	function install() {
 		if (!file) return;
+		if (file.kind === 'package' && file.repository && !file.repository.added && !trusting) {
+			trusting = true;
+			return;
+		}
+		trusting = false;
 		if (operation?.state === 'failed') void operations.cancel(operation.id);
 		started = true;
 		void operations.run(key, name, job(file));
@@ -64,6 +75,9 @@
 		package: fedora.available ? 'System package' : 'Command-line tool',
 		appImage: 'AppImage'
 	};
+	const kind = $derived(file?.kind === 'package' && file.system ? 'System package' : file ? KIND[file.kind] : '');
+	const source = $derived(file?.kind === 'package' ? file.repository : null);
+	const sourceName = $derived(source ? (source.described.sources[0]?.name ?? source.described.file) : null);
 </script>
 
 <div class="soft-scroll h-full overflow-y-auto">
@@ -75,7 +89,7 @@
 				<AppArt icon={file.kind === 'appImage' || file.kind === 'flatpakRef' ? file.icon : null} size={80} />
 				<div class="flex min-w-0 flex-1 flex-col gap-1">
 					<h2 class="truncate text-[24px] font-semibold">{name}</h2>
-					<span class="text-[13px] text-[var(--text-muted)]">{KIND[file.kind]}</span>
+					<span class="text-[13px] text-[var(--text-muted)]">{kind}</span>
 					{#if 'summary' in file && file.summary}
 						<p class="text-[14px] text-[var(--text-soft)]">{file.summary}</p>
 					{/if}
@@ -83,11 +97,11 @@
 				<div class="flex flex-col items-end gap-2">
 					{#if operation && operation.state !== 'failed'}
 						<ProgressButton {operation} large />
-					{:else if installed?.desktop && (finished || file.kind !== 'appImage')}
-						<button type="button" class="button primary large" onclick={() => backend.launch(installed.desktop!)}>Open</button>
+					{:else if desktop && (finished || file.kind !== 'appImage')}
+						<button type="button" class="button primary large" onclick={() => backend.launch(desktop)}>Open</button>
 					{:else if finished && file.kind === 'flatpakRepo'}
 						<button type="button" class="button large" onclick={() => navigation.open({ page: 'discover' })}>Done</button>
-					{:else if file.kind === 'package' && file.installed}
+					{:else if file.kind === 'package' && (file.installed || installed)}
 						<span class="text-[13px] text-[var(--text-muted)]">Already installed</span>
 					{:else}
 						<button type="button" class="button primary large" onclick={install}>{ACTION[file.kind]}</button>
@@ -117,15 +131,32 @@
 				{/if}
 				{#if file.kind === 'appImage'}
 					<Row title="Installs to" description="It gets a place in your app menu, and Schelf keeps it up to date when it can."><span>Applications folder</span></Row>
+				{:else if file.kind === 'package' && file.system}
+					<Row title="Installs to" description="For everyone on this computer, rebuilt with every update of Luft."><span>System</span></Row>
+					{#if source && sourceName}
+						<Row title="Updates from" description={source.described.sources[0]?.url}><span class="max-w-[320px] truncate">{sourceName}</span></Row>
+					{/if}
 				{:else if file.kind === 'package' && !fedora.available}
 					<Row title="Installs to" description="Its commands run in Tern."><span>Tools container</span></Row>
 				{/if}
 				<Row title="File" description={path} />
 			</Section>
 
-			{#if file.kind === 'package'}
+			{#if file.kind === 'package' && source}
 				<p class="px-2 text-[13px] text-[var(--text-muted)]">
-					Package files aren't checked before they install. Only install ones from people you trust.
+					{file.package} installs from {sourceName}, checked against its key, so it keeps getting updates. {source.added
+						? "It's one of your software sources already."
+						: 'Installing adds it to your software sources.'}
+				</p>
+			{:else if file.kind === 'package'}
+				<p class="px-2 text-[13px] text-[var(--text-muted)]">
+					{#if file.repositoryError}
+						It brings a software source Luft can't use, so it installs by itself and won't get updates. {file.repositoryError}
+					{:else if file.system}
+						It doesn't come with a software source, so it won't get updates. Package files aren't checked before they install. Only install ones from people you trust.
+					{:else}
+						Package files aren't checked before they install. Only install ones from people you trust.
+					{/if}
 				</p>
 			{/if}
 		{:else}
@@ -133,3 +164,7 @@
 		{/if}
 	</div>
 </div>
+
+{#if trusting && source}
+	<TrustDialog {source} action="Add and install" onconfirm={install} onclose={() => (trusting = false)} />
+{/if}

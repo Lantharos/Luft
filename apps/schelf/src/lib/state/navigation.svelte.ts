@@ -12,7 +12,8 @@ export type Route =
 	| { page: 'collection'; collection: Collection }
 	| { page: 'search'; query: string }
 	| { page: 'app'; target: AppTarget; name: string }
-	| { page: 'file'; path: string };
+	| { page: 'file'; path: string }
+	| { page: 'sources' };
 
 class Navigation {
 	stack = $state<Route[]>([{ page: 'discover' }]);

@@ -8,7 +8,7 @@
 	import { backend } from '#lib/bridge/index.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
-	import ToolResults from './ToolResults.svelte';
+	import PackageResults from './PackageResults.svelte';
 
 	const LIMIT = 30;
 
@@ -17,6 +17,7 @@
 	let remote = $state<CatalogApp[] | null>(null);
 	let error = $state<string | null>(null);
 	let tools = $state<number | null>(null);
+	let system = $state<number | null>(null);
 
 	const needle = $derived(query.toLowerCase());
 	const installed = $derived(library.installed.filter((app) => app.name.toLowerCase().includes(needle)).slice(0, 8));
@@ -36,7 +37,7 @@
 			});
 	});
 
-	const others = $derived(fedora.available ? (local?.length ?? null) : tools);
+	const others = $derived(fedora.available ? (local?.length ?? null) : tools === null || system === null ? null : tools + system);
 	const nothing = $derived(!installed.length && remote?.length === 0 && others === 0);
 </script>
 
@@ -64,7 +65,8 @@
 			<Shelf title="Flathub" apps={remote} />
 		{/if}
 		{#if !fedora.available}
-			<ToolResults {query} bind:found={tools} />
+			<PackageResults {query} kind="tool" bind:found={tools} />
+			<PackageResults {query} kind="system" bind:found={system} />
 		{:else if local === null || local.length}
 			<Shelf title="Fedora" apps={local} />
 		{/if}

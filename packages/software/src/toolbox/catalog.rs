@@ -11,10 +11,40 @@ pub struct Available {
     pub summary: String,
 }
 
-pub fn available() -> Result<Vec<Available>, String> {
+/// Which repositories to look in: Fedora's, for the tools container, or the ones added for
+/// system packages.
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+pub enum Repositories {
+    Fedora,
+    Added,
+}
+
+impl Repositories {
+    /// The dnf options that pick them, or `None` when there are none to look in. The added
+    /// sources' keys were confirmed when they were added, so dnf may take them without asking.
+    pub fn option(self) -> Option<Vec<String>> {
+        let added = crate::repositories::added_ids();
+        match self {
+            Self::Fedora if added.is_empty() => Some(Vec::new()),
+            Self::Fedora => Some(vec![format!("--disable-repo={}", added.join(","))]),
+            Self::Added if added.is_empty() => None,
+            Self::Added => Some(vec![
+                format!("--repo={}", added.join(",")),
+                "--assumeyes".to_owned(),
+            ]),
+        }
+    }
+}
+
+/// What's available in `repositories`, one entry per package.
+pub fn available(repositories: Repositories) -> Result<Vec<Available>, String> {
+    let Some(choice) = repositories.option() else {
+        return Ok(Vec::new());
+    };
     let architectures = format!("--arch=noarch,{}", std::env::consts::ARCH);
     let output = Command::new("dnf")
         .args(["repoquery", "--quiet", "--available", "--latest-limit=1"])
+        .args(choice)
         .arg(architectures)
         .args(["--queryformat", "%{name}\t%{summary}\n"])
         .env("LC_ALL", "C.UTF-8")

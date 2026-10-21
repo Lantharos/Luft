@@ -27,5 +27,7 @@ export function title(route: Route) {
 			return route.name;
 		case 'file':
 			return 'Install from a file';
+		case 'sources':
+			return 'Software sources';
 	}
 }

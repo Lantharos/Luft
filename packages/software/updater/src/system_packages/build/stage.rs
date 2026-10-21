@@ -19,6 +19,7 @@ const DIRECTORY: u32 = 0o040000;
 const KIND: u32 = 0o170000;
 const PRESET: &str = "usr/lib/systemd/system-preset/98-luft-system-packages.preset";
 const ENABLING: [&str; 3] = [".wants", ".requires", ".upholds"];
+const SOURCES: [&str; 2] = ["/etc/yum.repos.d/", "/etc/pki/rpm-gpg/"];
 
 /// The folders of a build: `lower` is Luft's own system, `root` the same with the packages
 /// installed over it and `upper` only what installing them changed.
@@ -96,7 +97,7 @@ fn copy_attributes(from: &Path, to: &Path) -> Result<()> {
 
 /// Makes `path` and its parents in `stage` with the attributes they have in `root`, since the
 /// topmost layer decides a merged folder's owner and mode.
-fn mirror_folder(root: &Path, stage: &Path, path: &Path) -> Result<()> {
+pub fn mirror_folder(root: &Path, stage: &Path, path: &Path) -> Result<()> {
     let mut built = PathBuf::new();
     for part in path.components() {
         built.push(part);
@@ -112,7 +113,7 @@ fn mirror_folder(root: &Path, stage: &Path, path: &Path) -> Result<()> {
     Ok(())
 }
 
-fn copy_files(from: &Path, into: &Path, paths: &[&str]) -> Result<()> {
+pub fn copy_files(from: &Path, into: &Path, paths: &[&str]) -> Result<()> {
     for chunk in paths.chunks(512) {
         run(Command::new("cp")
             .args([
@@ -168,14 +169,17 @@ fn made_mode(layout: &Layout, file: &File) -> Option<u32> {
 }
 
 /// Configuration and state go into the factory folder, to be copied to /etc and /var when
-/// they aren't there, like installing the package would have.
+/// they aren't there, like installing the package would have. Repositories and their keys are
+/// left out: they're added on their own, with a confirmation.
 pub fn placed(layout: &Layout, rpms: &[Rpm]) -> Result<Vec<Placed>> {
     let factory = layout.stage.join(FACTORY);
     mirror_folder(layout.root, layout.stage, Path::new(FACTORY))?;
     let (mut entries, mut files) = (Vec::new(), Vec::new());
     for rpm in rpms {
         for file in &rpm.files {
-            if !matches!(place(&file.path), Some(Place::Placed)) {
+            if !matches!(place(&file.path), Some(Place::Placed))
+                || SOURCES.iter().any(|prefix| file.path.starts_with(prefix))
+            {
                 continue;
             }
             let Some(mode) = made_mode(layout, file) else {

@@ -1,9 +1,14 @@
+use std::fs::File;
+
 use futures_util::future::{Either, select};
 use futures_util::{StreamExt, pin_mut};
 use luft_app::dbus::{self, failed, service::Service};
 use serde::{Deserialize, Serialize};
+use zbus::DynamicType;
+use zbus::Fd;
 
 use crate::progress::Stage;
+use crate::repositories::{Described, Draft};
 use crate::task::Task;
 
 const SYSTEM_PACKAGES: Service = Service {
@@ -11,6 +16,15 @@ const SYSTEM_PACKAGES: Service = Service {
     path: "/com/lantharos/Updater1",
     interface: "com.lantharos.Updater1.SystemPackages",
 };
+
+/// Where a system package came from.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub enum Origin {
+    Fedora,
+    Repository(String),
+    File,
+}
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Package {
@@ -20,21 +34,60 @@ pub struct Package {
     pub summary: String,
     pub requested: bool,
     pub units: Vec<String>,
+    pub apps: Vec<String>,
+    pub origin: Origin,
 }
 
-/// The Fedora packages added to the system, merged over it as a system extension.
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct Source {
+    pub id: String,
+    pub name: String,
+    pub url: String,
+}
+
+/// A repository file that was added, with the sources in it.
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct Repository {
+    pub file: String,
+    pub sources: Vec<Source>,
+}
+
+impl Repository {
+    pub fn name(&self) -> &str {
+        self.sources
+            .first()
+            .map_or(self.file.as_str(), |source| source.name.as_str())
+    }
+}
+
+/// The packages added to the system, merged over it as a system extension, and the
+/// repositories they can come from besides Fedora.
 #[derive(Serialize, Deserialize, Clone, Debug, Default)]
 pub struct SystemPackages {
     pub requested: Vec<String>,
     pub packages: Vec<Package>,
     pub services: Vec<String>,
     pub pending: bool,
+    pub repositories: Vec<Repository>,
 }
 
 impl SystemPackages {
     /// The packages asked for, without what they brought along.
     pub fn requested(&self) -> impl Iterator<Item = &Package> {
         self.packages.iter().filter(|package| package.requested)
+    }
+
+    /// Where a package came from, in words.
+    pub fn origin_of(&self, origin: &Origin) -> String {
+        match origin {
+            Origin::Fedora => "Fedora".to_owned(),
+            Origin::File => "Package file".to_owned(),
+            Origin::Repository(file) => self
+                .repositories
+                .iter()
+                .find(|repository| &repository.file == file)
+                .map_or_else(|| file.clone(), |repository| repository.name().to_owned()),
+        }
     }
 }
 
@@ -51,19 +104,22 @@ pub async fn list() -> Result<SystemPackages, String> {
 fn stage(step: &str, method: &str) -> Stage {
     match (step, method) {
         ("downloading", _) => Stage::Downloading,
-        ("building", "Remove") => Stage::Removing,
+        ("building", "Remove" | "RemoveRepository") => Stage::Removing,
         ("building", _) => Stage::Installing,
         _ => Stage::Finishing,
     }
 }
 
-async fn change(method: &str, names: &[String], task: Task<'_>) -> Result<(), String> {
+async fn rebuild<B: Serialize + DynamicType>(
+    method: &str,
+    body: &B,
+    task: Task<'_>,
+) -> Result<(), String> {
     let connection = dbus::system().await?;
     let signals =
         dbus::objects::signals(connection, SYSTEM_PACKAGES.name, SYSTEM_PACKAGES.path).await?;
     task.progress(Stage::Preparing, None);
-    let body = (names,);
-    let call = SYSTEM_PACKAGES.change::<_, ()>(method, &body);
+    let call = SYSTEM_PACKAGES.change::<_, ()>(method, body);
     let steps = signals.for_each(|message| {
         if let Ok(message) = message
             && message
@@ -83,13 +139,47 @@ async fn change(method: &str, names: &[String], task: Task<'_>) -> Result<(), St
     }
 }
 
-/// Adds Fedora packages to the system. Returns once the running system has them, with their
+/// Adds packages to the system. Returns once the running system has them, with their
 /// services started.
 pub async fn install(names: &[String], task: Task<'_>) -> Result<(), String> {
-    change("Install", names, task).await
+    rebuild("Install", &(names,), task).await
+}
+
+/// Adds a package file to the system by itself. It's kept, so every update of Luft installs
+/// it again, but it only changes when another file is opened.
+pub async fn install_file(path: &str, task: Task<'_>) -> Result<(), String> {
+    let file = File::open(path).map_err(|error| error.to_string())?;
+    rebuild("InstallFile", &(Fd::from(&file),), task).await
 }
 
 /// Removes system packages and everything they brought, leaving the system as it was before.
 pub async fn remove(names: &[String], task: Task<'_>) -> Result<(), String> {
-    change("Remove", names, task).await
+    rebuild("Remove", &(names,), task).await
+}
+
+/// Checks a repository and its keys, so they can be shown before it's trusted.
+pub async fn describe(draft: &Draft) -> Result<Described, String> {
+    let text: String = SYSTEM_PACKAGES
+        .proxy()
+        .await?
+        .call(
+            "DescribeRepository",
+            &(&draft.file, &draft.text, &draft.keys),
+        )
+        .await
+        .map_err(|error| dbus::explain(&error))?;
+    serde_json::from_str(&text).map_err(failed)
+}
+
+/// Adds a repository, so its packages can be system packages.
+pub async fn add_repository(draft: &Draft) -> Result<(), String> {
+    SYSTEM_PACKAGES
+        .change::<_, ()>("AddRepository", &(&draft.file, &draft.text, &draft.keys))
+        .await
+        .map_err(|error| dbus::explain(&error))
+}
+
+/// Removes a repository and the system packages that came from it.
+pub async fn remove_repository(file: &str, task: Task<'_>) -> Result<(), String> {
+    rebuild("RemoveRepository", &(file,), task).await
 }

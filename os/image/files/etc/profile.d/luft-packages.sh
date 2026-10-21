@@ -71,6 +71,28 @@ __luft_schelf() {
 	esac
 }
 
+__luft_repo() {
+	local source=$1
+	if [[ -z $source ]]; then
+		__luft_package_hint "$__luft_manager" install
+		return 1
+	fi
+	printf 'Luft adds software sources for system packages with Schelf.\n' >&2
+	schelf repo add "$source"
+}
+
+__luft_repofile() {
+	local word
+	while (($#)); do
+		word=$1
+		shift
+		case $word in
+		--from-repofile=*) printf '%s' "${word#--from-repofile=}" && return ;;
+		--from-repofile) printf '%s' "$1" && return ;;
+		esac
+	done
+}
+
 __luft_dnf() {
 	local __luft_manager=$1
 	shift
@@ -85,6 +107,22 @@ __luft_dnf() {
 	install | in) __luft_schelf install "$@" ;;
 	remove | erase | rm) __luft_schelf remove "$@" ;;
 	search | se) __luft_schelf search "$@" ;;
+	copr)
+		if [[ $1 == enable && -n $2 ]]; then
+			__luft_repo "copr:$2"
+		else
+			__luft_package_hint "$__luft_manager" copr
+			return 1
+		fi
+		;;
+	config-manager)
+		if [[ $1 == addrepo ]]; then
+			__luft_repo "$(__luft_repofile "$@")"
+		else
+			__luft_package_hint "$__luft_manager" config-manager
+			return 1
+		fi
+		;;
 	upgrade | update | up | distro-sync | dsync | upgrade-minimal)
 		__luft_update_hint
 		return 1

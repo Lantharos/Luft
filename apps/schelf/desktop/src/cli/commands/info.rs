@@ -1,4 +1,5 @@
 use luft_software::appimage;
+use luft_software::toolbox::Repositories;
 
 use crate::cli::Exit;
 use crate::cli::arguments::Arguments;
@@ -110,7 +111,8 @@ fn flathub_app(candidate: &Candidate, apps: &[InstalledApp]) -> Result<(), Strin
 }
 
 fn fedora_package(candidate: &Candidate, apps: &[InstalledApp]) -> Result<(), String> {
-    let details = fedora::details(&candidate.id)?.ok_or("Fedora doesn't have it any more.")?;
+    let details = fedora::details(Repositories::Fedora, &candidate.id)?
+        .ok_or("Fedora doesn't have it any more.")?;
     let installed = installed_version(apps, Origin::Fedora, &details.package);
     let kind = if fedora::graphical(&details.package) {
         Kind::Desktop
@@ -136,6 +138,39 @@ fn fedora_package(candidate: &Candidate, apps: &[InstalledApp]) -> Result<(), St
         )),
     );
     facts.add("Commands", installed.map(|app| app.commands.join(" ")));
+    facts.add("Download", Some(bytes(details.download)));
+    facts.add("Size", Some(bytes(details.size)));
+    facts.add("License", Some(details.license.clone()));
+    facts.add("Website", details.homepage.clone());
+    show(
+        &details.package,
+        &details.summary,
+        facts,
+        &details.description,
+    );
+    Ok(())
+}
+
+fn system_package(candidate: &Candidate, apps: &[InstalledApp]) -> Result<(), String> {
+    let details = fedora::details(Repositories::Added, &candidate.id)?
+        .ok_or("Your software sources don't have it any more.")?;
+    let installed = installed_version(apps, Origin::System, &details.package);
+    let mut facts = Facts(Vec::new());
+    facts.add(
+        "Source",
+        Some(format!(
+            "System package, from {}",
+            candidate.catalog.title()
+        )),
+    );
+    facts.add("Version", Some(details.version.clone()));
+    facts.add(
+        "Installed",
+        Some(installed.map_or_else(
+            || "no".to_owned(),
+            |app| app.version.clone().unwrap_or_else(|| "yes".to_owned()),
+        )),
+    );
     facts.add("Download", Some(bytes(details.download)));
     facts.add("Size", Some(bytes(details.size)));
     facts.add("License", Some(details.license.clone()));
@@ -184,6 +219,7 @@ fn catalog_entry(candidate: &Candidate, apps: &[InstalledApp]) -> Result<(), Str
     match candidate.catalog {
         Catalog::Flathub => flathub_app(candidate, apps),
         Catalog::Fedora => fedora_package(candidate, apps),
+        Catalog::System => system_package(candidate, apps),
     }
 }
 

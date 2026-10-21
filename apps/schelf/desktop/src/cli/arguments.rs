@@ -10,10 +10,11 @@ pub enum Command {
     Info,
     Trust,
     Untrust,
+    Repo,
 }
 
 impl Command {
-    const ALL: [Self; 8] = [
+    const ALL: [Self; 9] = [
         Self::Install,
         Self::Remove,
         Self::Search,
@@ -22,6 +23,7 @@ impl Command {
         Self::Info,
         Self::Trust,
         Self::Untrust,
+        Self::Repo,
     ];
 
     pub fn word(self) -> &'static str {
@@ -34,6 +36,7 @@ impl Command {
             Self::Info => "info",
             Self::Trust => "trust",
             Self::Untrust => "untrust",
+            Self::Repo => "repo",
         }
     }
 
@@ -90,6 +93,17 @@ impl Command {
             Self::Untrust => {
                 "untrust NAME...\n\n\
                  Takes full access away again and puts apps back in their sandbox."
+            }
+            Self::Repo => {
+                "repo add SOURCE  [-y]\n\
+                 \x20      repo remove NAME  [-y]\n\
+                 \x20      repo list\n\n\
+                 Adds a software source for system packages, such as a vendor's RPM\n\
+                 repository: the address of its .repo file, a COPR project as\n\
+                 copr:owner/project, or one Schelf knows by name: 1password, docker,\n\
+                 google-chrome, vscode or claude-desktop. Schelf shows the key its packages\n\
+                 are signed with and asks before adding it. Packages from it then install\n\
+                 with --system and update with Luft. Removing a source removes its packages."
             }
         }
     }
@@ -156,6 +170,7 @@ pub fn parse(arguments: &[String]) -> Result<Request, String> {
             | Command::Info
             | Command::Trust
             | Command::Untrust
+            | Command::Repo
     );
     if needs_words && parsed.words.is_empty() {
         return Err(format!("{} needs a name.", command.word()));
@@ -181,7 +196,8 @@ pub fn help(program: &str, command: Option<Command>) -> String {
          \x20 list                  Show what you installed\n\
          \x20 info NAME             Show details\n\
          \x20 trust NAME...         Give Flatpak apps full access\n\
-         \x20 untrust NAME...       Put them back in their sandbox\n\n\
+         \x20 untrust NAME...       Put them back in their sandbox\n\
+         \x20 repo add|remove|list  Manage software sources for system packages\n\n\
          Options:\n\
          \x20 --flathub, --fedora, --appimage  Use only this source\n\
          \x20 --system              Fedora packages for the whole system, such as services\n\

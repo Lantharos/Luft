@@ -4,14 +4,17 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use gio::prelude::*;
-use luft_app::Commands;
 use luft_app::portal::{FileChooser, Filter};
-use luft_software::{appimage, toolbox};
+use luft_app::{Commands, block_on};
+use luft_software::repositories;
+use luft_software::system::System;
+use luft_software::{appimage, system_packages, toolbox};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 
 use crate::catalog::cache;
 use crate::fedora;
+use crate::library::sources::Bundled;
 
 #[derive(Serialize)]
 #[serde(
@@ -49,6 +52,10 @@ pub enum Opened {
         homepage: Option<String>,
         size: u64,
         installed: bool,
+        system: bool,
+        desktop: Option<String>,
+        repository: Option<Bundled>,
+        repository_error: Option<String>,
     },
     AppImage {
         path: String,
@@ -134,8 +141,22 @@ fn package(path: &str) -> Result<Opened, String> {
     else {
         return Err("This package file is damaged or isn't meant for this computer.".into());
     };
+    let on_image = !fedora::available() && System::current() == System::Image;
+    let (repository, repository_error) = if on_image {
+        match repositories::bundled(path).and_then(|draft| draft.map(Bundled::check).transpose()) {
+            Ok(repository) => (repository, None),
+            Err(error) => (None, Some(error)),
+        }
+    } else {
+        (None, None)
+    };
+    let desktop = repositories::desktop_entry(path)?;
+    let system = on_image && (repository.is_some() || desktop.is_some());
     let installed = if fedora::available() {
         fedora::is_installed(name)
+    } else if system {
+        block_on(system_packages::list())
+            .is_ok_and(|packages| packages.requested.iter().any(|known| known == name))
     } else {
         toolbox::installed().iter().any(|tool| tool.package == name)
     };
@@ -149,6 +170,10 @@ fn package(path: &str) -> Result<Opened, String> {
         homepage: (url != "(none)").then(|| url.to_owned()),
         size: size.parse().unwrap_or(0),
         installed,
+        system,
+        desktop,
+        repository,
+        repository_error,
     })
 }
 

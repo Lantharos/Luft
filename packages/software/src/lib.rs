@@ -12,6 +12,7 @@ pub mod packagekit;
 #[cfg(feature = "system")]
 pub mod packages;
 pub mod progress;
+pub mod repositories;
 pub mod system;
 #[cfg(feature = "system")]
 pub mod system_packages;

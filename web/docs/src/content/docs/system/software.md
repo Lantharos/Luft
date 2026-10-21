@@ -1,18 +1,18 @@
 ---
 title: Installing software
-description: Flatpak apps, AppImages, command-line tools in a Toolbox container, and system packages for services.
+description: Flatpak apps, AppImages, command-line tools in a Toolbox container, and system packages for services and vendors' apps.
 sidebar:
   order: 3
 ---
 
-Luft's system is a sealed image, so apps and tools live next to it, in your account, where updates to the system can't break them and they can't break the system. The few things that have to be part of the system, such as Tailscale or Docker's daemon, are added as system packages. [Schelf](/apps/schelf/) handles all of them.
+Luft's system is a sealed image, so apps and tools live next to it, in your account, where updates to the system can't break them and they can't break the system. The few things that have to be part of the system, such as Tailscale, Docker's daemon or a vendor's app like 1Password, are added as system packages. [Schelf](/apps/schelf/) handles all of them.
 
 | Kind | Where it goes | Updates |
 | --- | --- | --- |
 | Flatpak apps from Flathub | Your account | In Schelf, under Updates, or `schelf update` |
 | AppImages | `~/Applications`, with a menu entry and icon | By themselves, a few minutes after you sign in and every six hours |
 | Command-line tools from Fedora | A Toolbox container, with their commands in `~/.local/bin` | In Schelf, under Updates, or `schelf update` |
-| System packages from Fedora | The system, for everyone on the computer | With Luft, in [Settings](/system/updates/) |
+| System packages from Fedora and the software sources you add | The system, for everyone on the computer | With Luft, in [Settings](/system/updates/) |
 
 Apps and tools don't need an administrator's password, in Schelf or in the terminal. System packages do.
 
@@ -56,7 +56,7 @@ Toolbox containers share your home folder, so files are where you expect them.
 
 ## System packages
 
-Some software only works as part of the system: services that start with the computer, such as Tailscale, Docker or libvirt, and udev rules for devices. These come from Fedora as system packages:
+Some software only works as part of the system: services that start with the computer, such as Tailscale, Docker or libvirt, udev rules for devices, and apps their vendors only ship as packages for the system, such as 1Password. These are system packages, from Fedora or from [software sources you add](#software-sources):
 
 ```sh
 schelf install --system tailscale
@@ -70,11 +70,12 @@ For virtual machines with [virt-manager](https://flathub.org/apps/org.virt_manag
 schelf install --system libvirt-daemon-kvm libvirt-daemon-config-network libvirt-client
 ```
 
-Luft downloads the packages and what they need from Fedora, checks Fedora's signature on every one, and adds them to the system without changing Luft itself, so their services start right away and with every start after. Schelf lists them under Installed, System, where they can be removed too.
+Luft downloads the packages and what they need, checks the signature on every one against Fedora's keys or those of the source it came from, and adds them to the system without changing Luft itself, so their services start right away and with every start after. Schelf lists them under Installed, System, where they can be removed too.
 
 - **Services start by themselves.** Where Fedora has a say, such as starting Docker only when it's first used, that's what happens. Otherwise the services of the packages you asked for start with the computer, while those of packages that only came along stay off until something needs them. To keep one from starting, run `sudo systemctl mask` with its name.
 - **Updates bring them along.** When an update of Luft downloads, the system packages are built again for it, with their newest versions, before you restart. The version before keeps its own copy, so going back to it brings its packages along. If an update starts before they're ready, they're built as soon as the computer is online.
 - **Removing one leaves the system as it was.** Its services stop, and what it added goes: its settings in `/etc`, its data in `/var`, and the users and groups it made. Removing libvirt stops and deletes its virtual machines, and removing Docker its images and containers. A service can still leave something it made on its own in a place nobody could tell was its, such as the empty `/etc/cni` Docker's containerd makes, and network changes such as Docker's bridge last until the next restart.
+- **Users, groups and helpers work.** Packages that make their own group, such as Docker's `docker` or 1Password's `onepassword`, get it on the computer with the same ID their files use, and helpers that need special permissions, such as 1Password's browser integration, keep them. Apps that install into `/opt` work like on Fedora.
 - **The list is yours.** `/var/lib/luft/system-packages/packages` lists the packages you asked for, one per line.
 
 Some packages can't be system packages, and Schelf says why:
@@ -85,6 +86,27 @@ Some packages can't be system packages, and Schelf says why:
 
 Everything else that needs the system to be changed, such as files in `/boot` or the startup image, stays out too.
 
+### Software sources
+
+Vendors that publish Linux apps often keep their own package repository, such as Docker, 1Password, Google, Microsoft or a [COPR](https://copr.fedorainfracloud.org) project. Add one, and its packages install with `--system` like Fedora's and update with Luft:
+
+```sh
+schelf repo add https://download.docker.com/linux/fedora/docker-ce.repo
+schelf repo add copr:scottames/ghostty
+schelf repo add 1password                  # also docker, google-chrome, vscode, claude-desktop
+schelf install --system docker-ce docker-ce-cli containerd.io
+schelf repo list
+schelf repo remove docker-ce
+```
+
+In Schelf, they're under Installed, System, **Software sources**.
+
+Before a source is added, Schelf shows its name, its address and the key its packages are signed with, and asks you to confirm, then for an administrator's password. Only add sources you trust: their packages become part of the system, with full access to the computer. Luft keeps the key it showed you, so packages signed with any other key are refused, and a source has to sign its packages and be reached over HTTPS. That leaves out Stripe's repository, which doesn't sign its packages. The Stripe CLI works as a command-line tool instead: open its `.rpm` file, or run `schelf install ./stripe.rpm`.
+
+Removing a source removes the packages you installed from it, with everything they added. Sources live in `/etc/yum.repos.d` and their keys in `/etc/pki/rpm-gpg`, so `dnf repolist` and `dnf info` see them too.
+
+Opening a desktop app's `.rpm` file, such as 1Password's, Chrome's or ChatGPT's, installs it as a system package. When it comes with its vendor's repository, Schelf shows that repository and its key first, adds it, and installs the app from it, so it keeps getting updates. A desktop app's `.rpm` without a repository is kept and installed again with every update of Luft, but only changes when you install a newer file. `.rpm` files of command-line tools still go into the Toolbox container.
+
 ## In the terminal
 
 The `schelf` command, or `sch` for short, does the same as the app:
@@ -94,10 +116,11 @@ The `schelf` command, or `sch` for short, does the same as the app:
 | `schelf install ripgrep` | Installs an app or a tool, or several at once (`schelf add` works too) |
 | `schelf install ./app.AppImage` | Installs a `.rpm`, `.AppImage`, `.flatpakref` or `.flatpakrepo` file |
 | `schelf remove ripgrep` | Removes something you installed |
-| `schelf search image editor` | Looks on Flathub and in Fedora at once, and through your AppImages |
+| `schelf search image editor` | Looks on Flathub, in Fedora and your software sources at once, and through your AppImages |
 | `schelf update` | Updates apps, AppImages and tools. Luft itself updates in [Settings](/system/updates/) |
 | `schelf list` | Shows what you installed, by where it came from, and the system packages |
-| `schelf install --system tailscale` | Adds a Fedora package to the system ([more](#system-packages)) |
+| `schelf install --system tailscale` | Adds a package to the system, from Fedora or your software sources ([more](#system-packages)) |
+| `schelf repo add copr:scottames/ghostty` | Adds a software source for system packages, after showing its key ([more](#software-sources)) |
 | `schelf info gimp` | Shows the details from every place that has it |
 | `schelf trust 1password` | Gives a Flatpak app [full access](#full-access), after warning you and asking first |
 | `schelf untrust 1password` | Puts it back in its sandbox |
@@ -126,7 +149,7 @@ $ dnf install ripgrep
 Luft installs this with Schelf, into your account. Install ripgrep? [Y/n]
 ```
 
-Removing and searching work the same way. Asking to upgrade the system points to Settings, and read-only commands such as `dnf info`, `dnf list` and `dnf provides` work normally.
+Removing and searching work the same way. `dnf copr enable` and `dnf config-manager addrepo --from-repofile` add a [software source](#software-sources) with Schelf. Asking to upgrade the system points to Settings, and read-only commands such as `dnf info`, `dnf list` and `dnf provides` work normally.
 
 ## Fonts and cursors
 

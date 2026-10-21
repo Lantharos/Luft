@@ -3,6 +3,7 @@ pub mod file;
 pub mod flathub;
 pub mod installed;
 mod resolve;
+pub mod system;
 
 pub use resolve::{Resolved, catalogs, resolve, search};
 
@@ -67,26 +68,32 @@ impl Origin {
 pub enum Catalog {
     Flathub,
     Fedora,
+    System,
 }
 
 impl Catalog {
-    pub const ALL: [Self; 2] = [Self::Flathub, Self::Fedora];
+    pub const ALL: [Self; 3] = [Self::Flathub, Self::Fedora, Self::System];
 
     pub fn origin(self) -> Origin {
         match self {
             Self::Flathub => Origin::Flathub,
             Self::Fedora => Origin::Fedora,
+            Self::System => Origin::System,
         }
     }
 
     pub fn title(self) -> &'static str {
-        self.origin().title()
+        match self {
+            Self::System => system::TITLE,
+            _ => self.origin().title(),
+        }
     }
 
     pub fn search(self, query: &str) -> Result<Vec<Candidate>, String> {
         match self {
             Self::Flathub => flathub::search(query),
             Self::Fedora => fedora::search(query),
+            Self::System => system::search(query),
         }
     }
 
@@ -94,6 +101,7 @@ impl Catalog {
         match self {
             Self::Flathub => flathub::find(name),
             Self::Fedora => fedora::find(name),
+            Self::System => system::find(name),
         }
     }
 
@@ -104,6 +112,7 @@ impl Catalog {
                 Job::InstallFlathub { id: id.to_owned() },
             ),
             Self::Fedora => fedora::install(id),
+            Self::System => system::install(id),
         }
     }
 }
@@ -112,6 +121,7 @@ impl Catalog {
 pub enum Kind {
     Desktop,
     Command,
+    System,
 }
 
 impl Kind {
@@ -119,6 +129,7 @@ impl Kind {
         match self {
             Self::Desktop => "desktop app",
             Self::Command => "command-line tool",
+            Self::System => "system package",
         }
     }
 }

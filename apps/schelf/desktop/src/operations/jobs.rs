@@ -2,6 +2,7 @@ use std::path::PathBuf;
 
 use luft_app::block_on;
 use luft_software::flatpak::{self, FLATHUB, Installation};
+use luft_software::repositories::{self, Draft};
 use luft_software::task::Task;
 use luft_software::{appimage, system_packages, toolbox};
 use serde::{Deserialize, Serialize};
@@ -68,6 +69,14 @@ pub enum Job {
     RemoveSystemPackages {
         packages: Vec<String>,
     },
+    InstallSystemPackageFile {
+        path: String,
+        package: String,
+        repository: Option<Draft>,
+    },
+    RemoveRepository {
+        file: String,
+    },
     #[serde(untagged)]
     Fedora(fedora::Job),
 }
@@ -81,11 +90,13 @@ impl Job {
             | Self::InstallAppImage { .. }
             | Self::InstallTool { .. }
             | Self::InstallToolFile { .. }
-            | Self::InstallSystemPackages { .. } => Action::Install,
+            | Self::InstallSystemPackages { .. }
+            | Self::InstallSystemPackageFile { .. } => Action::Install,
             Self::RemoveFlatpak { .. }
             | Self::RemoveAppImage { .. }
             | Self::RemoveTool { .. }
-            | Self::RemoveSystemPackages { .. } => Action::Remove,
+            | Self::RemoveSystemPackages { .. }
+            | Self::RemoveRepository { .. } => Action::Remove,
             Self::UpdateFlatpaks { .. }
             | Self::UpdateAppImage { .. }
             | Self::UpdateTools { .. } => Action::Update,
@@ -135,6 +146,24 @@ impl Job {
             }
             Self::RemoveSystemPackages { packages } => {
                 block_on(system_packages::remove(packages, task))
+            }
+            Self::InstallSystemPackageFile {
+                path,
+                package,
+                repository,
+            } => block_on(async {
+                match repository {
+                    Some(draft) => {
+                        if !repositories::is_added(draft) {
+                            system_packages::add_repository(draft).await?;
+                        }
+                        system_packages::install(std::slice::from_ref(package), task).await
+                    }
+                    None => system_packages::install_file(path, task).await,
+                }
+            }),
+            Self::RemoveRepository { file } => {
+                block_on(system_packages::remove_repository(file, task))
             }
             Self::Fedora(job) => job.run(task),
         }

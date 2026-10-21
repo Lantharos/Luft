@@ -1,6 +1,7 @@
 mod appimages;
 mod flatpaks;
 pub mod full_access;
+pub mod sources;
 mod system;
 mod tools;
 
@@ -93,7 +94,7 @@ fn permissions(
 }
 
 pub fn register(window: SabineWindow) -> SabineWindow {
-    window
+    sources::register(window)
         .command("library_installed", |_: Value| Ok(installed()))
         .command("library_launch", launch)
         .command("library_permissions", permissions)

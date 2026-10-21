@@ -9,6 +9,7 @@
 	import OpenFile from '#lib/pages/file/OpenFile.svelte';
 	import Installed from '#lib/pages/installed/Installed.svelte';
 	import Search from '#lib/pages/search/Search.svelte';
+	import Sources from '#lib/pages/sources/Sources.svelte';
 	import Updates from '#lib/pages/updates/Updates.svelte';
 	import { start } from '#lib/state/app.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
@@ -64,6 +65,8 @@
 							<AppPage target={entry.target} name={entry.name} />
 						{:else if entry.page === 'file'}
 							<OpenFile path={entry.path} />
+						{:else if entry.page === 'sources'}
+							<Sources />
 						{/if}
 					</div>
 				{/each}

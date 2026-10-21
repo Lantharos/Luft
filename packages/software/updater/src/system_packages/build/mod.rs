@@ -1,5 +1,8 @@
+mod accounts;
 mod checks;
+mod download;
 mod install;
+mod made;
 mod rpm;
 mod stage;
 mod units;
@@ -11,10 +14,11 @@ use std::os::unix::ffi::OsStrExt;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-use anyhow::{Context, Result, anyhow};
+use anyhow::{Context, Result};
 
 use super::manifest::{Build, Package};
 use super::requested::Requested;
+use super::sources::Sources;
 use super::{NAME, Step, declared, deployment};
 use crate::command::run;
 use stage::Layout;
@@ -22,7 +26,6 @@ use stage::Layout;
 pub const CACHE: &str = "/var/cache/luft/system-packages";
 const WORK: &str = "/var/tmp/luft-system-packages.XXXXXX";
 const WORK_PREFIX: &str = "luft-system-packages.";
-const PERSIST: &str = "var/lib/dnf";
 pub const LIBRARY_CACHE: &str = "/etc/ld.so.cache";
 const RELEASE: &str = "usr/lib/extension-release.d";
 
@@ -108,37 +111,6 @@ fn os_release(tree: &Path) -> Result<OsRelease> {
     })
 }
 
-fn download(root: &Path, release: &str, requested: &Requested, into: &Path) -> Result<()> {
-    run(Command::new("dnf")
-        .arg(format!("--installroot={}", root.display()))
-        .arg(format!("--releasever={release}"))
-        .arg(format!(
-            "--setopt=persistdir={}",
-            root.join(PERSIST).display()
-        ))
-        .args([
-            "--setopt=install_weak_deps=False",
-            "--setopt=countme=False",
-            "--assumeyes",
-            "--quiet",
-            "download",
-            "--resolve",
-        ])
-        .arg(format!("--destdir={}", into.display()))
-        .args(requested))
-    .map_err(|error| {
-        let message = error.to_string();
-        match message
-            .strip_prefix("No package \"")
-            .and_then(|rest| rest.split('"').next())
-        {
-            Some(name) => anyhow!("Fedora has no package called {name}."),
-            None => error,
-        }
-    })
-    .map(drop)
-}
-
 fn release(stage: &Path, os: &OsRelease) -> Result<()> {
     let folder = stage.join(RELEASE);
     fs::create_dir_all(&folder)?;
@@ -190,10 +162,12 @@ fn entries(folder: &Path, extension: &str) -> Vec<String> {
 }
 
 /// Builds the system packages in `requested` for the deployment `digest` into `image`, from
-/// Fedora's repositories for that deployment's version, against the packages it has.
+/// Fedora's repositories for that deployment's version and `sources`, against the packages it
+/// has.
 pub fn build(
     digest: &str,
     requested: &Requested,
+    sources: &Sources,
     image_path: &Path,
     step: &dyn Fn(Step),
 ) -> Result<Build> {
@@ -224,18 +198,22 @@ pub fn build(
     work.mounted(&cache);
 
     let os = os_release(&tree)?;
+    download::offer(&root, sources)?;
     step(Step::Downloading);
-    download(&root, &os.version_id, requested, &rpms_folder)?;
-    let mut rpms = fs::read_dir(&rpms_folder)?
-        .flatten()
-        .map(|entry| rpm::query(&entry.path()))
+    let origins = download::download(&root, &os.version_id, requested, sources, &rpms_folder)?;
+    let mut rpms = origins
+        .into_iter()
+        .map(|(path, origin)| rpm::query(&path).map(|rpm| rpm::Rpm { origin, ..rpm }))
         .collect::<Result<Vec<_>>>()?;
     rpms.sort_by(|left, right| left.name.cmp(&right.name));
     let base: BTreeSet<String> = rpm::installed(&root)?.into_iter().collect();
     checks::check(requested, &rpms, &base)?;
 
     step(Step::Building);
+    let made_before = super::footprint()?;
+    let seeded = accounts::seed(&root, made_before.users(), made_before.groups())?;
     install::install(&root, &os.version_id, &rpms_folder, &rpms)?;
+    let accounts = accounts::collect(&root, &seeded)?;
     let layout = Layout {
         lower: &tree,
         root: &root,
@@ -245,6 +223,8 @@ pub fn build(
     let enabled = stage::enable(&layout, &rpms, requested)?;
     stage::merged(&layout, &rpms)?;
     let placed = stage::placed(&layout, &rpms)?;
+    made::made(&layout, &rpms)?;
+    accounts::settle(&stage_folder, &accounts, &seeded)?;
     release(&stage_folder, &os)?;
     let names = rpms
         .iter()
@@ -281,6 +261,8 @@ pub fn build(
                 summary: rpm.summary.clone(),
                 requested: requested.contains(&rpm.name),
                 units: enabled.units.get(&rpm.name).cloned().unwrap_or_default(),
+                apps: rpm.apps(),
+                origin: rpm.origin.clone(),
             })
             .collect(),
         enabled: enabled.enabled,

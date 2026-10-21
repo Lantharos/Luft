@@ -1,7 +1,8 @@
+use luft_software::repositories;
 use luft_software::system::System;
 
 use crate::cli::Exit;
-use crate::cli::arguments::{Arguments, Command};
+use crate::cli::arguments::Arguments;
 use crate::cli::perform::{Plan, Verb, carry_out};
 use crate::cli::sources::{Origin, installed};
 use crate::cli::terminal::Ink;
@@ -23,7 +24,13 @@ fn plan(packages: Vec<String>, verb: Verb) -> Plan {
             members: Vec::new(),
         },
         verb,
-        from: (verb == Verb::Install).then(|| "Fedora into the system".to_owned()),
+        from: (verb == Verb::Install).then(|| {
+            if repositories::added_ids().is_empty() {
+                "Fedora into the system".to_owned()
+            } else {
+                "Fedora and your software sources into the system".to_owned()
+            }
+        }),
     }
 }
 
@@ -65,14 +72,9 @@ pub fn removal(packages: Vec<String>) -> Plan {
     plan(packages, Verb::Remove)
 }
 
-pub fn explain(command: Command) -> Exit {
-    match command {
-        Command::Update => eprintln!(
-            "System packages update with Luft, in Settings, under Updates. Every update brings their newest versions."
-        ),
-        _ => eprintln!(
-            "--system works with install, remove and list. System packages come from Fedora, so look for them with --fedora."
-        ),
-    }
+pub fn explain_updates() -> Exit {
+    eprintln!(
+        "System packages update with Luft, in Settings, under Updates. Every update brings their newest versions."
+    );
     Exit::Usage
 }

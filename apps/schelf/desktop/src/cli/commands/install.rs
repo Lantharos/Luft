@@ -58,6 +58,13 @@ fn prepare(target: &str, only: Option<Catalog>, yes: bool) -> Result<Option<Plan
             println!("{} is already installed.", ink.bold(prepared.plan.name()));
             return Ok(None);
         }
+        if let Some(described) = &prepared.trust {
+            eprintln!(
+                "{} gets its updates from a software source of its own:",
+                ink.bold(prepared.plan.name())
+            );
+            super::repo::confirm_trust(described, yes)?;
+        }
         return Ok(Some(prepared.plan));
     }
     let line = Line::default();
@@ -141,6 +148,13 @@ fn notes(plan: &Plan) -> Vec<String> {
         Job::InstallFlatpakRef { .. } | Job::InstallAppImage { .. } => {
             vec!["Open it from Start.".to_owned()]
         }
+        Job::InstallSystemPackageFile {
+            repository: Some(_),
+            ..
+        } => vec!["It's part of the system now, and updates with Luft.".to_owned()],
+        Job::InstallSystemPackageFile { .. } => vec![
+            "It's part of the system now. It doesn't get updates of its own, so remove it and install a newer file when one comes out.".to_owned(),
+        ],
         _ => Vec::new(),
     }
 }

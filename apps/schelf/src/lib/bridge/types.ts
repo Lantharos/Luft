@@ -55,6 +55,30 @@ export interface ToolSummary {
 	summary: string;
 }
 
+export interface SourceKey {
+	fingerprint: string;
+	user: string;
+}
+
+export interface RepositoryDraft {
+	file: string;
+	text: string;
+	keys: Record<string, string>;
+}
+
+export interface CheckedSource {
+	draft: RepositoryDraft;
+	described: { file: string; sources: { id: string; name: string; url: string }[]; keys: SourceKey[] };
+	added: boolean;
+}
+
+export interface AddedSource {
+	file: string;
+	name: string;
+	url: string;
+	packages: string[];
+}
+
 export interface Permissions {
 	shared: string[];
 	sockets: string[];
@@ -141,12 +165,30 @@ export type Job =
 	| { kind: 'updatePackages'; packages: string[] }
 	| { kind: 'updateAppImage'; id: string }
 	| { kind: 'updateTools'; packages: string[] }
-	| { kind: 'removeSystemPackages'; packages: string[] };
+	| { kind: 'installSystemPackages'; packages: string[] }
+	| { kind: 'installSystemPackageFile'; path: string; package: string; repository: RepositoryDraft | null }
+	| { kind: 'removeSystemPackages'; packages: string[] }
+	| { kind: 'removeRepository'; file: string };
 
 export type OpenedFile =
 	| { kind: 'flatpakRef'; path: string; id: string; title: string; branch: string | null; url: string; runtime: boolean; summary: string | null; homepage: string | null; icon: string | null }
 	| { kind: 'flatpakRepo'; path: string; name: string; title: string; url: string; summary: string | null; homepage: string | null }
-	| { kind: 'package'; path: string; package: string; version: string; summary: string; description: string; license: string; homepage: string | null; size: number; installed: boolean }
+	| {
+			kind: 'package';
+			path: string;
+			package: string;
+			version: string;
+			summary: string;
+			description: string;
+			license: string;
+			homepage: string | null;
+			size: number;
+			installed: boolean;
+			system: boolean;
+			desktop: string | null;
+			repository: CheckedSource | null;
+			repositoryError: string | null;
+	  }
 	| { kind: 'appImage'; path: string; name: string; summary: string | null; version: string | null; icon: string | null; size: number };
 
 export interface Backend {
@@ -160,6 +202,10 @@ export interface Backend {
 	launch(desktop: string): Promise<void>;
 	fedoraRemovalPlan(packageName: string): Promise<string[]>;
 	searchTools(query: string): Promise<ToolSummary[]>;
+	searchSystem(query: string): Promise<ToolSummary[]>;
+	sources(): Promise<AddedSource[]>;
+	fetchSource(source: string): Promise<CheckedSource>;
+	addSource(draft: RepositoryDraft): Promise<void>;
 	permissions(installation: Installation, reference: string): Promise<Permissions>;
 	fullAccess(id: string): Promise<boolean>;
 	setFullAccess(id: string, on: boolean): Promise<void>;

@@ -79,6 +79,14 @@ impl Footprint {
         super::replace(path, &serde_json::to_vec_pretty(self)?)
     }
 
+    pub fn users(&self) -> &BTreeSet<String> {
+        &self.users
+    }
+
+    pub fn groups(&self) -> &BTreeSet<String> {
+        &self.groups
+    }
+
     pub fn note(&mut self, declared: &Declared) {
         self.paths.extend(
             declared

@@ -35,6 +35,16 @@
     </defaults>
   </action>
 
+  <action id="com.lantharos.updater.software-sources">
+    <description>Add or remove software sources for system packages</description>
+    <message>Authentication is required to change where system packages come from</message>
+    <defaults>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+  </action>
+
   <action id="com.lantharos.updater.trust-app">
     <description>Give an app full access or take it away</description>
     <message>Authentication is required to change which apps have full access</message>

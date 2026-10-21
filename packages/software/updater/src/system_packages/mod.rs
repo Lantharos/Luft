@@ -5,7 +5,10 @@ mod deployment;
 mod footprint;
 mod manifest;
 mod namespace;
+mod repositories;
 mod requested;
+mod sources;
+mod third_party;
 
 use std::fs::{self, File};
 use std::io::ErrorKind;
@@ -22,6 +25,7 @@ use deployment::Slot;
 use footprint::Footprint;
 use manifest::{Build, Declared};
 use requested::Requested;
+use sources::Sources;
 
 pub const NAME: &str = "luft-system-packages";
 pub const IMAGE: &str = "luft-system-packages.raw";
@@ -45,6 +49,8 @@ impl Step {
         }
     }
 }
+
+pub use third_party::{add_repository, describe_repository, install_file, remove_repository};
 
 pub type Report = Arc<dyn Fn(Step) + Send + Sync>;
 
@@ -91,10 +97,11 @@ fn load(folder: &Path) -> Option<Build> {
     Build::load(&folder.join(MANIFEST)).ok()
 }
 
-fn current_for(digest: &str, requested: &Requested) -> Option<PathBuf> {
+fn current_for(digest: &str, requested: &Requested, sources: &Sources) -> Option<PathBuf> {
     let folder = folder(digest, "");
     let build = load(&folder)?;
-    (build.requested == *requested && folder.join(IMAGE).exists()).then_some(folder)
+    (build.requested == *requested && sources.cover(&build) && folder.join(IMAGE).exists())
+        .then_some(folder)
 }
 
 fn remove_folder(path: &Path) -> Result<()> {
@@ -106,17 +113,24 @@ fn remove_folder(path: &Path) -> Result<()> {
     }
 }
 
-fn build_into(digest: &str, requested: &Requested, report: &Report) -> Result<Build> {
+fn build_into(
+    digest: &str,
+    requested: &Requested,
+    sources: &Sources,
+    report: &Report,
+) -> Result<Build> {
     let partial = folder(digest, ".new");
     remove_folder(&partial)?;
     fs::create_dir_all(&partial)?;
-    let (digest, wanted, report, image) = (
+    let (digest, wanted, sources, report, image) = (
         digest.to_owned(),
         requested.clone(),
+        sources.clone(),
         report.clone(),
         partial.join(IMAGE),
     );
-    let built = namespace::isolated(move || build::build(&digest, &wanted, &image, &*report));
+    let built =
+        namespace::isolated(move || build::build(&digest, &wanted, &sources, &image, &*report));
     let build = match built {
         Ok(build) => build,
         Err(error) => {
@@ -188,12 +202,12 @@ fn forget() -> Result<()> {
     Ok(())
 }
 
-fn activate(digest: &str, requested: &Requested, report: &Report) -> Result<()> {
+fn activate(digest: &str, requested: &Requested, sources: &Sources, report: &Report) -> Result<()> {
     let old = activate::linked().and_then(|folder| load(&folder));
     if requested.is_empty() {
         return deactivate(old.as_ref());
     }
-    let build = build_into(digest, requested, report)?;
+    let build = build_into(digest, requested, sources, report)?;
     report(Step::Starting);
     let mut footprint = footprint()?;
     footprint.note(&build.declared);
@@ -253,18 +267,18 @@ fn relink(digest: &str, old: Option<&Build>) -> Result<()> {
     activate::link(Some(&current))
 }
 
-fn prepare_others(requested: &Requested) {
+fn prepare_others(requested: &Requested, sources: &Sources) {
     let others = deployment::all().map(|all| {
         all.into_iter()
             .filter(|deployment| deployment.slot != Slot::Booted)
             .collect::<Vec<_>>()
     });
     for other in others.unwrap_or_default() {
-        if requested.is_empty() || current_for(&other.digest, requested).is_some() {
+        if requested.is_empty() || current_for(&other.digest, requested, sources).is_some() {
             continue;
         }
-        if let Err(error) =
-            build_into(&other.digest, requested, &quiet()).and_then(|_| swap_in(&other.digest))
+        if let Err(error) = build_into(&other.digest, requested, sources, &quiet())
+            .and_then(|_| swap_in(&other.digest))
         {
             eprintln!(
                 "Preparing the system packages for {}: {error:#}",
@@ -278,15 +292,18 @@ fn booted() -> Result<String> {
     deployment::booted().context("System packages need a sealed Luft system.")
 }
 
-/// Adds and removes system packages, then makes the running system and the other versions on
-/// the computer use the new set.
-pub fn change(add: &[String], remove: &[String], report: Report) -> Result<()> {
-    let _lock = Lock::take()?;
-    let path = state("packages");
-    let current = requested::load(&path)?;
-    let changed = requested::changed(&current, add, remove).and_then(|next| {
-        activate(&booted()?, &next, &report)?;
-        requested::save(&path, &next)?;
+/// Adds and removes system packages with the sources in `sources`, then makes the running
+/// system and the other versions on the computer use the new set.
+fn change_locked(
+    current: &Requested,
+    add: &[String],
+    remove: &[String],
+    sources: &Sources,
+    report: &Report,
+) -> Result<()> {
+    let changed = requested::changed(current, add, remove).and_then(|next| {
+        activate(&booted()?, &next, sources, report)?;
+        requested::save(&state("packages"), &next)?;
         Ok(next)
     });
     let next = match changed {
@@ -298,19 +315,38 @@ pub fn change(add: &[String], remove: &[String], report: Report) -> Result<()> {
             return Err(error);
         }
     };
-    prepare_others(&next);
+    sources::discard(remove)?;
+    prepare_others(&next, sources);
     prune()
+}
+
+fn requested_now() -> Result<Requested> {
+    requested::load(&state("packages"))
+}
+
+/// Adds and removes system packages, then makes the running system and the other versions on
+/// the computer use the new set.
+pub fn change(add: &[String], remove: &[String], report: Report) -> Result<()> {
+    let _lock = Lock::take()?;
+    change_locked(
+        &requested_now()?,
+        add,
+        remove,
+        &Sources::current(None),
+        &report,
+    )
 }
 
 /// Builds the system packages for a newly staged version, so they're ready when it starts.
 pub fn prepare_staged() -> Result<()> {
     let _lock = Lock::take()?;
-    let requested = requested::load(&state("packages"))?;
+    let requested = requested_now()?;
+    let sources = Sources::current(None);
     if let Some(staged) = deployment::find(Slot::Staged)?
         && !requested.is_empty()
-        && current_for(&staged.digest, &requested).is_none()
+        && current_for(&staged.digest, &requested, &sources).is_none()
     {
-        build_into(&staged.digest, &requested, &quiet())?;
+        build_into(&staged.digest, &requested, &sources, &quiet())?;
         swap_in(&staged.digest)?;
     }
     prune()
@@ -319,11 +355,11 @@ pub fn prepare_staged() -> Result<()> {
 /// At startup, before systemd-sysext merges: offers the build made for this version, or queues
 /// one to be made once the network is up.
 pub fn link() -> Result<()> {
-    let requested = requested::load(&state("packages"))?;
+    let requested = requested_now()?;
     if requested.is_empty() {
         return Ok(());
     }
-    match current_for(&booted()?, &requested) {
+    match current_for(&booted()?, &requested, &Sources::current(None)) {
         Some(folder) => activate::link(Some(&folder)),
         None => {
             run(Command::new("systemctl").args(["start", "--no-block", REBUILD_UNIT])).map(drop)
@@ -349,17 +385,19 @@ pub fn settle() -> Result<()> {
 /// Builds the system packages for this version when it started without them.
 pub fn rebuild() -> Result<()> {
     let _lock = Lock::take()?;
-    let requested = requested::load(&state("packages"))?;
-    if current_for(&booted()?, &requested).is_none() {
-        activate(&booted()?, &requested, &quiet())?;
+    let requested = requested_now()?;
+    let sources = Sources::current(None);
+    if current_for(&booted()?, &requested, &sources).is_none() {
+        activate(&booted()?, &requested, &sources, &quiet())?;
     }
-    prepare_others(&requested);
+    prepare_others(&requested, &sources);
     prune()
 }
 
-/// The system packages and what the running system has merged, as JSON.
+/// The system packages, what the running system has merged and the repositories that were
+/// added, as JSON.
 pub fn list() -> Result<String> {
-    let requested = requested::load(&state("packages"))?;
+    let requested = requested_now()?;
     let merged = activate::linked().and_then(|folder| load(&folder));
     let packages = merged
         .as_ref()
@@ -370,6 +408,7 @@ pub fn list() -> Result<String> {
         "packages": packages,
         "services": merged.as_ref().map(|build| &build.enabled[..]).unwrap_or_default(),
         "pending": merged.map(|build| build.requested).unwrap_or_default() != requested,
+        "repositories": repositories::list(),
     })
     .to_string())
 }

@@ -47,8 +47,9 @@ Changing the image needs root, so the image side talks to `luft-updater` (in [`u
 | `packages` | Installing, removing and updating Fedora packages through PackageKit |
 | `image` | `Deployments` (`load`, `status`, `check`, `lacks`, `variant_offer`, `switch_size`), `download`, `switch`, `rollback`, and `downloading`, `follow` and `changes` for a download started anywhere |
 | `variant` | [`luft-variant`](../../packages/variant/README.md), which image suits this computer |
-| `system_packages` | `list`, `install` and `remove` Fedora packages merged over an image system as a system extension, through `luft-updater` |
-| `toolbox` | `available` lists Fedora's packages; `install`, `install_file`, `remove`, `installed`, `updates` and `update` manage them in the default Toolbox container, with their commands in `~/.local/bin` |
+| `system_packages` | `list`, `install`, `install_file` and `remove` packages merged over an image system as a system extension, through `luft-updater`, and `describe`, `add_repository` and `remove_repository` for the software sources they come from besides Fedora |
+| `repositories` | `fetch` gets a repository file from the address of a `.repo` file, `copr:owner/project` or a vendor in `KNOWN`, with the keys it names, as a `Draft`; `bundled` reads the one a package file ships or its scriptlets write, `desktop_entry` the menu entry a package file brings, and `added_ids` and `is_added` what's added already |
+| `toolbox` | `available` lists Fedora's packages, or those of the added software sources; `install`, `install_file`, `remove`, `installed`, `updates` and `update` manage them in the default Toolbox container, with their commands in `~/.local/bin` |
 | `classify` | `Classification::current()`, with `is_app`, `desktop_ids` and `apps`; cached until the RPM database or the applications folder changes |
 | `updates` | `PackageUpdates` (`load`, `apps`, `system`), `appimages()` for AppImages with an update, and `app_count` for every app update including Flatpak and AppImage |
 | `packagekit` | `refresh`, `updates`, `resolve`, `resolve_available`, `details`, `install`, `install_file`, `removal_plan`, `remove`, `update`, `prepare` and `follow`; `Mode` (`Quiet`, `Interactive`, `Background`), `Package`, `PackageId`, `PackageDetails`, `Update` and the `filter` flags |
@@ -89,4 +90,4 @@ On image systems Schelf installs Fedora packages into the default Toolbox contai
 
 ## System packages
 
-`luft-updater` also builds the system packages: Fedora packages merged over the image as one system extension, rebuilt for every version on the computer, including an update right after it downloads. [System packages](../system-packages.md) explains how. Changing them always asks for an administrator's password.
+`luft-updater` also builds the system packages: packages from Fedora, from software sources that were added and from package files, merged over the image as one system extension, rebuilt for every version on the computer, including an update right after it downloads. [System packages](../system-packages.md) explains how. Changing them, or the software sources, always asks for an administrator's password.

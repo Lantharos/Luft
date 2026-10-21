@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 use std::process::{Command, Stdio};
 
-use luft_software::toolbox::{self, Available};
+use luft_software::toolbox::{self, Available, Repositories};
 
 use super::{Candidate, Catalog, Kind};
 use crate::catalog::tools;
@@ -109,10 +109,14 @@ pub fn find(name: &str) -> Result<Vec<Candidate>, String> {
     Ok(candidates(tools::find(name)?.into_iter().collect()))
 }
 
-fn repoquery(arguments: &[&str]) -> Result<String, String> {
+fn repoquery(repositories: Repositories, arguments: &[&str]) -> Result<String, String> {
+    let Some(choice) = repositories.option() else {
+        return Ok(String::new());
+    };
     let architectures = format!("--arch=noarch,{}", std::env::consts::ARCH);
     let output = Command::new("dnf")
         .args(["repoquery", "--quiet", "--latest-limit=1"])
+        .args(choice)
         .arg(architectures)
         .args(arguments)
         .env("LC_ALL", "C.UTF-8")
@@ -128,7 +132,7 @@ fn repoquery(arguments: &[&str]) -> Result<String, String> {
 }
 
 pub fn graphical(package: &str) -> bool {
-    repoquery(&["--requires", package]).is_ok_and(|requires| {
+    repoquery(Repositories::Fedora, &["--requires", package]).is_ok_and(|requires| {
         requires.lines().any(|requirement| {
             GRAPHICAL
                 .iter()
@@ -141,8 +145,10 @@ fn without_epoch(version: &str) -> &str {
     version.split_once(':').map_or(version, |(_, rest)| rest)
 }
 
-pub fn details(package: &str) -> Result<Option<Details>, String> {
-    let text = repoquery(&["--queryformat", DETAILS, package])?;
+/// The details of `package` from Fedora, or from the repositories that were added for system
+/// packages.
+pub fn details(repositories: Repositories, package: &str) -> Result<Option<Details>, String> {
+    let text = repoquery(repositories, &["--queryformat", DETAILS, package])?;
     let mut fields = text.splitn(8, '\t').map(str::trim);
     let mut field = || fields.next().unwrap_or_default().to_owned();
     let name = field();

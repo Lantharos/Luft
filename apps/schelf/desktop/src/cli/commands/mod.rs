@@ -2,6 +2,7 @@ mod info;
 mod install;
 mod list;
 mod remove;
+pub mod repo;
 mod search;
 mod system;
 mod trust;
@@ -16,9 +17,7 @@ pub fn run(arguments: &Arguments) -> Exit {
     let system = arguments.only == Some(Origin::System);
     match arguments.command {
         Command::Install if system => system::install(arguments),
-        Command::Search | Command::Info | Command::Update if system => {
-            system::explain(arguments.command)
-        }
+        Command::Update if system => system::explain_updates(),
         Command::Install => install::run(arguments),
         Command::Remove => remove::run(arguments),
         Command::Search => search::run(arguments),
@@ -27,6 +26,7 @@ pub fn run(arguments: &Arguments) -> Exit {
         Command::Info => info::run(arguments),
         Command::Trust => trust::run(arguments, true),
         Command::Untrust => trust::run(arguments, false),
+        Command::Repo => repo::run(arguments),
     }
 }
 

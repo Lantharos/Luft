@@ -1,7 +1,9 @@
+use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
-use luft_software::toolbox::{self, Available};
+use luft_software::repositories;
+use luft_software::toolbox::{self, Available, Repositories};
 
 use super::cache::Entry;
 
@@ -9,17 +11,27 @@ const FRESH_FOR: Duration = Duration::from_secs(24 * 60 * 60);
 const SHOWN: usize = 20;
 const SHORTEST_QUERY: usize = 2;
 
-static INDEX: Mutex<Option<Arc<Vec<Available>>>> = Mutex::new(None);
+type Index = Arc<Vec<Available>>;
 
-fn load() -> Result<Vec<Available>, String> {
-    let entry = Entry::new("tools", "fedora");
+static INDEXES: Mutex<Option<HashMap<String, Index>>> = Mutex::new(None);
+
+/// The cache key of what's in `repositories`, which changes with the repositories added.
+fn key(repositories: Repositories) -> String {
+    match repositories {
+        Repositories::Fedora => "fedora".to_owned(),
+        Repositories::Added => format!("added-{}", repositories::added_ids().join("-")),
+    }
+}
+
+fn load(repositories: Repositories, key: &str) -> Result<Vec<Available>, String> {
+    let entry = Entry::new("tools", key);
     if let Some(index) = entry
         .fresh(FRESH_FOR)
         .and_then(|text| serde_json::from_str(&text).ok())
     {
         return Ok(index);
     }
-    match toolbox::available() {
+    match toolbox::available(repositories) {
         Ok(index) => {
             if let Ok(text) = serde_json::to_string(&index) {
                 entry.store(&text);
@@ -33,24 +45,30 @@ fn load() -> Result<Vec<Available>, String> {
     }
 }
 
-fn index() -> Result<Arc<Vec<Available>>, String> {
-    let mut slot = INDEX
+fn index(repositories: Repositories) -> Result<Index, String> {
+    let key = key(repositories);
+    let mut slot = INDEXES
         .lock()
         .unwrap_or_else(|poisoned| poisoned.into_inner());
-    if let Some(index) = slot.as_ref() {
+    let indexes = slot.get_or_insert_with(HashMap::new);
+    if let Some(index) = indexes.get(&key) {
         return Ok(index.clone());
     }
-    let index = Arc::new(load()?);
-    *slot = Some(index.clone());
+    let index = Arc::new(load(repositories, &key)?);
+    indexes.insert(key, index.clone());
     Ok(index)
 }
 
-pub fn find(package: &str) -> Result<Option<Available>, String> {
-    let index = index()?;
+pub fn find_in(repositories: Repositories, package: &str) -> Result<Option<Available>, String> {
+    let index = index(repositories)?;
     Ok(index
         .binary_search_by(|tool| tool.package.as_str().cmp(package))
         .ok()
         .map(|position| index[position].clone()))
+}
+
+pub fn find(package: &str) -> Result<Option<Available>, String> {
+    find_in(Repositories::Fedora, package)
 }
 
 fn rank(tool: &Available, needle: &str) -> Option<u8> {
@@ -68,12 +86,12 @@ fn rank(tool: &Available, needle: &str) -> Option<u8> {
     }
 }
 
-pub fn search(query: &str) -> Result<Vec<Available>, String> {
+pub fn search_in(repositories: Repositories, query: &str) -> Result<Vec<Available>, String> {
     let needle = query.trim().to_lowercase();
     if needle.chars().count() < SHORTEST_QUERY {
         return Ok(Vec::new());
     }
-    let index = index()?;
+    let index = index(repositories)?;
     let mut found: Vec<(u8, &Available)> = index
         .iter()
         .filter_map(|tool| Some((rank(tool, &needle)?, tool)))
@@ -86,4 +104,8 @@ pub fn search(query: &str) -> Result<Vec<Available>, String> {
         .take(SHOWN)
         .map(|(_, tool)| tool.clone())
         .collect())
+}
+
+pub fn search(query: &str) -> Result<Vec<Available>, String> {
+    search_in(Repositories::Fedora, query)
 }

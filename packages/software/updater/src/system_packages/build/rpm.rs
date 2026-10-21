@@ -4,6 +4,7 @@ use std::process::Command;
 use anyhow::{Context, Result};
 
 use crate::command::text;
+use crate::system_packages::manifest::Origin;
 
 const QUERY: &str = "%{NAME}\\t%|EPOCH?{%{EPOCH}:}:{}|%{VERSION}-%{RELEASE}\\t%{ARCH}\\t%{SUMMARY}\\n\
 [%{FILENAMES}\\t%{FILEUSERNAME}\\t%{FILEGROUPNAME}\\t%{FILEMODES}\\t%{FILEFLAGS}\\n]";
@@ -28,6 +29,21 @@ pub struct Rpm {
     pub arch: String,
     pub summary: String,
     pub files: Vec<File>,
+    pub origin: Origin,
+}
+
+const APPLICATIONS: &str = "/usr/share/applications/";
+
+impl Rpm {
+    /// The app menu entries the package brings.
+    pub fn apps(&self) -> Vec<String> {
+        self.files
+            .iter()
+            .filter_map(|file| file.path.strip_prefix(APPLICATIONS))
+            .filter(|name| name.ends_with(".desktop") && !name.contains('/'))
+            .map(str::to_owned)
+            .collect()
+    }
 }
 
 pub fn parse(path: &Path, output: &str) -> Option<Rpm> {
@@ -58,6 +74,7 @@ pub fn parse(path: &Path, output: &str) -> Option<Rpm> {
         arch: arch.to_owned(),
         summary: summary.to_owned(),
         files,
+        origin: Origin::Fedora,
     })
 }
 

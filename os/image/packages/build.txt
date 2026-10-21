@@ -1,4 +1,3 @@
-alsa-lib-devel
 at-spi2-atk-devel
 binutils
 ccache

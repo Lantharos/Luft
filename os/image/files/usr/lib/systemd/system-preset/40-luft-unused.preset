@@ -1,15 +1,6 @@
-disable clevis-luks-askpass.path
-disable dm-event.socket
 disable flatpak-add-fedora-repos.service
-disable lvm-devices-import.path
-disable lvm-devices-import.service
-disable lvm2-lvmpolld.socket
-disable lvm2-monitor.service
 disable mdmonitor.service
-disable nfs-client.target
 disable raid-check.timer
-disable rpm-ostree-countme.timer
 disable sshd.service
-disable sssd.service
 disable systemd-homed-activate.service
 disable systemd-homed.service

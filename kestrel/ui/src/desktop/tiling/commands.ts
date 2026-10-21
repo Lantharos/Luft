@@ -1,11 +1,11 @@
 import type Meta from 'gi://Meta';
 
 import type { Box } from '../../shared/placement.js';
+import { boxOf } from '../windows/frames.js';
 import { neighbor, type Direction } from './layouts/geometry.js';
 import { ScrollingSpace } from './scrolling/scrollingSpace.js';
 import type { Space } from './space.js';
 import type { Tiler } from './tiler.js';
-import { boxOf } from './windows.js';
 
 export interface CommandSurroundings {
   monitors(): Box[];

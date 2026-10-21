@@ -8,6 +8,7 @@ import type { SwipeTrack } from '../gestures/fourFingers.js';
 import type { Monitor } from '../panel/panel.js';
 import { isDark, watchScheme } from '../../shared/scheme.js';
 import type { Box } from '../../shared/placement.js';
+import { frameBox, setMagnification, setUnconstrained } from '../windows/frames.js';
 import { Corner } from './corner/corner.js';
 import { BoardInput, type BoardActions } from './input/input.js';
 import { BoardKeys } from './input/keys.js';
@@ -18,7 +19,7 @@ import { endGlideTracking, fadeIn, fadeOut, glideFrom, settleActor, trackGlides 
 import { arrange, putBack, restoreSizes } from './windows/arrange.js';
 import { Focus, WINDOW_PADDING, type FocusState } from './windows/focus.js';
 import { Follower } from './windows/follower.js';
-import { appWindowAfter, boardWindows, byOpening, Collisions, frameBox, isBoardWindow, magnify, setMagnification, setUnconstrained } from './windows/windows.js';
+import { appWindowAfter, boardWindows, byOpening, Collisions, isBoardWindow, magnify } from './windows/windows.js';
 import { X11Origin } from './windows/x11Origin.js';
 
 export interface Canvas extends FocusState {

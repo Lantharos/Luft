@@ -2,33 +2,17 @@ import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 
 import type { Box } from '../../../shared/placement.js';
+import { frameBox, setMagnification } from '../../windows/frames.js';
 import { FULL_SIZE, intersection, pushApart, screenBox, snapEdges, type View } from '../view/geometry.js';
 
 const SNAP_DISTANCE = 12;
 const MOVE_OPS = [Meta.GrabOp.MOVING, Meta.GrabOp.MOVING_UNCONSTRAINED, Meta.GrabOp.KEYBOARD_MOVING];
-
-export function setUnconstrained(window: Meta.Window, unconstrained: boolean): void {
-  window.unconstrained = unconstrained;
-}
-
-export function untile(window: Meta.Window): void {
-  window.set_tiled_edges(0);
-}
-
-export function setMagnification(window: Meta.Window, magnification: number): void {
-  if (window.magnification !== magnification) window.magnification = magnification;
-}
 
 export function magnify(windows: readonly Meta.Window[], view: View, viewport: Box): void {
   for (const window of windows) {
     const shown = view.scale > FULL_SIZE && intersection(screenBox(view, viewport, frameBox(window)), viewport) > 0;
     setMagnification(window, shown ? view.scale : FULL_SIZE);
   }
-}
-
-export function frameBox(window: Meta.Window): Box {
-  const { x, y, width, height } = window.get_frame_rect();
-  return { x, y, width, height };
 }
 
 export function isBoardWindow(window: Meta.Window): boolean {

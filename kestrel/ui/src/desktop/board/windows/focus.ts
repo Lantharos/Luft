@@ -2,9 +2,10 @@ import Meta from 'gi://Meta';
 
 import { animateActor, Curve, Duration } from '../../../shared/motion.js';
 import type { Box } from '../../../shared/placement.js';
+import { frameBox } from '../../windows/frames.js';
 import { CAMERA_DURATION, type Camera } from '../view/camera.js';
 import { boundsOf, copyView, fitView, nearestInDirection, type View } from '../view/geometry.js';
-import { boardWindows, frameBox } from './windows.js';
+import { boardWindows } from './windows.js';
 
 export const FIT_PADDING = 56;
 export const WINDOW_PADDING = 24;

@@ -5,7 +5,7 @@ import type { Box } from '../../../shared/placement.js';
 import { boundsOf, fitView, freeSpot, intersection, screenBox, settle, type ExitPlan, type View } from '../view/geometry.js';
 import { fadeAway, glideFrom } from '../view/transitions.js';
 import { FIT_PADDING } from './focus.js';
-import { frameBox, setUnconstrained, untile } from './windows.js';
+import { frameBox, setEdgesTiled, setUnconstrained } from '../../windows/frames.js';
 
 const RESTORE_TIMEOUT = 300;
 
@@ -19,7 +19,7 @@ export interface Layout {
 export function restoreSizes(windows: readonly Meta.Window[], done: () => void): (() => void) | null {
   const resizing = windows.filter(window => window.is_fullscreen() || window.get_maximize_flags() !== 0);
   for (const window of windows) {
-    untile(window);
+    setEdgesTiled(window, false);
     if (window.minimized) window.unminimize();
     if (window.is_fullscreen()) window.unmake_fullscreen();
     if (window.get_maximize_flags() !== 0) window.unmaximize();

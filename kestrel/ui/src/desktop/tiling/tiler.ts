@@ -2,12 +2,13 @@ import Gio from 'gi://Gio';
 import Meta from 'gi://Meta';
 
 import type { Box } from '../../shared/placement.js';
+import { boxOf, setEdgesTiled, setUnconstrained } from '../windows/frames.js';
 import { TiledSpace } from './layouts/tiledSpace.js';
 import { FloatingMemory } from './memory.js';
 import { TilingPreferences, type TilingKey, type TilingMode } from './preferences.js';
 import { ScrollingSpace } from './scrolling/scrollingSpace.js';
 import type { Space, SpaceHost } from './space.js';
-import { appKey, boxOf, floatsByNature, setEdgesTiled, setUnconstrained, stretched } from './windows.js';
+import { appKey, floatsByNature, stretched } from './windows.js';
 
 export interface TilingSurroundings {
   monitors(): Box[];

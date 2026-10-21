@@ -1,9 +1,10 @@
 import type Meta from 'gi://Meta';
 
 import type { Box } from '../../shared/placement.js';
+import { setEdgesTiled, setUnconstrained, targetBox } from '../windows/frames.js';
 import { sameBox } from './layouts/geometry.js';
 import type { SpaceHost } from './space.js';
-import { setEdgesTiled, setUnconstrained, stretched, targetBox } from './windows.js';
+import { stretched } from './windows.js';
 
 export function place(host: SpaceHost, window: Meta.Window, box: Box, animate: boolean): void {
   if (!host.ready(window)) return;

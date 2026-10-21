@@ -2,7 +2,7 @@ import Meta from 'gi://Meta';
 
 import type { Box } from '../../../shared/placement.js';
 import { screenBox, type View } from '../view/geometry.js';
-import { frameBox } from './windows.js';
+import { frameBox } from '../../windows/frames.js';
 
 interface X11OriginHost {
   readonly view: View;

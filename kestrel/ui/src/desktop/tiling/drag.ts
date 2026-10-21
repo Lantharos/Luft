@@ -1,9 +1,9 @@
 import Meta from 'gi://Meta';
 
 import type { Box } from '../../shared/placement.js';
+import { boxOf } from '../windows/frames.js';
 import { contains } from './layouts/geometry.js';
 import type { Tiler } from './tiler.js';
-import { boxOf } from './windows.js';
 
 const MOVES = [Meta.GrabOp.MOVING, Meta.GrabOp.MOVING_UNCONSTRAINED, Meta.GrabOp.KEYBOARD_MOVING];
 

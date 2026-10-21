@@ -1,8 +1,9 @@
 import Meta from 'gi://Meta';
 
 import type { Board, Canvas } from '../board.js';
+import { frameBox } from '../../windows/frames.js';
 import { intersection, screenBox } from '../view/geometry.js';
-import { frameBox, isBoardWindow } from './windows.js';
+import { isBoardWindow } from './windows.js';
 
 const HIDDEN_FRACTION = 0.3;
 

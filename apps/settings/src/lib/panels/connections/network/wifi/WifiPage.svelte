@@ -4,7 +4,7 @@
 	import { t } from '@luft/i18n';
 	import { Row, Section, Switch } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
-	import { setWifi, type Wifi } from '../api';
+	import { setWifi, type Wifi } from '@luft/network';
 	import type { Target } from '../connection/profile';
 	import type { NetworkState } from '../state.svelte';
 	import WifiSection from './WifiSection.svelte';

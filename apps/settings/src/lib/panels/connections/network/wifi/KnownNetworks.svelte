@@ -3,7 +3,7 @@
 	import { t } from '@luft/i18n';
 	import { IconButton, Row, Section } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
-	import { remove, type Known, type Network } from '../api';
+	import { remove, type Known, type Network } from '@luft/network';
 	import type { Target } from '../connection/profile';
 	import { linkLabel } from '../describe';
 

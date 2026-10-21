@@ -3,7 +3,7 @@
 	import { untrack } from 'svelte';
 	import { t } from '@luft/i18n';
 	import { IconButton, TextField } from '@luft/ui';
-	import type { Family, Route } from './profile';
+	import type { Family, Route } from '@luft/network';
 	import type { Errors } from './validate';
 
 	interface Props {

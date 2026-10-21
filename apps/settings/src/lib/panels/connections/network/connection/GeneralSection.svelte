@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Row, Section, Select, Switch, TextField } from '@luft/ui';
-	import type { Metered, Profile } from './profile';
+	import type { Metered, Profile } from '@luft/network';
 	import type { Errors } from './validate';
 
 	interface Props {

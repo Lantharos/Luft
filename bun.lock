@@ -192,6 +192,7 @@
       "devDependencies": {
         "@lucide/svelte": "^1.51.0",
         "@luft/i18n": "workspace:*",
+        "@luft/network": "workspace:*",
         "@luft/ui": "workspace:*",
         "@sveltejs/vite-plugin-svelte": "^7.3.1",
         "@tailwindcss/vite": "^4.3.3",
@@ -212,6 +213,7 @@
       "devDependencies": {
         "@lucide/svelte": "^1.51.0",
         "@luft/i18n": "workspace:*",
+        "@luft/network": "workspace:*",
         "@luft/ui": "workspace:*",
         "@sveltejs/vite-plugin-svelte": "^7.3.1",
         "@tailwindcss/vite": "^4.3.3",
@@ -286,6 +288,16 @@
     "packages/motion": {
       "name": "@luft/motion",
       "version": "0.1.0",
+    },
+    "packages/network": {
+      "name": "@luft/network",
+      "version": "0.1.0",
+      "dependencies": {
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.51",
+      },
+      "devDependencies": {
+        "typescript": "~6.0.3",
+      },
     },
     "packages/ui": {
       "name": "@luft/ui",
@@ -712,6 +724,8 @@
     "@luft/i18n": ["@luft/i18n@workspace:packages/i18n"],
 
     "@luft/motion": ["@luft/motion@workspace:packages/motion"],
+
+    "@luft/network": ["@luft/network@workspace:packages/network"],
 
     "@luft/site": ["@luft/site@workspace:web/site"],
 

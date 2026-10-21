@@ -1,5 +1,5 @@
 import { t } from '@luft/i18n';
-import { activate, close, deactivate, disconnect, onChanged, onFailed, open, type Network, type Vpn, type Wifi, type Wired } from './api';
+import { activate, close, deactivate, disconnect, onChanged, onFailed, open, type Network, type Vpn, type Wifi, type Wired } from '@luft/network';
 import { linkLabel, speedLabel } from './describe';
 
 export class NetworkState {

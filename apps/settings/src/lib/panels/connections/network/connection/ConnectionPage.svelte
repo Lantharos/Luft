@@ -3,13 +3,13 @@
 	import { t } from '@luft/i18n';
 	import { Row, Section } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
-	import { forget, remove, type Network } from '../api';
+	import { forget, loadProfile, loadSecret, remove, saveProfile, type Network, type Profile } from '@luft/network';
 	import AdvancedSection from './AdvancedSection.svelte';
 	import DetailsSection from './DetailsSection.svelte';
 	import GeneralSection from './GeneralSection.svelte';
 	import IpSection from './IpSection.svelte';
 	import SecuritySection from './SecuritySection.svelte';
-	import { loadProfile, loadSecret, macChoice, prepare, saveProfile, type Profile, type Target } from './profile';
+	import { macChoice, prepare, type Target } from './profile';
 	import { checkProfile } from './validate';
 
 	interface Props {

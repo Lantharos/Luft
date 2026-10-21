@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { PasswordField, Row, Select, TextField } from '@luft/ui';
-	import { chooseCertificate, type EapMethod, type Enterprise } from './profile';
+	import { chooseCertificate, type EapMethod, type Enterprise } from '@luft/network';
 	import type { Errors } from './validate';
 
 	interface Props {

@@ -1,5 +1,7 @@
-import { invoke, listen } from '#lib/bridge.js';
-import type { Enterprise } from './connection/profile';
+import { invoke, listen } from '@lantharos/sabine';
+import type { Enterprise } from './profile';
+
+export * from './profile';
 
 export type Link = 'connected' | 'connecting' | 'disconnected' | 'unplugged';
 export type Security = 'open' | 'owe' | 'wep' | 'psk' | 'sae' | 'enterprise';

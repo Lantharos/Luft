@@ -5,7 +5,7 @@
 	import WifiLow from '@lucide/svelte/icons/wifi-low';
 	import { t } from '@luft/i18n';
 	import { PasswordField } from '@luft/ui';
-	import { needsPassword, type WifiNetwork } from '#lib/api/network.js';
+	import { needsPassword, type WifiNetwork } from '@luft/network';
 
 	interface Props {
 		network: WifiNetwork;

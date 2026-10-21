@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Dialog, PasswordField, Row, TextField } from '@luft/ui';
-	import { addWireGuard, wireGuardKeys, wireGuardPublicKey } from '../api';
+	import { addWireGuard, wireGuardKeys, wireGuardPublicKey } from '@luft/network';
 
 	interface Props {
 		onclose: () => void;

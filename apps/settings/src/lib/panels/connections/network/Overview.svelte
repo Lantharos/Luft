@@ -6,7 +6,7 @@
 	import WifiIcon from '@lucide/svelte/icons/wifi';
 	import { t } from '@luft/i18n';
 	import { ActionRow, Row, Section, Switch } from '@luft/ui';
-	import { setAirplane, setWifi, type Network } from './api';
+	import { setAirplane, setWifi, type Network } from '@luft/network';
 	import { proxyLabel, type Proxy } from './proxy/proxy.svelte';
 	import type { NetworkState } from './state.svelte';
 

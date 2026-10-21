@@ -7,7 +7,7 @@
 	import MoreRow, { COLLAPSED } from '#lib/components/MoreRow.svelte';
 	import type { Target } from '../connection/profile';
 	import JoinDialog from './JoinDialog.svelte';
-	import { activate, join, needsPassword, onFailed, type Security, type Wifi, type WifiNetwork } from '../api';
+	import { activate, join, needsPassword, onFailed, type Security, type Wifi, type WifiNetwork } from '@luft/network';
 	import { isSecured, linkLabel, signalIcon } from '../describe';
 
 	interface Props {

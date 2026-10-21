@@ -3,7 +3,7 @@ import WifiHigh from '@lucide/svelte/icons/wifi-high';
 import WifiLow from '@lucide/svelte/icons/wifi-low';
 import WifiZero from '@lucide/svelte/icons/wifi-zero';
 import { i18n, t } from '@luft/i18n';
-import type { Details, Link, Security } from './api';
+import type { Details, Link, Security } from '@luft/network';
 
 export type DetailRow = [label: string, value: string];
 

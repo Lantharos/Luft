@@ -1,0 +1,19 @@
+{
+	"name": "@luft/network",
+	"version": "0.1.0",
+	"private": true,
+	"type": "module",
+	"license": "GPL-3.0-or-later",
+	"exports": {
+		".": "./bridge/index.ts"
+	},
+	"scripts": {
+		"check": "tsc --project tsconfig.json"
+	},
+	"dependencies": {
+		"@lantharos/sabine": "github:Lantharos/Sabine#v0.51"
+	},
+	"devDependencies": {
+		"typescript": "~6.0.3"
+	}
+}

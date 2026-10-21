@@ -3,8 +3,8 @@
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import { t } from '@luft/i18n';
 	import { Switch } from '@luft/ui';
-	import * as network from '#lib/api/network.js';
-	import type { Network, WifiNetwork } from '#lib/api/network.js';
+	import * as network from '@luft/network';
+	import type { Network, WifiNetwork } from '@luft/network';
 	import StepFrame from '#lib/components/StepFrame.svelte';
 	import { flow } from '#lib/state/flow.svelte.js';
 	import { regional } from '#lib/state/regional.svelte.js';
@@ -62,9 +62,9 @@
 
 	function choose(entry: WifiNetwork) {
 		if (!wifi || entry.state !== 'disconnected') return;
-		if (entry.saved) void run(entry.ssid, () => network.activate(entry.saved!, wifi!.device));
+		if (entry.saved) void run(entry.ssid, () => network.activate({ connection: entry.saved!, device: wifi!.device }));
 		else if (network.needsPassword(entry.security)) joining = joining === entry.ssid ? null : entry.ssid;
-		else void run(entry.ssid, () => network.join(wifi!.device, entry.ssid, entry.security, ''));
+		else void run(entry.ssid, () => network.join({ device: wifi!.device, ssid: entry.ssid, security: entry.security }));
 	}
 </script>
 
@@ -93,7 +93,7 @@
 							open={joining === entry.ssid}
 							problem={problems[entry.ssid] ? t(problems[entry.ssid]) : ''}
 							onchoose={() => choose(entry)}
-							onjoin={(password) => run(entry.ssid, () => network.join(wifi!.device, entry.ssid, entry.security, password))}
+							onjoin={(password) => run(entry.ssid, () => network.join({ device: wifi!.device, ssid: entry.ssid, security: entry.security, password }))}
 						/>
 					{/each}
 					{#if !all && wifi.networks.length > SHOWN}

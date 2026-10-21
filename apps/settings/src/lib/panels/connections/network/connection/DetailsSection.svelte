@@ -2,7 +2,7 @@
 	import { t } from '@luft/i18n';
 	import { Row, Section } from '@luft/ui';
 	import { percent } from '#lib/format.js';
-	import { activate, deactivate, disconnect, type Link, type Network } from '../api';
+	import { activate, deactivate, disconnect, type Link, type Network } from '@luft/network';
 	import { bandLabel, detailRows, linkLabel, securityLabel, signalLabel, speedLabel, type DetailRow } from '../describe';
 	import type { Target } from './profile';
 

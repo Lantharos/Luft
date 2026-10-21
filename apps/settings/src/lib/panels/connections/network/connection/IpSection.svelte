@@ -4,7 +4,8 @@
 	import { t } from '@luft/i18n';
 	import { IconButton, Row, Section, Select, Switch, TextField } from '@luft/ui';
 	import RouteRow from './RouteRow.svelte';
-	import { configurable, type Family, type Ip } from './profile';
+	import type { Family, Ip } from '@luft/network';
+	import { configurable } from './profile';
 	import { words, type Errors } from './validate';
 
 	interface Props {

@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { PasswordField, Row, Section, Select } from '@luft/ui';
-	import { needsPassword, type Security } from '../api';
+	import { needsPassword, type Security, type Wireless } from '@luft/network';
 	import { securityLabel } from '../describe';
 	import EnterpriseFields from './EnterpriseFields.svelte';
-	import { newEnterprise, type Wireless } from './profile';
+	import { newEnterprise } from './profile';
 	import type { Errors } from './validate';
 
 	interface Props {

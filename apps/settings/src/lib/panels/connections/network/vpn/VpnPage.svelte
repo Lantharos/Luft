@@ -6,7 +6,7 @@
 	import { t } from '@luft/i18n';
 	import { IconButton, Row, Section, Switch } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
-	import { importVpn, type Vpn } from '../api';
+	import { importVpn, type Vpn } from '@luft/network';
 	import type { Target } from '../connection/profile';
 	import type { NetworkState } from '../state.svelte';
 	import WireGuardDialog from './WireGuardDialog.svelte';

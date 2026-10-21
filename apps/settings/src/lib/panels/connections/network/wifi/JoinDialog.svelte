@@ -5,7 +5,7 @@
 	import EnterpriseFields from '../connection/EnterpriseFields.svelte';
 	import { newEnterprise } from '../connection/profile';
 	import { checkEnterprise, minimumPassword, type Errors } from '../connection/validate';
-	import { forget, join, needsPassword, onChanged, onFailed, type Security } from '../api';
+	import { forget, join, needsPassword, onChanged, onFailed, type Security } from '@luft/network';
 
 	interface Props {
 		device: string;

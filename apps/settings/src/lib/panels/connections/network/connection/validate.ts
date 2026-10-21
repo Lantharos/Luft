@@ -1,6 +1,6 @@
 import { t } from '@luft/i18n';
-import type { Security } from '../api';
-import { configurable, type Enterprise, type Family, type Ip, type Profile } from './profile';
+import type { Enterprise, Family, Ip, Profile, Security } from '@luft/network';
+import { configurable } from './profile';
 
 export type Errors = Record<string, string>;
 

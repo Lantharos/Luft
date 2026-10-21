@@ -3,7 +3,7 @@
 	import { t } from '@luft/i18n';
 	import { Row, Section, Switch } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
-	import type { Wired } from '../api';
+	import type { Wired } from '@luft/network';
 	import type { Target } from '../connection/profile';
 	import { detailRows, speedLabel } from '../describe';
 	import type { NetworkState } from '../state.svelte';

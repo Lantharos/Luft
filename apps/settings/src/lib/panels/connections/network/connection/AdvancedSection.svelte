@@ -2,7 +2,8 @@
 	import { untrack } from 'svelte';
 	import { t } from '@luft/i18n';
 	import { Row, Section, Select, TextField } from '@luft/ui';
-	import { macChoice, type MacChoice, type Profile } from './profile';
+	import type { MacChoice, Profile } from '@luft/network';
+	import { macChoice } from './profile';
 	import type { Errors } from './validate';
 
 	interface Props {

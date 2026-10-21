@@ -13,6 +13,7 @@ import {FrameRecorder, summarize, summarizeGpu, timelines} from '../frames/recor
 import {popupInteractions} from '../frames/popups.js';
 import {printReport, saveReport} from '../frames/report.js';
 import {surfaceInteractions} from '../frames/surfaces.js';
+import {tilingInteractions} from '../frames/tiling.js';
 import {windowInteractions} from '../frames/windows.js';
 
 const TIMING_ROUNDS = 3;
@@ -83,7 +84,7 @@ export async function run() {
   interfaceSettings.set_boolean('cursor-blink', false);
   await openWindows();
   try {
-    const interactions = [...surfaceInteractions, ...popupInteractions, ...glassInteractions, ...windowInteractions, ...boardInteractions];
+    const interactions = [...surfaceInteractions, ...popupInteractions, ...glassInteractions, ...windowInteractions, ...boardInteractions, ...tilingInteractions];
     for (const interaction of selected(interactions.filter(({first}) => first), ({first}) => first))
       results[interaction.first] = await measure(interaction.first, () => measureRounds(interaction, screen.refreshRate, 1, 0));
     for (const interaction of selected(interactions, ({name}) => name))

@@ -11,6 +11,8 @@ max_startup_failures=3
 inotify_per_session=24
 declare -A laptops=([laptop]=1920x1200:302x189mm [laptop15]=1920x1080:344x194mm)
 laptop_areas=(board input:dictation input:scrolling panel:battery panel:repaints panel:screenshot tablet:keyboard tablet:longPress windows:serverDecorations windows:x11Frames)
+two_display_groups=(tiling:monitors)
+second_display=1280x720
 
 usage() {
   echo "Usage: kestrel/tools/session.sh capture [--only GROUPS] [--jobs N] [--list]"
@@ -68,6 +70,7 @@ queue_groups() {
       printf -v index '%03d' $((10#$index + 1))
       size=default
       [[ "$group" == *+* ]] && size="${group##*+}"
+      [[ " ${two_display_groups[*]} " == *" $group "* ]] && size=dual
       mkdir -p "$out/queue/$size"
       : > "$out/queue/$size/$index-$group"
     fi
@@ -97,15 +100,18 @@ seconds_since() {
 
 start_worker() {
   local name="worker-$((++workers))" size capture_size="${KESTREL_CAPTURE_SIZE:-1440x900}" captures="$KESTREL_CAPTURE_DIR"
+  local secondary="${KESTREL_CAPTURE_SECONDARY_SIZE:-}"
   size=$(next_size)
-  if [[ "$size" != default ]]; then
+  if [[ "$size" == dual ]]; then
+    secondary="$second_display"
+  elif [[ "$size" != default ]]; then
     capture_size="${laptops[$size]}"
     captures="$KESTREL_CAPTURE_DIR/$size"
   fi
   mkdir -p "$captures"
   KESTREL_SESSION_DIR="$out/workers/$name" KESTREL_CAPTURE_WORKER="$name" KESTREL_CAPTURE_QUEUE="$out/queue/$size" \
     KESTREL_CAPTURE_CLAIMED="$out/claimed" KESTREL_CAPTURE_RESULTS="$out/results" \
-    KESTREL_CAPTURE_SIZE="$capture_size" KESTREL_CAPTURE_DIR="$captures" \
+    KESTREL_CAPTURE_SIZE="$capture_size" KESTREL_CAPTURE_SECONDARY_SIZE="$secondary" KESTREL_CAPTURE_DIR="$captures" \
     timeout "$session_timeout" "$tools/session/desktop.sh" capture > "$out/workers/$name.log" 2>&1 &
   running[$!]="$name"
   sizes[$!]="$size"

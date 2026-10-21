@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { bytes, Dialog } from '@luft/ui';
-	import * as api from '#lib/api.js';
-	import type { Drive, Format, Volume } from '#lib/api.js';
+	import * as api from '#lib/bridge/index.js';
+	import type { Drive, Format, Volume } from '#lib/bridge/index.js';
 	import { volumeName } from '#lib/format.js';
 	import { disks } from '#lib/state/disks.svelte.js';
 	import FormatFields from './FormatFields.svelte';

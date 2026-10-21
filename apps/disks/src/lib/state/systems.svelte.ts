@@ -1,5 +1,5 @@
-import * as api from '#lib/api.js';
-import type { Drive, OtherSystem } from '#lib/api.js';
+import * as api from '#lib/bridge/index.js';
+import type { Drive, OtherSystem } from '#lib/bridge/index.js';
 
 function layoutKey(drives: Drive[]) {
 	return drives

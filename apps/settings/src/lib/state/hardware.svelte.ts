@@ -1,4 +1,4 @@
-import { invoke, listen } from '#lib/bridge.js';
+import { invoke, listen } from '#lib/bridge/index.js';
 import { SettingsGroup } from './gsettings.svelte.js';
 
 export interface Hardware {

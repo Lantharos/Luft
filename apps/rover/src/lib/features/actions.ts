@@ -1,4 +1,4 @@
-import { getFileInfo } from '#lib/api.js';
+import { getFileInfo } from '#lib/bridge/index.js';
 import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 import type { FileEntry } from '#lib/types/index.js';
 import * as api from './api';

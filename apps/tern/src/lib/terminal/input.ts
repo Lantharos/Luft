@@ -1,4 +1,4 @@
-import { pty, type TerminalSize } from '#lib/api.js';
+import { pty, type TerminalSize } from '#lib/bridge/index.js';
 
 type Operation = { kind: 'data'; bytes: Uint8Array } | { kind: 'resize'; size: TerminalSize };
 

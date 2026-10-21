@@ -1,5 +1,5 @@
 import { appearance } from '@luft/ui';
-import { updateSettings } from '#lib/api.js';
+import { updateSettings } from '#lib/bridge/index.js';
 import { LUFT_COLORS, terminalTheme, withAlpha } from '#lib/terminal/palette.js';
 import type { TerminalOptions } from '#lib/terminal/session.svelte.js';
 import type { AppState, Settings } from '#lib/types.js';

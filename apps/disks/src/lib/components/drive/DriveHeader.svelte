@@ -1,6 +1,6 @@
 <script lang="ts">
-	import * as api from '#lib/api.js';
-	import type { Drive } from '#lib/api.js';
+	import * as api from '#lib/bridge/index.js';
+	import type { Drive } from '#lib/bridge/index.js';
 	import { driveSummary } from '#lib/format.js';
 	import { disks } from '#lib/state/disks.svelte.js';
 	import ActionMenu from '../ActionMenu.svelte';

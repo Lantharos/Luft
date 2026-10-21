@@ -2,8 +2,8 @@
 	import { untrack } from 'svelte';
 	import X from '@lucide/svelte/icons/x';
 	import { tooltip } from '@luft/ui';
-	import * as api from '#lib/api/index.js';
-	import type { Address } from '#lib/api/index.js';
+	import * as api from '#lib/bridge/index.js';
+	import type { Address } from '#lib/bridge/index.js';
 	import ComposeField from './ComposeField.svelte';
 
 	interface Props {

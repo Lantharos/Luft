@@ -1,5 +1,5 @@
 import { bytes, plural } from '@luft/ui';
-import * as api from '#lib/api.js';
+import * as api from '#lib/bridge/index.js';
 import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 import type { CloudDrive } from '#lib/types/cloud.js';
 import type { FileEntry } from '#lib/types/index.js';

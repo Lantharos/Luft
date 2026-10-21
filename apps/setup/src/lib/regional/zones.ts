@@ -1,4 +1,4 @@
-import type { Zone } from '#lib/api/system.js';
+import type { Zone } from '#lib/bridge/system.js';
 
 export interface NamedZone extends Zone {
 	country: string;

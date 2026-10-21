@@ -1,8 +1,8 @@
 <script lang="ts">
 	import Check from '@lucide/svelte/icons/check';
 	import { bytes, Dialog } from '@luft/ui';
-	import * as api from '#lib/api.js';
-	import type { ChosenImage } from '#lib/api.js';
+	import * as api from '#lib/bridge/index.js';
+	import type { ChosenImage } from '#lib/bridge/index.js';
 	import DriveIcon from '#lib/components/DriveIcon.svelte';
 	import { disks } from '#lib/state/disks.svelte.js';
 

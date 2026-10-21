@@ -1,4 +1,4 @@
-import type { SpaceView } from '#lib/api.js';
+import type { SpaceView } from '#lib/bridge/index.js';
 
 export type TileKind = 'dir' | 'file' | 'other' | 'rest';
 

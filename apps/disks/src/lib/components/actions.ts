@@ -1,5 +1,5 @@
-import * as api from '#lib/api.js';
-import type { Drive, Volume } from '#lib/api.js';
+import * as api from '#lib/bridge/index.js';
+import type { Drive, Volume } from '#lib/bridge/index.js';
 import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
 import { editor } from '#lib/editor/editor.svelte.js';
 import { changing } from '#lib/encryption.svelte.js';

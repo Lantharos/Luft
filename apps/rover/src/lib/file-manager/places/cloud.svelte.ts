@@ -1,5 +1,5 @@
 import { basename, isInside, parent } from '@luft/ui';
-import * as api from '#lib/api.js';
+import * as api from '#lib/bridge/index.js';
 import type { CloudConflict, CloudDrive, FileState } from '#lib/types/cloud.js';
 
 export class CloudState {

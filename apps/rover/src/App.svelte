@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { appearance, GlassShell } from '@luft/ui';
-	import * as api from '#lib/api.js';
+	import * as api from '#lib/bridge/index.js';
 	import DetailsPane from '#lib/components/details/DetailsPane.svelte';
 	import DialogHost from '#lib/components/dialogs/DialogHost.svelte';
 	import FilePane from '#lib/components/pane/FilePane.svelte';

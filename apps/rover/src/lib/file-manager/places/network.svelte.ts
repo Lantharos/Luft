@@ -1,6 +1,6 @@
 import { isInside } from '@luft/ui';
 import { SvelteSet } from 'svelte/reactivity';
-import * as api from '#lib/api.js';
+import * as api from '#lib/bridge/index.js';
 import { settings } from '#lib/state/settings.svelte.js';
 import type { NetworkAsk, NetworkLocation, NetworkPlace } from '#lib/types/index.js';
 import { addressName, normalizeAddress, sameAddress } from '../location/addresses';

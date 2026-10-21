@@ -1,5 +1,5 @@
 import { join } from '@luft/ui';
-import * as api from '#lib/api.js';
+import * as api from '#lib/bridge/index.js';
 import type { ChooserConfig, FileEntry, PinnedFolder } from '#lib/types/index.js';
 import type { FileManager } from './manager.svelte';
 import { bookmarkTarget } from './places/bookmarks';

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { bytes, Dialog } from '@luft/ui';
-	import * as api from '#lib/api.js';
-	import type { Drive, Volume } from '#lib/api.js';
+	import * as api from '#lib/bridge/index.js';
+	import type { Drive, Volume } from '#lib/bridge/index.js';
 	import { filesystemName, inner, volumeName } from '#lib/format.js';
 	import { explorable, typeName } from '#lib/partitions/types.js';
 	import { disks } from '#lib/state/disks.svelte.js';

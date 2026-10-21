@@ -1,4 +1,4 @@
-import * as api from '#lib/api.js';
+import * as api from '#lib/bridge/index.js';
 import type { ListColumn, Settings } from '#lib/types/index.js';
 
 export const DEFAULT_LIST_COLUMNS: ListColumn[] = [

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { bytes, Dialog, errorText } from '@luft/ui';
-	import * as api from '#lib/api.js';
-	import type { OtherSystem, Removed } from '#lib/api.js';
+	import * as api from '#lib/bridge/index.js';
+	import type { OtherSystem, Removed } from '#lib/bridge/index.js';
 	import { KeyRequest } from '#lib/encryption.svelte.js';
 	import { inner } from '#lib/format.js';
 	import { disks } from '#lib/state/disks.svelte.js';

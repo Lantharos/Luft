@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { i18n, t } from '@luft/i18n';
 	import { ProgressBar } from '@luft/ui';
-	import { restart, finishSetup } from '#lib/api/system.js';
+	import { restart, finishSetup } from '#lib/bridge/system.js';
 	import StepFrame from '#lib/components/StepFrame.svelte';
 	import EnrollSteps from '#lib/components/trust/EnrollSteps.svelte';
 	import { install } from '#lib/state/install.svelte.js';

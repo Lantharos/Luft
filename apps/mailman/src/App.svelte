@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { appearance, basename, CommandPalette, GlassShell, PaletteState, plural, Toast, tooltip } from '@luft/ui';
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
-	import * as api from '#lib/api/index.js';
+	import * as api from '#lib/bridge/index.js';
 	import { commands, paletteSource, type Shell } from '#lib/app/commands.js';
 	import { handleKeydown } from '#lib/app/keyboard.js';
 	import { opened } from '#lib/app/launch.svelte.js';

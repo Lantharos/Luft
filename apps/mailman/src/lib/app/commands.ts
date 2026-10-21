@@ -1,5 +1,5 @@
 import { matchItems, type PaletteSource } from '@luft/ui';
-import * as api from '#lib/api/index.js';
+import * as api from '#lib/bridge/index.js';
 import { composer } from '#lib/compose/composer.svelte.js';
 import * as actions from '#lib/mail/actions.js';
 import { list } from '#lib/mail/list.svelte.js';

@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { Dialog, errorText, PasswordField, Segmented, TextField } from '@luft/ui';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
-	import * as api from '#lib/api/index.js';
-	import type { AccountConfig, Provider, Server } from '#lib/api/index.js';
+	import * as api from '#lib/bridge/index.js';
+	import type { AccountConfig, Provider, Server } from '#lib/bridge/index.js';
 	import { mail } from '#lib/mail/mail.svelte.js';
 	import { toasts } from '#lib/shell/toasts.svelte.js';
 	import ServerFields from './ServerFields.svelte';

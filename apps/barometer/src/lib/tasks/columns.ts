@@ -1,5 +1,5 @@
 import { bytes, memoryBytes, time } from '@luft/ui';
-import type { Usage } from '#lib/backend/rows.js';
+import type { Usage } from '#lib/bridge/rows.js';
 import { count, cpuTime, percent, rate } from '#lib/format.js';
 import { monitor } from '#lib/state/monitor.svelte.js';
 import { settings, type Sort } from '#lib/state/settings.svelte.js';

@@ -1,5 +1,5 @@
 import { activationToken } from '@luft/ui';
-import { invoke } from '#lib/bridge.js';
+import { invoke } from '#lib/bridge/index.js';
 
 export interface About {
 	deviceName: string;

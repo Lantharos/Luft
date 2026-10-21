@@ -1,6 +1,6 @@
-import * as installer from '#lib/api/installer.js';
-import type { Drive, InstallerState, Intent, LinuxSystem, Survey, Target, WindowsChoices } from '#lib/api/installer.js';
-import { NO_HARDWARE, type Hardware } from '#lib/api/system.js';
+import * as installer from '#lib/bridge/installer.js';
+import type { Drive, InstallerState, Intent, LinuxSystem, Survey, Target, WindowsChoices } from '#lib/bridge/installer.js';
+import { NO_HARDWARE, type Hardware } from '#lib/bridge/system.js';
 import { regional } from './regional.svelte.js';
 
 const NAME_FALLBACK = 'luft';

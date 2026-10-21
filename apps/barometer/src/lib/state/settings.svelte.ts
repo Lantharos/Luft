@@ -1,4 +1,4 @@
-import type { Backend } from '#lib/backend/types.js';
+import type { Backend } from '#lib/bridge/types.js';
 
 export type TemperatureUnit = 'celsius' | 'fahrenheit';
 export type SortDirection = 'ascending' | 'descending';

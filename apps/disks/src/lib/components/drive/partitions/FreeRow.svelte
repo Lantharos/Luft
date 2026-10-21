@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { bytes } from '@luft/ui';
-	import type { Drive } from '#lib/api.js';
+	import type { Drive } from '#lib/bridge/index.js';
 	import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
 	import { disks } from '#lib/state/disks.svelte.js';
 

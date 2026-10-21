@@ -2,7 +2,7 @@
 	import Box from '@lucide/svelte/icons/box';
 	import { t } from '@luft/i18n';
 	import { bytes } from '@luft/ui';
-	import { openDisks } from '#lib/api/system.js';
+	import { openDisks } from '#lib/bridge/system.js';
 	import OptionRow from '#lib/components/OptionRow.svelte';
 	import { install } from '#lib/state/install.svelte.js';
 

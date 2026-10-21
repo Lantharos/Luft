@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { VirtualScroller, type VirtualHandle } from '@luft/ui';
-	import type { ThreadRow as Row } from '#lib/api/index.js';
+	import type { ThreadRow as Row } from '#lib/bridge/index.js';
 	import { navigate, openThread } from '#lib/app/navigation.js';
 	import { composer } from '#lib/compose/composer.svelte.js';
 	import * as actions from '#lib/mail/actions.js';

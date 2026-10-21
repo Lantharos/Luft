@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { Dialog, TextField } from '@luft/ui';
-	import * as api from '#lib/api.js';
+	import * as api from '#lib/bridge/index.js';
 	import { disks } from '#lib/state/disks.svelte.js';
 
 	interface Props {

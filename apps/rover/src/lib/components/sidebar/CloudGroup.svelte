@@ -7,7 +7,7 @@
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 	import { isInside, tooltip } from '@luft/ui';
 	import type { Component } from 'svelte';
-	import * as api from '#lib/api.js';
+	import * as api from '#lib/bridge/index.js';
 	import type { DragController } from '#lib/file-manager/drag/controller.svelte.js';
 	import { dropKey } from '#lib/file-manager/drag/drop-targets.js';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';

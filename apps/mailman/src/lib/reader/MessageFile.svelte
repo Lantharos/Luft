@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { Avatar, errorText, longDateTime } from '@luft/ui';
 	import Reply from '@lucide/svelte/icons/reply';
-	import * as api from '#lib/api/index.js';
-	import type { OpenedFile } from '#lib/api/index.js';
+	import * as api from '#lib/bridge/index.js';
+	import type { OpenedFile } from '#lib/bridge/index.js';
 	import { composer } from '#lib/compose/composer.svelte.js';
 	import { mail } from '#lib/mail/mail.svelte.js';
 	import Attachments from './Attachments.svelte';

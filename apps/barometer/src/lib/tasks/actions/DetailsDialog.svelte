@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { AppIcon, dateTime, Dialog, duration, errorText, memoryBytes } from '@luft/ui';
-	import type { Details } from '#lib/backend/types.js';
+	import type { Details } from '#lib/bridge/types.js';
 	import { count, cpuTime, percent, rate } from '#lib/format.js';
 	import { app } from '#lib/state/app.svelte.js';
 	import { processes } from '#lib/state/processes.svelte.js';

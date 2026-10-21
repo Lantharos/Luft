@@ -2,7 +2,7 @@
 	import { onMount, untrack } from 'svelte';
 	import { activity } from '@lantharos/sabine';
 	import { GlassShell, appearance } from '@luft/ui';
-	import * as api from '#lib/api.js';
+	import * as api from '#lib/bridge/index.js';
 	import CloseDialog from '#lib/components/dialogs/CloseDialog.svelte';
 	import PasteDialog from '#lib/components/dialogs/PasteDialog.svelte';
 	import Preferences from '#lib/components/dialogs/Preferences.svelte';

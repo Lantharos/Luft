@@ -1,6 +1,6 @@
 import { parent } from '@luft/ui';
-import * as api from '#lib/api.js';
-import type { SingleInstanceActivation } from '#lib/api.js';
+import * as api from '#lib/bridge/index.js';
+import type { SingleInstanceActivation } from '#lib/bridge/index.js';
 import { looksRemote } from './location/addresses';
 import type { FileManager } from './manager.svelte';
 

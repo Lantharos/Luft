@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { EncryptionWizard, errorText, PassphraseFields } from '@luft/ui';
-	import * as api from '#lib/api.js';
-	import type { Drive, DriveCheck, Volume } from '#lib/api.js';
+	import * as api from '#lib/bridge/index.js';
+	import type { Drive, DriveCheck, Volume } from '#lib/bridge/index.js';
 	import { SHORTEST_PASSPHRASE } from '#lib/encryption.svelte.js';
 	import { volumeName } from '#lib/format.js';
 	import SwitchLine from './SwitchLine.svelte';

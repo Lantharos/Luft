@@ -1,4 +1,4 @@
-import type { Identity, Message } from '#lib/api/index.js';
+import type { Identity, Message } from '#lib/bridge/index.js';
 
 export interface Sending {
 	identity: Identity;

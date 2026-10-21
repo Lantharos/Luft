@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Copy from '@lucide/svelte/icons/copy';
 	import { basename } from '@luft/ui';
-	import * as api from '#lib/api.js';
+	import * as api from '#lib/bridge/index.js';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 	import type { CloudConflict, CloudDrive } from '#lib/types/cloud.js';
 

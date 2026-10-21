@@ -10,7 +10,7 @@
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import { ContextMenu, MenuItem, MenuSeparator } from '@luft/ui';
 	import type { Component } from 'svelte';
-	import * as api from '#lib/api.js';
+	import * as api from '#lib/bridge/index.js';
 	import { showPathProperties } from '#lib/features/actions.js';
 	import { dialogs } from '#lib/features/dialogs.svelte.js';
 	import * as bookmarks from '#lib/file-manager/places/bookmarks.js';

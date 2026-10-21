@@ -1,4 +1,4 @@
-import * as api from '#lib/api/index.js';
+import * as api from '#lib/bridge/index.js';
 import { setRead } from '#lib/mail/actions.js';
 import { list } from '#lib/mail/list.svelte.js';
 import { mail } from '#lib/mail/mail.svelte.js';

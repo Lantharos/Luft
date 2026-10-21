@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Drive } from '#lib/api.js';
+	import type { Drive } from '#lib/bridge/index.js';
 	import { editor } from '#lib/editor/editor.svelte.js';
 	import { limitsOf } from '#lib/editor/limits.js';
 	import { gaps, type Layout } from '#lib/editor/model.js';

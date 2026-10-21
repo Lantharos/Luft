@@ -1,6 +1,6 @@
 import { t } from '@luft/i18n';
 import { bytes } from '@luft/ui';
-import type { Drive, LinuxSystem, WindowsVolume } from '#lib/api/installer.js';
+import type { Drive, LinuxSystem, WindowsVolume } from '#lib/bridge/installer.js';
 
 const GIB = 1024 ** 3;
 

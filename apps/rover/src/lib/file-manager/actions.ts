@@ -1,6 +1,6 @@
 import { appWindow } from '@lantharos/sabine';
 import { isInside, parent } from '@luft/ui';
-import * as api from '#lib/api.js';
+import * as api from '#lib/bridge/index.js';
 import type { FileManager } from './manager.svelte';
 
 export class FileActions {

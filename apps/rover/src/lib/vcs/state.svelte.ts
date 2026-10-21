@@ -1,5 +1,5 @@
 import { errorText } from '@luft/ui';
-import * as api from '#lib/api.js';
+import * as api from '#lib/bridge/index.js';
 import { absolutePath, relativePath } from '#lib/utils/paths.js';
 import { groupChangedFiles, statusOrder } from './format';
 import type { VcsBusyState, VcsChangedFile, VcsFileStatus, VcsProject, VcsStatusEvent } from './types';

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { AppIcon, errorText, Select } from '@luft/ui';
-	import * as api from '#lib/api.js';
+	import * as api from '#lib/bridge/index.js';
 	import * as features from '#lib/features/api.js';
 	import type { OpenWithApps } from '#lib/types/details.js';
 

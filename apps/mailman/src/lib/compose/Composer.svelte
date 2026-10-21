@@ -13,8 +13,8 @@
 	import Trash from '@lucide/svelte/icons/trash-2';
 	import X from '@lucide/svelte/icons/x';
 	import { fly } from 'svelte/transition';
-	import * as api from '#lib/api/index.js';
-	import type { Template } from '#lib/api/index.js';
+	import * as api from '#lib/bridge/index.js';
+	import type { Template } from '#lib/bridge/index.js';
 	import { REMINDERS, SEND_LATER } from '#lib/app/when.js';
 	import { toasts } from '#lib/shell/toasts.svelte.js';
 	import { composer, type Composition } from './composer.svelte';

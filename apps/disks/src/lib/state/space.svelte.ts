@@ -1,5 +1,5 @@
-import * as api from '#lib/api.js';
-import type { SpaceUpdate } from '#lib/api.js';
+import * as api from '#lib/bridge/index.js';
+import type { SpaceUpdate } from '#lib/bridge/index.js';
 
 const same = (a: string[], b: string[]) => a.length === b.length && a.every((part, index) => part === b[index]);
 

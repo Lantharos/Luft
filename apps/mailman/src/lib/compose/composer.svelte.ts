@@ -1,6 +1,6 @@
 import { longDateTime } from '@luft/ui';
-import * as api from '#lib/api/index.js';
-import type { Address, Attached, Draft, Message, Rendered } from '#lib/api/index.js';
+import * as api from '#lib/bridge/index.js';
+import type { Address, Attached, Draft, Message, Rendered } from '#lib/bridge/index.js';
 import { list } from '#lib/mail/list.svelte.js';
 import { mail } from '#lib/mail/mail.svelte.js';
 import { reader } from '#lib/reader/reader.svelte.js';

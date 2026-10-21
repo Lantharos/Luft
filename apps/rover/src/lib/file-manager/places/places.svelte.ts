@@ -6,7 +6,7 @@ import Music from '@lucide/svelte/icons/music';
 import Video from '@lucide/svelte/icons/video';
 import { basename } from '@luft/ui';
 import type { Component } from 'svelte';
-import * as api from '#lib/api.js';
+import * as api from '#lib/bridge/index.js';
 import type { Operation, UserDirs } from '#lib/types/index.js';
 
 export type Place = { path: string; label: string; icon: Component };

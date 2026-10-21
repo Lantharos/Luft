@@ -1,4 +1,4 @@
-import type { Address } from '#lib/api/index.js';
+import type { Address } from '#lib/bridge/index.js';
 
 export interface Mailto {
 	to: Address[];

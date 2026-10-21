@@ -1,6 +1,6 @@
 import { i18n } from '@luft/i18n';
 import { appearance } from '@luft/ui';
-import { appState, NO_HARDWARE, trustState, type Hardware, type TrustState } from '#lib/api/system.js';
+import { appState, NO_HARDWARE, trustState, type Hardware, type TrustState } from '#lib/bridge/system.js';
 import { flow, type Step } from './flow.svelte.js';
 import { install } from './install.svelte.js';
 import { regional } from './regional.svelte.js';

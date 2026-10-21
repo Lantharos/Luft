@@ -1,4 +1,4 @@
-import type { Drive } from '#lib/api.js';
+import type { Drive } from '#lib/bridge/index.js';
 
 const TONES = ['var(--accent)', 'var(--tertiary)', 'var(--secondary)'];
 

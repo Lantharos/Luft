@@ -4,6 +4,6 @@ import type { Backend } from './types';
 
 export async function connect(): Promise<Backend> {
 	if (!(await invoke<boolean>('sample_system'))) return native;
-	const { sample } = await import('./sample');
+	const { sample } = await import('./sample/index');
 	return { ...native, ...sample };
 }

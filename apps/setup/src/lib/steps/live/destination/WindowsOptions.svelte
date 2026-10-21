@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Switch } from '@luft/ui';
-	import type { WindowsChoices, WindowsVolume } from '#lib/api/installer.js';
+	import type { WindowsChoices, WindowsVolume } from '#lib/bridge/installer.js';
 	import { install } from '#lib/state/install.svelte.js';
 
 	interface Props {

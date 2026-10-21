@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { enrollKey, restart } from '#lib/api/system.js';
+	import { enrollKey, restart } from '#lib/bridge/system.js';
 	import StepFrame from '#lib/components/StepFrame.svelte';
 	import EnrollSteps from '#lib/components/trust/EnrollSteps.svelte';
 	import { flow } from '#lib/state/flow.svelte.js';

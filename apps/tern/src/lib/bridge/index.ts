@@ -1,6 +1,6 @@
 import { invoke, listen } from '@lantharos/sabine';
 import { activationToken } from '@luft/ui';
-import type { Activation, AppState, LaunchRequest, Settings } from './types';
+import type { Activation, AppState, LaunchRequest, Settings } from '../types';
 
 export interface TerminalSize {
 	cols: number;

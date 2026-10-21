@@ -1,5 +1,5 @@
-import { decode, FIELDS, type Process } from '#lib/backend/rows.js';
-import type { AppInfo, Backend, Catalog, ProcessEntry } from '#lib/backend/types.js';
+import { decode, FIELDS, type Process } from '#lib/bridge/rows.js';
+import type { AppInfo, Backend, Catalog, ProcessEntry } from '#lib/bridge/types.js';
 
 class ProcessStore {
 	list = $state.raw<Process[]>([]);

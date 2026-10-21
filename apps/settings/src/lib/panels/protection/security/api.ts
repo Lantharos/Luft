@@ -1,5 +1,5 @@
 import type { EncryptionCheck } from '@luft/ui';
-import { invoke, listen } from '#lib/bridge.js';
+import { invoke, listen } from '#lib/bridge/index.js';
 
 const WAIT_FOR_PERMISSION = { timeoutMs: 300_000 };
 

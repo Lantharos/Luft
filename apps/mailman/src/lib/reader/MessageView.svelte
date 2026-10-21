@@ -3,8 +3,8 @@
 	import ImageOff from '@lucide/svelte/icons/image-off';
 	import Reply from '@lucide/svelte/icons/reply';
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
-	import * as api from '#lib/api/index.js';
-	import type { Address, Message } from '#lib/api/index.js';
+	import * as api from '#lib/bridge/index.js';
+	import type { Address, Message } from '#lib/bridge/index.js';
 	import { composer } from '#lib/compose/composer.svelte.js';
 	import { mail } from '#lib/mail/mail.svelte.js';
 	import Attachments from './Attachments.svelte';

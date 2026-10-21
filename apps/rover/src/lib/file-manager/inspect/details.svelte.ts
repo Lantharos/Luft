@@ -1,4 +1,4 @@
-import * as api from '#lib/api.js';
+import * as api from '#lib/bridge/index.js';
 import type { FileEntry } from '#lib/types/index.js';
 import type { FileDetails, OpenWithApps } from '#lib/types/details.js';
 

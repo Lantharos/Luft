@@ -3,7 +3,7 @@
 	import Info from '@lucide/svelte/icons/info';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import { bytes, Select, TextField, tooltip } from '@luft/ui';
-	import type { Filesystem } from '#lib/api.js';
+	import type { Filesystem } from '#lib/bridge/index.js';
 	import { editor } from '#lib/editor/editor.svelte.js';
 	import { format, place, remove, rename } from '#lib/editor/edits.js';
 	import type { Limits } from '#lib/editor/limits.js';

@@ -1,4 +1,4 @@
-import type { ChosenImage, Drive, OtherSystem, Volume } from '#lib/api.js';
+import type { ChosenImage, Drive, OtherSystem, Volume } from '#lib/bridge/index.js';
 
 export type OpenDialog =
 	| { kind: 'format-volume'; drive: Drive; volume: Volume }

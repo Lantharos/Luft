@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { bytes } from '@luft/ui';
-	import type { OtherSystem } from '#lib/api.js';
+	import type { OtherSystem } from '#lib/bridge/index.js';
 	import { orderedParts, partName, startupName } from '#lib/systems.js';
 
 	interface Props {

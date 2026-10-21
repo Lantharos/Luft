@@ -2,7 +2,7 @@
 	import LockKeyhole from '@lucide/svelte/icons/lock-keyhole';
 	import { t } from '@luft/i18n';
 	import { Checkbox, PasswordField, RecoveryKey } from '@luft/ui';
-	import { encrypt, encryptionChecks, printKey, recoveryKey, saveKey, type Check } from '#lib/api/system.js';
+	import { encrypt, encryptionChecks, printKey, recoveryKey, saveKey, type Check } from '#lib/bridge/system.js';
 	import StepFrame from '#lib/components/StepFrame.svelte';
 	import { flow } from '#lib/state/flow.svelte.js';
 	import { setup } from '#lib/state/setup.svelte.js';

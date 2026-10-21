@@ -1,6 +1,6 @@
 import { ago } from '@luft/ui';
-import * as api from '#lib/api/index.js';
-import type { Action } from '#lib/api/index.js';
+import * as api from '#lib/bridge/index.js';
+import type { Action } from '#lib/bridge/index.js';
 import { reader } from '#lib/reader/reader.svelte.js';
 import { toasts } from '#lib/shell/toasts.svelte.js';
 import { list } from './list.svelte';

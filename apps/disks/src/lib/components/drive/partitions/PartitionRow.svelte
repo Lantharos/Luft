@@ -1,8 +1,8 @@
 <script lang="ts">
 	import Lock from '@lucide/svelte/icons/lock';
 	import { bytes } from '@luft/ui';
-	import * as api from '#lib/api.js';
-	import type { Drive, Volume } from '#lib/api.js';
+	import * as api from '#lib/bridge/index.js';
+	import type { Drive, Volume } from '#lib/bridge/index.js';
 	import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
 	import { changing, rowStatus } from '#lib/encryption.svelte.js';
 	import { filesystemName, inner, jobText, usedShare, volumeName } from '#lib/format.js';

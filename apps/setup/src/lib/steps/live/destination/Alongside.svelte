@@ -2,7 +2,7 @@
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
 	import { t } from '@luft/i18n';
 	import { SplitBar } from '@luft/ui';
-	import type { Drive, WindowsVolume } from '#lib/api/installer.js';
+	import type { Drive, WindowsVolume } from '#lib/bridge/installer.js';
 	import { install } from '#lib/state/install.svelte.js';
 	import { whyWindowsCantShrink } from './explain.js';
 	import WindowsOptions from './WindowsOptions.svelte';

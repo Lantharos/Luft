@@ -1,6 +1,6 @@
 import { i18n } from '@luft/i18n';
-import { catalog, formatsCountry, locate, setFormats, useKeyboard, useLanguage, useZone, type Catalog, type KeyboardLayout, type Zone } from '#lib/api/system.js';
-import type { Hints, Keyboard } from '#lib/api/installer.js';
+import { catalog, formatsCountry, locate, setFormats, useKeyboard, useLanguage, useZone, type Catalog, type KeyboardLayout, type Zone } from '#lib/bridge/system.js';
+import type { Hints, Keyboard } from '#lib/bridge/installer.js';
 import { describe, outranks, type Field, type Guesses, type Source } from '#lib/regional/guesses.js';
 import { namedZones } from '#lib/regional/zones.js';
 import { countryOf, DEFAULT_LANGUAGE, formatsIn, keyboardFor, languageFor, languageNamed, LANGUAGES, languageTag, type Language } from '#lib/regional/languages.js';

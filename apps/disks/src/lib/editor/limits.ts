@@ -1,4 +1,4 @@
-import type { Support } from '#lib/api.js';
+import type { Support } from '#lib/bridge/index.js';
 import { alignUp, end, MiB, type Layout, type Part } from './model';
 
 const OFFLINE_SHRINK = 2;

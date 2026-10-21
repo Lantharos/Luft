@@ -1,4 +1,4 @@
-import type { Drive, Volume } from '#lib/api.js';
+import type { Drive, Volume } from '#lib/bridge/index.js';
 import { inner, volumeName } from '#lib/format.js';
 import type { Table } from '#lib/partitions/types.js';
 

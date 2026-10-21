@@ -13,10 +13,10 @@ import type {
 	Settings,
 	TrashContents,
 	WindowsDrive
-} from './types';
-import type { CloudDrive, FileState } from './types/cloud';
-import type { FileDetails, OpenWithApps } from './types/details';
-import type { VcsRoot, VcsStatusEvent } from './vcs/types';
+} from '../types/index';
+import type { CloudDrive, FileState } from '../types/cloud';
+import type { FileDetails, OpenWithApps } from '../types/details';
+import type { VcsRoot, VcsStatusEvent } from '../vcs/types';
 
 export const appState = () => invoke<AppState>('app_state');
 export const updateSettings = (settings: Settings) => invoke<void>('update_settings', { settings });

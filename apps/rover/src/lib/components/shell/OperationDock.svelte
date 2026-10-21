@@ -9,7 +9,7 @@
 	import Usb from '@lucide/svelte/icons/usb';
 	import X from '@lucide/svelte/icons/x';
 	import { basename, bytes, duration, plural } from '@luft/ui';
-	import * as api from '#lib/api.js';
+	import * as api from '#lib/bridge/index.js';
 	import type { Operation } from '#lib/types/index.js';
 
 	interface Props {

@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { bytes, ConfirmDialog, RecoveryKeyDialog } from '@luft/ui';
-	import * as api from '#lib/api.js';
+	import * as api from '#lib/bridge/index.js';
 	import { volumeName } from '#lib/format.js';
 	import { disks } from '#lib/state/disks.svelte.js';
 	import { space } from '#lib/state/space.svelte.js';
 	import { editor } from '#lib/editor/editor.svelte.js';
-	import type { Drive, Volume } from '#lib/api.js';
+	import type { Drive, Volume } from '#lib/bridge/index.js';
 	import DriveDetails from './details/DriveDetails.svelte';
 	import HealthDialog from './details/HealthDialog.svelte';
 	import VolumeDetails from './details/VolumeDetails.svelte';

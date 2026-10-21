@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { RemoteImagesNotice, renderMarkdown } from '@luft/ui';
 	import { highlight } from '@luft/ui/code';
-	import * as api from '#lib/api.js';
+	import * as api from '#lib/bridge/index.js';
 	import { loadText, type TextPreview } from '#lib/file-manager/inspect/text.js';
 	import type { FileEntry } from '#lib/types/index.js';
 

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Dialog, errorText } from '@luft/ui';
-	import * as api from '#lib/api.js';
-	import type { Volume } from '#lib/api.js';
+	import * as api from '#lib/bridge/index.js';
+	import type { Volume } from '#lib/bridge/index.js';
 	import { KeyRequest } from '#lib/encryption.svelte.js';
 	import { volumeName } from '#lib/format.js';
 	import KeyPrompt from './KeyPrompt.svelte';

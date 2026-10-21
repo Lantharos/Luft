@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { TextField } from '@luft/ui';
-	import * as api from '#lib/api/index.js';
-	import type { Identity } from '#lib/api/index.js';
+	import * as api from '#lib/bridge/index.js';
+	import type { Identity } from '#lib/bridge/index.js';
 	import { signatureHtml } from '#lib/compose/html.js';
 	import { mail } from '#lib/mail/mail.svelte.js';
 	import { toasts } from '#lib/shell/toasts.svelte.js';

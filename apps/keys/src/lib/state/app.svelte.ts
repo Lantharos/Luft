@@ -1,5 +1,5 @@
 import { appearance } from '@luft/ui';
-import { appState, inputSources, onActivated, openFile, type Source } from '#lib/bridge.js';
+import { appState, inputSources, onActivated, openFile, type Source } from '#lib/bridge/index.js';
 import { listLayouts, type Entry } from '#lib/layout/api.js';
 import { ENGINE_PREFIX, listMethods, type Summary } from '#lib/method/api.js';
 import { toast } from './toast.svelte';

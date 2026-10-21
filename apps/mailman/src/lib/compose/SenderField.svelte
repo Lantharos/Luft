@@ -3,7 +3,7 @@
 	import { MenuButton, MenuItem, MenuSeparator } from '@luft/ui';
 	import Check from '@lucide/svelte/icons/check';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
-	import type { Account, Identity } from '#lib/api/index.js';
+	import type { Account, Identity } from '#lib/bridge/index.js';
 	import { mail } from '#lib/mail/mail.svelte.js';
 	import { toasts } from '#lib/shell/toasts.svelte.js';
 	import type { Composition } from './composer.svelte';

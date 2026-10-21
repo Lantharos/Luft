@@ -1,7 +1,7 @@
 <script lang="ts">
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 	import { bytes, tooltip } from '@luft/ui';
-	import * as api from '#lib/api.js';
+	import * as api from '#lib/bridge/index.js';
 	import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
 	import { disks } from '#lib/state/disks.svelte.js';
 	import { space } from '#lib/state/space.svelte.js';

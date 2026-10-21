@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Dialog, tooltip } from '@luft/ui';
-	import * as api from '#lib/api.js';
-	import type { Drive, Health } from '#lib/api.js';
+	import * as api from '#lib/bridge/index.js';
+	import type { Drive, Health } from '#lib/bridge/index.js';
 	import { duration, healthAdvice, selftestResult } from '#lib/format.js';
 	import { disks } from '#lib/state/disks.svelte.js';
 	import Facts from './Facts.svelte';

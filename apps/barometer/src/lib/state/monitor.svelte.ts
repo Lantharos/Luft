@@ -1,4 +1,4 @@
-import type { Backend, Devices, Tick } from '#lib/backend/types.js';
+import type { Backend, Devices, Tick } from '#lib/bridge/types.js';
 import { settings } from './settings.svelte';
 
 class MonitorStore {

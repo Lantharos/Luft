@@ -1,6 +1,6 @@
 import { SvelteSet } from 'svelte/reactivity';
 import { appearance, basename, errorText, parent } from '@luft/ui';
-import * as api from '#lib/api.js';
+import * as api from '#lib/bridge/index.js';
 import { settings } from '#lib/state/settings.svelte.js';
 import { Tabs } from '#lib/state/tabs.svelte.js';
 import type {

@@ -8,8 +8,8 @@
 	import SlidersHorizontal from '@lucide/svelte/icons/sliders-horizontal';
 	import { t } from '@luft/i18n';
 	import { bytes, Choice, Dialog } from '@luft/ui';
-	import type { Drive, Target, WindowsVolume } from '#lib/api/installer.js';
-	import { finishSetup } from '#lib/api/system.js';
+	import type { Drive, Target, WindowsVolume } from '#lib/bridge/installer.js';
+	import { finishSetup } from '#lib/bridge/system.js';
 	import StepFrame from '#lib/components/StepFrame.svelte';
 	import { flow } from '#lib/state/flow.svelte.js';
 	import { install } from '#lib/state/install.svelte.js';

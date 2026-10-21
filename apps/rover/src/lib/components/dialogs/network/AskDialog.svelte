@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { tick, untrack } from 'svelte';
 	import { Checkbox, Dialog, PasswordField, Segmented, TextField } from '@luft/ui';
-	import * as api from '#lib/api.js';
+	import * as api from '#lib/bridge/index.js';
 	import type { NetworkAsk } from '#lib/types/index.js';
 
 	interface Props {

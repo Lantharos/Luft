@@ -4,7 +4,7 @@ import { SearchAddon } from '@xterm/addon-search';
 import { UnicodeGraphemesAddon } from '@xterm/addon-unicode-graphemes';
 import { WebLinksAddon } from '@xterm/addon-web-links';
 import { Terminal, type ITheme } from '@xterm/xterm';
-import { openLink, pty } from '#lib/api.js';
+import { openLink, pty } from '#lib/bridge/index.js';
 import { settings } from '#lib/state/settings.svelte.js';
 import type { CursorStyle, LaunchRequest } from '#lib/types.js';
 import { InputQueue } from './input';

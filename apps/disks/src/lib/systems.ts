@@ -1,5 +1,5 @@
 import { bytes } from '@luft/ui';
-import type { OtherSystem, SystemPart, SystemStep } from './api';
+import type { OtherSystem, SystemPart, SystemStep } from './bridge/index';
 
 const MEET_PARTS: Record<string, string> = {
 	Luft: 'Try Luft, from Meet Luft',

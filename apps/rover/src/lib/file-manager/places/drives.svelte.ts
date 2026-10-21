@@ -1,6 +1,6 @@
 import { isInside } from '@luft/ui';
 import { SvelteSet } from 'svelte/reactivity';
-import * as api from '#lib/api.js';
+import * as api from '#lib/bridge/index.js';
 import type { DriveInfo, WindowsDrive } from '#lib/types/index.js';
 
 export class DrivesState {

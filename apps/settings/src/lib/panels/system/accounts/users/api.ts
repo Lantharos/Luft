@@ -1,5 +1,5 @@
 import { t } from '@luft/i18n';
-import { invoke } from '#lib/bridge.js';
+import { invoke } from '#lib/bridge/index.js';
 
 const WAIT_FOR_PERMISSION = 300_000;
 

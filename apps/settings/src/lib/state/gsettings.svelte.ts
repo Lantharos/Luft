@@ -1,5 +1,5 @@
 import { onDestroy } from 'svelte';
-import { invoke, listen } from '#lib/bridge.js';
+import { invoke, listen } from '#lib/bridge/index.js';
 
 export const KESTREL_SCHEMA = 'com.lantharos.kestrel';
 

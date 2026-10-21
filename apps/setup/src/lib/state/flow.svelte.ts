@@ -1,4 +1,4 @@
-import type { Phase } from '#lib/api/installer.js';
+import type { Phase } from '#lib/bridge/installer.js';
 
 export type Step = 'region' | 'destination' | 'network' | 'account' | 'finishing' | 'secure-boot' | 'protect' | 'fingerprint' | 'ready';
 

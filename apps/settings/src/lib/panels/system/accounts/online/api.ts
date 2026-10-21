@@ -1,5 +1,5 @@
 import { activationToken } from '@luft/ui';
-import { invoke, listen } from '#lib/bridge.js';
+import { invoke, listen } from '#lib/bridge/index.js';
 
 export type Provider = 'onedrive' | 'dropbox' | 'icloud' | 'nextcloud' | 'webdav';
 

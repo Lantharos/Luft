@@ -1,4 +1,4 @@
-import { invoke } from '#lib/bridge.js';
+import { invoke } from '#lib/bridge/index.js';
 
 export interface Rule {
 	keys: string;

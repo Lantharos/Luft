@@ -1,4 +1,4 @@
-import { invoke, listen } from '#lib/bridge.js';
+import { invoke, listen } from '#lib/bridge/index.js';
 
 const WAIT_FOR_PROMPT = { timeoutMs: 300_000 };
 

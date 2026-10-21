@@ -1,7 +1,7 @@
 import type { Component } from 'svelte';
 import { i18n } from '@luft/i18n';
 import { appearance } from '@luft/ui';
-import { appState, onActivated } from '#lib/bridge.js';
+import { appState, onActivated } from '#lib/bridge/index.js';
 import { DEFAULT_PANEL, PANELS, resolveLink, type Panel, type PanelId } from '#lib/panels/registry.js';
 import { hardware } from './hardware.svelte';
 import { updates } from './updates.svelte';

@@ -1,5 +1,5 @@
 import { bytes } from '@luft/ui';
-import type { Drive, Filesystem, Health, Job, Segment, Volume } from './api';
+import type { Drive, Filesystem, Health, Job, Segment, Volume } from './bridge/index';
 import { isEfiSystem, partitionType } from './partitions/types';
 
 export const FILESYSTEM_NAMES: Record<string, string> = {

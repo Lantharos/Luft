@@ -1,4 +1,4 @@
-import type { Volume } from '#lib/api.js';
+import type { Volume } from '#lib/bridge/index.js';
 
 export type Table = 'gpt' | 'dos';
 

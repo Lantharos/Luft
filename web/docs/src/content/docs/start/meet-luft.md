@@ -31,7 +31,7 @@ Meet Luft downloads the newest Luft, which works with any graphics card and inst
    - **Install Luft** opens the installer with **Alongside Windows** already chosen, in the room Meet Luft made, and your language, time zone and keyboard already filled in from Windows. **More options** shows the other ways to install. Nothing on the drive changes until you confirm there.
 4. **It packs a moving box**, if you like: folders from your Windows account, your wallpaper, your name and account picture, Bluetooth devices, and Wi-Fi networks with their passwords (only when you tick that). The installer fills in your name from it and unpacks the rest into your new account.
 
-Before restarting, Meet Luft offers to keep the clock right in both systems and, when you install, to turn off Fast Startup. It changes both in Windows itself, so they work with BitLocker on. [Installing alongside Windows](/start/alongside-windows/) explains why they matter.
+Before restarting, Meet Luft offers to keep the clock right in both systems and, whenever Fast Startup is on, to turn it off. It changes both in Windows itself, so they work with BitLocker on. [Installing alongside Windows](/start/alongside-windows/) explains why they matter.
 
 Meet Luft asks Windows for administrator rights once, when it first looks at the drive. It needs an internet connection unless you pick an ISO.
 

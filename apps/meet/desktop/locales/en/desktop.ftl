@@ -65,7 +65,7 @@ check-encryption-changing = BitLocker is still encrypting or decrypting
 check-encryption-changing-detail = Wait until Windows finishes, then come back. You can see how far it is in Settings, under Device encryption.
 # Fast Startup is the name of a Windows setting; use the name Windows uses in your language
 check-fast-startup-on = Fast Startup is on
-check-fast-startup-on-detail = Windows hibernates instead of shutting down, which keeps its drive locked. Meet Luft offers to turn it off before installing.
+check-fast-startup-on-detail = Windows hibernates instead of shutting down, which keeps its drive locked and can leave sound and Wi-Fi in a state Luft can't use. Meet Luft offers to turn it off before restarting.
 check-fast-startup-off = Fast Startup is off
 check-fast-startup-off-detail = Windows shuts down fully.
 check-secure-boot-on = Secure Boot is on

@@ -76,7 +76,7 @@ impl<'a> System<'a> {
     }
 
     pub fn fast_startup(&self) -> Result<bool> {
-        Ok(self.current(POWER, FAST_STARTUP)? == Some(1)
+        Ok(self.current(POWER, FAST_STARTUP)? != Some(0)
             && self.current(HIBERNATION, HIBERNATION_ENABLED)? != Some(0))
     }
 

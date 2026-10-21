@@ -26,12 +26,11 @@
 
 	let options = $derived(
 		[
-			restarting === 'install' &&
-				facts?.fastStartup && {
-					key: 'fastStartupOff',
-					title: t('ready-fast-startup-title'),
-					description: t('ready-fast-startup-description')
-				},
+			facts?.fastStartup && {
+				key: 'fastStartupOff',
+				title: t('ready-fast-startup-title'),
+				description: t('ready-fast-startup-description')
+			},
 			facts &&
 				!facts.universalClock && {
 					key: 'universalClock',

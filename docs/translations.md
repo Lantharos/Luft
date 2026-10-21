@@ -92,7 +92,7 @@ LUFT_LOCALE=de kestrel/tools/session.sh nested
 ## Adding a language
 
 1. Add it to `LANGUAGES` in `packages/i18n/src/locales.ts`, `LOCALES` in `packages/i18n/rust/locales.rs` and the `localizer!` macro in `packages/i18n/rust/lib.rs`. `LANGUAGES` is what Settings offers; keep it sorted by the language's own name, English first.
-2. Add its locales, with the country each is spoken in, to `LOCALES` in `apps/setup/src/lib/regional/languages.ts`, which Install Luft offers, and to `FORMATS` in `apps/settings/src/lib/panels/system/region/formats.ts`.
+2. Add its locales, with the country each is spoken in, to `LOCALES` in `apps/setup/src/lib/regional/languages.ts`, which Install Luft offers, and to `FORMATS` in `apps/settings/src/lib/panels/system/language/region/formats.ts`.
 3. Add its file to the outputs of `kestrel-locales` in `kestrel/engine/js/ui/meson.build` and to `kestrel/engine/js/js-resources.gresource.xml`.
 4. Add its CEF locale to `languages` in `os/image/parts/stages/runtime.sh` if CEF ships one.
 5. Create its folder with an empty file for every component, a glossary and a style guide. Weblate does the first step for new languages added there.

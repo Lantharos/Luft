@@ -211,6 +211,9 @@ const AuthenticationDialog = GObject.registerClass({
                 `Dismissing authentication request for action-id ${this.actionId} ` +
                 `cookie ${this._cookie}`);
             this._emitDone(true);
+        } else if (!this._announced) {
+            this._announced = true;
+            KestrelUi.playSound('notification-low');
         }
     }
 

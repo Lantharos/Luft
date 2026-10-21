@@ -11,14 +11,14 @@ Luft plays short, soft sounds when something happens that you might not be looki
 
 | Sound | When |
 | --- | --- |
-| Notification | A notification arrives. Low priority ones get a softer note, and urgent ones, such as a disk that's almost full, a two-tap warning |
+| Notification | A notification arrives. Low priority ones get a softer note, as do Luft asking for your password and an app asking for your permission while you're busy elsewhere, and urgent ones, such as a disk that's almost full, a two-tap warning |
 | New mail | Mailman finds new mail, and a whoosh when a message is sent |
 | Devices | A USB device, memory card or Bluetooth device connects or disconnects. Plugging in a hub with several devices plays one sound |
 | Charging | The charger is plugged in, and the battery runs low |
 | Volume | A tick on the speakers or headphones whose volume you changed, from the volume keys or a slider. A muted output stays silent |
 | Screenshot | A screenshot is saved |
 | Recording | Screen recording or sharing, the camera or [dictation](/desktop/dictation/) starts and stops |
-| Error and warning | A password or fingerprint isn't accepted, an app rings the bell, an app stops responding, or an app asks for your permission while you're busy elsewhere |
+| Error and warning | A password or fingerprint isn't accepted, an app rings the bell, or an app stops responding |
 | Sign-in | Your desktop appears after you sign in |
 | Keyboard taps | Each key on the on-screen keyboard, with their own sounds for delete and space. Off at first |
 

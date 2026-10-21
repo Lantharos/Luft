@@ -11,8 +11,8 @@ luft-software.workspace = true
 ```
 
 ```rust
-use luft_software::packagekit::Mode;
-use luft_software::updates::{self, PackageUpdates};
+use luft_software::system::packagekit::Mode;
+use luft_software::system::updates::{self, PackageUpdates};
 
 let updates = PackageUpdates::load(Mode::Quiet).await?;
 let waiting_in_schelf = updates::app_count(updates.apps.len());
@@ -41,22 +41,24 @@ Changing the image needs root, so the image side talks to `luft-updater` (in [`s
 
 ## Modules
 
+Modules come in two groups: `apps` for apps however they're installed, and `system` for the system itself.
+
 | Module | Provides |
 | --- | --- |
 | `system` | `System::current()`, `Packages` or `Image` |
-| `packages` | Installing, removing and updating Fedora packages through PackageKit |
-| `image` | `Deployments` (`load`, `status`, `check`, `lacks`, `variant_offer`, `switch_size`), `download`, `switch`, `rollback`, and `downloading`, `follow` and `changes` for a download started anywhere |
+| `system::packages` | Installing, removing and updating Fedora packages through PackageKit |
+| `system::image` | `Deployments` (`load`, `status`, `check`, `lacks`, `variant_offer`, `switch_size`), `download`, `switch`, `rollback`, and `downloading`, `follow` and `changes` for a download started anywhere |
 | `variant` | [`luft-variant`](../../packages/system/variant/README.md), which image suits this computer |
-| `system_packages` | `list`, `install`, `install_file` and `remove` packages merged over an image system as a system extension, through `luft-updater`, and `describe`, `add_repository` and `remove_repository` for the software sources they come from besides Fedora |
-| `repositories` | `fetch` gets a repository file from the address of a `.repo` file, `copr:owner/project` or a vendor in `KNOWN`, with the keys it names, as a `Draft`; `bundled` reads the one a package file ships or its scriptlets write, `desktop_entry` the menu entry a package file brings, and `added_ids` and `is_added` what's added already |
-| `toolbox` | `available` lists Fedora's packages, or those of the added software sources; `install`, `install_file`, `remove`, `installed`, `updates` and `update` manage them in the default Toolbox container, with their commands in `~/.local/bin` |
-| `classify` | `Classification::current()`, with `is_app`, `desktop_ids` and `apps`; cached until the RPM database or the applications folder changes |
-| `updates` | `PackageUpdates` (`load`, `apps`, `system`), `appimages()` for AppImages with an update, and `app_count` for every app update including Flatpak and AppImage |
-| `packagekit` | `refresh`, `updates`, `resolve`, `resolve_available`, `details`, `install`, `install_file`, `removal_plan`, `remove`, `update`, `prepare` and `follow`; `Mode` (`Quiet`, `Interactive`, `Background`), `Package`, `PackageId`, `PackageDetails`, `Update` and the `filter` flags |
-| `packagekit::offline` | `prepared()` lists the prepared offline update and `results()` reports how the last one went |
-| `packagekit::running` | `running()` lists PackageKit transactions in progress and `changes()` streams their changes |
-| `flatpak` | `installed`, `updates`, `install`, `install_ref`, `update`, `uninstall`, `add_remote`, `ensure_flathub` and `permissions`, for the user and system `Installation`; `set_trusted` adds an app to Kestrel's list of apps with full access or takes it off through the updater, `open_sandbox` and `reset_sandbox` override the app's sandbox for the account, and `has_full_access` reads the list; `integrate` turns on touchpad scrolling that follows the fingers on Wayland for installed Chromium-based apps through the flags file their launcher reads, joining the features already listed there and leaving a file that already names the feature alone; it only writes regular text files inside the app's own config folder, never through links |
-| `appimage` | `inspect` reads an AppImage's name and icon without running it, and `icons` only its icons; `install` moves it into `~/Applications` and `install_link` links it there from where it is, with a desktop entry named like the one inside it when no other app or entry uses that name (`appimage-<name>` otherwise) and its icon, which starts Chromium-based apps with touchpad scrolling that follows the fingers on Wayland, and Electron apps without Chromium's sandbox only when the computer can't make the user namespaces it needs; `placement` tells where it would go; `repair` rewrites the menu entry and icons of AppImages whose icons don't match their sizes; `list`, `find`, `remove`, `is_appimage`; `check` and `update` follow the update information embedded in the file (`zsync` and `gh-releases-zsync`) over HTTPS only, check the download against its SHA-256 when the release publishes one and its SHA-1 otherwise, and when the installed version carries a signing key, only accept an update signed with that key |
+| `system::system_packages` | `list`, `install`, `install_file` and `remove` packages merged over an image system as a system extension, through `luft-updater`, and `describe`, `add_repository` and `remove_repository` for the software sources they come from besides Fedora |
+| `system::repositories` | `fetch` gets a repository file from the address of a `.repo` file, `copr:owner/project` or a vendor in `KNOWN`, with the keys it names, as a `Draft`; `bundled` reads the one a package file ships or its scriptlets write, `desktop_entry` the menu entry a package file brings, and `added_ids` and `is_added` what's added already |
+| `apps::toolbox` | `available` lists Fedora's packages, or those of the added software sources; `install`, `install_file`, `remove`, `installed`, `updates` and `update` manage them in the default Toolbox container, with their commands in `~/.local/bin` |
+| `apps::classify` | `Classification::current()`, with `is_app`, `desktop_ids` and `apps`; cached until the RPM database or the applications folder changes |
+| `system::updates` | `PackageUpdates` (`load`, `apps`, `system`), `appimages()` for AppImages with an update, and `app_count` for every app update including Flatpak and AppImage |
+| `system::packagekit` | `refresh`, `updates`, `resolve`, `resolve_available`, `details`, `install`, `install_file`, `removal_plan`, `remove`, `update`, `prepare` and `follow`; `Mode` (`Quiet`, `Interactive`, `Background`), `Package`, `PackageId`, `PackageDetails`, `Update` and the `filter` flags |
+| `system::packagekit::offline` | `prepared()` lists the prepared offline update and `results()` reports how the last one went |
+| `system::packagekit::running` | `running()` lists PackageKit transactions in progress and `changes()` streams their changes |
+| `apps::flatpak` | `installed`, `updates`, `install`, `install_ref`, `update`, `uninstall`, `add_remote`, `ensure_flathub` and `permissions`, for the user and system `Installation`; `set_trusted` adds an app to Kestrel's list of apps with full access or takes it off through the updater, `open_sandbox` and `reset_sandbox` override the app's sandbox for the account, and `has_full_access` reads the list; `integrate` turns on touchpad scrolling that follows the fingers on Wayland for installed Chromium-based apps through the flags file their launcher reads, joining the features already listed there and leaving a file that already names the feature alone; it only writes regular text files inside the app's own config folder, never through links |
+| `apps::appimage` | `inspect` reads an AppImage's name and icon without running it, and `icons` only its icons; `install` moves it into `~/Applications` and `install_link` links it there from where it is, with a desktop entry named like the one inside it when no other app or entry uses that name (`appimage-<name>` otherwise) and its icon, which starts Chromium-based apps with touchpad scrolling that follows the fingers on Wayland, and Electron apps without Chromium's sandbox only when the computer can't make the user namespaces it needs; `placement` tells where it would go; `repair` rewrites the menu entry and icons of AppImages whose icons don't match their sizes; `list`, `find`, `remove`, `is_appimage`; `check` and `update` follow the update information embedded in the file (`zsync` and `gh-releases-zsync`) over HTTPS only, check the download against its SHA-256 when the release publishes one and its SHA-1 otherwise, and when the installed version carries a signing key, only accept an update signed with that key |
 | `task` | `Task` (a progress `report` and a `Cancel`) passed to every operation that changes the system; `Cancel::while_running` and `while_awaiting` stop work when it's cancelled; `exclusive` waits until no other process is changing the account's software, reporting `Waiting` meanwhile, and holds that until it's dropped |
 | `progress` | `Progress`, `Stage` and `Report` |
 | `http` | Shared HTTP agent with `text` and `download` |

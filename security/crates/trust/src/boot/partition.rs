@@ -4,8 +4,8 @@ use anyhow::{Context, Result};
 
 use super::esp::{self, Esp, XBOOTLDR_TYPE};
 use crate::paths;
-use crate::system::blocks;
-use crate::system::command::Tool;
+use crate::system::host::blocks;
+use crate::system::host::command::Tool;
 
 const PRIVATE_MOUNT: &str = "xbootldr";
 const ENTRIES: &str = "loader/entries";

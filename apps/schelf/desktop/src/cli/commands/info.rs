@@ -1,5 +1,5 @@
-use luft_software::appimage;
-use luft_software::toolbox::Repositories;
+use luft_software::apps::appimage;
+use luft_software::apps::toolbox::Repositories;
 
 use crate::cli::Exit;
 use crate::cli::arguments::Arguments;

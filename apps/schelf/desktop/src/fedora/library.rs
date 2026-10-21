@@ -3,7 +3,7 @@ use std::process::Command;
 
 use gio::prelude::*;
 use luft_app::apps::App;
-use luft_software::classify::Classification;
+use luft_software::apps::classify::Classification;
 
 use super::catalog;
 use crate::library::{InstalledApp, Source};

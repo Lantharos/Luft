@@ -4,7 +4,8 @@ use anyhow::{Context, Result};
 
 use crate::disk::SystemDisk;
 use crate::paths;
-use crate::system::{blocks, efi};
+use crate::system::firmware::efi;
+use crate::system::host::blocks;
 
 const PRIVATE_MOUNT: &str = "esp";
 const MOUNTS: [&str; 5] = [

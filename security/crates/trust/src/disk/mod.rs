@@ -1,34 +1,23 @@
-pub mod grow;
-mod initrd;
-pub mod keys;
-pub mod luks;
-pub mod mask;
-pub mod moving;
-pub mod old_system;
+pub mod encryption;
+pub mod layout;
 mod preflight;
-pub mod reencrypt;
-mod room;
-pub mod seal;
-pub mod stage;
-pub mod state;
-mod top_level;
-mod turn_off;
-mod turn_on;
-pub mod worker;
+pub mod unlock;
 
 use std::path::PathBuf;
 
 use anyhow::{Context, Result};
 
-use crate::system::blocks::{self, Mount};
-use crate::system::journal;
-use luks::{Direction, Header};
-use state::{Change, Plan};
+use crate::system::host::blocks::{self, Mount};
+use crate::system::host::journal;
+use encryption::initrd;
+use encryption::state::{self, Change, Plan};
+use unlock::luks::{self, Direction, Header};
+use unlock::{keys, seal};
 
-pub use initrd::run as run_in_initrd;
+pub use encryption::initrd::run as run_in_initrd;
+pub use encryption::turn_off::turn_off;
+pub use encryption::turn_on::{TurnedOn, finish_waiting, turn_on};
 pub use preflight::{Check, check};
-pub use turn_off::turn_off;
-pub use turn_on::{TurnedOn, finish_waiting, turn_on};
 
 const PHYSICAL_ROOTS: [&str; 2] = ["/sysroot", "/"];
 

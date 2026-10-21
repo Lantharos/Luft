@@ -1,6 +1,6 @@
 use luft_app::block_on;
-use luft_software::system_packages;
-use luft_software::toolbox::{Available, Repositories};
+use luft_software::apps::toolbox::{Available, Repositories};
+use luft_software::system::system_packages;
 
 use super::{Candidate, Catalog, Kind};
 use crate::catalog::tools;

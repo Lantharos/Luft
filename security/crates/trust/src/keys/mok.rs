@@ -5,10 +5,10 @@ use anyhow::{Result, bail};
 use super::CERTIFICATE;
 use super::request::Request;
 use crate::errors::Unsupported;
-use crate::system::command::Tool;
-use crate::system::efi::{self, SecureBoot};
-use crate::system::scratch::Scratch;
-use crate::system::secret::Secret;
+use crate::system::firmware::efi::{self, SecureBoot};
+use crate::system::host::command::Tool;
+use crate::system::secrets::scratch::Scratch;
+use crate::system::secrets::secret::Secret;
 
 const AUTOMATIC_ATTEMPTS: u32 = 3;
 

@@ -1,7 +1,7 @@
 use luft_app::block_on;
-use luft_software::repositories::{self, Described};
 use luft_software::system::System;
-use luft_software::system_packages::{self, Origin, Repository};
+use luft_software::system::repositories::{self, Described};
+use luft_software::system::system_packages::{self, Origin, Repository};
 
 use super::list_of;
 use crate::cli::Exit;

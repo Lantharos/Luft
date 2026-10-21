@@ -8,11 +8,11 @@ use clap::{Parser, Subcommand};
 
 use crate::boot::{attempts, startup};
 use crate::disk;
-use crate::disk::keys;
+use crate::disk::unlock::keys;
 use crate::keys::{mok, others};
 use crate::service::{self, actions, status};
-use crate::system::secret::Secret;
-use crate::system::tpm;
+use crate::system::firmware::tpm;
+use crate::system::secrets::secret::Secret;
 
 #[derive(Parser)]
 #[command(
@@ -210,7 +210,7 @@ fn tpm_unlock(action: TpmAction) -> Result<()> {
             Ok(())
         }
         TpmAction::Remove => actions::remove_tpm_unlock(&ask::unlock_key()?),
-        TpmAction::BeforeRestart => disk::seal::before_restart(),
+        TpmAction::BeforeRestart => disk::unlock::seal::before_restart(),
     }
 }
 
@@ -265,13 +265,13 @@ fn encryption(action: EncryptionAction) -> Result<()> {
         }
         EncryptionAction::Initrd => disk::run_in_initrd(),
         EncryptionAction::CopyTo { device } => {
-            println!("{}", disk::moving::copy_to(&device)?.display());
+            println!("{}", disk::layout::moving::copy_to(&device)?.display());
             Ok(())
         }
-        EncryptionAction::Retire { device } => disk::moving::retire(&device),
-        EncryptionAction::Settle { device, uuid } => disk::moving::settle(&device, &uuid),
-        EncryptionAction::Fit { device, size } => disk::moving::fit(&device, size),
-        EncryptionAction::InitrdMove => disk::moving::open_in_initrd(),
+        EncryptionAction::Retire { device } => disk::layout::moving::retire(&device),
+        EncryptionAction::Settle { device, uuid } => disk::layout::moving::settle(&device, &uuid),
+        EncryptionAction::Fit { device, size } => disk::layout::moving::fit(&device, size),
+        EncryptionAction::InitrdMove => disk::layout::moving::open_in_initrd(),
     }
 }
 

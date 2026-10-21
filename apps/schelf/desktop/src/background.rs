@@ -3,9 +3,10 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use gio::prelude::*;
-use luft_software::appimage::{self, AppImage, Placement};
+use luft_software::apps::appimage::{self, AppImage, Placement};
+use luft_software::apps::{flatpak, toolbox};
+use luft_software::system::updates;
 use luft_software::task::{Cancel, Task};
-use luft_software::{flatpak, toolbox, updates};
 
 const SEEDS: &str = "/usr/share/luft/preinstall";
 const BROWSER_TYPES: [&str; 4] = [

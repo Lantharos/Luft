@@ -1,4 +1,4 @@
-use crate::system::efi;
+use crate::system::firmware::efi;
 
 const BOOT_CURRENT: &str = "BootCurrent";
 const MEDIA: u8 = 4;

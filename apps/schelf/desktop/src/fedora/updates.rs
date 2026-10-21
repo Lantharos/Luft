@@ -1,7 +1,7 @@
 use luft_app::apps::App;
-use luft_software::classify::Classification;
-use luft_software::packages;
-use luft_software::updates::PackageUpdates;
+use luft_software::apps::classify::Classification;
+use luft_software::system::packages;
+use luft_software::system::updates::PackageUpdates;
 use tokio::task::spawn_blocking;
 
 use crate::library::Source;

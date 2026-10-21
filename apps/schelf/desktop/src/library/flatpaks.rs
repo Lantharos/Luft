@@ -1,6 +1,6 @@
 use gio::prelude::*;
 use luft_app::apps::App;
-use luft_software::flatpak;
+use luft_software::apps::flatpak;
 
 use super::{InstalledApp, Source};
 

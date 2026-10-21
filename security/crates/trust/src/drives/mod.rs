@@ -7,11 +7,12 @@ pub mod work;
 
 use anyhow::{Context, Result, bail};
 
-use crate::disk::{Check, keys, luks};
+use crate::disk::Check;
+use crate::disk::unlock::{keys, luks};
 use crate::errors::{Busy, NeedsKey, Unsupported};
-use crate::system::command::Tool;
-use crate::system::secret::Secret;
-use crate::system::{power, uuid};
+use crate::system::host::command::Tool;
+use crate::system::host::{power, uuid};
+use crate::system::secrets::secret::Secret;
 use hold::Hold;
 pub use record::{Change, Record};
 use room::Room;

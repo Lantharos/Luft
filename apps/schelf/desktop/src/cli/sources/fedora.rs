@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 use std::process::{Command, Stdio};
 
-use luft_software::toolbox::{self, Available, Repositories};
+use luft_software::apps::toolbox::{self, Available, Repositories};
 
 use super::{Candidate, Catalog, Kind};
 use crate::catalog::tools;

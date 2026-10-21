@@ -1,4 +1,4 @@
-use luft_software::flatpak::{FLATHUB, Installation};
+use luft_software::apps::flatpak::{FLATHUB, Installation};
 
 use crate::cli::Exit;
 use crate::cli::arguments::Arguments;

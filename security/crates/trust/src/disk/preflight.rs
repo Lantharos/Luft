@@ -1,12 +1,14 @@
 use std::path::Path;
 
 use crate::boot::esp;
-use crate::system::blocks;
-use crate::system::command::Tool;
-use crate::system::{efi, power, tpm};
+use crate::system::firmware::{efi, tpm};
+use crate::system::host::blocks;
+use crate::system::host::command::Tool;
+use crate::system::host::power;
 
-use super::room::HEADER_ROOM;
-use super::{SystemDisk, keys};
+use super::SystemDisk;
+use super::layout::room::HEADER_ROOM;
+use super::unlock::keys;
 
 const FREE_SPACE: u64 = 1 << 30;
 

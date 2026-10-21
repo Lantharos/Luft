@@ -3,8 +3,8 @@ use std::io::{BufRead, Write};
 use anyhow::{Result, bail};
 use rustix::termios::{self, LocalModes, OptionalActions};
 
-use crate::disk::keys;
-use crate::system::secret::Secret;
+use crate::disk::unlock::keys;
+use crate::system::secrets::secret::Secret;
 
 fn line(prompt: &str, hidden: bool) -> Result<Secret> {
     let stdin = std::io::stdin();

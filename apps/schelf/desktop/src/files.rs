@@ -6,9 +6,10 @@ use std::process::Command;
 use gio::prelude::*;
 use luft_app::portal::{FileChooser, Filter};
 use luft_app::{Commands, block_on};
-use luft_software::repositories;
+use luft_software::apps::{appimage, toolbox};
 use luft_software::system::System;
-use luft_software::{appimage, system_packages, toolbox};
+use luft_software::system::repositories;
+use luft_software::system::system_packages;
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 

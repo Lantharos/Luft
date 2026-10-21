@@ -1,4 +1,4 @@
-use luft_software::appimage;
+use luft_software::apps::appimage;
 
 use super::{InstalledApp, Source};
 

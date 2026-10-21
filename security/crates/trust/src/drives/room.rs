@@ -5,9 +5,9 @@ use serde::Deserialize;
 
 use super::target::Target;
 use crate::paths;
-use crate::system::blocks;
-use crate::system::command::Tool;
-use crate::system::secret::Secret;
+use crate::system::host::blocks;
+use crate::system::host::command::Tool;
+use crate::system::secrets::secret::Secret;
 
 pub const HEADER_ROOM: u64 = 32 << 20;
 const MARGIN: u64 = 64 << 20;

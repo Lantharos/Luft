@@ -1,7 +1,7 @@
 use std::os::unix::net::UnixStream;
 use std::path::PathBuf;
 
-use sushi::drivers;
+use sushi::display::drivers;
 
 use crate::takeover::Outcome;
 

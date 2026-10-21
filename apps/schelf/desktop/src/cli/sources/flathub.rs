@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use luft_software::flatpak;
+use luft_software::apps::flatpak;
 use serde::Deserialize;
 
 use super::{Candidate, Catalog, Kind};

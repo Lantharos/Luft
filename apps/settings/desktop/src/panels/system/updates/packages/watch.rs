@@ -5,7 +5,7 @@ use std::path::Path;
 use futures_util::StreamExt;
 use inotify::{Inotify, WatchMask};
 use luft_app::dbus;
-use luft_software::packagekit::{
+use luft_software::system::packagekit::{
     self,
     running::{self, Running},
 };

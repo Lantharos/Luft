@@ -6,7 +6,7 @@ use super::esp::{self, Esp};
 use super::files::{self, MOK_MANAGER, SECOND_STAGE, SHIM};
 use super::{entry, fallback, partition};
 use crate::keys::{self, mok};
-use crate::system::efi;
+use crate::system::firmware::efi;
 
 const BOOT_MENU: &str = "/usr/lib/sushi/efi/SushiBoot.efi";
 const FOLDER: &str = "EFI/luft";

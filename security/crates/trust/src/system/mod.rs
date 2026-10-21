@@ -1,14 +1,3 @@
-pub mod blocks;
-pub mod command;
-pub mod creds;
-pub mod efi;
-pub mod eventlog;
-pub mod journal;
-pub mod keyring;
-pub mod live;
-pub mod passbox;
-pub mod power;
-pub mod scratch;
-pub mod secret;
-pub mod tpm;
-pub mod uuid;
+pub mod firmware;
+pub mod host;
+pub mod secrets;

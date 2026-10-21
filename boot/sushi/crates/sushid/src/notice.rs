@@ -1,7 +1,7 @@
 use std::os::unix::net::UnixStream;
 use std::time::{Duration, Instant};
 
-use sushi::control::KeyEnrollment;
+use sushi::ipc::control::KeyEnrollment;
 use sushi::notice_file::{NoticeFile, SECONDS};
 use sushi::scene::Notice;
 use sushi::terminal::Key;

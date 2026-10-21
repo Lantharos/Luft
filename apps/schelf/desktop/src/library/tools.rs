@@ -1,4 +1,4 @@
-use luft_software::toolbox;
+use luft_software::apps::toolbox;
 
 use super::{InstalledApp, Source};
 

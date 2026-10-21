@@ -8,7 +8,7 @@ use super::esp::{self, Esp};
 use super::options::{self, LoadOption};
 use super::{entry, startup};
 use crate::errors::Unsupported;
-use crate::system::blocks;
+use crate::system::host::blocks;
 use references::Partitions;
 
 const LUFT_FOLDERS: [&str; 6] = [

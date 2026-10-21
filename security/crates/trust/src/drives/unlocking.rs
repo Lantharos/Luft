@@ -4,13 +4,16 @@ use std::path::{Path, PathBuf};
 use anyhow::{Context, Result, bail};
 
 use super::record::Record;
-use crate::disk::{self, keys, luks};
+use crate::disk;
+use crate::disk::unlock::{keys, luks};
 use crate::errors::Unsupported;
 use crate::paths;
-use crate::system::command::Tool;
-use crate::system::creds::{self, Protection};
-use crate::system::secret::Secret;
-use crate::system::{blocks, keyring, passbox, tpm};
+use crate::system::firmware::tpm;
+use crate::system::host::blocks;
+use crate::system::host::command::Tool;
+use crate::system::secrets::creds::{self, Protection};
+use crate::system::secrets::secret::Secret;
+use crate::system::secrets::{keyring, passbox};
 
 const KEYS: &str = "/etc/luks-keys";
 const KEY_BYTES: usize = 64;

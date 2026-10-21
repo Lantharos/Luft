@@ -1,6 +1,6 @@
 use std::process::Child;
 
-use sushi::drivers;
+use sushi::display::drivers;
 use sushi::scene::{FADE_SECONDS, ease};
 
 const EXPECT_LIMIT_SECONDS: f32 = 5.0;

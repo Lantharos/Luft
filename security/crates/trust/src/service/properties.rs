@@ -5,8 +5,8 @@ use zbus::{OwnedVariant, Variant};
 use super::status::{SigningKey, Startup};
 use crate::anticheat::Readiness;
 use crate::disk::DiskStatus;
-use crate::disk::worker::Progress;
-use crate::system::tpm::Tpm;
+use crate::disk::encryption::worker::Progress;
+use crate::system::firmware::tpm::Tpm;
 
 pub type Dict = HashMap<String, OwnedVariant>;
 

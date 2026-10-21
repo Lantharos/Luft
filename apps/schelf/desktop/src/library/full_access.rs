@@ -1,4 +1,4 @@
-use luft_software::flatpak;
+use luft_software::apps::flatpak;
 use luft_software::system::System;
 use serde::Deserialize;
 use tokio::task::spawn_blocking;

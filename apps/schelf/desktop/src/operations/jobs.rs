@@ -1,10 +1,11 @@
 use std::path::PathBuf;
 
 use luft_app::block_on;
-use luft_software::flatpak::{self, FLATHUB, Installation};
-use luft_software::repositories::{self, Draft};
+use luft_software::apps::flatpak::{self, FLATHUB, Installation};
+use luft_software::apps::{appimage, toolbox};
+use luft_software::system::repositories::{self, Draft};
+use luft_software::system::system_packages;
 use luft_software::task::Task;
-use luft_software::{appimage, system_packages, toolbox};
 use serde::{Deserialize, Serialize};
 
 use crate::fedora;

@@ -1,6 +1,6 @@
 use std::sync::Mutex;
 
-use luft_software::image::{self, Deployments};
+use luft_software::system::image::{self, Deployments};
 use luft_software::task::Task;
 use luft_software::variant::Variant;
 use serde::Serialize;

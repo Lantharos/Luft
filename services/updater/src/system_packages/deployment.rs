@@ -108,7 +108,7 @@ mod tests {
     #[test]
     fn reads_each_deployment_s_digest() {
         let fixture: serde_json::Value = serde_json::from_str(include_str!(
-            "../../../../packages/system/software/src/image/fixtures/staged.json"
+            "../../../../packages/system/software/src/system/image/fixtures/staged.json"
         ))
         .unwrap();
         let deployments = parse(fixture["host"].to_string().as_bytes()).unwrap();

@@ -1,7 +1,7 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use luft_software::appimage::{Icon, IconSize};
+use luft_software::apps::appimage::{Icon, IconSize};
 
 const GROUP: &str = "[Flatpak Ref]";
 const SYSTEM_INSTALLATION: &str = "/var/lib/flatpak";

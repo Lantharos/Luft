@@ -3,8 +3,8 @@ use crate::boot::startup;
 use crate::disk::{self, DiskStatus};
 use crate::keys::request::Request;
 use crate::keys::{self, mok, others};
-use crate::system::efi::{self, SecureBoot};
-use crate::system::tpm::{self, Tpm};
+use crate::system::firmware::efi::{self, SecureBoot};
+use crate::system::firmware::tpm::{self, Tpm};
 
 pub struct SigningKey {
     pub enrollment: mok::Enrollment,

@@ -3,10 +3,10 @@ use std::path::{Path, PathBuf};
 use anyhow::{Result, ensure};
 use serde::{Deserialize, Serialize};
 
-use crate::disk::mask;
+use crate::disk::encryption::mask;
 use crate::errors::Unsupported;
 use crate::paths;
-use crate::system::uuid;
+use crate::system::host::uuid;
 
 const FOLDER: &str = "/var/lib/trustd/drives";
 const CHANGING: &str = "/var/lib/trustd/changing";

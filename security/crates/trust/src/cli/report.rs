@@ -1,7 +1,7 @@
 use crate::anticheat::Readiness;
 use crate::disk::Check;
 use crate::service::status;
-use crate::system::secret::Secret;
+use crate::system::secrets::secret::Secret;
 
 fn yes_no(value: bool) -> &'static str {
     if value { "yes" } else { "no" }

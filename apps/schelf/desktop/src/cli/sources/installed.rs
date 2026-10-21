@@ -61,7 +61,7 @@ fn removal_job(app: &InstalledApp) -> Job {
         Source::Flatpak => Job::RemoveFlatpak {
             installation: app
                 .installation
-                .unwrap_or(luft_software::flatpak::Installation::User),
+                .unwrap_or(luft_software::apps::flatpak::Installation::User),
             reference: app.reference.clone().unwrap_or_default(),
         },
         Source::Package => Job::Fedora(fedora::Job::RemovePackage {

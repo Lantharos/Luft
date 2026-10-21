@@ -5,9 +5,9 @@ mod library;
 mod updates;
 
 use luft_app::Commands;
-use luft_software::packagekit::PackageDetails;
-use luft_software::packages;
 use luft_software::system::System;
+use luft_software::system::packagekit::PackageDetails;
+use luft_software::system::packages;
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;

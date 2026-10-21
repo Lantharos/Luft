@@ -4,8 +4,8 @@ use std::path::{Path, PathBuf};
 use anyhow::{Context, Result, bail};
 
 use crate::errors::Unsupported;
-use crate::system::blocks;
-use crate::system::command::Tool;
+use crate::system::host::blocks;
+use crate::system::host::command::Tool;
 
 const SYSTEM_MOUNTS: &[&str] = &[
     "/",

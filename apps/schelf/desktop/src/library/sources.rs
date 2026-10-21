@@ -1,6 +1,6 @@
 use luft_app::{Commands, block_on};
-use luft_software::repositories::{self, Described, Draft};
-use luft_software::system_packages::{self, Origin};
+use luft_software::system::repositories::{self, Described, Draft};
+use luft_software::system::system_packages::{self, Origin};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;

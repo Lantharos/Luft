@@ -1,5 +1,5 @@
 use luft_app::block_on;
-use luft_software::flatpak::Installation;
+use luft_software::apps::flatpak::Installation;
 
 use crate::cli::Exit;
 use crate::cli::arguments::Arguments;

@@ -1,6 +1,6 @@
 use luft_app::block_on;
 use luft_software::system::System;
-use luft_software::system_packages::{self, SystemPackages};
+use luft_software::system::system_packages::{self, SystemPackages};
 
 use super::{InstalledApp, Source};
 

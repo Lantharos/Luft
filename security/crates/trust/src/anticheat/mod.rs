@@ -1,8 +1,8 @@
 mod kernel;
 
 use crate::keys::mok::Enrollment;
-use crate::system::efi::{self, SecureBoot};
-use crate::system::tpm::Tpm;
+use crate::system::firmware::efi::{self, SecureBoot};
+use crate::system::firmware::tpm::Tpm;
 
 const LOCKDOWN_MODES: [&str; 2] = ["integrity", "confidentiality"];
 

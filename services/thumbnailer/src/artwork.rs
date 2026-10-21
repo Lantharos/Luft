@@ -7,7 +7,7 @@ use flate2::read::GzDecoder;
 use fast_image_resize::images::Image;
 use fast_image_resize::{FilterType, PixelType, ResizeAlg, ResizeOptions, Resizer};
 use image::{ImageFormat, ImageReader, Limits, RgbaImage};
-use luft_software::appimage::{Icon, IconSize};
+use luft_software::apps::appimage::{Icon, IconSize};
 use resvg::tiny_skia::{Pixmap, Transform};
 use resvg::usvg::{ImageHrefResolver, Options, Tree};
 

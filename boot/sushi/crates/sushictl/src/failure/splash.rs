@@ -4,8 +4,8 @@ use std::path::Path;
 use std::process::{Command, Stdio};
 use std::time::{Duration, Instant};
 
-use sushi::control::{self, Command as Request};
 use sushi::failure_file::FailureFile;
+use sushi::ipc::control::{self, Command as Request};
 
 const ANSWER_WAIT: Duration = Duration::from_secs(1);
 const START_WAIT: Duration = Duration::from_secs(5);

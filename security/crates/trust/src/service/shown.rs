@@ -1,7 +1,7 @@
 use serde::{Serialize, Serializer};
 use zbus::{Signature, Type};
 
-use crate::system::secret::Secret;
+use crate::system::secrets::secret::Secret;
 
 pub struct Shown(pub Secret);
 

@@ -5,12 +5,12 @@ use anyhow::{Context, Result};
 
 use super::record::{Change, Record};
 use super::unlocking;
-use crate::disk::reencrypt::{self, Progress};
-use crate::disk::{keys, luks};
+use crate::disk::encryption::reencrypt::{self, Progress};
+use crate::disk::unlock::{keys, luks};
 use crate::errors::NeedsKey;
-use crate::system::blocks;
-use crate::system::command::Tool;
-use crate::system::secret::Secret;
+use crate::system::host::blocks;
+use crate::system::host::command::Tool;
+use crate::system::secrets::secret::Secret;
 
 pub fn size_of(device: &Path) -> u64 {
     blocks::kernel_name(device).map_or(0, |name| blocks::size_bytes(&name))

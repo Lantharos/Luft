@@ -5,7 +5,7 @@ use crate::fedora;
 use crate::files::{self, Opened};
 use crate::library::sources::Bundled;
 use crate::operations::{Job, Request};
-use luft_software::repositories::Described;
+use luft_software::system::repositories::Described;
 
 const EXTENSIONS: [&str; 4] = [".rpm", ".appimage", ".flatpakref", ".flatpakrepo"];
 

@@ -5,8 +5,8 @@ use std::os::unix::process::CommandExt;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
+use sushi::ipc::password::{SHELL, Secret};
 use sushi::luks;
-use sushi::password::{SHELL, Secret};
 
 use super::splash;
 

@@ -1,7 +1,9 @@
 mod boot;
 mod card;
+pub mod drivers;
 mod modes;
 mod output;
+pub mod uevent;
 
 use std::io;
 use std::path::{Path, PathBuf};

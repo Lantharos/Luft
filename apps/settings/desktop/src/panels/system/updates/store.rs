@@ -2,7 +2,7 @@ use std::path::PathBuf;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use luft_app::files;
-use luft_software::image::Update;
+use luft_software::system::image::Update;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 

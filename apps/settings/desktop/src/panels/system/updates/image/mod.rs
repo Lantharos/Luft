@@ -1,8 +1,8 @@
 mod switch;
 mod watch;
 
-use luft_software::image::{self, Deployments, Release, Status, Update};
 use luft_software::progress::Progress;
+use luft_software::system::image::{self, Deployments, Release, Status, Update};
 use luft_software::task::{Cancel, Task};
 use serde::Serialize;
 

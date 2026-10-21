@@ -4,10 +4,10 @@ use super::CERTIFICATE;
 use super::mok;
 use crate::boot::files;
 use crate::errors::Unsupported;
-use crate::system::command::Tool;
-use crate::system::efi;
-use crate::system::scratch::Scratch;
-use crate::system::secret::Secret;
+use crate::system::firmware::efi;
+use crate::system::host::command::Tool;
+use crate::system::secrets::scratch::Scratch;
+use crate::system::secrets::secret::Secret;
 
 const NAME_FIELDS: [&str; 3] = ["commonName", "organizationName", "organizationalUnitName"];
 

@@ -3,7 +3,7 @@ pub mod flathub;
 pub mod tools;
 
 use luft_app::Commands;
-use luft_software::toolbox::Repositories;
+use luft_software::apps::toolbox::Repositories;
 use sabine::SabineWindow;
 use serde::Deserialize;
 

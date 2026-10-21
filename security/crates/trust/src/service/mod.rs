@@ -29,7 +29,7 @@ pub fn run() -> anyhow::Result<()> {
 }
 
 async fn serve() -> zbus::Result<()> {
-    if !system::live::running() {
+    if !system::host::live::running() {
         follow_up_on_this_start().await;
     }
     let idle = Arc::new(Idle::default());
@@ -59,7 +59,7 @@ async fn follow_up_on_this_start() {
     {
         eprintln!("Couldn't follow up on Luft's startup: {error:#}");
     }
-    if let Err(error) = tokio::task::spawn_blocking(disk::seal::follow_up)
+    if let Err(error) = tokio::task::spawn_blocking(disk::unlock::seal::follow_up)
         .await
         .expect("following up on the TPM's disk key doesn't panic")
     {

@@ -2,26 +2,23 @@
 
 extern crate alloc;
 
-pub mod failure;
 mod image;
 pub mod loader;
 mod logo;
 mod mark;
 mod monitor;
-mod notice;
-mod prompt;
+pub mod panels;
 mod scene;
-mod status;
 pub mod text;
 
-pub use failure::Failure;
 pub use image::decode_bmp;
 pub use logo::FirmwareLogo;
 pub use monitor::Monitor;
-pub use notice::Notice;
-pub use prompt::{Prompt, is_shaking};
+pub use panels::failure::Failure;
+pub use panels::notice::Notice;
+pub use panels::prompt::{Prompt, is_shaking};
+pub use panels::status::{Progress, Status};
 pub use scene::{Scene, Visuals};
-pub use status::{Progress, Status};
 pub use tiny_skia;
 
 use tiny_skia::{Path, PathBuilder};

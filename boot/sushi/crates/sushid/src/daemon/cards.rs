@@ -1,7 +1,7 @@
 use std::path::Path;
 
+use sushi::display::uevent::CardEvent;
 use sushi::display::{Card, Display};
-use sushi::uevent::CardEvent;
 
 use super::{Daemon, Firmware, Phase, Screen};
 

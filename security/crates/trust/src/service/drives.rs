@@ -13,10 +13,10 @@ use zbus::{OwnedVariant, Variant};
 use super::PATH;
 use super::error::Error;
 use super::shown::Shown;
-use crate::disk::reencrypt::Progress;
+use crate::disk::encryption::reencrypt::Progress;
 use crate::drives::{self, Change, DriveStatus, Record};
-use crate::system::secret::Secret;
-use crate::system::{power, uuid};
+use crate::system::host::{power, uuid};
+use crate::system::secrets::secret::Secret;
 
 const CHECK: &str = "com.lantharos.trust.check";
 const MANAGE: &str = "com.lantharos.trust.manage-drive-encryption";

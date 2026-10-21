@@ -1,6 +1,6 @@
 use luft_i18n::t;
-use luft_software::image::Deployments;
 use luft_software::system::System;
+use luft_software::system::image::Deployments;
 use luft_software::variant::{self, Variant};
 
 use super::background::notify;

@@ -2,8 +2,8 @@ use anyhow::{Context, Result};
 use serde_json::Value;
 
 use crate::paths::RUNTIME;
-use crate::system::command::Tool;
-use crate::system::efi;
+use crate::system::firmware::efi;
+use crate::system::host::command::Tool;
 
 const GOOD: &str = "LuftBootGood";
 const TRIED: &str = "LuftBootTried";

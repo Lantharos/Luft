@@ -3,10 +3,10 @@ mod watch;
 
 use futures_util::future::join;
 use luft_i18n::t;
-use luft_software::packagekit::{self, Mode, PackageId, Results, Update, offline};
 use luft_software::progress::Progress;
+use luft_software::system::packagekit::{self, Mode, PackageId, Results, Update, offline};
+use luft_software::system::updates::PackageUpdates;
 use luft_software::task::{Cancel, Task};
-use luft_software::updates::PackageUpdates;
 use serde::Serialize;
 
 use super::backend::{AVAILABLE, Backend, Notice, READY};

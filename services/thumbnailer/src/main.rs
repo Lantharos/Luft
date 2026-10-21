@@ -7,7 +7,7 @@ use std::io::Read;
 use std::path::Path;
 use std::process::ExitCode;
 
-use luft_software::appimage::{self, Icon};
+use luft_software::apps::appimage::{self, Icon};
 
 use request::Request;
 

@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::path::Path;
 
 use crate::boot::options::guid_bytes;
-use crate::system::blocks;
+use crate::system::host::blocks;
 
 const BCD: &str = "Boot/BCD";
 const GRUB_CONFIG: &str = "grub.cfg";

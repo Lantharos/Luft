@@ -2,8 +2,8 @@ use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
-use luft_software::repositories;
-use luft_software::toolbox::{self, Available, Repositories};
+use luft_software::apps::toolbox::{self, Available, Repositories};
+use luft_software::system::repositories;
 
 use super::cache::Entry;
 

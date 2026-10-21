@@ -1,7 +1,7 @@
 use anyhow::Result;
 
 use super::esp::Esp;
-use crate::system::command::Tool;
+use crate::system::host::command::Tool;
 
 const SYSTEMD_BOOT: &str = "Linux Boot Manager";
 

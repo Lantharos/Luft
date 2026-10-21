@@ -1,4 +1,4 @@
-use sushi::control::Mode;
+use sushi::ipc::control::Mode;
 use sushi::scene::{Progress, Status};
 
 use crate::screen::Fader;

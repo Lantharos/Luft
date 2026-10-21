@@ -4,7 +4,8 @@ use std::os::unix::net::UnixStream;
 use rustix::net::{RecvFlags, recv};
 
 use sushi::failure_file::{DETAILS, FailureFile};
-use sushi::scene::{Failure, failure};
+use sushi::scene::Failure;
+use sushi::scene::panels::failure;
 use sushi::terminal::Key;
 
 pub struct Shown {

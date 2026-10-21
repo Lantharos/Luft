@@ -15,12 +15,14 @@ use super::properties::{self, Dict};
 use super::shown::Shown;
 use super::status::{self, Status};
 use crate::boot::{attempts, other_systems, startup};
-use crate::disk::state::Plan;
-use crate::disk::worker::{self, Progress};
-use crate::disk::{self, grow, keys, old_system};
+use crate::disk;
+use crate::disk::encryption::state::Plan;
+use crate::disk::encryption::worker::{self, Progress};
+use crate::disk::layout::{grow, old_system};
+use crate::disk::unlock::keys;
 use crate::keys::{mok, others};
-use crate::system::power;
-use crate::system::secret::Secret;
+use crate::system::host::power;
+use crate::system::secrets::secret::Secret;
 
 const CHECK: &str = "com.lantharos.trust.check";
 const ENCRYPTION: &str = "com.lantharos.trust.manage-encryption";
@@ -314,7 +316,7 @@ impl Trust {
     ) -> Result<(), Error> {
         self.authorize(connection, &header, ACCEPT_SECURE_BOOT)
             .await?;
-        self.run(&emitter, disk::seal::accept_secure_boot_change)
+        self.run(&emitter, disk::unlock::seal::accept_secure_boot_change)
             .await
     }
 

@@ -2,11 +2,11 @@ use alloc::sync::Arc;
 
 use tiny_skia::{Color, Pixmap, PixmapPaint, Rect as Area, Transform};
 
-use crate::failure::{self, Failure};
 use crate::image::resized;
-use crate::notice::{self, Notice};
-use crate::prompt::{self, Prompt};
-use crate::status::{self, Status};
+use crate::panels::failure::{self, Failure};
+use crate::panels::notice::{self, Notice};
+use crate::panels::prompt::{self, Prompt};
+use crate::panels::status::{self, Status};
 use crate::{FirmwareLogo, Layout, Rect, loader};
 
 #[derive(Clone, Copy, Default)]

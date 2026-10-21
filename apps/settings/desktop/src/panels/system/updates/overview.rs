@@ -1,7 +1,7 @@
 use std::sync::{Mutex, MutexGuard};
 
+use luft_software::system::updates;
 use luft_software::task::Task;
-use luft_software::updates;
 use serde::Serialize;
 
 use super::backend;

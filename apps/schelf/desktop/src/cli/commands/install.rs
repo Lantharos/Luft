@@ -1,4 +1,4 @@
-use luft_software::toolbox;
+use luft_software::apps::toolbox;
 
 use super::{catalog, list_of, pick};
 use crate::cli::Exit;

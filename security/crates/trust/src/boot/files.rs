@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 use anyhow::{Context, Result};
 
 use super::pe::PeFile;
-use crate::system::efi;
+use crate::system::firmware::efi;
 
 pub const SHIM: &str = "shimx64.efi";
 pub const MOK_MANAGER: &str = "mmx64.efi";

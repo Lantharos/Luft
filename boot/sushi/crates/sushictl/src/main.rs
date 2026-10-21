@@ -6,8 +6,8 @@ use std::time::Duration;
 
 use clap::{Parser, Subcommand};
 
-use sushi::control::{self, Command, KeyEnrollment, Mode};
-use sushi::drivers;
+use sushi::display::drivers;
+use sushi::ipc::control::{self, Command, KeyEnrollment, Mode};
 
 const NOTICE_WAIT: Duration = Duration::from_secs(300);
 const DRIVER_WAIT: Duration = Duration::from_secs(20);

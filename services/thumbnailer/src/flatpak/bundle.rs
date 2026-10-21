@@ -2,7 +2,7 @@ use std::fs::File;
 use std::path::Path;
 
 use glib::{Bytes, Variant, VariantDict, VariantTy};
-use luft_software::appimage::{Icon, IconSize};
+use luft_software::apps::appimage::{Icon, IconSize};
 use memmap2::Mmap;
 
 const MAGICS: [&[u8]; 2] = [b"flatpak\0\x01\0\x89\xe5", b"xdg-app\0\x01\0\x89\xe5"];

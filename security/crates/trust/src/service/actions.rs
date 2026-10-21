@@ -1,9 +1,10 @@
 use anyhow::{Result, bail};
 
-use crate::disk::{SystemDisk, keys, luks, seal};
+use crate::disk::SystemDisk;
+use crate::disk::unlock::{keys, luks, seal};
 use crate::errors::Unsupported;
-use crate::system::secret::Secret;
-use crate::system::tpm;
+use crate::system::firmware::tpm;
+use crate::system::secrets::secret::Secret;
 
 fn encrypted_disk() -> Result<(SystemDisk, luks::Header)> {
     let disk = SystemDisk::find()?;

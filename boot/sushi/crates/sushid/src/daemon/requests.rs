@@ -4,9 +4,9 @@ use std::path::Path;
 use std::time::Duration;
 
 use sushi::config::Config;
-use sushi::control::{Command, Mode};
+use sushi::ipc::control::{Command, Mode};
+use sushi::ipc::plymouth::{Client, Request, Response};
 use sushi::notice_file::NoticeFile;
-use sushi::plymouth::{Client, Request, Response};
 
 use crate::notice::{self, Shown};
 

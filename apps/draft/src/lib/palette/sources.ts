@@ -1,8 +1,8 @@
-import { basename, fuzzyMatch, matchItems, topMatches, type PaletteItem, type PaletteSource } from '@luft/ui';
+import { basename, fuzzyMatch, matchItems, type PaletteItem, type PaletteSource, parent, topMatches } from '@luft/ui';
 import type { App } from '#lib/app/app.svelte.js';
 import type { Command } from '#lib/commands/registry.js';
 import { openPath } from '#lib/documents/opening.js';
-import { dirname, tildify } from '#lib/utils/paths.js';
+import { tildify } from '#lib/utils/paths.js';
 
 const LIMIT = 80;
 const COMMAND_PREFIX = '>';
@@ -23,7 +23,7 @@ function fileItems(app: App, query: string): PaletteItem[] {
 		return documents.map((document) => ({
 			key: document.id,
 			label: document.name,
-			detail: tildify(dirname(document.path!), workspace.home),
+			detail: tildify(parent(document.path!), workspace.home),
 			run: open(document.path!)
 		}));
 	}

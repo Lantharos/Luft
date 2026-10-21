@@ -13,15 +13,6 @@ export function extension(name: string) {
 	return dot > 0 ? name.slice(dot + 1).toLowerCase() : '';
 }
 
-export function parent(path: string) {
-	const slash = path.lastIndexOf('/');
-	return slash > 0 ? path.slice(0, slash) : '/';
-}
-
-export function baseName(path: string) {
-	return path.slice(path.lastIndexOf('/') + 1);
-}
-
 export function stem(name: string) {
 	const dot = name.lastIndexOf('.');
 	return dot > 0 ? name.slice(0, dot) : name;

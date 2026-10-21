@@ -1,5 +1,5 @@
+import { basename } from '@luft/ui';
 import type { Location, Place } from '#lib/bridge/api.js';
-import { baseName } from './kinds';
 
 export const PLACE_NAMES: Record<Place, string> = {
 	pictures: 'Pictures',
@@ -10,5 +10,5 @@ export const PLACE_NAMES: Record<Place, string> = {
 
 export function folderTitle(path: string, places: Location[]) {
 	const place = places.find((location) => location.path === path)?.place;
-	return place ? PLACE_NAMES[place] : baseName(path) || '/';
+	return place ? PLACE_NAMES[place] : basename(path);
 }

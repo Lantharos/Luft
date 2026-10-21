@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { appearance, CommandPalette, GlassShell, PaletteState, plural, Toast, tooltip } from '@luft/ui';
+	import { appearance, basename, CommandPalette, GlassShell, PaletteState, plural, Toast, tooltip } from '@luft/ui';
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import * as api from '#lib/api/index.js';
 	import { commands, paletteSource, type Shell } from '#lib/app/commands.js';
@@ -156,7 +156,7 @@
 		{/if}
 		<main class="glass-content relative isolate">
 			{#if opened.file}
-				<Header title="Message" subtitle={opened.file.split('/').pop()}>
+				<Header title="Message" subtitle={basename(opened.file)}>
 					{#snippet leading()}
 						{#if !opened.focused}
 							<button type="button" class="icon-button" aria-label="Back to mail" onclick={() => opened.close()} {@attach tooltip('Back to mail')}><ArrowLeft size={18} /></button>

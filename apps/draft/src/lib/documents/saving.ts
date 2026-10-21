@@ -1,6 +1,5 @@
-import { basename } from '@luft/ui';
+import { basename, parent } from '@luft/ui';
 import { detectLanguage } from '#lib/editor/languages.js';
-import { dirname } from '#lib/utils/paths.js';
 import { textChunks } from './chunks';
 import type { Document } from './document.svelte';
 import { LINE_BREAKS } from './encodings';
@@ -37,7 +36,7 @@ async function write(workspace: Workspace, document: Document, path: string) {
 }
 
 export async function saveAs(workspace: Workspace, document: Document) {
-	const folder = document.path ? dirname(document.path) : workspace.tree.root;
+	const folder = document.path ? parent(document.path) : workspace.tree.root;
 	const path = await workspace.backend.chooseSave(document.path ? basename(document.path) : `${document.name}.txt`, folder).catch((error) => {
 		workspace.report(error);
 		return null;

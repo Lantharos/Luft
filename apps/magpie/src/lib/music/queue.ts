@@ -1,12 +1,13 @@
+import { basename } from '@luft/ui';
 import type { Tags } from '#lib/bridge/api.js';
-import { baseName, stem } from '#lib/library/kinds.js';
+import { stem } from '#lib/library/kinds.js';
 
 export interface Track extends Tags {
 	name: string;
 }
 
 export function trackFrom(tags: Tags): Track {
-	return { ...tags, name: stem(baseName(tags.path)) };
+	return { ...tags, name: stem(basename(tags.path)) };
 }
 
 export function trackTitle(track: Track) {

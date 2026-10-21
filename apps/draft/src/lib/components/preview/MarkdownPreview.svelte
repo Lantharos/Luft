@@ -1,10 +1,9 @@
 <script lang="ts">
-	import { RemoteImagesNotice, renderMarkdown } from '@luft/ui';
+	import { join, parent, RemoteImagesNotice, renderMarkdown } from '@luft/ui';
 	import { SvelteSet } from 'svelte/reactivity';
 	import { highlight } from '@luft/ui/code';
 	import { useApp } from '#lib/app/context.js';
 	import { openPath } from '#lib/documents/opening.js';
-	import { dirname, join } from '#lib/utils/paths.js';
 
 	const app = useApp();
 	let workspace = $derived(app.workspace);
@@ -79,7 +78,7 @@
 		if (WEB_LINK.test(href)) return void app.backend.openLink(href);
 		if (href.startsWith('#')) return;
 		const path = workspace.active?.path;
-		if (path) void openPath(workspace, href.startsWith('/') ? href : join(dirname(path), decodeURI(href.split('#')[0])));
+		if (path) void openPath(workspace, href.startsWith('/') ? href : join(parent(path), decodeURI(href.split('#')[0])));
 	}
 </script>
 

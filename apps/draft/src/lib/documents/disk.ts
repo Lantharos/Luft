@@ -1,11 +1,11 @@
-import { dirname } from '#lib/utils/paths.js';
+import { parent } from '@luft/ui';
 import type { Document } from './document.svelte';
 import { reload } from './opening';
 import type { Workspace } from './workspace.svelte';
 
 export function watchedFolders(workspace: Workspace) {
 	const folders = new Set(workspace.tree.folders);
-	for (const document of workspace.documents) if (document.path) folders.add(dirname(document.path));
+	for (const document of workspace.documents) if (document.path) folders.add(parent(document.path));
 	return [...folders];
 }
 

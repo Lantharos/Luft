@@ -1,8 +1,7 @@
-import { isInside } from '@luft/ui';
+import { isInside, parent } from '@luft/ui';
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 import type { Backend } from '#lib/bridge/index.js';
 import type { Entry } from '#lib/bridge/types.js';
-import { dirname } from '#lib/utils/paths.js';
 
 export interface TreeRow {
 	entry: Entry;
@@ -72,13 +71,13 @@ export class FolderTree {
 	async reveal(path: string) {
 		if (!this.root || !isInside(path, this.root)) return;
 		const ancestors: string[] = [];
-		for (let folder = dirname(path); folder !== this.root && isInside(folder, this.root); folder = dirname(folder)) ancestors.unshift(folder);
+		for (let folder = parent(path); folder !== this.root && isInside(folder, this.root); folder = parent(folder)) ancestors.unshift(folder);
 		for (const folder of ancestors) if (!this.expanded.has(folder)) await this.#expand(folder);
 		this.#onchange();
 	}
 
 	async refresh(paths: string[]) {
-		const folders = new Set(paths.flatMap((path) => [path, dirname(path)]).filter((folder) => this.#listings.has(folder)));
+		const folders = new Set(paths.flatMap((path) => [path, parent(path)]).filter((folder) => this.#listings.has(folder)));
 		await Promise.all([...folders].map((folder) => this.#load(folder)));
 	}
 

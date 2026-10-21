@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { PasswordField, Row, Select, TextField } from '@luft/ui';
+	import { basename, PasswordField, Row, Select, TextField } from '@luft/ui';
 	import { chooseCertificate, type EapMethod, type Enterprise } from '@luft/network';
 	import type { Errors } from './validate';
 
@@ -39,14 +39,10 @@
 	let authority = $derived<Authority>(enterprise.caCertificate ? 'file' : enterprise.systemCertificates ? 'system' : 'none');
 	let authorities = $derived<{ value: Authority; label: string }[]>([
 		{ value: 'system', label: t('settings-network-ca-system') },
-		{ value: 'file', label: enterprise.caCertificate ? fileName(enterprise.caCertificate) : t('settings-network-ca-file') },
+		{ value: 'file', label: enterprise.caCertificate ? basename(enterprise.caCertificate) : t('settings-network-ca-file') },
 		...(enterprise.caCertificate ? [{ value: 'another' as const, label: t('settings-network-ca-another-file') }] : []),
 		{ value: 'none', label: t('settings-network-ca-none') }
 	]);
-
-	function fileName(path: string) {
-		return path.split('/').pop() ?? path;
-	}
 
 	function chooseMethod(method: EapMethod) {
 		enterprise.method = method;
@@ -76,7 +72,7 @@
 {#snippet file(path: string | null, error: string | undefined, choose: () => void)}
 	<div class="flex max-w-[260px] flex-col items-end gap-1.5">
 		<button type="button" class="button max-w-full" onclick={choose}>
-			<span class="truncate">{path ? fileName(path) : t('settings-network-choose-file')}</span>
+			<span class="truncate">{path ? basename(path) : t('settings-network-choose-file')}</span>
 		</button>
 		{#if error && !path}
 			<p class="px-3.5 text-[12.5px] text-[var(--danger)]">{error}</p>

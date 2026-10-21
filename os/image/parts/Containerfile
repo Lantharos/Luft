@@ -16,6 +16,7 @@ ENV CARGO_HOME=/var/cache/cargo CARGO_TARGET_DIR=/var/cache/luft-part/target LUF
     CCACHE_DIR=/var/cache/ccache CCACHE_MAXSIZE=1G
 
 FROM builder AS kestrel-build
+COPY package.json bun.lock /src/
 COPY kestrel /src/kestrel
 COPY packages/motion /src/packages/motion
 COPY packages/ui/src/taskbar /src/packages/ui/src/taskbar

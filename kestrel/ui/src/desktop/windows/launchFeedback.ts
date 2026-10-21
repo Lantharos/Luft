@@ -24,7 +24,7 @@ export class LaunchFeedback {
   private readonly signals: number[];
 
   constructor() {
-    const display = (global as unknown as Shell.Global).display;
+    const display = global.display;
     this.signals = [
       display.connect('window-created', (_display, window: Meta.Window) => {
         const shown = window.connect('shown', () => {
@@ -39,7 +39,7 @@ export class LaunchFeedback {
   }
 
   destroy(): void {
-    const display = (global as unknown as Shell.Global).display;
+    const display = global.display;
     for (const signal of this.signals) display.disconnect(signal);
   }
 }

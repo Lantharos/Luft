@@ -11,14 +11,12 @@ export interface SessionMode {
 
 const RECENT_INPUT_MS = 3000;
 
-const shell = () => global as unknown as Shell.Global;
-
 let session: SessionMode | null = null;
 const sharing = new Set<Meta.RemoteAccessHandle>();
 
 export function followSession(mode: SessionMode): void {
   session = mode;
-  shell().backend.get_remote_access_controller()?.connect('new-handle', (_controller, handle: Meta.RemoteAccessHandle) => {
+  global.backend.get_remote_access_controller()?.connect('new-handle', (_controller, handle: Meta.RemoteAccessHandle) => {
     if (handle.is_recording) return;
     sharing.add(handle);
     handle.connect('stopped', () => sharing.delete(handle));
@@ -30,7 +28,7 @@ export function onlyErrors(): boolean {
 }
 
 function playingFullscreenGame(): boolean {
-  const window = shell().display.focus_window;
+  const window = global.display.focus_window;
   return window !== null && window.is_fullscreen() && isGame(window);
 }
 
@@ -41,5 +39,5 @@ export function busy(): boolean {
 export function interactingWith(appId: string): boolean {
   const focused = Shell.WindowTracker.get_default().focus_app?.get_id();
   if (focused !== appId && focused !== `${appId}.desktop`) return false;
-  return shell().backend.get_core_idle_monitor().get_idletime() < RECENT_INPUT_MS;
+  return global.backend.get_core_idle_monitor().get_idletime() < RECENT_INPUT_MS;
 }

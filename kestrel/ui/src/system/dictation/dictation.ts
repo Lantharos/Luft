@@ -1,7 +1,6 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import Shell from 'gi://Shell';
 import * as MessageTray from 'resource:///com/lantharos/kestrel/ui/messageTray.js';
 import { getInputSourceManager } from 'resource:///com/lantharos/kestrel/ui/status/keyboard.js';
 
@@ -20,9 +19,6 @@ const MODIFIER_WAIT_MS = 1000;
 type Phase = 'idle' | 'listening' | 'finishing';
 type Mode = 'hold' | 'toggle';
 
-const shell = () => global as unknown as Shell.Global;
-const prependFilter = (Clutter.Event as unknown as { prepend_filter: typeof Clutter.Event.add_filter }).prepend_filter;
-
 function currentLayout(): string {
   const manager = getInputSourceManager();
   const source = manager.currentSource;
@@ -32,7 +28,7 @@ function currentLayout(): string {
 function afterModifiersAreReleased(run: () => void): void {
   const deadline = GLib.get_monotonic_time() + MODIFIER_WAIT_MS * 1000;
   GLib.timeout_add(GLib.PRIORITY_DEFAULT, MODIFIER_POLL_MS, () => {
-    const [, , modifiers] = shell().get_pointer();
+    const [, , modifiers] = global.get_pointer();
     if (modifiers & HELD_MODIFIERS && GLib.get_monotonic_time() < deadline) return GLib.SOURCE_CONTINUE;
     run();
     return GLib.SOURCE_REMOVE;
@@ -167,7 +163,7 @@ export class Dictation {
   }
 
   private listenForEscape(): void {
-    this.escapeFilter = prependFilter(null, event => {
+    this.escapeFilter = Clutter.Event.prepend_filter(null, event => {
       if (event.type() !== Clutter.EventType.KEY_PRESS || event.get_key_symbol() !== Clutter.KEY_Escape) return Clutter.EVENT_PROPAGATE;
       this.cancel();
       return Clutter.EVENT_STOP;

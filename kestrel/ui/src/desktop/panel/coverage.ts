@@ -1,5 +1,4 @@
 import Meta from 'gi://Meta';
-import Shell from 'gi://Shell';
 
 import type { Monitor } from './panel.js';
 
@@ -22,9 +21,8 @@ function covers(window: Meta.Window, monitor: Monitor): boolean {
 }
 
 export function coveredMonitors(monitors: Monitor[]): Set<number> {
-  const shell = global as unknown as Shell.Global;
-  const workspace = shell.workspace_manager.get_active_workspace();
-  const windows = shell.display.sort_windows_by_stacking(workspace.list_windows().filter(window => onScreen(window, workspace))).reverse();
+  const workspace = global.workspace_manager.get_active_workspace();
+  const windows = global.display.sort_windows_by_stacking(workspace.list_windows().filter(window => onScreen(window, workspace))).reverse();
   const covered = new Set<number>();
   for (const monitor of monitors) {
     const top = windows.find(window => window.get_monitor() === monitor.index);
@@ -41,7 +39,7 @@ function coversWorkArea(window: Meta.Window, workspace: Meta.Workspace, monitor:
 }
 
 export function visibleWallpaperMonitors(monitors: Monitor[]): Set<number> {
-  const workspace = (global as unknown as Shell.Global).workspace_manager.get_active_workspace();
+  const workspace = global.workspace_manager.get_active_workspace();
   const windows = workspace.list_windows().filter(window => onScreen(window, workspace) && opaque(window));
   return new Set(monitors
     .filter(monitor => !windows.some(window => coversWorkArea(window, workspace, monitor)))

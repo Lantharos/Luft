@@ -1,7 +1,6 @@
 import Gio from 'gi://Gio';
 import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
-import type Shell from 'gi://Shell';
 
 import type { PromptQueue } from './queue.js';
 import { accessRequest, passwordRequest, type Options } from './request.js';
@@ -102,7 +101,7 @@ export class KeyringPrompter {
   }
 
   private async authorized(invocation: Invocation): Promise<boolean> {
-    if ((global as unknown as Shell.Global).context.unsafe_mode) return true;
+    if (global.context.unsafe_mode) return true;
     try {
       const owner = await invocation.get_connection().call('org.freedesktop.DBus', '/org/freedesktop/DBus', 'org.freedesktop.DBus',
         'GetNameOwner', new GLib.Variant('(s)', [SECRET_SERVICE]), new GLib.VariantType('(s)'), Gio.DBusCallFlags.NONE, -1, null);

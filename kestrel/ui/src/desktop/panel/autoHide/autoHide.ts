@@ -1,7 +1,6 @@
 import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import Mtk from 'gi://Mtk';
-import type Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import { animateActor } from '../../../shared/motion.js';
@@ -26,7 +25,7 @@ export class AutoHide {
   constructor(private readonly panel: St.Widget, private readonly monitor: () => Monitor | null, private readonly rest: () => number) {
     panel.connect('notify::hover', () => this.sync());
     this.edge.connect('notify::hover', () => this.sync());
-    const stage = (global as unknown as Shell.Global).stage;
+    const stage = global.stage;
     this.focusSignal = stage.connect('notify::key-focus', () => this.sync());
     panel.connect('destroy', () => {
       this.cancel();
@@ -100,7 +99,7 @@ export class AutoHide {
   }
 
   private wanted(whenClear: boolean): boolean {
-    const stage = (global as unknown as Shell.Global).stage;
+    const stage = global.stage;
     const focus = stage.get_key_focus();
     return this.active || this.panel.hover || this.edge.hover || (!!focus && this.panel.contains(focus)) ||
       (this.held && this.revealed) || (whenClear && !this.touched());

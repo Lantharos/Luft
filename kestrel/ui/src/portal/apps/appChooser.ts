@@ -1,7 +1,6 @@
 import Gio from 'gi://Gio';
 import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
-import Shell from 'gi://Shell';
 import type St from 'gi://St';
 
 import { appIcon } from '../../appearance/icons/appIcons.js';
@@ -51,7 +50,7 @@ function heading(location: string | undefined, contentType: string | null): { ti
 
 function findInStore(store: GioUnix.DesktopAppInfo, contentType: string | null): void {
   const query = contentType ? Gio.content_type_get_description(contentType) : '';
-  store.launch_uris([`schelf:search?${GLib.uri_escape_string(query, null, false)}`], (global as unknown as Shell.Global).create_app_launch_context(0, -1));
+  store.launch_uris([`schelf:search?${GLib.uri_escape_string(query, null, false)}`], global.create_app_launch_context(0, -1));
 }
 
 function nothingInstalled(): St.Widget {

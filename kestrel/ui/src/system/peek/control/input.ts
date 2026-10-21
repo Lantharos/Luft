@@ -1,7 +1,6 @@
 import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import type Meta from 'gi://Meta';
-import type Shell from 'gi://Shell';
 
 import { t } from '../../../shared/i18n/index.js';
 import { PeekError } from '../errors.js';
@@ -17,9 +16,6 @@ const HELD = Clutter.ModifierType.CONTROL_MASK | Clutter.ModifierType.SHIFT_MASK
   | Clutter.ModifierType.BUTTON2_MASK | Clutter.ModifierType.BUTTON3_MASK;
 const POINTER = new Set([Clutter.EventType.MOTION, Clutter.EventType.BUTTON_PRESS, Clutter.EventType.BUTTON_RELEASE, Clutter.EventType.SCROLL]);
 const KEYS = new Set([Clutter.EventType.KEY_PRESS, Clutter.EventType.KEY_RELEASE]);
-
-const shell = () => global as unknown as Shell.Global;
-const prependFilter = (Clutter.Event as unknown as { prepend_filter: typeof Clutter.Event.add_filter }).prepend_filter;
 
 interface Devices {
   readonly pointer: Clutter.VirtualInputDevice;
@@ -51,8 +47,8 @@ export class Injector {
 
   constructor(private readonly guarded: () => boolean, ownsTheSeat: boolean) {
     if (ownsTheSeat) this.created();
-    this.filter = prependFilter(null, (event, actor) => this.deliver(event, actor));
-    this.keybindings = shell().window_manager.connect('filter-keybinding', () => {
+    this.filter = Clutter.Event.prepend_filter(null, (event, actor) => this.deliver(event, actor));
+    this.keybindings = global.window_manager.connect('filter-keybinding', () => {
       const event = Clutter.get_current_event() as Clutter.Event | null;
       return !!event && this.batches.has(event.get_time_us());
     });
@@ -60,7 +56,7 @@ export class Injector {
 
   destroy(): void {
     Clutter.Event.remove_filter(this.filter);
-    shell().window_manager.disconnect(this.keybindings);
+    global.window_manager.disconnect(this.keybindings);
   }
 
   move(target: Meta.Window, [x, y]: Point): Promise<void> {
@@ -128,7 +124,7 @@ export class Injector {
   }
 
   private created(): Devices {
-    const seat = shell().stage.context.get_backend().get_default_seat();
+    const seat = global.stage.context.get_backend().get_default_seat();
     this.devices ??= {
       pointer: seat.create_virtual_device(Clutter.InputDeviceType.POINTER_DEVICE),
       keyboard: seat.create_virtual_device(Clutter.InputDeviceType.KEYBOARD_DEVICE),
@@ -153,8 +149,8 @@ export class Injector {
       return !!window && partOf(window, target);
     }
     if (KEYS.has(type)) {
-      const stage = shell().stage;
-      const focus = shell().display.focus_window;
+      const stage = global.stage;
+      const focus = global.display.focus_window;
       const keyFocus = stage.get_key_focus();
       return !!focus && partOf(focus, target) && (keyFocus === null || keyFocus === stage);
     }
@@ -162,7 +158,7 @@ export class Injector {
   }
 
   private async inject(target: Meta.Window, send: (stamp: Stamp) => void | Promise<void>): Promise<void> {
-    const [, , modifiers] = shell().get_pointer();
+    const [, , modifiers] = global.get_pointer();
     if (modifiers & HELD) throw new PeekError('Busy', t('peek-error-input-held'));
     const stamps: number[] = [];
     let delivered = () => {};

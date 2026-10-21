@@ -1,5 +1,4 @@
 import Clutter from 'gi://Clutter';
-import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 const directions = new Map([
@@ -19,7 +18,7 @@ export function navigateWithKeyboard(root: St.Widget): void {
       return Clutter.EVENT_PROPAGATE;
     const key = event.get_key_symbol();
     const tab = key === Clutter.KEY_Tab || key === Clutter.KEY_ISO_Left_Tab;
-    const focus = (global as unknown as Shell.Global).stage.get_key_focus();
+    const focus = global.stage.get_key_focus();
     if (!tab && focus instanceof Clutter.Text && focus.editable) return Clutter.EVENT_PROPAGATE;
     const direction = tab
       ? (key === Clutter.KEY_ISO_Left_Tab || event.get_state() & Clutter.ModifierType.SHIFT_MASK) ? St.DirectionType.TAB_BACKWARD : St.DirectionType.TAB_FORWARD

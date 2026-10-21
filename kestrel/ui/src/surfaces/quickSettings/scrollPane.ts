@@ -1,5 +1,4 @@
 import Clutter from 'gi://Clutter';
-import type Shell from 'gi://Shell';
 import St from 'gi://St';
 import { ensureActorVisibleInScrollView } from 'resource:///com/lantharos/kestrel/misc/animationUtils.js';
 
@@ -11,7 +10,7 @@ export class ScrollPane {
   });
 
   constructor() {
-    const stage = (global as unknown as Shell.Global).stage;
+    const stage = global.stage;
     const focusSignal = stage.connect('notify::key-focus', () => {
       const focus = stage.get_key_focus();
       if (focus && this.body.contains(focus)) this.reveal(focus);

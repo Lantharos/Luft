@@ -1,5 +1,4 @@
 import GLib from 'gi://GLib';
-import type Shell from 'gi://Shell';
 
 const WORD_BASE = 0x80;
 
@@ -55,7 +54,7 @@ export function codepointOf(text: string): string {
 }
 
 export function loadCharacters(): CharacterTab[] {
-  const path = `${(global as unknown as Shell.Global).datadir}/characters.json`;
+  const path = `${global.datadir}/characters.json`;
   const table: CharacterTable = JSON.parse(new TextDecoder().decode(GLib.file_get_contents(path)[1]));
   const decode = decoder(table.words.split(' '));
   return table.tabs.map(({ sections, ...tab }) => ({

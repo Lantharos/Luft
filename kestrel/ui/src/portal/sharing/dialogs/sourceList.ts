@@ -1,6 +1,5 @@
 import Clutter from 'gi://Clutter';
 import type Meta from 'gi://Meta';
-import type Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import { windowIcon } from '../../../appearance/icons/appIcons.js';
@@ -17,7 +16,7 @@ interface SourceList {
 }
 
 function thumbnailBox(): St.Widget {
-  const { scale_factor } = St.ThemeContext.get_for_stage((global as unknown as Shell.Global).stage);
+  const { scale_factor } = St.ThemeContext.get_for_stage(global.stage);
   return new St.Widget({
     style_class: 'kestrel-portal-thumbnail', layout_manager: new Clutter.BinLayout(), clip_to_allocation: true,
     width: THUMBNAIL_WIDTH * scale_factor, height: THUMBNAIL_HEIGHT * scale_factor, y_align: Clutter.ActorAlign.CENTER,

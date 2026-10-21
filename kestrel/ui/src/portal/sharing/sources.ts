@@ -40,8 +40,6 @@ export interface Selection {
   readonly cursorMode: number;
 }
 
-const shell = () => global as unknown as Shell.Global;
-
 export function selectionFrom(options: Options): Selection | null {
   const types = option<number>(options, 'types') ?? MONITOR;
   const cursorMode = option<number>(options, 'cursor_mode') ?? 1;
@@ -55,7 +53,7 @@ function matchString(monitor: Meta.Monitor): string {
 }
 
 export function monitorSources(): MonitorSource[] {
-  const { display, backend } = shell();
+  const { display, backend } = global;
   const primary = display.get_primary_monitor();
   return (backend.get_monitor_manager().get_logical_monitors() ?? []).flatMap(logical => {
     const { width, height } = display.get_monitor_geometry(logical.get_number());
@@ -68,7 +66,7 @@ export function monitorSources(): MonitorSource[] {
 
 export function windowSources(): WindowSource[] {
   const tracker = Shell.WindowTracker.get_default();
-  return shell().display.get_tab_list(Meta.TabList.NORMAL, null)
+  return global.display.get_tab_list(Meta.TabList.NORMAL, null)
     .map(window => ({ type: WINDOW, window, app: tracker.get_window_app(window) }));
 }
 

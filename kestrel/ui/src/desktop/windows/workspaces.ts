@@ -1,6 +1,5 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
-import Shell from 'gi://Shell';
 import { WorkspaceSwitcherPopup } from 'resource:///com/lantharos/kestrel/ui/workspaceSwitcherPopup.js';
 
 import { ScrollSteps } from '../../shared/input/scrollSteps.js';
@@ -16,11 +15,10 @@ export class Workspaces {
 
   switchTo(index: number): void {
     if (!this.enabled()) return;
-    const shell = global as unknown as Shell.Global;
-    const manager = shell.workspace_manager;
+    const manager = global.workspace_manager;
     if (index < 0 || index >= manager.n_workspaces || index === manager.get_active_workspace_index()) return;
     this.beforeSwitch();
-    manager.get_workspace_by_index(index)!.activate(shell.get_current_time());
+    manager.get_workspace_by_index(index)!.activate(global.get_current_time());
     if (!this.popup) {
       this.popup = new WorkspaceSwitcherPopup();
       this.popup.connect('destroy', () => { this.popup = null; });
@@ -37,7 +35,7 @@ export class Workspaces {
       return this.swipe(event);
     }
     const step = this.steps.step(event);
-    if (step) this.switchTo((global as unknown as Shell.Global).workspace_manager.get_active_workspace_index() + step);
+    if (step) this.switchTo(global.workspace_manager.get_active_workspace_index() + step);
     return true;
   }
 }

@@ -2,7 +2,6 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
-import Shell from 'gi://Shell';
 import { LIBEXECDIR } from 'resource:///com/lantharos/kestrel/misc/config.js';
 
 import type { Monitor } from '../panel/panel.js';
@@ -16,10 +15,6 @@ const STABLE_AFTER_US = 2 * 60 * GLib.USEC_PER_SEC;
 const BUILD_DIRECTORY = GLib.getenv('KESTREL_BUILDDIR');
 
 export const RENDERER = BUILD_DIRECTORY ? `${BUILD_DIRECTORY}/wallpaper/kestrel-wallpaper` : `${LIBEXECDIR}/kestrel-wallpaper`;
-
-function shell(): Shell.Global {
-  return global as unknown as Shell.Global;
-}
 
 export class Renderer {
   private client!: Meta.WaylandClient;
@@ -37,10 +32,10 @@ export class Renderer {
 
   constructor(readonly uri: string, private readonly monitors: () => Monitor[], private readonly windowsChanged: () => void) {
     this.spawn();
-    this.createdId = shell().display.connect('window-created', (_display, window: Meta.Window) => {
+    this.createdId = global.display.connect('window-created', (_display, window: Meta.Window) => {
       if (this.client.owns_window(window)) this.adopt(window);
     });
-    this.mapId = shell().window_manager.connect('map', (_wm, actor: Meta.WindowActor) => {
+    this.mapId = global.window_manager.connect('map', (_wm, actor: Meta.WindowActor) => {
       if (!this.windows.has(actor.meta_window!)) return;
       this.place(actor.meta_window!);
       actor.opacity = 0;
@@ -50,7 +45,7 @@ export class Renderer {
 
   private spawn(): void {
     const launcher = new Gio.SubprocessLauncher({ flags: Gio.SubprocessFlags.STDIN_PIPE });
-    this.client = Meta.WaylandClient.new_subprocess(shell().context, launcher, [RENDERER, this.uri]);
+    this.client = Meta.WaylandClient.new_subprocess(global.context, launcher, [RENDERER, this.uri]);
     const process = this.client.get_subprocess();
     this.commands = process.get_stdin_pipe()!;
     this.sent = null;
@@ -94,7 +89,7 @@ export class Renderer {
   }
 
   private monitorOf(window: Meta.Window): Monitor | undefined {
-    const index = shell().backend.get_monitor_manager().get_monitor_for_connector(window.title ?? '');
+    const index = global.backend.get_monitor_manager().get_monitor_for_connector(window.title ?? '');
     return this.monitors().find(monitor => monitor.index === index);
   }
 
@@ -141,8 +136,8 @@ export class Renderer {
   stop(): void {
     this.running.cancel();
     if (this.restartTimer) GLib.Source.remove(this.restartTimer);
-    shell().display.disconnect(this.createdId);
-    shell().window_manager.disconnect(this.mapId);
+    global.display.disconnect(this.createdId);
+    global.window_manager.disconnect(this.mapId);
     const actors = [...this.windows].map(window => window.get_compositor_private() as Meta.WindowActor);
     const quit = () => this.client.get_subprocess().send_signal(SIGTERM);
     if (!actors.length) {

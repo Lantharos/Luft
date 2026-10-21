@@ -1,5 +1,4 @@
 import Clutter from 'gi://Clutter';
-import Shell from 'gi://Shell';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import Meta from 'gi://Meta';
@@ -68,7 +67,7 @@ export class QuickSettings {
     const unwatchRemoved = this.layoutStore.watchRemoved(() => this.arrangeTiles(true));
     this.actor.connect('destroy', () => {
       unwatchRemoved();
-      if (this.layoutLater) (global as unknown as Shell.Global).compositor.get_laters().remove(this.layoutLater);
+      if (this.layoutLater) global.compositor.get_laters().remove(this.layoutLater);
       if (this.revealTimer) GLib.Source.remove(this.revealTimer);
       this.actions.destroy();
       this.keepAwake.destroy();
@@ -138,7 +137,7 @@ export class QuickSettings {
 
   private queueLayout(): void {
     if (this.layoutLater) return;
-    const laters = (global as unknown as Shell.Global).compositor.get_laters();
+    const laters = global.compositor.get_laters();
     this.layoutLater = laters.add(Meta.LaterType.BEFORE_REDRAW, () => {
       this.layoutLater = 0;
       this.layoutChanged();

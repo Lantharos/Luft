@@ -52,7 +52,7 @@ export class ContextMenus {
       const key = event.get_key_symbol();
       if (key === Clutter.KEY_Escape) { this.close(); return Clutter.EVENT_STOP; }
       if ([Clutter.KEY_Down, Clutter.KEY_Up, Clutter.KEY_Tab].includes(key)) {
-        this.actor.navigate_focus((global as unknown as Shell.Global).stage.get_key_focus(), key === Clutter.KEY_Up ? St.DirectionType.TAB_BACKWARD : St.DirectionType.TAB_FORWARD, true);
+        this.actor.navigate_focus(global.stage.get_key_focus(), key === Clutter.KEY_Up ? St.DirectionType.TAB_BACKWARD : St.DirectionType.TAB_FORWARD, true);
         return Clutter.EVENT_STOP;
       }
       return Clutter.EVENT_PROPAGATE;
@@ -90,7 +90,7 @@ export class ContextMenus {
     if (app.can_open_new_window() && !info?.list_actions().includes('new-window'))
       entries.push({ label: t('window-menu-new-window'), run: launch(() => app.open_new_window(-1)) });
     for (const action of info?.list_actions() ?? [])
-      entries.push({ label: info!.get_action_name(action), run: launch(() => app.launch_action(action, (global as unknown as Shell.Global).get_current_time(), -1)) });
+      entries.push({ label: info!.get_action_name(action), run: launch(() => app.launch_action(action, global.get_current_time(), -1)) });
     for (const window of windows) entries.push({ label: window.get_title() || app.get_name(), run: launch(() => this.activateWindow(window)) });
     if (windows.length === 1) {
       const window = windows[0];
@@ -110,7 +110,7 @@ export class ContextMenus {
     }
     if (windows.length) entries.push({ label: t('window-menu-close', { count: windows.length }), run: () => {
       if (windows.length === app.get_windows().length) app.request_quit();
-      else for (const window of windows) window.delete((global as unknown as Shell.Global).get_current_time());
+      else for (const window of windows) window.delete(global.get_current_time());
     } });
     return entries;
   }
@@ -131,8 +131,8 @@ export class ContextMenus {
     this.clearSelection?.();
     this.clearSelection = null;
     this.anchor = { x, y, monitor };
-    this.previousFocus = (global as unknown as Shell.Global).stage.get_key_focus();
-    const stage = (global as unknown as Shell.Global).stage;
+    this.previousFocus = global.stage.get_key_focus();
+    const stage = global.stage;
     this.shield.set_position(0, 0);
     this.shield.set_size(stage.width, stage.height);
     raiseSurface(this.shield);
@@ -160,7 +160,7 @@ export class ContextMenus {
       hover: button => {
         if (!this.source || this.clearSelection) return;
         if (button.hover) button.grab_key_focus();
-        else if ((global as unknown as Shell.Global).stage.get_key_focus() === button) this.actor.grab_key_focus();
+        else if (global.stage.get_key_focus() === button) this.actor.grab_key_focus();
       },
     });
     const page = new St.ScrollView({
@@ -214,7 +214,7 @@ export class ContextMenus {
     this.previousFocus = null;
     if (previous?.mapped) previous.grab_key_focus();
     else {
-      const stage = (global as unknown as Shell.Global).stage;
+      const stage = global.stage;
       const focus = stage.get_key_focus();
       if (focus && this.actor.contains(focus)) stage.set_key_focus(null);
     }

@@ -48,6 +48,7 @@ kestrel/compositor/build.sh
 - Keep each patch focused with ordinary commits, fixups and rebases.
 - `prepare` refuses to replace a checkout with uncommitted or unexported work. The previous head is kept at `refs/kestrel/previous`.
 - `python3 kestrel/compositor/patches.py status` shows the state of the checkout.
+- The shell's TypeScript sees what the patches add through `kestrel/ui/src/compositor.d.ts`. Declare new API there when a patch exposes some to the shell.
 
 ## Update Mutter
 

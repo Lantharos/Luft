@@ -1,6 +1,5 @@
 import Clutter from 'gi://Clutter';
 import Pango from 'gi://Pango';
-import type Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import type { Context } from '../../../context.js';
@@ -114,7 +113,7 @@ export class DictationPill {
   }
 
   private place(): void {
-    const display = (global as unknown as Shell.Global).display;
+    const display = global.display;
     const index = display.focus_window?.get_monitor() ?? display.get_current_monitor();
     const monitor = this.layoutManager.monitors[index] ?? this.layoutManager.primaryMonitor;
     if (!monitor) return;

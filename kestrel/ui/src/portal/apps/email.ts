@@ -1,6 +1,5 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import type Shell from 'gi://Shell';
 
 import { portalObject } from '../core/exported.js';
 import { ENDED, SUCCESS, option, respond, type Invocation, type Options } from '../core/request.js';
@@ -42,7 +41,7 @@ export class EmailPortal {
       return;
     }
     try {
-      mailer.launch_uris([mailtoUri(options)], (global as unknown as Shell.Global).create_app_launch_context(0, -1));
+      mailer.launch_uris([mailtoUri(options)], global.create_app_launch_context(0, -1));
       respond(invocation, [SUCCESS, {}]);
     } catch (error) {
       console.warn(`Couldn't compose an email in ${mailer.get_name()}: ${error}`);

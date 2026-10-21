@@ -31,7 +31,7 @@ function dotTile(alpha: number, white: boolean): St.ImageContent {
     }
   }
   const content = St.ImageContent.new_with_preferred_size(TILE, TILE) as St.ImageContent;
-  const context = (global as unknown as Shell.Global).stage.context.get_backend().get_cogl_context();
+  const context = global.stage.context.get_backend().get_cogl_context();
   content.set_data(context, pixels, Cogl.PixelFormat.RGBA_8888_PRE, TILE, TILE, TILE * 4);
   return content;
 }

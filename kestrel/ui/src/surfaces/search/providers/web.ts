@@ -1,5 +1,4 @@
 import Gio from 'gi://Gio';
-import type Shell from 'gi://Shell';
 
 import { t } from '../../../shared/i18n/index.js';
 import { themedIcon } from '../icons.js';
@@ -27,7 +26,7 @@ export class WebSearch {
       activate: () => {
         this.close();
         Gio.AppInfo.launch_default_for_uri_async(`${engine.address}${encodeURIComponent(text)}`,
-          (global as unknown as Shell.Global).create_app_launch_context(0, -1), null, (_source, result) => {
+          global.create_app_launch_context(0, -1), null, (_source, result) => {
             try {
               Gio.AppInfo.launch_default_for_uri_finish(result);
             } catch (error) {

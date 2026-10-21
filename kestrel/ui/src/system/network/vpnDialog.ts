@@ -1,6 +1,5 @@
 import Clutter from 'gi://Clutter';
 import GObject from 'gi://GObject';
-import type Shell from 'gi://Shell';
 import St from 'gi://St';
 import { EntryField, MessageDialogContent } from 'resource:///com/lantharos/kestrel/ui/dialog.js';
 import type { ModalDialog } from 'resource:///com/lantharos/kestrel/ui/modalDialog.js';
@@ -44,7 +43,6 @@ interface Control {
 
 const ICON = 'network-vpn-symbolic';
 const MANY_CHOICES = 3;
-
 
 function choiceRow(field: Field, changed: () => void): [St.BoxLayout, Value] {
   const many = field.choices!.length > MANY_CHOICES;
@@ -123,7 +121,7 @@ export class VpnDialog {
   }
 
   private build(fields: Field[]): void {
-    (global as unknown as Shell.Global).stage.set_key_focus(null);
+    global.stage.set_key_focus(null);
     this.form.remove_child(this.warning);
     this.form.destroy_all_children();
     this.controls = new Map(fields.map(field => [field.key, this.control(field)]));

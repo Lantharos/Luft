@@ -2,7 +2,6 @@ import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import type GObject from 'gi://GObject';
 import Meta from 'gi://Meta';
-import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import { animateActor, animateAdjustment, Curve, Duration, reducedMotion, Spring } from '../../shared/motion.js';
@@ -61,15 +60,14 @@ export class TaskView {
 
   prepare(monitor: Monitor): void {
     this.cover(monitor);
-    const shell = global as unknown as Shell.Global;
-    const manager = shell.workspace_manager;
+    const manager = global.workspace_manager;
     const sync = () => this.scheduleSync();
     this.signals = [
       [manager, manager.connect('active-workspace-changed', sync)],
       [manager, manager.connect('workspace-added', sync)],
       [manager, manager.connect('workspace-removed', sync)],
-      [shell.display, shell.display.connect('window-created', sync)],
-      [shell.display, shell.display.connect('restacked', () => this.restack())],
+      [global.display, global.display.connect('window-created', sync)],
+      [global.display, global.display.connect('restacked', () => this.restack())],
     ];
     this.sync();
     if (!reducedMotion()) this.hideWindows();
@@ -156,7 +154,7 @@ export class TaskView {
   }
 
   private restack(): void {
-    const order = new Map((global as unknown as Shell.Global).get_window_actors().map((actor, index) => [actor.meta_window, index]));
+    const order = new Map(global.get_window_actors().map((actor, index) => [actor.meta_window, index]));
     const stacked = [...this.cards.values()].sort((a, b) => (order.get(a.window) ?? 0) - (order.get(b.window) ?? 0));
     for (const card of stacked) this.windowLayer.set_child_above_sibling(card.actor, null);
   }
@@ -179,7 +177,7 @@ export class TaskView {
   }
 
   private prewarmOnceWindowShows(monitor: Monitor): void {
-    const wm = (global as unknown as Shell.Global).window_manager;
+    const wm = global.window_manager;
     const mapped = wm.connect('map', (_wm, actor: Meta.WindowActor) => {
       wm.disconnect(mapped);
       const shown = actor.connect('effects-completed', () => {
@@ -193,9 +191,8 @@ export class TaskView {
   }
 
   private activeWindows(): Meta.Window[] {
-    const shell = global as unknown as Shell.Global;
-    const workspace = shell.workspace_manager.get_active_workspace();
-    return shell.display.get_tab_list(Meta.TabList.NORMAL, workspace).filter(window => window.located_on_workspace(workspace));
+    const workspace = global.workspace_manager.get_active_workspace();
+    return global.display.get_tab_list(Meta.TabList.NORMAL, workspace).filter(window => window.located_on_workspace(workspace));
   }
 
   private cover(monitor: Monitor): void {
@@ -223,7 +220,7 @@ export class TaskView {
 
   private sync(): void {
     const monitor = this.monitor!;
-    const stage = (global as unknown as Shell.Global).stage;
+    const stage = global.stage;
     const focused = stage.get_key_focus();
     const focusInside = !!focused && this.actor.contains(focused);
     const windows = this.activeWindows();

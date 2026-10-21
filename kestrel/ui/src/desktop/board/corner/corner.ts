@@ -1,6 +1,5 @@
 import Clutter from 'gi://Clutter';
 import Meta from 'gi://Meta';
-import type Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import type { Monitor } from '../../panel/panel.js';
@@ -71,14 +70,14 @@ export class Corner {
   }
 
   destroy(): void {
-    if (this.repositioning) (global as unknown as Shell.Global).compositor.get_laters().remove(this.repositioning);
+    if (this.repositioning) global.compositor.get_laters().remove(this.repositioning);
     this.pill.destroy();
     this.actor.destroy();
   }
 
   private queueReposition(): void {
     if (this.repositioning) return;
-    this.repositioning = (global as unknown as Shell.Global).compositor.get_laters().add(Meta.LaterType.BEFORE_REDRAW, () => {
+    this.repositioning = global.compositor.get_laters().add(Meta.LaterType.BEFORE_REDRAW, () => {
       this.repositioning = 0;
       this.reposition();
       return false;

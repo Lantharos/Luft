@@ -51,7 +51,7 @@ export class Taskbar {
         .filter((item): item is AppItem => !!item && pinned.has(item.app.id))
         .map(item => ({ id: item.app.id, slot: item.slot, button: item.button }));
     }, favorites);
-    const display = (global as unknown as Shell.Global).display;
+    const display = global.display;
     const refresh = () => this.updateIndicators();
     const signals = [display.connect('window-demands-attention', refresh), display.connect('window-marked-urgent', refresh)];
     this.disconnectors.push(

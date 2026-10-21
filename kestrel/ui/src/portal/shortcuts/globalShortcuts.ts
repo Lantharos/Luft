@@ -35,8 +35,6 @@ const TRIGGER_MODIFIERS: Record<string, string> = { CTRL: '<Control>', SHIFT: '<
 
 type Requested = [id: string, options: Options][];
 
-const display = () => (global as unknown as Shell.Global).display;
-
 function fromTrigger(trigger: string): string {
   const parts = trigger.split('+');
   const key = parts.pop()!;
@@ -57,7 +55,7 @@ class ShortcutSession extends PortalSession {
   }
 
   release(): void {
-    for (const action of this.grabs.keys()) display().ungrab_accelerator(action);
+    for (const action of this.grabs.keys()) global.display.ungrab_accelerator(action);
     this.grabs.clear();
   }
 
@@ -76,8 +74,8 @@ export class GlobalShortcutsPortal {
 
   constructor(private readonly keybindings: Keybindings) {
     this.signals = [
-      display().connect('accelerator-activated', (_display, action: number, _device, timestamp: number) => this.trigger('Activated', action, timestamp)),
-      display().connect('accelerator-deactivated', (_display, action: number, _device, timestamp: number) => this.trigger('Deactivated', action, timestamp)),
+      global.display.connect('accelerator-activated', (_display, action: number, _device, timestamp: number) => this.trigger('Activated', action, timestamp)),
+      global.display.connect('accelerator-deactivated', (_display, action: number, _device, timestamp: number) => this.trigger('Deactivated', action, timestamp)),
     ];
   }
 
@@ -137,7 +135,7 @@ export class GlobalShortcutsPortal {
 
   destroy(): void {
     for (const session of this.sessions) session.close();
-    for (const id of this.signals) display().disconnect(id);
+    for (const id of this.signals) global.display.disconnect(id);
   }
 
   private bind(appId: string, requested: Requested): AppShortcuts {
@@ -162,7 +160,7 @@ export class GlobalShortcutsPortal {
     session.release();
     for (const id of session.ids) {
       for (const accelerator of shortcuts[id]?.shortcuts ?? []) {
-        const action = display().grab_accelerator(accelerator, Meta.KeyBindingFlags.TRIGGER_RELEASE);
+        const action = global.display.grab_accelerator(accelerator, Meta.KeyBindingFlags.TRIGGER_RELEASE);
         if (action === Meta.KeyBindingAction.NONE) continue;
         this.keybindings.allow(Meta.external_binding_name_for_action(action), Shell.ActionMode.NORMAL);
         session.grabs.set(action, id);

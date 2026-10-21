@@ -1,6 +1,5 @@
 import { freezeSelection } from 'resource:///com/lantharos/kestrel/ui/kestrelGlass.js';
 import Clutter from 'gi://Clutter';
-import type Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import type { CaretPopup, Context } from '../context.js';
@@ -132,7 +131,7 @@ export class Surfaces {
 
     const monitor = this.surfaceMonitor();
     this.cover.set_position(0, 0);
-    const stage = (global as unknown as Shell.Global).stage;
+    const stage = global.stage;
     this.cover.set_size(stage.width, stage.height);
     const clearance = Math.max(this.parts.bottomClearance(), this.keyboardHeight(monitor));
     const bottom = monitor.y + monitor.height - clearance - SURFACE_GAP;
@@ -237,8 +236,8 @@ export class Surfaces {
     this.cover.hide();
     const panels = this.parts.panels();
     for (const panel of panels.all)
-      panel.actor.get_parent()!.set_child_below_sibling(panel.actor, (global as unknown as Shell.Global).top_window_group);
-    const stage = (global as unknown as Shell.Global).stage;
+      panel.actor.get_parent()!.set_child_below_sibling(panel.actor, global.top_window_group);
+    const stage = global.stage;
     const focus = stage.get_key_focus();
     if (focus && [...this.all(), taskView.actor].some(actor => actor.contains(focus)))
       stage.set_key_focus(null);
@@ -264,7 +263,7 @@ export class Surfaces {
   }
 
   private clipToFloor(): void {
-    const width = (global as unknown as Shell.Global).stage.width;
+    const width = global.stage.width;
     const floor = this.floor();
     const [, , clipWidth, clipHeight] = this.layer.get_clip();
     if (this.layer.has_clip && clipWidth === width && clipHeight === floor) return;
@@ -307,7 +306,7 @@ export class Surfaces {
   private keepComposited(composited: boolean): void {
     if (composited === this.keepsComposited) return;
     this.keepsComposited = composited;
-    const compositor = (global as unknown as Shell.Global).compositor;
+    const compositor = global.compositor;
     if (composited) compositor.disable_unredirect();
     else compositor.enable_unredirect();
   }
@@ -334,7 +333,7 @@ export class Surfaces {
 
   private pointerMonitor(): Monitor {
     const { layoutManager } = this.parts.context;
-    const index = (global as unknown as Shell.Global).display.get_current_monitor();
+    const index = global.display.get_current_monitor();
     const monitor = layoutManager.monitors[index];
     return monitor && this.parts.panels().panelOn(monitor) ? monitor : layoutManager.primaryMonitor!;
   }

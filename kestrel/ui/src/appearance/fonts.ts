@@ -7,8 +7,7 @@ const { fonts_refresh: refreshFonts } = Shell as unknown as { fonts_refresh(stag
 
 export class FontRefresh {
   private readonly serial = new FontconfigSerial(() => {
-    const shell = global as unknown as Shell.Global;
-    refreshFonts(shell.stage, shell.datadir);
+    refreshFonts(global.stage, global.datadir);
   });
 
   destroy(): void {

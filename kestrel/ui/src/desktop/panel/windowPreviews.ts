@@ -79,7 +79,7 @@ export class WindowPreviews {
       header.add_child(icon);
       header.add_child(title);
       const close = new St.Button({ style_class: 'kestrel-preview-close', can_focus: true, accessible_name: t('previews-close-window', { title: name() }), child: new St.Icon({ icon_name: 'window-close-symbolic', icon_size: 16 }) });
-      close.connect('clicked', () => window.delete((global as unknown as Shell.Global).get_current_time()));
+      close.connect('clicked', () => window.delete(global.get_current_time()));
       header.add_child(close);
       card.add_child(header);
       const source = window.get_compositor_private() as Clutter.Actor | null;
@@ -150,7 +150,7 @@ export class WindowPreviews {
   }
 
   private closeUnlessFocused(): void {
-    const focus = (global as unknown as Shell.Global).stage.get_key_focus();
+    const focus = global.stage.get_key_focus();
     if (!focus || !this.actor.contains(focus)) this.close();
   }
 

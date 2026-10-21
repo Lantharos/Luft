@@ -25,7 +25,7 @@ export function launchApp(app: Gio.AppInfo): void {
   launchHistory.record(appKey(app.get_id()!));
   const shellApp = Shell.AppSystem.get_default().lookup_app(app.get_id() ?? '');
   if (shellApp) shellApp.activate();
-  else app.launch([], (global as unknown as Shell.Global).create_app_launch_context(0, -1));
+  else app.launch([], global.create_app_launch_context(0, -1));
 }
 
 export class AppResults {

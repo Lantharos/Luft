@@ -1,6 +1,5 @@
 import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
-import type Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import type { Box } from '../../../shared/placement.js';
@@ -42,7 +41,7 @@ export class Camera {
   private settleTimer = 0;
 
   constructor(private readonly group: Clutter.Actor, private readonly host: CameraHost) {
-    const stage = (global as unknown as Shell.Global).stage;
+    const stage = global.stage;
     this.tween = new Clutter.Timeline({ actor: stage, duration: 1 });
     this.tween.set_progress_mode(Clutter.AnimationMode.EASE_OUT_CUBIC);
     this.tween.connect('new-frame', () => this.tweenFrame(this.tween.get_progress()));

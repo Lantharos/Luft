@@ -1,7 +1,6 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import type Meta from 'gi://Meta';
-import type Shell from 'gi://Shell';
 
 const decoder = new TextDecoder();
 
@@ -14,7 +13,7 @@ async function processOf(sender: string): Promise<number> {
 }
 
 function trusted(appId: string): boolean {
-  return ((global as unknown as Shell.Global).context as TrustingContext).is_app_trusted(appId);
+  return (global.context as TrustingContext).is_app_trusted(appId);
 }
 
 function inUntrustedFlatpak(pid: number): boolean {

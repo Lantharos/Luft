@@ -1,5 +1,4 @@
 import Meta from 'gi://Meta';
-import type Shell from 'gi://Shell';
 
 import type { Board, Canvas } from '../board.js';
 import { intersection, screenBox } from '../view/geometry.js';
@@ -7,12 +6,8 @@ import { frameBox, isBoardWindow } from './windows.js';
 
 const HIDDEN_FRACTION = 0.3;
 
-function shell(): Shell.Global {
-  return global as unknown as Shell.Global;
-}
-
 function later(run: () => void): void {
-  shell().compositor.get_laters().add(Meta.LaterType.BEFORE_REDRAW, () => {
+  global.compositor.get_laters().add(Meta.LaterType.BEFORE_REDRAW, () => {
     run();
     return false;
   });
@@ -25,7 +20,7 @@ export class Follower {
   private readonly signals: [{ disconnect(id: number): void }, number][];
 
   constructor(private readonly board: Board) {
-    const { window_manager: wm, display, workspace_manager: manager } = shell();
+    const { window_manager: wm, display, workspace_manager: manager } = global;
     this.signals = [
       [wm, wm.connect('map', (_wm, actor: Meta.WindowActor) => this.mapped(actor.meta_window))],
       [wm, wm.connect('size-change', (_wm, actor: Meta.WindowActor, change: Meta.SizeChange) => this.sizeChanged(actor.meta_window, change))],
@@ -56,7 +51,7 @@ export class Follower {
   private added(window: Meta.Window, canvas: Canvas): void {
     if (!canvas.shown || !isBoardWindow(window)) return;
     this.unplaced.add(window);
-    if ((window as Meta.Window & { mapped: boolean }).mapped) later(() => this.place(window, canvas));
+    if (window.mapped) later(() => this.place(window, canvas));
     else this.pending.add(window);
   }
 
@@ -70,7 +65,7 @@ export class Follower {
     if (!this.unplaced.delete(window)) return;
     if (!canvas.shown || !window.get_workspace() || this.board.canvasOf(window.get_workspace()) !== canvas) return;
     this.board.place(window, canvas);
-    if (shell().display.focus_window === window) this.focused(window);
+    if (global.display.focus_window === window) this.focused(window);
   }
 
   private removed(window: Meta.Window, canvas: Canvas): void {
@@ -106,7 +101,7 @@ export class Follower {
   }
 
   private prune(): void {
-    const manager = shell().workspace_manager;
+    const manager = global.workspace_manager;
     const current = new Set(Array.from({ length: manager.n_workspaces }, (_, index) => manager.get_workspace_by_index(index)));
     for (const workspace of [...this.workspaceSignals.keys()]) {
       if (!current.has(workspace)) this.board.forget(workspace);

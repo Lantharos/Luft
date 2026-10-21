@@ -3,7 +3,6 @@ import Cogl from 'gi://Cogl';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Gly from 'gi://Gly';
-import type Shell from 'gi://Shell';
 import St from 'gi://St';
 
 Gio._promisify(Gly.Loader.prototype, 'load_async');
@@ -31,10 +30,8 @@ export interface Thumbnail {
   imageHeight: number;
 }
 
-const shell = () => global as unknown as Shell.Global;
-
 function displayScale(): number {
-  const { display } = shell();
+  const { display } = global;
   return Math.max(...Array.from({ length: display.get_n_monitors() }, (_, monitor) => display.get_monitor_scale(monitor)));
 }
 
@@ -52,7 +49,7 @@ async function decode(bytes: GLib.Bytes): Promise<Gly.Frame | null> {
 }
 
 function render(frame: Gly.Frame, bounds: ThumbnailBounds): Thumbnail {
-  const context = shell().stage.context.get_backend().get_cogl_context();
+  const context = global.stage.context.get_backend().get_cogl_context();
   const source = new St.ImageContent();
   const [imageWidth, imageHeight] = [frame.get_width(), frame.get_height()];
   source.set_bytes(context, frame.get_buf_bytes(), Cogl.PixelFormat.RGBA_8888_PRE, imageWidth, imageHeight, frame.get_stride());

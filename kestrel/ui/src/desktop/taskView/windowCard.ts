@@ -33,7 +33,7 @@ export class WindowCard {
     const close = new St.Button({ style_class: 'kestrel-task-close', opacity: 0,
       child: new St.Icon({ icon_name: 'window-close-symbolic', icon_size: 14 }) });
     localized(close, () => (close.accessible_name = t('task-view-close-window')));
-    close.connect('clicked', () => window.delete((global as unknown as Shell.Global).get_current_time()));
+    close.connect('clicked', () => window.delete(global.get_current_time()));
     this.header.add_child(close);
 
     const body = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL });
@@ -42,7 +42,7 @@ export class WindowCard {
     this.actor = new St.Button({ style_class: 'kestrel-task-window', child: body, can_focus: true, track_hover: true,
       button_mask: St.ButtonMask.PRIMARY | St.ButtonMask.MIDDLE });
     this.actor.connect('clicked', (_actor, button: number) => {
-      if (button === Clutter.BUTTON_MIDDLE) window.delete((global as unknown as Shell.Global).get_current_time());
+      if (button === Clutter.BUTTON_MIDDLE) window.delete(global.get_current_time());
       else activate();
     });
     const revealClose = () => animateActor(close, {
@@ -54,7 +54,7 @@ export class WindowCard {
     this.actor.connect('key-focus-out', revealClose);
     this.actor.connect('key-press-event', (_actor, event: Clutter.Event) => {
       if (event.get_key_symbol() !== Clutter.KEY_Delete) return Clutter.EVENT_PROPAGATE;
-      window.delete((global as unknown as Shell.Global).get_current_time());
+      window.delete(global.get_current_time());
       return Clutter.EVENT_STOP;
     });
 

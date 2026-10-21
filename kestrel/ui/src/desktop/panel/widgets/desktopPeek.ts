@@ -1,7 +1,6 @@
 import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
-import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import { animateActor } from '../../../shared/motion.js';
@@ -14,9 +13,8 @@ const PEEKED_TYPES = [Meta.WindowType.NORMAL, Meta.WindowType.DIALOG, Meta.Windo
 let hidden: Meta.Window[] = [];
 
 function desktopWindows(): [Meta.WindowActor, Meta.Window][] {
-  const shell = global as unknown as Shell.Global;
-  const workspace = shell.workspace_manager.get_active_workspace();
-  return shell.get_window_actors()
+  const workspace = global.workspace_manager.get_active_workspace();
+  return global.get_window_actors()
     .map(actor => [actor, actor.meta_window] as [Meta.WindowActor, Meta.Window | null])
     .filter((pair): pair is [Meta.WindowActor, Meta.Window] => !!pair[1] &&
       PEEKED_TYPES.includes(pair[1].window_type) && pair[1].located_on_workspace(workspace));
@@ -59,7 +57,6 @@ export class DesktopPeek {
   }
 
   toggleDesktop(): void {
-    const shell = global as unknown as Shell.Global;
     const shown = desktopWindows().map(([, window]) => window).filter(window => !window.minimized && window.window_type === Meta.WindowType.NORMAL);
     if (shown.length) {
       hidden = shown;
@@ -69,6 +66,6 @@ export class DesktopPeek {
     const restore = hidden.filter(window => window.get_compositor_private());
     hidden = [];
     for (const window of restore) window.unminimize();
-    restore.at(-1)?.activate(shell.get_current_time());
+    restore.at(-1)?.activate(global.get_current_time());
   }
 }

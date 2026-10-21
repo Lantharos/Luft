@@ -1,10 +1,8 @@
-import type Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
-import type Shell from 'gi://Shell';
 
 const HOLD_MS = 300;
 
-const seat = () => (global as unknown as Shell.Global).stage.context.get_backend().get_default_seat() as Clutter.Seat & { consume_held_modifiers(): void };
+const seat = () => global.stage.context.get_backend().get_default_seat();
 
 export interface Presses {
   down(): void;

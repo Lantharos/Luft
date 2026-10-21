@@ -1,12 +1,11 @@
 import type Meta from 'gi://Meta';
-import type Shell from 'gi://Shell';
 
 import { cameraMonitor } from '../privacy/camera.js';
 import { playSound } from './sounds.js';
 
 export class RecordingSounds {
   private readonly camera = cameraMonitor();
-  private readonly controller = (global as unknown as Shell.Global).backend.get_remote_access_controller();
+  private readonly controller = global.backend.get_remote_access_controller();
   private readonly cameraId: number;
   private readonly handleId: number;
   private cameraInUse: boolean;

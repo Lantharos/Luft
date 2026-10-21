@@ -1,6 +1,5 @@
 import type Gio from 'gi://Gio';
 import GioUnix from 'gi://GioUnix';
-import type Shell from 'gi://Shell';
 
 import { launchHistory } from '../../../shared/launchHistory.js';
 import type { Ranked, SearchItem } from '../item.js';
@@ -37,7 +36,7 @@ export class CommandResults {
       activate: () => {
         launchHistory.record(key);
         this.close();
-        app.launch_action(action, (global as unknown as Shell.Global).create_app_launch_context(0, -1));
+        app.launch_action(action, global.create_app_launch_context(0, -1));
       },
     };
   }

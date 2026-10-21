@@ -2,7 +2,6 @@ import Clutter from 'gi://Clutter';
 import Cogl from 'gi://Cogl';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 export const TRAY_ICON_SIZE = 16;
@@ -45,7 +44,7 @@ function pixmapContent(pixmaps: GLib.Variant, size: number): St.ImageContent | n
   if (!best || bestWidth <= 0) return null;
   const height = best.get_child_value(1).get_int32();
   const content = new St.ImageContent({ preferred_width: bestWidth, preferred_height: height });
-  const context = (global as unknown as Shell.Global).stage.context.get_backend().get_cogl_context();
+  const context = global.stage.context.get_backend().get_cogl_context();
   content.set_bytes(context, best.get_child_value(2).get_data_as_bytes(), Cogl.PixelFormat.ARGB_8888, bestWidth, height, bestWidth * 4);
   return content;
 }
@@ -53,13 +52,13 @@ function pixmapContent(pixmaps: GLib.Variant, size: number): St.ImageContent | n
 export type TrayGlyph = Gio.Icon | St.ImageContent;
 
 export function resolveGlyph({ name, themePath, pixmaps }: IconSource): TrayGlyph | null {
-  const scale = St.ThemeContext.get_for_stage((global as unknown as Shell.Global).stage).scale_factor;
+  const scale = St.ThemeContext.get_for_stage(global.stage).scale_factor;
   return namedIcon(name, themePath) ?? (pixmaps ? pixmapContent(pixmaps, TRAY_ICON_SIZE * scale) : null);
 }
 
 export function paintGlyph(icon: St.Icon, glyph: TrayGlyph, size: number): void {
   if (glyph instanceof St.ImageContent) {
-    const scale = St.ThemeContext.get_for_stage((global as unknown as Shell.Global).stage).scale_factor;
+    const scale = St.ThemeContext.get_for_stage(global.stage).scale_factor;
     icon.set({ gicon: null, content: glyph, content_gravity: Clutter.ContentGravity.RESIZE_ASPECT,
       width: size * scale, height: size * scale });
     return;

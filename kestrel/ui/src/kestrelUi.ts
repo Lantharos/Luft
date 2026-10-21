@@ -1,5 +1,4 @@
 import Clutter from 'gi://Clutter';
-import Shell from 'gi://Shell';
 import Meta from 'gi://Meta';
 import type St from 'gi://St';
 
@@ -64,7 +63,7 @@ export { playNotificationSound, playSound, startSounds } from './system/sounds/s
 type Signals = { connect(signal: string, callback: (...args: any[]) => any): number; disconnect(id: number): void };
 
 class KestrelUi {
-  private readonly ownsTheScreen = !(global as unknown as Shell.Global).backend.is_headless();
+  private readonly ownsTheScreen = !global.backend.is_headless();
   private readonly services: SystemServices;
   private readonly menus: ContextMenus;
   private readonly workspaces: Workspaces;
@@ -87,7 +86,6 @@ class KestrelUi {
   private readonly syncSessionAfterMotion = () => this.syncSession();
 
   constructor(private readonly context: Context) {
-    const shellGlobal = global as unknown as Shell.Global;
     this.services = new SystemServices(context, this.ownsTheScreen, () => this.openStart());
     const close = () => this.surfaces.close();
     const place = () => this.surfaces.place();
@@ -186,7 +184,7 @@ class KestrelUi {
     context.layoutManager.addTopChrome(this.taskView.actor);
 
     this.watch(context.keyboard, 'visibility-changed', place);
-    this.watch(shellGlobal.stage, 'key-press-event', (_stage, event) => {
+    this.watch(global.stage, 'key-press-event', (_stage, event) => {
       const active = this.surfaces.active;
       if (active && event.get_key_symbol() === Clutter.KEY_Escape) {
         if (active !== 'quick' || !this.quick.closeSubmenu()) close();
@@ -194,18 +192,18 @@ class KestrelUi {
       }
       return Clutter.EVENT_PROPAGATE;
     });
-    this.watch(shellGlobal.stage, 'captured-event', (_stage, event) => {
+    this.watch(global.stage, 'captured-event', (_stage, event) => {
       if (this.touchpad(event)) return Clutter.EVENT_STOP;
       if (event.type() === Clutter.EventType.SCROLL) {
         const [x, y] = event.get_coords();
-        const target = shellGlobal.stage.get_actor_at_pos(Clutter.PickMode.REACTIVE, x, y);
+        const target = global.stage.get_actor_at_pos(Clutter.PickMode.REACTIVE, x, y);
         if ((event.get_state() & (Clutter.ModifierType.SUPER_MASK | Clutter.ModifierType.MOD4_MASK)) || (this.panels.contains(target) && !this.panels.primary.handlesScroll(target)))
           return this.workspaces.scroll(event) ? Clutter.EVENT_STOP : Clutter.EVENT_PROPAGATE;
       }
       if (!this.canInteract() || event.type() !== Clutter.EventType.BUTTON_PRESS)
         return Clutter.EVENT_PROPAGATE;
       const [x, y] = event.get_coords();
-      const target = shellGlobal.stage.get_actor_at_pos(Clutter.PickMode.REACTIVE, x, y);
+      const target = global.stage.get_actor_at_pos(Clutter.PickMode.REACTIVE, x, y);
       if (!this.previews.contains(target)) this.previews.close();
       return Clutter.EVENT_PROPAGATE;
     });
@@ -214,12 +212,12 @@ class KestrelUi {
     };
     context.wallpaper.get_children().forEach(bindWallpaper);
     this.watch(context.wallpaper, 'child-added', (_wallpaper, actor: Clutter.Actor) => bindWallpaper(actor));
-    this.watch(shellGlobal.display, 'overlay-key', () => this.superTapped());
-    this.watch(shellGlobal.display, 'in-fullscreen-changed', () => this.queueSyncSession());
-    this.watch(shellGlobal.display, 'notify::focus-window', () => this.trackFocusedWindow());
-    this.watch(shellGlobal.display, 'restacked', () => this.queueSyncSession());
-    this.watch(shellGlobal.display, 'grab-op-begin', (_display, window: Meta.Window | null) => { this.draggedWindow = window; });
-    this.watch(shellGlobal.display, 'grab-op-end', () => {
+    this.watch(global.display, 'overlay-key', () => this.superTapped());
+    this.watch(global.display, 'in-fullscreen-changed', () => this.queueSyncSession());
+    this.watch(global.display, 'notify::focus-window', () => this.trackFocusedWindow());
+    this.watch(global.display, 'restacked', () => this.queueSyncSession());
+    this.watch(global.display, 'grab-op-begin', (_display, window: Meta.Window | null) => { this.draggedWindow = window; });
+    this.watch(global.display, 'grab-op-end', () => {
       this.draggedWindow = null;
       this.queueSyncSession();
     });
@@ -276,7 +274,7 @@ class KestrelUi {
 
   private trackFocusedWindow(): void {
     for (const disconnect of this.focusSignals) disconnect();
-    const window = (global as unknown as Shell.Global).display.focus_window;
+    const window = global.display.focus_window;
     const actor = window?.get_compositor_private() as Meta.WindowActor | null;
     const sync = (object: Signals, signal: string, when = () => true) => {
       const id = object.connect(signal, () => {
@@ -294,7 +292,7 @@ class KestrelUi {
 
   private queueSyncSession(): void {
     if (this.sessionSyncLater) return;
-    this.sessionSyncLater = (global as unknown as Shell.Global).compositor.get_laters().add(Meta.LaterType.BEFORE_REDRAW, () => {
+    this.sessionSyncLater = global.compositor.get_laters().add(Meta.LaterType.BEFORE_REDRAW, () => {
       this.sessionSyncLater = 0;
       afterMotion(this.syncSessionAfterMotion);
       return false;
@@ -349,7 +347,7 @@ class KestrelUi {
 
   private takeScreenshot(): void {
     this.dismissImmediately();
-    const stage = (global as unknown as Shell.Global).stage;
+    const stage = global.stage;
     const painted = stage.connect('after-paint', () => {
       stage.disconnect(painted);
       this.context.openScreenshot();
@@ -382,7 +380,7 @@ class KestrelUi {
   shutdown(): void {
     for (const disconnect of [...this.focusSignals, ...this.disconnectors]) disconnect();
     this.cancelStartPrewarm();
-    if (this.sessionSyncLater) (global as unknown as Shell.Global).compositor.get_laters().remove(this.sessionSyncLater);
+    if (this.sessionSyncLater) global.compositor.get_laters().remove(this.sessionSyncLater);
     dropAfterMotion(this.syncSessionAfterMotion);
     this.panels.shutdown();
     this.liveWallpaper.destroy();

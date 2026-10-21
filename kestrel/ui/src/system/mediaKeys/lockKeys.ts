@@ -1,6 +1,5 @@
 import type Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
-import type Shell from 'gi://Shell';
 
 import type { Context } from '../../context.js';
 import { t } from '../../shared/i18n/index.js';
@@ -21,7 +20,7 @@ const LOCK_KEYS: LockKey[] = [
 ];
 
 export class LockKeys {
-  private readonly keymap = (global as unknown as Shell.Global).stage.context.get_backend().get_default_seat().get_keymap();
+  private readonly keymap = global.stage.context.get_backend().get_default_seat().get_keymap();
   private readonly settings = new Gio.Settings({ schema_id: 'com.lantharos.kestrel.media-keys' });
   private states = this.read();
   private startup = 0;

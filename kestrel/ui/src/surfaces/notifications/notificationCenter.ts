@@ -1,7 +1,6 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import Shell from 'gi://Shell';
 import { ensureActorVisibleInScrollView } from 'resource:///com/lantharos/kestrel/misc/animationUtils.js';
 import type { NotificationCard, NotificationSource, SignalSource } from './notificationCard.js';
 import { CollapseLayout } from './collapseLayout.js';
@@ -121,7 +120,7 @@ export class NotificationCenter {
       .sort((a, b) => b.newest.compare(a.newest))
       .map(({ source }) => source);
     const present = new Set(sources);
-    const stage = (global as unknown as Shell.Global).stage;
+    const stage = global.stage;
     const focus = stage.get_key_focus();
     const focusInside = !!focus && this.actor.contains(focus);
     for (const [source, group] of this.groups) {

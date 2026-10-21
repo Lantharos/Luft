@@ -3,7 +3,6 @@ import Gio from 'gi://Gio';
 import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
-import type Shell from 'gi://Shell';
 import { LockBackdrop } from 'resource:///com/lantharos/kestrel/ui/lockScreen/backdrop.js';
 
 import { AppearanceService } from '../../appearance/service.js';
@@ -27,13 +26,9 @@ export interface SetupContext {
   };
 }
 
-function shell(): Shell.Global {
-  return global as unknown as Shell.Global;
-}
-
 function firstWindow(): Promise<void> {
   return new Promise(resolve => {
-    const display = shell().display;
+    const display = global.display;
     const timeout = GLib.timeout_add(GLib.PRIORITY_DEFAULT, FIRST_WINDOW_TIMEOUT, () => {
       display.disconnect(created);
       resolve();
@@ -54,7 +49,7 @@ export class Setup {
   private readonly backdrop = new LockBackdrop();
   private readonly portal = PortalBackend.forSetup();
   private readonly appearance = new AppearanceService(color => this.portal.setAccent(color));
-  private readonly loginWallpaper = shell().backend.is_headless() ? null : new LoginWallpaper();
+  private readonly loginWallpaper = global.backend.is_headless() ? null : new LoginWallpaper();
   private readonly dbus = Gio.DBusExportedObject.wrapJSObject(INTERFACE, this);
   private readonly nameId: number;
   private readonly placement: () => void;
@@ -73,7 +68,7 @@ export class Setup {
   private launch(): boolean {
     const app = GioUnix.DesktopAppInfo.new(APP);
     if (!app) return false;
-    const context = shell().create_app_launch_context(0, -1);
+    const context = global.create_app_launch_context(0, -1);
     return app.launch_uris_as_manager([], context, GLib.SpawnFlags.SEARCH_PATH | GLib.SpawnFlags.DO_NOT_REAP_CHILD, null, (_app, pid) => {
       GLib.child_watch_add(GLib.PRIORITY_DEFAULT, pid, () => {
         GLib.spawn_close_pid(pid);
@@ -89,7 +84,7 @@ export class Setup {
   Finish(): void {
     if (this.finishing) return;
     this.finishing = true;
-    for (const actor of shell().get_window_actors())
+    for (const actor of global.get_window_actors())
       animateActor(actor, { opacity: 0, duration: FINISH_DURATION, mode: Clutter.AnimationMode.EASE_IN_QUAD });
     GLib.timeout_add(GLib.PRIORITY_DEFAULT, FINISH_DURATION, () => {
       terminateOnceShown();

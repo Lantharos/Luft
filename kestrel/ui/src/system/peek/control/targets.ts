@@ -2,7 +2,6 @@ import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import Graphene from 'gi://Graphene';
 import type Meta from 'gi://Meta';
-import type Shell from 'gi://Shell';
 
 import { t } from '../../../shared/i18n/index.js';
 import { PeekError } from '../errors.js';
@@ -12,8 +11,6 @@ export type Point = [x: number, y: number];
 
 const SETTLE_TIMEOUT = 1500;
 const POLL = 16;
-
-const shell = () => global as unknown as Shell.Global;
 
 function stagePoint(window: Meta.Window, [x, y]: Point): Point {
   const area = captureArea(window);
@@ -26,7 +23,7 @@ function stagePoint(window: Meta.Window, [x, y]: Point): Point {
 }
 
 function windowAt([x, y]: Point): Meta.Window | null {
-  return windowOfActor(shell().stage.get_actor_at_pos(Clutter.PickMode.REACTIVE, x, y));
+  return windowOfActor(global.stage.get_actor_at_pos(Clutter.PickMode.REACTIVE, x, y));
 }
 
 function reaches(target: Meta.Window, point: Point): boolean {
@@ -51,7 +48,7 @@ function settle(ready: () => boolean): Promise<boolean> {
 }
 
 export async function bringForward(window: Meta.Window, activate: (window: Meta.Window) => void, points: Point[]): Promise<Point[]> {
-  const display = shell().display;
+  const display = global.display;
   if (display.focus_window !== window) activate(window);
   if (!await settle(() => display.focus_window === window))
     throw new PeekError('Busy', t('peek-error-not-in-front'));

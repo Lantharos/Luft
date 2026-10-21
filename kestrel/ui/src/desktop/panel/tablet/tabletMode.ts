@@ -1,8 +1,7 @@
 import type Clutter from 'gi://Clutter';
-import type Shell from 'gi://Shell';
 
 class TabletMode {
-  private readonly seat: Clutter.Seat = (global as unknown as Shell.Global).stage.context.get_backend().get_default_seat();
+  private readonly seat: Clutter.Seat = global.stage.context.get_backend().get_default_seat();
   private readonly watchers = new Set<() => void>();
   private current = this.seat.touch_mode;
 

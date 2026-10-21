@@ -109,7 +109,7 @@ class AppIcons {
   private restyleHidden(icon: St.Icon): void {
     this.hidden.add(icon);
     this.restyleId ||= GLib.idle_add(GLib.PRIORITY_LOW, () => {
-      const scale = St.ThemeContext.get_for_stage((global as unknown as Shell.Global).stage).scale_factor;
+      const scale = St.ThemeContext.get_for_stage(global.stage).scale_factor;
       for (const icon of [...this.hidden].slice(0, RESTYLE_BATCH)) {
         this.hidden.delete(icon);
         icon.gicon = this.gicon(this.bound.get(icon)!);

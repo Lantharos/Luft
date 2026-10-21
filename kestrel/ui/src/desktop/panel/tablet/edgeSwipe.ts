@@ -31,11 +31,11 @@ export class EdgeSwipe {
     });
     this.gesture.connect('end', () => this.release(true));
     this.gesture.connect('cancel', () => this.release(false));
-    (global as unknown as Shell.Global).stage.add_action(this.gesture);
+    global.stage.add_action(this.gesture);
   }
 
   destroy(): void {
-    (global as unknown as Shell.Global).stage.remove_action(this.gesture);
+    global.stage.remove_action(this.gesture);
   }
 
   private release(completed: boolean): void {

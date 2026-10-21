@@ -1,6 +1,5 @@
 import Clutter from 'gi://Clutter';
 import Meta from 'gi://Meta';
-import Shell from 'gi://Shell';
 import St from 'gi://St';
 import * as DND from 'resource:///com/lantharos/kestrel/ui/dnd.js';
 
@@ -42,7 +41,7 @@ class WorkspaceThumbnail {
       label.text = t('task-view-desktop', { number: index + 1 });
       this.card.accessible_name = label.text;
     });
-    this.card.connect('clicked', () => workspace.activate((global as unknown as Shell.Global).get_current_time()));
+    this.card.connect('clicked', () => workspace.activate(global.get_current_time()));
   }
 
   sync(active: boolean, board: BoardFrame | null): void {
@@ -55,8 +54,7 @@ class WorkspaceThumbnail {
       translation_x: board ? board.viewportX - monitor.x - board.x * board.scale : -monitor.x,
       translation_y: board ? board.viewportY - monitor.y - board.y * board.scale : -monitor.y,
     });
-    const shell = global as unknown as Shell.Global;
-    const windows = shell.display.sort_windows_by_stacking(this.workspace.list_windows()
+    const windows = global.display.sort_windows_by_stacking(this.workspace.list_windows()
       .filter(window => !window.minimized && !window.skip_taskbar && window.get_compositor_private() && (board || window.get_monitor() === monitor.index)));
     if (windows.length === this.shown.length && windows.every((window, index) => window === this.shown[index])) return;
     this.shown = windows;
@@ -86,7 +84,7 @@ export class WorkspaceStrip {
   }
 
   sync(monitor: Monitor): void {
-    const manager = (global as unknown as Shell.Global).workspace_manager;
+    const manager = global.workspace_manager;
     const workspaces = Array.from({ length: manager.n_workspaces }, (_, index) => manager.get_workspace_by_index(index)!);
     if (workspaces.length !== this.thumbnails.length || workspaces.some((workspace, index) => this.thumbnails[index].workspace !== workspace)) {
       this.clear();

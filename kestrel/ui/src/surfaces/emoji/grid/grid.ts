@@ -1,5 +1,4 @@
 import Clutter from 'gi://Clutter';
-import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import { pixelScale, whenPixelScaleChanges } from '../../../shared/graphics.js';
@@ -36,7 +35,7 @@ export class EmojiGrid {
   private readonly emojiImages = new GlyphImages(GlyphRenderer.new_for_emoji(), EMOJI_SIZE);
   private characterImages: GlyphImages | null = null;
   private characterInk = '';
-  private readonly themeContext = St.ThemeContext.get_for_stage((global as unknown as Shell.Global).stage);
+  private readonly themeContext = St.ThemeContext.get_for_stage(global.stage);
   private readonly headers = new Map<number, St.Label>();
   private readonly spareHeaders: St.Label[] = [];
   private tone = 0;

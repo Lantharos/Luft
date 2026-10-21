@@ -1,6 +1,5 @@
 import Gio from 'gi://Gio';
 import GObject from 'gi://GObject';
-import type Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import type { Shadow, TaskbarHalos } from '../../../../../../packages/ui/src/taskbar/looks';
@@ -44,7 +43,7 @@ export class SchemeTheme {
   }
 
   private get context(): St.ThemeContext {
-    return St.ThemeContext.get_for_stage((global as unknown as Shell.Global).stage);
+    return St.ThemeContext.get_for_stage(global.stage);
   }
 
   private node(classes: string | null, parent = this.stage, type = St.Widget.$gtype): St.ThemeNode {

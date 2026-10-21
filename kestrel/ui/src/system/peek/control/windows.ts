@@ -9,15 +9,13 @@ import { captureArea } from './family.js';
 
 const LISTED = [Meta.WindowType.NORMAL, Meta.WindowType.DIALOG, Meta.WindowType.MODAL_DIALOG, Meta.WindowType.UTILITY];
 
-const shell = () => global as unknown as Shell.Global;
-
 function listed(window: Meta.Window | null): window is Meta.Window {
   return !!window && !window.is_override_redirect() && LISTED.includes(window.get_window_type());
 }
 
 export function listedWindows(): Meta.Window[] {
-  const windows = shell().get_window_actors().map(actor => actor.meta_window).filter(listed);
-  return shell().display.sort_windows_by_stacking(windows).reverse();
+  const windows = global.get_window_actors().map(actor => actor.meta_window).filter(listed);
+  return global.display.sort_windows_by_stacking(windows).reverse();
 }
 
 export function windowById(id: number): Meta.Window {
@@ -49,7 +47,7 @@ export function describe(window: Meta.Window, level: Level | null, handle: strin
 }
 
 function painted(): Promise<void> {
-  const stage = shell().stage;
+  const stage = global.stage;
   return new Promise(resolve => {
     const id = stage.connect_after('after-paint', () => {
       stage.disconnect(id);
@@ -62,7 +60,7 @@ function painted(): Promise<void> {
 export function waitForWindow(ended: Set<() => void>, owned: (window: Meta.Window) => boolean, timeout: number): Promise<Meta.Window> {
   const existing = listedWindows().find(owned);
   if (existing) return Promise.resolve(existing);
-  const display = shell().display;
+  const display = global.display;
   const shown: [Meta.Window, number][] = [];
   let created = 0;
   let timer = 0;

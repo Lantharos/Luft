@@ -1,5 +1,3 @@
-import Shell from 'gi://Shell';
-
 export interface Box {
   x: number;
   y: number;
@@ -27,12 +25,11 @@ function clamp(value: number, minimum: number, maximum: number): number {
 }
 
 export function findAnchor(caret: Box | null): Anchor {
-  const shell = global as unknown as Shell.Global;
-  const shellFocus = shell.stage.get_key_focus();
-  if (caret && (!shellFocus || shellFocus === shell.stage)) return { box: caret, centered: false };
-  const window = shell.display.focus_window;
+  const shellFocus = global.stage.get_key_focus();
+  if (caret && (!shellFocus || shellFocus === global.stage)) return { box: caret, centered: false };
+  const window = global.display.focus_window;
   if (window) return { box: window.get_frame_rect(), centered: true };
-  const [x, y] = shell.get_pointer();
+  const [x, y] = global.get_pointer();
   return { box: { x, y, width: 0, height: 0 }, centered: false };
 }
 

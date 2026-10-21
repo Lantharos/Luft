@@ -1,5 +1,4 @@
 import GLib from 'gi://GLib';
-import Shell from 'gi://Shell';
 import St from 'gi://St';
 import { FluentNumber, t } from '../../shared/i18n/index.js';
 import { animateActor, Curve, Duration } from '../../shared/motion.js';
@@ -9,7 +8,7 @@ const BUBBLE_GAP = 6;
 
 export function attachSliderValue(slider: St.Widget & { value: number }): void {
   const bubble = new St.Label({ style_class: 'kestrel-slider-value', opacity: 0, visible: false });
-  (global as unknown as Shell.Global).stage.add_child(bubble);
+  global.stage.add_child(bubble);
   let hideTimer = 0;
   const hide = () => {
     hideTimer = 0;

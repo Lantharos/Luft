@@ -1,7 +1,6 @@
 import Clutter from 'gi://Clutter';
 import Meta from 'gi://Meta';
 import Mtk from 'gi://Mtk';
-import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import { blurSurface } from '../../shared/surface.js';
@@ -59,12 +58,12 @@ export class SnapLayouts {
   }
 
   get available(): boolean {
-    const window = (global as unknown as Shell.Global).display.focus_window;
+    const window = global.display.focus_window;
     return this.allowed() && !!window && window.window_type === Meta.WindowType.NORMAL && window.allows_resize();
   }
 
   prepareOpen(): void {
-    this.window = (global as unknown as Shell.Global).display.focus_window;
+    this.window = global.display.focus_window;
   }
 
   private card(layout: Zone[]): St.Widget {
@@ -95,6 +94,6 @@ export class SnapLayouts {
       width: area.x + Math.round((x + width) * area.width) - left,
       height: area.y + Math.round((y + height) * area.height) - top,
     }));
-    window.activate((global as unknown as Shell.Global).get_current_time());
+    window.activate(global.get_current_time());
   }
 }

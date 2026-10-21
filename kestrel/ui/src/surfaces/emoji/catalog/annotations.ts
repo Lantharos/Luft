@@ -1,5 +1,4 @@
 import GLib from 'gi://GLib';
-import type Shell from 'gi://Shell';
 
 import { annotationKey, type Catalog, type Item } from './catalog.js';
 
@@ -26,7 +25,7 @@ function load(folder: string, locale: string): Record<string, Annotation> | null
 }
 
 export function annotate(catalog: Catalog): void {
-  const folder = `${(global as unknown as Shell.Global).datadir}/emoji-annotations`;
+  const folder = `${global.datadir}/emoji-annotations`;
   const emoji = new Map(catalog.items.filter(item => item.kind === 'emoji').map(item => [annotationKey(item.text), item]));
   for (const locale of locales()) {
     const annotations = load(folder, locale);

@@ -2,7 +2,6 @@ import Clutter from 'gi://Clutter';
 import type Meta from 'gi://Meta';
 
 import type { Box } from '../../../shared/placement.js';
-import { shell } from '../windows.js';
 import type { ScrollingSpace } from './scrollingSpace.js';
 
 export interface OverviewSurroundings {
@@ -61,7 +60,7 @@ export class StripOverview {
       return Clutter.EVENT_STOP;
     });
     this.shield = shield;
-    this.returnTo = shell().display.focus_window;
+    this.returnTo = global.display.focus_window;
     this.surroundings.addChrome(shield);
     shield.grab_key_focus();
     space.zoom(true);

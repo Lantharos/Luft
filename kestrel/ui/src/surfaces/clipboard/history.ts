@@ -1,7 +1,6 @@
 import type Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
-import Shell from 'gi://Shell';
 import St from 'gi://St';
 import System from 'system';
 
@@ -47,7 +46,7 @@ export class ClipboardHistory {
   private copies = 0;
   private readonly images = new ClipboardImageFiles();
   private readonly clipboard = St.Clipboard.get_default();
-  private readonly selection = (global as unknown as Shell.Global).display.get_selection();
+  private readonly selection = global.display.get_selection();
   private readonly ownerChanged: number;
   private readonly stopWatchingGraphics = whenGraphicsRestored(() => void this.redrawThumbnails());
   private quiet = false;

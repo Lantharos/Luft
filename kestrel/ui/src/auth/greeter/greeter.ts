@@ -41,10 +41,6 @@ export interface GreeterContext {
   pushModal(actor: Clutter.Actor): void;
 }
 
-function shell(): Shell.Global {
-  return global as unknown as Shell.Global;
-}
-
 function rememberSession(user: string, session: string): Promise<void> {
   return new Promise(resolve => Gio.DBus.system.call(
     'com.lantharos.Greeter1', '/com/lantharos/Greeter1', 'com.lantharos.Greeter1', 'RememberSession',
@@ -115,7 +111,7 @@ export class Greeter {
     this.prompt.connect('succeeded', () => void this.finish());
     this.prompt.connect('loading', (_prompt, busy) => (this.userList.sensitive = !busy));
 
-    const idleMonitor = shell().backend.get_core_idle_monitor();
+    const idleMonitor = global.backend.get_core_idle_monitor();
     idleMonitor.add_idle_watch(IDLE_TIMEOUT, () => this.pages.showClock());
 
     const shield = context.layoutManager.screenShieldGroup;
@@ -134,7 +130,7 @@ export class Greeter {
   }
 
   private matchNumLock(): void {
-    const seat = shell().stage.context.get_backend().get_default_seat();
+    const seat = global.stage.context.get_backend().get_default_seat();
     if (seat.get_keymap().get_num_lock_state() === this.config.numLock) return;
     const keyboard = seat.create_virtual_device(Clutter.InputDeviceType.KEYBOARD_DEVICE);
     const time = GLib.get_monotonic_time();

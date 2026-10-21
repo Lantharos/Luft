@@ -1,4 +1,3 @@
-import type Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
@@ -15,11 +14,6 @@ const STEP_BINDINGS: [string, number, number][] = [
   ['unmaximize', 0, 1],
 ];
 const OVERVIEW_BINDING = 'restore-shortcuts';
-
-type InhibitingWindow = Meta.Window & {
-  shortcuts_inhibited(source: Clutter.InputDevice): boolean;
-  force_restore_shortcuts(source: Clutter.InputDevice): void;
-};
 
 interface KeyActions {
   readonly shown: boolean;
@@ -58,7 +52,7 @@ export class BoardKeys {
     for (const [name, directionX, directionY] of STEP_BINDINGS)
       Meta.keybindings_set_custom_handler(name, () => this.actions.step(directionX, directionY));
     Meta.keybindings_set_custom_handler(OVERVIEW_BINDING, (display, _window, event) => {
-      const focused = display.focus_window as InhibitingWindow | null;
+      const focused = display.focus_window;
       const source = event.get_source_device();
       if (focused?.shortcuts_inhibited(source)) focused.force_restore_shortcuts(source);
       else this.actions.overview();

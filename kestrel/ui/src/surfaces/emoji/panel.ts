@@ -1,6 +1,5 @@
 import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
-import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import { blurSurface } from '../../shared/surface.js';
@@ -105,9 +104,8 @@ export class EmojiPanel {
 
   open(): void {
     this.prepare();
-    const shellGlobal = global as unknown as Shell.Global;
-    const shellFocus = shellGlobal.stage.get_key_focus();
-    this.intercepting = !!this.input.currentFocus && (!shellFocus || shellFocus === shellGlobal.stage);
+    const shellFocus = global.stage.get_key_focus();
+    this.intercepting = !!this.input.currentFocus && (!shellFocus || shellFocus === global.stage);
     if (this.search.text) this.search.clear();
     else this.showBrowsing();
     this.closeTones(false);
@@ -119,7 +117,7 @@ export class EmojiPanel {
       this.actor.grab_key_focus();
       return;
     }
-    this.focusWatch = shellGlobal.display.connect('notify::focus-window', () => this.close());
+    this.focusWatch = global.display.connect('notify::focus-window', () => this.close());
     this.input.interceptKeys(event => {
       this.key(event);
       return true;
@@ -129,7 +127,7 @@ export class EmojiPanel {
   closed(): void {
     this.input.interceptKeys(null);
     this.search.setActive(false);
-    if (this.focusWatch) (global as unknown as Shell.Global).display.disconnect(this.focusWatch);
+    if (this.focusWatch) global.display.disconnect(this.focusWatch);
     this.focusWatch = 0;
   }
 

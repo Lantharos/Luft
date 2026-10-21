@@ -2,17 +2,11 @@ import Clutter from 'gi://Clutter';
 import Graphene from 'gi://Graphene';
 import Meta from 'gi://Meta';
 import Pango from 'gi://Pango';
-import type Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import { animateActor, Duration } from '../../../shared/motion.js';
 import { localized, t } from '../../../shared/i18n/index.js';
 import { ResizeArea } from './resizeArea.js';
-
-export interface DecoratedWindow extends Meta.Window {
-  get_titlebar_height(): number;
-  has_rounded_corners(): boolean;
-}
 
 export type ShowWindowMenu = (window: Meta.Window, x: number, y: number) => void;
 
@@ -26,8 +20,7 @@ const WINDOW_SIGNALS = ['size-changed', 'notify::titlebar-height', 'notify::appe
   'notify::maximized-horizontally', 'notify::maximized-vertically', 'notify::resizeable'] as const;
 const PRESSED_SCALE = 0.96;
 
-const shell = () => global as unknown as Shell.Global;
-const settings = () => shell().stage.get_context().get_settings();
+const settings = () => global.stage.get_context().get_settings();
 
 function windowButton(name: string, labelId: string, activate: () => void): St.Button {
   const icon = new St.Icon({ icon_name: `titlebar-${name}-symbolic`, style_class: 'kestrel-titlebar-icon' });
@@ -58,12 +51,12 @@ export class TitleBar {
   private press: Press | null = null;
   private lastPress: Press | null = null;
 
-  constructor(private readonly window: DecoratedWindow, private readonly actor: Meta.WindowActor,
+  constructor(private readonly window: Meta.Window, private readonly actor: Meta.WindowActor,
     private readonly showMenu: ShowWindowMenu, gone: () => void) {
     this.resizeArea = new ResizeArea(window);
     this.minimize = windowButton('minimize', 'title-bar-minimize', () => window.minimize());
     this.maximize = windowButton('maximize', 'title-bar-maximize', () => this.toggleMaximized());
-    this.close = windowButton('close', 'title-bar-close', () => window.delete(shell().get_current_time()));
+    this.close = windowButton('close', 'title-bar-close', () => window.delete(global.get_current_time()));
     const buttons = new St.BoxLayout({ style_class: 'kestrel-titlebar-buttons' });
     for (const button of [this.minimize, this.maximize, this.close]) buttons.add_child(button);
     this.bar.add_child(this.title);
@@ -98,7 +91,7 @@ export class TitleBar {
   }
 
   private onBar(event: Clutter.Event): boolean {
-    const target = shell().stage.get_event_actor(event);
+    const target = global.stage.get_event_actor(event);
     return target === this.bar || target === this.title;
   }
 
@@ -132,7 +125,7 @@ export class TitleBar {
     if (Math.hypot(x - press.x, y - press.y) < settings().dnd_drag_threshold) return Clutter.EVENT_STOP;
     this.press = null;
     this.lastPress = null;
-    const stage = shell().stage;
+    const stage = global.stage;
     const sprite = stage.get_context().get_backend().get_sprite(stage, event);
     this.window.begin_grab_op(Meta.GrabOp.MOVING, sprite, event.get_time(), new Graphene.Point({ x: press.x, y: press.y }));
     return Clutter.EVENT_STOP;

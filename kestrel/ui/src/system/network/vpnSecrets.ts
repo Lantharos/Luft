@@ -64,7 +64,7 @@ export class VpnSecrets {
     const secrets = await this.signIn.run({
       ask: step => this.ask(step),
       wait: message => this.dialog?.wait(message),
-    }, () => (global as unknown as Shell.Global).create_app_launch_context(0, -1));
+    }, () => global.create_app_launch_context(0, -1));
     if (secrets) this.respond(secrets);
     else this.finish(Shell.NetworkAgentResponse.USER_CANCELED);
   }

@@ -7,7 +7,7 @@ import { FloatingMemory } from './memory.js';
 import { TilingPreferences, type TilingKey, type TilingMode } from './preferences.js';
 import { ScrollingSpace } from './scrolling/scrollingSpace.js';
 import type { Space, SpaceHost } from './space.js';
-import { appKey, boxOf, floatsByNature, setEdgesTiled, setUnconstrained, shell, stretched } from './windows.js';
+import { appKey, boxOf, floatsByNature, setEdgesTiled, setUnconstrained, stretched } from './windows.js';
 
 export interface TilingSurroundings {
   monitors(): Box[];
@@ -79,13 +79,13 @@ export class Tiler {
   }
 
   visibleSpaces(): Space[] {
-    const active = shell().workspace_manager.get_active_workspace();
+    const active = global.workspace_manager.get_active_workspace();
     return [...this.spaces.get(active)?.values() ?? [], ...this.spaces.get(null)?.values() ?? []];
   }
 
   spaceOn(monitor: number): Space {
     const primary = this.surroundings.primaryIndex();
-    const workspace = Meta.prefs_get_workspaces_only_on_primary() && monitor !== primary ? null : shell().workspace_manager.get_active_workspace();
+    const workspace = Meta.prefs_get_workspaces_only_on_primary() && monitor !== primary ? null : global.workspace_manager.get_active_workspace();
     return this.spaceAt(monitor, workspace);
   }
 
@@ -161,8 +161,8 @@ export class Tiler {
   }
 
   private start(): void {
-    const display = shell().display;
-    const manager = shell().workspace_manager;
+    const display = global.display;
+    const manager = global.workspace_manager;
     this.signals = [
       [display, display.connect('window-created', (_display, window: Meta.Window) => this.created(window))],
       [display, display.connect('notify::focus-window', () => this.focusChanged())],
@@ -205,7 +205,7 @@ export class Tiler {
   }
 
   private created(window: Meta.Window): void {
-    this.track(window, true, shell().display.focus_window);
+    this.track(window, true, global.display.focus_window);
   }
 
   private track(window: Meta.Window, opening: boolean, beside: Meta.Window | null = null): void {
@@ -349,18 +349,18 @@ export class Tiler {
   }
 
   private focusChanged(): void {
-    let window = shell().display.focus_window;
+    let window = global.display.focus_window;
     for (let parent = window?.get_transient_for(); parent; parent = parent.get_transient_for()) window = parent;
     const space = this.spaceOf(window);
     if (space && window && !this.surroundings.boardShown()) space.focused(window);
   }
 
   private keepFloatingAbove(): void {
-    const workspace = shell().workspace_manager.get_active_workspace();
+    const workspace = global.workspace_manager.get_active_workspace();
     const floating = this.floatingWindows().filter(window => window.located_on_workspace(workspace));
     if (!floating.length) return;
     const tiled = [...this.tracked].filter(([window, record]) => record.space && !window.minimized && window.located_on_workspace(workspace)).map(([window]) => window);
-    const stacked = shell().display.sort_windows_by_stacking([...floating, ...tiled]);
+    const stacked = global.display.sort_windows_by_stacking([...floating, ...tiled]);
     const topTiled = Math.max(...tiled.map(window => stacked.indexOf(window)));
     for (const window of stacked.filter((window, index) => floating.includes(window) && index < topTiled)) window.raise();
   }
@@ -387,7 +387,7 @@ export class Tiler {
     const primary = this.surroundings.primaryIndex();
     const monitor = this.tracked.get(window)?.space?.monitor ?? (window.get_monitor() >= 0 ? window.get_monitor() : primary);
     const onlyPrimary = Meta.prefs_get_workspaces_only_on_primary();
-    return [monitor, onlyPrimary && monitor !== primary ? null : window.get_workspace() ?? shell().workspace_manager.get_active_workspace()];
+    return [monitor, onlyPrimary && monitor !== primary ? null : window.get_workspace() ?? global.workspace_manager.get_active_workspace()];
   }
 
   private spaceAt(monitor: number, workspace: Meta.Workspace | null): Space {
@@ -406,7 +406,7 @@ export class Tiler {
   }
 
   private pruneSpaces(): void {
-    const manager = shell().workspace_manager;
+    const manager = global.workspace_manager;
     const alive = new Set(Array.from({ length: manager.n_workspaces }, (_, index) => manager.get_workspace_by_index(index)));
     for (const [workspace, byMonitor] of this.spaces) {
       if (workspace && !alive.has(workspace) && [...byMonitor.values()].every(space => !space.windows.length)) {

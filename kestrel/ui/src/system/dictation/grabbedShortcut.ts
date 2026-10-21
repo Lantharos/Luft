@@ -7,9 +7,6 @@ import type { Presses } from './pressAndHold.js';
 
 export const SHORTCUT_MODES = Shell.ActionMode.ALL & ~(Shell.ActionMode.LOGIN_SCREEN | Shell.ActionMode.LOCK_SCREEN | Shell.ActionMode.UNLOCK_SCREEN);
 
-const display = () => (global as unknown as Shell.Global).display;
-const prependFilter = (Clutter.Event as unknown as { prepend_filter: typeof Clutter.Event.add_filter }).prepend_filter;
-
 /**
  * Keys grabbed from the compositor that tell when they go down and come up.
  * Mutter only reports letting go when the shortcut's own key comes up, so
@@ -23,16 +20,16 @@ export class GrabbedShortcut {
 
   constructor(accelerators: string[], keybindings: Keybindings, private readonly presses: Presses) {
     for (const accelerator of accelerators) {
-      const action = display().grab_accelerator(accelerator, Meta.KeyBindingFlags.IGNORE_AUTOREPEAT | Meta.KeyBindingFlags.TRIGGER_RELEASE);
+      const action = global.display.grab_accelerator(accelerator, Meta.KeyBindingFlags.IGNORE_AUTOREPEAT | Meta.KeyBindingFlags.TRIGGER_RELEASE);
       if (action === Meta.KeyBindingAction.NONE) continue;
       keybindings.allow(Meta.external_binding_name_for_action(action), SHORTCUT_MODES);
       this.actions.push(action);
     }
     this.signals = [
-      display().connect('accelerator-activated', (_display, action: number) => {
+      global.display.connect('accelerator-activated', (_display, action: number) => {
         if (this.actions.includes(action)) this.pressed();
       }),
-      display().connect('accelerator-deactivated', (_display, action: number) => {
+      global.display.connect('accelerator-deactivated', (_display, action: number) => {
         if (this.actions.includes(action)) this.released();
       }),
     ];
@@ -42,7 +39,7 @@ export class GrabbedShortcut {
     this.presses.down();
     if (this.releaseFilter) return;
     const typed = new Set<number>();
-    this.releaseFilter = prependFilter(null, event => {
+    this.releaseFilter = Clutter.Event.prepend_filter(null, event => {
       const type = event.type();
       if (type === Clutter.EventType.KEY_PRESS && !(event.get_flags() & Clutter.EventFlags.FLAG_REPEATED)) typed.add(event.get_key_code());
       else if (type === Clutter.EventType.KEY_RELEASE && !typed.delete(event.get_key_code())) this.released();
@@ -63,7 +60,7 @@ export class GrabbedShortcut {
   destroy(): void {
     this.stopWatchingRelease();
     this.presses.cancel();
-    for (const signal of this.signals) display().disconnect(signal);
-    for (const action of this.actions) display().ungrab_accelerator(action);
+    for (const signal of this.signals) global.display.disconnect(signal);
+    for (const action of this.actions) global.display.ungrab_accelerator(action);
   }
 }

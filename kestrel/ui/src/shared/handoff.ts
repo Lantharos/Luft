@@ -1,8 +1,5 @@
-import type Shell from 'gi://Shell';
-
 export function terminateOnceShown(): void {
-  const shell = global as unknown as Shell.Global;
-  const stage = shell.stage;
+  const stage = global.stage;
   let painted = 0;
   const id = stage.connect('after-paint', () => {
     if (++painted < 2) {
@@ -10,7 +7,7 @@ export function terminateOnceShown(): void {
       return;
     }
     stage.disconnect(id);
-    shell.context.terminate();
+    global.context.terminate();
   });
   stage.queue_redraw();
 }

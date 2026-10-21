@@ -1,5 +1,4 @@
 import type Meta from 'gi://Meta';
-import Shell from 'gi://Shell';
 import type { getGeoclueAgent } from 'resource:///com/lantharos/kestrel/ui/status/location.js';
 
 import { ownDictation } from '../dictation/listening.js';
@@ -32,7 +31,7 @@ export class PrivacyMonitor {
     const camera = this.camera.connect('notify::cameras-in-use', changed);
     const recording = this.mixer.connect('notify::recording', changed);
     const dictating = this.mixer.connect('notify::dictating', dictationChanged);
-    const controller = (global as unknown as Shell.Global).backend.get_remote_access_controller();
+    const controller = global.backend.get_remote_access_controller();
     const handles = controller?.connect('new-handle', (_controller, handle: Meta.RemoteAccessHandle) => {
       this.handles.add(handle);
       handle.connect('stopped', () => {

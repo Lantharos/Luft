@@ -15,7 +15,7 @@ interface WindowEntry extends Searchable {
 }
 
 export function openWindows(): Meta.Window[] {
-  const display = (global as unknown as Shell.Global).display;
+  const display = global.display;
   return display.get_tab_list(Meta.TabList.NORMAL_ALL, null).filter(window => !window.skip_taskbar);
 }
 

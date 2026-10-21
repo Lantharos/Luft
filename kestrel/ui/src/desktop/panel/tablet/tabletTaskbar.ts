@@ -1,6 +1,5 @@
 import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
-import type Shell from 'gi://Shell';
 import type St from 'gi://St';
 
 import { animateActor, Curve, Duration, rubberband, Spring, type SpringToken } from '../../../shared/motion.js';
@@ -13,7 +12,6 @@ const LAYER_SCALE = 0.94;
 const OUTSIDE_EVENTS = [Clutter.EventType.BUTTON_PRESS, Clutter.EventType.TOUCH_BEGIN];
 
 const clamp = (value: number) => Math.min(1, Math.max(0, value));
-const stage = () => (global as unknown as Shell.Global).stage;
 
 export class TabletTaskbar {
   private strip: TabletStrip | null = null;
@@ -211,10 +209,10 @@ export class TabletTaskbar {
   private watch(): void {
     this.restartIdle();
     if (this.outsideSignal) return;
-    this.outsideSignal = stage().connect('captured-event', (_stage, event: Clutter.Event) => {
+    this.outsideSignal = global.stage.connect('captured-event', (_stage, event: Clutter.Event) => {
       if (!OUTSIDE_EVENTS.includes(event.type())) return Clutter.EVENT_PROPAGATE;
       const [x, y] = event.get_coords();
-      const target = stage().get_actor_at_pos(Clutter.PickMode.REACTIVE, x, y);
+      const target = global.stage.get_actor_at_pos(Clutter.PickMode.REACTIVE, x, y);
       if (target && this.panel.contains(target)) this.restartIdle();
       else this.collapse();
       return Clutter.EVENT_PROPAGATE;
@@ -233,7 +231,7 @@ export class TabletTaskbar {
   private stopWatching(): void {
     if (this.idleTimer) GLib.Source.remove(this.idleTimer);
     this.idleTimer = 0;
-    if (this.outsideSignal) stage().disconnect(this.outsideSignal);
+    if (this.outsideSignal) global.stage.disconnect(this.outsideSignal);
     this.outsideSignal = 0;
   }
 

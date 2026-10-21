@@ -19,18 +19,16 @@ const HANDLERS: Record<Exclude<Launcher, 'home' | 'calculator'>, string> = {
 };
 const CALCULATORS = ['org.gnome.Calculator.desktop', 'gnome-calculator.desktop'];
 
-const shell = () => global as unknown as Shell.Global;
-
 function activate(info: Gio.AppInfo | null): void {
   if (!info) return;
   const app = Shell.AppSystem.get_default().lookup_app(info.get_id() ?? '');
   if (app) app.activate();
-  else info.launch([], shell().create_app_launch_context(0, -1));
+  else info.launch([], global.create_app_launch_context(0, -1));
 }
 
 export function launch(launcher: Launcher): void {
   if (launcher === 'home') {
-    Gio.AppInfo.launch_default_for_uri(Gio.File.new_for_path(GLib.get_home_dir()).get_uri(), shell().create_app_launch_context(0, -1));
+    Gio.AppInfo.launch_default_for_uri(Gio.File.new_for_path(GLib.get_home_dir()).get_uri(), global.create_app_launch_context(0, -1));
     return;
   }
   if (launcher === 'calculator') {
@@ -55,7 +53,7 @@ export class CustomShortcuts {
 
   constructor(private readonly keybindings: Keybindings) {
     this.listId = this.mediaKeys.connect('changed::custom-keybindings', () => this.regrab());
-    this.activatedId = shell().display.connect('accelerator-activated', (_display: Meta.Display, action: number) => {
+    this.activatedId = global.display.connect('accelerator-activated', (_display: Meta.Display, action: number) => {
       const grab = this.grabs.find(candidate => candidate.action === action);
       const command = grab?.settings.get_string('command');
       if (command) spawnCommandLine(command);
@@ -69,7 +67,7 @@ export class CustomShortcuts {
       const settings = new Gio.Settings({ schema_id: CUSTOM, path });
       const changedId = settings.connect('changed::binding', () => this.regrab());
       const accelerator = settings.get_string('binding');
-      const action = accelerator ? shell().display.grab_accelerator(accelerator, Meta.KeyBindingFlags.NONE) : Meta.KeyBindingAction.NONE;
+      const action = accelerator ? global.display.grab_accelerator(accelerator, Meta.KeyBindingFlags.NONE) : Meta.KeyBindingAction.NONE;
       if (action !== Meta.KeyBindingAction.NONE) this.keybindings.allow(Meta.external_binding_name_for_action(action), CUSTOM_MODES);
       this.grabs.push({ settings, action, changedId });
     }
@@ -78,7 +76,7 @@ export class CustomShortcuts {
   private release(): void {
     for (const grab of this.grabs) {
       grab.settings.disconnect(grab.changedId);
-      if (grab.action !== Meta.KeyBindingAction.NONE) shell().display.ungrab_accelerator(grab.action);
+      if (grab.action !== Meta.KeyBindingAction.NONE) global.display.ungrab_accelerator(grab.action);
     }
     this.grabs = [];
   }
@@ -86,6 +84,6 @@ export class CustomShortcuts {
   destroy(): void {
     this.release();
     this.mediaKeys.disconnect(this.listId);
-    shell().display.disconnect(this.activatedId);
+    global.display.disconnect(this.activatedId);
   }
 }

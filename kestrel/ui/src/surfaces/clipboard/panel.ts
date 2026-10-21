@@ -194,10 +194,9 @@ export class ClipboardPanel {
 
   private sendPaste(sent?: () => void): void {
     GLib.timeout_add(GLib.PRIORITY_DEFAULT, PASTE_DELAY_MS, () => {
-      const shellGlobal = global as unknown as Shell.Global;
       const app = Shell.WindowTracker.get_default().focus_app;
       const terminal = app?.get_app_info()?.get_categories()?.split(';').includes('TerminalEmulator') ?? false;
-      this.keyboard ??= shellGlobal.stage.context.get_backend().get_default_seat().create_virtual_device(Clutter.InputDeviceType.KEYBOARD_DEVICE);
+      this.keyboard ??= global.stage.context.get_backend().get_default_seat().create_virtual_device(Clutter.InputDeviceType.KEYBOARD_DEVICE);
       const keyboard = this.keyboard;
       const keys = terminal ? [Clutter.KEY_Control_L, Clutter.KEY_Shift_L, Clutter.KEY_v] : [Clutter.KEY_Control_L, Clutter.KEY_v];
       const time = GLib.get_monotonic_time();

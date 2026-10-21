@@ -1,6 +1,5 @@
 import type Clutter from 'gi://Clutter';
 import Meta from 'gi://Meta';
-import type Shell from 'gi://Shell';
 
 export interface CaptureArea {
   readonly x: number;
@@ -9,8 +8,6 @@ export interface CaptureArea {
   readonly height: number;
   readonly scale: number;
 }
-
-const shell = () => global as unknown as Shell.Global;
 
 export function windowOfActor(actor: Clutter.Actor | null): Meta.Window | null {
   for (let current = actor; current; current = current.get_parent()) {
@@ -28,9 +25,9 @@ export function partOf(window: Meta.Window, target: Meta.Window): boolean {
 }
 
 export function family(target: Meta.Window): Meta.Window[] {
-  const windows = shell().get_window_actors().map(actor => actor.meta_window)
+  const windows = global.get_window_actors().map(actor => actor.meta_window)
     .filter((window): window is Meta.Window => !!window && partOf(window, target));
-  return shell().display.sort_windows_by_stacking(windows);
+  return global.display.sort_windows_by_stacking(windows);
 }
 
 export function scaleOf(window: Meta.Window): number {

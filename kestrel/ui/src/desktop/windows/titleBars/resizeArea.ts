@@ -1,7 +1,6 @@
 import Clutter from 'gi://Clutter';
 import Graphene from 'gi://Graphene';
 import Meta from 'gi://Meta';
-import type Shell from 'gi://Shell';
 import St from 'gi://St';
 
 const RESIZE_MARGIN = 8;
@@ -62,7 +61,7 @@ export class ResizeArea {
   private resize(event: Clutter.Event): boolean {
     const zone = event.get_button() === Clutter.BUTTON_PRIMARY ? this.zoneAt(event) : null;
     if (!zone) return Clutter.EVENT_PROPAGATE;
-    const stage = (global as unknown as Shell.Global).stage;
+    const stage = global.stage;
     const sprite = stage.get_context().get_backend().get_sprite(stage, event);
     const [x, y] = event.get_coords();
     this.window.begin_grab_op(zone.op, sprite, event.get_time(), new Graphene.Point({ x, y }));

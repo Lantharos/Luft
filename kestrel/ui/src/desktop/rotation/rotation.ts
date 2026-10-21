@@ -1,8 +1,6 @@
 import Clutter from 'gi://Clutter';
 import Cogl from 'gi://Cogl';
 import Mtk from 'gi://Mtk';
-import type Meta from 'gi://Meta';
-import type Shell from 'gi://Shell';
 
 import type { Monitor } from '../panel/panel.js';
 import { animateActor, Curve, Duration, reducedMotion } from '../../shared/motion.js';
@@ -30,20 +28,13 @@ interface MonitorSource {
   disconnect(id: number): void;
 }
 
-interface RotatingManager {
-  connect(signal: 'rotating', callback: (manager: Meta.MonitorManager, index: number, from: number, to: number) => void): number;
-  disconnect(id: number): void;
-}
-
-const shell = () => global as unknown as Shell.Global;
-
 function turn(from: number, to: number): number {
   const quarters = ((to % TRANSFORMS) - (from % TRANSFORMS) + TRANSFORMS) % TRANSFORMS;
   return (quarters > TRANSFORMS / 2 ? quarters - TRANSFORMS : quarters) * QUARTER;
 }
 
 export class RotationAnimation {
-  private readonly manager = shell().backend.get_monitor_manager() as unknown as RotatingManager;
+  private readonly manager = global.backend.get_monitor_manager();
   private readonly signals: [{ disconnect(id: number): void }, number][];
   private snapshots: Snapshot[] = [];
   private readonly playing = new Set<Clutter.Actor>();
@@ -69,7 +60,7 @@ export class RotationAnimation {
     const monitor = this.layout.monitors[index];
     const angle = turn(from, to);
     if (!monitor || !angle) return;
-    const { stage } = shell();
+    const { stage } = global;
     const area = new Mtk.Rectangle({ x: monitor.x, y: monitor.y, width: monitor.width, height: monitor.height });
     const [, , , scale] = stage.get_capture_final_size(area);
     const content = stage.paint_to_content(area, scale, null, Clutter.PaintFlag.NO_CURSORS);
@@ -108,7 +99,7 @@ export class RotationAnimation {
 
   private overlay(monitor: Monitor): Clutter.Actor {
     const frame = new Clutter.Actor({ name: 'kestrel-rotation', x: monitor.x, y: monitor.y, width: monitor.width, height: monitor.height, clip_to_allocation: true });
-    shell().stage.add_child(frame);
+    global.stage.add_child(frame);
     this.playing.add(frame);
     return frame;
   }

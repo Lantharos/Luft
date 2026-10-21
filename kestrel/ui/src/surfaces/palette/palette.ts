@@ -1,6 +1,5 @@
 import { ensureActorVisibleInScrollView } from 'resource:///com/lantharos/kestrel/misc/animationUtils.js';
 import Clutter from 'gi://Clutter';
-import type Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import { blurSurface } from '../../shared/surface.js';
@@ -82,7 +81,7 @@ export class Palette implements StartSurface {
     const y = monitor.y + Math.round(monitor.height * TOP);
     this.actor.set_width(width);
     this.actor.set_position(Math.round(monitor.x + (monitor.width - width) / 2), y);
-    const scale = St.ThemeContext.get_for_stage((global as unknown as Shell.Global).stage).scale_factor;
+    const scale = St.ThemeContext.get_for_stage(global.stage).scale_factor;
     const limit = Math.max(MINIMUM_LIST, Math.floor((bottom - y - this.search.height - EDGE_MARGIN * 4) / scale));
     if (limit === this.listLimit) return;
     this.listLimit = limit;

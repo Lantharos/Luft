@@ -1,7 +1,6 @@
 import Cogl from 'gi://Cogl';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import type Shell from 'gi://Shell';
 import St from 'gi://St';
 import { getStyleVariant, setAccent } from 'resource:///com/lantharos/kestrel/ui/kestrelTheme.js';
 
@@ -68,7 +67,7 @@ export class AccentStylesheet {
   }
 
   private get context(): St.ThemeContext {
-    return St.ThemeContext.get_for_stage((global as unknown as Shell.Global).stage);
+    return St.ThemeContext.get_for_stage(global.stage);
   }
 
   private file(variant: Variant): Gio.File {

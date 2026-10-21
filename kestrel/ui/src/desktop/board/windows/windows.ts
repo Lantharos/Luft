@@ -7,23 +7,16 @@ import { FULL_SIZE, intersection, pushApart, screenBox, snapEdges, type View } f
 const SNAP_DISTANCE = 12;
 const MOVE_OPS = [Meta.GrabOp.MOVING, Meta.GrabOp.MOVING_UNCONSTRAINED, Meta.GrabOp.KEYBOARD_MOVING];
 
-type FreeWindow = Meta.Window & { unconstrained: boolean; magnification: number; set_tiled_edges(edges: Meta.Direction | 0): void };
-
-function shell(): Shell.Global {
-  return global as unknown as Shell.Global;
-}
-
 export function setUnconstrained(window: Meta.Window, unconstrained: boolean): void {
-  (window as FreeWindow).unconstrained = unconstrained;
+  window.unconstrained = unconstrained;
 }
 
 export function untile(window: Meta.Window): void {
-  (window as FreeWindow).set_tiled_edges(0);
+  window.set_tiled_edges(0);
 }
 
 export function setMagnification(window: Meta.Window, magnification: number): void {
-  const free = window as FreeWindow;
-  if (free.magnification !== magnification) free.magnification = magnification;
+  if (window.magnification !== magnification) window.magnification = magnification;
 }
 
 export function magnify(windows: readonly Meta.Window[], view: View, viewport: Box): void {
@@ -44,7 +37,7 @@ export function isBoardWindow(window: Meta.Window): boolean {
 }
 
 export function boardWindows(workspace: Meta.Workspace): Meta.Window[] {
-  return shell().display.sort_windows_by_stacking(workspace.list_windows().filter(isBoardWindow)).reverse();
+  return global.display.sort_windows_by_stacking(workspace.list_windows().filter(isBoardWindow)).reverse();
 }
 
 export function byOpening(a: Meta.Window, b: Meta.Window): number {
@@ -53,7 +46,7 @@ export function byOpening(a: Meta.Window, b: Meta.Window): number {
 
 export function appWindowAfter(app: Shell.App, workspace: Meta.Workspace, entered: Meta.Window | null): Meta.Window | null {
   const tracker = Shell.WindowTracker.get_default();
-  const windows = shell().display.get_tab_list(Meta.TabList.NORMAL, workspace)
+  const windows = global.display.get_tab_list(Meta.TabList.NORMAL, workspace)
     .filter(window => isBoardWindow(window) && tracker.get_window_app(window)?.get_id() === app.get_id());
   if (!entered || !windows.includes(entered)) return windows[0] ?? null;
   windows.sort(byOpening);
@@ -74,7 +67,7 @@ export class Collisions {
   private readonly displaySignals: number[];
 
   constructor(private readonly workspace: () => Meta.Workspace | null, private readonly scale: () => number) {
-    const display = shell().display;
+    const display = global.display;
     this.displaySignals = [
       display.connect('grab-op-begin', (_display, window: Meta.Window, op: Meta.GrabOp) => this.grabBegan(window, op)),
       display.connect('grab-op-end', (_display, window: Meta.Window) => {
@@ -121,11 +114,11 @@ export class Collisions {
 
   destroy(): void {
     this.end();
-    for (const id of this.displaySignals) shell().display.disconnect(id);
+    for (const id of this.displaySignals) global.display.disconnect(id);
   }
 
   private stop(): void {
-    if (this.later) shell().compositor.get_laters().remove(this.later);
+    if (this.later) global.compositor.get_laters().remove(this.later);
     this.later = 0;
     for (const [window, id] of this.signals) window.disconnect(id);
     this.signals = [];
@@ -156,7 +149,7 @@ export class Collisions {
 
   private queue(): void {
     if (this.later) return;
-    this.later = shell().compositor.get_laters().add(Meta.LaterType.BEFORE_REDRAW, () => {
+    this.later = global.compositor.get_laters().add(Meta.LaterType.BEFORE_REDRAW, () => {
       this.later = 0;
       this.resolve();
       return false;

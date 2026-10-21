@@ -1,6 +1,5 @@
 import Clutter from 'gi://Clutter';
 import type Meta from 'gi://Meta';
-import type Shell from 'gi://Shell';
 
 import type { Camera } from '../view/camera.js';
 import { copyView, FULL_SIZE, type View } from '../view/geometry.js';
@@ -23,7 +22,6 @@ const SUPER = Clutter.ModifierType.SUPER_MASK | Clutter.ModifierType.MOD4_MASK;
 const BUTTONS = Clutter.ModifierType.BUTTON1_MASK | Clutter.ModifierType.BUTTON2_MASK | Clutter.ModifierType.BUTTON3_MASK |
   Clutter.ModifierType.BUTTON4_MASK | Clutter.ModifierType.BUTTON5_MASK;
 
-type GestureKeeper = Meta.WaylandCompositor & { keep_touchpad_gestures(keep: boolean): void };
 type SwipeMode = 'none' | 'pan' | 'move' | 'step' | 'switch';
 
 export interface BoardActions {
@@ -75,7 +73,7 @@ export class BoardInput {
   }
 
   keepGestures(keep: boolean): void {
-    ((global as unknown as Shell.Global).context.get_wayland_compositor() as GestureKeeper).keep_touchpad_gestures(keep);
+    global.context.get_wayland_compositor()!.keep_touchpad_gestures(keep);
   }
 
   syncShield(shown: boolean): void {
@@ -228,12 +226,12 @@ export class BoardInput {
     this.pickMoved = this.panned = false;
     this.dragX = x;
     this.dragY = y;
-    this.dragging = (global as unknown as Shell.Global).stage.grab(this.grabActor);
+    this.dragging = global.stage.grab(this.grabActor);
     return true;
   }
 
   private shielded(x: number, y: number): boolean {
-    return this.shield.visible && (global as unknown as Shell.Global).stage.get_actor_at_pos(Clutter.PickMode.REACTIVE, x, y) === this.shield;
+    return this.shield.visible && global.stage.get_actor_at_pos(Clutter.PickMode.REACTIVE, x, y) === this.shield;
   }
 
   private isDoubleClick(time: number, x: number, y: number): boolean {

@@ -21,7 +21,6 @@ import { Follower } from './windows/follower.js';
 import { appWindowAfter, boardWindows, byOpening, Collisions, frameBox, isBoardWindow, magnify, setMagnification, setUnconstrained } from './windows/windows.js';
 import { X11Origin } from './windows/x11Origin.js';
 
-
 export interface Canvas extends FocusState {
   readonly view: View;
   readonly layout: Map<Meta.Window, Box>;
@@ -53,10 +52,6 @@ interface BoardHost {
   canInteract(): boolean;
 }
 
-function shell(): Shell.Global {
-  return global as unknown as Shell.Global;
-}
-
 export class Board implements BoardActions {
   readonly camera: Camera;
   readonly input: BoardInput;
@@ -78,7 +73,7 @@ export class Board implements BoardActions {
   constructor(private readonly host: BoardHost) {
     this.backdrop = new Backdrop(host.createBackground, !isDark());
     this.unwatchScheme = watchScheme(dark => this.backdrop.setLight(!dark));
-    this.camera = new Camera(shell().window_group, {
+    this.camera = new Camera(global.window_group, {
       changed: view => {
         this.backdrop.update(view, this.camera.viewport);
         this.input.syncShield(true);
@@ -109,11 +104,11 @@ export class Board implements BoardActions {
         this.input.syncShield(!!this.presented);
       },
     });
-    const uiGroup = shell().window_group.get_parent()!;
-    uiGroup.insert_child_below(this.backdrop.actor, shell().window_group);
-    uiGroup.insert_child_above(this.input.shield, shell().window_group);
+    const uiGroup = global.window_group.get_parent()!;
+    uiGroup.insert_child_below(this.backdrop.actor, global.window_group);
+    uiGroup.insert_child_above(this.input.shield, global.window_group);
     host.addChrome(this.corner.actor);
-    const manager = shell().workspace_manager;
+    const manager = global.workspace_manager;
     this.managerSignal = manager.connect('active-workspace-changed', () => this.syncWorkspace());
   }
 
@@ -153,7 +148,7 @@ export class Board implements BoardActions {
   }
 
   presentedWorkspace(): Meta.Workspace | null {
-    return this.presented ? shell().workspace_manager.get_active_workspace() : null;
+    return this.presented ? global.workspace_manager.get_active_workspace() : null;
   }
 
   backdropFor(workspace: Meta.Workspace, monitor: Monitor): St.Widget | null {
@@ -194,7 +189,7 @@ export class Board implements BoardActions {
   }
 
   enter(): void {
-    const workspace = shell().workspace_manager.get_active_workspace();
+    const workspace = global.workspace_manager.get_active_workspace();
     const canvas = this.canvasFor(workspace);
     if (canvas.shown || this.cancelRestore) {
       endGlideTracking();
@@ -248,7 +243,7 @@ export class Board implements BoardActions {
   }
 
   enterFocused(): void {
-    const window = shell().display.focus_window;
+    const window = global.display.focus_window;
     if (window) this.enterWindow(window);
   }
 
@@ -318,13 +313,13 @@ export class Board implements BoardActions {
   }
 
   onCanvas(x: number, y: number): boolean {
-    const actor = shell().stage.get_actor_at_pos(Clutter.PickMode.REACTIVE, x, y);
+    const actor = global.stage.get_actor_at_pos(Clutter.PickMode.REACTIVE, x, y);
     if (actor === this.input.shield) return !this.windowUnder(x, y);
     return !!actor && this.backdrop.actor.contains(actor);
   }
 
   windowAt(x: number, y: number): Meta.Window | null {
-    let actor: Clutter.Actor | null = shell().stage.get_actor_at_pos(Clutter.PickMode.REACTIVE, x, y);
+    let actor: Clutter.Actor | null = global.stage.get_actor_at_pos(Clutter.PickMode.REACTIVE, x, y);
     if (actor === this.input.shield) return this.windowUnder(x, y);
     while (actor && !(actor instanceof Meta.WindowActor)) actor = actor.get_parent();
     const window = actor ? (actor as Meta.WindowActor).meta_window : null;
@@ -364,7 +359,7 @@ export class Board implements BoardActions {
   }
 
   destroy(): void {
-    shell().workspace_manager.disconnect(this.managerSignal);
+    global.workspace_manager.disconnect(this.managerSignal);
     this.unwatchScheme();
     this.cancelRestore?.();
     this.present(null);
@@ -394,7 +389,7 @@ export class Board implements BoardActions {
     const windows = boardWindows(workspace).filter(window => !window.minimized);
     magnify(windows, this.camera.shown, this.viewport);
     for (const window of windows) this.magnified.add(window);
-    const [x, y] = shell().get_pointer();
+    const [x, y] = global.get_pointer();
     this.x11Origin.settle(x, y);
   }
 
@@ -447,7 +442,7 @@ export class Board implements BoardActions {
   }
 
   private syncWorkspace(): void {
-    const canvas = this.canvasOf(shell().workspace_manager.get_active_workspace());
+    const canvas = this.canvasOf(global.workspace_manager.get_active_workspace());
     this.present(canvas?.shown ? canvas : null);
   }
 
@@ -477,7 +472,7 @@ export class Board implements BoardActions {
     this.input.shield.set_position(viewport.x, viewport.y);
     this.input.shield.set_size(viewport.width, viewport.height);
     this.backdrop.prepare(this.host.monitors());
-    this.camera.engage(canvas.view, shell().display.get_monitor_scale(primary?.index ?? 0));
+    this.camera.engage(canvas.view, global.display.get_monitor_scale(primary?.index ?? 0));
     this.cover(fade);
     this.host.wallpaper.hide();
     this.setDesktopWindowsVisible(false);
@@ -487,7 +482,7 @@ export class Board implements BoardActions {
       this.corner.place(primary);
     }
     this.keys.engage();
-    this.focus.attach(canvas, shell().workspace_manager.get_active_workspace());
+    this.focus.attach(canvas, global.workspace_manager.get_active_workspace());
     this.windowsChanged();
     this.host.changed();
   }
@@ -513,7 +508,7 @@ export class Board implements BoardActions {
   }
 
   private setDesktopWindowsVisible(visible: boolean): void {
-    for (const actor of shell().get_window_actors()) {
+    for (const actor of global.get_window_actors()) {
       if (actor.meta_window?.window_type === Meta.WindowType.DESKTOP) actor.opacity = visible ? 255 : 0;
     }
   }

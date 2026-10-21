@@ -1,14 +1,9 @@
 import Clutter from 'gi://Clutter';
 import Cogl from 'gi://Cogl';
 import Gio from 'gi://Gio';
-import type Shell from 'gi://Shell';
 
 import { animateActor } from '../shared/motion.js';
 import { BUS_NAME, FAREWELL_DURATION, MANAGER_PATH } from './manager/interfaces.js';
-
-function shell(): Shell.Global {
-  return global as unknown as Shell.Global;
-}
 
 export class Blackout {
   private cover: Clutter.Actor | null = null;
@@ -16,7 +11,7 @@ export class Blackout {
 
   fade(): Promise<void> {
     this.lift();
-    const stage = shell().stage;
+    const stage = global.stage;
     const cover = this.cover = new Clutter.Actor({
       background_color: new Cogl.Color({ red: 0, green: 0, blue: 0, alpha: 255 }),
       opacity: 0,
@@ -40,12 +35,12 @@ export class Blackout {
     this.cover = null;
     if (!this.pointerHidden) return;
     this.pointerHidden = false;
-    shell().backend.get_cursor_tracker().uninhibit_cursor_visibility();
+    global.backend.get_cursor_tracker().uninhibit_cursor_visibility();
   }
 
   private hidePointer(): void {
     this.pointerHidden = true;
-    shell().backend.get_cursor_tracker().inhibit_cursor_visibility();
+    global.backend.get_cursor_tracker().inhibit_cursor_visibility();
   }
 }
 

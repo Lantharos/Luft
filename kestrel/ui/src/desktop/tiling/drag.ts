@@ -3,7 +3,7 @@ import Meta from 'gi://Meta';
 import type { Box } from '../../shared/placement.js';
 import { contains } from './layouts/geometry.js';
 import type { Tiler } from './tiler.js';
-import { boxOf, shell } from './windows.js';
+import { boxOf } from './windows.js';
 
 const MOVES = [Meta.GrabOp.MOVING, Meta.GrabOp.MOVING_UNCONSTRAINED, Meta.GrabOp.KEYBOARD_MOVING];
 
@@ -21,7 +21,7 @@ export class TilingDrag {
   constructor(private readonly tiler: Tiler, private readonly monitors: () => Box[]) {}
 
   engage(on: boolean): void {
-    const display = shell().display;
+    const display = global.display;
     if (on && !this.signals.length) {
       this.signals = [
         display.connect('grab-op-begin', (_display, window: Meta.Window | null, op: Meta.GrabOp) => this.begin(window, op)),
@@ -64,7 +64,7 @@ export class TilingDrag {
     const space = this.tiler.spaceOf(window);
     if (!space) return;
     const frame = window.get_frame_rect();
-    const [x, y] = keyboard ? [frame.x + frame.width / 2, frame.y + frame.height / 2] : shell().get_pointer();
+    const [x, y] = keyboard ? [frame.x + frame.width / 2, frame.y + frame.height / 2] : global.get_pointer();
     const monitor = this.monitors().findIndex(box => contains(box, x, y));
     const target = monitor < 0 ? space : this.tiler.spaceOn(monitor);
     const onto = target.windows.find(other => other !== window && contains(target.boxOf(other) ?? boxOf(other.get_frame_rect()), x, y)) ?? null;
@@ -76,7 +76,7 @@ export class TilingDrag {
   private queueResize(): void {
     const resizing = this.resizing;
     if (!resizing || resizing.later) return;
-    resizing.later = shell().compositor.get_laters().add(Meta.LaterType.BEFORE_REDRAW, () => {
+    resizing.later = global.compositor.get_laters().add(Meta.LaterType.BEFORE_REDRAW, () => {
       resizing.later = 0;
       this.tiler.spaceOf(resizing.window)?.resized(resizing.window, boxOf(resizing.window.get_frame_rect()));
       return false;
@@ -88,6 +88,6 @@ export class TilingDrag {
     if (!resizing) return;
     this.resizing = null;
     resizing.window.disconnect(resizing.signal);
-    if (resizing.later) shell().compositor.get_laters().remove(resizing.later);
+    if (resizing.later) global.compositor.get_laters().remove(resizing.later);
   }
 }

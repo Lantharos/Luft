@@ -5,7 +5,7 @@ import { neighbor, type Direction } from './layouts/geometry.js';
 import { ScrollingSpace } from './scrolling/scrollingSpace.js';
 import type { Space } from './space.js';
 import type { Tiler } from './tiler.js';
-import { boxOf, shell } from './windows.js';
+import { boxOf } from './windows.js';
 
 export interface CommandSurroundings {
   monitors(): Box[];
@@ -17,7 +17,7 @@ export interface CommandSurroundings {
 const STEPS: Record<Direction, [number, number]> = { left: [-1, 0], right: [1, 0], up: [0, -1], down: [0, 1] };
 
 function focusedWindow(): Meta.Window | null {
-  return shell().display.focus_window;
+  return global.display.focus_window;
 }
 
 export class TilingCommands {
@@ -69,7 +69,7 @@ export class TilingCommands {
   focusedStrip(): ScrollingSpace | null {
     const space = this.tiler.spaceOf(focusedWindow());
     if (space instanceof ScrollingSpace) return space;
-    const [x, y] = shell().get_pointer();
+    const [x, y] = global.get_pointer();
     const monitor = this.surroundings.monitors().findIndex(box => x >= box.x && x < box.x + box.width && y >= box.y && y < box.y + box.height);
     const pointed = this.tiler.spaceOn(Math.max(0, monitor));
     return pointed instanceof ScrollingSpace ? pointed : null;
@@ -107,7 +107,7 @@ export class TilingCommands {
   }
 
   private pointerBox(): Box {
-    const [x, y] = shell().get_pointer();
+    const [x, y] = global.get_pointer();
     return { x, y, width: 1, height: 1 };
   }
 }

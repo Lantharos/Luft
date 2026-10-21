@@ -1,5 +1,4 @@
 import Meta from 'gi://Meta';
-import type Shell from 'gi://Shell';
 
 import { animateActor, Curve, Duration } from '../../../shared/motion.js';
 import type { Box } from '../../../shared/placement.js';
@@ -26,10 +25,6 @@ interface FocusHost {
   changed(entered: boolean): void;
 }
 
-function shell(): Shell.Global {
-  return global as unknown as Shell.Global;
-}
-
 export class Focus {
   private state: FocusState | null = null;
   private workspace: Meta.Workspace | null = null;
@@ -42,7 +37,7 @@ export class Focus {
   private readonly grabSignals: number[];
 
   constructor(private readonly host: FocusHost) {
-    const display = shell().display;
+    const display = global.display;
     this.grabSignals = [
       display.connect('grab-op-begin', (_display, window: Meta.Window) => this.grabBegan(window)),
       display.connect('grab-op-end', (_display, window: Meta.Window) => this.grabEnded(window)),
@@ -84,7 +79,7 @@ export class Focus {
       this.host.changed(true);
     }
     this.fit(window, !!previous && previous !== window);
-    if (shell().display.focus_window !== window) window.activate(shell().get_current_time());
+    if (global.display.focus_window !== window) window.activate(global.get_current_time());
   }
 
   overview(): void {
@@ -139,7 +134,7 @@ export class Focus {
   }
 
   destroy(): void {
-    for (const id of this.grabSignals) shell().display.disconnect(id);
+    for (const id of this.grabSignals) global.display.disconnect(id);
     this.detach();
   }
 
@@ -181,13 +176,13 @@ export class Focus {
     this.signals = [];
     this.watched = null;
     this.held = null;
-    if (this.following) shell().compositor.get_laters().remove(this.following);
+    if (this.following) global.compositor.get_laters().remove(this.following);
     this.following = 0;
   }
 
   private queueFollow(): void {
     if (this.following) return;
-    this.following = shell().compositor.get_laters().add(Meta.LaterType.BEFORE_REDRAW, () => {
+    this.following = global.compositor.get_laters().add(Meta.LaterType.BEFORE_REDRAW, () => {
       this.following = 0;
       this.follow();
       return false;

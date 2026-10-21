@@ -33,7 +33,7 @@ const LOOK_KEYS: TaskbarKey[] = ['taskbar-look', 'taskbar-style', 'taskbar-size'
 const APP_KEYS: TaskbarKey[] = ['taskbar-show-pinned', 'taskbar-windows-per-display', 'taskbar-windows-per-workspace'];
 
 function showLayout(keys: Shell.App, layout: string): void {
-  keys.get_app_info().launch_uris([`kestrel-keys:view/${encodeURIComponent(layout)}`], (global as unknown as Shell.Global).create_app_launch_context(0, -1));
+  keys.get_app_info().launch_uris([`kestrel-keys:view/${encodeURIComponent(layout)}`], global.create_app_launch_context(0, -1));
 }
 
 export interface Monitor {
@@ -158,7 +158,7 @@ export class KestrelPanel {
         afterMotion(this.updateFocusAfterMotion);
       })],
       ...(['window-entered-monitor', 'window-left-monitor'] as const).map(signal => {
-        const display = (global as unknown as Shell.Global).display;
+        const display = global.display;
         return [display, display.connect(signal, () => { if (taskbarPreferences.windowsPerDisplay) this.refreshApps(); })] as [Meta.Display, number];
       }),
     );

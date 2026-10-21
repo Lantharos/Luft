@@ -1,10 +1,7 @@
 import Meta from 'gi://Meta';
-import type Shell from 'gi://Shell';
-
-const shell = () => global as unknown as Shell.Global;
 
 export function activeWorkspace(): Meta.Workspace {
-  return shell().workspace_manager.get_active_workspace();
+  return global.workspace_manager.get_active_workspace();
 }
 
 export class WorkspaceWindows {
@@ -14,7 +11,7 @@ export class WorkspaceWindows {
   private later = 0;
 
   constructor(private readonly changed: () => void) {
-    this.switched = shell().workspace_manager.connect('active-workspace-changed', () => {
+    this.switched = global.workspace_manager.connect('active-workspace-changed', () => {
       this.follow();
       this.schedule();
     });
@@ -22,8 +19,8 @@ export class WorkspaceWindows {
   }
 
   destroy(): void {
-    if (this.later) shell().compositor.get_laters().remove(this.later);
-    shell().workspace_manager.disconnect(this.switched);
+    if (this.later) global.compositor.get_laters().remove(this.later);
+    global.workspace_manager.disconnect(this.switched);
     this.release();
   }
 
@@ -42,7 +39,7 @@ export class WorkspaceWindows {
 
   private schedule(): void {
     if (this.later) return;
-    this.later = shell().compositor.get_laters().add(Meta.LaterType.BEFORE_REDRAW, () => {
+    this.later = global.compositor.get_laters().add(Meta.LaterType.BEFORE_REDRAW, () => {
       this.later = 0;
       this.changed();
       return false;

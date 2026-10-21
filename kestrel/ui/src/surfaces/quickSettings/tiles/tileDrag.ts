@@ -1,12 +1,10 @@
 import Clutter from 'gi://Clutter';
-import type Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import type { TileGrid } from './tileGrid.js';
 
 interface Press { tile: St.Button; x: number; y: number }
 interface Drag { tile: St.Button; offsetX: number; offsetY: number; grab: Clutter.Grab }
-
 
 export class TileDrag {
   private press: Press | null = null;
@@ -52,7 +50,7 @@ export class TileDrag {
     tile.fake_release();
     this.drag = {
       tile, offsetX: x - gridX - tile.x, offsetY: y - gridY - tile.y,
-      grab: (global as unknown as Shell.Global).stage.grab(tile),
+      grab: global.stage.grab(tile),
     };
     this.grid.hold(tile);
     tile.add_style_class_name('kestrel-control-lifted');

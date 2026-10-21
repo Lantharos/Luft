@@ -1,6 +1,5 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import type Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import type { MenuEntry } from '../../../desktop/menus/contextMenus.js';
@@ -23,7 +22,7 @@ export function shortFolder(path: string): string {
 }
 
 function launchContext(): Gio.AppLaunchContext {
-  return (global as unknown as Shell.Global).create_app_launch_context(0, -1);
+  return global.create_app_launch_context(0, -1);
 }
 
 export class FileOpener {

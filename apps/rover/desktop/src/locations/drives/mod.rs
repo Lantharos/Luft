@@ -21,6 +21,9 @@ pub use watch::watch_mounts;
 pub use windows::{closed_windows, open_windows};
 
 const DISKS: &str = "com.lantharos.disks.desktop";
+const GIB: u64 = 1024 * 1024 * 1024;
+const SAMPLE_SYSTEM_SPACE: (u64, u64) = (931 * GIB, 612 * GIB);
+const SAMPLE_DRIVE_SPACE: (u64, u64) = (64 * GIB, 41 * GIB);
 
 #[derive(Debug, Serialize, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -172,6 +175,9 @@ fn prefers(candidate: &DriveInfo, current: &DriveInfo) -> bool {
 }
 
 fn disk_space(mount_point: &str) -> Option<(u64, u64)> {
+    if luft_app::sample_system() {
+        return Some(sample_space(mount_point));
+    }
     let path = CString::new(mount_point).ok()?;
     let mut stat = MaybeUninit::<libc::statvfs>::uninit();
     if unsafe { libc::statvfs(path.as_ptr(), stat.as_mut_ptr()) } != 0 {
@@ -180,6 +186,14 @@ fn disk_space(mount_point: &str) -> Option<(u64, u64)> {
     let stat = unsafe { stat.assume_init() };
     let total = stat.f_blocks * stat.f_frsize;
     (total > 0).then_some((total, stat.f_bavail * stat.f_frsize))
+}
+
+fn sample_space(mount_point: &str) -> (u64, u64) {
+    if mount_point == "/" {
+        SAMPLE_SYSTEM_SPACE
+    } else {
+        SAMPLE_DRIVE_SPACE
+    }
 }
 
 fn device_labels() -> HashMap<String, String> {

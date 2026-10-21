@@ -33,7 +33,7 @@ Strings in Luft's Spanish translation that a native speaker should check: terms 
 
 - `apps/settings/locales/es/connections.ftl` `settings-network-security-owe`: "Abierta mejorada" — no settled Spanish name for Wi‑Fi Enhanced Open (OWE); check whether it should stay in English.
 - `apps/settings/locales/es/connections.ftl` `settings-network-wireguard-keepalive`: "Keepalive" — kept in English as WireGuard clients do; check whether a Spanish term reads better.
-- `apps/settings/locales/es/connections.ftl` `settings-accounts-approve`: "la Protección de datos avanzada" — check against Apple's current Spanish (Spain) name for Advanced Data Protection.
+- `apps/settings/locales/es/system.ftl` `settings-accounts-approve`: "la Protección de datos avanzada" — check against Apple's current Spanish (Spain) name for Advanced Data Protection.
 - `apps/settings/locales/es/devices.ftl` `settings-dictation-hold`: "Pulsa y mantén { $keys } para dictar" — avoids "mantén pulsado/pulsada" because $keys can be a shortcut or "la tecla Copilot"; check it reads naturally (same in `settings-dictation-description`).
 - `apps/settings/locales/es/devices.ftl` `settings-dictation-language-unavailable`: "El idioma { $language } no está disponible en este ordenador" — "el idioma" is added so the lowercase language name doesn't start the sentence; same in `settings-dictation-engine-description`.
 - `apps/settings/locales/es/devices.ftl` `settings-keys-keypad`: "{ $key } del teclado numérico" — long for a shortcut label; check whether a shorter form is preferred.

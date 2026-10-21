@@ -40,8 +40,8 @@ Strings in Luft's Russian translation that a native speaker should check, each l
 ## Settings
 
 - `apps/settings/locales/ru/connections.ftl` `settings-bluetooth-request-unnamed`: "без названия" — reads after «устройство»/«устройством»/«на устройстве» in every pairing sentence, which put the noun in front of { $name }; check real names read well there too, e.g. «Выполнить сопряжение с устройством AirPods?»
-- `apps/settings/locales/ru/connections.ftl` `settings-accounts-remove-note`: "Ваши файлы останутся в { $provider }." — fine for OneDrive, Dropbox, iCloud Drive; check with Nextcloud or WebDAV.
-- `apps/settings/locales/ru/connections.ftl` `settings-accounts-provider-icloud`: "Ваш Аккаунт Apple, …" — follows Apple's Russian branding «Аккаунт Apple» (capital А) rather than the glossary's «учётная запись»; confirm.
+- `apps/settings/locales/ru/system.ftl` `settings-accounts-remove-note`: "Ваши файлы останутся в { $provider }." — fine for OneDrive, Dropbox, iCloud Drive; check with Nextcloud or WebDAV.
+- `apps/settings/locales/ru/system.ftl` `settings-accounts-provider-icloud`: "Ваш Аккаунт Apple, …" — follows Apple's Russian branding «Аккаунт Apple» (capital А) rather than the glossary's «учётная запись»; confirm.
 - `apps/settings/locales/ru/connections.ftl` `settings-network-security-owe`: "Улучшенная открытая" — no settled Russian term for Enhanced Open (OWE); check against Windows and Android wording.
 - `apps/settings/locales/ru/connections.ftl` `settings-network-wireguard-keepalive`: "Поддержание соединения" — WireGuard clients often keep "Keepalive" untranslated; check which reads better.
 - `apps/settings/locales/ru/devices.ftl` `settings-power-time-left`: "До разрядки примерно { $time }" — keeps the duration nominative («3 часа 20 минут»); with «менее минуты» it becomes «примерно менее минуты», check whether that is acceptable.

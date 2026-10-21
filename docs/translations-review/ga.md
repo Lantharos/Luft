@@ -50,11 +50,11 @@ Strings in Luft's Irish translation that a native speaker should check: terms wi
 ## Settings
 
 - `apps/settings/locales/ga/connections.ftl` `settings-network-known-count`: "{ $count } líonra shábháilte" (two) — adjective lenited after dhá, plain elsewhere; check the adjective agreement across all five variants.
-- `apps/settings/locales/ga/connections.ftl` `settings-accounts-syncing`: "{ $count } athrú á shioncrónú" / "á sioncrónú" — check whether the possessive should agree with the singular noun (á shioncrónú) in every variant.
+- `apps/settings/locales/ga/system.ftl` `settings-accounts-syncing`: "{ $count } athrú á shioncrónú" / "á sioncrónú" — check whether the possessive should agree with the singular noun (á shioncrónú) in every variant.
 - `apps/settings/locales/ga/connections.ftl` `settings-bluetooth-request-*`: "Péireáil { $name }?", "Ceadaigh { $name } a phéireáil?" — $name can be "an gléas", so every sentence keeps $name out of prepositional phrases (no ar an/leis an eclipsis); check they still read naturally.
-- `apps/settings/locales/ga/connections.ftl` `settings-accounts-online`: "…san fhillteán Cloud i d’fhillteán baile…" — assumes the folder is literally named Cloud and is not localised.
-- `apps/settings/locales/ga/connections.ftl` `settings-accounts-approve`: "Úsáideann do chuntas Apple Advanced Data Protection." — Apple's feature name kept in English since Apple has no Irish localisation; confirm.
-- `apps/settings/locales/ga/connections.ftl` `settings-accounts-working`: "Ag caint leis an tseirbhís { $provider }…" — rephrased to avoid "le" before vowel-initial names (iCloud, OneDrive); check it isn't too wordy.
+- `apps/settings/locales/ga/system.ftl` `settings-accounts-online`: "…san fhillteán Cloud i d’fhillteán baile…" — assumes the folder is literally named Cloud and is not localised.
+- `apps/settings/locales/ga/system.ftl` `settings-accounts-approve`: "Úsáideann do chuntas Apple Advanced Data Protection." — Apple's feature name kept in English since Apple has no Irish localisation; confirm.
+- `apps/settings/locales/ga/system.ftl` `settings-accounts-working`: "Ag caint leis an tseirbhís { $provider }…" — rephrased to avoid "le" before vowel-initial names (iCloud, OneDrive); check it isn't too wordy.
 - `apps/settings/locales/ga/connections.ftl` `settings-network-security-owe`: "Oscailte feabhsaithe" — no settled Irish term for Wi‑Fi Enhanced Open.
 - `apps/settings/locales/ga/devices.ftl` `settings-power-long-sleep-weeks`: "{ $weeks } seachtaine" (few/many) — check the counting form after 3–10 versus "sheachtain".
 - `apps/settings/locales/ga/devices.ftl` `settings-power-duration-hours`: "{ $hours } uaire" / "n-uaire" — counting forms of uair after digits; used inside other sentences, check the flow.

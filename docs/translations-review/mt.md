@@ -52,7 +52,7 @@ Strings in Luft's Maltese translation that a native speaker should check: places
 - `apps/settings/locales/mt/connections.ftl` `settings-bluetooth-windows`: "{ $devices } huwa mqabbad f’Windows…" — masculine agreement assumed for a single device name; check.
 - `apps/settings/locales/mt/connections.ftl` `settings-bluetooth-windows-more`: "{ $count } oħrajn" — ends a list like "Tastiera, Maws u 3 oħrajn"; check with the list joiner and for 11+.
 - `apps/settings/locales/mt/connections.ftl` `settings-network-security-enterprise`: "Enterprise" — kept as the WPA standard name; check whether a Maltese word is preferred.
-- `apps/settings/locales/mt/connections.ftl` `settings-accounts-syncing`: "Sinkronizzazzjoni ta’ { $count } bidliet" — nominal phrasing to avoid verb agreement with 11+; check it doesn't read stiff.
+- `apps/settings/locales/mt/system.ftl` `settings-accounts-syncing`: "Sinkronizzazzjoni ta’ { $count } bidliet" — nominal phrasing to avoid verb agreement with 11+; check it doesn't read stiff.
 - `apps/settings/locales/mt/devices.ftl` `settings-display-orientation-portrait-right`: "Ritratt, lejn il-lemin" — Pajsaġġ/Ritratt follow Windows; check.
 - `apps/settings/locales/mt/devices.ftl` `settings-sound-mute`: "Itfi l-ħoss: { $name }" — screen-reader label; colon form chosen because $name may be "Volum" or an app name.
 - `apps/settings/locales/mt/devices.ftl` `settings-sound-apps-playing`: "{ $count } app qed iddoqq il-ħoss" — singular verb for many/other per the style guide; a native may prefer plural agreement with 11+.

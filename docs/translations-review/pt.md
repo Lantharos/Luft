@@ -40,7 +40,7 @@ Strings in Luft's European Portuguese translation that a native speaker should c
 - `apps/settings/locales/pt/connections.ftl` `settings-network-security-owe`: "Aberta melhorada" — no settled term for Wi‑Fi Enhanced Open (OWE); check against what Windows or Android show in Portugal.
 - `apps/settings/locales/pt/connections.ftl` `settings-network-ip-link-local`: "Só local da ligação" — literal rendering of link-local; GNOME uses «Apenas ligação local», which may read better.
 - `apps/settings/locales/pt/connections.ftl` `settings-bluetooth-windows`: "{ $devices } está emparelhado no Windows…" — the participle is masculine; a device name that is clearly feminine would mismatch.
-- `apps/settings/locales/pt/connections.ftl` `settings-accounts-remove-note`: "Os seus ficheiros ficam no { $provider }." — assumes every provider takes the masculine article (iCloud Drive, OneDrive, Dropbox, Nextcloud, WebDAV).
+- `apps/settings/locales/pt/system.ftl` `settings-accounts-remove-note`: "Os seus ficheiros ficam no { $provider }." — assumes every provider takes the masculine article (iCloud Drive, OneDrive, Dropbox, Nextcloud, WebDAV).
 - `apps/settings/locales/pt/devices.ftl` `settings-sound-mute`: "Desativar som: { $name }" — built with a colon so it works for both «Volume» and app names; check it sounds natural to a screen-reader user.
 - `apps/settings/locales/pt/devices.ftl` `settings-display-night-light-from`: "Início" (and `-to` "Fim") — chosen over «Ativa às» because the time picker label is read as "{ $label }, { $time }".
 - `apps/settings/locales/pt/devices.ftl` `settings-keys-keypad`: "{ $key } (teclado numérico)" — check whether a shorter form like «Num { $key }» is preferred on shortcut labels.

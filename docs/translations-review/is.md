@@ -49,7 +49,7 @@ Strings in Luft's Icelandic translation that a native speaker should check: term
 - `apps/settings/locales/is/connections.ftl` `settings-network-security-enterprise`: "Fyrirtæki" — WPA Enterprise; might read better as „Fyrirtækjanet“.
 - `apps/settings/locales/is/connections.ftl` `settings-network-ip-link-local`: "Aðeins staðbundin vistföng (link-local)" — no settled term.
 - `apps/settings/locales/is/connections.ftl` `settings-network-wireguard-keepalive`: "Viðhaldsboð" — no settled term for keepalive.
-- `apps/settings/locales/is/connections.ftl` `settings-accounts-approve`: "…notar Advanced Data Protection…" — Apple has no Icelandic name for it, kept in English.
+- `apps/settings/locales/is/system.ftl` `settings-accounts-approve`: "…notar Advanced Data Protection…" — Apple has no Icelandic name for it, kept in English.
 - `apps/settings/locales/is/connections.ftl` `settings-bluetooth-request-display`: "Sláðu þennan kóða inn á tækinu og ýttu svo á Enter." — leaves out { $name } because „á“ needs the dative and the unnamed fallback „tækið“ is nominative/accusative.
 - `apps/settings/locales/is/protection.ftl` `settings-encryption-pin-field`: "PIN-númer" — used throughout, as Windows does; check it isn't too long in the PIN dialog rows and buttons („Bæta við PIN-númeri við ræsingu“).
 - `apps/settings/locales/is/protection.ftl` `settings-security-anti-cheat`: "Leikir með svindlvörn" — no settled Icelandic term for anti-cheat; „svindlvörn“ is a coinage.

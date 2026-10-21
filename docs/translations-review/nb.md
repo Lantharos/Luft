@@ -37,7 +37,7 @@ Strings in Luft's Norwegian Bokmål translation that a native speaker should che
 - `apps/settings/locales/nb/connections.ftl` `settings-network-ip-link-local`: "Bare lokal lenke (link-local)" — no settled Norwegian term; check it reads naturally.
 - `apps/settings/locales/nb/connections.ftl` `settings-network-security-owe`: "Forbedret åpen" — literal; Windows shows "OWE"; check.
 - `apps/settings/locales/nb/connections.ftl` `settings-network-wireguard-keepalive`: "Keepalive" — left in English as WireGuard tools do.
-- `apps/settings/locales/nb/connections.ftl` `settings-accounts-online`: "Hver konto er en mappe i Cloud i hjemmemappen din …" — assumes the folder is literally named Cloud and not localized.
+- `apps/settings/locales/nb/system.ftl` `settings-accounts-online`: "Hver konto er en mappe i Cloud i hjemmemappen din …" — assumes the folder is literally named Cloud and not localized.
 - `apps/settings/locales/nb/connections.ftl` `settings-bluetooth-request-confirm`: "Vil du koble sammen med { $name }?" — pairing is translated «koble sammen»/«sammenkobling» throughout; check it doesn't read too close to «koble til».
 - `apps/settings/locales/nb/devices.ftl` `settings-power-suspend-plugged-in`: "Hvilemodus når den er koblet til strøm" — may be long for a row label.
 - `apps/settings/locales/nb/personalization.ftl` `settings-cursors-folder-description`: "Temaer du legger i Hjem › .local › share › icons, vises her" — check that "Hjem" matches how Rover names the home folder in Norwegian.

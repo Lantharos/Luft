@@ -48,12 +48,12 @@ Strings in Luft's Hungarian translation that a native speaker should check: term
 
 ## Settings
 
-- `apps/settings/locales/hu/connections.ftl` `settings-accounts-online` and `personalization.ftl` `settings-cursors-folder-description`: "a Saját mappában lévő Cloud mappán belül", "A Saját mappa › .local › share › icons" — check that "Saját mappa" matches how Rover names the home folder, and that the Cloud folder keeps its English name on disk.
+- `apps/settings/locales/hu/system.ftl` `settings-accounts-online` and `personalization.ftl` `settings-cursors-folder-description`: "a Saját mappában lévő Cloud mappán belül", "A Saját mappa › .local › share › icons" — check that "Saját mappa" matches how Rover names the home folder, and that the Cloud folder keeps its English name on disk.
 - `apps/settings/locales/hu/connections.ftl` `settings-bluetooth-request-unnamed`: "névtelen eszköz" — fills $name in the pairing sentences ("Párosítás ezzel: névtelen eszköz?"); check it reads acceptably in every request message.
 - `apps/settings/locales/hu/connections.ftl` `settings-bluetooth-request-confirm` and siblings: "Párosítás ezzel: { $name }?" — colon constructions avoid suffixing the device name; check they don't feel too stiff for a dialog title.
 - `apps/settings/locales/hu/connections.ftl` `settings-network-band`: "{ $band } GHz · { $channel }. csatorna" — ordinal dot after the placeable; assumes $channel is a plain number.
-- `apps/settings/locales/hu/connections.ftl` `settings-accounts-browser`: "…bejelentkezhet { $provider } fiókjával…" — relies on "Microsoft fiókjával"/"Dropbox fiókjával" without hyphen, which is not strictly standard spelling.
-- `apps/settings/locales/hu/connections.ftl` `settings-accounts-approve`: "…be van kapcsolva a Speciális adatvédelem." — check this matches Apple's Hungarian name for Advanced Data Protection.
+- `apps/settings/locales/hu/system.ftl` `settings-accounts-browser`: "…bejelentkezhet { $provider } fiókjával…" — relies on "Microsoft fiókjával"/"Dropbox fiókjával" without hyphen, which is not strictly standard spelling.
+- `apps/settings/locales/hu/system.ftl` `settings-accounts-approve`: "…be van kapcsolva a Speciális adatvédelem." — check this matches Apple's Hungarian name for Advanced Data Protection.
 - `apps/settings/locales/hu/connections.ftl` `settings-network-security-psk`: "WPA2 Személyes" — Windows writes "WPA2-Personal" in some versions; check the preferred form.
 - `apps/settings/locales/hu/connections.ftl` `settings-bluetooth-windows`: "A Windowsban párosított eszközök: { $devices }. …" — $devices is a joined list; check the list joiner ("és még 3") fits.
 - `apps/settings/locales/hu/devices.ftl` `settings-dictation-description`: "…ha beszéd közben lenyomva tartja ezt: { $keys }." — $keys may be "Super+Alt vagy Copilot billentyű"; check it reads naturally.

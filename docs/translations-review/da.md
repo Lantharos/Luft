@@ -39,7 +39,7 @@ Strings in Luft's Danish translation that a native speaker should check: terms w
 - `apps/settings/locales/da/connections.ftl` `settings-network-security-owe`: "Udvidet åben" — no settled Danish term for Enhanced Open (OWE); Windows may keep it in English.
 - `apps/settings/locales/da/connections.ftl` `settings-network-security-enterprise`: "Virksomhed" — check against how Windows labels WPA Enterprise in Danish.
 - `apps/settings/locales/da/connections.ftl` `settings-network-wireguard-addresses`: "Denne computers adresser i VPN-forbindelsen" — avoided "VPN'et" because the style guide limits apostrophes; check it sounds natural.
-- `apps/settings/locales/da/connections.ftl` `settings-accounts-kept`: "{ $count } elementer gemt lokalt, resten hentes ved åbning" — "kept" rendered as "gemt lokalt"; confirm it matches the Accounts wording elsewhere.
+- `apps/settings/locales/da/system.ftl` `settings-accounts-kept`: "{ $count } elementer gemt lokalt, resten hentes ved åbning" — "kept" rendered as "gemt lokalt"; confirm it matches the Accounts wording elsewhere.
 - `apps/settings/locales/da/devices.ftl` `settings-keys-keypad`: "Numerisk { $key }" — Windows writes e.g. "Num 5"; check which a Danish user expects.
 - `apps/settings/locales/da/devices.ftl` `settings-dictation-credits`: "Tak til" — heading for model credits; "Kreditering" is the alternative.
 - `apps/settings/locales/da/personalization.ftl` `settings-fonts-sample`: "Quizdeltagerne spiste jordbær med fløde, mens cirkusklovnen Walther spillede på xylofon" — classic Danish pangram; check it isn't too long for the font preview rows (English is much shorter).

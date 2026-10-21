@@ -37,7 +37,7 @@ Strings in Luft's Polish translation that a native speaker should check, each li
 
 - `apps/settings/locales/pl/connections.ftl` `settings-network-security-owe`: "Rozszerzona otwarta" — no settled Polish term for Enhanced Open (OWE); check against what Windows or Android show.
 - `apps/settings/locales/pl/connections.ftl` `settings-bluetooth-request-confirm`: "Sparować z: { $name }?" — colon avoids declining the device name (and the unnamed fallback „urządzenie”); check it reads naturally. The .description lines of the pairing requests drop { $name } for the same reason.
-- `apps/settings/locales/pl/connections.ftl` `settings-accounts-online`: "…w folderze Cloud…" — kept the folder name Cloud on the assumption it is a fixed folder name on disk, as other languages did; translate if the folder is localized.
+- `apps/settings/locales/pl/system.ftl` `settings-accounts-online`: "…w folderze Cloud…" — kept the folder name Cloud on the assumption it is a fixed folder name on disk, as other languages did; translate if the folder is localized.
 - `apps/settings/locales/pl/devices.ftl` `settings-power-time-left`: "Szacowany czas pracy: { $time }" — "about … left" rephrased so the nominative duration fits; check it is clear on a battery row.
 - `apps/settings/locales/pl/devices.ftl` `settings-power-charging-until-full`: "Ładowanie, do pełnego naładowania: { $time }" — colon construction for the nominative duration; may be long at laptop size.
 - `apps/settings/locales/pl/devices.ftl` `settings-power-screen-off`: "Wyłączanie ekranu po czasie" — English "Turn off the screen after" + option cannot take nominative durations in Polish („po 5 minut” is wrong); check the label with options like „5 minut”. Same for `settings-power-long-sleep-after` "Czas do wyłączenia".

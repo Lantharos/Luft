@@ -41,7 +41,7 @@ Strings in Luft's French translation that a native speaker should check: terms w
 - `apps/settings/locales/fr/connections.ftl` `settings-network-ca`: "Certificat CA" — GNOME's wording; Windows' « certificat d’autorité de certification » may be clearer but is longer.
 - `apps/settings/locales/fr/connections.ftl` `settings-bluetooth-request-authorize`: "Après l’association, { $name } pourra se connecter à cet ordinateur." — built so the unnamed form « l’appareil » never starts a sentence; check device names starting with a vowel after « de » and « à » in the other pairing strings.
 - `apps/settings/locales/fr/connections.ftl` `settings-bluetooth-windows`: "Windows a déjà associé { $devices }. Vous pouvez l’utiliser ici…" — rephrased so nothing agrees with the device names' gender.
-- `apps/settings/locales/fr/connections.ftl` `settings-accounts-code`: "Code de validation" — Apple's French wording for the two-factor code; confirm.
+- `apps/settings/locales/fr/system.ftl` `settings-accounts-code`: "Code de validation" — Apple's French wording for the two-factor code; confirm.
 - `apps/settings/locales/fr/devices.ftl` `settings-power-time-left`: "Environ { $time } d’autonomie" — chosen so the duration's gender and number don't matter.
 - `apps/settings/locales/fr/devices.ftl` `settings-dictation-engine-description`: "Reconnaissance par { $engine } : { $language }" — the colon avoids agreement with language names that may arrive capitalized; check it reads naturally. Same for `settings-dictation-language-unavailable`.
 - `apps/settings/locales/fr/devices.ftl` `settings-keys-keypad`: "{ $key } (pavé num.)" — no fixed French label for keypad keys; check length and wording.

@@ -42,7 +42,7 @@ Strings in Luft's Latvian translation that a native speaker should check: terms 
 - `apps/settings/locales/lv/connections.ftl` `settings-bluetooth-windows`: "Ierīce { $devices } ir savienota pārī sistēmā Windows…" — { $devices } is a list like "Tastatūra, Pele un vēl 3"; check it reads naturally after "Ierīces".
 - `apps/settings/locales/lv/connections.ftl` `settings-network-metered`: "Limitēts savienojums" — Windows' term; confirm against current Windows Latvian.
 - `apps/settings/locales/lv/connections.ftl` `settings-network-security-owe`: "Uzlabots atvērtais" — no settled Latvian term for Enhanced Open (OWE).
-- `apps/settings/locales/lv/connections.ftl` `settings-accounts-online`: "Katrs konts ir mape Cloud jūsu mājas mapē…" — assumes the folder keeps its English name Cloud.
+- `apps/settings/locales/lv/system.ftl` `settings-accounts-online`: "Katrs konts ir mape Cloud jūsu mājas mapē…" — assumes the folder keeps its English name Cloud.
 - `apps/settings/locales/lv/devices.ftl` `settings-sound-mute`: "Izslēgt skaņu: { $name }" — $name can be "Skaļums" or an app name; colon form avoids declining it, check it sounds fine for screen readers.
 - `apps/settings/locales/lv/devices.ftl` `settings-dictation-engine-description`: "{ $engine } atpazīst šo valodu: { $language }" — colon used so the language name's case doesn't matter; might read stiff.
 - `apps/settings/locales/lv/devices.ftl` `settings-keys-keypad`: "Num { $key }" — short label for number pad keys; check whether reviewers prefer something else.

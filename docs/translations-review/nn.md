@@ -44,7 +44,7 @@ Strings in Luft's Nynorsk translation that a native speaker should check: terms 
 - `apps/settings/locales/nn/connections.ftl` `settings-network-security-psk`: "WPA2-Personleg" (also WPA3, and "Bedrift" for Enterprise) — Windows keeps "WPA2-Personal"/"WPA2-Enterprise"; check which a Nynorsk reader expects.
 - `apps/settings/locales/nn/connections.ftl` `settings-network-ip-link-local`: "Berre lenkjelokal" — no settled Nynorsk term.
 - `apps/settings/locales/nn/connections.ftl` `settings-network-proxy`: "Proxy" — the loanword, as in Windows; «mellomtenar» is only in the search keywords.
-- `apps/settings/locales/nn/connections.ftl` `settings-accounts-online`: "Kvar konto er ei mappe i Cloud, …" — assumes the folder keeps the English name Cloud.
+- `apps/settings/locales/nn/system.ftl` `settings-accounts-online`: "Kvar konto er ei mappe i Cloud, …" — assumes the folder keeps the English name Cloud.
 - `apps/settings/locales/nn/devices.ftl` `settings-mouse-touchpad-tap`: "Trykk lett for å klikke" — check against what Norwegian users know for "Tap to click".
 - `apps/settings/desktop/locales/nn/desktop.ftl` `desktop-shortcut-switch-panels`: "Byt mellom systemkontrollar" (and `desktop-shortcut-cycle-panels`) — moves keyboard focus between the taskbar and other parts of the desktop; check the name makes sense in the shortcut list.
 - `apps/settings/locales/nn/personalization.ftl` `settings-appearance-icons-clear`: "Klar" — icon style next to Original and Farga; «klar» may read as "ready", check whether «Gjennomsiktige» fits if the style is see-through glass.

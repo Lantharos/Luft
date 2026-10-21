@@ -42,7 +42,7 @@ Strings in Luft’s Catalan translation that a native speaker should check: term
 
 - `apps/settings/locales/ca/connections.ftl` `settings-network-router`: "Encaminador" — Softcatalà's term; confirm it isn't too formal next to «router», which many people use.
 - `apps/settings/locales/ca/connections.ftl` `settings-network-wireguard-keepalive`: "Manteniment de la connexió" — WireGuard's «keepalive» has no settled Catalan term; check whether keeping «Keepalive» is clearer to the people who use this field.
-- `apps/settings/locales/ca/connections.ftl` `settings-accounts-online`: "Cada compte és una carpeta dins de Cloud…" — assumes the Cloud folder keeps its English name on disk; check against the folder's actual name.
+- `apps/settings/locales/ca/system.ftl` `settings-accounts-online`: "Cada compte és una carpeta dins de Cloud…" — assumes the Cloud folder keeps its English name on disk; check against the folder's actual name.
 - `apps/settings/locales/ca/connections.ftl` `settings-bluetooth-request-display`: "Escriviu aquest codi amb { $name } i premeu Retorn." — phrased with «amb» so the fallback «el dispositiu» doesn't need a contraction; check it reads well.
 - `apps/settings/locales/ca/devices.ftl` `settings-sound-mute`: "Silencia: { $name }" — $name can be «Volum» or an app's name, so a colon was used; check this reads well for a screen reader.
 - `apps/settings/locales/ca/devices.ftl` `settings-power-time-left`: "Queden aproximadament { $time }" — with «menys d’un minut» it reads «Queden aproximadament menys d’un minut»; check.

@@ -47,7 +47,7 @@ Strings in Luft's Finnish translation that a native speaker should check. Each i
 - `apps/settings/locales/fi/connections.ftl` `settings-network-ip-ignore`: "Ei hallita" — check it reads naturally as a picker option.
 - `apps/settings/locales/fi/connections.ftl` `settings-bluetooth-request-confirm`: "Muodostetaanko pariliitos: { $name }?" — with the unnamed fallback this reads "…: laite?"; check it's acceptable.
 - `apps/settings/locales/fi/connections.ftl` `settings-bluetooth-request-display`: the description leaves out { $name } ("Kirjoita tämä koodi laitteella ja paina sitten Enter.") because the title already names the device and no inflected form fits the unnamed fallback.
-- `apps/settings/locales/fi/connections.ftl` `settings-accounts-online`: "…kotikansiosi Cloud-kansiossa…" — assumes the folder is named Cloud on disk; check.
+- `apps/settings/locales/fi/system.ftl` `settings-accounts-online`: "…kotikansiosi Cloud-kansiossa…" — assumes the folder is named Cloud on disk; check.
 - `apps/settings/locales/fi/devices.ftl` `settings-sound-output`, `settings-sound-input`: "Ulostulo", "Sisääntulo" — GNOME's words, also used in quick settings; Windows 11 may use others.
 - `apps/settings/locales/fi/devices.ftl` `settings-power-charging-until-full`: "Latautuu, aikaa täyteen { $time }" — built so the duration stays in the nominative; check "alle minuutin" reads well here and in "Noin { $time } jäljellä".
 - `apps/settings/locales/fi/devices.ftl` `settings-power-screen-off`: "Näytön sammutus" — a noun label instead of "Turn off the screen after", with durations as options; check it reads well with "Ei koskaan".

@@ -42,8 +42,8 @@ Strings in Luft's Romanian translation that a native speaker should check. Each 
 - `apps/settings/locales/ro/connections.ftl` `settings-network-autoconnect-other`: "Se conectează ori de câte ori este disponibilă" — feminine agreement assumes „conexiunea”; check it reads right for any connection kind.
 - `apps/settings/locales/ro/connections.ftl` `settings-network-all-users`: "Disponibilă pentru toți" — feminine agreement assumes „rețea/conexiune”; may also be shown for a VPN.
 - `apps/settings/locales/ro/connections.ftl` `settings-network-wireguard-keepalive`: "Keepalive" — left in English as WireGuard's own setting name; check whether a Romanian label is preferred.
-- `apps/settings/locales/ro/connections.ftl` `settings-accounts-remove-note`: "Fișierele rămân în { $provider }." — „în OneDrive/iCloud Drive” is fine, but check it with every provider name.
-- `apps/settings/locales/ro/connections.ftl` `settings-accounts-approve`: "Protecția avansată a datelor" — Apple's Romanian name for Advanced Data Protection should be confirmed.
+- `apps/settings/locales/ro/system.ftl` `settings-accounts-remove-note`: "Fișierele rămân în { $provider }." — „în OneDrive/iCloud Drive” is fine, but check it with every provider name.
+- `apps/settings/locales/ro/system.ftl` `settings-accounts-approve`: "Protecția avansată a datelor" — Apple's Romanian name for Advanced Data Protection should be confirmed.
 - `apps/settings/locales/ro/devices.ftl` `settings-sound-mute`: "Dezactivează sunetul pentru { $name }" — $name can be „Volum” or an app name; „pentru Volum” is slightly awkward for screen readers.
 - `apps/settings/locales/ro/devices.ftl` `settings-keys-keypad`: "Num { $key }" — chosen as a short keypad prefix; check what Romanian keyboard labels or Windows use.
 - `apps/settings/locales/ro/devices.ftl` `settings-keys-volume-up`: "Volum mai tare" — media key names (volume, brightness, mute, eject) have no printed Romanian names; check they read as key names.

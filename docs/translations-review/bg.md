@@ -43,9 +43,9 @@ Strings in Luft's Bulgarian translation that a native speaker should check. Each
 - `apps/settings/locales/bg/connections.ftl` `settings-network-security-owe`: "Подобрена отворена" — no settled Bulgarian name for Enhanced Open (OWE); check whether keeping the English name is better.
 - `apps/settings/locales/bg/connections.ftl` `settings-network-ip-link-local`: "Само локална връзка" — GNOME-style rendering of link-local; check it is recognizable.
 - `apps/settings/locales/bg/connections.ftl` `settings-network-ip-search-domains` `.label`: "{ $family } домейни за търсене" — Windows-style prefix order, unlike the "Метод за { $family }" pattern used for the other labels.
-- `apps/settings/locales/bg/connections.ftl` `settings-accounts-online`: "…папка в Cloud в личната ви папка…" — assumes the folder is literally named Cloud on disk; confirm.
+- `apps/settings/locales/bg/system.ftl` `settings-accounts-online`: "…папка в Cloud в личната ви папка…" — assumes the folder is literally named Cloud on disk; confirm.
 - `apps/settings/locales/bg/connections.ftl` `settings-bluetooth-windows`: "В Windows е сдвоено: { $devices }…" — rephrased with a colon so device names of any gender fit.
-- `apps/settings/locales/bg/connections.ftl` `settings-accounts-provider-icloud`: "акаунт в Apple" — follows Apple's Bulgarian wording for Apple Account; confirm.
+- `apps/settings/locales/bg/system.ftl` `settings-accounts-provider-icloud`: "акаунт в Apple" — follows Apple's Bulgarian wording for Apple Account; confirm.
 - `apps/settings/locales/bg/devices.ftl` `settings-sound-mute`: "{ $name }: изключи звука" — colon form because $name can be "Сила на звука" or an app name.
 - `apps/settings/locales/bg/devices.ftl` `settings-sound-connection`: "Връзка" — the device port (speakers vs headphones); check whether "Порт" or "Изход" reads better.
 - `apps/settings/locales/bg/devices.ftl` `settings-keys-keypad`: "Num { $key }" — short label for number-pad keys; check against what Bulgarian users expect.

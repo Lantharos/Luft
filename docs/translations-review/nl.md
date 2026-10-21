@@ -46,15 +46,15 @@ Strings in Luft's Dutch translation that a native speaker should check: terms wh
 - `apps/settings/locales/nl/connections.ftl` `settings-network-security-psk`: "WPA2 Persoonlijk" (and WPA3 Persoonlijk, Zakelijk) — follows macOS; Windows writes "WPA2-Persoonlijk". Check which spelling reads best.
 - `apps/settings/locales/nl/connections.ftl` `settings-network-private-address`: "Privéadres" — no settled term (macOS says "Privé-wifiadres", Windows "Willekeurige hardwareadressen").
 - `apps/settings/locales/nl/connections.ftl` `settings-network-ip-link-local`: "Alleen link-local" — kept the technical term untranslated.
-- `apps/settings/locales/nl/connections.ftl` `settings-accounts-app-password`: "App-wachtwoord" — Microsoft's spelling; strict compound rules would give "appwachtwoord".
-- `apps/settings/locales/nl/connections.ftl` `settings-accounts-approve`: "Geavanceerde gegevensbescherming" — Apple's Dutch name for Advanced Data Protection; confirm capitalization.
+- `apps/settings/locales/nl/system.ftl` `settings-accounts-app-password`: "App-wachtwoord" — Microsoft's spelling; strict compound rules would give "appwachtwoord".
+- `apps/settings/locales/nl/system.ftl` `settings-accounts-approve`: "Geavanceerde gegevensbescherming" — Apple's Dutch name for Advanced Data Protection; confirm capitalization.
 - `apps/settings/locales/nl/devices.ftl` `settings-display-orientation-portrait-right`: "Staand, naar rechts" (and "Staand, naar links", "Liggend, omgedraaid") — check against Windows' Dutch orientation names.
 - `apps/settings/locales/nl/devices.ftl` `settings-keys-keypad`: "Numeriek { $key }" — no printed key name exists; check whether "Num { $key }" is more familiar.
 - `apps/settings/locales/nl/devices.ftl` `settings-dictation-credits`: "Bronvermelding" — chosen over the loanword "Credits".
 - `apps/settings/locales/nl/devices.ftl` `settings-power-capacity`: "{ $full } van { $design } toen hij nieuw was" — “hij” refers to the battery; check it reads naturally in the Battery health row.
 - `apps/settings/desktop/locales/nl/desktop.ftl` `desktop-shortcut-switch-panels`: "Wisselen tussen systeembediening" — vague English source; check it makes sense in the shortcut list.
 - `apps/settings/desktop/locales/nl/desktop.ftl` `desktop-shortcut-show-screenshot-ui`: "Schermafbeelding maken met keuzes" — “interactively” has no neat Dutch equivalent.
-- `apps/settings/locales/nl/connections.ftl` `settings-accounts-online`: "Onlineaccounts" — one-word compound per the spelling rules; GNOME writes "Online-accounts".
+- `apps/settings/locales/nl/system.ftl` `settings-accounts-online`: "Onlineaccounts" — one-word compound per the spelling rules; GNOME writes "Online-accounts".
 - `apps/settings/locales/nl/system.ftl` `settings-updates-area-drivers`: "Drivers en firmware" — "driver" is used throughout instead of Windows' "stuurprogramma"; check which Dutch users expect.
 - `apps/settings/locales/nl/personalization.ftl` `settings-appearance-wallpaper-folder-description`: "Afbeeldingen › Wallpapers" — assumes the Pictures folder shows as Afbeeldingen (the Dutch folder name); Wallpapers is the real folder name and stays English.
 

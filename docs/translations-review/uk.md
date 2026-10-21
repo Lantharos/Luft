@@ -50,7 +50,7 @@ Strings in Luft's Ukrainian translation that a native speaker should check, each
 - `apps/settings/locales/uk/connections.ftl` `settings-bluetooth-windows`: "Пристрій { $devices } має пару у Windows…" — $devices is a list of names; check the noun in front reads naturally with a joined list like «Клавіатура, Миша і ще 3».
 - `apps/settings/locales/uk/connections.ftl` `settings-network-security-owe`: "Покращена відкрита" — no settled Ukrainian name for OWE / Enhanced Open; check against Windows or Android.
 - `apps/settings/locales/uk/connections.ftl` `settings-network-anonymous-identity`: "Анонімна ідентичність" — Windows and NetworkManager wording varies («анонімне посвідчення»); check.
-- `apps/settings/locales/uk/connections.ftl` `settings-accounts-remove-note`: "Ваші файли залишаться в сервісі { $provider }. Зміни, зроблені тут, спершу буде вивантажено." — check «сервісі» vs «службі» and «вивантажено» for uploading.
+- `apps/settings/locales/uk/system.ftl` `settings-accounts-remove-note`: "Ваші файли залишаться в сервісі { $provider }. Зміни, зроблені тут, спершу буде вивантажено." — check «сервісі» vs «службі» and «вивантажено» for uploading.
 - `apps/settings/locales/uk/devices.ftl` `settings-power-time-left`: "Залишилося приблизно { $time }" — $time is nominative («1 хвилина»), so agreement is slightly off for 1, 21…; check if acceptable.
 - `apps/settings/locales/uk/devices.ftl` `settings-power-long-sleep-hours`: "{ $hours } годину" — accusative, to follow the label «Вимикати через»; settings-power-duration-* stay nominative because they are also used inside sentences.
 - `apps/settings/locales/uk/devices.ftl` `settings-keys-keypad`: "Num { $key }" — keyboards print no word for the keypad; check if «Num 5» is what people expect.

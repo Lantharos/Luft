@@ -45,7 +45,7 @@ Strings in Luft's Turkish translation that a native speaker should check: terms 
 - `apps/settings/locales/tr/connections.ftl` `settings-network-metered`: "Tarifeli bağlantı" — Windows' term; check it against "Ölçülü bağlantı", which the page keywords also list.
 - `apps/settings/locales/tr/connections.ftl` `settings-network-proxy-port`: "Port" — chose "port" over GNOME's "Bağlantı noktası" to fit the short field; confirm.
 - `apps/settings/locales/tr/connections.ftl` `settings-network-ip-routes`: "Rotalar" — GNOME's word; "Yönlendirmeler" is the alternative.
-- `apps/settings/locales/tr/connections.ftl` `settings-accounts-approve`: "İleri Düzey Veri Koruması’nı" — check Apple's current Turkish name for Advanced Data Protection.
+- `apps/settings/locales/tr/system.ftl` `settings-accounts-approve`: "İleri Düzey Veri Koruması’nı" — check Apple's current Turkish name for Advanced Data Protection.
 - `apps/settings/locales/tr/devices.ftl` `settings-dictation-hold`: "Dikte için basılı tutun: { $keys }" — colon form avoids a suffix on { $keys } (e.g. "Super+Alt ya da Copilot tuşu"); check it reads naturally.
 - `apps/settings/locales/tr/devices.ftl` `settings-power-capacity`: "Şu an { $full }, yeniyken { $design }" — rephrased from "X of Y when new".
 - `apps/settings/locales/tr/devices.ftl` `settings-keys-keypad`: "Tuş takımı { $key }" — check what Turkish OSes print for number-pad keys; may clip on shortcut labels.

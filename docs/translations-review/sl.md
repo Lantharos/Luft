@@ -41,7 +41,7 @@ Strings in Luft's Slovenian translation that a native speaker should check: term
 - `apps/settings/locales/sl/connections.ftl` `settings-bluetooth-windows`: "Naprava/Napravi/Naprave { $devices } …" — agreement assumes $count is the total number of devices in the list.
 - `apps/settings/locales/sl/connections.ftl` `settings-network-ip-link-local`: "Samo lokalna povezava" — no settled Slovenian term for link-local.
 - `apps/settings/locales/sl/connections.ftl` `settings-network-security-owe`: "Izboljšano odprto" — check against Windows' Slovenian wording for Enhanced Open.
-- `apps/settings/locales/sl/connections.ftl` `settings-accounts-apple-account`: "Račun Apple" — Apple has no Slovenian localization; chose the modifier-after-noun order from the style guide.
+- `apps/settings/locales/sl/system.ftl` `settings-accounts-apple-account`: "Račun Apple" — Apple has no Slovenian localization; chose the modifier-after-noun order from the style guide.
 - `apps/settings/locales/sl/devices.ftl` `settings-power-duration-minutes`: "{ $minutes } minuto …" — durations are in the accusative (they follow „čez“, „zdrži še“); verify every sentence and picker using them takes the accusative, such as „Zdrži še približno { $time }“.
 - `apps/settings/locales/sl/devices.ftl` `settings-keys-keypad`: "Številčnica { $key }" — check whether keyboards/OSes say Num or something else for keypad keys.
 - `apps/settings/locales/sl/protection.ftl` `settings-encryption-passphrase-field`: "Šifrirno geslo" — used for the passphrase in setup and Settings alike; check it reads as distinct from the account "geslo" and matches what GNOME Disks uses in Slovenian.

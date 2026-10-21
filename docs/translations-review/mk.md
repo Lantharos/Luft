@@ -43,8 +43,8 @@ Strings in Luft's Macedonian translation that a native speaker should check. Eac
 ## Settings
 
 - `apps/settings/locales/mk/connections.ftl` `settings-network-security-psk`, `settings-network-security-sae`, `settings-network-security-enterprise`, `settings-network-security-owe`: "WPA2 лична", "WPA3 лична", "Деловна", "Подобрена отворена" — check whether these Wi-Fi security names should stay in English (WPA2-Personal, Enterprise, Enhanced Open).
-- `apps/settings/locales/mk/connections.ftl` `settings-accounts-apple-account`: "Apple-сметка" — Apple has no Macedonian localization; check whether „Apple Account“ reads better.
-- `apps/settings/locales/mk/connections.ftl` `settings-accounts-approve`: "…користи Напредна заштита на податоците…" — Apple's Advanced Data Protection has no official Macedonian name.
+- `apps/settings/locales/mk/system.ftl` `settings-accounts-apple-account`: "Apple-сметка" — Apple has no Macedonian localization; check whether „Apple Account“ reads better.
+- `apps/settings/locales/mk/system.ftl` `settings-accounts-approve`: "…користи Напредна заштита на податоците…" — Apple's Advanced Data Protection has no official Macedonian name.
 - `apps/settings/locales/mk/connections.ftl` `settings-bluetooth-windows`: "Уредот { $devices } е спарен во Windows…" / "Уредите { $devices } се спарени…" — the noun avoids gender agreement with device names; check it with a list like „Keyboard, Mouse и уште 3“.
 - `apps/settings/locales/mk/connections.ftl` `settings-bluetooth-request-authorize`: "Да се дозволи спарување со { $name }?" — `$name` may be the fallback „уредот“; check both readings.
 - `apps/settings/locales/mk/connections.ftl` `settings-network-wireguard-keepalive`: "Одржување на врската" — no settled term for WireGuard keepalive; „Keepalive“ may be more familiar.

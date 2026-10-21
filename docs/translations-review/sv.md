@@ -39,7 +39,7 @@ Strings in Luft's Swedish translation that a native speaker should check: terms 
 - `apps/settings/locales/sv/connections.ftl` `settings-network-ip-routes`: "Vägar" — GNOME uses "Rutter"; check which a Swedish network admin expects.
 - `apps/settings/locales/sv/connections.ftl` `settings-network-wireguard-preshared-key`: "I förväg delad nyckel" — WireGuard UIs often keep "Preshared key"; check.
 - `apps/settings/locales/sv/connections.ftl` `settings-network-wireguard-keepalive`: "Keepalive" — kept as the WireGuard term.
-- `apps/settings/locales/sv/connections.ftl` `settings-accounts-online`: "Varje konto är en mapp i Cloud i din hemmapp …" — check whether the Cloud folder keeps its English name on a Swedish system.
+- `apps/settings/locales/sv/system.ftl` `settings-accounts-online`: "Varje konto är en mapp i Cloud i din hemmapp …" — check whether the Cloud folder keeps its English name on a Swedish system.
 - `apps/settings/locales/sv/devices.ftl` `settings-sound-mute`: "Stäng av ljudet för { $name }" — $name can be "Volym", which reads oddly capitalized mid-sentence for screen readers.
 - `apps/settings/locales/sv/devices.ftl` `settings-keys-keypad`: "Num { $key }" — short form for number-pad keys; check against Swedish keyboard conventions.
 - `apps/settings/locales/sv/devices.ftl` `settings-power-suspend-plugged-in`: "Viloläge med laddare ansluten" — row label for the suspend timeout when plugged in; check it pairs naturally with "Viloläge på batteri".

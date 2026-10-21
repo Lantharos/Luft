@@ -53,13 +53,14 @@ Luft's apps are built with [Sabine](https://github.com/Lantharos/Sabine): a Svel
 
 | Package | Provides |
 | --- | --- |
-| `packages/ui` (`@luft/ui`) | Design tokens, Open Runde and Maple Mono, window chrome, controls and motion presets |
-| `packages/app` (`luft-app`) | The native window with its blurred sidebar, single-instance activation, Kestrel's palette, D-Bus and portals |
+| `packages/ui` (`@luft/ui`) | Design tokens, Open Runde and Maple Mono, window chrome, controls, dialogs, the command palette, motion presets and date, size and path formatting |
+| `packages/app` (`luft-app`) | The native window with its blurred sidebar, single-instance activation, Kestrel's palette, D-Bus, portals, settings files and folder watching |
 | `packages/motion` | Motion tokens shared by Kestrel and the apps |
 | `packages/dbus` | D-Bus connections and service properties |
 | `packages/software` | System updates, Flatpak, AppImages and Toolbox, shared by Settings and Schelf |
 | `packages/accounts` | Online accounts and the cloud drives they bring |
-| `packages/disks`, `network`, `fingerprint`, `windows`, `variant`, `meet` | Drives, networking, fingerprints, Windows on the same computer, choosing the image, and Meet Luft's plans |
+| `packages/disks`, `network`, `fingerprint`, `windows`, `variant`, `meet` | Drives, networking, fingerprints, Windows on the same computer, choosing the image, and Meet Luft's plans; `network` also has the TypeScript calls Settings and Install Luft use (`@luft/network`) |
+| `packages/settings-pages` | Settings' pages with their titles and search words, which Start searches too |
 | `packages/trust` | Calls to trustd, the security service, with its errors translated |
 
 Apps reach the system through D-Bus services that run with only the rights they need: `com.lantharos.Updater1` for updates, `com.lantharos.Trust1` for trustd, `com.lantharos.Installer1` for the installer, `com.lantharos.Accounts1` for cloud drives, and `com.lantharos.Windows1` for Windows on the same computer. Each checks polkit for what it changes.

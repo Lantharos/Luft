@@ -94,7 +94,7 @@ fill_store() {
   local destination="containers-storage:[overlay@$store+$work/run]" variant
   remove_store
   for variant; do
-    podman push --quiet "$(image_of "$variant")" "$destination$(published_of "$variant")"
+    podman push --quiet --remove-signatures "$(image_of "$variant")" "$destination$(published_of "$variant")"
   done
   podman push --quiet "$live_image" "$destination$live_image"
 }

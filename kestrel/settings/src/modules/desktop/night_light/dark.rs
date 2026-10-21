@@ -29,7 +29,12 @@ impl DarkSchedule {
         self.evaluated_at = None;
     }
 
-    pub fn update(&mut self, settings: &Schemas, now: &glib::DateTime, daylight: Option<&Daylight>) {
+    pub fn update(
+        &mut self,
+        settings: &Schemas,
+        now: &glib::DateTime,
+        daylight: Option<&Daylight>,
+    ) {
         let Some(plan) = plan(settings, daylight) else {
             self.evaluated_at = None;
             return;

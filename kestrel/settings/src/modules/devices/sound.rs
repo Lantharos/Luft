@@ -15,9 +15,7 @@ const SOUND: &str = "org.gnome.desktop.sound";
 type Failure = Box<dyn std::error::Error + Send + Sync>;
 
 pub async fn start(context: &Context) -> zbus::Result<()> {
-    let Some(mut settings) = context.settings.watch(&[SOUND]).await else {
-        return Ok(());
-    };
+    let mut settings = context.settings.watch(&[SOUND]).await;
     let mut themes = TreeWatch::new(theme_directories())?;
     tokio::spawn(async move {
         loop {

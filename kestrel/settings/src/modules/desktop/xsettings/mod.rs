@@ -105,9 +105,7 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
     schemas.extend(modules.iter().filter_map(GtkModule::schema));
     schemas.sort_unstable();
     schemas.dedup();
-    let Some(settings) = context.settings.watch(&schemas).await else {
-        return Ok(());
-    };
+    let settings = context.settings.watch(&schemas).await;
     let session = &context.session;
     let mut scale = RemoteProperty::<i32>::new(session, &MUTTER_X11, "UiScalingFactor").await?;
     let mut animations =

@@ -25,9 +25,7 @@ const DISK_CHECK: Duration = Duration::from_secs(60);
 const DISKS: &str = "com.lantharos.disks.desktop";
 
 pub async fn start(context: &Context) -> zbus::Result<()> {
-    let Some(mut settings) = context.settings.watch(&[PRIVACY, THUMBNAILS]).await else {
-        return Ok(());
-    };
+    let mut settings = context.settings.watch(&[PRIVACY, THUMBNAILS]).await;
     let mut actions = NotificationsProxy::new(&context.session)
         .await?
         .receive_action_invoked()

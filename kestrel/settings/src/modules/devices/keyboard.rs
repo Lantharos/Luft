@@ -22,9 +22,7 @@ trait Locale {
 }
 
 pub async fn start(context: &Context) -> zbus::Result<()> {
-    let Some(settings) = context.settings.watch(&[INPUT_SOURCES]).await else {
-        return Ok(());
-    };
+    let settings = context.settings.watch(&[INPUT_SOURCES]).await;
     let sources: Vec<(String, String)> = settings.get(INPUT_SOURCES, "sources");
     let options_chosen = settings.is_user_set(INPUT_SOURCES, "xkb-options").await;
     if !sources.is_empty() && options_chosen {

@@ -45,7 +45,7 @@ impl Settings {
         Self { context }
     }
 
-    pub async fn watch(&self, ids: &[&'static str]) -> Option<Schemas> {
+    pub async fn watch(&self, ids: &[&'static str]) -> Schemas {
         let group = NEXT_GROUP.fetch_add(1, Ordering::Relaxed);
         let ids = ids.to_vec();
         let (reply, opened) = oneshot::channel();
@@ -53,20 +53,16 @@ impl Settings {
         self.context.invoke(move || {
             let _ = reply.send(open(group, &ids, &sender));
         });
-        let values = match opened.await {
-            Ok(Ok(values)) => values,
-            Ok(Err(missing)) => {
-                eprintln!("The settings schema {missing} isn't installed");
-                return None;
-            }
-            Err(_) => return None,
-        };
-        Some(Schemas {
+        let values = opened
+            .await
+            .expect("the settings thread answers")
+            .unwrap_or_else(|missing| panic!("The settings schema {missing} isn't installed"));
+        Schemas {
             group,
             context: self.context.clone(),
             values,
             changes,
-        })
+        }
     }
 }
 

@@ -23,9 +23,7 @@ trait Timedate {
 }
 
 pub async fn start(context: &Context) -> zbus::Result<()> {
-    let Some(mut settings) = context.settings.watch(&[DATETIME, LOCATION]).await else {
-        return Ok(());
-    };
+    let mut settings = context.settings.watch(&[DATETIME, LOCATION]).await;
     let mut resumes = LoginProxy::new(&context.system)
         .await?
         .receive_prepare_for_sleep()

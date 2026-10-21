@@ -59,12 +59,10 @@ export function claimable(accelerator: string): boolean {
 }
 
 export function reservedAccelerators(): Set<string> {
-  const source = Gio.SettingsSchemaSource.get_default()!;
   const reserved = new Set<string>();
   for (const id of KEYBINDING_SCHEMAS) {
-    const schema = source.lookup(id, true);
-    if (!schema) continue;
-    const settings = new Gio.Settings({ settings_schema: schema });
+    const settings = new Gio.Settings({ schema_id: id });
+    const schema = settings.settings_schema;
     for (const key of schema.list_keys()) {
       if (key === CUSTOM_KEYBINDINGS || schema.get_key(key).get_value_type().dup_string() !== 'as') continue;
       for (const accelerator of settings.get_strv(key)) if (accelerator) reserved.add(canonical(accelerator));

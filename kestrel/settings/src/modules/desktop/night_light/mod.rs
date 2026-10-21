@@ -47,9 +47,10 @@ struct NightLight {
 }
 
 pub async fn start(context: &Context) -> zbus::Result<()> {
-    let Some(settings) = context.settings.watch(&[SCHEMA, LOCATION, dark::SCHEMA, dark::INTERFACE]).await else {
-        return Ok(());
-    };
+    let settings = context
+        .settings
+        .watch(&[SCHEMA, LOCATION, dark::SCHEMA, dark::INTERFACE])
+        .await;
     let (located, mut locations) = mpsc::unbounded_channel();
     let mut light = NightLight {
         settings,
@@ -173,7 +174,8 @@ impl NightLight {
     fn update(&mut self, smooth: bool) {
         let now = schedule::now();
         self.daylight = self.coordinates().map(|at| schedule::daylight(&now, at));
-        self.dark.update(&self.settings, &now, self.daylight.as_ref());
+        self.dark
+            .update(&self.settings, &now, self.daylight.as_ref());
         let (active, temperature) = self.target(&now);
         self.active = active;
         self.retarget(temperature, smooth);

@@ -13,9 +13,7 @@ const ASSISTIVE: [&str; 3] = [
 const SCREEN_READER_UNIT: &str = "orca.service";
 
 pub async fn start(context: &Context) -> zbus::Result<()> {
-    let Some(mut settings) = context.settings.watch(&[APPLICATIONS, INTERFACE]).await else {
-        return Ok(());
-    };
+    let mut settings = context.settings.watch(&[APPLICATIONS, INTERFACE]).await;
     let systemd = SystemdProxy::new(&context.session).await?;
     if assistive_enabled(&settings) {
         settings.set(INTERFACE, "toolkit-accessibility", true);

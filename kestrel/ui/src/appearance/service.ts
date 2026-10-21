@@ -133,8 +133,7 @@ export class AppearanceService {
     if (published === this.published) return;
     this.published = published;
     if (this.appearance.accentColor !== previousAccent) {
-      if (this.interfaceSettings.settings_schema.has_key('accent-color'))
-        this.interfaceSettings.set_string('accent-color', this.appearance.accentName);
+      this.interfaceSettings.set_string('accent-color', this.appearance.accentName);
       this.changed(accent);
     }
     for (const [name] of PROPERTIES) this.emitChanged(name);

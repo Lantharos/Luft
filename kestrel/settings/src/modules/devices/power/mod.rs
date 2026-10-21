@@ -69,9 +69,7 @@ const LIGHT_SENSOR: Endpoint = Endpoint {
 };
 
 pub async fn start(context: &Context) -> zbus::Result<()> {
-    let Some(settings) = context.settings.watch(&[POWER, SESSION, SCREENSAVER]).await else {
-        return Ok(());
-    };
+    let settings = context.settings.watch(&[POWER, SESSION, SCREENSAVER]).await;
     let (session, system) = (&context.session, &context.system);
     let (
         mut session_active,

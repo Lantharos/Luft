@@ -1,5 +1,6 @@
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::sync::{Arc, OnceLock};
 use std::time::Duration;
 
 use gio::glib;
@@ -124,23 +125,39 @@ pub fn open_folder(token: Option<&str>) -> Result<(), String> {
 }
 
 pub fn watch(events: Events) {
+    let Ok(folder) = folder() else {
+        return;
+    };
     let watch = Watch {
         events: WatchMask::CLOSE_WRITE
+            | WatchMask::CREATE
             | WatchMask::DELETE
             | WatchMask::MOVED_FROM
-            | WatchMask::MOVED_TO,
+            | WatchMask::MOVED_TO
+            | WatchMask::DELETE_SELF
+            | WatchMask::MOVE_SELF,
         report: Report::Folders,
         quiet: Duration::from_millis(150),
         latest: Duration::from_millis(600),
     };
-    let watcher = FolderWatcher::spawn(watch, move |_| {
-        if let Ok(wallpapers) = list() {
-            events.emit(WALLPAPERS_CHANGED, wallpapers);
+    let watcher = Arc::new(OnceLock::new());
+    let following = watcher.clone();
+    let wallpapers = folder.clone();
+    let Ok(spawned) = FolderWatcher::spawn(watch, move |_| {
+        if let Some(watcher) = following.get() {
+            follow(watcher, &wallpapers);
+            if let Ok(listed) = list() {
+                events.emit(WALLPAPERS_CHANGED, listed);
+            }
         }
-    });
-    if let (Ok(watcher), Ok(folder)) = (watcher, folder())
-        && fs::create_dir_all(&folder).is_ok()
-    {
-        let _ = watcher.watch([folder]);
+    }) else {
+        return;
+    };
+    follow(watcher.get_or_init(|| spawned), &folder);
+}
+
+fn follow(watcher: &FolderWatcher, folder: &Path) {
+    if let Some(existing) = folder.ancestors().find(|path| path.is_dir()) {
+        let _ = watcher.watch([existing.to_path_buf()]);
     }
 }

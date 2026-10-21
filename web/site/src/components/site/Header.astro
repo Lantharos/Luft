@@ -21,11 +21,11 @@ const { t, href } = page;
 		</a>
 		<ul class="flex items-center gap-1 text-[0.9375rem] font-medium">
 			{
-				nav(page).map(({ label, href }) => (
-					<li>
+				nav(page).map(({ label, href, secondary }) => (
+					<li class:list={[secondary && 'max-sm:hidden']}>
 						<a
 							href={href}
-							class="rounded-full px-3 py-2 opacity-80 transition-opacity duration-(--motion-tap) hover:opacity-100 aria-[current=page]:opacity-100"
+							class="rounded-full px-2.5 py-2 sm:px-3 opacity-80 transition-opacity duration-(--motion-tap) hover:opacity-100 aria-[current=page]:opacity-100"
 							aria-current={href === Astro.url.pathname ? 'page' : undefined}
 						>
 							{label}

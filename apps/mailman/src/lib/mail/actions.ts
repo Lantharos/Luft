@@ -1,6 +1,6 @@
+import { ago } from '@luft/ui';
 import * as api from '#lib/api/index.js';
 import type { Action } from '#lib/api/index.js';
-import { until } from '#lib/app/format.js';
 import { reader } from '#lib/reader/reader.svelte.js';
 import { toasts } from '#lib/shell/toasts.svelte.js';
 import { list } from './list.svelte';
@@ -70,7 +70,7 @@ export function moveTo(mailbox: number, threads: number[]) {
 export function snooze(at: number, threads: number[]) {
 	if (!threads.length) return;
 	if (list.view !== 'later') leave(threads);
-	void undoable({ action: 'snooze', until: at }, threads, `Back ${until(at)}`);
+	void undoable({ action: 'snooze', until: at }, threads, `Back ${ago(at)}`);
 }
 
 export async function wake(threads: number[]) {

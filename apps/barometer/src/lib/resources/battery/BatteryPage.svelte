@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { watts } from '@luft/ui';
+	import { duration, watts } from '@luft/ui';
 	import type { BatteryInfo, BatterySample } from '#lib/backend/types.js';
-	import { duration, percent, share } from '#lib/format.js';
+	import { percent, share } from '#lib/format.js';
 	import Chart from '#lib/resources/common/Chart.svelte';
 	import Facts from '#lib/resources/common/Facts.svelte';
 	import Page from '#lib/resources/common/Page.svelte';

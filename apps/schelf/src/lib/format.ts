@@ -1,7 +1,5 @@
 import type { Operation, Source } from '#lib/bridge/types.js';
 
-export const date = (seconds: number) => new Date(seconds * 1000).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
-
 export function sourceName(source: Source, origin: string) {
 	if (source === 'appImage') return 'AppImage';
 	if (source === 'tool') return 'Tools container';

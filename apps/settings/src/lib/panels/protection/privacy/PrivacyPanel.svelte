@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { Dialog, Row, Section, Select, Switch } from '@luft/ui';
+	import { Dialog, longDuration, Row, Section, Select, Switch } from '@luft/ui';
 	import { app } from '#lib/state/app.svelte.js';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import { clearHistory } from './api';
-	import { days, duration, including } from './format';
+	import { days, including } from './format';
 
 	type Screensaver = { 'lock-enabled': boolean; 'lock-delay': number };
 	type Session = { 'idle-delay': number };
@@ -36,7 +36,7 @@
 
 	let lockDelays = $derived([
 		{ value: 0, label: t('settings-privacy-lock-immediately') },
-		...[30, 60, 120, 180, 300, 1800, 3600].map((seconds) => ({ value: seconds, label: duration(seconds) }))
+		...[30, 60, 120, 180, 300, 1800, 3600].map((seconds) => ({ value: seconds, label: longDuration(seconds) }))
 	]);
 	let historyAges = $derived([
 		...[1, 7, 30].map((count) => ({ value: count, label: days(count) })),
@@ -59,7 +59,7 @@
 
 <Section title={t('settings-privacy-screen-lock')}>
 	<Row title={t('settings-privacy-screen-off')} description={t('settings-privacy-screen-off-hint')} onclick={() => app.open('power')}>
-		<span>{idle ? t('settings-privacy-screen-off-after', { duration: duration(idle) }) : t('settings-privacy-screen-off-never')}</span>
+		<span>{idle ? t('settings-privacy-screen-off-after', { duration: longDuration(idle) }) : t('settings-privacy-screen-off-never')}</span>
 	</Row>
 	<Row title={t('settings-privacy-lock-when-off')}>
 		<Switch label={t('settings-privacy-lock-when-off')} checked={locking} onchange={(on) => screensaver.set('lock-enabled', on)} />
@@ -67,7 +67,7 @@
 	<Row title={t('settings-privacy-lock-after')} description={t('settings-privacy-lock-after-hint')} disabled={!locking}>
 		<Select
 			label={t('settings-privacy-lock-after')}
-			options={including(lockDelays, screensaver.values['lock-delay'], duration)}
+			options={including(lockDelays, screensaver.values['lock-delay'], longDuration)}
 			value={screensaver.values['lock-delay'] ?? 0}
 			disabled={!locking}
 			onchange={(seconds) => screensaver.set('lock-delay', seconds)}

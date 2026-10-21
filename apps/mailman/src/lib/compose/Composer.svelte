@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { bytes, MenuButton, MenuItem, MenuSeparator, Spring, springTiming, tooltip } from '@luft/ui';
+	import { bytes, MenuButton, MenuItem, MenuSeparator, Spring, springTiming, tooltip, weekdayTime } from '@luft/ui';
 	import Bell from '@lucide/svelte/icons/bell';
 	import Bold from '@lucide/svelte/icons/bold';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
@@ -57,8 +57,6 @@
 
 	let title = $derived(composition.subject.trim() || (composition.inReplyTo ? 'Reply' : 'New message'));
 	let reminder = $derived(REMINDERS.find((option) => option.seconds === composition.remindAfter));
-
-	const laterFormat = new Intl.DateTimeFormat(undefined, { weekday: 'short', hour: 'numeric', minute: '2-digit' });
 
 	function send(at: number | null = null) {
 		if (editor) void composer.send(editor.content(), at);
@@ -163,7 +161,7 @@
 						{#each SEND_LATER as moment (moment.id)}
 							{@const at = moment.at()}
 							<MenuItem onclick={() => (closeMenu(), send(at))}>
-								<span class="flex-1">{moment.label}</span><span class="text-[12px] text-[var(--text-muted)]">{laterFormat.format(at * 1000)}</span>
+								<span class="flex-1">{moment.label}</span><span class="text-[12px] text-[var(--text-muted)]">{weekdayTime(at)}</span>
 							</MenuItem>
 						{/each}
 					{/snippet}

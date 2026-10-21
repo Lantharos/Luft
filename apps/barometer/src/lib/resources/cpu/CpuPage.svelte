@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { memoryBytes, plural, Switch } from '@luft/ui';
+	import { duration, memoryBytes, plural, Switch } from '@luft/ui';
 	import type { CpuInfo } from '#lib/backend/types.js';
-	import { count, duration, frequency, percent, temperature } from '#lib/format.js';
+	import { count, frequency, percent, temperature } from '#lib/format.js';
 	import Chart from '#lib/resources/common/Chart.svelte';
 	import Facts from '#lib/resources/common/Facts.svelte';
 	import Page from '#lib/resources/common/Page.svelte';

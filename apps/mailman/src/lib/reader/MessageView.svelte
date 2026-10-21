@@ -1,11 +1,10 @@
 <script lang="ts">
-	import { Avatar, tooltip } from '@luft/ui';
+	import { Avatar, longDateTime, relativeDay, tooltip } from '@luft/ui';
 	import ImageOff from '@lucide/svelte/icons/image-off';
 	import Reply from '@lucide/svelte/icons/reply';
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
 	import * as api from '#lib/api/index.js';
 	import type { Address, Message } from '#lib/api/index.js';
-	import { longDate, shortDate } from '#lib/app/format.js';
 	import { composer } from '#lib/compose/composer.svelte.js';
 	import { mail } from '#lib/mail/mail.svelte.js';
 	import Attachments from './Attachments.svelte';
@@ -62,7 +61,7 @@
 					to {recipients.map(label).join(', ') || 'undisclosed recipients'}
 				</p>
 			</div>
-			<span class="flex-none pt-0.5 text-[12.5px] text-[var(--text-muted)]" {@attach tooltip(longDate(message.date))}>{shortDate(message.date)}</span>
+			<span class="flex-none pt-0.5 text-[12.5px] text-[var(--text-muted)]" {@attach tooltip(longDateTime(message.date))}>{relativeDay(message.date)}</span>
 			{#if message.draft}
 				<button type="button" class="plain-button edit" onclick={() => void composer.reopen(message.id)}>Continue writing</button>
 			{:else}
@@ -104,7 +103,7 @@
 		<Avatar picture={null} name={name} size={28} />
 		<span class="flex-none text-[13.5px] font-semibold" class:unseen={!message.seen}>{name}</span>
 		<span class="min-w-0 flex-1 truncate text-left text-[13px] text-[var(--text-muted)]">{message.snippet}</span>
-		<span class="flex-none text-[12.5px] text-[var(--text-muted)]">{shortDate(message.date)}</span>
+		<span class="flex-none text-[12.5px] text-[var(--text-muted)]">{relativeDay(message.date)}</span>
 	</button>
 {/if}
 

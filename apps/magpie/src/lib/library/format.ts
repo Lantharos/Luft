@@ -1,8 +1,8 @@
-const DATE = new Intl.DateTimeFormat(undefined, { dateStyle: 'long', timeStyle: 'short' });
+import { longDateTime } from '@luft/ui';
 
 export function formatDate(value: string | number) {
 	const date = new Date(value);
-	return Number.isNaN(date.getTime()) ? null : DATE.format(date);
+	return Number.isNaN(date.getTime()) ? null : longDateTime(date.getTime() / 1000);
 }
 
 export function formatExposure(seconds: number) {

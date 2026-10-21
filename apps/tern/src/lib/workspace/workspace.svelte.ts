@@ -1,4 +1,5 @@
 import { appWindow } from '@lantharos/sabine';
+import { duration } from '@luft/ui';
 import { settings } from '#lib/state/settings.svelte.js';
 import type { FinishedCommand } from '#lib/terminal/integration.js';
 import { pasteRisks } from '#lib/terminal/paste.js';
@@ -25,13 +26,6 @@ export interface TerminalMenu {
 export interface CloseReview {
 	programs: string[];
 	close: () => void;
-}
-
-function describeDuration(milliseconds: number) {
-	const seconds = Math.round(milliseconds / 1000);
-	if (seconds < 60) return `${seconds} s`;
-	const minutes = Math.floor(seconds / 60);
-	return minutes < 60 ? `${minutes} min ${seconds % 60} s` : `${Math.floor(minutes / 60)} h ${minutes % 60} min`;
 }
 
 export class Workspace {
@@ -151,10 +145,10 @@ export class Workspace {
 		else this.pasteReview = { session, text, risks };
 	}
 
-	#finished(session: TerminalSession, { command, duration, code }: FinishedCommand) {
+	#finished(session: TerminalSession, { command, duration: elapsed, code }: FinishedCommand) {
 		const tab = this.#tabOf(session);
-		if (!tab || duration < LONG_COMMAND_MS || (tab === this.active && document.hasFocus())) return;
-		const took = describeDuration(duration);
+		if (!tab || elapsed < LONG_COMMAND_MS || (tab === this.active && document.hasFocus())) return;
+		const took = duration(elapsed / 1000);
 		const body = code === 0 ? `Finished in ${took}` : `Failed after ${took}`;
 		const notification = new Notification(command || tab.title, { body, tag: tab.key });
 		notification.onclick = () => {

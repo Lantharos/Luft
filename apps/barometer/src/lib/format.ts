@@ -3,8 +3,6 @@ import { settings } from '#lib/state/settings.svelte.js';
 
 const BIT_UNITS = ['bit/s', 'kbit/s', 'Mbit/s', 'Gbit/s', 'Tbit/s'];
 const whole = new Intl.NumberFormat();
-const dateTime = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' });
-const clock = new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' });
 
 function bits(value: number) {
 	let size = value * 8;
@@ -46,29 +44,10 @@ export function count(value: number) {
 	return whole.format(Math.round(value));
 }
 
-export function duration(seconds: number) {
-	const total = Math.max(0, Math.floor(seconds));
-	const days = Math.floor(total / 86400);
-	const hours = Math.floor((total % 86400) / 3600);
-	const minutes = Math.floor((total % 3600) / 60);
-	if (days > 0) return `${days}d ${hours}h`;
-	if (hours > 0) return `${hours}h ${minutes}m`;
-	if (minutes > 0) return `${minutes}m ${total % 60}s`;
-	return `${total}s`;
-}
-
 export function cpuTime(seconds: number) {
 	const total = Math.max(0, seconds);
 	const hours = Math.floor(total / 3600);
 	const minutes = Math.floor((total % 3600) / 60);
 	const rest = (total % 60).toFixed(hours > 0 ? 0 : 1).padStart(hours > 0 ? 2 : 4, '0');
 	return hours > 0 ? `${hours}:${String(minutes).padStart(2, '0')}:${rest}` : `${minutes}:${rest}`;
-}
-
-export function date(unixSeconds: number) {
-	return dateTime.format(new Date(unixSeconds * 1000));
-}
-
-export function timeOfDay(unixSeconds: number) {
-	return clock.format(new Date(unixSeconds * 1000));
 }

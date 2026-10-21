@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Popover } from '@luft/ui';
+	import { Popover, weekdayTime } from '@luft/ui';
 	import { SNOOZES } from '#lib/app/when.js';
 
 	interface Props {
@@ -9,8 +9,6 @@
 	}
 
 	let { anchor, onpick, onclose }: Props = $props();
-
-	const time = new Intl.DateTimeFormat(undefined, { weekday: 'short', hour: 'numeric', minute: '2-digit' });
 </script>
 
 <Popover {anchor} label="Later" role="menu" align="end" minWidth={240} {onclose}>
@@ -26,7 +24,7 @@
 			}}
 		>
 			<span>{moment.label}</span>
-			<span class="text-[12px] text-[var(--text-muted)]">{time.format(at * 1000)}</span>
+			<span class="text-[12px] text-[var(--text-muted)]">{weekdayTime(at)}</span>
 		</button>
 	{/each}
 </Popover>

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { AppIcon, Dialog, errorText, memoryBytes } from '@luft/ui';
+	import { AppIcon, dateTime, Dialog, duration, errorText, memoryBytes } from '@luft/ui';
 	import type { Details } from '#lib/backend/types.js';
-	import { count, cpuTime, date, duration, percent, rate } from '#lib/format.js';
+	import { count, cpuTime, percent, rate } from '#lib/format.js';
 	import { app } from '#lib/state/app.svelte.js';
 	import { processes } from '#lib/state/processes.svelte.js';
 	import { desktopId } from '../icons';
@@ -36,7 +36,7 @@
 			{ label: 'Program', value: details.executable, mono: true },
 			{ label: 'Working folder', value: details.directory, mono: true },
 			{ label: 'User', value: details.user },
-			{ label: 'Started', value: `${date(details.started)}, ${duration(Date.now() / 1000 - details.started)} ago` },
+			{ label: 'Started', value: `${dateTime(details.started)}, ${duration(Date.now() / 1000 - details.started)} ago` },
 			{ label: 'Parent', value: details.parent ? `${details.parent} (${details.ppid})` : String(details.ppid) },
 			{ label: 'State', value: STATES[details.state] ?? details.state },
 			{ label: 'Threads', value: count(details.threads) },

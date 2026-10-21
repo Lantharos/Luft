@@ -1,6 +1,6 @@
+import { longDateTime } from '@luft/ui';
 import * as api from '#lib/api/index.js';
 import type { Address, Attached, Draft, Message, Rendered } from '#lib/api/index.js';
-import { longDate } from '#lib/app/format.js';
 import { list } from '#lib/mail/list.svelte.js';
 import { mail } from '#lib/mail/mail.svelte.js';
 import { reader } from '#lib/reader/reader.svelte.js';
@@ -47,7 +47,7 @@ function prefixed(subject: string, prefix: 'Re' | 'Fwd') {
 function quoteOf(message: Message, rendered: Rendered | null) {
 	const name = message.senderName || message.sender;
 	const body = rendered ? (rendered.plain ? `<div style="white-space:pre-wrap">${escapeHtml(rendered.text)}</div>` : rendered.html) : escapeHtml(message.snippet);
-	return `<div>On ${escapeHtml(longDate(message.date))}, ${escapeHtml(name)} wrote:</div><blockquote type="cite" style="margin:0 0 0 .8ex;border-left:2px solid #ccc;padding-left:1ex">${body}</blockquote>`;
+	return `<div>On ${escapeHtml(longDateTime(message.date))}, ${escapeHtml(name)} wrote:</div><blockquote type="cite" style="margin:0 0 0 .8ex;border-left:2px solid #ccc;padding-left:1ex">${body}</blockquote>`;
 }
 
 class Composer {
@@ -116,7 +116,7 @@ class Composer {
 	}
 
 	forward(message: Message, rendered: Rendered | null) {
-		const header = `<div>---------- Forwarded message ----------<br>From: ${escapeHtml(message.senderName)} &lt;${escapeHtml(message.sender)}&gt;<br>Date: ${escapeHtml(longDate(message.date))}<br>Subject: ${escapeHtml(message.subject)}</div>`;
+		const header = `<div>---------- Forwarded message ----------<br>From: ${escapeHtml(message.senderName)} &lt;${escapeHtml(message.sender)}&gt;<br>Date: ${escapeHtml(longDateTime(message.date))}<br>Subject: ${escapeHtml(message.subject)}</div>`;
 		const body = rendered ? (rendered.plain ? `<div style="white-space:pre-wrap">${escapeHtml(rendered.text)}</div>` : rendered.html) : '';
 		this.start({
 			...this.sendingFrom(mail.account(message.account) ? message.account : this.defaultAccount(), sendingFor(message, mail.identities)),

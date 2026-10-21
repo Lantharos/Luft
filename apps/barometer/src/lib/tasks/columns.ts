@@ -1,6 +1,6 @@
-import { bytes, memoryBytes } from '@luft/ui';
+import { bytes, memoryBytes, time } from '@luft/ui';
 import type { Usage } from '#lib/backend/rows.js';
-import { count, cpuTime, percent, rate, timeOfDay } from '#lib/format.js';
+import { count, cpuTime, percent, rate } from '#lib/format.js';
 import { monitor } from '#lib/state/monitor.svelte.js';
 import { settings, type Sort } from '#lib/state/settings.svelte.js';
 
@@ -55,7 +55,7 @@ export const COLUMNS: Column[] = [
 	{ id: 'threads', label: 'Threads', width: 76, numeric: true, value: (row) => row.threads, text: (row) => count(row.threads) },
 	{ id: 'nice', label: 'Priority', width: 76, numeric: true, value: (row) => row.nice, text: (row) => String(row.nice) },
 	{ id: 'state', label: 'State', width: 92, numeric: false, value: (row) => row.state, text: (row) => STATES[row.state] ?? row.state },
-	{ id: 'started', label: 'Started', width: 92, numeric: true, value: (row) => row.started ?? 0, text: (row) => (row.started ? timeOfDay(row.started) : '') },
+	{ id: 'started', label: 'Started', width: 92, numeric: true, value: (row) => row.started ?? 0, text: (row) => (row.started ? time(row.started) : '') },
 	{ id: 'command', label: 'Command', width: 280, numeric: false, value: (row) => row.command ?? '', text: (row) => row.command ?? '' }
 ];
 

@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { Avatar, errorText } from '@luft/ui';
+	import { Avatar, errorText, longDateTime } from '@luft/ui';
 	import Reply from '@lucide/svelte/icons/reply';
 	import * as api from '#lib/api/index.js';
 	import type { OpenedFile } from '#lib/api/index.js';
-	import { longDate } from '#lib/app/format.js';
 	import { composer } from '#lib/compose/composer.svelte.js';
 	import { mail } from '#lib/mail/mail.svelte.js';
 	import Attachments from './Attachments.svelte';
@@ -46,7 +45,7 @@
 						<p class="truncate text-[14px] font-semibold">{opened.from.name || opened.from.address} <span class="font-normal text-[var(--text-muted)]">{opened.from.address}</span></p>
 						<p class="truncate text-[12.5px] text-[var(--text-muted)]">to {[...opened.to, ...opened.cc].map((address) => address.name || address.address).join(', ')}</p>
 					</div>
-					{#if opened.date}<span class="flex-none text-[12.5px] text-[var(--text-muted)]">{longDate(opened.date)}</span>{/if}
+					{#if opened.date}<span class="flex-none text-[12.5px] text-[var(--text-muted)]">{longDateTime(opened.date)}</span>{/if}
 				</header>
 				{#if opened.rendered.remote.length && !images}
 					<button type="button" class="plain-button self-start" onclick={() => (images = true)}>Show pictures</button>

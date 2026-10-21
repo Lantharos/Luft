@@ -30,6 +30,7 @@ gcr
 gdk-pixbuf2-modules-extra
 geoclue2
 geoclue2-libs
+git-core
 gjs
 glib-networking
 glibc-all-langpacks

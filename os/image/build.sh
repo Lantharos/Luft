@@ -10,6 +10,7 @@ image_name="${LUFT_IMAGE_NAME:-localhost/luft}"
 fedora=45
 signed_parts=(boot nvidia)
 chunkah=quay.io/coreos/chunkah:v0.7.1
+bun="docker.io/oven/bun:$(sed -n 's/^ARG BUN_VERSION=//p' "$image/parts/Containerfile")-distroless"
 retries=(--retry 6 --retry-delay 20s)
 
 # shellcheck source=os/image/throwaway-keys.sh
@@ -113,12 +114,26 @@ part_target() {
   esac
 }
 
+working_tree() {
+  local index
+  index="$(mktemp)"
+  cp "$(git -C "$luft" rev-parse --path-format=absolute --git-path index)" "$index"
+  GIT_INDEX_FILE="$index" git -C "$luft" add --all
+  GIT_INDEX_FILE="$index" git -C "$luft" write-tree
+  rm "$index"
+}
+
 part_refs() {
-  local name globals=(BASE="$base" SABINE="$(sabine_tag)")
+  local name tree globals=(BASE="$base" SABINE="$(sabine_tag)")
+  tree="$(mktemp)"
+  git -C "$luft" ls-tree -r -t -z "$(working_tree)" >"$tree"
   for name in "$@"; do
     echo "$name $(part_target "$name")"
-  done | (cd "$luft" && bun "$image/parts/key.ts" "$image/parts/Containerfile" "${globals[@]}") |
+  done | podman run "${retries[@]}" --quiet --rm --interactive --network none --security-opt label=disable \
+    --volume "$image/parts/key.ts:/key.ts:ro" --volume "$image/parts/Containerfile:/Containerfile:ro" \
+    --volume "$tree:/tree:ro" "$bun" /key.ts /Containerfile /tree "${globals[@]}" |
     while read -r name key; do echo "$name $registry:$name-$key"; done
+  rm "$tree"
 }
 
 part_exists() {

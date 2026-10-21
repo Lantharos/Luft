@@ -15,8 +15,6 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: oven-sh/setup-bun@v2
-
     - uses: ./.github/actions/registry
 
     - name: Compiler cache folder

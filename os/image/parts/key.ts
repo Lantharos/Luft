@@ -1,13 +1,9 @@
-import { copyFileSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { isAbsolute, join } from 'node:path';
-
 type Stage = { name: string; image: string; instructions: string[] };
 
-const [containerfile, ...assignments] = process.argv.slice(2);
+const [containerfile, tree, ...assignments] = process.argv.slice(2);
 
-if (!containerfile) {
-  throw new Error('Usage: key.ts CONTAINERFILE [NAME=VALUE...] < "PART TARGET [NAME=VALUE...]" lines');
+if (!containerfile || !tree) {
+  throw new Error('Usage: key.ts CONTAINERFILE TREE [NAME=VALUE...] < "PART TARGET [NAME=VALUE...]" lines');
 }
 
 function parseAssignments(list: string[]) {
@@ -19,22 +15,16 @@ function parseAssignments(list: string[]) {
   );
 }
 
-function git(args: string[], env: Record<string, string> = {}) {
-  const result = Bun.spawnSync(['git', ...args], { env: { ...process.env, ...env } });
-  if (result.exitCode !== 0) throw new Error(`git ${args.join(' ')}: ${result.stderr.toString()}`);
-  return result.stdout.toString().trim();
-}
-
-function workingTree() {
-  const index = join(tmpdir(), `luft-part-index-${process.pid}`);
-  const current = git(['rev-parse', '--git-path', 'index']);
-  copyFileSync(isAbsolute(current) ? current : join(process.cwd(), current), index);
-  try {
-    git(['add', '--all'], { GIT_INDEX_FILE: index });
-    return git(['write-tree'], { GIT_INDEX_FILE: index });
-  } finally {
-    rmSync(index, { force: true });
-  }
+function treeObjects(listing: string) {
+  return new Map(
+    listing
+      .split('\0')
+      .filter(Boolean)
+      .map((entry) => {
+        const tab = entry.indexOf('\t');
+        return [entry.slice(tab + 1), entry.slice(0, tab).split(' ')[2]];
+      }),
+  );
 }
 
 function instructions(text: string) {
@@ -79,14 +69,14 @@ function flags(words: string[]) {
 }
 
 const { stages, defaults } = parse(await Bun.file(containerfile).text());
-const tree = workingTree();
-const objects = new Map<string, string>();
+const objects = treeObjects(await Bun.file(tree).text());
 const globals = parseAssignments(assignments);
 
 function object(path: string) {
   const clean = path.replace(/^\.\//, '').replace(/\/+$/, '');
-  if (!objects.has(clean)) objects.set(clean, git(['rev-parse', `${tree}:${clean}`]));
-  return objects.get(clean);
+  const id = objects.get(clean);
+  if (!id) throw new Error(`${clean} is not in the working tree`);
+  return id;
 }
 
 function key(target: string, given: Record<string, string>) {

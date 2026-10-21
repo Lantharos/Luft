@@ -65,7 +65,7 @@ os/dev/layer.sh reset                    # back to the signed image
 | `services` | The installer, updater, sleep, accounts, speech and Windows services |
 | `app-NAME` | The app in `apps/NAME` |
 
-Run it on Luft itself rather than in a toolbox; it needs Bun and Podman. The first `apply` downloads the base and sets up the builder, which takes a while; later ones only rebuild what changed. `apply` refreshes the settings schemas, icon, font, MIME and app caches over the combined system, labels everything for SELinux with the installed policy, restarts the system services the build replaces, and reloads D-Bus. Log out and back in to run a new Kestrel or a new session service.
+Run it on Luft itself rather than in a toolbox, from a clone of this repository; Luft already has the Git and Podman it needs. The first `apply` downloads the base and sets up the builder, which takes a while and around 8 GB of space; later ones only rebuild what changed. It asks for your password to lay the build over `/usr`. `apply` refreshes the settings schemas, icon, font, MIME and app caches over the combined system, labels everything for SELinux with the installed policy, restarts the system services the build replaces, and reloads D-Bus. Log out and back in to run a new Kestrel or a new session service.
 
 The build stays across restarts. When Luft updates, the next start takes it off and says so, since a build made for the previous version would hide the update's own files; run `apply` again to put your build back on the new version. It goes over [system packages](/system/software/#system-packages) the same way, and both stay merged.
 

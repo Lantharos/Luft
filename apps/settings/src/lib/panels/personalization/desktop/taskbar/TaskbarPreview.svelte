@@ -4,7 +4,7 @@
 	import Volume2 from '@lucide/svelte/icons/volume-2';
 	import Wifi from '@lucide/svelte/icons/wifi';
 	import { AppIcon, appearance, MARK_HEIGHT, MARK_LAYERS, MARK_SCALE, MARK_WIDTH, PAINTED_MARK_SCALE, type GlassShading, type Shadow } from '@luft/ui';
-	import type { App } from '../../../protection/apps/api';
+	import type { App } from '#lib/panels/protection/apps/api.js';
 	import type { Alignment, AutoHide, Look, Size, Style } from './options';
 
 	interface Props {

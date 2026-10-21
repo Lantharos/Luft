@@ -5,7 +5,7 @@
 	import { app } from '#lib/state/app.svelte.js';
 	import { hardware, type Hardware } from '#lib/state/hardware.svelte.js';
 	import { updates } from '#lib/state/updates.svelte.js';
-	import SidebarProgress from '#lib/panels/system/system/updates/SidebarProgress.svelte';
+	import SidebarProgress from '#lib/panels/system/updates/SidebarProgress.svelte';
 
 	let nav = $state<HTMLElement>();
 	let present = $derived(hardware.present);

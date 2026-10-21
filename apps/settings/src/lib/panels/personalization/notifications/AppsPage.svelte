@@ -2,7 +2,7 @@
 	import { t } from '@luft/i18n';
 	import { SearchField, Section } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
-	import { matches } from '../../protection/apps/api';
+	import { matches } from '#lib/panels/protection/apps/api.js';
 	import AppNotifications from './AppNotifications.svelte';
 	import type { NotifyingApp } from './api';
 

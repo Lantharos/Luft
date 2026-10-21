@@ -2,7 +2,7 @@
 	import { t } from '@luft/i18n';
 	import { fileUrl } from '@lantharos/sabine';
 	import { Row, Section, Segmented } from '@luft/ui';
-	import { thumbnail } from '../../../personalization/appearance/wallpaper/api';
+	import { thumbnail } from '#lib/panels/personalization/appearance/wallpaper/api.js';
 
 	interface Props {
 		wallpaper: string | null;

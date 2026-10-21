@@ -3,7 +3,7 @@
 	import { AppIcon, appearance, Row, Section, type AppIconStyle } from '@luft/ui';
 	import Swatches from '#lib/components/Swatches.svelte';
 	import { KESTREL_SCHEMA, useSettings } from '#lib/state/gsettings.svelte.js';
-	import { installedApps, type App } from '../../protection/apps/api';
+	import { installedApps, type App } from '#lib/panels/protection/apps/api.js';
 
 	type Kestrel = {
 		'app-icon-style': AppIconStyle;

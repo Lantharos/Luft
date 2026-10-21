@@ -2,8 +2,8 @@
 	import { t } from '@luft/i18n';
 	import { Row, Section, Select, Switch } from '@luft/ui';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
-	import ChooseAppDialog from '../../../protection/apps/ChooseAppDialog.svelte';
-	import { installedApps, type App } from '../../../protection/apps/api';
+	import ChooseAppDialog from '#lib/panels/protection/apps/ChooseAppDialog.svelte';
+	import { installedApps, type App } from '#lib/panels/protection/apps/api.js';
 
 	type Press = 'search' | 'app' | 'nothing';
 	type CopilotKey = { press: Press; app: string; hold: boolean };

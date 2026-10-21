@@ -50,7 +50,7 @@ const network = () => import('./connections/network/NetworkPanel.svelte');
 const input = () => import('./devices/input/InputPanel.svelte');
 const security = () => import('./protection/security/SecurityPanel.svelte');
 const accounts = () => import('./system/accounts/AccountsPanel.svelte');
-const system = () => import('./system/system/SystemPanel.svelte');
+const system = () => import('./system/SystemPanel.svelte');
 
 const VIEWS: Record<PageId, View> = {
 	network: { icon: Wifi, load: network },

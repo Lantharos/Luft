@@ -2,7 +2,7 @@
 	import HardDrive from '@lucide/svelte/icons/hard-drive';
 	import { t } from '@luft/i18n';
 	import { Row } from '@luft/ui';
-	import { openDisks } from '#lib/panels/system/system/about/api.js';
+	import { openDisks } from '#lib/panels/system/about/api.js';
 	import type { Drives } from '../api';
 	import { percent } from './describe';
 

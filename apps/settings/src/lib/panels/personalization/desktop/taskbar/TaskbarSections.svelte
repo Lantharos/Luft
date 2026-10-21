@@ -3,9 +3,9 @@
 	import { onDestroy } from 'svelte';
 	import { Row, Section, Segmented, Select, Switch } from '@luft/ui';
 	import { KESTREL_SCHEMA, useSettings } from '#lib/state/gsettings.svelte.js';
-	import { installedApps, type App } from '../../../protection/apps/api';
-	import { loadDisplays, onDisplaysChanged, type Displays } from '../../../devices/display/api';
-	import { currentWallpaper } from '../../appearance/wallpaper/current.svelte';
+	import { installedApps, type App } from '#lib/panels/protection/apps/api.js';
+	import { loadDisplays, onDisplaysChanged, type Displays } from '#lib/panels/devices/display/api.js';
+	import { currentWallpaper } from '#lib/panels/personalization/appearance/wallpaper/current.svelte.js';
 	import { ALIGNMENTS, AUTO_HIDE, LOOKS, SIZES, START_STYLES, STYLES, TASKBAR_KEYS, WEB_SEARCH, type TaskbarSettings } from './options';
 	import TaskbarPreview from './TaskbarPreview.svelte';
 

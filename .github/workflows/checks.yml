@@ -168,6 +168,12 @@ jobs:
         with:
           bun-version: latest
 
+      - uses: actions/cache@v6
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ hashFiles('**/bun.lock') }}
+          restore-keys: bun-
+
       - run: bun install --frozen-lockfile
         working-directory: .
 

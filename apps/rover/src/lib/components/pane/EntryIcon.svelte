@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Icon from '#lib/components/Icon.svelte';
+	import { KIND_ICONS } from './kind-icons';
 	import type { EntryIconName } from '#lib/utils/file-kinds.js';
 
 	interface Props {
@@ -24,6 +24,7 @@
 		code: 'code'
 	};
 
+	let Icon = $derived(KIND_ICONS[name]);
 	let showThumbnail = $derived(Boolean(thumbnail) && failedThumbnail !== thumbnail);
 	let artwork = $derived(app ? 'entry-icon--app' : `entry-icon--thumbnail entry-icon--${fit}`);
 </script>
@@ -44,6 +45,6 @@
 			onerror={() => (failedThumbnail = thumbnail)}
 		/>
 	{:else}
-		<Icon {name} size={Math.round(Math.max(14, size * 0.46))} />
+		<Icon size={Math.round(Math.max(14, size * 0.46))} />
 	{/if}
 </span>

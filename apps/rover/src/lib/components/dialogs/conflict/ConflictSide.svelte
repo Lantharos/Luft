@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { basename, bytes, tooltip } from '@luft/ui';
-	import Icon from '#lib/components/Icon.svelte';
+	import File from '@lucide/svelte/icons/file';
+	import Folder from '@lucide/svelte/icons/folder';
 	import type { ConflictItem } from '#lib/features/types.js';
 	import { formatDate, formatFullDate } from '#lib/utils/format.js';
 	import { parentPath } from '#lib/utils/paths.js';
@@ -13,13 +14,15 @@
 	}
 
 	let { heading, item, newer, larger }: Props = $props();
+
+	let Icon = $derived(item.is_dir ? Folder : File);
 </script>
 
 <div class="flex min-w-0 flex-1 flex-col gap-3 rounded-[18px] bg-[var(--surface)] p-4">
 	<span class="text-[12px] text-[var(--text-muted)]">{heading}</span>
 	<div class="flex min-w-0 items-center gap-3">
 		<span class="grid h-10 w-10 shrink-0 place-items-center rounded-[12px] bg-[var(--control)] text-[var(--text-soft)]">
-			<Icon name={item.is_dir ? 'folder' : 'file'} size={19} />
+			<Icon size={19} />
 		</span>
 		<div class="min-w-0">
 			<div class="truncate text-[14px] font-medium" {@attach tooltip(item.name)}>{item.name}</div>

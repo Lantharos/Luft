@@ -1,4 +1,7 @@
 <script lang="ts">
+	import Clock from '@lucide/svelte/icons/clock';
+	import House from '@lucide/svelte/icons/house';
+	import Trash from '@lucide/svelte/icons/trash';
 	import { isInside, SearchField, selectionPill } from '@luft/ui';
 	import type { ChooserState } from '#lib/file-manager/chooser.svelte.js';
 	import type { DragController } from '#lib/file-manager/drag/controller.svelte.js';
@@ -77,10 +80,10 @@
 	<nav class="sidebar-scroll hidden-scroll scroll-fade" aria-label="Places" {@attach selectionPill('.sidebar-item.is-active')}>
 		<div class="sidebar-group">
 			{#if showHome}
-				<SidebarItem icon="home" label="Home" {...folderItem(manager.homePath)} />
+				<SidebarItem icon={House} label="Home" {...folderItem(manager.homePath)} />
 			{/if}
 			<SidebarItem
-				icon="clock"
+				icon={Clock}
 				label="Recent"
 				active={manager.view === 'recent'}
 				onclick={() => manager.showView('recent')}
@@ -92,7 +95,7 @@
 			{/each}
 			{#if !chooser}
 				<SidebarItem
-					icon="trash"
+					icon={Trash}
 					label="Trash"
 					active={manager.view === 'trash'}
 					dropping={drag.target?.key === key(TRASH_DROP_PATH)}

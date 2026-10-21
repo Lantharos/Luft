@@ -1,6 +1,7 @@
 <script lang="ts">
+	import X from '@lucide/svelte/icons/x';
 	import { tooltip } from '@luft/ui';
-	import Icon, { type IconName } from '#lib/components/Icon.svelte';
+	import { KIND_ICONS } from '#lib/components/pane/kind-icons.js';
 	import * as bookmarks from '#lib/file-manager/places/bookmarks.js';
 	import type { ChooserState } from '#lib/file-manager/chooser.svelte.js';
 	import type { DragController } from '#lib/file-manager/drag/controller.svelte.js';
@@ -22,8 +23,6 @@
 
 	let { manager, drag, chooser, hidden, onopentab, onmenu }: Props = $props();
 
-	const BOOKMARK_ICONS = new Set<IconName>(['monitor', 'download', 'file-text', 'image', 'music', 'video', 'archive', 'code', 'package']);
-
 	let receiving = $state(false);
 	let moving = $state<string | null>(null);
 	let insertBefore = $state<string | null>(null);
@@ -34,10 +33,8 @@
 		return dropKey('sidebar', path);
 	}
 
-	function icon(bookmark: PinnedFolder): IconName {
-		const named = bookmark.icon as IconName | null;
-		if (named && BOOKMARK_ICONS.has(named)) return named;
-		return bookmark.is_dir ? 'folder' : 'file';
+	function icon(bookmark: PinnedFolder) {
+		return KIND_ICONS[bookmark.icon ?? (bookmark.is_dir ? 'folder' : 'file')];
 	}
 
 	function open(bookmark: PinnedFolder) {
@@ -144,7 +141,7 @@
 					onclick={() => bookmarks.unpin(bookmark.path)}
 					{@attach tooltip('Remove from Favorites')}
 				>
-					<Icon name="x" size={14} />
+					<X size={14} />
 				</button>
 			{/snippet}
 		</SidebarItem>

@@ -1,6 +1,8 @@
 <script lang="ts">
+	import FilePlus from '@lucide/svelte/icons/file-plus';
+	import FolderPlus from '@lucide/svelte/icons/folder-plus';
+	import Plus from '@lucide/svelte/icons/plus';
 	import { MenuButton, MenuItem, tooltip } from '@luft/ui';
-	import Icon from '#lib/components/Icon.svelte';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 
 	interface Props {
@@ -17,16 +19,16 @@
 
 <MenuButton label="New" class="icon-button" align="end" {@attach tooltip('New')}>
 	{#snippet trigger()}
-		<Icon name="plus" size={18} />
+		<Plus size={18} />
 	{/snippet}
 	{#snippet children(close)}
 		<MenuItem onclick={() => create('folder', close)}>
-			<Icon name="folder-plus" size={16} />
+			<FolderPlus size={16} />
 			<span class="flex-1">New folder</span>
 			<span class="menu-shortcut">Ctrl+Shift+N</span>
 		</MenuItem>
 		<MenuItem onclick={() => create('file', close)}>
-			<Icon name="file-plus" size={16} />
+			<FilePlus size={16} />
 			<span class="flex-1">New file</span>
 		</MenuItem>
 	{/snippet}

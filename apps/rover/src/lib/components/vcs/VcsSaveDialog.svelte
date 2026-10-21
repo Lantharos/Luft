@@ -1,7 +1,8 @@
 <script lang="ts">
+	import Check from '@lucide/svelte/icons/check';
+	import X from '@lucide/svelte/icons/x';
 	import { untrack } from 'svelte';
 	import { TextField } from '@luft/ui';
-	import Icon from '#lib/components/Icon.svelte';
 	import VcsBadge from '#lib/components/vcs/VcsBadge.svelte';
 	import type { VcsState } from '#lib/vcs/state.svelte.js';
 
@@ -55,7 +56,7 @@
 			<header class="flex h-[52px] shrink-0 items-center justify-between gap-3 px-4 shadow-[inset_0_-1px_0_var(--hairline)]">
 				<div class="text-[14px] font-medium">Commit changes</div>
 				<button class="icon-button large" type="button" aria-label="Close" onclick={close}>
-					<Icon name="x" size={16} />
+					<X size={16} />
 				</button>
 			</header>
 
@@ -89,7 +90,7 @@
 									]}
 								>
 									{#if selected.includes(file.path)}
-										<Icon name="check" size={13} />
+										<Check size={13} />
 									{/if}
 								</span>
 								<VcsBadge status={file.status} />

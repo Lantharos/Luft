@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { tooltip } from '@luft/ui';
-	import Icon from '#lib/components/Icon.svelte';
+	import { KIND_ICONS } from '#lib/components/pane/kind-icons.js';
 	import type { SearchResult } from '#lib/features/types.js';
 	import { entryIcon } from '#lib/utils/file-kinds.js';
 	import { parentPath } from '#lib/utils/paths.js';
@@ -30,6 +30,7 @@
 
 <ol bind:this={list} class="flex flex-col" role="listbox" aria-label="Results">
 	{#each results as result, index (result.path)}
+		{@const Icon = KIND_ICONS[entryIcon(result)]}
 		<li role="option" aria-selected={index === highlighted}>
 			<button
 				type="button"
@@ -38,7 +39,7 @@
 				onclick={() => onreveal(result)}
 				ondblclick={() => onopen(result)}
 			>
-				<span class="icon"><Icon name={entryIcon(result)} size={17} /></span>
+				<span class="icon"><Icon size={17} /></span>
 				<span class="min-w-0 flex-1">
 					<span class="block truncate text-[14px] text-[var(--text)]">{result.name}</span>
 					{#if result.snippet}

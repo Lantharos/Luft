@@ -1,7 +1,15 @@
 <script lang="ts">
+	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import Clock from '@lucide/svelte/icons/clock';
+	import Folder from '@lucide/svelte/icons/folder';
+	import HardDrive from '@lucide/svelte/icons/hard-drive';
+	import House from '@lucide/svelte/icons/house';
+	import Server from '@lucide/svelte/icons/server';
+	import Smartphone from '@lucide/svelte/icons/smartphone';
+	import Trash from '@lucide/svelte/icons/trash';
+	import Usb from '@lucide/svelte/icons/usb';
 	import { isInside } from '@luft/ui';
-	import { untrack } from 'svelte';
-	import Icon, { type IconName } from '#lib/components/Icon.svelte';
+	import { untrack, type Component } from 'svelte';
 	import type { DragController } from '#lib/file-manager/drag/controller.svelte.js';
 	import { dropKey } from '#lib/file-manager/drag/drop-targets.js';
 	import { PathCompletion } from '#lib/file-manager/location/completion.svelte.js';
@@ -20,11 +28,11 @@
 
 	let { manager, drag, view, acceptsDrops }: Props = $props();
 
-	type Crumb = { path: string; label: string; icon?: IconName };
+	type Crumb = { path: string; label: string; icon?: Component };
 
 	const VIEW_CRUMBS: Record<'recent' | 'trash', Crumb> = {
-		recent: { path: '', label: 'Recent', icon: 'clock' },
-		trash: { path: '', label: 'Trash', icon: 'trash' }
+		recent: { path: '', label: 'Recent', icon: Clock },
+		trash: { path: '', label: 'Trash', icon: Trash }
 	};
 
 	const completion = new PathCompletion(() => manager.homePath);
@@ -36,12 +44,12 @@
 
 	let root = $derived.by((): Crumb => {
 		const path = manager.currentPath;
-		if (isInside(path, manager.homePath)) return { path: manager.homePath, label: 'Home', icon: 'home' };
+		if (isInside(path, manager.homePath)) return { path: manager.homePath, label: 'Home', icon: House };
 		const remote = manager.network.holding(path);
-		if (remote) return { path: remote.path, label: remote.name, icon: remote.device ? 'smartphone' : 'server' };
+		if (remote) return { path: remote.path, label: remote.name, icon: remote.device ? Smartphone : Server };
 		const drive = manager.drives.holding(path);
-		if (!drive) return { path: '/', label: 'Computer', icon: 'hard-drive' };
-		return { path: drive.mount_point, label: drive.name, icon: drive.is_removable ? 'usb' : 'hard-drive' };
+		if (!drive) return { path: '/', label: 'Computer', icon: HardDrive };
+		return { path: drive.mount_point, label: drive.name, icon: drive.is_removable ? Usb : HardDrive };
 	});
 	let crumbs = $derived.by((): Crumb[] => {
 		if (manager.view !== 'home') return [VIEW_CRUMBS[manager.view]];
@@ -132,7 +140,7 @@
 						aria-selected={index === completion.index}
 						onclick={() => choose(name)}
 					>
-						<Icon name="folder" size={15} />
+						<Folder size={15} />
 						<span class="truncate">{name}</span>
 					</button>
 				{/each}
@@ -150,7 +158,7 @@
 			{#each crumbs as crumb, index (crumb.path || crumb.label)}
 				{@const accepts = acceptsDrops && Boolean(crumb.path) && drag.canDropOn(crumb.path)}
 				{#if index > 0}
-					<Icon name="chevron-right" size={14} class="path-separator" />
+					<ChevronRight size={14} class="path-separator" />
 				{/if}
 				<button
 					class={['path-crumb', index === crumbs.length - 1 && 'is-current', drag.target?.key === segmentKey(crumb.path) && 'is-drop-target']}
@@ -161,7 +169,7 @@
 					onclick={() => open(crumb.path)}
 				>
 					{#if crumb.icon}
-						<Icon name={crumb.icon} size={15} />
+						<crumb.icon size={15} />
 					{/if}
 					<span class="truncate">{crumb.label}</span>
 				</button>

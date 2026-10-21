@@ -1,7 +1,15 @@
 <script lang="ts">
+	import Archive from '@lucide/svelte/icons/archive';
+	import Check from '@lucide/svelte/icons/check';
+	import Copy from '@lucide/svelte/icons/copy';
+	import Pause from '@lucide/svelte/icons/pause';
+	import Play from '@lucide/svelte/icons/play';
+	import Trash2 from '@lucide/svelte/icons/trash-2';
+	import Upload from '@lucide/svelte/icons/upload';
+	import Usb from '@lucide/svelte/icons/usb';
+	import X from '@lucide/svelte/icons/x';
 	import { basename, bytes, plural } from '@luft/ui';
 	import * as api from '#lib/api.js';
-	import Icon from '#lib/components/Icon.svelte';
 	import type { Operation } from '#lib/types/index.js';
 	import { formatDuration } from '#lib/utils/format.js';
 
@@ -63,12 +71,12 @@
 		}[operation.op_type];
 	}
 
-	function icon(operation: Operation): 'trash-2' | 'upload' | 'copy' | 'check' | 'usb' | 'archive' {
-		if (operation.phase === 'SafeToEject') return 'check';
-		if (operation.op_type === 'Compress' || operation.op_type === 'Extract') return 'archive';
-		if (operation.phase === 'Finalizing' && operation.destination_is_removable) return 'usb';
-		if (operation.op_type === 'Delete' || operation.op_type === 'Trash') return 'trash-2';
-		return operation.op_type === 'Move' ? 'upload' : 'copy';
+	function icon(operation: Operation) {
+		if (operation.phase === 'SafeToEject') return Check;
+		if (operation.op_type === 'Compress' || operation.op_type === 'Extract') return Archive;
+		if (operation.phase === 'Finalizing' && operation.destination_is_removable) return Usb;
+		if (operation.op_type === 'Delete' || operation.op_type === 'Trash') return Trash2;
+		return operation.op_type === 'Move' ? Upload : Copy;
 	}
 
 	function subject(operation: Operation) {
@@ -108,13 +116,14 @@
 {#if visible.length > 0}
 	<div class="pointer-events-none fixed bottom-4 right-4 z-40 flex w-[360px] max-w-[calc(100%-32px)] flex-col gap-2">
 		{#each visible as operation (operation.id)}
+			{@const Icon = icon(operation)}
 			<section
 				class="pointer-events-auto rounded-[18px] bg-[color-mix(in_oklab,var(--popover)_86%,transparent)] p-3 text-[13px] shadow-[0_20px_60px_var(--shadow-soft),inset_0_1px_0_var(--hairline)] backdrop-blur-2xl"
 				aria-label={`${title(operation)} operation`}
 			>
 				<div class="flex items-center gap-3">
 					<div class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[color-mix(in_oklab,var(--ink)_8%,transparent)] text-[var(--text-soft)]">
-						<Icon name={icon(operation)} size={17} />
+						<Icon size={17} />
 					</div>
 					<div class="min-w-0 flex-1">
 						<div class="flex items-center justify-between gap-3 text-[var(--text)]">
@@ -136,15 +145,15 @@
 						<div class="flex shrink-0 items-center gap-1">
 							{#if operation.status === 'InProgress'}
 								<button class="icon-button" type="button" aria-label="Pause" onclick={() => api.pauseOperation(operation.id)}>
-									<Icon name="pause" size={14} />
+									<Pause size={14} />
 								</button>
 							{:else}
 								<button class="icon-button" type="button" aria-label="Resume" onclick={() => api.resumeOperation(operation.id)}>
-									<Icon name="play" size={14} />
+									<Play size={14} />
 								</button>
 							{/if}
 							<button class="icon-button" type="button" aria-label="Cancel" onclick={() => api.cancelOperation(operation.id)}>
-								<Icon name="x" size={14} />
+								<X size={14} />
 							</button>
 						</div>
 					{/if}

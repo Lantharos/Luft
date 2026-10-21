@@ -1,6 +1,6 @@
 <script lang="ts">
+	import Check from '@lucide/svelte/icons/check';
 	import { ContextMenu, MenuItem, MenuSeparator } from '@luft/ui';
-	import Icon from '#lib/components/Icon.svelte';
 	import { columnLabel, type ListColumns } from '#lib/file-manager/view/list-columns.svelte.js';
 
 	interface Props {
@@ -25,7 +25,7 @@
 		<MenuItem checked={column.visible} onclick={() => choose(() => columns.toggle(column.id))}>
 			<span class="flex-1">{columnLabel(column.id, recent)}</span>
 			{#if column.visible}
-				<Icon name="check" size={14} />
+				<Check size={14} />
 			{/if}
 		</MenuItem>
 	{/each}

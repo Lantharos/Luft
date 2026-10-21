@@ -1,6 +1,8 @@
 <script lang="ts">
+	import File from '@lucide/svelte/icons/file';
+	import FolderOpen from '@lucide/svelte/icons/folder-open';
+	import Save from '@lucide/svelte/icons/save';
 	import { plural } from '@luft/ui';
-	import Icon from '#lib/components/Icon.svelte';
 	import type { ChooserState } from '#lib/file-manager/chooser.svelte.js';
 
 	interface Props {
@@ -25,9 +27,7 @@
 		return config.directory ? 'Select a folder' : 'Select a file';
 	});
 	let acceptLabel = $derived(config.accept_label.trim() || (config.mode === 'save' ? 'Save' : config.mode === 'save_files' ? 'Select' : 'Open'));
-	let icon = $derived<'folder-open' | 'file' | 'save'>(
-		config.mode === 'save' ? 'save' : config.directory || config.mode === 'save_files' ? 'folder-open' : 'file'
-	);
+	let Icon = $derived(config.mode === 'save' ? Save : config.directory || config.mode === 'save_files' ? FolderOpen : File);
 
 	function focusName(input: HTMLInputElement) {
 		input.focus();
@@ -51,7 +51,7 @@
 <div class="chooser-bar flex min-h-[68px] shrink-0 items-center justify-between gap-3 px-5 py-3">
 	<div class="flex min-w-0 flex-1 items-center gap-3 text-[13px] text-[var(--text-muted)]">
 		<div class="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[var(--control)] text-[var(--text-soft)] shadow-[inset_0_1px_0_var(--hairline)]">
-			<Icon name={icon} size={18} />
+			<Icon size={18} />
 		</div>
 		<div class="min-w-0">
 			<div class="truncate text-[14px] font-medium text-[var(--text)]">{config.title.trim() || selectionText}</div>

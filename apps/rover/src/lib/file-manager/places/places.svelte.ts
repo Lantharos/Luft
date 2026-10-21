@@ -1,17 +1,23 @@
+import Download from '@lucide/svelte/icons/download';
+import FileText from '@lucide/svelte/icons/file-text';
+import Image from '@lucide/svelte/icons/image';
+import Monitor from '@lucide/svelte/icons/monitor';
+import Music from '@lucide/svelte/icons/music';
+import Video from '@lucide/svelte/icons/video';
 import { basename } from '@luft/ui';
+import type { Component } from 'svelte';
 import * as api from '#lib/api.js';
-import type { IconName } from '#lib/components/Icon.svelte';
 import type { Operation, UserDirs } from '#lib/types/index.js';
 
-export type Place = { path: string; label: string; icon: IconName };
+export type Place = { path: string; label: string; icon: Component };
 
-const USER_FOLDERS: { key: Exclude<keyof UserDirs, 'home'>; icon: IconName }[] = [
-	{ key: 'desktop', icon: 'monitor' },
-	{ key: 'documents', icon: 'file-text' },
-	{ key: 'downloads', icon: 'download' },
-	{ key: 'music', icon: 'music' },
-	{ key: 'pictures', icon: 'image' },
-	{ key: 'videos', icon: 'video' }
+const USER_FOLDERS: { key: Exclude<keyof UserDirs, 'home'>; icon: Component }[] = [
+	{ key: 'desktop', icon: Monitor },
+	{ key: 'documents', icon: FileText },
+	{ key: 'downloads', icon: Download },
+	{ key: 'music', icon: Music },
+	{ key: 'pictures', icon: Image },
+	{ key: 'videos', icon: Video }
 ];
 
 export function userFolders(dirs: UserDirs | null): Place[] {

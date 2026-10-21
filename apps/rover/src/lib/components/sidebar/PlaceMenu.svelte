@@ -1,7 +1,16 @@
 <script lang="ts">
+	import Eject from '@lucide/svelte/icons/eject';
+	import ExternalLink from '@lucide/svelte/icons/external-link';
+	import EyeOff from '@lucide/svelte/icons/eye-off';
+	import Globe from '@lucide/svelte/icons/globe';
+	import HardDrive from '@lucide/svelte/icons/hard-drive';
+	import Info from '@lucide/svelte/icons/info';
+	import Plus from '@lucide/svelte/icons/plus';
+	import Star from '@lucide/svelte/icons/star';
+	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import { ContextMenu, MenuItem, MenuSeparator } from '@luft/ui';
+	import type { Component } from 'svelte';
 	import * as api from '#lib/api.js';
-	import Icon, { type IconName } from '#lib/components/Icon.svelte';
 	import { showPathProperties } from '#lib/features/actions.js';
 	import { dialogs } from '#lib/features/dialogs.svelte.js';
 	import * as bookmarks from '#lib/file-manager/places/bookmarks.js';
@@ -52,55 +61,55 @@
 	}
 </script>
 
-{#snippet item(icon: IconName, label: string, action: () => unknown, danger = false, disabled = false)}
+{#snippet item(Icon: Component, label: string, action: () => unknown, danger = false, disabled = false)}
 	<MenuItem {danger} {disabled} onclick={() => run(action)}>
-		<Icon name={icon} size={16} />
+		<Icon size={16} />
 		<span>{label}</span>
 	</MenuItem>
 {/snippet}
 
 <ContextMenu at={menu} onclose={() => (manager.placeMenu = null)}>
-	{@render item('external-link', 'Open', open)}
+	{@render item(ExternalLink, 'Open', open)}
 	{#if opensFolder}
-		{@render item('plus', 'Open in new tab', openInTab)}
+		{@render item(Plus, 'Open in new tab', openInTab)}
 	{/if}
 	{#if place.kind === 'drive' && place.drive.is_removable}
 		{@const drive = place.drive}
-		{@render item('eject', 'Eject', () => manager.ejectDrive(drive), false, manager.drives.ejecting.has(drive.mount_point))}
+		{@render item(Eject, 'Eject', () => manager.ejectDrive(drive), false, manager.drives.ejecting.has(drive.mount_point))}
 	{/if}
 	{#if place.kind === 'drive' && manager.drives.manageable}
 		{@const drive = place.drive}
-		{@render item('hard-drive', 'Manage drive…', () => api.manageDrive(drive.mount_point).catch(manager.notify))}
+		{@render item(HardDrive, 'Manage drive…', () => api.manageDrive(drive.mount_point).catch(manager.notify))}
 	{/if}
 	{#if place.kind === 'network'}
 		{@const entry = place.entry}
 		{#if entry.location}
 			{@const location = entry.location}
-			{@render item('eject', 'Disconnect', () => manager.disconnectNetwork(location.uri))}
+			{@render item(Eject, 'Disconnect', () => manager.disconnectNetwork(location.uri))}
 		{/if}
 		{#if entry.saved}
-			{@render item('star', 'Remove from sidebar', () => manager.network.forget(entry.place.uri))}
+			{@render item(Star, 'Remove from sidebar', () => manager.network.forget(entry.place.uri))}
 		{:else}
-			{@render item('star', 'Keep in sidebar', () => manager.network.save(entry.place))}
+			{@render item(Star, 'Keep in sidebar', () => manager.network.save(entry.place))}
 		{/if}
 		<MenuSeparator />
-		{@render item('globe', 'Connect to server…', () => dialogs.connect())}
+		{@render item(Globe, 'Connect to server…', () => dialogs.connect())}
 	{/if}
 	{#if place.kind === 'folder'}
 		{@const folder = place.path}
-		{@render item('eye-off', 'Remove from sidebar', () => setPlaceHidden(folder, true))}
+		{@render item(EyeOff, 'Remove from sidebar', () => setPlaceHidden(folder, true))}
 	{/if}
 	{#if place.kind === 'favorite'}
 		{@const bookmark = place.bookmark}
-		{@render item('star', 'Remove from Favorites', () => bookmarks.unpin(bookmark.path))}
+		{@render item(Star, 'Remove from Favorites', () => bookmarks.unpin(bookmark.path))}
 	{/if}
 	{#if place.kind === 'trash'}
 		<MenuSeparator />
-		{@render item('trash-2', 'Empty trash', emptyTrash, true, trash.count === 0)}
+		{@render item(Trash2, 'Empty trash', emptyTrash, true, trash.count === 0)}
 	{/if}
 	{#if path}
 		{@const target = path}
 		<MenuSeparator />
-		{@render item('info', 'Properties', () => showPathProperties(manager, target))}
+		{@render item(Info, 'Properties', () => showPathProperties(manager, target))}
 	{/if}
 </ContextMenu>

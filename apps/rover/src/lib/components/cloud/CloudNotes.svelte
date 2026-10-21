@@ -1,7 +1,7 @@
 <script lang="ts">
+	import Copy from '@lucide/svelte/icons/copy';
 	import { basename } from '@luft/ui';
 	import * as api from '#lib/api.js';
-	import Icon from '#lib/components/Icon.svelte';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 	import type { CloudConflict, CloudDrive } from '#lib/types/cloud.js';
 
@@ -22,7 +22,7 @@
 
 {#each notes as { drive, conflict } (conflict.copy)}
 	<div class="cloud-note" role="status">
-		<Icon name="copy" size={16} class="flex-none text-[var(--text-muted)]" />
+		<Copy size={16} class="flex-none text-[var(--text-muted)]" />
 		<p class="min-w-0 flex-1">
 			<strong>{basename(conflict.path)}</strong> changed on this computer and in {PROVIDER_NAMES[drive.provider]} at the same time. Both versions are kept;
 			the other one is <strong>{basename(conflict.copy)}</strong>.

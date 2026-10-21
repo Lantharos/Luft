@@ -1,8 +1,8 @@
 <script lang="ts">
+	import X from '@lucide/svelte/icons/x';
 	import { bytes, tooltip } from '@luft/ui';
 	import { cubicOut } from 'svelte/easing';
 	import { fade } from 'svelte/transition';
-	import Icon from '#lib/components/Icon.svelte';
 	import EntryIcon from '#lib/components/pane/EntryIcon.svelte';
 	import { entryContext } from '#lib/file-manager/view/entry-props.js';
 	import { thumbnailOf } from '#lib/file-manager/listing/thumbnails.js';
@@ -43,7 +43,7 @@
 				</div>
 				<button class="button" type="button" onclick={() => manager.openEntry(entry)}>Open</button>
 				<button class="icon-button" type="button" aria-label="Close" onclick={close} {@attach tooltip('Close')}>
-					<Icon name="x" size={17} />
+					<X size={17} />
 				</button>
 			</header>
 			<div class="quicklook-body">

@@ -1,6 +1,6 @@
 <script lang="ts">
+	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import { VirtualScroller } from '@luft/ui';
-	import Icon from '#lib/components/Icon.svelte';
 	import EntryIcon from '#lib/components/pane/EntryIcon.svelte';
 	import CloudMark from '#lib/components/cloud/CloudMark.svelte';
 	import VcsBadge from '#lib/components/vcs/VcsBadge.svelte';
@@ -72,7 +72,7 @@
 			<CloudMark state={manager.cloud.stateOf(entry.path)} />
 			<VcsBadge status={vcs.statusFor(entry.path, entry.is_dir)} />
 			{#if entry.is_dir}
-				<Icon name="chevron-right" size={14} class="column-chevron" />
+				<ChevronRight size={14} class="column-chevron" />
 			{/if}
 		</div>
 	{/snippet}

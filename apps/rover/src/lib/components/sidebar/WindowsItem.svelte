@@ -1,4 +1,6 @@
 <script lang="ts">
+	import HardDrive from '@lucide/svelte/icons/hard-drive';
+	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 	import { Dialog } from '@luft/ui';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 	import type { WindowsDrive } from '#lib/types/index.js';
@@ -29,7 +31,7 @@
 
 <SidebarItem
 	class="sidebar-item--drive"
-	icon={opening ? 'refresh' : 'hard-drive'}
+	icon={opening ? RefreshCw : HardDrive}
 	spinning={opening}
 	label={drive.name}
 	disabled={opening}

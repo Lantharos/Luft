@@ -1,6 +1,12 @@
 <script lang="ts">
+	import Clock from '@lucide/svelte/icons/clock';
+	import Folder from '@lucide/svelte/icons/folder';
+	import House from '@lucide/svelte/icons/house';
+	import Plus from '@lucide/svelte/icons/plus';
+	import Trash from '@lucide/svelte/icons/trash';
+	import X from '@lucide/svelte/icons/x';
 	import { tooltip } from '@luft/ui';
-	import Icon, { type IconName } from '#lib/components/Icon.svelte';
+	import type { Component } from 'svelte';
 	import type { DragController } from '#lib/file-manager/drag/controller.svelte.js';
 	import { tabDropKey } from '#lib/file-manager/drag/drop-targets.js';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
@@ -13,11 +19,11 @@
 
 	let { manager, drag }: Props = $props();
 
-	const VIEW_ICONS: Record<'recent' | 'trash', IconName> = { recent: 'clock', trash: 'trash' };
+	const VIEW_ICONS: Record<'recent' | 'trash', Component> = { recent: Clock, trash: Trash };
 
-	function tabIcon(tab: Tab): IconName {
+	function tabIcon(tab: Tab) {
 		if (tab.view !== 'home') return VIEW_ICONS[tab.view];
-		return tab.path === manager.homePath ? 'home' : 'folder';
+		return tab.path === manager.homePath ? House : Folder;
 	}
 
 	function closeOnMiddleClick(event: MouseEvent, id: string) {
@@ -36,6 +42,7 @@
 {#if manager.tabs.list.length > 1}
 	<div class="tab-strip" role="tablist" aria-label="Tabs">
 		{#each manager.tabs.list as tab (tab.id)}
+			{@const Icon = tabIcon(tab)}
 			<div
 				class={['tab', manager.tabs.activeId === tab.id && 'is-active', drag.target?.key === tabDropKey(tab.id) && 'is-drop-target']}
 				role="presentation"
@@ -51,7 +58,7 @@
 					onclick={() => manager.switchTab(tab.id)}
 					onauxclick={(event) => closeOnMiddleClick(event, tab.id)}
 				>
-					<Icon name={tabIcon(tab)} size={14} />
+					<Icon size={14} />
 					<span class="truncate">{tab.title}</span>
 				</button>
 				<button
@@ -61,12 +68,12 @@
 					onclick={() => manager.closeTab(tab.id)}
 					onauxclick={(event) => closeOnMiddleClick(event, tab.id)}
 				>
-					<Icon name="x" size={12} />
+					<X size={12} />
 				</button>
 			</div>
 		{/each}
 		<button class="icon-button" type="button" aria-label="New tab" onclick={() => manager.openTab()} {@attach tooltip('New tab')}>
-			<Icon name="plus" size={15} />
+			<Plus size={15} />
 		</button>
 	</div>
 {/if}

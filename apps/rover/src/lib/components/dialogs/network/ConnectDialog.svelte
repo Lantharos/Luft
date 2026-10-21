@@ -1,8 +1,9 @@
 <script lang="ts">
+	import Server from '@lucide/svelte/icons/server';
+	import X from '@lucide/svelte/icons/x';
 	import { tick } from 'svelte';
 	import { Checkbox, Dialog, TextField } from '@luft/ui';
 	import * as api from '#lib/api.js';
-	import Icon from '#lib/components/Icon.svelte';
 	import { normalizeAddress, protocolName } from '#lib/file-manager/location/addresses.js';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 	import { settings } from '#lib/state/settings.svelte.js';
@@ -39,7 +40,7 @@
 {#snippet server(place: NetworkPlace, removable: boolean)}
 	<div class="server">
 		<button type="button" class="server__main" onclick={() => connect(place.uri)}>
-			<Icon name="server" size={17} />
+			<Server size={17} />
 			<span class="flex min-w-0 flex-col">
 				<span class="truncate">{place.name}</span>
 				{#if place.name !== place.uri}
@@ -49,7 +50,7 @@
 		</button>
 		{#if removable}
 			<button type="button" class="icon-button" aria-label={`Forget ${place.uri}`} onclick={() => manager.network.forgetRecent(place.uri)}>
-				<Icon name="x" size={15} />
+				<X size={15} />
 			</button>
 		{/if}
 	</div>

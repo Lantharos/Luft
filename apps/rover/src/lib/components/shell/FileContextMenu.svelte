@@ -1,6 +1,31 @@
 <script lang="ts">
+	import Archive from '@lucide/svelte/icons/archive';
+	import ChartPie from '@lucide/svelte/icons/chart-pie';
+	import Check from '@lucide/svelte/icons/check';
+	import Clipboard from '@lucide/svelte/icons/clipboard';
+	import Cloud from '@lucide/svelte/icons/cloud';
+	import Code from '@lucide/svelte/icons/code';
+	import Copy from '@lucide/svelte/icons/copy';
+	import CopyPlus from '@lucide/svelte/icons/copy-plus';
+	import Download from '@lucide/svelte/icons/download';
+	import ExternalLink from '@lucide/svelte/icons/external-link';
+	import Eye from '@lucide/svelte/icons/eye';
+	import FilePlus from '@lucide/svelte/icons/file-plus';
+	import FolderPlus from '@lucide/svelte/icons/folder-plus';
+	import Globe from '@lucide/svelte/icons/globe';
+	import Info from '@lucide/svelte/icons/info';
+	import Link from '@lucide/svelte/icons/link';
+	import PackageOpen from '@lucide/svelte/icons/package-open';
+	import Plus from '@lucide/svelte/icons/plus';
+	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
+	import Scissors from '@lucide/svelte/icons/scissors';
+	import Search from '@lucide/svelte/icons/search';
+	import SquarePen from '@lucide/svelte/icons/square-pen';
+	import Star from '@lucide/svelte/icons/star';
+	import Terminal from '@lucide/svelte/icons/terminal';
+	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import { ContextMenu, MenuItem, MenuSeparator } from '@luft/ui';
-	import Icon, { type IconName } from '#lib/components/Icon.svelte';
+	import type { Component } from 'svelte';
 	import * as tools from '#lib/features/actions.js';
 	import * as cloud from '#lib/features/cloud.js';
 	import { isArchive } from '#lib/features/archives.js';
@@ -46,78 +71,78 @@
 	}
 </script>
 
-{#snippet item(icon: IconName, label: string, action: () => unknown, danger = false, disabled = false)}
+{#snippet item(Icon: Component, label: string, action: () => unknown, danger = false, disabled = false)}
 	<MenuItem {danger} {disabled} onclick={() => run(action)}>
-		<Icon name={icon} size={16} />
+		<Icon size={16} />
 		<span>{label}</span>
 	</MenuItem>
 {/snippet}
 
 <ContextMenu at={menu} onclose={close}>
 	{#if target}
-		{@render item('external-link', 'Open', () => manager.openEntry(target))}
+		{@render item(ExternalLink, 'Open', () => manager.openEntry(target))}
 		{#if !target.is_dir}
-			{@render item('eye', 'Quick Look', view.toggleQuickLook)}
+			{@render item(Eye, 'Quick Look', view.toggleQuickLook)}
 		{/if}
 		{#if offersVcs}
-			{@render item('code', target.is_dir ? 'View project changes' : 'View changes', () => viewChanges(target))}
-			{@render item('check', target.is_dir ? 'Commit changes' : 'Commit this file', () => saveChanges(target))}
+			{@render item(Code, target.is_dir ? 'View project changes' : 'View changes', () => viewChanges(target))}
+			{@render item(Check, target.is_dir ? 'Commit changes' : 'Commit this file', () => saveChanges(target))}
 		{/if}
 		{#if target.is_dir}
-			{@render item('plus', 'Open in tab', () => manager.openTab(target.path))}
+			{@render item(Plus, 'Open in tab', () => manager.openTab(target.path))}
 		{/if}
-		{@render item('star', isPinned ? 'Remove from Favorites' : 'Add to Favorites', () => bookmarks.togglePinned(target))}
+		{@render item(Star, isPinned ? 'Remove from Favorites' : 'Add to Favorites', () => bookmarks.togglePinned(target))}
 		{#if cloudDrive}
 			<MenuSeparator />
 			{#if kept}
-				{@render item('cloud', 'Free up space', () => cloud.free(manager, targets))}
+				{@render item(Cloud, 'Free up space', () => cloud.free(manager, targets))}
 			{:else}
-				{@render item('download', 'Keep on this device', () => cloud.keep(manager, targets))}
+				{@render item(Download, 'Keep on this device', () => cloud.keep(manager, targets))}
 			{/if}
 			{#if targets.length === 1 && cloudDrive.shareLinks}
-				{@render item('link', 'Copy share link', () => cloud.copyShareLink(manager, target))}
+				{@render item(Link, 'Copy share link', () => cloud.copyShareLink(manager, target))}
 			{/if}
 			{#if targets.length === 1 && cloudDrive.web}
-				{@render item('globe', 'Open in browser', () => cloud.openInBrowser(manager, target))}
+				{@render item(Globe, 'Open in browser', () => cloud.openInBrowser(manager, target))}
 			{/if}
 		{/if}
 		<MenuSeparator />
-		{@render item('scissors', 'Cut', manager.actions.cut)}
-		{@render item('copy', 'Copy', manager.actions.copy)}
-		{@render item('copy-plus', 'Duplicate', () => tools.duplicate(manager, targets))}
-		{@render item('link', targets.length > 1 ? 'Copy paths' : 'Copy path', () => tools.copyPaths(manager, targets))}
+		{@render item(Scissors, 'Cut', manager.actions.cut)}
+		{@render item(Copy, 'Copy', manager.actions.copy)}
+		{@render item(CopyPlus, 'Duplicate', () => tools.duplicate(manager, targets))}
+		{@render item(Link, targets.length > 1 ? 'Copy paths' : 'Copy path', () => tools.copyPaths(manager, targets))}
 		<MenuSeparator />
-		{@render item('edit', targets.length > 1 ? 'Rename…' : 'Rename', () => tools.rename(manager, targets))}
-		{@render item('archive', 'Compress…', () => tools.compress(manager, targets))}
+		{@render item(SquarePen, targets.length > 1 ? 'Rename…' : 'Rename', () => tools.rename(manager, targets))}
+		{@render item(Archive, 'Compress…', () => tools.compress(manager, targets))}
 		{#if archives}
-			{@render item('package-open', 'Extract here', () => tools.extract(manager, targets))}
+			{@render item(PackageOpen, 'Extract here', () => tools.extract(manager, targets))}
 		{/if}
 		{#if target.is_dir}
-			{@render item('terminal', 'Open in terminal', () => tools.openTerminal(manager, target.path))}
+			{@render item(Terminal, 'Open in terminal', () => tools.openTerminal(manager, target.path))}
 			{#if manager.drives.manageable}
-				{@render item('chart-pie', 'See what’s using space', () => tools.exploreSpace(manager, target.path))}
+				{@render item(ChartPie, 'See what’s using space', () => tools.exploreSpace(manager, target.path))}
 			{/if}
 		{/if}
-		{@render item('info', 'Properties', () => tools.showProperties(targets))}
+		{@render item(Info, 'Properties', () => tools.showProperties(targets))}
 		<MenuSeparator />
-		{@render item('trash-2', 'Move to trash', manager.actions.trashSelected, true)}
+		{@render item(Trash2, 'Move to trash', manager.actions.trashSelected, true)}
 	{:else}
-		{@render item('folder-plus', 'New folder', () => manager.startCreate('folder'))}
-		{@render item('file-plus', 'New file', () => manager.startCreate('file'))}
+		{@render item(FolderPlus, 'New folder', () => manager.startCreate('folder'))}
+		{@render item(FilePlus, 'New file', () => manager.startCreate('file'))}
 		<MenuSeparator />
-		{@render item('clipboard', 'Paste', manager.actions.paste, false, manager.clipboard.items.length === 0)}
+		{@render item(Clipboard, 'Paste', manager.actions.paste, false, manager.clipboard.items.length === 0)}
 		<MenuSeparator />
-		{@render item('search', 'Search in this folder', () => tools.searchHere(manager))}
-		{@render item('terminal', 'Open terminal here', () => tools.openTerminal(manager, manager.currentPath))}
+		{@render item(Search, 'Search in this folder', () => tools.searchHere(manager))}
+		{@render item(Terminal, 'Open terminal here', () => tools.openTerminal(manager, manager.currentPath))}
 		{#if manager.drives.manageable}
-			{@render item('chart-pie', 'See what’s using space', () => tools.exploreSpace(manager, manager.currentPath))}
+			{@render item(ChartPie, 'See what’s using space', () => tools.exploreSpace(manager, manager.currentPath))}
 		{/if}
-		{@render item('info', 'Properties', () => tools.showPathProperties(manager, manager.currentPath))}
+		{@render item(Info, 'Properties', () => tools.showPathProperties(manager, manager.currentPath))}
 		{#if offersVcs}
 			<MenuSeparator />
-			{@render item('code', 'View project changes', () => viewChanges(null))}
-			{@render item('check', 'Commit changes', () => saveChanges(null))}
-			{@render item('refresh', 'Sync project', vcs.sync)}
+			{@render item(Code, 'View project changes', () => viewChanges(null))}
+			{@render item(Check, 'Commit changes', () => saveChanges(null))}
+			{@render item(RefreshCw, 'Sync project', vcs.sync)}
 		{/if}
 	{/if}
 </ContextMenu>

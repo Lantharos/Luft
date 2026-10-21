@@ -1,5 +1,7 @@
 <script lang="ts">
-	import Icon from '#lib/components/Icon.svelte';
+	import Check from '@lucide/svelte/icons/check';
+	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 	import VcsBadge from '#lib/components/vcs/VcsBadge.svelte';
 	import { projectSummary, statusLabel } from '#lib/vcs/format.js';
 	import type { VcsState } from '#lib/vcs/state.svelte.js';
@@ -37,7 +39,7 @@
 				aria-label="Collapse version control"
 				onclick={() => (vcs.panelOpen = false)}
 			>
-				<Icon name="chevron-right" size={16} />
+				<ChevronRight size={16} />
 			</button>
 		</header>
 
@@ -71,15 +73,15 @@
 					disabled={vcs.project.changedCount === 0 || Boolean(vcs.busy)}
 					onclick={() => vcs.openSaveDialog()}
 				>
-					<Icon name="check" size={16} />
+					<Check size={16} />
 					<span>Commit</span>
 				</button>
 				<button class="button large" type="button" disabled={Boolean(vcs.busy)} onclick={() => vcs.sync()}>
-					<Icon name="refresh" size={16} />
+					<RefreshCw size={16} />
 					<span>Sync</span>
 				</button>
 				<button class="icon-button large" type="button" aria-label="Refresh VCS status" onclick={vcs.refresh}>
-					<Icon name="refresh" size={16} />
+					<RefreshCw size={16} />
 				</button>
 			</div>
 

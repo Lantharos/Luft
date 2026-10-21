@@ -1,6 +1,8 @@
 <script lang="ts">
+	import ArrowDownWideNarrow from '@lucide/svelte/icons/arrow-down-wide-narrow';
+	import ArrowUpNarrowWide from '@lucide/svelte/icons/arrow-up-narrow-wide';
+	import Check from '@lucide/svelte/icons/check';
 	import { MenuButton, MenuItem, MenuSeparator, tooltip } from '@luft/ui';
-	import Icon from '#lib/components/Icon.svelte';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 	import { settings } from '#lib/state/settings.svelte.js';
 	import type { GroupBy, SortBy } from '#lib/types/index.js';
@@ -44,14 +46,18 @@
 
 <MenuButton label="Sort" class="icon-button" align="end" minWidth={180} {@attach tooltip('Sort')}>
 	{#snippet trigger()}
-		<Icon name={settings.value.sortAsc ? 'sort-asc' : 'sort-desc'} size={17} />
+		{#if settings.value.sortAsc}
+			<ArrowUpNarrowWide size={17} />
+		{:else}
+			<ArrowDownWideNarrow size={17} />
+		{/if}
 	{/snippet}
 	{#snippet children(close)}
 		{#each FIELDS as field (field.value)}
 			<MenuItem checked={settings.value.sortBy === field.value} onclick={() => choose(field.value, close)}>
 				<span class="flex-1">{field.label}</span>
 				{#if settings.value.sortBy === field.value}
-					<Icon name="check" size={14} />
+					<Check size={14} />
 				{/if}
 			</MenuItem>
 		{/each}
@@ -60,7 +66,7 @@
 			<MenuItem checked={settings.value.sortAsc === ascending} onclick={() => direction(ascending, close)}>
 				<span class="flex-1">{ascending ? 'Ascending' : 'Descending'}</span>
 				{#if settings.value.sortAsc === ascending}
-					<Icon name="check" size={14} />
+					<Check size={14} />
 				{/if}
 			</MenuItem>
 		{/each}
@@ -70,7 +76,7 @@
 				<MenuItem checked={settings.value.groupBy === option.value} onclick={() => group(option.value, close)}>
 					<span class="flex-1">{option.label}</span>
 					{#if settings.value.groupBy === option.value}
-						<Icon name="check" size={14} />
+						<Check size={14} />
 					{/if}
 				</MenuItem>
 			{/each}

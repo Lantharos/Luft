@@ -1,6 +1,14 @@
 <script lang="ts">
+	import ArrowUp from '@lucide/svelte/icons/arrow-up';
+	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
+	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import Columns3 from '@lucide/svelte/icons/columns-3';
+	import GitBranch from '@lucide/svelte/icons/git-branch';
+	import LayoutGrid from '@lucide/svelte/icons/layout-grid';
+	import List from '@lucide/svelte/icons/list';
+	import PanelRight from '@lucide/svelte/icons/panel-right';
 	import { Segmented, tooltip, WindowControls } from '@luft/ui';
-	import Icon, { type IconName } from '#lib/components/Icon.svelte';
+	import type { Component } from 'svelte';
 	import type { DragController } from '#lib/file-manager/drag/controller.svelte.js';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 	import type { ViewState } from '#lib/file-manager/view/view-state.svelte.js';
@@ -21,12 +29,12 @@
 
 	let { manager, drag, view, vcs, chooser }: Props = $props();
 
-	const VIEW_MODES: { value: ViewMode; label: string; icon: IconName }[] = [
-		{ value: 'list', label: 'List', icon: 'list' },
-		{ value: 'grid', label: 'Grid', icon: 'grid' },
-		{ value: 'columns', label: 'Columns', icon: 'columns-3' }
+	const VIEW_MODES: { value: ViewMode; label: string; icon: Component }[] = [
+		{ value: 'list', label: 'List', icon: List },
+		{ value: 'grid', label: 'Grid', icon: LayoutGrid },
+		{ value: 'columns', label: 'Columns', icon: Columns3 }
 	];
-	const MODE_ICONS = Object.fromEntries(VIEW_MODES.map((mode) => [mode.value, mode.icon])) as Record<ViewMode, IconName>;
+	const MODE_ICONS = Object.fromEntries(VIEW_MODES.map((mode) => [mode.value, mode.icon])) as Record<ViewMode, Component>;
 
 	let browsing = $derived(manager.view === 'home');
 </script>
@@ -34,7 +42,7 @@
 <header class="toolbar drag-region">
 	<div class="flex shrink-0 items-center gap-0.5">
 		<button class="icon-button" type="button" aria-label="Back" disabled={!manager.tabs.canGoBack} onclick={manager.goBack} {@attach tooltip('Back')}>
-			<Icon name="chevron-left" size={19} />
+			<ChevronLeft size={19} />
 		</button>
 		<button
 			class="icon-button"
@@ -44,7 +52,7 @@
 			onclick={manager.goForward}
 			{@attach tooltip('Forward')}
 		>
-			<Icon name="chevron-right" size={19} />
+			<ChevronRight size={19} />
 		</button>
 		<button
 			class="icon-button"
@@ -54,7 +62,7 @@
 			onclick={manager.goUp}
 			{@attach tooltip('Parent folder')}
 		>
-			<Icon name="arrow-up" size={17} />
+			<ArrowUp size={17} />
 		</button>
 	</div>
 
@@ -68,7 +76,7 @@
 				onclick={() => (vcs.panelOpen = !vcs.panelOpen)}
 				{@attach tooltip('Changes')}
 			>
-				<Icon name="git-branch" size={15} />
+				<GitBranch size={15} />
 				<span class="truncate">{vcs.project.branch ?? 'Git'}</span>
 				{#if vcs.project.changedCount > 0}
 					<span class="text-[var(--text-muted)]">{vcs.project.changedCount}</span>
@@ -78,7 +86,8 @@
 		{#if browsing}
 			<Segmented options={VIEW_MODES} value={manager.viewMode} label="View" onchange={manager.setViewMode}>
 				{#snippet item(option)}
-					<Icon name={MODE_ICONS[option.value]} size={16} />
+					{@const Icon = MODE_ICONS[option.value]}
+					<Icon size={16} />
 				{/snippet}
 			</Segmented>
 			<SortMenu {manager} />
@@ -94,7 +103,7 @@
 			onclick={view.toggleDetails}
 			{@attach tooltip('Details')}
 		>
-			<Icon name="panel-right" size={17} />
+			<PanelRight size={17} />
 		</button>
 		<MoreMenu {manager} {view} {chooser} />
 	</div>

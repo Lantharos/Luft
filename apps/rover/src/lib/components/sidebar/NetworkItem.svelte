@@ -1,6 +1,9 @@
 <script lang="ts">
+	import Eject from '@lucide/svelte/icons/eject';
+	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
+	import Server from '@lucide/svelte/icons/server';
+	import Smartphone from '@lucide/svelte/icons/smartphone';
 	import { isInside, tooltip } from '@luft/ui';
-	import Icon from '#lib/components/Icon.svelte';
 	import type { DragController } from '#lib/file-manager/drag/controller.svelte.js';
 	import { dropKey } from '#lib/file-manager/drag/drop-targets.js';
 	import type { FileManager, SidebarPlace } from '#lib/file-manager/manager.svelte.js';
@@ -29,7 +32,7 @@
 </script>
 
 <SidebarItem
-	icon={connecting ? 'refresh' : location?.device ? 'smartphone' : 'server'}
+	icon={connecting ? RefreshCw : location?.device ? Smartphone : Server}
 	spinning={connecting}
 	label={location?.name ?? entry.place.name}
 	{active}
@@ -51,7 +54,7 @@
 				onclick={() => manager.disconnectNetwork(location.uri)}
 				{@attach tooltip('Disconnect')}
 			>
-				<Icon name="eject" size={15} />
+				<Eject size={15} />
 			</button>
 		{/if}
 	{/snippet}

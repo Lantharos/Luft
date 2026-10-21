@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Trash from '@lucide/svelte/icons/trash';
 	import { bytes, plural, Segmented, VirtualScroller } from '@luft/ui';
 	import EntryIcon from '#lib/components/pane/EntryIcon.svelte';
 	import { dialogs } from '#lib/features/dialogs.svelte.js';
@@ -35,7 +36,7 @@
 </script>
 
 {#if items.length === 0 && !manager.loading.active}
-	<EmptyState icon="trash" title="Trash is empty" />
+	<EmptyState icon={Trash} title="Trash is empty" />
 {:else}
 	<div class="trash-bar">
 		{#if locationOptions.length > 1 && activeLocation}

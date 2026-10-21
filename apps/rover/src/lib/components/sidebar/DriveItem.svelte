@@ -1,6 +1,9 @@
 <script lang="ts">
+	import Eject from '@lucide/svelte/icons/eject';
+	import HardDrive from '@lucide/svelte/icons/hard-drive';
+	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
+	import Usb from '@lucide/svelte/icons/usb';
 	import { bytes, tooltip } from '@luft/ui';
-	import Icon from '#lib/components/Icon.svelte';
 	import type { DragController } from '#lib/file-manager/drag/controller.svelte.js';
 	import { dropKey } from '#lib/file-manager/drag/drop-targets.js';
 	import type { FileManager, SidebarPlace } from '#lib/file-manager/manager.svelte.js';
@@ -28,7 +31,7 @@
 
 <SidebarItem
 	class="sidebar-item--drive"
-	icon={ejecting ? 'refresh' : drive.is_removable ? 'usb' : 'hard-drive'}
+	icon={ejecting ? RefreshCw : drive.is_removable ? Usb : HardDrive}
 	spinning={ejecting}
 	label={ejecting ? `${drive.name} · Ejecting` : drive.name}
 	{active}
@@ -57,7 +60,7 @@
 				onclick={() => manager.ejectDrive(drive)}
 				{@attach tooltip('Eject')}
 			>
-				<Icon name="eject" size={15} />
+				<Eject size={15} />
 			</button>
 		{/if}
 	{/snippet}

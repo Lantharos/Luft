@@ -1,5 +1,6 @@
 import type { Appearance } from '@luft/ui';
 import type { Conflict } from '#lib/features/types.js';
+import type { EntryIconName } from '#lib/utils/file-kinds.js';
 
 export interface FileEntry {
 	name: string;
@@ -120,7 +121,7 @@ export interface PinnedFolder {
 	name: string;
 	path: string;
 	is_dir: boolean;
-	icon: string | null;
+	icon: EntryIconName | null;
 }
 
 export type ListColumnId = 'date' | 'size' | 'kind';

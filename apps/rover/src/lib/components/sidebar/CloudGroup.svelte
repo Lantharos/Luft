@@ -1,7 +1,13 @@
 <script lang="ts">
+	import CircleAlert from '@lucide/svelte/icons/circle-alert';
+	import Cloud from '@lucide/svelte/icons/cloud';
+	import CloudOff from '@lucide/svelte/icons/cloud-off';
+	import Pause from '@lucide/svelte/icons/pause';
+	import Plus from '@lucide/svelte/icons/plus';
+	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 	import { isInside, tooltip } from '@luft/ui';
+	import type { Component } from 'svelte';
 	import * as api from '#lib/api.js';
-	import Icon, { type IconName } from '#lib/components/Icon.svelte';
 	import type { DragController } from '#lib/file-manager/drag/controller.svelte.js';
 	import { dropKey } from '#lib/file-manager/drag/drop-targets.js';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
@@ -17,10 +23,10 @@
 
 	let { manager, drag, adding, onopentab }: Props = $props();
 
-	function mark(drive: CloudDrive): { icon: IconName; label: string } | null {
-		if (drive.state === 'signInAgain') return { icon: 'alert-circle', label: 'Sign in again in Settings' };
-		if (drive.paused) return { icon: 'pause', label: drive.paused === 'metered' ? 'Paused on a metered connection' : 'Paused while the battery is low' };
-		if (drive.syncing > 0) return { icon: 'refresh', label: 'Syncing' };
+	function mark(drive: CloudDrive): { icon: Component; label: string; spinning?: boolean } | null {
+		if (drive.state === 'signInAgain') return { icon: CircleAlert, label: 'Sign in again in Settings' };
+		if (drive.paused) return { icon: Pause, label: drive.paused === 'metered' ? 'Paused on a metered connection' : 'Paused while the battery is low' };
+		if (drive.syncing > 0) return { icon: RefreshCw, label: 'Syncing', spinning: true };
 		return null;
 	}
 
@@ -34,7 +40,7 @@
 		<span>Cloud</span>
 		{#if adding}
 			<button class="sidebar-item__action" type="button" aria-label="Add a cloud account" onclick={add} {@attach tooltip('Add an account')}>
-				<Icon name="plus" size={15} />
+				<Plus size={15} />
 			</button>
 		{/if}
 	</div>
@@ -42,7 +48,7 @@
 		{@const key = dropKey('sidebar', drive.path)}
 		{@const status = mark(drive)}
 		<SidebarItem
-			icon={drive.state === 'offline' ? 'cloud-off' : 'cloud'}
+			icon={drive.state === 'offline' ? CloudOff : Cloud}
 			label={drive.name}
 			active={manager.view === 'home' && isInside(manager.currentPath, drive.path)}
 			dropping={drag.target?.key === key}
@@ -55,7 +61,7 @@
 			{#snippet trailing()}
 				{#if status}
 					<span class="sidebar-item__status" {@attach tooltip(status.label)}>
-						<Icon name={status.icon} size={14} class={status.icon === 'refresh' ? 'animate-spin' : ''} />
+						<status.icon size={14} class={status.spinning ? 'animate-spin' : ''} />
 					</span>
 				{/if}
 			{/snippet}

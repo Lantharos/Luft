@@ -49,8 +49,7 @@ jobs:
 
       - uses: oven-sh/setup-bun@v2
 
-      - name: Sign in to the registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | podman login ghcr.io --username "${{ github.actor }}" --password-stdin
+      - uses: ./.github/actions/registry
 
       - name: Version and release notes
         id: version
@@ -167,16 +166,16 @@ jobs:
       REFERENCE: ${{ needs.plan.outputs.reference }}
       RELEASE_NOTES: ${{ needs.plan.outputs.notes }}
     steps:
-      - name: Make room
-        run: nohup sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache /usr/local/share/boost >/dev/null 2>&1 &
-
       - uses: actions/checkout@v7
+
+      - uses: ./.github/actions/make-room
 
       - uses: oven-sh/setup-bun@v2
 
-      - name: Sign in to the registry
+      - uses: ./.github/actions/registry
+
+      - name: Build folders
         run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | podman login ghcr.io --username "${{ github.actor }}" --password-stdin
           {
             echo "LUFT_IMAGE_STATE=$RUNNER_TEMP/image"
             echo "TMPDIR=$RUNNER_TEMP"
@@ -222,8 +221,11 @@ jobs:
       VERSION: ${{ needs.plan.outputs.version }}
       TAGS: ${{ needs.plan.outputs.tags }}
     steps:
-      - name: Sign in to the registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | podman login ghcr.io --username "${{ github.actor }}" --password-stdin
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: .github/actions
+
+      - uses: ./.github/actions/registry
 
       - name: Tag both images
         run: |

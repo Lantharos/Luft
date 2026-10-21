@@ -17,11 +17,11 @@ runs:
   steps:
     - uses: oven-sh/setup-bun@v2
 
-    - name: Sign in to the registry
+    - uses: ./.github/actions/registry
+
+    - name: Compiler cache folder
       shell: bash
-      run: |
-        echo "${{ github.token }}" | podman login ghcr.io --username "${{ github.actor }}" --password-stdin
-        echo "LUFT_IMAGE_CACHE=$RUNNER_TEMP/luft-cache" >> "$GITHUB_ENV"
+      run: echo "LUFT_IMAGE_CACHE=$RUNNER_TEMP/luft-cache" >> "$GITHUB_ENV"
 
     - name: Restore the compiler caches
       uses: actions/cache/restore@v6

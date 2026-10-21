@@ -7,8 +7,8 @@
 	import { changing, rowStatus } from '#lib/encryption.svelte.js';
 	import { filesystemName, inner, jobText, usedShare, volumeName } from '#lib/format.js';
 	import { disks } from '#lib/state/disks.svelte.js';
-	import ActionMenu from '../ActionMenu.svelte';
-	import { primaryAction, volumeMenu } from '../actions';
+	import ActionMenu from '../../ActionMenu.svelte';
+	import { primaryAction, volumeMenu } from '../../actions';
 	import UsageRing from './UsageRing.svelte';
 
 	interface Props {

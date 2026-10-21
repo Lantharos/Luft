@@ -3,7 +3,7 @@
 	import { segmentKey } from '#lib/state/disks.svelte.js';
 	import FreeRow from './FreeRow.svelte';
 	import PartitionRow from './PartitionRow.svelte';
-	import { tones } from './tones';
+	import { tones } from '../tones';
 
 	interface Props {
 		drive: Drive;

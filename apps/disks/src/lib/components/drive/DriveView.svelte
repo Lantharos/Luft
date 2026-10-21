@@ -6,8 +6,8 @@
 	import DriveHeader from './DriveHeader.svelte';
 	import HealthRow from './HealthRow.svelte';
 	import ImageProgress from './ImageProgress.svelte';
-	import PartitionList from './PartitionList.svelte';
-	import SystemRows from './SystemRows.svelte';
+	import PartitionList from './partitions/PartitionList.svelte';
+	import SystemRows from './partitions/SystemRows.svelte';
 
 	interface Props {
 		drive: Drive;

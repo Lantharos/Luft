@@ -356,6 +356,7 @@ settings-shortcuts-title = Kiirklahvid
 settings-shortcuts-search = Otsi kiirklahve
 settings-shortcuts-category-system = Süsteem
 settings-shortcuts-category-windows = Aknad
+settings-shortcuts-category-tiling = Paanimine
 settings-shortcuts-category-workspaces = Tööalad
 settings-shortcuts-category-screenshots = Kuvatõmmised
 settings-shortcuts-category-media = Meedia

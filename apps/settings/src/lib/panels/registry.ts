@@ -9,6 +9,7 @@ import Globe from '@lucide/svelte/icons/globe';
 import Info from '@lucide/svelte/icons/info';
 import Keyboard from '@lucide/svelte/icons/keyboard';
 import LayoutGrid from '@lucide/svelte/icons/layout-grid';
+import LayoutPanelLeft from '@lucide/svelte/icons/layout-panel-left';
 import LogIn from '@lucide/svelte/icons/log-in';
 import Mic from '@lucide/svelte/icons/mic';
 import Monitor from '@lucide/svelte/icons/monitor';
@@ -84,6 +85,7 @@ const VIEWS: Record<PageId, View> = {
 	updates: { icon: RefreshCw, load: () => import('./system/updates/UpdatesPanel.svelte') },
 	about: { icon: Info, load: () => import('./system/about/AboutPanel.svelte') },
 	'appearance/taskbar': { icon: PanelBottom, load: appearance },
+	'appearance/tiling': { icon: LayoutPanelLeft, load: appearance },
 	'appearance/fonts': { icon: Type, load: appearance },
 	'appearance/cursors': { icon: MousePointer2, load: appearance },
 	'keyboard/dictation': { icon: Mic, load: keyboard },

@@ -222,6 +222,34 @@ settings-notifications-keep-description = Si no, desapareixen quan es tanca el b
 settings-notifications-app-lock-screen = Mostra-les a la pantalla de bloqueig
 settings-notifications-done = Fet
 
+## Window tiling
+
+settings-tiling-preview = Previsualització de la disposició de finestres
+settings-tiling-title = Mosaic de finestres
+settings-tiling-back = Aparença
+settings-tiling-mode = Organitza les finestres
+settings-tiling-mode-off = Desactivat
+settings-tiling-mode-tiling = Mosaic
+settings-tiling-mode-scrolling = Desplaçament
+settings-tiling-mode-off-description = Les finestres es queden on les poses i s’ajusten a les vores i als cantons
+settings-tiling-mode-tiling-description = Les finestres noves comparteixen la pantalla amb les altres, sense superposar-se
+settings-tiling-mode-scrolling-description = Cada finestra s’obre com una columna en una franja que es desplaça de costat
+settings-tiling-layout = Disposició
+settings-tiling-layout-dwindle = Espiral
+settings-tiling-layout-master = Principal i pila
+settings-tiling-layout-dwindle-description = Cada finestra nova divideix en dos la finestra activa
+settings-tiling-layout-master-description = Una finestra gran a l’esquerra i la resta apilades a la dreta
+settings-tiling-gaps = Espais
+settings-tiling-gaps-none = Cap
+settings-tiling-gaps-small = Petit
+settings-tiling-gaps-medium = Mitjà
+settings-tiling-gaps-large = Gran
+settings-tiling-new-windows = Les finestres noves s’obren
+settings-tiling-new-beside = Al costat de la finestra activa
+settings-tiling-new-at-end = Al final
+settings-tiling-shortcuts = Dreceres del mosaic
+settings-tiling-shortcuts-description = Activa, mou i canvia la mida de les finestres en mosaic amb el teclat
+
 ## Accessibility
 
 settings-accessibility-seeing = Visió

@@ -46,6 +46,8 @@ settings-page-about = Despre
 
 settings-page-taskbar = Bara de activități și Start
     .keywords = bară, panou, dock, ascundere automată, ascunde automat, ascunde bara de activități, plutitoare, transparentă, aplicații fixate, aliniere, butonul start, meniul start, meniu start, gust, bară de căutare, lansator, launcher, căutare pe web, căutare web, motor de căutare, ecrane, spațiu de lucru, desktop, desktop virtual
+settings-page-tiling = Așezarea ferestrelor în mozaic
+    .keywords = mozaic, ferestre în mozaic, tiling, derulare, coloane, spații, spirală, dwindle, principală și stivă, master, ferestre flotante, aranjarea ferestrelor, multitasking
 settings-page-fonts = Fonturi
     .keywords = toate fonturile, caractere, familii de fonturi, instalare fonturi, eliminare fonturi
 settings-page-cursors = Teme de cursor

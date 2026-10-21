@@ -124,6 +124,24 @@ desktop-shortcut-maximize-vertically = Immassimizza t-tieqa vertikalment
 desktop-shortcut-maximize-horizontally = Immassimizza t-tieqa orizzontalment
 desktop-shortcut-toggle-tiled-left = Allinja t-tieqa man-nofs tax-xellug
 desktop-shortcut-toggle-tiled-right = Allinja t-tieqa man-nofs tal-lemin
+desktop-shortcut-tiling-focus-left = Attiva t-tieqa fuq ix-xellug
+desktop-shortcut-tiling-focus-right = Attiva t-tieqa fuq il-lemin
+desktop-shortcut-tiling-focus-up = Attiva t-tieqa ta’ fuq
+desktop-shortcut-tiling-focus-down = Attiva t-tieqa ta’ taħt
+desktop-shortcut-tiling-move-left = Ċaqlaq it-tieqa lejn ix-xellug
+desktop-shortcut-tiling-move-right = Ċaqlaq it-tieqa lejn il-lemin
+desktop-shortcut-tiling-move-up = Ċaqlaq it-tieqa ’l fuq
+desktop-shortcut-tiling-move-down = Ċaqlaq it-tieqa ’l isfel
+desktop-shortcut-tiling-resize-left = Ċaqlaq it-tarf tat-tieqa lejn ix-xellug
+desktop-shortcut-tiling-resize-right = Ċaqlaq it-tarf tat-tieqa lejn il-lemin
+desktop-shortcut-tiling-resize-up = Ċaqlaq it-tarf tat-tieqa ’l fuq
+desktop-shortcut-tiling-resize-down = Ċaqlaq it-tarf tat-tieqa ’l isfel
+desktop-shortcut-tiling-toggle-floating = Ħalli t-tieqa tgħum jew poġġiha ħdejn l-oħrajn
+desktop-shortcut-tiling-cycle-width = Biddel il-wisa’ tal-kolonna
+desktop-shortcut-tiling-center-column = Iċċentra l-kolonna
+desktop-shortcut-tiling-overview = Uri l-istrixxa kollha
+desktop-shortcut-tiling-stack-left = Għaqqad fil-kolonna fuq ix-xellug
+desktop-shortcut-tiling-stack-right = Għaqqad fil-kolonna fuq il-lemin
 
 ## Sound
 desktop-sound-meter-stream = Livell tal-input

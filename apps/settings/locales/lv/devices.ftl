@@ -365,6 +365,7 @@ settings-shortcuts-title = Īsinājumtaustiņi
 settings-shortcuts-search = Meklēt īsinājumtaustiņus
 settings-shortcuts-category-system = Sistēma
 settings-shortcuts-category-windows = Logi
+settings-shortcuts-category-tiling = Flīzes
 settings-shortcuts-category-workspaces = Darbvietas
 settings-shortcuts-category-screenshots = Ekrānuzņēmumi
 settings-shortcuts-category-media = Multivide

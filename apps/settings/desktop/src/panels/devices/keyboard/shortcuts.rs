@@ -21,6 +21,7 @@ const DESCRIPTIONS: &str = "gnome-control-center/keybindings";
 enum Category {
     System,
     Windows,
+    Tiling,
     Workspaces,
     Screenshots,
     Media,
@@ -99,6 +100,9 @@ fn descriptions() -> Descriptions {
 }
 
 fn category(key: &str, group: &str) -> Category {
+    if key.starts_with("tiling-") {
+        return Category::Tiling;
+    }
     if key.contains("workspace") {
         return Category::Workspaces;
     }

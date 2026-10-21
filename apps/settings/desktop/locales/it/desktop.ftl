@@ -124,6 +124,24 @@ desktop-shortcut-maximize-vertically = Ingrandisci la finestra in verticale
 desktop-shortcut-maximize-horizontally = Ingrandisci la finestra in orizzontale
 desktop-shortcut-toggle-tiled-left = Ancora la finestra alla metà sinistra
 desktop-shortcut-toggle-tiled-right = Ancora la finestra alla metà destra
+desktop-shortcut-tiling-focus-left = Attiva la finestra a sinistra
+desktop-shortcut-tiling-focus-right = Attiva la finestra a destra
+desktop-shortcut-tiling-focus-up = Attiva la finestra sopra
+desktop-shortcut-tiling-focus-down = Attiva la finestra sotto
+desktop-shortcut-tiling-move-left = Sposta la finestra a sinistra
+desktop-shortcut-tiling-move-right = Sposta la finestra a destra
+desktop-shortcut-tiling-move-up = Sposta la finestra in alto
+desktop-shortcut-tiling-move-down = Sposta la finestra in basso
+desktop-shortcut-tiling-resize-left = Sposta il bordo della finestra a sinistra
+desktop-shortcut-tiling-resize-right = Sposta il bordo della finestra a destra
+desktop-shortcut-tiling-resize-up = Sposta il bordo della finestra in alto
+desktop-shortcut-tiling-resize-down = Sposta il bordo della finestra in basso
+desktop-shortcut-tiling-toggle-floating = Rendi mobile o affianca la finestra
+desktop-shortcut-tiling-cycle-width = Cambia la larghezza della colonna
+desktop-shortcut-tiling-center-column = Centra la colonna
+desktop-shortcut-tiling-overview = Mostra tutta la striscia
+desktop-shortcut-tiling-stack-left = Impila nella colonna a sinistra
+desktop-shortcut-tiling-stack-right = Impila nella colonna a destra
 
 ## Sound
 desktop-sound-meter-stream = Livello di ingresso

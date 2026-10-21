@@ -46,6 +46,8 @@ settings-page-about = Apie
 
 settings-page-taskbar = Užduočių juosta ir Pradžia
     .keywords = skydelis, dokas, automatiškai slėpti, slėpti automatiškai, slėpti užduočių juostą, plaukiojanti, permatoma, skaidri, prisegtos programos, lygiuotė, lygiavimas, mygtukas pradžia, pradžios mygtukas, start, meniu pradžia, start meniu, gust, paieškos juosta, paleidyklė, launcher, žiniatinklio paieška, paieška internete, paieškos sistema, search engine, ekranai, darbo sritis, darbalaukis, virtualus darbalaukis
+settings-page-tiling = Langų išklotinė
+    .keywords = išklotinė, išklotinės langai, tiling, slinkimas, stulpeliai, tarpai, spiralė, dwindle, pagrindinis ir krūva, master, slankieji langai, langų išdėstymas, multitasking, daugiaprogramis darbas
 settings-page-fonts = Šriftai
     .keywords = visi šriftai, garnitūros, šriftų šeimos, įdiegti šriftus, šriftų diegimas, pašalinti šriftus
 settings-page-cursors = Žymiklių temos

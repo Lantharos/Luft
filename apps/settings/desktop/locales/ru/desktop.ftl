@@ -124,6 +124,24 @@ desktop-shortcut-maximize-vertically = Развернуть окно по вер
 desktop-shortcut-maximize-horizontally = Развернуть окно по горизонтали
 desktop-shortcut-toggle-tiled-left = Прикрепить окно к левой половине
 desktop-shortcut-toggle-tiled-right = Прикрепить окно к правой половине
+desktop-shortcut-tiling-focus-left = Перейти к окну слева
+desktop-shortcut-tiling-focus-right = Перейти к окну справа
+desktop-shortcut-tiling-focus-up = Перейти к окну сверху
+desktop-shortcut-tiling-focus-down = Перейти к окну снизу
+desktop-shortcut-tiling-move-left = Переместить окно влево
+desktop-shortcut-tiling-move-right = Переместить окно вправо
+desktop-shortcut-tiling-move-up = Переместить окно вверх
+desktop-shortcut-tiling-move-down = Переместить окно вниз
+desktop-shortcut-tiling-resize-left = Сдвинуть край окна влево
+desktop-shortcut-tiling-resize-right = Сдвинуть край окна вправо
+desktop-shortcut-tiling-resize-up = Сдвинуть край окна вверх
+desktop-shortcut-tiling-resize-down = Сдвинуть край окна вниз
+desktop-shortcut-tiling-toggle-floating = Сделать окно плавающим или вернуть в мозаику
+desktop-shortcut-tiling-cycle-width = Изменить ширину колонки
+desktop-shortcut-tiling-center-column = Выровнять колонку по центру
+desktop-shortcut-tiling-overview = Показать всю ленту
+desktop-shortcut-tiling-stack-left = Добавить в колонку слева
+desktop-shortcut-tiling-stack-right = Добавить в колонку справа
 
 ## Sound
 desktop-sound-meter-stream = Уровень входного сигнала

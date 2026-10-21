@@ -226,6 +226,34 @@ settings-notifications-keep-description = Иначе уведомления ис
 settings-notifications-app-lock-screen = Показывать на экране блокировки
 settings-notifications-done = Готово
 
+## Window tiling
+
+settings-tiling-preview = Предпросмотр расположения окон
+settings-tiling-title = Мозаичное расположение окон
+settings-tiling-back = Оформление
+settings-tiling-mode = Расположение окон
+settings-tiling-mode-off = Выключено
+settings-tiling-mode-tiling = Мозаика
+settings-tiling-mode-scrolling = Прокрутка
+settings-tiling-mode-off-description = Окна остаются там, куда вы их положили, и прикрепляются к краям и углам
+settings-tiling-mode-tiling-description = Новые окна делят экран с остальными, и ничего не перекрывается
+settings-tiling-mode-scrolling-description = Каждое окно открывается колонкой на ленте, которая прокручивается в сторону
+settings-tiling-layout = Раскладка
+settings-tiling-layout-dwindle = Спираль
+settings-tiling-layout-master = Главное и стопка
+settings-tiling-layout-dwindle-description = Каждое новое окно делит активное окно надвое
+settings-tiling-layout-master-description = Одно большое окно слева, остальные стопкой справа
+settings-tiling-gaps = Отступы
+settings-tiling-gaps-none = Нет
+settings-tiling-gaps-small = Маленькие
+settings-tiling-gaps-medium = Средние
+settings-tiling-gaps-large = Большие
+settings-tiling-new-windows = Новые окна открываются
+settings-tiling-new-beside = Рядом с активным окном
+settings-tiling-new-at-end = В конце
+settings-tiling-shortcuts = Сочетания клавиш для мозаики
+settings-tiling-shortcuts-description = Переключайтесь между окнами мозаики, перемещайте их и меняйте их размер с клавиатуры
+
 ## Accessibility
 
 settings-accessibility-seeing = Зрение

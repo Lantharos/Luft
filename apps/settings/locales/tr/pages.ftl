@@ -46,6 +46,8 @@ settings-page-about = Hakkında
 
 settings-page-taskbar = Görev çubuğu ve Başlat
     .keywords = panel, dock, otomatik gizle, otomatik gizleme, görev çubuğunu gizle, kayan, saydam, sabitlenmiş uygulamalar, hizalama, başlat düğmesi, başlat menüsü, start menü, gust, arama çubuğu, başlatıcı, launcher, web araması, internette ara, arama motoru, ekranlar, çalışma alanı, masaüstü, sanal masaüstü
+settings-page-tiling = Pencere döşeme
+    .keywords = döşeme, döşenmiş pencereler, tiling, kaydırma, sütunlar, boşluklar, spiral, dwindle, ana ve yığın, master, yüzen pencereler, pencere düzeni, multitasking, çoklu görev
 settings-page-fonts = Yazı tipleri
     .keywords = tüm yazı tipleri, fontlar, yazı tipi aileleri, yazı tipi yükle, yazı tipi kaldır
 settings-page-cursors = İmleç temaları

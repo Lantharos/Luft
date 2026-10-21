@@ -146,6 +146,24 @@ desktop-shortcut-maximize-vertically = Maximize window vertically
 desktop-shortcut-maximize-horizontally = Maximize window horizontally
 desktop-shortcut-toggle-tiled-left = Snap the window to the left half
 desktop-shortcut-toggle-tiled-right = Snap the window to the right half
+desktop-shortcut-tiling-focus-left = Focus the window on the left
+desktop-shortcut-tiling-focus-right = Focus the window on the right
+desktop-shortcut-tiling-focus-up = Focus the window above
+desktop-shortcut-tiling-focus-down = Focus the window below
+desktop-shortcut-tiling-move-left = Move the window left
+desktop-shortcut-tiling-move-right = Move the window right
+desktop-shortcut-tiling-move-up = Move the window up
+desktop-shortcut-tiling-move-down = Move the window down
+desktop-shortcut-tiling-resize-left = Move the window edge left
+desktop-shortcut-tiling-resize-right = Move the window edge right
+desktop-shortcut-tiling-resize-up = Move the window edge up
+desktop-shortcut-tiling-resize-down = Move the window edge down
+desktop-shortcut-tiling-toggle-floating = Float or tile the window
+desktop-shortcut-tiling-cycle-width = Change the column width
+desktop-shortcut-tiling-center-column = Center the column
+desktop-shortcut-tiling-overview = Show the whole strip
+desktop-shortcut-tiling-stack-left = Stack into the column on the left
+desktop-shortcut-tiling-stack-right = Stack into the column on the right
 
 ## Sound
 # Name of the recording stream Settings opens to show the microphone level; other sound apps may list it

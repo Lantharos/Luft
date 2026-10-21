@@ -124,6 +124,24 @@ desktop-shortcut-maximize-vertically = Максимизирај го прозо�
 desktop-shortcut-maximize-horizontally = Максимизирај го прозорецот хоризонтално
 desktop-shortcut-toggle-tiled-left = Прилепи го прозорецот на левата половина
 desktop-shortcut-toggle-tiled-right = Прилепи го прозорецот на десната половина
+desktop-shortcut-tiling-focus-left = Активирај го прозорецот лево
+desktop-shortcut-tiling-focus-right = Активирај го прозорецот десно
+desktop-shortcut-tiling-focus-up = Активирај го прозорецот горе
+desktop-shortcut-tiling-focus-down = Активирај го прозорецот долу
+desktop-shortcut-tiling-move-left = Премести го прозорецот лево
+desktop-shortcut-tiling-move-right = Премести го прозорецот десно
+desktop-shortcut-tiling-move-up = Премести го прозорецот нагоре
+desktop-shortcut-tiling-move-down = Премести го прозорецот надолу
+desktop-shortcut-tiling-resize-left = Премести го работ на прозорецот лево
+desktop-shortcut-tiling-resize-right = Премести го работ на прозорецот десно
+desktop-shortcut-tiling-resize-up = Премести го работ на прозорецот нагоре
+desktop-shortcut-tiling-resize-down = Премести го работ на прозорецот надолу
+desktop-shortcut-tiling-toggle-floating = Нека прозорецот лебди или поплочи го
+desktop-shortcut-tiling-cycle-width = Смени ја ширината на колоната
+desktop-shortcut-tiling-center-column = Центрирај ја колоната
+desktop-shortcut-tiling-overview = Прикажи ја целата лента
+desktop-shortcut-tiling-stack-left = Нареди во колоната лево
+desktop-shortcut-tiling-stack-right = Нареди во колоната десно
 
 ## Sound
 desktop-sound-meter-stream = Ниво на влезот

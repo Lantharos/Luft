@@ -356,6 +356,7 @@ settings-shortcuts-title = Клавишни комбинации
 settings-shortcuts-search = Търсене на клавишни комбинации
 settings-shortcuts-category-system = Система
 settings-shortcuts-category-windows = Прозорци
+settings-shortcuts-category-tiling = Плочки
 settings-shortcuts-category-workspaces = Работни пространства
 settings-shortcuts-category-screenshots = Екранни снимки
 settings-shortcuts-category-media = Мултимедия

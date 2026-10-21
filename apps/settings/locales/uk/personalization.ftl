@@ -226,6 +226,34 @@ settings-notifications-keep-description = Інакше вони зникають
 settings-notifications-app-lock-screen = Показувати на екрані блокування
 settings-notifications-done = Готово
 
+## Window tiling
+
+settings-tiling-preview = Попередній перегляд розташування вікон
+settings-tiling-title = Мозаїчне розташування вікон
+settings-tiling-back = Вигляд
+settings-tiling-mode = Розташування вікон
+settings-tiling-mode-off = Вимкнено
+settings-tiling-mode-tiling = Мозаїка
+settings-tiling-mode-scrolling = Прокручування
+settings-tiling-mode-off-description = Вікна залишаються там, куди ви їх поклали, і прикріплюються до країв і кутів
+settings-tiling-mode-tiling-description = Нові вікна ділять екран з іншими, тож ніщо не перекривається
+settings-tiling-mode-scrolling-description = Кожне вікно відкривається колонкою на стрічці, яка прокручується вбік
+settings-tiling-layout = Розкладка
+settings-tiling-layout-dwindle = Спіраль
+settings-tiling-layout-master = Головне і стос
+settings-tiling-layout-dwindle-description = Кожне нове вікно ділить активне вікно навпіл
+settings-tiling-layout-master-description = Одне велике вікно ліворуч, решта стосом праворуч
+settings-tiling-gaps = Проміжки
+settings-tiling-gaps-none = Немає
+settings-tiling-gaps-small = Малі
+settings-tiling-gaps-medium = Середні
+settings-tiling-gaps-large = Великі
+settings-tiling-new-windows = Нові вікна відкриваються
+settings-tiling-new-beside = Поруч з активним вікном
+settings-tiling-new-at-end = У кінці
+settings-tiling-shortcuts = Клавіатурні скорочення мозаїки
+settings-tiling-shortcuts-description = Перемикайтеся між вікнами мозаїки, переміщуйте їх і змінюйте їхній розмір з клавіатури
+
 ## Accessibility
 
 settings-accessibility-seeing = Зір

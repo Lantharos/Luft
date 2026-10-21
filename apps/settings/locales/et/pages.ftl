@@ -46,6 +46,8 @@ settings-page-about = Teave
 
 settings-page-taskbar = Tegumiriba ja Start
     .keywords = paneel, riba, dokk, automaatne peitmine, peida automaatselt, peida tegumiriba, hõljuv, läbipaistev, kinnitatud rakendused, joondus, start-nupp, nupp start, menüü start, start-menüü, start menu, gust, otsinguriba, käivitaja, launcher, veebiotsing, otsingumootor, search engine, kuvarid, tööala, töölaud, virtuaalne töölaud
+settings-page-tiling = Akende paanimine
+    .keywords = paanimine, paanitud aknad, tiling, kerimine, veerud, vahed, spiraal, dwindle, põhiaken ja virn, master, ujuvad aknad, akende paigutus, multitegumtöö
 settings-page-fonts = Fondid
     .keywords = kõik fondid, kirjatüübid, šriftid, fondiperekonnad, fontide installimine, fontide eemaldamine
 settings-page-cursors = Kursoriteemad

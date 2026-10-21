@@ -356,6 +356,7 @@ settings-shortcuts-title = Shkurtoret e tastierës
 settings-shortcuts-search = Kërko shkurtore
 settings-shortcuts-category-system = Sistemi
 settings-shortcuts-category-windows = Dritaret
+settings-shortcuts-category-tiling = Krah për krah
 settings-shortcuts-category-workspaces = Hapësirat e punës
 settings-shortcuts-category-screenshots = Fotot e ekranit
 settings-shortcuts-category-media = Media

@@ -46,6 +46,8 @@ settings-page-about = Rreth
 
 settings-page-taskbar = Shiriti i detyrave dhe Fillimi
     .keywords = panel, dok, fshihe automatikisht, fshihu automatikisht, fshih shiritin e detyrave, pluskues, i tejdukshëm, transparent, aplikacione të fiksuara, rreshtim, butoni i fillimit, fillimi, menyja e fillimit, start menu, gust, shiriti i kërkimit, nisës, launcher, kërkim në ueb, motor kërkimi, ekranet, hapësirë pune, desktop, desktop virtual
+settings-page-tiling = Renditja e dritareve krah për krah
+    .keywords = krah për krah, dritare krah për krah, tiling, rrëshqitje, kolona, hapësira, spirale, dwindle, kryesore dhe pirg, master, dritare pluskuese, renditja e dritareve, multitasking, shumë detyra
 settings-page-fonts = Shkronjat
     .keywords = të gjitha shkronjat, fonte, lloje shkronjash, familje shkronjash, instalo shkronja, hiq shkronja
 settings-page-cursors = Temat e kursorit

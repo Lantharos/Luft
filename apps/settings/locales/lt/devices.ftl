@@ -374,6 +374,7 @@ settings-shortcuts-title = Spartieji klavišai
 settings-shortcuts-search = Ieškoti sparčiųjų klavišų
 settings-shortcuts-category-system = Sistema
 settings-shortcuts-category-windows = Langai
+settings-shortcuts-category-tiling = Išklotinė
 settings-shortcuts-category-workspaces = Darbo sritys
 settings-shortcuts-category-screenshots = Ekrano kopijos
 settings-shortcuts-category-media = Medija

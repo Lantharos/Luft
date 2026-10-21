@@ -356,6 +356,7 @@ settings-shortcuts-title = Tastenkürzel
 settings-shortcuts-search = Tastenkürzel durchsuchen
 settings-shortcuts-category-system = System
 settings-shortcuts-category-windows = Fenster
+settings-shortcuts-category-tiling = Kacheln
 settings-shortcuts-category-workspaces = Arbeitsflächen
 settings-shortcuts-category-screenshots = Bildschirmfotos
 settings-shortcuts-category-media = Medien

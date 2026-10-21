@@ -222,6 +222,34 @@ settings-notifications-keep-description = Ellers forsvinder de, når deres banne
 settings-notifications-app-lock-screen = Vis på låseskærmen
 settings-notifications-done = Udført
 
+## Window tiling
+
+settings-tiling-preview = Forhåndsvisning af vinduesarrangement
+settings-tiling-title = Fliselægning af vinduer
+settings-tiling-back = Udseende
+settings-tiling-mode = Arranger vinduer
+settings-tiling-mode-off = Fra
+settings-tiling-mode-tiling = Fliser
+settings-tiling-mode-scrolling = Rulning
+settings-tiling-mode-off-description = Vinduer bliver, hvor du lægger dem, og dokker ved kanter og hjørner
+settings-tiling-mode-tiling-description = Nye vinduer deler skærmen med de andre, så intet overlapper
+settings-tiling-mode-scrolling-description = Hvert vindue åbner som en kolonne på en strimmel, der ruller til siden
+settings-tiling-layout = Layout
+settings-tiling-layout-dwindle = Spiral
+settings-tiling-layout-master = Hoved og stak
+settings-tiling-layout-dwindle-description = Hvert nyt vindue deler det aktive vindue i to
+settings-tiling-layout-master-description = Ét stort vindue til venstre, resten stablet til højre
+settings-tiling-gaps = Mellemrum
+settings-tiling-gaps-none = Ingen
+settings-tiling-gaps-small = Små
+settings-tiling-gaps-medium = Mellem
+settings-tiling-gaps-large = Store
+settings-tiling-new-windows = Nye vinduer åbner
+settings-tiling-new-beside = Ved siden af det aktive vindue
+settings-tiling-new-at-end = Til sidst
+settings-tiling-shortcuts = Genveje til fliser
+settings-tiling-shortcuts-description = Aktivér, flyt og tilpas fliselagte vinduer med tastaturet
+
 ## Accessibility
 
 settings-accessibility-seeing = Syn

@@ -356,6 +356,7 @@ settings-shortcuts-title = Flýtilyklar
 settings-shortcuts-search = Leita að flýtilyklum
 settings-shortcuts-category-system = Kerfi
 settings-shortcuts-category-windows = Gluggar
+settings-shortcuts-category-tiling = Flísar
 settings-shortcuts-category-workspaces = Vinnusvæði
 settings-shortcuts-category-screenshots = Skjámyndir
 settings-shortcuts-category-media = Margmiðlun

@@ -15,7 +15,6 @@
 	const store = new ShortcutStore();
 
 	let recording = $state<Binding | null>(null);
-	let browsing = $state(false);
 
 	const dictation = useSettings<{ enabled: boolean }>('com.lantharos.kestrel.dictation', ['enabled']);
 
@@ -24,8 +23,8 @@
 
 {#if app.section === 'dictation'}
 	<DictationPage {store} onrecord={record} onclose={() => (app.section = null)} />
-{:else if browsing}
-	<ShortcutsPage {store} onrecord={record} onclose={() => (browsing = false)} />
+{:else if app.section === 'shortcuts'}
+	<ShortcutsPage {store} onrecord={record} onclose={() => (app.section = null)} />
 {:else}
 	<InputSources {store} onrecord={record} />
 	<TypingSection />
@@ -34,7 +33,7 @@
 	{/if}
 	<Section>
 		<Row title={t('settings-dictation-title')} description={dictation.values.enabled ? t('settings-keyboard-dictation-on') : t('settings-keyboard-dictation-off')} onclick={() => (app.section = 'dictation')} />
-		<Row title={t('settings-shortcuts-title')} description={t('settings-keyboard-shortcuts-description')} onclick={() => (browsing = true)} />
+		<Row title={t('settings-shortcuts-title')} description={t('settings-keyboard-shortcuts-description')} onclick={() => (app.section = 'shortcuts')} />
 	</Section>
 {/if}
 

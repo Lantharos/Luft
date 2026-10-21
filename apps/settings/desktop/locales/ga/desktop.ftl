@@ -124,6 +124,24 @@ desktop-shortcut-maximize-vertically = Uasmhéadaigh an fhuinneog go hingearach
 desktop-shortcut-maximize-horizontally = Uasmhéadaigh an fhuinneog go cothrománach
 desktop-shortcut-toggle-tiled-left = Snapáil an fhuinneog go dtí an leath chlé
 desktop-shortcut-toggle-tiled-right = Snapáil an fhuinneog go dtí an leath dheas
+desktop-shortcut-tiling-focus-left = Gníomhachtaigh an fhuinneog ar chlé
+desktop-shortcut-tiling-focus-right = Gníomhachtaigh an fhuinneog ar dheis
+desktop-shortcut-tiling-focus-up = Gníomhachtaigh an fhuinneog thuas
+desktop-shortcut-tiling-focus-down = Gníomhachtaigh an fhuinneog thíos
+desktop-shortcut-tiling-move-left = Bog an fhuinneog ar chlé
+desktop-shortcut-tiling-move-right = Bog an fhuinneog ar dheis
+desktop-shortcut-tiling-move-up = Bog an fhuinneog suas
+desktop-shortcut-tiling-move-down = Bog an fhuinneog síos
+desktop-shortcut-tiling-resize-left = Bog imeall na fuinneoige ar chlé
+desktop-shortcut-tiling-resize-right = Bog imeall na fuinneoige ar dheis
+desktop-shortcut-tiling-resize-up = Bog imeall na fuinneoige suas
+desktop-shortcut-tiling-resize-down = Bog imeall na fuinneoige síos
+desktop-shortcut-tiling-toggle-floating = Cuir an fhuinneog ar snámh nó tíleáil í
+desktop-shortcut-tiling-cycle-width = Athraigh leithead an cholúin
+desktop-shortcut-tiling-center-column = Láraigh an colún
+desktop-shortcut-tiling-overview = Taispeáin an stiall ar fad
+desktop-shortcut-tiling-stack-left = Cruach sa cholún ar chlé
+desktop-shortcut-tiling-stack-right = Cruach sa cholún ar dheis
 
 ## Sound
 desktop-sound-meter-stream = Leibhéal ionchuir

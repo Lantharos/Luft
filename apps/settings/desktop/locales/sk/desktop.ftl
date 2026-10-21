@@ -124,6 +124,24 @@ desktop-shortcut-maximize-vertically = Maximalizovať okno zvisle
 desktop-shortcut-maximize-horizontally = Maximalizovať okno vodorovne
 desktop-shortcut-toggle-tiled-left = Prichytiť okno k ľavej polovici
 desktop-shortcut-toggle-tiled-right = Prichytiť okno k pravej polovici
+desktop-shortcut-tiling-focus-left = Aktivovať okno vľavo
+desktop-shortcut-tiling-focus-right = Aktivovať okno vpravo
+desktop-shortcut-tiling-focus-up = Aktivovať okno hore
+desktop-shortcut-tiling-focus-down = Aktivovať okno dole
+desktop-shortcut-tiling-move-left = Presunúť okno doľava
+desktop-shortcut-tiling-move-right = Presunúť okno doprava
+desktop-shortcut-tiling-move-up = Presunúť okno nahor
+desktop-shortcut-tiling-move-down = Presunúť okno nadol
+desktop-shortcut-tiling-resize-left = Posunúť okraj okna doľava
+desktop-shortcut-tiling-resize-right = Posunúť okraj okna doprava
+desktop-shortcut-tiling-resize-up = Posunúť okraj okna nahor
+desktop-shortcut-tiling-resize-down = Posunúť okraj okna nadol
+desktop-shortcut-tiling-toggle-floating = Nechať okno plávať alebo z neho urobiť dlaždicu
+desktop-shortcut-tiling-cycle-width = Zmeniť šírku stĺpca
+desktop-shortcut-tiling-center-column = Vycentrovať stĺpec
+desktop-shortcut-tiling-overview = Zobraziť celý pás
+desktop-shortcut-tiling-stack-left = Pridať do stĺpca vľavo
+desktop-shortcut-tiling-stack-right = Pridať do stĺpca vpravo
 
 ## Sound
 desktop-sound-meter-stream = Úroveň vstupu

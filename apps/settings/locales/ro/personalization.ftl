@@ -224,6 +224,34 @@ settings-notifications-keep-description = Altfel dispar după ce li se închide 
 settings-notifications-app-lock-screen = Afișează pe ecranul de blocare
 settings-notifications-done = Gata
 
+## Window tiling
+
+settings-tiling-preview = Previzualizarea aranjării ferestrelor
+settings-tiling-title = Așezarea ferestrelor în mozaic
+settings-tiling-back = Aspect
+settings-tiling-mode = Aranjează ferestrele
+settings-tiling-mode-off = Dezactivat
+settings-tiling-mode-tiling = Mozaic
+settings-tiling-mode-scrolling = Derulare
+settings-tiling-mode-off-description = Ferestrele rămân unde le pui și se andochează la margini și colțuri
+settings-tiling-mode-tiling-description = Ferestrele noi împart ecranul cu celelalte, fără suprapuneri
+settings-tiling-mode-scrolling-description = Fiecare fereastră se deschide ca o coloană pe o bandă care derulează lateral
+settings-tiling-layout = Aranjament
+settings-tiling-layout-dwindle = Spirală
+settings-tiling-layout-master = Principală și stivă
+settings-tiling-layout-dwindle-description = Fiecare fereastră nouă împarte în două fereastra activă
+settings-tiling-layout-master-description = O fereastră mare în stânga, celelalte stivuite în dreapta
+settings-tiling-gaps = Spații
+settings-tiling-gaps-none = Fără
+settings-tiling-gaps-small = Mici
+settings-tiling-gaps-medium = Medii
+settings-tiling-gaps-large = Mari
+settings-tiling-new-windows = Ferestrele noi se deschid
+settings-tiling-new-beside = Lângă fereastra activă
+settings-tiling-new-at-end = La sfârșit
+settings-tiling-shortcuts = Scurtături pentru mozaic
+settings-tiling-shortcuts-description = Activează, mută și redimensionează ferestrele în mozaic de la tastatură
+
 ## Accessibility
 
 settings-accessibility-seeing = Vedere

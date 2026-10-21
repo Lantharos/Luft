@@ -222,6 +222,34 @@ settings-notifications-keep-description = Инаку исчезнуваат ко
 settings-notifications-app-lock-screen = Прикажи на заклучениот екран
 settings-notifications-done = Готово
 
+## Window tiling
+
+settings-tiling-preview = Преглед на распоредот на прозорците
+settings-tiling-title = Поплочување на прозорци
+settings-tiling-back = Изглед
+settings-tiling-mode = Распоредување прозорци
+settings-tiling-mode-off = Исклучено
+settings-tiling-mode-tiling = Поплочување
+settings-tiling-mode-scrolling = Лизгање
+settings-tiling-mode-off-description = Прозорците остануваат каде што ги ставате и се прилепуваат до рабовите и аглите
+settings-tiling-mode-tiling-description = Новите прозорци го делат екранот со другите, па ништо не се преклопува
+settings-tiling-mode-scrolling-description = Секој прозорец се отвора како колона на лента што се лизга настрана
+settings-tiling-layout = Распоред
+settings-tiling-layout-dwindle = Спирала
+settings-tiling-layout-master = Главен и куп
+settings-tiling-layout-dwindle-description = Секој нов прозорец го дели активниот прозорец на два дела
+settings-tiling-layout-master-description = Еден голем прозорец лево, другите наредени десно
+settings-tiling-gaps = Растојанија
+settings-tiling-gaps-none = Без растојание
+settings-tiling-gaps-small = Мали
+settings-tiling-gaps-medium = Средни
+settings-tiling-gaps-large = Големи
+settings-tiling-new-windows = Новите прозорци се отвораат
+settings-tiling-new-beside = До активниот прозорец
+settings-tiling-new-at-end = На крајот
+settings-tiling-shortcuts = Кратенки за поплочување
+settings-tiling-shortcuts-description = Активирајте, преместувајте и менувајте ја големината на поплочените прозорци со тастатурата
+
 ## Accessibility
 
 settings-accessibility-seeing = Вид

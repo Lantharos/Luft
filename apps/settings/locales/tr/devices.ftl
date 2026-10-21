@@ -356,6 +356,7 @@ settings-shortcuts-title = Klavye kısayolları
 settings-shortcuts-search = Kısayollarda ara
 settings-shortcuts-category-system = Sistem
 settings-shortcuts-category-windows = Pencereler
+settings-shortcuts-category-tiling = Döşeme
 settings-shortcuts-category-workspaces = Çalışma alanları
 settings-shortcuts-category-screenshots = Ekran görüntüleri
 settings-shortcuts-category-media = Medya

@@ -222,6 +222,34 @@ settings-notifications-keep-description = Muidu kaovad need, kui nende bänner s
 settings-notifications-app-lock-screen = Kuva lukustuskuval
 settings-notifications-done = Valmis
 
+## Window tiling
+
+settings-tiling-preview = Akende paigutuse eelvaade
+settings-tiling-title = Akende paanimine
+settings-tiling-back = Välimus
+settings-tiling-mode = Akende paigutus
+settings-tiling-mode-off = Väljas
+settings-tiling-mode-tiling = Paanid
+settings-tiling-mode-scrolling = Kerimine
+settings-tiling-mode-off-description = Aknad jäävad sinna, kuhu need paned, ning paigutuvad servade ja nurkade järgi
+settings-tiling-mode-tiling-description = Uued aknad jagavad ekraani teistega, nii et miski ei kattu
+settings-tiling-mode-scrolling-description = Iga aken avaneb veeruna ribal, mis kerib külgsuunas
+settings-tiling-layout = Paigutus
+settings-tiling-layout-dwindle = Spiraal
+settings-tiling-layout-master = Põhiaken ja virn
+settings-tiling-layout-dwindle-description = Iga uus aken jagab aktiivse akna kaheks
+settings-tiling-layout-master-description = Üks suur aken vasakul, ülejäänud virnas paremal
+settings-tiling-gaps = Vahed
+settings-tiling-gaps-none = Puuduvad
+settings-tiling-gaps-small = Väikesed
+settings-tiling-gaps-medium = Keskmised
+settings-tiling-gaps-large = Suured
+settings-tiling-new-windows = Uued aknad avanevad
+settings-tiling-new-beside = Aktiivse akna kõrval
+settings-tiling-new-at-end = Lõpus
+settings-tiling-shortcuts = Paanimise kiirklahvid
+settings-tiling-shortcuts-description = Paanitud akende aktiveerimine, liigutamine ja suuruse muutmine klaviatuuriga
+
 ## Accessibility
 
 settings-accessibility-seeing = Nägemine

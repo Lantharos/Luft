@@ -356,6 +356,7 @@ settings-shortcuts-title = Sneltoetsen
 settings-shortcuts-search = Sneltoetsen zoeken
 settings-shortcuts-category-system = Systeem
 settings-shortcuts-category-windows = Vensters
+settings-shortcuts-category-tiling = Tegelen
 settings-shortcuts-category-workspaces = Werkbladen
 settings-shortcuts-category-screenshots = Schermafbeeldingen
 settings-shortcuts-category-media = Media

@@ -46,6 +46,8 @@ settings-page-about = Eolas
 
 settings-page-taskbar = Tascbharra agus Tosaigh
     .keywords = painéal, duga, dock, folaigh go huathoibríoch, folaigh an tascbharra, ar snámh, trédhearcach, aipeanna pionnáilte, ailíniú, cnaipe tosaigh, tosaigh, start, roghchlár tosaigh, start menu, gust, barra cuardaigh, lainseálaí, launcher, cuardach gréasáin, inneall cuardaigh, search engine, scáileáin, spás oibre, deasc, deasc fhíorúil
+settings-page-tiling = Tíleáil fuinneog
+    .keywords = tíleáil, fuinneoga tíleáilte, tiling, scrollú, colúin, bearnaí, bíseach, dwindle, príomhfhuinneog agus cruach, master, fuinneoga ar snámh, leagan amach fuinneog, iltascáil
 settings-page-fonts = Clónna
     .keywords = gach cló, clófhoirne, teaghlaigh clónna, suiteáil clónna, bain clónna
 settings-page-cursors = Téamaí cúrsóra

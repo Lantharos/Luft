@@ -46,6 +46,8 @@ settings-page-about = Om
 
 settings-page-taskbar = Oppgavelinje og Start
     .keywords = panel, dokk, skjul automatisk, autoskjul, skjul oppgavelinjen, flytende, gjennomsiktig, festede apper, justering, plassering, startknapp, start-menyen, startmeny, gust, søkefelt, søkelinje, launcher, appstarter, nettsøk, søk på nettet, søkemotor, skjermer, arbeidsområde, skrivebord, virtuelt skrivebord
+settings-page-tiling = Flislegging av vinduer
+    .keywords = fliser, flislagte vinduer, tiling, rulling, kolonner, mellomrom, spiral, dwindle, hoved og stabel, master, flytende vinduer, vindusoppsett, multitasking, fleroppgavekjøring
 settings-page-fonts = Skrifter
     .keywords = alle skrifter, fonter, skrifttyper, skriftfamilier, installer skrifter, fjern skrifter
 settings-page-cursors = Markørtemaer

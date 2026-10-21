@@ -374,6 +374,7 @@ settings-shortcuts-title = Bližnjice na tipkovnici
 settings-shortcuts-search = Iskanje bližnjic
 settings-shortcuts-category-system = Sistem
 settings-shortcuts-category-windows = Okna
+settings-shortcuts-category-tiling = Tlakovanje
 settings-shortcuts-category-workspaces = Delovne površine
 settings-shortcuts-category-screenshots = Posnetki zaslona
 settings-shortcuts-category-media = Predstavnost

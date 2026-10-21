@@ -124,6 +124,24 @@ desktop-shortcut-maximize-vertically = Максимизиране на проз�
 desktop-shortcut-maximize-horizontally = Максимизиране на прозореца по хоризонтала
 desktop-shortcut-toggle-tiled-left = Прилепване на прозореца в лявата половина
 desktop-shortcut-toggle-tiled-right = Прилепване на прозореца в дясната половина
+desktop-shortcut-tiling-focus-left = Активиране на прозореца вляво
+desktop-shortcut-tiling-focus-right = Активиране на прозореца вдясно
+desktop-shortcut-tiling-focus-up = Активиране на прозореца отгоре
+desktop-shortcut-tiling-focus-down = Активиране на прозореца отдолу
+desktop-shortcut-tiling-move-left = Преместване на прозореца наляво
+desktop-shortcut-tiling-move-right = Преместване на прозореца надясно
+desktop-shortcut-tiling-move-up = Преместване на прозореца нагоре
+desktop-shortcut-tiling-move-down = Преместване на прозореца надолу
+desktop-shortcut-tiling-resize-left = Преместване на ръба на прозореца наляво
+desktop-shortcut-tiling-resize-right = Преместване на ръба на прозореца надясно
+desktop-shortcut-tiling-resize-up = Преместване на ръба на прозореца нагоре
+desktop-shortcut-tiling-resize-down = Преместване на ръба на прозореца надолу
+desktop-shortcut-tiling-toggle-floating = Плаващ прозорец или в плочки
+desktop-shortcut-tiling-cycle-width = Промяна на ширината на колоната
+desktop-shortcut-tiling-center-column = Центриране на колоната
+desktop-shortcut-tiling-overview = Показване на цялата лента
+desktop-shortcut-tiling-stack-left = Добавяне към колоната вляво
+desktop-shortcut-tiling-stack-right = Добавяне към колоната вдясно
 
 ## Sound
 desktop-sound-meter-stream = Входно ниво

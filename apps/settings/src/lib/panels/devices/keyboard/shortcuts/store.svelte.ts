@@ -8,6 +8,16 @@ const CUSTOM_SCHEMA = 'com.lantharos.kestrel.custom-keybinding';
 const CUSTOM_ROOT = '/com/lantharos/kestrel/media-keys/custom-keybindings/';
 const CUSTOM_KEYS = ['name', 'command', 'binding'] as const;
 const KESTREL = 'com.lantharos.kestrel';
+const REPLACED_WHILE_TILING = new Set([
+	'toggle-tiled-left',
+	'toggle-tiled-right',
+	'maximize',
+	'unmaximize',
+	'move-to-monitor-left',
+	'move-to-monitor-right',
+	'move-to-monitor-up',
+	'move-to-monitor-down'
+]);
 
 type Accelerators = Record<string, string[]>;
 type Registered = Record<string, Record<string, { description: string; shortcuts: string[] }>>;
@@ -24,6 +34,11 @@ export type SystemBinding = Base & { kind: 'system'; schema: string; key: string
 export type AppBinding = Base & { kind: 'app'; app: string; appName: string; shortcut: string };
 export type CustomBinding = Base & { kind: 'custom'; path: string; command: string };
 export type Binding = SystemBinding | AppBinding | CustomBinding;
+
+function takeTurns(a: Binding, b: Binding) {
+	if (a.kind !== 'system' || b.kind !== 'system') return false;
+	return (a.category === 'tiling' && REPLACED_WHILE_TILING.has(b.key)) || (b.category === 'tiling' && REPLACED_WHILE_TILING.has(a.key));
+}
 
 export class ShortcutStore {
 	entries = $state.raw<ShortcutEntry[]>([]);
@@ -126,7 +141,9 @@ export class ShortcutStore {
 
 	conflict(accelerator: string, binding: Binding) {
 		const wanted = canonical(accelerator);
-		return this.all.find((other) => other.id !== binding.id && other.accelerators.some((existing) => canonical(existing) === wanted));
+		return this.all.find(
+			(other) => other.id !== binding.id && !takeTurns(binding, other) && other.accelerators.some((existing) => canonical(existing) === wanted)
+		);
 	}
 
 	async assign(binding: Binding, accelerators: string[]) {

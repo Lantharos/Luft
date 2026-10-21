@@ -383,6 +383,7 @@ settings-shortcuts-title = Shortcuts tat-tastiera
 settings-shortcuts-search = Fittex shortcuts
 settings-shortcuts-category-system = Sistema
 settings-shortcuts-category-windows = Twieqi
+settings-shortcuts-category-tiling = Ħdejn xulxin
 settings-shortcuts-category-workspaces = Spazji tax-xogħol
 settings-shortcuts-category-screenshots = Screenshots
 settings-shortcuts-category-media = Midja

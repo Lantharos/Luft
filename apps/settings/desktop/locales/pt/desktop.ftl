@@ -124,6 +124,24 @@ desktop-shortcut-maximize-vertically = Maximizar a janela na vertical
 desktop-shortcut-maximize-horizontally = Maximizar a janela na horizontal
 desktop-shortcut-toggle-tiled-left = Ajustar a janela à metade esquerda
 desktop-shortcut-toggle-tiled-right = Ajustar a janela à metade direita
+desktop-shortcut-tiling-focus-left = Ativar a janela à esquerda
+desktop-shortcut-tiling-focus-right = Ativar a janela à direita
+desktop-shortcut-tiling-focus-up = Ativar a janela acima
+desktop-shortcut-tiling-focus-down = Ativar a janela abaixo
+desktop-shortcut-tiling-move-left = Mover a janela para a esquerda
+desktop-shortcut-tiling-move-right = Mover a janela para a direita
+desktop-shortcut-tiling-move-up = Mover a janela para cima
+desktop-shortcut-tiling-move-down = Mover a janela para baixo
+desktop-shortcut-tiling-resize-left = Mover a margem da janela para a esquerda
+desktop-shortcut-tiling-resize-right = Mover a margem da janela para a direita
+desktop-shortcut-tiling-resize-up = Mover a margem da janela para cima
+desktop-shortcut-tiling-resize-down = Mover a margem da janela para baixo
+desktop-shortcut-tiling-toggle-floating = Tornar a janela flutuante ou pô-la em mosaico
+desktop-shortcut-tiling-cycle-width = Mudar a largura da coluna
+desktop-shortcut-tiling-center-column = Centrar a coluna
+desktop-shortcut-tiling-overview = Mostrar a faixa inteira
+desktop-shortcut-tiling-stack-left = Empilhar na coluna à esquerda
+desktop-shortcut-tiling-stack-right = Empilhar na coluna à direita
 
 ## Sound
 desktop-sound-meter-stream = Nível de entrada

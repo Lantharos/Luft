@@ -356,6 +356,7 @@ settings-shortcuts-title = Dreceres de teclat
 settings-shortcuts-search = Cerca dreceres
 settings-shortcuts-category-system = Sistema
 settings-shortcuts-category-windows = Finestres
+settings-shortcuts-category-tiling = Mosaic
 settings-shortcuts-category-workspaces = Espais de treball
 settings-shortcuts-category-screenshots = Captures de pantalla
 settings-shortcuts-category-media = Multimèdia

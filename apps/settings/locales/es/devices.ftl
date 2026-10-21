@@ -356,6 +356,7 @@ settings-shortcuts-title = Atajos de teclado
 settings-shortcuts-search = Buscar atajos
 settings-shortcuts-category-system = Sistema
 settings-shortcuts-category-windows = Ventanas
+settings-shortcuts-category-tiling = Mosaico
 settings-shortcuts-category-workspaces = Áreas de trabajo
 settings-shortcuts-category-screenshots = Capturas de pantalla
 settings-shortcuts-category-media = Multimedia

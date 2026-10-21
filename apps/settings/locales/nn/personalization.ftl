@@ -222,6 +222,34 @@ settings-notifications-keep-description = Elles forsvinn dei når banneret blir 
 settings-notifications-app-lock-screen = Vis på låseskjermen
 settings-notifications-done = Ferdig
 
+## Window tiling
+
+settings-tiling-preview = Førehandsvising av vindaugsoppsett
+settings-tiling-title = Flislegging av vindauge
+settings-tiling-back = Utsjånad
+settings-tiling-mode = Ordne vindauge
+settings-tiling-mode-off = Av
+settings-tiling-mode-tiling = Fliser
+settings-tiling-mode-scrolling = Rulling
+settings-tiling-mode-off-description = Vindauge blir der du legg dei, og vert dokka mot kantar og hjørne
+settings-tiling-mode-tiling-description = Nye vindauge deler skjermen med dei andre, så ingenting overlappar
+settings-tiling-mode-scrolling-description = Kvart vindauge opnar seg som ein kolonne på ei stripe som rullar sidelengs
+settings-tiling-layout = Oppsett
+settings-tiling-layout-dwindle = Spiral
+settings-tiling-layout-master = Hovud og stabel
+settings-tiling-layout-dwindle-description = Kvart nytt vindauge deler det aktive vindauget i to
+settings-tiling-layout-master-description = Eitt stort vindauge til venstre, resten stabla til høgre
+settings-tiling-gaps = Mellomrom
+settings-tiling-gaps-none = Ingen
+settings-tiling-gaps-small = Små
+settings-tiling-gaps-medium = Middels
+settings-tiling-gaps-large = Store
+settings-tiling-new-windows = Nye vindauge opnar seg
+settings-tiling-new-beside = Ved sida av det aktive vindauget
+settings-tiling-new-at-end = Til slutt
+settings-tiling-shortcuts = Snarvegar for fliser
+settings-tiling-shortcuts-description = Aktiver, flytt og endra storleik på flislagde vindauge med tastaturet
+
 ## Accessibility
 
 settings-accessibility-seeing = Syn

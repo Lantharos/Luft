@@ -46,6 +46,8 @@ settings-page-about = Om
 
 settings-page-taskbar = Aktivitetsfält och Start
     .keywords = panel, docka, dölj automatiskt, autodölj, dölj aktivitetsfältet, flytande, genomskinlig, transparent, fästa appar, justering, centrera, startknapp, start-knapp, startmeny, start-menyn, gust, sökfält, launcher, programstartare, webbsökning, sök på webben, sökmotor, skärmar, arbetsyta, skrivbord, virtuellt skrivbord
+settings-page-tiling = Fönsterplattor
+    .keywords = plattor, fönsterplattor, tiling, rullning, kolumner, mellanrum, spiral, dwindle, huvud och stapel, master, flytande fönster, fönsterlayout, multitasking
 settings-page-fonts = Teckensnitt
     .keywords = alla teckensnitt, typsnitt, typsnittsfamiljer, teckensnittsfamiljer, installera teckensnitt, ta bort teckensnitt
 settings-page-cursors = Pekarteman

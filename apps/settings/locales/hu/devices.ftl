@@ -356,6 +356,7 @@ settings-shortcuts-title = Billentyűparancsok
 settings-shortcuts-search = Billentyűparancsok keresése
 settings-shortcuts-category-system = Rendszer
 settings-shortcuts-category-windows = Ablakok
+settings-shortcuts-category-tiling = Csempézés
 settings-shortcuts-category-workspaces = Munkaterületek
 settings-shortcuts-category-screenshots = Képernyőképek
 settings-shortcuts-category-media = Média

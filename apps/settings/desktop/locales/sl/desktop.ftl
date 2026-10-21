@@ -124,6 +124,24 @@ desktop-shortcut-maximize-vertically = Maksimiraj okno navpično
 desktop-shortcut-maximize-horizontally = Maksimiraj okno vodoravno
 desktop-shortcut-toggle-tiled-left = Zaskoči okno v levo polovico
 desktop-shortcut-toggle-tiled-right = Zaskoči okno v desno polovico
+desktop-shortcut-tiling-focus-left = Aktiviraj okno na levi
+desktop-shortcut-tiling-focus-right = Aktiviraj okno na desni
+desktop-shortcut-tiling-focus-up = Aktiviraj okno zgoraj
+desktop-shortcut-tiling-focus-down = Aktiviraj okno spodaj
+desktop-shortcut-tiling-move-left = Premakni okno levo
+desktop-shortcut-tiling-move-right = Premakni okno desno
+desktop-shortcut-tiling-move-up = Premakni okno gor
+desktop-shortcut-tiling-move-down = Premakni okno dol
+desktop-shortcut-tiling-resize-left = Premakni rob okna levo
+desktop-shortcut-tiling-resize-right = Premakni rob okna desno
+desktop-shortcut-tiling-resize-up = Premakni rob okna gor
+desktop-shortcut-tiling-resize-down = Premakni rob okna dol
+desktop-shortcut-tiling-toggle-floating = Naj okno plava ali ga tlakuj
+desktop-shortcut-tiling-cycle-width = Spremeni širino stolpca
+desktop-shortcut-tiling-center-column = Postavi stolpec na sredino
+desktop-shortcut-tiling-overview = Pokaži cel trak
+desktop-shortcut-tiling-stack-left = Zloži v stolpec na levi
+desktop-shortcut-tiling-stack-right = Zloži v stolpec na desni
 
 ## Sound
 desktop-sound-meter-stream = Raven vhoda

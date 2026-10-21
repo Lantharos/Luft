@@ -226,6 +226,34 @@ settings-notifications-keep-description = W przeciwnym razie znikają po zamkni�
 settings-notifications-app-lock-screen = Pokazuj na ekranie blokady
 settings-notifications-done = Gotowe
 
+## Window tiling
+
+settings-tiling-preview = Podgląd układu okien
+settings-tiling-title = Kafelkowanie okien
+settings-tiling-back = Wygląd
+settings-tiling-mode = Układanie okien
+settings-tiling-mode-off = Wyłączone
+settings-tiling-mode-tiling = Kafelki
+settings-tiling-mode-scrolling = Przewijanie
+settings-tiling-mode-off-description = Okna zostają tam, gdzie je położysz, i przyciągają się do krawędzi i rogów
+settings-tiling-mode-tiling-description = Nowe okna dzielą ekran z pozostałymi, więc nic na siebie nie nachodzi
+settings-tiling-mode-scrolling-description = Każde okno otwiera się jako kolumna na pasku przewijanym na boki
+settings-tiling-layout = Układ
+settings-tiling-layout-dwindle = Spirala
+settings-tiling-layout-master = Główne i stos
+settings-tiling-layout-dwindle-description = Każde nowe okno dzieli aktywne okno na pół
+settings-tiling-layout-master-description = Jedno duże okno po lewej, pozostałe ułożone w stos po prawej
+settings-tiling-gaps = Odstępy
+settings-tiling-gaps-none = Brak
+settings-tiling-gaps-small = Małe
+settings-tiling-gaps-medium = Średnie
+settings-tiling-gaps-large = Duże
+settings-tiling-new-windows = Nowe okna otwierają się
+settings-tiling-new-beside = Obok aktywnego okna
+settings-tiling-new-at-end = Na końcu
+settings-tiling-shortcuts = Skróty kafelkowania
+settings-tiling-shortcuts-description = Aktywuj, przenoś i zmieniaj rozmiar kafelkowanych okien z klawiatury
+
 ## Accessibility
 
 settings-accessibility-seeing = Wzrok

@@ -16,6 +16,7 @@
 	const CATEGORIES: [Category, string][] = [
 		['system', 'settings-shortcuts-category-system'],
 		['windows', 'settings-shortcuts-category-windows'],
+		['tiling', 'settings-shortcuts-category-tiling'],
 		['workspaces', 'settings-shortcuts-category-workspaces'],
 		['screenshots', 'settings-shortcuts-category-screenshots'],
 		['media', 'settings-shortcuts-category-media']

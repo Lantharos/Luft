@@ -356,6 +356,7 @@ settings-shortcuts-title = Tastaturgenveje
 settings-shortcuts-search = Søg i genveje
 settings-shortcuts-category-system = System
 settings-shortcuts-category-windows = Vinduer
+settings-shortcuts-category-tiling = Fliser
 settings-shortcuts-category-workspaces = Arbejdsområder
 settings-shortcuts-category-screenshots = Skærmbilleder
 settings-shortcuts-category-media = Medier

@@ -124,6 +124,24 @@ desktop-shortcut-maximize-vertically = Suurenna ikkuna pystysuunnassa
 desktop-shortcut-maximize-horizontally = Suurenna ikkuna vaakasuunnassa
 desktop-shortcut-toggle-tiled-left = Telakoi ikkuna vasempaan puoliskoon
 desktop-shortcut-toggle-tiled-right = Telakoi ikkuna oikeaan puoliskoon
+desktop-shortcut-tiling-focus-left = Aktivoi vasemmalla oleva ikkuna
+desktop-shortcut-tiling-focus-right = Aktivoi oikealla oleva ikkuna
+desktop-shortcut-tiling-focus-up = Aktivoi yläpuolella oleva ikkuna
+desktop-shortcut-tiling-focus-down = Aktivoi alapuolella oleva ikkuna
+desktop-shortcut-tiling-move-left = Siirrä ikkunaa vasemmalle
+desktop-shortcut-tiling-move-right = Siirrä ikkunaa oikealle
+desktop-shortcut-tiling-move-up = Siirrä ikkunaa ylös
+desktop-shortcut-tiling-move-down = Siirrä ikkunaa alas
+desktop-shortcut-tiling-resize-left = Siirrä ikkunan reunaa vasemmalle
+desktop-shortcut-tiling-resize-right = Siirrä ikkunan reunaa oikealle
+desktop-shortcut-tiling-resize-up = Siirrä ikkunan reunaa ylös
+desktop-shortcut-tiling-resize-down = Siirrä ikkunan reunaa alas
+desktop-shortcut-tiling-toggle-floating = Anna ikkunan kellua tai laatoita se
+desktop-shortcut-tiling-cycle-width = Vaihda sarakkeen leveyttä
+desktop-shortcut-tiling-center-column = Keskitä sarake
+desktop-shortcut-tiling-overview = Näytä koko nauha
+desktop-shortcut-tiling-stack-left = Pinoa vasemmanpuoleiseen sarakkeeseen
+desktop-shortcut-tiling-stack-right = Pinoa oikeanpuoleiseen sarakkeeseen
 
 ## Sound
 desktop-sound-meter-stream = Sisääntulon taso

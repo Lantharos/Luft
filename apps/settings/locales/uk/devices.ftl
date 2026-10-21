@@ -374,6 +374,7 @@ settings-shortcuts-title = Сполучення клавіш
 settings-shortcuts-search = Пошук сполучень клавіш
 settings-shortcuts-category-system = Система
 settings-shortcuts-category-windows = Вікна
+settings-shortcuts-category-tiling = Мозаїка
 settings-shortcuts-category-workspaces = Робочі простори
 settings-shortcuts-category-screenshots = Знімки екрана
 settings-shortcuts-category-media = Медіа

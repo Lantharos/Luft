@@ -11,6 +11,7 @@
 	import FontsSection from './fonts/FontsSection.svelte';
 	import StyleSection from './StyleSection.svelte';
 	import TaskbarPage from './taskbar/TaskbarPage.svelte';
+	import TilingPage from './tiling/TilingPage.svelte';
 	import WallpaperSection from './wallpaper/WallpaperSection.svelte';
 
 	type Interface = {
@@ -29,6 +30,8 @@
 	<FontsPage onclose={close} />
 {:else if app.section === 'taskbar'}
 	<TaskbarPage onclose={close} />
+{:else if app.section === 'tiling'}
+	<TilingPage onclose={close} />
 {:else}
 	<StyleSection />
 
@@ -38,6 +41,7 @@
 
 	<Section>
 		<Row title={t('settings-appearance-taskbar')} onclick={() => (app.section = 'taskbar')} />
+		<Row title={t('settings-tiling-title')} onclick={() => (app.section = 'tiling')} />
 	</Section>
 
 	<CursorSection onbrowse={() => (app.section = 'cursors')} />

@@ -222,6 +222,34 @@ settings-notifications-keep-description = Annars hverfa þær þegar borðinn þ
 settings-notifications-app-lock-screen = Sýna á læsiskjánum
 settings-notifications-done = Lokið
 
+## Window tiling
+
+settings-tiling-preview = Forskoðun gluggaröðunar
+settings-tiling-title = Flísalagning glugga
+settings-tiling-back = Útlit
+settings-tiling-mode = Raða gluggum
+settings-tiling-mode-off = Slökkt
+settings-tiling-mode-tiling = Flísar
+settings-tiling-mode-scrolling = Skrun
+settings-tiling-mode-off-description = Gluggar haldast þar sem þú setur þá og raðast að brúnum og hornum
+settings-tiling-mode-tiling-description = Nýir gluggar deila skjánum með hinum svo ekkert skarast
+settings-tiling-mode-scrolling-description = Hver gluggi opnast sem dálkur á borða sem skrunar til hliðar
+settings-tiling-layout = Uppsetning
+settings-tiling-layout-dwindle = Spírall
+settings-tiling-layout-master = Aðalgluggi og stafli
+settings-tiling-layout-dwindle-description = Hver nýr gluggi skiptir virka glugganum í tvennt
+settings-tiling-layout-master-description = Einn stór gluggi til vinstri, hinir í stafla til hægri
+settings-tiling-gaps = Bil
+settings-tiling-gaps-none = Engin
+settings-tiling-gaps-small = Lítil
+settings-tiling-gaps-medium = Miðlungs
+settings-tiling-gaps-large = Stór
+settings-tiling-new-windows = Nýir gluggar opnast
+settings-tiling-new-beside = Við hlið virka gluggans
+settings-tiling-new-at-end = Aftast
+settings-tiling-shortcuts = Flýtileiðir fyrir flísar
+settings-tiling-shortcuts-description = Virkja, færa og breyta stærð flísalagðra glugga með lyklaborðinu
+
 ## Accessibility
 
 settings-accessibility-seeing = Sjón

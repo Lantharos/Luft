@@ -374,6 +374,7 @@ settings-shortcuts-title = Skróty klawiaturowe
 settings-shortcuts-search = Szukaj skrótów
 settings-shortcuts-category-system = System
 settings-shortcuts-category-windows = Okna
+settings-shortcuts-category-tiling = Kafelkowanie
 settings-shortcuts-category-workspaces = Obszary robocze
 settings-shortcuts-category-screenshots = Zrzuty ekranu
 settings-shortcuts-category-media = Multimedia

@@ -46,6 +46,8 @@ settings-page-about = Dwar
 
 settings-page-taskbar = Taskbar u Start
     .keywords = panew, dock, aħbi awtomatikament, auto-hide, moħbi, aħbi t-taskbar, hide taskbar, floating, trasparenti, apps imwaħħla, allinjament, buttuna Start, menù Start, start menu, gust, bar tat-tiftix, search bar, launcher, tiftix fuq il-web, web search, magna tat-tiftix, search engine, skrins, spazju tax-xogħol, desktop, desktop virtwali
+settings-page-tiling = Tqegħid tat-twieqi ħdejn xulxin
+    .keywords = ħdejn xulxin, twieqi ħdejn xulxin, tiling, scrolling, kolonni, spazji, spirali, dwindle, prinċipali u munzell, master, twieqi f’wiċċ l-ilma, tqassim tat-twieqi, multitasking
 settings-page-fonts = Fonts
     .keywords = il-fonts kollha, tipi ta’ ittri, familji tal-fonts, installa fonts, neħħi fonts
 settings-page-cursors = Temi tal-kerser

@@ -356,6 +356,7 @@ settings-shortcuts-title = Snarvegar
 settings-shortcuts-search = Søk i snarvegar
 settings-shortcuts-category-system = System
 settings-shortcuts-category-windows = Vindauge
+settings-shortcuts-category-tiling = Fliser
 settings-shortcuts-category-workspaces = Arbeidsområde
 settings-shortcuts-category-screenshots = Skjermbilete
 settings-shortcuts-category-media = Media

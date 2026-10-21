@@ -2,31 +2,24 @@
 	import { t } from '@luft/i18n';
 	import { onDestroy } from 'svelte';
 	import SubPage from '#lib/components/SubPage.svelte';
-	import { fileUrl } from '@lantharos/sabine';
 	import { Row, Section, Segmented, Select, Switch } from '@luft/ui';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import { installedApps, type App } from '../../../system/apps/api';
 	import { loadDisplays, onDisplaysChanged, type Displays } from '../../../devices/display/api';
-	import { thumbnail, uriToPath } from '../wallpaper/api';
+	import { currentWallpaper } from '../wallpaper/current.svelte';
 	import { ALIGNMENTS, AUTO_HIDE, LOOKS, SIZES, START_STYLES, STYLES, TASKBAR_KEYS, WEB_SEARCH, type TaskbarSettings } from './options';
 	import TaskbarPreview from './TaskbarPreview.svelte';
 
 	let { onclose }: { onclose: () => void } = $props();
 
-	type Background = { 'picture-uri': string; 'picture-uri-dark': string };
-	type Wallpapers = { 'live-wallpaper': string; 'live-wallpaper-dark': string };
-
 	const PREVIEW_APPS = 5;
 	const RUNNING_APPS = 2;
 
 	const taskbar = useSettings<TaskbarSettings>('com.lantharos.kestrel', TASKBAR_KEYS);
-	const wallpapers = useSettings<Wallpapers>('com.lantharos.kestrel', ['live-wallpaper', 'live-wallpaper-dark']);
-	const background = useSettings<Background>('org.gnome.desktop.background', ['picture-uri', 'picture-uri-dark']);
-	const desktop = useSettings<{ 'color-scheme': string }>('org.gnome.desktop.interface', ['color-scheme']);
+	const wallpaper = currentWallpaper();
 
 	let installed = $state<App[]>([]);
 	let displays = $state(1);
-	let wallpaper = $state<string | null>(null);
 	let opened = $state(false);
 
 	let values = $derived(taskbar.values);
@@ -35,13 +28,6 @@
 	let startButton = $derived(values['taskbar-start-button'] ?? true);
 	let startStyle = $derived(values['start-style'] ?? 'menu');
 	let everyDisplay = $derived((values['taskbar-displays'] ?? 'all') === 'all');
-	let dark = $derived(desktop.values['color-scheme'] === 'prefer-dark');
-	let wallpaperPath = $derived(
-		uriToPath(
-			(dark ? wallpapers.values['live-wallpaper-dark'] : wallpapers.values['live-wallpaper']) ||
-				((dark ? background.values['picture-uri-dark'] : background.values['picture-uri']) ?? '')
-		)
-	);
 	let previewApps = $derived.by(() => {
 		const byId = new Map(installed.map((app) => [app.id, app]));
 		const pinned = (values['favorite-apps'] ?? []).map((id) => byId.get(id)).filter((app) => app !== undefined);
@@ -66,24 +52,13 @@
 		void installedApps().then((apps) => (installed = apps));
 	});
 
-	$effect(() => {
-		const path = wallpaperPath;
-		if (!path) {
-			wallpaper = null;
-			return;
-		}
-		void thumbnail(path).then((thumb) => {
-			if (path === wallpaperPath) wallpaper = fileUrl(thumb);
-		});
-	});
-
 	void loadDisplays().then(receiveDisplays);
 	onDestroy(onDisplaysChanged(receiveDisplays));
 </script>
 
 <SubPage title={t('settings-taskbar-title')} back={t('settings-taskbar-back')} {onclose}>
 	<TaskbarPreview
-		{wallpaper}
+		wallpaper={wallpaper.url}
 		apps={previewApps}
 		alignment={values['taskbar-alignment'] ?? 'center'}
 		look={values['taskbar-look'] ?? 'glass'}

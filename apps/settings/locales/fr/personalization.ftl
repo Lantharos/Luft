@@ -222,6 +222,34 @@ settings-notifications-keep-description = Sinon, elles disparaissent dès que le
 settings-notifications-app-lock-screen = Afficher sur l’écran de verrouillage
 settings-notifications-done = Terminé
 
+## Window tiling
+
+settings-tiling-preview = Aperçu de la disposition des fenêtres
+settings-tiling-title = Pavage des fenêtres
+settings-tiling-back = Apparence
+settings-tiling-mode = Disposer les fenêtres
+settings-tiling-mode-off = Désactivé
+settings-tiling-mode-tiling = Pavage
+settings-tiling-mode-scrolling = Défilement
+settings-tiling-mode-off-description = Les fenêtres restent là où vous les placez et s’ancrent aux bords et aux coins
+settings-tiling-mode-tiling-description = Les nouvelles fenêtres partagent l’écran avec les autres, sans chevauchement
+settings-tiling-mode-scrolling-description = Chaque fenêtre s’ouvre comme une colonne sur une bande qui défile horizontalement
+settings-tiling-layout = Disposition
+settings-tiling-layout-dwindle = Spirale
+settings-tiling-layout-master = Principale et pile
+settings-tiling-layout-dwindle-description = Chaque nouvelle fenêtre partage en deux la fenêtre active
+settings-tiling-layout-master-description = Une grande fenêtre à gauche, les autres empilées à droite
+settings-tiling-gaps = Espacement
+settings-tiling-gaps-none = Aucun
+settings-tiling-gaps-small = Petit
+settings-tiling-gaps-medium = Moyen
+settings-tiling-gaps-large = Grand
+settings-tiling-new-windows = Les nouvelles fenêtres s’ouvrent
+settings-tiling-new-beside = À côté de la fenêtre active
+settings-tiling-new-at-end = À la fin
+settings-tiling-shortcuts = Raccourcis de pavage
+settings-tiling-shortcuts-description = Activer, déplacer et redimensionner les fenêtres pavées au clavier
+
 ## Accessibility
 
 settings-accessibility-seeing = Vision

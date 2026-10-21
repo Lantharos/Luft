@@ -124,6 +124,24 @@ desktop-shortcut-maximize-vertically = Maksimizēt logu vertikāli
 desktop-shortcut-maximize-horizontally = Maksimizēt logu horizontāli
 desktop-shortcut-toggle-tiled-left = Piesaistīt logu kreisajai pusei
 desktop-shortcut-toggle-tiled-right = Piesaistīt logu labajai pusei
+desktop-shortcut-tiling-focus-left = Aktivizēt logu pa kreisi
+desktop-shortcut-tiling-focus-right = Aktivizēt logu pa labi
+desktop-shortcut-tiling-focus-up = Aktivizēt logu augšā
+desktop-shortcut-tiling-focus-down = Aktivizēt logu apakšā
+desktop-shortcut-tiling-move-left = Pārvietot logu pa kreisi
+desktop-shortcut-tiling-move-right = Pārvietot logu pa labi
+desktop-shortcut-tiling-move-up = Pārvietot logu uz augšu
+desktop-shortcut-tiling-move-down = Pārvietot logu uz leju
+desktop-shortcut-tiling-resize-left = Pārvietot loga malu pa kreisi
+desktop-shortcut-tiling-resize-right = Pārvietot loga malu pa labi
+desktop-shortcut-tiling-resize-up = Pārvietot loga malu uz augšu
+desktop-shortcut-tiling-resize-down = Pārvietot loga malu uz leju
+desktop-shortcut-tiling-toggle-floating = Padarīt logu peldošu vai flīzētu
+desktop-shortcut-tiling-cycle-width = Mainīt kolonnas platumu
+desktop-shortcut-tiling-center-column = Centrēt kolonnu
+desktop-shortcut-tiling-overview = Rādīt visu joslu
+desktop-shortcut-tiling-stack-left = Pievienot kolonnai pa kreisi
+desktop-shortcut-tiling-stack-right = Pievienot kolonnai pa labi
 
 ## Sound
 desktop-sound-meter-stream = Ievades līmenis

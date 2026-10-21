@@ -124,6 +124,24 @@ desktop-shortcut-maximize-vertically = Maksimizo dritaren vertikalisht
 desktop-shortcut-maximize-horizontally = Maksimizo dritaren horizontalisht
 desktop-shortcut-toggle-tiled-left = Mbërthe majtas
 desktop-shortcut-toggle-tiled-right = Mbërthe djathtas
+desktop-shortcut-tiling-focus-left = Aktivizo dritaren majtas
+desktop-shortcut-tiling-focus-right = Aktivizo dritaren djathtas
+desktop-shortcut-tiling-focus-up = Aktivizo dritaren sipër
+desktop-shortcut-tiling-focus-down = Aktivizo dritaren poshtë
+desktop-shortcut-tiling-move-left = Lëviz dritaren majtas
+desktop-shortcut-tiling-move-right = Lëviz dritaren djathtas
+desktop-shortcut-tiling-move-up = Lëviz dritaren lart
+desktop-shortcut-tiling-move-down = Lëviz dritaren poshtë
+desktop-shortcut-tiling-resize-left = Lëviz skajin e dritares majtas
+desktop-shortcut-tiling-resize-right = Lëviz skajin e dritares djathtas
+desktop-shortcut-tiling-resize-up = Lëviz skajin e dritares lart
+desktop-shortcut-tiling-resize-down = Lëviz skajin e dritares poshtë
+desktop-shortcut-tiling-toggle-floating = Bëje dritaren pluskuese ose vendose krah për krah
+desktop-shortcut-tiling-cycle-width = Ndrysho gjerësinë e kolonës
+desktop-shortcut-tiling-center-column = Vendose kolonën në qendër
+desktop-shortcut-tiling-overview = Shfaq gjithë shiritin
+desktop-shortcut-tiling-stack-left = Fute në kolonën majtas
+desktop-shortcut-tiling-stack-right = Fute në kolonën djathtas
 
 ## Sound
 desktop-sound-meter-stream = Niveli i hyrjes

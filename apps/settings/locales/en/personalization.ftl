@@ -259,6 +259,34 @@ settings-notifications-keep-description = Otherwise they go once their banner cl
 settings-notifications-app-lock-screen = Show on the lock screen
 settings-notifications-done = Done
 
+## Window tiling
+
+settings-tiling-preview = Window arrangement preview
+settings-tiling-title = Window tiling
+settings-tiling-back = Appearance
+settings-tiling-mode = Arrange windows
+settings-tiling-mode-off = Off
+settings-tiling-mode-tiling = Tiling
+settings-tiling-mode-scrolling = Scrolling
+settings-tiling-mode-off-description = Windows float where you put them and snap to edges and corners
+settings-tiling-mode-tiling-description = New windows share the screen with the others, so nothing overlaps
+settings-tiling-mode-scrolling-description = Each window opens as a column on a strip that scrolls sideways
+settings-tiling-layout = Layout
+settings-tiling-layout-dwindle = Spiral
+settings-tiling-layout-master = Main and stack
+settings-tiling-layout-dwindle-description = Each new window splits the focused one in two
+settings-tiling-layout-master-description = One large window on the left, the rest stacked on the right
+settings-tiling-gaps = Gaps
+settings-tiling-gaps-none = None
+settings-tiling-gaps-small = Small
+settings-tiling-gaps-medium = Medium
+settings-tiling-gaps-large = Large
+settings-tiling-new-windows = New windows open
+settings-tiling-new-beside = Next to the focused window
+settings-tiling-new-at-end = At the end
+settings-tiling-shortcuts = Tiling shortcuts
+settings-tiling-shortcuts-description = Focus, move and resize tiled windows from the keyboard
+
 ## Accessibility
 
 settings-accessibility-seeing = Seeing

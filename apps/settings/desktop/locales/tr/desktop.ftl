@@ -124,6 +124,24 @@ desktop-shortcut-maximize-vertically = Pencereyi dikey olarak büyüt
 desktop-shortcut-maximize-horizontally = Pencereyi yatay olarak büyüt
 desktop-shortcut-toggle-tiled-left = Pencereyi sol yarıya yasla
 desktop-shortcut-toggle-tiled-right = Pencereyi sağ yarıya yasla
+desktop-shortcut-tiling-focus-left = Soldaki pencereyi etkinleştir
+desktop-shortcut-tiling-focus-right = Sağdaki pencereyi etkinleştir
+desktop-shortcut-tiling-focus-up = Üstteki pencereyi etkinleştir
+desktop-shortcut-tiling-focus-down = Alttaki pencereyi etkinleştir
+desktop-shortcut-tiling-move-left = Pencereyi sola taşı
+desktop-shortcut-tiling-move-right = Pencereyi sağa taşı
+desktop-shortcut-tiling-move-up = Pencereyi yukarı taşı
+desktop-shortcut-tiling-move-down = Pencereyi aşağı taşı
+desktop-shortcut-tiling-resize-left = Pencere kenarını sola taşı
+desktop-shortcut-tiling-resize-right = Pencere kenarını sağa taşı
+desktop-shortcut-tiling-resize-up = Pencere kenarını yukarı taşı
+desktop-shortcut-tiling-resize-down = Pencere kenarını aşağı taşı
+desktop-shortcut-tiling-toggle-floating = Pencereyi yüzdür veya döşe
+desktop-shortcut-tiling-cycle-width = Sütun genişliğini değiştir
+desktop-shortcut-tiling-center-column = Sütunu ortala
+desktop-shortcut-tiling-overview = Tüm şeridi göster
+desktop-shortcut-tiling-stack-left = Soldaki sütuna yığ
+desktop-shortcut-tiling-stack-right = Sağdaki sütuna yığ
 
 ## Sound
 desktop-sound-meter-stream = Giriş düzeyi

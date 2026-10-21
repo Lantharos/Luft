@@ -46,6 +46,8 @@ settings-page-about = Névjegy
 
 settings-page-taskbar = Tálca és Start menü
     .keywords = panel, dokk, dock, automatikus elrejtés, elrejtés, tálca elrejtése, lebegő, átlátszó, rögzített alkalmazások, igazítás, start gomb, start menü, start menu, gust, keresősáv, indító, launcher, webes keresés, keresőmotor, search engine, kijelzők, munkaterület, asztal, virtuális asztal
+settings-page-tiling = Ablakok csempézése
+    .keywords = csempézés, csempézett ablakok, tiling, görgetés, oszlopok, térközök, spirál, dwindle, fő és halom, master, lebegő ablakok, ablakelrendezés, multitasking, többfeladatos munka
 settings-page-fonts = Betűtípusok
     .keywords = összes betűtípus, betűk, betűcsaládok, betűtípus telepítése, betűtípus eltávolítása, fontok
 settings-page-cursors = Kurzortémák

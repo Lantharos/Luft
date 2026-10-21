@@ -46,6 +46,8 @@ settings-page-about = Om
 
 settings-page-taskbar = Proceslinje og Start
     .keywords = panel, dock, skjul automatisk, automatisk skjul, skjul proceslinjen, flydende, gennemsigtig, fastgjorte apps, justering, placering, startknap, start, startmenu, gust, søgelinje, søgefelt, launcher, programstarter, websøgning, søg på nettet, søgemaskine, skærme, arbejdsområde, skrivebord, virtuelt skrivebord
+settings-page-tiling = Fliselægning af vinduer
+    .keywords = fliser, fliselagte vinduer, tiling, rulning, kolonner, mellemrum, spiral, dwindle, hoved og stak, master, flydende vinduer, vinduesarrangement, multitasking
 settings-page-fonts = Skrifttyper
     .keywords = alle skrifttyper, fonte, skrifttypefamilier, installer skrifttyper, fjern skrifttyper
 settings-page-cursors = Markørtemaer

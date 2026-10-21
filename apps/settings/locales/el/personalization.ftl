@@ -222,6 +222,34 @@ settings-notifications-keep-description = Διαφορετικά, φεύγουν
 settings-notifications-app-lock-screen = Εμφάνιση στην οθόνη κλειδώματος
 settings-notifications-done = Τέλος
 
+## Window tiling
+
+settings-tiling-preview = Προεπισκόπηση διάταξης παραθύρων
+settings-tiling-title = Παράθεση παραθύρων
+settings-tiling-back = Εμφάνιση
+settings-tiling-mode = Τακτοποίηση παραθύρων
+settings-tiling-mode-off = Ανενεργό
+settings-tiling-mode-tiling = Παράθεση
+settings-tiling-mode-scrolling = Κύλιση
+settings-tiling-mode-off-description = Τα παράθυρα μένουν εκεί που τα βάζετε και τακτοποιούνται στις άκρες και στις γωνίες
+settings-tiling-mode-tiling-description = Τα νέα παράθυρα μοιράζονται την οθόνη με τα άλλα, χωρίς επικαλύψεις
+settings-tiling-mode-scrolling-description = Κάθε παράθυρο ανοίγει ως στήλη σε μια λωρίδα που κυλά πλάγια
+settings-tiling-layout = Διάταξη
+settings-tiling-layout-dwindle = Σπιράλ
+settings-tiling-layout-master = Κύριο και στοίβα
+settings-tiling-layout-dwindle-description = Κάθε νέο παράθυρο χωρίζει στα δύο το ενεργό παράθυρο
+settings-tiling-layout-master-description = Ένα μεγάλο παράθυρο αριστερά, τα υπόλοιπα στοιβαγμένα δεξιά
+settings-tiling-gaps = Κενά
+settings-tiling-gaps-none = Κανένα
+settings-tiling-gaps-small = Μικρά
+settings-tiling-gaps-medium = Μεσαία
+settings-tiling-gaps-large = Μεγάλα
+settings-tiling-new-windows = Τα νέα παράθυρα ανοίγουν
+settings-tiling-new-beside = Δίπλα στο ενεργό παράθυρο
+settings-tiling-new-at-end = Στο τέλος
+settings-tiling-shortcuts = Συντομεύσεις παράθεσης
+settings-tiling-shortcuts-description = Ενεργοποίηση, μετακίνηση και αλλαγή μεγέθους παραθύρων σε παράθεση από το πληκτρολόγιο
+
 ## Accessibility
 
 settings-accessibility-seeing = Όραση

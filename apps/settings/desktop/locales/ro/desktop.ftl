@@ -124,6 +124,24 @@ desktop-shortcut-maximize-vertically = Maximizează fereastra pe verticală
 desktop-shortcut-maximize-horizontally = Maximizează fereastra pe orizontală
 desktop-shortcut-toggle-tiled-left = Andochează fereastra în jumătatea din stânga
 desktop-shortcut-toggle-tiled-right = Andochează fereastra în jumătatea din dreapta
+desktop-shortcut-tiling-focus-left = Activează fereastra din stânga
+desktop-shortcut-tiling-focus-right = Activează fereastra din dreapta
+desktop-shortcut-tiling-focus-up = Activează fereastra de deasupra
+desktop-shortcut-tiling-focus-down = Activează fereastra de dedesubt
+desktop-shortcut-tiling-move-left = Mută fereastra la stânga
+desktop-shortcut-tiling-move-right = Mută fereastra la dreapta
+desktop-shortcut-tiling-move-up = Mută fereastra în sus
+desktop-shortcut-tiling-move-down = Mută fereastra în jos
+desktop-shortcut-tiling-resize-left = Mută marginea ferestrei la stânga
+desktop-shortcut-tiling-resize-right = Mută marginea ferestrei la dreapta
+desktop-shortcut-tiling-resize-up = Mută marginea ferestrei în sus
+desktop-shortcut-tiling-resize-down = Mută marginea ferestrei în jos
+desktop-shortcut-tiling-toggle-floating = Fă fereastra flotantă sau pune-o în mozaic
+desktop-shortcut-tiling-cycle-width = Schimbă lățimea coloanei
+desktop-shortcut-tiling-center-column = Centrează coloana
+desktop-shortcut-tiling-overview = Arată toată banda
+desktop-shortcut-tiling-stack-left = Adaugă în coloana din stânga
+desktop-shortcut-tiling-stack-right = Adaugă în coloana din dreapta
 
 ## Sound
 desktop-sound-meter-stream = Nivel de intrare

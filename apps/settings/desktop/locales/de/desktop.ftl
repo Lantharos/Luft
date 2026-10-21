@@ -124,6 +124,24 @@ desktop-shortcut-maximize-vertically = Fenster vertikal maximieren
 desktop-shortcut-maximize-horizontally = Fenster horizontal maximieren
 desktop-shortcut-toggle-tiled-left = Links andocken
 desktop-shortcut-toggle-tiled-right = Rechts andocken
+desktop-shortcut-tiling-focus-left = Fenster links fokussieren
+desktop-shortcut-tiling-focus-right = Fenster rechts fokussieren
+desktop-shortcut-tiling-focus-up = Fenster darüber fokussieren
+desktop-shortcut-tiling-focus-down = Fenster darunter fokussieren
+desktop-shortcut-tiling-move-left = Fenster nach links verschieben
+desktop-shortcut-tiling-move-right = Fenster nach rechts verschieben
+desktop-shortcut-tiling-move-up = Fenster nach oben verschieben
+desktop-shortcut-tiling-move-down = Fenster nach unten verschieben
+desktop-shortcut-tiling-resize-left = Fensterkante nach links verschieben
+desktop-shortcut-tiling-resize-right = Fensterkante nach rechts verschieben
+desktop-shortcut-tiling-resize-up = Fensterkante nach oben verschieben
+desktop-shortcut-tiling-resize-down = Fensterkante nach unten verschieben
+desktop-shortcut-tiling-toggle-floating = Fenster schweben lassen oder kacheln
+desktop-shortcut-tiling-cycle-width = Spaltenbreite ändern
+desktop-shortcut-tiling-center-column = Spalte zentrieren
+desktop-shortcut-tiling-overview = Ganzen Streifen zeigen
+desktop-shortcut-tiling-stack-left = In die Spalte links stapeln
+desktop-shortcut-tiling-stack-right = In die Spalte rechts stapeln
 
 ## Sound
 desktop-sound-meter-stream = Eingangspegel

@@ -411,6 +411,7 @@ settings-shortcuts-title = Keyboard shortcuts
 settings-shortcuts-search = Search shortcuts
 settings-shortcuts-category-system = System
 settings-shortcuts-category-windows = Windows
+settings-shortcuts-category-tiling = Tiling
 settings-shortcuts-category-workspaces = Workspaces
 settings-shortcuts-category-screenshots = Screenshots
 settings-shortcuts-category-media = Media

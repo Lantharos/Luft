@@ -224,6 +224,34 @@ settings-notifications-keep-description = Citādi tie pazūd, tiklīdz aizveras 
 settings-notifications-app-lock-screen = Rādīt bloķēšanas ekrānā
 settings-notifications-done = Gatavs
 
+## Window tiling
+
+settings-tiling-preview = Logu izkārtojuma priekšskatījums
+settings-tiling-title = Logu flīzēšana
+settings-tiling-back = Izskats
+settings-tiling-mode = Kārtot logus
+settings-tiling-mode-off = Izslēgts
+settings-tiling-mode-tiling = Flīzes
+settings-tiling-mode-scrolling = Ritināšana
+settings-tiling-mode-off-description = Logi paliek tur, kur tos noliekat, un piesaistās malām un stūriem
+settings-tiling-mode-tiling-description = Jaunie logi dala ekrānu ar pārējiem, tāpēc nekas nepārklājas
+settings-tiling-mode-scrolling-description = Katrs logs atveras kā kolonna uz joslas, kas ritinās uz sāniem
+settings-tiling-layout = Izkārtojums
+settings-tiling-layout-dwindle = Spirāle
+settings-tiling-layout-master = Galvenais un kaudze
+settings-tiling-layout-dwindle-description = Katrs jauns logs sadala aktīvo logu uz pusēm
+settings-tiling-layout-master-description = Viens liels logs kreisajā pusē, pārējie kaudzē labajā pusē
+settings-tiling-gaps = Atstarpes
+settings-tiling-gaps-none = Nav
+settings-tiling-gaps-small = Mazas
+settings-tiling-gaps-medium = Vidējas
+settings-tiling-gaps-large = Lielas
+settings-tiling-new-windows = Jaunie logi atveras
+settings-tiling-new-beside = Blakus aktīvajam logam
+settings-tiling-new-at-end = Beigās
+settings-tiling-shortcuts = Flīzēšanas īsinājumtaustiņi
+settings-tiling-shortcuts-description = Aktivizējiet, pārvietojiet un mainiet flīzēto logu izmēru ar tastatūru
+
 ## Accessibility
 
 settings-accessibility-seeing = Redze

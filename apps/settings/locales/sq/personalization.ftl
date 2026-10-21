@@ -222,6 +222,34 @@ settings-notifications-keep-description = Përndryshe largohen sapo mbyllet bane
 settings-notifications-app-lock-screen = Shfaq në ekranin e bllokimit
 settings-notifications-done = U krye
 
+## Window tiling
+
+settings-tiling-preview = Paraparje e renditjes së dritareve
+settings-tiling-title = Renditja e dritareve krah për krah
+settings-tiling-back = Pamja
+settings-tiling-mode = Rendit dritaret
+settings-tiling-mode-off = Joaktive
+settings-tiling-mode-tiling = Krah për krah
+settings-tiling-mode-scrolling = Rrëshqitje
+settings-tiling-mode-off-description = Dritaret qëndrojnë aty ku i vendosni dhe mbërthehen te skajet dhe qoshet
+settings-tiling-mode-tiling-description = Dritaret e reja e ndajnë ekranin me të tjerat, pa u mbivendosur
+settings-tiling-mode-scrolling-description = Çdo dritare hapet si kolonë në një shirit që rrëshqet anash
+settings-tiling-layout = Skema
+settings-tiling-layout-dwindle = Spirale
+settings-tiling-layout-master = Kryesore dhe pirg
+settings-tiling-layout-dwindle-description = Çdo dritare e re e ndan në dysh dritaren aktive
+settings-tiling-layout-master-description = Një dritare e madhe majtas, të tjerat në pirg djathtas
+settings-tiling-gaps = Hapësira
+settings-tiling-gaps-none = Pa hapësira
+settings-tiling-gaps-small = Të vogla
+settings-tiling-gaps-medium = Mesatare
+settings-tiling-gaps-large = Të mëdha
+settings-tiling-new-windows = Dritaret e reja hapen
+settings-tiling-new-beside = Pranë dritares aktive
+settings-tiling-new-at-end = Në fund
+settings-tiling-shortcuts = Shkurtore për renditjen krah për krah
+settings-tiling-shortcuts-description = Aktivizoni, lëvizni dhe ndryshoni madhësinë e dritareve krah për krah me tastierë
+
 ## Accessibility
 
 settings-accessibility-seeing = Shikimi

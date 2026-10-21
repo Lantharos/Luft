@@ -222,6 +222,34 @@ settings-notifications-keep-description = Sonst verschwinden sie, sobald ihr Ban
 settings-notifications-app-lock-screen = Auf dem Sperrbildschirm anzeigen
 settings-notifications-done = Fertig
 
+## Window tiling
+
+settings-tiling-preview = Vorschau der Fensteranordnung
+settings-tiling-title = Fenster kacheln
+settings-tiling-back = Darstellung
+settings-tiling-mode = Fenster anordnen
+settings-tiling-mode-off = Aus
+settings-tiling-mode-tiling = Kacheln
+settings-tiling-mode-scrolling = Scrollen
+settings-tiling-mode-off-description = Fenster bleiben, wo du sie hinlegst, und docken an Rändern und Ecken an
+settings-tiling-mode-tiling-description = Neue Fenster teilen sich den Bildschirm mit den anderen, sodass sich nichts überlappt
+settings-tiling-mode-scrolling-description = Jedes Fenster öffnet sich als Spalte auf einem Streifen, der seitlich scrollt
+settings-tiling-layout = Layout
+settings-tiling-layout-dwindle = Spirale
+settings-tiling-layout-master = Haupt- und Stapelbereich
+settings-tiling-layout-dwindle-description = Jedes neue Fenster teilt das fokussierte Fenster in zwei Hälften
+settings-tiling-layout-master-description = Ein großes Fenster links, die übrigen rechts gestapelt
+settings-tiling-gaps = Abstände
+settings-tiling-gaps-none = Keine
+settings-tiling-gaps-small = Klein
+settings-tiling-gaps-medium = Mittel
+settings-tiling-gaps-large = Groß
+settings-tiling-new-windows = Neue Fenster öffnen sich
+settings-tiling-new-beside = Neben dem fokussierten Fenster
+settings-tiling-new-at-end = Am Ende
+settings-tiling-shortcuts = Tastenkürzel zum Kacheln
+settings-tiling-shortcuts-description = Gekachelte Fenster mit der Tastatur fokussieren, verschieben und in der Größe ändern
+
 ## Accessibility
 
 settings-accessibility-seeing = Sehen

@@ -356,6 +356,7 @@ settings-shortcuts-title = Συντομεύσεις πληκτρολογίου
 settings-shortcuts-search = Αναζήτηση συντομεύσεων
 settings-shortcuts-category-system = Σύστημα
 settings-shortcuts-category-windows = Παράθυρα
+settings-shortcuts-category-tiling = Παράθεση
 settings-shortcuts-category-workspaces = Χώροι εργασίας
 settings-shortcuts-category-screenshots = Στιγμιότυπα οθόνης
 settings-shortcuts-category-media = Πολυμέσα

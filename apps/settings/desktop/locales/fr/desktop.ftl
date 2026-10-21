@@ -124,6 +124,24 @@ desktop-shortcut-maximize-vertically = Agrandir la fenêtre verticalement
 desktop-shortcut-maximize-horizontally = Agrandir la fenêtre horizontalement
 desktop-shortcut-toggle-tiled-left = Ancrer la fenêtre sur la moitié gauche
 desktop-shortcut-toggle-tiled-right = Ancrer la fenêtre sur la moitié droite
+desktop-shortcut-tiling-focus-left = Activer la fenêtre de gauche
+desktop-shortcut-tiling-focus-right = Activer la fenêtre de droite
+desktop-shortcut-tiling-focus-up = Activer la fenêtre du dessus
+desktop-shortcut-tiling-focus-down = Activer la fenêtre du dessous
+desktop-shortcut-tiling-move-left = Déplacer la fenêtre vers la gauche
+desktop-shortcut-tiling-move-right = Déplacer la fenêtre vers la droite
+desktop-shortcut-tiling-move-up = Déplacer la fenêtre vers le haut
+desktop-shortcut-tiling-move-down = Déplacer la fenêtre vers le bas
+desktop-shortcut-tiling-resize-left = Déplacer le bord de la fenêtre vers la gauche
+desktop-shortcut-tiling-resize-right = Déplacer le bord de la fenêtre vers la droite
+desktop-shortcut-tiling-resize-up = Déplacer le bord de la fenêtre vers le haut
+desktop-shortcut-tiling-resize-down = Déplacer le bord de la fenêtre vers le bas
+desktop-shortcut-tiling-toggle-floating = Rendre la fenêtre flottante ou la paver
+desktop-shortcut-tiling-cycle-width = Changer la largeur de la colonne
+desktop-shortcut-tiling-center-column = Centrer la colonne
+desktop-shortcut-tiling-overview = Afficher toute la bande
+desktop-shortcut-tiling-stack-left = Empiler dans la colonne de gauche
+desktop-shortcut-tiling-stack-right = Empiler dans la colonne de droite
 
 ## Sound
 desktop-sound-meter-stream = Niveau d’entrée

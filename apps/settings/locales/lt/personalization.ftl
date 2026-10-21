@@ -226,6 +226,34 @@ settings-notifications-keep-description = Kitaip jie dingsta užsidarius iššok
 settings-notifications-app-lock-screen = Rodyti užrakinimo ekrane
 settings-notifications-done = Atlikta
 
+## Window tiling
+
+settings-tiling-preview = Langų išdėstymo peržiūra
+settings-tiling-title = Langų išklotinė
+settings-tiling-back = Išvaizda
+settings-tiling-mode = Langų išdėstymas
+settings-tiling-mode-off = Išjungta
+settings-tiling-mode-tiling = Išklotinė
+settings-tiling-mode-scrolling = Slinkimas
+settings-tiling-mode-off-description = Langai lieka ten, kur juos padedate, ir pritraukiami prie kraštų bei kampų
+settings-tiling-mode-tiling-description = Nauji langai dalijasi ekranu su kitais, todėl niekas nepersidengia
+settings-tiling-mode-scrolling-description = Kiekvienas langas atsiveria kaip stulpelis juostoje, kuri slenka į šoną
+settings-tiling-layout = Išdėstymas
+settings-tiling-layout-dwindle = Spiralė
+settings-tiling-layout-master = Pagrindinis ir krūva
+settings-tiling-layout-dwindle-description = Kiekvienas naujas langas padalija aktyvų langą pusiau
+settings-tiling-layout-master-description = Vienas didelis langas kairėje, kiti sukrauti dešinėje
+settings-tiling-gaps = Tarpai
+settings-tiling-gaps-none = Nėra
+settings-tiling-gaps-small = Maži
+settings-tiling-gaps-medium = Vidutiniai
+settings-tiling-gaps-large = Dideli
+settings-tiling-new-windows = Nauji langai atsiveria
+settings-tiling-new-beside = Šalia aktyvaus lango
+settings-tiling-new-at-end = Pabaigoje
+settings-tiling-shortcuts = Išklotinės spartieji klavišai
+settings-tiling-shortcuts-description = Aktyvinkite, perkelkite ir keiskite išklotinės langų dydį klaviatūra
+
 ## Accessibility
 
 settings-accessibility-seeing = Rega

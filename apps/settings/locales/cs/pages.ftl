@@ -46,6 +46,8 @@ settings-page-about = O počítači
 
 settings-page-taskbar = Hlavní panel a nabídka Start
     .keywords = panel, lišta, dok, dock, automaticky skrývat, skrývání, skrýt hlavní panel, plovoucí, průhledný, připnuté aplikace, zarovnání, tlačítko start, nabídka start, start menu, gust, vyhledávací pole, spouštěč, launcher, hledání na webu, vyhledávač, search engine, displeje, pracovní prostor, plocha, virtuální plocha
+settings-page-tiling = Dlaždicové uspořádání oken
+    .keywords = dlaždice, dlaždicová okna, tiling, posouvání, sloupce, mezery, spirála, dwindle, hlavní a zásobník, master, plovoucí okna, rozvržení oken, multitasking
 settings-page-fonts = Písma
     .keywords = všechna písma, fonty, rodiny písem, instalovat písma, odebrat písma
 settings-page-cursors = Motivy kurzoru

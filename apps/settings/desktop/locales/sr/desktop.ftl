@@ -124,6 +124,24 @@ desktop-shortcut-maximize-vertically = Увећај прозор усправн�
 desktop-shortcut-maximize-horizontally = Увећај прозор водоравно
 desktop-shortcut-toggle-tiled-left = Поравнај лево
 desktop-shortcut-toggle-tiled-right = Поравнај десно
+desktop-shortcut-tiling-focus-left = Активирај прозор лево
+desktop-shortcut-tiling-focus-right = Активирај прозор десно
+desktop-shortcut-tiling-focus-up = Активирај прозор изнад
+desktop-shortcut-tiling-focus-down = Активирај прозор испод
+desktop-shortcut-tiling-move-left = Помери прозор лево
+desktop-shortcut-tiling-move-right = Помери прозор десно
+desktop-shortcut-tiling-move-up = Помери прозор горе
+desktop-shortcut-tiling-move-down = Помери прозор доле
+desktop-shortcut-tiling-resize-left = Помери ивицу прозора лево
+desktop-shortcut-tiling-resize-right = Помери ивицу прозора десно
+desktop-shortcut-tiling-resize-up = Помери ивицу прозора горе
+desktop-shortcut-tiling-resize-down = Помери ивицу прозора доле
+desktop-shortcut-tiling-toggle-floating = Нека прозор плута или га поплочај
+desktop-shortcut-tiling-cycle-width = Промени ширину колоне
+desktop-shortcut-tiling-center-column = Центрирај колону
+desktop-shortcut-tiling-overview = Прикажи целу траку
+desktop-shortcut-tiling-stack-left = Сложи у колону лево
+desktop-shortcut-tiling-stack-right = Сложи у колону десно
 
 ## Sound
 desktop-sound-meter-stream = Ниво улаза

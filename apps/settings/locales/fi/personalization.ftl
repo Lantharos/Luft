@@ -222,6 +222,34 @@ settings-notifications-keep-description = Muuten ilmoitus poistuu, kun sen banne
 settings-notifications-app-lock-screen = Näytä lukitusnäytössä
 settings-notifications-done = Valmis
 
+## Window tiling
+
+settings-tiling-preview = Ikkunoiden järjestelyn esikatselu
+settings-tiling-title = Ikkunoiden laatoitus
+settings-tiling-back = Ulkoasu
+settings-tiling-mode = Järjestä ikkunat
+settings-tiling-mode-off = Pois
+settings-tiling-mode-tiling = Laatoitus
+settings-tiling-mode-scrolling = Vieritys
+settings-tiling-mode-off-description = Ikkunat pysyvät siellä, minne ne laitat, ja telakoituvat reunoihin ja kulmiin
+settings-tiling-mode-tiling-description = Uudet ikkunat jakavat näytön muiden kanssa, joten mikään ei mene päällekkäin
+settings-tiling-mode-scrolling-description = Jokainen ikkuna avautuu sarakkeeksi sivusuunnassa vierivälle nauhalle
+settings-tiling-layout = Asettelu
+settings-tiling-layout-dwindle = Spiraali
+settings-tiling-layout-master = Pää- ja pinoalue
+settings-tiling-layout-dwindle-description = Jokainen uusi ikkuna jakaa aktiivisen ikkunan kahtia
+settings-tiling-layout-master-description = Yksi suuri ikkuna vasemmalla, muut pinottuina oikealla
+settings-tiling-gaps = Välit
+settings-tiling-gaps-none = Ei välejä
+settings-tiling-gaps-small = Pienet
+settings-tiling-gaps-medium = Keskikokoiset
+settings-tiling-gaps-large = Suuret
+settings-tiling-new-windows = Uudet ikkunat avautuvat
+settings-tiling-new-beside = Aktiivisen ikkunan viereen
+settings-tiling-new-at-end = Loppuun
+settings-tiling-shortcuts = Laatoituksen pikanäppäimet
+settings-tiling-shortcuts-description = Aktivoi, siirrä ja muuta laatoitettujen ikkunoiden kokoa näppäimistöllä
+
 ## Accessibility
 
 settings-accessibility-seeing = Näkö

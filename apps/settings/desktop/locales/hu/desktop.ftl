@@ -124,6 +124,24 @@ desktop-shortcut-maximize-vertically = Ablak teljes magasságra állítása
 desktop-shortcut-maximize-horizontally = Ablak teljes szélességre állítása
 desktop-shortcut-toggle-tiled-left = Ablak illesztése a bal félre
 desktop-shortcut-toggle-tiled-right = Ablak illesztése a jobb félre
+desktop-shortcut-tiling-focus-left = A bal oldali ablak aktiválása
+desktop-shortcut-tiling-focus-right = A jobb oldali ablak aktiválása
+desktop-shortcut-tiling-focus-up = A fenti ablak aktiválása
+desktop-shortcut-tiling-focus-down = A lenti ablak aktiválása
+desktop-shortcut-tiling-move-left = Ablak mozgatása balra
+desktop-shortcut-tiling-move-right = Ablak mozgatása jobbra
+desktop-shortcut-tiling-move-up = Ablak mozgatása fel
+desktop-shortcut-tiling-move-down = Ablak mozgatása le
+desktop-shortcut-tiling-resize-left = Ablakszél mozgatása balra
+desktop-shortcut-tiling-resize-right = Ablakszél mozgatása jobbra
+desktop-shortcut-tiling-resize-up = Ablakszél mozgatása fel
+desktop-shortcut-tiling-resize-down = Ablakszél mozgatása le
+desktop-shortcut-tiling-toggle-floating = Ablak lebegtetése vagy csempézése
+desktop-shortcut-tiling-cycle-width = Oszlopszélesség módosítása
+desktop-shortcut-tiling-center-column = Oszlop középre igazítása
+desktop-shortcut-tiling-overview = A teljes sáv megjelenítése
+desktop-shortcut-tiling-stack-left = Hozzáadás a bal oldali oszlophoz
+desktop-shortcut-tiling-stack-right = Hozzáadás a jobb oldali oszlophoz
 
 ## Sound
 desktop-sound-meter-stream = Bemeneti szint

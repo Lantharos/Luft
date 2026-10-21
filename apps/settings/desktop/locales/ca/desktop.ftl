@@ -124,6 +124,24 @@ desktop-shortcut-maximize-vertically = Maximitza la finestra verticalment
 desktop-shortcut-maximize-horizontally = Maximitza la finestra horitzontalment
 desktop-shortcut-toggle-tiled-left = Ajusta la finestra a la meitat esquerra
 desktop-shortcut-toggle-tiled-right = Ajusta la finestra a la meitat dreta
+desktop-shortcut-tiling-focus-left = Activa la finestra de l’esquerra
+desktop-shortcut-tiling-focus-right = Activa la finestra de la dreta
+desktop-shortcut-tiling-focus-up = Activa la finestra de dalt
+desktop-shortcut-tiling-focus-down = Activa la finestra de baix
+desktop-shortcut-tiling-move-left = Mou la finestra a l’esquerra
+desktop-shortcut-tiling-move-right = Mou la finestra a la dreta
+desktop-shortcut-tiling-move-up = Mou la finestra amunt
+desktop-shortcut-tiling-move-down = Mou la finestra avall
+desktop-shortcut-tiling-resize-left = Mou la vora de la finestra a l’esquerra
+desktop-shortcut-tiling-resize-right = Mou la vora de la finestra a la dreta
+desktop-shortcut-tiling-resize-up = Mou la vora de la finestra amunt
+desktop-shortcut-tiling-resize-down = Mou la vora de la finestra avall
+desktop-shortcut-tiling-toggle-floating = Fes flotar la finestra o posa-la en mosaic
+desktop-shortcut-tiling-cycle-width = Canvia l’amplada de la columna
+desktop-shortcut-tiling-center-column = Centra la columna
+desktop-shortcut-tiling-overview = Mostra tota la franja
+desktop-shortcut-tiling-stack-left = Apila a la columna de l’esquerra
+desktop-shortcut-tiling-stack-right = Apila a la columna de la dreta
 
 ## Sound
 desktop-sound-meter-stream = Nivell d’entrada

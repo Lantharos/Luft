@@ -222,6 +222,34 @@ settings-notifications-keep-description = Annars försvinner de när banderollen
 settings-notifications-app-lock-screen = Visa på låsskärmen
 settings-notifications-done = Klar
 
+## Window tiling
+
+settings-tiling-preview = Förhandsvisning av fönsterarrangemang
+settings-tiling-title = Fönsterplattor
+settings-tiling-back = Utseende
+settings-tiling-mode = Ordna fönster
+settings-tiling-mode-off = Av
+settings-tiling-mode-tiling = Plattor
+settings-tiling-mode-scrolling = Rullning
+settings-tiling-mode-off-description = Fönster stannar där du lägger dem och dockas mot kanter och hörn
+settings-tiling-mode-tiling-description = Nya fönster delar skärmen med de andra så att inget överlappar
+settings-tiling-mode-scrolling-description = Varje fönster öppnas som en kolumn på en remsa som rullar i sidled
+settings-tiling-layout = Layout
+settings-tiling-layout-dwindle = Spiral
+settings-tiling-layout-master = Huvud och stapel
+settings-tiling-layout-dwindle-description = Varje nytt fönster delar det aktiva fönstret i två
+settings-tiling-layout-master-description = Ett stort fönster till vänster, resten staplade till höger
+settings-tiling-gaps = Mellanrum
+settings-tiling-gaps-none = Inga
+settings-tiling-gaps-small = Små
+settings-tiling-gaps-medium = Mellan
+settings-tiling-gaps-large = Stora
+settings-tiling-new-windows = Nya fönster öppnas
+settings-tiling-new-beside = Bredvid det aktiva fönstret
+settings-tiling-new-at-end = Sist
+settings-tiling-shortcuts = Kortkommandon för plattor
+settings-tiling-shortcuts-description = Aktivera, flytta och ändra storlek på fönster som plattor med tangentbordet
+
 ## Accessibility
 
 settings-accessibility-seeing = Syn

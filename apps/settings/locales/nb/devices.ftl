@@ -356,6 +356,7 @@ settings-shortcuts-title = Hurtigtaster
 settings-shortcuts-search = Søk i hurtigtaster
 settings-shortcuts-category-system = System
 settings-shortcuts-category-windows = Vinduer
+settings-shortcuts-category-tiling = Fliser
 settings-shortcuts-category-workspaces = Arbeidsområder
 settings-shortcuts-category-screenshots = Skjermbilder
 settings-shortcuts-category-media = Medier

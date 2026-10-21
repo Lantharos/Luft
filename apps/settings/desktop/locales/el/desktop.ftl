@@ -124,6 +124,24 @@ desktop-shortcut-maximize-vertically = Κατακόρυφη μεγιστοποί
 desktop-shortcut-maximize-horizontally = Οριζόντια μεγιστοποίηση παραθύρου
 desktop-shortcut-toggle-tiled-left = Τακτοποίηση παραθύρου στο αριστερό μισό
 desktop-shortcut-toggle-tiled-right = Τακτοποίηση παραθύρου στο δεξί μισό
+desktop-shortcut-tiling-focus-left = Ενεργοποίηση του παραθύρου αριστερά
+desktop-shortcut-tiling-focus-right = Ενεργοποίηση του παραθύρου δεξιά
+desktop-shortcut-tiling-focus-up = Ενεργοποίηση του παραθύρου επάνω
+desktop-shortcut-tiling-focus-down = Ενεργοποίηση του παραθύρου κάτω
+desktop-shortcut-tiling-move-left = Μετακίνηση παραθύρου αριστερά
+desktop-shortcut-tiling-move-right = Μετακίνηση παραθύρου δεξιά
+desktop-shortcut-tiling-move-up = Μετακίνηση παραθύρου επάνω
+desktop-shortcut-tiling-move-down = Μετακίνηση παραθύρου κάτω
+desktop-shortcut-tiling-resize-left = Μετακίνηση άκρης παραθύρου αριστερά
+desktop-shortcut-tiling-resize-right = Μετακίνηση άκρης παραθύρου δεξιά
+desktop-shortcut-tiling-resize-up = Μετακίνηση άκρης παραθύρου επάνω
+desktop-shortcut-tiling-resize-down = Μετακίνηση άκρης παραθύρου κάτω
+desktop-shortcut-tiling-toggle-floating = Αιώρηση ή παράθεση του παραθύρου
+desktop-shortcut-tiling-cycle-width = Αλλαγή πλάτους στήλης
+desktop-shortcut-tiling-center-column = Κεντράρισμα στήλης
+desktop-shortcut-tiling-overview = Εμφάνιση όλης της λωρίδας
+desktop-shortcut-tiling-stack-left = Στοίβαξη στη στήλη αριστερά
+desktop-shortcut-tiling-stack-right = Στοίβαξη στη στήλη δεξιά
 
 ## Sound
 desktop-sound-meter-stream = Στάθμη εισόδου

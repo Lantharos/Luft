@@ -222,6 +222,34 @@ settings-notifications-keep-description = Altrimenti spariscono quando si chiude
 settings-notifications-app-lock-screen = Mostra sulla schermata di blocco
 settings-notifications-done = Fine
 
+## Window tiling
+
+settings-tiling-preview = Anteprima della disposizione delle finestre
+settings-tiling-title = Affiancamento delle finestre
+settings-tiling-back = Aspetto
+settings-tiling-mode = Disponi le finestre
+settings-tiling-mode-off = Disattivato
+settings-tiling-mode-tiling = Affiancate
+settings-tiling-mode-scrolling = Scorrimento
+settings-tiling-mode-off-description = Le finestre restano dove le metti e si ancorano a bordi e angoli
+settings-tiling-mode-tiling-description = Le nuove finestre dividono lo schermo con le altre, senza sovrapporsi
+settings-tiling-mode-scrolling-description = Ogni finestra si apre come una colonna su una striscia che scorre di lato
+settings-tiling-layout = Disposizione
+settings-tiling-layout-dwindle = Spirale
+settings-tiling-layout-master = Principale e pila
+settings-tiling-layout-dwindle-description = Ogni nuova finestra divide in due quella attiva
+settings-tiling-layout-master-description = Una finestra grande a sinistra, le altre impilate a destra
+settings-tiling-gaps = Spaziatura
+settings-tiling-gaps-none = Nessuna
+settings-tiling-gaps-small = Piccola
+settings-tiling-gaps-medium = Media
+settings-tiling-gaps-large = Grande
+settings-tiling-new-windows = Le nuove finestre si aprono
+settings-tiling-new-beside = Accanto alla finestra attiva
+settings-tiling-new-at-end = In fondo
+settings-tiling-shortcuts = Scorciatoie per l’affiancamento
+settings-tiling-shortcuts-description = Attiva, sposta e ridimensiona le finestre affiancate con la tastiera
+
 ## Accessibility
 
 settings-accessibility-seeing = Vista

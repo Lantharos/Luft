@@ -365,6 +365,7 @@ settings-shortcuts-title = Тастерске пречице
 settings-shortcuts-search = Претражи пречице
 settings-shortcuts-category-system = Систем
 settings-shortcuts-category-windows = Прозори
+settings-shortcuts-category-tiling = Поплочавање
 settings-shortcuts-category-workspaces = Радни простори
 settings-shortcuts-category-screenshots = Снимци екрана
 settings-shortcuts-category-media = Медији

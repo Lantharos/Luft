@@ -46,6 +46,8 @@ settings-page-about = Informacje
 
 settings-page-taskbar = Pasek zadań i menu Start
     .keywords = panel, dok, dock, autoukrywanie, automatyczne ukrywanie, ukryj pasek zadań, pływający, przezroczysty, przezroczystość, przypięte aplikacje, wyrównanie, przycisk start, menu start, start menu, gust, pasek wyszukiwania, program uruchamiający, launcher, wyszukiwanie w internecie, wyszukiwarka, search engine, ekrany, obszar roboczy, pulpit, pulpit wirtualny
+settings-page-tiling = Kafelkowanie okien
+    .keywords = kafelkowanie, kafelki, tiling, przewijanie, kolumny, odstępy, spirala, dwindle, główne i stos, master, pływające okna, układ okien, wielozadaniowość
 settings-page-fonts = Czcionki
     .keywords = wszystkie czcionki, kroje pisma, rodziny czcionek, instaluj czcionki, usuń czcionki
 settings-page-cursors = Motywy kursora

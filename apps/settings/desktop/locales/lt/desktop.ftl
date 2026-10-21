@@ -124,6 +124,24 @@ desktop-shortcut-maximize-vertically = Maksimizuoti langą vertikaliai
 desktop-shortcut-maximize-horizontally = Maksimizuoti langą horizontaliai
 desktop-shortcut-toggle-tiled-left = Pritraukti langą prie kairės pusės
 desktop-shortcut-toggle-tiled-right = Pritraukti langą prie dešinės pusės
+desktop-shortcut-tiling-focus-left = Aktyvinti langą kairėje
+desktop-shortcut-tiling-focus-right = Aktyvinti langą dešinėje
+desktop-shortcut-tiling-focus-up = Aktyvinti langą viršuje
+desktop-shortcut-tiling-focus-down = Aktyvinti langą apačioje
+desktop-shortcut-tiling-move-left = Perkelti langą kairėn
+desktop-shortcut-tiling-move-right = Perkelti langą dešinėn
+desktop-shortcut-tiling-move-up = Perkelti langą aukštyn
+desktop-shortcut-tiling-move-down = Perkelti langą žemyn
+desktop-shortcut-tiling-resize-left = Perkelti lango kraštą kairėn
+desktop-shortcut-tiling-resize-right = Perkelti lango kraštą dešinėn
+desktop-shortcut-tiling-resize-up = Perkelti lango kraštą aukštyn
+desktop-shortcut-tiling-resize-down = Perkelti lango kraštą žemyn
+desktop-shortcut-tiling-toggle-floating = Padaryti langą slankiuoju arba įdėti į išklotinę
+desktop-shortcut-tiling-cycle-width = Keisti stulpelio plotį
+desktop-shortcut-tiling-center-column = Centruoti stulpelį
+desktop-shortcut-tiling-overview = Rodyti visą juostą
+desktop-shortcut-tiling-stack-left = Įdėti į stulpelį kairėje
+desktop-shortcut-tiling-stack-right = Įdėti į stulpelį dešinėje
 
 ## Sound
 desktop-sound-meter-stream = Įvesties lygis

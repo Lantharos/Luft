@@ -228,6 +228,34 @@ settings-notifications-keep-description = Inkella jmorru hekk kif jingħalaq il-
 settings-notifications-app-lock-screen = Uri fuq l-iskrin imsakkar
 settings-notifications-done = Lest
 
+## Window tiling
+
+settings-tiling-preview = Dehra minn qabel tal-arranġament tat-twieqi
+settings-tiling-title = Tqegħid tat-twieqi ħdejn xulxin
+settings-tiling-back = Dehra
+settings-tiling-mode = Irranġa t-twieqi
+settings-tiling-mode-off = Mitfi
+settings-tiling-mode-tiling = Ħdejn xulxin
+settings-tiling-mode-scrolling = Scrolling
+settings-tiling-mode-off-description = It-twieqi jibqgħu fejn tpoġġihom u jallinjaw mat-truf u l-kantunieri
+settings-tiling-mode-tiling-description = It-twieqi l-ġodda jaqsmu l-iskrin mal-oħrajn, mingħajr ma jaqbżu fuq xulxin
+settings-tiling-mode-scrolling-description = Kull tieqa tinfetaħ bħala kolonna fuq strixxa li tiskrollja lejn il-ġenb
+settings-tiling-layout = Tqassim
+settings-tiling-layout-dwindle = Spirali
+settings-tiling-layout-master = Prinċipali u munzell
+settings-tiling-layout-dwindle-description = Kull tieqa ġdida taqsam it-tieqa attiva fi tnejn
+settings-tiling-layout-master-description = Tieqa waħda kbira fuq ix-xellug, il-bqija f’munzell fuq il-lemin
+settings-tiling-gaps = Spazji
+settings-tiling-gaps-none = Xejn
+settings-tiling-gaps-small = Żgħar
+settings-tiling-gaps-medium = Medji
+settings-tiling-gaps-large = Kbar
+settings-tiling-new-windows = It-twieqi l-ġodda jinfetħu
+settings-tiling-new-beside = Ħdejn it-tieqa attiva
+settings-tiling-new-at-end = Fl-aħħar
+settings-tiling-shortcuts = Shortcuts għat-twieqi ħdejn xulxin
+settings-tiling-shortcuts-description = Attiva, ċaqlaq u biddel id-daqs tat-twieqi ħdejn xulxin bit-tastiera
+
 ## Accessibility
 
 settings-accessibility-seeing = Vista

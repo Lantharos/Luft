@@ -46,6 +46,8 @@ settings-page-about = Información
 
 settings-page-taskbar = Barra de tareas e Inicio
     .keywords = panel, dock, ocultar automáticamente, autoocultar, ocultar barra de tareas, flotante, transparente, aplicaciones ancladas, alineación, botón inicio, menú inicio, gust, barra de búsqueda, lanzador, launcher, búsqueda web, buscar en la web, motor de búsqueda, buscador, pantallas, área de trabajo, escritorio, escritorio virtual
+settings-page-tiling = Mosaico de ventanas
+    .keywords = mosaico, ventanas en mosaico, tiling, desplazamiento, columnas, espacios, espiral, dwindle, principal y pila, master, ventanas flotantes, disposición de ventanas, multitarea
 settings-page-fonts = Fuentes
     .keywords = todas las fuentes, tipografías, tipos de letra, familias de fuentes, instalar fuentes, quitar fuentes, eliminar fuentes
 settings-page-cursors = Temas de cursor

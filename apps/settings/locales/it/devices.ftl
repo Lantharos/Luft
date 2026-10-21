@@ -356,6 +356,7 @@ settings-shortcuts-title = Scorciatoie da tastiera
 settings-shortcuts-search = Cerca scorciatoie
 settings-shortcuts-category-system = Sistema
 settings-shortcuts-category-windows = Finestre
+settings-shortcuts-category-tiling = Affiancamento
 settings-shortcuts-category-workspaces = Spazi di lavoro
 settings-shortcuts-category-screenshots = Screenshot
 settings-shortcuts-category-media = Multimedia

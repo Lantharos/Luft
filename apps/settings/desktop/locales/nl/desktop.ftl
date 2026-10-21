@@ -124,6 +124,24 @@ desktop-shortcut-maximize-vertically = Venster verticaal maximaliseren
 desktop-shortcut-maximize-horizontally = Venster horizontaal maximaliseren
 desktop-shortcut-toggle-tiled-left = Venster uitlijnen op linkerhelft
 desktop-shortcut-toggle-tiled-right = Venster uitlijnen op rechterhelft
+desktop-shortcut-tiling-focus-left = Venster links activeren
+desktop-shortcut-tiling-focus-right = Venster rechts activeren
+desktop-shortcut-tiling-focus-up = Venster erboven activeren
+desktop-shortcut-tiling-focus-down = Venster eronder activeren
+desktop-shortcut-tiling-move-left = Venster naar links verplaatsen
+desktop-shortcut-tiling-move-right = Venster naar rechts verplaatsen
+desktop-shortcut-tiling-move-up = Venster omhoog verplaatsen
+desktop-shortcut-tiling-move-down = Venster omlaag verplaatsen
+desktop-shortcut-tiling-resize-left = Vensterrand naar links verplaatsen
+desktop-shortcut-tiling-resize-right = Vensterrand naar rechts verplaatsen
+desktop-shortcut-tiling-resize-up = Vensterrand omhoog verplaatsen
+desktop-shortcut-tiling-resize-down = Vensterrand omlaag verplaatsen
+desktop-shortcut-tiling-toggle-floating = Venster laten zweven of tegelen
+desktop-shortcut-tiling-cycle-width = Kolombreedte wijzigen
+desktop-shortcut-tiling-center-column = Kolom centreren
+desktop-shortcut-tiling-overview = Hele strook tonen
+desktop-shortcut-tiling-stack-left = In de kolom links stapelen
+desktop-shortcut-tiling-stack-right = In de kolom rechts stapelen
 
 ## Sound
 desktop-sound-meter-stream = Invoerniveau

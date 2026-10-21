@@ -374,6 +374,7 @@ settings-shortcuts-title = Klávesové skratky
 settings-shortcuts-search = Hľadať skratky
 settings-shortcuts-category-system = Systém
 settings-shortcuts-category-windows = Okná
+settings-shortcuts-category-tiling = Dlaždice
 settings-shortcuts-category-workspaces = Pracovné priestory
 settings-shortcuts-category-screenshots = Snímky obrazovky
 settings-shortcuts-category-media = Médiá

@@ -124,6 +124,24 @@ desktop-shortcut-maximize-vertically = Розгорнути вікно по ве
 desktop-shortcut-maximize-horizontally = Розгорнути вікно по горизонталі
 desktop-shortcut-toggle-tiled-left = Прикріпити вікно до лівої половини
 desktop-shortcut-toggle-tiled-right = Прикріпити вікно до правої половини
+desktop-shortcut-tiling-focus-left = Перейти до вікна ліворуч
+desktop-shortcut-tiling-focus-right = Перейти до вікна праворуч
+desktop-shortcut-tiling-focus-up = Перейти до вікна вгорі
+desktop-shortcut-tiling-focus-down = Перейти до вікна внизу
+desktop-shortcut-tiling-move-left = Перемістити вікно ліворуч
+desktop-shortcut-tiling-move-right = Перемістити вікно праворуч
+desktop-shortcut-tiling-move-up = Перемістити вікно вгору
+desktop-shortcut-tiling-move-down = Перемістити вікно вниз
+desktop-shortcut-tiling-resize-left = Зсунути край вікна ліворуч
+desktop-shortcut-tiling-resize-right = Зсунути край вікна праворуч
+desktop-shortcut-tiling-resize-up = Зсунути край вікна вгору
+desktop-shortcut-tiling-resize-down = Зсунути край вікна вниз
+desktop-shortcut-tiling-toggle-floating = Зробити вікно плаваючим або повернути в мозаїку
+desktop-shortcut-tiling-cycle-width = Змінити ширину колонки
+desktop-shortcut-tiling-center-column = Вирівняти колонку по центру
+desktop-shortcut-tiling-overview = Показати всю стрічку
+desktop-shortcut-tiling-stack-left = Додати до колонки ліворуч
+desktop-shortcut-tiling-stack-right = Додати до колонки праворуч
 
 ## Sound
 desktop-sound-meter-stream = Рівень входу

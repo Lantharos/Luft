@@ -222,6 +222,34 @@ settings-notifications-keep-description = Különben eltűnnek, amint a szalagc�
 settings-notifications-app-lock-screen = Megjelenítés a zárolási képernyőn
 settings-notifications-done = Kész
 
+## Window tiling
+
+settings-tiling-preview = Az ablakelrendezés előnézete
+settings-tiling-title = Ablakok csempézése
+settings-tiling-back = Megjelenés
+settings-tiling-mode = Ablakok elrendezése
+settings-tiling-mode-off = Ki
+settings-tiling-mode-tiling = Csempézés
+settings-tiling-mode-scrolling = Görgetés
+settings-tiling-mode-off-description = Az ablakok ott maradnak, ahová teszi őket, és a szélekhez és sarkokhoz illeszkednek
+settings-tiling-mode-tiling-description = Az új ablakok megosztják a képernyőt a többivel, így semmi sem fedi egymást
+settings-tiling-mode-scrolling-description = Minden ablak oszlopként nyílik meg egy oldalra görgethető sávon
+settings-tiling-layout = Elrendezés
+settings-tiling-layout-dwindle = Spirál
+settings-tiling-layout-master = Fő és halom
+settings-tiling-layout-dwindle-description = Minden új ablak kettéosztja az aktív ablakot
+settings-tiling-layout-master-description = Egy nagy ablak bal oldalon, a többi egymás alatt jobb oldalon
+settings-tiling-gaps = Térközök
+settings-tiling-gaps-none = Nincs
+settings-tiling-gaps-small = Kicsi
+settings-tiling-gaps-medium = Közepes
+settings-tiling-gaps-large = Nagy
+settings-tiling-new-windows = Az új ablakok megnyílnak
+settings-tiling-new-beside = Az aktív ablak mellett
+settings-tiling-new-at-end = A végén
+settings-tiling-shortcuts = Csempézés billentyűparancsai
+settings-tiling-shortcuts-description = Csempézett ablakok aktiválása, áthelyezése és átméretezése billentyűzettel
+
 ## Accessibility
 
 settings-accessibility-seeing = Látás

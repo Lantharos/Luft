@@ -51,6 +51,8 @@ settings-page-about = About
 
 settings-page-taskbar = Taskbar and Start
     .keywords = panel, dock, auto-hide, hide automatically, hide taskbar, floating, transparent, pinned apps, alignment, start button, start menu, gust, search bar, launcher, web search, search engine, displays, workspace, desktop, virtual desktop
+settings-page-tiling = Window tiling
+    .keywords = tiling, tiled windows, window tiling, scrolling, columns, gaps, spiral, dwindle, main and stack, master, floating windows, window layout, multitasking
 settings-page-fonts = Fonts
     .keywords = all fonts, typefaces, font families, install fonts, remove fonts
 settings-page-cursors = Cursor themes

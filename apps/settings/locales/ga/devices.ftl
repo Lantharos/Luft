@@ -383,6 +383,7 @@ settings-shortcuts-title = Aicearraí méarchláir
 settings-shortcuts-search = Cuardaigh aicearraí
 settings-shortcuts-category-system = Córas
 settings-shortcuts-category-windows = Fuinneoga
+settings-shortcuts-category-tiling = Tíleáil
 settings-shortcuts-category-workspaces = Spásanna oibre
 settings-shortcuts-category-screenshots = Gabhálacha scáileáin
 settings-shortcuts-category-media = Meáin

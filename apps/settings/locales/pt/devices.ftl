@@ -358,6 +358,7 @@ settings-shortcuts-title = Atalhos de teclado
 settings-shortcuts-search = Pesquisar atalhos
 settings-shortcuts-category-system = Sistema
 settings-shortcuts-category-windows = Janelas
+settings-shortcuts-category-tiling = Mosaico
 settings-shortcuts-category-workspaces = Áreas de trabalho
 settings-shortcuts-category-screenshots = Capturas de ecrã
 settings-shortcuts-category-media = Multimédia

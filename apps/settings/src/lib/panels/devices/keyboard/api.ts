@@ -1,7 +1,7 @@
 import { activationToken } from '@luft/ui';
 import { invoke } from '#lib/bridge.js';
 
-export type Category = 'system' | 'windows' | 'workspaces' | 'screenshots' | 'media';
+export type Category = 'system' | 'windows' | 'tiling' | 'workspaces' | 'screenshots' | 'media';
 
 export interface Layout {
 	id: string;

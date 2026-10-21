@@ -365,6 +365,7 @@ settings-shortcuts-title = Comenzi rapide
 settings-shortcuts-search = Caută comenzi rapide
 settings-shortcuts-category-system = Sistem
 settings-shortcuts-category-windows = Ferestre
+settings-shortcuts-category-tiling = Mozaic
 settings-shortcuts-category-workspaces = Spații de lucru
 settings-shortcuts-category-screenshots = Capturi de ecran
 settings-shortcuts-category-media = Media

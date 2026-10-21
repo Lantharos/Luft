@@ -228,6 +228,34 @@ settings-notifications-keep-description = Seachas sin, imíonn siad nuair a dhú
 settings-notifications-app-lock-screen = Taispeáin ar an scáileán glasála
 settings-notifications-done = Déanta
 
+## Window tiling
+
+settings-tiling-preview = Réamhamharc ar shocrú na bhfuinneog
+settings-tiling-title = Tíleáil fuinneog
+settings-tiling-back = Cuma
+settings-tiling-mode = Socraigh fuinneoga
+settings-tiling-mode-off = As
+settings-tiling-mode-tiling = Tíleáil
+settings-tiling-mode-scrolling = Scrollú
+settings-tiling-mode-off-description = Fanann fuinneoga san áit a gcuireann tú iad agus snapálann siad ar imill agus ar choirnéil
+settings-tiling-mode-tiling-description = Roinneann fuinneoga nua an scáileán leis na cinn eile, gan aon fhorluí
+settings-tiling-mode-scrolling-description = Osclaíonn gach fuinneog mar cholún ar stiall a scrollaíonn go cliathánach
+settings-tiling-layout = Leagan amach
+settings-tiling-layout-dwindle = Bíseach
+settings-tiling-layout-master = Príomhfhuinneog agus cruach
+settings-tiling-layout-dwindle-description = Roinneann gach fuinneog nua an fhuinneog ghníomhach ina dhá leath
+settings-tiling-layout-master-description = Fuinneog mhór amháin ar chlé, an chuid eile i gcruach ar dheis
+settings-tiling-gaps = Bearnaí
+settings-tiling-gaps-none = Gan bhearnaí
+settings-tiling-gaps-small = Beag
+settings-tiling-gaps-medium = Meánach
+settings-tiling-gaps-large = Mór
+settings-tiling-new-windows = Osclaítear fuinneoga nua
+settings-tiling-new-beside = In aice leis an bhfuinneog ghníomhach
+settings-tiling-new-at-end = Ag an deireadh
+settings-tiling-shortcuts = Aicearraí tíleála
+settings-tiling-shortcuts-description = Gníomhachtaigh, bog agus athraigh méid fuinneog tíleáilte leis an méarchlár
+
 ## Accessibility
 
 settings-accessibility-seeing = Radharc

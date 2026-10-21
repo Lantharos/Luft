@@ -356,6 +356,7 @@ settings-shortcuts-title = Кратенки на тастатура
 settings-shortcuts-search = Пребарај кратенки
 settings-shortcuts-category-system = Систем
 settings-shortcuts-category-windows = Прозорци
+settings-shortcuts-category-tiling = Поплочување
 settings-shortcuts-category-workspaces = Работни простори
 settings-shortcuts-category-screenshots = Слики од екранот
 settings-shortcuts-category-media = Медиуми

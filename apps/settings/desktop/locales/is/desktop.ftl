@@ -124,6 +124,24 @@ desktop-shortcut-maximize-vertically = Hámarka glugga lóðrétt
 desktop-shortcut-maximize-horizontally = Hámarka glugga lárétt
 desktop-shortcut-toggle-tiled-left = Raða glugganum á vinstri helming
 desktop-shortcut-toggle-tiled-right = Raða glugganum á hægri helming
+desktop-shortcut-tiling-focus-left = Virkja gluggann til vinstri
+desktop-shortcut-tiling-focus-right = Virkja gluggann til hægri
+desktop-shortcut-tiling-focus-up = Virkja gluggann fyrir ofan
+desktop-shortcut-tiling-focus-down = Virkja gluggann fyrir neðan
+desktop-shortcut-tiling-move-left = Færa gluggann til vinstri
+desktop-shortcut-tiling-move-right = Færa gluggann til hægri
+desktop-shortcut-tiling-move-up = Færa gluggann upp
+desktop-shortcut-tiling-move-down = Færa gluggann niður
+desktop-shortcut-tiling-resize-left = Færa gluggabrúnina til vinstri
+desktop-shortcut-tiling-resize-right = Færa gluggabrúnina til hægri
+desktop-shortcut-tiling-resize-up = Færa gluggabrúnina upp
+desktop-shortcut-tiling-resize-down = Færa gluggabrúnina niður
+desktop-shortcut-tiling-toggle-floating = Láta gluggann fljóta eða flísaleggja hann
+desktop-shortcut-tiling-cycle-width = Breyta dálkbreidd
+desktop-shortcut-tiling-center-column = Miðjusetja dálkinn
+desktop-shortcut-tiling-overview = Sýna allan borðann
+desktop-shortcut-tiling-stack-left = Stafla í dálkinn til vinstri
+desktop-shortcut-tiling-stack-right = Stafla í dálkinn til hægri
 
 ## Sound
 desktop-sound-meter-stream = Inntaksstyrkur

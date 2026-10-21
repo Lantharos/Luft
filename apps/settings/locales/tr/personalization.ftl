@@ -222,6 +222,34 @@ settings-notifications-keep-description = Kapalıyken bildirimler, başlıkları
 settings-notifications-app-lock-screen = Kilit ekranında göster
 settings-notifications-done = Bitti
 
+## Window tiling
+
+settings-tiling-preview = Pencere düzeni önizlemesi
+settings-tiling-title = Pencere döşeme
+settings-tiling-back = Görünüm
+settings-tiling-mode = Pencereleri düzenle
+settings-tiling-mode-off = Kapalı
+settings-tiling-mode-tiling = Döşeme
+settings-tiling-mode-scrolling = Kaydırma
+settings-tiling-mode-off-description = Pencereler bıraktığınız yerde kalır ve kenarlara ve köşelere yaslanır
+settings-tiling-mode-tiling-description = Yeni pencereler ekranı diğerleriyle paylaşır, hiçbir şey üst üste binmez
+settings-tiling-mode-scrolling-description = Her pencere yana kayan bir şeritte sütun olarak açılır
+settings-tiling-layout = Düzen
+settings-tiling-layout-dwindle = Spiral
+settings-tiling-layout-master = Ana ve yığın
+settings-tiling-layout-dwindle-description = Her yeni pencere etkin pencereyi ikiye böler
+settings-tiling-layout-master-description = Solda büyük bir pencere, diğerleri sağda yığın halinde
+settings-tiling-gaps = Boşluklar
+settings-tiling-gaps-none = Yok
+settings-tiling-gaps-small = Küçük
+settings-tiling-gaps-medium = Orta
+settings-tiling-gaps-large = Büyük
+settings-tiling-new-windows = Yeni pencereler açılır
+settings-tiling-new-beside = Etkin pencerenin yanında
+settings-tiling-new-at-end = Sonda
+settings-tiling-shortcuts = Döşeme kısayolları
+settings-tiling-shortcuts-description = Döşenmiş pencereleri klavyeyle etkinleştirin, taşıyın ve yeniden boyutlandırın
+
 ## Accessibility
 
 settings-accessibility-seeing = Görme

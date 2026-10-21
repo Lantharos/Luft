@@ -356,6 +356,7 @@ settings-shortcuts-title = Pikanäppäimet
 settings-shortcuts-search = Hae pikanäppäimiä
 settings-shortcuts-category-system = Järjestelmä
 settings-shortcuts-category-windows = Ikkunat
+settings-shortcuts-category-tiling = Laatoitus
 settings-shortcuts-category-workspaces = Työtilat
 settings-shortcuts-category-screenshots = Kuvakaappaukset
 settings-shortcuts-category-media = Media

@@ -46,6 +46,8 @@ settings-page-about = O računalu
 
 settings-page-taskbar = Programska traka i Start
     .keywords = traka, panel, dock, automatsko skrivanje, automatski sakrij, sakrij programsku traku, plutajuća, prozirna, prikvačene aplikacije, poravnanje, gumb start, izbornik start, start menu, gust, traka za pretraživanje, pokretač, launcher, pretraživanje weba, web-pretraživanje, tražilica, zasloni, radni prostor, radna površina, virtualna radna površina
+settings-page-tiling = Popločavanje prozora
+    .keywords = popločavanje, popločani prozori, tiling, pomicanje, stupci, razmaci, spirala, dwindle, glavni i hrpa, master, plutajući prozori, raspored prozora, višezadaćnost
 settings-page-fonts = Fontovi
     .keywords = svi fontovi, pisma, obitelji fontova, instaliraj fontove, ukloni fontove
 settings-page-cursors = Teme pokazivača

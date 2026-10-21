@@ -46,6 +46,8 @@ settings-page-about = Info
 
 settings-page-taskbar = Taskleiste und Start
     .keywords = leiste, dock, automatisch ausblenden, ausblenden, taskleiste ausblenden, schwebend, transparent, angeheftete apps, ausrichtung, startschaltfläche, start-schaltfläche, startmenü, start menu, gust, suchleiste, launcher, websuche, im web suchen, suchmaschine, bildschirme, arbeitsfläche, desktop, virtueller desktop
+settings-page-tiling = Fenster kacheln
+    .keywords = kacheln, gekachelte fenster, fensterkacheln, tiling, scrollen, spalten, abstände, spirale, dwindle, haupt- und stapelbereich, master, schwebende fenster, fensteranordnung, multitasking
 settings-page-fonts = Schriftarten
     .keywords = alle schriftarten, schriften, schriftfamilien, schriftarten installieren, schriftarten entfernen
 settings-page-cursors = Zeigerdesigns

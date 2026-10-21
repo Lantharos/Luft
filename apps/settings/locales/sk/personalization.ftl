@@ -226,6 +226,34 @@ settings-notifications-keep-description = Inak zmiznú, keď sa ich banner zavri
 settings-notifications-app-lock-screen = Zobrazovať na uzamknutej obrazovke
 settings-notifications-done = Hotovo
 
+## Window tiling
+
+settings-tiling-preview = Náhľad usporiadania okien
+settings-tiling-title = Dlaždicové usporiadanie okien
+settings-tiling-back = Vzhľad
+settings-tiling-mode = Usporiadanie okien
+settings-tiling-mode-off = Vypnuté
+settings-tiling-mode-tiling = Dlaždice
+settings-tiling-mode-scrolling = Posúvanie
+settings-tiling-mode-off-description = Okná zostanú tam, kam ich položíte, a prichytávajú sa k okrajom a rohom
+settings-tiling-mode-tiling-description = Nové okná zdieľajú obrazovku s ostatnými, takže sa nič neprekrýva
+settings-tiling-mode-scrolling-description = Každé okno sa otvorí ako stĺpec na páse, ktorý sa posúva do strany
+settings-tiling-layout = Rozloženie
+settings-tiling-layout-dwindle = Špirála
+settings-tiling-layout-master = Hlavné a zásobník
+settings-tiling-layout-dwindle-description = Každé nové okno rozdelí aktívne okno na dve polovice
+settings-tiling-layout-master-description = Jedno veľké okno vľavo, ostatné naskladané vpravo
+settings-tiling-gaps = Medzery
+settings-tiling-gaps-none = Žiadne
+settings-tiling-gaps-small = Malé
+settings-tiling-gaps-medium = Stredné
+settings-tiling-gaps-large = Veľké
+settings-tiling-new-windows = Nové okná sa otvárajú
+settings-tiling-new-beside = Vedľa aktívneho okna
+settings-tiling-new-at-end = Na konci
+settings-tiling-shortcuts = Skratky dlaždíc
+settings-tiling-shortcuts-description = Aktivácia, presun a zmena veľkosti dlaždicových okien z klávesnice
+
 ## Accessibility
 
 settings-accessibility-seeing = Zrak

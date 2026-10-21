@@ -124,6 +124,24 @@ desktop-shortcut-maximize-vertically = Maksimeeri aken vertikaalselt
 desktop-shortcut-maximize-horizontally = Maksimeeri aken horisontaalselt
 desktop-shortcut-toggle-tiled-left = Paiguta aken vasakule poolele
 desktop-shortcut-toggle-tiled-right = Paiguta aken paremale poolele
+desktop-shortcut-tiling-focus-left = Aktiveeri vasakpoolne aken
+desktop-shortcut-tiling-focus-right = Aktiveeri parempoolne aken
+desktop-shortcut-tiling-focus-up = Aktiveeri ülemine aken
+desktop-shortcut-tiling-focus-down = Aktiveeri alumine aken
+desktop-shortcut-tiling-move-left = Liiguta akent vasakule
+desktop-shortcut-tiling-move-right = Liiguta akent paremale
+desktop-shortcut-tiling-move-up = Liiguta akent üles
+desktop-shortcut-tiling-move-down = Liiguta akent alla
+desktop-shortcut-tiling-resize-left = Liiguta akna serva vasakule
+desktop-shortcut-tiling-resize-right = Liiguta akna serva paremale
+desktop-shortcut-tiling-resize-up = Liiguta akna serva üles
+desktop-shortcut-tiling-resize-down = Liiguta akna serva alla
+desktop-shortcut-tiling-toggle-floating = Lase aknal hõljuda või paani see
+desktop-shortcut-tiling-cycle-width = Muuda veeru laiust
+desktop-shortcut-tiling-center-column = Joonda veerg keskele
+desktop-shortcut-tiling-overview = Näita kogu riba
+desktop-shortcut-tiling-stack-left = Virna vasakpoolsesse veergu
+desktop-shortcut-tiling-stack-right = Virna parempoolsesse veergu
 
 ## Sound
 desktop-sound-meter-stream = Sisendi tase

@@ -356,6 +356,7 @@ settings-shortcuts-title = Kortkommandon
 settings-shortcuts-search = Sök kortkommandon
 settings-shortcuts-category-system = System
 settings-shortcuts-category-windows = Fönster
+settings-shortcuts-category-tiling = Plattor
 settings-shortcuts-category-workspaces = Arbetsytor
 settings-shortcuts-category-screenshots = Skärmbilder
 settings-shortcuts-category-media = Media

@@ -124,6 +124,24 @@ desktop-shortcut-maximize-vertically = Maksymalizuj okno w pionie
 desktop-shortcut-maximize-horizontally = Maksymalizuj okno w poziomie
 desktop-shortcut-toggle-tiled-left = Przyciągnij okno do lewej połowy
 desktop-shortcut-toggle-tiled-right = Przyciągnij okno do prawej połowy
+desktop-shortcut-tiling-focus-left = Aktywuj okno po lewej
+desktop-shortcut-tiling-focus-right = Aktywuj okno po prawej
+desktop-shortcut-tiling-focus-up = Aktywuj okno powyżej
+desktop-shortcut-tiling-focus-down = Aktywuj okno poniżej
+desktop-shortcut-tiling-move-left = Przenieś okno w lewo
+desktop-shortcut-tiling-move-right = Przenieś okno w prawo
+desktop-shortcut-tiling-move-up = Przenieś okno w górę
+desktop-shortcut-tiling-move-down = Przenieś okno w dół
+desktop-shortcut-tiling-resize-left = Przesuń krawędź okna w lewo
+desktop-shortcut-tiling-resize-right = Przesuń krawędź okna w prawo
+desktop-shortcut-tiling-resize-up = Przesuń krawędź okna w górę
+desktop-shortcut-tiling-resize-down = Przesuń krawędź okna w dół
+desktop-shortcut-tiling-toggle-floating = Ustaw okno jako pływające lub kafelkowe
+desktop-shortcut-tiling-cycle-width = Zmień szerokość kolumny
+desktop-shortcut-tiling-center-column = Wyśrodkuj kolumnę
+desktop-shortcut-tiling-overview = Pokaż cały pasek
+desktop-shortcut-tiling-stack-left = Dołącz do kolumny po lewej
+desktop-shortcut-tiling-stack-right = Dołącz do kolumny po prawej
 
 ## Sound
 desktop-sound-meter-stream = Poziom wejścia

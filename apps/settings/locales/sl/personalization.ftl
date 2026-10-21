@@ -226,6 +226,34 @@ settings-notifications-keep-description = Sicer izginejo, ko se njihova pasica z
 settings-notifications-app-lock-screen = Pokaži na zaklenjenem zaslonu
 settings-notifications-done = Končano
 
+## Window tiling
+
+settings-tiling-preview = Predogled razporeditve oken
+settings-tiling-title = Tlakovanje oken
+settings-tiling-back = Videz
+settings-tiling-mode = Razporedi okna
+settings-tiling-mode-off = Izklopljeno
+settings-tiling-mode-tiling = Tlakovanje
+settings-tiling-mode-scrolling = Drsenje
+settings-tiling-mode-off-description = Okna ostanejo tam, kamor jih postavite, in se zaskočijo ob robove in kote
+settings-tiling-mode-tiling-description = Nova okna si delijo zaslon z drugimi, zato se nič ne prekriva
+settings-tiling-mode-scrolling-description = Vsako okno se odpre kot stolpec na traku, ki drsi vstran
+settings-tiling-layout = Postavitev
+settings-tiling-layout-dwindle = Spirala
+settings-tiling-layout-master = Glavno in sklad
+settings-tiling-layout-dwindle-description = Vsako novo okno razdeli dejavno okno na dva dela
+settings-tiling-layout-master-description = Eno veliko okno levo, ostala zložena desno
+settings-tiling-gaps = Razmiki
+settings-tiling-gaps-none = Brez
+settings-tiling-gaps-small = Majhni
+settings-tiling-gaps-medium = Srednji
+settings-tiling-gaps-large = Veliki
+settings-tiling-new-windows = Nova okna se odprejo
+settings-tiling-new-beside = Ob dejavnem oknu
+settings-tiling-new-at-end = Na koncu
+settings-tiling-shortcuts = Bližnjice za tlakovanje
+settings-tiling-shortcuts-description = Aktivirajte, premikajte in spreminjajte velikost tlakovanih oken s tipkovnico
+
 ## Accessibility
 
 settings-accessibility-seeing = Vid

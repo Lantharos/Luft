@@ -46,6 +46,8 @@ settings-page-about = Um tölvuna
 
 settings-page-taskbar = Verkstika og Upphaf
     .keywords = spjald, dokka, fela sjálfkrafa, fela verkstiku, fljótandi, gegnsæ, fest forrit, jöfnun, staðsetning, upphafshnappur, upphaf, upphafsvalmynd, start, start menu, gust, leitarstika, leitarreitur, ræsiforrit, launcher, vefleit, leita á vefnum, leitarvél, skjáir, vinnusvæði, skjáborð, sýndarskjáborð
+settings-page-tiling = Flísalagning glugga
+    .keywords = flísar, flísalagðir gluggar, tiling, skrun, dálkar, bil, spírall, dwindle, aðalgluggi og stafli, master, fljótandi gluggar, gluggaröðun, fjölverkavinnsla
 settings-page-fonts = Letur
     .keywords = öll letur, leturgerðir, leturfjölskyldur, setja upp letur, fjarlægja letur
 settings-page-cursors = Bendlaþemu

@@ -20,7 +20,7 @@ export type PanelId =
 	| 'updates'
 	| 'about';
 
-export type SubpageId = 'appearance/taskbar' | 'appearance/fonts' | 'appearance/cursors' | 'keyboard/dictation' | 'accounts/add';
+export type SubpageId = 'appearance/taskbar' | 'appearance/tiling' | 'appearance/fonts' | 'appearance/cursors' | 'keyboard/dictation' | 'accounts/add';
 
 export type PageId = PanelId | SubpageId;
 
@@ -69,6 +69,7 @@ export const PANEL_PAGES: Page<PanelId>[][] = [
 
 export const SUBPAGES: Page<SubpageId>[] = [
 	page('appearance/taskbar', 'settings-page-taskbar', 'user-desktop-symbolic'),
+	page('appearance/tiling', 'settings-page-tiling', 'view-dual-symbolic'),
 	page('appearance/fonts', 'settings-page-fonts', 'preferences-desktop-font-symbolic'),
 	page('appearance/cursors', 'settings-page-cursors', 'input-mouse-symbolic'),
 	page('keyboard/dictation', 'settings-page-dictation', 'audio-input-microphone-symbolic', true),

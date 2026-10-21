@@ -124,6 +124,24 @@ desktop-shortcut-maximize-vertically = Maksimer vindauget loddrett
 desktop-shortcut-maximize-horizontally = Maksimer vindauget vassrett
 desktop-shortcut-toggle-tiled-left = Dokk vindauget til venstre halvdel
 desktop-shortcut-toggle-tiled-right = Dokk vindauget til høgre halvdel
+desktop-shortcut-tiling-focus-left = Aktiver vindauget til venstre
+desktop-shortcut-tiling-focus-right = Aktiver vindauget til høgre
+desktop-shortcut-tiling-focus-up = Aktiver vindauget over
+desktop-shortcut-tiling-focus-down = Aktiver vindauget under
+desktop-shortcut-tiling-move-left = Flytt vindauget til venstre
+desktop-shortcut-tiling-move-right = Flytt vindauget til høgre
+desktop-shortcut-tiling-move-up = Flytt vindauget opp
+desktop-shortcut-tiling-move-down = Flytt vindauget ned
+desktop-shortcut-tiling-resize-left = Flytt vindaugskanten til venstre
+desktop-shortcut-tiling-resize-right = Flytt vindaugskanten til høgre
+desktop-shortcut-tiling-resize-up = Flytt vindaugskanten opp
+desktop-shortcut-tiling-resize-down = Flytt vindaugskanten ned
+desktop-shortcut-tiling-toggle-floating = La vindauget flyte, eller legg det som flis
+desktop-shortcut-tiling-cycle-width = Endra kolonnebreidd
+desktop-shortcut-tiling-center-column = Midtstill kolonnen
+desktop-shortcut-tiling-overview = Vis heile stripa
+desktop-shortcut-tiling-stack-left = Stable i kolonnen til venstre
+desktop-shortcut-tiling-stack-right = Stable i kolonnen til høgre
 
 ## Sound
 desktop-sound-meter-stream = Inngangsnivå

@@ -222,6 +222,34 @@ settings-notifications-keep-description = Anders verdwijnen ze zodra hun banner 
 settings-notifications-app-lock-screen = Tonen op het vergrendelscherm
 settings-notifications-done = Klaar
 
+## Window tiling
+
+settings-tiling-preview = Voorbeeld van de vensterindeling
+settings-tiling-title = Vensters tegelen
+settings-tiling-back = Uiterlijk
+settings-tiling-mode = Vensters indelen
+settings-tiling-mode-off = Uit
+settings-tiling-mode-tiling = Tegelen
+settings-tiling-mode-scrolling = Scrollen
+settings-tiling-mode-off-description = Vensters blijven waar je ze neerzet en lijnen uit tegen randen en hoeken
+settings-tiling-mode-tiling-description = Nieuwe vensters delen het scherm met de andere, zodat niets overlapt
+settings-tiling-mode-scrolling-description = Elk venster opent als kolom op een strook die opzij scrolt
+settings-tiling-layout = Indeling
+settings-tiling-layout-dwindle = Spiraal
+settings-tiling-layout-master = Hoofdvenster en stapel
+settings-tiling-layout-dwindle-description = Elk nieuw venster deelt het actieve venster in tweeën
+settings-tiling-layout-master-description = Eén groot venster links, de rest rechts gestapeld
+settings-tiling-gaps = Tussenruimte
+settings-tiling-gaps-none = Geen
+settings-tiling-gaps-small = Klein
+settings-tiling-gaps-medium = Gemiddeld
+settings-tiling-gaps-large = Groot
+settings-tiling-new-windows = Nieuwe vensters openen
+settings-tiling-new-beside = Naast het actieve venster
+settings-tiling-new-at-end = Aan het einde
+settings-tiling-shortcuts = Sneltoetsen voor tegelen
+settings-tiling-shortcuts-description = Getegelde vensters met het toetsenbord activeren, verplaatsen en van grootte veranderen
+
 ## Accessibility
 
 settings-accessibility-seeing = Zien

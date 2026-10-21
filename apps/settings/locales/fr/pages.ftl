@@ -46,6 +46,8 @@ settings-page-about = À propos
 
 settings-page-taskbar = Barre des tâches et Start
     .keywords = barre, panneau, dock, masquer automatiquement, masquage automatique, masquer la barre des tâches, flottante, transparente, applications épinglées, alignement, bouton start, bouton démarrer, menu start, menu démarrer, gust, barre de recherche, lanceur, launcher, recherche web, rechercher sur le web, moteur de recherche, écrans, espace de travail, bureau, bureau virtuel
+settings-page-tiling = Pavage des fenêtres
+    .keywords = pavage, fenêtres pavées, tiling, défilement, colonnes, espacement, spirale, dwindle, principale et pile, master, fenêtres flottantes, disposition des fenêtres, multitâche
 settings-page-fonts = Polices
     .keywords = toutes les polices, polices de caractères, familles de polices, typographie, installer des polices, supprimer des polices
 settings-page-cursors = Thèmes de curseur

@@ -222,6 +222,34 @@ settings-notifications-keep-description = Caso contrário, elas somem quando o b
 settings-notifications-app-lock-screen = Mostrar na tela de bloqueio
 settings-notifications-done = Concluído
 
+## Window tiling
+
+settings-tiling-preview = Prévia da disposição das janelas
+settings-tiling-title = Mosaico de janelas
+settings-tiling-back = Aparência
+settings-tiling-mode = Organizar janelas
+settings-tiling-mode-off = Desligado
+settings-tiling-mode-tiling = Mosaico
+settings-tiling-mode-scrolling = Rolagem
+settings-tiling-mode-off-description = As janelas ficam onde você as coloca e se ajustam às bordas e cantos
+settings-tiling-mode-tiling-description = As novas janelas dividem a tela com as outras, sem sobreposição
+settings-tiling-mode-scrolling-description = Cada janela abre como uma coluna em uma faixa que rola para os lados
+settings-tiling-layout = Disposição
+settings-tiling-layout-dwindle = Espiral
+settings-tiling-layout-master = Principal e pilha
+settings-tiling-layout-dwindle-description = Cada nova janela divide em duas a janela ativa
+settings-tiling-layout-master-description = Uma janela grande à esquerda e as demais empilhadas à direita
+settings-tiling-gaps = Espaçamento
+settings-tiling-gaps-none = Nenhum
+settings-tiling-gaps-small = Pequeno
+settings-tiling-gaps-medium = Médio
+settings-tiling-gaps-large = Grande
+settings-tiling-new-windows = Novas janelas abrem
+settings-tiling-new-beside = Ao lado da janela ativa
+settings-tiling-new-at-end = No final
+settings-tiling-shortcuts = Atalhos do mosaico
+settings-tiling-shortcuts-description = Ative, mova e redimensione janelas em mosaico pelo teclado
+
 ## Accessibility
 
 settings-accessibility-seeing = Visão

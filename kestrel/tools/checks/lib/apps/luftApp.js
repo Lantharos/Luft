@@ -18,7 +18,6 @@ const LOG_LINES = 40;
 const SETTLE_TIMEOUT = 5000;
 const SETTLE_INTERVAL = 50;
 const CHANGE_TIMEOUT = 5000;
-const DEV_APPS = (GLib.getenv('KESTREL_DEV_APPS') ?? '').split(',').filter(Boolean);
 const SABINE = GLib.build_filenamev([GLib.get_user_data_dir(), 'sabine']);
 
 let home = null;
@@ -41,11 +40,8 @@ function environment(manifest = null) {
 }
 
 function command(name) {
-  if (DEV_APPS.includes(name)) {
-    const app = repository('apps', name);
-    return {path: GLib.build_filenamev([app, 'desktop/target/release', name]), manifest: GLib.build_filenamev([app, 'Sabine.toml'])};
-  }
-  return {path: GLib.build_filenamev([GLib.get_home_dir(), '.local/share/sabine/apps', `com.lantharos.${name}`, 'install', name]), manifest: null};
+  const app = repository('apps', name);
+  return {path: GLib.build_filenamev([app, 'desktop/target/release', name]), manifest: GLib.build_filenamev([app, 'Sabine.toml'])};
 }
 
 export const appBinary = name => command(name).path;

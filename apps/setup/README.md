@@ -28,7 +28,8 @@ The setup app and `luft-installer` ship in Luft's image; the installer's D-Bus, 
 ## Testing
 
 ```sh
-KESTREL_DEV_APPS=setup kestrel/tools/session.sh setup
+bun run desktop:build
+kestrel/tools/session.sh setup
 ```
 
 runs the setup checks in a headless Kestrel in setup mode, against stand-ins for the installer, NetworkManager, trustd and logind, and saves a screenshot of every step.

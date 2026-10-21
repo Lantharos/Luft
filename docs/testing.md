@@ -11,7 +11,7 @@ Build Kestrel first (see [Building Luft](https://docs.luft.computer/developers/b
 | `kestrel/tools/session.sh nested` | A visible nested session in Mutter's development kit window, for trying things by hand |
 | `kestrel/tools/session.sh capture` | The full headless check suite, including the login screen, saving screenshots of every surface |
 | `kestrel/tools/session.sh greeter` | Only the login screen checks, against a stand-in greetd |
-| `kestrel/tools/session.sh setup` | Only the first-run setup checks, in Kestrel's setup mode with Install Luft (needs `KESTREL_DEV_APPS=setup` or an installed build) |
+| `kestrel/tools/session.sh setup` | Only the first-run setup checks, in Kestrel's setup mode with Install Luft |
 | `kestrel/tools/session.sh scaling` | The default display scale for laptop panels and monitors of different sizes, as virtual monitors |
 | `kestrel/tools/session.sh performance` | Startup memory, search, notification bursts, actor reuse, memory after a burst of copied pictures, CPU while a tray icon animates, the cost of a window opening under the task view, idle paints and idle wakeups and CPU |
 | `kestrel/tools/session.sh frames` | Frame times of animations and gestures, see [Frame timing](#frame-timing) |
@@ -31,7 +31,7 @@ The board groups, `input:dictation`, `input:scrolling`, `panel:battery`, `panel:
 
 The `tablet` groups fold the session into a tablet with a virtual tablet mode switch and touchscreen, swipe and tap with a finger, and turn the display through Mutter's display configuration. Their clips of each transition go to `clips` in the capture folder, like those of `motion`.
 
-The nested session copies the host's wallpaper, interface settings, keyboard layout and favorite apps. Closing its window ends it. Headless sessions instead show Luft's own apps plus the stand-in apps in `kestrel/tools/fixtures/apps`, sign in as Mara Lindqvist on a computer named Mara’s Laptop, and read accounts, networks and Bluetooth devices from the stand-in system bus that `KESTREL_STAND_IN_BUS` names. Rover lists two stand-in drives from the mount table that `LUFT_MOUNTS` points it at, Schelf finds no system Flatpaks in the empty folder `FLATPAK_SYSTEM_DIR` names, and with `LUFT_SAMPLE_SYSTEM` set Barometer and Settings → System → About show sample hardware, so screenshots never show who uses the host or what is installed, running or plugged in on it. The `apps:barometer` check is the exception: it starts Mailman in a scope of its own and points a real Barometer at that scope's slice with `LUFT_APP_SLICE`, so it lists only the app the check started. Theme edits reload live after `meson compile -C kestrel/build`.
+The nested session copies the host's wallpaper, interface settings, keyboard layout and favorite apps. Closing its window ends it. Headless sessions instead show the Luft apps built in this tree, which the checks also start from their build folders (run `bun run desktop:build` in each app first), plus the stand-in apps in `kestrel/tools/fixtures/apps`, sign in as Mara Lindqvist on a computer named Mara’s Laptop, and read accounts, networks and Bluetooth devices from the stand-in system bus that `KESTREL_STAND_IN_BUS` names. Rover lists two stand-in drives from the mount table that `LUFT_MOUNTS` points it at, Schelf finds no system Flatpaks in the empty folder `FLATPAK_SYSTEM_DIR` names, and with `LUFT_SAMPLE_SYSTEM` set Barometer and Settings → System → About show sample hardware and Rover sample drive sizes, so screenshots never show who uses the host or what is installed, running or plugged in on it. The `apps:barometer` check is the exception: it starts Mailman in a scope of its own and points a real Barometer at that scope's slice with `LUFT_APP_SLICE`, so it lists only the app the check started. Theme edits reload live after `meson compile -C kestrel/build`.
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
@@ -42,7 +42,6 @@ The nested session copies the host's wallpaper, interface settings, keyboard lay
 | `KESTREL_CAPTURE_SCHEME` | the host's | `light` or `dark`, to capture every surface in one style |
 | `KESTREL_CAPTURE_WALLPAPER` | the host's | An image used as the wallpaper for both styles, also behind the Luft apps in place of their test gradient, to check the glass on light and dark pictures |
 | `LUFT_LOCALE` | the host's | A language for Kestrel and the apps, also used for their dates, numbers and first day of the week, such as `de` or the pseudo-locale `en-XA`. Most checks look for English text, so pair it with `--only system:translations`, which captures Kestrel's surfaces and every Settings page in any language |
-| `KESTREL_DEV_APPS` | none | Luft apps to test from their build folders instead of the installed ones, such as `rover,settings` (run `bun run desktop:build` in each first) |
 | `KESTREL_BUILD` | `kestrel/build` | Another Kestrel build to run, set up against `KESTREL_COMPOSITOR` |
 | `KESTREL_COMPOSITOR` | `kestrel/run/mutter-install` | Another Mutter install to run on, such as one from `kestrel/compositor/build.sh BUILD_DIR PREFIX` |
 

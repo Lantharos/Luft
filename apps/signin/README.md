@@ -22,4 +22,4 @@ kestrel-signin:?network=Harbor%20Hotel&url=http%3A%2F%2Ffedoraproject.org%2Fstat
 
 `network` is the name shown in the window and `url` the page to open, which has to be the web address NetworkManager checks the connection with. Links to any other page are ignored, so only Kestrel's sign-in notification opens a page here.
 
-`kestrel/tools/session.sh capture` opens it against a stand-in hotel page and NetworkManager; set `KESTREL_DEV_APPS=signin` to use your own build.
+`kestrel/tools/session.sh capture` opens its build from `bun run desktop:build` against a stand-in hotel page and NetworkManager.

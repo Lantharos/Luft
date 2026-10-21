@@ -34,7 +34,7 @@ An account keeps the registration it signed in with until it signs in again. iCl
 
 `cargo test` in `packages/accounts/service` covers token exchange against a stand-in server, filters, conflict names and how errors read.
 
-`kestrel/tools/session.sh capture --only apps:cloud`, with `rclone` installed and `KESTREL_DEV_APPS=settings,rover`, signs in to a local WebDAV server from `rclone serve webdav` with a scratch keyring, keeps a folder, and captures Accounts in Settings and the drive in Rover.
+`kestrel/tools/session.sh capture --only apps:cloud`, with `rclone` installed and Settings and Rover built, signs in to a local WebDAV server from `rclone serve webdav` with a scratch keyring, keeps a folder, and captures Accounts in Settings and the drive in Rover.
 
 Signing in to iCloud Drive, OneDrive and Dropbox needs real accounts, so check these by hand after changing sign-in:
 

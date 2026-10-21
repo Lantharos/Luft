@@ -62,22 +62,15 @@ write_dbus_services() {
   done
 }
 
-luft_app_entries() {
-  local apps
-  apps="$(find "$root/apps/" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | paste -sd'|')"
-  printf '^com\\.lantharos\\.(%s)(\\..+)?\\.desktop$' "$apps"
-}
-
 mask_host_apps() {
-  local fixture="$1" luft dir entry data_dirs
-  luft="$(luft_app_entries)"
+  local fixture="$1" dir entry data_dirs
   IFS=: read -ra data_dirs <<< "$XDG_DATA_DIRS"
   for dir in "${data_dirs[@]}"; do
     [[ "$dir" != "$compositor_data" && -d "$dir/applications" ]] || continue
     while read -r entry; do
       mkdir -p "$fixture/applications/$(dirname "$entry")"
       printf '[Desktop Entry]\nHidden=true\n' > "$fixture/applications/$entry"
-    done < <(cd "$dir/applications" && find . -name '*.desktop' -printf '%P\n' | grep -Ev "$luft")
+    done < <(cd "$dir/applications" && find . -name '*.desktop' -printf '%P\n')
   done
 }
 
@@ -86,6 +79,7 @@ use_fixture_desktop() {
   rm -rf "$fixture"
   mkdir -p "$fixture/applications" "$drives/TRAVEL"
   mask_host_apps "$fixture"
+  python3 "$tools/session/appEntries.py" "$root" "$fixture"
   cp "$tools/fixtures/apps/"*.desktop "$fixture/applications/"
   update-desktop-database "$fixture/applications"
   export XDG_DATA_DIRS="$fixture:$XDG_DATA_DIRS"

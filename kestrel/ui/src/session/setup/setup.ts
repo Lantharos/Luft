@@ -61,7 +61,7 @@ export class Setup {
     this.placement = centerOnArrival();
     this.dbus.export(Gio.DBus.session, PATH);
     this.nameId = Gio.bus_own_name_on_connection(Gio.DBus.session, NAME, Gio.BusNameOwnerFlags.NONE, null, null);
-    const launched = this.launch();
+    const launched = !global.backend.is_headless() && this.launch();
     this.ready = Promise.all([this.backdrop.loaded, launched ? firstWindow() : Promise.resolve()]).then(() => {});
   }
 

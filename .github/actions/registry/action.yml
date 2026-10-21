@@ -1,0 +1,9 @@
+name: Sign in to the registry
+description: Signs podman in to GitHub's container registry with the workflow's token.
+
+runs:
+  using: composite
+  steps:
+    - name: Sign in to the registry
+      shell: bash
+      run: echo "${{ github.token }}" | podman login ghcr.io --username "${{ github.actor }}" --password-stdin

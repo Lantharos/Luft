@@ -1,10 +1,8 @@
-import { basename } from '@luft/ui';
+import { basename, fuzzyMatch, matchItems, topMatches, type PaletteItem, type PaletteSource } from '@luft/ui';
 import type { App } from '#lib/app/app.svelte.js';
 import type { Command } from '#lib/commands/registry.js';
 import { openPath } from '#lib/documents/opening.js';
 import { dirname, tildify } from '#lib/utils/paths.js';
-import { fuzzyMatch, topMatches } from './fuzzy';
-import type { PaletteItem, PaletteSource } from './palette.svelte';
 
 const LIMIT = 80;
 const COMMAND_PREFIX = '>';
@@ -97,19 +95,10 @@ export function quickOpen(app: App): PaletteSource {
 	};
 }
 
-export function picker(placeholder: string, options: { key: string; label: string; detail?: string; checked?: boolean; run: () => void }[]): PaletteSource {
+export function picker(placeholder: string, options: PaletteItem[]): PaletteSource {
 	return {
 		placeholder,
 		empty: 'Nothing matches',
-		items: (query) => {
-			const lowered = query.trim().toLowerCase();
-			if (!lowered) return options;
-			const matched = new Map<string, number[]>();
-			return topMatches(options, LIMIT, (option) => {
-				const match = fuzzyMatch(lowered, option.label);
-				if (match) matched.set(option.key, match.indices);
-				return match?.score ?? null;
-			}).map((option) => ({ ...option, labelMatches: matched.get(option.key) }));
-		}
+		items: (query) => matchItems(options, query)
 	};
 }

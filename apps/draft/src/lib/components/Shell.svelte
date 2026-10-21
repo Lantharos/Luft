@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { appearance, fileDrop, GlassShell } from '@luft/ui';
+	import { appearance, CommandPalette, fileDrop, GlassShell } from '@luft/ui';
 	import { untrack } from 'svelte';
 	import type { App } from '#lib/app/app.svelte.js';
 	import { runShortcut } from '#lib/commands/shortcuts.js';
@@ -9,7 +9,6 @@
 	import EditorPane from './editor/EditorPane.svelte';
 	import StatusBar from './editor/StatusBar.svelte';
 	import TitleBar from './editor/TitleBar.svelte';
-	import PaletteView from './palette/PaletteView.svelte';
 	import MarkdownPreview from './preview/MarkdownPreview.svelte';
 	import Sidebar from './sidebar/Sidebar.svelte';
 
@@ -49,7 +48,7 @@
 			</div>
 			<StatusBar />
 		</main>
-		<PaletteView />
+		<CommandPalette palette={app.palette} onclose={() => app.workspace.editor.focus()} />
 		<CloseDialog />
 		<Menu />
 	</GlassShell>

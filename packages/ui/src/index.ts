@@ -32,6 +32,10 @@ export { default as ItemRow } from './rows/ItemRow.svelte';
 export { default as Row } from './rows/Row.svelte';
 export { default as Section } from './rows/Section.svelte';
 
+export { default as CommandPalette } from './palette/CommandPalette.svelte';
+export { fuzzyMatch, topMatches, type FuzzyMatch } from './palette/fuzzy';
+export { matchItems, PaletteState, type PaletteItem, type PaletteSource } from './palette/palette.svelte';
+
 export { formatClock } from './playback/clock';
 export { default as MediaControls } from './playback/MediaControls.svelte';
 export { MediaState } from './playback/media-state.svelte';

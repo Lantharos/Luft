@@ -1,11 +1,11 @@
 <script lang="ts">
+	import type { PaletteSource } from '@luft/ui';
 	import type { App } from '#lib/app/app.svelte.js';
 	import { useApp } from '#lib/app/context.js';
 	import type { Document } from '#lib/documents/document.svelte.js';
 	import { encodingName } from '#lib/documents/encodings.js';
 	import { describeIndentation } from '#lib/editor/indentation.js';
 	import { encodingPicker, indentationPicker, languagePicker, lineEndingPicker } from '#lib/palette/pickers.js';
-	import type { PaletteSource } from '#lib/palette/palette.svelte.js';
 	import { quickOpen } from '#lib/palette/sources.js';
 	import { tildify } from '#lib/utils/paths.js';
 

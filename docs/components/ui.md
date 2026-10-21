@@ -101,7 +101,7 @@ $effect(() => {
 
 | Component | Use |
 | --- | --- |
-| `GlassShell`, `WindowControls` | Window body and title bar buttons |
+| `GlassShell`, `WindowControls` | Window body and title bar buttons; `maximizable={false}` hides maximize, `closable={false}` disables close and `onclose` replaces closing the window |
 | `Switch`, `Checkbox`, `Slider`, `Select`, `Segmented` | Form controls with a `label` and `onchange`; `Segmented` takes an `item` snippet for icons |
 | `SearchField` | Search input; `variant="sidebar"`, `large`, and `focus()` |
 | `TextField`, `PasswordField` | Text inputs with `error`, `live`, `invalid` and bindable `touched`; `PasswordField` adds show and hide with `onreveal` |
@@ -120,6 +120,7 @@ $effect(() => {
 | `Choice` | Large option button with an icon, title, description and optional `note` |
 | `SplitBar` | Draggable bar that splits a drive's space between two parts, with `free` showing the part of the second that's free already |
 | `FingerprintDial` | Progress ring and prompt for a `FingerprintEnrollment` |
+| `CommandPalette` | Search box with a list of items over the window, showing the `PaletteState` it's given; `onclose` runs after it closes |
 
 ## Helpers
 
@@ -139,13 +140,15 @@ $effect(() => {
 | `ago(unixSeconds)` | Relative time such as `5 minutes ago` |
 | `watts(value)` | Power such as `4.2 W` |
 | `formatClock(seconds)` | `1:05` or `1:02:05` |
+| `PaletteState` | What the `CommandPalette` shows: `show(source, query?)` opens it with a `PaletteSource`, whose `items(query)` returns the `PaletteItem`s for what's typed |
+| `matchItems(items, query)`, `fuzzyMatch(query, text)`, `topMatches(items, limit, score)` | Fuzzy matching that favors word starts and runs of letters, with the matched positions for highlighting |
 | `renderMarkdown(source, path)` | Markdown to HTML, with relative images resolved against `path` |
 | `canPlayNatively()`, `decodeFailed(media)` | Whether native video is available, and whether a `<video>` failed to decode |
 | `MediaState` | A native player's state as reactive fields with setters, for `MediaControls` |
 | `MARK_LAYERS`, `MARK_SCALE`, `PAINTED_MARK_SCALE` | The Start mark's two layers, which color each takes and which one carries the taskbar's halo, shared with Kestrel's Start button |
 | `FingerprintEnrollment`, `fingerprints()`, `fingerprintReader()`, `deleteFingerprint(finger)` | Enrolling and managing fingerprints through `luft-fingerprint`; `FINGERS` and `fingerLabel` name the fingers |
 
-Types: `Appearance`, `AppIconStyle`, `Palette`, `Scheme`, `SchemeColors`, `MarkLayer`, `MarkFills`, `TaskbarLook`, `TaskbarLooks`, `TaskbarLookPaint`, `Shadow`, `VirtualRect`, `VirtualHandle`, `VirtualLayout`.
+Types: `Appearance`, `AppIconStyle`, `Palette`, `PaletteItem`, `PaletteSource`, `FuzzyMatch`, `Scheme`, `SchemeColors`, `MarkLayer`, `MarkFills`, `TaskbarLook`, `TaskbarLooks`, `TaskbarLookPaint`, `Shadow`, `VirtualRect`, `VirtualHandle`, `VirtualLayout`.
 
 ## Classes
 

@@ -1,11 +1,15 @@
 <script lang="ts">
 	import Check from '@lucide/svelte/icons/check';
-	import { useApp } from '#lib/app/context.js';
-	import type { PaletteItem } from '#lib/palette/palette.svelte.js';
 	import Highlight from './Highlight.svelte';
+	import type { PaletteItem, PaletteState } from './palette.svelte';
 
-	const app = useApp();
-	let palette = $derived(app.palette);
+	interface Props {
+		palette: PaletteState;
+		onclose?: () => void;
+	}
+
+	let { palette, onclose }: Props = $props();
+
 	let items = $derived(palette.open && palette.source ? palette.source.items(palette.query) : []);
 	let selected = $state(0);
 	let list = $state<HTMLDivElement>();
@@ -27,13 +31,12 @@
 
 	function close() {
 		palette.close();
-		app.workspace.editor.focus();
+		onclose?.();
 	}
 
 	function choose(item: PaletteItem | undefined) {
 		if (!item) return;
-		palette.close();
-		app.workspace.editor.focus();
+		close();
 		item.run();
 	}
 
@@ -49,7 +52,7 @@
 
 {#if palette.open && palette.source}
 	<div class="palette-backdrop" role="presentation" onpointerdown={close}></div>
-	<div class="palette" role="dialog" aria-label={palette.source.placeholder}>
+	<div class="palette" role="dialog" aria-modal="true" aria-label={palette.source.placeholder}>
 		<input
 			{@attach focusInput}
 			class="palette-input"
@@ -81,7 +84,7 @@
 							<Check size={15} class="flex-none text-[var(--accent)]" />
 						{/if}
 						{#if item.hint}
-							<span class="flex-none text-[12px] text-[var(--text-muted)]">{item.hint}</span>
+							<span class="flex flex-none gap-1">{#each item.hint.split(' ') as key, index (index)}<kbd>{key}</kbd>{/each}</span>
 						{/if}
 					</button>
 				{/each}
@@ -153,6 +156,17 @@
 
 	.palette-item.is-selected {
 		background: var(--surface-hover);
+	}
+
+	kbd {
+		min-width: 22px;
+		border-radius: 7px;
+		background: var(--control);
+		padding: 2px 6px;
+		text-align: center;
+		font-family: inherit;
+		font-size: 11.5px;
+		color: var(--text-muted);
 	}
 
 	.palette-empty {

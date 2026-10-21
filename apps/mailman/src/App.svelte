@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { appearance, GlassShell, plural, Toast, tooltip } from '@luft/ui';
+	import { appearance, CommandPalette, GlassShell, PaletteState, plural, Toast, tooltip } from '@luft/ui';
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import * as api from '#lib/api/index.js';
-	import { commands, type Shell } from '#lib/app/commands.js';
+	import { commands, paletteSource, type Shell } from '#lib/app/commands.js';
 	import { handleKeydown } from '#lib/app/keyboard.js';
 	import { opened } from '#lib/app/launch.svelte.js';
 	import { followSidebarRegions, layout } from '#lib/app/layout.svelte.js';
@@ -15,7 +15,6 @@
 	import { list } from '#lib/mail/list.svelte.js';
 	import { mail } from '#lib/mail/mail.svelte.js';
 	import { viewLabel } from '#lib/mail/views.js';
-	import CommandPalette from '#lib/palette/CommandPalette.svelte';
 	import MessageFile from '#lib/reader/MessageFile.svelte';
 	import Reader from '#lib/reader/Reader.svelte';
 	import ReaderActions from '#lib/reader/ReaderActions.svelte';
@@ -36,7 +35,7 @@
 
 	let sidebar = $state<Sidebar>();
 	let readerActions = $state<ReaderActions>();
-	let palette = $state(false);
+	const palette = new PaletteState();
 	let settings = $state(false);
 	let adding = $state(false);
 	let shortcuts = $state(false);
@@ -136,14 +135,14 @@
 		if (attached && composer.current) composer.current.attachments = [...composer.current.attachments, ...attached.map((file) => ({ ...file, cid: null }))];
 	}
 
-	function search(query: string) {
-		void list.search(query);
+	function showPalette() {
+		palette.show(paletteSource(shell, (query) => void list.search(query)));
 	}
 </script>
 
 <svelte:window
 	bind:innerWidth={layout.width}
-	onkeydown={(event) => handleKeydown(event, { commands: () => commands(shell), palette: () => (palette = true) })}
+	onkeydown={(event) => palette.open || handleKeydown(event, { commands: () => commands(shell), palette: showPalette })}
 	onfocus={() => void api.setFocused(true)}
 	onblur={() => void api.setFocused(false)}
 	ondragover={dragOver}
@@ -153,7 +152,7 @@
 <div class="h-[100dvh] w-screen overflow-hidden" style:--sidebar-width="{layout.sidebarWidth}px">
 	<GlassShell class="h-full select-none">
 		{#if layout.sidebar !== 'none'}
-			<Sidebar bind:this={sidebar} rail={layout.sidebar === 'rail'} onsettings={() => (settings = true)} onsearch={() => (palette = true)} />
+			<Sidebar bind:this={sidebar} rail={layout.sidebar === 'rail'} onsettings={() => (settings = true)} onsearch={showPalette} />
 		{/if}
 		<main class="glass-content relative isolate">
 			{#if opened.file}
@@ -218,9 +217,7 @@
 	</GlassShell>
 </div>
 
-{#if palette}
-	<CommandPalette commands={commands(shell)} onsearch={search} onclose={() => (palette = false)} />
-{/if}
+<CommandPalette {palette} />
 {#if settings}
 	<SettingsDialog onclose={() => (settings = false)} onadd={() => ((settings = false), (adding = true))} />
 {/if}

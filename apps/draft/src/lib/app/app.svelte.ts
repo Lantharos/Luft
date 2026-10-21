@@ -1,5 +1,5 @@
 import { appWindow } from '@lantharos/sabine';
-import { appearance } from '@luft/ui';
+import { appearance, PaletteState } from '@luft/ui';
 import { tick } from 'svelte';
 import type { Backend } from '#lib/bridge/index.js';
 import { buildCommands, type Command } from '#lib/commands/registry.js';
@@ -10,7 +10,6 @@ import { restoreSession, sessionName, sessionWriter, writeSession, type Session 
 import { Workspace } from '#lib/documents/workspace.svelte.js';
 import { FileIndex } from '#lib/files/index.svelte.js';
 import { Menus } from '#lib/app/menus.svelte.js';
-import { Palette } from '#lib/palette/palette.svelte.js';
 import { quickOpen } from '#lib/palette/sources.js';
 import { FONT_SIZES, SettingsStore } from '#lib/app/settings.svelte.js';
 import { debounce } from '#lib/utils/debounce.js';
@@ -21,7 +20,7 @@ const DEFAULT_FONT_SIZE = 14;
 export class App {
 	readonly backend: Backend;
 	readonly settings = new SettingsStore();
-	readonly palette = new Palette();
+	readonly palette = new PaletteState();
 	readonly menus = new Menus();
 	readonly workspace: Workspace;
 	readonly files: FileIndex;

@@ -1,3 +1,4 @@
+import { matchItems, type PaletteSource } from '@luft/ui';
 import * as api from '#lib/api/index.js';
 import { composer } from '#lib/compose/composer.svelte.js';
 import * as actions from '#lib/mail/actions.js';
@@ -97,6 +98,17 @@ export function commands(shell: Shell): Command[] {
 		{ id: 'shortcuts', title: 'Keyboard shortcuts', keys: '?', run: shell.showShortcuts },
 		{ id: 'quit', title: 'Quit Mailman', keys: 'Ctrl Q', run: () => void api.quit() }
 	];
+}
+
+export function paletteSource(shell: Shell, search: (query: string) => void): PaletteSource {
+	return {
+		placeholder: list.searching ? 'Type a command' : 'Type a command or search',
+		items: (query) => {
+			const matches = matchItems(commands(shell).map(({ id, title, keys, run }) => ({ key: id, label: title, hint: keys, run })), query);
+			const trimmed = query.trim();
+			return trimmed ? [...matches, { key: 'search-for', label: `Search mail for “${trimmed}”`, hint: 'Enter', run: () => search(trimmed) }] : matches;
+		}
+	};
 }
 
 function open() {

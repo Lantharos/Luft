@@ -2,7 +2,7 @@
 
 Install Luft puts Luft on a computer from the USB stick or from Meet Luft, next to Windows, on a whole drive or in place of another Linux, and sets the computer up the first time it starts. It runs in Kestrel's setup mode: one window over the blurred wallpaper, with no taskbar. The steps are described in [Install from a USB stick](https://docs.luft.computer/start/usb-stick/), and what happens underneath in [docs/install.md](../../docs/install.md).
 
-![Sharing a drive with Windows](../../docs/screenshots/setup-alongside.png)
+![Sharing a drive with Windows](../../web/docs/src/assets/shots/setup-alongside.webp)
 
 ## Parts
 

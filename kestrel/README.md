@@ -3,8 +3,8 @@
 Kestrel is Luft's desktop and login screen. It runs on its own patched Mutter 51 and brings its own taskbar, Start, quick settings, notification center, lock screen, session manager, settings service and portal backend. What it does for people is in the [docs](https://docs.luft.computer/desktop/overview/).
 
 <picture>
-  <source media="(prefers-color-scheme: light)" srcset="../docs/screenshots/notification-center-light.png">
-  <img src="../docs/screenshots/notification-center.png" alt="The notification center and calendar">
+  <source media="(prefers-color-scheme: light)" srcset="../web/docs/src/assets/shots/notification-center-light.webp">
+  <img src="../web/docs/src/assets/shots/notification-center.webp" alt="The notification center and calendar">
 </picture>
 
 | Folder | What it is |

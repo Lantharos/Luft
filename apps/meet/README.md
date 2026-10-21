@@ -1,6 +1,6 @@
 # Meet Luft
 
-![Meet Luft, ready to try or install Luft](../../docs/screenshots/meet-ready.png)
+![Meet Luft, ready to try or install Luft](../../web/docs/src/assets/shots/meet.webp)
 
 Meet Luft is an app for Windows and Linux that gets a computer ready for Luft without a USB stick. It checks the computer, makes room next to the system already there, and restarts into Luft once to try it, install it or, on Linux, replace the old system and keep your files. It can also make a USB stick, and take everything back out again. Using it is described in [the docs](https://docs.luft.computer/start/meet-luft/), and how it works in [docs/meet.md](../../docs/meet.md).
 

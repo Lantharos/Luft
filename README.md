@@ -3,8 +3,8 @@
 Luft is an operating system for PCs, built on Fedora. It has its own desktop, its own apps and a startup that's signed from the moment you press the power button. It ships as one sealed image that updates as a whole and can always go back to the version before.
 
 <picture>
-  <source media="(prefers-color-scheme: light)" srcset="docs/screenshots/desktop-light.png">
-  <img src="docs/screenshots/desktop.png" alt="The Luft desktop with Rover, Tern and Settings">
+  <source media="(prefers-color-scheme: light)" srcset="web/docs/src/assets/shots/desktop-light.webp">
+  <img src="web/docs/src/assets/shots/desktop.webp" alt="The Luft desktop with Rover, Tern and Settings">
 </picture>
 
 ## What makes it different
@@ -17,12 +17,12 @@ Luft is an operating system for PCs, built on Fedora. It has its own desktop, it
 
 <p>
   <picture>
-    <source media="(prefers-color-scheme: light)" srcset="docs/screenshots/start-light.png">
-    <img src="docs/screenshots/start.png" alt="Start" width="49%">
+    <source media="(prefers-color-scheme: light)" srcset="web/docs/src/assets/shots/start-light.webp">
+    <img src="web/docs/src/assets/shots/start.webp" alt="Start" width="49%">
   </picture>
   <picture>
-    <source media="(prefers-color-scheme: light)" srcset="docs/screenshots/quick-settings-light.png">
-    <img src="docs/screenshots/quick-settings.png" alt="Quick settings" width="49%">
+    <source media="(prefers-color-scheme: light)" srcset="web/docs/src/assets/shots/quick-settings-light.webp">
+    <img src="web/docs/src/assets/shots/quick-settings.webp" alt="Quick settings" width="49%">
   </picture>
 </p>
 

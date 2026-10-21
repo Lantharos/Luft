@@ -8,19 +8,11 @@ const ENDING = 15;
 type Positions = Record<string, { time: number; at: number }>;
 
 function read(): Positions {
-	try {
-		return JSON.parse(localStorage.getItem(KEY) ?? '{}') as Positions;
-	} catch {
-		return {};
-	}
+	return JSON.parse(localStorage.getItem(KEY) ?? '{}') as Positions;
 }
 
 function write(positions: Positions) {
-	try {
-		localStorage.setItem(KEY, JSON.stringify(positions));
-	} catch {
-		return;
-	}
+	localStorage.setItem(KEY, JSON.stringify(positions));
 }
 
 function key(item: Item) {

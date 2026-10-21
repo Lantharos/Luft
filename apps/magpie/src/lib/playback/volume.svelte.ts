@@ -1,12 +1,8 @@
 const KEY = 'magpie.volume';
 
 function stored() {
-	try {
-		const saved = JSON.parse(localStorage.getItem(KEY) ?? 'null');
-		return { volume: Number(saved?.volume ?? 1), muted: Boolean(saved?.muted) };
-	} catch {
-		return { volume: 1, muted: false };
-	}
+	const saved = JSON.parse(localStorage.getItem(KEY) ?? 'null');
+	return { volume: Number(saved?.volume ?? 1), muted: Boolean(saved?.muted) };
 }
 
 class Volume {
@@ -20,11 +16,7 @@ class Volume {
 	}
 
 	save() {
-		try {
-			localStorage.setItem(KEY, JSON.stringify({ volume: this.level, muted: this.muted }));
-		} catch {
-			return;
-		}
+		localStorage.setItem(KEY, JSON.stringify({ volume: this.level, muted: this.muted }));
 	}
 }
 

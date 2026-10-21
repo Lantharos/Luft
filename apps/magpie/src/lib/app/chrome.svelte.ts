@@ -9,20 +9,12 @@ const STRIP_KEY = 'magpie.strip';
 export type Mode = 'viewer' | 'library';
 
 function remembered(key: string, fallback: boolean) {
-	try {
-		const value = localStorage.getItem(key);
-		return value === null ? fallback : value === 'true';
-	} catch {
-		return fallback;
-	}
+	const value = localStorage.getItem(key);
+	return value === null ? fallback : value === 'true';
 }
 
 function remember(key: string, value: boolean) {
-	try {
-		localStorage.setItem(key, String(value));
-	} catch {
-		return;
-	}
+	localStorage.setItem(key, String(value));
 }
 
 class Chrome {

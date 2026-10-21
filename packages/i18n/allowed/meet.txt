@@ -1,4 +1,4 @@
-apps/meet/src/lib/steps/Hello.svelte	Meet Luft
+apps/meet/src/lib/steps/start/Hello.svelte	Meet Luft
 apps/meet/src/lib/components/SpaceBar.svelte	Windows
 apps/meet/src/lib/components/SpaceBar.svelte	Luft
-apps/meet/src/lib/steps/Resize.svelte	Luft
+apps/meet/src/lib/steps/luft/Resize.svelte	Luft

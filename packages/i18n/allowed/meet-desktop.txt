@@ -1,11 +1,11 @@
-apps/meet/desktop/src/app/belongings.rs	Control Panel\Desktop
-apps/meet/desktop/src/app/logs.rs	Luft logs
-apps/meet/desktop/src/app/regional.rs	Keyboard Layout\Preload
-apps/meet/desktop/src/app/regional.rs	Keyboard Layout\Substitutes
+apps/meet/desktop/src/windows/belongings.rs	Control Panel\Desktop
+apps/meet/desktop/src/windows/logs.rs	Luft logs
+apps/meet/desktop/src/windows/regional.rs	Keyboard Layout\Preload
+apps/meet/desktop/src/windows/regional.rs	Keyboard Layout\Substitutes
 apps/meet/desktop/src/app/mod.rs	Meet Luft
 apps/meet/desktop/src/boot/load_option.rs	Meet Luft
-apps/meet/desktop/src/helper/refresh.rs	Luft logs
-apps/meet/desktop/src/helper/system/protected.rs	Meet Luft
+apps/meet/desktop/src/windows/helper/setup/refresh.rs	Luft logs
+apps/meet/desktop/src/windows/helper/system/protected.rs	Meet Luft
 apps/meet/desktop/src/linux/app.rs	Luft keeps your files in place on Linux, so there's nothing to pack.
 apps/meet/desktop/src/linux/helper/mod.rs	Meet Luft doesn't do that on Linux.
 apps/meet/desktop/src/linux/logs.rs	Luft logs

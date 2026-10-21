@@ -8,6 +8,7 @@ import { windowIcon } from '../../appearance/icons/appIcons.js';
 import { animateActor, Duration } from '../../shared/motion.js';
 import { localized, t } from '../../shared/i18n/index.js';
 import type { Monitor } from '../panel/panel.js';
+import { clampUnit } from '../../shared/math.js';
 import type { Rect } from './grid.js';
 
 export const CARD_HEADER = 30;
@@ -100,7 +101,7 @@ export class WindowCard {
   morph(shown: number): void {
     const away = 1 - shown;
     const scale = 1 + (this.origin.scale - 1) * away;
-    const opacity = Math.round(255 * Math.min(1, Math.max(0, shown)));
+    const opacity = Math.round(255 * clampUnit(shown));
     this.actor.set_scale(scale, scale);
     this.actor.set_translation(this.origin.x * away, this.origin.y * away, 0);
     this.header.opacity = opacity;

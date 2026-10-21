@@ -2,6 +2,8 @@ import Cairo from 'cairo';
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
+import { clampUnit } from '../../../shared/math.js';
+
 const BAR = 3;
 const GAP = 2.5;
 const STEP = BAR + GAP;
@@ -73,7 +75,7 @@ export class Waveform {
     const bar = this.bars.shift();
     if (bar) {
       this.bars.push(bar);
-      bar.show(Math.min(1, Math.max(0, (level - this.floor - NOISE_MARGIN) / span)) ** 0.8, ++this.newest);
+      bar.show(clampUnit((level - this.floor - NOISE_MARGIN) / span) ** 0.8, ++this.newest);
     }
     this.advance();
   }
@@ -108,7 +110,7 @@ export class Waveform {
     this.strip.translation_x = width - BAR - (this.newest + offset) * STEP;
     for (let age = 0; age < count; age++) {
       const x = width - (age + offset) * STEP - BAR / 2;
-      const edge = Math.min(1, Math.max(0, Math.min(x, width - x) / fade));
+      const edge = clampUnit(Math.min(x, width - x) / fade);
       this.bars[count - 1 - age].actor.opacity = Math.round(255 * edge);
     }
   }

@@ -8,6 +8,7 @@ import { animateActor, animateAdjustment, Curve, Duration, reducedMotion, Spring
 import type { Monitor } from '../panel/panel.js';
 import { blurSurface, raiseSurface } from '../../shared/surface.js';
 import { paintHidden } from '../../surfaces/prewarm.js';
+import { clampUnit } from '../../shared/math.js';
 import { windowSlots } from './grid.js';
 import { CARD_HEADER, WindowCard } from './windowCard.js';
 import { WorkspaceStrip, type BackgroundFactory, type BoardFrames } from './workspaceStrip.js';
@@ -16,7 +17,7 @@ const MARGIN = 40;
 const SPACING = 28;
 const STRETCH = 0.5;
 
-const opacityAt = (shown: number) => Math.round(255 * Math.min(1, Math.max(0, shown)));
+const opacityAt = (shown: number) => Math.round(255 * clampUnit(shown));
 
 export class TaskView {
   readonly actor = new St.Widget({ name: 'kestrel-task-view', style_class: 'kestrel-task-view', reactive: true, visible: false });

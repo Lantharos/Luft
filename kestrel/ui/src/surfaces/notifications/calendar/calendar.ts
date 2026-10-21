@@ -5,7 +5,8 @@ import { formatsLocale, t } from '../../../shared/i18n/index.js';
 import { animateActor, projection, Spring } from '../../../shared/motion.js';
 import { MonthScroll } from './monthScroll.js';
 import { weekRow, WeekStrip } from './weekStrip.js';
-import { dateOf, dayNumber, firstOfMonth, isoWeek, monthIndex, Weeks } from './weeks.js';
+import { dayNumber, dayOf } from '../../../shared/days.js';
+import { dateOf, firstOfMonth, isoWeek, monthIndex, Weeks } from './weeks.js';
 import { WeekStart } from './weekStart.js';
 
 const THROWN_WEEKS_PER_SECOND = 6;
@@ -93,7 +94,7 @@ export class Calendar {
 
   private render(): void {
     const now = new Date();
-    const today = dayNumber(now);
+    const today = dayNumber(dayOf(now));
     const week = Math.floor(this.strip.week);
     const month = this.weeks.nearestMonth(this.strip.week);
     if (week === this.drawn.week && month === this.drawn.month && today === this.drawn.today) return;

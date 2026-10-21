@@ -1,3 +1,5 @@
+import { clamp } from './math.js';
+
 export interface Box {
   x: number;
   y: number;
@@ -19,10 +21,6 @@ interface Placement {
 const CARET_GAP = 6;
 const EDGE_MARGIN = 8;
 const COMFORTABLE_HEIGHT = 240;
-
-function clamp(value: number, minimum: number, maximum: number): number {
-  return Math.max(minimum, Math.min(value, maximum));
-}
 
 export function findAnchor(caret: Box | null): Anchor {
   const shellFocus = global.stage.get_key_focus();

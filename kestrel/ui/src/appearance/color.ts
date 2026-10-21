@@ -1,3 +1,5 @@
+import { clampUnit } from '../shared/math.js';
+
 export type Rgb = [number, number, number];
 type Oklab = [number, number, number];
 type Oklch = [number, number, number];
@@ -87,7 +89,7 @@ function gamutChroma(lightness: number, chroma: number, hue: number): number {
 }
 
 const clampedLinear = (lightness: number, chroma: number, hue: number) =>
-  oklchToLinear([lightness, gamutChroma(lightness, chroma, hue), hue]).map(channel => Math.min(1, Math.max(0, channel)));
+  oklchToLinear([lightness, gamutChroma(lightness, chroma, hue), hue]).map(clampUnit);
 
 const linearLuminance = ([red, green, blue]: number[]) => 0.2126 * red + 0.7152 * green + 0.0722 * blue;
 

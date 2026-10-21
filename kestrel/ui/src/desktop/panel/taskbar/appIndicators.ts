@@ -2,6 +2,7 @@ import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
 import { animateActor } from '../../../shared/motion.js';
+import { clampUnit } from '../../../shared/math.js';
 import type { LauncherEntry } from './launcherEntries.js';
 
 const PROGRESS_WIDTH = 28;
@@ -47,7 +48,7 @@ export class AppIndicators {
     this.progress.visible = entry.progressVisible;
     if (this.progress.visible) {
       this.fill.height = this.progress.get_theme_node().get_height();
-      animateActor(this.fill, { width: Math.round(PROGRESS_WIDTH * Math.min(1, Math.max(0, entry.progress))), duration: 200, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
+      animateActor(this.fill, { width: Math.round(PROGRESS_WIDTH * clampUnit(entry.progress)), duration: 200, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
     }
     this.setAttention(attention || entry.urgent);
   }

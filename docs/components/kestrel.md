@@ -24,6 +24,17 @@ peek stop $h
 
 Kestrel plays the `luft` sound theme from `kestrel/engine/data/sounds/luft`, which `kestrel/tools/sounds` renders. Each sound is decoded once, the first time it plays, and kept in memory; all of them play through one PipeWire stream with the Notification role, which keeps its own volume (the System sounds volume in Settings). A sound that plays again before it ends starts over instead of doubling up, so the volume tick keeps up with a held key. `com.lantharos.Kestrel.Sounds` at `/com/lantharos/Kestrel/Sounds` plays theme sounds for apps outside a sandbox: `Play` follows the switches in `com.lantharos.kestrel.sounds` and `org.gnome.desktop.sound event-sounds`, and `Preview`, which Settings uses, plays regardless of them. The headless `system:sounds` check follows what plays through the player's `played` signal.
 
+## Emoji and characters
+
+The emoji picker reads its emoji and symbols from `emoji.json` and `characters.json` in `kestrel/engine/data`. Both are generated from Unicode's data and checked in; regenerate them when Unicode publishes a new version:
+
+| Command | Writes |
+| --- | --- |
+| `bun kestrel/tools/unicode/emojiData.ts [emoji-test.txt]` | `emoji.json`: every emoji in Unicode's groups and order, marking those that take a skin tone, from the latest `emoji-test.txt` or the copy given |
+| `bun kestrel/tools/unicode/characterData.ts [ucd]` | `characters.json`: the symbol tabs and sections laid out in `characterGroups.ts`, from the latest Unicode Character Database or the folder given |
+
+The build runs `annotationData.ts` to turn CLDR's emoji annotations (`cldr-emoji-annotation` on Fedora) into the names and keywords search uses, for the emoji, symbols and kaomoji the picker shows.
+
 ## Settings
 
 Kestrel's settings live in the `com.lantharos.kestrel` schemas, and Settings changes most of them. Keyboard shortcuts are in `com.lantharos.kestrel.keybindings` and `.media-keys`, with window management in GNOME's `org.gnome.desktop.wm.keybindings`; every one is listed in [Keyboard shortcuts](https://docs.luft.computer/desktop/shortcuts/). The wallpaper palette Kestrel shares with apps is described in [Appearance](../appearance.md), and its own dialogs for the keyring and GnuPG in [Prompts](../prompts.md).

@@ -4,6 +4,7 @@ import type St from 'gi://St';
 
 import { animateActor, Curve, Duration, rubberband, Spring, type SpringToken } from '../../../shared/motion.js';
 import { STRIP_HEIGHT, taskbarPreferences } from '../preferences/taskbarPreferences.js';
+import { clampUnit } from '../../../shared/math.js';
 import { TabletStrip } from './strip.js';
 
 const IDLE_COLLAPSE = 5000;
@@ -11,7 +12,6 @@ const FLICK_SPEED = 300;
 const LAYER_SCALE = 0.94;
 const OUTSIDE_EVENTS = [Clutter.EventType.BUTTON_PRESS, Clutter.EventType.TOUCH_BEGIN];
 
-const clamp = (value: number) => Math.min(1, Math.max(0, value));
 
 export class TabletTaskbar {
   private strip: TabletStrip | null = null;
@@ -107,7 +107,7 @@ export class TabletTaskbar {
     for (const actor of [this.strip.actor, ...this.layers]) actor.remove_all_transitions();
     this.panel.translation_y = travel - Math.min(distance, travel) - rubberband(over, travel);
     this.fitContents();
-    this.paint(clamp(distance / travel));
+    this.paint(clampUnit(distance / travel));
   }
 
   release(distance: number, speed: number, completed: boolean): void {
@@ -147,9 +147,9 @@ export class TabletTaskbar {
   private paint(progress: number): void {
     const strip = this.strip!;
     strip.actor.show();
-    strip.actor.opacity = Math.round(255 * clamp(1 - progress * 2));
+    strip.actor.opacity = Math.round(255 * clampUnit(1 - progress * 2));
     strip.pull(progress);
-    const shown = clamp((progress - 0.25) / 0.75);
+    const shown = clampUnit((progress - 0.25) / 0.75);
     for (const layer of this.layers) {
       layer.show();
       const scale = LAYER_SCALE + (1 - LAYER_SCALE) * shown;

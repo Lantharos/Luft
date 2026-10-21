@@ -1,6 +1,7 @@
 import Clutter from 'gi://Clutter';
 
 import { animateActor, Duration, Gesture, rubberband, Spring } from '../../shared/motion.js';
+import { clampUnit } from '../../shared/math.js';
 
 const DISMISS_SHARE = 0.4;
 const FLING_SPEED = 500;
@@ -104,7 +105,7 @@ export class SwipeAway {
     const shown = raw >= 0 ? raw : rubberband(raw, size);
     if (axis === 'y') actor.translation_y = shown;
     else actor.translation_x = shown;
-    actor.opacity = Math.round(255 * (1 - Math.min(1, Math.max(0, shown) / (size * FADE_SHARE))));
+    actor.opacity = Math.round(255 * (1 - clampUnit(shown / (size * FADE_SHARE))));
   }
 
   private release(velocity: number): void {

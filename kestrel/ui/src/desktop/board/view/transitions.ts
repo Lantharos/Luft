@@ -4,6 +4,7 @@ import type Meta from 'gi://Meta';
 import { animateActor, Curve, Duration, Spring } from '../../../shared/motion.js';
 import type { Box } from '../../../shared/placement.js';
 import { banded, type SwipeTrack } from '../../gestures/fourFingers.js';
+import { clampUnit } from '../../../shared/math.js';
 import type { View } from './geometry.js';
 
 const GLIDE_PROPERTIES = ['scale_x', 'scale_y', 'translation_x', 'translation_y'] as const;
@@ -85,7 +86,7 @@ export class GlideTrack implements SwipeTrack {
         actor[property] = from[property] + (identity(property) - from[property]) * this.progress;
     }
     for (const { actor, appearing } of this.fades)
-      actor.opacity = Math.round(255 * visibility(appearing, Math.min(1, Math.max(0, this.progress))));
+      actor.opacity = Math.round(255 * visibility(appearing, clampUnit(this.progress)));
   }
 }
 

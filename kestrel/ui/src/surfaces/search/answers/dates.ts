@@ -1,4 +1,5 @@
-import { addDays, dayNumber, valid, weekday, type Day } from './calendar.js';
+import { dayNumber, type Day } from '../../../shared/days.js';
+import { addDays, valid, weekday } from './calendar.js';
 import { Cursor, tokens } from './text.js';
 import { FILLERS, HOLIDAYS, LAST, NEXT, ORDINAL, PHRASE_LOCALES, TODAY, TOMORROW, UNIT_WORDS, YESTERDAY, type Unit } from './vocabulary.js';
 

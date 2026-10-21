@@ -1,25 +1,11 @@
+import { dayNumber, fromDayNumber, type Day } from '../../../shared/days.js';
 import type { SpanUnit } from './vocabulary.js';
-
-const DAY_MS = 86_400_000;
-
-export interface Day {
-  year: number;
-  month: number;
-  day: number;
-}
 
 export interface Parts {
   years: number;
   months: number;
   weeks: number;
   days: number;
-}
-
-export const dayNumber = ({ year, month, day }: Day) => Math.floor(Date.UTC(year, month - 1, day) / DAY_MS);
-
-export function fromDayNumber(number: number): Day {
-  const date = new Date(number * DAY_MS);
-  return { year: date.getUTCFullYear(), month: date.getUTCMonth() + 1, day: date.getUTCDate() };
 }
 
 export const weekday = (day: Day) => (dayNumber(day) + 4) % 7;

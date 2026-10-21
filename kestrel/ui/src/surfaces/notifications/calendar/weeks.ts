@@ -1,11 +1,10 @@
-const DAY = 86_400_000;
+import { DAY_MS, dayNumber, dayOf, fromDayNumber } from '../../../shared/days.js';
+
 const EPOCH_WEEKDAY = 4;
 
-export const dayNumber = (date: Date) => Math.round(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / DAY);
-
-export function dateOf(day: number): Date {
-  const utc = new Date(day * DAY);
-  return new Date(utc.getUTCFullYear(), utc.getUTCMonth(), utc.getUTCDate());
+export function dateOf(number: number): Date {
+  const { year, month, day } = fromDayNumber(number);
+  return new Date(year, month - 1, day);
 }
 
 export const monthIndex = (date: Date) => date.getFullYear() * 12 + date.getMonth();
@@ -14,7 +13,7 @@ export const firstOfMonth = (month: number) => new Date(Math.floor(month / 12), 
 
 export function isoWeek(date: Date): number {
   const thursday = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate() + 3 - (date.getDay() + 6) % 7));
-  return 1 + Math.floor((thursday.getTime() - Date.UTC(thursday.getUTCFullYear(), 0, 1)) / DAY / 7);
+  return 1 + Math.floor((thursday.getTime() - Date.UTC(thursday.getUTCFullYear(), 0, 1)) / DAY_MS / 7);
 }
 
 export class Weeks {
@@ -33,7 +32,7 @@ export class Weeks {
   }
 
   startOf(month: number): number {
-    return this.weekOf(dayNumber(firstOfMonth(month)));
+    return this.weekOf(dayNumber(dayOf(firstOfMonth(month))));
   }
 
   nearestMonth(position: number): number {

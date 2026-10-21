@@ -5,6 +5,7 @@ import St from 'gi://St';
 
 import type { Monitor } from '../../panel/panel.js';
 import type { Box } from '../../../shared/placement.js';
+import { clampUnit } from '../../../shared/math.js';
 import type { View } from './geometry.js';
 
 export type BackgroundFactory = (container: Clutter.Actor, monitorIndex: number) => { destroy(): void };
@@ -20,7 +21,7 @@ function dotTile(alpha: number, white: boolean): St.ImageContent {
   const center = TILE / 2 - 0.5;
   for (let y = 0; y < TILE; y++) {
     for (let x = 0; x < TILE; x++) {
-      const coverage = Math.max(0, Math.min(1, DOT_RADIUS + 0.5 - Math.hypot(x - center, y - center)));
+      const coverage = clampUnit(DOT_RADIUS + 0.5 - Math.hypot(x - center, y - center));
       const value = Math.round(alpha * coverage * 255);
       const offset = (y * TILE + x) * 4;
       const channel = white ? value : 0;

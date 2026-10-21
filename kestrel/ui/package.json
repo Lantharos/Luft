@@ -3,7 +3,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "bun run build.ts kestrelUi ../../kestrel/build/js/ui/kestrelUi.js",
     "check": "tsc --noEmit && tsc --noEmit -p tsconfig.bun.json && bun test src"
   },
   "devDependencies": {

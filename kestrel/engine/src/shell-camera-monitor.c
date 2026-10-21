@@ -292,12 +292,12 @@ shell_camera_monitor_disconnect_core (ShellCameraMonitor *monitor)
   g_ptr_array_set_size (monitor->node_list, 0);
   g_clear_handle_id (&monitor->delayed_disable_id, g_source_remove);
 
+  if (monitor->core == NULL)
+    return;
+
   spa_hook_remove (&monitor->registry_listener);
-  if (monitor->registry != NULL)
-    {
-      pw_proxy_destroy ((struct pw_proxy *) monitor->registry);
-      monitor->registry = NULL;
-    }
+  pw_proxy_destroy ((struct pw_proxy *) monitor->registry);
+  monitor->registry = NULL;
   spa_hook_remove (&monitor->core_listener);
   g_clear_pointer (&monitor->core, pw_core_disconnect);
 }

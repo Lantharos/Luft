@@ -5,7 +5,7 @@ import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {rest} from '../checks/lib/input/input.js';
 import {stopAll} from '../checks/lib/processes.js';
-import {idleWorkDone, settled} from '../checks/lib/wait.js';
+import {settled} from '../checks/lib/wait.js';
 import {endSession, runGroup} from './runner.js';
 
 const FILE_MANAGER = 'com.lantharos.rover.desktop';
@@ -44,7 +44,6 @@ async function reset() {
 export async function run() {
   pinFileManager();
   await settled();
-  await idleWorkDone();
   try {
     for (let group = claim(); group; group = claim()) {
       if (!await runGroup(group, reset)) throw new Error(`${group} failed, ending this session`);

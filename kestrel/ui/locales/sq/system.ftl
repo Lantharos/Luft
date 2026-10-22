@@ -113,15 +113,21 @@ privacy-mute-microphone = Hesht mikrofonin
 privacy-unmute-microphone = Aktivizo mikrofonin
 privacy-close-app = Mbyll { $app }
 privacy-unknown-app = Një aplikacion
-privacy-windows-using = Po përdor dritaret e tua
-privacy-windows-seeing = Po sheh dritaret e tua
+privacy-windows-seeing-programs = { $count ->
+    [one] { $count } program mund të shohë dritaret e tua
+   *[other] { $count } programe mund të shohin dritaret e tua
+}
+privacy-windows-using-programs = { $count ->
+    [one] { $count } program mund të shohë dhe të përdorë dritaret e tua
+   *[other] { $count } programe mund të shohin dhe të përdorin dritaret e tua
+}
 privacy-windows-stop = Ndalo qasjen
 
 ## Window access prompt
 
-peek-see-title = { $app } dëshiron të shohë dritaret e tua
+peek-see-request = Të lejohet një program që ke nisur të shohë dritaret e tua?
 peek-see-description = Do të mund të bëjë foto të çdo dritareje që ke të hapur.
-peek-use-title = { $app } dëshiron të shohë dhe të përdorë dritaret e tua
+peek-use-request = Të lejohet një program që ke nisur të shohë dhe të përdorë dritaret e tua?
 peek-use-description = Do të mund të shohë çdo dritare që ke të hapur dhe të klikojë e të shkruajë në të si të ishe ti.
 peek-deny = Mos lejo
 peek-allow-once = Lejo një herë
@@ -129,7 +135,7 @@ peek-allow-until-quit = Lejo derisa të mbyllet
 
 ## Window access errors
 
-peek-error-declined = Personi që përdor këtë kompjuter e refuzoi. { $app } mund të pyesë sërish pasi të mbyllet.
+peek-error-declined-until-quit = Personi që përdor këtë kompjuter e refuzoi. Programi mund të pyesë sërish pasi të mbyllet.
 peek-error-not-allowed = Personi që përdor këtë kompjuter nuk e lejoi
 peek-error-sandboxed = Aplikacionet në mjedis të izoluar nuk mund të shohin ose përdorin dritare të tjera
 peek-error-unknown-caller = Programi që pyet përfundoi ose nuk u njoh dot

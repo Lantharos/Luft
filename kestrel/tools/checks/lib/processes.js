@@ -28,6 +28,18 @@ export function spawn(argv, {env = {}, flags = Gio.SubprocessFlags.NONE, cwd = n
   return process;
 }
 
+export function outcome(argv, options = {}) {
+  const process = spawn(argv, {...options, flags: Gio.SubprocessFlags.STDOUT_PIPE | Gio.SubprocessFlags.STDERR_PIPE});
+  return new Promise((resolve, reject) => process.communicate_utf8_async(null, null, (_process, result) => {
+    try {
+      const [, stdout, stderr] = process.communicate_utf8_finish(result);
+      resolve({ok: process.get_successful(), stdout: stdout.trim(), stderr: stderr.trim()});
+    } catch (error) {
+      reject(error);
+    }
+  }));
+}
+
 export function gjs(script, args = [], options = {}) {
   return spawn(['gjs', '-m', fixture(...script.split('/')), ...args], {...options, env: {GSK_RENDERER: 'cairo', ...options.env}});
 }

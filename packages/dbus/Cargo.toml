@@ -9,7 +9,6 @@ rust-version.workspace = true
 
 [dependencies]
 futures-util.workspace = true
-libc.workspace = true
 rustix = { workspace = true, features = ["fs"] }
 serde.workspace = true
 tokio = { workspace = true, features = ["sync", "time"] }

@@ -114,16 +114,22 @@ privacy-mute-microphone = Σίγαση μικροφώνου
 privacy-unmute-microphone = Κατάργηση σίγασης μικροφώνου
 privacy-close-app = Κλείσιμο: { $app }
 privacy-unknown-app = Μια εφαρμογή
-privacy-windows-using = Χρησιμοποιεί τα παράθυρά σας
-privacy-windows-seeing = Βλέπει τα παράθυρά σας
+privacy-windows-seeing-programs = { $count ->
+    [one] { $count } πρόγραμμα μπορεί να βλέπει τα παράθυρά σας
+   *[other] { $count } προγράμματα μπορούν να βλέπουν τα παράθυρά σας
+}
+privacy-windows-using-programs = { $count ->
+    [one] { $count } πρόγραμμα μπορεί να βλέπει και να χειρίζεται τα παράθυρά σας
+   *[other] { $count } προγράμματα μπορούν να βλέπουν και να χειρίζονται τα παράθυρά σας
+}
 privacy-windows-stop = Διακοπή πρόσβασης
 
 ## Window access prompt
 # A program (often a coding assistant) asks to see or control the windows on the screen. $app is its name.
 
-peek-see-title = Το πρόγραμμα { $app } ζητά να βλέπει τα παράθυρά σας
+peek-see-request = Να επιτρέπεται σε ένα πρόγραμμα που ξεκινήσατε να βλέπει τα παράθυρά σας;
 peek-see-description = Θα μπορεί να τραβά εικόνες από οποιοδήποτε ανοιχτό παράθυρο.
-peek-use-title = Το πρόγραμμα { $app } ζητά να βλέπει και να χειρίζεται τα παράθυρά σας
+peek-use-request = Να επιτρέπεται σε ένα πρόγραμμα που ξεκινήσατε να βλέπει και να χειρίζεται τα παράθυρά σας;
 peek-use-description = Θα μπορεί να βλέπει κάθε ανοιχτό παράθυρο και να κάνει κλικ και να πληκτρολογεί σε αυτό σαν να ήσασταν εσείς.
 peek-deny = Να μην επιτρέπεται
 peek-allow-once = Να επιτρέπεται μία φορά
@@ -132,7 +138,7 @@ peek-allow-until-quit = Να επιτρέπεται μέχρι να κλείσε
 ## Window access errors
 # Shown in a terminal to the person or program that ran the peek command. "peek run" and "peek list" are commands and stay as they are.
 
-peek-error-declined = Το άτομο που χρησιμοποιεί αυτόν τον υπολογιστή το αρνήθηκε. Το πρόγραμμα { $app } μπορεί να ζητήσει ξανά αφού κλείσει.
+peek-error-declined-until-quit = Το άτομο που χρησιμοποιεί αυτόν τον υπολογιστή το αρνήθηκε. Το πρόγραμμα μπορεί να ζητήσει ξανά αφού κλείσει.
 peek-error-not-allowed = Το άτομο που χρησιμοποιεί αυτόν τον υπολογιστή δεν το επέτρεψε
 peek-error-sandboxed = Οι εφαρμογές σε απομονωμένο περιβάλλον δεν μπορούν να βλέπουν ή να χειρίζονται άλλα παράθυρα
 peek-error-unknown-caller = Το πρόγραμμα που ζητά πρόσβαση τερματίστηκε ή δεν ήταν δυνατό να αναγνωριστεί

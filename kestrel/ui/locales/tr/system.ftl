@@ -113,15 +113,15 @@ privacy-mute-microphone = Mikrofonu kapat
 privacy-unmute-microphone = Mikrofonu aç
 privacy-close-app = Kapat: { $app }
 privacy-unknown-app = Bir uygulama
-privacy-windows-using = Pencerelerinizi kullanıyor
-privacy-windows-seeing = Pencerelerinizi görüyor
+privacy-windows-seeing-programs = { $count } program pencerelerinizi görebilir
+privacy-windows-using-programs = { $count } program pencerelerinizi görebilir ve kullanabilir
 privacy-windows-stop = Erişimi durdur
 
 ## Window access prompt
 
-peek-see-title = { $app } pencerelerinizi görmek istiyor
+peek-see-request = Başlattığınız bir programın pencerelerinizi görmesine izin verilsin mi?
 peek-see-description = Açık olan her pencerenin görüntüsünü alabilecek.
-peek-use-title = { $app } pencerelerinizi görmek ve kullanmak istiyor
+peek-use-request = Başlattığınız bir programın pencerelerinizi görmesine ve kullanmasına izin verilsin mi?
 peek-use-description = Açık olan her pencereyi görebilecek ve sizmiş gibi tıklayıp yazabilecek.
 peek-deny = İzin verme
 peek-allow-once = Bir kez izin ver
@@ -129,7 +129,7 @@ peek-allow-until-quit = Kapanana kadar izin ver
 
 ## Window access errors
 
-peek-error-declined = Bu bilgisayarı kullanan kişi bunu reddetti. { $app } kapandıktan sonra yeniden sorabilir.
+peek-error-declined-until-quit = Bu bilgisayarı kullanan kişi bunu reddetti. Program kapandıktan sonra yeniden sorabilir.
 peek-error-not-allowed = Bu bilgisayarı kullanan kişi buna izin vermedi
 peek-error-sandboxed = Korumalı alandaki uygulamalar başka pencereleri göremez ve kullanamaz
 peek-error-unknown-caller = İsteyen program sona erdi ya da tanınamadı

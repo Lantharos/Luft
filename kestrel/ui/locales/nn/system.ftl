@@ -113,15 +113,21 @@ privacy-mute-microphone = Demp mikrofonen
 privacy-unmute-microphone = Slå på mikrofonen
 privacy-close-app = Lukk { $app }
 privacy-unknown-app = Ein app
-privacy-windows-using = Brukar vindauga dine
-privacy-windows-seeing = Ser vindauga dine
+privacy-windows-seeing-programs = { $count ->
+    [one] { $count } program kan sjå vindauga dine
+   *[other] { $count } program kan sjå vindauga dine
+}
+privacy-windows-using-programs = { $count ->
+    [one] { $count } program kan sjå og bruke vindauga dine
+   *[other] { $count } program kan sjå og bruke vindauga dine
+}
 privacy-windows-stop = Fjern tilgangen
 
 ## Window access prompt
 
-peek-see-title = { $app } vil sjå vindauga dine
+peek-see-request = Vil du la eit program du har starta, sjå vindauga dine?
 peek-see-description = Appen kan då ta bilete av alle vindauga du har opne.
-peek-use-title = { $app } vil sjå og bruke vindauga dine
+peek-use-request = Vil du la eit program du har starta, sjå og bruke vindauga dine?
 peek-use-description = Appen kan då sjå alle vindauga du har opne, og klikke og skrive i dei som om det var deg.
 peek-deny = Ikkje tillat
 peek-allow-once = Tillat éin gong
@@ -129,7 +135,7 @@ peek-allow-until-quit = Tillat til appen blir avslutta
 
 ## Window access errors
 
-peek-error-declined = Den som brukar denne datamaskinen, avslo dette. { $app } kan spørje igjen når appen er avslutta.
+peek-error-declined-until-quit = Den som brukar denne datamaskinen, avslo dette. Programmet kan spørje igjen når det er avslutta.
 peek-error-not-allowed = Den som brukar denne datamaskinen, tillét det ikkje
 peek-error-sandboxed = Appar i sandkasse kan ikkje sjå eller bruke andre vindauge
 peek-error-unknown-caller = Programmet som spør, er avslutta eller kunne ikkje kjennast att

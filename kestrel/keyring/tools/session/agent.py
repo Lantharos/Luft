@@ -1,13 +1,10 @@
 import base64
 import os
-import shutil
 import signal
 import socket
 import struct
 import subprocess
-import sys
 
-HERE = os.path.dirname(os.path.abspath(__file__))
 SIGN_REQUEST = 13
 SIGN_RESPONSE = 14
 
@@ -49,19 +46,6 @@ def signs(environment, folder, public_key, name):
     return verified.returncode == 0
 
 
-SETTINGS_BUILD = "target/debug/settings"
-
-
-def settings_build(root):
-    return os.path.join(root, "luft", SETTINGS_BUILD)
-
-
-def as_settings(path):
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    shutil.copy(sys.executable, path)
-    return [path, os.path.join(HERE, "manager.py")]
-
-
 def agent_pid(environment):
     with socket.socket(socket.AF_UNIX) as agent:
         agent.connect(environment["SSH_AUTH_SOCK"])
@@ -96,9 +80,12 @@ def packed(data):
     return struct.pack(">I", len(data)) + data
 
 
-def exercise_agent(root, environment, check, script, requests, lock, login):
-    environment = dict(environment, SSH_AUTH_SOCK=os.path.join(environment["XDG_RUNTIME_DIR"], "luft-keyring/ssh"))
-    folder = os.path.join(root, "ssh")
+def exercise_agent(session, check, login):
+    script, requests, lock = session.script, session.requests, session.lock
+    environment = dict(
+        session.environment, SSH_AUTH_SOCK=os.path.join(session.environment["XDG_RUNTIME_DIR"], "luft-keyring/ssh")
+    )
+    folder = os.path.join(session.root, "ssh")
     os.makedirs(folder)
     for kind in ("ed25519", "ecdsa"):
         key = os.path.join(folder, kind)
@@ -158,31 +145,21 @@ def exercise_agent(root, environment, check, script, requests, lock, login):
         "a program that can't be identified is never offered to be remembered",
     )
 
-    posing = as_settings(os.path.join(root, "elsewhere/luft", SETTINGS_BUILD))
-    refused = subprocess.run(
-        [*posing, "generate", "Nope"], env=environment, capture_output=True, text=True, timeout=60, check=False
-    )
-    check("AccessDenied" in refused.stdout, "a program at another Settings build path can't manage the keyring")
-    manager = as_settings(settings_build(root))
-    made = subprocess.run(
-        [*manager, "generate", "Laptop"], env=environment, capture_output=True, text=True, timeout=60, check=False
-    )
-    check(made.stdout.startswith("SHA256:"), "Settings makes a new key in the keyring")
-    line = subprocess.run(
-        [*manager, "public", made.stdout], env=environment, capture_output=True, text=True, timeout=60, check=False
-    ).stdout
+    asked = len(session.confirmations())
+    made = session.manager("generate", "Laptop")
+    check(made.startswith("SHA256:"), "Settings makes a new key in the keyring")
+    line = session.manager("public", made)
     check(line.startswith("ssh-ed25519 ") and line.endswith(" Laptop"), "Settings shows a key's public half")
+    check(
+        "Laptop" in session.manager("keys").split(",") and len(session.confirmations()) == asked,
+        "making and listing keys doesn't ask you to confirm it's you",
+    )
     generated = os.path.join(folder, "generated.pub")
     with open(generated, "w") as output:
         output.write(line + "\n")
     script(access="allow", remember=True)
     check(signs(environment, folder, generated, "generated"), "a key made by Settings signs")
-    stranger = subprocess.run(
-        [sys.executable, os.path.join(HERE, "manager.py"), "generate", "Nope"],
-        env=environment,
-        capture_output=True,
-        text=True,
-        timeout=60,
-        check=False,
+    check(
+        not requests("access")[-1]["request"].get("remember"),
+        "a program of yours is never offered to be remembered for a careful key",
     )
-    check("AccessDenied" in stranger.stdout, "other apps can't manage SSH keys")

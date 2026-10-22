@@ -122,6 +122,9 @@ export async function start() {
     if (!sessionMode.isPeek)
         KestrelUi.startSounds(sessionMode);
 
+    if (!sessionMode.isGreeter)
+        KestrelUi.followAppPermissions();
+
     if (sessionMode.isGreeter) {
         await _initializeGreeter();
         _sessionUpdated();

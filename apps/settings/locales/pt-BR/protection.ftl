@@ -22,14 +22,10 @@ settings-privacy-lock-immediately = Imediatamente
 
 ## Privacy: location, camera and microphone
 
-settings-privacy-location = Localização
 settings-privacy-location-services = Serviços de localização
 settings-privacy-location-services-hint = Permite que os apps saibam onde você está, para mapas, clima e fusos horários
-settings-privacy-camera = Câmera
 settings-privacy-camera-allow = Permitir que os apps usem a câmera
 settings-privacy-microphone-allow = Permitir que os apps usem o microfone
-settings-privacy-apps-asked = Apps que pediram acesso
-settings-privacy-apps-allowed = { $allowed } de { $total } permitidos
 
 ## Privacy: file history
 
@@ -329,21 +325,14 @@ settings-passwords-pin-locked = Desbloqueie o Chaveiro para alterar isto
 settings-passwords-pin-description = Assim, só a impressão digital não basta para desbloqueá-las
 settings-passwords-lock-with-screen = Bloquear junto com a tela
 settings-passwords-lock-with-screen-description = Elas são bloqueadas e desbloqueadas junto com a tela
-settings-passwords-apps = Apps com acesso
+settings-passwords-apps = Logins e atividade de apps
 settings-passwords-apps-locked = Desbloqueie o Chaveiro para vê-los
-settings-passwords-apps-asked = { $count ->
-    [0] Nenhum app pediu acesso a elas ainda
-    [one] { $count } app pediu acesso a elas
-   *[other] { $count } apps pediram acesso a elas
-}
+settings-passwords-apps-description = O que os apps guardam aqui e quando usaram
+settings-passwords-apps-allowed = Quais apps podem usar suas senhas
+settings-passwords-apps-allowed-hint = Definido em Apps
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-description = Se você remover um, o app vai pedir de novo na próxima vez.
-settings-passwords-access-not-allowed = Não permitido
-settings-passwords-access-none = Nenhum app pediu suas senhas ainda
-settings-passwords-access-revoke = Impedir que { $app } use { $item }
-settings-passwords-access-reset = Deixar { $app } pedir { $item } de novo
 settings-passwords-stores = Logins de apps
 settings-passwords-stores-description = Logins que alguns apps guardam aqui, onde só o próprio app pode lê-los.
 settings-passwords-stores-count = { $count ->
@@ -452,3 +441,24 @@ settings-apps-startup-add-description = Escolha um app para abrir sempre que voc
 settings-apps-search = Pesquisar apps
 settings-apps-no-match = Nenhum app corresponde à pesquisa
 settings-apps-cancel = Cancelar
+
+## Apps: permissions
+
+settings-apps-permissions = Permissões
+settings-apps-location = Localização
+settings-apps-camera = Câmera
+settings-apps-clipboard = Área de transferência em segundo plano
+settings-apps-clipboard-hint = Estes apps podem ver e alterar o que você copia, mesmo enquanto você usa outros apps.
+settings-apps-full-access = Acesso total
+settings-apps-full-access-hint = Estes apps rodam fora do sandbox e agem como você, como os apps instalados no sistema. A remoção vale a partir da próxima vez que o app abrir.
+settings-apps-full-access-remove = Remover
+settings-apps-full-access-remove-app = Remover o acesso total do { $app }
+settings-apps-passwords = Senhas salvas
+settings-apps-passwords-hint = Os apps lembram sua resposta quando pedem para usar algo salvo no Chaveiro. Esqueça a resposta para que o app pergunte de novo.
+settings-apps-passwords-forget = Esquecer
+settings-apps-passwords-forget-app = Fazer o { $app } perguntar de novo
+settings-apps-permissions-allowed = { $allowed } de { $total } permitidos
+settings-apps-permissions-count = { $count ->
+    [one] { $count } app
+   *[other] { $count } apps
+}

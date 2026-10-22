@@ -113,15 +113,25 @@ privacy-mute-microphone = Wycisz mikrofon
 privacy-unmute-microphone = Wyłącz wyciszenie mikrofonu
 privacy-close-app = Zamknij aplikację { $app }
 privacy-unknown-app = Aplikacja
-privacy-windows-using = Używa twoich okien
-privacy-windows-seeing = Widzi twoje okna
+privacy-windows-seeing-programs = { $count ->
+    [one] { $count } program może widzieć twoje okna
+    [few] { $count } programy mogą widzieć twoje okna
+    [many] { $count } programów może widzieć twoje okna
+   *[other] { $count } programu może widzieć twoje okna
+}
+privacy-windows-using-programs = { $count ->
+    [one] { $count } program może widzieć twoje okna i z nich korzystać
+    [few] { $count } programy mogą widzieć twoje okna i z nich korzystać
+    [many] { $count } programów może widzieć twoje okna i z nich korzystać
+   *[other] { $count } programu może widzieć twoje okna i z nich korzystać
+}
 privacy-windows-stop = Odbierz dostęp
 
 ## Window access prompt
 
-peek-see-title = { $app } chce widzieć twoje okna
+peek-see-request = Pozwolić uruchomionemu przez ciebie programowi widzieć twoje okna?
 peek-see-description = Zyska możliwość robienia zdjęć każdego otwartego okna.
-peek-use-title = { $app } chce widzieć twoje okna i z nich korzystać
+peek-use-request = Pozwolić uruchomionemu przez ciebie programowi widzieć twoje okna i z nich korzystać?
 peek-use-description = Zyska możliwość oglądania każdego otwartego okna oraz klikania i pisania w nim tak jak ty.
 peek-deny = Nie zezwalaj
 peek-allow-once = Zezwól raz
@@ -129,7 +139,7 @@ peek-allow-until-quit = Zezwól do zamknięcia programu
 
 ## Window access errors
 
-peek-error-declined = Osoba korzystająca z tego komputera odmówiła. { $app } może zapytać ponownie po zakończeniu działania.
+peek-error-declined-until-quit = Osoba korzystająca z tego komputera odmówiła. Program może zapytać ponownie po zakończeniu działania.
 peek-error-not-allowed = Osoba korzystająca z tego komputera nie zezwoliła na to
 peek-error-sandboxed = Aplikacje w piaskownicy nie mogą widzieć innych okien ani z nich korzystać
 peek-error-unknown-caller = Program, który pyta, zakończył działanie lub nie można go rozpoznać

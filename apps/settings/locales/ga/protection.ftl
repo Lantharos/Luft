@@ -22,14 +22,10 @@ settings-privacy-lock-immediately = Láithreach
 
 ## Privacy: location, camera and microphone
 
-settings-privacy-location = Suíomh
 settings-privacy-location-services = Seirbhísí suímh
 settings-privacy-location-services-hint = Ligeann sé d’aipeanna d’áit a aimsiú, le haghaidh léarscáileanna, na haimsire agus criosanna ama
-settings-privacy-camera = Ceamara
 settings-privacy-camera-allow = Lig d’aipeanna an ceamara a úsáid
 settings-privacy-microphone-allow = Lig d’aipeanna an micreafón a úsáid
-settings-privacy-apps-asked = Aipeanna a d’iarr
-settings-privacy-apps-allowed = { $allowed } as { $total } ceadaithe
 
 ## Privacy: file history
 
@@ -362,24 +358,14 @@ settings-passwords-pin-locked = Díghlasáil d’fháinne eochrach chun é seo a
 settings-passwords-pin-description = Ionas nach féidir le méarlorg leis féin iad a dhíghlasáil
 settings-passwords-lock-with-screen = Glasáil leis an scáileán
 settings-passwords-lock-with-screen-description = Glasálann agus díghlasálann siad in éineacht leis an scáileán
-settings-passwords-apps = Aipeanna a bhfuil rochtain acu
+settings-passwords-apps = Sínithe isteach agus gníomhaíocht aipeanna
 settings-passwords-apps-locked = Díghlasáil d’fháinne eochrach chun iad a fheiceáil
-settings-passwords-apps-asked = { $count ->
-    [0] Níor iarr aon aip iad fós
-    [one] D’iarr { $count } aip iad
-    [two] D’iarr { $count } aip iad
-    [few] D’iarr { $count } aip iad
-    [many] D’iarr { $count } n-aip iad
-   *[other] D’iarr { $count } aip iad
-}
+settings-passwords-apps-description = An méid a choinníonn aipeanna anseo agus cathain a d’úsáid siad é
+settings-passwords-apps-allowed = Na haipeanna atá in ann do phasfhocail a úsáid
+settings-passwords-apps-allowed-hint = Socraigh é ar an leathanach Aipeanna
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-description = Má bhaineann tú ceann, iarrfaidh an aip arís an chéad uair eile.
-settings-passwords-access-not-allowed = Gan cead
-settings-passwords-access-none = Níor iarr aon aip do phasfhocail fós
-settings-passwords-access-revoke = Ná lig don aip { $app } { $item } a úsáid
-settings-passwords-access-reset = Lig don aip { $app } { $item } a iarraidh arís
 settings-passwords-stores = Sínithe isteach aipeanna
 settings-passwords-stores-description = Sínithe isteach a choinníonn roinnt aipeanna anseo, áit nach féidir ach leis an aip sin iad a léamh.
 settings-passwords-stores-count = { $count ->
@@ -494,3 +480,27 @@ settings-apps-startup-add-description = Roghnaigh aip le hoscailt gach uair a sh
 settings-apps-search = Cuardaigh aipeanna
 settings-apps-no-match = Níl aon aip ag teacht le do chuardach
 settings-apps-cancel = Cealaigh
+
+## Apps: permissions
+
+settings-apps-permissions = Ceadanna
+settings-apps-location = Suíomh
+settings-apps-camera = Ceamara
+settings-apps-clipboard = Gearrthaisce sa chúlra
+settings-apps-clipboard-hint = Is féidir leis na haipeanna seo an méid a chóipeálann tú a fheiceáil agus a athrú, fiú agus aipeanna eile in úsáid agat.
+settings-apps-full-access = Rochtain iomlán
+settings-apps-full-access-hint = Ritheann na haipeanna seo lasmuigh dá mbosca gainimh agus meastar gur tusa iad, cosúil le haipeanna atá suiteáilte ar an gcóras. Tagann a baint i bhfeidhm an chéad uair eile a osclaítear an aip.
+settings-apps-full-access-remove = Bain
+settings-apps-full-access-remove-app = Bain rochtain iomlán de { $app }
+settings-apps-passwords = Pasfhocail shábháilte
+settings-apps-passwords-hint = Cuimhníonn aipeanna ar do fhreagra nuair a iarrann siad rud éigin atá sábháilte i d’fháinne eochrach a úsáid. Déan dearmad air chun go n-iarrfaidh an aip arís.
+settings-apps-passwords-forget = Déan dearmad
+settings-apps-passwords-forget-app = Lig do { $app } fiafraí arís
+settings-apps-permissions-allowed = { $allowed } as { $total } ceadaithe
+settings-apps-permissions-count = { $count ->
+    [one] Aipeanna: { $count }
+    [two] Aipeanna: { $count }
+    [few] Aipeanna: { $count }
+    [many] Aipeanna: { $count }
+   *[other] Aipeanna: { $count }
+}

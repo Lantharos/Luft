@@ -1,90 +1,42 @@
 import os
+import shutil
 import subprocess
+import sys
 
-from ownership import HERE, READER, program_at
+from seal import in_daemon_user_namespace
 
-RELAY = "import subprocess, sys; sys.stdout.write(subprocess.run(sys.argv[1:], capture_output=True, timeout=60).stdout.decode())"
+HERE = os.path.dirname(os.path.abspath(__file__))
 
 
-def exercise_sabine(home, environment, check, script, requests):
-    sabine = os.path.join(home, ".local/share/sabine")
-    host = program_at(os.path.join(sabine, "bin/versions/0.33/sabine-host"))
-    bumped = program_at(os.path.join(sabine, "bin/versions/0.34/sabine-host"))
-    built = program_at(
-        os.path.join(
-            sabine,
-            "runtimes/cef/154.0.34+g14c5a08+chromium-154.0.8037.98-minimal/.sabine-hosts/721e89c95376d94d/sabine-host",
-        )
+def exercise_sabine(session, check):
+    subprocess.run(
+        ["secret-tool", "store", "--label", "Chromium Safe Storage", "application", "chromium"],
+        input=b"browser-key",
+        env=session.environment,
+        check=True,
     )
-    mailman = program_at(os.path.join(sabine, "apps/com.lantharos.mailman/install/mailman"))
-    raday = program_at(os.path.join(sabine, "apps/com.lantharos.raday/install/raday"))
-    limbo = program_at(os.path.join(sabine, "apps/al.kaleid.limbo/install/limbo"))
+    host = os.path.join(session.root, "sabine/sabine-host")
+    os.makedirs(os.path.dirname(host))
+    shutil.copy(sys.executable, host)
 
-    def hosted(app, host, action):
-        return subprocess.run(
-            [app, "-c", RELAY, host, READER, action], env=environment, capture_output=True, timeout=90, check=False
-        ).stdout.decode()
+    def hosted():
+        reader = os.path.join(HERE, "reader.py")
+        return session.run([*in_daemon_user_namespace(session.daemon), host, reader, "safe-storage"])
 
     def asked():
-        return len(requests("access"))
+        return len(session.requests("access")) + len(session.requests("password"))
 
-    script(access="deny", remember=False)
     before = asked()
-    mail_key = hosted(mailman, host, "safe-storage")
-    raday_key = hosted(raday, host, "safe-storage")
-    limbo_key = hosted(limbo, host, "safe-storage")
+    sabine_key = hosted()
     check(
-        len({mail_key, raday_key, limbo_key, "browser-key"}) == 4
-        and "" not in (mail_key, raday_key, limbo_key)
-        and asked() == before,
-        "each Sabine app keeps its own Chromium key instead of asking for the browser's",
+        sabine_key not in ("", "browser-key") and asked() == before,
+        "the Chromium Sabine apps share keeps its own key instead of taking your browser's",
     )
     check(
-        hosted(mailman, host, "safe-storage") == mail_key
-        and hosted(limbo, host, "safe-storage") == limbo_key
-        and asked() == before,
-        "a Sabine app finds its own Chromium key again without being asked",
+        hosted() == sabine_key and asked() == before,
+        "Sabine's Chromium finds its own key again",
     )
     check(
-        hosted(mailman, bumped, "safe-storage") == mail_key
-        and hosted(raday, built, "safe-storage") == raday_key
-        and asked() == before,
-        "a Sabine app keeps its key when Sabine updates or rebuilds its host",
+        session.reader("read", "application", "chromium") == "browser-key",
+        "your browser still finds only its own key",
     )
-
-    running = subprocess.Popen([mailman, "-c", "import time; time.sleep(60)"], env=environment)
-    try:
-        forged = subprocess.run(
-            [host, READER, "safe-storage", f"--sabine-parent-pid={running.pid}"],
-            env=environment,
-            capture_output=True,
-            timeout=60,
-            check=False,
-        ).stdout.decode()
-    finally:
-        running.kill()
-        running.wait()
-    check(
-        forged not in ("", mail_key),
-        "a Sabine host started by another program can't pass itself off as the app it names",
-    )
-
-    mail_portal = hosted(mailman, host, "portal").split("|")[0]
-    raday_portal = hosted(raday, host, "portal").split("|")[0]
-    check(
-        len(bytes.fromhex(mail_portal)) == 64
-        and mail_portal != raday_portal
-        and hosted(mailman, bumped, "portal").split("|")[0] == mail_portal,
-        "each Sabine app gets its own portal secret, kept across host updates",
-    )
-
-    settings = program_at(os.path.join(sabine, "apps/com.lantharos.settings/install/settings"))
-    refused = subprocess.run(
-        [settings, os.path.join(HERE, "manager.py"), "generate", "Nope"],
-        env=environment,
-        capture_output=True,
-        text=True,
-        timeout=60,
-        check=False,
-    ).stdout
-    check("AccessDenied" in refused, "an app installed in a person's own Sabine folder isn't taken for a Luft app")

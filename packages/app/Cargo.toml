@@ -46,6 +46,7 @@ image = { workspace = true, features = [
 inotify = { workspace = true, optional = true }
 libc = { workspace = true, optional = true }
 luft-dbus.workspace = true
+luft-identity.workspace = true
 luft-i18n.workspace = true
 md-5 = { workspace = true, optional = true }
 memmap2 = { workspace = true, optional = true }

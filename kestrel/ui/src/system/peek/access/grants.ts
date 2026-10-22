@@ -50,7 +50,7 @@ class WindowAccess {
   async require(caller: Caller, window: Meta.Window | null, level: Level): Promise<void> {
     if (this.allows(caller, window, level)) return;
     if (LEVELS.some(declined => RANK[declined] <= RANK[level] && this.declined.has(`${caller.unit} ${declined}`)))
-      throw new PeekError('Denied', t('peek-error-declined', { app: caller.name }));
+      throw new PeekError('Denied', t('peek-error-declined-until-quit'));
     const key = `${caller.unit} ${level}`;
     let prompt = this.prompts.get(key);
     if (!prompt) {
@@ -76,7 +76,7 @@ class WindowAccess {
   }
 
   private async ask(caller: Caller, level: Level): Promise<boolean> {
-    const answer = await askForAccess(caller, level);
+    const answer = await askForAccess(level);
     if (answer === 'until-quit') this.grant(caller, level);
     if (answer === 'deny') this.decline(caller, level);
     return answer !== 'deny';

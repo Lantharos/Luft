@@ -113,15 +113,15 @@ privacy-mute-microphone = Itfi l-mikrofonu
 privacy-unmute-microphone = Ixgħel il-mikrofonu
 privacy-close-app = Agħlaq { $app }
 privacy-unknown-app = App
-privacy-windows-using = Qed juża t-twieqi
-privacy-windows-seeing = Qed jara t-twieqi
+privacy-windows-seeing-programs = Programmi li jistgħu jaraw it-twieqi: { $count }
+privacy-windows-using-programs = Programmi li jistgħu jaraw u jużaw it-twieqi: { $count }
 privacy-windows-stop = Waqqaf l-aċċess
 
 ## Window access prompt
 
-peek-see-title = { $app } irid jara t-twieqi
+peek-see-request = Tippermetti li programm li bdejt jara t-twieqi?
 peek-see-description = Ikun jista’ jieħu stampi ta’ kwalunkwe tieqa miftuħa.
-peek-use-title = { $app } irid jara u juża t-twieqi
+peek-use-request = Tippermetti li programm li bdejt jara u juża t-twieqi?
 peek-use-description = Ikun jista’ jara kwalunkwe tieqa miftuħa, u jikklikkja u jittajpja fiha bħallikieku int.
 peek-deny = Tippermettix
 peek-allow-once = Ippermetti darba
@@ -129,7 +129,7 @@ peek-allow-until-quit = Ippermetti sakemm jingħalaq
 
 ## Window access errors
 
-peek-error-declined = Il-persuna li qed tuża dan il-kompjuter irrifjutat. { $app } jista’ jerġa’ jitlob wara li jingħalaq.
+peek-error-declined-until-quit = Il-persuna li qed tuża dan il-kompjuter irrifjutat. Il-programm jista’ jerġa’ jitlob wara li jingħalaq.
 peek-error-not-allowed = Il-persuna li qed tuża dan il-kompjuter ma ppermettietx
 peek-error-sandboxed = Apps f’sandbox ma jistgħux jaraw jew jużaw twieqi oħra
 peek-error-unknown-caller = Il-programm li qed jitlob intemm jew ma setax jingħaraf

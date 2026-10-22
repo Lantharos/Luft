@@ -22,14 +22,10 @@ settings-privacy-lock-immediately = Imediat
 
 ## Privacy: location, camera and microphone
 
-settings-privacy-location = Locație
 settings-privacy-location-services = Servicii de localizare
 settings-privacy-location-services-hint = Permite aplicațiilor să afle unde vă aflați, pentru hărți, vreme și fusuri orare
-settings-privacy-camera = Cameră
 settings-privacy-camera-allow = Permite aplicațiilor să folosească camera
 settings-privacy-microphone-allow = Permite aplicațiilor să folosească microfonul
-settings-privacy-apps-asked = Aplicații care au cerut acces
-settings-privacy-apps-allowed = Permise: { $allowed } din { $total }
 
 ## Privacy: file history
 
@@ -340,22 +336,14 @@ settings-passwords-pin-locked = Deblocați portcheiul pentru a schimba asta
 settings-passwords-pin-description = Ca amprenta să nu le poată debloca singură
 settings-passwords-lock-with-screen = Blocare odată cu ecranul
 settings-passwords-lock-with-screen-description = Se blochează și se deblochează odată cu ecranul
-settings-passwords-apps = Aplicații cu acces
+settings-passwords-apps = Conectări și activitate ale aplicațiilor
 settings-passwords-apps-locked = Deblocați portcheiul pentru a le vedea
-settings-passwords-apps-asked = { $count ->
-    [0] Nicio aplicație nu le-a cerut încă
-    [one] { $count } aplicație le-a cerut
-    [few] { $count } aplicații le-au cerut
-   *[other] { $count } de aplicații le-au cerut
-}
+settings-passwords-apps-description = Ce păstrează aplicațiile aici și când le-au folosit
+settings-passwords-apps-allowed = Ce aplicații pot folosi parolele dumneavoastră
+settings-passwords-apps-allowed-hint = Se setează în Aplicații
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-description = Dacă eliminați una, aplicația va cere din nou acces data viitoare.
-settings-passwords-access-not-allowed = Nepermis
-settings-passwords-access-none = Nicio aplicație nu a cerut încă parolele
-settings-passwords-access-revoke = Nu mai permite aplicației { $app } să folosească { $item }
-settings-passwords-access-reset = Permite aplicației { $app } să ceară din nou { $item }
 settings-passwords-stores = Date de conectare ale aplicațiilor
 settings-passwords-stores-description = Date de conectare pe care unele aplicații le păstrează aici, unde doar aplicația respectivă le poate citi.
 settings-passwords-stores-count = { $count ->
@@ -466,3 +454,25 @@ settings-apps-startup-add-description = Alegeți o aplicație care să se deschi
 settings-apps-search = Caută aplicații
 settings-apps-no-match = Nicio aplicație nu corespunde căutării
 settings-apps-cancel = Anulează
+
+## Apps: permissions
+
+settings-apps-permissions = Permisiuni
+settings-apps-location = Locație
+settings-apps-camera = Cameră
+settings-apps-clipboard = Clipboard în fundal
+settings-apps-clipboard-hint = Aceste aplicații pot vedea și modifica ce copiați, chiar și cât timp folosiți alte aplicații.
+settings-apps-full-access = Acces complet
+settings-apps-full-access-hint = Aceste aplicații rulează în afara mediului izolat și sunt tratate ca dumneavoastră, la fel ca aplicațiile instalate în sistem. Eliminarea se aplică data viitoare când se deschide aplicația.
+settings-apps-full-access-remove = Elimină
+settings-apps-full-access-remove-app = Elimină accesul complet pentru { $app }
+settings-apps-passwords = Parole salvate
+settings-apps-passwords-hint = Aplicațiile rețin răspunsul dumneavoastră când cer să folosească ceva salvat în portchei. Uitați-l pentru ca aplicația să întrebe din nou.
+settings-apps-passwords-forget = Uită
+settings-apps-passwords-forget-app = Lasă { $app } să întrebe din nou
+settings-apps-permissions-allowed = Permise: { $allowed } din { $total }
+settings-apps-permissions-count = { $count ->
+    [one] { $count } aplicație
+    [few] { $count } aplicații
+   *[other] { $count } de aplicații
+}

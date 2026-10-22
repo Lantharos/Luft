@@ -1,0 +1,17 @@
+[package]
+name = "luft-identity"
+version = "0.1.0"
+description = "Who calls Luft's services and what each app was allowed, shared by every service and app that decides"
+authors = ["Kristof"]
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+futures-util.workspace = true
+libc.workspace = true
+luft-dbus.workspace = true
+zbus = { workspace = true, features = ["proxy", "tokio"] }
+
+[lints]
+workspace = true

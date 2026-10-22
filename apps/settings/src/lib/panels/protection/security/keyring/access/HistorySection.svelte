@@ -14,8 +14,9 @@
 	let shown = $derived(expanded ? history : history.slice(0, COLLAPSED));
 
 	async function clear() {
-		await clearHistory();
+		const cleared = await clearHistory();
 		await refresh();
+		return cleared;
 	}
 </script>
 

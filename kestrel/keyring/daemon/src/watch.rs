@@ -2,6 +2,7 @@ use std::sync::Arc;
 use std::sync::atomic::Ordering;
 
 use futures_util::StreamExt;
+use luft_identity::permissions::{self, FULL_ACCESS};
 use zbus::fdo::DBusProxy;
 use zbus::{MatchRule, MessageStream};
 
@@ -19,11 +20,26 @@ pub async fn start(daemon: &Arc<Daemon>) -> zbus::Result<()> {
             };
             if arguments.new_owner().is_none() && arguments.name().starts_with(':') {
                 let name = arguments.name().to_string();
-                watcher.identities.forget(&name);
+                watcher.requesters.forget(&name);
+                watcher.granted.forget_connection(&name);
                 let server = watcher.connection.object_server();
                 for path in watcher.sessions.owned_by(&name) {
                     watcher.sessions.close(server, &path).await;
                 }
+            }
+        }
+    });
+
+    let watcher = daemon.clone();
+    tokio::spawn(async move {
+        let changes = match permissions::changes(&watcher.connection).await {
+            Ok(changes) => changes,
+            Err(error) => return eprintln!("Couldn't follow changes to app permissions: {error}"),
+        };
+        let mut changes = std::pin::pin!(changes);
+        while let Some(table) = changes.next().await {
+            if table == FULL_ACCESS.table {
+                watcher.requesters.forget_all();
             }
         }
     });

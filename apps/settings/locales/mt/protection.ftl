@@ -22,14 +22,10 @@ settings-privacy-lock-immediately = Minnufih
 
 ## Privacy: location, camera and microphone
 
-settings-privacy-location = Post
 settings-privacy-location-services = Servizzi tal-post
 settings-privacy-location-services-hint = Iħalli l-apps isibu fejn tinsab, għall-mapep, it-temp u ż-żoni tal-ħin
-settings-privacy-camera = Kamera
 settings-privacy-camera-allow = Ħalli l-apps jużaw il-kamera
 settings-privacy-microphone-allow = Ħalli l-apps jużaw il-mikrofonu
-settings-privacy-apps-asked = Apps li talbu
-settings-privacy-apps-allowed = { $allowed } minn { $total } permessi
 
 ## Privacy: file history
 
@@ -362,24 +358,14 @@ settings-passwords-pin-locked = Żblokka ċ-ċurkett taċ-ċwievet biex tibdel d
 settings-passwords-pin-description = Biex marka tas-saba’ waħedha ma tkunx tista’ tiżblokkahom
 settings-passwords-lock-with-screen = Sakkar mal-iskrin
 settings-passwords-lock-with-screen-description = Jissakkru u jiżblokkaw flimkien mal-iskrin
-settings-passwords-apps = Apps b’aċċess
+settings-passwords-apps = Dħul u attività tal-apps
 settings-passwords-apps-locked = Żblokka ċ-ċurkett taċ-ċwievet biex tarahom
-settings-passwords-apps-asked = { $count ->
-    [0] Għadha ebda app ma talbet għalihom
-    [one] { $count } app talbet għalihom
-    [two] { $count } apps talbu għalihom
-    [few] { $count } apps talbu għalihom
-    [many] { $count } app talbet għalihom
-   *[other] { $count } app talbet għalihom
-}
+settings-passwords-apps-description = X’iżommu l-apps hawn u meta użawh
+settings-passwords-apps-allowed = Liema apps jistgħu jużaw il-passwords tiegħek
+settings-passwords-apps-allowed-hint = Issettjat f’Apps
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-description = Jekk tneħħi waħda, l-app terġa’ titlob il-darba li jmiss.
-settings-passwords-access-not-allowed = Mhux permess
-settings-passwords-access-none = Għadha ebda app ma talbet għall-passwords
-settings-passwords-access-revoke = Waqqaf lil { $app } milli juża { $item }
-settings-passwords-access-reset = Ħalli lil { $app } jerġa’ jitlob { $item }
 settings-passwords-stores = Dħul tal-apps
 settings-passwords-stores-description = Dettalji tad-dħul li xi apps iżommu hawn, fejn dik l-app biss tista’ taqrahom.
 settings-passwords-stores-count = { $count ->
@@ -494,3 +480,27 @@ settings-apps-startup-add-description = Agħżel app li tinfetaħ kull darba li 
 settings-apps-search = Fittex apps
 settings-apps-no-match = L-ebda app ma taqbel mat-tfittxija
 settings-apps-cancel = Ikkanċella
+
+## Apps: permissions
+
+settings-apps-permissions = Permessi
+settings-apps-location = Post
+settings-apps-camera = Kamera
+settings-apps-clipboard = Klibbord fl-isfond
+settings-apps-clipboard-hint = Dawn l-apps jistgħu jaraw u jibdlu dak li tikkopja, anke waqt li tuża apps oħra.
+settings-apps-full-access = Aċċess sħiħ
+settings-apps-full-access-hint = Dawn l-apps jaħdmu barra mis-sandbox tagħhom u jitqiesu bħalek, bħall-apps installati fis-sistema. It-tneħħija tidħol fis-seħħ il-darba li jmiss li tinfetaħ l-app.
+settings-apps-full-access-remove = Neħħi
+settings-apps-full-access-remove-app = Neħħi l-aċċess sħiħ minn { $app }
+settings-apps-passwords = Passwords issejvjati
+settings-apps-passwords-hint = L-apps jiftakru t-tweġiba tiegħek meta jitolbu jużaw xi ħaġa ssejvjata fiċ-ċurkett taċ-ċwievet. Insieha biex l-app terġa’ tistaqsi.
+settings-apps-passwords-forget = Insa
+settings-apps-passwords-forget-app = Ħalli lil { $app } terġa’ tistaqsi
+settings-apps-permissions-allowed = { $allowed } minn { $total } permessi
+settings-apps-permissions-count = { $count ->
+    [one] { $count } app
+    [two] { $count } apps
+    [few] { $count } apps
+    [many] { $count } apps
+   *[other] { $count } apps
+}

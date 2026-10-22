@@ -382,7 +382,7 @@ impl Drives {
         #[zbus(connection)] connection: &Connection,
         #[zbus(header)] header: Header<'_>,
     ) -> Result<(), Error> {
-        if luft_dbus::caller::uid(connection, &header).await? != Some(0) {
+        if luft_identity::caller::uid(connection, &header).await? != Some(0) {
             return Err(Error::not_authorized());
         }
         let _activity = self.idle.hold();

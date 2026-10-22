@@ -22,14 +22,10 @@ settings-privacy-lock-immediately = Direkt
 
 ## Privacy: location, camera and microphone
 
-settings-privacy-location = Plats
 settings-privacy-location-services = Platstjänster
 settings-privacy-location-services-hint = Låter appar se var du är, för kartor, väder och tidszoner
-settings-privacy-camera = Kamera
 settings-privacy-camera-allow = Tillåt att appar använder kameran
 settings-privacy-microphone-allow = Tillåt att appar använder mikrofonen
-settings-privacy-apps-asked = Appar som har frågat
-settings-privacy-apps-allowed = { $allowed } av { $total } tillåtna
 
 ## Privacy: file history
 
@@ -329,21 +325,14 @@ settings-passwords-pin-locked = Lås upp nyckelringen för att ändra det här
 settings-passwords-pin-description = Så att ett fingeravtryck inte ensamt kan låsa upp dem
 settings-passwords-lock-with-screen = Lås tillsammans med skärmen
 settings-passwords-lock-with-screen-description = De låses och låses upp samtidigt som skärmen
-settings-passwords-apps = Appar med åtkomst
+settings-passwords-apps = Inloggningar och aktivitet i appar
 settings-passwords-apps-locked = Lås upp nyckelringen för att se dem
-settings-passwords-apps-asked = { $count ->
-    [0] Inga appar har frågat efter dem än
-    [one] { $count } app har frågat efter dem
-   *[other] { $count } appar har frågat efter dem
-}
+settings-passwords-apps-description = Vad appar sparar här och när de använde det
+settings-passwords-apps-allowed = Vilka appar som får använda dina lösenord
+settings-passwords-apps-allowed-hint = Ställs in i Appar
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-description = Om du tar bort en app frågar den igen nästa gång.
-settings-passwords-access-not-allowed = Inte tillåten
-settings-passwords-access-none = Inga appar har frågat efter dina lösenord än
-settings-passwords-access-revoke = Hindra { $app } från att använda { $item }
-settings-passwords-access-reset = Låt { $app } fråga efter { $item } igen
 settings-passwords-stores = Inloggningar i appar
 settings-passwords-stores-description = Inloggningar som vissa appar sparar här, där bara den appen kan läsa dem.
 settings-passwords-stores-count = { $count ->
@@ -452,3 +441,24 @@ settings-apps-startup-add-description = Välj en app som ska öppnas varje gång
 settings-apps-search = Sök efter appar
 settings-apps-no-match = Inga appar matchar sökningen
 settings-apps-cancel = Avbryt
+
+## Apps: permissions
+
+settings-apps-permissions = Behörigheter
+settings-apps-location = Plats
+settings-apps-camera = Kamera
+settings-apps-clipboard = Urklipp i bakgrunden
+settings-apps-clipboard-hint = De här apparna kan se och ändra det du kopierar, även medan du använder andra appar.
+settings-apps-full-access = Full åtkomst
+settings-apps-full-access-hint = De här apparna körs utanför sin sandlåda och räknas som du, precis som appar som är installerade i systemet. Tar du bort den gäller det nästa gång appen öppnas.
+settings-apps-full-access-remove = Ta bort
+settings-apps-full-access-remove-app = Ta bort full åtkomst för { $app }
+settings-apps-passwords = Sparade lösenord
+settings-apps-passwords-hint = Appar kommer ihåg ditt svar när de ber om att använda något i nyckelringen. Glöm det så frågar appen igen.
+settings-apps-passwords-forget = Glöm
+settings-apps-passwords-forget-app = Låt { $app } fråga igen
+settings-apps-permissions-allowed = { $allowed } av { $total } tillåtna
+settings-apps-permissions-count = { $count ->
+    [one] { $count } app
+   *[other] { $count } appar
+}

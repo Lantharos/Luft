@@ -62,10 +62,10 @@
 			onchange={(enabled) => runner.run(() => setLockWithScreen(enabled))}
 		/>
 	</Row>
-	{#if access && (access.apps.length || access.stores.length || access.history.length)}
+	{#if access}
 		<Row
 			title={t('settings-passwords-apps')}
-			description={keyring.locked ? t('settings-passwords-apps-locked') : t('settings-passwords-apps-asked', { count: access.apps.length })}
+			description={keyring.locked ? t('settings-passwords-apps-locked') : t('settings-passwords-apps-description')}
 			disabled={keyring.locked}
 			onclick={onaccess}
 		/>

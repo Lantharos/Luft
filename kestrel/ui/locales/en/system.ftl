@@ -149,18 +149,24 @@ privacy-unmute-microphone = Unmute microphone
 privacy-close-app = Close { $app }
 # Used in place of an app's name when it isn't known
 privacy-unknown-app = An app
-# Shown after a program's name in the menu, for example "Terminal · Using your windows"
-privacy-windows-using = Using your windows
-privacy-windows-seeing = Seeing your windows
+# Menu items for programs you let see your windows, or see and use them. $count is how many
+privacy-windows-seeing-programs = { $count ->
+    [one] A program can see your windows
+   *[other] { $count } programs can see your windows
+}
+privacy-windows-using-programs = { $count ->
+    [one] A program can see and use your windows
+   *[other] { $count } programs can see and use your windows
+}
 # Menu item that takes away a program's access to your windows
 privacy-windows-stop = Stop access
 
 ## Window access prompt
-# A program (often a coding assistant) asks to see or control the windows on the screen. $app is its name.
+# A program (often a coding assistant) asks to see or control the windows on the screen. Kestrel can't tell which program it is, only that it runs outside a sandbox.
 
-peek-see-title = { $app } wants to see your windows
+peek-see-request = Let a program you started see your windows?
 peek-see-description = It will be able to take pictures of any window you have open.
-peek-use-title = { $app } wants to see and use your windows
+peek-use-request = Let a program you started see and use your windows?
 peek-use-description = It will be able to see any window you have open, and click and type in it as if it were you.
 peek-deny = Don’t allow
 peek-allow-once = Allow once
@@ -169,8 +175,7 @@ peek-allow-until-quit = Allow until it quits
 ## Window access errors
 # Shown in a terminal to the person or program that ran the peek command. "peek run" and "peek list" are commands and stay as they are.
 
-# $app is the program that asked
-peek-error-declined = The person using this computer declined this. { $app } can ask again after it quits.
+peek-error-declined-until-quit = The person using this computer declined this. The program can ask again after it quits.
 peek-error-not-allowed = The person using this computer didn't allow it
 peek-error-sandboxed = Sandboxed apps cannot see or use other windows
 peek-error-unknown-caller = The program asking ended or could not be recognized

@@ -1,6 +1,6 @@
 import GLib from 'gi://GLib';
 
-import {descendants, labelled, named} from '../lib/actors.js';
+import {descendants, labelled, named, showsText} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {click} from '../lib/input/input.js';
 import {findWindow, gjs, scratch, waitForWindow} from '../lib/processes.js';
@@ -8,7 +8,7 @@ import {capture, output} from '../lib/screenshots.js';
 import {settled, waitUntil} from '../lib/wait.js';
 import {KeyringClient, SecretPipe, handle as promptHandle, keyringDialog, openedDialog} from '../keyring/lib/client.js';
 import {
-  HANDLE, displayLeftovers, endProgram, oldScreenshot, peek, peekDialog, pngSize, runTarget, scopeActive, titleOf, windowsOf,
+  HANDLE, displayLeftovers, endProgram, oldScreenshot, peek, peekDialog, peekInScopeOf, pngSize, runTarget, scopeActive, titleOf, windowsOf,
 } from './lib/peek.js';
 
 const {require, eventually} = checks('peek');
@@ -19,6 +19,8 @@ const OTHER = 'Peek other';
 const BUSY = 'The screen is locked, or a system prompt is open on it';
 const SCREENSHOT_REFUSAL = 'Screenshots are limited to the system. To see or use windows, run peek --help';
 const READY_WITHIN = 5000;
+const SEE_REQUEST = 'Let a program you started see your windows?';
+const SETTINGS_APP = 'com.lantharos.settings';
 
 const started = new Set();
 const titled = title => window => window.get_title() === title;
@@ -128,7 +130,7 @@ async function checkPrompt() {
   click(privacy);
   const menu = named('kestrel-context-menu');
   await eventually(() => menu.visible, 'the privacy menu opens');
-  const grant = descendants(menu).find(actor => actor.mapped && actor.accessible_name?.endsWith('Using your windows'));
+  const grant = descendants(menu).find(actor => actor.mapped && actor.accessible_name === 'A program can see and use your windows');
   require(grant, 'the privacy menu lists the program using windows');
   click(grant);
   await eventually(() => named('Stop access', menu), 'the grant offers to stop');
@@ -139,12 +141,22 @@ async function checkPrompt() {
   const dialog = await waitUntil(peekDialog, 'a stopped grant asks again');
   await settled();
   await capture('peek-prompt');
+  require(showsText(SEE_REQUEST, dialog), 'the prompt asks about the program without naming it');
   click(labelled('Don’t allow', dialog));
   const denied = await refused;
   require(!denied.ok && denied.stderr.includes("didn't allow"), 'Don’t allow refuses the picture');
   await eventually(() => !peekDialog(), 'Don’t allow closes the prompt');
   const again = await peek('window', id);
   require(!again.ok && again.stderr.includes('declined') && !peekDialog(), 'a declined program is refused without asking again');
+
+  const posing = peekInScopeOf(SETTINGS_APP, 'window', id);
+  const asked = await waitUntil(peekDialog, 'a program in a scope named after an app asks for itself');
+  await settled();
+  require(showsText(SEE_REQUEST, asked) && !descendants(asked).some(actor => actor.text?.includes('Settings')),
+    'the prompt never names an app it cannot verify');
+  click(labelled('Don’t allow', asked));
+  require(!(await posing).ok, 'the program posing as an app is refused');
+  await eventually(() => !peekDialog(), 'Don’t allow closes the prompt');
 }
 
 async function checkPasswordPrompt(here) {

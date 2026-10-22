@@ -8,13 +8,13 @@ use zbus::{fdo, interface};
 
 use super::{Target, parse};
 use crate::daemon::Daemon;
-use crate::identity::App;
+use crate::requester::Requester;
 
 static NEXT: AtomicU64 = AtomicU64::new(1);
 
 pub enum Action {
     Unlock {
-        app: App,
+        requester: Requester,
         objects: Vec<OwnedObjectPath>,
     },
 }
@@ -58,12 +58,12 @@ impl PromptObject {
 }
 
 async fn run(daemon: &Arc<Daemon>, action: Action) -> (bool, Variant<'static>) {
-    let Action::Unlock { app, objects } = action;
-    if !daemon.ensure_unlocked(&app, true).await {
+    let Action::Unlock { requester, objects } = action;
+    if !daemon.ensure_unlocked(&requester, true).await {
         return (true, Variant::from(Vec::<OwnedObjectPath>::new()));
     }
     let keys = daemon.items_of(&objects).await;
-    let allowed = daemon.authorize(&app, &keys, true).await;
+    let allowed = daemon.authorize(&requester, &keys, true).await;
     let unlocked: Vec<OwnedObjectPath> = objects
         .into_iter()
         .filter(|object| match parse(object) {

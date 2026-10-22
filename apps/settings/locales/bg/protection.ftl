@@ -22,14 +22,10 @@ settings-privacy-lock-immediately = Веднага
 
 ## Privacy: location, camera and microphone
 
-settings-privacy-location = Местоположение
 settings-privacy-location-services = Услуги за местоположение
 settings-privacy-location-services-hint = Позволява на приложенията да определят къде се намирате – за карти, времето и часови зони
-settings-privacy-camera = Камера
 settings-privacy-camera-allow = Достъп на приложенията до камерата
 settings-privacy-microphone-allow = Достъп на приложенията до микрофона
-settings-privacy-apps-asked = Приложения, поискали достъп
-settings-privacy-apps-allowed = Разрешени: { $allowed } от { $total }
 
 ## Privacy: file history
 
@@ -329,21 +325,14 @@ settings-passwords-pin-locked = Отключете ключодържателя,
 settings-passwords-pin-description = За да не може само отпечатък да ги отключи
 settings-passwords-lock-with-screen = Заключване заедно с екрана
 settings-passwords-lock-with-screen-description = Заключват се и се отключват заедно с екрана
-settings-passwords-apps = Приложения с достъп
+settings-passwords-apps = Данни за вход и активност на приложенията
 settings-passwords-apps-locked = Отключете ключодържателя, за да ги видите
-settings-passwords-apps-asked = { $count ->
-    [0] Още никое приложение не ги е поискало
-    [one] { $count } приложение ги е поискало
-   *[other] { $count } приложения са ги поискали
-}
+settings-passwords-apps-description = Какво пазят приложенията тук и кога са го използвали
+settings-passwords-apps-allowed = Кои приложения могат да използват паролите ви
+settings-passwords-apps-allowed-hint = Задава се в Приложения
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-description = Ако премахнете приложение, то ще поиска отново следващия път.
-settings-passwords-access-not-allowed = Не е разрешено
-settings-passwords-access-none = Още никое приложение не е поискало паролите ви
-settings-passwords-access-revoke = Спри достъпа на { $app } до { $item }
-settings-passwords-access-reset = Позволи на { $app } отново да поиска { $item }
 settings-passwords-stores = Данни за вход в приложения
 settings-passwords-stores-description = Данни за вход, които някои приложения пазят тук и само съответното приложение може да чете.
 settings-passwords-stores-count = { $count ->
@@ -452,3 +441,24 @@ settings-apps-startup-add-description = Изберете приложение, �
 settings-apps-search = Търсене на приложения
 settings-apps-no-match = Няма приложения, които отговарят на търсенето
 settings-apps-cancel = Отказ
+
+## Apps: permissions
+
+settings-apps-permissions = Разрешения
+settings-apps-location = Местоположение
+settings-apps-camera = Камера
+settings-apps-clipboard = Клипборд във фонов режим
+settings-apps-clipboard-hint = Тези приложения могат да виждат и променят това, което копирате, дори докато използвате други приложения.
+settings-apps-full-access = Пълен достъп
+settings-apps-full-access-hint = Тези приложения работят извън изолираната си среда и се смятат за вас, както приложенията, инсталирани в системата. Премахването важи от следващото отваряне на приложението.
+settings-apps-full-access-remove = Премахни
+settings-apps-full-access-remove-app = Премахни пълния достъп на { $app }
+settings-apps-passwords = Запазени пароли
+settings-apps-passwords-hint = Приложенията запомнят отговора ви, когато поискат да използват нещо от ключодържателя ви. Забравете го, за да попита приложението отново.
+settings-apps-passwords-forget = Забрави
+settings-apps-passwords-forget-app = Нека { $app } попита отново
+settings-apps-permissions-allowed = Разрешени: { $allowed } от { $total }
+settings-apps-permissions-count = { $count ->
+    [one] { $count } приложение
+   *[other] { $count } приложения
+}

@@ -40,16 +40,10 @@ settings-privacy-lock-immediately = Immediately
 
 ## Privacy: location, camera and microphone
 
-settings-privacy-location = Location
 settings-privacy-location-services = Location services
 settings-privacy-location-services-hint = Lets apps find where you are, for maps, weather and time zones
-settings-privacy-camera = Camera
 settings-privacy-camera-allow = Allow apps to use the camera
 settings-privacy-microphone-allow = Allow apps to use the microphone
-# Expandable row listing the apps that asked for location or camera access
-settings-privacy-apps-asked = Apps that asked
-# $allowed and $total are numbers of apps
-settings-privacy-apps-allowed = { $allowed } of { $total } allowed
 
 ## Privacy: file history
 
@@ -383,22 +377,15 @@ settings-passwords-pin-locked = Unlock your keyring to change this
 settings-passwords-pin-description = So a fingerprint alone can’t unlock them
 settings-passwords-lock-with-screen = Lock with the screen
 settings-passwords-lock-with-screen-description = They lock and unlock along with the screen
-settings-passwords-apps = Apps with access
+settings-passwords-apps = App sign-ins and activity
 settings-passwords-apps-locked = Unlock your keyring to see them
-settings-passwords-apps-asked = { $count ->
-    [0] No apps have asked for them yet
-    [one] { $count } app has asked for them
-   *[other] { $count } apps have asked for them
-}
+settings-passwords-apps-description = What apps keep here and when they used it
+settings-passwords-apps-allowed = Which apps can use your passwords
+# "Apps" is the name of another Settings page
+settings-passwords-apps-allowed-hint = Set in Apps
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-description = Removing one makes the app ask again next time.
-settings-passwords-access-not-allowed = Not allowed
-settings-passwords-access-none = No apps have asked for your passwords yet
-# Screen reader label of a remove button. $app is an app name, $item the name of a saved password
-settings-passwords-access-revoke = Stop { $app } from using { $item }
-settings-passwords-access-reset = Let { $app } ask for { $item } again
 settings-passwords-stores = App sign-ins
 settings-passwords-stores-description = Sign-ins some apps keep here, where only that app can read them.
 settings-passwords-stores-count = { $count ->
@@ -518,3 +505,29 @@ settings-apps-startup-add-description = Choose an app to open every time you sig
 settings-apps-search = Search apps
 settings-apps-no-match = No apps match your search
 settings-apps-cancel = Cancel
+
+## Apps: permissions
+
+settings-apps-permissions = Permissions
+settings-apps-location = Location
+settings-apps-camera = Camera
+settings-apps-clipboard = Clipboard in the background
+settings-apps-clipboard-hint = These apps can see and change what you copy, even while you use other apps.
+settings-apps-full-access = Full access
+settings-apps-full-access-hint = These apps run outside their sandbox and count as you, like apps installed on the system. Removing it takes effect the next time the app opens.
+# Button, verb
+settings-apps-full-access-remove = Remove
+# Screen reader label of the remove button; $app is an app name
+settings-apps-full-access-remove-app = Remove full access from { $app }
+settings-apps-passwords = Saved passwords
+settings-apps-passwords-hint = Apps remember your answer when they ask to use something saved in your keyring. Forget it to have the app ask again.
+# Button, verb
+settings-apps-passwords-forget = Forget
+# Screen reader label of the forget button; $app is an app name
+settings-apps-passwords-forget-app = Let { $app } ask again
+# $allowed and $total are numbers of apps, or of saved passwords
+settings-apps-permissions-allowed = { $allowed } of { $total } allowed
+settings-apps-permissions-count = { $count ->
+    [one] { $count } app
+   *[other] { $count } apps
+}

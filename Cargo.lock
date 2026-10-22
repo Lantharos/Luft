@@ -3806,6 +3806,7 @@ version = "0.1.0"
 dependencies = [
  "futures-util",
  "jiff",
+ "luft-identity",
  "rustix",
  "serde",
  "serde_json",
@@ -4209,6 +4210,7 @@ dependencies = [
  "libc",
  "luft-dbus",
  "luft-i18n",
+ "luft-identity",
  "md-5",
  "memmap2",
  "parking_lot 0.13.0",
@@ -4226,7 +4228,6 @@ name = "luft-dbus"
 version = "0.1.0"
 dependencies = [
  "futures-util",
- "libc",
  "rustix",
  "serde",
  "tokio",
@@ -4268,6 +4269,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "luft-identity"
+version = "0.1.0"
+dependencies = [
+ "futures-util",
+ "libc",
+ "luft-dbus",
+ "zbus 6.0.0",
+]
+
+[[package]]
 name = "luft-installer"
 version = "0.1.0"
 dependencies = [
@@ -4278,6 +4289,7 @@ dependencies = [
  "luft-dbus",
  "luft-disks",
  "luft-i18n",
+ "luft-identity",
  "luft-meet",
  "luft-trust",
  "luft-windows",
@@ -4303,6 +4315,7 @@ dependencies = [
  "hkdf",
  "hmac",
  "libc",
+ "luft-identity",
  "luft-keyring-vault",
  "luft-keyring-wire",
  "p256",
@@ -4447,6 +4460,7 @@ dependencies = [
  "serde_json",
  "sha1",
  "sha2",
+ "tokio",
  "ureq",
  "zbus 6.0.0",
 ]
@@ -4527,6 +4541,7 @@ dependencies = [
  "anyhow",
  "futures-util",
  "luft-dbus",
+ "luft-identity",
  "rustix",
  "tokio",
  "zbus 6.0.0",
@@ -8016,6 +8031,7 @@ dependencies = [
  "getrandom 0.4.3",
  "libc",
  "luft-dbus",
+ "luft-identity",
  "rustix",
  "serde",
  "serde_json",

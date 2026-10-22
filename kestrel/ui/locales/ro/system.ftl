@@ -113,15 +113,23 @@ privacy-mute-microphone = Dezactivează microfonul
 privacy-unmute-microphone = Activează microfonul
 privacy-close-app = Închide { $app }
 privacy-unknown-app = O aplicație
-privacy-windows-using = Folosește ferestrele
-privacy-windows-seeing = Vede ferestrele
+privacy-windows-seeing-programs = { $count ->
+    [one] { $count } program vă poate vedea ferestrele
+    [few] { $count } programe vă pot vedea ferestrele
+   *[other] { $count } de programe vă pot vedea ferestrele
+}
+privacy-windows-using-programs = { $count ->
+    [one] { $count } program vă poate vedea și folosi ferestrele
+    [few] { $count } programe vă pot vedea și folosi ferestrele
+   *[other] { $count } de programe vă pot vedea și folosi ferestrele
+}
 privacy-windows-stop = Oprește accesul
 
 ## Window access prompt
 
-peek-see-title = { $app } vrea să vă vadă ferestrele
+peek-see-request = Permiteți unui program pe care l-ați pornit să vă vadă ferestrele?
 peek-see-description = Va putea face capturi ale oricărei ferestre deschise.
-peek-use-title = { $app } vrea să vă vadă și să vă folosească ferestrele
+peek-use-request = Permiteți unui program pe care l-ați pornit să vă vadă și să vă folosească ferestrele?
 peek-use-description = Va putea vedea orice fereastră deschisă și va putea face clic și tasta în ea ca și cum ați face-o personal.
 peek-deny = Nu permite
 peek-allow-once = Permite o dată
@@ -129,7 +137,7 @@ peek-allow-until-quit = Permite până la închidere
 
 ## Window access errors
 
-peek-error-declined = Persoana care folosește acest computer a refuzat. { $app } poate cere din nou după ce se închide.
+peek-error-declined-until-quit = Persoana care folosește acest computer a refuzat. Programul poate cere din nou după ce se închide.
 peek-error-not-allowed = Persoana care folosește acest computer nu a permis acest lucru
 peek-error-sandboxed = Aplicațiile dintr-un mediu izolat nu pot vedea sau folosi alte ferestre
 peek-error-unknown-caller = Programul care a cerut s-a încheiat sau nu a putut fi recunoscut

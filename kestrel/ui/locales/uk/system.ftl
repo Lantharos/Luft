@@ -113,16 +113,26 @@ privacy-mute-microphone = Вимкнути мікрофон
 privacy-unmute-microphone = Увімкнути мікрофон
 privacy-close-app = Закрити { $app }
 privacy-unknown-app = Невідома програма
-privacy-windows-using = Використовує ваші вікна
-privacy-windows-seeing = Бачить ваші вікна
+privacy-windows-seeing-programs = { $count ->
+    [one] { $count } програма може бачити ваші вікна
+    [few] { $count } програми можуть бачити ваші вікна
+    [many] { $count } програм можуть бачити ваші вікна
+   *[other] { $count } програми можуть бачити ваші вікна
+}
+privacy-windows-using-programs = { $count ->
+    [one] { $count } програма може бачити ваші вікна й керувати ними
+    [few] { $count } програми можуть бачити ваші вікна й керувати ними
+    [many] { $count } програм можуть бачити ваші вікна й керувати ними
+   *[other] { $count } програми можуть бачити ваші вікна й керувати ними
+}
 privacy-windows-stop = Припинити доступ
 
 ## Window access prompt
 # A program (often a coding assistant) asks to see or control the windows on the screen. $app is its name.
 
-peek-see-title = { $app } хоче бачити ваші вікна
+peek-see-request = Дозволити запущеній вами програмі бачити ваші вікна?
 peek-see-description = Ця програма зможе робити знімки будь-якого відкритого вікна.
-peek-use-title = { $app } хоче бачити ваші вікна й керувати ними
+peek-use-request = Дозволити запущеній вами програмі бачити ваші вікна й керувати ними?
 peek-use-description = Ця програма зможе бачити будь-яке відкрите вікно, клацати й вводити текст у ньому так, ніби це робите ви.
 peek-deny = Не дозволяти
 peek-allow-once = Дозволити один раз
@@ -131,7 +141,7 @@ peek-allow-until-quit = Дозволити, доки працює
 ## Window access errors
 # Shown in a terminal to the person or program that ran the peek command. "peek run" and "peek list" are commands and stay as they are.
 
-peek-error-declined = Користувач цього комп’ютера відхилив запит. Програма { $app } зможе запитати знову, коли завершить роботу.
+peek-error-declined-until-quit = Користувач цього комп’ютера відхилив запит. Програма зможе запитати знову, коли завершить роботу.
 peek-error-not-allowed = Користувач цього комп’ютера цього не дозволив
 peek-error-sandboxed = Програми в пісочниці не можуть бачити інші вікна чи керувати ними
 peek-error-unknown-caller = Програма, що надіслала запит, завершила роботу або її не вдалося розпізнати

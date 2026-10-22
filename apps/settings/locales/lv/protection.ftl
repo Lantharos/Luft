@@ -22,14 +22,10 @@ settings-privacy-lock-immediately = Uzreiz
 
 ## Privacy: location, camera and microphone
 
-settings-privacy-location = Atrašanās vieta
 settings-privacy-location-services = Atrašanās vietas pakalpojumi
 settings-privacy-location-services-hint = Ļauj lietotnēm noteikt jūsu atrašanās vietu kartēm, laikapstākļiem un laika joslām
-settings-privacy-camera = Kamera
 settings-privacy-camera-allow = Atļaut lietotnēm izmantot kameru
 settings-privacy-microphone-allow = Atļaut lietotnēm izmantot mikrofonu
-settings-privacy-apps-asked = Lietotnes, kas pieprasīja piekļuvi
-settings-privacy-apps-allowed = Atļauts: { $allowed } no { $total }
 
 ## Privacy: file history
 
@@ -340,22 +336,14 @@ settings-passwords-pin-locked = Atbloķējiet atslēgu saišķi, lai to mainītu
 settings-passwords-pin-description = Lai tikai ar pirksta nospiedumu tās nevarētu atbloķēt
 settings-passwords-lock-with-screen = Bloķēt kopā ar ekrānu
 settings-passwords-lock-with-screen-description = Tās tiek bloķētas un atbloķētas kopā ar ekrānu
-settings-passwords-apps = Lietotnes ar piekļuvi
+settings-passwords-apps = Lietotņu pierakstīšanās dati un darbības
 settings-passwords-apps-locked = Atbloķējiet atslēgu saišķi, lai tās redzētu
-settings-passwords-apps-asked = { $count ->
-    [0] Neviena lietotne tās vēl nav pieprasījusi
-    [zero] { $count } lietotnes tās ir pieprasījušas
-    [one] { $count } lietotne tās ir pieprasījusi
-   *[other] { $count } lietotnes tās ir pieprasījušas
-}
+settings-passwords-apps-description = Ko lietotnes šeit glabā un kad tās to izmantoja
+settings-passwords-apps-allowed = Kuras lietotnes drīkst izmantot jūsu paroles
+settings-passwords-apps-allowed-hint = Iestatāms sadaļā Lietotnes
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-description = Ja noņemsiet kādu lietotni, tā nākamreiz jautās vēlreiz.
-settings-passwords-access-not-allowed = Nav atļauts
-settings-passwords-access-none = Neviena lietotne vēl nav pieprasījusi jūsu paroles
-settings-passwords-access-revoke = Liegt lietotnei { $app } izmantot { $item }
-settings-passwords-access-reset = Ļaut lietotnei { $app } vēlreiz pieprasīt { $item }
 settings-passwords-stores = Lietotņu pierakstīšanās dati
 settings-passwords-stores-description = Pierakstīšanās dati, ko dažas lietotnes glabā šeit un ko var nolasīt tikai attiecīgā lietotne.
 settings-passwords-stores-count = { $count ->
@@ -466,3 +454,25 @@ settings-apps-startup-add-description = Izvēlieties lietotni, kas tiks atvērta
 settings-apps-search = Meklēt lietotnes
 settings-apps-no-match = Neviena lietotne neatbilst meklētajam
 settings-apps-cancel = Atcelt
+
+## Apps: permissions
+
+settings-apps-permissions = Atļaujas
+settings-apps-location = Atrašanās vieta
+settings-apps-camera = Kamera
+settings-apps-clipboard = Starpliktuve fonā
+settings-apps-clipboard-hint = Šīs lietotnes var redzēt un mainīt to, ko kopējat, pat kamēr izmantojat citas lietotnes.
+settings-apps-full-access = Pilna piekļuve
+settings-apps-full-access-hint = Šīs lietotnes darbojas ārpus savas smilškastes un tiek uzskatītas par jums, tāpat kā sistēmā instalētās lietotnes. Noņemšana stāsies spēkā, kad lietotne tiks atvērta nākamreiz.
+settings-apps-full-access-remove = Noņemt
+settings-apps-full-access-remove-app = Noņemt pilnu piekļuvi lietotnei { $app }
+settings-apps-passwords = Saglabātās paroles
+settings-apps-passwords-hint = Lietotnes atceras jūsu atbildi, kad lūdz izmantot kaut ko no atslēgu saišķa. Aizmirstiet to, lai lietotne jautātu vēlreiz.
+settings-apps-passwords-forget = Aizmirst
+settings-apps-passwords-forget-app = Ļaut lietotnei { $app } jautāt vēlreiz
+settings-apps-permissions-allowed = Atļauts: { $allowed } no { $total }
+settings-apps-permissions-count = { $count ->
+    [zero] { $count } lietotņu
+    [one] { $count } lietotne
+   *[other] { $count } lietotnes
+}

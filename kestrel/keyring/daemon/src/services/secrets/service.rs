@@ -13,7 +13,7 @@ use super::transfer::{PLAIN, Transfer};
 use super::{Properties, ROOT, Secret, SecretError, Target, collection_path, none, parse, sync};
 use crate::access::ItemKey;
 use crate::daemon::Daemon;
-use crate::identity::App;
+use crate::requester::Requester;
 
 const LABEL: &str = "org.freedesktop.Secret.Collection.Label";
 
@@ -22,10 +22,15 @@ pub struct Service {
 }
 
 impl Daemon {
-    pub async fn caller(&self, header: &Header<'_>) -> (String, App) {
-        let sender = header.sender().map(ToString::to_string).unwrap_or_default();
-        let app = self.identities.identify(&self.connection, &sender).await;
-        (sender, app)
+    pub async fn requester(&self, header: &Header<'_>) -> Requester {
+        match header.sender() {
+            Some(sender) => {
+                self.requesters
+                    .identify(&self.connection, sender.as_str())
+                    .await
+            }
+            None => Requester::unknown(None),
+        }
     }
 
     pub async fn items_of(&self, paths: &[OwnedObjectPath]) -> Vec<ItemKey> {
@@ -48,7 +53,7 @@ impl Service {
         #[zbus(header)] header: Header<'_>,
         #[zbus(object_server)] server: &ObjectServer,
     ) -> fdo::Result<(OwnedVariant, OwnedObjectPath)> {
-        let (sender, _) = self.daemon.caller(&header).await;
+        let sender = sender(&header);
         let bytes = Vec::<u8>::try_from(input).unwrap_or_default();
         let (transfer, output) = Transfer::negotiate(algorithm, &bytes)
             .map_err(|_| fdo::Error::NotSupported(format!("{algorithm} isn't supported")))?;
@@ -77,8 +82,8 @@ impl Service {
         #[zbus(header)] header: Header<'_>,
         #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
     ) -> Result<(OwnedObjectPath, OwnedObjectPath), SecretError> {
-        let (_, app) = self.daemon.caller(&header).await;
-        if !self.daemon.ensure_unlocked(&app, true).await {
+        let requester = self.daemon.requester(&header).await;
+        if !self.daemon.ensure_unlocked(&requester, true).await {
             return Err(SecretError::locked());
         }
         let label = properties
@@ -117,8 +122,8 @@ impl Service {
         attributes: HashMap<String, String>,
         #[zbus(header)] header: Header<'_>,
     ) -> (Vec<OwnedObjectPath>, Vec<OwnedObjectPath>) {
-        let (_, app) = self.daemon.caller(&header).await;
-        self.daemon.ensure_unlocked(&app, false).await;
+        let requester = self.daemon.requester(&header).await;
+        self.daemon.ensure_unlocked(&requester, false).await;
         let query = attributes.into_iter().collect();
         let found: Vec<ItemKey> = {
             let keyring = self.daemon.keyring.lock().await;
@@ -126,14 +131,14 @@ impl Service {
                 return (Vec::new(), Vec::new());
             };
             view.search(&query)
+                .filter(|(_, item)| requester.view.shows(item))
                 .map(|(collection, item)| (collection.id.clone(), item.id))
                 .collect()
         };
-        let found = self.daemon.visible(&app, found).await;
         let (mut unlocked, mut locked) = (Vec::new(), Vec::new());
         for key in found {
             let path = super::item_path(&key.0, key.1);
-            if self.daemon.allowed(&app, &key).await {
+            if self.daemon.allowed(&requester, &key).await {
                 unlocked.push(path);
             } else {
                 locked.push(path);
@@ -148,14 +153,18 @@ impl Service {
         #[zbus(header)] header: Header<'_>,
         #[zbus(object_server)] server: &ObjectServer,
     ) -> fdo::Result<(Vec<OwnedObjectPath>, OwnedObjectPath)> {
-        let (_, app) = self.daemon.caller(&header).await;
+        let requester = self.daemon.requester(&header).await;
         let locked = self.daemon.keyring.lock().await.is_locked();
         let mut unlocked = Vec::new();
         let mut pending = Vec::new();
         for object in objects {
             match parse(&object) {
                 Some(Target::Item(collection, item))
-                    if !locked && self.daemon.allowed(&app, &(collection.clone(), item)).await =>
+                    if !locked
+                        && self
+                            .daemon
+                            .allowed(&requester, &(collection.clone(), item))
+                            .await =>
                 {
                     unlocked.push(object);
                 }
@@ -171,7 +180,7 @@ impl Service {
             &self.daemon,
             server,
             Action::Unlock {
-                app,
+                requester,
                 objects: pending,
             },
         )
@@ -190,17 +199,17 @@ impl Service {
         session: ObjectPath<'_>,
         #[zbus(header)] header: Header<'_>,
     ) -> Result<HashMap<OwnedObjectPath, Secret>, SecretError> {
-        let (sender, app) = self.daemon.caller(&header).await;
+        let requester = self.daemon.requester(&header).await;
         let transfer = self
             .daemon
             .sessions
-            .get(&session, &sender)
+            .get(&session, &sender(&header))
             .ok_or_else(|| SecretError::NoSession("No such session".into()))?;
-        if !self.daemon.ensure_unlocked(&app, false).await {
+        if !self.daemon.ensure_unlocked(&requester, false).await {
             return Ok(HashMap::new());
         }
         let keys = self.daemon.items_of(&items).await;
-        let allowed = self.daemon.authorize(&app, &keys, true).await;
+        let allowed = self.daemon.authorize(&requester, &keys, true).await;
         let keyring = self.daemon.keyring.lock().await;
         let Some(contents) = keyring.contents() else {
             return Ok(HashMap::new());
@@ -218,7 +227,7 @@ impl Service {
                         &item.content_type,
                     ),
                 );
-                keyring.record(&app, Logged::Read, &item.label);
+                keyring.record(&requester, Logged::Read, &item.label);
             }
         }
         Ok(secrets)
@@ -239,8 +248,8 @@ impl Service {
         collection: ObjectPath<'_>,
         #[zbus(header)] header: Header<'_>,
     ) -> Result<(), SecretError> {
-        let (_, app) = self.daemon.caller(&header).await;
-        if !self.daemon.ensure_unlocked(&app, true).await {
+        let requester = self.daemon.requester(&header).await;
+        if !self.daemon.ensure_unlocked(&requester, true).await {
             return Err(SecretError::locked());
         }
         let target = match parse(&collection) {
@@ -291,6 +300,10 @@ impl Service {
         emitter: &SignalEmitter<'_>,
         collection: ObjectPath<'_>,
     ) -> zbus::Result<()>;
+}
+
+pub fn sender(header: &Header<'_>) -> String {
+    header.sender().map(ToString::to_string).unwrap_or_default()
 }
 
 pub fn root_emitter(daemon: &Daemon) -> SignalEmitter<'static> {

@@ -114,16 +114,22 @@ privacy-mute-microphone = Silenciar microfone
 privacy-unmute-microphone = Reativar microfone
 privacy-close-app = Fechar { $app }
 privacy-unknown-app = Uma aplicação
-privacy-windows-using = A utilizar as suas janelas
-privacy-windows-seeing = A ver as suas janelas
+privacy-windows-seeing-programs = { $count ->
+    [one] { $count } programa pode ver as suas janelas
+   *[other] { $count } programas podem ver as suas janelas
+}
+privacy-windows-using-programs = { $count ->
+    [one] { $count } programa pode ver e utilizar as suas janelas
+   *[other] { $count } programas podem ver e utilizar as suas janelas
+}
 privacy-windows-stop = Retirar acesso
 
 ## Window access prompt
 # A program (often a coding assistant) asks to see or control the windows on the screen. $app is its name.
 
-peek-see-title = O programa { $app } quer ver as suas janelas
+peek-see-request = Permitir que um programa que abriu veja as suas janelas?
 peek-see-description = Poderá tirar imagens de qualquer janela que tenha aberta.
-peek-use-title = O programa { $app } quer ver e utilizar as suas janelas
+peek-use-request = Permitir que um programa que abriu veja e utilize as suas janelas?
 peek-use-description = Poderá ver qualquer janela que tenha aberta, e clicar e escrever nela em seu nome.
 peek-deny = Não permitir
 peek-allow-once = Permitir uma vez
@@ -132,7 +138,7 @@ peek-allow-until-quit = Permitir até que feche
 ## Window access errors
 # Shown in a terminal to the person or program that ran the peek command. "peek run" and "peek list" are commands and stay as they are.
 
-peek-error-declined = A pessoa que está a utilizar este computador recusou o pedido. O programa { $app } pode voltar a pedir depois de fechar.
+peek-error-declined-until-quit = A pessoa que está a utilizar este computador recusou o pedido. O programa pode voltar a pedir depois de fechar.
 peek-error-not-allowed = A pessoa que está a utilizar este computador não o permitiu
 peek-error-sandboxed = As aplicações num ambiente isolado não podem ver nem utilizar outras janelas
 peek-error-unknown-caller = O programa que fez o pedido terminou ou não foi possível identificá-lo

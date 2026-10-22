@@ -113,15 +113,25 @@ privacy-mute-microphone = Ztlumit mikrofon
 privacy-unmute-microphone = Zrušit ztlumení mikrofonu
 privacy-close-app = Zavřít { $app }
 privacy-unknown-app = Neznámá aplikace
-privacy-windows-using = Používá vaše okna
-privacy-windows-seeing = Vidí vaše okna
+privacy-windows-seeing-programs = { $count ->
+    [one] { $count } program může vidět vaše okna
+    [few] { $count } programy mohou vidět vaše okna
+    [many] { $count } programu může vidět vaše okna
+   *[other] { $count } programů může vidět vaše okna
+}
+privacy-windows-using-programs = { $count ->
+    [one] { $count } program může vidět a ovládat vaše okna
+    [few] { $count } programy mohou vidět a ovládat vaše okna
+    [many] { $count } programu může vidět a ovládat vaše okna
+   *[other] { $count } programů může vidět a ovládat vaše okna
+}
 privacy-windows-stop = Odebrat přístup
 
 ## Window access prompt
 
-peek-see-title = { $app } chce vidět vaše okna
+peek-see-request = Povolit programu, který jste spustili, vidět vaše okna?
 peek-see-description = Bude moct pořizovat snímky kteréhokoli otevřeného okna.
-peek-use-title = { $app } chce vidět a ovládat vaše okna
+peek-use-request = Povolit programu, který jste spustili, vidět a ovládat vaše okna?
 peek-use-description = Uvidí všechna otevřená okna a bude v nich moct klikat a psát, jako byste to dělali vy.
 peek-deny = Nepovolit
 peek-allow-once = Povolit jednou
@@ -129,7 +139,7 @@ peek-allow-until-quit = Povolit do ukončení
 
 ## Window access errors
 
-peek-error-declined = Uživatel tohoto počítače žádost odmítl. { $app } může požádat znovu po svém ukončení.
+peek-error-declined-until-quit = Uživatel tohoto počítače žádost odmítl. Program může požádat znovu po svém ukončení.
 peek-error-not-allowed = Uživatel tohoto počítače to nepovolil
 peek-error-sandboxed = Aplikace v izolovaném prostředí nemohou vidět ani ovládat jiná okna
 peek-error-unknown-caller = Žádající program skončil nebo ho nelze rozpoznat

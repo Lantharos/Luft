@@ -113,15 +113,21 @@ privacy-mute-microphone = Demp mikrofonen
 privacy-unmute-microphone = Slå på mikrofonen
 privacy-close-app = Lukk { $app }
 privacy-unknown-app = En app
-privacy-windows-using = Bruker vinduene dine
-privacy-windows-seeing = Ser vinduene dine
+privacy-windows-seeing-programs = { $count ->
+    [one] { $count } program kan se vinduene dine
+   *[other] { $count } programmer kan se vinduene dine
+}
+privacy-windows-using-programs = { $count ->
+    [one] { $count } program kan se og bruke vinduene dine
+   *[other] { $count } programmer kan se og bruke vinduene dine
+}
 privacy-windows-stop = Fjern tilgangen
 
 ## Window access prompt
 
-peek-see-title = { $app } vil se vinduene dine
+peek-see-request = Vil du la et program du har startet, se vinduene dine?
 peek-see-description = Den vil kunne ta bilder av alle vinduer du har åpne.
-peek-use-title = { $app } vil se og bruke vinduene dine
+peek-use-request = Vil du la et program du har startet, se og bruke vinduene dine?
 peek-use-description = Den vil kunne se alle vinduer du har åpne, og klikke og skrive i dem som om den var deg.
 peek-deny = Ikke tillat
 peek-allow-once = Tillat én gang
@@ -129,7 +135,7 @@ peek-allow-until-quit = Tillat til den avsluttes
 
 ## Window access errors
 
-peek-error-declined = Personen som bruker denne datamaskinen, avslo dette. { $app } kan spørre igjen etter at den er avsluttet.
+peek-error-declined-until-quit = Personen som bruker denne datamaskinen, avslo dette. Programmet kan spørre igjen etter at det er avsluttet.
 peek-error-not-allowed = Personen som bruker denne datamaskinen, tillot det ikke
 peek-error-sandboxed = Apper i sandkasse kan ikke se eller bruke andre vinduer
 peek-error-unknown-caller = Programmet som spør, ble avsluttet eller kunne ikke gjenkjennes

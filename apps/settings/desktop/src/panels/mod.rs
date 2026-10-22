@@ -23,7 +23,7 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     let window = personalization::notifications::register(window, events);
     let window = personalization::accessibility::register(window);
     let window = protection::apps::register(window, events);
-    let window = protection::privacy::register(window, events);
+    let window = protection::privacy::register(window);
     let window = protection::passkeys::register(window, events);
     let window = protection::security::register(window, events);
     let window = protection::keyring::register(window, events);

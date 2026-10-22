@@ -4,7 +4,7 @@ use luft_keyring_wire::{Chip, Problem};
 use zbus::message::Header;
 use zbus::{fdo, interface};
 
-use super::{PATH, settings_only};
+use super::{PATH, confirmed, yours};
 use crate::daemon::Daemon;
 
 pub struct Status {
@@ -78,8 +78,8 @@ impl Status {
     }
 
     async fn unlock(&self, #[zbus(header)] header: Header<'_>) -> bool {
-        let (_, app) = self.daemon.caller(&header).await;
-        self.daemon.ensure_unlocked(&app, true).await
+        let requester = self.daemon.requester(&header).await;
+        self.daemon.ensure_unlocked(&requester, true).await
     }
 
     async fn set_pin(
@@ -87,7 +87,11 @@ impl Status {
         enabled: bool,
         #[zbus(header)] header: Header<'_>,
     ) -> fdo::Result<bool> {
-        settings_only(&self.daemon, &header).await?;
+        if enabled {
+            yours(&self.daemon, &header).await?;
+        } else {
+            confirmed(&self.daemon, &header, "turn off your keyring PIN").await?;
+        }
         if self.daemon.keyring.lock().await.is_locked() {
             return Err(fdo::Error::Failed("Unlock the keyring first".into()));
         }
@@ -101,7 +105,11 @@ impl Status {
     }
 
     async fn reseal(&self, #[zbus(header)] header: Header<'_>) -> fdo::Result<()> {
-        settings_only(&self.daemon, &header).await?;
+        if self.sealed().await == Some(true) {
+            confirmed(&self.daemon, &header, "turn off your keyring PIN").await?;
+        } else {
+            yours(&self.daemon, &header).await?;
+        }
         self.daemon
             .seal(None)
             .await
@@ -165,11 +173,17 @@ impl Status {
         enabled: bool,
         #[zbus(header)] header: Option<Header<'_>>,
     ) -> fdo::Result<()> {
-        settings_only(
-            &self.daemon,
-            &header.ok_or_else(|| fdo::Error::AccessDenied("Unknown caller".into()))?,
-        )
-        .await?;
+        let header = header.ok_or_else(|| fdo::Error::AccessDenied("Unknown caller".into()))?;
+        if enabled {
+            yours(&self.daemon, &header).await?;
+        } else {
+            confirmed(
+                &self.daemon,
+                &header,
+                "stop locking your passwords and keys with the screen",
+            )
+            .await?;
+        }
         self.daemon
             .keyring
             .lock()

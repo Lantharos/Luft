@@ -113,15 +113,23 @@ privacy-mute-microphone = Izslēgt mikrofonu
 privacy-unmute-microphone = Ieslēgt mikrofonu
 privacy-close-app = Aizvērt lietotni { $app }
 privacy-unknown-app = Kāda lietotne
-privacy-windows-using = Izmanto jūsu logus
-privacy-windows-seeing = Redz jūsu logus
+privacy-windows-seeing-programs = { $count ->
+    [zero] { $count } programmas var redzēt jūsu logus
+    [one] { $count } programma var redzēt jūsu logus
+   *[other] { $count } programmas var redzēt jūsu logus
+}
+privacy-windows-using-programs = { $count ->
+    [zero] { $count } programmas var redzēt un izmantot jūsu logus
+    [one] { $count } programma var redzēt un izmantot jūsu logus
+   *[other] { $count } programmas var redzēt un izmantot jūsu logus
+}
 privacy-windows-stop = Pārtraukt piekļuvi
 
 ## Window access prompt
 
-peek-see-title = { $app } vēlas redzēt jūsu logus
+peek-see-request = Atļaut jūsu palaistai programmai redzēt jūsu logus?
 peek-see-description = Tā varēs uzņemt attēlus no jebkura atvērtā loga.
-peek-use-title = { $app } vēlas redzēt un izmantot jūsu logus
+peek-use-request = Atļaut jūsu palaistai programmai redzēt un izmantot jūsu logus?
 peek-use-description = Tā varēs redzēt jebkuru atvērto logu un tajā klikšķināt un rakstīt jūsu vietā.
 peek-deny = Neatļaut
 peek-allow-once = Atļaut vienreiz
@@ -129,7 +137,7 @@ peek-allow-until-quit = Atļaut līdz aizvēršanai
 
 ## Window access errors
 
-peek-error-declined = Šī datora lietotājs to noraidīja. { $app } var jautāt vēlreiz pēc tam, kad būs aizvērta.
+peek-error-declined-until-quit = Šī datora lietotājs to noraidīja. Programma var jautāt vēlreiz pēc tam, kad būs aizvērta.
 peek-error-not-allowed = Šī datora lietotājs to neatļāva
 peek-error-sandboxed = Lietotnes smilškastē nevar redzēt un izmantot citus logus
 peek-error-unknown-caller = Programma, kas jautā, beidza darbu vai netika atpazīta

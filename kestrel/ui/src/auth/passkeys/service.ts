@@ -1,7 +1,6 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
-import { LIBEXECDIR } from 'resource:///com/lantharos/kestrel/misc/config.js';
 
 import type { Context } from '../../context.js';
 import { refuseSandboxed } from '../../shared/dbus/sandbox.js';
@@ -10,19 +9,18 @@ import { PasskeyPrompt } from './prompt.js';
 
 const BUS_NAME = 'com.lantharos.Kestrel.Passkeys';
 const PATH = '/com/lantharos/Kestrel/Passkeys';
-const AGENT = `${LIBEXECDIR}/luft-passkeys`;
+const AGENT = 'com.lantharos.Passkeys';
 const PURPOSES: Purpose[] = ['register', 'sign-in', 'manage', 'registered', 'choose'];
 
 const SERVICE_XML = `<node><interface name="com.lantharos.Kestrel.Passkeys1">
   <method name="Open"><arg type="a{sv}" direction="in"/><arg type="o" direction="out"/></method>
 </interface></node>`;
 
-async function isAgent(sender: string): Promise<boolean> {
-  const reply = await Gio.DBus.session.call('org.freedesktop.DBus', '/org/freedesktop/DBus', 'org.freedesktop.DBus',
-    'GetConnectionUnixProcessID', new GLib.Variant('(s)', [sender]), new GLib.VariantType('(u)'), Gio.DBusCallFlags.NONE, -1, null);
-  const [pid] = reply.deepUnpack() as [number];
+async function isAgent(invocation: Gio.DBusMethodInvocation): Promise<boolean> {
   try {
-    return GLib.file_read_link(`/proc/${pid}/exe`) === AGENT;
+    const reply = await invocation.get_connection().call('org.freedesktop.DBus', '/org/freedesktop/DBus', 'org.freedesktop.DBus',
+      'GetNameOwner', new GLib.Variant('(s)', [AGENT]), new GLib.VariantType('(s)'), Gio.DBusCallFlags.NONE, -1, null);
+    return reply.deepUnpack<[string]>()[0] === invocation.get_sender();
   } catch {
     return false;
   }
@@ -56,7 +54,7 @@ export class PasskeyPrompts {
   async OpenAsync([details]: [Record<string, GLib.Variant>], invocation: Gio.DBusMethodInvocation): Promise<void> {
     const sender = invocation.get_sender()!;
     if (await refuseSandboxed(invocation, 'ask about passkeys')) return;
-    if (!await isAgent(sender)) {
+    if (!await isAgent(invocation)) {
       invocation.return_dbus_error('org.freedesktop.DBus.Error.AccessDenied', 'Only Luft Passkeys can ask about passkeys');
       return;
     }

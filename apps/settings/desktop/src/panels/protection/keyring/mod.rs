@@ -7,9 +7,9 @@ use std::sync::Once;
 use luft_app::{Commands, Events};
 use luft_i18n::t;
 use sabine::SabineWindow;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use zbus::ObjectPath;
+use zbus::DynamicType;
 
 use bus::{ACCESS, Problem, SSH, STATUS};
 use snapshot::Keyring;
@@ -21,12 +21,6 @@ static WATCH: Once = Once::new();
 #[derive(Deserialize)]
 struct Toggle {
     enabled: bool,
-}
-
-#[derive(Deserialize)]
-struct Revoke {
-    app: String,
-    item: String,
 }
 
 #[derive(Deserialize)]
@@ -65,9 +59,12 @@ async fn reseal(_: Value) -> Result<(), String> {
         })
 }
 
-async fn revoke(Revoke { app, item }: Revoke) -> Result<(), String> {
-    let item = ObjectPath::try_from(item.as_str()).map_err(|error| error.to_string())?;
-    Ok(bus::call::<_, ()>(ACCESS, "Revoke", &(app, item)).await?)
+async fn confirmed<B: Serialize + DynamicType>(method: &str, body: &B) -> Result<bool, String> {
+    match bus::call::<_, ()>(ACCESS, method, body).await {
+        Ok(()) => Ok(true),
+        Err(Problem::Denied) => Ok(false),
+        Err(problem) => Err(problem.into()),
+    }
 }
 
 async fn set_confirm(
@@ -98,12 +95,11 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
                 Ok(bus::set_property(STATUS, "LockWithScreen", enabled).await?)
             },
         )
-        .command_async("keyring_revoke", revoke)
         .command_async("keyring_forget_app", |Forget { app }| async move {
-            Ok(bus::call::<_, ()>(ACCESS, "ForgetApp", &(app,)).await?)
+            confirmed("ForgetApp", &(app,)).await
         })
         .command_async("keyring_clear_history", |_: Value| async {
-            Ok(bus::call::<_, ()>(ACCESS, "ClearHistory", &()).await?)
+            confirmed("ClearHistory", &()).await
         })
         .command_async(
             "keyring_ssh_generate",

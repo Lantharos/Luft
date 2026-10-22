@@ -1,20 +1,18 @@
-use std::os::fd::AsFd;
 use std::path::Path;
 use std::sync::Arc;
 
 use futures_util::StreamExt;
 use luft_dbus::idle::Idle;
+use luft_identity::caller::{self, Caller};
 use tokio::sync::Notify;
 use tokio::task::JoinHandle;
 use zbus::Connection;
 use zbus::fdo::DBusProxy;
 use zbus::message::Header;
-use zbus::names::BusName;
 use zbus::object_server::SignalEmitter;
 
 use super::error::Error;
 use super::interface::Installer;
-use crate::first_boot::caller;
 use crate::first_boot::fingerprint::Enrolling;
 use crate::first_boot::window;
 use crate::phase;
@@ -35,23 +33,14 @@ pub async fn setup_app_user(
     connection: &Connection,
     header: &Header<'_>,
     state_dir: &Path,
-    setup_app: &Path,
     uid_of: impl FnOnce(&str) -> Option<u32>,
 ) -> Result<String, Error> {
     let user = phase::pending_user(state_dir)
         .filter(|_| window::is_open(state_dir))
         .ok_or_else(Error::not_authorized)?;
-    let sender = header.sender().ok_or_else(Error::not_authorized)?;
-    let credentials = DBusProxy::new(connection)
-        .await?
-        .get_connection_credentials(BusName::Unique(sender.to_owned()))
-        .await?;
-    let from_user =
-        credentials.unix_user_id().is_some() && credentials.unix_user_id() == uid_of(&user);
-    let from_setup = credentials
-        .process_fd()
-        .is_some_and(|pidfd| caller::runs(pidfd.as_fd(), setup_app));
-    if from_user && from_setup {
+    let uid = caller::uid(connection, header).await?;
+    let from_user = uid.is_some() && uid == uid_of(&user);
+    if from_user && caller::of_sender(connection, header).await == Caller::You {
         Ok(user)
     } else {
         Err(Error::not_authorized())

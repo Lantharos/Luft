@@ -1,42 +1,15 @@
-import Gio from 'gi://Gio';
-import Shell from 'gi://Shell';
+import type Gio from 'gi://Gio';
 
 import { t } from '../../../shared/i18n/index.js';
 import { PeekError } from '../errors.js';
 import { callerProcess, type PidFd } from '../../../shared/dbus/processes.js';
-import { processUnit, statOf, unitName } from './processes.js';
+import { processUnit, statOf } from './processes.js';
 
 export interface Caller {
   readonly unit: string;
-  readonly name: string;
-  readonly app: Shell.App | null;
 }
 
 const USER_MANAGER = /\/init\.scope$/;
-const APP_UNIT = /^app-(.+?)(?:@[^@]*\.service|\.service|-[^-]+\.scope)$/;
-
-const unescape = (text: string) => text.replace(/\\x([0-9a-f]{2})/g, (_match, hex: string) => String.fromCharCode(parseInt(hex, 16)));
-
-function appIds(unit: string): string[] {
-  const match = APP_UNIT.exec(unitName(unit));
-  if (!match) return [];
-  const parts = match[1].split('-');
-  return [parts, parts.slice(1)].filter(ids => ids.length).map(ids => unescape(ids.join('-')));
-}
-
-function installedApp(unit: string): Shell.App | null {
-  const apps = Shell.AppSystem.get_default();
-  for (const id of appIds(unit)) {
-    const app = apps.lookup_app(`${id}.desktop`);
-    if (app) return app;
-  }
-  return null;
-}
-
-function unitCaller(unit: string): Caller {
-  const name = appIds(unit).at(-1) ?? unescape(unitName(unit).replace(/\.(?:scope|service)$/, ''));
-  return { unit, name, app: null };
-}
 
 export function identify(pid: number, launchedBy: (unit: string) => Caller | null): Caller | null {
   let own: string | null = null;
@@ -46,11 +19,9 @@ export function identify(pid: number, launchedBy: (unit: string) => Caller | nul
     own ??= unit;
     const owner = launchedBy(unit);
     if (owner) return owner;
-    const app = installedApp(unit);
-    if (app) return { unit, name: app.get_name(), app };
     current = statOf(current)?.parent ?? 0;
   }
-  return own ? unitCaller(own) : null;
+  return own ? { unit: own } : null;
 }
 
 export async function identifiedProcess(invocation: Gio.DBusMethodInvocation): Promise<PidFd> {

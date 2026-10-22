@@ -113,15 +113,21 @@ privacy-mute-microphone = Mikrofon némítása
 privacy-unmute-microphone = Mikrofon némításának feloldása
 privacy-close-app = { $app } bezárása
 privacy-unknown-app = Egy alkalmazás
-privacy-windows-using = Használja az ablakokat
-privacy-windows-seeing = Látja az ablakokat
+privacy-windows-seeing-programs = { $count ->
+    [one] { $count } program láthatja az ablakait
+   *[other] { $count } program láthatja az ablakait
+}
+privacy-windows-using-programs = { $count ->
+    [one] { $count } program láthatja és használhatja az ablakait
+   *[other] { $count } program láthatja és használhatja az ablakait
+}
 privacy-windows-stop = Hozzáférés megszüntetése
 
 ## Window access prompt
 
-peek-see-title = { $app } látni szeretné az ablakait
+peek-see-request = Engedélyezi, hogy egy Ön által elindított program lássa az ablakait?
 peek-see-description = Bármelyik megnyitott ablakáról képet készíthet majd.
-peek-use-title = { $app } látni és használni szeretné az ablakait
+peek-use-request = Engedélyezi, hogy egy Ön által elindított program lássa és használja az ablakait?
 peek-use-description = Látni fog minden megnyitott ablakot, és kattinthat, illetve gépelhet bennük, mintha saját maga tenné.
 peek-deny = Elutasítás
 peek-allow-once = Engedélyezés egyszer
@@ -129,7 +135,7 @@ peek-allow-until-quit = Engedélyezés kilépésig
 
 ## Window access errors
 
-peek-error-declined = A számítógép használója ezt elutasította. { $app } a kilépése után újra kérheti.
+peek-error-declined-until-quit = A számítógép használója ezt elutasította. A program a kilépése után újra kérheti.
 peek-error-not-allowed = A számítógép használója ezt nem engedélyezte
 peek-error-sandboxed = A homokozóban futó alkalmazások nem láthatják és nem használhatják a többi ablakot
 peek-error-unknown-caller = A kérést küldő program leállt, vagy nem sikerült azonosítani

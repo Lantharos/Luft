@@ -13,16 +13,6 @@ export interface Identity {
 	icon: string | null;
 }
 
-export interface Item {
-	label: string;
-	path: string;
-	allowed: boolean;
-}
-
-export interface AppAccess extends Identity {
-	items: Item[];
-}
-
 export interface AppStore extends Identity {
 	secrets: number;
 }
@@ -44,7 +34,6 @@ export interface SshKey {
 }
 
 export interface Access {
-	apps: AppAccess[];
 	stores: AppStore[];
 	history: AccessEvent[];
 }
@@ -67,7 +56,6 @@ export interface Keyring {
 	ssh: Ssh | null;
 }
 
-
 export const keyring = () => invoke<Keyring | null>('keyring');
 export const onKeyring = (callback: (keyring: Keyring) => void) => listen<Keyring>('keyring.changed', callback);
 
@@ -77,9 +65,8 @@ export const setPin = (enabled: boolean) => invoke<boolean>('keyring_set_pin', {
 export const reseal = () => invoke<void>('keyring_reseal', {}, WAIT_FOR_PROMPT);
 export const setLockWithScreen = (enabled: boolean) => invoke<void>('keyring_lock_with_screen', { enabled });
 
-export const revoke = (app: string, item: string) => invoke<void>('keyring_revoke', { app, item });
-export const forgetApp = (app: string) => invoke<void>('keyring_forget_app', { app });
-export const clearHistory = () => invoke<void>('keyring_clear_history');
+export const forgetApp = (app: string) => invoke<boolean>('keyring_forget_app', { app }, WAIT_FOR_PROMPT);
+export const clearHistory = () => invoke<boolean>('keyring_clear_history', {}, WAIT_FOR_PROMPT);
 
 export const generateKey = (name: string, chip: boolean) => invoke<string>('keyring_ssh_generate', { name, chip }, WAIT_FOR_PROMPT);
 export const publicKey = (fingerprint: string) => invoke<string>('keyring_ssh_public_key', { fingerprint });

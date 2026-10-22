@@ -22,14 +22,10 @@ settings-privacy-lock-immediately = Okamžitě
 
 ## Privacy: location, camera and microphone
 
-settings-privacy-location = Poloha
 settings-privacy-location-services = Služby určování polohy
 settings-privacy-location-services-hint = Aplikace můžou zjistit, kde jste, kvůli mapám, počasí a časovým pásmům
-settings-privacy-camera = Kamera
 settings-privacy-camera-allow = Povolit aplikacím používat kameru
 settings-privacy-microphone-allow = Povolit aplikacím používat mikrofon
-settings-privacy-apps-asked = Aplikace, které požádaly
-settings-privacy-apps-allowed = Povoleno: { $allowed } z { $total }
 
 ## Privacy: file history
 
@@ -351,23 +347,14 @@ settings-passwords-pin-locked = Chcete-li to změnit, odemkněte klíčenku
 settings-passwords-pin-description = Aby je nemohl odemknout jen otisk prstu
 settings-passwords-lock-with-screen = Zamykat spolu s obrazovkou
 settings-passwords-lock-with-screen-description = Zamykají a odemykají se spolu s obrazovkou
-settings-passwords-apps = Aplikace s přístupem
+settings-passwords-apps = Přihlášení a aktivita aplikací
 settings-passwords-apps-locked = Chcete-li je zobrazit, odemkněte klíčenku
-settings-passwords-apps-asked = { $count ->
-    [0] Zatím o ně nepožádala žádná aplikace
-    [one] Požádala o ně { $count } aplikace
-    [few] Požádaly o ně { $count } aplikace
-    [many] Požádalo o ně { $count } aplikace
-   *[other] Požádalo o ně { $count } aplikací
-}
+settings-passwords-apps-description = Co si zde aplikace ukládají a kdy to použily
+settings-passwords-apps-allowed = Které aplikace mohou používat vaše hesla
+settings-passwords-apps-allowed-hint = Nastavuje se na stránce Aplikace
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-description = Když přístup odeberete, aplikace o něj příště znovu požádá.
-settings-passwords-access-not-allowed = Nepovoleno
-settings-passwords-access-none = Zatím o vaše hesla nepožádala žádná aplikace
-settings-passwords-access-revoke = Zakázat aplikaci { $app } používat { $item }
-settings-passwords-access-reset = Nechat aplikaci { $app } znovu požádat o { $item }
 settings-passwords-stores = Přihlášení aplikací
 settings-passwords-stores-description = Přihlášení, která si tu některé aplikace ukládají a která může číst jen daná aplikace.
 settings-passwords-stores-count = { $count ->
@@ -480,3 +467,26 @@ settings-apps-startup-add-description = Vyberte aplikaci, která se otevře při
 settings-apps-search = Hledat aplikace
 settings-apps-no-match = Hledání neodpovídají žádné aplikace
 settings-apps-cancel = Zrušit
+
+## Apps: permissions
+
+settings-apps-permissions = Oprávnění
+settings-apps-location = Poloha
+settings-apps-camera = Kamera
+settings-apps-clipboard = Schránka na pozadí
+settings-apps-clipboard-hint = Tyto aplikace mohou vidět a měnit, co zkopírujete, i když používáte jiné aplikace.
+settings-apps-full-access = Úplný přístup
+settings-apps-full-access-hint = Tyto aplikace běží mimo své izolované prostředí a jednají za vás, stejně jako aplikace nainstalované v systému. Odebrání se projeví při příštím otevření aplikace.
+settings-apps-full-access-remove = Odebrat
+settings-apps-full-access-remove-app = Odebrat aplikaci { $app } úplný přístup
+settings-apps-passwords = Uložená hesla
+settings-apps-passwords-hint = Aplikace si pamatují vaši odpověď, když žádají o použití něčeho uloženého v klíčence. Zapomeňte ji a aplikace se zeptá znovu.
+settings-apps-passwords-forget = Zapomenout
+settings-apps-passwords-forget-app = Nechat aplikaci { $app } zeptat se znovu
+settings-apps-permissions-allowed = Povoleno: { $allowed } z { $total }
+settings-apps-permissions-count = { $count ->
+    [one] { $count } aplikace
+    [few] { $count } aplikace
+    [many] { $count } aplikace
+   *[other] { $count } aplikací
+}

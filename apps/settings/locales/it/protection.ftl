@@ -22,14 +22,10 @@ settings-privacy-lock-immediately = Subito
 
 ## Privacy: location, camera and microphone
 
-settings-privacy-location = Posizione
 settings-privacy-location-services = Servizi di localizzazione
 settings-privacy-location-services-hint = Consente alle app di sapere dove ti trovi, per mappe, meteo e fusi orari
-settings-privacy-camera = Fotocamera
 settings-privacy-camera-allow = Consenti alle app di usare la fotocamera
 settings-privacy-microphone-allow = Consenti alle app di usare il microfono
-settings-privacy-apps-asked = App che hanno chiesto l’accesso
-settings-privacy-apps-allowed = { $allowed } su { $total } consentite
 
 ## Privacy: file history
 
@@ -329,21 +325,14 @@ settings-passwords-pin-locked = Sblocca il Portachiavi per cambiare questa opzio
 settings-passwords-pin-description = Così l’impronta da sola non basta a sbloccarle
 settings-passwords-lock-with-screen = Blocca insieme allo schermo
 settings-passwords-lock-with-screen-description = Si bloccano e si sbloccano insieme allo schermo
-settings-passwords-apps = App con accesso
+settings-passwords-apps = Credenziali e attività delle app
 settings-passwords-apps-locked = Sblocca il Portachiavi per vederle
-settings-passwords-apps-asked = { $count ->
-    [0] Nessuna app le ha ancora chieste
-    [one] { $count } app le ha chieste
-   *[other] { $count } app le hanno chieste
-}
+settings-passwords-apps-description = Cosa conservano qui le app e quando l’hanno usato
+settings-passwords-apps-allowed = Quali app possono usare le tue password
+settings-passwords-apps-allowed-hint = Si imposta in App
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-description = Se ne rimuovi una, l’app chiederà di nuovo la prossima volta.
-settings-passwords-access-not-allowed = Non consentito
-settings-passwords-access-none = Nessuna app ha ancora chiesto le tue password
-settings-passwords-access-revoke = Impedisci a { $app } di usare { $item }
-settings-passwords-access-reset = Consenti a { $app } di chiedere di nuovo { $item }
 settings-passwords-stores = Credenziali delle app
 settings-passwords-stores-description = Credenziali che alcune app conservano qui, dove solo quell’app può leggerle.
 settings-passwords-stores-count = { $count ->
@@ -452,3 +441,24 @@ settings-apps-startup-add-description = Scegli un’app da aprire ogni volta che
 settings-apps-search = Cerca app
 settings-apps-no-match = Nessuna app corrisponde alla ricerca
 settings-apps-cancel = Annulla
+
+## Apps: permissions
+
+settings-apps-permissions = Autorizzazioni
+settings-apps-location = Posizione
+settings-apps-camera = Fotocamera
+settings-apps-clipboard = Appunti in background
+settings-apps-clipboard-hint = Queste app possono vedere e modificare ciò che copi, anche mentre usi altre app.
+settings-apps-full-access = Accesso completo
+settings-apps-full-access-hint = Queste app funzionano fuori dalla loro sandbox e agiscono come te, come le app installate nel sistema. La rimozione ha effetto alla prossima apertura dell’app.
+settings-apps-full-access-remove = Rimuovi
+settings-apps-full-access-remove-app = Rimuovi l’accesso completo a { $app }
+settings-apps-passwords = Password salvate
+settings-apps-passwords-hint = Le app ricordano la tua risposta quando chiedono di usare qualcosa salvato nel Portachiavi. Dimenticala perché l’app chieda di nuovo.
+settings-apps-passwords-forget = Dimentica
+settings-apps-passwords-forget-app = Fai chiedere di nuovo a { $app }
+settings-apps-permissions-allowed = { $allowed } su { $total } consentite
+settings-apps-permissions-count = { $count ->
+    [one] { $count } app
+   *[other] { $count } app
+}

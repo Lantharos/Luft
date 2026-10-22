@@ -1,5 +1,4 @@
 mod access;
-mod ownership;
 
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -10,7 +9,9 @@ use luft_keyring_vault::{
     AuditLog, ChipWrap, Contents, Error, Header, MasterKey, PasswordWrap, Record, Stored, now,
 };
 
-pub use access::{Decision, PORTAL_SCHEMA, decide, hidden};
+use crate::requester::Requester;
+
+pub use access::{Decision, PORTAL_SCHEMA, decide, sandboxed_owner};
 
 pub struct Paths {
     pub folder: PathBuf,
@@ -167,47 +168,16 @@ impl Keyring {
         Ok(())
     }
 
-    pub fn adopt(&mut self, app: &crate::identity::App) {
-        let Some(contents) = self.contents() else {
-            return;
-        };
-        let previous = ownership::predecessors(contents, app);
-        let inherited = ownership::inherited(contents, app);
-        if previous.is_empty() && inherited.is_empty() {
-            return;
-        }
-        if let Err(error) = self.edit(|contents| {
-            ownership::hand_over(contents, &previous, &app.key);
-            ownership::inherit(contents, inherited);
-        }) {
-            eprintln!("Couldn't carry an app's access over: {error}");
-        }
-    }
-
-    pub fn release_misclaimed(&mut self) {
-        if !self.contents().is_some_and(ownership::has_misclaimed) {
-            return;
-        }
-        if let Err(error) = self.edit(ownership::release_misclaimed) {
-            eprintln!("Couldn't release items a keyring tool claimed: {error}");
-        }
-    }
-
     pub fn audit(&self) -> AuditLog {
         AuditLog::new(self.paths.audit())
     }
 
-    pub fn record(
-        &self,
-        app: &crate::identity::App,
-        action: luft_keyring_vault::Action,
-        target: &str,
-    ) {
+    pub fn record(&self, requester: &Requester, action: luft_keyring_vault::Action, target: &str) {
         let Some(key) = self.key() else { return };
         let record = Record {
             time: now(),
-            app: app.key.clone(),
-            app_name: app.name.clone(),
+            app: requester.principal(),
+            app_name: requester.label(),
             action,
             target: target.to_owned(),
         };

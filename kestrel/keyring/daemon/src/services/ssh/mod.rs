@@ -14,6 +14,7 @@ use tokio::net::{UnixListener, UnixStream};
 pub use keys::{fingerprint, generate_in_chip, generate_software, kind, openssh_line};
 
 use crate::daemon::Daemon;
+use crate::requester::Requester;
 use wire::{Reader, Writer};
 
 const FAILURE: u8 = 5;
@@ -76,7 +77,7 @@ fn bind() -> std::io::Result<std::os::unix::net::UnixListener> {
 }
 
 async fn serve(daemon: Arc<Daemon>, mut stream: UnixStream) {
-    let requester = confirm::Requester::of(stream.as_raw_fd());
+    let requester = confirm::requester(&daemon, stream.as_raw_fd()).await;
     loop {
         let mut header = [0; 4];
         if stream.read_exact(&mut header).await.is_err() {
@@ -98,25 +99,20 @@ async fn serve(daemon: Arc<Daemon>, mut stream: UnixStream) {
     }
 }
 
-async fn answer(
-    daemon: &Arc<Daemon>,
-    requester: &confirm::Requester,
-    kind: u8,
-    body: &[u8],
-) -> Vec<u8> {
+async fn answer(daemon: &Arc<Daemon>, requester: &Requester, kind: u8, body: &[u8]) -> Vec<u8> {
     let outcome = match kind {
         REQUEST_IDENTITIES => Some(identities(daemon, requester).await),
         SIGN_REQUEST => sign(daemon, requester, body).await,
-        ADD_IDENTITY | ADD_CONSTRAINED => add(daemon, body).await,
-        REMOVE_IDENTITY => remove(daemon, Reader::new(body).string()).await,
-        REMOVE_ALL => remove(daemon, None).await,
+        ADD_IDENTITY | ADD_CONSTRAINED if requester.is_you() => add(daemon, body).await,
+        REMOVE_IDENTITY if requester.is_you() => remove(daemon, Reader::new(body).string()).await,
+        REMOVE_ALL if requester.is_you() => remove(daemon, None).await,
         _ => None,
     };
     outcome.unwrap_or_else(|| vec![FAILURE])
 }
 
-async fn identities(daemon: &Arc<Daemon>, requester: &confirm::Requester) -> Vec<u8> {
-    daemon.ensure_unlocked(&requester.app, false).await;
+async fn identities(daemon: &Arc<Daemon>, requester: &Requester) -> Vec<u8> {
+    daemon.ensure_unlocked(requester, false).await;
     let keyring = daemon.keyring.lock().await;
     let keys: &[SshKey] = keyring.view().map_or(&[], |view| &view.ssh);
     let mut reply = Writer::default()
@@ -128,15 +124,11 @@ async fn identities(daemon: &Arc<Daemon>, requester: &confirm::Requester) -> Vec
     reply.bytes
 }
 
-async fn sign(
-    daemon: &Arc<Daemon>,
-    requester: &confirm::Requester,
-    body: &[u8],
-) -> Option<Vec<u8>> {
+async fn sign(daemon: &Arc<Daemon>, requester: &Requester, body: &[u8]) -> Option<Vec<u8>> {
     let mut reader = Reader::new(body);
     let public = reader.string()?;
     let data = reader.string()?;
-    if !daemon.ensure_unlocked(&requester.app, true).await {
+    if !daemon.ensure_unlocked(requester, true).await {
         return None;
     }
     let key = {
@@ -148,7 +140,7 @@ async fn sign(
             .find(|key| key.public == public)?
             .clone()
     };
-    if key.confirm && !requester.confirm(daemon, &key).await {
+    if key.confirm && !confirm::confirm(daemon, requester, &key).await {
         return None;
     }
     let signature = keys::sign(&key, data).await?;
@@ -156,7 +148,7 @@ async fn sign(
         .keyring
         .lock()
         .await
-        .record(&requester.app, Action::Signed, &key.comment);
+        .record(requester, Action::Signed, &key.comment);
     Some(Writer::default().u8(SIGN_RESPONSE).string(&signature).bytes)
 }
 

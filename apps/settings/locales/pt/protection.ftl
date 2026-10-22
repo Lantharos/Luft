@@ -22,14 +22,10 @@ settings-privacy-lock-immediately = Imediatamente
 
 ## Privacy: location, camera and microphone
 
-settings-privacy-location = Localização
 settings-privacy-location-services = Serviços de localização
 settings-privacy-location-services-hint = Permite que as aplicações saibam onde está, para mapas, meteorologia e fusos horários
-settings-privacy-camera = Câmara
 settings-privacy-camera-allow = Permitir que as aplicações utilizem a câmara
 settings-privacy-microphone-allow = Permitir que as aplicações utilizem o microfone
-settings-privacy-apps-asked = Aplicações que pediram acesso
-settings-privacy-apps-allowed = { $allowed } de { $total } permitidas
 
 ## Privacy: file history
 
@@ -330,21 +326,14 @@ settings-passwords-pin-locked = Desbloqueie o porta-chaves para alterar isto
 settings-passwords-pin-description = Para que a impressão digital sozinha não as desbloqueie
 settings-passwords-lock-with-screen = Bloquear com o ecrã
 settings-passwords-lock-with-screen-description = Bloqueiam-se e desbloqueiam-se juntamente com o ecrã
-settings-passwords-apps = Aplicações com acesso
+settings-passwords-apps = Credenciais e atividade das aplicações
 settings-passwords-apps-locked = Desbloqueie o porta-chaves para as ver
-settings-passwords-apps-asked = { $count ->
-    [0] Ainda nenhuma aplicação as pediu
-    [one] { $count } aplicação pediu-as
-   *[other] { $count } aplicações pediram-nas
-}
+settings-passwords-apps-description = O que as aplicações guardam aqui e quando o usaram
+settings-passwords-apps-allowed = Que aplicações podem usar as suas palavras-passe
+settings-passwords-apps-allowed-hint = Definido em Aplicações
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-description = Ao remover uma, a aplicação volta a pedir acesso da próxima vez.
-settings-passwords-access-not-allowed = Não permitido
-settings-passwords-access-none = Ainda nenhuma aplicação pediu as palavras-passe
-settings-passwords-access-revoke = Impedir { $app } de utilizar { $item }
-settings-passwords-access-reset = Deixar { $app } voltar a pedir { $item }
 settings-passwords-stores = Credenciais das aplicações
 settings-passwords-stores-description = Credenciais que algumas aplicações guardam aqui, onde só essa aplicação as pode ler.
 settings-passwords-stores-count = { $count ->
@@ -454,3 +443,24 @@ settings-apps-startup-add-description = Escolha uma aplicação para abrir sempr
 settings-apps-search = Pesquisar aplicações
 settings-apps-no-match = Nenhuma aplicação corresponde à pesquisa
 settings-apps-cancel = Cancelar
+
+## Apps: permissions
+
+settings-apps-permissions = Permissões
+settings-apps-location = Localização
+settings-apps-camera = Câmara
+settings-apps-clipboard = Área de transferência em segundo plano
+settings-apps-clipboard-hint = Estas aplicações podem ver e alterar o que copia, mesmo enquanto utiliza outras aplicações.
+settings-apps-full-access = Acesso total
+settings-apps-full-access-hint = Estas aplicações são executadas fora do seu ambiente isolado e agem em seu nome, como as aplicações instaladas no sistema. A remoção aplica-se da próxima vez que a aplicação abrir.
+settings-apps-full-access-remove = Remover
+settings-apps-full-access-remove-app = Remover o acesso total de { $app }
+settings-apps-passwords = Palavras-passe guardadas
+settings-apps-passwords-hint = As aplicações lembram-se da sua resposta quando pedem para usar algo guardado no porta-chaves. Esqueça-a para que a aplicação volte a perguntar.
+settings-apps-passwords-forget = Esquecer
+settings-apps-passwords-forget-app = Fazer { $app } perguntar novamente
+settings-apps-permissions-allowed = { $allowed } de { $total } permitidas
+settings-apps-permissions-count = { $count ->
+    [one] { $count } aplicação
+   *[other] { $count } aplicações
+}

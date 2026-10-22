@@ -22,14 +22,10 @@ settings-privacy-lock-immediately = Med det samme
 
 ## Privacy: location, camera and microphone
 
-settings-privacy-location = Placering
 settings-privacy-location-services = Placeringstjenester
 settings-privacy-location-services-hint = Lader apps finde ud af, hvor du er, til kort, vejr og tidszoner
-settings-privacy-camera = Kamera
 settings-privacy-camera-allow = Tillad apps at bruge kameraet
 settings-privacy-microphone-allow = Tillad apps at bruge mikrofonen
-settings-privacy-apps-asked = Apps, der har spurgt
-settings-privacy-apps-allowed = { $allowed } af { $total } tilladt
 
 ## Privacy: file history
 
@@ -329,21 +325,14 @@ settings-passwords-pin-locked = Lås din nøglering op for at ændre dette
 settings-passwords-pin-description = Så et fingeraftryk alene ikke kan låse dem op
 settings-passwords-lock-with-screen = Lås sammen med skærmen
 settings-passwords-lock-with-screen-description = De låses og låses op sammen med skærmen
-settings-passwords-apps = Apps med adgang
+settings-passwords-apps = Applogins og aktivitet
 settings-passwords-apps-locked = Lås din nøglering op for at se dem
-settings-passwords-apps-asked = { $count ->
-    [0] Ingen apps har bedt om dem endnu
-    [one] { $count } app har bedt om dem
-   *[other] { $count } apps har bedt om dem
-}
+settings-passwords-apps-description = Hvad apps gemmer her, og hvornår de brugte det
+settings-passwords-apps-allowed = Hvilke apps der må bruge dine adgangskoder
+settings-passwords-apps-allowed-hint = Indstilles i Apps
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-description = Hvis du fjerner en, spørger appen igen næste gang.
-settings-passwords-access-not-allowed = Ikke tilladt
-settings-passwords-access-none = Ingen apps har bedt om dine adgangskoder endnu
-settings-passwords-access-revoke = Forhindr { $app } i at bruge { $item }
-settings-passwords-access-reset = Lad { $app } spørge efter { $item } igen
 settings-passwords-stores = Applogins
 settings-passwords-stores-description = Logins, som nogle apps gemmer her, hvor kun den pågældende app kan læse dem.
 settings-passwords-stores-count = { $count ->
@@ -452,3 +441,24 @@ settings-apps-startup-add-description = Vælg en app, der skal åbnes, hver gang
 settings-apps-search = Søg efter apps
 settings-apps-no-match = Ingen apps matcher din søgning
 settings-apps-cancel = Annuller
+
+## Apps: permissions
+
+settings-apps-permissions = Tilladelser
+settings-apps-location = Placering
+settings-apps-camera = Kamera
+settings-apps-clipboard = Udklipsholder i baggrunden
+settings-apps-clipboard-hint = Disse apps kan se og ændre det, du kopierer, også mens du bruger andre apps.
+settings-apps-full-access = Fuld adgang
+settings-apps-full-access-hint = Disse apps kører uden for deres sandkasse og regnes som dig, ligesom apps installeret på systemet. Fjerner du den, gælder det næste gang appen åbnes.
+settings-apps-full-access-remove = Fjern
+settings-apps-full-access-remove-app = Fjern fuld adgang for { $app }
+settings-apps-passwords = Gemte adgangskoder
+settings-apps-passwords-hint = Apps husker dit svar, når de beder om at bruge noget fra din nøglering. Glem det, så spørger appen igen.
+settings-apps-passwords-forget = Glem
+settings-apps-passwords-forget-app = Lad { $app } spørge igen
+settings-apps-permissions-allowed = { $allowed } af { $total } tilladt
+settings-apps-permissions-count = { $count ->
+    [one] { $count } app
+   *[other] { $count } apps
+}

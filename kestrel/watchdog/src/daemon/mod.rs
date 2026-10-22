@@ -1,4 +1,3 @@
-mod caller;
 mod judge;
 mod restart;
 mod threads;
@@ -7,10 +6,11 @@ use std::process::ExitCode;
 use std::time::Duration;
 
 use futures_util::StreamExt;
+use luft_identity::caller::{self, Caller};
 use tokio::process::Command;
 use tokio::signal::unix::{SignalKind, signal};
 use tokio::sync::{Mutex, mpsc};
-use zbus::fdo::{self, DBusProxy};
+use zbus::fdo;
 use zbus::message::Header;
 use zbus::{Connection, interface};
 
@@ -18,7 +18,6 @@ use crate::incident::{self, collect, efi};
 use crate::system::kmsg::KernelLog;
 use crate::system::output_within;
 use crate::system::proxies::{LoginProxy, SessionProxy, UserProxy};
-use caller::Programs;
 use judge::{Hang, Judge};
 
 const NAME: &str = "com.lantharos.Kestrel.Watchdog1";
@@ -28,7 +27,6 @@ const JOURNAL_SYNC_LIMIT: Duration = Duration::from_secs(5);
 struct Watchdog {
     judge: Mutex<Judge>,
     login: LoginProxy<'static>,
-    programs: Programs,
     hangs: mpsc::Sender<Hang>,
 }
 
@@ -40,29 +38,14 @@ impl Watchdog {
         compositor: u32,
     ) -> fdo::Result<()> {
         let denied = |reason: &str| Err(fdo::Error::AccessDenied(reason.into()));
-        let sender = header
-            .sender()
-            .ok_or_else(|| fdo::Error::AccessDenied("Unknown caller".into()))?;
-        let credentials = DBusProxy::new(connection)
-            .await?
-            .get_connection_credentials(sender.clone().into())
-            .await?;
-        let (Some(uid), Some(pidfd)) = (credentials.unix_user_id(), credentials.process_fd())
-        else {
+        if caller::of_sender(connection, header).await != Caller::You {
+            return denied("Sandboxed apps can't report stalls");
+        }
+        let Some(uid) = caller::uid(connection, header).await? else {
             return denied("The caller can't be identified");
         };
-        let Some(pid) = caller::pid_of(pidfd) else {
-            return denied("The caller has already quit");
-        };
-        if !self.programs.is_settings(pid, uid) {
-            return denied("Only Kestrel's settings service reports stalls");
-        }
-        if threads::owner(compositor) != Some(uid) || !self.programs.is_compositor(compositor, uid)
-        {
+        if threads::owner(compositor) != Some(uid) {
             return denied("That isn't the caller's Kestrel");
-        }
-        if caller::pid_of(pidfd) != Some(pid) {
-            return denied("The caller has already quit");
         }
         let user = self.login.get_user(uid).await?;
         let (_, session) = UserProxy::builder(connection)
@@ -161,7 +144,6 @@ pub async fn run() -> ExitCode {
 
 async fn serve() -> zbus::Result<()> {
     let log = KernelLog::watch()?;
-    let programs = Programs::installed()?;
     let system = Connection::system().await?;
     let login = LoginProxy::new(&system).await?;
     let (hangs, mut hung) = mpsc::channel(1);
@@ -172,7 +154,6 @@ async fn serve() -> zbus::Result<()> {
             Watchdog {
                 judge: Mutex::new(Judge::new(log)),
                 login: login.clone(),
-                programs,
                 hangs,
             },
         )

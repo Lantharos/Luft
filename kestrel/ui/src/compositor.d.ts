@@ -27,7 +27,9 @@ declare module '@girs/meta-51/meta-51' {
     }
 
     interface Context {
-      is_sender_unsandboxed(connection: Gio.DBusConnection, sender: string, cancellable: Gio.Cancellable | null): Promise<boolean>;
+      identify_sender(connection: Gio.DBusConnection, sender: string, cancellable: Gio.Cancellable | null): Promise<string>;
+      set_permitted_apps(permission: string, appIds: string[]): void;
+      is_app_permitted(permission: string, appId: string): boolean;
     }
 
     namespace Display {

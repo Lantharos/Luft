@@ -4,17 +4,17 @@ import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 
 import {named, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {withFullAccess} from '../lib/access/fullAccess.js';
+import {BACKGROUND_CLIPBOARD, answer, forget, withFullAccess} from '../lib/access/permissions.js';
 import {press} from '../lib/input/input.js';
 import {fixture, gjs, stop, waitForWindow} from '../lib/processes.js';
-import {bubblewrapped, launch, openSecurityContext, through} from '../lib/access/sandbox.js';
+import {bubblewrapped, inAppScope, launch, openSecurityContext, through} from '../lib/access/sandbox.js';
 import {settled} from '../lib/wait.js';
 
 const {require, eventually} = checks('background clipboard');
 const clipboard = St.Clipboard.get_default();
 const CLIENT = fixture('clients', 'wayland', 'dataControlClient.py');
-const TRUSTED_APP = 'com.onepassword.OnePassword';
-const UNTRUSTED_APP = 'org.example.Notes';
+const PASSWORD_MANAGER = 'com.onepassword.OnePassword';
+const NOTES_APP = 'org.example.Notes';
 const PASSWORD = 'lighthouse-keeper-42';
 
 const clipboardText = () => new Promise(resolve => clipboard.get_text(St.ClipboardType.CLIPBOARD, (_clipboard, text) => resolve(text)));
@@ -72,8 +72,8 @@ async function checkX11(client) {
 }
 
 async function checkFlatpaks() {
-  const notes = await openSecurityContext(UNTRUSTED_APP);
-  const passwords = await openSecurityContext(TRUSTED_APP);
+  const notes = await openSecurityContext(NOTES_APP);
+  const passwords = await openSecurityContext(PASSWORD_MANAGER);
   try {
     require(notes.listening && passwords.listening, 'sandbox engines can give their apps sockets of their own');
 
@@ -81,7 +81,7 @@ async function checkFlatpaks() {
     require(!untrusted.available, 'sandboxed apps cannot use the clipboard from the background');
     await stop(untrusted.process);
 
-    await withFullAccess(UNTRUSTED_APP, async () => {
+    await withFullAccess(NOTES_APP, async () => {
       const opened = await startClient({socket: notes.socket});
       require(opened.available, 'apps with full access can use the clipboard from the background');
       await stop(opened.process);
@@ -90,33 +90,58 @@ async function checkFlatpaks() {
     require(!closed.available, 'taking full access away takes the clipboard away from the background again');
     await stop(closed.process);
 
-    const nested = await openSecurityContext(TRUSTED_APP, {socket: notes.socket});
+    const nested = await openSecurityContext(PASSWORD_MANAGER, {socket: notes.socket});
     require(!nested.listening, 'sandboxed apps cannot open sockets that pass as another app');
     await stop(nested.process);
 
-    const trusted = await startClient({socket: passwords.socket});
+    const manager = await startClient({socket: passwords.socket});
     try {
-      require(trusted.available, 'sandboxed password managers can use the clipboard from the background');
-      await trusted.send('copy plain Boarding pass', 'copied');
+      require(manager.available, 'sandboxed password managers can use the clipboard from the background');
+      await manager.send('copy plain Boarding pass', 'copied');
       await eventually(async () => await clipboardText() === 'Boarding pass', 'a sandboxed password manager copies text');
     } finally {
-      await stop(trusted.process);
+      await stop(manager.process);
     }
+    await checkStoredAnswers(notes.socket, passwords.socket);
   } finally {
     await Promise.all([stop(notes.process), stop(passwords.process)]);
   }
 }
 
-async function checkImpostors() {
-  const impostor = await startClient({prefix: bubblewrapped(TRUSTED_APP)});
-  require(!impostor.available, 'apps sandboxed without a security context cannot pass as a password manager');
-  await stop(impostor.process);
+async function available(socket) {
+  const client = await startClient({socket});
+  await stop(client.process);
+  return client.available;
+}
 
-  const handoff = await startClient({prefix: bubblewrapped(TRUSTED_APP), args: ['--handoff']});
+async function checkStoredAnswers(notes, passwords) {
+  await answer(BACKGROUND_CLIPBOARD, PASSWORD_MANAGER, false);
+  try {
+    require(!await available(passwords), 'a password manager turned off in Settings loses the clipboard in the background');
+  } finally {
+    await forget(BACKGROUND_CLIPBOARD, PASSWORD_MANAGER, true);
+  }
+  require(await available(passwords), 'forgetting the answer gives a password manager the clipboard again');
+
+  await answer(BACKGROUND_CLIPBOARD, NOTES_APP, true);
+  try {
+    require(await available(notes), 'any app allowed in Settings can use the clipboard from the background');
+  } finally {
+    await forget(BACKGROUND_CLIPBOARD, NOTES_APP);
+  }
+  require(!await available(notes), 'forgetting the answer takes the clipboard away from the background again');
+}
+
+async function checkImpostors() {
+  const scoped = await startClient({prefix: inAppScope(PASSWORD_MANAGER, bubblewrapped(NOTES_APP))});
+  require(!scoped.available, 'a sandboxed app in a scope named after a password manager cannot use the clipboard from the background');
+  await stop(scoped.process);
+
+  const handoff = await startClient({prefix: bubblewrapped(NOTES_APP), args: ['--handoff']});
   require(!handoff.available, 'a sandboxed app cannot use the clipboard by leaving its connection to a child');
   await stop(handoff.process);
 
-  const engine = await openSecurityContext(TRUSTED_APP, {prefix: bubblewrapped(TRUSTED_APP)});
+  const engine = await openSecurityContext(PASSWORD_MANAGER, {prefix: bubblewrapped(PASSWORD_MANAGER)});
   require(!engine.listening, 'sandboxed apps cannot open sockets of their own');
   await stop(engine.process);
 }

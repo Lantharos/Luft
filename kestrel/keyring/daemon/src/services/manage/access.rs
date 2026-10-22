@@ -3,21 +3,27 @@ use std::sync::Arc;
 use luft_keyring_vault::Action;
 use zbus::message::Header;
 use zbus::object_server::SignalEmitter;
-use zbus::{ObjectPath, OwnedObjectPath};
 use zbus::{fdo, interface};
 
-use super::settings_only;
+use super::confirmed;
 use crate::daemon::Daemon;
-use crate::identity::App;
-use crate::services::secrets::{Target, item_path, parse};
+use crate::requester::{app_name, sandboxed_app_of};
 
 pub struct Access {
     pub daemon: Arc<Daemon>,
 }
 
-type Entry = (String, String, String, String, OwnedObjectPath, bool);
+const APP: &str = "app:";
+
 type Store = (String, String, String, u32);
 type Event = (u64, String, String, String, String);
+
+fn store_label(key: &str) -> (String, String) {
+    match sandboxed_app_of(key).or_else(|| key.strip_prefix(APP)) {
+        Some(id) => (app_name(id), id.to_owned()),
+        None => (key.to_owned(), String::new()),
+    }
+}
 
 fn action_name(action: Action) -> &'static str {
     match action {
@@ -31,82 +37,13 @@ fn action_name(action: Action) -> &'static str {
 
 #[interface(name = "com.lantharos.Keyring1.Access")]
 impl Access {
-    async fn entries(&self, #[zbus(header)] header: Header<'_>) -> fdo::Result<Vec<Entry>> {
-        settings_only(&self.daemon, &header).await?;
-        let keyring = self.daemon.keyring.lock().await;
-        let Some(contents) = keyring.contents() else {
-            return Ok(Vec::new());
-        };
-        let entry = |key: &str, label: &str, path: OwnedObjectPath, allowed: bool| {
-            let app = App::from_key(key);
-            (
-                key.to_owned(),
-                app.name,
-                app.icon,
-                label.to_owned(),
-                path,
-                allowed,
-            )
-        };
-        let mut entries: Vec<Entry> = contents
-            .collections
-            .iter()
-            .flat_map(|collection| collection.items.iter().map(move |item| (collection, item)))
-            .filter_map(|(collection, item)| {
-                Some(entry(
-                    item.owner.as_deref()?,
-                    &item.label,
-                    item_path(&collection.id, item.id),
-                    true,
-                ))
-            })
-            .collect();
-        entries.extend(contents.rules.iter().filter_map(|rule| {
-            let item = contents.item(&rule.collection, rule.item)?;
-            Some(entry(
-                &rule.app,
-                &item.label,
-                item_path(&rule.collection, rule.item),
-                rule.allowed,
-            ))
-        }));
-        Ok(entries)
-    }
-
-    async fn revoke(
-        &self,
-        app: &str,
-        item: ObjectPath<'_>,
-        #[zbus(header)] header: Header<'_>,
-        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
-    ) -> fdo::Result<()> {
-        settings_only(&self.daemon, &header).await?;
-        let Some(Target::Item(collection, id)) = parse(&item) else {
-            return Err(fdo::Error::InvalidArgs("Not an item".into()));
-        };
-        self.daemon
-            .keyring
-            .lock()
-            .await
-            .edit(|contents| {
-                contents.rules.retain(|rule| {
-                    !(rule.app == app && rule.collection == collection && rule.item == id)
-                });
-                if let Some(item) = contents.item_mut(&collection, id)
-                    && item.owner.as_deref() == Some(app)
-                {
-                    item.owner = None;
-                    item.unclaimed = false;
-                }
-            })
-            .map_err(|error| fdo::Error::Failed(error.to_string()))?;
-        self.daemon.granted.clear();
-        Self::changed(&emitter).await?;
-        Ok(())
-    }
-
     async fn app_stores(&self, #[zbus(header)] header: Header<'_>) -> fdo::Result<Vec<Store>> {
-        settings_only(&self.daemon, &header).await?;
+        confirmed(
+            &self.daemon,
+            &header,
+            "see which apps keep secrets in your keyring",
+        )
+        .await?;
         let keyring = self.daemon.keyring.lock().await;
         let Some(contents) = keyring.contents() else {
             return Ok(Vec::new());
@@ -115,11 +52,11 @@ impl Access {
             .apps
             .iter()
             .map(|(key, secrets)| {
-                let app = App::from_key(key);
+                let (name, icon) = store_label(key);
                 (
                     key.clone(),
-                    app.name,
-                    app.icon,
+                    name,
+                    icon,
                     u32::try_from(secrets.len()).unwrap_or(u32::MAX),
                 )
             })
@@ -132,7 +69,7 @@ impl Access {
         #[zbus(header)] header: Header<'_>,
         #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
     ) -> fdo::Result<()> {
-        settings_only(&self.daemon, &header).await?;
+        confirmed(&self.daemon, &header, "delete the secrets an app keeps").await?;
         self.daemon
             .keyring
             .lock()
@@ -148,7 +85,12 @@ impl Access {
         limit: u32,
         #[zbus(header)] header: Header<'_>,
     ) -> fdo::Result<Vec<Event>> {
-        settings_only(&self.daemon, &header).await?;
+        confirmed(
+            &self.daemon,
+            &header,
+            "see when apps used your passwords and keys",
+        )
+        .await?;
         let keyring = self.daemon.keyring.lock().await;
         let Some(key) = keyring.key() else {
             return Ok(Vec::new());
@@ -174,7 +116,12 @@ impl Access {
     }
 
     async fn clear_history(&self, #[zbus(header)] header: Header<'_>) -> fdo::Result<()> {
-        settings_only(&self.daemon, &header).await?;
+        confirmed(
+            &self.daemon,
+            &header,
+            "clear the history of your passwords and keys",
+        )
+        .await?;
         self.daemon
             .keyring
             .lock()

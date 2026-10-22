@@ -23,6 +23,15 @@ export function bubblewrapped(appId, binds = ['--ro-bind', fixture('clients'), f
     '--proc', '/proc', '--dev', '/dev', '--bind', runtime, runtime, ...binds, '--ro-bind', info, '/.flatpak-info'];
 }
 
+export function onSessionBus(appId) {
+  const bus = GLib.getenv('DBUS_SESSION_BUS_ADDRESS').replace(/^unix:path=/, '').split(',')[0];
+  const folder = GLib.path_get_dirname(linkTarget(bus));
+  return bubblewrapped(appId, ['--ro-bind', '/etc', '/etc', '--bind', folder, folder]);
+}
+
+export const inAppScope = (appId, argv) =>
+  ['systemd-run', '--user', '--scope', '--quiet', '--collect', `--unit=app-${appId}-${GLib.random_int()}.scope`, ...argv];
+
 export async function launch(argv, {env = {}, label}) {
   const process = spawn(argv, {env, flags: Gio.SubprocessFlags.STDIN_PIPE | Gio.SubprocessFlags.STDOUT_PIPE});
   const lines = outputLines(process);

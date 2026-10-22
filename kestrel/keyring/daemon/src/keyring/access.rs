@@ -1,55 +1,51 @@
-use luft_keyring_vault::{Contents, Item};
+use luft_keyring_vault::Item;
 
-use crate::identity::{App, UNBRANDED_CHROMIUM};
+use crate::requester::{Caller, Requester, SABINE, View, sandboxed_app_of};
 
 pub const PORTAL_SCHEMA: &str = "org.freedesktop.portal.Secret";
-const DRIVE_PASSPHRASE: &str = "gvfs-luks-uuid";
-const DRIVE_UNLOCKERS: [&str; 2] = [
-    "exe:/usr/libexec/gvfs-udisks2-volume-monitor",
-    "app:com.lantharos.disks",
-];
+const CHROMIUM: &str = "chromium";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Decision {
     Allowed,
-    Claim,
-    Ask,
     Denied,
+    ConfirmItsYou,
+    AskTheApp,
 }
 
-pub fn decide(contents: &Contents, app: &App, collection: &str, item: &Item) -> Decision {
-    if item.owner.as_deref() == Some(app.key.as_str()) {
-        return Decision::Allowed;
+pub fn sandboxed_owner(item: &Item) -> Option<&str> {
+    item.owner.as_deref().and_then(sandboxed_app_of)
+}
+
+pub fn decide(requester: &Requester, item: &Item) -> Decision {
+    let owner = sandboxed_owner(item);
+    match &requester.caller {
+        Caller::You => Decision::Allowed,
+        Caller::App(id) if owner == Some(id.as_str()) => Decision::Allowed,
+        _ if is_protected(item) => Decision::Denied,
+        Caller::App(_) if owner.is_some() => Decision::ConfirmItsYou,
+        _ => Decision::AskTheApp,
     }
-    if item.attributes.get("xdg:schema").is_some_and(|schema| {
+}
+
+fn is_protected(item: &Item) -> bool {
+    item.attributes.get("xdg:schema").is_some_and(|schema| {
         schema == PORTAL_SCHEMA || schema == crate::services::passkeys::SCHEMA
-    }) {
-        return Decision::Denied;
-    }
-    if item.attributes.contains_key(DRIVE_PASSPHRASE) && DRIVE_UNLOCKERS.contains(&app.key.as_str())
-    {
-        return Decision::Allowed;
-    }
-    let rule = contents
-        .rules
-        .iter()
-        .find(|rule| rule.app == app.key && rule.collection == collection && rule.item == item.id);
-    match rule {
-        Some(rule) if rule.allowed => Decision::Allowed,
-        Some(_) => Decision::Denied,
-        None if item.unclaimed && app.may_claim(app_hint(item).as_deref()) => Decision::Claim,
-        None => Decision::Ask,
+    })
+}
+
+impl View {
+    pub fn shows(self, item: &Item) -> bool {
+        let sabine = item.owner.as_deref() == Some(SABINE);
+        match self {
+            Self::Everything => !sabine,
+            Self::SabineChromium => sabine || !names_chromium(item),
+        }
     }
 }
 
-pub fn hidden(contents: &Contents, app: &App, collection: &str, item: &Item) -> bool {
-    app.keeps_its_own_chromium_key()
-        && app_hint(item).as_deref() == Some(UNBRANDED_CHROMIUM)
-        && decide(contents, app, collection, item) != Decision::Allowed
-}
-
-pub fn app_hint(item: &Item) -> Option<String> {
+fn names_chromium(item: &Item) -> bool {
     item.attributes
         .get("application")
-        .map(|application| application.to_lowercase())
+        .is_some_and(|application| application.eq_ignore_ascii_case(CHROMIUM))
 }

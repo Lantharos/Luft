@@ -9,7 +9,7 @@ rust-version.workspace = true
 
 [features]
 default = ["system"]
-system = ["dep:futures-util", "dep:luft-app", "dep:zbus"]
+system = ["dep:futures-util", "dep:luft-app", "dep:tokio", "dep:zbus"]
 
 [dependencies]
 backhand = { workspace = true, features = ["gzip", "lz4", "xz", "zstd"] }
@@ -24,6 +24,7 @@ serde.workspace = true
 serde_json.workspace = true
 sha1.workspace = true
 sha2.workspace = true
+tokio = { workspace = true, features = ["rt"], optional = true }
 ureq.workspace = true
 zbus = { workspace = true, features = ["proxy", "tokio"], optional = true }
 

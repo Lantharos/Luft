@@ -28,10 +28,6 @@ if [[ "$mode" =~ ^(capture|performance|frames|motion)$ && -n "${KESTREL_CAPTURE_
 fi
 
 prepare_session "${KESTREL_SESSION_DIR:-$root/kestrel/run}"
-if [[ "$mode" != nested ]]; then
-  export KESTREL_TRUSTED_APPS="$session/state/trusted-apps"
-  : > "$KESTREL_TRUSTED_APPS"
-fi
 home="$session/state/luft-home"
 mkdir -p "$home/.local/share"
 ln -sfn "$HOME/.local/share/sabine" "$home/.local/share/sabine"

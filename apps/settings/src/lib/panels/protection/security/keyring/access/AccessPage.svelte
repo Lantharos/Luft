@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
+	import { Row, Section } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
+	import { app } from '#lib/state/app.svelte.js';
 	import type { Access } from '../api';
-	import AppsSection from './AppsSection.svelte';
 	import HistorySection from './HistorySection.svelte';
 	import StoresSection from './StoresSection.svelte';
 
@@ -16,7 +17,9 @@
 </script>
 
 <SubPage title={t('settings-passwords-apps')} back={t('settings-passwords-title')} {onclose}>
-	<AppsSection apps={access.apps} {refresh} />
+	<Section>
+		<Row title={t('settings-passwords-apps-allowed')} description={t('settings-passwords-apps-allowed-hint')} onclick={() => app.open('apps')} />
+	</Section>
 
 	{#if access.stores.length}
 		<StoresSection stores={access.stores} {refresh} />

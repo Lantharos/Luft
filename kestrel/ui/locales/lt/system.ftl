@@ -113,15 +113,25 @@ privacy-mute-microphone = Nutildyti mikrofoną
 privacy-unmute-microphone = Įjungti mikrofoną
 privacy-close-app = Uždaryti programą { $app }
 privacy-unknown-app = Programa
-privacy-windows-using = Naudoja jūsų langus
-privacy-windows-seeing = Mato jūsų langus
+privacy-windows-seeing-programs = { $count ->
+    [one] { $count } programa gali matyti jūsų langus
+    [few] { $count } programos gali matyti jūsų langus
+    [many] { $count } programos gali matyti jūsų langus
+   *[other] { $count } programų gali matyti jūsų langus
+}
+privacy-windows-using-programs = { $count ->
+    [one] { $count } programa gali matyti ir naudoti jūsų langus
+    [few] { $count } programos gali matyti ir naudoti jūsų langus
+    [many] { $count } programos gali matyti ir naudoti jūsų langus
+   *[other] { $count } programų gali matyti ir naudoti jūsų langus
+}
 privacy-windows-stop = Atimti prieigą
 
 ## Window access prompt
 
-peek-see-title = { $app } nori matyti jūsų langus
+peek-see-request = Leisti jūsų paleistai programai matyti jūsų langus?
 peek-see-description = Galės daryti bet kurio atidaryto lango nuotraukas.
-peek-use-title = { $app } nori matyti ir naudoti jūsų langus
+peek-use-request = Leisti jūsų paleistai programai matyti ir naudoti jūsų langus?
 peek-use-description = Galės matyti bet kurį atidarytą langą, spustelėti jame ir rašyti, tarsi tai būtumėte jūs.
 peek-deny = Neleisti
 peek-allow-once = Leisti vieną kartą
@@ -129,7 +139,7 @@ peek-allow-until-quit = Leisti, kol neužsidarys
 
 ## Window access errors
 
-peek-error-declined = Šio kompiuterio naudotojas tai atmetė. { $app } galės paprašyti dar kartą, kai baigs darbą.
+peek-error-declined-until-quit = Šio kompiuterio naudotojas tai atmetė. Programa galės paprašyti dar kartą, kai baigs darbą.
 peek-error-not-allowed = Šio kompiuterio naudotojas to neleido
 peek-error-sandboxed = Programos smėlio dėžėje negali matyti ar naudoti kitų langų
 peek-error-unknown-caller = Prašanti programa baigė darbą arba nepavyko jos atpažinti

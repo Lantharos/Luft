@@ -1,15 +1,12 @@
-use std::collections::HashMap;
-
 use futures_util::future::join;
 use luft_app::apps::App;
 use serde::Serialize;
-use zbus::{DeserializeDict, OwnedObjectPath, Type};
+use zbus::{DeserializeDict, Type};
 
 use super::bus::{self, ACCESS, Problem, SSH, STATUS};
 
 const HISTORY_LIMIT: u32 = 50;
 
-type Entry = (String, String, String, String, OwnedObjectPath, bool);
 type Store = (String, String, String, u32);
 type Record = (u64, String, String, String, String);
 type Key = (String, String, String, bool, bool, u64);
@@ -43,20 +40,6 @@ struct Identity {
 }
 
 #[derive(Serialize)]
-struct Item {
-    label: String,
-    path: String,
-    allowed: bool,
-}
-
-#[derive(Serialize)]
-struct AppAccess {
-    #[serde(flatten)]
-    app: Identity,
-    items: Vec<Item>,
-}
-
-#[derive(Serialize)]
 struct AppStore {
     #[serde(flatten)]
     app: Identity,
@@ -84,7 +67,6 @@ struct SshKey {
 
 #[derive(Serialize)]
 struct Access {
-    apps: Vec<AppAccess>,
     stores: Vec<AppStore>,
     history: Vec<Event>,
 }
@@ -117,36 +99,7 @@ fn identity(key: String, name: String, desktop_id: &str) -> Identity {
     }
 }
 
-fn by_name<T>(list: &mut [T], name: impl Fn(&T) -> &str) {
-    list.sort_by_cached_key(|entry| name(entry).to_lowercase());
-}
-
-fn group(entries: Vec<Entry>) -> Vec<AppAccess> {
-    let mut apps: HashMap<String, AppAccess> = HashMap::new();
-    for (key, name, desktop_id, label, path, allowed) in entries {
-        let item = Item {
-            label,
-            path: path.to_string(),
-            allowed,
-        };
-        apps.entry(key.clone())
-            .or_insert_with(|| AppAccess {
-                app: identity(key, name, &desktop_id),
-                items: Vec::new(),
-            })
-            .items
-            .push(item);
-    }
-    let mut apps: Vec<AppAccess> = apps.into_values().collect();
-    for app in &mut apps {
-        by_name(&mut app.items, |item| &item.label);
-    }
-    by_name(&mut apps, |app| &app.app.name);
-    apps
-}
-
 async fn access() -> Result<Access, Problem> {
-    let entries: Vec<Entry> = bus::call(ACCESS, "Entries", &()).await?;
     let mut stores: Vec<AppStore> = bus::call::<_, Vec<Store>>(ACCESS, "AppStores", &())
         .await?
         .into_iter()
@@ -155,7 +108,7 @@ async fn access() -> Result<Access, Problem> {
             secrets,
         })
         .collect();
-    by_name(&mut stores, |store| &store.app.name);
+    stores.sort_by_cached_key(|store| store.app.name.to_lowercase());
     let history = bus::call::<_, Vec<Record>>(ACCESS, "History", &(HISTORY_LIMIT,))
         .await?
         .into_iter()
@@ -166,11 +119,7 @@ async fn access() -> Result<Access, Problem> {
             what,
         })
         .collect();
-    Ok(Access {
-        apps: group(entries),
-        stores,
-        history,
-    })
+    Ok(Access { stores, history })
 }
 
 async fn ssh() -> Result<Ssh, Problem> {

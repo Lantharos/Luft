@@ -22,14 +22,10 @@ settings-privacy-lock-immediately = Iš karto
 
 ## Privacy: location, camera and microphone
 
-settings-privacy-location = Buvimo vieta
 settings-privacy-location-services = Vietos nustatymo paslaugos
 settings-privacy-location-services-hint = Leidžia programoms nustatyti, kur esate, žemėlapiams, orams ir laiko juostoms
-settings-privacy-camera = Kamera
 settings-privacy-camera-allow = Leisti programoms naudoti kamerą
 settings-privacy-microphone-allow = Leisti programoms naudoti mikrofoną
-settings-privacy-apps-asked = Prašiusios programos
-settings-privacy-apps-allowed = Leidžiama { $allowed } iš { $total }
 
 ## Privacy: file history
 
@@ -351,23 +347,14 @@ settings-passwords-pin-locked = Atrakinkite raktinę, kad tai pakeistumėte
 settings-passwords-pin-description = Kad vien piršto atspaudu jų nebūtų galima atrakinti
 settings-passwords-lock-with-screen = Užrakinti kartu su ekranu
 settings-passwords-lock-with-screen-description = Jie užrakinami ir atrakinami kartu su ekranu
-settings-passwords-apps = Programos su prieiga
+settings-passwords-apps = Programų prisijungimai ir veikla
 settings-passwords-apps-locked = Atrakinkite raktinę, kad jas pamatytumėte
-settings-passwords-apps-asked = { $count ->
-    [0] Kol kas jų neprašė jokia programa
-    [one] Jų paprašė { $count } programa
-    [few] Jų paprašė { $count } programos
-    [many] Jų paprašė { $count } programos
-   *[other] Jų paprašė { $count } programų
-}
+settings-passwords-apps-description = Ką programos čia laiko ir kada tuo naudojosi
+settings-passwords-apps-allowed = Kurios programos gali naudoti jūsų slaptažodžius
+settings-passwords-apps-allowed-hint = Nustatoma skiltyje Programos
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-description = Pašalinus programą, kitą kartą ji paprašys vėl.
-settings-passwords-access-not-allowed = Neleidžiama
-settings-passwords-access-none = Kol kas jūsų slaptažodžių neprašė jokia programa
-settings-passwords-access-revoke = Neleisti programai { $app } naudoti įrašą { $item }
-settings-passwords-access-reset = Leisti programai { $app } vėl paprašyti įrašo { $item }
 settings-passwords-stores = Programų prisijungimai
 settings-passwords-stores-description = Prisijungimai, kuriuos kai kurios programos laiko čia ir kuriuos gali perskaityti tik ta programa.
 settings-passwords-stores-count = { $count ->
@@ -480,3 +467,26 @@ settings-apps-startup-add-description = Pasirinkite programą, kuri atsidarys ka
 settings-apps-search = Ieškoti programų
 settings-apps-no-match = Nerasta jokių programų
 settings-apps-cancel = Atšaukti
+
+## Apps: permissions
+
+settings-apps-permissions = Leidimai
+settings-apps-location = Buvimo vieta
+settings-apps-camera = Kamera
+settings-apps-clipboard = Iškarpinė fone
+settings-apps-clipboard-hint = Šios programos gali matyti ir keisti tai, ką nukopijuojate, net kai naudojate kitas programas.
+settings-apps-full-access = Visiška prieiga
+settings-apps-full-access-hint = Šios programos veikia už savo smėlio dėžės ribų ir laikomos jumis, kaip sistemoje įdiegtos programos. Pašalinimas įsigalios kitą kartą atidarius programą.
+settings-apps-full-access-remove = Pašalinti
+settings-apps-full-access-remove-app = Pašalinti visišką prieigą programai { $app }
+settings-apps-passwords = Įrašyti slaptažodžiai
+settings-apps-passwords-hint = Programos įsimena jūsų atsakymą, kai prašo naudoti tai, kas įrašyta raktinėje. Pamirškite jį, kad programa paklaustų vėl.
+settings-apps-passwords-forget = Pamiršti
+settings-apps-passwords-forget-app = Leisti programai { $app } paklausti vėl
+settings-apps-permissions-allowed = Leidžiama { $allowed } iš { $total }
+settings-apps-permissions-count = { $count ->
+    [one] { $count } programa
+    [few] { $count } programos
+    [many] { $count } programos
+   *[other] { $count } programų
+}

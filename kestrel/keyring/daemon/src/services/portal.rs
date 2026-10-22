@@ -4,15 +4,13 @@ use std::os::fd::AsFd;
 use std::sync::Arc;
 
 use luft_keyring_vault::{Action, DEFAULT_ALIAS, Item, LOGIN, Secret};
-use zbus::fdo::DBusProxy;
 use zbus::message::Header;
-use zbus::names::BusName;
 use zbus::{Fd, ObjectPath, OwnedVariant};
 use zbus::{fdo, interface};
 
 use crate::daemon::Daemon;
-use crate::identity::App;
-use crate::keyring::PORTAL_SCHEMA;
+use crate::keyring::{PORTAL_SCHEMA, sandboxed_owner};
+use crate::requester::{Caller, Requester, app_name};
 
 pub const PATH: &str = "/org/freedesktop/portal/desktop";
 const PORTAL: &str = "org.freedesktop.portal.Desktop";
@@ -28,90 +26,70 @@ pub struct Portal {
 }
 
 impl Portal {
-    async fn sent_by_portal(&self, header: &Header<'_>) -> bool {
-        let Ok(proxy) = DBusProxy::new(&self.daemon.connection).await else {
-            return false;
-        };
-        let Ok(owner) = proxy
-            .get_name_owner(BusName::from_static_str(PORTAL).expect("a valid bus name"))
-            .await
-        else {
-            return false;
-        };
-        header
-            .sender()
-            .is_some_and(|sender| sender.as_str() == owner.as_str())
-    }
-
-    async fn requester(&self, handle: &ObjectPath<'_>) -> Option<App> {
+    async fn requester(&self, handle: &ObjectPath<'_>) -> Option<Requester> {
         let escaped = handle.as_str().strip_prefix(REQUESTS)?.split_once('/')?.0;
         let sender = format!(":{}", escaped.replace('_', "."));
-        let app = self
+        let requester = self
             .daemon
-            .identities
+            .requesters
             .identify(&self.daemon.connection, &sender)
             .await;
-        (!app.is_unknown()).then_some(app)
+        (requester.caller != Caller::Unknown).then_some(requester)
     }
 
-    async fn token(&self, app: &App) -> Result<Secret, String> {
+    async fn token(&self, requester: &Requester, app_id: &str) -> Result<Secret, String> {
         let mut keyring = self.daemon.keyring.lock().await;
-        keyring.adopt(app);
         let contents = keyring.contents().ok_or("the keyring is locked")?;
         let collection = contents
             .resolve_alias(DEFAULT_ALIAS)
             .unwrap_or(LOGIN)
             .to_owned();
-        let mut matches: Vec<&Item> = contents
+        let kept = contents
             .collection(&collection)
             .into_iter()
             .flat_map(|found| found.items.iter())
-            .filter(|item| kept_for(item, app))
-            .collect();
-        matches.sort_by_key(|item| !is_portal_secret(item));
-        if let Some(item) = matches.first() {
+            .find(|item| kept_for(item, requester, app_id));
+        if let Some(item) = kept {
             let secret = item.secret.clone();
-            keyring.record(app, Action::Read, &item.label);
+            keyring.record(requester, Action::Read, &item.label);
             return Ok(secret);
         }
         let mut bytes = vec![0; TOKEN_SIZE];
         getrandom::fill(&mut bytes).map_err(|error| error.to_string())?;
         let secret = Secret::new(bytes);
         let attributes = BTreeMap::from([
-            (
-                APP_ID.to_owned(),
-                app.flatpak_id().unwrap_or(&app.key).to_owned(),
-            ),
+            (APP_ID.to_owned(), app_id.to_owned()),
             (SCHEMA.to_owned(), PORTAL_SCHEMA.to_owned()),
         ]);
-        let label = format!("Secret for {}", app.name);
+        let label = match requester.sandboxed_app() {
+            Some(id) => format!("Secret for {}", app_name(id)),
+            None if app_id.is_empty() => "Secret for apps on this computer".to_owned(),
+            None => format!("Secret for {app_id}"),
+        };
         let mut item = Item::new(
             label.clone(),
             attributes,
             secret.clone(),
             "application/octet-stream".into(),
         );
-        item.owner = Some(app.key.clone());
+        item.owner = requester.owner();
         keyring
-            .edit(|contents| contents.store_item(&collection, item, false))
+            .edit(|contents| contents.store_item(&collection, item, None))
             .map_err(|error| error.to_string())?;
-        keyring.record(app, Action::Saved, &label);
+        keyring.record(requester, Action::Saved, &label);
         Ok(secret)
     }
 }
 
-fn is_portal_secret(item: &Item) -> bool {
+fn kept_for(item: &Item, requester: &Requester, app_id: &str) -> bool {
     item.attributes
         .get(SCHEMA)
         .is_some_and(|schema| schema == PORTAL_SCHEMA)
-}
-
-fn kept_for(item: &Item, app: &App) -> bool {
-    let owned = item.owner.as_ref() == Some(&app.key);
-    let named = app
-        .flatpak_id()
-        .is_some_and(|id| item.attributes.get(APP_ID).is_some_and(|named| named == id));
-    is_portal_secret(item) && owned || named && (owned || item.owner.is_none())
+        && item
+            .attributes
+            .get(APP_ID)
+            .is_some_and(|named| named == app_id)
+        && sandboxed_owner(item) == requester.sandboxed_app()
 }
 
 #[interface(name = "org.freedesktop.impl.portal.Secret")]
@@ -119,25 +97,29 @@ impl Portal {
     async fn retrieve_secret(
         &self,
         handle: ObjectPath<'_>,
-        _app_id: &str,
+        app_id: &str,
         fd: Fd<'_>,
         _options: HashMap<String, OwnedVariant>,
         #[zbus(header)] header: Header<'_>,
     ) -> fdo::Result<(u32, HashMap<String, OwnedVariant>)> {
-        if !self.sent_by_portal(&header).await {
+        if !self.daemon.sent_by(&header, PORTAL).await {
             return Err(fdo::Error::AccessDenied(
                 "Only the desktop portal may ask for app secrets".into(),
             ));
         }
-        let Some(app) = self.requester(&handle).await else {
+        let Some(requester) = self.requester(&handle).await else {
             return Err(fdo::Error::AccessDenied(
                 "The app asking for a secret couldn't be identified".into(),
             ));
         };
-        if !self.daemon.ensure_unlocked(&app, true).await {
+        if !self.daemon.ensure_unlocked(&requester, true).await {
             return Ok((CANCELLED, HashMap::new()));
         }
-        let secret = self.token(&app).await.map_err(fdo::Error::Failed)?;
+        let app_id = requester.sandboxed_app().unwrap_or(app_id).to_owned();
+        let secret = self
+            .token(&requester, &app_id)
+            .await
+            .map_err(fdo::Error::Failed)?;
         let file = fd
             .as_fd()
             .try_clone_to_owned()

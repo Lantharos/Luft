@@ -1,3 +1,4 @@
+import ctypes
 import os
 import sys
 
@@ -10,8 +11,8 @@ from gi.repository import Gio, GLib
 SECRETS = "org.freedesktop.secrets"
 ROOT = "/org/freedesktop/secrets"
 KEYRING = "com.lantharos.Keyring1"
+PR_SET_DUMPABLE = 4
 
-bus = Gio.bus_get_sync(Gio.BusType.SESSION)
 
 
 def call(name, path, interface, method, signature, arguments, reply=None, fds=None):
@@ -50,8 +51,15 @@ def attributes():
 
 def complete(prompt):
     if prompt == "/":
-        return
+        return []
     loop = GLib.MainLoop()
+    unlocked = []
+
+    def completed(*arguments):
+        _, result = arguments[5].unpack()
+        unlocked.extend(result)
+        loop.quit()
+
     bus.signal_subscribe(
         SECRETS,
         "org.freedesktop.Secret.Prompt",
@@ -59,10 +67,11 @@ def complete(prompt):
         prompt,
         None,
         Gio.DBusSignalFlags.NONE,
-        lambda *_: loop.quit(),
+        completed,
     )
     call(SECRETS, prompt, "org.freedesktop.Secret.Prompt", "Prompt", "(s)", ("",))
     loop.run()
+    return unlocked
 
 
 def read():
@@ -72,13 +81,15 @@ def read():
     unlocked, locked = call(SECRETS, ROOT, "org.freedesktop.Secret.Service", "SearchItems", "(a{ss})", (attributes(),))
     if locked:
         _, prompt = call(SECRETS, ROOT, "org.freedesktop.Secret.Service", "Unlock", "(ao)", (locked,))
-        complete(prompt)
-    secrets = call(
-        SECRETS, ROOT, "org.freedesktop.Secret.Service", "GetSecrets", "(aoo)", (unlocked + locked, session)
-    )[0]
-    for _, _, value, _ in secrets.values():
-        sys.stdout.write(bytes(value).decode())
-        return
+        unlocked += complete(prompt)
+    secrets = call(SECRETS, ROOT, "org.freedesktop.Secret.Service", "GetSecrets", "(aoo)", (unlocked, session))[0]
+    return next((bytes(value).decode() for _, _, value, _ in secrets.values()), "")
+
+
+def delete():
+    unlocked, locked = call(SECRETS, ROOT, "org.freedesktop.Secret.Service", "SearchItems", "(a{ss})", (attributes(),))
+    for item in unlocked + locked:
+        call(SECRETS, item, "org.freedesktop.Secret.Item", "Delete", None, None)
 
 
 def store():
@@ -143,33 +154,31 @@ def pipe_with(data):
     return fds
 
 
-def load(name):
+def app_call(method, signature, arguments, reply=None, fds=None):
+    try:
+        interface = "com.lantharos.Keyring1.AppSecrets"
+        return call(KEYRING, "/com/lantharos/Keyring1", interface, method, signature, arguments, reply, fds)
+    except GLib.Error as error:
+        sys.stdout.write(Gio.DBusError.get_remote_error(error).rsplit(".", 1)[-1])
+        raise SystemExit(1) from error
+
+
+def load(app, name):
     reader, writer = os.pipe()
     fds = Gio.UnixFDList.new()
     fds.append(writer)
     os.close(writer)
-    (found,) = call(
-        KEYRING, "/com/lantharos/Keyring1", "com.lantharos.Keyring1.AppSecrets", "Load", "(sh)", (name, 0), "(b)", fds
-    )
+    (found,) = app_call("Load", "(ssh)", (app, name, 0), "(b)", fds)
     del fds
     value = os.read(reader, 4096) if found else None
     os.close(reader)
     return value
 
 
-def app_secrets():
-    call(
-        KEYRING,
-        "/com/lantharos/Keyring1",
-        "com.lantharos.Keyring1.AppSecrets",
-        "Store",
-        "(sh)",
-        ("account-token", 0),
-        None,
-        pipe_with(b"s3cr3t"),
-    )
-    value = load("account-token")
-    (names,) = call(KEYRING, "/com/lantharos/Keyring1", "com.lantharos.Keyring1.AppSecrets", "List", None, None, "(as)")
+def app_secrets(app):
+    app_call("Store", "(ssh)", (app, "account-token", 0), None, pipe_with(b"s3cr3t"))
+    value = load(app, "account-token")
+    (names,) = app_call("List", "(s)", (app,), "(as)")
     loaded = "account-token" if value == b"s3cr3t" else "wrong"
     sys.stdout.write(f"stored:account-token|loaded:{loaded}|listed:{','.join(names)}")
 
@@ -223,25 +232,34 @@ def portal():
     )
     app = bus.get_unique_name()
     answers = [
-        portal_secret(portal, app),
-        portal_secret(portal, app, "org.example.Sandboxed"),
+        portal_secret(portal, app, "org.example.Lumen"),
+        portal_secret(portal, app, "org.example.Quill"),
         portal_secret(bus, app),
         portal_secret(portal, ":1.999999"),
     ]
     sys.stdout.write("|".join(answers))
 
 
+if sys.argv[1] == "undumpable":
+    ctypes.CDLL(None).prctl(PR_SET_DUMPABLE, 0)
+    del sys.argv[1]
+
+bus = Gio.bus_get_sync(Gio.BusType.SESSION)
 action = sys.argv[1]
 if action == "read":
-    read()
+    sys.stdout.write(read())
+elif action == "read-twice":
+    sys.stdout.write(f"{read()}|{read()}")
+elif action == "delete":
+    delete()
 elif action == "store":
     store()
 elif action == "lock":
     call(SECRETS, ROOT, "org.freedesktop.Secret.Service", "Lock", "(ao)", ([],))
 elif action == "app-secrets":
-    app_secrets()
+    app_secrets(sys.argv[2])
 elif action == "app-load":
-    sys.stdout.write("missing" if load("account-token") is None else "found")
+    sys.stdout.write("missing" if load(sys.argv[2], "account-token") is None else "found")
 elif action == "portal":
     portal()
 elif action == "safe-storage":

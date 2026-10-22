@@ -113,15 +113,21 @@ privacy-mute-microphone = Þagga hljóðnema
 privacy-unmute-microphone = Kveikja á hljóðnema
 privacy-close-app = Loka { $app }
 privacy-unknown-app = Forrit
-privacy-windows-using = Notar gluggana þína
-privacy-windows-seeing = Sér gluggana þína
+privacy-windows-seeing-programs = { $count ->
+    [one] { $count } forrit getur séð gluggana þína
+   *[other] { $count } forrit geta séð gluggana þína
+}
+privacy-windows-using-programs = { $count ->
+    [one] { $count } forrit getur séð og notað gluggana þína
+   *[other] { $count } forrit geta séð og notað gluggana þína
+}
 privacy-windows-stop = Stöðva aðgang
 
 ## Window access prompt
 
-peek-see-title = { $app } vill sjá gluggana þína
+peek-see-request = Leyfa forriti sem þú ræstir að sjá gluggana þína?
 peek-see-description = Forritið getur þá tekið myndir af öllum gluggum sem þú hefur opna.
-peek-use-title = { $app } vill sjá og nota gluggana þína
+peek-use-request = Leyfa forriti sem þú ræstir að sjá og nota gluggana þína?
 peek-use-description = Forritið getur þá séð alla glugga sem þú hefur opna og smellt og skrifað í þá eins og það væri þú.
 peek-deny = Ekki leyfa
 peek-allow-once = Leyfa einu sinni
@@ -129,7 +135,7 @@ peek-allow-until-quit = Leyfa þar til forritið hættir
 
 ## Window access errors
 
-peek-error-declined = Notandi tölvunnar hafnaði þessu. { $app } getur spurt aftur eftir að forritið hættir.
+peek-error-declined-until-quit = Notandi tölvunnar hafnaði þessu. Forritið getur spurt aftur eftir að það hættir.
 peek-error-not-allowed = Notandi tölvunnar leyfði þetta ekki
 peek-error-sandboxed = Forrit í sandkassa geta hvorki séð né notað aðra glugga
 peek-error-unknown-caller = Forritið sem spurði hætti eða þekktist ekki

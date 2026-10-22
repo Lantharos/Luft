@@ -4,6 +4,7 @@ pub mod apps;
 mod bridge;
 pub use luft_dbus as dbus;
 pub use luft_i18n as i18n;
+pub use luft_identity as identity;
 mod desktop;
 pub mod file_manager;
 pub mod files;

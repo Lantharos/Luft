@@ -113,15 +113,21 @@ privacy-mute-microphone = Couper le microphone
 privacy-unmute-microphone = Réactiver le microphone
 privacy-close-app = Fermer { $app }
 privacy-unknown-app = Une application
-privacy-windows-using = Utilise vos fenêtres
-privacy-windows-seeing = Voit vos fenêtres
+privacy-windows-seeing-programs = { $count ->
+    [one] { $count } programme peut voir vos fenêtres
+   *[other] { $count } programmes peuvent voir vos fenêtres
+}
+privacy-windows-using-programs = { $count ->
+    [one] { $count } programme peut voir et utiliser vos fenêtres
+   *[other] { $count } programmes peuvent voir et utiliser vos fenêtres
+}
 privacy-windows-stop = Retirer l’accès
 
 ## Window access prompt
 
-peek-see-title = { $app } veut voir vos fenêtres
+peek-see-request = Autoriser un programme que vous avez lancé à voir vos fenêtres ?
 peek-see-description = Le programme pourra prendre des captures de toutes les fenêtres ouvertes.
-peek-use-title = { $app } veut voir et utiliser vos fenêtres
+peek-use-request = Autoriser un programme que vous avez lancé à voir et utiliser vos fenêtres ?
 peek-use-description = Le programme pourra voir toutes les fenêtres ouvertes, et y cliquer et y taper du texte comme si c’était vous.
 peek-deny = Ne pas autoriser
 peek-allow-once = Autoriser une fois
@@ -129,7 +135,7 @@ peek-allow-until-quit = Autoriser jusqu’à sa fermeture
 
 ## Window access errors
 
-peek-error-declined = La personne qui utilise cet ordinateur a refusé. { $app } pourra refaire la demande après son redémarrage.
+peek-error-declined-until-quit = La personne qui utilise cet ordinateur a refusé. Le programme pourra refaire la demande après sa fermeture.
 peek-error-not-allowed = La personne qui utilise cet ordinateur ne l’a pas autorisé
 peek-error-sandboxed = Les applications isolées dans un bac à sable ne peuvent ni voir ni utiliser les autres fenêtres
 peek-error-unknown-caller = Le programme demandeur s’est arrêté ou n’a pas pu être identifié

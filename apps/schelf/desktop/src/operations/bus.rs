@@ -1,4 +1,5 @@
-use luft_app::dbus::{self, caller, failed};
+use luft_app::dbus::{self, failed};
+use luft_app::identity::caller;
 use luft_software::progress::Progress;
 use zbus::fdo::{self, RequestNameFlags};
 use zbus::message::Header;

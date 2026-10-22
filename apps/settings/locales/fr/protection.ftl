@@ -22,14 +22,10 @@ settings-privacy-lock-immediately = Immédiatement
 
 ## Privacy: location, camera and microphone
 
-settings-privacy-location = Localisation
 settings-privacy-location-services = Services de localisation
 settings-privacy-location-services-hint = Permet aux applications de savoir où vous êtes, pour les cartes, la météo et les fuseaux horaires
-settings-privacy-camera = Caméra
 settings-privacy-camera-allow = Autoriser les applications à utiliser la caméra
 settings-privacy-microphone-allow = Autoriser les applications à utiliser le microphone
-settings-privacy-apps-asked = Applications ayant demandé l’accès
-settings-privacy-apps-allowed = { $allowed } sur { $total } autorisées
 
 ## Privacy: file history
 
@@ -329,21 +325,14 @@ settings-passwords-pin-locked = Déverrouillez votre trousseau pour modifier ce 
 settings-passwords-pin-description = Pour qu’une empreinte seule ne suffise pas à les déverrouiller
 settings-passwords-lock-with-screen = Verrouiller avec l’écran
 settings-passwords-lock-with-screen-description = Ils se verrouillent et se déverrouillent en même temps que l’écran
-settings-passwords-apps = Applications ayant accès
+settings-passwords-apps = Identifiants et activité des applications
 settings-passwords-apps-locked = Déverrouillez votre trousseau pour les afficher
-settings-passwords-apps-asked = { $count ->
-    [0] Aucune application ne les a encore demandés
-    [one] { $count } application les a demandés
-   *[other] { $count } applications les ont demandés
-}
+settings-passwords-apps-description = Ce que les applications conservent ici et quand elles l’ont utilisé
+settings-passwords-apps-allowed = Applications autorisées à utiliser vos mots de passe
+settings-passwords-apps-allowed-hint = À régler dans Applications
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-description = Si vous en retirez une, l’application redemandera l’accès la prochaine fois.
-settings-passwords-access-not-allowed = Non autorisée
-settings-passwords-access-none = Aucune application n’a encore demandé vos mots de passe
-settings-passwords-access-revoke = Ne plus autoriser { $app } à utiliser { $item }
-settings-passwords-access-reset = Permettre à { $app } de redemander { $item }
 settings-passwords-stores = Identifiants des applications
 settings-passwords-stores-description = Identifiants que certaines applications conservent ici et que seule l’application concernée peut lire.
 settings-passwords-stores-count = { $count ->
@@ -452,3 +441,24 @@ settings-apps-startup-add-description = Choisissez une application à ouvrir à 
 settings-apps-search = Rechercher des applications
 settings-apps-no-match = Aucune application ne correspond à votre recherche
 settings-apps-cancel = Annuler
+
+## Apps: permissions
+
+settings-apps-permissions = Autorisations
+settings-apps-location = Localisation
+settings-apps-camera = Caméra
+settings-apps-clipboard = Presse-papiers en arrière-plan
+settings-apps-clipboard-hint = Ces applications peuvent voir et modifier ce que vous copiez, même pendant que vous utilisez d’autres applications.
+settings-apps-full-access = Accès complet
+settings-apps-full-access-hint = Ces applications s’exécutent hors de leur bac à sable et agissent en votre nom, comme les applications installées sur le système. Le retrait prend effet à la prochaine ouverture de l’application.
+settings-apps-full-access-remove = Retirer
+settings-apps-full-access-remove-app = Retirer l’accès complet à { $app }
+settings-apps-passwords = Mots de passe enregistrés
+settings-apps-passwords-hint = Les applications retiennent votre réponse quand elles demandent à utiliser un élément de votre trousseau. Oubliez-la pour que l’application redemande.
+settings-apps-passwords-forget = Oublier
+settings-apps-passwords-forget-app = Laisser { $app } redemander
+settings-apps-permissions-allowed = { $allowed } sur { $total } autorisées
+settings-apps-permissions-count = { $count ->
+    [one] { $count } application
+   *[other] { $count } applications
+}

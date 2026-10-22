@@ -85,7 +85,6 @@ impl Contents {
         let before = self.collections.len();
         self.collections.retain(|collection| collection.id != id);
         self.aliases.retain(|_, target| target != id);
-        self.rules.retain(|rule| rule.collection != id);
         before != self.collections.len()
     }
 
@@ -93,14 +92,13 @@ impl Contents {
         &mut self,
         collection: &str,
         item: Item,
-        replace: bool,
+        replacing: Option<u64>,
     ) -> Option<(u64, bool)> {
         let target = self.collection_mut(collection)?;
-        if replace
-            && let Some(existing) = target
-                .items
-                .iter_mut()
-                .find(|existing| existing.attributes == item.attributes)
+        if let Some(existing) = target
+            .items
+            .iter_mut()
+            .find(|existing| Some(existing.id) == replacing)
         {
             existing.label = item.label;
             existing.secret = item.secret;
@@ -119,12 +117,7 @@ impl Contents {
         let before = target.items.len();
         target.items.retain(|existing| existing.id != item);
         target.modified = now();
-        let removed = before != target.items.len();
-        if removed {
-            self.rules
-                .retain(|rule| rule.collection != collection || rule.item != item);
-        }
-        removed
+        before != target.items.len()
     }
 
     pub fn item_count(&self) -> usize {

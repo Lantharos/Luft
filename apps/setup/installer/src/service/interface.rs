@@ -77,14 +77,7 @@ impl Installer {
         header: &Header<'_>,
     ) -> Result<String, Error> {
         self.authorize(connection, header, SET_UP).await?;
-        setup::setup_app_user(
-            connection,
-            header,
-            &self.options.state_dir,
-            &self.config.setup_app,
-            uid_of,
-        )
-        .await
+        setup::setup_app_user(connection, header, &self.options.state_dir, uid_of).await
     }
 
     async fn blocking<T: Send + 'static>(
@@ -287,7 +280,7 @@ impl Installer {
             return Err(Error::not_authorized());
         };
         let pending = uid_of(&user);
-        if pending.is_none() || pending != luft_dbus::caller::uid(connection, &header).await? {
+        if pending.is_none() || pending != luft_identity::caller::uid(connection, &header).await? {
             return Err(Error::not_authorized());
         }
         let _activity = self.idle.hold();

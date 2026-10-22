@@ -22,14 +22,10 @@ settings-privacy-lock-immediately = Azonnal
 
 ## Privacy: location, camera and microphone
 
-settings-privacy-location = Hely
 settings-privacy-location-services = Helymeghatározás
 settings-privacy-location-services-hint = Az alkalmazások megtudhatják, hol tartózkodik, például térképekhez, időjáráshoz és időzónákhoz
-settings-privacy-camera = Kamera
 settings-privacy-camera-allow = Kamerahasználat engedélyezése az alkalmazásoknak
 settings-privacy-microphone-allow = Mikrofonhasználat engedélyezése az alkalmazásoknak
-settings-privacy-apps-asked = Hozzáférést kérő alkalmazások
-settings-privacy-apps-allowed = { $allowed }/{ $total } engedélyezve
 
 ## Privacy: file history
 
@@ -329,21 +325,14 @@ settings-passwords-pin-locked = A módosításhoz oldja fel a kulcstartót
 settings-passwords-pin-description = Így egy ujjlenyomat önmagában nem oldja fel őket
 settings-passwords-lock-with-screen = Zárolás a képernyővel együtt
 settings-passwords-lock-with-screen-description = A képernyővel együtt zárolódnak és oldódnak fel
-settings-passwords-apps = Hozzáféréssel rendelkező alkalmazások
+settings-passwords-apps = Alkalmazások bejelentkezései és tevékenysége
 settings-passwords-apps-locked = A megtekintésükhöz oldja fel a kulcstartót
-settings-passwords-apps-asked = { $count ->
-    [0] Még egy alkalmazás sem kért hozzáférést
-    [one] { $count } alkalmazás kért hozzáférést
-   *[other] { $count } alkalmazás kért hozzáférést
-}
+settings-passwords-apps-description = Mit tárolnak itt az alkalmazások, és mikor használták
+settings-passwords-apps-allowed = Mely alkalmazások használhatják a jelszavait
+settings-passwords-apps-allowed-hint = Az Alkalmazások oldalon állítható be
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-description = Ha eltávolít egyet, az alkalmazás legközelebb újra engedélyt kér.
-settings-passwords-access-not-allowed = Nem engedélyezett
-settings-passwords-access-none = Még egy alkalmazás sem kért hozzáférést a jelszavaihoz
-settings-passwords-access-revoke = { $app } nem használhatja ezt: { $item }
-settings-passwords-access-reset = { $app } újra engedélyt kérhet ehhez: { $item }
 settings-passwords-stores = Alkalmazások bejelentkezései
 settings-passwords-stores-description = Egyes alkalmazások itt tárolják a bejelentkezéseiket, ahol csak az adott alkalmazás olvashatja őket.
 settings-passwords-stores-count = { $count ->
@@ -452,3 +441,24 @@ settings-apps-startup-add-description = Válassza ki, melyik alkalmazás nyíljo
 settings-apps-search = Alkalmazások keresése
 settings-apps-no-match = Egy alkalmazás sem felel meg a keresésnek
 settings-apps-cancel = Mégse
+
+## Apps: permissions
+
+settings-apps-permissions = Engedélyek
+settings-apps-location = Hely
+settings-apps-camera = Kamera
+settings-apps-clipboard = Vágólap a háttérben
+settings-apps-clipboard-hint = Ezek az alkalmazások láthatják és módosíthatják, amit kimásol, akkor is, ha más alkalmazásokat használ.
+settings-apps-full-access = Teljes hozzáférés
+settings-apps-full-access-hint = Ezek az alkalmazások a homokozójukon kívül futnak, és Önnek számítanak, mint a rendszerre telepített alkalmazások. Az eltávolítás az alkalmazás következő megnyitásakor lép életbe.
+settings-apps-full-access-remove = Eltávolítás
+settings-apps-full-access-remove-app = Teljes hozzáférés eltávolítása ettől: { $app }
+settings-apps-passwords = Mentett jelszavak
+settings-apps-passwords-hint = Az alkalmazások megjegyzik a válaszát, amikor a kulcstartóban tárolt valamit szeretnének használni. Felejtse el, és az alkalmazás újra rákérdez.
+settings-apps-passwords-forget = Elfelejtés
+settings-apps-passwords-forget-app = { $app } újra kérdezhessen
+settings-apps-permissions-allowed = { $allowed }/{ $total } engedélyezve
+settings-apps-permissions-count = { $count ->
+    [one] { $count } alkalmazás
+   *[other] { $count } alkalmazás
+}

@@ -9,6 +9,7 @@ use super::secret::Secret;
 const NAME: &str = "com.lantharos.Keyring1";
 const PATH: &str = "/com/lantharos/Keyring1";
 const INTERFACE: &str = "com.lantharos.Keyring1.AppSecrets";
+const APP_ID: &str = "com.lantharos.accounts";
 
 #[derive(Clone)]
 pub struct Keyring {
@@ -43,7 +44,7 @@ impl Keyring {
                 PATH,
                 Some(INTERFACE),
                 "Store",
-                &(key(account), Fd::from(&reader)),
+                &(APP_ID, key(account), Fd::from(&reader)),
             )
             .await;
         drop(reader);
@@ -68,7 +69,7 @@ impl Keyring {
                 PATH,
                 Some(INTERFACE),
                 "Load",
-                &(key(account), Fd::from(&writer)),
+                &(APP_ID, key(account), Fd::from(&writer)),
             )
             .await;
         drop(writer);
@@ -89,7 +90,7 @@ impl Keyring {
                 PATH,
                 Some(INTERFACE),
                 "Delete",
-                &(key(account),),
+                &(APP_ID, key(account)),
             )
             .await
             .map_err(explain)?;

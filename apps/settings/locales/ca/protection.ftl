@@ -22,14 +22,10 @@ settings-privacy-lock-immediately = Immediatament
 
 ## Privacy: location, camera and microphone
 
-settings-privacy-location = Ubicació
 settings-privacy-location-services = Serveis d’ubicació
 settings-privacy-location-services-hint = Permet que les aplicacions sàpiguen on sou, per als mapes, el temps i la zona horària
-settings-privacy-camera = Càmera
 settings-privacy-camera-allow = Permet que les aplicacions facin servir la càmera
 settings-privacy-microphone-allow = Permet que les aplicacions facin servir el micròfon
-settings-privacy-apps-asked = Aplicacions que ho han demanat
-settings-privacy-apps-allowed = { $allowed } de { $total } amb permís
 
 ## Privacy: file history
 
@@ -329,21 +325,14 @@ settings-passwords-pin-locked = Desbloquegeu el clauer per canviar-ho
 settings-passwords-pin-description = Perquè una empremta sola no les pugui desbloquejar
 settings-passwords-lock-with-screen = Bloqueja amb la pantalla
 settings-passwords-lock-with-screen-description = Es bloquegen i es desbloquegen alhora que la pantalla
-settings-passwords-apps = Aplicacions amb accés
+settings-passwords-apps = Inicis de sessió i activitat de les aplicacions
 settings-passwords-apps-locked = Desbloquegeu el clauer per veure-les
-settings-passwords-apps-asked = { $count ->
-    [0] Encara no les ha demanat cap aplicació
-    [one] { $count } aplicació les ha demanat
-   *[other] { $count } aplicacions les han demanat
-}
+settings-passwords-apps-description = Què hi guarden les aplicacions i quan ho han fet servir
+settings-passwords-apps-allowed = Quines aplicacions poden fer servir les vostres contrasenyes
+settings-passwords-apps-allowed-hint = Es defineix a Aplicacions
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-description = Si en traieu una, l’aplicació ho tornarà a demanar la pròxima vegada.
-settings-passwords-access-not-allowed = Sense permís
-settings-passwords-access-none = Encara cap aplicació no ha demanat les vostres contrasenyes
-settings-passwords-access-revoke = Impedeix que { $app } faci servir { $item }
-settings-passwords-access-reset = Deixa que { $app } torni a demanar { $item }
 settings-passwords-stores = Inicis de sessió d’aplicacions
 settings-passwords-stores-description = Inicis de sessió que algunes aplicacions guarden aquí, on només les pot llegir l’aplicació mateixa.
 settings-passwords-stores-count = { $count ->
@@ -452,3 +441,24 @@ settings-apps-startup-add-description = Trieu una aplicació que s’obri cada v
 settings-apps-search = Cerca aplicacions
 settings-apps-no-match = Cap aplicació no coincideix amb la cerca
 settings-apps-cancel = Cancel·la
+
+## Apps: permissions
+
+settings-apps-permissions = Permisos
+settings-apps-location = Ubicació
+settings-apps-camera = Càmera
+settings-apps-clipboard = Porta-retalls en segon pla
+settings-apps-clipboard-hint = Aquestes aplicacions poden veure i canviar el que copieu, fins i tot mentre feu servir altres aplicacions.
+settings-apps-full-access = Accés complet
+settings-apps-full-access-hint = Aquestes aplicacions s’executen fora del seu entorn aïllat i actuen com vós, igual que les aplicacions instal·lades al sistema. Treure’l s’aplica la propera vegada que s’obri l’aplicació.
+settings-apps-full-access-remove = Treu
+settings-apps-full-access-remove-app = Treu l’accés complet a { $app }
+settings-apps-passwords = Contrasenyes desades
+settings-apps-passwords-hint = Les aplicacions recorden la vostra resposta quan demanen fer servir alguna cosa desada al clauer. Oblideu-la perquè l’aplicació torni a preguntar.
+settings-apps-passwords-forget = Oblida
+settings-apps-passwords-forget-app = Fes que { $app } torni a preguntar
+settings-apps-permissions-allowed = { $allowed } de { $total } amb permís
+settings-apps-permissions-count = { $count ->
+    [one] { $count } aplicació
+   *[other] { $count } aplicacions
+}

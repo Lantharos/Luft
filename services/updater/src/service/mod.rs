@@ -1,7 +1,6 @@
 mod error;
 mod interface;
 mod system_packages;
-mod trusted_apps;
 
 use std::sync::Arc;
 use std::time::Duration;
@@ -10,7 +9,6 @@ use luft_dbus::idle::Idle;
 
 use interface::Updater;
 use system_packages::SystemPackages;
-use trusted_apps::TrustedApps;
 
 pub const NAME: &str = "com.lantharos.Updater1";
 pub const PATH: &str = "/com/lantharos/Updater1";
@@ -29,7 +27,6 @@ async fn serve() -> zbus::Result<()> {
     let connection = zbus::connection::Builder::system()
         .serve_at(PATH, Updater::new(idle.clone()))
         .serve_at(PATH, SystemPackages::new(idle.clone()))
-        .serve_at(PATH, TrustedApps::new(idle.clone()))
         .name(NAME)
         .build()
         .await?;

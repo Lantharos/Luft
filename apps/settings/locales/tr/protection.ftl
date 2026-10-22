@@ -22,14 +22,10 @@ settings-privacy-lock-immediately = Hemen
 
 ## Privacy: location, camera and microphone
 
-settings-privacy-location = Konum
 settings-privacy-location-services = Konum hizmetleri
 settings-privacy-location-services-hint = Uygulamaların haritalar, hava durumu ve saat dilimleri için konumunuzu bulmasını sağlar
-settings-privacy-camera = Kamera
 settings-privacy-camera-allow = Uygulamaların kamerayı kullanmasına izin ver
 settings-privacy-microphone-allow = Uygulamaların mikrofonu kullanmasına izin ver
-settings-privacy-apps-asked = İzin isteyen uygulamalar
-settings-privacy-apps-allowed = { $allowed }/{ $total } izinli
 
 ## Privacy: file history
 
@@ -329,21 +325,14 @@ settings-passwords-pin-locked = Bunu değiştirmek için anahtarlığınızın k
 settings-passwords-pin-description = Böylece yalnızca parmak iziyle kilit açılamaz
 settings-passwords-lock-with-screen = Ekranla birlikte kilitle
 settings-passwords-lock-with-screen-description = Ekranla birlikte kilitlenir ve kilidi açılır
-settings-passwords-apps = Erişimi olan uygulamalar
+settings-passwords-apps = Uygulama oturumları ve etkinliği
 settings-passwords-apps-locked = Görmek için anahtarlığınızın kilidini açın
-settings-passwords-apps-asked = { $count ->
-    [0] Henüz hiçbir uygulama istemedi
-    [one] { $count } uygulama istedi
-   *[other] { $count } uygulama istedi
-}
+settings-passwords-apps-description = Uygulamaların burada sakladıkları ve bunları ne zaman kullandıkları
+settings-passwords-apps-allowed = Parolalarınızı kullanabilecek uygulamalar
+settings-passwords-apps-allowed-hint = Uygulamalar sayfasından ayarlanır
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-description = Birini kaldırırsanız uygulama bir dahaki sefere yeniden sorar.
-settings-passwords-access-not-allowed = İzin verilmedi
-settings-passwords-access-none = Henüz hiçbir uygulama parolalarınızı istemedi
-settings-passwords-access-revoke = { $app } uygulamasının { $item } öğesini kullanmasını engelle
-settings-passwords-access-reset = { $app } uygulamasının { $item } öğesini yeniden istemesine izin ver
 settings-passwords-stores = Uygulama oturumları
 settings-passwords-stores-description = Bazı uygulamaların burada sakladığı, yalnızca o uygulamanın okuyabildiği oturum bilgileri.
 settings-passwords-stores-count = { $count ->
@@ -452,3 +441,24 @@ settings-apps-startup-add-description = Her oturum açtığınızda açılacak b
 settings-apps-search = Uygulamalarda ara
 settings-apps-no-match = Aramanızla eşleşen uygulama yok
 settings-apps-cancel = İptal
+
+## Apps: permissions
+
+settings-apps-permissions = İzinler
+settings-apps-location = Konum
+settings-apps-camera = Kamera
+settings-apps-clipboard = Arka planda pano
+settings-apps-clipboard-hint = Bu uygulamalar, başka uygulamaları kullanırken bile kopyaladıklarınızı görebilir ve değiştirebilir.
+settings-apps-full-access = Tam erişim
+settings-apps-full-access-hint = Bu uygulamalar korumalı alanlarının dışında çalışır ve sisteme yüklenen uygulamalar gibi sizin yerinize hareket eder. Kaldırma, uygulama bir sonraki açıldığında geçerli olur.
+settings-apps-full-access-remove = Kaldır
+settings-apps-full-access-remove-app = { $app } uygulamasının tam erişimini kaldır
+settings-apps-passwords = Kayıtlı parolalar
+settings-apps-passwords-hint = Uygulamalar, anahtarlığınızda kayıtlı bir şeyi kullanmak istediğinde verdiğiniz yanıtı hatırlar. Uygulamanın yeniden sorması için yanıtı unutun.
+settings-apps-passwords-forget = Unut
+settings-apps-passwords-forget-app = { $app } yeniden sorsun
+settings-apps-permissions-allowed = { $allowed }/{ $total } izinli
+settings-apps-permissions-count = { $count ->
+    [one] { $count } uygulama
+   *[other] { $count } uygulama
+}

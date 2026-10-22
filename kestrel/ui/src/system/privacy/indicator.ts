@@ -5,7 +5,7 @@ import St from 'gi://St';
 import { appIcons } from '../../appearance/icons/appIcons.js';
 import type { ContextMenus, MenuEntry } from '../../desktop/menus/contextMenus.js';
 import { formatsLocale, localized, t } from '../../shared/i18n/index.js';
-import { windowAccess, type Grant } from '../peek/access/grants.js';
+import { windowAccess, type Level } from '../peek/access/grants.js';
 import { mediaUsers, setMuted, type MediaUser } from './mediaUsers.js';
 import { PrivacyMonitor, type PrivacyState } from './monitor.js';
 
@@ -21,6 +21,8 @@ const THINGS: Record<keyof PrivacyState, string> = {
   camera: 'privacy-thing-camera', microphone: 'privacy-thing-microphone', sharing: 'privacy-thing-screen', recording: 'privacy-thing-screen',
   location: 'privacy-thing-location', windows: 'privacy-thing-windows',
 };
+
+const WINDOW_ACCESS: Record<Level, string> = { use: 'privacy-windows-using-programs', see: 'privacy-windows-seeing-programs' };
 
 const icon = (name: string) => new Gio.ThemedIcon({ name });
 
@@ -67,18 +69,21 @@ export class PrivacyIndicator {
     if (state.location)
       entries.push({ label: t('privacy-turn-off-location'), icon: icon(ICONS.location),
         run: () => new Gio.Settings({ schema_id: 'org.gnome.system.location' }).set_boolean('enabled', false) });
-    for (const grant of windowAccess.active) entries.push(this.windowsEntry(grant));
+    entries.push(...this.windowEntries());
     entries.push('separator', { label: t('privacy-settings'), run: () => this.menus.settings('privacy') });
     const [x, y] = this.actor.get_transformed_position();
     this.menus.open(this.actor, entries, Math.round(x + this.actor.width / 2), Math.round(y));
   }
 
-  private windowsEntry({ caller, level }: Grant): MenuEntry {
-    return {
-      label: `${caller.name} · ${t(level === 'use' ? 'privacy-windows-using' : 'privacy-windows-seeing')}`,
-      icon: caller.app ? appIcons.gicon(caller.app) : icon(ICONS.windows),
-      children: [{ label: t('privacy-windows-stop'), run: () => windowAccess.revoke(caller.unit) }],
-    };
+  private windowEntries(): MenuEntry[] {
+    return (Object.keys(WINDOW_ACCESS) as Level[]).flatMap(level => {
+      const units = windowAccess.active.filter(grant => grant.level === level).map(grant => grant.caller.unit);
+      return units.length ? [{
+        label: t(WINDOW_ACCESS[level], { count: units.length }),
+        icon: icon(ICONS.windows),
+        children: [{ label: t('privacy-windows-stop'), run: () => { for (const unit of units) windowAccess.revoke(unit); } }],
+      }] : [];
+    });
   }
 
   private userEntry(user: MediaUser): MenuEntry {

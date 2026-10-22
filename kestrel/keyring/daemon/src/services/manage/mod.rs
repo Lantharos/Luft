@@ -13,13 +13,10 @@ pub use apps::AppSecrets;
 pub use status::{Status, publish};
 
 use crate::daemon::Daemon;
-use crate::identity::App;
-#[cfg(debug_assertions)]
-use crate::identity::Kind;
+use crate::requester::Requester;
 
 pub const NAME: &str = "com.lantharos.Keyring1";
 pub const PATH: &str = "/com/lantharos/Keyring1";
-const SETTINGS: &str = "app:com.lantharos.settings";
 
 pub async fn serve(daemon: &Arc<Daemon>) -> zbus::Result<()> {
     let server = daemon.connection.object_server();
@@ -37,25 +34,27 @@ pub async fn serve(daemon: &Arc<Daemon>) -> zbus::Result<()> {
     Ok(())
 }
 
-async fn settings_only(daemon: &Daemon, header: &Header<'_>) -> fdo::Result<()> {
-    let (_, app) = daemon.caller(header).await;
-    if app.key == SETTINGS || is_development_settings(&app) {
-        Ok(())
+async fn yours(daemon: &Daemon, header: &Header<'_>) -> fdo::Result<Requester> {
+    let requester = daemon.requester(header).await;
+    if requester.is_you() {
+        Ok(requester)
     } else {
         Err(fdo::Error::AccessDenied(
-            "Only Settings can manage the keyring".into(),
+            "Apps in a sandbox can't manage the keyring".into(),
         ))
     }
 }
 
-#[cfg(debug_assertions)]
-fn is_development_settings(app: &App) -> bool {
-    app.kind == Kind::Host
-        && std::env::var_os("LUFT_KEYRING_DEVELOPMENT_SETTINGS")
-            .is_some_and(|build| build == app.executable.as_str())
-}
-
-#[cfg(not(debug_assertions))]
-fn is_development_settings(_: &App) -> bool {
-    false
+async fn confirmed(daemon: &Arc<Daemon>, header: &Header<'_>, wants: &str) -> fdo::Result<()> {
+    let requester = yours(daemon, header).await?;
+    let connection = requester.connection.unwrap_or_default();
+    if daemon.granted.may_manage(&connection) {
+        return Ok(());
+    }
+    let body = format!("An app on this computer wants to {wants}.");
+    if !daemon.confirm_its_you("Confirm it's you", &body).await {
+        return Err(fdo::Error::AccessDenied("It wasn't confirmed".into()));
+    }
+    daemon.granted.let_manage(&connection);
+    Ok(())
 }

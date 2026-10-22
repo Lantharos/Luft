@@ -22,14 +22,10 @@ settings-privacy-lock-immediately = Αμέσως
 
 ## Privacy: location, camera and microphone
 
-settings-privacy-location = Τοποθεσία
 settings-privacy-location-services = Υπηρεσίες τοποθεσίας
 settings-privacy-location-services-hint = Οι εφαρμογές μπορούν να βρουν πού βρίσκεστε, για χάρτες, καιρό και ζώνες ώρας
-settings-privacy-camera = Κάμερα
 settings-privacy-camera-allow = Να επιτρέπεται στις εφαρμογές η χρήση της κάμερας
 settings-privacy-microphone-allow = Να επιτρέπεται στις εφαρμογές η χρήση του μικροφώνου
-settings-privacy-apps-asked = Εφαρμογές που ζήτησαν πρόσβαση
-settings-privacy-apps-allowed = Επιτρέπονται { $allowed } από { $total }
 
 ## Privacy: file history
 
@@ -329,21 +325,14 @@ settings-passwords-pin-locked = Ξεκλειδώστε την κλειδοθήκ
 settings-passwords-pin-description = Ώστε να μην αρκεί μόνο το δακτυλικό αποτύπωμα για να ξεκλειδώσουν
 settings-passwords-lock-with-screen = Κλείδωμα μαζί με την οθόνη
 settings-passwords-lock-with-screen-description = Κλειδώνουν και ξεκλειδώνουν μαζί με την οθόνη
-settings-passwords-apps = Εφαρμογές με πρόσβαση
+settings-passwords-apps = Συνδέσεις και δραστηριότητα εφαρμογών
 settings-passwords-apps-locked = Ξεκλειδώστε την κλειδοθήκη σας για να τις δείτε
-settings-passwords-apps-asked = { $count ->
-    [0] Καμία εφαρμογή δεν τα έχει ζητήσει ακόμη
-    [one] { $count } εφαρμογή τα έχει ζητήσει
-   *[other] { $count } εφαρμογές τα έχουν ζητήσει
-}
+settings-passwords-apps-description = Τι κρατούν εδώ οι εφαρμογές και πότε το χρησιμοποίησαν
+settings-passwords-apps-allowed = Ποιες εφαρμογές μπορούν να χρησιμοποιούν τους κωδικούς σας
+settings-passwords-apps-allowed-hint = Ορίζεται στη σελίδα «Εφαρμογές»
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-description = Αν αφαιρέσετε μία, η εφαρμογή θα ρωτήσει ξανά την επόμενη φορά.
-settings-passwords-access-not-allowed = Δεν επιτρέπεται
-settings-passwords-access-none = Καμία εφαρμογή δεν έχει ζητήσει ακόμη τους κωδικούς πρόσβασής σας
-settings-passwords-access-revoke = Διακοπή χρήσης του «{ $item }» από την εφαρμογή { $app }
-settings-passwords-access-reset = Να ρωτά ξανά η εφαρμογή { $app } για το «{ $item }»
 settings-passwords-stores = Συνδέσεις εφαρμογών
 settings-passwords-stores-description = Συνδέσεις που κρατούν εδώ ορισμένες εφαρμογές και που μόνο η ίδια η εφαρμογή μπορεί να διαβάσει.
 settings-passwords-stores-count = { $count ->
@@ -452,3 +441,24 @@ settings-apps-startup-add-description = Επιλέξτε μια εφαρμογή
 settings-apps-search = Αναζήτηση εφαρμογών
 settings-apps-no-match = Καμία εφαρμογή δεν ταιριάζει με την αναζήτηση
 settings-apps-cancel = Ακύρωση
+
+## Apps: permissions
+
+settings-apps-permissions = Άδειες
+settings-apps-location = Τοποθεσία
+settings-apps-camera = Κάμερα
+settings-apps-clipboard = Πρόχειρο στο παρασκήνιο
+settings-apps-clipboard-hint = Αυτές οι εφαρμογές μπορούν να βλέπουν και να αλλάζουν ό,τι αντιγράφετε, ακόμα και όταν χρησιμοποιείτε άλλες εφαρμογές.
+settings-apps-full-access = Πλήρης πρόσβαση
+settings-apps-full-access-hint = Αυτές οι εφαρμογές εκτελούνται εκτός του απομονωμένου περιβάλλοντός τους και λογίζονται ως εσείς, όπως οι εφαρμογές που είναι εγκατεστημένες στο σύστημα. Η αφαίρεση ισχύει από το επόμενο άνοιγμα της εφαρμογής.
+settings-apps-full-access-remove = Αφαίρεση
+settings-apps-full-access-remove-app = Αφαίρεση πλήρους πρόσβασης από το { $app }
+settings-apps-passwords = Αποθηκευμένοι κωδικοί πρόσβασης
+settings-apps-passwords-hint = Οι εφαρμογές θυμούνται την απάντησή σας όταν ζητούν να χρησιμοποιήσουν κάτι από την κλειδοθήκη σας. Ξεχάστε την για να ρωτήσει ξανά η εφαρμογή.
+settings-apps-passwords-forget = Επαναφορά
+settings-apps-passwords-forget-app = Να ρωτήσει ξανά το { $app }
+settings-apps-permissions-allowed = Επιτρέπονται { $allowed } από { $total }
+settings-apps-permissions-count = { $count ->
+    [one] { $count } εφαρμογή
+   *[other] { $count } εφαρμογές
+}

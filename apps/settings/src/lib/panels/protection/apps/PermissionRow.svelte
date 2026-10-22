@@ -1,29 +1,25 @@
 <script lang="ts">
-	import type { Component } from 'svelte';
-	import { t } from '@luft/i18n';
-	import { Row, Switch } from '@luft/ui';
-	import type { AppPermission } from './permissions.svelte';
+	import type { Component, Snippet } from 'svelte';
+	import { Row } from '@luft/ui';
 
 	interface Props {
 		title: string;
 		icon: Component;
-		apps: AppPermission[];
-		disabled: boolean;
-		ontoggle: (app: AppPermission, allowed: boolean) => void;
+		description: string;
+		hint?: string;
+		disabled?: boolean;
+		children: Snippet;
 	}
 
-	let { title, icon, apps, disabled, ontoggle }: Props = $props();
+	let { title, icon, description, hint, disabled = false, children }: Props = $props();
 
 	let expanded = $state(false);
-
-	let allowed = $derived(apps.filter((app) => app.allowed).length);
 </script>
 
-<Row {title} {icon} description={t('settings-privacy-apps-allowed', { allowed, total: apps.length })} {disabled} {expanded} onclick={() => (expanded = !expanded)} />
+<Row {title} {icon} {description} {disabled} {expanded} onclick={() => (expanded = !expanded)} />
 {#if expanded}
-	{#each apps as app (app.id)}
-		<Row title={app.name} {disabled}>
-			<Switch label={app.name} checked={app.allowed} {disabled} onchange={(on) => ontoggle(app, on)} />
-		</Row>
-	{/each}
+	{#if hint}
+		<p class="pr-4 pb-2 pl-[50px] text-[12.5px] leading-[1.4] text-[var(--text-muted)]">{hint}</p>
+	{/if}
+	{@render children()}
 {/if}

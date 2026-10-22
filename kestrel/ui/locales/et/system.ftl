@@ -113,15 +113,21 @@ privacy-mute-microphone = Vaigista mikrofon
 privacy-unmute-microphone = Tühista mikrofoni vaigistus
 privacy-close-app = Sulge { $app }
 privacy-unknown-app = Rakendus
-privacy-windows-using = Kasutab teie aknaid
-privacy-windows-seeing = Näeb teie aknaid
+privacy-windows-seeing-programs = { $count ->
+    [one] { $count } programm saab teie aknaid näha
+   *[other] { $count } programmi saavad teie aknaid näha
+}
+privacy-windows-using-programs = { $count ->
+    [one] { $count } programm saab teie aknaid näha ja kasutada
+   *[other] { $count } programmi saavad teie aknaid näha ja kasutada
+}
 privacy-windows-stop = Lõpeta juurdepääs
 
 ## Window access prompt
 
-peek-see-title = { $app } soovib näha teie aknaid
+peek-see-request = Kas lubada teie käivitatud programmil teie aknaid näha?
 peek-see-description = See saab teha pilte kõigist teie avatud akendest.
-peek-use-title = { $app } soovib näha ja kasutada teie aknaid
+peek-use-request = Kas lubada teie käivitatud programmil teie aknaid näha ja kasutada?
 peek-use-description = See näeb kõiki teie avatud aknaid ning saab neis klõpsata ja tippida, nagu oleksite see teie.
 peek-deny = Ära luba
 peek-allow-once = Luba üks kord
@@ -129,7 +135,7 @@ peek-allow-until-quit = Luba kuni sulgemiseni
 
 ## Window access errors
 
-peek-error-declined = Selle arvuti kasutaja keeldus. { $app } saab pärast sulgemist uuesti küsida.
+peek-error-declined-until-quit = Selle arvuti kasutaja keeldus. Programm saab pärast sulgemist uuesti küsida.
 peek-error-not-allowed = Selle arvuti kasutaja ei lubanud seda
 peek-error-sandboxed = Liivakastis töötavad rakendused ei saa teisi aknaid näha ega kasutada
 peek-error-unknown-caller = Küsiv programm lõpetas töö või seda ei õnnestunud tuvastada

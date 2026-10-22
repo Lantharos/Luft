@@ -113,15 +113,25 @@ privacy-mute-microphone = Utišaj mikrofon
 privacy-unmute-microphone = Vklopi mikrofon
 privacy-close-app = Zapri { $app }
 privacy-unknown-app = Neka aplikacija
-privacy-windows-using = Uporablja vaša okna
-privacy-windows-seeing = Vidi vaša okna
+privacy-windows-seeing-programs = { $count ->
+    [one] { $count } program lahko vidi vaša okna
+    [two] { $count } programa lahko vidita vaša okna
+    [few] { $count } programi lahko vidijo vaša okna
+   *[other] { $count } programov lahko vidi vaša okna
+}
+privacy-windows-using-programs = { $count ->
+    [one] { $count } program lahko vidi in uporablja vaša okna
+    [two] { $count } programa lahko vidita in uporabljata vaša okna
+    [few] { $count } programi lahko vidijo in uporabljajo vaša okna
+   *[other] { $count } programov lahko vidi in uporablja vaša okna
+}
 privacy-windows-stop = Ustavi dostop
 
 ## Window access prompt
 
-peek-see-title = Program { $app } želi videti vaša okna
+peek-see-request = Ali želite programu, ki ste ga zagnali, dovoliti, da vidi vaša okna?
 peek-see-description = Lahko bo naredil posnetek katerega koli odprtega okna.
-peek-use-title = Program { $app } želi videti in uporabljati vaša okna
+peek-use-request = Ali želite programu, ki ste ga zagnali, dovoliti, da vidi in uporablja vaša okna?
 peek-use-description = Videl bo vsa odprta okna ter v njih klikal in tipkal, kot da bi bili vi.
 peek-deny = Ne dovoli
 peek-allow-once = Dovoli enkrat
@@ -129,7 +139,7 @@ peek-allow-until-quit = Dovoli, dokler se ne zapre
 
 ## Window access errors
 
-peek-error-declined = Oseba, ki uporablja ta računalnik, je to zavrnila. Program { $app } lahko znova vpraša, ko se zapre.
+peek-error-declined-until-quit = Oseba, ki uporablja ta računalnik, je to zavrnila. Program lahko znova vpraša, ko se zapre.
 peek-error-not-allowed = Oseba, ki uporablja ta računalnik, tega ni dovolila
 peek-error-sandboxed = Aplikacije v izoliranem okolju ne morejo videti ali uporabljati drugih oken
 peek-error-unknown-caller = Program, ki sprašuje, se je končal ali ga ni bilo mogoče prepoznati

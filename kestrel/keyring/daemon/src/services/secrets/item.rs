@@ -7,10 +7,11 @@ use zbus::{ObjectPath, OwnedObjectPath};
 use zbus::{fdo, interface};
 
 use super::collection::Collection;
+use super::service::sender;
 use super::session::{decode, encode};
 use super::{Secret, SecretError, collection_path, item_path, none, sync};
 use crate::daemon::Daemon;
-use crate::identity::App;
+use crate::requester::Requester;
 
 pub struct Item {
     pub daemon: Arc<Daemon>,
@@ -28,25 +29,25 @@ impl Item {
         keyring.view()?.item(&self.collection, self.id).map(read)
     }
 
-    async fn permit(&self, header: &Header<'_>) -> Result<App, SecretError> {
-        let (_, app) = self.daemon.caller(header).await;
-        if !self.daemon.ensure_unlocked(&app, false).await {
+    async fn permit(&self, header: &Header<'_>) -> Result<Requester, SecretError> {
+        let requester = self.daemon.requester(header).await;
+        if !self.daemon.ensure_unlocked(&requester, false).await {
             return Err(SecretError::locked());
         }
         if self
             .daemon
-            .authorize(&app, &[self.key()], true)
+            .authorize(&requester, &[self.key()], true)
             .await
             .is_empty()
         {
             return Err(SecretError::locked());
         }
-        Ok(app)
+        Ok(requester)
     }
 
     async fn change(
         &self,
-        app: &App,
+        requester: &Requester,
         change: impl FnOnce(&mut luft_keyring_vault::Item),
     ) -> Result<(), SecretError> {
         let mut keyring = self.daemon.keyring.lock().await;
@@ -59,7 +60,7 @@ impl Item {
             })
             .map_err(SecretError::failed)?
             .ok_or_else(SecretError::missing)?;
-        keyring.record(app, Action::Saved, &label);
+        keyring.record(requester, Action::Saved, &label);
         drop(keyring);
         if let Ok(emitter) = zbus::object_server::SignalEmitter::new(
             &self.daemon.connection,
@@ -79,7 +80,7 @@ impl Item {
         &self,
         #[zbus(header)] header: Header<'_>,
     ) -> Result<OwnedObjectPath, SecretError> {
-        let app = self.permit(&header).await?;
+        let requester = self.permit(&header).await?;
         let label = self
             .read(|item| item.label.clone())
             .await
@@ -90,11 +91,12 @@ impl Item {
             .await
             .edit(|contents| contents.delete_item(&self.collection, self.id))
             .map_err(SecretError::failed)?;
+        self.daemon.forget_choices(&[self.key()]).await;
         self.daemon
             .keyring
             .lock()
             .await
-            .record(&app, Action::Deleted, &label);
+            .record(&requester, Action::Deleted, &label);
         sync(&self.daemon).await;
         if let Ok(emitter) = zbus::object_server::SignalEmitter::new(
             &self.daemon.connection,
@@ -113,13 +115,12 @@ impl Item {
         session: ObjectPath<'_>,
         #[zbus(header)] header: Header<'_>,
     ) -> Result<(Secret,), SecretError> {
-        let (sender, _) = self.daemon.caller(&header).await;
         let transfer = self
             .daemon
             .sessions
-            .get(&session, &sender)
+            .get(&session, &sender(&header))
             .ok_or_else(|| SecretError::NoSession("No such session".into()))?;
-        let app = self.permit(&header).await?;
+        let requester = self.permit(&header).await?;
         let keyring = self.daemon.keyring.lock().await;
         let item = keyring
             .contents()
@@ -131,7 +132,7 @@ impl Item {
             item.secret.expose(),
             &item.content_type,
         );
-        keyring.record(&app, Action::Read, &item.label);
+        keyring.record(&requester, Action::Read, &item.label);
         Ok((secret,))
     }
 
@@ -140,16 +141,15 @@ impl Item {
         secret: Secret,
         #[zbus(header)] header: Header<'_>,
     ) -> Result<(), SecretError> {
-        let (sender, _) = self.daemon.caller(&header).await;
         let transfer = self
             .daemon
             .sessions
-            .get(&secret.0, &sender)
+            .get(&secret.0, &sender(&header))
             .ok_or_else(|| SecretError::NoSession("No such session".into()))?;
         let value = decode(&transfer, &secret)
             .ok_or_else(|| SecretError::failed("the secret couldn't be decrypted"))?;
-        let app = self.permit(&header).await?;
-        self.change(&app, |item| {
+        let requester = self.permit(&header).await?;
+        self.change(&requester, |item| {
             item.secret = luft_keyring_vault::Secret::copy_of(&value);
             item.content_type = secret.3.clone();
         })
@@ -159,8 +159,8 @@ impl Item {
     #[zbus(property)]
     async fn locked(&self, #[zbus(header)] header: Option<Header<'_>>) -> bool {
         let Some(header) = header else { return true };
-        let (_, app) = self.daemon.caller(&header).await;
-        !self.daemon.allowed(&app, &self.key()).await
+        let requester = self.daemon.requester(&header).await;
+        !self.daemon.allowed(&requester, &self.key()).await
     }
 
     #[zbus(property)]
@@ -177,11 +177,11 @@ impl Item {
         #[zbus(header)] header: Option<Header<'_>>,
     ) -> fdo::Result<()> {
         let header = header.ok_or_else(|| fdo::Error::AccessDenied("Unknown caller".into()))?;
-        let app = self
+        let requester = self
             .permit(&header)
             .await
             .map_err(|_| fdo::Error::AccessDenied("The item is locked".into()))?;
-        self.change(&app, |item| {
+        self.change(&requester, |item| {
             item.attributes = attributes.into_iter().collect()
         })
         .await
@@ -202,11 +202,11 @@ impl Item {
         #[zbus(header)] header: Option<Header<'_>>,
     ) -> fdo::Result<()> {
         let header = header.ok_or_else(|| fdo::Error::AccessDenied("Unknown caller".into()))?;
-        let app = self
+        let requester = self
             .permit(&header)
             .await
             .map_err(|_| fdo::Error::AccessDenied("The item is locked".into()))?;
-        self.change(&app, |item| item.label = label)
+        self.change(&requester, |item| item.label = label)
             .await
             .map_err(|_| fdo::Error::Failed("The item couldn't be changed".into()))
     }

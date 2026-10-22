@@ -9,7 +9,6 @@ use zbus::{Connection, interface};
 
 use super::PATH;
 use super::actions;
-use super::caller;
 use super::error::Error;
 use super::properties::{self, Dict};
 use super::shown::Shown;
@@ -403,9 +402,6 @@ impl Trust {
         #[zbus(connection)] connection: &Connection,
         #[zbus(header)] header: Header<'_>,
     ) -> Result<(), Error> {
-        if !caller::is_the_shell(connection, &header).await? {
-            return Err(Error::not_authorized());
-        }
         self.authorize(connection, &header, CONFIRM_STARTUP).await?;
         let _activity = self.idle.hold();
         tokio::task::spawn_blocking(attempts::mark_good)

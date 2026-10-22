@@ -71,7 +71,7 @@ fn warn(app: &InstalledApp, yes: bool) -> Result<(), Exit> {
 
 fn change(app: &InstalledApp, on: bool, yes: bool) -> Exit {
     let ink = Ink::stdout();
-    if flatpak::has_full_access(&app.id) == on {
+    if block_on(flatpak::has_full_access(&app.id)) == on {
         let state = if on {
             "has full access already"
         } else {

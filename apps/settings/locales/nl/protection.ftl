@@ -22,14 +22,10 @@ settings-privacy-lock-immediately = Meteen
 
 ## Privacy: location, camera and microphone
 
-settings-privacy-location = Locatie
 settings-privacy-location-services = Locatievoorzieningen
 settings-privacy-location-services-hint = Laat apps zien waar je bent, voor kaarten, weer en tijdzones
-settings-privacy-camera = Camera
 settings-privacy-camera-allow = Apps toegang geven tot de camera
 settings-privacy-microphone-allow = Apps toegang geven tot de microfoon
-settings-privacy-apps-asked = Apps die erom vroegen
-settings-privacy-apps-allowed = { $allowed } van { $total } toegestaan
 
 ## Privacy: file history
 
@@ -329,21 +325,14 @@ settings-passwords-pin-locked = Ontgrendel je sleutelbos om dit te wijzigen
 settings-passwords-pin-description = Zodat een vingerafdruk alleen ze niet kan ontgrendelen
 settings-passwords-lock-with-screen = Vergrendelen met het scherm
 settings-passwords-lock-with-screen-description = Ze worden samen met het scherm vergrendeld en ontgrendeld
-settings-passwords-apps = Apps met toegang
+settings-passwords-apps = Aanmeldgegevens en activiteit van apps
 settings-passwords-apps-locked = Ontgrendel je sleutelbos om ze te zien
-settings-passwords-apps-asked = { $count ->
-    [0] Nog geen apps hebben erom gevraagd
-    [one] { $count } app heeft erom gevraagd
-   *[other] { $count } apps hebben erom gevraagd
-}
+settings-passwords-apps-description = Wat apps hier bewaren en wanneer ze het gebruikten
+settings-passwords-apps-allowed = Welke apps je wachtwoorden mogen gebruiken
+settings-passwords-apps-allowed-hint = In te stellen bij Apps
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-description = Als je er een verwijdert, vraagt de app de volgende keer opnieuw.
-settings-passwords-access-not-allowed = Niet toegestaan
-settings-passwords-access-none = Nog geen apps hebben om je wachtwoorden gevraagd
-settings-passwords-access-revoke = { $app } niet meer { $item } laten gebruiken
-settings-passwords-access-reset = { $app } opnieuw om { $item } laten vragen
 settings-passwords-stores = Aanmeldgegevens van apps
 settings-passwords-stores-description = Aanmeldgegevens die sommige apps hier bewaren, waar alleen die app ze kan lezen.
 settings-passwords-stores-count = { $count ->
@@ -452,3 +441,24 @@ settings-apps-startup-add-description = Kies een app die elke keer opent als je 
 settings-apps-search = Apps zoeken
 settings-apps-no-match = Geen apps gevonden
 settings-apps-cancel = Annuleren
+
+## Apps: permissions
+
+settings-apps-permissions = Machtigingen
+settings-apps-location = Locatie
+settings-apps-camera = Camera
+settings-apps-clipboard = Klembord op de achtergrond
+settings-apps-clipboard-hint = Deze apps kunnen zien en wijzigen wat je kopieert, ook terwijl je andere apps gebruikt.
+settings-apps-full-access = Volledige toegang
+settings-apps-full-access-hint = Deze apps draaien buiten hun sandbox en handelen namens jou, net als apps die op het systeem zijn geïnstalleerd. Verwijderen geldt vanaf de volgende keer dat de app opent.
+settings-apps-full-access-remove = Verwijderen
+settings-apps-full-access-remove-app = Volledige toegang van { $app } verwijderen
+settings-apps-passwords = Opgeslagen wachtwoorden
+settings-apps-passwords-hint = Apps onthouden je antwoord als ze vragen iets uit je sleutelbos te gebruiken. Vergeet het om de app opnieuw te laten vragen.
+settings-apps-passwords-forget = Vergeten
+settings-apps-passwords-forget-app = { $app } opnieuw laten vragen
+settings-apps-permissions-allowed = { $allowed } van { $total } toegestaan
+settings-apps-permissions-count = { $count ->
+    [one] { $count } app
+   *[other] { $count } apps
+}

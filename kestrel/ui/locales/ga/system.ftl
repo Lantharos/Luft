@@ -113,15 +113,15 @@ privacy-mute-microphone = Balbhaigh an micreafón
 privacy-unmute-microphone = Díbhalbhaigh an micreafón
 privacy-close-app = Dún { $app }
 privacy-unknown-app = Aip
-privacy-windows-using = Ag úsáid d’fhuinneoga
-privacy-windows-seeing = Ag féachaint ar d’fhuinneoga
+privacy-windows-seeing-programs = Cláir atá in ann d’fhuinneoga a fheiceáil: { $count }
+privacy-windows-using-programs = Cláir atá in ann d’fhuinneoga a fheiceáil agus a úsáid: { $count }
 privacy-windows-stop = Stop an rochtain
 
 ## Window access prompt
 
-peek-see-title = Tá { $app } ag iarraidh d’fhuinneoga a fheiceáil
+peek-see-request = Ceadaigh do chlár a thosaigh tú d’fhuinneoga a fheiceáil?
 peek-see-description = Beidh sé in ann pictiúr a ghlacadh d’aon fhuinneog atá oscailte agat.
-peek-use-title = Tá { $app } ag iarraidh d’fhuinneoga a fheiceáil agus a úsáid
+peek-use-request = Ceadaigh do chlár a thosaigh tú d’fhuinneoga a fheiceáil agus a úsáid?
 peek-use-description = Beidh sé in ann aon fhuinneog atá oscailte agat a fheiceáil, agus cliceáil agus clóscríobh inti amhail is gur tusa a bhí ann.
 peek-deny = Ná ceadaigh
 peek-allow-once = Ceadaigh uair amháin
@@ -129,7 +129,7 @@ peek-allow-until-quit = Ceadaigh go dtí go scoirfidh sé
 
 ## Window access errors
 
-peek-error-declined = Dhiúltaigh an duine atá ag úsáid an ríomhaire seo dó seo. Féadfaidh { $app } iarraidh arís tar éis dó scor.
+peek-error-declined-until-quit = Dhiúltaigh an duine atá ag úsáid an ríomhaire seo dó seo. Féadfaidh an clár iarraidh arís tar éis dó scor.
 peek-error-not-allowed = Níor cheadaigh an duine atá ag úsáid an ríomhaire seo é
 peek-error-sandboxed = Ní féidir le haipeanna i mbosca gainimh fuinneoga eile a fheiceáil ná a úsáid
 peek-error-unknown-caller = Chríochnaigh an clár a d’iarr é, nó níorbh fhéidir é a aithint

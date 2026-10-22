@@ -148,23 +148,62 @@ It protects you when:
 
 - someone has your disk, a copy of it, or the powered-off computer
 - the boot chain is changed in a way Secure Boot sees
-- another account on the computer, or an app you didn't allow, wants your secrets
+- another account on the computer, or a sandboxed app you didn't allow, wants your secrets
 
 It doesn't protect you when:
 
 - someone can sign in as you, or uses the computer while it's unlocked
-- malware already runs as you (unsandboxed apps can impersonate each other; per-app access guards against mistakes, not malware)
+- malware already runs as you (apps outside a sandbox are you; see [Who an app is](#who-an-app-is))
 - root is compromised on a correctly started computer
 - a trusted but vulnerable signed component is abused
 - memory is read physically while unlocked
 
-## Flatpak apps with full access
+## Who an app is
 
-Kestrel and Luft's services hold Flatpak apps to their sandbox: no background clipboard, no windows kept above others or out of the taskbar, no screen recording or display changes without the portal, and none of the shell's private services. Apps listed in `/etc/kestrel/trusted-apps` are treated like apps installed on the system instead, and Schelf also opens their sandbox for the account with a Flatpak override. The list belongs to root and changes only through the updater, after an administrator's password, so an app can't give itself full access, even one allowed to write to your home folder or settings. An app is recognised by the app ID Flatpak gives it, which an app inside a sandbox can't change. 1Password, KeePassXC and Bitwarden may use the clipboard in the background without full access.
+Luft only tells apps apart where something an app can't fake vouches for them.
+
+- **Apps in a sandbox are isolated.** Flatpak gives each app's sandbox its app ID, which no app inside a sandbox can change or borrow from another. Kestrel and Luft's services hold sandboxed apps to their sandbox: no background clipboard, no windows kept above others or out of the taskbar, no screen recording or display changes without the portal, none of the shell's private services, and only their own secrets in the keyring.
+- **Apps outside a sandbox are you.** Every program you run outside a sandbox has your rights: it can read your files, change another program's settings, start it with a library slipped in, or name itself after any app. So Luft treats all of them as one caller, you, and never trusts a name, path, systemd scope or launcher entry to tell them apart. Secrets you saved are open to them without prompts, the same as your files are, and so are the secrets of sandboxed apps. Programs from system packages and from your Toolbox containers are you too.
+- **Sandboxed apps with full access are you too.** Schelf opens a Flatpak's sandbox with a Flatpak override, and Kestrel and Luft's services treat it like an app installed on the system.
+
+Every service judges its callers the same way, from the kernel's view of the D-Bus connection or socket and a pidfd that pins the process while it's looked at. A sandbox marks every process it starts with a `.flatpak-info` file at the root of the process's view of the files, which the process can't remove or change; the app ID in it is the app. A process without one is you. A process that keeps others out of its memory hides its root, so it is you when its mount table, which anyone may read, has nothing mounted at `/.flatpak-info`, and counts as an unknown sandbox otherwise, as does a process that quits while it's looked at. Sandboxed apps reach the session bus only through a filtering proxy that runs in a sandbox of its own with the same marker, so services see the app behind every message, and Wayland only through a socket the compositor tags with the app's ID.
+
+The Rust services share these rules through the `luft-identity` crate, Kestrel's compositor applies them to Wayland clients and answers the shell's D-Bus services with `meta_context_identify_sender()`, and the session manager reads the same marker.
+
+A program running as you can make a sandbox of its own that names any app, so it can pass as a sandboxed app, but never the other way round: a sandboxed app can't make itself look like you.
+
+## Confirming it's you
+
+Some things are sensitive no matter which of your programs asks, because they would show your secrets, cross into a Flatpak app's, or weaken a protection. For those, Luft asks the person at the screen instead of trusting the caller: Kestrel shows a prompt, and your fingerprint or password is checked by `kestrel-authenticate` against the computer's sign-in rules, the same as for passkeys.
+
+- Managing Luft Keyring in Settings: the access history, apps' own secrets, removing SSH keys or their confirmation, changing the PIN or locking with the screen. Once confirmed, Settings can keep managing for five minutes.
+- A sandboxed app reading an item another sandboxed app saved. An app reading your items is asked about once, and can be told to remember the answer.
+
+Things that aren't sensitive never ask: using what you saved, adding keys, locking the keyring, or making something stricter.
+
+These prompts can't stop malware that already runs as you, which could act on the screen as you do. They stop a program from doing these things quietly, and stop someone at your unlocked computer from opening your passwords.
+
+Two services act on what you ask without a prompt, because there would be nothing to gain from one:
+
+- trustd remembers that a version of Luft started once the login screen or the desktop has been shown for a moment. polkit accepts this from anyone in the session at the screen. The most a program could do with it is keep a broken update from being rolled back automatically, and the previous version stays in the startup menu.
+- `kestrel-watchdog` restarts the computer only when the kernel shows the GPU failed or Kestrel's threads stuck in the graphics driver. It accepts reports from you, about your own Kestrel, while your session is on screen; anyone at the screen can restart the computer anyway.
+
+## App permissions
+
+What apps were allowed is kept in one place, the desktop portal's permission store, one table per kind of permission. Flatpak keeps the store out of every sandbox, even for apps allowed into your home folder, so an app can't give itself anything; you can, as can any program you run.
+
+| Table | Holds |
+| --- | --- |
+| `full-access` | Flatpak apps that count as you |
+| `background-clipboard` | Flatpak apps that may read and set the clipboard while in the background. 1Password, KeePassXC and Bitwarden may unless you turned it off |
+| `keyring-items` | Which saved items a Flatpak app may use, one entry per item |
+| `location`, `devices`, `background`, `notifications` and the portal's others | What apps asked for through the desktop portal |
+
+Kestrel reads the store and tells the compositor which apps have full access and the background clipboard; a change applies to new connections, so the next time the app starts. Settings shows every table under Apps, where any permission can be taken away.
 
 ## Passkeys
 
-[Luft Passkeys](../kestrel/passkeys/README.md) makes each private key inside the TPM when there is one, so it never leaves the chip; otherwise the keyring holds it and makes the signature itself. Passkeys never leave the computer and are never marked as backed up. Only `luft-passkeys` may use the Passkeys collection.
+[Luft Passkeys](../kestrel/passkeys/README.md) makes each private key inside the TPM when there is one, so it never leaves the chip; otherwise the keyring holds it and makes the signature itself. Passkeys never leave the computer and are never marked as backed up. The keyring's Passkeys collection and Kestrel's passkey prompt only answer the program that holds Luft Passkeys' bus name, `com.lantharos.Passkeys`. That keeps Flatpak apps out; a program running as you could take the name while Luft Passkeys isn't running, like it could anything else of yours.
 
 ## USB protection while locked
 

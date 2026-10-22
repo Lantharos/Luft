@@ -3,11 +3,12 @@ import GLib from 'gi://GLib';
 import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 
 import {checks} from '../lib/check.js';
-import {withFullAccess} from '../lib/access/fullAccess.js';
-import {call, ownName, subscribe} from '../lib/dbus.js';
+import {withFullAccess} from '../lib/access/permissions.js';
+import {call, ownName, privateConnection, subscribe} from '../lib/dbus.js';
+import {outcome} from '../lib/processes.js';
 import {pause} from '../lib/wait.js';
 import {lock, unlock} from '../lockScreen/lib/shield.js';
-import {SANDBOXED_APP, sandboxedApp} from '../lib/access/sandbox.js';
+import {SANDBOXED_APP, inAppScope, onSessionBus, sandboxedApp} from '../lib/access/sandbox.js';
 
 const {require, eventually} = checks('sandbox');
 const MANAGER = ['/org/gnome/SessionManager', 'org.gnome.SessionManager'];
@@ -17,6 +18,13 @@ const ACCESS_DENIED = 'org.freedesktop.DBus.Error.AccessDenied';
 const NOT_IN_INITIALIZATION = 'org.gnome.SessionManager.NotInInitialization';
 const NO_CONFIRMATION = 1;
 const SCREENCAST_SERVICE = 'com.lantharos.Kestrel.Screencast';
+const PASSKEYS = ['/com/lantharos/Kestrel/Passkeys', 'com.lantharos.Kestrel.Passkeys1'];
+const PASSKEYS_AGENT = 'com.lantharos.Passkeys';
+const SETTINGS_APP = 'com.lantharos.settings';
+const PRELOADED = 'libm.so.6';
+
+const gdbus = (dest, [path, iface], method, ...args) =>
+  ['gdbus', 'call', '--session', '--dest', dest, '--object-path', path, '--method', `${iface}.${method}`, ...args];
 
 async function failure(reply) {
   try {
@@ -173,8 +181,30 @@ async function refusedAsSandboxed(reply) {
   }
 }
 
+async function checkHostImpostors() {
+  const setenv = gdbus('org.gnome.SessionManager', MANAGER, 'Setenv', 'LD_PRELOAD', '/tmp/payload.so');
+  const dim = gdbus('org.gnome.Shell', ['/com/lantharos/Kestrel/Brightness', 'com.lantharos.Kestrel.Brightness'], 'SetDimming', 'false');
+  const scoped = await outcome(inAppScope(SETTINGS_APP, [...onSessionBus(SANDBOXED_APP), ...setenv]));
+  require(scoped.stderr.includes(ACCESS_DENIED), 'a sandboxed app in a scope named after Settings still cannot change the session environment');
+  const dimming = await outcome(inAppScope(SETTINGS_APP, [...onSessionBus(SANDBOXED_APP), ...dim]));
+  require(dimming.stderr.includes('Sandboxed apps'), 'a sandboxed app in a scope named after Settings is still refused by Kestrel\'s services');
+
+  const preloaded = await outcome(inAppScope(PASSKEYS_AGENT, gdbus('com.lantharos.Kestrel.Passkeys', PASSKEYS, 'Open', '{}')), {env: {LD_PRELOAD: PRELOADED}});
+  require(preloaded.stderr.includes('Only Luft Passkeys'), 'a scope named after Luft Passkeys and a preloaded library do not pass as Luft Passkeys');
+  const agent = privateConnection();
+  try {
+    require(await ownName(agent, PASSKEYS_AGENT), 'a program outside a sandbox can take Luft Passkeys\' name while it is free');
+    const asked = await failure(call('com.lantharos.Kestrel.Passkeys', ...PASSKEYS, 'Open', new GLib.Variant('(a{sv})', [{}]), null, {connection: agent}));
+    require(asked === 'org.freedesktop.DBus.Error.InvalidArgs', 'the owner of Luft Passkeys\' name may ask about passkeys');
+  } finally {
+    agent.close_sync(null);
+  }
+}
+
 async function checkFullAccess() {
   const app = await sandboxedApp('org.gnome.Shell');
+  const manager = await sandboxedApp('org.gnome.SessionManager');
+  const setenv = () => failure(manager.call(...MANAGER, 'Setenv', new GLib.Variant('(ss)', ['KESTREL_LATE', '1'])));
   const dim = () => refusedAsSandboxed(app.call('/com/lantharos/Kestrel/Brightness', 'com.lantharos.Kestrel.Brightness', 'SetDimming', new GLib.Variant('(b)', [false])));
   const arrange = () => refusedAsSandboxed(app.call('/org/gnome/Mutter/DisplayConfig', 'org.gnome.Mutter.DisplayConfig', 'ApplyMonitorsConfig',
     new GLib.Variant('(uua(iiduba(ssa{sv}))a{sv})', [0, 0, [], {}])));
@@ -182,10 +212,12 @@ async function checkFullAccess() {
     await withFullAccess(SANDBOXED_APP, async () => {
       require(!await dim(), 'apps with full access use Kestrel\'s services like apps outside a sandbox');
       require(!await arrange(), 'apps with full access reach display settings like apps outside a sandbox');
+      require(await setenv() === NOT_IN_INITIALIZATION, 'the session manager treats apps with full access like apps outside a sandbox');
     });
     require(await dim() && await arrange(), 'taking full access away refuses the app again');
+    require(await setenv() === ACCESS_DENIED, 'the session manager refuses the app again once full access is gone');
   } finally {
-    await app.close();
+    await Promise.all([app.close(), manager.close()]);
   }
 }
 
@@ -196,5 +228,6 @@ export async function run() {
   await checkTray();
   await checkMutter();
   await checkFullAccess();
+  await checkHostImpostors();
   await checkScreencastImpostor();
 }

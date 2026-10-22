@@ -113,15 +113,21 @@ privacy-mute-microphone = Mikrofon stummschalten
 privacy-unmute-microphone = Stummschaltung aufheben
 privacy-close-app = { $app } schließen
 privacy-unknown-app = Eine App
-privacy-windows-using = Verwendet deine Fenster
-privacy-windows-seeing = Sieht deine Fenster
+privacy-windows-seeing-programs = { $count ->
+    [one] { $count } Programm kann deine Fenster sehen
+   *[other] { $count } Programme können deine Fenster sehen
+}
+privacy-windows-using-programs = { $count ->
+    [one] { $count } Programm kann deine Fenster sehen und bedienen
+   *[other] { $count } Programme können deine Fenster sehen und bedienen
+}
 privacy-windows-stop = Zugriff beenden
 
 ## Window access prompt
 
-peek-see-title = { $app } möchte deine Fenster sehen
+peek-see-request = Einem Programm, das du gestartet hast, erlauben, deine Fenster zu sehen?
 peek-see-description = Das Programm kann dann Bilder von jedem geöffneten Fenster aufnehmen.
-peek-use-title = { $app } möchte deine Fenster sehen und bedienen
+peek-use-request = Einem Programm, das du gestartet hast, erlauben, deine Fenster zu sehen und zu bedienen?
 peek-use-description = Das Programm kann dann jedes geöffnete Fenster sehen und darin klicken und tippen, als wärst du es.
 peek-deny = Nicht zulassen
 peek-allow-once = Einmal zulassen
@@ -129,7 +135,7 @@ peek-allow-until-quit = Bis zum Beenden zulassen
 
 ## Window access errors
 
-peek-error-declined = Die Person an diesem Computer hat das abgelehnt. { $app } kann erneut fragen, nachdem es beendet wurde.
+peek-error-declined-until-quit = Die Person an diesem Computer hat das abgelehnt. Das Programm kann erneut fragen, nachdem es beendet wurde.
 peek-error-not-allowed = Die Person an diesem Computer hat das nicht zugelassen
 peek-error-sandboxed = Apps in einer Sandbox können andere Fenster weder sehen noch bedienen
 peek-error-unknown-caller = Das anfragende Programm wurde beendet oder konnte nicht erkannt werden

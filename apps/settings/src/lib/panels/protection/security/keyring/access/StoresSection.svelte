@@ -8,8 +8,9 @@
 	let forgetting = $state<AppStore | null>(null);
 
 	async function forget(store: AppStore) {
-		await forgetApp(store.key);
+		const forgotten = await forgetApp(store.key);
 		await refresh();
+		return forgotten;
 	}
 </script>
 

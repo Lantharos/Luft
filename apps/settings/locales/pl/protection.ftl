@@ -22,14 +22,10 @@ settings-privacy-lock-immediately = Natychmiast
 
 ## Privacy: location, camera and microphone
 
-settings-privacy-location = Lokalizacja
 settings-privacy-location-services = Usługi lokalizacji
 settings-privacy-location-services-hint = Pozwala aplikacjom ustalić, gdzie jesteś, na potrzeby map, pogody i stref czasowych
-settings-privacy-camera = Kamera
 settings-privacy-camera-allow = Zezwalaj aplikacjom na używanie kamery
 settings-privacy-microphone-allow = Zezwalaj aplikacjom na używanie mikrofonu
-settings-privacy-apps-asked = Aplikacje, które poprosiły o dostęp
-settings-privacy-apps-allowed = Dozwolone: { $allowed } z { $total }
 
 ## Privacy: file history
 
@@ -351,23 +347,14 @@ settings-passwords-pin-locked = Odblokuj pęk kluczy, aby to zmienić
 settings-passwords-pin-description = Aby sam odcisk palca nie wystarczył do ich odblokowania
 settings-passwords-lock-with-screen = Blokuj razem z ekranem
 settings-passwords-lock-with-screen-description = Blokują się i odblokowują razem z ekranem
-settings-passwords-apps = Aplikacje z dostępem
+settings-passwords-apps = Dane logowania i aktywność aplikacji
 settings-passwords-apps-locked = Odblokuj pęk kluczy, aby je zobaczyć
-settings-passwords-apps-asked = { $count ->
-    [0] Żadna aplikacja jeszcze o nie nie prosiła
-    [one] { $count } aplikacja poprosiła o dostęp
-    [few] { $count } aplikacje poprosiły o dostęp
-    [many] { $count } aplikacji poprosiło o dostęp
-   *[other] { $count } aplikacji poprosiło o dostęp
-}
+settings-passwords-apps-description = Co aplikacje tu przechowują i kiedy z tego korzystały
+settings-passwords-apps-allowed = Które aplikacje mogą używać twoich haseł
+settings-passwords-apps-allowed-hint = Ustawiane na stronie Aplikacje
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-description = Po usunięciu aplikacja zapyta ponownie następnym razem.
-settings-passwords-access-not-allowed = Niedozwolone
-settings-passwords-access-none = Żadna aplikacja nie prosiła jeszcze o twoje hasła
-settings-passwords-access-revoke = Zabroń aplikacji { $app } używania { $item }
-settings-passwords-access-reset = Pozwól aplikacji { $app } ponownie zapytać o { $item }
 settings-passwords-stores = Dane logowania aplikacji
 settings-passwords-stores-description = Dane logowania, które niektóre aplikacje tu przechowują i które może odczytać tylko ta aplikacja.
 settings-passwords-stores-count = { $count ->
@@ -480,3 +467,26 @@ settings-apps-startup-add-description = Wybierz aplikację, która będzie się 
 settings-apps-search = Szukaj aplikacji
 settings-apps-no-match = Brak aplikacji pasujących do wyszukiwania
 settings-apps-cancel = Anuluj
+
+## Apps: permissions
+
+settings-apps-permissions = Uprawnienia
+settings-apps-location = Lokalizacja
+settings-apps-camera = Kamera
+settings-apps-clipboard = Schowek w tle
+settings-apps-clipboard-hint = Te aplikacje mogą widzieć i zmieniać to, co kopiujesz, nawet gdy używasz innych aplikacji.
+settings-apps-full-access = Pełny dostęp
+settings-apps-full-access-hint = Te aplikacje działają poza swoją piaskownicą i są traktowane jak ty, podobnie jak aplikacje zainstalowane w systemie. Usunięcie zacznie działać przy następnym otwarciu aplikacji.
+settings-apps-full-access-remove = Usuń
+settings-apps-full-access-remove-app = Usuń pełny dostęp aplikacji { $app }
+settings-apps-passwords = Zapisane hasła
+settings-apps-passwords-hint = Aplikacje zapamiętują twoją odpowiedź, gdy proszą o użycie czegoś z pęku kluczy. Zapomnij ją, aby aplikacja zapytała ponownie.
+settings-apps-passwords-forget = Zapomnij
+settings-apps-passwords-forget-app = Pozwól aplikacji { $app } zapytać ponownie
+settings-apps-permissions-allowed = Dozwolone: { $allowed } z { $total }
+settings-apps-permissions-count = { $count ->
+    [one] { $count } aplikacja
+    [few] { $count } aplikacje
+    [many] { $count } aplikacji
+   *[other] { $count } aplikacji
+}

@@ -1,5 +1,6 @@
 mod ask;
 mod authenticate;
+mod confirm;
 pub mod link;
 mod prints;
 
@@ -16,7 +17,7 @@ pub use ask::Why;
 pub use authenticate::{Mode, Outcome, authenticate, available as can_authenticate};
 
 use crate::daemon::Daemon;
-use crate::identity::App;
+use crate::requester::Requester;
 
 const SIGN_IN_GRACE: Duration = Duration::from_secs(6);
 const REATTACH_DELAY: Duration = Duration::from_secs(3);
@@ -106,7 +107,7 @@ impl Daemon {
         });
     }
 
-    pub async fn ensure_unlocked(self: &Arc<Self>, app: &App, insist: bool) -> bool {
+    pub async fn ensure_unlocked(self: &Arc<Self>, requester: &Requester, insist: bool) -> bool {
         if !self.keyring.lock().await.is_locked() {
             return true;
         }
@@ -123,7 +124,9 @@ impl Daemon {
         if recently_dismissed && !insist {
             return false;
         }
-        let opened = self.ask_for_password(Why::App(app.name.clone())).await;
+        let opened = self
+            .ask_for_password(Why::App(requester.named_first()))
+            .await;
         if !opened && !self.screen_is_locked() {
             *self.dismissed.lock().expect("dismissal time") = Some(std::time::Instant::now());
         }
@@ -180,7 +183,6 @@ impl Daemon {
     }
 
     pub async fn unlocked_now(self: &Arc<Self>, password: Option<Secret>) {
-        self.keyring.lock().await.release_misclaimed();
         self.signing_in.send_replace(false);
         self.unlocked.send_replace(true);
         self.changed.notify_one();

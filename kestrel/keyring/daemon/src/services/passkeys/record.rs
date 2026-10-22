@@ -43,19 +43,17 @@ impl Passkey {
             .flatten()
     }
 
-    pub fn item(&self, owner: &str) -> Item {
+    pub fn item(&self) -> Item {
         let attributes = BTreeMap::from([
             ("xdg:schema".to_owned(), SCHEMA.to_owned()),
             ("rp".to_owned(), self.rp.clone()),
         ]);
-        let mut item = Item::new(
+        Item::new(
             format!("Passkey for {}", self.rp),
             attributes,
             self.secret(),
             CONTENT_TYPE.to_owned(),
-        );
-        item.owner = Some(owner.to_owned());
-        item
+        )
     }
 
     pub fn secret(&self) -> Secret {

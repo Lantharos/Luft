@@ -7,6 +7,7 @@ use zbus::object_server::SignalEmitter;
 use zbus::{ObjectPath, OwnedObjectPath};
 use zbus::{fdo, interface};
 
+use super::service::sender;
 use super::session::decode;
 use super::{Properties, Secret, SecretError, Target, item_path, none, sync};
 use crate::daemon::Daemon;
@@ -45,9 +46,9 @@ impl Collection {
         &self,
         #[zbus(header)] header: Header<'_>,
     ) -> Result<OwnedObjectPath, SecretError> {
-        let (_, app) = self.daemon.caller(&header).await;
+        let requester = self.daemon.requester(&header).await;
         let id = self.id().await.ok_or_else(SecretError::missing)?;
-        if !self.daemon.ensure_unlocked(&app, true).await {
+        if !self.daemon.ensure_unlocked(&requester, true).await {
             return Err(SecretError::locked());
         }
         let label = self
@@ -56,11 +57,11 @@ impl Collection {
             .unwrap_or_default();
         let title = format!(
             "Allow {} to delete “{label}” and everything in it?",
-            app.name
+            requester.named()
         );
         let request = Request {
             title: &title,
-            app: &app.icon,
+            app: requester.icon(),
             action: "Delete",
             ..Request::default()
         };
@@ -80,11 +81,12 @@ impl Collection {
             .await
             .edit(|contents| contents.delete_collection(&id))
             .map_err(SecretError::failed)?;
+        self.daemon.forget_collection_choices(&id).await;
         self.daemon
             .keyring
             .lock()
             .await
-            .record(&app, Action::Deleted, &label);
+            .record(&requester, Action::Deleted, &label);
         sync(&self.daemon).await;
         let emitter = super::service::root_emitter(&self.daemon);
         super::Service::collection_deleted(&emitter, super::collection_path(&id).as_ref()).await?;
@@ -96,28 +98,21 @@ impl Collection {
         attributes: HashMap<String, String>,
         #[zbus(header)] header: Header<'_>,
     ) -> Vec<OwnedObjectPath> {
-        let (_, app) = self.daemon.caller(&header).await;
+        let view = self.daemon.requester(&header).await.view;
         let query: BTreeMap<String, String> = attributes.into_iter().collect();
         let Some(id) = self.id().await else {
             return Vec::new();
         };
-        let found = self
-            .read(|collection| {
-                collection
-                    .items
-                    .iter()
-                    .filter(|item| item.matches(&query))
-                    .map(|item| (id.clone(), item.id))
-                    .collect()
-            })
-            .await
-            .unwrap_or_default();
-        self.daemon
-            .visible(&app, found)
-            .await
-            .iter()
-            .map(|(collection, item)| item_path(collection, *item))
-            .collect()
+        self.read(|collection| {
+            collection
+                .items
+                .iter()
+                .filter(|item| item.matches(&query) && view.shows(item))
+                .map(|item| item_path(&id, item.id))
+                .collect()
+        })
+        .await
+        .unwrap_or_default()
     }
 
     async fn create_item(
@@ -128,16 +123,16 @@ impl Collection {
         #[zbus(header)] header: Header<'_>,
         #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
     ) -> Result<(OwnedObjectPath, OwnedObjectPath), SecretError> {
-        let (sender, app) = self.daemon.caller(&header).await;
+        let requester = self.daemon.requester(&header).await;
         let id = self.id().await.ok_or_else(SecretError::missing)?;
         let transfer = self
             .daemon
             .sessions
-            .get(&secret.0, &sender)
+            .get(&secret.0, &sender(&header))
             .ok_or_else(|| SecretError::NoSession("No such session".into()))?;
         let value = decode(&transfer, &secret)
             .ok_or_else(|| SecretError::failed("the secret couldn't be decrypted"))?;
-        if !self.daemon.ensure_unlocked(&app, true).await {
+        if !self.daemon.ensure_unlocked(&requester, true).await {
             return Err(SecretError::locked());
         }
         let label = properties
@@ -157,16 +152,21 @@ impl Collection {
                     .collection(&id)?
                     .items
                     .iter()
-                    .find(|item| item.attributes == attributes)
+                    .find(|item| item.attributes == attributes && requester.view.shows(item))
                     .map(|item| item.id)
             })
         } else {
             None
         };
+        if existing.is_none() && !self.daemon.may_save(&requester, &label).await {
+            return Err(SecretError::IsLocked(
+                "Saving this item was declined".into(),
+            ));
+        }
         if let Some(existing) = existing
             && self
                 .daemon
-                .authorize(&app, &[(id.clone(), existing)], true)
+                .authorize(&requester, &[(id.clone(), existing)], true)
                 .await
                 .is_empty()
         {
@@ -180,20 +180,20 @@ impl Collection {
             Stored::copy_of(&value),
             secret.3.clone(),
         );
-        item.owner = Some(app.key.clone());
+        item.owner = requester.owner();
         let stored = self
             .daemon
             .keyring
             .lock()
             .await
-            .edit(|contents| contents.store_item(&id, item, replace))
+            .edit(|contents| contents.store_item(&id, item, existing))
             .map_err(SecretError::failed)?;
         let (item_id, created) = stored.ok_or_else(SecretError::missing)?;
         self.daemon
             .keyring
             .lock()
             .await
-            .record(&app, Action::Saved, &label);
+            .record(&requester, Action::Saved, &label);
         sync(&self.daemon).await;
         let path = item_path(&id, item_id);
         if created {

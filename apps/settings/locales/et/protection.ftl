@@ -22,14 +22,10 @@ settings-privacy-lock-immediately = Kohe
 
 ## Privacy: location, camera and microphone
 
-settings-privacy-location = Asukoht
 settings-privacy-location-services = Asukohateenused
 settings-privacy-location-services-hint = Rakendused saavad teie asukoha teada kaartide, ilma ja ajavööndite jaoks
-settings-privacy-camera = Kaamera
 settings-privacy-camera-allow = Luba rakendustel kaamerat kasutada
 settings-privacy-microphone-allow = Luba rakendustel mikrofoni kasutada
-settings-privacy-apps-asked = Luba küsinud rakendused
-settings-privacy-apps-allowed = Lubatud { $allowed }/{ $total }
 
 ## Privacy: file history
 
@@ -329,21 +325,14 @@ settings-passwords-pin-locked = Selle muutmiseks avage võtmerõngas
 settings-passwords-pin-description = Et ainult sõrmejäljega neid avada ei saaks
 settings-passwords-lock-with-screen = Lukusta koos ekraaniga
 settings-passwords-lock-with-screen-description = Need lukustuvad ja avanevad koos ekraaniga
-settings-passwords-apps = Juurdepääsuga rakendused
+settings-passwords-apps = Rakenduste sisselogimisandmed ja tegevus
 settings-passwords-apps-locked = Nende nägemiseks avage võtmerõngas
-settings-passwords-apps-asked = { $count ->
-    [0] Ükski rakendus pole neid veel küsinud
-    [one] { $count } rakendus on neid küsinud
-   *[other] { $count } rakendust on neid küsinud
-}
+settings-passwords-apps-description = Mida rakendused siin hoiavad ja millal nad seda kasutasid
+settings-passwords-apps-allowed = Millised rakendused saavad teie paroole kasutada
+settings-passwords-apps-allowed-hint = Määratakse lehel Rakendused
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-description = Eemaldamise järel küsib rakendus järgmisel korral uuesti.
-settings-passwords-access-not-allowed = Pole lubatud
-settings-passwords-access-none = Ükski rakendus pole veel teie paroole küsinud
-settings-passwords-access-revoke = Keela rakendusel { $app } kasutada kirjet { $item }
-settings-passwords-access-reset = Luba rakendusel { $app } kirjet { $item } uuesti küsida
 settings-passwords-stores = Rakenduste sisselogimisandmed
 settings-passwords-stores-description = Sisselogimisandmed, mida mõni rakendus siin hoiab ja mida saab lugeda ainult see rakendus.
 settings-passwords-stores-count = { $count ->
@@ -452,3 +441,24 @@ settings-apps-startup-add-description = Valige rakendus, mis avatakse igal sisse
 settings-apps-search = Otsi rakendusi
 settings-apps-no-match = Otsingule ei vasta ükski rakendus
 settings-apps-cancel = Loobu
+
+## Apps: permissions
+
+settings-apps-permissions = Õigused
+settings-apps-location = Asukoht
+settings-apps-camera = Kaamera
+settings-apps-clipboard = Lõikelaud taustal
+settings-apps-clipboard-hint = Need rakendused näevad ja saavad muuta seda, mida kopeerite, ka siis, kui kasutate teisi rakendusi.
+settings-apps-full-access = Täielik juurdepääs
+settings-apps-full-access-hint = Need rakendused töötavad väljaspool oma liivakasti ja loetakse teieks, nagu süsteemi paigaldatud rakendused. Eemaldamine jõustub rakenduse järgmisel avamisel.
+settings-apps-full-access-remove = Eemalda
+settings-apps-full-access-remove-app = Eemalda rakenduselt { $app } täielik juurdepääs
+settings-apps-passwords = Salvestatud paroolid
+settings-apps-passwords-hint = Rakendused jätavad teie vastuse meelde, kui küsivad luba kasutada midagi võtmerõngasse salvestatut. Unustage see, et rakendus uuesti küsiks.
+settings-apps-passwords-forget = Unusta
+settings-apps-passwords-forget-app = Lase rakendusel { $app } uuesti küsida
+settings-apps-permissions-allowed = Lubatud { $allowed }/{ $total }
+settings-apps-permissions-count = { $count ->
+    [one] { $count } rakendus
+   *[other] { $count } rakendust
+}

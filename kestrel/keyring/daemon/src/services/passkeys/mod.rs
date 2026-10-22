@@ -2,7 +2,6 @@ mod key;
 mod record;
 
 use std::collections::HashMap;
-use std::path::PathBuf;
 use std::sync::Arc;
 
 use luft_keyring_vault::now;
@@ -12,13 +11,13 @@ use zbus::{DBusError, interface};
 use zbus::{OwnedVariant, Variant};
 
 use crate::daemon::Daemon;
-use crate::identity::App;
+use crate::requester::Requester;
 use crate::unlocking::link;
 use record::{Passkey, collection, find};
 
 pub use record::SCHEMA;
 
-const AGENT: &str = "luft-passkeys";
+const AGENT: &str = "com.lantharos.Passkeys";
 
 #[derive(Debug, DBusError)]
 #[zbus(prefix = "com.lantharos.Keyring1.Error")]
@@ -61,28 +60,22 @@ fn bytes(fields: &HashMap<String, OwnedVariant>, name: &str) -> Vec<u8> {
         .unwrap_or_default()
 }
 
-fn agent_path() -> Option<PathBuf> {
-    Some(std::env::current_exe().ok()?.parent()?.join(AGENT))
-}
-
 pub struct Passkeys {
     pub daemon: Arc<Daemon>,
 }
 
 impl Passkeys {
-    async fn caller(&self, header: &Header<'_>) -> Result<App, PasskeyError> {
-        let (_, app) = self.daemon.caller(header).await;
-        if !app.installed
-            || !agent_path().is_some_and(|path| path.as_os_str() == app.executable.as_str())
-        {
+    async fn caller(&self, header: &Header<'_>) -> Result<Requester, PasskeyError> {
+        let requester = self.daemon.requester(header).await;
+        if !requester.is_you() || !self.daemon.sent_by(header, AGENT).await {
             return Err(PasskeyError::NotAllowed(
                 "Only Luft Passkeys can use passkeys".into(),
             ));
         }
-        if !self.daemon.ensure_unlocked(&app, true).await {
+        if !self.daemon.ensure_unlocked(&requester, true).await {
             return Err(locked());
         }
-        Ok(app)
+        Ok(requester)
     }
 
     async fn passkey(&self, id: &[u8]) -> Result<Passkey, PasskeyError> {
@@ -146,7 +139,7 @@ impl Passkeys {
         fields: HashMap<String, OwnedVariant>,
         #[zbus(header)] header: Header<'_>,
     ) -> Result<HashMap<&'static str, OwnedVariant>, PasskeyError> {
-        let app = self.caller(&header).await?;
+        self.caller(&header).await?;
         let created = key::create(self.chip_ready().await)
             .await
             .map_err(chip_failed)?;
@@ -182,7 +175,7 @@ impl Passkeys {
         if passkey.rp.is_empty() || passkey.user_id.is_empty() {
             return Err(failed("A passkey needs a site and an account"));
         }
-        let item = passkey.item(&app.key);
+        let item = passkey.item();
         self.daemon
             .keyring
             .lock()

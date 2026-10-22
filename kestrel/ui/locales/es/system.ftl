@@ -113,15 +113,21 @@ privacy-mute-microphone = Silenciar micrófono
 privacy-unmute-microphone = Activar micrófono
 privacy-close-app = Cerrar { $app }
 privacy-unknown-app = Una aplicación
-privacy-windows-using = Usa tus ventanas
-privacy-windows-seeing = Ve tus ventanas
+privacy-windows-seeing-programs = { $count ->
+    [one] { $count } programa puede ver tus ventanas
+   *[other] { $count } programas pueden ver tus ventanas
+}
+privacy-windows-using-programs = { $count ->
+    [one] { $count } programa puede ver y usar tus ventanas
+   *[other] { $count } programas pueden ver y usar tus ventanas
+}
 privacy-windows-stop = Retirar acceso
 
 ## Window access prompt
 
-peek-see-title = { $app } quiere ver tus ventanas
+peek-see-request = ¿Permitir que un programa que has abierto vea tus ventanas?
 peek-see-description = Podrá hacer capturas de cualquier ventana que tengas abierta.
-peek-use-title = { $app } quiere ver y usar tus ventanas
+peek-use-request = ¿Permitir que un programa que has abierto vea y use tus ventanas?
 peek-use-description = Podrá ver cualquier ventana que tengas abierta, y hacer clic y escribir en ella como si fueras tú.
 peek-deny = No permitir
 peek-allow-once = Permitir una vez
@@ -129,7 +135,7 @@ peek-allow-until-quit = Permitir hasta que se cierre
 
 ## Window access errors
 
-peek-error-declined = La persona que usa este ordenador lo ha rechazado. { $app } puede volver a pedirlo cuando se cierre.
+peek-error-declined-until-quit = La persona que usa este ordenador lo ha rechazado. El programa puede volver a pedirlo cuando se cierre.
 peek-error-not-allowed = La persona que usa este ordenador no lo ha permitido
 peek-error-sandboxed = Las aplicaciones en un espacio aislado no pueden ver ni usar otras ventanas
 peek-error-unknown-caller = El programa que lo pide ha terminado o no se ha podido reconocer

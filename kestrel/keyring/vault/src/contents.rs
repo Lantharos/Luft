@@ -12,8 +12,6 @@ pub struct Contents {
     #[serde(default)]
     pub aliases: BTreeMap<String, String>,
     #[serde(default)]
-    pub rules: Vec<AccessRule>,
-    #[serde(default)]
     pub apps: BTreeMap<String, BTreeMap<String, Secret>>,
     #[serde(default)]
     pub ssh: Vec<SshKey>,
@@ -42,16 +40,6 @@ pub struct Item {
     pub modified: u64,
     #[serde(default)]
     pub owner: Option<String>,
-    #[serde(default)]
-    pub unclaimed: bool,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct AccessRule {
-    pub app: String,
-    pub collection: String,
-    pub item: u64,
-    pub allowed: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -126,7 +114,6 @@ impl Item {
             created,
             modified: created,
             owner: None,
-            unclaimed: false,
         }
     }
 

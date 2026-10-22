@@ -6,7 +6,7 @@ use zbus::message::Header;
 use zbus::object_server::SignalEmitter;
 use zbus::{fdo, interface};
 
-use super::{PATH, settings_only};
+use super::{PATH, confirmed, yours};
 use crate::daemon::Daemon;
 use crate::services::ssh::{
     fingerprint, generate_in_chip, generate_software, kind, openssh_line, socket_path,
@@ -53,7 +53,7 @@ impl Daemon {
 #[interface(name = "com.lantharos.Keyring1.Ssh")]
 impl Ssh {
     async fn keys(&self, #[zbus(header)] header: Header<'_>) -> fdo::Result<Vec<Key>> {
-        settings_only(&self.daemon, &header).await?;
+        yours(&self.daemon, &header).await?;
         let keyring = self.daemon.keyring.lock().await;
         let Some(view) = keyring.view() else {
             return Ok(Vec::new());
@@ -81,7 +81,7 @@ impl Ssh {
         chip: bool,
         #[zbus(header)] header: Header<'_>,
     ) -> fdo::Result<String> {
-        settings_only(&self.daemon, &header).await?;
+        yours(&self.daemon, &header).await?;
         let key = if chip {
             generate_in_chip(name).await.map_err(fdo::Error::Failed)?
         } else {
@@ -103,7 +103,7 @@ impl Ssh {
         fingerprint_wanted: &str,
         #[zbus(header)] header: Header<'_>,
     ) -> fdo::Result<String> {
-        settings_only(&self.daemon, &header).await?;
+        yours(&self.daemon, &header).await?;
         let keyring = self.daemon.keyring.lock().await;
         keyring
             .view()
@@ -122,7 +122,16 @@ impl Ssh {
         confirm: bool,
         #[zbus(header)] header: Header<'_>,
     ) -> fdo::Result<()> {
-        settings_only(&self.daemon, &header).await?;
+        if confirm {
+            yours(&self.daemon, &header).await?;
+        } else {
+            confirmed(
+                &self.daemon,
+                &header,
+                "let an SSH key sign without asking you",
+            )
+            .await?;
+        }
         self.daemon
             .edit_key(fingerprint_wanted, |keys, position| {
                 keys[position].confirm = confirm
@@ -137,7 +146,7 @@ impl Ssh {
         fingerprint_wanted: &str,
         #[zbus(header)] header: Header<'_>,
     ) -> fdo::Result<()> {
-        settings_only(&self.daemon, &header).await?;
+        confirmed(&self.daemon, &header, "delete an SSH key").await?;
         self.daemon
             .edit_key(fingerprint_wanted, |keys, position| {
                 drop(keys.remove(position))

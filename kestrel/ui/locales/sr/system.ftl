@@ -113,15 +113,23 @@ privacy-mute-microphone = Искључи микрофон
 privacy-unmute-microphone = Укључи микрофон
 privacy-close-app = Затвори { $app }
 privacy-unknown-app = Апликација
-privacy-windows-using = Користи ваше прозоре
-privacy-windows-seeing = Види ваше прозоре
+privacy-windows-seeing-programs = { $count ->
+    [one] { $count } програм може да види ваше прозоре
+    [few] { $count } програма могу да виде ваше прозоре
+   *[other] { $count } програма може да види ваше прозоре
+}
+privacy-windows-using-programs = { $count ->
+    [one] { $count } програм може да види и користи ваше прозоре
+    [few] { $count } програма могу да виде и користе ваше прозоре
+   *[other] { $count } програма може да види и користи ваше прозоре
+}
 privacy-windows-stop = Укини приступ
 
 ## Window access prompt
 
-peek-see-title = { $app } жели да види ваше прозоре
+peek-see-request = Дозволити програму који сте покренули да види ваше прозоре?
 peek-see-description = Моћи ће да снима слике сваког прозора који имате отворен.
-peek-use-title = { $app } жели да види и користи ваше прозоре
+peek-use-request = Дозволити програму који сте покренули да види и користи ваше прозоре?
 peek-use-description = Моћи ће да види сваки прозор који имате отворен и да у њему кликће и куца као да сте то ви.
 peek-deny = Не дозволи
 peek-allow-once = Дозволи једном
@@ -129,7 +137,7 @@ peek-allow-until-quit = Дозволи док се не затвори
 
 ## Window access errors
 
-peek-error-declined = Особа која користи овај рачунар је ово одбила. { $app } може поново да пита када се затвори.
+peek-error-declined-until-quit = Особа која користи овај рачунар је ово одбила. Програм може поново да пита када се затвори.
 peek-error-not-allowed = Особа која користи овај рачунар то није дозволила
 peek-error-sandboxed = Апликације у изолованом окружењу не могу да виде нити да користе друге прозоре
 peek-error-unknown-caller = Програм који пита се завршио или није могао да се препозна

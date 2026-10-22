@@ -1,5 +1,6 @@
 import json
 import os
+import pwd
 import shutil
 import subprocess
 import sys
@@ -7,18 +8,18 @@ import tempfile
 import time
 
 import gi
-from agent import exercise_agent, settings_build
-from launches import exercise_launches
-from ownership import exercise_ownership
-from portal import exercise_portal
+from agent import exercise_agent
+from flatpak import exercise_flatpaks
+from manage import exercise_management
 from sabine import exercise_sabine
-from seal import seal_off_system_services
+from seal import sealed
 
 gi.require_version("Gio", "2.0")
 from gi.repository import Gio, GLib
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-DAEMON = sys.argv[1]
+DAEMON = os.path.abspath(sys.argv[1])
+PERMISSION_STORE = "/usr/libexec/xdg-permission-store"
 LOGIN = "correct horse"
 checks = 0
 
@@ -44,21 +45,27 @@ def scratch_home(root, name):
     return home, environment
 
 
-def wait_for_name(name):
-    bus = Gio.bus_get_sync(Gio.BusType.SESSION)
-    for _ in range(100):
-        owner = bus.call_sync(
+def bus_call(method, signature, arguments):
+    return (
+        Gio.bus_get_sync(Gio.BusType.SESSION)
+        .call_sync(
             "org.freedesktop.DBus",
             "/org/freedesktop/DBus",
             "org.freedesktop.DBus",
-            "NameHasOwner",
-            GLib.Variant("(s)", (name,)),
+            method,
+            GLib.Variant(signature, arguments),
             None,
             Gio.DBusCallFlags.NONE,
             -1,
             None,
-        ).unpack()[0]
-        if owner:
+        )
+        .unpack()
+    )
+
+
+def wait_for_name(name):
+    for _ in range(100):
+        if bus_call("NameHasOwner", "(s)", (name,))[0]:
             return
         time.sleep(0.1)
     raise SystemExit(f"{name} never appeared")
@@ -72,7 +79,6 @@ def lookup(environment, *attributes):
 
 
 def main():
-    seal_off_system_services()
     root = tempfile.mkdtemp(prefix="luft-keyring-")
     try:
         run(root)
@@ -81,34 +87,89 @@ def main():
     print(f"Luft Keyring: {checks} checks passed")
 
 
-def run(root):
-    home, environment = scratch_home(root, "person")
+class Session:
+    def __init__(self, root):
+        self.root = root
+        self.home, self.environment = scratch_home(root, "person")
+        self.plan = os.path.join(root, "prompter.json")
+        self.prompts = os.path.join(root, "prompts.log")
+        self.attempts = os.path.join(root, "authenticate.log")
+        self.daemon = None
 
-    plan = os.path.join(root, "prompter.json")
-    prompts = os.path.join(root, "prompts.log")
-
-    def script(**settings):
-        with open(plan, "w") as output:
+    def script(self, **settings):
+        with open(self.plan, "w") as output:
             json.dump(settings, output)
 
-    def requests(kind):
-        if not os.path.exists(prompts):
+    def requests(self, kind):
+        if not os.path.exists(self.prompts):
             return []
-        with open(prompts) as lines:
+        with open(self.prompts) as lines:
             return [entry for entry in map(json.loads, lines) if entry["kind"] == kind]
 
-    script(passwords=[LOGIN], access="allow")
-    prompter = subprocess.Popen([sys.executable, os.path.join(HERE, "prompter.py"), plan, prompts], env=environment)
+    def confirmations(self):
+        return [entry for entry in self.requests("password") if entry["request"].get("continue") == "Confirm"]
+
+    def authentications(self):
+        if not os.path.exists(self.attempts):
+            return []
+        with open(self.attempts) as lines:
+            return [json.loads(line) for line in lines]
+
+    def run(self, command, extra=None):
+        environment = dict(self.environment, **(extra or {}))
+        return subprocess.run(
+            command, env=environment, capture_output=True, timeout=90, check=False
+        ).stdout.decode()
+
+    def reader(self, *arguments, program=sys.executable):
+        return self.run([program, os.path.join(HERE, "reader.py"), *arguments])
+
+    def manager(self, *arguments, extra=None):
+        return self.run([sys.executable, os.path.join(HERE, "manager.py"), *arguments], extra)
+
+    def lock(self):
+        self.reader("lock")
+
+
+def run(root):
+    session = Session(root)
+    data = session.environment["XDG_DATA_HOME"]
+    bus_call(
+        "UpdateActivationEnvironment",
+        "(a{ss})",
+        ({"HOME": session.home, "XDG_DATA_HOME": data},),
+    )
+    socket = os.path.join(root, "authenticate")
+    helpers = [
+        subprocess.Popen([PERMISSION_STORE, "--replace"], env=session.environment),
+        subprocess.Popen(
+            [sys.executable, os.path.join(HERE, "authenticator.py"), socket, LOGIN, session.attempts],
+            env=session.environment,
+        ),
+    ]
+    session.script(passwords=[LOGIN], access="allow")
+    helpers.append(
+        subprocess.Popen(
+            [sys.executable, os.path.join(HERE, "prompter.py"), session.plan, session.prompts], env=session.environment
+        )
+    )
+    wait_for_name("org.freedesktop.impl.portal.PermissionStore")
     wait_for_name("com.lantharos.Kestrel")
-    daemon = subprocess.Popen([DAEMON], env=dict(environment, LUFT_KEYRING_DEVELOPMENT_SETTINGS=settings_build(root)))
+    for _ in range(100):
+        if os.path.exists(socket):
+            break
+        time.sleep(0.1)
+    daemon = subprocess.Popen(sealed([DAEMON], socket), env=session.environment)
+    session.daemon = daemon.pid
     try:
         wait_for_name("org.freedesktop.secrets")
-        exercise(root, home, environment, script, requests)
+        exercise(session)
     finally:
         daemon.terminate()
-        prompter.terminate()
         daemon.wait()
-        prompter.wait()
+        for helper in helpers:
+            helper.terminate()
+            helper.wait()
 
 
 def store(environment, label, secret, *attributes):
@@ -121,43 +182,28 @@ def store(environment, label, secret, *attributes):
     )
 
 
-def exercise(root, home, environment, script, requests):
-    reader = [sys.executable, os.path.join(HERE, "reader.py")]
-    stranger = os.path.join(root, "stranger")
+def exercise(session):
+    environment = session.environment
+    stranger = os.path.join(session.root, "stranger")
     shutil.copy(sys.executable, stranger)
 
     store(environment, "Home network", "hunter2", "network", "home")
-    setup = requests("password")[0]["request"]
-    check(setup.get("confirm") is True, "setting up without the sign-in service asks to confirm the password")
-    subprocess.run(
-        [
-            stranger,
-            os.path.join(HERE, "reader.py"),
-            "store",
-            "GitHub",
-            "gh-token",
-            "service",
-            "github.com",
-            "user",
-            "mara",
-        ],
-        env=environment,
-        check=True,
-        timeout=60,
+    setup = session.requests("password")[0]["request"]
+    you = pwd.getpwuid(os.getuid()).pw_name
+    check(
+        not setup.get("confirm") and session.authentications() == [{"user": you, "accepted": True}],
+        "setting up checks the password with the sign-in service instead of asking for it twice",
     )
+    session.reader("store", "GitHub", "gh-token", "service", "github.com", "user", "mara", program=stranger)
     store(environment, "Mail", "mail-pass", "service", "mail.example.org")
-    store(environment, "Parley", "parley-key", "application", "parley")
-    store(environment, "Reader", "reader-key", "application", "reader")
 
+    asked = len(session.requests("access")) + len(session.requests("password"))
     check(
-        lookup(environment, "service", "github.com", "user", "mara") == "gh-token",
-        "a keyring tool reads another app's item once the person allows it",
+        lookup(environment, "service", "github.com", "user", "mara") == "gh-token"
+        and session.reader("read", "network", "home", program=stranger) == "hunter2"
+        and len(session.requests("access")) + len(session.requests("password")) == asked,
+        "every program you run reads what any other saved, without being asked",
     )
-    check(
-        [entry["request"]["title"] for entry in requests("access")] == ["Allow secret-tool to use “GitHub”?"],
-        "a keyring tool is asked before it uses another app's item",
-    )
-    check(lookup(environment, "service", "mail.example.org") == "mail-pass", "a keyring tool reads back what it stored")
     found = subprocess.run(
         ["secret-tool", "search", "--all", "network", "home"],
         env=environment,
@@ -170,7 +216,7 @@ def exercise(root, home, environment, script, requests):
         "an item hands its secret back in one piece, as Chromium-based apps read it",
     )
 
-    with open(os.path.join(home, ".local/share/luft-keyring/vault"), "rb") as file:
+    with open(os.path.join(session.home, ".local/share/luft-keyring/vault"), "rb") as file:
         vault = file.read()
     check(b"gh-token" not in vault and b"GitHub" not in vault, "secrets and labels are encrypted on disk")
 
@@ -184,40 +230,9 @@ def exercise(root, home, environment, script, requests):
         None,
     )
     check(service.get_cached_property("Locked").unpack() is False, "the keyring reports itself unlocked")
-    check(service.get_cached_property("ItemCount").unpack() == 5, "the keyring counts its items")
+    check(service.get_cached_property("ItemCount").unpack() == 3, "the keyring counts its items")
 
-    def lock():
-        subprocess.run([*reader, "lock"], env=environment, check=True, timeout=30)
-
-    asked = len(requests("access"))
-    owned = subprocess.run(
-        [stranger, os.path.join(HERE, "reader.py"), "read", "service", "github.com"],
-        env=environment,
-        capture_output=True,
-        timeout=60,
-        check=False,
-    )
-    check(
-        owned.stdout.decode() == "gh-token" and len(requests("access")) == asked,
-        "the app that stored an item reads it without being asked",
-    )
-
-    def read_as_other_app(*attributes):
-        result = subprocess.run(
-            [*reader, "read", *attributes], env=environment, capture_output=True, timeout=60, check=False
-        )
-        return result.stdout.decode()
-
-    script(access="deny", remember=False)
-    check(read_as_other_app("service", "github.com") == "", "another app is refused when the person says no")
-    check(requests("access")[-1]["request"]["title"].startswith("Allow "), "another app's read asks the person first")
-    script(access="allow", remember=True)
-    check(read_as_other_app("service", "github.com") == "gh-token", "another app reads once the person allows it")
-    asked = len(requests("access"))
-    check(read_as_other_app("service", "github.com") == "gh-token", "an allowed app keeps reading")
-    check(len(requests("access")) == asked, "a remembered choice doesn't ask again")
-
-    lock()
+    session.lock()
     check(
         service.call_sync(
             "org.freedesktop.DBus.Properties.Get",
@@ -229,33 +244,39 @@ def exercise(root, home, environment, script, requests):
         is True,
         "locking takes effect",
     )
-    script(passwords=["nope", LOGIN], access="allow")
+    session.script(passwords=["nope", LOGIN], access="allow")
     check(
         lookup(environment, "service", "github.com", "user", "mara") == "gh-token",
         "a locked keyring asks for the password and answers",
     )
-    retried = requests("password")[-1]["request"]
-    check("didn't unlock" in retried.get("warning", ""), "a wrong password keeps the prompt open with a warning")
-
-    sealed = subprocess.run([*reader, "app-secrets"], env=environment, capture_output=True, timeout=60, check=False)
+    unlock = session.requests("password")[-1]["request"]
+    check("didn't unlock" in unlock.get("warning", ""), "a wrong password keeps the prompt open with a warning")
     check(
-        sealed.stdout.decode() == "stored:account-token|loaded:account-token|listed:account-token",
+        unlock.get("body") == "An app on this computer wants to use something you saved.",
+        "the unlock prompt doesn't name a program it can't vouch for",
+    )
+
+    check(
+        session.reader("app-secrets", "com.example.Ledger")
+        == "stored:account-token|loaded:account-token|listed:account-token",
         "an app stores and reads back its own secret",
     )
-    other = subprocess.run(
-        [stranger, os.path.join(HERE, "reader.py"), "app-load"],
-        env=environment,
-        capture_output=True,
-        timeout=60,
-        check=False,
+    check(
+        session.reader("app-load", "com.example.Other") == "missing",
+        "an app's secrets are kept apart from another app's",
     )
-    check(other.stdout.decode() == "missing", "another app can't read an app's sealed secret")
 
-    exercise_portal(root, home, environment, check)
-    exercise_agent(root, environment, check, script, requests, lock, LOGIN)
-    exercise_ownership(root, home, environment, check, script, requests, lock)
-    exercise_launches(root, home, environment, check, script, requests)
-    exercise_sabine(home, environment, check, script, requests)
+    first, other, unsent, unidentified = session.reader("portal").split("|")
+    check(len(bytes.fromhex(first)) == 64, "an app gets a secret through the portal")
+    check(other != first and len(bytes.fromhex(other)) == 64, "each app ID the portal passes gets its own secret")
+    check(session.reader("portal").split("|")[:2] == [first, other], "an app gets the same secret again")
+    check(unsent == "AccessDenied", "only the desktop portal may ask for apps' secrets")
+    check(unidentified == "AccessDenied", "a request from an app that can't be identified is refused")
+
+    exercise_agent(session, check, LOGIN)
+    exercise_management(session, check, LOGIN)
+    exercise_flatpaks(session, check, LOGIN)
+    exercise_sabine(session, check)
 
 
 if __name__ == "__main__":

@@ -8,6 +8,7 @@ license.workspace = true
 [dependencies]
 futures-util = { workspace = true, features = ["std"] }
 jiff.workspace = true
+luft-identity.workspace = true
 rustix = { workspace = true, features = ["fs", "time"] }
 serde.workspace = true
 serde_json.workspace = true

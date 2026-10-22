@@ -1,5 +1,4 @@
 pub(crate) mod actions;
-mod caller;
 mod drives;
 mod error;
 mod interface;

@@ -113,15 +113,21 @@ privacy-mute-microphone = Mykistä mikrofoni
 privacy-unmute-microphone = Poista mikrofonin mykistys
 privacy-close-app = Sulje { $app }
 privacy-unknown-app = Sovellus
-privacy-windows-using = Käyttää ikkunoitasi
-privacy-windows-seeing = Näkee ikkunasi
+privacy-windows-seeing-programs = { $count ->
+    [one] { $count } ohjelma voi nähdä ikkunasi
+   *[other] { $count } ohjelmaa voi nähdä ikkunasi
+}
+privacy-windows-using-programs = { $count ->
+    [one] { $count } ohjelma voi nähdä ja käyttää ikkunoitasi
+   *[other] { $count } ohjelmaa voi nähdä ja käyttää ikkunoitasi
+}
 privacy-windows-stop = Peru käyttöoikeus
 
 ## Window access prompt
 
-peek-see-title = { $app } haluaa nähdä ikkunasi
+peek-see-request = Sallitaanko käynnistämäsi ohjelman nähdä ikkunasi?
 peek-see-description = Se voi ottaa kuvan mistä tahansa avoimesta ikkunastasi.
-peek-use-title = { $app } haluaa nähdä ja käyttää ikkunoitasi
+peek-use-request = Sallitaanko käynnistämäsi ohjelman nähdä ja käyttää ikkunoitasi?
 peek-use-description = Se näkee kaikki avoimet ikkunasi ja voi napsauttaa ja kirjoittaa niissä aivan kuin olisit itse.
 peek-deny = Älä salli
 peek-allow-once = Salli kerran
@@ -129,7 +135,7 @@ peek-allow-until-quit = Salli, kunnes se suljetaan
 
 ## Window access errors
 
-peek-error-declined = Tietokoneen käyttäjä kieltäytyi. { $app } voi pyytää uudelleen, kun se on sulkeutunut.
+peek-error-declined-until-quit = Tietokoneen käyttäjä kieltäytyi. Ohjelma voi pyytää uudelleen, kun se on sulkeutunut.
 peek-error-not-allowed = Tietokoneen käyttäjä ei sallinut tätä
 peek-error-sandboxed = Hiekkalaatikossa toimivat sovellukset eivät voi nähdä tai käyttää muita ikkunoita
 peek-error-unknown-caller = Pyytävä ohjelma päättyi, tai sitä ei tunnistettu

@@ -22,14 +22,10 @@ settings-privacy-lock-immediately = Odmah
 
 ## Privacy: location, camera and microphone
 
-settings-privacy-location = Lokacija
 settings-privacy-location-services = Usluge lokacije
 settings-privacy-location-services-hint = Omogućava aplikacijama da saznaju gdje se nalazite, za mape, vremensku prognozu i vremenske zone
-settings-privacy-camera = Kamera
 settings-privacy-camera-allow = Dozvoli aplikacijama da koriste kameru
 settings-privacy-microphone-allow = Dozvoli aplikacijama da koriste mikrofon
-settings-privacy-apps-asked = Aplikacije koje su tražile pristup
-settings-privacy-apps-allowed = Dozvoljeno: { $allowed } od { $total }
 
 ## Privacy: file history
 
@@ -336,22 +332,14 @@ settings-passwords-pin-locked = Otključajte privjesak ključeva da ovo promijen
 settings-passwords-pin-description = Da ih sam otisak prsta ne može otključati
 settings-passwords-lock-with-screen = Zaključaj zajedno s ekranom
 settings-passwords-lock-with-screen-description = Zaključavaju se i otključavaju zajedno s ekranom
-settings-passwords-apps = Aplikacije s pristupom
+settings-passwords-apps = Prijave i aktivnost aplikacija
 settings-passwords-apps-locked = Otključajte privjesak ključeva da ih vidite
-settings-passwords-apps-asked = { $count ->
-    [0] Još nijedna aplikacija ih nije tražila
-    [one] { $count } aplikacija ih je tražila
-    [few] { $count } aplikacije su ih tražile
-   *[other] { $count } aplikacija ih je tražilo
-}
+settings-passwords-apps-description = Šta aplikacije ovdje čuvaju i kad su to koristile
+settings-passwords-apps-allowed = Koje aplikacije smiju koristiti vaše lozinke
+settings-passwords-apps-allowed-hint = Podešava se u odjeljku Aplikacije
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-description = Ako uklonite neku, aplikacija će sljedeći put ponovo pitati.
-settings-passwords-access-not-allowed = Nije dozvoljeno
-settings-passwords-access-none = Još nijedna aplikacija nije tražila vaše lozinke
-settings-passwords-access-revoke = Zabrani aplikaciji { $app } da koristi { $item }
-settings-passwords-access-reset = Dozvoli aplikaciji { $app } da ponovo traži { $item }
 settings-passwords-stores = Prijave aplikacija
 settings-passwords-stores-description = Prijave koje neke aplikacije čuvaju ovdje, gdje ih može čitati samo ta aplikacija.
 settings-passwords-stores-count = { $count ->
@@ -462,3 +450,25 @@ settings-apps-startup-add-description = Odaberite aplikaciju koja će se otvarat
 settings-apps-search = Pretraži aplikacije
 settings-apps-no-match = Nijedna aplikacija ne odgovara pretrazi
 settings-apps-cancel = Otkaži
+
+## Apps: permissions
+
+settings-apps-permissions = Dozvole
+settings-apps-location = Lokacija
+settings-apps-camera = Kamera
+settings-apps-clipboard = Međuspremnik u pozadini
+settings-apps-clipboard-hint = Ove aplikacije mogu vidjeti i mijenjati ono što kopirate, čak i dok koristite druge aplikacije.
+settings-apps-full-access = Puni pristup
+settings-apps-full-access-hint = Ove aplikacije rade izvan svog izolovanog okruženja i smatraju se vama, kao aplikacije instalirane na sistemu. Uklanjanje stupa na snagu kad se aplikacija sljedeći put otvori.
+settings-apps-full-access-remove = Ukloni
+settings-apps-full-access-remove-app = Ukloni puni pristup za { $app }
+settings-apps-passwords = Sačuvane lozinke
+settings-apps-passwords-hint = Aplikacije pamte vaš odgovor kad traže da koriste nešto iz privjeska ključeva. Zaboravite ga i aplikacija će ponovo pitati.
+settings-apps-passwords-forget = Zaboravi
+settings-apps-passwords-forget-app = Neka { $app } ponovo pita
+settings-apps-permissions-allowed = Dozvoljeno: { $allowed } od { $total }
+settings-apps-permissions-count = { $count ->
+    [one] { $count } aplikacija
+    [few] { $count } aplikacije
+   *[other] { $count } aplikacija
+}

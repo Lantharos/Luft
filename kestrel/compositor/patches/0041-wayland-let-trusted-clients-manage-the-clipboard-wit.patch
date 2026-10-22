@@ -14,8 +14,7 @@ This lets password managers copy a password and clear it again later
 without being focused. Clients that are not sandboxed, including Flatpak
 apps with full access, can already read the clipboard through Xwayland,
 so they get the global. Other sandboxed clients get it only when they
-connect through a Flatpak security context as 1Password, KeePassXC or
-Bitwarden.
+are apps the shell gave the "background-clipboard" permission.
 ---
  src/meson.build                         |   3 +
  src/wayland/meta-wayland-data-control.c | 499 ++++++++++++++++++++++++
@@ -49,7 +48,7 @@ index ce589e3e21965d4ceeaa7f3343a7ef3a77363e0d..7e51861098aed187c1d45609340d8851
    ['fifo', 'staging', 1, ],
 diff --git a/src/wayland/meta-wayland-data-control.c b/src/wayland/meta-wayland-data-control.c
 new file mode 100644
-index 0000000000000000000000000000000000000000..d8f5b3208a5bc6d2f3e0a2649e7dac69eae7af8c
+index 0000000000000000000000000000000000000000..3da4e87c5e08ff0202a144159a6e0619ceb64020
 --- /dev/null
 +++ b/src/wayland/meta-wayland-data-control.c
 @@ -0,0 +1,499 @@
@@ -63,6 +62,7 @@ index 0000000000000000000000000000000000000000..d8f5b3208a5bc6d2f3e0a2649e7dac69
 +#include <unistd.h>
 +
 +#include "core/display-private.h"
++#include "meta/meta-context.h"
 +#include "meta/meta-selection-source-memory.h"
 +#include "wayland/meta-selection-source-wayland-private.h"
 +#include "wayland/meta-wayland-data-source.h"
@@ -73,12 +73,7 @@ index 0000000000000000000000000000000000000000..d8f5b3208a5bc6d2f3e0a2649e7dac69
 +
 +#include "ext-data-control-v1-server-protocol.h"
 +
-+static const char * const password_managers[] = {
-+  "com.onepassword.OnePassword",
-+  "org.keepassxc.KeePassXC",
-+  "com.bitwarden.desktop",
-+  NULL,
-+};
++#define BACKGROUND_CLIPBOARD "background-clipboard"
 +
 +typedef struct _MetaWaylandDataControl MetaWaylandDataControl;
 +
@@ -498,13 +493,17 @@ index 0000000000000000000000000000000000000000..d8f5b3208a5bc6d2f3e0a2649e7dac69
 +                     const struct wl_global *global,
 +                     gpointer                user_data)
 +{
++  MetaWaylandDataControl *data_control = user_data;
++  MetaContext *context =
++    meta_wayland_compositor_get_context (data_control->compositor);
 +  const char *app_id;
 +
 +  if (!meta_wayland_client_is_sandboxed (client))
 +    return META_WAYLAND_ACCESS_ALLOWED;
 +
-+  app_id = meta_wayland_client_get_flatpak_app_id (client);
-+  if (app_id && g_strv_contains (password_managers, app_id))
++  app_id = meta_wayland_client_get_sandboxed_app_id (client);
++  if (app_id &&
++      meta_context_is_app_permitted (context, BACKGROUND_CLIPBOARD, app_id))
 +    return META_WAYLAND_ACCESS_ALLOWED;
 +
 +  return META_WAYLAND_ACCESS_DENIED;
@@ -547,7 +546,7 @@ index 0000000000000000000000000000000000000000..d8f5b3208a5bc6d2f3e0a2649e7dac69
 +
 +  meta_wayland_filter_manager_add_global (meta_wayland_compositor_get_filter_manager (compositor),
 +                                          global, data_control_filter,
-+                                          NULL);
++                                          data_control);
 +
 +  g_object_set_data_full (G_OBJECT (compositor), "-meta-wayland-data-control",
 +                          data_control, (GDestroyNotify) data_control_free);

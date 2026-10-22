@@ -6,7 +6,7 @@ Kestrel runs on its own build of Mutter 51 ([kestrel/compositor](../../kestrel/c
 
 - Rounded window corners that stay square on maximized, tiled and fullscreen windows, so those keep direct scanout
 - Shared background blur, redraw clip filters the shell uses to repaint glass as far as its blur reaches, `xdg-toplevel-icon-v1` icons, and `kestrel_window_v1` for windows kept out of window lists, which sandboxed apps don't get
-- `wp_security_context_v1`, which Flatpak uses to tag the connections of its apps with their app ID. A connection made any other way counts as unsandboxed only while the process that made it is still running and shares the compositor's mounts; anything that can't be checked is treated as sandboxed. Flatpak apps given full access count as unsandboxed, see [Full access](#full-access)
+- `wp_security_context_v1`, which Flatpak and Luft's AppImage sandbox use to tag the connections of their apps with the app's ID. A connection made any other way is judged by the process that made it, as in [Who an app is](../security.md#who-an-app-is); anything that can't be checked is treated as sandboxed. Apps given full access count as unsandboxed, see [App permissions](#app-permissions)
 - Snapping and maximizing that animate at once, and windows the shell tiles counting as tiled
 - Shell text with fractional glyph advances and grayscale antialiasing
 - Shell text, icons and labels drawn at a fractional scale's own resolution and on whole pixels, so they stay sharp at 125% and 150%
@@ -22,18 +22,21 @@ Kestrel runs on its own build of Mutter 51 ([kestrel/compositor](../../kestrel/c
 - `xdg-decoration` for Wayland apps that ask for server-side title bars, which the shell draws in the same style
 - A signal before a monitor turns, so the shell can animate rotation from a picture of the old orientation
 - `ext-idle-notify-v1`, so apps such as password managers can lock themselves after a while without use, sandboxed or not. Idle times are at least a second, and at least ten seconds for sandboxed apps, so no app can follow someone's typing
-- `ext-data-control-v1`, so password managers can copy a password and clear it again while in the background: apps outside a sandbox and Flatpak apps with [full access](#full-access) always get it, other Flatpak apps only when they are 1Password, KeePassXC or Bitwarden
+- `ext-data-control-v1`, so password managers can copy a password and clear it again while in the background: apps outside a sandbox and Flatpak apps with full access always get it, other Flatpak apps only when they may use the clipboard in the background, see [App permissions](#app-permissions)
 - Screen recording, remote control and input capture sessions that only the desktop portal and Kestrel's screencast service can start, and display changes such as rearranging monitors or turning them off that sandboxed apps can't make
 - Virtual input devices that flip the tablet mode switch, for driving tablet mode in checks
 - The audible bell from X11 and Wayland apps handed to the shell, which plays it with the rest of its [sounds](kestrel.md#sounds)
 - Modifiers the shell can treat as used up while a shortcut made of them is held, such as the one held to dictate, so apps scroll, click and type as if they weren't held, and shortcuts that react to being let go that still notice it when a modifier comes up first
 - Smaller fixes, each described in its patch
 
-## Full access
+## App permissions
 
-Flatpak apps given full access in Schelf are listed in `/etc/kestrel/trusted-apps`, one app ID per line. The file belongs to root, so no app can add itself, not even one allowed to change settings; Schelf changes it through the updater service, which asks for an administrator's password. Kestrel watches the file and treats a listed app like one installed on the system: in the Wayland protocols kept from sandboxes, in Mutter's screen recording and display services, and in the shell's own D-Bus services, which ask Mutter about each caller through `meta_context_is_sender_unsandboxed()`. Connections an app already made keep how they were sorted, so a change applies the next time the app starts.
+The permissions sandboxed apps were given live in the desktop portal's permission store, which no sandbox can reach: the `full-access` and `background-clipboard` tables, each with one entry of the same name listing apps with `yes` or `no`. Schelf and Settings change them. The shell reads both before it starts and follows every change, and hands Mutter the apps each permission covers with `meta_context_set_permitted_apps()`.
 
-Headless sessions read the list from the file `KESTREL_TRUSTED_APPS` names instead, which the checks use to give a stand-in app full access and take it away again.
+- **Full access**: apps answered `yes` count as unsandboxed, like programs installed on the system: in the Wayland protocols kept from sandboxes, in Mutter's screen recording and display services, and in the shell's own D-Bus services, which ask Mutter about each caller through `meta_context_identify_sender()`. Connections an app already made keep how they were sorted, so a change applies the next time the app starts.
+- **Background clipboard**: 1Password (`com.onepassword.OnePassword`), KeePassXC (`org.keepassxc.KeePassXC`) and Bitwarden (`com.bitwarden.desktop`) may use the clipboard in the background unless answered `no`; any other app only when answered `yes`.
+
+Headless sessions run their own session bus with their own data folder, so the checks change these tables without touching yours.
 
 ## Edit the patches
 

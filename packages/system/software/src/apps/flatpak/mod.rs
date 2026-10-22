@@ -13,7 +13,7 @@ use serde::{Deserialize, Serialize};
 
 pub use chromium::integrate;
 #[cfg(feature = "system")]
-pub use full_access::{has_full_access, open_sandbox, reset_sandbox, set_trusted};
+pub use full_access::{has_full_access, set_full_access};
 pub use installed::{Installed, installed};
 pub use permissions::{Permissions, permissions};
 pub use remotes::{FLATHUB, ensure_flathub};

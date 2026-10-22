@@ -22,14 +22,10 @@ settings-privacy-lock-immediately = Одразу
 
 ## Privacy: location, camera and microphone
 
-settings-privacy-location = Розташування
 settings-privacy-location-services = Служби розташування
 settings-privacy-location-services-hint = Дає програмам змогу визначати, де ви, для карт, погоди й часових поясів
-settings-privacy-camera = Камера
 settings-privacy-camera-allow = Дозволити програмам використовувати камеру
 settings-privacy-microphone-allow = Дозволити програмам використовувати мікрофон
-settings-privacy-apps-asked = Програми, що запитували доступ
-settings-privacy-apps-allowed = Дозволено: { $allowed } з { $total }
 
 ## Privacy: file history
 
@@ -351,23 +347,14 @@ settings-passwords-pin-locked = Розблокуйте в’язку ключі�
 settings-passwords-pin-description = Щоб самого відбитка не було досить для розблокування
 settings-passwords-lock-with-screen = Блокувати разом з екраном
 settings-passwords-lock-with-screen-description = Блокуються й розблоковуються разом з екраном
-settings-passwords-apps = Програми з доступом
+settings-passwords-apps = Облікові дані та активність програм
 settings-passwords-apps-locked = Розблокуйте в’язку ключів, щоб їх побачити
-settings-passwords-apps-asked = { $count ->
-    [0] Програми ще не запитували до них доступу
-    [one] { $count } програма запитала до них доступ
-    [few] { $count } програми запитали до них доступ
-    [many] { $count } програм запитали до них доступ
-   *[other] { $count } програми запитали до них доступ
-}
+settings-passwords-apps-description = Що програми зберігають тут і коли це використовували
+settings-passwords-apps-allowed = Які програми можуть використовувати ваші паролі
+settings-passwords-apps-allowed-hint = Налаштовується на сторінці «Програми»
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-description = Якщо вилучити програму, наступного разу вона запитає знову.
-settings-passwords-access-not-allowed = Заборонено
-settings-passwords-access-none = Програми ще не запитували доступу до ваших паролів
-settings-passwords-access-revoke = Заборонити програмі { $app } використовувати { $item }
-settings-passwords-access-reset = Дозволити програмі { $app } знову запитати доступ до { $item }
 settings-passwords-stores = Облікові дані програм
 settings-passwords-stores-description = Облікові дані, які деякі програми зберігають тут. Прочитати їх може лише та сама програма.
 settings-passwords-stores-count = { $count ->
@@ -480,3 +467,26 @@ settings-apps-startup-add-description = Виберіть програму, як�
 settings-apps-search = Пошук програм
 settings-apps-no-match = Немає програм, що відповідають запиту
 settings-apps-cancel = Скасувати
+
+## Apps: permissions
+
+settings-apps-permissions = Дозволи
+settings-apps-location = Розташування
+settings-apps-camera = Камера
+settings-apps-clipboard = Буфер обміну у фоні
+settings-apps-clipboard-hint = Ці програми можуть бачити й змінювати те, що ви копіюєте, навіть поки ви користуєтеся іншими програмами.
+settings-apps-full-access = Повний доступ
+settings-apps-full-access-hint = Ці програми працюють поза своєю пісочницею і діють від вашого імені, як програми, встановлені в системі. Відкликання набуде чинності під час наступного відкриття програми.
+settings-apps-full-access-remove = Відкликати
+settings-apps-full-access-remove-app = Відкликати повний доступ у { $app }
+settings-apps-passwords = Збережені паролі
+settings-apps-passwords-hint = Програми запам’ятовують вашу відповідь, коли просять використати щось із в’язки ключів. Скиньте її, щоб програма запитала знову.
+settings-apps-passwords-forget = Скинути
+settings-apps-passwords-forget-app = Нехай { $app } запитає знову
+settings-apps-permissions-allowed = Дозволено: { $allowed } з { $total }
+settings-apps-permissions-count = { $count ->
+    [one] { $count } програма
+    [few] { $count } програми
+    [many] { $count } програм
+   *[other] { $count } програми
+}

@@ -22,14 +22,10 @@ settings-privacy-lock-immediately = Menjëherë
 
 ## Privacy: location, camera and microphone
 
-settings-privacy-location = Vendndodhja
 settings-privacy-location-services = Shërbimet e vendndodhjes
 settings-privacy-location-services-hint = U lejon aplikacioneve të gjejnë ku je, për hartat, motin dhe zonat kohore
-settings-privacy-camera = Kamera
 settings-privacy-camera-allow = Lejo aplikacionet të përdorin kamerën
 settings-privacy-microphone-allow = Lejo aplikacionet të përdorin mikrofonin
-settings-privacy-apps-asked = Aplikacionet që kërkuan
-settings-privacy-apps-allowed = { $allowed } nga { $total } të lejuara
 
 ## Privacy: file history
 
@@ -329,21 +325,14 @@ settings-passwords-pin-locked = Zhblloko vargun e çelësave për ta ndryshuar k
 settings-passwords-pin-description = Që vetëm gjurma e gishtit të mos mjaftojë për t’i zhbllokuar
 settings-passwords-lock-with-screen = Blloko bashkë me ekranin
 settings-passwords-lock-with-screen-description = Bllokohen dhe zhbllokohen bashkë me ekranin
-settings-passwords-apps = Aplikacionet me qasje
+settings-passwords-apps = Hyrjet dhe veprimtaria e aplikacioneve
 settings-passwords-apps-locked = Zhblloko vargun e çelësave për t’i parë
-settings-passwords-apps-asked = { $count ->
-    [0] Asnjë aplikacion nuk i ka kërkuar ende
-    [one] { $count } aplikacion i ka kërkuar
-   *[other] { $count } aplikacione i kanë kërkuar
-}
+settings-passwords-apps-description = Çfarë ruajnë aplikacionet këtu dhe kur e përdorën
+settings-passwords-apps-allowed = Cilat aplikacione mund të përdorin fjalëkalimet e tua
+settings-passwords-apps-allowed-hint = Caktohet te Aplikacionet
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-description = Nëse heq një, aplikacioni pyet sërish herën tjetër.
-settings-passwords-access-not-allowed = Nuk lejohet
-settings-passwords-access-none = Asnjë aplikacion nuk i ka kërkuar ende fjalëkalimet e tua
-settings-passwords-access-revoke = Ndalo { $app } të përdorë { $item }
-settings-passwords-access-reset = Lejo { $app } të kërkojë sërish { $item }
 settings-passwords-stores = Hyrjet e aplikacioneve
 settings-passwords-stores-description = Hyrje që disa aplikacione i mbajnë këtu, ku vetëm ai aplikacion mund t’i lexojë.
 settings-passwords-stores-count = { $count ->
@@ -452,3 +441,24 @@ settings-apps-startup-add-description = Zgjidh një aplikacion që hapet sa her�
 settings-apps-search = Kërko aplikacione
 settings-apps-no-match = Asnjë aplikacion nuk përputhet me kërkimin
 settings-apps-cancel = Anulo
+
+## Apps: permissions
+
+settings-apps-permissions = Lejet
+settings-apps-location = Vendndodhja
+settings-apps-camera = Kamera
+settings-apps-clipboard = Kujtesa e fragmenteve në sfond
+settings-apps-clipboard-hint = Këto aplikacione mund të shohin dhe të ndryshojnë atë që kopjon, edhe kur përdor aplikacione të tjera.
+settings-apps-full-access = Qasje e plotë
+settings-apps-full-access-hint = Këto aplikacione punojnë jashtë mjedisit të tyre të izoluar dhe llogariten si ti, ashtu si aplikacionet e instaluara në sistem. Heqja vlen herën tjetër që hapet aplikacioni.
+settings-apps-full-access-remove = Hiq
+settings-apps-full-access-remove-app = Hiq qasjen e plotë për { $app }
+settings-apps-passwords = Fjalëkalimet e ruajtura
+settings-apps-passwords-hint = Aplikacionet mbajnë mend përgjigjen tënde kur kërkojnë të përdorin diçka të ruajtur në vargun e çelësave. Harroje që aplikacioni të pyesë sërish.
+settings-apps-passwords-forget = Harro
+settings-apps-passwords-forget-app = Lëre { $app } të pyesë sërish
+settings-apps-permissions-allowed = { $allowed } nga { $total } të lejuara
+settings-apps-permissions-count = { $count ->
+    [one] { $count } aplikacion
+   *[other] { $count } aplikacione
+}

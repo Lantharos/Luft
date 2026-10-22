@@ -55,6 +55,7 @@ export { SwipeAway } from './surfaces/notifications/swipeAway.js';
 export { published as portalPublished } from './portal/backend.js';
 export { ownOnItsOwnConnection } from './shared/dbus/dedicatedName.js';
 export { refuseSandboxed } from './shared/dbus/sandbox.js';
+export { followAppPermissions } from './auth/permissions/appPermissions.js';
 export { bindText, formatsLocale, localized, onLocaleChanged, t } from './shared/i18n/index.js';
 export { playNotificationSound, playSound, startSounds } from './system/sounds/sounds.js';
 

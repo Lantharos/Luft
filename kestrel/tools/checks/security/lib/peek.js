@@ -1,29 +1,21 @@
-import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GdkPixbuf from 'gi://GdkPixbuf';
 
 import {shownStyled} from '../../lib/actors.js';
-import {fixture, repository, spawn} from '../../lib/processes.js';
+import {inAppScope} from '../../lib/access/sandbox.js';
+import {fixture, outcome, repository} from '../../lib/processes.js';
 
 const PEEK = repository('target', 'release', 'peek');
 
 export const HANDLE = /^[a-z][a-z0-9]{9}$/;
 export const peekDialog = () => shownStyled('kestrel-peek-dialog');
 
-function outcome(argv) {
-  const process = spawn(argv, {flags: Gio.SubprocessFlags.STDOUT_PIPE | Gio.SubprocessFlags.STDERR_PIPE});
-  return new Promise((resolve, reject) => process.communicate_utf8_async(null, null, (_process, result) => {
-    try {
-      const [, stdout, stderr] = process.communicate_utf8_finish(result);
-      resolve({ok: process.get_successful(), stdout: stdout.trim(), stderr: stderr.trim()});
-    } catch (error) {
-      reject(error);
-    }
-  }));
-}
-
 export function peek(...args) {
   return outcome([PEEK, ...args]);
+}
+
+export function peekInScopeOf(appId, ...args) {
+  return outcome(inAppScope(appId, [PEEK, ...args]));
 }
 
 export function runTarget(title, ...options) {

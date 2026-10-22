@@ -22,14 +22,10 @@ settings-privacy-lock-immediately = Strax
 
 ## Privacy: location, camera and microphone
 
-settings-privacy-location = Staðsetning
 settings-privacy-location-services = Staðsetningarþjónusta
 settings-privacy-location-services-hint = Leyfir forritum að finna hvar þú ert, fyrir kort, veður og tímabelti
-settings-privacy-camera = Myndavél
 settings-privacy-camera-allow = Leyfa forritum að nota myndavélina
 settings-privacy-microphone-allow = Leyfa forritum að nota hljóðnemann
-settings-privacy-apps-asked = Forrit sem báðu um aðgang
-settings-privacy-apps-allowed = { $allowed } af { $total } leyfð
 
 ## Privacy: file history
 
@@ -329,21 +325,14 @@ settings-passwords-pin-locked = Taktu lyklakippuna úr lás til að breyta þess
 settings-passwords-pin-description = Svo fingrafar eitt og sér geti ekki opnað þau
 settings-passwords-lock-with-screen = Læsa með skjánum
 settings-passwords-lock-with-screen-description = Þau læsast og opnast með skjánum
-settings-passwords-apps = Forrit með aðgang
+settings-passwords-apps = Innskráningar og virkni forrita
 settings-passwords-apps-locked = Taktu lyklakippuna úr lás til að sjá þau
-settings-passwords-apps-asked = { $count ->
-    [0] Engin forrit hafa beðið um þau enn
-    [one] { $count } forrit hefur beðið um þau
-   *[other] { $count } forrit hafa beðið um þau
-}
+settings-passwords-apps-description = Hvað forrit geyma hér og hvenær þau notuðu það
+settings-passwords-apps-allowed = Hvaða forrit mega nota lykilorðin þín
+settings-passwords-apps-allowed-hint = Stillt á síðunni Forrit
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-description = Ef þú fjarlægir forrit biður það aftur um aðgang næst.
-settings-passwords-access-not-allowed = Ekki leyft
-settings-passwords-access-none = Engin forrit hafa beðið um lykilorðin þín enn
-settings-passwords-access-revoke = Banna forritinu { $app } að nota { $item }
-settings-passwords-access-reset = Leyfa forritinu { $app } að biðja aftur um { $item }
 settings-passwords-stores = Innskráningar forrita
 settings-passwords-stores-description = Innskráningar sem sum forrit geyma hér, þar sem aðeins viðkomandi forrit getur lesið þær.
 settings-passwords-stores-count = { $count ->
@@ -452,3 +441,24 @@ settings-apps-startup-add-description = Veldu forrit sem opnast í hvert sinn se
 settings-apps-search = Leita að forritum
 settings-apps-no-match = Engin forrit passa við leitina
 settings-apps-cancel = Hætta við
+
+## Apps: permissions
+
+settings-apps-permissions = Heimildir
+settings-apps-location = Staðsetning
+settings-apps-camera = Myndavél
+settings-apps-clipboard = Klippiborð í bakgrunni
+settings-apps-clipboard-hint = Þessi forrit geta séð og breytt því sem þú afritar, líka á meðan þú notar önnur forrit.
+settings-apps-full-access = Fullur aðgangur
+settings-apps-full-access-hint = Þessi forrit keyra utan sandkassans síns og teljast vera þú, eins og forrit sem eru sett upp á kerfinu. Ef þú fjarlægir hann tekur það gildi næst þegar forritið er opnað.
+settings-apps-full-access-remove = Fjarlægja
+settings-apps-full-access-remove-app = Fjarlægja fullan aðgang frá { $app }
+settings-apps-passwords = Vistuð lykilorð
+settings-apps-passwords-hint = Forrit muna svarið þitt þegar þau biðja um að nota eitthvað úr lyklakippunni. Gleymdu því til að forritið spyrji aftur.
+settings-apps-passwords-forget = Gleyma
+settings-apps-passwords-forget-app = Láta { $app } spyrja aftur
+settings-apps-permissions-allowed = { $allowed } af { $total } leyfð
+settings-apps-permissions-count = { $count ->
+    [one] { $count } forrit
+   *[other] { $count } forrit
+}

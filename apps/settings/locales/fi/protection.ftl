@@ -22,14 +22,10 @@ settings-privacy-lock-immediately = Heti
 
 ## Privacy: location, camera and microphone
 
-settings-privacy-location = Sijainti
 settings-privacy-location-services = Sijaintipalvelut
 settings-privacy-location-services-hint = Sovellukset voivat selvittää sijaintisi karttoja, säätä ja aikavyöhykkeitä varten
-settings-privacy-camera = Kamera
 settings-privacy-camera-allow = Salli sovellusten käyttää kameraa
 settings-privacy-microphone-allow = Salli sovellusten käyttää mikrofonia
-settings-privacy-apps-asked = Pyytäneet sovellukset
-settings-privacy-apps-allowed = { $allowed }/{ $total } sallittu
 
 ## Privacy: file history
 
@@ -329,21 +325,14 @@ settings-passwords-pin-locked = Avaa avainnipun lukitus muuttaaksesi tätä
 settings-passwords-pin-description = Pelkkä sormenjälki ei silloin avaa niiden lukitusta
 settings-passwords-lock-with-screen = Lukitse näytön mukana
 settings-passwords-lock-with-screen-description = Ne lukitaan ja avataan yhdessä näytön kanssa
-settings-passwords-apps = Sovellusten käyttöoikeudet
+settings-passwords-apps = Sovellusten kirjautumistiedot ja toiminta
 settings-passwords-apps-locked = Avaa avainnipun lukitus nähdäksesi ne
-settings-passwords-apps-asked = { $count ->
-    [0] Mikään sovellus ei ole vielä pyytänyt niitä
-    [one] { $count } sovellus on pyytänyt niitä
-   *[other] { $count } sovellusta on pyytänyt niitä
-}
+settings-passwords-apps-description = Mitä sovellukset säilyttävät täällä ja milloin ne käyttivät sitä
+settings-passwords-apps-allowed = Mitkä sovellukset voivat käyttää salasanojasi
+settings-passwords-apps-allowed-hint = Määritetään sivulla Sovellukset
 
 ## Passwords and keys: apps with access
 
-settings-passwords-access-description = Jos poistat sovelluksen, se kysyy luvan uudelleen ensi kerralla.
-settings-passwords-access-not-allowed = Ei sallittu
-settings-passwords-access-none = Mikään sovellus ei ole vielä pyytänyt salasanojasi
-settings-passwords-access-revoke = Estä { $app } -sovellusta käyttämästä kohdetta { $item }
-settings-passwords-access-reset = Anna { $app } -sovelluksen pyytää kohdetta { $item } uudelleen
 settings-passwords-stores = Sovellusten kirjautumistiedot
 settings-passwords-stores-description = Joidenkin sovellusten tänne tallentamat kirjautumistiedot, joita vain kyseinen sovellus voi lukea.
 settings-passwords-stores-count = { $count ->
@@ -452,3 +441,24 @@ settings-apps-startup-add-description = Valitse sovellus, joka avautuu aina, kun
 settings-apps-search = Hae sovelluksia
 settings-apps-no-match = Haulla ei löytynyt sovelluksia
 settings-apps-cancel = Peruuta
+
+## Apps: permissions
+
+settings-apps-permissions = Käyttöoikeudet
+settings-apps-location = Sijainti
+settings-apps-camera = Kamera
+settings-apps-clipboard = Leikepöytä taustalla
+settings-apps-clipboard-hint = Nämä sovellukset voivat nähdä ja muuttaa kopioimaasi, myös kun käytät muita sovelluksia.
+settings-apps-full-access = Täysi käyttöoikeus
+settings-apps-full-access-hint = Nämä sovellukset toimivat hiekkalaatikkonsa ulkopuolella, ja niitä kohdellaan kuin sinua, kuten järjestelmään asennettuja sovelluksia. Poisto tulee voimaan, kun sovellus avataan seuraavan kerran.
+settings-apps-full-access-remove = Poista
+settings-apps-full-access-remove-app = Poista sovellukselta { $app } täysi käyttöoikeus
+settings-apps-passwords = Tallennetut salasanat
+settings-apps-passwords-hint = Sovellukset muistavat vastauksesi, kun ne pyytävät käyttää jotain avainnippuun tallennettua. Unohda se, niin sovellus kysyy uudelleen.
+settings-apps-passwords-forget = Unohda
+settings-apps-passwords-forget-app = Anna sovelluksen { $app } kysyä uudelleen
+settings-apps-permissions-allowed = { $allowed }/{ $total } sallittu
+settings-apps-permissions-count = { $count ->
+    [one] { $count } sovellus
+   *[other] { $count } sovellusta
+}

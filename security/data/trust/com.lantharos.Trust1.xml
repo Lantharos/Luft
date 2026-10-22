@@ -115,9 +115,9 @@
       <arg name="unlock" type="s" direction="in"/>
       <arg name="grown" type="t" direction="out"/>
     </method>
-    <!-- Called by the login screen or the desktop once it has been shown for a moment, and only accepted from
-         them. Remembers the running version as one that starts, so an update that never gets this far goes back
-         to it. -->
+    <!-- Called by the login screen or the desktop once it has been shown for a moment, and accepted from anyone
+         in the session at the screen. Remembers the running version as one that starts, so an update that never
+         gets this far goes back to it. -->
     <method name="ConfirmStartup"/>
   </interface>
 

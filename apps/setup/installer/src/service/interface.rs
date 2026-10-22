@@ -22,7 +22,7 @@ use crate::install::drive::plan::{self, Request};
 use crate::install::windows::Windows;
 use crate::install::{self, Account, Answers, Destination, Job, Regional, Stage, Status};
 use crate::options::Options;
-use crate::{first_boot, meet, phase, survey};
+use crate::{first_boot, phase, survey};
 
 const INSTALL: &str = "com.lantharos.installer.install";
 const FINISH: &str = "com.lantharos.installer.finish-first-boot";
@@ -41,9 +41,9 @@ pub struct Installer {
 }
 
 impl Installer {
-    pub fn new(options: Options, config: Config, idle: Arc<Idle>) -> Self {
+    pub fn new(options: Options, config: Config, meet: Option<Handoff>, idle: Arc<Idle>) -> Self {
         Self {
-            meet: meet::handoff(&options.live_medium),
+            meet,
             options: Arc::new(options),
             config: Arc::new(config),
             idle,

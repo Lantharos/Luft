@@ -9,6 +9,7 @@ use std::time::Duration;
 use luft_dbus::idle::Idle;
 
 use crate::config::Config;
+use crate::meet;
 use crate::options::Options;
 use interface::Installer;
 
@@ -27,9 +28,15 @@ pub fn run(options: Options) -> anyhow::Result<()> {
 
 async fn serve(options: Options, config: Config) -> zbus::Result<()> {
     language::restore();
+    let handoff = meet::handoff(&options.live_medium);
+    if let Some(handoff) = &handoff
+        && let Err(error) = meet::start::restore(handoff).await
+    {
+        eprintln!("Meet Luft's start partition couldn't get its type back: {error:#}");
+    }
     let idle = Arc::new(Idle::default());
     let connection = zbus::connection::Builder::system()
-        .serve_at(PATH, Installer::new(options, config, idle.clone()))
+        .serve_at(PATH, Installer::new(options, config, handoff, idle.clone()))
         .name(NAME)
         .build()
         .await?;

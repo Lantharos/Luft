@@ -79,7 +79,7 @@
 			source's key, and update with Luft.
 		</p>
 
-		<Section title="Add a source" description="The address of its .repo file, a COPR project as copr:owner/project, or 1password, docker, google-chrome, vscode or claude-desktop.">
+		<Section title="Add a source" description="The address of its .repo file, a COPR project as copr:owner/project, or 1password, docker, google-chrome or vscode.">
 			<Row title="Source">
 				<div class="flex items-center gap-2">
 					<div class="w-[320px]">

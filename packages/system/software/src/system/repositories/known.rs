@@ -30,7 +30,7 @@ impl Known {
     }
 }
 
-pub const KNOWN: [Known; 5] = [
+pub const KNOWN: [Known; 4] = [
     Known {
         name: "1password",
         file: "1password",
@@ -64,13 +64,6 @@ pub const KNOWN: [Known; 5] = [
              baseurl=https://packages.microsoft.com/yumrepos/vscode\n\
              enabled=1\ngpgcheck=1\n\
              gpgkey=https://packages.microsoft.com/keys/microsoft.asc\n",
-        ),
-    },
-    Known {
-        name: "claude-desktop",
-        file: "claude-desktop-unofficial",
-        definition: Definition::Address(
-            "https://pkg.claude-desktop-debian.dev/rpm/claude-desktop-unofficial.repo",
         ),
     },
 ];

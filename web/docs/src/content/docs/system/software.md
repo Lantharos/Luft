@@ -93,7 +93,7 @@ Vendors that publish Linux apps often keep their own package repository, such as
 ```sh
 schelf repo add https://download.docker.com/linux/fedora/docker-ce.repo
 schelf repo add copr:scottames/ghostty
-schelf repo add 1password                  # also docker, google-chrome, vscode, claude-desktop
+schelf repo add 1password                  # also docker, google-chrome, vscode
 schelf install --system docker-ce docker-ce-cli containerd.io
 schelf repo list
 schelf repo remove docker-ce

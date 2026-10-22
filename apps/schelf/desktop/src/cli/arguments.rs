@@ -101,7 +101,7 @@ impl Command {
                  Adds a software source for system packages, such as a vendor's RPM\n\
                  repository: the address of its .repo file, a COPR project as\n\
                  copr:owner/project, or one Schelf knows by name: 1password, docker,\n\
-                 google-chrome, vscode or claude-desktop. Schelf shows the key its packages\n\
+                 google-chrome or vscode. Schelf shows the key its packages\n\
                  are signed with and asks before adding it. Packages from it then install\n\
                  with --system and update with Luft. Removing a source removes its packages."
             }

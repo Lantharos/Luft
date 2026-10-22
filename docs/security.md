@@ -190,6 +190,8 @@ Some things are sensitive no matter which of your programs asks, because they wo
 - Managing Luft Keyring in Settings: the access history, apps' own secrets, removing SSH keys or their confirmation, changing the PIN or locking with the screen. Once confirmed, Settings can keep managing for five minutes.
 - A sandboxed app reading an item another sandboxed app saved. An app reading your items is asked about once, and can be told to remember the answer.
 
+Peek, which lets programs see and use your windows, isn't open to sandboxed apps at all. For programs of yours it asks before they first touch a window you opened yourself, and the answer lasts until that program quits. That keeps an agent from working in your windows without you noticing; it isn't a boundary between your programs, which are all you.
+
 Things that aren't sensitive never ask: using what you saved, adding keys, locking the keyring, or making something stricter.
 
 These prompts can't stop malware that already runs as you, which could act on the screen as you do. They stop a program from doing these things quietly, and stop someone at your unlocked computer from opening your passwords.

@@ -105,7 +105,7 @@ let token: Option<Vec<u8>> = secrets::load("account-token").await?;
 secrets::delete("account-token").await?;
 ```
 
-Each app keeps its own secrets without prompts, under its app ID. A Flatpak app's secrets are only readable by that app. Apps outside a sandbox run as you, so any program you run could read theirs; see [Who an app is](../security.md#who-an-app-is).
+Each app keeps its own secrets without prompts, under its app ID. A sandboxed app, a Flatpak or an AppImage, can only name its own ID, so other sandboxed apps can't read its secrets. Apps outside a sandbox run as you, so any program you run could read theirs; see [Who an app is](../security.md#who-an-app-is).
 
 ```rust
 let thumbnails = Thumbnails::new(events.clone(), "my-app.thumbnails");

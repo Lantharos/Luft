@@ -4,15 +4,14 @@ import pwd
 import shutil
 import subprocess
 import sys
-import tempfile
 import time
 
 import gi
 from agent import exercise_agent
 from flatpak import exercise_flatpaks
 from manage import exercise_management
+from namespace import PROGRAM, enter
 from sabine import exercise_sabine
-from seal import sealed
 
 gi.require_version("Gio", "2.0")
 from gi.repository import Gio, GLib
@@ -79,7 +78,7 @@ def lookup(environment, *attributes):
 
 
 def main():
-    root = tempfile.mkdtemp(prefix="luft-keyring-")
+    root = enter(DAEMON)
     try:
         run(root)
     finally:
@@ -159,10 +158,11 @@ def run(root):
         if os.path.exists(socket):
             break
         time.sleep(0.1)
-    daemon = subprocess.Popen(sealed([DAEMON], socket), env=session.environment)
+    daemon = subprocess.Popen([PROGRAM], env=session.environment)
     session.daemon = daemon.pid
     try:
         wait_for_name("org.freedesktop.secrets")
+        check(runs_with_own_group(daemon.pid), "the keyring runs with a group of its own, as Luft installs it")
         exercise(session)
     finally:
         daemon.terminate()
@@ -170,6 +170,12 @@ def run(root):
         for helper in helpers:
             helper.terminate()
             helper.wait()
+
+
+def runs_with_own_group(pid):
+    with open(f"/proc/{pid}/status") as status:
+        real, effective = next(line for line in status if line.startswith("Gid:")).split()[1:3]
+    return real != effective
 
 
 def store(environment, label, secret, *attributes):

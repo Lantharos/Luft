@@ -3,8 +3,6 @@ import shutil
 import subprocess
 import sys
 
-from seal import in_daemon_user_namespace
-
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -21,7 +19,7 @@ def exercise_sabine(session, check):
 
     def hosted():
         reader = os.path.join(HERE, "reader.py")
-        return session.run([*in_daemon_user_namespace(session.daemon), host, reader, "safe-storage"])
+        return session.run([host, reader, "safe-storage"])
 
     def asked():
         return len(session.requests("access")) + len(session.requests("password"))

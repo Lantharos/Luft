@@ -6,7 +6,6 @@ import gi
 
 gi.require_version("Gio", "2.0")
 from gi.repository import Gio, GLib
-from seal import in_daemon_user_namespace
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 APP = "org.example.Notebook"
@@ -50,7 +49,7 @@ def exercise_flatpaks(session, check, login):
         links = [part for name in ("bin", "lib", "lib64") for part in ("--symlink", f"usr/{name}", f"/{name}")]
         shared = ["--bind", "/tmp", "/tmp", "--ro-bind", HERE, HERE]
         identity = ["--ro-bind", sandbox_info(app), "/.flatpak-info"]
-        sandbox = [*around, *in_daemon_user_namespace(session.daemon), "bwrap", *system, *links, *shared, *identity, "--"]
+        sandbox = [*around, "bwrap", *system, *links, *shared, *identity, "--"]
         return session.run([*sandbox, sys.executable, os.path.join(HERE, program), *arguments], extra)
 
     def asked():

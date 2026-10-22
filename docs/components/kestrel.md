@@ -41,6 +41,8 @@ Kestrel's settings live in the `com.lantharos.kestrel` schemas, and Settings cha
 
 `kestrel-settings` follows the dark style schedule in `dark-schedule` together with the night light, from the same sunrise and sunset, so both change at the same moment.
 
+Chromium-based browsers and Electron apps lock their profile with the host name, and refuse a profile locked under another name. At sign-in and whenever the host name changes, `kestrel-settings` looks for these locks in `~/.config`, Flatpak's `~/.var/app/*/config` and Sabine's profiles: a lock still held by its running app is moved to the new name, so launching it again opens a window in that app, and one left behind by an app that's no longer running is removed. NetworkManager never names the computer after the network (`hostname-mode=none`), so the name only changes when you rename it in Settings.
+
 ## Session services
 
 | Service | Role |

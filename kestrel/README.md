@@ -12,7 +12,7 @@ Kestrel is Luft's desktop and login screen. It runs on its own patched Mutter 51
 | [`engine`](engine/README.md) | The native shell, started from GNOME Shell 51.0 |
 | `ui` | Taskbar, Start, quick settings and every other surface, in TypeScript |
 | [`compositor`](compositor/README.md) | Mutter patch series |
-| `settings` | `kestrel-settings`: XSETTINGS, night light, power, printing, housekeeping, time zone |
+| `settings` | `kestrel-settings`: XSETTINGS, night light, power, printing, housekeeping, time zone, browser profile locks |
 | `search` | `kestrel-search`, the file index behind Start's search |
 | `greeter` | `kestrel-greeter-service`, which stores the login screen's settings |
 | [`keyring`](keyring/README.md) | Luft Keyring |

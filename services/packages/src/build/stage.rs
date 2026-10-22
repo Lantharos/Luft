@@ -12,7 +12,7 @@ use super::checks::{Place, place};
 use super::rpm::{File, Rpm};
 use super::units;
 use crate::command::run;
-use crate::system_packages::manifest::Placed;
+use crate::state::manifest::Placed;
 
 const FACTORY: &str = "usr/share/factory";
 const DIRECTORY: u32 = 0o040000;

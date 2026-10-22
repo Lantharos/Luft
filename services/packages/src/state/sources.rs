@@ -8,8 +8,9 @@ use anyhow::{Context, Result, bail};
 
 use super::manifest::{Build, Origin};
 use super::requested::{self, Requested};
-use super::{repositories, state};
+use super::state;
 use crate::command::text;
+use crate::repositories;
 
 const ARCHITECTURES: [&str; 2] = ["noarch", std::env::consts::ARCH];
 

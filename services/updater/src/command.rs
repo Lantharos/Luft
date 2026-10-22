@@ -33,7 +33,3 @@ pub fn run(command: &mut Command) -> Result<Vec<u8>> {
     }
     Ok(output.stdout)
 }
-
-pub fn text(command: &mut Command) -> Result<String> {
-    Ok(String::from_utf8_lossy(&run(command)?).into_owned())
-}

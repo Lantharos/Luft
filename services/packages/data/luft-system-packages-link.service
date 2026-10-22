@@ -1,0 +1,38 @@
+[Unit]
+Description=Offer the system packages built for this version of Luft
+DefaultDependencies=no
+After=local-fs.target
+Before=systemd-sysext.service
+Wants=systemd-sysext.service
+ConditionPathExists=/var/lib/luft/system-packages/packages
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/luft-packages link
+SyslogIdentifier=luft-packages
+ReadWritePaths=/run
+ProtectSystem=strict
+ProtectHome=yes
+PrivateDevices=yes
+PrivateNetwork=yes
+NoNewPrivileges=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+ProtectProc=invisible
+RestrictAddressFamilies=AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged @resources
+CapabilityBoundingSet=
+
+[Install]
+WantedBy=sysinit.target

@@ -1,7 +1,7 @@
 use std::fs;
 use std::path::Path;
 
-use super::manifest::Declared;
+use crate::state::manifest::Declared;
 
 const CREATING_TMPFILES: &str = "fFdDvqQpLcbC";
 const CONVENTIONAL: [&str; 4] = ["/var/lib", "/var/cache", "/var/log", "/etc"];

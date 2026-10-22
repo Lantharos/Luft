@@ -8,7 +8,7 @@ use anyhow::{Context, Result, bail};
 use super::rpm::Rpm;
 use super::selinux;
 use crate::command::run;
-use crate::system_packages::manifest::Origin;
+use crate::state::manifest::Origin;
 
 const KEYS: &str = "usr/share/pki/rpm-gpg";
 const ADDED_KEYS: &str = "etc/pki/rpm-gpg";

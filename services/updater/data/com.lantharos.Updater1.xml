@@ -10,8 +10,8 @@
     Download, SwitchVariant, Cancel and Apply need com.lantharos.updater.download; Rollback needs
     com.lantharos.updater.rollback. Status needs nothing.
 
-    A finished download also builds the system packages for the version it staged, before
-    Finished.
+    A finished download also has com.lantharos.Packages1 build the system packages for the version
+    it staged, before Finished.
   -->
   <interface name="com.lantharos.Updater1">
     <property name="Downloading" type="b" access="read"/>
@@ -39,63 +39,6 @@
     <!-- Empty when the download succeeded. -->
     <signal name="Finished">
       <arg name="error" type="s"/>
-    </signal>
-  </interface>
-
-  <!--
-    Packages added to the system as a system extension, rebuilt for every version of Luft on the
-    computer, from Fedora, the repositories that were added in /etc/yum.repos.d, and package files
-    installed by themselves. Install, InstallFile and Remove need
-    com.lantharos.updater.system-packages, AddRepository and RemoveRepository
-    com.lantharos.updater.software-sources. Those that rebuild return once the running system
-    uses the new set; Step tells how far they are. List and DescribeRepository need nothing.
-  -->
-  <interface name="com.lantharos.Updater1.SystemPackages">
-    <property name="Busy" type="b" access="read"/>
-
-    <!-- JSON: {"requested": [names], "packages": [{"name", "version", "arch", "summary",
-         "requested", "units", "apps": [desktop entries], "origin": "fedora", "file" or
-         {"repository": file}}] merged now,
-         dependencies included, "services": [units turned on], "pending": true when the merged
-         set isn't the requested one yet, "repositories": [{"file", "sources": [{"id", "name",
-         "url"}]}]}. -->
-    <method name="List">
-      <arg name="packages" type="s" direction="out"/>
-    </method>
-    <method name="Install">
-      <arg name="names" type="as" direction="in"/>
-    </method>
-    <!-- Installs a package file, kept so every version builds it again. Its digests are
-         checked, not a signature. -->
-    <method name="InstallFile">
-      <arg name="package" type="h" direction="in"/>
-    </method>
-    <method name="Remove">
-      <arg name="names" type="as" direction="in"/>
-    </method>
-    <!-- Checks a repository file to be kept as /etc/yum.repos.d/FILE.repo, and the keys it names,
-         each given by the address its gpgkey has. Every source that's turned on must check
-         signatures and be reached over HTTPS. JSON: {"file", "sources": [...], "keys":
-         [{"fingerprint", "user"}]}. -->
-    <method name="DescribeRepository">
-      <arg name="file" type="s" direction="in"/>
-      <arg name="text" type="s" direction="in"/>
-      <arg name="keys" type="a{ss}" direction="in"/>
-      <arg name="repository" type="s" direction="out"/>
-    </method>
-    <!-- Adds what DescribeRepository described, with its keys kept in /etc/pki/rpm-gpg. -->
-    <method name="AddRepository">
-      <arg name="file" type="s" direction="in"/>
-      <arg name="text" type="s" direction="in"/>
-      <arg name="keys" type="a{ss}" direction="in"/>
-    </method>
-    <!-- Removes a repository and the packages that came from it. -->
-    <method name="RemoveRepository">
-      <arg name="file" type="s" direction="in"/>
-    </method>
-    <!-- "downloading", "building" or "starting". -->
-    <signal name="Step">
-      <arg name="step" type="s"/>
     </signal>
   </interface>
 </node>

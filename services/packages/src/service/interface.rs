@@ -11,21 +11,21 @@ use zbus::object_server::SignalEmitter;
 use zbus::{Connection, interface};
 
 use super::error::Error;
-use crate::system_packages::{self, Report, Step};
+use crate::changes::{self, Report, Step};
 
-const CHANGE: &str = "com.lantharos.updater.system-packages";
-const SOURCES: &str = "com.lantharos.updater.software-sources";
+const CHANGE: &str = "com.lantharos.packages.change";
+const SOURCES: &str = "com.lantharos.packages.sources";
 
 fn stopped() -> Error {
-    Error::Failed("The updater stopped unexpectedly.".to_owned())
+    Error::Failed("The system packages service stopped unexpectedly.".to_owned())
 }
 
-pub struct SystemPackages {
+pub struct Packages {
     idle: Arc<Idle>,
     busy: AtomicBool,
 }
 
-impl SystemPackages {
+impl Packages {
     pub fn new(idle: Arc<Idle>) -> Self {
         Self {
             idle,
@@ -45,8 +45,8 @@ impl SystemPackages {
         }
     }
 
-    /// Runs `work`, which rebuilds the system packages, reporting its steps.
-    async fn rebuild(
+    /// Runs `work`, which changes the system packages, reporting its steps.
+    async fn change(
         &self,
         emitter: &SignalEmitter<'_>,
         work: impl FnOnce(Report) -> anyhow::Result<()> + Send + 'static,
@@ -84,8 +84,8 @@ impl SystemPackages {
     }
 }
 
-#[interface(name = "com.lantharos.Updater1.SystemPackages")]
-impl SystemPackages {
+#[interface(name = "com.lantharos.Packages1")]
+impl Packages {
     #[zbus(property)]
     fn busy(&self) -> bool {
         self.busy.load(Ordering::SeqCst)
@@ -95,7 +95,11 @@ impl SystemPackages {
     async fn step(emitter: &SignalEmitter<'_>, step: &str) -> zbus::Result<()>;
 
     async fn list(&self) -> Result<String, Error> {
-        self.blocking(system_packages::list).await
+        self.blocking(changes::list).await
+    }
+
+    async fn rebuild(&self) -> Result<(), Error> {
+        self.blocking(changes::rebuild).await
     }
 
     async fn install(
@@ -106,10 +110,8 @@ impl SystemPackages {
         #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
     ) -> Result<(), Error> {
         Self::authorize(connection, &header, CHANGE).await?;
-        self.rebuild(&emitter, move |report| {
-            system_packages::change(&names, &[], report)
-        })
-        .await
+        self.change(&emitter, move |report| changes::change(&names, &[], report))
+            .await
     }
 
     async fn install_file(
@@ -121,8 +123,8 @@ impl SystemPackages {
     ) -> Result<(), Error> {
         Self::authorize(connection, &header, CHANGE).await?;
         let package = File::from(std::os::fd::OwnedFd::from(package));
-        self.rebuild(&emitter, move |report| {
-            system_packages::install_file(package, report)
+        self.change(&emitter, move |report| {
+            changes::install_file(package, report)
         })
         .await
     }
@@ -135,10 +137,8 @@ impl SystemPackages {
         #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
     ) -> Result<(), Error> {
         Self::authorize(connection, &header, CHANGE).await?;
-        self.rebuild(&emitter, move |report| {
-            system_packages::change(&[], &names, report)
-        })
-        .await
+        self.change(&emitter, move |report| changes::change(&[], &names, report))
+            .await
     }
 
     async fn describe_repository(
@@ -147,7 +147,7 @@ impl SystemPackages {
         text: String,
         keys: BTreeMap<String, String>,
     ) -> Result<String, Error> {
-        self.blocking(move || system_packages::describe_repository(&file, &text, &keys))
+        self.blocking(move || changes::describe_repository(&file, &text, &keys))
             .await
     }
 
@@ -160,7 +160,7 @@ impl SystemPackages {
         #[zbus(header)] header: Header<'_>,
     ) -> Result<(), Error> {
         Self::authorize(connection, &header, SOURCES).await?;
-        self.blocking(move || system_packages::add_repository(&file, &text, &keys))
+        self.blocking(move || changes::add_repository(&file, &text, &keys))
             .await
     }
 
@@ -172,8 +172,8 @@ impl SystemPackages {
         #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
     ) -> Result<(), Error> {
         Self::authorize(connection, &header, SOURCES).await?;
-        self.rebuild(&emitter, move |report| {
-            system_packages::remove_repository(&file, report)
+        self.change(&emitter, move |report| {
+            changes::remove_repository(&file, report)
         })
         .await
     }

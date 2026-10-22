@@ -1,0 +1,21 @@
+[package]
+name = "luft-packages"
+version = "0.1.0"
+description = "Builds the system packages Luft merges over its image as a system extension, for Schelf"
+authors = ["Kristof"]
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+libc.workspace = true
+luft-dbus.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio = { workspace = true, features = ["macros", "rt", "sync", "time"] }
+walkdir.workspace = true
+zbus = { workspace = true, features = ["service", "tokio"] }
+
+[lints]
+workspace = true

@@ -64,7 +64,7 @@ Luft's apps are built with [Sabine](https://github.com/Lantharos/Sabine): a Svel
 | `packages/web/settings-pages` | Settings' pages with their titles and search words, which Start searches too |
 | `packages/system/trust` | Calls to trustd, the security service, with its errors translated |
 
-Apps reach the system through D-Bus services that run with only the rights they need, most of them from `services`: `com.lantharos.Updater1` for updates, `com.lantharos.Trust1` for trustd, `com.lantharos.Installer1` for the installer, `com.lantharos.Accounts1` for cloud drives, and `com.lantharos.Windows1` for Windows on the same computer. Each checks polkit for what it changes.
+Apps reach the system through D-Bus services that run with only the rights they need, most of them from `services`: `com.lantharos.Updater1` for updates, `com.lantharos.Packages1` for system packages, `com.lantharos.Trust1` for trustd, `com.lantharos.Installer1` for the installer, `com.lantharos.Accounts1` for cloud drives, and `com.lantharos.Windows1` for Windows on the same computer. Each checks polkit for what it changes.
 
 Every name is in the `com.lantharos` namespace: app IDs such as `com.lantharos.rover`, GSettings schemas such as `com.lantharos.kestrel`, and D-Bus names such as `com.lantharos.Kestrel`.
 

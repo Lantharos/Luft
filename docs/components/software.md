@@ -49,7 +49,7 @@ Modules come in two groups: `apps` for apps however they're installed, and `syst
 | `system::packages` | Installing, removing and updating Fedora packages through PackageKit |
 | `system::image` | `Deployments` (`load`, `status`, `check`, `lacks`, `variant_offer`, `switch_size`), `download`, `switch`, `rollback`, and `downloading`, `follow` and `changes` for a download started anywhere |
 | `variant` | [`luft-variant`](../../packages/system/variant/README.md), which image suits this computer |
-| `system::system_packages` | `list`, `install`, `install_file` and `remove` packages merged over an image system as a system extension, through `luft-updater`, and `describe`, `add_repository` and `remove_repository` for the software sources they come from besides Fedora |
+| `system::system_packages` | `list`, `install`, `install_file` and `remove` packages merged over an image system as a system extension, through `luft-packages`, and `describe`, `add_repository` and `remove_repository` for the software sources they come from besides Fedora |
 | `system::repositories` | `fetch` gets a repository file from the address of a `.repo` file, `copr:owner/project` or a vendor in `KNOWN`, with the keys it names, as a `Draft`; `bundled` reads the one a package file ships or its scriptlets write, `desktop_entry` the menu entry a package file brings, and `added_ids` and `is_added` what's added already |
 | `apps::toolbox` | `available` lists Fedora's packages, or those of the added software sources; `install`, `install_file`, `remove`, `installed`, `updates` and `update` manage them in the default Toolbox container, with their commands in `~/.local/bin` |
 | `apps::classify` | `Classification::current()`, with `is_app`, `desktop_ids` and `apps`; cached until the RPM database or the applications folder changes |
@@ -82,7 +82,7 @@ Versions and release notes come from the image's labels:
 
 When get.luft.computer is reachable, What's new instead merges the changelogs of every version between the installed one and the offered one.
 
-`services/updater/data` has the service's D-Bus, systemd and polkit files, and `com.lantharos.Updater1.xml` describes its interface. Administrators signed in at the computer can download and install updates, and switch images, without a password, also in the background; going back to the previous version asks.
+`services/updater/data` has the service's D-Bus, systemd and polkit files, and `com.lantharos.Updater1.xml` describes its interface. Administrators signed in at the computer can download and install updates, and switch images, without a password, also in the background; going back to the previous version asks. The updater runs `bootc`, which mounts the boot partitions and writes the system's deployments, so its sandbox only keeps it away from home folders, the kernel's modules and logs, and other namespaces than mounts.
 
 ## Thumbnails
 
@@ -94,4 +94,6 @@ On image systems Schelf installs Fedora packages into the default Toolbox contai
 
 ## System packages
 
-`luft-updater` also builds the system packages: packages from Fedora, from software sources that were added and from package files, merged over the image as one system extension, rebuilt for every version on the computer, including an update right after it downloads. [System packages](../system-packages.md) explains how. Changing them, or the software sources, always asks for an administrator's password.
+`luft-packages` (in [`services/packages`](../../services/packages)) builds the system packages: packages from Fedora, from software sources that were added and from package files, merged over the image as one system extension, rebuilt for every version on the computer, including an update right after `luft-updater` downloads it. It builds in a tight sandbox and hands each finished build to a small activation service that brings it into the running system. [System packages](../system-packages.md) explains how. Changing them, or the software sources, always asks for an administrator's password.
+
+`services/packages/data` has its D-Bus, systemd and polkit files, and `com.lantharos.Packages1.xml` describes its interface.

@@ -11,10 +11,11 @@ use zbus::{Connection, interface};
 use super::PATH;
 use super::error::Error;
 use crate::bootc::{self, Fetch};
-use crate::system_packages;
 
 const DOWNLOAD: &str = "com.lantharos.updater.download";
 const ROLLBACK: &str = "com.lantharos.updater.rollback";
+const PACKAGES: &str = "com.lantharos.Packages1";
+const PACKAGES_PATH: &str = "/com/lantharos/Packages1";
 
 pub struct Updater {
     idle: Arc<Idle>,
@@ -112,7 +113,7 @@ async fn follow(updater: InterfaceRef<Updater>, fetch: Fetch, idle: Arc<Idle>) {
     let _ = inner.downloading_changed(emitter).await;
     let error = match result {
         Ok(Ok(())) => {
-            prepare_system_packages().await;
+            build_system_packages(emitter.connection()).await;
             String::new()
         }
         Ok(Err(error)) => format!("{error:#}"),
@@ -121,10 +122,20 @@ async fn follow(updater: InterfaceRef<Updater>, fetch: Fetch, idle: Arc<Idle>) {
     let _ = Updater::finished(emitter, &error).await;
 }
 
-async fn prepare_system_packages() {
-    let prepared = tokio::task::spawn_blocking(system_packages::prepare_staged).await;
-    if let Ok(Err(error)) = prepared {
-        eprintln!("Preparing the system packages for the update: {error:#}");
+/// Has the system packages built for the version that was just staged, so they're ready when
+/// it starts.
+async fn build_system_packages(connection: &Connection) {
+    let built = connection
+        .call_method(
+            Some(PACKAGES),
+            PACKAGES_PATH,
+            Some(PACKAGES),
+            "Rebuild",
+            &(),
+        )
+        .await;
+    if let Err(error) = built {
+        eprintln!("Building the system packages for the update: {error}");
     }
 }
 

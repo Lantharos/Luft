@@ -1,0 +1,24 @@
+[Unit]
+Description=Add the users and configuration of the system packages
+DefaultDependencies=no
+After=systemd-sysext.service luft-system-packages-link.service
+Before=systemd-tmpfiles-setup.service sysinit.target
+ConditionPathExists=/run/extensions/luft-system-packages.raw
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/luft-packages settle
+SyslogIdentifier=luft-packages
+UMask=0022
+IPAddressDeny=any
+CapabilityBoundingSet=CAP_AUDIT_WRITE CAP_CHOWN CAP_DAC_OVERRIDE CAP_DAC_READ_SEARCH CAP_FOWNER CAP_FSETID CAP_KILL CAP_MAC_ADMIN CAP_SETFCAP CAP_SETGID CAP_SETUID
+RestrictAddressFamilies=AF_UNIX AF_NETLINK
+RestrictNamespaces=yes
+RestrictRealtime=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=~@clock @cpu-emulation @debug @module @mount @obsolete @raw-io @reboot @swap
+
+[Install]
+WantedBy=sysinit.target

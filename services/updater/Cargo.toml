@@ -15,8 +15,7 @@ luft-variant.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 tokio = { workspace = true, features = ["macros", "rt", "sync", "time"] }
-walkdir.workspace = true
-zbus = { workspace = true, features = ["tokio"] }
+zbus = { workspace = true, features = ["service", "tokio"] }
 
 [lints]
 workspace = true

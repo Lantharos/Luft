@@ -1,5 +1,6 @@
 mod accounts;
 mod checks;
+mod declared;
 mod download;
 mod install;
 mod made;
@@ -11,23 +12,23 @@ mod units;
 use std::collections::BTreeSet;
 use std::ffi::CString;
 use std::fs;
-use std::os::unix::ffi::OsStrExt;
-use std::os::unix::fs::PermissionsExt;
+use std::io;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-use anyhow::{Context, Result};
+use anyhow::{Context, Result, anyhow};
 
-use super::manifest::{Build, Package};
-use super::requested::Requested;
-use super::sources::Sources;
-use super::{NAME, Step, declared, deployment};
+use crate::changes::Step;
 use crate::command::run;
+use crate::state::manifest::{Build, Package};
+use crate::state::requested::Requested;
+use crate::state::sources::Sources;
+use crate::state::{self, NAME, deployment};
 use stage::Layout;
 
 pub const CACHE: &str = "/var/cache/luft/system-packages";
-const WORK: &str = "/var/tmp/luft-system-packages.XXXXXX";
-const WORK_PREFIX: &str = "luft-system-packages.";
+const DNF_CACHE: &str = "/var/cache/luft/system-packages/dnf";
+const WORK: &str = "/var/cache/luft/system-packages/build";
 pub const LIBRARY_CACHE: &str = "/etc/ld.so.cache";
 const RELEASE: &str = "usr/lib/extension-release.d";
 
@@ -36,35 +37,12 @@ struct Workspace {
     mounts: Vec<PathBuf>,
 }
 
-/// Clears what a build that was stopped, by a restart for example, left behind. Builds never
-/// overlap, and their mounts went away with their namespace.
-fn clear_stopped() {
-    let Some(parent) = Path::new(WORK).parent() else {
-        return;
-    };
-    for entry in fs::read_dir(parent).into_iter().flatten().flatten() {
-        if entry
-            .file_name()
-            .as_bytes()
-            .starts_with(WORK_PREFIX.as_bytes())
-        {
-            let _ = fs::remove_dir_all(entry.path());
-        }
-    }
-}
-
 impl Workspace {
     fn new() -> Result<Self> {
-        clear_stopped();
-        let template = CString::new(WORK)?;
-        let mut template = template.into_bytes_with_nul();
-        let made = unsafe { libc::mkdtemp(template.as_mut_ptr().cast()) };
-        if made.is_null() {
-            return Err(std::io::Error::last_os_error()).context("Making a folder to build in");
-        }
-        template.pop();
+        state::remove_folder(Path::new(WORK))?;
+        fs::create_dir(WORK).context("Making a folder to build in")?;
         Ok(Self {
-            path: PathBuf::from(String::from_utf8(template)?),
+            path: PathBuf::from(WORK),
             mounts: Vec::new(),
         })
     }
@@ -196,10 +174,12 @@ pub fn build(
         .arg(&root))?;
     work.mounted(&root);
     let cache = root.join("var/cache/libdnf5");
-    fs::create_dir_all(CACHE)?;
-    fs::set_permissions(CACHE, fs::Permissions::from_mode(0o700))?;
     fs::create_dir_all(&cache)?;
-    run(Command::new("mount").arg("--bind").arg(CACHE).arg(&cache))?;
+    fs::create_dir_all(DNF_CACHE)?;
+    run(Command::new("mount")
+        .arg("--bind")
+        .arg(DNF_CACHE)
+        .arg(&cache))?;
     work.mounted(&cache);
 
     let os = os_release(&tree)?;
@@ -215,7 +195,7 @@ pub fn build(
     checks::check(requested, &rpms, &base)?;
 
     step(Step::Building);
-    let made_before = super::footprint()?;
+    let made_before = state::footprint()?;
     let seeded = accounts::seed(&root, made_before.users(), made_before.groups())?;
     let policy_before = selinux::before(&root)?;
     install::install(&root, &os.version_id, &rpms_folder, &rpms)?;
@@ -285,4 +265,38 @@ pub fn build(
     label(&root, &stage_folder)?;
     image(&stage_folder, image_path)?;
     Ok(build)
+}
+
+fn make_private() -> io::Result<()> {
+    if unsafe { libc::unshare(libc::CLONE_NEWNS) } != 0 {
+        return Err(io::Error::last_os_error());
+    }
+    let root = CString::new("/").expect("static path");
+    let flags = libc::MS_REC | libc::MS_PRIVATE;
+    let changed = unsafe {
+        libc::mount(
+            std::ptr::null(),
+            root.as_ptr(),
+            std::ptr::null(),
+            flags,
+            std::ptr::null(),
+        )
+    };
+    if changed != 0 {
+        return Err(io::Error::last_os_error());
+    }
+    Ok(())
+}
+
+/// Runs `work` on a thread of its own in a private mount namespace, so whatever it mounts goes
+/// away with the thread, even when a build stops halfway.
+pub fn isolated<T: Send + 'static>(work: impl FnOnce() -> Result<T> + Send + 'static) -> Result<T> {
+    std::thread::Builder::new()
+        .name("system-packages".to_owned())
+        .spawn(move || {
+            make_private().context("Setting up a private mount namespace")?;
+            work()
+        })?
+        .join()
+        .map_err(|_| anyhow!("Building the system packages stopped unexpectedly."))?
 }

@@ -1,0 +1,66 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+ "https://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node name="/com/lantharos/Packages1">
+  <!--
+    Packages added to the system as a system extension, rebuilt for every version of Luft on the
+    computer, from Fedora, the repositories that were added in /etc/yum.repos.d, and package files
+    installed by themselves. Started on demand and stops when idle.
+
+    Install, InstallFile and Remove need com.lantharos.packages.change, AddRepository and
+    RemoveRepository com.lantharos.packages.sources. Those that change the packages return once
+    the running system uses the new set; Step tells how far they are. List and
+    DescribeRepository need nothing. Only root can call Rebuild.
+  -->
+  <interface name="com.lantharos.Packages1">
+    <property name="Busy" type="b" access="read"/>
+
+    <!-- JSON: {"requested": [names], "packages": [{"name", "version", "arch", "summary",
+         "requested", "units", "apps": [desktop entries], "origin": "fedora", "file" or
+         {"repository": file}}] merged now,
+         dependencies included, "services": [units turned on], "pending": true when the merged
+         set isn't the requested one yet, "repositories": [{"file", "sources": [{"id", "name",
+         "url"}]}]}. -->
+    <method name="List">
+      <arg name="packages" type="s" direction="out"/>
+    </method>
+    <method name="Install">
+      <arg name="names" type="as" direction="in"/>
+    </method>
+    <!-- Installs a package file, kept so every version builds it again. Its digests are
+         checked, not a signature. -->
+    <method name="InstallFile">
+      <arg name="package" type="h" direction="in"/>
+    </method>
+    <method name="Remove">
+      <arg name="names" type="as" direction="in"/>
+    </method>
+    <!-- Checks a repository file to be kept as /etc/yum.repos.d/FILE.repo, and the keys it names,
+         each given by the address its gpgkey has. Every source that's turned on must check
+         signatures and be reached over HTTPS. JSON: {"file", "sources": [...], "keys":
+         [{"fingerprint", "user"}]}. -->
+    <method name="DescribeRepository">
+      <arg name="file" type="s" direction="in"/>
+      <arg name="text" type="s" direction="in"/>
+      <arg name="keys" type="a{ss}" direction="in"/>
+      <arg name="repository" type="s" direction="out"/>
+    </method>
+    <!-- Adds what DescribeRepository described, with its keys kept in /etc/pki/rpm-gpg. -->
+    <method name="AddRepository">
+      <arg name="file" type="s" direction="in"/>
+      <arg name="text" type="s" direction="in"/>
+      <arg name="keys" type="a{ss}" direction="in"/>
+    </method>
+    <!-- Removes a repository and the packages that came from it. -->
+    <method name="RemoveRepository">
+      <arg name="file" type="s" direction="in"/>
+    </method>
+    <!-- Builds the packages for the running version when it has none for the current list, and
+         for the other versions on the computer, such as an update that was just staged. Returns
+         when they're built. -->
+    <method name="Rebuild"/>
+    <!-- "downloading", "building" or "starting". -->
+    <signal name="Step">
+      <arg name="step" type="s"/>
+    </signal>
+  </interface>
+</node>

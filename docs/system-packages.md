@@ -1,6 +1,6 @@
 # System packages
 
-How packages from Fedora, from software sources people add and from package files get into Luft's sealed system without changing it. What people see is in [Installing software](https://docs.luft.computer/system/software/#system-packages); the code is `luft-updater` in [services/updater](../services/updater), and Schelf's `--system` and `repo` in [apps/schelf](../apps/schelf/README.md).
+How packages from Fedora, from software sources people add and from package files get into Luft's sealed system without changing it. What people see is in [Installing software](https://docs.luft.computer/system/software/#system-packages); the code is `luft-packages` in [services/packages](../services/packages), and Schelf's `--system` and `repo` in [apps/schelf](../apps/schelf/README.md).
 
 ## The idea
 
@@ -12,10 +12,10 @@ The system stays the signed image it always is. The packages someone asks for be
 | `/var/lib/luft/system-packages/files/NAME.rpm` | Package files installed by themselves |
 | `/var/lib/luft/system-packages/builds/DIGEST/` | `luft-system-packages.raw` and `build.json`, for the version whose composefs digest is `DIGEST` |
 | `/var/lib/luft/system-packages/footprint.json` | What the packages created in `/etc` and `/var`, and the users and groups, that wasn't there before |
-| `/var/cache/luft/system-packages` | dnf's metadata and the packages the current list needs, readable only by root |
+| `/var/cache/luft/system-packages` | dnf's metadata, the packages the current list needs and the build in progress, readable only by root |
 | `/run/extensions/luft-system-packages.raw` | A link to this version's build, made at every start |
 
-When the list becomes empty, all of these go. Software sources stay:
+When the list becomes empty, everything in them goes. Software sources stay:
 
 | Path | Holds |
 | --- | --- |
@@ -24,9 +24,18 @@ When the list becomes empty, all of these go. Software sources stay:
 
 Luft's image leaves both folders empty, so everything in them was added this way.
 
+## Who does what
+
+Building runs packages' scriptlets and talks to the network, so it's kept apart from what changes the running system:
+
+| Unit | Runs as | Does |
+| --- | --- | --- |
+| `luft-packages.service` | `com.lantharos.Packages1`, started on demand over D-Bus | Builds, and keeps the list, the package files and the software sources. It sees the system read-only, with write access only to its state and cache folders above and the two folders of software sources, a `/tmp` of its own, no devices, and only the capabilities building needs: owners, modes and labels of files, mounting the version's system and the sandbox's namespaces |
+| `luft-system-packages-activate@.service` | One instance per request on `/run/luft-system-packages/activate`, a socket only root can open | Brings a finished build into the running system or takes the packages away: merging, settling, starting and stopping services, and removing what the packages made. It reads nothing from the build service but the word asking for one of the two, and answers with `done` or what went wrong |
+
 ## Building
 
-`luft-updater` builds on a thread of its own in a private mount namespace, so nothing it mounts is seen elsewhere:
+`luft-packages` builds on a thread of its own in a private mount namespace, so nothing it mounts outlives the build:
 
 1. Mount the version's system read-only from the composefs repository with `bootc internals cfs mount`, which checks every file against the digest like the startup image does, and put a writable overlay over it.
 2. Copy the software sources and their keys into the build root, and `dnf --installroot install --store` against that version's own package database, Fedora's repositories in `/usr/share/dnf5/repos.d` and the added ones, without weak dependencies. Package files installed by themselves are named by their path, so dnf brings what they need. The stored transaction names every package and the repository it came from, which `build.json` keeps. Its packages are linked back into dnf's cache and everything else there is deleted, so the next build only downloads what changed; they're checked again when they're installed, like any download.
@@ -53,11 +62,11 @@ What scriptlets would otherwise do on the computer itself, such as making users 
 | --- | --- | --- |
 | `luft-system-packages-link.service` | Before `systemd-sysext.service` | Links the build for the running version's digest (from `composefs=`), if it was made for the current list; otherwise queues a rebuild |
 | `luft-system-packages-settle.service` | After `systemd-sysext.service`, before `systemd-tmpfiles-setup.service` | Notes what's missing, then runs `systemd-sysusers`, copies `/etc` and `/var` defaults that aren't there, runs `ldconfig` and reloads udev rules when the packages bring them, and queues the services that are turned on |
-| `luft-system-packages-rebuild.service` | Once online, when the link queues it | Builds for the running version and merges it |
+| `luft-system-packages-rebuild.service` | Once online, when the link queues it | Asks `luft-packages` to rebuild, which builds for the running version and merges it |
 
 The services are queued by hand because systemd merges extensions after the start's targets are queued, so links merged then don't pull anything in by themselves. `Upholds=` would, but it also restarts a service someone stopped.
 
-Installing and removing at runtime build, link, run `systemd-sysext refresh`, settle and start or stop the services that changed. Units that refuse to be started or stopped by hand, such as iSCSI's start-up unit, and templates are left to systemd. When anything after the build fails, the previous build, or none, is put back and what the new one added is taken away again.
+Installing and removing at runtime build, then have the activation service link, run `systemd-sysext refresh`, settle and start or stop the services that changed. Units that refuse to be started or stopped by hand, such as iSCSI's start-up unit, and templates are left to systemd. When anything after the build fails, the previous build, or none, is put back and what the new one added is taken away again.
 
 ## Removing
 
@@ -79,7 +88,7 @@ Schelf fetches a source as the user, from the address of a `.repo` file, `copr:o
 - Each key is imported into a throwaway rpm database, so a key rpm wouldn't accept, such as one bound with SHA-1, is refused now rather than at the next build. The fingerprints and names rpm reads are what Schelf shows.
 - A section ID another source already uses is refused.
 
-`AddRepository` checks the same file and keys again and writes the file back with only the settings that choose where packages come from, `gpgcheck=1`, and `gpgkey` pointing at the keys as they were shown, kept in `/etc/pki/rpm-gpg`. A source can't change its key later; packages signed with any other key fail at step 5. Both need `com.lantharos.updater.software-sources`.
+`AddRepository` checks the same file and keys again and writes the file back with only the settings that choose where packages come from, `gpgcheck=1`, and `gpgkey` pointing at the keys as they were shown, kept in `/etc/pki/rpm-gpg`. A source can't change its key later; packages signed with any other key fail at step 5. Both need `com.lantharos.packages.sources`.
 
 `RemoveRepository` rebuilds without the source and without the requested packages the merged build says came from it, the same way removing packages does, and only then deletes the file and its keys. A build is current only while every source its packages came from is still there, so the other versions on the computer are built again without it too.
 
@@ -87,7 +96,7 @@ A package file someone opens in Schelf becomes a system package when it has a me
 
 ## Updates and going back
 
-When `luft-updater` finishes downloading an update or a switch to the other image, it builds the system packages for the staged version before reporting the download finished, so Settings shows it as still finishing. Applying the update doesn't wait for that: a restart in the middle stops the build, and the version builds its packages once it's online. Builds for versions that aren't booted, staged or the rollback are removed.
+When `luft-updater` finishes downloading an update or a switch to the other image, it calls `Rebuild` on `com.lantharos.Packages1`, which only root may call, and `luft-packages` builds the system packages for the staged version before the updater reports the download finished, so Settings shows it as still finishing. Applying the update doesn't wait for that: a restart in the middle stops the build, and the version builds its packages once it's online. Builds for versions that aren't booted, staged or the rollback are removed.
 
 Going back needs nothing: the previous version keeps its build. If the list changed since then, the link at the next start doesn't match and the build is made once the computer is online, and the same happens when an update was staged some other way, such as `bootc upgrade` in a terminal.
 

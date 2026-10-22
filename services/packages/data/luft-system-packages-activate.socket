@@ -1,0 +1,9 @@
+[Unit]
+Description=Bring system packages into the running system
+
+[Socket]
+ListenStream=/run/luft-system-packages/activate
+SocketMode=0600
+DirectoryMode=0700
+Accept=yes
+RemoveOnStop=yes

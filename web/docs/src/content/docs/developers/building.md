@@ -62,7 +62,7 @@ os/dev/layer.sh reset                    # back to the signed image
 | --- | --- |
 | `kestrel` | Kestrel, its settings service, search, the login screen's service, Luft Keyring, Luft Passkeys and the watchdog |
 | `boot` | trustd, USB protection and Sushi's shutdown screen |
-| `services` | The installer, updater, sleep, accounts, speech and Windows services |
+| `services` | The installer, updater, system packages, sleep, accounts, speech and Windows services |
 | `app-NAME` | The app in `apps/NAME` |
 
 Run it on Luft itself rather than in a toolbox, from a clone of this repository; Luft already has the Git and Podman it needs. The first `apply` downloads the base and sets up the builder, which takes a while and around 8 GB of space; later ones only rebuild what changed. It asks for your password to lay the build over `/usr`. `apply` refreshes the settings schemas, icon, font, MIME and app caches over the combined system, labels everything for SELinux with the installed policy, restarts the system services the build replaces, and reloads D-Bus. Log out and back in to run a new Kestrel or a new session service.

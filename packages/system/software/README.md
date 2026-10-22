@@ -15,7 +15,7 @@ How it tells apps from the system, its modules, image and offline updates, thumb
 ## Checks
 
 ```sh
-cargo clippy -p luft-software -p luft-updater -p luft-thumbnailer --all-targets
-cargo fmt --check -p luft-software -p luft-updater -p luft-thumbnailer
-cargo test -p luft-software -p luft-updater -p luft-thumbnailer
+cargo clippy -p luft-software -p luft-updater -p luft-packages -p luft-thumbnailer --all-targets
+cargo fmt --check -p luft-software -p luft-updater -p luft-packages -p luft-thumbnailer
+cargo test -p luft-software -p luft-updater -p luft-packages -p luft-thumbnailer
 ```

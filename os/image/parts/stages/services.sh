@@ -6,7 +6,7 @@ destdir="$1"
 release="$CARGO_TARGET_DIR/release"
 
 cd "$luft"
-cargo build --release --locked -p luft-installer -p luft-updater -p luft-thumbnailer \
+cargo build --release --locked -p luft-installer -p luft-updater -p luft-packages -p luft-thumbnailer \
   -p luft-windows-service -p luft-sleep -p luft-accounts-service -p luft-speech-service
 
 installer="$luft/apps/setup/installer"
@@ -25,11 +25,19 @@ updater="$luft/services/updater"
 install -Dm755 "$release/luft-updater" "$destdir/usr/libexec/luft-updater"
 install -Dm644 -t "$destdir/usr/share/dbus-1/system.d" "$updater/data/com.lantharos.Updater1.conf"
 install -Dm644 -t "$destdir/usr/share/dbus-1/system-services" "$updater/data/com.lantharos.Updater1.service"
-install -Dm644 -t "$destdir/usr/lib/systemd/system" "$updater/data/luft-updater.service" \
-  "$updater/data/luft-system-packages-link.service" "$updater/data/luft-system-packages-settle.service" \
-  "$updater/data/luft-system-packages-rebuild.service"
+install -Dm644 -t "$destdir/usr/lib/systemd/system" "$updater/data/luft-updater.service"
 install -Dm644 -t "$destdir/usr/share/polkit-1/actions" "$updater/data/com.lantharos.updater.policy"
 install -Dm644 -t "$destdir/usr/share/polkit-1/rules.d" "$updater/data/50-luft-updater.rules"
+
+packages="$luft/services/packages"
+install -Dm755 "$release/luft-packages" "$destdir/usr/libexec/luft-packages"
+install -Dm644 -t "$destdir/usr/share/dbus-1/system.d" "$packages/data/com.lantharos.Packages1.conf"
+install -Dm644 -t "$destdir/usr/share/dbus-1/system-services" "$packages/data/com.lantharos.Packages1.service"
+install -Dm644 -t "$destdir/usr/lib/systemd/system" "$packages/data/luft-packages.service" \
+  "$packages/data/luft-system-packages-activate.socket" "$packages/data/luft-system-packages-activate@.service" \
+  "$packages/data/luft-system-packages-link.service" "$packages/data/luft-system-packages-settle.service" \
+  "$packages/data/luft-system-packages-rebuild.service"
+install -Dm644 -t "$destdir/usr/share/polkit-1/actions" "$packages/data/com.lantharos.packages.policy"
 printf 'enable luft-system-packages-%s.service\n' link settle |
   install -Dm644 /dev/stdin "$destdir/usr/lib/systemd/system-preset/40-luft-system-packages.preset"
 

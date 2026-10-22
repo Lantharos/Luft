@@ -6,12 +6,12 @@ use std::process::{Command, Stdio};
 use anyhow::{Context, Result, anyhow};
 use serde::Deserialize;
 
-use super::CACHE;
+use super::DNF_CACHE;
 use crate::command::failure;
-use crate::system_packages::manifest::Origin;
-use crate::system_packages::repositories::{self, FOLDER, KEYS};
-use crate::system_packages::requested::Requested;
-use crate::system_packages::sources::Sources;
+use crate::repositories::{self, FOLDER, KEYS};
+use crate::state::manifest::Origin;
+use crate::state::requested::Requested;
+use crate::state::sources::Sources;
 
 const PERSIST: &str = "var/lib/dnf";
 const PACKAGES: &str = "packages";
@@ -54,7 +54,7 @@ const COMMAND_LINE: &str = "@commandline";
 /// The folder dnf keeps a repository's metadata and packages in, named after its ID and a
 /// hash of its settings.
 fn cache_folder(repository: &str) -> Option<PathBuf> {
-    fs::read_dir(CACHE).ok()?.flatten().find_map(|entry| {
+    fs::read_dir(DNF_CACHE).ok()?.flatten().find_map(|entry| {
         let name = entry.file_name().into_string().ok()?;
         let hash = name.strip_prefix(repository)?.strip_prefix('-')?;
         (hash.len() == 16 && hash.chars().all(|character| character.is_ascii_hexdigit()))
@@ -63,7 +63,7 @@ fn cache_folder(repository: &str) -> Option<PathBuf> {
 }
 
 fn cached() -> impl Iterator<Item = PathBuf> {
-    fs::read_dir(CACHE)
+    fs::read_dir(DNF_CACHE)
         .into_iter()
         .flatten()
         .flatten()

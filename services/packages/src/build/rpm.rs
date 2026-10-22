@@ -4,7 +4,7 @@ use std::process::Command;
 use anyhow::{Context, Result};
 
 use crate::command::text;
-use crate::system_packages::manifest::Origin;
+use crate::state::manifest::Origin;
 
 const QUERY: &str = "%{NAME}\\t%|EPOCH?{%{EPOCH}:}:{}|%{VERSION}-%{RELEASE}\\t%{ARCH}\\t%{SUMMARY}\\n\
 [%{FILENAMES}\\t%{FILEUSERNAME}\\t%{FILEGROUPNAME}\\t%{FILEMODES}\\t%{FILEFLAGS}\\n]";

@@ -4435,6 +4435,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "luft-packages"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "libc",
+ "luft-dbus",
+ "serde",
+ "serde_json",
+ "tokio",
+ "walkdir",
+ "zbus 6.0.0",
+]
+
+[[package]]
 name = "luft-passkeys"
 version = "0.1.0"
 dependencies = [
@@ -4582,7 +4596,6 @@ dependencies = [
  "serde",
  "serde_json",
  "tokio",
- "walkdir",
  "zbus 6.0.0",
 ]
 

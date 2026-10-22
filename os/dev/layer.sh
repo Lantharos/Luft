@@ -21,7 +21,7 @@ across restarts until reset, and is taken off by itself when Luft updates.
 
   kestrel     Kestrel, its settings, search, greeter, keyring, passkeys and watchdog
   boot        trustd, USB protection and Sushi, as far as they run after startup
-  services    The installer, updater, sleep, accounts, speech and Windows services
+  services    The installer, updater, system packages, sleep, accounts, speech and Windows services
   app-NAME    An app from apps/NAME
 USAGE
 }

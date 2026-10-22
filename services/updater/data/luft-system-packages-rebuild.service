@@ -1,8 +1,0 @@
-[Unit]
-Description=Build the system packages for this version of Luft
-Wants=network-online.target
-After=network-online.target
-
-[Service]
-Type=oneshot
-ExecStart=/usr/libexec/luft-updater rebuild-system-packages

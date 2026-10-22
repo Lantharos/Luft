@@ -11,10 +11,10 @@ use crate::progress::Stage;
 use crate::system::repositories::{Described, Draft};
 use crate::task::Task;
 
-const SYSTEM_PACKAGES: Service = Service {
-    name: "com.lantharos.Updater1",
-    path: "/com/lantharos/Updater1",
-    interface: "com.lantharos.Updater1.SystemPackages",
+const PACKAGES: Service = Service {
+    name: "com.lantharos.Packages1",
+    path: "/com/lantharos/Packages1",
+    interface: "com.lantharos.Packages1",
 };
 
 /// Where a system package came from.
@@ -92,7 +92,7 @@ impl SystemPackages {
 }
 
 pub async fn list() -> Result<SystemPackages, String> {
-    let text: String = SYSTEM_PACKAGES
+    let text: String = PACKAGES
         .proxy()
         .await?
         .call("List", &())
@@ -116,10 +116,9 @@ async fn rebuild<B: Serialize + DynamicType>(
     task: Task<'_>,
 ) -> Result<(), String> {
     let connection = dbus::system().await?;
-    let signals =
-        dbus::objects::signals(connection, SYSTEM_PACKAGES.name, SYSTEM_PACKAGES.path).await?;
+    let signals = dbus::objects::signals(connection, PACKAGES.name, PACKAGES.path).await?;
     task.progress(Stage::Preparing, None);
-    let call = SYSTEM_PACKAGES.change::<_, ()>(method, body);
+    let call = PACKAGES.change::<_, ()>(method, body);
     let steps = signals.for_each(|message| {
         if let Ok(message) = message
             && message
@@ -135,7 +134,7 @@ async fn rebuild<B: Serialize + DynamicType>(
     pin_mut!(call, steps);
     match select(call, steps).await {
         Either::Left((result, _)) => result.map_err(|error| dbus::explain(&error)),
-        Either::Right(_) => Err("The update service stopped unexpectedly.".to_owned()),
+        Either::Right(_) => Err("The system packages service stopped unexpectedly.".to_owned()),
     }
 }
 
@@ -159,7 +158,7 @@ pub async fn remove(names: &[String], task: Task<'_>) -> Result<(), String> {
 
 /// Checks a repository and its keys, so they can be shown before it's trusted.
 pub async fn describe(draft: &Draft) -> Result<Described, String> {
-    let text: String = SYSTEM_PACKAGES
+    let text: String = PACKAGES
         .proxy()
         .await?
         .call(
@@ -173,7 +172,7 @@ pub async fn describe(draft: &Draft) -> Result<Described, String> {
 
 /// Adds a repository, so its packages can be system packages.
 pub async fn add_repository(draft: &Draft) -> Result<(), String> {
-    SYSTEM_PACKAGES
+    PACKAGES
         .change::<_, ()>("AddRepository", &(&draft.file, &draft.text, &draft.keys))
         .await
         .map_err(|error| dbus::explain(&error))

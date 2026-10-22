@@ -61,8 +61,7 @@ pub fn read(armored: &str) -> Result<Vec<Key>> {
 }
 
 fn tempfile() -> Result<std::path::PathBuf> {
-    let made =
-        text(Command::new("mktemp").args(["--directory", "--tmpdir=/run", "luft-key.XXXXXX"]))?;
+    let made = text(Command::new("mktemp").args(["--directory", "--tmpdir", "luft-key.XXXXXX"]))?;
     Ok(made.trim().into())
 }
 

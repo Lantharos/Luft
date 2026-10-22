@@ -3,14 +3,17 @@ use std::fs::File;
 
 use anyhow::{Result, bail};
 
-use super::manifest::{Origin, Package};
-use super::sources::{self, Sources};
-use super::{Lock, Report, activate, change_locked, load, repositories, requested_now};
+use super::{Report, change_locked};
+use crate::activation::linked;
+use crate::repositories;
+use crate::state::manifest::{Origin, Package};
+use crate::state::sources::{self, Sources};
+use crate::state::{self, Lock, load};
 
 /// Installs a package file by itself, kept so every version builds it again.
 pub fn install_file(package: File, report: Report) -> Result<()> {
     let _lock = Lock::take()?;
-    let current = requested_now()?;
+    let current = state::requested()?;
     let name = sources::receive(package, &current)?;
     let installed = change_locked(
         &current,
@@ -49,10 +52,10 @@ pub fn remove_repository(file: &str, report: Report) -> Result<()> {
         bail!("There's no software source called {file}.");
     }
     let from_it = |package: &&Package| package.origin == Origin::Repository(file.to_owned());
-    let merged = activate::linked().and_then(|folder| load(&folder));
+    let merged = linked().and_then(|folder| load(&folder));
     let packages = merged.map(|build| build.packages).unwrap_or_default();
     if packages.iter().any(|package| from_it(&package)) {
-        let current = requested_now()?;
+        let current = state::requested()?;
         let leaving: Vec<String> = packages
             .iter()
             .filter(from_it)

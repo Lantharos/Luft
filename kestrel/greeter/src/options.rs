@@ -3,7 +3,7 @@ use std::path::{PathBuf, absolute};
 pub struct Options {
     pub unprivileged: bool,
     pub state_dir: PathBuf,
-    pub greetd_config: PathBuf,
+    pub write_greetd_config: Option<PathBuf>,
 }
 
 impl Options {
@@ -11,13 +11,15 @@ impl Options {
         let mut options = Self {
             unprivileged: false,
             state_dir: PathBuf::from("/var/lib/kestrel-greeter"),
-            greetd_config: PathBuf::from("/etc/greetd/config.toml"),
+            write_greetd_config: None,
         };
         while let Some(arg) = args.next() {
             match arg.as_str() {
                 "--unprivileged" => options.unprivileged = true,
                 "--state-dir" => options.state_dir = path_after(&arg, args.next())?,
-                "--greetd-config" => options.greetd_config = path_after(&arg, args.next())?,
+                "--write-greetd-config" => {
+                    options.write_greetd_config = Some(path_after(&arg, args.next())?)
+                }
                 _ => return Err(format!("Unknown argument {arg}")),
             }
         }

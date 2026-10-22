@@ -80,6 +80,10 @@ make_efi_mountpoint() {
   install -d -m 0755 /efi
 }
 
+leave_greetd_config_to_the_greeter() {
+  rm -f /etc/greetd/config.toml
+}
+
 leave_initramfs_to_the_startup_image() {
   rm -f /usr/lib/modules/*/initramfs.img
 }
@@ -111,5 +115,6 @@ check_typelibs
 refresh_caches
 let_line_out_play_beside_headphones
 make_efi_mountpoint
+leave_greetd_config_to_the_greeter
 leave_initramfs_to_the_startup_image
 clean_build_state

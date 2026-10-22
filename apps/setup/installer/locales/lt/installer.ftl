@@ -10,8 +10,6 @@ installer-account-exists = Paskyra jau sukurta.
 ## Choosing what to install
 
 installer-no-image = Nėra { $variant } atvaizdo, kurį būtų galima įdiegti.
-installer-read-failed = Nepavyko perskaityti { $path }
-installer-parse-failed = Nepavyko išanalizuoti { $path }
 installer-write-failed = Nepavyko įrašyti { $path }
 
 ## Checking the destination

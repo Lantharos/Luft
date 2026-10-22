@@ -10,8 +10,6 @@ installer-account-exists = Kontot har redan skapats.
 ## Choosing what to install
 
 installer-no-image = Det finns ingen avbildning av typen { $variant } att installera.
-installer-read-failed = Det gick inte att läsa { $path }
-installer-parse-failed = Det gick inte att tolka { $path }
 installer-write-failed = Det gick inte att skriva { $path }
 
 ## Checking the destination

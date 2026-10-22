@@ -14,7 +14,7 @@ pub fn finish(state_dir: &Path) -> Result<()> {
     if let Err(error) = wait(systems::remove_old_system_startups()) {
         eprintln!("The replaced system's start entries weren't removed: {error}");
     }
-    greetd::stop_signing_in(&Path::new("/etc").join(greetd::CONFIG))?;
+    greetd::stop_signing_in(&Path::new("/var").join(greetd::INITIAL_SESSION))?;
     window::forget(state_dir)?;
     std::fs::remove_file(phase::marker(state_dir))?;
     Ok(())

@@ -10,8 +10,6 @@ installer-account-exists = Обліковий запис уже створено
 ## Choosing what to install
 
 installer-no-image = Немає образу { $variant } для встановлення.
-installer-read-failed = Не вдалося прочитати { $path }
-installer-parse-failed = Не вдалося розібрати { $path }
 installer-write-failed = Не вдалося записати { $path }
 
 ## Checking the destination

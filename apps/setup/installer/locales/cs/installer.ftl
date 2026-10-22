@@ -10,8 +10,6 @@ installer-account-exists = Účet už byl vytvořen.
 ## Choosing what to install
 
 installer-no-image = Neexistuje žádný obraz { $variant }, který by šel nainstalovat.
-installer-read-failed = Nepodařilo se přečíst { $path }
-installer-parse-failed = Nepodařilo se zpracovat { $path }
 installer-write-failed = Nepodařilo se zapsat { $path }
 
 ## Checking the destination

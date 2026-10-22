@@ -10,8 +10,6 @@ installer-account-exists = Hesap zaten oluşturuldu.
 ## Choosing what to install
 
 installer-no-image = Yüklenecek { $variant } kalıbı yok.
-installer-read-failed = Okunamadı: { $path }
-installer-parse-failed = Ayrıştırılamadı: { $path }
 installer-write-failed = Yazılamadı: { $path }
 
 ## Checking the destination

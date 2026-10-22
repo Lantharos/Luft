@@ -1,71 +1,24 @@
+use std::io::ErrorKind;
 use std::path::Path;
 
-use anyhow::{Context, Result};
-use luft_i18n::t;
-use toml_edit::{DocumentMut, Item, Table, value};
+use anyhow::Result;
+use toml_edit::{DocumentMut, value};
 
 use super::files::write;
-use crate::L10N;
 
-pub const CONFIG: &str = "greetd/config.toml";
-const INITIAL_SESSION: &str = "initial_session";
+pub const INITIAL_SESSION: &str = "lib/kestrel-greeter/initial-session.toml";
 const SESSION: &str = "/usr/bin/kestrel-session";
 
-fn read(config: &Path) -> Result<DocumentMut> {
-    std::fs::read_to_string(config)
-        .with_context(|| {
-            t!(
-                L10N,
-                "installer-read-failed",
-                path = config.display().to_string()
-            )
-        })?
-        .parse()
-        .with_context(|| {
-            t!(
-                L10N,
-                "installer-parse-failed",
-                path = config.display().to_string()
-            )
-        })
+pub fn sign_in_at_start(initial_session: &Path, user: &str) -> Result<()> {
+    let mut document = DocumentMut::new();
+    document["user"] = value(user);
+    document["command"] = value(SESSION);
+    write(initial_session, &document.to_string())
 }
 
-pub fn sign_in_at_start(config: &Path, user: &str) -> Result<()> {
-    let mut document = read(config)?;
-    let mut session = Table::new();
-    session["user"] = value(user);
-    session["command"] = value(SESSION);
-    document[INITIAL_SESSION] = Item::Table(session);
-    write(config, &document.to_string())
-}
-
-pub fn stop_signing_in(config: &Path) -> Result<()> {
-    let mut document = read(config)?;
-    document.remove(INITIAL_SESSION);
-    write(config, &document.to_string())
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    const CONFIG: &str = "[terminal]\nvt = 7\n\n[default_session]\ncommand = \"/usr/bin/kestrel-greeter\"\nuser = \"greetd\"\n";
-
-    #[test]
-    fn signs_in_until_setup_finishes_and_leaves_the_rest_as_it_was() {
-        let folder = std::env::temp_dir().join(format!("luft-greetd-{}", std::process::id()));
-        std::fs::create_dir_all(&folder).unwrap();
-        let config = folder.join("config.toml");
-        std::fs::write(&config, CONFIG).unwrap();
-
-        sign_in_at_start(&config, "ada").unwrap();
-        assert_eq!(
-            std::fs::read_to_string(&config).unwrap(),
-            format!("{CONFIG}\n[initial_session]\nuser = \"ada\"\ncommand = \"{SESSION}\"\n")
-        );
-        stop_signing_in(&config).unwrap();
-        assert_eq!(std::fs::read_to_string(&config).unwrap(), CONFIG);
-
-        std::fs::remove_dir_all(folder).unwrap();
+pub fn stop_signing_in(initial_session: &Path) -> Result<()> {
+    match std::fs::remove_file(initial_session) {
+        Err(error) if error.kind() != ErrorKind::NotFound => Err(error.into()),
+        _ => Ok(()),
     }
 }

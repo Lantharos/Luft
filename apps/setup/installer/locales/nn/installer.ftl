@@ -10,8 +10,6 @@ installer-account-exists = Kontoen er alt oppretta.
 ## Choosing what to install
 
 installer-no-image = Det finst ikkje noko { $variant }-bilete å installere.
-installer-read-failed = Kunne ikkje lese { $path }
-installer-parse-failed = Kunne ikkje tolke { $path }
 installer-write-failed = Kunne ikkje skrive { $path }
 
 ## Checking the destination

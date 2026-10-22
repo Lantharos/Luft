@@ -69,7 +69,7 @@ Run it on Luft itself rather than in a toolbox, from a clone of this repository;
 
 The build stays across restarts. When Luft updates, the next start takes it off and says so, since a build made for the previous version would hide the update's own files; run `apply` again to put your build back on the new version. It goes over [system packages](/system/software/#system-packages) the same way, and both stay merged.
 
-Some things only change with a new image: SELinux policy, Fedora packages and libraries the build needs that the image doesn't have, files in `/etc` such as PAM rules and greetd's configuration, and whatever runs before the disk is unlocked, such as Sushi in the startup image and SushiBoot. `apply` refuses builds that need libraries or typelibs the installed image lacks, and names the files in `/etc` that differ.
+Some things only change with a new image: SELinux policy, Fedora packages and libraries the build needs that the image doesn't have, files in `/etc` such as gpg-agent's configuration, and whatever runs before the disk is unlocked, such as Sushi in the startup image and SushiBoot. `apply` refuses builds that need libraries or typelibs the installed image lacks, and names the files in `/etc` that differ.
 
 ## The image
 

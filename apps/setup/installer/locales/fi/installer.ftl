@@ -10,8 +10,6 @@ installer-account-exists = Tili on jo luotu.
 ## Choosing what to install
 
 installer-no-image = Asennettavaa levykuvaa ei ole: { $variant }
-installer-read-failed = Tiedostoa ei voitu lukea: { $path }
-installer-parse-failed = Tiedostoa ei voitu jäsentää: { $path }
 installer-write-failed = Tiedostoa ei voitu kirjoittaa: { $path }
 
 ## Checking the destination

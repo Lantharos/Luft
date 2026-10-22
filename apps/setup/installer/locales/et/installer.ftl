@@ -10,8 +10,6 @@ installer-account-exists = Konto on juba loodud.
 ## Choosing what to install
 
 installer-no-image = Installimiseks pole tõmmist { $variant }.
-installer-read-failed = Faili { $path } ei õnnestunud lugeda
-installer-parse-failed = Faili { $path } ei õnnestunud parsida
 installer-write-failed = Faili { $path } ei õnnestunud kirjutada
 
 ## Checking the destination

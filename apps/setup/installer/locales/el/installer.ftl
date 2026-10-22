@@ -10,8 +10,6 @@ installer-account-exists = Ο λογαριασμός έχει ήδη δημιο�
 ## Choosing what to install
 
 installer-no-image = Δεν υπάρχει εικόνα { $variant } για εγκατάσταση.
-installer-read-failed = Δεν ήταν δυνατή η ανάγνωση: { $path }
-installer-parse-failed = Δεν ήταν δυνατή η ανάλυση: { $path }
 installer-write-failed = Δεν ήταν δυνατή η εγγραφή: { $path }
 
 ## Checking the destination

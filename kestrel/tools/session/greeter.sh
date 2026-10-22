@@ -37,7 +37,6 @@ cp "$run/images/mara-wallpaper.png" "$run/state/users/2001/wallpaper.jpg"
 cp "$run/images/theo-wallpaper.png" "$run/state/users/2002/wallpaper.jpg"
 printf '[Desktop Entry]\nName=Kestrel\nExec=kestrel-session\nDesktopNames=Kestrel;GNOME\n' > "$run/data/wayland-sessions/kestrel.desktop"
 printf '[Desktop Entry]\nName=Sway\nExec=sway\n' > "$run/data/wayland-sessions/sway.desktop"
-printf '[terminal]\nvt = 1\n\n[default_session]\ncommand = "kestrel-greeter"\nuser = "greetd"\n' > "$run/greetd.toml"
 
 start dbus-daemon --session --nofork --print-address=3 3> "$run/system-bus"
 wait_until "the stand-in system bus" test -s "$run/system-bus"
@@ -45,8 +44,7 @@ DBUS_SYSTEM_BUS_ADDRESS="$(head -n1 "$run/system-bus")"
 export DBUS_SYSTEM_BUS_ADDRESS
 
 start gjs -m "$fixtures/systemServices.js" "$run/images" "$events"
-start "$root/target/release/kestrel-greeter-service" --unprivileged \
-  --state-dir "$run/state" --greetd-config "$run/greetd.toml"
+start "$root/target/release/kestrel-greeter-service" --unprivileged --state-dir "$run/state"
 start gjs -m "$fixtures/greetd.js" "$socket" "$events"
 wait_until "the accounts service" gdbus introspect --system --dest org.freedesktop.Accounts --object-path /org/freedesktop/Accounts
 wait_until "the greeter service" gdbus introspect --system --dest com.lantharos.Greeter1 --object-path /com/lantharos/Greeter1

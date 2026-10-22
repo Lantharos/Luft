@@ -10,8 +10,6 @@ installer-account-exists = A fiók már létre lett hozva.
 ## Choosing what to install
 
 installer-no-image = Nincs telepíthető lemezkép ehhez a változathoz: { $variant }.
-installer-read-failed = Nem sikerült beolvasni: { $path }
-installer-parse-failed = Nem sikerült feldolgozni: { $path }
 installer-write-failed = Nem sikerült írni: { $path }
 
 ## Checking the destination

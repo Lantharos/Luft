@@ -32,8 +32,8 @@ const READ_LIMIT: Duration = Duration::from_secs(10);
 impl Greeter {
     pub fn new(options: Options, idle: Arc<Idle>) -> Self {
         Self {
+            greetd: Greetd::new(&options.state_dir),
             store: Store::new(options.state_dir),
-            greetd: Greetd::new(options.greetd_config),
             access: Access::new(options.unprivileged),
             idle,
             writing: Mutex::default(),
@@ -87,10 +87,10 @@ impl Greeter {
     ) -> Result<(), Error> {
         let session = sessions::preferred(sessions, default_session)
             .ok_or_else(|| Error::NotSupported("No sessions are installed".into()))?;
-        self.greetd.set_initial_session(Some(InitialSession {
+        Ok(self.greetd.set_initial_session(Some(InitialSession {
             user,
             command: &session.command(),
-        }))
+        }))?)
     }
 }
 

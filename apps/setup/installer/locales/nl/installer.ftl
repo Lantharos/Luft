@@ -10,8 +10,6 @@ installer-account-exists = Het account is al gemaakt.
 ## Choosing what to install
 
 installer-no-image = Er is geen { $variant }-image om te installeren.
-installer-read-failed = Kan { $path } niet lezen
-installer-parse-failed = Kan { $path } niet verwerken
 installer-write-failed = Kan { $path } niet schrijven
 
 ## Checking the destination

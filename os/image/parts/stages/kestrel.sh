@@ -21,7 +21,9 @@ greeter_files() {
   echo "kestrel-greeter.service /usr/lib/systemd/system/kestrel-greeter.service"
   echo "com.lantharos.greeter.policy /usr/share/polkit-1/actions/com.lantharos.greeter.policy"
   echo "kestrel-greeter.tmpfiles /usr/lib/tmpfiles.d/kestrel-greeter.conf"
-  echo "greetd.toml /etc/greetd/config.toml"
+  echo "greetd.toml /usr/lib/kestrel-greeter/greetd.toml"
+  echo "greetd.service.conf /usr/lib/systemd/system/greetd.service.d/kestrel-greeter.conf"
+  echo "luft-greeter.cil /usr/share/selinux/packages/luft-greeter.cil"
 }
 
 keyring_files() {
@@ -33,9 +35,9 @@ keyring_files() {
   echo "dbus/org.freedesktop.secrets.service /usr/share/dbus-1/services/org.freedesktop.secrets.service"
   echo "dbus/com.lantharos.Keyring1.service /usr/share/dbus-1/services/com.lantharos.Keyring1.service"
   echo "dbus/luft-keyring.portal /usr/share/xdg-desktop-portal/portals/luft-keyring.portal"
-  echo "pam/kestrel-unlock /etc/pam.d/kestrel-unlock"
-  echo "pam/kestrel-unlock-fingerprint /etc/pam.d/kestrel-unlock-fingerprint"
-  echo "pam/greetd /etc/pam.d/greetd"
+  echo "pam/kestrel-unlock /usr/lib/pam.d/kestrel-unlock"
+  echo "pam/kestrel-unlock-fingerprint /usr/lib/pam.d/kestrel-unlock-fingerprint"
+  echo "pam/greetd /usr/lib/pam.d/greetd"
 }
 
 watchdog_files() {

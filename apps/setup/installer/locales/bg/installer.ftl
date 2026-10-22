@@ -10,8 +10,6 @@ installer-account-exists = Акаунтът вече е създаден.
 ## Choosing what to install
 
 installer-no-image = Няма образ { $variant } за инсталиране.
-installer-read-failed = Неуспешно четене на { $path }
-installer-parse-failed = Неуспешен анализ на { $path }
 installer-write-failed = Неуспешен запис в { $path }
 
 ## Checking the destination

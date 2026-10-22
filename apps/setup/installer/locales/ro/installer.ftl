@@ -10,8 +10,6 @@ installer-account-exists = Contul a fost deja creat.
 ## Choosing what to install
 
 installer-no-image = Nu există nicio imagine { $variant } de instalat.
-installer-read-failed = Nu s-a putut citi { $path }
-installer-parse-failed = Nu s-a putut interpreta { $path }
 installer-write-failed = Nu s-a putut scrie { $path }
 
 ## Checking the destination

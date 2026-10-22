@@ -1,12 +1,13 @@
 use std::fs;
 use std::io;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use toml_edit::{DocumentMut, Item, Table, TomlError, value};
 
-use crate::error::Error;
-use crate::files::{Readers, write_atomically};
+use crate::files::{self, Readers, write_atomically};
 
+const DEFAULTS: &str = "/usr/lib/kestrel-greeter/greetd.toml";
+const INITIAL_SESSION_FILE: &str = "initial-session.toml";
 const INITIAL_SESSION: &str = "initial_session";
 
 pub struct InitialSession<'a> {
@@ -15,64 +16,74 @@ pub struct InitialSession<'a> {
 }
 
 pub struct Greetd {
-    config: PathBuf,
+    initial_session: PathBuf,
 }
 
 impl Greetd {
-    pub fn new(config: PathBuf) -> Self {
-        Self { config }
+    pub fn new(state_dir: &Path) -> Self {
+        Self {
+            initial_session: state_dir.join(INITIAL_SESSION_FILE),
+        }
     }
 
     pub fn automatic_login(&self) -> String {
-        let Ok(text) = fs::read_to_string(&self.config) else {
-            return String::new();
-        };
-        match text.parse::<DocumentMut>() {
-            Ok(document) => document
-                .get(INITIAL_SESSION)
-                .and_then(|session| session.get("user"))
-                .and_then(Item::as_str)
-                .unwrap_or_default()
-                .to_owned(),
-            Err(error) => {
-                eprintln!("Couldn't parse {}: {error}", self.config.display());
-                String::new()
-            }
-        }
+        self.initial_session()
+            .and_then(|session| session.get("user")?.as_str().map(str::to_owned))
+            .unwrap_or_default()
     }
 
-    pub fn set_initial_session(&self, session: Option<InitialSession>) -> Result<(), Error> {
-        let text = match fs::read_to_string(&self.config) {
-            Err(error) if error.kind() == io::ErrorKind::NotFound => {
-                return Err(Error::NotSupported("greetd isn't installed".into()));
-            }
-            result => result?,
+    pub fn set_initial_session(&self, session: Option<InitialSession>) -> io::Result<()> {
+        let Some(InitialSession { user, command }) = session else {
+            return files::remove(&self.initial_session);
         };
-        let edited = with_initial_session(&text, session).map_err(|error| {
-            eprintln!("Couldn't parse {}: {error}", self.config.display());
-            Error::Failed("greetd's configuration can't be read".into())
-        })?;
-        Ok(write_atomically(
-            &self.config,
-            edited.as_bytes(),
+        let mut document = DocumentMut::new();
+        document["user"] = value(user);
+        document["command"] = value(command);
+        write_atomically(
+            &self.initial_session,
+            document.to_string().as_bytes(),
             Readers::Everyone,
-        )?)
+        )
+    }
+
+    pub fn write_config(&self, path: &Path) -> io::Result<()> {
+        let defaults = fs::read_to_string(DEFAULTS)?;
+        let config = with_initial_session(&defaults, self.initial_session())
+            .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?;
+        write_atomically(path, config.as_bytes(), Readers::Everyone)
+    }
+
+    fn initial_session(&self) -> Option<Table> {
+        let text = match fs::read_to_string(&self.initial_session) {
+            Ok(text) => text,
+            Err(error) if error.kind() == io::ErrorKind::NotFound => return None,
+            Err(error) => {
+                eprintln!("Couldn't read {}: {error}", self.initial_session.display());
+                return None;
+            }
+        };
+        match text.parse::<DocumentMut>() {
+            Ok(document) => complete(document.as_table()),
+            Err(error) => {
+                eprintln!("Ignoring {}: {error}", self.initial_session.display());
+                None
+            }
+        }
     }
 }
 
-fn with_initial_session(text: &str, session: Option<InitialSession>) -> Result<String, TomlError> {
-    let mut document = text.parse::<DocumentMut>()?;
-    match session {
-        Some(InitialSession { user, command }) => {
-            let table = document
-                .entry(INITIAL_SESSION)
-                .or_insert_with(|| Item::Table(Table::new()));
-            table["user"] = value(user);
-            table["command"] = value(command);
-        }
-        None => {
-            document.remove(INITIAL_SESSION);
-        }
+fn complete(session: &Table) -> Option<Table> {
+    let mut table = Table::new();
+    for key in ["user", "command"] {
+        table[key] = value(session.get(key)?.as_str()?);
+    }
+    Some(table)
+}
+
+fn with_initial_session(defaults: &str, session: Option<Table>) -> Result<String, TomlError> {
+    let mut document = defaults.parse::<DocumentMut>()?;
+    if let Some(session) = session {
+        document[INITIAL_SESSION] = Item::Table(session);
     }
     Ok(document.to_string())
 }
@@ -81,7 +92,7 @@ fn with_initial_session(text: &str, session: Option<InitialSession>) -> Result<S
 mod tests {
     use super::*;
 
-    const CONFIG: &str = "\
+    const DEFAULTS: &str = "\
 # Luft's greetd configuration
 [terminal]
 vt = 1 # the first console
@@ -91,33 +102,30 @@ command = \"/usr/bin/kestrel-greeter\"
 user = \"greetd\"
 ";
 
-    #[test]
-    fn adds_and_removes_the_initial_session() {
-        let session = InitialSession {
-            user: "mara",
-            command: "env XDG_SESSION_TYPE=wayland kestrel",
-        };
-        let enabled = with_initial_session(CONFIG, Some(session)).unwrap();
-        assert_eq!(
-            enabled,
-            format!(
-                "{CONFIG}\n[initial_session]\nuser = \"mara\"\n\
-                 command = \"env XDG_SESSION_TYPE=wayland kestrel\"\n"
-            )
-        );
-        assert_eq!(with_initial_session(&enabled, None).unwrap(), CONFIG);
+    fn session(text: &str) -> Option<Table> {
+        complete(text.parse::<DocumentMut>().unwrap().as_table())
     }
 
     #[test]
-    fn updates_an_existing_initial_session_in_place() {
-        let text = "[initial_session]\n# who signs in at boot\nuser = \"ada\"\ncommand = \"old\"\n\n[terminal]\nvt = 1\n";
-        let session = InitialSession {
-            user: "grace",
-            command: "new",
-        };
+    fn adds_the_initial_session_to_the_defaults() {
+        let config = with_initial_session(
+            DEFAULTS,
+            session("user = \"mara\"\ncommand = \"env XDG_SESSION_TYPE=wayland kestrel\"\n"),
+        )
+        .unwrap();
         assert_eq!(
-            with_initial_session(text, Some(session)).unwrap(),
-            "[initial_session]\n# who signs in at boot\nuser = \"grace\"\ncommand = \"new\"\n\n[terminal]\nvt = 1\n"
+            config,
+            format!(
+                "{DEFAULTS}\n[initial_session]\nuser = \"mara\"\n\
+                 command = \"env XDG_SESSION_TYPE=wayland kestrel\"\n"
+            )
         );
+        assert_eq!(with_initial_session(DEFAULTS, None).unwrap(), DEFAULTS);
+    }
+
+    #[test]
+    fn leaves_out_an_initial_session_without_a_user_or_command() {
+        assert!(session("user = \"mara\"\n").is_none());
+        assert!(session("command = \"kestrel\"\nuser = 7\n").is_none());
     }
 }

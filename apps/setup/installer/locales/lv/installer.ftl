@@ -10,8 +10,6 @@ installer-account-exists = Konts jau ir izveidots.
 ## Choosing what to install
 
 installer-no-image = Nav attēla { $variant }, ko instalēt.
-installer-read-failed = Neizdevās nolasīt { $path }
-installer-parse-failed = Neizdevās parsēt { $path }
 installer-write-failed = Neizdevās ierakstīt { $path }
 
 ## Checking the destination

@@ -10,8 +10,6 @@ installer-account-exists = Il-kont diġà nħoloq.
 ## Choosing what to install
 
 installer-no-image = M’hemm l-ebda image { $variant } x’tiġi installata.
-installer-read-failed = Ma setax jinqara { $path }
-installer-parse-failed = Ma setax jiġi analizzat { $path }
 installer-write-failed = Ma setax jinkiteb { $path }
 
 ## Checking the destination

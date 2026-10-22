@@ -10,8 +10,6 @@ installer-account-exists = Račun je že ustvarjen.
 ## Choosing what to install
 
 installer-no-image = Slike { $variant } za namestitev ni.
-installer-read-failed = Datoteke { $path } ni bilo mogoče prebrati
-installer-parse-failed = Datoteke { $path } ni bilo mogoče razčleniti
 installer-write-failed = Datoteke { $path } ni bilo mogoče zapisati
 
 ## Checking the destination

@@ -10,8 +10,6 @@ installer-account-exists = Сметката е веќе создадена.
 ## Choosing what to install
 
 installer-no-image = Нема системска слика { $variant } за инсталирање.
-installer-read-failed = { $path } не можеше да се прочита
-installer-parse-failed = { $path } не можеше да се обработи
 installer-write-failed = { $path } не можеше да се запише
 
 ## Checking the destination

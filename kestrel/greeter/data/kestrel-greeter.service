@@ -9,7 +9,6 @@ Group=greetd
 UMask=0022
 StateDirectory=kestrel-greeter
 StateDirectoryMode=0755
-ReadWritePaths=-/etc/greetd
 ProtectSystem=strict
 ProtectHome=yes
 PrivateTmp=yes

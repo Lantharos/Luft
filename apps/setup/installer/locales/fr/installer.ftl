@@ -10,8 +10,6 @@ installer-account-exists = Le compte a déjà été créé.
 ## Choosing what to install
 
 installer-no-image = Aucune image { $variant } à installer.
-installer-read-failed = Impossible de lire { $path }
-installer-parse-failed = Impossible d’analyser { $path }
 installer-write-failed = Impossible d’écrire { $path }
 
 ## Checking the destination

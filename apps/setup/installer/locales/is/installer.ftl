@@ -10,8 +10,6 @@ installer-account-exists = Aðgangurinn hefur þegar verið búinn til.
 ## Choosing what to install
 
 installer-no-image = Engin kerfismynd af gerðinni { $variant } er til uppsetningar.
-installer-read-failed = Ekki tókst að lesa { $path }
-installer-parse-failed = Ekki tókst að túlka { $path }
 installer-write-failed = Ekki tókst að skrifa { $path }
 
 ## Checking the destination

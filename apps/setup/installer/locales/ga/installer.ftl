@@ -10,8 +10,6 @@ installer-account-exists = Cruthaíodh an cuntas cheana.
 ## Choosing what to install
 
 installer-no-image = Níl aon íomhá { $variant } ann le suiteáil.
-installer-read-failed = Níorbh fhéidir { $path } a léamh
-installer-parse-failed = Níorbh fhéidir { $path } a pharsáil
 installer-write-failed = Níorbh fhéidir { $path } a scríobh
 
 ## Checking the destination

@@ -14,10 +14,6 @@ installer-account-exists = The account was already made.
 # $variant is the name of a system image variant, like "nvidia"
 installer-no-image = There's no { $variant } image to install.
 # $path is a file path
-installer-read-failed = Couldn't read { $path }
-# $path is a file path
-installer-parse-failed = Couldn't parse { $path }
-# $path is a file path
 installer-write-failed = Couldn't write { $path }
 
 ## Checking the destination

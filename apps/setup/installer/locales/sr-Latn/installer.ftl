@@ -10,8 +10,6 @@ installer-account-exists = Nalog je već napravljen.
 ## Choosing what to install
 
 installer-no-image = Nema slike { $variant } za instaliranje.
-installer-read-failed = Čitanje „{ $path }“ nije uspelo
-installer-parse-failed = Obrada „{ $path }“ nije uspela
 installer-write-failed = Upisivanje „{ $path }“ nije uspelo
 
 ## Checking the destination

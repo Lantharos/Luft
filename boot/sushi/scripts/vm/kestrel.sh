@@ -51,7 +51,9 @@ place "$greeter_data/com.lantharos.Greeter1.service" /usr/share/dbus-1/system-se
 place "$greeter_data/kestrel-greeter.service" /usr/lib/systemd/system/kestrel-greeter.service
 place "$greeter_data/com.lantharos.greeter.policy" /usr/share/polkit-1/actions/com.lantharos.greeter.policy
 place "$greeter_data/kestrel-greeter.tmpfiles" /usr/lib/tmpfiles.d/kestrel-greeter.conf
-place "$greeter_data/greetd.toml" /etc/greetd/config.toml
+place "$greeter_data/greetd.toml" /usr/lib/kestrel-greeter/greetd.toml
+place "$greeter_data/greetd.service.conf" /usr/lib/systemd/system/greetd.service.d/kestrel-greeter.conf
+place "$greeter_data/luft-greeter.cil" /usr/share/selinux/packages/luft-greeter.cil
 place "$watchdog_data/com.lantharos.Kestrel.Watchdog1.conf" /etc/dbus-1/system.d/com.lantharos.Kestrel.Watchdog1.conf
 place "$watchdog_data/com.lantharos.Kestrel.Watchdog1.service" /usr/share/dbus-1/system-services/com.lantharos.Kestrel.Watchdog1.service
 place "$watchdog_data/kestrel-watchdog.service" /usr/lib/systemd/system/kestrel-watchdog.service
@@ -80,3 +82,4 @@ podman unshare sh -c "
   cp -a '$stage/.' '$tree/'
   chown -R 0:0 '$tree$prefix'
 "
+podman run --rm --security-opt label=disable --rootfs "$tree" semodule -i /usr/share/selinux/packages/luft-greeter.cil

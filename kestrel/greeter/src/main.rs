@@ -7,6 +7,7 @@ mod service;
 mod store;
 mod system;
 
+use std::path::Path;
 use std::process::ExitCode;
 use std::sync::Arc;
 use std::time::Duration;
@@ -14,6 +15,7 @@ use std::time::Duration;
 use idle::Idle;
 use options::Options;
 use service::Greeter;
+use system::greetd::Greetd;
 
 const NAME: &str = "com.lantharos.Greeter1";
 const PATH: &str = "/com/lantharos/Greeter1";
@@ -28,10 +30,23 @@ async fn main() -> ExitCode {
             return ExitCode::from(2);
         }
     };
+    if let Some(path) = &options.write_greetd_config {
+        return write_greetd_config(&options, path);
+    }
     match serve(options).await {
         Ok(()) => ExitCode::SUCCESS,
         Err(error) => {
             eprintln!("Couldn't serve {NAME}: {error}");
+            ExitCode::FAILURE
+        }
+    }
+}
+
+fn write_greetd_config(options: &Options, path: &Path) -> ExitCode {
+    match Greetd::new(&options.state_dir).write_config(path) {
+        Ok(()) => ExitCode::SUCCESS,
+        Err(error) => {
+            eprintln!("Couldn't write {}: {error}", path.display());
             ExitCode::FAILURE
         }
     }

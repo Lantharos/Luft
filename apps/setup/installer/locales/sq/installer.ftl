@@ -10,8 +10,6 @@ installer-account-exists = Llogaria është krijuar tashmë.
 ## Choosing what to install
 
 installer-no-image = Nuk ka imazh { $variant } për të instaluar.
-installer-read-failed = { $path } nuk u lexua dot
-installer-parse-failed = { $path } nuk u analizua dot
 installer-write-failed = { $path } nuk u shkrua dot
 
 ## Checking the destination

@@ -162,7 +162,7 @@ check_whole_drive() {
     [[ "$(cat "$root/etc/hostname")" == ada-laptop ]] || fail "the regional settings aren't in the new system"
   pass "the time zone, language, keyboard and name are in the new system"
   check_wifi_carried "$root"
-  [[ "$(sed -n '/^\[initial_session\]/,$p' "$root/etc/greetd/config.toml" | xargs)" == "[initial_session] user = ada command = /usr/bin/kestrel-session" ]] ||
+  [[ "$(xargs < "$state/lib/kestrel-greeter/initial-session.toml")" == "user = ada command = /usr/bin/kestrel-session" ]] ||
     fail "starting doesn't sign ada in by itself"
   [[ "$(cat "$state/lib/luft-installer/first-boot")" == ada ]] || fail "the first start won't open setup"
   pass "every start signs ada straight into setup until it's finished"
@@ -380,7 +380,7 @@ check_setup_expires() {
   ! setup_step EnrollSigningKey || fail "setup's exceptions last more than five starts"
   /usr/libexec/luft-installer expire-setup || fail "ending setup failed"
   [[ ! -e "$marker" && ! -e "$boots" ]] || fail "setup is still pending after too many starts"
-  cmp -s /etc/greetd/config.toml /run/greetd.toml || fail "too many starts later, ada is still signed in by herself"
+  [[ ! -e /var/lib/kestrel-greeter/initial-session.toml ]] || fail "too many starts later, ada is still signed in by herself"
   pass "setup's exceptions and signing in by itself end a day after installing or after five starts"
 }
 
@@ -396,8 +396,7 @@ check_password_needed_after_setup() {
 pending_setup() {
   mkdir -p /var/lib/luft-installer
   echo ada > /var/lib/luft-installer/first-boot
-  cp /etc/greetd/config.toml /run/greetd.toml
-  printf '\n[initial_session]\nuser = "ada"\ncommand = "/usr/bin/kestrel-session"\n' >> /etc/greetd/config.toml
+  printf 'user = "ada"\ncommand = "/usr/bin/kestrel-session"\n' > /var/lib/kestrel-greeter/initial-session.toml
 }
 
 check_first_boot_finish() {
@@ -416,7 +415,7 @@ check_first_boot_finish() {
   ! call FinishFirstBoot > /dev/null 2>&1 || fail "someone other than the new account could end setup"
   runuser -u ada -- busctl call "${BUS[@]}" FinishFirstBoot > /dev/null || fail "the new account couldn't end setup"
   [[ ! -e /var/lib/luft-installer/first-boot ]] || fail "setup would open again at the next sign-in"
-  cmp -s /etc/greetd/config.toml /run/greetd.toml || fail "the next start would still sign ada in by itself"
+  [[ ! -e /var/lib/kestrel-greeter/initial-session.toml ]] || fail "the next start would still sign ada in by itself"
   pass "only the new account ends setup"
   ! setup_step EnrollSigningKey || fail "setup's exceptions outlast setup"
   pass "after setup, nothing is done for ada without her password"

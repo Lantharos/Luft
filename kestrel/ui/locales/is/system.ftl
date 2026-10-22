@@ -24,6 +24,10 @@ oom-app-closed-title = Forritinu { $app } var lokað til að losa minni
 oom-container-closed-title = Gámi var lokað til að losa minni
 oom-closed-body = Minni tölvunnar var að klárast, svo þessu var lokað til að allt annað héldi áfram að svara.
 oom-closed-body-with-size = Minni tölvunnar var að klárast, svo þessu var lokað til að allt annað héldi áfram að svara. Minnisnotkunin var { $size }.
+memory-low-title = Minni Luft er að klárast
+memory-low-app-body = { $app } notar { $size }. Þvingaðu lokun svo allt annað haldi áfram að svara.
+memory-low-container-body = Gámur notar { $size }. Þvingaðu lokun svo allt annað haldi áfram að svara.
+memory-low-force-quit = Þvinga lokun
 
 ## Input source indicator
 

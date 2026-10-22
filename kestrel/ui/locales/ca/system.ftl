@@ -24,6 +24,10 @@ oom-app-closed-title = S’ha tancat { $app } per alliberar memòria
 oom-container-closed-title = S’ha tancat un contenidor per alliberar memòria
 oom-closed-body = L’ordinador s’estava quedant sense memòria, així que s’ha tancat perquè la resta continuï responent.
 oom-closed-body-with-size = L’ordinador s’estava quedant sense memòria, així que s’ha tancat perquè la resta continuï responent. Feia servir { $size }.
+memory-low-title = A Luft li queda poca memòria
+memory-low-app-body = { $app } fa servir { $size }. Forceu-ne el tancament perquè la resta continuï responent.
+memory-low-container-body = Un contenidor fa servir { $size }. Forceu-ne el tancament perquè la resta continuï responent.
+memory-low-force-quit = Força el tancament
 
 ## Input source indicator
 

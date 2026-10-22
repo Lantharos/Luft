@@ -24,6 +24,10 @@ oom-app-closed-title = { $app } foi fechado para liberar memória
 oom-container-closed-title = Um contêiner foi fechado para liberar memória
 oom-closed-body = O computador estava ficando sem memória, então ele foi fechado para que todo o resto continue respondendo.
 oom-closed-body-with-size = O computador estava ficando sem memória, então ele foi fechado para que todo o resto continue respondendo. Ele estava usando { $size }.
+memory-low-title = O Luft está ficando sem memória
+memory-low-app-body = { $app } está usando { $size }. Force o encerramento para que todo o resto continue respondendo.
+memory-low-container-body = Um contêiner está usando { $size }. Force o encerramento para que todo o resto continue respondendo.
+memory-low-force-quit = Forçar encerramento
 
 ## Input source indicator
 

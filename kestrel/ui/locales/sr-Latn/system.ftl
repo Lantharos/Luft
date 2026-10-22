@@ -24,6 +24,10 @@ oom-app-closed-title = Aplikacija { $app } je zatvorena da bi se oslobodila memo
 oom-container-closed-title = Kontejner je zatvoren da bi se oslobodila memorija
 oom-closed-body = Računaru je ponestajalo memorije, pa je zatvaranje bilo potrebno da bi sve ostalo i dalje brzo reagovalo.
 oom-closed-body-with-size = Računaru je ponestajalo memorije, pa je zatvaranje bilo potrebno da bi sve ostalo i dalje brzo reagovalo. Time je oslobođeno { $size }.
+memory-low-title = Luft ostaje bez memorije
+memory-low-app-body = Aplikacija { $app } koristi { $size }. Prinudno je zatvorite da bi sve ostalo i dalje brzo reagovalo.
+memory-low-container-body = Kontejner koristi { $size }. Prinudno ga zatvorite da bi sve ostalo i dalje brzo reagovalo.
+memory-low-force-quit = Prinudno zatvori
 
 ## Input source indicator
 

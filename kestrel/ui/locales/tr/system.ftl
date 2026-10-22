@@ -24,6 +24,10 @@ oom-app-closed-title = Bellek boşaltmak için { $app } uygulaması kapatıldı
 oom-container-closed-title = Bellek boşaltmak için bir kapsayıcı kapatıldı
 oom-closed-body = Bilgisayarın belleği azalıyordu, bu yüzden diğer her şeyin akıcı çalışması için kapatıldı.
 oom-closed-body-with-size = Bilgisayarın belleği azalıyordu, bu yüzden diğer her şeyin akıcı çalışması için kapatıldı. Kullandığı bellek: { $size }.
+memory-low-title = Luft’un belleği azalıyor
+memory-low-app-body = { $app } uygulaması { $size } kullanıyor. Diğer her şeyin akıcı çalışması için uygulamayı zorla kapatın.
+memory-low-container-body = Bir kapsayıcı { $size } kullanıyor. Diğer her şeyin akıcı çalışması için kapsayıcıyı zorla kapatın.
+memory-low-force-quit = Zorla kapat
 
 ## Input source indicator
 

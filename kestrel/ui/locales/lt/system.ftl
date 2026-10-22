@@ -24,6 +24,10 @@ oom-app-closed-title = Programa { $app } uždaryta, kad atsilaisvintų atminties
 oom-container-closed-title = Konteineris uždarytas, kad atsilaisvintų atminties
 oom-closed-body = Uždaryta, nes kompiuteriui ėmė trūkti atminties. Taip visa kita toliau veikia sklandžiai.
 oom-closed-body-with-size = Uždaryta, nes kompiuteriui ėmė trūkti atminties. Taip visa kita toliau veikia sklandžiai. Buvo naudojama { $size }.
+memory-low-title = Luft sistemai trūksta atminties
+memory-low-app-body = Programa { $app } naudoja { $size }. Priverstinai ją uždarykite, kad visa kita toliau veiktų sklandžiai.
+memory-low-container-body = Konteineris naudoja { $size }. Priverstinai jį uždarykite, kad visa kita toliau veiktų sklandžiai.
+memory-low-force-quit = Priverstinai uždaryti
 
 ## Input source indicator
 

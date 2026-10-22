@@ -24,6 +24,10 @@ oom-app-closed-title = { $app } suljettiin muistin vapauttamiseksi
 oom-container-closed-title = Säilö suljettiin muistin vapauttamiseksi
 oom-closed-body = Tietokoneen muisti oli loppumassa, joten se suljettiin, jotta kaikki muu toimisi sujuvasti.
 oom-closed-body-with-size = Tietokoneen muisti oli loppumassa, joten se suljettiin, jotta kaikki muu toimisi sujuvasti. Se käytti muistia { $size }.
+memory-low-title = Luftin muisti on loppumassa
+memory-low-app-body = { $app } käyttää muistia { $size }. Pakota se sulkeutumaan, jotta kaikki muu toimii sujuvasti.
+memory-low-container-body = Säilö käyttää muistia { $size }. Pakota se sulkeutumaan, jotta kaikki muu toimii sujuvasti.
+memory-low-force-quit = Pakota sulkeutumaan
 
 ## Input source indicator
 

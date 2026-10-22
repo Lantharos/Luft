@@ -24,6 +24,10 @@ oom-app-closed-title = Dúnadh { $app } chun cuimhne a shaoradh
 oom-container-closed-title = Dúnadh coimeádán chun cuimhne a shaoradh
 oom-closed-body = Bhí an ríomhaire ag rith as cuimhne, mar sin dúnadh é chun go bhfanfadh gach rud eile sofhreagrach.
 oom-closed-body-with-size = Bhí an ríomhaire ag rith as cuimhne, mar sin dúnadh é chun go bhfanfadh gach rud eile sofhreagrach. Bhí { $size } in úsáid aige.
+memory-low-title = Tá Luft ag rith as cuimhne
+memory-low-app-body = Tá { $size } in úsáid ag { $app }. Fórsáil é a scor chun go bhfanfaidh gach rud eile sofhreagrach.
+memory-low-container-body = Tá { $size } in úsáid ag coimeádán. Fórsáil é a scor chun go bhfanfaidh gach rud eile sofhreagrach.
+memory-low-force-quit = Fórsáil scor
 
 ## Input source indicator
 

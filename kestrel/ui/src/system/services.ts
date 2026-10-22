@@ -17,7 +17,7 @@ import { LoginDisplays } from '../session/loginScreen/displays.js';
 import { LoginNumLock } from '../session/loginScreen/numLock.js';
 import { Health } from './health/health.js';
 import { notifyAboutIncidents } from './health/incidents.js';
-import { OomNotifier } from './health/oomNotifier.js';
+import { MemoryNotices } from './health/memoryNotices.js';
 import { confirmStartupOnceSettled } from './health/startup.js';
 import { DesktopPolicy } from './peek/access/desktop.js';
 import { PeekService } from './peek/service.js';
@@ -30,7 +30,7 @@ import { SoundService } from './sounds/service.js';
 import { playSound } from './sounds/sounds.js';
 
 export class SystemServices {
-  private readonly oomNotifier = new OomNotifier();
+  private readonly memoryNotices = new MemoryNotices();
   private readonly health = new Health();
   private readonly batteryWarnings = new BatteryWarnings();
   private readonly chargerSound = new ChargerSound();
@@ -76,7 +76,7 @@ export class SystemServices {
     this.farewell.destroy();
     this.fontRefresh.destroy();
     this.mediaKeys.destroy();
-    this.oomNotifier.destroy();
+    this.memoryNotices.destroy();
     this.health.destroy();
     this.batteryWarnings.destroy();
     this.chargerSound.destroy();

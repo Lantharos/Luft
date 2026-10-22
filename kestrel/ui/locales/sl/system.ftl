@@ -24,6 +24,10 @@ oom-app-closed-title = Aplikacija { $app } je bila zaprta, da se sprosti pomniln
 oom-container-closed-title = Vsebnik je bil zaprt, da se sprosti pomnilnik
 oom-closed-body = Računalniku je zmanjkovalo pomnilnika, zato ga je sistem zaprl, da se vse drugo še naprej hitro odziva.
 oom-closed-body-with-size = Računalniku je zmanjkovalo pomnilnika, zato ga je sistem zaprl, da se vse drugo še naprej hitro odziva. Porabljeni pomnilnik: { $size }.
+memory-low-title = Sistemu Luft zmanjkuje pomnilnika
+memory-low-app-body = Aplikacija { $app } porablja { $size }. Vsilite njeno zaprtje, da se vse drugo še naprej hitro odziva.
+memory-low-container-body = Vsebnik porablja { $size }. Vsilite njegovo zaprtje, da se vse drugo še naprej hitro odziva.
+memory-low-force-quit = Vsili zaprtje
 
 ## Input source indicator
 

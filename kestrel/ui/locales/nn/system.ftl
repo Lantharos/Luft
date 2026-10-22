@@ -24,6 +24,10 @@ oom-app-closed-title = { $app } vart lukka for å frigjere minne
 oom-container-closed-title = Ein container vart lukka for å frigjere minne
 oom-closed-body = Datamaskinen var i ferd med å gå tom for minne, så han vart lukka for at alt anna skulle halde fram med å svare.
 oom-closed-body-with-size = Datamaskinen var i ferd med å gå tom for minne, så han vart lukka for at alt anna skulle halde fram med å svare. Han brukte { $size }.
+memory-low-title = Luft har lite minne att
+memory-low-app-body = { $app } brukar { $size }. Tving han til å avslutte, slik at alt anna held fram med å svare.
+memory-low-container-body = Ein container brukar { $size }. Tving han til å avslutte, slik at alt anna held fram med å svare.
+memory-low-force-quit = Tving avslutting
 
 ## Input source indicator
 

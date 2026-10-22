@@ -24,6 +24,10 @@ oom-app-closed-title = { $app } wurde geschlossen, um Arbeitsspeicher freizugebe
 oom-container-closed-title = Ein Container wurde geschlossen, um Arbeitsspeicher freizugeben
 oom-closed-body = Der Arbeitsspeicher wurde knapp. Damit alles andere flüssig bleibt, wurde es geschlossen.
 oom-closed-body-with-size = Der Arbeitsspeicher wurde knapp. Damit alles andere flüssig bleibt, wurde es geschlossen. Es hat { $size } belegt.
+memory-low-title = Luft hat kaum noch Arbeitsspeicher
+memory-low-app-body = { $app } belegt { $size }. Erzwinge das Beenden, damit alles andere flüssig bleibt.
+memory-low-container-body = Ein Container belegt { $size }. Erzwinge das Beenden, damit alles andere flüssig bleibt.
+memory-low-force-quit = Beenden erzwingen
 
 ## Input source indicator
 

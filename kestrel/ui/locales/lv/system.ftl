@@ -24,6 +24,10 @@ oom-app-closed-title = Lietotne { $app } tika aizvērta, lai atbrīvotu atmiņu
 oom-container-closed-title = Konteiners tika aizvērts, lai atbrīvotu atmiņu
 oom-closed-body = Datoram sāka pietrūkt atmiņas, tāpēc to aizvēra, lai viss pārējais turpinātu ātri reaģēt.
 oom-closed-body-with-size = Datoram sāka pietrūkt atmiņas, tāpēc to aizvēra, lai viss pārējais turpinātu ātri reaģēt. Izmantotā atmiņa: { $size }.
+memory-low-title = Sistēmai Luft pietrūkst atmiņas
+memory-low-app-body = Lietotne { $app } izmanto { $size }. Piespiedu kārtā aizveriet to, lai viss pārējais turpinātu ātri reaģēt.
+memory-low-container-body = Konteiners izmanto { $size }. Piespiedu kārtā aizveriet to, lai viss pārējais turpinātu ātri reaģēt.
+memory-low-force-quit = Piespiedu kārtā aizvērt
 
 ## Input source indicator
 

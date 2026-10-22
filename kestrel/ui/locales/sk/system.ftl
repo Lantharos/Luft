@@ -24,6 +24,10 @@ oom-app-closed-title = Aplikácia { $app } bola zatvorená, aby sa uvoľnila pam
 oom-container-closed-title = Kontajner bol zatvorený, aby sa uvoľnila pamäť
 oom-closed-body = V počítači dochádzala pamäť. Zatvorenie pomohlo, aby všetko ostatné reagovalo plynulo.
 oom-closed-body-with-size = V počítači dochádzala pamäť. Zatvorenie pomohlo, aby všetko ostatné reagovalo plynulo. Využitá pamäť: { $size }.
+memory-low-title = Luftu dochádza pamäť
+memory-low-app-body = Aplikácia { $app } využíva { $size }. Vynúťte jej ukončenie, aby všetko ostatné reagovalo plynulo.
+memory-low-container-body = Kontajner využíva { $size }. Vynúťte jeho ukončenie, aby všetko ostatné reagovalo plynulo.
+memory-low-force-quit = Vynútiť ukončenie
 
 ## Input source indicator
 

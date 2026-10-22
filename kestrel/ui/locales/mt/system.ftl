@@ -24,6 +24,10 @@ oom-app-closed-title = Luft għalaq { $app } biex tinħeles il-memorja
 oom-container-closed-title = Luft għalaq container biex tinħeles il-memorja
 oom-closed-body = Il-kompjuter kien qed jispiċċalu l-memorja, għalhekk Luft għalaq dan biex kull ħaġa oħra tibqa’ tirrispondi.
 oom-closed-body-with-size = Il-kompjuter kien qed jispiċċalu l-memorja, għalhekk Luft għalaq dan biex kull ħaġa oħra tibqa’ tirrispondi. Dan kien qed juża { $size }.
+memory-low-title = Luft qed jispiċċalu l-memorja
+memory-low-app-body = { $app } qed juża { $size }. Ġiegħlu jagħlaq biex kull ħaġa oħra tibqa’ tirrispondi.
+memory-low-container-body = Kontenitur qed juża { $size }. Ġiegħlu jagħlaq biex kull ħaġa oħra tibqa’ tirrispondi.
+memory-low-force-quit = Agħlaq bil-forza
 
 ## Input source indicator
 

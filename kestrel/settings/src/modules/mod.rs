@@ -6,13 +6,14 @@ use crate::context::Context;
 use desktop::{a11y, night_light, xsettings};
 use devices::{keyboard, power, printers, rfkill, sound};
 use system::security::{signing_key, usb_protection};
-use system::{housekeeping, profile_locks, timezone, watchdog};
+use system::{housekeeping, memory, profile_locks, timezone, watchdog};
 
 #[derive(Clone, Copy)]
 pub enum Module {
     A11y,
     Housekeeping,
     Keyboard,
+    Memory,
     NightLight,
     Power,
     Printers,
@@ -27,10 +28,11 @@ pub enum Module {
 }
 
 impl Module {
-    pub const ALL: [Self; 14] = [
+    pub const ALL: [Self; 15] = [
         Self::A11y,
         Self::Housekeeping,
         Self::Keyboard,
+        Self::Memory,
         Self::NightLight,
         Self::Power,
         Self::Printers,
@@ -53,6 +55,7 @@ impl Module {
             Self::A11y => "a11y",
             Self::Housekeeping => "housekeeping",
             Self::Keyboard => "keyboard",
+            Self::Memory => "memory",
             Self::NightLight => "night-light",
             Self::Power => "power",
             Self::Printers => "printers",
@@ -72,6 +75,7 @@ impl Module {
             Self::A11y => a11y::start(context).await,
             Self::Housekeeping => housekeeping::start(context).await,
             Self::Keyboard => keyboard::start(context).await,
+            Self::Memory => memory::start(context).await,
             Self::NightLight => night_light::start(context).await,
             Self::Power => power::start(context).await,
             Self::Printers => printers::start(context).await,

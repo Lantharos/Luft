@@ -24,6 +24,10 @@ oom-app-closed-title = { $app } blev lukket for at frigøre hukommelse
 oom-container-closed-title = En container blev lukket for at frigøre hukommelse
 oom-closed-body = Computeren var ved at løbe tør for hukommelse, så den blev lukket, for at alt andet kunne blive ved med at reagere.
 oom-closed-body-with-size = Computeren var ved at løbe tør for hukommelse, så den blev lukket, for at alt andet kunne blive ved med at reagere. Den brugte { $size }.
+memory-low-title = Luft er ved at løbe tør for hukommelse
+memory-low-app-body = { $app } bruger { $size }. Tving den til at lukke, så alt andet bliver ved med at reagere.
+memory-low-container-body = En container bruger { $size }. Tving den til at lukke, så alt andet bliver ved med at reagere.
+memory-low-force-quit = Tving til at lukke
 
 ## Input source indicator
 

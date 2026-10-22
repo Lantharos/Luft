@@ -24,6 +24,10 @@ oom-app-closed-title = Aplikacja { $app } została zamknięta, aby zwolnić pami
 oom-container-closed-title = Kontener został zamknięty, aby zwolnić pamięć
 oom-closed-body = Na komputerze kończyła się pamięć. Zamknięcie pozwoliło zachować płynne działanie reszty systemu.
 oom-closed-body-with-size = Na komputerze kończyła się pamięć. Zamknięcie pozwoliło zachować płynne działanie reszty systemu. Używana pamięć: { $size }.
+memory-low-title = W systemie Luft kończy się pamięć
+memory-low-app-body = Aplikacja { $app } używa { $size }. Wymuś jej zamknięcie, aby reszta systemu działała płynnie.
+memory-low-container-body = Kontener używa { $size }. Wymuś jego zamknięcie, aby reszta systemu działała płynnie.
+memory-low-force-quit = Wymuś zamknięcie
 
 ## Input source indicator
 

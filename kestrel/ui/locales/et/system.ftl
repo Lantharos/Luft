@@ -24,6 +24,10 @@ oom-app-closed-title = Rakendus { $app } suleti mälu vabastamiseks
 oom-container-closed-title = Konteiner suleti mälu vabastamiseks
 oom-closed-body = Arvutil hakkas mälu otsa saama, seega see suleti, et kõik muu töötaks endiselt sujuvalt.
 oom-closed-body-with-size = Arvutil hakkas mälu otsa saama, seega see suleti, et kõik muu töötaks endiselt sujuvalt. Mälu oli kasutusel { $size }.
+memory-low-title = Luftil hakkab mälu otsa saama
+memory-low-app-body = Rakendus { $app } kasutab { $size }. Sulgege see sunniviisiliselt, et kõik muu töötaks endiselt sujuvalt.
+memory-low-container-body = Konteiner kasutab { $size }. Sulgege see sunniviisiliselt, et kõik muu töötaks endiselt sujuvalt.
+memory-low-force-quit = Sule sunniviisiliselt
 
 ## Input source indicator
 

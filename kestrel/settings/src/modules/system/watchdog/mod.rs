@@ -11,6 +11,7 @@ use zbus::fdo::DBusProxy;
 use zbus::names::BusName;
 
 use crate::context::Context;
+use crate::modules::system::memory::Relief;
 use crate::shared::system::LoginProxy;
 use proxies::{HealthProxy, LoginSessionProxy, LoginUserProxy, WatchdogProxy};
 use stall::Stall;
@@ -20,6 +21,7 @@ const CHECK_INTERVAL: Duration = Duration::from_secs(3);
 const ANSWER_LIMIT: Duration = Duration::from_secs(3);
 const PRESENTATION_LIMIT: Duration = Duration::from_secs(10);
 const POWER_KEYS_AFTER: Duration = Duration::from_secs(6);
+const RELIEVE_MEMORY_AFTER: Duration = Duration::from_secs(6);
 const REPORT_AFTER: Duration = Duration::from_secs(15);
 const REPORT_LIMIT: Duration = Duration::from_secs(5);
 
@@ -131,6 +133,10 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
     let health = HealthProxy::new(&context.session).await?;
     let watchdog = WatchdogProxy::new(&context.system).await?;
     let display = display_session(&context.system, &login).await;
+    let mut relief = Relief::new(&context.session)
+        .await
+        .inspect_err(|error| eprintln!("Couldn't watch Kestrel's memory: {error}"))
+        .ok();
     let mut sleeps = login.receive_prepare_for_sleep().await?;
     let mut power_keys = PowerKeys {
         login,
@@ -172,7 +178,14 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
                     } else {
                         power_keys.hold().await;
                     }
-                    if stalled >= REPORT_AFTER {
+                    let starved = match &mut relief {
+                        Some(relief) if stalled >= RELIEVE_MEMORY_AFTER && relief.compositor_starved() => {
+                            relief.close_biggest_app().await;
+                            true
+                        }
+                        _ => false,
+                    };
+                    if stalled >= REPORT_AFTER && !starved {
                         report(&session, &watchdog, stalled).await;
                     }
                 }

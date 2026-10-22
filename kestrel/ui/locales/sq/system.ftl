@@ -24,6 +24,10 @@ oom-app-closed-title = { $app } u mbyll për të liruar memorie
 oom-container-closed-title = Një kontejner u mbyll për të liruar memorie
 oom-closed-body = Kompjuterit po i mbaronte memoria, ndaj u mbyll që gjithçka tjetër të vazhdojë të përgjigjet.
 oom-closed-body-with-size = Kompjuterit po i mbaronte memoria, ndaj u mbyll që gjithçka tjetër të vazhdojë të përgjigjet. Po përdorte { $size }.
+memory-low-title = Memoria e Luft po mbaron
+memory-low-app-body = { $app } po përdor { $size }. Detyroje të mbyllet që gjithçka tjetër të vazhdojë të përgjigjet.
+memory-low-container-body = Një kontejner po përdor { $size }. Detyroje të mbyllet që gjithçka tjetër të vazhdojë të përgjigjet.
+memory-low-force-quit = Detyro mbylljen
 
 ## Input source indicator
 

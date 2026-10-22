@@ -24,6 +24,10 @@ oom-app-closed-title = Aplicația { $app } a fost închisă pentru a elibera mem
 oom-container-closed-title = Un container a fost închis pentru a elibera memorie
 oom-closed-body = Computerul rămânea fără memorie, așa că a fost închis pentru ca restul să funcționeze în continuare fără întreruperi.
 oom-closed-body-with-size = Computerul rămânea fără memorie, așa că a fost închis pentru ca restul să funcționeze în continuare fără întreruperi. Folosea { $size }.
+memory-low-title = Luft rămâne fără memorie
+memory-low-app-body = Aplicația { $app } folosește { $size }. Forțați închiderea ei pentru ca restul să funcționeze în continuare fără întreruperi.
+memory-low-container-body = Un container folosește { $size }. Forțați închiderea lui pentru ca restul să funcționeze în continuare fără întreruperi.
+memory-low-force-quit = Forțează închiderea
 
 ## Input source indicator
 

@@ -34,6 +34,14 @@ oom-container-closed-title = A container was closed to free memory
 oom-closed-body = The computer was running out of memory, so it was closed to keep everything else responsive.
 # "it" is the app or container named in the title. $size is a formatted amount of memory, for example "1.5 GB"
 oom-closed-body-with-size = The computer was running out of memory, so it was closed to keep everything else responsive. It was using { $size }.
+# Shown while the computer is about to run out of memory
+memory-low-title = Luft is low on memory
+# $app is the name of the app using the most memory. $size is a formatted amount of memory, for example "6.2 GB"
+memory-low-app-body = { $app } is using { $size }. Force quit it to keep everything else responsive.
+# $size is a formatted amount of memory, for example "6.2 GB"
+memory-low-container-body = A container is using { $size }. Force quit it to keep everything else responsive.
+# Notification button that ends the app or container right away, without letting it save
+memory-low-force-quit = Force quit
 
 ## Input source indicator
 

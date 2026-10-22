@@ -24,6 +24,10 @@ oom-app-closed-title = { $app } is gesloten om geheugen vrij te maken
 oom-container-closed-title = Een container is gesloten om geheugen vrij te maken
 oom-closed-body = De computer had bijna geen geheugen meer. Daarom is dit gesloten, zodat al het andere vlot blijft reageren.
 oom-closed-body-with-size = De computer had bijna geen geheugen meer. Daarom is dit gesloten, zodat al het andere vlot blijft reageren. Het gebruikte { $size }.
+memory-low-title = Luft heeft bijna geen geheugen meer
+memory-low-app-body = { $app } gebruikt { $size }. Forceer het stoppen, zodat al het andere vlot blijft reageren.
+memory-low-container-body = Een container gebruikt { $size }. Forceer het stoppen, zodat al het andere vlot blijft reageren.
+memory-low-force-quit = Geforceerd stoppen
 
 ## Input source indicator
 

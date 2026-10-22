@@ -24,6 +24,10 @@ oom-app-closed-title = { $app } bezárva a memória felszabadításához
 oom-container-closed-title = Egy konténer bezárva a memória felszabadításához
 oom-closed-body = A számítógép memóriája majdnem elfogyott, ezért a rendszer bezárta, hogy minden más továbbra is gyorsan reagáljon.
 oom-closed-body-with-size = A számítógép memóriája majdnem elfogyott, ezért a rendszer bezárta, hogy minden más továbbra is gyorsan reagáljon. Memóriahasználata: { $size }.
+memory-low-title = A Luft memóriája fogytán van
+memory-low-app-body = { $app } { $size } memóriát használ. Kényszerítse ki a bezárását, hogy minden más továbbra is gyorsan reagáljon.
+memory-low-container-body = Egy konténer { $size } memóriát használ. Kényszerítse ki a bezárását, hogy minden más továbbra is gyorsan reagáljon.
+memory-low-force-quit = Bezárás kényszerítése
 
 ## Input source indicator
 

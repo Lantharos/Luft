@@ -51,7 +51,7 @@ export function panelSurface(node: St.ThemeNode, blurred: boolean): PanelSurface
 export function backdropsBehind({ tint, opacity, glass }: PanelSurface, floor: WallpaperFloor): Rgb[] {
   if (!floor.color) return [];
   const over = tint.map(channel => channel / 255) as Channels;
-  return (glass ? [floor.color] : [floor.color, ...floor.extremes]).map(color => {
+  return [floor.color, ...floor.extremes].map(color => {
     const behind = color.map(channel => channel / 255) as Channels;
     const shaded = glass ? shadeLikeGlass(behind, glass) : behind;
     return mix(shaded, over, opacity).map(channel => Math.round(channel * 255)) as Rgb;

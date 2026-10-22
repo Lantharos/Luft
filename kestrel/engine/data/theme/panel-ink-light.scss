@@ -5,6 +5,7 @@ $variant: 'light';
 
 stage { @include glass-shading; }
 .kestrel-panel-surface { @include panel-surfaces; }
+.kestrel-panel-surface.kestrel-panel-backed { background-color: glass(tinted); }
 .kestrel-panel-ink { @include panel-ink; }
 .kestrel-panel-soft-halo { @include halo(soft); }
 .kestrel-panel-status-halo { @include halo(soft, '.kestrel-panel-status'); }

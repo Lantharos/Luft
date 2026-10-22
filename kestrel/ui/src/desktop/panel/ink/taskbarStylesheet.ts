@@ -7,6 +7,7 @@ import type { TaskbarLook } from '../../../../../../packages/web/ui/src/taskbar/
 import { schemeThemes, type Halo, type Scheme, type SchemeTheme } from './schemeThemes.js';
 
 const TEXT_CONTRAST = 4.5;
+const COMFORTABLE_CONTRAST = 5;
 const ACCENT_OPACITY = 0.62;
 const OTHER: Record<Scheme, Scheme> = { light: 'dark', dark: 'light' };
 
@@ -25,6 +26,7 @@ export interface LookInk extends Surface {
   backdrops: Rgb[];
   ink: Scheme;
   halo: Halo;
+  backed: boolean;
 }
 
 const selector = (look: TaskbarLook, opaque = false) => `.kestrel-panel.kestrel-panel.kestrel-taskbar-${look}${opaque ? '.kestrel-taskbar-opaque' : ''}`;
@@ -53,8 +55,20 @@ function surfaces(theme: SchemeTheme, tints: Tints): Surface[] {
 
 function inkFor(scheme: Scheme, backdrops: Rgb[], themes: Record<Scheme, SchemeTheme>): Scheme {
   const own = worst(themes[scheme].ink, backdrops);
-  if (own >= TEXT_CONTRAST) return scheme;
+  if (own >= COMFORTABLE_CONTRAST) return scheme;
   return worst(themes[OTHER[scheme]].ink, backdrops) > own ? OTHER[scheme] : scheme;
+}
+
+function inkOver(surface: Surface, scheme: Scheme, themes: Record<Scheme, SchemeTheme>) {
+  const backdrops = backdropsBehind(surface.surface, wallpaperFloor);
+  const ink = inkFor(scheme, backdrops, themes);
+  return { ...surface, backdrops, ink, contrast: worst(themes[ink].ink, backdrops) };
+}
+
+const backing = (theme: SchemeTheme) => theme.surface('kestrel-taskbar-glass kestrel-panel-backed', true);
+
+function needsBacking({ look, opaque }: Surface, contrast: number): boolean {
+  return look === 'glass' && !opaque && wallpaperFloor.busy && contrast < COMFORTABLE_CONTRAST;
 }
 
 function haloFor(look: TaskbarLook, readable: boolean): Halo {
@@ -66,9 +80,10 @@ function haloFor(look: TaskbarLook, readable: boolean): Halo {
 export function lookInks(scheme: Scheme, tints: Tints): LookInk[] {
   const themes = schemeThemes();
   return surfaces(themes[scheme], tints).map(surface => {
-    const backdrops = backdropsBehind(surface.surface, wallpaperFloor);
-    const ink = inkFor(scheme, backdrops, themes);
-    return { ...surface, backdrops, ink, halo: haloFor(surface.look, worst(themes[ink].ink, backdrops) >= TEXT_CONTRAST) };
+    const plain = inkOver(surface, scheme, themes);
+    const backed = needsBacking(surface, plain.contrast);
+    const { contrast, ...choice } = backed ? inkOver({ ...surface, surface: backing(themes[scheme]) }, scheme, themes) : plain;
+    return { ...choice, backed, halo: haloFor(surface.look, contrast >= TEXT_CONTRAST) };
   });
 }
 
@@ -78,10 +93,11 @@ function inkRules(scheme: Scheme, palette: Palette, tints: Tints): string {
   const chosen = new Map<TaskbarLook, LookInk>();
   let css = '';
   for (const choice of lookInks(scheme, tints)) {
-    const { look, opaque, ink, halo } = choice;
-    const inherited = opaque ? chosen.get(look)! : { ink: scheme, halo: 'no-halo' };
+    const { look, opaque, ink, halo, backed, surface } = choice;
+    const inherited = opaque ? chosen.get(look)! : { ink: scheme, halo: 'no-halo', backed: false };
     chosen.set(look, choice);
     const target = selector(look, opaque);
+    if (backed || inherited.backed) css += `${target} { background-color: rgba(${surface.tint.join(', ')}, ${surface.opacity}); }\n`;
     if (ink !== inherited.ink) {
       css += themes[ink].rules('ink', target);
       css += `${target} .kestrel-app-focused .kestrel-running-dot, ${target} .kestrel-task-progress-fill { background-color: ${palette[ink].colors.primary}; }\n`;

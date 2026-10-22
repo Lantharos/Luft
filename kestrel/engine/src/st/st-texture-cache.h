@@ -70,6 +70,11 @@ cairo_surface_t *st_texture_cache_load_file_to_cairo_surface (StTextureCache *ca
                                                               gint            paint_scale,
                                                               gfloat          resource_scale);
 
+void st_texture_cache_preload_file_to_cairo_surface (StTextureCache *cache,
+                                                     GFile          *file,
+                                                     gint            paint_scale,
+                                                     gfloat          resource_scale);
+
 /**
  * StTextureCacheLoader: (skip)
  * @cache: a #StTextureCache

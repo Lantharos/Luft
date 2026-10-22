@@ -1410,6 +1410,13 @@ out:
   return texdata;
 }
 
+static char *
+file_for_cairo_key (GFile  *file,
+                    gfloat  resource_scale)
+{
+  return g_strdup_printf (CACHE_PREFIX_FILE_FOR_CAIRO "%u%f", g_file_hash (file), resource_scale);
+}
+
 static cairo_surface_t *
 st_texture_cache_load_file_sync_to_cairo_surface (StTextureCache        *cache,
                                                   StTextureCachePolicy   policy,
@@ -1424,7 +1431,7 @@ st_texture_cache_load_file_sync_to_cairo_surface (StTextureCache        *cache,
   GdkPixbuf *pixbuf;
   char *key;
 
-  key = g_strdup_printf (CACHE_PREFIX_FILE_FOR_CAIRO "%u%f", g_file_hash (file), resource_scale);
+  key = file_for_cairo_key (file, resource_scale);
 
   surface = g_hash_table_lookup (cache->keyed_surface_cache, key);
 
@@ -1531,6 +1538,70 @@ st_texture_cache_load_file_to_cairo_surface (StTextureCache *cache,
     }
 
   return surface;
+}
+
+static void
+on_cairo_surface_preloaded (GObject      *source,
+                            GAsyncResult *result,
+                            gpointer      user_data)
+{
+  StTextureCache *cache = ST_TEXTURE_CACHE (source);
+  AsyncTextureLoadData *data = g_task_get_task_data (G_TASK (result));
+  g_autoptr (GdkPixbuf) pixbuf = NULL;
+
+  g_hash_table_remove (cache->outstanding_requests, data->key);
+  pixbuf = load_pixbuf_async_finish (cache, result, NULL);
+  if (!pixbuf || g_hash_table_contains (cache->keyed_surface_cache, data->key))
+    return;
+
+  g_hash_table_insert (cache->keyed_surface_cache,
+                       g_strdup (data->key),
+                       pixbuf_to_cairo_surface (pixbuf));
+  hash_table_insert_scale (cache->used_scales, (double) data->resource_scale);
+  ensure_monitor_for_file (cache, data->file);
+}
+
+/**
+ * st_texture_cache_preload_file_to_cairo_surface:
+ * @cache: A #StTextureCache
+ * @file: A #GFile in supported image format
+ * @paint_scale: Scale factor of the display
+ * @resource_scale: Resource scale factor
+ *
+ * Decodes @file in a worker thread and keeps it for
+ * st_texture_cache_load_file_to_cairo_surface(), so drawing it as a
+ * background image does not have to load it synchronously.
+ */
+void
+st_texture_cache_preload_file_to_cairo_surface (StTextureCache *cache,
+                                                GFile          *file,
+                                                gint            paint_scale,
+                                                gfloat          resource_scale)
+{
+  g_autoptr (GTask) task = NULL;
+  AsyncTextureLoadData *data;
+  char *key;
+
+  key = file_for_cairo_key (file, resource_scale);
+  if (g_hash_table_contains (cache->keyed_surface_cache, key) ||
+      g_hash_table_contains (cache->outstanding_requests, key))
+    {
+      g_free (key);
+      return;
+    }
+
+  data = g_new0 (AsyncTextureLoadData, 1);
+  data->key = key;
+  data->file = g_object_ref (file);
+  data->width = -1;
+  data->height = -1;
+  data->paint_scale = paint_scale;
+  data->resource_scale = resource_scale;
+  g_hash_table_insert (cache->outstanding_requests, g_strdup (key), data);
+
+  task = g_task_new (cache, NULL, on_cairo_surface_preloaded, NULL);
+  g_task_set_task_data (task, data, texture_load_data_free);
+  g_task_run_in_thread (task, load_pixbuf_thread);
 }
 
 static StTextureCache *instance = NULL;

@@ -2,6 +2,7 @@
 // A widget showing the user avatar and name
 
 import Clutter from 'gi://Clutter';
+import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import St from 'gi://St';
@@ -81,6 +82,8 @@ class Avatar extends St.Bin {
             this._iconSize * scaleFactor);
 
         if (iconFile) {
+            St.TextureCache.get_default().preload_file_to_cairo_surface(
+                Gio.File.new_for_path(iconFile), scaleFactor, this.get_resource_scale());
             this.child = null;
             this.add_style_class_name('user-avatar');
             this.style = `

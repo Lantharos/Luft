@@ -21,17 +21,16 @@ stop_services() {
 trap stop_services EXIT
 
 restore_settings() {
-  for section in background interface input-sources; do
-    dconf reset -f "/org/gnome/desktop/$section/"
-    dconf load "/org/gnome/desktop/$section/" < "$session/$section.ini"
-  done
+  if [[ "$mode" == nested ]]; then
+    for section in background interface input-sources; do
+      dconf reset -f "/org/gnome/desktop/$section/"
+      dconf load "/org/gnome/desktop/$section/" < "$session/$section.ini"
+    done
+  else
+    dconf reset -f /
+  fi
   if [[ -s "$session/favorites.txt" ]]; then
     dconf write /com/lantharos/kestrel/favorite-apps "$(cat "$session/favorites.txt")"
-  fi
-  if [[ "$mode" == capture ]]; then
-    for key in quick-tile-order quick-tiles-removed quick-tiles-known live-wallpaper live-wallpaper-dark; do
-      dconf reset "/com/lantharos/kestrel/$key"
-    done
   fi
   case "${KESTREL_CAPTURE_SCHEME:-}" in
     light) dconf write /org/gnome/desktop/interface/color-scheme "'default'" ;;

@@ -9,7 +9,7 @@ fi
 # shellcheck source-path=SCRIPTDIR
 source "$(dirname "$0")/environment.sh"
 fixtures="$tools/fixtures/greeter"
-prepare_session "${KESTREL_SESSION_DIR:-$root/kestrel/run}"
+prepare_session "${KESTREL_SESSION_DIR:-$root/kestrel/run}" greeter
 run="$session/greeter"
 events="$run/events.jsonl"
 socket_dir="$(mktemp -d -p "${XDG_RUNTIME_DIR:-/tmp}" kestrel-greetd.XXXXXX)"

@@ -93,22 +93,40 @@ export_build_paths() {
   unset GSETTINGS_BACKEND GDK_BACKEND
 }
 
+copy_host_settings() {
+  local section
+  for section in background interface input-sources; do
+    dconf dump "/org/gnome/desktop/$section/" > "$session/$section.ini"
+  done
+  dconf read /com/lantharos/kestrel/favorite-apps > "$session/favorites.txt"
+}
+
+use_luft_defaults() {
+  python3 "$tools/session/luftDefaults.py" "$root" "$session/luft-defaults.d/luft"
+  dconf compile "$session/luft-defaults" "$session/luft-defaults.d"
+  printf 'file-db:%s\n' "$session/luft-defaults" >> "$DCONF_PROFILE"
+  export LANG=en_US.UTF-8 TZ=UTC
+  unset LANGUAGE "${!LC_@}"
+}
+
 prepare_session() {
   session="$1"
+  local mode="$2" data_path="$compositor_data:/usr/local/share:/usr/share" cursors=/usr/share/icons:/usr/share/pixmaps
   mkdir -p "$session"/{config,data,cache,state}
-  dconf dump /org/gnome/desktop/background/ > "$session/background.ini"
-  dconf dump /org/gnome/desktop/interface/ > "$session/interface.ini"
-  dconf dump /org/gnome/desktop/input-sources/ > "$session/input-sources.ini"
-  dconf read /com/lantharos/kestrel/favorite-apps > "$session/favorites.txt"
+  if [[ "$mode" == nested ]]; then
+    copy_host_settings
+    data_path="${XDG_DATA_HOME:-$HOME/.local/share}:$compositor_data:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
+    cursors="$HOME/.local/share/icons:$HOME/.icons:$cursors"
+  fi
 
-  export XDG_DATA_DIRS="${XDG_DATA_HOME:-$HOME/.local/share}:$compositor_data:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
+  export XDG_DATA_DIRS="$data_path"
   export XDG_CONFIG_HOME="$session/config" XDG_DATA_HOME="$session/data" XDG_STATE_HOME="$session/state"
   cache_link="${XDG_RUNTIME_DIR:-/tmp}/kestrel-cache-$(session_hash "$session" 12)"
   ln -sfn "$session/cache" "$cache_link"
   export XDG_CACHE_HOME="$cache_link"
   printf 'user-db:user\nfile-db:%s\n' "$build/data/dconf/kestrel" > "$session/dconf-profile"
   export DCONF_PROFILE="$session/dconf-profile"
-  export XCURSOR_PATH="$XDG_DATA_HOME/icons:$HOME/.local/share/icons:$HOME/.icons:/usr/share/icons:/usr/share/pixmaps"
+  export XCURSOR_PATH="$XDG_DATA_HOME/icons:$cursors"
   mkdir -p "$session/data/fonts"
   ln -sfn "$build/data/fonts" "$session/data/fonts/luft"
   mkdir -p "$session/data/sounds"
@@ -118,4 +136,5 @@ prepare_session() {
   ln -sfn "$root/kestrel/engine/data/session/kestrel.portal" "$session/data/xdg-desktop-portal/portals/kestrel.portal"
   ln -sfn "$root/kestrel/engine/data/session/kestrel-portals.conf" "$session/config/xdg-desktop-portal/kestrel-portals.conf"
   export_build_paths
+  [[ "$mode" == nested ]] || use_luft_defaults
 }

@@ -94,6 +94,9 @@ async fn locate_with(
 }
 
 pub fn timezone() -> Option<String> {
+    if let Ok(zone) = std::env::var("TZ") {
+        return Some(zone.trim_start_matches(':').to_owned());
+    }
     let target = std::fs::read_link("/etc/localtime").ok()?;
     let target = target.to_str()?;
     Some(target[target.find("zoneinfo/")? + "zoneinfo/".len()..].to_owned())

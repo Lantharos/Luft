@@ -57,3 +57,5 @@ cd $env:USERPROFILE\Desktop; iwr https://github.com/ChimeraOS/reverse-engineerin
 ```
 
 Send the `RtHDDump.txt` it lists.
+
+A fix that works becomes part of Luft in `os/image/files/usr/lib/firmware/luft/hda-boards.fw`, as a `[codec]` section with the chip's vendor and subsystem ids, so it only applies to that board.

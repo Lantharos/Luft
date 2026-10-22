@@ -1,0 +1,5 @@
+[codec]
+0x10ec0897 0x103c89b5 0
+
+[hint]
+jack_detect = no

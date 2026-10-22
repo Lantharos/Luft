@@ -21,7 +21,7 @@ function confirm(): void {
 }
 
 export function confirmStartupOnceSettled(layoutManager: StartupSignals): void {
-  if (global.backend.is_headless() || !GLib.file_test(ON_TRIAL, GLib.FileTest.EXISTS)) return;
+  if (!GLib.file_test(ON_TRIAL, GLib.FileTest.EXISTS)) return;
   const startup = layoutManager.connect('startup-complete', () => {
     layoutManager.disconnect(startup);
     GLib.timeout_add_seconds(GLib.PRIORITY_LOW, SETTLE_SECONDS, () => {

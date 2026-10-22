@@ -12,7 +12,11 @@ const LOGIN = `<node><interface name="org.freedesktop.login1.Manager">
   <method name="Suspend"><arg type="b" direction="in"/></method>
   <method name="Hibernate"><arg type="b" direction="in"/></method>
   <method name="PowerOff"><arg type="b" direction="in"/></method>
+  <method name="CanPowerOff"><arg type="s" direction="out"/></method>
+  <method name="CanReboot"><arg type="s" direction="out"/></method>
+  <method name="CanSuspend"><arg type="s" direction="out"/></method>
   <method name="GetUser"><arg type="u" direction="in"/><arg type="o" direction="out"/></method>
+  <method name="GetSession"><arg type="s" direction="in"/><arg type="o" direction="out"/></method>
   <property name="LidClosed" type="b" access="read"/>
   <signal name="PrepareForSleep"><arg type="b"/></signal>
 </interface></node>`;
@@ -24,7 +28,23 @@ const LOGIN_USER = `<node><interface name="org.freedesktop.login1.User">
   <property name="Display" type="(so)" access="read"/>
 </interface></node>`;
 const LOGIN_SESSION = `<node><interface name="org.freedesktop.login1.Session">
+  <property name="Id" type="s" access="read"/>
   <property name="Active" type="b" access="read"/>
+  <method name="SetLockedHint"><arg type="b" direction="in"/></method>
+  <signal name="Lock"/>
+  <signal name="Unlock"/>
+</interface></node>`;
+const POLKIT = `<node><interface name="org.freedesktop.PolicyKit1.Authority">
+  <method name="CheckAuthorization">
+    <arg type="(sa{sv})" direction="in"/><arg type="s" direction="in"/><arg type="a{ss}" direction="in"/><arg type="u" direction="in"/>
+    <arg type="s" direction="in"/><arg type="(bba{ss})" direction="out"/>
+  </method>
+  <method name="RegisterAuthenticationAgent"><arg type="(sa{sv})" direction="in"/><arg type="s" direction="in"/><arg type="s" direction="in"/></method>
+  <method name="UnregisterAuthenticationAgent"><arg type="(sa{sv})" direction="in"/><arg type="s" direction="in"/></method>
+  <property name="BackendName" type="s" access="read"/>
+  <property name="BackendVersion" type="s" access="read"/>
+  <property name="BackendFeatures" type="u" access="read"/>
+  <signal name="Changed"/>
 </interface></node>`;
 const WATCHDOG = `<node><interface name="com.lantharos.Kestrel.Watchdog1">
   <method name="Report"><arg type="t" direction="in"/><arg type="u" direction="in"/></method>
@@ -58,9 +78,11 @@ const TIME = `<node><interface name="org.freedesktop.timedate1">
   <method name="SetTimezone"><arg type="s" direction="in"/><arg type="b" direction="in"/></method>
 </interface></node>`;
 
-export const BASIC_NAMES = ['org.freedesktop.login1', 'org.freedesktop.UPower', 'org.freedesktop.hostname1', 'org.freedesktop.systemd1',
-  'org.freedesktop.locale1', 'org.freedesktop.timedate1', 'com.lantharos.Kestrel.Watchdog1'];
+export const BASIC_NAMES = ['org.freedesktop.login1', 'org.freedesktop.UPower', 'org.freedesktop.UPower.PowerProfiles', 'org.freedesktop.hostname1', 'org.freedesktop.systemd1',
+  'org.freedesktop.locale1', 'org.freedesktop.timedate1', 'org.freedesktop.PolicyKit1', 'com.lantharos.Kestrel.Watchdog1'];
 
+const SESSION_ID = 'c1';
+const SESSION_PATH = `/org/freedesktop/login1/session/${SESSION_ID}`;
 const inhibitors = [];
 
 export function publishBasics(publish, calls) {
@@ -77,7 +99,11 @@ export function publishBasics(publish, calls) {
     Hibernate: () => calls.push('Hibernate'),
     PowerOff: () => calls.push('PowerOff'),
     Reboot: () => calls.push('Reboot'),
+    CanPowerOff: () => 'yes',
+    CanReboot: () => 'yes',
+    CanSuspend: () => 'yes',
     GetUser: () => '/org/freedesktop/login1/user/self',
+    GetSession: () => SESSION_PATH,
     get LidClosed() { return lidClosed; },
   }, '/org/freedesktop/login1');
   publish(LOGIN_CONTROL, {
@@ -87,8 +113,16 @@ export function publishBasics(publish, calls) {
     },
     PrepareForSleep: sleeping => login.emit_signal('PrepareForSleep', new GLib.Variant('(b)', [sleeping])),
   }, '/com/lantharos/KestrelChecks/Login');
-  publish(LOGIN_USER, {Display: ['c1', '/org/freedesktop/login1/session/c1']}, '/org/freedesktop/login1/user/self');
-  publish(LOGIN_SESSION, {Active: true}, '/org/freedesktop/login1/session/c1');
+  publish(LOGIN_USER, {Display: [SESSION_ID, SESSION_PATH]}, '/org/freedesktop/login1/user/self');
+  publish(LOGIN_SESSION, {Id: SESSION_ID, Active: true, SetLockedHint() {}}, SESSION_PATH);
+  publish(POLKIT, {
+    CheckAuthorization: () => [true, false, {}],
+    RegisterAuthenticationAgent() {},
+    UnregisterAuthenticationAgent() {},
+    BackendName: 'kestrel-checks',
+    BackendVersion: '1',
+    BackendFeatures: 0,
+  }, '/org/freedesktop/PolicyKit1/Authority');
   publish(WATCHDOG, {Report: (_stalledMs, compositor) => calls.push(`Report ${compositor}`)}, '/com/lantharos/Kestrel/Watchdog1');
 
   publishUpower(publish, calls);

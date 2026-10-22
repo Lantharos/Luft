@@ -9,7 +9,7 @@ import {show} from '../navigation.js';
 
 const {require, eventually} = checks('dictation settings');
 const SPEECH = 'com.lantharos.Speech1';
-const SERVICE = repository('packages', 'speech', 'service', 'target', 'release', 'luft-speech');
+const SERVICE = repository('target', 'release', 'luft-speech');
 const PARAKEET = 'parakeet-tdt-0.6b-v3';
 const WHISPER = 'whisper-large-v3-turbo-q5_0';
 

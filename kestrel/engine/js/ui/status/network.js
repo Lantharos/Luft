@@ -20,7 +20,7 @@ import {QuickMenuToggle, SystemIndicator} from '../quickSettings.js';
 import {registerDestroyableType} from '../../misc/signalTracker.js';
 
 Gio._promisify(Gio.DBusConnection.prototype, 'call');
-Gio._promisify(NM.Client.prototype, 'init_async');
+Gio._promisify(NM.Client, 'new_async');
 Gio._promisify(NM.Client.prototype, 'dbus_set_property');
 Gio._promisify(NM.Client.prototype, 'add_and_activate_connection_async');
 Gio._promisify(NM.DeviceWifi.prototype, 'request_scan_async');
@@ -2084,8 +2084,7 @@ class Indicator extends SystemIndicator {
     }
 
     async _getClient() {
-        this._client = new NM.Client({dbus_connection: KestrelUi.standInBus()});
-        await this._client.init_async(GLib.PRIORITY_DEFAULT, null);
+        this._client = await NM.Client.new_async(null);
 
         this.quickSettingsItems.forEach(
             toggle => toggle.setClient(this._client));

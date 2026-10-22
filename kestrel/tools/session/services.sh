@@ -48,9 +48,10 @@ restore_settings() {
 start_system_bus() {
   start dbus-daemon --session --nofork --print-address=3 3> "$session/system-bus"
   wait_until "the stand-in system bus" test -s "$session/system-bus"
-  KESTREL_SYSTEM_BUS="$(head -n1 "$session/system-bus")"
-  export KESTREL_SYSTEM_BUS
-  [[ "$mode" == nested ]] || export KESTREL_STAND_IN_BUS="$KESTREL_SYSTEM_BUS"
+  system_bus="$(head -n1 "$session/system-bus")"
+  [[ "$mode" == nested ]] && return
+  export DBUS_SYSTEM_BUS_ADDRESS="$system_bus"
+  dbus-update-activation-environment DBUS_SYSTEM_BUS_ADDRESS
 }
 
 start() {
@@ -72,20 +73,20 @@ start_system_bus
 start gjs -m "$build/js/ui/kestrel-session.js"
 system_services="$fixtures/system/systemBus.js"
 [[ "$mode" == setup ]] && system_services="$fixtures/setup/systemBus.js"
-DBUS_SYSTEM_BUS_ADDRESS="$KESTREL_SYSTEM_BUS" start gjs -m "$system_services"
-DBUS_SYSTEM_BUS_ADDRESS="$KESTREL_SYSTEM_BUS" start "$fixtures/session/printServer.sh" "$session/cups" "$CUPS_SERVER"
+DBUS_SYSTEM_BUS_ADDRESS="$system_bus" start gjs -m "$system_services"
+DBUS_SYSTEM_BUS_ADDRESS="$system_bus" start "$fixtures/session/printServer.sh" "$session/cups" "$CUPS_SERVER"
 start gjs -m "$fixtures/auth/authenticator.js" "$KESTREL_AUTHENTICATE_SOCK"
 start pipewire -c "$fixtures/session/pipewire.conf"
 gdbus wait --session --timeout 10 org.gnome.SessionManager
-gdbus wait --address "$KESTREL_SYSTEM_BUS" --timeout 10 com.lantharos.KestrelChecks
+gdbus wait --address "$system_bus" --timeout 10 com.lantharos.KestrelChecks
 gdbus wait --session --timeout 10 com.lantharos.KestrelChecks.Authenticator
 wait_until "the sound server" test -S "$PULSE_RUNTIME_PATH/native"
 start "$fixtures/session/soundDefaults.sh"
 wait_until "the print server" printer_ready
-DBUS_SYSTEM_BUS_ADDRESS="$KESTREL_SYSTEM_BUS" GIO_USE_VFS=local start "$root/target/release/kestrel-settings" \
+DBUS_SYSTEM_BUS_ADDRESS="$system_bus" GIO_USE_VFS=local start "$root/target/release/kestrel-settings" \
   --modules a11y,housekeeping,keyboard,night-light,power,printers,sound,timezone,watchdog,xsettings
 gdbus wait --session --timeout 10 com.lantharos.Settings
-DBUS_SYSTEM_BUS_ADDRESS="$KESTREL_SYSTEM_BUS" start "$root/target/release/kestrel-search"
+DBUS_SYSTEM_BUS_ADDRESS="$system_bus" start "$root/target/release/kestrel-search"
 gdbus wait --session --timeout 10 com.lantharos.Search
 start python3 "$fixtures/session/portalFrontend.py" "$KESTREL_READY_SOCK" /usr/libexec/xdg-desktop-portal
 wait_until "the readiness socket" test -S "$KESTREL_READY_SOCK"

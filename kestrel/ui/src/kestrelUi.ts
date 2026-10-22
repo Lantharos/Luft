@@ -49,8 +49,6 @@ export { isGame } from './desktop/windows/games.js';
 export { VpnSecrets } from './system/network/vpnSecrets.js';
 export { battery } from './shared/battery/battery.js';
 export { accelerometer } from './desktop/rotation/accelerometer.js';
-export { useStandInAccounts } from './system/standIn/accounts.js';
-export { standInBus } from './system/standIn/bus.js';
 export { holdMotion } from './shared/motion/afterMotion.js';
 export { Curve, Duration, Gesture, projection, reducedMotion, rubberband, Spring } from './shared/motion/motion.js';
 export { SwipeAway } from './surfaces/notifications/swipeAway.js';
@@ -63,7 +61,6 @@ export { playNotificationSound, playSound, startSounds } from './system/sounds/s
 type Signals = { connect(signal: string, callback: (...args: any[]) => any): number; disconnect(id: number): void };
 
 class KestrelUi {
-  private readonly ownsTheScreen = !global.backend.is_headless();
   private readonly services: SystemServices;
   private readonly menus: ContextMenus;
   private readonly workspaces: Workspaces;
@@ -86,7 +83,7 @@ class KestrelUi {
   private readonly syncSessionAfterMotion = () => this.syncSession();
 
   constructor(private readonly context: Context) {
-    this.services = new SystemServices(context, this.ownsTheScreen, () => this.openStart());
+    this.services = new SystemServices(context, () => this.openStart());
     const close = () => this.surfaces.close();
     const place = () => this.surfaces.place();
     const monitorAt = (x: number, y: number) => this.surfaces.monitorAt(x, y);
@@ -173,7 +170,7 @@ class KestrelUi {
     });
     const holdPanels = () => this.panels.hold(this.menus.actor.visible || this.previews.actor.visible);
     for (const actor of [this.menus.actor, this.previews.actor]) actor.connect('notify::visible', holdPanels);
-    this.disconnectors.push(followUserLanguage(this.ownsTheScreen));
+    this.disconnectors.push(followUserLanguage());
     this.disconnectors.push(taskbarPreferences.watch(key => {
       if (key === 'taskbar-style' || key === 'taskbar-size' || key === 'tablet') place();
       if (key === 'start-style') this.surfaces.restyleStart();

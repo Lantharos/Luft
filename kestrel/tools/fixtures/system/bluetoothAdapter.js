@@ -21,7 +21,7 @@ const adapterProperties = () => ({
 });
 
 export function plugInBluetoothAdapter() {
-  const connection = Gio.DBusConnection.new_for_address_sync(GLib.getenv('KESTREL_SYSTEM_BUS'),
+  const connection = Gio.DBusConnection.new_for_address_sync(Gio.dbus_address_get_for_bus_sync(Gio.BusType.SYSTEM, null),
     Gio.DBusConnectionFlags.AUTHENTICATION_CLIENT | Gio.DBusConnectionFlags.MESSAGE_BUS_CONNECTION, null, null);
   const manager = Gio.DBusExportedObject.wrapJSObject(OBJECT_MANAGER, {
     GetManagedObjects: () => ({[ADAPTER]: adapterProperties()}),

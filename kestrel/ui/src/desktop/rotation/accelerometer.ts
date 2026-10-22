@@ -1,7 +1,5 @@
 import Gio from 'gi://Gio';
 
-import { standInBus } from '../../system/standIn/bus.js';
-
 const SENSOR_PROXY = 'net.hadess.SensorProxy';
 
 type Listener = (present: boolean) => void;
@@ -11,7 +9,7 @@ class Accelerometer {
   private readonly listeners = new Set<Listener>();
 
   constructor() {
-    Gio.DBusProxy.new(standInBus() ?? Gio.DBus.system, Gio.DBusProxyFlags.DO_NOT_AUTO_START, null, SENSOR_PROXY,
+    Gio.DBusProxy.new(Gio.DBus.system, Gio.DBusProxyFlags.DO_NOT_AUTO_START, null, SENSOR_PROXY,
       '/net/hadess/SensorProxy', SENSOR_PROXY, null, (_source, result) => {
         try {
           this.proxy = Gio.DBusProxy.new_finish(result);

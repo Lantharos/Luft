@@ -53,7 +53,6 @@ export async function startCloud(rclone) {
     env: {
       HOME: prepareHome(),
       XDG_RUNTIME_DIR: GLib.getenv('KESTREL_APP_RUNTIME_DIR'),
-      DBUS_SYSTEM_BUS_ADDRESS: GLib.getenv('KESTREL_SYSTEM_BUS'),
       PATH: `${GLib.path_get_dirname(rclone)}:${GLib.getenv('PATH')}`,
     },
   });

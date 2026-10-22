@@ -19,12 +19,8 @@ const COPY_TIMEOUT = 10000;
 async function withDriver(args, use) {
   return withApp('disks', args, async app => {
     const driver = new Driver(app);
-    try {
-      await driver.take();
-      return await use(driver);
-    } finally {
-      driver.close();
-    }
+    await driver.take();
+    return use(driver);
   });
 }
 

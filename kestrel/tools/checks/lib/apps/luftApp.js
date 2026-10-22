@@ -31,7 +31,6 @@ function environment(manifest = null) {
     GI_TYPELIB_PATH: null,
     HOME: home,
     SABINE_TRACE: '1',
-    DBUS_SYSTEM_BUS_ADDRESS: GLib.getenv('KESTREL_SYSTEM_BUS'),
     XDG_RUNTIME_DIR: GLib.getenv('KESTREL_APP_RUNTIME_DIR'),
     WAYLAND_DISPLAY: GLib.build_filenamev([GLib.get_user_runtime_dir(), GLib.getenv('WAYLAND_DISPLAY')]),
     ...manifest && {SABINE_MANIFEST_PATH: manifest},

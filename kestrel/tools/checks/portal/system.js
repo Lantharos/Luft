@@ -71,6 +71,7 @@ async function checkAccount() {
   click(labelled('Share', dialog));
   const [response, results] = (await shared).recursiveUnpack();
   const account = AccountsService.UserManager.get_default().get_user(GLib.get_user_name());
+  await eventually(() => account.is_loaded, 'the account loads');
   const picture = results.image ? Gio.File.new_for_uri(results.image) : null;
   require(response === 0 && results.id === account.user_name && results.name === account.get_real_name() && !!picture?.query_exists(null),
     'apps get your name and picture once you share them');

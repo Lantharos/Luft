@@ -1,6 +1,5 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
-import GLib from 'gi://GLib';
 
 import {checks} from '../../lib/check.js';
 import {call} from '../../lib/dbus.js';
@@ -28,12 +27,10 @@ export const AT = {
 export class Driver {
   constructor(app) {
     this.app = app;
-    this.bus = Gio.DBusConnection.new_for_address_sync(GLib.getenv('KESTREL_SYSTEM_BUS'),
-      Gio.DBusConnectionFlags.AUTHENTICATION_CLIENT | Gio.DBusConnectionFlags.MESSAGE_BUS_CONNECTION, null, null);
   }
 
   async take() {
-    const reply = await call(CHECKS, '/com/lantharos/KestrelChecks', `${CHECKS}.Calls`, 'Take', null, '(as)', {connection: this.bus});
+    const reply = await call(CHECKS, '/com/lantharos/KestrelChecks', `${CHECKS}.Calls`, 'Take', null, '(as)', {connection: Gio.DBus.system});
     return reply.deepUnpack()[0];
   }
 
@@ -72,9 +69,5 @@ export class Driver {
       throw new Error(`${error.message}: expected ${expected.join(', ')}, saw ${seen.join(', ') || 'nothing'}`);
     });
     return seen;
-  }
-
-  close() {
-    this.bus.close_sync(null);
   }
 }

@@ -45,7 +45,7 @@ bun run desktop:build    # a release build
 
 `kestrel/tools/session.sh capture` runs every check headless, in isolated sessions with their own D-Bus buses and stand-ins for system services, and saves a screenshot of every surface. Other modes measure frame times, record animations frame by frame, and check the login screen and first-run setup. [Testing](/reference/testing/) covers every mode and option.
 
-Test sessions still reach the real system bus for a few services. Point `KESTREL_SESSION_DIR` and `KESTREL_CAPTURE_DIR` at scratch folders, and never type a real password into a prompt that appears during a test.
+Headless sessions run on a private system bus of stand-ins, while the nested session uses the computer's real one. Point `KESTREL_SESSION_DIR` and `KESTREL_CAPTURE_DIR` at scratch folders, and never type a real password into a prompt that appears during a test.
 
 ## On an installed Luft
 

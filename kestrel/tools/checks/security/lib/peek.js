@@ -5,7 +5,7 @@ import GdkPixbuf from 'gi://GdkPixbuf';
 import {shownStyled} from '../../lib/actors.js';
 import {fixture, repository, spawn} from '../../lib/processes.js';
 
-const PEEK = repository('kestrel', 'peek', 'target', 'release', 'peek');
+const PEEK = repository('target', 'release', 'peek');
 
 export const HANDLE = /^[a-z][a-z0-9]{9}$/;
 export const peekDialog = () => shownStyled('kestrel-peek-dialog');

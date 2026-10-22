@@ -8,12 +8,8 @@ const TYPES = {IsPresent: 'b', OnBattery: 'b', State: 'u', Percentage: 'd', Time
 
 export const UPOWER_STATE = {charging: 1, discharging: 2, full: 4, pendingCharge: 5};
 
-let bus = null;
-
 function control(method, parameters = null) {
-  bus ??= Gio.DBusConnection.new_for_address_sync(GLib.getenv('KESTREL_SYSTEM_BUS'),
-    Gio.DBusConnectionFlags.AUTHENTICATION_CLIENT | Gio.DBusConnectionFlags.MESSAGE_BUS_CONNECTION, null, null);
-  return call('org.freedesktop.UPower', '/com/lantharos/KestrelChecks/Battery', 'com.lantharos.KestrelChecks.Battery', method, parameters, null, {connection: bus});
+  return call('org.freedesktop.UPower', '/com/lantharos/KestrelChecks/Battery', 'com.lantharos.KestrelChecks.Battery', method, parameters, null, {connection: Gio.DBus.system});
 }
 
 export function setBattery(values) {

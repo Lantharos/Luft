@@ -3,7 +3,6 @@ import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 
 import {loadInterfaceXML} from '../../../misc/fileUtils.js';
-import * as KestrelUi from '../../kestrelUi.js';
 import {BluetoothDevice, BUS_NAME, DEVICE_INTERFACE} from './device.js';
 import {Reconnector} from './reconnect.js';
 
@@ -56,19 +55,15 @@ const BluetoothClient = GObject.registerClass({
 
         this._reconnector = new Reconnector(this);
 
-        const standIn = KestrelUi.standInBus();
-        const flags = Gio.DBusObjectManagerClientFlags.DO_NOT_AUTO_START;
-        const watch = finish => (source, result) => {
-            try {
-                this._watch(finish(result));
-            } catch (e) {
-                console.error(`Could not watch Bluetooth: ${e.message}`);
-            }
-        };
-        if (standIn)
-            Gio.DBusObjectManagerClient.new(standIn, flags, BUS_NAME, '/', null, null, watch(Gio.DBusObjectManagerClient.new_finish));
-        else
-            Gio.DBusObjectManagerClient.new_for_bus(Gio.BusType.SYSTEM, flags, BUS_NAME, '/', null, null, watch(Gio.DBusObjectManagerClient.new_for_bus_finish));
+        Gio.DBusObjectManagerClient.new_for_bus(Gio.BusType.SYSTEM,
+            Gio.DBusObjectManagerClientFlags.DO_NOT_AUTO_START, BUS_NAME, '/', null, null,
+            (source, result) => {
+                try {
+                    this._watch(Gio.DBusObjectManagerClient.new_for_bus_finish(result));
+                } catch (e) {
+                    console.error(`Could not watch Bluetooth: ${e.message}`);
+                }
+            });
     }
 
     get available() {

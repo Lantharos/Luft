@@ -15,7 +15,7 @@ import {pause, settled} from '../lib/wait.js';
 
 const {require, eventually} = checks('dictation');
 const SPEECH = 'com.lantharos.Speech1';
-const SERVICE = repository('packages', 'speech', 'service', 'target', 'release', 'luft-speech');
+const SERVICE = repository('target', 'release', 'luft-speech');
 const RECORDING = GLib.getenv('KESTREL_DICTATION');
 const KEY_ESC = 1;
 const KEY_TAB = 15;

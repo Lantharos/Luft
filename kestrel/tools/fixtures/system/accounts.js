@@ -62,6 +62,7 @@ export function publishAccounts(publish) {
     account.SetLanguage = language => {
       account.Language = language;
       exported.emit_property_changed('Language', new GLib.Variant('s', language));
+      exported.flush();
       exported.emit_signal('Changed', null);
     };
     const exported = publish(interfaceXml('org.freedesktop.Accounts.User'), account, person.path);

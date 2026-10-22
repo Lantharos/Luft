@@ -14,8 +14,6 @@ const CONTROL = `${CHECKS}.Installer`;
 
 export class Setup {
   constructor() {
-    this.bus = Gio.DBusConnection.new_for_address_sync(GLib.getenv('KESTREL_SYSTEM_BUS'),
-      Gio.DBusConnectionFlags.AUTHENTICATION_CLIENT | Gio.DBusConnectionFlags.MESSAGE_BUS_CONNECTION, null, null);
     this.seen = [];
   }
 
@@ -26,7 +24,7 @@ export class Setup {
   }
 
   control(method, parameters = null, replyType = null) {
-    return call('com.lantharos.Installer1', '/com/lantharos/KestrelChecks/Installer', CONTROL, method, parameters, replyType, {connection: this.bus});
+    return call('com.lantharos.Installer1', '/com/lantharos/KestrelChecks/Installer', CONTROL, method, parameters, replyType, {connection: Gio.DBus.system});
   }
 
   setPhase(phase) {
@@ -43,7 +41,7 @@ export class Setup {
 
   setSigningKey(state) {
     return call(CHECKS, '/com/lantharos/KestrelChecks/Trust', `${CHECKS}.Trust`, 'SetSigningKey', new GLib.Variant('(s)', [state]), null,
-      {connection: this.bus});
+      {connection: Gio.DBus.system});
   }
 
   async requests() {
@@ -52,7 +50,7 @@ export class Setup {
   }
 
   async calls() {
-    const reply = await call(CHECKS, '/com/lantharos/KestrelChecks', `${CHECKS}.Calls`, 'Take', null, '(as)', {connection: this.bus});
+    const reply = await call(CHECKS, '/com/lantharos/KestrelChecks', `${CHECKS}.Calls`, 'Take', null, '(as)', {connection: Gio.DBus.system});
     this.seen.push(...reply.deepUnpack()[0]);
     return this.seen;
   }

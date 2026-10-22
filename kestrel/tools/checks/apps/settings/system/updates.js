@@ -22,20 +22,14 @@ const SIDEBAR_STEPS = 10;
 const LOOKS = ['refresh', 'updates'].map(role => `PackageKit ${role}`);
 const UPDATE_IDS = ['kernel;6.17.4-300.fc45;x86_64;updates', 'systemd;258.2-1.fc45;x86_64;updates'];
 
-function systemBus() {
-  return Gio.DBusConnection.new_for_address_sync(GLib.getenv('KESTREL_SYSTEM_BUS'),
-    Gio.DBusConnectionFlags.AUTHENTICATION_CLIENT | Gio.DBusConnectionFlags.MESSAGE_BUS_CONNECTION, null, null);
-}
-
 class Updates {
   constructor(accent) {
     this.accent = accent;
-    this.bus = systemBus();
     this.seen = [];
   }
 
   async take() {
-    const reply = await call(CHECKS, '/com/lantharos/KestrelChecks', `${CHECKS}.Calls`, 'Take', null, '(as)', {connection: this.bus});
+    const reply = await call(CHECKS, '/com/lantharos/KestrelChecks', `${CHECKS}.Calls`, 'Take', null, '(as)', {connection: Gio.DBus.system});
     this.seen.push(...reply.deepUnpack()[0]);
     return this.seen;
   }
@@ -65,8 +59,8 @@ class Updates {
   }
 
   async installElsewhere() {
-    const [path] = (await call(PACKAGEKIT, '/org/freedesktop/PackageKit', PACKAGEKIT, 'CreateTransaction', null, '(o)', {connection: this.bus})).deepUnpack();
-    await call(PACKAGEKIT, path, `${PACKAGEKIT}.Transaction`, 'UpdatePackages', new GLib.Variant('(tas)', [0, UPDATE_IDS]), null, {connection: this.bus});
+    const [path] = (await call(PACKAGEKIT, '/org/freedesktop/PackageKit', PACKAGEKIT, 'CreateTransaction', null, '(o)', {connection: Gio.DBus.system})).deepUnpack();
+    await call(PACKAGEKIT, path, `${PACKAGEKIT}.Transaction`, 'UpdatePackages', new GLib.Variant('(tas)', [0, UPDATE_IDS]), null, {connection: Gio.DBus.system});
   }
 }
 
@@ -129,6 +123,5 @@ export async function checkUpdates(palette) {
     await checkInstalledElsewhere(updates);
   } finally {
     await updates.app?.close();
-    updates.bus.close_sync(null);
   }
 }

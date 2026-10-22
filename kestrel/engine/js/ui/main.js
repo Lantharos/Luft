@@ -267,8 +267,6 @@ async function _initializeGreeter() {
 
 /** @private */
 async function _initializeUI() {
-    KestrelUi.useStandInAccounts();
-
     // Ensure ShellWindowTracker is initialized; this will
     // also initialize ShellAppSystem first. ShellAppSystem
     // needs to load all the .desktop files, and ShellWindowTracker

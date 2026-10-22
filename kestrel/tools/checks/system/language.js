@@ -1,6 +1,6 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import {formatsLocale, standInBus, t} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
+import {formatsLocale, t} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 
 import {descendants} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
@@ -12,7 +12,7 @@ const {require, eventually} = checks('language');
 const ACCOUNTS = 'org.freedesktop.Accounts';
 
 async function chooseLanguage(language) {
-  const connection = standInBus();
+  const connection = Gio.DBus.system;
   const [path] = (await call(ACCOUNTS, '/org/freedesktop/Accounts', ACCOUNTS, 'FindUserByName',
     new GLib.Variant('(s)', [GLib.get_user_name()]), '(o)', {connection})).deepUnpack();
   await call(ACCOUNTS, path, `${ACCOUNTS}.User`, 'SetLanguage', new GLib.Variant('(s)', [language]), null, {connection});

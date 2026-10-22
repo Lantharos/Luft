@@ -8,8 +8,7 @@ const SENSOR_PROXY = `<node><interface name="net.hadess.SensorProxy">
   <property name="AccelerometerOrientation" type="s" access="read"/>
 </interface></node>`;
 
-const bus = Gio.DBusConnection.new_for_address_sync(GLib.getenv('KESTREL_STAND_IN_BUS'),
-  Gio.DBusConnectionFlags.AUTHENTICATION_CLIENT | Gio.DBusConnectionFlags.MESSAGE_BUS_CONNECTION, null, null);
+const bus = Gio.DBus.system;
 Gio.DBusExportedObject.wrapJSObject(SENSOR_PROXY, {
   ClaimAccelerometer() {},
   ReleaseAccelerometer() {},

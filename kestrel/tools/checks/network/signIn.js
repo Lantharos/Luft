@@ -19,13 +19,8 @@ const PORTAL_PAGE = `<!doctype html>
 <form method="post" action="/"><h1>Welcome to Harbor Hotel</h1><p>Enter your room number to get online.</p>
 <input name="room" placeholder="Room"> <button>Connect</button></form></body></html>`;
 
-function systemBus() {
-  return Gio.DBusConnection.new_for_address_sync(GLib.getenv('KESTREL_SYSTEM_BUS'),
-    Gio.DBusConnectionFlags.AUTHENTICATION_CLIENT | Gio.DBusConnectionFlags.MESSAGE_BUS_CONNECTION, null, null);
-}
-
-function control(connection, method, parameters = null, replyType = null) {
-  return call(...NETWORK_MANAGER, method, parameters, replyType, {connection});
+function control(method, parameters = null, replyType = null) {
+  return call(...NETWORK_MANAGER, method, parameters, replyType, {connection: Gio.DBus.system});
 }
 
 async function startPortal(folder) {
@@ -41,12 +36,11 @@ export async function run() {
   const folder = scratch('signin-portal');
   const styles = new Gio.Settings({schema_id: 'org.gnome.desktop.interface'});
   const scheme = styles.get_string('color-scheme');
-  const bus = systemBus();
   const portal = await startPortal(folder);
   await sabineService();
   try {
-    await control(bus, 'SetConnectivity', new GLib.Variant('(u)', [PORTAL]));
-    await control(bus, 'SetConnectivityCheckUri', new GLib.Variant('(s)', [portal.url]));
+    await control('SetConnectivity', new GLib.Variant('(u)', [PORTAL]));
+    await control('SetConnectivityCheckUri', new GLib.Variant('(s)', [portal.url]));
     styles.set_string('color-scheme', 'prefer-dark');
     const app = new LuftApp('signin', [`kestrel-signin:?network=${encodeURIComponent('Harbor Hotel')}&url=${encodeURIComponent(portal.url)}`]);
     await app.open();
@@ -59,16 +53,15 @@ export async function run() {
     const light = await app.settle(frame => !frame.same(dark) && shows(frame));
     light.save('signin-light');
     require(!light.looksLike(dark), 'the window follows the light style around the page');
-    await eventually(async () => (await control(bus, 'Checks', null, '(u)')).deepUnpack()[0] > 0,
+    await eventually(async () => (await control('Checks', null, '(u)')).deepUnpack()[0] > 0,
       'loading the page asks NetworkManager to check the connection');
-    await control(bus, 'SetConnectivity', new GLib.Variant('(u)', [FULL]));
+    await control('SetConnectivity', new GLib.Variant('(u)', [FULL]));
     await eventually(() => !app.window.get_compositor_private(), 'the window closes once NetworkManager reports full connectivity');
     await app.finished(CLOSE_TIMEOUT);
   } finally {
     styles.set_string('color-scheme', scheme);
     await stop(portal.server);
-    await control(bus, 'SetConnectivity', new GLib.Variant('(u)', [FULL]));
-    bus.close_sync(null);
+    await control('SetConnectivity', new GLib.Variant('(u)', [FULL]));
     await spawn(['rm', '-rf', folder]).exited;
   }
 }

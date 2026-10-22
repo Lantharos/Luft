@@ -41,7 +41,7 @@ export class SystemServices {
   private readonly openWindows = new OpenWindows();
   private readonly variableRefresh = new VariableRefresh();
   private readonly titleBars: TitleBars;
-  private readonly loginScreen: { destroy(): void }[];
+  private readonly loginScreen = [new LoginWallpaper(), new LoginDisplays(), new LoginNumLock()];
   private readonly farewell = new Farewell();
   private readonly fontRefresh = new FontRefresh();
   private readonly portal: PortalBackend;
@@ -51,10 +51,9 @@ export class SystemServices {
   private readonly mediaKeys: MediaKeys;
   private readonly peek: PeekService;
 
-  constructor(context: Context, ownsTheScreen: boolean, openStart: () => void) {
+  constructor(context: Context, openStart: () => void) {
     this.titleBars = new TitleBars((window, x, y) =>
       context.showWindowMenu(window, new Mtk.Rectangle({ x: Math.round(x), y: Math.round(y), width: 0, height: 0 })));
-    this.loginScreen = ownsTheScreen ? [new LoginWallpaper(), new LoginDisplays(), new LoginNumLock()] : [];
     this.portal = PortalBackend.forSession(context);
     this.passkeys = new PasskeyPrompts(context);
     this.appearance = new AppearanceService(color => this.portal.setAccent(color));

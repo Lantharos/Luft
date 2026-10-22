@@ -18,9 +18,8 @@ function environmentFor(language: string, region: string): Record<string, string
   };
 }
 
-function shareWithApps(environment: Record<string, string>, ownsTheScreen: boolean): void {
+function shareWithApps(environment: Record<string, string>): void {
   for (const [name, value] of Object.entries(environment)) GLib.setenv(name, value, true);
-  if (!ownsTheScreen) return;
   const assignments = Object.entries(environment).map(([name, value]) => `${name}=${value}`);
   Gio.DBus.session.call('org.freedesktop.DBus', '/org/freedesktop/DBus', 'org.freedesktop.DBus', 'UpdateActivationEnvironment',
     new GLib.Variant('(a{ss})', [environment]), null, Gio.DBusCallFlags.NONE, -1, null, null);
@@ -28,7 +27,7 @@ function shareWithApps(environment: Record<string, string>, ownsTheScreen: boole
     new GLib.Variant('(as)', [assignments]), null, Gio.DBusCallFlags.NONE, -1, null, null);
 }
 
-export function followUserLanguage(ownsTheScreen: boolean): () => void {
+export function followUserLanguage(): () => void {
   const user = AccountsService.UserManager.get_default().get_user(GLib.get_user_name());
   const locale = new Gio.Settings({ schema_id: 'org.gnome.system.locale' });
   let applied = '';
@@ -38,7 +37,7 @@ export function followUserLanguage(ownsTheScreen: boolean): () => void {
     if (`${language}|${region}` === applied) return;
     applied = `${language}|${region}`;
     chooseLocale(language, region);
-    if (language) shareWithApps(environmentFor(language, region), ownsTheScreen);
+    if (language) shareWithApps(environmentFor(language, region));
   };
   const signals: [GObject.Object, number][] = [
     [user, user.connect('notify::is-loaded', apply)],

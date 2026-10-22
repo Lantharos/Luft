@@ -26,6 +26,16 @@ const DEVICE = `<node><interface name="org.freedesktop.UPower.Device">
   <property name="ChargeStartThreshold" type="u" access="read"/>
   <property name="ChargeEndThreshold" type="u" access="read"/>
 </interface></node>`;
+const POWER_PROFILES = `<node><interface name="org.freedesktop.UPower.PowerProfiles">
+  <method name="HoldProfile">
+    <arg type="s" direction="in"/><arg type="s" direction="in"/><arg type="s" direction="in"/><arg type="u" direction="out"/>
+  </method>
+  <method name="ReleaseProfile"><arg type="u" direction="in"/></method>
+  <property name="ActiveProfile" type="s" access="readwrite"/>
+  <property name="PerformanceDegraded" type="s" access="read"/>
+  <property name="Profiles" type="aa{sv}" access="read"/>
+  <property name="ActiveProfileHolds" type="aa{sv}" access="read"/>
+</interface></node>`;
 const CONTROL = `<node><interface name="com.lantharos.KestrelChecks.Battery">
   <method name="Set"><arg type="a{sv}" direction="in"/></method>
   <method name="Reset"/>
@@ -85,4 +95,23 @@ export function publishUpower(publish, calls) {
     Set: values => changed(Object.fromEntries(Object.entries(values).map(([name, value]) => [name, value.recursiveUnpack()]))),
     Reset: () => changed({...NO_BATTERY, OnBattery: false}),
   }, '/com/lantharos/KestrelChecks/Battery');
+
+  publishPowerProfiles(publish);
+}
+
+function publishPowerProfiles(publish) {
+  let active = 'balanced';
+  const profiles = publish(POWER_PROFILES, {
+    HoldProfile: () => 1,
+    ReleaseProfile() {},
+    get ActiveProfile() { return active; },
+    set ActiveProfile(profile) {
+      active = profile;
+      profiles.emit_property_changed('ActiveProfile', new GLib.Variant('s', profile));
+    },
+    PerformanceDegraded: '',
+    Profiles: ['power-saver', 'balanced', 'performance'].map(profile =>
+      ({Profile: new GLib.Variant('s', profile), Driver: new GLib.Variant('s', 'platform_profile')})),
+    ActiveProfileHolds: [],
+  }, '/org/freedesktop/UPower/PowerProfiles');
 }

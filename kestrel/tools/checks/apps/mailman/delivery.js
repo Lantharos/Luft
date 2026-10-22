@@ -78,12 +78,9 @@ async function deliveries(app, server, from, to, label) {
 }
 
 function networkReturned() {
-  const bus = Gio.DBusConnection.new_for_address_sync(GLib.getenv('KESTREL_SYSTEM_BUS'),
-    Gio.DBusConnectionFlags.AUTHENTICATION_CLIENT | Gio.DBusConnectionFlags.MESSAGE_BUS_CONNECTION, null, null);
-  bus.emit_signal(null, '/org/freedesktop/NetworkManager', 'org.freedesktop.DBus.Properties', 'PropertiesChanged',
+  Gio.DBus.system.emit_signal(null, '/org/freedesktop/NetworkManager', 'org.freedesktop.DBus.Properties', 'PropertiesChanged',
     new GLib.Variant('(sa{sv}as)', ['org.freedesktop.NetworkManager', {State: new GLib.Variant('u', 70)}, []]));
-  bus.flush_sync(null);
-  bus.close_sync(null);
+  Gio.DBus.system.flush_sync(null);
 }
 
 async function afterCutOff(app, server, subject, recover) {

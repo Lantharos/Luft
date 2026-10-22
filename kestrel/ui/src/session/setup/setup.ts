@@ -49,7 +49,7 @@ export class Setup {
   private readonly backdrop = new LockBackdrop();
   private readonly portal = PortalBackend.forSetup();
   private readonly appearance = new AppearanceService(color => this.portal.setAccent(color));
-  private readonly loginWallpaper = global.backend.is_headless() ? null : new LoginWallpaper();
+  private readonly loginWallpaper = new LoginWallpaper();
   private readonly dbus = Gio.DBusExportedObject.wrapJSObject(INTERFACE, this);
   private readonly nameId: number;
   private readonly placement: () => void;
@@ -93,7 +93,7 @@ export class Setup {
   }
 
   destroy(): void {
-    this.loginWallpaper?.destroy();
+    this.loginWallpaper.destroy();
     this.appearance.destroy();
     this.portal.destroy();
     this.placement();

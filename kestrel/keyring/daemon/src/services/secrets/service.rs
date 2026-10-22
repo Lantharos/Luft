@@ -144,6 +144,9 @@ impl Service {
                 locked.push(path);
             }
         }
+        if !unlocked.is_empty() {
+            locked.clear();
+        }
         (unlocked, locked)
     }
 

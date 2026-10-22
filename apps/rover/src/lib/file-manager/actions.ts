@@ -1,6 +1,7 @@
 import { appWindow } from '@lantharos/sabine';
 import { isInside, parent } from '@luft/ui';
 import * as api from '#lib/bridge/index.js';
+import { extractArchives } from '#lib/features/api.js';
 import type { FileManager } from './manager.svelte';
 
 export class FileActions {
@@ -11,6 +12,11 @@ export class FileActions {
 	}
 
 	closeWindow = () => appWindow.close();
+
+	extractNextTo = async (path: string) => {
+		const manager = this.#manager;
+		await extractArchives([path], parent(path)).then(manager.selectWhenDone, manager.notify);
+	};
 
 	copy = () => {
 		const items = this.#manager.selectedEntries;

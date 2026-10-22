@@ -443,6 +443,7 @@ settings-apps-videos = Vídeos
 settings-apps-photos = Fotografias
 settings-apps-text-editor = Editor de texto
 settings-apps-files = Ficheiros
+settings-apps-archives = Ficheiros comprimidos
 settings-apps-choose = Escolher
 settings-apps-startup = Arranque
 settings-apps-startup-description = Estas aplicações abrem quando inicia sessão

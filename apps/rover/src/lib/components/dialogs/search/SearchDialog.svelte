@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { tick } from 'svelte';
 	import { basename, Dialog, parent, plural, SearchField } from '@luft/ui';
-	import * as api from '#lib/bridge/index.js';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 	import { search } from '#lib/features/search.svelte.js';
 	import type { SearchResult } from '#lib/features/types.js';
@@ -48,7 +47,7 @@
 			search.close();
 			void manager.navigate(result.path);
 		} else {
-			api.openWithDefault(result.path).catch(manager.notify);
+			void manager.openFile(result.path);
 		}
 	}
 

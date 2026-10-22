@@ -451,6 +451,7 @@ settings-apps-videos = Video-snimci
 settings-apps-photos = Fotografije
 settings-apps-text-editor = Uređivač teksta
 settings-apps-files = Datoteke
+settings-apps-archives = Arhive
 settings-apps-choose = Izaberi
 settings-apps-startup = Pokretanje
 settings-apps-startup-description = Ove aplikacije se otvaraju kada se prijavite

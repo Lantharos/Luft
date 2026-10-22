@@ -1,7 +1,16 @@
 use luft_app::Activation;
+use serde::Serialize;
 use url::Url;
 
-pub fn resolve(activation: &Activation) -> Vec<String> {
+pub const REVEAL: &str = "--reveal";
+
+#[derive(Clone, Serialize)]
+pub struct Launch {
+    paths: Vec<String>,
+    reveal: bool,
+}
+
+pub fn resolve(activation: &Activation) -> Launch {
     let mut paths: Vec<String> = Vec::new();
     for path in activation
         .arguments()
@@ -12,7 +21,10 @@ pub fn resolve(activation: &Activation) -> Vec<String> {
             paths.push(path);
         }
     }
-    paths
+    Launch {
+        paths,
+        reveal: activation.arguments().iter().any(|argument| argument == REVEAL),
+    }
 }
 
 fn target(activation: &Activation, argument: &str) -> Option<String> {

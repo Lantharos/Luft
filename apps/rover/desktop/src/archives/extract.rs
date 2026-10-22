@@ -6,12 +6,14 @@ use std::path::Path;
 use super::progress::{Counted, Progress};
 
 const READ_BUFFER: usize = 256 * 1024;
-const TAR_SUFFIXES: [(&str, Codec); 9] = [
+const TAR_SUFFIXES: [(&str, Codec); 11] = [
     (".tar", Codec::Plain),
+    (".gtar", Codec::Plain),
     (".tar.gz", Codec::Gzip),
     (".tgz", Codec::Gzip),
     (".tar.bz2", Codec::Bzip2),
     (".tbz2", Codec::Bzip2),
+    (".tb2", Codec::Bzip2),
     (".tar.xz", Codec::Xz),
     (".txz", Codec::Xz),
     (".tar.zst", Codec::Zstd),
@@ -23,7 +25,7 @@ const STREAM_SUFFIXES: [(&str, Codec); 4] = [
     (".xz", Codec::Xz),
     (".zst", Codec::Zstd),
 ];
-const ZIP_SUFFIXES: [&str; 5] = [".zip", ".jar", ".cbz", ".epub", ".apk"];
+const ZIP_SUFFIXES: [&str; 6] = [".zip", ".zipx", ".jar", ".cbz", ".epub", ".apk"];
 
 #[derive(Clone, Copy)]
 pub(super) enum Codec {

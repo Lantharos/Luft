@@ -33,7 +33,7 @@ export function extract(manager: FileManager, entries: FileEntry[]) {
 	api.extractArchives(
 		entries.map((entry) => entry.path),
 		manager.currentPath
-	).catch(manager.notify);
+	).then(manager.selectWhenDone, manager.notify);
 }
 
 export function rename(manager: FileManager, entries: FileEntry[]) {

@@ -18,7 +18,7 @@ sabine install --bundle .
 
 Thumbnails only load from the packaged app, so they show in builds and bundles, not against the Vite dev server.
 
-The desktop entry opens folders, and `sftp://`, `smb://`, `dav://`, `davs://` and `nfs://` links. If Rover is running, a path opens in a new tab.
+The desktop entry opens folders, archives, which it extracts next to themselves, and `sftp://`, `smb://`, `dav://`, `davs://` and `nfs://` links. If Rover is running, a path opens in a new tab.
 
 ## File dialogs and "Show in folder"
 

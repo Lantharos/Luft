@@ -21,7 +21,7 @@
 	import { DragController } from '#lib/file-manager/drag/controller.svelte.js';
 	import { handleKeydown } from '#lib/file-manager/keyboard.js';
 	import { FileManager } from '#lib/file-manager/manager.svelte.js';
-	import { openActivation, openLaunchPaths } from '#lib/file-manager/open-targets.js';
+	import { openActivation, openLaunch } from '#lib/file-manager/open-targets.js';
 	import { TrashCounter } from '#lib/file-manager/places/places.svelte.js';
 	import { setEntryContext } from '#lib/file-manager/view/entry-props.js';
 	import { ViewState } from '#lib/file-manager/view/view-state.svelte.js';
@@ -82,7 +82,7 @@
 		const state = await api.appState();
 		chooser = state.chooser && new ChooserState(state.chooser, manager);
 		await manager.start(state, state.chooser?.currentFolder ?? undefined);
-		if (!state.chooser) await openLaunchPaths(manager, state.launchPaths);
+		if (!state.chooser) await openLaunch(manager, state.launch);
 		const operations = await api.listOperations();
 		manager.receiveOperations(operations);
 		trash.receiveOperations(operations);

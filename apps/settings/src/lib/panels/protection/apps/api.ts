@@ -6,7 +6,7 @@ export interface App {
 	icon: string | null;
 }
 
-export type Category = 'browser' | 'email' | 'calendar' | 'music' | 'video' | 'photos' | 'text' | 'files';
+export type Category = 'browser' | 'email' | 'calendar' | 'music' | 'video' | 'photos' | 'text' | 'files' | 'archives';
 
 export interface Handler {
 	category: Category;

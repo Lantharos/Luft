@@ -483,6 +483,7 @@ settings-apps-videos = Físeáin
 settings-apps-photos = Grianghraif
 settings-apps-text-editor = Eagarthóir téacs
 settings-apps-files = Comhaid
+settings-apps-archives = Cartlanna
 settings-apps-choose = Roghnaigh
 settings-apps-startup = Tosú
 settings-apps-startup-description = Osclaítear na haipeanna seo nuair a shíníonn tú isteach

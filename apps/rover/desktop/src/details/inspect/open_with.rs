@@ -3,8 +3,6 @@ use luft_app::apps::App;
 use luft_app::launch;
 use serde::Serialize;
 
-const OWN_APP_PREFIX: &str = "com.lantharos.rover";
-
 #[derive(Serialize)]
 pub struct OpenWith {
     default: Option<App>,
@@ -26,13 +24,11 @@ pub fn apps_for(path: &str) -> OpenWith {
             others: Vec::new(),
         };
     };
-    let default = gio::AppInfo::default_for_type(&content_type, false)
-        .filter(is_foreign)
-        .and_then(|info| App::from_info(&info));
+    let default =
+        gio::AppInfo::default_for_type(&content_type, false).and_then(|info| App::from_info(&info));
     let mut others: Vec<App> = gio::AppInfo::recommended_for_type(&content_type)
         .into_iter()
         .chain(gio::AppInfo::fallback_for_type(&content_type))
-        .filter(is_foreign)
         .filter_map(|info| App::from_info(&info))
         .filter(|app| default.as_ref().is_none_or(|default| default.id != app.id))
         .collect();
@@ -41,12 +37,23 @@ pub fn apps_for(path: &str) -> OpenWith {
     OpenWith { default, others }
 }
 
-pub fn launch(path: &str, app: &str, token: Option<&str>) -> Result<(), String> {
+pub fn launch(path: &str, app: &str, token: Option<&str>) -> Result<bool, String> {
     let app = gio_unix::DesktopAppInfo::new(app).ok_or("This app is no longer installed")?;
-    launch::open_files(app.upcast_ref(), &[gio::File::for_path(path)], token)
-        .map_err(|error| error.to_string())
+    open_in(app.upcast_ref(), &gio::File::for_path(path), token)
 }
 
-fn is_foreign(info: &gio::AppInfo) -> bool {
-    info.id().is_none_or(|id| !id.starts_with(OWN_APP_PREFIX))
+pub fn launch_default(path: &str, token: Option<&str>) -> Result<bool, String> {
+    let file = gio::File::for_path(path);
+    let app = file
+        .query_default_handler(gio::Cancellable::NONE)
+        .map_err(|error| error.to_string())?;
+    open_in(&app, &file, token)
+}
+
+fn open_in(app: &gio::AppInfo, file: &gio::File, token: Option<&str>) -> Result<bool, String> {
+    if app.id().is_some_and(|id| id.starts_with(crate::APP_ID)) {
+        return Ok(true);
+    }
+    launch::open_files(app, std::slice::from_ref(file), token).map_err(|error| error.to_string())?;
+    Ok(false)
 }

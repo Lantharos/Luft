@@ -4,6 +4,7 @@ use tokio::process::Command;
 use url::Url;
 use zbus::interface;
 
+use super::launch_args::REVEAL;
 use super::{install_dbus_service, serve_dbus};
 
 const BUS_NAME: &str = "org.freedesktop.FileManager1";
@@ -38,7 +39,7 @@ fn open_in_rover(uris: &[String], startup_id: &str) {
         return;
     };
     let mut command = Command::new(exe);
-    command.args(paths);
+    command.arg(REVEAL).args(paths);
     if !startup_id.is_empty() {
         command.env("XDG_ACTIVATION_TOKEN", startup_id);
     }

@@ -99,6 +99,7 @@ export interface Operation {
 	totalItems: number;
 	conflict: Conflict | null;
 	error: string | null;
+	created: string[];
 	startedAt: number;
 	completedAt: number | null;
 }
@@ -184,9 +185,14 @@ export interface NetworkAnswer {
 	choice?: number;
 }
 
+export interface Launch {
+	paths: string[];
+	reveal: boolean;
+}
+
 export interface AppState extends Appearance {
 	chooser: ChooserConfig | null;
-	launchPaths: string[];
+	launch: Launch;
 	canManageDrives: boolean;
 	settings: Settings;
 	userDirs: UserDirs | null;

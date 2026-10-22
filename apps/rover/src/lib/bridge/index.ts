@@ -5,6 +5,7 @@ import type {
 	DirectoryContents,
 	DriveInfo,
 	FileEntry,
+	Launch,
 	NetworkAnswer,
 	NetworkAsk,
 	NetworkLocation,
@@ -30,11 +31,11 @@ export const createDirectory = (path: string, name: string) => invoke<FileEntry>
 export const renameItem = (path: string, newName: string) => invoke<FileEntry>('rename_item', { path, newName });
 export const copyItems = (sources: string[], destination: string) => invoke<string>('copy_items', { sources, destination });
 export const moveItems = (sources: string[], destination: string) => invoke<string>('move_items', { sources, destination });
-export const openWithDefault = async (path: string) => invoke<void>('open_with_default', { path, token: await activationToken() });
+export const openWithDefault = async (path: string) => invoke<boolean>('open_with_default', { path, token: await activationToken() });
 export const openLink = async (uri: string) => invoke<void>('open_link', { uri, token: await activationToken() });
 export const fileDetails = (path: string) => invoke<FileDetails>('file_details', { path });
 export const appsForFile = (path: string) => invoke<OpenWithApps>('apps_for_file', { path });
-export const openWithApp = async (path: string, app: string) => invoke<void>('open_with_app', { path, app, token: await activationToken() });
+export const openWithApp = async (path: string, app: string) => invoke<boolean>('open_with_app', { path, app, token: await activationToken() });
 
 export const listDrives = () => invoke<DriveInfo[]>('list_drives');
 export const ejectDrive = (mountPoint: string) => invoke<void>('eject_drive', { mountPoint });
@@ -80,7 +81,7 @@ export const vcsDiff = (root: string, filePath: string | null) => invoke<string>
 export const saveVcs = (root: string, message: string, files: string[] | null) => invoke<void>('vcs_save', { root, message, files });
 export const syncVcs = (root: string) => invoke<void>('vcs_sync', { root });
 
-export const resolveArguments = (activation: SingleInstanceActivation) => invoke<string[]>('resolve_arguments', activation);
+export const resolveArguments = (activation: SingleInstanceActivation) => invoke<Launch>('resolve_arguments', activation);
 
 export const acceptChooser = (paths: string[]) => invoke<void>('accept_chooser', { paths });
 export const cancelChooser = () => invoke<void>('cancel_chooser');

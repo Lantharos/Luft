@@ -11,7 +11,7 @@ struct Category {
     types: &'static [&'static str],
 }
 
-const CATEGORIES: [Category; 8] = [
+const CATEGORIES: [Category; 9] = [
     Category {
         id: "browser",
         types: &[
@@ -79,6 +79,23 @@ const CATEGORIES: [Category; 8] = [
     Category {
         id: "files",
         types: &["inode/directory"],
+    },
+    Category {
+        id: "archives",
+        types: &[
+            "application/zip",
+            "application/x-7z-compressed",
+            "application/vnd.rar",
+            "application/x-tar",
+            "application/x-compressed-tar",
+            "application/x-bzip2-compressed-tar",
+            "application/x-xz-compressed-tar",
+            "application/x-zstd-compressed-tar",
+            "application/gzip",
+            "application/x-bzip2",
+            "application/x-xz",
+            "application/zstd",
+        ],
     },
 ];
 

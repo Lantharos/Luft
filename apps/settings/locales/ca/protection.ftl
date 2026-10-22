@@ -441,6 +441,7 @@ settings-apps-videos = Vídeos
 settings-apps-photos = Fotos
 settings-apps-text-editor = Editor de text
 settings-apps-files = Fitxers
+settings-apps-archives = Arxius comprimits
 settings-apps-choose = Trieu
 settings-apps-startup = Arrencada
 settings-apps-startup-description = Aquestes aplicacions s’obren quan inicieu la sessió

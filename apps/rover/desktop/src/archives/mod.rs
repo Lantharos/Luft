@@ -92,7 +92,7 @@ pub fn extract(
         let total = archives.iter().map(|(path, _, _)| path_size(path)).sum();
         queue.set_totals(&operation_id, total, 0);
         let progress = Progress::new(&queue, &operation_id);
-        let mut steps = Vec::new();
+        let mut created = Vec::new();
         let result =
             archives
                 .iter()
@@ -106,7 +106,7 @@ pub fn extract(
                         .and_then(|()| settle(&staging, &destination, stem));
                     match unpacked {
                         Ok(target) => {
-                            steps.push(Step::Created(target));
+                            created.push(target);
                             Ok(())
                         }
                         Err(error) => {
@@ -115,10 +115,17 @@ pub fn extract(
                         }
                     }
                 });
+        queue.set_created(
+            &operation_id,
+            created
+                .iter()
+                .map(|path| path.to_string_lossy().into_owned())
+                .collect(),
+        );
         history.record(
             format!("Extracted {}", subject(&paths)),
             "Moved the extracted files to the trash".to_string(),
-            steps,
+            created.into_iter().map(Step::Created).collect(),
             false,
         );
         let _ = queue.finish(&operation_id, result);

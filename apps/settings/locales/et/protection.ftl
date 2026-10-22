@@ -441,6 +441,7 @@ settings-apps-videos = Videod
 settings-apps-photos = Fotod
 settings-apps-text-editor = Tekstiredaktor
 settings-apps-files = Failid
+settings-apps-archives = Arhiivid
 settings-apps-choose = Vali
 settings-apps-startup = Käivitus
 settings-apps-startup-description = Need rakendused avatakse sisselogimisel

@@ -94,6 +94,7 @@ pub struct Operation {
     pub total_items: usize,
     pub conflict: Option<Conflict>,
     pub error: Option<String>,
+    pub created: Vec<String>,
     pub started_at: i64,
     pub completed_at: Option<i64>,
 }
@@ -160,6 +161,7 @@ impl OperationsQueue {
                 total_items: total_items.max(1),
                 conflict: None,
                 error: None,
+                created: Vec::new(),
                 started_at: now,
                 completed_at: None,
             });
@@ -217,6 +219,10 @@ impl OperationsQueue {
             operation.total_items = total_items.max(1);
             operation.progress = 0.0;
         });
+    }
+
+    pub fn set_created(&self, id: &str, created: Vec<String>) {
+        self.update(id, false, |operation| operation.created = created);
     }
 
     pub fn ask(&self, id: &str, conflict: Conflict) -> Result<Decision, String> {

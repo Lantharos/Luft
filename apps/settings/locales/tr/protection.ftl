@@ -441,6 +441,7 @@ settings-apps-videos = Videolar
 settings-apps-photos = Fotoğraflar
 settings-apps-text-editor = Metin düzenleyici
 settings-apps-files = Dosyalar
+settings-apps-archives = Arşivler
 settings-apps-choose = Seçin
 settings-apps-startup = Başlangıç
 settings-apps-startup-description = Bu uygulamalar oturum açtığınızda açılır

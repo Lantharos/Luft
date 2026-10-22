@@ -1,8 +1,8 @@
 import type { FileEntry } from '#lib/types/index.js';
 
 const SUFFIXES = [
-	'.zip', '.jar', '.cbz', '.epub', '.apk', '.7z',
-	'.tar', '.tar.gz', '.tgz', '.tar.bz2', '.tbz2', '.tar.xz', '.txz', '.tar.zst', '.tzst',
+	'.zip', '.zipx', '.jar', '.cbz', '.epub', '.apk', '.7z',
+	'.tar', '.gtar', '.tar.gz', '.tgz', '.tar.bz2', '.tbz2', '.tb2', '.tar.xz', '.txz', '.tar.zst', '.tzst',
 	'.gz', '.bz2', '.xz', '.zst'
 ];
 

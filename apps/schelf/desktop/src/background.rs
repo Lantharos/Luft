@@ -2,19 +2,12 @@ use std::collections::BTreeSet;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use gio::prelude::*;
-use luft_software::apps::appimage::{self, AppImage, Placement};
+use luft_software::apps::appimage::{self, Placement};
 use luft_software::apps::{flatpak, toolbox};
 use luft_software::system::updates;
 use luft_software::task::{Cancel, Task};
 
 const SEEDS: &str = "/usr/share/luft/preinstall";
-const BROWSER_TYPES: [&str; 4] = [
-    "x-scheme-handler/https",
-    "x-scheme-handler/http",
-    "text/html",
-    "application/xhtml+xml",
-];
 
 pub fn run(command: &str) -> Option<i32> {
     let result = match command {
@@ -81,9 +74,7 @@ fn preinstall() -> Result<(), String> {
         if done.contains(&name) {
             continue;
         }
-        if let Some(app) = install_seed(&seed)? {
-            prefer_as_browser(&app);
-        }
+        install_seed(&seed)?;
         done.insert(name);
         fs::create_dir_all(record.parent().unwrap_or(Path::new("/")))
             .map_err(|error| error.to_string())?;
@@ -93,36 +84,16 @@ fn preinstall() -> Result<(), String> {
     Ok(())
 }
 
-fn install_seed(seed: &Path) -> Result<Option<AppImage>, String> {
+fn install_seed(seed: &Path) -> Result<(), String> {
     let bundle = appimage::inspect(seed)?;
     let Placement { id, path } = appimage::placement(seed, &bundle);
     if appimage::list()
         .iter()
         .any(|app| app.id == id || app.path == path)
     {
-        return Ok(None);
+        return Ok(());
     }
-    quietly(|task| appimage::install_link(seed, task)).map(Some)
-}
-
-fn prefer_as_browser(app: &AppImage) {
-    let Some(info) = gio_unix::DesktopAppInfo::new(&format!("{}.desktop", app.id)) else {
-        return;
-    };
-    let supported = info.supported_types();
-    let chosen = gio::AppInfo::default_for_type(BROWSER_TYPES[0], false)
-        .and_then(|default| default.id())
-        .filter(|default| *default != info.id().unwrap_or_default());
-    if chosen.is_some() || !supported.iter().any(|kind| kind == BROWSER_TYPES[0]) {
-        return;
-    }
-    for kind in BROWSER_TYPES {
-        if supported.iter().any(|supported| supported == kind)
-            && let Err(error) = info.set_as_default_for_type(kind)
-        {
-            eprintln!("{} can't open {kind}: {error}", app.name);
-        }
-    }
+    quietly(|task| appimage::install_link(seed, task)).map(drop)
 }
 
 fn update_apps() -> Result<(), String> {

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import type { Component } from 'svelte';
+	import Archive from '@lucide/svelte/icons/archive';
 	import Calendar from '@lucide/svelte/icons/calendar';
 	import FileText from '@lucide/svelte/icons/file-text';
 	import Film from '@lucide/svelte/icons/film';
@@ -20,7 +21,8 @@
 		video: { title: 'settings-apps-videos', icon: Film },
 		photos: { title: 'settings-apps-photos', icon: Image },
 		text: { title: 'settings-apps-text-editor', icon: FileText },
-		files: { title: 'settings-apps-files', icon: Folder }
+		files: { title: 'settings-apps-files', icon: Folder },
+		archives: { title: 'settings-apps-archives', icon: Archive }
 	};
 
 	let handlers = $state<Handler[]>([]);

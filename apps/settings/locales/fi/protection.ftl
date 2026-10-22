@@ -441,6 +441,7 @@ settings-apps-videos = Videot
 settings-apps-photos = Valokuvat
 settings-apps-text-editor = Tekstieditori
 settings-apps-files = Tiedostot
+settings-apps-archives = Pakatut tiedostot
 settings-apps-choose = Valitse
 settings-apps-startup = Käynnistys
 settings-apps-startup-description = Nämä sovellukset avautuvat, kun kirjaudut sisään

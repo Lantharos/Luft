@@ -112,6 +112,7 @@ export class FileManager {
 	#lastNavigationButton = { button: 0, at: 0 };
 	#noticeTimer: ReturnType<typeof setTimeout> | undefined;
 	#finishedOperations = new Set<string>();
+	#selectingWhenDone = new Set<string>();
 	#capture: () => ViewMemory | null = () => null;
 	#recalling: ViewMemory | null = null;
 
@@ -128,10 +129,26 @@ export class FileManager {
 	receiveOperations = (operations: Operation[]) => {
 		this.operations = operations;
 		const finished = operations.filter((operation) => operation.completedAt !== null);
-		const settled = finished.some((operation) => !this.#finishedOperations.has(operation.id));
+		const settled = finished.filter((operation) => !this.#finishedOperations.has(operation.id));
 		this.#finishedOperations = new Set(finished.map((operation) => operation.id));
-		if (settled) void this.refreshListing(this.currentPath);
+		if (settled.length > 0) void this.#settle(settled);
 	};
+
+	selectWhenDone = (id: string) => {
+		this.#selectingWhenDone.add(id);
+		const finished = this.operations.find((operation) => operation.id === id && operation.completedAt !== null);
+		if (finished) void this.#settle([finished]);
+	};
+
+	async #settle(settled: Operation[]) {
+		await this.refreshListing(this.currentPath);
+		const present = new Set(this.entries.map((entry) => entry.path));
+		const created = settled
+			.filter((operation) => this.#selectingWhenDone.delete(operation.id))
+			.flatMap((operation) => operation.created)
+			.filter((path) => present.has(path));
+		if (created.length > 0) this.replaceSelection(created);
+	}
 
 	ejectDrive = (drive: DriveInfo) => this.#leavingUnmounted(() => this.drives.eject(drive));
 
@@ -340,7 +357,15 @@ export class FileManager {
 	openEntry = (entry: Pick<FileEntry, 'path' | 'isDir'>) => {
 		if (entry.isDir) void this.navigate(entry.path);
 		else if (this.cloud.unreachable(entry.path)) this.notify('Connect to the internet to open files that aren’t kept on this device');
-		else api.openWithDefault(entry.path).catch(this.notify);
+		else void this.openFile(entry.path);
+	};
+
+	openFile = async (path: string) => {
+		try {
+			if (await api.openWithDefault(path)) await this.actions.extractNextTo(path);
+		} catch (caught) {
+			this.notify(caught);
+		}
 	};
 
 	openContextMenu = (event: MouseEvent, entry?: FileEntry) => {

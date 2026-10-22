@@ -17,8 +17,12 @@
 	let expanded = $state(false);
 	let others = $derived(expanded ? apps.others : apps.others.slice(0, COLLAPSED_COUNT));
 
-	function open(app: AppChoice) {
-		api.openWithApp(path, app.id).catch(manager.notify);
+	async function open(app: AppChoice) {
+		try {
+			if (await api.openWithApp(path, app.id)) await manager.actions.extractNextTo(path);
+		} catch (caught) {
+			manager.notify(caught);
+		}
 	}
 </script>
 

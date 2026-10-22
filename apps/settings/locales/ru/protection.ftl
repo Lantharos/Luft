@@ -469,6 +469,7 @@ settings-apps-videos = Видео
 settings-apps-photos = Фото
 settings-apps-text-editor = Текстовый редактор
 settings-apps-files = Файлы
+settings-apps-archives = Архивы
 settings-apps-choose = Выберите
 settings-apps-startup = Автозапуск
 settings-apps-startup-description = Эти приложения открываются при входе в систему

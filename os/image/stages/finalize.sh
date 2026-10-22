@@ -62,6 +62,10 @@ give_keyring_its_group() {
   chmod 2755 /usr/libexec/luft-keyring
 }
 
+write_default_apps() {
+  "$(dirname "$0")/default-apps.py" "$(dirname "$0")/../apps" /usr/share/applications/kestrel-mimeapps.list
+}
+
 refresh_caches() {
   glib-compile-schemas /usr/share/glib-2.0/schemas
   fc-cache -f
@@ -112,6 +116,7 @@ enable_units
 configure_toolbox
 configure_security
 check_typelibs
+write_default_apps
 refresh_caches
 let_line_out_play_beside_headphones
 make_efi_mountpoint

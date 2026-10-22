@@ -441,6 +441,7 @@ settings-apps-videos = Видеа
 settings-apps-photos = Фотографии
 settings-apps-text-editor = Уредувач на текст
 settings-apps-files = Датотеки
+settings-apps-archives = Архиви
 settings-apps-choose = Изберете
 settings-apps-startup = Стартување
 settings-apps-startup-description = Овие апликации се отвораат кога ќе се најавите

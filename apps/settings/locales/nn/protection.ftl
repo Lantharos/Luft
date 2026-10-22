@@ -441,6 +441,7 @@ settings-apps-videos = Videoar
 settings-apps-photos = Bilete
 settings-apps-text-editor = Tekstredigerar
 settings-apps-files = Filer
+settings-apps-archives = Arkiv
 settings-apps-choose = Vel
 settings-apps-startup = Oppstart
 settings-apps-startup-description = Desse appane blir opna når du loggar inn

@@ -15,7 +15,7 @@ use crate::files::operations::OperationsQueue;
 use crate::files::watch::DirectoryWatcher;
 use crate::history::History;
 use crate::integration::chooser::{ChooserConfig, ChooserSession};
-use crate::integration::launch_args;
+use crate::integration::launch_args::{self, Launch};
 use crate::search::Search;
 
 #[derive(Clone)]
@@ -30,7 +30,7 @@ pub struct RoverState {
     pub measurements: Measurements,
     pub settings: Arc<RwLock<Settings>>,
     pub chooser: Option<Arc<ChooserSession>>,
-    launch_paths: Arc<Vec<String>>,
+    launch: Arc<Launch>,
     user_dirs: Arc<Option<UserDirs>>,
 }
 
@@ -38,7 +38,7 @@ pub struct RoverState {
 #[serde(rename_all = "camelCase")]
 pub struct AppState {
     chooser: Option<ChooserConfig>,
-    launch_paths: Vec<String>,
+    launch: Launch,
     settings: Settings,
     user_dirs: Option<UserDirs>,
     can_manage_drives: bool,
@@ -61,7 +61,7 @@ impl RoverState {
             watcher: DirectoryWatcher::new(events.clone()),
             settings: Arc::new(RwLock::new(Settings::load())),
             chooser: ChooserSession::from_environment().map(Arc::new),
-            launch_paths: Arc::new(launch_args::resolve(&Activation::current_process())),
+            launch: Arc::new(launch_args::resolve(&Activation::current_process())),
             user_dirs: Arc::new(user_dirs),
             events,
         }
@@ -79,7 +79,7 @@ impl RoverState {
         let appearance = Appearance::current().await;
         AppState {
             chooser: self.chooser.as_ref().map(|session| session.config.clone()),
-            launch_paths: self.launch_paths.to_vec(),
+            launch: self.launch.as_ref().clone(),
             settings: self.settings.read().clone(),
             user_dirs: self.user_dirs.as_ref().clone(),
             can_manage_drives: crate::locations::drives::can_manage(),

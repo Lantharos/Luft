@@ -74,6 +74,7 @@ use_fixture_desktop() {
   mkdir -p "$fixture/applications" "$drives/TRAVEL"
   mask_host_apps "$fixture"
   python3 "$tools/session/appEntries.py" "$root" "$fixture"
+  python3 "$root/os/image/stages/default-apps.py" "$root/apps" "$fixture/applications/kestrel-mimeapps.list"
   cp "$tools/fixtures/apps/"*.desktop "$fixture/applications/"
   update-desktop-database "$fixture/applications"
   export XDG_DATA_DIRS="$fixture:$XDG_DATA_DIRS"

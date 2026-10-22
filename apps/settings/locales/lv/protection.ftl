@@ -455,6 +455,7 @@ settings-apps-videos = Video
 settings-apps-photos = Fotoattēli
 settings-apps-text-editor = Teksta redaktors
 settings-apps-files = Faili
+settings-apps-archives = Arhīvi
 settings-apps-choose = Izvēlēties
 settings-apps-startup = Palaišana
 settings-apps-startup-description = Šīs lietotnes tiek atvērtas, kad pierakstāties

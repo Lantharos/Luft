@@ -441,6 +441,7 @@ settings-apps-videos = Videot
 settings-apps-photos = Fotot
 settings-apps-text-editor = Redaktori i tekstit
 settings-apps-files = Skedarët
+settings-apps-archives = Arkiva
 settings-apps-choose = Zgjidh
 settings-apps-startup = Nisja
 settings-apps-startup-description = Këto aplikacione hapen kur hyn

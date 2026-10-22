@@ -441,6 +441,7 @@ settings-apps-videos = Videor
 settings-apps-photos = Foton
 settings-apps-text-editor = Textredigerare
 settings-apps-files = Filer
+settings-apps-archives = Arkiv
 settings-apps-choose = Välj
 settings-apps-startup = Autostart
 settings-apps-startup-description = De här apparna öppnas när du loggar in

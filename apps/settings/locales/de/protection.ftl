@@ -441,6 +441,7 @@ settings-apps-videos = Videos
 settings-apps-photos = Fotos
 settings-apps-text-editor = Texteditor
 settings-apps-files = Dateien
+settings-apps-archives = Archive
 settings-apps-choose = Auswählen
 settings-apps-startup = Autostart
 settings-apps-startup-description = Diese Apps öffnen sich, wenn du dich anmeldest

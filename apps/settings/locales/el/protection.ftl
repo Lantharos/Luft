@@ -441,6 +441,7 @@ settings-apps-videos = Βίντεο
 settings-apps-photos = Φωτογραφίες
 settings-apps-text-editor = Επεξεργαστής κειμένου
 settings-apps-files = Αρχεία
+settings-apps-archives = Συμπιεσμένα αρχεία
 settings-apps-choose = Επιλογή
 settings-apps-startup = Εκκίνηση
 settings-apps-startup-description = Αυτές οι εφαρμογές ανοίγουν όταν συνδέεστε

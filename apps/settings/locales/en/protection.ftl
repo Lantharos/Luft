@@ -505,6 +505,7 @@ settings-apps-videos = Videos
 settings-apps-photos = Photos
 settings-apps-text-editor = Text editor
 settings-apps-files = Files
+settings-apps-archives = Archives
 # Placeholder of the app list when no default app is chosen
 settings-apps-choose = Choose
 settings-apps-startup = Startup

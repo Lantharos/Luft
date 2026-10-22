@@ -85,9 +85,6 @@ fn register_files(window: SabineWindow, state: &RoverState) -> SabineWindow {
                 transfer::move_items(sources, destination, &state.queue, &state.history)
             },
         )
-        .command("open_with_default", |Handoff { path, token }| {
-            entries::open_with_default(&path, token.as_deref())
-        })
         .command("open_link", |Link { uri, token }| {
             luft_app::launch::open_web_link(&uri, token.as_deref())
         })

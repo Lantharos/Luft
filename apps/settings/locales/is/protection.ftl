@@ -441,6 +441,7 @@ settings-apps-videos = Myndskeið
 settings-apps-photos = Ljósmyndir
 settings-apps-text-editor = Textaritill
 settings-apps-files = Skrár
+settings-apps-archives = Þjappaðar skrár
 settings-apps-choose = Veldu
 settings-apps-startup = Ræsing
 settings-apps-startup-description = Þessi forrit opnast þegar þú skráir þig inn

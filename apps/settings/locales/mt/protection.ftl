@@ -483,6 +483,7 @@ settings-apps-videos = Vidjows
 settings-apps-photos = Ritratti
 settings-apps-text-editor = Editur tat-test
 settings-apps-files = Fajls
+settings-apps-archives = Arkivji
 settings-apps-choose = Agħżel
 settings-apps-startup = Startjar
 settings-apps-startup-description = Dawn l-apps jinfetħu meta tidħol

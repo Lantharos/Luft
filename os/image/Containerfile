@@ -22,6 +22,7 @@ ARG FEDORA
 ARG BASE
 ARG VERSION=1.dev
 RUN --mount=type=bind,source=os/image/stages,target=/run/luft/stages \
+    --mount=type=bind,source=apps,target=/run/luft/apps \
     --mount=type=bind,from=parts,source=kestrel/typelibs.txt,target=/run/luft/typelibs.txt \
     /run/luft/stages/finalize.sh luft "${VERSION}" "${BASE}"
 RUN bootc container lint

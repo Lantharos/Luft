@@ -469,6 +469,7 @@ settings-apps-videos = Vaizdo įrašai
 settings-apps-photos = Nuotraukos
 settings-apps-text-editor = Teksto rengyklė
 settings-apps-files = Failai
+settings-apps-archives = Archyvai
 settings-apps-choose = Pasirinkite
 settings-apps-startup = Paleidimas
 settings-apps-startup-description = Šios programos atsidaro jums prisijungus

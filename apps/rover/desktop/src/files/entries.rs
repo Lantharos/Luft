@@ -5,8 +5,6 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::time::SystemTime;
 
-use gio::prelude::*;
-use luft_app::launch;
 use parking_lot::Mutex;
 use rustc_hash::FxHashMap;
 use serde::Serialize;
@@ -179,10 +177,6 @@ pub fn user_dirs() -> Result<UserDirs, String> {
         music: dirs::audio_dir().map(display),
         desktop: dirs::desktop_dir().map(display),
     })
-}
-
-pub fn open_with_default(path: &str, token: Option<&str>) -> Result<(), String> {
-    launch::open(&gio::File::for_path(path).uri(), token).map_err(|error| error.to_string())
 }
 
 pub(crate) fn file_entry(path: &Path) -> std::io::Result<FileEntry> {

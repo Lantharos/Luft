@@ -8,6 +8,8 @@ import { fileIcon } from '../icons.js';
 import type { SearchItem } from '../item.js';
 
 const FOLDER_TYPE = 'inode/directory';
+const FILE_MANAGER = 'org.freedesktop.FileManager1';
+const FILE_MANAGER_PATH = '/org/freedesktop/FileManager1';
 
 export interface FoundFile {
   uri: string;
@@ -50,7 +52,15 @@ export class FileOpener {
 
   private reveal(uri: string): void {
     const manager = Gio.AppInfo.get_default_for_type(FOLDER_TYPE, false);
-    if (manager) this.run(() => manager.launch_uris([uri], launchContext()));
+    const token = launchContext().get_startup_notify_id(manager, [Gio.File.new_for_uri(uri)]) ?? '';
+    this.run(() => Gio.DBus.session.call(FILE_MANAGER, FILE_MANAGER_PATH, FILE_MANAGER, 'ShowItems', new GLib.Variant('(ass)', [[uri], token]),
+      null, Gio.DBusCallFlags.NONE, -1, null, (connection, result) => {
+        try {
+          connection!.call_finish(result);
+        } catch (error) {
+          console.warn(`Could not show ${uri} in its folder: ${error}`);
+        }
+      }));
   }
 
   private open(uri: string): void {

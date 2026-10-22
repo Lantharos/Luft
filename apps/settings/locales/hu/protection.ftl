@@ -441,6 +441,7 @@ settings-apps-videos = Videók
 settings-apps-photos = Fényképek
 settings-apps-text-editor = Szövegszerkesztő
 settings-apps-files = Fájlok
+settings-apps-archives = Tömörített fájlok
 settings-apps-choose = Válasszon
 settings-apps-startup = Indítás
 settings-apps-startup-description = Ezek az alkalmazások bejelentkezéskor megnyílnak

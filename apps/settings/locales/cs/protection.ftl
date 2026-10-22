@@ -469,6 +469,7 @@ settings-apps-videos = Videa
 settings-apps-photos = Fotky
 settings-apps-text-editor = Textový editor
 settings-apps-files = Soubory
+settings-apps-archives = Archivy
 settings-apps-choose = Vyberte
 settings-apps-startup = Po spuštění
 settings-apps-startup-description = Tyto aplikace se otevřou po přihlášení

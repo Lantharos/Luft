@@ -455,6 +455,7 @@ settings-apps-videos = Videoclipuri
 settings-apps-photos = Fotografii
 settings-apps-text-editor = Editor de text
 settings-apps-files = Fișiere
+settings-apps-archives = Arhive
 settings-apps-choose = Alege
 settings-apps-startup = Pornire
 settings-apps-startup-description = Aceste aplicații se deschid când vă conectați

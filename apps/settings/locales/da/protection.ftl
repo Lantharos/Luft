@@ -441,6 +441,7 @@ settings-apps-videos = Videoer
 settings-apps-photos = Fotos
 settings-apps-text-editor = Teksteditor
 settings-apps-files = Filer
+settings-apps-archives = Arkiver
 settings-apps-choose = Vælg
 settings-apps-startup = Opstart
 settings-apps-startup-description = Disse apps åbnes, når du logger ind

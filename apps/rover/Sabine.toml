@@ -7,7 +7,25 @@ keywords = ["files", "file manager", "file explorer", "explorer", "finder", "fol
 version = "0.1.0"
 icon = "public/favicon.svg"
 cargo_manifest = "desktop/Cargo.toml"
-mime_types = ["inode/directory", "x-scheme-handler/sftp", "x-scheme-handler/smb", "x-scheme-handler/dav", "x-scheme-handler/davs", "x-scheme-handler/nfs"]
+mime_types = [
+	"inode/directory",
+	"x-scheme-handler/sftp",
+	"x-scheme-handler/smb",
+	"x-scheme-handler/dav",
+	"x-scheme-handler/davs",
+	"x-scheme-handler/nfs",
+	"application/zip",
+	"application/x-7z-compressed",
+	"application/x-tar",
+	"application/x-compressed-tar",
+	"application/x-bzip2-compressed-tar",
+	"application/x-xz-compressed-tar",
+	"application/x-zstd-compressed-tar",
+	"application/gzip",
+	"application/x-bzip2",
+	"application/x-xz",
+	"application/zstd"
+]
 
 [install]
 command = "cargo run --manifest-path desktop/Cargo.toml --"

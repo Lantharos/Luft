@@ -216,7 +216,8 @@ impl Profile<'_> {
             .set("APPDIR", INSIDE_APP)
             .set("APPIMAGE", &self.app.image)
             .set("OWD", home)
-            .set("DESKTOPINTEGRATION", "1");
+            .set("DESKTOPINTEGRATION", "1")
+            .set("SECRET_BACKEND", "service");
         if self.wayland.is_some() {
             arguments.set("WAYLAND_DISPLAY", "wayland-0");
         }

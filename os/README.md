@@ -22,7 +22,7 @@ Builds sign SushiBoot, the startup image and NVIDIA's driver with the keys in `L
 | `image/parts` | Building the parts |
 | `image/stages` | The scripts that put the image together |
 | `image/packages` | Fedora packages for building, those added to the image, and the ones left out |
-| `image/patches` | Changes to Fedora packages the image rebuilds, such as [bootc](image/patches/bootc/README.md) |
+| `image/patches` | Changes to Fedora packages the image rebuilds, such as [bootc](image/patches/bootc/README.md) and [libsecret](image/patches/libsecret/README.md) |
 | `image/files` | Files copied into the image as they are |
 | `image/startup` | Building and signing the startup image |
 | `image/keys` | Luft's public Secure Boot certificate and TPM policy key |

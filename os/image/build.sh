@@ -32,8 +32,8 @@ only changes when what's in it does, and the NVIDIA system is that system plus
 the driver, so the two images share every layer below it.
 
 The image is put together from parts: Kestrel, the boot services, the patched
-bootc, the web runtime, Helium, the system services, each app and NVIDIA's
-driver. Each part is an image named after a hash of everything it's built from,
+bootc and libsecret, the web runtime, Helium, the system services, each app and
+NVIDIA's driver. Each part is an image named after a hash of everything it's built from,
 the Fedora image's digest included, in LUFT_PARTS (default localhost/luft-parts),
 so a build only makes the parts that changed. LUFT_REBUILD=1 makes every part again. Compilers keep their caches in
 LUFT_IMAGE_CACHE (default ~/.cache/luft-image), shared by every checkout.
@@ -92,7 +92,7 @@ is_signed() {
 
 part_names() {
   local app
-  printf '%s\n' kestrel boot bootc
+  printf '%s\n' kestrel boot bootc libsecret
   [[ "$1" != luft-nvidia ]] || echo nvidia
   printf '%s\n' runtime helium services
   for app in "$luft"/apps/*/; do
@@ -105,16 +105,17 @@ pull_base() {
   podman image exists "$base" || podman pull "${retries[@]}" --quiet "$base" >/dev/null
 }
 
-base_bootc() {
+base_version() {
   pull_base
-  podman run --rm --network none "$base" rpm -q --qf '%{VERSION}-%{RELEASE}' bootc
+  podman run --rm --network none "$base" rpm -q --qf '%{VERSION}-%{RELEASE}' "$1"
 }
 
 part_target() {
   case "$1" in
     app-keys) echo "app APP=keys APP_SOURCES=keys-sources" ;;
     app-*) echo "app APP=${1#app-}" ;;
-    bootc) echo "bootc BOOTC=$(base_bootc)" ;;
+    bootc) echo "bootc BOOTC=$(base_version bootc)" ;;
+    libsecret) echo "libsecret LIBSECRET=$(base_version libsecret)" ;;
     boot | nvidia) echo "$1 SIGNED_BY=$(signed_by)" ;;
     *) echo "$1" ;;
   esac

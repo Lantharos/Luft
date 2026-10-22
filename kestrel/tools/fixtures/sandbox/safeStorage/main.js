@@ -2,27 +2,27 @@ const { app, safeStorage } = require('electron');
 const fs = require('node:fs');
 const path = require('node:path');
 
-async function previous(file) {
+function previous(file) {
   if (!fs.existsSync(file)) return 'none';
   try {
-    return (await safeStorage.decryptStringAsync(fs.readFileSync(file))).result;
+    return safeStorage.decryptString(fs.readFileSync(file));
   } catch {
     return 'unreadable';
   }
 }
 
-async function report() {
+function report() {
   const file = path.join(app.getPath('userData'), 'secret');
-  const available = await safeStorage.isAsyncEncryptionAvailable();
-  const found = { available, previous: await previous(file) };
-  if (available) fs.writeFileSync(file, await safeStorage.encryptStringAsync('lighthouse keeper'));
+  const available = safeStorage.isEncryptionAvailable();
+  const found = { backend: safeStorage.getSelectedStorageBackend(), available, previous: previous(file) };
+  if (available) fs.writeFileSync(file, safeStorage.encryptString('lighthouse keeper'));
   return found;
 }
 
-app.whenReady().then(async () => {
+app.whenReady().then(() => {
   let found;
   try {
-    found = await report();
+    found = report();
   } catch (error) {
     found = { error: String(error) };
   }

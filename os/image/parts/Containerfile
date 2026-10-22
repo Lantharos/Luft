@@ -73,13 +73,23 @@ COPY --from=boot-build /out/ /
 FROM builder AS bootc-build
 ARG BOOTC
 COPY os/image/patches/bootc /src/os/image/patches/bootc
-COPY os/image/parts/stages/bootc.sh /src/os/image/parts/stages/bootc.sh
+COPY os/image/parts/stages/rebuild.sh /src/os/image/parts/stages/rebuild.sh
 RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
     --mount=type=cache,from=cache,source=sccache,target=/var/cache/sccache \
-    /src/os/image/parts/stages/bootc.sh "${BOOTC}" /out/rpms
+    /src/os/image/parts/stages/rebuild.sh bootc "${BOOTC}" /out/rpms
 
 FROM scratch AS bootc
 COPY --from=bootc-build /out/ /
+
+FROM builder AS libsecret-build
+ARG LIBSECRET
+COPY os/image/patches/libsecret /src/os/image/patches/libsecret
+COPY os/image/parts/stages/rebuild.sh /src/os/image/parts/stages/rebuild.sh
+RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
+    /src/os/image/parts/stages/rebuild.sh libsecret "${LIBSECRET}" /out/rpms
+
+FROM scratch AS libsecret
+COPY --from=libsecret-build /out/ /
 
 FROM builder AS sabine
 ARG SABINE

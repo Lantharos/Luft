@@ -8,7 +8,8 @@ RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
     --mount=type=bind,source=os/image/stages,target=/run/luft/stages \
     --mount=type=bind,from=parts,source=needed.txt,target=/run/luft/needed.txt \
     --mount=type=bind,from=parts,source=bootc/rpms,target=/run/luft/bootc \
-    dnf install -y /run/luft/bootc/*.rpm && \
+    --mount=type=bind,from=parts,source=libsecret/rpms,target=/run/luft/libsecret \
+    dnf install -y /run/luft/bootc/*.rpm /run/luft/libsecret/*.rpm && \
     /run/luft/stages/packages.sh /run/luft/needed.txt
 COPY --from=parts kestrel/stage/ /
 COPY --from=parts boot/stage/ /

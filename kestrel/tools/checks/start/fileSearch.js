@@ -4,10 +4,11 @@ import GLib from 'gi://GLib';
 
 import {labelled, named} from '../lib/actors.js';
 import {resetBattery, setBattery} from '../lib/battery.js';
+import {sabineService} from '../lib/apps/luftApp.js';
 import {checks} from '../lib/check.js';
 import {call} from '../lib/dbus.js';
 import {press, rightClick} from '../lib/input/input.js';
-import {scratch} from '../lib/processes.js';
+import {findWindow, scratch, waitForWindow} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {settled, waitUntil} from '../lib/wait.js';
 import {bestTitle, closeStart, descriptionOf, groupTitles, openStart, row, search, withHandler} from './search/results.js';
@@ -23,6 +24,7 @@ const RECENT = scratch('kestrel-quarterly-report.txt');
 const HISTORY = GLib.build_filenamev([GLib.get_user_data_dir(), 'recently-used.xbel']);
 const SECOND_APP = GLib.build_filenamev([GLib.get_user_data_dir(), 'applications', 'com.lantharos.SearchCheckPrinters.desktop']);
 const INDEX_TIMEOUT = 20000;
+const REVEAL_TIMEOUT = 30000;
 
 const uri = path => GLib.filename_to_uri(path, null);
 const indexer = (method, parameters, reply) => call('com.lantharos.Search', '/com/lantharos/Search', 'com.lantharos.Search', method, parameters, reply);
@@ -111,20 +113,20 @@ async function checkNames() {
     press(Clutter.KEY_Return);
     await eventually(() => opened().includes(PLANS), 'Enter opens the file');
   });
-  await withHandler('inode/directory', 'Folder Check', async opened => {
-    await openStart();
-    search('harbor plans');
-    await eventually(() => bestTitle() === 'Harbor plans.txt', 'the file is found again');
-    await settled();
-    rightClick(row(`file:${uri(PLANS)}`));
-    const menu = named('kestrel-context-menu');
-    await eventually(() => menu.visible && labelled('Show in Folder Check', menu)?.mapped,
-      'a file result offers to show it in the file manager');
-    press(Clutter.KEY_Escape);
-    await eventually(() => !menu.visible, 'Escape closes the file menu');
-    press(Clutter.KEY_Control_L, Clutter.KEY_Return);
-    await eventually(() => opened().includes(PLANS), 'Ctrl+Enter shows the file in the file manager');
-  });
+  await openStart();
+  search('harbor plans');
+  await eventually(() => bestTitle() === 'Harbor plans.txt', 'the file is found again');
+  await settled();
+  rightClick(row(`file:${uri(PLANS)}`));
+  const menu = named('kestrel-context-menu');
+  await eventually(() => menu.visible && labelled('Show in Rover', menu)?.mapped, 'a file result offers to show it in Rover');
+  press(Clutter.KEY_Escape);
+  await eventually(() => !menu.visible, 'Escape closes the file menu');
+  await sabineService();
+  press(Clutter.KEY_Control_L, Clutter.KEY_Return);
+  const rover = await waitForWindow(window => window.get_wm_class() === 'com.lantharos.rover', 'Ctrl+Enter shows the file in Rover', REVEAL_TIMEOUT);
+  rover.delete(global.get_current_time());
+  await eventually(() => !findWindow(window => window === rover), 'Rover closes');
 }
 
 async function checkContents() {

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Write launchers, desktop entries and icons that start the Luft apps built in this tree."""
+"""Write launchers, desktop entries, D-Bus services and icons that start the Luft apps built in this tree."""
 
 import shutil
 import sys
@@ -36,12 +36,19 @@ def entry(app: dict, start: Path) -> str:
     return '\n'.join(lines) + '\n'
 
 
+def bus_services(folder: Path, start: Path, services: Path) -> None:
+    for service in sorted(folder.glob('data/dbus/*.service')):
+        (services / service.name).write_text(service.read_text().replace(f'/usr/bin/{folder.name}', f'"{start}"'))
+
+
 def main(root: Path, data: Path) -> None:
     applications = data / 'applications'
     icons = data / 'icons/hicolor/scalable/apps'
     launchers = data / 'bin'
+    services = data / 'dbus-1/services'
     icons.mkdir(parents=True, exist_ok=True)
     launchers.mkdir(exist_ok=True)
+    services.mkdir(parents=True, exist_ok=True)
     for manifest in sorted(root.glob('apps/*/Sabine.toml')):
         folder = manifest.parent
         binary = root / 'target/release' / folder.name
@@ -50,6 +57,7 @@ def main(root: Path, data: Path) -> None:
         app = tomllib.loads(manifest.read_text())['app']
         start = launcher(launchers / folder.name, manifest, binary)
         (applications / f"{app['id']}.desktop").write_text(entry(app, start))
+        bus_services(folder, start, services)
         shutil.copyfile(folder / app['icon'], icons / f"{app['id']}.svg")
 
 

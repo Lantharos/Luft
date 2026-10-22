@@ -22,7 +22,7 @@ The desktop entry opens folders, archives, which it extracts next to themselves,
 
 ## File dialogs and "Show in folder"
 
-Kestrel already prefers Rover for file dialogs. Elsewhere, register it for your account:
+On Luft, Rover provides file dialogs and Show in folder for every app. Elsewhere, register it for your account:
 
 ```sh
 ../../target/debug/rover --install-file-chooser-portal   # the xdg-desktop-portal FileChooser backend

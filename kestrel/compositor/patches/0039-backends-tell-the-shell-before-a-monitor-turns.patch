@@ -12,7 +12,7 @@ it and turn it into the new one instead of the picture jumping.
  1 file changed, 65 insertions(+)
 
 diff --git a/src/backends/meta-monitor-manager.c b/src/backends/meta-monitor-manager.c
-index f81dcc6dc61788df70bb94adf4e876967f973e4b..6aa88fc65cb5747350d1b22b4e31546e3518bcfe 100644
+index f81dcc6dc61788df70bb94adf4e876967f973e4b..6bc7b4f321dd7a18ac191e760ce2c842f7f73c3f 100644
 --- a/src/backends/meta-monitor-manager.c
 +++ b/src/backends/meta-monitor-manager.c
 @@ -89,6 +89,7 @@ enum
@@ -77,7 +77,7 @@ index f81dcc6dc61788df70bb94adf4e876967f973e4b..6aa88fc65cb5747350d1b22b4e31546e
    MetaMonitorManagerClass *manager_class =
      META_MONITOR_MANAGER_GET_CLASS (manager);
  
-+  if (method != META_MONITORS_CONFIG_METHOD_VERIFY && !manager->in_init)
++  if (config && method != META_MONITORS_CONFIG_METHOD_VERIFY && !manager->in_init)
 +    announce_rotations (manager, config);
 +
    if (!manager_class->apply_monitors_config (manager, config, method, error))

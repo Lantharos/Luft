@@ -261,7 +261,7 @@ index 0000000000000000000000000000000000000000..29c903528d51f5dd4855ae396c4933c1
 +
 +MetaDBusDisplayConfig * meta_display_config_skeleton_new (MetaContext *context);
 diff --git a/src/backends/meta-monitor-manager.c b/src/backends/meta-monitor-manager.c
-index 6aa88fc65cb5747350d1b22b4e31546e3518bcfe..4945ed209e94a934e0f846678246e4ec3220c48a 100644
+index 6bc7b4f321dd7a18ac191e760ce2c842f7f73c3f..4fd0f8937c506e69422544f8e2df6d122260d2d3 100644
 --- a/src/backends/meta-monitor-manager.c
 +++ b/src/backends/meta-monitor-manager.c
 @@ -49,6 +49,7 @@

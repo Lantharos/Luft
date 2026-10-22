@@ -9,3 +9,4 @@ apps/meet/desktop/src/windows/helper/system/protected.rs	Meet Luft
 apps/meet/desktop/src/linux/app.rs	Luft keeps your files in place on Linux, so there's nothing to pack.
 apps/meet/desktop/src/linux/helper/mod.rs	Meet Luft doesn't do that on Linux.
 apps/meet/desktop/src/linux/logs.rs	Luft logs
+apps/meet/desktop/src/windows/helper/drive/storage.rs	Windows storage error {code}

@@ -69,7 +69,7 @@ impl Deployment {
 
     fn set_contexts(&self, flags: &[&str], paths: &[PathBuf]) -> Result<()> {
         let contexts = self.root.join(CONTEXTS);
-        if !contexts.exists() {
+        if paths.is_empty() || !contexts.exists() {
             return Ok(());
         }
         Tool::new("setfiles")

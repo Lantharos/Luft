@@ -31,7 +31,6 @@ env:
   FEDORA: "45"
   MAJOR: "1"
   DOWNLOADS: https://get.luft.computer
-  RETIRED_NIGHTLY: 45-nightly
 
 jobs:
   promote:
@@ -204,7 +203,7 @@ jobs:
             exit 0
           fi
           version="$MAJOR.$(date -u +%Y%m%d).${{ github.run_number }}"
-          tags=("$MAJOR-nightly" "$version" "$RETIRED_NIGHTLY")
+          tags=("$MAJOR-nightly" "$version")
           {
             echo "version=$version"
             echo "tags=${tags[*]}"

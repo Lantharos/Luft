@@ -106,7 +106,6 @@ fn followed() -> Result<Reference> {
 
 pub fn switch_target(variant: Variant) -> Result<Reference> {
     let Reference { image, transport } = followed()?;
-    let image = luft_variant::renamed(&image).unwrap_or(image);
     if Variant::of(&image) == variant {
         bail!("This system already uses that image.");
     }
@@ -123,11 +122,7 @@ pub struct Fetch {
 
 impl Fetch {
     pub fn upgrade() -> Result<Self> {
-        let renamed = luft_variant::renamed(&followed()?.image);
-        match renamed.as_deref().and_then(|image| image.rsplit_once(':')) {
-            Some((_, tag)) => Self::start(&["upgrade", "--download-only", "--tag", tag]),
-            None => Self::start(&["upgrade", "--download-only"]),
-        }
+        Self::start(&["upgrade", "--download-only"])
     }
 
     pub fn switch(target: &Reference) -> Result<Self> {

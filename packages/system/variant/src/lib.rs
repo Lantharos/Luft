@@ -1,9 +1,7 @@
-mod channel;
 mod graphics;
 
 use serde::{Deserialize, Serialize};
 
-pub use channel::renamed;
 pub use graphics::nvidia_cards;
 
 const NVIDIA_TAG: &str = "-nvidia";

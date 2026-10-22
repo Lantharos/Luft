@@ -55,12 +55,8 @@ pub struct Reference {
 }
 
 impl Reference {
-    fn current(&self) -> String {
-        luft_variant::renamed(&self.image).unwrap_or_else(|| self.image.clone())
-    }
-
     pub fn location(&self) -> Option<String> {
-        registry::location(&self.transport, &self.current())
+        registry::location(&self.transport, &self.image)
     }
 
     pub fn variant(&self) -> Variant {
@@ -68,7 +64,7 @@ impl Reference {
     }
 
     pub fn channel(&self) -> Option<&'static str> {
-        let standard = Variant::Standard.reference(&self.current())?;
+        let standard = Variant::Standard.reference(&self.image)?;
         match standard.rsplit_once(':')?.1 {
             "1-nightly" => Some("nightly"),
             "1" => Some("1"),
@@ -78,7 +74,7 @@ impl Reference {
 
     pub fn as_variant(&self, variant: Variant) -> Option<Self> {
         Some(Self {
-            image: variant.reference(&self.current())?,
+            image: variant.reference(&self.image)?,
             transport: self.transport.clone(),
         })
     }

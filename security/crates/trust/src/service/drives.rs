@@ -13,7 +13,7 @@ use zbus::{OwnedVariant, Variant};
 use super::PATH;
 use super::error::Error;
 use super::shown::Shown;
-use crate::disk::encryption::reencrypt::Progress;
+use crate::drives::reencrypt::Progress;
 use crate::drives::{self, Change, DriveStatus, Record};
 use crate::system::host::{power, uuid};
 use crate::system::secrets::secret::Secret;

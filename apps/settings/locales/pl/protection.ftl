@@ -52,18 +52,7 @@ settings-privacy-delete-after-hint = Jak długo pliki pozostają przed usunięci
 ## Security: summary at the top of the page
 
 settings-security-protected = Urządzenie jest chronione
-settings-security-encrypting = Szyfrowanie urządzenia
-settings-security-encrypting-progress = { $progress }. W tym czasie możesz normalnie pracować.
-settings-security-decrypting = Wyłączanie szyfrowania urządzenia
-settings-security-restart-to-encrypt = Uruchom ponownie, aby rozpocząć szyfrowanie
-settings-security-restart-to-encrypt-description = Szyfrowanie rozpocznie się przy następnym ponownym uruchomieniu komputera.
-settings-security-encryption-failed = Szyfrowanie się nie rozpoczęło
-settings-security-encryption-failed-description = System Luft uruchomił się bez szyfrowania, a twoje pliki nie zostały zmienione. Włącz je ponownie, aby spróbować jeszcze raz.
-settings-security-encryption-refused-description = System Luft zakończył zmianę rozmiaru, ale szyfrowanie nie mogło się potem rozpocząć. Twoje pliki nie zostały zmienione. Włącz je ponownie, aby spróbować jeszcze raz.
-settings-security-waiting-to-encrypt = Szyfrowanie czeka
-settings-security-waiting-to-encrypt-description = System Luft wciąż zmienia swój rozmiar. Gdy skończy, szyfrowanie rozpocznie się przy następnym uruchomieniu.
 settings-security-could-be-safer = Urządzenie mogłoby być lepiej chronione
-settings-security-could-be-safer-description = Włącz szyfrowanie urządzenia, aby twoje pliki pozostały prywatne.
 settings-security-starts-differently-description = Jeśli zmieniono ustawienia Secure Boot, potwierdź to, aby dysk znów odblokowywał się samodzielnie.
 settings-security-needed-recovery-key = Dysk wymagał klucza odzyskiwania
 settings-security-needed-recovery-key-description = Połącz ponownie procesor zabezpieczeń, aby dysk odblokowywał się samodzielnie.
@@ -168,27 +157,6 @@ settings-usb-hold-back-description = Urządzenia podłączone przy zablokowanym 
 ## Device encryption
 
 settings-encryption = Szyfrowanie urządzenia
-settings-encryption-encrypting = Szyfrowanie tego urządzenia
-settings-encryption-decrypting = Wyłączanie szyfrowania urządzenia
-settings-encryption-starting = Rozpocznie się przy następnym ponownym uruchomieniu
-settings-encryption-failed = Nie rozpoczęło się przy ostatnim uruchomieniu, pliki nie zostały zmienione
-settings-encryption-waiting = Czeka, aż Luft skończy zmieniać rozmiar, a potem rozpocznie się przy następnym uruchomieniu
-settings-encryption-refused = Nie mogło się rozpocząć po zmianie rozmiaru systemu Luft, pliki nie zostały zmienione
-settings-encryption-off = Chroni prywatność plików, jeśli zgubisz komputer
-settings-encryption-progress = Ukończono { $percent }
-settings-encryption-progress-seconds = Ukończono { $percent }, pozostało mniej niż minuta
-settings-encryption-progress-minutes = { $minutes ->
-    [one] Ukończono { $percent }, pozostało około { $minutes } minuty
-    [few] Ukończono { $percent }, pozostało około { $minutes } minut
-    [many] Ukończono { $percent }, pozostało około { $minutes } minut
-   *[other] Ukończono { $percent }, pozostało około { $minutes } minuty
-}
-settings-encryption-progress-hours = { $hours ->
-    [one] Ukończono { $percent }, pozostało około { $hours } godziny
-    [few] Ukończono { $percent }, pozostało około { $hours } godzin
-    [many] Ukończono { $percent }, pozostało około { $hours } godzin
-   *[other] Ukończono { $percent }, pozostało około { $hours } godziny
-}
 settings-encryption-unlocks-chip-pin = Odblokowywany procesorem zabezpieczeń i kodem PIN
 settings-encryption-unlocks-chip = Odblokowywany samodzielnie przez procesor zabezpieczeń
 settings-encryption-unlocks-passphrase = Prosi o frazę hasła przy uruchamianiu
@@ -210,38 +178,6 @@ settings-encryption-drives-auto-unlock = { $count ->
     [many] { $count } zaszyfrowanych dysków odblokowuje się razem z tym komputerem
    *[other] { $count } zaszyfrowanego dysku odblokowuje się razem z tym komputerem
 }
-
-## Device encryption: turning it on
-
-settings-encryption-turn-on-title = Włącz szyfrowanie urządzenia
-settings-encryption-turn-on-description = Twoje pliki pozostaną prywatne, jeśli komputer zostanie zgubiony lub skradziony. Bez właściwego klucza nikt nie odczyta dysku.
-settings-encryption-blocked-title = Nie można jeszcze włączyć szyfrowania urządzenia
-settings-encryption-blocked-description = Zajmij się tym, co zaznaczono poniżej, i spróbuj ponownie.
-settings-encryption-backup = Zanim zaczniesz, upewnij się, że masz kopię zapasową ważnych plików.
-settings-encryption-key-title = Zapisz klucz odzyskiwania
-settings-encryption-key-description = Jeśli dysk kiedyś nie odblokuje się samodzielnie, na przykład po naprawie, ten klucz pozwoli ci się do niego dostać. Przechowuj go w innym miejscu niż ten komputer.
-settings-encryption-unlock-title = Odblokowywanie przy uruchamianiu
-settings-encryption-unlock-description = Procesor zabezpieczeń sam odblokowuje dysk przy uruchamianiu, więc logowanie się nie zmienia.
-settings-encryption-passphrase-title = Wybierz frazę hasła
-settings-encryption-passphrase-description = Ten komputer nie może sam odblokować dysku, więc przy każdym uruchomieniu poprosi o tę frazę hasła.
-settings-encryption-summary-title = Wszystko gotowe do szyfrowania
-settings-encryption-summary-description = Oto, co stanie się dalej.
-settings-encryption-step-restart = Komputer uruchomi się ponownie jeden raz.
-settings-encryption-step-screen = Podczas uruchamiania na chwilę pojawi się ekran „Encrypting your device”.
-settings-encryption-step-background = Reszta odbywa się w tle, a ty możesz dalej pracować.
-settings-encryption-step-plugged-in = Nie odłączaj komputera od zasilania, dopóki szyfrowanie się nie zakończy.
-settings-encryption-ask-pin = Pytaj też o kod PIN
-settings-encryption-ask-pin-description = Dysk pozostaje zablokowany, nawet jeśli ktoś zabierze komputer. Kod PIN zostanie ustawiony po zakończeniu szyfrowania.
-settings-encryption-starting-button = Rozpoczynanie…
-settings-encryption-restart-and-encrypt = Uruchom ponownie i szyfruj
-
-## Device encryption: turning it off
-
-settings-encryption-turn-off-title = Wyłączyć szyfrowanie urządzenia?
-settings-encryption-turn-off-description = Pliki zostaną odszyfrowane w tle, podczas gdy pracujesz. Później każdy, kto wyjmie dysk, będzie mógł go odczytać.
-settings-encryption-keep = Zachowaj szyfrowanie
-settings-encryption-turning-off = Wyłączanie…
-settings-encryption-turn-off = Wyłącz
 
 ## Device encryption: unlocking the disk
 
@@ -275,6 +211,7 @@ settings-encryption-unlock-disk-field = Klucz odzyskiwania lub fraza hasła
 
 ## Device encryption: security chip and PIN
 
+settings-encryption-ask-pin = Pytaj też o kod PIN
 settings-encryption-chip-setup-description = Procesor zabezpieczeń w komputerze sam odblokowuje dysk przy uruchamianiu, więc nie musisz już najpierw wpisywać frazy hasła.
 settings-encryption-add-pin-title = Dodaj kod PIN
 settings-encryption-add-pin-description = Będziesz go wpisywać przy każdym uruchomieniu komputera. Bez niego dysk pozostaje zablokowany, nawet jeśli ktoś zabierze cały komputer.

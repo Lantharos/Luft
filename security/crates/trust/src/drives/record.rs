@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 use anyhow::{Result, ensure};
 use serde::{Deserialize, Serialize};
 
-use crate::disk::encryption::mask;
+use super::mask;
 use crate::errors::Unsupported;
 use crate::paths;
 use crate::system::host::uuid;

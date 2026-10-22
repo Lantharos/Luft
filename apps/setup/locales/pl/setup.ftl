@@ -255,18 +255,12 @@ setup-secure-boot-new-code = Pobierz nowy kod
 setup-protect-title = Chroń swoje pliki
 setup-protect-tpm = Zaszyfruj ten komputer, aby nikt nie mógł odczytać twoich plików bez zalogowania się, nawet jeśli komputer zginie. Przy uruchamianiu odblokuje się sam.
 setup-protect-passphrase = Zaszyfruj ten komputer, aby nikt nie mógł odczytać twoich plików bez twojej frazy hasła, nawet jeśli komputer zginie.
-setup-protect-staged-title = Twoje pliki zostaną zaszyfrowane
-setup-protect-staged-description = Szyfrowanie rozpocznie się samo po ponownym uruchomieniu na końcu konfiguracji. W tym czasie możesz normalnie korzystać z komputera.
-setup-protect-waiting-description = System Luft wciąż zmienia swój rozmiar. Gdy skończy, szyfrowanie rozpocznie się przy następnym uruchomieniu, a w tym czasie możesz dalej korzystać z komputera.
 setup-protect-keep-safe = Przechowuj ten klucz odzyskiwania w bezpiecznym miejscu, z dala od tego komputera. Będzie potrzebny, jeśli komputer kiedyś nie odblokuje się sam.
 setup-protect-passphrase-label = Fraza hasła
 setup-protect-repeat = Wpisz ponownie
 setup-protect-mismatch = Wpisy nie są zgodne
 setup-protect-kept = Klucz odzyskiwania jest bezpiecznie zapisany
-setup-protect-background = Szyfrowanie odbywa się w tle po następnym ponownym uruchomieniu. W tym czasie możesz normalnie korzystać z komputera.
 setup-protect-encrypt = Zaszyfruj
-setup-protect-checking = Sprawdzanie…
-setup-protect-start = Zaszyfruj moje pliki
 
 ## Fingerprint
 
@@ -283,6 +277,5 @@ setup-fingerprint-choose-another = Wybierz inny palec
 
 setup-ready-title = Wszystko gotowe
 setup-ready-trust = Uruchom komputer ponownie jeszcze raz, aby zakończyć. Zaraz po ponownym uruchomieniu niebieski ekran zapyta, czy ufać systemowi Luft. Obsłuż go za pomocą klawiatury i wpisz ten kod.
-setup-ready-restart = Uruchom komputer ponownie jeszcze raz, aby zakończyć, a następnie zaloguj się hasłem.
 setup-ready-done = Pulpit jest gotowy. Miłej pracy z systemem Luft.
 setup-ready-start = Zacznij korzystać z systemu Luft

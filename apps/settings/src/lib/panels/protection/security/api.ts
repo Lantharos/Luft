@@ -1,10 +1,8 @@
-import type { EncryptionCheck } from '@luft/ui';
 import { invoke, listen } from '#lib/bridge/index.js';
 
 const WAIT_FOR_PERMISSION = { timeoutMs: 300_000 };
 
 export type SecureBoot = 'on' | 'off' | 'setup' | 'unsupported';
-export type DiskState = 'off' | 'waiting' | 'starting' | 'failed' | 'refused' | 'encrypting' | 'decrypting' | 'on';
 export type UnlockMethod = 'tpm' | 'pin' | 'passphrase' | 'recovery-key' | 'security-key';
 
 export interface Tpm {
@@ -39,9 +37,6 @@ export interface Startup {
 export interface Disk {
 	device: string;
 	encrypted: boolean;
-	state: DiskState;
-	progress: number;
-	remaining: number;
 	unlock: UnlockMethod[];
 	recoveryKeyStored: boolean;
 	tpmRefused: boolean;
@@ -98,11 +93,6 @@ export const usbProtection = () => invoke<UsbProtection | null>('security_usb');
 export const onUsbProtection = (callback: (usb: UsbProtection) => void) => listen<UsbProtection>('security.usb', callback);
 export const setUsbProtection = (enabled: boolean) => invoke<void>('security_set_usb', { enabled }, WAIT_FOR_PERMISSION);
 
-export const checkEncryption = () => invoke<EncryptionCheck[]>('security_check_encryption', {}, WAIT_FOR_PERMISSION);
-export const generateRecoveryKey = () => invoke<string>('security_generate_key', {}, WAIT_FOR_PERMISSION);
-export const turnOnEncryption = (recoveryKey: string, pin: string, passphrase: string) =>
-	invoke<void>('security_turn_on', { recoveryKey, pin, passphrase }, WAIT_FOR_PERMISSION);
-export const turnOffEncryption = (unlock: string) => invoke<Outcome<null>>('security_turn_off', { unlock }, WAIT_FOR_PERMISSION);
 export const setUpTpmUnlock = (pin: string) => (unlock: string) => invoke<Outcome<string>>('security_set_up_tpm', { unlock, pin }, WAIT_FOR_PERMISSION);
 export const removeTpmUnlock = (unlock: string) => invoke<Outcome<null>>('security_remove_tpm', { unlock }, WAIT_FOR_PERMISSION);
 export const showRecoveryKey = () => invoke<string>('security_show_key', {}, WAIT_FOR_PERMISSION);

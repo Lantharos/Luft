@@ -178,7 +178,6 @@ luft-bar-used = { $size }, využité { $used }
 luft-resize-title = Zmeniť veľkosť systému Luft
 luft-resize-description = Dajte systému Luft viac miesta z Windows alebo časť miesta vráťte systému Windows.
 luft-resize-drive-description = Dajte systému Luft viac voľného miesta na disku { $drive } alebo jeho časť nechajte voľnú.
-luft-resize-reencrypting = Luft ešte šifruje alebo dešifruje svoj disk. Keď skončí, bude možné zmeniť jeho veľkosť.
 luft-resize-passphrase = Disk systému Luft sa otvára iba prístupovou frázou a Luft ju počas presunu nemôže zadať sám.
 luft-resize-start-first = Raz spustite Luft, aby mohol aplikácii Meet Luft oznámiť, aký je zaplnený, a potom sa sem vráťte.
 luft-resize-apart = Medzi Windows a systémom Luft je ďalší oddiel, takže si nemôžu deliť miesto.

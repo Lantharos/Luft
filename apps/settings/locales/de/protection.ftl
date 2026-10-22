@@ -52,18 +52,7 @@ settings-privacy-delete-after-hint = Wie lange Dateien bleiben, bevor sie entfer
 ## Security: summary at the top of the page
 
 settings-security-protected = Dein Gerät ist geschützt
-settings-security-encrypting = Dein Gerät wird verschlüsselt
-settings-security-encrypting-progress = { $progress }. Du kannst weiterarbeiten, bis es fertig ist.
-settings-security-decrypting = Geräteverschlüsselung wird ausgeschaltet
-settings-security-restart-to-encrypt = Neu starten, um die Verschlüsselung zu beginnen
-settings-security-restart-to-encrypt-description = Die Verschlüsselung beginnt beim nächsten Neustart dieses Computers.
-settings-security-encryption-failed = Die Verschlüsselung hat nicht begonnen
-settings-security-encryption-failed-description = Luft ist ohne sie gestartet und deine Dateien wurden nicht verändert. Schalte sie wieder ein, um es erneut zu versuchen.
-settings-security-encryption-refused-description = Luft hat seine Größe geändert, aber die Verschlüsselung konnte danach nicht beginnen. Deine Dateien wurden nicht verändert. Schalte sie wieder ein, um es erneut zu versuchen.
-settings-security-waiting-to-encrypt = Die Verschlüsselung wartet
-settings-security-waiting-to-encrypt-description = Luft ändert noch seine Größe. Sobald das fertig ist, beginnt die Verschlüsselung beim nächsten Neustart.
 settings-security-could-be-safer = Dein Gerät könnte sicherer sein
-settings-security-could-be-safer-description = Schalte die Geräteverschlüsselung ein, damit deine Dateien privat bleiben.
 settings-security-starts-differently-description = Wenn du die Secure-Boot-Einstellungen geändert hast, bestätige das, damit sich der Datenträger wieder von selbst entsperrt.
 settings-security-needed-recovery-key = Dein Datenträger brauchte seinen Wiederherstellungsschlüssel
 settings-security-needed-recovery-key-description = Verknüpf den Sicherheitschip erneut, damit er sich von selbst entsperrt.
@@ -158,23 +147,6 @@ settings-usb-hold-back-description = Geräte, die im gesperrten Zustand angestec
 ## Device encryption
 
 settings-encryption = Geräteverschlüsselung
-settings-encryption-encrypting = Dieses Gerät wird verschlüsselt
-settings-encryption-decrypting = Geräteverschlüsselung wird ausgeschaltet
-settings-encryption-starting = Beginnt beim nächsten Neustart
-settings-encryption-failed = Hat beim letzten Neustart nicht begonnen, deine Dateien wurden nicht verändert
-settings-encryption-waiting = Wartet, bis Luft seine Größe geändert hat, und beginnt dann beim nächsten Neustart
-settings-encryption-refused = Konnte nach der Größenänderung von Luft nicht beginnen, deine Dateien wurden nicht verändert
-settings-encryption-off = Hält deine Dateien privat, falls dieser Computer verloren geht
-settings-encryption-progress = { $percent } erledigt
-settings-encryption-progress-seconds = { $percent } erledigt, weniger als eine Minute übrig
-settings-encryption-progress-minutes = { $minutes ->
-    [one] { $percent } erledigt, noch etwa { $minutes } Minute
-   *[other] { $percent } erledigt, noch etwa { $minutes } Minuten
-}
-settings-encryption-progress-hours = { $hours ->
-    [one] { $percent } erledigt, noch etwa { $hours } Stunde
-   *[other] { $percent } erledigt, noch etwa { $hours } Stunden
-}
 settings-encryption-unlocks-chip-pin = Entsperrt mit dem Sicherheitschip und deiner PIN
 settings-encryption-unlocks-chip = Entsperrt von selbst mit dem Sicherheitschip
 settings-encryption-unlocks-passphrase = Fragt beim Start nach deiner Passphrase
@@ -194,38 +166,6 @@ settings-encryption-drives-auto-unlock = { $count ->
     [one] { $count } verschlüsseltes Laufwerk entsperrt sich mit diesem Computer
    *[other] { $count } verschlüsselte Laufwerke entsperren sich mit diesem Computer
 }
-
-## Device encryption: turning it on
-
-settings-encryption-turn-on-title = Geräteverschlüsselung einschalten
-settings-encryption-turn-on-description = Deine Dateien bleiben privat, falls dieser Computer verloren geht oder gestohlen wird. Ohne den richtigen Schlüssel kann niemand den Datenträger lesen.
-settings-encryption-blocked-title = Die Geräteverschlüsselung kann noch nicht eingeschaltet werden
-settings-encryption-blocked-description = Kümmere dich um das, was unten markiert ist, und versuch es dann erneut.
-settings-encryption-backup = Sorg vor dem Start dafür, dass deine wichtigen Dateien gesichert sind.
-settings-encryption-key-title = Speichere deinen Wiederherstellungsschlüssel
-settings-encryption-key-description = Falls sich der Datenträger einmal nicht von selbst entsperren kann, etwa nach einer Reparatur, kommst du mit diesem Schlüssel wieder hinein. Bewahre ihn nicht auf diesem Computer auf.
-settings-encryption-unlock-title = Entsperren beim Start
-settings-encryption-unlock-description = Der Sicherheitschip entsperrt den Datenträger beim Start von selbst, die Anmeldung bleibt also gleich.
-settings-encryption-passphrase-title = Wähl eine Passphrase
-settings-encryption-passphrase-description = Dieser Computer kann den Datenträger nicht von selbst entsperren, deshalb fragt er bei jedem Start nach dieser Passphrase.
-settings-encryption-summary-title = Bereit zum Verschlüsseln
-settings-encryption-summary-description = So geht es weiter.
-settings-encryption-step-restart = Dein Computer startet einmal neu.
-settings-encryption-step-screen = Beim Start erscheint kurz der Bildschirm „Encrypting your device“.
-settings-encryption-step-background = Der Rest passiert im Hintergrund, während du weiterarbeitest.
-settings-encryption-step-plugged-in = Lass den Computer am Netzteil, bis alles fertig ist.
-settings-encryption-ask-pin = Zusätzlich nach einer PIN fragen
-settings-encryption-ask-pin-description = Hält den Datenträger gesperrt, selbst wenn jemand den Computer mitnimmt. Danach wird sie abgefragt, sobald die Verschlüsselung fertig ist.
-settings-encryption-starting-button = Wird gestartet …
-settings-encryption-restart-and-encrypt = Neu starten und verschlüsseln
-
-## Device encryption: turning it off
-
-settings-encryption-turn-off-title = Geräteverschlüsselung ausschalten?
-settings-encryption-turn-off-description = Deine Dateien werden im Hintergrund entschlüsselt, während du arbeitest. Danach kann jeder, der den Datenträger ausbaut, ihn lesen.
-settings-encryption-keep = Verschlüsselung behalten
-settings-encryption-turning-off = Wird ausgeschaltet …
-settings-encryption-turn-off = Ausschalten
 
 ## Device encryption: unlocking the disk
 
@@ -259,6 +199,7 @@ settings-encryption-unlock-disk-field = Wiederherstellungsschlüssel oder Passph
 
 ## Device encryption: security chip and PIN
 
+settings-encryption-ask-pin = Zusätzlich nach einer PIN fragen
 settings-encryption-chip-setup-description = Der Sicherheitschip in deinem Computer entsperrt den Datenträger beim Start von selbst, du musst also vorher keine Passphrase mehr eingeben.
 settings-encryption-add-pin-title = PIN hinzufügen
 settings-encryption-add-pin-description = Du gibst sie bei jedem Start des Computers ein. Ohne sie bleibt der Datenträger gesperrt, selbst wenn jemand den ganzen Computer mitnimmt.

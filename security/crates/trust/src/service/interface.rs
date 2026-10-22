@@ -4,10 +4,9 @@ use std::time::{Duration, Instant};
 use luft_dbus::idle::Idle;
 use tokio::sync::Mutex;
 use zbus::message::Header;
-use zbus::object_server::{InterfaceRef, SignalEmitter};
+use zbus::object_server::SignalEmitter;
 use zbus::{Connection, interface};
 
-use super::PATH;
 use super::actions;
 use super::error::Error;
 use super::properties::{self, Dict};
@@ -15,12 +14,9 @@ use super::shown::Shown;
 use super::status::{self, Status};
 use crate::boot::{attempts, other_systems, startup};
 use crate::disk;
-use crate::disk::encryption::state::Plan;
-use crate::disk::encryption::worker::{self, Progress};
 use crate::disk::layout::{grow, old_system};
 use crate::disk::unlock::keys;
 use crate::keys::{mok, others};
-use crate::system::host::power;
 use crate::system::secrets::secret::Secret;
 
 const CHECK: &str = "com.lantharos.trust.check";
@@ -31,14 +27,11 @@ const CONFIRM_STARTUP: &str = "com.lantharos.trust.confirm-startup";
 const OTHER_SYSTEMS: &str = "com.lantharos.trust.remove-other-systems";
 const ACCEPT_SECURE_BOOT: &str = "com.lantharos.trust.accept-secure-boot-change";
 const FRESH: Duration = Duration::from_secs(2);
-const BATTERY_RETRY: Duration = Duration::from_secs(60);
 
 pub struct Trust {
     idle: Arc<Idle>,
     busy: Arc<Mutex<()>>,
     snapshot: SyncMutex<Option<(Instant, Arc<Status>)>>,
-    progress: Arc<SyncMutex<Option<Progress>>>,
-    working: Arc<std::sync::atomic::AtomicBool>,
 }
 
 impl Trust {
@@ -47,8 +40,6 @@ impl Trust {
             idle,
             busy: Arc::default(),
             snapshot: SyncMutex::default(),
-            progress: Arc::default(),
-            working: Arc::default(),
         }
     }
 
@@ -113,78 +104,6 @@ impl Trust {
 
 type OtherStartup = (String, String, String, Vec<(u16, String)>, Vec<String>);
 
-pub async fn continue_disk_work(connection: &Connection) -> zbus::Result<()> {
-    let trust: InterfaceRef<Trust> = connection.object_server().interface(PATH).await?;
-    if Plan::waiting().is_some() {
-        finish_when_disk_is_free(trust.clone());
-    }
-    start_worker(trust);
-    Ok(())
-}
-
-fn finish_when_disk_is_free(trust: InterfaceRef<Trust>) {
-    tokio::spawn(async move {
-        let idle = trust.get().await.idle.clone();
-        let _activity = idle.hold();
-        if let Ok(Err(error)) = tokio::task::spawn_blocking(disk::finish_waiting).await {
-            eprintln!("Encryption couldn't start after the disk changes: {error:#}");
-        }
-        let inner = trust.get().await;
-        inner.forget_status();
-        inner.announce(trust.signal_emitter()).await;
-    });
-}
-
-fn start_worker(trust: InterfaceRef<Trust>) {
-    tokio::spawn(async move {
-        let (idle, progress, working) = {
-            let inner = trust.get().await;
-            (
-                inner.idle.clone(),
-                inner.progress.clone(),
-                inner.working.clone(),
-            )
-        };
-        if working.swap(true, std::sync::atomic::Ordering::SeqCst) {
-            return;
-        }
-        let _activity = idle.hold();
-        let (sender, mut receiver) = tokio::sync::watch::channel(Progress::default());
-        let announcer = trust.clone();
-        let forward = tokio::spawn(async move {
-            while receiver.changed().await.is_ok() {
-                let inner = announcer.get().await;
-                *inner.progress.lock().expect("progress lock") = Some(*receiver.borrow());
-                let _ = inner.disk_changed(announcer.signal_emitter()).await;
-            }
-        });
-        while let Some(plan) = worker::pending() {
-            let sender = sender.clone();
-            let finished = tokio::task::spawn_blocking(move || {
-                worker::run(&plan, |update| {
-                    let _ = sender.send(update);
-                })
-            })
-            .await;
-            match finished {
-                Ok(Ok(false)) if power::on_battery() => tokio::time::sleep(BATTERY_RETRY).await,
-                Ok(Err(error)) => {
-                    eprintln!("Changing the disk's encryption paused: {error:#}");
-                    break;
-                }
-                _ => break,
-            }
-        }
-        drop(sender);
-        let _ = forward.await;
-        *progress.lock().expect("progress lock") = None;
-        working.store(false, std::sync::atomic::Ordering::SeqCst);
-        let inner = trust.get().await;
-        inner.forget_status();
-        inner.announce(trust.signal_emitter()).await;
-    });
-}
-
 #[interface(name = "com.lantharos.Trust1")]
 impl Trust {
     #[zbus(property)]
@@ -214,68 +133,11 @@ impl Trust {
 
     #[zbus(property)]
     async fn disk(&self) -> Dict {
-        let live = *self.progress.lock().expect("progress lock");
-        properties::disk(self.status().await.disk.as_ref(), live)
+        properties::disk(self.status().await.disk.as_ref())
     }
 
     async fn generate_recovery_key(&self) -> Result<Shown, Error> {
         Ok(Shown(keys::generate_recovery_key()?))
-    }
-
-    async fn check_encryption(
-        &self,
-        #[zbus(connection)] connection: &Connection,
-        #[zbus(header)] header: Header<'_>,
-    ) -> Result<Vec<(String, bool, String)>, Error> {
-        self.authorize(connection, &header, CHECK).await?;
-        let _activity = self.idle.hold();
-        let checks = tokio::task::spawn_blocking(disk::check)
-            .await
-            .map_err(|_| Error::Failed("The checks stopped unexpectedly.".to_owned()))?;
-        Ok(checks
-            .into_iter()
-            .map(|check| (check.id.to_owned(), check.passed, check.message))
-            .collect())
-    }
-
-    async fn turn_on_encryption(
-        &self,
-        #[zbus(connection)] connection: &Connection,
-        #[zbus(header)] header: Header<'_>,
-        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
-        recovery_key: String,
-        pin: String,
-        passphrase: String,
-    ) -> Result<(), Error> {
-        self.authorize(connection, &header, ENCRYPTION).await?;
-        let (recovery_key, pin, passphrase) = (
-            Secret::from(recovery_key),
-            Secret::from(pin),
-            Secret::from(passphrase),
-        );
-        let turned_on = self
-            .run(&emitter, move || {
-                disk::turn_on(&recovery_key, &pin, &passphrase)
-            })
-            .await?;
-        if turned_on == disk::TurnedOn::AfterDiskChanges {
-            finish_when_disk_is_free(connection.object_server().interface(PATH).await?);
-        }
-        Ok(())
-    }
-
-    async fn turn_off_encryption(
-        &self,
-        #[zbus(connection)] connection: &Connection,
-        #[zbus(header)] header: Header<'_>,
-        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
-        unlock: String,
-    ) -> Result<(), Error> {
-        self.authorize(connection, &header, ENCRYPTION).await?;
-        let unlock = Secret::from(unlock);
-        self.run(&emitter, move || disk::turn_off(&unlock)).await?;
-        start_worker(connection.object_server().interface(PATH).await?);
-        Ok(())
     }
 
     async fn set_up_tpm_unlock(

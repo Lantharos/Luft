@@ -7,7 +7,7 @@
 	import { t } from '@luft/i18n';
 	import { ActionRow, Section } from '@luft/ui';
 	import type { Disk } from './api';
-	import { progressLine, unlockSummary } from './encryption/describe';
+	import { unlockSummary } from './encryption/describe';
 	import { protection } from './keyring/describe';
 	import type { KeyringState } from './keyring/state.svelte';
 	import { levelSentence } from './protections/hsi';
@@ -33,12 +33,7 @@
 	}
 
 	function encryptionSummary(disk: Disk) {
-		if (disk.state === 'encrypting' || disk.state === 'decrypting') return progressLine(disk);
-		if (disk.state === 'waiting') return t('settings-encryption-waiting');
-		if (disk.state === 'starting') return t('settings-encryption-starting');
-		if (disk.state === 'failed') return t('settings-encryption-failed');
-		if (disk.state === 'refused') return t('settings-encryption-refused');
-		return disk.state === 'on' ? unlockSummary(disk) : t('settings-encryption-off');
+		return disk.encrypted ? unlockSummary(disk) : t('settings-encryption-not-encrypted');
 	}
 
 	function keyringSummary() {
@@ -62,7 +57,7 @@
 
 {#if security.loaded}
 	<Section>
-		{#if security.trust && (security.trust.disk.device || security.trust.disk.state !== 'off')}
+		{#if security.trust?.disk.device}
 			<ActionRow title={t('settings-encryption')} icon={HardDrive} description={encryptionSummary(security.trust.disk)} onclick={() => onopen('encryption')} />
 		{/if}
 		<ActionRow title={t('settings-passwords-title')} icon={KeyRound} description={keyringSummary()} onclick={() => onopen('keyring')} />

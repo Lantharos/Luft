@@ -2,8 +2,8 @@ import type { Phase } from '#lib/bridge/installer.js';
 
 export type Step = 'region' | 'destination' | 'network' | 'account' | 'finishing' | 'secure-boot' | 'protect' | 'fingerprint' | 'ready';
 
-const LIVE: Step[] = ['region', 'destination', 'network', 'account', 'finishing'];
-const FIRST_BOOT: Step[] = ['secure-boot', 'protect', 'fingerprint', 'ready'];
+const LIVE: Step[] = ['region', 'destination', 'protect', 'network', 'account', 'finishing'];
+const FIRST_BOOT: Step[] = ['secure-boot', 'fingerprint', 'ready'];
 const POINT_OF_NO_RETURN: Step = 'network';
 
 class Flow {

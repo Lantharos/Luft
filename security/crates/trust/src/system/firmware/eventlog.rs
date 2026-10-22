@@ -7,6 +7,12 @@ const SECURE_BOOT_PCR: u32 = 7;
 const SHA256: u16 = 0x000b;
 const NO_ACTION: u32 = 0x3;
 const VARIABLE_DRIVER_CONFIG: u32 = 0x8000_0001;
+const VARIABLE_AUTHORITY: u32 = 0x8000_00e0;
+const SHIM_LOCK: [u8; 16] = [
+    0x50, 0xab, 0x5d, 0x60, 0x46, 0xe0, 0x00, 0x43, 0xab, 0xb6, 0x3d, 0xd8, 0x10, 0xdd, 0x8b, 0x23,
+];
+const MOK_LIST: &str = "MokListRT";
+const SHIM_AUTHORITIES: [&str; 2] = [MOK_LIST, "Shim"];
 const LEGACY_HEADER: usize = 4 + 4 + 20;
 const SPEC_ID_HEADER: usize = 16 + 4 + 4;
 const VARIABLE_HEADER: usize = 16 + 8 + 8;
@@ -96,17 +102,40 @@ fn guid(bytes: &[u8; 16]) -> String {
     )
 }
 
-fn with_value_now(measured: &[u8]) -> Option<Vec<u8>> {
+fn variable_of(measured: &[u8]) -> Option<(&[u8; 16], &[u8])> {
     let mut reader = Reader { data: measured };
     let vendor = reader.take(16)?.try_into().ok()?;
     let name_units = usize::try_from(reader.u64()?).ok()?;
     reader.u64()?;
-    let name = reader.take(name_units.checked_mul(2)?)?;
+    Some((vendor, reader.take(name_units.checked_mul(2)?)?))
+}
+
+fn with_value_now(measured: &[u8]) -> Option<Vec<u8>> {
+    let (vendor, name) = variable_of(measured)?;
     let value = efi::variable(&efi::text(name), &guid(vendor)).unwrap_or_default();
     let mut now = measured[..VARIABLE_HEADER + name.len()].to_vec();
     now[16 + 8..VARIABLE_HEADER].copy_from_slice(&(value.len() as u64).to_le_bytes());
     now.extend(value);
     Some(now)
+}
+
+fn verified_by_shim(event: &Event) -> bool {
+    event.kind == VARIABLE_AUTHORITY
+        && variable_of(&event.data).is_some_and(|(vendor, name)| {
+            *vendor == SHIM_LOCK && SHIM_AUTHORITIES.contains(&efi::text(name).as_str())
+        })
+}
+
+fn authority(name: &str, data: &[u8]) -> Vec<u8> {
+    let name: Vec<u8> = name.encode_utf16().flat_map(u16::to_le_bytes).collect();
+    [
+        SHIM_LOCK.as_slice(),
+        &((name.len() / 2) as u64).to_le_bytes(),
+        &(data.len() as u64).to_le_bytes(),
+        &name,
+        data,
+    ]
+    .concat()
 }
 
 fn sha256(data: &[u8]) -> Sha256Digest {
@@ -124,11 +153,30 @@ pub fn hex(bytes: &[u8]) -> String {
     bytes.iter().map(|byte| format!("{byte:02x}")).collect()
 }
 
-pub fn next_secure_boot_pcr(now: &str) -> Option<String> {
+fn events_matching(now: &str) -> Option<Vec<Event>> {
     let events = secure_boot_events(&std::fs::read(LOG).ok()?)?;
-    if replay(events.iter().map(|event| event.digest)) != now {
-        return None;
+    (replay(events.iter().map(|event| event.digest)) == now).then_some(events)
+}
+
+pub fn secure_boot_pcr_with_luft_key(
+    now: &str,
+    certificate: &[u8],
+    secure_boot: bool,
+) -> Option<String> {
+    let mut digests: Vec<Sha256Digest> = events_matching(now)?
+        .iter()
+        .filter(|event| !verified_by_shim(event))
+        .map(|event| event.digest)
+        .collect();
+    if secure_boot {
+        let signature = [SHIM_LOCK.as_slice(), certificate].concat();
+        digests.push(sha256(&authority(MOK_LIST, &signature)));
     }
+    Some(replay(digests))
+}
+
+pub fn next_secure_boot_pcr(now: &str) -> Option<String> {
+    let events = events_matching(now)?;
     let digests = events
         .iter()
         .map(|event| {

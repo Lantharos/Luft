@@ -30,14 +30,6 @@ static WATCH_TRUST: Once = Once::new();
 static WATCH_USB: Once = Once::new();
 
 #[derive(Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct TurnOn {
-    recovery_key: String,
-    pin: String,
-    passphrase: String,
-}
-
-#[derive(Deserialize)]
 struct Unlock {
     unlock: String,
 }
@@ -105,28 +97,6 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .command_async("security_host", |_: Value| hsi::read())
         .command_async("security_set_usb", |Enabled { enabled }| {
             usb::set_enabled(enabled)
-        })
-        .command_async("security_check_encryption", |_: Value| luft_trust::checks())
-        .command_async("security_generate_key", |_: Value| {
-            luft_trust::call::<_, String>(&TRUST, "GenerateRecoveryKey", &())
-        })
-        .command_async(
-            "security_turn_on",
-            |TurnOn {
-                 recovery_key,
-                 pin,
-                 passphrase,
-             }| async move {
-                luft_trust::call::<_, ()>(
-                    &TRUST,
-                    "TurnOnEncryption",
-                    &(recovery_key, pin, passphrase),
-                )
-                .await
-            },
-        )
-        .command_async("security_turn_off", |Unlock { unlock }| async move {
-            luft_trust::unlocking::<_, ()>(&TRUST, "TurnOffEncryption", &unlock).await
         })
         .command_async(
             "security_set_up_tpm",

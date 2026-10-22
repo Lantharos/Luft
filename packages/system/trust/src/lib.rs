@@ -91,11 +91,6 @@ where
     }
 }
 
-pub async fn checks() -> Result<Vec<Check>, String> {
-    let checks: Vec<(String, bool, String)> = call(&TRUST, "CheckEncryption", &()).await?;
-    Ok(checks.into_iter().map(Check::from).collect())
-}
-
 pub fn group(properties: &Map, name: &str) -> Map {
     get::<OwnedVariant>(properties, name)
         .and_then(|value| Map::try_from(value).ok())

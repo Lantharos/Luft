@@ -72,19 +72,8 @@ settings-privacy-delete-after-hint = How long files stay before they’re remove
 ## Security: summary at the top of the page
 
 settings-security-protected = Your device is protected
-settings-security-encrypting = Encrypting your device
-# $progress is how far encryption got, such as "40% done, about 5 minutes left"
-settings-security-encrypting-progress = { $progress }. Keep working while it finishes.
-settings-security-decrypting = Turning off device encryption
-settings-security-restart-to-encrypt = Restart to start encrypting
-settings-security-restart-to-encrypt-description = Encryption starts the next time this computer restarts.
-settings-security-encryption-failed = Encryption didn’t start
-settings-security-encryption-failed-description = Luft started without it and your files weren’t changed. Turn it on again to try once more.
-settings-security-encryption-refused-description = Luft finished changing its size, but encryption couldn’t start afterwards. Your files weren’t changed. Turn it on again to try once more.
-settings-security-waiting-to-encrypt = Encryption is waiting
-settings-security-waiting-to-encrypt-description = Luft is still changing its size. Once that’s done, encryption starts at the next restart.
 settings-security-could-be-safer = Your device could be safer
-settings-security-could-be-safer-description = Turn on device encryption to keep your files private.
+settings-security-not-encrypted-description = Its disk isn’t encrypted, so anyone who takes it out can read your files.
 settings-security-starts-differently-description = If you changed its Secure Boot settings, confirm it so the disk unlocks by itself again.
 settings-security-needed-recovery-key = Your disk needed its recovery key
 settings-security-needed-recovery-key-description = Link the security chip again so it unlocks by itself.
@@ -194,24 +183,7 @@ settings-usb-hold-back-description = Ones plugged in while locked wait until you
 ## Device encryption
 
 settings-encryption = Device encryption
-settings-encryption-encrypting = Encrypting this device
-settings-encryption-decrypting = Turning off device encryption
-settings-encryption-starting = Starts the next time you restart
-settings-encryption-failed = Didn’t start at the last restart, your files weren’t changed
-settings-encryption-waiting = Waits for Luft to finish changing its size, then starts at the next restart
-settings-encryption-refused = Couldn’t start after Luft changed its size, your files weren’t changed
-settings-encryption-off = Keeps your files private if this computer is lost
-# $percent is already formatted, such as "40%"
-settings-encryption-progress = { $percent } done
-settings-encryption-progress-seconds = { $percent } done, less than a minute left
-settings-encryption-progress-minutes = { $minutes ->
-    [one] { $percent } done, about { $minutes } minute left
-   *[other] { $percent } done, about { $minutes } minutes left
-}
-settings-encryption-progress-hours = { $hours ->
-    [one] { $percent } done, about { $hours } hour left
-   *[other] { $percent } done, about { $hours } hours left
-}
+settings-encryption-not-encrypted = Off, and it can only be turned on while installing Luft
 settings-encryption-unlocks-chip-pin = Unlocks with the security chip and your PIN
 settings-encryption-unlocks-chip = Unlocks by itself with the security chip
 settings-encryption-unlocks-passphrase = Asks for your passphrase at startup
@@ -234,40 +206,6 @@ settings-encryption-drives-auto-unlock = { $count ->
     [one] { $count } encrypted drive unlocks with this computer
    *[other] { $count } encrypted drives unlock with this computer
 }
-
-## Device encryption: turning it on
-
-settings-encryption-turn-on-title = Turn on device encryption
-settings-encryption-turn-on-description = Your files stay private if this computer is lost or stolen. Without the right key, nobody can read the disk.
-settings-encryption-blocked-title = Device encryption can’t be turned on yet
-settings-encryption-blocked-description = Take care of what’s marked below, then try again.
-settings-encryption-backup = Before you start, make sure your important files are backed up.
-settings-encryption-key-title = Save your recovery key
-settings-encryption-key-description = If the disk ever can’t unlock by itself, such as after a repair, this key gets you back in. Keep it somewhere other than this computer.
-settings-encryption-unlock-title = Unlocking at startup
-settings-encryption-unlock-description = The security chip unlocks the disk by itself at startup, so signing in stays the same.
-settings-encryption-passphrase-title = Choose a passphrase
-settings-encryption-passphrase-description = This computer can’t unlock the disk by itself, so it asks for this passphrase every time it starts.
-settings-encryption-summary-title = Ready to encrypt
-settings-encryption-summary-description = Here’s what happens next.
-settings-encryption-step-restart = Your computer restarts once.
-# The quoted text is the title of the screen shown while the computer starts
-settings-encryption-step-screen = While it starts, a short “Encrypting your device” screen appears.
-settings-encryption-step-background = The rest happens in the background while you keep working.
-settings-encryption-step-plugged-in = Keep the computer plugged in until it’s done.
-settings-encryption-ask-pin = Also ask for a PIN
-settings-encryption-ask-pin-description = Keeps the disk locked even if someone takes the computer. It’s asked once encryption finishes.
-settings-encryption-starting-button = Starting…
-settings-encryption-restart-and-encrypt = Restart and encrypt
-
-## Device encryption: turning it off
-
-settings-encryption-turn-off-title = Turn off device encryption?
-settings-encryption-turn-off-description = Your files are decrypted in the background while you work. Afterwards, anyone who takes out the disk can read it.
-settings-encryption-keep = Keep encryption
-settings-encryption-turning-off = Turning off…
-# Button, verb
-settings-encryption-turn-off = Turn off
 
 ## Device encryption: unlocking the disk
 
@@ -303,6 +241,7 @@ settings-encryption-unlock-disk-field = Recovery key or passphrase
 
 ## Device encryption: security chip and PIN
 
+settings-encryption-ask-pin = Also ask for a PIN
 settings-encryption-chip-setup-description = The security chip in your computer unlocks the disk by itself at startup, so you no longer type a passphrase first.
 settings-encryption-add-pin-title = Add a PIN
 settings-encryption-add-pin-description = You’ll type it each time the computer starts. Without it, the disk stays locked, even if someone takes the whole computer.

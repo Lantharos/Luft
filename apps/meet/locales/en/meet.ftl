@@ -215,7 +215,6 @@ luft-resize-title = Change how much space Luft has
 luft-resize-description = Give Luft more of Windows’ space, or give some back to Windows.
 # $drive is the name of a drive, like "Samsung SSD 990 PRO"
 luft-resize-drive-description = Give Luft more of the free space on { $drive }, or leave some of it free.
-luft-resize-reencrypting = Luft is still encrypting or decrypting its drive. Once it’s done, its size can change.
 luft-resize-passphrase = Luft’s drive opens only with a passphrase, and Luft can’t type it for itself while it moves.
 luft-resize-start-first = Start Luft once, so it can tell Meet Luft how full it is, then come back.
 luft-resize-apart = Another partition sits between Windows and Luft, so they can’t share their space.

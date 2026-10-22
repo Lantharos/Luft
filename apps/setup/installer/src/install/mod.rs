@@ -17,6 +17,7 @@ pub use configure::regional::Regional;
 use crate::config::Image;
 use configure::deployment::Deployment;
 use configure::{handoff, networks};
+use drive::encryption::Encryption;
 use drive::partition;
 use drive::plan::Plan;
 use drive::target::Mounted;
@@ -34,6 +35,7 @@ const PREPARED: f64 = 0.04;
 const COPIED: f64 = 0.96;
 const COPIED_BEFORE_UNPACKING: f64 = 0.8;
 const STATE: &str = "lib/luft-installer";
+const TRUST_STATE: &str = "lib/trustd";
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Stage {
@@ -141,6 +143,7 @@ pub struct Job<'a> {
     pub answers: &'a Answers,
     pub windows: Option<Windows>,
     pub meet: Option<Handoff>,
+    pub encryption: Option<Encryption>,
 }
 
 fn unpack_box(
@@ -170,7 +173,7 @@ pub fn run(job: Job, report: impl Fn(Status)) {
 fn prepare(job: &Job) -> Result<(Mounted, Option<Kept>)> {
     match &job.destination {
         Destination::Partitions(plan) => {
-            let parts = wait(partition::apply(plan))?;
+            let parts = wait(partition::apply(plan, job.encryption.is_some()))?;
             let skipped: Vec<&str> = job
                 .meet
                 .iter()
@@ -178,12 +181,18 @@ fn prepare(job: &Job) -> Result<(Mounted, Option<Kept>)> {
                 .map(|(_, partition)| partition)
                 .collect();
             Ok((
-                Mounted::assemble(job.target, &plan.device, &parts, &skipped)?,
+                Mounted::assemble(
+                    job.target,
+                    &plan.device,
+                    &parts,
+                    &skipped,
+                    job.encryption.as_ref(),
+                )?,
                 None,
             ))
         }
         Destination::Replace(plan) => {
-            let (mounted, kept) = replace::prepare(plan, job.target)?;
+            let (mounted, kept) = replace::prepare(plan, job.target, job.encryption.as_ref())?;
             Ok((mounted, Some(kept)))
         }
     }
@@ -221,6 +230,11 @@ fn install(job: &Job, report: &impl Fn(Status)) -> Result<()> {
         .wait(kept.as_ref().is_none_or(Kept::needs_password));
     report(Status::at(Stage::Configuring, copied));
     let deployment = Deployment::mount(mounted.root(), &job.target.with_extension("system"))?;
+    if let (Some(encryption), Some(opened)) = (&job.encryption, mounted.encrypted()) {
+        let state = deployment.var(TRUST_STATE);
+        encryption.seal(opened, &state)?;
+        deployment.relabel(&[state])?;
+    }
     regional.apply(&deployment)?;
     let user = match (&kept, account) {
         (Some(kept), account) => {

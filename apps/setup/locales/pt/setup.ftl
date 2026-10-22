@@ -243,18 +243,12 @@ setup-secure-boot-new-code = Obter um novo código
 setup-protect-title = Proteger os seus ficheiros
 setup-protect-tpm = Encriptar este computador para que ninguém possa ler os seus ficheiros sem iniciar sessão, mesmo que o perca. O computador desbloqueia-se sozinho ao arrancar.
 setup-protect-passphrase = Encriptar este computador para que ninguém possa ler os seus ficheiros sem a frase de acesso, mesmo que o perca.
-setup-protect-staged-title = Os seus ficheiros vão ser encriptados
-setup-protect-staged-description = A encriptação começa sozinha depois do reinício no fim da configuração, e pode continuar a utilizar o computador enquanto decorre.
-setup-protect-waiting-description = O Luft ainda está a mudar de tamanho. Quando terminar, a encriptação começa no próximo reinício e pode continuar a usar o computador entretanto.
 setup-protect-keep-safe = Guarde esta chave de recuperação num lugar seguro, longe deste computador. Vai precisar dela se o computador não conseguir desbloquear-se sozinho.
 setup-protect-passphrase-label = Frase de acesso
 setup-protect-repeat = Escreva-a novamente
 setup-protect-mismatch = Não coincidem
 setup-protect-kept = Guardei a minha chave de recuperação
-setup-protect-background = A encriptação decorre em segundo plano após o próximo reinício, e pode continuar a utilizar o computador entretanto.
 setup-protect-encrypt = Encriptar
-setup-protect-checking = A verificar…
-setup-protect-start = Encriptar os meus ficheiros
 
 ## Fingerprint
 
@@ -271,6 +265,5 @@ setup-fingerprint-choose-another = Escolher outro dedo
 
 setup-ready-title = Está tudo pronto
 setup-ready-trust = Reinicie mais uma vez para concluir. Logo após o reinício, um ecrã azul pede para confiar no Luft. Utilize o teclado nesse ecrã com este código.
-setup-ready-restart = Reinicie mais uma vez para concluir e depois inicie sessão com a sua palavra-passe.
 setup-ready-done = O ambiente de trabalho está pronto. Divirta-se com o Luft.
 setup-ready-start = Começar a utilizar o Luft

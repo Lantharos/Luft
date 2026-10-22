@@ -20,13 +20,13 @@ const KEY_BYTES: usize = 64;
 const ESCROW_NAME: &str = "trustd.drive-recovery-key";
 
 pub fn system_protected() -> bool {
-    disk::status().is_some_and(|disk| disk.encrypted && disk.state == "on")
+    disk::status().is_some_and(|disk| disk.encrypted)
 }
 
 pub fn require_system_protected() -> Result<()> {
     if !system_protected() {
         bail!(Unsupported(
-            "Turn on device encryption first. The key that unlocks this drive is kept on this computer's own disk, so that disk has to be encrypted too.".to_owned()
+            "Only a computer whose own disk is encrypted can unlock this drive by itself, since the key that unlocks it is kept on that disk.".to_owned()
         ));
     }
     Ok(())
@@ -163,9 +163,9 @@ pub fn escrow(record: &Record, recovery: &Secret) -> Result<bool> {
         return Ok(false);
     }
     let protection = if tpm::detect().usable {
-        Protection::Tpm
+        Protection::HostAndTpm
     } else {
-        Protection::Disk
+        Protection::Host
     };
     creds::seal(ESCROW_NAME, recovery, protection, &record.escrow_file())?;
     Ok(true)

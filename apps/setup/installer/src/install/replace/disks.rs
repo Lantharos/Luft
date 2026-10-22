@@ -34,17 +34,25 @@ fn set_type(part: &Part, role: Role) -> Result<()> {
     .with_context(|| format!("{} couldn't be marked for Luft", part.device))
 }
 
-pub fn format(part: &Part, role: Role) -> Result<()> {
-    let (filesystem, label) = role.filesystem();
+fn format_as(part: &Part, role: Role, filesystem: &str, label: Option<&str>) -> Result<()> {
     wait(udisks::run(
         &part.block,
         BLOCK,
         "Format",
-        &(filesystem, options(Some(label))),
+        &(filesystem, options(label)),
     ))
     .map_err(|error| anyhow!(error))
     .with_context(|| format!("{} couldn't be formatted", part.device))?;
     set_type(part, role)
+}
+
+pub fn format(part: &Part, role: Role) -> Result<()> {
+    let (filesystem, label) = role.filesystem();
+    format_as(part, role, filesystem, Some(label))
+}
+
+pub fn erase(part: &Part, role: Role) -> Result<()> {
+    format_as(part, role, "empty", None)
 }
 
 pub fn mark_root(part: &Part) -> Result<()> {

@@ -52,18 +52,7 @@ settings-privacy-delete-after-hint = Quanto tempo os arquivos ficam antes de ser
 ## Security: summary at the top of the page
 
 settings-security-protected = Seu dispositivo está protegido
-settings-security-encrypting = Criptografando o dispositivo
-settings-security-encrypting-progress = { $progress }. Você pode continuar trabalhando enquanto isso termina.
-settings-security-decrypting = Desativando a criptografia do dispositivo
-settings-security-restart-to-encrypt = Reinicie para começar a criptografia
-settings-security-restart-to-encrypt-description = A criptografia começa na próxima vez que este computador reiniciar.
-settings-security-encryption-failed = A criptografia não começou
-settings-security-encryption-failed-description = O Luft iniciou sem ela e seus arquivos não foram alterados. Ative-a de novo para tentar mais uma vez.
-settings-security-encryption-refused-description = O Luft terminou de mudar de tamanho, mas a criptografia não conseguiu começar depois. Seus arquivos não foram alterados. Ative-a de novo para tentar mais uma vez.
-settings-security-waiting-to-encrypt = A criptografia está esperando
-settings-security-waiting-to-encrypt-description = O Luft ainda está mudando de tamanho. Quando terminar, a criptografia começa na próxima reinicialização.
 settings-security-could-be-safer = Seu dispositivo poderia estar mais seguro
-settings-security-could-be-safer-description = Ative a criptografia do dispositivo para manter seus arquivos privados.
 settings-security-starts-differently-description = Se você alterou as configurações de Secure Boot, confirme para que o disco volte a se desbloquear sozinho.
 settings-security-needed-recovery-key = O disco precisou da chave de recuperação
 settings-security-needed-recovery-key-description = Vincule o chip de segurança de novo para que ele se desbloqueie sozinho.
@@ -158,23 +147,6 @@ settings-usb-hold-back-description = Os conectados com a tela bloqueada esperam 
 ## Device encryption
 
 settings-encryption = Criptografia do dispositivo
-settings-encryption-encrypting = Criptografando este dispositivo
-settings-encryption-decrypting = Desativando a criptografia do dispositivo
-settings-encryption-starting = Começa na próxima vez que você reiniciar
-settings-encryption-failed = Não começou na última reinicialização, seus arquivos não foram alterados
-settings-encryption-waiting = Espera o Luft terminar de mudar de tamanho e começa na próxima reinicialização
-settings-encryption-refused = Não conseguiu começar depois que o Luft mudou de tamanho, seus arquivos não foram alterados
-settings-encryption-off = Mantém seus arquivos privados se este computador for perdido
-settings-encryption-progress = { $percent } concluído
-settings-encryption-progress-seconds = { $percent } concluído, falta menos de um minuto
-settings-encryption-progress-minutes = { $minutes ->
-    [one] { $percent } concluído, falta cerca de { $minutes } minuto
-   *[other] { $percent } concluído, faltam cerca de { $minutes } minutos
-}
-settings-encryption-progress-hours = { $hours ->
-    [one] { $percent } concluído, falta cerca de { $hours } hora
-   *[other] { $percent } concluído, faltam cerca de { $hours } horas
-}
 settings-encryption-unlocks-chip-pin = Desbloqueia com o chip de segurança e o seu PIN
 settings-encryption-unlocks-chip = Desbloqueia sozinho com o chip de segurança
 settings-encryption-unlocks-passphrase = Pede a frase secreta na inicialização
@@ -194,38 +166,6 @@ settings-encryption-drives-auto-unlock = { $count ->
     [one] { $count } unidade criptografada é desbloqueada com este computador
    *[other] { $count } unidades criptografadas são desbloqueadas com este computador
 }
-
-## Device encryption: turning it on
-
-settings-encryption-turn-on-title = Ativar a criptografia do dispositivo
-settings-encryption-turn-on-description = Seus arquivos continuam privados se este computador for perdido ou roubado. Sem a chave certa, ninguém consegue ler o disco.
-settings-encryption-blocked-title = Ainda não é possível ativar a criptografia do dispositivo
-settings-encryption-blocked-description = Resolva o que está marcado abaixo e tente novamente.
-settings-encryption-backup = Antes de começar, confira se há backup dos seus arquivos importantes.
-settings-encryption-key-title = Salve a chave de recuperação
-settings-encryption-key-description = Se o disco não conseguir se desbloquear sozinho, por exemplo depois de um reparo, esta chave permite entrar de novo. Guarde-a em outro lugar que não seja este computador.
-settings-encryption-unlock-title = Desbloqueio na inicialização
-settings-encryption-unlock-description = O chip de segurança desbloqueia o disco sozinho na inicialização, então o login continua igual.
-settings-encryption-passphrase-title = Escolha uma frase secreta
-settings-encryption-passphrase-description = Este computador não consegue desbloquear o disco sozinho, então pede esta frase secreta toda vez que inicia.
-settings-encryption-summary-title = Pronto para criptografar
-settings-encryption-summary-description = Veja o que acontece a seguir.
-settings-encryption-step-restart = O computador reinicia uma vez.
-settings-encryption-step-screen = Durante a inicialização, aparece por pouco tempo uma tela “Encrypting your device”.
-settings-encryption-step-background = O resto acontece em segundo plano enquanto você continua trabalhando.
-settings-encryption-step-plugged-in = Mantenha o computador ligado na tomada até terminar.
-settings-encryption-ask-pin = Pedir também um PIN
-settings-encryption-ask-pin-description = Mantém o disco bloqueado mesmo se alguém levar o computador. Ele é pedido quando a criptografia terminar.
-settings-encryption-starting-button = Iniciando…
-settings-encryption-restart-and-encrypt = Reiniciar e criptografar
-
-## Device encryption: turning it off
-
-settings-encryption-turn-off-title = Desativar a criptografia do dispositivo?
-settings-encryption-turn-off-description = Seus arquivos são descriptografados em segundo plano enquanto você trabalha. Depois disso, qualquer pessoa que retirar o disco poderá lê-lo.
-settings-encryption-keep = Manter a criptografia
-settings-encryption-turning-off = Desativando…
-settings-encryption-turn-off = Desativar
 
 ## Device encryption: unlocking the disk
 
@@ -259,6 +199,7 @@ settings-encryption-unlock-disk-field = Chave de recuperação ou frase secreta
 
 ## Device encryption: security chip and PIN
 
+settings-encryption-ask-pin = Pedir também um PIN
 settings-encryption-chip-setup-description = O chip de segurança do computador desbloqueia o disco sozinho na inicialização, então você não precisa mais digitar uma frase secreta antes.
 settings-encryption-add-pin-title = Adicionar um PIN
 settings-encryption-add-pin-description = Você vai digitá-lo toda vez que o computador iniciar. Sem ele, o disco continua bloqueado, mesmo se alguém levar o computador inteiro.

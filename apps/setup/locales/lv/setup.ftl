@@ -249,18 +249,12 @@ setup-secure-boot-new-code = Iegūt jaunu kodu
 setup-protect-title = Aizsargājiet savus failus
 setup-protect-tpm = Šifrējiet šo datoru, lai neviens nevarētu lasīt jūsu failus bez pierakstīšanās, pat ja dators pazūd. Startējot tas atbloķējas pats.
 setup-protect-passphrase = Šifrējiet šo datoru, lai neviens nevarētu lasīt jūsu failus bez jūsu paroles frāzes, pat ja dators pazūd.
-setup-protect-staged-title = Jūsu faili tiks šifrēti
-setup-protect-staged-description = Šifrēšana sāksies pati pēc restartēšanas iestatīšanas beigās, un tās laikā varat turpināt lietot datoru.
-setup-protect-waiting-description = Luft vēl maina savu izmēru. Kad tas būs paveikts, šifrēšana sāksies nākamajā restartēšanas reizē, un pa to laiku varat turpināt lietot datoru.
 setup-protect-keep-safe = Glabājiet šo atkopšanas atslēgu drošā vietā, atsevišķi no šī datora. Tā būs vajadzīga, ja dators kādreiz nevarēs atbloķēties pats.
 setup-protect-passphrase-label = Paroles frāze
 setup-protect-repeat = Ievadiet vēlreiz
 setup-protect-mismatch = Tās nesakrīt
 setup-protect-kept = Atkopšanas atslēga ir saglabāta
-setup-protect-background = Šifrēšana notiek fonā pēc nākamās restartēšanas, un tikmēr varat turpināt lietot datoru.
 setup-protect-encrypt = Šifrēt
-setup-protect-checking = Notiek pārbaude…
-setup-protect-start = Šifrēt manus failus
 
 ## Fingerprint
 
@@ -277,6 +271,5 @@ setup-fingerprint-choose-another = Izvēlēties citu pirkstu
 
 setup-ready-title = Viss ir gatavs
 setup-ready-trust = Lai pabeigtu, restartējiet vēlreiz. Tūlīt pēc restartēšanas zilā ekrānā tiks jautāts, vai uzticēties sistēmai Luft. Tur ar tastatūru ievadiet šo kodu.
-setup-ready-restart = Lai pabeigtu, restartējiet vēlreiz un pēc tam pierakstieties ar savu paroli.
 setup-ready-done = Jūsu darbvirsma ir gatava. Lai jauki ar Luft.
 setup-ready-start = Sākt lietot Luft

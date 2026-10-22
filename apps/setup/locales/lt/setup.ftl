@@ -256,18 +256,12 @@ setup-secure-boot-new-code = Gauti naują kodą
 setup-protect-title = Apsaugokite savo failus
 setup-protect-tpm = Užšifruokite šį kompiuterį, kad niekas negalėtų perskaityti jūsų failų neprisijungęs, net jei kompiuterį pamestumėte. Paleidžiamas jis atsirakina pats.
 setup-protect-passphrase = Užšifruokite šį kompiuterį, kad niekas negalėtų perskaityti jūsų failų be slaptafrazės, net jei kompiuterį pamestumėte.
-setup-protect-staged-title = Jūsų failai bus užšifruoti
-setup-protect-staged-description = Šifravimas prasidės savaime po paleidimo iš naujo sąrankos pabaigoje, o kol jis vyksta, galėsite naudotis kompiuteriu.
-setup-protect-waiting-description = Sistema Luft dar keičia savo dydį. Kai tai bus baigta, šifravimas prasidės kitą kartą paleidus iš naujo, o kompiuteriu galite toliau naudotis.
 setup-protect-keep-safe = Laikykite šį atkūrimo raktą saugioje vietoje, ne šalia kompiuterio. Jo prireiks, jei kompiuteris kada nors negalės atsirakinti pats.
 setup-protect-passphrase-label = Slaptafrazė
 setup-protect-repeat = Pakartokite
 setup-protect-mismatch = Nesutampa
 setup-protect-kept = Atkūrimo raktą išsaugojau
-setup-protect-background = Šifravimas vyks fone po kito paleidimo iš naujo, o tuo metu galėsite naudotis kompiuteriu.
 setup-protect-encrypt = Šifruoti
-setup-protect-checking = Tikrinama…
-setup-protect-start = Šifruoti mano failus
 
 ## Fingerprint
 
@@ -284,6 +278,5 @@ setup-fingerprint-choose-another = Pasirinkti kitą pirštą
 
 setup-ready-title = Viskas paruošta
 setup-ready-trust = Paleiskite iš naujo dar kartą, kad baigtumėte. Iškart po paleidimo iš naujo mėlyname ekrane bus paprašyta pasitikėti sistema Luft. Ten klaviatūra įveskite šį kodą.
-setup-ready-restart = Paleiskite iš naujo dar kartą, kad baigtumėte, tada prisijunkite slaptažodžiu.
 setup-ready-done = Jūsų darbalaukis paruoštas. Smagaus darbo su Luft.
 setup-ready-start = Pradėti naudoti Luft

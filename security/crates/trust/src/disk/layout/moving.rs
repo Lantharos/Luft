@@ -50,11 +50,7 @@ fn mapper(name: &str) -> PathBuf {
 }
 
 fn system_key(disk: &SystemDisk) -> Result<Secret> {
-    let header = disk.header()?.context("The system disk isn't encrypted")?;
-    ensure!(
-        header.reencrypting.is_none(),
-        "The system disk is still being encrypted or decrypted, so it can't move yet"
-    );
+    disk.header()?.context("The system disk isn't encrypted")?;
     keys::unlock_key(&disk.device(), None, &Secret::default())
         .context("Without a TPM, only Luft's startup can open the system disk")
 }

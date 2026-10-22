@@ -9,17 +9,11 @@ const REFUSALS: [&str; 6] = [
     "Failed to unseal secret using TPM2",
 ];
 
-pub const STAGE_REFUSED: &str = "The TPM didn't release the disk key";
-
 pub fn tpm_refused_this_boot() -> bool {
-    let messages = |identifier: &str| {
-        Tool::new("journalctl")
-            .args(["-b", "0", "-o", "cat", "--no-pager"])
-            .arg(format!("SYSLOG_IDENTIFIER={identifier}"))
-            .output()
-            .unwrap_or_default()
-    };
-    let cryptsetup = messages("systemd-cryptsetup");
+    let cryptsetup = Tool::new("journalctl")
+        .args(["-b", "0", "-o", "cat", "--no-pager"])
+        .arg("SYSLOG_IDENTIFIER=systemd-cryptsetup")
+        .output()
+        .unwrap_or_default();
     REFUSALS.iter().any(|refusal| cryptsetup.contains(refusal))
-        || messages("trustd").contains(STAGE_REFUSED)
 }

@@ -52,18 +52,7 @@ settings-privacy-delete-after-hint = Скільки файли зберігаю�
 ## Security: summary at the top of the page
 
 settings-security-protected = Ваш пристрій захищено
-settings-security-encrypting = Шифрування пристрою
-settings-security-encrypting-progress = { $progress }. Можна працювати далі, доки воно завершується.
-settings-security-decrypting = Вимкнення шифрування пристрою
-settings-security-restart-to-encrypt = Перезавантажте, щоб почати шифрування
-settings-security-restart-to-encrypt-description = Шифрування почнеться під час наступного перезавантаження цього комп’ютера.
-settings-security-encryption-failed = Шифрування не почалося
-settings-security-encryption-failed-description = Система Luft запустилася без нього, ваші файли не змінено. Увімкніть його знову, щоб спробувати ще раз.
-settings-security-encryption-refused-description = Система Luft завершила зміну свого розміру, але після цього шифрування не змогло початися. Ваші файли не змінено. Увімкніть його знову, щоб спробувати ще раз.
-settings-security-waiting-to-encrypt = Шифрування очікує
-settings-security-waiting-to-encrypt-description = Система Luft ще змінює свій розмір. Коли це завершиться, шифрування почнеться під час наступного перезавантаження.
 settings-security-could-be-safer = Ваш пристрій можна захистити краще
-settings-security-could-be-safer-description = Увімкніть шифрування пристрою, щоб ваші файли залишалися приватними.
 settings-security-starts-differently-description = Якщо ви змінили параметри Secure Boot, підтвердьте це, щоб диск знову розблоковувався сам.
 settings-security-needed-recovery-key = Для диска знадобився ключ відновлення
 settings-security-needed-recovery-key-description = Прив’яжіть процесор безпеки знову, щоб диск розблоковувався сам.
@@ -168,27 +157,6 @@ settings-usb-hold-back-description = Під’єднані під час бло�
 ## Device encryption
 
 settings-encryption = Шифрування пристрою
-settings-encryption-encrypting = Шифрування цього пристрою
-settings-encryption-decrypting = Вимкнення шифрування пристрою
-settings-encryption-starting = Почнеться після наступного перезавантаження
-settings-encryption-failed = Не почалося під час останнього перезавантаження, ваші файли не змінено
-settings-encryption-waiting = Чекає, доки Luft завершить зміну розміру, тоді почнеться під час наступного перезавантаження
-settings-encryption-refused = Не змогло початися після зміни розміру Luft, ваші файли не змінено
-settings-encryption-off = Ваші файли залишаться приватними, якщо цей комп’ютер буде втрачено
-settings-encryption-progress = Виконано { $percent }
-settings-encryption-progress-seconds = Виконано { $percent }, залишилося менше хвилини
-settings-encryption-progress-minutes = { $minutes ->
-    [one] Виконано { $percent }, залишилася приблизно { $minutes } хвилина
-    [few] Виконано { $percent }, залишилося приблизно { $minutes } хвилини
-    [many] Виконано { $percent }, залишилося приблизно { $minutes } хвилин
-   *[other] Виконано { $percent }, залишилося приблизно { $minutes } хвилини
-}
-settings-encryption-progress-hours = { $hours ->
-    [one] Виконано { $percent }, залишилася приблизно { $hours } година
-    [few] Виконано { $percent }, залишилося приблизно { $hours } години
-    [many] Виконано { $percent }, залишилося приблизно { $hours } годин
-   *[other] Виконано { $percent }, залишилося приблизно { $hours } години
-}
 settings-encryption-unlocks-chip-pin = Розблоковується процесором безпеки й вашим PIN-кодом
 settings-encryption-unlocks-chip = Розблоковується автоматично процесором безпеки
 settings-encryption-unlocks-passphrase = Під час запуску запитує парольну фразу
@@ -210,38 +178,6 @@ settings-encryption-drives-auto-unlock = { $count ->
     [many] { $count } зашифрованих дисків розблоковуються разом із цим комп’ютером
    *[other] { $count } зашифрованого диска розблоковуються разом із цим комп’ютером
 }
-
-## Device encryption: turning it on
-
-settings-encryption-turn-on-title = Увімкнути шифрування пристрою
-settings-encryption-turn-on-description = Ваші файли залишаться приватними, якщо комп’ютер буде втрачено чи викрадено. Без правильного ключа ніхто не зможе прочитати диск.
-settings-encryption-blocked-title = Шифрування пристрою поки не можна ввімкнути
-settings-encryption-blocked-description = Розв’яжіть позначені нижче проблеми й спробуйте ще раз.
-settings-encryption-backup = Перш ніж почати, переконайтеся, що маєте резервні копії важливих файлів.
-settings-encryption-key-title = Збережіть ключ відновлення
-settings-encryption-key-description = Якщо диск колись не зможе розблокуватися сам, наприклад після ремонту, цей ключ поверне вам доступ. Зберігайте його будь-де, крім цього комп’ютера.
-settings-encryption-unlock-title = Розблокування під час запуску
-settings-encryption-unlock-description = Процесор безпеки сам розблоковує диск під час запуску, тож вхід у систему не зміниться.
-settings-encryption-passphrase-title = Виберіть парольну фразу
-settings-encryption-passphrase-description = Цей комп’ютер не може сам розблокувати диск, тому запитуватиме цю парольну фразу під час кожного запуску.
-settings-encryption-summary-title = Усе готово до шифрування
-settings-encryption-summary-description = Ось що буде далі.
-settings-encryption-step-restart = Комп’ютер перезавантажиться один раз.
-settings-encryption-step-screen = Під час запуску ненадовго з’явиться екран «Encrypting your device».
-settings-encryption-step-background = Решта відбуватиметься у фоновому режимі, поки ви працюєте.
-settings-encryption-step-plugged-in = Не від’єднуйте комп’ютер від живлення, доки все не завершиться.
-settings-encryption-ask-pin = Також запитувати PIN-код
-settings-encryption-ask-pin-description = Диск залишається заблокованим, навіть якщо хтось забере комп’ютер. PIN-код буде запитано, коли шифрування завершиться.
-settings-encryption-starting-button = Запуск…
-settings-encryption-restart-and-encrypt = Перезавантажити й зашифрувати
-
-## Device encryption: turning it off
-
-settings-encryption-turn-off-title = Вимкнути шифрування пристрою?
-settings-encryption-turn-off-description = Ваші файли буде розшифровано у фоновому режимі, поки ви працюєте. Після цього будь-хто, хто вийме диск, зможе його прочитати.
-settings-encryption-keep = Залишити шифрування
-settings-encryption-turning-off = Вимкнення…
-settings-encryption-turn-off = Вимкнути
 
 ## Device encryption: unlocking the disk
 
@@ -275,6 +211,7 @@ settings-encryption-unlock-disk-field = Ключ відновлення або �
 
 ## Device encryption: security chip and PIN
 
+settings-encryption-ask-pin = Також запитувати PIN-код
 settings-encryption-chip-setup-description = Процесор безпеки у вашому комп’ютері сам розблоковує диск під час запуску, тож вам більше не потрібно спершу вводити парольну фразу.
 settings-encryption-add-pin-title = Додайте PIN-код
 settings-encryption-add-pin-description = Ви вводитимете його під час кожного запуску комп’ютера. Без нього диск залишиться заблокованим, навіть якщо хтось забере весь комп’ютер.

@@ -52,18 +52,7 @@ settings-privacy-delete-after-hint = Колко време остават фай
 ## Security: summary at the top of the page
 
 settings-security-protected = Устройството ви е защитено
-settings-security-encrypting = Устройството ви се шифрова
-settings-security-encrypting-progress = { $progress }. Можете да продължите работа, докато приключи.
-settings-security-decrypting = Шифроването на устройството се изключва
-settings-security-restart-to-encrypt = Рестартирайте, за да започне шифроването
-settings-security-restart-to-encrypt-description = Шифроването започва при следващото рестартиране на компютъра.
-settings-security-encryption-failed = Шифроването не започна
-settings-security-encryption-failed-description = Luft стартира без него и файловете ви не са променени. Включете го отново, за да опитате пак.
-settings-security-encryption-refused-description = Luft приключи с промяната на размера си, но шифроването не можа да започне след това. Файловете ви не са променени. Включете го отново, за да опитате пак.
-settings-security-waiting-to-encrypt = Шифроването чака
-settings-security-waiting-to-encrypt-description = Luft все още променя размера си. Щом приключи, шифроването започва при следващото рестартиране.
 settings-security-could-be-safer = Устройството ви може да е по-защитено
-settings-security-could-be-safer-description = Включете шифроването на устройството, за да пазите файловете си поверителни.
 settings-security-starts-differently-description = Ако сте променили настройките на Secure Boot, потвърдете промяната, за да може дискът отново да се отключва сам.
 settings-security-needed-recovery-key = Дискът ви поиска ключа за възстановяване
 settings-security-needed-recovery-key-description = Свържете отново чипа за сигурност, за да се отключва сам.
@@ -158,23 +147,6 @@ settings-usb-hold-back-description = Включените, докато е за�
 ## Device encryption
 
 settings-encryption = Шифроване на устройството
-settings-encryption-encrypting = Устройството се шифрова
-settings-encryption-decrypting = Шифроването на устройството се изключва
-settings-encryption-starting = Започва при следващото рестартиране
-settings-encryption-failed = Не започна при последното рестартиране, файловете ви не са променени
-settings-encryption-waiting = Изчаква Luft да промени размера си, после започва при следващото рестартиране
-settings-encryption-refused = Не започна, след като Luft промени размера си, файловете ви не са променени
-settings-encryption-off = Пази файловете ви поверителни, ако компютърът бъде изгубен
-settings-encryption-progress = Готово: { $percent }
-settings-encryption-progress-seconds = Готово: { $percent }, остава по-малко от минута
-settings-encryption-progress-minutes = { $minutes ->
-    [one] Готово: { $percent }, остава около { $minutes } минута
-   *[other] Готово: { $percent }, остават около { $minutes } минути
-}
-settings-encryption-progress-hours = { $hours ->
-    [one] Готово: { $percent }, остава около { $hours } час
-   *[other] Готово: { $percent }, остават около { $hours } часа
-}
 settings-encryption-unlocks-chip-pin = Отключва се с чипа за сигурност и вашия ПИН
 settings-encryption-unlocks-chip = Отключва се сам с чипа за сигурност
 settings-encryption-unlocks-passphrase = Иска паролата за диска при стартиране
@@ -194,38 +166,6 @@ settings-encryption-drives-auto-unlock = { $count ->
     [one] { $count } шифрован диск се отключва с този компютър
    *[other] { $count } шифровани диска се отключват с този компютър
 }
-
-## Device encryption: turning it on
-
-settings-encryption-turn-on-title = Включване на шифроването на устройството
-settings-encryption-turn-on-description = Файловете ви остават поверителни, ако компютърът бъде изгубен или откраднат. Без правилния ключ никой не може да прочете диска.
-settings-encryption-blocked-title = Шифроването на устройството все още не може да се включи
-settings-encryption-blocked-description = Погрижете се за отбелязаното по-долу и опитайте отново.
-settings-encryption-backup = Преди да започнете, се уверете, че важните ви файлове имат резервно копие.
-settings-encryption-key-title = Запазете ключа за възстановяване
-settings-encryption-key-description = Ако дискът някога не може да се отключи сам, например след ремонт, този ключ ще ви върне достъпа. Пазете го на място извън този компютър.
-settings-encryption-unlock-title = Отключване при стартиране
-settings-encryption-unlock-description = Чипът за сигурност отключва диска сам при стартиране, така че входът остава същият.
-settings-encryption-passphrase-title = Изберете парола за диска
-settings-encryption-passphrase-description = Този компютър не може да отключи диска сам, затова ще иска тази парола при всяко стартиране.
-settings-encryption-summary-title = Готово за шифроване
-settings-encryption-summary-description = Ето какво следва.
-settings-encryption-step-restart = Компютърът се рестартира веднъж.
-settings-encryption-step-screen = При стартиране за кратко се появява екран с надпис „Encrypting your device“.
-settings-encryption-step-background = Останалото става във фонов режим, докато продължавате работа.
-settings-encryption-step-plugged-in = Дръжте компютъра включен в захранването, докато приключи.
-settings-encryption-ask-pin = Искане и на ПИН
-settings-encryption-ask-pin-description = Дискът остава заключен, дори ако някой вземе компютъра. ПИН се иска, след като шифроването приключи.
-settings-encryption-starting-button = Започване…
-settings-encryption-restart-and-encrypt = Рестартирай и шифровай
-
-## Device encryption: turning it off
-
-settings-encryption-turn-off-title = Да се изключи ли шифроването на устройството?
-settings-encryption-turn-off-description = Файловете ви се дешифроват във фонов режим, докато работите. След това всеки, който извади диска, може да го прочете.
-settings-encryption-keep = Запази шифроването
-settings-encryption-turning-off = Изключване…
-settings-encryption-turn-off = Изключи
 
 ## Device encryption: unlocking the disk
 
@@ -259,6 +199,7 @@ settings-encryption-unlock-disk-field = Ключ за възстановяван
 
 ## Device encryption: security chip and PIN
 
+settings-encryption-ask-pin = Искане и на ПИН
 settings-encryption-chip-setup-description = Чипът за сигурност в компютъра отключва диска сам при стартиране, така че вече не въвеждате парола за диска.
 settings-encryption-add-pin-title = Добавяне на ПИН
 settings-encryption-add-pin-description = Ще го въвеждате при всяко стартиране на компютъра. Без него дискът остава заключен, дори ако някой вземе целия компютър.

@@ -2,6 +2,7 @@ use anyhow::{Result, bail};
 use luft_i18n::t;
 use serde::Deserialize;
 
+use super::encryption::Encryption;
 use super::layout::{self, Part, Startup};
 use crate::L10N;
 use crate::install::Destination;
@@ -27,6 +28,7 @@ pub struct Request {
     pub variant: String,
     #[serde(default)]
     pub windows: Choices,
+    pub encryption: Option<Encryption>,
 }
 
 pub struct Shrink {

@@ -1,6 +1,5 @@
 import { t } from '@luft/i18n';
 import type { Trust } from './api';
-import { progressLine } from './encryption/describe';
 
 export interface Summary {
 	headline: string;
@@ -9,22 +8,8 @@ export interface Summary {
 }
 
 export function summarize({ disk, secureBoot }: Trust, firmwareUpdates: number): Summary | null {
-	switch (disk.state) {
-		case 'encrypting':
-			return { headline: t('settings-security-encrypting'), sentence: t('settings-security-encrypting-progress', { progress: progressLine(disk) }), safe: true };
-		case 'decrypting':
-			return { headline: t('settings-security-decrypting'), sentence: t('settings-security-encrypting-progress', { progress: progressLine(disk) }), safe: false };
-		case 'waiting':
-			return { headline: t('settings-security-waiting-to-encrypt'), sentence: t('settings-security-waiting-to-encrypt-description'), safe: false };
-		case 'starting':
-			return { headline: t('settings-security-restart-to-encrypt'), sentence: t('settings-security-restart-to-encrypt-description'), safe: false };
-		case 'failed':
-			return { headline: t('settings-security-encryption-failed'), sentence: t('settings-security-encryption-failed-description'), safe: false };
-		case 'refused':
-			return { headline: t('settings-security-encryption-failed'), sentence: t('settings-security-encryption-refused-description'), safe: false };
-		case 'off':
-			return disk.device ? { headline: t('settings-security-could-be-safer'), sentence: t('settings-security-could-be-safer-description'), safe: false } : null;
-	}
+	if (!disk.device) return null;
+	if (!disk.encrypted) return { headline: t('settings-security-could-be-safer'), sentence: t('settings-security-not-encrypted-description'), safe: false };
 	if (disk.secureBootChanged)
 		return { headline: t('settings-encryption-starts-differently'), sentence: t('settings-security-starts-differently-description'), safe: false };
 	if (disk.tpmRefused) return { headline: t('settings-security-needed-recovery-key'), sentence: t('settings-security-needed-recovery-key-description'), safe: false };

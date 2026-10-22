@@ -52,18 +52,7 @@ settings-privacy-delete-after-hint = Durée de conservation des fichiers avant l
 ## Security: summary at the top of the page
 
 settings-security-protected = Votre appareil est protégé
-settings-security-encrypting = Chiffrement de votre appareil
-settings-security-encrypting-progress = { $progress }. Vous pouvez continuer à travailler pendant ce temps.
-settings-security-decrypting = Désactivation du chiffrement de l’appareil
-settings-security-restart-to-encrypt = Redémarrer pour lancer le chiffrement
-settings-security-restart-to-encrypt-description = Le chiffrement commencera au prochain redémarrage de cet ordinateur.
-settings-security-encryption-failed = Le chiffrement n’a pas démarré
-settings-security-encryption-failed-description = Luft a démarré sans le chiffrement et vos fichiers n’ont pas été modifiés. Activez-le de nouveau pour réessayer.
-settings-security-encryption-refused-description = Luft a fini de changer de taille, mais le chiffrement n’a pas pu démarrer ensuite. Vos fichiers n’ont pas été modifiés. Activez-le de nouveau pour réessayer.
-settings-security-waiting-to-encrypt = Le chiffrement est en attente
-settings-security-waiting-to-encrypt-description = Luft change encore de taille. Une fois terminé, le chiffrement commencera au prochain redémarrage.
 settings-security-could-be-safer = Votre appareil pourrait être mieux protégé
-settings-security-could-be-safer-description = Activez le chiffrement de l’appareil pour protéger vos fichiers.
 settings-security-starts-differently-description = Si vous avez modifié ses paramètres Secure Boot, confirmez-le pour que le disque se déverrouille de nouveau tout seul.
 settings-security-needed-recovery-key = Votre disque a demandé sa clé de récupération
 settings-security-needed-recovery-key-description = Associez de nouveau la puce de sécurité pour qu’il se déverrouille tout seul.
@@ -158,23 +147,6 @@ settings-usb-hold-back-description = Ceux branchés pendant le verrouillage atte
 ## Device encryption
 
 settings-encryption = Chiffrement de l’appareil
-settings-encryption-encrypting = Chiffrement de cet appareil
-settings-encryption-decrypting = Désactivation du chiffrement de l’appareil
-settings-encryption-starting = Commencera au prochain redémarrage
-settings-encryption-failed = N’a pas démarré au dernier redémarrage, vos fichiers n’ont pas été modifiés
-settings-encryption-waiting = Attend que Luft ait fini de changer de taille, puis commencera au prochain redémarrage
-settings-encryption-refused = N’a pas pu démarrer après le changement de taille de Luft, vos fichiers n’ont pas été modifiés
-settings-encryption-off = Protège vos fichiers si cet ordinateur est perdu
-settings-encryption-progress = Terminé à { $percent }
-settings-encryption-progress-seconds = Terminé à { $percent }, moins d’une minute restante
-settings-encryption-progress-minutes = { $minutes ->
-    [one] Terminé à { $percent }, encore environ { $minutes } minute
-   *[other] Terminé à { $percent }, encore environ { $minutes } minutes
-}
-settings-encryption-progress-hours = { $hours ->
-    [one] Terminé à { $percent }, encore environ { $hours } heure
-   *[other] Terminé à { $percent }, encore environ { $hours } heures
-}
 settings-encryption-unlocks-chip-pin = Se déverrouille avec la puce de sécurité et votre code PIN
 settings-encryption-unlocks-chip = Se déverrouille tout seul avec la puce de sécurité
 settings-encryption-unlocks-passphrase = Demande votre phrase secrète au démarrage
@@ -194,38 +166,6 @@ settings-encryption-drives-auto-unlock = { $count ->
     [one] { $count } lecteur chiffré se déverrouille avec cet ordinateur
    *[other] { $count } lecteurs chiffrés se déverrouillent avec cet ordinateur
 }
-
-## Device encryption: turning it on
-
-settings-encryption-turn-on-title = Activer le chiffrement de l’appareil
-settings-encryption-turn-on-description = Vos fichiers restent privés si cet ordinateur est perdu ou volé. Sans la bonne clé, personne ne peut lire le disque.
-settings-encryption-blocked-title = Le chiffrement de l’appareil ne peut pas encore être activé
-settings-encryption-blocked-description = Réglez les points signalés ci-dessous, puis réessayez.
-settings-encryption-backup = Avant de commencer, assurez-vous que vos fichiers importants sont sauvegardés.
-settings-encryption-key-title = Enregistrez votre clé de récupération
-settings-encryption-key-description = Si le disque ne peut plus se déverrouiller tout seul, par exemple après une réparation, cette clé vous permet d’y accéder. Conservez-la ailleurs que sur cet ordinateur.
-settings-encryption-unlock-title = Déverrouillage au démarrage
-settings-encryption-unlock-description = La puce de sécurité déverrouille le disque toute seule au démarrage, la connexion ne change donc pas.
-settings-encryption-passphrase-title = Choisissez une phrase secrète
-settings-encryption-passphrase-description = Cet ordinateur ne peut pas déverrouiller le disque tout seul : il demandera cette phrase secrète à chaque démarrage.
-settings-encryption-summary-title = Prêt pour le chiffrement
-settings-encryption-summary-description = Voici la suite des opérations.
-settings-encryption-step-restart = Votre ordinateur redémarre une fois.
-settings-encryption-step-screen = Pendant le démarrage, un bref écran « Encrypting your device » s’affiche.
-settings-encryption-step-background = Le reste se fait en arrière-plan pendant que vous continuez à travailler.
-settings-encryption-step-plugged-in = Laissez l’ordinateur branché jusqu’à la fin.
-settings-encryption-ask-pin = Demander aussi un code PIN
-settings-encryption-ask-pin-description = Le disque reste verrouillé même si quelqu’un prend l’ordinateur. Le code sera demandé une fois le chiffrement terminé.
-settings-encryption-starting-button = Démarrage…
-settings-encryption-restart-and-encrypt = Redémarrer et chiffrer
-
-## Device encryption: turning it off
-
-settings-encryption-turn-off-title = Désactiver le chiffrement de l’appareil ?
-settings-encryption-turn-off-description = Vos fichiers sont déchiffrés en arrière-plan pendant que vous travaillez. Ensuite, toute personne qui retire le disque pourra le lire.
-settings-encryption-keep = Garder le chiffrement
-settings-encryption-turning-off = Désactivation…
-settings-encryption-turn-off = Désactiver
 
 ## Device encryption: unlocking the disk
 
@@ -259,6 +199,7 @@ settings-encryption-unlock-disk-field = Clé de récupération ou phrase secrèt
 
 ## Device encryption: security chip and PIN
 
+settings-encryption-ask-pin = Demander aussi un code PIN
 settings-encryption-chip-setup-description = La puce de sécurité de votre ordinateur déverrouille le disque toute seule au démarrage, vous n’avez donc plus à taper de phrase secrète.
 settings-encryption-add-pin-title = Ajouter un code PIN
 settings-encryption-add-pin-description = Vous le taperez à chaque démarrage de l’ordinateur. Sans lui, le disque reste verrouillé, même si quelqu’un emporte tout l’ordinateur.

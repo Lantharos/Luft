@@ -243,18 +243,12 @@ setup-secure-boot-new-code = Hae uusi koodi
 setup-protect-title = Suojaa tiedostosi
 setup-protect-tpm = Salaa tämä tietokone, jotta kukaan ei voi lukea tiedostojasi kirjautumatta sisään, vaikka tietokone katoaisi. Lukitus avautuu itsestään käynnistettäessä.
 setup-protect-passphrase = Salaa tämä tietokone, jotta kukaan ei voi lukea tiedostojasi ilman tunnuslausettasi, vaikka tietokone katoaisi.
-setup-protect-staged-title = Tiedostosi salataan
-setup-protect-staged-description = Salaus alkaa itsestään käyttöönoton lopuksi tehtävän uudelleenkäynnistyksen jälkeen, ja voit käyttää tietokonetta sen aikana.
-setup-protect-waiting-description = Luft muuttaa vielä kokoaan. Kun se on valmis, salaus alkaa seuraavassa uudelleenkäynnistyksessä, ja voit käyttää tietokonetta sillä välin.
 setup-protect-keep-safe = Säilytä tämä palautusavain turvallisessa paikassa erillään tästä tietokoneesta. Tarvitset sitä, jos tietokone ei joskus pysty avaamaan lukitusta itse.
 setup-protect-passphrase-label = Tunnuslause
 setup-protect-repeat = Kirjoita se uudelleen
 setup-protect-mismatch = Ne eivät täsmää
 setup-protect-kept = Olen tallentanut palautusavaimeni
-setup-protect-background = Salaus tapahtuu taustalla seuraavan uudelleenkäynnistyksen jälkeen, ja voit käyttää tietokonetta sillä välin.
 setup-protect-encrypt = Salaa
-setup-protect-checking = Tarkistetaan…
-setup-protect-start = Salaa tiedostoni
 
 ## Fingerprint
 
@@ -271,6 +265,5 @@ setup-fingerprint-choose-another = Valitse toinen sormi
 
 setup-ready-title = Kaikki on valmista
 setup-ready-trust = Viimeistele käynnistämällä tietokone vielä kerran uudelleen. Heti sen jälkeen sininen näyttö pyytää luottamaan Luftiin. Kirjoita siinä tämä koodi näppäimistöllä.
-setup-ready-restart = Viimeistele käynnistämällä tietokone vielä kerran uudelleen ja kirjaudu sitten sisään salasanallasi.
 setup-ready-done = Työpöytäsi on valmis. Mukavia hetkiä Luftin parissa.
 setup-ready-start = Aloita Luftin käyttö

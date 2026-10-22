@@ -16,7 +16,7 @@ impl Scratch {
         getrandom::fill(&mut name)?;
         let name: String = name.iter().map(|byte| format!("{byte:02x}")).collect();
         let directory = Path::new(RUNTIME).join(format!("scratch-{name}"));
-        paths::ensure_private(&directory.to_string_lossy())?;
+        paths::ensure_private(&directory)?;
         Ok(Self { directory })
     }
 

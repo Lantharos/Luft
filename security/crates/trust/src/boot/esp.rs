@@ -35,10 +35,6 @@ fn describe(path: &Path, name: String) -> Result<Esp> {
     })
 }
 
-pub fn needed_at_startup(name: &str) -> bool {
-    blocks::partition_type(name).is_some_and(|kind| kind == ESP_TYPE || kind == XBOOTLDR_TYPE)
-}
-
 pub fn on_disk(disk: &str, kind: &str) -> Option<String> {
     blocks::partitions_of(disk)
         .into_iter()
@@ -80,7 +76,7 @@ pub fn find() -> Result<Esp> {
         Some(path) => path,
         None => {
             let path = Path::new(paths::RUNTIME).join(PRIVATE_MOUNT);
-            paths::ensure_private(&path.to_string_lossy())?;
+            paths::ensure_private(&path)?;
             blocks::mount_boot_partition(&blocks::device(&name), &path, false)?;
             path
         }

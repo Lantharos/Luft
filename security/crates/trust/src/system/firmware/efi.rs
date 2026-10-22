@@ -7,7 +7,6 @@ const SHIM: &str = "605dab50-e046-4300-abb6-3dd810dd8b23";
 const STUB: &str = "4a67b082-0a4c-41cf-b6c7-440b29bb8c4f";
 const LUFT: &str = "b6a4c1e2-3f5d-4c8a-9e71-2d0f6a8b5c3e";
 const IMAGE_SECURITY: &str = "d719b2cb-3d3a-4596-a3bc-dad00e67656f";
-const DISK_CHANGE: &str = "LuftDiskChange";
 const NON_VOLATILE_BOOT_RUNTIME: u32 = 0x7;
 const X509: [u8; 16] = [
     0xa1, 0x59, 0xc0, 0xa5, 0xe4, 0x94, 0xa7, 0x4a, 0x87, 0xb5, 0xab, 0x15, 0x5c, 0x2b, 0xf0, 0x72,
@@ -115,10 +114,6 @@ pub fn set_luft_variable(name: &str, data: Option<&[u8]>) -> std::io::Result<()>
     let mut contents = NON_VOLATILE_BOOT_RUNTIME.to_le_bytes().to_vec();
     contents.extend_from_slice(data);
     std::fs::write(path, contents)
-}
-
-pub fn announce_disk_change(pending: bool) -> std::io::Result<()> {
-    set_luft_variable(DISK_CHANGE, pending.then_some(&[1]))
 }
 
 pub fn requested_certificates() -> Vec<Vec<u8>> {

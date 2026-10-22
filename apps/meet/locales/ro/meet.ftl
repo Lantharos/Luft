@@ -19,7 +19,6 @@ meet-logs-show = Afișează
 meet-logs-none = Nu există încă jurnale din sesiunea de încercare Luft
 meet-logs-failed = Meet Luft nu a putut salva jurnalele din sesiunea de încercare Luft
 
-
 problem-check = { $platform ->
     [linux] Meet Luft nu a putut termina verificarea acestui computer.
    *[windows] Meet Luft nu a putut termina verificarea acestui PC.
@@ -46,7 +45,6 @@ problem-declined = { $platform ->
    *[windows] Meet Luft are nevoie de permisiune pentru a lucra pe unitate. Alegeți Da când Windows întreabă.
 }
 
-
 hello-intro = { $platform ->
     [linux] Încercați Luft chiar de aici, fără stick USB. Dacă vă place, Luft poate lua locul acestui sistem și vă păstrează fișierele.
    *[windows] Luft poate sta chiar lângă Windows. Încercați-l mai întâi fără să instalați nimic și aduceți-vă lucrurile când sunteți gata.
@@ -55,7 +53,6 @@ hello-check = { $platform ->
     [linux] Verifică acest computer
    *[windows] Verifică acest PC
 }
-
 
 check-looking-title = { $platform ->
     [linux] Se verifică acest computer
@@ -82,7 +79,6 @@ check-get-ready-title = Pregătiți Luft?
 check-get-ready-file = Meet Luft copiază Luft din imaginea ISO într-un folder de pe acest computer și adaugă o intrare de pornire pentru el. Partițiile nu se modifică.
 check-get-ready-download = Meet Luft descarcă Luft, aproximativ { $size }, într-un folder de pe acest computer și adaugă o intrare de pornire pentru el. Partițiile nu se modifică.
 check-get-ready-confirm = Pregătește-l
-
 
 room-title = Cât spațiu pentru Luft?
 room-description = Windows se micșorează pentru a face loc sistemului Luft. Fișierele din Windows rămân exact unde sunt.
@@ -121,7 +117,6 @@ room-erase-bitlocker = Criptată cu BitLocker
 room-erase-understood = Știu că o parte este criptată cu BitLocker și nu mai poate fi recuperată
 room-erase-confirm = Șterge și fă loc
 
-
 ready-title = Luft este pregătit
 ready-description = Alegeți cum vreți să faceți cunoștință cu el. Apoi Windows pornește ca de obicei, dacă nu instalați Luft și nu îl alegeți.
 ready-update-title = Obține cel mai nou Luft
@@ -143,7 +138,6 @@ ready-clock-title = Ora corectă în ambele sisteme
 ready-clock-description = Windows citește ceasul computerului la fel ca Luft, așa că ora nu mai sare când treceți de la un sistem la altul.
 ready-remove-title = Eliminați Luft de pe acest PC?
 ready-remove-description = Meet Luft șterge tot ce a adăugat, inclusiv cutia de mutare, și îi redă sistemului Windows tot spațiul.
-
 
 linux-ready-description = Alegeți cum vreți să faceți cunoștință cu el. { $system } pornește în continuare ca de obicei până decideți altfel.
 linux-ready-this-system = acest sistem
@@ -170,7 +164,6 @@ luft-bar-used = { $size }, { $used } ocupați
 luft-resize-title = Modifică spațiul sistemului Luft
 luft-resize-description = Oferiți sistemului Luft mai mult din spațiul Windows sau redați o parte sistemului Windows.
 luft-resize-drive-description = Oferiți sistemului Luft mai mult din spațiul liber de pe { $drive } sau lăsați o parte din el liberă.
-luft-resize-reencrypting = Luft încă își criptează sau își decriptează unitatea. După ce termină, i se poate modifica dimensiunea.
 luft-resize-passphrase = Unitatea sistemului Luft se deschide doar cu o frază de acces, iar Luft nu o poate introduce singur cât timp se mută.
 luft-resize-start-first = Porniți Luft o dată, ca să-i poată spune aplicației Meet Luft cât de plin este, apoi reveniți.
 luft-resize-apart = Între Windows și Luft se află altă partiție, așa că nu își pot împărți spațiul.
@@ -214,7 +207,6 @@ resize-trim-description = Luft se micșorează la următoarea pornire, iar spaț
 resize-shrink-title = Redați { $size } sistemului Windows?
 resize-shrink-description = Luft își mută fișierele la următoarea pornire, ceea ce durează câteva minute. Apoi deschideți din nou Meet Luft, iar Windows preia înapoi spațiul. Țineți PC-ul conectat la priză.
 
-
 box-title = Aduceți-vă lucrurile
 box-description = Alegeți ce să luați. Luft le despachetează în noul cont după instalare și nu se elimină nimic din Windows.
 box-looking = Se parcurg folderele…
@@ -247,7 +239,6 @@ box-total-slow = { $size }, se împachetează în aproximativ { $minutes ->
 }
 box-pack = Împachetează
 
-
 working-shrinking = Se face loc
     .description = Windows își mută fișierele pentru a face spațiu. Poate dura câteva minute.
 working-erasing = Se șterge unitatea
@@ -273,13 +264,11 @@ working-stick-downloading = Se descarcă Luft
 working-progress = { $done } din { $total }
 working-keep-open = Țineți această fereastră deschisă.
 
-
 removed-title = Totul e ca înainte
 removed-description = { $platform ->
     [linux] Fișierele sistemului Luft și intrarea lui de pornire au dispărut, iar computerul pornește exact ca înainte. Reveniți oricând.
    *[windows] Partițiile sistemului Luft și intrarea lui de pornire au dispărut, iar Windows are din nou tot spațiul. Reveniți oricând.
 }
-
 
 stick-title = Creați un stick USB
 stick-description = Luft pornește de pe el pe orice computer, pentru încercare sau instalare.

@@ -8,10 +8,8 @@ use clap::{Parser, Subcommand};
 
 use crate::boot::{attempts, startup};
 use crate::disk;
-use crate::disk::unlock::keys;
 use crate::keys::{mok, others};
-use crate::service::{self, actions, status};
-use crate::system::firmware::tpm;
+use crate::service::{actions, status};
 use crate::system::secrets::secret::Secret;
 
 #[derive(Parser)]
@@ -49,7 +47,7 @@ enum Command {
         #[command(subcommand)]
         action: RecoveryAction,
     },
-    /// Encrypting or decrypting the system disk
+    /// Encrypting the system disk while Luft is installed
     Encryption {
         #[command(subcommand)]
         action: EncryptionAction,
@@ -104,44 +102,29 @@ enum RecoveryAction {
 
 #[derive(Subcommand)]
 enum EncryptionAction {
-    /// Check whether this computer can be encrypted, without changing anything
-    Check,
-    On,
-    Off,
-    /// The step that runs at startup before the system disk is mounted
-    Initrd,
+    /// Encrypt an empty partition with the recovery key and passphrase given on stdin, one per line, and open it
+    Format { partition: PathBuf },
+    /// Let the TPM unlock the partition once Luft is installed, with the recovery key on stdin, keeping trustd's state in STATE
+    Seal {
+        partition: PathBuf,
+        #[arg(long)]
+        state: PathBuf,
+    },
     /// Copy the system disk's encryption onto a partition and open it there, to move the system onto it
-    CopyTo {
-        device: PathBuf,
-    },
+    CopyTo { device: PathBuf },
     /// Close a partition the system moved off and wipe its encryption
-    Retire {
-        device: PathBuf,
-    },
+    Retire { device: PathBuf },
     /// Give a partition the system moved onto the system disk's own LUKS UUID
-    Settle {
-        device: PathBuf,
-        uuid: String,
-    },
+    Settle { device: PathBuf, uuid: String },
     /// Fit the open encryption on a partition to the partition, or to SIZE bytes of it
-    Fit {
-        device: PathBuf,
-        size: Option<u64>,
-    },
+    Fit { device: PathBuf, size: Option<u64> },
     /// The step at startup that opens both partitions while the system moves
     InitrdMove,
 }
 
 impl Command {
     fn changes_the_system(&self) -> bool {
-        !matches!(
-            self,
-            Command::Status
-                | Command::AntiCheat
-                | Command::Encryption {
-                    action: EncryptionAction::Check
-                }
-        )
+        !matches!(self, Command::Status | Command::AntiCheat)
     }
 }
 
@@ -243,45 +226,15 @@ fn recovery_key(action: RecoveryAction) -> Result<()> {
 
 fn encryption(action: EncryptionAction) -> Result<()> {
     match action {
-        EncryptionAction::Check => {
-            let checks = disk::check();
-            report::checks(&checks);
-            if checks.iter().any(|check| !check.passed) {
-                bail!("This computer can't be encrypted yet.");
-            }
+        EncryptionAction::Format { partition } => {
+            let given = ask::piped(2)?;
+            let opened = disk::encryption::format(&partition, &given[0], &given[1])?;
+            println!("{}", opened.display());
             Ok(())
         }
-        EncryptionAction::On => {
-            let key = keys::generate_recovery_key()?;
-            report::recovery_key(&key);
-            ask::confirm(
-                "Type yes once you've saved the recovery key somewhere other than this computer",
-            )?;
-            let (pin, passphrase) = if tpm::detect().usable {
-                (
-                    if ask::yes("Ask for a PIN at startup?")? {
-                        ask::new_pin()?
-                    } else {
-                        Secret::default()
-                    },
-                    Secret::default(),
-                )
-            } else {
-                (Secret::default(), ask::new_passphrase()?)
-            };
-            if disk::turn_on(&key, &pin, &passphrase)? == disk::TurnedOn::AfterDiskChanges {
-                println!("Luft is still changing its size. Encryption waits until that's done.");
-                disk::finish_waiting()?;
-            }
-            println!("Restart to start encrypting. The rest happens in the background afterwards.");
-            Ok(())
+        EncryptionAction::Seal { partition, state } => {
+            disk::encryption::seal(&partition, &ask::piped(1)?[0], &state)
         }
-        EncryptionAction::Off => {
-            ask_trustd_to_decrypt(&ask::unlock_key()?)?;
-            println!("Decrypting in the background. You can keep using the computer.");
-            Ok(())
-        }
-        EncryptionAction::Initrd => disk::run_in_initrd(),
         EncryptionAction::CopyTo { device } => {
             println!("{}", disk::layout::moving::copy_to(&device)?.display());
             Ok(())
@@ -291,23 +244,4 @@ fn encryption(action: EncryptionAction) -> Result<()> {
         EncryptionAction::Fit { device, size } => disk::layout::moving::fit(&device, size),
         EncryptionAction::InitrdMove => disk::layout::moving::open_in_initrd(),
     }
-}
-
-fn ask_trustd_to_decrypt(unlock: &Secret) -> Result<()> {
-    tokio::runtime::Builder::new_current_thread()
-        .enable_all()
-        .build()?
-        .block_on(async {
-            zbus::Connection::system()
-                .await?
-                .call_method(
-                    Some(service::NAME),
-                    service::PATH,
-                    Some(service::NAME),
-                    "TurnOffEncryption",
-                    &(unlock.text()),
-                )
-                .await
-        })?;
-    Ok(())
 }

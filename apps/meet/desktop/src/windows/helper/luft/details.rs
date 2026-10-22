@@ -14,7 +14,6 @@ use crate::windows::helper::drive::windows_drive;
 #[serde(rename_all = "camelCase")]
 pub enum Blocked {
     Busy,
-    Reencrypting,
     Passphrase,
     Apart,
     Unreadable,
@@ -138,8 +137,6 @@ impl Survey {
         let encryption = self.luft.encryption;
         if pending.is_some() {
             Some(Blocked::Busy)
-        } else if encryption.is_some_and(|encryption| encryption.reencrypting) {
-            Some(Blocked::Reencrypting)
         } else if encryption.is_some_and(|encryption| !encryption.tpm) {
             Some(Blocked::Passphrase)
         } else if self.beside_windows() && self.gap().is_none() {

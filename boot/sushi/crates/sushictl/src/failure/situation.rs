@@ -182,7 +182,7 @@ fn reason(
     {
         Some(Reason::Damaged)
     } else if failed(|name| {
-        name.starts_with("systemd-cryptsetup@") || name == "trustd-encrypt.service"
+        name.starts_with("systemd-cryptsetup@") || name == "trustd-move.service"
     }) {
         Some(Reason::Locked)
     } else if timed_out {

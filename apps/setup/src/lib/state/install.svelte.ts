@@ -1,5 +1,5 @@
 import * as installer from '#lib/bridge/installer.js';
-import type { Drive, InstallerState, Intent, LinuxSystem, Survey, Target, WindowsChoices } from '#lib/bridge/installer.js';
+import type { Drive, Encryption, InstallerState, Intent, LinuxSystem, Survey, Target, WindowsChoices } from '#lib/bridge/installer.js';
 import { NO_HARDWARE, type Hardware } from '#lib/bridge/system.js';
 import { regional } from './regional.svelte.js';
 
@@ -15,6 +15,7 @@ class InstallState {
 	user = $state('');
 	intent = $state<Intent | null>(null);
 	replacing = $state<LinuxSystem | null>(null);
+	target = $state<Target | null>(null);
 	windowsChoices = $state<WindowsChoices>({ fastStartupOff: true, universalClock: true, bluetooth: true });
 	private hardware = NO_HARDWARE;
 
@@ -51,11 +52,11 @@ class InstallState {
 		}
 	}
 
-	async install(target: Target) {
+	async install(target: Target, encryption: Encryption | null) {
 		this.starting = true;
 		this.startError = '';
 		try {
-			await installer.install(target, this.hardware.nvidia ? 'nvidia' : 'default', $state.snapshot(this.windowsChoices));
+			await installer.install(target, this.hardware.nvidia ? 'nvidia' : 'default', $state.snapshot(this.windowsChoices), encryption);
 			this.replacing = target.kind === 'replace' ? (this.systems.find((system) => system.id === target.system) ?? null) : null;
 			this.status = await installer.state();
 			await this.configure();
@@ -82,6 +83,10 @@ class InstallState {
 		this.user = name;
 		await this.configure();
 		await installer.createAccount(name, fullName, password);
+	}
+
+	encryptable(target: Target) {
+		return target.kind !== 'replace' || !this.systems.find((system) => system.id === target.system)?.keepsOld;
 	}
 
 	drive(block: string): Drive | null {

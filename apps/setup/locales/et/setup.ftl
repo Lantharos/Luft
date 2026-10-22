@@ -243,18 +243,12 @@ setup-secure-boot-new-code = Hangi uus kood
 setup-protect-title = Kaitske oma faile
 setup-protect-tpm = Krüptige see arvuti, et keegi ei saaks teie faile ilma sisselogimiseta lugeda, isegi kui arvuti kaob. Käivitamisel avaneb see iseenesest.
 setup-protect-passphrase = Krüptige see arvuti, et keegi ei saaks teie faile ilma teie paroolifraasita lugeda, isegi kui arvuti kaob.
-setup-protect-staged-title = Teie failid krüptitakse
-setup-protect-staged-description = Krüptimine algab iseenesest pärast seadistamise lõpus toimuvat taaskäivitust ja arvutit saab selle ajal edasi kasutada.
-setup-protect-waiting-description = Luft muudab veel oma suurust. Kui see on tehtud, algab krüptimine järgmisel taaskäivitusel ja saate seni arvutit edasi kasutada.
 setup-protect-keep-safe = Hoidke see taastevõti turvalises kohas, sellest arvutist eraldi. Seda on vaja, kui arvuti ei peaks kunagi suutma iseenesest avaneda.
 setup-protect-passphrase-label = Paroolifraas
 setup-protect-repeat = Tippige uuesti
 setup-protect-mismatch = Need ei ühti
 setup-protect-kept = Olen taastevõtme talletanud
-setup-protect-background = Krüptimine toimub taustal pärast järgmist taaskäivitust ja arvutit saab selle ajal edasi kasutada.
 setup-protect-encrypt = Krüpti
-setup-protect-checking = Kontrollimine…
-setup-protect-start = Krüpti minu failid
 
 ## Fingerprint
 
@@ -271,6 +265,5 @@ setup-fingerprint-choose-another = Vali teine sõrm
 
 setup-ready-title = Kõik on valmis
 setup-ready-trust = Lõpetamiseks taaskäivitage veel kord. Kohe pärast taaskäivitust küsib sinine ekraan, kas Lufti usaldada. Kasutage seal klaviatuuri ja sisestage see kood.
-setup-ready-restart = Lõpetamiseks taaskäivitage veel kord ja logige siis parooliga sisse.
 setup-ready-done = Teie töölaud on valmis. Meeldivat Lufti kasutamist.
 setup-ready-start = Alusta Lufti kasutamist

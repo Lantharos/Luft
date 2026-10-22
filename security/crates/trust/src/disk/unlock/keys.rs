@@ -9,18 +9,13 @@ use crate::paths;
 use crate::system::firmware::{efi, tpm};
 use crate::system::host::command::Tool;
 use crate::system::secrets::creds::{self, Protection};
-use crate::system::secrets::passbox;
 use crate::system::secrets::scratch::Scratch;
 use crate::system::secrets::secret::Secret;
 
 const MODHEX: &[u8; 16] = b"cbdefghijklnrtuv";
 const ESCROW: &str = "recovery-key.cred";
 const ESCROW_NAME: &str = "trustd.recovery-key";
-const PIN: &str = "pin.cred";
-const PIN_NAME: &str = "trustd.pin";
-const PASSPHRASE: &str = "passphrase.box";
 const NEW_PIN_CREDENTIAL: &str = "cryptenroll.new-tpm2-pin";
-pub const HANDED_OVER: &str = "disk-key";
 
 pub fn generate_recovery_key() -> Result<Secret> {
     let mut bytes = [0u8; 32];
@@ -66,9 +61,13 @@ pub fn is_recovery_key(key: &Secret) -> bool {
             .all(|byte| *byte == b'-' || MODHEX.contains(byte))
 }
 
+pub fn escrow_in(state: &Path, key: &Secret) -> Result<()> {
+    paths::ensure_private(state)?;
+    creds::seal(ESCROW_NAME, key, Protection::Tpm, &state.join(ESCROW))
+}
+
 pub fn escrow(key: &Secret) -> Result<()> {
-    paths::ensure_private(paths::STATE)?;
-    creds::seal(ESCROW_NAME, key, Protection::Tpm, &paths::state(ESCROW))
+    escrow_in(Path::new(paths::STATE), key)
 }
 
 pub fn escrowed() -> Option<Secret> {
@@ -77,10 +76,6 @@ pub fn escrowed() -> Option<Secret> {
 
 pub fn has_escrow() -> bool {
     paths::state(ESCROW).exists()
-}
-
-pub fn forget_escrow() {
-    let _ = std::fs::remove_file(paths::state(ESCROW));
 }
 
 pub fn opens(device: &Path, header: Option<&Path>, key: &Secret) -> bool {
@@ -175,9 +170,6 @@ pub fn enroll_tpm(
     pin: &Secret,
     secure_boot_pcr: &str,
 ) -> Result<()> {
-    if let Some(reason) = tpm_unavailable_reason() {
-        bail!(Unsupported(reason));
-    }
     let credentials = Scratch::empty()?;
     if !pin.is_empty() {
         credentials.write(NEW_PIN_CREDENTIAL, pin)?;
@@ -208,38 +200,4 @@ pub fn check_pin(pin: &Secret) -> Result<()> {
         bail!(Unsupported("A PIN is 6 to 20 digits.".to_owned()));
     }
     Ok(())
-}
-
-pub fn keep_pin_for_later(pin: &Secret) -> Result<()> {
-    paths::ensure_private(paths::STATE)?;
-    creds::seal(PIN_NAME, pin, Protection::Tpm, &paths::state(PIN))
-}
-
-pub fn pin_kept_for_later() -> Secret {
-    creds::unseal(PIN_NAME, &paths::state(PIN)).unwrap_or_default()
-}
-
-pub fn forget_kept_pin() {
-    let _ = std::fs::remove_file(paths::state(PIN));
-}
-
-pub fn keep_passphrase_for_later(passphrase: &Secret, recovery: &Secret) -> Result<()> {
-    paths::ensure_private(paths::STATE)?;
-    paths::write_private(
-        &paths::state(PASSPHRASE),
-        &passbox::close(passphrase, recovery, &[])?,
-    )?;
-    Ok(())
-}
-
-pub fn passphrase_kept_for_later(recovery: &Secret) -> Option<Secret> {
-    passbox::open(
-        &std::fs::read(paths::state(PASSPHRASE)).ok()?,
-        recovery,
-        &[],
-    )
-}
-
-pub fn forget_kept_passphrase() {
-    let _ = std::fs::remove_file(paths::state(PASSPHRASE));
 }

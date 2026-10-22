@@ -28,21 +28,6 @@ fn line(prompt: &str, hidden: bool) -> Result<Secret> {
     Ok(secret)
 }
 
-pub fn yes(question: &str) -> Result<bool> {
-    let answer = line(&format!("{question} [y/N]"), false)?;
-    Ok(matches!(
-        answer.text().to_ascii_lowercase().as_str(),
-        "y" | "yes"
-    ))
-}
-
-pub fn confirm(question: &str) -> Result<()> {
-    if line(question, false)?.text() != "yes" {
-        bail!("Nothing was changed.");
-    }
-    Ok(())
-}
-
 pub fn unlock_key() -> Result<Secret> {
     let prompt = if keys::has_escrow() {
         "Recovery key or passphrase (leave empty to use the stored recovery key)"
@@ -66,9 +51,14 @@ pub fn new_pin() -> Result<Secret> {
     Ok(pin)
 }
 
-pub fn new_passphrase() -> Result<Secret> {
-    println!(
-        "This computer has no TPM to unlock the disk, so it will ask for a passphrase at every startup."
-    );
-    twice("New passphrase")
+pub fn piped(count: usize) -> Result<Vec<Secret>> {
+    let mut given = Vec::with_capacity(count);
+    let mut line = String::new();
+    for _ in 0..count {
+        line.clear();
+        std::io::stdin().lock().read_line(&mut line)?;
+        given.push(Secret::from(line.trim_end_matches(['\n', '\r'])));
+    }
+    line.clear();
+    Ok(given)
 }

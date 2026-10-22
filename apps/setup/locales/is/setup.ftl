@@ -243,18 +243,12 @@ setup-secure-boot-new-code = Fá nýjan kóða
 setup-protect-title = Verndaðu skrárnar þínar
 setup-protect-tpm = Dulritaðu tölvuna svo enginn geti lesið skrárnar þínar án þess að skrá sig inn, jafnvel þótt hún týnist. Hún tekur sig sjálf úr lás við ræsingu.
 setup-protect-passphrase = Dulritaðu tölvuna svo enginn geti lesið skrárnar þínar án lykilsetningarinnar, jafnvel þótt hún týnist.
-setup-protect-staged-title = Skrárnar þínar verða dulritaðar
-setup-protect-staged-description = Dulritunin hefst sjálfkrafa eftir endurræsinguna í lok uppsetningar og þú getur notað tölvuna á meðan.
-setup-protect-waiting-description = Luft er enn að breyta stærð sinni. Þegar því lýkur hefst dulritun við næstu endurræsingu og þú getur notað tölvuna á meðan.
 setup-protect-keep-safe = Geymdu þennan endurheimtarlykil á öruggum stað, fjarri tölvunni. Þú þarft hann ef tölvan getur einhvern tímann ekki tekið sig sjálf úr lás.
 setup-protect-passphrase-label = Lykilsetning
 setup-protect-repeat = Sláðu hana inn aftur
 setup-protect-mismatch = Lykilsetningarnar passa ekki saman
 setup-protect-kept = Ég hef geymt endurheimtarlykilinn
-setup-protect-background = Dulritunin fer fram í bakgrunni eftir næstu endurræsingu og þú getur notað tölvuna á meðan.
 setup-protect-encrypt = Dulrita
-setup-protect-checking = Athugar…
-setup-protect-start = Dulrita skrárnar mínar
 
 ## Fingerprint
 
@@ -271,6 +265,5 @@ setup-fingerprint-choose-another = Velja annan fingur
 
 setup-ready-title = Allt er tilbúið
 setup-ready-trust = Endurræstu einu sinni enn til að ljúka. Strax eftir endurræsinguna biður blár skjár þig um að treysta Luft. Notaðu lyklaborðið þar með þessum kóða.
-setup-ready-restart = Endurræstu einu sinni enn til að ljúka og skráðu þig svo inn með lykilorðinu.
 setup-ready-done = Skjáborðið er tilbúið. Góða skemmtun með Luft.
 setup-ready-start = Byrja að nota Luft

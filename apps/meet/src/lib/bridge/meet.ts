@@ -72,7 +72,7 @@ export interface Report {
 	outdated: boolean;
 }
 
-export type Blocked = 'busy' | 'reencrypting' | 'passphrase' | 'apart' | 'unreadable';
+export type Blocked = 'busy' | 'passphrase' | 'apart' | 'unreadable';
 export type Change = { change: 'grow' } | { change: 'shrink'; bytes: number } | { change: 'trim'; bytes: number };
 
 export interface Range {

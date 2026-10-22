@@ -15,7 +15,7 @@ pub struct TopLevel {
 impl TopLevel {
     pub fn mount(disk: &SystemDisk) -> Result<Self> {
         let path = Path::new(RUNTIME).join(FOLDER);
-        paths::ensure_private(&path.to_string_lossy())?;
+        paths::ensure_private(&path)?;
         Tool::new("mount")
             .args(["-t", "btrfs", "-o", "subvolid=5"])
             .arg(&disk.root.source)

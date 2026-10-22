@@ -52,18 +52,7 @@ settings-privacy-delete-after-hint = Cik ilgi faili tiek glabāti, pirms tos no�
 ## Security: summary at the top of the page
 
 settings-security-protected = Ierīce ir aizsargāta
-settings-security-encrypting = Notiek ierīces šifrēšana
-settings-security-encrypting-progress = { $progress }. Varat turpināt darbu, kamēr tā tiek pabeigta.
-settings-security-decrypting = Notiek ierīces šifrēšanas izslēgšana
-settings-security-restart-to-encrypt = Restartējiet, lai sāktu šifrēšanu
-settings-security-restart-to-encrypt-description = Šifrēšana sāksies nākamajā datora restartēšanas reizē.
-settings-security-encryption-failed = Šifrēšana netika sākta
-settings-security-encryption-failed-description = Luft startējās bez tās, un jūsu faili netika mainīti. Ieslēdziet to vēlreiz, lai mēģinātu atkārtoti.
-settings-security-encryption-refused-description = Luft pabeidza mainīt savu izmēru, taču pēc tam šifrēšanu nevarēja sākt. Jūsu faili netika mainīti. Ieslēdziet to vēlreiz, lai mēģinātu atkārtoti.
-settings-security-waiting-to-encrypt = Šifrēšana gaida
-settings-security-waiting-to-encrypt-description = Luft vēl maina savu izmēru. Kad tas būs paveikts, šifrēšana sāksies nākamajā restartēšanas reizē.
 settings-security-could-be-safer = Ierīce varētu būt drošāka
-settings-security-could-be-safer-description = Ieslēdziet ierīces šifrēšanu, lai jūsu faili paliktu privāti.
 settings-security-starts-differently-description = Ja mainījāt datora Secure Boot iestatījumus, apstipriniet to, lai disks atkal atbloķētos pats.
 settings-security-needed-recovery-key = Diskam bija nepieciešama atkopšanas atslēga
 settings-security-needed-recovery-key-description = Sasaistiet drošības mikroshēmu vēlreiz, lai disks atbloķētos pats.
@@ -163,25 +152,6 @@ settings-usb-hold-back-description = Bloķēšanas laikā pievienotās ierīces 
 ## Device encryption
 
 settings-encryption = Ierīces šifrēšana
-settings-encryption-encrypting = Notiek šīs ierīces šifrēšana
-settings-encryption-decrypting = Notiek ierīces šifrēšanas izslēgšana
-settings-encryption-starting = Sāksies nākamajā restartēšanas reizē
-settings-encryption-failed = Pēdējās restartēšanas laikā netika sākta, jūsu faili netika mainīti
-settings-encryption-waiting = Gaida, līdz Luft pabeigs mainīt izmēru, un tad sāksies nākamajā restartēšanas reizē
-settings-encryption-refused = Nevarēja sākt pēc Luft izmēra maiņas, jūsu faili netika mainīti
-settings-encryption-off = Jūsu faili paliek privāti, ja dators tiek pazaudēts
-settings-encryption-progress = { $percent } pabeigti
-settings-encryption-progress-seconds = { $percent } pabeigti, atlikusi mazāk nekā minūte
-settings-encryption-progress-minutes = { $minutes ->
-    [zero] { $percent } pabeigti, atlikušas apmēram { $minutes } minūtes
-    [one] { $percent } pabeigti, atlikusi apmēram { $minutes } minūte
-   *[other] { $percent } pabeigti, atlikušas apmēram { $minutes } minūtes
-}
-settings-encryption-progress-hours = { $hours ->
-    [zero] { $percent } pabeigti, atlikušas apmēram { $hours } stundas
-    [one] { $percent } pabeigti, atlikusi apmēram { $hours } stunda
-   *[other] { $percent } pabeigti, atlikušas apmēram { $hours } stundas
-}
 settings-encryption-unlocks-chip-pin = Atbloķē ar drošības mikroshēmu un jūsu PIN
 settings-encryption-unlocks-chip = Atbloķējas automātiski ar drošības mikroshēmu
 settings-encryption-unlocks-passphrase = Startējot prasa jūsu paroles frāzi
@@ -202,38 +172,6 @@ settings-encryption-drives-auto-unlock = { $count ->
     [one] { $count } šifrēts disks atbloķējas kopā ar šo datoru
    *[other] { $count } šifrēti diski atbloķējas kopā ar šo datoru
 }
-
-## Device encryption: turning it on
-
-settings-encryption-turn-on-title = Ieslēgt ierīces šifrēšanu
-settings-encryption-turn-on-description = Jūsu faili paliek privāti, ja dators tiek pazaudēts vai nozagts. Bez pareizās atslēgas neviens nevar nolasīt disku.
-settings-encryption-blocked-title = Ierīces šifrēšanu vēl nevar ieslēgt
-settings-encryption-blocked-description = Novērsiet tālāk atzīmēto un mēģiniet vēlreiz.
-settings-encryption-backup = Pirms sākat, pārliecinieties, ka svarīgajiem failiem ir rezerves kopijas.
-settings-encryption-key-title = Saglabājiet atkopšanas atslēgu
-settings-encryption-key-description = Ja disks kādreiz nevar atbloķēties pats, piemēram, pēc remonta, ar šo atslēgu varēsiet piekļūt. Glabājiet to kaut kur citur, ne šajā datorā.
-settings-encryption-unlock-title = Atbloķēšana startēšanas laikā
-settings-encryption-unlock-description = Drošības mikroshēma startēšanas laikā pati atbloķē disku, tāpēc pierakstīšanās paliek tāda pati.
-settings-encryption-passphrase-title = Izvēlieties paroles frāzi
-settings-encryption-passphrase-description = Šis dators nevar pats atbloķēt disku, tāpēc tas prasīs šo paroles frāzi katru reizi, kad startēs.
-settings-encryption-summary-title = Gatavs šifrēšanai
-settings-encryption-summary-description = Lūk, kas notiks tālāk.
-settings-encryption-step-restart = Dators vienreiz restartēsies.
-settings-encryption-step-screen = Startēšanas laikā uz brīdi parādīsies ekrāns „Encrypting your device“.
-settings-encryption-step-background = Pārējais notiek fonā, kamēr turpināt darbu.
-settings-encryption-step-plugged-in = Neatvienojiet datoru no barošanas, līdz viss ir pabeigts.
-settings-encryption-ask-pin = Prasīt arī PIN
-settings-encryption-ask-pin-description = Disks paliek bloķēts, pat ja kāds paņem datoru. PIN tiks prasīts, kad šifrēšana būs pabeigta.
-settings-encryption-starting-button = Sāk…
-settings-encryption-restart-and-encrypt = Restartēt un šifrēt
-
-## Device encryption: turning it off
-
-settings-encryption-turn-off-title = Izslēgt ierīces šifrēšanu?
-settings-encryption-turn-off-description = Jūsu faili tiks atšifrēti fonā, kamēr strādājat. Pēc tam ikviens, kas izņem disku, varēs to nolasīt.
-settings-encryption-keep = Paturēt šifrēšanu
-settings-encryption-turning-off = Izslēdz…
-settings-encryption-turn-off = Izslēgt
 
 ## Device encryption: unlocking the disk
 
@@ -267,6 +205,7 @@ settings-encryption-unlock-disk-field = Atkopšanas atslēga vai paroles frāze
 
 ## Device encryption: security chip and PIN
 
+settings-encryption-ask-pin = Prasīt arī PIN
 settings-encryption-chip-setup-description = Datora drošības mikroshēma startēšanas laikā pati atbloķē disku, tāpēc paroles frāze vairs nav jāievada.
 settings-encryption-add-pin-title = Pievienot PIN
 settings-encryption-add-pin-description = To ievadīsiet katru reizi, kad dators startē. Bez tā disks paliek bloķēts, pat ja kāds paņem visu datoru.

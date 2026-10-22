@@ -243,18 +243,12 @@ setup-secure-boot-new-code = Nieuwe code aanvragen
 setup-protect-title = Je bestanden beschermen
 setup-protect-tpm = Versleutel deze computer, zodat niemand je bestanden kan lezen zonder zich aan te melden, ook niet als je hem kwijtraakt. Hij ontgrendelt vanzelf bij het opstarten.
 setup-protect-passphrase = Versleutel deze computer, zodat niemand je bestanden kan lezen zonder je wachtwoordzin, ook niet als je de computer kwijtraakt.
-setup-protect-staged-title = Je bestanden worden versleuteld
-setup-protect-staged-description = Het versleutelen begint vanzelf na de herstart aan het eind van de installatie, en je kunt je computer ondertussen gewoon gebruiken.
-setup-protect-waiting-description = Luft wijzigt nog zijn grootte. Zodra dat klaar is, begint het versleutelen bij de volgende herstart, en je kunt je computer intussen gewoon gebruiken.
 setup-protect-keep-safe = Bewaar deze herstelsleutel op een veilige plek, niet bij deze computer. Je hebt hem nodig als de computer zichzelf ooit niet kan ontgrendelen.
 setup-protect-passphrase-label = Wachtwoordzin
 setup-protect-repeat = Typ hem opnieuw
 setup-protect-mismatch = Ze komen niet overeen
 setup-protect-kept = Ik heb mijn herstelsleutel bewaard
-setup-protect-background = Het versleutelen gebeurt op de achtergrond na de volgende herstart, en je kunt je computer ondertussen gewoon gebruiken.
 setup-protect-encrypt = Versleutelen
-setup-protect-checking = Controleren…
-setup-protect-start = Mijn bestanden versleutelen
 
 ## Fingerprint
 
@@ -271,6 +265,5 @@ setup-fingerprint-choose-another = Andere vinger kiezen
 
 setup-ready-title = Je bent er klaar voor
 setup-ready-trust = Start nog één keer opnieuw op om af te ronden. Direct na het opnieuw opstarten vraagt een blauw scherm of je Luft vertrouwt. Gebruik daar het toetsenbord met deze code.
-setup-ready-restart = Start nog één keer opnieuw op om af te ronden en meld je daarna aan met je wachtwoord.
 setup-ready-done = Je bureaublad staat klaar. Veel plezier met Luft.
 setup-ready-start = Luft gaan gebruiken

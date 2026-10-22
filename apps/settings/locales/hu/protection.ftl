@@ -52,18 +52,7 @@ settings-privacy-delete-after-hint = Mennyi ideig maradnak meg a fájlok az elt�
 ## Security: summary at the top of the page
 
 settings-security-protected = Az eszköz védett
-settings-security-encrypting = Az eszköz titkosítása folyamatban
-settings-security-encrypting-progress = { $progress }. Nyugodtan dolgozhat tovább, amíg befejeződik.
-settings-security-decrypting = Az eszköztitkosítás kikapcsolása folyamatban
-settings-security-restart-to-encrypt = A titkosítás elindításához indítsa újra a számítógépet
-settings-security-restart-to-encrypt-description = A titkosítás a számítógép következő újraindításakor kezdődik.
-settings-security-encryption-failed = A titkosítás nem indult el
-settings-security-encryption-failed-description = A Luft titkosítás nélkül indult el, a fájlok nem változtak. Kapcsolja be újra, ha még egyszer meg szeretné próbálni.
-settings-security-encryption-refused-description = A Luft befejezte a méretének módosítását, de a titkosítás utána nem tudott elindulni. A fájlok nem változtak. Kapcsolja be újra, ha még egyszer meg szeretné próbálni.
-settings-security-waiting-to-encrypt = A titkosítás várakozik
-settings-security-waiting-to-encrypt-description = A Luft még módosítja a méretét. Ha ez kész, a titkosítás a következő újraindításkor indul el.
 settings-security-could-be-safer = Az eszköz lehetne biztonságosabb
-settings-security-could-be-safer-description = Kapcsolja be az eszköztitkosítást, hogy a fájljai privátak maradjanak.
 settings-security-starts-differently-description = Ha módosította a Secure Boot beállításait, erősítse meg a változást, hogy a lemez ismét magától feloldódjon.
 settings-security-needed-recovery-key = A lemez a helyreállítási kulcsot kérte
 settings-security-needed-recovery-key-description = Kapcsolja össze újra a biztonsági chippel, hogy magától feloldódjon.
@@ -158,23 +147,6 @@ settings-usb-hold-back-description = A zárolt állapotban csatlakoztatott eszk�
 ## Device encryption
 
 settings-encryption = Eszköztitkosítás
-settings-encryption-encrypting = Az eszköz titkosítása folyamatban
-settings-encryption-decrypting = Az eszköztitkosítás kikapcsolása folyamatban
-settings-encryption-starting = A következő újraindításkor kezdődik
-settings-encryption-failed = A legutóbbi újraindításkor nem indult el, a fájlok nem változtak
-settings-encryption-waiting = Megvárja, hogy a Luft befejezze a méretmódosítást, majd a következő újraindításkor indul el
-settings-encryption-refused = Nem tudott elindulni a Luft méretmódosítása után, a fájlok nem változtak
-settings-encryption-off = Privátan tartja a fájlokat, ha a számítógép elveszik
-settings-encryption-progress = { $percent } kész
-settings-encryption-progress-seconds = { $percent } kész, kevesebb mint egy perc van hátra
-settings-encryption-progress-minutes = { $minutes ->
-    [one] { $percent } kész, körülbelül { $minutes } perc van hátra
-   *[other] { $percent } kész, körülbelül { $minutes } perc van hátra
-}
-settings-encryption-progress-hours = { $hours ->
-    [one] { $percent } kész, körülbelül { $hours } óra van hátra
-   *[other] { $percent } kész, körülbelül { $hours } óra van hátra
-}
 settings-encryption-unlocks-chip-pin = A biztonsági chippel és a PIN-kóddal oldódik fel
 settings-encryption-unlocks-chip = A biztonsági chippel magától oldódik fel
 settings-encryption-unlocks-passphrase = Indításkor a jelmondatot kéri
@@ -194,38 +166,6 @@ settings-encryption-drives-auto-unlock = { $count ->
     [one] { $count } titkosított meghajtó oldódik fel ezzel a számítógéppel
    *[other] { $count } titkosított meghajtó oldódik fel ezzel a számítógéppel
 }
-
-## Device encryption: turning it on
-
-settings-encryption-turn-on-title = Eszköztitkosítás bekapcsolása
-settings-encryption-turn-on-description = A fájlok privátak maradnak akkor is, ha a számítógép elveszik vagy ellopják. A megfelelő kulcs nélkül senki sem tudja olvasni a lemezt.
-settings-encryption-blocked-title = Az eszköztitkosítás még nem kapcsolható be
-settings-encryption-blocked-description = Rendezze az alább megjelölt dolgokat, majd próbálja újra.
-settings-encryption-backup = Mielőtt elkezdi, győződjön meg róla, hogy a fontos fájljairól van biztonsági másolat.
-settings-encryption-key-title = A helyreállítási kulcs mentése
-settings-encryption-key-description = Ha a lemez egyszer nem tud magától feloldódni, például egy javítás után, ezzel a kulccsal férhet hozzá újra. Ne ezen a számítógépen tárolja.
-settings-encryption-unlock-title = Feloldás indításkor
-settings-encryption-unlock-description = Indításkor a biztonsági chip magától feloldja a lemezt, így a bejelentkezés nem változik.
-settings-encryption-passphrase-title = Jelmondat megadása
-settings-encryption-passphrase-description = Ez a számítógép nem tudja magától feloldani a lemezt, ezért minden indításkor ezt a jelmondatot kéri.
-settings-encryption-summary-title = Készen áll a titkosításra
-settings-encryption-summary-description = A következők történnek.
-settings-encryption-step-restart = A számítógép egyszer újraindul.
-settings-encryption-step-screen = Indítás közben rövid ideig megjelenik az „Encrypting your device” feliratú képernyő.
-settings-encryption-step-background = A többi a háttérben történik, miközben tovább dolgozik.
-settings-encryption-step-plugged-in = A befejezésig tartsa a számítógépet töltőn.
-settings-encryption-ask-pin = PIN-kód kérése is
-settings-encryption-ask-pin-description = A lemez zárolva marad akkor is, ha valaki elviszi a számítógépet. A titkosítás befejezése után kell megadni.
-settings-encryption-starting-button = Indítás…
-settings-encryption-restart-and-encrypt = Újraindítás és titkosítás
-
-## Device encryption: turning it off
-
-settings-encryption-turn-off-title = Kikapcsolja az eszköztitkosítást?
-settings-encryption-turn-off-description = A fájlok visszafejtése a háttérben történik, miközben dolgozik. Ezután bárki elolvashatja a lemezt, aki kiszereli.
-settings-encryption-keep = Titkosítás megtartása
-settings-encryption-turning-off = Kikapcsolás…
-settings-encryption-turn-off = Kikapcsolás
 
 ## Device encryption: unlocking the disk
 
@@ -259,6 +199,7 @@ settings-encryption-unlock-disk-field = Helyreállítási kulcs vagy jelmondat
 
 ## Device encryption: security chip and PIN
 
+settings-encryption-ask-pin = PIN-kód kérése is
 settings-encryption-chip-setup-description = Indításkor a számítógép biztonsági chipje magától feloldja a lemezt, így nem kell előtte jelmondatot beírnia.
 settings-encryption-add-pin-title = PIN-kód hozzáadása
 settings-encryption-add-pin-description = Minden indításkor be kell írnia. Nélküle a lemez zárolva marad, még akkor is, ha valaki az egész számítógépet elviszi.

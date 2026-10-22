@@ -243,18 +243,12 @@ setup-secure-boot-new-code = Neuen Code abrufen
 setup-protect-title = Deine Dateien schützen
 setup-protect-tpm = Verschlüssle diesen Computer, damit niemand deine Dateien ohne Anmeldung lesen kann, selbst wenn er verloren geht. Beim Start entsperrt er sich von selbst.
 setup-protect-passphrase = Verschlüssle diesen Computer, damit niemand deine Dateien ohne deine Passphrase lesen kann, selbst wenn er verloren geht.
-setup-protect-staged-title = Deine Dateien werden verschlüsselt
-setup-protect-staged-description = Die Verschlüsselung startet nach dem Neustart am Ende der Einrichtung von selbst, und du kannst deinen Computer währenddessen weiter nutzen.
-setup-protect-waiting-description = Luft ändert noch seine Größe. Sobald das fertig ist, beginnt die Verschlüsselung beim nächsten Neustart, und du kannst deinen Computer währenddessen weiter nutzen.
 setup-protect-keep-safe = Bewahre diesen Wiederherstellungsschlüssel an einem sicheren Ort auf, nicht bei diesem Computer. Du brauchst ihn, falls sich der Computer einmal nicht von selbst entsperren kann.
 setup-protect-passphrase-label = Passphrase
 setup-protect-repeat = Erneut eingeben
 setup-protect-mismatch = Sie stimmen nicht überein
 setup-protect-kept = Ich habe meinen Wiederherstellungsschlüssel aufbewahrt
-setup-protect-background = Die Verschlüsselung läuft nach dem nächsten Neustart im Hintergrund, und du kannst deinen Computer währenddessen weiter nutzen.
 setup-protect-encrypt = Verschlüsseln
-setup-protect-checking = Wird geprüft …
-setup-protect-start = Meine Dateien verschlüsseln
 
 ## Fingerprint
 
@@ -271,6 +265,5 @@ setup-fingerprint-choose-another = Anderen Finger wählen
 
 setup-ready-title = Alles bereit
 setup-ready-trust = Starte noch einmal neu, um abzuschließen. Direkt nach dem Neustart fragt ein blauer Bildschirm, ob Luft vertraut werden soll. Gib dort mit der Tastatur diesen Code ein.
-setup-ready-restart = Starte noch einmal neu, um abzuschließen, und melde dich dann mit deinem Passwort an.
 setup-ready-done = Dein Desktop ist bereit. Viel Spaß mit Luft.
 setup-ready-start = Luft verwenden

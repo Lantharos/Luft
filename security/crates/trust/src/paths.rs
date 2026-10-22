@@ -7,8 +7,9 @@ pub fn state(name: &str) -> PathBuf {
     PathBuf::from(STATE).join(name)
 }
 
-pub fn ensure_private(path: &str) -> std::io::Result<()> {
+pub fn ensure_private(path: impl AsRef<std::path::Path>) -> std::io::Result<()> {
     use std::os::unix::fs::{DirBuilderExt, PermissionsExt};
+    let path = path.as_ref();
     std::fs::DirBuilder::new()
         .recursive(true)
         .mode(0o700)

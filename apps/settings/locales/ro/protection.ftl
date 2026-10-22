@@ -52,18 +52,7 @@ settings-privacy-delete-after-hint = Cât timp rămân fișierele înainte de a 
 ## Security: summary at the top of the page
 
 settings-security-protected = Dispozitivul este protejat
-settings-security-encrypting = Se criptează dispozitivul
-settings-security-encrypting-progress = { $progress }. Puteți lucra în continuare până se termină.
-settings-security-decrypting = Se dezactivează criptarea dispozitivului
-settings-security-restart-to-encrypt = Reporniți pentru a începe criptarea
-settings-security-restart-to-encrypt-description = Criptarea începe la următoarea repornire a computerului.
-settings-security-encryption-failed = Criptarea nu a pornit
-settings-security-encryption-failed-description = Sistemul a pornit fără ea, iar fișierele nu au fost modificate. Activați-o din nou pentru a mai încerca o dată.
-settings-security-encryption-refused-description = Luft și-a terminat redimensionarea, dar criptarea nu a putut porni după aceea. Fișierele nu au fost modificate. Activați-o din nou pentru a mai încerca o dată.
-settings-security-waiting-to-encrypt = Criptarea așteaptă
-settings-security-waiting-to-encrypt-description = Luft încă își schimbă dimensiunea. După ce termină, criptarea pornește la următoarea repornire.
 settings-security-could-be-safer = Dispozitivul ar putea fi mai sigur
-settings-security-could-be-safer-description = Activați criptarea dispozitivului ca fișierele să rămână private.
 settings-security-starts-differently-description = Dacă ați modificat setările Secure Boot, confirmați schimbarea pentru ca discul să se deblocheze din nou singur.
 settings-security-needed-recovery-key = Discul a avut nevoie de cheia de recuperare
 settings-security-needed-recovery-key-description = Asociați din nou cipul de securitate pentru ca discul să se deblocheze singur.
@@ -163,25 +152,6 @@ settings-usb-hold-back-description = Cele conectate cât timp ecranul este bloca
 ## Device encryption
 
 settings-encryption = Criptarea dispozitivului
-settings-encryption-encrypting = Se criptează acest dispozitiv
-settings-encryption-decrypting = Se dezactivează criptarea dispozitivului
-settings-encryption-starting = Începe la următoarea repornire
-settings-encryption-failed = Nu a pornit la ultima repornire, fișierele nu au fost modificate
-settings-encryption-waiting = Așteaptă ca Luft să își termine redimensionarea, apoi pornește la următoarea repornire
-settings-encryption-refused = Nu a putut porni după redimensionarea Luft, fișierele nu au fost modificate
-settings-encryption-off = Păstrează fișierele private dacă pierdeți acest computer
-settings-encryption-progress = Finalizat: { $percent }
-settings-encryption-progress-seconds = Finalizat: { $percent }, a mai rămas mai puțin de un minut
-settings-encryption-progress-minutes = { $minutes ->
-    [one] Finalizat: { $percent }, a mai rămas aproximativ { $minutes } minut
-    [few] Finalizat: { $percent }, au mai rămas aproximativ { $minutes } minute
-   *[other] Finalizat: { $percent }, au mai rămas aproximativ { $minutes } de minute
-}
-settings-encryption-progress-hours = { $hours ->
-    [one] Finalizat: { $percent }, a mai rămas aproximativ { $hours } oră
-    [few] Finalizat: { $percent }, au mai rămas aproximativ { $hours } ore
-   *[other] Finalizat: { $percent }, au mai rămas aproximativ { $hours } de ore
-}
 settings-encryption-unlocks-chip-pin = Se deblochează cu cipul de securitate și PIN-ul
 settings-encryption-unlocks-chip = Se deblochează singur cu cipul de securitate
 settings-encryption-unlocks-passphrase = Cere fraza de acces la pornire
@@ -202,38 +172,6 @@ settings-encryption-drives-auto-unlock = { $count ->
     [few] { $count } unități criptate se deblochează odată cu acest computer
    *[other] { $count } de unități criptate se deblochează odată cu acest computer
 }
-
-## Device encryption: turning it on
-
-settings-encryption-turn-on-title = Activați criptarea dispozitivului
-settings-encryption-turn-on-description = Fișierele rămân private dacă acest computer este pierdut sau furat. Fără cheia potrivită, nimeni nu poate citi discul.
-settings-encryption-blocked-title = Criptarea dispozitivului nu poate fi activată încă
-settings-encryption-blocked-description = Rezolvați ce este marcat mai jos, apoi încercați din nou.
-settings-encryption-backup = Înainte de a începe, asigurați-vă că aveți o copie de rezervă a fișierelor importante.
-settings-encryption-key-title = Salvați cheia de recuperare
-settings-encryption-key-description = Dacă discul nu se mai poate debloca singur, de exemplu după o reparație, această cheie vă redă accesul. Păstrați-o în alt loc decât pe acest computer.
-settings-encryption-unlock-title = Deblocarea la pornire
-settings-encryption-unlock-description = Cipul de securitate deblochează singur discul la pornire, așa că vă conectați la fel ca până acum.
-settings-encryption-passphrase-title = Alegeți o frază de acces
-settings-encryption-passphrase-description = Acest computer nu poate debloca singur discul, așa că cere această frază de acces la fiecare pornire.
-settings-encryption-summary-title = Totul este pregătit pentru criptare
-settings-encryption-summary-description = Iată ce urmează.
-settings-encryption-step-restart = Computerul repornește o dată.
-settings-encryption-step-screen = În timpul pornirii apare pentru scurt timp ecranul „Encrypting your device”.
-settings-encryption-step-background = Restul se face în fundal, în timp ce lucrați.
-settings-encryption-step-plugged-in = Țineți computerul conectat la priză până la final.
-settings-encryption-ask-pin = Cere și un PIN
-settings-encryption-ask-pin-description = Discul rămâne blocat chiar dacă cineva ia computerul. Codul este cerut după ce se termină criptarea.
-settings-encryption-starting-button = Se pornește…
-settings-encryption-restart-and-encrypt = Repornește și criptează
-
-## Device encryption: turning it off
-
-settings-encryption-turn-off-title = Dezactivați criptarea dispozitivului?
-settings-encryption-turn-off-description = Fișierele sunt decriptate în fundal în timp ce lucrați. După aceea, oricine scoate discul îl poate citi.
-settings-encryption-keep = Păstrează criptarea
-settings-encryption-turning-off = Se dezactivează…
-settings-encryption-turn-off = Dezactivează
 
 ## Device encryption: unlocking the disk
 
@@ -267,6 +205,7 @@ settings-encryption-unlock-disk-field = Cheie de recuperare sau frază de acces
 
 ## Device encryption: security chip and PIN
 
+settings-encryption-ask-pin = Cere și un PIN
 settings-encryption-chip-setup-description = Cipul de securitate din computer deblochează singur discul la pornire, așa că nu mai trebuie să tastați întâi o frază de acces.
 settings-encryption-add-pin-title = Adăugați un PIN
 settings-encryption-add-pin-description = Îl veți tasta la fiecare pornire a computerului. Fără el, discul rămâne blocat, chiar dacă cineva ia tot computerul.

@@ -15,7 +15,7 @@
 		problem = '';
 		try {
 			await finishFirstBoot();
-			if (setup.needsRestart) await restart();
+			if (setup.secureBootCode) await restart();
 			else if (!(await finishSetup())) await appWindow.close();
 		} catch (error) {
 			problem = String(error);
@@ -26,7 +26,7 @@
 
 <StepFrame
 	title={t('setup-ready-title')}
-	description={t(setup.secureBootCode ? 'setup-ready-trust' : setup.needsRestart ? 'setup-ready-restart' : 'setup-ready-done')}
+	description={t(setup.secureBootCode ? 'setup-ready-trust' : 'setup-ready-done')}
 >
 	{#if setup.secureBootCode}
 		<EnrollSteps code={setup.secureBootCode} />
@@ -36,7 +36,7 @@
 	{/if}
 	{#snippet actions()}
 		<button type="button" class="button primary large px-6" disabled={busy} onclick={finish}>
-			{t(setup.needsRestart ? 'setup-restart' : 'setup-ready-start')}
+			{t(setup.secureBootCode ? 'setup-restart' : 'setup-ready-start')}
 		</button>
 	{/snippet}
 </StepFrame>

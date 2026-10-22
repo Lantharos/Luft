@@ -2,9 +2,7 @@ use anyhow::{Context, Result, bail};
 
 use super::top_level::TopLevel;
 use crate::disk::SystemDisk;
-use crate::disk::encryption::state::Plan;
 use crate::disk::unlock::keys;
-use crate::errors::Busy;
 use crate::system::host::blocks;
 use crate::system::host::command::Tool;
 use crate::system::secrets::secret::Secret;
@@ -102,13 +100,6 @@ fn usable(disk: &SystemDisk) -> u64 {
 
 pub fn grow(typed: &Secret) -> Result<u64> {
     let disk = SystemDisk::find()?;
-    if Plan::load().is_some()
-        || disk
-            .header()?
-            .is_some_and(|header| header.reencrypting.is_some())
-    {
-        bail!(Busy);
-    }
     let before = usable(&disk);
     grow_partition(&disk.partition)?;
     if let Some(mapping) = &disk.mapping {

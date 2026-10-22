@@ -4,8 +4,8 @@ use std::sync::atomic::AtomicBool;
 use anyhow::{Context, Result};
 
 use super::record::{Change, Record};
+use super::reencrypt::{self, Progress};
 use super::unlocking;
-use crate::disk::encryption::reencrypt::{self, Progress};
 use crate::disk::unlock::{keys, luks};
 use crate::errors::NeedsKey;
 use crate::system::host::blocks;

@@ -9,6 +9,8 @@ const AT = {
   back: [85, 547],
   keyboard: [400, 280],
   install: [700, 547],
+  kept: [70, 420],
+  encrypt: [722, 547],
   confirm: [565, 346],
   skip: [730, 547],
   name: [315, 222],
@@ -33,10 +35,16 @@ async function checkAccount(setup) {
 }
 
 async function checkInstallStarts(setup) {
+  await setup.shot('protect');
+  await setup.click(AT.kept, 'confirming the recovery key was kept lets Luft be encrypted');
+  await setup.click(AT.encrypt, 'encrypting asks to confirm');
+  await setup.shot('protect-confirm');
   await setup.click(AT.confirm, 'confirming starts the install');
   const [request, regional] = await setup.requests();
   require(['default', 'nvidia'].includes(request.variant) && request.target.kind === 'alongside' && request.target.drive.endsWith('/nvme0n1') &&
     request.target.size > 300 * GB && request.target.size < 500 * GB, 'Luft is installed next to Windows with the size the bar shows');
+  require(request.encryption?.recoveryKey?.length === 71 && request.encryption.passphrase === '',
+    'Luft is encrypted with the recovery key shown, unlocking with the TPM');
   require(regional.keyboard.layout === 'de' && regional.timezone === 'Europe/Berlin' && regional.locale === 'en_US.UTF-8',
     'the installed system gets the keyboard, time zone and language chosen at the start');
 }
@@ -84,8 +92,7 @@ export async function checkLive() {
   await setup.click(AT.back, 'going back shows the choices again');
   await setup.click(AT.alongside, 'choosing Windows shows how to share its drive');
   await setup.shot('alongside');
-  await setup.click(AT.install, 'installing asks to confirm');
-  await setup.shot('alongside-confirm');
+  await setup.click(AT.install, 'installing asks whether to encrypt Luft');
   await checkInstallStarts(setup);
   await setup.shot('network');
   await setup.click(AT.skip, 'skipping the network asks for an account');

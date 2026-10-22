@@ -52,18 +52,7 @@ settings-privacy-delete-after-hint = Kui kaua faile hoitakse enne eemaldamist
 ## Security: summary at the top of the page
 
 settings-security-protected = Teie seade on kaitstud
-settings-security-encrypting = Seadme krüptimine
-settings-security-encrypting-progress = { $progress }. Võite krüptimise ajal edasi töötada.
-settings-security-decrypting = Seadme krüptimise väljalülitamine
-settings-security-restart-to-encrypt = Krüptimise alustamiseks taaskäivitage
-settings-security-restart-to-encrypt-description = Krüptimine algab selle arvuti järgmisel taaskäivitusel.
-settings-security-encryption-failed = Krüptimine ei alanud
-settings-security-encryption-failed-description = Luft käivitus ilma selleta ja teie faile ei muudetud. Uuesti proovimiseks lülitage see uuesti sisse.
-settings-security-encryption-refused-description = Luft lõpetas oma suuruse muutmise, kuid krüptimine ei saanud pärast seda alata. Teie faile ei muudetud. Uuesti proovimiseks lülitage see uuesti sisse.
-settings-security-waiting-to-encrypt = Krüptimine ootab
-settings-security-waiting-to-encrypt-description = Luft muudab veel oma suurust. Kui see on tehtud, algab krüptimine järgmisel taaskäivitusel.
 settings-security-could-be-safer = Teie seade võiks olla turvalisem
-settings-security-could-be-safer-description = Lülitage sisse seadme krüptimine, et teie failid jääksid privaatseks.
 settings-security-starts-differently-description = Kui muutsite selle Secure Booti sätteid, kinnitage muudatus, et ketas avaneks taas iseenesest.
 settings-security-needed-recovery-key = Teie ketas vajas taastevõtit
 settings-security-needed-recovery-key-description = Siduge turvakiip uuesti, et ketas avaneks iseenesest.
@@ -158,23 +147,6 @@ settings-usb-hold-back-description = Lukustatud olekus ühendatud seadmed ootava
 ## Device encryption
 
 settings-encryption = Seadme krüptimine
-settings-encryption-encrypting = Seadme krüptimine
-settings-encryption-decrypting = Seadme krüptimise väljalülitamine
-settings-encryption-starting = Algab järgmisel taaskäivitusel
-settings-encryption-failed = Ei alanud viimasel taaskäivitusel, teie faile ei muudetud
-settings-encryption-waiting = Ootab, kuni Luft oma suuruse muutmise lõpetab, ja algab siis järgmisel taaskäivitusel
-settings-encryption-refused = Ei saanud pärast Lufti suuruse muutmist alata, teie faile ei muudetud
-settings-encryption-off = Hoiab teie failid privaatsena, kui arvuti kaob
-settings-encryption-progress = Valmis: { $percent }
-settings-encryption-progress-seconds = Valmis: { $percent }, jäänud alla minuti
-settings-encryption-progress-minutes = { $minutes ->
-    [one] Valmis: { $percent }, jäänud umbes { $minutes } minut
-   *[other] Valmis: { $percent }, jäänud umbes { $minutes } minutit
-}
-settings-encryption-progress-hours = { $hours ->
-    [one] Valmis: { $percent }, jäänud umbes { $hours } tund
-   *[other] Valmis: { $percent }, jäänud umbes { $hours } tundi
-}
 settings-encryption-unlocks-chip-pin = Avaneb turvakiibi ja PIN-koodiga
 settings-encryption-unlocks-chip = Avaneb turvakiibiga iseenesest
 settings-encryption-unlocks-passphrase = Küsib käivitamisel paroolifraasi
@@ -194,38 +166,6 @@ settings-encryption-drives-auto-unlock = { $count ->
     [one] { $count } krüptitud ketas avaneb koos selle arvutiga
    *[other] { $count } krüptitud ketast avaneb koos selle arvutiga
 }
-
-## Device encryption: turning it on
-
-settings-encryption-turn-on-title = Seadme krüptimise sisselülitamine
-settings-encryption-turn-on-description = Teie failid jäävad privaatseks, kui arvuti kaob või varastatakse. Ilma õige võtmeta ei saa keegi ketast lugeda.
-settings-encryption-blocked-title = Seadme krüptimist ei saa veel sisse lülitada
-settings-encryption-blocked-description = Lahendage allpool märgitud probleemid ja proovige siis uuesti.
-settings-encryption-backup = Enne alustamist veenduge, et teie olulistest failidest on varukoopia.
-settings-encryption-key-title = Salvestage taastevõti
-settings-encryption-key-description = Kui ketas ei saa kunagi iseenesest avaneda, näiteks pärast remonti, pääsete selle võtmega uuesti sisse. Hoidke seda kusagil mujal kui selles arvutis.
-settings-encryption-unlock-title = Avamine käivitamisel
-settings-encryption-unlock-description = Turvakiip avab ketta käivitamisel iseenesest, nii et sisselogimine jääb samaks.
-settings-encryption-passphrase-title = Valige paroolifraas
-settings-encryption-passphrase-description = See arvuti ei saa ketast iseenesest avada, seega küsib see paroolifraasi igal käivitamisel.
-settings-encryption-summary-title = Valmis krüptimiseks
-settings-encryption-summary-description = Edasi juhtub järgmine.
-settings-encryption-step-restart = Arvuti taaskäivitub ühe korra.
-settings-encryption-step-screen = Käivitamise ajal kuvatakse lühidalt ekraan „Encrypting your device“.
-settings-encryption-step-background = Ülejäänu toimub taustal, samal ajal kui teie edasi töötate.
-settings-encryption-step-plugged-in = Hoidke arvuti vooluvõrgus, kuni krüptimine on lõpetatud.
-settings-encryption-ask-pin = Küsi ka PIN-koodi
-settings-encryption-ask-pin-description = Hoiab ketta lukus ka siis, kui keegi arvuti ära viib. Seda küsitakse pärast krüptimise lõppu.
-settings-encryption-starting-button = Alustamine…
-settings-encryption-restart-and-encrypt = Taaskäivita ja krüpti
-
-## Device encryption: turning it off
-
-settings-encryption-turn-off-title = Kas lülitada seadme krüptimine välja?
-settings-encryption-turn-off-description = Teie failid dekrüptitakse taustal, samal ajal kui töötate. Seejärel saab ketast lugeda igaüks, kes selle välja võtab.
-settings-encryption-keep = Jäta krüptimine alles
-settings-encryption-turning-off = Väljalülitamine…
-settings-encryption-turn-off = Lülita välja
 
 ## Device encryption: unlocking the disk
 
@@ -259,6 +199,7 @@ settings-encryption-unlock-disk-field = Taastevõti või paroolifraas
 
 ## Device encryption: security chip and PIN
 
+settings-encryption-ask-pin = Küsi ka PIN-koodi
 settings-encryption-chip-setup-description = Arvuti turvakiip avab ketta käivitamisel iseenesest, nii et te ei pea enam enne paroolifraasi tippima.
 settings-encryption-add-pin-title = PIN-koodi lisamine
 settings-encryption-add-pin-description = Tipite selle igal arvuti käivitamisel. Ilma selleta jääb ketas lukku, isegi kui keegi kogu arvuti ära viib.

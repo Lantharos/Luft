@@ -52,18 +52,7 @@ settings-privacy-delete-after-hint = Πόσο μένουν τα αρχεία π�
 ## Security: summary at the top of the page
 
 settings-security-protected = Η συσκευή σας προστατεύεται
-settings-security-encrypting = Κρυπτογράφηση της συσκευής σας
-settings-security-encrypting-progress = { $progress }. Μπορείτε να συνεχίσετε να εργάζεστε μέχρι να ολοκληρωθεί.
-settings-security-decrypting = Απενεργοποίηση κρυπτογράφησης συσκευής
-settings-security-restart-to-encrypt = Κάντε επανεκκίνηση για να ξεκινήσει η κρυπτογράφηση
-settings-security-restart-to-encrypt-description = Η κρυπτογράφηση ξεκινά την επόμενη φορά που θα γίνει επανεκκίνηση του υπολογιστή.
-settings-security-encryption-failed = Η κρυπτογράφηση δεν ξεκίνησε
-settings-security-encryption-failed-description = Το Luft ξεκίνησε χωρίς αυτήν και τα αρχεία σας δεν άλλαξαν. Ενεργοποιήστε την ξανά για να δοκιμάσετε άλλη μία φορά.
-settings-security-encryption-refused-description = Το Luft ολοκλήρωσε την αλλαγή μεγέθους του, αλλά η κρυπτογράφηση δεν μπόρεσε να ξεκινήσει μετά. Τα αρχεία σας δεν άλλαξαν. Ενεργοποιήστε την ξανά για να δοκιμάσετε άλλη μία φορά.
-settings-security-waiting-to-encrypt = Η κρυπτογράφηση περιμένει
-settings-security-waiting-to-encrypt-description = Το Luft αλλάζει ακόμα μέγεθος. Μόλις τελειώσει, η κρυπτογράφηση ξεκινά στην επόμενη επανεκκίνηση.
 settings-security-could-be-safer = Η συσκευή σας θα μπορούσε να είναι πιο ασφαλής
-settings-security-could-be-safer-description = Ενεργοποιήστε την κρυπτογράφηση συσκευής για να μένουν ιδιωτικά τα αρχεία σας.
 settings-security-starts-differently-description = Αν αλλάξατε τις ρυθμίσεις Secure Boot, επιβεβαιώστε το για να ξεκλειδώνει ξανά ο δίσκος μόνος του.
 settings-security-needed-recovery-key = Ο δίσκος σας χρειάστηκε το κλειδί αποκατάστασης
 settings-security-needed-recovery-key-description = Συνδέστε ξανά το τσιπ ασφαλείας ώστε ο δίσκος να ξεκλειδώνει μόνος του.
@@ -158,23 +147,6 @@ settings-usb-hold-back-description = Όσες συνδέονται ενώ είν
 ## Device encryption
 
 settings-encryption = Κρυπτογράφηση συσκευής
-settings-encryption-encrypting = Κρυπτογράφηση αυτής της συσκευής
-settings-encryption-decrypting = Απενεργοποίηση κρυπτογράφησης συσκευής
-settings-encryption-starting = Ξεκινά στην επόμενη επανεκκίνηση
-settings-encryption-failed = Δεν ξεκίνησε στην τελευταία επανεκκίνηση, τα αρχεία σας δεν άλλαξαν
-settings-encryption-waiting = Περιμένει να τελειώσει το Luft την αλλαγή μεγέθους και ξεκινά στην επόμενη επανεκκίνηση
-settings-encryption-refused = Δεν μπόρεσε να ξεκινήσει μετά την αλλαγή μεγέθους του Luft, τα αρχεία σας δεν άλλαξαν
-settings-encryption-off = Κρατά τα αρχεία σας ιδιωτικά αν χαθεί ο υπολογιστής
-settings-encryption-progress = Ολοκληρώθηκε { $percent }
-settings-encryption-progress-seconds = Ολοκληρώθηκε { $percent }, απομένει λιγότερο από ένα λεπτό
-settings-encryption-progress-minutes = { $minutes ->
-    [one] Ολοκληρώθηκε { $percent }, απομένει περίπου { $minutes } λεπτό
-   *[other] Ολοκληρώθηκε { $percent }, απομένουν περίπου { $minutes } λεπτά
-}
-settings-encryption-progress-hours = { $hours ->
-    [one] Ολοκληρώθηκε { $percent }, απομένει περίπου { $hours } ώρα
-   *[other] Ολοκληρώθηκε { $percent }, απομένουν περίπου { $hours } ώρες
-}
 settings-encryption-unlocks-chip-pin = Ξεκλειδώνει με το τσιπ ασφαλείας και το PIN σας
 settings-encryption-unlocks-chip = Ξεκλειδώνει αυτόματα με το τσιπ ασφαλείας
 settings-encryption-unlocks-passphrase = Ζητά τη φράση πρόσβασης κατά την εκκίνηση
@@ -194,38 +166,6 @@ settings-encryption-drives-auto-unlock = { $count ->
     [one] { $count } κρυπτογραφημένη μονάδα δίσκου ξεκλειδώνει μαζί με τον υπολογιστή
    *[other] { $count } κρυπτογραφημένες μονάδες δίσκου ξεκλειδώνουν μαζί με τον υπολογιστή
 }
-
-## Device encryption: turning it on
-
-settings-encryption-turn-on-title = Ενεργοποίηση κρυπτογράφησης συσκευής
-settings-encryption-turn-on-description = Τα αρχεία σας μένουν ιδιωτικά αν ο υπολογιστής χαθεί ή κλαπεί. Χωρίς το σωστό κλειδί, κανείς δεν μπορεί να διαβάσει τον δίσκο.
-settings-encryption-blocked-title = Η κρυπτογράφηση συσκευής δεν μπορεί να ενεργοποιηθεί ακόμη
-settings-encryption-blocked-description = Τακτοποιήστε όσα επισημαίνονται παρακάτω και δοκιμάστε ξανά.
-settings-encryption-backup = Πριν ξεκινήσετε, βεβαιωθείτε ότι έχετε αντίγραφα ασφαλείας των σημαντικών αρχείων σας.
-settings-encryption-key-title = Αποθήκευση του κλειδιού αποκατάστασης
-settings-encryption-key-description = Αν ποτέ ο δίσκος δεν μπορεί να ξεκλειδώσει μόνος του, για παράδειγμα μετά από επισκευή, αυτό το κλειδί σάς επιτρέπει να μπείτε ξανά. Φυλάξτε το κάπου αλλού, όχι σε αυτόν τον υπολογιστή.
-settings-encryption-unlock-title = Ξεκλείδωμα κατά την εκκίνηση
-settings-encryption-unlock-description = Το τσιπ ασφαλείας ξεκλειδώνει τον δίσκο μόνο του κατά την εκκίνηση, οπότε η σύνδεση γίνεται όπως πριν.
-settings-encryption-passphrase-title = Επιλογή φράσης πρόσβασης
-settings-encryption-passphrase-description = Αυτός ο υπολογιστής δεν μπορεί να ξεκλειδώσει τον δίσκο μόνος του, οπότε ζητά αυτήν τη φράση πρόσβασης σε κάθε εκκίνηση.
-settings-encryption-summary-title = Έτοιμο για κρυπτογράφηση
-settings-encryption-summary-description = Αυτό θα γίνει στη συνέχεια.
-settings-encryption-step-restart = Ο υπολογιστής κάνει μία επανεκκίνηση.
-settings-encryption-step-screen = Κατά την εκκίνηση εμφανίζεται για λίγο η οθόνη «Encrypting your device».
-settings-encryption-step-background = Τα υπόλοιπα γίνονται στο παρασκήνιο ενώ συνεχίζετε να εργάζεστε.
-settings-encryption-step-plugged-in = Κρατήστε τον υπολογιστή στο ρεύμα μέχρι να ολοκληρωθεί.
-settings-encryption-ask-pin = Να ζητείται και PIN
-settings-encryption-ask-pin-description = Ο δίσκος μένει κλειδωμένος ακόμη κι αν κάποιος πάρει τον υπολογιστή. Θα σας ζητηθεί μόλις ολοκληρωθεί η κρυπτογράφηση.
-settings-encryption-starting-button = Έναρξη…
-settings-encryption-restart-and-encrypt = Επανεκκίνηση και κρυπτογράφηση
-
-## Device encryption: turning it off
-
-settings-encryption-turn-off-title = Απενεργοποίηση κρυπτογράφησης συσκευής;
-settings-encryption-turn-off-description = Τα αρχεία σας αποκρυπτογραφούνται στο παρασκήνιο ενώ εργάζεστε. Μετά, όποιος βγάλει τον δίσκο μπορεί να τον διαβάσει.
-settings-encryption-keep = Διατήρηση κρυπτογράφησης
-settings-encryption-turning-off = Απενεργοποίηση…
-settings-encryption-turn-off = Απενεργοποίηση
 
 ## Device encryption: unlocking the disk
 
@@ -259,6 +199,7 @@ settings-encryption-unlock-disk-field = Κλειδί αποκατάστασης 
 
 ## Device encryption: security chip and PIN
 
+settings-encryption-ask-pin = Να ζητείται και PIN
 settings-encryption-chip-setup-description = Το τσιπ ασφαλείας του υπολογιστή σας ξεκλειδώνει τον δίσκο μόνο του κατά την εκκίνηση, οπότε δεν χρειάζεται πια να πληκτρολογείτε πρώτα φράση πρόσβασης.
 settings-encryption-add-pin-title = Προσθήκη PIN
 settings-encryption-add-pin-description = Θα το πληκτρολογείτε σε κάθε εκκίνηση του υπολογιστή. Χωρίς αυτό, ο δίσκος μένει κλειδωμένος, ακόμη κι αν κάποιος πάρει ολόκληρο τον υπολογιστή.

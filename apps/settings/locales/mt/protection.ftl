@@ -52,18 +52,7 @@ settings-privacy-delete-after-hint = Kemm jibqgħu l-fajls qabel jitneħħew
 ## Security: summary at the top of the page
 
 settings-security-protected = L-apparat huwa protett
-settings-security-encrypting = Qed jiġi ċċifrat l-apparat
-settings-security-encrypting-progress = { $progress }. Kompli aħdem sakemm jispiċċa.
-settings-security-decrypting = Qed jintefa ċ-ċċifrar tal-apparat
-settings-security-restart-to-encrypt = Irristartja biex jibda ċ-ċċifrar
-settings-security-restart-to-encrypt-description = Iċ-ċċifrar jibda l-ħin li jmiss li dan il-kompjuter jirristartja.
-settings-security-encryption-failed = Iċ-ċċifrar ma bediex
-settings-security-encryption-failed-description = Luft beda mingħajru u l-fajls ma nbidlux. Erġa’ ixgħlu biex terġa’ tipprova.
-settings-security-encryption-refused-description = Luft spiċċa jibdel id-daqs tiegħu, iżda ċ-ċċifrar ma setax jibda wara. Il-fajls ma nbidlux. Erġa’ ixgħlu biex terġa’ tipprova.
-settings-security-waiting-to-encrypt = Iċ-ċċifrar qed jistenna
-settings-security-waiting-to-encrypt-description = Luft għadu qed jibdel id-daqs tiegħu. Meta jispiċċa, iċ-ċċifrar jibda fir-restart li jmiss.
 settings-security-could-be-safer = L-apparat jista’ jkun aktar sigur
-settings-security-could-be-safer-description = Ixgħel iċ-ċċifrar tal-apparat biex il-fajls jibqgħu privati.
 settings-security-starts-differently-description = Jekk biddilt is-settings tas-Secure Boot, ikkonferma l-bidla biex id-diska terġa’ tiżblokka waħedha.
 settings-security-needed-recovery-key = Id-diska kellha bżonn iċ-ċavetta tal-irkupru
 settings-security-needed-recovery-key-description = Erġa’ orbot iċ-ċippa tas-sigurtà biex tiżblokka waħedha.
@@ -173,29 +162,6 @@ settings-usb-hold-back-description = Dawk imqabbda waqt li l-iskrin huwa msakkar
 ## Device encryption
 
 settings-encryption = Ċċifrar tal-apparat
-settings-encryption-encrypting = Qed jiġi ċċifrat dan l-apparat
-settings-encryption-decrypting = Qed jintefa ċ-ċċifrar tal-apparat
-settings-encryption-starting = Jibda l-ħin li jmiss li tirristartja
-settings-encryption-failed = Ma bediex fl-aħħar restart, il-fajls ma nbidlux
-settings-encryption-waiting = Jistenna lil Luft jispiċċa jibdel id-daqs, imbagħad jibda fir-restart li jmiss
-settings-encryption-refused = Ma setax jibda wara li Luft biddel id-daqs, il-fajls ma nbidlux
-settings-encryption-off = Iżomm il-fajls privati jekk dan il-kompjuter jintilef
-settings-encryption-progress = { $percent } lest
-settings-encryption-progress-seconds = { $percent } lest, fadal inqas minn minuta
-settings-encryption-progress-minutes = { $minutes ->
-    [one] { $percent } lest, fadal madwar { $minutes } minuta
-    [two] { $percent } lest, fadal madwar { $minutes } minuti
-    [few] { $percent } lest, fadal madwar { $minutes } minuti
-    [many] { $percent } lest, fadal madwar { $minutes } minuta
-   *[other] { $percent } lest, fadal madwar { $minutes } minuta
-}
-settings-encryption-progress-hours = { $hours ->
-    [one] { $percent } lest, fadal madwar { $hours } siegħa
-    [two] { $percent } lest, fadal madwar { $hours } sigħat
-    [few] { $percent } lest, fadal madwar { $hours } sigħat
-    [many] { $percent } lest, fadal madwar { $hours } siegħa
-   *[other] { $percent } lest, fadal madwar { $hours } siegħa
-}
 settings-encryption-unlocks-chip-pin = Tiżblokka biċ-ċippa tas-sigurtà u l-PIN
 settings-encryption-unlocks-chip = Tiżblokka waħedha biċ-ċippa tas-sigurtà
 settings-encryption-unlocks-passphrase = Titlob il-passphrase meta tistartja
@@ -218,38 +184,6 @@ settings-encryption-drives-auto-unlock = { $count ->
     [many] { $count } drajv iċċifrat jiżblokka ma’ dan il-kompjuter
    *[other] { $count } drajv iċċifrat jiżblokka ma’ dan il-kompjuter
 }
-
-## Device encryption: turning it on
-
-settings-encryption-turn-on-title = Ixgħel iċ-ċċifrar tal-apparat
-settings-encryption-turn-on-description = Il-fajls jibqgħu privati jekk dan il-kompjuter jintilef jew jinsteraq. Mingħajr iċ-ċavetta t-tajba, ħadd ma jista’ jaqra d-diska.
-settings-encryption-blocked-title = Iċ-ċċifrar tal-apparat għadu ma jistax jinxtegħel
-settings-encryption-blocked-description = Irranġa dak li hu mmarkat hawn taħt, imbagħad erġa’ pprova.
-settings-encryption-backup = Qabel tibda, kun ċert li għandek backup tal-fajls importanti.
-settings-encryption-key-title = Issejvja ċ-ċavetta tal-irkupru
-settings-encryption-key-description = Jekk xi darba d-diska ma tkunx tista’ tiżblokka waħedha, bħal wara tiswija, din iċ-ċavetta ddaħħlek lura. Żommha x’imkien għajr f’dan il-kompjuter.
-settings-encryption-unlock-title = Żblokk meta jistartja
-settings-encryption-unlock-description = Iċ-ċippa tas-sigurtà tiżblokka d-diska waħedha meta jistartja l-kompjuter, għalhekk id-dħul jibqa’ l-istess.
-settings-encryption-passphrase-title = Agħżel passphrase
-settings-encryption-passphrase-description = Dan il-kompjuter ma jistax jiżblokka d-diska waħdu, għalhekk jitlob din il-passphrase kull darba li jistartja.
-settings-encryption-summary-title = Lest biex jiċċifra
-settings-encryption-summary-description = Hekk se jiġri issa.
-settings-encryption-step-restart = Il-kompjuter jirristartja darba.
-settings-encryption-step-screen = Waqt li jistartja, jidher għal ftit skrin “Encrypting your device”.
-settings-encryption-step-background = Il-bqija jsir fl-isfond waqt li tkompli taħdem.
-settings-encryption-step-plugged-in = Żomm il-kompjuter imqabbad mal-elettriku sakemm jispiċċa.
-settings-encryption-ask-pin = Itlob ukoll PIN
-settings-encryption-ask-pin-description = Iżżomm id-diska msakkra anke jekk xi ħadd jieħu l-kompjuter. Jintalab ladarba jispiċċa ċ-ċċifrar.
-settings-encryption-starting-button = Qed jibda…
-settings-encryption-restart-and-encrypt = Irristartja u ċċifra
-
-## Device encryption: turning it off
-
-settings-encryption-turn-off-title = Titfi ċ-ċċifrar tal-apparat?
-settings-encryption-turn-off-description = Il-fajls jiġu deċifrati fl-isfond waqt li taħdem. Wara, kull min joħroġ id-diska jista’ jaqraha.
-settings-encryption-keep = Żomm iċ-ċċifrar
-settings-encryption-turning-off = Qed jintefa…
-settings-encryption-turn-off = Itfi
 
 ## Device encryption: unlocking the disk
 
@@ -283,6 +217,7 @@ settings-encryption-unlock-disk-field = Ċavetta tal-irkupru jew passphrase
 
 ## Device encryption: security chip and PIN
 
+settings-encryption-ask-pin = Itlob ukoll PIN
 settings-encryption-chip-setup-description = Iċ-ċippa tas-sigurtà fil-kompjuter tiżblokka d-diska waħedha meta jistartja, għalhekk ma tibqax tittajpja passphrase l-ewwel.
 settings-encryption-add-pin-title = Żid PIN
 settings-encryption-add-pin-description = Se tittajpjah kull darba li jistartja l-kompjuter. Mingħajru, id-diska tibqa’ msakkra, anke jekk xi ħadd jieħu l-kompjuter kollu.

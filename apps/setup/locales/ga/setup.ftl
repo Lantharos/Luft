@@ -261,18 +261,12 @@ setup-secure-boot-new-code = Faigh cód nua
 setup-protect-title = Cosain do chomhaid
 setup-protect-tpm = Criptigh an ríomhaire seo ionas nach féidir le haon duine do chomhaid a léamh gan síniú isteach, fiú má chailltear é. Díghlasálann sé é féin nuair a thosaíonn sé.
 setup-protect-passphrase = Criptigh an ríomhaire seo ionas nach féidir le haon duine do chomhaid a léamh gan d’fhrása faire, fiú má chailltear é.
-setup-protect-staged-title = Cripteofar do chomhaid
-setup-protect-staged-description = Tosóidh an criptiú leis féin tar éis an atosaithe ag deireadh an tsocraithe, agus is féidir leat leanúint ar aghaidh ag úsáid do ríomhaire fad atá sé ag obair.
-setup-protect-waiting-description = Tá Luft fós ag athrú a mhéide. Nuair a bheidh sin déanta, tosóidh an criptiú ag an gcéad atosú eile, agus is féidir leat leanúint ar aghaidh ag úsáid do ríomhaire idir an dá linn.
 setup-protect-keep-safe = Coinnigh an eochair athshlánaithe seo in áit shábháilte, i bhfad ón ríomhaire seo. Beidh sí ag teastáil uait mura féidir leis an ríomhaire é féin a dhíghlasáil choíche.
 setup-protect-passphrase-label = Frása faire
 setup-protect-repeat = Clóscríobh arís é
 setup-protect-mismatch = Ní hionann iad
 setup-protect-kept = Tá m’eochair athshlánaithe coinnithe agam
-setup-protect-background = Déanfar an criptiú sa chúlra tar éis an chéad atosaithe eile, agus is féidir leat leanúint ar aghaidh ag úsáid do ríomhaire idir an dá linn.
 setup-protect-encrypt = Criptigh
-setup-protect-checking = Á sheiceáil…
-setup-protect-start = Criptigh mo chomhaid
 
 ## Fingerprint
 
@@ -289,6 +283,5 @@ setup-fingerprint-choose-another = Roghnaigh méar eile
 
 setup-ready-title = Tá tú réidh
 setup-ready-trust = Atosaigh uair amháin eile chun críochnú. Díreach tar éis an atosaithe, iarrfaidh scáileán gorm ort muinín a bheith agat as Luft. Úsáid an méarchlár ansin leis an gcód seo.
-setup-ready-restart = Atosaigh uair amháin eile chun críochnú, ansin sínigh isteach le do phasfhocal.
 setup-ready-done = Tá do dheasc réidh. Bain sult as Luft.
 setup-ready-start = Tosaigh ag úsáid Luft

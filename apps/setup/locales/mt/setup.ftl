@@ -261,18 +261,12 @@ setup-secure-boot-new-code = Ikseb kodiċi ġdid
 setup-protect-title = Ipproteġi l-fajls
 setup-protect-tpm = Iċċifra dan il-kompjuter biex ħadd ma jkun jista’ jaqra l-fajls mingħajr ma jidħol, anke jekk jintilef. Jiżblokka waħdu meta jinxtegħel.
 setup-protect-passphrase = Iċċifra dan il-kompjuter biex ħadd ma jkun jista’ jaqra l-fajls mingħajr il-passphrase, anke jekk jintilef.
-setup-protect-staged-title = Il-fajls se jiġu ċċifrati
-setup-protect-staged-description = Iċ-ċċifrar jibda waħdu wara r-restart fl-aħħar tas-setup, u tista’ tibqa’ tuża l-kompjuter waqt li jaħdem.
-setup-protect-waiting-description = Luft għadu qed jibdel id-daqs tiegħu. Meta jispiċċa, iċ-ċċifrar jibda fir-restart li jmiss, u sadanittant tista’ tkompli tuża l-kompjuter.
 setup-protect-keep-safe = Żomm din iċ-ċavetta tal-irkupru x’imkien sigur, ’il bogħod minn dan il-kompjuter. Ikollok bżonnha jekk xi darba l-kompjuter ma jkunx jista’ jiżblokka waħdu.
 setup-protect-passphrase-label = Passphrase
 setup-protect-repeat = Erġa’ ttajpjaha
 setup-protect-mismatch = Ma jaqblux
 setup-protect-kept = Żammejt iċ-ċavetta tal-irkupru
-setup-protect-background = Iċ-ċċifrar isir fl-isfond wara r-restart li jmiss, u sadanittant tista’ tibqa’ tuża l-kompjuter.
 setup-protect-encrypt = Iċċifra
-setup-protect-checking = Qed jiċċekkja…
-setup-protect-start = Iċċifra l-fajls
 
 ## Fingerprint
 
@@ -289,6 +283,5 @@ setup-fingerprint-choose-another = Agħżel saba’ ieħor
 
 setup-ready-title = Kollox lest
 setup-ready-trust = Irristartja darba oħra biex tlesti. Eżatt wara r-restart, skrin blu jitolbok tafda lil Luft. Hemmhekk uża t-tastiera b’dan il-kodiċi.
-setup-ready-restart = Irristartja darba oħra biex tlesti, imbagħad idħol bil-password.
 setup-ready-done = Id-desktop huwa lest. Ħu gost b’Luft.
 setup-ready-start = Ibda uża Luft

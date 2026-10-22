@@ -5,7 +5,6 @@ use zbus::{OwnedVariant, Variant};
 use super::status::{SigningKey, Startup};
 use crate::anticheat::Readiness;
 use crate::disk::DiskStatus;
-use crate::disk::encryption::worker::Progress;
 use crate::system::firmware::tpm::Tpm;
 
 pub type Dict = HashMap<String, OwnedVariant>;
@@ -65,18 +64,13 @@ pub fn startup(startup: &Startup) -> Dict {
     ])
 }
 
-pub fn disk(disk: Option<&DiskStatus>, live: Option<Progress>) -> Dict {
+pub fn disk(disk: Option<&DiskStatus>) -> Dict {
     let Some(disk) = disk else {
-        return dict([("Encrypted", false.into()), ("State", "off".into())]);
+        return dict([("Encrypted", false.into())]);
     };
-    let progress = live.map_or(disk.progress, |live| live.done);
-    let remaining = live.map_or(0, |live| live.remaining_seconds);
     dict([
         ("Device", disk.device.as_str().into()),
         ("Encrypted", disk.encrypted.into()),
-        ("State", disk.state.into()),
-        ("Progress", progress.into()),
-        ("Remaining", remaining.into()),
         ("Unlock", disk.unlock.clone().into()),
         ("RecoveryKeyStored", disk.recovery_key_stored.into()),
         ("TpmRefused", disk.tpm_refused.into()),

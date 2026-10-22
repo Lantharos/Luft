@@ -6,12 +6,12 @@
 	import { appearance, GlassShell } from '@luft/ui';
 	import Fingerprint from '#lib/steps/firstboot/Fingerprint.svelte';
 	import SecureBoot from '#lib/steps/firstboot/SecureBoot.svelte';
-	import Protect from '#lib/steps/firstboot/Protect.svelte';
 	import Ready from '#lib/steps/firstboot/Ready.svelte';
 	import Account from '#lib/steps/live/Account.svelte';
 	import Destination from '#lib/steps/live/destination/Destination.svelte';
 	import Finishing from '#lib/steps/live/Finishing.svelte';
 	import Network from '#lib/steps/live/network/Network.svelte';
+	import Protect from '#lib/steps/live/Protect.svelte';
 	import Region from '#lib/steps/live/Region.svelte';
 	import { flow } from '#lib/state/flow.svelte.js';
 	import { install } from '#lib/state/install.svelte.js';

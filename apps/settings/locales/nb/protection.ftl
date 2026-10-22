@@ -52,18 +52,7 @@ settings-privacy-delete-after-hint = Hvor lenge filene blir liggende før de fje
 ## Security: summary at the top of the page
 
 settings-security-protected = Enheten din er beskyttet
-settings-security-encrypting = Krypterer enheten din
-settings-security-encrypting-progress = { $progress }. Du kan jobbe videre mens det fullføres.
-settings-security-decrypting = Slår av enhetskryptering
-settings-security-restart-to-encrypt = Start på nytt for å begynne krypteringen
-settings-security-restart-to-encrypt-description = Krypteringen begynner neste gang denne datamaskinen startes på nytt.
-settings-security-encryption-failed = Krypteringen startet ikke
-settings-security-encryption-failed-description = Luft startet uten den, og filene dine ble ikke endret. Slå den på igjen for å prøve en gang til.
-settings-security-encryption-refused-description = Luft ble ferdig med å endre størrelsen sin, men krypteringen kunne ikke starte etterpå. Filene dine ble ikke endret. Slå den på igjen for å prøve en gang til.
-settings-security-waiting-to-encrypt = Krypteringen venter
-settings-security-waiting-to-encrypt-description = Luft endrer fortsatt størrelsen sin. Når det er ferdig, starter krypteringen ved neste omstart.
 settings-security-could-be-safer = Enheten din kunne vært tryggere
-settings-security-could-be-safer-description = Slå på enhetskryptering for å holde filene dine private.
 settings-security-starts-differently-description = Hvis du har endret Secure Boot-innstillingene, bekrefter du det, så låser disken seg opp av seg selv igjen.
 settings-security-needed-recovery-key = Disken trengte gjenopprettingsnøkkelen
 settings-security-needed-recovery-key-description = Koble til sikkerhetsbrikken på nytt, så låser disken seg opp av seg selv.
@@ -158,23 +147,6 @@ settings-usb-hold-back-description = De som kobles til mens skjermen er låst, v
 ## Device encryption
 
 settings-encryption = Enhetskryptering
-settings-encryption-encrypting = Krypterer denne enheten
-settings-encryption-decrypting = Slår av enhetskryptering
-settings-encryption-starting = Begynner neste gang du starter på nytt
-settings-encryption-failed = Startet ikke ved forrige omstart, filene dine ble ikke endret
-settings-encryption-waiting = Venter til Luft er ferdig med å endre størrelse, og starter så ved neste omstart
-settings-encryption-refused = Kunne ikke starte etter at Luft endret størrelse, filene dine ble ikke endret
-settings-encryption-off = Holder filene dine private hvis denne datamaskinen kommer bort
-settings-encryption-progress = { $percent } ferdig
-settings-encryption-progress-seconds = { $percent } ferdig, under ett minutt igjen
-settings-encryption-progress-minutes = { $minutes ->
-    [one] { $percent } ferdig, omtrent { $minutes } minutt igjen
-   *[other] { $percent } ferdig, omtrent { $minutes } minutter igjen
-}
-settings-encryption-progress-hours = { $hours ->
-    [one] { $percent } ferdig, omtrent { $hours } time igjen
-   *[other] { $percent } ferdig, omtrent { $hours } timer igjen
-}
 settings-encryption-unlocks-chip-pin = Låses opp med sikkerhetsbrikken og PIN-koden din
 settings-encryption-unlocks-chip = Låses opp av seg selv med sikkerhetsbrikken
 settings-encryption-unlocks-passphrase = Ber om passfrasen din ved oppstart
@@ -194,38 +166,6 @@ settings-encryption-drives-auto-unlock = { $count ->
     [one] { $count } kryptert disk låses opp sammen med denne datamaskinen
    *[other] { $count } krypterte disker låses opp sammen med denne datamaskinen
 }
-
-## Device encryption: turning it on
-
-settings-encryption-turn-on-title = Slå på enhetskryptering
-settings-encryption-turn-on-description = Filene dine forblir private hvis denne datamaskinen kommer bort eller blir stjålet. Uten riktig nøkkel kan ingen lese disken.
-settings-encryption-blocked-title = Enhetskryptering kan ikke slås på ennå
-settings-encryption-blocked-description = Ordne det som er merket nedenfor, og prøv igjen.
-settings-encryption-backup = Før du begynner, må du sørge for at de viktige filene dine er sikkerhetskopiert.
-settings-encryption-key-title = Lagre gjenopprettingsnøkkelen
-settings-encryption-key-description = Hvis disken en gang ikke kan låse seg opp av seg selv, for eksempel etter en reparasjon, får du tilgang igjen med denne nøkkelen. Oppbevar den et annet sted enn på denne datamaskinen.
-settings-encryption-unlock-title = Opplåsing ved oppstart
-settings-encryption-unlock-description = Sikkerhetsbrikken låser opp disken av seg selv ved oppstart, så påloggingen blir som før.
-settings-encryption-passphrase-title = Velg en passfrase
-settings-encryption-passphrase-description = Denne datamaskinen kan ikke låse opp disken av seg selv, så den ber om denne passfrasen hver gang den starter.
-settings-encryption-summary-title = Klar til å kryptere
-settings-encryption-summary-description = Dette skjer nå.
-settings-encryption-step-restart = Datamaskinen starter på nytt én gang.
-settings-encryption-step-screen = Mens den starter, vises skjermen «Encrypting your device» en kort stund.
-settings-encryption-step-background = Resten skjer i bakgrunnen mens du jobber videre.
-settings-encryption-step-plugged-in = Hold datamaskinen koblet til strøm til den er ferdig.
-settings-encryption-ask-pin = Be også om en PIN-kode
-settings-encryption-ask-pin-description = Holder disken låst selv om noen tar datamaskinen. Du blir spurt om den når krypteringen er ferdig.
-settings-encryption-starting-button = Starter…
-settings-encryption-restart-and-encrypt = Start på nytt og krypter
-
-## Device encryption: turning it off
-
-settings-encryption-turn-off-title = Vil du slå av enhetskryptering?
-settings-encryption-turn-off-description = Filene dine dekrypteres i bakgrunnen mens du jobber. Etterpå kan alle som tar ut disken, lese den.
-settings-encryption-keep = Behold krypteringen
-settings-encryption-turning-off = Slår av…
-settings-encryption-turn-off = Slå av
 
 ## Device encryption: unlocking the disk
 
@@ -259,6 +199,7 @@ settings-encryption-unlock-disk-field = Gjenopprettingsnøkkel eller passfrase
 
 ## Device encryption: security chip and PIN
 
+settings-encryption-ask-pin = Be også om en PIN-kode
 settings-encryption-chip-setup-description = Sikkerhetsbrikken i datamaskinen låser opp disken av seg selv ved oppstart, så du slipper å skrive inn en passfrase først.
 settings-encryption-add-pin-title = Legg til en PIN-kode
 settings-encryption-add-pin-description = Du skriver den inn hver gang datamaskinen starter. Uten den forblir disken låst, selv om noen tar hele datamaskinen.

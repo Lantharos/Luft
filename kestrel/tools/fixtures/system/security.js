@@ -10,11 +10,6 @@ const TRUST = `<node><interface name="com.lantharos.Trust1">
   <property name="Disk" type="a{sv}" access="read"/>
   <property name="AntiCheat" type="a{sv}" access="read"/>
   <method name="GenerateRecoveryKey"><arg name="key" type="s" direction="out"/></method>
-  <method name="CheckEncryption"><arg name="checks" type="a(sbs)" direction="out"/></method>
-  <method name="TurnOnEncryption">
-    <arg name="recovery_key" type="s" direction="in"/><arg name="pin" type="s" direction="in"/><arg name="passphrase" type="s" direction="in"/>
-  </method>
-  <method name="TurnOffEncryption"><arg name="unlock" type="s" direction="in"/></method>
   <method name="SetUpTpmUnlock">
     <arg name="unlock" type="s" direction="in"/><arg name="pin" type="s" direction="in"/><arg name="recovery_key" type="s" direction="out"/>
   </method>
@@ -74,16 +69,12 @@ export function publishSecurity(publish, calls, model, trust = {}) {
       {State: 'enrolled', Available: true, Reason: '', Missed: 0, MissedThisBoot: false, OtherKeys: [], RemovingOtherKeys: false}),
     Startup: variants({Installed: 'b', Measured: 'b', Available: 'b', Reason: 's'},
       {Installed: true, Measured: true, Available: true, Reason: ''}),
-    Disk: variants({Device: 's', Encrypted: 'b', State: 's', Progress: 'd', Remaining: 't', Unlock: 'as', RecoveryKeyStored: 'b', TpmRefused: 'b',
-      SecureBootChanged: 'b'},
-      {Device: '/dev/nvme0n1p3', Encrypted: true, State: 'on', Progress: 0, Remaining: 0, Unlock: ['tpm', 'pin', 'recovery-key'],
-        RecoveryKeyStored: true, TpmRefused: false, SecureBootChanged: false}),
+    Disk: variants({Device: 's', Encrypted: 'b', Unlock: 'as', RecoveryKeyStored: 'b', TpmRefused: 'b', SecureBootChanged: 'b'},
+      {Device: '/dev/nvme0n1p3', Encrypted: true, Unlock: ['tpm', 'pin', 'recovery-key'], RecoveryKeyStored: true, TpmRefused: false,
+        SecureBootChanged: false}),
     AntiCheat: variants({Checks: 'a(sbs)', UsesLuftKey: 'b'},
       {Checks: ANTI_CHEAT_CHECKS.map(id => [id, true, '']), UsesLuftKey: true}),
     GenerateRecoveryKey: () => RECOVERY_KEY,
-    CheckEncryption: () => [['space', true, 'There’s enough free space to encrypt the disk.'], ['power', true, 'The computer is plugged in.']],
-    TurnOnEncryption: () => calls.push('TurnOnEncryption'),
-    TurnOffEncryption: () => calls.push('TurnOffEncryption'),
     SetUpTpmUnlock: () => {
       calls.push('SetUpTpmUnlock');
       return '';

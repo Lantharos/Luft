@@ -178,7 +178,6 @@ luft-bar-used = { $size }, { $used } të përdorura
 luft-resize-title = Ndrysho sa hapësirë ka Luft
 luft-resize-description = Jepi Luft më shumë nga hapësira e Windows, ose ktheji Windows një pjesë.
 luft-resize-drive-description = Jepi Luft më shumë nga hapësira e lirë në { $drive }, ose lëre një pjesë të saj të lirë.
-luft-resize-reencrypting = Luft ende po e enkripton ose po e dekripton diskun e vet. Sapo të mbarojë, madhësia e tij mund të ndryshojë.
 luft-resize-passphrase = Disku i Luft hapet vetëm me frazëkalim, dhe Luft nuk mund ta shkruajë vetë ndërsa zhvendoset.
 luft-resize-start-first = Nise Luft një herë, që t’i tregojë Meet Luft sa i mbushur është, pastaj kthehu.
 luft-resize-apart = Mes Windows dhe Luft ndodhet një ndarje tjetër, ndaj ata nuk mund ta ndajnë hapësirën.

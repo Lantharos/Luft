@@ -47,25 +47,36 @@ async fn wipe(drive: &str) -> Result<()> {
         .map_err(failed)
 }
 
-async fn create(drive: &str, part: &Part) -> Result<String> {
+async fn create(drive: &str, part: &Part, encrypted: bool) -> Result<String> {
     let (offset, size, kind, name) = (
         part.offset,
         part.size,
         part.role.partition_type(),
         part.role.name(),
     );
-    let (filesystem, label) = part.role.filesystem();
-    let mut format = quiet();
-    format.insert("label", Variant::from(label));
-    udisks::created(
-        drive,
-        TABLE,
-        "CreatePartitionAndFormat",
-        &(offset, size, kind, name, quiet(), filesystem, format),
-    )
-    .await
-    .map_err(failed)
-    .with_context(|| part.role.creation_failed())
+    let created = if encrypted && part.role == Role::Root {
+        udisks::created(
+            drive,
+            TABLE,
+            "CreatePartition",
+            &(offset, size, kind, name, quiet()),
+        )
+        .await
+    } else {
+        let (filesystem, label) = part.role.filesystem();
+        let mut format = quiet();
+        format.insert("label", Variant::from(label));
+        udisks::created(
+            drive,
+            TABLE,
+            "CreatePartitionAndFormat",
+            &(offset, size, kind, name, quiet(), filesystem, format),
+        )
+        .await
+    };
+    created
+        .map_err(failed)
+        .with_context(|| part.role.creation_failed())
 }
 
 async fn describe(role: Role, block: &str) -> Result<Created> {
@@ -80,7 +91,7 @@ async fn describe(role: Role, block: &str) -> Result<Created> {
     })
 }
 
-pub async fn apply(plan: &Plan) -> Result<Vec<Created>> {
+pub async fn apply(plan: &Plan, encrypted: bool) -> Result<Vec<Created>> {
     if plan.wipe {
         wipe(&plan.drive).await?;
     }
@@ -92,7 +103,7 @@ pub async fn apply(plan: &Plan) -> Result<Vec<Created>> {
     }
     let mut created = Vec::with_capacity(plan.parts.len());
     for part in &plan.parts {
-        let block = create(&plan.drive, part).await?;
+        let block = create(&plan.drive, part, encrypted).await?;
         created.push(describe(part.role, &block).await?);
     }
     Ok(created)

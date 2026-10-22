@@ -52,18 +52,7 @@ settings-privacy-delete-after-hint = Sa qëndrojnë skedarët para se të hiqen
 ## Security: summary at the top of the page
 
 settings-security-protected = Pajisja jote është e mbrojtur
-settings-security-encrypting = Po enkriptohet pajisja jote
-settings-security-encrypting-progress = { $progress }. Vazhdo punën ndërsa përfundon.
-settings-security-decrypting = Po çaktivizohet enkriptimi i pajisjes
-settings-security-restart-to-encrypt = Rinis për të nisur enkriptimin
-settings-security-restart-to-encrypt-description = Enkriptimi nis herën tjetër që rinis këtë kompjuter.
-settings-security-encryption-failed = Enkriptimi nuk nisi
-settings-security-encryption-failed-description = Luft u nis pa të dhe skedarët e tu nuk ndryshuan. Aktivizoje sërish për të provuar edhe një herë.
-settings-security-encryption-refused-description = Luft mbaroi ndryshimin e madhësisë, por enkriptimi nuk mundi të nisë pas kësaj. Skedarët e tu nuk ndryshuan. Aktivizoje sërish për të provuar edhe një herë.
-settings-security-waiting-to-encrypt = Enkriptimi po pret
-settings-security-waiting-to-encrypt-description = Luft ende po ndryshon madhësinë. Sapo të mbarojë, enkriptimi nis në rinisjen e ardhshme.
 settings-security-could-be-safer = Pajisja jote mund të ishte më e sigurt
-settings-security-could-be-safer-description = Aktivizo enkriptimin e pajisjes që skedarët e tu të mbeten privatë.
 settings-security-starts-differently-description = Nëse ndryshove cilësimet e Secure Boot, konfirmoje që disku të zhbllokohet sërish vetë.
 settings-security-needed-recovery-key = Disku yt kërkoi çelësin e rikuperimit
 settings-security-needed-recovery-key-description = Lidhe sërish çipin e sigurisë që të zhbllokohet vetë.
@@ -158,23 +147,6 @@ settings-usb-hold-back-description = Ato që lidhen kur je i bllokuar presin der
 ## Device encryption
 
 settings-encryption = Enkriptimi i pajisjes
-settings-encryption-encrypting = Po enkriptohet kjo pajisje
-settings-encryption-decrypting = Po çaktivizohet enkriptimi i pajisjes
-settings-encryption-starting = Nis herën tjetër që rinis
-settings-encryption-failed = Nuk nisi në rinisjen e fundit, skedarët e tu nuk ndryshuan
-settings-encryption-waiting = Pret që Luft të mbarojë ndryshimin e madhësisë, pastaj nis në rinisjen e ardhshme
-settings-encryption-refused = Nuk mundi të nisë pasi Luft ndryshoi madhësinë, skedarët e tu nuk ndryshuan
-settings-encryption-off = I mban skedarët privatë nëse ky kompjuter humbet
-settings-encryption-progress = { $percent } kryer
-settings-encryption-progress-seconds = { $percent } kryer, më pak se një minutë mbetur
-settings-encryption-progress-minutes = { $minutes ->
-    [one] { $percent } kryer, rreth { $minutes } minutë mbetur
-   *[other] { $percent } kryer, rreth { $minutes } minuta mbetur
-}
-settings-encryption-progress-hours = { $hours ->
-    [one] { $percent } kryer, rreth { $hours } orë mbetur
-   *[other] { $percent } kryer, rreth { $hours } orë mbetur
-}
 settings-encryption-unlocks-chip-pin = Zhbllokohet me çipin e sigurisë dhe PIN-in tënd
 settings-encryption-unlocks-chip = Zhbllokohet vetë me çipin e sigurisë
 settings-encryption-unlocks-passphrase = Kërkon frazëkalimin tënd në nisje
@@ -194,38 +166,6 @@ settings-encryption-drives-auto-unlock = { $count ->
     [one] { $count } disk i enkriptuar zhbllokohet me këtë kompjuter
    *[other] { $count } disqe të enkriptuar zhbllokohen me këtë kompjuter
 }
-
-## Device encryption: turning it on
-
-settings-encryption-turn-on-title = Aktivizo enkriptimin e pajisjes
-settings-encryption-turn-on-description = Skedarët e tu mbeten privatë nëse ky kompjuter humbet ose vidhet. Pa çelësin e duhur, askush nuk mund ta lexojë diskun.
-settings-encryption-blocked-title = Enkriptimi i pajisjes nuk mund të aktivizohet ende
-settings-encryption-blocked-description = Rregullo atë që është shënuar më poshtë, pastaj provo sërish.
-settings-encryption-backup = Para se të nisësh, sigurohu që skedarët e rëndësishëm të kenë një kopje rezervë.
-settings-encryption-key-title = Ruaj çelësin e rikuperimit
-settings-encryption-key-description = Nëse disku nuk mund të zhbllokohet ndonjëherë vetë, për shembull pas një riparimi, ky çelës të kthen brenda. Mbaje diku tjetër, jo në këtë kompjuter.
-settings-encryption-unlock-title = Zhbllokimi në nisje
-settings-encryption-unlock-description = Çipi i sigurisë e zhbllokon diskun vetë në nisje, ndaj hyrja mbetet si më parë.
-settings-encryption-passphrase-title = Zgjidh një frazëkalim
-settings-encryption-passphrase-description = Ky kompjuter nuk mund ta zhbllokojë diskun vetë, ndaj e kërkon këtë frazëkalim sa herë niset.
-settings-encryption-summary-title = Gati për enkriptim
-settings-encryption-summary-description = Ja çfarë ndodh më pas.
-settings-encryption-step-restart = Kompjuteri yt riniset një herë.
-settings-encryption-step-screen = Gjatë nisjes shfaqet për pak kohë ekrani “Po enkriptohet pajisja jote”.
-settings-encryption-step-background = Pjesa tjetër ndodh në sfond ndërsa vazhdon punën.
-settings-encryption-step-plugged-in = Mbaje kompjuterin të lidhur në korrent derisa të përfundojë.
-settings-encryption-ask-pin = Kërko edhe një PIN
-settings-encryption-ask-pin-description = E mban diskun të bllokuar edhe nëse dikush e merr kompjuterin. Kërkohet sapo të përfundojë enkriptimi.
-settings-encryption-starting-button = Po niset…
-settings-encryption-restart-and-encrypt = Rinis dhe enkripto
-
-## Device encryption: turning it off
-
-settings-encryption-turn-off-title = Të çaktivizohet enkriptimi i pajisjes?
-settings-encryption-turn-off-description = Skedarët e tu dekriptohen në sfond ndërsa punon. Më pas, kushdo që e nxjerr diskun mund ta lexojë.
-settings-encryption-keep = Mbaje enkriptimin
-settings-encryption-turning-off = Po çaktivizohet…
-settings-encryption-turn-off = Çaktivizo
 
 ## Device encryption: unlocking the disk
 
@@ -259,6 +199,7 @@ settings-encryption-unlock-disk-field = Çelësi i rikuperimit ose frazëkalimi
 
 ## Device encryption: security chip and PIN
 
+settings-encryption-ask-pin = Kërko edhe një PIN
 settings-encryption-chip-setup-description = Çipi i sigurisë në kompjuterin tënd e zhbllokon diskun vetë në nisje, ndaj nuk shkruan më frazëkalim më parë.
 settings-encryption-add-pin-title = Shto një PIN
 settings-encryption-add-pin-description = Do ta shkruash sa herë niset kompjuteri. Pa të, disku mbetet i bllokuar, edhe nëse dikush e merr gjithë kompjuterin.

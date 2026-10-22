@@ -46,9 +46,6 @@ pub struct AntiCheat {
 pub struct Disk {
     device: String,
     encrypted: bool,
-    state: String,
-    progress: f64,
-    remaining: u64,
     unlock: Vec<String>,
     recovery_key_stored: bool,
     tpm_refused: bool,
@@ -131,9 +128,6 @@ fn disk(map: &Map) -> Disk {
     Disk {
         device: text(map, "Device"),
         encrypted: flag(map, "Encrypted"),
-        state: text(map, "State"),
-        progress: get(map, "Progress").unwrap_or_default(),
-        remaining: get(map, "Remaining").unwrap_or_default(),
         unlock: get(map, "Unlock").unwrap_or_default(),
         recovery_key_stored: flag(map, "RecoveryKeyStored"),
         tpm_refused: flag(map, "TpmRefused"),

@@ -9,8 +9,7 @@ const AT = {
   back: [85, 547],
   code: [690, 547],
   later: [560, 547],
-  encrypt: [680, 547],
-  kept: [70, 420],
+  notNow: [575, 547],
   addFingerprint: [690, 547],
   continue: [722, 547],
   restart: [720, 547],
@@ -22,16 +21,7 @@ async function checkSecureBoot(setup) {
   await setup.click(AT.code, 'asking for the code shows it');
   await setup.called('EnrollSigningKey', 'the code comes from trustd, which asks shim to add the key');
   await setup.shot('secure-boot-code');
-  await setup.click(AT.later, 'restarting later moves on to encryption');
-}
-
-async function checkProtect(setup) {
-  await setup.shot('protect');
-  await setup.click(AT.encrypt, 'choosing encryption shows the recovery key');
-  await setup.shot('protect-key');
-  await setup.click(AT.kept, 'confirming the key was kept');
-  await setup.click(AT.encrypt, 'encrypting moves on');
-  await setup.called('TurnOnEncryption', 'encryption is turned on through trustd');
+  await setup.click(AT.later, 'restarting later moves on to fingerprints');
 }
 
 async function released(setup, times, label) {
@@ -47,9 +37,8 @@ async function checkFingerprint(setup) {
   await setup.shot('fingerprint-duplicate');
   await setup.click(AT.back, 'going back from the refused finger shows the finger choice again');
   await setup.shot('fingerprint-back');
-  await setup.click(AT.back, 'going back from the finger choice shows the encryption already set up');
-  await setup.shot('protect-staged');
-  await setup.click(AT.continue, 'continuing from the set up encryption returns to fingerprints');
+  await setup.click(AT.back, 'going back from the finger choice shows the Secure Boot code again');
+  await setup.click(AT.later, 'restarting later returns to fingerprints');
   await setup.click(AT.addFingerprint, 'adding a fingerprint starts scanning');
   await setup.called('fingerprint EnrollStart left-index-finger', 'the next finger is offered after the refused one');
   await released(setup, 2, 'the reader is released once the finger is added');
@@ -71,9 +60,9 @@ async function checkKeyAlreadyTrusted() {
   const setup = new Setup();
   await setup.setSigningKey('enrolled');
   await setup.open();
-  await setup.click(AT.encrypt, 'setup opens on encryption when the computer already trusts Luft');
-  require(!(await setup.calls()).includes('EnrollSigningKey'), 'no code is asked for when the computer already trusts Luft');
   await setup.shot('first-boot-trusted');
+  await setup.click(AT.notNow, 'setup opens on fingerprints when the computer already trusts Luft');
+  require(!(await setup.calls()).includes('EnrollSigningKey'), 'no code is asked for when the computer already trusts Luft');
   await setup.close();
   await setup.setSigningKey('none');
 }
@@ -84,11 +73,10 @@ export async function checkFirstBoot(endSession) {
   await checkKeyAlreadyTrusted();
   await setup.open();
   await checkSecureBoot(setup);
-  await checkProtect(setup);
   await checkFingerprint(setup);
   await setup.shot('ready');
   setup.tap(AT.restart);
   await setup.called('installer FinishFirstBoot', 'finishing tells the installer setup is done');
-  await eventually(async () => (await setup.calls()).includes('Reboot'), 'encrypting needs a restart to finish');
+  await eventually(async () => (await setup.calls()).includes('Reboot'), 'adding Luft’s key needs a restart to finish');
   await checkHandoff(endSession);
 }

@@ -243,18 +243,12 @@ setup-secure-boot-new-code = Obtenir un nouveau code
 setup-protect-title = Protéger vos fichiers
 setup-protect-tpm = Chiffrez cet ordinateur pour que personne ne puisse lire vos fichiers sans se connecter, même en cas de perte. Il se déverrouille tout seul au démarrage.
 setup-protect-passphrase = Chiffrez cet ordinateur pour que personne ne puisse lire vos fichiers sans votre phrase secrète, même en cas de perte.
-setup-protect-staged-title = Vos fichiers seront chiffrés
-setup-protect-staged-description = Le chiffrement démarre tout seul après le redémarrage qui termine la configuration, et vous pouvez continuer à utiliser votre ordinateur pendant ce temps.
-setup-protect-waiting-description = Luft change encore de taille. Une fois terminé, le chiffrement commencera au prochain redémarrage, et vous pouvez continuer à utiliser votre ordinateur en attendant.
 setup-protect-keep-safe = Conservez cette clé de récupération en lieu sûr, loin de cet ordinateur. Vous en aurez besoin si l’ordinateur ne parvient plus à se déverrouiller tout seul.
 setup-protect-passphrase-label = Phrase secrète
 setup-protect-repeat = Saisissez-la de nouveau
 setup-protect-mismatch = Les saisies ne correspondent pas
 setup-protect-kept = J’ai conservé ma clé de récupération
-setup-protect-background = Le chiffrement se fait en arrière-plan après le prochain redémarrage, et vous pouvez continuer à utiliser votre ordinateur pendant ce temps.
 setup-protect-encrypt = Chiffrer
-setup-protect-checking = Vérification…
-setup-protect-start = Chiffrer mes fichiers
 
 ## Fingerprint
 
@@ -271,6 +265,5 @@ setup-fingerprint-choose-another = Choisir un autre doigt
 
 setup-ready-title = Tout est prêt
 setup-ready-trust = Redémarrez une dernière fois pour terminer. Juste après le redémarrage, un écran bleu vous demande de faire confiance à Luft. Utilisez le clavier sur cet écran avec ce code.
-setup-ready-restart = Redémarrez une dernière fois pour terminer, puis connectez-vous avec votre mot de passe.
 setup-ready-done = Votre bureau est prêt. Bonne découverte de Luft.
 setup-ready-start = Commencer à utiliser Luft

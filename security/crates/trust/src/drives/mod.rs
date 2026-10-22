@@ -1,5 +1,7 @@
 mod hold;
+mod mask;
 mod record;
+pub mod reencrypt;
 mod room;
 mod target;
 mod unlocking;
@@ -7,7 +9,6 @@ pub mod work;
 
 use anyhow::{Context, Result, bail};
 
-use crate::disk::Check;
 use crate::disk::unlock::{keys, luks};
 use crate::errors::{Busy, NeedsKey, Unsupported};
 use crate::system::host::command::Tool;
@@ -19,6 +20,12 @@ use room::Room;
 use target::Target;
 
 const SHORTEST_PASSPHRASE: usize = 8;
+
+pub struct Check {
+    pub id: &'static str,
+    pub passed: bool,
+    pub message: String,
+}
 
 pub struct Assessment {
     pub method: &'static str,

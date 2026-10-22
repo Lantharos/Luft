@@ -52,18 +52,7 @@ settings-privacy-delete-after-hint = Hve lengi skrár eru geymdar áður en þæ
 ## Security: summary at the top of the page
 
 settings-security-protected = Tækið þitt er varið
-settings-security-encrypting = Dulritar tækið þitt
-settings-security-encrypting-progress = { $progress }. Þú getur haldið áfram að vinna á meðan.
-settings-security-decrypting = Slekkur á dulritun tækis
-settings-security-restart-to-encrypt = Endurræstu til að hefja dulritun
-settings-security-restart-to-encrypt-description = Dulritun hefst næst þegar þessi tölva er endurræst.
-settings-security-encryption-failed = Dulritun hófst ekki
-settings-security-encryption-failed-description = Luft ræstist án hennar og skránum þínum var ekki breytt. Kveiktu aftur á henni til að reyna á ný.
-settings-security-encryption-refused-description = Luft lauk við að breyta stærð sinni en dulritun gat ekki hafist á eftir. Skránum þínum var ekki breytt. Kveiktu aftur á henni til að reyna á ný.
-settings-security-waiting-to-encrypt = Dulritun bíður
-settings-security-waiting-to-encrypt-description = Luft er enn að breyta stærð sinni. Þegar því lýkur hefst dulritun við næstu endurræsingu.
 settings-security-could-be-safer = Tækið þitt gæti verið öruggara
-settings-security-could-be-safer-description = Kveiktu á dulritun tækis til að halda skránum þínum lokuðum öðrum.
 settings-security-starts-differently-description = Ef þú breyttir Secure Boot-stillingum tölvunnar skaltu staðfesta það svo diskurinn opnist aftur sjálfkrafa.
 settings-security-needed-recovery-key = Diskurinn þurfti endurheimtarlykilinn
 settings-security-needed-recovery-key-description = Tengdu öryggiskubbinn aftur svo diskurinn opnist sjálfkrafa.
@@ -158,23 +147,6 @@ settings-usb-hold-back-description = Tæki sem eru tengd á meðan tölvan er l�
 ## Device encryption
 
 settings-encryption = Dulritun tækis
-settings-encryption-encrypting = Dulritar þetta tæki
-settings-encryption-decrypting = Slekkur á dulritun tækis
-settings-encryption-starting = Hefst við næstu endurræsingu
-settings-encryption-failed = Hófst ekki við síðustu endurræsingu, skránum þínum var ekki breytt
-settings-encryption-waiting = Bíður eftir að Luft ljúki við að breyta stærð sinni og hefst svo við næstu endurræsingu
-settings-encryption-refused = Gat ekki hafist eftir að Luft breytti stærð sinni, skránum þínum var ekki breytt
-settings-encryption-off = Heldur skránum þínum lokuðum öðrum ef tölvan týnist
-settings-encryption-progress = { $percent } lokið
-settings-encryption-progress-seconds = { $percent } lokið, innan við mínúta eftir
-settings-encryption-progress-minutes = { $minutes ->
-    [one] { $percent } lokið, um { $minutes } mínúta eftir
-   *[other] { $percent } lokið, um { $minutes } mínútur eftir
-}
-settings-encryption-progress-hours = { $hours ->
-    [one] { $percent } lokið, um { $hours } klukkustund eftir
-   *[other] { $percent } lokið, um { $hours } klukkustundir eftir
-}
 settings-encryption-unlocks-chip-pin = Opnast með öryggiskubbnum og PIN-númerinu þínu
 settings-encryption-unlocks-chip = Opnast sjálfkrafa með öryggiskubbnum
 settings-encryption-unlocks-passphrase = Biður um lykilsetninguna þína við ræsingu
@@ -194,38 +166,6 @@ settings-encryption-drives-auto-unlock = { $count ->
     [one] { $count } dulritað drif opnast með þessari tölvu
    *[other] { $count } dulrituð drif opnast með þessari tölvu
 }
-
-## Device encryption: turning it on
-
-settings-encryption-turn-on-title = Kveikja á dulritun tækis
-settings-encryption-turn-on-description = Skrárnar þínar eru áfram lokaðar öðrum ef tölvan týnist eða henni er stolið. Án rétta lykilsins getur enginn lesið diskinn.
-settings-encryption-blocked-title = Ekki er hægt að kveikja á dulritun tækis strax
-settings-encryption-blocked-description = Leystu það sem er merkt hér fyrir neðan og reyndu svo aftur.
-settings-encryption-backup = Áður en þú byrjar skaltu ganga úr skugga um að mikilvægar skrár séu afritaðar.
-settings-encryption-key-title = Vistaðu endurheimtarlykilinn
-settings-encryption-key-description = Ef diskurinn getur einhvern tímann ekki opnast sjálfkrafa, til dæmis eftir viðgerð, kemstu inn með þessum lykli. Geymdu hann annars staðar en á þessari tölvu.
-settings-encryption-unlock-title = Opnun við ræsingu
-settings-encryption-unlock-description = Öryggiskubburinn opnar diskinn sjálfkrafa við ræsingu, svo innskráning helst óbreytt.
-settings-encryption-passphrase-title = Veldu lykilsetningu
-settings-encryption-passphrase-description = Þessi tölva getur ekki opnað diskinn sjálfkrafa, svo hún biður um þessa lykilsetningu í hvert sinn sem hún ræsist.
-settings-encryption-summary-title = Tilbúið til dulritunar
-settings-encryption-summary-description = Þetta gerist næst.
-settings-encryption-step-restart = Tölvan endurræsist einu sinni.
-settings-encryption-step-screen = Á meðan hún ræsist birtist stuttlega skjár með fyrirsögninni „Encrypting your device“.
-settings-encryption-step-background = Afgangurinn gerist í bakgrunni á meðan þú heldur áfram að vinna.
-settings-encryption-step-plugged-in = Hafðu tölvuna tengda við rafmagn þar til þessu er lokið.
-settings-encryption-ask-pin = Biðja einnig um PIN-númer
-settings-encryption-ask-pin-description = Heldur diskinum læstum jafnvel þótt einhver taki tölvuna. Beðið er um það þegar dulrituninni lýkur.
-settings-encryption-starting-button = Byrjar…
-settings-encryption-restart-and-encrypt = Endurræsa og dulrita
-
-## Device encryption: turning it off
-
-settings-encryption-turn-off-title = Slökkva á dulritun tækis?
-settings-encryption-turn-off-description = Skrárnar þínar eru afdulritaðar í bakgrunni á meðan þú vinnur. Eftir það getur hver sem tekur diskinn úr lesið hann.
-settings-encryption-keep = Halda dulritun
-settings-encryption-turning-off = Slekkur…
-settings-encryption-turn-off = Slökkva
 
 ## Device encryption: unlocking the disk
 
@@ -259,6 +199,7 @@ settings-encryption-unlock-disk-field = Endurheimtarlykill eða lykilsetning
 
 ## Device encryption: security chip and PIN
 
+settings-encryption-ask-pin = Biðja einnig um PIN-númer
 settings-encryption-chip-setup-description = Öryggiskubburinn í tölvunni opnar diskinn sjálfkrafa við ræsingu, svo þú þarft ekki lengur að slá inn lykilsetningu fyrst.
 settings-encryption-add-pin-title = Bæta við PIN-númeri
 settings-encryption-add-pin-description = Þú slærð það inn í hvert sinn sem tölvan ræsist. Án þess helst diskurinn læstur, jafnvel þótt einhver taki alla tölvuna.

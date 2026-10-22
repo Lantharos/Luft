@@ -52,18 +52,7 @@ settings-privacy-delete-after-hint = Quant de temps es conserven els fitxers aba
 ## Security: summary at the top of the page
 
 settings-security-protected = El dispositiu està protegit
-settings-security-encrypting = S’està xifrant el dispositiu
-settings-security-encrypting-progress = { $progress }. Podeu continuar treballant mentre s’acaba.
-settings-security-decrypting = S’està desactivant el xifratge del dispositiu
-settings-security-restart-to-encrypt = Reinicieu per començar a xifrar
-settings-security-restart-to-encrypt-description = El xifratge començarà el pròxim cop que es reiniciï aquest ordinador.
-settings-security-encryption-failed = El xifratge no ha començat
-settings-security-encryption-failed-description = Luft s’ha iniciat sense xifratge i els fitxers no han canviat. Torneu-lo a activar per provar-ho un altre cop.
-settings-security-encryption-refused-description = Luft ha acabat de canviar de mida, però després el xifratge no ha pogut començar. Els fitxers no han canviat. Torneu-lo a activar per provar-ho un altre cop.
-settings-security-waiting-to-encrypt = El xifratge està en espera
-settings-security-waiting-to-encrypt-description = Luft encara està canviant de mida. Quan acabi, el xifratge començarà en el pròxim reinici.
 settings-security-could-be-safer = El dispositiu podria estar més protegit
-settings-security-could-be-safer-description = Activeu el xifratge del dispositiu per mantenir privats els fitxers.
 settings-security-starts-differently-description = Si heu canviat la configuració de Secure Boot, confirmeu-ho perquè el disc es torni a desbloquejar sol.
 settings-security-needed-recovery-key = El disc ha necessitat la clau de recuperació
 settings-security-needed-recovery-key-description = Torneu a vincular el xip de seguretat perquè es desbloquegi sol.
@@ -158,23 +147,6 @@ settings-usb-hold-back-description = Els que es connecten amb la sessió bloquej
 ## Device encryption
 
 settings-encryption = Xifratge del dispositiu
-settings-encryption-encrypting = S’està xifrant aquest dispositiu
-settings-encryption-decrypting = S’està desactivant el xifratge del dispositiu
-settings-encryption-starting = Començarà el pròxim cop que reinicieu
-settings-encryption-failed = No va començar en el darrer reinici; els fitxers no han canviat
-settings-encryption-waiting = Espera que Luft acabi de canviar de mida i començarà en el pròxim reinici
-settings-encryption-refused = No ha pogut començar després que Luft canviés de mida; els fitxers no han canviat
-settings-encryption-off = Manté privats els fitxers si perdeu aquest ordinador
-settings-encryption-progress = { $percent } completat
-settings-encryption-progress-seconds = { $percent } completat, queda menys d’un minut
-settings-encryption-progress-minutes = { $minutes ->
-    [one] { $percent } completat, queda aproximadament { $minutes } minut
-   *[other] { $percent } completat, queden aproximadament { $minutes } minuts
-}
-settings-encryption-progress-hours = { $hours ->
-    [one] { $percent } completat, queda aproximadament { $hours } hora
-   *[other] { $percent } completat, queden aproximadament { $hours } hores
-}
 settings-encryption-unlocks-chip-pin = Es desbloqueja amb el xip de seguretat i el PIN
 settings-encryption-unlocks-chip = Es desbloqueja sol amb el xip de seguretat
 settings-encryption-unlocks-passphrase = Demana la frase de pas en arrencar
@@ -194,38 +166,6 @@ settings-encryption-drives-auto-unlock = { $count ->
     [one] { $count } unitat xifrada es desbloqueja amb aquest ordinador
    *[other] { $count } unitats xifrades es desbloquegen amb aquest ordinador
 }
-
-## Device encryption: turning it on
-
-settings-encryption-turn-on-title = Activeu el xifratge del dispositiu
-settings-encryption-turn-on-description = Els fitxers es mantenen privats si perdeu aquest ordinador o us el roben. Sense la clau correcta, ningú no pot llegir el disc.
-settings-encryption-blocked-title = Encara no es pot activar el xifratge del dispositiu
-settings-encryption-blocked-description = Resoleu el que s’indica a continuació i torneu-ho a provar.
-settings-encryption-backup = Abans de començar, assegureu-vos que teniu una còpia de seguretat dels fitxers importants.
-settings-encryption-key-title = Deseu la clau de recuperació
-settings-encryption-key-description = Si mai el disc no es pot desbloquejar sol, per exemple després d’una reparació, aquesta clau us hi permetrà tornar a entrar. Guardeu-la en algun lloc que no sigui aquest ordinador.
-settings-encryption-unlock-title = Desbloqueig en arrencar
-settings-encryption-unlock-description = El xip de seguretat desbloqueja el disc sol en arrencar, de manera que iniciar la sessió continua igual.
-settings-encryption-passphrase-title = Trieu una frase de pas
-settings-encryption-passphrase-description = Aquest ordinador no pot desbloquejar el disc sol, així que demanarà aquesta frase de pas cada vegada que s’iniciï.
-settings-encryption-summary-title = A punt per xifrar
-settings-encryption-summary-description = Això és el que passarà a continuació.
-settings-encryption-step-restart = L’ordinador es reiniciarà un cop.
-settings-encryption-step-screen = Mentre s’inicia, apareixerà breument una pantalla «Encrypting your device».
-settings-encryption-step-background = La resta es fa en segon pla mentre continueu treballant.
-settings-encryption-step-plugged-in = Mantingueu l’ordinador endollat fins que acabi.
-settings-encryption-ask-pin = Demana també un PIN
-settings-encryption-ask-pin-description = Manté el disc bloquejat encara que algú s’endugui l’ordinador. Es demana quan acaba el xifratge.
-settings-encryption-starting-button = S’està iniciant…
-settings-encryption-restart-and-encrypt = Reinicia i xifra
-
-## Device encryption: turning it off
-
-settings-encryption-turn-off-title = Voleu desactivar el xifratge del dispositiu?
-settings-encryption-turn-off-description = Els fitxers es desxifren en segon pla mentre treballeu. Després, qualsevol que tregui el disc el podrà llegir.
-settings-encryption-keep = Mantén el xifratge
-settings-encryption-turning-off = S’està desactivant…
-settings-encryption-turn-off = Desactiva
 
 ## Device encryption: unlocking the disk
 
@@ -259,6 +199,7 @@ settings-encryption-unlock-disk-field = Clau de recuperació o frase de pas
 
 ## Device encryption: security chip and PIN
 
+settings-encryption-ask-pin = Demana també un PIN
 settings-encryption-chip-setup-description = El xip de seguretat de l’ordinador desbloqueja el disc sol en arrencar, així que ja no cal escriure primer una frase de pas.
 settings-encryption-add-pin-title = Afegiu un PIN
 settings-encryption-add-pin-description = L’haureu d’escriure cada vegada que s’iniciï l’ordinador. Sense el PIN, el disc es manté bloquejat, encara que algú s’endugui tot l’ordinador.

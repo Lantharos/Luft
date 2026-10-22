@@ -178,7 +178,6 @@ luft-bar-used = { $size }, искористени { $used }
 luft-resize-title = Менување на просторот за Luft
 luft-resize-description = Дајте му на Luft повеќе од просторот на Windows или вратете му дел на Windows.
 luft-resize-drive-description = Дајте му на Luft повеќе од слободниот простор на { $drive } или оставете дел од него слободен.
-luft-resize-reencrypting = Luft сè уште го шифрира или дешифрира својот диск. Штом ќе заврши, неговата големина ќе може да се смени.
 luft-resize-passphrase = Дискот на Luft се отвора само со тајна фраза, а Luft не може сам да ја внесе додека се преместува.
 luft-resize-start-first = Стартувајте го Luft еднаш за да му каже на Meet Luft колку е полн, а потоа вратете се.
 luft-resize-apart = Меѓу Windows и Luft има друга партиција, па тие не можат да го делат својот простор.

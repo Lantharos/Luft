@@ -45,6 +45,7 @@ installer-unknown-zone = The new system doesn't know the time zone { $zone }.
 installer-esp-partition-failed = Couldn't make the EFI system partition
 installer-startup-partition-failed = Couldn't make the partition for Luft's startup files
 installer-root-partition-failed = Couldn't make the partition for Luft
+installer-encryption-failed = Luft's partition couldn't be encrypted
 installer-shrink-failed = Windows couldn't be made smaller
 installer-no-esp = The drive has no EFI system partition
 installer-no-root = No partition for Luft was made
@@ -57,6 +58,7 @@ installer-key-queue-failed = Luft's Secure Boot key couldn't be queued for the n
 
 ## Replacing a Linux system
 
+installer-encryption-keeps-old = Luft can't be encrypted when it keeps the old system's files next to it.
 installer-leftovers-failed = What an earlier attempt left couldn't be cleared
 installer-default-failed = Luft couldn't be made the system that starts
 installer-relabel-failed = Your files couldn't be labelled for Luft

@@ -14,13 +14,13 @@
 
 <SubPage title={t('settings-encryption')} back={t('settings-page-security')} {onclose}>
 	<Section>
-		<EncryptionRow {disk} tpm={trust.tpm} />
+		<EncryptionRow {disk} />
 		{#if trust.drives.available}
 			<DrivesRow drives={trust.drives} />
 		{/if}
 	</Section>
 
-	{#if disk.encrypted && disk.state !== 'decrypting'}
+	{#if disk.encrypted}
 		<UnlockSection {trust} />
 	{/if}
 </SubPage>

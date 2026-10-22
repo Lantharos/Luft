@@ -243,18 +243,12 @@ setup-secure-boot-new-code = Yeni kod al
 setup-protect-title = Dosyalarınızı koruyun
 setup-protect-tpm = Bu bilgisayarı şifreleyin. Böylece kaybolsa bile oturum açmadan kimse dosyalarınızı okuyamaz. Bilgisayar başlarken kilit kendiliğinden açılır.
 setup-protect-passphrase = Bu bilgisayarı şifreleyin. Böylece kaybolsa bile disk parolanız olmadan kimse dosyalarınızı okuyamaz.
-setup-protect-staged-title = Dosyalarınız şifrelenecek
-setup-protect-staged-description = Şifreleme, kurulumun sonundaki yeniden başlatmadan sonra kendiliğinden başlar. Bu sırada bilgisayarınızı kullanmaya devam edebilirsiniz.
-setup-protect-waiting-description = Luft hâlâ boyutunu değiştiriyor. Bu bittiğinde şifreleme bir sonraki yeniden başlatmada başlar ve bu arada bilgisayarınızı kullanmaya devam edebilirsiniz.
 setup-protect-keep-safe = Bu kurtarma anahtarını bu bilgisayardan uzakta, güvenli bir yerde saklayın. Bilgisayarın kilidi bir gün kendiliğinden açılamazsa anahtara ihtiyacınız olur.
 setup-protect-passphrase-label = Disk parolası
 setup-protect-repeat = Yeniden yazın
 setup-protect-mismatch = Eşleşmiyor
 setup-protect-kept = Kurtarma anahtarımı sakladım
-setup-protect-background = Şifreleme bir sonraki yeniden başlatmadan sonra arka planda yapılır. Bu sırada bilgisayarınızı kullanmaya devam edebilirsiniz.
 setup-protect-encrypt = Şifrele
-setup-protect-checking = Denetleniyor…
-setup-protect-start = Dosyalarımı şifrele
 
 ## Fingerprint
 
@@ -271,6 +265,5 @@ setup-fingerprint-choose-another = Başka bir parmak seç
 
 setup-ready-title = Her şey hazır
 setup-ready-trust = Bitirmek için bir kez daha yeniden başlatın. Yeniden başlatmanın hemen ardından mavi bir ekran Luft’a güvenmek isteyip istemediğinizi sorar. Orada klavyeyle bu kodu kullanın.
-setup-ready-restart = Bitirmek için bir kez daha yeniden başlatın, ardından parolanızla oturum açın.
 setup-ready-done = Masaüstünüz hazır. Luft’un keyfini çıkarın.
 setup-ready-start = Luft’u kullanmaya başla

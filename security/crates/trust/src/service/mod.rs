@@ -33,7 +33,6 @@ async fn serve() -> zbus::Result<()> {
         .name(NAME)
         .build()
         .await?;
-    interface::continue_disk_work(&connection).await?;
     drives::continue_work(&connection).await?;
     idle.wait(IDLE_TIMEOUT).await;
     connection.release_name(NAME).await?;

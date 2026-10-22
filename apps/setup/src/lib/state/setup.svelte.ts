@@ -8,7 +8,6 @@ import { regional } from './regional.svelte.js';
 function firstBootSkips(trust: TrustState | null, hardware: Hardware): Step[] {
 	const skips: Step[] = [];
 	if (!trust || trust.secureBoot !== 'on' || trust.key !== 'none' || !trust.keyAvailable) skips.push('secure-boot');
-	if (!trust || trust.encrypted || trust.encryption !== 'off') skips.push('protect');
 	if (!hardware.fingerprint) skips.push('fingerprint');
 	return skips;
 }
@@ -17,11 +16,8 @@ class SetupState {
 	hardware = $state<Hardware>(NO_HARDWARE);
 	trust = $state<TrustState | null>(null);
 	secureBootCode = $state('');
-	stagedRecoveryKey = $state('');
 	refusedFingers = $state<string[]>([]);
 	ready = $state(false);
-
-	needsRestart = $derived(Boolean(this.secureBootCode || this.stagedRecoveryKey));
 
 	async start() {
 		const state = await appState();
@@ -30,8 +26,8 @@ class SetupState {
 		this.hardware = state.hardware;
 		stops.push(await install.start(state.hardware, state.meet));
 		const phase = install.status?.phase ?? 'live';
+		this.trust = await trustState().catch(() => null);
 		if (phase === 'first-boot') {
-			this.trust = await trustState().catch(() => null);
 			void regional.adoptFormats().catch(() => {});
 			flow.begin(phase, firstBootSkips(this.trust, this.hardware));
 		} else {

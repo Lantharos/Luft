@@ -52,18 +52,7 @@ settings-privacy-delete-after-hint = Kiek laiko failai laikomi, kol bus pašalin
 ## Security: summary at the top of the page
 
 settings-security-protected = Jūsų įrenginys apsaugotas
-settings-security-encrypting = Įrenginys šifruojamas
-settings-security-encrypting-progress = { $progress }. Galite dirbti toliau, kol tai baigsis.
-settings-security-decrypting = Išjungiamas įrenginio šifravimas
-settings-security-restart-to-encrypt = Paleiskite iš naujo, kad prasidėtų šifravimas
-settings-security-restart-to-encrypt-description = Šifravimas prasidės kitą kartą paleidus šį kompiuterį iš naujo.
-settings-security-encryption-failed = Šifravimas neprasidėjo
-settings-security-encryption-failed-description = Sistema Luft pasileido be jo, o jūsų failai nepakeisti. Įjunkite jį dar kartą, kad bandytumėte iš naujo.
-settings-security-encryption-refused-description = Sistema Luft baigė keisti savo dydį, bet po to šifravimas negalėjo prasidėti. Jūsų failai nepakeisti. Įjunkite jį dar kartą, kad bandytumėte iš naujo.
-settings-security-waiting-to-encrypt = Šifravimas laukia
-settings-security-waiting-to-encrypt-description = Sistema Luft dar keičia savo dydį. Kai tai bus baigta, šifravimas prasidės kitą kartą paleidus iš naujo.
 settings-security-could-be-safer = Jūsų įrenginys galėtų būti saugesnis
-settings-security-could-be-safer-description = Įjunkite įrenginio šifravimą, kad jūsų failai liktų privatūs.
 settings-security-starts-differently-description = Jei pakeitėte šio kompiuterio Secure Boot nustatymus, patvirtinkite tai, kad diskas vėl būtų atrakinamas savaime.
 settings-security-needed-recovery-key = Diskui prireikė atkūrimo rakto
 settings-security-needed-recovery-key-description = Susiekite saugos lustą iš naujo, kad diskas būtų atrakinamas savaime.
@@ -168,27 +157,6 @@ settings-usb-hold-back-description = Prijungti užrakinus laukia, kol atrakinsit
 ## Device encryption
 
 settings-encryption = Įrenginio šifravimas
-settings-encryption-encrypting = Šis įrenginys šifruojamas
-settings-encryption-decrypting = Išjungiamas įrenginio šifravimas
-settings-encryption-starting = Prasidės kitą kartą paleidus iš naujo
-settings-encryption-failed = Paskutinį kartą paleidus iš naujo neprasidėjo, jūsų failai nepakeisti
-settings-encryption-waiting = Laukia, kol Luft baigs keisti dydį, tada prasidės kitą kartą paleidus iš naujo
-settings-encryption-refused = Nepavyko pradėti po to, kai Luft pakeitė dydį, jūsų failai nepakeisti
-settings-encryption-off = Jūsų failai lieka privatūs, jei šis kompiuteris bus pamestas
-settings-encryption-progress = Atlikta { $percent }
-settings-encryption-progress-seconds = Atlikta { $percent }, liko mažiau nei minutė
-settings-encryption-progress-minutes = { $minutes ->
-    [one] Atlikta { $percent }, liko apie { $minutes } minutė
-    [few] Atlikta { $percent }, liko apie { $minutes } minutės
-    [many] Atlikta { $percent }, liko apie { $minutes } minutės
-   *[other] Atlikta { $percent }, liko apie { $minutes } minučių
-}
-settings-encryption-progress-hours = { $hours ->
-    [one] Atlikta { $percent }, liko apie { $hours } valanda
-    [few] Atlikta { $percent }, liko apie { $hours } valandos
-    [many] Atlikta { $percent }, liko apie { $hours } valandos
-   *[other] Atlikta { $percent }, liko apie { $hours } valandų
-}
 settings-encryption-unlocks-chip-pin = Atrakinamas saugos lustu ir jūsų PIN kodu
 settings-encryption-unlocks-chip = Atrakinamas savaime saugos lustu
 settings-encryption-unlocks-passphrase = Paleidžiant prašoma jūsų slaptafrazės
@@ -210,38 +178,6 @@ settings-encryption-drives-auto-unlock = { $count ->
     [many] { $count } šifruoto disko atrakinama kartu su šiuo kompiuteriu
    *[other] { $count } šifruotų diskų atrakinama kartu su šiuo kompiuteriu
 }
-
-## Device encryption: turning it on
-
-settings-encryption-turn-on-title = Įjungti įrenginio šifravimą
-settings-encryption-turn-on-description = Jūsų failai liks privatūs, jei šis kompiuteris bus pamestas ar pavogtas. Be tinkamo rakto niekas negalės perskaityti disko.
-settings-encryption-blocked-title = Įrenginio šifravimo kol kas įjungti negalima
-settings-encryption-blocked-description = Sutvarkykite toliau pažymėtus dalykus ir bandykite dar kartą.
-settings-encryption-backup = Prieš pradėdami įsitikinkite, kad svarbių failų atsarginės kopijos padarytos.
-settings-encryption-key-title = Įrašykite atkūrimo raktą
-settings-encryption-key-description = Jei diskas kada nors negalės atsirakinti savaime, pavyzdžiui, po remonto, šis raktas padės vėl patekti į sistemą. Laikykite jį ne šiame kompiuteryje.
-settings-encryption-unlock-title = Atrakinimas paleidžiant
-settings-encryption-unlock-description = Saugos lustas paleidžiant atrakina diską savaime, todėl prisijungimas nesikeičia.
-settings-encryption-passphrase-title = Sugalvokite slaptafrazę
-settings-encryption-passphrase-description = Šis kompiuteris negali atrakinti disko savaime, todėl kaskart paleidžiant prašys šios slaptafrazės.
-settings-encryption-summary-title = Paruošta šifruoti
-settings-encryption-summary-description = Štai kas vyks toliau.
-settings-encryption-step-restart = Kompiuteris vieną kartą bus paleistas iš naujo.
-settings-encryption-step-screen = Jam pasileidžiant trumpai pasirodys ekranas „Encrypting your device“.
-settings-encryption-step-background = Visa kita vyks fone, kol jūs dirbsite toliau.
-settings-encryption-step-plugged-in = Kol bus baigta, laikykite kompiuterį prijungtą prie maitinimo.
-settings-encryption-ask-pin = Taip pat prašyti PIN kodo
-settings-encryption-ask-pin-description = Diskas liks užrakintas, net jei kas nors paims kompiuterį. Jo bus paprašyta, kai šifravimas baigsis.
-settings-encryption-starting-button = Pradedama…
-settings-encryption-restart-and-encrypt = Paleisti iš naujo ir šifruoti
-
-## Device encryption: turning it off
-
-settings-encryption-turn-off-title = Išjungti įrenginio šifravimą?
-settings-encryption-turn-off-description = Failai bus iššifruoti fone, kol dirbate. Po to diską išėmęs bet kas galės jį perskaityti.
-settings-encryption-keep = Palikti šifravimą
-settings-encryption-turning-off = Išjungiama…
-settings-encryption-turn-off = Išjungti
 
 ## Device encryption: unlocking the disk
 
@@ -275,6 +211,7 @@ settings-encryption-unlock-disk-field = Atkūrimo raktas arba slaptafrazė
 
 ## Device encryption: security chip and PIN
 
+settings-encryption-ask-pin = Taip pat prašyti PIN kodo
 settings-encryption-chip-setup-description = Jūsų kompiuterio saugos lustas paleidžiant atrakina diską savaime, todėl slaptafrazės įvesti nebereikės.
 settings-encryption-add-pin-title = Pridėti PIN kodą
 settings-encryption-add-pin-description = Jį įvesite kaskart paleisdami kompiuterį. Be jo diskas liks užrakintas, net jei kas nors paims visą kompiuterį.

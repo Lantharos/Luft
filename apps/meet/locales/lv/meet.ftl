@@ -178,7 +178,6 @@ luft-bar-used = { $size }, izmantoti { $used }
 luft-resize-title = Mainīt Luft vietas apjomu
 luft-resize-description = Atvēliet sistēmai Luft vairāk Windows vietas vai atdodiet daļu atpakaļ sistēmai Windows.
 luft-resize-drive-description = Atvēliet sistēmai Luft vairāk brīvās vietas diskā { $drive } vai atstājiet daļu no tās brīvu.
-luft-resize-reencrypting = Luft joprojām šifrē vai atšifrē savu disku. Kad tas būs paveikts, tās lielumu varēs mainīt.
 luft-resize-passphrase = Luft disks atveras tikai ar paroles frāzi, un Luft nevar to pati ievadīt, kamēr pārvietojas.
 luft-resize-start-first = Vienreiz startējiet sistēmu Luft, lai tā varētu paziņot programmai Meet Luft, cik pilna tā ir, un tad atgriezieties.
 luft-resize-apart = Starp Windows un Luft atrodas cits nodalījums, tāpēc tās nevar dalīt savu vietu.

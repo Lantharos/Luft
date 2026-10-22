@@ -52,18 +52,7 @@ settings-privacy-delete-after-hint = Hoelang bestanden blijven voordat ze worden
 ## Security: summary at the top of the page
 
 settings-security-protected = Je apparaat is beveiligd
-settings-security-encrypting = Je apparaat wordt versleuteld
-settings-security-encrypting-progress = { $progress }. Je kunt gewoon doorwerken.
-settings-security-decrypting = Apparaatversleuteling wordt uitgeschakeld
-settings-security-restart-to-encrypt = Start opnieuw op om te versleutelen
-settings-security-restart-to-encrypt-description = Het versleutelen begint de volgende keer dat deze computer opnieuw opstart.
-settings-security-encryption-failed = Versleutelen is niet begonnen
-settings-security-encryption-failed-description = Luft is zonder versleuteling gestart en je bestanden zijn niet gewijzigd. Schakel het opnieuw in om het nog eens te proberen.
-settings-security-encryption-refused-description = Luft is klaar met het wijzigen van zijn grootte, maar daarna kon het versleutelen niet beginnen. Je bestanden zijn niet gewijzigd. Schakel het opnieuw in om het nog eens te proberen.
-settings-security-waiting-to-encrypt = Versleutelen wacht
-settings-security-waiting-to-encrypt-description = Luft wijzigt nog zijn grootte. Zodra dat klaar is, begint het versleutelen bij de volgende herstart.
 settings-security-could-be-safer = Je apparaat kan veiliger
-settings-security-could-be-safer-description = Schakel apparaatversleuteling in om je bestanden privé te houden.
 settings-security-starts-differently-description = Als je de Secure Boot-instellingen hebt gewijzigd, bevestig dit dan, zodat de schijf weer vanzelf ontgrendelt.
 settings-security-needed-recovery-key = Je schijf had de herstelsleutel nodig
 settings-security-needed-recovery-key-description = Koppel de beveiligingschip opnieuw, zodat de schijf vanzelf ontgrendelt.
@@ -158,23 +147,6 @@ settings-usb-hold-back-description = Apparaten die worden aangesloten terwijl de
 ## Device encryption
 
 settings-encryption = Apparaatversleuteling
-settings-encryption-encrypting = Dit apparaat wordt versleuteld
-settings-encryption-decrypting = Apparaatversleuteling wordt uitgeschakeld
-settings-encryption-starting = Begint de volgende keer dat je opnieuw opstart
-settings-encryption-failed = Niet begonnen bij de laatste herstart, je bestanden zijn niet gewijzigd
-settings-encryption-waiting = Wacht tot Luft klaar is met het wijzigen van zijn grootte en begint dan bij de volgende herstart
-settings-encryption-refused = Kon niet beginnen nadat Luft zijn grootte wijzigde, je bestanden zijn niet gewijzigd
-settings-encryption-off = Houdt je bestanden privé als deze computer kwijtraakt
-settings-encryption-progress = { $percent } klaar
-settings-encryption-progress-seconds = { $percent } klaar, nog minder dan een minuut
-settings-encryption-progress-minutes = { $minutes ->
-    [one] { $percent } klaar, nog ongeveer { $minutes } minuut
-   *[other] { $percent } klaar, nog ongeveer { $minutes } minuten
-}
-settings-encryption-progress-hours = { $hours ->
-    [one] { $percent } klaar, nog ongeveer { $hours } uur
-   *[other] { $percent } klaar, nog ongeveer { $hours } uur
-}
 settings-encryption-unlocks-chip-pin = Ontgrendelt met de beveiligingschip en je pincode
 settings-encryption-unlocks-chip = Ontgrendelt vanzelf met de beveiligingschip
 settings-encryption-unlocks-passphrase = Vraagt bij het opstarten om je wachtwoordzin
@@ -194,38 +166,6 @@ settings-encryption-drives-auto-unlock = { $count ->
     [one] { $count } versleutelde schijf ontgrendelt met deze computer
    *[other] { $count } versleutelde schijven ontgrendelen met deze computer
 }
-
-## Device encryption: turning it on
-
-settings-encryption-turn-on-title = Apparaatversleuteling inschakelen
-settings-encryption-turn-on-description = Je bestanden blijven privé als deze computer kwijtraakt of wordt gestolen. Zonder de juiste sleutel kan niemand de schijf lezen.
-settings-encryption-blocked-title = Apparaatversleuteling kan nog niet worden ingeschakeld
-settings-encryption-blocked-description = Los op wat hieronder is gemarkeerd en probeer het dan opnieuw.
-settings-encryption-backup = Zorg voordat je begint dat er een back-up van je belangrijke bestanden is.
-settings-encryption-key-title = Je herstelsleutel bewaren
-settings-encryption-key-description = Als de schijf ooit niet vanzelf kan ontgrendelen, bijvoorbeeld na een reparatie, kom je met deze sleutel weer binnen. Bewaar hem ergens anders dan op deze computer.
-settings-encryption-unlock-title = Ontgrendelen bij het opstarten
-settings-encryption-unlock-description = De beveiligingschip ontgrendelt de schijf vanzelf bij het opstarten, dus aanmelden blijft hetzelfde.
-settings-encryption-passphrase-title = Een wachtwoordzin kiezen
-settings-encryption-passphrase-description = Deze computer kan de schijf niet vanzelf ontgrendelen, dus vraagt hij bij elke start om deze wachtwoordzin.
-settings-encryption-summary-title = Klaar om te versleutelen
-settings-encryption-summary-description = Dit gebeurt er nu.
-settings-encryption-step-restart = Je computer start één keer opnieuw op.
-settings-encryption-step-screen = Tijdens het opstarten verschijnt kort het scherm “Je apparaat wordt versleuteld”.
-settings-encryption-step-background = De rest gebeurt op de achtergrond terwijl je doorwerkt.
-settings-encryption-step-plugged-in = Houd de computer aan de stroom tot het klaar is.
-settings-encryption-ask-pin = Ook om een pincode vragen
-settings-encryption-ask-pin-description = Houdt de schijf vergrendeld, zelfs als iemand de computer meeneemt. Er wordt om gevraagd zodra het versleutelen klaar is.
-settings-encryption-starting-button = Starten…
-settings-encryption-restart-and-encrypt = Opnieuw opstarten en versleutelen
-
-## Device encryption: turning it off
-
-settings-encryption-turn-off-title = Apparaatversleuteling uitschakelen?
-settings-encryption-turn-off-description = Je bestanden worden op de achtergrond ontsleuteld terwijl je werkt. Daarna kan iedereen die de schijf eruit haalt hem lezen.
-settings-encryption-keep = Versleuteling behouden
-settings-encryption-turning-off = Uitschakelen…
-settings-encryption-turn-off = Uitschakelen
 
 ## Device encryption: unlocking the disk
 
@@ -259,6 +199,7 @@ settings-encryption-unlock-disk-field = Herstelsleutel of wachtwoordzin
 
 ## Device encryption: security chip and PIN
 
+settings-encryption-ask-pin = Ook om een pincode vragen
 settings-encryption-chip-setup-description = De beveiligingschip in je computer ontgrendelt de schijf vanzelf bij het opstarten, dus je hoeft niet eerst een wachtwoordzin te typen.
 settings-encryption-add-pin-title = Een pincode toevoegen
 settings-encryption-add-pin-description = Je typt hem elke keer dat de computer opstart. Zonder pincode blijft de schijf vergrendeld, zelfs als iemand de hele computer meeneemt.

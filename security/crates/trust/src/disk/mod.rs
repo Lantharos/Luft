@@ -1,6 +1,5 @@
 pub mod encryption;
 pub mod layout;
-mod preflight;
 pub mod unlock;
 
 use std::path::PathBuf;
@@ -9,15 +8,8 @@ use anyhow::{Context, Result};
 
 use crate::system::host::blocks::{self, Mount};
 use crate::system::host::journal;
-use encryption::initrd;
-use encryption::state::{self, Change, Plan};
-use unlock::luks::{self, Direction, Header};
+use unlock::luks::{self, Header};
 use unlock::{keys, seal};
-
-pub use encryption::initrd::run as run_in_initrd;
-pub use encryption::turn_off::turn_off;
-pub use encryption::turn_on::{TurnedOn, finish_waiting, turn_on};
-pub use preflight::{Check, check};
 
 const PHYSICAL_ROOTS: [&str; 2] = ["/sysroot", "/"];
 
@@ -25,17 +17,14 @@ pub struct SystemDisk {
     pub partition: String,
     pub mapping: Option<String>,
     pub root: Mount,
-    pub mountpoint: &'static str,
 }
 
 impl SystemDisk {
     pub fn find() -> Result<Self> {
-        let (mountpoint, root) = PHYSICAL_ROOTS
+        let root = PHYSICAL_ROOTS
             .iter()
             .find_map(|path| {
-                blocks::mount_at(path)
-                    .filter(|mount| mount.source.starts_with("/dev"))
-                    .map(|mount| (*path, mount))
+                blocks::mount_at(path).filter(|mount| mount.source.starts_with("/dev"))
             })
             .context("The system disk couldn't be found.")?;
         let name =
@@ -52,7 +41,6 @@ impl SystemDisk {
             partition,
             mapping,
             root,
-            mountpoint,
         })
     }
 
@@ -65,18 +53,13 @@ impl SystemDisk {
     }
 
     pub fn header(&self) -> Result<Option<Header>> {
-        let detached = Plan::load()
-            .filter(|plan| plan.change == Change::Decrypt)
-            .and_then(|plan| plan.header_file());
-        luks::read(&self.device(), detached.as_deref(), self.size())
+        luks::read(&self.device(), None, self.size())
     }
 }
 
 pub struct DiskStatus {
     pub device: String,
     pub encrypted: bool,
-    pub state: &'static str,
-    pub progress: f64,
     pub unlock: Vec<&'static str>,
     pub recovery_key_stored: bool,
     pub tpm_refused: bool,
@@ -106,50 +89,12 @@ fn unlock_methods(header: &Header) -> Vec<&'static str> {
 pub fn status() -> Option<DiskStatus> {
     let disk = SystemDisk::find().ok()?;
     let header = disk.header().ok().flatten();
-    let plan = Plan::load();
-    let (state, progress) = match (&plan, &header) {
-        (None, None) if Plan::waiting().is_some() => ("waiting", 0.0),
-        (_, None) if initrd::start_failed() => ("failed", 0.0),
-        (_, None) if initrd::refused() => ("refused", 0.0),
-        (Some(plan), None) if plan.change == Change::Encrypt => ("starting", 0.0),
-        (Some(plan), Some(header)) => (
-            match plan.change {
-                Change::Encrypt => "encrypting",
-                Change::Decrypt => "decrypting",
-            },
-            if header.reencrypting.is_some() {
-                header.done
-            } else {
-                1.0
-            },
-        ),
-        (None, Some(header)) => match header.reencrypting {
-            Some(Direction::Encrypt) => ("encrypting", header.done),
-            Some(Direction::Decrypt) => ("decrypting", header.done),
-            None => ("on", 1.0),
-        },
-        _ => ("off", 0.0),
-    };
     Some(DiskStatus {
         device: disk.device().display().to_string(),
         encrypted: header.is_some(),
-        state,
-        progress,
-        unlock: match (&plan, &header) {
-            (Some(plan), Some(_)) if plan.change == Change::Encrypt => vec![
-                match plan.mode {
-                    state::Mode::Tpm => "tpm",
-                    state::Mode::Passphrase => "passphrase",
-                },
-                "recovery-key",
-            ],
-            (_, Some(header)) => unlock_methods(header),
-            _ => Vec::new(),
-        },
+        unlock: header.as_ref().map(unlock_methods).unwrap_or_default(),
         recovery_key_stored: keys::has_escrow(),
-        tpm_refused: header
-            .as_ref()
-            .is_some_and(|header| header.has(luks::TPM2) || plan.is_some())
+        tpm_refused: header.as_ref().is_some_and(|header| header.has(luks::TPM2))
             && journal::tpm_refused_this_boot(),
         secure_boot_changed: seal::secure_boot_changed(),
     })

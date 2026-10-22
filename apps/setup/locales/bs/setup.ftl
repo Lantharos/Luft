@@ -249,18 +249,12 @@ setup-secure-boot-new-code = Zatraži novi kôd
 setup-protect-title = Zaštitite svoje fajlove
 setup-protect-tpm = Šifrirajte ovaj računar da niko ne može čitati vaše fajlove bez prijave, čak ni ako se izgubi. Otključava se sam pri pokretanju.
 setup-protect-passphrase = Šifrirajte ovaj računar da niko ne može čitati vaše fajlove bez vaše pristupne fraze, čak ni ako se izgubi.
-setup-protect-staged-title = Vaši fajlovi će biti šifrirani
-setup-protect-staged-description = Šifriranje počinje samo od sebe nakon ponovnog pokretanja na kraju postavljanja, a računar možete koristiti dok traje.
-setup-protect-waiting-description = Luft još mijenja svoju veličinu. Kad to završi, šifriranje počinje pri sljedećem ponovnom pokretanju, a vi možete nastaviti koristiti računar.
 setup-protect-keep-safe = Čuvajte ovaj ključ za oporavak na sigurnom mjestu, odvojeno od ovog računara. Trebat će vam ako se računar ikada ne bude mogao sam otključati.
 setup-protect-passphrase-label = Pristupna fraza
 setup-protect-repeat = Unesite je ponovo
 setup-protect-mismatch = Ne podudaraju se
 setup-protect-kept = Ključ za oporavak je sačuvan
-setup-protect-background = Šifriranje se odvija u pozadini nakon sljedećeg ponovnog pokretanja, a računar u međuvremenu možete koristiti.
 setup-protect-encrypt = Šifriraj
-setup-protect-checking = Provjeravanje…
-setup-protect-start = Šifriraj moje fajlove
 
 ## Fingerprint
 
@@ -277,6 +271,5 @@ setup-fingerprint-choose-another = Odaberi drugi prst
 
 setup-ready-title = Sve je spremno
 setup-ready-trust = Ponovo pokrenite računar još jednom da završite. Odmah nakon toga plavi ekran traži da vjerujete Luftu. Tamo pomoću tastature unesite ovaj kôd.
-setup-ready-restart = Ponovo pokrenite računar još jednom da završite, a zatim se prijavite svojom lozinkom.
 setup-ready-done = Vaša radna površina je spremna. Uživajte u Luftu.
 setup-ready-start = Počni koristiti Luft

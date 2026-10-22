@@ -3,6 +3,7 @@ use std::path::{Path, PathBuf};
 use anyhow::{Context, Result};
 use luft_i18n::t;
 
+use super::encryption::{Encryption, Opened};
 use super::layout::Role;
 use super::partition::Created;
 use crate::L10N;
@@ -12,6 +13,7 @@ pub struct Mounted {
     root: PathBuf,
     pub root_uuid: String,
     pub esp: String,
+    encrypted: Option<Opened>,
 }
 
 fn find(parts: &[Created], role: Role) -> Option<&Created> {
@@ -67,15 +69,24 @@ impl Mounted {
         drive_device: &str,
         parts: &[Created],
         skipped_esps: &[&str],
+        encryption: Option<&Encryption>,
     ) -> Result<Self> {
         let system = find(parts, Role::Root).with_context(|| t!(L10N, "installer-no-root"))?;
-        Self::open(
-            &system.device,
-            "",
-            root,
-            &system.uuid,
-            first_esp(drive_device, skipped_esps)?,
-        )
+        let esp = first_esp(drive_device, skipped_esps)?;
+        match encryption {
+            Some(encryption) => Self::open_encrypted(encryption.open(&system.device)?, root, esp),
+            None => Self::open(&system.device, "", root, &system.uuid, esp),
+        }
+    }
+
+    pub fn open_encrypted(opened: Opened, root: &Path, esp: String) -> Result<Self> {
+        mount_root(&opened.device, "", root)?;
+        Ok(Self {
+            root: root.to_owned(),
+            root_uuid: opened.uuid.clone(),
+            esp,
+            encrypted: Some(opened),
+        })
     }
 
     pub fn open(
@@ -90,11 +101,16 @@ impl Mounted {
             root: root.to_owned(),
             root_uuid: root_uuid.to_owned(),
             esp,
+            encrypted: None,
         })
     }
 
     pub fn root(&self) -> &Path {
         &self.root
+    }
+
+    pub fn encrypted(&self) -> Option<&Opened> {
+        self.encrypted.as_ref()
     }
 
     pub fn finish(self) -> Result<()> {

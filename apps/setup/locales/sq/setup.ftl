@@ -243,18 +243,12 @@ setup-secure-boot-new-code = Merr një kod të ri
 setup-protect-title = Mbro skedarët e tu
 setup-protect-tpm = Enkripto këtë kompjuter që askush të mos lexojë skedarët e tu pa hyrë, edhe nëse humbet. Zhbllokohet vetë kur niset.
 setup-protect-passphrase = Enkripto këtë kompjuter që askush të mos lexojë skedarët e tu pa frazëkalimin tënd, edhe nëse humbet.
-setup-protect-staged-title = Skedarët e tu do të enkriptohen
-setup-protect-staged-description = Enkriptimi nis vetë pas rinisjes në fund të konfigurimit dhe mund ta përdorësh kompjuterin ndërkohë.
-setup-protect-waiting-description = Luft ende po ndryshon madhësinë. Sapo të mbarojë, enkriptimi nis në rinisjen e ardhshme dhe ndërkohë mund ta përdorësh kompjuterin.
 setup-protect-keep-safe = Ruaje këtë çelës rikuperimi diku të sigurt, larg këtij kompjuteri. Të duhet nëse kompjuteri ndonjëherë nuk zhbllokohet dot vetë.
 setup-protect-passphrase-label = Frazëkalimi
 setup-protect-repeat = Shkruaje sërish
 setup-protect-mismatch = Nuk përputhen
 setup-protect-kept = E kam ruajtur çelësin e rikuperimit
-setup-protect-background = Enkriptimi bëhet në sfond pas rinisjes së ardhshme dhe ndërkohë mund ta përdorësh kompjuterin.
 setup-protect-encrypt = Enkripto
-setup-protect-checking = Po kontrollohet…
-setup-protect-start = Enkripto skedarët e mi
 
 ## Fingerprint
 
@@ -271,6 +265,5 @@ setup-fingerprint-choose-another = Zgjidh një gisht tjetër
 
 setup-ready-title = Gjithçka gati
 setup-ready-trust = Rinis edhe një herë për të përfunduar. Menjëherë pas rinisjes, një ekran blu të kërkon t’i besosh Luft. Përdor tastierën aty me këtë kod.
-setup-ready-restart = Rinis edhe një herë për të përfunduar, pastaj hyr me fjalëkalimin tënd.
 setup-ready-done = Desktopi yt është gati. Kënaqu me Luft.
 setup-ready-start = Nis të përdorësh Luft

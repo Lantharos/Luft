@@ -1,5 +1,4 @@
 use crate::anticheat::Readiness;
-use crate::disk::Check;
 use crate::service::status;
 use crate::system::secrets::secret::Secret;
 
@@ -45,10 +44,15 @@ pub fn status() {
     );
     match &status.disk {
         Some(disk) => {
-            println!("Disk               {} {}", disk.device, disk.state);
-            if matches!(disk.state, "encrypting" | "decrypting") {
-                println!("                   {:.0}% done", disk.progress * 100.0);
-            }
+            println!(
+                "Disk               {} {}",
+                disk.device,
+                if disk.encrypted {
+                    "encrypted"
+                } else {
+                    "not encrypted"
+                }
+            );
             if !disk.unlock.is_empty() {
                 println!("Unlocks with       {}", disk.unlock.join(", "));
             }
@@ -105,16 +109,6 @@ pub fn anti_cheat(readiness: &Readiness, other_keys: &[String]) {
     if readiness.uses_luft_key {
         println!(
             "Luft starts with its own key, which Epic hasn't added to its list of well-known keys yet. There's nothing to change on this computer for that."
-        );
-    }
-}
-
-pub fn checks(checks: &[Check]) {
-    for check in checks {
-        println!(
-            "{} {}",
-            if check.passed { "ok  " } else { "stop" },
-            check.message
         );
     }
 }

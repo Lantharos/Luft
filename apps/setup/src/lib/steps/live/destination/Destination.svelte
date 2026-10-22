@@ -7,7 +7,7 @@
 	import Sparkles from '@lucide/svelte/icons/sparkles';
 	import SlidersHorizontal from '@lucide/svelte/icons/sliders-horizontal';
 	import { t } from '@luft/i18n';
-	import { bytes, Choice, Dialog } from '@luft/ui';
+	import { bytes, Choice } from '@luft/ui';
 	import type { Drive, Target, WindowsVolume } from '#lib/bridge/installer.js';
 	import { finishSetup } from '#lib/bridge/system.js';
 	import StepFrame from '#lib/components/StepFrame.svelte';
@@ -18,6 +18,8 @@
 	import MeetRoom from './MeetRoom.svelte';
 	import Replace from './Replace.svelte';
 	import WholeDrive from './WholeDrive.svelte';
+	import { begin } from '../begin.js';
+	import ConfirmInstall from '../ConfirmInstall.svelte';
 	import { whyNotReplaced, windowsName } from './explain.js';
 
 	type View = 'choose' | 'alongside' | 'whole' | 'custom' | 'replace';
@@ -60,7 +62,6 @@
 		return null;
 	});
 	let chosenSystem = $derived(install.systems.find((system) => system.id === replacing) ?? null);
-	let chosenDrive = $derived(target ? install.drive(target.kind === 'replace' ? (chosenSystem?.drive ?? '') : target.drive) : null);
 
 	const TITLES: Record<Exclude<View, 'replace'>, [string, string]> = {
 		choose: ['setup-destination-choose-title', 'setup-destination-choose-description'],
@@ -78,29 +79,24 @@
 		return TITLES[view].map((id) => t(id));
 	});
 
-	let confirmTitle = $derived.by(() => {
-		if (!target || !chosenDrive) return '';
-		if (target.kind === 'replace') return t('setup-confirm-replace-title', { system: chosenSystem?.name ?? 'Linux' });
-		if (target.kind === 'whole') return t('setup-confirm-erase-title', { drive: chosenDrive.name });
-		if (target.kind === 'alongside') return t('setup-confirm-shrink-title', { size: bytes(chosenDrive.windows!.size - target.size) });
-		if (meet?.space && meetElsewhere) return t('setup-confirm-meet-drive-title', { drive: chosenDrive.name });
-		return t(meet?.space ? 'setup-confirm-meet-title' : 'setup-confirm-free-title');
-	});
-
-	let confirmDescription = $derived.by(() => {
-		if (target?.kind === 'replace') return t(chosenSystem?.keepsOld ? 'setup-confirm-replace-keep-old' : 'setup-confirm-replace-erase-old');
-		return t(target?.kind === 'whole' ? 'setup-confirm-erase-description' : 'setup-confirm-install-description');
-	});
-
 	async function justTry() {
 		if (!(await finishSetup().catch(() => false))) await appWindow.close();
 	}
 
-	async function start() {
-		confirming = false;
-		if (!target || !(await install.install(target))) return;
-		if (install.replacing?.owner?.password) flow.skip('account');
+	function choose() {
+		if (!target) return;
+		if (!install.encryptable(target)) {
+			confirming = true;
+			return;
+		}
+		install.target = target;
 		flow.next();
+	}
+
+	async function start(chosen: Target) {
+		confirming = false;
+		flow.skip('protect');
+		await begin(chosen, null);
 	}
 
 	function open(next: View) {
@@ -185,24 +181,13 @@
 			<button type="button" class="plain-button large" disabled={install.starting} onclick={() => open('choose')}>{t('setup-destination-more-options')}</button>
 		{/if}
 		{#if view !== 'choose'}
-			<button type="button" class="button primary large px-6" disabled={!target || install.starting} onclick={() => (confirming = true)}>
+			<button type="button" class="button primary large px-6" disabled={!target || install.starting} onclick={choose}>
 				{t(install.starting ? 'setup-destination-starting' : view === 'replace' ? 'setup-destination-replace' : 'setup-destination-install')}
 			</button>
 		{/if}
 	{/snippet}
 </StepFrame>
 
-{#if confirming && target && chosenDrive}
-	<Dialog
-		title={confirmTitle}
-		description={confirmDescription}
-		onclose={() => (confirming = false)}
-	>
-		{#snippet actions()}
-			<button type="button" class="button" onclick={() => (confirming = false)}>{t('setup-cancel')}</button>
-			<button type="button" class="button {target.kind === 'whole' ? 'danger' : 'primary'}" onclick={start}>
-				{t(target.kind === 'whole' ? 'setup-confirm-erase' : target.kind === 'replace' ? 'setup-destination-replace' : 'setup-confirm-install')}
-			</button>
-		{/snippet}
-	</Dialog>
+{#if confirming && target}
+	<ConfirmInstall {target} onconfirm={() => start(target!)} onclose={() => (confirming = false)} />
 {/if}

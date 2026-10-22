@@ -17,7 +17,6 @@
 
 	const GIB = 1024 ** 3;
 	const HELD: Record<Exclude<Blocked, 'busy'>, string> = {
-		reencrypting: 'luft-resize-reencrypting',
 		passphrase: 'luft-resize-passphrase',
 		apart: 'luft-resize-apart',
 		unreadable: 'luft-resize-start-first'

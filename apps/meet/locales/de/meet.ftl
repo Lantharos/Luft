@@ -180,7 +180,6 @@ luft-bar-used = { $size }, { $used } belegt
 luft-resize-title = Speicherplatz von Luft ändern
 luft-resize-description = Gib Luft mehr vom Platz von Windows oder gib Windows etwas zurück.
 luft-resize-drive-description = Gib Luft mehr vom freien Platz auf { $drive } oder lass einen Teil davon frei.
-luft-resize-reencrypting = Luft verschlüsselt oder entschlüsselt seinen Datenträger noch. Sobald das erledigt ist, lässt sich seine Größe ändern.
 luft-resize-passphrase = Der Datenträger von Luft lässt sich nur mit einer Passphrase öffnen, und Luft kann sie nicht selbst eingeben, während es umzieht.
 luft-resize-start-first = Starte Luft einmal, damit es Meet Luft mitteilen kann, wie voll es ist, und komm dann zurück.
 luft-resize-apart = Zwischen Windows und Luft liegt eine andere Partition, daher können sie sich ihren Platz nicht teilen.

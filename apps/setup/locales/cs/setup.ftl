@@ -255,18 +255,12 @@ setup-secure-boot-new-code = Získat nový kód
 setup-protect-title = Ochrana souborů
 setup-protect-tpm = Zašifrujte tento počítač, aby nikdo nemohl číst vaše soubory bez přihlášení, ani když počítač ztratíte. Při spuštění se odemkne sám.
 setup-protect-passphrase = Zašifrujte tento počítač, aby nikdo nemohl číst vaše soubory bez hesla k disku, ani když počítač ztratíte.
-setup-protect-staged-title = Vaše soubory budou zašifrovány
-setup-protect-staged-description = Šifrování začne samo po restartu na konci nastavení a počítač můžete mezitím dál používat.
-setup-protect-waiting-description = Luft ještě mění svou velikost. Až to dokončí, šifrování se spustí při příštím restartu a počítač můžete mezitím dál používat.
 setup-protect-keep-safe = Uložte si tento obnovovací klíč na bezpečné místo mimo tento počítač. Budete ho potřebovat, kdyby se počítač někdy nedokázal odemknout sám.
 setup-protect-passphrase-label = Heslo k disku
 setup-protect-repeat = Zadejte ho znovu
 setup-protect-mismatch = Neshodují se
 setup-protect-kept = Obnovovací klíč mám uložený
-setup-protect-background = Šifrování proběhne na pozadí po příštím restartu a počítač můžete mezitím dál používat.
 setup-protect-encrypt = Zašifrovat
-setup-protect-checking = Kontrola…
-setup-protect-start = Zašifrovat soubory
 
 ## Fingerprint
 
@@ -283,6 +277,5 @@ setup-fingerprint-choose-another = Vybrat jiný prst
 
 setup-ready-title = Vše je připraveno
 setup-ready-trust = Dokončete nastavení dalším restartem. Hned po něm se modrá obrazovka zeptá, jestli Luftu důvěřovat. Ovládejte ji klávesnicí a zadejte tento kód.
-setup-ready-restart = Dokončete nastavení dalším restartem a pak se přihlaste heslem.
 setup-ready-done = Plocha je připravená. Ať se vám s Luftem dobře pracuje.
 setup-ready-start = Začít používat Luft

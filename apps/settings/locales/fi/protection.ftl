@@ -52,18 +52,7 @@ settings-privacy-delete-after-hint = Kuinka kauan tiedostot säilyvät ennen poi
 ## Security: summary at the top of the page
 
 settings-security-protected = Laitteesi on suojattu
-settings-security-encrypting = Laitettasi salataan
-settings-security-encrypting-progress = { $progress }. Voit jatkaa työskentelyä sillä aikaa.
-settings-security-decrypting = Laitteen salausta poistetaan käytöstä
-settings-security-restart-to-encrypt = Aloita salaus käynnistämällä uudelleen
-settings-security-restart-to-encrypt-description = Salaus alkaa, kun tämä tietokone käynnistetään seuraavan kerran uudelleen.
-settings-security-encryption-failed = Salaus ei alkanut
-settings-security-encryption-failed-description = Luft käynnistyi ilman sitä, eikä tiedostojasi muutettu. Yritä uudelleen ottamalla se taas käyttöön.
-settings-security-encryption-refused-description = Luft muutti kokoaan, mutta salaus ei voinut alkaa sen jälkeen. Tiedostojasi ei muutettu. Yritä uudelleen ottamalla se taas käyttöön.
-settings-security-waiting-to-encrypt = Salaus odottaa
-settings-security-waiting-to-encrypt-description = Luft muuttaa vielä kokoaan. Kun se on valmis, salaus alkaa seuraavassa uudelleenkäynnistyksessä.
 settings-security-could-be-safer = Laitteesi voisi olla paremmin suojattu
-settings-security-could-be-safer-description = Pidä tiedostosi yksityisinä ottamalla laitteen salaus käyttöön.
 settings-security-starts-differently-description = Jos muutit sen Secure Boot -asetuksia, vahvista muutos, niin levyn lukitus avautuu taas itsestään.
 settings-security-needed-recovery-key = Levysi tarvitsi palautusavaimen
 settings-security-needed-recovery-key-description = Yhdistä suojaussiru uudelleen, niin levyn lukitus avautuu itsestään.
@@ -158,23 +147,6 @@ settings-usb-hold-back-description = Lukituksen aikana liitetyt odottavat, kunne
 ## Device encryption
 
 settings-encryption = Laitteen salaus
-settings-encryption-encrypting = Laitetta salataan
-settings-encryption-decrypting = Laitteen salausta poistetaan käytöstä
-settings-encryption-starting = Alkaa seuraavan uudelleenkäynnistyksen yhteydessä
-settings-encryption-failed = Ei alkanut viime käynnistyksessä, tiedostojasi ei muutettu
-settings-encryption-waiting = Odottaa, että Luft muuttaa kokonsa, ja alkaa sitten seuraavassa uudelleenkäynnistyksessä
-settings-encryption-refused = Ei voinut alkaa Luftin koon muuttamisen jälkeen, tiedostojasi ei muutettu
-settings-encryption-off = Pitää tiedostosi yksityisinä, jos tietokone katoaa
-settings-encryption-progress = { $percent } valmiina
-settings-encryption-progress-seconds = { $percent } valmiina, alle minuutti jäljellä
-settings-encryption-progress-minutes = { $minutes ->
-    [one] { $percent } valmiina, noin { $minutes } minuutti jäljellä
-   *[other] { $percent } valmiina, noin { $minutes } minuuttia jäljellä
-}
-settings-encryption-progress-hours = { $hours ->
-    [one] { $percent } valmiina, noin { $hours } tunti jäljellä
-   *[other] { $percent } valmiina, noin { $hours } tuntia jäljellä
-}
 settings-encryption-unlocks-chip-pin = Lukitus avataan suojaussirulla ja PIN-koodilla
 settings-encryption-unlocks-chip = Lukitus avautuu itsestään suojaussirulla
 settings-encryption-unlocks-passphrase = Kysyy tunnuslausetta käynnistyksessä
@@ -194,38 +166,6 @@ settings-encryption-drives-auto-unlock = { $count ->
     [one] { $count } salattu asema avautuu tämän tietokoneen mukana
    *[other] { $count } salattua asemaa avautuu tämän tietokoneen mukana
 }
-
-## Device encryption: turning it on
-
-settings-encryption-turn-on-title = Ota laitteen salaus käyttöön
-settings-encryption-turn-on-description = Tiedostosi pysyvät yksityisinä, vaikka tietokone katoaisi tai varastettaisiin. Ilman oikeaa avainta kukaan ei voi lukea levyä.
-settings-encryption-blocked-title = Laitteen salausta ei voi vielä ottaa käyttöön
-settings-encryption-blocked-description = Korjaa alla merkityt kohdat ja yritä sitten uudelleen.
-settings-encryption-backup = Varmista ennen aloittamista, että tärkeistä tiedostoistasi on varmuuskopio.
-settings-encryption-key-title = Tallenna palautusavain
-settings-encryption-key-description = Jos levyn lukitus ei joskus avaudu itsestään, esimerkiksi korjauksen jälkeen, pääset tällä avaimella takaisin sisään. Säilytä sitä muualla kuin tässä tietokoneessa.
-settings-encryption-unlock-title = Lukituksen avaus käynnistyksessä
-settings-encryption-unlock-description = Suojaussiru avaa levyn lukituksen itsestään käynnistyksessä, joten kirjautuminen pysyy ennallaan.
-settings-encryption-passphrase-title = Valitse tunnuslause
-settings-encryption-passphrase-description = Tämä tietokone ei pysty avaamaan levyn lukitusta itsestään, joten se kysyy tunnuslausetta joka käynnistyksessä.
-settings-encryption-summary-title = Valmis salaamaan
-settings-encryption-summary-description = Seuraavaksi tapahtuu näin.
-settings-encryption-step-restart = Tietokone käynnistyy kerran uudelleen.
-settings-encryption-step-screen = Käynnistyksen aikana näkyy hetken näyttö, jossa lukee ”Encrypting your device”.
-settings-encryption-step-background = Loput tapahtuu taustalla, kun jatkat työskentelyä.
-settings-encryption-step-plugged-in = Pidä tietokone kytkettynä laturiin, kunnes salaus on valmis.
-settings-encryption-ask-pin = Kysy myös PIN-koodia
-settings-encryption-ask-pin-description = Pitää levyn lukittuna, vaikka joku veisi tietokoneen. PIN-koodi kysytään, kun salaus on valmis.
-settings-encryption-starting-button = Aloitetaan…
-settings-encryption-restart-and-encrypt = Käynnistä uudelleen ja salaa
-
-## Device encryption: turning it off
-
-settings-encryption-turn-off-title = Poistetaanko laitteen salaus käytöstä?
-settings-encryption-turn-off-description = Tiedostojesi salaus puretaan taustalla, kun työskentelet. Sen jälkeen kuka tahansa levyn irrottava voi lukea sen.
-settings-encryption-keep = Säilytä salaus
-settings-encryption-turning-off = Poistetaan käytöstä…
-settings-encryption-turn-off = Poista käytöstä
 
 ## Device encryption: unlocking the disk
 
@@ -259,6 +199,7 @@ settings-encryption-unlock-disk-field = Palautusavain tai tunnuslause
 
 ## Device encryption: security chip and PIN
 
+settings-encryption-ask-pin = Kysy myös PIN-koodia
 settings-encryption-chip-setup-description = Tietokoneesi suojaussiru avaa levyn lukituksen itsestään käynnistyksessä, joten tunnuslausetta ei enää tarvitse kirjoittaa ensin.
 settings-encryption-add-pin-title = Lisää PIN-koodi
 settings-encryption-add-pin-description = Kirjoitat sen aina, kun tietokone käynnistyy. Ilman sitä levy pysyy lukittuna, vaikka joku veisi koko tietokoneen.

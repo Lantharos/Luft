@@ -27,7 +27,6 @@ use crate::{first_boot, phase, survey};
 const INSTALL: &str = "com.lantharos.installer.install";
 const FINISH: &str = "com.lantharos.installer.finish-first-boot";
 const SET_UP: &str = "com.lantharos.installer.set-up";
-const NO_PIN: &str = "";
 
 pub struct Installer {
     options: Arc<Options>,
@@ -171,7 +170,7 @@ impl Installer {
         #[zbus(object_server)] server: &ObjectServer,
     ) -> Result<(), Error> {
         self.authorize(connection, &header, INSTALL).await?;
-        let request: Request = serde_json::from_str(&request).map_err(|error| {
+        let mut request: Request = serde_json::from_str(&request).map_err(|error| {
             Error::Failed(t!(
                 L10N,
                 "installer-request-invalid",
@@ -179,6 +178,7 @@ impl Installer {
             ))
         })?;
         let image = self.config.image(&request.variant)?;
+        let encryption = request.encryption.take();
         let smallest = self.config.smallest_system;
         let handoff = self.meet.clone();
         let scratch = self.options.target.with_extension("moving-box");
@@ -217,6 +217,7 @@ impl Installer {
                     answers: &answers,
                     windows,
                     meet,
+                    encryption,
                 };
                 install::run(job, |status| {
                     let _ = sender.send(status);
@@ -297,24 +298,6 @@ impl Installer {
         luft_trust::call(&TRUST, "EnrollSigningKey", &())
             .await
             .map_err(Error::Failed)
-    }
-
-    async fn turn_on_encryption(
-        &self,
-        recovery_key: String,
-        passphrase: String,
-        #[zbus(connection)] connection: &Connection,
-        #[zbus(header)] header: Header<'_>,
-    ) -> Result<(), Error> {
-        self.setup_app_user(connection, &header).await?;
-        let _activity = self.idle.hold();
-        luft_trust::call(
-            &TRUST,
-            "TurnOnEncryption",
-            &(recovery_key, NO_PIN, passphrase),
-        )
-        .await
-        .map_err(Error::Failed)
     }
 
     async fn enroll_fingerprint(

@@ -13,7 +13,6 @@ const INSTALLER = `<node><interface name="com.lantharos.Installer1">
   <method name="CreateAccount"><arg type="s" direction="in"/><arg type="s" direction="in"/><arg type="s" direction="in"/></method>
   <method name="FinishFirstBoot"/>
   <method name="EnrollSigningKey"><arg type="s" direction="out"/></method>
-  <method name="TurnOnEncryption"><arg type="s" direction="in"/><arg type="s" direction="in"/></method>
   <method name="EnrollFingerprint"><arg type="s" direction="in"/></method>
   <method name="StopFingerprint"/>
   <signal name="FingerprintStatus"><arg type="s"/><arg type="b"/></signal>
@@ -158,8 +157,6 @@ export function publishInstaller(publish, calls) {
     CreateAccount: (name, fullName) => calls.push(`installer CreateAccount ${name} ${fullName}`),
     FinishFirstBoot: () => calls.push('installer FinishFirstBoot'),
     EnrollSigningKeyAsync: (_parameters, invocation) => answer(invocation, relay(TRUST, 'EnrollSigningKey')),
-    TurnOnEncryptionAsync: ([recoveryKey, passphrase], invocation) =>
-      answer(invocation, relay(TRUST, 'TurnOnEncryption', new GLib.Variant('(sss)', [recoveryKey, '', passphrase]))),
     EnrollFingerprintAsync: ([finger], invocation) => answer(invocation, fingerprints.start(finger)),
     StopFingerprintAsync: (_parameters, invocation) => answer(invocation, fingerprints.stop()),
   }, '/com/lantharos/Installer1');

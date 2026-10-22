@@ -178,7 +178,6 @@ luft-bar-used = { $size }, zajęte: { $used }
 luft-resize-title = Zmień ilość miejsca dla systemu Luft
 luft-resize-description = Przydziel systemowi Luft więcej miejsca z systemu Windows albo oddaj jego część systemowi Windows.
 luft-resize-drive-description = Przydziel systemowi Luft więcej wolnego miejsca na dysku { $drive } albo zostaw jego część wolną.
-luft-resize-reencrypting = Luft nadal szyfruje lub odszyfrowuje swój dysk. Gdy skończy, będzie można zmienić jego rozmiar.
 luft-resize-passphrase = Dysk systemu Luft można otworzyć tylko frazą hasła, a Luft nie może sam jej wpisać podczas przenoszenia.
 luft-resize-start-first = Uruchom raz system Luft, aby mógł przekazać aplikacji Meet Luft, jak bardzo jest zapełniony, a potem wróć tutaj.
 luft-resize-apart = Między systemami Windows i Luft jest inna partycja, więc nie mogą dzielić się miejscem.

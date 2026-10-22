@@ -6,10 +6,11 @@ mod toolbox;
 
 use std::path::Path;
 
-use anyhow::{Context, Result};
+use anyhow::{Context, Result, bail};
 use luft_i18n::t;
 
 use super::configure::deployment::Deployment;
+use super::drive::encryption::Encryption;
 use super::drive::layout::Role;
 use super::drive::target::Mounted;
 use crate::L10N;
@@ -64,12 +65,19 @@ fn startup_partition(plan: &Plan) -> Result<()> {
     }
 }
 
-pub fn prepare(plan: &Plan, target: &Path) -> Result<(Mounted, Kept)> {
+pub fn prepare(
+    plan: &Plan,
+    target: &Path,
+    encryption: Option<&Encryption>,
+) -> Result<(Mounted, Kept)> {
     writable(&plan.root)?;
     writable(&plan.home.part)?;
     let startups = startups(plan, &target.with_extension("esp"))?;
     let esp = plan.esp.device.clone();
     if let Some(subvolume) = &plan.subvolume {
+        if encryption.is_some() {
+            bail!(t!(L10N, "installer-encryption-keeps-old"));
+        }
         let top = Opened::new(
             &plan.root.device,
             mount::top_level(&plan.root.fs_type),
@@ -107,9 +115,17 @@ pub fn prepare(plan: &Plan, target: &Path) -> Result<(Mounted, Kept)> {
         old::read(opened.path())
     };
     startup_partition(plan)?;
-    disks::format(&plan.root, Role::Root)?;
-    let uuid = uuid_of(&plan.root)?;
-    let mounted = Mounted::open(&plan.root.device, "", target, &uuid, esp)?;
+    let mounted = match encryption {
+        Some(encryption) => {
+            disks::erase(&plan.root, Role::Root)?;
+            Mounted::open_encrypted(encryption.open(&plan.root.device)?, target, esp)?
+        }
+        None => {
+            disks::format(&plan.root, Role::Root)?;
+            let uuid = uuid_of(&plan.root)?;
+            Mounted::open(&plan.root.device, "", target, &uuid, esp)?
+        }
+    };
     Ok((
         mounted,
         Kept {

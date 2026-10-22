@@ -180,7 +180,6 @@ luft-bar-used = { $size }, { $used } brukt
 luft-resize-title = Endre hvor mye plass Luft har
 luft-resize-description = Gi Luft mer av plassen til Windows, eller gi noe tilbake til Windows.
 luft-resize-drive-description = Gi Luft mer av den ledige plassen på { $drive }, eller la noe av den stå ledig.
-luft-resize-reencrypting = Luft holder fortsatt på å kryptere eller dekryptere disken sin. Når det er ferdig, kan størrelsen endres.
 luft-resize-passphrase = Lufts disk kan bare åpnes med en passfrase, og Luft kan ikke skrive den inn selv mens det flytter.
 luft-resize-start-first = Start Luft én gang, så det kan fortelle Meet Luft hvor fullt det er, og kom så tilbake.
 luft-resize-apart = En annen partisjon ligger mellom Windows og Luft, så de kan ikke dele plassen.

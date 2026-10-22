@@ -243,18 +243,12 @@ setup-secure-boot-new-code = Obtén un codi nou
 setup-protect-title = Protegiu els vostres fitxers
 setup-protect-tpm = Xifreu aquest ordinador perquè ningú pugui llegir els vostres fitxers sense iniciar la sessió, encara que el perdeu. Es desbloqueja sol en arrencar.
 setup-protect-passphrase = Xifreu aquest ordinador perquè ningú pugui llegir els vostres fitxers sense la vostra frase de pas, encara que el perdeu.
-setup-protect-staged-title = Els vostres fitxers es xifraran
-setup-protect-staged-description = El xifratge comença sol després del reinici del final de la configuració, i podeu continuar fent servir l’ordinador mentrestant.
-setup-protect-waiting-description = Luft encara està canviant de mida. Quan acabi, el xifratge començarà en el pròxim reinici, i mentrestant podeu continuar fent servir l’ordinador.
 setup-protect-keep-safe = Guardeu aquesta clau de recuperació en un lloc segur, lluny d’aquest ordinador. La necessitareu si algun dia l’ordinador no es pot desbloquejar sol.
 setup-protect-passphrase-label = Frase de pas
 setup-protect-repeat = Torneu-la a escriure
 setup-protect-mismatch = No coincideixen
 setup-protect-kept = He guardat la clau de recuperació
-setup-protect-background = El xifratge es fa en segon pla després del pròxim reinici, i mentrestant podeu continuar fent servir l’ordinador.
 setup-protect-encrypt = Xifra
-setup-protect-checking = S’està comprovant…
-setup-protect-start = Xifra els meus fitxers
 
 ## Fingerprint
 
@@ -271,6 +265,5 @@ setup-fingerprint-choose-another = Tria un altre dit
 
 setup-ready-title = Ja està tot a punt
 setup-ready-trust = Reinicieu una vegada més per acabar. Just després de reiniciar, una pantalla blava us demanarà que confieu en Luft. Feu-hi servir el teclat amb aquest codi.
-setup-ready-restart = Reinicieu una vegada més per acabar i inicieu la sessió amb la contrasenya.
 setup-ready-done = L’escriptori ja està a punt. Gaudiu de Luft.
 setup-ready-start = Comença a fer servir Luft

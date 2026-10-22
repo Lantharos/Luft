@@ -243,18 +243,12 @@ setup-secure-boot-new-code = Hent en ny kode
 setup-protect-title = Beskyt dine filer
 setup-protect-tpm = Krypter denne computer, så ingen kan læse dine filer uden at logge ind, heller ikke hvis den bliver væk. Den låser selv op, når den starter.
 setup-protect-passphrase = Krypter denne computer, så ingen kan læse dine filer uden din adgangsfrase, heller ikke hvis den bliver væk.
-setup-protect-staged-title = Dine filer bliver krypteret
-setup-protect-staged-description = Krypteringen starter af sig selv efter genstarten til sidst i konfigurationen, og du kan bruge din computer imens.
-setup-protect-waiting-description = Luft er stadig ved at ændre sin størrelse. Når det er færdigt, starter krypteringen ved næste genstart, og du kan bruge computeren imens.
 setup-protect-keep-safe = Opbevar denne genoprettelsesnøgle et sikkert sted, væk fra denne computer. Du skal bruge den, hvis computeren en dag ikke kan låse op af sig selv.
 setup-protect-passphrase-label = Adgangsfrase
 setup-protect-repeat = Skriv den igen
 setup-protect-mismatch = De er ikke ens
 setup-protect-kept = Jeg har gemt min genoprettelsesnøgle
-setup-protect-background = Krypteringen sker i baggrunden efter næste genstart, og du kan bruge din computer imens.
 setup-protect-encrypt = Krypter
-setup-protect-checking = Kontrollerer…
-setup-protect-start = Krypter mine filer
 
 ## Fingerprint
 
@@ -271,6 +265,5 @@ setup-fingerprint-choose-another = Vælg en anden finger
 
 setup-ready-title = Så er du klar
 setup-ready-trust = Genstart én gang mere for at gøre det færdigt. Lige efter genstarten beder en blå skærm dig om at stole på Luft. Brug tastaturet der med denne kode.
-setup-ready-restart = Genstart én gang mere for at gøre det færdigt, og log derefter ind med din adgangskode.
 setup-ready-done = Dit skrivebord er klar. God fornøjelse med Luft.
 setup-ready-start = Begynd at bruge Luft

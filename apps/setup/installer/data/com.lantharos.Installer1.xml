@@ -28,8 +28,11 @@
       <arg name="survey" type="s" direction="out"/>
     </method>
     <!-- JSON: {"target": {"kind": "whole", "drive"} | {"kind": "alongside", "drive", "size"} |
-         {"kind": "free", "drive", "offset"}, "variant": "default" | "nvidia", "windows": {"fastStartupOff", "universalClock", "bluetooth"}}.
-         Starts right away; the Windows choices apply to the Windows on that drive. -->
+         {"kind": "free", "drive", "offset"} | {"kind": "replace", "system"}, "variant": "default" | "nvidia",
+         "windows": {"fastStartupOff", "universalClock", "bluetooth"}, "encryption": {"recoveryKey", "passphrase"} | null}.
+         Starts right away; the Windows choices apply to the Windows on that drive. With encryption, Luft's partition
+         is encrypted with the recovery key from trustd's GenerateRecoveryKey, and the passphrase too when the TPM
+         can't unlock it; replacing a system while keeping its files can't be encrypted. -->
     <method name="Install">
       <arg name="request" type="s" direction="in"/>
     </method>
@@ -53,11 +56,6 @@
     <!-- Asks trustd to add Luft's key to shim, and gives the code to type when the computer restarts. -->
     <method name="EnrollSigningKey">
       <arg name="code" type="s" direction="out"/>
-    </method>
-    <!-- Asks trustd to encrypt the system drive with this recovery key and passphrase. -->
-    <method name="TurnOnEncryption">
-      <arg name="recovery_key" type="s" direction="in"/>
-      <arg name="passphrase" type="s" direction="in"/>
     </method>
     <!-- Starts adding a fingerprint for the account on the default reader; FingerprintStatus follows each
          touch until done, then the reader is let go. -->

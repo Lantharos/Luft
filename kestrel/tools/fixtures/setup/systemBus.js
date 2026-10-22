@@ -33,10 +33,6 @@ publishSecurity(publish, calls, publishUdisks(calls), {
   get SigningKey() {
     return variants({State: 's', Available: 'b', Reason: 's', Missed: 'u', MissedThisBoot: 'b'}, signingKey);
   },
-  Disk: variants({Device: 's', Encrypted: 'b', State: 's', Progress: 'd', Remaining: 't', Unlock: 'as', RecoveryKeyStored: 'b', TpmRefused: 'b',
-    SecureBootChanged: 'b'},
-    {Device: '/dev/nvme0n1p3', Encrypted: false, State: 'off', Progress: 0, Remaining: 0, Unlock: [], RecoveryKeyStored: false, TpmRefused: false,
-      SecureBootChanged: false}),
   EnrollSigningKey: () => {
     calls.push('EnrollSigningKey');
     return '48203917';

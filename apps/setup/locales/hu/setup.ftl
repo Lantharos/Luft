@@ -243,18 +243,12 @@ setup-secure-boot-new-code = Új kód kérése
 setup-protect-title = Fájlok védelme
 setup-protect-tpm = Titkosítsa a számítógépet, hogy bejelentkezés nélkül senki se olvashassa a fájljait, akkor sem, ha elveszíti. Indításkor magától feloldódik.
 setup-protect-passphrase = Titkosítsa a számítógépet, hogy a jelmondata nélkül senki se olvashassa a fájljait, akkor sem, ha elveszíti.
-setup-protect-staged-title = A fájljai titkosítva lesznek
-setup-protect-staged-description = A titkosítás a beállítás végi újraindítás után magától elindul, és közben tovább használhatja a számítógépet.
-setup-protect-waiting-description = A Luft még módosítja a méretét. Ha ez kész, a titkosítás a következő újraindításkor indul el, addig is nyugodtan használhatja a számítógépet.
 setup-protect-keep-safe = Tartsa ezt a helyreállítási kulcsot biztonságos helyen, a számítógéptől távol. Akkor lesz rá szüksége, ha a számítógép egyszer nem tudja magától feloldani a titkosítást.
 setup-protect-passphrase-label = Jelmondat
 setup-protect-repeat = Jelmondat még egyszer
 setup-protect-mismatch = Nem egyeznek
 setup-protect-kept = Elmentettem a helyreállítási kulcsot
-setup-protect-background = A titkosítás a következő újraindítás után a háttérben történik, és közben tovább használhatja a számítógépet.
 setup-protect-encrypt = Titkosítás
-setup-protect-checking = Ellenőrzés…
-setup-protect-start = Fájlok titkosítása
 
 ## Fingerprint
 
@@ -271,6 +265,5 @@ setup-fingerprint-choose-another = Másik ujj kiválasztása
 
 setup-ready-title = Minden kész
 setup-ready-trust = A befejezéshez indítsa újra még egyszer a számítógépet. Közvetlenül az újraindítás után egy kék képernyő kéri, hogy jelölje megbízhatónak a Luftot. Ott a billentyűzettel adja meg ezt a kódot.
-setup-ready-restart = A befejezéshez indítsa újra még egyszer a számítógépet, majd jelentkezzen be a jelszavával.
 setup-ready-done = Az asztal készen áll. Jó szórakozást a Lufttal.
 setup-ready-start = Kezdés

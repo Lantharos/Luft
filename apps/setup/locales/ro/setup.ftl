@@ -249,18 +249,12 @@ setup-secure-boot-new-code = Obține un cod nou
 setup-protect-title = Protejați-vă fișierele
 setup-protect-tpm = Criptați acest computer ca nimeni să nu vă poată citi fișierele fără conectare, chiar dacă îl pierdeți. Se deblochează singur la pornire.
 setup-protect-passphrase = Criptați acest computer ca nimeni să nu vă poată citi fișierele fără fraza de acces, chiar dacă îl pierdeți.
-setup-protect-staged-title = Fișierele vor fi criptate
-setup-protect-staged-description = Criptarea începe singură după repornirea de la finalul configurării și puteți folosi computerul în timpul ei.
-setup-protect-waiting-description = Luft încă își schimbă dimensiunea. După ce termină, criptarea pornește la următoarea repornire, iar între timp puteți folosi calculatorul în continuare.
 setup-protect-keep-safe = Păstrați această cheie de recuperare într-un loc sigur, departe de acest computer. Veți avea nevoie de ea dacă computerul nu se mai poate debloca singur.
 setup-protect-passphrase-label = Frază de acces
 setup-protect-repeat = Introduceți-o din nou
 setup-protect-mismatch = Nu se potrivesc
 setup-protect-kept = Am păstrat cheia de recuperare
-setup-protect-background = Criptarea are loc în fundal după următoarea repornire și puteți folosi computerul între timp.
 setup-protect-encrypt = Criptează
-setup-protect-checking = Se verifică…
-setup-protect-start = Criptează fișierele
 
 ## Fingerprint
 
@@ -277,6 +271,5 @@ setup-fingerprint-choose-another = Alege alt deget
 
 setup-ready-title = Totul este gata
 setup-ready-trust = Reporniți încă o dată pentru a finaliza. Imediat după repornire, un ecran albastru vă cere să aveți încredere în Luft. Acolo folosiți tastatura și acest cod.
-setup-ready-restart = Reporniți încă o dată pentru a finaliza, apoi conectați-vă cu parola.
 setup-ready-done = Desktopul este gata. Bucurați-vă de Luft.
 setup-ready-start = Începe să folosești Luft

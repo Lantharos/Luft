@@ -110,6 +110,22 @@ setup-confirm-erase = Erase and install
 # Button, verb
 setup-confirm-install = Install
 
+## Encryption
+
+setup-protect-title = Protect your files
+setup-protect-tpm = Encrypt this computer so nobody can read your files without signing in, even if it’s lost. It unlocks by itself when it starts.
+setup-protect-passphrase = Encrypt this computer so nobody can read your files without your passphrase, even if it’s lost.
+setup-protect-keep-safe = Keep this recovery key somewhere safe, away from this computer. You need it if the computer ever can’t unlock by itself.
+setup-protect-passphrase-label = Passphrase
+setup-protect-repeat = Type it again
+setup-protect-mismatch = They don’t match
+setup-protect-kept = I’ve kept my recovery key
+setup-protect-only-now = You can only turn encryption on now, while installing Luft.
+# Button: installs Luft without encrypting it
+setup-protect-skip = Don’t encrypt
+# Button, verb: installs Luft encrypted
+setup-protect-encrypt = Encrypt
+
 ## Making room next to Windows
 
 # $drive is a drive name, like "Samsung SSD 980"
@@ -282,25 +298,6 @@ setup-secure-boot-skipped = The blue screen was skipped. Get a new code and rest
 setup-secure-boot-getting = Getting your code…
 setup-secure-boot-new-code = Get a new code
 
-## Encryption
-
-setup-protect-title = Protect your files
-setup-protect-tpm = Encrypt this computer so nobody can read your files without signing in, even if it’s lost. It unlocks by itself when it starts.
-setup-protect-passphrase = Encrypt this computer so nobody can read your files without your passphrase, even if it’s lost.
-setup-protect-staged-title = Your files will be encrypted
-setup-protect-staged-description = Encrypting starts by itself after the restart at the end of setup, and you can keep using your computer while it works.
-setup-protect-waiting-description = Luft is still changing its size. Once that’s done, encrypting starts at the next restart, and you can keep using your computer meanwhile.
-setup-protect-keep-safe = Keep this recovery key somewhere safe, away from this computer. You need it if the computer ever can’t unlock by itself.
-setup-protect-passphrase-label = Passphrase
-setup-protect-repeat = Type it again
-setup-protect-mismatch = They don’t match
-setup-protect-kept = I’ve kept my recovery key
-setup-protect-background = Encrypting happens in the background after the next restart, and you can keep using your computer meanwhile.
-# Button, verb
-setup-protect-encrypt = Encrypt
-setup-protect-checking = Checking…
-setup-protect-start = Encrypt my files
-
 ## Fingerprint
 
 setup-fingerprint-title = Sign in with your finger
@@ -317,6 +314,5 @@ setup-fingerprint-choose-another = Choose another finger
 
 setup-ready-title = You’re all set
 setup-ready-trust = Restart once more to finish. Right after the restart, a blue screen asks to trust Luft. Use the keyboard there with this code.
-setup-ready-restart = Restart once more to finish, then sign in with your password.
 setup-ready-done = Your desktop is ready. Have fun with Luft.
 setup-ready-start = Start using Luft

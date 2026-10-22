@@ -10,12 +10,3 @@ export function unlockSummary({ unlock }: Disk) {
 }
 
 export const percent = (fraction: number) => new Intl.NumberFormat(i18n.formats, { style: 'percent' }).format(Math.floor(fraction * 100) / 100);
-
-export function progressLine({ progress, remaining }: Disk) {
-	const done = percent(progress);
-	if (!remaining) return t('settings-encryption-progress', { percent: done });
-	if (remaining < 60) return t('settings-encryption-progress-seconds', { percent: done });
-	const minutes = Math.round(remaining / 60);
-	if (minutes < 60) return t('settings-encryption-progress-minutes', { percent: done, minutes });
-	return t('settings-encryption-progress-hours', { percent: done, hours: Math.round(minutes / 60) });
-}

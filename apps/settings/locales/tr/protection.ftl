@@ -52,18 +52,7 @@ settings-privacy-delete-after-hint = Dosyaların kaldırılmadan önce ne kadar 
 ## Security: summary at the top of the page
 
 settings-security-protected = Cihazınız korunuyor
-settings-security-encrypting = Cihazınız şifreleniyor
-settings-security-encrypting-progress = { $progress }. Bu sırada çalışmaya devam edebilirsiniz.
-settings-security-decrypting = Cihaz şifreleme kapatılıyor
-settings-security-restart-to-encrypt = Şifrelemeyi başlatmak için yeniden başlatın
-settings-security-restart-to-encrypt-description = Şifreleme, bilgisayar bir sonraki yeniden başlatıldığında başlar.
-settings-security-encryption-failed = Şifreleme başlamadı
-settings-security-encryption-failed-description = Luft şifreleme olmadan başladı ve dosyalarınız değiştirilmedi. Yeniden denemek için şifrelemeyi tekrar açın.
-settings-security-encryption-refused-description = Luft boyutunu değiştirmeyi bitirdi ama şifreleme ardından başlayamadı. Dosyalarınız değiştirilmedi. Yeniden denemek için şifrelemeyi tekrar açın.
-settings-security-waiting-to-encrypt = Şifreleme bekliyor
-settings-security-waiting-to-encrypt-description = Luft hâlâ boyutunu değiştiriyor. Bu bittiğinde şifreleme bir sonraki yeniden başlatmada başlar.
 settings-security-could-be-safer = Cihazınız daha güvenli olabilir
-settings-security-could-be-safer-description = Dosyalarınızı gizli tutmak için cihaz şifrelemeyi açın.
 settings-security-starts-differently-description = Secure Boot ayarlarını siz değiştirdiyseniz diskin yeniden kendiliğinden açılması için bunu onaylayın.
 settings-security-needed-recovery-key = Diskiniz kurtarma anahtarını istedi
 settings-security-needed-recovery-key-description = Diskin kendiliğinden açılması için güvenlik çipini yeniden bağlayın.
@@ -158,23 +147,6 @@ settings-usb-hold-back-description = Kilitliyken takılanlar, kilidi açana kada
 ## Device encryption
 
 settings-encryption = Cihaz şifreleme
-settings-encryption-encrypting = Bu cihaz şifreleniyor
-settings-encryption-decrypting = Cihaz şifreleme kapatılıyor
-settings-encryption-starting = Bir sonraki yeniden başlatmada başlar
-settings-encryption-failed = Son yeniden başlatmada başlamadı, dosyalarınız değiştirilmedi
-settings-encryption-waiting = Luft'un boyutunu değiştirmeyi bitirmesini bekler, ardından bir sonraki yeniden başlatmada başlar
-settings-encryption-refused = Luft boyutunu değiştirdikten sonra başlayamadı, dosyalarınız değiştirilmedi
-settings-encryption-off = Bilgisayar kaybolursa dosyalarınızı gizli tutar
-settings-encryption-progress = { $percent } tamamlandı
-settings-encryption-progress-seconds = { $percent } tamamlandı, bir dakikadan az kaldı
-settings-encryption-progress-minutes = { $minutes ->
-    [one] { $percent } tamamlandı, yaklaşık { $minutes } dakika kaldı
-   *[other] { $percent } tamamlandı, yaklaşık { $minutes } dakika kaldı
-}
-settings-encryption-progress-hours = { $hours ->
-    [one] { $percent } tamamlandı, yaklaşık { $hours } saat kaldı
-   *[other] { $percent } tamamlandı, yaklaşık { $hours } saat kaldı
-}
 settings-encryption-unlocks-chip-pin = Güvenlik çipi ve PIN’inizle açılır
 settings-encryption-unlocks-chip = Güvenlik çipiyle kendiliğinden açılır
 settings-encryption-unlocks-passphrase = Başlangıçta disk parolanızı ister
@@ -194,38 +166,6 @@ settings-encryption-drives-auto-unlock = { $count ->
     [one] { $count } şifreli sürücü bu bilgisayarla birlikte açılır
    *[other] { $count } şifreli sürücü bu bilgisayarla birlikte açılır
 }
-
-## Device encryption: turning it on
-
-settings-encryption-turn-on-title = Cihaz şifrelemeyi aç
-settings-encryption-turn-on-description = Bu bilgisayar kaybolsa ya da çalınsa da dosyalarınız gizli kalır. Doğru anahtar olmadan diski kimse okuyamaz.
-settings-encryption-blocked-title = Cihaz şifreleme henüz açılamıyor
-settings-encryption-blocked-description = Aşağıda işaretlenenleri halledip yeniden deneyin.
-settings-encryption-backup = Başlamadan önce önemli dosyalarınızın yedeklendiğinden emin olun.
-settings-encryption-key-title = Kurtarma anahtarınızı kaydedin
-settings-encryption-key-description = Disk bir gün, örneğin bir onarımdan sonra, kendiliğinden açılamazsa bu anahtarla yeniden erişebilirsiniz. Anahtarı bu bilgisayar dışında bir yerde saklayın.
-settings-encryption-unlock-title = Başlangıçta kilit açma
-settings-encryption-unlock-description = Güvenlik çipi başlangıçta diski kendiliğinden açar, oturum açma aynı kalır.
-settings-encryption-passphrase-title = Disk parolası seçin
-settings-encryption-passphrase-description = Bu bilgisayar diski kendiliğinden açamadığı için her başlangıçta bu disk parolasını ister.
-settings-encryption-summary-title = Şifrelemeye hazır
-settings-encryption-summary-description = Bundan sonra olacaklar:
-settings-encryption-step-restart = Bilgisayarınız bir kez yeniden başlar.
-settings-encryption-step-screen = Başlarken kısa bir süre “Encrypting your device” yazan bir ekran görünür.
-settings-encryption-step-background = Gerisi siz çalışmaya devam ederken arka planda gerçekleşir.
-settings-encryption-step-plugged-in = İşlem bitene kadar bilgisayarı prize takılı tutun.
-settings-encryption-ask-pin = PIN de iste
-settings-encryption-ask-pin-description = Biri bilgisayarı alsa bile disk kilitli kalır. Şifreleme bittiğinde sorulur.
-settings-encryption-starting-button = Başlatılıyor…
-settings-encryption-restart-and-encrypt = Yeniden başlat ve şifrele
-
-## Device encryption: turning it off
-
-settings-encryption-turn-off-title = Cihaz şifreleme kapatılsın mı?
-settings-encryption-turn-off-description = Siz çalışırken dosyalarınızın şifresi arka planda çözülür. Sonrasında diski çıkaran herkes onu okuyabilir.
-settings-encryption-keep = Şifrelemeyi koru
-settings-encryption-turning-off = Kapatılıyor…
-settings-encryption-turn-off = Kapat
 
 ## Device encryption: unlocking the disk
 
@@ -259,6 +199,7 @@ settings-encryption-unlock-disk-field = Kurtarma anahtarı ya da disk parolası
 
 ## Device encryption: security chip and PIN
 
+settings-encryption-ask-pin = PIN de iste
 settings-encryption-chip-setup-description = Bilgisayarınızdaki güvenlik çipi başlangıçta diski kendiliğinden açar, böylece önce disk parolası yazmanız gerekmez.
 settings-encryption-add-pin-title = PIN ekle
 settings-encryption-add-pin-description = Bilgisayar her başladığında bunu yazarsınız. PIN olmadan, biri bilgisayarın tamamını alsa bile disk kilitli kalır.

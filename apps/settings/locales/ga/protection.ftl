@@ -52,18 +52,7 @@ settings-privacy-delete-after-hint = Cé chomh fada a fhanann comhaid sula mbain
 ## Security: summary at the top of the page
 
 settings-security-protected = Tá do ghléas cosanta
-settings-security-encrypting = Do ghléas á chriptiú
-settings-security-encrypting-progress = { $progress }. Is féidir leat leanúint ort ag obair go dtí go mbeidh sé críochnaithe.
-settings-security-decrypting = Criptiú gléis á chasadh as
-settings-security-restart-to-encrypt = Atosaigh chun an criptiú a thosú
-settings-security-restart-to-encrypt-description = Tosóidh an criptiú an chéad uair eile a atosóidh an ríomhaire seo.
-settings-security-encryption-failed = Níor thosaigh an criptiú
-settings-security-encryption-failed-description = Thosaigh Luft gan é agus níor athraíodh do chomhaid. Cas air arís é chun triail eile a bhaint as.
-settings-security-encryption-refused-description = Chríochnaigh Luft a mhéid a athrú, ach níorbh fhéidir leis an gcriptiú tosú ina dhiaidh sin. Níor athraíodh do chomhaid. Cas air arís é chun triail eile a bhaint as.
-settings-security-waiting-to-encrypt = Tá an criptiú ag fanacht
-settings-security-waiting-to-encrypt-description = Tá Luft fós ag athrú a mhéide. Nuair a bheidh sin déanta, tosóidh an criptiú ag an gcéad atosú eile.
 settings-security-could-be-safer = D’fhéadfadh do ghléas a bheith níos sábháilte
-settings-security-could-be-safer-description = Cas air criptiú gléis chun do chomhaid a choinneáil príobháideach.
 settings-security-starts-differently-description = Má d’athraigh tú socruithe Secure Boot an ríomhaire, deimhnigh an t-athrú ionas go ndíghlasálfar an diosca leis féin arís.
 settings-security-needed-recovery-key = Bhí an eochair athshlánaithe ag teastáil ó do dhiosca
 settings-security-needed-recovery-key-description = Nasc an tslis slándála arís ionas go ndíghlasálfar an diosca leis féin.
@@ -173,29 +162,6 @@ settings-usb-hold-back-description = Fanann gléasanna a phlugáiltear isteach a
 ## Device encryption
 
 settings-encryption = Criptiú gléis
-settings-encryption-encrypting = An gléas seo á chriptiú
-settings-encryption-decrypting = Criptiú gléis á chasadh as
-settings-encryption-starting = Tosóidh sé an chéad uair eile a atosóidh tú
-settings-encryption-failed = Níor thosaigh sé ag an atosú deireanach, níor athraíodh do chomhaid
-settings-encryption-waiting = Ag fanacht le Luft a mhéid a athrú, ansin tosóidh sé ag an gcéad atosú eile
-settings-encryption-refused = Níorbh fhéidir leis tosú tar éis do Luft a mhéid a athrú, níor athraíodh do chomhaid
-settings-encryption-off = Coinníonn sé do chomhaid príobháideach má chailltear an ríomhaire seo
-settings-encryption-progress = { $percent } déanta
-settings-encryption-progress-seconds = { $percent } déanta, níos lú ná nóiméad fágtha
-settings-encryption-progress-minutes = { $minutes ->
-    [one] { $percent } déanta, thart ar { $minutes } nóiméad fágtha
-    [two] { $percent } déanta, thart ar { $minutes } nóiméad fágtha
-    [few] { $percent } déanta, thart ar { $minutes } nóiméad fágtha
-    [many] { $percent } déanta, thart ar { $minutes } nóiméad fágtha
-   *[other] { $percent } déanta, thart ar { $minutes } nóiméad fágtha
-}
-settings-encryption-progress-hours = { $hours ->
-    [one] { $percent } déanta, thart ar { $hours } uair an chloig fágtha
-    [two] { $percent } déanta, thart ar { $hours } uair an chloig fágtha
-    [few] { $percent } déanta, thart ar { $hours } huaire an chloig fágtha
-    [many] { $percent } déanta, thart ar { $hours } n-uaire an chloig fágtha
-   *[other] { $percent } déanta, thart ar { $hours } uair an chloig fágtha
-}
 settings-encryption-unlocks-chip-pin = Díghlasálann sé leis an tslis slándála agus le d’UAP
 settings-encryption-unlocks-chip = Díghlasálann sé leis féin leis an tslis slándála
 settings-encryption-unlocks-passphrase = Iarrann sé d’fhrása faire ag an tosú
@@ -218,38 +184,6 @@ settings-encryption-drives-auto-unlock = { $count ->
     [many] Tiomántáin chriptithe a dhíghlasáiltear leis an ríomhaire seo: { $count }
    *[other] Tiomántáin chriptithe a dhíghlasáiltear leis an ríomhaire seo: { $count }
 }
-
-## Device encryption: turning it on
-
-settings-encryption-turn-on-title = Cas air criptiú gléis
-settings-encryption-turn-on-description = Fanann do chomhaid príobháideach má chailltear nó má ghoidtear an ríomhaire seo. Gan an eochair cheart, ní féidir le duine ar bith an diosca a léamh.
-settings-encryption-blocked-title = Ní féidir criptiú gléis a chasadh air fós
-settings-encryption-blocked-description = Réitigh a bhfuil marcáilte thíos, ansin bain triail eile as.
-settings-encryption-backup = Sula dtosaíonn tú, cinntigh go bhfuil cúltaca de do chomhaid thábhachtacha agat.
-settings-encryption-key-title = Sábháil d’eochair athshlánaithe
-settings-encryption-key-description = Mura féidir leis an diosca é féin a dhíghlasáil am éigin, mar shampla tar éis deisiúcháin, ligfidh an eochair seo isteach arís thú. Coinnigh í áit éigin seachas ar an ríomhaire seo.
-settings-encryption-unlock-title = Díghlasáil ag an tosú
-settings-encryption-unlock-description = Díghlasálann an tslis slándála an diosca léi féin ag an tosú, mar sin ní athraíonn an síniú isteach.
-settings-encryption-passphrase-title = Roghnaigh frása faire
-settings-encryption-passphrase-description = Ní féidir leis an ríomhaire seo an diosca a dhíghlasáil leis féin, mar sin iarrfaidh sé an frása faire seo gach uair a thosaíonn sé.
-settings-encryption-summary-title = Réidh le criptiú
-settings-encryption-summary-description = Seo a tharlóidh anois.
-settings-encryption-step-restart = Atosóidh do ríomhaire uair amháin.
-settings-encryption-step-screen = Agus é ag tosú, feicfidh tú scáileán gearr “Encrypting your device”.
-settings-encryption-step-background = Tarlóidh an chuid eile sa chúlra agus tú ag obair leat.
-settings-encryption-step-plugged-in = Coinnigh an ríomhaire plugáilte isteach go dtí go mbeidh sé críochnaithe.
-settings-encryption-ask-pin = Iarr UAP freisin
-settings-encryption-ask-pin-description = Coinníonn sé an diosca faoi ghlas fiú má thógann duine an ríomhaire. Iarrfar ort é a shocrú nuair a bheidh an criptiú críochnaithe.
-settings-encryption-starting-button = Á thosú…
-settings-encryption-restart-and-encrypt = Atosaigh agus criptigh
-
-## Device encryption: turning it off
-
-settings-encryption-turn-off-title = Cas as criptiú gléis?
-settings-encryption-turn-off-description = Díchriptítear do chomhaid sa chúlra agus tú ag obair. Ina dhiaidh sin, is féidir le duine ar bith a bhaineann an diosca amach é a léamh.
-settings-encryption-keep = Coinnigh an criptiú
-settings-encryption-turning-off = Á chasadh as…
-settings-encryption-turn-off = Cas as
 
 ## Device encryption: unlocking the disk
 
@@ -283,6 +217,7 @@ settings-encryption-unlock-disk-field = Eochair athshlánaithe nó frása faire
 
 ## Device encryption: security chip and PIN
 
+settings-encryption-ask-pin = Iarr UAP freisin
 settings-encryption-chip-setup-description = Díghlasálann an tslis slándála i do ríomhaire an diosca léi féin ag an tosú, mar sin ní gá duit frása faire a chlóscríobh roimh ré a thuilleadh.
 settings-encryption-add-pin-title = Cuir UAP leis
 settings-encryption-add-pin-description = Clóscríobhfaidh tú é gach uair a thosaíonn an ríomhaire. Gan é, fanann an diosca faoi ghlas, fiú má thógann duine an ríomhaire ar fad.

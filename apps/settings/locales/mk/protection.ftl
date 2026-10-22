@@ -52,18 +52,7 @@ settings-privacy-delete-after-hint = Колку долго датотеките 
 ## Security: summary at the top of the page
 
 settings-security-protected = Вашиот уред е заштитен
-settings-security-encrypting = Вашиот уред се шифрира
-settings-security-encrypting-progress = { $progress }. Можете да продолжите да работите додека не заврши.
-settings-security-decrypting = Се исклучува шифрирањето на уредот
-settings-security-restart-to-encrypt = Рестартирајте за да започне шифрирањето
-settings-security-restart-to-encrypt-description = Шифрирањето започнува при следното рестартирање на овој компјутер.
-settings-security-encryption-failed = Шифрирањето не започна
-settings-security-encryption-failed-description = Luft се стартуваше без него и вашите датотеки не се променети. Вклучете го повторно за да се обидете уште еднаш.
-settings-security-encryption-refused-description = Luft заврши со промената на големината, но шифрирањето не можеше да започне потоа. Вашите датотеки не се променети. Вклучете го повторно за да се обидете уште еднаш.
-settings-security-waiting-to-encrypt = Шифрирањето чека
-settings-security-waiting-to-encrypt-description = Luft сѐ уште ја менува својата големина. Штом заврши, шифрирањето започнува при следното рестартирање.
 settings-security-could-be-safer = Вашиот уред може да биде побезбеден
-settings-security-could-be-safer-description = Вклучете шифрирање на уредот за вашите датотеки да останат приватни.
 settings-security-starts-differently-description = Ако сте ги промениле неговите поставки за Secure Boot, потврдете ја промената за дискот повторно да се отклучува сам.
 settings-security-needed-recovery-key = На дискот му требаше клучот за обновување
 settings-security-needed-recovery-key-description = Поврзете го безбедносниот чип повторно за дискот да се отклучува сам.
@@ -158,23 +147,6 @@ settings-usb-hold-back-description = Оние приклучени додека 
 ## Device encryption
 
 settings-encryption = Шифрирање на уредот
-settings-encryption-encrypting = Овој уред се шифрира
-settings-encryption-decrypting = Се исклучува шифрирањето на уредот
-settings-encryption-starting = Започнува при следното рестартирање
-settings-encryption-failed = Не започна при последното рестартирање, вашите датотеки не се променети
-settings-encryption-waiting = Чека Luft да ја заврши промената на големината, па започнува при следното рестартирање
-settings-encryption-refused = Не можеше да започне откако Luft ја промени големината, вашите датотеки не се променети
-settings-encryption-off = Ги чува вашите датотеки приватни ако го изгубите овој компјутер
-settings-encryption-progress = { $percent } завршено
-settings-encryption-progress-seconds = { $percent } завршено, уште помалку од минута
-settings-encryption-progress-minutes = { $minutes ->
-    [one] { $percent } завршено, уште околу { $minutes } минута
-   *[other] { $percent } завршено, уште околу { $minutes } минути
-}
-settings-encryption-progress-hours = { $hours ->
-    [one] { $percent } завршено, уште околу { $hours } час
-   *[other] { $percent } завршено, уште околу { $hours } часа
-}
 settings-encryption-unlocks-chip-pin = Се отклучува со безбедносниот чип и вашиот PIN
 settings-encryption-unlocks-chip = Се отклучува сам со безбедносниот чип
 settings-encryption-unlocks-passphrase = Ја бара вашата тајна фраза при стартување
@@ -194,38 +166,6 @@ settings-encryption-drives-auto-unlock = { $count ->
     [one] { $count } шифриран диск се отклучува со овој компјутер
    *[other] { $count } шифрирани диска се отклучуваат со овој компјутер
 }
-
-## Device encryption: turning it on
-
-settings-encryption-turn-on-title = Вклучување шифрирање на уредот
-settings-encryption-turn-on-description = Вашите датотеки остануваат приватни ако овој компјутер се изгуби или биде украден. Без вистинскиот клуч, никој не може да го прочита дискот.
-settings-encryption-blocked-title = Шифрирањето на уредот сè уште не може да се вклучи
-settings-encryption-blocked-description = Средете го она што е означено подолу, па обидете се повторно.
-settings-encryption-backup = Пред да започнете, проверете дали имате резервна копија од важните датотеки.
-settings-encryption-key-title = Зачувајте го клучот за обновување
-settings-encryption-key-description = Ако дискот некогаш не може да се отклучи сам, на пример по поправка, овој клуч ќе ви овозможи пристап. Чувајте го на друго место, не на овој компјутер.
-settings-encryption-unlock-title = Отклучување при стартување
-settings-encryption-unlock-description = Безбедносниот чип сам го отклучува дискот при стартување, така што најавувањето останува исто.
-settings-encryption-passphrase-title = Изберете тајна фраза
-settings-encryption-passphrase-description = Овој компјутер не може сам да го отклучи дискот, па ја бара оваа тајна фраза при секое стартување.
-settings-encryption-summary-title = Подготвено за шифрирање
-settings-encryption-summary-description = Еве што следува.
-settings-encryption-step-restart = Компјутерот се рестартира еднаш.
-settings-encryption-step-screen = Додека се стартува, накратко се појавува екранот „Encrypting your device“.
-settings-encryption-step-background = Остатокот се одвива во позадина додека продолжувате да работите.
-settings-encryption-step-plugged-in = Држете го компјутерот приклучен на струја додека не заврши.
-settings-encryption-ask-pin = Барај и PIN
-settings-encryption-ask-pin-description = Го држи дискот заклучен дури и ако некој го земе компјутерот. Се бара откако ќе заврши шифрирањето.
-settings-encryption-starting-button = Се започнува…
-settings-encryption-restart-and-encrypt = Рестартирај и шифрирај
-
-## Device encryption: turning it off
-
-settings-encryption-turn-off-title = Да се исклучи шифрирањето на уредот?
-settings-encryption-turn-off-description = Вашите датотеки се дешифрираат во позадина додека работите. Потоа, секој што ќе го извади дискот ќе може да го прочита.
-settings-encryption-keep = Задржи го шифрирањето
-settings-encryption-turning-off = Се исклучува…
-settings-encryption-turn-off = Исклучи
 
 ## Device encryption: unlocking the disk
 
@@ -259,6 +199,7 @@ settings-encryption-unlock-disk-field = Клуч за обновување ил�
 
 ## Device encryption: security chip and PIN
 
+settings-encryption-ask-pin = Барај и PIN
 settings-encryption-chip-setup-description = Безбедносниот чип во вашиот компјутер сам го отклучува дискот при стартување, така што повеќе не мора прво да внесувате тајна фраза.
 settings-encryption-add-pin-title = Додавање PIN
 settings-encryption-add-pin-description = Ќе го внесувате при секое стартување на компјутерот. Без него дискот останува заклучен, дури и ако некој го земе целиот компјутер.

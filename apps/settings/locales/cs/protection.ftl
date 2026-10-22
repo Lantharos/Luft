@@ -52,18 +52,7 @@ settings-privacy-delete-after-hint = Jak dlouho soubory zůstanou, než se odstr
 ## Security: summary at the top of the page
 
 settings-security-protected = Vaše zařízení je chráněné
-settings-security-encrypting = Zařízení se šifruje
-settings-security-encrypting-progress = { $progress }. Mezitím můžete dál pracovat.
-settings-security-decrypting = Šifrování zařízení se vypíná
-settings-security-restart-to-encrypt = Šifrování začne po restartu
-settings-security-restart-to-encrypt-description = Šifrování začne při příštím restartu tohoto počítače.
-settings-security-encryption-failed = Šifrování se nespustilo
-settings-security-encryption-failed-description = Luft se spustil bez něj a vaše soubory zůstaly beze změny. Zapněte ho znovu a zkuste to ještě jednou.
-settings-security-encryption-refused-description = Luft dokončil změnu velikosti, ale šifrování se potom nemohlo spustit. Vaše soubory zůstaly beze změny. Zapněte ho znovu a zkuste to ještě jednou.
-settings-security-waiting-to-encrypt = Šifrování čeká
-settings-security-waiting-to-encrypt-description = Luft ještě mění svou velikost. Až to dokončí, šifrování se spustí při příštím restartu.
 settings-security-could-be-safer = Vaše zařízení by mohlo být lépe chráněné
-settings-security-could-be-safer-description = Zapněte šifrování zařízení, aby vaše soubory zůstaly soukromé.
 settings-security-starts-differently-description = Pokud jste změnili jeho nastavení Secure Boot, potvrďte to, aby se disk znovu odemykal sám.
 settings-security-needed-recovery-key = Disk potřeboval obnovovací klíč
 settings-security-needed-recovery-key-description = Znovu propojte bezpečnostní čip, aby se disk odemykal sám.
@@ -168,27 +157,6 @@ settings-usb-hold-back-description = Zařízení připojená při zamčení poč
 ## Device encryption
 
 settings-encryption = Šifrování zařízení
-settings-encryption-encrypting = Toto zařízení se šifruje
-settings-encryption-decrypting = Šifrování zařízení se vypíná
-settings-encryption-starting = Začne při příštím restartu
-settings-encryption-failed = Při posledním restartu se nespustilo, vaše soubory zůstaly beze změny
-settings-encryption-waiting = Čeká, až Luft dokončí změnu velikosti, pak se spustí při příštím restartu
-settings-encryption-refused = Po změně velikosti Luftu se nemohlo spustit, vaše soubory zůstaly beze změny
-settings-encryption-off = Chrání soukromí vašich souborů, pokud počítač ztratíte
-settings-encryption-progress = Hotovo { $percent }
-settings-encryption-progress-seconds = Hotovo { $percent }, zbývá méně než minuta
-settings-encryption-progress-minutes = { $minutes ->
-    [one] Hotovo { $percent }, zbývá asi { $minutes } minuta
-    [few] Hotovo { $percent }, zbývají asi { $minutes } minuty
-    [many] Hotovo { $percent }, zbývá asi { $minutes } minuty
-   *[other] Hotovo { $percent }, zbývá asi { $minutes } minut
-}
-settings-encryption-progress-hours = { $hours ->
-    [one] Hotovo { $percent }, zbývá asi { $hours } hodina
-    [few] Hotovo { $percent }, zbývají asi { $hours } hodiny
-    [many] Hotovo { $percent }, zbývá asi { $hours } hodiny
-   *[other] Hotovo { $percent }, zbývá asi { $hours } hodin
-}
 settings-encryption-unlocks-chip-pin = Odemyká se bezpečnostním čipem a vaším PINem
 settings-encryption-unlocks-chip = Odemyká se sám pomocí bezpečnostního čipu
 settings-encryption-unlocks-passphrase = Při spuštění žádá heslo k disku
@@ -210,38 +178,6 @@ settings-encryption-drives-auto-unlock = { $count ->
     [many] { $count } šifrované jednotky se odemyká spolu s tímto počítačem
    *[other] { $count } šifrovaných jednotek se odemyká spolu s tímto počítačem
 }
-
-## Device encryption: turning it on
-
-settings-encryption-turn-on-title = Zapnout šifrování zařízení
-settings-encryption-turn-on-description = Vaše soubory zůstanou soukromé, i když počítač ztratíte nebo vám ho někdo ukradne. Bez správného klíče nikdo disk nepřečte.
-settings-encryption-blocked-title = Šifrování zařízení zatím nejde zapnout
-settings-encryption-blocked-description = Vyřešte, co je označené níže, a zkuste to znovu.
-settings-encryption-backup = Než začnete, ujistěte se, že máte zálohované důležité soubory.
-settings-encryption-key-title = Uložte si obnovovací klíč
-settings-encryption-key-description = Pokud se disk někdy nedokáže odemknout sám, například po opravě, tento klíč vám umožní se k němu znovu dostat. Uchovávejte ho jinde než v tomto počítači.
-settings-encryption-unlock-title = Odemykání při spuštění
-settings-encryption-unlock-description = Bezpečnostní čip při spuštění odemkne disk sám, takže přihlašování zůstane stejné.
-settings-encryption-passphrase-title = Zvolte heslo k disku
-settings-encryption-passphrase-description = Tento počítač neumí odemknout disk sám, takže si o heslo k disku řekne při každém spuštění.
-settings-encryption-summary-title = Připraveno k šifrování
-settings-encryption-summary-description = Co bude následovat:
-settings-encryption-step-restart = Počítač se jednou restartuje.
-settings-encryption-step-screen = Během spouštění se krátce zobrazí obrazovka „Šifrování zařízení“.
-settings-encryption-step-background = Zbytek proběhne na pozadí, zatímco budete dál pracovat.
-settings-encryption-step-plugged-in = Nechte počítač připojený k napájení, dokud šifrování neskončí.
-settings-encryption-ask-pin = Žádat také PIN
-settings-encryption-ask-pin-description = Disk zůstane zamčený, i když někdo počítač odnese. O PIN budete požádáni po dokončení šifrování.
-settings-encryption-starting-button = Spouštění…
-settings-encryption-restart-and-encrypt = Restartovat a zašifrovat
-
-## Device encryption: turning it off
-
-settings-encryption-turn-off-title = Vypnout šifrování zařízení?
-settings-encryption-turn-off-description = Soubory se dešifrují na pozadí, zatímco pracujete. Potom bude disk moct přečíst každý, kdo ho z počítače vyjme.
-settings-encryption-keep = Ponechat šifrování
-settings-encryption-turning-off = Vypínání…
-settings-encryption-turn-off = Vypnout
 
 ## Device encryption: unlocking the disk
 
@@ -275,6 +211,7 @@ settings-encryption-unlock-disk-field = Obnovovací klíč nebo heslo k disku
 
 ## Device encryption: security chip and PIN
 
+settings-encryption-ask-pin = Žádat také PIN
 settings-encryption-chip-setup-description = Bezpečnostní čip ve vašem počítači při spuštění odemkne disk sám, takže už nebudete nejdřív zadávat heslo k disku.
 settings-encryption-add-pin-title = Přidat PIN
 settings-encryption-add-pin-description = Budete ho zadávat při každém spuštění počítače. Bez něj zůstane disk zamčený, i když někdo odnese celý počítač.

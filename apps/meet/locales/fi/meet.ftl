@@ -178,7 +178,6 @@ luft-bar-used = { $size }, { $used } käytössä
 luft-resize-title = Muuta Luftin kokoa
 luft-resize-description = Anna Luftille lisää Windowsin tilaa tai palauta osa Windowsille.
 luft-resize-drive-description = Anna Luftille enemmän levyn { $drive } vapaasta tilasta tai jätä osa siitä vapaaksi.
-luft-resize-reencrypting = Luft salaa vielä levyään tai purkaa sen salausta. Kun se on valmis, kokoa voi muuttaa.
 luft-resize-passphrase = Luftin levy aukeaa vain tunnuslauseella, eikä Luft voi kirjoittaa sitä itse siirtyessään.
 luft-resize-start-first = Käynnistä Luft kerran, jotta se voi kertoa Meet Luftille, kuinka täynnä se on, ja palaa sitten tänne.
 luft-resize-apart = Windowsin ja Luftin välissä on toinen osio, joten ne eivät voi jakaa tilaansa.

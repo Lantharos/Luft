@@ -11,6 +11,7 @@ const PARENT: usize = 1;
 const TERMINAL: usize = 4;
 const STARTED: usize = 19;
 const FUSE_DEVICE: &str = "/dev/fuse";
+const DEVICE_ONLY: u32 = 0;
 
 pub struct Process {
     directory: OwnedFd,
@@ -36,7 +37,7 @@ impl Process {
         (pid_of(pidfd) == Some(pid)).then_some(process)
     }
 
-    fn read(&self, name: &str) -> Option<Vec<u8>> {
+    fn open_file(&self, name: &str) -> Option<File> {
         let name = CString::new(name).ok()?;
         let fd = unsafe {
             libc::openat(
@@ -45,13 +46,12 @@ impl Process {
                 libc::O_RDONLY | libc::O_CLOEXEC,
             )
         };
-        if fd < 0 {
-            return None;
-        }
+        (fd >= 0).then(|| unsafe { File::from_raw_fd(fd) })
+    }
+
+    fn read(&self, name: &str) -> Option<Vec<u8>> {
         let mut contents = Vec::new();
-        unsafe { File::from_raw_fd(fd) }
-            .read_to_end(&mut contents)
-            .ok()?;
+        self.open_file(name)?.read_to_end(&mut contents).ok()?;
         Some(contents)
     }
 
@@ -89,8 +89,14 @@ impl Process {
         Some(link.strip_suffix(" (deleted)").unwrap_or(&link).to_owned())
     }
 
+    pub fn executable_start<const LENGTH: usize>(&self) -> Option<[u8; LENGTH]> {
+        let mut start = [0; LENGTH];
+        self.open_file("exe")?.read_exact(&mut start).ok()?;
+        Some(start)
+    }
+
     pub fn runs_installed(&self, path: &str) -> bool {
-        let Some(running) = self.executable_status() else {
+        let Some(running) = self.executable_status(libc::STATX_INO) else {
             return false;
         };
         std::fs::metadata(path).is_ok_and(|installed| {
@@ -117,18 +123,18 @@ impl Process {
     }
 
     pub fn executable_device(&self) -> Option<(u32, u32)> {
-        self.executable_status()
+        self.executable_status(DEVICE_ONLY)
             .map(|status| (status.stx_dev_major, status.stx_dev_minor))
     }
 
-    fn executable_status(&self) -> Option<libc::statx> {
+    fn executable_status(&self, mask: u32) -> Option<libc::statx> {
         let mut status = unsafe { std::mem::zeroed::<libc::statx>() };
         let found = unsafe {
             libc::statx(
                 self.directory.as_raw_fd(),
                 c"exe".as_ptr(),
                 libc::AT_STATX_DONT_SYNC,
-                libc::STATX_INO,
+                mask,
                 &raw mut status,
             )
         };

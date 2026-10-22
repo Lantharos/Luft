@@ -215,7 +215,9 @@ fn classify(process: &Process) -> App {
     if let Some(id) = process.flatpak_id() {
         return App::flatpak(&id);
     }
-    let executable = process.executable().unwrap_or_default();
+    let Some(executable) = process.executable() else {
+        return App::unknown();
+    };
     if sabine::is_shared_runtime(process, &executable) {
         return App::sabine_runtime(executable);
     }

@@ -6,6 +6,15 @@ from ownership import READER, launcher_entry, program_at
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 INSIDE = "usr/bin/vault"
+APPIMAGE_MARK = b"AI\x02"
+
+
+def appimage_at(path):
+    program_at(path)
+    with open(path, "r+b") as image:
+        image.seek(8)
+        image.write(APPIMAGE_MARK)
+    return path
 
 
 def exercise_launches(root, home, environment, check, script, requests):
@@ -16,7 +25,7 @@ def exercise_launches(root, home, environment, check, script, requests):
         env = dict(environment, **(extra or {}))
         return subprocess.run(command, env=env, capture_output=True, timeout=60, check=False).stdout.decode()
 
-    image = program_at(os.path.join(root, "Applications/Vault.AppImage"))
+    image = appimage_at(os.path.join(root, "Applications/Vault.AppImage"))
     launcher_entry(home, "org.example.Vault", "Vault", image)
 
     def launched(*arguments):

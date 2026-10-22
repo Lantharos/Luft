@@ -2,6 +2,9 @@ use super::process::Process;
 use super::program::file_name;
 
 const ANONYMOUS_DEVICES: u32 = 0;
+const ELF: [u8; 4] = *b"\x7fELF";
+const APPIMAGE: [u8; 2] = *b"AI";
+const APPIMAGE_TYPES: [u8; 2] = [1, 2];
 
 pub fn of(process: &Process) -> Option<String> {
     let (major, connection) = process.executable_device()?;
@@ -16,7 +19,16 @@ pub fn of(process: &Process) -> Option<String> {
 fn server(connection: u32, named: impl Fn(&str) -> bool) -> Option<String> {
     running().find_map(|candidate| {
         let executable = candidate.executable()?;
-        (named(file_name(&executable)) && candidate.serves_fuse(connection)).then_some(executable)
+        (named(file_name(&executable))
+            && is_appimage(&candidate)
+            && candidate.serves_fuse(connection))
+        .then_some(executable)
+    })
+}
+
+fn is_appimage(process: &Process) -> bool {
+    process.executable_start::<11>().is_some_and(|start| {
+        start[..4] == ELF && start[8..10] == APPIMAGE && APPIMAGE_TYPES.contains(&start[10])
     })
 }
 

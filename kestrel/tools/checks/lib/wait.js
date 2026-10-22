@@ -22,6 +22,13 @@ export async function waitUntil(condition, label, timeout = 5000) {
   }
 }
 
+export function idleWorkDone() {
+  return new Promise(resolve => GLib.idle_add(GLib.PRIORITY_LOW + 1, () => {
+    resolve();
+    return GLib.SOURCE_REMOVE;
+  }));
+}
+
 export function nextFrame() {
   return new Promise(resolve => {
     const id = global.stage.connect_after('after-paint', () => {

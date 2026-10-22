@@ -87,6 +87,11 @@ struct Attributes {
 }
 
 #[derive(Serialize)]
+struct Kind {
+    GptType: String,
+}
+
+#[derive(Serialize)]
 struct Format {
     FileSystem: String,
     FileSystemLabel: String,
@@ -376,6 +381,23 @@ impl Storage {
             )
             .map_err(wmi_error)?;
         checked("drive-hide-failed", returned.ReturnValue)
+    }
+
+    pub fn set_type(&self, partition: &MSFT_Partition, kind: &str) -> Result<(), String> {
+        let returned: Returned = self
+            .wmi
+            .exec_instance_method::<MSFT_Partition, _>(
+                &partition.__Path,
+                "SetAttributes",
+                Kind {
+                    GptType: kind.to_owned(),
+                },
+            )
+            .map_err(wmi_error)?;
+        match returned.ReturnValue {
+            0 => Ok(()),
+            code => Err(format!("Windows storage error {code}")),
+        }
     }
 
     pub fn refreshed(&self, partition: &MSFT_Partition) -> Result<MSFT_Partition, String> {

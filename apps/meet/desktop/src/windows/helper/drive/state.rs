@@ -11,7 +11,7 @@ use crate::protocol::WindowsChoices;
 
 use super::bitlocker::BitLocker;
 use super::record::{self, Made};
-use super::storage::{Layout, MSFT_Partition, Storage};
+use super::storage::{BASIC_TYPE, ESP_TYPE, Layout, MSFT_Partition, Storage};
 use crate::boot::entries;
 use crate::live::durable;
 use crate::plan::layout::Span;
@@ -109,9 +109,24 @@ pub fn find(partitions: &[MSFT_Partition]) -> Found {
     }
 }
 
+pub fn restore_start_type(storage: &Storage, found: &Found) {
+    let start = found
+        .handoff
+        .as_ref()
+        .and_then(Handoff::made_partitions)
+        .and_then(|made| found.made_partition(&made.start))
+        .filter(|start| start.is_type(BASIC_TYPE));
+    if let Some(start) = start
+        && let Err(error) = storage.set_type(start, ESP_TYPE)
+    {
+        eprintln!("Luft's start partition couldn't get its type back: {error}");
+    }
+}
+
 pub fn restart(intent: Intent, windows: WindowsChoices, hints: Hints) -> Result<(), String> {
     let storage = Storage::open()?;
     let found = find(&storage.all_partitions()?);
+    restore_start_type(&storage, &found);
     let (Some(mut handoff), Some(live)) = (found.handoff.clone(), found.live_path()) else {
         return Err(t!(L10N, "helper-not-ready-to-start-windows"));
     };

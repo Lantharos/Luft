@@ -60,6 +60,7 @@ pub fn check(source: &Source) -> Result<Report<Facts>, String> {
     let layout = storage.layout(&drive.volume)?;
     let windows = storage.windows_plan(&layout, &drive.volume)?;
     let found = state::find(&storage.all_partitions()?);
+    state::restore_start_type(&storage, &found);
     let listing = live_system::listing(source)
         .inspect_err(|error| eprintln!("Luft's download isn't reachable: {error}"))
         .ok();

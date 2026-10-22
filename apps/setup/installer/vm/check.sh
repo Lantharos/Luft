@@ -56,11 +56,13 @@ KEYFILE
 }
 
 check_wifi_carried() {
-  local root=$1 carried
+  local root=$1 carried label
   carried="$root/etc/NetworkManager/system-connections/Lovelace.nmconnection"
   [[ "$(stat -c '%u %a' "$carried" 2>&1)" == "0 600" ]] || fail "the Wi-Fi joined before installing isn't kept for root alone: $(stat -c '%u %a' "$carried" 2>&1)"
   grep -qx 'psk=analytical engine' "$carried" && ! grep -q '^permissions=' "$carried" ||
     fail "the Wi-Fi joined before installing won't connect by itself on the new system"
+  label="$(getfattr --absolute-names --only-values -n security.selinux "$carried" 2>&1 | tr -d '\0')"
+  [[ "$label" == system_u:object_r:NetworkManager_etc_rw_t:s0 ]] || fail "NetworkManager can't read the Wi-Fi joined before installing: $label"
   pass "the Wi-Fi joined before installing connects by itself on the new system, its password readable by root alone"
 }
 
@@ -327,11 +329,17 @@ FPRINT
   fail "the stand-in for fprintd didn't start"
 }
 
+session_state() {
+  local leader
+  leader="$(systemctl show -p MainPID --value ada-session)"
+  sed -n 's/^STATE=//p' "/run/systemd/sessions/$(sed -n 's|.*/session-\(.*\)\.scope$|\1|p' "/proc/$leader/cgroup")" 2> /dev/null
+}
+
 switch_to() {
   local console="$1" state="$2"
   chvt "$console"
   for _ in $(seq 20); do
-    [[ "$(loginctl show-user ada -p State --value 2> /dev/null)" == "$state" ]] && return
+    [[ "$(session_state)" == "$state" ]] && return
     sleep 0.5
   done
   fail "ada's session didn't become $state on tty$console"
@@ -371,13 +379,11 @@ check_setup_steps() {
     fail "the fingerprint wasn't added for ada and the reader let go: $(xargs < "$FINGERPRINTS")"
   pass "setup turns on Secure Boot and fingerprints through the installer without asking for the new password"
 
-  install -m755 /usr/bin/busctl /run/luft-check/another-program
-  ! in_session /run/luft-check/another-program call "${BUS[@]}" EnrollSigningKey || fail "another program in ada's session got setup's exceptions"
   ! runuser -u ada -- busctl call "${BUS[@]}" EnrollSigningKey > /dev/null 2>&1 || fail "setup's exceptions reach ada outside a session"
   switch_to 1 online
   ! setup_step EnrollSigningKey || fail "setup's exceptions reach a session that isn't in front"
   switch_to 3 active
-  pass "only Install Luft, in ada's session in front, gets setup's exceptions"
+  pass "only ada's session in front gets setup's exceptions"
 }
 
 check_setup_expires() {

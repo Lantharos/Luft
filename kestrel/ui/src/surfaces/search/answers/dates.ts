@@ -66,7 +66,7 @@ function addWeekdays(weekdays: Map<string, number>, locale: string): void {
   }
 }
 
-function addRelative(lexicon: Lexicon, locale: string): void {
+function addRelativeDays(lexicon: Lexicon, locale: string): void {
   const automatic = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
   for (let days = -2; days <= 2; days++) {
     const found = meaningful(automatic.format(days, 'day'));
@@ -74,26 +74,27 @@ function addRelative(lexicon: Lexicon, locale: string): void {
   }
   const now = meaningful(automatic.format(0, 'second'));
   if (now.length === 1) setFirst(lexicon.relativeDays, now[0], 0);
+}
+
+function addUnit(lexicon: Lexicon, locale: string, [intlUnit, unit]: [Intl.RelativeTimeFormatUnit, Unit]): void {
   const always = new Intl.RelativeTimeFormat(locale, { numeric: 'always' });
-  for (const [intlUnit, unit] of INTL_UNITS) {
-    for (const count of COUNTS) {
-      for (const sign of [1, -1] as const) {
-        const parts = always.formatToParts(sign * count, intlUnit);
-        const number = parts.findIndex(({ type }) => type === 'integer');
-        if (number < 0) continue;
-        const before = meaningful(parts.slice(0, number).map(({ value }) => value).join(''));
-        const after = meaningful(parts.slice(number + 1).filter(({ type }) => type === 'literal').map(({ value }) => value).join(''));
-        const key = [unit, sign, ...before, '#', ...after].join(' ');
-        if (!lexicon.templates.some(template => [template.unit, template.sign, ...template.before, '#', ...template.after].join(' ') === key))
-          lexicon.templates.push({ before, after, unit, sign });
-      }
+  for (const count of COUNTS) {
+    for (const sign of [1, -1] as const) {
+      const parts = always.formatToParts(sign * count, intlUnit);
+      const number = parts.findIndex(({ type }) => type === 'integer');
+      if (number < 0) continue;
+      const before = meaningful(parts.slice(0, number).map(({ value }) => value).join(''));
+      const after = meaningful(parts.slice(number + 1).filter(({ type }) => type === 'literal').map(({ value }) => value).join(''));
+      const key = [unit, sign, ...before, '#', ...after].join(' ');
+      if (!lexicon.templates.some(template => [template.unit, template.sign, ...template.before, '#', ...template.after].join(' ') === key))
+        lexicon.templates.push({ before, after, unit, sign });
     }
-    for (const unitDisplay of ['long', 'short'] as const) {
-      const format = new Intl.NumberFormat(locale, { style: 'unit', unit: intlUnit.replace(/s$/, ''), unitDisplay });
-      for (const count of [...COUNTS, 100]) {
-        for (const part of format.formatToParts(count))
-          if (part.type === 'unit') for (const word of tokens(part.value)) if (word.length > 1) setFirst(lexicon.units, word, unit);
-      }
+  }
+  for (const unitDisplay of ['long', 'short'] as const) {
+    const format = new Intl.NumberFormat(locale, { style: 'unit', unit: intlUnit.replace(/s$/, ''), unitDisplay });
+    for (const count of [...COUNTS, 100]) {
+      for (const part of format.formatToParts(count))
+        if (part.type === 'unit') for (const word of tokens(part.value)) if (word.length > 1) setFirst(lexicon.units, word, unit);
     }
   }
 }
@@ -111,10 +112,13 @@ function emptyLexicon(): Lexicon {
   return found;
 }
 
-function addLanguage(found: Lexicon, language: string): void {
-  addMonths(found.months, language);
-  addWeekdays(found.weekdays, language);
-  addRelative(found, language);
+function languageSteps(found: Lexicon, language: string): (() => void)[] {
+  return [
+    () => addMonths(found.months, language),
+    () => addWeekdays(found.weekdays, language),
+    () => addRelativeDays(found, language),
+    ...INTL_UNITS.map(unit => () => addUnit(found, language, unit)),
+  ];
 }
 
 function finish(found: Lexicon, locale: string): void {
@@ -128,7 +132,7 @@ export function lexiconSteps(locale: string): (() => void)[] {
   if (lexicons.has(locale)) return [];
   const found = emptyLexicon();
   const languages = [...new Set([locale, ...PHRASE_LOCALES])].filter(supported);
-  return [...languages.map(language => () => addLanguage(found, language)), () => finish(found, locale)];
+  return [...languages.flatMap(language => languageSteps(found, language)), () => finish(found, locale)];
 }
 
 export function lexicon(locale: string): Lexicon {

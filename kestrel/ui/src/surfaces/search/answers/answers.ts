@@ -221,7 +221,7 @@ function day(cursor: Cursor, scope: Scope): Answer | null {
 }
 
 export function answerSteps(locale: string): (() => void)[] {
-  return [...lexiconSteps(locale), () => placeIndex()];
+  return [...lexiconSteps(locale), () => { placeIndex(); }];
 }
 
 export function answer(text: string, context: AnswerContext): Answer | null {

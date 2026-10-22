@@ -69,6 +69,13 @@ export class GridLayout {
     return low;
   }
 
+  rowRange(top: number, bottom: number): [first: number, end: number] {
+    const first = this.rows.length ? this.firstRowAt(top) : 0;
+    let end = first;
+    while (end < this.rows.length && this.rows[end].y < bottom) end++;
+    return [first, end];
+  }
+
   neighbour(cell: Cell, rows: number): Cell | undefined {
     let rowIndex = cell.row;
     const center = cell.column + cell.span / 2;

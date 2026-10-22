@@ -1,5 +1,4 @@
 import Clutter from 'gi://Clutter';
-import GLib from 'gi://GLib';
 import St from 'gi://St';
 
 import { blurSurface } from '../../shared/layout/surface.js';
@@ -9,13 +8,14 @@ import { boxCenter, findAnchor, heightNear, placeNear, type Anchor, type Box } f
 import type { TextInput } from '../../shared/input/textInput.js';
 import { describe, withTone, type Catalog } from './catalog/catalog.js';
 import type { SearchIndex } from './catalog/search.js';
-import { emojiData } from './catalog/shared.js';
+import { emojiData, prepareEmojiData } from './catalog/shared.js';
 import { SearchField } from './controls/searchField.js';
 import { TabStrip } from './controls/tabStrip.js';
 import { TonePicker } from './controls/tonePicker.js';
 import { EmojiGrid, GRID_WIDTH } from './grid/grid.js';
 import { GridLayout, type Cell } from './grid/layout.js';
 import { EmojiPreferences } from './preferences.js';
+import type { Work } from '../prewarm/queue.js';
 
 type Zone = 'grid' | 'tone' | 'tabs' | 'tones';
 
@@ -23,7 +23,6 @@ const ZONES: readonly Zone[] = ['grid', 'tone', 'tabs'];
 const PREFERRED_HEIGHT = 452;
 const SLIDE_DISTANCE = 8;
 const FADE_DURATION = 160;
-const INDEX_CHUNK = 500;
 const ENTER_KEYS = [Clutter.KEY_Return, Clutter.KEY_KP_Enter, Clutter.KEY_ISO_Enter];
 const NAVIGATION_KEYS = [
   Clutter.KEY_Left, Clutter.KEY_Right, Clutter.KEY_Up, Clutter.KEY_Down,
@@ -57,7 +56,6 @@ export class EmojiPanel {
   private anchor: Anchor | null = null;
   private above = false;
   private focusWatch = 0;
-  private indexing = 0;
 
   constructor(private readonly input: TextInput, private readonly close: () => void, private readonly paste: (text: string) => void) {
     blurSurface(this.actor);
@@ -71,9 +69,6 @@ export class EmojiPanel {
         this.updateFooter();
       }
       return Clutter.EVENT_PROPAGATE;
-    });
-    this.actor.connect('destroy', () => {
-      if (this.indexing) GLib.Source.remove(this.indexing);
     });
   }
 
@@ -97,8 +92,13 @@ export class EmojiPanel {
     this.actor.set_position(x, y);
   }
 
-  prewarm(): void {
-    this.prepare();
+  *prewarm(): Work {
+    yield* prepareEmojiData();
+    if (!this.catalog) this.build();
+    yield;
+    yield* this.grid.prepare(this.browsingLayout(), this.preferences.tone);
+    if (this.actor.visible) return;
+    this.showBrowsing();
     if (!this.anchor) this.actor.set_size(GRID_WIDTH + this.actor.get_theme_node().get_horizontal_padding(), PREFERRED_HEIGHT);
   }
 
@@ -133,15 +133,14 @@ export class EmojiPanel {
 
   private prepare(): void {
     if (this.catalog) return;
+    this.build();
+    this.showBrowsing();
+  }
+
+  private build(): void {
     const { catalog, index } = emojiData();
     this.catalog = catalog;
     this.index = index;
-    this.indexing = GLib.idle_add(GLib.PRIORITY_LOW, () => {
-      index.extend(INDEX_CHUNK);
-      if (!index.complete) return GLib.SOURCE_CONTINUE;
-      this.indexing = 0;
-      return GLib.SOURCE_REMOVE;
-    });
     const hovered = (title: string | null) => this.hover(title);
     this.tabs = new TabStrip(catalog.tabs, { hovered, activated: index => this.openTab(index) });
     this.tones = new TonePicker({ hovered, activated: tone => this.chooseTone(tone), toggled: () => this.toggleTones(false) });
@@ -155,17 +154,20 @@ export class EmojiPanel {
     body.add_child(this.grid.actor);
     body.add_child(this.empty);
     for (const child of [header, switcher, body, this.footer]) this.actor.add_child(child);
-    this.showBrowsing();
   }
 
-  private showBrowsing(): void {
+  private browsingLayout(): GridLayout {
     const catalog = this.catalog!;
-    this.browsing ??= new GridLayout([
+    return this.browsing ??= new GridLayout([
       { title: t('emoji-recently-used'), tab: catalog.tabs[0], items: this.preferences.recent.flatMap(text => catalog.find(text) ?? []) },
       ...catalog.tabs.flatMap(tab => GridLayout.sections(tab.sections)),
     ]);
+  }
+
+  private showBrowsing(): void {
+    const layout = this.browsingLayout();
     this.empty.hide();
-    this.grid.show(this.browsing, this.preferences.tone);
+    this.grid.show(layout, this.preferences.tone);
   }
 
   private query(text: string): void {

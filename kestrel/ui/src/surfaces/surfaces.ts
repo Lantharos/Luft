@@ -275,7 +275,6 @@ export class Surfaces {
     if (created) return created;
     const surface = this.adopt((this.parts[name] as SurfaceFactories[Name])());
     this.created[name] = surface;
-    this.place();
     return surface;
   }
 

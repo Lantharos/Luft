@@ -62,14 +62,37 @@ shell_util_set_hidden_from_pick (ClutterActor *actor,
     }
 }
 
+static CoglFramebuffer *
+scratch_framebuffer (CoglContext *cogl_context)
+{
+  CoglFramebuffer *framebuffer;
+  g_autoptr (CoglTexture) texture = NULL;
+
+  framebuffer = g_object_get_data (G_OBJECT (cogl_context), "shell-scratch-framebuffer");
+  if (framebuffer)
+    return framebuffer;
+
+  texture = cogl_texture_2d_new_with_size (cogl_context, 1, 1);
+  framebuffer = COGL_FRAMEBUFFER (cogl_offscreen_new_with_texture (texture));
+  if (!cogl_framebuffer_allocate (framebuffer, NULL))
+    {
+      g_object_unref (framebuffer);
+      return NULL;
+    }
+
+  g_object_set_data_full (G_OBJECT (cogl_context), "shell-scratch-framebuffer",
+                          framebuffer, g_object_unref);
+  return framebuffer;
+}
+
 /**
  * shell_util_paint_offscreen:
- * @actor: A #ClutterActor whose parent is mapped
+ * @actor: A mapped #ClutterActor, or a hidden one whose parent is mapped
  *
- * Shows @actor if it is hidden, paints it once into a scratch framebuffer and
- * hides it again, all before the next frame. Its styles, text layouts,
- * glyphs, icons, shaders and effect buffers are then ready the first time it
- * appears on screen.
+ * Shows @actor if it is hidden, paints it once into a one-pixel scratch
+ * framebuffer and hides it again, all before the next frame. Its styles,
+ * text layouts, glyphs, icons, shaders and effect buffers are then ready the
+ * first time it appears on screen.
  */
 void
 shell_util_paint_offscreen (ClutterActor *actor)
@@ -81,13 +104,11 @@ shell_util_paint_offscreen (ClutterActor *actor)
   float resource_scale;
   ClutterActorBox box;
   graphene_matrix_t transform, inverse;
-  g_autoptr (CoglTexture) texture = NULL;
-  g_autoptr (CoglOffscreen) offscreen = NULL;
   CoglFramebuffer *framebuffer;
   ClutterColorState *color_state;
   ClutterPaintContext *paint_context;
   int opacity_override;
-  int width, height;
+  float width, height;
 
   clutter_actor_show (actor);
   if (!clutter_actor_is_mapped (actor))
@@ -95,21 +116,20 @@ shell_util_paint_offscreen (ClutterActor *actor)
 
   clutter_actor_get_allocation_box (actor, &box);
   resource_scale = clutter_actor_get_resource_scale (actor);
-  width = ceilf (clutter_actor_box_get_width (&box) * resource_scale);
-  height = ceilf (clutter_actor_box_get_height (&box) * resource_scale);
+  width = clutter_actor_box_get_width (&box) * resource_scale;
+  height = clutter_actor_box_get_height (&box) * resource_scale;
   if (width <= 0 || height <= 0)
     goto out;
 
-  texture = cogl_texture_2d_new_with_size (cogl_context, width, height);
-  offscreen = cogl_offscreen_new_with_texture (texture);
-  framebuffer = COGL_FRAMEBUFFER (offscreen);
-  if (!cogl_framebuffer_allocate (framebuffer, NULL))
+  framebuffer = scratch_framebuffer (cogl_context);
+  if (!framebuffer)
     goto out;
 
   clutter_actor_get_transform (actor, &transform);
   if (!graphene_matrix_inverse (&transform, &inverse))
     goto out;
 
+  cogl_framebuffer_push_matrix (framebuffer);
   cogl_framebuffer_orthographic (framebuffer, 0, 0, width, height, 0, 1.0);
   cogl_framebuffer_scale (framebuffer, resource_scale, resource_scale, 1);
   cogl_framebuffer_transform (framebuffer, &inverse);
@@ -125,6 +145,8 @@ shell_util_paint_offscreen (ClutterActor *actor)
   clutter_paint_context_pop_color_state (paint_context);
   clutter_paint_context_destroy (paint_context);
   clutter_actor_set_opacity_override (actor, opacity_override);
+  cogl_framebuffer_pop_matrix (framebuffer);
+  cogl_framebuffer_flush (framebuffer);
 
 out:
   if (!was_visible)

@@ -1,7 +1,5 @@
-import Gio from 'gi://Gio';
-
 import { t } from '../../../shared/i18n/index.js';
-import { codepointOf, loadCharacters, type Character } from './characters.js';
+import { characterDecoder, codepointOf, type Character, type CharacterTable } from './characters.js';
 import { KAOMOJI } from './kaomoji.js';
 
 export type Kind = 'emoji' | 'character' | 'space' | 'kaomoji';
@@ -32,6 +30,7 @@ export interface Item {
 }
 
 type Entry = string | [string, string];
+export type EmojiGroups = readonly { group: string; emoji: Entry[] }[];
 type Fields = Omit<Item, 'order'>;
 
 const LIGHT_TONE = '\u{1F3FB}';
@@ -80,34 +79,17 @@ export class Catalog {
   readonly items: Item[] = [];
   private readonly byText = new Map<string, Item>();
 
-  constructor() {
-    const file = Gio.File.new_for_uri('resource:///com/lantharos/kestrel/osk-layouts/emoji.json');
-    const groups: { group: string; emoji: Entry[] }[] = JSON.parse(new TextDecoder().decode(file.load_contents(null)[1]));
-    const entries = new Map(groups.map(({ group, emoji }) => [group, emoji]));
-    for (const [id, message] of EMOJI_TABS) {
-      const title = t(message);
-      this.section(this.tab(id, title, { icon: ICONS[id] }), title, entries.get(id)!.map(emoji));
-    }
-    for (const { id, title, glyph, sections } of loadCharacters()) {
-      const tab = this.tab(id, title, { glyph });
-      for (const section of sections) this.section(tab, section.title, section.characters.map(character));
-    }
-    const kaomojiTitle = t('emoji-kaomoji');
-    const kaomoji = this.tab('kaomoji', kaomojiTitle, { glyph: ';)' });
-    this.section(kaomoji, kaomojiTitle, KAOMOJI.map(([text, name, keywords = '']) => ({ text, face: text, toned: null, kind: 'kaomoji', name, aliases: [], keywords })));
-  }
-
   find(text: string): Item | undefined {
     return this.byText.get(text);
   }
 
-  private tab(id: string, title: string, face: { icon?: string; glyph?: string }): Tab {
+  tab(id: string, title: string, face: { icon?: string; glyph?: string }): Tab {
     const tab = { id, title, icon: face.icon ?? '', glyph: face.glyph, sections: [] };
     this.tabs.push(tab);
     return tab;
   }
 
-  private section(tab: Tab, title: string, fields: Fields[]): void {
+  section(tab: Tab, title: string, fields: Fields[]): void {
     tab.sections.push({ title, tab, items: fields.map(field => this.byText.get(field.text) ?? this.add(field)) });
   }
 
@@ -117,4 +99,26 @@ export class Catalog {
     this.byText.set(item.text, item);
     return item;
   }
+}
+
+export function* buildCatalog(groups: EmojiGroups, characters: CharacterTable): Generator<void, Catalog, unknown> {
+  const catalog = new Catalog();
+  const entries = new Map(groups.map(({ group, emoji }) => [group, emoji]));
+  for (const [id, message] of EMOJI_TABS) {
+    const title = t(message);
+    catalog.section(catalog.tab(id, title, { icon: ICONS[id] }), title, entries.get(id)!.map(emoji));
+    yield;
+  }
+  const decode = characterDecoder(characters);
+  for (const { id, title, glyph, sections } of characters.tabs) {
+    const tab = catalog.tab(id, title, { glyph });
+    for (const section of sections) {
+      catalog.section(tab, section.title, decode(section).map(character));
+      yield;
+    }
+  }
+  const kaomojiTitle = t('emoji-kaomoji');
+  const kaomoji = catalog.tab('kaomoji', kaomojiTitle, { glyph: ';)' });
+  catalog.section(kaomoji, kaomojiTitle, KAOMOJI.map(([text, name, keywords = '']) => ({ text, face: text, toned: null, kind: 'kaomoji', name, aliases: [], keywords })));
+  return catalog;
 }

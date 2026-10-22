@@ -1,8 +1,6 @@
-import GLib from 'gi://GLib';
-
 const WORD_BASE = 0x80;
 
-interface StoredSection {
+export interface StoredSection {
   readonly title: string;
   readonly characters: string;
   readonly names: string;
@@ -16,7 +14,7 @@ interface StoredTab {
   readonly sections: readonly StoredSection[];
 }
 
-interface CharacterTable {
+export interface CharacterTable {
   readonly words: string;
   readonly tabs: readonly StoredTab[];
   readonly aliases: Readonly<Record<string, string[]>>;
@@ -29,44 +27,21 @@ export interface Character {
   readonly aliases: string[];
 }
 
-interface CharacterSection {
-  readonly title: string;
-  readonly characters: Character[];
-}
-
-interface CharacterTab {
-  readonly id: string;
-  readonly title: string;
-  readonly glyph: string;
-  readonly sections: CharacterSection[];
-}
-
-function decoder(words: readonly string[]): (encoded: string) => string {
-  return encoded => {
-    let name = words[encoded.charCodeAt(0) - WORD_BASE];
-    for (let index = 1; index < encoded.length; index++) name += ` ${words[encoded.charCodeAt(index) - WORD_BASE]}`;
-    return name;
-  };
-}
-
 export function codepointOf(text: string): string {
   return `U+${text.codePointAt(0)!.toString(16).toUpperCase().padStart(4, '0')}`;
 }
 
-export function loadCharacters(): CharacterTab[] {
-  const path = `${global.datadir}/characters.json`;
-  const table: CharacterTable = JSON.parse(new TextDecoder().decode(GLib.file_get_contents(path)[1]));
-  const decode = decoder(table.words.split(' '));
-  return table.tabs.map(({ sections, ...tab }) => ({
-    ...tab,
-    sections: sections.map(section => {
-      const names = section.names.split('\n');
-      return {
-        title: section.title,
-        characters: Array.from(section.characters, (text, index) => (
-          { text, name: decode(names[index]), label: section.labels?.[index] ?? null, aliases: table.aliases[text] ?? [] }
-        )),
-      };
-    }),
-  }));
+export function characterDecoder(table: CharacterTable): (section: StoredSection) => Character[] {
+  const words = table.words.split(' ');
+  const decode = (encoded: string) => {
+    let name = words[encoded.charCodeAt(0) - WORD_BASE];
+    for (let index = 1; index < encoded.length; index++) name += ` ${words[encoded.charCodeAt(index) - WORD_BASE]}`;
+    return name;
+  };
+  return section => {
+    const names = section.names.split('\n');
+    return Array.from(section.characters, (text, index) => (
+      { text, name: decode(names[index]), label: section.labels?.[index] ?? null, aliases: table.aliases[text] ?? [] }
+    ));
+  };
 }

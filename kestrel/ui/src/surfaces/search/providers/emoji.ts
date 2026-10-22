@@ -2,8 +2,8 @@ import St from 'gi://St';
 
 import { t } from '../../../shared/i18n/index.js';
 import { describe, withTone, type Item } from '../../emoji/catalog/catalog.js';
-import { builtEmojiData, emojiData } from '../../emoji/catalog/shared.js';
-import { prewarmSoon } from '../../prewarm.js';
+import { builtEmojiData, prepareEmojiData } from '../../emoji/catalog/shared.js';
+import { prewarmSoon } from '../../prewarm/queue.js';
 import { EmojiPreferences } from '../../emoji/preferences.js';
 import { themedIcon } from '../icons.js';
 import type { Ranked, SearchItem } from '../item.js';
@@ -23,7 +23,7 @@ export class EmojiResults {
   prepare(): void {
     if (builtEmojiData()) return;
     this.stopPreparing();
-    this.stopPreparing = prewarmSoon([() => emojiData()]);
+    this.stopPreparing = prewarmSoon([() => prepareEmojiData()]);
   }
 
   destroy(): void {

@@ -2,7 +2,7 @@ import GLib from 'gi://GLib';
 import St from 'gi://St';
 
 import { formatsLocale, t } from '../../../shared/i18n/index.js';
-import { prewarmSoon } from '../../prewarm.js';
+import { prewarmSoon } from '../../prewarm/queue.js';
 import { answer, answerSteps, type Answer, type Location } from '../answers/answers.js';
 import type { Day } from '../../../shared/time/days.js';
 import { wallClock, zoneOffset, type Parts } from '../answers/calendar.js';

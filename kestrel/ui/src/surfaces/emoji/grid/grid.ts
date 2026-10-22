@@ -7,6 +7,7 @@ import { withTone, type Item, type Tab } from '../catalog/catalog.js';
 import { CellView } from './cellView.js';
 import { GlyphImages, GlyphRenderer, type Glyph } from './images.js';
 import { CELL_SIZE, COLUMNS, GridLayout, HEADER_HEIGHT, type Cell } from './layout.js';
+import type { Work } from '../../prewarm/queue.js';
 
 const SCROLLBAR_GUTTER = 10;
 export const GRID_WIDTH = COLUMNS * CELL_SIZE + SCROLLBAR_GUTTER;
@@ -126,14 +127,29 @@ export class EmojiGrid {
     adjustment.value = top < value ? top : row.y + row.height - adjustment.page_size;
   }
 
+  *prepare(layout: GridLayout, tone: number): Work {
+    const scale = this.scale();
+    const [first, end] = layout.rowRange(0, this.maximumHeight);
+    const cells = layout.rows.slice(first, end).flatMap(row => row.cells);
+    for (const cell of cells) {
+      this.face(cell.item, scale, tone);
+      yield;
+    }
+    for (let missing = cells.length - this.views.size - this.spareViews.length; missing > 0; missing--) {
+      const view = this.createView();
+      view.release();
+      this.spareViews.push(view);
+      yield;
+    }
+  }
+
   private refresh(): void {
     const { value, page_size: pageSize } = this.actor.vadjustment;
     const rows = this.layout.rows;
-    const first = rows.length ? this.layout.firstRowAt(value) : 0;
-    const bottom = value + (pageSize || this.maximumHeight);
+    const [first, end] = this.layout.rowRange(value, value + (pageSize || this.maximumHeight));
     const cells: Cell[] = [];
     const titled: number[] = [];
-    for (let index = first; index < rows.length && rows[index].y < bottom; index++) {
+    for (let index = first; index < end; index++) {
       if (rows[index].title) titled.push(index);
       cells.push(...rows[index].cells);
     }
@@ -156,9 +172,9 @@ export class EmojiGrid {
     return this.themeContext.scale_factor * pixelScale(this.actor);
   }
 
-  private face(item: Item, scale: number): [string, Glyph | null] {
+  private face(item: Item, scale: number, tone = this.tone): [string, Glyph | null] {
     if (item.kind === 'emoji') {
-      const text = withTone(item, this.tone);
+      const text = withTone(item, tone);
       return [text, this.emojiImages.get(text, scale)];
     }
     if (item.kind === 'character') return [item.face, this.characters.get(item.text, scale)];

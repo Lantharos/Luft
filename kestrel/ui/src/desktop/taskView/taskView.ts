@@ -7,7 +7,8 @@ import St from 'gi://St';
 import { animateActor, animateAdjustment, Curve, Duration, reducedMotion, Spring } from '../../shared/motion/motion.js';
 import type { Monitor } from '../panel/panel.js';
 import { blurSurface, raiseSurface } from '../../shared/layout/surface.js';
-import { paintHidden } from '../../surfaces/prewarm.js';
+import { warmHidden } from '../../surfaces/prewarm/hidden.js';
+import { prewarmSoon, type Work } from '../../surfaces/prewarm/queue.js';
 import { clampUnit } from '../../shared/math.js';
 import { windowSlots } from './grid.js';
 import { CARD_HEADER, WindowCard } from './windowCard.js';
@@ -98,7 +99,7 @@ export class TaskView {
     else this.reveal(1, velocity);
   }
 
-  prewarm(monitor: Monitor): void {
+  *prewarm(monitor: Monitor): Work {
     if (this.monitor) return;
     if (!this.activeWindows().length) {
       this.prewarmOnceWindowShows(monitor);
@@ -107,9 +108,14 @@ export class TaskView {
     this.cover(monitor);
     this.sync();
     this.monitor = null;
-    paintHidden(this.actor, this.actor);
-    this.clearCards();
-    this.strip.clear();
+    try {
+      yield* warmHidden(this.actor, { focused: this.actor });
+    } finally {
+      if (!this.monitor) {
+        this.clearCards();
+        this.strip.clear();
+      }
+    }
   }
 
   close(immediate = false, velocity?: number): void {
@@ -183,10 +189,7 @@ export class TaskView {
       wm.disconnect(mapped);
       const shown = actor.connect('effects-completed', () => {
         actor.disconnect(shown);
-        GLib.idle_add(GLib.PRIORITY_LOW, () => {
-          this.prewarm(monitor);
-          return GLib.SOURCE_REMOVE;
-        });
+        prewarmSoon([() => this.prewarm(monitor)]);
       });
     });
   }

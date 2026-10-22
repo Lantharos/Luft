@@ -34,7 +34,8 @@ import { QuickSettings } from './surfaces/quickSettings/quickSettings.js';
 import { Palette } from './surfaces/palette/palette.js';
 import type { SearchHost } from './surfaces/search/engine.js';
 import { StartMenu } from './surfaces/start/startMenu.js';
-import { paintHidden, prewarmAfterStartup, prewarmSoon } from './surfaces/prewarm.js';
+import { warmHidden } from './surfaces/prewarm/hidden.js';
+import { prewarmAfterStartup, prewarmSettled, prewarmSoon, type Step } from './surfaces/prewarm/queue.js';
 import { Surfaces, type Surface } from './surfaces/surfaces.js';
 import { confirmStartupOnceSettled } from './system/health/startup.js';
 import { CopilotActions } from './system/dictation/copilotActions.js';
@@ -237,10 +238,10 @@ class KestrelUi {
     this.syncSession();
     this.disconnectors.push(prewarmAfterStartup(context.layoutManager, [
       ...this.startPrewarm(),
-      () => paintHidden(this.quick.actor, this.quick.actor),
-      () => paintHidden(this.surfaces.notifications.actor, this.surfaces.notifications.actor),
+      () => warmHidden(this.quick.actor, { focused: this.quick.actor }),
+      () => warmHidden(this.surfaces.notifications.actor, { focused: this.surfaces.notifications.actor, place }),
       () => this.surfaces.emoji.prewarm(),
-      () => paintHidden(this.surfaces.emoji.actor),
+      () => warmHidden(this.surfaces.emoji.actor, { place }),
       () => this.taskView.prewarm(context.layoutManager.primaryMonitor!),
     ]));
   }
@@ -319,10 +320,10 @@ class KestrelUi {
     this.cancelStartPrewarm = prewarmSoon(this.startPrewarm());
   }
 
-  private startPrewarm(): (() => void)[] {
+  private startPrewarm(): Step[] {
     return [
       () => this.surfaces.start.reset(),
-      () => paintHidden(this.surfaces.start.actor, this.surfaces.start.search),
+      () => warmHidden(this.surfaces.start.actor, { focused: this.surfaces.start.search, place: () => this.surfaces.place() }),
     ];
   }
 
@@ -444,6 +445,8 @@ export function shutdown(): void {
   peekHost?.destroy();
   setup?.destroy();
 }
+
+export function surfacesPrepared(): Promise<void> { return prewarmSettled(); }
 
 export function dismissImmediately(): void {
   currentUi?.dismissImmediately();

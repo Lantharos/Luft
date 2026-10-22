@@ -3,7 +3,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
 import System from 'system';
-import {dismissImmediately, toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
+import {dismissImmediately, surfacesPrepared, toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
 import * as MessageTray from 'resource:///com/lantharos/kestrel/ui/messageTray.js';
 
@@ -318,6 +318,8 @@ async function measureIdle() {
 
 export async function run() {
   report(processMetrics());
+  await settled();
+  await surfacesPrepared();
   await settled(MEASURE_SETTLE);
   await measureEmojiOpening('first');
   await dismiss();

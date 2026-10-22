@@ -2,7 +2,7 @@
 Description=Open both halves of the system disk while Luft moves it
 DefaultDependencies=no
 Wants=tpm2.target
-After=systemd-udev-trigger.service tpm2.target systemd-pcrphase-initrd.service
+After=tpm2.target systemd-pcrphase-initrd.service
 Before=cryptsetup.target initrd-root-device.target sysroot.mount
 
 [Service]

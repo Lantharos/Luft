@@ -27,5 +27,4 @@ install() {
     inst_simple "$moddir/90-luft-root-partition.rules" "$udevrulesdir/90-luft-root-partition.rules"
     $SYSTEMCTL -q --root "$initdir" add-wants sockets.target systemd-pcrextend.socket
     $SYSTEMCTL -q --root "$initdir" add-wants sysinit.target systemd-tpm2-setup-early.service
-    $SYSTEMCTL -q --root "$initdir" add-wants cryptsetup.target trustd-move.service
 }

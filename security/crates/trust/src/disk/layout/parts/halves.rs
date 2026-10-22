@@ -1,9 +1,8 @@
 use std::fs::File;
 use std::io::{Read, Seek, SeekFrom};
 use std::path::{Path, PathBuf};
-use std::time::{Duration, Instant};
 
-use anyhow::{Context, Result, bail, ensure};
+use anyhow::{Context, Result, ensure};
 
 use crate::disk::SystemDisk;
 use crate::disk::unlock::{keys, luks};
@@ -18,7 +17,6 @@ const TOKEN: &str = "luft-move";
 const HEADER: &str = "/run/trustd/move-header";
 const ROOT_PARTITION: &str = "/dev/luft-root-partition";
 const SECTOR: u64 = 512;
-const DEVICE_WAIT: Duration = Duration::from_secs(90);
 const BTRFS_FSID: u64 = (64 << 10) + 32;
 
 fn name_of(device: &Path) -> Result<String> {
@@ -203,27 +201,13 @@ pub fn fit(device: &Path, partition_size: Option<u64>, key: &Secret) -> Result<(
         .context("The system disk's encryption couldn't change its size")
 }
 
-fn wait_for(device: &Path) -> Result<()> {
-    let started = Instant::now();
-    while !device.exists() {
-        if started.elapsed() > DEVICE_WAIT {
-            bail!("{} never appeared", device.display());
-        }
-        std::thread::sleep(Duration::from_millis(200));
-    }
-    Ok(())
-}
-
-fn moving_half(name: &str) -> Option<(PathBuf, String, String)> {
-    let device = blocks::device(name);
-    let filesystem = luks::read(&device, None, 0)
+fn moving_filesystem(device: &Path) -> Option<String> {
+    luks::read(device, None, 0)
         .ok()??
         .tokens
         .into_iter()
         .find_map(|(_, token)| (token.kind == TOKEN).then_some(token.filesystem))
-        .filter(|filesystem| uuid::is_uuid(filesystem))?;
-    let partition = blocks::partuuid(name).filter(|partition| uuid::is_partuuid(partition))?;
-    Some((device, partition, filesystem))
+        .filter(|filesystem| uuid::is_uuid(filesystem))
 }
 
 fn open_half(device: &Path, partition: &str, filesystem: &str) -> Result<()> {
@@ -251,18 +235,25 @@ fn open_half(device: &Path, partition: &str, filesystem: &str) -> Result<()> {
 
 pub fn open_in_initrd() -> Result<()> {
     let root = Path::new(ROOT_PARTITION);
-    wait_for(root)?;
     if !Tool::new("cryptsetup").arg("isLuks").arg(root).succeeds() {
         return Ok(());
     }
     let root = name_of(root)?;
     let disk = blocks::disk_of(&root).context("Luft's partition isn't on a disk")?;
+    let moving: Vec<_> = blocks::partitions_of(&disk)
+        .into_iter()
+        .filter(|name| *name != root)
+        .filter_map(|name| Some((moving_filesystem(&blocks::device(&name))?, name)))
+        .collect();
+    if moving.is_empty() {
+        return Ok(());
+    }
     let _ = Tool::new("udevadm").arg("settle").status();
-    for (device, partition, filesystem) in blocks::partitions_of(&disk)
-        .iter()
-        .filter(|name| **name != root)
-        .filter_map(|name| moving_half(name))
-    {
+    for (filesystem, name) in moving {
+        let device = blocks::device(&name);
+        let partition = blocks::partuuid(&name)
+            .filter(|partition| uuid::is_partuuid(partition))
+            .with_context(|| format!("{} has no partition UUID", device.display()))?;
         if mapping_on(&device)?.is_none() {
             open_half(&device, &partition, &filesystem)?;
         }

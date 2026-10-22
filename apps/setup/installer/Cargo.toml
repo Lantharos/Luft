@@ -17,7 +17,6 @@ luft-disks.workspace = true
 luft-i18n.workspace = true
 luft-meet.workspace = true
 luft-trust.workspace = true
-luft-variant.workspace = true
 luft-windows.workspace = true
 serde.workspace = true
 serde_json.workspace = true

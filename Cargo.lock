@@ -4280,7 +4280,6 @@ dependencies = [
  "luft-i18n",
  "luft-meet",
  "luft-trust",
- "luft-variant",
  "luft-windows",
  "serde",
  "serde_json",

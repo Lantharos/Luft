@@ -167,8 +167,7 @@ check_whole_drive() {
   [[ "$(cat "$state/lib/luft-installer/first-boot")" == ada ]] || fail "the first start won't open setup"
   pass "every start signs ada straight into setup until it's finished"
   local followed
-  followed="$(cat /usr/share/luft/image-reference)"
-  grep -q '^\[images\.nvidia\]$' /usr/lib/luft-installer/install.toml && followed+=-nvidia
+  followed="$(sed -n 's/^target = "\(.*\)"$/\1/p' /usr/lib/luft-installer/install.toml)"
   grep -rqsx ".*$followed" "$TARGET"/state/deploy/*/*.origin || fail "updates won't come from the image the stick carries"
   pass "updates come from $followed, the image the stick carries"
   umount "$TARGET"

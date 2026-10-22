@@ -33,7 +33,7 @@ place 644 "$here/luft-remove-check.service" /usr/lib/systemd/system/luft-remove-
 place 644 "$here/check.rules" /etc/polkit-1/rules.d/50-luft-remove-check.rules
 printf 'kargs = ["console=ttyS0,115200"]\n' | install -Dm644 /dev/stdin "$stage/root/usr/lib/bootc/kargs.d/90-check.toml"
 size="$(podman image inspect --format '{{.Size}}' "$base")"
-printf '[images.default]\nsource = "oci-archive:/run/luft-source/luft.ociarchive"\nsize = %s\n' "$size" |
+printf '[images.default]\nsource = "oci-archive:/run/luft-source/luft.ociarchive"\ntarget = "ghcr.io/lantharos/luft:1"\nsize = %s\n' "$size" |
   install -Dm644 /dev/stdin "$stage/root/usr/lib/luft-installer/install.toml"
 cp "$here/Containerfile" "$stage/"
 podman build --quiet --build-arg "BASE=$base" --tag "$system" "$stage" > /dev/null

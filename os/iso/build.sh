@@ -11,7 +11,7 @@ store="$work/store"
 fedora=45
 major=1
 label="Luft-$major"
-published=ghcr.io/lantharos/luft:$major
+followed="${2:-ghcr.io/lantharos/luft:$major}"
 live_image=$image_name-live:$fedora
 tools=$image_name-iso-tools
 initramfs_omitted=(
@@ -24,13 +24,14 @@ initramfs_omitted_drivers=(nouveau nvidia amdgpu radeon i915 xe)
 
 usage() {
   cat <<'USAGE'
-Usage: os/iso/build.sh [IMAGE]
+Usage: os/iso/build.sh [IMAGE [FOLLOWED]]
 
 Builds Luft's live USB image from IMAGE (default localhost/luft:45) and
 IMAGE-nvidia, pulling them when they aren't here yet. LUFT_IMAGE_NAME names
 its own images something other than localhost/luft. The stick starts the
 regular image and carries both, so it installs the right one for the computer
-without a network.
+without a network. Installed systems get their updates from FOLLOWED (default
+ghcr.io/lantharos/luft:1), or FOLLOWED-nvidia.
 
 Writes os/iso/state/luft-VERSION.iso with a .sha256 (LUFT_ISO picks another
 folder).
@@ -54,10 +55,10 @@ image_of() {
   esac
 }
 
-published_of() {
+followed_of() {
   case "$1" in
-    default) echo "$published" ;;
-    nvidia) echo "$published-nvidia" ;;
+    default) echo "$followed" ;;
+    nvidia) echo "$followed-nvidia" ;;
   esac
 }
 
@@ -76,8 +77,8 @@ ensure_images() {
 install_images() {
   local variant
   for variant; do
-    printf '\n[images.%s]\nsource = "containers-storage:%s"\nsize = %s\n' \
-      "$variant" "$(published_of "$variant")" "$(image_value "$(image_of "$variant")" '{{.Size}}')"
+    printf '\n[images.%s]\nsource = "containers-storage:%s"\ntarget = "%s"\nsize = %s\n' \
+      "$variant" "$(followed_of "$variant")" "$(followed_of "$variant")" "$(image_value "$(image_of "$variant")" '{{.Size}}')"
   done
 }
 
@@ -94,7 +95,7 @@ fill_store() {
   local destination="containers-storage:[overlay@$store+$work/run]" variant
   remove_store
   for variant; do
-    podman push --quiet --remove-signatures "$(image_of "$variant")" "$destination$(published_of "$variant")"
+    podman push --quiet --remove-signatures "$(image_of "$variant")" "$destination$(followed_of "$variant")"
   done
   podman push --quiet "$live_image" "$destination$live_image"
 }

@@ -38,8 +38,7 @@ enable_units() {
   systemctl mask bootc-fetch-apply-updates.timer
 }
 
-write_image_references() {
-  echo "$reference" | install -Dm644 /dev/stdin /usr/share/luft/image-reference
+write_base_image() {
   echo "$base" | install -Dm644 /dev/stdin /usr/share/luft/base-image
 }
 
@@ -102,10 +101,9 @@ clean_build_state() {
 
 variant="$1"
 version="$2"
-reference="$3"
-base="$4"
+base="$3"
 write_os_release
-write_image_references
+write_base_image
 enable_units
 configure_toolbox
 configure_security

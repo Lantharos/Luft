@@ -6,9 +6,11 @@ on:
     types: [completed]
   workflow_dispatch:
     inputs:
-      image:
-        description: Image to build the ISO from
-        default: ghcr.io/lantharos/luft:1-nightly
+      channel:
+        description: Build the stick of the newest nightly or of the current release
+        type: choice
+        options: [nightly, release]
+        default: nightly
 
 concurrency:
   group: iso-${{ github.event.workflow_run.head_branch || github.ref }}
@@ -34,6 +36,8 @@ jobs:
       R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
       R2_BUCKET: ${{ secrets.R2_BUCKET }}
       KEPT_NIGHTLIES: 3
+      REPOSITORY: ghcr.io/lantharos/luft
+      MAJOR: "1"
     steps:
       - uses: actions/checkout@v7
         with:
@@ -43,47 +47,49 @@ jobs:
 
       - uses: ./.github/actions/registry
 
-      - name: Image and folder
+      - name: Images and folder
         env:
-          CHOSEN: ${{ inputs.image }}
+          CHOSEN: ${{ inputs.channel }}
           RUN_EVENT: ${{ github.event.workflow_run.event }}
           RUN_TAG: ${{ github.event.workflow_run.head_branch }}
         run: |
-          if [[ -n "$CHOSEN" ]]; then
-            image="$CHOSEN"
-          elif [[ "$RUN_EVENT" == push ]]; then
-            image="ghcr.io/lantharos/luft:${RUN_TAG#v}"
+          if [[ "$RUN_EVENT" == push ]]; then
+            tag="${RUN_TAG#v}" folder="$MAJOR" followed="$REPOSITORY:$MAJOR"
+          elif [[ "$CHOSEN" == release ]]; then
+            tag="$MAJOR" folder="$MAJOR" followed="$REPOSITORY:$MAJOR"
           else
-            image=ghcr.io/lantharos/luft:1-nightly
+            tag="$MAJOR-nightly" folder=nightly followed="$REPOSITORY:$MAJOR-nightly"
           fi
-          version="$(skopeo inspect --format '{{index .Labels "org.opencontainers.image.version"}}' "docker://$image")"
-          if [[ "$version" == *-nightly ]]; then folder=nightly; else folder="${version%%.*}"; fi
+          version="$(skopeo inspect --format '{{index .Labels "org.opencontainers.image.version"}}' "docker://$REPOSITORY:$tag")"
           published="$(curl -sf "$DOWNLOADS/$folder/latest.json" | jq -r .version || true)"
           if [[ "$GITHUB_EVENT_NAME" == workflow_run && "$published" == "$version" ]]; then
             echo "luft-$version.iso is already published."
             echo "SKIP=1" >> "$GITHUB_ENV"
           fi
           {
-            echo "IMAGE=$image"
+            echo "TAG=$tag"
+            echo "FOLLOWED=$followed"
             echo "VERSION=$version"
             echo "FOLDER=$folder"
             echo "ISO_NAME=luft-$version.iso"
           } >> "$GITHUB_ENV"
 
-      - name: Check the images' signatures
+      - name: Pull the signed images by digest
         if: env.SKIP != '1'
         run: |
           sudo install -Dm644 -t /usr/share/pki/containers os/image/files/usr/share/pki/containers/luft.pub
           install -Dm644 -t ~/.config/containers/registries.d os/image/files/etc/containers/registries.d/luft.yaml
-          for reference in "$IMAGE" "$IMAGE-nvidia"; do
-            podman pull --quiet --signature-policy os/image/files/etc/containers/policy.json "$reference" > /dev/null
+          for suffix in "" -nvidia; do
+            digest="$(skopeo inspect --retry-times 3 --format '{{.Digest}}' "docker://$REPOSITORY:$TAG$suffix")"
+            podman pull --quiet --signature-policy os/image/files/etc/containers/policy.json "$REPOSITORY@$digest" > /dev/null
+            podman tag "$REPOSITORY@$digest" "localhost/luft:stick$suffix"
           done
 
       - name: Build
         if: env.SKIP != '1'
         run: |
           mkdir -p "$LUFT_ISO"
-          os/iso/build.sh "$IMAGE"
+          os/iso/build.sh localhost/luft:stick "$FOLLOWED"
           ls -l "$LUFT_ISO"
 
       - name: Sign the checksum
@@ -122,7 +128,7 @@ jobs:
           done
           s3 cp latest.json "s3://$R2_BUCKET/$FOLDER/latest.json" --cache-control max-age=300
           if [[ "$FOLDER" == nightly ]]; then
-            aws s3 ls "s3://$R2_BUCKET/nightly/" --endpoint-url "$endpoint" | awk '{print $4}' | grep -E '^luft-.*-nightly\.iso$' | sort -t. -k2,2n -k3,3n | head -n -"$KEPT_NIGHTLIES" |
+            aws s3 ls "s3://$R2_BUCKET/nightly/" --endpoint-url "$endpoint" | awk '{print $4}' | grep -E '^luft-.*\.iso$' | sort -t. -k2,2n -k3,3n | head -n -"$KEPT_NIGHTLIES" |
               while read -r old; do
                 for file in "$old" "$old.sha256" "$old.sha256.minisig"; do
                   s3 rm "s3://$R2_BUCKET/nightly/$file"

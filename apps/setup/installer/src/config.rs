@@ -3,13 +3,11 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
 use luft_i18n::t;
-use luft_variant::Variant;
 use serde::Deserialize;
 
 use crate::L10N;
 
 const GIB: u64 = 1 << 30;
-const IMAGE_REFERENCE: &str = "/usr/share/luft/image-reference";
 const SETUP_APP: &str = "/usr/lib/sabine/com.lantharos.setup/setup";
 
 #[derive(Deserialize)]
@@ -27,6 +25,7 @@ pub struct Config {
 #[serde(rename_all = "kebab-case")]
 struct Source {
     source: String,
+    target: String,
     size: u64,
 }
 
@@ -63,17 +62,12 @@ impl Config {
     }
 
     pub fn image(&self, wanted: &str) -> Result<Image> {
-        let (variant, source) = self
+        let (_, source) = self
             .chosen(wanted)
             .with_context(|| t!(L10N, "installer-no-image", variant = wanted))?;
-        let running = std::fs::read_to_string(IMAGE_REFERENCE)
-            .with_context(|| t!(L10N, "installer-read-failed", path = IMAGE_REFERENCE))?;
-        let target = Variant::named(variant)
-            .reference(running.trim())
-            .with_context(|| format!("{IMAGE_REFERENCE} names no image tag"))?;
         Ok(Image {
             source: source.source.clone(),
-            target,
+            target: source.target.clone(),
             size: source.size,
         })
     }
@@ -87,8 +81,8 @@ mod tests {
         toml::from_str(images).unwrap()
     }
 
-    const NVIDIA_ONLY: &str = "[images.nvidia]\nsource = \"containers-storage:ghcr.io/lantharos/luft:1-nvidia\"\nsize = 2\n";
-    const UNIVERSAL: &str = "[images.default]\nsource = \"containers-storage:ghcr.io/lantharos/luft:1\"\nsize = 1\n[images.nvidia]\nsource = \"containers-storage:ghcr.io/lantharos/luft:1-nvidia\"\nsize = 2\n";
+    const NVIDIA_ONLY: &str = "[images.nvidia]\nsource = \"containers-storage:ghcr.io/lantharos/luft:1-nvidia\"\ntarget = \"ghcr.io/lantharos/luft:1-nvidia\"\nsize = 2\n";
+    const UNIVERSAL: &str = "[images.default]\nsource = \"containers-storage:ghcr.io/lantharos/luft:1\"\ntarget = \"ghcr.io/lantharos/luft:1\"\nsize = 1\n[images.nvidia]\nsource = \"containers-storage:ghcr.io/lantharos/luft:1-nvidia\"\ntarget = \"ghcr.io/lantharos/luft:1-nvidia\"\nsize = 2\n";
 
     #[test]
     fn a_stick_with_one_image_installs_that_one() {

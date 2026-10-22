@@ -7,7 +7,7 @@ How Meet Luft prepares a Windows or Linux computer for Luft, makes USB sticks an
 There is one Luft ISO for every computer. It starts the regular image and carries the one with NVIDIA's driver too, so Install Luft puts the right one on without a network. Releases are published on get.luft.computer in a folder per major version (`1/`), nightly builds in `nightly/`, each as `luft-<version>.iso` with its `.sha256` and [signature](#signatures). Each folder's `latest.json` names its newest ISO:
 
 ```json
-{"name": "luft-1.20261020.57-nightly.iso", "version": "1.20261020.57-nightly", "size": 2147483648, "sha256": "…"}
+{"name": "luft-1.20261020.57.iso", "version": "1.20261020.57", "size": 2147483648, "sha256": "…"}
 ```
 
 Meet Luft reads it to find the ISO and its size, then takes the checksum from the signed `.sha256`, and refuses the download when the two checksums disagree. *Get the newest Luft* and *Make a USB stick* use the same ISO.

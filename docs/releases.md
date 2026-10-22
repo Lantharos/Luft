@@ -9,7 +9,7 @@ What CI publishes from [os](../os/README.md): the system images and the USB stic
 | `ghcr.io/lantharos/luft:1` | Any computer |
 | `ghcr.io/lantharos/luft:1-nvidia` | NVIDIA graphics, with the driver built for the image's kernel and signed with Luft's key |
 
-Luft's versions start at 1, whatever Fedora release the image is built on. CI builds `:1-nightly` and `:1-nightly-nvidia` every night `main` changed, each also tagged with its version such as `:1.20261020.57-nightly`, and the USB stick with them. Pushing a tag such as `v1.20261101` builds and publishes a release as `:1` and `:1-nvidia`. Every image is signed with Luft's key.
+Luft's versions start at 1, whatever Fedora release the image is built on. CI builds `:1-nightly` and `:1-nightly-nvidia` every night `main` changed, each also tagged with its version such as `:1.20261020.57`, and the USB stick with them. A release is a nightly that was tested: pushing the tag `v1.20261020.57` moves `:1` and `:1-nvidia` to exactly those images, by digest, without building them again, and makes the release's stick from them. Every image is signed with Luft's key, and the signatures belong to the digest, so they carry over.
 
 ## USB sticks
 
@@ -17,7 +17,7 @@ The stick starts through Fedora's signed shim and GRUB, carries its images so in
 
 | Published at get.luft.computer | Holds |
 | --- | --- |
-| `nightly/luft-VERSION.iso` | The newest few nightly sticks, such as `luft-1.20261020.57-nightly.iso` |
+| `nightly/luft-VERSION.iso` | The newest few nightly sticks, such as `luft-1.20261020.57.iso` |
 | `1/luft-VERSION.iso` | Releases, from the first one on |
 | `…/latest.json` | The newest stick in that folder: its `name`, `version`, `size` and `sha256` |
 | `meet/` | Meet Luft for Windows and Linux |

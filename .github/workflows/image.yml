@@ -29,14 +29,39 @@ env:
   RETIRED_NIGHTLY: 45-nightly
 
 jobs:
+  promote:
+    name: Promote
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-26.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: |
+            .github/actions
+            os/image/files
+
+      - uses: ./.github/actions/registry
+
+      - name: Release the tested nightly
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          sudo install -Dm644 -t /usr/share/pki/containers os/image/files/usr/share/pki/containers/luft.pub
+          install -Dm644 -t ~/.config/containers/registries.d os/image/files/etc/containers/registries.d/luft.yaml
+          for suffix in "" -nvidia; do
+            digest="$(skopeo inspect --retry-times 3 --format '{{.Digest}}' "docker://$IMAGE:$version$suffix")"
+            skopeo copy --retry-times 3 --preserve-digests --policy os/image/files/etc/containers/policy.json \
+              "docker://$IMAGE@$digest" "docker://$IMAGE:$MAJOR$suffix"
+          done
+
   plan:
+    if: github.ref_type != 'tag'
     runs-on: ubuntu-26.04
     timeout-minutes: 15
     outputs:
       skip: ${{ steps.version.outputs.skip }}
       version: ${{ steps.version.outputs.version }}
       tags: ${{ steps.version.outputs.tags }}
-      reference: ${{ steps.version.outputs.reference }}
       notes: ${{ steps.version.outputs.notes }}
       base: ${{ steps.parts.outputs.base }}
       parts: ${{ steps.parts.outputs.parts }}
@@ -52,25 +77,18 @@ jobs:
       - name: Version and release notes
         id: version
         run: |
-          if [[ "$GITHUB_REF_TYPE" == tag ]]; then
-            version="${GITHUB_REF_NAME#v}"
-            tags=("$MAJOR" "$version")
-            since="$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || git rev-parse HEAD~10)"
-          else
-            if [[ "$GITHUB_EVENT_NAME" == schedule && -z "$(git log --since=24.hours --format=%H -1)" ]]; then
-              echo "No changes since the last nightly build."
-              echo "skip=1" >> "$GITHUB_OUTPUT"
-              exit 0
-            fi
-            version="$MAJOR.$(date -u +%Y%m%d).${{ github.run_number }}-nightly"
-            tags=("$MAJOR-nightly" "$version" "$RETIRED_NIGHTLY")
-            since="$(git rev-list -1 --before=24.hours HEAD)"
+          if [[ "$GITHUB_EVENT_NAME" == schedule && -z "$(git log --since=24.hours --format=%H -1)" ]]; then
+            echo "No changes since the last nightly build."
+            echo "skip=1" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
+          version="$MAJOR.$(date -u +%Y%m%d).${{ github.run_number }}"
+          tags=("$MAJOR-nightly" "$version" "$RETIRED_NIGHTLY")
+          since="$(git rev-list -1 --before=24.hours HEAD)"
           delimiter="notes-$(openssl rand -hex 8)"
           {
             echo "version=$version"
             echo "tags=${tags[*]}"
-            echo "reference=$IMAGE:${tags[0]}"
             echo "notes<<$delimiter"
             git log --no-merges --format='- %s' "$since..HEAD"
             echo "$delimiter"
@@ -81,7 +99,7 @@ jobs:
         if: steps.version.outputs.skip != '1'
         env:
           LUFT_SECUREBOOT_CERT: os/image/keys/luft-secureboot.crt
-          LUFT_REBUILD: ${{ (github.ref_type == 'tag' || inputs.rebuild) && '1' || '' }}
+          LUFT_REBUILD: ${{ inputs.rebuild && '1' || '' }}
         run: |
           base="$(os/image/build.sh base)"
           LUFT_BASE="$base" os/image/build.sh plan luft-nvidia | tee "$RUNNER_TEMP/parts.tsv"
@@ -161,7 +179,6 @@ jobs:
     env:
       LUFT_BASE: ${{ needs.plan.outputs.base }}
       VERSION: ${{ needs.plan.outputs.version }}
-      REFERENCE: ${{ needs.plan.outputs.reference }}
       RELEASE_NOTES: ${{ needs.plan.outputs.notes }}
     steps:
       - uses: actions/checkout@v7
@@ -186,8 +203,7 @@ jobs:
       - name: Build both images
         run: |
           os/image/build.sh luft luft-nvidia --cache-from "$CACHE" --cache-to "$CACHE" \
-            --build-arg "VERSION=$VERSION" --build-arg "IMAGE_REFERENCE=$REFERENCE" \
-            --build-arg "RELEASE_NOTES=$RELEASE_NOTES"
+            --build-arg "VERSION=$VERSION" --build-arg "RELEASE_NOTES=$RELEASE_NOTES"
 
       - name: Forget the signing keys
         if: always()

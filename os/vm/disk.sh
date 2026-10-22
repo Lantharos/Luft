@@ -58,7 +58,7 @@ podman run --rm --privileged --pid=host --security-opt label=type:unconfined_t \
   -v /dev:/dev -v /var/lib/containers:/var/lib/containers \
   -v /sys/firmware/efi/efivars:/sys/firmware/efi/efivars \
   "$image" sh -c '
-    bootc install to-disk --wipe --target-imgref "$(cat /usr/share/luft/image-reference)" /dev/vdb
+    bootc install to-disk --wipe --target-imgref ghcr.io/lantharos/luft:1 /dev/vdb
     esp="$(lsblk --list --noheadings --paths --output PATH,PARTTYPE /dev/vdb | grep c12a7328-f81f-11d2-ba4b-00a0c93ec93b | cut -d" " -f1)"
     mkdir -p /run/esp
     mount "$esp" /run/esp

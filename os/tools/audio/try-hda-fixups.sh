@@ -45,14 +45,20 @@ coef() {
 	awk -v key="$(printf 'Coeff 0x%02x:' "$1")" 'index($0, key) { print $3; exit }' "$work/before.txt"
 }
 
+busy() {
+	echo "The sound chip is still in use, so it can't be changed. These programs have it open:"
+	find /proc/[0-9]*/fd -lname "/dev/snd/*C$card*" -printf '%h\n' 2>/dev/null | cut -d/ -f3 | sort -u | xargs -r ps -o pid=,comm= -p
+	exit 1
+}
+
 reload_codec() {
-	echo 1 >"$dev/clear"
+	echo 1 2>/dev/null >"$dev/clear" || busy
 	write_lines hints "$saved_hints"
 	write_lines user_pin_configs "$saved_pins"
 	write_lines init_verbs "$saved_verbs"
 	write_lines init_verbs "$1"
 	write_lines hints "${2:-}"
-	echo 1 >"$dev/reconfig"
+	echo 1 2>/dev/null >"$dev/reconfig" || busy
 	udevadm settle
 }
 
@@ -111,12 +117,12 @@ try() {
 
 restore() {
 	set +e
-	reload_codec "$(gpio_verbs "$(gpio_register enable)" "$(gpio_register dir)" "$(gpio_register data)")" "jack_detect = yes"
-	reload_codec ""
+	(reload_codec "$(gpio_verbs "$(gpio_register enable)" "$(gpio_register dir)" "$(gpio_register data)")" "jack_detect = yes")
+	(reload_codec "")
 	alsactl -f "$work/mixer.state" restore "$card" 2>/dev/null
 	echo "$saved_power_save" >"$power_save"
 	echo "$saved_dump_coef" >"$dump_coef"
-	session start pipewire.socket pipewire-pulse.socket pipewire wireplumber pipewire-pulse
+	resume
 	rm -rf "$work"
 }
 
@@ -129,11 +135,16 @@ a little away from your ears. Sound stops working for other apps until the end.
 EOF
 read -rp "Press Enter to start. " </dev/tty
 
-trap 'session start pipewire.socket pipewire-pulse.socket pipewire wireplumber pipewire-pulse' EXIT
-session stop pipewire.socket pipewire-pulse.socket wireplumber pipewire pipewire-pulse
-holders=$({ find /proc/[0-9]*/fd -lname "/dev/snd/pcmC$card*" -printf '%h\n' 2>/dev/null || true; } | cut -d/ -f3 | sort -u)
-if [[ -n $holders ]]; then
+alsa_daemons=$(systemctl list-units --state=active --plain --no-legend 'alsa-*.service' | cut -d' ' -f1)
+resume() {
+	[[ -z $alsa_daemons ]] || systemctl start $alsa_daemons
 	session start pipewire.socket pipewire-pulse.socket pipewire wireplumber pipewire-pulse
+}
+trap resume EXIT
+session stop pipewire.socket pipewire-pulse.socket wireplumber pipewire pipewire-pulse
+[[ -z $alsa_daemons ]] || systemctl stop $alsa_daemons
+holders=$({ find /proc/[0-9]*/fd -lname "/dev/snd/*C$card*" -printf '%h\n' 2>/dev/null || true; } | cut -d/ -f3 | sort -u)
+if [[ -n $holders ]]; then
 	echo "These programs still use the sound card. Close them and run this again:"
 	ps -o pid=,comm= -p "${holders//$'\n'/,}"
 	exit 1

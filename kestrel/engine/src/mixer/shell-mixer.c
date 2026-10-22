@@ -35,6 +35,7 @@ enum
 {
   DEVICES_CHANGED,
   HEADSET_CHANGED,
+  PLAYBACK_STARTED,
   N_SIGNALS
 };
 
@@ -263,6 +264,16 @@ _shell_mixer_remove_recorder (ShellMixer *mixer,
 }
 
 void
+_shell_mixer_playback_started (ShellMixer *mixer,
+                               guint       pid,
+                               const char *app_id,
+                               const char *binary,
+                               const char *name)
+{
+  g_signal_emit (mixer, signals[PLAYBACK_STARTED], 0, pid, app_id, binary, name);
+}
+
+void
 _shell_mixer_set_defaults (ShellMixer *mixer,
                            const char *sink,
                            const char *source)
@@ -279,6 +290,7 @@ _shell_mixer_forget (ShellMixer *mixer)
   g_hash_table_remove_all (mixer->sources);
   g_hash_table_remove_all (mixer->cards);
   g_hash_table_remove_all (mixer->recorders);
+  g_hash_table_remove_all (mixer->players);
   g_clear_pointer (&mixer->default_sink, g_free);
   g_clear_pointer (&mixer->default_source, g_free);
   g_clear_pointer (&mixer->pending_port, g_free);
@@ -328,6 +340,7 @@ shell_mixer_finalize (GObject *object)
   g_hash_table_unref (mixer->sources);
   g_hash_table_unref (mixer->cards);
   g_hash_table_unref (mixer->recorders);
+  g_hash_table_unref (mixer->players);
   g_ptr_array_unref (mixer->devices[0]);
   g_ptr_array_unref (mixer->devices[1]);
   g_free (mixer->default_sink);
@@ -366,6 +379,10 @@ shell_mixer_class_init (ShellMixerClass *klass)
   signals[HEADSET_CHANGED] =
     g_signal_new ("headset-changed", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST,
                   0, NULL, NULL, NULL, G_TYPE_NONE, 1, SHELL_TYPE_MIXER_HEADSET);
+  signals[PLAYBACK_STARTED] =
+    g_signal_new ("playback-started", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST,
+                  0, NULL, NULL, NULL, G_TYPE_NONE, 4,
+                  G_TYPE_UINT, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
 }
 
 static void
@@ -375,6 +392,7 @@ shell_mixer_init (ShellMixer *mixer)
   mixer->sources = g_hash_table_new_full (NULL, NULL, NULL, g_object_unref);
   mixer->cards = g_hash_table_new_full (NULL, NULL, NULL, (GDestroyNotify) _shell_mixer_card_free);
   mixer->recorders = g_hash_table_new (NULL, NULL);
+  mixer->players = g_hash_table_new (NULL, NULL);
   mixer->devices[0] = g_ptr_array_new_with_free_func (g_object_unref);
   mixer->devices[1] = g_ptr_array_new_with_free_func (g_object_unref);
   mixer->headset_card = PA_INVALID_INDEX;

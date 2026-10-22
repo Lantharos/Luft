@@ -69,6 +69,7 @@ struct _ShellMixer
   GHashTable *sources;
   GHashTable *cards;
   GHashTable *recorders;
+  GHashTable *players;
   char *default_sink;
   char *default_source;
   ShellMixerStream *output;
@@ -122,6 +123,16 @@ void        _shell_mixer_update_recorder  (ShellMixer                 *mixer,
                                            const char                 *app_id);
 void        _shell_mixer_remove_recorder  (ShellMixer                 *mixer,
                                            guint32                     index);
+void        _shell_mixer_update_player    (ShellMixer                 *mixer,
+                                           const pa_sink_input_info   *info,
+                                           gboolean                    announce_start);
+void        _shell_mixer_remove_player    (ShellMixer                 *mixer,
+                                           guint32                     index);
+void        _shell_mixer_playback_started (ShellMixer                 *mixer,
+                                           guint                       pid,
+                                           const char                 *app_id,
+                                           const char                 *binary,
+                                           const char                 *name);
 void        _shell_mixer_set_defaults     (ShellMixer                 *mixer,
                                            const char                 *sink,
                                            const char                 *source);

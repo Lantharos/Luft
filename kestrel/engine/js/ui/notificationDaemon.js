@@ -210,6 +210,7 @@ class FdoNotificationDaemon {
             gicon,
             useBodyMarkup: true,
             sound: soundFromHints(hints),
+            senderPid: hints['x-shell-sender-pid'] ?? 0,
             acknowledged: false,
         });
         notification.clearActions();

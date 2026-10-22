@@ -708,6 +708,12 @@
     <value value="1" nick="urgent"/>
     <value value="2" nick="always"/>
   </enum>
+  <enum id="com.lantharos.kestrel.notifications.Sound">
+    <value value="0" nick="automatic"/>
+    <value value="1" nick="luft"/>
+    <value value="2" nick="app"/>
+    <value value="3" nick="none"/>
+  </enum>
   <schema id="com.lantharos.kestrel.notifications.application"
           gettext-domain="@GETTEXT_PACKAGE@">
     <key name="during-do-not-disturb" enum="com.lantharos.kestrel.notifications.DoNotDisturb">
@@ -725,6 +731,15 @@
       <description>
         When disabled, notifications from the app are removed once their
         banner closes, or right away when no banner is shown.
+      </description>
+    </key>
+    <key name="sound" enum="com.lantharos.kestrel.notifications.Sound">
+      <default>'automatic'</default>
+      <summary>Which sound the app’s notifications play</summary>
+      <description>
+        “automatic” plays the sound the app asks for, or Luft’s sound unless
+        the app starts playing its own, “luft” always plays Luft’s sound,
+        “app” plays only sounds the app asks for and “none” stays silent.
       </description>
     </key>
   </schema>

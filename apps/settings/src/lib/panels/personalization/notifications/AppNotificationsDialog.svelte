@@ -2,7 +2,7 @@
 	import { t } from '@luft/i18n';
 	import { Dialog, Row, Select, Switch } from '@luft/ui';
 	import type { SettingsGroup } from '#lib/state/gsettings.svelte.js';
-	import type { AppOptions, AppRules, DoNotDisturb, NotifyingApp } from './api';
+	import type { AppOptions, AppRules, DoNotDisturb, NotifyingApp, Sound } from './api';
 
 	interface Props {
 		app: NotifyingApp;
@@ -18,6 +18,12 @@
 		{ value: 'never', label: t('settings-notifications-dnd-never') },
 		{ value: 'urgent', label: t('settings-notifications-dnd-urgent') },
 		{ value: 'always', label: t('settings-notifications-dnd-always') }
+	]);
+	let sounds = $derived<{ value: Sound; label: string }[]>([
+		{ value: 'automatic', label: t('settings-notifications-sound-automatic') },
+		{ value: 'luft', label: t('settings-notifications-sound-luft') },
+		{ value: 'app', label: t('settings-notifications-sound-app') },
+		{ value: 'none', label: t('settings-notifications-sound-none') }
 	]);
 	let off = $derived(!(options.values.enable ?? true));
 	let hiddenOnLockScreen = $derived(off || !lockScreen || !options.values['show-in-lock-screen']);
@@ -35,8 +41,14 @@
 		<Row title={t('settings-notifications-banners')} description={t('settings-notifications-banners-description')} disabled={off}>
 			{@render toggle('show-banners', t('settings-notifications-banners'), off)}
 		</Row>
-		<Row title={t('settings-notifications-sound')} disabled={off}>
-			{@render toggle('enable-sound-alerts', t('settings-notifications-sound'), off)}
+		<Row title={t('settings-notifications-sound')} description={t('settings-notifications-sound-description')} disabled={off}>
+			<Select
+				label={t('settings-notifications-sound')}
+				options={sounds}
+				value={rules.values.sound ?? 'automatic'}
+				disabled={off}
+				onchange={(value) => rules.set('sound', value)}
+			/>
 		</Row>
 		<Row title={t('settings-notifications-dnd-allow')} description={t('settings-notifications-dnd-allow-description')} disabled={off}>
 			<Select

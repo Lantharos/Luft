@@ -26,6 +26,10 @@ export interface Mixer {
   choose_headset(choice: MixerHeadset): void;
   connect(signal: 'headset-changed', callback: (mixer: Mixer, choices: MixerHeadset | 0) => void): number;
   connect(signal: 'notify::recording' | 'notify::dictating', callback: () => void): number;
+  connect(
+    signal: 'playback-started',
+    callback: (mixer: Mixer, pid: number, appId: string | null, binary: string | null, name: string | null) => void,
+  ): number;
   disconnect(id: number): void;
 }
 

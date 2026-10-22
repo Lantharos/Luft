@@ -147,9 +147,9 @@ export const NotificationPolicy = GObject.registerClass({
     Properties: {
         'enable': GObject.ParamSpec.boolean(
             'enable', null, null, GObject.ParamFlags.READABLE, true),
-        'enable-sound': GObject.ParamSpec.boolean(
-            'enable-sound', null, null,
-            GObject.ParamFlags.READABLE, true),
+        'sound': GObject.ParamSpec.string(
+            'sound', null, null,
+            GObject.ParamFlags.READABLE, 'automatic'),
         'show-banners': GObject.ParamSpec.boolean(
             'show-banners', null, null,
             GObject.ParamFlags.READABLE, true),
@@ -200,8 +200,8 @@ export const NotificationPolicy = GObject.registerClass({
         return true;
     }
 
-    get enableSound() {
-        return true;
+    get sound() {
+        return 'automatic';
     }
 
     get showBanners() {
@@ -311,8 +311,8 @@ export const NotificationApplicationPolicy = GObject.registerClass({
         return this._settings.get_boolean('enable');
     }
 
-    get enableSound() {
-        return this._settings.get_boolean('enable-sound-alerts');
+    get sound() {
+        return this._rules.get_string('sound');
     }
 
     get showBanners() {
@@ -480,10 +480,15 @@ export class Notification extends GObject.Object {
     }
 
     playSound() {
-        if (!this.source.policy.enableSound || this.forFeedback || this.sound?.sound === null)
+        if (this.forFeedback)
             return;
 
-        KestrelUi.playNotificationSound(this.sound?.sound ?? {name: URGENCY_SOUNDS[this.urgency]});
+        KestrelUi.playNotificationSound({
+            choice: this.source.policy.sound,
+            requested: this.sound?.sound,
+            fallback: {name: URGENCY_SOUNDS[this.urgency]},
+            sender: {app: KestrelUi.sourceApp(this.source), pid: this.senderPid},
+        });
     }
 
     activate() {
@@ -677,6 +682,10 @@ GObject.registerClass({
             'sound', null, null,
             GObject.ParamFlags.READWRITE,
             Sound),
+        'sender-pid': GObject.ParamSpec.uint(
+            'sender-pid', null, null,
+            GObject.ParamFlags.READWRITE,
+            0, GLib.MAXUINT32, 0),
         'datetime': GObject.ParamSpec.boxed(
             'datetime', null, null,
             GObject.ParamFlags.READWRITE,

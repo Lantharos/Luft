@@ -119,6 +119,30 @@ on_source_output_info (pa_context                  *context,
 }
 
 static void
+on_sink_input_info (pa_context               *context,
+                    const pa_sink_input_info *info,
+                    int                       eol,
+                    gpointer                  user_data)
+{
+  ShellMixerServer *server = user_data;
+
+  if (!eol)
+    _shell_mixer_update_player (server->mixer, info, TRUE);
+}
+
+static void
+on_existing_sink_input_info (pa_context               *context,
+                             const pa_sink_input_info *info,
+                             int                       eol,
+                             gpointer                  user_data)
+{
+  ShellMixerServer *server = user_data;
+
+  if (!eol)
+    _shell_mixer_update_player (server->mixer, info, FALSE);
+}
+
+static void
 on_card_info (pa_context         *context,
               const pa_card_info *info,
               int                 eol,
@@ -170,6 +194,12 @@ on_event (pa_context                   *context,
       else
         drop_operation (pa_context_get_source_output_info (context, index, on_source_output_info, server));
       break;
+    case PA_SUBSCRIPTION_EVENT_SINK_INPUT:
+      if (removed)
+        _shell_mixer_remove_player (mixer, index);
+      else
+        drop_operation (pa_context_get_sink_input_info (context, index, on_sink_input_info, server));
+      break;
     case PA_SUBSCRIPTION_EVENT_CARD:
       if (removed)
         _shell_mixer_remove_card (mixer, index);
@@ -208,6 +238,7 @@ on_state (pa_context *context,
                                             PA_SUBSCRIPTION_MASK_SINK |
                                             PA_SUBSCRIPTION_MASK_SOURCE |
                                             PA_SUBSCRIPTION_MASK_SOURCE_OUTPUT |
+                                            PA_SUBSCRIPTION_MASK_SINK_INPUT |
                                             PA_SUBSCRIPTION_MASK_CARD |
                                             PA_SUBSCRIPTION_MASK_SERVER,
                                             NULL, NULL));
@@ -215,6 +246,7 @@ on_state (pa_context *context,
       drop_operation (pa_context_get_sink_info_list (context, on_sink_info, server));
       drop_operation (pa_context_get_source_info_list (context, on_source_info, server));
       drop_operation (pa_context_get_source_output_info_list (context, on_source_output_info, server));
+      drop_operation (pa_context_get_sink_input_info_list (context, on_existing_sink_input_info, server));
       drop_operation (pa_context_get_server_info (context, on_server_info, server));
       break;
     case PA_CONTEXT_FAILED:

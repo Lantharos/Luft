@@ -134,6 +134,7 @@ libshell_sources = [
   'mixer/shell-mixer-device.c',
   'mixer/shell-mixer-devices.c',
   'mixer/shell-mixer-headset.c',
+  'mixer/shell-mixer-players.c',
   'mixer/shell-mixer-server.c',
   'mixer/shell-mixer-stream.c',
   'sound/shell-sound-decode.c',

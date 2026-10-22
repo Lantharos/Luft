@@ -31,7 +31,8 @@ The play button next to each kind plays it once, so you can hear it before choos
 - [Do Not Disturb](/desktop/notifications/#do-not-disturb) silences notification sounds, but not the volume tick or errors, which answer something you just did. Apps allowed through Do Not Disturb still play theirs.
 - Notification sounds also stay quiet while a game is fullscreen or while you share your screen.
 - The lock screen only plays errors, such as a wrong password.
-- Each app's notifications can be kept silent: in Settings, under Notifications, choose the app and turn off **Play a sound**.
+- When an app such as Discord plays its own sound as a notification arrives, Luft's stays quiet so you don't hear two. A call or music the app was already playing doesn't count.
+- Each app's notifications can play something else: in Settings, under Notifications, choose the app and set **Sound** to **Luft's sound**, **The app's own** or **None**.
 
 ## When nothing plays
 
@@ -54,4 +55,4 @@ The last one saves a full report of the sound hardware and says where it put it.
 
 ## For apps
 
-Luft's sounds are a standard sound theme named `luft`, so apps that play theme sounds use them. Apps choose a notification's sound with the `sound-name`, `sound-file` and `suppress-sound` hints, or the `sound` option of the notification portal. Apps outside a sandbox can play a sound from the theme by calling `Play` on `com.lantharos.Kestrel.Sounds` at `/com/lantharos/Kestrel/Sounds` on the session bus, with names such as `dialog-warning` or `message-sent-email`; the switches above still apply.
+Luft's sounds are a standard sound theme named `luft`, so apps that play theme sounds use them. Apps choose a notification's sound with the `sound-name`, `sound-file` and `suppress-sound` hints, or the `sound` option of the notification portal. An app that plays its own sound should send `suppress-sound`; otherwise Luft waits a moment before its sound and skips it when the app starts playing in the meantime. Apps outside a sandbox can play a sound from the theme by calling `Play` on `com.lantharos.Kestrel.Sounds` at `/com/lantharos/Kestrel/Sounds` on the session bus, with names such as `dialog-warning` or `message-sent-email`; the switches above still apply.

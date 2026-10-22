@@ -1,15 +1,20 @@
 import Gio from 'gi://Gio';
 
 import { categoryOf, SOUNDS, type Category, type Sound } from './catalog.js';
+import { followPlayback, unlessSenderPlays, type Sender } from './playback.js';
 import { soundPlayer } from './player.js';
 import { busy, followSession, interactingWith, onlyErrors, type SessionMode } from './situation.js';
 
 const desktop = new Gio.Settings({ schema_id: 'org.gnome.desktop.sound' });
 const kestrel = new Gio.Settings({ schema_id: 'com.lantharos.kestrel.sounds' });
 
+const OWN_SOUND_LEAD_US = 500_000;
+const OWN_SOUND_WAIT_MS = 150;
+
 export function startSounds(session: SessionMode): void {
   followSession(session);
   soundPlayer().prepare();
+  followPlayback();
   global.display.connect('bell', () => {
     playSound('error');
     return true;
@@ -35,11 +40,27 @@ export function playNamedSound(name: string): void {
 
 export type NotificationSound = { name: string } | { file: Gio.File } | { fds: Gio.UnixFDList; index: number };
 
-export function playNotificationSound(sound: NotificationSound): void {
-  if (!allowed('notifications')) return;
+export type SoundChoice = 'automatic' | 'luft' | 'app' | 'none';
+
+export interface NotificationSoundRequest {
+  choice: SoundChoice;
+  requested: NotificationSound | null | undefined;
+  fallback: NotificationSound;
+  sender: Sender;
+}
+
+function playFor(sound: NotificationSound): void {
   if ('fds' in sound) soundPlayer().play_fd(sound.fds.get(sound.index));
   else if ('file' in sound) soundPlayer().play_file(sound.file);
   else soundPlayer().play(sound.name);
+}
+
+export function playNotificationSound({ choice, requested, fallback, sender }: NotificationSoundRequest): void {
+  if (choice === 'none' || !allowed('notifications')) return;
+  if (choice === 'luft') playFor(fallback);
+  else if (requested) playFor(requested);
+  else if (choice === 'automatic' && requested === undefined)
+    unlessSenderPlays(sender, OWN_SOUND_LEAD_US, OWN_SOUND_WAIT_MS, () => playFor(fallback));
 }
 
 export function promptAppeared(appId: string): void {

@@ -99,7 +99,7 @@
 					{t('settings-apps-full-access-remove')}
 				</button>
 			</Row>
-		{:else if app.appImage}
+		{:else}
 			<Row title={t('settings-apps-full-access')} description={t('settings-apps-full-access-off')}>
 				<button type="button" class="button" disabled={permissions.busy} onclick={() => permissions.askForFullAccess(app)}>
 					{t('settings-apps-full-access-give')}

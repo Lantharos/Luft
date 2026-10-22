@@ -19,6 +19,7 @@ FROM builder AS kestrel-build
 COPY Cargo.toml Cargo.lock package.json bun.lock /src/
 COPY kestrel /src/kestrel
 COPY packages/dbus /src/packages/dbus
+COPY packages/identity /src/packages/identity
 COPY packages/web/motion /src/packages/web/motion
 COPY packages/web/ui/src/taskbar /src/packages/web/ui/src/taskbar
 COPY packages/i18n/src /src/packages/i18n/src
@@ -45,6 +46,7 @@ COPY Cargo.toml Cargo.lock /src/
 COPY boot/sushi /src/boot/sushi
 COPY security /src/security
 COPY packages/dbus /src/packages/dbus
+COPY packages/identity /src/packages/identity
 COPY kestrel/engine/data/fonts /src/kestrel/engine/data/fonts
 COPY os/image/parts/stages/boot.sh os/image/parts/stages/needed.sh os/image/parts/stages/source-times.ts os/image/parts/stages/workspace.ts \
   /src/os/image/parts/stages/
@@ -110,6 +112,7 @@ COPY .cargo /src/.cargo
 COPY services /src/services
 COPY packages/app /src/packages/app
 COPY packages/dbus /src/packages/dbus
+COPY packages/identity /src/packages/identity
 COPY packages/i18n /src/packages/i18n
 COPY packages/system /src/packages/system
 COPY apps/setup/installer /src/apps/setup/installer

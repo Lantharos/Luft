@@ -53,10 +53,15 @@ pub fn looks_installed(root: &Path) -> bool {
     root.join("etc/os-release").is_file() && root.join("etc/fstab").is_file()
 }
 
+fn names_the_computer(hostname: &str) -> bool {
+    let label = hostname.split('.').next().unwrap_or_default();
+    !matches!(label, "" | "localhost" | "localhost4" | "localhost6")
+}
+
 pub fn read(root: &Path) -> OldSystem {
     let release = release::parse(&text(root, "etc/os-release"));
     let hostname = Some(text(root, "etc/hostname").trim().to_owned())
-        .filter(|name| !name.is_empty() && name.len() <= 63);
+        .filter(|name| names_the_computer(name) && name.len() <= 63);
     OldSystem {
         hostname,
         accounts: accounts::read(

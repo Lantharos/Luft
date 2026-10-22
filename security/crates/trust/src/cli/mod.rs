@@ -56,6 +56,8 @@ enum Command {
     },
     /// Check what games with anti-cheat look for in how the computer started
     AntiCheat,
+    /// Catch up once per start on Luft's key, the startup files and the TPM's disk key
+    FollowUp,
 }
 
 #[derive(Subcommand)]
@@ -166,7 +168,23 @@ impl Cli {
                 }
                 Ok(())
             }
+            Command::FollowUp => {
+                follow_up();
+                Ok(())
+            }
         }
+    }
+}
+
+fn follow_up() {
+    if let Err(error) = mok::follow_up() {
+        eprintln!("Couldn't follow up on adding Luft's key: {error:#}");
+    }
+    if let Err(error) = startup::follow_up() {
+        eprintln!("Couldn't follow up on Luft's startup: {error:#}");
+    }
+    if let Err(error) = disk::unlock::seal::follow_up() {
+        eprintln!("Couldn't seal the disk key to how this computer starts: {error:#}");
     }
 }
 

@@ -245,7 +245,7 @@ check_secure_boot() {
   [[ "$(disk_value TpmRefused)" == false ]] || fail "the TPM didn't unlock the encrypted disk"
   pass "with Secure Boot on, the TPM unlocks the encrypted disk"
   sealed="$(sealed_to)"
-  in_vm "/usr/lib/systemd/systemd-pcrextend --pcr=7 trustd-check && systemctl restart trustd" > /dev/null || fail "PCR 7 couldn't be changed"
+  in_vm "/usr/lib/systemd/systemd-pcrextend --pcr=7 trustd-check && systemctl restart trustd-follow-up" > /dev/null || fail "PCR 7 couldn't be changed"
   [[ "$(disk_value SecureBootChanged)" == true ]] || fail "Settings doesn't say the startup changed"
   [[ "$(sealed_to)" == "$sealed" ]] || fail "trustd sealed the disk key to an unexpected PCR 7 by itself"
   pass "an unexpected PCR 7 leaves the disk key sealed as it was"

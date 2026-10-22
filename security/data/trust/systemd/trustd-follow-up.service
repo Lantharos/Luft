@@ -1,0 +1,19 @@
+[Unit]
+Description=Bring Luft's key, startup files and TPM disk key in line with how this computer started
+Documentation=https://github.com/Lantharos/Luft/blob/main/docs/boot.md
+ConditionKernelCommandLine=!rd.live.image
+After=local-fs.target tpm2.target
+Before=trustd.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/trustctl follow-up
+PrivateTmp=yes
+ProtectHome=read-only
+KeyringMode=shared
+NoNewPrivileges=yes
+LockPersonality=yes
+RestrictRealtime=yes
+
+[Install]
+WantedBy=multi-user.target

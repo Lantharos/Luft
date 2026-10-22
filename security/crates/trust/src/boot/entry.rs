@@ -83,10 +83,11 @@ pub fn put_first(labels: &[&str]) -> Result<()> {
     order.extend(
         listing
             .order
-            .into_iter()
-            .filter(|number| !first.contains(number)),
+            .iter()
+            .filter(|number| !first.contains(number))
+            .cloned(),
     );
-    if order.is_empty() {
+    if order == listing.order {
         return Ok(());
     }
     Tool::new("efibootmgr")

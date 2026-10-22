@@ -1,7 +1,7 @@
 [Unit]
 Description=Give Luft the space Meet Luft used
 After=local-fs.target dbus.service
-Before=trustd.service luft-installer.service display-manager.service greetd.service
+Before=trustd.service trustd-follow-up.service luft-installer.service display-manager.service greetd.service
 ConditionPathExists=/var/lib/luft-installer/meet.json
 ConditionPathExists=!/var/lib/trustd/encryption.json
 

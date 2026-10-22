@@ -129,8 +129,9 @@ a little away from your ears. Sound stops working for other apps until the end.
 EOF
 read -rp "Press Enter to start. " </dev/tty
 
+trap 'session start pipewire.socket pipewire-pulse.socket pipewire wireplumber pipewire-pulse' EXIT
 session stop pipewire.socket pipewire-pulse.socket wireplumber pipewire pipewire-pulse
-holders=$(find /proc/[0-9]*/fd -lname "/dev/snd/*C$card*" -printf '%h\n' 2>/dev/null | cut -d/ -f3 | sort -u)
+holders=$({ find /proc/[0-9]*/fd -lname "/dev/snd/*C$card*" -printf '%h\n' 2>/dev/null || true; } | cut -d/ -f3 | sort -u)
 if [[ -n $holders ]]; then
 	session start pipewire.socket pipewire-pulse.socket pipewire wireplumber pipewire-pulse
 	echo "These programs still use the sound card. Close them and run this again:"

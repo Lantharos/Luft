@@ -232,3 +232,4 @@ desktop-updates-another-app = o altă aplicație
 desktop-updates-firmware-unnamed = Firmware-ul dispozitivului
 desktop-updates-firmware-current = Acest dispozitiv este deja actualizat.
 desktop-updates-firmware-no-download = Această actualizare nu poate fi descărcată.
+desktop-apps-folder-title = Alege un dosar pentru aplicație

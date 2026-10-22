@@ -448,17 +448,28 @@ settings-apps-permissions = İzinler
 settings-apps-location = Konum
 settings-apps-camera = Kamera
 settings-apps-clipboard = Arka planda pano
-settings-apps-clipboard-hint = Bu uygulamalar, başka uygulamaları kullanırken bile kopyaladıklarınızı görebilir ve değiştirebilir.
 settings-apps-full-access = Tam erişim
-settings-apps-full-access-hint = Bu uygulamalar korumalı alanlarının dışında çalışır ve sisteme yüklenen uygulamalar gibi sizin yerinize hareket eder. Kaldırma, uygulama bir sonraki açıldığında geçerli olur.
+settings-apps-full-access-hint = Korumalı alanının dışında çalışır ve kendi başlattığınız bir programın yapabildiği her şeyi yapabilir. Kaldırma bir sonraki açılışta geçerli olur.
 settings-apps-full-access-remove = Kaldır
 settings-apps-full-access-remove-app = { $app } uygulamasının tam erişimini kaldır
 settings-apps-passwords = Kayıtlı parolalar
-settings-apps-passwords-hint = Uygulamalar, anahtarlığınızda kayıtlı bir şeyi kullanmak istediğinde verdiğiniz yanıtı hatırlar. Uygulamanın yeniden sorması için yanıtı unutun.
 settings-apps-passwords-forget = Unut
 settings-apps-passwords-forget-app = { $app } yeniden sorsun
 settings-apps-permissions-allowed = { $allowed }/{ $total } izinli
-settings-apps-permissions-count = { $count ->
-    [one] { $count } uygulama
-   *[other] { $count } uygulama
+settings-apps-permissions-description = Korumalı alandaki uygulamalar kendi dosyalarını ve yalnızca burada izin verdiklerinizi alır.
+settings-apps-sandbox-only = Korumalı alanı dışında hiçbir şey
+settings-apps-folders = Klasörler
+settings-apps-folders-hint = Bir sonraki açılışından itibaren bu klasörlerdeki her şeyi okuyup değiştirebilir.
+settings-apps-folders-count = { $count ->
+    [one] { $count } klasör
+   *[other] { $count } klasör
 }
+settings-apps-folder-add = Klasör ekle
+settings-apps-folder-remove = Kaldır
+settings-apps-folder-remove-app = { $folder } paylaşımını durdur
+settings-apps-usb = USB aygıtları
+settings-apps-usb-hint = Güvenlik anahtarları, telefonlar ve mikrodenetleyiciler gibi
+settings-apps-serial = Seri aygıtlar
+settings-apps-serial-hint = 3D yazıcılar ve USB ile bağlanan kartlar gibi
+settings-apps-full-access-off = Korumalı alanda çalışıyor. Tam erişim korumalı alanı kaldırır.
+settings-apps-full-access-give = Tam erişim ver

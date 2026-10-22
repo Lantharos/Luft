@@ -461,18 +461,29 @@ settings-apps-permissions = Permisiuni
 settings-apps-location = Locație
 settings-apps-camera = Cameră
 settings-apps-clipboard = Clipboard în fundal
-settings-apps-clipboard-hint = Aceste aplicații pot vedea și modifica ce copiați, chiar și cât timp folosiți alte aplicații.
 settings-apps-full-access = Acces complet
-settings-apps-full-access-hint = Aceste aplicații rulează în afara mediului izolat și sunt tratate ca dumneavoastră, la fel ca aplicațiile instalate în sistem. Eliminarea se aplică data viitoare când se deschide aplicația.
+settings-apps-full-access-hint = Rulează în afara sandboxului și poate face tot ce poate un program pornit de tine. Eliminarea se aplică de la următoarea deschidere.
 settings-apps-full-access-remove = Elimină
 settings-apps-full-access-remove-app = Elimină accesul complet pentru { $app }
 settings-apps-passwords = Parole salvate
-settings-apps-passwords-hint = Aplicațiile rețin răspunsul dumneavoastră când cer să folosească ceva salvat în portchei. Uitați-l pentru ca aplicația să întrebe din nou.
 settings-apps-passwords-forget = Uită
 settings-apps-passwords-forget-app = Lasă { $app } să întrebe din nou
 settings-apps-permissions-allowed = Permise: { $allowed } din { $total }
-settings-apps-permissions-count = { $count ->
-    [one] { $count } aplicație
-    [few] { $count } aplicații
-   *[other] { $count } de aplicații
+settings-apps-permissions-description = Aplicațiile dintr-un sandbox primesc propriile fișiere și doar ce permiți aici.
+settings-apps-sandbox-only = Nimic în afara sandboxului
+settings-apps-folders = Dosare
+settings-apps-folders-hint = De la următoarea deschidere poate citi și modifica tot din aceste dosare.
+settings-apps-folders-count = { $count ->
+    [one] { $count } dosar
+    [few] { $count } dosare
+   *[other] { $count } de dosare
 }
+settings-apps-folder-add = Adaugă un dosar
+settings-apps-folder-remove = Elimină
+settings-apps-folder-remove-app = Nu mai partaja { $folder }
+settings-apps-usb = Dispozitive USB
+settings-apps-usb-hint = Cum ar fi chei de securitate, telefoane și microcontrolere
+settings-apps-serial = Dispozitive seriale
+settings-apps-serial-hint = Cum ar fi imprimante 3D și plăci conectate prin USB
+settings-apps-full-access-off = Rulează într-un sandbox. Accesul complet elimină sandboxul.
+settings-apps-full-access-give = Acordă acces complet

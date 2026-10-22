@@ -1,0 +1,10 @@
+apps/schelf/sandbox/src/launch/folder.rs	There's no runtime folder for this session.
+apps/schelf/sandbox/src/launch/folder.rs	The app is still starting.
+apps/schelf/sandbox/src/launch/mount.rs	This file isn't an AppImage this computer can open.
+apps/schelf/sandbox/src/launch/mount.rs	The AppImage couldn't be opened ({status})
+apps/schelf/sandbox/src/launch/mount.rs	The AppImage took too long to open.
+apps/schelf/sandbox/src/launch/profile.rs	There's no home folder.
+apps/schelf/sandbox/src/launch/proxy.rs	The session bus isn't at a path this sandbox can reach.
+apps/schelf/sandbox/src/launch/proxy.rs	The app's view of the session bus couldn't be set up.
+apps/schelf/sandbox/src/files.rs	The document portal isn't running.
+apps/schelf/sandbox/src/launch/mod.rs	The sandbox couldn't be set up.

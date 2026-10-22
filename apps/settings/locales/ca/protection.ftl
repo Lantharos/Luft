@@ -448,17 +448,28 @@ settings-apps-permissions = Permisos
 settings-apps-location = Ubicació
 settings-apps-camera = Càmera
 settings-apps-clipboard = Porta-retalls en segon pla
-settings-apps-clipboard-hint = Aquestes aplicacions poden veure i canviar el que copieu, fins i tot mentre feu servir altres aplicacions.
 settings-apps-full-access = Accés complet
-settings-apps-full-access-hint = Aquestes aplicacions s’executen fora del seu entorn aïllat i actuen com vós, igual que les aplicacions instal·lades al sistema. Treure’l s’aplica la propera vegada que s’obri l’aplicació.
+settings-apps-full-access-hint = Funciona fora del seu entorn aïllat i pot fer tot el que pot fer un programa que obres tu. Treure-ho s'aplica la pròxima vegada que s'obri.
 settings-apps-full-access-remove = Treu
 settings-apps-full-access-remove-app = Treu l’accés complet a { $app }
 settings-apps-passwords = Contrasenyes desades
-settings-apps-passwords-hint = Les aplicacions recorden la vostra resposta quan demanen fer servir alguna cosa desada al clauer. Oblideu-la perquè l’aplicació torni a preguntar.
 settings-apps-passwords-forget = Oblida
 settings-apps-passwords-forget-app = Fes que { $app } torni a preguntar
 settings-apps-permissions-allowed = { $allowed } de { $total } amb permís
-settings-apps-permissions-count = { $count ->
-    [one] { $count } aplicació
-   *[other] { $count } aplicacions
+settings-apps-permissions-description = Les aplicacions en un entorn aïllat tenen els seus propis fitxers i només el que permetis aquí.
+settings-apps-sandbox-only = Res fora del seu entorn aïllat
+settings-apps-folders = Carpetes
+settings-apps-folders-hint = Pot llegir i canviar tot el que hi ha en aquestes carpetes a partir de la pròxima vegada que s'obri.
+settings-apps-folders-count = { $count ->
+    [one] { $count } carpeta
+   *[other] { $count } carpetes
 }
+settings-apps-folder-add = Afegeix una carpeta
+settings-apps-folder-remove = Elimina
+settings-apps-folder-remove-app = Deixa de compartir { $folder }
+settings-apps-usb = Dispositius USB
+settings-apps-usb-hint = Com claus de seguretat, telèfons i microcontroladors
+settings-apps-serial = Dispositius sèrie
+settings-apps-serial-hint = Com impressores 3D i plaques connectades per USB
+settings-apps-full-access-off = Funciona en un entorn aïllat. L'accés complet elimina l'entorn aïllat.
+settings-apps-full-access-give = Dona accés complet

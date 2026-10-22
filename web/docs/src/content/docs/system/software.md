@@ -24,20 +24,30 @@ The `flatpak` command works too: `flatpak install --user flathub org.example.App
 
 ### Full access
 
-Flatpak apps run in a sandbox: they only see the files and devices they ask for, can't read the clipboard while you're using another app, and can't control other apps' windows. A few apps need more than that to work well, such as password managers that fill and clear the clipboard or AI assistants that work with your files. For those, turn on **Full access** on the app's page in Schelf. With it, the app can:
+Flatpak apps and AppImages run in a sandbox: they only see their own files and the ones you pick for them, can't read the clipboard while you're using another app, can't control other apps' windows, and can't read what other apps saved in your keyring. A few apps need more than that to work well, such as password managers that fill and clear the clipboard or AI assistants that work with your files. For those, turn on **Full access** on the app's page in Schelf. With it, the app can:
 
-- see and change all your files
-- read the clipboard in the background
-- control other apps' windows
-- act like an app installed on the system, including use your devices and talk to other apps
+- read, change and delete all your files
+- use every device, such as USB drives, cameras and game controllers
+- read what you copy, even while it's in the background
+- read the passwords and keys saved in your keyring, other apps' too
+- start any program as you, outside a sandbox
 
-Only give full access to apps you trust. Schelf asks you to confirm, then for an administrator's password, and the app gets its new access the next time it opens. Turning it off puts the app back in its sandbox as it shipped, which also undoes changes you made to its permissions with other tools, such as Flatseal.
+Only give full access to apps you trust. Schelf asks you to confirm, and the app gets its new access the next time it opens. Turning it off puts the app back in its sandbox. For a Flatpak that also undoes changes you made to its permissions with other tools, such as Flatseal.
 
-AppImages, command-line tools and system packages don't run in a sandbox, so they have full access already.
+Command-line tools and system packages don't run in a sandbox, so they have full access already. Settings → Apps lists what every sandboxed app was allowed, and takes any of it away.
 
 ## AppImages
 
 Open an `.AppImage` file and Schelf offers to install it. It moves it into `~/Applications` and adds it to Start with its own icon, so it opens like any other app. AppImages you set up earlier with other tools, such as Gear Lever, are picked up too.
+
+AppImages run in a sandbox, like Flatpak apps:
+
+- They get the internet, the graphics card, sound, notifications and windows, and keep their settings and data in a folder of their own, `~/.var/app/` followed by the app's ID.
+- Your files reach them through the file chooser: what you pick is shared with the app, nothing else. Files you open with the app from Rover are shared the same way.
+- Secrets they save, such as an app's sign-in, are theirs. Other sandboxed apps can't read them without you confirming.
+- In Settings → Apps you can give one a folder, or USB or serial devices, from the next time it opens.
+
+An AppImage that closes right after it starts, or looks for a USB or serial device, may need more. Luft then tells you, and **Review access** opens Schelf, where you can give it full access. With full access it runs as it would without Luft, and keeps its data where it always did, outside its sandbox's folder, so it starts without the settings it had in its sandbox.
 
 ## Command-line tools
 
@@ -101,7 +111,7 @@ schelf repo remove docker-ce
 
 In Schelf, they're under Installed, System, **Software sources**.
 
-Before a source is added, Schelf shows its name, its address and the key its packages are signed with, and asks you to confirm, then for an administrator's password. Only add sources you trust: their packages become part of the system, with full access to the computer. Luft keeps the key it showed you, so packages signed with any other key are refused, and a source has to sign its packages and be reached over HTTPS. That leaves out Stripe's repository, which doesn't sign its packages. The Stripe CLI works as a command-line tool instead: open its `.rpm` file, or run `schelf install ./stripe.rpm`.
+Before a source is added, Schelf shows its name, its address and the key its packages are signed with, and asks you to confirm, then for an administrator's password. A package file that isn't signed by Fedora or by a source you added, and comes without a source of its own, asks you to confirm too, since nobody vouches for it. Only add sources you trust: their packages become part of the system, with full access to the computer. Luft keeps the key it showed you, so packages signed with any other key are refused, and a source has to sign its packages and be reached over HTTPS. That leaves out Stripe's repository, which doesn't sign its packages. The Stripe CLI works as a command-line tool instead: open its `.rpm` file, or run `schelf install ./stripe.rpm`.
 
 Removing a source removes the packages you installed from it, with everything they added. Sources live in `/etc/yum.repos.d` and their keys in `/etc/pki/rpm-gpg`, so `dnf repolist` and `dnf info` see them too.
 
@@ -122,7 +132,7 @@ The `schelf` command, or `sch` for short, does the same as the app:
 | `schelf install --system tailscale` | Adds a package to the system, from Fedora or your software sources ([more](#system-packages)) |
 | `schelf repo add copr:scottames/ghostty` | Adds a software source for system packages, after showing its key ([more](#software-sources)) |
 | `schelf info gimp` | Shows the details from every place that has it |
-| `schelf trust 1password` | Gives a Flatpak app [full access](#full-access), after warning you and asking first |
+| `schelf trust 1password` | Gives a Flatpak app or an AppImage [full access](#full-access), after warning you and asking first |
 | `schelf untrust 1password` | Puts it back in its sandbox |
 
 When a name is both on Flathub and in Fedora, a desktop app comes from Flathub and a command-line tool from Fedora. If that still leaves a choice, Schelf asks which one you mean. `--flathub` or `--fedora` picks the place yourself, `-y` goes ahead without asking, and `schelf --help` lists everything.

@@ -457,18 +457,29 @@ settings-apps-permissions = Дозволе
 settings-apps-location = Локација
 settings-apps-camera = Камера
 settings-apps-clipboard = Остава у позадини
-settings-apps-clipboard-hint = Ове апликације могу да виде и мењају оно што копирате, чак и док користите друге апликације.
 settings-apps-full-access = Пуни приступ
-settings-apps-full-access-hint = Ове апликације раде изван свог изолованог окружења и сматрају се вама, као апликације инсталиране на систему. Уклањање ступа на снагу када се апликација следећи пут отвори.
+settings-apps-full-access-hint = Ради ван свог сендбокса и може све што може програм који сами покренете. Уклањање важи од следећег отварања.
 settings-apps-full-access-remove = Уклони
 settings-apps-full-access-remove-app = Уклони пуни приступ за { $app }
 settings-apps-passwords = Сачуване лозинке
-settings-apps-passwords-hint = Апликације памте ваш одговор када траже да користе нешто из привеска кључева. Заборавите га и апликација ће поново питати.
 settings-apps-passwords-forget = Заборави
 settings-apps-passwords-forget-app = Нека { $app } поново пита
 settings-apps-permissions-allowed = Дозвољено { $allowed } од { $total }
-settings-apps-permissions-count = { $count ->
-    [one] { $count } апликација
-    [few] { $count } апликације
-   *[other] { $count } апликација
+settings-apps-permissions-description = Апликације у сендбоксу добијају своје датотеке и само оно што овде дозволите.
+settings-apps-sandbox-only = Ништа ван сендбокса
+settings-apps-folders = Фасцикле
+settings-apps-folders-hint = Од следећег отварања може да чита и мења све у овим фасциклама.
+settings-apps-folders-count = { $count ->
+    [one] { $count } фасцикла
+    [few] { $count } фасцикле
+   *[other] { $count } фасцикли
 }
+settings-apps-folder-add = Додај фасциклу
+settings-apps-folder-remove = Уклони
+settings-apps-folder-remove-app = Престани да делиш { $folder }
+settings-apps-usb = USB уређаји
+settings-apps-usb-hint = Попут безбедносних кључева, телефона и микроконтролера
+settings-apps-serial = Серијски уређаји
+settings-apps-serial-hint = Попут 3D штампача и плочица повезаних преко USB-а
+settings-apps-full-access-off = Ради у сендбоксу. Пун приступ уклања сендбокс.
+settings-apps-full-access-give = Дај пун приступ

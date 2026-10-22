@@ -2,8 +2,7 @@ use std::fs::{self, File};
 use std::io::{Read, Write};
 use std::os::unix::fs::{PermissionsExt, symlink};
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
-use std::sync::OnceLock;
+use std::process::Command;
 
 use super::bundle::{self, Bundle};
 use super::library::{self, AppImage, IconSize};
@@ -14,7 +13,10 @@ use crate::task::{CANCELLED, Task};
 const PREFIX: &str = "appimage-";
 const CHUNK: usize = 1 << 20;
 const MAIN_GROUP: &str = "[Desktop Entry]";
-const NO_SANDBOX: &str = "--no-sandbox";
+pub const SANDBOX: &str = "--sandbox";
+pub const FILES: &str = "@@";
+pub const URIS: &str = "@@u";
+pub const CHROMIUM: &str = "X-Luft-Chromium";
 
 fn failed(error: impl std::fmt::Display) -> String {
     error.to_string()
@@ -161,7 +163,7 @@ pub fn integrate(id: &str, executable: &Path, bundle: &Bundle) -> Result<(), Str
     let applications = library::applications();
     fs::create_dir_all(&applications).map_err(failed)?;
     let icon = (!bundle.icons.is_empty()).then_some(id);
-    let entry = desktop_entry(bundle, executable, icon);
+    let entry = desktop_entry(id, bundle, executable, icon);
     fs::write(applications.join(format!("{id}.desktop")), entry).map_err(failed)?;
     refresh_menus(&applications);
     Ok(())
@@ -183,7 +185,9 @@ fn icon_fits(icon: &Path) -> bool {
 
 pub fn repair() {
     for app in library::list() {
-        if app.icon.as_deref().is_some_and(icon_fits) {
+        if app.launcher.as_deref() == Some(launcher().as_path())
+            && app.icon.as_deref().is_some_and(icon_fits)
+        {
             continue;
         }
         if let Ok(bundle) = bundle::read(&app.path) {
@@ -192,53 +196,40 @@ pub fn repair() {
     }
 }
 
-fn exec_line(original: &str, executable: &Path, bundle: &Bundle) -> String {
+fn forwarded(argument: &str) -> String {
+    match argument {
+        "%f" | "%F" => format!("{FILES} {argument} {FILES}"),
+        "%u" | "%U" => format!("{URIS} {argument} {FILES}"),
+        _ => argument.to_owned(),
+    }
+}
+
+/// Schelf itself, which starts AppImages in their sandbox.
+pub fn launcher() -> PathBuf {
+    std::env::current_exe().unwrap_or_default()
+}
+
+fn quoted(path: &Path) -> String {
+    format!("\"{}\"", path.display().to_string().replace('"', "\\\""))
+}
+
+fn exec_line(original: &str, id: &str, bundle: &Bundle) -> String {
     let mut arguments: Vec<String> = original
         .split_whitespace()
         .skip(1)
         .map(str::to_owned)
         .collect();
-    if bundle.electron
-        && !namespace_sandbox_works()
-        && !arguments.iter().any(|argument| argument == NO_SANDBOX)
-    {
-        arguments.insert(0, NO_SANDBOX.into());
-    }
     if bundle.chromium {
         chromium::enable_finger_scrolling(&mut arguments);
     }
-    let quoted = format!(
-        "\"{}\"",
-        executable.display().to_string().replace('"', "\\\"")
-    );
-    ["env DESKTOPINTEGRATION=1".to_owned(), quoted]
+    [quoted(&launcher()), SANDBOX.to_owned(), id.to_owned()]
         .into_iter()
-        .chain(arguments)
+        .chain(arguments.iter().map(|argument| forwarded(argument)))
         .collect::<Vec<_>>()
         .join(" ")
 }
 
-fn namespace_sandbox_works() -> bool {
-    static WORKS: OnceLock<bool> = OnceLock::new();
-    *WORKS.get_or_init(|| {
-        Command::new("unshare")
-            .args([
-                "--user",
-                "--map-root-user",
-                "--net",
-                "--pid",
-                "--fork",
-                "true",
-            ])
-            .stdin(Stdio::null())
-            .stdout(Stdio::null())
-            .stderr(Stdio::null())
-            .status()
-            .is_ok_and(|status| status.success())
-    })
-}
-
-fn desktop_entry(bundle: &Bundle, executable: &Path, icon: Option<&str>) -> String {
+fn desktop_entry(id: &str, bundle: &Bundle, executable: &Path, icon: Option<&str>) -> String {
     let mut lines = Vec::new();
     let mut main = false;
     for line in bundle.entry_text.lines() {
@@ -248,6 +239,9 @@ fn desktop_entry(bundle: &Bundle, executable: &Path, icon: Option<&str>) -> Stri
             lines.push(trimmed.to_owned());
             if main {
                 lines.push(format!("TryExec={}", executable.display()));
+                if bundle.electron || bundle.chromium {
+                    lines.push(format!("{CHROMIUM}=true"));
+                }
             }
             continue;
         }
@@ -263,11 +257,11 @@ fn desktop_entry(bundle: &Bundle, executable: &Path, icon: Option<&str>) -> Stri
                         .split_once('=')
                         .map(|(_, value)| value)
                         .unwrap_or_default(),
-                    executable,
+                    id,
                     bundle
                 )
             )),
-            "TryExec" => {}
+            "TryExec" | CHROMIUM => {}
             "Icon" if main => {
                 if let Some(icon) = icon {
                     lines.push(format!("Icon={icon}"));

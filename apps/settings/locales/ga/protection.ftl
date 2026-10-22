@@ -487,20 +487,31 @@ settings-apps-permissions = Ceadanna
 settings-apps-location = Suíomh
 settings-apps-camera = Ceamara
 settings-apps-clipboard = Gearrthaisce sa chúlra
-settings-apps-clipboard-hint = Is féidir leis na haipeanna seo an méid a chóipeálann tú a fheiceáil agus a athrú, fiú agus aipeanna eile in úsáid agat.
 settings-apps-full-access = Rochtain iomlán
-settings-apps-full-access-hint = Ritheann na haipeanna seo lasmuigh dá mbosca gainimh agus meastar gur tusa iad, cosúil le haipeanna atá suiteáilte ar an gcóras. Tagann a baint i bhfeidhm an chéad uair eile a osclaítear an aip.
+settings-apps-full-access-hint = Ritheann sé lasmuigh dá bhosca gainimh agus is féidir leis gach rud is féidir le ríomhchlár a thosaíonn tú féin. Beidh feidhm leis an mbaint an chéad uair eile a osclaítear é.
 settings-apps-full-access-remove = Bain
 settings-apps-full-access-remove-app = Bain rochtain iomlán de { $app }
 settings-apps-passwords = Pasfhocail shábháilte
-settings-apps-passwords-hint = Cuimhníonn aipeanna ar do fhreagra nuair a iarrann siad rud éigin atá sábháilte i d’fháinne eochrach a úsáid. Déan dearmad air chun go n-iarrfaidh an aip arís.
 settings-apps-passwords-forget = Déan dearmad
 settings-apps-passwords-forget-app = Lig do { $app } fiafraí arís
 settings-apps-permissions-allowed = { $allowed } as { $total } ceadaithe
-settings-apps-permissions-count = { $count ->
-    [one] Aipeanna: { $count }
-    [two] Aipeanna: { $count }
-    [few] Aipeanna: { $count }
-    [many] Aipeanna: { $count }
-   *[other] Aipeanna: { $count }
+settings-apps-permissions-description = Faigheann aipeanna i mbosca gainimh a gcuid comhad féin agus a gceadaíonn tú anseo amháin.
+settings-apps-sandbox-only = Faic lasmuigh dá bhosca gainimh
+settings-apps-folders = Fillteáin
+settings-apps-folders-hint = Is féidir leis gach rud sna fillteáin seo a léamh agus a athrú, ón chéad uair eile a osclaítear é.
+settings-apps-folders-count = { $count ->
+    [one] Fillteáin: { $count }
+    [two] Fillteáin: { $count }
+    [few] Fillteáin: { $count }
+    [many] Fillteáin: { $count }
+   *[other] Fillteáin: { $count }
 }
+settings-apps-folder-add = Cuir fillteán leis
+settings-apps-folder-remove = Bain
+settings-apps-folder-remove-app = Stop ag comhroinnt { $folder }
+settings-apps-usb = Gléasanna USB
+settings-apps-usb-hint = Mar eochracha slándála, fóin agus micrea-rialaitheoirí
+settings-apps-serial = Gléasanna sraitheacha
+settings-apps-serial-hint = Mar phrintéirí 3D agus cláir atá ceangailte trí USB
+settings-apps-full-access-off = Ritheann sé i mbosca gainimh. Baineann lánrochtain an bosca gainimh.
+settings-apps-full-access-give = Tabhair lánrochtain

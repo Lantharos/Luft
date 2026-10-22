@@ -4,6 +4,7 @@
 	import AppArt from '#lib/components/AppArt.svelte';
 	import Description from '#lib/components/Description.svelte';
 	import ProgressButton from '#lib/components/ProgressButton.svelte';
+	import SourceTrustDialog from '#lib/components/SourceTrustDialog.svelte';
 	import TrustDialog from '#lib/components/TrustDialog.svelte';
 	import { fedora } from '#lib/fedora/fedora.svelte.js';
 	import { backend } from '#lib/bridge/index.js';
@@ -17,6 +18,7 @@
 	let error = $state<string | null>(null);
 	let started = $state(false);
 	let trusting = $state(false);
+	let confirming = $state(false);
 
 	const key = $derived(`file:${path}`);
 	const operation = $derived(operations.forKey(key));
@@ -56,13 +58,20 @@
 		return { kind: 'installAppImage', path: opened.path };
 	}
 
+	const unverified = $derived(file?.kind === 'package' && !file.repository && !file.verified);
+
 	function install() {
 		if (!file) return;
 		if (file.kind === 'package' && file.repository && !file.repository.added && !trusting) {
 			trusting = true;
 			return;
 		}
+		if (unverified && !confirming) {
+			confirming = true;
+			return;
+		}
 		trusting = false;
+		confirming = false;
 		if (operation?.state === 'failed') void operations.cancel(operation.id);
 		started = true;
 		void operations.run(key, name, job(file));
@@ -148,15 +157,9 @@
 						? "It's one of your software sources already."
 						: 'Installing adds it to your software sources.'}
 				</p>
-			{:else if file.kind === 'package'}
+			{:else if file.kind === 'package' && file.repositoryError}
 				<p class="px-2 text-[13px] text-[var(--text-muted)]">
-					{#if file.repositoryError}
-						It brings a software source Luft can't use, so it installs by itself and won't get updates. {file.repositoryError}
-					{:else if file.system}
-						It doesn't come with a software source, so it won't get updates. Package files aren't checked before they install. Only install ones from people you trust.
-					{:else}
-						Package files aren't checked before they install. Only install ones from people you trust.
-					{/if}
+					It brings a software source Luft can't use, so it installs by itself and won't get updates. {file.repositoryError}
 				</p>
 			{/if}
 		{:else}
@@ -166,5 +169,18 @@
 </div>
 
 {#if trusting && source}
-	<TrustDialog {source} action="Add and install" onconfirm={install} onclose={() => (trusting = false)} />
+	<SourceTrustDialog {source} confirm="Add and install" onconfirm={install} onclose={() => (trusting = false)} />
+{/if}
+
+{#if confirming && file?.kind === 'package'}
+	<TrustDialog
+		title="Install {file.package} without checking it?"
+		description="Nobody vouches for this package file: it isn't signed by Fedora or by a software source you added. Only install it if you trust whoever gave it to you."
+		facts={file.system
+			? ['Not verified', 'Installs for everyone on this computer', 'Can run as administrator while it installs', "Won't get updates"]
+			: ['Not verified', 'Installs in your tools container, where it can read and change your files', "Won't get updates"]}
+		confirm="Install anyway"
+		onconfirm={install}
+		onclose={() => (confirming = false)}
+	/>
 {/if}

@@ -31,6 +31,18 @@ pub const BACKGROUND_CLIPBOARD: Permission = Permission {
     id: "background-clipboard",
 };
 
+/// Folders an AppImage's sandbox opens, one path per folder.
+pub const FOLDERS: Permission = Permission {
+    table: "sandbox",
+    id: "folders",
+};
+
+/// Devices an AppImage's sandbox opens: `usb`, `serial` or `all`.
+pub const DEVICES: Permission = Permission {
+    table: "sandbox",
+    id: "devices",
+};
+
 /// Sandboxed apps' choices about items in Luft Keyring, one entry per item.
 pub const KEYRING_ITEMS: &str = "keyring-items";
 
@@ -93,6 +105,30 @@ pub async fn answer(connection: &Connection, table: &str, id: &str, app: &str) -
 
 pub async fn allowed(connection: &Connection, permission: &Permission, app: &str) -> bool {
     answer(connection, permission.table, permission.id, app).await == Some(true)
+}
+
+/// Everything the app was given in one entry, such as the folders it may use.
+pub async fn values(connection: &Connection, permission: &Permission, app: &str) -> Vec<String> {
+    lookup(connection, permission.table, permission.id)
+        .await
+        .ok()
+        .and_then(|mut apps| apps.remove(app))
+        .unwrap_or_default()
+}
+
+pub async fn set_values(
+    connection: &Connection,
+    permission: &Permission,
+    app: &str,
+    values: &[&str],
+) -> zbus::Result<()> {
+    let store = StoreProxy::new(connection).await?;
+    if values.is_empty() {
+        return forget(connection, permission.table, permission.id, app).await;
+    }
+    store
+        .set_permission(permission.table, true, permission.id, app, values)
+        .await
 }
 
 pub async fn set(

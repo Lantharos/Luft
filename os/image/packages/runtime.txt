@@ -91,6 +91,7 @@ python3-gobject
 rclone
 shared-mime-info
 skopeo
+squashfuse
 steam-devices
 switcheroo-control
 swtpm

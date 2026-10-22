@@ -232,3 +232,4 @@ desktop-updates-another-app = druga aplikacija
 desktop-updates-firmware-unnamed = Firmver uređaja
 desktop-updates-firmware-current = Ovaj uređaj je već ažuran.
 desktop-updates-firmware-no-download = Ovo ažuriranje se ne može preuzeti.
+desktop-apps-folder-title = Odaberite mapu za aplikaciju

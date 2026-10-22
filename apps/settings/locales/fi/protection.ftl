@@ -448,17 +448,28 @@ settings-apps-permissions = Käyttöoikeudet
 settings-apps-location = Sijainti
 settings-apps-camera = Kamera
 settings-apps-clipboard = Leikepöytä taustalla
-settings-apps-clipboard-hint = Nämä sovellukset voivat nähdä ja muuttaa kopioimaasi, myös kun käytät muita sovelluksia.
 settings-apps-full-access = Täysi käyttöoikeus
-settings-apps-full-access-hint = Nämä sovellukset toimivat hiekkalaatikkonsa ulkopuolella, ja niitä kohdellaan kuin sinua, kuten järjestelmään asennettuja sovelluksia. Poisto tulee voimaan, kun sovellus avataan seuraavan kerran.
+settings-apps-full-access-hint = Se toimii hiekkalaatikkonsa ulkopuolella ja voi tehdä kaiken, mitä itse käynnistämäsi ohjelma voi. Poisto tulee voimaan seuraavalla avauskerralla.
 settings-apps-full-access-remove = Poista
 settings-apps-full-access-remove-app = Poista sovellukselta { $app } täysi käyttöoikeus
 settings-apps-passwords = Tallennetut salasanat
-settings-apps-passwords-hint = Sovellukset muistavat vastauksesi, kun ne pyytävät käyttää jotain avainnippuun tallennettua. Unohda se, niin sovellus kysyy uudelleen.
 settings-apps-passwords-forget = Unohda
 settings-apps-passwords-forget-app = Anna sovelluksen { $app } kysyä uudelleen
 settings-apps-permissions-allowed = { $allowed }/{ $total } sallittu
-settings-apps-permissions-count = { $count ->
-    [one] { $count } sovellus
-   *[other] { $count } sovellusta
+settings-apps-permissions-description = Hiekkalaatikossa olevat sovellukset saavat omat tiedostonsa ja vain sen, mitä sallit tässä.
+settings-apps-sandbox-only = Ei mitään hiekkalaatikon ulkopuolelta
+settings-apps-folders = Kansiot
+settings-apps-folders-hint = Se voi lukea ja muuttaa kaikkea näissä kansioissa seuraavasta avauskerrasta alkaen.
+settings-apps-folders-count = { $count ->
+    [one] { $count } kansio
+   *[other] { $count } kansiota
 }
+settings-apps-folder-add = Lisää kansio
+settings-apps-folder-remove = Poista
+settings-apps-folder-remove-app = Lopeta kansion { $folder } jakaminen
+settings-apps-usb = USB-laitteet
+settings-apps-usb-hint = Kuten suojausavaimet, puhelimet ja mikro-ohjaimet
+settings-apps-serial = Sarjalaitteet
+settings-apps-serial-hint = Kuten 3D-tulostimet ja USB:llä liitetyt piirilevyt
+settings-apps-full-access-off = Se toimii hiekkalaatikossa. Täysi käyttöoikeus poistaa hiekkalaatikon.
+settings-apps-full-access-give = Anna täysi käyttöoikeus

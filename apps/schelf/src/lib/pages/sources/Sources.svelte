@@ -2,7 +2,7 @@
 	import { Dialog, Row, Section, TextField } from '@luft/ui';
 	import type { AddedSource, CheckedSource } from '#lib/bridge/types.js';
 	import ProgressButton from '#lib/components/ProgressButton.svelte';
-	import TrustDialog from '#lib/components/TrustDialog.svelte';
+	import SourceTrustDialog from '#lib/components/SourceTrustDialog.svelte';
 	import { backend } from '#lib/bridge/index.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { operations } from '#lib/state/operations.svelte.js';
@@ -123,7 +123,7 @@
 </div>
 
 {#if trusting}
-	<TrustDialog source={trusting} onconfirm={() => add(trusting!)} onclose={() => (trusting = null)} />
+	<SourceTrustDialog source={trusting} onconfirm={() => add(trusting!)} onclose={() => (trusting = null)} />
 {/if}
 
 {#if removing}

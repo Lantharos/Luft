@@ -487,20 +487,31 @@ settings-apps-permissions = Permessi
 settings-apps-location = Post
 settings-apps-camera = Kamera
 settings-apps-clipboard = Klibbord fl-isfond
-settings-apps-clipboard-hint = Dawn l-apps jistgħu jaraw u jibdlu dak li tikkopja, anke waqt li tuża apps oħra.
 settings-apps-full-access = Aċċess sħiħ
-settings-apps-full-access-hint = Dawn l-apps jaħdmu barra mis-sandbox tagħhom u jitqiesu bħalek, bħall-apps installati fis-sistema. It-tneħħija tidħol fis-seħħ il-darba li jmiss li tinfetaħ l-app.
+settings-apps-full-access-hint = Taħdem barra mis-sandbox tagħha u tista' tagħmel dak kollu li jista' jagħmel programm li tibda int. It-tneħħija tidħol fis-seħħ il-ftuħ li jmiss.
 settings-apps-full-access-remove = Neħħi
 settings-apps-full-access-remove-app = Neħħi l-aċċess sħiħ minn { $app }
 settings-apps-passwords = Passwords issejvjati
-settings-apps-passwords-hint = L-apps jiftakru t-tweġiba tiegħek meta jitolbu jużaw xi ħaġa ssejvjata fiċ-ċurkett taċ-ċwievet. Insieha biex l-app terġa’ tistaqsi.
 settings-apps-passwords-forget = Insa
 settings-apps-passwords-forget-app = Ħalli lil { $app } terġa’ tistaqsi
 settings-apps-permissions-allowed = { $allowed } minn { $total } permessi
-settings-apps-permissions-count = { $count ->
-    [one] { $count } app
-    [two] { $count } apps
-    [few] { $count } apps
-    [many] { $count } apps
-   *[other] { $count } apps
+settings-apps-permissions-description = L-apps f'sandbox ikollhom il-fajls tagħhom u biss dak li tippermetti hawn.
+settings-apps-sandbox-only = Xejn lil hinn mis-sandbox tagħha
+settings-apps-folders = Folders
+settings-apps-folders-hint = Mill-ftuħ li jmiss tista' taqra u tibdel kollox f'dawn il-folders.
+settings-apps-folders-count = { $count ->
+    [one] { $count } folder
+    [two] { $count } folders
+    [few] { $count } folders
+    [many] { $count } folders
+   *[other] { $count } folders
 }
+settings-apps-folder-add = Żid folder
+settings-apps-folder-remove = Neħħi
+settings-apps-folder-remove-app = Ieqaf aqsam { $folder }
+settings-apps-usb = Apparat USB
+settings-apps-usb-hint = Bħal ċwievet tas-sigurtà, telefowns u mikrokontrollers
+settings-apps-serial = Apparat serjali
+settings-apps-serial-hint = Bħal printers 3D u boards imqabbda bl-USB
+settings-apps-full-access-off = Taħdem f'sandbox. L-aċċess sħiħ ineħħi s-sandbox.
+settings-apps-full-access-give = Agħti aċċess sħiħ

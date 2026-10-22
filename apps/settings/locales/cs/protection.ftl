@@ -474,19 +474,30 @@ settings-apps-permissions = Oprávnění
 settings-apps-location = Poloha
 settings-apps-camera = Kamera
 settings-apps-clipboard = Schránka na pozadí
-settings-apps-clipboard-hint = Tyto aplikace mohou vidět a měnit, co zkopírujete, i když používáte jiné aplikace.
 settings-apps-full-access = Úplný přístup
-settings-apps-full-access-hint = Tyto aplikace běží mimo své izolované prostředí a jednají za vás, stejně jako aplikace nainstalované v systému. Odebrání se projeví při příštím otevření aplikace.
+settings-apps-full-access-hint = Běží mimo svůj sandbox a může vše, co program, který spustíte sami. Odebrání platí od příštího otevření.
 settings-apps-full-access-remove = Odebrat
 settings-apps-full-access-remove-app = Odebrat aplikaci { $app } úplný přístup
 settings-apps-passwords = Uložená hesla
-settings-apps-passwords-hint = Aplikace si pamatují vaši odpověď, když žádají o použití něčeho uloženého v klíčence. Zapomeňte ji a aplikace se zeptá znovu.
 settings-apps-passwords-forget = Zapomenout
 settings-apps-passwords-forget-app = Nechat aplikaci { $app } zeptat se znovu
 settings-apps-permissions-allowed = Povoleno: { $allowed } z { $total }
-settings-apps-permissions-count = { $count ->
-    [one] { $count } aplikace
-    [few] { $count } aplikace
-    [many] { $count } aplikace
-   *[other] { $count } aplikací
+settings-apps-permissions-description = Aplikace v sandboxu dostávají vlastní soubory a jen to, co zde povolíte.
+settings-apps-sandbox-only = Nic mimo svůj sandbox
+settings-apps-folders = Složky
+settings-apps-folders-hint = Od příštího otevření může číst a měnit vše v těchto složkách.
+settings-apps-folders-count = { $count ->
+    [one] { $count } složka
+    [few] { $count } složky
+    [many] { $count } složky
+   *[other] { $count } složek
 }
+settings-apps-folder-add = Přidat složku
+settings-apps-folder-remove = Odebrat
+settings-apps-folder-remove-app = Přestat sdílet { $folder }
+settings-apps-usb = Zařízení USB
+settings-apps-usb-hint = Například bezpečnostní klíče, telefony a mikrokontroléry
+settings-apps-serial = Sériová zařízení
+settings-apps-serial-hint = Například 3D tiskárny a desky připojené přes USB
+settings-apps-full-access-off = Běží v sandboxu. Plný přístup sandbox odstraní.
+settings-apps-full-access-give = Udělit plný přístup

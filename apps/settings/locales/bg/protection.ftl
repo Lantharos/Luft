@@ -448,17 +448,28 @@ settings-apps-permissions = Разрешения
 settings-apps-location = Местоположение
 settings-apps-camera = Камера
 settings-apps-clipboard = Клипборд във фонов режим
-settings-apps-clipboard-hint = Тези приложения могат да виждат и променят това, което копирате, дори докато използвате други приложения.
 settings-apps-full-access = Пълен достъп
-settings-apps-full-access-hint = Тези приложения работят извън изолираната си среда и се смятат за вас, както приложенията, инсталирани в системата. Премахването важи от следващото отваряне на приложението.
+settings-apps-full-access-hint = Работи извън пясъчника си и може всичко, което може програма, която стартирате сами. Премахването важи от следващото му отваряне.
 settings-apps-full-access-remove = Премахни
 settings-apps-full-access-remove-app = Премахни пълния достъп на { $app }
 settings-apps-passwords = Запазени пароли
-settings-apps-passwords-hint = Приложенията запомнят отговора ви, когато поискат да използват нещо от ключодържателя ви. Забравете го, за да попита приложението отново.
 settings-apps-passwords-forget = Забрави
 settings-apps-passwords-forget-app = Нека { $app } попита отново
 settings-apps-permissions-allowed = Разрешени: { $allowed } от { $total }
-settings-apps-permissions-count = { $count ->
-    [one] { $count } приложение
-   *[other] { $count } приложения
+settings-apps-permissions-description = Приложенията в пясъчник получават собствените си файлове и само това, което разрешите тук.
+settings-apps-sandbox-only = Нищо извън пясъчника
+settings-apps-folders = Папки
+settings-apps-folders-hint = Може да чете и променя всичко в тези папки от следващото си отваряне.
+settings-apps-folders-count = { $count ->
+    [one] { $count } папка
+   *[other] { $count } папки
 }
+settings-apps-folder-add = Добавяне на папка
+settings-apps-folder-remove = Премахване
+settings-apps-folder-remove-app = Спиране на споделянето на { $folder }
+settings-apps-usb = USB устройства
+settings-apps-usb-hint = Например ключове за сигурност, телефони и микроконтролери
+settings-apps-serial = Серийни устройства
+settings-apps-serial-hint = Например 3D принтери и платки, свързани през USB
+settings-apps-full-access-off = Работи в пясъчник. Пълният достъп премахва пясъчника.
+settings-apps-full-access-give = Даване на пълен достъп

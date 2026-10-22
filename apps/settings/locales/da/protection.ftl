@@ -448,17 +448,28 @@ settings-apps-permissions = Tilladelser
 settings-apps-location = Placering
 settings-apps-camera = Kamera
 settings-apps-clipboard = Udklipsholder i baggrunden
-settings-apps-clipboard-hint = Disse apps kan se og ændre det, du kopierer, også mens du bruger andre apps.
 settings-apps-full-access = Fuld adgang
-settings-apps-full-access-hint = Disse apps kører uden for deres sandkasse og regnes som dig, ligesom apps installeret på systemet. Fjerner du den, gælder det næste gang appen åbnes.
+settings-apps-full-access-hint = Den kører uden for sin sandkasse og kan alt, hvad et program, du selv starter, kan. Det træder i kraft, næste gang den åbner, når du fjerner det.
 settings-apps-full-access-remove = Fjern
 settings-apps-full-access-remove-app = Fjern fuld adgang for { $app }
 settings-apps-passwords = Gemte adgangskoder
-settings-apps-passwords-hint = Apps husker dit svar, når de beder om at bruge noget fra din nøglering. Glem det, så spørger appen igen.
 settings-apps-passwords-forget = Glem
 settings-apps-passwords-forget-app = Lad { $app } spørge igen
 settings-apps-permissions-allowed = { $allowed } af { $total } tilladt
-settings-apps-permissions-count = { $count ->
-    [one] { $count } app
-   *[other] { $count } apps
+settings-apps-permissions-description = Apps i en sandkasse får deres egne filer og kun det, du tillader her.
+settings-apps-sandbox-only = Intet uden for sandkassen
+settings-apps-folders = Mapper
+settings-apps-folders-hint = Den kan læse og ændre alt i disse mapper, fra næste gang den åbner.
+settings-apps-folders-count = { $count ->
+    [one] { $count } mappe
+   *[other] { $count } mapper
 }
+settings-apps-folder-add = Tilføj mappe
+settings-apps-folder-remove = Fjern
+settings-apps-folder-remove-app = Stop med at dele { $folder }
+settings-apps-usb = USB-enheder
+settings-apps-usb-hint = Som sikkerhedsnøgler, telefoner og mikrocontrollere
+settings-apps-serial = Serielle enheder
+settings-apps-serial-hint = Som 3D-printere og kort, der er tilsluttet med USB
+settings-apps-full-access-off = Den kører i en sandkasse. Fuld adgang fjerner sandkassen.
+settings-apps-full-access-give = Giv fuld adgang

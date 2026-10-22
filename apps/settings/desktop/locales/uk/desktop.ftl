@@ -232,3 +232,4 @@ desktop-updates-another-app = інша програма
 desktop-updates-firmware-unnamed = Мікропрограма пристрою
 desktop-updates-firmware-current = Цей пристрій уже оновлено.
 desktop-updates-firmware-no-download = Це оновлення не вдається завантажити.
+desktop-apps-folder-title = Виберіть теку для застосунку

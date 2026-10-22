@@ -11,7 +11,7 @@ export type Route =
 	| { page: 'category'; category: CategoryId }
 	| { page: 'collection'; collection: Collection }
 	| { page: 'search'; query: string }
-	| { page: 'app'; target: AppTarget; name: string }
+	| { page: 'app'; target: AppTarget; name: string; askFullAccess?: boolean }
 	| { page: 'file'; path: string }
 	| { page: 'sources' };
 

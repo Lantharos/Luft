@@ -3,6 +3,7 @@ use std::path::{Path, PathBuf};
 use serde::Serialize;
 
 use super::elf;
+use super::integrate::{CHROMIUM, SANDBOX};
 use crate::apps::desktop::DesktopEntry;
 
 const ICON_FOLDERS: [u32; 13] = [16, 22, 24, 32, 36, 48, 64, 72, 96, 128, 192, 256, 512];
@@ -60,6 +61,8 @@ pub struct AppImage {
     pub desktop: PathBuf,
     pub size: u64,
     pub updatable: bool,
+    pub chromium: bool,
+    pub launcher: Option<PathBuf>,
 }
 
 pub fn folder() -> PathBuf {
@@ -139,6 +142,11 @@ fn executable(entry: &DesktopEntry) -> Option<PathBuf> {
         .find(|path| path.is_absolute() && is_appimage_path(path))
 }
 
+fn launcher(exec: &str) -> Option<PathBuf> {
+    let (program, rest) = exec.strip_prefix('"')?.split_once('"')?;
+    (rest.split_whitespace().next() == Some(SANDBOX)).then(|| PathBuf::from(program))
+}
+
 fn read(desktop: &Path) -> Option<AppImage> {
     let entry = DesktopEntry::read(desktop)?;
     let path = executable(&entry).filter(|path| path.exists())?;
@@ -150,6 +158,8 @@ fn read(desktop: &Path) -> Option<AppImage> {
         icon: entry.get("Icon").and_then(icon_path),
         size: path.metadata().map(|metadata| metadata.len()).unwrap_or(0),
         updatable: elf::section(&path, ".upd_info").is_some(),
+        chromium: entry.get(CHROMIUM) == Some("true"),
+        launcher: entry.get("Exec").and_then(launcher),
         desktop: desktop.to_path_buf(),
         path,
     })

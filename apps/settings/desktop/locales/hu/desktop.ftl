@@ -232,3 +232,4 @@ desktop-updates-another-app = egy másik alkalmazás
 desktop-updates-firmware-unnamed = Eszköz firmware-e
 desktop-updates-firmware-current = Ez az eszköz már naprakész.
 desktop-updates-firmware-no-download = Ez a frissítés nem tölthető le.
+desktop-apps-folder-title = Válassz mappát az alkalmazásnak

@@ -448,17 +448,28 @@ settings-apps-permissions = Permisos
 settings-apps-location = Ubicación
 settings-apps-camera = Cámara
 settings-apps-clipboard = Portapapeles en segundo plano
-settings-apps-clipboard-hint = Estas aplicaciones pueden ver y cambiar lo que copias, incluso mientras usas otras aplicaciones.
 settings-apps-full-access = Acceso total
-settings-apps-full-access-hint = Estas aplicaciones se ejecutan fuera de su espacio aislado y actúan como tú, igual que las aplicaciones instaladas en el sistema. Quitarlo se aplica la próxima vez que se abra la aplicación.
+settings-apps-full-access-hint = Funciona fuera de su entorno aislado y puede hacer todo lo que hace un programa que abras tú. Quitarlo se aplica la próxima vez que se abra.
 settings-apps-full-access-remove = Quitar
 settings-apps-full-access-remove-app = Quitar el acceso total a { $app }
 settings-apps-passwords = Contraseñas guardadas
-settings-apps-passwords-hint = Las aplicaciones recuerdan tu respuesta cuando piden usar algo guardado en tu llavero. Olvídala para que la aplicación vuelva a preguntar.
 settings-apps-passwords-forget = Olvidar
 settings-apps-passwords-forget-app = Hacer que { $app } vuelva a preguntar
 settings-apps-permissions-allowed = { $allowed } de { $total } permitidas
-settings-apps-permissions-count = { $count ->
-    [one] { $count } aplicación
-   *[other] { $count } aplicaciones
+settings-apps-permissions-description = Las aplicaciones en un entorno aislado tienen sus propios archivos y solo lo que permitas aquí.
+settings-apps-sandbox-only = Nada fuera de su entorno aislado
+settings-apps-folders = Carpetas
+settings-apps-folders-hint = Podrá leer y cambiar todo lo que hay en estas carpetas desde la próxima vez que se abra.
+settings-apps-folders-count = { $count ->
+    [one] { $count } carpeta
+   *[other] { $count } carpetas
 }
+settings-apps-folder-add = Añadir carpeta
+settings-apps-folder-remove = Quitar
+settings-apps-folder-remove-app = Dejar de compartir { $folder }
+settings-apps-usb = Dispositivos USB
+settings-apps-usb-hint = Como llaves de seguridad, teléfonos y microcontroladores
+settings-apps-serial = Dispositivos serie
+settings-apps-serial-hint = Como impresoras 3D y placas conectadas por USB
+settings-apps-full-access-off = Funciona en un entorno aislado. El acceso completo quita el aislamiento.
+settings-apps-full-access-give = Dar acceso completo

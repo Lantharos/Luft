@@ -232,3 +232,4 @@ desktop-updates-another-app = друга апликација
 desktop-updates-firmware-unnamed = Фирмвер уређаја
 desktop-updates-firmware-current = Овај уређај је већ ажуран.
 desktop-updates-firmware-no-download = Ово ажурирање не може да се преузме.
+desktop-apps-folder-title = Изаберите фасциклу за апликацију

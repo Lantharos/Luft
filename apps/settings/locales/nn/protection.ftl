@@ -448,17 +448,28 @@ settings-apps-permissions = Løyve
 settings-apps-location = Posisjon
 settings-apps-camera = Kamera
 settings-apps-clipboard = Utklippstavle i bakgrunnen
-settings-apps-clipboard-hint = Desse appane kan sjå og endre det du kopierer, også medan du brukar andre appar.
 settings-apps-full-access = Full tilgang
-settings-apps-full-access-hint = Desse appane køyrer utanfor sandkassa si og blir rekna som deg, slik som appar installerte på systemet. Fjernar du den, gjeld det neste gong appen blir opna.
+settings-apps-full-access-hint = Han køyrer utanfor sandkassa og kan alt eit program du startar sjølv kan. Fjerning gjeld frå neste gong han opnar.
 settings-apps-full-access-remove = Fjern
 settings-apps-full-access-remove-app = Fjern full tilgang for { $app }
 settings-apps-passwords = Lagra passord
-settings-apps-passwords-hint = Appar hugsar svaret ditt når dei ber om å bruke noko frå nøkkelringen. Gløym det, så spør appen på nytt.
 settings-apps-passwords-forget = Gløym
 settings-apps-passwords-forget-app = La { $app } spørje på nytt
 settings-apps-permissions-allowed = { $allowed } av { $total } har løyve
-settings-apps-permissions-count = { $count ->
-    [one] { $count } app
-   *[other] { $count } appar
+settings-apps-permissions-description = Appar i ei sandkasse får eigne filer og berre det du tillèt her.
+settings-apps-sandbox-only = Ingenting utanfor sandkassa
+settings-apps-folders = Mapper
+settings-apps-folders-hint = Frå neste gong han opnar, kan han lese og endre alt i desse mappene.
+settings-apps-folders-count = { $count ->
+    [one] { $count } mappe
+   *[other] { $count } mapper
 }
+settings-apps-folder-add = Legg til mappe
+settings-apps-folder-remove = Fjern
+settings-apps-folder-remove-app = Slutt å dele { $folder }
+settings-apps-usb = USB-einingar
+settings-apps-usb-hint = Til dømes tryggleiksnøklar, telefonar og mikrokontrollarar
+settings-apps-serial = Serielle einingar
+settings-apps-serial-hint = Til dømes 3D-skrivarar og kort kopla til med USB
+settings-apps-full-access-off = Han køyrer i ei sandkasse. Full tilgang fjernar sandkassa.
+settings-apps-full-access-give = Gje full tilgang

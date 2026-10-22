@@ -448,17 +448,28 @@ settings-apps-permissions = Engedélyek
 settings-apps-location = Hely
 settings-apps-camera = Kamera
 settings-apps-clipboard = Vágólap a háttérben
-settings-apps-clipboard-hint = Ezek az alkalmazások láthatják és módosíthatják, amit kimásol, akkor is, ha más alkalmazásokat használ.
 settings-apps-full-access = Teljes hozzáférés
-settings-apps-full-access-hint = Ezek az alkalmazások a homokozójukon kívül futnak, és Önnek számítanak, mint a rendszerre telepített alkalmazások. Az eltávolítás az alkalmazás következő megnyitásakor lép életbe.
+settings-apps-full-access-hint = A homokozóján kívül fut, és mindent megtehet, amit egy általad indított program. Az eltávolítás a következő indításkor lép életbe.
 settings-apps-full-access-remove = Eltávolítás
 settings-apps-full-access-remove-app = Teljes hozzáférés eltávolítása ettől: { $app }
 settings-apps-passwords = Mentett jelszavak
-settings-apps-passwords-hint = Az alkalmazások megjegyzik a válaszát, amikor a kulcstartóban tárolt valamit szeretnének használni. Felejtse el, és az alkalmazás újra rákérdez.
 settings-apps-passwords-forget = Elfelejtés
 settings-apps-passwords-forget-app = { $app } újra kérdezhessen
 settings-apps-permissions-allowed = { $allowed }/{ $total } engedélyezve
-settings-apps-permissions-count = { $count ->
-    [one] { $count } alkalmazás
-   *[other] { $count } alkalmazás
+settings-apps-permissions-description = A homokozóban futó alkalmazások saját fájlokat kapnak, és csak azt, amit itt engedélyezel.
+settings-apps-sandbox-only = Semmi a homokozóján kívül
+settings-apps-folders = Mappák
+settings-apps-folders-hint = A következő indítástól mindent olvashat és módosíthat ezekben a mappákban.
+settings-apps-folders-count = { $count ->
+    [one] { $count } mappa
+   *[other] { $count } mappa
 }
+settings-apps-folder-add = Mappa hozzáadása
+settings-apps-folder-remove = Eltávolítás
+settings-apps-folder-remove-app = { $folder } megosztásának leállítása
+settings-apps-usb = USB-eszközök
+settings-apps-usb-hint = Például biztonsági kulcsok, telefonok és mikrovezérlők
+settings-apps-serial = Soros eszközök
+settings-apps-serial-hint = Például 3D-nyomtatók és USB-n csatlakozó panelek
+settings-apps-full-access-off = Homokozóban fut. A teljes hozzáférés megszünteti a homokozót.
+settings-apps-full-access-give = Teljes hozzáférés megadása

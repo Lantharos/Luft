@@ -448,17 +448,28 @@ settings-apps-permissions = Permissões
 settings-apps-location = Localização
 settings-apps-camera = Câmera
 settings-apps-clipboard = Área de transferência em segundo plano
-settings-apps-clipboard-hint = Estes apps podem ver e alterar o que você copia, mesmo enquanto você usa outros apps.
 settings-apps-full-access = Acesso total
-settings-apps-full-access-hint = Estes apps rodam fora do sandbox e agem como você, como os apps instalados no sistema. A remoção vale a partir da próxima vez que o app abrir.
+settings-apps-full-access-hint = Ele roda fora do ambiente isolado e pode fazer tudo o que um programa que você mesmo abre pode. A remoção vale a partir da próxima vez que abrir.
 settings-apps-full-access-remove = Remover
 settings-apps-full-access-remove-app = Remover o acesso total do { $app }
 settings-apps-passwords = Senhas salvas
-settings-apps-passwords-hint = Os apps lembram sua resposta quando pedem para usar algo salvo no Chaveiro. Esqueça a resposta para que o app pergunte de novo.
 settings-apps-passwords-forget = Esquecer
 settings-apps-passwords-forget-app = Fazer o { $app } perguntar de novo
 settings-apps-permissions-allowed = { $allowed } de { $total } permitidos
-settings-apps-permissions-count = { $count ->
-    [one] { $count } app
-   *[other] { $count } apps
+settings-apps-permissions-description = Apps em um ambiente isolado recebem seus próprios arquivos e só o que você permitir aqui.
+settings-apps-sandbox-only = Nada além do ambiente isolado
+settings-apps-folders = Pastas
+settings-apps-folders-hint = A partir da próxima vez que abrir, ele pode ler e alterar tudo nestas pastas.
+settings-apps-folders-count = { $count ->
+    [one] { $count } pasta
+   *[other] { $count } pastas
 }
+settings-apps-folder-add = Adicionar pasta
+settings-apps-folder-remove = Remover
+settings-apps-folder-remove-app = Parar de compartilhar { $folder }
+settings-apps-usb = Dispositivos USB
+settings-apps-usb-hint = Como chaves de segurança, celulares e microcontroladores
+settings-apps-serial = Dispositivos seriais
+settings-apps-serial-hint = Como impressoras 3D e placas conectadas por USB
+settings-apps-full-access-off = Ele roda em um ambiente isolado. O acesso total tira o isolamento.
+settings-apps-full-access-give = Dar acesso total

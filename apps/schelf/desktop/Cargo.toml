@@ -18,6 +18,7 @@ gio.workspace = true
 gio-unix.workspace = true
 libc.workspace = true
 luft-app = { workspace = true, features = ["apps", "launch"] }
+luft-sandbox.workspace = true
 luft-software = { workspace = true, features = ["default"] }
 quick-xml.workspace = true
 sabine.workspace = true

@@ -448,17 +448,28 @@ settings-apps-permissions = Άδειες
 settings-apps-location = Τοποθεσία
 settings-apps-camera = Κάμερα
 settings-apps-clipboard = Πρόχειρο στο παρασκήνιο
-settings-apps-clipboard-hint = Αυτές οι εφαρμογές μπορούν να βλέπουν και να αλλάζουν ό,τι αντιγράφετε, ακόμα και όταν χρησιμοποιείτε άλλες εφαρμογές.
 settings-apps-full-access = Πλήρης πρόσβαση
-settings-apps-full-access-hint = Αυτές οι εφαρμογές εκτελούνται εκτός του απομονωμένου περιβάλλοντός τους και λογίζονται ως εσείς, όπως οι εφαρμογές που είναι εγκατεστημένες στο σύστημα. Η αφαίρεση ισχύει από το επόμενο άνοιγμα της εφαρμογής.
+settings-apps-full-access-hint = Εκτελείται εκτός του περιβάλλοντος απομόνωσης και μπορεί ό,τι μπορεί ένα πρόγραμμα που ξεκινάτε εσείς. Η αφαίρεση ισχύει από το επόμενο άνοιγμα.
 settings-apps-full-access-remove = Αφαίρεση
 settings-apps-full-access-remove-app = Αφαίρεση πλήρους πρόσβασης από το { $app }
 settings-apps-passwords = Αποθηκευμένοι κωδικοί πρόσβασης
-settings-apps-passwords-hint = Οι εφαρμογές θυμούνται την απάντησή σας όταν ζητούν να χρησιμοποιήσουν κάτι από την κλειδοθήκη σας. Ξεχάστε την για να ρωτήσει ξανά η εφαρμογή.
 settings-apps-passwords-forget = Επαναφορά
 settings-apps-passwords-forget-app = Να ρωτήσει ξανά το { $app }
 settings-apps-permissions-allowed = Επιτρέπονται { $allowed } από { $total }
-settings-apps-permissions-count = { $count ->
-    [one] { $count } εφαρμογή
-   *[other] { $count } εφαρμογές
+settings-apps-permissions-description = Οι εφαρμογές σε περιβάλλον απομόνωσης έχουν τα δικά τους αρχεία και μόνο ό,τι επιτρέπετε εδώ.
+settings-apps-sandbox-only = Τίποτα έξω από το περιβάλλον απομόνωσης
+settings-apps-folders = Φάκελοι
+settings-apps-folders-hint = Από το επόμενο άνοιγμα μπορεί να διαβάζει και να αλλάζει τα πάντα σε αυτούς τους φακέλους.
+settings-apps-folders-count = { $count ->
+    [one] { $count } φάκελος
+   *[other] { $count } φάκελοι
 }
+settings-apps-folder-add = Προσθήκη φακέλου
+settings-apps-folder-remove = Αφαίρεση
+settings-apps-folder-remove-app = Διακοπή κοινής χρήσης του { $folder }
+settings-apps-usb = Συσκευές USB
+settings-apps-usb-hint = Όπως κλειδιά ασφαλείας, τηλέφωνα και μικροελεγκτές
+settings-apps-serial = Σειριακές συσκευές
+settings-apps-serial-hint = Όπως εκτυπωτές 3D και πλακέτες συνδεδεμένες μέσω USB
+settings-apps-full-access-off = Εκτελείται σε περιβάλλον απομόνωσης. Η πλήρης πρόσβαση το καταργεί.
+settings-apps-full-access-give = Παροχή πλήρους πρόσβασης

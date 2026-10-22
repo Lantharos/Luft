@@ -1,14 +1,17 @@
-import { appsAnswering, answerOf, BACKGROUND_CLIPBOARD, FULL_ACCESS, lookupSync, watchStore, type Apps, type Permission } from '../../shared/dbus/permissionStore.js';
+import { appsAnswering, answerOf, BACKGROUND_CLIPBOARD, FULL_ACCESS, lookupSync, setAnswer, watchStore, type Apps, type Permission } from '../../shared/dbus/permissionStore.js';
 
 const PASSWORD_MANAGERS = ['com.onepassword.OnePassword', 'org.keepassxc.KeePassXC', 'com.bitwarden.desktop'];
+const ANSWERED_BY_DEFAULT = new Map<Permission, string[]>([[BACKGROUND_CLIPBOARD, PASSWORD_MANAGERS]]);
+const PERMISSIONS = [FULL_ACCESS, BACKGROUND_CLIPBOARD];
 
-const PERMITTED = new Map<Permission, (apps: Apps) => string[]>([
-  [FULL_ACCESS, apps => appsAnswering(apps, 'yes')],
-  [BACKGROUND_CLIPBOARD, apps => [...new Set([...PASSWORD_MANAGERS, ...appsAnswering(apps, 'yes')])].filter(app => answerOf(apps, app) !== 'no')],
-]);
+function answerDefaults(permission: Permission, apps: Apps): void {
+  for (const app of ANSWERED_BY_DEFAULT.get(permission) ?? [])
+    if (answerOf(apps, app) === null) void setAnswer(permission, app, 'yes').catch(error => console.error(`Kestrel couldn't give ${app} ${permission.table}`, error));
+}
 
 function apply(permission: Permission, apps: Apps): void {
-  global.context.set_permitted_apps(permission.table, PERMITTED.get(permission)!(apps));
+  answerDefaults(permission, apps);
+  global.context.set_permitted_apps(permission.table, appsAnswering(apps, 'yes'));
 }
 
 function stored(permission: Permission): Apps {
@@ -21,6 +24,6 @@ function stored(permission: Permission): Apps {
 }
 
 export function followAppPermissions(): void {
-  watchStore([...PERMITTED.keys()], apply);
-  for (const permission of PERMITTED.keys()) apply(permission, stored(permission));
+  watchStore(PERMISSIONS, apply);
+  for (const permission of PERMISSIONS) apply(permission, stored(permission));
 }

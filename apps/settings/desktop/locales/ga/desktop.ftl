@@ -232,3 +232,4 @@ desktop-updates-another-app = aip eile
 desktop-updates-firmware-unnamed = Dochtearraí an ghléis
 desktop-updates-firmware-current = Tá an gléas seo cothrom le dáta cheana.
 desktop-updates-firmware-no-download = Ní féidir an nuashonrú seo a íoslódáil.
+desktop-apps-folder-title = Roghnaigh fillteán don aip

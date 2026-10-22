@@ -457,18 +457,29 @@ settings-apps-permissions = Dozvole
 settings-apps-location = Lokacija
 settings-apps-camera = Kamera
 settings-apps-clipboard = Međuspremnik u pozadini
-settings-apps-clipboard-hint = Ove aplikacije mogu vidjeti i mijenjati ono što kopirate, čak i dok koristite druge aplikacije.
 settings-apps-full-access = Puni pristup
-settings-apps-full-access-hint = Ove aplikacije rade izvan svog izolovanog okruženja i smatraju se vama, kao aplikacije instalirane na sistemu. Uklanjanje stupa na snagu kad se aplikacija sljedeći put otvori.
+settings-apps-full-access-hint = Radi izvan svog sandboxa i može sve što može program koji sami pokrenete. Uklanjanje važi od sljedećeg otvaranja.
 settings-apps-full-access-remove = Ukloni
 settings-apps-full-access-remove-app = Ukloni puni pristup za { $app }
 settings-apps-passwords = Sačuvane lozinke
-settings-apps-passwords-hint = Aplikacije pamte vaš odgovor kad traže da koriste nešto iz privjeska ključeva. Zaboravite ga i aplikacija će ponovo pitati.
 settings-apps-passwords-forget = Zaboravi
 settings-apps-passwords-forget-app = Neka { $app } ponovo pita
 settings-apps-permissions-allowed = Dozvoljeno: { $allowed } od { $total }
-settings-apps-permissions-count = { $count ->
-    [one] { $count } aplikacija
-    [few] { $count } aplikacije
-   *[other] { $count } aplikacija
+settings-apps-permissions-description = Aplikacije u sandboxu dobijaju svoje datoteke i samo ono što ovdje dozvolite.
+settings-apps-sandbox-only = Ništa izvan sandboxa
+settings-apps-folders = Mape
+settings-apps-folders-hint = Može čitati i mijenjati sve u ovim mapama od sljedećeg otvaranja.
+settings-apps-folders-count = { $count ->
+    [one] { $count } mapa
+    [few] { $count } mape
+   *[other] { $count } mapa
 }
+settings-apps-folder-add = Dodaj mapu
+settings-apps-folder-remove = Ukloni
+settings-apps-folder-remove-app = Prestani dijeliti { $folder }
+settings-apps-usb = USB uređaji
+settings-apps-usb-hint = Poput sigurnosnih ključeva, telefona i mikrokontrolera
+settings-apps-serial = Serijski uređaji
+settings-apps-serial-hint = Poput 3D printera i ploča povezanih preko USB-a
+settings-apps-full-access-off = Radi u sandboxu. Puni pristup uklanja sandbox.
+settings-apps-full-access-give = Daj puni pristup

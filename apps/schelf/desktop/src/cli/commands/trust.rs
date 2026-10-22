@@ -9,38 +9,48 @@ use crate::cli::terminal::{Ink, prompt};
 use crate::library::full_access;
 use crate::library::{InstalledApp, Source};
 
-const ABILITIES: [&str; 4] = [
-    "see and change all your files",
-    "read the clipboard in the background",
-    "control other apps' windows",
-    "act like an app installed on the system",
+const ABILITIES: [&str; 5] = [
+    "read, change and delete all your files",
+    "use every device, such as USB drives, cameras and game controllers",
+    "read what you copy, even while it's in the background",
+    "read the passwords and keys saved in your keyring, other apps' too",
+    "start any program as you, outside a sandbox",
 ];
 
-fn flatpak_named(name: &str, everything: &[InstalledApp], yes: bool) -> Result<InstalledApp, Exit> {
+fn sandboxed(app: &InstalledApp) -> bool {
+    match app.source {
+        Source::AppImage => true,
+        Source::Flatpak => full_access::offered_for_flatpaks(),
+        _ => false,
+    }
+}
+
+fn sandboxed_named(
+    name: &str,
+    everything: &[InstalledApp],
+    yes: bool,
+) -> Result<InstalledApp, Exit> {
     let ink = Ink::stderr();
     let found = installed::matching(everything.to_vec(), name);
-    let (mut flatpaks, others): (Vec<InstalledApp>, Vec<InstalledApp>) = found
-        .into_iter()
-        .partition(|app| app.source == Source::Flatpak);
-    match (flatpaks.len(), others.first()) {
+    let (mut apps, others): (Vec<InstalledApp>, Vec<InstalledApp>) =
+        found.into_iter().partition(sandboxed);
+    match (apps.len(), others.first()) {
         (0, None) => {
             eprintln!("{} isn't installed.", ink.bold(name));
             Err(Exit::Missing)
         }
         (0, Some(app)) => {
-            let how = if app.source == Source::AppImage {
-                "is an AppImage, which already runs outside a sandbox"
-            } else {
-                "isn't in a sandbox, so it has full access already"
-            };
-            eprintln!("{} {how}.", ink.bold(&app.name));
+            eprintln!(
+                "{} isn't in a sandbox, so it has full access already.",
+                ink.bold(&app.name)
+            );
             Err(Exit::Usage)
         }
-        (1, _) => Ok(flatpaks.remove(0)),
+        (1, _) => Ok(apps.remove(0)),
         _ => {
-            let options: Vec<String> = flatpaks.iter().map(installed::describe).collect();
+            let options: Vec<String> = apps.iter().map(installed::describe).collect();
             let chosen = pick(name, &options, yes, "Name it by its app ID instead.")?;
-            Ok(flatpaks.swap_remove(chosen))
+            Ok(apps.swap_remove(chosen))
         }
     }
 }
@@ -83,7 +93,12 @@ fn change(app: &InstalledApp, on: bool, yes: bool) -> Exit {
     if on && let Err(exit) = warn(app, yes) {
         return exit;
     }
-    match block_on(full_access::set(app.id.clone(), on)) {
+    let change = full_access::Change {
+        id: app.id.clone(),
+        source: app.source,
+        on,
+    };
+    match block_on(full_access::set(change)) {
         Ok(()) if on => {
             println!(
                 "{} has full access from the next time it opens.",
@@ -106,21 +121,17 @@ fn change(app: &InstalledApp, on: bool, yes: bool) -> Exit {
 }
 
 pub fn run(arguments: &Arguments, on: bool) -> Exit {
-    if !full_access::offered() {
-        eprintln!("Full access is for Flatpak apps on Luft.");
-        return Exit::Usage;
-    }
     if arguments
         .only
-        .is_some_and(|origin| origin != Origin::Flathub)
+        .is_some_and(|origin| origin != Origin::Flathub && origin != Origin::AppImage)
     {
-        eprintln!("Only Flatpak apps run in a sandbox.");
+        eprintln!("Only Flatpak apps and AppImages run in a sandbox.");
         return Exit::Usage;
     }
     let everything = installed::all(None);
     let mut worst = Exit::Done;
     for name in &arguments.words {
-        let exit = match flatpak_named(name, &everything, arguments.yes) {
+        let exit = match sandboxed_named(name, &everything, arguments.yes) {
             Ok(app) => change(&app, on, arguments.yes),
             Err(exit) => exit,
         };

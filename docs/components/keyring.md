@@ -13,20 +13,22 @@ Luft Keyring ([kestrel/keyring](../../kestrel/keyring)) keeps passwords, tokens 
 
 ## App access
 
-Each request is tied to the app that made it, by its Flatpak or app ID, launcher entry or program path. Luft apps are known by their system-wide install in `/usr/lib/sabine`; a copy in your own Sabine folder counts as any other app. An AppImage counts as the image file it runs from, whichever folder it is mounted at. The Chromium that Sabine apps share counts as one app, Sabine apps, since it keeps every Sabine app's web data under a single key. An app can always use what it saved; anything else asks first, and Settings shows and revokes those choices along with the access history. Tools such as `secret-tool` and Seahorse are asked like any other app. A program that can't be identified is asked every time, and its answer is never remembered.
+The keyring tells apps apart only as [Who an app is](../security.md#who-an-app-is) describes. Programs you run outside a sandbox are all you: they use every item without being asked, including what sandboxed apps saved. A sandboxed app, whether a Flatpak or an AppImage in Schelf's sandbox, is known by its app ID: it uses what it saved without being asked, is asked once before it uses one of your items and can be told to remember the answer, and needs you to confirm with your fingerprint or password before it uses an item another sandboxed app saved. Remembered answers live in the permission store's `keyring-items` table, and Settings shows them under Apps. A sandboxed app whose sandbox can't be read is asked every time, and its answer is never remembered. Portal secrets and passkeys stay with the app they belong to.
 
-Only Settings manages the keyring. A debug build of the keyring also lets a Settings build do so when `LUFT_KEYRING_DEVELOPMENT_SETTINGS` names that build's program.
+Managing the keyring, such as reading the access history or removing an SSH key, works only for programs outside a sandbox and asks you to confirm it's you first; after that, the same program can keep managing for five minutes.
 
 ## App secrets
 
-Apps can keep tokens that only they can read back, on `com.lantharos.Keyring1.AppSecrets` at `/com/lantharos/Keyring1`. Secrets travel through file descriptors, never over the bus.
+Apps can keep tokens of their own, on `com.lantharos.Keyring1.AppSecrets` at `/com/lantharos/Keyring1`. Secrets travel through file descriptors, never over the bus.
 
 | Method | Does |
 | --- | --- |
-| `Store(s name, h secret)` | Keeps up to 1 MiB read from the file descriptor |
-| `Load(s name, h output) → b` | Writes the secret to the file descriptor; false when there is none |
-| `Delete(s name) → b` | Removes it |
-| `List() → as` | Names the app has kept |
+| `Store(s app, s name, h secret)` | Keeps up to 1 MiB read from the file descriptor |
+| `Load(s app, s name, h output) → b` | Writes the secret to the file descriptor; false when there is none |
+| `Delete(s app, s name) → b` | Removes it |
+| `List(s app) → as` | Names the app has kept |
+
+`app` is the caller's app ID. A sandboxed app can only name its own; programs outside a sandbox keep each app's secrets apart by the ID they name, which separates them but doesn't keep one from another, since they are all you.
 
 Luft apps use them through `luft-app`:
 

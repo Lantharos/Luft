@@ -14,6 +14,15 @@ import Usb from '@lucide/svelte/icons/usb';
 import Volume2 from '@lucide/svelte/icons/volume-2';
 import type { Permissions } from '#lib/bridge/types.js';
 
+export const APPIMAGE_SANDBOX: Permissions = {
+	shared: ['network', 'ipc'],
+	sockets: ['wayland', 'fallback-x11', 'pulseaudio'],
+	devices: ['dri'],
+	filesystems: [],
+	sessionBus: [],
+	systemBus: []
+};
+
 export interface Access {
 	icon: Component;
 	title: string;

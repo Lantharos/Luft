@@ -461,18 +461,29 @@ settings-apps-permissions = Atļaujas
 settings-apps-location = Atrašanās vieta
 settings-apps-camera = Kamera
 settings-apps-clipboard = Starpliktuve fonā
-settings-apps-clipboard-hint = Šīs lietotnes var redzēt un mainīt to, ko kopējat, pat kamēr izmantojat citas lietotnes.
 settings-apps-full-access = Pilna piekļuve
-settings-apps-full-access-hint = Šīs lietotnes darbojas ārpus savas smilškastes un tiek uzskatītas par jums, tāpat kā sistēmā instalētās lietotnes. Noņemšana stāsies spēkā, kad lietotne tiks atvērta nākamreiz.
+settings-apps-full-access-hint = Tā darbojas ārpus smilškastes un var visu, ko var jūsu palaista programma. Noņemšana stājas spēkā nākamajā atvēršanā.
 settings-apps-full-access-remove = Noņemt
 settings-apps-full-access-remove-app = Noņemt pilnu piekļuvi lietotnei { $app }
 settings-apps-passwords = Saglabātās paroles
-settings-apps-passwords-hint = Lietotnes atceras jūsu atbildi, kad lūdz izmantot kaut ko no atslēgu saišķa. Aizmirstiet to, lai lietotne jautātu vēlreiz.
 settings-apps-passwords-forget = Aizmirst
 settings-apps-passwords-forget-app = Ļaut lietotnei { $app } jautāt vēlreiz
 settings-apps-permissions-allowed = Atļauts: { $allowed } no { $total }
-settings-apps-permissions-count = { $count ->
-    [zero] { $count } lietotņu
-    [one] { $count } lietotne
-   *[other] { $count } lietotnes
+settings-apps-permissions-description = Lietotnes smilškastē saņem savus failus un tikai to, ko šeit atļaujat.
+settings-apps-sandbox-only = Nekā ārpus smilškastes
+settings-apps-folders = Mapes
+settings-apps-folders-hint = No nākamās atvēršanas tā varēs lasīt un mainīt visu šajās mapēs.
+settings-apps-folders-count = { $count ->
+    [zero] { $count } mapju
+    [one] { $count } mape
+   *[other] { $count } mapes
 }
+settings-apps-folder-add = Pievienot mapi
+settings-apps-folder-remove = Noņemt
+settings-apps-folder-remove-app = Pārtraukt koplietot { $folder }
+settings-apps-usb = USB ierīces
+settings-apps-usb-hint = Piemēram, drošības atslēgas, tālruņi un mikrokontrolleri
+settings-apps-serial = Seriālās ierīces
+settings-apps-serial-hint = Piemēram, 3D printeri un caur USB pievienotas plates
+settings-apps-full-access-off = Tā darbojas smilškastē. Pilna piekļuve noņem smilškasti.
+settings-apps-full-access-give = Piešķirt pilnu piekļuvi

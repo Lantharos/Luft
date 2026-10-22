@@ -448,17 +448,28 @@ settings-apps-permissions = Behörigheter
 settings-apps-location = Plats
 settings-apps-camera = Kamera
 settings-apps-clipboard = Urklipp i bakgrunden
-settings-apps-clipboard-hint = De här apparna kan se och ändra det du kopierar, även medan du använder andra appar.
 settings-apps-full-access = Full åtkomst
-settings-apps-full-access-hint = De här apparna körs utanför sin sandlåda och räknas som du, precis som appar som är installerade i systemet. Tar du bort den gäller det nästa gång appen öppnas.
+settings-apps-full-access-hint = Den körs utanför sin sandlåda och kan allt ett program du startar själv kan. Borttagningen gäller från nästa gång den öppnas.
 settings-apps-full-access-remove = Ta bort
 settings-apps-full-access-remove-app = Ta bort full åtkomst för { $app }
 settings-apps-passwords = Sparade lösenord
-settings-apps-passwords-hint = Appar kommer ihåg ditt svar när de ber om att använda något i nyckelringen. Glöm det så frågar appen igen.
 settings-apps-passwords-forget = Glöm
 settings-apps-passwords-forget-app = Låt { $app } fråga igen
 settings-apps-permissions-allowed = { $allowed } av { $total } tillåtna
-settings-apps-permissions-count = { $count ->
-    [one] { $count } app
-   *[other] { $count } appar
+settings-apps-permissions-description = Appar i en sandlåda får egna filer och bara det du tillåter här.
+settings-apps-sandbox-only = Inget utanför sandlådan
+settings-apps-folders = Mappar
+settings-apps-folders-hint = Från nästa gång den öppnas kan den läsa och ändra allt i de här mapparna.
+settings-apps-folders-count = { $count ->
+    [one] { $count } mapp
+   *[other] { $count } mappar
 }
+settings-apps-folder-add = Lägg till mapp
+settings-apps-folder-remove = Ta bort
+settings-apps-folder-remove-app = Sluta dela { $folder }
+settings-apps-usb = USB-enheter
+settings-apps-usb-hint = Som säkerhetsnycklar, telefoner och mikrokontroller
+settings-apps-serial = Seriella enheter
+settings-apps-serial-hint = Som 3D-skrivare och kort anslutna via USB
+settings-apps-full-access-off = Den körs i en sandlåda. Full åtkomst tar bort sandlådan.
+settings-apps-full-access-give = Ge full åtkomst

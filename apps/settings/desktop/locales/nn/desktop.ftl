@@ -232,3 +232,4 @@ desktop-updates-another-app = ein annan app
 desktop-updates-firmware-unnamed = Einingsfastvare
 desktop-updates-firmware-current = Denne eininga er alt oppdatert.
 desktop-updates-firmware-no-download = Denne oppdateringa kan ikkje lastast ned.
+desktop-apps-folder-title = Vel ei mappe for appen

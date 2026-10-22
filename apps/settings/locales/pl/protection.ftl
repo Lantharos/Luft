@@ -474,19 +474,30 @@ settings-apps-permissions = Uprawnienia
 settings-apps-location = Lokalizacja
 settings-apps-camera = Kamera
 settings-apps-clipboard = Schowek w tle
-settings-apps-clipboard-hint = Te aplikacje mogą widzieć i zmieniać to, co kopiujesz, nawet gdy używasz innych aplikacji.
 settings-apps-full-access = Pełny dostęp
-settings-apps-full-access-hint = Te aplikacje działają poza swoją piaskownicą i są traktowane jak ty, podobnie jak aplikacje zainstalowane w systemie. Usunięcie zacznie działać przy następnym otwarciu aplikacji.
+settings-apps-full-access-hint = Działa poza swoją piaskownicą i może wszystko, co program uruchomiony przez ciebie. Usunięcie zacznie działać przy następnym uruchomieniu.
 settings-apps-full-access-remove = Usuń
 settings-apps-full-access-remove-app = Usuń pełny dostęp aplikacji { $app }
 settings-apps-passwords = Zapisane hasła
-settings-apps-passwords-hint = Aplikacje zapamiętują twoją odpowiedź, gdy proszą o użycie czegoś z pęku kluczy. Zapomnij ją, aby aplikacja zapytała ponownie.
 settings-apps-passwords-forget = Zapomnij
 settings-apps-passwords-forget-app = Pozwól aplikacji { $app } zapytać ponownie
 settings-apps-permissions-allowed = Dozwolone: { $allowed } z { $total }
-settings-apps-permissions-count = { $count ->
-    [one] { $count } aplikacja
-    [few] { $count } aplikacje
-    [many] { $count } aplikacji
-   *[other] { $count } aplikacji
+settings-apps-permissions-description = Aplikacje w piaskownicy dostają własne pliki i tylko to, na co tu zezwolisz.
+settings-apps-sandbox-only = Nic poza piaskownicą
+settings-apps-folders = Foldery
+settings-apps-folders-hint = Od następnego uruchomienia może czytać i zmieniać wszystko w tych folderach.
+settings-apps-folders-count = { $count ->
+    [one] { $count } folder
+    [few] { $count } foldery
+    [many] { $count } folderów
+   *[other] { $count } folderu
 }
+settings-apps-folder-add = Dodaj folder
+settings-apps-folder-remove = Usuń
+settings-apps-folder-remove-app = Przestań udostępniać { $folder }
+settings-apps-usb = Urządzenia USB
+settings-apps-usb-hint = Na przykład klucze bezpieczeństwa, telefony i mikrokontrolery
+settings-apps-serial = Urządzenia szeregowe
+settings-apps-serial-hint = Na przykład drukarki 3D i płytki podłączone przez USB
+settings-apps-full-access-off = Działa w piaskownicy. Pełny dostęp usuwa piaskownicę.
+settings-apps-full-access-give = Daj pełny dostęp

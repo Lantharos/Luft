@@ -232,3 +232,4 @@ desktop-updates-another-app = una altra aplicació
 desktop-updates-firmware-unnamed = Microprogramari del dispositiu
 desktop-updates-firmware-current = Aquest dispositiu ja està actualitzat.
 desktop-updates-firmware-no-download = Aquesta actualització no es pot baixar.
+desktop-apps-folder-title = Tria una carpeta per a l'aplicació

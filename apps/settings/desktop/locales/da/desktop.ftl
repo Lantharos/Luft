@@ -232,3 +232,4 @@ desktop-updates-another-app = en anden app
 desktop-updates-firmware-unnamed = Enhedsfirmware
 desktop-updates-firmware-current = Denne enhed er allerede opdateret.
 desktop-updates-firmware-no-download = Denne opdatering kan ikke hentes.
+desktop-apps-folder-title = Vælg en mappe til appen

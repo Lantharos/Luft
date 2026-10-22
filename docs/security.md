@@ -172,6 +172,17 @@ The Rust services share these rules through the `luft-identity` crate, Kestrel's
 
 A program running as you can make a sandbox of its own that names any app, so it can pass as a sandboxed app, but never the other way round: a sandboxed app can't make itself look like you.
 
+## The AppImage sandbox
+
+Schelf starts every AppImage it installs in a sandbox, through `schelf --sandbox APP-ID`, unless you gave it full access.
+
+- **Its files.** Nothing from the AppImage runs before the sandbox is up: `squashfuse` from the system mounts the image read-only from outside, and bubblewrap shows it to the app at `/app`. The app gets `/usr` and `/etc` read-only, a private `/tmp` shared by its own windows, a fresh `/proc` and `/dev`, and its own folder, `~/.var/app/APP-ID`, in place of your home folder. Other files reach it only through the document portal: what you pick in the file chooser, which GTK, Qt and Electron apps are made to use, and the files it was opened with.
+- **Its connections.** It talks to the session bus through `xdg-dbus-proxy`, which only lets it reach the desktop portal, notifications, the Secret Service and tray icons, and own names under its app ID. Wayland comes through a socket Kestrel tags with the app ID, and the app also gets X11, PipeWire and the graphics card. X11 apps can see each other's input and windows, so an app that uses X11 is only as isolated as X11 allows.
+- **Its identity.** The app ID is the name Schelf gave its menu entry, which Schelf only gives an AppImage when no other installed app uses it. The sandbox and the bus proxy carry it in a `.flatpak-info`, as Flatpak's do, so the desktop portal, Kestrel and Luft's services treat it like a Flatpak with that ID. Its secrets, permissions and data stay the same from one launch to the next.
+- **The kernel.** The sandbox has no capabilities, can't make user namespaces of its own, and a seccomp filter refuses the kernel keyrings, `ptrace`, `perf_event_open`, memory placement calls and typing into the terminal it was started from.
+- **Chromium and Electron.** Chromium's own sandbox needs user namespaces, and with a `.flatpak-info` present it asks Flatpak's portal to start its helpers, which can't serve this sandbox. Luft starts these apps with `--no-sandbox` and keeps user namespaces off instead: letting an app make its own namespaces would open the kernel's largest attack surface to it, while the bubblewrap sandbox already holds the whole app, renderers included. A page that breaks out of a renderer reaches what the app can reach, its own folder and connections, and nothing else.
+- **More access.** When an app closes within a few seconds of starting, or opens one of the stand-ins the sandbox puts where your USB, HID and serial devices would be, Luft offers to review its access, which opens Schelf's full access confirmation. Settings → Apps can also give it a folder or USB or serial devices, kept in the permission store's `sandbox` table.
+
 ## Confirming it's you
 
 Some things are sensitive no matter which of your programs asks, because they would show your secrets, cross into a Flatpak app's, or weaken a protection. For those, Luft asks the person at the screen instead of trusting the caller: Kestrel shows a prompt, and your fingerprint or password is checked by `kestrel-authenticate` against the computer's sign-in rules, the same as for passkeys.
@@ -190,13 +201,14 @@ Two services act on what you ask without a prompt, because there would be nothin
 
 ## App permissions
 
-What apps were allowed is kept in one place, the desktop portal's permission store, one table per kind of permission. Flatpak keeps the store out of every sandbox, even for apps allowed into your home folder, so an app can't give itself anything; you can, as can any program you run.
+What apps were allowed is kept in one place, the desktop portal's permission store, one table per kind of permission. Flatpak and the AppImage sandbox keep the store out of every sandbox, even for apps allowed into your home folder, so an app can't give itself anything; you can, as can any program you run.
 
 | Table | Holds |
 | --- | --- |
-| `full-access` | Flatpak apps that count as you |
-| `background-clipboard` | Flatpak apps that may read and set the clipboard while in the background. 1Password, KeePassXC and Bitwarden may unless you turned it off |
-| `keyring-items` | Which saved items a Flatpak app may use, one entry per item |
+| `full-access` | Sandboxed apps that count as you; an AppImage given full access runs without its sandbox |
+| `background-clipboard` | Sandboxed apps that may read and set the clipboard while in the background. Kestrel answers yes for 1Password, KeePassXC and Bitwarden whenever they have no answer |
+| `keyring-items` | Which saved items a sandboxed app may use, one entry per item |
+| `sandbox` | Folders (`folders`) and devices (`devices`) an AppImage's sandbox opens |
 | `location`, `devices`, `background`, `notifications` and the portal's others | What apps asked for through the desktop portal |
 
 Kestrel reads the store and tells the compositor which apps have full access and the background clipboard; a change applies to new connections, so the next time the app starts. Settings shows every table under Apps, where any permission can be taken away.

@@ -474,19 +474,30 @@ settings-apps-permissions = Dovoljenja
 settings-apps-location = Lokacija
 settings-apps-camera = Kamera
 settings-apps-clipboard = Odložišče v ozadju
-settings-apps-clipboard-hint = Te aplikacije lahko vidijo in spreminjajo, kar kopirate, tudi ko uporabljate druge aplikacije.
 settings-apps-full-access = Polni dostop
-settings-apps-full-access-hint = Te aplikacije se izvajajo zunaj svojega izoliranega okolja in veljajo za vas, tako kot aplikacije, nameščene v sistemu. Odstranitev začne veljati ob naslednjem odprtju aplikacije.
+settings-apps-full-access-hint = Deluje zunaj peskovnika in lahko naredi vse, kar lahko program, ki ga zaženete sami. Odstranitev velja od naslednjega odprtja.
 settings-apps-full-access-remove = Odstrani
 settings-apps-full-access-remove-app = Odstrani polni dostop za { $app }
 settings-apps-passwords = Shranjena gesla
-settings-apps-passwords-hint = Aplikacije si zapomnijo vaš odgovor, ko prosijo za uporabo nečesa iz zbirke ključev. Pozabite ga in aplikacija bo vprašala znova.
 settings-apps-passwords-forget = Pozabi
 settings-apps-passwords-forget-app = Naj { $app } znova vpraša
 settings-apps-permissions-allowed = Dovoljeno: { $allowed } od { $total }
-settings-apps-permissions-count = { $count ->
-    [one] { $count } aplikacija
-    [two] { $count } aplikaciji
-    [few] { $count } aplikacije
-   *[other] { $count } aplikacij
+settings-apps-permissions-description = Aplikacije v peskovniku dobijo svoje datoteke in samo to, kar dovolite tukaj.
+settings-apps-sandbox-only = Nič zunaj peskovnika
+settings-apps-folders = Mape
+settings-apps-folders-hint = Od naslednjega odprtja lahko bere in spreminja vse v teh mapah.
+settings-apps-folders-count = { $count ->
+    [one] { $count } mapa
+    [two] { $count } mapi
+    [few] { $count } mape
+   *[other] { $count } map
 }
+settings-apps-folder-add = Dodaj mapo
+settings-apps-folder-remove = Odstrani
+settings-apps-folder-remove-app = Prenehaj deliti { $folder }
+settings-apps-usb = Naprave USB
+settings-apps-usb-hint = Na primer varnostni ključi, telefoni in mikrokrmilniki
+settings-apps-serial = Serijske naprave
+settings-apps-serial-hint = Na primer 3D-tiskalniki in plošče, povezane prek USB
+settings-apps-full-access-off = Deluje v peskovniku. Polni dostop odstrani peskovnik.
+settings-apps-full-access-give = Dovoli polni dostop

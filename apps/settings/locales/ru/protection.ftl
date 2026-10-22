@@ -474,19 +474,30 @@ settings-apps-permissions = Разрешения
 settings-apps-location = Местоположение
 settings-apps-camera = Камера
 settings-apps-clipboard = Буфер обмена в фоне
-settings-apps-clipboard-hint = Эти приложения могут видеть и менять то, что вы копируете, даже пока вы работаете в других приложениях.
 settings-apps-full-access = Полный доступ
-settings-apps-full-access-hint = Эти приложения работают вне своей песочницы и действуют от вашего имени, как приложения, установленные в системе. Отзыв вступит в силу при следующем открытии приложения.
+settings-apps-full-access-hint = Работает вне песочницы и может всё, что может запущенная вами программа. Отмена вступит в силу при следующем запуске.
 settings-apps-full-access-remove = Отозвать
 settings-apps-full-access-remove-app = Отозвать полный доступ у { $app }
 settings-apps-passwords = Сохранённые пароли
-settings-apps-passwords-hint = Приложения запоминают ваш ответ, когда просят использовать что-то из связки ключей. Сбросьте его, чтобы приложение спросило снова.
 settings-apps-passwords-forget = Сбросить
 settings-apps-passwords-forget-app = Пусть { $app } спросит снова
 settings-apps-permissions-allowed = Разрешено: { $allowed } из { $total }
-settings-apps-permissions-count = { $count ->
-    [one] { $count } приложение
-    [few] { $count } приложения
-    [many] { $count } приложений
-   *[other] { $count } приложения
+settings-apps-permissions-description = Приложения в песочнице получают свои файлы и только то, что вы разрешите здесь.
+settings-apps-sandbox-only = Ничего за пределами песочницы
+settings-apps-folders = Папки
+settings-apps-folders-hint = Со следующего запуска оно сможет читать и изменять всё в этих папках.
+settings-apps-folders-count = { $count ->
+    [one] { $count } папка
+    [few] { $count } папки
+    [many] { $count } папок
+   *[other] { $count } папки
 }
+settings-apps-folder-add = Добавить папку
+settings-apps-folder-remove = Убрать
+settings-apps-folder-remove-app = Перестать открывать доступ к { $folder }
+settings-apps-usb = USB-устройства
+settings-apps-usb-hint = Например, ключи безопасности, телефоны и микроконтроллеры
+settings-apps-serial = Последовательные устройства
+settings-apps-serial-hint = Например, 3D-принтеры и платы, подключённые по USB
+settings-apps-full-access-off = Работает в песочнице. Полный доступ убирает песочницу.
+settings-apps-full-access-give = Дать полный доступ

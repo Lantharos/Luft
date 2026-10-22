@@ -474,19 +474,30 @@ settings-apps-permissions = Leidimai
 settings-apps-location = Buvimo vieta
 settings-apps-camera = Kamera
 settings-apps-clipboard = Iškarpinė fone
-settings-apps-clipboard-hint = Šios programos gali matyti ir keisti tai, ką nukopijuojate, net kai naudojate kitas programas.
 settings-apps-full-access = Visiška prieiga
-settings-apps-full-access-hint = Šios programos veikia už savo smėlio dėžės ribų ir laikomos jumis, kaip sistemoje įdiegtos programos. Pašalinimas įsigalios kitą kartą atidarius programą.
+settings-apps-full-access-hint = Ji veikia už smėlio dėžės ribų ir gali viską, ką gali jūsų paleista programa. Pašalinimas įsigalios kitą kartą atidarius.
 settings-apps-full-access-remove = Pašalinti
 settings-apps-full-access-remove-app = Pašalinti visišką prieigą programai { $app }
 settings-apps-passwords = Įrašyti slaptažodžiai
-settings-apps-passwords-hint = Programos įsimena jūsų atsakymą, kai prašo naudoti tai, kas įrašyta raktinėje. Pamirškite jį, kad programa paklaustų vėl.
 settings-apps-passwords-forget = Pamiršti
 settings-apps-passwords-forget-app = Leisti programai { $app } paklausti vėl
 settings-apps-permissions-allowed = Leidžiama { $allowed } iš { $total }
-settings-apps-permissions-count = { $count ->
-    [one] { $count } programa
-    [few] { $count } programos
-    [many] { $count } programos
-   *[other] { $count } programų
+settings-apps-permissions-description = Smėlio dėžėje veikiančios programos gauna savo failus ir tik tai, ką čia leidžiate.
+settings-apps-sandbox-only = Nieko už smėlio dėžės ribų
+settings-apps-folders = Aplankai
+settings-apps-folders-hint = Nuo kito atidarymo ji galės skaityti ir keisti viską šiuose aplankuose.
+settings-apps-folders-count = { $count ->
+    [one] { $count } aplankas
+    [few] { $count } aplankai
+    [many] { $count } aplanko
+   *[other] { $count } aplankų
 }
+settings-apps-folder-add = Pridėti aplanką
+settings-apps-folder-remove = Pašalinti
+settings-apps-folder-remove-app = Nebebendrinti { $folder }
+settings-apps-usb = USB įrenginiai
+settings-apps-usb-hint = Pavyzdžiui, saugos raktai, telefonai ir mikrovaldikliai
+settings-apps-serial = Nuoseklieji įrenginiai
+settings-apps-serial-hint = Pavyzdžiui, 3D spausdintuvai ir USB prijungtos plokštės
+settings-apps-full-access-off = Ji veikia smėlio dėžėje. Visa prieiga panaikina smėlio dėžę.
+settings-apps-full-access-give = Suteikti visą prieigą

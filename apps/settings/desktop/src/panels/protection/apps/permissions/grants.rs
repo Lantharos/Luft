@@ -1,27 +1,12 @@
-use luft_app::apps::App;
-use luft_app::identity::permissions::{
-    self, BACKGROUND_CLIPBOARD, FULL_ACCESS, NO, StoreProxy, YES,
-};
-use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+
+use luft_app::identity::permissions::{self, BACKGROUND_CLIPBOARD, StoreProxy, YES};
+use serde::Deserialize;
 use zbus::Connection;
 
-use super::{identify, known, sort};
-
-const PASSWORD_MANAGERS: [&str; 3] = [
-    "com.onepassword.OnePassword",
-    "org.keepassxc.KeePassXC",
-    "com.bitwarden.desktop",
-];
 const NO_LOCATION: &str = "NONE";
 const EXACT_LOCATION: &str = "EXACT";
 const NEVER_USED: &str = "0";
-
-#[derive(Serialize)]
-pub struct Grant {
-    #[serde(flatten)]
-    app: App,
-    allowed: bool,
-}
 
 #[derive(Deserialize, Clone, Copy)]
 #[serde(rename_all = "camelCase")]
@@ -30,6 +15,8 @@ pub enum Switch {
     Camera,
     Clipboard,
 }
+
+pub const SWITCHES: [Switch; 3] = [Switch::Location, Switch::Camera, Switch::Clipboard];
 
 impl Switch {
     pub fn entry(self) -> (&'static str, &'static str) {
@@ -40,55 +27,24 @@ impl Switch {
         }
     }
 
-    fn allows(self, app: &str, answer: &[String]) -> bool {
-        let first = answer.first().map(String::as_str);
-        match self {
-            Self::Location => first.is_some_and(|level| level != NO_LOCATION),
-            Self::Clipboard if PASSWORD_MANAGERS.contains(&app) => first != Some(NO),
-            Self::Camera | Self::Clipboard => first == Some(YES),
-        }
-    }
-
-    fn allowed_by_default(self) -> &'static [&'static str] {
-        match self {
-            Self::Clipboard => &PASSWORD_MANAGERS,
-            Self::Location | Self::Camera => &[],
-        }
-    }
-}
-
-pub async fn list(connection: &Connection, switch: Switch) -> zbus::Result<Vec<Grant>> {
-    let (table, id) = switch.entry();
-    let answers = permissions::lookup(connection, table, id).await?;
-    let unanswered: Vec<Grant> = switch
-        .allowed_by_default()
-        .iter()
-        .filter(|app| !answers.contains_key(**app))
-        .filter_map(|app| known(app))
-        .map(|app| Grant { app, allowed: true })
-        .collect();
-    let mut grants: Vec<Grant> = answers
-        .into_iter()
-        .filter(|(app, _)| !app.is_empty())
-        .map(|(app, answer)| Grant {
-            allowed: switch.allows(&app, &answer),
-            app: identify(app),
+    fn allows(self, answer: &[String]) -> Option<bool> {
+        let first = answer.first().map(String::as_str)?;
+        Some(match self {
+            Self::Location => first != NO_LOCATION,
+            Self::Camera | Self::Clipboard => first == YES,
         })
-        .chain(unanswered)
-        .collect();
-    sort(&mut grants, |grant| &grant.app);
-    Ok(grants)
-}
+    }
 
-pub async fn full_access(connection: &Connection) -> zbus::Result<Vec<App>> {
-    let mut apps: Vec<App> = permissions::lookup(connection, FULL_ACCESS.table, FULL_ACCESS.id)
-        .await?
-        .into_iter()
-        .filter(|(_, answer)| answer.first().map(String::as_str) == Some(YES))
-        .map(|(app, _)| identify(app))
-        .collect();
-    sort(&mut apps, |app| app);
-    Ok(apps)
+    /// Each app's answer, for the apps that have one.
+    pub async fn answers(self, connection: &Connection) -> zbus::Result<HashMap<String, bool>> {
+        let (table, id) = self.entry();
+        Ok(permissions::lookup(connection, table, id)
+            .await?
+            .into_iter()
+            .filter(|(app, _)| !app.is_empty())
+            .filter_map(|(app, answer)| Some((app, self.allows(&answer)?)))
+            .collect())
+    }
 }
 
 pub async fn set(

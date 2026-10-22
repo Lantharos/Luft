@@ -11,4 +11,4 @@ luft-identity.workspace = true
 | `caller::of_sender`, `caller::of_process` | Who sent a message or runs a process: you, a sandboxed app by its app ID, or an unknown sandbox, counting apps with full access as you |
 | `caller::sandboxed` | The same from the sandbox alone, before full access |
 | `caller::refuse_sandboxed`, `caller::uid` | Turning away anything but you, and the caller's account |
-| `permissions` | The desktop portal's permission store: `lookup`, `answer`, `allowed`, `set`, `forget`, `remove`, `entries` and `changes`, with the tables Luft keeps there |
+| `permissions` | The desktop portal's permission store: `lookup`, `answer`, `allowed`, `values`, `set`, `set_values`, `forget`, `remove`, `entries` and `changes`, with the tables Luft keeps there |

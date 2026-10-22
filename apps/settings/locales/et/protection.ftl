@@ -448,17 +448,28 @@ settings-apps-permissions = Õigused
 settings-apps-location = Asukoht
 settings-apps-camera = Kaamera
 settings-apps-clipboard = Lõikelaud taustal
-settings-apps-clipboard-hint = Need rakendused näevad ja saavad muuta seda, mida kopeerite, ka siis, kui kasutate teisi rakendusi.
 settings-apps-full-access = Täielik juurdepääs
-settings-apps-full-access-hint = Need rakendused töötavad väljaspool oma liivakasti ja loetakse teieks, nagu süsteemi paigaldatud rakendused. Eemaldamine jõustub rakenduse järgmisel avamisel.
+settings-apps-full-access-hint = See töötab väljaspool liivakasti ja saab teha kõike, mida saab ise käivitatud programm. Eemaldamine kehtib järgmisest avamisest.
 settings-apps-full-access-remove = Eemalda
 settings-apps-full-access-remove-app = Eemalda rakenduselt { $app } täielik juurdepääs
 settings-apps-passwords = Salvestatud paroolid
-settings-apps-passwords-hint = Rakendused jätavad teie vastuse meelde, kui küsivad luba kasutada midagi võtmerõngasse salvestatut. Unustage see, et rakendus uuesti küsiks.
 settings-apps-passwords-forget = Unusta
 settings-apps-passwords-forget-app = Lase rakendusel { $app } uuesti küsida
 settings-apps-permissions-allowed = Lubatud { $allowed }/{ $total }
-settings-apps-permissions-count = { $count ->
-    [one] { $count } rakendus
-   *[other] { $count } rakendust
+settings-apps-permissions-description = Liivakastis olevad rakendused saavad oma failid ja ainult selle, mida siin lubad.
+settings-apps-sandbox-only = Mitte midagi väljaspool liivakasti
+settings-apps-folders = Kaustad
+settings-apps-folders-hint = Alates järgmisest avamisest saab see kõike nendes kaustades lugeda ja muuta.
+settings-apps-folders-count = { $count ->
+    [one] { $count } kaust
+   *[other] { $count } kausta
 }
+settings-apps-folder-add = Lisa kaust
+settings-apps-folder-remove = Eemalda
+settings-apps-folder-remove-app = Lõpeta { $folder } jagamine
+settings-apps-usb = USB-seadmed
+settings-apps-usb-hint = Näiteks turvavõtmed, telefonid ja mikrokontrollerid
+settings-apps-serial = Jadaseadmed
+settings-apps-serial-hint = Näiteks 3D-printerid ja USB kaudu ühendatud plaadid
+settings-apps-full-access-off = See töötab liivakastis. Täielik ligipääs eemaldab liivakasti.
+settings-apps-full-access-give = Anna täielik ligipääs

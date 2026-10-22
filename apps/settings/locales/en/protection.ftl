@@ -512,22 +512,37 @@ settings-apps-permissions = Permissions
 settings-apps-location = Location
 settings-apps-camera = Camera
 settings-apps-clipboard = Clipboard in the background
-settings-apps-clipboard-hint = These apps can see and change what you copy, even while you use other apps.
 settings-apps-full-access = Full access
-settings-apps-full-access-hint = These apps run outside their sandbox and count as you, like apps installed on the system. Removing it takes effect the next time the app opens.
+settings-apps-full-access-hint = It runs outside its sandbox, with everything a program you start yourself can do. Removing it takes effect the next time it opens.
 # Button, verb
 settings-apps-full-access-remove = Remove
 # Screen reader label of the remove button; $app is an app name
 settings-apps-full-access-remove-app = Remove full access from { $app }
 settings-apps-passwords = Saved passwords
-settings-apps-passwords-hint = Apps remember your answer when they ask to use something saved in your keyring. Forget it to have the app ask again.
 # Button, verb
 settings-apps-passwords-forget = Forget
 # Screen reader label of the forget button; $app is an app name
 settings-apps-passwords-forget-app = Let { $app } ask again
 # $allowed and $total are numbers of apps, or of saved passwords
 settings-apps-permissions-allowed = { $allowed } of { $total } allowed
-settings-apps-permissions-count = { $count ->
-    [one] { $count } app
-   *[other] { $count } apps
+settings-apps-permissions-description = Apps in a sandbox get their own files and only what you allow here.
+settings-apps-sandbox-only = Nothing beyond its sandbox
+settings-apps-folders = Folders
+settings-apps-folders-hint = It can read and change everything in these folders, from the next time it opens.
+# $count is a number of folders an app may use
+settings-apps-folders-count = { $count ->
+    [one] { $count } folder
+   *[other] { $count } folders
 }
+settings-apps-folder-add = Add folder
+# Button, verb
+settings-apps-folder-remove = Remove
+# Screen reader label of the remove button; $folder is a folder path
+settings-apps-folder-remove-app = Stop sharing { $folder }
+settings-apps-usb = USB devices
+settings-apps-usb-hint = Such as security keys, phones and microcontrollers
+settings-apps-serial = Serial devices
+settings-apps-serial-hint = Such as 3D printers and boards connected over USB
+settings-apps-full-access-off = It runs in a sandbox. Full access takes the sandbox away.
+# Button that opens Schelf to confirm giving the app full access
+settings-apps-full-access-give = Give full access

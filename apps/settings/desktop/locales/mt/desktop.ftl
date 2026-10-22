@@ -232,3 +232,4 @@ desktop-updates-another-app = app oħra
 desktop-updates-firmware-unnamed = Firmware tal-apparat
 desktop-updates-firmware-current = Dan l-apparat diġà aġġornat.
 desktop-updates-firmware-no-download = Dan l-aġġornament ma jistax jitniżżel.
+desktop-apps-folder-title = Agħżel folder għall-app

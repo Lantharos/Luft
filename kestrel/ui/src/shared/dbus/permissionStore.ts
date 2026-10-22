@@ -48,6 +48,11 @@ export async function lookup(connection: Gio.DBusConnection, permission: Permiss
   }
 }
 
+export async function setAnswer({ table, id }: Permission, app: string, answer: Answer): Promise<void> {
+  await Gio.DBus.session.call(STORE, STORE_PATH, STORE, 'SetPermission', new GLib.Variant('(sbssas)', [table, true, id, app, [answer]]),
+    null, Gio.DBusCallFlags.NONE, -1, null);
+}
+
 export function watchStore(permissions: Permission[], changed: (permission: Permission, apps: Apps) => void): void {
   Gio.DBus.session.signal_subscribe(STORE, STORE, 'Changed', STORE_PATH, null, Gio.DBusSignalFlags.NONE, (_connection, _sender, _path, _iface, _signal, parameters) => {
     const [table, id, deleted, , apps] = parameters.deepUnpack<[string, string, boolean, GLib.Variant, Apps]>();

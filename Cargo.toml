@@ -10,6 +10,7 @@ members = [
     "apps/meet/desktop",
     "apps/rover/desktop",
     "apps/schelf/desktop",
+    "apps/schelf/sandbox",
     "apps/settings/desktop",
     "apps/setup/desktop",
     "apps/setup/installer",
@@ -69,6 +70,7 @@ default-members = [
     "apps/meet/desktop",
     "apps/rover/desktop",
     "apps/schelf/desktop",
+    "apps/schelf/sandbox",
     "apps/settings/desktop",
     "apps/setup/desktop",
     "apps/setup/installer",
@@ -137,7 +139,8 @@ luft-keyring-vault = { path = "kestrel/keyring/vault" }
 luft-keyring-wire = { path = "kestrel/keyring/wire" }
 luft-meet = { path = "packages/system/meet" }
 luft-network = { path = "packages/system/network" }
-luft-software = { path = "packages/system/software" }
+luft-sandbox = { path = "apps/schelf/sandbox" }
+luft-software = { path = "packages/system/software", default-features = false }
 luft-speech = { path = "packages/system/speech" }
 luft-trust = { path = "packages/system/trust" }
 luft-variant = { path = "packages/system/variant" }
@@ -262,6 +265,8 @@ ureq = { version = "3.4.2", features = ["platform-verifier"] }
 url = "2.5.8"
 uzers = "0.12.2"
 walkdir = "2.5.0"
+wayland-client = "0.31.15"
+wayland-protocols = { version = "0.32.13", default-features = false }
 whisper-rs = "0.16.0"
 windows = "0.62.2"
 wmi = { version = "0.18.4", default-features = false }

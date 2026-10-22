@@ -5,13 +5,23 @@ use std::time::Duration;
 use futures_util::StreamExt;
 use luft_app::Events;
 use luft_app::dbus;
-use luft_app::identity::permissions;
+use luft_app::identity::permissions::{
+    self, BACKGROUND_CLIPBOARD, FOLDERS, FULL_ACCESS, KEYRING_ITEMS,
+};
 use tokio::time::timeout;
 
-use super::Kind;
+use super::read;
 
 const CHANGED: &str = "apps.permissions";
 const SETTLE: Duration = Duration::from_millis(120);
+const TABLES: [&str; 6] = [
+    "location",
+    "devices",
+    BACKGROUND_CLIPBOARD.table,
+    FULL_ACCESS.table,
+    KEYRING_ITEMS,
+    FOLDERS.table,
+];
 
 pub fn watch(events: Events) {
     luft_app::spawn(async move {
@@ -21,18 +31,11 @@ pub fn watch(events: Events) {
         let Ok(changes) = permissions::changes(session).await else {
             return;
         };
-        let mut changes = pin!(changes.filter_map(|table| ready(Kind::of(&table))));
-        while let Some(kind) = changes.next().await {
-            let mut changed = vec![kind];
-            while let Ok(Some(kind)) = timeout(SETTLE, changes.next()).await {
-                if !changed.contains(&kind) {
-                    changed.push(kind);
-                }
-            }
-            for kind in changed {
-                if let Ok(update) = kind.read(session).await {
-                    events.emit(CHANGED, update);
-                }
+        let mut changes = pin!(changes.filter(|table| ready(TABLES.contains(&table.as_str()))));
+        while changes.next().await.is_some() {
+            while let Ok(Some(_)) = timeout(SETTLE, changes.next()).await {}
+            if let Ok(apps) = read(session).await {
+                events.emit(CHANGED, apps);
             }
         }
     });

@@ -232,3 +232,4 @@ desktop-updates-another-app = een andere app
 desktop-updates-firmware-unnamed = Apparaatfirmware
 desktop-updates-firmware-current = Dit apparaat is al up-to-date.
 desktop-updates-firmware-no-download = Deze update kan niet worden gedownload.
+desktop-apps-folder-title = Kies een map voor de app

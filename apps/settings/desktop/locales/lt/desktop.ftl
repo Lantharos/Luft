@@ -232,3 +232,4 @@ desktop-updates-another-app = kita programa
 desktop-updates-firmware-unnamed = Įrenginio programinė aparatinė įranga
 desktop-updates-firmware-current = Šis įrenginys jau atnaujintas.
 desktop-updates-firmware-no-download = Šio naujinimo atsisiųsti negalima.
+desktop-apps-folder-title = Pasirinkite aplanką programai

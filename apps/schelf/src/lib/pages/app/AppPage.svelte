@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Segmented } from '@luft/ui';
 	import type { Permissions } from '#lib/bridge/types.js';
+	import { APPIMAGE_SANDBOX } from '#lib/app/permissions.js';
 	import AccessList from '#lib/components/AccessList.svelte';
 	import AppArt from '#lib/components/AppArt.svelte';
 	import Description from '#lib/components/Description.svelte';
@@ -13,18 +14,23 @@
 	import FullAccess from './FullAccess.svelte';
 	import { installedFor, load, type Listing, type Loaded } from './load';
 
-	let { target, name }: { target: AppTarget; name: string } = $props();
+	let { target, name, askFullAccess = false }: { target: AppTarget; name: string; askFullAccess?: boolean } = $props();
 
 	let loaded = $state<Loaded | null>(null);
 	let localPermissions = $state<Permissions | null>(null);
 	let fullAccess = $state(false);
+	let asking = $state(false);
 
 	const details = $derived(loaded?.details ?? null);
 	const installed = $derived(installedFor(target, details));
-	const permissions = $derived(localPermissions ?? details?.permissions ?? null);
+	const permissions = $derived(installed?.source === 'appImage' ? APPIMAGE_SANDBOX : (localPermissions ?? details?.permissions ?? null));
 	const title = $derived(details?.name ?? installed?.name ?? name);
 	const summary = $derived(details?.summary ?? installed?.summary ?? '');
-	const sandboxed = $derived(installed?.source === 'flatpak' && !fedora.available ? installed : null);
+	const sandboxed = $derived(installed?.source === 'appImage' || (installed?.source === 'flatpak' && !fedora.available) ? installed : null);
+
+	$effect(() => {
+		asking = askFullAccess;
+	});
 
 	$effect(() => {
 		const current = target;
@@ -104,7 +110,7 @@
 			<AppFacts {details} {installed} />
 			{#if sandboxed}
 				<AccessList permissions={fullAccess ? null : permissions}>
-					<FullAccess app={sandboxed} bind:on={fullAccess} />
+					<FullAccess app={sandboxed} bind:on={fullAccess} bind:asking />
 				</AccessList>
 			{:else if permissions}
 				<AccessList {permissions} />

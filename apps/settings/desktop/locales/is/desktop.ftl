@@ -232,3 +232,4 @@ desktop-updates-another-app = annað forrit
 desktop-updates-firmware-unnamed = Fastbúnaður tækis
 desktop-updates-firmware-current = Þetta tæki er þegar uppfært.
 desktop-updates-firmware-no-download = Ekki er hægt að sækja þessa uppfærslu.
+desktop-apps-folder-title = Veldu möppu fyrir forritið

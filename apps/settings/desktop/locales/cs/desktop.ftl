@@ -232,3 +232,4 @@ desktop-updates-another-app = jiná aplikace
 desktop-updates-firmware-unnamed = Firmware zařízení
 desktop-updates-firmware-current = Toto zařízení je už aktuální.
 desktop-updates-firmware-no-download = Tuto aktualizaci nelze stáhnout.
+desktop-apps-folder-title = Vyberte složku pro aplikaci

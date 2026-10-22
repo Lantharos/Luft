@@ -232,3 +232,4 @@ desktop-updates-another-app = μια άλλη εφαρμογή
 desktop-updates-firmware-unnamed = Υλικολογισμικό συσκευής
 desktop-updates-firmware-current = Αυτή η συσκευή είναι ήδη ενημερωμένη.
 desktop-updates-firmware-no-download = Δεν είναι δυνατή η λήψη αυτής της ενημέρωσης.
+desktop-apps-folder-title = Επιλέξτε φάκελο για την εφαρμογή

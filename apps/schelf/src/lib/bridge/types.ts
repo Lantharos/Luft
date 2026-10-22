@@ -188,6 +188,7 @@ export type OpenedFile =
 			desktop: string | null;
 			repository: CheckedSource | null;
 			repositoryError: string | null;
+			verified: boolean;
 	  }
 	| { kind: 'appImage'; path: string; name: string; summary: string | null; version: string | null; icon: string | null; size: number };
 
@@ -207,8 +208,8 @@ export interface Backend {
 	fetchSource(source: string): Promise<CheckedSource>;
 	addSource(draft: RepositoryDraft): Promise<void>;
 	permissions(installation: Installation, reference: string): Promise<Permissions>;
-	fullAccess(id: string): Promise<boolean>;
-	setFullAccess(id: string, on: boolean): Promise<void>;
+	fullAccess(id: string, source: Source): Promise<boolean>;
+	setFullAccess(id: string, source: Source, on: boolean): Promise<void>;
 	checkUpdates(): Promise<Updates>;
 	inspectFile(path: string): Promise<OpenedFile>;
 	chooseAppImage(): Promise<string | null>;

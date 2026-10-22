@@ -232,3 +232,4 @@ desktop-updates-another-app = cita lietotne
 desktop-updates-firmware-unnamed = Ierīces aparātprogrammatūra
 desktop-updates-firmware-current = Šī ierīce jau ir atjaunināta.
 desktop-updates-firmware-no-download = Šo atjauninājumu nevar lejupielādēt.
+desktop-apps-folder-title = Izvēlieties mapi lietotnei

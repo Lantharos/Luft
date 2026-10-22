@@ -232,3 +232,4 @@ desktop-updates-another-app = başka bir uygulama
 desktop-updates-firmware-unnamed = Cihaz üretici yazılımı
 desktop-updates-firmware-current = Bu cihaz zaten güncel.
 desktop-updates-firmware-no-download = Bu güncelleme indirilemiyor.
+desktop-apps-folder-title = Uygulama için bir klasör seçin

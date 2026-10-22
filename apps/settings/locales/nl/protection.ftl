@@ -448,17 +448,28 @@ settings-apps-permissions = Machtigingen
 settings-apps-location = Locatie
 settings-apps-camera = Camera
 settings-apps-clipboard = Klembord op de achtergrond
-settings-apps-clipboard-hint = Deze apps kunnen zien en wijzigen wat je kopieert, ook terwijl je andere apps gebruikt.
 settings-apps-full-access = Volledige toegang
-settings-apps-full-access-hint = Deze apps draaien buiten hun sandbox en handelen namens jou, net als apps die op het systeem zijn geïnstalleerd. Verwijderen geldt vanaf de volgende keer dat de app opent.
+settings-apps-full-access-hint = De app draait buiten haar sandbox en kan alles wat een programma dat je zelf start kan. Verwijderen geldt vanaf de volgende keer dat de app opent.
 settings-apps-full-access-remove = Verwijderen
 settings-apps-full-access-remove-app = Volledige toegang van { $app } verwijderen
 settings-apps-passwords = Opgeslagen wachtwoorden
-settings-apps-passwords-hint = Apps onthouden je antwoord als ze vragen iets uit je sleutelbos te gebruiken. Vergeet het om de app opnieuw te laten vragen.
 settings-apps-passwords-forget = Vergeten
 settings-apps-passwords-forget-app = { $app } opnieuw laten vragen
 settings-apps-permissions-allowed = { $allowed } van { $total } toegestaan
-settings-apps-permissions-count = { $count ->
-    [one] { $count } app
-   *[other] { $count } apps
+settings-apps-permissions-description = Apps in een sandbox krijgen hun eigen bestanden en alleen wat je hier toestaat.
+settings-apps-sandbox-only = Niets buiten de sandbox
+settings-apps-folders = Mappen
+settings-apps-folders-hint = Vanaf de volgende keer dat de app opent, kan ze alles in deze mappen lezen en wijzigen.
+settings-apps-folders-count = { $count ->
+    [one] { $count } map
+   *[other] { $count } mappen
 }
+settings-apps-folder-add = Map toevoegen
+settings-apps-folder-remove = Verwijderen
+settings-apps-folder-remove-app = { $folder } niet meer delen
+settings-apps-usb = USB-apparaten
+settings-apps-usb-hint = Zoals beveiligingssleutels, telefoons en microcontrollers
+settings-apps-serial = Seriële apparaten
+settings-apps-serial-hint = Zoals 3D-printers en via USB verbonden borden
+settings-apps-full-access-off = De app draait in een sandbox. Volledige toegang haalt de sandbox weg.
+settings-apps-full-access-give = Volledige toegang geven

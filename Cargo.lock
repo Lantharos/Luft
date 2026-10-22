@@ -4469,6 +4469,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "luft-sandbox"
+version = "0.1.0"
+dependencies = [
+ "futures-util",
+ "libc",
+ "luft-i18n",
+ "luft-identity",
+ "luft-software",
+ "serde",
+ "serde_json",
+ "tokio",
+ "wayland-client",
+ "wayland-protocols",
+ "zbus 6.0.0",
+]
+
+[[package]]
 name = "luft-sleep"
 version = "0.1.0"
 dependencies = [
@@ -6888,6 +6905,7 @@ dependencies = [
  "gio-unix",
  "libc",
  "luft-app",
+ "luft-sandbox",
  "luft-software",
  "quick-xml 0.42.0",
  "sabine",

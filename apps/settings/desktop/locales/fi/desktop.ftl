@@ -232,3 +232,4 @@ desktop-updates-another-app = toinen sovellus
 desktop-updates-firmware-unnamed = Laitteen laiteohjelmisto
 desktop-updates-firmware-current = Tämä laite on jo ajan tasalla.
 desktop-updates-firmware-no-download = Tätä päivitystä ei voi ladata.
+desktop-apps-folder-title = Valitse kansio sovellukselle

@@ -232,3 +232,4 @@ desktop-updates-another-app = другое приложение
 desktop-updates-firmware-unnamed = Прошивка устройства
 desktop-updates-firmware-current = На этом устройстве уже установлена последняя версия.
 desktop-updates-firmware-no-download = Это обновление нельзя скачать.
+desktop-apps-folder-title = Выберите папку для приложения

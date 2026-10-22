@@ -16,8 +16,20 @@ function openFiles(files: string[]) {
 }
 
 const SEARCH = 'schelf:search?';
+const FULL_ACCESS = 'schelf:full-access?';
+
+async function askFullAccess(id: string) {
+	if (!library.loaded) await library.refresh();
+	const app = library.byKey(`appimage/${id}`) ?? library.flatpak(id);
+	if (app) navigation.open({ page: 'app', target: { installed: app.key }, name: app.name, askFullAccess: true });
+}
 
 function openPage(argumentsList: (string | null)[]) {
+	const fullAccess = argumentsList.find((argument) => argument?.startsWith(FULL_ACCESS));
+	if (fullAccess) {
+		void askFullAccess(decodeURIComponent(fullAccess.slice(FULL_ACCESS.length)));
+		return;
+	}
 	const search = argumentsList.find((argument) => argument?.startsWith(SEARCH));
 	if (search) {
 		navigation.query = decodeURIComponent(search.slice(SEARCH.length));

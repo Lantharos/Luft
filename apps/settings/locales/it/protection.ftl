@@ -448,17 +448,28 @@ settings-apps-permissions = Autorizzazioni
 settings-apps-location = Posizione
 settings-apps-camera = Fotocamera
 settings-apps-clipboard = Appunti in background
-settings-apps-clipboard-hint = Queste app possono vedere e modificare ciò che copi, anche mentre usi altre app.
 settings-apps-full-access = Accesso completo
-settings-apps-full-access-hint = Queste app funzionano fuori dalla loro sandbox e agiscono come te, come le app installate nel sistema. La rimozione ha effetto alla prossima apertura dell’app.
+settings-apps-full-access-hint = Funziona fuori dalla sua sandbox e può fare tutto ciò che fa un programma che avvii tu. La rimozione vale dalla prossima apertura.
 settings-apps-full-access-remove = Rimuovi
 settings-apps-full-access-remove-app = Rimuovi l’accesso completo a { $app }
 settings-apps-passwords = Password salvate
-settings-apps-passwords-hint = Le app ricordano la tua risposta quando chiedono di usare qualcosa salvato nel Portachiavi. Dimenticala perché l’app chieda di nuovo.
 settings-apps-passwords-forget = Dimentica
 settings-apps-passwords-forget-app = Fai chiedere di nuovo a { $app }
 settings-apps-permissions-allowed = { $allowed } su { $total } consentite
-settings-apps-permissions-count = { $count ->
-    [one] { $count } app
-   *[other] { $count } app
+settings-apps-permissions-description = Le app in una sandbox hanno i propri file e solo ciò che consenti qui.
+settings-apps-sandbox-only = Niente oltre la sua sandbox
+settings-apps-folders = Cartelle
+settings-apps-folders-hint = Dalla prossima apertura potrà leggere e modificare tutto il contenuto di queste cartelle.
+settings-apps-folders-count = { $count ->
+    [one] { $count } cartella
+   *[other] { $count } cartelle
 }
+settings-apps-folder-add = Aggiungi cartella
+settings-apps-folder-remove = Rimuovi
+settings-apps-folder-remove-app = Smetti di condividere { $folder }
+settings-apps-usb = Dispositivi USB
+settings-apps-usb-hint = Come chiavi di sicurezza, telefoni e microcontrollori
+settings-apps-serial = Dispositivi seriali
+settings-apps-serial-hint = Come stampanti 3D e schede collegate via USB
+settings-apps-full-access-off = Funziona in una sandbox. L'accesso completo la rimuove.
+settings-apps-full-access-give = Dai accesso completo

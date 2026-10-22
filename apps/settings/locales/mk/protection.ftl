@@ -448,17 +448,28 @@ settings-apps-permissions = Дозволи
 settings-apps-location = Локација
 settings-apps-camera = Камера
 settings-apps-clipboard = Клипборд во позадина
-settings-apps-clipboard-hint = Овие апликации можат да гледаат и менуваат што копирате, дури и додека користите други апликации.
 settings-apps-full-access = Целосен пристап
-settings-apps-full-access-hint = Овие апликации работат надвор од својата изолирана средина и се сметаат за вас, како апликациите инсталирани на системот. Отстранувањето важи од следното отворање на апликацијата.
+settings-apps-full-access-hint = Работи надвор од песочникот и може сè што може програма што ја стартувате сами. Отстранувањето важи од следното отворање.
 settings-apps-full-access-remove = Отстрани
 settings-apps-full-access-remove-app = Отстрани го целосниот пристап за { $app }
 settings-apps-passwords = Зачувани лозинки
-settings-apps-passwords-hint = Апликациите го паметат вашиот одговор кога бараат да користат нешто од привезокот за клучеви. Заборавете го за апликацијата повторно да праша.
 settings-apps-passwords-forget = Заборави
 settings-apps-passwords-forget-app = Нека { $app } повторно праша
 settings-apps-permissions-allowed = Дозволени { $allowed } од { $total }
-settings-apps-permissions-count = { $count ->
-    [one] { $count } апликација
-   *[other] { $count } апликации
+settings-apps-permissions-description = Апликациите во песочник добиваат свои датотеки и само она што ќе го дозволите тука.
+settings-apps-sandbox-only = Ништо надвор од песочникот
+settings-apps-folders = Папки
+settings-apps-folders-hint = Од следното отворање може да чита и менува сè во овие папки.
+settings-apps-folders-count = { $count ->
+    [one] { $count } папка
+   *[other] { $count } папки
 }
+settings-apps-folder-add = Додај папка
+settings-apps-folder-remove = Отстрани
+settings-apps-folder-remove-app = Престани да ја споделуваш { $folder }
+settings-apps-usb = USB уреди
+settings-apps-usb-hint = На пример безбедносни клучеви, телефони и микроконтролери
+settings-apps-serial = Сериски уреди
+settings-apps-serial-hint = На пример 3D печатачи и плочки поврзани преку USB
+settings-apps-full-access-off = Работи во песочник. Целосниот пристап го отстранува песочникот.
+settings-apps-full-access-give = Дај целосен пристап

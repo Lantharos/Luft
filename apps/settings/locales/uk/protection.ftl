@@ -474,19 +474,30 @@ settings-apps-permissions = Дозволи
 settings-apps-location = Розташування
 settings-apps-camera = Камера
 settings-apps-clipboard = Буфер обміну у фоні
-settings-apps-clipboard-hint = Ці програми можуть бачити й змінювати те, що ви копіюєте, навіть поки ви користуєтеся іншими програмами.
 settings-apps-full-access = Повний доступ
-settings-apps-full-access-hint = Ці програми працюють поза своєю пісочницею і діють від вашого імені, як програми, встановлені в системі. Відкликання набуде чинності під час наступного відкриття програми.
+settings-apps-full-access-hint = Працює поза пісочницею й може все, що може запущена вами програма. Скасування діє з наступного запуску.
 settings-apps-full-access-remove = Відкликати
 settings-apps-full-access-remove-app = Відкликати повний доступ у { $app }
 settings-apps-passwords = Збережені паролі
-settings-apps-passwords-hint = Програми запам’ятовують вашу відповідь, коли просять використати щось із в’язки ключів. Скиньте її, щоб програма запитала знову.
 settings-apps-passwords-forget = Скинути
 settings-apps-passwords-forget-app = Нехай { $app } запитає знову
 settings-apps-permissions-allowed = Дозволено: { $allowed } з { $total }
-settings-apps-permissions-count = { $count ->
-    [one] { $count } програма
-    [few] { $count } програми
-    [many] { $count } програм
-   *[other] { $count } програми
+settings-apps-permissions-description = Застосунки в пісочниці отримують власні файли й лише те, що ви дозволите тут.
+settings-apps-sandbox-only = Нічого поза пісочницею
+settings-apps-folders = Теки
+settings-apps-folders-hint = З наступного запуску він зможе читати й змінювати все в цих теках.
+settings-apps-folders-count = { $count ->
+    [one] { $count } тека
+    [few] { $count } теки
+    [many] { $count } тек
+   *[other] { $count } теки
 }
+settings-apps-folder-add = Додати теку
+settings-apps-folder-remove = Прибрати
+settings-apps-folder-remove-app = Припинити спільний доступ до { $folder }
+settings-apps-usb = USB-пристрої
+settings-apps-usb-hint = Наприклад, ключі безпеки, телефони й мікроконтролери
+settings-apps-serial = Послідовні пристрої
+settings-apps-serial-hint = Наприклад, 3D-принтери й плати, під'єднані через USB
+settings-apps-full-access-off = Працює в пісочниці. Повний доступ прибирає пісочницю.
+settings-apps-full-access-give = Надати повний доступ

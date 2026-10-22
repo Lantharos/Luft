@@ -232,3 +232,4 @@ desktop-updates-another-app = teine rakendus
 desktop-updates-firmware-unnamed = Seadme püsivara
 desktop-updates-firmware-current = See seade on juba ajakohane.
 desktop-updates-firmware-no-download = Seda värskendust ei saa alla laadida.
+desktop-apps-folder-title = Vali rakendusele kaust

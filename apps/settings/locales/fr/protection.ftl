@@ -448,17 +448,28 @@ settings-apps-permissions = Autorisations
 settings-apps-location = Localisation
 settings-apps-camera = Caméra
 settings-apps-clipboard = Presse-papiers en arrière-plan
-settings-apps-clipboard-hint = Ces applications peuvent voir et modifier ce que vous copiez, même pendant que vous utilisez d’autres applications.
 settings-apps-full-access = Accès complet
-settings-apps-full-access-hint = Ces applications s’exécutent hors de leur bac à sable et agissent en votre nom, comme les applications installées sur le système. Le retrait prend effet à la prochaine ouverture de l’application.
+settings-apps-full-access-hint = Elle fonctionne hors de son bac à sable et peut faire tout ce que peut un programme que vous lancez vous-même. Le retrait s'applique à sa prochaine ouverture.
 settings-apps-full-access-remove = Retirer
 settings-apps-full-access-remove-app = Retirer l’accès complet à { $app }
 settings-apps-passwords = Mots de passe enregistrés
-settings-apps-passwords-hint = Les applications retiennent votre réponse quand elles demandent à utiliser un élément de votre trousseau. Oubliez-la pour que l’application redemande.
 settings-apps-passwords-forget = Oublier
 settings-apps-passwords-forget-app = Laisser { $app } redemander
 settings-apps-permissions-allowed = { $allowed } sur { $total } autorisées
-settings-apps-permissions-count = { $count ->
-    [one] { $count } application
-   *[other] { $count } applications
+settings-apps-permissions-description = Les apps dans un bac à sable ont leurs propres fichiers et seulement ce que vous autorisez ici.
+settings-apps-sandbox-only = Rien en dehors de son bac à sable
+settings-apps-folders = Dossiers
+settings-apps-folders-hint = Elle peut lire et modifier tout le contenu de ces dossiers à partir de sa prochaine ouverture.
+settings-apps-folders-count = { $count ->
+    [one] { $count } dossier
+   *[other] { $count } dossiers
 }
+settings-apps-folder-add = Ajouter un dossier
+settings-apps-folder-remove = Retirer
+settings-apps-folder-remove-app = Ne plus partager { $folder }
+settings-apps-usb = Appareils USB
+settings-apps-usb-hint = Comme les clés de sécurité, les téléphones et les microcontrôleurs
+settings-apps-serial = Appareils série
+settings-apps-serial-hint = Comme les imprimantes 3D et les cartes connectées en USB
+settings-apps-full-access-off = Elle fonctionne dans un bac à sable. L'accès complet retire le bac à sable.
+settings-apps-full-access-give = Donner l'accès complet

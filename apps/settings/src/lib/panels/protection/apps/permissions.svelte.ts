@@ -3,72 +3,57 @@ import { invoke, listen } from '#lib/bridge/index.js';
 import type { App } from './api';
 
 export type Switchable = 'location' | 'camera' | 'clipboard';
+export type Device = 'usb' | 'serial';
 
-export interface Grant extends App {
-	allowed: boolean;
+export interface AppAccess extends App {
+	appImage: boolean;
+	location: boolean | null;
+	camera: boolean | null;
+	clipboard: boolean | null;
+	passwords: { allowed: number; total: number } | null;
+	fullAccess: boolean;
+	folders: string[];
+	devices: string[];
 }
 
-export interface Remembered extends App {
-	allowed: number;
-	total: number;
-}
-
-type Update =
-	| { kind: Switchable; apps: Grant[] }
-	| { kind: 'fullAccess'; apps: App[] }
-	| { kind: 'passwords'; apps: Remembered[] };
-
-interface Granted {
-	location: Grant[];
-	camera: Grant[];
-	clipboard: Grant[];
-	fullAccess: App[];
-	passwords: Remembered[];
-}
-
-const permissions = () => invoke<Update[]>('apps_permissions');
-const setPermission = (kind: Switchable, app: string, allowed: boolean) => invoke<void>('apps_permission_set', { kind, app, allowed });
-const revokeFullAccess = (app: string) => invoke<void>('apps_full_access_revoke', { app });
-const forgetPasswords = (app: string) => invoke<void>('apps_passwords_forget', { app });
-const onPermissionsChanged = (callback: (update: Update) => void) => listen<Update>('apps.permissions', callback);
+const list = () => invoke<AppAccess[]>('apps_permissions');
+const onChanged = (callback: (apps: AppAccess[]) => void) => listen<AppAccess[]>('apps.permissions', callback);
 
 export class Permissions {
-	apps = $state<Granted>({ location: [], camera: [], clipboard: [], fullAccess: [], passwords: [] });
+	apps = $state<AppAccess[]>([]);
 	busy = $state(false);
 	error = $state('');
 
-	any = $derived(Object.values(this.apps).some((apps) => apps.length));
-
 	start() {
-		void permissions().then((updates) => updates.forEach(this.apply));
-		return onPermissionsChanged(this.apply);
+		void list().then((apps) => (this.apps = apps));
+		return onChanged((apps) => (this.apps = apps));
 	}
 
-	private apply = (update: Update) => {
-		Object.assign(this.apps, { [update.kind]: update.apps });
-	};
-
-	async toggle(kind: Switchable, app: Grant, allowed: boolean) {
-		app.allowed = allowed;
-		try {
-			await setPermission(kind, app.id, allowed);
-		} catch {
-			app.allowed = !allowed;
-		}
-	}
-
-	revokeFullAccess = (app: App) => this.revoke(app, revokeFullAccess);
-
-	forgetPasswords = (app: App) => this.revoke(app, forgetPasswords);
-
-	private async revoke(app: App, revoke: (id: string) => Promise<void>) {
+	private async run(work: () => Promise<unknown>) {
 		this.busy = true;
 		this.error = '';
 		try {
-			await revoke(app.id);
+			await work();
 		} catch (reason) {
 			this.error = errorText(reason);
 		}
 		this.busy = false;
 	}
+
+	toggle(kind: Switchable, app: AppAccess, allowed: boolean) {
+		app[kind] = allowed;
+		return this.run(() => invoke('apps_permission_set', { kind, app: app.id, allowed }));
+	}
+
+	revokeFullAccess = (app: AppAccess) => this.run(() => invoke('apps_full_access_revoke', { app: app.id, appImage: app.appImage }));
+
+	askForFullAccess = (app: AppAccess) => this.run(() => invoke('apps_full_access_ask', { app: app.id }));
+
+	forgetPasswords = (app: AppAccess) => this.run(() => invoke('apps_passwords_forget', { app: app.id }));
+
+	addFolder = (app: AppAccess) => this.run(() => invoke('apps_folder_add', { app: app.id }));
+
+	removeFolder = (app: AppAccess, folder: string) => this.run(() => invoke('apps_folder_remove', { app: app.id, folder }));
+
+	setDevice = (app: AppAccess, device: Device, on: boolean) => this.run(() => invoke('apps_device_set', { app: app.id, device, on }));
 }

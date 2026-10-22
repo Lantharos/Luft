@@ -448,17 +448,28 @@ settings-apps-permissions = Lejet
 settings-apps-location = Vendndodhja
 settings-apps-camera = Kamera
 settings-apps-clipboard = Kujtesa e fragmenteve në sfond
-settings-apps-clipboard-hint = Këto aplikacione mund të shohin dhe të ndryshojnë atë që kopjon, edhe kur përdor aplikacione të tjera.
 settings-apps-full-access = Qasje e plotë
-settings-apps-full-access-hint = Këto aplikacione punojnë jashtë mjedisit të tyre të izoluar dhe llogariten si ti, ashtu si aplikacionet e instaluara në sistem. Heqja vlen herën tjetër që hapet aplikacioni.
+settings-apps-full-access-hint = Punon jashtë kutisë së izolimit dhe mund të bëjë gjithçka që mund të bëjë një program që e nisni vetë. Heqja vlen nga hapja e ardhshme.
 settings-apps-full-access-remove = Hiq
 settings-apps-full-access-remove-app = Hiq qasjen e plotë për { $app }
 settings-apps-passwords = Fjalëkalimet e ruajtura
-settings-apps-passwords-hint = Aplikacionet mbajnë mend përgjigjen tënde kur kërkojnë të përdorin diçka të ruajtur në vargun e çelësave. Harroje që aplikacioni të pyesë sërish.
 settings-apps-passwords-forget = Harro
 settings-apps-passwords-forget-app = Lëre { $app } të pyesë sërish
 settings-apps-permissions-allowed = { $allowed } nga { $total } të lejuara
-settings-apps-permissions-count = { $count ->
-    [one] { $count } aplikacion
-   *[other] { $count } aplikacione
+settings-apps-permissions-description = Aplikacionet në një kuti izolimi marrin skedarët e tyre dhe vetëm atë që lejoni këtu.
+settings-apps-sandbox-only = Asgjë jashtë kutisë së izolimit
+settings-apps-folders = Dosje
+settings-apps-folders-hint = Nga hapja e ardhshme mund të lexojë dhe ndryshojë gjithçka në këto dosje.
+settings-apps-folders-count = { $count ->
+    [one] { $count } dosje
+   *[other] { $count } dosje
 }
+settings-apps-folder-add = Shto dosje
+settings-apps-folder-remove = Hiq
+settings-apps-folder-remove-app = Ndalo ndarjen e { $folder }
+settings-apps-usb = Pajisje USB
+settings-apps-usb-hint = Si çelësa sigurie, telefona dhe mikrokontrollues
+settings-apps-serial = Pajisje serike
+settings-apps-serial-hint = Si printera 3D dhe pllaka të lidhura me USB
+settings-apps-full-access-off = Punon në një kuti izolimi. Qasja e plotë e heq kutinë e izolimit.
+settings-apps-full-access-give = Jep qasje të plotë

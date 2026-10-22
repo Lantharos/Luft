@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::hash::{DefaultHasher, Hash, Hasher};
 use std::path::{Path, PathBuf};
-use std::process::Command;
+use std::process::{Command, Stdio};
 
 use gio::prelude::*;
 use luft_app::portal::{FileChooser, Filter};
@@ -57,6 +57,7 @@ pub enum Opened {
         desktop: Option<String>,
         repository: Option<Bundled>,
         repository_error: Option<String>,
+        verified: bool,
     },
     AppImage {
         path: String,
@@ -175,7 +176,20 @@ fn package(path: &str) -> Result<Opened, String> {
         desktop,
         repository,
         repository_error,
+        verified: signed(path),
     })
+}
+
+/// Whether the package is signed with a key this computer's packages are
+/// checked against, such as Fedora's.
+fn signed(path: &str) -> bool {
+    Command::new("rpmkeys")
+        .args(["--checksig", "--define", "_pkgverify_level signature"])
+        .arg(path)
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .status()
+        .is_ok_and(|status| status.success())
 }
 
 fn appimage_file(path: &str) -> Result<Opened, String> {

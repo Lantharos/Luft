@@ -99,8 +99,5 @@ pub fn register(window: SabineWindow) -> SabineWindow {
         .command("library_launch", launch)
         .command("library_permissions", permissions)
         .command_async("library_full_access", full_access::has)
-        .command_async(
-            "library_set_full_access",
-            |full_access::Change { id, on }| full_access::set(id, on),
-        )
+        .command_async("library_set_full_access", full_access::set)
 }

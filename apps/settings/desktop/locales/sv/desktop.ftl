@@ -232,3 +232,4 @@ desktop-updates-another-app = en annan app
 desktop-updates-firmware-unnamed = Enhetens firmware
 desktop-updates-firmware-current = Enheten är redan uppdaterad.
 desktop-updates-firmware-no-download = Det går inte att hämta uppdateringen.
+desktop-apps-folder-title = Välj en mapp för appen

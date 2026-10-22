@@ -23,11 +23,14 @@ const GLASS_WINDOW: GlassWindow = GlassWindow {
 
 pub fn run_app() -> ! {
     let arguments: Vec<String> = std::env::args().skip(1).collect();
-    if let Some(code) = cli::run(&arguments).or_else(|| {
-        arguments
-            .first()
-            .and_then(|command| background::run(command))
-    }) {
+    if let Some(code) = luft_sandbox::run(&arguments)
+        .or_else(|| cli::run(&arguments))
+        .or_else(|| {
+            arguments
+                .first()
+                .and_then(|command| background::run(command))
+        })
+    {
         std::process::exit(code);
     }
     let events = Events::default();

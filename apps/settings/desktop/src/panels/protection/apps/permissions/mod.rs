@@ -1,49 +1,44 @@
 mod grants;
 mod passwords;
+mod sandbox;
 mod watch;
 
+use std::collections::{BTreeSet, HashMap};
 use std::sync::Once;
 
 use luft_app::apps::App;
 use luft_app::dbus;
-use luft_app::identity::permissions;
+use luft_app::identity::permissions::{self, Apps, DEVICES, FOLDERS};
 use luft_app::{Commands, Events};
-use luft_software::apps::flatpak;
+use luft_i18n::t;
+use luft_software::apps::{appimage, flatpak};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use zbus::Connection;
 
-use grants::{Grant, Switch};
+use crate::L10N;
+use grants::{SWITCHES, Switch};
 use passwords::Remembered;
+use sandbox::Device;
+
+const FULL_ACCESS_LINK: &str = "schelf:full-access?";
 
 static WATCH: Once = Once::new();
 
-#[derive(Clone, Copy, PartialEq, Eq)]
-enum Kind {
-    Location,
-    Camera,
-    Clipboard,
-    FullAccess,
-    Passwords,
-}
-
-const KINDS: [Kind; 5] = [
-    Kind::Location,
-    Kind::Camera,
-    Kind::Clipboard,
-    Kind::FullAccess,
-    Kind::Passwords,
-];
-
 #[derive(Serialize)]
-#[serde(tag = "kind", content = "apps", rename_all = "camelCase")]
-enum Update {
-    Location(Vec<Grant>),
-    Camera(Vec<Grant>),
-    Clipboard(Vec<Grant>),
-    FullAccess(Vec<App>),
-    Passwords(Vec<Remembered>),
+#[serde(rename_all = "camelCase")]
+struct AppAccess {
+    #[serde(flatten)]
+    app: App,
+    app_image: bool,
+    location: Option<bool>,
+    camera: Option<bool>,
+    clipboard: Option<bool>,
+    passwords: Option<Remembered>,
+    full_access: bool,
+    folders: Vec<String>,
+    devices: Vec<String>,
 }
 
 #[derive(Deserialize)]
@@ -54,69 +49,95 @@ struct Change {
 }
 
 #[derive(Deserialize)]
-struct Revoke {
+struct Target {
     app: String,
 }
 
-impl Kind {
-    fn of(table: &str) -> Option<Self> {
-        KINDS.into_iter().find(|kind| kind.table() == table)
-    }
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct Revoke {
+    app: String,
+    app_image: bool,
+}
 
-    fn table(self) -> &'static str {
-        match self {
-            Self::Location => Switch::Location.entry().0,
-            Self::Camera => Switch::Camera.entry().0,
-            Self::Clipboard => Switch::Clipboard.entry().0,
-            Self::FullAccess => permissions::FULL_ACCESS.table,
-            Self::Passwords => permissions::KEYRING_ITEMS,
-        }
-    }
+#[derive(Deserialize)]
+struct Folder {
+    app: String,
+    folder: String,
+}
 
-    async fn read(self, connection: &Connection) -> zbus::Result<Update> {
-        Ok(match self {
-            Self::Location => Update::Location(grants::list(connection, Switch::Location).await?),
-            Self::Camera => Update::Camera(grants::list(connection, Switch::Camera).await?),
-            Self::Clipboard => {
-                Update::Clipboard(grants::list(connection, Switch::Clipboard).await?)
-            }
-            Self::FullAccess => Update::FullAccess(grants::full_access(connection).await?),
-            Self::Passwords => Update::Passwords(passwords::list(connection).await?),
+#[derive(Deserialize)]
+struct DeviceChange {
+    app: String,
+    device: Device,
+    on: bool,
+}
+
+fn identify(id: &str) -> App {
+    App::by_id(&format!("{id}.desktop"))
+        .map(|app| App {
+            id: id.to_owned(),
+            ..app
         })
-    }
+        .unwrap_or_else(|| App {
+            name: id.to_owned(),
+            id: id.to_owned(),
+            icon: None,
+        })
 }
 
-fn known(id: &str) -> Option<App> {
-    App::by_id(&format!("{id}.desktop")).map(|app| App {
-        id: id.to_owned(),
-        ..app
-    })
+fn by_app(apps: Apps) -> HashMap<String, Vec<String>> {
+    apps.into_iter()
+        .filter(|(app, _)| !app.is_empty())
+        .collect()
 }
 
-fn identify(id: String) -> App {
-    known(&id).unwrap_or_else(|| App {
-        name: id.clone(),
-        id,
-        icon: None,
-    })
-}
-
-fn sort<T>(apps: &mut [T], app: impl Fn(&T) -> &App) {
-    apps.sort_by_cached_key(|entry| app(entry).name.to_lowercase());
+async fn read(connection: &Connection) -> zbus::Result<Vec<AppAccess>> {
+    let [location, camera, clipboard] = [
+        SWITCHES[0].answers(connection).await?,
+        SWITCHES[1].answers(connection).await?,
+        SWITCHES[2].answers(connection).await?,
+    ];
+    let passwords = passwords::counts(connection).await?;
+    let full_access = sandbox::full_access(connection).await?;
+    let folders = by_app(permissions::lookup(connection, FOLDERS.table, FOLDERS.id).await?);
+    let devices = by_app(permissions::lookup(connection, DEVICES.table, DEVICES.id).await?);
+    let app_images: BTreeSet<String> = appimage::list().into_iter().map(|app| app.id).collect();
+    let ids: BTreeSet<&String> = location
+        .keys()
+        .chain(camera.keys())
+        .chain(clipboard.keys())
+        .chain(passwords.keys())
+        .chain(&full_access)
+        .chain(folders.keys())
+        .chain(devices.keys())
+        .chain(&app_images)
+        .collect();
+    let mut apps: Vec<AppAccess> = ids
+        .into_iter()
+        .map(|id| AppAccess {
+            app: identify(id),
+            app_image: app_images.contains(id),
+            location: location.get(id).copied(),
+            camera: camera.get(id).copied(),
+            clipboard: clipboard.get(id).copied(),
+            passwords: passwords.get(id).copied(),
+            full_access: full_access.contains(id),
+            folders: folders.get(id).cloned().unwrap_or_default(),
+            devices: devices.get(id).cloned().unwrap_or_default(),
+        })
+        .collect();
+    apps.sort_by_cached_key(|access| access.app.name.to_lowercase());
+    Ok(apps)
 }
 
 fn explain(error: zbus::Error) -> String {
     dbus::explain(&error)
 }
 
-async fn list(events: Events, _: Value) -> Result<Vec<Update>, String> {
+async fn list(events: Events, _: Value) -> Result<Vec<AppAccess>, String> {
     WATCH.call_once(|| watch::watch(events));
-    let session = dbus::session().await?;
-    let mut updates = Vec::with_capacity(KINDS.len());
-    for kind in KINDS {
-        updates.push(kind.read(session).await.map_err(explain)?);
-    }
-    Ok(updates)
+    read(dbus::session().await?).await.map_err(explain)
 }
 
 async fn set(Change { kind, app, allowed }: Change) -> Result<(), String> {
@@ -125,12 +146,45 @@ async fn set(Change { kind, app, allowed }: Change) -> Result<(), String> {
         .map_err(explain)
 }
 
-async fn revoke_full_access(Revoke { app }: Revoke) -> Result<(), String> {
-    flatpak::set_full_access(&app, false).await
+async fn revoke_full_access(Revoke { app, app_image }: Revoke) -> Result<(), String> {
+    if app_image {
+        appimage::set_full_access(&app, false).await
+    } else {
+        flatpak::set_full_access(&app, false).await
+    }
 }
 
-async fn forget_passwords(Revoke { app }: Revoke) -> Result<(), String> {
+fn ask_for_full_access(Target { app }: Target) -> Result<(), String> {
+    gio::AppInfo::launch_default_for_uri(
+        &format!("{FULL_ACCESS_LINK}{app}"),
+        None::<&gio::AppLaunchContext>,
+    )
+    .map_err(|error| error.to_string())
+}
+
+async fn forget_passwords(Target { app }: Target) -> Result<(), String> {
     passwords::forget(dbus::session().await?, &app)
+        .await
+        .map_err(explain)
+}
+
+async fn add_folder(Target { app }: Target) -> Result<bool, String> {
+    sandbox::add_folder(
+        dbus::session().await?,
+        &app,
+        &t!(L10N, "desktop-apps-folder-title"),
+    )
+    .await
+}
+
+async fn remove_folder(Folder { app, folder }: Folder) -> Result<(), String> {
+    sandbox::remove_folder(dbus::session().await?, &app, &folder)
+        .await
+        .map_err(explain)
+}
+
+async fn set_device(DeviceChange { app, device, on }: DeviceChange) -> Result<(), String> {
+    sandbox::set_device(dbus::session().await?, &app, device, on)
         .await
         .map_err(explain)
 }
@@ -140,5 +194,9 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .with_async("apps_permissions", events, list)
         .command_async("apps_permission_set", set)
         .command_async("apps_full_access_revoke", revoke_full_access)
+        .command("apps_full_access_ask", ask_for_full_access)
         .command_async("apps_passwords_forget", forget_passwords)
+        .command_async("apps_folder_add", add_folder)
+        .command_async("apps_folder_remove", remove_folder)
+        .command_async("apps_device_set", set_device)
 }

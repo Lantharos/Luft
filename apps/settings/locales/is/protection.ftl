@@ -448,17 +448,28 @@ settings-apps-permissions = Heimildir
 settings-apps-location = Staðsetning
 settings-apps-camera = Myndavél
 settings-apps-clipboard = Klippiborð í bakgrunni
-settings-apps-clipboard-hint = Þessi forrit geta séð og breytt því sem þú afritar, líka á meðan þú notar önnur forrit.
 settings-apps-full-access = Fullur aðgangur
-settings-apps-full-access-hint = Þessi forrit keyra utan sandkassans síns og teljast vera þú, eins og forrit sem eru sett upp á kerfinu. Ef þú fjarlægir hann tekur það gildi næst þegar forritið er opnað.
+settings-apps-full-access-hint = Það keyrir utan sandkassans og getur allt sem forrit sem þú ræsir sjálf(ur) getur. Fjarlæging tekur gildi við næstu ræsingu.
 settings-apps-full-access-remove = Fjarlægja
 settings-apps-full-access-remove-app = Fjarlægja fullan aðgang frá { $app }
 settings-apps-passwords = Vistuð lykilorð
-settings-apps-passwords-hint = Forrit muna svarið þitt þegar þau biðja um að nota eitthvað úr lyklakippunni. Gleymdu því til að forritið spyrji aftur.
 settings-apps-passwords-forget = Gleyma
 settings-apps-passwords-forget-app = Láta { $app } spyrja aftur
 settings-apps-permissions-allowed = { $allowed } af { $total } leyfð
-settings-apps-permissions-count = { $count ->
-    [one] { $count } forrit
-   *[other] { $count } forrit
+settings-apps-permissions-description = Forrit í sandkassa fá eigin skrár og aðeins það sem þú leyfir hér.
+settings-apps-sandbox-only = Ekkert utan sandkassans
+settings-apps-folders = Möppur
+settings-apps-folders-hint = Það getur lesið og breytt öllu í þessum möppum frá næstu ræsingu.
+settings-apps-folders-count = { $count ->
+    [one] { $count } mappa
+   *[other] { $count } möppur
 }
+settings-apps-folder-add = Bæta við möppu
+settings-apps-folder-remove = Fjarlægja
+settings-apps-folder-remove-app = Hætta að deila { $folder }
+settings-apps-usb = USB-tæki
+settings-apps-usb-hint = Til dæmis öryggislyklar, símar og örstýringar
+settings-apps-serial = Raðtengitæki
+settings-apps-serial-hint = Til dæmis þrívíddarprentarar og borð tengd með USB
+settings-apps-full-access-off = Það keyrir í sandkassa. Fullur aðgangur tekur sandkassann burt.
+settings-apps-full-access-give = Veita fullan aðgang

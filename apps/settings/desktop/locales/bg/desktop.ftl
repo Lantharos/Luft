@@ -232,3 +232,4 @@ desktop-updates-another-app = друго приложение
 desktop-updates-firmware-unnamed = Фърмуер на устройството
 desktop-updates-firmware-current = Това устройство вече е актуално.
 desktop-updates-firmware-no-download = Тази актуализация не може да бъде изтеглена.
+desktop-apps-folder-title = Изберете папка за приложението

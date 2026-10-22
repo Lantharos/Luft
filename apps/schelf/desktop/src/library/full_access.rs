@@ -1,29 +1,42 @@
-use luft_software::apps::flatpak;
+use luft_software::apps::{appimage, flatpak};
 use luft_software::system::System;
 use serde::Deserialize;
+
+use super::Source;
 
 #[derive(Deserialize)]
 pub struct App {
     id: String,
+    source: Source,
 }
 
 #[derive(Deserialize)]
 pub struct Change {
     pub id: String,
+    pub source: Source,
     pub on: bool,
 }
 
-pub fn offered() -> bool {
+pub fn offered_for_flatpaks() -> bool {
     System::current() == System::Image
 }
 
-pub async fn has(App { id }: App) -> Result<bool, String> {
-    Ok(offered() && flatpak::has_full_access(&id).await)
+fn offered(source: Source) -> bool {
+    match source {
+        Source::AppImage => true,
+        Source::Flatpak => offered_for_flatpaks(),
+        _ => false,
+    }
 }
 
-pub async fn set(id: String, on: bool) -> Result<(), String> {
-    if !offered() {
-        return Err("Full access is for Flatpak apps on Luft.".to_owned());
+pub async fn has(App { id, source }: App) -> Result<bool, String> {
+    Ok(offered(source) && flatpak::has_full_access(&id).await)
+}
+
+pub async fn set(Change { id, source, on }: Change) -> Result<(), String> {
+    match source {
+        Source::AppImage => appimage::set_full_access(&id, on).await,
+        Source::Flatpak if offered(source) => flatpak::set_full_access(&id, on).await,
+        _ => Err("Full access is for Flatpak apps on Luft and for AppImages.".to_owned()),
     }
-    flatpak::set_full_access(&id, on).await
 }

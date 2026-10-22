@@ -12,6 +12,7 @@ use super::session::decode;
 use super::{Properties, Secret, SecretError, Target, item_path, none, sync};
 use crate::daemon::Daemon;
 use crate::prompter::{Answer, Request};
+use crate::requester::Requester;
 
 const ITEM_LABEL: &str = "org.freedesktop.Secret.Item.Label";
 const ITEM_ATTRIBUTES: &str = "org.freedesktop.Secret.Item.Attributes";
@@ -37,6 +38,34 @@ impl Collection {
         let id = self.id().await?;
         let keyring = self.daemon.keyring.lock().await;
         keyring.view()?.collection(&id).map(read)
+    }
+
+    /// The item a save replaces: one with the same attributes that the
+    /// requester may already use. Anything else stays as it is, and the
+    /// requester gets an item of its own.
+    async fn replaceable(
+        &self,
+        requester: &Requester,
+        id: &str,
+        attributes: &BTreeMap<String, String>,
+    ) -> Option<u64> {
+        let matching: Vec<u64> = {
+            let keyring = self.daemon.keyring.lock().await;
+            keyring
+                .contents()?
+                .collection(id)?
+                .items
+                .iter()
+                .filter(|item| item.attributes == *attributes && requester.view.shows(item))
+                .map(|item| item.id)
+                .collect()
+        };
+        for item in matching {
+            if self.daemon.allowed(requester, &(id.to_owned(), item)).await {
+                return Some(item);
+            }
+        }
+        None
     }
 }
 
@@ -146,32 +175,13 @@ impl Collection {
             .into_iter()
             .collect();
         let existing = if replace {
-            let keyring = self.daemon.keyring.lock().await;
-            keyring.contents().and_then(|contents| {
-                contents
-                    .collection(&id)?
-                    .items
-                    .iter()
-                    .find(|item| item.attributes == attributes && requester.view.shows(item))
-                    .map(|item| item.id)
-            })
+            self.replaceable(&requester, &id, &attributes).await
         } else {
             None
         };
         if existing.is_none() && !self.daemon.may_save(&requester, &label).await {
             return Err(SecretError::IsLocked(
                 "Saving this item was declined".into(),
-            ));
-        }
-        if let Some(existing) = existing
-            && self
-                .daemon
-                .authorize(&requester, &[(id.clone(), existing)], true)
-                .await
-                .is_empty()
-        {
-            return Err(SecretError::IsLocked(
-                "Replacing this item was declined".into(),
             ));
         }
         let mut item = StoredItem::new(

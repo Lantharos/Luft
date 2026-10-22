@@ -9,6 +9,7 @@ const CHROMIUM_SCOPE: &str = "org.chromium.Chromium";
 const PSEUDO: &str = "unit:";
 const SABINE_RUNTIME_UNIT: &str = "sabine-runtime@";
 const SABINE_RUNTIME: &str = "sabine:runtime";
+const SABINE_ICON: &str = "com.lantharos.sabine";
 
 pub fn is_desktop_app(key: &str) -> bool {
     !key.starts_with(PSEUDO) && key != SABINE_RUNTIME
@@ -117,7 +118,7 @@ impl Apps {
                     .or_insert_with(|| AppInfo {
                         key: SABINE_RUNTIME.to_owned(),
                         name: "Sabine".to_owned(),
-                        icon: None,
+                        icon: Some(SABINE_ICON.to_owned()),
                     });
                 SABINE_RUNTIME.to_owned()
             })

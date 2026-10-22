@@ -1659,6 +1659,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "92773504d58c093f6de2459af4af33faa518c13451eb8f2b5698ed3d36e7c813"
 
 [[package]]
+name = "ecb"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "26f2a8b3e564eba0877223dc343703ad0385794e882e6d13f3a4dd5c6b1f41ac"
+dependencies = [
+ "cipher",
+]
+
+[[package]]
 name = "ecdsa"
 version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2290,7 +2299,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ee8cfcc411d9adbbaba82fb72661cc1bcca13e8bba98b364e62b2dba8f960159"
 dependencies = [
  "color_quant",
- "weezl",
+ "weezl 0.1.12",
 ]
 
 [[package]]
@@ -4156,6 +4165,33 @@ dependencies = [
  "precomputed-hash",
  "selectors",
  "thiserror 2.0.21",
+]
+
+[[package]]
+name = "lopdf"
+version = "0.46.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d43f64cb8c0d673ff84245a6de9e0172c0cc05dc5dd9d263660b5b4a02b6c4ae"
+dependencies = [
+ "aes",
+ "bitflags 2.13.2",
+ "brotli-decompressor",
+ "cbc",
+ "ecb",
+ "encoding_rs",
+ "flate2",
+ "getrandom 0.4.3",
+ "indexmap",
+ "itoa",
+ "log",
+ "md-5",
+ "nom 8.0.0",
+ "rand",
+ "rangemap",
+ "sha2",
+ "stringprep",
+ "thiserror 2.0.21",
+ "weezl 0.2.1",
 ]
 
 [[package]]
@@ -6682,8 +6718,8 @@ checksum = "cf54715a573b99ac80df0bc206da022bcd442c974952c7b9720069370852e21f"
 
 [[package]]
 name = "sabine"
-version = "0.52.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.52#02e4e66d2cd08c8e3fc73dffb0cc7b71403d3842"
+version = "0.53.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.53#3298fa4ea0f80ac5551e2b7bb566ac881341e0c8"
 dependencies = [
  "base64",
  "block2",
@@ -6700,6 +6736,7 @@ dependencies = [
  "khronos-egl",
  "libc",
  "libloading 0.9.0",
+ "lopdf",
  "mach2",
  "objc2",
  "objc2-app-kit",
@@ -6741,8 +6778,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-bridge"
-version = "0.52.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.52#02e4e66d2cd08c8e3fc73dffb0cc7b71403d3842"
+version = "0.53.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.53#3298fa4ea0f80ac5551e2b7bb566ac881341e0c8"
 dependencies = [
  "serde",
  "serde_json",
@@ -6750,8 +6787,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-host"
-version = "0.52.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.52#02e4e66d2cd08c8e3fc73dffb0cc7b71403d3842"
+version = "0.53.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.53#3298fa4ea0f80ac5551e2b7bb566ac881341e0c8"
 dependencies = [
  "sabine-bridge",
  "sabine-runtime",
@@ -6762,8 +6799,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-platform"
-version = "0.52.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.52#02e4e66d2cd08c8e3fc73dffb0cc7b71403d3842"
+version = "0.53.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.53#3298fa4ea0f80ac5551e2b7bb566ac881341e0c8"
 dependencies = [
  "block2",
  "futures-util",
@@ -6782,8 +6819,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-runtime"
-version = "0.52.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.52#02e4e66d2cd08c8e3fc73dffb0cc7b71403d3842"
+version = "0.53.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.53#3298fa4ea0f80ac5551e2b7bb566ac881341e0c8"
 dependencies = [
  "bzip2",
  "libc",
@@ -6799,12 +6836,13 @@ dependencies = [
 
 [[package]]
 name = "sabine-service"
-version = "0.52.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.52#02e4e66d2cd08c8e3fc73dffb0cc7b71403d3842"
+version = "0.53.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.53#3298fa4ea0f80ac5551e2b7bb566ac881341e0c8"
 dependencies = [
  "base64",
  "clap",
  "ed25519-dalek",
+ "embed-resource",
  "flate2",
  "getrandom 0.4.3",
  "libc",
@@ -7462,6 +7500,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "stringprep"
+version = "0.1.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7b4df3d392d81bd458a8a621b8bffbd2302a12ffe288a9d931670948749463b1"
+dependencies = [
+ "unicode-bidi",
+ "unicode-normalization",
+ "unicode-properties",
+]
+
+[[package]]
 name = "strsim"
 version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7800,7 +7849,7 @@ dependencies = [
  "flate2",
  "half",
  "quick-error",
- "weezl",
+ "weezl 0.1.12",
  "zune-jpeg",
 ]
 
@@ -8217,6 +8266,21 @@ name = "unicode-linebreak"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3b09c83c3c29d37506a3e260c08c03743a6bb66a9cd432c6934ab501a190571f"
+
+[[package]]
+name = "unicode-normalization"
+version = "0.1.26"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "75cd3fb03d5288b3ba9a1ee103ac7e9cbb59f0b03d64f8ddfcc04dd42758a85d"
+dependencies = [
+ "tinyvec",
+]
+
+[[package]]
+name = "unicode-properties"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7df058c713841ad818f1dc5d3fd88063241cc61f49f5fbea4b951e8cf5a8d71d"
 
 [[package]]
 name = "unicode-script"
@@ -8679,6 +8743,12 @@ name = "weezl"
 version = "0.1.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a28ac98ddc8b9274cb41bb4d9d4d5c425b6020c50c46f25559911905610b4a88"
+
+[[package]]
+name = "weezl"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d4ca08e5ef825b65b056d9efbd95c8750683f0a6d0466d02e96dc2e4e360f3d2"
 
 [[package]]
 name = "wgpu"

@@ -52,15 +52,19 @@ pub fn grub() -> Result<PathBuf> {
     installed(GRUB_VERSIONS, SECOND_STAGE, "Fedora's GRUB").map(|folder| folder.join(SECOND_STAGE))
 }
 
+fn settle(folder: &Path) -> Result<()> {
+    rustix::fs::syncfs(std::fs::File::open(folder)?)?;
+    Ok(())
+}
+
 pub fn write(path: &Path, contents: &[u8]) -> Result<()> {
-    if let Some(folder) = path.parent() {
-        std::fs::create_dir_all(folder)?;
-    }
+    let folder = path.parent().context("A file needs a folder.")?;
+    std::fs::create_dir_all(folder)?;
     let partial = path.with_extension("partial");
     std::fs::write(&partial, contents)?;
     std::fs::File::open(&partial)?.sync_all()?;
     std::fs::rename(&partial, path)?;
-    Ok(())
+    settle(folder)
 }
 
 pub fn write_if_changed(path: &Path, contents: &[u8]) -> Result<bool> {
@@ -75,4 +79,28 @@ pub fn copy_if_changed(source: &Path, target: &Path) -> Result<bool> {
     let contents =
         std::fs::read(source).with_context(|| format!("{} is missing.", source.display()))?;
     write_if_changed(target, &contents)
+}
+
+pub fn place_shim_after(second_stage: &Path, folder: &Path, shim_name: &str) -> Result<bool> {
+    let shim = shim_folder()?;
+    let mut changed = copy_if_changed(second_stage, &folder.join(SECOND_STAGE))?;
+    changed |= copy_if_changed(&shim.join(MOK_MANAGER), &folder.join(MOK_MANAGER))?;
+    changed |= copy_if_changed(&shim.join(SHIM), &folder.join(shim_name))?;
+    Ok(changed)
+}
+
+pub fn write_folder_once(folder: &Path, files: &[(&str, &[u8])]) -> Result<bool> {
+    if folder.is_dir() {
+        return Ok(false);
+    }
+    let partial = folder.with_extension("partial");
+    let _ = std::fs::remove_dir_all(&partial);
+    std::fs::create_dir_all(&partial)?;
+    for (name, contents) in files {
+        std::fs::write(partial.join(name), contents)?;
+    }
+    settle(&partial)?;
+    std::fs::rename(&partial, folder)?;
+    settle(folder)?;
+    Ok(true)
 }

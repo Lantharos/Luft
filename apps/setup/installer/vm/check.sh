@@ -251,7 +251,7 @@ check_alongside_windows() {
   pass "Windows' boot files stay, next to shim, SushiBoot and Luft's certificate"
   mount -o ro /dev/vde4 "$TARGET" || fail "the startup partition doesn't mount"
   compgen -G "$TARGET/EFI/Linux/bootc/*.efi" > /dev/null && grep -qs '^uki ' "$TARGET"/loader/entries/*.conf &&
-    [[ -f "$TARGET/EFI/luft-start/linux" && -f "$TARGET/EFI/luft-start/initrd" ]] ||
+    compgen -G "$TARGET/EFI/luft-start/*/linux" > /dev/null && compgen -G "$TARGET/EFI/luft-start/*/initrd" > /dev/null ||
     fail "the startup images aren't on the startup partition"
   umount "$TARGET"
   pass "the signed startup images and their entries are on the startup partition"

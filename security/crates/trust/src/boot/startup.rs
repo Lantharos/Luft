@@ -1,9 +1,9 @@
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use anyhow::Result;
 
 use super::esp::{self, Esp};
-use super::files::{self, MOK_MANAGER, SECOND_STAGE, SHIM};
+use super::files::{self, SECOND_STAGE, SHIM};
 use super::{entry, fallback, partition};
 use crate::keys::{self, mok};
 use crate::system::firmware::efi;
@@ -19,20 +19,6 @@ const BOOTCTL_FOLDERS: [&str; 3] = ["loader/keys", "loader/entries", "EFI/Linux"
 const LOADER: &str = "\\EFI\\luft\\shimx64.efi";
 const LABEL: &str = "Luft";
 const FALLBACK_LABEL: &str = "Luft without its key";
-
-fn placements() -> Result<Vec<(PathBuf, String)>> {
-    let shim = files::shim_folder()?;
-    let place = |source: PathBuf, folder: &str, name: &str| (source, format!("{folder}/{name}"));
-    Ok(vec![
-        place(shim.join(SHIM), FOLDER, SHIM),
-        place(shim.join(MOK_MANAGER), FOLDER, MOK_MANAGER),
-        place(PathBuf::from(BOOT_MENU), FOLDER, SECOND_STAGE),
-        place(PathBuf::from(keys::CERTIFICATE), FOLDER, CERTIFICATE),
-        place(shim.join(SHIM), REMOVABLE, REMOVABLE_SHIM),
-        place(shim.join(MOK_MANAGER), REMOVABLE, MOK_MANAGER),
-        place(PathBuf::from(BOOT_MENU), REMOVABLE, SECOND_STAGE),
-    ])
-}
 
 fn remove_systemd_boot(esp: &Esp) {
     let _ = std::fs::remove_dir_all(esp.file(SYSTEMD_BOOT));
@@ -80,14 +66,16 @@ fn place_fallback(esp: &Esp) -> Result<bool> {
 }
 
 pub fn place(esp: &Esp) -> Result<bool> {
-    let mut changed = false;
-    for (source, target) in placements()? {
-        changed |= files::copy_if_changed(&source, &esp.file(&target))?;
-    }
+    let boot_menu = Path::new(BOOT_MENU);
+    let mut changed = files::copy_if_changed(
+        Path::new(keys::CERTIFICATE),
+        &esp.file(&format!("{FOLDER}/{CERTIFICATE}")),
+    )?;
+    changed |= files::place_shim_after(boot_menu, &esp.file(FOLDER), SHIM)?;
+    changed |= files::place_shim_after(boot_menu, &esp.file(REMOVABLE), REMOVABLE_SHIM)?;
     remove_systemd_boot(esp);
     hide_menu(esp)?;
     changed |= place_fallback(esp)?;
-    rustix::fs::sync();
     if efi::booted_with_uefi() {
         entry::ensure(esp, LABEL, LOADER)?;
         entry::put_first(&[LABEL, FALLBACK_LABEL])?;

@@ -67,6 +67,15 @@ impl Reference {
         Variant::of(&self.image)
     }
 
+    pub fn channel(&self) -> Option<&'static str> {
+        let standard = Variant::Standard.reference(&self.current())?;
+        match standard.rsplit_once(':')?.1 {
+            "1-nightly" => Some("nightly"),
+            "1" => Some("1"),
+            _ => None,
+        }
+    }
+
     pub fn as_variant(&self, variant: Variant) -> Option<Self> {
         Some(Self {
             image: variant.reference(&self.current())?,

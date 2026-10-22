@@ -1,5 +1,6 @@
 mod config;
 mod host;
+mod notes;
 mod registry;
 mod updater;
 
@@ -88,13 +89,22 @@ impl Deployments {
     }
 
     pub fn check(&self) -> Result<Option<Update>, String> {
-        let location = self.followed()?.location().ok_or(NOT_FROM_AN_IMAGE)?;
+        let followed = self.followed()?;
+        let location = followed.location().ok_or(NOT_FROM_AN_IMAGE)?;
         let image = registry::fetch(&location)?;
         if image.config.layers() == self.0.booted.layers() {
             return Ok(None);
         }
+        let mut release = image.config.release();
+        if let (Some(channel), Some(installed), Some(offered)) = (
+            followed.channel(),
+            self.0.booted.release().version,
+            release.version.as_deref(),
+        ) {
+            release.notes = notes::between(channel, &installed, offered).or(release.notes);
+        }
         Ok(Some(Update {
-            release: image.config.release(),
+            release,
             size: self.new_bytes(&image),
             layers: image.config.layers().to_vec(),
         }))

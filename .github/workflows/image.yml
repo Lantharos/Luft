@@ -26,6 +26,7 @@ env:
   LUFT_PARTS: ghcr.io/lantharos/luft-parts
   FEDORA: "45"
   MAJOR: "1"
+  DOWNLOADS: https://get.luft.computer
   RETIRED_NIGHTLY: 45-nightly
 
 jobs:
@@ -44,8 +45,22 @@ jobs:
       - uses: ./.github/actions/registry
 
       - name: Release the tested nightly
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
         run: |
           version="${GITHUB_REF_NAME#v}"
+          previous="$(skopeo inspect --retry-times 3 --format '{{index .Labels "org.opencontainers.image.version"}}' "docker://$IMAGE:$MAJOR" || true)"
+          notes=()
+          nightly="$version"
+          while [[ -n "$nightly" && "$(printf '%s\n' "$previous" "$nightly" | sort -V | tail -n 1)" != "$previous" ]]; do
+            entry="$(curl -sf "$DOWNLOADS/nightly/notes/$nightly.json")" || break
+            notes+=("$(jq -r .notes <<<"$entry")")
+            nightly="$(jq -r '.previous // empty' <<<"$entry")"
+          done
           sudo install -Dm644 -t /usr/share/pki/containers os/image/files/usr/share/pki/containers/luft.pub
           install -Dm644 -t ~/.config/containers/registries.d os/image/files/etc/containers/registries.d/luft.yaml
           for suffix in "" -nvidia; do
@@ -53,6 +68,10 @@ jobs:
             skopeo copy --retry-times 3 --preserve-digests --policy os/image/files/etc/containers/policy.json \
               "docker://$IMAGE@$digest" "docker://$IMAGE:$MAJOR$suffix"
           done
+          jq -n --arg version "$version" --arg previous "$previous" --arg notes "$(printf '%s\n' "${notes[@]}")" \
+            '{version: $version, previous: (if $previous == "" then null else $previous end), notes: $notes}' |
+            aws s3 cp - "s3://$R2_BUCKET/$MAJOR/notes/$version.json" --endpoint-url "https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com" \
+              --content-type application/json --only-show-errors
 
   plan:
     if: github.ref_type != 'tag'
@@ -238,6 +257,21 @@ jobs:
           sparse-checkout: .github/actions
 
       - uses: ./.github/actions/registry
+
+      - name: Publish the release notes
+        env:
+          NOTES: ${{ needs.plan.outputs.notes }}
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+        run: |
+          previous="$(skopeo inspect --retry-times 3 --format '{{index .Labels "org.opencontainers.image.version"}}' "docker://$IMAGE:$MAJOR-nightly")"
+          jq -n --arg version "$VERSION" --arg previous "$previous" --arg notes "$NOTES" \
+            '{version: $version, previous: $previous, notes: $notes}' |
+            aws s3 cp - "s3://$R2_BUCKET/nightly/notes/$VERSION.json" --endpoint-url "https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com" \
+              --content-type application/json --only-show-errors
 
       - name: Tag both images
         run: |

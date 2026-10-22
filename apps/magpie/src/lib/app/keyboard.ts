@@ -5,7 +5,7 @@ import { activePhoto } from '#lib/photo/active.svelte.js';
 import { copyImage } from '#lib/photo/clipboard.js';
 import { slideshow } from '#lib/photo/slideshow.svelte.js';
 import { volume } from '#lib/playback/volume.svelte.js';
-import { openFile } from './actions';
+import { canPrint, openFile, printCurrent } from './actions';
 import { chrome } from './chrome.svelte';
 import { viewHandled } from './keys';
 
@@ -35,6 +35,7 @@ function common(event: KeyboardEvent, primary: boolean) {
 	else if (key === 'F11' || (key === 'f' && !primary)) chrome.setFullscreen(!chrome.fullscreen);
 	else if (key === 'F9') togglePanel();
 	else if (primary && key === 'o') void openFile();
+	else if (primary && key === 'p' && canPrint()) void printCurrent();
 	else if (key === 'PageDown' && library.group !== 'document') library.step(1);
 	else if (key === 'PageUp' && library.group !== 'document') library.step(-1);
 	else if (event.altKey && key === 'Enter' && library.current?.kind === 'image') chrome.details = !chrome.details;

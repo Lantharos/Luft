@@ -4,6 +4,7 @@
 	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
 	import RotateCw from '@lucide/svelte/icons/rotate-cw';
 	import * as api from '#lib/bridge/api.js';
+	import { canPrint, printCurrent } from '#lib/app/actions.js';
 	import { chrome } from '#lib/app/chrome.svelte.js';
 	import MoreMenu from '#lib/shell/MoreMenu.svelte';
 	import { activePhoto } from './active.svelte';
@@ -59,6 +60,13 @@
 				close();
 				void copy();
 			}}>Copy</MenuItem
+		>
+		<MenuItem
+			disabled={!canPrint()}
+			onclick={() => {
+				close();
+				void printCurrent();
+			}}>Print…</MenuItem
 		>
 		<MenuItem
 			disabled={!activePhoto.item}

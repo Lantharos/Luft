@@ -1,10 +1,11 @@
 <script lang="ts">
-	import { tooltip } from '@luft/ui';
+	import { MenuItem, tooltip } from '@luft/ui';
 	import Minus from '@lucide/svelte/icons/minus';
 	import MoveHorizontal from '@lucide/svelte/icons/move-horizontal';
 	import Plus from '@lucide/svelte/icons/plus';
 	import RectangleVertical from '@lucide/svelte/icons/rectangle-vertical';
 	import Search from '@lucide/svelte/icons/search';
+	import { canPrint, printCurrent } from '#lib/app/actions.js';
 	import MoreMenu from '#lib/shell/MoreMenu.svelte';
 	import FindBar from './FindBar.svelte';
 	import { documentState } from './state.svelte';
@@ -50,7 +51,17 @@
 >
 	<RectangleVertical size={17} />
 </button>
-<MoreMenu />
+<MoreMenu>
+	{#snippet children(close)}
+		<MenuItem
+			disabled={!canPrint()}
+			onclick={() => {
+				close();
+				void printCurrent();
+			}}>Print…</MenuItem
+		>
+	{/snippet}
+</MoreMenu>
 
 <style>
 	.on {

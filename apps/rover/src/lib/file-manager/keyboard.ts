@@ -72,6 +72,7 @@ function handleShortcut(event: KeyboardEvent, manager: FileManager, key: string)
 		x: manager.actions.cut,
 		v: manager.actions.paste,
 		a: () => manager.replaceSelection(manager.view === 'trash' ? manager.trash.items.map((item) => item.id) : manager.displayEntries.map((entry) => entry.path)),
+		p: () => tools.printFiles(manager, tools.selection(manager)),
 		t: () => manager.openTab(),
 		w: () => manager.closeTab(manager.tabs.activeId)
 	};

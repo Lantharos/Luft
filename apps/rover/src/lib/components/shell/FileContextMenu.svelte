@@ -17,6 +17,7 @@
 	import Link from '@lucide/svelte/icons/link';
 	import PackageOpen from '@lucide/svelte/icons/package-open';
 	import Plus from '@lucide/svelte/icons/plus';
+	import Printer from '@lucide/svelte/icons/printer';
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 	import Scissors from '@lucide/svelte/icons/scissors';
 	import Search from '@lucide/svelte/icons/search';
@@ -51,6 +52,7 @@
 	let cloudDrive = $derived(target ? manager.cloud.holding(target.path) : undefined);
 	let kept = $derived(cloud.keptEverywhere(manager, targets));
 	let archives = $derived(targets.length > 0 && targets.every((entry) => !entry.isDir && isArchive(entry.name)));
+	let printable = $derived(tools.printable(targets));
 
 	function close() {
 		manager.contextMenu = null;
@@ -116,6 +118,9 @@
 		{@render item(Archive, 'Compress…', () => tools.compress(manager, targets))}
 		{#if archives}
 			{@render item(PackageOpen, 'Extract here', () => tools.extract(manager, targets))}
+		{/if}
+		{#if printable}
+			{@render item(Printer, 'Print…', () => tools.printFiles(manager, targets))}
 		{/if}
 		{#if target.isDir}
 			{@render item(Terminal, 'Open in terminal', () => tools.openTerminal(manager, target.path))}

@@ -134,6 +134,11 @@ export function previewKind({ isDir, mimeType }: KindSource): PreviewKind {
 	return PREVIEW_BY_MIME.get(mimeType) ?? (isText(mimeType) ? 'text' : 'none');
 }
 
+export function isPrintable({ isDir, mimeType }: KindSource) {
+	if (isDir || !mimeType) return false;
+	return mimeType === 'application/pdf' || PREVIEW_BY_MIME.get(mimeType) === 'image' || isText(mimeType);
+}
+
 export function isImage(entry: KindSource) {
 	return fileKind(entry) === 'image';
 }

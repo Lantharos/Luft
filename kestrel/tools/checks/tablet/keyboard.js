@@ -5,6 +5,7 @@ import Meta from 'gi://Meta';
 import St from 'gi://St';
 import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
+import {getInputSourceManager} from 'resource:///com/lantharos/kestrel/ui/status/keyboard.js';
 
 import {descendants, labelled, named, shown, shownStyled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
@@ -13,7 +14,7 @@ import {centerOf, hold, press, release} from '../lib/input/input.js';
 import {LuftApp} from '../lib/apps/luftApp.js';
 import {fixture, gjs, scratch, spawn, stop, waitForWindow} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
-import {settled} from '../lib/wait.js';
+import {settled, waitUntil} from '../lib/wait.js';
 import {darkened, lock, unlock} from '../lockScreen/lib/shield.js';
 import {fold, tap} from './lib/touch.js';
 
@@ -141,6 +142,9 @@ async function checkLayouts() {
   try {
     settings.set_value('mru-sources', SERBIAN);
     settings.set_value('sources', SERBIAN);
+    const manager = getInputSourceManager();
+    const latin = await waitUntil(() => Object.values(manager.inputSources).find(source => source.id === 'rs+latin'), 'Kestrel offers Serbian Latin');
+    if (manager.currentSource !== latin) latin.activate(true);
     await eventually(showsLatin, 'the on-screen keyboard shows Latin letters while Serbian Latin is the input source');
     switchInputSource();
     await eventually(showsCyrillic, 'the on-screen keyboard switches to Cyrillic with the input source');

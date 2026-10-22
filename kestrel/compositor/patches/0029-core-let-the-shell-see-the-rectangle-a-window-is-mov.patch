@@ -102,16 +102,16 @@ index deb8b8cde4fd6cba41e0a54b63e60c7068a8a4a5..4d04b5b58f8f1af68f7ea6d34f44bf24
  meta_window_wayland_get_pending_serial (MetaWindowWayland *wl_window,
                                          uint32_t          *serial)
 diff --git a/src/wayland/meta-window-wayland.h b/src/wayland/meta-window-wayland.h
-index 0c3e7fbda62c7c339a430159f5c293ad802e2767..3d2b3ce41dc1ec89e96c560b205885af0d9e281f 100644
+index 0c3e7fbda62c7c339a430159f5c293ad802e2767..664dd6e4bb1d15b5e1b6c26faf96e35d48d8a07f 100644
 --- a/src/wayland/meta-window-wayland.h
 +++ b/src/wayland/meta-window-wayland.h
-@@ -82,6 +82,9 @@ META_EXPORT_TEST
+@@ -81,6 +81,9 @@ gboolean meta_window_wayland_is_resize (MetaWindowWayland *wl_window,
+ META_EXPORT_TEST
  gboolean meta_window_wayland_is_acked_fullscreen (MetaWindowWayland *wl_window);
  
- META_EXPORT_TEST
 +void meta_window_wayland_get_pending_frame_rect (MetaWindowWayland *wl_window,
 +                                                 MtkRectangle      *rect);
 +
+ META_EXPORT_TEST
  gboolean meta_window_wayland_get_pending_serial (MetaWindowWayland *wl_window,
                                                   uint32_t          *serial);
- 

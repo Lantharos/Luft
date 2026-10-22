@@ -28,7 +28,7 @@ async function saved(app, name, condition) {
 
 export async function checkDictation(app) {
   const {port} = freePorts('port');
-  const mirror = spawn(['python3', fixture('services', 'speechModels.py'), `${port}`, repository('packages', 'speech', 'data', 'models.json')]);
+  const mirror = spawn(['python3', fixture('services', 'speechModels.py'), `${port}`, repository('services', 'speech', 'data', 'models.json')]);
   const preferences = new Gio.Settings({schema_id: 'com.lantharos.kestrel.dictation'});
   const service = spawn([SERVICE], {env: {
     XDG_DATA_HOME: scratch('kestrel-settings-dictation', `${GLib.get_real_time()}`),

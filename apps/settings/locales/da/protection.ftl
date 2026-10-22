@@ -53,6 +53,7 @@ settings-privacy-delete-after-hint = Hvor længe filer bliver liggende, før de 
 
 settings-security-protected = Din enhed er beskyttet
 settings-security-could-be-safer = Din enhed kunne være bedre beskyttet
+settings-security-not-encrypted-description = Dens disk er ikke krypteret, så alle, der tager den ud, kan læse dine filer.
 settings-security-starts-differently-description = Hvis du har ændret dens indstillinger for Secure Boot, skal du bekræfte det, så disken igen låses op af sig selv.
 settings-security-needed-recovery-key = Din disk skulle bruge sin genoprettelsesnøgle
 settings-security-needed-recovery-key-description = Tilknyt sikkerhedschippen igen, så den låses op af sig selv.
@@ -147,6 +148,7 @@ settings-usb-hold-back-description = Enheder, der tilsluttes, mens computeren er
 ## Device encryption
 
 settings-encryption = Enhedskryptering
+settings-encryption-not-encrypted = Slået fra, og det kan kun slås til, mens Luft installeres
 settings-encryption-unlocks-chip-pin = Låses op med sikkerhedschippen og din pinkode
 settings-encryption-unlocks-chip = Låses op af sig selv med sikkerhedschippen
 settings-encryption-unlocks-passphrase = Beder om din adgangsfrase ved opstart

@@ -2,7 +2,7 @@ use std::path::Path;
 
 use anyhow::{Context, Result};
 
-use crate::system::command::Tool;
+use crate::system::host::command::Tool;
 
 const MOUNTED: &str = "/var";
 const ALLOCATIONS: [&str; 3] = ["data", "metadata", "system"];
@@ -53,14 +53,14 @@ pub fn member(device: &str) -> Result<Option<Member>> {
 pub fn add(device: &str) -> Result<()> {
     Tool::new("btrfs")
         .args(["device", "add", "--force", device, MOUNTED])
-        .run()
+        .status()
         .with_context(|| format!("{device} couldn't join Luft's file system"))
 }
 
 pub fn remove(device: &str) -> Result<()> {
     Tool::new("btrfs")
         .args(["device", "remove", device, MOUNTED])
-        .run()
+        .status()
         .with_context(|| format!("Luft's files couldn't move off {device}"))
 }
 
@@ -68,7 +68,7 @@ pub fn resize(devid: u64, size: Option<u64>) -> Result<()> {
     let size = size.map_or_else(|| "max".to_owned(), |size| size.to_string());
     Tool::new("btrfs")
         .args(["filesystem", "resize", &format!("{devid}:{size}"), MOUNTED])
-        .run()
+        .status()
         .context("Luft's file system couldn't change its size")
 }
 

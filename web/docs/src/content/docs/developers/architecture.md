@@ -27,7 +27,7 @@ firmware → shim (signed by Microsoft) → SushiBoot (Luft's key)
 
 - **SushiBoot** is Luft's UEFI boot menu. It reads Boot Loader Specification entries, counts tries for new versions and falls back to the last one that worked, and measures what it starts into the TPM like systemd-boot.
 - **Sushi** is the boot splash, in place of Plymouth. It keeps the firmware logo on screen from power-on to the login screen, asks for disk passphrases, and shows update progress.
-- **trustd** handles Secure Boot key enrollment, keeps shim and SushiBoot up to date, unlocks the disk with the TPM, and encrypts disks in place. `trustctl` is its command line.
+- **trustd** handles Secure Boot key enrollment, keeps shim and SushiBoot up to date, unlocks the disk with the TPM, is the one service that changes the size and place of Luft's partition, and encrypts other drives in place. `trustctl` is its command line.
 
 [Boot and recovery](/reference/boot/) and the [Security model](/reference/security/) go into the details.
 

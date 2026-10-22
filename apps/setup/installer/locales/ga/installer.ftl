@@ -39,6 +39,7 @@ installer-unknown-zone = Níl aithne ag an gcóras nua ar an gcrios ama { $zone 
 installer-esp-partition-failed = Níorbh fhéidir deighilt chóras EFI a dhéanamh
 installer-startup-partition-failed = Níorbh fhéidir an deighilt do chomhaid tosaithe Luft a dhéanamh
 installer-root-partition-failed = Níorbh fhéidir an deighilt do Luft a dhéanamh
+installer-encryption-failed = Níorbh fhéidir an deighilt do Luft a chriptiú
 installer-shrink-failed = Níorbh fhéidir Windows a dhéanamh níos lú
 installer-no-esp = Níl deighilt chóras EFI ar an tiomántán
 installer-no-root = Ní dhearnadh aon deighilt do Luft
@@ -51,6 +52,7 @@ installer-key-queue-failed = Níorbh fhéidir eochair Secure Boot Luft a chur i 
 
 ## Replacing a Linux system
 
+installer-encryption-keeps-old = Ní féidir Luft a chriptiú nuair a choinníonn sé comhaid an tseanchórais in aice leis.
 installer-leftovers-failed = Níorbh fhéidir an méid a d’fhág iarracht roimhe seo a ghlanadh
 installer-default-failed = Níorbh fhéidir Luft a dhéanamh mar an córas a thosaíonn
 installer-relabel-failed = Níorbh fhéidir lipéid Luft a chur ar do chomhaid

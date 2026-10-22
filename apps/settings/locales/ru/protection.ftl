@@ -53,6 +53,7 @@ settings-privacy-delete-after-hint = Сколько файлы хранятся 
 
 settings-security-protected = Устройство защищено
 settings-security-could-be-safer = Устройство можно защитить лучше
+settings-security-not-encrypted-description = Его диск не зашифрован, поэтому любой, кто его извлечёт, сможет прочитать ваши файлы.
 settings-security-starts-differently-description = Если вы меняли настройки Secure Boot, подтвердите это, чтобы диск снова разблокировался сам.
 settings-security-needed-recovery-key = Для диска потребовался ключ восстановления
 settings-security-needed-recovery-key-description = Снова привяжите чип безопасности, чтобы диск разблокировался сам.
@@ -157,6 +158,7 @@ settings-usb-hold-back-description = Устройства, подключённ�
 ## Device encryption
 
 settings-encryption = Шифрование устройства
+settings-encryption-not-encrypted = Выключено, включить можно только при установке Luft
 settings-encryption-unlocks-chip-pin = Разблокируется чипом безопасности и PIN-кодом
 settings-encryption-unlocks-chip = Разблокируется чипом безопасности автоматически
 settings-encryption-unlocks-passphrase = При запуске запрашивается парольная фраза

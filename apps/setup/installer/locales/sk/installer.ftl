@@ -39,6 +39,7 @@ installer-unknown-zone = Nový systém nepozná časové pásmo { $zone }.
 installer-esp-partition-failed = Systémový oddiel EFI sa nepodarilo vytvoriť
 installer-startup-partition-failed = Oddiel pre spúšťacie súbory Luftu sa nepodarilo vytvoriť
 installer-root-partition-failed = Oddiel pre Luft sa nepodarilo vytvoriť
+installer-encryption-failed = Oddiel pre Luft sa nepodarilo zašifrovať
 installer-shrink-failed = Windows sa nepodarilo zmenšiť
 installer-no-esp = Disk nemá systémový oddiel EFI
 installer-no-root = Nevytvoril sa žiadny oddiel pre Luft
@@ -51,6 +52,7 @@ installer-key-queue-failed = Kľúč Secure Boot pre Luft sa nepodarilo pripravi
 
 ## Replacing a Linux system
 
+installer-encryption-keeps-old = Luft nemožno zašifrovať, keď si vedľa seba ponecháva súbory starého systému.
 installer-leftovers-failed = Zvyšky po predchádzajúcom pokuse sa nepodarilo odstrániť
 installer-default-failed = Luft sa nepodarilo nastaviť ako systém, ktorý sa spúšťa
 installer-relabel-failed = Vaše súbory sa nepodarilo označiť pre Luft

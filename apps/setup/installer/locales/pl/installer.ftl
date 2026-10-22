@@ -39,6 +39,7 @@ installer-unknown-zone = Nowy system nie zna strefy czasowej { $zone }.
 installer-esp-partition-failed = Nie udało się utworzyć partycji systemowej EFI
 installer-startup-partition-failed = Nie udało się utworzyć partycji na pliki rozruchowe systemu Luft
 installer-root-partition-failed = Nie udało się utworzyć partycji dla systemu Luft
+installer-encryption-failed = Nie udało się zaszyfrować partycji dla systemu Luft
 installer-shrink-failed = Nie udało się zmniejszyć systemu Windows
 installer-no-esp = Dysk nie ma partycji systemowej EFI
 installer-no-root = Nie utworzono partycji dla systemu Luft
@@ -51,6 +52,7 @@ installer-key-queue-failed = Nie udało się przygotować klucza Secure Boot sys
 
 ## Replacing a Linux system
 
+installer-encryption-keeps-old = Systemu Luft nie można zaszyfrować, gdy zachowuje obok siebie pliki starego systemu.
 installer-leftovers-failed = Nie udało się usunąć pozostałości po wcześniejszej próbie
 installer-default-failed = Nie udało się ustawić systemu Luft jako uruchamianego domyślnie
 installer-relabel-failed = Nie udało się oznaczyć twoich plików dla systemu Luft

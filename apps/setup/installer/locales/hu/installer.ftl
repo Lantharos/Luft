@@ -39,6 +39,7 @@ installer-unknown-zone = Az új rendszer nem ismeri ezt az időzónát: { $zone 
 installer-esp-partition-failed = Nem sikerült létrehozni az EFI-rendszerpartíciót
 installer-startup-partition-failed = Nem sikerült létrehozni a Luft indítófájljainak partícióját
 installer-root-partition-failed = Nem sikerült létrehozni a Luft partícióját
+installer-encryption-failed = Nem sikerült titkosítani a Luft partícióját
 installer-shrink-failed = Nem sikerült zsugorítani a Windowst
 installer-no-esp = A lemezen nincs EFI-rendszerpartíció
 installer-no-root = Nem jött létre partíció a Luft számára
@@ -51,6 +52,7 @@ installer-key-queue-failed = Nem sikerült előkészíteni a Luft Secure Boot-ku
 
 ## Replacing a Linux system
 
+installer-encryption-keeps-old = A Luft nem titkosítható, ha megtartja maga mellett a régi rendszer fájljait.
 installer-leftovers-failed = Nem sikerült eltávolítani egy korábbi kísérlet maradványait
 installer-default-failed = Nem sikerült a Luftot alapértelmezett indítórendszerré tenni
 installer-relabel-failed = Nem sikerült a fájljait megjelölni a Luft számára

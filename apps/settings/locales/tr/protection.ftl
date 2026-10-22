@@ -53,6 +53,7 @@ settings-privacy-delete-after-hint = Dosyaların kaldırılmadan önce ne kadar 
 
 settings-security-protected = Cihazınız korunuyor
 settings-security-could-be-safer = Cihazınız daha güvenli olabilir
+settings-security-not-encrypted-description = Diski şifrelenmemiş, bu yüzden onu çıkaran herkes dosyalarınızı okuyabilir.
 settings-security-starts-differently-description = Secure Boot ayarlarını siz değiştirdiyseniz diskin yeniden kendiliğinden açılması için bunu onaylayın.
 settings-security-needed-recovery-key = Diskiniz kurtarma anahtarını istedi
 settings-security-needed-recovery-key-description = Diskin kendiliğinden açılması için güvenlik çipini yeniden bağlayın.
@@ -147,6 +148,7 @@ settings-usb-hold-back-description = Kilitliyken takılanlar, kilidi açana kada
 ## Device encryption
 
 settings-encryption = Cihaz şifreleme
+settings-encryption-not-encrypted = Kapalı, yalnızca Luft yüklenirken açılabilir
 settings-encryption-unlocks-chip-pin = Güvenlik çipi ve PIN’inizle açılır
 settings-encryption-unlocks-chip = Güvenlik çipiyle kendiliğinden açılır
 settings-encryption-unlocks-passphrase = Başlangıçta disk parolanızı ister

@@ -4264,7 +4264,6 @@ name = "luft-dbus"
 version = "0.1.0"
 dependencies = [
  "futures-util",
- "rustix",
  "serde",
  "tokio",
  "zbus 6.0.0",
@@ -8098,7 +8097,9 @@ dependencies = [
  "getrandom 0.4.3",
  "libc",
  "luft-dbus",
+ "luft-disks",
  "luft-identity",
+ "luft-meet",
  "rustix",
  "serde",
  "serde_json",

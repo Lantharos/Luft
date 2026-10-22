@@ -53,6 +53,7 @@ settings-privacy-delete-after-hint = Kiek laiko failai laikomi, kol bus pašalin
 
 settings-security-protected = Jūsų įrenginys apsaugotas
 settings-security-could-be-safer = Jūsų įrenginys galėtų būti saugesnis
+settings-security-not-encrypted-description = Jo diskas nešifruotas, todėl bet kas, jį išėmęs, gali skaityti jūsų failus.
 settings-security-starts-differently-description = Jei pakeitėte šio kompiuterio Secure Boot nustatymus, patvirtinkite tai, kad diskas vėl būtų atrakinamas savaime.
 settings-security-needed-recovery-key = Diskui prireikė atkūrimo rakto
 settings-security-needed-recovery-key-description = Susiekite saugos lustą iš naujo, kad diskas būtų atrakinamas savaime.
@@ -157,6 +158,7 @@ settings-usb-hold-back-description = Prijungti užrakinus laukia, kol atrakinsit
 ## Device encryption
 
 settings-encryption = Įrenginio šifravimas
+settings-encryption-not-encrypted = Išjungta, įjungti galima tik diegiant Luft
 settings-encryption-unlocks-chip-pin = Atrakinamas saugos lustu ir jūsų PIN kodu
 settings-encryption-unlocks-chip = Atrakinamas savaime saugos lustu
 settings-encryption-unlocks-passphrase = Paleidžiant prašoma jūsų slaptafrazės

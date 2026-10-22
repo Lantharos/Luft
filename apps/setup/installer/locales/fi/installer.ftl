@@ -39,6 +39,7 @@ installer-unknown-zone = Uusi järjestelmä ei tunne aikavyöhykettä { $zone }.
 installer-esp-partition-failed = EFI-järjestelmäosiota ei voitu luoda
 installer-startup-partition-failed = Luftin käynnistystiedostojen osiota ei voitu luoda
 installer-root-partition-failed = Luftin osiota ei voitu luoda
+installer-encryption-failed = Luftin osiota ei voitu salata
 installer-shrink-failed = Windowsia ei voitu pienentää
 installer-no-esp = Levyllä ei ole EFI-järjestelmäosiota
 installer-no-root = Luftille ei luotu osiota
@@ -51,6 +52,7 @@ installer-key-queue-failed = Luftin Secure Boot -avainta ei voitu asettaa odotta
 
 ## Replacing a Linux system
 
+installer-encryption-keeps-old = Luftia ei voi salata, kun se säilyttää vanhan järjestelmän tiedostot vierellään.
 installer-leftovers-failed = Aiemman yrityksen jäänteitä ei voitu poistaa
 installer-default-failed = Luftia ei voitu asettaa käynnistyväksi järjestelmäksi
 installer-relabel-failed = Tiedostojasi ei voitu merkitä Luftia varten

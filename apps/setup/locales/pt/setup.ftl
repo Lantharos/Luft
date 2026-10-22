@@ -248,6 +248,8 @@ setup-protect-passphrase-label = Frase de acesso
 setup-protect-repeat = Escreva-a novamente
 setup-protect-mismatch = Não coincidem
 setup-protect-kept = Guardei a minha chave de recuperação
+setup-protect-only-now = A encriptação só pode ser ativada agora, durante a instalação do Luft.
+setup-protect-skip = Não encriptar
 setup-protect-encrypt = Encriptar
 
 ## Fingerprint

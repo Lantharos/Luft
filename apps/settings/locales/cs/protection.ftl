@@ -53,6 +53,7 @@ settings-privacy-delete-after-hint = Jak dlouho soubory zůstanou, než se odstr
 
 settings-security-protected = Vaše zařízení je chráněné
 settings-security-could-be-safer = Vaše zařízení by mohlo být lépe chráněné
+settings-security-not-encrypted-description = Jeho disk není šifrovaný, takže kdokoli, kdo ho vyjme, si může přečíst vaše soubory.
 settings-security-starts-differently-description = Pokud jste změnili jeho nastavení Secure Boot, potvrďte to, aby se disk znovu odemykal sám.
 settings-security-needed-recovery-key = Disk potřeboval obnovovací klíč
 settings-security-needed-recovery-key-description = Znovu propojte bezpečnostní čip, aby se disk odemykal sám.
@@ -157,6 +158,7 @@ settings-usb-hold-back-description = Zařízení připojená při zamčení poč
 ## Device encryption
 
 settings-encryption = Šifrování zařízení
+settings-encryption-not-encrypted = Vypnuto, zapnout ho lze jen při instalaci Luftu
 settings-encryption-unlocks-chip-pin = Odemyká se bezpečnostním čipem a vaším PINem
 settings-encryption-unlocks-chip = Odemyká se sám pomocí bezpečnostního čipu
 settings-encryption-unlocks-passphrase = Při spuštění žádá heslo k disku

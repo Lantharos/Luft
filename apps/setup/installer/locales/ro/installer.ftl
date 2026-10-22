@@ -39,6 +39,7 @@ installer-unknown-zone = Noul sistem nu cunoaște fusul orar { $zone }.
 installer-esp-partition-failed = Partiția de sistem EFI nu a putut fi creată
 installer-startup-partition-failed = Partiția pentru fișierele de pornire ale sistemului Luft nu a putut fi creată
 installer-root-partition-failed = Partiția pentru Luft nu a putut fi creată
+installer-encryption-failed = Partiția pentru Luft nu a putut fi criptată
 installer-shrink-failed = Windows nu a putut fi micșorat
 installer-no-esp = Unitatea nu are o partiție de sistem EFI
 installer-no-root = Nu a fost creată nicio partiție pentru Luft
@@ -51,6 +52,7 @@ installer-key-queue-failed = Cheia Secure Boot a sistemului Luft nu a putut fi p
 
 ## Replacing a Linux system
 
+installer-encryption-keeps-old = Luft nu poate fi criptat când păstrează lângă el fișierele sistemului vechi.
 installer-leftovers-failed = Resturile unei încercări anterioare nu au putut fi șterse
 installer-default-failed = Luft nu a putut fi setat ca sistemul care pornește
 installer-relabel-failed = Fișierele nu au putut fi etichetate pentru Luft

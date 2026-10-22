@@ -53,6 +53,7 @@ settings-privacy-delete-after-hint = Kuinka kauan tiedostot säilyvät ennen poi
 
 settings-security-protected = Laitteesi on suojattu
 settings-security-could-be-safer = Laitteesi voisi olla paremmin suojattu
+settings-security-not-encrypted-description = Sen levyä ei ole salattu, joten kuka tahansa sen irrottava voi lukea tiedostosi.
 settings-security-starts-differently-description = Jos muutit sen Secure Boot -asetuksia, vahvista muutos, niin levyn lukitus avautuu taas itsestään.
 settings-security-needed-recovery-key = Levysi tarvitsi palautusavaimen
 settings-security-needed-recovery-key-description = Yhdistä suojaussiru uudelleen, niin levyn lukitus avautuu itsestään.
@@ -147,6 +148,7 @@ settings-usb-hold-back-description = Lukituksen aikana liitetyt odottavat, kunne
 ## Device encryption
 
 settings-encryption = Laitteen salaus
+settings-encryption-not-encrypted = Pois päältä, ja sen voi ottaa käyttöön vain Luftia asennettaessa
 settings-encryption-unlocks-chip-pin = Lukitus avataan suojaussirulla ja PIN-koodilla
 settings-encryption-unlocks-chip = Lukitus avautuu itsestään suojaussirulla
 settings-encryption-unlocks-passphrase = Kysyy tunnuslausetta käynnistyksessä

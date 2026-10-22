@@ -9,7 +9,7 @@ use serde::Serialize;
 use luft_trust::{DRIVES, Map, TRUST, get, group};
 
 pub const CHANGED: &str = "disks.trust";
-const NEEDS_DEVICE_ENCRYPTION: &str = "Turn on device encryption in Settings first. This computer keeps the drive's key on its own disk, so that disk has to be encrypted too.";
+const NEEDS_DEVICE_ENCRYPTION: &str = "Only a computer whose own disk is encrypted can unlock this drive by itself, since the key that unlocks it is kept on that disk.";
 
 #[derive(Serialize, Default)]
 #[serde(rename_all = "camelCase")]
@@ -51,12 +51,11 @@ async fn system_disk() -> Result<Map, String> {
 
 async fn system_protected() -> Result<bool, String> {
     let disk = system_disk().await?;
-    Ok(get::<bool>(&disk, "Encrypted").unwrap_or(false)
-        && get::<String>(&disk, "State").as_deref() == Some("on"))
+    Ok(get::<bool>(&disk, "Encrypted").unwrap_or(false))
 }
 
-pub async fn system_encryption_starting() -> Result<bool, String> {
-    Ok(get::<String>(&system_disk().await?, "State").as_deref() == Some("starting"))
+pub async fn resize_system(size: u64) -> Result<u64, String> {
+    luft_trust::call(&TRUST, "ResizeSystem", &(size, "")).await
 }
 
 pub async fn state() -> Result<Protection, String> {

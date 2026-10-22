@@ -1,4 +1,3 @@
-pub mod disk_lock;
 pub mod idle;
 pub mod objects;
 pub mod polkit;

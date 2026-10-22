@@ -266,6 +266,8 @@ setup-protect-passphrase-label = Frása faire
 setup-protect-repeat = Clóscríobh arís é
 setup-protect-mismatch = Ní hionann iad
 setup-protect-kept = Tá m’eochair athshlánaithe coinnithe agam
+setup-protect-only-now = Ní féidir criptiú a chasadh air ach anois, agus Luft á shuiteáil.
+setup-protect-skip = Ná criptigh
 setup-protect-encrypt = Criptigh
 
 ## Fingerprint

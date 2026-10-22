@@ -39,6 +39,7 @@ installer-unknown-zone = Nýja kerfið þekkir ekki tímabeltið { $zone }.
 installer-esp-partition-failed = Ekki tókst að búa til EFI-kerfisdisksneiðina
 installer-startup-partition-failed = Ekki tókst að búa til disksneiðina fyrir ræsiskrár Luft
 installer-root-partition-failed = Ekki tókst að búa til disksneiðina fyrir Luft
+installer-encryption-failed = Ekki tókst að dulrita disksneiðina fyrir Luft
 installer-shrink-failed = Ekki tókst að minnka Windows
 installer-no-esp = Diskurinn er ekki með EFI-kerfisdisksneið
 installer-no-root = Engin disksneið var búin til fyrir Luft
@@ -51,6 +52,7 @@ installer-key-queue-failed = Ekki tókst að setja Secure Boot-lykil Luft í bi�
 
 ## Replacing a Linux system
 
+installer-encryption-keeps-old = Ekki er hægt að dulrita Luft þegar það heldur skrám gamla kerfisins við hliðina á sér.
 installer-leftovers-failed = Ekki tókst að hreinsa það sem fyrri tilraun skildi eftir
 installer-default-failed = Ekki tókst að gera Luft að kerfinu sem ræsist
 installer-relabel-failed = Ekki tókst að merkja skrárnar þínar fyrir Luft

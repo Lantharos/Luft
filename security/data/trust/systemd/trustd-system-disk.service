@@ -1,0 +1,23 @@
+[Unit]
+Description=Carry on changing Luft's partition, and take back the space Meet Luft used
+Documentation=https://github.com/Lantharos/Luft/blob/main/docs/meet.md
+ConditionKernelCommandLine=!rd.live.image
+After=local-fs.target dbus.service udisks2.service trustd-follow-up.service
+Wants=udisks2.service
+
+[Service]
+Type=exec
+ExecStart=/usr/bin/trustctl system-disk continue
+SyslogIdentifier=trustd
+Nice=10
+IOSchedulingClass=idle
+PrivateTmp=yes
+ProtectHome=read-only
+KeyringMode=shared
+NoNewPrivileges=yes
+LockPersonality=yes
+RestrictRealtime=yes
+TimeoutStopSec=1min
+
+[Install]
+WantedBy=multi-user.target

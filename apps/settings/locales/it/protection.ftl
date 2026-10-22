@@ -53,6 +53,7 @@ settings-privacy-delete-after-hint = Quanto restano i file prima di essere rimos
 
 settings-security-protected = Il dispositivo è protetto
 settings-security-could-be-safer = Il dispositivo potrebbe essere più sicuro
+settings-security-not-encrypted-description = Il suo disco non è crittografato, quindi chiunque lo estragga può leggerne i file.
 settings-security-starts-differently-description = Se hai cambiato le impostazioni di Secure Boot, conferma la modifica perché il disco si sblocchi di nuovo da solo.
 settings-security-needed-recovery-key = Il disco ha richiesto la chiave di ripristino
 settings-security-needed-recovery-key-description = Collega di nuovo il chip di sicurezza perché lo sblocchi da solo.
@@ -147,6 +148,7 @@ settings-usb-hold-back-description = Quelli collegati mentre il computer è bloc
 ## Device encryption
 
 settings-encryption = Crittografia del dispositivo
+settings-encryption-not-encrypted = Disattivata, si può attivare solo durante l’installazione di Luft
 settings-encryption-unlocks-chip-pin = Si sblocca con il chip di sicurezza e il tuo PIN
 settings-encryption-unlocks-chip = Si sblocca da solo con il chip di sicurezza
 settings-encryption-unlocks-passphrase = Chiede la passphrase all’avvio

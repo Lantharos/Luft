@@ -39,6 +39,7 @@ installer-unknown-zone = Sistemi i ri nuk e njeh zonën kohore { $zone }.
 installer-esp-partition-failed = Ndarja e sistemit EFI nuk u krijua dot
 installer-startup-partition-failed = Ndarja për skedarët e nisjes së Luft nuk u krijua dot
 installer-root-partition-failed = Ndarja për Luft nuk u krijua dot
+installer-encryption-failed = Ndarja për Luft nuk u enkriptua dot
 installer-shrink-failed = Windows nuk u zvogëlua dot
 installer-no-esp = Disku nuk ka ndarje të sistemit EFI
 installer-no-root = Nuk u krijua asnjë ndarje për Luft
@@ -51,6 +52,7 @@ installer-key-queue-failed = Çelësi Secure Boot i Luft nuk u vu dot në radhë
 
 ## Replacing a Linux system
 
+installer-encryption-keeps-old = Luft nuk mund të enkriptohet kur mban pranë vetes skedarët e sistemit të vjetër.
 installer-leftovers-failed = Mbetjet e një përpjekjeje të mëparshme nuk u pastruan dot
 installer-default-failed = Luft nuk u bë dot sistemi që niset
 installer-relabel-failed = Skedarët e tu nuk u etiketuan dot për Luft

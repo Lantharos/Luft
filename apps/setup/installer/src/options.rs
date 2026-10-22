@@ -23,10 +23,6 @@ pub struct Options {
 
 #[derive(Subcommand, Clone, Copy)]
 pub enum Command {
-    /// Removes Meet Luft's partitions or folder and grows Luft into the space they used.
-    Reclaim,
-    /// Tells Meet Luft how full Luft is, and changes Luft's size the way Meet Luft asked from Windows.
-    Resize,
     /// Counts this start toward first-run setup's limit, and ends setup once it's reached.
     ExpireSetup,
 }

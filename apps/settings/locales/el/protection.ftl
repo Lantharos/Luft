@@ -53,6 +53,7 @@ settings-privacy-delete-after-hint = Πόσο μένουν τα αρχεία π�
 
 settings-security-protected = Η συσκευή σας προστατεύεται
 settings-security-could-be-safer = Η συσκευή σας θα μπορούσε να είναι πιο ασφαλής
+settings-security-not-encrypted-description = Ο δίσκος της δεν είναι κρυπτογραφημένος, οπότε όποιος τον αφαιρέσει μπορεί να διαβάσει τα αρχεία σας.
 settings-security-starts-differently-description = Αν αλλάξατε τις ρυθμίσεις Secure Boot, επιβεβαιώστε το για να ξεκλειδώνει ξανά ο δίσκος μόνος του.
 settings-security-needed-recovery-key = Ο δίσκος σας χρειάστηκε το κλειδί αποκατάστασης
 settings-security-needed-recovery-key-description = Συνδέστε ξανά το τσιπ ασφαλείας ώστε ο δίσκος να ξεκλειδώνει μόνος του.
@@ -147,6 +148,7 @@ settings-usb-hold-back-description = Όσες συνδέονται ενώ είν
 ## Device encryption
 
 settings-encryption = Κρυπτογράφηση συσκευής
+settings-encryption-not-encrypted = Ανενεργή, ενεργοποιείται μόνο κατά την εγκατάσταση του Luft
 settings-encryption-unlocks-chip-pin = Ξεκλειδώνει με το τσιπ ασφαλείας και το PIN σας
 settings-encryption-unlocks-chip = Ξεκλειδώνει αυτόματα με το τσιπ ασφαλείας
 settings-encryption-unlocks-passphrase = Ζητά τη φράση πρόσβασης κατά την εκκίνηση

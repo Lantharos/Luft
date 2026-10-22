@@ -254,6 +254,8 @@ setup-protect-passphrase-label = Paroles frāze
 setup-protect-repeat = Ievadiet vēlreiz
 setup-protect-mismatch = Tās nesakrīt
 setup-protect-kept = Atkopšanas atslēga ir saglabāta
+setup-protect-only-now = Šifrēšanu var ieslēgt tikai tagad, kamēr tiek instalēts Luft.
+setup-protect-skip = Nešifrēt
 setup-protect-encrypt = Šifrēt
 
 ## Fingerprint

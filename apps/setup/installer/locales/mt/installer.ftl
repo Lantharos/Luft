@@ -39,6 +39,7 @@ installer-unknown-zone = Is-sistema l-ġdida ma tafx iż-żona tal-ħin { $zone 
 installer-esp-partition-failed = Il-partizzjoni tas-sistema EFI ma setgħetx issir
 installer-startup-partition-failed = Il-partizzjoni għall-fajls tal-istartjar ta’ Luft ma setgħetx issir
 installer-root-partition-failed = Il-partizzjoni għal Luft ma setgħetx issir
+installer-encryption-failed = Il-partizzjoni għal Luft ma setgħetx tiġi ċċifrata
 installer-shrink-failed = Windows ma setax jiċċekken
 installer-no-esp = Id-diska m’għandhiex partizzjoni tas-sistema EFI
 installer-no-root = Ma saret l-ebda partizzjoni għal Luft
@@ -51,6 +52,7 @@ installer-key-queue-failed = Iċ-ċavetta Secure Boot ta’ Luft ma setgħetx ti
 
 ## Replacing a Linux system
 
+installer-encryption-keeps-old = Luft ma jistax jiġi ċċifrat meta jżomm il-fajls tas-sistema l-qadima ħdejh.
 installer-leftovers-failed = Dak li ħalla tentattiv preċedenti ma setax jitneħħa
 installer-default-failed = Luft ma setax isir is-sistema li tibda
 installer-relabel-failed = Il-fajls ma setgħux jiġu ttikkettjati għal Luft

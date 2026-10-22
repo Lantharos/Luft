@@ -53,6 +53,7 @@ settings-privacy-delete-after-hint = Cât timp rămân fișierele înainte de a 
 
 settings-security-protected = Dispozitivul este protejat
 settings-security-could-be-safer = Dispozitivul ar putea fi mai sigur
+settings-security-not-encrypted-description = Discul său nu este criptat, așa că oricine îl scoate poate citi fișierele.
 settings-security-starts-differently-description = Dacă ați modificat setările Secure Boot, confirmați schimbarea pentru ca discul să se deblocheze din nou singur.
 settings-security-needed-recovery-key = Discul a avut nevoie de cheia de recuperare
 settings-security-needed-recovery-key-description = Asociați din nou cipul de securitate pentru ca discul să se deblocheze singur.
@@ -152,6 +153,7 @@ settings-usb-hold-back-description = Cele conectate cât timp ecranul este bloca
 ## Device encryption
 
 settings-encryption = Criptarea dispozitivului
+settings-encryption-not-encrypted = Dezactivată, poate fi activată doar la instalarea Luft
 settings-encryption-unlocks-chip-pin = Se deblochează cu cipul de securitate și PIN-ul
 settings-encryption-unlocks-chip = Se deblochează singur cu cipul de securitate
 settings-encryption-unlocks-passphrase = Cere fraza de acces la pornire

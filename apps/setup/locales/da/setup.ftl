@@ -248,6 +248,8 @@ setup-protect-passphrase-label = Adgangsfrase
 setup-protect-repeat = Skriv den igen
 setup-protect-mismatch = De er ikke ens
 setup-protect-kept = Jeg har gemt min genoprettelsesnøgle
+setup-protect-only-now = Du kan kun slå kryptering til nu, mens Luft installeres.
+setup-protect-skip = Krypter ikke
 setup-protect-encrypt = Krypter
 
 ## Fingerprint

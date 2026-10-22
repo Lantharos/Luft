@@ -39,6 +39,7 @@ installer-unknown-zone = Нова система не знає часового 
 installer-esp-partition-failed = Не вдалося створити системний розділ EFI
 installer-startup-partition-failed = Не вдалося створити розділ для файлів запуску Luft
 installer-root-partition-failed = Не вдалося створити розділ для Luft
+installer-encryption-failed = Не вдалося зашифрувати розділ для Luft
 installer-shrink-failed = Не вдалося зменшити Windows
 installer-no-esp = На диску немає системного розділу EFI
 installer-no-root = Розділ для Luft не створено
@@ -51,6 +52,7 @@ installer-key-queue-failed = Не вдалося підготувати ключ
 
 ## Replacing a Linux system
 
+installer-encryption-keeps-old = Luft не можна зашифрувати, якщо поруч із ним залишаються файли старої системи.
 installer-leftovers-failed = Не вдалося очистити залишки попередньої спроби
 installer-default-failed = Не вдалося зробити Luft системою, яка запускається
 installer-relabel-failed = Не вдалося позначити ваші файли для Luft

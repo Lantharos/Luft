@@ -14,7 +14,7 @@ use super::shown::Shown;
 use super::status::{self, Status};
 use crate::boot::{attempts, other_systems, startup};
 use crate::disk;
-use crate::disk::layout::{grow, old_system};
+use crate::disk::layout::{self, old_system};
 use crate::disk::unlock::keys;
 use crate::keys::{mok, others};
 use crate::system::secrets::secret::Secret;
@@ -26,6 +26,7 @@ const SECURE_BOOT: &str = "com.lantharos.trust.manage-secure-boot";
 const CONFIRM_STARTUP: &str = "com.lantharos.trust.confirm-startup";
 const OTHER_SYSTEMS: &str = "com.lantharos.trust.remove-other-systems";
 const ACCEPT_SECURE_BOOT: &str = "com.lantharos.trust.accept-secure-boot-change";
+const RESIZE_SYSTEM: &str = "com.lantharos.trust.resize-system";
 const FRESH: Duration = Duration::from_secs(2);
 
 pub struct Trust {
@@ -335,6 +336,20 @@ impl Trust {
     ) -> Result<u64, Error> {
         self.authorize(connection, &header, OTHER_SYSTEMS).await?;
         let unlock = Secret::from(unlock);
-        self.run(&emitter, move || grow::grow(&unlock)).await
+        self.run(&emitter, move || layout::grow(&unlock)).await
+    }
+
+    async fn resize_system(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
+        size: u64,
+        unlock: String,
+    ) -> Result<u64, Error> {
+        self.authorize(connection, &header, RESIZE_SYSTEM).await?;
+        let unlock = Secret::from(unlock);
+        self.run(&emitter, move || layout::resize(size, &unlock))
+            .await
     }
 }

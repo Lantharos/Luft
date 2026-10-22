@@ -53,6 +53,7 @@ settings-privacy-delete-after-hint = Wie lange Dateien bleiben, bevor sie entfer
 
 settings-security-protected = Dein Gerät ist geschützt
 settings-security-could-be-safer = Dein Gerät könnte sicherer sein
+settings-security-not-encrypted-description = Sein Datenträger ist nicht verschlüsselt, daher kann jeder, der ihn ausbaut, deine Dateien lesen.
 settings-security-starts-differently-description = Wenn du die Secure-Boot-Einstellungen geändert hast, bestätige das, damit sich der Datenträger wieder von selbst entsperrt.
 settings-security-needed-recovery-key = Dein Datenträger brauchte seinen Wiederherstellungsschlüssel
 settings-security-needed-recovery-key-description = Verknüpf den Sicherheitschip erneut, damit er sich von selbst entsperrt.
@@ -147,6 +148,7 @@ settings-usb-hold-back-description = Geräte, die im gesperrten Zustand angestec
 ## Device encryption
 
 settings-encryption = Geräteverschlüsselung
+settings-encryption-not-encrypted = Aus, und sie lässt sich nur bei der Installation von Luft einschalten
 settings-encryption-unlocks-chip-pin = Entsperrt mit dem Sicherheitschip und deiner PIN
 settings-encryption-unlocks-chip = Entsperrt von selbst mit dem Sicherheitschip
 settings-encryption-unlocks-passphrase = Fragt beim Start nach deiner Passphrase

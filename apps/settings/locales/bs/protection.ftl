@@ -53,6 +53,7 @@ settings-privacy-delete-after-hint = Koliko dugo fajlovi ostaju prije nego što 
 
 settings-security-protected = Vaš uređaj je zaštićen
 settings-security-could-be-safer = Vaš uređaj bi mogao biti sigurniji
+settings-security-not-encrypted-description = Njegov disk nije šifriran, pa svako ko ga izvadi može čitati vaše datoteke.
 settings-security-starts-differently-description = Ako ste promijenili postavke za Secure Boot, potvrdite to da se disk ponovo sam otključava.
 settings-security-needed-recovery-key = Vaš disk je tražio ključ za oporavak
 settings-security-needed-recovery-key-description = Ponovo povežite sigurnosni čip da se disk sam otključava.
@@ -148,6 +149,7 @@ settings-usb-hold-back-description = Oni priključeni dok je računar zaključan
 ## Device encryption
 
 settings-encryption = Šifriranje uređaja
+settings-encryption-not-encrypted = Isključeno, a može se uključiti samo tokom instaliranja Lufta
 settings-encryption-unlocks-chip-pin = Otključava se sigurnosnim čipom i vašim PIN-om
 settings-encryption-unlocks-chip = Otključava se sam pomoću sigurnosnog čipa
 settings-encryption-unlocks-passphrase = Pri pokretanju traži vašu pristupnu frazu

@@ -39,6 +39,7 @@ installer-unknown-zone = Novi sistem ne poznaje vremensku zonu { $zone }.
 installer-esp-partition-failed = EFI sistemska particija nije mogla da se napravi
 installer-startup-partition-failed = Particija za datoteke kojima se Luft pokreće nije mogla da se napravi
 installer-root-partition-failed = Particija za Luft nije mogla da se napravi
+installer-encryption-failed = Particija za Luft nije mogla da se šifruje
 installer-shrink-failed = Windows nije mogao da se smanji
 installer-no-esp = Disk nema EFI sistemsku particiju
 installer-no-root = Particija za Luft nije napravljena
@@ -51,6 +52,7 @@ installer-key-queue-failed = Secure Boot ključ sistema Luft nije mogao da se pr
 
 ## Replacing a Linux system
 
+installer-encryption-keeps-old = Luft ne može da se šifruje kada pored sebe zadržava datoteke starog sistema.
 installer-leftovers-failed = Ostaci ranijeg pokušaja nisu mogli da se uklone
 installer-default-failed = Luft nije mogao da postane sistem koji se pokreće
 installer-relabel-failed = Vaše datoteke nisu mogle da se obeleže za Luft

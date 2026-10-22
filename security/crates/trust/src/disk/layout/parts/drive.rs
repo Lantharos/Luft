@@ -6,11 +6,10 @@ use luft_disks::udisks::snapshot::{self, Drive};
 use luft_disks::udisks::volumes::{Segment, Volume};
 use luft_disks::udisks::{self, PARTITION, TABLE, no_options};
 
-use super::plan::Span;
-use crate::system::command::Tool;
-use crate::system::wait;
+use crate::disk::SystemDisk;
+use crate::disk::layout::plan::Span;
+use crate::system::host::wait;
 
-const PHYSICAL_ROOT: &str = "/sysroot";
 const STARTUP_FILESYSTEM: &str = "vfat";
 
 pub struct Part {
@@ -90,16 +89,6 @@ fn drives() -> Result<Vec<Drive>> {
     Ok(snapshot::build(&objects).drives)
 }
 
-fn beneath_mapping(device: &str) -> Option<String> {
-    let name = Path::new(device).file_name()?.to_str()?;
-    let mut below = std::fs::read_dir(format!("/sys/class/block/{name}/slaves")).ok()?;
-    let partition = below.next()?.ok()?.file_name();
-    below
-        .next()
-        .is_none()
-        .then(|| format!("/dev/{}", partition.to_string_lossy()))
-}
-
 pub fn mapper_name(device: &str) -> Result<String> {
     let name = Path::new(device)
         .file_name()
@@ -110,19 +99,8 @@ pub fn mapper_name(device: &str) -> Result<String> {
     Ok(mapped.trim().to_owned())
 }
 
-pub fn root_device() -> Result<String> {
-    let source = Tool::new("findmnt")
-        .args([
-            "--noheadings",
-            "--nofsroot",
-            "--output",
-            "SOURCE",
-            "--target",
-        ])
-        .arg(PHYSICAL_ROOT)
-        .output()?;
-    let device = canonical(source.trim());
-    Ok(beneath_mapping(&device).unwrap_or(device))
+pub fn system_partition() -> Result<String> {
+    Ok(SystemDisk::find()?.device().display().to_string())
 }
 
 pub fn holding(device: &str) -> Result<Disk> {

@@ -53,6 +53,7 @@ settings-privacy-delete-after-hint = Sa qëndrojnë skedarët para se të hiqen
 
 settings-security-protected = Pajisja jote është e mbrojtur
 settings-security-could-be-safer = Pajisja jote mund të ishte më e sigurt
+settings-security-not-encrypted-description = Disku i saj nuk është i enkriptuar, ndaj kushdo që e nxjerr mund të lexojë skedarët e tu.
 settings-security-starts-differently-description = Nëse ndryshove cilësimet e Secure Boot, konfirmoje që disku të zhbllokohet sërish vetë.
 settings-security-needed-recovery-key = Disku yt kërkoi çelësin e rikuperimit
 settings-security-needed-recovery-key-description = Lidhe sërish çipin e sigurisë që të zhbllokohet vetë.
@@ -147,6 +148,7 @@ settings-usb-hold-back-description = Ato që lidhen kur je i bllokuar presin der
 ## Device encryption
 
 settings-encryption = Enkriptimi i pajisjes
+settings-encryption-not-encrypted = Joaktiv, mund të aktivizohet vetëm gjatë instalimit të Luft
 settings-encryption-unlocks-chip-pin = Zhbllokohet me çipin e sigurisë dhe PIN-in tënd
 settings-encryption-unlocks-chip = Zhbllokohet vetë me çipin e sigurisë
 settings-encryption-unlocks-passphrase = Kërkon frazëkalimin tënd në nisje

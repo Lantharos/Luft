@@ -1,4 +1,5 @@
 use anyhow::{Result, bail, ensure};
+use luft_meet::Folder;
 use luft_meet::resize::{Change, needed};
 use serde::{Deserialize, Serialize};
 
@@ -46,13 +47,16 @@ pub enum Step {
     Grow { at: u64, end: u64 },
     Rename { at: u64, uuid: String },
     Settle { at: u64, uuid: String },
+    Discard { at: u64, uuid: String },
+    ForgetStartEntry { number: u16 },
+    RemoveFolder { folder: Folder },
 }
 
 fn align_up(bytes: u64) -> u64 {
     bytes.div_ceil(MIB) * MIB
 }
 
-fn align_down(bytes: u64) -> u64 {
+pub fn align_down(bytes: u64) -> u64 {
     bytes / MIB * MIB
 }
 

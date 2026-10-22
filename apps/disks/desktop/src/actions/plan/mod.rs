@@ -133,12 +133,12 @@ async fn place(
     size: u64,
 ) -> Result<Option<String>, String> {
     let guard = Guard::volume(block).await?;
+    if offset == guard.offset && guard.system {
+        return trust::resize_system(size).await.map(|_| None);
+    }
     if offset == guard.offset {
         guard.resizable()?;
-        if guard.system && trust::system_encryption_starting().await? {
-            return Err("Device encryption starts at the next restart, so the system's partition keeps its size until then".to_owned());
-        }
-        resize::resize(block, size, !guard.system).await?;
+        resize::resize(block, size, true).await?;
         return Ok(None);
     }
     guard.movable()?;

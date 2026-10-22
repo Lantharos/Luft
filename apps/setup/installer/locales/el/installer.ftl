@@ -39,6 +39,7 @@ installer-unknown-zone = Το νέο σύστημα δεν γνωρίζει τη
 installer-esp-partition-failed = Δεν ήταν δυνατή η δημιουργία του διαμερίσματος συστήματος EFI
 installer-startup-partition-failed = Δεν ήταν δυνατή η δημιουργία του διαμερίσματος για τα αρχεία εκκίνησης του Luft
 installer-root-partition-failed = Δεν ήταν δυνατή η δημιουργία του διαμερίσματος για το Luft
+installer-encryption-failed = Δεν ήταν δυνατή η κρυπτογράφηση του διαμερίσματος για το Luft
 installer-shrink-failed = Δεν ήταν δυνατή η σμίκρυνση των Windows
 installer-no-esp = Ο δίσκος δεν έχει διαμέρισμα συστήματος EFI
 installer-no-root = Δεν δημιουργήθηκε διαμέρισμα για το Luft
@@ -51,6 +52,7 @@ installer-key-queue-failed = Δεν ήταν δυνατή η προετοιμα�
 
 ## Replacing a Linux system
 
+installer-encryption-keeps-old = Το Luft δεν μπορεί να κρυπτογραφηθεί όταν κρατά δίπλα του τα αρχεία του παλιού συστήματος.
 installer-leftovers-failed = Δεν ήταν δυνατή η απαλοιφή όσων άφησε μια προηγούμενη προσπάθεια
 installer-default-failed = Δεν ήταν δυνατό να οριστεί το Luft ως το σύστημα που ξεκινά
 installer-relabel-failed = Δεν ήταν δυνατή η επισήμανση των αρχείων σας για το Luft

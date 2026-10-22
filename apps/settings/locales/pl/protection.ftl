@@ -53,6 +53,7 @@ settings-privacy-delete-after-hint = Jak długo pliki pozostają przed usunięci
 
 settings-security-protected = Urządzenie jest chronione
 settings-security-could-be-safer = Urządzenie mogłoby być lepiej chronione
+settings-security-not-encrypted-description = Jego dysk nie jest zaszyfrowany, więc każdy, kto go wyjmie, może odczytać pliki.
 settings-security-starts-differently-description = Jeśli zmieniono ustawienia Secure Boot, potwierdź to, aby dysk znów odblokowywał się samodzielnie.
 settings-security-needed-recovery-key = Dysk wymagał klucza odzyskiwania
 settings-security-needed-recovery-key-description = Połącz ponownie procesor zabezpieczeń, aby dysk odblokowywał się samodzielnie.
@@ -157,6 +158,7 @@ settings-usb-hold-back-description = Urządzenia podłączone przy zablokowanym 
 ## Device encryption
 
 settings-encryption = Szyfrowanie urządzenia
+settings-encryption-not-encrypted = Wyłączone, a włączyć je można tylko podczas instalacji systemu Luft
 settings-encryption-unlocks-chip-pin = Odblokowywany procesorem zabezpieczeń i kodem PIN
 settings-encryption-unlocks-chip = Odblokowywany samodzielnie przez procesor zabezpieczeń
 settings-encryption-unlocks-passphrase = Prosi o frazę hasła przy uruchamianiu

@@ -52,6 +52,11 @@ enum Command {
         #[command(subcommand)]
         action: EncryptionAction,
     },
+    /// Luft's own partition: its size and where it sits on the drive
+    SystemDisk {
+        #[command(subcommand)]
+        action: SystemDiskAction,
+    },
     /// Check what games with anti-cheat look for in how the computer started
     AntiCheat,
     /// Catch up once per start on Luft's key, the startup files and the TPM's disk key
@@ -110,16 +115,14 @@ enum EncryptionAction {
         #[arg(long)]
         state: PathBuf,
     },
-    /// Copy the system disk's encryption onto a partition and open it there, to move the system onto it
-    CopyTo { device: PathBuf },
-    /// Close a partition the system moved off and wipe its encryption
-    Retire { device: PathBuf },
-    /// Give a partition the system moved onto the system disk's own LUKS UUID
-    Settle { device: PathBuf, uuid: String },
-    /// Fit the open encryption on a partition to the partition, or to SIZE bytes of it
-    Fit { device: PathBuf, size: Option<u64> },
-    /// The step at startup that opens both partitions while the system moves
-    InitrdMove,
+}
+
+#[derive(Subcommand)]
+enum SystemDiskAction {
+    /// Carry on changing Luft's partition, and take on what Meet Luft asked for
+    Continue,
+    /// The step at startup that opens the other half of an encrypted system disk while Luft moves it
+    OpenHalves,
 }
 
 impl Command {
@@ -143,6 +146,7 @@ impl Cli {
             Command::Tpm { action } => tpm_unlock(action),
             Command::RecoveryKey { action } => recovery_key(action),
             Command::Encryption { action } => encryption(action),
+            Command::SystemDisk { action } => system_disk(action),
             Command::AntiCheat => {
                 let status = status::gather();
                 report::anti_cheat(&status.anti_cheat, &status.signing_key.other_keys);
@@ -235,13 +239,17 @@ fn encryption(action: EncryptionAction) -> Result<()> {
         EncryptionAction::Seal { partition, state } => {
             disk::encryption::seal(&partition, &ask::piped(1)?[0], &state)
         }
-        EncryptionAction::CopyTo { device } => {
-            println!("{}", disk::layout::moving::copy_to(&device)?.display());
-            Ok(())
-        }
-        EncryptionAction::Retire { device } => disk::layout::moving::retire(&device),
-        EncryptionAction::Settle { device, uuid } => disk::layout::moving::settle(&device, &uuid),
-        EncryptionAction::Fit { device, size } => disk::layout::moving::fit(&device, size),
-        EncryptionAction::InitrdMove => disk::layout::moving::open_in_initrd(),
+    }
+}
+
+fn system_disk(action: SystemDiskAction) -> Result<()> {
+    match action {
+        SystemDiskAction::Continue => tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()?
+            .block_on(async {
+                tokio::task::spawn_blocking(disk::layout::continue_at_start).await
+            })?,
+        SystemDiskAction::OpenHalves => disk::layout::open_in_initrd(),
     }
 }

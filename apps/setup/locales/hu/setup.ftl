@@ -248,6 +248,8 @@ setup-protect-passphrase-label = Jelmondat
 setup-protect-repeat = Jelmondat még egyszer
 setup-protect-mismatch = Nem egyeznek
 setup-protect-kept = Elmentettem a helyreállítási kulcsot
+setup-protect-only-now = A titkosítás csak most, a Luft telepítése közben kapcsolható be.
+setup-protect-skip = Ne legyen titkosítva
 setup-protect-encrypt = Titkosítás
 
 ## Fingerprint

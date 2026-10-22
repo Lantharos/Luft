@@ -53,6 +53,7 @@ settings-privacy-delete-after-hint = Hve lengi skrár eru geymdar áður en þæ
 
 settings-security-protected = Tækið þitt er varið
 settings-security-could-be-safer = Tækið þitt gæti verið öruggara
+settings-security-not-encrypted-description = Diskurinn í því er ekki dulritaður, svo hver sem tekur hann út getur lesið skrárnar þínar.
 settings-security-starts-differently-description = Ef þú breyttir Secure Boot-stillingum tölvunnar skaltu staðfesta það svo diskurinn opnist aftur sjálfkrafa.
 settings-security-needed-recovery-key = Diskurinn þurfti endurheimtarlykilinn
 settings-security-needed-recovery-key-description = Tengdu öryggiskubbinn aftur svo diskurinn opnist sjálfkrafa.
@@ -147,6 +148,7 @@ settings-usb-hold-back-description = Tæki sem eru tengd á meðan tölvan er l�
 ## Device encryption
 
 settings-encryption = Dulritun tækis
+settings-encryption-not-encrypted = Slökkt, og aðeins er hægt að kveikja á því við uppsetningu Luft
 settings-encryption-unlocks-chip-pin = Opnast með öryggiskubbnum og PIN-númerinu þínu
 settings-encryption-unlocks-chip = Opnast sjálfkrafa með öryggiskubbnum
 settings-encryption-unlocks-passphrase = Biður um lykilsetninguna þína við ræsingu

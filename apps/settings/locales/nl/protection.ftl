@@ -53,6 +53,7 @@ settings-privacy-delete-after-hint = Hoelang bestanden blijven voordat ze worden
 
 settings-security-protected = Je apparaat is beveiligd
 settings-security-could-be-safer = Je apparaat kan veiliger
+settings-security-not-encrypted-description = De schijf is niet versleuteld, dus iedereen die hem eruit haalt, kan je bestanden lezen.
 settings-security-starts-differently-description = Als je de Secure Boot-instellingen hebt gewijzigd, bevestig dit dan, zodat de schijf weer vanzelf ontgrendelt.
 settings-security-needed-recovery-key = Je schijf had de herstelsleutel nodig
 settings-security-needed-recovery-key-description = Koppel de beveiligingschip opnieuw, zodat de schijf vanzelf ontgrendelt.
@@ -147,6 +148,7 @@ settings-usb-hold-back-description = Apparaten die worden aangesloten terwijl de
 ## Device encryption
 
 settings-encryption = Apparaatversleuteling
+settings-encryption-not-encrypted = Uit, en kan alleen worden aangezet tijdens het installeren van Luft
 settings-encryption-unlocks-chip-pin = Ontgrendelt met de beveiligingschip en je pincode
 settings-encryption-unlocks-chip = Ontgrendelt vanzelf met de beveiligingschip
 settings-encryption-unlocks-passphrase = Vraagt bij het opstarten om je wachtwoordzin

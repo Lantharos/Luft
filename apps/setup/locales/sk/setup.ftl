@@ -260,6 +260,8 @@ setup-protect-passphrase-label = Prístupová fráza
 setup-protect-repeat = Zadajte ju znova
 setup-protect-mismatch = Nezhodujú sa
 setup-protect-kept = Kľúč na obnovenie mám uložený
+setup-protect-only-now = Šifrovanie môžete zapnúť len teraz, počas inštalácie Luftu.
+setup-protect-skip = Nešifrovať
 setup-protect-encrypt = Zašifrovať
 
 ## Fingerprint

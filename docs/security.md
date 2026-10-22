@@ -85,34 +85,13 @@ Until a rotation is needed, every Luft-signed image keeps unlocking the disk.
 
 ## Device encryption
 
-`trustctl encryption on`, or Settings, encrypts the running system in place with LUKS2.
+Luft is encrypted while it's installed, never afterwards. Install Luft asks right after choosing where Luft goes, and shows the recovery key there. The installer formats Luft's partition as LUKS2 with `trustctl encryption format`, keyed by the recovery key and, without a TPM, a passphrase of at least eight characters, and installs into it. Replacing a Linux system while keeping its files next to Luft can't be encrypted, since those files stay on the same unencrypted partition.
 
-Requirements, checked first by `trustctl encryption check`:
+Before the first start, `trustctl encryption seal` links the TPM with the signed policy for the startup image. PCR 7 isn't sealed to what the live system measured, since the live system started through Fedora's shim and GRUB, but to what it measures once Luft's key is in shim: trustd replays the TPM's event log without the authorities shim measured for the live system's loader and adds Luft's key from `MokListRT`, the same replay `tpm before-restart` uses. The recovery key is also sealed to the TPM in `/var/lib/trustd`, inside the encryption, so Settings can show it again and trustd can open the disk for itself, to move it.
 
-- UEFI, with the system on a single btrfs partition
-- the EFI system partition on its own partition
-- nothing else on the disk that would stay unencrypted, and no other system on the same partition
-- 1 GB free, and the computer plugged in
+If the prediction misses, for example because the firmware measures something the live system didn't, the first start asks once for the recovery key that was just saved, and trustd seals the disk key to what that start measured. From then on it unlocks without a prompt.
 
-Steps:
-
-1. Save the recovery key.
-2. If Luft is still taking back Meet Luft's space or changing its size, encryption waits until that's done, also across restarts, and Settings says so. Then the checks run again, the file system shrinks by 32 MB for the header, and the plan waits on the EFI system partition, with the recovery key sealed to the TPM (or to the passphrase without one). The plan's fingerprint is sealed with it, so a plan changed on the EFI system partition doesn't open.
-3. At the next restart Sushi shows "Encrypting your device" for a few seconds while the header is written. If the file system no longer leaves the 32 MB free, the disk isn't touched: Luft starts unencrypted and Settings says encryption didn't start. Disks won't resize the system's partition while encryption waits for the restart.
-4. The rest is encrypted in the background at idle priority, pausing on battery. A crash or power cut loses nothing.
-5. When it finishes, the TPM is linked and the disk unlocks without a prompt.
-
-Without a TPM, a passphrase is asked at every start instead. Decrypting works the same way in reverse, with the disk's header kept on the EFI system partition until it finishes, since the startup has to read it before the disk opens.
-
-The EFI system partition can be written by anyone who starts another system on the computer, so the startup trusts nothing on it by itself:
-
-- The plan has to name its disks by plain IDs and the partition Luft starts from; anything else leaves the disk as it is.
-- With the TPM, the plan only counts when its fingerprint comes out of the TPM sealed to Luft's startup, and the recovery key next to it has to be one Luft makes. Without one, the passphrase opens the plan and the recovery key together.
-- While decrypting, the header on the EFI system partition is only used once the TPM vouches for the plan, or once the passphrase or recovery key typed at startup opens it.
-
-Someone who can start another system can still make a TPM-sealed plan of their own, since sealing doesn't take Luft's startup, only opening does. What such a plan can do stays within the partition Luft starts from and Luft's own way of encrypting it, which they could already change from the other system while it's unencrypted.
-
-Only root can read the EFI system partition and the startup partition, so other accounts can't copy the header or the sealed recovery key and try passphrases against them elsewhere.
+Turning encryption on or off on an installed system isn't possible. Settings shows whether the disk is encrypted, its recovery key, and whether the TPM unlocks it.
 
 ### Moving the encrypted system
 
@@ -121,7 +100,8 @@ When Meet Luft asks Luft to change its size and Luft has to move to a new partit
 - No key leaves Luft: the header copy holds the keyslots as they are, and the copy is opened with the recovery key the TPM keeps for Luft, which never leaves memory.
 - Encrypting different data at different places on two devices with one XTS key reveals nothing more than one disk written over time does.
 - The old partition's header is wiped, and the partition trimmed, once btrfs no longer uses it. On a drive that doesn't erase trimmed blocks, its old contents stay readable to whoever has the volume key until Windows writes over them, the same as blocks freed inside one encrypted disk.
-- `LuftMove` sits in a UEFI variable another system could change, so the startup only opens partitions named by plain partition UUIDs, through their own LUKS headers. A container someone made elsewhere can't join the system's file system without knowing its ID, which is inside the encryption, the same as a planted root partition today.
+- Both halves carry a `luft-move` token in their LUKS2 header with the btrfs file system's UUID. The startup only opens partitions on the system disk's drive that have the token, and closes one again unless the file system inside has that UUID. A header someone copied onto another partition only opens to noise, since its contents weren't written with the volume key, and the UUID inside the encryption can't be read without it.
+- Nothing about a move is kept in firmware variables, so resetting them halfway can't keep Luft from starting.
 
 ## Other drives
 
@@ -130,7 +110,7 @@ Disks can encrypt other drives in place through `trustd`. Partitions the system 
 - Room for the 32 MB header comes from free space right after the partition (any file system), shrinking ext2/3/4 while unmounted, or shrinking btrfs while mounted. Otherwise the drive can only be encrypted by formatting it.
 - Encryption runs in the background, can be paused, and continues when the drive is unlocked again.
 - Every drive gets a recovery key; a passphrase is optional.
-- **Unlock automatically on this computer** keeps a random key in `/etc/luks-keys` with an `/etc/crypttab` entry, like BitLocker's automatic unlock. It requires device encryption, so the drive's key is protected by the TPM-protected disk.
+- **Unlock automatically on this computer** keeps a random key in `/etc/luks-keys` with an `/etc/crypttab` entry, like BitLocker's automatic unlock. It requires Luft to be encrypted, so the drive's key is protected by the TPM-protected disk.
 - Removable drives aren't decrypted in place.
 
 ## Luft Keyring
@@ -140,7 +120,7 @@ Disks can encrypt other drives in place through `trustd`. Partitions the system 
 - Only after the system's sign-in rules succeed does `pam_luft_keyring.so` tell the unlock service, which hands the TPM key only to your own `luft-keyring` (checked by pidfd, installed binary, your user manager's unit, not traced).
 - `luft-keyring` is installed setgid to its own `luft-keyring` group. Starting with that group makes the kernel shield it from the first instruction: your other programs can't trace it, read its memory or slip libraries into it, even through a changed unit. The unlock service only answers a keyring that is running with the group, so one started under a debugger or with no new privileges gets no key.
 - PCR 7 ties the seal to the Secure Boot state, and PCR 15 to this installation: with device encryption the disk's volume key is measured into it at every start, so another system the firmware would start, even a signed one, can't unseal it. Kernel and Luft updates change neither, so they never cost a password prompt. A changed Secure Boot state means typing your password once.
-- Without device encryption, PCR 15 only holds values another system could read off the disk and measure itself, so the seal then rests on Secure Boot alone. Turn on device encryption to have it bound to this computer's own installation.
+- Without device encryption, PCR 15 only holds values another system could read off the disk and measure itself, so the seal then rests on Secure Boot alone. Only an encrypted Luft binds it to this computer's own installation.
 - While unlocked, the master key sits in locked, non-dumpable memory; locking wipes it and every secret.
 - Automatic login never unlocks the keyring.
 

@@ -39,6 +39,7 @@ installer-unknown-zone = Jaunā sistēma nepazīst laika joslu { $zone }.
 installer-esp-partition-failed = Neizdevās izveidot EFI sistēmas nodalījumu
 installer-startup-partition-failed = Neizdevās izveidot nodalījumu Luft startēšanas failiem
 installer-root-partition-failed = Neizdevās izveidot nodalījumu sistēmai Luft
+installer-encryption-failed = Neizdevās šifrēt nodalījumu sistēmai Luft
 installer-shrink-failed = Windows neizdevās samazināt
 installer-no-esp = Diskā nav EFI sistēmas nodalījuma
 installer-no-root = Nodalījums sistēmai Luft netika izveidots
@@ -51,6 +52,7 @@ installer-key-queue-failed = Luft Secure Boot atslēgu neizdevās sagatavot nāk
 
 ## Replacing a Linux system
 
+installer-encryption-keeps-old = Luft nevar šifrēt, ja blakus tam paliek vecās sistēmas faili.
 installer-leftovers-failed = Neizdevās notīrīt iepriekšējā mēģinājuma atlikumus
 installer-default-failed = Neizdevās iestatīt Luft kā sistēmu, kas tiek palaista
 installer-relabel-failed = Neizdevās marķēt jūsu failus sistēmai Luft

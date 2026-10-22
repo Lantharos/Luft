@@ -47,6 +47,10 @@ COPY boot/sushi /src/boot/sushi
 COPY security /src/security
 COPY packages/dbus /src/packages/dbus
 COPY packages/identity /src/packages/identity
+COPY packages/i18n /src/packages/i18n
+COPY packages/system/disks /src/packages/system/disks
+COPY packages/system/meet /src/packages/system/meet
+COPY packages/system/trust /src/packages/system/trust
 COPY kestrel/engine/data/fonts /src/kestrel/engine/data/fonts
 COPY os/image/parts/stages/boot.sh os/image/parts/stages/needed.sh os/image/parts/stages/source-times.ts os/image/parts/stages/workspace.ts \
   /src/os/image/parts/stages/

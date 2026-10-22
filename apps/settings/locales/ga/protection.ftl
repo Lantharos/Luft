@@ -53,6 +53,7 @@ settings-privacy-delete-after-hint = Cé chomh fada a fhanann comhaid sula mbain
 
 settings-security-protected = Tá do ghléas cosanta
 settings-security-could-be-safer = D’fhéadfadh do ghléas a bheith níos sábháilte
+settings-security-not-encrypted-description = Níl a dhiosca criptithe, mar sin is féidir le duine ar bith a bhaineann amach é do chuid comhad a léamh.
 settings-security-starts-differently-description = Má d’athraigh tú socruithe Secure Boot an ríomhaire, deimhnigh an t-athrú ionas go ndíghlasálfar an diosca leis féin arís.
 settings-security-needed-recovery-key = Bhí an eochair athshlánaithe ag teastáil ó do dhiosca
 settings-security-needed-recovery-key-description = Nasc an tslis slándála arís ionas go ndíghlasálfar an diosca leis féin.
@@ -162,6 +163,7 @@ settings-usb-hold-back-description = Fanann gléasanna a phlugáiltear isteach a
 ## Device encryption
 
 settings-encryption = Criptiú gléis
+settings-encryption-not-encrypted = As, agus ní féidir é a chasadh air ach agus Luft á shuiteáil
 settings-encryption-unlocks-chip-pin = Díghlasálann sé leis an tslis slándála agus le d’UAP
 settings-encryption-unlocks-chip = Díghlasálann sé leis féin leis an tslis slándála
 settings-encryption-unlocks-passphrase = Iarrann sé d’fhrása faire ag an tosú

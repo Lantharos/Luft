@@ -2,7 +2,6 @@ pub mod command;
 pub mod files;
 pub mod greetd;
 pub mod mount;
-pub mod system_disk;
 
 use std::ffi::CString;
 use std::future::Future;

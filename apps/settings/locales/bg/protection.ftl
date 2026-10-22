@@ -53,6 +53,7 @@ settings-privacy-delete-after-hint = Колко време остават фай
 
 settings-security-protected = Устройството ви е защитено
 settings-security-could-be-safer = Устройството ви може да е по-защитено
+settings-security-not-encrypted-description = Дискът му не е шифрован, така че всеки, който го извади, може да чете файловете ви.
 settings-security-starts-differently-description = Ако сте променили настройките на Secure Boot, потвърдете промяната, за да може дискът отново да се отключва сам.
 settings-security-needed-recovery-key = Дискът ви поиска ключа за възстановяване
 settings-security-needed-recovery-key-description = Свържете отново чипа за сигурност, за да се отключва сам.
@@ -147,6 +148,7 @@ settings-usb-hold-back-description = Включените, докато е за�
 ## Device encryption
 
 settings-encryption = Шифроване на устройството
+settings-encryption-not-encrypted = Изключено и може да се включи само при инсталиране на Luft
 settings-encryption-unlocks-chip-pin = Отключва се с чипа за сигурност и вашия ПИН
 settings-encryption-unlocks-chip = Отключва се сам с чипа за сигурност
 settings-encryption-unlocks-passphrase = Иска паролата за диска при стартиране

@@ -39,6 +39,7 @@ installer-unknown-zone = Naujoji sistema nežino laiko juostos { $zone }.
 installer-esp-partition-failed = Nepavyko sukurti EFI sistemos skaidinio
 installer-startup-partition-failed = Nepavyko sukurti skaidinio sistemos Luft paleidimo failams
 installer-root-partition-failed = Nepavyko sukurti skaidinio sistemai Luft
+installer-encryption-failed = Nepavyko užšifruoti skaidinio sistemai Luft
 installer-shrink-failed = Nepavyko sumažinti Windows
 installer-no-esp = Diske nėra EFI sistemos skaidinio
 installer-no-root = Skaidinys sistemai Luft nesukurtas
@@ -51,6 +52,7 @@ installer-key-queue-failed = Nepavyko paruošti sistemos Luft Secure Boot rakto 
 
 ## Replacing a Linux system
 
+installer-encryption-keeps-old = Luft negalima užšifruoti, kai šalia jo paliekami senosios sistemos failai.
 installer-leftovers-failed = Nepavyko išvalyti to, kas liko po ankstesnio bandymo
 installer-default-failed = Nepavyko nustatyti, kad būtų paleidžiama sistema Luft
 installer-relabel-failed = Nepavyko paženklinti jūsų failų sistemai Luft

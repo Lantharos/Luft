@@ -248,6 +248,8 @@ setup-protect-passphrase-label = Wachtwoordzin
 setup-protect-repeat = Typ hem opnieuw
 setup-protect-mismatch = Ze komen niet overeen
 setup-protect-kept = Ik heb mijn herstelsleutel bewaard
+setup-protect-only-now = Je kunt versleuteling alleen nu aanzetten, tijdens het installeren van Luft.
+setup-protect-skip = Niet versleutelen
 setup-protect-encrypt = Versleutelen
 
 ## Fingerprint

@@ -53,6 +53,7 @@ settings-privacy-delete-after-hint = Durée de conservation des fichiers avant l
 
 settings-security-protected = Votre appareil est protégé
 settings-security-could-be-safer = Votre appareil pourrait être mieux protégé
+settings-security-not-encrypted-description = Son disque n’est pas chiffré, donc quiconque le retire peut lire vos fichiers.
 settings-security-starts-differently-description = Si vous avez modifié ses paramètres Secure Boot, confirmez-le pour que le disque se déverrouille de nouveau tout seul.
 settings-security-needed-recovery-key = Votre disque a demandé sa clé de récupération
 settings-security-needed-recovery-key-description = Associez de nouveau la puce de sécurité pour qu’il se déverrouille tout seul.
@@ -147,6 +148,7 @@ settings-usb-hold-back-description = Ceux branchés pendant le verrouillage atte
 ## Device encryption
 
 settings-encryption = Chiffrement de l’appareil
+settings-encryption-not-encrypted = Désactivé, et il ne peut être activé que pendant l’installation de Luft
 settings-encryption-unlocks-chip-pin = Se déverrouille avec la puce de sécurité et votre code PIN
 settings-encryption-unlocks-chip = Se déverrouille tout seul avec la puce de sécurité
 settings-encryption-unlocks-passphrase = Demande votre phrase secrète au démarrage

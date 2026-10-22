@@ -39,6 +39,7 @@ installer-unknown-zone = Det nye systemet kjenner ikke tidssonen { $zone }.
 installer-esp-partition-failed = Kunne ikke opprette EFI-systempartisjonen
 installer-startup-partition-failed = Kunne ikke opprette partisjonen for oppstartsfilene til Luft
 installer-root-partition-failed = Kunne ikke opprette partisjonen for Luft
+installer-encryption-failed = Kunne ikke kryptere partisjonen for Luft
 installer-shrink-failed = Windows kunne ikke gjøres mindre
 installer-no-esp = Disken har ingen EFI-systempartisjon
 installer-no-root = Ingen partisjon for Luft ble opprettet
@@ -51,6 +52,7 @@ installer-key-queue-failed = Secure Boot-nøkkelen til Luft kunne ikke klargjør
 
 ## Replacing a Linux system
 
+installer-encryption-keeps-old = Luft kan ikke krypteres når det beholder filene til det gamle systemet ved siden av seg.
 installer-leftovers-failed = Det et tidligere forsøk etterlot, kunne ikke ryddes bort
 installer-default-failed = Luft kunne ikke gjøres til systemet som starter
 installer-relabel-failed = Filene dine kunne ikke merkes for Luft

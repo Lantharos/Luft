@@ -39,6 +39,7 @@ installer-unknown-zone = Uus süsteem ei tunne ajavööndit { $zone }.
 installer-esp-partition-failed = EFI-süsteemipartitsiooni ei õnnestunud luua
 installer-startup-partition-failed = Lufti käivitusfailide partitsiooni ei õnnestunud luua
 installer-root-partition-failed = Lufti partitsiooni ei õnnestunud luua
+installer-encryption-failed = Lufti partitsiooni ei õnnestunud krüptida
 installer-shrink-failed = Windowsi ei õnnestunud väiksemaks teha
 installer-no-esp = Kettal pole EFI-süsteemipartitsiooni
 installer-no-root = Lufti partitsiooni ei loodud
@@ -51,6 +52,7 @@ installer-key-queue-failed = Lufti Secure Booti võtit ei õnnestunud järgmisek
 
 ## Replacing a Linux system
 
+installer-encryption-keeps-old = Lufti ei saa krüptida, kui see hoiab vana süsteemi faile enda kõrval alles.
 installer-leftovers-failed = Varasemast katsest jäänud andmeid ei õnnestunud eemaldada
 installer-default-failed = Lufti ei õnnestunud käivituvaks süsteemiks määrata
 installer-relabel-failed = Teie failidele ei õnnestunud Lufti jaoks silte määrata

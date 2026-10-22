@@ -53,6 +53,7 @@ settings-privacy-delete-after-hint = Mennyi ideig maradnak meg a fájlok az elt�
 
 settings-security-protected = Az eszköz védett
 settings-security-could-be-safer = Az eszköz lehetne biztonságosabb
+settings-security-not-encrypted-description = A lemeze nincs titkosítva, így bárki, aki kiveszi, elolvashatja a fájlokat.
 settings-security-starts-differently-description = Ha módosította a Secure Boot beállításait, erősítse meg a változást, hogy a lemez ismét magától feloldódjon.
 settings-security-needed-recovery-key = A lemez a helyreállítási kulcsot kérte
 settings-security-needed-recovery-key-description = Kapcsolja össze újra a biztonsági chippel, hogy magától feloldódjon.
@@ -147,6 +148,7 @@ settings-usb-hold-back-description = A zárolt állapotban csatlakoztatott eszk�
 ## Device encryption
 
 settings-encryption = Eszköztitkosítás
+settings-encryption-not-encrypted = Kikapcsolva, és csak a Luft telepítésekor kapcsolható be
 settings-encryption-unlocks-chip-pin = A biztonsági chippel és a PIN-kóddal oldódik fel
 settings-encryption-unlocks-chip = A biztonsági chippel magától oldódik fel
 settings-encryption-unlocks-passphrase = Indításkor a jelmondatot kéri

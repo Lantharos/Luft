@@ -260,6 +260,8 @@ setup-protect-passphrase-label = Парольная фраза
 setup-protect-repeat = Повторите фразу
 setup-protect-mismatch = Фразы не совпадают
 setup-protect-kept = Ключ восстановления сохранён
+setup-protect-only-now = Шифрование можно включить только сейчас, во время установки Luft.
+setup-protect-skip = Не шифровать
 setup-protect-encrypt = Зашифровать
 
 ## Fingerprint

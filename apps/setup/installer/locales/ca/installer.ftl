@@ -39,6 +39,7 @@ installer-unknown-zone = El sistema nou no coneix la zona horària { $zone }.
 installer-esp-partition-failed = No s’ha pogut crear la partició del sistema EFI
 installer-startup-partition-failed = No s’ha pogut crear la partició per als fitxers d’arrencada de Luft
 installer-root-partition-failed = No s’ha pogut crear la partició per a Luft
+installer-encryption-failed = No s’ha pogut xifrar la partició per a Luft
 installer-shrink-failed = No s’ha pogut reduir Windows
 installer-no-esp = El disc no té cap partició del sistema EFI
 installer-no-root = No s’ha creat cap partició per a Luft
@@ -51,6 +52,7 @@ installer-key-queue-failed = No s’ha pogut preparar la clau de Secure Boot de 
 
 ## Replacing a Linux system
 
+installer-encryption-keeps-old = Luft no es pot xifrar si conserva al costat els fitxers del sistema antic.
 installer-leftovers-failed = No s’ha pogut netejar el que va deixar un intent anterior
 installer-default-failed = No s’ha pogut fer que Luft sigui el sistema que s’inicia
 installer-relabel-failed = No s’han pogut etiquetar els vostres fitxers per a Luft

@@ -67,6 +67,8 @@ check_wifi_carried() {
 HINTS='{"language":"en_US","locale":"de_AT","timezone":"Europe/Vienna","keyboards":[{"layout":"at","variant":"nodeadkeys"},{"layout":"us","variant":""}]}'
 ASKED=/run/luft-check/asked-for-code
 CODE=31415926
+RECOVERY_KEY=cbdefghi-jklnrtuv-cbdefghi-jklnrtuv-cbdefghi-jklnrtuv-cbdefghi-jklnrtuv
+PASSPHRASE='correct horse battery'
 
 check_meet_hints() {
   local hints
@@ -91,7 +93,6 @@ const TRUST = `<node><interface name="com.lantharos.Trust1">
   <property name="SecureBoot" type="s" access="read"/>
   <property name="SigningKey" type="a{sv}" access="read"/>
   <method name="EnrollSigningKey"><arg type="s" direction="out"/></method>
-  <method name="TurnOnEncryption"><arg type="s" direction="in"/><arg type="s" direction="in"/><arg type="s" direction="in"/></method>
 </interface></node>`;
 
 const trust = Gio.DBusExportedObject.wrapJSObject(TRUST, {
@@ -101,7 +102,6 @@ const trust = Gio.DBusExportedObject.wrapJSObject(TRUST, {
     GLib.file_set_contents(asked, code);
     return code;
   },
-  TurnOnEncryption: (recoveryKey, pin, passphrase) => GLib.file_set_contents(`${asked}.encryption`, `${recoveryKey} ${pin}${passphrase}`),
 });
 trust.export(Gio.DBus.system, '/com/lantharos/Trust1');
 Gio.bus_own_name_on_connection(Gio.DBus.system, 'com.lantharos.Trust1', Gio.BusNameOwnerFlags.NONE, null, null);
@@ -187,15 +187,30 @@ check_free_space() {
   offset="$(jq -r '.drives[] | select(.device == "/dev/vdc") | .free[0].offset' <<< "$survey")"
   [[ -n "$drive" && "$offset" =~ ^[0-9]+$ ]] || fail "the survey doesn't offer the free space"
   call Configure s '{"locale":"en_US.UTF-8","keyboard":{"layout":"us","variant":""},"timezone":"UTC","hostname":"grace-computer"}' > /dev/null
-  call Install s "{\"target\":{\"kind\":\"free\",\"drive\":\"$drive\",\"offset\":$offset},\"variant\":\"default\"}" > /dev/null ||
+  call Install s "{\"target\":{\"kind\":\"free\",\"drive\":\"$drive\",\"offset\":$offset},\"variant\":\"default\",\"encryption\":{\"recoveryKey\":\"$RECOVERY_KEY\",\"passphrase\":\"$PASSPHRASE\"}}" > /dev/null ||
     fail "installing into free space didn't start"
   call CreateAccount sss grace "Grace Hopper" "cobol" > /dev/null
   wait_for_install
   mkdir -p "$TARGET" && mount -o ro /dev/vdc1 "$TARGET" && [[ "$(cat "$TARGET/kept")" == "still here" ]] ||
     fail "the partition that was already there changed"
   umount "$TARGET"
-  [[ "$(lsblk -no FSTYPE /dev/vdc | xargs)" == "ext4 vfat btrfs" ]] || fail "Luft's partitions aren't in the free space"
+  [[ "$(lsblk -no FSTYPE /dev/vdc | xargs)" == "ext4 vfat crypto_LUKS" ]] || fail "Luft's partitions aren't in the free space"
   pass "Luft goes into free space and leaves the partition before it alone"
+  check_encrypted /dev/vdc3
+}
+
+check_encrypted() {
+  local partition=$1
+  cryptsetup luksDump "$partition" | grep -q 'systemd-recovery' || fail "the recovery key isn't marked in Luft's encryption"
+  printf '%s' "$PASSPHRASE" | cryptsetup open --test-passphrase --key-file - "$partition" &&
+    printf '%s' "$RECOVERY_KEY" | cryptsetup open --test-passphrase --key-file - "$partition" ||
+    fail "Luft's encryption doesn't open with the passphrase and the recovery key"
+  printf '%s' "$PASSPHRASE" | cryptsetup open --readonly --key-file - "$partition" luft-check || fail "Luft's encryption doesn't open"
+  [[ "$(blkid -o value -s TYPE /dev/mapper/luft-check)" == btrfs ]] && mount -o ro /dev/mapper/luft-check "$TARGET" &&
+    [[ -d "$(deployment "$TARGET")" ]] || fail "Luft isn't installed inside its encryption"
+  umount "$TARGET"
+  cryptsetup close luft-check
+  pass "Luft is installed inside LUKS2 that opens with the passphrase and the recovery key"
 }
 
 prepare_windows() {
@@ -257,7 +272,7 @@ check_alongside_windows() {
   pass "the signed startup images and their entries are on the startup partition"
 }
 
-SETUP_ACTIONS=(com.lantharos.trust.manage-encryption com.lantharos.trust.manage-secure-boot net.reactivated.fprint.device.enroll)
+SETUP_ACTIONS=(com.lantharos.trust.manage-secure-boot net.reactivated.fprint.device.enroll)
 ADA=/run/luft-check/ada
 FINGERPRINTS=/run/luft-check/fingerprints
 
@@ -344,11 +359,9 @@ setup_step() {
 }
 
 check_setup_steps() {
-  [[ "$(pkcheck --action-id com.lantharos.trust.manage-encryption --process $$ > /dev/null 2>&1; echo $?)" == 0 ]] ||
+  [[ "$(pkcheck --action-id com.lantharos.trust.manage-secure-boot --process $$ > /dev/null 2>&1; echo $?)" == 0 ]] ||
     fail "trustd would ask the installer for a password"
   setup_step EnrollSigningKey && [[ "$(cat "$ADA/out")" == "s \"$CODE\"" ]] || fail "setup couldn't enroll Luft's key: $(cat "$ADA/out")"
-  setup_step TurnOnEncryption ss ABCD-EFGH correct-horse && [[ "$(cat "$ASKED.encryption")" == "ABCD-EFGH correct-horse" ]] ||
-    fail "setup couldn't turn on encryption: $(cat "$ADA/out")"
   setup_step EnrollFingerprint s right-index-finger || fail "setup couldn't add a fingerprint: $(cat "$ADA/out")"
   for _ in $(seq 20); do
     [[ "$(xargs < "$FINGERPRINTS" 2> /dev/null)" == "Claim ada EnrollStart right-index-finger EnrollStop Release" ]] && break
@@ -356,7 +369,7 @@ check_setup_steps() {
   done
   [[ "$(xargs < "$FINGERPRINTS")" == "Claim ada EnrollStart right-index-finger EnrollStop Release" ]] ||
     fail "the fingerprint wasn't added for ada and the reader let go: $(xargs < "$FINGERPRINTS")"
-  pass "setup turns on encryption, Secure Boot and fingerprints through the installer without asking for the new password"
+  pass "setup turns on Secure Boot and fingerprints through the installer without asking for the new password"
 
   install -m755 /usr/bin/busctl /run/luft-check/another-program
   ! in_session /run/luft-check/another-program call "${BUS[@]}" EnrollSigningKey || fail "another program in ada's session got setup's exceptions"
@@ -390,7 +403,7 @@ check_password_needed_after_setup() {
     [[ "$(pkcheck --action-id "$action" --process "$(systemctl show -p MainPID --value ada-session)" > /dev/null 2>&1; echo $?)" == 2 ]] ||
       fail "$action needs no password for ada"
   done
-  pass "encryption, Secure Boot and fingerprints ask ada for her password"
+  pass "Secure Boot and fingerprints ask ada for her password"
 }
 
 pending_setup() {

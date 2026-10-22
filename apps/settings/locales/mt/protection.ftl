@@ -53,6 +53,7 @@ settings-privacy-delete-after-hint = Kemm jibqgħu l-fajls qabel jitneħħew
 
 settings-security-protected = L-apparat huwa protett
 settings-security-could-be-safer = L-apparat jista’ jkun aktar sigur
+settings-security-not-encrypted-description = Id-diska tiegħu mhix iċċifrata, għalhekk kulmin joħroġha jista’ jaqra l-fajls tiegħek.
 settings-security-starts-differently-description = Jekk biddilt is-settings tas-Secure Boot, ikkonferma l-bidla biex id-diska terġa’ tiżblokka waħedha.
 settings-security-needed-recovery-key = Id-diska kellha bżonn iċ-ċavetta tal-irkupru
 settings-security-needed-recovery-key-description = Erġa’ orbot iċ-ċippa tas-sigurtà biex tiżblokka waħedha.
@@ -162,6 +163,7 @@ settings-usb-hold-back-description = Dawk imqabbda waqt li l-iskrin huwa msakkar
 ## Device encryption
 
 settings-encryption = Ċċifrar tal-apparat
+settings-encryption-not-encrypted = Mitfi, u jista’ jinxtegħel biss waqt l-installazzjoni ta’ Luft
 settings-encryption-unlocks-chip-pin = Tiżblokka biċ-ċippa tas-sigurtà u l-PIN
 settings-encryption-unlocks-chip = Tiżblokka waħedha biċ-ċippa tas-sigurtà
 settings-encryption-unlocks-passphrase = Titlob il-passphrase meta tistartja

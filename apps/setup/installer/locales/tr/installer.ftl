@@ -39,6 +39,7 @@ installer-unknown-zone = Yeni sistem şu saat dilimini tanımıyor: { $zone }.
 installer-esp-partition-failed = EFI sistem bölümü oluşturulamadı
 installer-startup-partition-failed = Luft’un başlangıç dosyaları için bölüm oluşturulamadı
 installer-root-partition-failed = Luft için bölüm oluşturulamadı
+installer-encryption-failed = Luft bölümü şifrelenemedi
 installer-shrink-failed = Windows küçültülemedi
 installer-no-esp = Diskte EFI sistem bölümü yok
 installer-no-root = Luft için bölüm oluşturulmadı
@@ -51,6 +52,7 @@ installer-key-queue-failed = Luft’un Secure Boot anahtarı bir sonraki yeniden
 
 ## Replacing a Linux system
 
+installer-encryption-keeps-old = Luft, eski sistemin dosyalarını yanında tuttuğunda şifrelenemez.
 installer-leftovers-failed = Önceki bir denemeden kalanlar temizlenemedi
 installer-default-failed = Luft başlangıçta açılan sistem yapılamadı
 installer-relabel-failed = Dosyalarınız Luft için etiketlenemedi

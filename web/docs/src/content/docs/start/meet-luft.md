@@ -49,7 +49,7 @@ It asks for your password once, when it first looks at the computer. When Luft i
 
 When you open Meet Luft on a PC that has Luft, it shows **Your Luft**:
 
-- **Change how much space Luft has** gives Luft more of Windows' space, or gives some back. Windows makes itself smaller right away; Luft moves into the space the next time it starts and takes a few minutes, while you can keep using it. To give space back, Luft moves its files first, then Meet Luft hands the space to Windows when you open it again. Luft needs some free room to move. An encrypted Luft moves with its own keys, so you won't need the recovery key; it only has to wait while it's still encrypting or decrypting, and one that opens only with a passphrase can't move by itself. When Luft has a drive of its own, it can take the free space right after it, or leave some of it free.
+- **Change how much space Luft has** gives Luft more of Windows' space, or gives some back. Windows makes itself smaller right away; Luft moves into the space the next time it starts and takes a few minutes, while you can keep using it. To give space back, Luft moves its files first, then Meet Luft hands the space to Windows when you open it again. Luft needs some free room to move. An encrypted Luft moves with its own keys, so you won't need the recovery key; one that opens only with a passphrase can't move by itself. When Luft has a drive of its own, it can take the free space right after it, or leave some of it free.
 - **Give Windows the free space** extends Windows into unused space right after it.
 - **Remove Luft from this PC** deletes Luft, its start files and its start entry, and gives Windows the space back. It asks first, and doesn't need a recovery key even when Luft is encrypted.
 
@@ -79,4 +79,4 @@ When Luft runs from Meet Luft, it saves its logs where Meet Luft keeps it, so a 
 
 ## Taking it back out
 
-**Remove Luft from this PC** deletes everything Meet Luft added and gives Windows its space back. On Linux, **Remove Luft from this computer** deletes the folder and the start entry. Once Luft is installed and you sign in for the first time, it removes Meet Luft's leftovers itself and grows into their space. To take out an installed Luft, see [Once Luft is installed](#once-luft-is-installed).
+**Remove Luft from this PC** deletes everything Meet Luft added and gives Windows its space back. On Linux, **Remove Luft from this computer** deletes the folder and the start entry. Once Luft is installed, its first start removes Meet Luft's leftovers in the background and grows into their space. To take out an installed Luft, see [Once Luft is installed](#once-luft-is-installed).

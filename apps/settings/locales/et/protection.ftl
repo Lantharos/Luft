@@ -53,6 +53,7 @@ settings-privacy-delete-after-hint = Kui kaua faile hoitakse enne eemaldamist
 
 settings-security-protected = Teie seade on kaitstud
 settings-security-could-be-safer = Teie seade võiks olla turvalisem
+settings-security-not-encrypted-description = Selle ketas pole krüptitud, nii et igaüks, kes selle välja võtab, saab teie faile lugeda.
 settings-security-starts-differently-description = Kui muutsite selle Secure Booti sätteid, kinnitage muudatus, et ketas avaneks taas iseenesest.
 settings-security-needed-recovery-key = Teie ketas vajas taastevõtit
 settings-security-needed-recovery-key-description = Siduge turvakiip uuesti, et ketas avaneks iseenesest.
@@ -147,6 +148,7 @@ settings-usb-hold-back-description = Lukustatud olekus ühendatud seadmed ootava
 ## Device encryption
 
 settings-encryption = Seadme krüptimine
+settings-encryption-not-encrypted = Väljas, selle saab sisse lülitada ainult Lufti paigaldamise ajal
 settings-encryption-unlocks-chip-pin = Avaneb turvakiibi ja PIN-koodiga
 settings-encryption-unlocks-chip = Avaneb turvakiibiga iseenesest
 settings-encryption-unlocks-passphrase = Küsib käivitamisel paroolifraasi

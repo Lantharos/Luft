@@ -16,7 +16,7 @@ pub use configure::regional::Regional;
 
 use crate::config::Image;
 use configure::deployment::Deployment;
-use configure::{handoff, networks};
+use configure::{handoff, networks, trust};
 use drive::encryption::Encryption;
 use drive::partition;
 use drive::plan::Plan;
@@ -29,13 +29,11 @@ use crate::survey::linux;
 use crate::system::wait;
 
 use crate::L10N;
-use crate::meet::{self, reclaim, start, unpack};
+use crate::meet::{self, start, unpack};
 
 const PREPARED: f64 = 0.04;
 const COPIED: f64 = 0.96;
 const COPIED_BEFORE_UNPACKING: f64 = 0.8;
-const STATE: &str = "lib/luft-installer";
-const TRUST_STATE: &str = "lib/trustd";
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Stage {
@@ -231,9 +229,7 @@ fn install(job: &Job, report: &impl Fn(Status)) -> Result<()> {
     report(Status::at(Stage::Configuring, copied));
     let deployment = Deployment::mount(mounted.root(), &job.target.with_extension("system"))?;
     if let (Some(encryption), Some(opened)) = (&job.encryption, mounted.encrypted()) {
-        let state = deployment.var(TRUST_STATE);
-        encryption.seal(opened, &state)?;
-        deployment.relabel(&[state])?;
+        trust::seal(&deployment, encryption, opened)?;
     }
     regional.apply(&deployment)?;
     let user = match (&kept, account) {
@@ -272,7 +268,7 @@ fn install(job: &Job, report: &impl Fn(Status)) -> Result<()> {
         (None, None) => anyhow::bail!(t!(L10N, "installer-account-missing")),
     };
     if let Some(meet) = &job.meet {
-        reclaim::remember(&deployment.var(STATE), meet)?;
+        trust::remember_meet(&deployment, meet)?;
     }
     if let Err(error) = networks::carry_from_live(&deployment) {
         eprintln!("The Wi-Fi networks joined here weren't brought over: {error:#}");

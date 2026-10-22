@@ -248,6 +248,8 @@ setup-protect-passphrase-label = Disk parolası
 setup-protect-repeat = Yeniden yazın
 setup-protect-mismatch = Eşleşmiyor
 setup-protect-kept = Kurtarma anahtarımı sakladım
+setup-protect-only-now = Şifrelemeyi yalnızca şimdi, Luft yüklenirken açabilirsiniz.
+setup-protect-skip = Şifrelemeden kur
 setup-protect-encrypt = Şifrele
 
 ## Fingerprint

@@ -98,6 +98,7 @@ fn remove_subvolume(subvolume: &str) -> Result<()> {
 }
 
 pub fn remove() -> Result<()> {
+    let _working = super::claim()?;
     let text = std::fs::read_to_string(RECORD)
         .map_err(|_| Unsupported("There's no old system on this computer.".to_owned()))?;
     let record: Record =

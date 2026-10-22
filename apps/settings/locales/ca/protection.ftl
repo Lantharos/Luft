@@ -53,6 +53,7 @@ settings-privacy-delete-after-hint = Quant de temps es conserven els fitxers aba
 
 settings-security-protected = El dispositiu està protegit
 settings-security-could-be-safer = El dispositiu podria estar més protegit
+settings-security-not-encrypted-description = El disc no està xifrat, així que qualsevol que el tregui pot llegir els fitxers.
 settings-security-starts-differently-description = Si heu canviat la configuració de Secure Boot, confirmeu-ho perquè el disc es torni a desbloquejar sol.
 settings-security-needed-recovery-key = El disc ha necessitat la clau de recuperació
 settings-security-needed-recovery-key-description = Torneu a vincular el xip de seguretat perquè es desbloquegi sol.
@@ -147,6 +148,7 @@ settings-usb-hold-back-description = Els que es connecten amb la sessió bloquej
 ## Device encryption
 
 settings-encryption = Xifratge del dispositiu
+settings-encryption-not-encrypted = Desactivat, i només es pot activar en instal·lar Luft
 settings-encryption-unlocks-chip-pin = Es desbloqueja amb el xip de seguretat i el PIN
 settings-encryption-unlocks-chip = Es desbloqueja sol amb el xip de seguretat
 settings-encryption-unlocks-passphrase = Demana la frase de pas en arrencar

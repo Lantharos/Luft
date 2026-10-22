@@ -39,6 +39,7 @@ installer-unknown-zone = Новата система не познава час�
 installer-esp-partition-failed = Системният дял EFI не можа да бъде създаден
 installer-startup-partition-failed = Дялът за стартовите файлове на Luft не можа да бъде създаден
 installer-root-partition-failed = Дялът за Luft не можа да бъде създаден
+installer-encryption-failed = Дялът за Luft не можа да бъде шифрован
 installer-shrink-failed = Windows не можа да бъде смален
 installer-no-esp = Дискът няма системен дял EFI
 installer-no-root = Не беше създаден дял за Luft
@@ -51,6 +52,7 @@ installer-key-queue-failed = Ключът за Secure Boot на Luft не мож
 
 ## Replacing a Linux system
 
+installer-encryption-keeps-old = Luft не може да бъде шифрован, когато запазва файловете на старата система до себе си.
 installer-leftovers-failed = Остатъците от предишен опит не можаха да бъдат изчистени
 installer-default-failed = Luft не можа да бъде зададен като системата, която се стартира
 installer-relabel-failed = Файловете ви не можаха да бъдат обозначени за Luft

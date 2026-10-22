@@ -53,6 +53,7 @@ settings-privacy-delete-after-hint = Cik ilgi faili tiek glabāti, pirms tos no�
 
 settings-security-protected = Ierīce ir aizsargāta
 settings-security-could-be-safer = Ierīce varētu būt drošāka
+settings-security-not-encrypted-description = Tās disks nav šifrēts, tāpēc ikviens, kas to izņem, var lasīt jūsu failus.
 settings-security-starts-differently-description = Ja mainījāt datora Secure Boot iestatījumus, apstipriniet to, lai disks atkal atbloķētos pats.
 settings-security-needed-recovery-key = Diskam bija nepieciešama atkopšanas atslēga
 settings-security-needed-recovery-key-description = Sasaistiet drošības mikroshēmu vēlreiz, lai disks atbloķētos pats.
@@ -152,6 +153,7 @@ settings-usb-hold-back-description = Bloķēšanas laikā pievienotās ierīces 
 ## Device encryption
 
 settings-encryption = Ierīces šifrēšana
+settings-encryption-not-encrypted = Izslēgta, to var ieslēgt tikai, instalējot Luft
 settings-encryption-unlocks-chip-pin = Atbloķē ar drošības mikroshēmu un jūsu PIN
 settings-encryption-unlocks-chip = Atbloķējas automātiski ar drošības mikroshēmu
 settings-encryption-unlocks-passphrase = Startējot prasa jūsu paroles frāzi

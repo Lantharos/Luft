@@ -248,6 +248,8 @@ setup-protect-passphrase-label = Phrase secrète
 setup-protect-repeat = Saisissez-la de nouveau
 setup-protect-mismatch = Les saisies ne correspondent pas
 setup-protect-kept = J’ai conservé ma clé de récupération
+setup-protect-only-now = Le chiffrement ne peut être activé que maintenant, pendant l’installation de Luft.
+setup-protect-skip = Ne pas chiffrer
 setup-protect-encrypt = Chiffrer
 
 ## Fingerprint

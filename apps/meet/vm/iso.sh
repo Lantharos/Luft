@@ -46,7 +46,7 @@ ARG BASE
 FROM ${BASE}
 COPY root/ /
 RUN systemctl --global enable luft-carried-tools.service && \
-    systemctl enable luft-installer-reclaim.service luft-installer-resize.service luft-installer-expire-setup.service && \
+    systemctl enable luft-installer-expire-setup.service trustd-system-disk.service && \
     dnf install -y qemu-guest-agent && dnf clean all && \
     echo '(typepermissive virt_qemu_ga_t)' >/tmp/guest-agent.cil && semodule -i /tmp/guest-agent.cil && rm /tmp/guest-agent.cil
 CONTAINERFILE

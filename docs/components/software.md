@@ -77,8 +77,10 @@ Versions and release notes come from the image's labels:
 
 | Label | Shown as |
 |-------|----------|
-| `org.opencontainers.image.version` | The version, such as 45.2 |
-| `com.lantharos.release-notes` | What's new, as plain text |
+| `org.opencontainers.image.version` | The version, such as 1.20261020.57 |
+| `com.lantharos.release-notes` | What's new, as the image's [changelog](../releases.md#changelogs) |
+
+When get.luft.computer is reachable, What's new instead merges the changelogs of every version between the installed one and the offered one.
 
 `services/updater/data` has the service's D-Bus, systemd and polkit files, and `com.lantharos.Updater1.xml` describes its interface. Administrators signed in at the computer can download and install updates, and switch images, without a password, also in the background; going back to the previous version asks.
 

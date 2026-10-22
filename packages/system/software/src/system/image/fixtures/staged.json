@@ -3,7 +3,7 @@
     "sha256:51a39c3c8e3687e696a5b7ea9fb84ac8ba4b21c49b4978e1fa1d4e697f809fc9": {
       "config": {
         "Labels": {
-          "com.lantharos.release-notes": "Wi-Fi reconnects faster after sleep.\nSettings shows what's new in each update.",
+          "com.lantharos.release-notes": "[{\"area\":\"apps\",\"title\":\"Settings\",\"changes\":[\"Settings shows what's new in each update.\"]},{\"area\":\"system\",\"title\":\"System\",\"changes\":[\"Wi-Fi reconnects faster after sleep.\"]}]",
           "containers.bootc": "1",
           "io.buildah.version": "1.45.1",
           "org.opencontainers.image.version": "45.2",
@@ -105,7 +105,7 @@
     "sha256:7284e924986861cd7d1810357e1757e8ecf959a1a699b304252b0dd446ad11cf": {
       "config": {
         "Labels": {
-          "com.lantharos.release-notes": "Faster startup and a fresher look.",
+          "com.lantharos.release-notes": "[{\"area\":\"desktop\",\"title\":\"Desktop\",\"changes\":[\"Faster startup and a fresher look.\"]}]",
           "containers.bootc": "1",
           "io.buildah.version": "1.45.1",
           "org.opencontainers.image.version": "45.1",

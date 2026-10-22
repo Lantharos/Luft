@@ -19,7 +19,7 @@
 	const next = $derived(overview.switching ? null : (overview.available ?? overview.staged));
 	const ready = $derived(next !== null && next === overview.staged);
 
-	const summary = (release: Release) => release.notes?.split('\n').find((line) => line.trim())?.trim() ?? t('settings-updates-improvements');
+	const summary = (release: Release) => release.notes?.[0].changes[0] ?? t('settings-updates-improvements');
 
 	function describeNext(release: Release) {
 		const released = release.released ? t('settings-updates-released', { when: ago(release.released) }) : null;

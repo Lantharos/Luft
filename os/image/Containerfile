@@ -27,7 +27,9 @@ RUN --mount=type=bind,source=os/image/stages,target=/run/luft/stages \
     /run/luft/stages/finalize.sh luft "${VERSION}" "${BASE}"
 RUN bootc container lint
 ARG RELEASE_NOTES=""
-LABEL org.opencontainers.image.version="${VERSION}" com.lantharos.release-notes="${RELEASE_NOTES}"
+ARG REVISION=""
+LABEL org.opencontainers.image.version="${VERSION}" org.opencontainers.image.revision="${REVISION}" \
+    org.opencontainers.image.base.name="${BASE}" com.lantharos.release-notes="${RELEASE_NOTES}"
 
 FROM ${SYSTEM} AS luft-nvidia
 RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \

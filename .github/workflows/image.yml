@@ -11,10 +11,14 @@ on:
         description: Build every part again instead of reusing the unchanged ones
         type: boolean
         default: false
+      promote:
+        description: Release this tested nightly as the stable version, such as 1.20261020.57
+        type: string
+        default: ""
 
 concurrency:
-  group: image-${{ github.ref }}
-  cancel-in-progress: true
+  group: image-${{ (github.ref_type == 'tag' || inputs.promote) && 'promote' || github.ref }}
+  cancel-in-progress: ${{ github.ref_type != 'tag' && !inputs.promote }}
 
 permissions:
   contents: read
@@ -32,49 +36,137 @@ env:
 jobs:
   promote:
     name: Promote
-    if: github.ref_type == 'tag'
+    if: github.ref_type == 'tag' || inputs.promote
     runs-on: ubuntu-26.04
     timeout-minutes: 15
+    outputs:
+      version: ${{ steps.release.outputs.version }}
+      revision: ${{ steps.release.outputs.revision }}
+      notes: ${{ steps.release.outputs.notes }}
+      digest: ${{ steps.release.outputs.digest }}
+      nvidia-digest: ${{ steps.release.outputs.nvidia-digest }}
     steps:
       - uses: actions/checkout@v7
         with:
           sparse-checkout: |
             .github/actions
+            .github/scripts
             os/image/files
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
 
       - uses: ./.github/actions/registry
 
       - name: Release the tested nightly
+        id: release
         env:
+          PROMOTED: ${{ inputs.promote || github.ref_name }}
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
           R2_BUCKET: ${{ secrets.R2_BUCKET }}
           AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: auto
         run: |
-          version="${GITHUB_REF_NAME#v}"
+          version="${PROMOTED#v}"
+          [[ "$version" =~ ^$MAJOR\.[0-9]{8}\.[0-9]+$ ]] || { echo "$PROMOTED doesn't name a Luft $MAJOR nightly." >&2; exit 1; }
+          revision="$(skopeo inspect --retry-times 3 --format '{{index .Labels "org.opencontainers.image.revision"}}' "docker://$IMAGE:$version")"
+          [[ -n "$revision" ]] || { echo "$version doesn't say which commit it was built from." >&2; exit 1; }
           previous="$(skopeo inspect --retry-times 3 --format '{{index .Labels "org.opencontainers.image.version"}}' "docker://$IMAGE:$MAJOR" || true)"
-          notes=()
           nightly="$version"
           while [[ -n "$nightly" && "$(printf '%s\n' "$previous" "$nightly" | sort -V | tail -n 1)" != "$previous" ]]; do
             entry="$(curl -sf "$DOWNLOADS/nightly/notes/$nightly.json")" || break
-            notes+=("$(jq -r .notes <<<"$entry")")
+            jq -c .notes <<<"$entry"
             nightly="$(jq -r '.previous // empty' <<<"$entry")"
-          done
+          done > "$RUNNER_TEMP/nightlies.jsonl"
+          notes="$(bun .github/scripts/changelog/index.ts merge < "$RUNNER_TEMP/nightlies.jsonl")"
           sudo install -Dm644 -t /usr/share/pki/containers os/image/files/usr/share/pki/containers/luft.pub
           install -Dm644 -t ~/.config/containers/registries.d os/image/files/etc/containers/registries.d/luft.yaml
           for suffix in "" -nvidia; do
             digest="$(skopeo inspect --retry-times 3 --format '{{.Digest}}' "docker://$IMAGE:$version$suffix")"
             skopeo copy --retry-times 3 --preserve-digests --policy os/image/files/etc/containers/policy.json \
               "docker://$IMAGE@$digest" "docker://$IMAGE:$MAJOR$suffix"
+            echo "${suffix#-}${suffix:+-}digest=$digest" >> "$GITHUB_OUTPUT"
           done
-          jq -n --arg version "$version" --arg previous "$previous" --arg notes "$(printf '%s\n' "${notes[@]}")" \
+          jq -n --arg version "$version" --arg previous "$previous" --argjson notes "$notes" \
             '{version: $version, previous: (if $previous == "" then null else $previous end), notes: $notes}' |
             aws s3 cp - "s3://$R2_BUCKET/$MAJOR/notes/$version.json" --endpoint-url "https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com" \
               --content-type application/json --only-show-errors
+          {
+            echo "version=$version"
+            echo "revision=$revision"
+            echo "notes=$notes"
+          } >> "$GITHUB_OUTPUT"
+
+  stick:
+    name: Stick
+    needs: promote
+    uses: ./.github/workflows/iso.yml
+    with:
+      channel: release
+    secrets: inherit
+    permissions:
+      contents: read
+      packages: read
+
+  release:
+    name: GitHub release
+    needs: [promote, stick]
+    runs-on: ubuntu-26.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    env:
+      VERSION: ${{ needs.promote.outputs.version }}
+      REVISION: ${{ needs.promote.outputs.revision }}
+      NOTES: ${{ needs.promote.outputs.notes }}
+      DIGEST: ${{ needs.promote.outputs.digest }}
+      NVIDIA_DIGEST: ${{ needs.promote.outputs.nvidia-digest }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: .github/scripts
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Publish the release
+        run: |
+          bun .github/scripts/changelog/index.ts markdown <<<"$NOTES" > "$RUNNER_TEMP/CHANGES.md"
+          cd "$RUNNER_TEMP"
+          iso="luft-$VERSION.iso"
+          for file in "$iso.sha256" "$iso.sha256.minisig"; do
+            curl -sfLO "$DOWNLOADS/$MAJOR/$file"
+          done
+          key="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/blob/$REVISION/os/image/files/usr/share/pki/containers/luft.pub"
+          cat CHANGES.md - > body.md <<EOF
+
+          ## Downloads
+
+          - [$iso]($DOWNLOADS/$MAJOR/$iso), with its [checksum]($DOWNLOADS/$MAJOR/$iso.sha256) and [signature]($DOWNLOADS/$MAJOR/$iso.sha256.minisig)
+          - Meet Luft for [Windows]($DOWNLOADS/meet/meet-luft.exe) ([checksum]($DOWNLOADS/meet/meet-luft.exe.sha256)) and [Linux]($DOWNLOADS/meet/meet-luft.AppImage) ([checksum]($DOWNLOADS/meet/meet-luft.AppImage.sha256))
+
+          ## Images
+
+          | Image | Digest |
+          | --- | --- |
+          | \`$IMAGE:$MAJOR\` | \`$DIGEST\` |
+          | \`$IMAGE:$MAJOR-nvidia\` | \`$NVIDIA_DIGEST\` |
+
+          Both are signed with [Luft's key]($key):
+
+          \`\`\`
+          cosign verify --key luft.pub --insecure-ignore-tlog=true $IMAGE@$DIGEST
+          \`\`\`
+          EOF
+          gh release create "v$VERSION" --repo "$GITHUB_REPOSITORY" --target "$REVISION" --title "Luft $VERSION" \
+            --notes-file body.md CHANGES.md "$iso.sha256" "$iso.sha256.minisig"
 
   plan:
-    if: github.ref_type != 'tag'
+    if: github.ref_type != 'tag' && !inputs.promote
     runs-on: ubuntu-26.04
     timeout-minutes: 15
     outputs:
@@ -89,28 +181,34 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          fetch-depth: 50
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
 
       - uses: ./.github/actions/registry
 
       - name: Version and release notes
         id: version
         run: |
-          if [[ "$GITHUB_EVENT_NAME" == schedule && -z "$(git log --since=24.hours --format=%H -1)" ]]; then
-            echo "No changes since the last nightly build."
+          nightly="$(skopeo inspect --retry-times 3 --format '{{json .Labels}}' "docker://$IMAGE:$MAJOR-nightly")"
+          built="$(jq -r '."org.opencontainers.image.revision" // empty' <<<"$nightly")"
+          base="$(os/image/build.sh base)"
+          echo "LUFT_BASE=$base" >> "$GITHUB_ENV"
+          if [[ "$GITHUB_EVENT_NAME" == schedule && "$built" == "$GITHUB_SHA" &&
+                "$base" == "$(jq -r '."org.opencontainers.image.base.name" // empty' <<<"$nightly")" ]] &&
+            LUFT_BASE="$base" os/image/build.sh updates "$IMAGE:$MAJOR-nightly"; then
+            echo "Nothing changed since the last nightly."
             echo "skip=1" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           version="$MAJOR.$(date -u +%Y%m%d).${{ github.run_number }}"
           tags=("$MAJOR-nightly" "$version" "$RETIRED_NIGHTLY")
-          since="$(git rev-list -1 --before=24.hours HEAD)"
-          delimiter="notes-$(openssl rand -hex 8)"
           {
             echo "version=$version"
             echo "tags=${tags[*]}"
-            echo "notes<<$delimiter"
-            git log --no-merges --format='- %s' "$since..HEAD"
-            echo "$delimiter"
+            echo "notes=$(bun .github/scripts/changelog/index.ts since "$built")"
           } >> "$GITHUB_OUTPUT"
 
       - name: Parts
@@ -120,8 +218,7 @@ jobs:
           LUFT_SECUREBOOT_CERT: os/image/keys/luft-secureboot.crt
           LUFT_REBUILD: ${{ inputs.rebuild && '1' || '' }}
         run: |
-          base="$(os/image/build.sh base)"
-          LUFT_BASE="$base" os/image/build.sh plan luft-nvidia | tee "$RUNNER_TEMP/parts.tsv"
+          os/image/build.sh plan luft-nvidia | tee "$RUNNER_TEMP/parts.tsv"
           rows() {
             jq --raw-input --slurp --compact-output '[
               split("\n")[] | select(length > 0) | split("\t") | select(.[2] == "missing") |
@@ -130,7 +227,7 @@ jobs:
           }
           missing="$(rows)"
           {
-            echo "base=$base"
+            echo "base=$LUFT_BASE"
             echo "parts=$(jq -c '[.[] | select(.signing == "unsigned") | .name]' <<<"$missing")"
             echo "signed=$(jq -c '[.[] | select(.signing == "signed") | .name]' <<<"$missing")"
             echo "details=$(jq -c 'map({(.name): {key, family}}) | add // {}' <<<"$missing")"
@@ -222,7 +319,7 @@ jobs:
       - name: Build both images
         run: |
           os/image/build.sh luft luft-nvidia --cache-from "$CACHE" --cache-to "$CACHE" \
-            --build-arg "VERSION=$VERSION" --build-arg "RELEASE_NOTES=$RELEASE_NOTES"
+            --build-arg "VERSION=$VERSION" --build-arg "REVISION=$GITHUB_SHA" --build-arg "RELEASE_NOTES=$RELEASE_NOTES"
 
       - name: Forget the signing keys
         if: always()
@@ -268,7 +365,7 @@ jobs:
           AWS_DEFAULT_REGION: auto
         run: |
           previous="$(skopeo inspect --retry-times 3 --format '{{index .Labels "org.opencontainers.image.version"}}' "docker://$IMAGE:$MAJOR-nightly")"
-          jq -n --arg version "$VERSION" --arg previous "$previous" --arg notes "$NOTES" \
+          jq -n --arg version "$VERSION" --arg previous "$previous" --argjson notes "$NOTES" \
             '{version: $version, previous: $previous, notes: $notes}' |
             aws s3 cp - "s3://$R2_BUCKET/nightly/notes/$VERSION.json" --endpoint-url "https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com" \
               --content-type application/json --only-show-errors

@@ -1,4 +1,13 @@
+use super::notes::{Area, Section};
 use super::*;
+
+fn section(area: Area, title: &str, change: &str) -> Section {
+    Section {
+        area,
+        title: title.into(),
+        changes: vec![change.into()],
+    }
+}
 
 fn deployments(fixture: &str) -> Deployments {
     Deployments(Host::parse(fixture).unwrap())
@@ -7,7 +16,11 @@ fn deployments(fixture: &str) -> Deployments {
 fn first() -> Release {
     Release {
         version: Some("45.1".into()),
-        notes: Some("Faster startup and a fresher look.".into()),
+        notes: Some(vec![section(
+            Area::Desktop,
+            "Desktop",
+            "Faster startup and a fresher look.",
+        )]),
         released: Some(1_791_987_953),
     }
 }
@@ -15,10 +28,18 @@ fn first() -> Release {
 fn second() -> Release {
     Release {
         version: Some("45.2".into()),
-        notes: Some(
-            "Wi-Fi reconnects faster after sleep.\nSettings shows what's new in each update."
-                .into(),
-        ),
+        notes: Some(vec![
+            section(
+                Area::Apps,
+                "Settings",
+                "Settings shows what's new in each update.",
+            ),
+            section(
+                Area::System,
+                "System",
+                "Wi-Fi reconnects faster after sleep.",
+            ),
+        ]),
         released: Some(1_791_988_620),
     }
 }

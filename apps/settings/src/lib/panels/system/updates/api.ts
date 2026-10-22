@@ -60,9 +60,15 @@ export interface PackageOverview {
 	results: Results | null;
 }
 
+export interface ChangelogSection {
+	area: 'desktop' | 'apps' | 'system' | 'installing';
+	title: string;
+	changes: string[];
+}
+
 export interface Release {
 	version: string | null;
-	notes: string | null;
+	notes: ChangelogSection[] | null;
 	released: number | null;
 }
 

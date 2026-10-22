@@ -1,9 +1,8 @@
 name: ISO
 
 on:
-  workflow_run:
-    workflows: [Image]
-    types: [completed]
+  schedule:
+    - cron: "0 6 * * 0"
   workflow_dispatch:
     inputs:
       channel:
@@ -11,9 +10,14 @@ on:
         type: choice
         options: [nightly, release]
         default: nightly
+  workflow_call:
+    inputs:
+      channel:
+        type: string
+        required: true
 
 concurrency:
-  group: iso-${{ github.event.workflow_run.head_branch || github.ref }}
+  group: iso-${{ inputs.channel || 'nightly' }}
   cancel-in-progress: true
 
 permissions:
@@ -23,11 +27,6 @@ permissions:
 jobs:
   build:
     name: ISO
-    if: >-
-      github.event_name == 'workflow_dispatch' ||
-      (github.event.workflow_run.conclusion == 'success' &&
-       ((github.event.workflow_run.event == 'push' && startsWith(github.event.workflow_run.head_branch, 'v')) ||
-        github.event.workflow_run.event == 'schedule' || github.event.workflow_run.event == 'workflow_dispatch'))
     runs-on: ubuntu-26.04
     timeout-minutes: 120
     env:
@@ -40,8 +39,6 @@ jobs:
       MAJOR: "1"
     steps:
       - uses: actions/checkout@v7
-        with:
-          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
       - uses: ./.github/actions/make-room
 
@@ -50,19 +47,16 @@ jobs:
       - name: Images and folder
         env:
           CHOSEN: ${{ inputs.channel }}
-          RUN_EVENT: ${{ github.event.workflow_run.event }}
-          RUN_TAG: ${{ github.event.workflow_run.head_branch }}
         run: |
-          if [[ "$RUN_EVENT" == push ]]; then
-            tag="${RUN_TAG#v}" folder="$MAJOR" followed="$REPOSITORY:$MAJOR"
-          elif [[ "$CHOSEN" == release ]]; then
-            tag="$MAJOR" folder="$MAJOR" followed="$REPOSITORY:$MAJOR"
+          if [[ "$CHOSEN" == release ]]; then
+            tag="$MAJOR" folder="$MAJOR"
           else
-            tag="$MAJOR-nightly" folder=nightly followed="$REPOSITORY:$MAJOR-nightly"
+            tag="$MAJOR-nightly" folder=nightly
           fi
+          followed="$REPOSITORY:$tag"
           version="$(skopeo inspect --format '{{index .Labels "org.opencontainers.image.version"}}' "docker://$REPOSITORY:$tag")"
           published="$(curl -sf "$DOWNLOADS/$folder/latest.json" | jq -r .version || true)"
-          if [[ "$GITHUB_EVENT_NAME" == workflow_run && "$published" == "$version" ]]; then
+          if [[ "$GITHUB_EVENT_NAME" == schedule && "$published" == "$version" ]]; then
             echo "luft-$version.iso is already published."
             echo "SKIP=1" >> "$GITHUB_ENV"
           fi

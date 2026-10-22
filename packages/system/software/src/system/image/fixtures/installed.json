@@ -3,7 +3,7 @@
     "sha256:7284e924986861cd7d1810357e1757e8ecf959a1a699b304252b0dd446ad11cf": {
       "config": {
         "Labels": {
-          "com.lantharos.release-notes": "Faster startup and a fresher look.",
+          "com.lantharos.release-notes": "[{\"area\":\"desktop\",\"title\":\"Desktop\",\"changes\":[\"Faster startup and a fresher look.\"]}]",
           "containers.bootc": "1",
           "io.buildah.version": "1.45.1",
           "org.opencontainers.image.version": "45.1",

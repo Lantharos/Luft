@@ -22,6 +22,7 @@ Usage: os/image/build.sh [luft] [luft-nvidia] [PODMAN BUILD OPTIONS...]
        os/image/build.sh plan [luft | luft-nvidia]
        os/image/build.sh part NAME [PODMAN BUILD OPTIONS...]
        os/image/build.sh base
+       os/image/build.sh updates IMAGE
 
 Builds the Luft images with Podman and seals them as localhost/luft:45 and
 localhost/luft:45-nvidia, with localhost/luft-system:45(-nvidia) as the systems
@@ -39,7 +40,8 @@ LUFT_IMAGE_CACHE (default ~/.cache/luft-image), shared by every checkout.
 
 plan lists each part with its image and whether it's missing, part builds one
 part, and base prints the Fedora image the parts are built on (LUFT_BASE, by
-digest).
+digest). updates lists the packages IMAGE adds to that Fedora image which have
+updates, and exits with 100 when there are some, like dnf check-upgrade.
 
 Signs with the keys named by LUFT_SECUREBOOT_KEY, LUFT_SECUREBOOT_CERT (PEM)
 and LUFT_PCR_KEY, or with throwaway keys kept in ~/.local/state/luft/throwaway-keys
@@ -99,8 +101,12 @@ part_names() {
   done
 }
 
-base_bootc() {
+pull_base() {
   podman image exists "$base" || podman pull "${retries[@]}" --quiet "$base" >/dev/null
+}
+
+base_bootc() {
+  pull_base
   podman run --rm --network none "$base" rpm -q --qf '%{VERSION}-%{RELEASE}' bootc
 }
 
@@ -308,12 +314,30 @@ plan() {
   done < <(part_refs "${names[@]}")
 }
 
+updates() {
+  local built="$1" packages='%{NAME}.%{ARCH} %{EPOCHNUM}:%{VERSION}-%{RELEASE}\n'
+  pull_base
+  podman pull "${retries[@]}" --quiet "$built" >/dev/null
+  podman run --rm --network none "$base" rpm -qa --qf "$packages" |
+    podman run --rm --interactive --security-opt label=disable --volume "$image/stages:/run/luft/stages:ro" "$built" \
+      bash -c 'source /run/luft/stages/rpmfusion.sh
+        cat >/tmp/base-packages
+        mapfile -t added < <(rpm -qa --qf "$1" | grep -vxF -f /tmp/base-packages | grep -v "^gpg-pubkey\." | cut -d" " -f1)
+        use_rpmfusion &>/dev/null
+        dnf check-upgrade --quiet "${added[@]}"' updates "$packages"
+}
+
 [[ "${BASH_SOURCE[0]}" == "$0" ]] || return 0
 
 case "${1:-luft}" in
   -h | --help) usage ;;
   base) resolve_base ;;
   plan) base="$(resolve_base)"; plan "${@:2}" ;;
+  updates)
+    (($# == 2)) || { usage >&2; exit 2; }
+    base="$(resolve_base)"
+    updates "$2"
+    ;;
   part)
     (($# >= 2)) || { usage >&2; exit 2; }
     base="$(resolve_base)"

@@ -2,6 +2,8 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
+use super::notes::{self, Section};
+
 const VERSION: &str = "org.opencontainers.image.version";
 const NOTES: &str = "com.lantharos.release-notes";
 
@@ -9,7 +11,7 @@ const NOTES: &str = "com.lantharos.release-notes";
 #[serde(rename_all = "camelCase")]
 pub struct Release {
     pub version: Option<String>,
-    pub notes: Option<String>,
+    pub notes: Option<Vec<Section>>,
     pub released: Option<u64>,
 }
 
@@ -48,7 +50,10 @@ impl Config {
     pub fn release(&self) -> Release {
         Release {
             version: self.label(VERSION),
-            notes: self.label(NOTES),
+            notes: self
+                .label(NOTES)
+                .and_then(|label| serde_json::from_str(&label).ok())
+                .and_then(|sections| notes::merge([sections])),
             released: self.created.as_deref().and_then(epoch),
         }
     }

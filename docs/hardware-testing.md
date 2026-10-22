@@ -45,3 +45,15 @@ Note what you did, what you expected and what happened, with a photo if it's on 
 | `wpctl status` | Sound devices |
 
 For problems in one app, `journalctl -b --user` has the session's own messages.
+
+### No sound from the jacks
+
+When headphones or speakers stay silent but work in Windows, download [`os/tools/audio/try-hda-fixups.sh`](../os/tools/audio/try-hda-fixups.sh) and run `bash try-hda-fixups.sh`. It asks for your password, tries a few known fixes for Realtek sound chips one after another, asks whether you heard a tone after each, and puts everything back at the end. Send the `hda-fixups.txt` it leaves in your home folder.
+
+If Windows is on the same computer, a dump from there shows how its driver sets up the chip. In Windows, plug the headphones in, open PowerShell as administrator and run:
+
+```powershell
+cd $env:USERPROFILE\Desktop; iwr https://github.com/ChimeraOS/reverse-engineering-tools/raw/main/RtHDDump_V236.zip -OutFile RtHDDump.zip; Expand-Archive RtHDDump.zip RtHDDump -Force; cd RtHDDump; & (Get-ChildItem -Recurse RtHDDump.exe)[0].FullName; Get-ChildItem -Recurse RtHDDump.txt
+```
+
+Send the `RtHDDump.txt` it lists.

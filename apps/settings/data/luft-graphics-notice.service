@@ -8,6 +8,11 @@ ConditionUser=!@system
 Type=exec
 ExecStart=/usr/bin/settings --check-graphics
 Nice=10
+NoNewPrivileges=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+SystemCallArchitectures=native
 
 [Install]
 WantedBy=kestrel-session.target

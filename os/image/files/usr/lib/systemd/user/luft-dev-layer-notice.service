@@ -9,6 +9,15 @@ Type=oneshot
 ExecStart=/usr/libexec/luft-dev-layer notice
 Restart=on-failure
 RestartSec=5
+NoNewPrivileges=yes
+RestrictAddressFamilies=AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
 
 [Install]
 WantedBy=kestrel-session.target

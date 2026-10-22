@@ -8,12 +8,17 @@ Before=trustd.service
 [Service]
 Type=oneshot
 ExecStart=/usr/bin/trustctl follow-up
-PrivateTmp=yes
-ProtectHome=read-only
 KeyringMode=shared
+ProtectHome=read-only
+PrivateTmp=yes
 NoNewPrivileges=yes
-LockPersonality=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectHostname=yes
+RestrictAddressFamilies=AF_UNIX AF_NETLINK AF_ALG
 RestrictRealtime=yes
+LockPersonality=yes
+SystemCallArchitectures=native
 
 [Install]
 WantedBy=multi-user.target

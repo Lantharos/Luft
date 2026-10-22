@@ -9,6 +9,10 @@ ConditionPathExists=/sys/firmware/efi/efivars/LuftBootWentBack-b6a4c1e2-3f5d-4c8
 Type=oneshot
 ExecStart=/usr/bin/trustctl startup went-back
 TimeoutStartSec=6min
+RestrictAddressFamilies=AF_UNIX AF_NETLINK AF_ALG
+RestrictRealtime=yes
+LockPersonality=yes
+SystemCallArchitectures=native
 
 [Install]
 WantedBy=graphical.target

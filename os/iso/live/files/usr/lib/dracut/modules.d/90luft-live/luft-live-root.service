@@ -8,3 +8,6 @@ Before=sysroot.mount
 Type=oneshot
 RemainAfterExit=yes
 ExecStart=/usr/libexec/luft-live-root
+RestrictRealtime=yes
+LockPersonality=yes
+SystemCallArchitectures=native

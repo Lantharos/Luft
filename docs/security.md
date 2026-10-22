@@ -207,3 +207,9 @@ While the screen is locked, and at the login screen, new USB devices wait until 
 - At unlock everything that waited connects, and Kestrel names it in a notification.
 - It uses the kernel's `authorized_default` and `interface_authorized_default` switches per bus, follows logind's lock state, and costs nothing while unlocked. It is not meant to run alongside USBGuard.
 - On by default; turning it off in Settings needs an administrator. The choice is kept in `/var/lib/luft-usb-protection`.
+
+## Service sandboxing
+
+Each of Luft's services runs with only what it needs: a read-only view of the system with write access to its own folders, no network, devices or capabilities it doesn't use, and a filter on the system calls it may make. Services that hand their sandbox on to apps they start, such as cloud drives and Kestrel's settings, or that start containers, keep fewer of these limits so those apps keep working.
+
+`systemd-analyze security` scores how exposed each service is, and `.github/scripts/units/exposure.json` records that score for every service in the repository. The checks fail when a service scores worse than recorded, when a new one has no score yet, or when systemd doesn't understand one of its settings. After hardening a service or adding one, record the new scores with `bun .github/scripts/units/index.ts --update`. The scores depend on the systemd version, so the check runs on Fedora 45, like Luft.

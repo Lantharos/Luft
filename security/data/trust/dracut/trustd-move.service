@@ -11,3 +11,7 @@ RemainAfterExit=yes
 ExecStart=/usr/bin/trustctl system-disk open-halves
 SyslogIdentifier=trustd
 TimeoutSec=infinity
+RestrictAddressFamilies=AF_UNIX AF_NETLINK AF_ALG
+RestrictRealtime=yes
+LockPersonality=yes
+SystemCallArchitectures=native

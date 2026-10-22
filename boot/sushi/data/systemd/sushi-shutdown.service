@@ -12,6 +12,17 @@ Type=oneshot
 RemainAfterExit=yes
 ExecStart=-/usr/bin/sushictl show shutdown
 TimeoutStartSec=6min
+NoNewPrivileges=yes
+RestrictAddressFamilies=AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged @resources
+CapabilityBoundingSet=
 
 [Install]
 WantedBy=reboot.target poweroff.target halt.target kexec.target

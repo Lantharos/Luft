@@ -11,13 +11,18 @@ ExecStart=/usr/bin/trustctl system-disk continue
 SyslogIdentifier=trustd
 Nice=10
 IOSchedulingClass=idle
-PrivateTmp=yes
-ProtectHome=read-only
-KeyringMode=shared
-NoNewPrivileges=yes
-LockPersonality=yes
-RestrictRealtime=yes
 TimeoutStopSec=1min
+KeyringMode=shared
+ProtectHome=read-only
+PrivateTmp=yes
+NoNewPrivileges=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectHostname=yes
+RestrictAddressFamilies=AF_UNIX AF_NETLINK AF_ALG
+RestrictRealtime=yes
+LockPersonality=yes
+SystemCallArchitectures=native
 
 [Install]
 WantedBy=multi-user.target

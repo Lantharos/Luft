@@ -7,12 +7,17 @@ Type=dbus
 BusName=com.lantharos.Trust1
 ExecStart=@libexecdir@/trustd
 SyslogIdentifier=trustd
-PrivateTmp=yes
-ProtectHome=read-only
 KeyringMode=shared
+ProtectHome=read-only
+PrivateTmp=yes
 NoNewPrivileges=yes
-LockPersonality=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectHostname=yes
+RestrictAddressFamilies=AF_UNIX AF_NETLINK AF_ALG
 RestrictRealtime=yes
+LockPersonality=yes
+SystemCallArchitectures=native
 TimeoutStopSec=5min
 
 [Install]

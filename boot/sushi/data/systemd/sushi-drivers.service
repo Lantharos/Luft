@@ -11,6 +11,15 @@ Type=oneshot
 RemainAfterExit=yes
 ExecStart=/usr/bin/sushictl load-drivers
 TimeoutStartSec=90
+RestrictAddressFamilies=AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service @module
+CapabilityBoundingSet=CAP_SYS_MODULE
 
 [Install]
 WantedBy=sysinit.target

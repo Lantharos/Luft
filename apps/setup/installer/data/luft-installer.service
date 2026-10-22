@@ -12,3 +12,6 @@ RuntimeDirectoryPreserve=yes
 StateDirectory=luft-installer
 KillMode=mixed
 TimeoutStopSec=5min
+RestrictRealtime=yes
+LockPersonality=yes
+SystemCallArchitectures=native

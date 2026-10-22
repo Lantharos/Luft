@@ -15,6 +15,13 @@ Type=notify
 ExecStart=@/usr/bin/sushid @sushid
 KillMode=mixed
 SendSIGKILL=no
+RestrictAddressFamilies=AF_UNIX AF_NETLINK
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
 
 [Install]
 WantedBy=sysinit.target

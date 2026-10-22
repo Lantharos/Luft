@@ -9,6 +9,15 @@ ConditionPathExists=|!%S/luft/windows-checked
 [Service]
 Type=exec
 ExecStart=/usr/libexec/luft-windows notice
+NoNewPrivileges=yes
+RestrictAddressFamilies=AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
 
 [Install]
 WantedBy=kestrel-session.target

@@ -10,6 +10,10 @@ RemainAfterExit=yes
 ExecStart=/usr/bin/true
 ExecStop=/usr/bin/trustctl tpm before-restart
 TimeoutStopSec=2min
+RestrictAddressFamilies=AF_UNIX AF_NETLINK AF_ALG
+RestrictRealtime=yes
+LockPersonality=yes
+SystemCallArchitectures=native
 
 [Install]
 WantedBy=multi-user.target

@@ -27,6 +27,7 @@ jobs:
       uefi: ${{ steps.affected.outputs.uefi }}
       meet-windows: ${{ steps.affected.outputs.meet-windows }}
       web: ${{ steps.affected.outputs.web }}
+      units: ${{ steps.affected.outputs.units }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -143,9 +144,28 @@ jobs:
 
       - run: bun run check
 
+  units:
+    name: Service sandboxing
+    needs: changes
+    if: needs.changes.outputs.units == 'true'
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    container:
+      image: quay.io/fedora/fedora:45
+    steps:
+      - run: dnf install --assumeyes --setopt=install_weak_deps=False systemd git unzip
+
+      - uses: actions/checkout@v7
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun .github/scripts/units/index.ts
+
   checks:
     name: Checks
-    needs: [changes, rust, uefi, meet-windows, web]
+    needs: [changes, rust, uefi, meet-windows, web, units]
     if: always()
     runs-on: ubuntu-slim
     steps:

@@ -10,6 +10,13 @@ RemainAfterExit=yes
 ExecStart=/usr/bin/true
 ExecStop=/usr/libexec/luft-live-logs
 TimeoutStopSec=2min
+NoNewPrivileges=yes
+RestrictAddressFamilies=AF_UNIX AF_NETLINK
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+SystemCallArchitectures=native
 
 [Install]
 WantedBy=multi-user.target

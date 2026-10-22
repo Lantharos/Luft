@@ -2,6 +2,7 @@ import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
 
+import {printsThroughDialog, writeDocument} from '../lib/access/printing.js';
 import {checks} from '../lib/check.js';
 import {drag, press, type} from '../lib/input/input.js';
 import {changes, withApp} from './lib/apps.js';
@@ -11,7 +12,7 @@ import {checkNetwork} from './rover/network.js';
 
 const {require, eventually} = checks('Luft app');
 const DRAG = {steps: 24, interval: 30, hover: 300};
-const AT = {note: [338, 140], inbox: [330, 104], search: [142, 32]};
+const AT = {note: [338, 140], inbox: [330, 104], pdf: [330, 104], search: [142, 32]};
 const PLACES = {home: {menu: [70, 82], item: [141, 227]}, system: {menu: [70, 718], item: [141, 694]}};
 const SEARCH = {x: 12, y: 14, width: 236, height: 36};
 const CUT = [40, 23];
@@ -32,6 +33,15 @@ async function checkDrag(app) {
   await drag(app.at(AT.note), app.at(AT.inbox), DRAG);
   await eventually(() => exists(GLib.build_filenamev([FOLDER, 'Inbox', 'Note.txt'])), 'Rover moves a file dropped on a folder');
   require(!exists(GLib.build_filenamev([FOLDER, 'Note.txt'])), 'dragging a file onto a folder in Rover moves it there');
+}
+
+async function checkPrinting(app) {
+  const folder = GLib.build_filenamev([FOLDER, 'Printing']);
+  GLib.mkdir_with_parents(folder, 0o755);
+  writeDocument(GLib.build_filenamev([folder, 'Itinerary.pdf']));
+  await open(app, folder);
+  await changes(app, 'Rover selects a PDF', () => app.click(AT.pdf));
+  await printsThroughDialog(eventually, 'Ctrl+P on a PDF in Rover', () => press(Clutter.KEY_Control_L, Clutter.KEY_p));
 }
 
 async function checkProperties(app) {
@@ -61,6 +71,7 @@ export async function run() {
         await checkPalette(app, palette, {accent: true});
         await showDark(app, palette);
         await checkDrag(app);
+        await checkPrinting(app);
         await checkTextMenu(app);
         await checkProperties(app);
       });

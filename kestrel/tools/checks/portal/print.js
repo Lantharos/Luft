@@ -1,4 +1,3 @@
-import Cairo from 'cairo';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
@@ -6,38 +5,17 @@ import {firstStyled, labelled, named, shown, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {click, type} from '../lib/input/input.js';
 import {BACKEND, call, PORTAL_PATH, portalDialog, requestHandle} from '../lib/access/portal.js';
+import {completedJobs, JOB_TIMEOUT, PRINTER, writeDocument} from '../lib/access/printing.js';
 import {scratch} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {settled} from '../lib/wait.js';
 
 Gio._promisify(Gio.DBusConnection.prototype, 'call_with_unix_fd_list');
-Gio._promisify(Gio.Subprocess.prototype, 'communicate_utf8_async');
 
 const {require, eventually} = checks('print');
 const APP = 'com.lantharos.draft';
-const PRINTER = 'Office';
-const JOB_TIMEOUT = 10000;
 const string = value => new GLib.Variant('s', value);
 const double = value => new GLib.Variant('d', value);
-
-function writeDocument(path) {
-  const surface = new Cairo.PDFSurface(path, 595, 842);
-  const context = new Cairo.Context(surface);
-  for (const page of [1, 2, 3]) {
-    context.moveTo(72, 120);
-    context.setFontSize(32);
-    context.showText(`Page ${page}`);
-    context.showPage();
-  }
-  context.$dispose();
-  surface.finish();
-}
-
-async function completedJobs() {
-  const lpstat = Gio.Subprocess.new(['lpstat', '-W', 'completed', '-o', PRINTER], Gio.SubprocessFlags.STDOUT_PIPE);
-  const [output] = await lpstat.communicate_utf8_async(null, null);
-  return output.split('\n').filter(Boolean).length;
-}
 
 function printDocument(path, options) {
   const document = Gio.UnixFDList.new_from_array([GLib.open(path, 0, 0)]);

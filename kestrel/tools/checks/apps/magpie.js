@@ -1,7 +1,10 @@
+import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
+import {printsThroughDialog, writeDocument, writePicture} from '../lib/access/printing.js';
 import {checks} from '../lib/check.js';
+import {press} from '../lib/input/input.js';
 import {fixture, scratch} from '../lib/processes.js';
 import {changes, withApp} from './lib/apps.js';
 import {checkPalette, useScheme, withPalette} from './lib/palette.js';
@@ -77,9 +80,23 @@ async function checkSample({name, source, tabs, install}, home, palette) {
   });
 }
 
+async function checkPrinting() {
+  const samples = [{kind: 'PDF', path: scratch('magpie-print.pdf'), write: writeDocument},
+    {kind: 'photo', path: scratch('magpie-print.png'), write: writePicture}];
+  for (const {kind, path, write} of samples) {
+    write(path);
+    await withApp('magpie', [path], async app => {
+      await app.settle(() => true);
+      await printsThroughDialog(eventually, `Ctrl+P in magpie with a ${kind} open`, () => press(Clutter.KEY_Control_L, Clutter.KEY_p));
+    });
+    Gio.File.new_for_path(path).delete(null);
+  }
+}
+
 export async function run() {
   await withPalette(async palette => {
     const home = await withApp('magpie', [], app => checkPalette(app, palette, {accent: true}));
     for (const sample of SAMPLES) await checkSample(sample, home, palette);
   });
+  await checkPrinting();
 }

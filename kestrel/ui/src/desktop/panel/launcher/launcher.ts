@@ -25,7 +25,7 @@ function markPaint(button: St.Button, panel: St.Widget): () => MarkFills {
   let painted = { key: '', fills: { shade: WHITE, ink: WHITE } };
   return () => {
     const foreground = button.peek_theme_node()?.get_foreground_color().to_string() ?? WHITE;
-    const paint = appIcons.paint;
+    const paint = appIcons.taskbarPaint;
     const backdrops = taskbarBackdrops(panel, wallpaperFloor);
     const key = [foreground, paint?.ink, paint?.shade, ...backdrops].join();
     if (key !== painted.key) painted = { key, fills: markFills(foreground, paint, backdrops) };
@@ -58,7 +58,7 @@ function animatedMark(button: St.Button, panel: St.Widget): [St.Widget, (size: n
   const paint = () => {
     const fills = painted = current();
     MARK_LAYERS.forEach((layer, index) => {
-      icons[index].icon_size = Math.round(size * (appIcons.paint ? PAINTED_MARK_SCALE : 1));
+      icons[index].icon_size = Math.round(size * (appIcons.taskbarPaint ? PAINTED_MARK_SCALE : 1));
       icons[index].gicon = svgIcon(layer, fills[layer.fill]);
     });
   };

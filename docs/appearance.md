@@ -1,6 +1,6 @@
 # Wallpaper colors
 
-Kestrel takes an accent from the wallpaper's most vivid dominant hue (white when the wallpaper has hardly any color, or when White is chosen in Settings) and builds a full palette from it for light and dark. Apps can read it to match the desktop. A new wallpaper restyles the shell once, with its accent and colors together.
+Kestrel takes an accent from the most vivid dominant hue in the lower part of the wallpaper, where the taskbar and everything that opens from it sit: the top 40% doesn't count, and the rest counts more the lower it is. It's white when that part has hardly any color, or when White is chosen in Settings. Kestrel builds a full palette from it for light and dark. Apps can read it to match the desktop. A new wallpaper restyles the shell once, with its accent and colors together.
 
 ## Light and dark
 
@@ -10,6 +10,7 @@ Luft starts dark, on Fog. The light style has its own wallpaper, Dunes, in `pict
 
 - Light glass is a thin white frost over the blur with dark text and icons. Its blur brightens dark wallpapers and deepens their colors, so the wallpaper shows through clean instead of grey. Dark glass dims bright wallpapers instead, so text stays readable on any wallpaper.
 - Tinted and clear app icons, the Start mark and symbolic icons switch to the ink of each style.
+- The taskbar takes its light or dark glass from the bottom of the wallpaper rather than the style: light glass over a clearly light bottom (tone 62 or more), dark glass over a clearly dark one (38 or less), and the style's glass in between. Its tinted and clear app icons and the Start mark follow its glass, while Start, quick settings and everything else keep the style. With pure black in the dark style, the taskbar stays black.
 - The taskbar's text and icons take the light or dark ink, whichever reads better against what sits behind them: the bottom of the wallpaper as the taskbar's look shows it, judged by its darkest and brightest parts as well as its average. A transparent taskbar over a dark wallpaper turns its ink white in the light style, and over a bright one it turns dark in the dark style. Over a busy wallpaper where the ink comes close to unreadable, the glass taskbar takes a slightly stronger tint. Where neither ink is clear enough, the clock and status icons get a halo, a firmer one on a transparent taskbar over a busy wallpaper. The choice is made once per wallpaper, for both styles and every look, so switching style or look adds no extra restyle.
 - The back half of the Start mark takes its shade from what sits behind the taskbar: the bottom of the wallpaper as the taskbar's look shows it. It stays a quieter partner of the front half and keeps clear of the wallpaper in every look. Over a busy wallpaper it also gets a faint edge.
 - Pure black only applies to the dark style. In the light style the shell keeps its glass.

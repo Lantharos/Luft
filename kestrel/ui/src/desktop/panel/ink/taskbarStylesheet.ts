@@ -5,6 +5,7 @@ import { wallpaperFloor } from '../../wallpaper/floor.js';
 import { backdropsBehind, type PanelSurface } from '../backdrop.js';
 import type { TaskbarLook } from '../../../../../../packages/web/ui/src/taskbar/looks';
 import { schemeThemes, type Halo, type Scheme, type SchemeTheme } from './schemeThemes.js';
+import { taskbarScheme } from './taskbarScheme.js';
 
 const TEXT_CONTRAST = 4.5;
 const COMFORTABLE_CONTRAST = 5;
@@ -34,6 +35,20 @@ const worst = (ink: Rgb, backdrops: Rgb[]) => Math.min(...backdrops.map(backdrop
 
 export function tintsOf(seed: Seed, colors: Colors): Tints {
   return { solid: colors.surfaceContainer, accent: isNeutral(seed) ? colors.surfaceContainerHighest : colors.primaryContainer };
+}
+
+const shading = ({ glass }: PanelSurface) => glass
+  ? ` -kestrel-glass-dim: ${glass.dim}; -kestrel-glass-lift: ${glass.lift}; -kestrel-glass-saturation: ${glass.saturation};`
+  : '';
+
+// The stylesheet of each style gives the taskbar that style's glass; a
+// taskbar that takes the other one over its wallpaper gets it here
+function surfaceRules(style: Scheme, scheme: Scheme): string {
+  if (scheme === style) return '';
+  const glass = schemeThemes()[scheme].surface('kestrel-taskbar-glass', true);
+  return `${selector('glass')} { background-color: rgba(${glass.tint.join(', ')}, ${glass.opacity});${shading(glass)} }
+${selector('accent')} {${shading(glass)} }
+`;
 }
 
 function surfaces(theme: SchemeTheme, tints: Tints): Surface[] {
@@ -87,14 +102,14 @@ export function lookInks(scheme: Scheme, tints: Tints): LookInk[] {
   });
 }
 
-function inkRules(scheme: Scheme, palette: Palette, tints: Tints): string {
+function inkRules(style: Scheme, scheme: Scheme, palette: Palette, tints: Tints): string {
   if (!wallpaperFloor.color) return '';
   const themes = schemeThemes();
   const chosen = new Map<TaskbarLook, LookInk>();
   let css = '';
   for (const choice of lookInks(scheme, tints)) {
     const { look, opaque, ink, halo, backed, surface } = choice;
-    const inherited = opaque ? chosen.get(look)! : { ink: scheme, halo: 'no-halo', backed: false };
+    const inherited = opaque ? chosen.get(look)! : { ink: style, halo: 'no-halo', backed: false };
     chosen.set(look, choice);
     const target = selector(look, opaque);
     if (backed || inherited.backed) css += `${target} { background-color: rgba(${surface.tint.join(', ')}, ${surface.opacity}); }\n`;
@@ -102,16 +117,17 @@ function inkRules(scheme: Scheme, palette: Palette, tints: Tints): string {
       css += themes[ink].rules('ink', target);
       css += `${target} .kestrel-app-focused .kestrel-running-dot, ${target} .kestrel-task-progress-fill { background-color: ${palette[ink].colors.primary}; }\n`;
     }
-    if (look === 'transparent' && ink !== scheme) css += themes[ink].rules('soft-halo', target);
+    if (look === 'transparent' && ink !== style) css += themes[ink].rules('soft-halo', target);
     if (halo !== inherited.halo || (halo !== 'no-halo' && ink !== inherited.ink)) css += themes[ink].rules(halo, target);
   }
   return css;
 }
 
-export function taskbarStylesheet(seed: Seed, palette: Palette, scheme: Scheme): string {
+export function taskbarStylesheet(seed: Seed, palette: Palette, style: Scheme, pureBlack: boolean): string {
+  const scheme = taskbarScheme(style, pureBlack && style === 'dark', wallpaperFloor);
   const tints = tintsOf(seed, palette[scheme].colors);
-  return `${selector('solid')} { background-color: ${tints.solid}; }
+  return `${surfaceRules(style, scheme)}${selector('solid')} { background-color: ${tints.solid}; }
 ${selector('accent')} { background-color: ${rgba(tints.accent, ACCENT_OPACITY)}; }
 ${selector('accent', true)} { background-color: ${tints.accent}; }
-${inkRules(scheme, palette, tints)}`;
+${inkRules(style, scheme, palette, tints)}`;
 }

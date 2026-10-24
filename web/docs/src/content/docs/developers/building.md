@@ -81,7 +81,7 @@ os/image/build.sh luft-nvidia        # localhost/luft:45-nvidia
 os/iso/build.sh                      # the USB stick, in os/iso/state
 ```
 
-The first build downloads Fedora packages, Mutter's source and the web runtime, and takes about an hour. Later builds only remake the parts whose sources changed. Without signing keys, builds make throwaway ones.
+The first build downloads Fedora packages, Mutter's source and the web runtime, and takes about an hour. Later builds only remake the parts whose sources changed, and the web runtime when a newer CEF build comes out: the image ships the CEF build Sabine would install, which `os/image/build.sh cef` prints and `LUFT_CEF` pins. Without signing keys, builds make throwaway ones.
 
 ## Virtual machines
 

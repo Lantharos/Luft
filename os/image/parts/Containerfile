@@ -100,9 +100,13 @@ RUN --mount=type=cache,from=cache,source=cargo,target=/var/cache/cargo \
     rm -rf /var/tmp/sabine-target
 
 FROM sabine AS runtime-build
-COPY os/image/parts/stages/runtime.sh os/image/parts/stages/needed.sh /src/os/image/parts/stages/
+ARG CEF
+COPY os/image/parts/stages/cef.sh os/image/parts/stages/runtime.sh os/image/parts/stages/needed.sh \
+  /src/os/image/parts/stages/
 RUN --mount=type=cache,from=cache,source=sabine,target=/root/.local/share/sabine \
+    /src/os/image/parts/stages/cef.sh "${CEF}" /root/.local/share/sabine/runtimes/cef && \
     sabine runtime install --system-wide --root /stage && \
+    test -d "/stage/usr/lib/sabine/runtimes/cef/${CEF}-minimal" && \
     /src/os/image/parts/stages/runtime.sh /stage && \
     /src/os/image/parts/stages/needed.sh /stage /out
 

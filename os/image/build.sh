@@ -22,6 +22,7 @@ Usage: os/image/build.sh [luft] [luft-nvidia] [PODMAN BUILD OPTIONS...]
        os/image/build.sh plan [luft | luft-nvidia]
        os/image/build.sh part NAME [PODMAN BUILD OPTIONS...]
        os/image/build.sh base
+       os/image/build.sh cef
        os/image/build.sh updates IMAGE
 
 Builds the Luft images with Podman and seals them as localhost/luft:45 and
@@ -34,13 +35,14 @@ the driver, so the two images share every layer below it.
 The image is put together from parts: Kestrel, the boot services, the patched
 bootc and libsecret, the web runtime, Helium, the system services, each app and
 NVIDIA's driver. Each part is an image named after a hash of everything it's built from,
-the Fedora image's digest included, in LUFT_PARTS (default localhost/luft-parts),
+the Fedora image's digest and the CEF build included, in LUFT_PARTS (default localhost/luft-parts),
 so a build only makes the parts that changed. LUFT_REBUILD=1 makes every part again. Compilers keep their caches in
 LUFT_IMAGE_CACHE (default ~/.cache/luft-image), shared by every checkout.
 
 plan lists each part with its image and whether it's missing, part builds one
 part, and base prints the Fedora image the parts are built on (LUFT_BASE, by
-digest). updates lists the packages IMAGE adds to that Fedora image which have
+digest). cef prints the CEF build the web runtime ships, the newest one Sabine
+would install (LUFT_CEF), so a new CEF build makes the runtime part again. updates lists the packages IMAGE adds to that Fedora image which have
 updates, and exits with 100 when there are some, like dnf check-upgrade.
 
 Signs with the keys named by LUFT_SECUREBOOT_KEY, LUFT_SECUREBOOT_CERT (PEM)
@@ -70,6 +72,15 @@ require_keys() {
 signed_by() {
   require_keys LUFT_SECUREBOOT_CERT
   openssl x509 -in "$LUFT_SECUREBOOT_CERT" -noout -fingerprint -sha256 | tr ' ' _
+}
+
+resolve_cef() {
+  if [[ -n "${LUFT_CEF:-}" ]]; then
+    echo "$LUFT_CEF"
+    return
+  fi
+  podman run "${retries[@]}" --quiet --rm --security-opt label=disable --volume "$image/parts:/parts:ro" \
+    "$bun" /parts/cef.ts
 }
 
 resolve_base() {
@@ -116,6 +127,7 @@ part_target() {
     app-*) echo "app APP=${1#app-}" ;;
     bootc) echo "bootc BOOTC=$(base_version bootc)" ;;
     libsecret) echo "libsecret LIBSECRET=$(base_version libsecret)" ;;
+    runtime) echo "runtime CEF=$cef" ;;
     boot | nvidia) echo "$1 SIGNED_BY=$(signed_by)" ;;
     *) echo "$1" ;;
   esac
@@ -265,7 +277,7 @@ build_system() {
   local target="$1" tag="$2"
   shift 2
   podman build "${retries[@]}" --layers --security-opt label=disable --target "$target" --file "$image/Containerfile" \
-    --build-context "parts=$state/parts" --build-arg "BASE=$base" "$@" \
+    --build-context "parts=$state/parts" --build-arg "BASE=$base" --build-arg "CEF=$cef" "$@" \
     --build-arg "VERSION=1.$(date -u +%Y%m%d).dev" "${podman_options[@]}" --tag "$tag" "$luft"
 }
 
@@ -333,7 +345,8 @@ updates() {
 case "${1:-luft}" in
   -h | --help) usage ;;
   base) resolve_base ;;
-  plan) base="$(resolve_base)"; plan "${@:2}" ;;
+  cef) resolve_cef ;;
+  plan) base="$(resolve_base)"; cef="$(resolve_cef)"; plan "${@:2}" ;;
   updates)
     (($# == 2)) || { usage >&2; exit 2; }
     base="$(resolve_base)"
@@ -342,6 +355,7 @@ case "${1:-luft}" in
   part)
     (($# >= 2)) || { usage >&2; exit 2; }
     base="$(resolve_base)"
+    [[ "$2" != runtime ]] || cef="$(resolve_cef)"
     podman_options=("${@:3}")
     ! is_signed "$2" || require_keys LUFT_SECUREBOOT_KEY LUFT_SECUREBOOT_CERT
     read -r name ref <<<"$(part_refs "$2")"
@@ -349,6 +363,7 @@ case "${1:-luft}" in
     ;;
   luft | luft-nvidia)
     base="$(resolve_base)"
+    cef="$(resolve_cef)"
     variants=()
     while [[ "${1:-}" == luft || "${1:-}" == luft-nvidia ]]; do
       variants+=("$1")

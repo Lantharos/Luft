@@ -1,6 +1,6 @@
 # Wallpaper colors
 
-Kestrel takes an accent from the wallpaper's most vivid dominant hue (white when the wallpaper has hardly any color, or when White is chosen in Settings) and builds a full palette from it for light and dark. Apps can read it to match the desktop. A new wallpaper restyles the shell once, with its accent and colors together.
+Kestrel takes an accent from the most vivid dominant hue in the lower part of the wallpaper, where the taskbar and everything that opens from it sit: the top 40% doesn't count, and the rest counts more the lower it is. It's white when that part has hardly any color, or when White is chosen in Settings. Kestrel builds a full palette from it for light and dark. Apps can read it to match the desktop. A new wallpaper restyles the shell once, with its accent and colors together.
 
 ## Light and dark
 

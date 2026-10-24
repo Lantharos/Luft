@@ -4,6 +4,8 @@ mod loaders;
 mod pe;
 pub mod volume;
 
+pub use loaders::WINDOWS;
+
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

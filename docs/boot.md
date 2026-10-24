@@ -18,7 +18,7 @@ Every version of Luft is a sealed bootc image, built and signed in CI. An update
 
 Next to Windows, whose EFI system partition is usually too small for them, the startup images and entries go on a separate 2 GB startup partition (XBOOTLDR, as the Boot Loader Specification calls it) on the same drive instead. Shim and SushiBoot stay on the EFI system partition, and SushiBoot reads the entries from both.
 
-- SushiBoot starts the newest. Next to Windows or another system, its menu shows itself for 10 seconds and starts whichever system was started last, so Windows can finish an update that restarts it several times. Otherwise holding any key while the computer starts shows the menu, with the version before under Previous versions.
+- SushiBoot starts the newest. Next to Windows or another system, its menu shows itself for 10 seconds and starts whichever system was started last, so Windows can finish an update that restarts it several times. Windows starts through a quick restart into its own firmware entry, so BitLocker doesn't ask for its recovery key. Otherwise holding any key while the computer starts shows the menu, with the version before under Previous versions.
 - `bootc rollback` makes the previous version the default from a running system.
 - After an update, trustd brings shim and SushiBoot on the EFI system partition up to the new version's at the next start. It replaces SushiBoot before shim, one whole file at a time, so a power cut partway leaves an older shim with the newer SushiBoot, which still starts. bootupd, which does this on other bootc systems, is turned off.
 

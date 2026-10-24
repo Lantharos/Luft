@@ -1,3 +1,4 @@
+mod clock;
 mod view;
 
 use alloc::format;
@@ -10,6 +11,7 @@ use uefi::system;
 
 use crate::entries::{Catalog, Row};
 use crate::screen::Screen;
+use clock::Clock;
 use view::{List, View};
 
 const FRAME: Duration = Duration::from_micros(16_667);
@@ -75,6 +77,7 @@ pub fn choose(
         countdown: (!asked).then_some(timeout as f32),
         notice: failed.map(|title| format!("{title} didn't start")),
     };
+    let clock = Clock::start();
     let mut chosen = None;
     let mut shown = 0.0f32;
     let mut opened = 0.0f32;
@@ -98,7 +101,8 @@ pub fn choose(
             return chosen.unwrap_or(default);
         }
         boot::stall(FRAME);
-        shown += FRAME.as_secs_f32();
+        let elapsed = clock.seconds() - shown;
+        shown += elapsed;
         if leaving.is_some() {
             continue;
         }
@@ -129,7 +133,7 @@ pub fn choose(
             }
         }
         if let Some(remaining) = view.countdown.as_mut() {
-            *remaining -= FRAME.as_secs_f32();
+            *remaining -= elapsed;
             if *remaining <= 0.0 {
                 view.countdown = None;
                 leaving = Some(shown);

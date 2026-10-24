@@ -241,6 +241,7 @@ impl Session {
                 self.refresh(engine, learned);
                 return true;
             }
+            self.flush(engine);
             return false;
         }
         if !self.is_active() {
@@ -319,5 +320,48 @@ impl Session {
             handled,
             commit: std::mem::take(&mut self.committed),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::method::definition::{Entry, Method, Rule};
+
+    fn typed(method: &Method, keys: &str) -> String {
+        let engine = Engine::new(method);
+        let mut learned = Learned::default();
+        let mut session = Session::default();
+        let mut text = String::new();
+        for character in keys.chars() {
+            let response = session.feed(&engine, &mut learned, Input::Text(character));
+            text.push_str(&response.commit);
+            if !response.handled {
+                text.push(character);
+            }
+        }
+        text + &session.preedit(&engine)
+    }
+
+    #[test]
+    fn words_commit_before_other_characters() {
+        let mut method = Method::named("test");
+        method.words.push(Entry {
+            keys: "a".to_owned(),
+            text: "AA".to_owned(),
+        });
+        assert_eq!(typed(&method, "aafe"), "aafe");
+    }
+
+    #[test]
+    fn waiting_rules_commit_before_other_characters() {
+        let mut method = Method::named("test");
+        method.rules.push(Rule {
+            keys: "sh".to_owned(),
+            text: "š".to_owned(),
+            after: String::new(),
+        });
+        assert_eq!(typed(&method, "sx"), "sx");
+        assert_eq!(typed(&method, "shx"), "šx");
     }
 }

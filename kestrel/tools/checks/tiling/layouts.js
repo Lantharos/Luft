@@ -38,7 +38,7 @@ async function checkDwindle() {
 }
 
 async function checkKeyboard(windows) {
-  const [first, second] = windows;
+  const [first, second, third] = windows;
   await focus(first);
   await chord(SUPER, Clutter.KEY_Right);
   await eventually(() => second.has_focus() || third.has_focus(), 'Super+Right focuses a window on the right');

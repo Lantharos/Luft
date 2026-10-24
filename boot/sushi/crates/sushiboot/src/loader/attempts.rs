@@ -19,12 +19,12 @@ pub struct Attempts {
     tried: Option<(u32, String)>,
 }
 
-fn read(name: &CStr16) -> Option<String> {
+pub(super) fn read(name: &CStr16) -> Option<String> {
     let (data, _) = runtime::get_variable_boxed(name, &LUFT).ok()?;
     String::from_utf8(data.into_vec()).ok()
 }
 
-fn write(name: &CStr16, text: &str, lasting: bool) {
+pub(super) fn write(name: &CStr16, text: &str, lasting: bool) {
     let mut attributes =
         VariableAttributes::BOOTSERVICE_ACCESS | VariableAttributes::RUNTIME_ACCESS;
     if lasting {
@@ -68,6 +68,10 @@ impl Attempts {
         write(TRIED, &format!("{count} {image}"), true);
         self.tried = Some((count, image.to_string()));
     }
+}
+
+pub(super) fn remove(name: &CStr16) {
+    let _ = runtime::delete_variable(name, &LUFT);
 }
 
 pub fn went_back(version: &str) {

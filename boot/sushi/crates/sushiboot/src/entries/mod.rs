@@ -4,6 +4,8 @@ mod loaders;
 mod pe;
 pub mod volume;
 
+pub use loaders::WINDOWS;
+
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
@@ -60,6 +62,7 @@ pub struct Catalog {
     pub entries: Vec<BootEntry>,
     pub main: Vec<Row>,
     pub previous: Vec<usize>,
+    pub others: Vec<usize>,
 }
 
 #[derive(Clone)]
@@ -112,6 +115,7 @@ impl Catalog {
         for entry in others {
             let index = catalog.push(entry);
             catalog.main.push(Row::Entry(index));
+            catalog.others.push(index);
         }
         if catalog.entries.is_empty() {
             return catalog;

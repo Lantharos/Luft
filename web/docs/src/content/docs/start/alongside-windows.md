@@ -5,7 +5,7 @@ sidebar:
   order: 5
 ---
 
-Luft can share a drive with Windows. Install Luft makes Windows' partition smaller and puts Luft in the space it frees, and you choose which system to start from the firmware's boot menu, or from Luft's own menu by holding any key while the computer starts.
+Luft can share a drive with Windows. Install Luft makes Windows' partition smaller and puts Luft in the space it frees, and Luft's boot menu lets you choose which system to start each time the computer starts. When you don't choose, it starts the one you started last. Choosing Windows restarts the computer straight into Windows, so BitLocker unlocks Windows by itself rather than asking for its recovery key.
 
 There are two ways to get there:
 

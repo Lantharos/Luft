@@ -7,7 +7,7 @@ sidebar:
 
 ## The boot menu
 
-Luft's boot menu stays hidden. Hold any key while the computer starts to show it. It lists:
+When Windows or another system is on the computer, Luft's boot menu shows itself for 10 seconds as the computer starts. Press any key to stop the countdown. When nobody picks, it starts the system you started last, so Windows can restart as often as an update needs. With only Luft on the computer, the menu stays hidden: hold any key while the computer starts to show it. It lists:
 
 - the newest version of Luft, and below it **Rescue**
 - **Previous versions**, to start the one before the last update

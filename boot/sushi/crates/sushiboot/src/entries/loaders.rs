@@ -6,7 +6,7 @@ use super::pe;
 use super::{Action, BootEntry, Origin};
 use crate::files::Volume;
 
-const WINDOWS: &str = "\\EFI\\Microsoft\\Boot\\bootmgfw.efi";
+pub const WINDOWS: &str = "\\EFI\\Microsoft\\Boot\\bootmgfw.efi";
 const NOT_SYSTEMS: [&str; 4] = ["boot", "linux", "luft-start", "microsoft"];
 const SHIM: &str = "shimx64.efi";
 const SHIM_SECOND_STAGE: &str = "grubx64.efi";

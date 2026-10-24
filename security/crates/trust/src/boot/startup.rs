@@ -27,21 +27,33 @@ fn remove_systemd_boot(esp: &Esp) {
     }
 }
 
-fn hide_menu(esp: &Esp) -> Result<()> {
-    let path = esp.file(LOADER_CONF);
-    let existing = std::fs::read_to_string(&path).unwrap_or_default();
-    let mut lines: Vec<&str> = existing
-        .lines()
-        .filter(|line| !line.trim_start().starts_with('#'))
-        .collect();
-    if lines
-        .iter()
-        .any(|line| line.trim_start().starts_with("timeout"))
-    {
-        return Ok(());
+const MENU_NOTE: &str = "# SushiBoot shows its menu by itself when it finds another system, such as Windows. \
+timeout 0 hides it, and a number of seconds always shows it.";
+
+// Luft used to hide the menu everywhere with `timeout 0`. The first time
+// round, that line goes and the note explains what timeout does now; after
+// that the file is left as it is, so a timeout set by hand stays.
+fn menu_conf(existing: &str) -> Option<String> {
+    if existing.lines().any(|line| line.trim() == MENU_NOTE) {
+        return None;
     }
-    lines.push("timeout 0");
-    files::write(&path, (lines.join("\n") + "\n").as_bytes())
+    let kept = existing
+        .lines()
+        .filter(|line| line.split_whitespace().collect::<Vec<_>>() != ["timeout", "0"]);
+    Some(
+        std::iter::once(MENU_NOTE)
+            .chain(kept)
+            .map(|line| format!("{line}\n"))
+            .collect(),
+    )
+}
+
+fn show_menu(esp: &Esp) -> Result<()> {
+    let path = esp.file(LOADER_CONF);
+    match menu_conf(&std::fs::read_to_string(&path).unwrap_or_default()) {
+        Some(contents) => files::write(&path, contents.as_bytes()),
+        None => Ok(()),
+    }
 }
 
 fn needs_fallback() -> bool {
@@ -74,7 +86,7 @@ pub fn place(esp: &Esp) -> Result<bool> {
     changed |= files::place_shim_after(boot_menu, &esp.file(FOLDER), SHIM)?;
     changed |= files::place_shim_after(boot_menu, &esp.file(REMOVABLE), REMOVABLE_SHIM)?;
     remove_systemd_boot(esp);
-    hide_menu(esp)?;
+    show_menu(esp)?;
     changed |= place_fallback(esp)?;
     if efi::booted_with_uefi() {
         entry::ensure(esp, LABEL, LOADER)?;
@@ -117,4 +129,32 @@ pub fn follow_up() -> Result<()> {
         eprintln!("Brought shim and Luft's boot menu on the EFI system partition up to date");
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{MENU_NOTE, menu_conf};
+
+    #[test]
+    fn drops_the_timeout_that_hid_the_menu() {
+        assert_eq!(menu_conf("timeout 0\n").unwrap(), format!("{MENU_NOTE}\n"));
+        assert_eq!(menu_conf("").unwrap(), format!("{MENU_NOTE}\n"));
+    }
+
+    #[test]
+    fn keeps_the_rest() {
+        assert_eq!(
+            menu_conf("# mine\ndefault luft-*\ntimeout  0\n").unwrap(),
+            format!("{MENU_NOTE}\n# mine\ndefault luft-*\n")
+        );
+        assert_eq!(
+            menu_conf("timeout 3\n").unwrap(),
+            format!("{MENU_NOTE}\ntimeout 3\n")
+        );
+    }
+
+    #[test]
+    fn leaves_the_file_alone_once_noted() {
+        assert_eq!(menu_conf(&format!("{MENU_NOTE}\ntimeout 0\n")), None);
+    }
 }

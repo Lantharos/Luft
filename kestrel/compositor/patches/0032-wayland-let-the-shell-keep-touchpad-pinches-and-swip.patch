@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Sat, 17 Oct 2026 19:18:54 +0200
-Subject: [PATCH 32/51] wayland: let the shell keep touchpad pinches and swipes
+Subject: [PATCH 32/52] wayland: let the shell keep touchpad pinches and swipes
  from clients
 
 Add meta_wayland_compositor_keep_touchpad_gestures(). While it is on,

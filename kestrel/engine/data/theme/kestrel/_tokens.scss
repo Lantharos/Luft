@@ -41,7 +41,6 @@ $on_danger: #ffffff;
 }
 
 @mixin glass-shading {
-  -kestrel-glass-highlight: pick(0.35, 0.14);
   -kestrel-glass-dim: pick(0, 0.55);
   -kestrel-glass-lift: pick(0.7, 0);
   -kestrel-glass-saturation: pick(1.9, 1);

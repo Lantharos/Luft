@@ -355,7 +355,7 @@ case "${1:-luft}" in
   part)
     (($# >= 2)) || { usage >&2; exit 2; }
     base="$(resolve_base)"
-    cef="$(resolve_cef)"
+    [[ "$2" != runtime ]] || cef="$(resolve_cef)"
     podman_options=("${@:3}")
     ! is_signed "$2" || require_keys LUFT_SECUREBOOT_KEY LUFT_SECUREBOOT_CERT
     read -r name ref <<<"$(part_refs "$2")"

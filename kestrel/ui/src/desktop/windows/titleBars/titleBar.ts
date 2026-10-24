@@ -40,7 +40,6 @@ function windowButton(name: string, labelId: string, activate: () => void): St.B
 
 export class TitleBar {
   private readonly resizeArea: ResizeArea;
-  private readonly shadow = new St.Widget({ style_class: 'kestrel-titlebar-shadow' });
   private readonly bar = new St.BoxLayout({ style_class: 'kestrel-titlebar', reactive: true });
   private readonly title = new St.Label({ style_class: 'kestrel-titlebar-title', x_expand: true, y_align: Clutter.ActorAlign.CENTER });
   private readonly minimize: St.Button;
@@ -63,7 +62,7 @@ export class TitleBar {
     this.bar.add_child(buttons);
     this.title.clutter_text.ellipsize = Pango.EllipsizeMode.END;
 
-    for (const child of [this.bar, this.shadow, this.resizeArea.actor]) actor.insert_child_below(child, null);
+    for (const child of [this.bar, this.resizeArea.actor]) actor.insert_child_below(child, null);
     this.actorSignal = actor.connect('destroy', () => {
       this.disconnect();
       gone();
@@ -138,19 +137,13 @@ export class TitleBar {
     const x = frame.x - buffer.x;
     const y = frame.y - buffer.y;
     this.resizeArea.place(x, y, frame.width, frame.height);
-    this.shadow.set_position(x, y);
-    this.shadow.set_size(frame.width, frame.height);
     this.bar.set_position(x, y);
     this.bar.set_size(frame.width, height);
 
-    const square = !this.window.has_rounded_corners();
-    const focused = this.window.appears_focused;
-    for (const widget of [this.shadow, this.bar]) {
-      if (square) widget.add_style_class_name('kestrel-titlebar-square');
-      else widget.remove_style_class_name('kestrel-titlebar-square');
-      if (focused) widget.remove_style_pseudo_class('backdrop');
-      else widget.add_style_pseudo_class('backdrop');
-    }
+    if (this.window.has_rounded_corners()) this.bar.remove_style_class_name('kestrel-titlebar-square');
+    else this.bar.add_style_class_name('kestrel-titlebar-square');
+    if (this.window.appears_focused) this.bar.remove_style_pseudo_class('backdrop');
+    else this.bar.add_style_pseudo_class('backdrop');
     this.title.text = this.window.title ?? '';
     this.minimize.visible = this.window.can_minimize();
     this.maximize.visible = this.window.can_maximize();
@@ -165,7 +158,6 @@ export class TitleBar {
   destroy(): void {
     this.disconnect();
     this.resizeArea.actor.destroy();
-    this.shadow.destroy();
     this.bar.destroy();
   }
 }

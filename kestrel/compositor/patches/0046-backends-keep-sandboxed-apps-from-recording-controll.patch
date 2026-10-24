@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Mon, 19 Oct 2026 08:39:38 +0200
-Subject: [PATCH 46/51] backends: keep sandboxed apps from recording,
+Subject: [PATCH 46/52] backends: keep sandboxed apps from recording,
  controlling and rearranging the screen
 
 The RemoteDesktop, ScreenCast and InputCapture services accepted

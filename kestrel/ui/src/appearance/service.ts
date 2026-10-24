@@ -119,8 +119,6 @@ export class AppearanceService {
     setSolidSurfaces(this.PureBlack && isDark());
     const seed = this.seed;
     if (!seed) return;
-    const style = isDark() ? 'dark' : 'light';
-    appIcons.setAccent(seed, isDark(), taskbarScheme(style, this.PureBlack && isDark(), wallpaperFloor) === 'dark');
     const accent = accentColor(seed);
     const previousAccent = this.AccentColor;
     this.appearance = {
@@ -130,6 +128,9 @@ export class AppearanceService {
       pureBlack: this.PureBlack,
       palette: buildPalette(seed, this.PureBlack),
     };
+    // After the palette, since the icons' listeners repaint the taskbar looks with it
+    const style = isDark() ? 'dark' : 'light';
+    appIcons.setAccent(seed, isDark(), taskbarScheme(style, this.PureBlack && isDark(), wallpaperFloor) === 'dark');
     this.stylesheet.apply(seed, this.appearance.palette);
     this.paintTaskbar();
     const published = JSON.stringify([this.appearance, this.WallpaperAccentColor, this.taskbar]);

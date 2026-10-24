@@ -50,7 +50,6 @@ static const gchar *brightness_glsl_declarations =
 "uniform vec2 surface_size;                                                \n"
 "uniform vec4 surface_area;                                                \n"
 "uniform float corner_radius;                                              \n"
-"uniform float edge_highlight;                                             \n"
 "uniform float bright_dim;                                                 \n"
 "uniform float dark_lift;                                                  \n"
 "uniform float saturation;                                                 \n";
@@ -71,10 +70,6 @@ static const gchar *brightness_glsl =
 "  vec2 p = abs(position - half_size);                                      \n"
 "  vec2 q = p - half_size + vec2(r);                                        \n"
 "  float d = length(max(q, vec2(0.0))) + min(max(q.x, q.y), 0.0) - r;       \n"
-"  float light = 1.0 - position.y / surface_size.y;                         \n"
-"  float rim = 1.0 - smoothstep(0.0, 1.0, abs(d + 1.0));                    \n"
-"  cogl_color_out.rgb = mix(cogl_color_out.rgb, vec3(cogl_color_out.a),     \n"
-"                           edge_highlight * light * light * rim);          \n"
 "  if (corner_radius > 0.0)                                                \n"
 "    cogl_color_out *= 1.0 - smoothstep(-0.5, 0.5, d);                      \n";
 
@@ -117,8 +112,6 @@ struct _ShellBlurEffect
   int surface_area_uniform;
   int corner_radius_uniform;
   float corner_radius;
-  int edge_highlight_uniform;
-  float edge_highlight;
   int bright_dim_uniform;
   float bright_dim;
   int dark_lift_uniform;
@@ -139,7 +132,6 @@ enum {
   PROP_RADIUS,
   PROP_BRIGHTNESS,
   PROP_CORNER_RADIUS,
-  PROP_EDGE_HIGHLIGHT,
   PROP_BRIGHT_DIM,
   PROP_DARK_LIFT,
   PROP_SATURATION,
@@ -186,6 +178,155 @@ create_base_pipeline (CoglContext *ctx)
   return cogl_pipeline_copy (base_pipeline);
 }
 
+static CoglPipeline *
+create_outline_pipeline (CoglContext *ctx)
+{
+  static CoglPipelineKey outline_pipeline_key = "shell-blur-effect-outline";
+  CoglPipeline *pipeline =
+    cogl_context_get_named_pipeline (ctx, &outline_pipeline_key);
+
+  if (G_UNLIKELY (pipeline == NULL))
+    {
+      CoglSnippet *snippet;
+
+      pipeline = cogl_pipeline_new (ctx);
+      cogl_pipeline_set_layer_null_texture (pipeline, 0);
+      snippet = cogl_snippet_new (COGL_SNIPPET_HOOK_VERTEX,
+        "varying vec2 outline_position;\n",
+        "outline_position = cogl_tex_coord0_in.xy;\n");
+      cogl_pipeline_add_snippet (pipeline, snippet);
+      g_object_unref (snippet);
+      snippet = cogl_snippet_new (COGL_SNIPPET_HOOK_FRAGMENT,
+        "varying vec2 outline_position;\n"
+        "uniform vec4 outline_bounds;\n"
+        "uniform float outline_radius;\n",
+        "vec2 half_size = outline_bounds.zw * 0.5;\n"
+        "vec2 q = abs(outline_position - outline_bounds.xy - half_size) - half_size + outline_radius;\n"
+        "float d = length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - outline_radius;\n"
+        "float aa = max(fwidth(d), 0.001);\n"
+        "float outside = smoothstep(-aa * 0.5, aa * 0.5, d);\n"
+        "float inside = smoothstep(-aa * 0.5, aa * 0.5, d + 1.0);\n"
+        "cogl_color_out *= inside - outside;\n");
+      cogl_pipeline_add_snippet (pipeline, snippet);
+      g_object_unref (snippet);
+      cogl_context_set_named_pipeline (ctx, &outline_pipeline_key, pipeline);
+    }
+
+  return cogl_pipeline_copy (pipeline);
+}
+
+static void
+add_outline_band (ClutterPaintNode *node,
+                  float             x1,
+                  float             y1,
+                  float             x2,
+                  float             y2)
+{
+  clutter_paint_node_add_texture_rectangle (node,
+                                            &(ClutterActorBox) { x1, y1, x2, y2 },
+                                            x1, y1, x2, y2);
+}
+
+typedef enum
+{
+  SIDE_TOP = 1 << 0,
+  SIDE_BOTTOM = 1 << 1,
+  SIDE_LEFT = 1 << 2,
+  SIDE_RIGHT = 1 << 3,
+} Sides;
+
+/* The sides of the surface that don't lie against an edge of its monitor */
+static Sides
+exposed_sides (ShellBlurEffect *self)
+{
+  MetaDisplay *display = shell_global_get_display (shell_global_get ());
+  graphene_rect_t extents;
+  MtkRectangle rect, monitor;
+  Sides sides = 0;
+  int index;
+
+  clutter_actor_get_transformed_extents (self->actor, &extents);
+  rect = (MtkRectangle) {
+    (int) floorf (extents.origin.x), (int) floorf (extents.origin.y),
+    (int) ceilf (extents.size.width), (int) ceilf (extents.size.height),
+  };
+  index = meta_display_get_monitor_index_for_rect (display, &rect);
+  if (index < 0)
+    return SIDE_TOP | SIDE_BOTTOM | SIDE_LEFT | SIDE_RIGHT;
+
+  meta_display_get_monitor_geometry (display, index, &monitor);
+  if (extents.origin.y > monitor.y + 0.5f)
+    sides |= SIDE_TOP;
+  if (extents.origin.y + extents.size.height < monitor.y + monitor.height - 0.5f)
+    sides |= SIDE_BOTTOM;
+  if (extents.origin.x > monitor.x + 0.5f)
+    sides |= SIDE_LEFT;
+  if (extents.origin.x + extents.size.width < monitor.x + monitor.width - 0.5f)
+    sides |= SIDE_RIGHT;
+  return sides;
+}
+
+/* The neutral line windows get along their edge, on top of the surface,
+ * leaving out the sides that lie against the screen's edge */
+static void
+add_outline_node (ShellBlurEffect  *self,
+                  ClutterPaintNode *node,
+                  uint8_t           paint_opacity)
+{
+  g_autoptr (CoglPipeline) pipeline = NULL;
+  g_autoptr (ClutterPaintNode) outline_node = NULL;
+  float width, height, radius, band, alpha, top, bottom, reach;
+  float bounds[4];
+  CoglColor color;
+  Sides sides;
+
+  clutter_actor_get_size (self->actor, &width, &height);
+  if (width < 2 || height < 2 || paint_opacity == 0)
+    return;
+
+  sides = exposed_sides (self);
+  if (sides == 0)
+    return;
+
+  radius = MIN (MAX (self->corner_radius, 0), MIN (width, height) / 2.0f);
+  band = MIN (MAX (ceilf (radius) + 1.0f, 2.0f), height / 2.0f);
+  alpha = 0.3f * paint_opacity / 255.0f;
+  /* Push the shape past the sides that get no line, so its edge never
+   * shows there */
+  reach = 2.0f * (radius + 2.0f);
+  bounds[0] = sides & SIDE_LEFT ? 0 : -reach;
+  bounds[1] = sides & SIDE_TOP ? 0 : -reach;
+  bounds[2] = width - bounds[0] + (sides & SIDE_RIGHT ? 0 : reach);
+  bounds[3] = height - bounds[1] + (sides & SIDE_BOTTOM ? 0 : reach);
+
+  pipeline = create_outline_pipeline (get_cogl_context ());
+  cogl_color_init_from_4f (&color, 0.5f * alpha, 0.5f * alpha, 0.5f * alpha, alpha);
+  cogl_pipeline_set_color (pipeline, &color);
+  cogl_pipeline_set_uniform_float (pipeline,
+                                   cogl_pipeline_get_uniform_location (pipeline, "outline_bounds"),
+                                   4, 1, bounds);
+  cogl_pipeline_set_uniform_1f (pipeline,
+                                cogl_pipeline_get_uniform_location (pipeline, "outline_radius"),
+                                radius);
+
+  outline_node = clutter_pipeline_node_new (pipeline);
+  clutter_paint_node_set_static_name (outline_node, "ShellBlurEffect (outline)");
+  clutter_paint_node_add_child (node, outline_node);
+  top = sides & SIDE_TOP ? band : 0;
+  bottom = sides & SIDE_BOTTOM ? height - band : height;
+  if (sides & SIDE_TOP)
+    add_outline_band (outline_node, 0, 0, width, top);
+  if (sides & SIDE_BOTTOM)
+    add_outline_band (outline_node, 0, bottom, width, height);
+  if (bottom > top)
+    {
+      if (sides & SIDE_LEFT)
+        add_outline_band (outline_node, 0, top, 2, bottom);
+      if (sides & SIDE_RIGHT)
+        add_outline_band (outline_node, width - 2, top, width, bottom);
+    }
+}
+
 static CoglPipeline*
 create_brightness_pipeline (CoglContext *ctx)
 {
@@ -226,8 +367,6 @@ create_pipelines (ShellBlurEffect *self,
     cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "surface_area");
   self->corner_radius_uniform =
     cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "corner_radius");
-  self->edge_highlight_uniform =
-    cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "edge_highlight");
   self->bright_dim_uniform =
     cogl_pipeline_get_uniform_location (self->brightness_fb.pipeline, "bright_dim");
   self->dark_lift_uniform =
@@ -297,8 +436,6 @@ update_brightness (ShellBlurEffect *self,
                                   self->surface_area_uniform, 4, 1, area);
   cogl_pipeline_set_uniform_1f (self->brightness_fb.pipeline,
                                self->corner_radius_uniform, self->corner_radius);
-  cogl_pipeline_set_uniform_1f (self->brightness_fb.pipeline,
-                               self->edge_highlight_uniform, self->edge_highlight);
   cogl_pipeline_set_uniform_1f (self->brightness_fb.pipeline,
                                self->bright_dim_uniform, self->bright_dim);
   cogl_pipeline_set_uniform_1f (self->brightness_fb.pipeline,
@@ -848,6 +985,7 @@ shell_blur_effect_paint_node (ClutterEffect           *effect,
 
         case SHELL_BLUR_MODE_BACKGROUND:
           add_actor_node (self, node, -1);
+          add_outline_node (self, node, paint_opacity);
           break;
         }
 
@@ -903,10 +1041,6 @@ shell_blur_effect_get_property (GObject    *object,
       g_value_set_float (value, self->corner_radius);
       break;
 
-    case PROP_EDGE_HIGHLIGHT:
-      g_value_set_float (value, self->edge_highlight);
-      break;
-
     case PROP_BRIGHT_DIM:
       g_value_set_float (value, self->bright_dim);
       break;
@@ -953,16 +1087,6 @@ shell_blur_effect_set_property (GObject      *object,
           if (self->actor)
             clutter_effect_queue_repaint (CLUTTER_EFFECT (self));
           g_object_notify_by_pspec (object, properties[PROP_CORNER_RADIUS]);
-        }
-      break;
-
-    case PROP_EDGE_HIGHLIGHT:
-      if (self->edge_highlight != g_value_get_float (value))
-        {
-          self->edge_highlight = g_value_get_float (value);
-          if (self->actor)
-            clutter_effect_queue_repaint (CLUTTER_EFFECT (self));
-          g_object_notify_by_pspec (object, properties[PROP_EDGE_HIGHLIGHT]);
         }
       break;
 
@@ -1034,11 +1158,6 @@ shell_blur_effect_class_init (ShellBlurEffectClass *klass)
   properties[PROP_CORNER_RADIUS] =
     g_param_spec_float ("corner-radius", NULL, NULL,
                         0.f, G_MAXFLOAT, 0.f,
-                        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_EXPLICIT_NOTIFY);
-
-  properties[PROP_EDGE_HIGHLIGHT] =
-    g_param_spec_float ("edge-highlight", NULL, NULL,
-                        0.f, 1.f, 0.f,
                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_EXPLICIT_NOTIFY);
 
   properties[PROP_BRIGHT_DIM] =

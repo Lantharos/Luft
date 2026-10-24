@@ -17,15 +17,21 @@ shadow is never painted under the window, so translucent and blurred
 parts of it stay clear, and both go away with the rounded corners on
 maximized, tiled and fullscreen windows. The default shadows grow a
 little softer and wider for every window.
+
+Window actors drop their shadows when they're unrealized, since the
+shadows' textures belong to the graphics context that a GPU reset
+replaces, and the shadow factory shares one shadow between every window
+of the same shape.
 ---
- src/compositor/meta-window-actor-wayland.c | 204 +++++++++++++++++++++
- src/compositor/meta-window-corners.c       | 150 ++++++++++++++-
+ src/compositor/meta-window-actor-wayland.c | 222 +++++++++++++++++++++
+ src/compositor/meta-window-actor-x11.c     |  17 ++
+ src/compositor/meta-window-corners.c       | 150 +++++++++++++-
  src/compositor/meta-window-corners.h       |   9 +
  src/x11/meta-shadow-factory.c              |  14 +-
- 4 files changed, 369 insertions(+), 8 deletions(-)
+ 5 files changed, 404 insertions(+), 8 deletions(-)
 
 diff --git a/src/compositor/meta-window-actor-wayland.c b/src/compositor/meta-window-actor-wayland.c
-index cd4db8a290b2b2425ce3a8c0edee6634b516b116..b233221d68053f87616811b053f1c43d7bb65436 100644
+index cd4db8a290b2b2425ce3a8c0edee6634b516b116..b99bdad2619d896c7f0deece89b8d059c6e47ae4 100644
 --- a/src/compositor/meta-window-actor-wayland.c
 +++ b/src/compositor/meta-window-actor-wayland.c
 @@ -24,6 +24,7 @@
@@ -250,7 +256,29 @@ index cd4db8a290b2b2425ce3a8c0edee6634b516b116..b233221d68053f87616811b053f1c43d
  static gboolean
  maybe_configure_black_background (MetaWindowActorWayland *self,
                                    float                  *surfaces_width,
-@@ -687,6 +880,11 @@ meta_window_actor_wayland_dispose (GObject *object)
+@@ -677,6 +870,21 @@ meta_window_actor_wayland_map (ClutterActor *actor)
+     }
+ }
+ 
++#ifdef HAVE_XWAYLAND
++/* The shadow's texture belongs to the graphics context, which is replaced
++ * when the GPU resets */
++static void
++meta_window_actor_wayland_unrealize (ClutterActor *actor)
++{
++  MetaWindowActorWayland *self = META_WINDOW_ACTOR_WAYLAND (actor);
++
++  g_clear_pointer (&self->shadow, meta_shadow_unref);
++  g_clear_pointer (&self->shadow_hole, mtk_region_unref);
++
++  CLUTTER_ACTOR_CLASS (meta_window_actor_wayland_parent_class)->unrealize (actor);
++}
++#endif
++
+ static void
+ meta_window_actor_wayland_dispose (GObject *object)
+ {
+@@ -687,6 +895,11 @@ meta_window_actor_wayland_dispose (GObject *object)
  
    g_clear_signal_handler (&self->highest_scale_monitor_handler_id,
                            window);
@@ -262,7 +290,7 @@ index cd4db8a290b2b2425ce3a8c0edee6634b516b116..b233221d68053f87616811b053f1c43d
  
    parent_class->dispose (object);
  }
-@@ -703,6 +901,10 @@ meta_window_actor_wayland_constructed (GObject *object)
+@@ -703,6 +916,10 @@ meta_window_actor_wayland_constructed (GObject *object)
      g_signal_connect_swapped (window, "highest-scale-monitor-changed",
                                G_CALLBACK (clutter_actor_notify_transform_invalid),
                                self->surface_container);
@@ -273,15 +301,53 @@ index cd4db8a290b2b2425ce3a8c0edee6634b516b116..b233221d68053f87616811b053f1c43d
  }
  
  static void
-@@ -726,6 +928,8 @@ meta_window_actor_wayland_class_init (MetaWindowActorWaylandClass *klass)
+@@ -726,6 +943,11 @@ meta_window_actor_wayland_class_init (MetaWindowActorWaylandClass *klass)
    window_actor_class->is_single_surface_actor = meta_window_actor_wayland_is_single_surface_actor;
  
    clutter_actor_class->map = meta_window_actor_wayland_map;
 +  clutter_actor_class->paint = meta_window_actor_wayland_paint;
 +  clutter_actor_class->get_paint_volume = meta_window_actor_wayland_get_paint_volume;
++#ifdef HAVE_XWAYLAND
++  clutter_actor_class->unrealize = meta_window_actor_wayland_unrealize;
++#endif
  
    object_class->constructed = meta_window_actor_wayland_constructed;
    object_class->dispose = meta_window_actor_wayland_dispose;
+diff --git a/src/compositor/meta-window-actor-x11.c b/src/compositor/meta-window-actor-x11.c
+index ac370b22aa8f89425efe8f2e702282f1833763c3..a479dc61ffe70cb532623a58e6aac48e27869388 100644
+--- a/src/compositor/meta-window-actor-x11.c
++++ b/src/compositor/meta-window-actor-x11.c
+@@ -1440,6 +1440,22 @@ meta_window_actor_x11_dispose (GObject *object)
+   G_OBJECT_CLASS (meta_window_actor_x11_parent_class)->dispose (object);
+ }
+ 
++/* The shadows' textures belong to the graphics context, which is replaced
++ * when the GPU resets, and the shadow factory hands the same shadow to
++ * every window of the same shape */
++static void
++meta_window_actor_x11_unrealize (ClutterActor *actor)
++{
++  MetaWindowActorX11 *actor_x11 = META_WINDOW_ACTOR_X11 (actor);
++
++  g_clear_pointer (&actor_x11->focused_shadow, meta_shadow_unref);
++  g_clear_pointer (&actor_x11->unfocused_shadow, meta_shadow_unref);
++  actor_x11->recompute_focused_shadow = TRUE;
++  actor_x11->recompute_unfocused_shadow = TRUE;
++
++  CLUTTER_ACTOR_CLASS (meta_window_actor_x11_parent_class)->unrealize (actor);
++}
++
+ static void
+ meta_window_actor_x11_class_init (MetaWindowActorX11Class *klass)
+ {
+@@ -1461,6 +1477,7 @@ meta_window_actor_x11_class_init (MetaWindowActorX11Class *klass)
+   window_actor_class->is_single_surface_actor = meta_window_actor_x11_is_single_surface_actor;
+ 
+   actor_class->paint = meta_window_actor_x11_paint;
++  actor_class->unrealize = meta_window_actor_x11_unrealize;
+   actor_class->get_paint_volume = meta_window_actor_x11_get_paint_volume;
+ 
+   object_class->constructed = meta_window_actor_x11_constructed;
 diff --git a/src/compositor/meta-window-corners.c b/src/compositor/meta-window-corners.c
 index 4dc55ae0dde04bd47973ea032712aead3b71aeea..863d5ee4fb364aba0e9061757ea48f7ae598cceb 100644
 --- a/src/compositor/meta-window-corners.c

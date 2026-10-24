@@ -14,6 +14,8 @@ import { AppThemes } from './themes/appThemes.js';
 import { taskbarLooks } from '../desktop/panel/ink/taskbarLooks.js';
 import { taskbarStylesheet } from '../desktop/panel/ink/taskbarStylesheet.js';
 import { titleBarStylesheet } from '../desktop/windows/titleBars/titleBarStylesheet.js';
+import { taskbarScheme } from '../desktop/panel/ink/taskbarScheme.js';
+import { wallpaperFloor } from '../desktop/wallpaper/floor.js';
 
 const APPEARANCE_INTERFACE = `<node>
   <interface name="com.lantharos.Kestrel.Appearance">
@@ -37,7 +39,7 @@ const PERSIST_DELAY = 400;
 
 export class AppearanceService {
   private readonly stylesheet = new AccentStylesheet('accent', (seed, palette, variant) =>
-    taskbarStylesheet(seed, palette, variant) + titleBarStylesheet(palette, variant));
+    taskbarStylesheet(seed, palette, variant, this.PureBlack) + titleBarStylesheet(palette, variant));
   private readonly configDirectory = GLib.build_filenamev([GLib.get_user_config_dir(), 'kestrel']);
   private readonly interfaceSettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.interface' });
   private readonly settings = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
@@ -107,7 +109,7 @@ export class AppearanceService {
   private paintTaskbar(): boolean {
     const seed = this.seed;
     if (!seed || !this.palette) return false;
-    const taskbar = JSON.stringify(taskbarLooks(seed, this.palette, isDark() ? 'dark' : 'light', this.PureBlack, appIcons.paint));
+    const taskbar = JSON.stringify(taskbarLooks(seed, this.palette, isDark() ? 'dark' : 'light', this.PureBlack, appIcons.taskbarPaint));
     if (taskbar === this.taskbar) return false;
     this.taskbar = taskbar;
     return true;
@@ -117,7 +119,8 @@ export class AppearanceService {
     setSolidSurfaces(this.PureBlack && isDark());
     const seed = this.seed;
     if (!seed) return;
-    appIcons.setAccent(seed, isDark());
+    const style = isDark() ? 'dark' : 'light';
+    appIcons.setAccent(seed, isDark(), taskbarScheme(style, this.PureBlack && isDark(), wallpaperFloor) === 'dark');
     const accent = accentColor(seed);
     const previousAccent = this.AccentColor;
     this.appearance = {

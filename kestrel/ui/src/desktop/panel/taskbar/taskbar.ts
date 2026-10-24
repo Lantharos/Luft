@@ -7,7 +7,7 @@ import St from 'gi://St';
 import type { WindowPreviews } from '../windowPreviews.js';
 import type { ContextMenus } from '../../menus/contextMenus.js';
 import { taskbarPreferences, type TaskbarMetrics } from '../preferences/taskbarPreferences.js';
-import { appIcon } from '../../../appearance/icons/appIcons.js';
+import { taskbarAppIcon } from '../../../appearance/icons/appIcons.js';
 import { animateActor, liftIcon } from '../../../shared/motion/motion.js';
 import { TaskbarDrop } from './taskbarDrop.js';
 import { AppIndicators } from './appIndicators.js';
@@ -141,7 +141,7 @@ export class Taskbar {
         const currentItem = item;
         item.windowsChanged = app.connect('windows-changed', () => this.windowsChanged(currentItem));
         item.icon.child.destroy();
-        item.icon.child = appIcon(app, this.metrics.icon);
+        item.icon.child = taskbarAppIcon(app, this.metrics.icon);
       }
       item.button.accessible_name = app.get_name();
       item.draggable.enabled = pinned.has(app.id);
@@ -172,7 +172,7 @@ export class Taskbar {
     (item.button as St.Button & { _delegate: object })._delegate = {
       get id() { return item.app.id; },
       folder: false,
-      getDragActor: () => appIcon(item.app, this.metrics.icon),
+      getDragActor: () => taskbarAppIcon(item.app, this.metrics.icon),
       getDragActorSource: () => item.icon,
     };
     const draggable = DND.makeDraggable(item.button, { dragActorOpacity: 220 });
@@ -218,7 +218,7 @@ export class Taskbar {
   }
 
   private create(app: Shell.App): AppItem {
-    const icon = new St.Bin({ child: appIcon(app, this.metrics.icon) });
+    const icon = new St.Bin({ child: taskbarAppIcon(app, this.metrics.icon) });
     const content = new St.Widget();
     content.add_child(icon);
     const dots = Array.from({ length: 4 }, () => {

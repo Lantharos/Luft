@@ -241,9 +241,9 @@ rustc-hash = "2.1.3"
 rustix = "1.1.5"
 rustls = { version = "0.23.46", default-features = false }
 rustls-platform-verifier = "0.7.1"
-sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.53" }
-sabine-runtime = { git = "https://github.com/Lantharos/Sabine", tag = "v0.53" }
-sabine-service = { git = "https://github.com/Lantharos/Sabine", tag = "v0.53" }
+sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.55" }
+sabine-runtime = { git = "https://github.com/Lantharos/Sabine", tag = "v0.55" }
+sabine-service = { git = "https://github.com/Lantharos/Sabine", tag = "v0.55" }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.154"
 sevenz-rust2 = { version = "0.24.1", default-features = false }

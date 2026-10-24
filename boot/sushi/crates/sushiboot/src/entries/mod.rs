@@ -60,6 +60,7 @@ pub struct Catalog {
     pub entries: Vec<BootEntry>,
     pub main: Vec<Row>,
     pub previous: Vec<usize>,
+    pub others: Vec<usize>,
 }
 
 #[derive(Clone)]
@@ -112,6 +113,7 @@ impl Catalog {
         for entry in others {
             let index = catalog.push(entry);
             catalog.main.push(Row::Entry(index));
+            catalog.others.push(index);
         }
         if catalog.entries.is_empty() {
             return catalog;

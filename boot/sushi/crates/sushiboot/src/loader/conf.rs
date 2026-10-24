@@ -7,7 +7,7 @@ use crate::tpm;
 
 pub struct LoaderConfig {
     pub default: Option<String>,
-    pub timeout: u32,
+    pub timeout: Option<u32>,
 }
 
 pub fn load(device: Handle) -> LoaderConfig {
@@ -23,7 +23,7 @@ pub fn load(device: Handle) -> LoaderConfig {
 fn parse(text: &str) -> LoaderConfig {
     let mut config = LoaderConfig {
         default: None,
-        timeout: 5,
+        timeout: None,
     };
     for line in text.lines().map(str::trim) {
         let Some((key, value)) = line.split_once(char::is_whitespace) else {
@@ -33,7 +33,7 @@ fn parse(text: &str) -> LoaderConfig {
             "default" => config.default = Some(value.trim().to_string()),
             "timeout" => {
                 if let Ok(seconds) = value.trim().parse() {
-                    config.timeout = seconds;
+                    config.timeout = Some(seconds);
                 }
             }
             _ => {}

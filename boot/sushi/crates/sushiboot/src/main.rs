@@ -24,9 +24,13 @@ use uefi::{Handle, Identify};
 
 use entries::Catalog;
 use loader::attempts::{self, Attempts};
-use loader::{conf, vars};
+use loader::{conf, last, vars};
 use screen::Screen;
 use start::firmware;
+
+// With another system on the computer, the menu shows itself this long
+// unless loader.conf sets a timeout: long enough for a monitor to wake up
+const OTHER_SYSTEM_TIMEOUT: u32 = 10;
 
 fn graphics_handle() -> Option<Handle> {
     boot::get_handle_for_protocol::<GraphicsOutput>()
@@ -67,11 +71,16 @@ fn efi_main() -> Status {
     };
     vars::describe(&catalog, device);
     let config = conf::load(device);
-    let default = [vars::take_oneshot(), vars::chosen_default(), config.default]
-        .iter()
-        .flatten()
-        .find_map(|pattern| catalog.find(pattern))
-        .unwrap_or(first);
+    let default = [
+        vars::take_oneshot(),
+        vars::chosen_default(),
+        last::other_system(),
+        config.default,
+    ]
+    .iter()
+    .flatten()
+    .find_map(|pattern| catalog.find(pattern))
+    .unwrap_or(first);
     let mut attempts = Attempts::load();
     let going_back = match attempts::take_go_back().and_then(|entry| catalog.find(&entry)) {
         Some(left) => catalog.image_of(left).zip(catalog.older(left)),
@@ -85,12 +94,18 @@ fn efi_main() -> Status {
         let gop = protocol::shared::<GraphicsOutput>(handle).ok()?;
         Some(Screen::new(handle, gop))
     });
+    let timeout = config.timeout.unwrap_or(if catalog.others.is_empty() {
+        0
+    } else {
+        OTHER_SYSTEM_TIMEOUT
+    });
     let mut chosen = match screen.as_mut() {
-        Some(screen) => menu::choose(screen, &catalog, default, config.timeout, None),
+        Some(screen) => menu::choose(screen, &catalog, default, timeout, None),
         None => default,
     };
     loop {
         note_attempt(&catalog, chosen, failed, &mut attempts);
+        last::started(&catalog, chosen);
         let entry = &catalog.entries[chosen];
         vars::selected(&entry.id);
         let previous = catalog

@@ -36,10 +36,11 @@ sudo plymouth display-message --text="Upgrading firefox"
 
 ## SushiBoot
 
-SushiBoot reads unified kernel images and [Boot Loader Specification](https://uapi-group.org/specifications/specs/boot_loader_specification/) entries, finds Windows and other systems, and draws its menu under the firmware logo. Holding any key while it starts shows the menu.
+SushiBoot reads unified kernel images and [Boot Loader Specification](https://uapi-group.org/specifications/specs/boot_loader_specification/) entries, finds Windows and other systems, and draws its menu under the firmware logo. With another system on the computer the menu shows itself for 10 seconds, starting the system started last when nobody picks one; otherwise it stays hidden, and holding any key while it starts shows it.
 
 - Startup images listed by BLS entries, such as the ones bootc writes for each version of Luft, show the newest and keep the others under Previous versions.
-- `loader/loader.conf` takes `timeout` and `default`, which accepts patterns such as `luft-*`.
+- `loader/loader.conf` takes `timeout` and `default`, which accepts patterns such as `luft-*`. `timeout 0` hides the menu even next to another system, and any other number shows it for that many seconds even without one. trustd adds a comment saying so the first time it updates the boot files, and removes the `timeout 0` it used to write.
+- The other system started last is kept in `LuftBootLast` (vendor `b6a4c1e2-3f5d-4c8a-9e71-2d0f6a8b5c3e`), written only when it changes, and starting Luft clears it, so Luft always means its newest version. A one-shot entry or a default set with `bootctl` comes first.
 - Entry IDs and the Boot Loader Interface match systemd-boot's, so `bootctl status`, `bootctl list` and `bootctl set-oneshot ID` work.
 - A new version gets three tries before SushiBoot goes back to the one that last worked ([details](../boot.md#when-an-update-doesnt-start)).
 - With Secure Boot on it must be signed, has no command line editor, and skips entries that start a kernel directly. It measures what it starts into the TPM like systemd-boot.

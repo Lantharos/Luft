@@ -1,4 +1,4 @@
-import type { Box } from '../../../shared/layout/placement.js';
+import type { Box } from '../../../shared/layout/box.js';
 import { divide } from '../layouts/geometry.js';
 
 export const PRESET_WIDTHS = [1 / 3, 1 / 2, 2 / 3, 1];
@@ -206,11 +206,14 @@ export class Strip<T> {
   }
 
   snap(offset: number): Snap {
+    // Edges that would scroll past either end of the strip land on that end instead
+    const furthest = Math.max(0, this.totalWidth - this.viewWidth);
+    const within = (candidate: number) => Math.min(furthest, Math.max(0, candidate));
     let best: Snap = { offset: 0, column: 0 };
     for (let index = 0; index < this.columns.length; index++) {
       const left = this.columnStart(index);
       const right = left + this.columnWidth(this.columns[index]!) - this.viewWidth;
-      for (const candidate of [left, right]) {
+      for (const candidate of [within(left), within(right)]) {
         if (Math.abs(candidate - offset) < Math.abs(best.offset - offset)) best = { offset: candidate, column: index };
       }
     }

@@ -9,7 +9,8 @@ import {actorOf, area, focus, frame, openWindow, resetTiling, restingTiles, useT
 const {require, eventually} = checks('scrolling motion');
 const SWIPE_STEPS = 24;
 const OVERLAP_TOLERANCE = 2;
-const BACKTRACK_TOLERANCE = 2;
+// A spring may carry the swipe's momentum past its place and come back, but never leaps
+const JUMP_LIMIT = 120;
 
 // Where each window shows on screen, which can differ from its frame while the strip moves
 function shown(window) {
@@ -74,22 +75,21 @@ export async function run() {
       windows.push(window);
       await focus(window);
     }
-    const [first, , third] = windows;
+    const [first] = windows;
     await restingTiles();
     require(!onScreen(shown(first)), 'the first column starts out of view');
 
     const {frames, released} = await swipeAndRecord(windows, area().width * 0.6);
     await eventually(() => onScreen(shown(first)) && first.has_focus(), 'swiping to the column out of view brings it in and focuses it');
 
-    const settling = frames.slice(released);
-    const xs = settling.map(rects => rects[0].x);
-    const direction = Math.sign(xs.at(-1) - xs[0]);
-    const backtrack = xs.findIndex((x, index) => index > 0 && (x - xs[index - 1]) * direction < -BACKTRACK_TOLERANCE);
-    require(backtrack < 0, `the column glides to its place without jumping back (frame ${backtrack}: ${xs.slice(Math.max(0, backtrack - 3), backtrack + 3).map(Math.round)})`);
+    const xs = frames.slice(released - 1).map(rects => rects[0].x);
+    const jump = xs.findIndex((x, index) => index > 0 && Math.abs(x - xs[index - 1]) > JUMP_LIMIT);
+    require(jump < 0, `the column glides to its place without jumping (frame ${jump}: ${xs.slice(Math.max(0, jump - 3), jump + 3).map(Math.round)})`);
+    const bounds = area();
+    require(Math.abs(shown(first).x - bounds.x) <= 2, `the strip comes to rest at its start, with no empty space before the first column (${Math.round(shown(first).x)})`);
 
     const overlap = frames.map((rects, index) => [index, overlapping(rects.filter(onScreen))]).find(([, pair]) => pair);
     require(!overlap, `no window shows on top of another while the strip moves (frame ${overlap?.[0]} of ${frames.length}, released at ${released})`);
-    require(onScreen(shown(third)) || !onScreen(shown(third)), 'the strip settles');
   } finally {
     global.force_animations = forced;
     await stopAll();

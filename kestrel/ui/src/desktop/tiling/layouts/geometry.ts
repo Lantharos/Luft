@@ -1,4 +1,4 @@
-import type { Box } from '../../../shared/layout/placement.js';
+import type { Box } from '../../../shared/layout/box.js';
 
 export type Direction = 'left' | 'right' | 'up' | 'down';
 export type Axis = 'horizontal' | 'vertical';

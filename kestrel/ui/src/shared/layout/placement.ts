@@ -1,11 +1,7 @@
 import { clamp } from '../math.js';
+import type { Box } from './box.js';
 
-export interface Box {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
+export type { Box };
 
 export interface Anchor {
   box: Box;

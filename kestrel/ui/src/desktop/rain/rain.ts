@@ -11,6 +11,7 @@ import { visibleWallpaperMonitors } from '../panel/coverage.js';
 import { PlaybackConditions } from '../wallpaper/conditions.js';
 import { animateActor, reducedMotion } from '../../shared/motion/motion.js';
 import { DECLARATIONS, MAIN, MAX_SURFACES } from './shader.js';
+import { WEATHER, type Intensity } from './weather.js';
 
 export type Rect = Omit<Monitor, 'index'>;
 
@@ -19,13 +20,6 @@ export interface RainHost {
   taskbar(monitor: Monitor): Rect | null;
 }
 
-type Intensity = 'drizzle' | 'rain' | 'storm';
-
-const WEATHER: Record<Intensity, { density: number; wind: number }> = {
-  drizzle: { density: 0.25, wind: 0.05 },
-  rain: { density: 0.6, wind: 0.1 },
-  storm: { density: 1, wind: 0.22 },
-};
 const SURFACE_TYPES = [Meta.WindowType.NORMAL, Meta.WindowType.DIALOG, Meta.WindowType.MODAL_DIALOG];
 const FADE_DURATION = 600;
 const TIME_WRAP_S = 3600;
@@ -68,8 +62,10 @@ function onScreen(window: Meta.Window, workspace: Meta.Workspace): boolean {
 
 class Sheet {
   readonly actor = new RainActor();
+  destroyed = false;
 
   constructor(readonly monitor: Monitor) {
+    this.actor.connect('destroy', () => (this.destroyed = true));
     this.actor.set_position(monitor.x, monitor.y);
     this.actor.set_size(monitor.width, monitor.height);
     this.actor.uniform('rain_size', [monitor.width, monitor.height]);
@@ -92,7 +88,7 @@ class Sheet {
   }
 
   destroy(): void {
-    this.actor.destroy();
+    if (!this.destroyed) this.actor.destroy();
   }
 }
 
@@ -108,7 +104,7 @@ export class Rain {
   private desktopVisible = false;
 
   constructor(private readonly host: RainHost) {
-    this.settingsSignals = ['rain', 'rain-intensity'].map(key => this.settings.connect(`changed::${key}`, () => this.sync()));
+    this.settingsSignals = ['rain', 'rain-visible', 'rain-intensity'].map(key => this.settings.connect(`changed::${key}`, () => this.sync()));
     this.shellSignals = [
       this.shell.connect('notify::enable-animations', () => this.sync()),
       this.shell.connect('notify::reduced-motion', () => this.sync()),
@@ -117,7 +113,7 @@ export class Rain {
   }
 
   private get allowed(): boolean {
-    return this.settings.get_boolean('rain') && this.desktopVisible && this.conditions.allowed &&
+    return this.settings.get_boolean('rain') && this.settings.get_boolean('rain-visible') && this.desktopVisible && this.conditions.allowed &&
       this.shell.enable_animations && !reducedMotion();
   }
 
@@ -125,7 +121,7 @@ export class Rain {
     this.desktopVisible = desktopVisible;
     const visible = this.allowed ? visibleWallpaperMonitors(this.host.monitors()) : new Set<number>();
     if (visible.size && !this.sheets.length) this.build();
-    for (const sheet of this.sheets) this.show(sheet, visible.has(sheet.monitor.index));
+    for (const sheet of this.sheets.filter(sheet => !sheet.destroyed)) this.show(sheet, visible.has(sheet.monitor.index));
     if (visible.size && !this.timeline.is_playing()) {
       this.frame();
       this.timeline.start();
@@ -159,7 +155,7 @@ export class Rain {
       onStopped: () => {
         if (actor.opacity !== 0) return;
         actor.hide();
-        if (this.sheets.every(other => !other.actor.visible)) this.timeline.stop();
+        if (this.sheets.every(other => other.destroyed || !other.actor.visible)) this.timeline.stop();
       },
     });
   }
@@ -176,7 +172,7 @@ export class Rain {
         return { x, y, width, height };
       });
     for (const sheet of this.sheets) {
-      if (sheet.actor.visible) sheet.paint(time, weather.density, weather.wind * gust, windows, this.host.taskbar(sheet.monitor));
+      if (!sheet.destroyed && sheet.actor.visible) sheet.paint(time, weather.density, weather.wind * gust, windows, this.host.taskbar(sheet.monitor));
     }
   }
 

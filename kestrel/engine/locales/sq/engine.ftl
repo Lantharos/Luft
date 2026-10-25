@@ -402,3 +402,15 @@ screenshot-screencast-view = Kliko këtu për të parë videon
 screenshot-show-in-rover = Shfaq në Rover
 screenshot-captured = Foto ekrani u bë
 screenshot-captured-body = Mund ta ngjitësh imazhin nga kujtesa e fragmenteve
+
+## Rain
+
+rain-title = Shi
+rain-open-menu = Hap menynë e shiut
+rain-drizzle = Vesë
+rain-rain = Shi
+rain-storm = Stuhi
+rain-show = Shfaqe në desktop
+rain-sound = Zëri
+rain-volume = Volumi i shiut
+rain-settings = Cilësimet e shiut

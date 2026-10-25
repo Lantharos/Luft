@@ -83,7 +83,7 @@ export class QuickSettings {
     source.ready.then(() => {
       const indicators = [['network', source._network, 'network'], ['bluetooth', source._bluetooth, 'bluetooth'],
         ['airplane', source._rfkill, 'network'], ['power', source._powerProfiles, 'power'], ['keep-awake', source._caffeine, 'power'],
-        ['night-light', source._nightLight, 'display'], ['dark-style', source._darkMode, 'appearance'],
+        ['night-light', source._nightLight, 'display'], ['dark-style', source._darkMode, 'appearance'], ['rain', source._rain, 'appearance'],
         ['do-not-disturb', source._doNotDisturb, 'notifications'], ['keyboard', source._backlight, 'power'],
         ['rotation', source._autoRotate, 'display']] as const;
       for (const [key, indicator, settingsPanel] of indicators) {

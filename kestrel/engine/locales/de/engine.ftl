@@ -402,3 +402,15 @@ screenshot-screencast-view = Klick hier, um das Video anzusehen
 screenshot-show-in-rover = In Rover anzeigen
 screenshot-captured = Bildschirmfoto aufgenommen
 screenshot-captured-body = Du kannst das Bild aus der Zwischenablage einfügen
+
+## Rain
+
+rain-title = Regen
+rain-open-menu = Regenmenü öffnen
+rain-drizzle = Nieselregen
+rain-rain = Regen
+rain-storm = Sturm
+rain-show = Auf dem Desktop zeigen
+rain-sound = Ton
+rain-volume = Lautstärke des Regens
+rain-settings = Regen-Einstellungen

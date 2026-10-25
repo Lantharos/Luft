@@ -410,3 +410,15 @@ screenshot-screencast-view = Kliknite ovdje za prikaz videozapisa
 screenshot-show-in-rover = Prikaži u aplikaciji Rover
 screenshot-captured = Snimka zaslona je snimljena
 screenshot-captured-body = Sliku možete zalijepiti iz međuspremnika
+
+## Rain
+
+rain-title = Kiša
+rain-open-menu = Otvori izbornik kiše
+rain-drizzle = Rosulja
+rain-rain = Kiša
+rain-storm = Oluja
+rain-show = Prikaži na radnoj površini
+rain-sound = Zvuk
+rain-volume = Glasnoća kiše
+rain-settings = Postavke kiše

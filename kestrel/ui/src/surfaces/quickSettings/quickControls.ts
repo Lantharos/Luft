@@ -38,6 +38,7 @@ export interface QuickSettingsSource {
   _caffeine: Indicator;
   _nightLight: Indicator;
   _darkMode: Indicator;
+  _rain: Indicator;
   _doNotDisturb: Indicator;
   _rfkill: Indicator;
   _backlight: Indicator;

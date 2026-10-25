@@ -47,11 +47,16 @@ settings-appearance-wallpaper-span = Shtrij në të gjitha ekranet
 settings-appearance-wallpaper-battery = Luaj videot me bateri
 settings-appearance-wallpaper-battery-description = Përndryshe sfondet video ndalen derisa ta lidhësh në korrent
 settings-appearance-rain = Shi
-settings-appearance-rain-description = Shiu bie mbi sfondin dhe spërkat mbi dritaret dhe shiritin e detyrave
+settings-appearance-rain-description = Shiu bie mbi sfondin dhe spërkat mbi dritaret dhe shiritin e detyrave, ose dëgjohet ndërsa punon
 settings-appearance-rain-intensity = Sa fort bie shiu
 settings-appearance-rain-drizzle = Vesë
 settings-appearance-rain-rain = Shi
 settings-appearance-rain-storm = Stuhi
+settings-appearance-rain-visible = Shfaqe në desktop
+settings-appearance-rain-visible-description = Pikat bien mbi dritaret dhe shiritin e detyrave
+settings-appearance-rain-sound = Zëri
+settings-appearance-rain-sound-description = Krijohet ndërsa luhet, ndaj nuk përsëritet kurrë. Vazhdon edhe pas dritareve
+settings-appearance-rain-volume = Volumi i shiut
 
 ## Appearance: app icons
 

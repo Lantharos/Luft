@@ -134,7 +134,7 @@
       <summary>Order of the Quick Settings tiles</summary>
     </key>
     <key name="quick-tiles-removed" type="as">
-      <default>["screenshot", "settings", "lock", "rotation-0"]</default>
+      <default>["screenshot", "settings", "lock", "rotation-0", "rain-0"]</default>
       <summary>Quick Settings tiles removed by the user</summary>
     </key>
     <key name="quick-tiles-known" type="as">
@@ -276,16 +276,37 @@
     </key>
     <key name="rain" type="b">
       <default>false</default>
-      <summary>Let it rain on the desktop</summary>
+      <summary>Let it rain</summary>
+      <description>
+        Turns rain on, shown on the desktop when rain-visible is on and heard
+        when rain-sound is on. The Rain tile in Quick Settings switches this.
+      </description>
+    </key>
+    <key name="rain-visible" type="b">
+      <default>true</default>
+      <summary>Show rain on the desktop</summary>
       <description>
         Rain falls over the wallpaper, lands on the top edges of windows and
         the taskbar and splashes there. It stops while the wallpaper is
         hidden, animations are off or reduced, or the power saver is on.
       </description>
     </key>
+    <key name="rain-sound" type="b">
+      <default>false</default>
+      <summary>Play the sound of rain</summary>
+      <description>
+        The sound is made as it plays, so it never loops. It keeps playing
+        behind windows and stops while the screen is locked.
+      </description>
+    </key>
+    <key name="rain-volume" type="d">
+      <range min="0" max="1"/>
+      <default>0.6</default>
+      <summary>Volume of the rain sound</summary>
+    </key>
     <key name="rain-intensity" enum="com.lantharos.kestrel.RainIntensity">
       <default>'rain'</default>
-      <summary>How hard it rains on the desktop</summary>
+      <summary>How hard it rains</summary>
     </key>
     <key name="global-shortcuts" type="s">
       <default>'{}'</default>

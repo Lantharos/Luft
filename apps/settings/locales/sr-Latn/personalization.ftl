@@ -47,11 +47,16 @@ settings-appearance-wallpaper-span = Preko svih ekrana
 settings-appearance-wallpaper-battery = Puštaj video-snimke na bateriji
 settings-appearance-wallpaper-battery-description = U suprotnom video-pozadine pauziraju dok ne priključite napajanje
 settings-appearance-rain = Kiša
-settings-appearance-rain-description = Kiša pada preko pozadine i prska po prozorima i traci zadataka
+settings-appearance-rain-description = Kiša pada preko pozadine i prska po prozorima i traci zadataka, ili se čuje dok radiš
 settings-appearance-rain-intensity = Koliko jako pada kiša
 settings-appearance-rain-drizzle = Rosulja
 settings-appearance-rain-rain = Kiša
 settings-appearance-rain-storm = Oluja
+settings-appearance-rain-visible = Prikaži na radnoj površini
+settings-appearance-rain-visible-description = Kapi padaju na prozore i traku zadataka
+settings-appearance-rain-sound = Zvuk
+settings-appearance-rain-sound-description = Nastaje dok svira pa se nikad ne ponavlja. Svira i iza prozora
+settings-appearance-rain-volume = Jačina kiše
 
 ## Appearance: app icons
 

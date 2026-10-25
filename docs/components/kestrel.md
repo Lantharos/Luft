@@ -57,6 +57,7 @@ Chromium-based browsers and Electron apps lock their profile with the host name,
 | `kestrel-authenticate` | Checks lock screen passwords and fingerprints through the `kestrel-unlock` PAM rules |
 | `kestrel-watchdog` | Restarts the computer when the GPU is stuck ([details](../boot.md#graphics-driver-stopped-responding)) |
 | `kestrel-wallpaper` | Plays live wallpapers |
+| `kestrel-rain` | Makes the sound of rain as it plays, as a `Rain` stream in PipeWire. Kestrel writes `INTENSITY VOLUME` lines to it and closes its input to fade it out. `--render PATH SECONDS:INTENSITY:VOLUME...` writes the same sound to a WAV file instead |
 
 greetd reads `/run/greetd/config.toml`, which `kestrel-greeter-service --write-greetd-config` writes before each start from the image's defaults in `/usr/lib/kestrel-greeter/greetd.toml` and the account that signs in by itself, kept in `/var/lib/kestrel-greeter/initial-session.toml`. Nothing in `/etc` holds it, so updates to the defaults always arrive; to change greetd's configuration on one computer, point `greetd.service` at your own file with a drop-in. The `greetd` and `kestrel-unlock` PAM rules are in `/usr/lib/pam.d` for the same reason, and a file of the same name in `/etc/pam.d` takes their place.
 

@@ -57,6 +57,12 @@ settings-appearance-wallpaper-tile = Tile
 settings-appearance-wallpaper-span = Span displays
 settings-appearance-wallpaper-battery = Play videos on battery
 settings-appearance-wallpaper-battery-description = Otherwise video wallpapers pause until you plug in
+settings-appearance-rain = Rain
+settings-appearance-rain-description = Rain falls over the wallpaper and splashes on windows and the taskbar
+settings-appearance-rain-intensity = How hard it rains
+settings-appearance-rain-drizzle = Drizzle
+settings-appearance-rain-rain = Rain
+settings-appearance-rain-storm = Storm
 
 ## Appearance: app icons
 

@@ -82,6 +82,12 @@
     <value nick="large" value="2"/>
   </enum>
 
+  <enum id="com.lantharos.kestrel.RainIntensity">
+    <value nick="drizzle" value="0"/>
+    <value nick="rain" value="1"/>
+    <value nick="storm" value="2"/>
+  </enum>
+
   <enum id="com.lantharos.kestrel.TaskbarAutoHide">
     <value nick="never" value="0"/>
     <value nick="always" value="1"/>
@@ -267,6 +273,19 @@
         When disabled, live wallpapers pause on their still frame while the
         computer runs on battery.
       </description>
+    </key>
+    <key name="rain" type="b">
+      <default>false</default>
+      <summary>Let it rain on the desktop</summary>
+      <description>
+        Rain falls over the wallpaper, lands on the top edges of windows and
+        the taskbar and splashes there. It stops while the wallpaper is
+        hidden, animations are off or reduced, or the power saver is on.
+      </description>
+    </key>
+    <key name="rain-intensity" enum="com.lantharos.kestrel.RainIntensity">
+      <default>'rain'</default>
+      <summary>How hard it rains on the desktop</summary>
     </key>
     <key name="global-shortcuts" type="s">
       <default>'{}'</default>

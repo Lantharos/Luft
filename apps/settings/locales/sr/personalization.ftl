@@ -46,6 +46,12 @@ settings-appearance-wallpaper-tile = Поплочај
 settings-appearance-wallpaper-span = Преко свих екрана
 settings-appearance-wallpaper-battery = Пуштај видео-снимке на батерији
 settings-appearance-wallpaper-battery-description = У супротном видео-позадине паузирају док не прикључите напајање
+settings-appearance-rain = Киша
+settings-appearance-rain-description = Киша пада преко позадине и прска по прозорима и траци задатака
+settings-appearance-rain-intensity = Колико јако пада киша
+settings-appearance-rain-drizzle = Росуља
+settings-appearance-rain-rain = Киша
+settings-appearance-rain-storm = Олуја
 
 ## Appearance: app icons
 

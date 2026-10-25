@@ -46,6 +46,12 @@ settings-appearance-wallpaper-tile = Kacheln
 settings-appearance-wallpaper-span = Über alle Bildschirme
 settings-appearance-wallpaper-battery = Videos im Akkubetrieb abspielen
 settings-appearance-wallpaper-battery-description = Sonst pausieren Video-Hintergrundbilder, bis du das Netzteil ansteckst
+settings-appearance-rain = Regen
+settings-appearance-rain-description = Regen fällt über das Hintergrundbild und spritzt auf Fenster und die Taskleiste
+settings-appearance-rain-intensity = Wie stark es regnet
+settings-appearance-rain-drizzle = Nieselregen
+settings-appearance-rain-rain = Regen
+settings-appearance-rain-storm = Sturm
 
 ## Appearance: app icons
 

@@ -46,6 +46,12 @@ settings-appearance-wallpaper-tile = Pllaka
 settings-appearance-wallpaper-span = Shtrij në të gjitha ekranet
 settings-appearance-wallpaper-battery = Luaj videot me bateri
 settings-appearance-wallpaper-battery-description = Përndryshe sfondet video ndalen derisa ta lidhësh në korrent
+settings-appearance-rain = Shi
+settings-appearance-rain-description = Shiu bie mbi sfondin dhe spërkat mbi dritaret dhe shiritin e detyrave
+settings-appearance-rain-intensity = Sa fort bie shiu
+settings-appearance-rain-drizzle = Vesë
+settings-appearance-rain-rain = Shi
+settings-appearance-rain-storm = Stuhi
 
 ## Appearance: app icons
 

@@ -141,6 +141,16 @@ async function checkOverview(windows) {
   await restingTiles();
 }
 
+async function checkMinimumWidth(windows) {
+  const {window: wide} = await openWindow('Wide', 900, 420, 'wide');
+  await focus(wide);
+  await eventually(() => frame(wide).width >= 900, 'a window with a minimum width keeps it');
+  await restingTiles();
+  const columns = [...windows, wide].sort((a, b) => shownX(a) - shownX(b));
+  require(columns.every((window, index) => index === 0 || shownX(window) >= shownX(columns[index - 1]) + frame(columns[index - 1]).width + gap() - 2),
+    'its column widens for it instead of the next column covering it');
+}
+
 async function checkAtEnd([first, , third]) {
   useTiling('scrolling', {'tiling-new-windows': 'at-end'});
   await focus(first);
@@ -156,6 +166,7 @@ export async function run() {
     await checkStacking(windows);
     await checkSwipe(windows);
     await checkColumns(windows);
+    await checkMinimumWidth(windows);
     await checkOverview(windows);
     await checkAtEnd(windows);
   } finally {

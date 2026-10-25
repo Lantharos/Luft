@@ -96,6 +96,16 @@ export class ScrollingSpace implements Space {
     this.arrange(false, window);
   }
 
+  /** An app that keeps its window wider than its column, as ones with a minimum width do, widens the column
+   * instead of covering the next one. */
+  widened(window: Meta.Window): void {
+    const box = this.boxes.get(window);
+    const frame = window.get_frame_rect();
+    if (!box || this.swipeStart !== null || this.zoomed || frame.width <= box.width + 1) return;
+    this.strip.setWidth(window, frame.width);
+    this.arrange(true);
+  }
+
   drop(window: Meta.Window, onto: Meta.Window): void {
     this.strip.remove(window);
     this.strip.focus(onto);

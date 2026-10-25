@@ -53,6 +53,8 @@ app.connect('activate', () => {
     show();
   }));
   if (state === 'maximized') window.maximize();
+  // Won't get narrower than 900 pixels, like apps with a minimum width
+  if (state === 'wide') window.set_size_request(900, -1);
   // Opens fixed in size and becomes resizable a moment later, like some Chromium and Electron apps
   if (state === 'fixed') {
     window.resizable = false;

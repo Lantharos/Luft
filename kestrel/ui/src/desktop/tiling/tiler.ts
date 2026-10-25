@@ -226,6 +226,7 @@ export class Tiler {
         window.connect('notify::minimized', () => this.minimizedChanged(window)),
         window.connect('workspace-changed', () => this.homeChanged(window)),
         window.connect('notify::maximized-horizontally', () => this.stretchChanged(window)),
+        window.connect('size-changed', () => this.sizeChanged(window)),
         window.connect('notify::maximized-vertically', () => this.stretchChanged(window)),
         window.connect('notify::fullscreen', () => this.stretchChanged(window)),
         window.connect('notify::transient-for', () => this.natureChanged(window)),
@@ -360,6 +361,11 @@ export class Tiler {
     const [monitor, workspace] = this.homeOf(window);
     const home = this.spaceAt(monitor, workspace);
     if (home !== record.space) this.moveTo(window, home, null);
+  }
+
+  private sizeChanged(window: Meta.Window): void {
+    const space = this.tracked.get(window)?.space;
+    if (space instanceof ScrollingSpace && window !== this.held && !stretched(window)) space.widened(window);
   }
 
   private stretchChanged(window: Meta.Window): void {

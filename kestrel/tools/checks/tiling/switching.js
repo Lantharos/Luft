@@ -92,6 +92,11 @@ export async function run() {
     useTiling('tiling');
     await eventually(() => !windows[0].is_maximized() && windows.every(tiled) && tiledTightly(windows),
       'turning tiling on tiles a maximized window with the others');
+    await restingTiles();
+    const {window: opened} = await openWindow('Maximized', 640, 420, 'maximized');
+    windows.push(opened);
+    await eventually(() => !opened.is_maximized() && windows.every(tiled) && tiledTightly(windows),
+      'a window that opens maximized takes a tile');
   } finally {
     rest();
     await stopAll();

@@ -26,6 +26,10 @@ declare module '@girs/meta-51/meta-51' {
       has_rounded_corners(): boolean;
     }
 
+    interface WindowConfig {
+      unset_maximize_flags(flags: MaximizeFlags): void;
+    }
+
     interface Context {
       identify_sender(connection: Gio.DBusConnection, sender: string, cancellable: Gio.Cancellable | null): Promise<string>;
       set_permitted_apps(permission: string, appIds: string[]): void;

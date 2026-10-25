@@ -23,8 +23,8 @@ export function resetTiling() {
 export const gap = () => GAPS[settings.get_string('tiling-gaps')];
 export const edgeTiling = () => mutter.get_boolean('edge-tiling');
 
-export async function openWindow(title, width = 640, height = 420) {
-  const process = openBoardWindow(title, width, height);
+export async function openWindow(title, width = 640, height = 420, state = 'normal') {
+  const process = openBoardWindow(title, width, height, state);
   const window = await waitForWindow(candidate => candidate.get_title()?.startsWith(title), `a window titled ${title} opens`);
   return {process, window};
 }

@@ -2,7 +2,7 @@ import Gdk from 'gi://Gdk?version=4.0';
 import Gio from 'gi://Gio';
 import Gtk from 'gi://Gtk?version=4.0';
 
-const [title, width, height] = ARGV;
+const [title, width, height, state] = ARGV;
 const MOVE_HANDLE = 32;
 const GESTURES = {[Gdk.EventType.TOUCHPAD_PINCH]: 'p', [Gdk.EventType.TOUCHPAD_SWIPE]: 's'};
 const PHASES = {
@@ -52,6 +52,7 @@ app.connect('activate', () => {
     scale = surface.scale === 1 ? '' : ` x${surface.scale.toFixed(2)}`;
     show();
   }));
+  if (state === 'maximized') window.maximize();
   window.present();
 });
 

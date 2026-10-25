@@ -252,6 +252,7 @@ export class Tiler {
       const box = record.space?.boxOf(window);
       if (!box) return;
       setUnconstrained(window, true);
+      config.unset_maximize_flags(Meta.MaximizeFlags.BOTH);
       config.set_position(box.x, box.y);
       config.set_size(box.width, box.height);
     });

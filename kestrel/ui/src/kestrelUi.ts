@@ -229,6 +229,8 @@ class KestrelUi {
     this.watch(global.display, 'in-fullscreen-changed', () => this.queueSyncSession());
     this.watch(global.display, 'notify::focus-window', () => this.trackFocusedWindow());
     this.watch(global.display, 'restacked', () => this.queueSyncSession());
+    this.watch(global.workspace_manager, 'active-workspace-changed', () => this.queueSyncSession());
+    this.watch(global.display, 'window-visibility-updated', () => this.queueSyncSession());
     this.watch(global.display, 'grab-op-begin', (_display, window: Meta.Window | null) => { this.draggedWindow = window; });
     this.watch(global.display, 'grab-op-end', () => {
       this.draggedWindow = null;

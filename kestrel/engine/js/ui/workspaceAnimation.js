@@ -434,6 +434,8 @@ export class WorkspaceAnimationController {
 
         this._switchData = switchData;
         switchData.monitors = [];
+        // Windows slide as clones, so work that looks at them waits for the slide to end
+        switchData.releaseMotion = KestrelUi.holdMotion();
 
         switchData.gestureActivated = false;
         switchData.superseded = false;
@@ -477,6 +479,7 @@ export class WorkspaceAnimationController {
         this._switchData = null;
 
         switchData.monitors.forEach(m => m.destroy());
+        switchData.releaseMotion();
 
         this.movingWindow = null;
     }

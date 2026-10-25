@@ -19,6 +19,8 @@ import { WindowPreviews } from './desktop/panel/windowPreviews.js';
 import { TaskView } from './desktop/taskView/taskView.js';
 import { wallpaperFloor } from './desktop/wallpaper/floor.js';
 import { LiveWallpaper } from './desktop/wallpaper/liveWallpaper.js';
+import { Rain } from './desktop/rain/rain.js';
+import { RainSound } from './desktop/rain/sound.js';
 import { Tiling } from './desktop/tiling/tiling.js';
 import { SnapLayouts } from './desktop/windows/snapLayouts.js';
 import { Workspaces } from './desktop/windows/workspaces.js';
@@ -74,6 +76,8 @@ class KestrelUi {
   readonly board: Board;
   private readonly tiling: Tiling;
   private readonly liveWallpaper: LiveWallpaper;
+  private readonly rain: Rain;
+  private readonly rainSound = new RainSound();
   private readonly rotation: RotationAnimation;
   private readonly copilot: CopilotActions;
   private readonly fourFingers = new FourFingerSwipe(direction => this.followFourFingers(direction));
@@ -137,6 +141,16 @@ class KestrelUi {
     };
     this.taskView = new TaskView(context.createBackground, workspace => this.board.frameOf(workspace), close, context.activateWindow);
     this.liveWallpaper = new LiveWallpaper(() => context.layoutManager.monitors);
+    this.rain = new Rain({
+      monitors: () => context.layoutManager.monitors,
+      taskbar: monitor => {
+        const actor = this.panels.panelOn(monitor)?.actor;
+        if (!actor?.mapped) return null;
+        const [x, y] = actor.get_transformed_position();
+        const [width, height] = actor.get_transformed_size();
+        return { x, y, width, height };
+      },
+    });
     this.rotation = new RotationAnimation(context.layoutManager, context.createBackground);
     this.surfaces = new Surfaces({
       context,
@@ -229,6 +243,7 @@ class KestrelUi {
       this.dismissImmediately();
       this.panels.sync();
       this.liveWallpaper.monitorsChanged();
+      this.rain.monitorsChanged();
       this.board.monitorsChanged();
       this.tiling.monitorsChanged();
       place();
@@ -307,6 +322,8 @@ class KestrelUi {
     const primary = this.context.layoutManager.primaryMonitor;
     this.panels.showCorner(!taskbarPreferences.shown && !!primary && available && !this.taskView.visible && !this.board.shown && !covered.has(primary.index));
     this.liveWallpaper.sync(available && !this.taskView.visible && !this.board.shown);
+    this.rain.sync(available && !this.taskView.visible && !this.board.shown);
+    this.rainSound.sync(available);
     if (!available) this.dismissImmediately();
   }
 
@@ -383,6 +400,8 @@ class KestrelUi {
     dropAfterMotion(this.syncSessionAfterMotion);
     this.panels.shutdown();
     this.liveWallpaper.destroy();
+    this.rain.destroy();
+    this.rainSound.destroy();
     this.rotation.destroy();
     this.copilot.destroy();
     this.tiling.destroy();

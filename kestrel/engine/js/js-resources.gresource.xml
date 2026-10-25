@@ -120,6 +120,7 @@
     <file>ui/status/brightness.js</file>
     <file>ui/status/caffeine.js</file>
     <file>ui/status/darkMode.js</file>
+    <file>ui/status/rain.js</file>
     <file>ui/status/doNotDisturb.js</file>
     <file>ui/status/keyboard.js</file>
     <file>ui/status/location.js</file>

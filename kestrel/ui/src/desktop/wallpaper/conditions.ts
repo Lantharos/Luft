@@ -20,9 +20,10 @@ export class PlaybackConditions {
   private readonly disconnectors: (() => void)[] = [];
   private readonly cancellable = new Gio.Cancellable();
 
-  constructor(private readonly changed: () => void) {
+  constructor(private readonly changed: () => void, private readonly batteryKey: string | null = 'live-wallpaper-on-battery') {
     for (const source of [DISPLAY, POWER, PROFILES]) this.watch(source);
-    const id = this.settings.connect('changed::live-wallpaper-on-battery', () => this.changed());
+    if (!batteryKey) return;
+    const id = this.settings.connect(`changed::${batteryKey}`, () => this.changed());
     this.disconnectors.push(() => this.settings.disconnect(id));
   }
 
@@ -48,7 +49,7 @@ export class PlaybackConditions {
 
   get allowed(): boolean {
     return !DISPLAY_OFF_MODES.includes(this.property<number>(DISPLAY, 'PowerSaveMode') ?? 0) &&
-      (this.settings.get_boolean('live-wallpaper-on-battery') || !this.property<boolean>(POWER, 'OnBattery')) &&
+      (!this.batteryKey || this.settings.get_boolean(this.batteryKey) || !this.property<boolean>(POWER, 'OnBattery')) &&
       this.property<string>(PROFILES, 'ActiveProfile') !== 'power-saver';
   }
 

@@ -15,6 +15,7 @@ install_rpath = ':'.join([mutter_dep.get_variable('libdir'), mutter_typelibdir, 
 subdir('hotplug-sniffer')
 subdir('st')
 subdir('authenticate')
+subdir('rain')
 subdir('wallpaper')
 
 typelib_cflags = [

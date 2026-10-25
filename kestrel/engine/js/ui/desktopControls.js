@@ -7,6 +7,7 @@ import * as PowerProfiles from './status/powerProfiles.js';
 import * as Caffeine from './status/caffeine.js';
 import * as NightLight from './status/nightLight.js';
 import * as DarkMode from './status/darkMode.js';
+import * as Rain from './status/rain.js';
 import * as DoNotDisturb from './status/doNotDisturb.js';
 import * as Rfkill from './status/rfkill.js';
 import * as Backlight from './status/backlight.js';
@@ -23,6 +24,7 @@ export class DesktopControls {
         this._caffeine = new Caffeine.Indicator();
         this._nightLight = new NightLight.Indicator();
         this._darkMode = new DarkMode.Indicator();
+        this._rain = new Rain.Indicator();
         this._doNotDisturb = new DoNotDisturb.Indicator();
         this._rfkill = new Rfkill.Indicator();
         this._backlight = new Backlight.Indicator();
@@ -32,7 +34,7 @@ export class DesktopControls {
         this._network = null;
         this._bluetooth = new Bluetooth.Indicator();
         for (const indicator of [this._volumeOutput, this._brightness,
-            this._powerProfiles, this._caffeine, this._nightLight, this._darkMode,
+            this._powerProfiles, this._caffeine, this._nightLight, this._darkMode, this._rain,
             this._doNotDisturb, this._rfkill, this._backlight, this._autoRotate, this._bluetooth])
             this.actor.add_child(indicator);
         this.ready = this._loadDevices();

@@ -22,6 +22,7 @@
 	const description = $derived.by(() => {
 		if (app.source === 'appImage') return `${app.name} and its file in ${app.origin} will be deleted.`;
 		if (app.source === 'tool') return `${app.name} will be removed from your tools container.`;
+		if (app.source === 'debian') return `${app.name} will be removed from the Ubuntu container. Your files and settings stay.`;
 		if (app.source === 'system') return `This removes ${app.name} from the system with everything it added, including its settings in /etc and its data in /var.`;
 		if (alsoRemoved.length) return `This also removes ${alsoRemoved.join(', ')}, which ${alsoRemoved.length === 1 ? 'needs' : 'need'} ${app.name}.`;
 		return `${app.name} will be removed from this computer. Your files and settings stay.`;

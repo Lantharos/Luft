@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use luft_app::block_on;
 use luft_software::apps::flatpak::{self, FLATHUB, Installation};
-use luft_software::apps::{appimage, toolbox};
+use luft_software::apps::{appimage, debian, toolbox};
 use luft_software::system::repositories::{self, Draft};
 use luft_software::system::system_packages;
 use luft_software::task::Task;
@@ -33,6 +33,15 @@ pub enum Job {
     },
     InstallFlatpakBundle {
         path: PathBuf,
+    },
+    InstallDeb {
+        path: PathBuf,
+    },
+    RemoveDeb {
+        package: String,
+    },
+    UpdateDebs {
+        packages: Vec<String>,
     },
     AddFlatpakRepo {
         path: PathBuf,
@@ -91,6 +100,7 @@ impl Job {
             Self::InstallFlathub { .. }
             | Self::InstallFlatpakRef { .. }
             | Self::InstallFlatpakBundle { .. }
+            | Self::InstallDeb { .. }
             | Self::AddFlatpakRepo { .. }
             | Self::InstallAppImage { .. }
             | Self::InstallTool { .. }
@@ -98,11 +108,13 @@ impl Job {
             | Self::InstallSystemPackages { .. }
             | Self::InstallSystemPackageFile { .. } => Action::Install,
             Self::RemoveFlatpak { .. }
+            | Self::RemoveDeb { .. }
             | Self::RemoveAppImage { .. }
             | Self::RemoveTool { .. }
             | Self::RemoveSystemPackages { .. }
             | Self::RemoveRepository { .. } => Action::Remove,
             Self::UpdateFlatpaks { .. }
+            | Self::UpdateDebs { .. }
             | Self::UpdateAppImage { .. }
             | Self::UpdateTools { .. } => Action::Update,
             Self::Fedora(job) => job.action(),
@@ -136,6 +148,9 @@ impl Job {
                 flatpak::integrate();
                 Ok(())
             }
+            Self::InstallDeb { path } => debian::install(path, task).map(drop),
+            Self::RemoveDeb { package } => debian::remove(package, task),
+            Self::UpdateDebs { packages } => debian::update(packages, task),
             Self::AddFlatpakRepo { path, name } => {
                 flatpak::add_remote(Installation::User, name, path)
             }

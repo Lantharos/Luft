@@ -14,9 +14,11 @@ system = ["dep:futures-util", "dep:luft-app", "dep:tokio", "dep:zbus"]
 [dependencies]
 backhand = { workspace = true, features = ["gzip", "lz4", "xz", "zstd"] }
 dirs.workspace = true
+flate2 = { workspace = true, features = ["zlib-rs"] }
 futures-util = { workspace = true, optional = true }
 glob.workspace = true
 libc.workspace = true
+liblzma.workspace = true
 luft-app = { workspace = true, features = ["apps"], optional = true }
 luft-variant.workspace = true
 rustix = { workspace = true, features = ["fs"] }
@@ -24,8 +26,10 @@ serde.workspace = true
 serde_json.workspace = true
 sha1.workspace = true
 sha2.workspace = true
+tar.workspace = true
 tokio = { workspace = true, features = ["rt"], optional = true }
 ureq.workspace = true
+zstd.workspace = true
 zbus = { workspace = true, features = ["proxy", "tokio"], optional = true }
 
 [lints]

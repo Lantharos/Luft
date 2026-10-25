@@ -30,6 +30,7 @@
 	const installed = $derived.by((): InstalledApp | null => {
 		if (!file) return null;
 		if (file.kind === 'flatpakRef' || file.kind === 'flatpakBundle') return library.flatpak(file.id);
+		if (file.kind === 'deb') return library.deb(file.package);
 		if (file.kind === 'package' && file.system) return library.system(file.package);
 		if (file.kind === 'package') return fedora.available ? library.package(file.package) : library.tool(file.package);
 		if (file.kind === 'appImage' && started) return library.installed.find((app) => app.source === 'appImage' && app.name === name) ?? null;
@@ -52,6 +53,7 @@
 	function job(opened: OpenedFile): Job {
 		if (opened.kind === 'flatpakRef') return { kind: 'installFlatpakRef', path: opened.path };
 		if (opened.kind === 'flatpakBundle') return { kind: 'installFlatpakBundle', path: opened.path };
+		if (opened.kind === 'deb') return { kind: 'installDeb', path: opened.path };
 		if (opened.kind === 'flatpakRepo') return { kind: 'addFlatpakRepo', path: opened.path, name: opened.name };
 		if (opened.kind === 'package' && opened.system)
 			return { kind: 'installSystemPackageFile', path: opened.path, package: opened.package, repository: opened.repository?.draft ?? null };
@@ -60,6 +62,18 @@
 	}
 
 	const unverified = $derived(file?.kind === 'package' && !file.repository && !file.verified);
+
+	// A .deb's app on Flathub installs better, sandboxed and updating itself, so it's offered first
+	const flathub = $derived(file?.kind === 'deb' && !file.installed ? file.flathub : null);
+	const flathubKey = $derived(flathub ? `flathub:${flathub.id}` : null);
+	const flathubOperation = $derived(flathubKey ? operations.forKey(flathubKey) : null);
+	const fromFlathub = $derived(flathub ? library.flatpak(flathub.id) : null);
+
+	function installFromFlathub() {
+		if (!flathub || !flathubKey) return;
+		if (flathubOperation?.state === 'failed') void operations.cancel(flathubOperation.id);
+		void operations.run(flathubKey, flathub.name, { kind: 'installFlathub', id: flathub.id });
+	}
 
 	function install() {
 		if (!file) return;
@@ -78,10 +92,11 @@
 		void operations.run(key, name, job(file));
 	}
 
-	const ACTION: Record<OpenedFile['kind'], string> = { flatpakRef: 'Install', flatpakBundle: 'Install', flatpakRepo: 'Add source', package: 'Install', appImage: 'Install' };
+	const ACTION: Record<OpenedFile['kind'], string> = { flatpakRef: 'Install', flatpakBundle: 'Install', flatpakRepo: 'Add source', package: 'Install', appImage: 'Install', deb: 'Install' };
 	const KIND: Record<OpenedFile['kind'], string> = {
 		flatpakRef: 'Flatpak app',
 		flatpakBundle: 'Flatpak app',
+		deb: 'App for Debian and Ubuntu',
 		flatpakRepo: 'Flatpak app source',
 		package: fedora.available ? 'System package' : 'Command-line tool',
 		appImage: 'AppImage'
@@ -97,7 +112,7 @@
 			<p class="px-2 text-[14px] text-[var(--text-muted)]">{error}</p>
 		{:else if file}
 			<header class="flex items-center gap-5">
-				<AppArt icon={file.kind === 'appImage' || file.kind === 'flatpakRef' || file.kind === 'flatpakBundle' ? file.icon : null} size={80} />
+				<AppArt icon={file.kind === 'appImage' || file.kind === 'flatpakRef' || file.kind === 'flatpakBundle' || file.kind === 'deb' ? file.icon : null} size={80} />
 				<div class="flex min-w-0 flex-1 flex-col gap-1">
 					<h2 class="truncate text-[24px] font-semibold">{name}</h2>
 					<span class="text-[13px] text-[var(--text-muted)]">{kind}</span>
@@ -112,8 +127,12 @@
 						<button type="button" class="button primary large" onclick={() => backend.launch(desktop)}>Open</button>
 					{:else if finished && file.kind === 'flatpakRepo'}
 						<button type="button" class="button large" onclick={() => navigation.open({ page: 'discover' })}>Done</button>
-					{:else if file.kind === 'package' && (file.installed || installed)}
+					{:else if (file.kind === 'package' || file.kind === 'deb') && (file.installed || installed)}
 						<span class="text-[13px] text-[var(--text-muted)]">Already installed</span>
+					{:else if file.kind === 'deb' && !file.runsHere}
+						<span class="max-w-[260px] text-right text-[13px] text-[var(--text-muted)]">This package is made for a different kind of computer.</span>
+					{:else if flathub}
+						<button type="button" class="button large" onclick={install}>Install the .deb anyway</button>
 					{:else}
 						<button type="button" class="button primary large" onclick={install}>{ACTION[file.kind]}</button>
 					{/if}
@@ -123,12 +142,36 @@
 				</div>
 			</header>
 
-			{#if file.kind === 'package' && file.description}
+			{#if flathub}
+				<Section title="Also on Flathub">
+					<div class="flex items-center gap-4 px-4 py-3">
+						<AppArt icon={flathub.icon} size={48} />
+						<div class="flex min-w-0 flex-1 flex-col gap-0.5">
+							<span class="truncate text-[15px] font-medium">{flathub.name}{flathub.verified ? ' · Verified' : ''}</span>
+							<span class="text-[13px] text-[var(--text-muted)]">
+								The better way to get it: sandboxed, and it keeps itself up to date, without an Ubuntu container under it.
+							</span>
+						</div>
+						{#if flathubOperation && flathubOperation.state !== 'failed'}
+							<ProgressButton operation={flathubOperation} />
+						{:else if fromFlathub?.desktop}
+							<button type="button" class="button primary" onclick={() => backend.launch(fromFlathub.desktop!)}>Open</button>
+						{:else}
+							<button type="button" class="button primary" onclick={installFromFlathub}>Install from Flathub</button>
+						{/if}
+					</div>
+					{#if flathubOperation?.state === 'failed'}
+						<p class="px-4 pb-3 text-[12.5px] text-[var(--danger)]">{flathubOperation.error}</p>
+					{/if}
+				</Section>
+			{/if}
+
+			{#if (file.kind === 'package' || file.kind === 'deb') && file.description}
 				<Description html={`<p>${file.description.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</p>`} />
 			{/if}
 
 			<Section title="Details">
-				{#if file.kind === 'package' || file.kind === 'appImage'}
+				{#if file.kind === 'package' || file.kind === 'appImage' || file.kind === 'deb'}
 					{#if file.version}
 						<Row title="Version"><span>{file.version}</span></Row>
 					{/if}
@@ -150,6 +193,16 @@
 					{:else}
 						<Row title="Updates" description="It doesn't update by itself. Install a newer file when one comes out."><span>From newer files</span></Row>
 					{/if}
+				{/if}
+				{#if file.kind === 'deb'}
+					<Row
+						title="Installs to"
+						description="A container with Ubuntu's software, which shares your home folder. Installing the first app downloads Ubuntu itself, a few hundred megabytes."
+						><span>Ubuntu container</span></Row
+					>
+					<Row title="Updates" description="From its maker's software source when the package adds one, as many do. Otherwise, install a newer file when one comes out."
+						><span>When its maker has them</span></Row
+					>
 				{/if}
 				{#if file.kind === 'appImage'}
 					<Row title="Installs to" description="It gets a place in your app menu, and Schelf keeps it up to date when it can."><span>Applications folder</span></Row>

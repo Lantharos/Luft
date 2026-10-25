@@ -4516,9 +4516,11 @@ version = "0.1.0"
 dependencies = [
  "backhand",
  "dirs",
+ "flate2",
  "futures-util",
  "glob",
  "libc",
+ "liblzma",
  "luft-app",
  "luft-variant",
  "rustix",
@@ -4526,9 +4528,11 @@ dependencies = [
  "serde_json",
  "sha1",
  "sha2",
+ "tar",
  "tokio",
  "ureq",
  "zbus 6.0.0",
+ "zstd 0.14.3",
 ]
 
 [[package]]

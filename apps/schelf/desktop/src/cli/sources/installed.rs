@@ -71,6 +71,9 @@ fn removal_job(app: &InstalledApp) -> Job {
             package: app.package.clone().unwrap_or_default(),
         },
         Source::AppImage => Job::RemoveAppImage { id: app.id.clone() },
+        Source::Debian => Job::RemoveDeb {
+            package: app.package.clone().unwrap_or_default(),
+        },
         Source::System => Job::RemoveSystemPackages {
             packages: vec![app.id.clone()],
         },

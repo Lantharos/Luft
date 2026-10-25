@@ -109,6 +109,13 @@ fn plans(updates: &[AppUpdate]) -> Vec<Plan> {
         |packages| Job::UpdateTools { packages },
         package,
     ));
+    plans.extend(batch(
+        "deb-updates",
+        "apps from .deb files",
+        &of(Source::Debian),
+        |packages| Job::UpdateDebs { packages },
+        package,
+    ));
     plans.extend(of(Source::AppImage).into_iter().map(|update| {
         plan(
             update.key.clone(),

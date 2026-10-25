@@ -26,7 +26,7 @@ Schelf is where you get apps: from Flathub, as AppImages, and command-line tools
 - **Updates** updates every app in one go. Flatpak runtimes are listed separately, as app platforms.
 - AppImages update by themselves a few minutes after you sign in, and every six hours after that.
 
-Opening a `.flatpak`, `.flatpakref`, `.AppImage` or `.rpm` file shows a page explaining it, and where it would go, before anything is installed. A desktop app's `.rpm`, such as 1Password's or Chrome's, becomes a system package, and when it comes with its vendor's repository, Schelf shows that repository and its key and adds it, so the app keeps getting updates. A `.flatpak` file installs its app for your account, along with the runtime it needs from Flathub; it updates only from newer files unless it names a repository of its own. [Installing software](/system/software/) explains where each kind goes.
+Opening a `.flatpak`, `.flatpakref`, `.deb`, `.AppImage` or `.rpm` file shows a page explaining it, and where it would go, before anything is installed. A desktop app's `.rpm`, such as 1Password's or Chrome's, becomes a system package, and when it comes with its vendor's repository, Schelf shows that repository and its key and adds it, so the app keeps getting updates. A `.flatpak` file installs its app for your account, along with the runtime it needs from Flathub; it updates only from newer files unless it names a repository of its own. A `.deb` file's app is offered from Flathub when it's there too, and otherwise goes into an Ubuntu container. [Installing software](/system/software/) explains where each kind goes.
 
 ## Command-line tools
 

@@ -141,9 +141,19 @@ async function checkGestures(shown) {
   await enters(inbox, 'spreading three fingers over a window enters it');
   swipe(120, 0);
   await enters(notes, 'a three-finger swipe to the right brings in the window on the left');
+  const home = inbox.get_frame_rect();
+  const above = notes.get_frame_rect();
+  inbox.move_frame(false, above.x, above.y + above.height + 40);
+  await eventually(() => inbox.get_frame_rect().y === above.y + above.height + 40, 'Inbox moves below the entered window');
+  swipe(0, -120);
+  await enters(inbox, 'a three-finger swipe up brings in the window below');
+  swipe(0, 120);
+  await enters(notes, 'a three-finger swipe down brings in the window above');
+  inbox.move_frame(false, home.x, home.y);
+  await eventually(() => inbox.get_frame_rect().x === home.x && inbox.get_frame_rect().y === home.y, 'Inbox goes back');
   swipe(0, 120);
   await eventually(() => board().shown && !board().enteredWindow() && sameView(view(), shown),
-    'a three-finger swipe down returns to the overview and stays on the board');
+    'with no window above, a three-finger swipe down returns to the overview and stays on the board');
   await boardResting();
 }
 

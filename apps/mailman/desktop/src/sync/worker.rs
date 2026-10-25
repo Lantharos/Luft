@@ -16,6 +16,8 @@ use crate::store::Store;
 use crate::store::{Fetched, Inserted, Mailbox, Outgoing, Role, now};
 
 const POLL: Duration = Duration::from_secs(5 * 60);
+// After a failure, try again soon, then less often while it keeps failing
+const FIRST_RETRY: Duration = Duration::from_secs(20);
 const PREFETCH_BATCH: usize = 25;
 const PREFETCH_MAX_SIZE: i64 = 512 * 1024;
 const NOTIFY_WINDOW: i64 = 6 * 3600;
@@ -92,6 +94,7 @@ pub fn spawn(account: Account, shared: Shared) -> Queue {
         backfill: VecDeque::new(),
         backfilling: false,
         poll_at: Instant::now() + POLL,
+        retry: FIRST_RETRY,
     };
     std::thread::Builder::new()
         .name(format!("account-{}", worker.account.id))
@@ -115,6 +118,7 @@ struct Worker {
     backfill: VecDeque<i64>,
     backfilling: bool,
     poll_at: Instant,
+    retry: Duration,
 }
 
 fn order(mailbox: &Mailbox) -> u8 {
@@ -189,6 +193,8 @@ impl Worker {
 
     fn fail(&mut self, error: String) {
         self.connection = None;
+        self.poll_at = self.poll_at.min(Instant::now() + self.retry);
+        self.retry = (self.retry * 2).min(POLL);
         self.status("error", Some(error));
     }
 
@@ -204,7 +210,10 @@ impl Worker {
             result = self.perform(&job);
         }
         match result {
-            Ok(()) => self.status("ready", None),
+            Ok(()) => {
+                self.retry = FIRST_RETRY;
+                self.status("ready", None);
+            }
             Err(error) => self.fail(error),
         }
     }

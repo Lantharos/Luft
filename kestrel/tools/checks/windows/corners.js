@@ -1,6 +1,8 @@
 import Gio from 'gi://Gio';
+import St from 'gi://St';
+import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
 
-import {styled} from '../lib/actors.js';
+import {named, shown, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {fixture, spawn, stopAll, waitForWindow} from '../lib/processes.js';
 import {capture, captureFrame} from '../lib/screenshots.js';
@@ -45,6 +47,24 @@ async function shadowBelow({window}) {
 
 const titleBar = ({window}) => styled('kestrel-titlebar', window.get_compositor_private())[0];
 
+function surfaceCorners(actor) {
+  const node = actor.get_theme_node();
+  return [St.Corner.TOPLEFT, St.Corner.TOPRIGHT, St.Corner.BOTTOMRIGHT, St.Corner.BOTTOMLEFT].map(corner => node.get_border_radius(corner))
+    .concat(actor.get_effect('backdrop').corner_radius);
+}
+
+async function quickSettingsCorners(label) {
+  toggleSurface('quick');
+  const quick = named('kestrel-quick-settings');
+  await eventually(() => shown(quick), `Quick Settings opens ${label}`);
+  await settled();
+  const corners = surfaceCorners(quick);
+  if (label === 'with square corners') await capture('quick-settings-square');
+  toggleSurface('quick');
+  await eventually(() => !quick.visible, 'Quick Settings closes');
+  return corners;
+}
+
 export async function run() {
   settings.reset('rounded-window-corners');
   try {
@@ -67,11 +87,13 @@ export async function run() {
     const shadow = await shadowBelow(notes);
     require(shadow.every((value, channel) => value <= backdrop.color[channel] - SHADOW_DEPTH), 'a square window keeps its shadow');
     await capture('window-corners-square');
+    require((await quickSettingsCorners('with square corners')).every(radius => radius === 0), 'Quick Settings goes square too');
 
     settings.set_boolean('rounded-window-corners', true);
     await eventually(() => notes.window.has_rounded_corners(), 'turning rounded corners on rounds windows again');
     await settled();
     require((await corners(notes)).every(corner => !same(corner, notes.color)), 'its corners are rounded again');
+    require((await quickSettingsCorners('with rounded corners')).every(radius => radius > 0), 'Quick Settings is rounded again');
   } finally {
     settings.reset('rounded-window-corners');
     await stopAll();

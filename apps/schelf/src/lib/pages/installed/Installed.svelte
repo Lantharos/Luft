@@ -15,6 +15,7 @@
 
 	const EMPTY: Partial<Record<Filter, string>> = {
 		appImage: 'AppImages you add show up here, with a place in your app menu.',
+		debian: 'Apps you install from .deb files show up here.',
 		tool: 'Command-line tools you install from search show up here.',
 		system: 'Packages you add to the system, such as services, show up here. Add one in Tern with schelf install --system, or open a package file.'
 	};
@@ -45,7 +46,8 @@
 					{ value: 'all', label: 'All' },
 					{ value: 'flatpak', label: 'Flatpak' },
 					...(fedora.available ? [{ value: 'package' as const, label: 'System' }] : [{ value: 'tool' as const, label: 'Tools' }, { value: 'system' as const, label: 'System' }]),
-					{ value: 'appImage', label: 'AppImage' }
+					{ value: 'appImage', label: 'AppImage' },
+					...(library.installed.some((app) => app.source === 'debian') ? [{ value: 'debian' as const, label: '.deb' }] : [])
 				]}
 				onchange={(value) => (filter = value)}
 			/>

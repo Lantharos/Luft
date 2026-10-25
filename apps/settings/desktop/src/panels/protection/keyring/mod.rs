@@ -12,7 +12,7 @@ use serde_json::Value;
 use zbus::DynamicType;
 
 use bus::{ACCESS, Problem, SSH, STATUS};
-use snapshot::Keyring;
+use snapshot::{Access, Keyring};
 
 use crate::L10N;
 
@@ -50,6 +50,10 @@ async fn keyring(events: Events, _: Value) -> Result<Option<Keyring>, String> {
     Ok(snapshot::read().await?)
 }
 
+async fn access(_: Value) -> Result<Option<Access>, String> {
+    Ok(bus::optional(snapshot::access().await)?)
+}
+
 async fn reseal(_: Value) -> Result<(), String> {
     bus::call(STATUS, "Reseal", &())
         .await
@@ -79,6 +83,7 @@ async fn set_confirm(
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     window
         .with_async("keyring", events, keyring)
+        .command_async("keyring_access", access)
         .command_async("keyring_lock", |_: Value| async {
             Ok(bus::call::<_, ()>(STATUS, "Lock", &()).await?)
         })

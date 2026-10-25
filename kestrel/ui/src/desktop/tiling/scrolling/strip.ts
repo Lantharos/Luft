@@ -1,4 +1,4 @@
-import type { Box } from '../../../shared/layout/placement.js';
+import type { Box } from '../../../shared/layout/box.js';
 import { divide } from '../layouts/geometry.js';
 
 export const PRESET_WIDTHS = [1 / 3, 1 / 2, 2 / 3, 1];
@@ -13,6 +13,7 @@ export interface Column<T> {
   weights: number[];
   width: number;
   row: number;
+  restore?: number;
 }
 
 export interface Snap {
@@ -144,12 +145,53 @@ export class Strip<T> {
   cycleWidth(): void {
     const column = this.columns[this.focused];
     if (!column) return;
+    delete column.restore;
     column.width = PRESET_WIDTHS.find(width => width > column.width + PRESET_TOLERANCE) ?? PRESET_WIDTHS[0]!;
+  }
+
+  /** Makes the focused column as wide as the view, keeping its gaps, or gives it back the width it had. */
+  maximize(): void {
+    const column = this.columns[this.focused];
+    if (!column) return;
+    if (column.width >= 1 - PRESET_TOLERANCE) {
+      column.width = column.restore ?? DEFAULT_WIDTH;
+      delete column.restore;
+      return;
+    }
+    column.restore = column.width;
+    column.width = 1;
+  }
+
+  /** Widens the focused column over the space the other columns fully in view leave, so together they fill it. */
+  expand(): void {
+    const column = this.columns[this.focused];
+    if (!column) return;
+    const shown = this.columns.map((_, index) => index).filter(index => index !== this.focused && this.fullyShown(index));
+    const taken = shown.reduce((sum, index) => sum + this.columnWidth(this.columns[index]!) + this.gap, 0);
+    delete column.restore;
+    column.width = this.widthFor(this.viewWidth - taken);
+    this.offset = this.columnStart(Math.min(this.focused, ...shown));
+  }
+
+  edge(last: boolean): T | null {
+    const column = this.columns[last ? this.columns.length - 1 : 0];
+    return column?.windows[column.row] ?? null;
+  }
+
+  moveColumnToEdge(last: boolean): boolean {
+    const target = last ? this.columns.length - 1 : 0;
+    if (!this.columns.length || target === this.focused) return false;
+    const [column] = this.columns.splice(this.focused, 1);
+    this.columns.splice(target, 0, column!);
+    this.focused = target;
+    return true;
   }
 
   resizeWidth(direction: -1 | 1): void {
     const column = this.columns[this.focused];
-    if (column) column.width = Math.min(1, Math.max(MIN_WIDTH, column.width + direction * WIDTH_STEP));
+    if (!column) return;
+    delete column.restore;
+    column.width = Math.min(1, Math.max(MIN_WIDTH, column.width + direction * WIDTH_STEP));
   }
 
   resizeRow(direction: -1 | 1): void {
@@ -163,7 +205,16 @@ export class Strip<T> {
   setWidth(window: T, pixels: number): void {
     const found = this.locate(window);
     if (!found) return;
-    this.columns[found[0]]!.width = Math.min(1, Math.max(MIN_WIDTH, (pixels + this.gap) / Math.max(1, this.view.width - this.gap)));
+    this.columns[found[0]]!.width = this.widthFor(pixels);
+  }
+
+  private widthFor(pixels: number): number {
+    return Math.min(1, Math.max(MIN_WIDTH, (pixels + this.gap) / Math.max(1, this.view.width - this.gap)));
+  }
+
+  private fullyShown(index: number): boolean {
+    const left = this.columnStart(index);
+    return left >= this.offset - 1 && left + this.columnWidth(this.columns[index]!) <= this.offset + this.viewWidth + 1;
   }
 
   moveRowEdge(window: T, bottom: boolean, coordinate: number): void {
@@ -206,12 +257,17 @@ export class Strip<T> {
   }
 
   snap(offset: number): Snap {
+    // Edges that would scroll past either end of the strip land on that end instead
+    const furthest = Math.max(0, this.totalWidth - this.viewWidth);
+    const within = (candidate: number) => Math.min(furthest, Math.max(0, candidate));
     let best: Snap = { offset: 0, column: 0 };
     for (let index = 0; index < this.columns.length; index++) {
       const left = this.columnStart(index);
       const right = left + this.columnWidth(this.columns[index]!) - this.viewWidth;
-      for (const candidate of [left, right]) {
-        if (Math.abs(candidate - offset) < Math.abs(best.offset - offset)) best = { offset: candidate, column: index };
+      for (const candidate of [within(left), within(right)]) {
+        const distance = Math.abs(candidate - offset) - Math.abs(best.offset - offset);
+        // At the end of the strip, the last of the columns sharing that edge is the one in view
+        if (distance < 0 || (distance === 0 && candidate === furthest && furthest > 0)) best = { offset: candidate, column: index };
       }
     }
     return best;

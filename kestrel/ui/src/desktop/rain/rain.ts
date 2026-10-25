@@ -86,6 +86,7 @@ class Sheet {
   destroyed = false;
 
   constructor(readonly monitor: Monitor) {
+    this.actor.name = 'kestrel-rain';
     this.actor.connect('destroy', () => (this.destroyed = true));
     this.actor.set_position(monitor.x, monitor.y);
     this.actor.set_size(monitor.width, monitor.height);

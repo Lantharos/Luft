@@ -1,5 +1,6 @@
 use serde::Deserialize;
 
+use crate::protocols::net;
 use crate::store::Identity;
 
 const SEND_AS: &str = "https://gmail.googleapis.com/gmail/v1/users/me/settings/sendAs";
@@ -64,7 +65,8 @@ fn plain(html: &str) -> String {
 }
 
 pub fn send_as(account: i64, token: &str) -> Result<Vec<Identity>, String> {
-    let listed: Listed = ureq::get(SEND_AS)
+    let listed: Listed = net::http()
+        .get(SEND_AS)
         .header("Authorization", &format!("Bearer {token}"))
         .call()
         .map_err(|error| error.to_string())?

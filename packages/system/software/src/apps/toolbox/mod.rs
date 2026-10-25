@@ -2,7 +2,7 @@ mod catalog;
 mod commands;
 mod container;
 mod installed;
-mod pull;
+pub(crate) mod pull;
 mod transaction;
 mod updates;
 

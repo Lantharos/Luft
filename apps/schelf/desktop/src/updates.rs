@@ -3,7 +3,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use luft_app::Commands;
 use luft_app::apps::App;
 use luft_software::apps::flatpak::{self, Installation};
-use luft_software::apps::toolbox;
+use luft_software::apps::{debian, toolbox};
 use luft_software::system::updates;
 use sabine::SabineWindow;
 use serde::Serialize;
@@ -109,6 +109,31 @@ fn tools(updates: Vec<toolbox::Update>) -> Vec<AppUpdate> {
         .collect()
 }
 
+fn debs(updates: Vec<debian::Update>) -> Vec<AppUpdate> {
+    let apps = debian::installed();
+    updates
+        .into_iter()
+        .map(|update| {
+            let app = apps.iter().find(|app| app.package == update.package);
+            AppUpdate {
+                key: format!("deb/{}", update.package),
+                source: Source::Debian,
+                id: update.package.clone(),
+                desktop: app.and_then(|app| app.desktop.first().cloned()),
+                name: app.map_or_else(|| update.package.clone(), |app| app.name.clone()),
+                icon: app.and_then(|app| app.icon.clone()),
+                from: Some(update.from),
+                to: Some(update.to),
+                size: 0,
+                platform: false,
+                installation: None,
+                reference: None,
+                package: Some(update.package),
+            }
+        })
+        .collect()
+}
+
 fn installed_tools() -> Result<Vec<AppUpdate>, String> {
     if fedora::available() {
         Ok(Vec::new())
@@ -125,11 +150,13 @@ pub async fn find() -> (Vec<AppUpdate>, Option<String>) {
     let flatpaks = spawn_blocking(|| flatpak::updates().map(flatpaks));
     let tools = spawn_blocking(installed_tools);
     let appimages = spawn_blocking(appimages);
+    let debs = spawn_blocking(|| debian::updates().map(debs));
     let packages = fedora::updates().await;
+    let debs = joined(debs).await;
     let flatpaks = joined(flatpaks).await;
     let tools = joined(tools).await;
     let appimages = appimages.await.unwrap_or_default();
-    let error = [&packages, &flatpaks, &tools]
+    let error = [&packages, &flatpaks, &tools, &debs]
         .into_iter()
         .find_map(|result| result.as_ref().err())
         .cloned();
@@ -137,6 +164,7 @@ pub async fn find() -> (Vec<AppUpdate>, Option<String>) {
     apps.extend(flatpaks.unwrap_or_default());
     apps.extend(appimages);
     apps.extend(tools.unwrap_or_default());
+    apps.extend(debs.unwrap_or_default());
     apps.sort_by_cached_key(|update| (update.platform, update.name.to_lowercase()));
     (apps, error)
 }

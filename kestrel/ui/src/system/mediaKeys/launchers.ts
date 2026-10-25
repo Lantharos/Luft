@@ -10,14 +10,22 @@ const MEDIA_KEYS = 'com.lantharos.kestrel.media-keys';
 const CUSTOM = 'com.lantharos.kestrel.custom-keybinding';
 const CUSTOM_MODES = Shell.ActionMode.ALL & ~(Shell.ActionMode.LOGIN_SCREEN | Shell.ActionMode.LOCK_SCREEN | Shell.ActionMode.UNLOCK_SCREEN);
 
-export type Launcher = 'www' | 'email' | 'calculator' | 'media' | 'home';
+export type Launcher = 'www' | 'email' | 'calculator' | 'media' | 'home' | 'terminal';
 
-const HANDLERS: Record<Exclude<Launcher, 'home' | 'calculator'>, string> = {
+const HANDLERS: Record<Exclude<Launcher, 'home' | 'calculator' | 'terminal'>, string> = {
   www: 'x-scheme-handler/http',
   email: 'x-scheme-handler/mailto',
   media: 'audio/x-vorbis+ogg',
 };
 const CALCULATORS = ['org.gnome.Calculator.desktop', 'gnome-calculator.desktop'];
+const TERMINAL = 'com.lantharos.tern.desktop';
+
+// Tern, or else the first app that says it is a terminal
+function terminal(): Shell.App | null {
+  const apps = Shell.AppSystem.get_default();
+  return apps.lookup_app(TERMINAL) ??
+    apps.get_installed().map(info => apps.lookup_app(info.get_id() ?? '')).find(app => app?.app_info?.get_categories()?.split(';').includes('TerminalEmulator')) ?? null;
+}
 
 function activate(info: Gio.AppInfo | null): void {
   if (!info) return;
@@ -29,6 +37,10 @@ function activate(info: Gio.AppInfo | null): void {
 export function launch(launcher: Launcher): void {
   if (launcher === 'home') {
     Gio.AppInfo.launch_default_for_uri(Gio.File.new_for_path(GLib.get_home_dir()).get_uri(), global.create_app_launch_context(0, -1));
+    return;
+  }
+  if (launcher === 'terminal') {
+    terminal()?.open_new_window(-1);
     return;
   }
   if (launcher === 'calculator') {

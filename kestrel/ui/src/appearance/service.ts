@@ -1,6 +1,6 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import { setSolidSurfaces } from 'resource:///com/lantharos/kestrel/ui/kestrelGlass.js';
+import { setSolidSurfaces, setSquareSurfaces } from 'resource:///com/lantharos/kestrel/ui/kestrelGlass.js';
 
 import { accentColor, namedAccent, NEUTRAL, seedFromSamples, toHex, type Rgb, type Seed } from './color.js';
 import { appearanceCss, appearanceJson, type Appearance } from './exports.js';
@@ -68,8 +68,14 @@ export class AppearanceService {
       [this.settings, this.settings.connect('changed::pure-black', () => this.update())],
       [this.settings, this.settings.connect('changed::accent', () => this.update())],
       [this.settings, this.settings.connect('changed::theme-apps', () => this.schedulePersist())],
+      [this.settings, this.settings.connect('changed::rounded-window-corners', () => this.followCorners())],
     ];
     setSolidSurfaces(this.PureBlack && isDark());
+    this.followCorners();
+  }
+
+  private followCorners(): void {
+    setSquareSurfaces(!this.settings.get_boolean('rounded-window-corners'));
   }
 
   private get palette(): Palette | null {

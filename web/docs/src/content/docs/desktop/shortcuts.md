@@ -23,6 +23,8 @@ sidebar:
 | <kbd>Copilot</kbd> | Start, or the app chosen in Settings |
 | Hold <kbd>Copilot</kbd> | Dictation, like holding <kbd>Super</kbd>+<kbd>Alt</kbd> |
 | <kbd>Super</kbd>+<kbd>I</kbd> | Settings |
+| <kbd>Super</kbd>+<kbd>T</kbd> | A new terminal window |
+| <kbd>Super</kbd>+<kbd>E</kbd> | Your home folder in Rover |
 | <kbd>Super</kbd>+<kbd>L</kbd> | Lock the screen |
 | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Esc</kbd> | [Barometer](/apps/barometer/), the system monitor |
 | <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Delete</kbd> | Log out, after asking |
@@ -40,7 +42,7 @@ sidebar:
 | <kbd>Alt</kbd>+<kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>Tab</kbd> | Switch windows on this workspace. In the switcher, <kbd>W</kbd> closes the selected window |
 | <kbd>Alt</kbd>+<kbd>`</kbd> or <kbd>Super</kbd>+<kbd>`</kbd> | Switch between windows of the same app |
 | <kbd>Alt</kbd>+<kbd>Esc</kbd> | Cycle windows directly, without the switcher |
-| <kbd>Alt</kbd>+<kbd>F4</kbd> | Close |
+| <kbd>Alt</kbd>+<kbd>F4</kbd> or <kbd>Super</kbd>+<kbd>Q</kbd> | Close |
 | <kbd>Super</kbd>+<kbd>H</kbd> | Minimize |
 | <kbd>Super</kbd>+<kbd>Up</kbd> | Maximize |
 | <kbd>Super</kbd>+<kbd>Down</kbd> | Restore |
@@ -63,6 +65,9 @@ While [window tiling](/windows/tiling/) is on, these replace snapping with the a
 | <kbd>Super</kbd>+<kbd>F</kbd> | Let the window float, or tile it again |
 | <kbd>Super</kbd>+<kbd>R</kbd> | While scrolling, change the column width |
 | <kbd>Super</kbd>+<kbd>C</kbd> | While scrolling, center the column |
+| <kbd>Super</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd> | While scrolling, make the column as wide as the screen, or give it back its width |
+| <kbd>Super</kbd>+<kbd>Ctrl</kbd>+<kbd>F</kbd> | While scrolling, widen the column over the space the columns beside it leave |
+| <kbd>Super</kbd>+<kbd>Home</kbd> / <kbd>End</kbd> | While scrolling, focus the first or last column; with <kbd>Shift</kbd>, move the column there |
 | <kbd>Super</kbd>+<kbd>W</kbd> | While scrolling, zoom out to the whole strip |
 | <kbd>Super</kbd>+<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Left</kbd> / <kbd>Right</kbd> | While scrolling, stack the window into the next column, or take it out |
 
@@ -131,11 +136,13 @@ The volume, mute, microphone, play, pause, next and previous, brightness, keyboa
 | --- | --- |
 | Three fingers | Pan around the board |
 | Pinch | Zoom. Pinch out over a window to enter it, pinch in to step out |
-| Three fingers sideways, in a window | Move to the window next to it |
-| Three fingers down, in a window | Step out to the whole board |
+| Three fingers, in a window | Move to the window next to it in that direction |
+| Three fingers down, in a window with none above it | Step out to the whole board |
 | Tap with three fingers, then swipe | Move the window under your fingers |
 
 ## Touchscreen gestures
+
+A touchscreen takes the touchpad's gestures too, as if it were one big touchpad: four fingers up and down, three fingers on a board or while scrolling, and two fingers on a board to pan and zoom.
 
 | Gesture | Does |
 | --- | --- |

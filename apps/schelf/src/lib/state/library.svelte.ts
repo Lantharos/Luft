@@ -55,6 +55,10 @@ class Library {
 		return this.installed.find((app) => app.source === 'tool' && app.package === name) ?? null;
 	}
 
+	deb(name: string) {
+		return this.installed.find((app) => app.source === 'debian' && app.package === name) ?? null;
+	}
+
 	system(name: string) {
 		return this.installed.find((app) => app.source === 'system' && app.id === name) ?? null;
 	}

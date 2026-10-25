@@ -9,6 +9,7 @@ use rand::RngExt;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
+use crate::protocols::net;
 use crate::store::now;
 
 const SIGN_IN_TIMEOUT: Duration = Duration::from_secs(300);
@@ -122,7 +123,8 @@ fn identity(id_token: Option<&str>) -> Identity {
 }
 
 fn exchange(provider: Provider, form: &[(&str, &str)]) -> Result<Tokens, String> {
-    let response: TokenResponse = ureq::post(provider.endpoints().token)
+    let response: TokenResponse = net::http()
+        .post(provider.endpoints().token)
         .send_form(form.iter().copied())
         .map_err(|error| format!("Signing in failed: {error}"))?
         .body_mut()

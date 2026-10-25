@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 use socket2::{SockRef, TcpKeepalive};
 
 const CONNECT_TIMEOUT: Duration = Duration::from_secs(15);
+const HTTP_TIMEOUT: Duration = Duration::from_secs(30);
 const KEEPALIVE: TcpKeepalive = TcpKeepalive::new()
     .with_time(Duration::from_secs(45))
     .with_interval(Duration::from_secs(15))
@@ -29,6 +30,17 @@ pub struct Server {
     pub host: String,
     pub port: u16,
     pub security: Security,
+}
+
+// A request that loses its connection, say across suspend, fails instead of waiting forever
+pub fn http() -> &'static ureq::Agent {
+    static AGENT: OnceLock<ureq::Agent> = OnceLock::new();
+    AGENT.get_or_init(|| {
+        ureq::Agent::config_builder()
+            .timeout_global(Some(HTTP_TIMEOUT))
+            .build()
+            .into()
+    })
 }
 
 pub fn tls() -> Arc<ClientConfig> {

@@ -62,6 +62,24 @@ export class TilingCommands {
     this.inStrip((space, window) => space.center(window));
   }
 
+  maximizeColumn(): void {
+    this.inStrip((space, window) => space.maximize(window));
+  }
+
+  expandColumn(): void {
+    this.inStrip((space, window) => space.expand(window));
+  }
+
+  focusEdge(last: boolean): void {
+    const space = this.focusedStrip();
+    const target = space && !this.surroundings.boardShown() ? space.edgeWindow(last) : null;
+    if (target) this.surroundings.activate(target);
+  }
+
+  moveToEdge(last: boolean): void {
+    this.inStrip((space, window) => space.moveToEdge(window, last));
+  }
+
   stack(direction: -1 | 1): void {
     this.inStrip((space, window) => space.stack(window, direction));
   }

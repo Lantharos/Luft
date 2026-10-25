@@ -8,7 +8,18 @@
 #define SWELLS 6
 #define FDN 4
 #define STORM_FROM 0.75f
-#define GAIN 0.9f
+#define GAIN 1.12f
+
+/* Mix levels. Small laptop speakers play roughly 200 Hz to 10 kHz, so the bed carries
+ * the body, the crackle stays below the fizzy top octave, and the low end starts above
+ * the sub-bass that only eats headroom and makes speaker limiters pump. */
+#define BED 0.32f
+#define CRACKLE 0.8f
+#define CRACKLE_TOP 6500.0f
+#define DROPS_TOP 7000.0f
+#define RUMBLE 0.3f
+#define THUNDER_BODY 2.2f
+#define THUNDER_ROLL 2.5f
 
 typedef enum
 {
@@ -58,6 +69,7 @@ typedef struct
   float crack;
   float brown[RAIN_CHANNELS];
   Biquad body[RAIN_CHANNELS];
+  Biquad body_high[RAIN_CHANNELS];
   Biquad roll[RAIN_CHANNELS];
   Biquad crack_high[RAIN_CHANNELS];
 } Thunder;
@@ -69,6 +81,7 @@ struct _RainSynth
   float target_intensity;
   float volume;
   float target_volume;
+  float fade;
   float gust;
   float gust_target;
   gsize gust_hold;
@@ -81,7 +94,11 @@ struct _RainSynth
   Biquad crackle_low[RAIN_CHANNELS];
   float brown[RAIN_CHANNELS];
   Biquad rumble[RAIN_CHANNELS];
+  Biquad rumble_high[RAIN_CHANNELS];
   float bed_gain;
+  float dc_in[RAIN_CHANNELS];
+  float dc_out[RAIN_CHANNELS];
+  Biquad drops_soft[RAIN_CHANNELS];
 
   Drop drops[DROPS];
   Thunder thunder;
@@ -231,6 +248,7 @@ spawn_drop (RainSynth *synth,
       drop->click_decay = decay_per_sample (0.0004f);
       drop->step = 2.0f * G_PI * between (synth, 1400.0f, 4200.0f) / RAIN_RATE;
       drop->chirp = expf (logf (rise) / (seconds * 3.0f * RAIN_RATE));
+      biquad_set (&drop->body, LOWPASS, 5000.0f, 0.7f);
     }
   else
     {
@@ -250,7 +268,8 @@ run_drop (RainSynth *synth,
 
   if (drop->bubble)
     {
-      sample = drop->amp * (drop->envelope * sinf (drop->phase) + 0.4f * drop->click * bipolar (synth));
+      sample = drop->amp * (drop->envelope * sinf (drop->phase) +
+                            0.4f * biquad_run (&drop->body, drop->click * bipolar (synth)));
       drop->phase += drop->step;
       drop->step *= drop->chirp;
       drop->click *= drop->click_decay;
@@ -296,6 +315,7 @@ start_thunder (RainSynth *synth)
   for (guint c = 0; c < RAIN_CHANNELS; c++)
     {
       biquad_set (&thunder->body[c], LOWPASS, 90.0f + 140.0f * (1.0f - distance), 0.7f);
+      biquad_set (&thunder->body_high[c], HIGHPASS, 45.0f, 0.7f);
       biquad_set (&thunder->roll[c], LOWPASS, 300.0f + 300.0f * (1.0f - distance), 0.7f);
       biquad_set (&thunder->crack_high[c], HIGHPASS, 900.0f, 0.7f);
     }
@@ -338,8 +358,9 @@ run_thunder (RainSynth *synth,
       float white = bipolar (synth);
 
       thunder->brown[c] = 0.997f * thunder->brown[c] + 0.04f * white;
-      *out[c] += thunder->gain * envelope * (2.5f * biquad_run (&thunder->body[c], thunder->brown[c]) +
-                                             0.25f * biquad_run (&thunder->roll[c], white));
+      *out[c] += thunder->gain * envelope * (THUNDER_BODY * biquad_run (&thunder->body_high[c],
+                                                                       biquad_run (&thunder->body[c], thunder->brown[c])) +
+                                             THUNDER_ROLL * biquad_run (&thunder->roll[c], white));
       *out[c] += crack * biquad_run (&thunder->crack_high[c], white);
     }
 
@@ -351,13 +372,11 @@ static void
 update_controls (RainSynth *synth)
 {
   float smooth = 1.0f - expf (-(float) CONTROL_BLOCK / (1.5f * RAIN_RATE));
-  float fade = 1.0f - expf (-(float) CONTROL_BLOCK / (0.25f * RAIN_RATE));
   float gust_smooth = 1.0f - expf (-(float) CONTROL_BLOCK / (2.5f * RAIN_RATE));
   float storm;
   float cutoff;
 
   synth->intensity += (synth->target_intensity - synth->intensity) * smooth;
-  synth->volume += (synth->target_volume - synth->volume) * fade;
 
   if (synth->gust_hold <= CONTROL_BLOCK)
     {
@@ -419,10 +438,11 @@ rain_synth_render (RainSynth *synth,
             }
 
           synth->brown[c] = 0.998f * synth->brown[c] + 0.02f * white;
-          dry[c] += 0.22f * synth->bed_gain * bed;
-          dry[c] += (0.35f + 0.4f * intensity) * synth->gust * biquad_run (&synth->crackle_low[c],
-                                                            biquad_run (&synth->crackle_high[c], impulse));
-          dry[c] += 0.3f * intensity * intensity * synth->gust * biquad_run (&synth->rumble[c], synth->brown[c]);
+          dry[c] += BED * synth->bed_gain * bed;
+          dry[c] += CRACKLE * (0.35f + 0.4f * intensity) * synth->gust *
+                    biquad_run (&synth->crackle_low[c], biquad_run (&synth->crackle_high[c], impulse));
+          dry[c] += RUMBLE * intensity * intensity * synth->gust *
+                    biquad_run (&synth->rumble[c], biquad_run (&synth->rumble_high[c], synth->brown[c]));
         }
 
       if (uniform (synth) < (3.0f + 30.0f * intensity) / RAIN_RATE)
@@ -434,6 +454,8 @@ rain_synth_render (RainSynth *synth,
           if (synth->drops[i].active)
             run_drop (synth, &synth->drops[i], &drops[0], &drops[1]);
         }
+      for (guint c = 0; c < RAIN_CHANNELS; c++)
+        drops[c] = biquad_run (&synth->drops_soft[c], drops[c]);
 
       for (guint k = 0; k < FDN; k++)
         {
@@ -454,11 +476,17 @@ rain_synth_render (RainSynth *synth,
       if (synth->thunder.active)
         run_thunder (synth, &dry[0], &dry[1]);
 
+      /* Volume glides every sample, so moving the slider never steps in 64-sample stairs. */
+      synth->volume += (synth->target_volume - synth->volume) * synth->fade;
       gain = GAIN * (1.0f - 0.45f * intensity) * synth->volume;
       for (guint c = 0; c < RAIN_CHANNELS; c++)
         {
           float sample = dry[c] + drops[c] + 0.3f * wet[c];
-          stereo[frame * RAIN_CHANNELS + c] = tanhf (sample * gain);
+
+          /* A DC blocker keeps the leaky brown noise from parking an offset on the speaker. */
+          synth->dc_out[c] = sample - synth->dc_in[c] + 0.9985f * synth->dc_out[c];
+          synth->dc_in[c] = sample;
+          stereo[frame * RAIN_CHANNELS + c] = tanhf (synth->dc_out[c] * gain);
         }
     }
 }
@@ -493,6 +521,7 @@ rain_synth_new (guint32 seed)
   synth->random = seed ? seed : 0x9e3779b9;
   synth->gust = 1.0f;
   synth->gust_target = 1.0f;
+  synth->fade = 1.0f - expf (-1.0f / (0.25f * RAIN_RATE));
   synth->thunder_wait = (gsize) (between (synth, 6.0f, 15.0f) * RAIN_RATE);
 
   for (guint c = 0; c < RAIN_CHANNELS; c++)
@@ -500,8 +529,10 @@ rain_synth_new (guint32 seed)
       biquad_set (&synth->bed_high[c], HIGHPASS, 150.0f, 0.7f);
       biquad_set (&synth->bed_low[c], LOWPASS, 6000.0f, 0.6f);
       biquad_set (&synth->crackle_high[c], HIGHPASS, 1800.0f, 0.7f);
-      biquad_set (&synth->crackle_low[c], LOWPASS, 9000.0f, 0.7f);
-      biquad_set (&synth->rumble[c], LOWPASS, 260.0f, 0.7f);
+      biquad_set (&synth->crackle_low[c], LOWPASS, CRACKLE_TOP, 0.7f);
+      biquad_set (&synth->rumble[c], LOWPASS, 340.0f, 0.7f);
+      biquad_set (&synth->rumble_high[c], HIGHPASS, 55.0f, 0.7f);
+      biquad_set (&synth->drops_soft[c], LOWPASS, DROPS_TOP, 0.6f);
     }
 
   for (guint k = 0; k < FDN; k++)

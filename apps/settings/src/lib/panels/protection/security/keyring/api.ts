@@ -52,11 +52,12 @@ export interface Keyring {
 	itemCount: number;
 	chip: Chip;
 	lockWithScreen: boolean;
-	access: Access | null;
 	ssh: Ssh | null;
 }
 
 export const keyring = () => invoke<Keyring | null>('keyring');
+// The keyring asks to confirm it's you before telling which apps keep secrets, so only ask when someone opens the list
+export const keyringAccess = () => invoke<Access | null>('keyring_access', {}, WAIT_FOR_PROMPT);
 export const onKeyring = (callback: (keyring: Keyring) => void) => listen<Keyring>('keyring.changed', callback);
 
 export const lock = () => invoke<void>('keyring_lock');

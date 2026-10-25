@@ -49,6 +49,16 @@ AppImages run in a sandbox, like Flatpak apps:
 
 An AppImage that closes right after it starts, or looks for a USB or serial device, may need more. Luft then tells you, and **Review access** opens Schelf, where you can give it full access. With full access it runs as it would without Luft, and keeps its data where it always did, outside its sandbox's folder, so it starts without the settings it had in its sandbox.
 
+## Apps from .deb files
+
+Some apps only come as a `.deb` file, made for Debian and Ubuntu. Open one and Schelf first looks for the same app on Flathub: when it's there, **Install from Flathub** is the better way, sandboxed and keeping itself up to date.
+
+Otherwise, **Install the .deb anyway** puts it in a [Toolbox](https://containertoolbx.org) container with Ubuntu 26.04, called `luft-ubuntu`, along with the Ubuntu software it needs. The first one downloads Ubuntu itself, a few hundred megabytes. The app gets a place in Start with its own icon and opens like any other, and links it opens go to your browser.
+
+- It isn't sandboxed: it can read and change everything in your home folder, as it would on Ubuntu.
+- Packages that add their maker's software source when installed, as many do, get updates in Schelf. Others stay at their version until you open a newer file.
+- Apps that need drivers or system services of their own don't work this way.
+
 ## Command-line tools
 
 Command-line tools come from Fedora and go into a [Toolbox](https://containertoolbx.org) container called `fedora-toolbox-45`. Search for them in Schelf, or open an `.rpm` file. Each command gets a small launcher in `~/.local/bin`, so it runs in [Tern](/apps/tern/) like any other, without entering the container.
@@ -124,7 +134,7 @@ The `schelf` command, or `sch` for short, does the same as the app:
 | Command | Does |
 | --- | --- |
 | `schelf install ripgrep` | Installs an app or a tool, or several at once (`schelf add` works too) |
-| `schelf install ./app.AppImage` | Installs a `.rpm`, `.AppImage`, `.flatpakref` or `.flatpakrepo` file |
+| `schelf install ./app.AppImage` | Installs a `.rpm`, `.deb`, `.AppImage`, `.flatpak`, `.flatpakref` or `.flatpakrepo` file |
 | `schelf remove ripgrep` | Removes something you installed |
 | `schelf search image editor` | Looks on Flathub, in Fedora and your software sources at once, and through your AppImages |
 | `schelf update` | Updates apps, AppImages and tools. Luft itself updates in [Settings](/system/updates/) |

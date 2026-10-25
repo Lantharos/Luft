@@ -8,8 +8,10 @@ const THEMED_PROPERTIES = [
     ['-kestrel-glass-saturation', 'saturation'],
 ];
 
-const solidSurfaces = new Set();
+const surfaces = new Set();
+const cornered = new Set();
 let solid = false;
+let square = false;
 
 function makeSolid({actor, effect, corners}, enabled) {
     effect.enabled = !enabled;
@@ -25,8 +27,36 @@ export function setSolidSurfaces(enabled) {
     if (solid === enabled)
         return;
     solid = enabled;
-    for (const surface of solidSurfaces)
+    for (const surface of surfaces)
         makeSolid(surface, enabled);
+}
+
+// Pills keep their shape when window corners are square, like the controls inside surfaces
+function followCorners({actor, effect, corners}) {
+    const squared = square && corners !== PILL;
+    effect.set_property('corner-radius', squared ? 0 : corners);
+    if (squared)
+        actor.add_style_class_name('kestrel-square-surface');
+    else
+        actor.remove_style_class_name('kestrel-square-surface');
+}
+
+export function setSquareSurfaces(enabled) {
+    if (square === enabled)
+        return;
+    square = enabled;
+    for (const surface of [...surfaces, ...cornered])
+        followCorners(surface);
+}
+
+/* Lets a backdrop that isn't a surface, such as the preview of where a window snaps, square its corners
+ * with the windows' */
+export function followWindowCorners(actor, effect, corners) {
+    const backdrop = {actor, effect, corners};
+    cornered.add(backdrop);
+    if (square)
+        followCorners(backdrop);
+    actor.connect('destroy', () => cornered.delete(backdrop));
 }
 
 function followTheme(actor, effect) {
@@ -59,10 +89,12 @@ export function blurBackdrop(actor, corners) {
 
 export function blurSurface(actor, corners = 24) {
     const surface = {actor, effect: blurBackdrop(actor, corners), corners};
-    solidSurfaces.add(surface);
+    surfaces.add(surface);
     if (solid)
         makeSolid(surface, true);
-    actor.connect('destroy', () => solidSurfaces.delete(surface));
+    if (square)
+        followCorners(surface);
+    actor.connect('destroy', () => surfaces.delete(surface));
 }
 
 export function styleSurface(actor, corners = 24) {

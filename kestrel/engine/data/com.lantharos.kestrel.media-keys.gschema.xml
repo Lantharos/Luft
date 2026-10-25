@@ -133,8 +133,12 @@
       <summary>Open the music player</summary>
     </key>
     <key name="home" type="as">
-      <default>['XF86Explorer']</default>
+      <default>['XF86Explorer', '&lt;Super&gt;e']</default>
       <summary>Open the home folder</summary>
+    </key>
+    <key name="terminal" type="as">
+      <default>['&lt;Super&gt;t']</default>
+      <summary>Open a terminal</summary>
     </key>
     <key name="search" type="as">
       <default>['XF86Search']</default>

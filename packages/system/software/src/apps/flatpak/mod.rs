@@ -17,7 +17,7 @@ pub use full_access::{has_full_access, set_full_access};
 pub use installed::{Installed, installed};
 pub use permissions::{Permissions, permissions};
 pub use remotes::{FLATHUB, ensure_flathub};
-pub use transaction::{add_remote, install, install_ref, uninstall, update};
+pub use transaction::{add_remote, install, install_bundle, install_ref, uninstall, update};
 pub use updates::{Update, updates};
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Hash, Debug)]

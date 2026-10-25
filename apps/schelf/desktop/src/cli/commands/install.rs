@@ -145,7 +145,10 @@ fn notes(plan: &Plan) -> Vec<String> {
             "Open it from Start, or run {}.",
             ink.bold(format!("flatpak run {id}"))
         )],
-        Job::InstallFlatpakRef { .. } | Job::InstallAppImage { .. } => {
+        Job::InstallFlatpakRef { .. }
+        | Job::InstallFlatpakBundle { .. }
+        | Job::InstallDeb { .. }
+        | Job::InstallAppImage { .. } => {
             vec!["Open it from Start.".to_owned()]
         }
         Job::InstallSystemPackageFile {

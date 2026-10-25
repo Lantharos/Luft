@@ -12,7 +12,7 @@ use crate::task::{CANCELLED, Task};
 
 const LISTEN_FD: i32 = 3;
 const UNREACHABLE: &str =
-    "Couldn't reach Fedora's container registry. Check your connection and try again.";
+    "Couldn't reach the container registry. Check your connection and try again.";
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -86,7 +86,7 @@ fn follow(stream: UnixStream, task: Task) -> Result<(), String> {
             continue;
         };
         if let Some(error) = event.error {
-            eprintln!("Pulling the tools image: {error}");
+            eprintln!("Pulling a container image: {error}");
             return Err(UNREACHABLE.into());
         }
         if let Some(fraction) = event

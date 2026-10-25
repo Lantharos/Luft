@@ -226,11 +226,13 @@ export class Tiler {
         window.connect('notify::minimized', () => this.minimizedChanged(window)),
         window.connect('workspace-changed', () => this.homeChanged(window)),
         window.connect('notify::maximized-horizontally', () => this.stretchChanged(window)),
+        window.connect('size-changed', () => this.sizeChanged(window)),
         window.connect('notify::maximized-vertically', () => this.stretchChanged(window)),
         window.connect('notify::fullscreen', () => this.stretchChanged(window)),
         window.connect('notify::transient-for', () => this.natureChanged(window)),
         window.connect('notify::window-type', () => this.natureChanged(window)),
         window.connect('notify::resizeable', () => this.natureChanged(window)),
+        window.connect('notify::skip-taskbar', () => this.natureChanged(window)),
       ],
     };
     this.tracked.set(window, record);
@@ -297,6 +299,14 @@ export class Tiler {
 
   private natureChanged(window: Meta.Window): void {
     const record = this.tracked.get(window)!;
+    // Apps such as Chromium and Electron ones can open fixed in size and only then become resizable
+    if (!record.space && record.floating && !floatsByNature(window) && !this.floatedByHand.has(window) &&
+      !this.memory.floats(appKey(window)) && !this.unconfigured.has(window) && !window.minimized) {
+      record.floating = false;
+      unstretch(window);
+      this.arrange(this.attach(window, null), true);
+      return;
+    }
     if (!record.space || !floatsByNature(window)) return;
     const space = record.space;
     space.release(window);
@@ -353,6 +363,11 @@ export class Tiler {
     if (home !== record.space) this.moveTo(window, home, null);
   }
 
+  private sizeChanged(window: Meta.Window): void {
+    const space = this.tracked.get(window)?.space;
+    if (space instanceof ScrollingSpace && window !== this.held && !stretched(window) && !this.surroundings.boardShown()) space.widened(window);
+  }
+
   private stretchChanged(window: Meta.Window): void {
     const space = this.tracked.get(window)?.space;
     if (!space) return;
@@ -385,6 +400,14 @@ export class Tiler {
     const box = record.restore ?? this.restoredBox(window);
     this.surroundings.morph(window);
     window.move_resize_frame(true, box.x, box.y, box.width, box.height);
+  }
+
+  // The size a tiled window has while floating, which the board shows it at instead of its tile
+  floatingSize(window: Meta.Window): Pick<Box, 'width' | 'height'> | null {
+    const record = this.tracked.get(window);
+    if (!record?.space || !window.allows_resize()) return null;
+    const { width, height } = record.restore ?? this.restoredBox(window);
+    return { width, height };
   }
 
   private restoredBox(window: Meta.Window): Box {

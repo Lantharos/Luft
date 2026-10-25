@@ -6,6 +6,7 @@ Schelf is where you get apps on Luft. It finds, installs, updates and removes ap
 |--------|---------------|
 | Flathub | Your account; Flathub is added on first use |
 | AppImage | Your account, in `~/Applications`, with a menu entry, icon and automatic updates, running in a sandbox |
+| `.deb` files | Your account, in an Ubuntu 26.04 Toolbox container called `luft-ubuntu`, with menu entries and icons copied out, unless the app is on Flathub too, which Schelf offers first |
 | Fedora packages as command-line tools | Your account, in the default Toolbox container, with launchers in `~/.local/bin` |
 | System packages (`--system`) | Everyone, merged over Luft's image as a system extension and rebuilt with each update ([how](../../docs/system-packages.md)), from Fedora, added software sources such as a vendor's RPM repository or a COPR, and desktop-app `.rpm` files |
 | System software sources | Everyone, through PackageKit, on regular Fedora installs only |
@@ -24,7 +25,7 @@ bun run desktop:bundle   # Sabine bundle
 sabine install --bundle .
 ```
 
-Installing makes Schelf the app for `.flatpakref`, `.flatpakrepo`, `.rpm` and `.AppImage` files and for `schelf:` links (`schelf:updates`, `schelf:installed`, `schelf:search?<query>`).
+Installing makes Schelf the app for `.flatpak`, `.flatpakref`, `.deb`, `.flatpakrepo`, `.rpm` and `.AppImage` files and for `schelf:` links (`schelf:updates`, `schelf:installed`, `schelf:search?<query>`).
 
 ## Command line
 

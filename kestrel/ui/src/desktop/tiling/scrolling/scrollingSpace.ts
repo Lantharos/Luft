@@ -96,6 +96,26 @@ export class ScrollingSpace implements Space {
     this.arrange(false, window);
   }
 
+  /** An app that keeps its window wider than its column, as ones with a minimum width do, widens the column
+   * instead of covering the next one. */
+  widened(window: Meta.Window): void {
+    if (this.swipeStart !== null || this.zoomed || !this.widen(window)) return;
+    this.arrange(true);
+  }
+
+  private widen(window: Meta.Window): boolean {
+    const box = this.boxes.get(window);
+    const frame = window.get_frame_rect();
+    if (!box || frame.width <= box.width + 1) return false;
+    this.strip.setWidth(window, frame.width);
+    return true;
+  }
+
+  // Windows that widened during a swipe or the overview get their columns widened once it ends
+  private widenAll(): void {
+    if (this.strip.windows.filter(window => this.widen(window)).length) this.arrange(true);
+  }
+
   drop(window: Meta.Window, onto: Meta.Window): void {
     this.strip.remove(window);
     this.strip.focus(onto);
@@ -115,6 +135,27 @@ export class ScrollingSpace implements Space {
     if (!this.strip.focus(window)) return;
     this.strip.cycleWidth();
     this.arrange(true);
+  }
+
+  maximize(window: Meta.Window): void {
+    if (!this.strip.focus(window)) return;
+    this.strip.maximize();
+    this.arrange(true);
+  }
+
+  expand(window: Meta.Window): void {
+    if (!this.strip.focus(window)) return;
+    this.syncView();
+    this.strip.expand();
+    this.arrange(true);
+  }
+
+  edgeWindow(last: boolean): Meta.Window | null {
+    return this.strip.edge(last);
+  }
+
+  moveToEdge(window: Meta.Window, last: boolean): void {
+    if (this.strip.focus(window) && this.strip.moveColumnToEdge(last)) this.arrange(true);
   }
 
   center(window: Meta.Window): void {
@@ -150,6 +191,7 @@ export class ScrollingSpace implements Space {
     this.strip.offset = snap.offset;
     this.strip.focused = snap.column;
     this.arrange(true, null, velocity);
+    this.widenAll();
     return this.strip.focusedWindow;
   }
 
@@ -159,7 +201,10 @@ export class ScrollingSpace implements Space {
     this.syncView();
     this.boxes = this.strip.layout();
     if (zoomed) this.scene.zoom(this.overviewBoxes(), this.overviewScale());
-    else this.scene.unzoom(this.boxes);
+    else {
+      this.scene.unzoom(this.boxes);
+      this.widenAll();
+    }
   }
 
   windowAt(x: number, y: number): Meta.Window | null {

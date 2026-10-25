@@ -101,6 +101,8 @@
 		height: 212px;
 		aspect-ratio: 16 / 10;
 		border-radius: 10px;
+		/* overflow alone lets composited children, such as the taskbar, keep square corners */
+		clip-path: inset(0 round 10px);
 		background: var(--control);
 		box-shadow: 0 8px 24px var(--shadow-faint);
 	}
@@ -154,6 +156,7 @@
 		right: 0;
 		bottom: 0;
 		left: 0;
+		border-radius: 0 0 10px 10px;
 		background: color-mix(in oklab, var(--raised) 70%, transparent);
 	}
 </style>

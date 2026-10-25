@@ -1,4 +1,5 @@
 mod appimages;
+mod debian;
 mod flatpaks;
 pub mod full_access;
 pub mod sources;
@@ -21,6 +22,7 @@ pub enum Source {
     Package,
     AppImage,
     Tool,
+    Debian,
     System,
 }
 
@@ -64,7 +66,9 @@ pub fn installed() -> Vec<InstalledApp> {
         let packages = scope.spawn(fedora::installed);
         let tools = (!fedora::available()).then(|| scope.spawn(tools::installed));
         let system = scope.spawn(system::installed);
+        let debs = scope.spawn(debian::installed);
         let mut apps = appimages::installed();
+        apps.extend(debs.join().unwrap_or_default());
         apps.extend(flatpaks.join().unwrap_or_default());
         apps.extend(packages.join().unwrap_or_default());
         if let Some(tools) = tools {

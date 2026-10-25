@@ -16,17 +16,25 @@ pub enum Origin {
     Flathub,
     Fedora,
     AppImage,
+    Debian,
     System,
 }
 
 impl Origin {
-    pub const ALL: [Self; 4] = [Self::Flathub, Self::Fedora, Self::AppImage, Self::System];
+    pub const ALL: [Self; 5] = [
+        Self::Flathub,
+        Self::Fedora,
+        Self::AppImage,
+        Self::Debian,
+        Self::System,
+    ];
 
     pub fn flag(self) -> &'static str {
         match self {
             Self::Flathub => "flathub",
             Self::Fedora => "fedora",
             Self::AppImage => "appimage",
+            Self::Debian => "deb",
             Self::System => "system",
         }
     }
@@ -36,6 +44,7 @@ impl Origin {
             Self::Flathub => "Flathub",
             Self::Fedora => "Fedora",
             Self::AppImage => "AppImage",
+            Self::Debian => "a .deb file",
             Self::System => "System package",
         }
     }
@@ -43,6 +52,7 @@ impl Origin {
     pub fn heading(self) -> &'static str {
         match self {
             Self::AppImage => "AppImages",
+            Self::Debian => "Apps from .deb files",
             Self::System => "System packages",
             _ => self.title(),
         }
@@ -53,6 +63,7 @@ impl Origin {
             Source::Flatpak => Self::Flathub,
             Source::Package | Source::Tool => Self::Fedora,
             Source::AppImage => Self::AppImage,
+            Source::Debian => Self::Debian,
             Source::System => Self::System,
         }
     }

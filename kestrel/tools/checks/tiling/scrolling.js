@@ -99,6 +99,33 @@ async function checkSwipe([first, , third]) {
   await restingTiles();
 }
 
+async function checkColumns([first, second, third]) {
+  await focus(second);
+  const before = frame(second).width;
+  await chord(SUPER, Clutter.KEY_Shift_L, Clutter.KEY_f);
+  await eventually(() => near(frame(second).width, columnWidth(1), 2) && visible(second), 'Super+Shift+F makes the column as wide as the screen');
+  await chord(SUPER, Clutter.KEY_Shift_L, Clutter.KEY_f);
+  await eventually(() => near(frame(second).width, before, 2), 'Super+Shift+F again gives it back its width');
+  await restingTiles();
+  await chord(SUPER, Clutter.KEY_Control_L, Clutter.KEY_f);
+  await eventually(() => {
+    const shown = [first, second, third].filter(visible);
+    const filled = shown.reduce((sum, window) => sum + frame(window).width, 0) + gap() * (shown.length - 1);
+    return shown.length >= 2 && shown.includes(second) && near(filled, area().width, 3);
+  }, 'Super+Ctrl+F widens the column until the columns in view fill the screen');
+  await restingTiles();
+  await chord(SUPER, Clutter.KEY_Home);
+  await eventually(() => first.has_focus() && visible(first), 'Super+Home focuses the first column');
+  await chord(SUPER, Clutter.KEY_End);
+  await eventually(() => third.has_focus() && visible(third), 'Super+End focuses the last column');
+  await focus(first);
+  await chord(SUPER, Clutter.KEY_Shift_L, Clutter.KEY_End);
+  await eventually(() => shownX(first) > shownX(third) && visible(first), 'Super+Shift+End moves the column to the end of the strip');
+  await chord(SUPER, Clutter.KEY_Shift_L, Clutter.KEY_Home);
+  await eventually(() => shownX(first) < shownX(second) && visible(first), 'Super+Shift+Home moves it back to the start');
+  await restingTiles();
+}
+
 async function checkOverview(windows) {
   await chord(SUPER, Clutter.KEY_w);
   await eventually(() => named('kestrel-strip-overview') && windows.every(window => actorOf(window).scale_x < 0.99), 'Super+W zooms out to the whole strip');
@@ -112,6 +139,16 @@ async function checkOverview(windows) {
   await chord(SUPER, Clutter.KEY_w);
   await eventually(() => !named('kestrel-strip-overview') && windows.every(window => near(actorOf(window).scale_x, 1, 0.001)), 'Super+W again zooms back in');
   await restingTiles();
+}
+
+async function checkMinimumWidth(windows) {
+  const {window: wide} = await openWindow('Wide', 900, 420, 'wide');
+  await focus(wide);
+  await eventually(() => frame(wide).width >= 900, 'a window with a minimum width keeps it');
+  await restingTiles();
+  const columns = [...windows, wide].sort((a, b) => shownX(a) - shownX(b));
+  require(columns.every((window, index) => index === 0 || shownX(window) >= shownX(columns[index - 1]) + frame(columns[index - 1]).width + gap() - 2),
+    'its column widens for it instead of the next column covering it');
 }
 
 async function checkAtEnd([first, , third]) {
@@ -128,6 +165,8 @@ export async function run() {
     await checkFocus(windows);
     await checkStacking(windows);
     await checkSwipe(windows);
+    await checkColumns(windows);
+    await checkMinimumWidth(windows);
     await checkOverview(windows);
     await checkAtEnd(windows);
   } finally {

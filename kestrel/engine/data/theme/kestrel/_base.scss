@@ -26,6 +26,7 @@ stage { @include glass-shading; }
 .kestrel-solid-22.kestrel-solid-22 { border-radius: 22px; }
 .kestrel-solid-24.kestrel-solid-24 { border-radius: 24px; }
 .kestrel-solid-999.kestrel-solid-999 { border-radius: 999px; }
+.kestrel-square-surface.kestrel-square-surface.kestrel-square-surface { border-radius: 0; }
 
 .kestrel-closing-selection { background-color: fill(0.16); }
 .kestrel-glass .kestrel-closing-selection { background-color: fill(0.18); }

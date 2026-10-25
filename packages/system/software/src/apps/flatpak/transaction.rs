@@ -35,6 +35,17 @@ pub fn install_ref(installation: Installation, file: &Path, task: Task) -> Resul
     )
 }
 
+/// Installs an app from a `.flatpak` bundle file, along with the runtime it
+/// needs from the remotes already added.
+pub fn install_bundle(installation: Installation, file: &Path, task: Task) -> Result<(), String> {
+    run(
+        command(installation)
+            .args(["install", "-y", "--or-update", "--bundle", "--"])
+            .arg(file),
+        task,
+    )
+}
+
 pub fn update(installation: Installation, references: &[&str], task: Task) -> Result<(), String> {
     let references = references
         .iter()

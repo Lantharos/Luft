@@ -68,6 +68,10 @@ export class Board implements BoardActions {
   private presented: Canvas | null = null;
   private readonly managerSignal: number;
   private cancelRestore: (() => void) | null = null;
+  private aside: Meta.Window | null = null;
+  private restoring = false;
+  // The size a window takes on the board when it has one of its own apart from its current size, as tiled windows do
+  ownSize: (window: Meta.Window) => Pick<Box, 'width' | 'height'> | null = () => null;
 
   private readonly unwatchScheme: () => void;
 
@@ -115,6 +119,11 @@ export class Board implements BoardActions {
 
   get shown(): boolean {
     return this.presented !== null;
+  }
+
+  // Shown, or still giving windows back their sizes on the way in, when nothing else should lay them out
+  get holding(): boolean {
+    return this.shown || this.restoring;
   }
 
   get cornerClearance(): number {
@@ -197,16 +206,19 @@ export class Board implements BoardActions {
       return;
     }
     canvas.shown = true;
+    this.aside = null;
     const windows = boardWindows(workspace);
     for (const window of windows) setUnconstrained(window, true);
-    this.cancelRestore = restoreSizes(windows, () => {
+    this.restoring = true;
+    this.cancelRestore = restoreSizes(windows, window => this.ownSize(window), () => {
+      this.restoring = false;
       this.cancelRestore = null;
       if (canvas.shown && workspace.active) this.layOut(workspace, canvas);
       endGlideTracking();
     });
   }
 
-  exit(): void {
+  exit(except: Meta.Window | null = null): void {
     const canvas = this.presented;
     const workspace = this.presentedWorkspace();
     if (!canvas || !workspace) {
@@ -214,19 +226,37 @@ export class Board implements BoardActions {
       return;
     }
     this.collisions.end();
-    const windows = boardWindows(workspace).filter(window => !window.minimized);
+    const windows = boardWindows(workspace).filter(window => !window.minimized && window !== except);
     const view = copyView({ x: 0, y: 0, scale: 1 }, this.camera.shown);
     const viewport = { ...this.viewport };
     const workArea = this.host.workArea(this.host.primary()?.index ?? 0);
     canvas.layout.clear();
     for (const window of windows) canvas.layout.set(window, frameBox(window));
-    const entered = canvas.entered && !canvas.entered.minimized ? canvas.entered : null;
+    const entered = canvas.entered && !canvas.entered.minimized && canvas.entered !== except ? canvas.entered : null;
     const fitted = entered ?? windows.find(window => fits(view, frameBox(window), viewport, WINDOW_PADDING)) ?? null;
     const plan = planExit([...canvas.layout], view, viewport, workArea, fitted);
     canvas.shown = false;
     this.present(null, true);
     putBack(plan, canvas, view, viewport, workArea);
     endGlideTracking();
+  }
+
+  // Full screen can't show through the board's view, so the board steps aside until the window leaves it
+  setAside(window: Meta.Window, before: Box): void {
+    const canvas = this.presented;
+    if (!canvas) return;
+    this.exit(window);
+    canvas.layout.set(window, before);
+    this.aside = window;
+  }
+
+  bringBack(window: Meta.Window): void {
+    if (window !== this.aside) return;
+    this.aside = null;
+    const workspace = window.get_workspace();
+    const canvas = this.canvasOf(workspace);
+    if (workspace?.active && canvas && !canvas.shown) this.enter();
+    else if (canvas) this.release(window, canvas);
   }
 
   fitAll(): void {
@@ -256,8 +286,8 @@ export class Board implements BoardActions {
     this.focus.release();
   }
 
-  navigate(directionX: number, directionY: number): void {
-    this.focus.navigate(directionX, directionY);
+  navigate(directionX: number, directionY: number): boolean {
+    return this.focus.navigate(directionX, directionY);
   }
 
   reveal(window: Meta.Window): void {

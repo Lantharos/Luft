@@ -64,6 +64,7 @@ declare module 'resource:///com/lantharos/kestrel/ui/kestrelGlass.js' {
   export function blurBackdrop(actor: import('gi://St').default.Widget, corners: number): import('gi://Shell').default.BlurEffect;
   export function freezeSelection(actor: import('gi://Clutter').default.Actor): () => void;
   export function setSolidSurfaces(enabled: boolean): void;
+  export function setSquareSurfaces(enabled: boolean): void;
 }
 
 declare module 'resource:///com/lantharos/kestrel/ui/kestrelTheme.js' {

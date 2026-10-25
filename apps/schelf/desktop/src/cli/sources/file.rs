@@ -7,7 +7,14 @@ use crate::library::sources::Bundled;
 use crate::operations::{Job, Request};
 use luft_software::system::repositories::Described;
 
-const EXTENSIONS: [&str; 4] = [".rpm", ".appimage", ".flatpakref", ".flatpakrepo"];
+const EXTENSIONS: [&str; 6] = [
+    ".rpm",
+    ".deb",
+    ".appimage",
+    ".flatpak",
+    ".flatpakref",
+    ".flatpakrepo",
+];
 
 pub fn named(target: &str) -> bool {
     let lowered = target.to_lowercase();
@@ -27,6 +34,7 @@ pub struct Prepared {
 fn job(opened: &Opened) -> Job {
     match opened {
         Opened::FlatpakRef { path, .. } => Job::InstallFlatpakRef { path: path.into() },
+        Opened::FlatpakBundle { path, .. } => Job::InstallFlatpakBundle { path: path.into() },
         Opened::FlatpakRepo { path, name, .. } => Job::AddFlatpakRepo {
             path: path.into(),
             name: name.clone(),
@@ -47,14 +55,17 @@ fn job(opened: &Opened) -> Job {
         },
         Opened::Package { path, .. } => Job::InstallToolFile { path: path.clone() },
         Opened::AppImage { path, .. } => Job::InstallAppImage { path: path.into() },
+        Opened::Deb { path, .. } => Job::InstallDeb { path: path.into() },
     }
 }
 
 fn title(opened: &Opened) -> &str {
     match opened {
-        Opened::FlatpakRef { title, .. } | Opened::FlatpakRepo { title, .. } => title,
+        Opened::FlatpakRef { title, .. }
+        | Opened::FlatpakBundle { title, .. }
+        | Opened::FlatpakRepo { title, .. } => title,
         Opened::Package { package, .. } => package,
-        Opened::AppImage { name, .. } => name,
+        Opened::AppImage { name, .. } | Opened::Deb { name, .. } => name,
     }
 }
 
@@ -70,8 +81,21 @@ pub fn prepare(target: &str) -> Result<Prepared, String> {
         Opened::Package {
             installed: true,
             ..
+        } | Opened::Deb {
+            installed: true,
+            ..
         }
     );
+    if let Opened::Deb {
+        flathub: Some(flathub),
+        ..
+    } = &opened
+    {
+        eprintln!(
+            "{} is on Flathub too, where it's sandboxed and keeps itself up to date: schelf install {} installs that instead.",
+            flathub.name, flathub.id
+        );
+    }
     let verb = if matches!(opened, Opened::FlatpakRepo { .. }) {
         Verb::AddSource
     } else {

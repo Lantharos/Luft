@@ -20,7 +20,7 @@ export interface TilingContext {
   morph(window: Meta.Window): void;
   activate(window: Meta.Window): void;
   keybindings: Keybindings;
-  board: { readonly shown: boolean; step(directionX: number, directionY: number): void };
+  board: { readonly shown: boolean; readonly holding: boolean; step(directionX: number, directionY: number): void; ownSize: (window: Meta.Window) => Pick<Box, 'width' | 'height'> | null };
   addChrome(actor: Clutter.Actor): void;
   removeChrome(actor: Clutter.Actor): void;
   canInteract(): boolean;
@@ -37,8 +37,9 @@ export class Tiling {
 
   constructor(private readonly context: TilingContext) {
     const monitors = () => context.monitors();
-    const boardShown = () => context.board.shown;
+    const boardShown = () => context.board.holding;
     this.tiler = new Tiler({ monitors, primaryIndex: context.primaryIndex, workArea: context.workArea, morph: context.morph, boardShown });
+    context.board.ownSize = window => this.tiler.floatingSize(window);
     this.commands = new TilingCommands(this.tiler, {
       monitors, activate: context.activate, boardShown,
       boardStep: (directionX, directionY) => context.board.step(directionX, directionY),

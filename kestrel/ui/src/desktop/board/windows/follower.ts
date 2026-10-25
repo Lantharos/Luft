@@ -1,7 +1,8 @@
 import Meta from 'gi://Meta';
+import type Mtk from 'gi://Mtk';
 
 import type { Board, Canvas } from '../board.js';
-import { frameBox } from '../../windows/frames.js';
+import { boxOf, frameBox } from '../../windows/frames.js';
 import { intersection, screenBox } from '../view/geometry.js';
 import { isBoardWindow } from './windows.js';
 
@@ -24,7 +25,7 @@ export class Follower {
     const { window_manager: wm, display, workspace_manager: manager } = global;
     this.signals = [
       [wm, wm.connect('map', (_wm, actor: Meta.WindowActor) => this.mapped(actor.meta_window))],
-      [wm, wm.connect('size-change', (_wm, actor: Meta.WindowActor, change: Meta.SizeChange) => this.sizeChanged(actor.meta_window, change))],
+      [wm, wm.connect('size-change', (_wm, actor: Meta.WindowActor, change: Meta.SizeChange, before: Mtk.Rectangle) => this.sizeChanged(actor.meta_window, change, before))],
       [display, display.connect('notify::focus-window', () => this.focused(display.focus_window))],
       [manager, manager.connect('workspace-removed', () => this.prune())],
     ];
@@ -75,7 +76,11 @@ export class Follower {
     later(() => this.board.release(window, canvas));
   }
 
-  private sizeChanged(window: Meta.Window | null, change: Meta.SizeChange): void {
+  private sizeChanged(window: Meta.Window | null, change: Meta.SizeChange, before: Mtk.Rectangle): void {
+    if (window && change === Meta.SizeChange.UNFULLSCREEN) {
+      later(() => this.board.bringBack(window));
+      return;
+    }
     const workspace = this.board.presentedWorkspace();
     if (!window || !workspace || !isBoardWindow(window) || !window.located_on_workspace(workspace)) return;
     if (change === Meta.SizeChange.MAXIMIZE) {
@@ -85,7 +90,10 @@ export class Follower {
         this.board.enterWindow(window);
       });
     } else if (change === Meta.SizeChange.FULLSCREEN) {
-      later(() => this.board.exit());
+      const box = boxOf(before);
+      later(() => {
+        if (window.is_fullscreen()) this.board.setAside(window, box);
+      });
     }
   }
 

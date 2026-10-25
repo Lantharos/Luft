@@ -136,8 +136,8 @@ The volume, mute, microphone, play, pause, next and previous, brightness, keyboa
 | --- | --- |
 | Three fingers | Pan around the board |
 | Pinch | Zoom. Pinch out over a window to enter it, pinch in to step out |
-| Three fingers sideways, in a window | Move to the window next to it |
-| Three fingers down, in a window | Step out to the whole board |
+| Three fingers, in a window | Move to the window next to it in that direction |
+| Three fingers down, in a window with none above it | Step out to the whole board |
 | Tap with three fingers, then swipe | Move the window under your fingers |
 
 ## Touchscreen gestures

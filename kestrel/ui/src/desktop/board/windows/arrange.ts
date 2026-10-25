@@ -16,13 +16,18 @@ export interface Layout {
   known: boolean;
 }
 
-export function restoreSizes(windows: readonly Meta.Window[], done: () => void): (() => void) | null {
+export function restoreSizes(windows: readonly Meta.Window[], ownSize: (window: Meta.Window) => Pick<Box, 'width' | 'height'> | null, done: () => void): (() => void) | null {
   const resizing = windows.filter(window => window.is_fullscreen() || window.get_maximize_flags() !== 0);
   for (const window of windows) {
     setEdgesTiled(window, false);
     if (window.minimized) window.unminimize();
     if (window.is_fullscreen()) window.unmake_fullscreen();
     if (window.get_maximize_flags() !== 0) window.unmaximize();
+    const size = resizing.includes(window) ? null : ownSize(window);
+    const frame = window.get_frame_rect();
+    if (!size || (Math.abs(size.width - frame.width) <= 1 && Math.abs(size.height - frame.height) <= 1)) continue;
+    window.move_resize_frame(true, frame.x, frame.y, size.width, size.height);
+    resizing.push(window);
   }
   if (!resizing.length) {
     done();

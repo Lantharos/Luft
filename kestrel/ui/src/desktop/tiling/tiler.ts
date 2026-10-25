@@ -365,7 +365,7 @@ export class Tiler {
 
   private sizeChanged(window: Meta.Window): void {
     const space = this.tracked.get(window)?.space;
-    if (space instanceof ScrollingSpace && window !== this.held && !stretched(window)) space.widened(window);
+    if (space instanceof ScrollingSpace && window !== this.held && !stretched(window) && !this.surroundings.boardShown()) space.widened(window);
   }
 
   private stretchChanged(window: Meta.Window): void {
@@ -400,6 +400,14 @@ export class Tiler {
     const box = record.restore ?? this.restoredBox(window);
     this.surroundings.morph(window);
     window.move_resize_frame(true, box.x, box.y, box.width, box.height);
+  }
+
+  // The size a tiled window has while floating, which the board shows it at instead of its tile
+  floatingSize(window: Meta.Window): Pick<Box, 'width' | 'height'> | null {
+    const record = this.tracked.get(window);
+    if (!record?.space || !window.allows_resize()) return null;
+    const { width, height } = record.restore ?? this.restoredBox(window);
+    return { width, height };
   }
 
   private restoredBox(window: Meta.Window): Box {

@@ -109,12 +109,14 @@ export class Focus {
     this.host.camera.animateTo(this.target, CAMERA_DURATION);
   }
 
-  navigate(directionX: number, directionY: number): void {
+  navigate(directionX: number, directionY: number): boolean {
     const entered = this.entered;
-    if (!entered || !this.workspace) return;
+    if (!entered || !this.workspace) return false;
     const others = boardWindows(this.workspace).filter(window => window !== entered && !window.minimized);
     const index = nearestInDirection(frameBox(entered), others.map(frameBox), directionX, directionY);
-    if (index >= 0) this.enter(others[index]!);
+    if (index < 0) return false;
+    this.enter(others[index]!);
+    return true;
   }
 
   shade(animated: boolean): void {

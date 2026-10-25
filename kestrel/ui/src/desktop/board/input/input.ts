@@ -33,7 +33,7 @@ export interface BoardActions {
   enterWindow(window: Meta.Window, from?: View): void;
   overview(): void;
   freeView(): void;
-  navigate(directionX: number, directionY: number): void;
+  navigate(directionX: number, directionY: number): boolean;
   onCanvas(x: number, y: number): boolean;
   windowAt(x: number, y: number): Meta.Window | null;
   beginMove(window: Meta.Window): void;
@@ -143,7 +143,8 @@ export class BoardInput {
     if (Math.hypot(this.swipeX, this.swipeY) < STEP_THRESHOLD) return true;
     this.swipeMode = 'switch';
     if (Math.abs(this.swipeX) >= Math.abs(this.swipeY)) this.actions.navigate(this.swipeX < 0 ? 1 : -1, 0);
-    else if (this.swipeY > 0) this.actions.overview();
+    // Like sideways, the fingers pull the next window in: up for the one below, down for the one above or, with none, out to the board
+    else if (!this.actions.navigate(0, this.swipeY < 0 ? 1 : -1) && this.swipeY > 0) this.actions.overview();
     return true;
   }
 

@@ -229,12 +229,16 @@ export class Tiler {
     };
     this.tracked.set(window, record);
     if (opening) this.watchOpening(window, record, beside);
-    else this.classify(window, record, null, this.floatedByHand.has(window));
+    else this.classify(window, record, null, this.floatedByHand.has(window), true);
   }
 
-  private classify(window: Meta.Window, record: Tracked, beside: Meta.Window | null, floated: boolean): void {
+  // Windows already open when tiling starts may be maximized or snapped to a side, which Mutter also counts as
+  // maximized; unmaximizing them lets them take their tile instead of covering the others
+  private classify(window: Meta.Window, record: Tracked, beside: Meta.Window | null, floated: boolean, unstretch = false): void {
     record.floating = floatsByNature(window) || floated;
-    if (!record.floating && !window.minimized) this.arrange(this.attach(window, beside), true);
+    if (record.floating || window.minimized) return;
+    if (unstretch && !window.fullscreen && (window.maximized_horizontally || window.maximized_vertically)) window.unmaximize();
+    this.arrange(this.attach(window, beside), true);
   }
 
   private watchOpening(window: Meta.Window, record: Tracked, beside: Meta.Window | null): void {

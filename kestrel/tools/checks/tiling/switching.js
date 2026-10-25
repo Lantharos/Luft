@@ -83,6 +83,15 @@ export async function run() {
     await focus(windows[1]);
     await chord(Clutter.KEY_Super_L, Clutter.KEY_f);
     await eventually(() => windows.every(tiled), 'tiling the floating window again lets its app tile from now on');
+    await restingTiles();
+
+    useTiling('off');
+    await eventually(() => windows.every(window => !tiled(window)), 'turning tiling off lets the windows float again');
+    windows[0].maximize();
+    await eventually(() => windows[0].is_maximized(), 'a floating window maximizes');
+    useTiling('tiling');
+    await eventually(() => !windows[0].is_maximized() && windows.every(tiled) && tiledTightly(windows),
+      'turning tiling on tiles a maximized window with the others');
   } finally {
     rest();
     await stopAll();

@@ -8,7 +8,7 @@ use crate::task::Task;
 use super::apt;
 
 pub const NAME: &str = "luft-ubuntu";
-const IMAGE: &str = "quay.io/toolbx/ubuntu-toolbox:24.04";
+const IMAGE: &str = "quay.io/toolbx/ubuntu-toolbox:26.04";
 // The host's files show inside a toolbox container here, besides the home folder, which shows as itself
 const HOST: &str = "/run/host";
 const SET_UP: &str = "/usr/local/share/luft-set-up";

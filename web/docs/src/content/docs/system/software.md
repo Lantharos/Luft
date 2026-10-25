@@ -53,7 +53,7 @@ An AppImage that closes right after it starts, or looks for a USB or serial devi
 
 Some apps only come as a `.deb` file, made for Debian and Ubuntu. Open one and Schelf first looks for the same app on Flathub: when it's there, **Install from Flathub** is the better way, sandboxed and keeping itself up to date.
 
-Otherwise, **Install the .deb anyway** puts it in a [Toolbox](https://containertoolbx.org) container with Ubuntu 24.04, called `luft-ubuntu`, along with the Ubuntu software it needs. The first one downloads Ubuntu itself, a few hundred megabytes. The app gets a place in Start with its own icon and opens like any other, and links it opens go to your browser.
+Otherwise, **Install the .deb anyway** puts it in a [Toolbox](https://containertoolbx.org) container with Ubuntu 26.04, called `luft-ubuntu`, along with the Ubuntu software it needs. The first one downloads Ubuntu itself, a few hundred megabytes. The app gets a place in Start with its own icon and opens like any other, and links it opens go to your browser.
 
 - It isn't sandboxed: it can read and change everything in your home folder, as it would on Ubuntu.
 - Packages that add their maker's software source when installed, as many do, get updates in Schelf. Others stay at their version until you open a newer file.

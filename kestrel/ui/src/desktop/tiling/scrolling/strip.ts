@@ -13,6 +13,7 @@ export interface Column<T> {
   weights: number[];
   width: number;
   row: number;
+  restore?: number;
 }
 
 export interface Snap {
@@ -144,12 +145,53 @@ export class Strip<T> {
   cycleWidth(): void {
     const column = this.columns[this.focused];
     if (!column) return;
+    delete column.restore;
     column.width = PRESET_WIDTHS.find(width => width > column.width + PRESET_TOLERANCE) ?? PRESET_WIDTHS[0]!;
+  }
+
+  /** Makes the focused column as wide as the view, keeping its gaps, or gives it back the width it had. */
+  maximize(): void {
+    const column = this.columns[this.focused];
+    if (!column) return;
+    if (column.width >= 1 - PRESET_TOLERANCE) {
+      column.width = column.restore ?? DEFAULT_WIDTH;
+      delete column.restore;
+      return;
+    }
+    column.restore = column.width;
+    column.width = 1;
+  }
+
+  /** Widens the focused column over the space the other columns fully in view leave, so together they fill it. */
+  expand(): void {
+    const column = this.columns[this.focused];
+    if (!column) return;
+    const shown = this.columns.map((_, index) => index).filter(index => index !== this.focused && this.fullyShown(index));
+    const taken = shown.reduce((sum, index) => sum + this.columnWidth(this.columns[index]!) + this.gap, 0);
+    delete column.restore;
+    column.width = this.widthFor(this.viewWidth - taken);
+    this.offset = this.columnStart(Math.min(this.focused, ...shown));
+  }
+
+  edge(last: boolean): T | null {
+    const column = this.columns[last ? this.columns.length - 1 : 0];
+    return column?.windows[column.row] ?? null;
+  }
+
+  moveColumnToEdge(last: boolean): boolean {
+    const target = last ? this.columns.length - 1 : 0;
+    if (!this.columns.length || target === this.focused) return false;
+    const [column] = this.columns.splice(this.focused, 1);
+    this.columns.splice(target, 0, column!);
+    this.focused = target;
+    return true;
   }
 
   resizeWidth(direction: -1 | 1): void {
     const column = this.columns[this.focused];
-    if (column) column.width = Math.min(1, Math.max(MIN_WIDTH, column.width + direction * WIDTH_STEP));
+    if (!column) return;
+    delete column.restore;
+    column.width = Math.min(1, Math.max(MIN_WIDTH, column.width + direction * WIDTH_STEP));
   }
 
   resizeRow(direction: -1 | 1): void {
@@ -163,7 +205,16 @@ export class Strip<T> {
   setWidth(window: T, pixels: number): void {
     const found = this.locate(window);
     if (!found) return;
-    this.columns[found[0]]!.width = Math.min(1, Math.max(MIN_WIDTH, (pixels + this.gap) / Math.max(1, this.view.width - this.gap)));
+    this.columns[found[0]]!.width = this.widthFor(pixels);
+  }
+
+  private widthFor(pixels: number): number {
+    return Math.min(1, Math.max(MIN_WIDTH, (pixels + this.gap) / Math.max(1, this.view.width - this.gap)));
+  }
+
+  private fullyShown(index: number): boolean {
+    const left = this.columnStart(index);
+    return left >= this.offset - 1 && left + this.columnWidth(this.columns[index]!) <= this.offset + this.viewWidth + 1;
   }
 
   moveRowEdge(window: T, bottom: boolean, coordinate: number): void {

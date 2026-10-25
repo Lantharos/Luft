@@ -30,6 +30,12 @@ export class TilingKeys {
       bindings.push(
         ['tiling-cycle-width', () => this.commands.cycleWidth()],
         ['tiling-center-column', () => this.commands.center()],
+        ['tiling-maximize-column', () => this.commands.maximizeColumn()],
+        ['tiling-expand-column', () => this.commands.expandColumn()],
+        ['tiling-focus-first', () => this.commands.focusEdge(false)],
+        ['tiling-focus-last', () => this.commands.focusEdge(true)],
+        ['tiling-move-first', () => this.commands.moveToEdge(false)],
+        ['tiling-move-last', () => this.commands.moveToEdge(true)],
         ['tiling-overview', this.toggleOverview],
         ['tiling-stack-left', () => this.commands.stack(-1)],
         ['tiling-stack-right', () => this.commands.stack(1)],

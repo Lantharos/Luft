@@ -35,3 +35,39 @@ describe('snapping after a swipe', () => {
     expect(columns.snap(second + 20)).toEqual({ offset: second, column: 1 });
   });
 });
+
+describe('column widths', () => {
+  test('maximizing fills the view and maximizing again gives the width back', () => {
+    const columns = strip(2);
+    columns.focused = 0;
+    columns.maximize();
+    expect(columns.columnWidth(columns.columns[0]!)).toBe(columns.viewWidth);
+    columns.maximize();
+    expect(columns.columns[0]!.width).toBe(1 / 2);
+  });
+
+  test('expanding fills what the column beside it leaves', () => {
+    const columns = new Strip<string>();
+    columns.setView({ x: 0, y: 0, width: 1000, height: 600 }, 10);
+    columns.add('third', false);
+    columns.add('half', false);
+    columns.columns[0]!.width = 1 / 3;
+    columns.focused = 1;
+    columns.offset = 0;
+    columns.expand();
+    const [first, second] = columns.columns;
+    expect(columns.columnWidth(first!) + 10 + columns.columnWidth(second!)).toBeCloseTo(columns.viewWidth, -1);
+    expect(columns.offset).toBe(0);
+  });
+
+  test('moving a column to the ends of the strip', () => {
+    const columns = strip(3);
+    columns.focused = 1;
+    expect(columns.moveColumnToEdge(false)).toBe(true);
+    expect(columns.edge(false)).toBe('window 1');
+    expect(columns.focused).toBe(0);
+    expect(columns.moveColumnToEdge(true)).toBe(true);
+    expect(columns.edge(true)).toBe('window 1');
+    expect(columns.moveColumnToEdge(true)).toBe(false);
+  });
+});

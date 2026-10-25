@@ -77,6 +77,7 @@ export class MediaKeys {
       'calculator': { modes: DESKTOP, run: () => launch('calculator') },
       'media': { modes: DESKTOP, run: () => launch('media') },
       'home': { modes: DESKTOP, run: () => launch('home') },
+      'terminal': { modes: DESKTOP, run: () => launch('terminal') },
       'search': { modes: DESKTOP, run: openStart },
       'control-center': { modes: DESKTOP, run: () => openSettings() },
       'screensaver': { modes: UNLESS_UNLOCKING, run: () => this.power.lock() },

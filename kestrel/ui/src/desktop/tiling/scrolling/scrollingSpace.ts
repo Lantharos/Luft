@@ -117,6 +117,27 @@ export class ScrollingSpace implements Space {
     this.arrange(true);
   }
 
+  maximize(window: Meta.Window): void {
+    if (!this.strip.focus(window)) return;
+    this.strip.maximize();
+    this.arrange(true);
+  }
+
+  expand(window: Meta.Window): void {
+    if (!this.strip.focus(window)) return;
+    this.syncView();
+    this.strip.expand();
+    this.arrange(true);
+  }
+
+  edgeWindow(last: boolean): Meta.Window | null {
+    return this.strip.edge(last);
+  }
+
+  moveToEdge(window: Meta.Window, last: boolean): void {
+    if (this.strip.focus(window) && this.strip.moveColumnToEdge(last)) this.arrange(true);
+  }
+
   center(window: Meta.Window): void {
     if (!this.strip.focus(window)) return;
     this.syncView();

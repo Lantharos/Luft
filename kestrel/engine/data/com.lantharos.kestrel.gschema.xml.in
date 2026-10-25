@@ -624,6 +624,30 @@
       <default>["&lt;Super&gt;c"]</default>
       <summary>Center the focused column</summary>
     </key>
+    <key name="tiling-maximize-column" type="as">
+      <default>["&lt;Super&gt;&lt;Shift&gt;f"]</default>
+      <summary>Make the focused column as wide as the screen, or give it back its width</summary>
+    </key>
+    <key name="tiling-expand-column" type="as">
+      <default>["&lt;Super&gt;&lt;Control&gt;f"]</default>
+      <summary>Widen the focused column over the space the columns beside it leave</summary>
+    </key>
+    <key name="tiling-focus-first" type="as">
+      <default>["&lt;Super&gt;Home"]</default>
+      <summary>Focus the first column</summary>
+    </key>
+    <key name="tiling-focus-last" type="as">
+      <default>["&lt;Super&gt;End"]</default>
+      <summary>Focus the last column</summary>
+    </key>
+    <key name="tiling-move-first" type="as">
+      <default>["&lt;Super&gt;&lt;Shift&gt;Home"]</default>
+      <summary>Move the focused column to the start of the strip</summary>
+    </key>
+    <key name="tiling-move-last" type="as">
+      <default>["&lt;Super&gt;&lt;Shift&gt;End"]</default>
+      <summary>Move the focused column to the end of the strip</summary>
+    </key>
     <key name="tiling-overview" type="as">
       <default>["&lt;Super&gt;w"]</default>
       <summary>Zoom out to see the whole strip of columns</summary>

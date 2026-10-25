@@ -27,6 +27,12 @@ interface Tracked {
 
 type Signal = [object: { disconnect(id: number): void }, id: number];
 
+// Windows open when tiling starts, and windows that open while it's on, may be maximized or snapped to a side,
+// which Mutter also counts as maximized; unmaximizing them lets them take their tile instead of covering the others
+function unstretch(window: Meta.Window): void {
+  if (!window.fullscreen && (window.maximized_horizontally || window.maximized_vertically)) window.unmaximize();
+}
+
 const RESTORED_WIDTH = 0.6;
 const RESTORED_HEIGHT = 0.7;
 
@@ -232,12 +238,10 @@ export class Tiler {
     else this.classify(window, record, null, this.floatedByHand.has(window), true);
   }
 
-  // Windows already open when tiling starts may be maximized or snapped to a side, which Mutter also counts as
-  // maximized; unmaximizing them lets them take their tile instead of covering the others
-  private classify(window: Meta.Window, record: Tracked, beside: Meta.Window | null, floated: boolean, unstretch = false): void {
+  private classify(window: Meta.Window, record: Tracked, beside: Meta.Window | null, floated: boolean, unstretched = false): void {
     record.floating = floatsByNature(window) || floated;
     if (record.floating || window.minimized) return;
-    if (unstretch && !window.fullscreen && (window.maximized_horizontally || window.maximized_vertically)) window.unmaximize();
+    if (unstretched) unstretch(window);
     this.arrange(this.attach(window, beside), true);
   }
 
@@ -252,7 +256,6 @@ export class Tiler {
       const box = record.space?.boxOf(window);
       if (!box) return;
       setUnconstrained(window, true);
-      config.unset_maximize_flags(Meta.MaximizeFlags.BOTH);
       config.set_position(box.x, box.y);
       config.set_size(box.width, box.height);
     });
@@ -261,8 +264,9 @@ export class Tiler {
       this.unconfigured.delete(window);
       if (record.signals.includes(configure)) {
         this.forgetSignal(window, record, configure);
-        this.classify(window, record, beside, this.memory.floats(appKey(window)));
+        this.classify(window, record, beside, this.memory.floats(appKey(window)), true);
       } else if (record.space) {
+        unstretch(window);
         this.arrange(record.space, true);
       }
       if (!record.space) this.centerOnParent(window);
@@ -351,7 +355,10 @@ export class Tiler {
 
   private stretchChanged(window: Meta.Window): void {
     const space = this.tracked.get(window)?.space;
-    if (space && !stretched(window)) this.arrange(space, true);
+    if (!space) return;
+    // Apps that open maximized can ask for it again once shown
+    if (this.opening.has(window)) unstretch(window);
+    if (!stretched(window)) this.arrange(space, true);
   }
 
   private focusChanged(): void {

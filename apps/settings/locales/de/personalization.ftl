@@ -235,6 +235,12 @@ settings-notifications-keep-description = Sonst verschwinden sie, sobald ihr Ban
 settings-notifications-app-lock-screen = Auf dem Sperrbildschirm anzeigen
 settings-notifications-done = Fertig
 
+## Windows
+
+settings-windows-title = Fenster
+settings-windows-rounded-corners = Abgerundete Ecken
+settings-windows-rounded-corners-description = Maximierte und gekachelte Fenster sind sowieso eckig, und manche Apps runden ihre Ecken selbst ab
+
 ## Window tiling
 
 settings-tiling-preview = Vorschau der Fensteranordnung

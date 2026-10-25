@@ -14,7 +14,7 @@ use serde_json::Value;
 
 const APP_ID: &str = "com.lantharos.setup";
 const SIZE: (u32, u32) = (820, 600);
-const RADIUS: i32 = 22;
+const RADIUS: i32 = 15;
 const MEET_NOTES: &str = "/run/initramfs/live/meet.json";
 
 pub static L10N: Localizer = localizer!("locales", ["desktop"]);

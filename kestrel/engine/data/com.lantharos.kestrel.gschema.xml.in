@@ -412,6 +412,15 @@
         and clicks use only those windows.
       </description>
     </key>
+    <key name="rounded-window-corners" type="b">
+      <default>true</default>
+      <summary>Round the corners of windows</summary>
+      <description>
+        When disabled, windows keep square corners even when they float.
+        Maximized, tiled and fullscreen windows are always square. Apps
+        that draw their own rounded corners, such as GTK apps, keep them.
+      </description>
+    </key>
     <key name="window-tiling" enum="com.lantharos.kestrel.WindowTiling">
       <default>'off'</default>
       <summary>How windows are arranged</summary>

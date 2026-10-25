@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Sun, 18 Oct 2026 19:48:29 +0200
-Subject: [PATCH 41/52] wayland: let trusted clients manage the clipboard with
+Subject: [PATCH 41/53] wayland: let trusted clients manage the clipboard with
  ext-data-control-v1
 
 Implement ext_data_control_manager_v1 for the clipboard and the primary

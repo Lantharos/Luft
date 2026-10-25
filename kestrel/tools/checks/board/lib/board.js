@@ -28,8 +28,8 @@ export function noOverlap() {
   return rects.every((a, i) => rects.every((b, j) => i === j || !overlap(a, b)));
 }
 
-export function openBoardWindow(title, width, height) {
-  return gjs('clients/windows/boardWindow.js', [title, `${width}`, `${height}`]);
+export function openBoardWindow(title, width, height, state = 'normal') {
+  return gjs('clients/windows/boardWindow.js', [title, `${width}`, `${height}`, state]);
 }
 
 export async function openWindows() {

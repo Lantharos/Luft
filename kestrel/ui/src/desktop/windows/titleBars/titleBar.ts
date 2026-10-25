@@ -130,7 +130,7 @@ export class TitleBar {
     return Clutter.EVENT_STOP;
   }
 
-  private update(): void {
+  update(): void {
     const height = this.window.get_titlebar_height();
     const frame = this.window.get_frame_rect();
     const buffer = this.window.get_buffer_rect();

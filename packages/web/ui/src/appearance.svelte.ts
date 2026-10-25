@@ -7,6 +7,7 @@ import type { TaskbarLooks } from './taskbar/looks';
 const PALETTE_CHANGED = 'kestrel.palette';
 const TYPOGRAPHY_CHANGED = 'appearance.typography';
 const MOTION_CHANGED = 'appearance.motion';
+const CORNERS_CHANGED = 'appearance.corners';
 const SANS = "'Open Runde', ui-sans-serif, system-ui, sans-serif";
 const MONO = "'Maple Mono NF', ui-monospace, monospace";
 
@@ -46,6 +47,8 @@ const SCHEMES = ['light', 'dark'] as const;
 
 export type Scheme = 'dark' | 'light';
 
+export type Corners = 'rounded' | 'square';
+
 export interface Typography {
 	interface: string | null;
 	monospace: string | null;
@@ -56,6 +59,7 @@ export interface Appearance {
 	palette: Palette | null;
 	typography: Typography;
 	motion: MotionPreference;
+	corners?: Corners;
 	locale?: Locale;
 }
 
@@ -74,6 +78,7 @@ class AppearanceState {
 	taskbar = $state<TaskbarLooks | null>(null);
 	typography = $state<Typography>({ interface: null, monospace: null, textScale: 1 });
 	motion = $state<MotionPreference>('full');
+	corners = $state<Corners>('rounded');
 	fontSans = $derived(fontList(this.typography.interface, SANS));
 	fontMono = $derived(fontList(this.typography.monospace, MONO));
 
@@ -82,12 +87,14 @@ class AppearanceState {
 		if (initial.palette) this.receive(initial.palette);
 		this.type(initial.typography);
 		this.move(initial.motion);
+		this.round(initial.corners ?? 'rounded');
 		void i18n.start(initial.locale);
 		const stops = [
 			listen<Palette>(PALETTE_CHANGED, (palette) => this.receive(palette)),
 			events.appearanceChanged(({ colorScheme }) => (this.scheme = colorScheme)),
 			listen<Typography>(TYPOGRAPHY_CHANGED, (typography) => this.type(typography)),
-			listen<MotionPreference>(MOTION_CHANGED, (motion) => this.move(motion))
+			listen<MotionPreference>(MOTION_CHANGED, (motion) => this.move(motion)),
+			listen<Corners>(CORNERS_CHANGED, (corners) => this.round(corners))
 		];
 		void system.appearance().then(({ colorScheme }) => (this.scheme = colorScheme));
 		return () => stops.forEach((stop) => stop());
@@ -96,6 +103,11 @@ class AppearanceState {
 	private move(motion: MotionPreference) {
 		this.motion = motion;
 		document.documentElement.dataset.motion = motion;
+	}
+
+	private round(corners: Corners) {
+		this.corners = corners;
+		document.documentElement.dataset.corners = corners;
 	}
 
 	private type(typography: Typography) {

@@ -43,8 +43,12 @@
 	--shadow-faint: rgba(0, 0, 0, 0.22);
 	--radius-pill: 999px;
 	--radius-group: 18px;
-	--window-radius: 16px;
+	--window-radius: 15px;
 	--sidebar-width: 280px;
+}
+
+:root[data-corners='square'] {
+	--window-radius: 0px;
 }
 
 :root[data-black]:not([data-scheme='light']) {

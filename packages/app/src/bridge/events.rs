@@ -18,6 +18,12 @@ impl Events {
         emitter.emit(name, payload)
     }
 
+    pub fn set_square_corners(&self, square: bool) -> bool {
+        self.0
+            .get()
+            .is_some_and(|emitter| emitter.set_square_corners(square))
+    }
+
     pub fn emit_bytes(&self, name: &str, bytes: &[u8]) -> bool {
         self.0
             .get()

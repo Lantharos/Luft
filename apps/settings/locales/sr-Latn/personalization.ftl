@@ -237,6 +237,12 @@ settings-notifications-keep-description = U suprotnom nestaju čim se njihov ban
 settings-notifications-app-lock-screen = Prikaži na zaključanom ekranu
 settings-notifications-done = Gotovo
 
+## Windows
+
+settings-windows-title = Prozori
+settings-windows-rounded-corners = Zaobljeni uglovi
+settings-windows-rounded-corners-description = Uvećani i popločani prozori su ionako četvrtasti, a neke aplikacije same zaobljavaju svoje uglove
+
 ## Window tiling
 
 settings-tiling-preview = Pregled rasporeda prozora

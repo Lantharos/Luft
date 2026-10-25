@@ -235,6 +235,12 @@ settings-notifications-keep-description = Përndryshe largohen sapo mbyllet bane
 settings-notifications-app-lock-screen = Shfaq në ekranin e bllokimit
 settings-notifications-done = U krye
 
+## Windows
+
+settings-windows-title = Dritaret
+settings-windows-rounded-corners = Qoshe të rrumbullakëta
+settings-windows-rounded-corners-description = Dritaret e maksimizuara dhe ato krah për krah janë gjithsesi katrore, dhe disa aplikacione i rrumbullakosin vetë qoshet
+
 ## Window tiling
 
 settings-tiling-preview = Paraparje e renditjes së dritareve

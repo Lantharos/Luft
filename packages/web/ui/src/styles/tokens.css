@@ -47,6 +47,10 @@
 	--sidebar-width: 280px;
 }
 
+:root[data-corners='square'] {
+	--window-radius: 0px;
+}
+
 :root[data-black]:not([data-scheme='light']) {
 	--app-bg: #000000;
 	--content: #000000;

@@ -70,7 +70,7 @@ export const PANEL_PAGES: Page<PanelId>[][] = [
 		page('appearance', 'settings-page-appearance', 'preferences-desktop-appearance-symbolic', {
 			keywords: ['settings-page-appearance', 'settings-page-fonts', 'settings-page-cursors']
 		}),
-		page('desktop', 'settings-page-desktop', 'user-desktop-symbolic', { keywords: ['settings-page-taskbar', 'settings-page-tiling'] }),
+		page('desktop', 'settings-page-desktop', 'user-desktop-symbolic', { keywords: ['settings-page-taskbar', 'settings-page-windows', 'settings-page-tiling'] }),
 		page('notifications', 'settings-page-notifications', 'preferences-system-notifications-symbolic'),
 		page('accessibility', 'settings-page-accessibility', 'preferences-desktop-accessibility-symbolic')
 	],

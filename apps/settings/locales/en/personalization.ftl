@@ -271,6 +271,12 @@ settings-notifications-keep-description = Otherwise they go once their banner cl
 settings-notifications-app-lock-screen = Show on the lock screen
 settings-notifications-done = Done
 
+## Windows
+
+settings-windows-title = Windows
+settings-windows-rounded-corners = Rounded corners
+settings-windows-rounded-corners-description = Maximized and tiled windows are square either way, and some apps round their own corners
+
 ## Window tiling
 
 settings-tiling-preview = Window arrangement preview

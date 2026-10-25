@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Tue, 20 Oct 2026 21:38:11 +0200
-Subject: [PATCH 50/52] x11: give up on selection owners that stop answering
+Subject: [PATCH 50/53] x11: give up on selection owners that stop answering
 
 A transfer from an X11 selection waited for the owner's SelectionNotify
 and for every INCR chunk without a limit, and ignored cancellation, so

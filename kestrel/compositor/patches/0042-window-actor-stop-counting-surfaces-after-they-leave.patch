@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Sun, 18 Oct 2026 20:42:43 +0200
-Subject: [PATCH 42/52] window-actor: stop counting surfaces after they leave
+Subject: [PATCH 42/53] window-actor: stop counting surfaces after they leave
  the window
 
 A window actor follows whether each of its surfaces is mapped and

@@ -6,7 +6,7 @@ use serde::Serialize;
 
 use crate::bridge::events::Events;
 use crate::desktop::palette::{self, Palette};
-use crate::desktop::{self, motion::Motion, typography::Typography};
+use crate::desktop::{self, corners::Corners, motion::Motion, typography::Typography};
 
 const WINDOW_RADIUS: i32 = 16;
 const CONTROL_SIZE: i32 = 28;
@@ -85,6 +85,7 @@ pub struct Appearance {
     palette: Option<Palette>,
     typography: Typography,
     motion: Motion,
+    corners: Corners,
     locale: Locale,
 }
 
@@ -94,6 +95,7 @@ impl Appearance {
             palette: palette::palette().await,
             typography: Typography::current().await,
             motion: Motion::current().await,
+            corners: Corners::current().await,
             locale: Locale {
                 languages: luft_i18n::requested(),
                 formats: luft_i18n::formats(),

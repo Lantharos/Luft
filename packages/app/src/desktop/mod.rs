@@ -1,3 +1,4 @@
+pub mod corners;
 pub mod motion;
 pub mod palette;
 pub mod typography;
@@ -30,6 +31,7 @@ pub async fn watch(events: Events) {
     let Ok(mut signals) = proxy.receive_signal("SettingChanged").await else {
         return;
     };
+    events.set_square_corners(corners::Corners::read(&proxy).await == corners::Corners::Square);
     while let Some(signal) = signals.next().await {
         let Ok((namespace, key, _)) = signal
             .body()
@@ -45,6 +47,11 @@ pub async fn watch(events: Events) {
         }
         if motion::changed(&namespace, &key) {
             events.emit(motion::MOTION_CHANGED, motion::Motion::read(&proxy).await);
+        }
+        if corners::changed(&namespace, &key) {
+            let corners = corners::Corners::read(&proxy).await;
+            events.set_square_corners(corners == corners::Corners::Square);
+            events.emit(corners::CORNERS_CHANGED, corners);
         }
     }
 }

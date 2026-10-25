@@ -50,3 +50,4 @@
 0050-x11-give-up-on-selection-owners-that-stop-answering.patch
 0051-compositor-don-t-cull-with-actors-that-clip-what-the.patch
 0052-compositor-shadow-and-outline-Wayland-windows-that-d.patch
+0053-compositor-let-people-turn-rounded-window-corners-of.patch

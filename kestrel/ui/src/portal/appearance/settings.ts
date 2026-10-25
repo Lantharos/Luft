@@ -17,6 +17,9 @@ const APPEARANCE = 'org.freedesktop.appearance';
 const FONTCONFIG = 'org.gnome.fontconfig';
 const INTERFACE = 'org.gnome.desktop.interface';
 const A11Y_INTERFACE = 'org.gnome.desktop.a11y.interface';
+const KESTREL = 'com.lantharos.kestrel';
+// Only what apps need to look like the desktop, since the rest of Kestrel's settings are private
+const KESTREL_KEYS = ['rounded-window-corners'];
 const SHARED_SCHEMAS = [
   'org.gnome.desktop.a11y',
   A11Y_INTERFACE,
@@ -51,6 +54,9 @@ export class SettingsPortal {
       settings.connect('changed', (_settings, key) => this.changed(id, key));
       this.schemas.set(id, settings);
     }
+    const kestrel = new Gio.Settings({ schema_id: KESTREL });
+    for (const key of KESTREL_KEYS) kestrel.connect(`changed::${key}`, () => this.emitValue(KESTREL, key));
+    this.schemas.set(KESTREL, kestrel);
     this.shell.connect('notify::enable-animations', () => {
       this.emitValue(INTERFACE, 'enable-animations');
       this.emitValue(APPEARANCE, 'reduced-motion');
@@ -81,14 +87,14 @@ export class SettingsPortal {
   private namespace(namespace: string): Namespace {
     if (namespace === APPEARANCE) return this.appearance();
     if (namespace === FONTCONFIG) return { serial: new GLib.Variant('i', this.fontconfig.serial) };
-    const keys = this.schemas.get(namespace)!.settings_schema.list_keys();
+    const keys = namespace === KESTREL ? KESTREL_KEYS : this.schemas.get(namespace)!.settings_schema.list_keys();
     return Object.fromEntries(keys.map(key => [key, this.value(namespace, key)!]));
   }
 
   private value(namespace: string, key: string): GLib.Variant | null {
     if (namespace === APPEARANCE || namespace === FONTCONFIG) return this.namespace(namespace)[key] ?? null;
     const settings = this.schemas.get(namespace);
-    if (!settings?.settings_schema.has_key(key)) return null;
+    if (!settings?.settings_schema.has_key(key) || (namespace === KESTREL && !KESTREL_KEYS.includes(key))) return null;
     if (namespace === INTERFACE && key === 'enable-animations') return new GLib.Variant('b', this.shell.enable_animations);
     if (namespace === INTERFACE && key === 'gtk-theme' && this.highContrast()) return new GLib.Variant('s', 'HighContrast');
     return settings.get_value(key);

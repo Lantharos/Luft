@@ -58,6 +58,10 @@ Each folder's README says what it is and how to build it.
 
 [Building Luft](https://docs.luft.computer/developers/building/) sets up a development machine and runs Kestrel in a window, the apps on their own, and the image and USB stick in VMs. [How Luft fits together](https://docs.luft.computer/developers/architecture/) is the place to start reading, and [Contributing](https://docs.luft.computer/developers/contributing/) covers how to send changes. Problems and ideas go in [the issues](https://github.com/Lantharos/Luft/issues).
 
+## Translating
+
+Luft is translated on [Hosted Weblate](https://hosted.weblate.org/projects/luft/), in the browser, with no programming needed. Weblate sends the work back here as pull requests, and it reaches the nightlies once merged. [Translating Luft](https://docs.luft.computer/developers/translating/) covers getting started and the style guide for each language.
+
 ## License and credits
 
 Luft is licensed under the GNU General Public License, version 3 or later ([`LICENSE`](LICENSE)). Kestrel's engine comes from [GNOME Shell](https://gitlab.gnome.org/GNOME/gnome-shell) and the patches to [Mutter](https://gitlab.gnome.org/GNOME/mutter) follow Mutter, so both stay GPL-2.0-or-later (`kestrel/engine/COPYING`).

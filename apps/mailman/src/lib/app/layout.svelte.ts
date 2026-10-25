@@ -5,7 +5,8 @@ const FULL_SIDEBAR_FROM = 1200;
 const SIDE_BY_SIDE_FROM = 960;
 const SIDEBAR_WIDTH = { full: 248, rail: 72, none: 0 };
 const LIST = { min: 300, share: 0.3, max: 400 };
-const WINDOW_RADIUS = 16;
+// Kestrel rounds windows to 15px, so the regions follow it
+const WINDOW_RADIUS = 15;
 
 export type SidebarMode = keyof typeof SIDEBAR_WIDTH;
 

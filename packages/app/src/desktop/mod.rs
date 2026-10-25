@@ -31,7 +31,10 @@ pub async fn watch(events: Events) {
     let Ok(mut signals) = proxy.receive_signal("SettingChanged").await else {
         return;
     };
-    events.set_square_corners(corners::Corners::read(&proxy).await == corners::Corners::Square);
+    // The page read its corners before this subscribed, so a change in between reaches it here
+    let corners = corners::Corners::read(&proxy).await;
+    events.set_square_corners(corners == corners::Corners::Square);
+    events.emit(corners::CORNERS_CHANGED, corners);
     while let Some(signal) = signals.next().await {
         let Ok((namespace, key, _)) = signal
             .body()

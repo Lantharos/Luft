@@ -18,4 +18,6 @@ install() {
     inst_script "$moddir/luft-live-root.sh" /usr/libexec/luft-live-root
     inst_simple "$moddir/luft-live-root.service" "$systemdsystemunitdir/luft-live-root.service"
     inst_simple "$moddir/sysroot.conf" "$systemdsystemunitdir/sysroot.mount.d/luft-live.conf"
+    # Ventoy before 1.1.18 drops the hooks that map the ISO into /lib/dracut/hooks
+    ln_r /var/lib/dracut/hooks /usr/lib/dracut/hooks
 }

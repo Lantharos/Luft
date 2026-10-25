@@ -7,6 +7,7 @@ use serde_json::json;
 use crate::mail::compose::{self, Draft, Sender};
 use crate::mail::envelope::{Address, Unsubscribe};
 use crate::mail::render;
+use crate::protocols::net;
 use crate::state::MailmanState;
 use crate::store::{Identity, Outgoing, Role, now};
 use crate::sync::{Operation, Target};
@@ -180,7 +181,8 @@ pub fn unsubscribe(
         .and_then(|value| serde_json::from_value(value).ok())
         .ok_or("This sender doesn't offer a way to unsubscribe")?;
     if let (true, Some(url)) = (unsubscribe.one_click, &unsubscribe.http) {
-        ureq::post(url)
+        net::http()
+            .post(url)
             .content_type("application/x-www-form-urlencoded")
             .send("List-Unsubscribe=One-Click")
             .map_err(|error| format!("Unsubscribing failed: {error}"))?;

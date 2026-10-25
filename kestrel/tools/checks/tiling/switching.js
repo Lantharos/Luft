@@ -97,6 +97,10 @@ export async function run() {
     windows.push(opened);
     await eventually(() => !opened.is_maximized() && windows.every(tiled) && tiledTightly(windows),
       'a window that opens maximized takes a tile');
+    await restingTiles();
+    const {window: fixed} = await openWindow('Fixed', 640, 420, 'fixed');
+    windows.push(fixed);
+    await eventually(() => windows.every(tiled) && tiledTightly(windows), 'a window that opens fixed in size takes a tile once it can resize');
   } finally {
     rest();
     await stopAll();

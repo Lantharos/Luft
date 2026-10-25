@@ -53,6 +53,11 @@ app.connect('activate', () => {
     show();
   }));
   if (state === 'maximized') window.maximize();
+  // Opens fixed in size and becomes resizable a moment later, like some Chromium and Electron apps
+  if (state === 'fixed') {
+    window.resizable = false;
+    setTimeout(() => (window.resizable = true), 800);
+  }
   window.present();
 });
 

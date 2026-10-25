@@ -231,6 +231,7 @@ export class Tiler {
         window.connect('notify::transient-for', () => this.natureChanged(window)),
         window.connect('notify::window-type', () => this.natureChanged(window)),
         window.connect('notify::resizeable', () => this.natureChanged(window)),
+        window.connect('notify::skip-taskbar', () => this.natureChanged(window)),
       ],
     };
     this.tracked.set(window, record);
@@ -297,6 +298,14 @@ export class Tiler {
 
   private natureChanged(window: Meta.Window): void {
     const record = this.tracked.get(window)!;
+    // Apps such as Chromium and Electron ones can open fixed in size and only then become resizable
+    if (!record.space && record.floating && !floatsByNature(window) && !this.floatedByHand.has(window) &&
+      !this.memory.floats(appKey(window)) && !this.unconfigured.has(window) && !window.minimized) {
+      record.floating = false;
+      unstretch(window);
+      this.arrange(this.attach(window, null), true);
+      return;
+    }
     if (!record.space || !floatsByNature(window)) return;
     const space = record.space;
     space.release(window);

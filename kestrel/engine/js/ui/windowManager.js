@@ -21,7 +21,7 @@ import * as IBusManager from '../misc/ibusManager.js';
 import * as WorkspaceAnimation from './workspaceAnimation.js';
 
 import * as Main from './main.js';
-import {blurBackdrop} from './kestrelGlass.js';
+import {blurBackdrop, followWindowCorners} from './kestrelGlass.js';
 import {CornerSnap} from './cornerSnap.js';
 import {WindowMorphs} from './windowEffects/morph.js';
 import {OpenCloseEffects} from './windowEffects/openClose.js';
@@ -378,7 +378,7 @@ export const TilePreview = GObject.registerClass(
 class TilePreview extends St.Widget {
     _init() {
         super._init({style_class: 'tile-preview'});
-        blurBackdrop(this, TILE_PREVIEW_RADIUS);
+        followWindowCorners(this, blurBackdrop(this, TILE_PREVIEW_RADIUS), TILE_PREVIEW_RADIUS);
         global.window_group.add_child(this);
 
         this._reset();

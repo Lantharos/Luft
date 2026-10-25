@@ -21,7 +21,7 @@ describe('snapping after a swipe', () => {
   test('never scrolls past the end of the strip', () => {
     const columns = strip(3);
     const furthest = columns.totalWidth - columns.viewWidth;
-    expect(columns.snap(furthest + 400).offset).toBe(furthest);
+    expect(columns.snap(furthest + 400)).toEqual({ offset: furthest, column: 2 });
   });
 
   test('a strip narrower than the view stays at its start', () => {
@@ -56,7 +56,7 @@ describe('column widths', () => {
     columns.offset = 0;
     columns.expand();
     const [first, second] = columns.columns;
-    expect(columns.columnWidth(first!) + 10 + columns.columnWidth(second!)).toBeCloseTo(columns.viewWidth, -1);
+    expect(columns.columnWidth(first!) + 10 + columns.columnWidth(second!)).toBe(columns.viewWidth);
     expect(columns.offset).toBe(0);
   });
 

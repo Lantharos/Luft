@@ -9,6 +9,7 @@ const THEMED_PROPERTIES = [
 ];
 
 const surfaces = new Set();
+const cornered = new Set();
 let solid = false;
 let square = false;
 
@@ -44,8 +45,18 @@ export function setSquareSurfaces(enabled) {
     if (square === enabled)
         return;
     square = enabled;
-    for (const surface of surfaces)
+    for (const surface of [...surfaces, ...cornered])
         followCorners(surface);
+}
+
+/* Lets a backdrop that isn't a surface, such as the preview of where a window snaps, square its corners
+ * with the windows' */
+export function followWindowCorners(actor, effect, corners) {
+    const backdrop = {actor, effect, corners};
+    cornered.add(backdrop);
+    if (square)
+        followCorners(backdrop);
+    actor.connect('destroy', () => cornered.delete(backdrop));
 }
 
 function followTheme(actor, effect) {

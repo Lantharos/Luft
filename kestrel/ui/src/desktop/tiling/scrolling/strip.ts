@@ -265,7 +265,9 @@ export class Strip<T> {
       const left = this.columnStart(index);
       const right = left + this.columnWidth(this.columns[index]!) - this.viewWidth;
       for (const candidate of [within(left), within(right)]) {
-        if (Math.abs(candidate - offset) < Math.abs(best.offset - offset)) best = { offset: candidate, column: index };
+        const distance = Math.abs(candidate - offset) - Math.abs(best.offset - offset);
+        // At the end of the strip, the last of the columns sharing that edge is the one in view
+        if (distance < 0 || (distance === 0 && candidate === furthest && furthest > 0)) best = { offset: candidate, column: index };
       }
     }
     return best;

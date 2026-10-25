@@ -19,18 +19,27 @@
 
 	let access = $state<Access | null>(null);
 	let unlocked = $derived(!!keyring.current && !keyring.current.locked);
+	// Bumped whenever the list closes, so an answer that arrives after that doesn't open it again
+	let request = 0;
 
 	$effect(() => {
-		if (!unlocked) access = null;
+		if (!unlocked) closeAccess();
 	});
 
+	function closeAccess() {
+		request++;
+		access = null;
+	}
+
 	async function loadAccess() {
-		access = await keyringAccess().catch(() => null);
+		const current = ++request;
+		const loaded = await keyringAccess().catch(() => null);
+		if (current === request && unlocked) access = loaded;
 	}
 </script>
 
 {#if access && unlocked}
-	<AccessPage {access} refresh={loadAccess} onclose={() => (access = null)} />
+	<AccessPage {access} refresh={loadAccess} onclose={closeAccess} />
 {:else}
 	<SubPage title={t('settings-passwords-title')} back={t('settings-page-security')} {onclose}>
 		{#if keyring.current === null}

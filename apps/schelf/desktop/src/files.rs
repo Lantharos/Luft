@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::hash::{DefaultHasher, Hash, Hasher};
+use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
@@ -10,6 +11,7 @@ use luft_software::apps::{appimage, toolbox};
 use luft_software::system::System;
 use luft_software::system::repositories;
 use luft_software::system::system_packages;
+use quick_xml::events::Event;
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 
@@ -34,6 +36,17 @@ pub enum Opened {
         summary: Option<String>,
         homepage: Option<String>,
         icon: Option<String>,
+    },
+    FlatpakBundle {
+        path: String,
+        id: String,
+        title: String,
+        branch: String,
+        summary: Option<String>,
+        icon: Option<String>,
+        size: u64,
+        runtime: Option<String>,
+        origin: Option<String>,
     },
     FlatpakRepo {
         path: String,
@@ -104,6 +117,135 @@ fn flatpak_ref(path: &str) -> Result<Opened, String> {
         homepage: values.get("Homepage").cloned(),
         icon: values.get("Icon").cloned(),
         id,
+    })
+}
+
+// A bundle is an OSTree static delta, whose superblock starts with what's in it
+const BUNDLE_FORMAT: &str = "(a{sv}tayay(ua(ayay))aya(uayttay)a(yaytt))";
+const BUNDLE_ICONS: [&str; 2] = ["icon-128", "icon-64"];
+
+fn bundle_value(metadata: &gio::glib::VariantDict, key: &str) -> Option<gio::glib::Variant> {
+    metadata.lookup_value(key, None)
+}
+
+fn bundle_bytes(metadata: &gio::glib::VariantDict, key: &str) -> Option<Vec<u8>> {
+    bundle_value(metadata, key)?
+        .fixed_array::<u8>()
+        .ok()
+        .map(<[u8]>::to_vec)
+}
+
+/// The name and summary of the app in a bundle's AppStream data.
+fn bundle_appstream(compressed: &[u8]) -> (Option<String>, Option<String>) {
+    let mut xml = String::new();
+    if flate2::read::GzDecoder::new(compressed)
+        .read_to_string(&mut xml)
+        .is_err()
+    {
+        return (None, None);
+    }
+    let mut reader = quick_xml::Reader::from_str(&xml);
+    let (mut name, mut summary) = (None, None);
+    let (mut current, mut field, mut text) = (String::new(), None, String::new());
+    loop {
+        match reader.read_event() {
+            Ok(Event::Start(element)) => {
+                let tag = element.local_name().as_ref().to_owned();
+                let localized = element
+                    .try_get_attribute("xml:lang")
+                    .ok()
+                    .flatten()
+                    .is_some();
+                // The app's untranslated name and summary, not those of the screenshots or releases inside it
+                if (tag == "name" || tag == "summary") && !localized && current == "component" {
+                    field = Some(tag.clone());
+                    text.clear();
+                }
+                current = tag;
+            }
+            Ok(Event::Text(content)) if field.is_some() => text.push_str(&content.xml10_content()),
+            Ok(Event::End(element)) => {
+                let tag = element.local_name().as_ref().to_owned();
+                if field.as_deref() == Some(tag.as_str()) {
+                    let slot = if tag == "name" {
+                        &mut name
+                    } else {
+                        &mut summary
+                    };
+                    slot.get_or_insert_with(|| text.trim().to_owned());
+                    field = None;
+                }
+                // A bundle's data describes just its app
+                if tag == "component" {
+                    break;
+                }
+                current = "component".into();
+            }
+            Ok(Event::Eof) | Err(_) => break,
+            Ok(_) => {}
+        }
+    }
+    (
+        name.filter(|name| !name.is_empty()),
+        summary.filter(|summary| !summary.is_empty()),
+    )
+}
+
+fn save_icon(bytes: &[u8], extension: &str) -> Option<String> {
+    let mut hasher = DefaultHasher::new();
+    bytes.hash(&mut hasher);
+    let folder = cache::folder().join("opened");
+    let file: PathBuf = folder.join(format!("{:x}.{extension}", hasher.finish()));
+    std::fs::create_dir_all(&folder).ok()?;
+    std::fs::write(&file, bytes).ok()?;
+    Some(file.to_string_lossy().into_owned())
+}
+
+fn flatpak_bundle(path: &str) -> Result<Opened, String> {
+    let damaged = "This Flatpak file is damaged or isn't a Flatpak app.";
+    let data = std::fs::read(path).map_err(|error| error.to_string())?;
+    let size = data.len() as u64;
+    let format = gio::glib::VariantTy::new(BUNDLE_FORMAT).map_err(|error| error.to_string())?;
+    let superblock =
+        gio::glib::Variant::from_bytes_with_type(&gio::glib::Bytes::from_owned(data), format);
+    let metadata = gio::glib::VariantDict::new(Some(&superblock.child_value(0)));
+    let reference = bundle_value(&metadata, "ref")
+        .and_then(|value| value.get::<String>())
+        .ok_or(damaged)?;
+    let [kind, id, _arch, branch] = reference.split('/').collect::<Vec<_>>()[..] else {
+        return Err(damaged.into());
+    };
+    if kind != "app" {
+        return Err("This Flatpak file holds a runtime, not an app. Apps that need it install it themselves.".into());
+    }
+    let runtime = bundle_value(&metadata, "metadata")
+        .and_then(|value| value.get::<String>())
+        .and_then(|keyfile| {
+            keyfile
+                .lines()
+                .find_map(|line| line.strip_prefix("runtime="))
+                .map(str::to_owned)
+        });
+    let (name, summary) = bundle_bytes(&metadata, "appdata")
+        .map(|appdata| bundle_appstream(&appdata))
+        .unwrap_or_default();
+    let icon = BUNDLE_ICONS
+        .iter()
+        .find_map(|key| bundle_bytes(&metadata, key))
+        .and_then(|bytes| save_icon(&bytes, "png"));
+    Ok(Opened::FlatpakBundle {
+        path: path.to_owned(),
+        title: name.unwrap_or_else(|| id.rsplit('.').next().unwrap_or(id).to_owned()),
+        id: id.to_owned(),
+        branch: branch.to_owned(),
+        summary,
+        icon,
+        size,
+        runtime,
+        // Bundles built with a repository's address keep getting updates from it
+        origin: bundle_value(&metadata, "origin")
+            .and_then(|value| value.get::<String>())
+            .filter(|origin| !origin.is_empty()),
     })
 }
 
@@ -194,15 +336,10 @@ fn signed(path: &str) -> bool {
 
 fn appimage_file(path: &str) -> Result<Opened, String> {
     let bundle = appimage::inspect(Path::new(path))?;
-    let icon = bundle.icons.first().and_then(|icon| {
-        let mut hasher = DefaultHasher::new();
-        icon.bytes.hash(&mut hasher);
-        let folder = cache::folder().join("opened");
-        let file: PathBuf = folder.join(format!("{:x}.{}", hasher.finish(), icon.extension));
-        std::fs::create_dir_all(&folder).ok()?;
-        std::fs::write(&file, &icon.bytes).ok()?;
-        Some(file.to_string_lossy().into_owned())
-    });
+    let icon = bundle
+        .icons
+        .first()
+        .and_then(|icon| save_icon(&icon.bytes, icon.extension));
     Ok(Opened::AppImage {
         path: path.to_owned(),
         name: bundle.entry.get("Name").unwrap_or("AppImage").to_owned(),
@@ -220,6 +357,8 @@ pub fn inspect(path: &str) -> Result<Opened, String> {
     let lowered = path.to_lowercase();
     if lowered.ends_with(".flatpakref") {
         flatpak_ref(path)
+    } else if lowered.ends_with(".flatpak") {
+        flatpak_bundle(path)
     } else if lowered.ends_with(".flatpakrepo") {
         flatpak_repo(path)
     } else if lowered.ends_with(".rpm") {

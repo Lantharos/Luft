@@ -151,6 +151,7 @@ export interface Finished {
 export type Job =
 	| { kind: 'installFlathub'; id: string }
 	| { kind: 'installFlatpakRef'; path: string }
+	| { kind: 'installFlatpakBundle'; path: string }
 	| { kind: 'addFlatpakRepo'; path: string; name: string }
 	| { kind: 'installPackage'; package: string }
 	| { kind: 'installPackageFile'; path: string }
@@ -172,6 +173,7 @@ export type Job =
 
 export type OpenedFile =
 	| { kind: 'flatpakRef'; path: string; id: string; title: string; branch: string | null; url: string; runtime: boolean; summary: string | null; homepage: string | null; icon: string | null }
+	| { kind: 'flatpakBundle'; path: string; id: string; title: string; branch: string; summary: string | null; icon: string | null; size: number; runtime: string | null; origin: string | null }
 	| { kind: 'flatpakRepo'; path: string; name: string; title: string; url: string; summary: string | null; homepage: string | null }
 	| {
 			kind: 'package';

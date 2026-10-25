@@ -24,12 +24,12 @@
 	const operation = $derived(operations.forKey(key));
 	const name = $derived.by(() => {
 		if (!file) return '';
-		if (file.kind === 'flatpakRef' || file.kind === 'flatpakRepo') return file.title;
+		if (file.kind === 'flatpakRef' || file.kind === 'flatpakBundle' || file.kind === 'flatpakRepo') return file.title;
 		return file.kind === 'package' ? file.package : file.name;
 	});
 	const installed = $derived.by((): InstalledApp | null => {
 		if (!file) return null;
-		if (file.kind === 'flatpakRef') return library.flatpak(file.id);
+		if (file.kind === 'flatpakRef' || file.kind === 'flatpakBundle') return library.flatpak(file.id);
 		if (file.kind === 'package' && file.system) return library.system(file.package);
 		if (file.kind === 'package') return fedora.available ? library.package(file.package) : library.tool(file.package);
 		if (file.kind === 'appImage' && started) return library.installed.find((app) => app.source === 'appImage' && app.name === name) ?? null;
@@ -51,6 +51,7 @@
 
 	function job(opened: OpenedFile): Job {
 		if (opened.kind === 'flatpakRef') return { kind: 'installFlatpakRef', path: opened.path };
+		if (opened.kind === 'flatpakBundle') return { kind: 'installFlatpakBundle', path: opened.path };
 		if (opened.kind === 'flatpakRepo') return { kind: 'addFlatpakRepo', path: opened.path, name: opened.name };
 		if (opened.kind === 'package' && opened.system)
 			return { kind: 'installSystemPackageFile', path: opened.path, package: opened.package, repository: opened.repository?.draft ?? null };
@@ -77,9 +78,10 @@
 		void operations.run(key, name, job(file));
 	}
 
-	const ACTION: Record<OpenedFile['kind'], string> = { flatpakRef: 'Install', flatpakRepo: 'Add source', package: 'Install', appImage: 'Install' };
+	const ACTION: Record<OpenedFile['kind'], string> = { flatpakRef: 'Install', flatpakBundle: 'Install', flatpakRepo: 'Add source', package: 'Install', appImage: 'Install' };
 	const KIND: Record<OpenedFile['kind'], string> = {
 		flatpakRef: 'Flatpak app',
+		flatpakBundle: 'Flatpak app',
 		flatpakRepo: 'Flatpak app source',
 		package: fedora.available ? 'System package' : 'Command-line tool',
 		appImage: 'AppImage'
@@ -95,7 +97,7 @@
 			<p class="px-2 text-[14px] text-[var(--text-muted)]">{error}</p>
 		{:else if file}
 			<header class="flex items-center gap-5">
-				<AppArt icon={file.kind === 'appImage' || file.kind === 'flatpakRef' ? file.icon : null} size={80} />
+				<AppArt icon={file.kind === 'appImage' || file.kind === 'flatpakRef' || file.kind === 'flatpakBundle' ? file.icon : null} size={80} />
 				<div class="flex min-w-0 flex-1 flex-col gap-1">
 					<h2 class="truncate text-[24px] font-semibold">{name}</h2>
 					<span class="text-[13px] text-[var(--text-muted)]">{kind}</span>
@@ -137,6 +139,17 @@
 				{/if}
 				{#if file.kind === 'flatpakRef' || file.kind === 'flatpakRepo'}
 					<Row title="Source" description={file.url}><span>{new URL(file.url).host}</span></Row>
+				{/if}
+				{#if file.kind === 'flatpakBundle'}
+					<Row title="Size"><span>{bytes(file.size)}</span></Row>
+					{#if file.runtime}
+						<Row title="Needs" description="Installed from Flathub along with it, unless you have it already."><span class="max-w-[320px] truncate">{file.runtime.split('/')[0]}</span></Row>
+					{/if}
+					{#if file.origin}
+						<Row title="Updates from" description={file.origin}><span>{new URL(file.origin).host}</span></Row>
+					{:else}
+						<Row title="Updates" description="It doesn't update by itself. Install a newer file when one comes out."><span>From newer files</span></Row>
+					{/if}
 				{/if}
 				{#if file.kind === 'appImage'}
 					<Row title="Installs to" description="It gets a place in your app menu, and Schelf keeps it up to date when it can."><span>Applications folder</span></Row>

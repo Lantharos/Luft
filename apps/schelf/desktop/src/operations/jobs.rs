@@ -31,6 +31,9 @@ pub enum Job {
     InstallFlatpakRef {
         path: PathBuf,
     },
+    InstallFlatpakBundle {
+        path: PathBuf,
+    },
     AddFlatpakRepo {
         path: PathBuf,
         name: String,
@@ -87,6 +90,7 @@ impl Job {
         match self {
             Self::InstallFlathub { .. }
             | Self::InstallFlatpakRef { .. }
+            | Self::InstallFlatpakBundle { .. }
             | Self::AddFlatpakRepo { .. }
             | Self::InstallAppImage { .. }
             | Self::InstallTool { .. }
@@ -116,6 +120,19 @@ impl Job {
             }
             Self::InstallFlatpakRef { path } => {
                 flatpak::install_ref(Installation::User, path, task)?;
+                flatpak::integrate();
+                Ok(())
+            }
+            Self::InstallFlatpakBundle { path } => {
+                // Apps from bundles still need a runtime, which most get from Flathub, unless it's installed already
+                let flathub = flatpak::ensure_flathub(Installation::User);
+                flatpak::install_bundle(Installation::User, path, task).map_err(|error| match flathub {
+                    Err(reason) => format!(
+                        "{}. Flathub, where its runtime would come from, couldn't be added: {reason}",
+                        error.trim_end_matches('.')
+                    ),
+                    Ok(()) => error,
+                })?;
                 flatpak::integrate();
                 Ok(())
             }

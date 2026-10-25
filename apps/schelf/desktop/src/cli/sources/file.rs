@@ -7,7 +7,13 @@ use crate::library::sources::Bundled;
 use crate::operations::{Job, Request};
 use luft_software::system::repositories::Described;
 
-const EXTENSIONS: [&str; 4] = [".rpm", ".appimage", ".flatpakref", ".flatpakrepo"];
+const EXTENSIONS: [&str; 5] = [
+    ".rpm",
+    ".appimage",
+    ".flatpak",
+    ".flatpakref",
+    ".flatpakrepo",
+];
 
 pub fn named(target: &str) -> bool {
     let lowered = target.to_lowercase();
@@ -27,6 +33,7 @@ pub struct Prepared {
 fn job(opened: &Opened) -> Job {
     match opened {
         Opened::FlatpakRef { path, .. } => Job::InstallFlatpakRef { path: path.into() },
+        Opened::FlatpakBundle { path, .. } => Job::InstallFlatpakBundle { path: path.into() },
         Opened::FlatpakRepo { path, name, .. } => Job::AddFlatpakRepo {
             path: path.into(),
             name: name.clone(),
@@ -52,7 +59,9 @@ fn job(opened: &Opened) -> Job {
 
 fn title(opened: &Opened) -> &str {
     match opened {
-        Opened::FlatpakRef { title, .. } | Opened::FlatpakRepo { title, .. } => title,
+        Opened::FlatpakRef { title, .. }
+        | Opened::FlatpakBundle { title, .. }
+        | Opened::FlatpakRepo { title, .. } => title,
         Opened::Package { package, .. } => package,
         Opened::AppImage { name, .. } => name,
     }

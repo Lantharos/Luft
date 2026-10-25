@@ -37,7 +37,10 @@ on_process (void *data)
 
   block = &buffer->buffer->datas[0];
   if (!block->data)
-    return;
+    {
+      pw_stream_queue_buffer (rain->stream, buffer);
+      return;
+    }
 
   frames = block->maxsize / stride;
   if (buffer->requested)

@@ -20,7 +20,7 @@ export interface RainHost {
   taskbar(monitor: Monitor): Rect | null;
 }
 
-const SURFACE_TYPES = [Meta.WindowType.NORMAL, Meta.WindowType.DIALOG, Meta.WindowType.MODAL_DIALOG];
+const SURFACE_TYPES = [Meta.WindowType.NORMAL, Meta.WindowType.DIALOG, Meta.WindowType.MODAL_DIALOG, Meta.WindowType.UTILITY];
 const FADE_DURATION = 600;
 const TIME_WRAP_S = 3600;
 const SNIPPET = (() => {
@@ -60,6 +60,27 @@ function onScreen(window: Meta.Window, workspace: Meta.Workspace): boolean {
     SURFACE_TYPES.includes(window.window_type) && !!actor?.visible && actor.opacity > 0;
 }
 
+function contains(outer: Rect, inner: Rect): boolean {
+  return inner.x >= outer.x && inner.y >= outer.y &&
+    inner.x + inner.width <= outer.x + outer.width && inner.y + inner.height <= outer.y + outer.height;
+}
+
+function bounds(rects: Rect[]): Rect {
+  const left = Math.min(...rects.map(rect => rect.x));
+  const top = Math.min(...rects.map(rect => rect.y));
+  const right = Math.max(...rects.map(rect => rect.x + rect.width));
+  const bottom = Math.max(...rects.map(rect => rect.y + rect.height));
+  return { x: left, y: top, width: right - left, height: bottom - top };
+}
+
+// Windows come topmost first. Ones hidden inside a higher window shelter nothing more, and past the
+// shader's limit the rest share one box, which keeps them dry at the cost of some wallpaper between them.
+function fitSurfaces(windows: Rect[]): Rect[] {
+  const visible = windows.filter((rect, index) => !windows.slice(0, index).some(above => contains(above, rect)));
+  if (visible.length <= MAX_SURFACES) return visible;
+  return [...visible.slice(0, MAX_SURFACES - 1), bounds(visible.slice(MAX_SURFACES - 1))];
+}
+
 class Sheet {
   readonly actor = new RainActor();
   destroyed = false;
@@ -73,9 +94,8 @@ class Sheet {
 
   paint(time: number, density: number, wind: number, windows: Rect[], taskbar: Rect | null): void {
     const { x, y, width, height } = this.monitor;
-    const rects = windows
-      .filter(rect => rect.x < x + width && rect.x + rect.width > x && rect.y < y + height && rect.y + rect.height > y)
-      .slice(0, MAX_SURFACES);
+    const rects = fitSurfaces(windows
+      .filter(rect => rect.x < x + width && rect.x + rect.width > x && rect.y < y + height && rect.y + rect.height > y));
     const values = new Array<number>(MAX_SURFACES * 4).fill(0);
     rects.forEach((rect, index) => values.splice(index * 4, 4, rect.x - x, rect.y - y, rect.width, rect.height));
     this.actor.uniform('rain_time', [time]);

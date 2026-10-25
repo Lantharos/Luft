@@ -13,6 +13,9 @@ const WHEEL_PAN = 60;
 const FINGER_PAN = 10;
 const FINGER_ZOOM = 0.04;
 const PINCH_ENTER = 1.15;
+// A pinch that moves this far without zooming much is a pan, and leaves the view where it went
+const PINCH_PAN = 24;
+const PINCH_STILL = 1.08;
 const MAGNIFIED = 1.06;
 const STEP_THRESHOLD = 48;
 const SHIELD_BELOW = 0.6;
@@ -54,6 +57,7 @@ export class BoardInput {
   private tapTime = -Infinity;
   private pinching = false;
   private pinchScale = 1;
+  private pinchTravel = 0;
   private pinchEntered: Meta.Window | null = null;
   private readonly pinchStart: View = { x: 0, y: 0, scale: 1 };
   private dragging: Clutter.Grab | null = null;
@@ -172,6 +176,7 @@ export class BoardInput {
         camera.stop();
         copyView(this.pinchStart, camera.view);
         this.pinchScale = 1;
+        this.pinchTravel = 0;
         this.pinchEntered = this.actions.enteredWindow();
       }
       return this.pinching;
@@ -180,6 +185,7 @@ export class BoardInput {
     if (phase === Clutter.TouchpadGesturePhase.UPDATE) {
       const [dx, dy] = event.get_gesture_motion_delta();
       this.pinchScale = event.get_gesture_pinch_scale();
+      this.pinchTravel += Math.hypot(dx, dy);
       camera.zoomAt(this.pinchStart.scale * this.pinchScale, x, y, dx, dy);
       return true;
     }
@@ -193,6 +199,10 @@ export class BoardInput {
     this.pinchEntered = null;
     const camera = this.actions.camera;
     if (camera.view.scale >= FULL_SIZE * MAGNIFIED) {
+      this.actions.freeView();
+      return;
+    }
+    if (this.pinchTravel >= PINCH_PAN && this.pinchScale < PINCH_STILL && this.pinchScale > 1 / PINCH_STILL) {
       this.actions.freeView();
       return;
     }

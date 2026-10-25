@@ -5,6 +5,8 @@ import Gtk from 'gi://Gtk?version=4.0';
 const [title, width, height, state] = ARGV;
 const MOVE_HANDLE = 32;
 const GESTURES = {[Gdk.EventType.TOUCHPAD_PINCH]: 'p', [Gdk.EventType.TOUCHPAD_SWIPE]: 's'};
+// Touches show as t, then how they ended: e for lifted, c for taken away by the desktop
+const TOUCHES = {[Gdk.EventType.TOUCH_BEGIN]: 't', [Gdk.EventType.TOUCH_END]: 'te', [Gdk.EventType.TOUCH_CANCEL]: 'tc'};
 const PHASES = {
   [Gdk.TouchpadGesturePhase.BEGIN]: 'b',
   [Gdk.TouchpadGesturePhase.UPDATE]: 'u',
@@ -24,6 +26,14 @@ app.connect('activate', () => {
   const show = () => { window.title = `${title}${entry.text ? `: ${entry.text}` : ''}${clicked}${scale}${gestures.length ? ` ~${gestures.join(',')}` : ''}`; };
   const touchpad = new Gtk.EventControllerLegacy();
   touchpad.connect('event', (_controller, event) => {
+    const touch = TOUCHES[event.get_event_type()];
+    if (touch) {
+      if (gestures.at(-1) !== touch) {
+        gestures.push(touch);
+        show();
+      }
+      return false;
+    }
     const gesture = GESTURES[event.get_event_type()];
     if (!gesture) return false;
     const step = gesture + PHASES[event.get_gesture_phase()];

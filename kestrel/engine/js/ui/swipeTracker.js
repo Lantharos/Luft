@@ -365,6 +365,8 @@ export const SwipeTracker = GObject.registerClass({
             allowScroll: true,
             phase: Clutter.EventPhase.BUBBLE,
             name: 'SwipeTracker',
+            // Lets touches someone else wants go to them instead
+            yieldsTouch: () => false,
         });
 
         super._init();
@@ -381,7 +383,7 @@ export const SwipeTracker = GObject.registerClass({
             max_n_points: params.allowDrag ? 0 : GESTURE_FINGER_COUNT,
         });
         this._panGesture.connect('may-recognize', () => {
-            return (this._allowedModes & Main.actionMode) !== 0;
+            return (this._allowedModes & Main.actionMode) !== 0 && !params.yieldsTouch(this._panGesture);
         });
         this._panGesture.connect('recognize', this._beginPanGesture.bind(this));
         this._panGesture.connect('pan-update', this._updatePanGesture.bind(this));

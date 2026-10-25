@@ -142,6 +142,8 @@ The volume, mute, microphone, play, pause, next and previous, brightness, keyboa
 
 ## Touchscreen gestures
 
+A touchscreen takes the touchpad's gestures too, as if it were one big touchpad: four fingers up and down, three fingers on a board or while scrolling, and two fingers on a board to pan and zoom.
+
 | Gesture | Does |
 | --- | --- |
 | Three fingers sideways | Next or previous workspace |

@@ -9,6 +9,7 @@ import { Greeter, type GreeterContext } from './auth/greeter/greeter.js';
 import { LockControls } from './auth/lockScreen/controls.js';
 import { Board, type BoardFrame } from './desktop/board/board.js';
 import { FourFingerSwipe, type SwipeDirection, type SwipeTrack } from './desktop/gestures/fourFingers.js';
+import { TouchscreenGestures } from './desktop/gestures/touchscreen.js';
 import { ContextMenus, type MenuEntry } from './desktop/menus/contextMenus.js';
 import { coveredMonitors } from './desktop/panel/coverage.js';
 import type { Monitor } from './desktop/panel/panel.js';
@@ -81,6 +82,12 @@ class KestrelUi {
   private readonly rotation: RotationAnimation;
   private readonly copilot: CopilotActions;
   private readonly fourFingers = new FourFingerSwipe(direction => this.followFourFingers(direction));
+  private readonly touchscreen = new TouchscreenGestures({
+    handle: event => this.touchpad(event),
+    wantsSwipe: (fingers, x, y) => fingers === 4 || (fingers === 3 && (this.board.shown || this.tiling.ownsSwipe(x, y))),
+    // Two fingers on the board zoom anywhere once they pinch, and move the view on its empty canvas
+    wantsPinch: (x, y, pinched) => this.board.shown && this.board.canInteract() && (pinched || this.board.onCanvas(x, y)),
+  });
   private focusSignals: (() => void)[] = [];
   private readonly disconnectors: (() => void)[] = [];
   private sessionSyncLater = 0;
@@ -391,6 +398,10 @@ class KestrelUi {
     return this.fourFingers.handle(event) || this.tiling.touchpad(event) || this.board.input.handle(event);
   }
 
+  touchClaimed(gesture: Clutter.Gesture): boolean {
+    return this.touchscreen.claims(gesture);
+  }
+
   snappingAllowed(): boolean {
     return this.tiling.mode === 'off';
   }
@@ -402,6 +413,7 @@ class KestrelUi {
     dropAfterMotion(this.syncSessionAfterMotion);
     this.panels.shutdown();
     this.liveWallpaper.destroy();
+    this.touchscreen.destroy();
     this.rain.destroy();
     this.rainSound.destroy();
     this.rotation.destroy();
@@ -490,6 +502,7 @@ export function taskViewProgress(): number { return currentUi?.taskViewProgress(
 export function lockControls(): LockControls { return currentUi!.lockControls(); }
 
 export function touchpad(event: Clutter.Event): boolean { return currentUi?.touchpad(event) ?? false; }
+export function touchClaimed(gesture: Clutter.Gesture): boolean { return currentUi?.touchClaimed(gesture) ?? false; }
 
 export function board(): Board | null { return currentUi?.board ?? null; }
 

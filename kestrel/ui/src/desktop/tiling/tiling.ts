@@ -62,6 +62,11 @@ export class Tiling {
     return this.tiler.mode;
   }
 
+  // Whether a three-finger swipe at this point scrolls a strip
+  ownsSwipe(x: number, y: number): boolean {
+    return this.tiler.mode === 'scrolling' && this.context.canInteract() && !this.context.board.shown && this.stripAt(x, y) !== null;
+  }
+
   touchpad(event: Clutter.Event): boolean {
     return this.swipe.handle(event);
   }

@@ -412,6 +412,7 @@ export class WorkspaceAnimationController {
                 allowDrag: false,
                 phase: Clutter.EventPhase.CAPTURE,
                 name: 'WorkspaceAnimation swipe tracker',
+                yieldsTouch: gesture => KestrelUi.touchClaimed(gesture),
             });
         swipeTracker.connect('begin', this._switchWorkspaceBegin.bind(this));
         swipeTracker.connect('update', this._switchWorkspaceUpdate.bind(this));

@@ -6747,8 +6747,8 @@ checksum = "cf54715a573b99ac80df0bc206da022bcd442c974952c7b9720069370852e21f"
 
 [[package]]
 name = "sabine"
-version = "0.55.0"
-source = "git+https://github.com/Lantharos/Sabine?rev=4c24325419edd2095d8d9bb7e221b10b1ad95efa#4c24325419edd2095d8d9bb7e221b10b1ad95efa"
+version = "0.56.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.56#21c052fe52e7485f223f843f77a12ffe9098ba64"
 dependencies = [
  "base64",
  "block2",
@@ -6807,8 +6807,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-bridge"
-version = "0.55.0"
-source = "git+https://github.com/Lantharos/Sabine?rev=4c24325419edd2095d8d9bb7e221b10b1ad95efa#4c24325419edd2095d8d9bb7e221b10b1ad95efa"
+version = "0.56.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.56#21c052fe52e7485f223f843f77a12ffe9098ba64"
 dependencies = [
  "serde",
  "serde_json",
@@ -6816,8 +6816,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-host"
-version = "0.55.0"
-source = "git+https://github.com/Lantharos/Sabine?rev=4c24325419edd2095d8d9bb7e221b10b1ad95efa#4c24325419edd2095d8d9bb7e221b10b1ad95efa"
+version = "0.56.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.56#21c052fe52e7485f223f843f77a12ffe9098ba64"
 dependencies = [
  "sabine-bridge",
  "sabine-runtime",
@@ -6828,8 +6828,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-platform"
-version = "0.55.0"
-source = "git+https://github.com/Lantharos/Sabine?rev=4c24325419edd2095d8d9bb7e221b10b1ad95efa#4c24325419edd2095d8d9bb7e221b10b1ad95efa"
+version = "0.56.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.56#21c052fe52e7485f223f843f77a12ffe9098ba64"
 dependencies = [
  "block2",
  "futures-util",
@@ -6848,8 +6848,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-runtime"
-version = "0.55.0"
-source = "git+https://github.com/Lantharos/Sabine?rev=4c24325419edd2095d8d9bb7e221b10b1ad95efa#4c24325419edd2095d8d9bb7e221b10b1ad95efa"
+version = "0.56.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.56#21c052fe52e7485f223f843f77a12ffe9098ba64"
 dependencies = [
  "bzip2",
  "libc",
@@ -6865,8 +6865,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-service"
-version = "0.55.0"
-source = "git+https://github.com/Lantharos/Sabine?rev=4c24325419edd2095d8d9bb7e221b10b1ad95efa#4c24325419edd2095d8d9bb7e221b10b1ad95efa"
+version = "0.56.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.56#21c052fe52e7485f223f843f77a12ffe9098ba64"
 dependencies = [
  "base64",
  "clap",

@@ -8,7 +8,8 @@ use crate::bridge::events::Events;
 use crate::desktop::palette::{self, Palette};
 use crate::desktop::{self, corners::Corners, motion::Motion, typography::Typography};
 
-const WINDOW_RADIUS: i32 = 16;
+// Kestrel rounds windows to 15px, so the blur and input regions follow it
+const WINDOW_RADIUS: i32 = 15;
 const CONTROL_SIZE: i32 = 28;
 const CONTROL_TOP: i32 = 12;
 const CONTROL_OFFSETS: [(SabineWindowControlAction, i32); 3] = [

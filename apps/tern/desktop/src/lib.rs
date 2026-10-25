@@ -12,7 +12,7 @@ use sabine::{SabineWindow, WindowRegion};
 use state::TernState;
 
 const APP_ID: &str = "com.lantharos.tern";
-const WINDOW_RADIUS: i32 = 16;
+const WINDOW_RADIUS: i32 = 15;
 
 pub fn run_app() -> ! {
     let state = TernState::new();

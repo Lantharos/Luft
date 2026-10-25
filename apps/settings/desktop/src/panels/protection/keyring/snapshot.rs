@@ -1,4 +1,3 @@
-use futures_util::future::join;
 use luft_app::apps::App;
 use serde::Serialize;
 use zbus::{DeserializeDict, Type};
@@ -66,7 +65,7 @@ struct SshKey {
 }
 
 #[derive(Serialize)]
-struct Access {
+pub struct Access {
     stores: Vec<AppStore>,
     history: Vec<Event>,
 }
@@ -83,7 +82,6 @@ struct Ssh {
 pub struct Keyring {
     #[serde(flatten)]
     status: Status,
-    access: Option<Access>,
     ssh: Option<Ssh>,
 }
 
@@ -99,7 +97,9 @@ fn identity(key: String, name: String, desktop_id: &str) -> Identity {
     }
 }
 
-async fn access() -> Result<Access, Problem> {
+/// Which apps keep secrets and what they did lately. The keyring asks you to confirm
+/// before telling, so this is read only when someone opens the list.
+pub async fn access() -> Result<Access, Problem> {
     let mut stores: Vec<AppStore> = bus::call::<_, Vec<Store>>(ACCESS, "AppStores", &())
         .await?
         .into_iter()
@@ -147,10 +147,8 @@ pub async fn read() -> Result<Option<Keyring>, Problem> {
     let Some(status) = bus::optional(bus::properties::<Status>(STATUS).await)? else {
         return Ok(None);
     };
-    let (access, ssh) = join(access(), ssh()).await;
     Ok(Some(Keyring {
         status,
-        access: bus::optional(access)?,
-        ssh: bus::optional(ssh)?,
+        ssh: bus::optional(ssh().await)?,
     }))
 }

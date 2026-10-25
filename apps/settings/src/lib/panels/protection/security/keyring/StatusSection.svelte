@@ -20,7 +20,6 @@
 	let chipSealed = $derived(sealed(keyring));
 	let resealable = $derived(keyring.chip === 'ready' && !keyring.tpmSealed);
 	let fingerprints = $derived(fingerprintReader && chipSealed);
-	let access = $derived(keyring.access);
 </script>
 
 <Section>
@@ -62,14 +61,12 @@
 			onchange={(enabled) => runner.run(() => setLockWithScreen(enabled))}
 		/>
 	</Row>
-	{#if access}
-		<Row
-			title={t('settings-passwords-apps')}
-			description={keyring.locked ? t('settings-passwords-apps-locked') : t('settings-passwords-apps-description')}
-			disabled={keyring.locked}
-			onclick={onaccess}
-		/>
-	{/if}
+	<Row
+		title={t('settings-passwords-apps')}
+		description={keyring.locked ? t('settings-passwords-apps-locked') : t('settings-passwords-apps-description')}
+		disabled={keyring.locked}
+		onclick={onaccess}
+	/>
 </Section>
 
 {#if runner.error}

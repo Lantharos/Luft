@@ -52,7 +52,6 @@ setup-destination-meet-description = Meet Luft on selle ruumi juba teinud, nii e
 setup-destination-meet-drive-title = Kettal { $drive }
 setup-destination-meet-drive-description = Meet Luft on selle ruumi juba teisele kettale teinud ja Luft käivitub sealt oma käivitusfailidega.
 setup-destination-looking = Kettaid uuritakse…
-
 setup-destination-meet-choice = Koos Windowsiga
 setup-destination-meet-choice-description = Kasutage { $size } ruumi, mille Meet Luft Windowsi kõrvale tegi.
 setup-destination-meet-drive-choice = Kettal { $drive }
@@ -67,7 +66,6 @@ setup-destination-try-choice = Proovi Lufti
 setup-destination-try-choice-description = Vaadake kõigepealt ringi. Midagi ei installita ja teie kettad jäävad puutumata.
 setup-destination-custom-choice = Kohandatud
 setup-destination-custom-choice-description = Korraldage partitsioonid ise rakenduses Kettad.
-
 setup-destination-more-options = Rohkem valikuid
 setup-destination-starting = Käivitamine…
 setup-destination-replace = Asenda
@@ -108,10 +106,11 @@ setup-windows-fast-startup-description = Siis lülitub Windows täielikult välj
 setup-windows-clock = Hoia kell mõlemas õige
 setup-windows-clock-description = Windows loeb arvuti kella samamoodi nagu Luft, nii et kellaaeg ei hüppa enam süsteemi vahetamisel.
 setup-windows-bluetooth = Too Bluetoothi seadmed kaasa
-setup-windows-bluetooth-description = { $count ->
-    [one] { $count } Windowsis seotud seade töötab Luftis ilma uuesti sidumata.
-   *[other] { $count } Windowsis seotud seadet töötab Luftis ilma uuesti sidumata.
-}
+setup-windows-bluetooth-description =
+    { $count ->
+        [one] { $count } Windowsis seotud seade töötab Luftis ilma uuesti sidumata.
+       *[other] { $count } Windowsis seotud seadet töötab Luftis ilma uuesti sidumata.
+    }
 
 ## Choosing a drive
 
@@ -119,10 +118,11 @@ setup-drives-label = Kettad
 setup-drives-none = Pole ühtegi ketast, mida Luft saaks kasutada. Ühendage ketas ja otsige uuesti.
 setup-drive-has-windows = Sisaldab: { $windows }
 setup-drive-empty = Tühi
-setup-drive-partitions = { $count ->
-    [one] { $count } partitsioon
-   *[other] { $count } partitsiooni
-}
+setup-drive-partitions =
+    { $count ->
+        [one] { $count } partitsioon
+       *[other] { $count } partitsiooni
+    }
 
 ## Custom space
 
@@ -139,26 +139,28 @@ setup-custom-none = Tehke rakenduses Kettad vähemalt { $size } vaba ruumi ja ot
 setup-replace-stays = Mis jääb alles
 setup-replace-changes = Mis muutub
 setup-replace-keeps-account = Teie failid ja konto { $account }
-setup-replace-keeps-account-password = Teie failid ja konto { $account } koos parooliga
-setup-replace-keeps-accounts = { $count ->
-    [one] Teine konto koos failidega
-   *[other] Ülejäänud { $count } kontot koos failidega
-}
-setup-replace-keeps-networks = { $count ->
-    [one] { $count } võrguühendus koos Wi-Fi-parooliga
-   *[other] { $count } võrguühendust koos Wi-Fi-paroolidega
-}
+setup-replace-keeps-account-password = Sinu failid ja konto { $account } koos salasõna
+setup-replace-keeps-accounts =
+    { $count ->
+        [one] Teine konto koos failidega
+       *[other] Ülejäänud { $count } kontot koos failidega
+    }
+setup-replace-keeps-networks =
+    { $count ->
+        [one] { $count } võrguühendus koos selle WiFi-salasõnaga
+       *[other] { $count } võrguühendust koos selle WiFi-salasõnaga
+    }
 setup-replace-keeps-drives = { $drives }, mis ühendatakse käivitamisel nagu varem
 setup-replace-keeps-hostname = Arvuti nimi { $hostname } ja selle SSH-võtmed
-setup-replace-keeps-tools = { $count ->
-    [one] { $count } teie installitud käsureatööriist, mis on pärast sisselogimist Toolboxis
-   *[other] { $count } teie installitud käsureatööriista, mis on pärast sisselogimist Toolboxis
-}
+setup-replace-keeps-tools =
+    { $count ->
+        [one] { $count } teie installitud käsureatööriist, mis on pärast sisselogimist Toolboxis
+       *[other] { $count } teie installitud käsureatööriista, mis on pärast sisselogimist Toolboxis
+    }
 setup-replace-keeps-old = { $system } ei käivitu enam. Selle süsteemifailid jäävad alles kaustas old-system, kuni eemaldate need rakenduses Kettad või Sätetes.
 setup-replace-erases-system = Süsteemi { $system } süsteemipartitsioon kustutatakse. Teie failid on eraldi partitsioonil ja jäävad nii, nagu on.
 setup-replace-clears-boot = Selle /boot-partitsioon tühjendatakse Lufti käivitusfailide jaoks.
 setup-replace-apps = Sellesse installitud rakendused kaasa ei tule. Hankige need uuesti rakendusest Schelf.
-
 setup-replace-blocked-encrypted = See on krüptitud, seega ei saa seda veel failide säilitamisega asendada.
 setup-replace-blocked-single = Teie failid on süsteemiga samal partitsioonil, seega ei saa seda veel failide säilitamisega asendada.
 setup-replace-blocked-layout = Selle ketta paigutus on selline, mida Luft veel asendada ei saa.
@@ -177,11 +179,11 @@ setup-network-cable = Ühendatud kaabliga
 setup-network-show-all = Kuva kõik võrgud
 setup-network-skip = Jäta vahele
 setup-network-failed = Ühendamine ebaõnnestus
-setup-network-wrong-password = Vale parool
+setup-network-wrong-password = Vale salasõna
 setup-network-connected = Ühendatud
 setup-network-connecting = Ühendamine…
 setup-network-saved = Salvestatud
-setup-network-password = Parool
+setup-network-password = Salasõna
 setup-network-join = Ühenda
 
 ## Account
@@ -191,11 +193,11 @@ setup-account-description = Selle kontoga logite sisse. Rohkem inimesi saate hil
 setup-account-full-name = Teie nimi
 setup-account-full-name-example = Lydia Koidula
 setup-account-user-name = Kasutajanimi
-setup-account-password = Parool
+setup-account-password = Salasõna
 setup-account-repeat = Tippige uuesti
 setup-account-user-name-invalid = Kasutage väiketähti, numbreid ning märke - ja _
 setup-account-full-name-invalid = Ärge kasutage komasid ega kooloneid
-setup-account-mismatch = Paroolid ei ühti
+setup-account-mismatch = Salasõnad ei ühti
 
 ## Installing
 
@@ -228,10 +230,11 @@ setup-enroll-press-key = Vajutage 10 sekundi jooksul mõnda klahvi
 setup-enroll-choose-enroll = Valige Enroll MOK, seejärel Continue
 setup-enroll-choose-yes = Valige Yes
 setup-enroll-type-code = Tippige kood, seejärel valige Reboot
-setup-enroll-digits = { $count ->
-    [one] { $count } number
-   *[other] { $count } numbrit
-}
+setup-enroll-digits =
+    { $count ->
+        [one] { $count } number
+       *[other] { $count } numbrit
+    }
 setup-secure-boot-title = Teie arvuti ei usalda veel Lufti
 setup-secure-boot-code = Kohe pärast järgmist taaskäivitust küsib sinine ekraan, kas Lufti usaldada. Kasutage seal klaviatuuri ja sisestage see kood.
 setup-secure-boot-skipped = Sinine ekraan jäeti vahele. Hankige uus kood ja taaskäivitage, seejärel kasutage seal klaviatuuri.
@@ -255,7 +258,7 @@ setup-protect-encrypt = Krüpti
 ## Fingerprint
 
 setup-fingerprint-title = Logige sisse sõrmejäljega
-setup-fingerprint-description = Avage Luft puudutusega, ilma parooli tippimata. Rohkem sõrmi saate hiljem lisada Sätetes.
+setup-fingerprint-description = Ava Luft puudutusega, ilma salasõna sisestamata. Rohkem sõrmi saate hiljem lisada Seadistustes.
 setup-fingerprint-which = Milline sõrm?
 setup-fingerprint-another = Kas lisada veel üks sõrm?
 setup-fingerprint-finger = Sõrm

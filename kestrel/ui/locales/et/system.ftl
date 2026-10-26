@@ -5,7 +5,7 @@ system-cancel = Loobu
 ## Dictation notifications
 
 dictation-setup-title = Kirjutage häälega
-dictation-setup-body = Rääkige ja öeldu kirjutatakse teie eest mis tahes rakenduses. Kõnetuvastus töötab selles arvutis, seega on kõigepealt vaja kõnemudelit.
+dictation-setup-body = Räägi ja öeldu kirjutatakse sinu eest mis tahes rakenduses. Kõnetuvastus töötab selles arvutis, seega on kõigepealt vaja kõnemudelit.
 dictation-setup-action = Seadista dikteerimine
 dictation-unsupported-title = Dikteerimine keeles { $language } pole selles arvutis saadaval
 dictation-unsupported-body = Selle arvuti protsessor ei suuda käitada kõnetuvastajat, mida keel { $language } vajab. Saate dikteerida mõnes teises keeles.
@@ -14,12 +14,12 @@ dictation-settings-action = Dikteerimise sätted
 ## System health notifications
 
 health-gpu-reset-title = Graafikadraiver lakkas vastamast
-health-gpu-reset-body = { $day ->
-    [today] Arvuti taaskäivitus täna kell { $time } iseenesest. Sätetes on näha, mis võib seda edaspidi ära hoida.
-   *[other] Arvuti taaskäivitus iseenesest: { $date } kell { $time }. Sätetes on näha, mis võib seda edaspidi ära hoida.
-}
+health-gpu-reset-body =
+    { $day ->
+        [today] Arvuti taaskäivitus täna kell { $time } iseenesest. Sätetes on näha, mis võib seda edaspidi ära hoida.
+       *[other] Arvuti taaskäivitus iseenesest: { $date } kell { $time }. Sätetes on näha, mis võib seda edaspidi ära hoida.
+    }
 health-gpu-reset-details = Üksikasjad
-
 oom-app-closed-title = Rakendus { $app } suleti mälu vabastamiseks
 oom-container-closed-title = Konteiner suleti mälu vabastamiseks
 oom-closed-body = Arvutil hakkas mälu otsa saama, seega see suleti, et kõik muu töötaks endiselt sujuvalt.
@@ -54,12 +54,11 @@ vpn-finish-in-browser = Lõpetage sisselogimine brauseris.
 vpn-certificate-untrusted = { $host } esitas sertifikaadi, mida ei saa kontrollida ({ $reason }). Selle sõrmejälg on { $fingerprint }.
 vpn-certificate-warning = Keegi võib end selle serverina esitleda. Looge ühendus ainult siis, kui ootasite seda.
 vpn-certificate-connect = Ühenda siiski
-
-vpn-field-password = Parool
-vpn-field-certificate-password = Sertifikaadi parool
-vpn-field-proxy-password = Puhverserveri parool
+vpn-field-password = Salasõna
+vpn-field-certificate-password = Sertifikaadi salasõna
+vpn-field-proxy-password = Puhverserveri salasõna
 vpn-field-pre-shared-key = Eeljagatud võti
-vpn-field-group-password = Rühma parool
+vpn-field-group-password = Rühma salasõna
 
 ## Battery notifications
 
@@ -73,12 +72,10 @@ battery-ups-very-low-title = UPS-i aku tase on väga madal
 battery-ups-almost-empty-title = UPS-i aku on peaaegu tühi
 battery-very-low-body = { $left } Ühendage arvuti peagi vooluvõrku.
 battery-almost-empty-body = { $left } Ühendage arvuti kohe vooluvõrku, et salvestamata töö ei kaoks.
-
 battery-device-low-title = { $device }: aku tase on madal
 battery-device-very-low-title = { $device }: aku tase on väga madal
 battery-device-low-body = { $left } Laadige seadet peagi.
 battery-device-very-low-body = { $left } Laadige seadet kohe, et see välja ei lülituks.
-
 battery-device-mouse = Hiir
 battery-device-keyboard = Klaviatuur
 battery-device-phone = Telefon
@@ -100,7 +97,6 @@ privacy-thing-microphone = mikrofon
 privacy-thing-screen = ekraan
 privacy-thing-location = asukoht
 privacy-thing-windows = aknad
-
 privacy-camera-unknown-app = Üks rakendus kasutab kaamerat
 privacy-stop-sharing = Lõpeta ekraani jagamine
 privacy-stop-recording = Lõpeta salvestamine
@@ -113,21 +109,23 @@ privacy-mute-microphone = Vaigista mikrofon
 privacy-unmute-microphone = Tühista mikrofoni vaigistus
 privacy-close-app = Sulge { $app }
 privacy-unknown-app = Rakendus
-privacy-windows-seeing-programs = { $count ->
-    [one] { $count } programm saab teie aknaid näha
-   *[other] { $count } programmi saavad teie aknaid näha
-}
-privacy-windows-using-programs = { $count ->
-    [one] { $count } programm saab teie aknaid näha ja kasutada
-   *[other] { $count } programmi saavad teie aknaid näha ja kasutada
-}
+privacy-windows-seeing-programs =
+    { $count ->
+        [one] { $count } programm saab sinu aknaid näha
+       *[other] { $count } programmi saavad sinu aknaid näha
+    }
+privacy-windows-using-programs =
+    { $count ->
+        [one] { $count } programm saab sinu aknaid näha ja kasutada
+       *[other] { $count } programmi saavad sinu aknaid näha ja kasutada
+    }
 privacy-windows-stop = Lõpeta juurdepääs
 
 ## Window access prompt
 
-peek-see-request = Kas lubada teie käivitatud programmil teie aknaid näha?
-peek-see-description = See saab teha pilte kõigist teie avatud akendest.
-peek-use-request = Kas lubada teie käivitatud programmil teie aknaid näha ja kasutada?
+peek-see-request = Kas lubada sinu käivitatud programmil sinu aknaid näha?
+peek-see-description = See saab teha pilte kõigist sinu avatud akendest.
+peek-use-request = Kas lubad sinu käivitatud programmil sinu aknaid näha ja kasutada?
 peek-use-description = See näeb kõiki teie avatud aknaid ning saab neis klõpsata ja tippida, nagu oleksite see teie.
 peek-deny = Ära luba
 peek-allow-once = Luba üks kord
@@ -149,7 +147,7 @@ peek-error-outside = { $x }, { $y } jääb akna pildist välja, pildi suurus on 
 peek-error-nothing-to-capture = Aken ei kuva midagi, mida jäädvustada
 peek-error-window-picture-late = Akna pilt ei saanud õigeks ajaks valmis
 peek-error-screen-picture-late = Ekraani pilt ei saanud õigeks ajaks valmis
-peek-error-no-window-id = Ühelgi aknal pole ID-d { $id }. Avatud aknaid näitab käsk peek list.
+peek-error-no-window-id = Ühelgi aknal pole tunnust { $id }. Avatud aknaid näitab käsk „peek list“.
 peek-error-no-window-for-handle = Tunnusega { $handle } käivitatud programmil pole avatud akent
 peek-error-ended-before-window = Programm lõpetas töö enne, kui avas akna
 peek-error-no-window-in-time = Ühtegi akent ei avanenud { $duration } jooksul

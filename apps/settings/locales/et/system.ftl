@@ -44,9 +44,9 @@ settings-users-account = Teie konto
 settings-users-name = Nimi
 settings-users-name-description = Kuvatakse sisselogimisel ja lukustuskuval
 settings-users-change = Muuda
-settings-users-password = Parool
+settings-users-password = Salasõna
 settings-users-password-description = Kasutatakse selle arvutisse sisselogimiseks ja selle lukust avamiseks
-settings-users-password-set = Määra parool
+settings-users-password-set = Määra salasõna
 settings-users-account-type = Konto tüüp
 settings-users-administrator = Administraator
 settings-users-standard = Tavakonto
@@ -59,36 +59,38 @@ settings-users-close = Sulge
 settings-users-done = Valmis
 settings-users-try-again = Proovi uuesti
 settings-users-remove = Eemalda
-settings-users-password-change-title = Parooli muutmine
-settings-users-password-set-title = Parooli määramine
-settings-users-password-dialog-description = Kasutate seda selle arvutisse sisselogimiseks ja selle lukust avamiseks.
-settings-users-password-current = Praegune parool
-settings-users-password-new = Uus parool
-settings-users-password-new-placeholder = { $count ->
-    [one] Vähemalt { $count } märk
-   *[other] Vähemalt { $count } märki
-}
+settings-users-password-change-title = Muuda oma salasõna
+settings-users-password-set-title = Seadista salasõna
+settings-users-password-dialog-description = Kasutad seda antud arvutisse sisselogimiseks ja selle lukust avamiseks.
+settings-users-password-current = Senine salasõna
+settings-users-password-new = Uus salasõna
+settings-users-password-new-placeholder =
+    { $count ->
+        [one] Vähemalt { $count } märk
+       *[other] Vähemalt { $count } märki
+    }
 settings-users-password-confirm = Kinnita
-settings-users-password-confirm-placeholder = Tippige uuesti
-settings-users-password-change = Muuda parooli
-settings-users-password-changing = Muutmine…
-settings-users-password-wrong = See pole teie praegune parool
-settings-users-password-mismatch = Paroolid ei ühti
-settings-users-password-too-short = See parool on liiga lühike
-settings-users-password-too-similar = See on liiga sarnane teie praeguse parooliga
-settings-users-password-dictionary-word = See põhineb sõnastikusõnal. Proovige midagi vähem levinut.
-settings-users-password-too-simple = See on liiga lihtne. Muutke see pikemaks või kasutage rohkem eri tüüpi märke.
-settings-users-password-rejected = Seda parooli ei aktsepteeritud. Proovige muud parooli.
-settings-users-password-minimum = { $count ->
-    [one] Kasutage vähemalt { $count } märki
-   *[other] Kasutage vähemalt { $count } märki
-}
-settings-users-password-weak = Nõrk. Pikemaid ja mitmest sõnast koosnevaid paroole on raskem ära arvata.
+settings-users-password-confirm-placeholder = Sisesta uuesti
+settings-users-password-change = Muuda salasõna
+settings-users-password-changing = Muudan…
+settings-users-password-wrong = See pole sinu praegune salasõna
+settings-users-password-mismatch = Salasõnad ei ühti
+settings-users-password-too-short = See salasõna on liiga lühike
+settings-users-password-too-similar = See on liiga sarnane sinu praeguse salasõnaga
+settings-users-password-dictionary-word = See põhineb sõnastikusõnal. Proovi midagi vähem levinut.
+settings-users-password-too-simple = See salasõna on liiga lihtne. Muuda see pikemaks või kasuta rohkem eri tüüpi märke.
+settings-users-password-rejected = See salasõna ei sobinud. Proovi muud salasõna.
+settings-users-password-minimum =
+    { $count ->
+        [one] Kasuta vähemalt { $count } märki
+       *[other] Kasuta vähemalt { $count } märki
+    }
+settings-users-password-weak = Nõrk. Pikemaid ja mitmest sõnast koosnevaid salasõnu on raskem ära arvata.
 settings-users-password-fair = Rahuldav. Mõne märgi lisamine muudab selle tugevamaks.
 settings-users-password-strong = Tugev
 settings-users-fingerprints = Sõrmejäljed
 settings-users-fingerprint-add = Lisa sõrmejälg
-settings-users-fingerprint-add-description = Logige sisse ja avage lukk sõrmega, parooli tippimata
+settings-users-fingerprint-add-description = Logi sisse ja ava lukk sõrmejäljega, salasõna sisestamata
 settings-users-fingerprint-choose = Valige lisatav sõrm.
 settings-users-finger = Sõrm
 settings-users-fingerprint-start = Alusta
@@ -120,7 +122,7 @@ settings-login-session = Vaikeseanss
 settings-login-session-description = Kasutatakse, kui keegi muud ei vali
 settings-login-session-automatic = Automaatne
 settings-login-automatic = Automaatne sisselogimine
-settings-login-automatic-description = Logib käivitamisel sisse ilma paroolita
+settings-login-automatic-description = Logib käivitamisel sisse ilma salasõnata
 settings-login-automatic-off = Väljas
 
 ## Updates
@@ -142,10 +144,11 @@ settings-updates-elsewhere-change-by = { $app } muudab tarkvara
 settings-updates-elsewhere-change = Tarkvara muudetakse
 settings-updates-elsewhere-wait = Kui see on lõpetatud, saate uuesti värskendusi otsida
 settings-updates-ready = Värskendused on installimiseks valmis
-settings-updates-available = { $count ->
-    [one] Saadaval on { $count } värskendus
-   *[other] Saadaval on { $count } värskendust
-}
+settings-updates-available =
+    { $count ->
+        [one] Saadaval on { $count } värskendus
+       *[other] Saadaval on { $count } värskendust
+    }
 settings-updates-up-to-date = Teie süsteem on ajakohane
 settings-updates-version = Versioon { $version }
 settings-updates-version-new = Uus versioon
@@ -170,11 +173,12 @@ settings-updates-checking-button = Kontrollimine…
 settings-updates-apps = Rakendused
 settings-updates-app-updates = Rakenduste värskendused
 settings-updates-apps-checking = Rakenduste värskenduste otsimine…
-settings-updates-apps-count = { $count ->
-    [0] Hallatakse rakenduses Schelf
-    [one] { $count } rakendus ootab rakenduses Schelf värskendust
-   *[other] { $count } rakendust ootab rakenduses Schelf värskendust
-}
+settings-updates-apps-count =
+    { $count ->
+        [0] Hallatakse rakenduses Schelf
+        [one] { $count } rakendus ootab rakenduses Schelf värskendust
+       *[other] { $count } rakendust ootab rakenduses Schelf värskendust
+    }
 settings-updates-automatic = Automaatsed värskendused
 settings-updates-look = Otsi värskendusi
 settings-updates-look-description = Ka siis, kui Sätted on suletud
@@ -192,28 +196,31 @@ settings-updates-firmware-update = Värskenda
 settings-updates-firmware-failed = Püsivara ei õnnestunud värskendada
 settings-updates-failed = Viimaseid värskendusi ei õnnestunud installida
 settings-updates-failed-description = Süsteem jäeti endisesse olekusse
-settings-updates-includes = { $parts ->
-    [security] Sisaldab turbeparandusi
-    [kernel] Sisaldab uut Linuxi tuuma
-    [drivers] Sisaldab värskendatud draivereid
-    [security-kernel] Sisaldab turbeparandusi ja uut Linuxi tuuma
-    [security-drivers] Sisaldab turbeparandusi ja värskendatud draivereid
-    [kernel-drivers] Sisaldab uut Linuxi tuuma ja värskendatud draivereid
-    [security-kernel-drivers] Sisaldab turbeparandusi, uut Linuxi tuuma ja värskendatud draivereid
-   *[other] Parandused ja täiustused kogu süsteemis
-}
-settings-updates-count-size = { $count ->
-    [one] { $count } värskendus · { $size }
-   *[other] { $count } värskendust · { $size }
-}
+settings-updates-includes =
+    { $parts ->
+        [security] Sisaldab turbeparandusi
+        [kernel] Sisaldab uut Linuxi tuuma
+        [drivers] Sisaldab värskendatud draivereid
+        [security-kernel] Sisaldab turbeparandusi ja uut Linuxi tuuma
+        [security-drivers] Sisaldab turbeparandusi ja värskendatud draivereid
+        [kernel-drivers] Sisaldab uut Linuxi tuuma ja värskendatud draivereid
+        [security-kernel-drivers] Sisaldab turbeparandusi, uut Linuxi tuuma ja värskendatud draivereid
+       *[other] Parandused ja täiustused kogu süsteemis
+    }
+settings-updates-count-size =
+    { $count ->
+        [one] { $count } värskendus · { $size }
+       *[other] { $count } värskendust · { $size }
+    }
 settings-updates-restart-and-install = Taaskäivita ja installi
 settings-updates-download = Laadi alla
 settings-updates-see-included = Vaata, mis on kaasas
 settings-updates-included = Mis on kaasas
-settings-updates-included-description = { $count ->
-    [one] { $count } värskendus süsteemile, selle draiveritele ja teekidele
-   *[other] { $count } värskendust süsteemile, selle draiveritele ja teekidele
-}
+settings-updates-included-description =
+    { $count ->
+        [one] { $count } värskendus süsteemile, selle draiveritele ja teekidele
+       *[other] { $count } värskendust süsteemile, selle draiveritele ja teekidele
+    }
 settings-updates-security-fix = Turbeparandus
 settings-updates-done = Valmis
 settings-updates-area-kernel = Linuxi tuum
@@ -311,7 +318,8 @@ settings-accounts-connecting = Ühendamine…
 settings-accounts-offline = Võrguühenduseta
 settings-accounts-offline-kept = Võrguühenduseta, alles hoitud failid on endiselt siin
 settings-accounts-not-connected = Pole ühendatud
-settings-accounts-syncing = { $count ->
+settings-accounts-syncing =
+    { $count ->
         [one] Sünkroonitakse { $count } muudatus
        *[other] Sünkroonitakse { $count } muudatust
     }
@@ -321,7 +329,8 @@ settings-accounts-server = Server
 settings-accounts-storage = Salvestusruum
 settings-accounts-storage-used = Kasutusel { $used }, kokku { $total }
 settings-accounts-on-device = Selles seadmes
-settings-accounts-kept = { $count ->
+settings-accounts-kept =
+    { $count ->
         [one] Alles hoitud { $count } üksus, ülejäänu laaditakse alla avamisel
        *[other] Alles hoitud { $count } üksust, ülejäänu laaditakse alla avamisel
     }
@@ -344,19 +353,19 @@ settings-accounts-provider-webdav = Mis tahes server, mis toetab WebDAV-i
 ## Accounts: signing in
 
 settings-accounts-sign-in-again-title = Uuesti sisselogimine: { $account }
-settings-accounts-browser = Avaneb brauser, kus saate sisse logida teenuse { $provider } kontoga. Luft ei näe kunagi teie parooli.
-settings-accounts-password-for = Sisestage konto { $user } parool.
+settings-accounts-browser = Avaneb brauser, kus saad sisse logida teenuse { $provider } kontoga. Luft ei näe kunagi sinu salasõna.
+settings-accounts-password-for = Sisesta { $user } konto salasõna.
 settings-accounts-apple-account = Apple’i konto
-settings-accounts-password = Parool
-settings-accounts-app-password = Rakenduse parool
+settings-accounts-password = Salasõna
+settings-accounts-app-password = Rakenduse salasõna
 settings-accounts-user = Kasutajanimi
-settings-accounts-apple-note = Kasutage oma Apple’i konto parooli, rakendusepõhised paroolid siin ei tööta. Seejärel kuvab Apple koodi teie iPhone’is, iPadis või Macis.
+settings-accounts-apple-note = Kasuta oma Apple’i konto salasõna, rakendusepõhised salasõnad siin ei tööta. Seejärel kuvab Apple koodi sinu iPhone’is, iPadis või Macis.
 settings-accounts-nextcloud-browser = Avaneb brauser, kus saate oma serverisse sisse logida ja Luftile juurdepääsu anda.
-settings-accounts-use-app-password = Kasuta hoopis rakenduse parooli
+settings-accounts-use-app-password = Kasuta hoopis rakenduse salasõna
 settings-accounts-error-server = Sisestage serveri aadress
 settings-accounts-error-apple-account = Sisestage oma Apple’i konto e-posti aadress
 settings-accounts-error-user = Sisestage kasutajanimi
-settings-accounts-error-password = Sisestage parool
+settings-accounts-error-password = Sisesta salasõna
 settings-accounts-cancel = Loobu
 settings-accounts-back = Tagasi
 settings-accounts-continue-in-browser = Jätka brauseris
@@ -364,7 +373,7 @@ settings-accounts-sign-in = Logi sisse
 settings-accounts-try-again = Proovi uuesti
 settings-accounts-continue = Jätka
 settings-accounts-working = Ühendumine: { $provider }…
-settings-accounts-finish-in-browser = Lõpetage brauseris sisselogimine teenuse { $provider } kontoga. Luft ei näe kunagi teie parooli ja see vaade värskendub ise, kui olete valmis.
+settings-accounts-finish-in-browser = Lõpeta brauseris sisselogimine teenuse { $provider } kontoga. Luft ei näe kunagi sinu salasõna ja see vaade värskendub ise, kui oled lõpetanud.
 settings-accounts-no-browser = Brauser ei avanenud. Kopeerige link ja avage see brauseris.
 settings-accounts-open-again = Ava leht uuesti
 settings-accounts-copy-link = Kopeeri link

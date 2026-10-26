@@ -23,10 +23,11 @@ meet-logs-failed = Meet Luft ei saanud Lufti proovimise logisid salvestada
 
 ## What went wrong, shown in red next to a Try again button
 
-problem-check = { $platform ->
-    [linux] Meet Luft ei saanud selle arvuti kontrollimist lõpetada.
-   *[windows] Meet Luft ei saanud selle arvuti kontrollimist lõpetada.
-}
+problem-check =
+    { $platform ->
+        [linux] Meet Luft ei saanud selle arvuti kontrollimist lõpetada.
+       *[windows] Meet Luft ei saanud selle arvuti kontrollimist lõpetada.
+    }
 problem-room = Luftile ruumi tegemine jäi pooleli.
 problem-room-linux = Lufti ettevalmistamine jäi pooleli.
 problem-update = Lufti värskendamine jäi pooleli.
@@ -44,32 +45,37 @@ problem-luft = Meet Luft ei saanud Lufti ketast kontrollida.
 problem-resize = Lufti suuruse muutmine jäi pooleli.
 problem-cancel = Meet Luft ei saanud muudatust tühistada.
 problem-give = Windows ei saanud ruumi tagasi võtta.
-problem-declined = { $platform ->
-    [linux] Meet Luft vajab kettal toimetamiseks teie luba. Sisestage küsimisel oma parool.
-   *[windows] Meet Luft vajab kettal toimetamiseks teie luba. Kui Windows küsib, valige Jah.
-}
+problem-declined =
+    { $platform ->
+        [linux] Meet Luft vajab kettal toimetamiseks sinu luba. Sisesta küsimisel oma salasõna.
+       *[windows] Meet Luft vajab kettal toimetamiseks sinu luba. Kui Windows küsib, vali Jah.
+    }
 
 ## First screen
 
-hello-intro = { $platform ->
-    [linux] Proovige Lufti otse siit, ilma USB-mälupulgata. Kui see meeldib, võib Luft selle süsteemi asemele tulla ja teie failid alles jätta.
-   *[windows] Luft saab elada otse Windowsi kõrval. Proovige seda esmalt ilma midagi installimata ja võtke oma asjad kaasa, kui olete valmis.
-}
-hello-check = { $platform ->
-    [linux] Kontrolli seda arvutit
-   *[windows] Kontrolli seda arvutit
-}
+hello-intro =
+    { $platform ->
+        [linux] Proovige Lufti otse siit, ilma USB-mälupulgata. Kui see meeldib, võib Luft selle süsteemi asemele tulla ja teie failid alles jätta.
+       *[windows] Luft saab elada otse Windowsi kõrval. Proovige seda esmalt ilma midagi installimata ja võtke oma asjad kaasa, kui olete valmis.
+    }
+hello-check =
+    { $platform ->
+        [linux] Kontrolli seda arvutit
+       *[windows] Kontrolli seda arvutit
+    }
 
 ## Checking whether the computer is ready
 
-check-looking-title = { $platform ->
-    [linux] Arvuti kontrollimine
-   *[windows] Arvuti kontrollimine
-}
-check-ready-title = { $platform ->
-    [linux] See arvuti on Lufti jaoks valmis
-   *[windows] See arvuti on Lufti jaoks valmis
-}
+check-looking-title =
+    { $platform ->
+        [linux] Arvuti kontrollimine
+       *[windows] Arvuti kontrollimine
+    }
+check-ready-title =
+    { $platform ->
+        [linux] See arvuti on Lufti jaoks valmis
+       *[windows] See arvuti on Lufti jaoks valmis
+    }
 check-blocked-title = Peaaegu valmis
 check-moment = See võtab hetke.
 check-slow = Windows arvutab, kui palju ruumi see loovutada saab. Suurel kettal võib see võtta mõne minuti.
@@ -232,24 +238,27 @@ box-folder-downloads = Allalaadimised
 box-folder-music = Muusika
 box-folder-pictures = Pildid
 box-folder-videos = Videod
-box-folder-size = { $size }, { $files ->
-    [one] { $files } fail
-   *[other] { $files } faili
-}
+box-folder-size =
+    { $size }, { $files ->
+        [one] { $files } fail
+       *[other] { $files } faili
+    }
 box-wifi-title = Wi-Fi-võrgud
-box-wifi-description = Koos paroolidega, nii et Luft on kohe võrgus
+box-wifi-description = Koos salasõnadega, nii et Luft on kohe võrgus
 box-bluetooth-title = Bluetooth-seadmed
-box-bluetooth-description = { $devices ->
-    [one] { $devices } seade, valmis ilma uuesti sidumata
-   *[other] { $devices } seadet, valmis ilma uuesti sidumata
-}
+box-bluetooth-description =
+    { $devices ->
+        [one] { $devices } seade, valmis ilma uuesti sidumata
+       *[other] { $devices } seadet, valmis ilma uuesti sidumata
+    }
 box-wallpaper-title = Taustapilt
 box-wallpaper-description = Teie Windowsi töölaua pilt
 box-account-title = Teie nimi ja pilt
-box-total-slow = { $size }, pakkimine võtab umbes { $minutes ->
-    [one] { $minutes } minuti
-   *[other] { $minutes } minutit
-}
+box-total-slow =
+    { $size }, pakkimine võtab umbes { $minutes ->
+        [one] { $minutes } minuti
+       *[other] { $minutes } minutit
+    }
 box-pack = Paki
 
 ## Progress while Meet Luft works
@@ -282,10 +291,11 @@ working-keep-open = Hoidke see aken avatuna.
 ## After Luft was removed
 
 removed-title = Kõik on nagu enne
-removed-description = { $platform ->
-    [linux] Lufti failid ja käivituskirje on eemaldatud ning arvuti käivitub täpselt nagu varem. Tulge tagasi millal iganes.
-   *[windows] Lufti partitsioonid ja käivituskirje on eemaldatud ning Windowsil on taas kogu oma ruum. Tulge tagasi millal iganes.
-}
+removed-description =
+    { $platform ->
+        [linux] Lufti failid ja käivituskirje on eemaldatud ning arvuti käivitub täpselt nagu varem. Tulge tagasi millal iganes.
+       *[windows] Lufti partitsioonid ja käivituskirje on eemaldatud ning Windowsil on taas kogu oma ruum. Tulge tagasi millal iganes.
+    }
 
 ## Making a USB stick
 
@@ -304,14 +314,16 @@ stick-ventoy-description = Kas lisada Luft sellele või kustutada kogu mälupulk
 stick-erase-it = Kustuta
 stick-add = Lisa Luft
 stick-replace-title = Kas asendada sellel olev Luft?
-stick-replace-description = { $count ->
-    [one] { $names } on juba sellel mälupulgal. Uus Luft võib selle asemele tulla.
-   *[other] { $names } on juba sellel mälupulgal. Uus Luft võib nende asemele tulla.
-}
-stick-keep = { $count ->
-    [one] Jäta mõlemad
-   *[other] Jäta kõik
-}
+stick-replace-description =
+    { $count ->
+        [one] { $names } on juba sellel mälupulgal. Uus Luft võib selle asemele tulla.
+       *[other] { $names } on juba sellel mälupulgal. Uus Luft võib nende asemele tulla.
+    }
+stick-keep =
+    { $count ->
+        [one] Jäta mõlemad
+       *[other] Jäta kõik
+    }
 stick-replace = Asenda
 stick-full-title = Luftile pole ruumi
 stick-full-description = Luft vajab { $needed } ja sellel mälupulgal on vaba { $free }. Tehke sellele ruumi või kustutage see ja tehke sellest Lufti mälupulk.

@@ -65,28 +65,31 @@ bluetooth-connect-device = Ühenda seadmega { $deviceName }
 bluetooth-disconnect-device = Katkesta ühendus seadmega { $deviceName }
 bluetooth-no-devices = Saadaolevaid ega ühendatud seadmeid pole
 bluetooth-turn-on-hint = Seadmetega ühenduse loomiseks lülitage Bluetooth sisse
-bluetooth-connected-count = { $count ->
-    [one] { $count } ühendatud
-   *[other] { $count } ühendatud
-}
+bluetooth-connected-count =
+    { $count ->
+        [one] { $count } ühendatud
+       *[other] { $count } ühendatud
+    }
 
 ## Network menus in quick settings
 
-network-menu-unknown-network = <tundmatu>
+network-menu-unknown-network = <unknown>
 network-menu-connect = Ühenda
 network-menu-disconnect = Katkesta ühendus
 network-menu-connect-to = Ühenda: { $name }
 network-menu-disconnect-from = Katkesta ühendus: { $name }
 network-menu-turn-off = Lülita välja
-network-menu-wifi-network = { $secure ->
-    [yes] { $name }, turvaline, signaali tugevus { $strength }%
-   *[no] { $name }, turvamata, signaali tugevus { $strength }%
-}
+network-menu-wifi-network =
+    { $secure ->
+        [yes] { $name }, turvaline, signaali tugevus { $strength }%
+       *[no] { $name }, turvamata, signaali tugevus { $strength }%
+    }
 network-menu-hotspot = Kuumkoht { $name }
-network-menu-connected-count = { $count ->
-    [one] { $count } ühendatud
-   *[other] { $count } ühendatud
-}
+network-menu-connected-count =
+    { $count ->
+        [one] { $count } ühendatud
+       *[other] { $count } ühendatud
+    }
 network-menu-vpn = VPN
 network-menu-vpn-open-menu = Ava VPN-i menüü
 network-menu-vpn-settings = VPN-i sätted
@@ -113,7 +116,7 @@ network-menu-failed-body = Võrguühendust ei õnnestunud aktiveerida
 ## Location access dialog
 
 location-dialog-title = Juurdepääs asukohale
-location-dialog-description = Rakendus { $appName } soovib juurdepääsu teie asukohale
+location-dialog-description = Rakendus { $appName } soovib juurdepääsu sinu asukohale
 location-dialog-info = Asukohale juurdepääsu saab igal ajal muuta privaatsussätetes
 location-dialog-deny = Keela juurdepääs
 location-dialog-grant = Luba juurdepääs
@@ -121,7 +124,7 @@ location-dialog-grant = Luba juurdepääs
 ## Thunderbolt notifications
 
 thunderbolt-unknown-title = Tundmatu Thunderbolti seade
-thunderbolt-unknown-body = Teie äraolekul ühendati uus seade. Selle kasutamiseks eemaldage see ja ühendage uuesti.
+thunderbolt-unknown-body = Sinu äraolekul ühendati uus seade. Selle kasutamiseks eemalda see ja ühenda uuesti.
 thunderbolt-unauthorized-title = Volitamata Thunderbolti seade
 thunderbolt-unauthorized-body = Ühendati uus seade, mis vajab administraatori heakskiitu
 thunderbolt-error-title = Thunderbolti volitamise viga
@@ -135,10 +138,11 @@ access-dialog-allow = Luba
 ## Display change confirmation
 
 display-change-title = Kas jätta need kuvasätted?
-display-change-countdown = { $seconds ->
-    [one] Sätted taastatakse { $seconds } sekundi pärast
-   *[other] Sätted taastatakse { $seconds } sekundi pärast
-}
+display-change-countdown =
+    { $seconds ->
+        [one] Sätted taastatakse { $seconds } sekundi pärast
+       *[other] Sätted taastatakse { $seconds } sekundi pärast
+    }
 display-change-revert = Taasta sätted
 display-change-keep = Jäta muudatused
 
@@ -149,7 +153,7 @@ window-resize-size = { $width } × { $height }
 ## App not responding
 
 close-dialog-title = „{ $appName }“ ei reageeri
-close-dialog-description = Võite veidi oodata, kuni see jätkab, või sundida rakenduse täielikult sulguma.
+close-dialog-description = Või veidi oodata, kuni see jätkab või sundida rakenduse täielikult sulguma
 close-dialog-force-quit = Sunni sulgema
 close-dialog-wait = Oota
 
@@ -162,12 +166,12 @@ switch-monitor-built-in-only = Ainult sisemine
 
 ## Sign-in prompt
 
-auth-prompt-password = Parool
+auth-prompt-password = Salasõna
 auth-prompt-username = Kasutajanimi
 auth-prompt-back = Tagasi
 auth-prompt-submit = Kinnita
-auth-prompt-wrong-password = See parool ei sobinud
-auth-prompt-failed = See ei õnnestunud. Proovige uuesti.
+auth-prompt-wrong-password = See salasõna ei sobinud
+auth-prompt-failed = See ei õnnestunud. Proovi uuesti.
 fingerprint-not-recognized = Sõrmejälge ei tuvastatud
 
 ## Drive connected notification
@@ -212,10 +216,10 @@ inhibit-shortcuts-allow = Luba
 
 polkit-title = Vajalik on autentimine
 polkit-administrator = Administraator
-polkit-password = Parool
+polkit-password = Salasõna
 polkit-cancel = Loobu
 polkit-authenticate = Autendi
-polkit-failed = See ei õnnestunud. Proovige uuesti.
+polkit-failed = See ei õnnestunud. Proovi uuesti.
 
 ## Unlocking encrypted drives
 
@@ -226,12 +230,12 @@ mount-keyfiles-use-app = Võtmefaile kasutava köite avamiseks kasutage rakendus
 mount-keyfiles-need-app = Võtmefaile kasutava köite avamiseks on vaja eraldi tööriista, näiteks rakendust <i>Kettad</i>
 mount-pim-number = PIM-number
 mount-pim-invalid = PIM peab olema number või tühi
-mount-password = Parool
-mount-remember-password = Jäta parool meelde
+mount-password = Salasõna
+mount-remember-password = Jäta salasõna meelde
 mount-cancel = Loobu
 mount-unlock = Ava
 mount-open-app = Ava { $appName }
-mount-wrong-password = See ei õnnestunud. Proovige uuesti.
+mount-wrong-password = Vabandust, see ei õnnestunud. Proovi uuesti.
 mount-unlock-failed = Köidet ei õnnestunud avada
 mount-pim-unsupported = Installitud udisksi versioon ei toeta PIM-sätet
 
@@ -239,34 +243,39 @@ mount-pim-unsupported = Installitud udisksi versioon ei toeta PIM-sätet
 
 end-session-log-out-user = Kasutaja { $userName } väljalogimine
 end-session-log-out-title = Väljalogimine
-end-session-log-out-user-countdown = { $seconds ->
-    [one] Kasutaja { $userName } logitakse automaatselt välja { $seconds } sekundi pärast
-   *[other] Kasutaja { $userName } logitakse automaatselt välja { $seconds } sekundi pärast
-}
-end-session-log-out-countdown = { $seconds ->
-    [one] Teid logitakse automaatselt välja { $seconds } sekundi pärast
-   *[other] Teid logitakse automaatselt välja { $seconds } sekundi pärast
-}
+end-session-log-out-user-countdown =
+    { $seconds ->
+        [one] Kasutaja { $userName } logitakse automaatselt välja { $seconds } sekundi pärast
+       *[other] Kasutaja { $userName } logitakse automaatselt välja { $seconds } sekundi pärast
+    }
+end-session-log-out-countdown =
+    { $seconds ->
+        [one] Teid logitakse automaatselt välja { $seconds } sekundi pärast
+       *[other] Teid logitakse automaatselt välja { $seconds } sekundi pärast
+    }
 end-session-log-out-button = Logi välja
 end-session-power-off-title = Väljalülitamine
 end-session-power-off-updates-title = Värskenduste installimine ja väljalülitamine
-end-session-power-off-countdown = { $seconds ->
-    [one] Süsteem lülitub automaatselt välja { $seconds } sekundi pärast
-   *[other] Süsteem lülitub automaatselt välja { $seconds } sekundi pärast
-}
+end-session-power-off-countdown =
+    { $seconds ->
+        [one] Süsteem lülitub automaatselt välja { $seconds } sekundi pärast
+       *[other] Süsteem lülitub automaatselt välja { $seconds } sekundi pärast
+    }
 end-session-power-off-button = Lülita välja
 end-session-restart-title = Taaskäivitamine
 end-session-restart-updates-title = Värskenduste installimine ja taaskäivitamine
-end-session-restart-countdown = { $seconds ->
-    [one] Süsteem taaskäivitub automaatselt { $seconds } sekundi pärast
-   *[other] Süsteem taaskäivitub automaatselt { $seconds } sekundi pärast
-}
+end-session-restart-countdown =
+    { $seconds ->
+        [one] Süsteem taaskäivitub automaatselt { $seconds } sekundi pärast
+       *[other] Süsteem taaskäivitub automaatselt { $seconds } sekundi pärast
+    }
 end-session-restart-button = Taaskäivita
 end-session-update-restart-title = Taaskäivitamine ja värskenduste installimine
-end-session-update-restart-countdown = { $seconds ->
-    [one] Süsteem taaskäivitub ja installib värskendused automaatselt { $seconds } sekundi pärast
-   *[other] Süsteem taaskäivitub ja installib värskendused automaatselt { $seconds } sekundi pärast
-}
+end-session-update-restart-countdown =
+    { $seconds ->
+        [one] Süsteem taaskäivitub ja installib värskendused automaatselt { $seconds } sekundi pärast
+       *[other] Süsteem taaskäivitub ja installib värskendused automaatselt { $seconds } sekundi pärast
+    }
 end-session-update-restart-button = Taaskäivita ja installi
 end-session-install-updates = Installi ootel tarkvaravärskendused
 end-session-install-version = Installi versioon { $version }
@@ -281,21 +290,21 @@ end-session-console-user = { $userName } (konsool)
 ## Network passwords, asked when connecting needs one
 
 network-agent-auth-required = Vajalik on autentimine
-network-agent-wifi-rejected = Võrgu „{ $networkName }“ salvestatud parool ei sobinud. Sisestage see uuesti.
-network-agent-wifi-secrets = Traadita võrguga „{ $networkName }“ ühendamiseks on vaja paroole või krüptovõtmeid
+network-agent-wifi-rejected = Võrgu „{ $networkName }“ salvestatud salasõna ei sobinud. Sisesta see uuesti.
+network-agent-wifi-secrets = Traadita võrguga „{ $networkName }“ ühendamiseks on vaja salasõnu või krüptovõtmeid
 network-agent-wps-hint = Ühenduse saate luua ka ruuteri nupuga „WPS“
 network-agent-wired-title = Juhtmega võrgu 802.1X-autentimine
 network-agent-dsl-title = DSL-autentimine
 network-agent-pin-title = Vajalik on PIN-kood
 network-agent-pin-body = Mobiilse lairibaseadme jaoks on vaja PIN-koodi
-network-agent-vpn-title = VPN-i parool
-network-agent-password-required = Ühenduse „{ $networkName }“ loomiseks on vaja parooli
+network-agent-vpn-title = VPN-i salasõna
+network-agent-password-required = Ühenduse „{ $networkName }“ loomiseks on vaja salasõna
 network-agent-connect = Ühenda
 network-agent-cancel = Loobu
-network-agent-password = Parool
+network-agent-password = Salasõna
 network-agent-username = Kasutajanimi
 network-agent-key = Võti
-network-agent-private-key-password = Privaatvõtme parool
+network-agent-private-key-password = Privaatvõtme salasõna
 network-agent-identity = Identiteet
 network-agent-service = Teenus
 network-agent-network-name = Võrgu nimi
@@ -396,9 +405,18 @@ screenshot-file = Kuvatõmmis { $timestamp }
 screenshot-screencast-recorded = Ekraanisalvestus on valmis
 screenshot-screencast-start-failed = Ekraanisalvestust ei õnnestunud alustada
 screenshot-screencast-out-of-space = Ekraanisalvestus ebaõnnestus: kettaruum on otsas
-screenshot-screencast-try-again = Ekraanisalvestus ebaõnnestus. Proovige uuesti.
+screenshot-screencast-try-again = Ekraanisalvestus ebaõnnestus. Proovi uuesti
 screenshot-screencast-failed = Ekraanisalvestus ebaõnnestus
 screenshot-screencast-view = Klõpsake video vaatamiseks
 screenshot-show-in-rover = Kuva rakenduses Rover
 screenshot-captured = Kuvatõmmis on tehtud
 screenshot-captured-body = Pildi saate kleepida lõikelaualt
+rain-title = Vihm
+rain-open-menu = Ava vihmamenüü
+rain-drizzle = Uduvihm
+rain-rain = Vihm
+rain-storm = Torm
+rain-show = Näita töölaual
+rain-sound = Heli
+rain-volume = Vihma valjus
+rain-settings = Vihma seadistused

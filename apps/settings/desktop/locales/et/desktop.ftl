@@ -1,14 +1,18 @@
 desktop-app-name = Sätted
 
 ## Settings storage
+
 desktop-gsettings-none-installed = Sätteid pole installitud
 desktop-gsettings-not-installed = { $schema } pole installitud
 desktop-gsettings-no-schema = Sätetel pole skeemi
 desktop-gsettings-watcher-stopped = Sätete jälgija peatus
+
 ## Online accounts
+
 desktop-accounts-not-web-address = See pole veebiaadress
 
 ## Bluetooth
+
 desktop-bluetooth-code-mismatch = Kood ei klappinud
 desktop-bluetooth-pairing-canceled = Sidumine tühistati
 desktop-bluetooth-timed-out = Seade ei vastanud piisavalt kiiresti
@@ -20,10 +24,12 @@ desktop-bluetooth-no-adapter = Bluetoothi adapterit pole
 desktop-bluetooth-windows-import-failed = Windowsi Bluetoothi seadmeid ei õnnestunud üle tuua
 
 ## Keyboard and dictation
+
 desktop-keyboard-keys-missing = Rakendus Keys pole installitud
 desktop-dictation-not-web-address = See pole veebiaadress
 
 ## Keyboard shortcuts
+
 desktop-shortcut-toggle-message-tray = Kuva teavituste loend
 desktop-shortcut-toggle-start = Ava menüü Start
 desktop-shortcut-toggle-quick-settings = Ava kiirsätted
@@ -144,15 +150,18 @@ desktop-shortcut-tiling-stack-left = Virna vasakpoolsesse veergu
 desktop-shortcut-tiling-stack-right = Virna parempoolsesse veergu
 
 ## Sound
+
 desktop-sound-meter-stream = Sisendi tase
 desktop-sound-unavailable = Heli pole praegu saadaval
 
 ## Folders
+
 desktop-no-cache-folder = Vahemälukausta pole
 desktop-no-data-folder = Andmekausta pole
 desktop-no-config-folder = Konfiguratsioonikausta pole
 
 ## Cursor themes downloaded from GNOME-Look
+
 desktop-cursors-store-unreachable = GNOME-Look pole praegu kättesaadav. Kontrollige ühendust ja proovige uuesti.
 desktop-cursors-store-failed = GNOME-Look ei saanud vastata: { $reason }
 desktop-cursors-theme-gone = See teema pole enam saadaval
@@ -170,9 +179,11 @@ desktop-cursors-no-free-name = Ikoonide kaustas pole vaba nime teema „{ $name 
 desktop-cursors-nothing-to-preview = Selles teemas pole kursoreid, mida kuvada
 
 ## Fonts
+
 desktop-fonts-magpie-missing = Rakendus Magpie pole installitud
 
 ## Wallpaper
+
 desktop-wallpaper-no-pictures-folder = Kausta Pildid pole
 desktop-wallpaper-unopenable = Seda faili ei saa avada
 desktop-wallpaper-add-title = Taustapiltide lisamine
@@ -180,43 +191,53 @@ desktop-wallpaper-add-filter = Pildid ja videod
 desktop-wallpaper-video-no-picture = Selles videos pole pilti
 
 ## Keyring
+
 desktop-keyring-not-running = Võtmerõngas ei tööta
 desktop-keyring-denied = Seda saab muuta ainult installitud rakendus Sätted
 desktop-keyring-unsupported = Võtmerõngas ei oska seda veel teha
 desktop-keyring-reseal-failed = Turvakiip ei saanud praegu võtmerõngast kaitsta
 
 ## Passkeys
+
 desktop-passkeys-missing = Seda pääsuvõtit pole olemas
 
 ## Device security
+
 desktop-security-recovery-file-name = Taastevõti.txt
 desktop-security-usb-unavailable = USB-kaitse pole selles arvutis saadaval
 
 ## Shared
+
 desktop-admin-required = Selle muutmiseks on vaja administraatori õigusi
 
 ## About
+
 desktop-about-disks-missing = Rakendus Kettad pole installitud
 
 ## Apps
+
 desktop-apps-kind-not-choosable = Sellist rakendust ei saa valida
 desktop-apps-uninstalled = See rakendus pole enam installitud
 desktop-apps-no-longer-starts = See rakendus ei käivitu enam automaatselt
 desktop-apps-cannot-autostart = See rakendus ei saa automaatselt käivituda
 
 ## Login screen
+
 desktop-login-missing-property = Sisselogimiskuva jättis teatamata atribuudi { $property }
 
 ## Picture chooser for the login screen wallpaper and account pictures
+
 desktop-picture-choose-title = Pildi valimine
 desktop-picture-filter = Pildid
 desktop-picture-unopenable = Seda pilti ei saa avada
 
 ## Users
-desktop-users-password-failed = Parooli ei õnnestunud muuta: { $reason }
+
+desktop-users-password-failed = Salasõna muutmine ei õnnestunud: { $reason }
 desktop-users-password-timed-out = passwd lakkas vastamast
 
 ## Updates
+
 desktop-updates-available-summary = Saadaval on süsteemivärskendused
 desktop-updates-available-body = Nende allalaadimiseks ja installimiseks avage Sätted.
 desktop-updates-ready-summary = Värskendused on installimiseks valmis
@@ -233,3 +254,10 @@ desktop-updates-firmware-unnamed = Seadme püsivara
 desktop-updates-firmware-current = See seade on juba ajakohane.
 desktop-updates-firmware-no-download = Seda värskendust ei saa alla laadida.
 desktop-apps-folder-title = Vali rakendusele kaust
+desktop-shortcut-terminal = Ava terminal
+desktop-shortcut-tiling-maximize-column = Kasuta täislaiuses veergu
+desktop-shortcut-tiling-expand-column = Laienda veerg vabasse ruumi
+desktop-shortcut-tiling-focus-first = Säti fookus esimesele veerule
+desktop-shortcut-tiling-focus-last = Säti fookus viimasele veerule
+desktop-shortcut-tiling-move-first = Tõsta veerg algusesse
+desktop-shortcut-tiling-move-last = Tõsta veerg lõppu

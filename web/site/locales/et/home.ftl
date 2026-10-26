@@ -3,36 +3,30 @@
 home-description = Rahulik ja kiire töölaud teie arvutile. Proovige seda Windowsist või Linuxist ühe taaskäivitusega, ilma USB-mälupulgata.
 home-get = Hangi Luft
 home-look = Vaata lähemalt
-
 home-desktop-alt = Lufti töölaud, kus udusel metsataustal on avatud Rover, Sätted ja Tern
 home-intro = Luft on terviklik süsteem teie arvutile, mis põhineb Fedoral. Sellel on oma töölaud, oma rakendused ja tuum, mis hoiab end ise tervena, nii et saate oma päevaga edasi minna.
-
 home-start-heading = Start teab, kus kõik asub.
 home-start-text = Tippige paar tähte ja Start leiab rakendused, sätted, failid ja isegi neis olevad sõnad. See arvutab tehteid, teisendab ühikuid ning lülitab soovi korral sisse tumeda režiimi või Wi-Fi.
 home-start-alt = Menüü Start otsib sõna „tume“, tulemusteks tumeda režiimi toiming ja sobivad sätted
-
 home-essentials-heading = Kõik vajalik ühe klõpsu kaugusel.
 home-essentials-text = Kiirsätted on paanid, mille paigutate ise. Teavitused on rühmitatud rakenduste kaupa ning vastused, meediajuhtelemendid ja kalender on kohe nende kõrval.
 home-quick-settings-alt = Kiirsätted võrgu, toiterežiimi, tumeda režiimi ja helitugevusega
 home-notifications-alt = Teavituskeskus koos kalendriga
-
 home-windows-heading = Ruumi igale aknale.
 home-windows-text = Paigutage aknad mallidesse või vaadake neid kõiki korraga. Või muutke mis tahes tööala tahvliks – lõputuks lõuendiks, kus aknad on kõrvuti ja kogu pilti näete välja suumides.
 home-board-alt = Tööala tahvlina, kõik aknad kõrvuti
 home-snap-alt = Paigutusmallid aktiivsele aknale
 home-all-windows-alt = Kõik aknad ja tööalad ühe pilguga
-
 home-motion-heading = Liigub nii, nagu peab.
 home-motion-text = Kõik Luftis liigub vedrudel, nii et liikumine saab poole pealt suunda muuta ilma tõmblemata. Pühkimised järgivad teie sõrmi ja jõuavad sinna, kuhu soovisite, ning rakendused avanevad kiiresti, isegi esimesel korral.
 home-motion-clip = Start, kiirsätted, kõik aknad ja tahvel avanevad ning sulguvad Luftis
-
 home-wallpapers-heading = Valige foto. Luft teeb ülejäänu.
-home-wallpapers-text = { $count ->
-    [one] Kaasas on üks foto. Valige see ning rõhuvärv, klaas ja kõik rakendused võtavad üle selle värvid, nii heledas kui ka tumedas režiimis.
-   *[other] Kaasas on { $count } fotot. Valige üks ning rõhuvärv, klaas ja kõik rakendused võtavad üle selle värvid, nii heledas kui ka tumedas režiimis.
-}
+home-wallpapers-text =
+    { $count ->
+        [one] Kaasas on üks foto. Valige see ning rõhuvärv, klaas ja kõik rakendused võtavad üle selle värvid, nii heledas kui ka tumedas režiimis.
+       *[other] Kaasas on { $count } fotot. Valige üks ning rõhuvärv, klaas ja kõik rakendused võtavad üle selle värvid, nii heledas kui ka tumedas režiimis.
+    }
 home-wallpaper = { $name }, foto: { $photographer }
-
 home-apps-heading = Omad rakendused algusest peale.
 home-apps-text = Luftil on oma rakendused. Neil on sama klaas, samad värvid ja sama liikumine nagu töölaual, need avanevad silmapilkselt ega jää jalgu.
 home-apps-label = Lufti rakendused
@@ -59,10 +53,8 @@ home-app-barometer = Süsteemimonitor
 home-app-barometer-detail = Mida iga rakendus kasutab, koos reaalajas graafikutega protsessori, mälu, graafika ja võrgu kohta.
 home-app-keys = Klaviatuuripaigutused
 home-app-keys-detail = Joonistage oma klaviatuuripaigutus või sisestusmeetod ja proovige seda enne salvestamist.
-
 home-cloud-heading = Teie pilv tavaliste kaustadena.
 home-cloud-text = Logige Sätetes üks kord sisse ja teie failid ilmuvad rakendusse Rover ning iga rakenduse avamisdialoogi. Midagi ei laadita alla enne, kui selle avate, ja arvutisse hoitu töötab ka võrguühenduseta.
-
 home-security-heading = Turvaline loomult, mitte sätetest.
 home-security-text = Kõik, mis hoiab teie arvuti teie omana, on algusest peale sees ega jää jalgu.
 home-security-sealed = Pitseeritud ja allkirjastatud
@@ -74,10 +66,9 @@ home-security-secure-boot-text = Käivituse iga samm on allkirjastatud, alates U
 home-security-encryption = Krüptimine ilma tippimiseta
 home-security-encryption-text = Lülitage krüptimine sisse ühe klõpsuga. TPM-iga avaneb ketas ise ja ainult sellele süsteemile, millele see kuulub.
 home-security-passkeys = Pääsuvõtmed kõikjal
-home-security-passkeys-text = Pääsuvõtmed asuvad teie arvutis ja töötavad igas brauseris, kinnitatuna sõrmejälje või parooliga.
+home-security-passkeys-text = Pääsuvõtmed asuvad sinu arvutis ja töötavad igas brauseris, kinnitatuna sõrmejälje või salasõnaga.
 home-security-keyring = Üks võtmerõngas
-home-security-keyring-text = Paroolid, sisselogimised, SSH-võtmed ja GnuPG on ühes kohas ning avanevad, kui sisse logite.
-
+home-security-keyring-text = Salasõnad, sisselogimised, SSH-võtmed ja GnuPG on ühes kohas ning avanevad, kui logid sisse.
 home-meet-heading = Proovige juba täna. Ilma mälupulgata.
 home-meet-text = Meet Luft valmistab arvuti ette süsteemist, mida juba kasutate, ja taaskäivitab selle üheks korraks Lufti.
 home-meet-download = Laadi alla Meet Luft
@@ -88,7 +79,6 @@ home-meet-restart = Taaskäivitage Lufti
 home-meet-restart-text = Proovige nii kaua, kui soovite, ja installige see siis Windowsi kõrvale või vana Linuxi asemele, failid alles jättes. Järgmine taaskäivitus viib tagasi selle juurde, mis teil oli.
 home-meet-usb = Eelistate USB-mälupulka? Meet Luft teeb ka selle, või <a href="{ $iso }">kirjutage ISO ise</a>.
 home-meet-shot = Meet Luft, valmis Lufti proovima, teie asju kaasa võtma või seda installima
-
 home-questions-heading = Küsimused
 home-question-cost = Kas see maksab midagi?
 home-question-cost-answer = Ei. Luft on tasuta ja avatud lähtekoodiga, nagu ka selle rakendused.

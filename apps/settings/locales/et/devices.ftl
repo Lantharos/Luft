@@ -71,10 +71,11 @@ settings-sound-louder = Luba valjemat heli kui 100%
 settings-sound-louder-description = Suurema helitugevuse korral võib heli moonduda
 settings-sound-input-level = Sisendi tase
 settings-sound-apps = Rakenduste helitugevus
-settings-sound-apps-playing = { $count ->
-    [one] { $count } rakendus esitab heli
-   *[other] { $count } rakendust esitab heli
-}
+settings-sound-apps-playing =
+    { $count ->
+        [one] { $count } rakendus esitab heli
+       *[other] { $count } rakendust esitab heli
+    }
 settings-sound-app-output = Rakenduse { $app } heliväljund
 settings-sound-profiles = Seadmeprofiilid
 settings-sound-profiles-row-description = Valige, kuidas iga heliseadet kasutatakse
@@ -125,10 +126,11 @@ settings-power-empty = Tühi
 settings-power-not-charging = Vooluvõrgus, ei laadi
 settings-power-health = Aku seisukord
 settings-power-capacity = { $full }, uuena { $design }
-settings-power-cycles = { $count ->
-    [one] { $cycles } laadimistsükkel
-   *[other] { $cycles } laadimistsüklit
-}
+settings-power-cycles =
+    { $count ->
+        [one] { $cycles } laadimistsükkel
+       *[other] { $cycles } laadimistsüklit
+    }
 settings-power-watt-hours = { NUMBER($value, maximumFractionDigits: 1) } Wh
 settings-power-show-percentage = Kuva protsent
 settings-power-show-percentage-description = Kuvab akutaseme akuikooni sees
@@ -136,21 +138,24 @@ settings-power-show-percentage-description = Kuvab akutaseme akuikooni sees
 ## Durations, used inside other sentences and as picker options
 
 settings-power-duration-under-minute = alla minuti
-settings-power-duration-minutes = { $minutes ->
-    [one] { $minutes } minut
-   *[other] { $minutes } minutit
-}
-settings-power-duration-hours = { $hours ->
-    [one] { $hours } tund
-   *[other] { $hours } tundi
-}
-settings-power-duration-hours-minutes = { $hours ->
-    [one] { $hours } tund
-   *[other] { $hours } tundi
-} { $minutes ->
-    [one] { $minutes } minut
-   *[other] { $minutes } minutit
-}
+settings-power-duration-minutes =
+    { $minutes ->
+        [one] { $minutes } minut
+       *[other] { $minutes } minutit
+    }
+settings-power-duration-hours =
+    { $hours ->
+        [one] { $hours } tund
+       *[other] { $hours } tundi
+    }
+settings-power-duration-hours-minutes =
+    { $hours ->
+        [one] { $hours } tund
+       *[other] { $hours } tundi
+    } { $minutes ->
+        [one] { $minutes } minut
+       *[other] { $minutes } minutit
+    }
 settings-power-never = Mitte kunagi
 
 ## Charge limit
@@ -228,18 +233,21 @@ settings-power-long-sleep = Lülita pärast pikka und välja
 settings-power-long-sleep-description = Selle asemel, et lasta akul unerežiimis tühjaks saada, lülitub arvuti välja, kui aku hakkab tühjaks saama või pärast pikka und akutoitel. Avatud aknaid ei säilitata.
 settings-power-long-sleep-failed = Seda ei õnnestunud muuta. Proovige uuesti.
 settings-power-long-sleep-after = Lülita välja pärast
-settings-power-long-sleep-hours = { $hours ->
-    [one] { $hours } tund
-   *[other] { $hours } tundi
-}
-settings-power-long-sleep-days = { $days ->
-    [one] { $days } päev
-   *[other] { $days } päeva
-}
-settings-power-long-sleep-weeks = { $weeks ->
-    [one] { $weeks } nädal
-   *[other] { $weeks } nädalat
-}
+settings-power-long-sleep-hours =
+    { $hours ->
+        [one] { $hours } tund
+       *[other] { $hours } tundi
+    }
+settings-power-long-sleep-days =
+    { $days ->
+        [one] { $days } päev
+       *[other] { $days } päeva
+    }
+settings-power-long-sleep-weeks =
+    { $weeks ->
+        [one] { $weeks } nädal
+       *[other] { $weeks } nädalat
+    }
 
 ## Keyboard
 
@@ -461,3 +469,4 @@ settings-mouse-touchpad-secondary-click-description = Kuidas paremklõpsata ilma
 settings-mouse-touchpad-click-corner = Nurgas
 settings-mouse-touchpad-disable-typing = Keela tippimise ajal
 settings-mouse-touchpad-disable-typing-description = Et kursor tippimise ajal ei hüppaks
+settings-sound-connection-undetected = { $name } (mitte midagi ei õnnestunud tuvastada)

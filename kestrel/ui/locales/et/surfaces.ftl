@@ -46,14 +46,16 @@ start-search-calculation = { $expression }, kopeerimiseks vajutage Enter
 start-search-answer-until = Kuni kuupäevani { $date }
 start-search-answer-since = Alates kuupäevast { $date }
 start-search-answer-between = Vahemik { $from } – { $to }
-start-search-answer-time-ahead = { $place }, { $hours ->
-    [one] { $hours } tund ees
-   *[other] { $hours } tundi ees
-}
-start-search-answer-time-behind = { $place }, { $hours ->
-    [one] { $hours } tund taga
-   *[other] { $hours } tundi taga
-}
+start-search-answer-time-ahead =
+    { $place }, { $hours ->
+        [one] { $hours } tund ees
+       *[other] { $hours } tundi ees
+    }
+start-search-answer-time-behind =
+    { $place }, { $hours ->
+        [one] { $hours } tund taga
+       *[other] { $hours } tundi taga
+    }
 start-search-answer-time-same = { $place }, sama aeg mis siin
 start-search-answer-converted = { $place }, kui kell on { $time } ({ $from })
 start-search-answer-converted-here = Siin, kui kell on { $time } ({ $from })
@@ -83,7 +85,7 @@ start-search-airplane-mode-off = Lülita lennukirežiim välja
 start-search-airplane-mode-keywords = lennukirežiim, lennurežiim, raadiod, airplane mode
 start-search-keep-awake-on = Hoia ärkvel
 start-search-keep-awake-off = Lõpeta ärkvel hoidmine
-start-search-keep-awake-keywords = hoia ärkvel, ärkvel, ära maga, unerežiimi vältimine, caffeine
+start-search-keep-awake-keywords = hoia ärkvel, püsi ärkvel, ära maga, unerežiimi vältimine, caffeine
 start-search-lock-keywords = lukusta, lukusta ekraan, lukusta arvuti, lukustuskuva
 start-search-suspend-keywords = unerežiim, uni, ooterežiim, magama
 start-search-log-out-keywords = logi välja, väljalogimine, lõpeta seanss, log out
@@ -124,10 +126,11 @@ notifications-clear-everything = Tühjenda kõik teavitused
 notifications-lock-screen-content = Kuva sõnumite sisu lukustuskuval
 notifications-settings = Teavituste sätted
 notifications-clear-app = Tühjenda rakenduse { $app } teavitused
-notifications-more = { $count ->
-    [one] Veel { $count }
-   *[other] Veel { $count }
-}
+notifications-more =
+    { $count ->
+        [one] Veel { $count }
+       *[other] Veel { $count }
+    }
 notifications-show-less = Kuva vähem
 notifications-dismiss-notification = Sulge teavitus
 notifications-open = Ava

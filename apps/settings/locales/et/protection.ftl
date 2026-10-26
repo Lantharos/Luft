@@ -68,10 +68,11 @@ settings-security-secure-boot-description = Seda arvutit saab käivitada ainult 
 settings-security-chip = Turvakiip
 settings-security-chip-description = Hoiab võtmeid turvaliselt ja kontrollib, kuidas arvuti käivitus
 settings-firmware-updates-ready = Püsivaravärskendused on valmis
-settings-firmware-updates-count = { $count ->
-    [one] Lehel Värskendused on teie riistvarale { $count } värskendus
-   *[other] Lehel Värskendused on teie riistvarale { $count } värskendust
-}
+settings-firmware-updates-count =
+    { $count ->
+        [one] Lehel Värskendused on teie riistvarale { $count } värskendus
+       *[other] Lehel Värskendused on teie riistvarale { $count } värskendust
+    }
 
 ## Security: signed startup
 
@@ -123,22 +124,26 @@ settings-security-hardware-description = { $summary }, tase { $level }/{ $highes
 settings-security-hardware-next = Järgmise taseme jaoks
 settings-security-hardware-highest = See on kõrgeim olemasolev tase.
 settings-security-hardware-inactive = Praegu pole aktiivne
-settings-security-hardware-fix-maker = { $count ->
-    [one] Seda saab lisada ainult teie arvuti tootja, tavaliselt püsivaravärskendusega:
-   *[other] Neid saab lisada ainult teie arvuti tootja, tavaliselt püsivaravärskendusega:
-}
-settings-security-hardware-fix-firmware = { $count ->
-    [one] Selle saab sisse lülitada arvuti püsivara sätetes:
-   *[other] Need saab sisse lülitada arvuti püsivara sätetes:
-}
-settings-security-hardware-fix-system = { $count ->
-    [one] See sõltub süsteemi seadistusest:
-   *[other] Need sõltuvad süsteemi seadistusest:
-}
-settings-security-hardware-fix-unknown = { $count ->
-    [one] See pole selles arvutis saadaval:
-   *[other] Need pole selles arvutis saadaval:
-}
+settings-security-hardware-fix-maker =
+    { $count ->
+        [one] Seda saab lisada ainult teie arvuti tootja, tavaliselt püsivaravärskendusega:
+       *[other] Neid saab lisada ainult teie arvuti tootja, tavaliselt püsivaravärskendusega:
+    }
+settings-security-hardware-fix-firmware =
+    { $count ->
+        [one] Selle saab sisse lülitada arvuti püsivara sätetes:
+       *[other] Need saab sisse lülitada arvuti püsivara sätetes:
+    }
+settings-security-hardware-fix-system =
+    { $count ->
+        [one] See sõltub süsteemi seadistusest:
+       *[other] Need sõltuvad süsteemi seadistusest:
+    }
+settings-security-hardware-fix-unknown =
+    { $count ->
+        [one] See pole selles arvutis saadaval:
+       *[other] Need pole selles arvutis saadaval:
+    }
 
 ## Security: USB protection
 
@@ -164,10 +169,11 @@ settings-encryption-drive-encrypting = Ketta krüptimine, valmis { $percent }
 settings-encryption-drive-encrypting-paused = Ketta krüptimine, peatatud: { $percent }
 settings-encryption-drive-decrypting = Ketta dekrüptimine, valmis { $percent }
 settings-encryption-drive-decrypting-paused = Ketta dekrüptimine, peatatud: { $percent }
-settings-encryption-drives-auto-unlock = { $count ->
-    [one] { $count } krüptitud ketas avaneb koos selle arvutiga
-   *[other] { $count } krüptitud ketast avaneb koos selle arvutiga
-}
+settings-encryption-drives-auto-unlock =
+    { $count ->
+        [one] { $count } krüptitud ketas avaneb koos selle arvutiga
+       *[other] { $count } krüptitud ketast avaneb koos selle arvutiga
+    }
 
 ## Device encryption: unlocking the disk
 
@@ -215,14 +221,16 @@ settings-encryption-pin-field = PIN-kood
 settings-encryption-new-pin-field = Uus PIN-kood
 settings-encryption-pin-length = { $min }–{ $max } numbrit
 settings-encryption-pin-digits-only = Kasutage ainult numbreid
-settings-encryption-pin-too-short = { $min ->
-    [one] Kasutage vähemalt { $min } numbrit
-   *[other] Kasutage vähemalt { $min } numbrit
-}
-settings-encryption-pin-too-long = { $max ->
-    [one] Kasutage kõige rohkem { $max } numbrit
-   *[other] Kasutage kõige rohkem { $max } numbrit
-}
+settings-encryption-pin-too-short =
+    { $min ->
+        [one] Kasutage vähemalt { $min } numbrit
+       *[other] Kasutage vähemalt { $min } numbrit
+    }
+settings-encryption-pin-too-long =
+    { $max ->
+        [one] Kasutage kõige rohkem { $max } numbrit
+       *[other] Kasutage kõige rohkem { $max } numbrit
+    }
 settings-encryption-pins-differ = PIN-koodid ei ühti
 settings-encryption-confirm-field = Kinnita
 settings-encryption-type-again = Tippige uuesti
@@ -239,101 +247,104 @@ settings-recovery-replace-key = Asenda võti
 settings-recovery-shown-title = Teie taastevõti
 settings-recovery-shown-description = Tippige see, kui arvuti küsib käivitamisel kunagi taastevõtit. Hoidke koopiat kusagil mujal kui selles arvutis.
 settings-recovery-fresh-title = Salvestage uus taastevõti
-settings-recovery-fresh-description = Eelmine võti enam ei tööta. Hoidke see paberil või paroolihalduris.
+settings-recovery-fresh-description = Eelmine võti enam ei tööta. Hoid see uus turvaliselt kas vana kooli seifis või moodsas salasõnahalduris.
 
 ## Passwords and keys (the keyring)
 
-settings-passwords-title = Paroolid ja võtmed
+settings-passwords-title = Salasõnad ja võtmed
 settings-passwords-not-running = Võtmerõngas ei tööta
-settings-passwords-not-running-description = Teie paroolid ja võtmed kuvatakse siin, kui see käivitub
+settings-passwords-not-running-description = Sinu salasõnad ja võtmed kuvatakse siin, kui see käivitub
 settings-passwords-locked = Lukus
-settings-passwords-contents = { $count ->
-    [0] Midagi pole veel salvestatud
-    [one] { $count } parool või võti
-   *[other] { $count } parooli ja võtit
-}
-settings-passwords-protected-chip = Kaitstud teie parooli ja turvakiibiga
-settings-passwords-protected = Kaitstud teie parooliga
+settings-passwords-contents =
+    { $count ->
+        [0] Midagi pole veel salvestatud
+        [one] { $count } salasõna või võti
+       *[other] { $count } salasõna ja võtit
+    }
+settings-passwords-protected-chip = Kaitstud sinu salasõna ja turvakiibiga
+settings-passwords-protected = Kaitstud sinu salasõnaga
 settings-passwords-unlock = Ava
 settings-passwords-lock = Lukusta
 settings-passwords-seal-title = Pitseeri turvakiibiga
 settings-passwords-seal-description = Nende koopiaid ei saa teises arvutis avada
 settings-passwords-seal = Pitseeri
-settings-passwords-fingerprint-on = Avaneb teie sõrmejäljega
-settings-passwords-fingerprint-on-description = Sellega sisselogimine avab ka teie paroolid
+settings-passwords-fingerprint-on = Avaneb sinu sõrmejäljega
+settings-passwords-fingerprint-on-description = Sellega sisselogimine avab ka sinu salasõnad
 settings-passwords-fingerprint = Ava sõrmejäljega
-settings-passwords-fingerprint-description = Lisage kõigepealt sõrmejälg lehel Kasutajad
+settings-passwords-fingerprint-description = Lisa kõigepealt sõrmejälg lehel Kasutajad
 settings-passwords-pin = Küsi pärast sõrmejälge PIN-koodi
-settings-passwords-pin-locked = Selle muutmiseks avage võtmerõngas
+settings-passwords-pin-locked = Selle muutmiseks ava võtmerõngas
 settings-passwords-pin-description = Et ainult sõrmejäljega neid avada ei saaks
 settings-passwords-lock-with-screen = Lukusta koos ekraaniga
 settings-passwords-lock-with-screen-description = Need lukustuvad ja avanevad koos ekraaniga
 settings-passwords-apps = Rakenduste sisselogimisandmed ja tegevus
 settings-passwords-apps-locked = Nende nägemiseks avage võtmerõngas
 settings-passwords-apps-description = Mida rakendused siin hoiavad ja millal nad seda kasutasid
-settings-passwords-apps-allowed = Millised rakendused saavad teie paroole kasutada
+settings-passwords-apps-allowed = Millised rakendused saavad sinu salasõnu kasutada
 settings-passwords-apps-allowed-hint = Määratakse lehel Rakendused
 
 ## Passwords and keys: apps with access
 
 settings-passwords-stores = Rakenduste sisselogimisandmed
 settings-passwords-stores-description = Sisselogimisandmed, mida mõni rakendus siin hoiab ja mida saab lugeda ainult see rakendus.
-settings-passwords-stores-count = { $count ->
-    [one] { $count } salvestatud sisselogimine
-   *[other] { $count } salvestatud sisselogimist
-}
+settings-passwords-stores-count =
+    { $count ->
+        [one] { $count } salvestatud sisselogimine
+       *[other] { $count } salvestatud sisselogimist
+    }
 settings-passwords-forget = Unusta
-settings-passwords-forget-title = Kas unustada rakenduse { $app } salvestatud andmed?
-settings-passwords-forget-description = Rakendus { $app } kaotab siin hoitud sisselogimisandmed, nii et peate võib-olla sellesse uuesti sisse logima.
+settings-passwords-forget-title = Kas unustame rakenduse { $app } salvestatud andmed?
+settings-passwords-forget-description = Rakendus { $app } kaotab siin hoitud sisselogimisandmed, nii et pead võib-olla sellesse uuesti sisse logima.
 
 ## Passwords and keys: recent access
 
 settings-passwords-history = Hiljutine juurdepääs
 settings-passwords-history-read = { $app } kasutas kirjet „{ $item }“
-settings-passwords-history-read-unnamed = { $app } kasutas salvestatud parooli
+settings-passwords-history-read-unnamed = { $app } kasutas salvestatud salasõna
 settings-passwords-history-saved = { $app } salvestas kirje „{ $item }“
-settings-passwords-history-saved-unnamed = { $app } salvestas parooli
+settings-passwords-history-saved-unnamed = { $app } salvestas salasõna
 settings-passwords-history-deleted = { $app } kustutas kirje „{ $item }“
-settings-passwords-history-deleted-unnamed = { $app } kustutas salvestatud parooli
+settings-passwords-history-deleted-unnamed = { $app } kustutas salvestatud salasõna
 settings-passwords-history-denied = { $app } ei saanud luba kasutada kirjet „{ $item }“
-settings-passwords-history-denied-unnamed = { $app } ei saanud luba kasutada salvestatud parooli
+settings-passwords-history-denied-unnamed = { $app } ei saanud luba kasutada salvestatud salasõna
 settings-passwords-history-signed = { $app } allkirjastas võtmega „{ $item }“
-settings-passwords-history-signed-unnamed = { $app } allkirjastas salvestatud parooliga
+settings-passwords-history-signed-unnamed = { $app } allkirjastas salvestatud salasõnaga
 settings-passwords-history-fewer = Kuva vähem
-settings-passwords-history-all = { $count ->
-    [one] Kuva kõik { $count }
-   *[other] Kuva kõik { $count }
-}
+settings-passwords-history-all =
+    { $count ->
+        [one] Kuva kõik { $count }
+       *[other] Kuva kõik { $count }
+    }
 settings-passwords-history-clear = Tühjenda ajalugu
 settings-passwords-history-clear-description = Unusta, millised rakendused ja millal võtmerõngast kasutasid
 settings-passwords-history-clear-button = Tühjenda
-settings-passwords-history-clear-title = Kas tühjendada hiljutine juurdepääs?
-settings-passwords-history-clear-confirm = Loend sellest, millised rakendused ja millal võtmerõngast kasutasid, kustutatakse. Salvestatud paroolid ja võtmed jäävad alles.
+settings-passwords-history-clear-title = Kas kustutame hiljutise juurdepääsu andmed?
+settings-passwords-history-clear-confirm = Loend sellest, millised rakendused ja millal võtmerõngast kasutasid, kustutatakse. Salvestatud salasõnad ja võtmed jäävad alles.
 
 ## Passwords and keys: SSH keys
 
 settings-passwords-ssh = SSH-võtmed
-settings-passwords-ssh-description = Võtmed serveritesse sisselogimiseks, turvaliselt hoitud teie võtmerõngas.
+settings-passwords-ssh-description = Võtmed serveritesse sisselogimiseks, turvaliselt hoitud sinu võtmerõngas.
 settings-passwords-ssh-unnamed = Nimeta võti
 settings-passwords-ssh-in-chip = Hoitakse turvakiibis
 settings-passwords-ssh-added = Lisatud { $when }
-settings-passwords-ssh-copy = Kopeeri võtme { $name } avalik võti
+settings-passwords-ssh-copy = Kopeeri { $name } võtme avalik võti
 settings-passwords-ssh-remove = Eemalda { $name }
 settings-passwords-ssh-confirm = Küsi enne iga kasutust
-settings-passwords-ssh-confirm-label = Küsi enne võtme { $name } iga kasutust
+settings-passwords-ssh-confirm-label = Küsi enne { $name } iga võtme kasutust
 settings-passwords-ssh-add-row = Lisa võti
 settings-passwords-ssh-use = Kasuta neid võtmeid SSH-ga
-settings-passwords-ssh-use-description = Kopeerige rida, mis suunab SSH nende juurde
+settings-passwords-ssh-use-description = Kopeeri rida, mis suunab SSH nende juurde
 settings-passwords-ssh-copy-line = Kopeeri { $line }
-settings-passwords-ssh-remove-title = Kas eemaldada „{ $name }“?
-settings-passwords-ssh-remove-chip = See on olemas ainult selle arvuti turvakiibis, seega kaob see jäädavalt. Serverid, mis aktsepteerivad ainult seda võtit, ei lase teid sellega enam sisse.
-settings-passwords-ssh-remove-description = Serverid, mis aktsepteerivad ainult seda võtit, ei lase teid sellega enam sisse. Seda ei saa tagasi võtta.
+settings-passwords-ssh-remove-title = Kas eemaldame „{ $name }“?
+settings-passwords-ssh-remove-chip = See on olemas ainult selle arvuti turvakiibis, seega kaob see jäädavalt. Serverid, mis aktsepteerivad ainult seda võtit, ei lase sind sellega enam sisse.
+settings-passwords-ssh-remove-description = Serverid, mis aktsepteerivad ainult seda võtit, ei lase sind sellega enam sisse. Seda tegevust ei saa tagasi pöörata.
 settings-passwords-ssh-add-title = SSH-võtme lisamine
-settings-passwords-ssh-add-description = Selles arvutis luuakse uus võti. Kopeerige selle avalik võti serveritesse, kuhu soovite sisse logida.
+settings-passwords-ssh-add-description = Selles arvutis luuakse uus võti. Kopeeri selle avalik võti serveritesse, kuhu soovid sisse logida.
 settings-passwords-ssh-name = Nimi
 settings-passwords-ssh-name-placeholder = Näiteks tööarvuti
 settings-passwords-ssh-chip = Hoia turvakiibis
-settings-passwords-ssh-chip-description = Seda ei saa kunagi sellest arvutist kopeerida, isegi mitte teie
+settings-passwords-ssh-chip-description = Seda ei saa kunagi sellest arvutist kopeerida, isegi mitte sina
 settings-passwords-ssh-chip-unsupported = Selle arvuti turvakiip ei saa SSH-võtmeid hoida
 settings-passwords-ssh-add = Lisa võti
 
@@ -341,13 +352,13 @@ settings-passwords-ssh-add = Lisa võti
 
 settings-passkeys-title = Pääsuvõtmed
 settings-passkeys-unavailable = Pääsuvõtmete nägemiseks avage võtmerõngas.
-settings-passkeys-chip-fingerprint = Pitseeritud selle arvuti turvakiibiga. Iga sisselogimine küsib sõrmejälge või parooli.
-settings-passkeys-chip-password = Pitseeritud selle arvuti turvakiibiga. Iga sisselogimine küsib parooli.
-settings-passkeys-password-fingerprint = Krüptitud teie parooliga. Iga sisselogimine küsib sõrmejälge või parooli.
-settings-passkeys-password = Krüptitud teie parooliga. Iga sisselogimine küsib parooli.
+settings-passkeys-chip-fingerprint = Pitseeritud selle arvuti turvakiibiga. Iga sisselogimine küsib sõrmejälge või salasõna.
+settings-passkeys-chip-password = Pitseeritud selle arvuti turvakiibiga. Iga sisselogimine küsib salasõna.
+settings-passkeys-password-fingerprint = Krüptitud sinu salasõnaga. Iga sisselogimine küsib sõrmejälge või salasõna.
+settings-passkeys-password = Krüptitud sinu salasõna. Iga sisselogimine küsib salasõna.
 settings-passkeys-last-used = Viimati kasutatud { $when }
 settings-passkeys-never-used = Pole kasutatud
-settings-passkeys-password-only = Kaitstud teie parooliga
+settings-passkeys-password-only = Kaitstud sinu salasõnaga
 settings-passkeys-unreachable = Brauserid ei pääse teie pääsuvõtmetele juurde
 settings-passkeys-unreachable-description = Need on tagasi, kui pääsuvõtmete teenus töötab
 settings-passkeys-rename-label = Nimeta ümber saidi { $site } pääsuvõti
@@ -395,7 +406,7 @@ settings-apps-full-access = Täielik juurdepääs
 settings-apps-full-access-hint = See töötab väljaspool liivakasti ja saab teha kõike, mida saab ise käivitatud programm. Eemaldamine kehtib järgmisest avamisest.
 settings-apps-full-access-remove = Eemalda
 settings-apps-full-access-remove-app = Eemalda rakenduselt { $app } täielik juurdepääs
-settings-apps-passwords = Salvestatud paroolid
+settings-apps-passwords = Salvestatud salasõnad
 settings-apps-passwords-forget = Unusta
 settings-apps-passwords-forget-app = Lase rakendusel { $app } uuesti küsida
 settings-apps-permissions-allowed = Lubatud { $allowed }/{ $total }
@@ -403,10 +414,11 @@ settings-apps-permissions-description = Liivakastis olevad rakendused saavad oma
 settings-apps-sandbox-only = Mitte midagi väljaspool liivakasti
 settings-apps-folders = Kaustad
 settings-apps-folders-hint = Alates järgmisest avamisest saab see kõike nendes kaustades lugeda ja muuta.
-settings-apps-folders-count = { $count ->
-    [one] { $count } kaust
-   *[other] { $count } kausta
-}
+settings-apps-folders-count =
+    { $count ->
+        [one] { $count } kaust
+       *[other] { $count } kausta
+    }
 settings-apps-folder-add = Lisa kaust
 settings-apps-folder-remove = Eemalda
 settings-apps-folder-remove-app = Lõpeta { $folder } jagamine

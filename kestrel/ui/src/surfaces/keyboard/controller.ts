@@ -63,6 +63,7 @@ export class KeyboardController extends EventEmitter {
   }
 
   destroy(): void {
+    this.toggleDelete(false);
     this.inputSourceManager.disconnectObject(this);
     Main.inputMethod.disconnectObject(this);
     this.virtualDevice.run_dispose();

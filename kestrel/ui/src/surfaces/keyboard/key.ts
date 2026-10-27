@@ -22,6 +22,7 @@ export function isExtendedKey(actor: Clutter.Actor): boolean {
 export namespace Key {
   export interface Signals extends St.BoxLayout.SignalSignatures {
     'long-press': () => void;
+    'long-press-end': () => void;
     'released': () => void;
     'keyval': (keyval: number) => void;
     'commit': (text: string) => void;
@@ -31,6 +32,7 @@ export namespace Key {
 export const Key = GObject.registerClass({
   Signals: {
     'long-press': {},
+    'long-press-end': {},
     'released': {},
     'keyval': { param_types: [GObject.TYPE_UINT] },
     'commit': { param_types: [GObject.TYPE_STRING] },
@@ -112,6 +114,8 @@ export const Key = GObject.registerClass({
       this.emit('long-press');
       if (this.extendedKeys.length > 0) this.showSubkeys();
     });
+    longPressGesture.connect('end', () => this.emit('long-press-end'));
+    longPressGesture.connect('cancel', () => this.emit('long-press-end'));
     button.add_action(longPressGesture);
 
     button.connect('clicked', () => {

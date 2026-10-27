@@ -52,7 +52,6 @@ export const Keyboard = GObject.registerClass({
   private focusInExtendedKeys = false;
   private emojiActive = false;
   private emojiVisible = false;
-  private longPressed = false;
   private keyboardVisible = false;
   private keyboardRequested = false;
   private gestureInProgress = false;
@@ -77,9 +76,9 @@ export const Keyboard = GObject.registerClass({
     latchLevel: level => {
       this.setActiveLevel(level);
       this.levels.setLatched(true);
-      this.longPressed = true;
     },
     holdDelete: () => this.controller.toggleDelete(true),
+    releaseDelete: () => this.controller.toggleDelete(false),
   };
 
   constructor() {
@@ -371,12 +370,10 @@ export const Keyboard = GObject.registerClass({
       this.controller.toggleDelete(true);
       this.controller.toggleDelete(false);
       this.updateLevelFromHints(true);
-    } else if (!this.longPressed && key.action === 'levelSwitch') {
+    } else if (key.action === 'levelSwitch') {
       this.setActiveLevel(key.level!);
       this.levels.setLatched(false);
     }
-
-    this.longPressed = false;
   }
 
   private popupLanguageMenu(keyActor: Key): void {

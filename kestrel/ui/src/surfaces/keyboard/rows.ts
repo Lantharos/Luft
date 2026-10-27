@@ -12,6 +12,7 @@ export interface KeyHandler {
   commit(text: string): void;
   latchLevel(level: string): void;
   holdDelete(): void;
+  releaseDelete(): void;
 }
 
 export interface Levels {
@@ -60,7 +61,10 @@ function addRowKeys(keys: ModelKey[], layout: KeyContainer, emojiVisible: boolea
       if (key.level === 'shift') button.connect('long-press', () => handler.latchLevel('shift'));
     }
 
-    if (key.action === 'delete') button.connect('long-press', () => handler.holdDelete());
+    if (key.action === 'delete') {
+      button.connect('long-press', () => handler.holdDelete());
+      button.connect('long-press-end', () => handler.releaseDelete());
+    }
 
     if (key.action === 'modifier') modifierKeys.set(keyval, [...modifierKeys.get(keyval) ?? [], button]);
 

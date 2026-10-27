@@ -13,7 +13,7 @@ use rustix::process::Pid;
 
 use super::budget::Budget;
 use super::output::{Output, State};
-use super::spawn::{Size, spawn};
+use super::spawn::{TerminalSize, spawn};
 
 const READ_BYTES: usize = 64 * 1024;
 const WAKE_EXITED: u8 = 1;
@@ -31,7 +31,7 @@ impl Session {
     pub fn start(
         id: u32,
         command: Command,
-        size: Size,
+        size: TerminalSize,
         events: Events,
         budget: Arc<Budget>,
     ) -> io::Result<Self> {
@@ -67,7 +67,7 @@ impl Session {
         let _ = self.input.send(bytes);
     }
 
-    pub fn resize(&self, size: Size) -> io::Result<()> {
+    pub fn resize(&self, size: TerminalSize) -> io::Result<()> {
         size.apply(&self.master)
     }
 

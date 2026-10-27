@@ -10,12 +10,12 @@ use serde::Deserialize;
 use specta::Type;
 
 #[derive(Clone, Copy, Deserialize, Type)]
-pub struct Size {
+pub struct TerminalSize {
     pub cols: u16,
     pub rows: u16,
 }
 
-impl Size {
+impl TerminalSize {
     pub fn apply(self, master: &OwnedFd) -> io::Result<()> {
         let size = Winsize {
             ws_row: self.rows,
@@ -32,7 +32,7 @@ pub struct Spawned {
     pub child: Child,
 }
 
-pub fn spawn(mut command: Command, size: Size) -> io::Result<Spawned> {
+pub fn spawn(mut command: Command, size: TerminalSize) -> io::Result<Spawned> {
     let master = openpt(OpenptFlags::RDWR | OpenptFlags::NOCTTY | OpenptFlags::CLOEXEC)?;
     grantpt(&master)?;
     unlockpt(&master)?;

@@ -1,18 +1,16 @@
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
-use luft_app::{Activation, Commands};
+use luft_app::{Activation, Commands, Empty};
 use sabine::SabineWindow;
 use serde::Deserialize;
 use specta::Type;
 
 use crate::desktop::links;
+use crate::events;
 use crate::launch::LaunchRequest;
-use crate::pty::Size;
+use crate::pty::TerminalSize;
 use crate::settings::{self, Settings};
 use crate::state::TernState;
-
-#[derive(Deserialize, Type)]
-struct Empty {}
 
 #[derive(Deserialize, Type)]
 struct Terminal {
@@ -22,7 +20,7 @@ struct Terminal {
 #[derive(Deserialize, Type)]
 struct Spawn {
     #[serde(flatten)]
-    size: Size,
+    size: TerminalSize,
     directory: Option<String>,
     command: Option<Vec<String>>,
 }
@@ -37,7 +35,7 @@ struct Input {
 struct Resize {
     id: u32,
     #[serde(flatten)]
-    size: Size,
+    size: TerminalSize,
 }
 
 #[derive(Deserialize, Type)]
@@ -52,7 +50,7 @@ struct Link {
 }
 
 pub fn register(window: SabineWindow, state: &TernState) -> SabineWindow {
-    register_app(register_terminals(window, state), state)
+    register_app(register_terminals(events::declare(window), state), state)
 }
 
 fn register_terminals(window: SabineWindow, state: &TernState) -> SabineWindow {

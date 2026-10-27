@@ -4,7 +4,8 @@ use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
 use luft_app::Events;
 use parking_lot::{Condvar, Mutex};
-use serde_json::json;
+use serde::Serialize;
+use specta::Type;
 
 use super::budget::Budget;
 use crate::events::{EXITED, OUTPUT};
@@ -12,6 +13,18 @@ use crate::events::{EXITED, OUTPUT};
 const CHUNK_BYTES: usize = 256 * 1024;
 const MAX_CHUNKS_IN_FLIGHT: usize = 16;
 const PENDING_LIMIT: usize = 1024 * 1024;
+
+#[derive(Serialize, Type)]
+pub struct TerminalOutput {
+    id: u32,
+    data: String,
+}
+
+#[derive(Serialize, Type)]
+pub struct TerminalExited {
+    id: u32,
+    code: i32,
+}
 
 pub struct Output {
     id: u32,
@@ -139,7 +152,7 @@ impl Output {
             let data = STANDARD.encode(&state.pending[..length]);
             if !self
                 .events
-                .emit(OUTPUT, json!({ "id": self.id, "data": data }))
+                .emit(OUTPUT, TerminalOutput { id: self.id, data })
             {
                 self.budget.refund();
                 return;
@@ -155,7 +168,7 @@ impl Output {
         ) {
             state.exit_sent = self
                 .events
-                .emit(EXITED, json!({ "id": self.id, "code": code }));
+                .emit(EXITED, TerminalExited { id: self.id, code });
         }
     }
 }

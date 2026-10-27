@@ -18,7 +18,6 @@ parking_lot.workspace = true
 rustix = { workspace = true, features = ["event", "fs", "pipe", "process", "pty", "stdio", "termios"] }
 sabine.workspace = true
 serde.workspace = true
-serde_json.workspace = true
 specta.workspace = true
 uzers.workspace = true
 

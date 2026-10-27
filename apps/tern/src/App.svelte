@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { onMount, untrack } from 'svelte';
-	import { activity } from '@lantharos/sabine';
+	import { activity, events } from '@lantharos/sabine';
 	import { GlassShell, appearance } from '@luft/ui';
-	import * as api from '#lib/bridge/index.js';
+	import { commands } from '#lib/bindings.js';
 	import CloseDialog from '#lib/components/dialogs/CloseDialog.svelte';
 	import PasteDialog from '#lib/components/dialogs/PasteDialog.svelte';
 	import Preferences from '#lib/components/dialogs/Preferences.svelte';
@@ -19,14 +19,14 @@
 
 	onMount(() => {
 		const stops = [
-			api.events.activation(async (activation) => workspace.openTab(await api.resolveLaunch(activation)))
+			events.singleInstance(async (activation) => workspace.openTab(await commands.resolveLaunch(activation)))
 		];
 		void start(stops);
 		return () => stops.forEach((stop) => stop());
 	});
 
 	async function start(stops: (() => void)[]) {
-		const [state] = await Promise.all([api.appState(), loadFonts()]);
+		const [state] = await Promise.all([commands.appState(), loadFonts()]);
 		settings.start(state);
 		stops.push(appearance.start(state));
 		workspace.openTab(state.launch);

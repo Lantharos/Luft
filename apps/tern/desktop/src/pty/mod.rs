@@ -12,8 +12,9 @@ use luft_app::Events;
 use parking_lot::RwLock;
 
 use budget::Budget;
+pub use output::{TerminalExited, TerminalOutput};
 use session::Session;
-pub use spawn::Size;
+pub use spawn::TerminalSize;
 
 #[derive(Clone, Default)]
 pub struct Sessions {
@@ -23,7 +24,12 @@ pub struct Sessions {
 }
 
 impl Sessions {
-    pub fn start(&self, command: Command, size: Size, events: Events) -> Result<u32, String> {
+    pub fn start(
+        &self,
+        command: Command,
+        size: TerminalSize,
+        events: Events,
+    ) -> Result<u32, String> {
         let id = self.next.fetch_add(1, Ordering::Relaxed) + 1;
         let session = Session::start(id, command, size, events, self.budget.clone())
             .map_err(|error| format!("Could not start the shell: {error}"))?;
@@ -49,7 +55,7 @@ impl Sessions {
         }
     }
 
-    pub fn resize(&self, id: u32, size: Size) -> Result<(), String> {
+    pub fn resize(&self, id: u32, size: TerminalSize) -> Result<(), String> {
         match self.get(id) {
             Some(session) => session.resize(size).map_err(|error| error.to_string()),
             None => Ok(()),

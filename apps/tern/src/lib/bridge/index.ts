@@ -1,29 +1,4 @@
-import { invoke, listen } from '@lantharos/sabine';
 import { activationToken } from '@luft/ui';
-import type { Activation, AppState, LaunchRequest, Settings } from '../types';
+import { commands } from '#lib/bindings.js';
 
-export interface TerminalSize {
-	cols: number;
-	rows: number;
-}
-
-export const appState = () => invoke<AppState>('app_state');
-export const updateSettings = (settings: Settings) => invoke<void>('update_settings', { settings });
-export const resolveLaunch = (activation: Activation) => invoke<LaunchRequest>('resolve_launch', { ...activation });
-export const openLink = async (uri: string) => invoke<void>('open_link', { uri, token: await activationToken() });
-
-export const pty = {
-	spawn: (size: TerminalSize, request: LaunchRequest) => invoke<number>('pty_spawn', { ...size, ...request }),
-	attach: (id: number) => invoke<void>('pty_attach', { id }),
-	write: (id: number, data: string) => invoke<void>('pty_write', { id, data }),
-	acknowledge: (id: number) => invoke<void>('pty_ack', { id }),
-	resize: (id: number, size: TerminalSize) => invoke<void>('pty_resize', { id, ...size }),
-	foreground: (id: number) => invoke<string | null>('pty_foreground', { id }),
-	close: (id: number) => invoke<void>('pty_close', { id })
-};
-
-export const events = {
-	output: (callback: (event: { id: number; data: string }) => void) => listen('tern.output', callback),
-	exited: (callback: (event: { id: number; code: number }) => void) => listen('tern.exited', callback),
-	activation: (callback: (activation: Activation) => void) => listen('singleInstance.activate', callback)
-};
+export const openLink = async (uri: string) => commands.openLink({ uri, token: await activationToken() });

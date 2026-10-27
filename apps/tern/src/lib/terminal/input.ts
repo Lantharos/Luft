@@ -1,4 +1,5 @@
-import { pty, type TerminalSize } from '#lib/bridge/index.js';
+import { commands } from '#lib/bindings.js';
+import type { TerminalSize } from '#lib/bindings.js';
 
 type Operation = { kind: 'data'; bytes: Uint8Array } | { kind: 'resize'; size: TerminalSize };
 
@@ -49,8 +50,8 @@ export class InputQueue {
 		this.#running = true;
 		try {
 			for (let operation = this.#operations.shift(); operation; operation = this.#operations.shift()) {
-				if (operation.kind === 'data') await pty.write(this.#id, operation.bytes.toBase64());
-				else await pty.resize(this.#id, operation.size);
+				if (operation.kind === 'data') await commands.ptyWrite({ id: this.#id, data: operation.bytes.toBase64() });
+				else await commands.ptyResize({ id: this.#id, ...operation.size });
 			}
 		} finally {
 			this.#running = false;

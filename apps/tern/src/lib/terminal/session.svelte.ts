@@ -4,9 +4,10 @@ import { SearchAddon } from '@xterm/addon-search';
 import { UnicodeGraphemesAddon } from '@xterm/addon-unicode-graphemes';
 import { WebLinksAddon } from '@xterm/addon-web-links';
 import { Terminal, type ITheme } from '@xterm/xterm';
-import { openLink, pty } from '#lib/bridge/index.js';
+import { commands } from '#lib/bindings.js';
+import type { CursorStyle, LaunchRequest } from '#lib/bindings.js';
+import { openLink } from '#lib/bridge/index.js';
 import { settings } from '#lib/state/settings.svelte.js';
-import type { CursorStyle, LaunchRequest } from '#lib/types.js';
 import { InputQueue } from './input';
 import { ShellIntegration, type FinishedCommand } from './integration';
 import { acquireRenderer, releaseRenderer } from './renderers';
@@ -143,12 +144,12 @@ export class TerminalSession {
 		const { cols, rows } = this.terminal;
 		let id: number;
 		try {
-			id = await pty.spawn({ cols, rows }, this.#request);
+			id = await commands.ptySpawn({ cols, rows, ...this.#request });
 		} catch (error) {
 			this.terminal.write(`\x1b[2m${error}\x1b[0m\r\n`);
 			return;
 		}
-		if (this.#disposed) return void pty.close(id);
+		if (this.#disposed) return void commands.ptyClose({ id });
 		this.#id = id;
 		this.#input = new InputQueue(id);
 		this.#disconnect = connect(id, {
@@ -189,7 +190,7 @@ export class TerminalSession {
 	}
 
 	foreground() {
-		return this.#id === null ? Promise.resolve(null) : pty.foreground(this.#id);
+		return this.#id === null ? Promise.resolve(null) : commands.ptyForeground({ id: this.#id });
 	}
 
 	dispose() {

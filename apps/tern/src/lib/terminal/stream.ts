@@ -1,4 +1,4 @@
-import { events, pty } from '#lib/bridge/index.js';
+import { commands, events } from '#lib/bindings.js';
 
 export interface Sink {
 	write(data: Uint8Array, parsed: () => void): void;
@@ -10,18 +10,18 @@ let listening = false;
 
 function listen() {
 	listening = true;
-	events.output(({ id, data }) => {
-		sinks.get(id)?.write(Uint8Array.fromBase64(data), () => void pty.acknowledge(id));
+	events.ternOutput(({ id, data }) => {
+		sinks.get(id)?.write(Uint8Array.fromBase64(data), () => void commands.ptyAck({ id }));
 	});
-	events.exited(({ id, code }) => sinks.get(id)?.exited(code));
+	events.ternExited(({ id, code }) => sinks.get(id)?.exited(code));
 }
 
 export function connect(id: number, sink: Sink) {
 	if (!listening) listen();
 	sinks.set(id, sink);
-	void pty.attach(id);
+	void commands.ptyAttach({ id });
 	return () => {
 		sinks.delete(id);
-		void pty.close(id);
+		void commands.ptyClose({ id });
 	};
 }

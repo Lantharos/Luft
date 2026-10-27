@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Dialog, Row, Section, Segmented, Select, Slider, Switch, appearance } from '@luft/ui';
+	import type { CursorStyle, SchemePreference } from '#lib/bindings.js';
 	import { FONT_SIZES, settings } from '#lib/state/settings.svelte.js';
-	import type { CursorStyle, SchemePreference } from '#lib/types.js';
 
 	interface Props {
 		onclose: () => void;

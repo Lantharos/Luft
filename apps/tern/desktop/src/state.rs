@@ -7,7 +7,7 @@ use serde::Serialize;
 use specta::Type;
 
 use crate::launch::LaunchRequest;
-use crate::pty::{Sessions, Size};
+use crate::pty::{Sessions, TerminalSize};
 use crate::settings::Settings;
 use crate::shell;
 
@@ -56,7 +56,7 @@ impl TernState {
         }
     }
 
-    pub fn spawn(&self, request: LaunchRequest, size: Size) -> Result<u32, String> {
+    pub fn spawn(&self, request: LaunchRequest, size: TerminalSize) -> Result<u32, String> {
         let shell = self
             .settings
             .read()

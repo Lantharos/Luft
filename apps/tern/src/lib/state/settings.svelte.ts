@@ -1,8 +1,8 @@
 import { appearance } from '@luft/ui';
-import { updateSettings } from '#lib/bridge/index.js';
+import { commands } from '#lib/bindings.js';
+import type { AppState, Settings } from '#lib/bindings.js';
 import { LUFT_COLORS, terminalTheme, withAlpha } from '#lib/terminal/palette.js';
 import type { TerminalOptions } from '#lib/terminal/session.svelte.js';
-import type { AppState, Settings } from '#lib/types.js';
 
 const DEFAULTS: Settings = {
 	fontSize: 13,
@@ -51,7 +51,7 @@ class SettingsState {
 
 	update(patch: Partial<Settings>) {
 		this.current = { ...this.current, ...patch };
-		void updateSettings($state.snapshot(this.current));
+		void commands.updateSettings({ settings: $state.snapshot(this.current) });
 	}
 
 	zoom(step: number) {

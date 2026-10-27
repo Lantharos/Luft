@@ -30,9 +30,9 @@ async fn start_at_sign_in(session: &Connection, wanted: bool) -> Result<()> {
         return Ok(());
     }
     if wanted {
-        manager(session, "EnableUnitFiles", &(&[UNIT], false, false)).await?;
+        manager(session, "EnableUnitFiles", &(&[UNIT][..], false, false)).await?;
     } else {
-        manager(session, "DisableUnitFiles", &(&[UNIT], false)).await?;
+        manager(session, "DisableUnitFiles", &(&[UNIT][..], false)).await?;
     }
     manager(session, "Reload", &()).await?;
     Ok(())

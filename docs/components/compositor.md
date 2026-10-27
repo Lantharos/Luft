@@ -13,7 +13,7 @@ Kestrel runs on its own build of Mutter 51 ([kestrel/compositor](../../kestrel/c
 - Shell text, icons and labels drawn at a fractional scale's own resolution and on whole pixels, so they stay sharp at 125% and 150%
 - Desktop windows for live wallpapers, and the transformed window groups behind the board
 - Shortcuts the shell adds winning over built-in ones on the same keys, so window tiling can take over Super and the arrow keys while it's on
-- Windows the shell clips to one monitor, such as scrolling columns peeking over a shared edge, left out of culling so what's underneath still draws
+- Windows the shell clips to one monitor, such as scrolling columns peeking over a shared edge, only hiding what's underneath where they're drawn, so the rest still draws
 - Variable refresh only for games, and `wp_content_type_v1`
 - Settings from `kestrel-settings` in place of gnome-settings-daemon, and default display scales aimed at 110 DPI
 - Recovery from GPU resets, from GNOME/mutter!5247 by Toluwaleke Ogundipe

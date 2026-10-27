@@ -9,6 +9,7 @@ use crate::files::Volume;
 
 const IMAGES: &str = "\\EFI\\Linux";
 const LOCKDOWN: &str = "lockdown";
+const NIGHTLY: &str = "-nightly.";
 
 pub struct Image {
     origin: Origin,
@@ -25,8 +26,10 @@ impl Image {
         path: String,
         name: String,
         sort_key: Option<String>,
+        image_version: Option<String>,
     ) -> Option<Self> {
-        let uki = pe::uki(&mut volume.file(&path)?)?;
+        let mut uki = pe::uki(&mut volume.file(&path)?)?;
+        uki.image_version = uki.image_version.or(image_version);
         Some(Self {
             origin: origin.clone(),
             path,
@@ -45,7 +48,7 @@ impl Image {
 
     fn release(&self) -> String {
         match (&self.uki.name, &self.uki.image_version) {
-            (Some(name), Some(version)) => format!("{name} {version}"),
+            (Some(name), Some(version)) => format!("{name} {}", readable(version)),
             _ => format!("Linux {}", self.version()),
         }
     }
@@ -112,9 +115,16 @@ pub fn scan(volume: &mut Volume, origin: &Origin) -> Vec<Image> {
         .filter(|listed| !listed.directory && listed.name.to_ascii_lowercase().ends_with(".efi"))
         .filter_map(|listed| {
             let path = format!("{IMAGES}\\{}", listed.name);
-            Image::open(volume, origin, path, listed.name, None)
+            Image::open(volume, origin, path, listed.name, None, None)
         })
         .collect()
+}
+
+fn readable(version: &str) -> String {
+    match version.split_once(NIGHTLY) {
+        Some((release, number)) => format!("{release} Nightly {number}"),
+        None => version.into(),
+    }
 }
 
 fn without_lockdown(command_line: &str) -> String {
@@ -131,14 +141,12 @@ pub fn add(catalog: &mut Catalog, mut images: Vec<Image>, secure_boot: bool) {
     for image in &images {
         let newest = !listed.contains(&image.uki.os.as_str());
         let name = image.uki.name.as_deref();
-        let title = if newest {
-            name.map_or_else(|| image.release(), String::from)
-        } else if image.uki.image_version.is_none()
-            && let Some(name) = name
-        {
-            format!("{name}, {}", image.release())
-        } else {
-            image.release()
+        let title = match name {
+            Some(name) if image.uki.image_version.is_none() && newest => name.into(),
+            Some(name) if image.uki.image_version.is_none() => {
+                format!("{name}, {}", image.release())
+            }
+            _ => image.release(),
         };
         let main = catalog.push(image.entry(0, title, secure_boot));
         if newest {

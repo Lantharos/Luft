@@ -1,10 +1,10 @@
 # clutter/texture-content: Skip textures of a defunct context
 
-A follow-up for GNOME/mutter!5247, based on its branch at 4ffeb2fd2. It could go in as an extra commit there, so this is written as a review comment rather than a merge request of its own.
+A follow-up for GNOME/mutter!5247, written against its branch at 4ffeb2fd2. It fits as an extra commit there, so this is a review comment rather than a merge request of its own.
 
 ## Comment
 
-One more place can paint a texture from the context that was replaced: `ClutterTextureContent` keeps its texture until its owner sets a new one, and painting it in between uses a GL name that in the new context can belong to an unrelated texture.
+One more place can paint a texture from the context that was replaced: ClutterTextureContent keeps its texture until its owner sets a new one. clutter_stage_paint_to_content() and meta_window_actor_paint_to_content() hand these out, and GNOME Shell keeps them around, for example in the screenshot UI. Painting one after a reset uses a GL name that can belong to an unrelated texture in the new context.
 
 Skipping the paint while the texture's context is defunct fixes it:
 

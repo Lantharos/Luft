@@ -102,7 +102,7 @@
 
 		<Section title={t('settings-about-software')}>
 			<Row title={t('settings-about-system')} description={info.built ? t('settings-about-built', { date: builtOn(info.built) }) : undefined}>
-				<span class="value">{info.version ? t('settings-about-version', { version: versionLabel(info.version) }) : info.system}</span>
+				<span class="value">{info.version ? t('settings-about-version', { system: info.system, version: versionLabel(info.version) }) : info.system}</span>
 			</Row>
 			<Row title={t('settings-about-desktop')}><span class="value">Kestrel</span></Row>
 			<Row title={t('settings-about-kernel')}><span class="value">{info.kernel}</span></Row>

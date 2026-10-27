@@ -10,10 +10,17 @@ const SYSTEM_PACKAGES = `<node><interface name="com.lantharos.Updater1.SystemPac
 
 const UPDATER = `<node><interface name="com.lantharos.Updater1">
   <property name="Downloading" type="b" access="read"/>
+  <property name="Downloaded" type="t" access="read"/>
   <method name="Status"><arg type="s" direction="out"/></method>
+  <method name="Download"/>
+  <method name="Cancel"/>
+  <signal name="Finished"><arg type="s"/></signal>
 </interface></node>`;
 
 export const UPDATER_NAME = 'com.lantharos.Updater1';
+export const DOWNLOAD_SIZE = 200_000_000;
+const DOWNLOAD_STEP_MS = 250;
+const DOWNLOAD_STEPS = 160;
 const VERSION = '1.2-nightly.21';
 const DIGEST = 'sha256:4c5f0f8a1b6e2d7c9a3e5b1f7d2c8a6e4b0f9d3c7a1e5b2f8d6c4a0e9b3f7d1c';
 
@@ -56,8 +63,43 @@ function keyOf(armored) {
   return {fingerprint: lines.find(fields => fields[0] === 'fpr')?.[9] ?? '', user: lines.find(fields => fields[0] === 'uid')?.[9] ?? ''};
 }
 
-export function publishUpdater(publish) {
-  publish(UPDATER, {Downloading: false, Status: status}, '/com/lantharos/Updater1');
+function publishDownloads(publish, calls) {
+  let downloading = false;
+  let downloaded = 0;
+  let step = 0;
+  const updater = publish(UPDATER, {
+    get Downloading() { return downloading; },
+    get Downloaded() { return downloaded; },
+    Status: status,
+    Download: () => {
+      calls.push('Updater Download');
+      downloading = true;
+      downloaded = 0;
+      updater.emit_property_changed('Downloading', new GLib.Variant('b', true));
+      step = GLib.timeout_add(GLib.PRIORITY_DEFAULT, DOWNLOAD_STEP_MS, () => {
+        downloaded = Math.min(DOWNLOAD_SIZE, downloaded + DOWNLOAD_SIZE / DOWNLOAD_STEPS);
+        updater.emit_property_changed('Downloaded', new GLib.Variant('t', downloaded));
+        if (downloaded < DOWNLOAD_SIZE) return GLib.SOURCE_CONTINUE;
+        finish('');
+        return GLib.SOURCE_REMOVE;
+      });
+    },
+    Cancel: () => {
+      calls.push('Updater Cancel');
+      GLib.source_remove(step);
+      finish('The download was stopped.');
+    },
+  }, '/com/lantharos/Updater1');
+
+  function finish(error) {
+    downloading = false;
+    updater.emit_property_changed('Downloading', new GLib.Variant('b', false));
+    updater.emit_signal('Finished', new GLib.Variant('(s)', [error]));
+  }
+}
+
+export function publishUpdater(publish, calls) {
+  publishDownloads(publish, calls);
   publish(SYSTEM_PACKAGES, {
     List: () => JSON.stringify({requested: [], packages: [], services: [], pending: false, repositories: []}),
     DescribeRepository: (file, text, keys) => JSON.stringify({file, sources: sources(text), keys: Object.values(keys).map(keyOf)}),

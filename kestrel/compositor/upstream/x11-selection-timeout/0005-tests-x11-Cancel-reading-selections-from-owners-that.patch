@@ -1,0 +1,349 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Tue, 27 Oct 2026 19:01:13 +0100
+Subject: [PATCH 5/5] tests/x11: Cancel reading selections from owners that
+ stop answering
+
+Add an X11 client that owns the clipboard and either never answers a
+request for its contents or stops after the first chunk of an INCR
+transfer, and check that cancelling the transfer from it finishes it.
+---
+ src/tests/meson.build                         |   1 +
+ src/tests/x11-test-clients/meson.build        |   3 +
+ .../unresponsive-selection-owner.c            | 178 ++++++++++++++++++
+ src/tests/x11-tests.c                         |  97 ++++++++++
+ 4 files changed, 279 insertions(+)
+ create mode 100644 src/tests/x11-test-clients/unresponsive-selection-owner.c
+
+diff --git a/src/tests/meson.build b/src/tests/meson.build
+index 269931c749..61243a2b2f 100644
+--- a/src/tests/meson.build
++++ b/src/tests/meson.build
+@@ -1279,6 +1279,7 @@ if have_xwayland
+       'depends': [
+         x11_test_client_executables['xwayland-allow-commits-test'],
+         x11_test_client_executables['user-position'],
++        x11_test_client_executables['unresponsive-selection-owner'],
+       ],
+       'sources': [
+         'x11-tests.c',
+diff --git a/src/tests/x11-test-clients/meson.build b/src/tests/x11-test-clients/meson.build
+index 878ded1160..e6bab17536 100644
+--- a/src/tests/x11-test-clients/meson.build
++++ b/src/tests/x11-test-clients/meson.build
+@@ -18,6 +18,9 @@ x11_test_clients = [
+   {
+     'name': 'user-position',
+   },
++  {
++    'name': 'unresponsive-selection-owner',
++  },
+ ]
+ 
+ x11_test_client_executables = {}
+diff --git a/src/tests/x11-test-clients/unresponsive-selection-owner.c b/src/tests/x11-test-clients/unresponsive-selection-owner.c
+new file mode 100644
+index 0000000000..fe6c55877b
+--- /dev/null
++++ b/src/tests/x11-test-clients/unresponsive-selection-owner.c
+@@ -0,0 +1,178 @@
++/*
++ * Copyright (C) 2026 Kristof Imeri
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of the
++ * License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "config.h"
++
++#include <glib-unix.h>
++#include <X11/Xatom.h>
++#include <X11/Xlib.h>
++#include <stdio.h>
++#include <stdlib.h>
++
++#include "x11-test-client-utils.h"
++
++static Atom atom_targets;
++static Atom atom_incr;
++static Atom atom_test_target;
++
++static gboolean stall_incr;
++
++static Window incr_requestor = None;
++static Atom incr_property = None;
++static gboolean incr_chunk_sent;
++
++static void
++send_selection_notify (Display                *xdisplay,
++                       XSelectionRequestEvent *request)
++{
++  XEvent xevent = { 0 };
++
++  xevent.xselection.type = SelectionNotify;
++  xevent.xselection.requestor = request->requestor;
++  xevent.xselection.selection = request->selection;
++  xevent.xselection.target = request->target;
++  xevent.xselection.property = request->property;
++  xevent.xselection.time = request->time;
++
++  XSendEvent (xdisplay, request->requestor, False, NoEventMask, &xevent);
++}
++
++static void
++handle_selection_request (Display                *xdisplay,
++                          XSelectionRequestEvent *request)
++{
++  if (request->target == atom_targets)
++    {
++      Atom targets[] = { atom_targets, atom_test_target };
++
++      XChangeProperty (xdisplay, request->requestor, request->property,
++                       XA_ATOM, 32, PropModeReplace,
++                       (unsigned char *) targets, G_N_ELEMENTS (targets));
++      send_selection_notify (xdisplay, request);
++    }
++  else if (request->target == atom_test_target && stall_incr)
++    {
++      long size = 1024;
++
++      incr_requestor = request->requestor;
++      incr_property = request->property;
++
++      XSelectInput (xdisplay, incr_requestor, PropertyChangeMask);
++      XChangeProperty (xdisplay, incr_requestor, incr_property,
++                       atom_incr, 32, PropModeReplace,
++                       (unsigned char *) &size, 1);
++      send_selection_notify (xdisplay, request);
++    }
++
++  XFlush (xdisplay);
++}
++
++static void
++handle_property_notify (Display        *xdisplay,
++                        XPropertyEvent *event)
++{
++  const char chunk[] = "first chunk";
++
++  if (event->window != incr_requestor ||
++      event->atom != incr_property ||
++      event->state != PropertyDelete ||
++      incr_chunk_sent)
++    return;
++
++  XChangeProperty (xdisplay, incr_requestor, incr_property,
++                   atom_test_target, 8, PropModeReplace,
++                   (unsigned char *) chunk, strlen (chunk));
++  XFlush (xdisplay);
++  incr_chunk_sent = TRUE;
++}
++
++static gboolean
++on_xevent (XEvent   *xevent,
++           gpointer  user_data)
++{
++  Display *xdisplay = user_data;
++
++  switch (xevent->type)
++    {
++    case SelectionRequest:
++      handle_selection_request (xdisplay, &xevent->xselectionrequest);
++      break;
++    case PropertyNotify:
++      handle_property_notify (xdisplay, &xevent->xproperty);
++      break;
++    }
++
++  return G_SOURCE_CONTINUE;
++}
++
++static gboolean
++on_sigterm (gpointer user_data)
++{
++  GMainLoop *loop = user_data;
++
++  g_main_loop_quit (loop);
++
++  return G_SOURCE_REMOVE;
++}
++
++int
++main (int    argc,
++      char **argv)
++{
++  g_autoptr (GMainLoop) loop = NULL;
++  Display *xdisplay;
++  Window window;
++  GSource *source;
++
++  g_assert_cmpint (argc, ==, 2);
++  if (g_strcmp0 (argv[1], "stall-incr") == 0)
++    stall_incr = TRUE;
++  else
++    g_assert_cmpstr (argv[1], ==, "never-answer");
++
++  xdisplay = XOpenDisplay (NULL);
++  if (!xdisplay)
++    {
++      fprintf (stderr, "Failed to open display\n");
++      return EXIT_FAILURE;
++    }
++
++  loop = g_main_loop_new (NULL, FALSE);
++  g_unix_signal_add (SIGTERM, on_sigterm, loop);
++
++  atom_targets = XInternAtom (xdisplay, "TARGETS", False);
++  atom_incr = XInternAtom (xdisplay, "INCR", False);
++  atom_test_target = XInternAtom (xdisplay, "application/mutter-test", False);
++
++  window = XCreateSimpleWindow (xdisplay, DefaultRootWindow (xdisplay),
++                                0, 0, 1, 1, 0, 0, 0);
++  XSetSelectionOwner (xdisplay,
++                      XInternAtom (xdisplay, "CLIPBOARD", False),
++                      window, CurrentTime);
++  XFlush (xdisplay);
++
++  source = x11_event_source_new (xdisplay, on_xevent, xdisplay);
++
++  g_main_loop_run (loop);
++
++  g_source_destroy (source);
++  g_source_unref (source);
++  XDestroyWindow (xdisplay, window);
++  XCloseDisplay (xdisplay);
++
++  return EXIT_SUCCESS;
++}
+diff --git a/src/tests/x11-tests.c b/src/tests/x11-tests.c
+index e661cbe0ad..ed31e50d66 100644
+--- a/src/tests/x11-tests.c
++++ b/src/tests/x11-tests.c
+@@ -23,6 +23,7 @@
+ #include "backends/meta-virtual-monitor.h"
+ #include "compositor/meta-surface-actor.h"
+ #include "compositor/meta-window-actor-private.h"
++#include "meta/meta-selection.h"
+ #include "meta-test/meta-context-test.h"
+ #include "tests/meta-ref-test.h"
+ #include "tests/meta-test-utils.h"
+@@ -180,6 +181,98 @@ meta_test_x11_user_position (void)
+   meta_x11_test_client_finish (test_client);
+ }
+ 
++static gboolean
++clipboard_has_mimetype (const char *mimetype)
++{
++  MetaDisplay *display = meta_context_get_display (test_context);
++  MetaSelection *selection = meta_display_get_selection (display);
++  GList *mimetypes;
++  gboolean found;
++
++  mimetypes = meta_selection_get_mimetypes (selection,
++                                            META_SELECTION_CLIPBOARD);
++  found = g_list_find_custom (mimetypes, mimetype,
++                              (GCompareFunc) g_strcmp0) != NULL;
++  g_list_free_full (mimetypes, g_free);
++
++  return found;
++}
++
++static void
++cancelled_transfer_cb (GObject      *source_object,
++                       GAsyncResult *res,
++                       gpointer      user_data)
++{
++  gboolean *done = user_data;
++  g_autoptr (GError) error = NULL;
++
++  g_assert_false (meta_selection_transfer_finish (META_SELECTION (source_object),
++                                                  res, &error));
++  g_assert_error (error, G_IO_ERROR, G_IO_ERROR_CANCELLED);
++
++  *done = TRUE;
++}
++
++static void
++cancel_transfer_from_unresponsive_owner (const char *mode)
++{
++  MetaDisplay *display = meta_context_get_display (test_context);
++  MetaSelection *selection = meta_display_get_selection (display);
++  g_autoptr (GOutputStream) output = NULL;
++  g_autoptr (GCancellable) cancellable = NULL;
++  MetaX11TestClient *test_client;
++  gboolean done = FALSE;
++
++  test_client = meta_x11_test_client_new_with_args (test_context,
++                                                    "unresponsive-selection-owner",
++                                                    mode,
++                                                    NULL);
++  while (!clipboard_has_mimetype ("application/mutter-test"))
++    g_main_context_iteration (NULL, TRUE);
++
++  output = g_memory_output_stream_new_resizable ();
++  cancellable = g_cancellable_new ();
++  meta_selection_transfer_async (selection,
++                                 META_SELECTION_CLIPBOARD,
++                                 "application/mutter-test",
++                                 -1,
++                                 output,
++                                 cancellable,
++                                 cancelled_transfer_cb,
++                                 &done);
++
++  if (g_strcmp0 (mode, "stall-incr") == 0)
++    {
++      GMemoryOutputStream *memory_output = G_MEMORY_OUTPUT_STREAM (output);
++
++      while (g_memory_output_stream_get_data_size (memory_output) == 0)
++        g_main_context_iteration (NULL, TRUE);
++    }
++
++  g_cancellable_cancel (cancellable);
++
++  while (!done)
++    g_main_context_iteration (NULL, TRUE);
++
++  meta_x11_test_client_send_sigterm (test_client);
++  meta_x11_test_client_finish (test_client);
++
++  while (clipboard_has_mimetype ("application/mutter-test"))
++    g_main_context_iteration (NULL, TRUE);
++}
++
++static void
++meta_test_x11_selection_cancel_unanswered (void)
++{
++  cancel_transfer_from_unresponsive_owner ("never-answer");
++}
++
++static void
++meta_test_x11_selection_cancel_stalled_incr (void)
++{
++  cancel_transfer_from_unresponsive_owner ("stall-incr");
++}
++
+ static void
+ on_before_tests (void)
+ {
+@@ -200,6 +293,10 @@ init_tests (void)
+                    meta_test_x11_allow_commits_race);
+   g_test_add_func ("/x11/client/user-position",
+                    meta_test_x11_user_position);
++  g_test_add_func ("/x11/selection/cancel-unanswered",
++                   meta_test_x11_selection_cancel_unanswered);
++  g_test_add_func ("/x11/selection/cancel-stalled-incr",
++                   meta_test_x11_selection_cancel_stalled_incr);
+ }
+ 
+ int

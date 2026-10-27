@@ -47,7 +47,7 @@
 0047-wayland-show-the-input-panel-as-soon-as-a-text-input.patch
 0048-core-let-the-shell-play-the-audible-bell.patch
 0049-wayland-deliver-the-cursor-rectangle-of-text-inputs-.patch
-0050-x11-give-up-on-selection-owners-that-stop-answering.patch
-0051-compositor-don-t-cull-with-actors-that-clip-what-the.patch
+0050-x11-stop-waiting-forever-on-X11-selection-owners.patch
+0051-compositor-only-cull-with-the-part-of-an-actor-insid.patch
 0052-compositor-shadow-and-outline-Wayland-windows-that-d.patch
 0053-compositor-let-people-turn-rounded-window-corners-of.patch

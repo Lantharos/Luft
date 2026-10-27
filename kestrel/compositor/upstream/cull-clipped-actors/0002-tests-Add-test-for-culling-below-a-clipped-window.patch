@@ -1,0 +1,235 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Tue, 27 Oct 2026 19:08:38 +0100
+Subject: [PATCH 2/2] tests: Add test for culling below a clipped window
+
+Check that a window below a clipped window is only culled where the
+clip lets the window above paint.
+---
+ src/compositor/meta-surface-actor.h           |   2 +
+ src/tests/meson.build                         |  11 ++
+ src/tests/wayland-test-clients/meson.build    |   3 +
+ .../wayland-test-clients/window-culling.c     |  46 ++++++++
+ src/tests/window-culling-tests.c              | 104 ++++++++++++++++++
+ 5 files changed, 166 insertions(+)
+ create mode 100644 src/tests/wayland-test-clients/window-culling.c
+ create mode 100644 src/tests/window-culling-tests.c
+
+diff --git a/src/compositor/meta-surface-actor.h b/src/compositor/meta-surface-actor.h
+index 9dce861587..3a2aee98ee 100644
+--- a/src/compositor/meta-surface-actor.h
++++ b/src/compositor/meta-surface-actor.h
+@@ -3,6 +3,7 @@
+ #pragma once
+ 
+ #include "backends/meta-backend-types.h"
++#include "core/util-private.h"
+ #include "meta/meta-shaped-texture.h"
+ #include "meta/window.h"
+ 
+@@ -33,6 +34,7 @@ gboolean meta_surface_actor_is_obscured (MetaSurfaceActor *self);
+ 
+ gboolean meta_surface_actor_is_effectively_obscured (MetaSurfaceActor *self);
+ 
++META_EXPORT_TEST
+ gboolean meta_surface_actor_is_obscured_on_stage_view (MetaSurfaceActor *self,
+                                                        ClutterStageView *stage_view,
+                                                        float            *unobscurred_fraction);
+diff --git a/src/tests/meson.build b/src/tests/meson.build
+index 269931c749..3494a27c48 100644
+--- a/src/tests/meson.build
++++ b/src/tests/meson.build
+@@ -1176,6 +1176,17 @@ wayland_test_cases = [
+       test_client,
+     ],
+   },
++  {
++    'name': 'window-culling',
++    'suite': 'wayland',
++    'sources': [
++      'window-culling-tests.c',
++      wayland_test_utils,
++    ],
++    'depends': [
++      test_client_executables.get('window-culling'),
++    ],
++  },
+   {
+     'name': 'external-constraint',
+     'suite': 'wayland',
+diff --git a/src/tests/wayland-test-clients/meson.build b/src/tests/wayland-test-clients/meson.build
+index 9c92663def..160621a12c 100644
+--- a/src/tests/wayland-test-clients/meson.build
++++ b/src/tests/wayland-test-clients/meson.build
+@@ -110,6 +110,9 @@ wayland_test_clients = [
+   {
+     'name': 'xdg-activation-no-serial',
+   },
++  {
++    'name': 'window-culling',
++  },
+   {
+     'name': 'xdg-activation-before-mapped',
+   },
+diff --git a/src/tests/wayland-test-clients/window-culling.c b/src/tests/wayland-test-clients/window-culling.c
+new file mode 100644
+index 0000000000..1dbeac87ea
+--- /dev/null
++++ b/src/tests/wayland-test-clients/window-culling.c
+@@ -0,0 +1,46 @@
++/*
++ * Copyright (C) 2026 Kristof Imeri
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of the
++ * License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "config.h"
++
++#include <glib.h>
++#include <wayland-client.h>
++
++#include "wayland-test-client-utils.h"
++
++int
++main (int    argc,
++      char **argv)
++{
++  g_autoptr (WaylandDisplay) display = NULL;
++  g_autoptr (WaylandSurface) bottom = NULL;
++  g_autoptr (WaylandSurface) top = NULL;
++
++  display = wayland_display_new (WAYLAND_DISPLAY_CAPABILITY_TEST_DRIVER);
++
++  bottom = wayland_surface_new (display, "window-culling-bottom",
++                                100, 100, 0xffff0000);
++  wl_surface_commit (bottom->wl_surface);
++
++  top = wayland_surface_new (display, "window-culling-top",
++                             100, 100, 0xff0000ff);
++  wl_surface_commit (top->wl_surface);
++
++  wait_for_sync_event (display, 0);
++
++  return EXIT_SUCCESS;
++}
+diff --git a/src/tests/window-culling-tests.c b/src/tests/window-culling-tests.c
+new file mode 100644
+index 0000000000..01e50394e4
+--- /dev/null
++++ b/src/tests/window-culling-tests.c
+@@ -0,0 +1,104 @@
++/*
++ * Copyright (C) 2026 Kristof Imeri
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of the
++ * License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "config.h"
++
++#include "backends/meta-backend-private.h"
++#include "compositor/meta-surface-actor.h"
++#include "compositor/meta-window-actor-private.h"
++#include "tests/meta-test-utils.h"
++#include "tests/meta-wayland-test-runner.h"
++#include "tests/meta-wayland-test-utils.h"
++
++static MetaWindow *
++wait_for_window (const char *title)
++{
++  MetaWindow *window;
++
++  window = meta_wait_for_client_window (test_context, title);
++  meta_wait_for_window_shown (window);
++  meta_wait_for_effects (window);
++  meta_window_move_frame (window, FALSE, 0, 0);
++
++  return window;
++}
++
++static void
++wait_for_paint (void)
++{
++  MetaBackend *backend = meta_context_get_backend (test_context);
++  ClutterActor *stage = meta_backend_get_stage (backend);
++
++  clutter_actor_queue_redraw (stage);
++  meta_wait_for_paint (CLUTTER_STAGE (stage));
++}
++
++static void
++window_culling_clipped_window (void)
++{
++  MetaBackend *backend = meta_context_get_backend (test_context);
++  MetaRenderer *renderer = meta_backend_get_renderer (backend);
++  ClutterStageView *view;
++  MetaWaylandTestClient *wayland_test_client;
++  MetaWindow *bottom_window;
++  MetaWindow *top_window;
++  MetaSurfaceActor *bottom_surface_actor;
++  float unobscured_fraction;
++
++  wayland_test_client =
++    meta_wayland_test_client_new (test_context, "window-culling");
++
++  bottom_window = wait_for_window ("window-culling-bottom");
++  top_window = wait_for_window ("window-culling-top");
++  meta_window_raise (top_window);
++
++  bottom_surface_actor =
++    meta_window_actor_get_surface (meta_window_actor_from_window (bottom_window));
++
++  view = meta_renderer_get_views (renderer)->data;
++
++  wait_for_paint ();
++  g_assert_true (meta_surface_actor_is_obscured_on_stage_view (bottom_surface_actor,
++                                                               view,
++                                                               &unobscured_fraction));
++
++  clutter_actor_set_clip (CLUTTER_ACTOR (meta_window_actor_from_window (top_window)),
++                          0, 0, 50, 100);
++
++  wait_for_paint ();
++  g_assert_false (meta_surface_actor_is_obscured_on_stage_view (bottom_surface_actor,
++                                                                view,
++                                                                &unobscured_fraction));
++  g_assert_cmpfloat (unobscured_fraction, ==, 0.5);
++
++  meta_wayland_test_driver_emit_sync_event (test_driver, 0);
++  meta_wayland_test_client_finish (wayland_test_client);
++}
++
++static void
++init_tests (void)
++{
++  g_test_add_func ("/compositor/window-culling/clipped-window",
++                   window_culling_clipped_window);
++}
++
++int
++main (int   argc,
++      char *argv[])
++{
++  return meta_run_wayland_tests (argc, argv, init_tests);
++}

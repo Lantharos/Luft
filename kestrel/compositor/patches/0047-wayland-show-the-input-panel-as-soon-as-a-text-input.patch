@@ -17,27 +17,31 @@ a client enabled a text input that was already focused, which GTK 3 does
 to ask for the panel, but Chromium enables its text input once, after
 the tap that focuses a field, and never again while the field keeps
 focus. Show the panel for these clients when they enable a text input
-right after a press or touch on the focused surface, and when such a
-press lands on it while their text input is enabled.
+right after a press or touch on the focused surface. Until the client
+enables that text input again, as GTK 3 does when its field is tapped,
+a later press on the surface brings the panel back, so a Chromium field
+that keeps focus gets the keyboard back when it is tapped again, while
+taps elsewhere in a GTK 3 window leave it alone.
 
-Upstream-Status: upstream https://gitlab.gnome.org/GNOME/mutter/-/merge_requests/5367 covers show and hide; the Chromium part is forwardable
+Upstream-Status: upstream https://gitlab.gnome.org/GNOME/mutter/-/merge_requests/5367 covers show and hide; Mutter turned down showing the panel for legacy clients (!1543), so the Chromium part stays until Chromium binds text-input-v3 version 2 and asks for it
 ---
- src/wayland/meta-wayland-text-input.c | 133 +++++++++++++++++---------
- 1 file changed, 89 insertions(+), 44 deletions(-)
+ src/wayland/meta-wayland-text-input.c | 122 ++++++++++++++++----------
+ 1 file changed, 78 insertions(+), 44 deletions(-)
 
 diff --git a/src/wayland/meta-wayland-text-input.c b/src/wayland/meta-wayland-text-input.c
-index ef1866aea1c13adcc1817c8dd5f3de64187ec5b8..1bb12147be4edf1bae3e7fe8d99e83dc2c4c74ee 100644
+index ef1866aea1c13adcc1817c8dd5f3de64187ec5b8..f12f9f3a53f5fa9fa30487a3095fe778b2240be3 100644
 --- a/src/wayland/meta-wayland-text-input.c
 +++ b/src/wayland/meta-wayland-text-input.c
-@@ -99,6 +99,7 @@ struct _MetaWaylandTextInput
+@@ -99,6 +99,8 @@ struct _MetaWaylandTextInput
    ClutterInputActionFlags available_actions;
    gboolean show_panel;
    gboolean enabled;
 +  gboolean pressed;
++  gboolean panel_follows_presses;
  
    struct
    {
-@@ -555,6 +556,7 @@ meta_wayland_text_input_set_focus (MetaWaylandTextInput *text_input,
+@@ -555,6 +557,7 @@ meta_wayland_text_input_set_focus (MetaWaylandTextInput *text_input,
      return;
  
    text_input->pending_state = META_WAYLAND_PENDING_STATE_NONE;
@@ -45,7 +49,7 @@ index ef1866aea1c13adcc1817c8dd5f3de64187ec5b8..1bb12147be4edf1bae3e7fe8d99e83dc
  
    if (text_input->surface)
      {
-@@ -858,12 +860,21 @@ text_input_commit_state (struct wl_client   *client,
+@@ -858,12 +861,24 @@ text_input_commit_state (struct wl_client   *client,
        if (text_input->enabled)
          {
            gboolean can_show_preedit;
@@ -60,10 +64,13 @@ index ef1866aea1c13adcc1817c8dd5f3de64187ec5b8..1bb12147be4edf1bae3e7fe8d99e83dc
 -            enable_panel_v1 = TRUE;
 +            {
 +              clutter_input_method_focus_in (input_method, focus);
-+              enable_panel_v1 = text_input->pressed && !asks_for_panel;
++              text_input->panel_follows_presses =
++                text_input->pressed && !asks_for_panel;
++              enable_panel_v1 = text_input->panel_follows_presses;
 +            }
 +          else if (!asks_for_panel)
 +            {
++              text_input->panel_follows_presses = FALSE;
 +              enable_panel_v1 = TRUE;
 +            }
 +
@@ -71,7 +78,7 @@ index ef1866aea1c13adcc1817c8dd5f3de64187ec5b8..1bb12147be4edf1bae3e7fe8d99e83dc
  
            can_show_preedit =
              wl_resource_get_version (resource) <
-@@ -1011,24 +1022,38 @@ text_input_set_available_actions (struct wl_client   *client,
+@@ -1011,24 +1026,38 @@ text_input_set_available_actions (struct wl_client   *client,
    text_input->pending_state |= META_WAYLAND_PENDING_STATE_ACTIONS;
  }
  
@@ -118,7 +125,7 @@ index ef1866aea1c13adcc1817c8dd5f3de64187ec5b8..1bb12147be4edf1bae3e7fe8d99e83dc
  }
  
  static struct zwp_text_input_v3_interface meta_text_input_interface = {
-@@ -1189,53 +1214,73 @@ meta_wayland_text_input_update (MetaWaylandTextInput *text_input,
+@@ -1189,53 +1218,58 @@ meta_wayland_text_input_update (MetaWaylandTextInput *text_input,
    return FALSE;
  }
  
@@ -139,21 +146,6 @@ index ef1866aea1c13adcc1817c8dd5f3de64187ec5b8..1bb12147be4edf1bae3e7fe8d99e83dc
 +  return META_IS_SURFACE_ACTOR_WAYLAND (actor) &&
 +         meta_surface_actor_wayland_get_surface (META_SURFACE_ACTOR_WAYLAND (actor)) ==
 +         text_input->surface;
-+}
-+
-+static gboolean
-+focus_asks_for_panel (MetaWaylandTextInput *text_input)
-+{
-+  struct wl_resource *resource;
-+
-+  wl_resource_for_each (resource, &text_input->focus_resource_list)
-+    {
-+      if (wl_resource_get_version (resource) >=
-+          ZWP_TEXT_INPUT_V3_SHOW_INPUT_PANEL_SINCE_VERSION)
-+        return TRUE;
-+    }
-+
-+  return FALSE;
 +}
 +
  gboolean
@@ -218,7 +210,7 @@ index ef1866aea1c13adcc1817c8dd5f3de64187ec5b8..1bb12147be4edf1bae3e7fe8d99e83dc
 +      clutter_input_focus_reset (text_input->input_focus);
 +      meta_wayland_text_input_focus_flush_done (text_input->input_focus);
 +
-+      if (!focus_asks_for_panel (text_input))
++      if (text_input->panel_follows_presses)
 +        clutter_input_focus_set_input_panel_state (text_input->input_focus,
 +                                                   CLUTTER_INPUT_PANEL_STATE_ON);
      }

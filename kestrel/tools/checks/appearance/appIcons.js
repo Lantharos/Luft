@@ -37,9 +37,13 @@ function inAppButton(actor) {
   return false;
 }
 
+const appIconsIn = root => descendants(root).filter(actor => actor instanceof St.Icon && actor.mapped && inAppButton(actor));
+
 function shownIcons() {
-  return [named('kestrel-panel'), named('kestrel-start')].flatMap(descendants)
-    .filter(actor => actor instanceof St.Icon && actor.mapped && inAppButton(actor));
+  return [
+    ...appIconsIn(named('kestrel-panel')).map(icon => [icon, () => appIcons.taskbarPaint]),
+    ...appIconsIn(named('kestrel-start')).map(icon => [icon, () => appIcons.paint]),
+  ];
 }
 
 const loaded = icon => icon.get_children().some(child => child.content && child.opacity > 0);
@@ -54,7 +58,7 @@ async function checkStyles(settings, slug, scheme) {
     await eventually(() => appIcons.style === style, `${style} icons are chosen (${setting})`);
     const icons = shownIcons();
     require(icons.length > 0, `the taskbar and Start show app icons (${setting})`);
-    await eventually(() => icons.every(icon => loaded(icon) && painted(icon, appIcons.paint)), `${style} reaches every taskbar and Start icon (${setting})`);
+    await eventually(() => icons.every(([icon, paint]) => loaded(icon) && painted(icon, paint())), `${style} reaches every taskbar and Start icon (${setting})`);
     await capture(`icons-${style}-${scheme}-${slug}`);
   }
   toggleSurface('start');

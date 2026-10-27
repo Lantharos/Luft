@@ -257,8 +257,8 @@ settings-about-remove = Remove
 settings-about-software = Software
 # The operating system
 settings-about-system = System
-# Luft's version, like "Luft 1.1" or "Luft 1.2 Nightly 21"
-settings-about-version = Luft { $version }
+# $system is Luft's name and $version its version, like "Luft Alizé" and "1.2 Nightly 21"
+settings-about-version = { $system } { $version }
 # $date is the day the installed version was built, like "27 October"
 settings-about-built = Built { $date }
 settings-about-desktop = Desktop

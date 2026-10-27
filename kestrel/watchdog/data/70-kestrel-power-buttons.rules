@@ -1,0 +1,1 @@
+SUBSYSTEM=="input", KERNEL=="event*", ATTRS{name}=="Power Button|Sleep Button", TAG+="uaccess"

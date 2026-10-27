@@ -9,6 +9,7 @@ import {checkPages} from './settings/pages.js';
 import {checkTiling} from './settings/desktop/tiling.js';
 import {checkLongSleep} from './settings/system/power.js';
 import {checkTaskbarLooks} from './settings/desktop/taskbar.js';
+import {checkUpdates} from './settings/system/updates.js';
 import {checkWallpaper} from './settings/desktop/wallpaper.js';
 
 export async function run() {
@@ -27,5 +28,6 @@ export async function run() {
       await checkWallpaper(app);
       await checkDictation(app);
     });
+    await checkUpdates(palette);
   });
 }

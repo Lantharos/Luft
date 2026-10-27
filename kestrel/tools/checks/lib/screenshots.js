@@ -89,6 +89,19 @@ class Frame {
     return this._pixels.length === other._pixels.length && this._pixels.every((value, index) => Math.abs(value - other._pixels[index]) <= tolerance);
   }
 
+  pixelsApart(other, tolerance) {
+    const [width, height, stride, size] = [this._pixbuf.get_width(), this._pixbuf.get_height(), this._pixbuf.get_rowstride(), this._pixbuf.get_n_channels()];
+    const [a, b] = [this._pixels, other._pixels];
+    let count = 0;
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const offset = y * stride + x * size;
+        if ([0, 1, 2].some(channel => Math.abs(a[offset + channel] - b[offset + channel]) > tolerance)) count++;
+      }
+    }
+    return count;
+  }
+
   differences(other) {
     const [width, height, stride, size] = [this._pixbuf.get_width(), this._pixbuf.get_height(), this._pixbuf.get_rowstride(), this._pixbuf.get_n_channels()];
     const [a, b] = [this._pixels, other._pixels];

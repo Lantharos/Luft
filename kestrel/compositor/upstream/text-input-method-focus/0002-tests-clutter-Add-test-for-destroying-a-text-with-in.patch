@@ -1,0 +1,136 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Tue, 27 Oct 2026 18:43:32 +0100
+Subject: [PATCH 2/2] tests/clutter: Add test for destroying a text with input
+ method focus
+
+Check that the input method is focused out when a text that has key
+focus is destroyed.
+---
+ src/tests/clutter/conform/text.c | 101 +++++++++++++++++++++++++++++++
+ 1 file changed, 101 insertions(+)
+
+diff --git a/src/tests/clutter/conform/text.c b/src/tests/clutter/conform/text.c
+index ae597b4150..a3cd5a7fbc 100644
+--- a/src/tests/clutter/conform/text.c
++++ b/src/tests/clutter/conform/text.c
+@@ -18,6 +18,82 @@ test_text_data[] = {
+   { 0x2665, "\xe2\x99\xa5", 3 }  /* BLACK HEART SUIT */
+ };
+ 
++#define TEST_TYPE_INPUT_METHOD (test_input_method_get_type ())
++G_DECLARE_FINAL_TYPE (TestInputMethod, test_input_method,
++                      TEST, INPUT_METHOD, ClutterInputMethod)
++
++struct _TestInputMethod
++{
++  ClutterInputMethod parent;
++
++  ClutterInputFocus *focus;
++};
++
++G_DEFINE_TYPE (TestInputMethod, test_input_method, CLUTTER_TYPE_INPUT_METHOD)
++
++static void
++test_input_method_focus_in (ClutterInputMethod *im,
++                            ClutterInputFocus  *focus)
++{
++  TEST_INPUT_METHOD (im)->focus = focus;
++}
++
++static void
++test_input_method_focus_out (ClutterInputMethod *im)
++{
++  TEST_INPUT_METHOD (im)->focus = NULL;
++}
++
++static void
++test_input_method_reset (ClutterInputMethod *im)
++{
++}
++
++static void
++test_input_method_set_cursor_location (ClutterInputMethod    *im,
++                                       const graphene_rect_t *rect)
++{
++}
++
++static void
++test_input_method_set_surrounding (ClutterInputMethod *im,
++                                   const char         *text,
++                                   unsigned int        cursor,
++                                   unsigned int        anchor)
++{
++}
++
++static void
++test_input_method_update_content_hints (ClutterInputMethod           *im,
++                                        ClutterInputContentHintFlags  hints)
++{
++}
++
++static void
++test_input_method_update_content_purpose (ClutterInputMethod         *im,
++                                          ClutterInputContentPurpose  purpose)
++{
++}
++
++static void
++test_input_method_class_init (TestInputMethodClass *klass)
++{
++  ClutterInputMethodClass *im_class = CLUTTER_INPUT_METHOD_CLASS (klass);
++
++  im_class->focus_in = test_input_method_focus_in;
++  im_class->focus_out = test_input_method_focus_out;
++  im_class->reset = test_input_method_reset;
++  im_class->set_cursor_location = test_input_method_set_cursor_location;
++  im_class->set_surrounding = test_input_method_set_surrounding;
++  im_class->update_content_hints = test_input_method_update_content_hints;
++  im_class->update_content_purpose = test_input_method_update_content_purpose;
++}
++
++static void
++test_input_method_init (TestInputMethod *im)
++{
++}
++
+ static void
+ text_utf8_validation (void)
+ {
+@@ -576,6 +652,30 @@ text_idempotent_use_markup (void)
+   g_object_unref (text);
+ }
+ 
++static void
++text_destroy_im_focused (void)
++{
++  ClutterBackend *backend = clutter_test_get_backend ();
++  g_autoptr (TestInputMethod) im = NULL;
++  ClutterActor *stage;
++  ClutterText *text;
++
++  im = g_object_new (TEST_TYPE_INPUT_METHOD, NULL);
++  clutter_backend_set_input_method (backend, CLUTTER_INPUT_METHOD (im));
++
++  text = CLUTTER_TEXT (clutter_text_new ());
++  stage = clutter_test_get_stage ();
++  clutter_actor_add_child (stage, CLUTTER_ACTOR (text));
++  clutter_text_set_editable (text, TRUE);
++  clutter_actor_grab_key_focus (CLUTTER_ACTOR (text));
++  g_assert_nonnull (im->focus);
++
++  clutter_actor_destroy (CLUTTER_ACTOR (text));
++  g_assert_null (im->focus);
++
++  clutter_backend_set_input_method (backend, NULL);
++}
++
+ CLUTTER_TEST_SUITE (
+   CLUTTER_TEST_UNIT ("/text/utf8-validation", text_utf8_validation)
+   CLUTTER_TEST_UNIT ("/text/set-empty", text_set_empty)
+@@ -590,4 +690,5 @@ CLUTTER_TEST_SUITE (
+   CLUTTER_TEST_UNIT ("/text/cursor", text_cursor)
+   CLUTTER_TEST_UNIT ("/text/event", text_event)
+   CLUTTER_TEST_UNIT ("/text/idempotent-use-markup", text_idempotent_use_markup)
++  CLUTTER_TEST_UNIT ("/text/destroy-im-focused", text_destroy_im_focused)
+ )

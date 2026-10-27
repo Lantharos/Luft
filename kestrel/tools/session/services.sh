@@ -58,6 +58,16 @@ start() {
   pids+=($!)
 }
 
+stand_in_power_button() {
+  local input="$session/input"
+  rm -rf "$input"
+  mkdir -p "$input/sys/class/input/event0/device/capabilities" "$input/dev/input"
+  printf '10000000000000 0\n' > "$input/sys/class/input/event0/device/capabilities/key"
+  mkfifo "$input/dev/input/event0"
+  exec {power_button}<> "$input/dev/input/event0"
+  export LUFT_INPUT_ROOT="$input"
+}
+
 printer_ready() {
   [[ "$(lpstat -d)" == *Office* ]]
 }
@@ -82,6 +92,7 @@ gdbus wait --session --timeout 10 com.lantharos.KestrelChecks.Authenticator
 wait_until "the sound server" test -S "$PULSE_RUNTIME_PATH/native"
 start "$fixtures/session/soundDefaults.sh"
 wait_until "the print server" printer_ready
+stand_in_power_button
 DBUS_SYSTEM_BUS_ADDRESS="$system_bus" GIO_USE_VFS=local start "$root/target/release/kestrel-settings" \
   --modules a11y,housekeeping,keyboard,night-light,power,printers,sound,timezone,watchdog,xsettings
 gdbus wait --session --timeout 10 com.lantharos.Settings

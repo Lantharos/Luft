@@ -45,6 +45,7 @@ watchdog_files() {
   echo "com.lantharos.Kestrel.Watchdog1.service /usr/share/dbus-1/system-services/com.lantharos.Kestrel.Watchdog1.service"
   echo "kestrel-watchdog.service /usr/lib/systemd/system/kestrel-watchdog.service"
   echo "kestrel-incident.service /usr/lib/systemd/system/kestrel-incident.service"
+  echo "70-kestrel-power-buttons.rules /usr/lib/udev/rules.d/70-kestrel-power-buttons.rules"
 }
 
 passkeys_files() {

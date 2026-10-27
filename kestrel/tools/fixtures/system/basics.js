@@ -84,17 +84,46 @@ export const BASIC_NAMES = ['org.freedesktop.login1', 'org.freedesktop.UPower', 
 
 const SESSION_ID = 'c1';
 const SESSION_PATH = `/org/freedesktop/login1/session/${SESSION_ID}`;
-const inhibitors = [];
+const inhibitors = new Set();
+
+function unixSocket() {
+  return Gio.Socket.new(Gio.SocketFamily.UNIX, Gio.SocketType.STREAM, Gio.SocketProtocol.DEFAULT);
+}
+
+function connectedPair() {
+  const address = Gio.UnixSocketAddress.new_with_type(`kestrel-checks-inhibitor-${GLib.uuid_string_random()}`,
+    Gio.UnixSocketAddressType.ABSTRACT);
+  const listener = unixSocket();
+  listener.bind(address, true);
+  listener.listen();
+  const given = unixSocket();
+  given.connect(address, null);
+  const held = listener.accept(null);
+  listener.close();
+  return [given, held];
+}
+
+function followRelease(held, released) {
+  const connection = held.connection_factory_create_connection();
+  inhibitors.add(connection);
+  connection.get_input_stream().read_bytes_async(1, GLib.PRIORITY_DEFAULT, null, (stream, result) => {
+    stream.read_bytes_finish(result);
+    inhibitors.delete(connection);
+    connection.close(null);
+    released();
+  });
+}
 
 export function publishBasics(publish, calls) {
   let lidClosed = false;
   const login = publish(LOGIN, {
     InhibitAsync([what, , , mode], invocation) {
       calls.push(`Inhibit ${what} ${mode}`);
-      const held = Gio.Socket.new(Gio.SocketFamily.UNIX, Gio.SocketType.STREAM, Gio.SocketProtocol.DEFAULT);
-      inhibitors.push(held);
+      const [given, held] = connectedPair();
+      followRelease(held, () => calls.push(`Release ${what} ${mode}`));
       const descriptors = new Gio.UnixFDList();
-      invocation.return_value_with_unix_fd_list(new GLib.Variant('(h)', [descriptors.append(held.get_fd())]), descriptors);
+      invocation.return_value_with_unix_fd_list(new GLib.Variant('(h)', [descriptors.append(given.get_fd())]), descriptors);
+      given.close();
     },
     Suspend: () => calls.push('Suspend'),
     Hibernate: () => calls.push('Hibernate'),

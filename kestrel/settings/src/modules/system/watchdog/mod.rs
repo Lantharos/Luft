@@ -1,3 +1,4 @@
+mod buttons;
 mod cadence;
 mod proxies;
 mod stall;
@@ -14,6 +15,7 @@ use zbus::names::BusName;
 use crate::context::Context;
 use crate::modules::system::memory::Relief;
 use crate::shared::system::LoginProxy;
+use buttons::Buttons;
 use cadence::{Cadence, Pressure};
 use proxies::{HealthProxy, LoginSessionProxy, LoginUserProxy, WatchdogProxy};
 use stall::Stall;
@@ -154,6 +156,7 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
         let mut stall = Stall::default();
         let mut cadence = Cadence::new();
         let mut pressure = Pressure::on_compositor();
+        let mut buttons = Buttons::open();
         loop {
             tokio::select! {
                 Some(signal) = sleeps.next() => {
@@ -165,6 +168,7 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
                     }
                 }
                 () = pressure.fired() => cadence.watch_now(),
+                () = buttons.pressed() => cadence.watch_now(),
                 () = sleep_until(cadence.next()) => {
                     let active = match &display {
                         Some(display) => display.active().await.unwrap_or(true),

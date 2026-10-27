@@ -64,6 +64,7 @@ impl Accounts {
 
     fn cancel(&self, session: String) {
         self.hub.signins.cancel(&session);
+        self.hub.demand.notify_one();
     }
 
     async fn rename(&self, account: String, name: String) -> Result<(), Error> {

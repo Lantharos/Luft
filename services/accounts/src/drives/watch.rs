@@ -107,5 +107,6 @@ pub async fn follow_changes(hub: Arc<Hub>, mut changes: Changes) {
         }
         hub.drives
             .update(&account, |live| live.dirty = Some(Instant::now()));
+        hub.drives.changed.notify_one();
     }
 }

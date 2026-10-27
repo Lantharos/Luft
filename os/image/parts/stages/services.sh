@@ -69,8 +69,6 @@ accounts="$luft/services/accounts"
 install -Dm755 "$release/luft-accounts" "$destdir/usr/libexec/luft-accounts"
 install -Dm644 -t "$destdir/usr/share/dbus-1/services" "$accounts/data/com.lantharos.Accounts1.service"
 install -Dm644 -t "$destdir/usr/lib/systemd/user" "$accounts/data/luft-accounts.service"
-printf 'enable luft-accounts.service\n' |
-  install -Dm644 /dev/stdin "$destdir/usr/lib/systemd/user-preset/40-luft-accounts.preset"
 
 speech="$luft/services/speech"
 install -Dm755 "$release/luft-speech" "$destdir/usr/libexec/luft-speech"

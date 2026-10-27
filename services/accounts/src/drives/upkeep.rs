@@ -1,9 +1,10 @@
 use std::collections::HashSet;
 use std::sync::Arc;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 use luft_accounts::types::{DriveState, Usage};
-use tokio::time::sleep;
+use tokio::sync::broadcast::error::RecvError;
+use tokio::time::{Instant, sleep_until};
 
 use super::attach::{self, is_stale};
 use super::keep::{self, sync};
@@ -12,7 +13,7 @@ use crate::hub::Hub;
 use crate::providers::trouble::{self, Trouble};
 
 const BUSY: Duration = Duration::from_secs(2);
-const IDLE: Duration = Duration::from_secs(15);
+const HELD: Duration = Duration::from_secs(15);
 const SETTLE: Duration = Duration::from_secs(3);
 const SYNC_EVERY: Duration = Duration::from_secs(5 * 60);
 const CHECK_EVERY: Duration = Duration::from_secs(10 * 60);
@@ -20,28 +21,81 @@ const RETRY_EVERY: Duration = Duration::from_secs(30);
 const HOLD: f64 = 120.0;
 const HOLD_WHEN_BELOW: f64 = 30.0;
 const RELEASE: f64 = -1_000_000_000.0;
+const QUEUED_FOR_UPLOAD: &str = "vfs cache: queuing for upload";
+
+struct Rounds {
+    synced: Instant,
+    checked: Instant,
+    retried: Instant,
+}
+
+impl Rounds {
+    fn new() -> Self {
+        let now = Instant::now();
+        Self {
+            synced: now,
+            checked: now,
+            retried: now,
+        }
+    }
+
+    fn next(&self, hub: &Hub) -> Instant {
+        let mut next = (self.synced + SYNC_EVERY).min(self.checked + CHECK_EVERY);
+        if hub.conditions().online && unready(hub) {
+            next = next.min(self.retried + RETRY_EVERY);
+        }
+        if busy(hub) {
+            let every = if hub.conditions().pause.is_some() {
+                HELD
+            } else {
+                BUSY
+            };
+            next = next.min(Instant::now() + every);
+        }
+        next
+    }
+
+    async fn run(&mut self, hub: &Arc<Hub>) {
+        if busy(hub) {
+            follow_uploads(hub, false).await;
+            sync_settled(hub);
+        }
+        if self.synced.elapsed() >= SYNC_EVERY {
+            self.synced = Instant::now();
+            sync_all(hub);
+        }
+        if self.checked.elapsed() >= CHECK_EVERY {
+            self.checked = Instant::now();
+            for account in accounts(hub) {
+                check(hub, &account).await;
+            }
+        } else if self.retried.elapsed() >= RETRY_EVERY && hub.conditions().online {
+            self.retried = Instant::now();
+            retry_unready(hub).await;
+        }
+    }
+}
 
 pub async fn run(hub: Arc<Hub>) {
     let mut starts = hub.rclone.starts.clone();
     let mut conditions = hub.conditions.clone();
     let mut woke = hub.woke.subscribe();
+    let mut logs = hub.rclone.logs();
     let mut was = hub.conditions();
-    let mut synced = Instant::now();
-    let mut checked = Instant::now();
-    let mut retried = Instant::now();
+    let mut rounds = Rounds::new();
+    for account in accounts(&hub) {
+        spawn_attach(&hub, account);
+    }
     loop {
-        let busy = hub
-            .drives
-            .live()
-            .values()
-            .any(|live| !live.uploads.is_empty() || live.dirty.is_some());
         tokio::select! {
             started = starts.changed() => {
                 if started.is_err() {
                     return;
                 }
-                for account in accounts(&hub) {
-                    spawn_attach(&hub, account);
+                if *starts.borrow_and_update() > 1 {
+                    for account in accounts(&hub) {
+                        spawn_attach(&hub, account);
+                    }
                 }
             }
             changed = conditions.changed() => {
@@ -62,25 +116,32 @@ pub async fn run(hub: Arc<Hub>) {
                 was = now;
             }
             _ = woke.recv() => recover(&hub),
-            _ = sleep(if busy { BUSY } else { IDLE }) => {
-                follow_uploads(&hub, false).await;
-                sync_settled(&hub);
-                if synced.elapsed() >= SYNC_EVERY {
-                    synced = Instant::now();
-                    sync_all(&hub);
-                }
-                if checked.elapsed() >= CHECK_EVERY {
-                    checked = Instant::now();
-                    for account in accounts(&hub) {
-                        check(&hub, &account).await;
-                    }
-                } else if retried.elapsed() >= RETRY_EVERY && hub.conditions().online {
-                    retried = Instant::now();
-                    retry_unready(&hub).await;
-                }
-            }
+            line = logs.recv() => match line {
+                Ok(line) if !line.contains(QUEUED_FOR_UPLOAD) => {}
+                Err(RecvError::Closed) => return,
+                _ => follow_uploads(&hub, false).await,
+            },
+            () = hub.drives.changed.notified() => {}
+            () = sleep_until(rounds.next(&hub)) => rounds.run(&hub).await,
         }
     }
+}
+
+fn busy(hub: &Hub) -> bool {
+    hub.drives
+        .live()
+        .values()
+        .any(|live| !live.uploads.is_empty() || live.dirty.is_some())
+}
+
+fn unready(hub: &Hub) -> bool {
+    hub.records().all().iter().any(|record| {
+        record.sign_in_again.is_none()
+            && matches!(
+                hub.drives.get(&record.id).state,
+                DriveState::Offline | DriveState::Problem
+            )
+    })
 }
 
 fn accounts(hub: &Hub) -> Vec<String> {
@@ -271,7 +332,7 @@ async fn follow_uploads(hub: &Hub, release: bool) {
                 .difference(&uploads)
                 .any(|upload| filters::keeps(&record.kept, &record.skipped, upload));
             if landed_in_kept {
-                live.dirty = Some(Instant::now());
+                live.dirty = Some(std::time::Instant::now());
             }
             std::mem::replace(&mut live.uploads, uploads.clone()) != uploads
         });

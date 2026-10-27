@@ -3,6 +3,7 @@ mod bus;
 mod conditions;
 mod drives;
 mod hub;
+mod lifetime;
 mod notify;
 mod paths;
 mod providers;
@@ -34,7 +35,8 @@ async fn serve() -> Result<()> {
     let session = zbus::Connection::session().await?;
     let system = zbus::Connection::system().await?;
     let watchers = conditions::watch(system);
-    let rclone = Rclone::start(&paths)?;
+    let rclone = Rclone::prepare(&paths)?;
+    lifetime::follow_accounts(&session, !records.all().is_empty()).await;
     let (watcher, changes) = drives::Watcher::start()?;
     let hub = Arc::new(Hub::new(Parts {
         paths,
@@ -57,6 +59,7 @@ async fn serve() -> Result<()> {
     tokio::select! {
         _ = terminate.recv() => {}
         _ = interrupt.recv() => {}
+        () = lifetime::until_unneeded(&hub) => {}
     }
     if let Err(error) = hub.rclone.unmount_all().await {
         eprintln!("Couldn't unmount the cloud drives: {error:#}");

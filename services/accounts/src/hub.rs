@@ -1,11 +1,12 @@
 use std::sync::{Mutex, MutexGuard};
 
 use luft_accounts::types::Step;
-use tokio::sync::{broadcast, watch};
+use tokio::sync::{Notify, broadcast, watch};
 use zbus::Connection;
 
 use crate::conditions::Conditions;
 use crate::drives::Drives;
+use crate::lifetime;
 use crate::notify::Notifier;
 use crate::paths::Paths;
 use crate::rclone::Rclone;
@@ -26,6 +27,7 @@ pub struct Hub {
     pub notifier: Notifier,
     pub conditions: watch::Receiver<Conditions>,
     pub woke: broadcast::Sender<()>,
+    pub demand: Notify,
     records: Mutex<Records>,
     session: Connection,
 }
@@ -51,6 +53,7 @@ impl Hub {
             signins: SignIns::default(),
             conditions: parts.conditions,
             woke: parts.woke,
+            demand: Notify::new(),
             records: Mutex::new(parts.records),
             session: parts.session,
         }
@@ -66,8 +69,15 @@ impl Hub {
         *self.conditions.borrow()
     }
 
+    pub fn needed(&self) -> bool {
+        !self.records().all().is_empty() || self.signins.in_progress()
+    }
+
     pub async fn accounts_changed(&self) {
+        let any = !self.records().all().is_empty();
+        self.demand.notify_one();
         self.signal(ACCOUNTS, "Changed", &()).await;
+        lifetime::follow_accounts(&self.session, any).await;
     }
 
     pub async fn drives_changed(&self) {
@@ -75,6 +85,7 @@ impl Hub {
     }
 
     pub async fn step_changed(&self, session: &str, step: &Step) {
+        self.demand.notify_one();
         let step = serde_json::to_string(step).expect("steps always serialize");
         self.signal(ACCOUNTS, "SignInStep", &(session, step)).await;
     }

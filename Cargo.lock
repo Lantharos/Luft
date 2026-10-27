@@ -6806,6 +6806,7 @@ checksum = "cf54715a573b99ac80df0bc206da022bcd442c974952c7b9720069370852e21f"
 [[package]]
 name = "sabine"
 version = "0.57.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.57#449c891be4f456d2d8b79b9a513ec6dd6b3634ec"
 dependencies = [
  "base64",
  "block2",
@@ -6866,6 +6867,7 @@ dependencies = [
 [[package]]
 name = "sabine-bridge"
 version = "0.57.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.57#449c891be4f456d2d8b79b9a513ec6dd6b3634ec"
 dependencies = [
  "serde",
  "serde_json",
@@ -6877,6 +6879,7 @@ dependencies = [
 [[package]]
 name = "sabine-host"
 version = "0.57.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.57#449c891be4f456d2d8b79b9a513ec6dd6b3634ec"
 dependencies = [
  "sabine-bridge",
  "sabine-runtime",
@@ -6888,6 +6891,7 @@ dependencies = [
 [[package]]
 name = "sabine-platform"
 version = "0.57.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.57#449c891be4f456d2d8b79b9a513ec6dd6b3634ec"
 dependencies = [
  "block2",
  "futures-util",
@@ -6907,6 +6911,7 @@ dependencies = [
 [[package]]
 name = "sabine-runtime"
 version = "0.57.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.57#449c891be4f456d2d8b79b9a513ec6dd6b3634ec"
 dependencies = [
  "bzip2",
  "libc",
@@ -6923,6 +6928,7 @@ dependencies = [
 [[package]]
 name = "sabine-service"
 version = "0.57.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.57#449c891be4f456d2d8b79b9a513ec6dd6b3634ec"
 dependencies = [
  "base64",
  "clap",

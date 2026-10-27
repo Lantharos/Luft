@@ -17,6 +17,7 @@ with a TPM whose state stays in os/vm/state/tpm.
                     os/vm/state/target.qcow2 to install onto
   MEDIA=cd          attach the ISO as a DVD instead of a USB stick
   DISK=path         start from another virtual disk
+  DRIVES="a b"      also attach these virtual disks as drives inside the computer
   SECURE_BOOT=1     firmware with Secure Boot on and Microsoft's keys enrolled
   NETWORK=0         no network card
   AUDIO=out.wav     an Intel HD Audio card whose playback is recorded to out.wav
@@ -58,6 +59,13 @@ fi
 [[ -f "$disk" ]] || "$os/vm/disk.sh"
 [[ -f "$vars" ]] || cp "$vars_template" "$vars"
 
+drives=()
+for drive in ${DRIVES:-}; do
+  format=raw
+  [[ "$drive" == *.qcow2 ]] && format=qcow2
+  drives+=(-drive "file=$drive,format=$format,if=virtio")
+done
+
 network=(-nic "user,model=virtio-net-pci")
 [[ "${NETWORK:-1}" == 0 ]] && network=(-nic none)
 
@@ -81,6 +89,7 @@ qemu-system-x86_64 -machine "$machine" -cpu host -smp 4 -m "${MEMORY:-8192}" "${
   -drive "file=$disk,format=qcow2,if=virtio" \
   -chardev "socket,id=tpm,path=$vm/tpm.sock" -tpmdev emulator,id=tpm,chardev=tpm -device tpm-tis,tpmdev=tpm \
   "${media[@]}" \
+  "${drives[@]}" \
   -device pcie-root-port,id=display-port,chassis=1 \
   -device "virtio-vga,bus=display-port,x-pcie-pm-no-soft-reset=on,xres=${XRES:-1920},yres=${YRES:-1080}" \
   -device virtio-keyboard-pci -device virtio-tablet-pci \

@@ -22,8 +22,7 @@ COPY packages/dbus /src/packages/dbus
 COPY packages/identity /src/packages/identity
 COPY packages/web/motion /src/packages/web/motion
 COPY packages/web/ui/src/taskbar /src/packages/web/ui/src/taskbar
-COPY packages/i18n/src /src/packages/i18n/src
-COPY packages/i18n/tools /src/packages/i18n/tools
+COPY packages/i18n /src/packages/i18n
 COPY packages/web/settings-pages /src/packages/web/settings-pages
 COPY os/image/parts/stages/kestrel.sh os/image/parts/stages/needed.sh os/image/parts/stages/source-times.ts os/image/parts/stages/workspace.ts \
   /src/os/image/parts/stages/

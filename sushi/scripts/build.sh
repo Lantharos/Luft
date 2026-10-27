@@ -2,11 +2,11 @@
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
-luft="$(cd "$root/../.." && pwd)"
+luft="$(cd "$root/.." && pwd)"
 
 usage() {
   cat <<'USAGE'
-Usage: boot/sushi/scripts/build.sh [DESTDIR]
+Usage: sushi/scripts/build.sh [DESTDIR]
 
 Builds Sushi and SushiBoot. With DESTDIR, also stages their files under it as
 they would be laid out on the computer.

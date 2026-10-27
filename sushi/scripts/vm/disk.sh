@@ -37,7 +37,7 @@ podman run --rm --security-opt label=disable --rootfs "$tree" sh -c "
 podman unshare setfiles -F -r "$tree" "$contexts/file_contexts" "$tree"
 
 cargo build --release --manifest-path "$root/scripts/vm/display/Cargo.toml" --target x86_64-unknown-uefi
-uefi="${CARGO_TARGET_DIR:-$root/../../target}/x86_64-unknown-uefi/release"
+uefi="${CARGO_TARGET_DIR:-$root/../target}/x86_64-unknown-uefi/release"
 rm -rf "$esp"
 mkdir -p "$esp/EFI/BOOT" "$esp/EFI/sushi" "$esp/loader/entries"
 cp "$uefi/vm-display.efi" "$esp/EFI/BOOT/BOOTX64.EFI"

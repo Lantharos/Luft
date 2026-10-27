@@ -1,4 +1,4 @@
-/boot/sushi/vm/
+/sushi/vm/
 /os/vm/state/
 /os/image/state/
 /os/iso/state/

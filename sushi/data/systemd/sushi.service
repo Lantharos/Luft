@@ -1,6 +1,6 @@
 [Unit]
 Description=Boot splash
-Documentation=https://github.com/Lantharos/Luft/tree/main/boot/sushi
+Documentation=https://github.com/Lantharos/Luft/tree/main/sushi
 DefaultDependencies=no
 Wants=systemd-vconsole-setup.service
 After=systemd-vconsole-setup.service

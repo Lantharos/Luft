@@ -26,8 +26,8 @@ cargo clippy -p luft-passkeys -p ctap -p luft-passkeys-relay --all-targets -- -D
 
 ```sh
 export SUSHI_VM=~/.cache/luft-passkeys-vm
-boot/sushi/scripts/vm/tree.sh && boot/sushi/scripts/vm/kestrel.sh
-kestrel/passkeys/tools/check/prepare.sh && boot/sushi/scripts/vm/disk.sh
+sushi/scripts/vm/tree.sh && sushi/scripts/vm/kestrel.sh
+kestrel/passkeys/tools/check/prepare.sh && sushi/scripts/vm/disk.sh
 kestrel/passkeys/tools/check/run.py                     # with a TPM and a fingerprint
 kestrel/passkeys/tools/check/run.py --no-tpm --password # without a TPM, with the password
 ```

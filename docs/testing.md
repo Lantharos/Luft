@@ -100,7 +100,7 @@ See [Luft Keyring](../kestrel/keyring/README.md#testing) and [Luft Passkeys](../
 
 ## Boot VM
 
-A Fedora system built with Podman, with greetd and Kestrel's login screen, booting through SushiBoot under QEMU and OVMF with SELinux enforcing. It needs no `sudo`. From `boot/sushi`:
+A Fedora system built with Podman, with greetd and Kestrel's login screen, booting through SushiBoot under QEMU and OVMF with SELinux enforcing. It needs no `sudo`. From `sushi`:
 
 ```sh
 scripts/vm/tree.sh       # Fedora root tree (first run downloads packages)
@@ -112,7 +112,7 @@ scripts/vm/run.sh        # boot it in a window
 
 `make vm-build`, `make vm-build-luks`, `make vm-run` and `make vm-clean` wrap the same steps.
 
-Everything lives in `boot/sushi/vm`; set `SUSHI_VM` to use another folder. The `sushi` account's password, and the disk passphrase, is `sushi-vm`.
+Everything lives in `sushi/vm`; set `SUSHI_VM` to use another folder. The `sushi` account's password, and the disk passphrase, is `sushi-vm`.
 
 `disk.sh` options:
 

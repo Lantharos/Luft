@@ -42,7 +42,7 @@ COPY --from=kestrel-build /out/ /
 
 FROM builder AS boot-build
 COPY Cargo.toml Cargo.lock /src/
-COPY boot/sushi /src/boot/sushi
+COPY sushi /src/sushi
 COPY security /src/security
 COPY packages/dbus /src/packages/dbus
 COPY packages/identity /src/packages/identity

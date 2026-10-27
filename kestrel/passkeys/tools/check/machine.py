@@ -9,7 +9,7 @@ from pathlib import Path
 
 from PIL import Image
 
-SUSHI = Path(__file__).resolve().parents[4] / "boot/sushi"
+SUSHI = Path(__file__).resolve().parents[4] / "sushi"
 KEYS = {
     " ": "spc",
     "-": "minus",

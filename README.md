@@ -47,7 +47,7 @@ Luft is young. There's no stable release yet: the downloads are nightly builds o
 | [`apps`](apps) | Luft's apps, one folder each, and Install Luft and Meet Luft |
 | [`packages`](packages) | Code the apps and services share: the native app shell, D-Bus and translations, libraries for the system's parts in `system` and the UI kit in `web` |
 | [`services`](services) | Luft's own system and session services: updates, sleep, online accounts, dictation, Windows next to Luft and app thumbnails |
-| [`boot`](boot/sushi/README.md) | The Sushi boot splash and the SushiBoot boot menu |
+| [`sushi`](sushi/README.md) | The Sushi boot splash and the SushiBoot boot menu |
 | [`security`](security/README.md) | Secure Boot, TPM unlock, disk encryption and USB protection |
 | [`web`](web) | The [website](web/site/README.md), the [docs](web/docs/README.md) and what they [share](web/shared/README.md) |
 | [`docs`](docs) | Notes on how things work underneath, also published on the docs site under Reference |

@@ -6,6 +6,6 @@
 kestrel/run
 kestrel/build
 kestrel/install
-boot/sushi/vm
+sushi/vm
 apps/meet/vm
 docs

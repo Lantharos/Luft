@@ -16,12 +16,12 @@ members = [
     "apps/setup/installer",
     "apps/signin/desktop",
     "apps/tern/desktop",
-    "boot/sushi/crates/sushi",
-    "boot/sushi/crates/sushi-scene",
-    "boot/sushi/crates/sushiboot",
-    "boot/sushi/crates/sushictl",
-    "boot/sushi/crates/sushid",
-    "boot/sushi/scripts/vm/display",
+    "sushi/crates/sushi",
+    "sushi/crates/sushi-scene",
+    "sushi/crates/sushiboot",
+    "sushi/crates/sushictl",
+    "sushi/crates/sushid",
+    "sushi/scripts/vm/display",
     "kestrel/greeter",
     "kestrel/keyring/daemon",
     "kestrel/keyring/pam",
@@ -78,10 +78,10 @@ default-members = [
     "apps/setup/installer",
     "apps/signin/desktop",
     "apps/tern/desktop",
-    "boot/sushi/crates/sushi",
-    "boot/sushi/crates/sushi-scene",
-    "boot/sushi/crates/sushictl",
-    "boot/sushi/crates/sushid",
+    "sushi/crates/sushi",
+    "sushi/crates/sushi-scene",
+    "sushi/crates/sushictl",
+    "sushi/crates/sushid",
     "kestrel/greeter",
     "kestrel/keyring/daemon",
     "kestrel/keyring/pam",
@@ -149,8 +149,8 @@ luft-speech = { path = "packages/system/speech" }
 luft-trust = { path = "packages/system/trust" }
 luft-variant = { path = "packages/system/variant" }
 luft-windows = { path = "packages/system/windows" }
-sushi = { path = "boot/sushi/crates/sushi" }
-sushi-scene = { path = "boot/sushi/crates/sushi-scene" }
+sushi = { path = "sushi/crates/sushi" }
+sushi-scene = { path = "sushi/crates/sushi-scene" }
 
 ab_glyph = { version = "0.2.32", default-features = false }
 aes = "0.9.3"

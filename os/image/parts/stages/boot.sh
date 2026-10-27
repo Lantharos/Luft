@@ -2,7 +2,7 @@
 set -euo pipefail
 
 luft="$(cd "$(dirname "$0")/../../../.." && pwd)"
-sushi="$luft/boot/sushi"
+sushi="$luft/sushi"
 destdir="$1"
 key="$2"
 certificate="$3"

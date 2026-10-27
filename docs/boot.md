@@ -1,6 +1,6 @@
 # Boot and recovery
 
-How a Luft computer starts, and what to do when it doesn't. The pieces are [SushiBoot and Sushi](../boot/sushi/README.md), [trustd](../security/README.md) and the [Luft image](../os/README.md).
+How a Luft computer starts, and what to do when it doesn't. The pieces are [SushiBoot and Sushi](../sushi/README.md), [trustd](../security/README.md) and the [Luft image](../os/README.md).
 
 ## How the computer starts
 

@@ -1,6 +1,6 @@
 # Sushi
 
-Sushi ([boot/sushi](../../boot/sushi)) is Luft's boot splash, and SushiBoot the UEFI boot menu Luft starts through. Building and installing them is in [the folder's README](../../boot/sushi/README.md), and how they fit into the boot chain in [Boot](../boot.md).
+Sushi ([`sushi`](../../sushi)) is Luft's boot splash, and SushiBoot the UEFI boot menu Luft starts through. Building and installing them is in [the folder's README](../../sushi/README.md), and how they fit into the boot chain in [Boot](../boot.md).
 
 ## Configuration
 

@@ -12,7 +12,7 @@ const TEST_ONLY = ['**/vm/**', '**/tools/check/**'].map((pattern) => new Glob(pa
 const SCOPES: [string, Scope][] = [
 	['apps/setup/installer/data/*', 'system'],
 	['apps/*/data/*', 'user'],
-	['boot/sushi/data/systemd/*', 'system'],
+	['sushi/data/systemd/*', 'system'],
 	['kestrel/engine/data/system/*', 'system'],
 	['kestrel/engine/data/session/*', 'user'],
 	['kestrel/engine/data/*', 'user'],

@@ -11,7 +11,7 @@ prefix="$vm/kestrel/prefix"
 libexec="$prefix/libexec"
 packages=(chromium firefox python3-gobject fprintd-pam)
 
-[[ -d "$prefix" ]] || { echo "Build Kestrel into the VM first: SUSHI_VM=$vm boot/sushi/scripts/vm/kestrel.sh" >&2; exit 1; }
+[[ -d "$prefix" ]] || { echo "Build Kestrel into the VM first: SUSHI_VM=$vm sushi/scripts/vm/kestrel.sh" >&2; exit 1; }
 
 if [[ "$(cat "$vm/.passkeys-packages" 2>/dev/null)" != "${packages[*]}" ]]; then
   podman run --rm --security-opt label=disable -v "$tree:/installroot" "registry.fedoraproject.org/fedora:45" \

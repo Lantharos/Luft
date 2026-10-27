@@ -3,7 +3,7 @@ use tiny_skia::{FillRule, Paint, PathBuilder, PixmapMut, Transform};
 
 fn font() -> FontRef<'static> {
     FontRef::try_from_slice(include_bytes!(
-        "../../../../../kestrel/engine/data/fonts/OpenRunde-Medium.otf"
+        "../../../../kestrel/engine/data/fonts/OpenRunde-Medium.otf"
     ))
     .expect("Open Runde is a valid OpenType font")
 }

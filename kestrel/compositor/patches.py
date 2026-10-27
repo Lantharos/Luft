@@ -2,10 +2,12 @@
 import argparse
 import hashlib
 import json
+import os
 import re
 import shutil
 import subprocess
 import tempfile
+from contextlib import contextmanager
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
@@ -14,6 +16,8 @@ SOURCE = RUN / "mutter-source"
 LOCK = ROOT / "upstream.json"
 PATCHES = ROOT / "patches"
 SERIES = ROOT / "series"
+IDENTITY_HARNESS = ROOT / "tests" / "sandbox-cases.c"
+IDENTITY_CASES = ROOT.parent.parent / "packages" / "identity" / "sandbox-cases.ini"
 STATE = SOURCE / ".git" / "kestrel-series.json"
 STATUS_TRAILER = "Upstream-Status: "
 STATUS_KINDS = ("upstream", "forwardable", "luft-only")
@@ -151,22 +155,42 @@ def export(base, version):
     print(f"Exported {len(names)} patches")
 
 
-def check():
+@contextmanager
+def applied_series(prefix):
     spec = upstream()
+    if not (SOURCE / ".git").exists():
+        init_source(spec)
     fetch_revision(spec["revision"])
-    path = Path(tempfile.mkdtemp(prefix="kestrel-check-", dir=RUN))
+    path = Path(tempfile.mkdtemp(prefix=prefix, dir=RUN))
     path.rmdir()
     git("worktree", "add", "--detach", str(path), spec["revision"])
     try:
         for name in series():
             git("apply", "--index", str(PATCHES / name), cwd=path)
+        yield path
+    finally:
+        git("worktree", "remove", "--force", str(path))
+
+
+def check():
+    with applied_series("kestrel-check-") as path:
         tree = git("write-tree", cwd=path, capture=True)
         print(f"Series applies cleanly; resulting tree: {tree}")
         if (STATE.exists() and json.loads(STATE.read_text())["fingerprint"] == fingerprint()
                 and tree != git("rev-parse", "HEAD^{tree}", capture=True)):
             raise RuntimeError("Replayed series differs from the prepared checkout")
-    finally:
-        git("worktree", "remove", "--force", str(path))
+
+
+def identity():
+    with applied_series("kestrel-identity-") as path, tempfile.TemporaryDirectory(dir=RUN) as build:
+        (Path(build) / "config.h").touch()
+        harness = Path(build) / "sandbox-cases"
+        glib = subprocess.run(["pkg-config", "--cflags", "--libs", "glib-2.0"], check=True,
+                              text=True, stdout=subprocess.PIPE).stdout.split()
+        subprocess.run([os.environ.get("CC", "cc"), "-std=gnu11", "-D_GNU_SOURCE", "-Wall", "-Werror", f"-I{build}",
+                        f"-I{path / 'src'}", str(IDENTITY_HARNESS), str(path / "src/core/meta-process-identity.c"),
+                        *glib, "-o", str(harness)], check=True)
+        subprocess.run([str(harness), str(IDENTITY_CASES)], check=True)
 
 
 def report():
@@ -241,6 +265,7 @@ def main():
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("prepare")
     commands.add_parser("check")
+    commands.add_parser("identity")
     commands.add_parser("status")
     commands.add_parser("list")
     trier = commands.add_parser("trial")
@@ -256,6 +281,8 @@ def main():
         export(args.base, args.version)
     elif args.command == "check":
         check()
+    elif args.command == "identity":
+        identity()
     elif args.command == "list":
         report()
     elif args.command == "trial":

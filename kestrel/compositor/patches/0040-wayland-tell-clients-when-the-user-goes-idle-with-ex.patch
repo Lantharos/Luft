@@ -28,10 +28,10 @@ Upstream-Status: forwardable
  create mode 100644 src/wayland/meta-wayland-idle-notify.h
 
 diff --git a/src/meson.build b/src/meson.build
-index ed4c1ac4ae0327b0baf786d74f69eebfcb6f0765..ce589e3e21965d4ceeaa7f3343a7ef3a77363e0d 100644
+index 43e6c97c5b0c4a731f307e65b61adcd248187ed8..5830177db84eb6f6d3658719cc5b9c5bf67f4a36 100644
 --- a/src/meson.build
 +++ b/src/meson.build
-@@ -545,6 +545,8 @@ mutter_sources += [
+@@ -547,6 +547,8 @@ mutter_sources += [
    'wayland/meta-wayland.h',
    'wayland/meta-wayland-idle-inhibit.c',
    'wayland/meta-wayland-idle-inhibit.h',
@@ -40,7 +40,7 @@ index ed4c1ac4ae0327b0baf786d74f69eebfcb6f0765..ce589e3e21965d4ceeaa7f3343a7ef3a
    'wayland/meta-wayland-inhibit-shortcuts.c',
    'wayland/meta-wayland-inhibit-shortcuts-dialog.c',
    'wayland/meta-wayland-inhibit-shortcuts-dialog.h',
-@@ -1027,6 +1029,7 @@ wayland_protocols = [
+@@ -1029,6 +1031,7 @@ wayland_protocols = [
    ['cursor-shape', 'staging', 1, ],
    ['drm-lease', 'staging', 1, ],
    ['ext-background-effect', 'staging', 1, ],

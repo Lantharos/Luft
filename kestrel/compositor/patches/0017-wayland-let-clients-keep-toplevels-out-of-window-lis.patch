@@ -29,10 +29,10 @@ Upstream-Status: luft-only Kestrel's private kestrel_window_v1 protocol
  create mode 100644 src/wayland/protocol/kestrel-window-v1.xml
 
 diff --git a/src/meson.build b/src/meson.build
-index a2bec5c5d450e8cda04b16648fe689b1386958a8..483ef3c0a7257d8f28c6e82d5af0e1968bde9538 100644
+index abc370b6a805e97f68ccb729ba4ec461c0eb33d0..ff8d07720fcf906552b2fb569e5d0f51b01471a5 100644
 --- a/src/meson.build
 +++ b/src/meson.build
-@@ -642,6 +642,8 @@ mutter_sources += [
+@@ -644,6 +644,8 @@ mutter_sources += [
    'wayland/meta-wayland-xdg-shell.h',
    'wayland/meta-wayland-toplevel-icon.c',
    'wayland/meta-wayland-toplevel-icon.h',
@@ -41,7 +41,7 @@ index a2bec5c5d450e8cda04b16648fe689b1386958a8..483ef3c0a7257d8f28c6e82d5af0e196
    'wayland/meta-wayland-icon-pixels.c',
    'wayland/meta-wayland-icon-pixels.h',
    'wayland/meta-wayland-xdg-dialog.c',
-@@ -1023,6 +1025,7 @@ wayland_protocols = [
+@@ -1025,6 +1027,7 @@ wayland_protocols = [
    ['fractional-scale', 'staging', 1, ],
    ['fifo', 'staging', 1, ],
    ['gtk-shell', 'private', ],

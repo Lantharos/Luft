@@ -28,10 +28,10 @@ Upstream-Status: luft-only GNOME leaves clipboard managers to shell extensions
  create mode 100644 src/wayland/meta-wayland-data-control.h
 
 diff --git a/src/meson.build b/src/meson.build
-index ce589e3e21965d4ceeaa7f3343a7ef3a77363e0d..7e51861098aed187c1d45609340d8851fd3b1cb7 100644
+index 5830177db84eb6f6d3658719cc5b9c5bf67f4a36..fb92374479b5125e91695a3c0904eb5f07cc8602 100644
 --- a/src/meson.build
 +++ b/src/meson.build
-@@ -520,6 +520,8 @@ mutter_sources += [
+@@ -522,6 +522,8 @@ mutter_sources += [
    'wayland/meta-wayland-cursor-surface.h',
    'wayland/meta-wayland-data-device.c',
    'wayland/meta-wayland-data-device.h',
@@ -40,7 +40,7 @@ index ce589e3e21965d4ceeaa7f3343a7ef3a77363e0d..7e51861098aed187c1d45609340d8851
    'wayland/meta-wayland-data-device-primary.c',
    'wayland/meta-wayland-data-device-primary.h',
    'wayland/meta-wayland-data-offer.c',
-@@ -1029,6 +1031,7 @@ wayland_protocols = [
+@@ -1031,6 +1033,7 @@ wayland_protocols = [
    ['cursor-shape', 'staging', 1, ],
    ['drm-lease', 'staging', 1, ],
    ['ext-background-effect', 'staging', 1, ],

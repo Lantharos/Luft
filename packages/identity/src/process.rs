@@ -3,6 +3,8 @@ use std::fs::File;
 use std::io::{ErrorKind, Read};
 use std::os::fd::{AsRawFd, BorrowedFd, FromRawFd, OwnedFd};
 
+use crate::sandbox_info;
+
 const SANDBOX_INFO: &CStr = c"root/.flatpak-info";
 const MOUNTS: &CStr = c"mountinfo";
 const SANDBOX_INFO_MOUNT: &str = "/.flatpak-info";
@@ -26,19 +28,6 @@ pub fn pid_of(pidfd: BorrowedFd<'_>) -> Option<u32> {
         .filter(|pid| *pid > 0)
 }
 
-/// The app ID in a sandbox's `.flatpak-info`.
-pub fn sandbox_app_id(info: &str) -> Option<&str> {
-    let mut in_application = false;
-    for line in info.lines().map(str::trim) {
-        if line.starts_with('[') {
-            in_application = line == "[Application]";
-        } else if in_application && let Some(name) = line.strip_prefix("name=") {
-            return Some(name.trim()).filter(|name| !name.is_empty());
-        }
-    }
-    None
-}
-
 fn open_folder(pid: u32) -> Option<OwnedFd> {
     let path = CString::new(format!("/proc/{pid}")).ok()?;
     let fd = unsafe {
@@ -50,7 +39,7 @@ fn open_folder(pid: u32) -> Option<OwnedFd> {
     (fd >= 0).then(|| unsafe { OwnedFd::from_raw_fd(fd) })
 }
 
-fn read_at(folder: &OwnedFd, name: &CStr) -> std::io::Result<String> {
+fn open_at(folder: &OwnedFd, name: &CStr) -> std::io::Result<File> {
     let fd = unsafe {
         libc::openat(
             folder.as_raw_fd(),
@@ -61,27 +50,33 @@ fn read_at(folder: &OwnedFd, name: &CStr) -> std::io::Result<String> {
     if fd < 0 {
         return Err(std::io::Error::last_os_error());
     }
-    let mut text = String::new();
-    unsafe { File::from_raw_fd(fd) }.read_to_string(&mut text)?;
-    Ok(text)
+    Ok(unsafe { File::from_raw_fd(fd) })
 }
 
-fn mounts_sandbox_info(mounts: &str) -> bool {
-    mounts
-        .lines()
-        .any(|line| line.split(' ').nth(4) == Some(SANDBOX_INFO_MOUNT))
+fn read_info(mut file: File) -> Sandbox {
+    let mut info = Vec::new();
+    match file.read_to_end(&mut info) {
+        Ok(_) => sandbox_info::app_id(&info).map_or(Sandbox::Unreadable, Sandbox::App),
+        Err(_) => Sandbox::Unreadable,
+    }
+}
+
+fn mounts_show_no_sandbox(folder: &OwnedFd) -> bool {
+    let mut mounts = String::new();
+    open_at(folder, MOUNTS)
+        .and_then(|mut file| file.read_to_string(&mut mounts))
+        .is_ok()
+        && !mounts
+            .lines()
+            .any(|line| line.split(' ').nth(4) == Some(SANDBOX_INFO_MOUNT))
 }
 
 fn read_sandbox(folder: &OwnedFd) -> Sandbox {
-    match read_at(folder, SANDBOX_INFO) {
-        Ok(info) => {
-            sandbox_app_id(&info).map_or(Sandbox::Unreadable, |id| Sandbox::App(id.to_owned()))
-        }
+    match open_at(folder, SANDBOX_INFO) {
+        Ok(file) => read_info(file),
         Err(error) if error.kind() == ErrorKind::NotFound => Sandbox::None,
-        Err(_undumpable) => match read_at(folder, MOUNTS) {
-            Ok(mounts) if !mounts_sandbox_info(&mounts) => Sandbox::None,
-            _ => Sandbox::Unreadable,
-        },
+        Err(_undumpable) if mounts_show_no_sandbox(folder) => Sandbox::None,
+        Err(_undumpable) => Sandbox::Unreadable,
     }
 }
 
@@ -101,3 +96,6 @@ pub fn sandbox_of(pidfd: BorrowedFd<'_>) -> Sandbox {
         Sandbox::Unreadable
     }
 }
+
+#[cfg(test)]
+mod cases;

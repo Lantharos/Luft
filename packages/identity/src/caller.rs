@@ -11,7 +11,7 @@ use zbus::names::BusName;
 use crate::permissions::{self, FULL_ACCESS};
 use crate::process::{self, Sandbox};
 
-pub use crate::process::{pid_of, sandbox_app_id};
+pub use crate::process::pid_of;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Caller {
@@ -88,16 +88,4 @@ pub async fn uid(connection: &Connection, header: &Header<'_>) -> zbus::Result<O
         .get_connection_credentials(BusName::Unique(sender.to_owned()))
         .await?
         .unix_user_id())
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn the_app_id_comes_from_the_application_group() {
-        let info = "[Instance]\nname=org.example.Fake\n\n[Application]\nname=org.example.Notes\nruntime=runtime/org.gnome.Platform\n";
-        assert_eq!(sandbox_app_id(info), Some("org.example.Notes"));
-        assert_eq!(sandbox_app_id("[Runtime]\nname=org.gnome.Platform\n"), None);
-    }
 }

@@ -18,6 +18,8 @@ outside a sandbox. A process that keeps others out of its memory hides
 its root, so it counts as outside a sandbox when its mount table, which
 anyone may read, has nothing mounted at /.flatpak-info. Clients that cannot be judged, because the process
 already exited or its sandbox info cannot be read, count as sandboxed.
+meta_process_identify_at() judges a process from its /proc folder
+alone, which Luft tests against the same cases as its own services.
 
 The shell tells the compositor which sandboxed apps hold which
 permissions with meta_context_set_permitted_apps(), and
@@ -32,44 +34,153 @@ meta_wayland_filter_unsandboxed().
 
 Upstream-Status: luft-only Luft's sandbox model and permission API; upstream's security-context work, GNOME/mutter!3107, was closed
 ---
- src/core/meta-sandbox.c             | 174 ++++++++++++
+ src/core/meta-process-identity.c    |  91 ++++++
+ src/core/meta-process-identity.h    |   7 +
+ src/core/meta-sandbox.c             |  95 +++++++
  src/core/meta-sandbox.h             |  13 +
- src/meson.build                     |   5 +
+ src/meson.build                     |   7 +
  src/meta/meta-context.h             |  10 +
  src/wayland/meta-wayland-sandbox.c  | 423 ++++++++++++++++++++++++++++
  src/wayland/meta-wayland-sandbox.h  |  18 ++
  src/wayland/meta-wayland-versions.h |   1 +
  src/wayland/meta-wayland.c          |   2 +
- 8 files changed, 646 insertions(+)
+ 10 files changed, 667 insertions(+)
+ create mode 100644 src/core/meta-process-identity.c
+ create mode 100644 src/core/meta-process-identity.h
  create mode 100644 src/core/meta-sandbox.c
  create mode 100644 src/core/meta-sandbox.h
  create mode 100644 src/wayland/meta-wayland-sandbox.c
  create mode 100644 src/wayland/meta-wayland-sandbox.h
 
+diff --git a/src/core/meta-process-identity.c b/src/core/meta-process-identity.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..48860bee9e290a1dfc353b16dac5246db2f57ed3
+--- /dev/null
++++ b/src/core/meta-process-identity.c
+@@ -0,0 +1,91 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#include "config.h"
++
++#include "core/meta-process-identity.h"
++
++#include <errno.h>
++#include <fcntl.h>
++#include <glib/gstdio.h>
++#include <unistd.h>
++
++#define SANDBOX_INFO "root/.flatpak-info"
++#define SANDBOX_INFO_MOUNT "/.flatpak-info"
++#define SANDBOX_INFO_LIMIT (64 * 1024)
++#define MOUNTS_LIMIT (4 * 1024 * 1024)
++
++static GString *
++read_all (int   fd,
++          gsize limit)
++{
++  g_autoptr (GString) contents = g_string_new (NULL);
++  char buffer[4096];
++  ssize_t length;
++
++  while ((length = read (fd, buffer, sizeof (buffer))) > 0)
++    {
++      if (contents->len + length > limit)
++        return NULL;
++      g_string_append_len (contents, buffer, length);
++    }
++
++  return length < 0 ? NULL : g_steal_pointer (&contents);
++}
++
++static gboolean
++read_sandbox_info (int     info_fd,
++                   char  **app_id)
++{
++  g_autoptr (GString) contents = read_all (info_fd, SANDBOX_INFO_LIMIT);
++  g_autoptr (GKeyFile) info = g_key_file_new ();
++
++  if (!contents ||
++      !g_key_file_load_from_data (info, contents->str, contents->len,
++                                  G_KEY_FILE_NONE, NULL))
++    return FALSE;
++
++  *app_id = g_key_file_get_string (info, "Application", "name", NULL);
++  if (*app_id && **app_id)
++    return TRUE;
++
++  g_clear_pointer (app_id, g_free);
++  return FALSE;
++}
++
++static gboolean
++mounts_sandbox_info (int process_fd)
++{
++  g_autofd int mounts_fd = openat (process_fd, "mountinfo", O_RDONLY | O_CLOEXEC);
++  g_autoptr (GString) mounts = NULL;
++  g_auto (GStrv) lines = NULL;
++  char **line;
++
++  if (mounts_fd < 0 || !(mounts = read_all (mounts_fd, MOUNTS_LIMIT)))
++    return TRUE;
++
++  lines = g_strsplit (mounts->str, "\n", -1);
++  for (line = lines; *line; line++)
++    {
++      g_auto (GStrv) fields = g_strsplit (*line, " ", 6);
++
++      if (g_strv_length (fields) > 4 && g_str_equal (fields[4], SANDBOX_INFO_MOUNT))
++        return TRUE;
++    }
++
++  return FALSE;
++}
++
++gboolean
++meta_process_identify_at (int    process_fd,
++                          char **app_id)
++{
++  g_autofd int info_fd = openat (process_fd, SANDBOX_INFO,
++                                 O_RDONLY | O_NOFOLLOW | O_CLOEXEC);
++
++  *app_id = NULL;
++  if (info_fd >= 0)
++    return read_sandbox_info (info_fd, app_id);
++  if (errno == ENOENT)
++    return TRUE;
++
++  return !mounts_sandbox_info (process_fd);
++}
+diff --git a/src/core/meta-process-identity.h b/src/core/meta-process-identity.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..b0bab71a166cf229fecacb65efc984eee3b291b9
+--- /dev/null
++++ b/src/core/meta-process-identity.h
+@@ -0,0 +1,7 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#pragma once
++
++#include <glib.h>
++
++gboolean meta_process_identify_at (int    process_fd,
++                                   char **app_id);
 diff --git a/src/core/meta-sandbox.c b/src/core/meta-sandbox.c
 new file mode 100644
-index 0000000000000000000000000000000000000000..2cd3368f0163a3e8cd9ea928f8a05c716ea9b188
+index 0000000000000000000000000000000000000000..034b2b79d1120659ac12a95d88cb03a555a6557a
 --- /dev/null
 +++ b/src/core/meta-sandbox.c
-@@ -0,0 +1,174 @@
+@@ -0,0 +1,95 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
 +#include "config.h"
 +
 +#include "core/meta-sandbox.h"
 +
-+#include <errno.h>
 +#include <fcntl.h>
 +#include <glib/gstdio.h>
 +#include <sys/pidfd.h>
-+#include <unistd.h>
 +
++#include "core/meta-process-identity.h"
 +#include "meta/meta-context.h"
 +
 +#define PERMITTED_APPS_KEY "-meta-permitted-apps"
-+#define SANDBOX_INFO "root/.flatpak-info"
-+#define SANDBOX_INFO_MOUNT "/.flatpak-info"
-+#define SANDBOX_INFO_LIMIT (64 * 1024)
-+#define MOUNTS_LIMIT (4 * 1024 * 1024)
 +
 +static GHashTable *
 +permitted_apps_of (MetaContext *context)
@@ -135,92 +246,18 @@ index 0000000000000000000000000000000000000000..2cd3368f0163a3e8cd9ea928f8a05c71
 +  return apps && g_hash_table_contains (apps, app_id);
 +}
 +
-+static GString *
-+read_all (int   fd,
-+          gsize limit)
-+{
-+  g_autoptr (GString) contents = g_string_new (NULL);
-+  char buffer[4096];
-+  ssize_t length;
-+
-+  while ((length = read (fd, buffer, sizeof (buffer))) > 0)
-+    {
-+      if (contents->len + length > limit)
-+        return NULL;
-+      g_string_append_len (contents, buffer, length);
-+    }
-+
-+  return length < 0 ? NULL : g_steal_pointer (&contents);
-+}
-+
-+static gboolean
-+read_sandbox_info (int     info_fd,
-+                   char  **app_id)
-+{
-+  g_autoptr (GString) contents = read_all (info_fd, SANDBOX_INFO_LIMIT);
-+  g_autoptr (GKeyFile) info = g_key_file_new ();
-+
-+  if (!contents ||
-+      !g_key_file_load_from_data (info, contents->str, contents->len,
-+                                  G_KEY_FILE_NONE, NULL))
-+    return FALSE;
-+
-+  *app_id = g_key_file_get_string (info, "Application", "name", NULL);
-+  if (*app_id && **app_id)
-+    return TRUE;
-+
-+  g_clear_pointer (app_id, g_free);
-+  return FALSE;
-+}
-+
-+static gboolean
-+mounts_sandbox_info (int process_fd)
-+{
-+  g_autofd int mounts_fd = openat (process_fd, "mountinfo", O_RDONLY | O_CLOEXEC);
-+  g_autoptr (GString) mounts = NULL;
-+  g_auto (GStrv) lines = NULL;
-+  char **line;
-+
-+  if (mounts_fd < 0 || !(mounts = read_all (mounts_fd, MOUNTS_LIMIT)))
-+    return TRUE;
-+
-+  lines = g_strsplit (mounts->str, "\n", -1);
-+  for (line = lines; *line; line++)
-+    {
-+      g_auto (GStrv) fields = g_strsplit (*line, " ", 6);
-+
-+      if (g_strv_length (fields) > 4 && g_str_equal (fields[4], SANDBOX_INFO_MOUNT))
-+        return TRUE;
-+    }
-+
-+  return FALSE;
-+}
-+
 +gboolean
 +meta_process_identify (int     pidfd,
 +                       pid_t   pid,
 +                       char  **app_id)
 +{
 +  g_autofree char *path = g_strdup_printf ("/proc/%d", pid);
-+  g_autofd int process_fd = -1;
-+  g_autofd int info_fd = -1;
-+  gboolean identified;
++  g_autofd int process_fd = open (path, O_PATH | O_DIRECTORY | O_CLOEXEC);
 +
 +  *app_id = NULL;
-+
-+  process_fd = open (path, O_PATH | O_DIRECTORY | O_CLOEXEC);
-+  if (process_fd < 0)
-+    return FALSE;
-+
-+  info_fd = openat (process_fd, SANDBOX_INFO, O_RDONLY | O_NOFOLLOW | O_CLOEXEC);
-+  if (info_fd >= 0)
-+    identified = read_sandbox_info (info_fd, app_id);
-+  else if (errno == ENOENT)
-+    identified = TRUE;
-+  else
-+    identified = !mounts_sandbox_info (process_fd);
-+
-+  if (identified && pidfd_send_signal (pidfd, 0, NULL, 0) == 0)
++  if (process_fd >= 0 &&
++      meta_process_identify_at (process_fd, app_id) &&
++      pidfd_send_signal (pidfd, 0, NULL, 0) == 0)
 +    return TRUE;
 +
 +  g_clear_pointer (app_id, g_free);
@@ -246,19 +283,22 @@ index 0000000000000000000000000000000000000000..6cb1c4cf1417f8b9fe4b9ae5be36815e
 +                                pid_t   pid,
 +                                char  **app_id);
 diff --git a/src/meson.build b/src/meson.build
-index bd726b0085107f71c56272551128b0ac693b4f46..a2bec5c5d450e8cda04b16648fe689b1386958a8 100644
+index bd726b0085107f71c56272551128b0ac693b4f46..abc370b6a805e97f68ccb729ba4ec461c0eb33d0 100644
 --- a/src/meson.build
 +++ b/src/meson.build
-@@ -341,6 +341,8 @@ mutter_sources = [
+@@ -340,7 +340,11 @@ mutter_sources = [
+   'core/meta-launch-context.c',
    'core/meta-pad-action-mapper.c',
    'core/meta-private-enums.h',
++  'core/meta-process-identity.c',
++  'core/meta-process-identity.h',
    'core/meta-sealed-fd.c',
 +  'core/meta-sandbox.c',
 +  'core/meta-sandbox.h',
    'core/meta-sealed-fd.h',
    'core/meta-selection.c',
    'core/meta-selection-source.c',
-@@ -579,6 +581,8 @@ mutter_sources += [
+@@ -579,6 +583,8 @@ mutter_sources += [
    'wayland/meta-wayland-private.h',
    'wayland/meta-wayland-region.c',
    'wayland/meta-wayland-region.h',
@@ -267,7 +307,7 @@ index bd726b0085107f71c56272551128b0ac693b4f46..a2bec5c5d450e8cda04b16648fe689b1
    'wayland/meta-wayland-seat.c',
    'wayland/meta-wayland-seat.h',
    'wayland/meta-wayland-shell-surface.c',
-@@ -1029,6 +1033,7 @@ wayland_protocols = [
+@@ -1029,6 +1035,7 @@ wayland_protocols = [
    ['presentation-time', 'stable', ],
    ['primary-selection', 'unstable', 1, ],
    ['relative-pointer', 'unstable', 1, ],

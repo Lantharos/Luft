@@ -46,6 +46,7 @@ python3 kestrel/compositor/patches.py prepare   # check out upstream and apply t
 # commit changes in kestrel/run/mutter-source
 python3 kestrel/compositor/patches.py export    # write the committed stack back to patches/
 python3 kestrel/compositor/patches.py check     # replay the series and compare trees
+python3 kestrel/compositor/patches.py identity  # judge the shared sandbox cases with the patched code
 python3 kestrel/compositor/patches.py list      # each patch's upstream status
 kestrel/compositor/build.sh
 ```
@@ -54,6 +55,7 @@ kestrel/compositor/build.sh
 - Every commit needs an `Upstream-Status` trailer saying whether it is upstream, forwardable or Luft's own, see [Upstream patches](../upstream.md).
 - `prepare` refuses to replace a checkout with uncommitted or unexported work. The previous head is kept at `refs/kestrel/previous`.
 - `python3 kestrel/compositor/patches.py status` shows the state of the checkout.
+- `identity` builds `tests/sandbox-cases.c` against the series' `meta_process_identify_at()` and runs it over `packages/identity/sandbox-cases.ini`, the cases `luft-identity` is tested against too, so Mutter and Luft's services judge every process alike. CI runs it whenever the series or the cases change.
 - The shell's TypeScript sees what the patches add through the types generated from the build's GIR files. Run `bun run generate` in `kestrel/types` after a patch changes API the shell uses, see [Kestrel's types](kestrel.md#types).
 
 ## Update Mutter

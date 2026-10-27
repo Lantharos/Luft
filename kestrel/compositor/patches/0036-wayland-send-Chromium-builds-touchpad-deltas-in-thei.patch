@@ -34,10 +34,10 @@ Upstream-Status: luft-only workaround keyed on how Chromium is packaged; the fix
  create mode 100644 src/wayland/meta-wayland-chromium.h
 
 diff --git a/src/meson.build b/src/meson.build
-index 483ef3c0a7257d8f28c6e82d5af0e1968bde9538..80e25ab5d37032a9eadb2132e5ac58d6b23ee288 100644
+index ff8d07720fcf906552b2fb569e5d0f51b01471a5..def63c3b9ce2e16d3cb636d61571065a9c485c0b 100644
 --- a/src/meson.build
 +++ b/src/meson.build
-@@ -560,6 +560,8 @@ mutter_sources += [
+@@ -562,6 +562,8 @@ mutter_sources += [
    'wayland/meta-wayland-linux-drm-syncobj.h',
    'wayland/meta-wayland-outputs.c',
    'wayland/meta-wayland-outputs.h',

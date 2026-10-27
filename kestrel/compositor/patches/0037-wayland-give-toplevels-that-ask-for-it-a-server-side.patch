@@ -230,10 +230,10 @@ index f04f0b88376e975233b8708ce7bedeb556ff8d01..50342c797309a28010a18eaa16fd8a2c
      g_param_spec_enum ("content-type", NULL, NULL,
                         META_TYPE_WINDOW_CONTENT_TYPE,
 diff --git a/src/meson.build b/src/meson.build
-index 80e25ab5d37032a9eadb2132e5ac58d6b23ee288..ed4c1ac4ae0327b0baf786d74f69eebfcb6f0765 100644
+index def63c3b9ce2e16d3cb636d61571065a9c485c0b..43e6c97c5b0c4a731f307e65b61adcd248187ed8 100644
 --- a/src/meson.build
 +++ b/src/meson.build
-@@ -370,6 +370,7 @@ mutter_sources = [
+@@ -372,6 +372,7 @@ mutter_sources = [
    'core/util-private.h',
    'core/window.c',
    'core/window-icon.c',
@@ -241,7 +241,7 @@ index 80e25ab5d37032a9eadb2132e5ac58d6b23ee288..ed4c1ac4ae0327b0baf786d74f69eebf
    'core/window-variable-refresh.c',
    'core/window-private.h',
    'core/workspace.c',
-@@ -646,6 +647,8 @@ mutter_sources += [
+@@ -648,6 +649,8 @@ mutter_sources += [
    'wayland/meta-wayland-toplevel-icon.h',
    'wayland/meta-wayland-kestrel-window.c',
    'wayland/meta-wayland-kestrel-window.h',
@@ -250,7 +250,7 @@ index 80e25ab5d37032a9eadb2132e5ac58d6b23ee288..ed4c1ac4ae0327b0baf786d74f69eebf
    'wayland/meta-wayland-icon-pixels.c',
    'wayland/meta-wayland-icon-pixels.h',
    'wayland/meta-wayland-xdg-dialog.c',
-@@ -1044,6 +1047,7 @@ wayland_protocols = [
+@@ -1046,6 +1049,7 @@ wayland_protocols = [
    ['text-input', 'unstable', 3, ],
    ['viewporter', 'stable', ],
    ['xdg-activation', 'staging', 1, ],

@@ -7,7 +7,8 @@ Kestrel runs on its own build of Mutter 51: the upstream release plus an ordered
 | `upstream.json` | Upstream repository, release and exact base commit |
 | `series` | Patches in the order they apply |
 | `patches/` | The patches, in Git format |
-| `patches.py` | Prepares, exports, checks and trials the series, and lists each patch's upstream status |
+| `patches.py` | Prepares, exports, checks and trials the series, lists each patch's upstream status, and tests the sandbox rules |
+| `tests/` | The check that the patched Mutter judges sandboxed processes like Luft's services |
 | `upstream/` | Patches drafted for Mutter upstream, one folder per merge request |
 | `build.sh` | Builds and installs the patched Mutter for development |
 

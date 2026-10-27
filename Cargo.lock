@@ -4340,8 +4340,10 @@ name = "luft-identity"
 version = "0.1.0"
 dependencies = [
  "futures-util",
+ "glib",
  "libc",
  "luft-dbus",
+ "tempfile",
  "zbus 6.0.0",
 ]
 

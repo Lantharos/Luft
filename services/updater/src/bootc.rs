@@ -16,6 +16,7 @@ const BOOTC: &str = "bootc";
 const PROGRESS_FD: i32 = 3;
 const SLOTS: [&str; 3] = ["booted", "staged", "rollback"];
 const UNSIGNED: &str = "This update isn't signed by Luft, so it wasn't downloaded.";
+const KEPT_TO_GO_BACK_TO: &str = "same fs-verity digest as the existing Some(Rollback) deployment";
 const SIGNATURE_REFUSALS: [&str; 4] = [
     "A signature was required",
     "signature verification failed",
@@ -68,6 +69,26 @@ pub fn rollback() -> Result<()> {
     bootc(&["rollback"]).map(drop)
 }
 
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct Order {
+    spec: OrderSpec,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct OrderSpec {
+    boot_order: String,
+}
+
+fn start_kept_version() -> Result<()> {
+    let host: Order = serde_json::from_slice(&bootc(&["status", "--format=json"])?)?;
+    if host.spec.boot_order == "rollback" {
+        return Ok(());
+    }
+    rollback()
+}
+
 pub fn apply() -> Result<()> {
     bootc(&["upgrade", "--from-downloaded"]).map(drop)
 }
@@ -118,18 +139,22 @@ pub fn switch_target(variant: Variant) -> Result<Reference> {
 pub struct Fetch {
     child: Child,
     events: File,
+    switching: bool,
 }
 
 impl Fetch {
     pub fn upgrade() -> Result<Self> {
-        Self::start(&["upgrade", "--download-only"])
+        Self::start(&["upgrade", "--download-only"], false)
     }
 
     pub fn switch(target: &Reference) -> Result<Self> {
-        Self::start(&["switch", "--transport", &target.transport, &target.image])
+        Self::start(
+            &["switch", "--transport", &target.transport, &target.image],
+            true,
+        )
     }
 
-    fn start(arguments: &[&str]) -> Result<Self> {
+    fn start(arguments: &[&str], switching: bool) -> Result<Self> {
         let (events, writer) = pipe()?;
         let source = writer.as_raw_fd();
         let mut command = Command::new(BOOTC);
@@ -148,7 +173,11 @@ impl Fetch {
         }
         let child = command.spawn().context("Starting bootc")?;
         drop(writer);
-        Ok(Self { child, events })
+        Ok(Self {
+            child,
+            events,
+            switching,
+        })
     }
 
     pub fn pid(&self) -> i32 {
@@ -180,6 +209,9 @@ impl Fetch {
             }
             if unsigned(&errors) {
                 bail!(UNSIGNED);
+            }
+            if self.switching && String::from_utf8_lossy(&errors).contains(KEPT_TO_GO_BACK_TO) {
+                return start_kept_version();
             }
             return Err(command::failure(BOOTC, &errors));
         }

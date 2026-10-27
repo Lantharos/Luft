@@ -26,7 +26,8 @@
          Apply unlocks it. Finished says how it went. -->
     <method name="Download"/>
     <!-- Starts downloading the same channel and version of Luft's other image, "standard" or "nvidia",
-         and stages it, unlocked, for the next restart, keeping this one to go back to. Downloading,
+         and stages it, unlocked, for the next restart, keeping this one to go back to. When that is
+         the version already kept to go back to, it starts that one next instead. Downloading,
          Downloaded and Finished report it like an update. -->
     <method name="SwitchVariant">
       <arg name="variant" type="s" direction="in"/>

@@ -123,6 +123,7 @@ end-session-update-restart-countdown = { $seconds ->
 end-session-update-restart-button = Endurræsa og setja upp
 end-session-install-updates = Setja upp hugbúnaðaruppfærslur sem bíða
 end-session-install-version = Setja upp útgáfu { $version }
+end-session-version-nightly = { $release } næturútgáfa { $number }
 end-session-low-battery = Lítil hleðsla á rafhlöðu: tengdu tölvuna við rafmagn áður en uppfærslur eru settar upp
 end-session-busy-apps = Sum forrit eru upptekin eða með óvistaða vinnu
 end-session-other-users = Aðrir notendur eru skráðir inn

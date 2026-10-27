@@ -78,8 +78,8 @@ mod tests {
                 "ghcr.io/lantharos/luft:1-nightly-nvidia",
             ),
             (
-                "ghcr.io/lantharos/luft:1.20261014",
-                "ghcr.io/lantharos/luft:1.20261014-nvidia",
+                "ghcr.io/lantharos/luft:1.2-nightly.21",
+                "ghcr.io/lantharos/luft:1.2-nightly.21-nvidia",
             ),
             (
                 "10.0.2.2:5000/lantharos/luft:1",

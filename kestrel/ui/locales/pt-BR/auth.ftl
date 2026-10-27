@@ -123,6 +123,7 @@ end-session-update-restart-countdown = { $seconds ->
 end-session-update-restart-button = Reiniciar e instalar
 end-session-install-updates = Instalar atualizações pendentes
 end-session-install-version = Instalar a versão { $version }
+end-session-version-nightly = { $release } Nightly { $number }
 end-session-low-battery = Bateria fraca: conecte o carregador antes de instalar atualizações
 end-session-busy-apps = Alguns apps estão ocupados ou têm trabalho não salvo
 end-session-other-users = Há outros usuários conectados

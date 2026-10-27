@@ -10,6 +10,7 @@ use luft_app::dbus::{self, failed};
 use luft_app::launch::{self, Token};
 use luft_app::{Commands, Events};
 use luft_i18n::t;
+use luft_software::system::image::{Deployments, Release};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -26,6 +27,8 @@ struct About {
     hostname: String,
     system: String,
     kernel: String,
+    version: Option<String>,
+    built: Option<u64>,
     processor: Option<String>,
     graphics: Vec<String>,
     memory: Option<u64>,
@@ -160,6 +163,13 @@ fn pci_name(names: &str, vendor: &str, device: &str) -> Option<String> {
     Some(format!("{short_vendor} {device_name}"))
 }
 
+async fn installed() -> Release {
+    Deployments::load()
+        .await
+        .map(|deployments| deployments.status().current)
+        .unwrap_or_default()
+}
+
 async fn about(_: Value) -> Result<About, String> {
     let hostnamed = hostnamed().await?;
     let hostname: String = hostnamed
@@ -175,8 +185,11 @@ async fn about(_: Value) -> Result<About, String> {
     } else {
         pretty
     };
+    let Release {
+        version, released, ..
+    } = installed().await;
     if luft_app::sample_system() {
-        return Ok(sample::about(device_name, hostname));
+        return Ok(sample::about(device_name, hostname, version, released));
     }
     tokio::task::spawn_blocking(move || About {
         device_name,
@@ -186,6 +199,8 @@ async fn about(_: Value) -> Result<About, String> {
             .unwrap_or_default()
             .trim()
             .to_owned(),
+        version,
+        built: released,
         processor: processor(),
         graphics: graphics(),
         memory: memory(),

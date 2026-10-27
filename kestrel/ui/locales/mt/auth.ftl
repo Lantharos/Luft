@@ -138,6 +138,7 @@ end-session-update-restart-countdown = { $seconds ->
 end-session-update-restart-button = Irristartja u installa
 end-session-install-updates = Installa l-aġġornamenti pendenti
 end-session-install-version = Installa l-verżjoni { $version }
+end-session-version-nightly = { $release } Nightly { $number }
 end-session-low-battery = Il-batterija baxxa: qabbad mal-elettriku qabel ma tinstalla l-aġġornamenti
 end-session-busy-apps = Xi apps għadhom qed jaħdmu jew għandhom xogħol mhux issejvjat
 end-session-other-users = Hemm utenti oħra li daħlu

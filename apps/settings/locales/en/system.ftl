@@ -150,6 +150,8 @@ settings-updates-switching-standard = Downloading the standard image…
 settings-updates-up-to-date = Your system is up to date
 settings-updates-version = Version { $version }
 settings-updates-version-new = A new version
+# A nightly build of a version that isn't out yet, like "1.2 Nightly 21": $release is the version it leads to, $number counts the nightly builds toward it
+settings-version-nightly = { $release } Nightly { $number }
 settings-updates-returning = Ready to go back to version { $version }
 settings-updates-returning-unversioned = Ready to go back to the earlier version
 settings-updates-nvidia-ready = NVIDIA’s driver is ready
@@ -255,6 +257,10 @@ settings-about-remove = Remove
 settings-about-software = Software
 # The operating system
 settings-about-system = System
+# Luft's version, like "Luft 1.1" or "Luft 1.2 Nightly 21"
+settings-about-version = Luft { $version }
+# $date is the day the installed version was built, like "27 October"
+settings-about-built = Built { $date }
 settings-about-desktop = Desktop
 settings-about-kernel = Kernel
 settings-about-hostname = Hostname

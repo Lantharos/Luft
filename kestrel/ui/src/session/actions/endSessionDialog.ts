@@ -27,6 +27,7 @@ const MAX_USERS_IN_SESSION_DIALOG = 5;
 const COUNTDOWN_INTERVAL = 10;
 const BATTERY_CHARGING = 1;
 const BATTERY_FULLY_CHARGED = 4;
+const NIGHTLY = '-nightly.';
 
 const EndSessionDialogIface = loadInterfaceXML('org.gnome.SessionManager.EndSessionDialog')!;
 
@@ -159,7 +160,9 @@ export class EndSessionDialog extends ModalDialog {
 
     const version = this.stagedImage?.version;
     if (!version) return checkBoxText();
-    return KestrelUi.t('end-session-install-version', { version });
+    const [release, number] = version.split(NIGHTLY);
+    const label = number ? KestrelUi.t('end-session-version-nightly', { release, number }) : version;
+    return KestrelUi.t('end-session-install-version', { version: label });
   }
 
   private isBatteryLow(): boolean {

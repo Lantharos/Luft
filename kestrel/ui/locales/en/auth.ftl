@@ -169,6 +169,8 @@ end-session-update-restart-button = Restart & Install
 end-session-install-updates = Install pending software updates
 # Checkbox. $version is the system version the update installs
 end-session-install-version = Install version { $version }
+# A nightly build of a version that isn't out yet, like "1.2 Nightly 21": $release is the version it leads to, $number counts the nightly builds toward it
+end-session-version-nightly = { $release } Nightly { $number }
 end-session-low-battery = Low battery power: please plug in before installing updates
 end-session-busy-apps = Some applications are busy or have unsaved work
 end-session-other-users = Other users are logged in

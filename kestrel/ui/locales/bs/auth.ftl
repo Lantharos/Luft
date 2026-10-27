@@ -128,6 +128,7 @@ end-session-update-restart-countdown = { $seconds ->
 end-session-update-restart-button = Ponovo pokreni i instaliraj
 end-session-install-updates = Instaliraj ažuriranja na čekanju
 end-session-install-version = Instaliraj verziju { $version }
+end-session-version-nightly = { $release } noćna verzija { $number }
 end-session-low-battery = Baterija je slaba: priključite punjač prije instaliranja ažuriranja
 end-session-busy-apps = Neke aplikacije su zauzete ili imaju nesačuvan rad
 end-session-other-users = Prijavljeni su i drugi korisnici

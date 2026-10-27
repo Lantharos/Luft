@@ -6,7 +6,7 @@
           "com.lantharos.release-notes": "[{\"area\":\"desktop\",\"title\":\"Desktop\",\"changes\":[\"Faster startup and a fresher look.\"]}]",
           "containers.bootc": "1",
           "io.buildah.version": "1.45.1",
-          "org.opencontainers.image.version": "45.1",
+          "org.opencontainers.image.version": "1.1",
           "ostree.bootable": "true",
           "ostree.commit": "962af743e51788f85acdadc854283071c488617e559f3aa7ece3d24c188d097a",
           "ostree.final-diffid": "sha256:12787d84fa137cd5649a9005efe98ec9d05ea46245fdc50aecb7dd007f2035b1",
@@ -133,7 +133,7 @@
           },
           "imageDigest": "sha256:7284e924986861cd7d1810357e1757e8ecf959a1a699b304252b0dd446ad11cf",
           "timestamp": "2026-10-14T14:25:53.323127405Z",
-          "version": "45.20261013.0"
+          "version": "1.1"
         },
         "incompatible": false,
         "ostree": null,

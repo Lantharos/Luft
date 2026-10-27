@@ -220,7 +220,7 @@ mod tests {
         fs::create_dir_all(root.join("ventoy")).unwrap();
         for name in [
             "luft-nightly.iso",
-            "Luft-45.20261001.ISO",
+            "Luft-1.1.ISO",
             "fedora.iso",
             "luft-notes.txt",
         ] {
@@ -232,7 +232,7 @@ mod tests {
             .map(|older| older.name)
             .collect();
         fs::remove_dir_all(&root).unwrap();
-        assert_eq!(names, ["Luft-45.20261001.ISO", "luft-nightly.iso"]);
+        assert_eq!(names, ["Luft-1.1.ISO", "luft-nightly.iso"]);
     }
 
     #[test]

@@ -123,6 +123,7 @@ end-session-update-restart-countdown = { $seconds ->
 end-session-update-restart-button = Reinicia i instal·la
 end-session-install-updates = Instal·la les actualitzacions pendents
 end-session-install-version = Instal·la la versió { $version }
+end-session-version-nightly = { $release } Nightly { $number }
 end-session-low-battery = Queda poca bateria: endolleu l’ordinador abans d’instal·lar les actualitzacions
 end-session-busy-apps = Algunes aplicacions estan ocupades o tenen feina sense desar
 end-session-other-users = Hi ha altres usuaris amb la sessió iniciada

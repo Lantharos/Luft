@@ -138,6 +138,7 @@ end-session-update-restart-countdown = { $seconds ->
 end-session-update-restart-button = Atosaigh agus suiteáil
 end-session-install-updates = Suiteáil na nuashonruithe bogearraí atá ag fanacht
 end-session-install-version = Suiteáil leagan { $version }
+end-session-version-nightly = { $release } leagan oíche { $number }
 end-session-low-battery = Ceallra íseal: plugáil isteach sula suiteálann tú nuashonruithe
 end-session-busy-apps = Tá roinnt aipeanna gnóthach nó tá obair gan sábháil iontu
 end-session-other-users = Tá úsáideoirí eile sínithe isteach

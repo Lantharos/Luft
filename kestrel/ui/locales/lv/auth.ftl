@@ -128,6 +128,7 @@ end-session-update-restart-countdown = { $seconds ->
 end-session-update-restart-button = Restartēt un instalēt
 end-session-install-updates = Instalēt gaidošos programmatūras atjauninājumus
 end-session-install-version = Instalēt versiju { $version }
+end-session-version-nightly = { $release } nakts būvējums { $number }
 end-session-low-battery = Zems akumulatora līmenis: pirms atjauninājumu instalēšanas pievienojiet lādētāju
 end-session-busy-apps = Dažas lietotnes ir aizņemtas vai tajās ir nesaglabāts darbs
 end-session-other-users = Ir pierakstījušies citi lietotāji

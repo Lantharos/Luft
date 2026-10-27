@@ -123,6 +123,7 @@ end-session-update-restart-countdown = { $seconds ->
 end-session-update-restart-button = Επανεκκίνηση και εγκατάσταση
 end-session-install-updates = Εγκατάσταση εκκρεμών ενημερώσεων λογισμικού
 end-session-install-version = Εγκατάσταση έκδοσης { $version }
+end-session-version-nightly = { $release } νυχτερινή έκδοση { $number }
 end-session-low-battery = Χαμηλή μπαταρία: συνδέστε τον φορτιστή πριν από την εγκατάσταση ενημερώσεων
 end-session-busy-apps = Ορισμένες εφαρμογές είναι απασχολημένες ή έχουν εργασία που δεν έχει αποθηκευτεί
 end-session-other-users = Είναι συνδεδεμένοι και άλλοι χρήστες

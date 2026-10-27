@@ -123,6 +123,7 @@ end-session-update-restart-countdown = { $seconds ->
 end-session-update-restart-button = Yeniden başlat ve yükle
 end-session-install-updates = Bekleyen yazılım güncellemelerini yükle
 end-session-install-version = { $version } sürümünü yükle
+end-session-version-nightly = { $release } gecelik sürüm { $number }
 end-session-low-battery = Pil zayıf. Güncellemeleri yüklemeden önce bilgisayarı prize takın.
 end-session-busy-apps = Bazı uygulamalar meşgul ya da kaydedilmemiş çalışmalar içeriyor
 end-session-other-users = Başka kullanıcıların oturumu açık

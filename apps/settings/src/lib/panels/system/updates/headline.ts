@@ -1,10 +1,11 @@
 import { t } from '@luft/i18n';
 import { ago } from '@luft/ui';
+import { versionLabel } from '../version';
 import { describe } from './activity';
 import type { Activity, Overview, Release, SystemOverview } from './api';
 
 export const named = (release: Release, versioned: string, unversioned: string) =>
-	release.version ? t(versioned, { version: release.version }) : t(unversioned);
+	release.version ? t(versioned, { version: versionLabel(release.version) }) : t(unversioned);
 
 export const versionName = (release: Release) => named(release, 'settings-updates-version', 'settings-updates-version-new');
 

@@ -127,18 +127,13 @@ fn without_lockdown(command_line: &str) -> String {
 
 pub fn add(catalog: &mut Catalog, mut images: Vec<Image>, secure_boot: bool) {
     images.sort_by(Image::order);
-    let mut systems: Vec<&str> = images.iter().map(|image| image.uki.os.as_str()).collect();
-    systems.sort_unstable();
-    systems.dedup();
-    let several = systems.len() > 1;
     let mut listed: Vec<&str> = Vec::new();
     for image in &images {
         let newest = !listed.contains(&image.uki.os.as_str());
         let name = image.uki.name.as_deref();
         let title = if newest {
             name.map_or_else(|| image.release(), String::from)
-        } else if several
-            && image.uki.image_version.is_none()
+        } else if image.uki.image_version.is_none()
             && let Some(name) = name
         {
             format!("{name}, {}", image.release())

@@ -133,6 +133,7 @@ end-session-update-restart-countdown = { $seconds ->
 end-session-update-restart-button = Reštartovať a inštalovať
 end-session-install-updates = Nainštalovať čakajúce aktualizácie softvéru
 end-session-install-version = Nainštalovať verziu { $version }
+end-session-version-nightly = { $release } nočná zostava { $number }
 end-session-low-battery = Batéria je slabá. Pred inštaláciou aktualizácií pripojte napájanie.
 end-session-busy-apps = Niektoré aplikácie sú zaneprázdnené alebo obsahujú neuloženú prácu
 end-session-other-users = Prihlásení sú aj ďalší používatelia

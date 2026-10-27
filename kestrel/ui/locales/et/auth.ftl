@@ -128,6 +128,7 @@ end-session-update-restart-countdown =
 end-session-update-restart-button = Taaskäivita ja installi
 end-session-install-updates = Installi ootel tarkvaravärskendused
 end-session-install-version = Installi versioon { $version }
+end-session-version-nightly = { $release } öine järk { $number }
 end-session-low-battery = Aku tase on madal: enne värskenduste installimist ühenda arvuti vooluvõrku
 end-session-busy-apps = Mõni rakendus on hõivatud või sisaldab salvestamata tööd
 end-session-other-users = Sisse on logitud teisi kasutajaid

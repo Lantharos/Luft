@@ -56,7 +56,7 @@ Versions and release notes come from the image's labels:
 
 | Label | Shown as |
 |-------|----------|
-| `org.opencontainers.image.version` | The version, such as 1.20261020.57 |
+| `org.opencontainers.image.version` | The version, such as 1.1 or 1.2-nightly.21 |
 | `com.lantharos.release-notes` | What's new, as the image's [changelog](../releases.md#changelogs) |
 
 When get.luft.computer is reachable, What's new instead merges the changelogs of every version between the installed one and the offered one.

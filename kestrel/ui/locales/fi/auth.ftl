@@ -123,6 +123,7 @@ end-session-update-restart-countdown = { $seconds ->
 end-session-update-restart-button = Käynnistä ja asenna
 end-session-install-updates = Asenna odottavat päivitykset
 end-session-install-version = Asenna versio { $version }
+end-session-version-nightly = { $release } yökäännös { $number }
 end-session-low-battery = Akun varaus on vähissä: kytke laturi ennen päivitysten asentamista
 end-session-busy-apps = Jotkin sovellukset ovat kesken tai niissä on tallentamatonta työtä
 end-session-other-users = Muita käyttäjiä on kirjautuneena

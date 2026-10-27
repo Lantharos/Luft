@@ -133,6 +133,7 @@ end-session-update-restart-countdown = { $seconds ->
 end-session-update-restart-button = Znova zaženi in namesti
 end-session-install-updates = Namesti čakajoče posodobitve programske opreme
 end-session-install-version = Namesti različico { $version }
+end-session-version-nightly = { $release } nočna različica { $number }
 end-session-low-battery = Baterija je skoraj prazna. Pred nameščanjem posodobitev priključite napajanje.
 end-session-busy-apps = Nekatere aplikacije so zasedene ali imajo neshranjeno delo
 end-session-other-users = Prijavljeni so drugi uporabniki

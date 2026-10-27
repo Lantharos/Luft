@@ -128,6 +128,7 @@ end-session-update-restart-countdown = { $seconds ->
 end-session-update-restart-button = Repornește și instalează
 end-session-install-updates = Instalează actualizările în așteptare
 end-session-install-version = Instalează versiunea { $version }
+end-session-version-nightly = { $release } Nightly { $number }
 end-session-low-battery = Baterie descărcată: conectați încărcătorul înainte de a instala actualizările
 end-session-busy-apps = Unele aplicații sunt ocupate sau au lucru nesalvat
 end-session-other-users = Alți utilizatori sunt conectați

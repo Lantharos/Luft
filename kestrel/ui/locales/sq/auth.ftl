@@ -123,6 +123,7 @@ end-session-update-restart-countdown = { $seconds ->
 end-session-update-restart-button = Rinis dhe instalo
 end-session-install-updates = Instalo përditësimet e softuerit në pritje
 end-session-install-version = Instalo versionin { $version }
+end-session-version-nightly = { $release } Nightly { $number }
 end-session-low-battery = Bateria është e ulët: lidhe në korrent para se të instalosh përditësimet
 end-session-busy-apps = Disa aplikacione janë të zëna ose kanë punë të paruajtur
 end-session-other-users = Përdorues të tjerë kanë hyrë në sistem

@@ -123,6 +123,7 @@ end-session-update-restart-countdown = { $seconds ->
 end-session-update-restart-button = Újraindítás és telepítés
 end-session-install-updates = Függőben lévő frissítések telepítése
 end-session-install-version = { $version } verzió telepítése
+end-session-version-nightly = { $release }, { $number }. éjszakai build
 end-session-low-battery = Alacsony töltöttség: a frissítések telepítése előtt csatlakoztassa a töltőt
 end-session-busy-apps = Néhány alkalmazás még dolgozik, vagy nem mentett munkát tartalmaz
 end-session-other-users = Más felhasználók is be vannak jelentkezve

@@ -133,6 +133,7 @@ end-session-update-restart-countdown = { $seconds ->
 end-session-update-restart-button = Перезавантажити і встановити
 end-session-install-updates = Встановити наявні оновлення
 end-session-install-version = Встановити версію { $version }
+end-session-version-nightly = { $release } нічна збірка { $number }
 end-session-low-battery = Низький заряд акумулятора: перед встановленням оновлень під’єднайте живлення
 end-session-busy-apps = Деякі програми зайняті або мають незбережені зміни
 end-session-other-users = У системі є інші користувачі

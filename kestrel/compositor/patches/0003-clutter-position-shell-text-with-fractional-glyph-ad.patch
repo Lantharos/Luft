@@ -7,6 +7,8 @@ Subject: [PATCH 03/53] clutter: position shell text with fractional glyph
 Rounding glyph advances to whole pixels makes letter spacing uneven at
 small sizes. Leave metrics unhinted, as GTK 4 does, so Pango places
 glyphs at fractional positions.
+
+Upstream-Status: forwardable
 ---
  clutter/clutter/clutter-backend.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

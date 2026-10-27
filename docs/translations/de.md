@@ -1,6 +1,6 @@
 # German style guide
 
-How Luft speaks German. The [glossary](../../packages/i18n/glossary/de.csv) has the agreed terms; Weblate shows them next to every string.
+How Luft speaks German. The [glossary](../../packages/i18n/glossary/de.tbx) has the agreed terms; Weblate shows them next to every string.
 
 ## Address and tone
 

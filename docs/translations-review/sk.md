@@ -4,14 +4,14 @@ Strings in Luft's Slovak translation that a native speaker should check, each li
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/sk.csv` `account`: "účet" — Windows says „konto“; check that „účet“ is the better known word for both user and online accounts.
-- `packages/i18n/glossary/sk.csv` `tray`: "systémová lišta" — KDE's word; Windows has no direct equivalent. Check it reads as a button of background app icons.
-- `packages/i18n/glossary/sk.csv` `snap layout`: "rozloženie okien" — Windows uses „rozloženie prichytenia“; check which people recognize.
-- `packages/i18n/glossary/sk.csv` `Keep awake`: "Nezaspávať" — no settled term; check it fits a Quick settings tile.
-- `packages/i18n/glossary/sk.csv` `Power saver`: "Šetrenie energie" — check against how Slovak GNOME and Windows name the power profiles.
-- `packages/i18n/glossary/sk.csv` `remove` / `delete`: "odstrániť" / "vymazať" — Windows uses „odstrániť“ for both; check the split feels natural.
-- `packages/i18n/glossary/sk.csv` `board`: "tabuľa" — new feature with no existing term.
-- `packages/i18n/glossary/sk.csv` `Start`: "Start" — Slovak Windows writes „Štart“; Luft keeps the name unchanged.
+- `packages/i18n/glossary/sk.tbx` `account`: "účet" — Windows says „konto“; check that „účet“ is the better known word for both user and online accounts.
+- `packages/i18n/glossary/sk.tbx` `tray`: "systémová lišta" — KDE's word; Windows has no direct equivalent. Check it reads as a button of background app icons.
+- `packages/i18n/glossary/sk.tbx` `snap layout`: "rozloženie okien" — Windows uses „rozloženie prichytenia“; check which people recognize.
+- `packages/i18n/glossary/sk.tbx` `Keep awake`: "Nezaspávať" — no settled term; check it fits a Quick settings tile.
+- `packages/i18n/glossary/sk.tbx` `Power saver`: "Šetrenie energie" — check against how Slovak GNOME and Windows name the power profiles.
+- `packages/i18n/glossary/sk.tbx` `remove` / `delete`: "odstrániť" / "vymazať" — Windows uses „odstrániť“ for both; check the split feels natural.
+- `packages/i18n/glossary/sk.tbx` `board`: "tabuľa" — new feature with no existing term.
+- `packages/i18n/glossary/sk.tbx` `Start`: "Start" — Slovak Windows writes „Štart“; Luft keeps the name unchanged.
 - `apps/settings/locales/sk/settings.ftl` `settings-subpage-back`: "Späť na stránku { $page }" — page titles stay in the nominative after „stránku“; check it sounds natural with titles like „Klávesnica“.
 - `apps/settings/locales/sk/settings.ftl` `settings-more-show`: "Zobraziť ešte { $count }" — identical in every plural form to avoid guessing the hidden noun's gender.
 - `packages/web/ui/locales/sk/ui.ftl` `ui-select-placeholder`: "Vybrať" — infinitive like buttons; „Vyberte“ might read better as a placeholder.
@@ -21,11 +21,11 @@ Strings in Luft's Slovak translation that a native speaker should check, each li
 
 ## Kestrel and setup
 
-- `kestrel/ui/locales/sk/engine.ftl` `network-menu-tether`: "Tethering" — English loanword used for Bluetooth tethering; check it reads naturally or whether "Zdieľanie pripojenia" fits the tile.
+- `kestrel/ui/locales/sk/system.ftl` `network-menu-tether`: "Tethering" — English loanword used for Bluetooth tethering; check it reads naturally or whether "Zdieľanie pripojenia" fits the tile.
 - `kestrel/ui/locales/sk/system.ftl` `privacy-indicator`: "Používa sa: { $things }" — built as a label + list to avoid gender agreement with "vaša/váš/vaše"; check it sounds natural with a list like "kamera, mikrofón a obrazovka".
 - `kestrel/ui/locales/sk/portal.ftl` `portal-unknown-app-subject`/`portal-unknown-app-object`: "Táto aplikácia"/"táto aplikácia" — all $appName sentences use the name in the nominative ("Môže { $appName } …?"); check the uninflected real app names read well there.
 - `apps/setup/locales/sk/setup.ftl` `setup-region-field-keyboard`: "klávesnicu" — written in the accusative because it is only used inside "Odhadli sme { $guesses }"; check no other place shows it alone.
-- `kestrel/ui/locales/sk/engine.ftl` `ctrl-alt-tab-unlock`: "Okno odomknutia" — unclear English source ("Unlock Window" as a noun); check wording.
+- `kestrel/ui/locales/sk/auth.ftl` `ctrl-alt-tab-unlock`: "Okno odomknutia" — unclear English source ("Unlock Window" as a noun); check wording.
 - `kestrel/ui/locales/sk/desktop.ftl` `task-view-desktop`: "Pracovný priestor { $number }" — workspace name in the task view, matching Settings; check it fits under each workspace thumbnail.
 - `apps/setup/locales/sk/setup.ftl` `setup-windows-hibernated` / `setup-windows-fast-startup`: "rýchle spustenie" — check the name Slovak Windows uses for Fast Startup (rýchle spúšťanie?) and whether it should be capitalized.
 
@@ -55,7 +55,6 @@ Strings in Luft's Slovak translation that a native speaker should check, each li
 - `apps/settings/locales/sk/personalization.ftl` `settings-fonts-sample`: "Kŕdeľ ďatľov učí koňa žrať kôru." — short well-known sentence rich in diacritics, not a full pangram.
 - `apps/settings/locales/sk/personalization.ftl` `settings-accessibility-bounce-keys`: "Filtrovanie opakovaných stlačení" — long; check against the term KDE/GNOME Slovak use and whether it clips.
 - `apps/settings/locales/sk/personalization.ftl` `settings-fonts-monospace`: "Neproporcionálne" — some OSes say „s pevnou šírkou“; check preference.
-- `apps/settings/locales/sk/system.ftl` `settings-updates-elsewhere-refresh-by` (and the other `-by` messages): "{ $app } hľadá aktualizácie" — the app name stands alone as the subject, so the fallback reads „Iná aplikácia hľadá aktualizácie“; check it reads well with real names like „Schelf“.
 
 ## Website
 

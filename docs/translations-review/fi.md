@@ -4,12 +4,12 @@ Strings in Luft's Finnish translation that a native speaker should check. Each i
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/fi.csv` `snap`: "telakoida", with "ikkuna-asettelu" and "ikkunaryhmä" — Windows uses kiinnittää for both pin and snap; check that telakoida reads naturally for putting a window into half of the screen.
-- `packages/i18n/glossary/fi.csv` `board`: "taulu" — a new feature with no established Finnish word; check it isn't confused with a spreadsheet table or a Kanban board.
-- `packages/i18n/glossary/fi.csv` `tray`: "ilmaisinalue" — Windows' older term for the notification area; check it fits a button that holds background apps.
-- `packages/i18n/glossary/fi.csv` `security`: "suojaus" — chosen to match Windows and suojaussiru; tietoturva may be what people expect as a Settings page name.
-- `packages/i18n/glossary/fi.csv` `sandbox`: "hiekkalaatikko" — check it is understood by ordinary users, not only developers.
-- `packages/i18n/glossary/fi.csv` `turn on`, `turn off`: "ottaa käyttöön", "poistaa käytöstä" — check against "kytkeä päälle/pois" for radios and hardware.
+- `packages/i18n/glossary/fi.tbx` `snap`: "telakoida", with "ikkuna-asettelu" and "ikkunaryhmä" — Windows uses kiinnittää for both pin and snap; check that telakoida reads naturally for putting a window into half of the screen.
+- `packages/i18n/glossary/fi.tbx` `board`: "taulu" — a new feature with no established Finnish word; check it isn't confused with a spreadsheet table or a Kanban board.
+- `packages/i18n/glossary/fi.tbx` `tray`: "ilmaisinalue" — Windows' older term for the notification area; check it fits a button that holds background apps.
+- `packages/i18n/glossary/fi.tbx` `security`: "suojaus" — chosen to match Windows and suojaussiru; tietoturva may be what people expect as a Settings page name.
+- `packages/i18n/glossary/fi.tbx` `sandbox`: "hiekkalaatikko" — check it is understood by ordinary users, not only developers.
+- `packages/i18n/glossary/fi.tbx` `turn on`, `turn off`: "ottaa käyttöön", "poistaa käytöstä" — check against "kytkeä päälle/pois" for radios and hardware.
 - `kestrel/ui/locales/fi/shell.ftl` `keys-shift`, `keys-tab`, `keys-space`, `keys-backspace`: "Vaihto", "Sarkain", "Välilyönti", "Askelpalautin" — follow Microsoft's Finnish shortcut names; Finnish keyboards mostly print arrows on these keys, so check that people prefer these to Shift and Tab.
 - `kestrel/ui/locales/fi/shell.ftl` `keys-delete`, `keys-insert`, `keys-home`, `keys-end`, `keys-page-up`, `keys-page-down`, `keys-print-screen`: kept in English as printed on Finnish keyboards — check against the abbreviations (Del, Ins, PgUp, PrtSc) some keyboards print.
 - `kestrel/ui/locales/fi/shell.ftl` `battery-level`: "Akku { $percentage } %, kytketty verkkovirtaan" — the plugged-in state without charging; check that it doesn't suggest charging.
@@ -30,10 +30,10 @@ Strings in Luft's Finnish translation that a native speaker should check. Each i
 - `kestrel/ui/locales/fi/surfaces.ftl` `start-search-settings-section`: "Asetukset: { $page }" — built this way to keep the page name in the nominative; check it reads well as a search result description.
 - `kestrel/ui/locales/fi/surfaces.ftl` `quick-settings-on`, `quick-settings-off`: "Päällä", "Pois" — also used for every on/off state in Settings; check they read well as tile subtitles and picker options.
 - `kestrel/ui/locales/fi/auth.ftl` `lock-screen-dwell-click`: "Viivenapsautus" — no settled term; the Settings switch for the same feature says "Napsauta pysäyttämällä osoitin".
-- `kestrel/ui/locales/fi/engine.ftl` `network-menu-tethers`, `network-menu-tether`: "Bluetooth-jakoyhteydet", "Jakoyhteys" — no settled Finnish term for Bluetooth tethering.
-- `kestrel/ui/locales/fi/engine.ftl` `network-menu-mobile`: "Mobiiliverkko" — tile title for mobile broadband; check it fits the tile width.
-- `kestrel/ui/locales/fi/engine.ftl` `switch-monitor-mirror`, `switch-monitor-join`: "Monista", "Laajenna" — Windows' terms for duplicate and extend; check they fit here.
-- `kestrel/ui/locales/fi/engine.ftl` `ctrl-alt-tab-panel`: "Tehtäväpalkki" — English says "Panel"; translated as the taskbar it refers to.
+- `kestrel/ui/locales/fi/system.ftl` `network-menu-tethers`, `network-menu-tether`: "Bluetooth-jakoyhteydet", "Jakoyhteys" — no settled Finnish term for Bluetooth tethering.
+- `kestrel/ui/locales/fi/system.ftl` `network-menu-mobile`: "Mobiiliverkko" — tile title for mobile broadband; check it fits the tile width.
+- `kestrel/ui/locales/fi/desktop.ftl` `switch-monitor-mirror`, `switch-monitor-join`: "Monista", "Laajenna" — Windows' terms for duplicate and extend; check they fit here.
+- `kestrel/ui/locales/fi/shell.ftl` `ctrl-alt-tab-panel`: "Tehtäväpalkki" — English says "Panel"; translated as the taskbar it refers to.
 - `kestrel/ui/locales/fi/system.ftl` `dictation-unsupported-body`: "…puheentunnistinta, jota { $language } vaatii." — the language name may arrive in English (e.g. "Japanese"), so the sentence may read oddly.
 - `kestrel/ui/locales/fi/system.ftl` `peek-error-launch-not-started-by-peek`: "Käynnistää voi vain ohjelman, jonka peek run on itse käynnistänyt" — the English is ambiguous; check the intended meaning.
 - `apps/setup/locales/fi/setup.ftl` `setup-destination-alongside-choice`: "{ $windows } -järjestelmän rinnalle" — compound used to keep "Windows 11" in the nominative; check it doesn't feel heavy.
@@ -62,7 +62,6 @@ Strings in Luft's Finnish translation that a native speaker should check. Each i
 - `apps/settings/locales/fi/personalization.ftl` `settings-accessibility-typing-assist-count`: "Pois", "{ $count } päällä" — check the count reads naturally as a row summary.
 - `apps/settings/locales/fi/protection.ftl` `settings-privacy-screen-off-after`: "Kun { $duration } on kulunut" — built so the duration stays in the nominative; check it reads naturally with "1 minuutti" and "5 minuuttia".
 - `apps/settings/locales/fi/protection.ftl` `settings-passwords-history-signed`: "{ $app } allekirjoitti kohteella ”{ $item }”" — "kohteella" is vague; the item is normally a key.
-- `apps/settings/locales/fi/system.ftl` `settings-updates-includes`: "Sisältää tietoturvakorjauksia" — uses tietoturva rather than the glossary's suojaus, because Windows Update says tietoturvapäivitys.
 - `apps/settings/locales/fi/system.ftl` `settings-updates-switching-standard`: "Ladataan vakiokuvaa…" — the standard system image (without NVIDIA's driver); check it's clear.
 - `apps/settings/locales/fi/system.ftl` `settings-users-fingerprint-remove-description`: "Tämän jälkeen { $finger } ei enää kelpaa kirjautumiseen." — relies on the .inline finger name in the nominative.
 

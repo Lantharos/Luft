@@ -1,34 +1,20 @@
+use specta::Type;
 use std::sync::{Mutex, MutexGuard};
 
-use luft_software::system::updates;
+use luft_software::apps::updates;
 use luft_software::task::Task;
 use serde::Serialize;
-use specta::Type;
 
-use super::backend;
 use super::image;
-use super::packages;
 use super::state;
 use super::store::Checked;
 
 #[derive(Serialize, Clone, Type)]
-#[serde(tag = "kind", rename_all = "camelCase")]
-pub enum System {
-    Packages(packages::PackagesOverview),
-    Image(Box<image::ImageOverview>),
-}
-
-#[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct UpdatesOverview {
+pub struct Overview {
     checked: Option<u64>,
     apps: Option<usize>,
-    pub system: System,
-}
-
-pub struct Loaded {
-    pub system: System,
-    pub package_apps: usize,
+    pub system: image::Overview,
 }
 
 #[derive(PartialEq, Eq)]
@@ -42,22 +28,19 @@ static RELOAD: Mutex<Reload> = Mutex::new(Reload::Idle);
 
 pub fn load(refresh: Option<Task>) -> Result<(), String> {
     let refreshed = refresh.is_some();
-    let Loaded {
-        system,
-        package_apps,
-    } = backend::current().load(refresh)?;
+    let system = image::load(refresh)?;
     let checked = if refreshed {
         Checked::now()?
     } else {
         Checked::load()
     };
-    state::set_overview(UpdatesOverview {
+    state::set_overview(Overview {
         checked: checked.at,
         apps: state::overview().and_then(|overview| overview.apps),
         system,
     });
     std::thread::spawn(move || {
-        let apps = updates::app_count(package_apps);
+        let apps = updates::count();
         state::edit_overview(|overview| overview.apps = Some(apps));
     });
     Ok(())

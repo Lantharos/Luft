@@ -1,7 +1,7 @@
 import Clutter from 'gi://Clutter';
 import type Shell from 'gi://Shell';
 import St from 'gi://St';
-import { HeaderLayout } from '../../shell/widgets/headerLayout.js';
+import { HeaderLayout } from '../../shared/widgets/headerLayout.js';
 
 import { appIcons, sourceApp } from '../../appearance/icons/appIcons.js';
 import type { ContextMenus } from '../../desktop/menus/contextMenus.js';

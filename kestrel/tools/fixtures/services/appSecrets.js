@@ -5,10 +5,10 @@ import GLib from 'gi://GLib';
 const NAME = 'com.lantharos.Keyring1';
 const PATH = '/com/lantharos/Keyring1';
 const INTERFACE = `<node><interface name="com.lantharos.Keyring1.AppSecrets">
-  <method name="Store"><arg type="s" direction="in"/><arg type="h" direction="in"/></method>
-  <method name="Load"><arg type="s" direction="in"/><arg type="h" direction="in"/><arg type="b" direction="out"/></method>
-  <method name="Delete"><arg type="s" direction="in"/><arg type="b" direction="out"/></method>
-  <method name="List"><arg type="as" direction="out"/></method>
+  <method name="Store"><arg type="s" direction="in"/><arg type="s" direction="in"/><arg type="h" direction="in"/></method>
+  <method name="Load"><arg type="s" direction="in"/><arg type="s" direction="in"/><arg type="h" direction="in"/><arg type="b" direction="out"/></method>
+  <method name="Delete"><arg type="s" direction="in"/><arg type="s" direction="in"/><arg type="b" direction="out"/></method>
+  <method name="List"><arg type="s" direction="in"/><arg type="as" direction="out"/></method>
 </interface></node>`;
 
 const descriptor = (invocation, index) => invocation.get_message().get_unix_fd_list().get(index);
@@ -19,21 +19,21 @@ export class ScratchAppSecrets {
     this._connection = Gio.DBusConnection.new_for_address_sync(Gio.dbus_address_get_for_bus_sync(Gio.BusType.SESSION, null),
       Gio.DBusConnectionFlags.AUTHENTICATION_CLIENT | Gio.DBusConnectionFlags.MESSAGE_BUS_CONNECTION, null, null);
     this._exported = Gio.DBusExportedObject.wrapJSObject(INTERFACE, {
-      StoreAsync: ([name, index], invocation) => {
+      StoreAsync: ([, name, index], invocation) => {
         const input = new GioUnix.InputStream({fd: descriptor(invocation, index), close_fd: true});
         const bytes = input.read_bytes(1 << 20, null);
         input.close(null);
         this.secrets.set(name, new TextDecoder().decode(bytes.toArray()));
         invocation.return_value(null);
       },
-      LoadAsync: ([name, index], invocation) => {
+      LoadAsync: ([, name, index], invocation) => {
         const output = new GioUnix.OutputStream({fd: descriptor(invocation, index), close_fd: true});
         const secret = this.secrets.get(name);
         if (secret !== undefined) output.write_all(new TextEncoder().encode(secret), null);
         output.close(null);
         invocation.return_value(new GLib.Variant('(b)', [secret !== undefined]));
       },
-      Delete: name => this.secrets.delete(name),
+      Delete: (_app, name) => this.secrets.delete(name),
       List: () => [...this.secrets.keys()],
     });
     this._exported.export(this._connection, PATH);

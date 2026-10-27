@@ -1,5 +1,5 @@
 import GLib from 'gi://GLib';
-import { LIBEXECDIR } from '../../shell/config.js';
+import { LIBEXECDIR } from '../../core/config.js';
 
 const BUILD_DIRECTORY = GLib.getenv('KESTREL_BUILDDIR');
 

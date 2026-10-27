@@ -4,13 +4,13 @@ Strings in Luft's Bulgarian translation that a native speaker should check. Each
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/bg.csv` `board`: "табло" — check it reads as a canvas of windows rather than a dashboard; "дъска" was the alternative.
-- `packages/i18n/glossary/bg.csv` `wallpaper`: "тапет" — chosen over "фон" (Windows' Personalization word) to avoid confusion with background colors; confirm it doesn't feel too colloquial.
-- `packages/i18n/glossary/bg.csv` `tray`: "системна област" — no settled Bulgarian term; Windows says "област за уведомяване", which describes notifications rather than background apps.
-- `packages/i18n/glossary/bg.csv` `Keep awake`: "Без заспиване" — short tile name; check it reads as a feature and not as an instruction.
-- `packages/i18n/glossary/bg.csv` `Media Viewer`: "Преглед на мултимедия" — generic app name; check against what Bulgarian desktops call a viewer.
-- `packages/i18n/glossary/bg.csv` `snap group`: "група за прилепване" — follows Windows' "оформление за прилепване"; check it's understandable on its own.
-- `packages/i18n/glossary/bg.csv` `Install Luft`: "Инсталиране на Luft" — a verbal noun as the app name; the imperative "Инсталирай Luft" would match buttons instead.
+- `packages/i18n/glossary/bg.tbx` `board`: "табло" — check it reads as a canvas of windows rather than a dashboard; "дъска" was the alternative.
+- `packages/i18n/glossary/bg.tbx` `wallpaper`: "тапет" — chosen over "фон" (Windows' Personalization word) to avoid confusion with background colors; confirm it doesn't feel too colloquial.
+- `packages/i18n/glossary/bg.tbx` `tray`: "системна област" — no settled Bulgarian term; Windows says "област за уведомяване", which describes notifications rather than background apps.
+- `packages/i18n/glossary/bg.tbx` `Keep awake`: "Без заспиване" — short tile name; check it reads as a feature and not as an instruction.
+- `packages/i18n/glossary/bg.tbx` `Media Viewer`: "Преглед на мултимедия" — generic app name; check against what Bulgarian desktops call a viewer.
+- `packages/i18n/glossary/bg.tbx` `snap group`: "група за прилепване" — follows Windows' "оформление за прилепване"; check it's understandable on its own.
+- `packages/i18n/glossary/bg.tbx` `Install Luft`: "Инсталиране на Luft" — a verbal noun as the app name; the imperative "Инсталирай Luft" would match buttons instead.
 - `docs/translations/bg.md` quotation marks: "‚…‘" for inner quotes — check against current Bulgarian typographic practice.
 - `docs/translations/bg.md` percent sign: "57 %" with a space — follows the orthographic dictionary; check it matches what users expect in battery labels.
 - `packages/web/ui/locales/bg/ui.ftl` `ui-window-minimize`: "Минимизирай" — imperative per the button rule; Windows uses "Минимизиране" for its title bar buttons.
@@ -22,11 +22,11 @@ Strings in Luft's Bulgarian translation that a native speaker should check. Each
 ## Kestrel and setup
 
 - `kestrel/ui/locales/bg/desktop.ftl` `task-view-desktop`: "Работно пространство { $number }" — follows the glossary (workspace = работно пространство, not работен плот as Windows says); check it doesn't clip in the task view.
-- `kestrel/ui/locales/bg/engine.ftl` `auto-rotate-title`: "Автозавъртане" — shortened for the tile; confirm it reads naturally versus "Автоматично завъртане".
-- `kestrel/ui/locales/bg/engine.ftl` `network-menu-tether`: "Тетъринг" — Android's loanword; check it is the expected term for a Bluetooth tether tile.
-- `kestrel/ui/locales/bg/engine.ftl` `network-menu-mobile`: "Мобилни данни" — chosen for the "Mobile" (broadband) tile, while its settings item and the PIN prompt say "мобилен интернет"; check whether one term should cover both.
-- `kestrel/ui/locales/bg/engine.ftl` `switch-monitor-join`: "Разширяване" — Windows' "Extend" wording for joining displays.
-- `kestrel/ui/locales/bg/engine.ftl` `autorun-connected`: "Свързано: „{ $driveName }“" — phrased this way to avoid gender agreement with an unknown partition name.
+- `kestrel/ui/locales/bg/system.ftl` `auto-rotate-title`: "Автозавъртане" — shortened for the tile; confirm it reads naturally versus "Автоматично завъртане".
+- `kestrel/ui/locales/bg/system.ftl` `network-menu-tether`: "Тетъринг" — Android's loanword; check it is the expected term for a Bluetooth tether tile.
+- `kestrel/ui/locales/bg/system.ftl` `network-menu-mobile`: "Мобилни данни" — chosen for the "Mobile" (broadband) tile, while its settings item and the PIN prompt say "мобилен интернет"; check whether one term should cover both.
+- `kestrel/ui/locales/bg/desktop.ftl` `switch-monitor-join`: "Разширяване" — Windows' "Extend" wording for joining displays.
+- `kestrel/ui/locales/bg/system.ftl` `autorun-connected`: "Свързано: „{ $driveName }“" — phrased this way to avoid gender agreement with an unknown partition name.
 - `kestrel/ui/locales/bg/system.ftl` `oom-closed-body`: "Паметта на компютъра почти се изчерпа и затварянето му помогна всичко останало да продължи да работи гладко." — rephrased so "му" covers both приложението and контейнерът; check it reads naturally.
 - `kestrel/ui/locales/bg/system.ftl` `dictation-unsupported-title`: "Диктовка на { $language } не е налична на този компютър" — $language arrives in English for now, so it will read "на Japanese".
 - `kestrel/ui/locales/bg/system.ftl` `privacy-indicator`: "В употреба: { $things }" — avoids agreement with the list; check the list joiner output looks right.

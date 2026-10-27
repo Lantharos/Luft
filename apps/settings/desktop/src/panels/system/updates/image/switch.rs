@@ -6,7 +6,6 @@ use luft_software::variant::Variant;
 use serde::Serialize;
 use specta::Type;
 
-use super::super::overview::System;
 use super::super::state;
 
 #[derive(Serialize, Clone, Type)]
@@ -33,8 +32,11 @@ fn measure(deployments: Deployments, variant: Variant) {
         };
         *SIZE.lock().unwrap_or_else(|poisoned| poisoned.into_inner()) = Some((variant, size));
         state::edit_overview(|overview| {
-            if let System::Image(image) = &mut overview.system
-                && let Some(offer) = image.offer.as_mut().filter(|offer| offer.to == variant)
+            if let Some(offer) = overview
+                .system
+                .offer
+                .as_mut()
+                .filter(|offer| offer.to == variant)
             {
                 offer.size = Some(size);
             }

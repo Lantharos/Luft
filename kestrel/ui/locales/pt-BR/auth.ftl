@@ -24,6 +24,7 @@ lock-screen-larger-text = Texto maior
 lock-screen-suspend = Suspender
 lock-screen-restart = Reiniciar…
 lock-screen-power-off = Desligar…
+lock-inhibit-reason = O Kestrel precisa bloquear a tela
 
 ## Keyring and passphrase prompts. Apps usually supply their own text; these are the defaults
 
@@ -67,3 +68,75 @@ passkeys-ok = OK
 passkeys-use-this-computer = Usar este computador
 passkeys-fingerprint-unavailable = Use sua senha para continuar.
 passkeys-wrong-password = Senha incorreta. Tente novamente.
+
+## Sign-in prompt
+
+auth-prompt-password = Senha
+auth-prompt-username = Nome de usuário
+auth-prompt-back = Voltar
+auth-prompt-submit = Enviar
+auth-prompt-wrong-password = Essa senha não funcionou
+auth-prompt-failed = Não funcionou. Tente novamente.
+fingerprint-not-recognized = Impressão digital não reconhecida
+
+## Administrator authentication
+
+polkit-title = Autenticação necessária
+polkit-administrator = Administrador
+polkit-password = Senha
+polkit-cancel = Cancelar
+polkit-authenticate = Autenticar
+polkit-failed = Não funcionou. Tente novamente.
+
+## Log out, power off and restart dialog
+
+end-session-log-out-user = Sair: { $userName }
+end-session-log-out-title = Sair
+end-session-log-out-user-countdown = { $seconds ->
+    [one] A sessão de { $userName } será encerrada automaticamente em { $seconds } segundo
+   *[other] A sessão de { $userName } será encerrada automaticamente em { $seconds } segundos
+}
+end-session-log-out-countdown = { $seconds ->
+    [one] Sua sessão será encerrada automaticamente em { $seconds } segundo
+   *[other] Sua sessão será encerrada automaticamente em { $seconds } segundos
+}
+end-session-log-out-button = Sair
+end-session-power-off-title = Desligar
+end-session-power-off-updates-title = Instalar atualizações e desligar
+end-session-power-off-countdown = { $seconds ->
+    [one] O computador será desligado automaticamente em { $seconds } segundo
+   *[other] O computador será desligado automaticamente em { $seconds } segundos
+}
+end-session-power-off-button = Desligar
+end-session-restart-title = Reiniciar
+end-session-restart-updates-title = Instalar atualizações e reiniciar
+end-session-restart-countdown = { $seconds ->
+    [one] O computador será reiniciado automaticamente em { $seconds } segundo
+   *[other] O computador será reiniciado automaticamente em { $seconds } segundos
+}
+end-session-restart-button = Reiniciar
+end-session-update-restart-title = Reiniciar e instalar atualizações
+end-session-update-restart-countdown = { $seconds ->
+    [one] O computador será reiniciado e instalará as atualizações automaticamente em { $seconds } segundo
+   *[other] O computador será reiniciado e instalará as atualizações automaticamente em { $seconds } segundos
+}
+end-session-update-restart-button = Reiniciar e instalar
+end-session-install-updates = Instalar atualizações pendentes
+end-session-install-version = Instalar a versão { $version }
+end-session-version-nightly = { $release } Nightly { $number }
+end-session-low-battery = Bateria fraca: conecte o carregador antes de instalar atualizações
+end-session-busy-apps = Alguns apps estão ocupados ou têm trabalho não salvo
+end-session-other-users = Há outros usuários conectados
+end-session-cancel = Cancelar
+end-session-boot-options = Opções de inicialização
+end-session-remote-user = { $userName } (remoto)
+end-session-console-user = { $userName } (console)
+
+## Lock screen clock
+
+lock-clock-swipe-up = Deslize para cima
+lock-clock-click-or-press = Clique ou pressione uma tecla
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-unlock = Janela de desbloqueio

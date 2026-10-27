@@ -36,3 +36,27 @@ keys-page-down = Page Down
 keys-print-screen = Print Screen
 
 date-just-now = Épp most
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-panel = Tálca
+
+## System notifications
+
+unsafe-mode-title = A rendszer nem biztonságos módba került
+unsafe-mode-body = Az alkalmazások mostantól korlátozás nélkül hozzáférnek mindenhez
+unsafe-mode-undo = Visszavonás
+privileged-user-title = Bejelentkezve kiemelt jogú felhasználóként
+privileged-user-body = Biztonsági okokból kerülje a munkamenet kiemelt jogú felhasználóként való futtatását. Ha lehet, jelentkezzen be normál felhasználóként.
+
+## Starting programs
+
+spawn-failed = „{ $command }” végrehajtása nem sikerült:
+
+## Text field context menu
+
+entry-menu-copy = Másolás
+entry-menu-paste = Beillesztés
+entry-menu-show-text = Szöveg megjelenítése
+entry-menu-hide-text = Szöveg elrejtése
+entry-caps-lock-on = A Caps Lock be van kapcsolva

@@ -8,6 +8,8 @@ implementation. A shell that draws scalable cursors then replaced every
 Xcursor theme with its own fallback. Implementations that are initable
 can now fail to initialize, and the next one in priority order is tried,
 so Xcursor themes keep working next to scalable ones.
+
+Upstream-Status: upstream https://gitlab.gnome.org/GNOME/mutter/-/merge_requests/5352 merged for 51.1
 ---
  src/backends/meta-cursor-theme.c | 8 +++++++-
  1 file changed, 7 insertions(+), 1 deletion(-)

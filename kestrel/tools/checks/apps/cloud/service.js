@@ -2,6 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import {ScratchAppSecrets} from '../../../fixtures/services/appSecrets.js';
+import {ScratchUserManager} from '../../../fixtures/services/userManager.js';
 import {checks} from '../../lib/check.js';
 import {call} from '../../lib/dbus.js';
 import {prepareHome} from '../../lib/apps/home.js';
@@ -12,6 +13,7 @@ import {removeTree, write} from '../lib/files.js';
 
 const {require} = checks('Luft app');
 const NAME = 'com.lantharos.Accounts1';
+const UNIT = 'luft-accounts.service';
 const PATH = '/com/lantharos/Accounts1';
 const ACCOUNTS = 'com.lantharos.Accounts1';
 const FILES = 'com.lantharos.Accounts1.Files';
@@ -49,6 +51,8 @@ export async function startCloud(rclone) {
   await waitUntil(() => listening(ports.dav), 'the WebDAV server starts');
   const keyring = new ScratchAppSecrets({});
   require(await keyring.own(), 'a scratch keyring stands in for Luft Keyring');
+  const userManager = new ScratchUserManager();
+  require(await userManager.own(), 'a scratch user manager stands in for systemd');
   const service = spawn([SERVICE], {
     env: {
       HOME: prepareHome(),
@@ -60,10 +64,12 @@ export async function startCloud(rclone) {
   return {
     server: `http://127.0.0.1:${ports.dav}`,
     keyring,
+    userManager,
     async stop() {
       service.send_signal(15);
       await service.exited;
       keyring.close();
+      userManager.close();
       removeTree(folder());
     },
   };
@@ -79,6 +85,7 @@ export async function signIn(cloud) {
   }, 'signing in to the WebDAV server finishes', SIGN_IN_TIMEOUT);
   require(step.step === 'done', `signing in to a WebDAV server with its password works (${step.message ?? ''})`);
   require([...cloud.keyring.secrets.values()].some(secret => secret.includes(PASSWORD)), 'the password is kept in the keyring');
+  require(cloud.userManager.enabled.has(UNIT), 'the first account turns the accounts service on at sign-in');
   await waitUntil(async () => (await drives())[0]?.state === 'ready', 'the WebDAV drive mounts', SIGN_IN_TIMEOUT);
   return (await drives())[0];
 }

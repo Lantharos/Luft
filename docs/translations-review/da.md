@@ -4,13 +4,13 @@ Strings in Luft's Danish translation that a native speaker should check: terms w
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/da.csv` `snap`: "docke, docklayout, dockgruppe" — Windows uses »fastgøre« for both snap and pin; check whether »docke« reads naturally or another verb is better.
-- `packages/i18n/glossary/da.csv` `board`: "tavle" — check it reads as the endless-canvas mode, not a whiteboard app.
-- `packages/i18n/glossary/da.csv` `notification`: "notifikation" — chosen over Windows' »meddelelse«; check it feels right throughout the desktop.
-- `packages/i18n/glossary/da.csv` `tray`: "systembakke" — Windows' Danish label differs; check it is understood.
-- `packages/i18n/glossary/da.csv` `Power saver`: "Strømbesparelse" — Windows' Danish power modes use longer phrases; check it sits well next to the other modes.
-- `packages/i18n/glossary/da.csv` `App Store`: "Appbutik" — generic name of Schelf; check against »App Store«-style usage people know.
-- `packages/i18n/glossary/da.csv` `sign in`: "log ind / log ud" — chosen over Windows' »log på / log af«.
+- `packages/i18n/glossary/da.tbx` `snap`: "docke, docklayout, dockgruppe" — Windows uses »fastgøre« for both snap and pin; check whether »docke« reads naturally or another verb is better.
+- `packages/i18n/glossary/da.tbx` `board`: "tavle" — check it reads as the endless-canvas mode, not a whiteboard app.
+- `packages/i18n/glossary/da.tbx` `notification`: "notifikation" — chosen over Windows' »meddelelse«; check it feels right throughout the desktop.
+- `packages/i18n/glossary/da.tbx` `tray`: "systembakke" — Windows' Danish label differs; check it is understood.
+- `packages/i18n/glossary/da.tbx` `Power saver`: "Strømbesparelse" — Windows' Danish power modes use longer phrases; check it sits well next to the other modes.
+- `packages/i18n/glossary/da.tbx` `App Store`: "Appbutik" — generic name of Schelf; check against »App Store«-style usage people know.
+- `packages/i18n/glossary/da.tbx` `sign in`: "log ind / log ud" — chosen over Windows' »log på / log af«.
 - `kestrel/ui/locales/da/shell.ftl` `keys-backspace`: "Tilbage" — Danish keyboards print an arrow; check whether »Backspace« is the more familiar shortcut label.
 - `kestrel/ui/locales/da/shell.ftl` `keys-shift`: "Skift" — Microsoft's Danish name; check it against what keyboards and people use.
 - `packages/web/ui/locales/da/ui.ftl` `ui-fingerprint-retry`: "Det kunne ikke aflæses ordentligt. Prøv igen." — check it sounds natural.
@@ -23,11 +23,11 @@ Strings in Luft's Danish translation that a native speaker should check: terms w
 - `kestrel/ui/locales/da/surfaces.ftl` `notifications-more`: "{ $count } mere" — follows settings-more-show; strictly "flere" is the count form, check which is preferred.
 - `kestrel/ui/locales/da/surfaces.ftl` `start-search-settings-section`: "Indstillinger for { $page }" — $page keeps its capital (Udseende); check it reads fine in search results.
 - `kestrel/ui/locales/da/system.ftl` `privacy-indicator`: "Bruger { $things }" — list items carry their own article or possessive (kameraet, mikrofonen, din placering, dine vinduer) to avoid gender clashes; check the mix reads well.
-- `kestrel/ui/locales/da/engine.ftl` `screenshot-source`: "Skærmbilleder" — source name for screenshot and recording notifications; skærmoptagelse is reserved for screen recording.
-- `kestrel/ui/locales/da/engine.ftl` `screenshot-capture`: "Tag" — shutter button for both screenshots and recordings; check it fits in recording mode.
-- `kestrel/ui/locales/da/engine.ftl` `switch-monitor-join`: "Udvid" — Windows' word for extending the desktop across displays, not a literal "join".
-- `kestrel/ui/locales/da/engine.ftl` `inhibit-shortcuts-title`: "Tillad overtagelse af genveje" — "inhibit" rendered as the app taking over system shortcuts; check the meaning.
-- `kestrel/ui/locales/da/engine.ftl` `mount-hidden-volume`: "Skjult diskenhed" — volume as diskenhed (Windows); VeraCrypt users may expect "volumen".
+- `kestrel/ui/locales/da/system.ftl` `screenshot-source`: "Skærmbilleder" — source name for screenshot and recording notifications; skærmoptagelse is reserved for screen recording.
+- `kestrel/ui/locales/da/system.ftl` `screenshot-capture`: "Tag" — shutter button for both screenshots and recordings; check it fits in recording mode.
+- `kestrel/ui/locales/da/desktop.ftl` `switch-monitor-join`: "Udvid" — Windows' word for extending the desktop across displays, not a literal "join".
+- `kestrel/ui/locales/da/system.ftl` `inhibit-shortcuts-title`: "Tillad overtagelse af genveje" — "inhibit" rendered as the app taking over system shortcuts; check the meaning.
+- `kestrel/ui/locales/da/system.ftl` `mount-hidden-volume`: "Skjult diskenhed" — volume as diskenhed (Windows); VeraCrypt users may expect "volumen".
 - `apps/setup/locales/da/setup.ftl` `setup-region-guess-from-computer`: "{ $fields } ud fra din computer" — the field names carry their possessive (dit sprog, din tidszone) because sprog/tastatur and tidszone differ in gender; check the joined sentence.
 - `apps/setup/locales/da/setup.ftl` `setup-account-full-name-example`: "Karen Blixen" — chosen as a well-known Danish name.
 - `apps/setup/installer/locales/da/installer.ftl` `installer-no-deployment`: "Det nye system har ingen udrulning" — technical ostree term with no settled Danish word.

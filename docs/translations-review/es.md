@@ -4,14 +4,14 @@ Strings in Luft's Spanish translation that a native speaker should check: terms 
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/es.csv` `Start`: "Inicio" — the brief keeps Start in English, but Spanish Windows says menú Inicio and Start can't inflect; check it doesn't clash with Inicio as the Home key name in shortcut labels.
-- `packages/i18n/glossary/es.csv` `Settings`: "Configuración" — Apple now says Ajustes; check Configuración still reads as the app name and not only as an abstract noun.
-- `packages/i18n/glossary/es.csv` `tray`: "bandeja del sistema" — Windows 11 no longer names it; check it is understood on a taskbar button.
-- `packages/i18n/glossary/es.csv` `board`: "tablero" — no established term in other systems.
-- `packages/i18n/glossary/es.csv` `snap layout`: "diseño de acoplamiento" — Windows' term, but long; check it fits in Super+Z labels.
-- `packages/i18n/glossary/es.csv` `Keep awake`: "Mantener activo" — the screen is feminine; check it reads right as a Quick settings tile.
-- `packages/i18n/glossary/es.csv` `signed startup`: "arranque firmado" — no settled term.
-- `packages/i18n/glossary/es.csv` `computer`: "ordenador" — Spain-only; Windows uses the neutral equipo.
+- `packages/i18n/glossary/es.tbx` `Start`: "Inicio" — the brief keeps Start in English, but Spanish Windows says menú Inicio and Start can't inflect; check it doesn't clash with Inicio as the Home key name in shortcut labels.
+- `packages/i18n/glossary/es.tbx` `Settings`: "Configuración" — Apple now says Ajustes; check Configuración still reads as the app name and not only as an abstract noun.
+- `packages/i18n/glossary/es.tbx` `tray`: "bandeja del sistema" — Windows 11 no longer names it; check it is understood on a taskbar button.
+- `packages/i18n/glossary/es.tbx` `board`: "tablero" — no established term in other systems.
+- `packages/i18n/glossary/es.tbx` `snap layout`: "diseño de acoplamiento" — Windows' term, but long; check it fits in Super+Z labels.
+- `packages/i18n/glossary/es.tbx` `Keep awake`: "Mantener activo" — the screen is feminine; check it reads right as a Quick settings tile.
+- `packages/i18n/glossary/es.tbx` `signed startup`: "arranque firmado" — no settled term.
+- `packages/i18n/glossary/es.tbx` `computer`: "ordenador" — Spain-only; Windows uses the neutral equipo.
 - `packages/web/ui/locales/es/ui.ftl` `ui-recovery-key-saved`: "Guardada" — feminine, agreeing with clave; check it's only ever shown next to the recovery key.
 - `packages/web/ui/locales/es/ui.ftl` `ui-fingerprint-place`: "Coloca el { $finger } en el sensor." — the article sits in the sentence, so every finger's .inline form must be masculine (they all are).
 - `packages/web/ui/locales/es/ui.ftl` `ui-finger-right-middle`: "Dedo corazón derecho" — corazón is Spain's word; Latin America says medio.
@@ -23,8 +23,8 @@ Strings in Luft's Spanish translation that a native speaker should check: terms 
 - `kestrel/ui/locales/es/system.ftl` `privacy-indicator`: "En uso: { $things }" — built as a colon list so the items need no possessive or gender agreement; check it reads well to a screen-reader user.
 - `kestrel/ui/locales/es/system.ftl` `battery-left`: "Queda un { $percent }." — assumes $percent arrives as "8 %"; check "un" before the figure reads naturally in every case.
 - `kestrel/ui/locales/es/surfaces.ftl` `quick-settings-battery-left`: "Quedan { $duration }" — the plural verb is wrong when the span is a single unit such as "1 h"; check whether a neutral wording is better.
-- `kestrel/ui/locales/es/engine.ftl` `network-menu-tether`: "Conexión compartida" — Bluetooth tethering has no settled Spanish term (Android says "Compartir conexión por Bluetooth"); anclaje was avoided because anclar means pin. Check it reads right as a Quick settings tile title.
-- `kestrel/ui/locales/es/engine.ftl` `switch-monitor-external-only`: "Solo externas" — the plural assumes several external displays may be meant; check against the 15-character limit and context.
+- `kestrel/ui/locales/es/system.ftl` `network-menu-tether`: "Conexión compartida" — Bluetooth tethering has no settled Spanish term (Android says "Compartir conexión por Bluetooth"); anclaje was avoided because anclar means pin. Check it reads right as a Quick settings tile title.
+- `kestrel/ui/locales/es/desktop.ftl` `switch-monitor-external-only`: "Solo externas" — the plural assumes several external displays may be meant; check against the 15-character limit and context.
 - `kestrel/ui/locales/es/portal.ftl` `print-paper-statement`: "Media carta" — North American paper names; check they match what Spanish print dialogs show.
 - `apps/setup/locales/es/setup.ftl` `setup-region-guess-from-computer`: "tu { $fields } a partir del ordenador" — "tu" before a joined list ("tu idioma y teclado") is acceptable, but check it reads well with every field combination.
 - `apps/setup/locales/es/setup.ftl` `setup-account-full-name-example`: "Clara Campoamor" — chosen as a well-known Spanish name; confirm.

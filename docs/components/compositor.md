@@ -46,10 +46,12 @@ python3 kestrel/compositor/patches.py prepare   # check out upstream and apply t
 # commit changes in kestrel/run/mutter-source
 python3 kestrel/compositor/patches.py export    # write the committed stack back to patches/
 python3 kestrel/compositor/patches.py check     # replay the series and compare trees
+python3 kestrel/compositor/patches.py list      # each patch's upstream status
 kestrel/compositor/build.sh
 ```
 
 - Keep each patch focused with ordinary commits, fixups and rebases.
+- Every commit needs an `Upstream-Status` trailer saying whether it is upstream, forwardable or Luft's own, see [Upstream patches](../upstream.md).
 - `prepare` refuses to replace a checkout with uncommitted or unexported work. The previous head is kept at `refs/kestrel/previous`.
 - `python3 kestrel/compositor/patches.py status` shows the state of the checkout.
 - The shell's TypeScript sees what the patches add through `kestrel/ui/src/compositor.d.ts`. Declare new API there when a patch exposes some to the shell.
@@ -67,6 +69,8 @@ python3 kestrel/compositor/patches.py export --base "$new_tag" --version "$new_t
 python3 kestrel/compositor/patches.py check
 kestrel/compositor/build.sh
 ```
+
+`patches.py trial latest` shows beforehand which patches the new release already carries and which will conflict. Drop patches whose upstream change is in the release before rebasing.
 
 The pinned base only changes when both `--base` and `--version` are given. `git rebase --abort` restores the old stack. A Mutter ABI change also needs the engine build and session library paths updated.
 

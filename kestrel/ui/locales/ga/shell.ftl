@@ -36,3 +36,27 @@ keys-page-down = Page Down
 keys-print-screen = Print Screen
 
 date-just-now = Anois díreach
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-panel = Painéal
+
+## System notifications
+
+unsafe-mode-title = Cuireadh an córas i mód neamhshábháilte
+unsafe-mode-body = Tá rochtain gan srian ag aipeanna anois
+unsafe-mode-undo = Cealaigh
+privileged-user-title = Sínithe isteach mar úsáideoir pribhléideach
+privileged-user-body = Níor cheart seisiún a rith mar úsáideoir pribhléideach ar chúiseanna slándála. Más féidir, sínigh isteach mar ghnáthúsáideoir.
+
+## Starting programs
+
+spawn-failed = Theip ar “{ $command }” a rith:
+
+## Text field context menu
+
+entry-menu-copy = Cóipeáil
+entry-menu-paste = Greamaigh
+entry-menu-show-text = Taispeáin an téacs
+entry-menu-hide-text = Folaigh an téacs
+entry-caps-lock-on = Tá Caps Lock ar siúl

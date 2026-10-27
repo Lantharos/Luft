@@ -1,6 +1,6 @@
 # Icelandic style guide
 
-How Luft speaks Icelandic. The [glossary](../../packages/i18n/glossary/is.csv) has the agreed terms; Weblate shows them next to every string.
+How Luft speaks Icelandic. The [glossary](../../packages/i18n/glossary/is.tbx) has the agreed terms; Weblate shows them next to every string.
 
 ## Address and tone
 

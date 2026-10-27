@@ -143,6 +143,10 @@ notifications-media-previous = Poprzedni utwór
 notifications-media-next = Następny utwór
 notifications-media-play = Odtwórz
 notifications-media-pause = Wstrzymaj
+messages-unknown-app = Nieznana aplikacja
+messages-reply = Odpowiedz
+messages-reply-placeholder = Napisz odpowiedź
+messages-reply-send = Wyślij
 
 ## Calendar
 
@@ -180,3 +184,17 @@ emoji-skin-tone-medium-light = Średnio jasny odcień skóry
 emoji-skin-tone-medium = Średni odcień skóry
 emoji-skin-tone-medium-dark = Średnio ciemny odcień skóry
 emoji-skin-tone-dark = Ciemny odcień skóry
+
+## System notifications
+
+messages-system-source = System
+
+## On-screen keyboard
+
+osk-keyboard-settings = Ustawienia klawiatury
+osk-letters-key = ABC
+
+## Media player controls
+
+mpris-unknown-artist = Nieznany wykonawca
+mpris-unknown-title = Nieznany tytuł

@@ -1,3 +1,4 @@
+use specta::Type;
 mod appimages;
 mod debian;
 mod flatpaks;
@@ -7,19 +8,16 @@ mod system;
 mod tools;
 
 use gio::prelude::*;
-use luft_app::{Commands, Empty};
+use luft_app::Commands;
 use luft_software::apps::flatpak::{self, Installation, Permissions};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
-use specta::Type;
-
-use crate::fedora;
+use serde_json::Value;
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Debug, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum Source {
     Flatpak,
-    Package,
     AppImage,
     Tool,
     Debian,
@@ -63,17 +61,13 @@ struct FlatpakRef {
 pub fn installed() -> Vec<InstalledApp> {
     let mut apps: Vec<InstalledApp> = std::thread::scope(|scope| {
         let flatpaks = scope.spawn(flatpaks::installed);
-        let packages = scope.spawn(fedora::installed);
-        let tools = (!fedora::available()).then(|| scope.spawn(tools::installed));
+        let tools = scope.spawn(tools::installed);
         let system = scope.spawn(system::installed);
         let debs = scope.spawn(debian::installed);
         let mut apps = appimages::installed();
         apps.extend(debs.join().unwrap_or_default());
         apps.extend(flatpaks.join().unwrap_or_default());
-        apps.extend(packages.join().unwrap_or_default());
-        if let Some(tools) = tools {
-            apps.extend(tools.join().unwrap_or_default());
-        }
+        apps.extend(tools.join().unwrap_or_default());
         apps.extend(system.join().unwrap_or_default());
         apps
     });
@@ -99,7 +93,7 @@ fn permissions(
 
 pub fn register(window: SabineWindow) -> SabineWindow {
     sources::register(window)
-        .command("library_installed", |Empty {}| Ok(installed()))
+        .command("library_installed", |_: Value| Ok(installed()))
         .command("library_launch", launch)
         .command("library_permissions", permissions)
         .command_async("library_full_access", full_access::has)

@@ -130,25 +130,10 @@ settings-updates-downloading = Po shkarkohen përditësimet…
 settings-updates-rolling-back = Po përgatitet versioni i mëparshëm…
 settings-updates-switching-nvidia = Po shkarkohet drajveri i NVIDIA…
 settings-updates-switching-standard = Po shkarkohet imazhi standard…
-settings-updates-elsewhere-refresh-by = { $app } po kërkon përditësime
-settings-updates-elsewhere-download-by = { $app } po shkarkon përditësime
-settings-updates-elsewhere-update-by = { $app } po instalon përditësime
-settings-updates-elsewhere-update = Po instalohen përditësime
-settings-updates-elsewhere-install-by = { $app } po instalon softuer
-settings-updates-elsewhere-install = Po instalohet softuer
-settings-updates-elsewhere-remove-by = { $app } po heq softuer
-settings-updates-elsewhere-remove = Po hiqet softuer
-settings-updates-elsewhere-change-by = { $app } po ndryshon softuer
-settings-updates-elsewhere-change = Po ndryshohet softuer
-settings-updates-elsewhere-wait = Mund të kërkosh sërish përditësime kur të përfundojë
-settings-updates-ready = Përditësimet janë gati për t’u instaluar
-settings-updates-available = { $count ->
-    [one] Ka { $count } përditësim
-   *[other] Ka { $count } përditësime
-}
 settings-updates-up-to-date = Sistemi yt është i përditësuar
 settings-updates-version = Versioni { $version }
 settings-updates-version-new = Një version i ri
+settings-version-nightly = { $release } Nightly { $number }
 settings-updates-returning = Gati për t’u kthyer te versioni { $version }
 settings-updates-returning-unversioned = Gati për t’u kthyer te versioni i mëparshëm
 settings-updates-nvidia-ready = Drajveri i NVIDIA është gati
@@ -157,13 +142,11 @@ settings-updates-version-available = Versioni { $version } është i disponuesh�
 settings-updates-version-available-new = Një version i ri është i disponueshëm
 settings-updates-version-staged = Versioni { $version } është gati për t’u instaluar
 settings-updates-version-staged-new = Një version i ri është gati për t’u instaluar
-settings-updates-restart-install-them = Rinis për t’i instaluar. Kompjuteri yt kthehet pas pak minutash.
 settings-updates-restart-return = Rinis për të përfunduar kthimin.
 settings-updates-restart-switch = Rinis për të përfunduar. Kompjuteri yt kthehet pas pak minutash.
 settings-updates-restart-install-it = Rinis për ta instaluar. Kompjuteri yt kthehet pas pak minutash.
 settings-updates-last-checked = Kontrolluar për herë të fundit { $when }
 settings-updates-never-checked = Ende pa kontrolluar
-settings-updates-installed-when = Përditësimet u instaluan { $when }
 settings-updates-stop = Ndalo
 settings-updates-check = Kontrollo tani
 settings-updates-checking-button = Po kontrollohet…
@@ -190,37 +173,7 @@ settings-updates-firmware-restart = Përfundon kur të rinisësh
 settings-updates-firmware-installing = Po instalohet…
 settings-updates-firmware-update = Përditëso
 settings-updates-firmware-failed = Firmware nuk mund të përditësohej
-settings-updates-failed = Përditësimet e fundit nuk mund të instaloheshin
-settings-updates-failed-description = Sistemi yt mbeti siç ishte
-settings-updates-includes = { $parts ->
-    [security] Përfshin rregullime sigurie
-    [kernel] Përfshin një kernel të ri Linux
-    [drivers] Përfshin drajverë të përditësuar
-    [security-kernel] Përfshin rregullime sigurie dhe një kernel të ri Linux
-    [security-drivers] Përfshin rregullime sigurie dhe drajverë të përditësuar
-    [kernel-drivers] Përfshin një kernel të ri Linux dhe drajverë të përditësuar
-    [security-kernel-drivers] Përfshin rregullime sigurie, një kernel të ri Linux dhe drajverë të përditësuar
-   *[other] Rregullime dhe përmirësime në gjithë sistemin
-}
-settings-updates-count-size = { $count ->
-    [one] { $count } përditësim · { $size }
-   *[other] { $count } përditësime · { $size }
-}
-settings-updates-restart-and-install = Rinis dhe instalo
 settings-updates-download = Shkarko
-settings-updates-see-included = Shih çfarë përfshihet
-settings-updates-included = Çfarë përfshihet
-settings-updates-included-description = { $count ->
-    [one] { $count } përditësim për sistemin, drajverët dhe libraritë e tij
-   *[other] { $count } përditësime për sistemin, drajverët dhe libraritë e tij
-}
-settings-updates-security-fix = Rregullim sigurie
-settings-updates-done = U krye
-settings-updates-area-kernel = Kerneli Linux
-settings-updates-area-drivers = Drajverët dhe firmware
-settings-updates-area-desktop = Desktopi
-settings-updates-area-core = Bërthama e sistemit
-settings-updates-area-other = Libraritë dhe mjetet
 settings-updates-released = Publikuar { $when }
 settings-updates-improvements = Rregullime dhe përmirësime në gjithë sistemin
 settings-updates-download-size = { $size } për t’u shkarkuar
@@ -247,6 +200,7 @@ settings-updates-variant-standard = Kalo te imazhi standard
 settings-updates-variant-nvidia-reason = Shpejtësi e plotë nga grafika jote NVIDIA
 settings-updates-variant-standard-reason = Më i vogël, pasi ky kompjuter nuk ka grafikë NVIDIA
 settings-updates-switch = Kalo
+settings-updates-done = U krye
 
 ## About
 
@@ -270,6 +224,8 @@ settings-about-other-system = Hiqe për t’i dhënë Luft-it { $size } e tij
 settings-about-remove = Hiq
 settings-about-software = Softueri
 settings-about-system = Sistemi
+settings-about-version = Luft { $version }
+settings-about-built = Ndërtuar më { $date }
 settings-about-desktop = Desktopi
 settings-about-kernel = Kerneli
 settings-about-hostname = Emri i hostit

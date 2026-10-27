@@ -1,10 +1,9 @@
 <script lang="ts">
 	import Plus from '@lucide/svelte/icons/plus';
 	import { bytes, Segmented, VirtualScroller } from '@luft/ui';
-	import { commands, type InstalledApp, type Source } from '#lib/bindings.js';
+	import type { InstalledApp, Source } from '#lib/bridge/types.js';
 	import RemoveDialog from '#lib/components/RemoveDialog.svelte';
-	import { fedora } from '#lib/fedora/fedora.svelte.js';
-	import { SLOW } from '#lib/bridge/index.js';
+	import { backend } from '#lib/bridge/index.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
 	import InstalledRow from './InstalledRow.svelte';
@@ -30,7 +29,7 @@
 	const noun = $derived((NOUNS[filter] ?? ['app', 'apps'])[shown.length === 1 ? 0 : 1]);
 
 	async function addAppImage() {
-		const path = await commands.filesChooseAppimage(SLOW);
+		const path = await backend.chooseAppImage();
 		if (path) navigation.push({ page: 'file', path });
 	}
 
@@ -45,7 +44,8 @@
 				options={[
 					{ value: 'all', label: 'All' },
 					{ value: 'flatpak', label: 'Flatpak' },
-					...(fedora.available ? [{ value: 'package' as const, label: 'System' }] : [{ value: 'tool' as const, label: 'Tools' }, { value: 'system' as const, label: 'System' }]),
+					{ value: 'tool', label: 'Tools' },
+					{ value: 'system', label: 'System' },
 					{ value: 'appImage', label: 'AppImage' },
 					...(library.installed.some((app) => app.source === 'debian') ? [{ value: 'debian' as const, label: '.deb' }] : [])
 				]}

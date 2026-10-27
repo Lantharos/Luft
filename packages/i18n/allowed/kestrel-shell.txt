@@ -2,3 +2,10 @@ kestrel/ui/src/shared/input/longPress.ts	Kestrel long press
 kestrel/ui/src/shared/dbus/sandbox.ts	Sandboxed apps cannot ${action}
 kestrel/ui/src/appearance/themes/ghostty.ts	Kestrel Light
 kestrel/ui/src/appearance/themes/ghostty.ts	Kestrel Dark
+kestrel/ui/src/core/runtime/easing.ts	Transition was stopped before completing
+kestrel/ui/src/core/stage/layout.ts	Dummy Cursor
+kestrel/ui/src/core/stage/layout/backgrounds.ts	Background loading was cancelled
+kestrel/ui/src/shared/popups/menu/menuBase.ts	Invalid argument to PopupMenuBase.addMenuItem()
+kestrel/ui/src/core/shellDBus.ts	The screen is locked and only unlocks after signing in
+kestrel/ui/src/shared/widgets/userWidget.ts	Empty User
+kestrel/ui/src/core/main.ts	Kestrel started at ${startDate}

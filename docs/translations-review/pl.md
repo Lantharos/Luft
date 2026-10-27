@@ -4,14 +4,14 @@ Strings in Luft's Polish translation that a native speaker should check, each li
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/pl.csv` `board`: "tablica" — no established Polish term for this canvas mode; check it doesn't read as a whiteboard or notice board.
-- `packages/i18n/glossary/pl.csv` `Night light`: "Oświetlenie nocne" — Windows' term, longer than GNOME's "Nocne światło"; check it fits a Quick settings tile.
-- `packages/i18n/glossary/pl.csv` `Keep awake`: "Nie usypiaj" — no settled term; check it reads naturally as a tile label.
-- `packages/i18n/glossary/pl.csv` `security chip`: "procesor zabezpieczeń" — Windows' name for the TPM, though it is technically a chip, not a processor; check people recognize it.
-- `packages/i18n/glossary/pl.csv` `Keyring`: "pęk kluczy" — macOS' term for Keychain; GNOME users may know "baza kluczy".
-- `packages/i18n/glossary/pl.csv` `signed startup`: "podpisane uruchamianie" — no established term; check it doesn't read oddly next to Secure Boot.
-- `packages/i18n/glossary/pl.csv` `security`: "bezpieczeństwo" — Windows names its page "Zabezpieczenia"; check which reads better as the Settings page name.
-- `packages/i18n/glossary/pl.csv` `remove`, `delete`: both "usunąć" — Polish has no common pair; check the cases where both appear on one screen.
+- `packages/i18n/glossary/pl.tbx` `board`: "tablica" — no established Polish term for this canvas mode; check it doesn't read as a whiteboard or notice board.
+- `packages/i18n/glossary/pl.tbx` `Night light`: "Oświetlenie nocne" — Windows' term, longer than GNOME's "Nocne światło"; check it fits a Quick settings tile.
+- `packages/i18n/glossary/pl.tbx` `Keep awake`: "Nie usypiaj" — no settled term; check it reads naturally as a tile label.
+- `packages/i18n/glossary/pl.tbx` `security chip`: "procesor zabezpieczeń" — Windows' name for the TPM, though it is technically a chip, not a processor; check people recognize it.
+- `packages/i18n/glossary/pl.tbx` `Keyring`: "pęk kluczy" — macOS' term for Keychain; GNOME users may know "baza kluczy".
+- `packages/i18n/glossary/pl.tbx` `signed startup`: "podpisane uruchamianie" — no established term; check it doesn't read oddly next to Secure Boot.
+- `packages/i18n/glossary/pl.tbx` `security`: "bezpieczeństwo" — Windows names its page "Zabezpieczenia"; check which reads better as the Settings page name.
+- `packages/i18n/glossary/pl.tbx` `remove`, `delete`: both "usunąć" — Polish has no common pair; check the cases where both appear on one screen.
 - `packages/web/ui/locales/pl/ui.ftl` `ui-fingerprint-place`: "Przyłóż { $finger } do czytnika." — relies on .inline being accusative, which equals the nominative for every finger name; check it reads naturally.
 - `packages/web/ui/locales/pl/ui.ftl` `ui-toast-dismiss`: "Odrzuć" — Windows' word for dismissing a notification; "Zamknij" is the alternative.
 - `apps/settings/locales/pl/settings.ftl` `settings-subpage-back`: "Wróć do strony { $page }" — $page stays in the nominative after "strony"; check it reads well with titles like "Zasilanie i bateria".
@@ -26,8 +26,8 @@ Strings in Luft's Polish translation that a native speaker should check, each li
 - `kestrel/ui/locales/pl/system.ftl` `oom-closed-body`: "Na komputerze kończyła się pamięć. Zamknięcie pozwoliło zachować płynne działanie reszty systemu." — rephrased to avoid gender agreement with an app or container.
 - `kestrel/ui/locales/pl/surfaces.ftl` `quick-settings-on`: "Włączone" — neuter used generically for tiles of any gender (Bluetooth, Tryb samolotowy, Oświetlenie nocne).
 - `kestrel/ui/locales/pl/surfaces.ftl` `start-search-settings-section`: "Ustawienia: { $page }" — check it fits as a search result description.
-- `kestrel/ui/locales/pl/engine.ftl` `auto-rotate-title`: "Autoobracanie" — short tile title; GNOME says "Automatyczne obracanie", which may clip.
-- `kestrel/ui/locales/pl/engine.ftl` `network-menu-tethers`: "Tethering przez Bluetooth" — no settled Polish term; Windows and Android also use "tethering".
+- `kestrel/ui/locales/pl/system.ftl` `auto-rotate-title`: "Autoobracanie" — short tile title; GNOME says "Automatyczne obracanie", which may clip.
+- `kestrel/ui/locales/pl/system.ftl` `network-menu-tethers`: "Tethering przez Bluetooth" — no settled Polish term; Windows and Android also use "tethering".
 - `apps/setup/locales/pl/setup.ftl` `setup-region-field-keyboard`: "klawiaturę" — the field names are in the accusative to fit "Dobrano { $guesses }"; they're only used in that list.
 - `apps/setup/locales/pl/setup.ftl` `setup-network-unavailable`: "Możesz połączyć się później z paska zadań." — English says "from the panel"; check which part of the desktop is meant.
 - `apps/setup/locales/pl/setup.ftl` `setup-windows-hibernated`: "…przytrzymaj Shift i wybierz Zamknij…" — Polish Windows calls Shut down "Zamknij" in the power menu; Fast Startup is "szybkie uruchamianie".
@@ -43,7 +43,6 @@ Strings in Luft's Polish translation that a native speaker should check, each li
 - `apps/settings/locales/pl/devices.ftl` `settings-power-screen-off`: "Wyłączanie ekranu po czasie" — English "Turn off the screen after" + option cannot take nominative durations in Polish („po 5 minut” is wrong); check the label with options like „5 minut”. Same for `settings-power-long-sleep-after` "Czas do wyłączenia".
 - `apps/settings/locales/pl/devices.ftl` `settings-mouse-touchpad-scroll-edge`: "Przy krawędzi" — and `settings-mouse-touchpad-click-corner` "W rogu"; options shown next to "Dwoma palcami", check they read as a consistent set.
 - `apps/settings/locales/pl/devices.ftl` `settings-keys-keypad`: "Num { $key }" — chosen for keypad keys (Num 5, Num Enter); check against common Polish usage.
-- `apps/settings/locales/pl/system.ftl` `settings-updates-elsewhere-download-by`: "Aktualizacje pobiera { $app }" — object-first word order keeps { $app } in the nominative, so both an app name and the fallback „inna aplikacja” fit; the other `-by` messages are built the same way. Check it reads naturally.
 - `apps/settings/locales/pl/protection.ftl` `settings-privacy-screen-off-after`: "Po { $duration } bezczynności" — built so $duration stays in the nominative ("5 minut bezczynności"); check it reads well with every duration value, e.g. "1 minuta".
 - `packages/web/ui/locales/pl/ui.ftl` `ui-passphrase-field`: "Fraza hasła" — chosen for "passphrase" to keep it distinct from the account "hasło"; not in the glossary, check it against what Polish disk-encryption UIs use.
 - `apps/settings/locales/pl/protection.ftl` `settings-encryption-unlocks-security-key`: "Odblokowywany kluczem zabezpieczeń przy uruchamianiu" — "klucz zabezpieczeń" (Windows' term for a hardware security key) is not in the glossary.

@@ -1,6 +1,6 @@
 # Russian style guide
 
-How Luft speaks Russian. The [glossary](../../packages/i18n/glossary/ru.csv) has the agreed terms; Weblate shows them next to every string.
+How Luft speaks Russian. The [glossary](../../packages/i18n/glossary/ru.tbx) has the agreed terms; Weblate shows them next to every string.
 
 ## Address and tone
 

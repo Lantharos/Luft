@@ -4,18 +4,18 @@ Strings in Luft's Russian translation that a native speaker should check, each l
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/ru.csv` `Settings`: "Настройки" — Windows says "Параметры"; chosen because macOS, GNOME and phones say "Настройки". Check that it doesn't feel foreign to Windows switchers.
-- `packages/i18n/glossary/ru.csv` `Start`: "Пуск" — translated as in Windows; check it reads right next to the Luft mark, which is not a Windows logo.
-- `packages/i18n/glossary/ru.csv` `board`: "доска" — no established term for this canvas mode; check it doesn't read as a whiteboard.
-- `packages/i18n/glossary/ru.csv` `snap`, `snap layout`: "прикрепить", "макет прикрепления" — taken from Windows 11; check against current Windows wording and that it isn't confused with "закрепить" (pin).
-- `packages/i18n/glossary/ru.csv` `tray`: "системный трей" — colloquial but widely known; KDE says "системный лоток", Windows avoids a name.
-- `packages/i18n/glossary/ru.csv` `workspace`: "рабочая область" — GNOME and KDE say "рабочий стол", which Luft keeps for the desktop; check it is understood.
-- `packages/i18n/glossary/ru.csv` `Keep awake`: "Не засыпать" — no settled term; check it reads naturally as a tile label.
-- `packages/i18n/glossary/ru.csv` `security chip`: "чип безопасности" — Windows says "процессор безопасности"; check people recognize it.
-- `packages/i18n/glossary/ru.csv` `signed startup`: "подписанная загрузка" — no established term; check it doesn't read oddly next to Secure Boot.
-- `packages/i18n/glossary/ru.csv` `firmware`: "прошивка" — colloquial next to Windows' "встроенное ПО"; check it suits Settings pages.
-- `packages/i18n/glossary/ru.csv` `Media Viewer`: "Просмотр медиафайлов" — no common generic name for a viewer of photos, video, music and PDFs.
-- `packages/i18n/glossary/ru.csv` `remove`, `delete`: both "удалить", with "убрать" when nothing is lost; check screens where both appear.
+- `packages/i18n/glossary/ru.tbx` `Settings`: "Настройки" — Windows says "Параметры"; chosen because macOS, GNOME and phones say "Настройки". Check that it doesn't feel foreign to Windows switchers.
+- `packages/i18n/glossary/ru.tbx` `Start`: "Пуск" — translated as in Windows; check it reads right next to the Luft mark, which is not a Windows logo.
+- `packages/i18n/glossary/ru.tbx` `board`: "доска" — no established term for this canvas mode; check it doesn't read as a whiteboard.
+- `packages/i18n/glossary/ru.tbx` `snap`, `snap layout`: "прикрепить", "макет прикрепления" — taken from Windows 11; check against current Windows wording and that it isn't confused with "закрепить" (pin).
+- `packages/i18n/glossary/ru.tbx` `tray`: "системный трей" — colloquial but widely known; KDE says "системный лоток", Windows avoids a name.
+- `packages/i18n/glossary/ru.tbx` `workspace`: "рабочая область" — GNOME and KDE say "рабочий стол", which Luft keeps for the desktop; check it is understood.
+- `packages/i18n/glossary/ru.tbx` `Keep awake`: "Не засыпать" — no settled term; check it reads naturally as a tile label.
+- `packages/i18n/glossary/ru.tbx` `security chip`: "чип безопасности" — Windows says "процессор безопасности"; check people recognize it.
+- `packages/i18n/glossary/ru.tbx` `signed startup`: "подписанная загрузка" — no established term; check it doesn't read oddly next to Secure Boot.
+- `packages/i18n/glossary/ru.tbx` `firmware`: "прошивка" — colloquial next to Windows' "встроенное ПО"; check it suits Settings pages.
+- `packages/i18n/glossary/ru.tbx` `Media Viewer`: "Просмотр медиафайлов" — no common generic name for a viewer of photos, video, music and PDFs.
+- `packages/i18n/glossary/ru.tbx` `remove`, `delete`: both "удалить", with "убрать" when nothing is lost; check screens where both appear.
 - `packages/web/ui/locales/ru/ui.ftl` `ui-fingerprint-place`: "Прикоснитесь к сканеру { $finger }." — .inline is instrumental ("правым указательным пальцем") so both fingerprint sentences fit it; check the word order reads naturally.
 - `packages/web/ui/locales/ru/ui.ftl` `ui-select-placeholder`: "Выберите" — an instruction rather than the infinitive buttons use; check it fits as a dropdown placeholder.
 - `apps/settings/locales/ru/settings.ftl` `settings-subpage-back`: "Назад: { $page }" — colon form keeps $page in the nominative; check it sounds right to screen-reader users.
@@ -30,8 +30,8 @@ Strings in Luft's Russian translation that a native speaker should check, each l
 - `kestrel/ui/locales/ru/system.ftl` `privacy-indicator`: "Используются: { $things }" — list items are nominative (камера, микрофон…); check the joined list, also for a single item like «Используются: окна».
 - `kestrel/ui/locales/ru/system.ftl` `health-gpu-reset-body`: "Компьютер перезагрузился сам: { $date }, { $time }." — built around the placeables to avoid the case of the formatted date; may read a bit dry.
 - `kestrel/ui/locales/ru/system.ftl` `oom-closed-body`: "…поэтому его пришлось закрыть…" — «его» covers both приложение and контейнер; check it reads clearly after either title.
-- `kestrel/ui/locales/ru/engine.ftl` `screenshot-capture`: "Захватить" — shutter button for both screenshots and recordings; «Снять» could be an alternative.
-- `kestrel/ui/locales/ru/engine.ftl` `network-menu-tethers`, `network-menu-tether`: "Модем через Bluetooth", "Модем" — no settled term for Bluetooth tethering.
+- `kestrel/ui/locales/ru/system.ftl` `screenshot-capture`: "Захватить" — shutter button for both screenshots and recordings; «Снять» could be an alternative.
+- `kestrel/ui/locales/ru/system.ftl` `network-menu-tethers`, `network-menu-tether`: "Модем через Bluetooth", "Модем" — no settled term for Bluetooth tethering.
 - `apps/setup/locales/ru/setup.ftl` `setup-region-intro-guessed`: "Начнём настройку. Определено автоматически: { $guesses }. Измените то, что не подходит." — the guess parts are nominative («язык и раскладка клавиатуры по данным компьютера»); check the joined list.
 - `apps/setup/locales/ru/setup.ftl` `setup-account-full-name-example`: "Софья Ковалевская" — a well-known Russian mathematician, the counterpart of Ada Lovelace; check it suits a name placeholder.
 - `apps/setup/locales/ru/setup.ftl` `setup-drive-has-windows`: "На диске { $windows }" — short subtitle under a drive name; check it reads well there.
@@ -50,7 +50,6 @@ Strings in Luft's Russian translation that a native speaker should check, each l
 - `apps/settings/locales/ru/devices.ftl` `settings-keys-volume-up`: "Громкость +" (also volume-down, brightness-up/down with "+"/"−", mute «Без звука», microphone-mute «Откл. микрофон») — compact key labels; check they don't look odd inside a shortcut like Ctrl+Громкость +.
 - `apps/settings/locales/ru/protection.ftl` `settings-privacy-screen-off-after`: "{ $duration } бездействия" — the duration arrives nominative («5 минут»), so «Через { $duration }» would give «через 1 минута»; check this reads well as the value next to «Отключение экрана».
 - `apps/settings/locales/ru/protection.ftl` `settings-passwords-stores-count`: "Сохранено данных для входа: { $count }" — sign-ins aren't countable in Russian, so every variant uses the colon form.
-- `apps/settings/locales/ru/system.ftl` `settings-updates-elsewhere-update-by` (and the other `-by` sentences): "{ $app } устанавливает обновления" — the app name is the bare subject, unlike «приложение X» elsewhere, so the fallback «другое приложение» reads right; check it with names like Schelf.
 - `apps/settings/locales/ru/system.ftl` `settings-users-fingerprint-remove-description`: "Входить в систему { $finger } больше не получится." — relies on the finger's .inline form being instrumental («правым указательным пальцем»).
 - `apps/settings/locales/ru/personalization.ftl` `settings-cursors-folder-description`: "Здесь появляются темы, сохранённые по пути: Домашняя папка › .local › share › icons" — check the colon construction and that «Домашняя папка» matches Rover's name for Home.
 - `apps/settings/locales/ru/personalization.ftl` `settings-appearance-icons-clear`: "Прозрачные" — unsure whether "Clear" means transparent, glass-like icons; check against the actual look.

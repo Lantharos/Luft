@@ -6,20 +6,18 @@
 	import { library } from '#lib/state/library.svelte.js';
 	import { operations } from '#lib/state/operations.svelte.js';
 	import { updateJob } from '#lib/app/jobs.js';
-	import type { Listing } from './load';
 
 	interface Props {
 		name: string;
-		listing: Listing | null;
-		packageName: string | null;
+		listing: string | null;
 		installed: InstalledApp | null;
 	}
 
-	let { name, listing, packageName, installed }: Props = $props();
+	let { name, listing, installed }: Props = $props();
 
 	let confirming = $state(false);
 
-	const listingKey = $derived(listing ? `${listing.origin}:${listing.id}` : null);
+	const listingKey = $derived(listing ? `flathub:${listing}` : null);
 	const operation = $derived((installed && operations.forKey(installed.key)) || (listingKey && operations.forKey(listingKey)) || null);
 	const active = $derived(operation && operation.state !== 'failed' ? operation : null);
 	const update = $derived(installed ? library.update(installed.key) : null);
@@ -31,8 +29,7 @@
 
 	function install() {
 		if (!listing || !listingKey) return;
-		if (listing.origin === 'flathub') run(listingKey, { kind: 'installFlathub', id: listing.id });
-		else if (packageName) run(listingKey, { kind: 'installPackage', package: packageName });
+		run(listingKey, { kind: 'installFlathub', id: listing });
 	}
 
 	function updateNow() {

@@ -4,13 +4,13 @@ Strings in Luft's French translation that a native speaker should check: terms w
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/fr.csv` `board`: "tableau" — no OS has this mode; check that it reads as a canvas of windows and not as a table or a dashboard.
-- `packages/i18n/glossary/fr.csv` `tray`: "barre d’état système" — chosen over Windows' "zone de notification" to avoid a clash with the notification center; check it is understood.
-- `packages/i18n/glossary/fr.csv` `Start`: "Start" — kept in English as a name, while French Windows says "Démarrer"; check "le menu Start" reads acceptably.
-- `packages/i18n/glossary/fr.csv` `App Store`: "Boutique d’applications" — long; GNOME says "Logiciels", Ubuntu "Logithèque".
-- `packages/i18n/glossary/fr.csv` `Keep awake`: "Maintenir éveillé" — no OS equivalent; check it fits a Quick settings tile.
-- `packages/i18n/glossary/fr.csv` `shut down`: "éteindre" — Windows' power menu says "Arrêter"; check the choice.
-- `packages/i18n/glossary/fr.csv` `undo`: "Annuler" — same word as cancel; check no screen shows both side by side.
+- `packages/i18n/glossary/fr.tbx` `board`: "tableau" — no OS has this mode; check that it reads as a canvas of windows and not as a table or a dashboard.
+- `packages/i18n/glossary/fr.tbx` `tray`: "barre d’état système" — chosen over Windows' "zone de notification" to avoid a clash with the notification center; check it is understood.
+- `packages/i18n/glossary/fr.tbx` `Start`: "Start" — kept in English as a name, while French Windows says "Démarrer"; check "le menu Start" reads acceptably.
+- `packages/i18n/glossary/fr.tbx` `App Store`: "Boutique d’applications" — long; GNOME says "Logiciels", Ubuntu "Logithèque".
+- `packages/i18n/glossary/fr.tbx` `Keep awake`: "Maintenir éveillé" — no OS equivalent; check it fits a Quick settings tile.
+- `packages/i18n/glossary/fr.tbx` `shut down`: "éteindre" — Windows' power menu says "Arrêter"; check the choice.
+- `packages/i18n/glossary/fr.tbx` `undo`: "Annuler" — same word as cancel; check no screen shows both side by side.
 - `packages/web/ui/locales/fr/ui.ftl` `ui-split-windows-size`: "{ $size }, dont { $used } utilisés" — "utilisés" is plural; reads oddly for values under 2 GB.
 - `packages/web/ui/locales/fr/ui.ftl` `ui-toast-dismiss`: "Ignorer" — Windows' word for closing a notification; "Fermer" is the alternative.
 - `apps/settings/locales/fr/settings.ftl` `settings-subpage-back`: "Retour à { $page }" — page titles without article, like "Retour à Réseau"; check it reads naturally as a screen-reader label.
@@ -24,9 +24,9 @@ Strings in Luft's French translation that a native speaker should check: terms w
 - `kestrel/ui/locales/fr/system.ftl` `dictation-unsupported-body`: "…la reconnaissance vocale nécessaire pour cette langue ({ $language })…" — check the parenthesis reads naturally.
 - `kestrel/ui/locales/fr/system.ftl` `media-keys-caps-lock-on`: "Verr. Maj activé" — Caps Lock and Num Lock are written « Verr. Maj » and « Verr. Num » everywhere, as Windows does, although many French keyboards print only a padlock arrow; check the key names.
 - `kestrel/ui/locales/fr/system.ftl` `peek-error-declined`: "{ $app } pourra refaire la demande après son redémarrage." — "after it quits" rephrased to avoid agreement with the program name; check the meaning still holds.
-- `kestrel/ui/locales/fr/engine.ftl` `end-session-log-out-user-countdown`: "{ $userName } sera déconnecté automatiquement…" — masculine participle regardless of the person; same for `end-session-log-out-countdown` « Vous serez déconnecté ».
-- `kestrel/ui/locales/fr/engine.ftl` `screenshot-screencasts-folder`: "Enregistrements de l’écran" — folder name follows the glossary term; check it isn't too long next to « Captures d’écran ».
-- `kestrel/ui/locales/fr/engine.ftl` `switch-monitor-join`: "Étendre" — Windows' word for joined displays; check it against Dupliquer, Externe seul and Intégré seul.
+- `kestrel/ui/locales/fr/auth.ftl` `end-session-log-out-user-countdown`: "{ $userName } sera déconnecté automatiquement…" — masculine participle regardless of the person; same for `end-session-log-out-countdown` « Vous serez déconnecté ».
+- `kestrel/ui/locales/fr/system.ftl` `screenshot-screencasts-folder`: "Enregistrements de l’écran" — folder name follows the glossary term; check it isn't too long next to « Captures d’écran ».
+- `kestrel/ui/locales/fr/desktop.ftl` `switch-monitor-join`: "Étendre" — Windows' word for joined displays; check it against Dupliquer, Externe seul and Intégré seul.
 - `kestrel/ui/locales/fr/desktop.ftl` `task-view-desktop`: "Espace de travail { $number }" — Windows says « Bureau 1 », but here it names a workspace; check it fits the task view.
 - `kestrel/ui/locales/fr/portal.ftl` `print-paper-executive`: "Exécutive" — paper size names (Lettre US, Légal US, Exécutive, Tabloïd, Statement) vary between CUPS and Windows; check they match French print dialogs.
 - `apps/setup/locales/fr/setup.ftl` `setup-region-intro-guessed`: "Nous avons déduit { $guesses }, modifiez ce qui ne convient pas." — the guess fragments carry their own articles (« la langue et le clavier d’après votre ordinateur »); check the joined sentence with both sources.
@@ -49,7 +49,7 @@ Strings in Luft's French translation that a native speaker should check: terms w
 - `apps/settings/locales/fr/devices.ftl` `settings-display-night-light-warmth`: "Chaleur" — Windows calls this slider « Intensité »; check which is clearer.
 - `apps/settings/locales/fr/protection.ftl` `settings-encryption-progress-minutes`: "Terminé à { $percent }, encore environ { $minutes } minute" — also inserted into `settings-security-encrypting-progress` before « . Vous pouvez continuer… »; check it reads well there.
 - `apps/settings/locales/fr/protection.ftl` `settings-protection-remove`: "Supprimer" — one button for passkeys, SSH keys, the startup PIN and the anti-cheat firmware keys; check it suits the PIN, where « Retirer » might read softer.
-- `apps/settings/locales/fr/protection.ftl` `settings-passwords-ssh-added`: "Ajoutée { $when }" — assumes $when reads like « il y a 3 jours » or « hier ». Same for `settings-updates-installed-when` in system.ftl.
+- `apps/settings/locales/fr/protection.ftl` `settings-passwords-ssh-added`: "Ajoutée { $when }" — assumes $when reads like « il y a 3 jours » or « hier ».
 - `apps/settings/locales/fr/personalization.ftl` `settings-appearance-icons-clear`: "Transparentes" — the English "Clear" icon style is ambiguous (glass-like or plain); check against the actual look.
 - `apps/settings/locales/fr/personalization.ftl` `settings-accessibility-typing-assist-count`: "{ $count } activée" — agrees with « aide à la saisie »; check it reads well as a row summary.
 

@@ -1,5 +1,5 @@
 import type Meta from 'gi://Meta';
-import { getGeoclueAgent } from '../../shell/status/location.js';
+import { getGeoclueAgent } from './location.js';
 
 import { ownDictation } from '../dictation/listening.js';
 import { windowAccess } from '../peek/access/grants.js';

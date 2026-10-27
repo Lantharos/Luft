@@ -4,9 +4,9 @@ use std::time::Duration;
 use luft_i18n::t;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
-use specta::Type;
 use ureq::Agent;
 use ureq::tls::{RootCerts, TlsConfig};
+use specta::Type;
 
 use super::signature;
 use crate::L10N;
@@ -316,20 +316,20 @@ mod tests {
             .into()
     }
 
-    const POINTER: &str = r#"{"name": "luft-1.20261020.57-nightly.iso", "version": "1.20261020.57-nightly", "size": 4096, "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}"#;
-    const CHECKSUM: &str = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  luft-1.20261020.57-nightly.iso\n";
-    const OTHER_CHECKSUM: &str = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb  luft-1.20261020.57-nightly.iso\n";
+    const POINTER: &str = r#"{"name": "luft-1.1-nightly.21.iso", "version": "1.1-nightly.21", "size": 4096, "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}"#;
+    const CHECKSUM: &str = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  luft-1.1-nightly.21.iso\n";
+    const OTHER_CHECKSUM: &str = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb  luft-1.1-nightly.21.iso\n";
 
     #[test]
     fn the_newest_iso_is_found_through_its_folders_pointer() {
         let downloads = published(&[
             ("nightly/latest.json", POINTER),
-            ("nightly/luft-1.20261020.57-nightly.iso.sha256", CHECKSUM),
+            ("nightly/luft-1.1-nightly.21.iso.sha256", CHECKSUM),
         ]);
         let located = locate_at(&plain_agent(), &downloads, None, Channel::Nightly).unwrap();
         assert_eq!(
             located.iso,
-            format!("{downloads}/nightly/luft-1.20261020.57-nightly.iso")
+            format!("{downloads}/nightly/luft-1.1-nightly.21.iso")
         );
         assert_eq!(located.size, 4096);
         assert_eq!(located.checksum, [0xaa; 32]);
@@ -339,10 +339,7 @@ mod tests {
     fn a_pointer_that_disagrees_with_the_checksum_file_is_refused() {
         let downloads = published(&[
             ("nightly/latest.json", POINTER),
-            (
-                "nightly/luft-1.20261020.57-nightly.iso.sha256",
-                OTHER_CHECKSUM,
-            ),
+            ("nightly/luft-1.1-nightly.21.iso.sha256", OTHER_CHECKSUM),
         ]);
         assert!(locate_at(&plain_agent(), &downloads, None, Channel::Nightly).is_err());
     }
@@ -351,7 +348,7 @@ mod tests {
     fn an_unsigned_checksum_is_refused_once_there_is_a_key() {
         let downloads = published(&[
             ("nightly/latest.json", POINTER),
-            ("nightly/luft-1.20261020.57-nightly.iso.sha256", CHECKSUM),
+            ("nightly/luft-1.1-nightly.21.iso.sha256", CHECKSUM),
         ]);
         let key = Some("RWQuKaSbHEMaG0cGBcTRjFj81Fysjto7YETokGzKqzy6t4/CiyKPriyV");
         assert!(locate_at(&plain_agent(), &downloads, key, Channel::Nightly).is_err());
@@ -362,12 +359,12 @@ mod tests {
         let downloads = published(&[
             (
                 "1/latest.json",
-                r#"{"name": "luft-1.20261101.0.iso", "version": "1.20261101.0", "size": 2048, "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}"#,
+                r#"{"name": "luft-1.1.iso", "version": "1.1", "size": 2048, "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}"#,
             ),
-            ("1/luft-1.20261101.0.iso.sha256", CHECKSUM),
+            ("1/luft-1.1.iso.sha256", CHECKSUM),
         ]);
         let located = locate_at(&plain_agent(), &downloads, None, Channel::Latest).unwrap();
-        assert_eq!(located.iso, format!("{downloads}/1/luft-1.20261101.0.iso"));
+        assert_eq!(located.iso, format!("{downloads}/1/luft-1.1.iso"));
         assert_eq!(located.size, 2048);
     }
 
@@ -379,7 +376,7 @@ mod tests {
 
     #[test]
     fn the_checksum_file_names_the_digest_first() {
-        let line = format!("{}  luft-1.20261020.57-nightly.iso\n", "ab".repeat(32));
+        let line = format!("{}  luft-1.1-nightly.21.iso\n", "ab".repeat(32));
         assert_eq!(parse_checksum(&line), Some([0xab; 32]));
         assert_eq!(parse_checksum("not a checksum"), None);
         assert_eq!(

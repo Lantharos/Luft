@@ -24,6 +24,7 @@ lock-screen-larger-text = Більший текст
 lock-screen-suspend = Сплячий режим
 lock-screen-restart = Перезавантажити…
 lock-screen-power-off = Вимкнути…
+lock-inhibit-reason = Kestrel має заблокувати екран
 
 ## Keyring and passphrase prompts. Apps usually supply their own text; these are the defaults
 
@@ -67,3 +68,85 @@ passkeys-ok = OK
 passkeys-use-this-computer = Використати цей комп’ютер
 passkeys-fingerprint-unavailable = Щоб продовжити, введіть пароль.
 passkeys-wrong-password = Неправильний пароль. Спробуйте ще раз.
+
+## Sign-in prompt
+
+auth-prompt-password = Пароль
+auth-prompt-username = Ім’я користувача
+auth-prompt-back = Назад
+auth-prompt-submit = Надіслати
+auth-prompt-wrong-password = Неправильний пароль
+auth-prompt-failed = Не вдалося. Спробуйте ще раз.
+fingerprint-not-recognized = Відбиток пальця не розпізнано
+
+## Administrator authentication
+
+polkit-title = Потрібна автентифікація
+polkit-administrator = Адміністратор
+polkit-password = Пароль
+polkit-cancel = Скасувати
+polkit-authenticate = Підтвердити
+polkit-failed = Не вдалося. Спробуйте ще раз.
+
+## Log out, power off and restart dialog
+
+end-session-log-out-user = Вихід: { $userName }
+end-session-log-out-title = Вийти
+end-session-log-out-user-countdown = { $seconds ->
+    [one] { $userName }: автоматичний вихід через { $seconds } секунду
+    [few] { $userName }: автоматичний вихід через { $seconds } секунди
+    [many] { $userName }: автоматичний вихід через { $seconds } секунд
+   *[other] { $userName }: автоматичний вихід через { $seconds } секунди
+}
+end-session-log-out-countdown = { $seconds ->
+    [one] Автоматичний вихід через { $seconds } секунду
+    [few] Автоматичний вихід через { $seconds } секунди
+    [many] Автоматичний вихід через { $seconds } секунд
+   *[other] Автоматичний вихід через { $seconds } секунди
+}
+end-session-log-out-button = Вийти
+end-session-power-off-title = Вимкнути
+end-session-power-off-updates-title = Встановити оновлення й вимкнути
+end-session-power-off-countdown = { $seconds ->
+    [one] Комп’ютер автоматично вимкнеться через { $seconds } секунду
+    [few] Комп’ютер автоматично вимкнеться через { $seconds } секунди
+    [many] Комп’ютер автоматично вимкнеться через { $seconds } секунд
+   *[other] Комп’ютер автоматично вимкнеться через { $seconds } секунди
+}
+end-session-power-off-button = Вимкнути
+end-session-restart-title = Перезавантажити
+end-session-restart-updates-title = Встановити оновлення й перезавантажити
+end-session-restart-countdown = { $seconds ->
+    [one] Комп’ютер автоматично перезавантажиться через { $seconds } секунду
+    [few] Комп’ютер автоматично перезавантажиться через { $seconds } секунди
+    [many] Комп’ютер автоматично перезавантажиться через { $seconds } секунд
+   *[other] Комп’ютер автоматично перезавантажиться через { $seconds } секунди
+}
+end-session-restart-button = Перезавантажити
+end-session-update-restart-title = Перезавантажити і встановити оновлення
+end-session-update-restart-countdown = { $seconds ->
+    [one] Комп’ютер автоматично перезавантажиться і встановить оновлення через { $seconds } секунду
+    [few] Комп’ютер автоматично перезавантажиться і встановить оновлення через { $seconds } секунди
+    [many] Комп’ютер автоматично перезавантажиться і встановить оновлення через { $seconds } секунд
+   *[other] Комп’ютер автоматично перезавантажиться і встановить оновлення через { $seconds } секунди
+}
+end-session-update-restart-button = Перезавантажити і встановити
+end-session-install-updates = Встановити наявні оновлення
+end-session-install-version = Встановити версію { $version }
+end-session-version-nightly = { $release } нічна збірка { $number }
+end-session-low-battery = Низький заряд акумулятора: перед встановленням оновлень під’єднайте живлення
+end-session-busy-apps = Деякі програми зайняті або мають незбережені зміни
+end-session-other-users = У системі є інші користувачі
+end-session-cancel = Скасувати
+end-session-boot-options = Параметри завантаження
+end-session-remote-user = { $userName } (віддалено)
+end-session-console-user = { $userName } (консоль)
+
+## Lock screen clock
+
+lock-clock-swipe-up = Проведіть угору
+lock-clock-click-or-press = Клацніть або натисніть будь-яку клавішу
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-unlock = Вікно розблокування

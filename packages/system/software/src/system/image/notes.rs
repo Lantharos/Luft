@@ -1,10 +1,11 @@
-use std::cmp::Ordering;
 use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
 use crate::http;
+
+use super::version::newer;
 
 const DOWNLOADS: &str = "https://get.luft.computer";
 
@@ -70,20 +71,9 @@ pub fn between(channel: &str, installed: &str, offered: &str) -> Option<Vec<Sect
     merge(gathered)
 }
 
-fn numbers(version: &str) -> Vec<u64> {
-    version
-        .split(['.', '-'])
-        .map_while(|part| part.parse().ok())
-        .collect()
-}
-
-fn newer(version: &str, than: &str) -> bool {
-    numbers(version).cmp(&numbers(than)) == Ordering::Greater
-}
-
 #[cfg(test)]
 mod tests {
-    use super::{Area, Section, merge, newer};
+    use super::{Area, Section, merge};
 
     fn section(area: Area, title: &str, changes: &[&str]) -> Section {
         Section {
@@ -91,15 +81,6 @@ mod tests {
             title: title.into(),
             changes: changes.iter().map(|&change| change.into()).collect(),
         }
-    }
-
-    #[test]
-    fn compares_versions_by_their_numbers() {
-        assert!(newer("1.20261022.60", "1.20261022.57"));
-        assert!(newer("1.20261101.3", "1.20261022.57"));
-        assert!(newer("1.20261022.57", "1.20261020.57-nightly"));
-        assert!(!newer("1.20261022.57", "1.20261022.57"));
-        assert!(!newer("1.20261020.9", "1.20261022.57"));
     }
 
     #[test]

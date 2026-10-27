@@ -13,6 +13,8 @@ garbage.
 
 Actors with a clip are now left out of culling, like actors with
 effects: they paint fully and hide nothing below them.
+
+Upstream-Status: forwardable
 ---
  src/compositor/meta-cullable.c | 5 +++++
  1 file changed, 5 insertions(+)

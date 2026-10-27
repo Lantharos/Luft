@@ -130,25 +130,10 @@ settings-updates-downloading = Téléchargement des mises à jour…
 settings-updates-rolling-back = Préparation de la version précédente…
 settings-updates-switching-nvidia = Téléchargement du pilote NVIDIA…
 settings-updates-switching-standard = Téléchargement de l’image standard…
-settings-updates-elsewhere-refresh-by = { $app } recherche des mises à jour
-settings-updates-elsewhere-download-by = { $app } télécharge des mises à jour
-settings-updates-elsewhere-update-by = { $app } installe des mises à jour
-settings-updates-elsewhere-update = Installation de mises à jour en cours
-settings-updates-elsewhere-install-by = { $app } installe des logiciels
-settings-updates-elsewhere-install = Installation de logiciels en cours
-settings-updates-elsewhere-remove-by = { $app } supprime des logiciels
-settings-updates-elsewhere-remove = Suppression de logiciels en cours
-settings-updates-elsewhere-change-by = { $app } modifie des logiciels
-settings-updates-elsewhere-change = Modification de logiciels en cours
-settings-updates-elsewhere-wait = Vous pourrez rechercher des mises à jour une fois l’opération terminée
-settings-updates-ready = Les mises à jour sont prêtes à être installées
-settings-updates-available = { $count ->
-    [one] { $count } mise à jour disponible
-   *[other] { $count } mises à jour disponibles
-}
 settings-updates-up-to-date = Votre système est à jour
 settings-updates-version = Version { $version }
 settings-updates-version-new = Une nouvelle version
+settings-version-nightly = { $release } Nightly { $number }
 settings-updates-returning = Prêt à revenir à la version { $version }
 settings-updates-returning-unversioned = Prêt à revenir à la version précédente
 settings-updates-nvidia-ready = Le pilote NVIDIA est prêt
@@ -157,13 +142,11 @@ settings-updates-version-available = La version { $version } est disponible
 settings-updates-version-available-new = Une nouvelle version est disponible
 settings-updates-version-staged = La version { $version } est prête à être installée
 settings-updates-version-staged-new = Une nouvelle version est prête à être installée
-settings-updates-restart-install-them = Redémarrez pour les installer. Votre ordinateur sera de nouveau prêt dans quelques minutes.
 settings-updates-restart-return = Redémarrez pour terminer le retour en arrière.
 settings-updates-restart-switch = Redémarrez pour terminer. Votre ordinateur sera de nouveau prêt dans quelques minutes.
 settings-updates-restart-install-it = Redémarrez pour l’installer. Votre ordinateur sera de nouveau prêt dans quelques minutes.
 settings-updates-last-checked = Dernière vérification : { $when }
 settings-updates-never-checked = Jamais vérifié
-settings-updates-installed-when = Mises à jour installées { $when }
 settings-updates-stop = Arrêter
 settings-updates-check = Vérifier maintenant
 settings-updates-checking-button = Vérification…
@@ -190,37 +173,7 @@ settings-updates-firmware-restart = Se termine au redémarrage
 settings-updates-firmware-installing = Installation…
 settings-updates-firmware-update = Mettre à jour
 settings-updates-firmware-failed = Impossible de mettre à jour le micrologiciel
-settings-updates-failed = Les dernières mises à jour n’ont pas pu être installées
-settings-updates-failed-description = Votre système n’a pas été modifié
-settings-updates-includes = { $parts ->
-    [security] Comprend des correctifs de sécurité
-    [kernel] Comprend un nouveau noyau Linux
-    [drivers] Comprend des pilotes mis à jour
-    [security-kernel] Comprend des correctifs de sécurité et un nouveau noyau Linux
-    [security-drivers] Comprend des correctifs de sécurité et des pilotes mis à jour
-    [kernel-drivers] Comprend un nouveau noyau Linux et des pilotes mis à jour
-    [security-kernel-drivers] Comprend des correctifs de sécurité, un nouveau noyau Linux et des pilotes mis à jour
-   *[other] Corrections et améliorations dans tout le système
-}
-settings-updates-count-size = { $count ->
-    [one] { $count } mise à jour · { $size }
-   *[other] { $count } mises à jour · { $size }
-}
-settings-updates-restart-and-install = Redémarrer et installer
 settings-updates-download = Télécharger
-settings-updates-see-included = Voir le contenu
-settings-updates-included = Contenu
-settings-updates-included-description = { $count ->
-    [one] { $count } mise à jour du système, de ses pilotes et de ses bibliothèques
-   *[other] { $count } mises à jour du système, de ses pilotes et de ses bibliothèques
-}
-settings-updates-security-fix = Correctif de sécurité
-settings-updates-done = Terminé
-settings-updates-area-kernel = Noyau Linux
-settings-updates-area-drivers = Pilotes et micrologiciels
-settings-updates-area-desktop = Bureau
-settings-updates-area-core = Système de base
-settings-updates-area-other = Bibliothèques et outils
 settings-updates-released = Publication : { $when }
 settings-updates-improvements = Corrections et améliorations dans tout le système
 settings-updates-download-size = { $size } à télécharger
@@ -247,6 +200,7 @@ settings-updates-variant-standard = Passer à l’image standard
 settings-updates-variant-nvidia-reason = Toute la puissance de votre carte graphique NVIDIA
 settings-updates-variant-standard-reason = Plus légère, car cet ordinateur n’a pas de carte graphique NVIDIA
 settings-updates-switch = Changer
+settings-updates-done = Terminé
 
 ## About
 
@@ -270,6 +224,8 @@ settings-about-other-system = Supprimez-le pour donner ses { $size } à Luft
 settings-about-remove = Supprimer
 settings-about-software = Logiciel
 settings-about-system = Système
+settings-about-version = Luft { $version }
+settings-about-built = Compilée le { $date }
 settings-about-desktop = Bureau
 settings-about-kernel = Noyau
 settings-about-hostname = Nom d’hôte

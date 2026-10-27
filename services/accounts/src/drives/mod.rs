@@ -54,6 +54,7 @@ impl Default for Live {
 
 pub struct Drives {
     pub watcher: Watcher,
+    pub changed: tokio::sync::Notify,
     live: Mutex<HashMap<String, Live>>,
     locks: Mutex<HashMap<String, Arc<tokio::sync::Mutex<()>>>>,
 }
@@ -62,6 +63,7 @@ impl Drives {
     pub fn new(watcher: Watcher) -> Self {
         Self {
             watcher,
+            changed: tokio::sync::Notify::new(),
             live: Mutex::default(),
             locks: Mutex::default(),
         }

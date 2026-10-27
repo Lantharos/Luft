@@ -57,13 +57,11 @@ const PAGE_SIZE = 48;
 function toApp(hit: Hit): CatalogApp {
 	return {
 		key: `flathub:${hit.app_id}`,
-		origin: 'flathub',
 		id: hit.app_id,
 		name: hit.name,
 		summary: hit.summary,
 		icon: hit.icon,
-		developer: hit.developer_name ?? null,
-		package: null
+		developer: hit.developer_name ?? null
 	};
 }
 
@@ -108,7 +106,6 @@ export async function details(id: string): Promise<AppDetails> {
 	]);
 	const release = appstream.releases?.find((entry) => entry.type !== 'development') ?? appstream.releases?.[0];
 	return {
-		origin: 'flathub',
 		id,
 		name: appstream.name,
 		summary: appstream.summary,
@@ -124,7 +121,6 @@ export async function details(id: string): Promise<AppDetails> {
 		downloadSize: summary.download_size ?? null,
 		installedSize: summary.installed_size ?? null,
 		verified: verified(appstream.metadata),
-		package: null,
 		permissions: permissions(summary)
 	};
 }

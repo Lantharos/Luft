@@ -1,8 +1,6 @@
 name: Image
 
 on:
-  push:
-    tags: ["v*"]
   schedule:
     - cron: "0 2 * * *"
   workflow_dispatch:
@@ -12,32 +10,13 @@ on:
         type: boolean
         default: false
       promote:
-        description: Release this tested nightly as the stable version, such as 1.20261020.57
-        type: string
-        default: ""
-
-concurrency:
-  group: image-${{ (github.ref_type == 'tag' || inputs.promote) && 'promote' || github.ref }}
-  cancel-in-progress: ${{ github.ref_type != 'tag' && !inputs.promote }}
-
-permissions:
-  contents: read
-  packages: write
-
-env:
-  IMAGE: ghcr.io/lantharos/luft
-  CACHE: ghcr.io/lantharos/luft-cache
-  LUFT_PARTS: ghcr.io/lantharos/luft-parts
-  FEDORA: "45"
-  MAJOR: "1"
-  DOWNLOADS: https://get.luft.computer
-
-jobs:
-  promote:
     name: Promote
-    if: github.ref_type == 'tag' || inputs.promote
+    if: inputs.promote
     runs-on: ubuntu-26.04
     timeout-minutes: 15
+    permissions:
+      contents: write
+      packages: write
     outputs:
       version: ${{ steps.release.outputs.version }}
       revision: ${{ steps.release.outputs.revision }}
@@ -56,40 +35,73 @@ jobs:
         with:
           bun-version: latest
 
+      - uses: imjasonh/setup-crane@v0.7
+
       - uses: ./.github/actions/registry
 
       - name: Release the tested nightly
         id: release
         env:
-          PROMOTED: ${{ inputs.promote || github.ref_name }}
+          NIGHTLY: ${{ inputs.promote }}
+          GH_TOKEN: ${{ github.token }}
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
           R2_BUCKET: ${{ secrets.R2_BUCKET }}
           AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: auto
         run: |
-          version="${PROMOTED#v}"
-          [[ "$version" =~ ^$MAJOR\.[0-9]{8}\.[0-9]+$ ]] || { echo "$PROMOTED doesn't name a Luft $MAJOR nightly." >&2; exit 1; }
-          revision="$(skopeo inspect --retry-times 3 --format '{{index .Labels "org.opencontainers.image.revision"}}' "docker://$IMAGE:$version")"
-          [[ -n "$revision" ]] || { echo "$version doesn't say which commit it was built from." >&2; exit 1; }
-          previous="$(skopeo inspect --retry-times 3 --format '{{index .Labels "org.opencontainers.image.version"}}' "docker://$IMAGE:$MAJOR" || true)"
-          nightly="$version"
-          while [[ -n "$nightly" && "$(printf '%s\n' "$previous" "$nightly" | sort -V | tail -n 1)" != "$previous" ]]; do
+          [[ "$NIGHTLY" =~ ^($MAJOR\.([0-9]+))-nightly\.[0-9]+$ ]] || { echo "$NIGHTLY doesn't name a Luft $MAJOR nightly." >&2; exit 1; }
+          version="${BASH_REMATCH[1]}" release="${BASH_REMATCH[2]}"
+          revision="$(skopeo inspect --retry-times 3 --format '{{index .Labels "org.opencontainers.image.revision"}}' "docker://$IMAGE:$NIGHTLY")"
+          [[ -n "$revision" ]] || { echo "$NIGHTLY doesn't say which commit it was built from." >&2; exit 1; }
+          tagged="$(git ls-remote --tags --refs origin "v$version" | cut -f1)"
+          if [[ -z "$tagged" ]]; then
+            last="$(git ls-remote --tags --refs origin "v$MAJOR.*" | sed -nE "s|.*refs/tags/v$MAJOR\.([0-9]+)$|\1|p" | sort -n | tail -n 1)"
+            (( release == ${last:-0} + 1 )) || { echo "$NIGHTLY leads to $version, but Luft $MAJOR.$(( ${last:-0} + 1 )) is next." >&2; exit 1; }
+            gh api "repos/$GITHUB_REPOSITORY/git/refs" -f "ref=refs/tags/v$version" -f "sha=$revision" > /dev/null
+          elif [[ "$tagged" != "$revision" ]]; then
+            echo "v$version is already out, from $tagged." >&2
+            exit 1
+          fi
+          previous="" since=""
+          if ((release > 1)); then
+            previous="$MAJOR.$((release - 1))"
+            since="$(curl -sf "$DOWNLOADS/$MAJOR/notes/$previous.json" | jq -r .nightly)"
+          fi
+          nightly="$NIGHTLY"
+          while [[ -n "$nightly" && "$nightly" != "$since" ]]; do
             entry="$(curl -sf "$DOWNLOADS/nightly/notes/$nightly.json")" || break
             jq -c .notes <<<"$entry"
             nightly="$(jq -r '.previous // empty' <<<"$entry")"
           done > "$RUNNER_TEMP/nightlies.jsonl"
           notes="$(bun .github/scripts/changelog/index.ts merge < "$RUNNER_TEMP/nightlies.jsonl")"
+          key="$(mktemp -d)"
+          trap 'rm -rf "$key"' EXIT
+          printf '%s\n' "$COSIGN_PRIVATE_KEY" > "$key/private"
+          printf '%s' "$COSIGN_PASSWORD" > "$key/password"
           sudo install -Dm644 -t /usr/share/pki/containers os/image/files/usr/share/pki/containers/luft.pub
           install -Dm644 -t ~/.config/containers/registries.d os/image/files/etc/containers/registries.d/luft.yaml
           for suffix in "" -nvidia; do
-            digest="$(skopeo inspect --retry-times 3 --format '{{.Digest}}' "docker://$IMAGE:$version$suffix")"
+            stable="$IMAGE:$version$suffix"
+            digest="$(skopeo inspect --retry-times 3 --format '{{.Digest}}' "docker://$IMAGE:$NIGHTLY$suffix")"
             skopeo copy --retry-times 3 --preserve-digests --policy os/image/files/etc/containers/policy.json \
-              "docker://$IMAGE@$digest" "docker://$IMAGE:$MAJOR$suffix"
+              "docker://$IMAGE@$digest" "docker://$stable"
+            crane config "$stable" |
+              jq -c --arg version "$version" --arg notes "$notes" \
+                '.config.Labels += {"org.opencontainers.image.version": $version, "com.lantharos.release-notes": $notes}' |
+              crane edit config "$stable" > /dev/null
+            crane manifest "$stable" |
+              jq -c --arg version "$version" '.annotations += {"org.opencontainers.image.version": $version}' |
+              crane edit manifest "$stable" > /dev/null
+            digest="$(skopeo inspect --retry-times 3 --format '{{.Digest}}' "docker://$stable")"
+            skopeo copy --retry-times 3 --preserve-digests --sign-by-sigstore-private-key "$key/private" \
+              --sign-passphrase-file "$key/password" "docker://$IMAGE@$digest" "docker://$IMAGE:$MAJOR$suffix"
             echo "${suffix#-}${suffix:+-}digest=$digest" >> "$GITHUB_OUTPUT"
           done
-          jq -n --arg version "$version" --arg previous "$previous" --argjson notes "$notes" \
-            '{version: $version, previous: (if $previous == "" then null else $previous end), notes: $notes}' |
+          jq -n --arg version "$version" --arg previous "$previous" --arg nightly "$NIGHTLY" --argjson notes "$notes" \
+            '{version: $version, previous: (if $previous == "" then null else $previous end), nightly: $nightly, notes: $notes}' |
             aws s3 cp - "s3://$R2_BUCKET/$MAJOR/notes/$version.json" --endpoint-url "https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com" \
               --content-type application/json --only-show-errors
           {
@@ -161,11 +173,11 @@ jobs:
           cosign verify --key luft.pub --insecure-ignore-tlog=true $IMAGE@$DIGEST
           \`\`\`
           EOF
-          gh release create "v$VERSION" --repo "$GITHUB_REPOSITORY" --target "$REVISION" --title "Luft $VERSION" \
+          gh release create "v$VERSION" --repo "$GITHUB_REPOSITORY" --verify-tag --title "Luft $VERSION" \
             --notes-file body.md CHANGES.md "$iso.sha256" "$iso.sha256.minisig"
 
   plan:
-    if: github.ref_type != 'tag' && !inputs.promote
+    if: "!inputs.promote"
     runs-on: ubuntu-26.04
     timeout-minutes: 15
     outputs:
@@ -208,7 +220,12 @@ jobs:
             echo "skip=1" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          version="$MAJOR.$(date -u +%Y%m%d).${{ github.run_number }}"
+          last="$(git tag --list "v$MAJOR.*" | sed -nE "s/^v$MAJOR\.([0-9]+)$/\1/p" | sort -n | tail -n 1)"
+          target="$MAJOR.$(( ${last:-0} + 1 ))"
+          current="$(jq -r '."org.opencontainers.image.version" // empty' <<<"$nightly")"
+          number=1
+          [[ "$current" =~ ^"$target"-nightly\.([0-9]+)$ ]] && number=$(( BASH_REMATCH[1] + 1 ))
+          version="$target-nightly.$number"
           tags=("$MAJOR-nightly" "$version")
           {
             echo "version=$version"

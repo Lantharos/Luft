@@ -1,5 +1,4 @@
 use luft_app::block_on;
-use luft_software::system::System;
 use luft_software::system::repositories::{self, Described};
 use luft_software::system::system_packages::{self, Origin, Repository};
 
@@ -190,12 +189,6 @@ fn list() -> Exit {
 }
 
 pub fn run(arguments: &Arguments) -> Exit {
-    if System::current() != System::Image {
-        eprintln!(
-            "Software sources for system packages are for Luft. On Fedora, use dnf config-manager."
-        );
-        return Exit::Usage;
-    }
     let (verb, rest) = arguments.words.split_first().expect("repo needs a word");
     match (verb.as_str(), rest) {
         ("add", [source]) => add(source, arguments.yes),

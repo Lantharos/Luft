@@ -64,3 +64,45 @@ snap-zone = Allinja fiż-żona ta’ { $width }% × { $height }%
 title-bar-minimize = Imminimizza
 title-bar-maximize = Immassimizza
 title-bar-close = Agħlaq
+
+## Window resizing
+
+window-resize-size = { $width } × { $height }
+
+## App not responding
+
+close-dialog-title = “{ $appName }” mhix qed tirrispondi
+close-dialog-description = Tista’ tistenna ftit biex tkompli, jew iġġegħel lill-app tingħalaq għal kollox
+close-dialog-force-quit = Agħlaq bilfors
+close-dialog-wait = Stenna
+
+## Display mode switcher, keep each label under about 15 characters
+
+switch-monitor-mirror = Mera
+switch-monitor-join = Għaqqad skrins
+switch-monitor-external-only = Estern biss
+switch-monitor-built-in-only = Intern biss
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-windows = Twieqi
+
+## Window menu, opened by right-clicking a window's title bar
+
+title-bar-menu-screenshot = Ħu screenshot
+title-bar-menu-hide = Aħbi
+title-bar-menu-restore = Irrestawra
+title-bar-menu-maximize = Immassimizza
+title-bar-menu-move = Ċaqlaq
+title-bar-menu-resize = Ibdel id-daqs
+title-bar-menu-always-on-top = Dejjem fuq kollox
+title-bar-menu-always-on-visible-workspace = Dejjem fuq l-ispazju tax-xogħol viżibbli
+title-bar-menu-workspace-left = Ressaq lejn l-ispazju tax-xogħol fuq ix-xellug
+title-bar-menu-workspace-right = Ressaq lejn l-ispazju tax-xogħol fuq il-lemin
+title-bar-menu-workspace-up = Ressaq lejn l-ispazju tax-xogħol ta’ fuq
+title-bar-menu-workspace-down = Ressaq lejn l-ispazju tax-xogħol ta’ taħt
+title-bar-menu-monitor-up = Ressaq lejn l-iskrin ta’ fuq
+title-bar-menu-monitor-down = Ressaq lejn l-iskrin ta’ taħt
+title-bar-menu-monitor-left = Ressaq lejn l-iskrin fuq ix-xellug
+title-bar-menu-monitor-right = Ressaq lejn l-iskrin fuq il-lemin
+title-bar-menu-close = Agħlaq

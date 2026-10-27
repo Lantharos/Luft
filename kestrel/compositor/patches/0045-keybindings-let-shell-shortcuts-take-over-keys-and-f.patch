@@ -20,6 +20,8 @@ A binding the shell added now keeps its keys when a built-in binding
 with the same keys is indexed after it, and takes them over without a
 warning when it comes later. Once the shell removes its binding, the
 table is rebuilt and the built-in binding gets its keys back.
+
+Upstream-Status: luft-only shortcut handling for Kestrel's shell modes
 ---
  src/core/keybindings-private.h | 11 ++++--
  src/core/keybindings.c         | 61 +++++++++++++++++++++++++++-------

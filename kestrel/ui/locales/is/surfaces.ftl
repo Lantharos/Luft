@@ -137,6 +137,10 @@ notifications-media-previous = Fyrra lag
 notifications-media-next = Næsta lag
 notifications-media-play = Spila
 notifications-media-pause = Gera hlé
+messages-unknown-app = Óþekkt forrit
+messages-reply = Svara
+messages-reply-placeholder = Skrifaðu svar
+messages-reply-send = Senda
 
 ## Calendar
 
@@ -174,3 +178,17 @@ emoji-skin-tone-medium-light = Meðalljós húðlitur
 emoji-skin-tone-medium = Miðlungs húðlitur
 emoji-skin-tone-medium-dark = Meðaldökkur húðlitur
 emoji-skin-tone-dark = Dökkur húðlitur
+
+## System notifications
+
+messages-system-source = Kerfi
+
+## On-screen keyboard
+
+osk-keyboard-settings = Lyklaborðsstillingar
+osk-letters-key = ABC
+
+## Media player controls
+
+mpris-unknown-artist = Óþekktur flytjandi
+mpris-unknown-title = Óþekktur titill

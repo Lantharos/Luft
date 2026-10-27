@@ -16,8 +16,8 @@ Until the first release, the ISO is the newest nightly build, and a computer ins
 Each ISO has a checksum next to it, with `.sha256` added to its name, and that checksum is signed with [minisign](https://jedisct1.github.io/minisign/) in a `.sha256.minisig` file. To check a download:
 
 ```sh
-minisign -Vm luft-1.20261020.57-nightly.iso.sha256 -P RWRz9rCK/H8Drrze/f851hxNNOH/D42kpyTMpXV7DT7QoUdCZySZwRWA
-sha256sum -c luft-1.20261020.57-nightly.iso.sha256
+minisign -Vm luft-1.1-nightly.21.iso.sha256 -P RWRz9rCK/H8Drrze/f851hxNNOH/D42kpyTMpXV7DT7QoUdCZySZwRWA
+sha256sum -c luft-1.1-nightly.21.iso.sha256
 ```
 
 The signature's trusted comment is the ISO's file name, so a checksum can't pass for another version.
@@ -28,7 +28,7 @@ Use a stick of 4 GB or more. Everything on it is erased.
 
 - [Meet Luft](/start/meet-luft/#making-a-usb-stick) downloads and writes it in one go, on Windows and Linux, and can add Luft to a Ventoy stick.
 - Fedora Media Writer, balenaEtcher, or Rufus in DD mode work too.
-- On Linux: `sudo dd if=luft-1.20261020.57-nightly.iso of=/dev/sdX bs=4M oflag=direct status=progress`, with the stick's device in place of `/dev/sdX`.
+- On Linux: `sudo dd if=luft-1.1-nightly.21.iso of=/dev/sdX bs=4M oflag=direct status=progress`, with the stick's device in place of `/dev/sdX`.
 
 ## Start from it
 

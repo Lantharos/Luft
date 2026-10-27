@@ -7,3 +7,7 @@ The image build rebuilds Fedora's xdg-desktop-portal package with these patches 
 | `secret-service-apps.patch` | The Secret portal tells a Flatpak app that can reach the Secret Service itself, through `--talk-name=org.freedesktop.secrets` or the whole session bus, that it isn't there. libsecret keeps passwords in a file locked with the Secret portal whenever the portal answers, while its Secret Service API still searches the Secret Service, so Chromium and Electron apps such as Obsidian, VS Code and Slack saved their encryption key in the file, didn't find it in the Secret Service and made a new one on every start. Without the portal those apps keep everything in Luft Keyring, which knows them by their app ID. Apps without that permission, such as Vesktop and Discord, keep using the portal |
 
 The patch is against xdg-desktop-portal 1.22.1, the version Fedora 45 ships.
+
+## Upstream
+
+Upstream xdg-desktop-portal still answers the Secret portal for every Flatpak app. [UPSTREAM.md](UPSTREAM.md) is the pull request drafted for it, against its main branch.

@@ -7,6 +7,8 @@ Subject: [PATCH 19/53] core: let the shell check and restore inhibited
 The shell can bind its own action to the shortcut that restores inhibited
 shortcuts, and needs to know whether a window inhibits them to keep
 restoring them first.
+
+Upstream-Status: luft-only API for Kestrel's shell that GNOME Shell has no use for
 ---
  src/core/window-private.h |  5 -----
  src/core/window.c         | 16 ++++++++++++++++

@@ -1,4 +1,4 @@
-import * as SystemActions from '../../shell/system/systemActions.js';
+import * as SystemActions from '../../session/actions/systemActions.js';
 
 import type { MenuEntry } from '../../desktop/menus/contextMenus.js';
 import { t } from '../../shared/i18n/index.js';

@@ -63,3 +63,45 @@ snap-zone = Přichytit do oblasti { $width } % × { $height } %
 title-bar-minimize = Minimalizovat
 title-bar-maximize = Maximalizovat
 title-bar-close = Zavřít
+
+## Window resizing
+
+window-resize-size = { $width } × { $height }
+
+## App not responding
+
+close-dialog-title = Aplikace { $appName } neodpovídá
+close-dialog-description = Můžete chvíli počkat, jestli bude aplikace pokračovat, nebo ji vynuceně ukončit
+close-dialog-force-quit = Vynutit ukončení
+close-dialog-wait = Počkat
+
+## Display mode switcher, keep each label under about 15 characters
+
+switch-monitor-mirror = Zrcadlit
+switch-monitor-join = Rozšířit
+switch-monitor-external-only = Jen externí
+switch-monitor-built-in-only = Jen vestavěný
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-windows = Okna
+
+## Window menu, opened by right-clicking a window's title bar
+
+title-bar-menu-screenshot = Pořídit snímek obrazovky
+title-bar-menu-hide = Skrýt
+title-bar-menu-restore = Obnovit
+title-bar-menu-maximize = Maximalizovat
+title-bar-menu-move = Přesunout
+title-bar-menu-resize = Změnit velikost
+title-bar-menu-always-on-top = Vždy navrchu
+title-bar-menu-always-on-visible-workspace = Vždy na viditelném pracovním prostoru
+title-bar-menu-workspace-left = Přesunout na pracovní prostor vlevo
+title-bar-menu-workspace-right = Přesunout na pracovní prostor vpravo
+title-bar-menu-workspace-up = Přesunout na pracovní prostor nahoře
+title-bar-menu-workspace-down = Přesunout na pracovní prostor dole
+title-bar-menu-monitor-up = Přesunout na displej nahoře
+title-bar-menu-monitor-down = Přesunout na displej dole
+title-bar-menu-monitor-left = Přesunout na displej vlevo
+title-bar-menu-monitor-right = Přesunout na displej vpravo
+title-bar-menu-close = Zavřít

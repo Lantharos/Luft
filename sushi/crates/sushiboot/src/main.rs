@@ -48,10 +48,10 @@ fn note_attempt(catalog: &Catalog, chosen: usize, failed: Option<usize>, attempt
         let counted = catalog.on_trial(chosen, attempts);
         attempts.start(image, counted);
     }
-    if let Some((_, release)) = failed.and_then(|failed| catalog.entries[failed].image())
+    if let Some((image, _)) = failed.and_then(|failed| catalog.entries[failed].image())
         && failed != Some(chosen)
     {
-        attempts::went_back(&release.version);
+        attempts::went_back(image);
     }
 }
 

@@ -1,6 +1,6 @@
 # Macedonian style guide
 
-How Luft speaks Macedonian. The [glossary](../../packages/i18n/glossary/mk.csv) has the agreed terms; Weblate shows them next to every string.
+How Luft speaks Macedonian. The [glossary](../../packages/i18n/glossary/mk.tbx) has the agreed terms; Weblate shows them next to every string.
 
 ## Address and tone
 

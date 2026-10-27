@@ -1,0 +1,1643 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE martif PUBLIC "ISO 12200:1999A//DTD MARTIF core (DXFcdV04)//EN" "TBXcdv04.dtd">
+<martif type="TBX" xml:lang="en">
+  <martifHeader>
+    <fileDesc>
+      <sourceDesc>
+        <p>Luft glossary for is</p>
+      </sourceDesc>
+    </fileDesc>
+  </martifHeader>
+  <text>
+    <body>
+      <termEntry id="1">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Luft</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Luft</term>
+            <note from="translator">Not translated. Name of the operating system</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="2">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Kestrel</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Kestrel</term>
+            <note from="translator">Not translated. Name of Luft's desktop</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="3">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Rover</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Rover</term>
+            <note from="translator">Not translated. App name, the file manager</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="4">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Magpie</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Magpie</term>
+            <note from="translator">Not translated. App name, the viewer for photos, videos, music and PDFs</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="5">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Mailman</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Mailman</term>
+            <note from="translator">Not translated. App name, the mail app</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="6">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Draft</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Draft</term>
+            <note from="translator">Not translated. App name, the text and code editor</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="7">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Tern</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Tern</term>
+            <note from="translator">Not translated. App name, the terminal</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="8">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Schelf</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Schelf</term>
+            <note from="translator">Not translated. App name, the app store</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="9">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Barometer</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Barometer</term>
+            <note from="translator">Not translated. App name, the system monitor</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="10">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Keys</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Keys</term>
+            <note from="translator">Not translated. App name, makes keyboard layouts and input methods</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="11">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Meet Luft</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Meet Luft</term>
+            <note from="translator">Not translated. Name of the Windows app that prepares a PC for Luft</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="12">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Helium</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Helium</term>
+            <note from="translator">Not translated. Name of the default browser</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="13">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Flatpak</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Flatpak</term>
+            <note from="translator">Not translated. App packaging format</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="14">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Secure Boot</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Secure Boot</term>
+            <note from="translator">Not translated. UEFI feature, named this way in every PC's firmware setup</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="15">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>TPM</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>TPM</term>
+            <note from="translator">Not translated. Trusted Platform Module; in the interface usually called the security chip</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="16">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Bluetooth</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Bluetooth</term>
+            <note from="translator">Not translated. Trademark; compounds take a hyphen: Bluetooth-tæki</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="17">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Wi-Fi</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Wi-Fi</term>
+            <note from="translator">Wireless network; written Wi-Fi as in Windows and macOS, compounds Wi-Fi-net; in running text also þráðlaust net</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="18">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Settings</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Stillingar</term>
+            <note from="translator">App name and the general word for settings; feminine plural, definite stillingarnar</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="19">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Disks</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Diskar</term>
+            <note from="translator">App name for the disk utility; masculine plural</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="20">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Install Luft</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Setja upp Luft</term>
+            <note from="translator">App name of the installer</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="21">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Network Sign-In</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Innskráning á net</term>
+            <note from="translator">App that opens the sign-in page of a public Wi-Fi</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="22">
+        <langSet xml:lang="en">
+          <tig>
+            <term>File Manager</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Skráastjóri</term>
+            <note from="translator">Generic name of Rover</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="23">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Media Viewer</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Margmiðlunarskoðari</term>
+            <note from="translator">Generic name of Magpie</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="24">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Mail</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Póstur</term>
+            <note from="translator">Generic name of Mailman; what macOS and iOS call their mail app</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="25">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Text Editor</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Textaritill</term>
+            <note from="translator">Generic name of Draft</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="26">
+        <langSet xml:lang="en">
+          <tig>
+            <term>App Store</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Forritaverslun</term>
+            <note from="translator">Generic name of Schelf</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="27">
+        <langSet xml:lang="en">
+          <tig>
+            <term>System Monitor</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Kerfisvakt</term>
+            <note from="translator">Generic name of Barometer</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="28">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Keyboard Layouts</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Lyklaborðsuppsetningar</term>
+            <note from="translator">Generic name of Keys</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="29">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Start</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Upphaf</term>
+            <note from="translator">The menu opened with Super or the Luft mark; a name, neuter, capitalized; in running text and after prepositions say upphafsvalmynd (feminine): Festa á upphafsvalmynd</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="30">
+        <langSet xml:lang="en">
+          <tig>
+            <term>board</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>tafla</term>
+            <note from="translator">Mode that lays a workspace's windows side by side on an endless canvas; feminine, taflan, plural töflur</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="31">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Quick settings</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Flýtistillingar</term>
+            <note from="translator">Panel of switches and sliders opened from the status icons; feminine plural, flýtistillingarnar</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="32">
+        <langSet xml:lang="en">
+          <tig>
+            <term>notification center</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>tilkynningamiðstöð</term>
+            <note from="translator">Panel with notifications, media and the calendar, opened from the clock; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="33">
+        <langSet xml:lang="en">
+          <tig>
+            <term>All windows</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Allir gluggar</term>
+            <note from="translator">The task view: every window of a workspace and the workspaces, Super+Tab</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="34">
+        <langSet xml:lang="en">
+          <tig>
+            <term>snap</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>raða</term>
+            <note from="translator">verb: put a window into a half, third or quarter of the screen; raða glugga; noun uppröðun</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="35">
+        <langSet xml:lang="en">
+          <tig>
+            <term>snap layout</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>gluggauppröðun</term>
+            <note from="translator">One of the arrangements offered by Super+Z; feminine, plural gluggauppraðanir</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="36">
+        <langSet xml:lang="en">
+          <tig>
+            <term>snap group</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>gluggahópur</term>
+            <note from="translator">Windows snapped side by side that come back together; masculine, plural gluggahópar</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="37">
+        <langSet xml:lang="en">
+          <tig>
+            <term>taskbar</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>verkstika</term>
+            <note from="translator">The bar along the bottom of the screen; feminine, verkstikan</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="38">
+        <langSet xml:lang="en">
+          <tig>
+            <term>tray</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>kerfisbakki</term>
+            <note from="translator">Taskbar button holding the icons of apps running in the background; masculine, kerfisbakkinn</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="39">
+        <langSet xml:lang="en">
+          <tig>
+            <term>status icons</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>stöðutákn</term>
+            <note from="translator">Taskbar icons for network, sound and battery that open Quick settings; neuter plural</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="40">
+        <langSet xml:lang="en">
+          <tig>
+            <term>lock screen</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>læsiskjár</term>
+            <note from="translator">Screen shown while the session is locked; masculine, læsiskjárinn</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="41">
+        <langSet xml:lang="en">
+          <tig>
+            <term>login screen</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>innskráningarskjár</term>
+            <note from="translator">Screen listing the people on the computer before anyone signs in; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="42">
+        <langSet xml:lang="en">
+          <tig>
+            <term>workspace</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>vinnusvæði</term>
+            <note from="translator">One of up to ten separate desktops; neuter, plural vinnusvæði</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="43">
+        <langSet xml:lang="en">
+          <tig>
+            <term>desktop</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>skjáborð</term>
+            <note from="translator">The background area behind the windows; also the whole desktop environment; neuter</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="44">
+        <langSet xml:lang="en">
+          <tig>
+            <term>wallpaper</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>bakgrunnsmynd</term>
+            <note from="translator">Picture behind the desktop; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="45">
+        <langSet xml:lang="en">
+          <tig>
+            <term>accent color</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>áherslulitur</term>
+            <note from="translator">Color taken from the wallpaper and used for highlights; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="46">
+        <langSet xml:lang="en">
+          <tig>
+            <term>dark style</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Dökkt útlit</term>
+            <note from="translator">Quick settings tile that switches between light and dark; neuter</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="47">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Night light</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Næturljós</term>
+            <note from="translator">Warmer screen colors in the evening; neuter</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="48">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Do Not Disturb</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Ekki trufla</term>
+            <note from="translator">Holds back notification banners and sounds; a name in sentences: kveiktu á Ekki trufla</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="49">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Airplane mode</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Flugstilling</term>
+            <note from="translator">Turns off every radio; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="50">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Keep awake</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Halda vakandi</term>
+            <note from="translator">Keeps the screen on for a while</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="51">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Power mode</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Orkustilling</term>
+            <note from="translator">Performance, Balanced or Power saver; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="52">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Power saver</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Orkusparnaður</term>
+            <note from="translator">Power mode; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="53">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Dictation</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Raddinnsláttur</term>
+            <note from="translator">Typing by speaking; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="54">
+        <langSet xml:lang="en">
+          <tig>
+            <term>clipboard</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>klippiborð</term>
+            <note from="translator">Holds what was copied; neuter, klippiborðið</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="55">
+        <langSet xml:lang="en">
+          <tig>
+            <term>clipboard history</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>ferill klippiborðs</term>
+            <note from="translator">List of recently copied items, Super+V</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="56">
+        <langSet xml:lang="en">
+          <tig>
+            <term>emoji</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>tjákn</term>
+            <note from="translator">noun; neuter, plural tjákn</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="57">
+        <langSet xml:lang="en">
+          <tig>
+            <term>screenshot</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>skjámynd</term>
+            <note from="translator">Picture of the screen; feminine, plural skjámyndir</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="58">
+        <langSet xml:lang="en">
+          <tig>
+            <term>screen recording</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>skjáupptaka</term>
+            <note from="translator">Video of the screen; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="59">
+        <langSet xml:lang="en">
+          <tig>
+            <term>privacy indicator</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>persónuverndarvísir</term>
+            <note from="translator">Taskbar icon shown while the camera, microphone, location or screen is in use; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="60">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Full access</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Fullur aðgangur</term>
+            <note from="translator">Schelf switch that lets a Flatpak app leave its sandbox: all files, clipboard in the background, other apps' windows; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="61">
+        <langSet xml:lang="en">
+          <tig>
+            <term>sandbox</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>sandkassi</term>
+            <note from="translator">Isolation Flatpak apps run in; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="62">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Keyring</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>lyklakippa</term>
+            <note from="translator">Luft Keyring, which keeps passwords, tokens and keys; feminine, lyklakippan</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="63">
+        <langSet xml:lang="en">
+          <tig>
+            <term>passkey</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>aðgangslykill</term>
+            <note from="translator">Sign-in key that replaces a password on websites; masculine, plural aðgangslyklar</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="64">
+        <langSet xml:lang="en">
+          <tig>
+            <term>recovery key</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>endurheimtarlykill</term>
+            <note from="translator">Long code that unlocks an encrypted disk when the TPM can't; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="65">
+        <langSet xml:lang="en">
+          <tig>
+            <term>security chip</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>öryggiskubbur</term>
+            <note from="translator">How the interface names the TPM; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="66">
+        <langSet xml:lang="en">
+          <tig>
+            <term>device encryption</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>dulritun tækis</term>
+            <note from="translator">Encryption of the whole disk; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="67">
+        <langSet xml:lang="en">
+          <tig>
+            <term>encryption</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>dulritun</term>
+            <note from="translator">noun; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="68">
+        <langSet xml:lang="en">
+          <tig>
+            <term>signed startup</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Undirrituð ræsing</term>
+            <note from="translator">Startup where every step is checked against Luft's signature; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="69">
+        <langSet xml:lang="en">
+          <tig>
+            <term>firmware</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>fastbúnaður</term>
+            <note from="translator">Software built into the hardware; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="70">
+        <langSet xml:lang="en">
+          <tig>
+            <term>window</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>gluggi</term>
+            <note from="translator">noun; masculine, plural gluggar</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="71">
+        <langSet xml:lang="en">
+          <tig>
+            <term>pin</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>festa</term>
+            <note from="translator">verb: keep an app on the taskbar or in Start; festa á verkstiku</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="72">
+        <langSet xml:lang="en">
+          <tig>
+            <term>unpin</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>losa</term>
+            <note from="translator">verb; losa af verkstiku</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="73">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Pin to taskbar</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Festa á verkstiku</term>
+            <note from="translator">Menu item</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="74">
+        <langSet xml:lang="en">
+          <tig>
+            <term>open</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>opna</term>
+            <note from="translator">verb</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="75">
+        <langSet xml:lang="en">
+          <tig>
+            <term>close</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>loka</term>
+            <note from="translator">verb; takes the dative: loka glugganum</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="76">
+        <langSet xml:lang="en">
+          <tig>
+            <term>remove</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>fjarlægja</term>
+            <note from="translator">verb</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="77">
+        <langSet xml:lang="en">
+          <tig>
+            <term>delete</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>eyða</term>
+            <note from="translator">verb; takes the dative: eyða skránni</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="78">
+        <langSet xml:lang="en">
+          <tig>
+            <term>turn on</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>kveikja á</term>
+            <note from="translator">verb, for a feature or setting; virkja for settings that are not switches</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="79">
+        <langSet xml:lang="en">
+          <tig>
+            <term>turn off</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>slökkva á</term>
+            <note from="translator">verb, for a feature or setting; afvirkja for settings that are not switches</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="80">
+        <langSet xml:lang="en">
+          <tig>
+            <term>sign in</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>skrá inn</term>
+            <note from="translator">verb; noun innskráning; button Skrá inn</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="81">
+        <langSet xml:lang="en">
+          <tig>
+            <term>sign out</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>skrá út</term>
+            <note from="translator">verb, also Log out; noun útskráning</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="82">
+        <langSet xml:lang="en">
+          <tig>
+            <term>restart</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>endurræsa</term>
+            <note from="translator">verb</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="83">
+        <langSet xml:lang="en">
+          <tig>
+            <term>shut down</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>slökkva</term>
+            <note from="translator">verb, also Power off; power menu item Slökkva</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="84">
+        <langSet xml:lang="en">
+          <tig>
+            <term>suspend</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Svefn</term>
+            <note from="translator">verb and power menu item, also Sleep; menu item Svefn, verb setja í svefn</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="85">
+        <langSet xml:lang="en">
+          <tig>
+            <term>hibernate</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Dvali</term>
+            <note from="translator">verb and power menu item; menu item Dvali, verb setja í dvala</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="86">
+        <langSet xml:lang="en">
+          <tig>
+            <term>lock</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>læsa</term>
+            <note from="translator">verb</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="87">
+        <langSet xml:lang="en">
+          <tig>
+            <term>unlock</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>taka úr lás</term>
+            <note from="translator">verb; button Taka úr lás</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="88">
+        <langSet xml:lang="en">
+          <tig>
+            <term>install</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>setja upp</term>
+            <note from="translator">verb; noun uppsetning</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="89">
+        <langSet xml:lang="en">
+          <tig>
+            <term>update</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>uppfæra</term>
+            <note from="translator">verb</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="90">
+        <langSet xml:lang="en">
+          <tig>
+            <term>updates</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>uppfærslur</term>
+            <note from="translator">noun, new versions of Luft or apps; feminine plural; singular uppfærsla</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="91">
+        <langSet xml:lang="en">
+          <tig>
+            <term>cancel</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Hætta við</term>
+            <note from="translator">button</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="92">
+        <langSet xml:lang="en">
+          <tig>
+            <term>save</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>vista</term>
+            <note from="translator">verb</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="93">
+        <langSet xml:lang="en">
+          <tig>
+            <term>allow</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>leyfa</term>
+            <note from="translator">verb</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="94">
+        <langSet xml:lang="en">
+          <tig>
+            <term>forget</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>gleyma</term>
+            <note from="translator">verb, for a saved network or device; takes the dative: gleyma þessu neti</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="95">
+        <langSet xml:lang="en">
+          <tig>
+            <term>share</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>deila</term>
+            <note from="translator">verb</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="96">
+        <langSet xml:lang="en">
+          <tig>
+            <term>search</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>leita</term>
+            <note from="translator">verb and noun; noun: leit</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="97">
+        <langSet xml:lang="en">
+          <tig>
+            <term>set up</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>stilla</term>
+            <note from="translator">verb, for preparing something for use; setja upp is install</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="98">
+        <langSet xml:lang="en">
+          <tig>
+            <term>try again</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Reyna aftur</term>
+            <note from="translator">button</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="99">
+        <langSet xml:lang="en">
+          <tig>
+            <term>undo</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>afturkalla</term>
+            <note from="translator">verb; button: Afturkalla</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="100">
+        <langSet xml:lang="en">
+          <tig>
+            <term>done</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Lokið</term>
+            <note from="translator">button</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="101">
+        <langSet xml:lang="en">
+          <tig>
+            <term>next</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Áfram</term>
+            <note from="translator">button that moves to the next step</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="102">
+        <langSet xml:lang="en">
+          <tig>
+            <term>app</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>forrit</term>
+            <note from="translator">noun, also application; neuter, plural forrit</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="103">
+        <langSet xml:lang="en">
+          <tig>
+            <term>file</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>skrá</term>
+            <note from="translator">noun; feminine, plural skrár</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="104">
+        <langSet xml:lang="en">
+          <tig>
+            <term>folder</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>mappa</term>
+            <note from="translator">noun; feminine, plural möppur</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="105">
+        <langSet xml:lang="en">
+          <tig>
+            <term>trash</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>ruslafata</term>
+            <note from="translator">Where deleted files wait; feminine, ruslafatan</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="106">
+        <langSet xml:lang="en">
+          <tig>
+            <term>device</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>tæki</term>
+            <note from="translator">noun; neuter, plural tæki</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="107">
+        <langSet xml:lang="en">
+          <tig>
+            <term>disk</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>diskur</term>
+            <note from="translator">noun, also drive; masculine; drif (neuter) for a drive you plug in</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="108">
+        <langSet xml:lang="en">
+          <tig>
+            <term>USB stick</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>USB-lykill</term>
+            <note from="translator">noun; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="109">
+        <langSet xml:lang="en">
+          <tig>
+            <term>computer</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>tölva</term>
+            <note from="translator">noun, also PC; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="110">
+        <langSet xml:lang="en">
+          <tig>
+            <term>network</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>net</term>
+            <note from="translator">noun; neuter, netið</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="111">
+        <langSet xml:lang="en">
+          <tig>
+            <term>battery</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>rafhlaða</term>
+            <note from="translator">noun; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="112">
+        <langSet xml:lang="en">
+          <tig>
+            <term>power</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>Orka</term>
+            <note from="translator">Settings page and button for power; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="113">
+        <langSet xml:lang="en">
+          <tig>
+            <term>display</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>skjár</term>
+            <note from="translator">noun, a monitor or built-in screen; also screen; masculine, plural skjáir</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="114">
+        <langSet xml:lang="en">
+          <tig>
+            <term>sound</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>hljóð</term>
+            <note from="translator">noun, the Settings page and audio in general; neuter</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="115">
+        <langSet xml:lang="en">
+          <tig>
+            <term>notification</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>tilkynning</term>
+            <note from="translator">noun; feminine, plural tilkynningar</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="116">
+        <langSet xml:lang="en">
+          <tig>
+            <term>keyboard shortcut</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>flýtilykill</term>
+            <note from="translator">noun; masculine, plural flýtilyklar</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="117">
+        <langSet xml:lang="en">
+          <tig>
+            <term>keyboard layout</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>lyklaborðsuppsetning</term>
+            <note from="translator">noun; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="118">
+        <langSet xml:lang="en">
+          <tig>
+            <term>input method</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>innsláttaraðferð</term>
+            <note from="translator">Turns what you type into something else, such as Compose sequences or word choices; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="119">
+        <langSet xml:lang="en">
+          <tig>
+            <term>touchpad</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>snertiflötur</term>
+            <note from="translator">noun; masculine, plural snertifletir</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="120">
+        <langSet xml:lang="en">
+          <tig>
+            <term>privacy</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>persónuvernd</term>
+            <note from="translator">noun; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="121">
+        <langSet xml:lang="en">
+          <tig>
+            <term>security</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>öryggi</term>
+            <note from="translator">noun; neuter</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="122">
+        <langSet xml:lang="en">
+          <tig>
+            <term>account</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>aðgangur</term>
+            <note from="translator">noun, a user account or online account; masculine, plural aðgangar</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="123">
+        <langSet xml:lang="en">
+          <tig>
+            <term>password</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>lykilorð</term>
+            <note from="translator">noun; neuter, plural lykilorð</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="124">
+        <langSet xml:lang="en">
+          <tig>
+            <term>accessibility</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="is">
+          <tig>
+            <term>aðgengi</term>
+            <note from="translator">noun; neuter</note>
+          </tig>
+        </langSet>
+      </termEntry>
+    </body>
+  </text>
+</martif>

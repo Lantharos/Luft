@@ -12,6 +12,8 @@ tablet mode switch counts as the seat's switch, so touch mode follows
 it exactly as it follows a convertible's hinge. Programs that drive the
 desktop, such as Kestrel's checks, can pinch and swipe over windows and
 fold a computer into a tablet and back.
+
+Upstream-Status: forwardable
 ---
  .../clutter/clutter-virtual-input-device.c    |  84 +++++++++
  .../clutter/clutter-virtual-input-device.h    |  41 +++++

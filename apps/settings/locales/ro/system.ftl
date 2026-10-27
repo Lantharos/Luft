@@ -132,26 +132,10 @@ settings-updates-downloading = Se descarcă actualizările…
 settings-updates-rolling-back = Se pregătește versiunea anterioară…
 settings-updates-switching-nvidia = Se descarcă driverul NVIDIA…
 settings-updates-switching-standard = Se descarcă imaginea standard…
-settings-updates-elsewhere-refresh-by = { $app } caută actualizări
-settings-updates-elsewhere-download-by = Actualizările sunt descărcate de { $app }
-settings-updates-elsewhere-update-by = Actualizările sunt instalate de { $app }
-settings-updates-elsewhere-update = Se instalează actualizări
-settings-updates-elsewhere-install-by = Software-ul este instalat de { $app }
-settings-updates-elsewhere-install = Se instalează software
-settings-updates-elsewhere-remove-by = Software-ul este eliminat de { $app }
-settings-updates-elsewhere-remove = Se elimină software
-settings-updates-elsewhere-change-by = Software-ul este modificat de { $app }
-settings-updates-elsewhere-change = Se modifică software-ul
-settings-updates-elsewhere-wait = Puteți căuta din nou actualizări după ce se termină
-settings-updates-ready = Actualizările sunt gata de instalare
-settings-updates-available = { $count ->
-    [one] Este disponibilă { $count } actualizare
-    [few] Sunt disponibile { $count } actualizări
-   *[other] Sunt disponibile { $count } de actualizări
-}
 settings-updates-up-to-date = Sistemul este actualizat
 settings-updates-version = Versiunea { $version }
 settings-updates-version-new = O versiune nouă
+settings-version-nightly = { $release } Nightly { $number }
 settings-updates-returning = Gata de revenirea la versiunea { $version }
 settings-updates-returning-unversioned = Gata de revenirea la versiunea anterioară
 settings-updates-nvidia-ready = Driverul NVIDIA este gata
@@ -160,13 +144,11 @@ settings-updates-version-available = Versiunea { $version } este disponibilă
 settings-updates-version-available-new = Este disponibilă o versiune nouă
 settings-updates-version-staged = Versiunea { $version } este gata de instalare
 settings-updates-version-staged-new = O versiune nouă este gata de instalare
-settings-updates-restart-install-them = Reporniți pentru a le instala. Computerul revine în câteva minute.
 settings-updates-restart-return = Reporniți pentru a finaliza revenirea.
 settings-updates-restart-switch = Reporniți pentru a finaliza. Computerul revine în câteva minute.
 settings-updates-restart-install-it = Reporniți pentru a o instala. Computerul revine în câteva minute.
 settings-updates-last-checked = Ultima verificare: { $when }
 settings-updates-never-checked = Nu s-a verificat încă
-settings-updates-installed-when = Actualizări instalate: { $when }
 settings-updates-stop = Oprește
 settings-updates-check = Verifică acum
 settings-updates-checking-button = Se verifică…
@@ -194,39 +176,7 @@ settings-updates-firmware-restart = Se finalizează la repornire
 settings-updates-firmware-installing = Se instalează…
 settings-updates-firmware-update = Actualizează
 settings-updates-firmware-failed = Firmware-ul nu a putut fi actualizat
-settings-updates-failed = Ultimele actualizări nu au putut fi instalate
-settings-updates-failed-description = Sistemul a rămas neschimbat
-settings-updates-includes = { $parts ->
-    [security] Include remedieri de securitate
-    [kernel] Include un nou kernel Linux
-    [drivers] Include drivere actualizate
-    [security-kernel] Include remedieri de securitate și un nou kernel Linux
-    [security-drivers] Include remedieri de securitate și drivere actualizate
-    [kernel-drivers] Include un nou kernel Linux și drivere actualizate
-    [security-kernel-drivers] Include remedieri de securitate, un nou kernel Linux și drivere actualizate
-   *[other] Remedieri și îmbunătățiri în tot sistemul
-}
-settings-updates-count-size = { $count ->
-    [one] { $count } actualizare · { $size }
-    [few] { $count } actualizări · { $size }
-   *[other] { $count } de actualizări · { $size }
-}
-settings-updates-restart-and-install = Repornește și instalează
 settings-updates-download = Descarcă
-settings-updates-see-included = Vezi ce include
-settings-updates-included = Ce include
-settings-updates-included-description = { $count ->
-    [one] { $count } actualizare pentru sistem, drivere și biblioteci
-    [few] { $count } actualizări pentru sistem, drivere și biblioteci
-   *[other] { $count } de actualizări pentru sistem, drivere și biblioteci
-}
-settings-updates-security-fix = Remediere de securitate
-settings-updates-done = Gata
-settings-updates-area-kernel = Kernel Linux
-settings-updates-area-drivers = Drivere și firmware
-settings-updates-area-desktop = Desktop
-settings-updates-area-core = Sistem de bază
-settings-updates-area-other = Biblioteci și instrumente
 settings-updates-released = Publicată: { $when }
 settings-updates-improvements = Remedieri și îmbunătățiri în tot sistemul
 settings-updates-download-size = De descărcat: { $size }
@@ -253,6 +203,7 @@ settings-updates-variant-standard = Treci la imaginea standard
 settings-updates-variant-nvidia-reason = Viteză maximă de la placa grafică NVIDIA
 settings-updates-variant-standard-reason = Mai mică, deoarece acest computer nu are placă grafică NVIDIA
 settings-updates-switch = Comută
+settings-updates-done = Gata
 
 ## About
 
@@ -276,6 +227,8 @@ settings-about-other-system = Eliminați-l pentru a oferi sistemului Luft spați
 settings-about-remove = Elimină
 settings-about-software = Software
 settings-about-system = Sistem
+settings-about-version = Luft { $version }
+settings-about-built = Construită pe { $date }
 settings-about-desktop = Desktop
 settings-about-kernel = Kernel
 settings-about-hostname = Nume gazdă

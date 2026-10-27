@@ -130,25 +130,10 @@ settings-updates-downloading = A transferir atualizações…
 settings-updates-rolling-back = A preparar a versão anterior…
 settings-updates-switching-nvidia = A transferir o controlador da NVIDIA…
 settings-updates-switching-standard = A transferir a imagem padrão…
-settings-updates-elsewhere-refresh-by = { $app } está a procurar atualizações
-settings-updates-elsewhere-download-by = { $app } está a transferir atualizações
-settings-updates-elsewhere-update-by = { $app } está a instalar atualizações
-settings-updates-elsewhere-update = A instalar atualizações
-settings-updates-elsewhere-install-by = { $app } está a instalar software
-settings-updates-elsewhere-install = A instalar software
-settings-updates-elsewhere-remove-by = { $app } está a remover software
-settings-updates-elsewhere-remove = A remover software
-settings-updates-elsewhere-change-by = { $app } está a alterar software
-settings-updates-elsewhere-change = A alterar software
-settings-updates-elsewhere-wait = Pode voltar a procurar atualizações quando terminar
-settings-updates-ready = As atualizações estão prontas a instalar
-settings-updates-available = { $count ->
-    [one] Há { $count } atualização disponível
-   *[other] Há { $count } atualizações disponíveis
-}
 settings-updates-up-to-date = O sistema está atualizado
 settings-updates-version = Versão { $version }
 settings-updates-version-new = Uma nova versão
+settings-version-nightly = { $release } Nightly { $number }
 settings-updates-returning = Pronto para voltar à versão { $version }
 settings-updates-returning-unversioned = Pronto para voltar à versão anterior
 settings-updates-nvidia-ready = O controlador da NVIDIA está pronto
@@ -157,13 +142,11 @@ settings-updates-version-available = A versão { $version } está disponível
 settings-updates-version-available-new = Está disponível uma nova versão
 settings-updates-version-staged = A versão { $version } está pronta a instalar
 settings-updates-version-staged-new = Uma nova versão está pronta a instalar
-settings-updates-restart-install-them = Reinicie para as instalar. O computador volta dentro de alguns minutos.
 settings-updates-restart-return = Reinicie para concluir o regresso à versão anterior.
 settings-updates-restart-switch = Reinicie para concluir. O computador volta dentro de alguns minutos.
 settings-updates-restart-install-it = Reinicie para a instalar. O computador volta dentro de alguns minutos.
 settings-updates-last-checked = Última verificação: { $when }
 settings-updates-never-checked = Ainda não verificado
-settings-updates-installed-when = Atualizações instaladas { $when }
 settings-updates-stop = Parar
 settings-updates-check = Verificar agora
 settings-updates-checking-button = A verificar…
@@ -190,37 +173,7 @@ settings-updates-firmware-restart = Termina quando reiniciar
 settings-updates-firmware-installing = A instalar…
 settings-updates-firmware-update = Atualizar
 settings-updates-firmware-failed = Não foi possível atualizar o firmware
-settings-updates-failed = Não foi possível instalar as últimas atualizações
-settings-updates-failed-description = O sistema ficou como estava
-settings-updates-includes = { $parts ->
-    [security] Inclui correções de segurança
-    [kernel] Inclui um novo kernel Linux
-    [drivers] Inclui controladores atualizados
-    [security-kernel] Inclui correções de segurança e um novo kernel Linux
-    [security-drivers] Inclui correções de segurança e controladores atualizados
-    [kernel-drivers] Inclui um novo kernel Linux e controladores atualizados
-    [security-kernel-drivers] Inclui correções de segurança, um novo kernel Linux e controladores atualizados
-   *[other] Correções e melhorias em todo o sistema
-}
-settings-updates-count-size = { $count ->
-    [one] { $count } atualização · { $size }
-   *[other] { $count } atualizações · { $size }
-}
-settings-updates-restart-and-install = Reiniciar e instalar
 settings-updates-download = Transferir
-settings-updates-see-included = Ver o que inclui
-settings-updates-included = O que inclui
-settings-updates-included-description = { $count ->
-    [one] { $count } atualização para o sistema, os controladores e as bibliotecas
-   *[other] { $count } atualizações para o sistema, os controladores e as bibliotecas
-}
-settings-updates-security-fix = Correção de segurança
-settings-updates-done = Concluído
-settings-updates-area-kernel = Kernel Linux
-settings-updates-area-drivers = Controladores e firmware
-settings-updates-area-desktop = Ambiente de trabalho
-settings-updates-area-core = Sistema base
-settings-updates-area-other = Bibliotecas e ferramentas
 settings-updates-released = Lançada { $when }
 settings-updates-improvements = Correções e melhorias em todo o sistema
 settings-updates-download-size = { $size } a transferir
@@ -247,6 +200,7 @@ settings-updates-variant-standard = Mudar para a imagem padrão
 settings-updates-variant-nvidia-reason = Desempenho máximo da placa gráfica NVIDIA
 settings-updates-variant-standard-reason = Mais pequena, já que este computador não tem placa gráfica NVIDIA
 settings-updates-switch = Mudar
+settings-updates-done = Concluído
 
 ## About
 
@@ -270,6 +224,8 @@ settings-about-other-system = Remova-o para dar os seus { $size } ao Luft
 settings-about-remove = Remover
 settings-about-software = Software
 settings-about-system = Sistema
+settings-about-version = Luft { $version }
+settings-about-built = Compilada a { $date }
 settings-about-desktop = Ambiente de trabalho
 settings-about-kernel = Kernel
 settings-about-hostname = Nome do anfitrião

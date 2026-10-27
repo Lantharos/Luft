@@ -4,17 +4,17 @@ Strings in Luft's Turkish translation that a native speaker should check: terms 
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/tr.csv` `Start`: "Başlat" — translated as in Windows; check that the name reads well in Luft, where it is also a taskbar button.
-- `packages/i18n/glossary/tr.csv` `board`: "tahta" — no settled term; pano is taken by the clipboard. Check it reads naturally in "Tahta görünümü" and "tahtada".
-- `packages/i18n/glossary/tr.csv` `snap`: "yasla", "yaslama düzeni", "yaslama grubu" — check against the current Windows 11 wording, which may say "Ek düzenleri".
-- `packages/i18n/glossary/tr.csv` `Install Luft`: "Luft’u yükle" — an imperative as an app name; "Luft kurulumu" is the alternative if a noun reads better in Start.
-- `packages/i18n/glossary/tr.csv` `Network Sign-In`: "Ağda oturum açma" — check it is clear as an app name.
-- `packages/i18n/glossary/tr.csv` `wallpaper`: "duvar kâğıdı" — dictionary spelling; many apps write "duvar kağıdı" without the circumflex.
-- `packages/i18n/glossary/tr.csv` `security chip`: "güvenlik çipi" — Windows Security says "güvenlik işlemcisi"; check which people recognize.
-- `packages/i18n/glossary/tr.csv` `firmware`: "üretici yazılımı" — Windows' word, but many people simply say "firmware".
-- `packages/i18n/glossary/tr.csv` `trash`: "Çöp kutusu" — Windows says "Geri Dönüşüm Kutusu", macOS "Çöp Sepeti", GNOME "Çöp"; check the choice.
-- `packages/i18n/glossary/tr.csv` `System Monitor`: "Sistem izleyici" — GNOME says "Sistem Gözetmeni".
-- `packages/i18n/glossary/tr.csv` `set up`: "kur" — "ayarla" fits some contexts better (setting up an account versus installing).
+- `packages/i18n/glossary/tr.tbx` `Start`: "Başlat" — translated as in Windows; check that the name reads well in Luft, where it is also a taskbar button.
+- `packages/i18n/glossary/tr.tbx` `board`: "tahta" — no settled term; pano is taken by the clipboard. Check it reads naturally in "Tahta görünümü" and "tahtada".
+- `packages/i18n/glossary/tr.tbx` `snap`: "yasla", "yaslama düzeni", "yaslama grubu" — check against the current Windows 11 wording, which may say "Ek düzenleri".
+- `packages/i18n/glossary/tr.tbx` `Install Luft`: "Luft’u yükle" — an imperative as an app name; "Luft kurulumu" is the alternative if a noun reads better in Start.
+- `packages/i18n/glossary/tr.tbx` `Network Sign-In`: "Ağda oturum açma" — check it is clear as an app name.
+- `packages/i18n/glossary/tr.tbx` `wallpaper`: "duvar kâğıdı" — dictionary spelling; many apps write "duvar kağıdı" without the circumflex.
+- `packages/i18n/glossary/tr.tbx` `security chip`: "güvenlik çipi" — Windows Security says "güvenlik işlemcisi"; check which people recognize.
+- `packages/i18n/glossary/tr.tbx` `firmware`: "üretici yazılımı" — Windows' word, but many people simply say "firmware".
+- `packages/i18n/glossary/tr.tbx` `trash`: "Çöp kutusu" — Windows says "Geri Dönüşüm Kutusu", macOS "Çöp Sepeti", GNOME "Çöp"; check the choice.
+- `packages/i18n/glossary/tr.tbx` `System Monitor`: "Sistem izleyici" — GNOME says "Sistem Gözetmeni".
+- `packages/i18n/glossary/tr.tbx` `set up`: "kur" — "ayarla" fits some contexts better (setting up an account versus installing).
 - `packages/web/ui/locales/tr/ui.ftl` `ui-fingerprint-place`: "Sensöre { $finger } yerleştirin." — the .inline forms carry the possessive and accusative (sağ işaret parmağınızı); check both sentences with every finger.
 - `packages/web/ui/locales/tr/ui.ftl` `ui-select-placeholder`: "Seçin" — the only polite imperative used as a label; "Seçiniz" or "Seçim yapın" are the alternatives.
 - `packages/web/ui/locales/tr/ui.ftl` `ui-split-windows-size`: "{ $size }, { $used } dolu" — check "dolu" reads clearly for space holding files.
@@ -31,9 +31,9 @@ Strings in Luft's Turkish translation that a native speaker should check: terms 
 - `kestrel/ui/locales/tr/surfaces.ftl` `start-search-wifi-on`: "Wi-Fi’ı aç" — suffix follows the "vay fay" pronunciation, as Windows does; confirm.
 - `kestrel/ui/locales/tr/system.ftl` `privacy-indicator`: "Kullanımda: { $things }" — depends on how the list items are joined (ve); check the result reads well.
 - `kestrel/ui/locales/tr/system.ftl` `health-gpu-reset-body`: "Bilgisayarınız kendiliğinden yeniden başladı: bugün, { $time }. …" — built to avoid a suffix on the time; check it doesn't feel stiff.
-- `kestrel/ui/locales/tr/engine.ftl` `caffeine-until`: "{ $time } saatine kadar" — avoids a suffix on the time placeable; check it sounds natural under the tile.
-- `kestrel/ui/locales/tr/engine.ftl` `network-menu-tether`: "Paylaşım" — short tile title for Bluetooth tethering; check it is clear enough.
-- `kestrel/ui/locales/tr/engine.ftl` `switch-monitor-join`: "Genişlet" — Windows' word for extending the desktop across displays.
+- `kestrel/ui/locales/tr/system.ftl` `caffeine-until`: "{ $time } saatine kadar" — avoids a suffix on the time placeable; check it sounds natural under the tile.
+- `kestrel/ui/locales/tr/system.ftl` `network-menu-tether`: "Paylaşım" — short tile title for Bluetooth tethering; check it is clear enough.
+- `kestrel/ui/locales/tr/desktop.ftl` `switch-monitor-join`: "Genişlet" — Windows' word for extending the desktop across displays.
 - `kestrel/ui/locales/tr/portal.ftl` `portal-unknown-app-subject`: "Uygulama" — sentences with { $appName } avoid "uygulaması" after the placeable so this stand-in doesn't produce "Uygulama uygulaması"; check the sentences still read well with real app names.
 - `apps/setup/locales/tr/setup.ftl` `setup-region-intro-guessed`: "Luft’u kuralım. Bazı seçimleri tahmin ettik: { $guesses }. Yanlış olanı değiştirin." — with guesses like "dil ve klavye bilgisayarınıza göre"; check the assembled sentence with two guesses joined by "ve".
 - `apps/setup/locales/tr/setup.ftl` `setup-account-full-name-example`: "Cahit Arf" — a well-known Turkish mathematician, in the spirit of Ada Lovelace; confirm.

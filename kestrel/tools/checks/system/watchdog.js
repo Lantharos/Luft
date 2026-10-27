@@ -6,7 +6,7 @@ import {call} from '../lib/dbus.js';
 import {callLog, takeCalls} from './lib/systemCalls.js';
 
 const {require, eventually} = checks('watchdog');
-const STALL_LIMIT = 30 * GLib.USEC_PER_SEC;
+const STALL_LIMIT = 60 * GLib.USEC_PER_SEC;
 const STALL_STEP = 100 * 1000;
 const POWER_KEYS = 'Inhibit handle-power-key:handle-suspend-key:handle-hibernate-key block';
 

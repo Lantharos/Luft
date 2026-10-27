@@ -39,3 +39,34 @@ keys-print-screen = Print Screen
 
 # Shown instead of a time on notifications from the last few minutes
 date-just-now = Just now
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+# The taskbar
+ctrl-alt-tab-panel = Panel
+
+## System notifications
+
+# Notification shown when a developer tool turns off app sandboxing restrictions
+unsafe-mode-title = System was put in unsafe mode
+unsafe-mode-body = Apps now have unrestricted access
+# Notification button, turns unsafe mode off again
+unsafe-mode-undo = Undo
+privileged-user-title = Logged in as a privileged user
+privileged-user-body = Running a session as a privileged user should be avoided for security reasons. If possible, you should log in as a normal user.
+
+## Starting programs
+
+# Notification title when a program can't be started. $command is the command that failed
+spawn-failed = Execution of “{ $command }” failed:
+
+## Text field context menu
+
+entry-menu-copy = Copy
+entry-menu-paste = Paste
+# Menu item that reveals the characters typed into a password field
+entry-menu-show-text = Show Text
+# Menu item that hides the characters typed into a password field again
+entry-menu-hide-text = Hide Text
+# Warning under password fields
+entry-caps-lock-on = Caps Lock is on

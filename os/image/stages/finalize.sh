@@ -10,14 +10,13 @@ write_os_release() {
 NAME="Luft"
 ID=luft
 ID_LIKE=fedora
-VERSION="$version"
+VERSION="$major"
 VERSION_ID=$fedora
 VERSION_CODENAME=alize
 PRETTY_NAME="Luft $codename"
 LOGO=luft
 ANSI_COLOR="0;39"
 IMAGE_ID=$variant
-IMAGE_VERSION=$version
 PLATFORM_ID="platform:f$fedora"
 DEFAULT_HOSTNAME="luft"
 HOME_URL="https://github.com/Lantharos/Luft"
@@ -108,7 +107,7 @@ clean_build_state() {
 [[ "${BASH_SOURCE[0]}" == "$0" ]] || return 0
 
 variant="$1"
-version="$2"
+major="$2"
 base="$3"
 write_os_release
 write_base_image

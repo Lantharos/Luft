@@ -1,7 +1,5 @@
-import { events as sabineEvents } from '@lantharos/sabine';
 import { appearance } from '@luft/ui';
-import { commands } from '#lib/bindings.js';
-import { fedora } from '#lib/fedora/fedora.svelte.js';
+import { backend } from '#lib/bridge/index.js';
 import { library } from './library.svelte';
 import { navigation, type Route } from './navigation.svelte';
 import { operations } from './operations.svelte';
@@ -42,15 +40,13 @@ function openPage(argumentsList: (string | null)[]) {
 }
 
 export async function start() {
-	const state = await commands.appState();
-	fedora.available = state.fedora;
+	const state = await backend.appState();
 	appearance.start(state);
 	openPage([state.page]);
 	openFiles(state.files);
-	sabineEvents.singleInstance(async ({ arguments: list, workingDirectory }) => {
+	backend.onActivated(async ({ arguments: list, workingDirectory }) => {
 		openPage(list);
-		openFiles(await commands.appActivationFiles({ arguments: list, workingDirectory }));
+		openFiles(await backend.activationFiles(list, workingDirectory));
 	});
-	void fedora.load();
 	await Promise.all([operations.start(), library.start()]);
 }

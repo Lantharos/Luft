@@ -4,15 +4,15 @@ Strings in Luft's Norwegian Bokmål translation that a native speaker should che
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/nb.csv` `snap`: "dokke, dokkeoppsett, dokkegruppe" — Windows uses «feste» for both snap and pin; check whether «dokke» reads naturally or another verb is better.
-- `packages/i18n/glossary/nb.csv` `board`: "tavle" — check it reads as the endless-canvas mode, not a whiteboard app.
-- `packages/i18n/glossary/nb.csv` `tray`: "systemstatusfelt" — Windows' name for the notification area; check it is understood for a button that holds background apps.
-- `packages/i18n/glossary/nb.csv` `sign in`: "logge inn / logge ut", noun «pålogging» — chosen over Windows' «logge på / logge av»; check the mix with «påloggingsskjerm» feels natural.
-- `packages/i18n/glossary/nb.csv` `notification`: "varsel, plural varsler" — check against «varsling», which some apps use.
-- `packages/i18n/glossary/nb.csv` `Media Viewer`: "Medievisning" — generic name of Magpie; check whether «Mediefremviser» or another name is more familiar.
-- `packages/i18n/glossary/nb.csv` `USB stick`: "minnepinne" — check against «USB-pinne» in installer contexts.
-- `packages/i18n/glossary/nb.csv` `accent color`: "aksentfarge" — Windows says «uthevingsfarge»; check which people know better.
-- `packages/i18n/glossary/nb.csv` `passkey`: "tilgangsnøkkel" — Apple uses «passnøkkel»; check which is more widespread.
+- `packages/i18n/glossary/nb.tbx` `snap`: "dokke, dokkeoppsett, dokkegruppe" — Windows uses «feste» for both snap and pin; check whether «dokke» reads naturally or another verb is better.
+- `packages/i18n/glossary/nb.tbx` `board`: "tavle" — check it reads as the endless-canvas mode, not a whiteboard app.
+- `packages/i18n/glossary/nb.tbx` `tray`: "systemstatusfelt" — Windows' name for the notification area; check it is understood for a button that holds background apps.
+- `packages/i18n/glossary/nb.tbx` `sign in`: "logge inn / logge ut", noun «pålogging» — chosen over Windows' «logge på / logge av»; check the mix with «påloggingsskjerm» feels natural.
+- `packages/i18n/glossary/nb.tbx` `notification`: "varsel, plural varsler" — check against «varsling», which some apps use.
+- `packages/i18n/glossary/nb.tbx` `Media Viewer`: "Medievisning" — generic name of Magpie; check whether «Mediefremviser» or another name is more familiar.
+- `packages/i18n/glossary/nb.tbx` `USB stick`: "minnepinne" — check against «USB-pinne» in installer contexts.
+- `packages/i18n/glossary/nb.tbx` `accent color`: "aksentfarge" — Windows says «uthevingsfarge»; check which people know better.
+- `packages/i18n/glossary/nb.tbx` `passkey`: "tilgangsnøkkel" — Apple uses «passnøkkel»; check which is more widespread.
 - `kestrel/ui/locales/nb/shell.ftl` `keys-backspace`: "Tilbake" — Norwegian keyboards print an arrow; check whether «Backspace» is the more familiar shortcut label.
 - `packages/web/ui/locales/nb/ui.ftl` `ui-fingerprint-retry`: "Det ble ikke lest skikkelig. Prøv igjen." — check it sounds natural.
 - `packages/web/ui/locales/nb/ui.ftl` `ui-media-unmute`: "Slå på lyd" — check it is clear next to «Demp».
@@ -24,13 +24,13 @@ Strings in Luft's Norwegian Bokmål translation that a native speaker should che
 - `kestrel/ui/locales/nb/system.ftl` `health-gpu-reset-body`: "Datamaskinen startet seg selv på nytt { $date } kl. { $time }." — check that a bare date without «den» reads naturally with the formatted day and month.
 - `kestrel/ui/locales/nb/surfaces.ftl` `start-search-settings-section`: "Innstillinger: { $page }" — chosen to avoid hyphenating a multi-word page title («Strøm og batteri-innstillinger»); check it reads well as a search-result description.
 - `kestrel/ui/locales/nb/surfaces.ftl` `start-folder-ungroup`: "Løs opp mappen" — English says "Ungroup apps"; check this is clear for an app folder in Start.
-- `kestrel/ui/locales/nb/engine.ftl` `network-menu-tethers`: "Internettdeling via Bluetooth" — no settled short term for Bluetooth tethering; may clip as a menu header.
-- `kestrel/ui/locales/nb/engine.ftl` `switch-monitor-join`: "Utvid skjermer" — follows Windows' «Utvid»; check against the 15-character limit context.
-- `kestrel/ui/locales/nb/engine.ftl` `inhibit-shortcuts-title`: "Tillat at hurtigtaster overstyres" — "inhibit shortcuts" has no settled Norwegian term.
+- `kestrel/ui/locales/nb/system.ftl` `network-menu-tethers`: "Internettdeling via Bluetooth" — no settled short term for Bluetooth tethering; may clip as a menu header.
+- `kestrel/ui/locales/nb/desktop.ftl` `switch-monitor-join`: "Utvid skjermer" — follows Windows' «Utvid»; check against the 15-character limit context.
+- `kestrel/ui/locales/nb/system.ftl` `inhibit-shortcuts-title`: "Tillat at hurtigtaster overstyres" — "inhibit shortcuts" has no settled Norwegian term.
 - `apps/setup/installer/locales/nb/installer.ftl` `installer-no-deployment`: "Det nye systemet har ingen utrulling" — «utrulling» for an ostree deployment is a technical guess.
 - `apps/setup/locales/nb/setup.ftl` `setup-region-intro-guessed`: "Vi har gjettet { $guesses }" — relies on the joined list ("tastaturet ut fra datamaskinen og tidssonen ut fra nettverket") using «og»; check the list joiner.
-- `kestrel/ui/locales/nb/engine.ftl` `network-menu-hotspot`: "Trådløssone på { $name }" — $name is the Wi-Fi device sharing the connection; check it reads well with the device names people see, and against Windows' «mobilt tilkoblingspunkt».
-- `kestrel/ui/locales/nb/engine.ftl` `screenshot-source`: "Skjermbilder og opptak" — notification source for the screenshot and recording tool; «skjermopptak» alone would mean only recordings.
+- `kestrel/ui/locales/nb/system.ftl` `network-menu-hotspot`: "Trådløssone på { $name }" — $name is the Wi-Fi device sharing the connection; check it reads well with the device names people see, and against Windows' «mobilt tilkoblingspunkt».
+- `kestrel/ui/locales/nb/system.ftl` `screenshot-source`: "Skjermbilder og opptak" — notification source for the screenshot and recording tool; «skjermopptak» alone would mean only recordings.
 
 ## Settings
 

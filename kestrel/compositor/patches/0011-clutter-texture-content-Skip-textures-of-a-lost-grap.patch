@@ -5,6 +5,8 @@ Subject: [PATCH 11/53] clutter/texture-content: Skip textures of a lost
  graphics context
 
 A texture from a context that was replaced during graphics recovery has a stale GL name, which in the new context can point at an unrelated texture. Draw nothing until the owner provides a new texture.
+
+Upstream-Status: forwardable fix for GNOME/mutter!5247, to suggest there
 ---
  clutter/clutter/clutter-texture-content.c | 3 +++
  1 file changed, 3 insertions(+)

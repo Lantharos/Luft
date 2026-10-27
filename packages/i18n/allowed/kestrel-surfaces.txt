@@ -1,1 +1,3 @@
 kestrel/ui/src/surfaces/search/providers/web.ts	Brave Search
+kestrel/ui/src/surfaces/notifications/service/notificationDaemon.ts	Invalid notification ID
+kestrel/ui/src/surfaces/notifications/daemon/gtkDaemon.ts	The app by ID "${appId}" could not be found

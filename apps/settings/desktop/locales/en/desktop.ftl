@@ -273,9 +273,6 @@ desktop-updates-notification-open = Open
 desktop-updates-already-downloading = Something is already being downloaded.
 desktop-updates-system-busy = Something else is changing the system right now.
 desktop-updates-already-installing = Something is already being installed.
-desktop-updates-no-rollback = This system can't go back to an earlier version.
-# Shown in place of a program's name when an unknown program is changing the system's software; the Updates page puts it inside sentences such as "Updates are being installed by another app"
-desktop-updates-another-app = another app
 # Name for a device's firmware when the device has no name
 desktop-updates-firmware-unnamed = Device firmware
 desktop-updates-firmware-current = This device is already up to date.

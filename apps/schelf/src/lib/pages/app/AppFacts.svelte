@@ -25,7 +25,7 @@
 			if (installed.source === 'system') return 'Fedora, in the system for everyone';
 			return name;
 		}
-		return details?.origin === 'flathub' ? 'Flathub' : 'Fedora';
+		return 'Flathub';
 	});
 </script>
 

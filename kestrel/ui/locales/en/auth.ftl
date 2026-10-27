@@ -37,6 +37,8 @@ lock-screen-suspend = Suspend
 lock-screen-restart = Restart…
 # Power menu item; asks for confirmation before turning the computer off
 lock-screen-power-off = Power off…
+# Reason given to the system for delaying sleep until the screen is locked, shown by tools that list what delays sleep
+lock-inhibit-reason = Kestrel needs to lock the screen
 
 ## Keyring and passphrase prompts. Apps usually supply their own text; these are the defaults
 
@@ -91,3 +93,103 @@ passkeys-ok = OK
 passkeys-use-this-computer = Use this computer
 passkeys-fingerprint-unavailable = Use your password to continue.
 passkeys-wrong-password = That password isn’t right. Try again.
+
+## Sign-in prompt
+
+# Placeholder of the password field
+auth-prompt-password = Password
+# Placeholder of the user name field
+auth-prompt-username = Username
+# Screen-reader label of the back arrow button
+auth-prompt-back = Back
+# Screen-reader label of the button that submits the password
+auth-prompt-submit = Submit
+auth-prompt-wrong-password = That password didn’t work
+auth-prompt-failed = That didn’t work. Try again.
+fingerprint-not-recognized = Fingerprint not recognized
+
+## Administrator authentication
+
+polkit-title = Authentication Required
+# Shown instead of the user name "root"
+polkit-administrator = Administrator
+polkit-password = Password
+polkit-cancel = Cancel
+# Button
+polkit-authenticate = Authenticate
+# Shown when the password or other authentication was wrong
+polkit-failed = Sorry, that didn’t work. Please try again.
+
+## Log out, power off and restart dialog
+
+# Dialog title. $userName is the person's full name
+end-session-log-out-user = Log Out { $userName }
+# Dialog title
+end-session-log-out-title = Log Out
+# $userName is the person's full name
+end-session-log-out-user-countdown = { $seconds ->
+    [one] { $userName } will be logged out automatically in { $seconds } second
+   *[other] { $userName } will be logged out automatically in { $seconds } seconds
+}
+end-session-log-out-countdown = { $seconds ->
+    [one] You will be logged out automatically in { $seconds } second
+   *[other] You will be logged out automatically in { $seconds } seconds
+}
+# Button
+end-session-log-out-button = Log Out
+# Dialog title
+end-session-power-off-title = Power Off
+# Dialog title when updates are installed before powering off
+end-session-power-off-updates-title = Install Updates & Power Off
+end-session-power-off-countdown = { $seconds ->
+    [one] The system will power off automatically in { $seconds } second
+   *[other] The system will power off automatically in { $seconds } seconds
+}
+# Button
+end-session-power-off-button = Power Off
+# Dialog title
+end-session-restart-title = Restart
+# Dialog title when updates are installed before restarting
+end-session-restart-updates-title = Install Updates & Restart
+end-session-restart-countdown = { $seconds ->
+    [one] The system will restart automatically in { $seconds } second
+   *[other] The system will restart automatically in { $seconds } seconds
+}
+# Button
+end-session-restart-button = Restart
+# Dialog title
+end-session-update-restart-title = Restart & Install Updates
+end-session-update-restart-countdown = { $seconds ->
+    [one] The system will automatically restart and install updates in { $seconds } second
+   *[other] The system will automatically restart and install updates in { $seconds } seconds
+}
+# Button
+end-session-update-restart-button = Restart & Install
+# Checkbox
+end-session-install-updates = Install pending software updates
+# Checkbox. $version is the system version the update installs
+end-session-install-version = Install version { $version }
+# A nightly build of a version that isn't out yet, like "1.2 Nightly 21": $release is the version it leads to, $number counts the nightly builds toward it
+end-session-version-nightly = { $release } Nightly { $number }
+end-session-low-battery = Low battery power: please plug in before installing updates
+end-session-busy-apps = Some applications are busy or have unsaved work
+end-session-other-users = Other users are logged in
+end-session-cancel = Cancel
+# Button shown in place of Restart while Alt is held; restarts into the boot menu
+end-session-boot-options = Boot Options
+# A user signed in from another computer, for example over SSH. $userName is their name
+end-session-remote-user = { $userName } (remote)
+# A user signed in on a text console. $userName is their name
+end-session-console-user = { $userName } (console)
+
+## Lock screen clock
+
+# Hint under the lock screen clock on touch screens
+lock-clock-swipe-up = Swipe up
+# Hint under the lock screen clock with a mouse or keyboard
+lock-clock-click-or-press = Click or press a key
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+# The lock screen's sign-in prompt
+ctrl-alt-tab-unlock = Unlock Window

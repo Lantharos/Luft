@@ -1,6 +1,6 @@
 # Croatian style guide
 
-How Luft speaks Croatian. The [glossary](../../packages/i18n/glossary/hr.csv) has the agreed terms; Weblate shows them next to every string.
+How Luft speaks Croatian. The [glossary](../../packages/i18n/glossary/hr.tbx) has the agreed terms; Weblate shows them next to every string.
 
 ## Address and tone
 

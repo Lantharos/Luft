@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { bytes, Row } from '@luft/ui';
-	import { restart, switchVariant, type Activity, type ImageOverview, type Variant, type VariantOffer } from '../api';
+	import { restart, switchVariant, type Activity, type SystemOverview, type Variant, type VariantOffer } from '../api';
 
 	interface Props {
-		overview: ImageOverview;
+		overview: SystemOverview;
 		activity: Activity;
 		attempt: (action: () => Promise<void>) => void;
 	}

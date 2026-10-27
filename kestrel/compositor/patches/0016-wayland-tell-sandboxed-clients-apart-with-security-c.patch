@@ -29,6 +29,8 @@ Only unsandboxed clients see the manager, so sandboxed apps can neither
 nest security contexts nor claim another app's ID. Protocols that should
 stay out of sandboxes filter their globals with
 meta_wayland_filter_unsandboxed().
+
+Upstream-Status: luft-only Luft's sandbox model and permission API; upstream's security-context work, GNOME/mutter!3107, was closed
 ---
  src/core/meta-sandbox.c             | 174 ++++++++++++
  src/core/meta-sandbox.h             |  13 +

@@ -134,27 +134,10 @@ settings-updates-downloading = Atsisiunčiami naujinimai…
 settings-updates-rolling-back = Ruošiama ankstesnė versija…
 settings-updates-switching-nvidia = Atsisiunčiama NVIDIA tvarkyklė…
 settings-updates-switching-standard = Atsisiunčiamas standartinis atvaizdis…
-settings-updates-elsewhere-refresh-by = { $app } ieško naujinimų
-settings-updates-elsewhere-download-by = { $app } atsisiunčia naujinimus
-settings-updates-elsewhere-update-by = { $app } diegia naujinimus
-settings-updates-elsewhere-update = Diegiami naujinimai
-settings-updates-elsewhere-install-by = { $app } diegia programinę įrangą
-settings-updates-elsewhere-install = Diegiama programinė įranga
-settings-updates-elsewhere-remove-by = { $app } šalina programinę įrangą
-settings-updates-elsewhere-remove = Šalinama programinė įranga
-settings-updates-elsewhere-change-by = { $app } keičia programinę įrangą
-settings-updates-elsewhere-change = Keičiama programinė įranga
-settings-updates-elsewhere-wait = Kai tai baigsis, galėsite vėl ieškoti naujinimų
-settings-updates-ready = Naujinimai paruošti įdiegti
-settings-updates-available = { $count ->
-    [one] Galimas { $count } naujinimas
-    [few] Galimi { $count } naujinimai
-    [many] Galima { $count } naujinimo
-   *[other] Galima { $count } naujinimų
-}
 settings-updates-up-to-date = Jūsų sistema naujausia
 settings-updates-version = Versija { $version }
 settings-updates-version-new = Nauja versija
+settings-version-nightly = { $release } naktinė versija { $number }
 settings-updates-returning = Paruošta grįžti į versiją { $version }
 settings-updates-returning-unversioned = Paruošta grįžti į ankstesnę versiją
 settings-updates-nvidia-ready = NVIDIA tvarkyklė paruošta
@@ -163,13 +146,11 @@ settings-updates-version-available = Galima versija { $version }
 settings-updates-version-available-new = Galima nauja versija
 settings-updates-version-staged = Versija { $version } paruošta įdiegti
 settings-updates-version-staged-new = Nauja versija paruošta įdiegti
-settings-updates-restart-install-them = Paleiskite iš naujo, kad juos įdiegtumėte. Kompiuteris vėl veiks po kelių minučių.
 settings-updates-restart-return = Paleiskite iš naujo, kad baigtumėte grįžimą.
 settings-updates-restart-switch = Paleiskite iš naujo, kad baigtumėte. Kompiuteris vėl veiks po kelių minučių.
 settings-updates-restart-install-it = Paleiskite iš naujo, kad ją įdiegtumėte. Kompiuteris vėl veiks po kelių minučių.
 settings-updates-last-checked = Paskutinį kartą tikrinta { $when }
 settings-updates-never-checked = Dar netikrinta
-settings-updates-installed-when = Naujinimai įdiegti { $when }
 settings-updates-stop = Sustabdyti
 settings-updates-check = Tikrinti dabar
 settings-updates-checking-button = Tikrinama…
@@ -198,41 +179,7 @@ settings-updates-firmware-restart = Bus baigta paleidus iš naujo
 settings-updates-firmware-installing = Diegiama…
 settings-updates-firmware-update = Atnaujinti
 settings-updates-firmware-failed = Nepavyko atnaujinti programinės aparatinės įrangos
-settings-updates-failed = Nepavyko įdiegti paskutinių naujinimų
-settings-updates-failed-description = Sistema liko tokia, kokia buvo
-settings-updates-includes = { $parts ->
-    [security] Apima saugos pataisas
-    [kernel] Apima naują Linux branduolį
-    [drivers] Apima atnaujintas tvarkykles
-    [security-kernel] Apima saugos pataisas ir naują Linux branduolį
-    [security-drivers] Apima saugos pataisas ir atnaujintas tvarkykles
-    [kernel-drivers] Apima naują Linux branduolį ir atnaujintas tvarkykles
-    [security-kernel-drivers] Apima saugos pataisas, naują Linux branduolį ir atnaujintas tvarkykles
-   *[other] Pataisymai ir patobulinimai visoje sistemoje
-}
-settings-updates-count-size = { $count ->
-    [one] { $count } naujinimas · { $size }
-    [few] { $count } naujinimai · { $size }
-    [many] { $count } naujinimo · { $size }
-   *[other] { $count } naujinimų · { $size }
-}
-settings-updates-restart-and-install = Paleisti iš naujo ir įdiegti
 settings-updates-download = Atsisiųsti
-settings-updates-see-included = Žiūrėti, kas įtraukta
-settings-updates-included = Kas įtraukta
-settings-updates-included-description = { $count ->
-    [one] { $count } sistemos, jos tvarkyklių ir bibliotekų naujinimas
-    [few] { $count } sistemos, jos tvarkyklių ir bibliotekų naujinimai
-    [many] { $count } sistemos, jos tvarkyklių ir bibliotekų naujinimo
-   *[other] { $count } sistemos, jos tvarkyklių ir bibliotekų naujinimų
-}
-settings-updates-security-fix = Saugos pataisa
-settings-updates-done = Atlikta
-settings-updates-area-kernel = Linux branduolys
-settings-updates-area-drivers = Tvarkyklės ir programinė aparatinė įranga
-settings-updates-area-desktop = Darbalaukis
-settings-updates-area-core = Sistemos pagrindas
-settings-updates-area-other = Bibliotekos ir įrankiai
 settings-updates-released = Išleista { $when }
 settings-updates-improvements = Pataisymai ir patobulinimai visoje sistemoje
 settings-updates-download-size = Atsisiuntimo dydis: { $size }
@@ -259,6 +206,7 @@ settings-updates-variant-standard = Pereiti prie standartinio atvaizdžio
 settings-updates-variant-nvidia-reason = Visa jūsų NVIDIA vaizdo plokštės sparta
 settings-updates-variant-standard-reason = Mažesnis, nes šiame kompiuteryje nėra NVIDIA vaizdo plokštės
 settings-updates-switch = Perjungti
+settings-updates-done = Atlikta
 
 ## About
 
@@ -282,6 +230,8 @@ settings-about-other-system = Pašalinkite ją, kad jos { $size } atitektų sist
 settings-about-remove = Pašalinti
 settings-about-software = Programinė įranga
 settings-about-system = Sistema
+settings-about-version = Luft { $version }
+settings-about-built = Sukurta { $date }
 settings-about-desktop = Darbalaukis
 settings-about-kernel = Branduolys
 settings-about-hostname = Kompiuterio vardas

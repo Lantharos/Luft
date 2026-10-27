@@ -83,6 +83,12 @@ impl SignIns {
         }
     }
 
+    pub fn in_progress(&self) -> bool {
+        self.sessions()
+            .values()
+            .any(|session| !session.step.finished())
+    }
+
     fn cancel_browser_sign_ins(&self) {
         self.sessions().retain(|_, session| {
             if session.browser && !session.step.finished() {
@@ -133,6 +139,7 @@ pub async fn start(
             browser,
         },
     );
+    hub.demand.notify_one();
     let flow = Flow {
         hub: hub.clone(),
         session: session.clone(),

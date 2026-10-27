@@ -1,6 +1,6 @@
 # Romanian style guide
 
-How Luft speaks Romanian. The [glossary](../../packages/i18n/glossary/ro.csv) has the agreed terms; Weblate shows them next to every string.
+How Luft speaks Romanian. The [glossary](../../packages/i18n/glossary/ro.tbx) has the agreed terms; Weblate shows them next to every string.
 
 ## Address and tone
 

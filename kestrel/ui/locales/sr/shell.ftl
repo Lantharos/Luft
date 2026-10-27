@@ -36,3 +36,27 @@ keys-page-down = Page Down
 keys-print-screen = Print Screen
 
 date-just-now = Управо
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-panel = Трака задатака
+
+## System notifications
+
+unsafe-mode-title = Систем је пребачен у небезбедни режим
+unsafe-mode-body = Апликације сада имају неограничен приступ
+unsafe-mode-undo = Опозови
+privileged-user-title = Пријављени сте као привилеговани корисник
+privileged-user-body = Из безбедносних разлога избегавајте рад у сесији привилегованог корисника. Ако је могуће, пријавите се као обичан корисник.
+
+## Starting programs
+
+spawn-failed = Покретање „{ $command }“ није успело:
+
+## Text field context menu
+
+entry-menu-copy = Копирај
+entry-menu-paste = Налепи
+entry-menu-show-text = Прикажи текст
+entry-menu-hide-text = Сакриј текст
+entry-caps-lock-on = Caps Lock је укључен

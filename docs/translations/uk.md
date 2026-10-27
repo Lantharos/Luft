@@ -1,6 +1,6 @@
 # Ukrainian style guide
 
-How Luft speaks Ukrainian. The [glossary](../../packages/i18n/glossary/uk.csv) has the agreed terms; Weblate shows them next to every string.
+How Luft speaks Ukrainian. The [glossary](../../packages/i18n/glossary/uk.tbx) has the agreed terms; Weblate shows them next to every string.
 
 ## Address and tone
 

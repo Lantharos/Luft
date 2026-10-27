@@ -2,7 +2,7 @@
 
 The session service behind online accounts and their cloud drives. Apps talk to it through the [luft-accounts crate](../../packages/system/accounts).
 
-`luft-accounts` owns `com.lantharos.Accounts1` (see `data/com.lantharos.Accounts1.xml`). It starts at login, runs one `rclone rcd` and mounts every account with rclone's VFS cache, so files download when opened. Folders and files kept on the device live in `~/.local/share/luft-accounts/kept` and sync both ways with `rclone bisync`. Background syncing pauses on metered connections and below 20% battery, and drives reconnect after sleep and network changes.
+`luft-accounts` owns `com.lantharos.Accounts1` (see `data/com.lantharos.Accounts1.xml`) and starts when an app first asks for it. Adding the first account turns it on at sign-in, and removing the last one turns that off again; without accounts or a sign-in in progress it quits after a minute. Once an account needs it, it runs one `rclone rcd` and mounts every account with rclone's VFS cache, so files download when opened. Folders and files kept on the device live in `~/.local/share/luft-accounts/kept` and sync both ways with `rclone bisync`. Background syncing pauses on metered connections and below 20% battery, and drives reconnect after sleep and network changes.
 
 | File in `data` | Goes to |
 | --- | --- |

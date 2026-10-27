@@ -1,5 +1,5 @@
-mod cgroup;
-mod pressure;
+pub mod cgroup;
+pub mod pressure;
 
 use std::time::Duration;
 
@@ -29,7 +29,7 @@ trait KestrelMemory {
     fn closed(&self, unit: &str, bytes: u64) -> zbus::Result<()>;
 }
 
-fn own_manager() -> zbus::Result<UserManager> {
+pub fn own_manager() -> zbus::Result<UserManager> {
     UserManager::own().ok_or_else(|| zbus::Error::Failure("This isn't a user's session".into()))
 }
 

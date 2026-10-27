@@ -1,6 +1,6 @@
 # Albanian style guide
 
-How Luft speaks Albanian. The [glossary](../../packages/i18n/glossary/sq.csv) has the agreed terms; Weblate shows them next to every string.
+How Luft speaks Albanian. The [glossary](../../packages/i18n/glossary/sq.tbx) has the agreed terms; Weblate shows them next to every string.
 
 ## Address and tone
 

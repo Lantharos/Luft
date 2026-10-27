@@ -63,3 +63,45 @@ snap-zone = Przyciągnij do obszaru { $width }% na { $height }%
 title-bar-minimize = Minimalizuj
 title-bar-maximize = Maksymalizuj
 title-bar-close = Zamknij
+
+## Window resizing
+
+window-resize-size = { $width } × { $height }
+
+## App not responding
+
+close-dialog-title = Aplikacja { $appName } nie odpowiada
+close-dialog-description = Możesz chwilę poczekać, aż zacznie znowu działać, albo wymusić jej zamknięcie
+close-dialog-force-quit = Wymuś zamknięcie
+close-dialog-wait = Czekaj
+
+## Display mode switcher, keep each label under about 15 characters
+
+switch-monitor-mirror = Duplikuj
+switch-monitor-join = Rozszerz
+switch-monitor-external-only = Tylko zewnętrzny
+switch-monitor-built-in-only = Tylko wbudowany
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-windows = Okna
+
+## Window menu, opened by right-clicking a window's title bar
+
+title-bar-menu-screenshot = Zrób zrzut ekranu
+title-bar-menu-hide = Ukryj
+title-bar-menu-restore = Przywróć
+title-bar-menu-maximize = Maksymalizuj
+title-bar-menu-move = Przenieś
+title-bar-menu-resize = Zmień rozmiar
+title-bar-menu-always-on-top = Zawsze na wierzchu
+title-bar-menu-always-on-visible-workspace = Zawsze na widocznym obszarze roboczym
+title-bar-menu-workspace-left = Przenieś do obszaru roboczego po lewej
+title-bar-menu-workspace-right = Przenieś do obszaru roboczego po prawej
+title-bar-menu-workspace-up = Przenieś do obszaru roboczego powyżej
+title-bar-menu-workspace-down = Przenieś do obszaru roboczego poniżej
+title-bar-menu-monitor-up = Przenieś na ekran powyżej
+title-bar-menu-monitor-down = Przenieś na ekran poniżej
+title-bar-menu-monitor-left = Przenieś na ekran po lewej
+title-bar-menu-monitor-right = Przenieś na ekran po prawej
+title-bar-menu-close = Zamknij

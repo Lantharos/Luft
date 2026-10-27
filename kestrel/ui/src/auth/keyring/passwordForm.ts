@@ -2,10 +2,10 @@ import Clutter from 'gi://Clutter';
 import GObject from 'gi://GObject';
 import Pango from 'gi://Pango';
 import St from 'gi://St';
-import { wiggle } from '../../shell/runtime/animationUtils.js';
-import { EntryField } from '../../shell/dialogs/dialog.js';
-import type { ModalDialog } from '../../shell/dialogs/modalDialog.js';
-import { CapsLockWarning, addContextMenu } from '../../shell/widgets/shellEntry.js';
+import { wiggle } from '../../core/runtime/animationUtils.js';
+import { EntryField } from '../../shared/dialogs/dialog.js';
+import type { ModalDialog } from '../../shared/dialogs/modalDialog.js';
+import { CapsLockWarning, addContextMenu } from '../../shared/widgets/shellEntry.js';
 
 import { t } from '../../shared/i18n/index.js';
 import { QualityMeter, type Measure } from './quality.js';

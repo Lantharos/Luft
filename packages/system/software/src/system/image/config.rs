@@ -1,14 +1,14 @@
+use specta::Type;
 use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
-use specta::Type;
 
 use super::notes::{self, Section};
 
 const VERSION: &str = "org.opencontainers.image.version";
 const NOTES: &str = "com.lantharos.release-notes";
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Release {
     pub version: Option<String>,

@@ -1,9 +1,9 @@
 import Clutter from 'gi://Clutter';
 import GObject from 'gi://GObject';
 import St from 'gi://St';
-import { EntryField, MessageDialogContent } from '../../shell/dialogs/dialog.js';
-import { ModalDialog } from '../../shell/dialogs/modalDialog.js';
-import { CapsLockWarning, addContextMenu } from '../../shell/widgets/shellEntry.js';
+import { EntryField, MessageDialogContent } from '../../shared/dialogs/dialog.js';
+import { ModalDialog } from '../../shared/dialogs/modalDialog.js';
+import { CapsLockWarning, addContextMenu } from '../../shared/widgets/shellEntry.js';
 
 import { feedbackLabel, showText } from '../../auth/keyring/passwordForm.js';
 import { t } from '../../shared/i18n/index.js';

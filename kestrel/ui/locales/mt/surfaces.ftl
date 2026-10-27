@@ -146,6 +146,10 @@ notifications-media-previous = Il-kanzunetta ta’ qabel
 notifications-media-next = Il-kanzunetta li jmiss
 notifications-media-play = Doqq
 notifications-media-pause = Pawża
+messages-unknown-app = App mhux magħrufa
+messages-reply = Wieġeb
+messages-reply-placeholder = Ikteb tweġiba
+messages-reply-send = Ibgħat
 
 ## Calendar
 
@@ -183,3 +187,17 @@ emoji-skin-tone-medium-light = Ġilda medja ċara
 emoji-skin-tone-medium = Ġilda medja
 emoji-skin-tone-medium-dark = Ġilda medja skura
 emoji-skin-tone-dark = Ġilda skura
+
+## System notifications
+
+messages-system-source = Sistema
+
+## On-screen keyboard
+
+osk-keyboard-settings = Settings tat-tastiera
+osk-letters-key = ABC
+
+## Media player controls
+
+mpris-unknown-artist = Artist mhux magħruf
+mpris-unknown-title = Titlu mhux magħruf

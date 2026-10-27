@@ -22,6 +22,8 @@ Window actors drop their shadows when they're unrealized, since the
 shadows' textures belong to the graphics context that a GPU reset
 replaces, and the shadow factory shares one shadow between every window
 of the same shape.
+
+Upstream-Status: luft-only Kestrel's window shadows and outline
 ---
  src/compositor/meta-window-actor-wayland.c | 222 +++++++++++++++++++++
  src/compositor/meta-window-actor-x11.c     |  17 ++

@@ -1,3 +1,4 @@
+use specta::Type;
 mod problems;
 mod sample;
 mod systems;
@@ -8,11 +9,12 @@ use std::fs;
 use gio::prelude::*;
 use luft_app::dbus::{self, failed};
 use luft_app::launch::{self, Token};
-use luft_app::{Commands, Empty, Events};
+use luft_app::{Commands, Events};
 use luft_i18n::t;
+use luft_software::system::image::{Deployments, Release};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
-use specta::Type;
+use serde_json::Value;
 use zbus::Proxy;
 
 use crate::L10N;
@@ -26,6 +28,8 @@ struct About {
     hostname: String,
     system: String,
     kernel: String,
+    version: Option<String>,
+    built: Option<u64>,
     processor: Option<String>,
     graphics: Vec<String>,
     memory: Option<u64>,
@@ -41,7 +45,7 @@ struct Storage {
 }
 
 #[derive(Deserialize, Type)]
-struct ComputerRename {
+struct Rename {
     name: String,
 }
 
@@ -160,7 +164,14 @@ fn pci_name(names: &str, vendor: &str, device: &str) -> Option<String> {
     Some(format!("{short_vendor} {device_name}"))
 }
 
-async fn about(Empty {}: Empty) -> Result<About, String> {
+async fn installed() -> Release {
+    Deployments::load()
+        .await
+        .map(|deployments| deployments.status().current)
+        .unwrap_or_default()
+}
+
+async fn about(_: Value) -> Result<About, String> {
     let hostnamed = hostnamed().await?;
     let hostname: String = hostnamed
         .get_property("StaticHostname")
@@ -175,8 +186,11 @@ async fn about(Empty {}: Empty) -> Result<About, String> {
     } else {
         pretty
     };
+    let Release {
+        version, released, ..
+    } = installed().await;
     if luft_app::sample_system() {
-        return Ok(sample::about(device_name, hostname));
+        return Ok(sample::about(device_name, hostname, version, released));
     }
     tokio::task::spawn_blocking(move || About {
         device_name,
@@ -186,6 +200,8 @@ async fn about(Empty {}: Empty) -> Result<About, String> {
             .unwrap_or_default()
             .trim()
             .to_owned(),
+        version,
+        built: released,
         processor: processor(),
         graphics: graphics(),
         memory: memory(),
@@ -222,7 +238,7 @@ fn hostname_for(name: &str) -> String {
     hostname.trim_end_matches('-').to_owned()
 }
 
-async fn rename(ComputerRename { name }: ComputerRename) -> Result<(), String> {
+async fn rename(Rename { name }: Rename) -> Result<(), String> {
     let name = name.trim();
     let hostnamed = hostnamed().await?;
     hostnamed
@@ -247,10 +263,10 @@ pub fn register(window: SabineWindow, _events: &Events) -> SabineWindow {
         .command("about_open_disks", |Token { token }| {
             launch_disks("file:///", token.as_deref())
         })
-        .command_async("about_other_systems", |Empty {}| systems::list())
+        .command_async("about_other_systems", |_: Value| systems::list())
         .command("about_remove_system", systems::remove)
-        .command("about_problems", |Empty {}| problems::problems())
-        .command_async("about_firmware_restart", |Empty {}| {
+        .command("about_problems", |_: Value| problems::problems())
+        .command_async("about_firmware_restart", |_: Value| {
             problems::restart_to_firmware()
         })
 }

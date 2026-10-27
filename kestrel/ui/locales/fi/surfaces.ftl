@@ -137,6 +137,10 @@ notifications-media-previous = Edellinen kappale
 notifications-media-next = Seuraava kappale
 notifications-media-play = Toista
 notifications-media-pause = Keskeytä
+messages-unknown-app = Tuntematon sovellus
+messages-reply = Vastaa
+messages-reply-placeholder = Kirjoita vastaus
+messages-reply-send = Lähetä
 
 ## Calendar
 
@@ -174,3 +178,17 @@ emoji-skin-tone-medium-light = Keskivaalea ihonväri
 emoji-skin-tone-medium = Keskisävyinen ihonväri
 emoji-skin-tone-medium-dark = Keskitumma ihonväri
 emoji-skin-tone-dark = Tumma ihonväri
+
+## System notifications
+
+messages-system-source = Järjestelmä
+
+## On-screen keyboard
+
+osk-keyboard-settings = Näppäimistöasetukset
+osk-letters-key = ABC
+
+## Media player controls
+
+mpris-unknown-artist = Tuntematon esittäjä
+mpris-unknown-title = Tuntematon nimi

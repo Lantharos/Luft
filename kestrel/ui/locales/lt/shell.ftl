@@ -36,3 +36,27 @@ keys-page-down = Page Down
 keys-print-screen = Print Screen
 
 date-just-now = Ką tik
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-panel = Užduočių juosta
+
+## System notifications
+
+unsafe-mode-title = Sistema perjungta į nesaugų režimą
+unsafe-mode-body = Programos dabar turi neribotą prieigą
+unsafe-mode-undo = Anuliuoti
+privileged-user-title = Prisijungta kaip privilegijuotas naudotojas
+privileged-user-body = Saugumo sumetimais seanso geriau nenaudoti kaip privilegijuotas naudotojas. Jei įmanoma, prisijunkite kaip įprastas naudotojas.
+
+## Starting programs
+
+spawn-failed = Nepavyko vykdyti „{ $command }“:
+
+## Text field context menu
+
+entry-menu-copy = Kopijuoti
+entry-menu-paste = Įklijuoti
+entry-menu-show-text = Rodyti tekstą
+entry-menu-hide-text = Slėpti tekstą
+entry-caps-lock-on = Caps Lock įjungtas

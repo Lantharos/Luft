@@ -1,8 +1,7 @@
 import type { CategoryId } from '#lib/catalog/categories.js';
 import type { Collection } from '#lib/catalog/flathub.js';
-import type { Origin } from '#lib/catalog/types.js';
 
-export type AppTarget = { origin: Origin; id: string } | { installed: string };
+export type AppTarget = { id: string } | { installed: string };
 
 export type Route =
 	| { page: 'discover' }
@@ -34,10 +33,6 @@ class Navigation {
 
 	push(route: Route) {
 		this.stack = [...this.stack, route];
-	}
-
-	replace(route: Route) {
-		this.stack = [...this.stack.slice(0, -1), route];
 	}
 
 	back() {

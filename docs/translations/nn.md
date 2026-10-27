@@ -1,6 +1,6 @@
 # Norwegian Nynorsk style guide
 
-How Luft speaks Nynorsk. The [glossary](../../packages/i18n/glossary/nn.csv) has the agreed terms; Weblate shows them next to every string.
+How Luft speaks Nynorsk. The [glossary](../../packages/i18n/glossary/nn.tbx) has the agreed terms; Weblate shows them next to every string.
 
 Luft follows the current official Nynorsk norm and its mainstream forms, the ones GNOME and KDE use in Nynorsk: ikkje, eg, berre, noko, fleire, innstillingar, filer, programmet, datamaskinen. Write genuine Nynorsk, not Bokmål with a few words swapped: høgre, venstre, frå, kvar, korleis, gøyme, straum, tryggleik, bilete, vindauge.
 

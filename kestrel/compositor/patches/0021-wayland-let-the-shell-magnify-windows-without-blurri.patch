@@ -14,6 +14,8 @@ the window's surfaces, so a magnified window stays sharp. Popups and
 dialogs follow their parent window. Unconstrained windows that lie
 beyond every monitor take the primary monitor's scale, since the shell
 shows them there.
+
+Upstream-Status: luft-only Kestrel's board zoom
 ---
  src/core/window-private.h                   |  1 +
  src/core/window.c                           | 40 +++++++++++++++++++++

@@ -147,26 +147,11 @@ settings-updates-downloading = Downloading updates…
 settings-updates-rolling-back = Getting the earlier version ready…
 settings-updates-switching-nvidia = Downloading NVIDIA’s driver…
 settings-updates-switching-standard = Downloading the standard image…
-# $app is the app that is changing software, like Schelf
-settings-updates-elsewhere-refresh-by = { $app } is looking for updates
-settings-updates-elsewhere-download-by = Updates are being downloaded by { $app }
-settings-updates-elsewhere-update-by = Updates are being installed by { $app }
-settings-updates-elsewhere-update = Updates are being installed
-settings-updates-elsewhere-install-by = Software is being installed by { $app }
-settings-updates-elsewhere-install = Software is being installed
-settings-updates-elsewhere-remove-by = Software is being removed by { $app }
-settings-updates-elsewhere-remove = Software is being removed
-settings-updates-elsewhere-change-by = Software is being changed by { $app }
-settings-updates-elsewhere-change = Software is being changed
-settings-updates-elsewhere-wait = You can look for updates again when it’s done
-settings-updates-ready = Updates are ready to install
-settings-updates-available = { $count ->
-    [one] { $count } update is available
-   *[other] { $count } updates are available
-}
 settings-updates-up-to-date = Your system is up to date
 settings-updates-version = Version { $version }
 settings-updates-version-new = A new version
+# A nightly build of a version that isn't out yet, like "1.2 Nightly 21": $release is the version it leads to, $number counts the nightly builds toward it
+settings-version-nightly = { $release } Nightly { $number }
 settings-updates-returning = Ready to go back to version { $version }
 settings-updates-returning-unversioned = Ready to go back to the earlier version
 settings-updates-nvidia-ready = NVIDIA’s driver is ready
@@ -175,15 +160,12 @@ settings-updates-version-available = Version { $version } is available
 settings-updates-version-available-new = A new version is available
 settings-updates-version-staged = Version { $version } is ready to install
 settings-updates-version-staged-new = A new version is ready to install
-settings-updates-restart-install-them = Restart to install them. Your computer is back in a few minutes.
 settings-updates-restart-return = Restart to finish going back.
 settings-updates-restart-switch = Restart to finish. Your computer is back in a few minutes.
 settings-updates-restart-install-it = Restart to install it. Your computer is back in a few minutes.
 # $when is a relative time, like 5 minutes ago
 settings-updates-last-checked = Last checked { $when }
 settings-updates-never-checked = Not checked yet
-# $when is a relative time, like yesterday
-settings-updates-installed-when = Updates installed { $when }
 settings-updates-stop = Stop
 settings-updates-check = Check now
 settings-updates-checking-button = Checking…
@@ -211,40 +193,8 @@ settings-updates-firmware-installing = Installing…
 # Button, verb
 settings-updates-firmware-update = Update
 settings-updates-firmware-failed = The firmware couldn’t be updated
-settings-updates-failed = The last updates couldn’t be installed
-settings-updates-failed-description = Your system was left as it was
-# $parts says what the updates contain: security fixes, a new Linux kernel and updated drivers, joined by "-"
-settings-updates-includes = { $parts ->
-    [security] Includes security fixes
-    [kernel] Includes a new Linux kernel
-    [drivers] Includes updated drivers
-    [security-kernel] Includes security fixes and a new Linux kernel
-    [security-drivers] Includes security fixes and updated drivers
-    [kernel-drivers] Includes a new Linux kernel and updated drivers
-    [security-kernel-drivers] Includes security fixes, a new Linux kernel and updated drivers
-   *[other] Fixes and improvements across the system
-}
-# $size is a download size, like 120 MB
-settings-updates-count-size = { $count ->
-    [one] { $count } update · { $size }
-   *[other] { $count } updates · { $size }
-}
-settings-updates-restart-and-install = Restart and install
 # Button, verb
 settings-updates-download = Download
-settings-updates-see-included = See what’s included
-settings-updates-included = What’s included
-settings-updates-included-description = { $count ->
-    [one] { $count } update for the system, its drivers and its libraries
-   *[other] { $count } updates for the system, its drivers and its libraries
-}
-settings-updates-security-fix = Security fix
-settings-updates-done = Done
-settings-updates-area-kernel = Linux kernel
-settings-updates-area-drivers = Drivers and firmware
-settings-updates-area-desktop = Desktop
-settings-updates-area-core = Core system
-settings-updates-area-other = Libraries and tools
 # $when is a relative time, like 3 days ago
 settings-updates-released = Released { $when }
 settings-updates-improvements = Fixes and improvements across the system
@@ -277,6 +227,7 @@ settings-updates-variant-nvidia-reason = Full speed from your NVIDIA graphics
 settings-updates-variant-standard-reason = Smaller, as this computer has no NVIDIA graphics
 # Button, verb
 settings-updates-switch = Switch
+settings-updates-done = Done
 
 ## About
 
@@ -306,6 +257,10 @@ settings-about-remove = Remove
 settings-about-software = Software
 # The operating system
 settings-about-system = System
+# Luft's version, like "Luft 1.1" or "Luft 1.2 Nightly 21"
+settings-about-version = Luft { $version }
+# $date is the day the installed version was built, like "27 October"
+settings-about-built = Built { $date }
 settings-about-desktop = Desktop
 settings-about-kernel = Kernel
 settings-about-hostname = Hostname

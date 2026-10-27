@@ -1,4 +1,5 @@
 ARG FEDORA=45
+ARG MAJOR=1
 ARG BASE=quay.io/fedora/fedora-bootc:${FEDORA}
 ARG SYSTEM=localhost/luft-system:${FEDORA}
 
@@ -21,13 +22,14 @@ COPY os/image/files/ /
 COPY --from=parts keys/luft-secureboot.der /usr/share/luft/secure-boot/luft.der
 COPY --from=parts keys/luft-pcr-policy.pub.pem /usr/share/luft/secure-boot/pcr-policy.pem
 ARG FEDORA
+ARG MAJOR
 ARG BASE
-ARG VERSION=1.dev
 RUN --mount=type=bind,source=os/image/stages,target=/run/luft/stages \
     --mount=type=bind,source=apps,target=/run/luft/apps \
     --mount=type=bind,from=parts,source=kestrel/typelibs.txt,target=/run/luft/typelibs.txt \
-    /run/luft/stages/finalize.sh luft "${VERSION}" "${BASE}"
+    /run/luft/stages/finalize.sh luft "${MAJOR}" "${BASE}"
 RUN bootc container lint
+ARG VERSION=dev
 ARG RELEASE_NOTES=""
 ARG REVISION=""
 ARG CEF=""

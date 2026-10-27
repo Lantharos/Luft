@@ -284,7 +284,7 @@ build_system() {
   shift 2
   podman build "${retries[@]}" --layers --security-opt label=disable --target "$target" --file "$image/Containerfile" \
     --build-context "parts=$state/parts" --build-arg "BASE=$base" --build-arg "CEF=$cef" "$@" \
-    --build-arg "VERSION=1.$(date -u +%Y%m%d).dev" "${podman_options[@]}" --tag "$tag" "$luft"
+    "${podman_options[@]}" --tag "$tag" "$luft"
 }
 
 rechunk() {

@@ -1,6 +1,6 @@
 # Bulgarian style guide
 
-How Luft speaks Bulgarian. The [glossary](../../packages/i18n/glossary/bg.csv) has the agreed terms; Weblate shows them next to every string.
+How Luft speaks Bulgarian. The [glossary](../../packages/i18n/glossary/bg.tbx) has the agreed terms; Weblate shows them next to every string.
 
 ## Address and tone
 

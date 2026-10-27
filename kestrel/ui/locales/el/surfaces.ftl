@@ -137,6 +137,10 @@ notifications-media-previous = Προηγούμενο κομμάτι
 notifications-media-next = Επόμενο κομμάτι
 notifications-media-play = Αναπαραγωγή
 notifications-media-pause = Παύση
+messages-unknown-app = Άγνωστη εφαρμογή
+messages-reply = Απάντηση
+messages-reply-placeholder = Γράψτε μια απάντηση
+messages-reply-send = Αποστολή
 
 ## Calendar
 
@@ -174,3 +178,17 @@ emoji-skin-tone-medium-light = Μεσαία ανοιχτός τόνος δέρμ
 emoji-skin-tone-medium = Μεσαίος τόνος δέρματος
 emoji-skin-tone-medium-dark = Μεσαία σκούρος τόνος δέρματος
 emoji-skin-tone-dark = Σκούρος τόνος δέρματος
+
+## System notifications
+
+messages-system-source = Σύστημα
+
+## On-screen keyboard
+
+osk-keyboard-settings = Ρυθμίσεις πληκτρολογίου
+osk-letters-key = ΑΒΓ
+
+## Media player controls
+
+mpris-unknown-artist = Άγνωστος καλλιτέχνης
+mpris-unknown-title = Άγνωστος τίτλος

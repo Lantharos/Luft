@@ -130,25 +130,10 @@ settings-updates-downloading = Sækir uppfærslur…
 settings-updates-rolling-back = Undirbýr fyrri útgáfu…
 settings-updates-switching-nvidia = Sækir rekil frá NVIDIA…
 settings-updates-switching-standard = Sækir stöðluðu kerfismyndina…
-settings-updates-elsewhere-refresh-by = { $app } er að leita að uppfærslum
-settings-updates-elsewhere-download-by = { $app } er að sækja uppfærslur
-settings-updates-elsewhere-update-by = { $app } er að setja upp uppfærslur
-settings-updates-elsewhere-update = Verið er að setja upp uppfærslur
-settings-updates-elsewhere-install-by = { $app } er að setja upp hugbúnað
-settings-updates-elsewhere-install = Verið er að setja upp hugbúnað
-settings-updates-elsewhere-remove-by = { $app } er að fjarlægja hugbúnað
-settings-updates-elsewhere-remove = Verið er að fjarlægja hugbúnað
-settings-updates-elsewhere-change-by = { $app } er að breyta hugbúnaði
-settings-updates-elsewhere-change = Verið er að breyta hugbúnaði
-settings-updates-elsewhere-wait = Þú getur leitað aftur að uppfærslum þegar þessu er lokið
-settings-updates-ready = Uppfærslur eru tilbúnar til uppsetningar
-settings-updates-available = { $count ->
-    [one] { $count } uppfærsla er í boði
-   *[other] { $count } uppfærslur eru í boði
-}
 settings-updates-up-to-date = Kerfið þitt er uppfært
 settings-updates-version = Útgáfa { $version }
 settings-updates-version-new = Ný útgáfa
+settings-version-nightly = { $release } næturútgáfa { $number }
 settings-updates-returning = Tilbúið að fara aftur í útgáfu { $version }
 settings-updates-returning-unversioned = Tilbúið að fara aftur í fyrri útgáfu
 settings-updates-nvidia-ready = Rekillinn frá NVIDIA er tilbúinn
@@ -157,13 +142,11 @@ settings-updates-version-available = Útgáfa { $version } er í boði
 settings-updates-version-available-new = Ný útgáfa er í boði
 settings-updates-version-staged = Útgáfa { $version } er tilbúin til uppsetningar
 settings-updates-version-staged-new = Ný útgáfa er tilbúin til uppsetningar
-settings-updates-restart-install-them = Endurræstu til að setja þær upp. Tölvan er komin aftur eftir nokkrar mínútur.
 settings-updates-restart-return = Endurræstu til að ljúka við að fara til baka.
 settings-updates-restart-switch = Endurræstu til að ljúka. Tölvan er komin aftur eftir nokkrar mínútur.
 settings-updates-restart-install-it = Endurræstu til að setja hana upp. Tölvan er komin aftur eftir nokkrar mínútur.
 settings-updates-last-checked = Síðast athugað { $when }
 settings-updates-never-checked = Ekki athugað enn
-settings-updates-installed-when = Uppfærslur settar upp { $when }
 settings-updates-stop = Stöðva
 settings-updates-check = Athuga núna
 settings-updates-checking-button = Athugar…
@@ -190,37 +173,7 @@ settings-updates-firmware-restart = Lýkur þegar þú endurræsir
 settings-updates-firmware-installing = Setur upp…
 settings-updates-firmware-update = Uppfæra
 settings-updates-firmware-failed = Ekki tókst að uppfæra fastbúnaðinn
-settings-updates-failed = Ekki tókst að setja upp síðustu uppfærslur
-settings-updates-failed-description = Kerfið var látið óbreytt
-settings-updates-includes = { $parts ->
-    [security] Inniheldur öryggislagfæringar
-    [kernel] Inniheldur nýjan Linux-kjarna
-    [drivers] Inniheldur uppfærða rekla
-    [security-kernel] Inniheldur öryggislagfæringar og nýjan Linux-kjarna
-    [security-drivers] Inniheldur öryggislagfæringar og uppfærða rekla
-    [kernel-drivers] Inniheldur nýjan Linux-kjarna og uppfærða rekla
-    [security-kernel-drivers] Inniheldur öryggislagfæringar, nýjan Linux-kjarna og uppfærða rekla
-   *[other] Lagfæringar og endurbætur um allt kerfið
-}
-settings-updates-count-size = { $count ->
-    [one] { $count } uppfærsla · { $size }
-   *[other] { $count } uppfærslur · { $size }
-}
-settings-updates-restart-and-install = Endurræsa og setja upp
 settings-updates-download = Sækja
-settings-updates-see-included = Sjá hvað er innifalið
-settings-updates-included = Hvað er innifalið
-settings-updates-included-description = { $count ->
-    [one] { $count } uppfærsla fyrir kerfið, rekla þess og söfn
-   *[other] { $count } uppfærslur fyrir kerfið, rekla þess og söfn
-}
-settings-updates-security-fix = Öryggislagfæring
-settings-updates-done = Lokið
-settings-updates-area-kernel = Linux-kjarni
-settings-updates-area-drivers = Reklar og fastbúnaður
-settings-updates-area-desktop = Skjáborð
-settings-updates-area-core = Grunnkerfi
-settings-updates-area-other = Söfn og verkfæri
 settings-updates-released = Gefið út { $when }
 settings-updates-improvements = Lagfæringar og endurbætur um allt kerfið
 settings-updates-download-size = { $size } til að sækja
@@ -247,6 +200,7 @@ settings-updates-variant-standard = Skipta yfir í staðlaða kerfismynd
 settings-updates-variant-nvidia-reason = Fullur hraði úr NVIDIA-skjákortinu þínu
 settings-updates-variant-standard-reason = Minni, þar sem þessi tölva er ekki með NVIDIA-skjákort
 settings-updates-switch = Skipta
+settings-updates-done = Lokið
 
 ## About
 
@@ -270,6 +224,8 @@ settings-about-other-system = Fjarlægðu það til að gefa Luft plássið, { $
 settings-about-remove = Fjarlægja
 settings-about-software = Hugbúnaður
 settings-about-system = Kerfi
+settings-about-version = Luft { $version }
+settings-about-built = Smíðað { $date }
 settings-about-desktop = Skjáborð
 settings-about-kernel = Kjarni
 settings-about-hostname = Vélarheiti

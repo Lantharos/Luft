@@ -64,3 +64,45 @@ snap-zone = Snapáil chuig limistéar { $width }% × { $height }%
 title-bar-minimize = Íoslaghdaigh
 title-bar-maximize = Uasmhéadaigh
 title-bar-close = Dún
+
+## Window resizing
+
+window-resize-size = { $width } × { $height }
+
+## App not responding
+
+close-dialog-title = Níl “{ $appName }” ag freagairt
+close-dialog-description = Is féidir leat fanacht tamall go leanfaidh sé ar aghaidh, nó an aip a scor go hiomlán
+close-dialog-force-quit = Fórsáil scor
+close-dialog-wait = Fan
+
+## Display mode switcher, keep each label under about 15 characters
+
+switch-monitor-mirror = Scáthán
+switch-monitor-join = Leathnaigh
+switch-monitor-external-only = Seachtrach amháin
+switch-monitor-built-in-only = Inmheánach amháin
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-windows = Fuinneoga
+
+## Window menu, opened by right-clicking a window's title bar
+
+title-bar-menu-screenshot = Glac gabháil scáileáin
+title-bar-menu-hide = Folaigh
+title-bar-menu-restore = Athchóirigh
+title-bar-menu-maximize = Uasmhéadaigh
+title-bar-menu-move = Bog
+title-bar-menu-resize = Athraigh an méid
+title-bar-menu-always-on-top = I gcónaí ar barr
+title-bar-menu-always-on-visible-workspace = I gcónaí ar an spás oibre infheicthe
+title-bar-menu-workspace-left = Bog chuig an spás oibre ar chlé
+title-bar-menu-workspace-right = Bog chuig an spás oibre ar dheis
+title-bar-menu-workspace-up = Bog chuig an spás oibre thuas
+title-bar-menu-workspace-down = Bog chuig an spás oibre thíos
+title-bar-menu-monitor-up = Bog chuig an scáileán thuas
+title-bar-menu-monitor-down = Bog chuig an scáileán thíos
+title-bar-menu-monitor-left = Bog chuig an scáileán ar chlé
+title-bar-menu-monitor-right = Bog chuig an scáileán ar dheis
+title-bar-menu-close = Dún

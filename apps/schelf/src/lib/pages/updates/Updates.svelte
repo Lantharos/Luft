@@ -2,7 +2,6 @@
 	import { ago, bytes, Section } from '@luft/ui';
 	import type { AppUpdate, Job } from '#lib/bindings.js';
 	import { updateJob } from '#lib/app/jobs.js';
-	import { fedora } from '#lib/fedora/fedora.svelte.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { operations } from '#lib/state/operations.svelte.js';
 	import UpdateRow from './UpdateRow.svelte';
@@ -30,8 +29,6 @@
 			const list = waiting.filter((update) => update.source === 'flatpak' && update.installation === installation);
 			batch(`flatpak-updates/${installation}`, list, { kind: 'updateFlatpaks', installation, references: list.map((update) => update.reference!) });
 		}
-		const packages = waiting.filter((update) => update.source === 'package');
-		batch('package-updates', packages, { kind: 'updatePackages', packages: packages.map((update) => update.package!) });
 		const tools = waiting.filter((update) => update.source === 'tool');
 		batch('tool-updates', tools, { kind: 'updateTools', packages: tools.map((update) => update.package!) });
 		for (const update of waiting.filter((update) => update.source === 'appImage')) void operations.run(update.key, update.name, updateJob(update));
@@ -47,7 +44,7 @@
 					{#if library.error}
 						{library.error}
 					{:else if library.checking}
-						{fedora.available ? 'Looking at Flathub, your software sources and your AppImages' : 'Looking at Flathub, your AppImages and your tools'}
+						Looking at Flathub, your AppImages and your tools
 					{:else if library.updates}
 						{updates.length ? `${bytes(size)} to download · ` : ''}Checked {ago(library.updates.checked)}
 					{/if}

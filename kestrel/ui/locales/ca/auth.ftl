@@ -24,6 +24,7 @@ lock-screen-larger-text = Text més gran
 lock-screen-suspend = Suspèn
 lock-screen-restart = Reinicia…
 lock-screen-power-off = Apaga…
+lock-inhibit-reason = Kestrel ha de bloquejar la pantalla
 
 ## Keyring and passphrase prompts. Apps usually supply their own text; these are the defaults
 
@@ -67,3 +68,75 @@ passkeys-ok = D’acord
 passkeys-use-this-computer = Fes servir aquest ordinador
 passkeys-fingerprint-unavailable = Feu servir la contrasenya per continuar.
 passkeys-wrong-password = La contrasenya no és correcta. Torneu-ho a provar.
+
+## Sign-in prompt
+
+auth-prompt-password = Contrasenya
+auth-prompt-username = Nom d’usuari
+auth-prompt-back = Enrere
+auth-prompt-submit = Envia
+auth-prompt-wrong-password = La contrasenya no ha funcionat
+auth-prompt-failed = No ha funcionat. Torneu-ho a provar.
+fingerprint-not-recognized = No s’ha reconegut l’empremta digital
+
+## Administrator authentication
+
+polkit-title = Cal autenticar-se
+polkit-administrator = Administrador
+polkit-password = Contrasenya
+polkit-cancel = Cancel·la
+polkit-authenticate = Autentica
+polkit-failed = No ha funcionat. Torneu-ho a provar.
+
+## Log out, power off and restart dialog
+
+end-session-log-out-user = Tanca la sessió de { $userName }
+end-session-log-out-title = Tanca la sessió
+end-session-log-out-user-countdown = { $seconds ->
+    [one] La sessió de { $userName } es tancarà automàticament d’aquí a { $seconds } segon
+   *[other] La sessió de { $userName } es tancarà automàticament d’aquí a { $seconds } segons
+}
+end-session-log-out-countdown = { $seconds ->
+    [one] La sessió es tancarà automàticament d’aquí a { $seconds } segon
+   *[other] La sessió es tancarà automàticament d’aquí a { $seconds } segons
+}
+end-session-log-out-button = Tanca la sessió
+end-session-power-off-title = Apaga
+end-session-power-off-updates-title = Instal·la les actualitzacions i apaga
+end-session-power-off-countdown = { $seconds ->
+    [one] L’ordinador s’apagarà automàticament d’aquí a { $seconds } segon
+   *[other] L’ordinador s’apagarà automàticament d’aquí a { $seconds } segons
+}
+end-session-power-off-button = Apaga
+end-session-restart-title = Reinicia
+end-session-restart-updates-title = Instal·la les actualitzacions i reinicia
+end-session-restart-countdown = { $seconds ->
+    [one] L’ordinador es reiniciarà automàticament d’aquí a { $seconds } segon
+   *[other] L’ordinador es reiniciarà automàticament d’aquí a { $seconds } segons
+}
+end-session-restart-button = Reinicia
+end-session-update-restart-title = Reinicia i instal·la les actualitzacions
+end-session-update-restart-countdown = { $seconds ->
+    [one] L’ordinador es reiniciarà i instal·larà les actualitzacions automàticament d’aquí a { $seconds } segon
+   *[other] L’ordinador es reiniciarà i instal·larà les actualitzacions automàticament d’aquí a { $seconds } segons
+}
+end-session-update-restart-button = Reinicia i instal·la
+end-session-install-updates = Instal·la les actualitzacions pendents
+end-session-install-version = Instal·la la versió { $version }
+end-session-version-nightly = { $release } Nightly { $number }
+end-session-low-battery = Queda poca bateria: endolleu l’ordinador abans d’instal·lar les actualitzacions
+end-session-busy-apps = Algunes aplicacions estan ocupades o tenen feina sense desar
+end-session-other-users = Hi ha altres usuaris amb la sessió iniciada
+end-session-cancel = Cancel·la
+end-session-boot-options = Opcions d’arrencada
+end-session-remote-user = { $userName } (remot)
+end-session-console-user = { $userName } (consola)
+
+## Lock screen clock
+
+lock-clock-swipe-up = Llisqueu cap amunt
+lock-clock-click-or-press = Feu clic o premeu una tecla
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-unlock = Finestra de desbloqueig

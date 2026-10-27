@@ -1,6 +1,6 @@
 # Czech style guide
 
-How Luft speaks Czech. The [glossary](../../packages/i18n/glossary/cs.csv) has the agreed terms; Weblate shows them next to every string.
+How Luft speaks Czech. The [glossary](../../packages/i18n/glossary/cs.tbx) has the agreed terms; Weblate shows them next to every string.
 
 ## Address and tone
 

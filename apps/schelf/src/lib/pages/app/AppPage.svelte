@@ -1,17 +1,16 @@
 <script lang="ts">
-	import { Segmented } from '@luft/ui';
-	import { commands, type Permissions } from '#lib/bindings.js';
+	import type { Permissions } from '#lib/bridge/types.js';
 	import { APPIMAGE_SANDBOX } from '#lib/app/permissions.js';
 	import AccessList from '#lib/components/AccessList.svelte';
 	import AppArt from '#lib/components/AppArt.svelte';
 	import Description from '#lib/components/Description.svelte';
 	import Screenshots from '#lib/components/Screenshots.svelte';
-	import { fedora } from '#lib/fedora/fedora.svelte.js';
-	import { navigation, type AppTarget } from '#lib/state/navigation.svelte.js';
+	import { backend } from '#lib/bridge/index.js';
+	import type { AppTarget } from '#lib/state/navigation.svelte.js';
 	import AppActions from './AppActions.svelte';
 	import AppFacts from './AppFacts.svelte';
 	import FullAccess from './FullAccess.svelte';
-	import { installedFor, load, type Listing, type Loaded } from './load';
+	import { installedFor, load, type Loaded } from './load';
 
 	let { target, name, askFullAccess = false }: { target: AppTarget; name: string; askFullAccess?: boolean } = $props();
 
@@ -21,11 +20,11 @@
 	let asking = $state(false);
 
 	const details = $derived(loaded?.details ?? null);
-	const installed = $derived(installedFor(target, details));
+	const installed = $derived(installedFor(target));
 	const permissions = $derived(installed?.source === 'appImage' ? APPIMAGE_SANDBOX : (localPermissions ?? details?.permissions ?? null));
 	const title = $derived(details?.name ?? installed?.name ?? name);
 	const summary = $derived(details?.summary ?? installed?.summary ?? '');
-	const sandboxed = $derived(installed?.source === 'appImage' || (installed?.source === 'flatpak' && !fedora.available) ? installed : null);
+	const sandboxed = $derived(installed?.source === 'appImage' || installed?.source === 'flatpak' ? installed : null);
 
 	$effect(() => {
 		asking = askFullAccess;
@@ -43,17 +42,11 @@
 		const app = installed;
 		localPermissions = null;
 		if (app?.source !== 'flatpak' || !app.installation || !app.reference) return;
-		void commands
-			.libraryPermissions({ installation: app.installation, reference: app.reference })
+		void backend
+			.permissions(app.installation, app.reference)
 			.then((result) => (localPermissions = result))
 			.catch(() => {});
 	});
-
-	function switchTo(listing: Listing) {
-		navigation.replace({ page: 'app', target: listing, name: title });
-	}
-
-	const LABELS = { flathub: 'Flathub', fedora: 'Fedora' };
 </script>
 
 <div class="soft-scroll h-full overflow-y-auto">
@@ -69,21 +62,8 @@
 					<p class="text-[14px] text-[var(--text-soft)]">{summary}</p>
 				{/if}
 			</div>
-			<AppActions name={title} listing={loaded?.listing ?? null} packageName={details?.package ?? null} {installed} />
+			<AppActions name={title} listing={loaded?.listing ?? null} {installed} />
 		</header>
-
-		{#if loaded && loaded.alternatives.length > 1 && loaded.listing}
-			{@const listing = loaded.listing}
-			<div class="flex items-center justify-between gap-4">
-				<span class="text-[13px] text-[var(--text-muted)]">Also available from another source</span>
-				<Segmented
-					label="Source"
-					value={listing.origin}
-					options={loaded.alternatives.map((option) => ({ value: option.origin, label: LABELS[option.origin] }))}
-					onchange={(origin) => switchTo(loaded!.alternatives.find((option) => option.origin === origin)!)}
-				/>
-			</div>
-		{/if}
 
 		{#if !loaded}
 			<div class="flex flex-col gap-3" aria-busy="true">

@@ -5,38 +5,14 @@ export type Schedule = 'daily' | 'weekly' | 'never';
 export type Variant = 'standard' | 'nvidia';
 export type Stage = 'waiting' | 'preparing' | 'downloading' | 'installing' | 'removing' | 'finishing';
 
-export interface PackageId {
-	id: string;
-	name: string;
-	version: string;
-	arch: string;
-	data: string;
-}
-
-export interface Update {
-	package: PackageId;
-	summary: string;
-	security: boolean;
-	downloadSize: number;
-	installedVersion: string | null;
-}
-
 export interface Progress {
 	stage: Stage;
 	fraction: number | null;
 }
 
-export type Change = 'refresh' | 'download' | 'update' | 'install' | 'remove';
-
-export interface Elsewhere {
-	by: string | null;
-	change: Change | null;
-}
-
 export interface Activity {
-	running: 'check' | 'download' | 'firmware' | 'rollback' | 'switch' | 'elsewhere' | null;
+	running: 'check' | 'download' | 'firmware' | 'rollback' | 'switch' | null;
 	target: string | null;
-	elsewhere: Elsewhere | null;
 	progress: Progress | null;
 	error: string | null;
 }
@@ -44,20 +20,6 @@ export interface Activity {
 export interface Preferences {
 	schedule: Schedule;
 	download: boolean;
-}
-
-export interface Results {
-	success: boolean;
-	packages: number;
-	finished: number;
-	error: string | null;
-}
-
-export interface PackageOverview {
-	kind: 'packages';
-	updates: Update[];
-	prepared: boolean;
-	results: Results | null;
 }
 
 export interface ChangelogSection {
@@ -77,8 +39,7 @@ export interface VariantOffer {
 	size: number | null;
 }
 
-export interface ImageOverview {
-	kind: 'image';
+export interface SystemOverview {
 	current: Release;
 	staged: Release | null;
 	previous: Release | null;
@@ -91,7 +52,7 @@ export interface ImageOverview {
 export interface Overview {
 	checked: number | null;
 	apps: number | null;
-	system: PackageOverview | ImageOverview;
+	system: SystemOverview;
 }
 
 export interface Status {

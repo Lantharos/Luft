@@ -130,25 +130,10 @@ settings-updates-downloading = Се преземаат ажурирањата…
 settings-updates-rolling-back = Се подготвува претходната верзија…
 settings-updates-switching-nvidia = Се презема двигателот на NVIDIA…
 settings-updates-switching-standard = Се презема стандардната слика на системот…
-settings-updates-elsewhere-refresh-by = { $app } бара ажурирања
-settings-updates-elsewhere-download-by = { $app } ги презема ажурирањата
-settings-updates-elsewhere-update-by = { $app } ги инсталира ажурирањата
-settings-updates-elsewhere-update = Се инсталираат ажурирања
-settings-updates-elsewhere-install-by = { $app } инсталира софтвер
-settings-updates-elsewhere-install = Се инсталира софтвер
-settings-updates-elsewhere-remove-by = { $app } отстранува софтвер
-settings-updates-elsewhere-remove = Се отстранува софтвер
-settings-updates-elsewhere-change-by = { $app } менува софтвер
-settings-updates-elsewhere-change = Се менува софтвер
-settings-updates-elsewhere-wait = Ќе можете повторно да барате ажурирања кога ќе заврши
-settings-updates-ready = Ажурирањата се подготвени за инсталирање
-settings-updates-available = { $count ->
-    [one] Достапно е { $count } ажурирање
-   *[other] Достапни се { $count } ажурирања
-}
 settings-updates-up-to-date = Системот е ажуриран
 settings-updates-version = Верзија { $version }
 settings-updates-version-new = Нова верзија
+settings-version-nightly = { $release } ноќна верзија { $number }
 settings-updates-returning = Подготвено за враќање на верзијата { $version }
 settings-updates-returning-unversioned = Подготвено за враќање на претходната верзија
 settings-updates-nvidia-ready = Двигателот на NVIDIA е подготвен
@@ -157,13 +142,11 @@ settings-updates-version-available = Достапна е верзијата { $v
 settings-updates-version-available-new = Достапна е нова верзија
 settings-updates-version-staged = Верзијата { $version } е подготвена за инсталирање
 settings-updates-version-staged-new = Нова верзија е подготвена за инсталирање
-settings-updates-restart-install-them = Рестартирајте за да ги инсталирате. Компјутерот ќе биде повторно подготвен за неколку минути.
 settings-updates-restart-return = Рестартирајте за да го завршите враќањето.
 settings-updates-restart-switch = Рестартирајте за да завршите. Компјутерот ќе биде повторно подготвен за неколку минути.
 settings-updates-restart-install-it = Рестартирајте за да ја инсталирате. Компјутерот ќе биде повторно подготвен за неколку минути.
 settings-updates-last-checked = Последна проверка { $when }
 settings-updates-never-checked = Сè уште не е проверено
-settings-updates-installed-when = Ажурирањата се инсталирани { $when }
 settings-updates-stop = Запри
 settings-updates-check = Провери сега
 settings-updates-checking-button = Се проверува…
@@ -190,37 +173,7 @@ settings-updates-firmware-restart = Ќе заврши кога ќе рестар
 settings-updates-firmware-installing = Се инсталира…
 settings-updates-firmware-update = Ажурирај
 settings-updates-firmware-failed = Фирмверот не може да се ажурира
-settings-updates-failed = Последните ажурирања не може да се инсталираат
-settings-updates-failed-description = Системот остана каков што беше
-settings-updates-includes = { $parts ->
-    [security] Содржи безбедносни поправки
-    [kernel] Содржи нов Linux-кернел
-    [drivers] Содржи ажурирани двигатели
-    [security-kernel] Содржи безбедносни поправки и нов Linux-кернел
-    [security-drivers] Содржи безбедносни поправки и ажурирани двигатели
-    [kernel-drivers] Содржи нов Linux-кернел и ажурирани двигатели
-    [security-kernel-drivers] Содржи безбедносни поправки, нов Linux-кернел и ажурирани двигатели
-   *[other] Поправки и подобрувања низ целиот систем
-}
-settings-updates-count-size = { $count ->
-    [one] { $count } ажурирање · { $size }
-   *[other] { $count } ажурирања · { $size }
-}
-settings-updates-restart-and-install = Рестартирај и инсталирај
 settings-updates-download = Преземи
-settings-updates-see-included = Погледни што содржи
-settings-updates-included = Што содржи
-settings-updates-included-description = { $count ->
-    [one] { $count } ажурирање за системот, неговите двигатели и библиотеки
-   *[other] { $count } ажурирања за системот, неговите двигатели и библиотеки
-}
-settings-updates-security-fix = Безбедносна поправка
-settings-updates-done = Готово
-settings-updates-area-kernel = Linux-кернел
-settings-updates-area-drivers = Двигатели и фирмвер
-settings-updates-area-desktop = Работна површина
-settings-updates-area-core = Јадро на системот
-settings-updates-area-other = Библиотеки и алатки
 settings-updates-released = Објавено { $when }
 settings-updates-improvements = Поправки и подобрувања низ целиот систем
 settings-updates-download-size = { $size } за преземање
@@ -247,6 +200,7 @@ settings-updates-variant-standard = Префрли се на стандардн�
 settings-updates-variant-nvidia-reason = Полна брзина од вашата графика NVIDIA
 settings-updates-variant-standard-reason = Помала е, бидејќи овој компјутер нема графика NVIDIA
 settings-updates-switch = Префрли
+settings-updates-done = Готово
 
 ## About
 
@@ -270,6 +224,8 @@ settings-about-other-system = Отстранете го за Luft да доби�
 settings-about-remove = Отстрани
 settings-about-software = Софтвер
 settings-about-system = Систем
+settings-about-version = Luft { $version }
+settings-about-built = Изградено на { $date }
 settings-about-desktop = Работна површина
 settings-about-kernel = Кернел
 settings-about-hostname = Име на хостот

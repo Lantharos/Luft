@@ -12,6 +12,8 @@ the plugin was called into a shell that no longer exists and crashed.
 
 Run the Wayland handler after the others, so the plugin manager stops
 starting effects before any client or X11 window goes away.
+
+Upstream-Status: upstream https://gitlab.gnome.org/GNOME/mutter/-/merge_requests/5336 merged for 51.1
 ---
  src/wayland/meta-wayland.c | 5 +++--
  1 file changed, 3 insertions(+), 2 deletions(-)

@@ -4,14 +4,14 @@ Strings in Luft's Latvian translation that a native speaker should check: terms 
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/lv.csv` `board`: "tāfele" — no settled term for an endless window canvas; check it reads naturally next to "darbvieta"
-- `packages/i18n/glossary/lv.csv` `tray`: "sistēmas tekne" — Windows has used both this and "paziņojumu apgabals"; confirm which Latvian users know
-- `packages/i18n/glossary/lv.csv` `accent color`: "akcenta krāsa" — check against the current Windows Latvian term ("izcēluma krāsa" is also seen)
-- `packages/i18n/glossary/lv.csv` `Keep awake`: "Neaizmigt" — no OS precedent; check it reads as a quick settings tile
-- `packages/i18n/glossary/lv.csv` `Keyring`: "atslēgu saišķis" — GNOME's term as remembered; confirm against current GNOME Latvian
-- `packages/i18n/glossary/lv.csv` `signed startup`: "parakstīta startēšana" — no settled term; matches "startēšana" used for the computer starting elsewhere, "parakstīta sāknēšana" is an alternative
-- `packages/i18n/glossary/lv.csv` `shut down`: "izslēgt" — same word as turn off; check no screen needs both side by side
-- `packages/i18n/glossary/lv.csv` `firmware`: "aparātprogrammatūra" — long; check it fits in labels
+- `packages/i18n/glossary/lv.tbx` `board`: "tāfele" — no settled term for an endless window canvas; check it reads naturally next to "darbvieta"
+- `packages/i18n/glossary/lv.tbx` `tray`: "sistēmas tekne" — Windows has used both this and "paziņojumu apgabals"; confirm which Latvian users know
+- `packages/i18n/glossary/lv.tbx` `accent color`: "akcenta krāsa" — check against the current Windows Latvian term ("izcēluma krāsa" is also seen)
+- `packages/i18n/glossary/lv.tbx` `Keep awake`: "Neaizmigt" — no OS precedent; check it reads as a quick settings tile
+- `packages/i18n/glossary/lv.tbx` `Keyring`: "atslēgu saišķis" — GNOME's term as remembered; confirm against current GNOME Latvian
+- `packages/i18n/glossary/lv.tbx` `signed startup`: "parakstīta startēšana" — no settled term; matches "startēšana" used for the computer starting elsewhere, "parakstīta sāknēšana" is an alternative
+- `packages/i18n/glossary/lv.tbx` `shut down`: "izslēgt" — same word as turn off; check no screen needs both side by side
+- `packages/i18n/glossary/lv.tbx` `firmware`: "aparātprogrammatūra" — long; check it fits in labels
 - `packages/web/ui/locales/lv/ui.ftl` `ui-fingerprint-swipe`: "Pārvelciet ar { $finger } pāri sensoram." — relies on the .inline accusative doubling as the instrumental after "ar"
 - `packages/web/ui/locales/lv/ui.ftl` `ui-split-space`: "Vieta sistēmai Luft" — added "sistēmai" so Luft needn't decline; check it isn't too stiff
 - `apps/settings/locales/lv/settings.ftl` `settings-subpage-back`: "Atpakaļ: { $page }" — avoids declining the page name after "uz"; check it sounds right to screen-reader users
@@ -29,9 +29,9 @@ Strings in Luft's Latvian translation that a native speaker should check: terms 
 - `kestrel/ui/locales/lv/system.ftl` `health-gpu-reset-body`: "Dators restartējās pats: { $date }, { $time }." — built so the date's case doesn't matter; check.
 - `kestrel/ui/locales/lv/system.ftl` `peek-error-declined`: "{ $app } var jautāt vēlreiz pēc tam, kad būs aizvērta." — feminine assumes the program is an app; may be a terminal tool.
 - `kestrel/ui/locales/lv/portal.ftl` `print-two-sided`: "Abpusēja druka" — check against what Latvian print dialogs use.
-- `kestrel/ui/locales/lv/engine.ftl` `network-menu-tether`: "Tīklājs" — internet shared from a phone over Bluetooth, named like the Wi-Fi hotspot (header "Bluetooth tīklāji"); check it is understood as Bluetooth tethering.
-- `kestrel/ui/locales/lv/engine.ftl` `switch-monitor-join`: "Paplašināt" — Windows' Extend; English says "Join Displays".
-- `kestrel/ui/locales/lv/engine.ftl` `screenshot-screencasts-folder`: "Ekrāna ieraksti" — folder name on disk; check against existing XDG/GNOME Latvian folder names.
+- `kestrel/ui/locales/lv/system.ftl` `network-menu-tether`: "Tīklājs" — internet shared from a phone over Bluetooth, named like the Wi-Fi hotspot (header "Bluetooth tīklāji"); check it is understood as Bluetooth tethering.
+- `kestrel/ui/locales/lv/desktop.ftl` `switch-monitor-join`: "Paplašināt" — Windows' Extend; English says "Join Displays".
+- `kestrel/ui/locales/lv/system.ftl` `screenshot-screencasts-folder`: "Ekrāna ieraksti" — folder name on disk; check against existing XDG/GNOME Latvian folder names.
 - `apps/setup/locales/lv/setup.ftl` `setup-region-intro-guessed`: "Mēs noteicām { $guesses }, …" — field names (`setup-region-field-*`) are in the accusative (valodu, tastatūru, laika joslu) to fit this sentence; check the joined list reads well.
 - `apps/setup/locales/lv/setup.ftl` `setup-finishing-installed-title`: "Luft ir instalēta" — Luft is treated as feminine (sistēma) throughout setup and installer; confirm the gender.
 - `apps/setup/locales/lv/setup.ftl` `setup-windows-hibernated`: "…ar ātro startēšanu…" — Windows' Latvian name for Fast Startup; verify.
@@ -46,7 +46,6 @@ Strings in Luft's Latvian translation that a native speaker should check: terms 
 - `apps/settings/locales/lv/devices.ftl` `settings-sound-mute`: "Izslēgt skaņu: { $name }" — $name can be "Skaļums" or an app name; colon form avoids declining it, check it sounds fine for screen readers.
 - `apps/settings/locales/lv/devices.ftl` `settings-dictation-engine-description`: "{ $engine } atpazīst šo valodu: { $language }" — colon used so the language name's case doesn't matter; might read stiff.
 - `apps/settings/locales/lv/devices.ftl` `settings-keys-keypad`: "Num { $key }" — short label for number pad keys; check whether reviewers prefer something else.
-- `apps/settings/desktop/locales/lv/desktop.ftl` `desktop-updates-another-app`: "cita lietotne" — fills `settings-updates-elsewhere-*-by` ("{ $app } instalē atjauninājumus"), giving "Schelf instalē atjauninājumus" or "Cita lietotne instalē atjauninājumus"; check both read well.
 - `apps/settings/locales/lv/personalization.ftl` `settings-appearance-wallpaper-folder`: "Mape Wallpapers" — the folder on disk is literally named Wallpapers, so it is kept in English; check it reads naturally next to the translated Attēli.
 - `apps/settings/locales/lv/personalization.ftl` `settings-appearance-wallpaper-fit-title`: "Ietilpināšana" — row title over Aizpildīt/Ietilpināt/Centrēt/Izstiept/Izklāt (Windows' Latvian fit options); check the title isn't stiff.
 - `apps/settings/locales/lv/personalization.ftl` `settings-cursors-folder-description`: "Šeit parādās motīvi, ko ievietojat mapē Mājas › .local › share › icons" — assumes the home folder shows as Mājas in Rover's Latvian sidebar.

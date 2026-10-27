@@ -4,14 +4,14 @@ Strings in Luft's Brazilian Portuguese translation that a native speaker should 
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/pt-BR.csv` `app`: "app" — chosen over Windows' "aplicativo" for length; check it reads naturally on the Settings page "Apps" and in running text.
-- `packages/i18n/glossary/pt-BR.csv` `tray`: "bandeja do sistema" — Windows 11 in Brazil mostly says "área de notificação" or "estouro do canto da barra de tarefas"; check the better-known word.
-- `packages/i18n/glossary/pt-BR.csv` `snap`: "ajustar", "layout de ajuste", "grupo de ajuste" — Windows' terms; check they don't read as "adjust" out of context.
-- `packages/i18n/glossary/pt-BR.csv` `board`: "quadro" — no settled term; check it suggests a canvas of windows rather than a picture frame.
-- `packages/i18n/glossary/pt-BR.csv` `Keep awake`: "Manter ativo" — check it is clear that the screen stays on.
-- `packages/i18n/glossary/pt-BR.csv` `sandbox`: "sandbox" (feminine) — usage varies between "a sandbox" and "o sandbox".
-- `packages/i18n/glossary/pt-BR.csv` `login screen`: "tela de login" — Windows says "tela de entrada"; check which reads better.
-- `packages/i18n/glossary/pt-BR.csv` `Start`: "Start" — kept as a name; Brazilians know Windows' "Iniciar", so check that "menu Start" doesn't feel odd.
+- `packages/i18n/glossary/pt-BR.tbx` `app`: "app" — chosen over Windows' "aplicativo" for length; check it reads naturally on the Settings page "Apps" and in running text.
+- `packages/i18n/glossary/pt-BR.tbx` `tray`: "bandeja do sistema" — Windows 11 in Brazil mostly says "área de notificação" or "estouro do canto da barra de tarefas"; check the better-known word.
+- `packages/i18n/glossary/pt-BR.tbx` `snap`: "ajustar", "layout de ajuste", "grupo de ajuste" — Windows' terms; check they don't read as "adjust" out of context.
+- `packages/i18n/glossary/pt-BR.tbx` `board`: "quadro" — no settled term; check it suggests a canvas of windows rather than a picture frame.
+- `packages/i18n/glossary/pt-BR.tbx` `Keep awake`: "Manter ativo" — check it is clear that the screen stays on.
+- `packages/i18n/glossary/pt-BR.tbx` `sandbox`: "sandbox" (feminine) — usage varies between "a sandbox" and "o sandbox".
+- `packages/i18n/glossary/pt-BR.tbx` `login screen`: "tela de login" — Windows says "tela de entrada"; check which reads better.
+- `packages/i18n/glossary/pt-BR.tbx` `Start`: "Start" — kept as a name; Brazilians know Windows' "Iniciar", so check that "menu Start" doesn't feel odd.
 - `packages/web/ui/locales/pt-BR/ui.ftl` `ui-recovery-key-saved`: "Salva" — feminine to agree with "chave"; check it reads well alone on the button.
 - `packages/web/ui/locales/pt-BR/ui.ftl` `ui-fingerprint-place`: "Coloque o { $finger } no sensor." — every .inline finger name is masculine; check the sentence with "polegar" and "dedo mínimo".
 - `packages/web/ui/locales/pt-BR/ui.ftl` `ui-time-just-now`: "agora mesmo" — lowercase because it may follow other text; check where it shows.
@@ -25,8 +25,8 @@ Strings in Luft's Brazilian Portuguese translation that a native speaker should 
 - `kestrel/ui/locales/pt-BR/system.ftl` `dictation-unsupported-title`: "O ditado em { $language } não está disponível neste computador" — $language currently arrives in English (“em Japanese”).
 - `apps/setup/locales/pt-BR/setup.ftl` `setup-region-field-language` (and keyboard, time zone): "o idioma" — fields carry articles so “Detectamos o idioma e o teclado pelo computador” reads well; check they are only used inside these lists.
 - `kestrel/ui/locales/pt-BR/portal.ftl` `print-paper-statement`: "Statement" — no settled Brazilian name for this paper size; kept the English name.
-- `kestrel/ui/locales/pt-BR/engine.ftl` `network-menu-tether`: "Ancoragem" — Android's term for tethering; check it is clear on a quick settings tile.
-- `kestrel/ui/locales/pt-BR/engine.ftl` `switch-monitor-external-only`: "Só externa" / `switch-monitor-built-in-only`: "Só integrada" — shortened to stay under 15 characters; feminine agreeing with “tela”.
+- `kestrel/ui/locales/pt-BR/system.ftl` `network-menu-tether`: "Ancoragem" — Android's term for tethering; check it is clear on a quick settings tile.
+- `kestrel/ui/locales/pt-BR/desktop.ftl` `switch-monitor-external-only`: "Só externa" / `switch-monitor-built-in-only`: "Só integrada" — shortened to stay under 15 characters; feminine agreeing with “tela”.
 - `apps/setup/locales/pt-BR/setup.ftl` `setup-account-full-name-example`: "Clarice Lispector" — chosen as a well-known Brazilian name in place of Ada Lovelace.
 
 ## Settings
@@ -49,9 +49,8 @@ Strings in Luft's Brazilian Portuguese translation that a native speaker should 
 - `apps/settings/locales/pt-BR/personalization.ftl` `settings-accessibility-pointing`: "Ponteiro" — section heading for pointing aids; "Apontar e clicar" is GNOME's alternative if this feels too narrow.
 - `apps/settings/locales/pt-BR/personalization.ftl` `settings-fonts-sample`: "Um pequeno jabuti xereta viu dez cegonhas felizes" — classic Brazilian pangram (misses k, w, y); check it is the preferred one.
 - `packages/web/ui/locales/pt-BR/ui.ftl` `ui-passphrase-field`: "Frase secreta" — used for "passphrase" throughout to keep it apart from "senha"; GNOME's term, Windows BitLocker just says "senha".
-- `apps/settings/locales/pt-BR/protection.ftl` `settings-passwords-history-read`: "{ $app } usou “{ $item }”" — app names start the sentence without the article the style guide asks for (o Rover), since $app can be any app; same in the other history lines, `settings-passwords-forget-*` and `settings-updates-elsewhere-*-by`.
+- `apps/settings/locales/pt-BR/protection.ftl` `settings-passwords-history-read`: "{ $app } usou “{ $item }”" — app names start the sentence without the article the style guide asks for (o Rover), since $app can be any app; same in the other history lines and `settings-passwords-forget-*`.
 - `apps/settings/locales/pt-BR/protection.ftl` `settings-security-anti-cheat`: "Jogos com antitrapaça" — "anti-cheat" is often left in English by Brazilian gamers; check which reads more natural.
-- `apps/settings/locales/pt-BR/system.ftl` `settings-updates-installed-when`: "Atualizações instaladas { $when }" — relies on $when being "há 3 dias" / "ontem"; same in `settings-updates-released`, `settings-passwords-ssh-added`, `settings-passkeys-last-used`.
 - `apps/settings/locales/pt-BR/system.ftl` `settings-updates-stay`: "Ficar na { $version }" — elided "versão"; check it reads naturally with a version number.
 
 

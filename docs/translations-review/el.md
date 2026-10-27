@@ -4,14 +4,14 @@ Strings in Luft's Greek translation that a native speaker should check: terms wi
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/el.csv` `snap`: "τακτοποίηση", snap layout "διάταξη παραθύρων", snap group "ομάδα παραθύρων" — check what Greek Windows 11 calls Snap, Snap layouts and Snap groups and whether to follow it.
-- `packages/i18n/glossary/el.csv` `board`: "πίνακας" — the word also means table and painting; check it reads as Luft's canvas mode in context.
-- `packages/i18n/glossary/el.csv` `tray`: "πλαίσιο συστήματος" — KDE's term; check it's understood for a taskbar button holding background apps.
-- `packages/i18n/glossary/el.csv` `Keep awake`: "Παραμονή σε εγρήγορση" — no standard term; check it's natural for a quick settings tile and fits.
-- `packages/i18n/glossary/el.csv` `Network Sign-In`: "Σύνδεση σε δίκτυο" — "σύνδεση" is both sign in and connect; check it doesn't read as just connecting to a network.
-- `packages/i18n/glossary/el.csv` `sandbox`: "απομονωμένο περιβάλλον" — long; check whether "sandbox" in Latin letters is more common among Greek users.
-- `packages/i18n/glossary/el.csv` `Power mode`: "Λειτουργία ενέργειας" — check against Greek Windows' "Λειτουργία παροχής ενέργειας".
-- `packages/i18n/glossary/el.csv` `USB stick`: "στικ USB" — check against "μονάδα flash USB" and the everyday "στικάκι".
+- `packages/i18n/glossary/el.tbx` `snap`: "τακτοποίηση", snap layout "διάταξη παραθύρων", snap group "ομάδα παραθύρων" — check what Greek Windows 11 calls Snap, Snap layouts and Snap groups and whether to follow it.
+- `packages/i18n/glossary/el.tbx` `board`: "πίνακας" — the word also means table and painting; check it reads as Luft's canvas mode in context.
+- `packages/i18n/glossary/el.tbx` `tray`: "πλαίσιο συστήματος" — KDE's term; check it's understood for a taskbar button holding background apps.
+- `packages/i18n/glossary/el.tbx` `Keep awake`: "Παραμονή σε εγρήγορση" — no standard term; check it's natural for a quick settings tile and fits.
+- `packages/i18n/glossary/el.tbx` `Network Sign-In`: "Σύνδεση σε δίκτυο" — "σύνδεση" is both sign in and connect; check it doesn't read as just connecting to a network.
+- `packages/i18n/glossary/el.tbx` `sandbox`: "απομονωμένο περιβάλλον" — long; check whether "sandbox" in Latin letters is more common among Greek users.
+- `packages/i18n/glossary/el.tbx` `Power mode`: "Λειτουργία ενέργειας" — check against Greek Windows' "Λειτουργία παροχής ενέργειας".
+- `packages/i18n/glossary/el.tbx` `USB stick`: "στικ USB" — check against "μονάδα flash USB" and the everyday "στικάκι".
 - `packages/web/ui/locales/el/ui.ftl` `ui-finger-*` `.inline`: "τον δεξιό δείκτη", "το δεξί μικρό δάχτυλο" — the article is part of `.inline`; check it reads well in "Τοποθετήστε { $finger } στον αισθητήρα." and in any later sentence using these forms.
 - `packages/web/ui/locales/el/ui.ftl` `ui-toast-dismiss`: "Απόρριψη" — check whether "Κλείσιμο" is the more natural screen-reader label for closing a notification.
 - `packages/web/ui/locales/el/ui.ftl` `ui-select-placeholder`: "Επιλογή" — check it reads as a prompt in an empty dropdown.
@@ -28,10 +28,10 @@ Strings in Luft's Greek translation that a native speaker should check: terms wi
 - `kestrel/ui/locales/el/system.ftl` `media-keys-airplane-mode-hardware`: "Η λειτουργία πτήσης είναι ενεργή από διακόπτη της συσκευής" — "in hardware" interpreted as a hardware switch.
 - `kestrel/ui/locales/el/system.ftl` `oom-closed-body`: "Η μνήμη του υπολογιστή είχε σχεδόν εξαντληθεί, οπότε έκλεισε…" — the subject of «έκλεισε» (the app or container) comes from the title; check it doesn't read as if the memory closed.
 - `kestrel/ui/locales/el/system.ftl` `vpn-field-pre-shared-key`: "Προκοινόχρηστο κλειδί" — Windows' term, also used for `settings-network-wireguard-preshared-key` in connections.ftl; check it's still current.
-- `kestrel/ui/locales/el/engine.ftl` `network-menu-tether`: "Κοινή σύνδεση" — no settled short term for a Bluetooth tether tile.
-- `kestrel/ui/locales/el/engine.ftl` `network-menu-mobile`: "Κινητά δεδομένα" — tile title for mobile broadband.
-- `kestrel/ui/locales/el/engine.ftl` `switch-monitor-built-in-only`: "Μόνο εσωτερική" — shortened to stay under 15 characters; «ενσωματωμένη» would be more precise.
-- `kestrel/ui/locales/el/engine.ftl` `osk-letters-key`: "ΑΒΓ" — Greek letters on the key; check that's right when the active layout is Latin.
+- `kestrel/ui/locales/el/system.ftl` `network-menu-tether`: "Κοινή σύνδεση" — no settled short term for a Bluetooth tether tile.
+- `kestrel/ui/locales/el/system.ftl` `network-menu-mobile`: "Κινητά δεδομένα" — tile title for mobile broadband.
+- `kestrel/ui/locales/el/desktop.ftl` `switch-monitor-built-in-only`: "Μόνο εσωτερική" — shortened to stay under 15 characters; «ενσωματωμένη» would be more precise.
+- `kestrel/ui/locales/el/surfaces.ftl` `osk-letters-key`: "ΑΒΓ" — Greek letters on the key; check that's right when the active layout is Latin.
 - `apps/setup/locales/el/setup.ftl` `setup-region-field-language`: "τη γλώσσα" — field names carry the accusative article because they are only used inside «Συμπεράναμε { $guesses }».
 - `apps/setup/locales/el/setup.ftl` `setup-destination-replace-title`: "Αντικατάσταση του { $system }" — assumes a Latin system name (neuter).
 - `apps/setup/locales/el/setup.ftl` `setup-windows-hibernated`: "…τερματίστηκαν με γρήγορη εκκίνηση…" — assumes Greek Windows calls Fast Startup «Γρήγορη εκκίνηση».
@@ -39,7 +39,6 @@ Strings in Luft's Greek translation that a native speaker should check: terms wi
 
 ## Settings
 
-- `apps/settings/desktop/locales/el/desktop.ftl` `desktop-updates-another-app`: "μια άλλη εφαρμογή" — fills `{ $app }` in the `settings-updates-elsewhere-*-by` lines of system.ftl, which start with the bare name: «Μια άλλη εφαρμογή αναζητά ενημερώσεις», «GNOME Software αναζητά ενημερώσεις», «dnf εγκαθιστά λογισμικό». Check the named forms read acceptably without an article.
 - `apps/settings/locales/el/connections.ftl` `settings-bluetooth-request-unnamed`: "τη συσκευή" — accusative so it fits "Σύζευξη με { $name };", "για { $name }"; the .description lines of request-confirm, request-authorize and request-display say «η συσκευή» instead of repeating $name, which the title already shows.
 - `apps/settings/locales/el/connections.ftl` `settings-network-security-owe`: "Βελτιωμένο ανοιχτό" — no settled Greek term for Enhanced Open (OWE); compare with what Windows/Android show.
 - `apps/settings/locales/el/devices.ftl` `settings-keys-keypad`: "Num { $key }" — short label for number-pad keys; check whether Greek users would expect something else.

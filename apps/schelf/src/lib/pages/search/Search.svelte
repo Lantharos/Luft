@@ -3,7 +3,6 @@
 	import Shelf from '#lib/components/Shelf.svelte';
 	import * as flathub from '#lib/catalog/flathub.js';
 	import type { CatalogApp } from '#lib/catalog/types.js';
-	import { fedora } from '#lib/fedora/fedora.svelte.js';
 	import { sourceName } from '#lib/format.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
@@ -20,7 +19,6 @@
 
 	const needle = $derived(query.toLowerCase());
 	const installed = $derived(library.installed.filter((app) => app.name.toLowerCase().includes(needle)).slice(0, 8));
-	const local = $derived(fedora.search(query)?.slice(0, LIMIT) ?? null);
 
 	$effect(() => {
 		const current = query;
@@ -36,7 +34,7 @@
 			});
 	});
 
-	const others = $derived(fedora.available ? (local?.length ?? null) : tools === null || system === null ? null : tools + system);
+	const others = $derived(tools === null || system === null ? null : tools + system);
 	const nothing = $derived(!installed.length && remote?.length === 0 && others === 0);
 </script>
 
@@ -63,12 +61,8 @@
 		{:else if remote === null || remote.length}
 			<Shelf title="Flathub" apps={remote} />
 		{/if}
-		{#if !fedora.available}
-			<PackageResults {query} kind="tool" bind:found={tools} />
-			<PackageResults {query} kind="system" bind:found={system} />
-		{:else if local === null || local.length}
-			<Shelf title="Fedora" apps={local} />
-		{/if}
+		<PackageResults {query} kind="tool" bind:found={tools} />
+		<PackageResults {query} kind="system" bind:found={system} />
 		{#if nothing}
 			<p class="px-1.5 pt-10 text-center text-[15px] text-[var(--text-muted)]">Nothing matches “{query}”.</p>
 		{/if}

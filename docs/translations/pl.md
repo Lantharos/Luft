@@ -1,6 +1,6 @@
 # Polish style guide
 
-How Luft speaks Polish. The [glossary](../../packages/i18n/glossary/pl.csv) has the agreed terms; Weblate shows them next to every string.
+How Luft speaks Polish. The [glossary](../../packages/i18n/glossary/pl.tbx) has the agreed terms; Weblate shows them next to every string.
 
 ## Address and tone
 

@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
-import * as DND from '../../../shell/popups/dnd.js';
+import * as DND from '../../../shared/popups/dnd.js';
 
 import { taskbarPreferences } from '../preferences/taskbarPreferences.js';
 

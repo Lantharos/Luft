@@ -61,3 +61,45 @@ snap-zone = Telakoi alueelle { $width } % × { $height } %
 title-bar-minimize = Pienennä
 title-bar-maximize = Suurenna
 title-bar-close = Sulje
+
+## Window resizing
+
+window-resize-size = { $width } × { $height }
+
+## App not responding
+
+close-dialog-title = ”{ $appName }” ei vastaa
+close-dialog-description = Voit odottaa hetken, jatkaako se toimintaansa, tai pakottaa sovelluksen sulkeutumaan
+close-dialog-force-quit = Pakota lopetus
+close-dialog-wait = Odota
+
+## Display mode switcher, keep each label under about 15 characters
+
+switch-monitor-mirror = Monista
+switch-monitor-join = Laajenna
+switch-monitor-external-only = Vain ulkoinen
+switch-monitor-built-in-only = Vain sisäinen
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-windows = Ikkunat
+
+## Window menu, opened by right-clicking a window's title bar
+
+title-bar-menu-screenshot = Ota kuvakaappaus
+title-bar-menu-hide = Pienennä
+title-bar-menu-restore = Palauta
+title-bar-menu-maximize = Suurenna
+title-bar-menu-move = Siirrä
+title-bar-menu-resize = Muuta kokoa
+title-bar-menu-always-on-top = Aina päällimmäisenä
+title-bar-menu-always-on-visible-workspace = Aina näkyvässä työtilassa
+title-bar-menu-workspace-left = Siirrä vasemmanpuoleiseen työtilaan
+title-bar-menu-workspace-right = Siirrä oikeanpuoleiseen työtilaan
+title-bar-menu-workspace-up = Siirrä yläpuoliseen työtilaan
+title-bar-menu-workspace-down = Siirrä alapuoliseen työtilaan
+title-bar-menu-monitor-up = Siirrä yläpuoliseen näyttöön
+title-bar-menu-monitor-down = Siirrä alapuoliseen näyttöön
+title-bar-menu-monitor-left = Siirrä vasemmanpuoleiseen näyttöön
+title-bar-menu-monitor-right = Siirrä oikeanpuoleiseen näyttöön
+title-bar-menu-close = Sulje

@@ -6793,7 +6793,7 @@ checksum = "cf54715a573b99ac80df0bc206da022bcd442c974952c7b9720069370852e21f"
 
 [[package]]
 name = "sabine"
-version = "0.56.0"
+version = "0.57.0"
 dependencies = [
  "base64",
  "block2",
@@ -6853,7 +6853,7 @@ dependencies = [
 
 [[package]]
 name = "sabine-bridge"
-version = "0.56.0"
+version = "0.57.0"
 dependencies = [
  "serde",
  "serde_json",
@@ -6864,7 +6864,7 @@ dependencies = [
 
 [[package]]
 name = "sabine-host"
-version = "0.56.0"
+version = "0.57.0"
 dependencies = [
  "sabine-bridge",
  "sabine-runtime",
@@ -6875,7 +6875,7 @@ dependencies = [
 
 [[package]]
 name = "sabine-platform"
-version = "0.56.0"
+version = "0.57.0"
 dependencies = [
  "block2",
  "futures-util",
@@ -6894,7 +6894,7 @@ dependencies = [
 
 [[package]]
 name = "sabine-runtime"
-version = "0.56.0"
+version = "0.57.0"
 dependencies = [
  "bzip2",
  "libc",
@@ -6910,7 +6910,7 @@ dependencies = [
 
 [[package]]
 name = "sabine-service"
-version = "0.56.0"
+version = "0.57.0"
 dependencies = [
  "base64",
  "clap",

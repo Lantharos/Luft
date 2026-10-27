@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { ago, Row } from '@luft/ui';
-	import { rollback, type Activity, type ImageOverview, type Release } from '../api';
+	import { rollback, type Activity, type SystemOverview, type Release } from '../api';
+	import { versionLabel } from '../../version';
 	import { named } from '../headline';
 	import NotesDialog from './NotesDialog.svelte';
 	import VariantRow from './VariantRow.svelte';
 
 	interface Props {
-		overview: ImageOverview;
+		overview: SystemOverview;
 		activity: Activity;
 		attempt: (action: () => Promise<void>) => void;
 	}
@@ -21,7 +22,7 @@
 	const released = $derived(current.released ? t('settings-updates-released', { when: ago(current.released) }) : null);
 </script>
 
-<Row title={t('settings-updates-installed-version')} description={[current.version, released].filter(Boolean).join(' · ') || t('settings-updates-unknown')}>
+<Row title={t('settings-updates-installed-version')} description={[current.version && versionLabel(current.version), released].filter(Boolean).join(' · ') || t('settings-updates-unknown')}>
 	{#if current.notes}
 		<button type="button" class="button" onclick={() => (notes = current)}>{t('settings-updates-whats-new')}</button>
 	{/if}

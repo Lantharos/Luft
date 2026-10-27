@@ -130,25 +130,10 @@ settings-updates-downloading = Download degli aggiornamenti…
 settings-updates-rolling-back = Preparazione della versione precedente…
 settings-updates-switching-nvidia = Download del driver NVIDIA…
 settings-updates-switching-standard = Download dell’immagine standard…
-settings-updates-elsewhere-refresh-by = { $app } sta cercando aggiornamenti
-settings-updates-elsewhere-download-by = { $app } sta scaricando gli aggiornamenti
-settings-updates-elsewhere-update-by = { $app } sta installando gli aggiornamenti
-settings-updates-elsewhere-update = Installazione degli aggiornamenti in corso
-settings-updates-elsewhere-install-by = { $app } sta installando del software
-settings-updates-elsewhere-install = Installazione di software in corso
-settings-updates-elsewhere-remove-by = { $app } sta rimuovendo del software
-settings-updates-elsewhere-remove = Rimozione di software in corso
-settings-updates-elsewhere-change-by = { $app } sta modificando del software
-settings-updates-elsewhere-change = Modifica di software in corso
-settings-updates-elsewhere-wait = Potrai cercare di nuovo gli aggiornamenti quando avrà finito
-settings-updates-ready = Gli aggiornamenti sono pronti per l’installazione
-settings-updates-available = { $count ->
-    [one] { $count } aggiornamento disponibile
-   *[other] { $count } aggiornamenti disponibili
-}
 settings-updates-up-to-date = Il sistema è aggiornato
 settings-updates-version = Versione { $version }
 settings-updates-version-new = Una nuova versione
+settings-version-nightly = { $release } Nightly { $number }
 settings-updates-returning = Pronto a tornare alla versione { $version }
 settings-updates-returning-unversioned = Pronto a tornare alla versione precedente
 settings-updates-nvidia-ready = Il driver NVIDIA è pronto
@@ -157,13 +142,11 @@ settings-updates-version-available = La versione { $version } è disponibile
 settings-updates-version-available-new = È disponibile una nuova versione
 settings-updates-version-staged = La versione { $version } è pronta per l’installazione
 settings-updates-version-staged-new = Una nuova versione è pronta per l’installazione
-settings-updates-restart-install-them = Riavvia per installarli. Il computer sarà di nuovo pronto in pochi minuti.
 settings-updates-restart-return = Riavvia per completare il ritorno alla versione precedente.
 settings-updates-restart-switch = Riavvia per completare. Il computer sarà di nuovo pronto in pochi minuti.
 settings-updates-restart-install-it = Riavvia per installarla. Il computer sarà di nuovo pronto in pochi minuti.
 settings-updates-last-checked = Ultimo controllo: { $when }
 settings-updates-never-checked = Non ancora controllato
-settings-updates-installed-when = Aggiornamenti installati { $when }
 settings-updates-stop = Interrompi
 settings-updates-check = Controlla ora
 settings-updates-checking-button = Controllo…
@@ -190,37 +173,7 @@ settings-updates-firmware-restart = Termina al riavvio
 settings-updates-firmware-installing = Installazione…
 settings-updates-firmware-update = Aggiorna
 settings-updates-firmware-failed = Impossibile aggiornare il firmware
-settings-updates-failed = Impossibile installare gli ultimi aggiornamenti
-settings-updates-failed-description = Il sistema è rimasto com’era
-settings-updates-includes = { $parts ->
-    [security] Include correzioni di sicurezza
-    [kernel] Include un nuovo kernel Linux
-    [drivers] Include driver aggiornati
-    [security-kernel] Include correzioni di sicurezza e un nuovo kernel Linux
-    [security-drivers] Include correzioni di sicurezza e driver aggiornati
-    [kernel-drivers] Include un nuovo kernel Linux e driver aggiornati
-    [security-kernel-drivers] Include correzioni di sicurezza, un nuovo kernel Linux e driver aggiornati
-   *[other] Correzioni e miglioramenti in tutto il sistema
-}
-settings-updates-count-size = { $count ->
-    [one] { $count } aggiornamento · { $size }
-   *[other] { $count } aggiornamenti · { $size }
-}
-settings-updates-restart-and-install = Riavvia e installa
 settings-updates-download = Scarica
-settings-updates-see-included = Vedi cosa include
-settings-updates-included = Cosa include
-settings-updates-included-description = { $count ->
-    [one] { $count } aggiornamento per il sistema, i suoi driver e le sue librerie
-   *[other] { $count } aggiornamenti per il sistema, i suoi driver e le sue librerie
-}
-settings-updates-security-fix = Correzione di sicurezza
-settings-updates-done = Fine
-settings-updates-area-kernel = Kernel Linux
-settings-updates-area-drivers = Driver e firmware
-settings-updates-area-desktop = Desktop
-settings-updates-area-core = Sistema di base
-settings-updates-area-other = Librerie e strumenti
 settings-updates-released = Pubblicato { $when }
 settings-updates-improvements = Correzioni e miglioramenti in tutto il sistema
 settings-updates-download-size = { $size } da scaricare
@@ -247,6 +200,7 @@ settings-updates-variant-standard = Passa all’immagine standard
 settings-updates-variant-nvidia-reason = Piena velocità dalla tua scheda video NVIDIA
 settings-updates-variant-standard-reason = Più leggera, perché questo computer non ha una scheda video NVIDIA
 settings-updates-switch = Passa
+settings-updates-done = Fine
 
 ## About
 
@@ -270,6 +224,8 @@ settings-about-other-system = Rimuovilo per dare i suoi { $size } a Luft
 settings-about-remove = Rimuovi
 settings-about-software = Software
 settings-about-system = Sistema
+settings-about-version = Luft { $version }
+settings-about-built = Compilata il { $date }
 settings-about-desktop = Desktop
 settings-about-kernel = Kernel
 settings-about-hostname = Nome host

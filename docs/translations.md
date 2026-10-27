@@ -8,16 +8,14 @@ Luft is translated into Albanian, Bosnian, Bulgarian, Catalan, Croatian, Czech, 
 
 | Component | Files | English source |
 | --- | --- | --- |
-| kestrel-desktop | `kestrel/ui/locales/*/desktop.ftl` | taskbar, tray, board, task view, snapping |
-| kestrel-surfaces | `kestrel/ui/locales/*/surfaces.ftl` | Start, quick settings, notifications, calendar, clipboard, emoji |
-| kestrel-shell | `kestrel/ui/locales/*/shell.ftl` | shared pieces such as key names and durations |
-| kestrel-system | `kestrel/ui/locales/*/system.ftl` | network sign-in, VPNs, dictation, system notices |
-| kestrel-auth | `kestrel/ui/locales/*/auth.ftl` | login screen, lock screen, keyring and passkey prompts |
+| kestrel-desktop | `kestrel/ui/locales/*/desktop.ftl` | taskbar, tray, board, task view, snapping, title bars, window menus, switchers, rain |
+| kestrel-surfaces | `kestrel/ui/locales/*/surfaces.ftl` | Start, quick settings, notifications, calendar, clipboard, emoji, the on-screen keyboard |
+| kestrel-shell | `kestrel/ui/locales/*/shell.ftl` | shared pieces such as key names, durations and text field menus |
+| kestrel-system | `kestrel/ui/locales/*/system.ftl` | network menus and sign-in, VPNs, Bluetooth, sound, power, displays, drives, accessibility, screenshots, dictation, system notices |
+| kestrel-auth | `kestrel/ui/locales/*/auth.ftl` | login screen, lock screen, sign-in and administrator prompts, keyring and passkey prompts, signing out and powering off |
 | kestrel-portal | `kestrel/ui/locales/*/portal.ftl` | printing, screen sharing, shortcuts and other app requests |
-| kestrel-session | `kestrel/ui/locales/*/session.ftl` | signing out, first-run setup mode |
 | kestrel-settings | `kestrel/settings/locales/*/settings.ftl` | notifications from `kestrel-settings` about drives |
 | kestrel-portal-service | `kestrel/portal/locales/*/portal.ftl` | print job names and printing failures from `kestrel-portal` |
-| kestrel-engine | `kestrel/ui/locales/*/engine.ftl` | dialogs, menus and quick settings of Kestrel's window management, lock screen, notifications and screenshots |
 | ui | `packages/web/ui/locales/*/ui.ftl` | the UI kit every app shares |
 | settings | `apps/settings/locales/*/settings.ftl` | Settings' window, sidebar and its groups, and search |
 | settings-pages | `packages/web/settings-pages/locales/*/pages.ftl` | Settings' page names and search words, also used by Start |
@@ -40,7 +38,7 @@ Luft is translated into Albanian, Bosnian, Bulgarian, Catalan, Croatian, Czech, 
 
 `packages/i18n/components.json` lists the same components with the code each one covers. Language folders use BCP 47 tags: `en`, `bs`, `ca`, `cs`, `da`, `de`, `et`, `es`, `fr`, `ga`, `hr`, `is`, `it`, `lv`, `lt`, `hu`, `mt`, `nl`, `nb`, `nn`, `pl`, `pt-BR`, `pt`, `ro`, `sq`, `sk`, `sl`, `sr-Latn`, `fi`, `sv`, `tr`, `el`, `bg`, `mk`, `ru`, `sr`, `uk`.
 
-The glossary for each language is `packages/i18n/glossary/<language>.csv`, and its style guide is `docs/translations/<language>.md`. Strings a native speaker should look at first, with the reason for each, are listed in `docs/translations-review/<language>.md`; remove a note once someone fluent has checked it.
+The glossary for each language is `packages/i18n/glossary/<language>.tbx`, and its style guide is `docs/translations/<language>.md`. Strings a native speaker should look at first, with the reason for each, are listed in `docs/translations-review/<language>.md`; remove a note once someone fluent has checked it.
 
 ## How a language is picked
 
@@ -119,7 +117,7 @@ Translations happen on [Hosted Weblate](https://hosted.weblate.org) under its fr
    - Language filter: `^(?!sr-Latn$).*$`, since the Latin Serbian files are generated from the Cyrillic ones
    - License: **GPL-3.0-or-later**
 4. Add every other component from the table above the same way, with **From existing component** → repository `weblate://luft/kestrel-desktop`, so they share one clone and one pull request. Name each component as in the table, with its file mask and its `en` file as the base.
-5. Add a component named **Glossary**: file format **CSV file**, file mask `packages/i18n/glossary/*.csv`, no base file, and turn on **Use as a glossary**. Weblate then shows the agreed terms next to every string.
+5. Add a component named **Glossary**: file format **TermBase eXchange file**, file mask `packages/i18n/glossary/*.tbx`, no base file, and turn on **Use as a glossary**. Weblate then shows the agreed terms next to every string.
 6. On GitHub, under the repository's **Settings → Webhooks**, add `https://hosted.weblate.org/hooks/github/` with content type `application/json` and the push event, so Weblate pulls new strings as soon as they land on `main`.
 7. Weblate opens pull requests from its own fork. In the project's **Add-ons**, turn on **Squash Git commits** (per language) to keep them small.
 8. Each pull request runs the checks workflow, which fails if a translation doesn't parse or uses a variable English doesn't have. A pull request that changes Serbian also needs `bun run transliterate` in `packages/i18n`, committed to its branch, before it passes.

@@ -1,3 +1,5 @@
 kestrel/ui/src/desktop/gestures/touchscreen.ts	Kestrel touchscreen ${type === Clutter.EventType.TOUCHPAD_PINCH ? 'pinch' : 'swipe'}
 kestrel/ui/src/desktop/panel/tablet/edgeSwipe.ts	Tablet taskbar bottom drag
 kestrel/ui/src/desktop/tray/watcher.ts	Only one tray host is supported
+kestrel/ui/src/desktop/windowManager/windowManager.ts	Window unfullscreen top drag
+kestrel/ui/src/desktop/windowManager/windowManager.ts	Unmatched call to unblockWorkspaceUpdates()

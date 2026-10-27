@@ -24,6 +24,7 @@ lock-screen-larger-text = Поголем текст
 lock-screen-suspend = Спиење
 lock-screen-restart = Рестартирај…
 lock-screen-power-off = Исклучи…
+lock-inhibit-reason = Kestrel треба да го заклучи екранот
 
 ## Keyring and passphrase prompts. Apps usually supply their own text; these are the defaults
 
@@ -67,3 +68,75 @@ passkeys-ok = Во ред
 passkeys-use-this-computer = Користи го овој компјутер
 passkeys-fingerprint-unavailable = Користете ја лозинката за да продолжите.
 passkeys-wrong-password = Лозинката не е точна. Обидете се повторно.
+
+## Sign-in prompt
+
+auth-prompt-password = Лозинка
+auth-prompt-username = Корисничко име
+auth-prompt-back = Назад
+auth-prompt-submit = Потврди
+auth-prompt-wrong-password = Лозинката не е точна
+auth-prompt-failed = Не успеа. Обидете се повторно.
+fingerprint-not-recognized = Отпечатокот од прст не е препознаен
+
+## Administrator authentication
+
+polkit-title = Потребна е потврда
+polkit-administrator = Администратор
+polkit-password = Лозинка
+polkit-cancel = Откажи
+polkit-authenticate = Потврди
+polkit-failed = Не успеа. Обидете се повторно.
+
+## Log out, power off and restart dialog
+
+end-session-log-out-user = Одјава на { $userName }
+end-session-log-out-title = Одјава
+end-session-log-out-user-countdown = { $seconds ->
+    [one] { $userName } ќе се одјави автоматски за { $seconds } секунда
+   *[other] { $userName } ќе се одјави автоматски за { $seconds } секунди
+}
+end-session-log-out-countdown = { $seconds ->
+    [one] Ќе бидете автоматски одјавени за { $seconds } секунда
+   *[other] Ќе бидете автоматски одјавени за { $seconds } секунди
+}
+end-session-log-out-button = Одјави се
+end-session-power-off-title = Исклучување
+end-session-power-off-updates-title = Инсталирање ажурирања и исклучување
+end-session-power-off-countdown = { $seconds ->
+    [one] Системот ќе се исклучи автоматски за { $seconds } секунда
+   *[other] Системот ќе се исклучи автоматски за { $seconds } секунди
+}
+end-session-power-off-button = Исклучи
+end-session-restart-title = Рестартирање
+end-session-restart-updates-title = Инсталирање ажурирања и рестартирање
+end-session-restart-countdown = { $seconds ->
+    [one] Системот ќе се рестартира автоматски за { $seconds } секунда
+   *[other] Системот ќе се рестартира автоматски за { $seconds } секунди
+}
+end-session-restart-button = Рестартирај
+end-session-update-restart-title = Рестартирање и инсталирање ажурирања
+end-session-update-restart-countdown = { $seconds ->
+    [one] Системот ќе се рестартира и ќе ги инсталира ажурирањата автоматски за { $seconds } секунда
+   *[other] Системот ќе се рестартира и ќе ги инсталира ажурирањата автоматски за { $seconds } секунди
+}
+end-session-update-restart-button = Рестартирај и инсталирај
+end-session-install-updates = Инсталирај ги ажурирањата што чекаат
+end-session-install-version = Инсталирај ја верзијата { $version }
+end-session-version-nightly = { $release } ноќна верзија { $number }
+end-session-low-battery = Батеријата е слаба. Приклучете го компјутерот на струја пред да инсталирате ажурирања.
+end-session-busy-apps = Некои апликации се зафатени или имаат незачувана работа
+end-session-other-users = Најавени се и други корисници
+end-session-cancel = Откажи
+end-session-boot-options = Опции за подигање
+end-session-remote-user = { $userName } (од далечина)
+end-session-console-user = { $userName } (конзола)
+
+## Lock screen clock
+
+lock-clock-swipe-up = Повлечете нагоре
+lock-clock-click-or-press = Кликнете или притиснете копче
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-unlock = Прозорец за отклучување

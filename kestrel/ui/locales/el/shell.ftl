@@ -36,3 +36,27 @@ keys-page-down = Page Down
 keys-print-screen = Print Screen
 
 date-just-now = Μόλις τώρα
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-panel = Γραμμή εργασιών
+
+## System notifications
+
+unsafe-mode-title = Το σύστημα τέθηκε σε μη ασφαλή λειτουργία
+unsafe-mode-body = Οι εφαρμογές έχουν πλέον απεριόριστη πρόσβαση
+unsafe-mode-undo = Αναίρεση
+privileged-user-title = Συνδεθήκατε ως χρήστης με αυξημένα δικαιώματα
+privileged-user-body = Για λόγους ασφαλείας, αποφύγετε να χρησιμοποιείτε περίοδο λειτουργίας ως χρήστης με αυξημένα δικαιώματα. Αν είναι δυνατό, συνδεθείτε ως κανονικός χρήστης.
+
+## Starting programs
+
+spawn-failed = Η εκτέλεση της εντολής «{ $command }» απέτυχε:
+
+## Text field context menu
+
+entry-menu-copy = Αντιγραφή
+entry-menu-paste = Επικόλληση
+entry-menu-show-text = Εμφάνιση κειμένου
+entry-menu-hide-text = Απόκρυψη κειμένου
+entry-caps-lock-on = Το Caps Lock είναι ενεργό

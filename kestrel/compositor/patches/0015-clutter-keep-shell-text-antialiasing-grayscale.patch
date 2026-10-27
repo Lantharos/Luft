@@ -6,6 +6,8 @@ Subject: [PATCH 15/53] clutter: keep shell text antialiasing grayscale
 The glyph cache composites coverage as plain alpha, so subpixel
 antialiasing only leaves colored fringes on shell text. Draw it
 grayscale, as GTK 4 does, whatever the subpixel setting says.
+
+Upstream-Status: forwardable
 ---
  clutter/clutter/clutter-settings.c | 5 +----
  1 file changed, 1 insertion(+), 4 deletions(-)

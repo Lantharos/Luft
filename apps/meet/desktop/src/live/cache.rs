@@ -114,17 +114,17 @@ mod tests {
     fn a_kept_iso_counts_only_with_the_same_checksum() {
         let folder = std::env::temp_dir().join(format!("meet-cache-{}", std::process::id()));
         fs::create_dir_all(&folder).unwrap();
-        let url = "https://get.luft.computer/nightly/luft-1.20261020.57-nightly.iso";
-        fs::write(folder.join("luft-1.20261020.57-nightly.iso"), b"iso").unwrap();
+        let url = "https://get.luft.computer/nightly/luft-1.1-nightly.21.iso";
+        fs::write(folder.join("luft-1.1-nightly.21.iso"), b"iso").unwrap();
         fs::write(
-            folder.join("luft-1.20261020.57-nightly.iso.sha256"),
-            format!("{}  luft-1.20261020.57-nightly.iso\n", "ab".repeat(32)),
+            folder.join("luft-1.1-nightly.21.iso.sha256"),
+            format!("{}  luft-1.1-nightly.21.iso\n", "ab".repeat(32)),
         )
         .unwrap();
         let kept = kept_at(&folder, url, &[0xab; 32]);
         let other = kept_at(&folder, url, &[0xcd; 32]);
         fs::remove_dir_all(&folder).unwrap();
-        assert_eq!(kept, Some(folder.join("luft-1.20261020.57-nightly.iso")));
+        assert_eq!(kept, Some(folder.join("luft-1.1-nightly.21.iso")));
         assert_eq!(other, None);
     }
 }

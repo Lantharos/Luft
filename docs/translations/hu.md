@@ -1,6 +1,6 @@
 # Hungarian style guide
 
-How Luft speaks Hungarian. The [glossary](../../packages/i18n/glossary/hu.csv) has the agreed terms; Weblate shows them next to every string.
+How Luft speaks Hungarian. The [glossary](../../packages/i18n/glossary/hu.tbx) has the agreed terms; Weblate shows them next to every string.
 
 ## Address and tone
 

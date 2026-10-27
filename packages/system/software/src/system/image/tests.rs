@@ -15,7 +15,7 @@ fn deployments(fixture: &str) -> Deployments {
 
 fn first() -> Release {
     Release {
-        version: Some("45.1".into()),
+        version: Some("1.1".into()),
         notes: Some(vec![section(
             Area::Desktop,
             "Desktop",
@@ -27,7 +27,7 @@ fn first() -> Release {
 
 fn second() -> Release {
     Release {
-        version: Some("45.2".into()),
+        version: Some("1.2".into()),
         notes: Some(vec![
             section(
                 Area::Apps,

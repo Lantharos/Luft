@@ -4,19 +4,19 @@ Strings in Luft's Ukrainian translation that a native speaker should check, each
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/uk.csv` `Settings`: "Параметри" — GNOME, macOS and Windows 10 use it, Windows 11 and Android say "Налаштування"/"Настройки"; check it reads naturally in phrases like "Параметри дисплея".
-- `packages/i18n/glossary/uk.csv` `app`: "програма" — what Windows, macOS and GNOME say; "застосунок" is the newer word many Ukrainian apps use. Check which one readers expect today.
-- `packages/i18n/glossary/uk.csv` `Install Luft`: "Встановлення Luft" — a noun like Windows' installer; check it reads as an app name next to "Диски".
-- `packages/i18n/glossary/uk.csv` `Start`: "Пуск" — Windows' name; check it doesn't read dated next to the rest of Luft.
-- `packages/i18n/glossary/uk.csv` `board`: "дошка" — no established term for this canvas mode; check it doesn't read as a whiteboard or notice board.
-- `packages/i18n/glossary/uk.csv` `snap`: "прикріпити" — next to "закріпити" for pin; check the two stay distinct for readers.
-- `packages/i18n/glossary/uk.csv` `tray`: "системний лоток" — KDE's word; Windows users may expect "область сповіщень".
-- `packages/i18n/glossary/uk.csv` `Keep awake`: "Не засинати" — no settled term; check it reads naturally as a tile label.
-- `packages/i18n/glossary/uk.csv` `suspend`: "Сплячий режим" — long for a power menu item; "Сон" is the shorter option.
-- `packages/i18n/glossary/uk.csv` `shut down`: "Вимкнути" — the same word as turn off; Windows says "Завершити роботу".
-- `packages/i18n/glossary/uk.csv` `undo`: "скасувати" — collides with Cancel; "Повернути" is the fallback where both appear.
-- `packages/i18n/glossary/uk.csv` `signed startup`: "підписаний запуск" — no established term; check it doesn't read oddly next to Secure Boot.
-- `packages/i18n/glossary/uk.csv` `security chip`: "процесор безпеки" — Windows' name for the TPM, though it is a chip; check people recognize it.
+- `packages/i18n/glossary/uk.tbx` `Settings`: "Параметри" — GNOME, macOS and Windows 10 use it, Windows 11 and Android say "Налаштування"/"Настройки"; check it reads naturally in phrases like "Параметри дисплея".
+- `packages/i18n/glossary/uk.tbx` `app`: "програма" — what Windows, macOS and GNOME say; "застосунок" is the newer word many Ukrainian apps use. Check which one readers expect today.
+- `packages/i18n/glossary/uk.tbx` `Install Luft`: "Встановлення Luft" — a noun like Windows' installer; check it reads as an app name next to "Диски".
+- `packages/i18n/glossary/uk.tbx` `Start`: "Пуск" — Windows' name; check it doesn't read dated next to the rest of Luft.
+- `packages/i18n/glossary/uk.tbx` `board`: "дошка" — no established term for this canvas mode; check it doesn't read as a whiteboard or notice board.
+- `packages/i18n/glossary/uk.tbx` `snap`: "прикріпити" — next to "закріпити" for pin; check the two stay distinct for readers.
+- `packages/i18n/glossary/uk.tbx` `tray`: "системний лоток" — KDE's word; Windows users may expect "область сповіщень".
+- `packages/i18n/glossary/uk.tbx` `Keep awake`: "Не засинати" — no settled term; check it reads naturally as a tile label.
+- `packages/i18n/glossary/uk.tbx` `suspend`: "Сплячий режим" — long for a power menu item; "Сон" is the shorter option.
+- `packages/i18n/glossary/uk.tbx` `shut down`: "Вимкнути" — the same word as turn off; Windows says "Завершити роботу".
+- `packages/i18n/glossary/uk.tbx` `undo`: "скасувати" — collides with Cancel; "Повернути" is the fallback where both appear.
+- `packages/i18n/glossary/uk.tbx` `signed startup`: "підписаний запуск" — no established term; check it doesn't read oddly next to Secure Boot.
+- `packages/i18n/glossary/uk.tbx` `security chip`: "процесор безпеки" — Windows' name for the TPM, though it is a chip; check people recognize it.
 - `packages/web/ui/locales/uk/ui.ftl` `ui-fingerprint-place`: "Прикладіть { $finger } до сканера." — relies on .inline being accusative, which equals the nominative for every finger name; check it reads naturally.
 - `packages/web/ui/locales/uk/ui.ftl` `ui-media-pause`: "Пауза" — a noun among infinitive buttons, as media players usually label it; "Призупинити" is the alternative.
 - `packages/web/ui/locales/uk/ui.ftl` `ui-select-placeholder`: "Вибрати" — placeholder of an empty dropdown; check whether "Не вибрано" reads better.
@@ -36,8 +36,8 @@ Strings in Luft's Ukrainian translation that a native speaker should check, each
 - `kestrel/ui/locales/uk/system.ftl` `privacy-indicator`: "Задіяно: { $things }" — chosen so the list stays in the nominative.
 - `kestrel/ui/locales/uk/system.ftl` `dictation-unsupported-title`: "Диктування для мови { $language } недоступне на цьому комп’ютері" — $language arrives in English, so «для мови» keeps it undeclined.
 - `kestrel/ui/locales/uk/system.ftl` `peek-error-unknown-handle`: "…не має дескриптора { $handle }…" — "handle" rendered as «дескриптор»; a reviewer may prefer «мітка».
-- `kestrel/ui/locales/uk/engine.ftl` `network-menu-tethers`: "Модеми Bluetooth" — Bluetooth tethering; check against KDE/GNOME wording.
-- `kestrel/ui/locales/uk/engine.ftl` `screenshot-source`: "Знімки й записи екрана" — name for "Screen Capture" notifications; «Захоплення екрана» is the alternative.
+- `kestrel/ui/locales/uk/system.ftl` `network-menu-tethers`: "Модеми Bluetooth" — Bluetooth tethering; check against KDE/GNOME wording.
+- `kestrel/ui/locales/uk/system.ftl` `screenshot-source`: "Знімки й записи екрана" — name for "Screen Capture" notifications; «Захоплення екрана» is the alternative.
 - `apps/setup/locales/uk/setup.ftl` `setup-region-intro-guessed`, `setup-region-field-*`: field names are in the accusative (мову, клавіатуру) to follow «Автоматично визначено …» — check the joined list reads well.
 - `apps/setup/locales/uk/setup.ftl` `setup-windows-hibernated`: "…утримуйте Shift, вибираючи «Завершити роботу»…" — Windows' Ukrainian menu item; check it matches current Windows.
 - `apps/setup/locales/uk/setup.ftl` `setup-windows-bitlocker`: "…у програмі «Керування дисками»…" — Windows' Ukrainian name for Disk Management.
@@ -55,7 +55,6 @@ Strings in Luft's Ukrainian translation that a native speaker should check, each
 - `apps/settings/locales/uk/devices.ftl` `settings-power-long-sleep-hours`: "{ $hours } годину" — accusative, to follow the label «Вимикати через»; settings-power-duration-* stay nominative because they are also used inside sentences.
 - `apps/settings/locales/uk/devices.ftl` `settings-keys-keypad`: "Num { $key }" — keyboards print no word for the keypad; check if «Num 5» is what people expect.
 - `apps/settings/locales/uk/devices.ftl` `settings-dictation-copilot-key`: "клавішу Copilot" — accusative because it is inserted after «Утримуйте»; check it still reads right everywhere $keys is used.
-- `apps/settings/locales/uk/system.ftl` `settings-updates-elsewhere-*-by`: "{ $app } шукає оновлення" — the name starts the sentence without «програма», because the fallback is «інша програма»; check it reads well with names like Schelf.
 - `apps/settings/locales/uk/personalization.ftl` `settings-cursors-folder-description`: "Тут з’являються теми з папки Домівка › .local › share › icons" — «Домівка» is GNOME's name for the home folder; it must match what Rover shows in its path bar.
 - `apps/settings/locales/uk/personalization.ftl` `settings-fonts-sample`: "Чуєш їх, доцю, га? Кумедна ж ти, прощайся без ґольфів!" — a well-known Ukrainian pangram; check it fits the preview width.
 - `apps/settings/locales/uk/personalization.ftl` `settings-accessibility-dwell-time`: "Утримувати" — followed by a duration slider; check it reads naturally next to the value (same for `settings-accessibility-hold-time`).

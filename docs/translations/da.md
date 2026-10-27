@@ -1,6 +1,6 @@
 # Danish style guide
 
-How Luft speaks Danish. The [glossary](../../packages/i18n/glossary/da.csv) has the agreed terms; Weblate shows them next to every string.
+How Luft speaks Danish. The [glossary](../../packages/i18n/glossary/da.tbx) has the agreed terms; Weblate shows them next to every string.
 
 ## Address and tone
 

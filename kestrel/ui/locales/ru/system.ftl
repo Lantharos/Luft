@@ -166,3 +166,257 @@ peek-error-unknown-modifier = { $modifier } не является клавише
 peek-error-display-owner = Этот дисплей принадлежит другой программе
 peek-error-display-run = Программы на скрытом дисплее запускаются через peek run
 peek-error-display-handle = Этот дисплей был запущен как { $handle }, а не { $requested }
+
+## Quick settings tiles
+
+auto-rotate-title = Автоповорот
+dark-style-title = Тёмный режим
+do-not-disturb-title = Не беспокоить
+night-light-title = Ночной свет
+airplane-mode-title = Режим полёта
+
+## Power mode
+
+power-profile-title = Режим питания
+power-profile-header = Режим питания
+power-profile-open-menu = Открыть меню режимов питания
+power-profile-settings = Настройки питания
+power-profile-performance = Производительность
+power-profile-balanced = Сбалансированный
+power-profile-power-saver = Энергосбережение
+power-profile-custom = Особый
+
+## Keep awake
+
+caffeine-title = Не засыпать
+caffeine-open-menu = Открыть меню «Не засыпать»
+caffeine-until = До { $time }
+caffeine-until-turned-off = До отключения
+caffeine-30-minutes = 30 минут
+caffeine-1-hour = 1 час
+caffeine-2-hours = 2 часа
+caffeine-inhibit-reason = «Не засыпать» включено в быстрых настройках
+
+## Brightness
+
+brightness-title = Яркость
+brightness-open-menu = Открыть меню яркости
+
+## Keyboard backlight
+
+backlight-title = Подсветка клавиатуры
+backlight-open-menu = Открыть меню подсветки клавиатуры
+backlight-slider = Яркость подсветки клавиатуры
+backlight-off = Отключена
+backlight-low = Низкая
+backlight-high = Высокая
+
+## Sound
+
+volume-sound-settings = Настройки звука
+volume-mute = Выключить звук
+volume-unmute = Включить звук
+volume-output-slider = Громкость
+volume-output-title = Вывод звука
+volume-output-open-menu = Открыть меню вывода звука
+volume-input-slider = Микрофон
+volume-input-title = Ввод звука
+volume-input-open-menu = Открыть меню ввода звука
+
+## Bluetooth
+
+bluetooth-title = Bluetooth
+bluetooth-open-menu = Открыть меню Bluetooth
+bluetooth-settings = Настройки Bluetooth
+bluetooth-connect = Подключить
+bluetooth-disconnect = Отключить
+bluetooth-connect-device = Подключить { $deviceName }
+bluetooth-disconnect-device = Отключить { $deviceName }
+bluetooth-no-devices = Нет доступных или подключённых устройств
+bluetooth-turn-on-hint = Включите Bluetooth, чтобы подключать устройства
+bluetooth-connected-count = { $count ->
+    [one] Подключено: { $count }
+    [few] Подключено: { $count }
+    [many] Подключено: { $count }
+   *[other] Подключено: { $count }
+}
+
+## Network menus in quick settings
+
+network-menu-unknown-network = <неизвестная сеть>
+network-menu-connect = Подключиться
+network-menu-disconnect = Отключиться
+network-menu-connect-to = Подключиться к { $name }
+network-menu-disconnect-from = Отключиться от { $name }
+network-menu-turn-off = Отключить
+network-menu-wifi-network = { $secure ->
+    [yes] { $name }, защищённая, уровень сигнала { $strength } %
+   *[no] { $name }, незащищённая, уровень сигнала { $strength } %
+}
+network-menu-hotspot = Точка доступа { $name }
+network-menu-connected-count = { $count ->
+    [one] Подключено: { $count }
+    [few] Подключено: { $count }
+    [many] Подключено: { $count }
+   *[other] Подключено: { $count }
+}
+network-menu-vpn = VPN
+network-menu-vpn-open-menu = Открыть меню VPN
+network-menu-vpn-settings = Настройки VPN
+network-menu-wifi = Wi-Fi
+network-menu-wifi-open-menu = Открыть меню Wi-Fi
+network-menu-wifi-settings = Все сети
+network-menu-wired = Проводные подключения
+network-menu-wired-open-menu = Открыть меню проводных подключений
+network-menu-wired-settings = Настройки проводной сети
+network-menu-tethers = Модем через Bluetooth
+network-menu-tethers-open-menu = Открыть меню модема через Bluetooth
+network-menu-tether = Модем
+network-menu-tether-settings = Настройки Bluetooth
+network-menu-mobile-connections = Мобильные подключения
+network-menu-mobile-open-menu = Открыть меню мобильных подключений
+network-menu-mobile-settings = Настройки мобильной сети
+network-menu-mobile = Мобильная сеть
+network-device-wired = Проводная сеть
+network-device-named = { $kind } ({ $name })
+network-menu-sign-in = Вход в сеть
+network-menu-failed-title = Не удалось подключиться
+network-menu-failed-body = Не удалось активировать сетевое подключение
+
+## Location access dialog
+
+location-dialog-title = Разрешить доступ к местоположению
+location-dialog-description = Приложение { $appName } запрашивает доступ к вашему местоположению
+location-dialog-info = Доступ к местоположению можно изменить в любое время в настройках конфиденциальности
+location-dialog-deny = Запретить
+location-dialog-grant = Разрешить
+
+## Thunderbolt notifications
+
+thunderbolt-unknown-title = Неизвестное устройство Thunderbolt
+thunderbolt-unknown-body = Пока вас не было, подключили новое устройство. Отключите его и подключите снова, чтобы начать им пользоваться.
+thunderbolt-unauthorized-title = Неразрешённое устройство Thunderbolt
+thunderbolt-unauthorized-body = Подключено новое устройство, которое должен разрешить администратор
+thunderbolt-error-title = Ошибка авторизации Thunderbolt
+thunderbolt-error-body = Не удалось разрешить устройство Thunderbolt: { $reason }
+
+## App permission dialog, used when an app asks for access to something
+
+access-dialog-deny = Запретить
+access-dialog-allow = Разрешить
+
+## Display change confirmation
+
+display-change-title = Сохранить эти настройки экрана?
+display-change-countdown = { $seconds ->
+    [one] Изменения будут отменены через { $seconds } секунду
+    [few] Изменения будут отменены через { $seconds } секунды
+    [many] Изменения будут отменены через { $seconds } секунд
+   *[other] Изменения будут отменены через { $seconds } секунды
+}
+display-change-revert = Отменить
+display-change-keep = Сохранить
+
+## Drive connected notification
+
+autorun-connected = Подключён диск «{ $driveName }»
+autorun-ready = Диск готов к использованию
+autorun-open-with = Открыть в приложении { $appName }
+
+## Keyboard accessibility shortcuts
+
+kbd-a11y-slow-keys-on = Медленные клавиши включены
+kbd-a11y-slow-keys-off = Медленные клавиши отключены
+kbd-a11y-slow-keys-description = Вы удерживали клавишу Shift 8 секунд. Это сочетание включает медленные клавиши, которые меняют работу клавиатуры.
+kbd-a11y-sticky-keys-on = Залипание клавиш включено
+kbd-a11y-sticky-keys-off = Залипание клавиш отключено
+kbd-a11y-sticky-keys-on-description = Вы нажали клавишу Shift 5 раз подряд. Это сочетание включает залипание клавиш, которое меняет работу клавиатуры.
+kbd-a11y-sticky-keys-off-description = Вы нажали две клавиши одновременно или нажали Shift 5 раз подряд. Это отключает залипание клавиш, которое меняет работу клавиатуры.
+kbd-a11y-leave-on = Не отключать
+kbd-a11y-turn-on = Включить
+kbd-a11y-turn-off = Отключить
+kbd-a11y-leave-off = Не включать
+
+## Audio device selection, shown after plugging something into the headphone jack
+
+audio-device-title = Выбор аудиоустройства
+audio-device-cancel = Отмена
+audio-device-sound-settings = Настройки звука
+audio-device-headphones = Наушники
+audio-device-headset = Гарнитура
+audio-device-microphone = Микрофон
+
+## Keyboard shortcut inhibiting, asked when an app wants to receive system shortcuts itself
+
+inhibit-shortcuts-title = Разрешить перехват сочетаний клавиш
+inhibit-shortcuts-app = Приложение { $appName } хочет перехватывать сочетания клавиш
+inhibit-shortcuts-unknown-app = Приложение хочет перехватывать сочетания клавиш
+inhibit-shortcuts-restore = Чтобы вернуть сочетания клавиш, нажмите { $shortcut }
+inhibit-shortcuts-deny = Запретить
+inhibit-shortcuts-allow = Разрешить
+
+## Unlocking encrypted drives
+
+mount-hidden-volume = Скрытый том
+mount-windows-system-volume = Системный том Windows
+mount-uses-keyfiles = Использует ключевые файлы
+mount-keyfiles-use-app = Чтобы разблокировать том с ключевыми файлами, используйте приложение <i>{ $appName }</i>
+mount-keyfiles-need-app = Чтобы разблокировать том с ключевыми файлами, нужна внешняя программа, например <i>Диски</i>
+mount-pim-number = Число PIM
+mount-pim-invalid = PIM должен быть числом или пустым
+mount-password = Пароль
+mount-remember-password = Запомнить пароль
+mount-cancel = Отмена
+mount-unlock = Разблокировать
+mount-open-app = Открыть { $appName }
+mount-wrong-password = Не получилось. Попробуйте ещё раз.
+mount-unlock-failed = Не удалось разблокировать том
+mount-pim-unsupported = Установленная версия udisks не поддерживает параметр PIM
+
+## Network passwords, asked when connecting needs one
+
+network-agent-auth-required = Требуется аутентификация
+network-agent-wifi-rejected = Сохранённый пароль для сети «{ $networkName }» не подошёл. Введите его ещё раз.
+network-agent-wifi-secrets = Для доступа к беспроводной сети «{ $networkName }» нужен пароль или ключ шифрования
+network-agent-wps-hint = Также можно подключиться, нажав кнопку WPS на роутере
+network-agent-wired-title = Аутентификация 802.1X в проводной сети
+network-agent-dsl-title = Аутентификация DSL
+network-agent-pin-title = Требуется PIN-код
+network-agent-pin-body = Для модема мобильной сети нужен PIN-код
+network-agent-vpn-title = Пароль VPN
+network-agent-password-required = Для подключения к «{ $networkName }» нужен пароль
+network-agent-connect = Подключиться
+network-agent-cancel = Отмена
+network-agent-password = Пароль
+network-agent-username = Имя пользователя
+network-agent-key = Ключ
+network-agent-private-key-password = Пароль закрытого ключа
+network-agent-identity = Идентификатор
+network-agent-service = Служба
+network-agent-network-name = Имя сети
+network-agent-pin = PIN-код
+
+## Screenshots and screen recording
+
+screenshot-source = Захват экрана
+screenshot-area = Выбор области
+screenshot-screen = Выбор экрана
+screenshot-window = Выбор окна
+screenshot-take = Сделать снимок экрана
+screenshot-record = Записать экран
+screenshot-show-pointer = Показывать указатель
+screenshot-capture = Захватить
+screenshot-close = Закрыть
+screenshot-screencasts-folder = Записи экрана
+screenshot-screencast-file = Запись экрана от { $date } { $time }
+screenshot-screenshots-folder = Снимки экрана
+screenshot-file = Снимок экрана от { $timestamp }
+screenshot-screencast-recorded = Запись экрана сохранена
+screenshot-screencast-start-failed = Не удалось начать запись экрана
+screenshot-screencast-out-of-space = Запись экрана прервана: на диске нет места
+screenshot-screencast-try-again = Не удалось записать экран. Попробуйте ещё раз
+screenshot-screencast-failed = Не удалось записать экран
+screenshot-screencast-view = Нажмите, чтобы посмотреть видео
+screenshot-show-in-rover = Показать в приложении Rover
+screenshot-captured = Снимок экрана сделан
+screenshot-captured-body = Изображение можно вставить из буфера обмена

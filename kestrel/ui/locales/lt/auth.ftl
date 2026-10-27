@@ -24,6 +24,7 @@ lock-screen-larger-text = Didesnis tekstas
 lock-screen-suspend = Miego režimas
 lock-screen-restart = Paleisti iš naujo…
 lock-screen-power-off = Išjungti…
+lock-inhibit-reason = Kestrel turi užrakinti ekraną
 
 ## Keyring and passphrase prompts. Apps usually supply their own text; these are the defaults
 
@@ -67,3 +68,85 @@ passkeys-ok = Gerai
 passkeys-use-this-computer = Naudoti šį kompiuterį
 passkeys-fingerprint-unavailable = Norėdami tęsti, įveskite slaptažodį.
 passkeys-wrong-password = Slaptažodis neteisingas. Bandykite dar kartą.
+
+## Sign-in prompt
+
+auth-prompt-password = Slaptažodis
+auth-prompt-username = Naudotojo vardas
+auth-prompt-back = Atgal
+auth-prompt-submit = Pateikti
+auth-prompt-wrong-password = Slaptažodis netinka
+auth-prompt-failed = Nepavyko. Bandykite dar kartą.
+fingerprint-not-recognized = Piršto atspaudas neatpažintas
+
+## Administrator authentication
+
+polkit-title = Reikia patvirtinti tapatybę
+polkit-administrator = Administratorius
+polkit-password = Slaptažodis
+polkit-cancel = Atšaukti
+polkit-authenticate = Patvirtinti
+polkit-failed = Nepavyko. Bandykite dar kartą.
+
+## Log out, power off and restart dialog
+
+end-session-log-out-user = Atjungti naudotoją { $userName }
+end-session-log-out-title = Atsijungti
+end-session-log-out-user-countdown = { $seconds ->
+    [one] Naudotojas { $userName } bus automatiškai atjungtas po { $seconds } sekundės
+    [few] Naudotojas { $userName } bus automatiškai atjungtas po { $seconds } sekundžių
+    [many] Naudotojas { $userName } bus automatiškai atjungtas po { $seconds } sekundės
+   *[other] Naudotojas { $userName } bus automatiškai atjungtas po { $seconds } sekundžių
+}
+end-session-log-out-countdown = { $seconds ->
+    [one] Būsite automatiškai atjungti po { $seconds } sekundės
+    [few] Būsite automatiškai atjungti po { $seconds } sekundžių
+    [many] Būsite automatiškai atjungti po { $seconds } sekundės
+   *[other] Būsite automatiškai atjungti po { $seconds } sekundžių
+}
+end-session-log-out-button = Atsijungti
+end-session-power-off-title = Išjungti
+end-session-power-off-updates-title = Įdiegti naujinimus ir išjungti
+end-session-power-off-countdown = { $seconds ->
+    [one] Sistema bus automatiškai išjungta po { $seconds } sekundės
+    [few] Sistema bus automatiškai išjungta po { $seconds } sekundžių
+    [many] Sistema bus automatiškai išjungta po { $seconds } sekundės
+   *[other] Sistema bus automatiškai išjungta po { $seconds } sekundžių
+}
+end-session-power-off-button = Išjungti
+end-session-restart-title = Paleisti iš naujo
+end-session-restart-updates-title = Įdiegti naujinimus ir paleisti iš naujo
+end-session-restart-countdown = { $seconds ->
+    [one] Sistema bus automatiškai paleista iš naujo po { $seconds } sekundės
+    [few] Sistema bus automatiškai paleista iš naujo po { $seconds } sekundžių
+    [many] Sistema bus automatiškai paleista iš naujo po { $seconds } sekundės
+   *[other] Sistema bus automatiškai paleista iš naujo po { $seconds } sekundžių
+}
+end-session-restart-button = Paleisti iš naujo
+end-session-update-restart-title = Paleisti iš naujo ir įdiegti naujinimus
+end-session-update-restart-countdown = { $seconds ->
+    [one] Po { $seconds } sekundės sistema bus automatiškai paleista iš naujo ir bus įdiegti naujinimai
+    [few] Po { $seconds } sekundžių sistema bus automatiškai paleista iš naujo ir bus įdiegti naujinimai
+    [many] Po { $seconds } sekundės sistema bus automatiškai paleista iš naujo ir bus įdiegti naujinimai
+   *[other] Po { $seconds } sekundžių sistema bus automatiškai paleista iš naujo ir bus įdiegti naujinimai
+}
+end-session-update-restart-button = Paleisti iš naujo ir įdiegti
+end-session-install-updates = Įdiegti laukiančius programinės įrangos naujinimus
+end-session-install-version = Įdiegti versiją { $version }
+end-session-version-nightly = { $release } naktinė versija { $number }
+end-session-low-battery = Akumuliatorius beveik išsikrovęs: prieš diegdami naujinimus prijunkite maitinimą
+end-session-busy-apps = Kai kurios programos užimtos arba turi neįrašytų darbų
+end-session-other-users = Prisijungę kiti naudotojai
+end-session-cancel = Atšaukti
+end-session-boot-options = Paleisties parinktys
+end-session-remote-user = { $userName } (nuotoliniu būdu)
+end-session-console-user = { $userName } (konsolėje)
+
+## Lock screen clock
+
+lock-clock-swipe-up = Perbraukite aukštyn
+lock-clock-click-or-press = Spustelėkite arba paspauskite klavišą
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-unlock = Atrakinimo langas

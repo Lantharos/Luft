@@ -36,3 +36,27 @@ keys-page-down = Page Down
 keys-print-screen = Print Screen
 
 date-just-now = Právě teď
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-panel = Hlavní panel
+
+## System notifications
+
+unsafe-mode-title = Systém byl přepnut do nebezpečného režimu
+unsafe-mode-body = Aplikace mají teď neomezený přístup
+unsafe-mode-undo = Vrátit zpět
+privileged-user-title = Jste přihlášeni jako privilegovaný uživatel
+privileged-user-body = Z bezpečnostních důvodů nepoužívejte relaci privilegovaného uživatele. Pokud můžete, přihlaste se jako běžný uživatel.
+
+## Starting programs
+
+spawn-failed = Spuštění „{ $command }“ se nezdařilo:
+
+## Text field context menu
+
+entry-menu-copy = Kopírovat
+entry-menu-paste = Vložit
+entry-menu-show-text = Zobrazit text
+entry-menu-hide-text = Skrýt text
+entry-caps-lock-on = Caps Lock je zapnutý

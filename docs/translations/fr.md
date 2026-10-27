@@ -1,6 +1,6 @@
 # French style guide
 
-How Luft speaks French, as written in France. The [glossary](../../packages/i18n/glossary/fr.csv) has the agreed terms; Weblate shows them next to every string.
+How Luft speaks French, as written in France. The [glossary](../../packages/i18n/glossary/fr.tbx) has the agreed terms; Weblate shows them next to every string.
 
 ## Address and tone
 

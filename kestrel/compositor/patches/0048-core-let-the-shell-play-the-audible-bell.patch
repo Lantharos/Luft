@@ -5,6 +5,8 @@ Subject: [PATCH 48/53] core: let the shell play the audible bell
 
 Emit MetaDisplay::bell before playing the bell through the sound
 player, so a shell with its own sound player can play it instead.
+
+Upstream-Status: luft-only API for Kestrel's sounds
 ---
  src/core/bell.c            |  3 +++
  src/core/display-private.h |  3 +++

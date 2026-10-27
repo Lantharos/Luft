@@ -36,3 +36,27 @@ keys-page-down = Bild ab
 keys-print-screen = Druck
 
 date-just-now = Gerade eben
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-panel = Leiste
+
+## System notifications
+
+unsafe-mode-title = Das System ist im unsicheren Modus
+unsafe-mode-body = Apps haben jetzt uneingeschränkten Zugriff
+unsafe-mode-undo = Rückgängig
+privileged-user-title = Als privilegierter Benutzer angemeldet
+privileged-user-body = Aus Sicherheitsgründen solltest du keine Sitzung als privilegierter Benutzer verwenden. Melde dich wenn möglich als normaler Benutzer an.
+
+## Starting programs
+
+spawn-failed = „{ $command }“ konnte nicht ausgeführt werden:
+
+## Text field context menu
+
+entry-menu-copy = Kopieren
+entry-menu-paste = Einfügen
+entry-menu-show-text = Text anzeigen
+entry-menu-hide-text = Text ausblenden
+entry-caps-lock-on = Feststelltaste ist aktiviert

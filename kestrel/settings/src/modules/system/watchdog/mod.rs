@@ -1,10 +1,11 @@
+mod cadence;
 mod proxies;
 mod stall;
 
 use std::time::Duration;
 
 use futures_util::StreamExt;
-use tokio::time::{Instant, MissedTickBehavior, interval, timeout};
+use tokio::time::{Instant, sleep_until, timeout};
 use zbus::Connection;
 use zbus::OwnedFd;
 use zbus::fdo::DBusProxy;
@@ -13,13 +14,14 @@ use zbus::names::BusName;
 use crate::context::Context;
 use crate::modules::system::memory::Relief;
 use crate::shared::system::LoginProxy;
+use cadence::{Cadence, Pressure};
 use proxies::{HealthProxy, LoginSessionProxy, LoginUserProxy, WatchdogProxy};
 use stall::Stall;
 
 const KESTREL: &str = "com.lantharos.Kestrel";
-const CHECK_INTERVAL: Duration = Duration::from_secs(3);
 const ANSWER_LIMIT: Duration = Duration::from_secs(3);
 const PRESENTATION_LIMIT: Duration = Duration::from_secs(10);
+const UNSETTLED_AFTER: Duration = Duration::from_secs(1);
 const POWER_KEYS_AFTER: Duration = Duration::from_secs(6);
 const RELIEVE_MEMORY_AFTER: Duration = Duration::from_secs(6);
 const REPORT_AFTER: Duration = Duration::from_secs(15);
@@ -83,7 +85,8 @@ async fn display_session(
 }
 
 enum Answer {
-    Healthy,
+    Settled,
+    Unsettled,
     StalledSince(Instant),
 }
 
@@ -92,8 +95,10 @@ async fn ask(health: &HealthProxy<'static>) -> Answer {
     match timeout(ANSWER_LIMIT, health.check()).await {
         Ok(Ok((waiting_ms, recovering))) => {
             let waiting = Duration::from_millis(waiting_ms);
-            if recovering || waiting < PRESENTATION_LIMIT {
-                Answer::Healthy
+            if !recovering && waiting < UNSETTLED_AFTER {
+                Answer::Settled
+            } else if recovering || waiting < PRESENTATION_LIMIT {
+                Answer::Unsettled
             } else {
                 Answer::StalledSince(asked.checked_sub(waiting).unwrap_or(asked))
             }
@@ -102,7 +107,7 @@ async fn ask(health: &HealthProxy<'static>) -> Answer {
             if name.as_str() == "org.freedesktop.DBus.Error.ServiceUnknown"
                 || name.as_str() == "org.freedesktop.DBus.Error.NameHasNoOwner" =>
         {
-            Answer::Healthy
+            Answer::Settled
         }
         Ok(Err(_)) | Err(_) => Answer::StalledSince(asked),
     }
@@ -147,28 +152,34 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
 
     tokio::spawn(async move {
         let mut stall = Stall::default();
-        let mut checks = interval(CHECK_INTERVAL);
-        checks.set_missed_tick_behavior(MissedTickBehavior::Delay);
+        let mut cadence = Cadence::new();
+        let mut pressure = Pressure::on_compositor();
         loop {
             tokio::select! {
                 Some(signal) = sleeps.next() => {
                     if let Ok(args) = signal.args() {
                         stall.sleeping(args.start);
+                        if !args.start {
+                            cadence.watch_now();
+                        }
                     }
                 }
-                _ = checks.tick() => {
+                () = pressure.fired() => cadence.watch_now(),
+                () = sleep_until(cadence.next()) => {
                     let active = match &display {
                         Some(display) => display.active().await.unwrap_or(true),
                         None => true,
                     };
-                    let answer = if active && stall.watching() {
+                    let watching = stall.watching();
+                    let answer = if active && watching {
                         ask(&health).await
                     } else {
-                        Answer::Healthy
+                        Answer::Settled
                     };
+                    cadence.checked(watching && matches!(answer, Answer::Settled));
                     let stalled = match answer {
                         Answer::StalledSince(at) => stall.stalled_since(at),
-                        Answer::Healthy => {
+                        Answer::Settled | Answer::Unsettled => {
                             stall.clear();
                             Duration::ZERO
                         }

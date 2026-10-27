@@ -1,3 +1,4 @@
+use specta::Type;
 use std::collections::HashMap;
 use std::hash::{DefaultHasher, Hash, Hasher};
 use std::io::Read;
@@ -6,19 +7,16 @@ use std::process::{Command, Stdio};
 
 use gio::prelude::*;
 use luft_app::portal::{FileChooser, Filter};
-use luft_app::{Commands, Empty, block_on};
+use luft_app::{Commands, block_on};
 use luft_software::apps::{appimage, debian, toolbox};
-use luft_software::system::System;
 use luft_software::system::repositories;
 use luft_software::system::system_packages;
 use quick_xml::events::Event;
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
-use specta::Type;
 
 use crate::catalog::cache;
-use crate::fedora;
-use crate::library::sources::CheckedSource;
+use crate::library::sources::Bundled;
 
 #[derive(Serialize, Type)]
 #[serde(
@@ -26,7 +24,7 @@ use crate::library::sources::CheckedSource;
     rename_all = "camelCase",
     rename_all_fields = "camelCase"
 )]
-pub enum OpenedFile {
+pub enum Opened {
     FlatpakRef {
         path: String,
         id: String,
@@ -69,7 +67,7 @@ pub enum OpenedFile {
         installed: bool,
         system: bool,
         desktop: Option<String>,
-        repository: Option<CheckedSource>,
+        repository: Option<Bundled>,
         repository_error: Option<String>,
         verified: bool,
     },
@@ -127,13 +125,13 @@ fn keyfile(path: &Path, group: &str) -> Result<HashMap<String, String>, String> 
         .collect())
 }
 
-fn flatpak_ref(path: &str) -> Result<OpenedFile, String> {
+fn flatpak_ref(path: &str) -> Result<Opened, String> {
     let values = keyfile(Path::new(path), "Flatpak Ref")?;
     let id = values
         .get("Name")
         .cloned()
         .ok_or("This file doesn't name an app.")?;
-    Ok(OpenedFile::FlatpakRef {
+    Ok(Opened::FlatpakRef {
         path: path.to_owned(),
         title: values.get("Title").cloned().unwrap_or_else(|| id.clone()),
         branch: values.get("Branch").cloned(),
@@ -227,7 +225,7 @@ fn save_icon(bytes: &[u8], extension: &str) -> Option<String> {
     Some(file.to_string_lossy().into_owned())
 }
 
-fn flatpak_bundle(path: &str) -> Result<OpenedFile, String> {
+fn flatpak_bundle(path: &str) -> Result<Opened, String> {
     let damaged = "This Flatpak file is damaged or isn't a Flatpak app.";
     let data = std::fs::read(path).map_err(|error| error.to_string())?;
     let size = data.len() as u64;
@@ -259,7 +257,7 @@ fn flatpak_bundle(path: &str) -> Result<OpenedFile, String> {
         .iter()
         .find_map(|key| bundle_bytes(&metadata, key))
         .and_then(|bytes| save_icon(&bytes, "png"));
-    Ok(OpenedFile::FlatpakBundle {
+    Ok(Opened::FlatpakBundle {
         path: path.to_owned(),
         title: name.unwrap_or_else(|| id.rsplit('.').next().unwrap_or(id).to_owned()),
         id: id.to_owned(),
@@ -275,7 +273,7 @@ fn flatpak_bundle(path: &str) -> Result<OpenedFile, String> {
     })
 }
 
-fn flatpak_repo(path: &str) -> Result<OpenedFile, String> {
+fn flatpak_repo(path: &str) -> Result<Opened, String> {
     let values = keyfile(Path::new(path), "Flatpak Repo")?;
     let url = values
         .get("Url")
@@ -285,7 +283,7 @@ fn flatpak_repo(path: &str) -> Result<OpenedFile, String> {
         .file_stem()
         .map(|stem| stem.to_string_lossy().to_lowercase())
         .unwrap_or_else(|| "source".into());
-    Ok(OpenedFile::FlatpakRepo {
+    Ok(Opened::FlatpakRepo {
         path: path.to_owned(),
         title: values.get("Title").cloned().unwrap_or_else(|| name.clone()),
         name: name
@@ -298,7 +296,7 @@ fn flatpak_repo(path: &str) -> Result<OpenedFile, String> {
     })
 }
 
-fn package(path: &str) -> Result<OpenedFile, String> {
+fn package(path: &str) -> Result<Opened, String> {
     let output = Command::new("rpm")
         .args(["--query", "--package", "--queryformat"])
         .arg("%{NAME}\x1f%{VERSION}-%{RELEASE}\x1f%{SUMMARY}\x1f%{LICENSE}\x1f%{URL}\x1f%{SIZE}\x1f%{DESCRIPTION}")
@@ -311,28 +309,20 @@ fn package(path: &str) -> Result<OpenedFile, String> {
     else {
         return Err("This package file is damaged or isn't meant for this computer.".into());
     };
-    let on_image = !fedora::available() && System::current() == System::Image;
-    let (repository, repository_error) = if on_image {
-        match repositories::bundled(path)
-            .and_then(|draft| draft.map(CheckedSource::check).transpose())
-        {
+    let (repository, repository_error) =
+        match repositories::bundled(path).and_then(|draft| draft.map(Bundled::check).transpose()) {
             Ok(repository) => (repository, None),
             Err(error) => (None, Some(error)),
-        }
-    } else {
-        (None, None)
-    };
+        };
     let desktop = repositories::desktop_entry(path)?;
-    let system = on_image && (repository.is_some() || desktop.is_some());
-    let installed = if fedora::available() {
-        fedora::is_installed(name)
-    } else if system {
+    let system = repository.is_some() || desktop.is_some();
+    let installed = if system {
         block_on(system_packages::list())
             .is_ok_and(|packages| packages.requested.iter().any(|known| known == name))
     } else {
         toolbox::installed().iter().any(|tool| tool.package == name)
     };
-    Ok(OpenedFile::Package {
+    Ok(Opened::Package {
         path: path.to_owned(),
         package: name.to_owned(),
         version: version.to_owned(),
@@ -371,7 +361,8 @@ fn simplified(name: &str) -> String {
 
 /// Finds the app on Flathub by its name, which only counts when it's exactly the same.
 pub fn on_flathub(name: &str) -> Option<OnFlathub> {
-    let found: serde_json::Value = crate::catalog::flathub::search(name).ok()?.read().ok()?;
+    let found: serde_json::Value =
+        serde_json::from_str(crate::catalog::flathub::search(name).ok()?.get()).ok()?;
     let wanted = simplified(name);
     let text = |hit: &serde_json::Value, key: &str| hit[key].as_str().map(str::to_owned);
     found["hits"]
@@ -393,10 +384,10 @@ pub fn on_flathub(name: &str) -> Option<OnFlathub> {
         })
 }
 
-fn deb(path: &str) -> Result<OpenedFile, String> {
+fn deb(path: &str) -> Result<Opened, String> {
     let deb = debian::inspect(Path::new(path))?;
     let name = deb.name.clone().unwrap_or_else(|| deb.package.clone());
-    Ok(OpenedFile::Deb {
+    Ok(Opened::Deb {
         path: path.to_owned(),
         installed: debian::installed()
             .iter()
@@ -417,13 +408,13 @@ fn deb(path: &str) -> Result<OpenedFile, String> {
     })
 }
 
-fn appimage_file(path: &str) -> Result<OpenedFile, String> {
+fn appimage_file(path: &str) -> Result<Opened, String> {
     let bundle = appimage::inspect(Path::new(path))?;
     let icon = bundle
         .icons
         .first()
         .and_then(|icon| save_icon(&icon.bytes, icon.extension));
-    Ok(OpenedFile::AppImage {
+    Ok(Opened::AppImage {
         path: path.to_owned(),
         name: bundle.entry.get("Name").unwrap_or("AppImage").to_owned(),
         summary: bundle.entry.get("Comment").map(str::to_owned),
@@ -436,7 +427,7 @@ fn appimage_file(path: &str) -> Result<OpenedFile, String> {
     })
 }
 
-pub fn inspect(path: &str) -> Result<OpenedFile, String> {
+pub fn inspect(path: &str) -> Result<Opened, String> {
     let lowered = path.to_lowercase();
     if lowered.ends_with(".flatpakref") {
         flatpak_ref(path)
@@ -455,7 +446,7 @@ pub fn inspect(path: &str) -> Result<OpenedFile, String> {
     }
 }
 
-async fn choose(Empty {}: Empty) -> Result<Option<String>, String> {
+async fn choose(_: serde_json::Value) -> Result<Option<String>, String> {
     let chosen = FileChooser {
         title: "Add an AppImage",
         filters: vec![Filter {

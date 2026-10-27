@@ -4,17 +4,17 @@ Strings in Luft's Icelandic translation that a native speaker should check: term
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/is.csv` `Start`: "Upphaf", in running text "upphafsvalmynd" — check that this matches what Icelandic Windows shows today, or whether people simply say Start.
-- `packages/i18n/glossary/is.csv` `board`: "tafla" — no established term exists for this mode; "tafla" also means a data table.
-- `packages/i18n/glossary/is.csv` `snap`, `snap layout`, `snap group`: "raða", "gluggauppröðun", "gluggahópur" — Windows' Icelandic term for snap is unknown to me; "festa" is kept for pin.
-- `packages/i18n/glossary/is.csv` `tray`: "kerfisbakki" — check it is understood; Windows calls the area "tilkynningasvæði".
-- `packages/i18n/glossary/is.csv` `dark style`: "Dökkt útlit" — GNOME may say "Dökkur stíll"; check which reads best on a quick settings tile.
-- `packages/i18n/glossary/is.csv` `Dictation`: "Raddinnsláttur" — check against Apple's and Microsoft's Icelandic term for dictation.
-- `packages/i18n/glossary/is.csv` `clipboard`: "klippiborð" — GNOME says "klippispjald"; check which Icelandic users know better.
-- `packages/i18n/glossary/is.csv` `Do Not Disturb`: "Ekki trufla" — Apple uses "Ónáðið ekki".
-- `packages/i18n/glossary/is.csv` `account`: "aðgangur", plural "aðgangar" — check that the Settings page name "Aðgangar" reads natural for online accounts.
-- `packages/i18n/glossary/is.csv` `set up`: "stilla" — chosen so it doesn't clash with "setja upp" (install); check it fits "set up a device".
-- `packages/i18n/glossary/is.csv` `Media Viewer`: "Margmiðlunarskoðari" — long; check it fits as a generic app name.
+- `packages/i18n/glossary/is.tbx` `Start`: "Upphaf", in running text "upphafsvalmynd" — check that this matches what Icelandic Windows shows today, or whether people simply say Start.
+- `packages/i18n/glossary/is.tbx` `board`: "tafla" — no established term exists for this mode; "tafla" also means a data table.
+- `packages/i18n/glossary/is.tbx` `snap`, `snap layout`, `snap group`: "raða", "gluggauppröðun", "gluggahópur" — Windows' Icelandic term for snap is unknown to me; "festa" is kept for pin.
+- `packages/i18n/glossary/is.tbx` `tray`: "kerfisbakki" — check it is understood; Windows calls the area "tilkynningasvæði".
+- `packages/i18n/glossary/is.tbx` `dark style`: "Dökkt útlit" — GNOME may say "Dökkur stíll"; check which reads best on a quick settings tile.
+- `packages/i18n/glossary/is.tbx` `Dictation`: "Raddinnsláttur" — check against Apple's and Microsoft's Icelandic term for dictation.
+- `packages/i18n/glossary/is.tbx` `clipboard`: "klippiborð" — GNOME says "klippispjald"; check which Icelandic users know better.
+- `packages/i18n/glossary/is.tbx` `Do Not Disturb`: "Ekki trufla" — Apple uses "Ónáðið ekki".
+- `packages/i18n/glossary/is.tbx` `account`: "aðgangur", plural "aðgangar" — check that the Settings page name "Aðgangar" reads natural for online accounts.
+- `packages/i18n/glossary/is.tbx` `set up`: "stilla" — chosen so it doesn't clash with "setja upp" (install); check it fits "set up a device".
+- `packages/i18n/glossary/is.tbx` `Media Viewer`: "Margmiðlunarskoðari" — long; check it fits as a generic app name.
 - `kestrel/ui/locales/is/shell.ftl` `keys-space`: "Bilslá" — the other keys keep the English names printed on Icelandic keyboards; check that this mix reads right in shortcut labels.
 - `kestrel/ui/locales/is/shell.ftl` `battery-level` [plugged]: "Rafhlaða { $percentage }%, tengd við rafmagn" — check the wording and the percent sign without a space.
 - `apps/settings/locales/is/settings.ftl` `settings-subpage-back`: "Til baka á síðuna { $page }" — "síðuna" keeps the page name in the nominative; check it isn't too long for a screen-reader label.
@@ -32,14 +32,13 @@ Strings in Luft's Icelandic translation that a native speaker should check: term
 - `kestrel/ui/locales/is/portal.ftl` `shortcuts-record-title`: "Flýtilyklar í { $appName }" — "í" so the dative works with the unknown-app fallback; "fyrir" would be more natural but needs the accusative.
 - `kestrel/ui/locales/is/desktop.ftl` `window-menu-close`, `portal.ftl` `usb-title`/`usb-description`, `setup.ftl` `setup-replace-keeps-accounts`: English singular variants without the number became exact [1] variants, since Icelandic [one] also covers 21, 31 ….
 - `kestrel/ui/locales/is/system.ftl` `oom-closed-body`: "…svo þessu var lokað…" — avoids a gendered pronoun for app vs container; check it doesn't read too vague.
-- `kestrel/ui/locales/is/engine.ftl` `network-menu-tethers` / `network-menu-tether`: "Netdeiling um Bluetooth" / "Netdeiling" — no settled term for tethering.
-- `kestrel/ui/locales/is/engine.ftl` `end-session-log-out-user-countdown`: "Notandinn { $userName } verður skráður út…" — "notandinn" carries the masculine agreement so the person's gender doesn't matter; check it sounds natural.
-- `kestrel/ui/locales/is/engine.ftl` `ctrl-alt-tab-unlock`: "Innskráningargluggi" — the lock screen's sign-in prompt; check the term.
+- `kestrel/ui/locales/is/system.ftl` `network-menu-tethers` / `network-menu-tether`: "Netdeiling um Bluetooth" / "Netdeiling" — no settled term for tethering.
+- `kestrel/ui/locales/is/auth.ftl` `end-session-log-out-user-countdown`: "Notandinn { $userName } verður skráður út…" — "notandinn" carries the masculine agreement so the person's gender doesn't matter; check it sounds natural.
+- `kestrel/ui/locales/is/auth.ftl` `ctrl-alt-tab-unlock`: "Innskráningargluggi" — the lock screen's sign-in prompt; check the term.
 - `kestrel/ui/locales/is/system.ftl` `peek-error-no-caller`: "Setubrautin (session bus)" — technical term with no settled Icelandic equivalent.
 
 ## Settings
 
-- `apps/settings/locales/is/system.ftl` `settings-updates-elsewhere-*-by`: "{ $app } er að leita að uppfærslum" — the app name is the subject in the nominative; when the app is unknown it reads "Annað forrit er að …". Check both read naturally.
 - `apps/settings/locales/is/devices.ftl` `settings-power-duration-minutes`: "{ $minutes } mínútu" — durations are in the accusative so they fit „eftir { $time }“, „Um { $time } eftir“ and the pickers after „Slökkva á skjánum eftir“; check every use reads well.
 - `apps/settings/locales/is/devices.ftl` `settings-dictation-copilot-key`: "Copilot-lyklinum" — dative, because it fills „Haltu { $keys } inni“; check the joined list „Super+Alt eða Copilot-lyklinum“.
 - `apps/settings/locales/is/devices.ftl` `settings-dictation-engine-description`: "Talgreining með { $engine } – { $language }" — rebuilt so the language name's case doesn't matter.

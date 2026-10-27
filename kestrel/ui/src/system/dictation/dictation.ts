@@ -1,8 +1,8 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import * as MessageTray from '../../shell/notifications/messageTray.js';
-import { getInputSourceManager } from '../../shell/status/devices/keyboard.js';
+import * as MessageTray from '../../surfaces/notifications/tray/messageTray.js';
+import { getInputSourceManager } from '../inputSources/keyboard.js';
 
 import type { Context } from '../../context.js';
 import { t } from '../../shared/i18n/index.js';

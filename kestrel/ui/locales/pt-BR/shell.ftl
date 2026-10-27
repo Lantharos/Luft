@@ -36,3 +36,27 @@ keys-page-down = Page Down
 keys-print-screen = Print Screen
 
 date-just-now = Agora mesmo
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-panel = Painel
+
+## System notifications
+
+unsafe-mode-title = O sistema foi colocado em modo inseguro
+unsafe-mode-body = Os apps agora têm acesso irrestrito
+unsafe-mode-undo = Desfazer
+privileged-user-title = Conectado como usuário privilegiado
+privileged-user-body = Por segurança, evite usar uma sessão como usuário privilegiado. Se possível, entre como usuário comum.
+
+## Starting programs
+
+spawn-failed = Falha ao executar “{ $command }”:
+
+## Text field context menu
+
+entry-menu-copy = Copiar
+entry-menu-paste = Colar
+entry-menu-show-text = Mostrar texto
+entry-menu-hide-text = Ocultar texto
+entry-caps-lock-on = Caps Lock ativado

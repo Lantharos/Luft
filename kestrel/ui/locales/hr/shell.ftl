@@ -36,3 +36,27 @@ keys-page-down = Page Down
 keys-print-screen = Print Screen
 
 date-just-now = Upravo sada
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-panel = Programska traka
+
+## System notifications
+
+unsafe-mode-title = Sustav je prebačen u nesigurni način rada
+unsafe-mode-body = Aplikacije sada imaju neograničen pristup
+unsafe-mode-undo = Poništi
+privileged-user-title = Prijavljeni ste kao povlašteni korisnik
+privileged-user-body = Iz sigurnosnih razloga izbjegavajte rad u sesiji povlaštenog korisnika. Ako je moguće, prijavite se kao običan korisnik.
+
+## Starting programs
+
+spawn-failed = Izvršavanje naredbe „{ $command }“ nije uspjelo:
+
+## Text field context menu
+
+entry-menu-copy = Kopiraj
+entry-menu-paste = Zalijepi
+entry-menu-show-text = Prikaži tekst
+entry-menu-hide-text = Sakrij tekst
+entry-caps-lock-on = Caps Lock je uključen

@@ -24,6 +24,7 @@ lock-screen-larger-text = Grotere tekst
 lock-screen-suspend = Slaapstand
 lock-screen-restart = Opnieuw opstarten…
 lock-screen-power-off = Afsluiten…
+lock-inhibit-reason = Kestrel moet het scherm vergrendelen
 
 ## Keyring and passphrase prompts. Apps usually supply their own text; these are the defaults
 
@@ -67,3 +68,75 @@ passkeys-ok = OK
 passkeys-use-this-computer = Deze computer gebruiken
 passkeys-fingerprint-unavailable = Gebruik je wachtwoord om door te gaan.
 passkeys-wrong-password = Dat wachtwoord klopt niet. Probeer het opnieuw.
+
+## Sign-in prompt
+
+auth-prompt-password = Wachtwoord
+auth-prompt-username = Gebruikersnaam
+auth-prompt-back = Terug
+auth-prompt-submit = Versturen
+auth-prompt-wrong-password = Dat wachtwoord werkte niet
+auth-prompt-failed = Dat werkte niet. Probeer het opnieuw.
+fingerprint-not-recognized = Vingerafdruk niet herkend
+
+## Administrator authentication
+
+polkit-title = Verificatie vereist
+polkit-administrator = Beheerder
+polkit-password = Wachtwoord
+polkit-cancel = Annuleren
+polkit-authenticate = Verifiëren
+polkit-failed = Dat werkte niet. Probeer het opnieuw.
+
+## Log out, power off and restart dialog
+
+end-session-log-out-user = { $userName } afmelden
+end-session-log-out-title = Afmelden
+end-session-log-out-user-countdown = { $seconds ->
+    [one] { $userName } wordt over { $seconds } seconde automatisch afgemeld
+   *[other] { $userName } wordt over { $seconds } seconden automatisch afgemeld
+}
+end-session-log-out-countdown = { $seconds ->
+    [one] Je wordt over { $seconds } seconde automatisch afgemeld
+   *[other] Je wordt over { $seconds } seconden automatisch afgemeld
+}
+end-session-log-out-button = Afmelden
+end-session-power-off-title = Afsluiten
+end-session-power-off-updates-title = Updates installeren en afsluiten
+end-session-power-off-countdown = { $seconds ->
+    [one] De computer wordt over { $seconds } seconde automatisch afgesloten
+   *[other] De computer wordt over { $seconds } seconden automatisch afgesloten
+}
+end-session-power-off-button = Afsluiten
+end-session-restart-title = Opnieuw opstarten
+end-session-restart-updates-title = Updates installeren en opnieuw opstarten
+end-session-restart-countdown = { $seconds ->
+    [one] De computer wordt over { $seconds } seconde automatisch opnieuw opgestart
+   *[other] De computer wordt over { $seconds } seconden automatisch opnieuw opgestart
+}
+end-session-restart-button = Opnieuw opstarten
+end-session-update-restart-title = Opnieuw opstarten en updates installeren
+end-session-update-restart-countdown = { $seconds ->
+    [one] De computer wordt over { $seconds } seconde automatisch opnieuw opgestart om updates te installeren
+   *[other] De computer wordt over { $seconds } seconden automatisch opnieuw opgestart om updates te installeren
+}
+end-session-update-restart-button = Opnieuw opstarten en installeren
+end-session-install-updates = Openstaande software-updates installeren
+end-session-install-version = Versie { $version } installeren
+end-session-version-nightly = { $release } Nightly { $number }
+end-session-low-battery = Batterij bijna leeg: sluit de lader aan voordat je updates installeert
+end-session-busy-apps = Sommige apps zijn bezig of hebben niet-opgeslagen werk
+end-session-other-users = Er zijn andere gebruikers aangemeld
+end-session-cancel = Annuleren
+end-session-boot-options = Opstartopties
+end-session-remote-user = { $userName } (op afstand)
+end-session-console-user = { $userName } (console)
+
+## Lock screen clock
+
+lock-clock-swipe-up = Veeg omhoog
+lock-clock-click-or-press = Klik of druk op een toets
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-unlock = Ontgrendelvenster

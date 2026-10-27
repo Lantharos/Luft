@@ -1,6 +1,6 @@
 # Bosnian style guide
 
-How Luft speaks Bosnian. The [glossary](../../packages/i18n/glossary/bs.csv) has the agreed terms; Weblate shows them next to every string.
+How Luft speaks Bosnian. The [glossary](../../packages/i18n/glossary/bs.tbx) has the agreed terms; Weblate shows them next to every string.
 
 ## Script and variant
 

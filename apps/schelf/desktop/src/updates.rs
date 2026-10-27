@@ -3,14 +3,12 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use luft_app::apps::App;
 use luft_app::{Commands, Empty};
 use luft_software::apps::flatpak::{self, Installation};
-use luft_software::apps::{debian, toolbox};
-use luft_software::system::updates;
+use luft_software::apps::{debian, toolbox, updates};
 use sabine::SabineWindow;
 use serde::Serialize;
 use specta::Type;
 use tokio::task::{JoinHandle, spawn_blocking};
 
-use crate::fedora;
 use crate::library::Source;
 
 #[derive(Serialize, Type)]
@@ -134,34 +132,24 @@ fn debs(updates: Vec<debian::Update>) -> Vec<AppUpdate> {
         .collect()
 }
 
-fn installed_tools() -> Result<Vec<AppUpdate>, String> {
-    if fedora::available() {
-        Ok(Vec::new())
-    } else {
-        toolbox::updates().map(tools)
-    }
-}
-
 async fn joined<T>(work: JoinHandle<Result<T, String>>) -> Result<T, String> {
     work.await.unwrap_or_else(|error| Err(error.to_string()))
 }
 
 pub async fn find() -> (Vec<AppUpdate>, Option<String>) {
     let flatpaks = spawn_blocking(|| flatpak::updates().map(flatpaks));
-    let tools = spawn_blocking(installed_tools);
+    let tools = spawn_blocking(|| toolbox::updates().map(tools));
     let appimages = spawn_blocking(appimages);
     let debs = spawn_blocking(|| debian::updates().map(debs));
-    let packages = fedora::updates().await;
     let debs = joined(debs).await;
     let flatpaks = joined(flatpaks).await;
     let tools = joined(tools).await;
     let appimages = appimages.await.unwrap_or_default();
-    let error = [&packages, &flatpaks, &tools, &debs]
+    let error = [&flatpaks, &tools, &debs]
         .into_iter()
         .find_map(|result| result.as_ref().err())
         .cloned();
-    let mut apps: Vec<AppUpdate> = packages.unwrap_or_default();
-    apps.extend(flatpaks.unwrap_or_default());
+    let mut apps: Vec<AppUpdate> = flatpaks.unwrap_or_default();
     apps.extend(appimages);
     apps.extend(tools.unwrap_or_default());
     apps.extend(debs.unwrap_or_default());

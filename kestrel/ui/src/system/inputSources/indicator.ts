@@ -1,6 +1,6 @@
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
-import { getInputSourceManager, type InputSource } from '../../shell/status/devices/keyboard.js';
+import { getInputSourceManager, type InputSource } from './keyboard.js';
 
 import type { ContextMenus, MenuEntry } from '../../desktop/menus/contextMenus.js';
 import { localized, t } from '../../shared/i18n/index.js';

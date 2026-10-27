@@ -9,6 +9,8 @@ reloading them when they change. Both follow the light or dark style
 through prefers-color-scheme, which the helper now sets through
 gtk-interface-color-scheme when libadwaita isn't loaded. The title sits
 at the start of the bar like in Kestrel's own windows.
+
+Upstream-Status: luft-only draws X11 frames in Kestrel's style
 ---
  src/frames/main.c                             |  3 +
  src/frames/meson.build                        |  7 ++

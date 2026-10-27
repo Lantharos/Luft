@@ -1,6 +1,6 @@
 # Estonian style guide
 
-How Luft speaks Estonian. The [glossary](../../packages/i18n/glossary/et.csv) has the agreed terms; Weblate shows them next to every string.
+How Luft speaks Estonian. The [glossary](../../packages/i18n/glossary/et.tbx) has the agreed terms; Weblate shows them next to every string.
 
 ## Address and tone
 

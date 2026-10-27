@@ -1,0 +1,76 @@
+name: Upstream patches
+
+on:
+  schedule:
+    - cron: "30 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  mutter:
+    name: Mutter series
+    runs-on: ubuntu-26.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Apply the series to Mutter main and its newest release
+        run: python3 kestrel/compositor/patches.py trial main latest | tee "$RUNNER_TEMP/mutter.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: mutter
+          path: ${{ runner.temp }}/mutter.md
+
+  engine:
+    name: GNOME Shell changes
+    runs-on: ubuntu-26.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: List GNOME Shell changes to the files the engine carries
+        run: |
+          {
+            echo '## GNOME Shell main'
+            echo
+            echo '```'
+            python3 kestrel/engine/upstream.py changes
+            echo '```'
+          } | tee "$RUNNER_TEMP/engine.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: engine
+          path: ${{ runner.temp }}/engine.md
+
+  image:
+    name: ${{ matrix.package }} patches
+    runs-on: ubuntu-26.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - package: bootc
+            repository: https://github.com/bootc-dev/bootc.git
+          - package: libsecret
+            repository: https://gitlab.gnome.org/GNOME/libsecret.git
+          - package: xdg-desktop-portal
+            repository: https://github.com/flatpak/xdg-desktop-portal.git
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Apply the patches to ${{ matrix.package }} main
+        run: os/image/patches/trial.sh "${{ matrix.package }}" "${{ matrix.repository }}" | tee "$RUNNER_TEMP/${{ matrix.package }}.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.package }}
+          path: ${{ runner.temp }}/${{ matrix.package }}.md

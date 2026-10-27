@@ -137,6 +137,10 @@ notifications-media-previous = Traccia precedente
 notifications-media-next = Traccia successiva
 notifications-media-play = Riproduci
 notifications-media-pause = Pausa
+messages-unknown-app = App sconosciuta
+messages-reply = Rispondi
+messages-reply-placeholder = Scrivi una risposta
+messages-reply-send = Invia
 
 ## Calendar
 
@@ -174,3 +178,17 @@ emoji-skin-tone-medium-light = Tonalità medio-chiara
 emoji-skin-tone-medium = Tonalità media
 emoji-skin-tone-medium-dark = Tonalità medio-scura
 emoji-skin-tone-dark = Tonalità scura
+
+## System notifications
+
+messages-system-source = Sistema
+
+## On-screen keyboard
+
+osk-keyboard-settings = Impostazioni tastiera
+osk-letters-key = ABC
+
+## Media player controls
+
+mpris-unknown-artist = Artista sconosciuto
+mpris-unknown-title = Titolo sconosciuto

@@ -47,10 +47,6 @@ class Library {
 		return this.installed.find((app) => app.source === 'flatpak' && app.id === id) ?? null;
 	}
 
-	package(name: string) {
-		return this.installed.find((app) => app.source === 'package' && app.package === name) ?? null;
-	}
-
 	tool(name: string) {
 		return this.installed.find((app) => app.source === 'tool' && app.package === name) ?? null;
 	}

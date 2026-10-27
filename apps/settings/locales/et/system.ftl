@@ -132,26 +132,10 @@ settings-updates-downloading = Värskenduste allalaadimine…
 settings-updates-rolling-back = Varasema versiooni ettevalmistamine…
 settings-updates-switching-nvidia = NVIDIA draiveri allalaadimine…
 settings-updates-switching-standard = Tavalise tõmmise allalaadimine…
-settings-updates-elsewhere-refresh-by = { $app } otsib värskendusi
-settings-updates-elsewhere-download-by = { $app } laadib värskendusi alla
-settings-updates-elsewhere-update-by = { $app } installib värskendusi
-settings-updates-elsewhere-update = Värskendusi installitakse
-settings-updates-elsewhere-install-by = { $app } installib tarkvara
-settings-updates-elsewhere-install = Tarkvara installitakse
-settings-updates-elsewhere-remove-by = { $app } eemaldab tarkvara
-settings-updates-elsewhere-remove = Tarkvara eemaldatakse
-settings-updates-elsewhere-change-by = { $app } muudab tarkvara
-settings-updates-elsewhere-change = Tarkvara muudetakse
-settings-updates-elsewhere-wait = Kui see on lõpetatud, saad uuesti värskendusi otsida
-settings-updates-ready = Värskendused on installimiseks valmis
-settings-updates-available =
-    { $count ->
-        [one] Saadaval on { $count } värskendus
-       *[other] Saadaval on { $count } värskendust
-    }
 settings-updates-up-to-date = Sinu süsteem on ajakohane
 settings-updates-version = Versioon { $version }
 settings-updates-version-new = Uus versioon
+settings-version-nightly = { $release } öine järk { $number }
 settings-updates-returning = Valmis naasma versioonile { $version }
 settings-updates-returning-unversioned = Valmis naasma varasemale versioonile
 settings-updates-nvidia-ready = NVIDIA draiver on valmis
@@ -160,13 +144,11 @@ settings-updates-version-available = Saadaval on versioon { $version }
 settings-updates-version-available-new = Saadaval on uus versioon
 settings-updates-version-staged = Versioon { $version } on installimiseks valmis
 settings-updates-version-staged-new = Uus versioon on installimiseks valmis
-settings-updates-restart-install-them = Installimiseks taaskäivita. Arvuti on mõne minuti pärast tagasi.
 settings-updates-restart-return = Tagasipöördumise lõpetamiseks taaskäivita.
 settings-updates-restart-switch = Lõpetamiseks taaskäivita. Arvuti on mõne minuti pärast tagasi.
 settings-updates-restart-install-it = Installimiseks taaskäivita. Arvuti on mõne minuti pärast tagasi.
 settings-updates-last-checked = Viimati kontrollitud { $when }
 settings-updates-never-checked = Pole veel kontrollitud
-settings-updates-installed-when = Värskendused installiti { $when }
 settings-updates-stop = Peata
 settings-updates-check = Kontrolli kohe
 settings-updates-checking-button = Kontrollimine…
@@ -194,40 +176,7 @@ settings-updates-firmware-restart = Lõpetatakse taaskäivitamisel
 settings-updates-firmware-installing = Installimine…
 settings-updates-firmware-update = Värskenda
 settings-updates-firmware-failed = Püsivara ei õnnestunud värskendada
-settings-updates-failed = Viimaseid värskendusi ei õnnestunud installida
-settings-updates-failed-description = Süsteem jäeti endisesse olekusse
-settings-updates-includes =
-    { $parts ->
-        [security] Sisaldab turbeparandusi
-        [kernel] Sisaldab uut Linuxi tuuma
-        [drivers] Sisaldab värskendatud draivereid
-        [security-kernel] Sisaldab turbeparandusi ja uut Linuxi tuuma
-        [security-drivers] Sisaldab turbeparandusi ja värskendatud draivereid
-        [kernel-drivers] Sisaldab uut Linuxi tuuma ja värskendatud draivereid
-        [security-kernel-drivers] Sisaldab turbeparandusi, uut Linuxi tuuma ja värskendatud draivereid
-       *[other] Parandused ja täiustused kogu süsteemis
-    }
-settings-updates-count-size =
-    { $count ->
-        [one] { $count } värskendus · { $size }
-       *[other] { $count } värskendust · { $size }
-    }
-settings-updates-restart-and-install = Taaskäivita ja installi
 settings-updates-download = Laadi alla
-settings-updates-see-included = Vaata, mis on kaasas
-settings-updates-included = Mis on kaasas
-settings-updates-included-description =
-    { $count ->
-        [one] { $count } värskendus süsteemile, selle draiveritele ja teekidele
-       *[other] { $count } värskendust süsteemile, selle draiveritele ja teekidele
-    }
-settings-updates-security-fix = Turbeparandus
-settings-updates-done = Valmis
-settings-updates-area-kernel = Linuxi tuum
-settings-updates-area-drivers = Draiverid ja püsivara
-settings-updates-area-desktop = Töölaud
-settings-updates-area-core = Põhisüsteem
-settings-updates-area-other = Teegid ja tööriistad
 settings-updates-released = Avaldatud { $when }
 settings-updates-improvements = Parandused ja täiustused kogu süsteemis
 settings-updates-download-size = Allalaadimise maht: { $size }
@@ -254,6 +203,7 @@ settings-updates-variant-standard = Lülitu tavalisele tõmmisele
 settings-updates-variant-nvidia-reason = Sinu NVIDIA graafika täiskiirusel
 settings-updates-variant-standard-reason = Väiksem, kuna selles arvutis pole NVIDIA graafikat
 settings-updates-switch = Lülitu
+settings-updates-done = Valmis
 
 ## About
 
@@ -277,6 +227,8 @@ settings-about-other-system = Eemalda see, et anda Luftile { $size } ruumi
 settings-about-remove = Eemalda
 settings-about-software = Tarkvara
 settings-about-system = Süsteem
+settings-about-version = Luft { $version }
+settings-about-built = Ehitatud { $date }
 settings-about-desktop = Töölaud
 settings-about-kernel = Tuum
 settings-about-hostname = Hostinimi

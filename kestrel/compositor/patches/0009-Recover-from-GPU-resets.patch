@@ -19,6 +19,8 @@ ClutterGraphicsRecoveryContext signals to recreate their own textures.
 This is GNOME/mutter!5247 by Toluwaleke Ogundipe, squashed onto Mutter 51
 with the window corner API kept next to the new shaped texture realize
 and unrealize functions.
+
+Upstream-Status: upstream https://gitlab.gnome.org/GNOME/mutter/-/merge_requests/5247
 ---
  clutter/clutter/clutter-actor-private.h       |   3 +
  clutter/clutter/clutter-actor.c               | 218 ++++++-

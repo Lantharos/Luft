@@ -4,13 +4,13 @@ Strings in Luft's European Portuguese translation that a native speaker should c
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/pt.csv` `tray`: "bandeja do sistema" — KDE's term; Windows in Portugal says "área de notificação", which Luft avoids because the tray holds apps. Check it sounds natural.
-- `packages/i18n/glossary/pt.csv` `board`: "quadro" — no established equivalent; check it's understood as a canvas of windows.
-- `packages/i18n/glossary/pt.csv` `trash`: "Lixo" — GNOME and macOS; Windows users know "Reciclagem". Confirm the choice.
-- `packages/i18n/glossary/pt.csv` `Keep awake`: "Manter ativo" — no settled term; "Manter acordado" is the alternative.
-- `packages/i18n/glossary/pt.csv` `sandbox`: "ambiente isolado" — Flatpak material in Portuguese often keeps "sandbox".
-- `packages/i18n/glossary/pt.csv` `passkey`: "chave de acesso" — Apple in Portugal may use a different term; check what people actually see on websites.
-- `packages/i18n/glossary/pt.csv` `Install Luft`: "Instalar o Luft" — check whether the app name reads better without the article.
+- `packages/i18n/glossary/pt.tbx` `tray`: "bandeja do sistema" — KDE's term; Windows in Portugal says "área de notificação", which Luft avoids because the tray holds apps. Check it sounds natural.
+- `packages/i18n/glossary/pt.tbx` `board`: "quadro" — no established equivalent; check it's understood as a canvas of windows.
+- `packages/i18n/glossary/pt.tbx` `trash`: "Lixo" — GNOME and macOS; Windows users know "Reciclagem". Confirm the choice.
+- `packages/i18n/glossary/pt.tbx` `Keep awake`: "Manter ativo" — no settled term; "Manter acordado" is the alternative.
+- `packages/i18n/glossary/pt.tbx` `sandbox`: "ambiente isolado" — Flatpak material in Portuguese often keeps "sandbox".
+- `packages/i18n/glossary/pt.tbx` `passkey`: "chave de acesso" — Apple in Portugal may use a different term; check what people actually see on websites.
+- `packages/i18n/glossary/pt.tbx` `Install Luft`: "Instalar o Luft" — check whether the app name reads better without the article.
 - `packages/web/ui/locales/pt/ui.ftl` `ui-recovery-key-saved`: "Guardada" — feminine to agree with "chave"; check it reads right where it appears.
 - `packages/web/ui/locales/pt/ui.ftl` `ui-finger-right-little`: "Mindinho direito" — "Dedo mínimo direito" is more formal; check the register.
 - `packages/web/ui/locales/pt/ui.ftl` `ui-media-pause`: "Pausa" — noun, as Windows uses; "Pausar" is the alternative.
@@ -25,8 +25,8 @@ Strings in Luft's European Portuguese translation that a native speaker should c
 - `kestrel/ui/locales/pt/system.ftl` `health-gpu-reset-body`: "…reiniciou-se sozinho a { $date }, às { $time }." — check "a"/"às" read well with every date and time format (e.g. "à 1:05").
 - `kestrel/ui/locales/pt/portal.ftl` `usb-title`, `screen-share-remote-desktop-title`, `shortcuts-consent-title` and other `$appName` messages: built without an article so they also work with the fallback "a aplicação"/"A aplicação"; check "Permitir que Firefox utilize…" without "o" is acceptable.
 - `kestrel/ui/locales/pt/portal.ftl` `print-paper-letter` … `print-paper-statement`: paper names kept in English (Letter, Legal, Executive, Statement), Tabloid as "Tabloide" — check against what CUPS and GNOME show in Portuguese.
-- `kestrel/ui/locales/pt/engine.ftl` `network-menu-tethers`, `network-menu-tether`: "Partilha de ligação por Bluetooth", "Partilha de ligação" — no settled tile term; check it fits the tile width.
-- `kestrel/ui/locales/pt/engine.ftl` `switch-monitor-join`: "Expandir" — Windows' term for extended displays; check it matches Windows in Portugal ("Expandir estes ecrãs").
+- `kestrel/ui/locales/pt/system.ftl` `network-menu-tethers`, `network-menu-tether`: "Partilha de ligação por Bluetooth", "Partilha de ligação" — no settled tile term; check it fits the tile width.
+- `kestrel/ui/locales/pt/desktop.ftl` `switch-monitor-join`: "Expandir" — Windows' term for extended displays; check it matches Windows in Portugal ("Expandir estes ecrãs").
 - `apps/setup/installer/locales/pt/installer.ftl` `installer-no-deployment`: "implementação" — an ostree deployment; technical, check the wording.
 - `apps/setup/locales/pt/setup.ftl` `setup-region-intro-guessed`: "Deduzimos { $guesses }; …" with fields carrying their article ("o teclado a partir do computador e o fuso horário a partir da rede") — check the assembled sentence.
 - `apps/setup/locales/pt/setup.ftl` `setup-network-unavailable`: "a partir da barra de tarefas" — English says "the panel"; assumed the taskbar's network icons.
@@ -53,7 +53,7 @@ Strings in Luft's European Portuguese translation that a native speaker should c
 - `apps/settings/locales/pt/personalization.ftl` `settings-accessibility-dwell`: "Clicar ao repousar o ponteiro" — no settled term for dwell click; the lock screen's shorter label is «Clique por permanência».
 - `apps/settings/locales/pt/protection.ftl` `settings-passwords-stores`: "Credenciais das aplicações" — the sign-ins apps store, rendered as credenciais.
 - `apps/settings/locales/pt/protection.ftl` `settings-security-anti-cheat`: "Jogos com anti-batota" — anti-batota is the European word, but gamers may expect "anti-cheat".
-- `apps/settings/locales/pt/protection.ftl` `settings-passwords-ssh-added`: "Adicionada { $when }" — assumes $when reads like «há 3 dias» or «ontem»; the same goes for `settings-passkeys-last-used` and `apps/settings/locales/pt/system.ftl` `settings-updates-installed-when` / `settings-updates-released`.
+- `apps/settings/locales/pt/protection.ftl` `settings-passwords-ssh-added`: "Adicionada { $when }" — assumes $when reads like «há 3 dias» or «ontem»; the same goes for `settings-passkeys-last-used` and `apps/settings/locales/pt/system.ftl` `settings-updates-released`.
 - `apps/settings/locales/pt/system.ftl` `settings-updates-apps-count`: "[0] Geridas no Schelf" — agrees with atualizações; check it fits under the "App updates" row.
 - `apps/settings/locales/pt/system.ftl` `settings-about-hostname`: "Nome do anfitrião" — GNOME's term; Windows just says «Nome do dispositivo».
 

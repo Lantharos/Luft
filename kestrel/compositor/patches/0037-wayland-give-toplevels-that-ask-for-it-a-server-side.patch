@@ -20,6 +20,8 @@ MetaWindow:titlebar-height tells the shell how tall a title bar to draw,
 and meta_window_has_rounded_corners() whether to round it like the
 window, so it can draw the bar, its controls and the window shadow as
 children of the window actor.
+
+Upstream-Status: luft-only GNOME doesn't draw server-side decorations for Wayland clients; Kestrel's shell draws the bar
 ---
  src/compositor/meta-window-actor-wayland.c    |  11 +-
  src/compositor/meta-window-corners.c          |  44 ++--

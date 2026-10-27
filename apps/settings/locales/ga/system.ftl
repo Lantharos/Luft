@@ -136,28 +136,10 @@ settings-updates-downloading = Nuashonruithe á n-íoslódáil…
 settings-updates-rolling-back = An leagan roimhe seo á ullmhú…
 settings-updates-switching-nvidia = Tiománaí NVIDIA á íoslódáil…
 settings-updates-switching-standard = An íomhá chaighdeánach á híoslódáil…
-settings-updates-elsewhere-refresh-by = Tá { $app } ag lorg nuashonruithe
-settings-updates-elsewhere-download-by = Tá nuashonruithe á n-íoslódáil ag { $app }
-settings-updates-elsewhere-update-by = Tá nuashonruithe á suiteáil ag { $app }
-settings-updates-elsewhere-update = Tá nuashonruithe á suiteáil
-settings-updates-elsewhere-install-by = Tá bogearraí á suiteáil ag { $app }
-settings-updates-elsewhere-install = Tá bogearraí á suiteáil
-settings-updates-elsewhere-remove-by = Tá bogearraí á mbaint ag { $app }
-settings-updates-elsewhere-remove = Tá bogearraí á mbaint
-settings-updates-elsewhere-change-by = Tá bogearraí á n-athrú ag { $app }
-settings-updates-elsewhere-change = Tá bogearraí á n-athrú
-settings-updates-elsewhere-wait = Is féidir leat nuashonruithe a lorg arís nuair a bheidh sé críochnaithe
-settings-updates-ready = Tá nuashonruithe réidh le suiteáil
-settings-updates-available = { $count ->
-    [one] Tá { $count } nuashonrú ar fáil
-    [two] Tá { $count } nuashonrú ar fáil
-    [few] Tá { $count } nuashonrú ar fáil
-    [many] Tá { $count } nuashonrú ar fáil
-   *[other] Tá { $count } nuashonrú ar fáil
-}
 settings-updates-up-to-date = Tá do chóras cothrom le dáta
 settings-updates-version = Leagan { $version }
 settings-updates-version-new = Leagan nua
+settings-version-nightly = { $release } leagan oíche { $number }
 settings-updates-returning = Réidh le dul ar ais chuig leagan { $version }
 settings-updates-returning-unversioned = Réidh le dul ar ais chuig an leagan roimhe seo
 settings-updates-nvidia-ready = Tá tiománaí NVIDIA réidh
@@ -166,13 +148,11 @@ settings-updates-version-available = Tá leagan { $version } ar fáil
 settings-updates-version-available-new = Tá leagan nua ar fáil
 settings-updates-version-staged = Tá leagan { $version } réidh le suiteáil
 settings-updates-version-staged-new = Tá leagan nua réidh le suiteáil
-settings-updates-restart-install-them = Atosaigh chun iad a shuiteáil. Beidh do ríomhaire ar ais i gceann cúpla nóiméad.
 settings-updates-restart-return = Atosaigh chun an filleadh ar an leagan roimhe seo a chríochnú.
 settings-updates-restart-switch = Atosaigh chun críochnú. Beidh do ríomhaire ar ais i gceann cúpla nóiméad.
 settings-updates-restart-install-it = Atosaigh chun é a shuiteáil. Beidh do ríomhaire ar ais i gceann cúpla nóiméad.
 settings-updates-last-checked = Seiceáilte go deireanach { $when }
 settings-updates-never-checked = Gan seiceáil fós
-settings-updates-installed-when = Nuashonruithe suiteáilte { $when }
 settings-updates-stop = Stop
 settings-updates-check = Seiceáil anois
 settings-updates-checking-button = Á sheiceáil…
@@ -202,43 +182,7 @@ settings-updates-firmware-restart = Críochnóidh sé nuair a atosóidh tú
 settings-updates-firmware-installing = Á shuiteáil…
 settings-updates-firmware-update = Nuashonraigh
 settings-updates-firmware-failed = Níorbh fhéidir na dochtearraí a nuashonrú
-settings-updates-failed = Níorbh fhéidir na nuashonruithe deireanacha a shuiteáil
-settings-updates-failed-description = Fágadh do chóras mar a bhí sé
-settings-updates-includes = { $parts ->
-    [security] Tá deisiúcháin slándála ann
-    [kernel] Tá eithne nua Linux ann
-    [drivers] Tá tiománaithe nuashonraithe ann
-    [security-kernel] Tá deisiúcháin slándála agus eithne nua Linux ann
-    [security-drivers] Tá deisiúcháin slándála agus tiománaithe nuashonraithe ann
-    [kernel-drivers] Tá eithne nua Linux agus tiománaithe nuashonraithe ann
-    [security-kernel-drivers] Tá deisiúcháin slándála, eithne nua Linux agus tiománaithe nuashonraithe ann
-   *[other] Deisiúcháin agus feabhsuithe ar fud an chórais
-}
-settings-updates-count-size = { $count ->
-    [one] { $count } nuashonrú · { $size }
-    [two] { $count } nuashonrú · { $size }
-    [few] { $count } nuashonrú · { $size }
-    [many] { $count } nuashonrú · { $size }
-   *[other] { $count } nuashonrú · { $size }
-}
-settings-updates-restart-and-install = Atosaigh agus suiteáil
 settings-updates-download = Íoslódáil
-settings-updates-see-included = Féach cad atá ann
-settings-updates-included = Cad atá ann
-settings-updates-included-description = { $count ->
-    [one] { $count } nuashonrú don chóras, dá thiománaithe agus dá leabharlanna
-    [two] { $count } nuashonrú don chóras, dá thiománaithe agus dá leabharlanna
-    [few] { $count } nuashonrú don chóras, dá thiománaithe agus dá leabharlanna
-    [many] { $count } nuashonrú don chóras, dá thiománaithe agus dá leabharlanna
-   *[other] { $count } nuashonrú don chóras, dá thiománaithe agus dá leabharlanna
-}
-settings-updates-security-fix = Deisiú slándála
-settings-updates-done = Déanta
-settings-updates-area-kernel = Eithne Linux
-settings-updates-area-drivers = Tiománaithe agus dochtearraí
-settings-updates-area-desktop = Deasc
-settings-updates-area-core = Bunchóras
-settings-updates-area-other = Leabharlanna agus uirlisí
 settings-updates-released = Eisithe { $when }
 settings-updates-improvements = Deisiúcháin agus feabhsuithe ar fud an chórais
 settings-updates-download-size = { $size } le híoslódáil
@@ -265,6 +209,7 @@ settings-updates-variant-standard = Athraigh chuig an íomhá chaighdeánach
 settings-updates-variant-nvidia-reason = Lánluas ó ghrafaic NVIDIA
 settings-updates-variant-standard-reason = Níos lú, ós rud é nach bhfuil grafaic NVIDIA sa ríomhaire seo
 settings-updates-switch = Athraigh
+settings-updates-done = Déanta
 
 ## About
 
@@ -288,6 +233,8 @@ settings-about-other-system = Bain é chun a spás ({ $size }) a thabhairt do Lu
 settings-about-remove = Bain
 settings-about-software = Bogearraí
 settings-about-system = Córas
+settings-about-version = Luft { $version }
+settings-about-built = Tógtha { $date }
 settings-about-desktop = Deasc
 settings-about-kernel = Eithne
 settings-about-hostname = Óstainm

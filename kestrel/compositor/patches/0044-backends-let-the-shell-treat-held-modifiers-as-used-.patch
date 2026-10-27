@@ -10,6 +10,8 @@ pressed again, so pointer, touchpad and keyboard input, the key symbols
 it produces and the keyboard state clients see behave as if they weren't
 held. The native seat clears them from its xkb state and queues a key
 state event, which now also sends the new modifiers to Wayland clients.
+
+Upstream-Status: luft-only API for Kestrel's held-modifier shortcuts
 ---
  clutter/clutter/clutter-seat.c         | 18 +++++++
  clutter/clutter/clutter-seat.h         |  6 +++

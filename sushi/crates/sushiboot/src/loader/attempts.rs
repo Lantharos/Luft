@@ -74,8 +74,8 @@ pub(super) fn remove(name: &CStr16) {
     let _ = runtime::delete_variable(name, &LUFT);
 }
 
-pub fn went_back(version: &str) {
-    write(WENT_BACK, version, false);
+pub fn went_back(image: &str) {
+    write(WENT_BACK, image, false);
 }
 
 pub fn take_go_back() -> Option<String> {

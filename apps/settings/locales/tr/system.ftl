@@ -130,25 +130,10 @@ settings-updates-downloading = Güncellemeler indiriliyor…
 settings-updates-rolling-back = Önceki sürüm hazırlanıyor…
 settings-updates-switching-nvidia = NVIDIA sürücüsü indiriliyor…
 settings-updates-switching-standard = Standart sistem görüntüsü indiriliyor…
-settings-updates-elsewhere-refresh-by = { $app } güncellemeleri arıyor
-settings-updates-elsewhere-download-by = { $app } güncellemeleri indiriyor
-settings-updates-elsewhere-update-by = { $app } güncellemeleri yüklüyor
-settings-updates-elsewhere-update = Güncellemeler yükleniyor
-settings-updates-elsewhere-install-by = { $app } yazılım yüklüyor
-settings-updates-elsewhere-install = Yazılım yükleniyor
-settings-updates-elsewhere-remove-by = { $app } yazılım kaldırıyor
-settings-updates-elsewhere-remove = Yazılım kaldırılıyor
-settings-updates-elsewhere-change-by = { $app } yazılımda değişiklik yapıyor
-settings-updates-elsewhere-change = Yazılım değiştiriliyor
-settings-updates-elsewhere-wait = İşlem bittiğinde güncellemeleri yeniden arayabilirsiniz
-settings-updates-ready = Güncellemeler yüklenmeye hazır
-settings-updates-available = { $count ->
-    [one] { $count } güncelleme var
-   *[other] { $count } güncelleme var
-}
 settings-updates-up-to-date = Sisteminiz güncel
 settings-updates-version = Sürüm { $version }
 settings-updates-version-new = Yeni bir sürüm
+settings-version-nightly = { $release } gecelik sürüm { $number }
 settings-updates-returning = { $version } sürümüne dönmeye hazır
 settings-updates-returning-unversioned = Önceki sürüme dönmeye hazır
 settings-updates-nvidia-ready = NVIDIA sürücüsü hazır
@@ -157,13 +142,11 @@ settings-updates-version-available = Sürüm { $version } kullanılabilir
 settings-updates-version-available-new = Yeni bir sürüm kullanılabilir
 settings-updates-version-staged = Sürüm { $version } yüklenmeye hazır
 settings-updates-version-staged-new = Yeni bir sürüm yüklenmeye hazır
-settings-updates-restart-install-them = Yüklemek için yeniden başlatın. Bilgisayarınız birkaç dakika içinde geri gelir.
 settings-updates-restart-return = Geri dönmeyi tamamlamak için yeniden başlatın.
 settings-updates-restart-switch = Tamamlamak için yeniden başlatın. Bilgisayarınız birkaç dakika içinde geri gelir.
 settings-updates-restart-install-it = Yüklemek için yeniden başlatın. Bilgisayarınız birkaç dakika içinde geri gelir.
 settings-updates-last-checked = Son denetim: { $when }
 settings-updates-never-checked = Henüz denetlenmedi
-settings-updates-installed-when = Güncellemeler yüklendi: { $when }
 settings-updates-stop = Durdur
 settings-updates-check = Şimdi denetle
 settings-updates-checking-button = Denetleniyor…
@@ -190,37 +173,7 @@ settings-updates-firmware-restart = Yeniden başlattığınızda tamamlanır
 settings-updates-firmware-installing = Yükleniyor…
 settings-updates-firmware-update = Güncelle
 settings-updates-firmware-failed = Üretici yazılımı güncellenemedi
-settings-updates-failed = Son güncellemeler yüklenemedi
-settings-updates-failed-description = Sisteminiz olduğu gibi bırakıldı
-settings-updates-includes = { $parts ->
-    [security] Güvenlik düzeltmeleri içerir
-    [kernel] Yeni bir Linux çekirdeği içerir
-    [drivers] Güncellenmiş sürücüler içerir
-    [security-kernel] Güvenlik düzeltmeleri ve yeni bir Linux çekirdeği içerir
-    [security-drivers] Güvenlik düzeltmeleri ve güncellenmiş sürücüler içerir
-    [kernel-drivers] Yeni bir Linux çekirdeği ve güncellenmiş sürücüler içerir
-    [security-kernel-drivers] Güvenlik düzeltmeleri, yeni bir Linux çekirdeği ve güncellenmiş sürücüler içerir
-   *[other] Sistem genelinde düzeltmeler ve iyileştirmeler
-}
-settings-updates-count-size = { $count ->
-    [one] { $count } güncelleme · { $size }
-   *[other] { $count } güncelleme · { $size }
-}
-settings-updates-restart-and-install = Yeniden başlat ve yükle
 settings-updates-download = İndir
-settings-updates-see-included = Neler içerdiğini gör
-settings-updates-included = İçerik
-settings-updates-included-description = { $count ->
-    [one] Sistem, sürücüleri ve kitaplıkları için { $count } güncelleme
-   *[other] Sistem, sürücüleri ve kitaplıkları için { $count } güncelleme
-}
-settings-updates-security-fix = Güvenlik düzeltmesi
-settings-updates-done = Bitti
-settings-updates-area-kernel = Linux çekirdeği
-settings-updates-area-drivers = Sürücüler ve üretici yazılımı
-settings-updates-area-desktop = Masaüstü
-settings-updates-area-core = Temel sistem
-settings-updates-area-other = Kitaplıklar ve araçlar
 settings-updates-released = Yayımlanma: { $when }
 settings-updates-improvements = Sistem genelinde düzeltmeler ve iyileştirmeler
 settings-updates-download-size = İndirme boyutu: { $size }
@@ -247,6 +200,7 @@ settings-updates-variant-standard = Standart sistem görüntüsüne geç
 settings-updates-variant-nvidia-reason = NVIDIA grafik kartınızdan tam performans
 settings-updates-variant-standard-reason = Daha küçük, çünkü bu bilgisayarda NVIDIA grafik kartı yok
 settings-updates-switch = Geç
+settings-updates-done = Bitti
 
 ## About
 
@@ -270,6 +224,8 @@ settings-about-other-system = Kapladığı { $size } alanı Luft’a vermek içi
 settings-about-remove = Kaldır
 settings-about-software = Yazılım
 settings-about-system = Sistem
+settings-about-version = Luft { $version }
+settings-about-built = Derlenme: { $date }
 settings-about-desktop = Masaüstü
 settings-about-kernel = Çekirdek
 settings-about-hostname = Ana makine adı

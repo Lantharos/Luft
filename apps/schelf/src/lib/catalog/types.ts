@@ -1,16 +1,12 @@
 import type { Permissions, Screenshot } from '#lib/bindings.js';
 
-export type Origin = 'flathub' | 'fedora';
-
 export interface CatalogApp {
 	key: string;
-	origin: Origin;
 	id: string;
 	name: string;
 	summary: string;
 	icon: string | null;
 	developer: string | null;
-	package: string | null;
 }
 
 export interface Release {
@@ -20,7 +16,6 @@ export interface Release {
 }
 
 export interface AppDetails {
-	origin: Origin;
 	id: string;
 	name: string;
 	summary: string;
@@ -34,7 +29,6 @@ export interface AppDetails {
 	downloadSize: number | null;
 	installedSize: number | null;
 	verified: string | null;
-	package: string | null;
 	permissions: Permissions | null;
 }
 

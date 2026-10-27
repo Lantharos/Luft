@@ -61,3 +61,45 @@ snap-zone = Docka till ett område på { $width } % × { $height } %
 title-bar-minimize = Minimera
 title-bar-maximize = Maximera
 title-bar-close = Stäng
+
+## Window resizing
+
+window-resize-size = { $width } × { $height }
+
+## App not responding
+
+close-dialog-title = ”{ $appName }” svarar inte
+close-dialog-description = Du kan vänta en stund på att appen fortsätter eller tvinga den att avslutas helt
+close-dialog-force-quit = Tvinga avslut
+close-dialog-wait = Vänta
+
+## Display mode switcher, keep each label under about 15 characters
+
+switch-monitor-mirror = Spegla
+switch-monitor-join = Utöka
+switch-monitor-external-only = Bara extern
+switch-monitor-built-in-only = Bara inbyggd
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-windows = Fönster
+
+## Window menu, opened by right-clicking a window's title bar
+
+title-bar-menu-screenshot = Ta en skärmbild
+title-bar-menu-hide = Minimera
+title-bar-menu-restore = Återställ
+title-bar-menu-maximize = Maximera
+title-bar-menu-move = Flytta
+title-bar-menu-resize = Ändra storlek
+title-bar-menu-always-on-top = Alltid överst
+title-bar-menu-always-on-visible-workspace = Visa på alla arbetsytor
+title-bar-menu-workspace-left = Flytta till arbetsytan till vänster
+title-bar-menu-workspace-right = Flytta till arbetsytan till höger
+title-bar-menu-workspace-up = Flytta till arbetsytan ovanför
+title-bar-menu-workspace-down = Flytta till arbetsytan nedanför
+title-bar-menu-monitor-up = Flytta till skärmen ovanför
+title-bar-menu-monitor-down = Flytta till skärmen nedanför
+title-bar-menu-monitor-left = Flytta till skärmen till vänster
+title-bar-menu-monitor-right = Flytta till skärmen till höger
+title-bar-menu-close = Stäng

@@ -130,25 +130,10 @@ settings-updates-downloading = S’estan baixant les actualitzacions…
 settings-updates-rolling-back = S’està preparant la versió anterior…
 settings-updates-switching-nvidia = S’està baixant el controlador de NVIDIA…
 settings-updates-switching-standard = S’està baixant la imatge estàndard…
-settings-updates-elsewhere-refresh-by = { $app } està cercant actualitzacions
-settings-updates-elsewhere-download-by = { $app } està baixant actualitzacions
-settings-updates-elsewhere-update-by = { $app } està instal·lant actualitzacions
-settings-updates-elsewhere-update = S’estan instal·lant actualitzacions
-settings-updates-elsewhere-install-by = { $app } està instal·lant programari
-settings-updates-elsewhere-install = S’està instal·lant programari
-settings-updates-elsewhere-remove-by = { $app } està suprimint programari
-settings-updates-elsewhere-remove = S’està suprimint programari
-settings-updates-elsewhere-change-by = { $app } està canviant programari
-settings-updates-elsewhere-change = S’està canviant programari
-settings-updates-elsewhere-wait = Podreu tornar a cercar actualitzacions quan acabi
-settings-updates-ready = Les actualitzacions estan a punt per instal·lar
-settings-updates-available = { $count ->
-    [one] Hi ha { $count } actualització disponible
-   *[other] Hi ha { $count } actualitzacions disponibles
-}
 settings-updates-up-to-date = El sistema està actualitzat
 settings-updates-version = Versió { $version }
 settings-updates-version-new = Una versió nova
+settings-version-nightly = { $release } Nightly { $number }
 settings-updates-returning = A punt per tornar a la versió { $version }
 settings-updates-returning-unversioned = A punt per tornar a la versió anterior
 settings-updates-nvidia-ready = El controlador de NVIDIA està a punt
@@ -157,13 +142,11 @@ settings-updates-version-available = La versió { $version } està disponible
 settings-updates-version-available-new = Hi ha una versió nova disponible
 settings-updates-version-staged = La versió { $version } està a punt per instal·lar
 settings-updates-version-staged-new = Hi ha una versió nova a punt per instal·lar
-settings-updates-restart-install-them = Reinicieu per instal·lar-les. L’ordinador tornarà a estar a punt en pocs minuts.
 settings-updates-restart-return = Reinicieu per acabar de tornar a la versió anterior.
 settings-updates-restart-switch = Reinicieu per acabar. L’ordinador tornarà a estar a punt en pocs minuts.
 settings-updates-restart-install-it = Reinicieu per instal·lar-la. L’ordinador tornarà a estar a punt en pocs minuts.
 settings-updates-last-checked = Darrera comprovació: { $when }
 settings-updates-never-checked = Encara no s’ha comprovat
-settings-updates-installed-when = Actualitzacions instal·lades: { $when }
 settings-updates-stop = Atura
 settings-updates-check = Comprova ara
 settings-updates-checking-button = S’està comprovant…
@@ -190,37 +173,7 @@ settings-updates-firmware-restart = S’acabarà quan reinicieu
 settings-updates-firmware-installing = S’està instal·lant…
 settings-updates-firmware-update = Actualitza
 settings-updates-firmware-failed = No s’ha pogut actualitzar el microprogramari
-settings-updates-failed = No s’han pogut instal·lar les darreres actualitzacions
-settings-updates-failed-description = El sistema s’ha quedat com estava
-settings-updates-includes = { $parts ->
-    [security] Inclou correccions de seguretat
-    [kernel] Inclou un nucli Linux nou
-    [drivers] Inclou controladors actualitzats
-    [security-kernel] Inclou correccions de seguretat i un nucli Linux nou
-    [security-drivers] Inclou correccions de seguretat i controladors actualitzats
-    [kernel-drivers] Inclou un nucli Linux nou i controladors actualitzats
-    [security-kernel-drivers] Inclou correccions de seguretat, un nucli Linux nou i controladors actualitzats
-   *[other] Correccions i millores a tot el sistema
-}
-settings-updates-count-size = { $count ->
-    [one] { $count } actualització · { $size }
-   *[other] { $count } actualitzacions · { $size }
-}
-settings-updates-restart-and-install = Reinicia i instal·la
 settings-updates-download = Baixa
-settings-updates-see-included = Mostra què inclou
-settings-updates-included = Què inclou
-settings-updates-included-description = { $count ->
-    [one] { $count } actualització del sistema, els controladors i les biblioteques
-   *[other] { $count } actualitzacions del sistema, els controladors i les biblioteques
-}
-settings-updates-security-fix = Correcció de seguretat
-settings-updates-done = Fet
-settings-updates-area-kernel = Nucli Linux
-settings-updates-area-drivers = Controladors i microprogramari
-settings-updates-area-desktop = Escriptori
-settings-updates-area-core = Sistema base
-settings-updates-area-other = Biblioteques i eines
 settings-updates-released = Publicada { $when }
 settings-updates-improvements = Correccions i millores a tot el sistema
 settings-updates-download-size = { $size } per baixar
@@ -247,6 +200,7 @@ settings-updates-variant-standard = Canvia a la imatge estàndard
 settings-updates-variant-nvidia-reason = Tot el rendiment de la targeta gràfica NVIDIA
 settings-updates-variant-standard-reason = Més petita, perquè aquest ordinador no té gràfics NVIDIA
 settings-updates-switch = Canvia
+settings-updates-done = Fet
 
 ## About
 
@@ -270,6 +224,8 @@ settings-about-other-system = Suprimiu-lo per donar-ne els { $size } a Luft
 settings-about-remove = Suprimeix
 settings-about-software = Programari
 settings-about-system = Sistema
+settings-about-version = Luft { $version }
+settings-about-built = Creada el { $date }
 settings-about-desktop = Escriptori
 settings-about-kernel = Nucli
 settings-about-hostname = Nom de l’amfitrió

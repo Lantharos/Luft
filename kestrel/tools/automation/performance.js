@@ -12,7 +12,8 @@ import {pause, settled, waitUntil} from '../checks/lib/wait.js';
 const MEASURE_SETTLE = 3000;
 const OPENING = 500_000;
 const IDLE_SAMPLE = 2000;
-const WAKEUP_SAMPLE = 10000;
+const WAKEUP_SAMPLE = 30000;
+const SETTINGS_COMMAND = 'kestrel-setting';
 const FRAME = 16;
 const START_QUERIES = ['f', 'fi', 'fil', 'files', 'file', 'fi', ''];
 const EMOJI_QUERIES = ['p', 'pa', 'par', 'part', 'party', 'h', 'he', 'heart', 'smiling face', ''];
@@ -281,27 +282,44 @@ async function measureTaskViewAdd() {
   }
 }
 
-function threadSwitches() {
-  const tasks = Gio.File.new_for_path('/proc/self/task').enumerate_children('standard::name', Gio.FileQueryInfoFlags.NONE, null);
+function threadSwitches(pid = 'self') {
+  const tasks = Gio.File.new_for_path(`/proc/${pid}/task`).enumerate_children('standard::name', Gio.FileQueryInfoFlags.NONE, null);
   const switches = new Map();
   for (let info; (info = tasks.next_file(null));) {
-    const status = read(`/proc/self/task/${info.get_name()}/status`);
+    const status = read(`/proc/${pid}/task/${info.get_name()}/status`);
     switches.set(info.get_name(), Number(/\nvoluntary_ctxt_switches:\s+(\d+)/.exec(status)[1]) + Number(/nonvoluntary_ctxt_switches:\s+(\d+)/.exec(status)[1]));
   }
   return switches;
 }
 
+function sessionPidOf(command) {
+  const bus = `DBUS_SESSION_BUS_ADDRESS=${GLib.getenv('DBUS_SESSION_BUS_ADDRESS')}`;
+  const processes = Gio.File.new_for_path('/proc').enumerate_children('standard::name', Gio.FileQueryInfoFlags.NONE, null);
+  for (let info; (info = processes.next_file(null));) {
+    const pid = info.get_name();
+    if (!/^\d+$/.test(pid)) continue;
+    try {
+      if (read(`/proc/${pid}/comm`).trim() === command && read(`/proc/${pid}/environ`).split('\0').includes(bus)) return pid;
+    } catch {}
+  }
+  return null;
+}
+
+const switchesSince = (before, after) => [...after].reduce((sum, [thread, count]) => sum + count - (before.get(thread) ?? 0), 0);
+const perSecond = count => Number((count / (WAKEUP_SAMPLE / 1000)).toFixed(2));
+
 const cpuTicks = () => read('/proc/self/stat').split(') ')[1].split(' ').slice(11, 13).map(Number).reduce((a, b) => a + b);
 
 async function measureIdleWakeups() {
+  const settings = sessionPidOf(SETTINGS_COMMAND);
   const before = threadSwitches();
+  const settingsBefore = settings && threadSwitches(settings);
   const ticks = cpuTicks();
   await pause(WAKEUP_SAMPLE);
-  const after = threadSwitches();
   const seconds = WAKEUP_SAMPLE / 1000;
-  const switches = [...after].reduce((sum, [thread, count]) => sum + count - (before.get(thread) ?? 0), 0);
   report({
-    idleWakeupsPerSecond: Number((switches / seconds).toFixed(1)),
+    idleWakeupsPerSecond: perSecond(switchesSince(before, threadSwitches())),
+    idleSettingsWakeupsPerSecond: settings ? perSecond(switchesSince(settingsBefore, threadSwitches(settings))) : null,
     idleCpuPercent: Number((((cpuTicks() - ticks) / 100 / seconds) * 100).toFixed(2)),
   });
 }

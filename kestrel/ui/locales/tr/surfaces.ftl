@@ -137,6 +137,10 @@ notifications-media-previous = Önceki parça
 notifications-media-next = Sonraki parça
 notifications-media-play = Oynat
 notifications-media-pause = Duraklat
+messages-unknown-app = Bilinmeyen uygulama
+messages-reply = Yanıtla
+messages-reply-placeholder = Yanıt yazın
+messages-reply-send = Gönder
 
 ## Calendar
 
@@ -174,3 +178,17 @@ emoji-skin-tone-medium-light = Orta açık ten rengi
 emoji-skin-tone-medium = Orta ten rengi
 emoji-skin-tone-medium-dark = Orta koyu ten rengi
 emoji-skin-tone-dark = Koyu ten rengi
+
+## System notifications
+
+messages-system-source = Sistem
+
+## On-screen keyboard
+
+osk-keyboard-settings = Klavye ayarları
+osk-letters-key = ABC
+
+## Media player controls
+
+mpris-unknown-artist = Bilinmeyen sanatçı
+mpris-unknown-title = Bilinmeyen başlık

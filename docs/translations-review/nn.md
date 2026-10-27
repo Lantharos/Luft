@@ -4,17 +4,17 @@ Strings in Luft's Nynorsk translation that a native speaker should check: terms 
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/nn.csv` `snap`: "dokke, dokkingsoppsett, dokkingsgruppe" — Windows uses «feste» for both snap and pin; check «dokke» reads naturally for windows and doesn't suggest «doll».
-- `packages/i18n/glossary/nn.csv` `notification`: "varsling, varslingar" — chosen over «varsel» (same form in singular and plural); check it feels right throughout the desktop.
-- `packages/i18n/glossary/nn.csv` `tray`: "systemfelt" — Norwegian Windows says «systemstatusfelt»; check the shorter word is understood.
-- `packages/i18n/glossary/nn.csv` `board`: "tavle" — check it reads as the endless-canvas mode, not a whiteboard app.
-- `packages/i18n/glossary/nn.csv` `File Manager`: "Filhandsamar" — KDE's word; check against GNOME's plain «Filer».
-- `packages/i18n/glossary/nn.csv` `Text Editor`: "Tekstredigerar" — check against «Tekstredigering» or «Skriveprogram».
-- `packages/i18n/glossary/nn.csv` `accessibility`: "Tilgjenge" — KDE's word; check it is understood as accessibility rather than access.
-- `packages/i18n/glossary/nn.csv` `security`: "tryggleik" — chosen over «sikkerheit»; check it suits technical contexts like Secure Boot and encryption.
-- `packages/i18n/glossary/nn.csv` `keyboard shortcut`: "snarveg" — check it is clear next to file shortcuts; «tastatursnarveg» is the fallback.
-- `packages/i18n/glossary/nn.csv` `passkey`: "tilgangsnøkkel" — Apple says «passnøkkel» in Norwegian; check which people know.
-- `packages/i18n/glossary/nn.csv` `search`: "søkje" — the norm also allows «søke»; the guide picks the classic -je forms (leggje, setje, søkje), check that's the preferred house style.
+- `packages/i18n/glossary/nn.tbx` `snap`: "dokke, dokkingsoppsett, dokkingsgruppe" — Windows uses «feste» for both snap and pin; check «dokke» reads naturally for windows and doesn't suggest «doll».
+- `packages/i18n/glossary/nn.tbx` `notification`: "varsling, varslingar" — chosen over «varsel» (same form in singular and plural); check it feels right throughout the desktop.
+- `packages/i18n/glossary/nn.tbx` `tray`: "systemfelt" — Norwegian Windows says «systemstatusfelt»; check the shorter word is understood.
+- `packages/i18n/glossary/nn.tbx` `board`: "tavle" — check it reads as the endless-canvas mode, not a whiteboard app.
+- `packages/i18n/glossary/nn.tbx` `File Manager`: "Filhandsamar" — KDE's word; check against GNOME's plain «Filer».
+- `packages/i18n/glossary/nn.tbx` `Text Editor`: "Tekstredigerar" — check against «Tekstredigering» or «Skriveprogram».
+- `packages/i18n/glossary/nn.tbx` `accessibility`: "Tilgjenge" — KDE's word; check it is understood as accessibility rather than access.
+- `packages/i18n/glossary/nn.tbx` `security`: "tryggleik" — chosen over «sikkerheit»; check it suits technical contexts like Secure Boot and encryption.
+- `packages/i18n/glossary/nn.tbx` `keyboard shortcut`: "snarveg" — check it is clear next to file shortcuts; «tastatursnarveg» is the fallback.
+- `packages/i18n/glossary/nn.tbx` `passkey`: "tilgangsnøkkel" — Apple says «passnøkkel» in Norwegian; check which people know.
+- `packages/i18n/glossary/nn.tbx` `search`: "søkje" — the norm also allows «søke»; the guide picks the classic -je forms (leggje, setje, søkje), check that's the preferred house style.
 - `kestrel/ui/locales/nn/shell.ftl` `keys-backspace`: "Tilbaketast" — Norwegian keyboards print an arrow; check whether «Backspace» is the more familiar shortcut label.
 - `kestrel/ui/locales/nn/shell.ftl` `battery-level`: "Batteri { $percentage } %, fullada" — check «fullada» vs «fulladd» for the participle.
 - `packages/web/ui/locales/nn/ui.ftl` `ui-fingerprint-retry`: "Fingeren vart ikkje lesen godt nok. Prøv igjen." — check it sounds natural.
@@ -28,12 +28,12 @@ Strings in Luft's Nynorsk translation that a native speaker should check: terms 
 - `kestrel/ui/locales/nn/system.ftl` `privacy-indicator`: "Brukar { $things }" with definite list items (kameraet, mikrofonen …) — check the list joins naturally without a possessive.
 - `kestrel/ui/locales/nn/system.ftl` `oom-closed-body`: "… så han vart lukka …" — "han" stands for both the app and the container; check it reads naturally.
 - `kestrel/ui/locales/nn/system.ftl` `health-gpu-reset-body`: "… på nytt { $date } klokka { $time }." — check the date placeable (e.g. "3. mars") fits without "den".
-- `kestrel/ui/locales/nn/system.ftl` `battery-device-headset`: "Headset" — English loan, also in `engine.ftl` `audio-device-headset`; check against «hovudtelefonar med mikrofon».
+- `kestrel/ui/locales/nn/system.ftl` `battery-device-headset`: "Headset" — English loan, also in `system.ftl` `audio-device-headset`; check against «hovudtelefonar med mikrofon».
 - `kestrel/ui/locales/nn/portal.ftl` `screen-share-device-touchscreen`: "Trykkskjerm" — no settled Nynorsk term (Bokmål systems say «berøringsskjerm»).
-- `kestrel/ui/locales/nn/engine.ftl` `network-menu-hotspot`: "Tilgangspunkt på { $name }" — check wording for a shared Wi-Fi hotspot.
-- `kestrel/ui/locales/nn/engine.ftl` `network-menu-tethers`: "Deling over Bluetooth" (and `network-menu-tether` "Deling") — no settled term for Bluetooth tethering.
-- `kestrel/ui/locales/nn/engine.ftl` `display-change-title`: "Behalde skjerminnstillingane?" — kept under 30 characters; check the bare infinitive question reads fine.
-- `kestrel/ui/locales/nn/engine.ftl` `end-session-remote-user`: "{ $userName } (eksternt)" — check this is the clearest word for a user signed in over SSH.
+- `kestrel/ui/locales/nn/system.ftl` `network-menu-hotspot`: "Tilgangspunkt på { $name }" — check wording for a shared Wi-Fi hotspot.
+- `kestrel/ui/locales/nn/system.ftl` `network-menu-tethers`: "Deling over Bluetooth" (and `network-menu-tether` "Deling") — no settled term for Bluetooth tethering.
+- `kestrel/ui/locales/nn/system.ftl` `display-change-title`: "Behalde skjerminnstillingane?" — kept under 30 characters; check the bare infinitive question reads fine.
+- `kestrel/ui/locales/nn/auth.ftl` `end-session-remote-user`: "{ $userName } (eksternt)" — check this is the clearest word for a user signed in over SSH.
 - `apps/setup/locales/nn/setup.ftl` `setup-windows-hibernated`: "… Rask oppstart … hald inne Skift medan du vel Avslutt …" — names taken from Norwegian Windows (Rask oppstart, Avslutt, and Diskbehandling in `setup-windows-bitlocker`); verify against a Norwegian Windows.
 - `apps/setup/locales/nn/setup.ftl` `setup-region-intro-guessed`: "Vi har gjetta { $guesses }, …" with parts like "tastaturet ut frå datamaskinen" — check the joined sentence reads naturally.
 - `apps/setup/locales/nn/setup.ftl` `setup-network-unavailable`: "… frå oppgåvelinja." — English says "the panel", read here as the taskbar.

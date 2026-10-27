@@ -1,32 +1,30 @@
-mod backend;
+use specta::Type;
 mod background;
-mod elsewhere;
 mod firmware;
 mod graphics;
 mod image;
 mod overview;
-mod packages;
 mod schedule;
 mod state;
 mod store;
 
 use luft_app::dbus::{self, failed};
 use luft_app::launch::{self, Token};
-use luft_app::{Commands, Empty, Events};
+use luft_app::{Commands, Events};
 use luft_software::variant::Variant;
 use sabine::SabineWindow;
 use serde::Deserialize;
+use serde_json::Value;
 use tokio::sync::OnceCell;
 
 use firmware::Firmware;
-use state::{Activity, UpdateKind, UpdatesStatus};
+use state::{Activity, Kind, Status};
 use store::Preferences;
 
 pub use background::run as check_in_background;
 pub use graphics::{CHECK_GRAPHICS_ARGUMENT, run as check_graphics};
 use luft_i18n::t;
 pub use schedule::CHECK_ARGUMENT;
-use specta::Type;
 
 use crate::L10N;
 
@@ -35,16 +33,16 @@ const APP_UPDATES: &str = "schelf:updates";
 static FIRST_RUN: OnceCell<()> = OnceCell::const_new();
 
 #[derive(Deserialize, Type)]
-struct FirmwareDevice {
+struct Device {
     id: String,
 }
 
 #[derive(Deserialize, Type)]
-struct VariantSwitch {
+struct Switch {
     variant: Variant,
 }
 
-async fn load(Empty {}: Empty) -> Result<(), String> {
+async fn load(_: Value) -> Result<(), String> {
     FIRST_RUN
         .get_or_init(|| async {
             if Preferences::exists() {
@@ -63,50 +61,42 @@ async fn load(Empty {}: Empty) -> Result<(), String> {
 }
 
 fn scan() {
-    backend::current().scan();
+    luft_app::spawn(image::scan());
 }
 
-fn check(Empty {}: Empty) -> Result<(), String> {
+fn check(_: Value) -> Result<(), String> {
     state::start(
-        Activity::new(UpdateKind::Check),
+        Activity::new(Kind::Check),
         |task| overview::load(Some(task)),
         scan,
     );
     Ok(())
 }
 
-fn download(Empty {}: Empty) -> Result<(), String> {
-    let started = state::start(
-        Activity::new(UpdateKind::Download),
-        |task| backend::current().download(task),
-        || {
-            backend::current().downloaded();
-            scan();
-        },
-    );
+fn download(_: Value) -> Result<(), String> {
+    let started = state::start(Activity::new(Kind::Download), image::download, || {
+        overview::reload();
+        scan();
+    });
     started
         .then_some(())
         .ok_or_else(|| t!(L10N, "desktop-updates-already-downloading"))
 }
 
-fn rollback(Empty {}: Empty) -> Result<(), String> {
-    let started = state::start(
-        Activity::new(UpdateKind::Rollback),
-        |task| backend::current().rollback(task),
-        || {
-            overview::reload();
-            scan();
-        },
-    );
+fn rollback(_: Value) -> Result<(), String> {
+    let started = state::start(Activity::new(Kind::Rollback), image::rollback, || {
+        overview::reload();
+        scan();
+    });
     started
         .then_some(())
         .ok_or_else(|| t!(L10N, "desktop-updates-system-busy"))
 }
 
-fn switch(VariantSwitch { variant }: VariantSwitch) -> Result<(), String> {
+fn switch(Switch { variant }: Switch) -> Result<(), String> {
     let activity = Activity {
         target: Some(variant.name().to_owned()),
-        ..Activity::new(UpdateKind::Switch)
+        ..Activity::new(Kind::Switch)
     };
     let started = state::start(
         activity,
@@ -121,10 +111,10 @@ fn switch(VariantSwitch { variant }: VariantSwitch) -> Result<(), String> {
         .ok_or_else(|| t!(L10N, "desktop-updates-system-busy"))
 }
 
-fn install_firmware(FirmwareDevice { id }: FirmwareDevice) -> Result<(), String> {
+fn install_firmware(Device { id }: Device) -> Result<(), String> {
     let activity = Activity {
         target: Some(id.clone()),
-        ..Activity::new(UpdateKind::Firmware)
+        ..Activity::new(Kind::Firmware)
     };
     let started = state::start(activity, move |task| firmware::install(&id, task), scan);
     started
@@ -132,14 +122,14 @@ fn install_firmware(FirmwareDevice { id }: FirmwareDevice) -> Result<(), String>
         .ok_or_else(|| t!(L10N, "desktop-updates-already-installing"))
 }
 
-async fn firmware_updates(Empty {}: Empty) -> Result<Vec<Firmware>, String> {
+async fn firmware_updates(_: Value) -> Result<Vec<Firmware>, String> {
     if !firmware::available().await {
         return Ok(Vec::new());
     }
     firmware::updates().await
 }
 
-async fn restart(Empty {}: Empty) -> Result<(), String> {
+async fn restart(_: Value) -> Result<(), String> {
     dbus::session()
         .await?
         .call_method(
@@ -169,17 +159,15 @@ fn open_apps(Token { token }: Token) -> Result<(), String> {
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     state::attach(events);
-    backend::current().watch();
+    image::watch();
     window
-        .bridge_event(&state::ACTIVITY)
-        .bridge_event(&state::OVERVIEW)
-        .command("updates_status", |Empty {}| {
-            Ok::<UpdatesStatus, String>(state::status())
+        .command("updates_status", |_: Value| {
+            Ok::<Status, String>(state::status())
         })
         .command_async("updates_load", load)
         .command("updates_check", check)
         .command("updates_download", download)
-        .command("updates_cancel", |Empty {}| {
+        .command("updates_cancel", |_: Value| {
             state::cancel();
             Ok(())
         })
@@ -188,7 +176,7 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .command("updates_rollback", rollback)
         .command("updates_switch", switch)
         .command_async("updates_restart", restart)
-        .command("updates_preferences", |Empty {}| {
+        .command("updates_preferences", |_: Value| {
             Ok::<Preferences, String>(Preferences::load())
         })
         .command_async("updates_set_preferences", set_preferences)

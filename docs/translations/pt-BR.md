@@ -1,6 +1,6 @@
 # Brazilian Portuguese style guide
 
-How Luft speaks Brazilian Portuguese. The [glossary](../../packages/i18n/glossary/pt-BR.csv) has the agreed terms; Weblate shows them next to every string. European Portuguese is a separate translation with its own words; don't borrow from it.
+How Luft speaks Brazilian Portuguese. The [glossary](../../packages/i18n/glossary/pt-BR.tbx) has the agreed terms; Weblate shows them next to every string. European Portuguese is a separate translation with its own words; don't borrow from it.
 
 ## Address and tone
 

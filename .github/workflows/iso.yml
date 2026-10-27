@@ -122,7 +122,7 @@ jobs:
           done
           s3 cp latest.json "s3://$R2_BUCKET/$FOLDER/latest.json" --cache-control max-age=300
           if [[ "$FOLDER" == nightly ]]; then
-            aws s3 ls "s3://$R2_BUCKET/nightly/" --endpoint-url "$endpoint" | awk '{print $4}' | grep -E '^luft-.*\.iso$' | sort -t. -k2,2n -k3,3n | head -n -"$KEPT_NIGHTLIES" |
+            aws s3 ls "s3://$R2_BUCKET/nightly/" --endpoint-url "$endpoint" | sort -k1,2 | awk '{print $4}' | grep -E '^luft-.*\.iso$' | head -n -"$KEPT_NIGHTLIES" |
               while read -r old; do
                 for file in "$old" "$old.sha256" "$old.sha256.minisig"; do
                   s3 rm "s3://$R2_BUCKET/nightly/$file"

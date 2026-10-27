@@ -8,7 +8,6 @@ import {checkLive} from './settings/live.js';
 import {checkPages} from './settings/pages.js';
 import {checkTiling} from './settings/desktop/tiling.js';
 import {checkLongSleep} from './settings/system/power.js';
-import {checkUpdates} from './settings/system/updates.js';
 import {checkTaskbarLooks} from './settings/desktop/taskbar.js';
 import {checkWallpaper} from './settings/desktop/wallpaper.js';
 
@@ -28,6 +27,5 @@ export async function run() {
       await checkWallpaper(app);
       await checkDictation(app);
     });
-    await checkUpdates(palette);
   });
 }

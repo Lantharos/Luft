@@ -36,3 +36,27 @@ keys-page-down = Page Down
 keys-print-screen = Print Screen
 
 date-just-now = Nyss
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-panel = Aktivitetsfält
+
+## System notifications
+
+unsafe-mode-title = Systemet är i osäkert läge
+unsafe-mode-body = Appar har nu obegränsad åtkomst
+unsafe-mode-undo = Ångra
+privileged-user-title = Inloggad som privilegierad användare
+privileged-user-body = Av säkerhetsskäl bör du inte köra en session som privilegierad användare. Logga in som vanlig användare om du kan.
+
+## Starting programs
+
+spawn-failed = Det gick inte att köra ”{ $command }”:
+
+## Text field context menu
+
+entry-menu-copy = Kopiera
+entry-menu-paste = Klistra in
+entry-menu-show-text = Visa text
+entry-menu-hide-text = Dölj text
+entry-caps-lock-on = Caps Lock är på

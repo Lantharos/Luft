@@ -9,6 +9,8 @@ the input method. When focus moved on before that, such as when the
 window closed, the handler stayed recorded on the old surface, so no
 text input focused afterwards ever told the input method where its
 cursor is. Drop the pending update when focus leaves the surface.
+
+Upstream-Status: forwardable
 ---
  src/wayland/meta-wayland-text-input.c | 2 ++
  1 file changed, 2 insertions(+)

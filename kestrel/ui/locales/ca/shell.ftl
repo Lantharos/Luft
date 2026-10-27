@@ -36,3 +36,27 @@ keys-page-down = Av Pàg
 keys-print-screen = Impr Pant
 
 date-just-now = Ara mateix
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-panel = Barra de tasques
+
+## System notifications
+
+unsafe-mode-title = El sistema s’ha posat en mode no segur
+unsafe-mode-body = Ara les aplicacions tenen accés sense restriccions
+unsafe-mode-undo = Desfés
+privileged-user-title = Heu iniciat la sessió com a usuari privilegiat
+privileged-user-body = Per seguretat, és millor no fer servir una sessió d’usuari privilegiat. Si podeu, inicieu la sessió com a usuari normal.
+
+## Starting programs
+
+spawn-failed = No s’ha pogut executar «{ $command }»:
+
+## Text field context menu
+
+entry-menu-copy = Copia
+entry-menu-paste = Enganxa
+entry-menu-show-text = Mostra el text
+entry-menu-hide-text = Amaga el text
+entry-caps-lock-on = Bloq Maj està activat

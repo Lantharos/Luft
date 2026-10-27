@@ -130,25 +130,10 @@ settings-updates-downloading = Updates downloaden…
 settings-updates-rolling-back = Vorige versie wordt klaargezet…
 settings-updates-switching-nvidia = Driver van NVIDIA downloaden…
 settings-updates-switching-standard = Standaardimage downloaden…
-settings-updates-elsewhere-refresh-by = { $app } zoekt naar updates
-settings-updates-elsewhere-download-by = Updates worden gedownload door { $app }
-settings-updates-elsewhere-update-by = Updates worden geïnstalleerd door { $app }
-settings-updates-elsewhere-update = Updates worden geïnstalleerd
-settings-updates-elsewhere-install-by = Software wordt geïnstalleerd door { $app }
-settings-updates-elsewhere-install = Software wordt geïnstalleerd
-settings-updates-elsewhere-remove-by = Software wordt verwijderd door { $app }
-settings-updates-elsewhere-remove = Software wordt verwijderd
-settings-updates-elsewhere-change-by = Software wordt gewijzigd door { $app }
-settings-updates-elsewhere-change = Software wordt gewijzigd
-settings-updates-elsewhere-wait = Je kunt opnieuw naar updates zoeken als dit klaar is
-settings-updates-ready = Updates zijn klaar om te installeren
-settings-updates-available = { $count ->
-    [one] { $count } update beschikbaar
-   *[other] { $count } updates beschikbaar
-}
 settings-updates-up-to-date = Je systeem is up-to-date
 settings-updates-version = Versie { $version }
 settings-updates-version-new = Een nieuwe versie
+settings-version-nightly = { $release } Nightly { $number }
 settings-updates-returning = Klaar om terug te gaan naar versie { $version }
 settings-updates-returning-unversioned = Klaar om terug te gaan naar de vorige versie
 settings-updates-nvidia-ready = De driver van NVIDIA staat klaar
@@ -157,13 +142,11 @@ settings-updates-version-available = Versie { $version } is beschikbaar
 settings-updates-version-available-new = Er is een nieuwe versie beschikbaar
 settings-updates-version-staged = Versie { $version } is klaar om te installeren
 settings-updates-version-staged-new = Een nieuwe versie is klaar om te installeren
-settings-updates-restart-install-them = Start opnieuw op om ze te installeren. Je computer is binnen een paar minuten terug.
 settings-updates-restart-return = Start opnieuw op om het teruggaan af te ronden.
 settings-updates-restart-switch = Start opnieuw op om af te ronden. Je computer is binnen een paar minuten terug.
 settings-updates-restart-install-it = Start opnieuw op om deze te installeren. Je computer is binnen een paar minuten terug.
 settings-updates-last-checked = Laatst gecontroleerd: { $when }
 settings-updates-never-checked = Nog niet gecontroleerd
-settings-updates-installed-when = Updates geïnstalleerd: { $when }
 settings-updates-stop = Stoppen
 settings-updates-check = Nu controleren
 settings-updates-checking-button = Controleren…
@@ -190,37 +173,7 @@ settings-updates-firmware-restart = Wordt afgerond als je opnieuw opstart
 settings-updates-firmware-installing = Installeren…
 settings-updates-firmware-update = Bijwerken
 settings-updates-firmware-failed = De firmware kon niet worden bijgewerkt
-settings-updates-failed = De laatste updates konden niet worden geïnstalleerd
-settings-updates-failed-description = Je systeem is gebleven zoals het was
-settings-updates-includes = { $parts ->
-    [security] Bevat beveiligingsoplossingen
-    [kernel] Bevat een nieuwe Linux-kernel
-    [drivers] Bevat bijgewerkte drivers
-    [security-kernel] Bevat beveiligingsoplossingen en een nieuwe Linux-kernel
-    [security-drivers] Bevat beveiligingsoplossingen en bijgewerkte drivers
-    [kernel-drivers] Bevat een nieuwe Linux-kernel en bijgewerkte drivers
-    [security-kernel-drivers] Bevat beveiligingsoplossingen, een nieuwe Linux-kernel en bijgewerkte drivers
-   *[other] Oplossingen en verbeteringen in het hele systeem
-}
-settings-updates-count-size = { $count ->
-    [one] { $count } update · { $size }
-   *[other] { $count } updates · { $size }
-}
-settings-updates-restart-and-install = Opnieuw opstarten en installeren
 settings-updates-download = Downloaden
-settings-updates-see-included = Bekijken wat erin zit
-settings-updates-included = Wat erin zit
-settings-updates-included-description = { $count ->
-    [one] { $count } update voor het systeem, de drivers en de bibliotheken
-   *[other] { $count } updates voor het systeem, de drivers en de bibliotheken
-}
-settings-updates-security-fix = Beveiligingsoplossing
-settings-updates-done = Klaar
-settings-updates-area-kernel = Linux-kernel
-settings-updates-area-drivers = Drivers en firmware
-settings-updates-area-desktop = Bureaublad
-settings-updates-area-core = Kernsysteem
-settings-updates-area-other = Bibliotheken en hulpmiddelen
 settings-updates-released = Uitgebracht: { $when }
 settings-updates-improvements = Oplossingen en verbeteringen in het hele systeem
 settings-updates-download-size = { $size } te downloaden
@@ -247,6 +200,7 @@ settings-updates-variant-standard = Overstappen naar de standaardimage
 settings-updates-variant-nvidia-reason = Volle snelheid uit je grafische kaart van NVIDIA
 settings-updates-variant-standard-reason = Kleiner, want deze computer heeft geen grafische kaart van NVIDIA
 settings-updates-switch = Overstappen
+settings-updates-done = Klaar
 
 ## About
 
@@ -270,6 +224,8 @@ settings-about-other-system = Verwijder het om de { $size } aan Luft te geven
 settings-about-remove = Verwijderen
 settings-about-software = Software
 settings-about-system = Systeem
+settings-about-version = Luft { $version }
+settings-about-built = Gebouwd op { $date }
 settings-about-desktop = Bureaublad
 settings-about-kernel = Kernel
 settings-about-hostname = Hostnaam

@@ -11,6 +11,8 @@ else repainted it.
 The shell can now add redraw clip filters to the stage, as the compositor
 already does for the backgrounds that clients blur, and repaint the glass
 the blur reaches.
+
+Upstream-Status: luft-only API for Kestrel's glass
 ---
  src/backends/meta-stage-private.h | 11 -----------
  src/backends/meta-stage.c         | 18 ++++++++++++++++++

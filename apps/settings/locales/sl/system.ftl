@@ -134,27 +134,10 @@ settings-updates-downloading = Prenašanje posodobitev …
 settings-updates-rolling-back = Pripravljanje prejšnje različice …
 settings-updates-switching-nvidia = Prenašanje gonilnika NVIDIA …
 settings-updates-switching-standard = Prenašanje standardne slike sistema …
-settings-updates-elsewhere-refresh-by = { $app } išče posodobitve
-settings-updates-elsewhere-download-by = { $app } prenaša posodobitve
-settings-updates-elsewhere-update-by = { $app } namešča posodobitve
-settings-updates-elsewhere-update = Nameščanje posodobitev
-settings-updates-elsewhere-install-by = { $app } namešča programsko opremo
-settings-updates-elsewhere-install = Nameščanje programske opreme
-settings-updates-elsewhere-remove-by = { $app } odstranjuje programsko opremo
-settings-updates-elsewhere-remove = Odstranjevanje programske opreme
-settings-updates-elsewhere-change-by = { $app } spreminja programsko opremo
-settings-updates-elsewhere-change = Spreminjanje programske opreme
-settings-updates-elsewhere-wait = Ko bo končano, lahko znova poiščete posodobitve
-settings-updates-ready = Posodobitve so pripravljene za namestitev
-settings-updates-available = { $count ->
-    [one] Na voljo je { $count } posodobitev
-    [two] Na voljo sta { $count } posodobitvi
-    [few] Na voljo so { $count } posodobitve
-   *[other] Na voljo je { $count } posodobitev
-}
 settings-updates-up-to-date = Sistem je posodobljen
 settings-updates-version = Različica { $version }
 settings-updates-version-new = Nova različica
+settings-version-nightly = { $release } nočna različica { $number }
 settings-updates-returning = Pripravljeno za vrnitev na različico { $version }
 settings-updates-returning-unversioned = Pripravljeno za vrnitev na prejšnjo različico
 settings-updates-nvidia-ready = Gonilnik NVIDIA je pripravljen
@@ -163,13 +146,11 @@ settings-updates-version-available = Na voljo je različica { $version }
 settings-updates-version-available-new = Na voljo je nova različica
 settings-updates-version-staged = Različica { $version } je pripravljena za namestitev
 settings-updates-version-staged-new = Nova različica je pripravljena za namestitev
-settings-updates-restart-install-them = Znova zaženite, da jih namestite. Računalnik bo spet pripravljen v nekaj minutah.
 settings-updates-restart-return = Znova zaženite, da dokončate vrnitev.
 settings-updates-restart-switch = Znova zaženite, da dokončate. Računalnik bo spet pripravljen v nekaj minutah.
 settings-updates-restart-install-it = Znova zaženite, da jo namestite. Računalnik bo spet pripravljen v nekaj minutah.
 settings-updates-last-checked = Nazadnje preverjeno { $when }
 settings-updates-never-checked = Še ni preverjeno
-settings-updates-installed-when = Posodobitve nameščene { $when }
 settings-updates-stop = Ustavi
 settings-updates-check = Preveri zdaj
 settings-updates-checking-button = Preverjanje …
@@ -198,41 +179,7 @@ settings-updates-firmware-restart = Dokonča se ob vnovičnem zagonu
 settings-updates-firmware-installing = Nameščanje …
 settings-updates-firmware-update = Posodobi
 settings-updates-firmware-failed = Vdelane programske opreme ni bilo mogoče posodobiti
-settings-updates-failed = Zadnjih posodobitev ni bilo mogoče namestiti
-settings-updates-failed-description = Sistem je ostal nespremenjen
-settings-updates-includes = { $parts ->
-    [security] Vključuje varnostne popravke
-    [kernel] Vključuje novo jedro Linux
-    [drivers] Vključuje posodobljene gonilnike
-    [security-kernel] Vključuje varnostne popravke in novo jedro Linux
-    [security-drivers] Vključuje varnostne popravke in posodobljene gonilnike
-    [kernel-drivers] Vključuje novo jedro Linux in posodobljene gonilnike
-    [security-kernel-drivers] Vključuje varnostne popravke, novo jedro Linux in posodobljene gonilnike
-   *[other] Popravki in izboljšave v celotnem sistemu
-}
-settings-updates-count-size = { $count ->
-    [one] { $count } posodobitev · { $size }
-    [two] { $count } posodobitvi · { $size }
-    [few] { $count } posodobitve · { $size }
-   *[other] { $count } posodobitev · { $size }
-}
-settings-updates-restart-and-install = Znova zaženi in namesti
 settings-updates-download = Prenesi
-settings-updates-see-included = Kaj je vključeno
-settings-updates-included = Vključeno
-settings-updates-included-description = { $count ->
-    [one] { $count } posodobitev za sistem, njegove gonilnike in knjižnice
-    [two] { $count } posodobitvi za sistem, njegove gonilnike in knjižnice
-    [few] { $count } posodobitve za sistem, njegove gonilnike in knjižnice
-   *[other] { $count } posodobitev za sistem, njegove gonilnike in knjižnice
-}
-settings-updates-security-fix = Varnostni popravek
-settings-updates-done = Končano
-settings-updates-area-kernel = Jedro Linux
-settings-updates-area-drivers = Gonilniki in vdelana programska oprema
-settings-updates-area-desktop = Namizje
-settings-updates-area-core = Jedro sistema
-settings-updates-area-other = Knjižnice in orodja
 settings-updates-released = Izdano { $when }
 settings-updates-improvements = Popravki in izboljšave v celotnem sistemu
 settings-updates-download-size = Za prenos: { $size }
@@ -259,6 +206,7 @@ settings-updates-variant-standard = Preklopi na standardno sliko sistema
 settings-updates-variant-nvidia-reason = Polna hitrost grafične kartice NVIDIA
 settings-updates-variant-standard-reason = Manjša, ker ta računalnik nima grafične kartice NVIDIA
 settings-updates-switch = Preklopi
+settings-updates-done = Končano
 
 ## About
 
@@ -282,6 +230,8 @@ settings-about-other-system = Odstranite ga in njegov prostor ({ $size }) dodeli
 settings-about-remove = Odstrani
 settings-about-software = Programska oprema
 settings-about-system = Sistem
+settings-about-version = Luft { $version }
+settings-about-built = Zgrajeno { $date }
 settings-about-desktop = Namizje
 settings-about-kernel = Jedro
 settings-about-hostname = Ime gostitelja

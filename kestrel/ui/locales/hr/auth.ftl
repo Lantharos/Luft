@@ -24,6 +24,7 @@ lock-screen-larger-text = Veći tekst
 lock-screen-suspend = Mirovanje
 lock-screen-restart = Ponovno pokreni…
 lock-screen-power-off = Isključi…
+lock-inhibit-reason = Kestrel mora zaključati zaslon
 
 ## Keyring and passphrase prompts. Apps usually supply their own text; these are the defaults
 
@@ -67,3 +68,80 @@ passkeys-ok = U redu
 passkeys-use-this-computer = Koristi ovo računalo
 passkeys-fingerprint-unavailable = Za nastavak upotrijebite lozinku.
 passkeys-wrong-password = Lozinka nije točna. Pokušajte ponovno.
+
+## Sign-in prompt
+
+auth-prompt-password = Lozinka
+auth-prompt-username = Korisničko ime
+auth-prompt-back = Natrag
+auth-prompt-submit = Pošalji
+auth-prompt-wrong-password = Ta lozinka nije ispravna
+auth-prompt-failed = Nije uspjelo. Pokušajte ponovno.
+fingerprint-not-recognized = Otisak prsta nije prepoznat
+
+## Administrator authentication
+
+polkit-title = Potrebna je provjera autentičnosti
+polkit-administrator = Administrator
+polkit-password = Lozinka
+polkit-cancel = Odustani
+polkit-authenticate = Potvrdi
+polkit-failed = Nažalost, to nije uspjelo. Pokušajte ponovno.
+
+## Log out, power off and restart dialog
+
+end-session-log-out-user = Odjava korisnika { $userName }
+end-session-log-out-title = Odjava
+end-session-log-out-user-countdown = { $seconds ->
+    [one] Korisnik { $userName } automatski će se odjaviti za { $seconds } sekundu
+    [few] Korisnik { $userName } automatski će se odjaviti za { $seconds } sekunde
+   *[other] Korisnik { $userName } automatski će se odjaviti za { $seconds } sekundi
+}
+end-session-log-out-countdown = { $seconds ->
+    [one] Automatski ćete se odjaviti za { $seconds } sekundu
+    [few] Automatski ćete se odjaviti za { $seconds } sekunde
+   *[other] Automatski ćete se odjaviti za { $seconds } sekundi
+}
+end-session-log-out-button = Odjava
+end-session-power-off-title = Isključivanje
+end-session-power-off-updates-title = Instaliranje ažuriranja i isključivanje
+end-session-power-off-countdown = { $seconds ->
+    [one] Sustav će se automatski isključiti za { $seconds } sekundu
+    [few] Sustav će se automatski isključiti za { $seconds } sekunde
+   *[other] Sustav će se automatski isključiti za { $seconds } sekundi
+}
+end-session-power-off-button = Isključi
+end-session-restart-title = Ponovno pokretanje
+end-session-restart-updates-title = Instaliranje ažuriranja i ponovno pokretanje
+end-session-restart-countdown = { $seconds ->
+    [one] Sustav će se automatski ponovno pokrenuti za { $seconds } sekundu
+    [few] Sustav će se automatski ponovno pokrenuti za { $seconds } sekunde
+   *[other] Sustav će se automatski ponovno pokrenuti za { $seconds } sekundi
+}
+end-session-restart-button = Ponovno pokreni
+end-session-update-restart-title = Ponovno pokretanje i instaliranje ažuriranja
+end-session-update-restart-countdown = { $seconds ->
+    [one] Sustav će se automatski ponovno pokrenuti i instalirati ažuriranja za { $seconds } sekundu
+    [few] Sustav će se automatski ponovno pokrenuti i instalirati ažuriranja za { $seconds } sekunde
+   *[other] Sustav će se automatski ponovno pokrenuti i instalirati ažuriranja za { $seconds } sekundi
+}
+end-session-update-restart-button = Pokreni ponovno i instaliraj
+end-session-install-updates = Instaliraj ažuriranja na čekanju
+end-session-install-version = Instaliraj verziju { $version }
+end-session-version-nightly = { $release } noćna verzija { $number }
+end-session-low-battery = Baterija je slaba: priključite napajanje prije instaliranja ažuriranja
+end-session-busy-apps = Neke su aplikacije zauzete ili imaju nespremljen rad
+end-session-other-users = Prijavljeni su i drugi korisnici
+end-session-cancel = Odustani
+end-session-boot-options = Mogućnosti pokretanja
+end-session-remote-user = { $userName } (udaljeno)
+end-session-console-user = { $userName } (konzola)
+
+## Lock screen clock
+
+lock-clock-swipe-up = Prijeđite prstom prema gore
+lock-clock-click-or-press = Kliknite ili pritisnite tipku
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-unlock = Prozor za otključavanje

@@ -164,3 +164,254 @@ peek-error-unknown-modifier = { $modifier } nije modifikator. Koristite ctrl, sh
 peek-error-display-owner = Ovaj ekran pripada drugom programu
 peek-error-display-run = Programe na skrivenom ekranu pokreće peek run
 peek-error-display-handle = Ovaj ekran je pokrenut kao { $handle }, a ne kao { $requested }
+
+## Quick settings tiles
+
+auto-rotate-title = Automatska rotacija
+dark-style-title = Tamni režim
+do-not-disturb-title = Ne uznemiravaj
+night-light-title = Noćno svetlo
+airplane-mode-title = Režim rada u avionu
+
+## Power mode
+
+power-profile-title = Režim napajanja
+power-profile-header = Režim napajanja
+power-profile-open-menu = Otvori meni režima napajanja
+power-profile-settings = Podešavanja napajanja
+power-profile-performance = Performanse
+power-profile-balanced = Uravnoteženo
+power-profile-power-saver = Ušteda energije
+power-profile-custom = Prilagođeno
+
+## Keep awake
+
+caffeine-title = Drži budnim
+caffeine-open-menu = Otvori meni za držanje budnim
+caffeine-until = Do { $time }
+caffeine-until-turned-off = Dok se ne isključi
+caffeine-30-minutes = 30 minuta
+caffeine-1-hour = 1 sat
+caffeine-2-hours = 2 sata
+caffeine-inhibit-reason = Drži budnim iz brzih podešavanja
+
+## Brightness
+
+brightness-title = Osvetljenost
+brightness-open-menu = Otvori meni osvetljenosti
+
+## Keyboard backlight
+
+backlight-title = Osvetljenje tastature
+backlight-open-menu = Otvori meni osvetljenja tastature
+backlight-slider = Osvetljenje tastature
+backlight-off = Isključeno
+backlight-low = Slabo
+backlight-high = Jako
+
+## Sound
+
+volume-sound-settings = Podešavanja zvuka
+volume-mute = Isključi zvuk
+volume-unmute = Uključi zvuk
+volume-output-slider = Jačina zvuka
+volume-output-title = Izlaz zvuka
+volume-output-open-menu = Otvori meni izlaza zvuka
+volume-input-slider = Mikrofon
+volume-input-title = Ulaz zvuka
+volume-input-open-menu = Otvori meni ulaza zvuka
+
+## Bluetooth
+
+bluetooth-title = Bluetooth
+bluetooth-open-menu = Otvori meni za Bluetooth
+bluetooth-settings = Podešavanja za Bluetooth
+bluetooth-connect = Poveži
+bluetooth-disconnect = Prekini vezu
+bluetooth-connect-device = Poveži se sa uređajem { $deviceName }
+bluetooth-disconnect-device = Prekini vezu sa uređajem { $deviceName }
+bluetooth-no-devices = Nema dostupnih ni povezanih uređaja
+bluetooth-turn-on-hint = Uključite Bluetooth da biste povezali uređaje
+bluetooth-connected-count = { $count ->
+    [one] { $count } povezan
+    [few] { $count } povezana
+   *[other] { $count } povezano
+}
+
+## Network menus in quick settings
+
+network-menu-unknown-network = <nepoznata>
+network-menu-connect = Poveži
+network-menu-disconnect = Prekini vezu
+network-menu-connect-to = Poveži se sa { $name }
+network-menu-disconnect-from = Prekini vezu sa { $name }
+network-menu-turn-off = Isključi
+network-menu-wifi-network = { $secure ->
+    [yes] { $name }, zaštićena, jačina signala { $strength }%
+   *[no] { $name }, nije zaštićena, jačina signala { $strength }%
+}
+network-menu-hotspot = Pristupna tačka: { $name }
+network-menu-connected-count = { $count ->
+    [one] { $count } povezana
+    [few] { $count } povezane
+   *[other] { $count } povezanih
+}
+network-menu-vpn = VPN
+network-menu-vpn-open-menu = Otvori meni za VPN
+network-menu-vpn-settings = Podešavanja za VPN
+network-menu-wifi = Wi-Fi
+network-menu-wifi-open-menu = Otvori meni za Wi-Fi
+network-menu-wifi-settings = Sve mreže
+network-menu-wired = Žične veze
+network-menu-wired-open-menu = Otvori meni žičnih veza
+network-menu-wired-settings = Podešavanja žične mreže
+network-menu-tethers = Deljenje veze preko telefona
+network-menu-tethers-open-menu = Otvori meni deljenja veze
+network-menu-tether = Deljenje veze
+network-menu-tether-settings = Podešavanja za Bluetooth
+network-menu-mobile-connections = Mobilne veze
+network-menu-mobile-open-menu = Otvori meni mobilnih veza
+network-menu-mobile-settings = Podešavanja mobilnog interneta
+network-menu-mobile = Mobilni internet
+network-device-wired = Žična veza
+network-device-named = { $kind } ({ $name })
+network-menu-sign-in = Prijava na mrežu
+network-menu-failed-title = Povezivanje nije uspelo
+network-menu-failed-body = Mrežna veza nije mogla da se aktivira
+
+## Location access dialog
+
+location-dialog-title = Dozvoliti pristup lokaciji?
+location-dialog-description = Aplikacija { $appName } želi da pristupi vašoj lokaciji
+location-dialog-info = Pristup lokaciji možete bilo kada da promenite u podešavanjima privatnosti
+location-dialog-deny = Zabrani pristup
+location-dialog-grant = Dozvoli pristup
+
+## Thunderbolt notifications
+
+thunderbolt-unknown-title = Nepoznat Thunderbolt uređaj
+thunderbolt-unknown-body = Dok ste bili odsutni, otkriven je novi uređaj. Isključite ga i ponovo priključite da biste počeli da ga koristite.
+thunderbolt-unauthorized-title = Neodobren Thunderbolt uređaj
+thunderbolt-unauthorized-body = Otkriven je novi uređaj koji administrator mora da odobri
+thunderbolt-error-title = Greška pri odobravanju Thunderbolt uređaja
+thunderbolt-error-body = Thunderbolt uređaj nije mogao da se odobri: { $reason }
+
+## App permission dialog, used when an app asks for access to something
+
+access-dialog-deny = Zabrani
+access-dialog-allow = Dozvoli
+
+## Display change confirmation
+
+display-change-title = Zadržati ova podešavanja ekrana?
+display-change-countdown = { $seconds ->
+    [one] Promene će biti vraćene za { $seconds } sekundu
+    [few] Promene će biti vraćene za { $seconds } sekunde
+   *[other] Promene će biti vraćene za { $seconds } sekundi
+}
+display-change-revert = Vrati
+display-change-keep = Zadrži promene
+
+## Drive connected notification
+
+autorun-connected = Povezan je disk „{ $driveName }“
+autorun-ready = Disk je spreman za korišćenje
+autorun-open-with = Otvori u aplikaciji { $appName }
+
+## Keyboard accessibility shortcuts
+
+kbd-a11y-slow-keys-on = Spori tasteri su uključeni
+kbd-a11y-slow-keys-off = Spori tasteri su isključeni
+kbd-a11y-slow-keys-description = Upravo ste držali taster Shift 8 sekundi. To je prečica za Spore tastere, koji menjaju način na koji tastatura radi.
+kbd-a11y-sticky-keys-on = Lepljivi tasteri su uključeni
+kbd-a11y-sticky-keys-off = Lepljivi tasteri su isključeni
+kbd-a11y-sticky-keys-on-description = Upravo ste pritisnuli taster Shift 5 puta zaredom. To je prečica za Lepljive tastere, koji menjaju način na koji tastatura radi.
+kbd-a11y-sticky-keys-off-description = Upravo ste pritisnuli dva tastera odjednom ili taster Shift 5 puta zaredom. Time se isključuju Lepljivi tasteri, koji menjaju način na koji tastatura radi.
+kbd-a11y-leave-on = Ostavi uključeno
+kbd-a11y-turn-on = Uključi
+kbd-a11y-turn-off = Isključi
+kbd-a11y-leave-off = Ostavi isključeno
+
+## Audio device selection, shown after plugging something into the headphone jack
+
+audio-device-title = Izaberite audio-uređaj
+audio-device-cancel = Otkaži
+audio-device-sound-settings = Podešavanja zvuka
+audio-device-headphones = Slušalice
+audio-device-headset = Slušalice sa mikrofonom
+audio-device-microphone = Mikrofon
+
+## Keyboard shortcut inhibiting, asked when an app wants to receive system shortcuts itself
+
+inhibit-shortcuts-title = Dozvoliti zaobilaženje prečica?
+inhibit-shortcuts-app = Aplikacija { $appName } želi da zaobiđe sistemske prečice
+inhibit-shortcuts-unknown-app = Jedna aplikacija želi da zaobiđe sistemske prečice
+inhibit-shortcuts-restore = Prečice možete da vratite pritiskom na { $shortcut }
+inhibit-shortcuts-deny = Zabrani
+inhibit-shortcuts-allow = Dozvoli
+
+## Unlocking encrypted drives
+
+mount-hidden-volume = Skriveni volumen
+mount-windows-system-volume = Sistemski volumen za Windows
+mount-uses-keyfiles = Koristi datoteke ključeva
+mount-keyfiles-use-app = Da biste otključali volumen koji koristi datoteke ključeva, koristite aplikaciju <i>{ $appName }</i>
+mount-keyfiles-need-app = Za otključavanje volumena koji koristi datoteke ključeva potrebna je posebna aplikacija, na primer <i>Diskovi</i>
+mount-pim-number = PIM broj
+mount-pim-invalid = PIM mora da bude broj ili da ostane prazan
+mount-password = Lozinka
+mount-remember-password = Zapamti lozinku
+mount-cancel = Otkaži
+mount-unlock = Otključaj
+mount-open-app = Otvori aplikaciju { $appName }
+mount-wrong-password = Nije uspelo. Pokušajte ponovo.
+mount-unlock-failed = Volumen nije mogao da se otključa
+mount-pim-unsupported = Instalirana verzija udisks ne podržava PIM
+
+## Network passwords, asked when connecting needs one
+
+network-agent-auth-required = Potrebna je potvrda identiteta
+network-agent-wifi-rejected = Sačuvana lozinka za „{ $networkName }“ nije uspela. Unesite je ponovo.
+network-agent-wifi-secrets = Za pristup bežičnoj mreži „{ $networkName }“ potrebne su lozinke ili ključevi za šifrovanje
+network-agent-wps-hint = Možete se povezati i pritiskom na dugme „WPS“ na ruteru
+network-agent-wired-title = Potvrda identiteta za žičnu mrežu 802.1X
+network-agent-dsl-title = Potvrda identiteta za DSL
+network-agent-pin-title = Potreban je PIN
+network-agent-pin-body = Uređaju za mobilni internet je potreban PIN
+network-agent-vpn-title = Lozinka za VPN
+network-agent-password-required = Za povezivanje sa „{ $networkName }“ potrebna je lozinka
+network-agent-connect = Poveži
+network-agent-cancel = Otkaži
+network-agent-password = Lozinka
+network-agent-username = Korisničko ime
+network-agent-key = Ključ
+network-agent-private-key-password = Lozinka privatnog ključa
+network-agent-identity = Identitet
+network-agent-service = Usluga
+network-agent-network-name = Naziv mreže
+network-agent-pin = PIN
+
+## Screenshots and screen recording
+
+screenshot-source = Snimanje ekrana
+screenshot-area = Izbor oblasti
+screenshot-screen = Izbor ekrana
+screenshot-window = Izbor prozora
+screenshot-take = Napravi snimak ekrana
+screenshot-record = Snimi ekran
+screenshot-show-pointer = Prikaži pokazivač
+screenshot-capture = Snimi
+screenshot-close = Zatvori
+screenshot-screencasts-folder = Video-snimci ekrana
+screenshot-screencast-file = Video-snimak ekrana { $date } { $time }
+screenshot-screenshots-folder = Snimci ekrana
+screenshot-file = Snimak ekrana { $timestamp }
+screenshot-screencast-recorded = Ekran je snimljen
+screenshot-screencast-start-failed = Snimanje ekrana nije moglo da počne
+screenshot-screencast-out-of-space = Snimanje ekrana nije uspelo: nema mesta na disku
+screenshot-screencast-try-again = Snimanje ekrana nije uspelo, pokušajte ponovo
+screenshot-screencast-failed = Snimanje ekrana nije uspelo
+screenshot-screencast-view = Kliknite ovde da biste pogledali video
+screenshot-show-in-rover = Prikaži u aplikaciji Rover
+screenshot-captured = Snimak ekrana je napravljen
+screenshot-captured-body = Sliku možete da nalepite iz ostave

@@ -61,7 +61,7 @@ impl Origin {
     pub fn of(source: Source) -> Self {
         match source {
             Source::Flatpak => Self::Flathub,
-            Source::Package | Source::Tool => Self::Fedora,
+            Source::Tool => Self::Fedora,
             Source::AppImage => Self::AppImage,
             Source::Debian => Self::Debian,
             Source::System => Self::System,

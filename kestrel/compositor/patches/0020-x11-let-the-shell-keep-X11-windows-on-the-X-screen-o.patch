@@ -17,6 +17,8 @@ all go through it, and moving the origin moves every X11 window on the
 X server and tells its client. Window menus requested in window
 coordinates and move and resize requests from X11 clients also follow
 the window group's transform.
+
+Upstream-Status: luft-only Kestrel's board canvas
 ---
  src/compositor/meta-window-actor-private.h |   4 +
  src/compositor/meta-window-actor.c         |  24 ++++

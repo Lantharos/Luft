@@ -6,6 +6,8 @@ export interface About {
 	hostname: string;
 	system: string;
 	kernel: string;
+	version: string | null;
+	built: number | null;
 	processor: string | null;
 	graphics: string[];
 	memory: number | null;

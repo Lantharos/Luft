@@ -14,7 +14,7 @@ import {fixture, gjs, scratch, spawn, stop, waitForWindow} from '../lib/processe
 import {capture} from '../lib/screenshots.js';
 import {settled, waitUntil} from '../lib/wait.js';
 import {darkened, lock, unlock} from '../lockScreen/lib/shield.js';
-import {fold, tap} from './lib/touch.js';
+import {fold, tap, touchDown, touchUp} from './lib/touch.js';
 
 const {require, eventually} = checks('on-screen keyboard');
 const ROVER_SEARCH = [142, 32];
@@ -40,6 +40,7 @@ const coversPoint = ([x, y]) => keyboard().contains(global.stage.get_actor_at_po
 const intoCaret = ({x, y, height}) => [x + 8, y + height / 2];
 const emojiKey = () => descendants(keyboard()).find(actor => actor.icon_name === 'osk-emoji-picker-symbolic' && actor.mapped);
 const emojiPane = () => shownStyled('emoji-panel', keyboard());
+const deleteKey = () => descendants(keyboard()).find(actor => actor.icon_name === 'osk-delete-symbolic' && actor.mapped);
 
 async function tapsOpen(label, point) {
   await tap(point);
@@ -87,6 +88,27 @@ async function typeOnKeyboard(word) {
   for (const letter of word) {
     await tap(centerOf(labelled(letter, keyboard())));
     await settled();
+  }
+}
+
+async function checkHeldDelete() {
+  const app = gjs('clients/windows/window.js', ['--entry']);
+  try {
+    const window = await waitForWindow('Kestrel window check');
+    await settled();
+    await eventually(caret, 'the field reports where its caret is');
+    await tapsOpen('a field to clear', intoCaret(caret()));
+    await typeOnKeyboard(WORD);
+    await eventually(() => window.title === `Kestrel entry: ${WORD}`, 'the on-screen keyboard types into the field');
+    touchDown(centerOf(deleteKey()));
+    await eventually(() => window.title === 'Kestrel entry: ', 'holding the delete key clears the field');
+    touchUp();
+    await typeOnKeyboard(WORD);
+    await settled();
+    require(window.title === `Kestrel entry: ${WORD}`, 'what is typed after letting go of the delete key stays in the field');
+    await hide('the field closes', () => stop(app));
+  } finally {
+    await stop(app);
   }
 }
 
@@ -238,6 +260,7 @@ export async function run() {
   await fold(true);
   try {
     await checkGtk();
+    await checkHeldDelete();
     await checkToolkit('a GTK 3 window', () => gjs('clients/entries/gtk3Entry.js'), Meta.WindowClientType.WAYLAND);
     await checkToolkit('an Xwayland window', () => gjs('clients/windows/window.js', ['--entry'], {env: {GDK_BACKEND: 'x11', GTK_IM_MODULE: 'ibus'}}),
       Meta.WindowClientType.X11);

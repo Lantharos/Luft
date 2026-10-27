@@ -1,7 +1,7 @@
 [package]
 name = "luft-software"
 version = "0.1.0"
-description = "Apps, system updates and offline updates shared by Luft's software tools"
+description = "Apps and system updates shared by Luft's software tools"
 authors = ["Kristof"]
 license.workspace = true
 edition.workspace = true

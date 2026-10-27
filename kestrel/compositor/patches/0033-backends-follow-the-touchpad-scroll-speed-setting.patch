@@ -9,6 +9,8 @@ org.gnome.desktop.peripherals.touchpad, which gsettings-desktop-schemas
 input thread like the other libinput settings, so scrolling reads no
 settings per event. Wheels, continuous sources and virtual devices keep
 their deltas.
+
+Upstream-Status: upstream https://gitlab.gnome.org/GNOME/mutter/-/merge_requests/5434 also GNOME/mutter!4952, both by others
 ---
  src/backends/meta-input-settings-private.h    |  3 ++
  src/backends/meta-input-settings.c            | 29 +++++++++++++++++++

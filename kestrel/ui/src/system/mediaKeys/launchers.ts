@@ -2,7 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
-import { spawnCommandLine } from '../../shell/runtime/util.js';
+import { spawnCommandLine } from '../../core/runtime/util.js';
 
 import type { Keybindings } from '../../context.js';
 

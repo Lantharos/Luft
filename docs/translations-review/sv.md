@@ -4,12 +4,12 @@ Strings in Luft's Swedish translation that a native speaker should check: terms 
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/sv.csv` `notification`: "notis" — chosen over Windows' "meddelande" and GNOME's/Android's "avisering"; check that it reads natural in system text, not only on phones.
-- `packages/i18n/glossary/sv.csv` `suspend` / `hibernate`: "Viloläge" / "Dvala" — follows KDE and Ubuntu; Windows users know "Strömsparläge" for sleep and "Viloläge" for hibernate, so check whether this swap confuses them.
-- `packages/i18n/glossary/sv.csv` `snap`: "docka", "dockningslayout" — Windows says "fästa" for snap but also for pin; check that "docka" is understood for placing a window in part of the screen.
-- `packages/i18n/glossary/sv.csv` `board`: "tavla" — no established term exists for this mode.
-- `packages/i18n/glossary/sv.csv` `passkey`: "lösennyckel" — Apple's word; Google and Microsoft use "nyckel" or leave "passkey" in English.
-- `packages/i18n/glossary/sv.csv` `accessibility`: "Hjälpmedel" — Windows and GNOME; macOS says "Tillgänglighet", which is in the search keywords.
+- `packages/i18n/glossary/sv.tbx` `notification`: "notis" — chosen over Windows' "meddelande" and GNOME's/Android's "avisering"; check that it reads natural in system text, not only on phones.
+- `packages/i18n/glossary/sv.tbx` `suspend` / `hibernate`: "Viloläge" / "Dvala" — follows KDE and Ubuntu; Windows users know "Strömsparläge" for sleep and "Viloläge" for hibernate, so check whether this swap confuses them.
+- `packages/i18n/glossary/sv.tbx` `snap`: "docka", "dockningslayout" — Windows says "fästa" for snap but also for pin; check that "docka" is understood for placing a window in part of the screen.
+- `packages/i18n/glossary/sv.tbx` `board`: "tavla" — no established term exists for this mode.
+- `packages/i18n/glossary/sv.tbx` `passkey`: "lösennyckel" — Apple's word; Google and Microsoft use "nyckel" or leave "passkey" in English.
+- `packages/i18n/glossary/sv.tbx` `accessibility`: "Hjälpmedel" — Windows and GNOME; macOS says "Tillgänglighet", which is in the search keywords.
 - `kestrel/ui/locales/sv/shell.ftl` `keys-shift`, `keys-tab`, `keys-space`, `keys-backspace`: "Skift", "Tabb", "Blanksteg", "Backsteg" — Swedish keyboards print symbols for these; check that the Windows names are the right ones to show in shortcut labels.
 - `kestrel/ui/locales/sv/shell.ftl` `battery-level` [plugged]: "Batteri { $percentage } %, laddare ansluten" — the English "plugged in" has no short Swedish participle that agrees with "batteri".
 - `packages/web/ui/locales/sv/ui.ftl` `ui-finger-*` .inline: the possessive is part of the inline form ("ditt högra pekfinger", "din högra tumme") because it agrees with the finger's gender; check every sentence that uses `{ $finger }` reads right without its own "din"/"ditt".
@@ -25,9 +25,9 @@ Strings in Luft's Swedish translation that a native speaker should check: terms 
 - `kestrel/ui/locales/sv/surfaces.ftl` `start-folder-ungroup`: "Dela upp mappen" — English says "Ungroup apps"; check it is clear that the apps move back to the grid.
 - `kestrel/ui/locales/sv/desktop.ftl` `snap-zone`: "Docka till ett område på { $width } % × { $height } %" — screen-reader phrasing; check it sounds natural when read aloud.
 - `kestrel/ui/locales/sv/auth.ftl` `lock-screen-dwell-click`: "Vilande klick" — no settled Swedish term for dwell click (Settings describes it as "Klicka genom att låta pekaren vila"); check it is understood in the lock screen menu.
-- `kestrel/ui/locales/sv/engine.ftl` `network-menu-tether`: "Delad anslutning" (and `network-menu-tethers` "Delade anslutningar via Bluetooth") — no settled Swedish term for tethering; check it is understood and fits the tile.
-- `kestrel/ui/locales/sv/engine.ftl` `switch-monitor-join`: "Utöka" — Windows' word for extending the desktop; check it is clear next to "Spegla".
-- `kestrel/ui/locales/sv/engine.ftl` `ctrl-alt-tab-unlock`: "Upplåsning" — names the lock screen sign-in prompt in the Ctrl+Alt+Tab switcher; check it is understandable.
+- `kestrel/ui/locales/sv/system.ftl` `network-menu-tether`: "Delad anslutning" (and `network-menu-tethers` "Delade anslutningar via Bluetooth") — no settled Swedish term for tethering; check it is understood and fits the tile.
+- `kestrel/ui/locales/sv/desktop.ftl` `switch-monitor-join`: "Utöka" — Windows' word for extending the desktop; check it is clear next to "Spegla".
+- `kestrel/ui/locales/sv/auth.ftl` `ctrl-alt-tab-unlock`: "Upplåsning" — names the lock screen sign-in prompt in the Ctrl+Alt+Tab switcher; check it is understandable.
 - `apps/setup/locales/sv/setup.ftl` `setup-region-intro-guessed`: "Vi har gissat { $guesses }, så ändra det som inte stämmer." with parts like "tangentbordet utifrån datorn" — check the assembled sentence with two guesses joined by "och".
 - `apps/setup/locales/sv/setup.ftl` `setup-destination-meet-choice-description`: "Använd de { $size } som Meet Luft har gjort plats för bredvid Windows." — check the construction around the size.
 - `apps/setup/installer/locales/sv/installer.ftl` `installer-no-deployment`: "Det nya systemet har ingen driftsättning" — technical ostree term; check whether a plainer word fits better.
@@ -53,7 +53,6 @@ Strings in Luft's Swedish translation that a native speaker should check: terms 
 - `apps/settings/locales/sv/protection.ftl` `settings-usb-hold-back`: "Spärra nya USB-enheter" — "spärra" may sound more permanent than holding devices back until unlock.
 - `apps/settings/locales/sv/system.ftl` `settings-datetime-increase`: "Öka { $label }" — $label arrives capitalized (Timme/Minut), so it reads "Öka Timme" to a screen reader.
 - `apps/settings/locales/sv/system.ftl` `settings-about-other-system`: "Ta bort det för att ge dess { $size } till Luft" — "det" assumes the other system is referred to as "systemet" (ett); check against the row title it sits under.
-- `apps/settings/locales/sv/system.ftl` `settings-updates-elsewhere-refresh-by`: "Sökning efter uppdateringar pågår i { $app }" — rephrased so it also reads right when $app is "en annan app"; check it sounds natural next to the other "… av { $app }" lines.
 
 ## Website
 

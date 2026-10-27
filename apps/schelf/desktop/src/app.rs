@@ -3,8 +3,6 @@ use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
-use crate::fedora;
-
 const PAGE_SCHEME: &str = "schelf:";
 
 #[derive(Serialize, Type)]
@@ -14,7 +12,6 @@ struct AppState {
     appearance: Appearance,
     files: Vec<String>,
     page: Option<String>,
-    fedora: bool,
 }
 
 fn files(activation: &Activation) -> Vec<String> {
@@ -48,7 +45,6 @@ async fn state(Empty {}: Empty) -> Result<AppState, String> {
             .iter()
             .find(|argument| argument.starts_with(PAGE_SCHEME))
             .cloned(),
-        fedora: fedora::available(),
     })
 }
 

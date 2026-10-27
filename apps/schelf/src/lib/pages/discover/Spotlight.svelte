@@ -10,7 +10,7 @@
 <button
 	type="button"
 	class="spotlight"
-	onclick={() => navigation.push({ page: 'app', target: { origin: app.origin, id: app.id }, name: app.name })}
+	onclick={() => navigation.push({ page: 'app', target: { id: app.id }, name: app.name })}
 >
 	<div class="flex min-w-0 flex-1 flex-col items-start gap-3">
 		<AppArt icon={app.icon} size={64} />

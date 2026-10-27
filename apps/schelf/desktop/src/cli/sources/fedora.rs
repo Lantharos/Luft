@@ -5,7 +5,6 @@ use luft_software::apps::toolbox::{self, Available, Repositories};
 
 use super::{Candidate, Catalog, Kind};
 use crate::catalog::tools;
-use crate::fedora;
 use crate::operations::Job;
 
 const GRAPHICAL: [&str; 14] = [
@@ -38,20 +37,9 @@ pub struct Details {
     pub description: String,
 }
 
-pub fn in_toolbox() -> bool {
-    !fedora::available()
-}
-
 pub fn install(package: &str) -> (String, Job) {
     let package = package.to_owned();
-    if in_toolbox() {
-        (format!("tool/{package}"), Job::InstallTool { package })
-    } else {
-        (
-            format!("package/{package}"),
-            Job::Fedora(fedora::PackageJob::InstallPackage { package }),
-        )
-    }
+    (format!("tool/{package}"), Job::InstallTool { package })
 }
 
 fn on_system(packages: &[&str]) -> HashSet<String> {
@@ -74,14 +62,12 @@ fn on_system(packages: &[&str]) -> HashSet<String> {
 }
 
 pub fn comes_with_luft(package: &str) -> bool {
-    in_toolbox() && on_system(&[package]).contains(package)
+    on_system(&[package]).contains(package)
 }
 
 fn installed(packages: &[&str]) -> HashSet<String> {
     let mut installed = on_system(packages);
-    if in_toolbox() {
-        installed.extend(toolbox::installed().into_iter().map(|tool| tool.package));
-    }
+    installed.extend(toolbox::installed().into_iter().map(|tool| tool.package));
     installed
 }
 

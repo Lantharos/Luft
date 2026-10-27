@@ -1,6 +1,6 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
-import { WorkspaceSwitcherPopup } from '../../shell/switchers/workspaceSwitcherPopup.js';
+import { WorkspaceSwitcherPopup } from '../switchers/workspaceSwitcherPopup.js';
 
 import { ScrollSteps } from '../../shared/input/scrollSteps.js';
 

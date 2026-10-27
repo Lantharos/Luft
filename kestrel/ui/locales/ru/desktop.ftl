@@ -61,3 +61,45 @@ snap-zone = Прикрепить к области { $width } % на { $height 
 title-bar-minimize = Свернуть
 title-bar-maximize = Развернуть
 title-bar-close = Закрыть
+
+## Window resizing
+
+window-resize-size = { $width } × { $height }
+
+## App not responding
+
+close-dialog-title = Приложение «{ $appName }» не отвечает
+close-dialog-description = Можно немного подождать, пока оно продолжит работу, или принудительно закрыть приложение
+close-dialog-force-quit = Закрыть принудительно
+close-dialog-wait = Подождать
+
+## Display mode switcher, keep each label under about 15 characters
+
+switch-monitor-mirror = Дублировать
+switch-monitor-join = Расширить
+switch-monitor-external-only = Только внешний
+switch-monitor-built-in-only = Только встроенный
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-windows = Окна
+
+## Window menu, opened by right-clicking a window's title bar
+
+title-bar-menu-screenshot = Сделать снимок экрана
+title-bar-menu-hide = Свернуть
+title-bar-menu-restore = Восстановить
+title-bar-menu-maximize = Развернуть
+title-bar-menu-move = Переместить
+title-bar-menu-resize = Изменить размер
+title-bar-menu-always-on-top = Поверх других окон
+title-bar-menu-always-on-visible-workspace = На всех рабочих областях
+title-bar-menu-workspace-left = Переместить на рабочую область слева
+title-bar-menu-workspace-right = Переместить на рабочую область справа
+title-bar-menu-workspace-up = Переместить на рабочую область сверху
+title-bar-menu-workspace-down = Переместить на рабочую область снизу
+title-bar-menu-monitor-up = Переместить на экран сверху
+title-bar-menu-monitor-down = Переместить на экран снизу
+title-bar-menu-monitor-left = Переместить на экран слева
+title-bar-menu-monitor-right = Переместить на экран справа
+title-bar-menu-close = Закрыть

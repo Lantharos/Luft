@@ -166,3 +166,257 @@ peek-error-unknown-modifier = { $modifier } není modifikační klávesa. Použi
 peek-error-display-owner = Tento displej patří jinému programu
 peek-error-display-run = Programy ve skrytém displeji spouští peek run
 peek-error-display-handle = Tento displej byl spuštěn jako { $handle }, ne jako { $requested }
+
+## Quick settings tiles
+
+auto-rotate-title = Automatické otočení
+dark-style-title = Tmavý režim
+do-not-disturb-title = Nerušit
+night-light-title = Noční světlo
+airplane-mode-title = Režim v letadle
+
+## Power mode
+
+power-profile-title = Režim napájení
+power-profile-header = Režim napájení
+power-profile-open-menu = Otevřít nabídku režimů napájení
+power-profile-settings = Nastavení napájení
+power-profile-performance = Výkon
+power-profile-balanced = Vyvážený
+power-profile-power-saver = Úspora energie
+power-profile-custom = Vlastní
+
+## Keep awake
+
+caffeine-title = Nevypínat obrazovku
+caffeine-open-menu = Otevřít nabídku Nevypínat obrazovku
+caffeine-until = Do { $time }
+caffeine-until-turned-off = Do vypnutí
+caffeine-30-minutes = 30 minut
+caffeine-1-hour = 1 hodinu
+caffeine-2-hours = 2 hodiny
+caffeine-inhibit-reason = Obrazovku nechává zapnutou rychlé nastavení
+
+## Brightness
+
+brightness-title = Jas
+brightness-open-menu = Otevřít nabídku jasu
+
+## Keyboard backlight
+
+backlight-title = Podsvícení klávesnice
+backlight-open-menu = Otevřít nabídku jasu klávesnice
+backlight-slider = Jas klávesnice
+backlight-off = Vypnuto
+backlight-low = Nízké
+backlight-high = Vysoké
+
+## Sound
+
+volume-sound-settings = Nastavení zvuku
+volume-mute = Ztlumit
+volume-unmute = Zrušit ztlumení
+volume-output-slider = Hlasitost
+volume-output-title = Výstup zvuku
+volume-output-open-menu = Otevřít nabídku výstupu zvuku
+volume-input-slider = Mikrofon
+volume-input-title = Vstup zvuku
+volume-input-open-menu = Otevřít nabídku vstupu zvuku
+
+## Bluetooth
+
+bluetooth-title = Bluetooth
+bluetooth-open-menu = Otevřít nabídku Bluetooth
+bluetooth-settings = Nastavení Bluetooth
+bluetooth-connect = Připojit
+bluetooth-disconnect = Odpojit
+bluetooth-connect-device = Připojit k { $deviceName }
+bluetooth-disconnect-device = Odpojit { $deviceName }
+bluetooth-no-devices = Žádná dostupná ani připojená zařízení
+bluetooth-turn-on-hint = Pro připojení zařízení zapněte Bluetooth
+bluetooth-connected-count = { $count ->
+    [one] { $count } připojené
+    [few] { $count } připojená
+    [many] { $count } připojeného
+   *[other] { $count } připojených
+}
+
+## Network menus in quick settings
+
+network-menu-unknown-network = <neznámá>
+network-menu-connect = Připojit
+network-menu-disconnect = Odpojit
+network-menu-connect-to = Připojit k { $name }
+network-menu-disconnect-from = Odpojit { $name }
+network-menu-turn-off = Vypnout
+network-menu-wifi-network = { $secure ->
+    [yes] { $name }, zabezpečená, síla signálu { $strength } %
+   *[no] { $name }, nezabezpečená, síla signálu { $strength } %
+}
+network-menu-hotspot = Hotspot { $name }
+network-menu-connected-count = { $count ->
+    [one] { $count } připojené
+    [few] { $count } připojená
+    [many] { $count } připojeného
+   *[other] { $count } připojených
+}
+network-menu-vpn = VPN
+network-menu-vpn-open-menu = Otevřít nabídku VPN
+network-menu-vpn-settings = Nastavení VPN
+network-menu-wifi = Wi-Fi
+network-menu-wifi-open-menu = Otevřít nabídku Wi-Fi
+network-menu-wifi-settings = Všechny sítě
+network-menu-wired = Kabelová připojení
+network-menu-wired-open-menu = Otevřít nabídku kabelových připojení
+network-menu-wired-settings = Nastavení kabelové sítě
+network-menu-tethers = Sdílení přes Bluetooth
+network-menu-tethers-open-menu = Otevřít nabídku sdílení přes Bluetooth
+network-menu-tether = Sdílení připojení
+network-menu-tether-settings = Nastavení Bluetooth
+network-menu-mobile-connections = Mobilní připojení
+network-menu-mobile-open-menu = Otevřít nabídku mobilních připojení
+network-menu-mobile-settings = Nastavení mobilních dat
+network-menu-mobile = Mobilní data
+network-device-wired = Kabelové připojení
+network-device-named = { $kind } ({ $name })
+network-menu-sign-in = Přihlásit se k síti
+network-menu-failed-title = Připojení se nezdařilo
+network-menu-failed-body = Síťové připojení se nepodařilo aktivovat
+
+## Location access dialog
+
+location-dialog-title = Povolit přístup k poloze
+location-dialog-description = Aplikace { $appName } chce získat přístup k vaší poloze
+location-dialog-info = Přístup k poloze můžete kdykoli změnit v nastavení soukromí
+location-dialog-deny = Odepřít přístup
+location-dialog-grant = Povolit přístup
+
+## Thunderbolt notifications
+
+thunderbolt-unknown-title = Neznámé zařízení Thunderbolt
+thunderbolt-unknown-body = Během vaší nepřítomnosti bylo připojeno nové zařízení. Začnete ho používat, když ho odpojíte a znovu připojíte.
+thunderbolt-unauthorized-title = Neautorizované zařízení Thunderbolt
+thunderbolt-unauthorized-body = Bylo připojeno nové zařízení, které musí schválit správce
+thunderbolt-error-title = Chyba autorizace zařízení Thunderbolt
+thunderbolt-error-body = Zařízení Thunderbolt se nepodařilo autorizovat: { $reason }
+
+## App permission dialog, used when an app asks for access to something
+
+access-dialog-deny = Odepřít
+access-dialog-allow = Povolit
+
+## Display change confirmation
+
+display-change-title = Ponechat nastavení displeje?
+display-change-countdown = { $seconds ->
+    [one] Změny nastavení se vrátí za { $seconds } sekundu
+    [few] Změny nastavení se vrátí za { $seconds } sekundy
+    [many] Změny nastavení se vrátí za { $seconds } sekundy
+   *[other] Změny nastavení se vrátí za { $seconds } sekund
+}
+display-change-revert = Vrátit zpět
+display-change-keep = Ponechat změny
+
+## Drive connected notification
+
+autorun-connected = Připojeno „{ $driveName }“
+autorun-ready = Disk je připravený k použití
+autorun-open-with = Otevřít v aplikaci { $appName }
+
+## Keyboard accessibility shortcuts
+
+kbd-a11y-slow-keys-on = Pomalé klávesy zapnuty
+kbd-a11y-slow-keys-off = Pomalé klávesy vypnuty
+kbd-a11y-slow-keys-description = Právě jste 8 sekund drželi klávesu Shift. To je zkratka funkce Pomalé klávesy, která mění chování klávesnice.
+kbd-a11y-sticky-keys-on = Lepicí klávesy zapnuty
+kbd-a11y-sticky-keys-off = Lepicí klávesy vypnuty
+kbd-a11y-sticky-keys-on-description = Právě jste 5krát za sebou stiskli klávesu Shift. To je zkratka funkce Lepicí klávesy, která mění chování klávesnice.
+kbd-a11y-sticky-keys-off-description = Právě jste stiskli dvě klávesy najednou nebo 5krát za sebou klávesu Shift. Tím se vypíná funkce Lepicí klávesy, která mění chování klávesnice.
+kbd-a11y-leave-on = Nechat zapnuté
+kbd-a11y-turn-on = Zapnout
+kbd-a11y-turn-off = Vypnout
+kbd-a11y-leave-off = Nechat vypnuté
+
+## Audio device selection, shown after plugging something into the headphone jack
+
+audio-device-title = Vyberte zvukové zařízení
+audio-device-cancel = Zrušit
+audio-device-sound-settings = Nastavení zvuku
+audio-device-headphones = Sluchátka
+audio-device-headset = Náhlavní souprava
+audio-device-microphone = Mikrofon
+
+## Keyboard shortcut inhibiting, asked when an app wants to receive system shortcuts itself
+
+inhibit-shortcuts-title = Povolit blokování zkratek
+inhibit-shortcuts-app = Aplikace { $appName } chce blokovat systémové zkratky
+inhibit-shortcuts-unknown-app = Aplikace chce blokovat systémové zkratky
+inhibit-shortcuts-restore = Zkratky obnovíte stisknutím { $shortcut }
+inhibit-shortcuts-deny = Odepřít
+inhibit-shortcuts-allow = Povolit
+
+## Unlocking encrypted drives
+
+mount-hidden-volume = Skrytý svazek
+mount-windows-system-volume = Systémový svazek Windows
+mount-uses-keyfiles = Používá soubory klíčů
+mount-keyfiles-use-app = Svazek, který používá soubory klíčů, odemknete v nástroji <i>{ $appName }</i>
+mount-keyfiles-need-app = K odemknutí svazku, který používá soubory klíčů, potřebujete externí nástroj, například <i>Disky</i>
+mount-pim-number = Číslo PIM
+mount-pim-invalid = PIM musí být číslo, nebo zůstat prázdné
+mount-password = Heslo
+mount-remember-password = Zapamatovat heslo
+mount-cancel = Zrušit
+mount-unlock = Odemknout
+mount-open-app = Otevřít { $appName }
+mount-wrong-password = Nepodařilo se. Zkuste to znovu.
+mount-unlock-failed = Svazek se nepodařilo odemknout
+mount-pim-unsupported = Nainstalovaná verze udisks nepodporuje nastavení PIM
+
+## Network passwords, asked when connecting needs one
+
+network-agent-auth-required = Vyžaduje se ověření
+network-agent-wifi-rejected = Uložené heslo k síti „{ $networkName }“ nefungovalo. Zadejte ho znovu.
+network-agent-wifi-secrets = Pro přístup k bezdrátové síti „{ $networkName }“ je potřeba heslo nebo šifrovací klíč
+network-agent-wps-hint = Můžete se také připojit stisknutím tlačítka „WPS“ na routeru
+network-agent-wired-title = Ověření 802.1X v kabelové síti
+network-agent-dsl-title = Ověření DSL
+network-agent-pin-title = Vyžaduje se kód PIN
+network-agent-pin-body = Zařízení pro mobilní data potřebuje kód PIN
+network-agent-vpn-title = Heslo VPN
+network-agent-password-required = K připojení k síti „{ $networkName }“ je potřeba heslo
+network-agent-connect = Připojit
+network-agent-cancel = Zrušit
+network-agent-password = Heslo
+network-agent-username = Uživatelské jméno
+network-agent-key = Klíč
+network-agent-private-key-password = Heslo soukromého klíče
+network-agent-identity = Identita
+network-agent-service = Služba
+network-agent-network-name = Název sítě
+network-agent-pin = PIN
+
+## Screenshots and screen recording
+
+screenshot-source = Zachycení obrazovky
+screenshot-area = Výběr oblasti
+screenshot-screen = Výběr obrazovky
+screenshot-window = Výběr okna
+screenshot-take = Pořídit snímek obrazovky
+screenshot-record = Nahrát obrazovku
+screenshot-show-pointer = Zobrazit ukazatel
+screenshot-capture = Zachytit
+screenshot-close = Zavřít
+screenshot-screencasts-folder = Záznamy obrazovky
+screenshot-screencast-file = Záznam obrazovky { $date } { $time }
+screenshot-screenshots-folder = Snímky obrazovky
+screenshot-file = Snímek obrazovky { $timestamp }
+screenshot-screencast-recorded = Záznam obrazovky uložen
+screenshot-screencast-start-failed = Záznam obrazovky se nepodařilo spustit
+screenshot-screencast-out-of-space = Záznam obrazovky se nezdařil: na disku není místo
+screenshot-screencast-try-again = Záznam obrazovky se nezdařil, zkuste to znovu
+screenshot-screencast-failed = Záznam obrazovky se nezdařil
+screenshot-screencast-view = Kliknutím zobrazíte video
+screenshot-show-in-rover = Zobrazit v aplikaci Rover
+screenshot-captured = Snímek obrazovky pořízen
+screenshot-captured-body = Obrázek můžete vložit ze schránky

@@ -36,3 +36,27 @@ keys-page-down = Page Down
 keys-print-screen = Print Screen
 
 date-just-now = Lige nu
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-panel = Proceslinje
+
+## System notifications
+
+unsafe-mode-title = Systemet er sat i usikker tilstand
+unsafe-mode-body = Apps har nu ubegrænset adgang
+unsafe-mode-undo = Fortryd
+privileged-user-title = Logget ind som privilegeret bruger
+privileged-user-body = Af sikkerhedshensyn bør du undgå at køre en session som privilegeret bruger. Log om muligt ind som almindelig bruger.
+
+## Starting programs
+
+spawn-failed = »{ $command }« kunne ikke køres:
+
+## Text field context menu
+
+entry-menu-copy = Kopier
+entry-menu-paste = Sæt ind
+entry-menu-show-text = Vis tekst
+entry-menu-hide-text = Skjul tekst
+entry-caps-lock-on = Caps Lock er slået til

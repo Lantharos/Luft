@@ -137,6 +137,10 @@ notifications-media-previous = Pjesa e mëparshme
 notifications-media-next = Pjesa tjetër
 notifications-media-play = Luaj
 notifications-media-pause = Pauzë
+messages-unknown-app = Aplikacion i panjohur
+messages-reply = Përgjigju
+messages-reply-placeholder = Shkruaj një përgjigje
+messages-reply-send = Dërgo
 
 ## Calendar
 
@@ -174,3 +178,17 @@ emoji-skin-tone-medium-light = Lëkurë mesatarisht e çelët
 emoji-skin-tone-medium = Lëkurë mesatare
 emoji-skin-tone-medium-dark = Lëkurë mesatarisht e errët
 emoji-skin-tone-dark = Lëkurë e errët
+
+## System notifications
+
+messages-system-source = Sistemi
+
+## On-screen keyboard
+
+osk-keyboard-settings = Cilësimet e tastierës
+osk-letters-key = ABC
+
+## Media player controls
+
+mpris-unknown-artist = Artist i panjohur
+mpris-unknown-title = Titull i panjohur

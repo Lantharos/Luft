@@ -5,16 +5,16 @@ Strings in Luft's Estonian translation that a native speaker should check. Each 
 ## Terms and shared strings
 
 - Every string: the move from teie to sina and from parool to salasõna was done by machine; read the whole translation once for verb forms and case endings.
-- `packages/i18n/glossary/et.csv` `notification`: "teavitus" — Windows uses "teatis", phones often "märguanne"; check which reads most natural.
-- `packages/i18n/glossary/et.csv` `snap`, `snap layout`, `snap group`: "paigutama", "paigutusmall", "paigutusrühm" — no settled Estonian term known; check against Windows 11's Estonian name for Snap layouts.
-- `packages/i18n/glossary/et.csv` `tray`: "süsteemisalv" — check whether Windows' current Estonian term is better known.
-- `packages/i18n/glossary/et.csv` `workspace`: "tööala" — check against GNOME's Estonian term.
-- `packages/i18n/glossary/et.csv` `board`: "tahvel" — Luft-specific mode; check it reads as a canvas of windows and not a tablet.
-- `packages/i18n/glossary/et.csv` `App Store`: "Rakendusepood" — "Rakenduste pood" is also common; check the spelling as one word.
-- `packages/i18n/glossary/et.csv` `Install Luft`: "Lufti installimine" — check the genitive without apostrophe and the noun form as an app name.
-- `packages/i18n/glossary/et.csv` `Night light`: "Öövalgus" — check against Windows' current Estonian name.
-- `packages/i18n/glossary/et.csv` `Do Not Disturb`: "Ära sega" — Windows may say "Mitte segada"; check.
-- `packages/i18n/glossary/et.csv` `Power saver`: "Energiasääst" — check it fits next to the other power modes.
+- `packages/i18n/glossary/et.tbx` `notification`: "teavitus" — Windows uses "teatis", phones often "märguanne"; check which reads most natural.
+- `packages/i18n/glossary/et.tbx` `snap`, `snap layout`, `snap group`: "paigutama", "paigutusmall", "paigutusrühm" — no settled Estonian term known; check against Windows 11's Estonian name for Snap layouts.
+- `packages/i18n/glossary/et.tbx` `tray`: "süsteemisalv" — check whether Windows' current Estonian term is better known.
+- `packages/i18n/glossary/et.tbx` `workspace`: "tööala" — check against GNOME's Estonian term.
+- `packages/i18n/glossary/et.tbx` `board`: "tahvel" — Luft-specific mode; check it reads as a canvas of windows and not a tablet.
+- `packages/i18n/glossary/et.tbx` `App Store`: "Rakendusepood" — "Rakenduste pood" is also common; check the spelling as one word.
+- `packages/i18n/glossary/et.tbx` `Install Luft`: "Lufti installimine" — check the genitive without apostrophe and the noun form as an app name.
+- `packages/i18n/glossary/et.tbx` `Night light`: "Öövalgus" — check against Windows' current Estonian name.
+- `packages/i18n/glossary/et.tbx` `Do Not Disturb`: "Ära sega" — Windows may say "Mitte segada"; check.
+- `packages/i18n/glossary/et.tbx` `Power saver`: "Energiasääst" — check it fits next to the other power modes.
 - `docs/translations/et.md` Typography: inner quotes ‚…‘ — check against current EKI recommendation.
 - `packages/web/ui/locales/et/ui.ftl` `ui-fingerprint-place`: "Aseta oma { $finger } andurile." — relies on the imperative object being nominative; check it reads naturally with every finger name.
 - `packages/web/ui/locales/et/ui.ftl` `ui-finger-right-little`: "Parem väike sõrm" — "väikesõrm" is also used; check.
@@ -31,15 +31,15 @@ Strings in Luft's Estonian translation that a native speaker should check. Each 
 - `kestrel/ui/locales/et/system.ftl` `health-gpu-reset-body`: "Arvuti taaskäivitus iseenesest: { $date } kell { $time }." — colon keeps the date in the nominative; check it doesn't feel stiff.
 - `kestrel/ui/locales/et/system.ftl` `privacy-indicator`: "Kasutusel: { $things }" — the privacy-thing items are nominative lowercase (kaamera, mikrofon, ekraan, asukoht, aknad); check the joined list reads naturally.
 - `kestrel/ui/locales/et/portal.ftl` `portal-unknown-app-object`: "see rakendus" — all portal sentences put the app name in the nominative ("Kas { $appName } võib …?"), so both unknown-app forms are nominative; check the question form fits every title.
-- `kestrel/ui/locales/et/engine.ftl` `auto-rotate-title`: "Automaatne pööramine" — may be long for a Quick settings tile.
-- `kestrel/ui/locales/et/engine.ftl` `network-menu-tethers`: "Bluetoothi ühiskasutus" / `network-menu-tether`: "Ühiskasutus" — no settled Estonian term for Bluetooth tethering; check against what Estonian phones show.
-- `kestrel/ui/locales/et/engine.ftl` `network-menu-hotspot`: "Kuumkoht { $name }" — check against Windows' "mobiilne kuumkoht" wording.
-- `kestrel/ui/locales/et/engine.ftl` `switch-monitor-join`: "Laienda" — Windows' word for extending the desktop across displays; English says "Join Displays".
+- `kestrel/ui/locales/et/system.ftl` `auto-rotate-title`: "Automaatne pööramine" — may be long for a Quick settings tile.
+- `kestrel/ui/locales/et/system.ftl` `network-menu-tethers`: "Bluetoothi ühiskasutus" / `network-menu-tether`: "Ühiskasutus" — no settled Estonian term for Bluetooth tethering; check against what Estonian phones show.
+- `kestrel/ui/locales/et/system.ftl` `network-menu-hotspot`: "Kuumkoht { $name }" — check against Windows' "mobiilne kuumkoht" wording.
+- `kestrel/ui/locales/et/desktop.ftl` `switch-monitor-join`: "Laienda" — Windows' word for extending the desktop across displays; English says "Join Displays".
 - `apps/setup/locales/et/setup.ftl` `setup-region-field-language`: "keele" — the three field names are genitive because they only appear as the object of "Tuvastasime { $guesses }"; check the whole built sentence.
 - `apps/setup/locales/et/setup.ftl` `setup-windows-hibernated`: "… hoia all Shift-klahvi ja vali Lülita välja …" — should match the label of Shut down in Estonian Windows (possibly "Sule arvuti"); "kiirkäivitus" and "kettahaldus" should likewise match Windows.
 - `apps/setup/locales/et/setup.ftl` `setup-destination-alongside-choice`: "Koos süsteemiga { $windows }" — built to keep "Windows 11" uninflected; check it reads well as an option title.
 - `apps/setup/locales/et/setup.ftl` `setup-network-unavailable`: "Ühenduse saad luua hiljem paneelilt." — unclear which panel the English means; check in context.
-- `kestrel/ui/locales/et/engine.ftl` `backlight-title`: "Klaviatuuri taustvalgustus" — matches the Power page in Settings but may clip on a Quick settings tile.
+- `kestrel/ui/locales/et/system.ftl` `backlight-title`: "Klaviatuuri taustvalgustus" — matches the Power page in Settings but may clip on a Quick settings tile.
 
 ## Settings
 

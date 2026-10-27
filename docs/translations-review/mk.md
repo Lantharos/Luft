@@ -4,15 +4,15 @@ Strings in Luft's Macedonian translation that a native speaker should check. Eac
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/mk.csv` `Settings`: "Поставки" — chosen over GNOME's "Подесувања" as the word Windows uses; confirm it's the one people know best.
-- `packages/i18n/glossary/mk.csv` `Start`: "Старт" — follows Macedonian Windows; check that "менито Старт" reads naturally in sentences.
-- `packages/i18n/glossary/mk.csv` `tray`: "системска област" — no settled Macedonian term; Windows' "област за известувања" describes notifications rather than background apps.
-- `packages/i18n/glossary/mk.csv` `snap`: "прилепи" — check it reads as arranging a window on the screen; snap group "група прилепени прозорци" may be long for titles.
-- `packages/i18n/glossary/mk.csv` `clipboard`: "клипборд" — loanword chosen over "привремена меморија"; check it isn't too colloquial.
-- `packages/i18n/glossary/mk.csv` `Keep awake`: "Без спиење" — short tile name; check it reads as a feature, not an instruction.
-- `packages/i18n/glossary/mk.csv` `Keyring`: "привезок за клучеви" — no settled Macedonian term.
-- `packages/i18n/glossary/mk.csv` `passkey`: "клуч за пристап" — check it doesn't clash with other "клуч" terms such as the recovery key.
-- `packages/i18n/glossary/mk.csv` `USB stick`: "USB-меморија" — "USB-стик" and "флеш" are also common.
+- `packages/i18n/glossary/mk.tbx` `Settings`: "Поставки" — chosen over GNOME's "Подесувања" as the word Windows uses; confirm it's the one people know best.
+- `packages/i18n/glossary/mk.tbx` `Start`: "Старт" — follows Macedonian Windows; check that "менито Старт" reads naturally in sentences.
+- `packages/i18n/glossary/mk.tbx` `tray`: "системска област" — no settled Macedonian term; Windows' "област за известувања" describes notifications rather than background apps.
+- `packages/i18n/glossary/mk.tbx` `snap`: "прилепи" — check it reads as arranging a window on the screen; snap group "група прилепени прозорци" may be long for titles.
+- `packages/i18n/glossary/mk.tbx` `clipboard`: "клипборд" — loanword chosen over "привремена меморија"; check it isn't too colloquial.
+- `packages/i18n/glossary/mk.tbx` `Keep awake`: "Без спиење" — short tile name; check it reads as a feature, not an instruction.
+- `packages/i18n/glossary/mk.tbx` `Keyring`: "привезок за клучеви" — no settled Macedonian term.
+- `packages/i18n/glossary/mk.tbx` `passkey`: "клуч за пристап" — check it doesn't clash with other "клуч" terms such as the recovery key.
+- `packages/i18n/glossary/mk.tbx` `USB stick`: "USB-меморија" — "USB-стик" and "флеш" are also common.
 - `docs/translations/mk.md` percent sign: "57%" with no space — check against current Macedonian orthography and what users expect in battery labels.
 - `docs/translations/mk.md` count form: "два диска" but "два прозорци" — check the rule on which masculine nouns take the count form.
 - `packages/web/ui/locales/mk/ui.ftl` `ui-split-windows-size`: "{ $size }, зафатени { $used }" — check the order reads naturally with sizes like "120 GB".
@@ -31,10 +31,10 @@ Strings in Luft's Macedonian translation that a native speaker should check. Eac
 - `kestrel/ui/locales/mk/system.ftl` `battery-left`: "Преостанато е { $percent }." — impersonal neuter to avoid number agreement with the percentage; check it sounds natural.
 - `kestrel/ui/locales/mk/system.ftl` `media-keys-airplane-mode-hardware`: "Режимот за авион е вклучен со копче на уредот" — "in hardware" means a physical switch; check the wording.
 - `kestrel/ui/locales/mk/portal.ftl` `portal-unknown-app-subject`: "Апликацијата" — `$appName` stands bare in these sentences because this fallback replaces it, so app names start sentences without „апликацијата“, e.g. „Firefox сака…“.
-- `kestrel/ui/locales/mk/engine.ftl` `network-menu-tether`: "Тетеринг" — no settled Macedonian term; also in `network-menu-tethers` „Тетеринг преку Bluetooth“.
-- `kestrel/ui/locales/mk/engine.ftl` `network-menu-hotspot`: "Хотспот на { $name }" — loanword; „Точка на пристап“ is the alternative.
-- `kestrel/ui/locales/mk/engine.ftl` `screenshot-screencasts-folder`: "Снимки од екранот" — folder name on disk, next to „Слики од екранот“ for screenshots; check the two are distinct enough.
-- `kestrel/ui/locales/mk/engine.ftl` `ctrl-alt-tab-panel`: "Лента со задачи" — English says "Panel", which here means the taskbar.
+- `kestrel/ui/locales/mk/system.ftl` `network-menu-tether`: "Тетеринг" — no settled Macedonian term; also in `network-menu-tethers` „Тетеринг преку Bluetooth“.
+- `kestrel/ui/locales/mk/system.ftl` `network-menu-hotspot`: "Хотспот на { $name }" — loanword; „Точка на пристап“ is the alternative.
+- `kestrel/ui/locales/mk/system.ftl` `screenshot-screencasts-folder`: "Снимки од екранот" — folder name on disk, next to „Слики од екранот“ for screenshots; check the two are distinct enough.
+- `kestrel/ui/locales/mk/shell.ftl` `ctrl-alt-tab-panel`: "Лента со задачи" — English says "Panel", which here means the taskbar.
 - `apps/setup/locales/mk/setup.ftl` `setup-region-intro-guessed`: "Да почнеме со поставувањето. Претпоставивме: { $guesses }. Сменете сè што не е точно." — the list is built from definite nouns („јазикот и тастатурата според компјутерот“); check the joined sentence with real values.
 - `apps/setup/locales/mk/setup.ftl` `setup-account-full-name-example`: "Блаже Конески" — a well-known Macedonian name as the placeholder.
 - `apps/setup/locales/mk/setup.ftl` `setup-windows-fast-startup`: "Исклучи го Брзо стартување во Windows" — assumes Windows calls Fast Startup „Брзо стартување“ in Macedonian; same for „Управување со дискови“ (Disk Management) in `setup-windows-bitlocker`.

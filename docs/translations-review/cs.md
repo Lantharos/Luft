@@ -4,13 +4,13 @@ Strings in Luft's Czech translation that a native speaker should check: term cho
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/cs.csv` `board`: "tabule" — no established Czech term for this feature; check that tabule reads naturally next to plátno for the canvas.
-- `packages/i18n/glossary/cs.csv` `workspace`: "pracovní prostor" — GNOME uses pracovní plocha; chosen to avoid confusion with plocha (desktop). Check it's understood.
-- `packages/i18n/glossary/cs.csv` `tray`: "oznamovací oblast" — Windows' classic term, though the button holds background apps rather than notifications.
-- `packages/i18n/glossary/cs.csv` `Keep awake`: "Nevypínat obrazovku" — long for a Quick settings tile; check whether a shorter form fits.
-- `packages/i18n/glossary/cs.csv` `sandbox`: "izolované prostředí" — some readers may know only the English sandbox.
-- `packages/i18n/glossary/cs.csv` `wallpaper`: "tapeta" — Windows and GNOME say pozadí; tapeta follows macOS and phones.
-- `packages/i18n/glossary/cs.csv` `USB stick`: "flash disk" — check against jednotka USB flash used by Windows.
+- `packages/i18n/glossary/cs.tbx` `board`: "tabule" — no established Czech term for this feature; check that tabule reads naturally next to plátno for the canvas.
+- `packages/i18n/glossary/cs.tbx` `workspace`: "pracovní prostor" — GNOME uses pracovní plocha; chosen to avoid confusion with plocha (desktop). Check it's understood.
+- `packages/i18n/glossary/cs.tbx` `tray`: "oznamovací oblast" — Windows' classic term, though the button holds background apps rather than notifications.
+- `packages/i18n/glossary/cs.tbx` `Keep awake`: "Nevypínat obrazovku" — long for a Quick settings tile; check whether a shorter form fits.
+- `packages/i18n/glossary/cs.tbx` `sandbox`: "izolované prostředí" — some readers may know only the English sandbox.
+- `packages/i18n/glossary/cs.tbx` `wallpaper`: "tapeta" — Windows and GNOME say pozadí; tapeta follows macOS and phones.
+- `packages/i18n/glossary/cs.tbx` `USB stick`: "flash disk" — check against jednotka USB flash used by Windows.
 - `packages/web/ui/locales/cs/ui.ftl` `ui-fingerprint-place`: "Dotkněte se snímače { $finger }." — .inline finger names are in the instrumental so they fit both this and the swipe sentence; check it reads naturally for placing a finger.
 - `packages/web/ui/locales/cs/ui.ftl` `ui-toast-dismiss`: "Zavřít" — dismissing a notification bubble; Skrýt would also work.
 - `apps/settings/locales/cs/settings.ftl` `settings-subpage-back`: "Zpět na stránku { $page }" — the page title stays in the nominative as an apposition; check it doesn't sound stiff to screen-reader users.
@@ -24,7 +24,7 @@ Strings in Luft's Czech translation that a native speaker should check: term cho
 - `kestrel/ui/locales/cs/system.ftl` `oom-closed-body-with-size`: "Počítači docházela paměť. Zavřením se uvolnilo { $size }, aby vše ostatní dál plynule reagovalo." — rephrased to avoid gender agreement between app and container; English says what it was using, not what was freed.
 - `kestrel/ui/locales/cs/surfaces.ftl` `start-search-keep-awake-off`: "Povolit vypínání obrazovky" — opposite of Nevypínat obrazovku; check it is clear.
 - `kestrel/ui/locales/cs/desktop.ftl` `task-view-desktop`: "Pracovní prostor { $number }" — follows the glossary's workspace; Windows says Plocha 1.
-- `kestrel/ui/locales/cs/engine.ftl` `switch-monitor-join`: "Rozšířit" — Windows' word for extending displays; check it is understood as joining.
+- `kestrel/ui/locales/cs/desktop.ftl` `switch-monitor-join`: "Rozšířit" — Windows' word for extending displays; check it is understood as joining.
 - `apps/setup/locales/cs/setup.ftl` `setup-region-intro-guessed`: "Na začátek jsme odhadli { $guesses }. Upravte, co nesedí." — built from pieces; field names are accusative (jazyk, klávesnici, časové pásmo); check the joined list.
 - `apps/setup/locales/cs/setup.ftl` `setup-windows-hibernated`: "…vypnutý s rychlým spuštěním…" — Fast Startup as Windows names it in Czech (Rychlé spuštění); check.
 - `apps/setup/desktop/locales/cs/desktop.ftl` `desktop-window-title`: "Nastavit Luft" — infinitive like Instalovat Luft; avoids clashing with Nastavení.
@@ -43,7 +43,6 @@ Strings in Luft's Czech translation that a native speaker should check: term cho
 - `apps/settings/locales/cs/devices.ftl` `settings-dictation-engine-description`: "{ $engine } rozpoznává jazyk { $language }" — "jazyk" added so the language name can stay nominative.
 - `apps/settings/locales/cs/devices.ftl` `settings-keys-keypad`: "Num { $key }" — check this is the label Czech users expect for number-pad keys.
 - `apps/settings/locales/cs/protection.ftl` (all passphrase strings, and `setup-protect-passphrase-label` in setup): "heslo k disku" — chosen for "passphrase" to keep it apart from the account "heslo" and from "přístupový klíč" (passkey); check it reads naturally and isn't confused with the account password.
-- `apps/settings/locales/cs/system.ftl` `settings-updates-elsewhere-update-by`: "Aktualizace instaluje { $app }" — the agent comes last so { $app } can be a name (Schelf, dnf) or "jiná aplikace" in the nominative; same for the other `-by` strings. Check the word order reads naturally.
 - `apps/settings/locales/cs/protection.ftl` `settings-encryption-step-screen`: "Během spouštění se krátce zobrazí obrazovka „Šifrování zařízení“." — the quoted title must match what the startup screen actually shows; if that screen stays in English, quote the English title instead.
 - `apps/settings/locales/cs/protection.ftl` `settings-privacy-screen-off-after`: "{ $duration } nečinnosti" — rebuilt so the nominative duration ("5 minut", "1 minuta") fits; confirm it reads well as a row value.
 - `apps/settings/locales/cs/protection.ftl` `settings-privacy-delete-after`: "Odstraňovat starší než" — followed by a choice of durations ("30 dní"); check it fits every option.

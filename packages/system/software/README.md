@@ -1,6 +1,6 @@
 # luft-software
 
-The software handling Schelf and Settings share: which installed packages are apps and which are part of the system, system updates for both kinds of Luft installs, Flatpak, AppImages and command-line tools in a Toolbox container.
+The software handling Schelf and Settings share: image updates, system packages, Flatpak, AppImages and command-line tools in a Toolbox container.
 
 ## Setup
 
@@ -10,7 +10,7 @@ Add it to an app's `desktop/Cargo.toml`; the root `Cargo.toml` says where it liv
 luft-software.workspace = true
 ```
 
-How it tells apps from the system, its modules, image and offline updates, thumbnails, Toolbox tools and system packages are in [the software library reference](../../../docs/components/software.md).
+Its modules, image updates, thumbnails, Toolbox tools and system packages are in [the software library reference](../../../docs/components/software.md).
 
 ## Checks
 

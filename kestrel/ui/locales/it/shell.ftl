@@ -36,3 +36,27 @@ keys-page-down = Pag giù
 keys-print-screen = Stamp
 
 date-just-now = Adesso
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-panel = Barra delle applicazioni
+
+## System notifications
+
+unsafe-mode-title = Il sistema è in modalità non sicura
+unsafe-mode-body = Le app ora hanno accesso senza restrizioni
+unsafe-mode-undo = Annulla
+privileged-user-title = Accesso eseguito come utente con privilegi
+privileged-user-body = Per motivi di sicurezza è meglio non usare una sessione come utente con privilegi. Se possibile, accedi come utente normale.
+
+## Starting programs
+
+spawn-failed = Impossibile eseguire “{ $command }”:
+
+## Text field context menu
+
+entry-menu-copy = Copia
+entry-menu-paste = Incolla
+entry-menu-show-text = Mostra testo
+entry-menu-hide-text = Nascondi testo
+entry-caps-lock-on = Bloc Maiusc è attivo

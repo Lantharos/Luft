@@ -1,5 +1,5 @@
 import GObject from 'gi://GObject';
-import * as SystemActions from '../../shell/system/systemActions.js';
+import * as SystemActions from '../../session/actions/systemActions.js';
 
 export interface SessionAction {
   icon: string;

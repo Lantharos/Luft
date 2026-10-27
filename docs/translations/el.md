@@ -1,6 +1,6 @@
 # Greek style guide
 
-How Luft speaks Greek. The [glossary](../../packages/i18n/glossary/el.csv) has the agreed terms; Weblate shows them next to every string.
+How Luft speaks Greek. The [glossary](../../packages/i18n/glossary/el.tbx) has the agreed terms; Weblate shows them next to every string.
 
 ## Address and tone
 

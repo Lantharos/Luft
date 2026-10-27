@@ -130,25 +130,10 @@ settings-updates-downloading = Henter opdateringer…
 settings-updates-rolling-back = Gør den tidligere version klar…
 settings-updates-switching-nvidia = Henter NVIDIAs driver…
 settings-updates-switching-standard = Henter standardudgaven…
-settings-updates-elsewhere-refresh-by = { $app } søger efter opdateringer
-settings-updates-elsewhere-download-by = Opdateringer hentes af { $app }
-settings-updates-elsewhere-update-by = Opdateringer installeres af { $app }
-settings-updates-elsewhere-update = Opdateringer installeres
-settings-updates-elsewhere-install-by = Software installeres af { $app }
-settings-updates-elsewhere-install = Software installeres
-settings-updates-elsewhere-remove-by = Software fjernes af { $app }
-settings-updates-elsewhere-remove = Software fjernes
-settings-updates-elsewhere-change-by = Software ændres af { $app }
-settings-updates-elsewhere-change = Software ændres
-settings-updates-elsewhere-wait = Du kan søge efter opdateringer igen, når det er færdigt
-settings-updates-ready = Opdateringer er klar til at blive installeret
-settings-updates-available = { $count ->
-    [one] { $count } opdatering er tilgængelig
-   *[other] { $count } opdateringer er tilgængelige
-}
 settings-updates-up-to-date = Dit system er opdateret
 settings-updates-version = Version { $version }
 settings-updates-version-new = En ny version
+settings-version-nightly = { $release } natlig build { $number }
 settings-updates-returning = Klar til at gå tilbage til version { $version }
 settings-updates-returning-unversioned = Klar til at gå tilbage til den tidligere version
 settings-updates-nvidia-ready = NVIDIAs driver er klar
@@ -157,13 +142,11 @@ settings-updates-version-available = Version { $version } er tilgængelig
 settings-updates-version-available-new = En ny version er tilgængelig
 settings-updates-version-staged = Version { $version } er klar til at blive installeret
 settings-updates-version-staged-new = En ny version er klar til at blive installeret
-settings-updates-restart-install-them = Genstart for at installere dem. Computeren er klar igen om få minutter.
 settings-updates-restart-return = Genstart for at gå tilbage.
 settings-updates-restart-switch = Genstart for at gøre det færdigt. Computeren er klar igen om få minutter.
 settings-updates-restart-install-it = Genstart for at installere den. Computeren er klar igen om få minutter.
 settings-updates-last-checked = Sidst kontrolleret { $when }
 settings-updates-never-checked = Ikke kontrolleret endnu
-settings-updates-installed-when = Opdateringer installeret { $when }
 settings-updates-stop = Stop
 settings-updates-check = Søg nu
 settings-updates-checking-button = Søger…
@@ -190,37 +173,7 @@ settings-updates-firmware-restart = Gøres færdig, når du genstarter
 settings-updates-firmware-installing = Installerer…
 settings-updates-firmware-update = Opdater
 settings-updates-firmware-failed = Firmwaren kunne ikke opdateres
-settings-updates-failed = De seneste opdateringer kunne ikke installeres
-settings-updates-failed-description = Dit system blev efterladt, som det var
-settings-updates-includes = { $parts ->
-    [security] Indeholder sikkerhedsrettelser
-    [kernel] Indeholder en ny Linux-kerne
-    [drivers] Indeholder opdaterede drivere
-    [security-kernel] Indeholder sikkerhedsrettelser og en ny Linux-kerne
-    [security-drivers] Indeholder sikkerhedsrettelser og opdaterede drivere
-    [kernel-drivers] Indeholder en ny Linux-kerne og opdaterede drivere
-    [security-kernel-drivers] Indeholder sikkerhedsrettelser, en ny Linux-kerne og opdaterede drivere
-   *[other] Rettelser og forbedringer i hele systemet
-}
-settings-updates-count-size = { $count ->
-    [one] { $count } opdatering · { $size }
-   *[other] { $count } opdateringer · { $size }
-}
-settings-updates-restart-and-install = Genstart og installer
 settings-updates-download = Hent
-settings-updates-see-included = Se indholdet
-settings-updates-included = Indhold
-settings-updates-included-description = { $count ->
-    [one] { $count } opdatering til systemet, dets drivere og dets biblioteker
-   *[other] { $count } opdateringer til systemet, dets drivere og dets biblioteker
-}
-settings-updates-security-fix = Sikkerhedsrettelse
-settings-updates-done = Udført
-settings-updates-area-kernel = Linux-kerne
-settings-updates-area-drivers = Drivere og firmware
-settings-updates-area-desktop = Skrivebord
-settings-updates-area-core = Kernesystem
-settings-updates-area-other = Biblioteker og værktøjer
 settings-updates-released = Udgivet { $when }
 settings-updates-improvements = Rettelser og forbedringer i hele systemet
 settings-updates-download-size = { $size } skal hentes
@@ -247,6 +200,7 @@ settings-updates-variant-standard = Skift til standardudgaven
 settings-updates-variant-nvidia-reason = Fuld fart fra dit NVIDIA-grafikkort
 settings-updates-variant-standard-reason = Mindre, da denne computer ikke har NVIDIA-grafik
 settings-updates-switch = Skift
+settings-updates-done = Udført
 
 ## About
 
@@ -270,6 +224,8 @@ settings-about-other-system = Fjern det for at give dets { $size } til Luft
 settings-about-remove = Fjern
 settings-about-software = Software
 settings-about-system = System
+settings-about-version = Luft { $version }
+settings-about-built = Bygget { $date }
 settings-about-desktop = Skrivebord
 settings-about-kernel = Kerne
 settings-about-hostname = Værtsnavn

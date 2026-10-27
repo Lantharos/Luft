@@ -25,8 +25,6 @@ const SCREENSAVER_SCHEMA = 'org.gnome.desktop.screensaver';
 const LOCK_ENABLED_KEY = 'lock-enabled';
 const LOCK_DELAY_KEY = 'lock-delay';
 
-const LOCKDOWN_SCHEMA = 'org.gnome.desktop.lockdown';
-const DISABLE_LOCK_KEY = 'disable-lock-screen';
 
 const STANDARD_FADE_TIME = 10000;
 const MANUAL_FADE_TIME = 300;
@@ -86,7 +84,6 @@ export class ScreenShield extends Signals.EventEmitter {
   private loginSession: LoginManager.LoginSession | null = null;
   private readonly loginSessionReady: Promise<void>;
   private readonly settings = new Gio.Settings({ schema_id: SCREENSAVER_SCHEMA });
-  private readonly lockSettings = new Gio.Settings({ schema_id: LOCKDOWN_SCHEMA });
   private dialog: UnlockDialog | null = null;
   private grab: Clutter.Grab | null = null;
   private isActive = false;
@@ -128,7 +125,6 @@ export class ScreenShield extends Signals.EventEmitter {
     this.loginSessionReady = this.watchLoginSession();
 
     this.settings.connect(`changed::${LOCK_ENABLED_KEY}`, () => void this.syncInhibitor());
-    this.lockSettings.connect(`changed::${DISABLE_LOCK_KEY}`, () => void this.syncInhibitor());
 
     this.longLightbox.connect('notify::active', lightbox => {
       if (lightbox.active) this.activate(false);
@@ -174,9 +170,8 @@ export class ScreenShield extends Signals.EventEmitter {
 
   private async syncInhibitor(): Promise<void> {
     const lockEnabled = this.settings.get_boolean(LOCK_ENABLED_KEY);
-    const lockLocked = this.lockSettings.get_boolean(DISABLE_LOCK_KEY);
     const inhibit = !!this.loginSession && this.loginSession.Active &&
-      !this.isActive && lockEnabled && !lockLocked &&
+      !this.isActive && lockEnabled &&
       !!Main.sessionMode.unlockDialog;
 
     if (inhibit === this.inhibited) return;
@@ -470,11 +465,6 @@ export class ScreenShield extends Signals.EventEmitter {
   }
 
   lock(animate: boolean): void {
-    if (this.lockSettings.get_boolean(DISABLE_LOCK_KEY)) {
-      log('Screen lock is locked down, not locking');
-      return;
-    }
-
     this.becomeModal();
 
     St.Clipboard.get_default().set_text(St.ClipboardType.CLIPBOARD, '');

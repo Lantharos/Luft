@@ -9,7 +9,6 @@ import * as Main from '../main.js';
 
 const LOCKDOWN_SCHEMA = 'org.gnome.desktop.lockdown';
 const SCREENSAVER_SCHEMA = 'org.gnome.desktop.screensaver';
-const DISABLE_LOCK_SCREEN_KEY = 'disable-lock-screen';
 const DISABLE_LOG_OUT_KEY = 'disable-log-out';
 const RESTART_ENABLED_KEY = 'restart-enabled';
 const ALWAYS_SHOW_LOG_OUT_KEY = 'always-show-log-out';
@@ -79,8 +78,6 @@ const SystemActions = GObject.registerClass({
     this.lockdownSettings.connect(`changed::${DISABLE_LOG_OUT_KEY}`, updateLogout);
     global.settings.connect(`changed::${ALWAYS_SHOW_LOG_OUT_KEY}`, updateLogout);
 
-    this.lockdownSettings.connect(`changed::${DISABLE_LOCK_SCREEN_KEY}`, () => this.updateLockScreen());
-
     this.lockdownSettings.connect(`changed::${DISABLE_LOG_OUT_KEY}`, () => {
       void this.updateHaveShutdown();
       void this.updateHaveReboot();
@@ -149,9 +146,7 @@ const SystemActions = GObject.registerClass({
   }
 
   private updateLockScreen(): void {
-    const showLock = !Main.sessionMode.isLocked;
-    const allowLockScreen = !this.lockdownSettings.get_boolean(DISABLE_LOCK_SCREEN_KEY);
-    this.setAvailable('lock-screen', showLock && allowLockScreen);
+    this.setAvailable('lock-screen', !Main.sessionMode.isLocked);
   }
 
   private async updateHaveShutdown(): Promise<void> {

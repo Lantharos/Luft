@@ -4,8 +4,8 @@ settings-datetime-automatic = Määra kellaaeg automaatselt
 settings-datetime-automatic-description = Hoiab kella interneti abil täpsena
 settings-datetime-date-and-time = Kuupäev ja kellaaeg
 settings-datetime-automatic-zone = Määra ajavöönd automaatselt
-settings-datetime-automatic-zone-description = Järgib reisimisel teie asukohta
-settings-datetime-automatic-zone-location-off = Selle kasutamiseks lülitage lehel Privaatsus sisse asukohateenused
+settings-datetime-automatic-zone-description = Järgib reisimisel sinu asukohta
+settings-datetime-automatic-zone-location-off = Selle kasutamiseks lülita lehel Privaatsus sisse asukohateenused
 settings-datetime-zone = Ajavöönd
 settings-datetime-zone-description = { $place } · { $offset }
 settings-datetime-clock = Kell
@@ -40,7 +40,7 @@ settings-datetime-zone-failed = Ajavööndit ei õnnestunud muuta.
 
 settings-users-picture = Muuda pilti
 settings-users-picture-edit = Muuda
-settings-users-account = Teie konto
+settings-users-account = Sinu konto
 settings-users-name = Nimi
 settings-users-name-description = Kuvatakse sisselogimisel ja lukustuskuval
 settings-users-change = Muuda
@@ -52,7 +52,7 @@ settings-users-administrator = Administraator
 settings-users-standard = Tavakonto
 settings-users-others = Teised selle arvuti kasutajad
 settings-users-name-title = Nime muutmine
-settings-users-name-dialog-description = Nii kuvatakse teid sisselogimisel.
+settings-users-name-dialog-description = Nii kuvatakse sind sisselogimisel.
 settings-users-save = Salvesta
 settings-users-cancel = Loobu
 settings-users-close = Sulge
@@ -91,7 +91,7 @@ settings-users-password-strong = Tugev
 settings-users-fingerprints = Sõrmejäljed
 settings-users-fingerprint-add = Lisa sõrmejälg
 settings-users-fingerprint-add-description = Logi sisse ja ava lukk sõrmejäljega, salasõna sisestamata
-settings-users-fingerprint-choose = Valige lisatav sõrm.
+settings-users-fingerprint-choose = Vali lisatav sõrm.
 settings-users-finger = Sõrm
 settings-users-fingerprint-start = Alusta
 settings-users-fingerprint-another = Vali teine sõrm
@@ -142,14 +142,14 @@ settings-updates-elsewhere-remove-by = { $app } eemaldab tarkvara
 settings-updates-elsewhere-remove = Tarkvara eemaldatakse
 settings-updates-elsewhere-change-by = { $app } muudab tarkvara
 settings-updates-elsewhere-change = Tarkvara muudetakse
-settings-updates-elsewhere-wait = Kui see on lõpetatud, saate uuesti värskendusi otsida
+settings-updates-elsewhere-wait = Kui see on lõpetatud, saad uuesti värskendusi otsida
 settings-updates-ready = Värskendused on installimiseks valmis
 settings-updates-available =
     { $count ->
         [one] Saadaval on { $count } värskendus
        *[other] Saadaval on { $count } värskendust
     }
-settings-updates-up-to-date = Teie süsteem on ajakohane
+settings-updates-up-to-date = Sinu süsteem on ajakohane
 settings-updates-version = Versioon { $version }
 settings-updates-version-new = Uus versioon
 settings-updates-returning = Valmis naasma versioonile { $version }
@@ -160,10 +160,10 @@ settings-updates-version-available = Saadaval on versioon { $version }
 settings-updates-version-available-new = Saadaval on uus versioon
 settings-updates-version-staged = Versioon { $version } on installimiseks valmis
 settings-updates-version-staged-new = Uus versioon on installimiseks valmis
-settings-updates-restart-install-them = Installimiseks taaskäivitage. Arvuti on mõne minuti pärast tagasi.
-settings-updates-restart-return = Tagasipöördumise lõpetamiseks taaskäivitage.
-settings-updates-restart-switch = Lõpetamiseks taaskäivitage. Arvuti on mõne minuti pärast tagasi.
-settings-updates-restart-install-it = Installimiseks taaskäivitage. Arvuti on mõne minuti pärast tagasi.
+settings-updates-restart-install-them = Installimiseks taaskäivita. Arvuti on mõne minuti pärast tagasi.
+settings-updates-restart-return = Tagasipöördumise lõpetamiseks taaskäivita.
+settings-updates-restart-switch = Lõpetamiseks taaskäivita. Arvuti on mõne minuti pärast tagasi.
+settings-updates-restart-install-it = Installimiseks taaskäivita. Arvuti on mõne minuti pärast tagasi.
 settings-updates-last-checked = Viimati kontrollitud { $when }
 settings-updates-never-checked = Pole veel kontrollitud
 settings-updates-installed-when = Värskendused installiti { $when }
@@ -233,7 +233,7 @@ settings-updates-improvements = Parandused ja täiustused kogu süsteemis
 settings-updates-download-size = Allalaadimise maht: { $size }
 settings-updates-replaces = Asendab installimist ootava versiooni { $version }
 settings-updates-replaces-new = Asendab installimist ootava uue versiooni
-settings-updates-returning-description = Varem kasutusel olnud versioon. Teie failid ja sätted jäävad samaks.
+settings-updates-returning-description = Varem kasutusel olnud versioon. Sinu failid ja sätted jäävad samaks.
 settings-updates-stay = Jää versioonile { $version }
 settings-updates-stay-unversioned = Jää sellele versioonile
 settings-updates-restart = Taaskäivita
@@ -244,14 +244,14 @@ settings-updates-installed-version = Installitud versioon
 settings-updates-unknown = Teadmata
 settings-updates-whats-new = Mis on uut
 settings-updates-go-back-title = Naase eelmisele versioonile
-settings-updates-previous = Versioon { $version }. Teie failid ja sätted jäävad samaks.
-settings-updates-previous-unversioned = Teie failid ja sätted jäävad samaks.
+settings-updates-previous = Versioon { $version }. Sinu failid ja sätted jäävad samaks.
+settings-updates-previous-unversioned = Sinu failid ja sätted jäävad samaks.
 settings-updates-go-back = Naase
 settings-updates-notes-title = Mis on uut versioonis { $version }
 settings-updates-notes-title-new = Mis on uut uues versioonis
 settings-updates-variant-nvidia = Kasuta NVIDIA draiverit
 settings-updates-variant-standard = Lülitu tavalisele tõmmisele
-settings-updates-variant-nvidia-reason = Teie NVIDIA graafika täiskiirusel
+settings-updates-variant-nvidia-reason = Sinu NVIDIA graafika täiskiirusel
 settings-updates-variant-standard-reason = Väiksem, kuna selles arvutis pole NVIDIA graafikat
 settings-updates-switch = Lülitu
 
@@ -272,7 +272,7 @@ settings-about-storage = Salvestusruum
 settings-about-storage-free = Vaba { $free }, kokku { $total }
 settings-about-manage-drives = Halda kettaid
 settings-about-old-system = Säilitati, kui Luft selle asendas · { $size }
-settings-about-other-system = Eemaldage see, et anda Luftile { $size } ruumi
+settings-about-other-system = Eemalda see, et anda Luftile { $size } ruumi
 settings-about-remove = Eemalda
 settings-about-software = Tarkvara
 settings-about-system = Süsteem
@@ -287,7 +287,7 @@ settings-about-problem-forced = { $when }. Mõni rakendus ei sulgunud õigel aja
 settings-about-problem-emergency = { $when }. Arvuti pidi taaskäivituma rakendusi ootamata.
 settings-about-problem-help = Mis võib aidata
 settings-about-problem-what = Mis juhtus
-settings-about-problem-log = Selle seansi täielik tuumalogi jääb süsteemi žurnaali. Kui käivitate administraatorina nvidia-bug-report.sh, kogutakse see draiveri veateate jaoks kokku.
+settings-about-problem-log = Selle seansi täielik tuumalogi jääb süsteemi žurnaali. Kui käivitad administraatorina nvidia-bug-report.sh, kogutakse see draiveri veateate jaoks kokku.
 settings-about-problem-firmware = Taaskäivita püsivara sätetesse
 settings-about-done = Valmis
 
@@ -306,12 +306,12 @@ settings-region-formats-next-sign-in = { $sample }, alates järgmisest sisselogi
 settings-accounts-unavailable = Kontod pole saadaval
     .description = Kontode teenust pole sellesse arvutisse installitud
 settings-accounts-online = Võrgukontod
-    .description = Iga konto on kaust teie kodukaustas olevas kaustas Cloud ja seda saab avada iga rakendus. Failid laaditakse alla, kui need avate.
+    .description = Iga konto on kaust sinu kodukaustas olevas kaustas Cloud ja seda saab avada iga rakendus. Failid laaditakse alla, kui need avad.
 settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud või WebDAV
 
 ## Accounts: an account's row
 
-settings-accounts-sign-in-again-needed = Kasutamise jätkamiseks logige uuesti sisse
+settings-accounts-sign-in-again-needed = Kasutamise jätkamiseks logi uuesti sisse
 settings-accounts-paused-metered = Sünkroonimine on mahupõhise ühenduse tõttu peatatud
 settings-accounts-paused-battery = Sünkroonimine on peatatud, sest aku on tühjenemas
 settings-accounts-connecting = Ühendamine…
@@ -334,20 +334,20 @@ settings-accounts-kept =
         [one] Alles hoitud { $count } üksus, ülejäänu laaditakse alla avamisel
        *[other] Alles hoitud { $count } üksust, ülejäänu laaditakse alla avamisel
     }
-settings-accounts-on-demand = Failid laaditakse alla, kui need avate
+settings-accounts-on-demand = Failid laaditakse alla, kui need avad
 settings-accounts-sign-in-again = Logi uuesti sisse
 settings-accounts-keep = Säilita
 settings-accounts-remove = Eemalda
 settings-accounts-remove-confirm = Eemalda sellest arvutist
 settings-accounts-removing = Eemaldamine…
-settings-accounts-remove-note = Teie failid jäävad teenusesse { $provider }. Siin tehtud muudatused saadetakse enne üles.
+settings-accounts-remove-note = Sinu failid jäävad teenusesse { $provider }. Siin tehtud muudatused saadetakse enne üles.
 
 ## Accounts: providers
 
-settings-accounts-provider-icloud = Teie Apple’i konto, kinnitatud koodiga teie iPhone’ist, iPadist või Macist
+settings-accounts-provider-icloud = Sinu Apple’i konto, kinnitatud koodiga sinu iPhone’ist, iPadist või Macist
 settings-accounts-provider-onedrive = Microsofti isiklik, töö- või koolikonto, brauseri kaudu
 settings-accounts-provider-dropbox = Dropboxi konto, brauseri kaudu
-settings-accounts-provider-nextcloud = Teie enda või teie organisatsiooni server
+settings-accounts-provider-nextcloud = Sinu enda või sinu organisatsiooni server
 settings-accounts-provider-webdav = Mis tahes server, mis toetab WebDAV-i
 
 ## Accounts: signing in
@@ -360,11 +360,11 @@ settings-accounts-password = Salasõna
 settings-accounts-app-password = Rakenduse salasõna
 settings-accounts-user = Kasutajanimi
 settings-accounts-apple-note = Kasuta oma Apple’i konto salasõna, rakendusepõhised salasõnad siin ei tööta. Seejärel kuvab Apple koodi sinu iPhone’is, iPadis või Macis.
-settings-accounts-nextcloud-browser = Avaneb brauser, kus saate oma serverisse sisse logida ja Luftile juurdepääsu anda.
+settings-accounts-nextcloud-browser = Avaneb brauser, kus saad oma serverisse sisse logida ja Luftile juurdepääsu anda.
 settings-accounts-use-app-password = Kasuta hoopis rakenduse salasõna
-settings-accounts-error-server = Sisestage serveri aadress
-settings-accounts-error-apple-account = Sisestage oma Apple’i konto e-posti aadress
-settings-accounts-error-user = Sisestage kasutajanimi
+settings-accounts-error-server = Sisesta serveri aadress
+settings-accounts-error-apple-account = Sisesta oma Apple’i konto e-posti aadress
+settings-accounts-error-user = Sisesta kasutajanimi
 settings-accounts-error-password = Sisesta salasõna
 settings-accounts-cancel = Loobu
 settings-accounts-back = Tagasi
@@ -374,7 +374,7 @@ settings-accounts-try-again = Proovi uuesti
 settings-accounts-continue = Jätka
 settings-accounts-working = Ühendumine: { $provider }…
 settings-accounts-finish-in-browser = Lõpeta brauseris sisselogimine teenuse { $provider } kontoga. Luft ei näe kunagi sinu salasõna ja see vaade värskendub ise, kui oled lõpetanud.
-settings-accounts-no-browser = Brauser ei avanenud. Kopeerige link ja avage see brauseris.
+settings-accounts-no-browser = Brauser ei avanenud. Kopeeri link ja ava see brauseris.
 settings-accounts-open-again = Ava leht uuesti
 settings-accounts-copy-link = Kopeeri link
 settings-accounts-copied = Kopeeritud
@@ -383,4 +383,4 @@ settings-accounts-code = Kinnituskood
 settings-accounts-text-me = Saada kood hoopis SMS-iga
 settings-accounts-choose-phone = Millisele numbrile peaks Apple koodi saatma?
     .description = Saada SMS
-settings-accounts-approve = Teie Apple’i konto kasutab täpsemat andmekaitset. Kinnitage taotlus oma iPhone’is, iPadis või Macis, et see arvuti saaks iCloud Drive’i avada.
+settings-accounts-approve = Sinu Apple’i konto kasutab täpsemat andmekaitset. Kinnita taotlus oma iPhone’is, iPadis või Macis, et see arvuti saaks iCloud Drive’i avada.

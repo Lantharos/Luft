@@ -5,24 +5,24 @@ How Luft speaks Estonian. The [glossary](../../packages/i18n/glossary/et.csv) ha
 ## Address and tone
 
 - Prefer sentences without a person. Estonian does this naturally with the impersonal: „Värskendused installitakse järgmisel taaskäivitusel“, „Teavitusi pole“.
-- When the reader has to be addressed, use **teie**, lowercase, with plural verb forms: „Saate seda hiljem Sätetes muuta.“ This is what Windows and Microsoft's Estonian style guide do, and what most Estonian GNOME and KDE translations do where they address the reader at all. Never capitalize Teie or Teile, and never switch to sina.
+- When the reader has to be addressed, use **sina**, lowercase, with singular verb forms: „Saad seda hiljem Sätetes muuta.“ This is how Estonian GNOME and KDE speak to the reader, and it matches the buttons, which are already in the singular. Never capitalize Sina or Sinu, and don't mix in teie.
 - Luft is friendly but calm. Short, plain sentences, no exclamation marks, no „palun“ at the start of every hint, no marketing words.
 - Say what happens, not how it works inside.
 - When English uses „you“ only out of habit, leave it out: „Teavitusi pole“ for „You have no notifications“.
 
 ## Buttons, menus and labels
 
-- Buttons and menu items use the **imperative, second person singular**, the usual form for commands in Estonian software: „Salvesta“, „Ava“, „Loobu“, „Taaskäivita“, „Kinnita tegumiribale“. This doesn't contradict addressing the reader with teie: the button is a command the reader gives.
+- Buttons and menu items use the **imperative, second person singular**, the usual form for commands in Estonian software: „Salvesta“, „Ava“, „Loobu“, „Taaskäivita“, „Kinnita tegumiribale“.
 - Some power and session actions read better as nouns, as in Windows: „Unerežiim“, „Talveunerežiim“.
 - Switches and settings are nouns or follow the English form: „Öövalgus“, „Kuva sekundid“.
 - Headings and page names are nouns: „Teavitused“, „Privaatsus“.
-- Instructions in running text use teie: „Vajutage Super+Tab, et näha kõiki aknaid.“
+- Instructions in running text use sina: „Vajuta Super+Tab, et näha kõiki aknaid.“
 - Use „ja“ instead of „&“ in page names: „Toide ja aku“, „Kuupäev ja kellaaeg“.
 - Keep labels short. Estonian compounds get long; if a button clips, look for a shorter word before abbreviating.
 
 ## Capitalization
 
-Sentence case everywhere: only the first word and names take a capital letter. „Kiirsätted“, „Kõik aknad“. Languages, days and months are lowercase, as always in Estonian. In running text, Luft's parts are ordinary nouns: „tegumiriba“, „lukustuskuva“. A label referred to in a sentence keeps its capital letter and needs no quotation marks: „lülitage sisse Ära sega“.
+Sentence case everywhere: only the first word and names take a capital letter. „Kiirsätted“, „Kõik aknad“. Languages, days and months are lowercase, as always in Estonian. In running text, Luft's parts are ordinary nouns: „tegumiriba“, „lukustuskuva“. A label referred to in a sentence keeps its capital letter and needs no quotation marks: „lülita sisse Ära sega“.
 
 ## Typography
 
@@ -37,11 +37,11 @@ Sentence case everywhere: only the first word and names take a capital letter. �
 ## Names
 
 - Luft, Kestrel and the names of the apps stay as they are: Rover, Magpie, Mailman, Draft, Tern, Schelf, Barometer, Keys, Meet Luft, Helium.
-- Settings, Disks and Install Luft are descriptions, so they are translated: Sätted, Kettad, Lufti installimine. When a sentence means the app, Sätted keeps its capital in every case: „lisage hiljem Sätetes“.
+- Settings, Disks and Install Luft are descriptions, so they are translated: Sätted, Kettad, Lufti installimine. When a sentence means the app, Sätted keeps its capital in every case: „lisa hiljem Sätetes“.
 - A Settings page named in a sentence uses its exact page name after „lehel“: „lehel Toide ja aku“.
 - Start stays Start, as in Windows; say „menüü Start“ when it has to take a case ending.
 - Avoid inflecting app names. Put the kind of thing first: „rakenduses Rover“, „rakendus Tern on suletud“. Luft itself inflects normally when needed (Lufti, Luftis), but prefer sentences where it doesn't have to.
-- Prefer sentences where a placeable stays in the nominative, since Estonian has fourteen cases and a placeable can't change its ending: „Tagasi: { $page }“, „Viimane kontroll: { $date }“. The object of a command is in the nominative too, so „Asetage { $finger } andurile“ works.
+- Prefer sentences where a placeable stays in the nominative, since Estonian has fourteen cases and a placeable can't change its ending: „Tagasi: { $page }“, „Viimane kontroll: { $date }“. The object of a command is in the nominative too, so „Aseta { $finger } andurile“ works.
 
 ## Plurals
 
@@ -68,7 +68,7 @@ Never write a date, time or number format into a translation. They come from the
 
 | English | Estonian | Instead of | Why |
 | --- | --- | --- | --- |
-| you | teie, lowercase, or no person | sina | Windows and Microsoft's style guide |
+| you | sina, lowercase, or no person | teie | GNOME and KDE; matches the singular buttons |
 | Settings | Sätted | Seaded, Seadistused | Windows' app name, the one most people know |
 | board | tahvel | laud, lõuend | Laud is the desktop; lõuend is the canvas inside it |
 | All windows | Kõik aknad | Tegumivaade | That's what Luft calls the task view |
@@ -90,7 +90,8 @@ Never write a date, time or number format into a translation. They come from the
 | firmware | püsivara | firmware | Established Estonian term |
 | display | kuvar | ekraan, monitor | Windows' word for a connected screen |
 | accessibility | hõlbustus | juurdepääsetavus | Windows' page name, shorter |
-| passphrase | paroolifraas | salafraas | Keeps it apart from parool |
+| password | salasõna | parool | The native speakers' choice, though Windows and GNOME say parool |
+| passphrase | paroolifraas | salafraas | KDE's word, also in the Estonian cybersecurity term base; no Estonian software uses salafraas |
 | PIN | PIN-kood | PIN | Reads naturally in sentences; also as a field label |
 | security key | turvavõti | riistvaravõti | Common name for FIDO keys |
 | light/dark style | hele/tume režiim | stiil | Matches the Quick settings tile and Windows |

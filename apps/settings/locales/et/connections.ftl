@@ -78,27 +78,27 @@ settings-network-ethernet = Ethernet
 settings-network-ethernet-named = Ethernet ({ $name })
 settings-network-wired-connected = Ühendatud · { $speed }
 settings-network-empty = Võrguühendusi pole
-    .description = Internetti pääsemiseks ühendage võrgukaabel või Wi-Fi-adapter
+    .description = Internetti pääsemiseks ühenda võrgukaabel või Wi-Fi-adapter
 settings-network-proxy = Puhverserver
-    .description = Suunake veebiliiklus läbi teise serveri. Seda on sageli vaja töö- või koolivõrkudes.
+    .description = Suuna veebiliiklus läbi teise serveri. Seda on sageli vaja töö- või koolivõrkudes.
 
 ## Network: Wi‑Fi networks
 
 settings-network-wifi-networks = Wi-Fi-võrgud
 settings-network-wifi-saved = Salvestatud
-settings-network-wifi-enterprise = Logige sisse töö- või koolikontoga
+settings-network-wifi-enterprise = Logi sisse töö- või koolikontoga
 settings-network-wifi-connect-failed = Selle võrguga ei õnnestunud ühenduda
 settings-network-wifi-saved-password-failed = Salvestatud salasõna ei sobinud. Sisesta see uuesti.
 settings-network-wifi-settings = Võrgu sätted
 settings-network-wifi-searching = Võrkude otsimine…
 settings-network-hidden = Ühenda peidetud võrguga
-    .description = Sisestage võrgu nimi ja turbe tüüp.
+    .description = Sisesta võrgu nimi ja turbe tüüp.
 settings-network-hidden-name = Võrgu nimi
 
 ## Network: joining a Wi‑Fi network
 
 settings-network-join = Ühenda võrguga „{ $network }“
-settings-network-join-enterprise = Logige sisse oma töö- või koolikontoga.
+settings-network-join-enterprise = Logi sisse oma töö- või koolikontoga.
 settings-network-join-password = Sisesta selle võrgu salasõna.
 settings-network-join-failed = Selle võrguga ei õnnestunud ühenduda.
 settings-network-join-sign-in-failed = Sisselogimine ei õnnestunud. Kontrolli kasutajanime ja salasõna.
@@ -139,7 +139,7 @@ settings-network-mac-private-off = Väljas
 settings-network-mac-builtin = Sisseehitatud aadress
 settings-network-mac-custom = Kohandatud aadress
 settings-network-mtu = Suurim paketi suurus (MTU)
-    .description = Jätke tühjaks, kui teie võrk ei vaja kindlat suurust
+    .description = Jäta tühjaks, kui sinu võrk ei vaja kindlat suurust
     .label = MTU
 
 ## Network: IPv4 and IPv6 settings
@@ -162,7 +162,7 @@ settings-network-ip-router = Ruuter ({ $family })
 settings-network-ip-automatic-dns = Automaatne DNS
     .description = Kasutab DNS-servereid, mida see võrk soovitab
 settings-network-ip-dns-first = Kasutatakse enne soovitatud servereid
-settings-network-ip-dns-separate = Eraldage aadressid komadega
+settings-network-ip-dns-separate = Eralda aadressid komadega
 settings-network-ip-dns-servers = DNS-serverid ({ $family })
 settings-network-ip-search-domains = Otsingudomeenid
     .description = Kasutatakse, kui nimel pole domeeni, näiteks „printer“
@@ -183,13 +183,13 @@ settings-network-eap-peap = Kaitstud EAP (PEAP)
 settings-network-eap-ttls = Tunneldatud TLS (TTLS)
 settings-network-eap-tls = Sertifikaat (TLS)
 settings-network-eap-inner = Sisemine autentimine
-settings-network-client-certificate = Teie sertifikaat
+settings-network-client-certificate = Sinu sertifikaat
 settings-network-private-key-password = Privaatvõtme salasõna
     .placeholder = Kui võtmel see on
 settings-network-anonymous-identity = Anonüümne identiteet
-    .description = Jätke tühjaks, kui teie võrk seda ei nõua
+    .description = Jäta tühjaks, kui sinu võrk seda ei nõua
 settings-network-ca = CA-sertifikaat
-    .description = Kinnitab, et ühendute õige võrguga
+    .description = Kinnitab, et ühendud õige võrguga
 settings-network-ca-system = Kasuta süsteemi sertifikaate
 settings-network-ca-file = Vali fail…
 settings-network-ca-another-file = Vali teine fail…
@@ -201,20 +201,20 @@ settings-network-server-domain = Serveri domeen
 ## Network: form errors
 ## $example is an address in the right format, like 192.168.1.1.
 
-settings-network-error-name = Sisestage nimi
-settings-network-error-no-addresses = Lisage vähemalt üks aadress
-settings-network-error-address = Sisestage aadress koos prefiksiga, näiteks { $example }
-settings-network-error-router = Sisestage ruuteri aadress, näiteks { $example }
+settings-network-error-name = Sisesta nimi
+settings-network-error-no-addresses = Lisa vähemalt üks aadress
+settings-network-error-address = Sisesta aadress koos prefiksiga, näiteks { $example }
+settings-network-error-router = Sisesta ruuteri aadress, näiteks { $example }
 settings-network-error-dns = „{ $address }“ pole sobiv aadress
 settings-network-error-search-domain = „{ $domain }“ pole sobiv domeen
-settings-network-error-route = Sisestage võrk, näiteks { $example }
+settings-network-error-route = Sisesta võrk, näiteks { $example }
 settings-network-error-priority = Prioriteet peab olema täisarv
-settings-network-error-username = Sisestage kasutajanimi
-settings-network-error-domain = Sisestage domeen, näiteks example.com
-settings-network-error-certificate = Valige oma sertifikaat
-settings-network-error-private-key = Valige oma privaatvõti
-settings-network-error-mtu = Kasutage arvu vahemikus { $lowest } kuni { $highest } või jätke väli tühjaks
-settings-network-error-mac = Sisestage aadress kujul 12:34:56:78:9A:BC
+settings-network-error-username = Sisesta kasutajanimi
+settings-network-error-domain = Sisesta domeen, näiteks example.com
+settings-network-error-certificate = Vali oma sertifikaat
+settings-network-error-private-key = Vali oma privaatvõti
+settings-network-error-mtu = Kasuta arvu vahemikus { $lowest } kuni { $highest } või jäta väli tühjaks
+settings-network-error-mac = Sisesta aadress kujul 12:34:56:78:9A:BC
 settings-network-error-password = Sisesta oma salasõna
 settings-network-error-password-length =
     { $count ->
@@ -235,9 +235,9 @@ settings-network-proxy-server = Server
 settings-network-proxy-port = Port
     .label = Port: { $protocol }
 settings-network-proxy-skip = Ära kasuta puhverserverit järgmiste jaoks
-settings-network-proxy-error-url = Sisestage veebiaadress, näiteks http://example.com/proxy.pac
-settings-network-proxy-error-host = Sisestage ainult serveri nimi, näiteks proxy.example.com
-settings-network-proxy-error-port = Kasutage porti vahemikus 1 kuni 65535
+settings-network-proxy-error-url = Sisesta veebiaadress, näiteks http://example.com/proxy.pac
+settings-network-proxy-error-host = Sisesta ainult serveri nimi, näiteks proxy.example.com
+settings-network-proxy-error-port = Kasuta porti vahemikus 1 kuni 65535
 settings-network-proxy-save-failed = Puhverserveri sätteid ei õnnestunud salvestada
 
 ## Network: VPN
@@ -247,8 +247,8 @@ settings-network-vpn-import = Impordi failist
     .description = WireGuardi, OpenVPN-i ja muud VPN-i konfiguratsioonifailid
 settings-network-vpn-importing = Importimine…
 settings-network-wireguard = Seadista WireGuard
-    .description = Sisestage andmed, mille saite VPN-i pakkujalt või serverist
-settings-network-wireguard-dialog = Need andmed saate oma VPN-i pakkujalt või serveri omanikult.
+    .description = Sisesta andmed, mille said VPN-i pakkujalt või serverist
+settings-network-wireguard-dialog = Need andmed saad oma VPN-i pakkujalt või serveri omanikult.
 settings-network-wireguard-name-example = Kodu VPN
 settings-network-wireguard-public-key = Avalik võti { $key }
 settings-network-wireguard-public-key-pending = Siin kuvatakse jagamiseks selle avalik võti
@@ -266,12 +266,12 @@ settings-network-wireguard-keepalive = Elushoidmine
     .placeholder = Valikuline, sekundites
 settings-network-wireguard-add = Lisa
 settings-network-wireguard-adding = Lisamine…
-settings-network-wireguard-error-private-key = Sisestage või looge privaatvõti
-settings-network-wireguard-error-addresses = Sisestage vähemalt üks aadress
-settings-network-wireguard-error-server-key = Sisestage serveri avalik võti
-settings-network-wireguard-error-endpoint = Sisestage serveri aadress ja port
-settings-network-wireguard-error-allowed-ips = Sisestage vähemalt üks vahemik
-settings-network-wireguard-error-keepalive = Sisestage sekundite arv
+settings-network-wireguard-error-private-key = Sisesta või loo privaatvõti
+settings-network-wireguard-error-addresses = Sisesta vähemalt üks aadress
+settings-network-wireguard-error-server-key = Sisesta serveri avalik võti
+settings-network-wireguard-error-endpoint = Sisesta serveri aadress ja port
+settings-network-wireguard-error-allowed-ips = Sisesta vähemalt üks vahemik
+settings-network-wireguard-error-keepalive = Sisesta sekundite arv
 
 ## Bluetooth panel
 
@@ -292,9 +292,9 @@ settings-bluetooth-visible-failed = Selle arvuti nähtavust ei õnnestunud muuta
 settings-bluetooth-paired = Minu seadmed
 settings-bluetooth-nearby = Lähedalasuvad seadmed
 settings-bluetooth-searching = Seadmete otsimine…
-    .description = Lülitage lisatav seade sidumisrežiimi
+    .description = Lülita lisatav seade sidumisrežiimi
 settings-bluetooth-blocked = Bluetooth on riistvaralülitiga välja lülitatud
-    .description = Lülitage see sisse arvuti lüliti või klahviga
+    .description = Lülita see sisse arvuti lüliti või klahviga
 settings-bluetooth-details = Seadme üksikasjad
 settings-bluetooth-connected = Ühendatud
 settings-bluetooth-connected-battery = Ühendatud · aku { $battery }
@@ -334,25 +334,25 @@ settings-bluetooth-kind-other = Muu seade
 
 settings-bluetooth-request-unnamed = seade
 settings-bluetooth-request-confirm = Kas siduda { $name }?
-    .description = Veenduge, et { $name } kuvab sama koodi.
+    .description = Veendu, et { $name } kuvab sama koodi.
 settings-bluetooth-request-authorize = Kas lubada, et { $name } seotakse?
     .description = Seejärel saab { $name } selle arvutiga ühenduda.
-settings-bluetooth-request-pin = Sisestage PIN-kood, mida { $name } nõuab
-    .description = Sageli on see 0000 või 1234. Kui kumbki ei sobi, leiate selle seadme kasutusjuhendist.
-settings-bluetooth-request-passkey = Sisestage kood, mida { $name } kuvab
-    .description = Tippige kuus numbrit täpselt nii, nagu need on kuvatud.
+settings-bluetooth-request-pin = Sisesta PIN-kood, mida { $name } nõuab
+    .description = Sageli on see 0000 või 1234. Kui kumbki ei sobi, leiad selle seadme kasutusjuhendist.
+settings-bluetooth-request-passkey = Sisesta kood, mida { $name } kuvab
+    .description = Tipi kuus numbrit täpselt nii, nagu need on kuvatud.
 settings-bluetooth-request-display = Sidumine: { $name }
-    .description = Koodi ootab { $name }. Tippige see seal sisse ja vajutage Enter.
+    .description = Koodi ootab { $name }. Tipi see seal sisse ja vajuta Enter.
 settings-bluetooth-pair = Seo
 settings-bluetooth-allow = Luba
 
 ## Bluetooth: devices paired in Windows on the same computer
 
-settings-bluetooth-windows = Tooge oma seadmed üle Windowsist
+settings-bluetooth-windows = Too oma seadmed üle Windowsist
     .description =
         { $count ->
-            [one] Windowsis on seotud { $devices }. Kasutage seda siin ilma uuesti sidumata.
-           *[other] Windowsis on seotud { $devices }. Kasutage neid siin ilma uuesti sidumata.
+            [one] Windowsis on seotud { $devices }. Kasuta seda siin ilma uuesti sidumata.
+           *[other] Windowsis on seotud { $devices }. Kasuta neid siin ilma uuesti sidumata.
         }
 settings-bluetooth-windows-more =
     { $count ->

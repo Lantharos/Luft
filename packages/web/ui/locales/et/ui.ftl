@@ -14,8 +14,8 @@ ui-edit-select-all = Vali kõik
 ## Form controls
 
 ui-select-placeholder = Vali
-ui-password-show = Kuva parool
-ui-password-hide = Peida parool
+ui-password-show = Kuva salasõna
+ui-password-hide = Peida salasõna
 ui-toast-dismiss = Sulge
 
 ## Media playback controls
@@ -74,19 +74,19 @@ ui-finger-right-little = Parem väike sõrm
 ui-finger-left-little = Vasak väike sõrm
     .inline = vasak väike sõrm
 
-ui-fingerprint-place = Asetage oma { $finger } andurile.
-ui-fingerprint-swipe = Libistage oma { $finger } üle anduri.
-ui-fingerprint-stage-passed = Hästi. Tõstke sõrm üles ja asetage see uuesti.
-ui-fingerprint-stage-passed-swipe = Hästi. Libistage uuesti.
-ui-fingerprint-retry = Sõrmejälge ei õnnestunud lugeda. Proovige uuesti.
-ui-fingerprint-swipe-too-short = Libistage veidi aeglasemalt.
-ui-fingerprint-not-centered = Asetage sõrm anduri keskele.
-ui-fingerprint-remove-and-retry = Tõstke sõrm üles ja proovige uuesti.
+ui-fingerprint-place = Aseta oma { $finger } andurile.
+ui-fingerprint-swipe = Libista oma { $finger } üle anduri.
+ui-fingerprint-stage-passed = Hästi. Tõsta sõrm üles ja aseta see uuesti.
+ui-fingerprint-stage-passed-swipe = Hästi. Libista uuesti.
+ui-fingerprint-retry = Sõrmejälge ei õnnestunud lugeda. Proovi uuesti.
+ui-fingerprint-swipe-too-short = Libista veidi aeglasemalt.
+ui-fingerprint-not-centered = Aseta sõrm anduri keskele.
+ui-fingerprint-remove-and-retry = Tõsta sõrm üles ja proovi uuesti.
 ui-fingerprint-added = Sõrmejälg on lisatud.
 ui-fingerprint-full = Lugejasse ei mahu enam ühtegi sõrmejälge.
-ui-fingerprint-disconnected = Sõrmejäljelugeja lakkas vastamast. Proovige hetke pärast uuesti.
-ui-fingerprint-duplicate = See sõrm on lugejasse juba salvestatud, tõenäoliselt Windowsis või mõnes teises kontos. Kasutage teist sõrme.
-ui-fingerprint-failed = Seda sõrmejälge ei õnnestunud lisada. Proovige uuesti.
+ui-fingerprint-disconnected = Sõrmejäljelugeja lakkas vastamast. Proovi hetke pärast uuesti.
+ui-fingerprint-duplicate = See sõrm on lugejasse juba salvestatud, tõenäoliselt Windowsis või mõnes teises kontos. Kasuta teist sõrme.
+ui-fingerprint-failed = Seda sõrmejälge ei õnnestunud lisada. Proovi uuesti.
 
 ## Sizes and times
 
@@ -106,7 +106,7 @@ ui-dialog-done = Valmis
 
 ui-passphrase-field = Paroolifraas
 ui-passphrase-confirm = Kinnita
-ui-passphrase-type-again = Tippige uuesti
+ui-passphrase-type-again = Tipi uuesti
 ui-passphrase-length = { $min ->
     [one] Vähemalt { $min } märk
    *[other] Vähemalt { $min } märki

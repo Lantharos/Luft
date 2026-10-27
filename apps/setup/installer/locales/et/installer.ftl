@@ -1,6 +1,6 @@
 ## Errors shown in Install Luft and first-run setup
 
-installer-not-allowed = Teil pole lubatud seda teha.
+installer-not-allowed = Sul pole lubatud seda teha.
 installer-stopped = Installer peatus ootamatult.
 installer-request-invalid = Taotlus pole sobiv: { $error }
 installer-settings-invalid = Sätted pole sobivad: { $error }
@@ -55,7 +55,7 @@ installer-key-queue-failed = Lufti Secure Booti võtit ei õnnestunud järgmisek
 installer-encryption-keeps-old = Lufti ei saa krüptida, kui see hoiab vana süsteemi faile enda kõrval alles.
 installer-leftovers-failed = Varasemast katsest jäänud andmeid ei õnnestunud eemaldada
 installer-default-failed = Lufti ei õnnestunud käivituvaks süsteemiks määrata
-installer-relabel-failed = Teie failidele ei õnnestunud Lufti jaoks silte määrata
+installer-relabel-failed = Sinu failidele ei õnnestunud Lufti jaoks silte määrata
 installer-set-aside-failed = Vana süsteemi ei õnnestunud kõrvale panna
 
 ## Things packed with Meet Luft

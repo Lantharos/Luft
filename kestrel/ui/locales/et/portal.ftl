@@ -9,11 +9,11 @@ portal-unknown-app-object = see rakendus
 ## Choosing an app to open a file or link
 
 portal-app-chooser-open-title = Ava „{ $name }“
-portal-app-chooser-open-description = Valige rakendus, millega see avada.
-portal-app-chooser-open-kind = Valige rakendus, millega see avada ({ $kind }).
+portal-app-chooser-open-description = Vali rakendus, millega see avada.
+portal-app-chooser-open-kind = Vali rakendus, millega see avada ({ $kind }).
 portal-app-chooser-title = Vali rakendus
-portal-app-chooser-description = Jätkamiseks valige rakendus.
-portal-app-chooser-kind = Valige seda tüüpi failide jaoks rakendus ({ $kind }).
+portal-app-chooser-description = Jätkamiseks vali rakendus.
+portal-app-chooser-kind = Vali seda tüüpi failide jaoks rakendus ({ $kind }).
 portal-app-chooser-nothing-installed = Ükski installitud rakendus ei saa seda avada
 portal-app-chooser-find = Leia rakendus
 portal-app-chooser-open = Ava
@@ -60,7 +60,7 @@ usb-unknown-device = Tundmatu seade
 ## Screen sharing, remote control and input capture
 
 screen-share-title = Kas { $appName } võib sinu ekraani näha?
-screen-share-description = { $appName } näeb seda, mille valite.
+screen-share-description = { $appName } näeb seda, mille valid.
 screen-share-screens = Kuvarid
 screen-share-windows = Aknad
 screen-share-main-screen = Põhikuvar
@@ -73,8 +73,8 @@ screen-share-remember-description = { $appName } ei pea uuesti küsima
 screen-share-clipboard = Jaga lõikelauda
 screen-share-clipboard-description = Kopeerimine ja kleepimine mõlemas suunas
 screen-share-remote-desktop-title = Kas { $appName } võib sinu arvutit juhtida?
-screen-share-remote-desktop-with-screen = { $appName } näeb seda, mille valite, ja saab kasutada seadmeid, mida lubate.
-screen-share-remote-desktop-description = { $appName } saab kasutada seadmeid, mida lubate.
+screen-share-remote-desktop-with-screen = { $appName } näeb seda, mille valid, ja saab kasutada seadmeid, mida lubad.
+screen-share-remote-desktop-description = { $appName } saab kasutada seadmeid, mida lubad.
 screen-share-devices = Seadmed
 screen-share-device-keyboard = Klaviatuur
 screen-share-device-pointer = Hiir ja puuteplaat
@@ -85,11 +85,11 @@ screen-share-input-capture-description = Kui kursor jõuab ekraani servani, saab
 ## Keyboard shortcuts apps register for the whole session
 
 shortcuts-consent-title = Kas { $appName } võib kasutada kiirklahve?
-shortcuts-consent-description = { $appName } saab neid kiirklahve kasutada ka siis, kui töötate teistes rakendustes.
+shortcuts-consent-description = { $appName } saab neid kiirklahve kasutada ka siis, kui töötad teistes rakendustes.
 shortcuts-record-title = Kiirklahvid: { $appName }
-shortcuts-record-description = Valige kiirklahv ja vajutage soovitud klahve. Backspace tühjendab selle.
+shortcuts-record-description = Vali kiirklahv ja vajuta soovitud klahve. Backspace tühjendab selle.
 shortcuts-not-set = Määramata
-shortcuts-press-keys = Vajutage klahve
+shortcuts-press-keys = Vajuta klahve
 shortcuts-unusable = Kiirklahvi { $shortcut } ei saa kasutada
 shortcuts-taken = Kiirklahv { $shortcut } on juba kasutusel
 shortcuts-save = Salvesta

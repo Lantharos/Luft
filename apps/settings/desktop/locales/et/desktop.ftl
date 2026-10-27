@@ -16,9 +16,9 @@ desktop-accounts-not-web-address = See pole veebiaadress
 desktop-bluetooth-code-mismatch = Kood ei klappinud
 desktop-bluetooth-pairing-canceled = Sidumine tühistati
 desktop-bluetooth-timed-out = Seade ei vastanud piisavalt kiiresti
-desktop-bluetooth-unreachable = Seadmega ei saadud ühendust. Veenduge, et see on sisse lülitatud ja läheduses.
+desktop-bluetooth-unreachable = Seadmega ei saadud ühendust. Veendu, et see on sisse lülitatud ja läheduses.
 desktop-bluetooth-busy = Eelmine päring on veel pooleli
-desktop-bluetooth-failed = Midagi läks valesti. Proovige uuesti.
+desktop-bluetooth-failed = Midagi läks valesti. Proovi uuesti.
 desktop-bluetooth-unknown-device = Tundmatu seade
 desktop-bluetooth-no-adapter = Bluetoothi adapterit pole
 desktop-bluetooth-windows-import-failed = Windowsi Bluetoothi seadmeid ei õnnestunud üle tuua
@@ -162,13 +162,13 @@ desktop-no-config-folder = Konfiguratsioonikausta pole
 
 ## Cursor themes downloaded from GNOME-Look
 
-desktop-cursors-store-unreachable = GNOME-Look pole praegu kättesaadav. Kontrollige ühendust ja proovige uuesti.
+desktop-cursors-store-unreachable = GNOME-Look pole praegu kättesaadav. Kontrolli ühendust ja proovi uuesti.
 desktop-cursors-store-failed = GNOME-Look ei saanud vastata: { $reason }
 desktop-cursors-theme-gone = See teema pole enam saadaval
 desktop-cursors-download-gone = See allalaadimine pole enam saadaval
-desktop-cursors-download-refused = GNOME-Look ei saanud seda allalaadimist saata. Proovige hiljem uuesti.
+desktop-cursors-download-refused = GNOME-Look ei saanud seda allalaadimist saata. Proovi hiljem uuesti.
 desktop-cursors-download-too-large = See allalaadimine on suurem, kui kursoriteema olla võiks
-desktop-cursors-download-interrupted = Allalaadimine katkes enne lõppu. Proovige uuesti.
+desktop-cursors-download-interrupted = Allalaadimine katkes enne lõppu. Proovi uuesti.
 desktop-cursors-unpacks-too-large = Lahtipakituna võtab see allalaadimine rohkem ruumi, kui kursoriteema vajama peaks
 desktop-cursors-archive-damaged = See allalaadimine on rikutud või pole arhiiv, mida Sätted avada saab
 desktop-cursors-not-an-archive = See allalaadimine pole arhiiv, mida Sätted avada saab
@@ -239,11 +239,11 @@ desktop-users-password-timed-out = passwd lakkas vastamast
 ## Updates
 
 desktop-updates-available-summary = Saadaval on süsteemivärskendused
-desktop-updates-available-body = Nende allalaadimiseks ja installimiseks avage Sätted.
+desktop-updates-available-body = Nende allalaadimiseks ja installimiseks ava Sätted.
 desktop-updates-ready-summary = Värskendused on installimiseks valmis
-desktop-updates-ready-body = Nende installimiseks taaskäivitage arvuti, kui teile sobib.
-desktop-updates-nvidia-summary = Kasutage oma NVIDIA graafikakaarti täiel määral
-desktop-updates-nvidia-body = Lülituge Sätetes NVIDIA enda draiverile.
+desktop-updates-ready-body = Nende installimiseks taaskäivita arvuti, kui sulle sobib.
+desktop-updates-nvidia-summary = Kasuta oma NVIDIA graafikakaarti täiel määral
+desktop-updates-nvidia-body = Lülitu Sätetes NVIDIA enda draiverile.
 desktop-updates-notification-open = Ava
 desktop-updates-already-downloading = Midagi juba laaditakse alla.
 desktop-updates-system-busy = Midagi muud muudab praegu süsteemi.

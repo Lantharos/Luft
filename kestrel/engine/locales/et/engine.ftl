@@ -64,7 +64,7 @@ bluetooth-disconnect = Katkesta ühendus
 bluetooth-connect-device = Ühenda seadmega { $deviceName }
 bluetooth-disconnect-device = Katkesta ühendus seadmega { $deviceName }
 bluetooth-no-devices = Saadaolevaid ega ühendatud seadmeid pole
-bluetooth-turn-on-hint = Seadmetega ühenduse loomiseks lülitage Bluetooth sisse
+bluetooth-turn-on-hint = Seadmetega ühenduse loomiseks lülita Bluetooth sisse
 bluetooth-connected-count =
     { $count ->
         [one] { $count } ühendatud
@@ -73,7 +73,7 @@ bluetooth-connected-count =
 
 ## Network menus in quick settings
 
-network-menu-unknown-network = <unknown>
+network-menu-unknown-network = <tundmatu>
 network-menu-connect = Ühenda
 network-menu-disconnect = Katkesta ühendus
 network-menu-connect-to = Ühenda: { $name }
@@ -153,7 +153,7 @@ window-resize-size = { $width } × { $height }
 ## App not responding
 
 close-dialog-title = „{ $appName }“ ei reageeri
-close-dialog-description = Või veidi oodata, kuni see jätkab või sundida rakenduse täielikult sulguma
+close-dialog-description = Võid veidi oodata, kuni see jätkab, või sundida rakenduse täielikult sulguma
 close-dialog-force-quit = Sunni sulgema
 close-dialog-wait = Oota
 
@@ -184,11 +184,11 @@ autorun-open-with = Ava rakendusega { $appName }
 
 kbd-a11y-slow-keys-on = Aeglased klahvid on sisse lülitatud
 kbd-a11y-slow-keys-off = Aeglased klahvid on välja lülitatud
-kbd-a11y-slow-keys-description = Hoidsite Shift-klahvi 8 sekundit all. See on aeglaste klahvide kiirklahv. Aeglased klahvid muudavad klaviatuuri tööviisi.
+kbd-a11y-slow-keys-description = Hoidsid Shift-klahvi 8 sekundit all. See on aeglaste klahvide kiirklahv. Aeglased klahvid muudavad klaviatuuri tööviisi.
 kbd-a11y-sticky-keys-on = Kleepklahvid on sisse lülitatud
 kbd-a11y-sticky-keys-off = Kleepklahvid on välja lülitatud
-kbd-a11y-sticky-keys-on-description = Vajutasite Shift-klahvi 5 korda järjest. See on kleepklahvide kiirklahv. Kleepklahvid muudavad klaviatuuri tööviisi.
-kbd-a11y-sticky-keys-off-description = Vajutasite kaht klahvi korraga või Shift-klahvi 5 korda järjest. See lülitab kleepklahvid välja. Kleepklahvid muudavad klaviatuuri tööviisi.
+kbd-a11y-sticky-keys-on-description = Vajutasid Shift-klahvi 5 korda järjest. See on kleepklahvide kiirklahv. Kleepklahvid muudavad klaviatuuri tööviisi.
+kbd-a11y-sticky-keys-off-description = Vajutasid kaht klahvi korraga või Shift-klahvi 5 korda järjest. See lülitab kleepklahvid välja. Kleepklahvid muudavad klaviatuuri tööviisi.
 kbd-a11y-leave-on = Jäta sisse
 kbd-a11y-turn-on = Lülita sisse
 kbd-a11y-turn-off = Lülita välja
@@ -208,7 +208,7 @@ audio-device-microphone = Mikrofon
 inhibit-shortcuts-title = Kiirklahvide blokeerimine
 inhibit-shortcuts-app = Rakendus { $appName } soovib süsteemi kiirklahvid blokeerida
 inhibit-shortcuts-unknown-app = Üks rakendus soovib süsteemi kiirklahvid blokeerida
-inhibit-shortcuts-restore = Kiirklahvid saate taastada, kui vajutate { $shortcut }
+inhibit-shortcuts-restore = Kiirklahvid saad taastada, kui vajutad { $shortcut }
 inhibit-shortcuts-deny = Keela
 inhibit-shortcuts-allow = Luba
 
@@ -226,7 +226,7 @@ polkit-failed = See ei õnnestunud. Proovi uuesti.
 mount-hidden-volume = Peidetud köide
 mount-windows-system-volume = Windowsi süsteemiköide
 mount-uses-keyfiles = Kasutab võtmefaile
-mount-keyfiles-use-app = Võtmefaile kasutava köite avamiseks kasutage rakendust <i>{ $appName }</i>
+mount-keyfiles-use-app = Võtmefaile kasutava köite avamiseks kasuta rakendust <i>{ $appName }</i>
 mount-keyfiles-need-app = Võtmefaile kasutava köite avamiseks on vaja eraldi tööriista, näiteks rakendust <i>Kettad</i>
 mount-pim-number = PIM-number
 mount-pim-invalid = PIM peab olema number või tühi
@@ -250,8 +250,8 @@ end-session-log-out-user-countdown =
     }
 end-session-log-out-countdown =
     { $seconds ->
-        [one] Teid logitakse automaatselt välja { $seconds } sekundi pärast
-       *[other] Teid logitakse automaatselt välja { $seconds } sekundi pärast
+        [one] Sind logitakse automaatselt välja { $seconds } sekundi pärast
+       *[other] Sind logitakse automaatselt välja { $seconds } sekundi pärast
     }
 end-session-log-out-button = Logi välja
 end-session-power-off-title = Väljalülitamine
@@ -279,7 +279,7 @@ end-session-update-restart-countdown =
 end-session-update-restart-button = Taaskäivita ja installi
 end-session-install-updates = Installi ootel tarkvaravärskendused
 end-session-install-version = Installi versioon { $version }
-end-session-low-battery = Aku tase on madal: enne värskenduste installimist ühendage arvuti vooluvõrku
+end-session-low-battery = Aku tase on madal: enne värskenduste installimist ühenda arvuti vooluvõrku
 end-session-busy-apps = Mõni rakendus on hõivatud või sisaldab salvestamata tööd
 end-session-other-users = Sisse on logitud teisi kasutajaid
 end-session-cancel = Loobu
@@ -292,7 +292,7 @@ end-session-console-user = { $userName } (konsool)
 network-agent-auth-required = Vajalik on autentimine
 network-agent-wifi-rejected = Võrgu „{ $networkName }“ salvestatud salasõna ei sobinud. Sisesta see uuesti.
 network-agent-wifi-secrets = Traadita võrguga „{ $networkName }“ ühendamiseks on vaja salasõnu või krüptovõtmeid
-network-agent-wps-hint = Ühenduse saate luua ka ruuteri nupuga „WPS“
+network-agent-wps-hint = Ühenduse saad luua ka ruuteri nupuga „WPS“
 network-agent-wired-title = Juhtmega võrgu 802.1X-autentimine
 network-agent-dsl-title = DSL-autentimine
 network-agent-pin-title = Vajalik on PIN-kood
@@ -312,8 +312,8 @@ network-agent-pin = PIN-kood
 
 ## Lock screen clock
 
-lock-clock-swipe-up = Pühkige üles
-lock-clock-click-or-press = Klõpsake või vajutage mõnda klahvi
+lock-clock-swipe-up = Pühi üles
+lock-clock-click-or-press = Klõpsa või vajuta mõnda klahvi
 
 ## Notification times
 
@@ -332,7 +332,7 @@ unsafe-mode-title = Süsteem viidi ohtlikku režiimi
 unsafe-mode-body = Rakendustel on nüüd piiramatu juurdepääs
 unsafe-mode-undo = Võta tagasi
 privileged-user-title = Sisse logitud privilegeeritud kasutajana
-privileged-user-body = Turvakaalutlustel ei tohiks seanssi privilegeeritud kasutajana käitada. Võimaluse korral logige sisse tavakasutajana.
+privileged-user-body = Turvakaalutlustel ei tohiks seanssi privilegeeritud kasutajana käitada. Võimaluse korral logi sisse tavakasutajana.
 
 ## On-screen keyboard
 
@@ -347,7 +347,7 @@ lock-inhibit-reason = Kestrel peab ekraani lukustama
 
 messages-unknown-app = Tundmatu rakendus
 messages-reply = Vasta
-messages-reply-placeholder = Kirjutage vastus
+messages-reply-placeholder = Kirjuta vastus
 messages-reply-send = Saada
 
 ## Media player controls
@@ -407,10 +407,10 @@ screenshot-screencast-start-failed = Ekraanisalvestust ei õnnestunud alustada
 screenshot-screencast-out-of-space = Ekraanisalvestus ebaõnnestus: kettaruum on otsas
 screenshot-screencast-try-again = Ekraanisalvestus ebaõnnestus. Proovi uuesti
 screenshot-screencast-failed = Ekraanisalvestus ebaõnnestus
-screenshot-screencast-view = Klõpsake video vaatamiseks
+screenshot-screencast-view = Klõpsa video vaatamiseks
 screenshot-show-in-rover = Kuva rakenduses Rover
 screenshot-captured = Kuvatõmmis on tehtud
-screenshot-captured-body = Pildi saate kleepida lõikelaualt
+screenshot-captured-body = Pildi saad kleepida lõikelaualt
 rain-title = Vihm
 rain-open-menu = Ava vihmamenüü
 rain-drizzle = Uduvihm

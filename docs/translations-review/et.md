@@ -4,7 +4,7 @@ Strings in Luft's Estonian translation that a native speaker should check. Each 
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/et.csv` `you`: teie, lowercase, with impersonal sentences preferred — check that teie (rather than sina) still matches what current Windows, macOS and GNOME Estonian use; Apple's choice wasn't confirmed.
+- Every string: the move from teie to sina and from parool to salasõna was done by machine; read the whole translation once for verb forms and case endings.
 - `packages/i18n/glossary/et.csv` `notification`: "teavitus" — Windows uses "teatis", phones often "märguanne"; check which reads most natural.
 - `packages/i18n/glossary/et.csv` `snap`, `snap layout`, `snap group`: "paigutama", "paigutusmall", "paigutusrühm" — no settled Estonian term known; check against Windows 11's Estonian name for Snap layouts.
 - `packages/i18n/glossary/et.csv` `tray`: "süsteemisalv" — check whether Windows' current Estonian term is better known.
@@ -16,7 +16,7 @@ Strings in Luft's Estonian translation that a native speaker should check. Each 
 - `packages/i18n/glossary/et.csv` `Do Not Disturb`: "Ära sega" — Windows may say "Mitte segada"; check.
 - `packages/i18n/glossary/et.csv` `Power saver`: "Energiasääst" — check it fits next to the other power modes.
 - `docs/translations/et.md` Typography: inner quotes ‚…‘ — check against current EKI recommendation.
-- `packages/web/ui/locales/et/ui.ftl` `ui-fingerprint-place`: "Asetage oma { $finger } andurile." — relies on the imperative object being nominative; check it reads naturally with every finger name.
+- `packages/web/ui/locales/et/ui.ftl` `ui-fingerprint-place`: "Aseta oma { $finger } andurile." — relies on the imperative object being nominative; check it reads naturally with every finger name.
 - `packages/web/ui/locales/et/ui.ftl` `ui-finger-right-little`: "Parem väike sõrm" — "väikesõrm" is also used; check.
 - `packages/web/ui/locales/et/ui.ftl` `ui-time-just-now`: "äsja" — shown where "N sekundit tagasi" would be; check it fits.
 - `packages/web/ui/locales/et/ui.ftl` `ui-split-windows-size`: "{ $size }, kasutusel { $used }" — check word order.
@@ -36,16 +36,16 @@ Strings in Luft's Estonian translation that a native speaker should check. Each 
 - `kestrel/engine/locales/et/engine.ftl` `network-menu-hotspot`: "Kuumkoht { $name }" — check against Windows' "mobiilne kuumkoht" wording.
 - `kestrel/engine/locales/et/engine.ftl` `switch-monitor-join`: "Laienda" — Windows' word for extending the desktop across displays; English says "Join Displays".
 - `apps/setup/locales/et/setup.ftl` `setup-region-field-language`: "keele" — the three field names are genitive because they only appear as the object of "Tuvastasime { $guesses }"; check the whole built sentence.
-- `apps/setup/locales/et/setup.ftl` `setup-windows-hibernated`: "… hoidke all Shift-klahvi ja valige Lülita välja …" — should match the label of Shut down in Estonian Windows (possibly "Sule arvuti"); "kiirkäivitus" and "kettahaldus" should likewise match Windows.
+- `apps/setup/locales/et/setup.ftl` `setup-windows-hibernated`: "… hoia all Shift-klahvi ja vali Lülita välja …" — should match the label of Shut down in Estonian Windows (possibly "Sule arvuti"); "kiirkäivitus" and "kettahaldus" should likewise match Windows.
 - `apps/setup/locales/et/setup.ftl` `setup-destination-alongside-choice`: "Koos süsteemiga { $windows }" — built to keep "Windows 11" uninflected; check it reads well as an option title.
-- `apps/setup/locales/et/setup.ftl` `setup-network-unavailable`: "Ühenduse saate luua hiljem paneelilt." — unclear which panel the English means; check in context.
+- `apps/setup/locales/et/setup.ftl` `setup-network-unavailable`: "Ühenduse saad luua hiljem paneelilt." — unclear which panel the English means; check in context.
 - `kestrel/engine/locales/et/engine.ftl` `backlight-title`: "Klaviatuuri taustvalgustus" — matches the Power page in Settings but may clip on a Quick settings tile.
 
 ## Settings
 
-- `apps/settings/locales/et/system.ftl` `settings-accounts-online`: "Iga konto on kaust teie kodukaustas olevas kaustas Cloud …" — kept the folder name Cloud in English; check whether the folder is localized on disk and whether the double "kaust" reads well.
+- `apps/settings/locales/et/system.ftl` `settings-accounts-online`: "Iga konto on kaust sinu kodukaustas olevas kaustas Cloud …" — kept the folder name Cloud in English; check whether the folder is localized on disk and whether the double "kaust" reads well.
 - `apps/settings/locales/et/connections.ftl` `settings-bluetooth-request-authorize`: "Kas lubada, et { $name } seotakse?" — built so the unnamed fallback „seade“ works; check it reads naturally with real device names.
-- `apps/settings/locales/et/connections.ftl` `settings-bluetooth-request-display`: "Sidumine: { $name }" / "Koodi ootab { $name }. Tippige see seal sisse ja vajutage Enter." — rephrased to keep the name in the nominative; check fluency.
+- `apps/settings/locales/et/connections.ftl` `settings-bluetooth-request-display`: "Sidumine: { $name }" / "Koodi ootab { $name }. Tipi see seal sisse ja vajuta Enter." — rephrased to keep the name in the nominative; check fluency.
 - `apps/settings/locales/et/connections.ftl` `settings-bluetooth-windows`: "Windowsis on seotud { $devices }." — $devices is a list ending in "ja veel 3"; check agreement with a single device vs. a list.
 - `apps/settings/locales/et/connections.ftl` `settings-network-security-enterprise`: "Ettevõte" — Windows may show "Enterprise" or "Ettevõtte"; confirm the usual Estonian label.
 - `apps/settings/locales/et/connections.ftl` `settings-network-ip-link-local`: "Ainult kohtvõrguaadress" — no settled term for link-local; check against GNOME/NetworkManager Estonian.
@@ -55,7 +55,7 @@ Strings in Luft's Estonian translation that a native speaker should check. Each 
 - `apps/settings/locales/et/devices.ftl` `settings-dictation-engine-description`: "{ $engine }, keel: { $language }" — terse to keep the language name in the nominative; check it is clear.
 - `apps/settings/locales/et/devices.ftl` `settings-keys-keypad`: "Numbriplokk { $key }" — may be long on shortcut labels; a shorter form like "Num { $key }" could be preferable.
 - `apps/settings/locales/et/protection.ftl` `settings-privacy-screen-off-after`: "Pärast { $duration }" — assumes $duration arrives as a partitive phrase like „5 minutit“; check it reads naturally with the real value (genitive „5 minuti pärast“ would be more idiomatic but can't be built around a placeable).
-- `packages/web/ui/locales/et/ui.ftl` `ui-passphrase-field`: "Paroolifraas" — used for passphrase everywhere, to keep it apart from „parool“; confirm against GNOME Disks usage.
+- `packages/web/ui/locales/et/ui.ftl` `ui-passphrase-field`: "Paroolifraas" — used for passphrase everywhere, as in KDE; check it sits well next to „salasõna“ (GNOME Disks just says „parool“).
 - `apps/settings/locales/et/protection.ftl` `settings-security-anti-cheat`: "Petmisvastase kaitsega mängud" — no settled Estonian term for anti-cheat; many gamers just say „anti-cheat“.
 - `apps/settings/locales/et/system.ftl` `settings-users-fingerprint-remove-description`: "Edaspidi ei sobi { $finger } enam sisselogimiseks." — built so the finger name stays the nominative subject; check it reads naturally with every finger name.
 - `apps/settings/locales/et/system.ftl` `settings-updates-switching-standard`: "Tavalise tõmmise allalaadimine…" — „tõmmis“ for system image; check whether „kujutis“ reads better.
@@ -65,9 +65,9 @@ Strings in Luft's Estonian translation that a native speaker should check. Each 
 
 ## Website
 
-- `web/site/locales/et/download.ftl` `download-meet-note`: "valige Lisateave ja seejärel Käivita ikkagi" — SmartScreen button labels not verified; check against Estonian Windows 11 („Käivita siiski“ is possible).
+- `web/site/locales/et/download.ftl` `download-meet-note`: "vali Lisateave ja seejärel Käivita ikkagi" — SmartScreen button labels not verified; check against Estonian Windows 11 („Käivita siiski“ is possible).
 - `web/site/locales/et/home.ftl` `home-question-ready-answer`: "Öiseid järke", "öisest järgust" — no settled Estonian term for nightly builds.
-- `web/site/locales/et/home.ftl` `home-meet-restart`: "Taaskäivitage Lufti" — step heading for "Restart into Luft"; check the illative reads naturally.
+- `web/site/locales/et/home.ftl` `home-meet-restart`: "Taaskäivita Lufti" — step heading for "Restart into Luft"; check the illative reads naturally.
 - `web/site/locales/et/home.ftl` `home-motion-heading`: "Liigub nii, nagu peab." — free rendering of "It moves like it means it".
 
 ## Meet Luft

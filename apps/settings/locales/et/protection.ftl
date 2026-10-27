@@ -23,7 +23,7 @@ settings-privacy-lock-immediately = Kohe
 ## Privacy: location, camera and microphone
 
 settings-privacy-location-services = Asukohateenused
-settings-privacy-location-services-hint = Rakendused saavad teie asukoha teada kaartide, ilma ja ajavööndite jaoks
+settings-privacy-location-services-hint = Rakendused saavad sinu asukoha teada kaartide, ilma ja ajavööndite jaoks
 settings-privacy-camera-allow = Luba rakendustel kaamerat kasutada
 settings-privacy-microphone-allow = Luba rakendustel mikrofoni kasutada
 
@@ -45,21 +45,21 @@ settings-privacy-clear-description = Rakendused ei näita enam hiljuti avatud fa
 settings-privacy-cleanup = Prügikast ja ajutised failid
 settings-privacy-empty-trash = Tühjenda prügikast automaatselt
 settings-privacy-delete-temp = Kustuta ajutised failid automaatselt
-settings-privacy-delete-temp-hint = Teie failid ajutistes kaustades, mida pole viimasel ajal kasutatud
+settings-privacy-delete-temp-hint = Sinu failid ajutistes kaustades, mida pole viimasel ajal kasutatud
 settings-privacy-delete-after = Kustuta pärast
 settings-privacy-delete-after-hint = Kui kaua faile hoitakse enne eemaldamist
 
 ## Security: summary at the top of the page
 
-settings-security-protected = Teie seade on kaitstud
-settings-security-could-be-safer = Teie seade võiks olla turvalisem
-settings-security-not-encrypted-description = Selle ketas pole krüptitud, nii et igaüks, kes selle välja võtab, saab teie faile lugeda.
-settings-security-starts-differently-description = Kui muutsite selle Secure Booti sätteid, kinnitage muudatus, et ketas avaneks taas iseenesest.
-settings-security-needed-recovery-key = Teie ketas vajas taastevõtit
-settings-security-needed-recovery-key-description = Siduge turvakiip uuesti, et ketas avaneks iseenesest.
-settings-security-firmware-ready-description = Teie riistvara püsivaravärskendused on lehel Värskendused valmis.
-settings-security-encrypted-secure-boot = Teie ketas on krüptitud ja Secure Boot kontrollib, kuidas see käivitub.
-settings-security-encrypted = Teie ketas on krüptitud.
+settings-security-protected = Sinu seade on kaitstud
+settings-security-could-be-safer = Sinu seade võiks olla turvalisem
+settings-security-not-encrypted-description = Selle ketas pole krüptitud, nii et igaüks, kes selle välja võtab, saab sinu faile lugeda.
+settings-security-starts-differently-description = Kui muutsid selle Secure Booti sätteid, kinnita muudatus, et ketas avaneks taas iseenesest.
+settings-security-needed-recovery-key = Sinu ketas vajas taastevõtit
+settings-security-needed-recovery-key-description = Seo turvakiip uuesti, et ketas avaneks iseenesest.
+settings-security-firmware-ready-description = Sinu riistvara püsivaravärskendused on lehel Värskendused valmis.
+settings-security-encrypted-secure-boot = Sinu ketas on krüptitud ja Secure Boot kontrollib, kuidas see käivitub.
+settings-security-encrypted = Sinu ketas on krüptitud.
 
 ## Security: protections
 
@@ -70,8 +70,8 @@ settings-security-chip-description = Hoiab võtmeid turvaliselt ja kontrollib, k
 settings-firmware-updates-ready = Püsivaravärskendused on valmis
 settings-firmware-updates-count =
     { $count ->
-        [one] Lehel Värskendused on teie riistvarale { $count } värskendus
-       *[other] Lehel Värskendused on teie riistvarale { $count } värskendust
+        [one] Lehel Värskendused on sinu riistvarale { $count } värskendus
+       *[other] Lehel Värskendused on sinu riistvarale { $count } värskendust
     }
 
 ## Security: signed startup
@@ -81,7 +81,7 @@ settings-security-signed-startup-on = Alglaadimismenüü ja süsteem on selle ar
 settings-security-signed-startup-purpose = Lubab arvutit käivitada ainult selle arvuti jaoks allkirjastatud tarkvaral
 settings-security-signed-startup-restart = Võetakse kasutusele pärast taaskäivitust
 settings-security-signed-startup-missed = Võtit ei lisatud viimasel taaskäivitusel
-settings-security-signed-startup-pending = Taaskäivitamisel lisage võti sinisel ekraanil
+settings-security-signed-startup-pending = Taaskäivitamisel lisa võti sinisel ekraanil
 settings-security-signed-startup-missed-often = Võtit ei lisatud ka pärast mitut taaskäivitust
 settings-security-show-steps = Kuva juhised
 settings-security-try-again = Proovi uuesti
@@ -90,23 +90,23 @@ settings-security-try-again = Proovi uuesti
 
 settings-security-anti-cheat = Petmisvastase kaitsega mängud
 settings-security-anti-cheat-ready = Valmis petmisvastase kaitsega mängudeks
-settings-security-anti-cheat-removing = Taaskäivitamisel eemaldage sinisel ekraanil teised võtmed
+settings-security-anti-cheat-removing = Taaskäivitamisel eemalda sinisel ekraanil teised võtmed
 settings-security-anti-cheat-luft-key = Epic peab Lufti võtme veel oma loendisse lisama
 settings-security-anti-cheat-ready-description = Mängud saavad kontrollida, kuidas see arvuti käivitus
 
 ## Security: steps on the blue startup screen
 
-settings-security-key-steps-remove = Eemaldage võtmed taaskäivitamisel
-settings-security-key-steps-add = Lisage võti taaskäivitamisel
-settings-security-key-steps-remove-description = Pärast taaskäivitust küsib sinine ekraan võtmete eemaldamise kohta. See ootab ainult 10 sekundit, seega vajutage mõnda klahvi kohe, kui see ilmub.
-settings-security-key-steps-add-description = Pärast taaskäivitust küsib sinine ekraan uue võtme kohta. See ootab ainult 10 sekundit, seega vajutage mõnda klahvi kohe, kui see ilmub.
-settings-security-key-step-choose = Valige { $option }, seejärel { $next }.
-settings-security-key-step-confirm = Valige { $option }.
-settings-security-key-step-code = Tippige allolev kood ja vajutage { $key }.
-settings-security-key-step-reboot = Valige { $option }.
+settings-security-key-steps-remove = Eemalda võtmed taaskäivitamisel
+settings-security-key-steps-add = Lisa võti taaskäivitamisel
+settings-security-key-steps-remove-description = Pärast taaskäivitust küsib sinine ekraan võtmete eemaldamise kohta. See ootab ainult 10 sekundit, seega vajuta mõnda klahvi kohe, kui see ilmub.
+settings-security-key-steps-add-description = Pärast taaskäivitust küsib sinine ekraan uue võtme kohta. See ootab ainult 10 sekundit, seega vajuta mõnda klahvi kohe, kui see ilmub.
+settings-security-key-step-choose = Vali { $option }, seejärel { $next }.
+settings-security-key-step-confirm = Vali { $option }.
+settings-security-key-step-code = Tipi allolev kood ja vajuta { $key }.
+settings-security-key-step-reboot = Vali { $option }.
 settings-security-key-enter = Enter
 settings-security-key-code = Kood { $code }
-settings-security-key-steps-remove-missed = Kui see vahele jääb, käivitub arvuti tavapäraselt ja saate siin uuesti proovida.
+settings-security-key-steps-remove-missed = Kui see vahele jääb, käivitub arvuti tavapäraselt ja saad siin uuesti proovida.
 settings-security-key-steps-add-missed = Kui see vahele jääb, käivitub arvuti tavapäraselt ja juhised kuvatakse järgmisel taaskäivitusel uuesti, uue koodiga.
 settings-security-later = Hiljem
 settings-security-restart-now = Taaskäivita kohe
@@ -114,20 +114,20 @@ settings-security-restart-now = Taaskäivita kohe
 ## Security: hardware security level
 
 settings-security-hardware = Riistvara turve
-settings-security-hardware-level-0 = Teie riistvaral on vähe võimalikest kaitsetest
-settings-security-hardware-level-1 = Teie riistvaral on põhikaitsed
-settings-security-hardware-level-2 = Teie riistvaral on olulised kaitsed
-settings-security-hardware-level-3 = Teie riistvara on hästi kaitstud
-settings-security-hardware-level-4 = Teie riistvara kaitseb end töö ajal
-settings-security-hardware-level-5 = Teie riistvara kaitseb end ja suudab seda tõendada
+settings-security-hardware-level-0 = Sinu riistvaral on vähe võimalikest kaitsetest
+settings-security-hardware-level-1 = Sinu riistvaral on põhikaitsed
+settings-security-hardware-level-2 = Sinu riistvaral on olulised kaitsed
+settings-security-hardware-level-3 = Sinu riistvara on hästi kaitstud
+settings-security-hardware-level-4 = Sinu riistvara kaitseb end töö ajal
+settings-security-hardware-level-5 = Sinu riistvara kaitseb end ja suudab seda tõendada
 settings-security-hardware-description = { $summary }, tase { $level }/{ $highest }.
 settings-security-hardware-next = Järgmise taseme jaoks
 settings-security-hardware-highest = See on kõrgeim olemasolev tase.
 settings-security-hardware-inactive = Praegu pole aktiivne
 settings-security-hardware-fix-maker =
     { $count ->
-        [one] Seda saab lisada ainult teie arvuti tootja, tavaliselt püsivaravärskendusega:
-       *[other] Neid saab lisada ainult teie arvuti tootja, tavaliselt püsivaravärskendusega:
+        [one] Seda saab lisada ainult sinu arvuti tootja, tavaliselt püsivaravärskendusega:
+       *[other] Neid saab lisada ainult sinu arvuti tootja, tavaliselt püsivaravärskendusega:
     }
 settings-security-hardware-fix-firmware =
     { $count ->
@@ -148,7 +148,7 @@ settings-security-hardware-fix-unknown =
 ## Security: USB protection
 
 settings-usb-hold-back = Pea uued USB-seadmed kinni
-settings-usb-hold-back-description = Lukustatud olekus ühendatud seadmed ootavad, kuni lukust avate
+settings-usb-hold-back-description = Lukustatud olekus ühendatud seadmed ootavad, kuni lukust avad
 
 ## Device encryption
 
@@ -163,7 +163,7 @@ settings-encryption-unlocks-recovery-key = Küsib käivitamisel taastevõtit
 ## Device encryption: other drives
 
 settings-encryption-drives = Muud kettad
-settings-encryption-drives-hint = Krüptige muid kettaid ja USB-mälupulki rakenduses Kettad
+settings-encryption-drives-hint = Krüpti muid kettaid ja USB-mälupulki rakenduses Kettad
 settings-encryption-drives-open = Ava Kettad
 settings-encryption-drive-encrypting = Ketta krüptimine, valmis { $percent }
 settings-encryption-drive-encrypting-paused = Ketta krüptimine, peatatud: { $percent }
@@ -179,61 +179,61 @@ settings-encryption-drives-auto-unlock =
 
 settings-encryption-unlocking = Ketta avamine
 settings-encryption-starts-differently = See arvuti käivitub nüüd teisiti
-settings-encryption-starts-differently-description = Selle Secure Booti sätted muutusid, mistõttu küsis ketas taastevõtit. Kui tegite muudatuse ise, kinnitage see, et ketas avaneks taas iseenesest
+settings-encryption-starts-differently-description = Selle Secure Booti sätted muutusid, mistõttu küsis ketas taastevõtit. Kui tegid muudatuse ise, kinnita see, et ketas avaneks taas iseenesest
 settings-encryption-confirm = Kinnita
-settings-encryption-asked-recovery-key = Teie ketas küsis taastevõtit
-settings-encryption-relink-description = Siduge turvakiip uuesti, et ketas avaneks iseenesest
+settings-encryption-asked-recovery-key = Sinu ketas küsis taastevõtit
+settings-encryption-relink-description = Seo turvakiip uuesti, et ketas avaneks iseenesest
 settings-encryption-relink = Seo uuesti
 settings-encryption-chip-unlock = Ava turvakiibiga
 settings-encryption-chip-unlock-on = Kuni miski ei muuda seda, kuidas arvuti käivitub
 settings-encryption-chip-unlock-off = Et käivitamisel ei peaks paroolifraasi tippima
 settings-encryption-pin = PIN-kood käivitamisel
-settings-encryption-pin-description = Tippige see enne ketta avanemist
+settings-encryption-pin-description = Tipi see enne ketta avanemist
 settings-encryption-change = Muuda
 settings-encryption-add-pin-row = Lisa PIN-kood käivitamiseks
 settings-encryption-add-pin-row-description = Hoiab ketta lukus ka siis, kui arvuti ära viiakse
 settings-encryption-add-pin = Lisa PIN-kood
-settings-encryption-new-key-description = Teie kettal polnud veel taastevõtit. Hoidke seda kusagil mujal kui selles arvutis.
+settings-encryption-new-key-description = Sinu kettal polnud veel taastevõtit. Hoia seda kusagil mujal kui selles arvutis.
 settings-encryption-stop-chip-title = Kas lõpetada turvakiibiga avamine?
-settings-encryption-stop-chip-passphrase = Arvuti küsib igal käivitamisel teie paroolifraasi.
-settings-encryption-stop-chip-recovery-key = Arvuti küsib igal käivitamisel teie taastevõtit, seega hoidke see käepärast.
+settings-encryption-stop-chip-passphrase = Arvuti küsib igal käivitamisel sinu paroolifraasi.
+settings-encryption-stop-chip-recovery-key = Arvuti küsib igal käivitamisel sinu taastevõtit, seega hoia see käepärast.
 settings-encryption-stop-chip = Lõpeta avamine
 settings-encryption-remove-pin-title = Kas eemaldada PIN-kood?
 settings-encryption-remove-pin-description = Ketas avaneb arvuti käivitamisel taas iseenesest.
 settings-encryption-remove-pin = Eemalda PIN-kood
 settings-encryption-unlock-disk-title = Ketta avamine
-settings-encryption-unlock-disk-description = Selle muudatuse jaoks on vaja taastevõtit või paroolifraasi, mille arvuti käivitamisel tipite.
+settings-encryption-unlock-disk-description = Selle muudatuse jaoks on vaja taastevõtit või paroolifraasi, mille arvuti käivitamisel tipid.
 settings-encryption-unlock-disk-field = Taastevõti või paroolifraas
 
 ## Device encryption: security chip and PIN
 
 settings-encryption-ask-pin = Küsi ka PIN-koodi
-settings-encryption-chip-setup-description = Arvuti turvakiip avab ketta käivitamisel iseenesest, nii et te ei pea enam enne paroolifraasi tippima.
+settings-encryption-chip-setup-description = Arvuti turvakiip avab ketta käivitamisel iseenesest, nii et sa ei pea enam enne paroolifraasi tippima.
 settings-encryption-add-pin-title = PIN-koodi lisamine
-settings-encryption-add-pin-description = Tipite selle igal arvuti käivitamisel. Ilma selleta jääb ketas lukku, isegi kui keegi kogu arvuti ära viib.
+settings-encryption-add-pin-description = Tipid selle igal arvuti käivitamisel. Ilma selleta jääb ketas lukku, isegi kui keegi kogu arvuti ära viib.
 settings-encryption-change-pin-title = PIN-koodi muutmine
-settings-encryption-change-pin-description = Tipite uue PIN-koodi igal arvuti käivitamisel.
+settings-encryption-change-pin-description = Tipid uue PIN-koodi igal arvuti käivitamisel.
 settings-encryption-change-pin = Muuda PIN-koodi
 settings-encryption-relink-title = Turvakiibi uuesti sidumine
-settings-encryption-relink-pin-description = Tippige PIN-kood, mida soovite käivitamisel kasutada.
+settings-encryption-relink-pin-description = Tipi PIN-kood, mida soovid käivitamisel kasutada.
 settings-encryption-ask-pin-step = Lisab käivitamisele ühe sammu.
 settings-encryption-pin-field = PIN-kood
 settings-encryption-new-pin-field = Uus PIN-kood
 settings-encryption-pin-length = { $min }–{ $max } numbrit
-settings-encryption-pin-digits-only = Kasutage ainult numbreid
+settings-encryption-pin-digits-only = Kasuta ainult numbreid
 settings-encryption-pin-too-short =
     { $min ->
-        [one] Kasutage vähemalt { $min } numbrit
-       *[other] Kasutage vähemalt { $min } numbrit
+        [one] Kasuta vähemalt { $min } numbrit
+       *[other] Kasuta vähemalt { $min } numbrit
     }
 settings-encryption-pin-too-long =
     { $max ->
-        [one] Kasutage kõige rohkem { $max } numbrit
-       *[other] Kasutage kõige rohkem { $max } numbrit
+        [one] Kasuta kõige rohkem { $max } numbrit
+       *[other] Kasuta kõige rohkem { $max } numbrit
     }
 settings-encryption-pins-differ = PIN-koodid ei ühti
 settings-encryption-confirm-field = Kinnita
-settings-encryption-type-again = Tippige uuesti
+settings-encryption-type-again = Tipi uuesti
 
 ## Recovery key
 
@@ -242,12 +242,12 @@ settings-recovery-description = Laseb sisse, kui ketas ei saa iseenesest avaneda
 settings-recovery-show = Kuva
 settings-recovery-replace = Asenda
 settings-recovery-replace-title = Kas asendada taastevõti?
-settings-recovery-replace-description = Praegune võti lakkab töötamast ja saate salvestamiseks uue.
+settings-recovery-replace-description = Praegune võti lakkab töötamast ja saad salvestamiseks uue.
 settings-recovery-replace-key = Asenda võti
-settings-recovery-shown-title = Teie taastevõti
-settings-recovery-shown-description = Tippige see, kui arvuti küsib käivitamisel kunagi taastevõtit. Hoidke koopiat kusagil mujal kui selles arvutis.
-settings-recovery-fresh-title = Salvestage uus taastevõti
-settings-recovery-fresh-description = Eelmine võti enam ei tööta. Hoid see uus turvaliselt kas vana kooli seifis või moodsas salasõnahalduris.
+settings-recovery-shown-title = Sinu taastevõti
+settings-recovery-shown-description = Tipi see, kui arvuti küsib käivitamisel kunagi taastevõtit. Hoia koopiat kusagil mujal kui selles arvutis.
+settings-recovery-fresh-title = Salvesta uus taastevõti
+settings-recovery-fresh-description = Eelmine võti enam ei tööta. Hoia see uus turvaliselt kas vana kooli seifis või moodsas salasõnahalduris.
 
 ## Passwords and keys (the keyring)
 
@@ -278,7 +278,7 @@ settings-passwords-pin-description = Et ainult sõrmejäljega neid avada ei saak
 settings-passwords-lock-with-screen = Lukusta koos ekraaniga
 settings-passwords-lock-with-screen-description = Need lukustuvad ja avanevad koos ekraaniga
 settings-passwords-apps = Rakenduste sisselogimisandmed ja tegevus
-settings-passwords-apps-locked = Nende nägemiseks avage võtmerõngas
+settings-passwords-apps-locked = Nende nägemiseks ava võtmerõngas
 settings-passwords-apps-description = Mida rakendused siin hoiavad ja millal nad seda kasutasid
 settings-passwords-apps-allowed = Millised rakendused saavad sinu salasõnu kasutada
 settings-passwords-apps-allowed-hint = Määratakse lehel Rakendused
@@ -351,24 +351,24 @@ settings-passwords-ssh-add = Lisa võti
 ## Passkeys
 
 settings-passkeys-title = Pääsuvõtmed
-settings-passkeys-unavailable = Pääsuvõtmete nägemiseks avage võtmerõngas.
+settings-passkeys-unavailable = Pääsuvõtmete nägemiseks ava võtmerõngas.
 settings-passkeys-chip-fingerprint = Pitseeritud selle arvuti turvakiibiga. Iga sisselogimine küsib sõrmejälge või salasõna.
 settings-passkeys-chip-password = Pitseeritud selle arvuti turvakiibiga. Iga sisselogimine küsib salasõna.
 settings-passkeys-password-fingerprint = Krüptitud sinu salasõnaga. Iga sisselogimine küsib sõrmejälge või salasõna.
-settings-passkeys-password = Krüptitud sinu salasõna. Iga sisselogimine küsib salasõna.
+settings-passkeys-password = Krüptitud sinu salasõnaga. Iga sisselogimine küsib salasõna.
 settings-passkeys-last-used = Viimati kasutatud { $when }
 settings-passkeys-never-used = Pole kasutatud
 settings-passkeys-password-only = Kaitstud sinu salasõnaga
-settings-passkeys-unreachable = Brauserid ei pääse teie pääsuvõtmetele juurde
+settings-passkeys-unreachable = Brauserid ei pääse sinu pääsuvõtmetele juurde
 settings-passkeys-unreachable-description = Need on tagasi, kui pääsuvõtmete teenus töötab
 settings-passkeys-rename-label = Nimeta ümber saidi { $site } pääsuvõti
 settings-passkeys-remove-label = Eemalda saidi { $site } pääsuvõti
 settings-passkeys-empty = Pääsuvõtmeid pole veel
 settings-passkeys-empty-description = Saitide loodud pääsuvõtmed salvestatakse siia kõigi brauserite jaoks
 settings-passkeys-remove-title = Kas eemaldada see pääsuvõti?
-settings-passkeys-remove-description = Te ei saa sellega enam saidile { $site } sisse logida, seega veenduge, et teil on muu viis sisse pääseda.
+settings-passkeys-remove-description = Sa ei saa sellega enam saidile { $site } sisse logida, seega veendu, et sul on muu viis sisse pääseda.
 settings-passkeys-rename-title = Pääsuvõtme ümbernimetamine
-settings-passkeys-rename-description = Andke saidi { $site } pääsuvõtmele nimi, mille ära tunnete.
+settings-passkeys-rename-description = Anna saidi { $site } pääsuvõtmele nimi, mille ära tunned.
 settings-passkeys-name = Nimi
 settings-passkeys-save = Salvesta
 
@@ -391,7 +391,7 @@ settings-apps-startup-description = Need rakendused avatakse sisselogimisel
 settings-apps-startup-app = Ava { $app } sisselogimisel
 settings-apps-startup-add = Lisa rakendus
 settings-apps-startup-add-title = Käivitusrakenduse lisamine
-settings-apps-startup-add-description = Valige rakendus, mis avatakse igal sisselogimisel.
+settings-apps-startup-add-description = Vali rakendus, mis avatakse igal sisselogimisel.
 settings-apps-search = Otsi rakendusi
 settings-apps-no-match = Otsingule ei vasta ükski rakendus
 settings-apps-cancel = Loobu

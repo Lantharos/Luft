@@ -38,7 +38,7 @@ start-search-settings-section = Sätted: { $page }
 start-search-file-reveal = Kuva rakenduses { $fileManager }
 start-search-file-copy-path = Kopeeri asukoht
 start-search-conversion = { $amount } { $from } → { $to }
-start-search-calculation = { $expression }, kopeerimiseks vajutage Enter
+start-search-calculation = { $expression }, kopeerimiseks vajuta Enter
 
 ## Answers in Start's search to questions about dates and times.
 ## The answer itself, such as "157 days" or "17:00", is formatted for the language; these describe it.

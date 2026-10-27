@@ -11,7 +11,7 @@ meet-close = Sulge
 meet-restart-title = Kas taaskäivitada kohe?
 meet-not-yet = Mitte veel
 meet-iso-use = Kasuta olemasolevat ISO-faili
-meet-iso-using = Kasutatakse teie Lufti ISO-faili
+meet-iso-using = Kasutatakse sinu Lufti ISO-faili
 meet-nightly = Öised järgud
 meet-channel-nightly = Meet Luft kasutab öiseid järke
 meet-channel-latest = Meet Luft kasutab taas väljalaskeid
@@ -31,16 +31,16 @@ problem-check =
 problem-room = Luftile ruumi tegemine jäi pooleli.
 problem-room-linux = Lufti ettevalmistamine jäi pooleli.
 problem-update = Lufti värskendamine jäi pooleli.
-problem-download = Lufti allalaadimine katkes. Kontrollige, kas olete võrgus.
-problem-pack = Teie asjade pakkimine jäi pooleli.
+problem-download = Lufti allalaadimine katkes. Kontrolli, kas oled võrgus.
+problem-pack = Sinu asjade pakkimine jäi pooleli.
 problem-remove = Lufti eemaldamine jäi pooleli.
 problem-restart = Meet Luft ei saanud taaskäivitust seadistada.
 problem-tidy = Vanu käivituskirjeid ei saanud eemaldada.
 problem-firmware = Meet Luft ei saanud püsivara sätteid avada.
-problem-folders = Meet Luft ei saanud teie kaustu läbi vaadata.
+problem-folders = Meet Luft ei saanud sinu kaustu läbi vaadata.
 problem-sticks = Meet Luft ei saanud USB-draive otsida.
 problem-stick = Mälupulga tegemine jäi pooleli.
-problem-offer = Lufti ei saa praegu alla laadida. Kontrollige, kas olete võrgus, või kasutage olemasolevat ISO-faili.
+problem-offer = Lufti ei saa praegu alla laadida. Kontrolli, kas oled võrgus, või kasuta olemasolevat ISO-faili.
 problem-luft = Meet Luft ei saanud Lufti ketast kontrollida.
 problem-resize = Lufti suuruse muutmine jäi pooleli.
 problem-cancel = Meet Luft ei saanud muudatust tühistada.
@@ -55,8 +55,8 @@ problem-declined =
 
 hello-intro =
     { $platform ->
-        [linux] Proovige Lufti otse siit, ilma USB-mälupulgata. Kui see meeldib, võib Luft selle süsteemi asemele tulla ja teie failid alles jätta.
-       *[windows] Luft saab elada otse Windowsi kõrval. Proovige seda esmalt ilma midagi installimata ja võtke oma asjad kaasa, kui olete valmis.
+        [linux] Proovi Lufti otse siit, ilma USB-mälupulgata. Kui see meeldib, võib Luft selle süsteemi asemele tulla ja sinu failid alles jätta.
+       *[windows] Luft saab elada otse Windowsi kõrval. Proovi seda esmalt ilma midagi installimata ja võta oma asjad kaasa, kui oled valmis.
     }
 hello-check =
     { $platform ->
@@ -79,30 +79,30 @@ check-ready-title =
 check-blocked-title = Peaaegu valmis
 check-moment = See võtab hetke.
 check-slow = Windows arvutab, kui palju ruumi see loovutada saab. Suurel kettal võib see võtta mõne minuti.
-check-blocked-description = Enne kui Luft sisse kolida saab, tuleb midagi muuta. Toimige nii.
+check-blocked-description = Enne kui Luft sisse kolida saab, tuleb midagi muuta. Toimi nii.
 check-found-description = Meet Luft leidis järgmist.
 check-checking = Ketta, püsivara ja riistvara kontrollimine…
 check-again = Kontrolli uuesti
 check-action-firmware = Ava püsivara sätted
 check-action-tidy = Korista
 check-firmware-title = Kas taaskäivitada püsivara sätetesse?
-check-firmware-description = Salvestage esmalt pooleliolev töö. Lülitage seal sisse Secure Boot ja salvestage, siis käivitub arvuti taas tavapäraselt.
+check-firmware-description = Salvesta esmalt pooleliolev töö. Lülita seal sisse Secure Boot ja salvesta, siis käivitub arvuti taas tavapäraselt.
 check-tidy-title = Kas eemaldada vanad käivituskirjed?
 check-tidy-description = Need viitavad ainult süsteemidele, mida enam pole. Windows ja kõik muu käivituvad täpselt nagu varem.
 check-get-ready-title = Kas valmistada Luft ette?
-check-get-ready-file = Meet Luft kopeerib Lufti teie ISO-failist selle arvuti kausta ja lisab sellele käivituskirje. Partitsioone ei muudeta.
+check-get-ready-file = Meet Luft kopeerib Lufti sinu ISO-failist selle arvuti kausta ja lisab sellele käivituskirje. Partitsioone ei muudeta.
 check-get-ready-download = Meet Luft laadib Lufti (umbes { $size }) selle arvuti kausta ja lisab sellele käivituskirje. Partitsioone ei muudeta.
 check-get-ready-confirm = Valmista ette
 
 ## Choosing how much of the Windows drive Luft gets
 
 room-title = Kui palju ruumi Luftile?
-room-description = Windows teeb end väiksemaks, et Luftile ruumi anda. Teie Windowsi failid jäävad täpselt sinna, kus nad on.
+room-description = Windows teeb end väiksemaks, et Luftile ruumi anda. Sinu Windowsi failid jäävad täpselt sinna, kus nad on.
 room-live = Windowsile jääb kasvuruumi. Luft jätab lisaks käivitamiseks kõrvale { $size }, mille ta pärast installimist tagasi annab.
 room-make = Tee ruumi
 room-confirm-title = Kas anda Luftile { $size }?
-room-confirm-file = Windows kahandab oma ketast, seejärel kopeerib Meet Luft Lufti teie ISO-failist. Hoidke arvuti vooluvõrgus.
-room-confirm-download = Windows kahandab oma ketast, seejärel laadib Meet Luft alla Lufti (umbes { $size }). Hoidke arvuti vooluvõrgus ja võrguühenduses.
+room-confirm-file = Windows kahandab oma ketast, seejärel kopeerib Meet Luft Lufti sinu ISO-failist. Hoia arvuti vooluvõrgus.
+room-confirm-download = Windows kahandab oma ketast, seejärel laadib Meet Luft alla Lufti (umbes { $size }). Hoia arvuti vooluvõrgus ja võrguühenduses.
 
 ## Choosing where Luft goes, when there's more than one place
 ## $drive is the name of a drive, like "Samsung SSD 990 PRO", and $size a size, like "120 GB"
@@ -121,8 +121,8 @@ room-place-whole-detail = Kustutab Lufti jaoks selle ketta ({ $size })
 room-live-free = Sellest on juba vaba { $free }, nii et Windows loovutab vähem ja talle jääb kasvuruumi. Luft jätab lisaks käivitamiseks kõrvale { $size }, mille ta pärast installimist tagasi annab.
 room-live-elsewhere = Luft saab sealt { $room } ja jätab käivitamiseks kõrvale veel { $size }, mille ta pärast installimist tagasi annab.
 room-confirm-free-title = Kas anda Luftile { $size } vaba ruumi?
-room-confirm-free-file = Meet Luft kopeerib Lufti sinna teie ISO-failist. Muu kettal ei muutu.
-room-confirm-free-download = Meet Luft laadib Lufti (umbes { $size }) sinna alla. Muu kettal ei muutu. Hoidke arvuti võrguühenduses.
+room-confirm-free-file = Meet Luft kopeerib Lufti sinna sinu ISO-failist. Muu kettal ei muutu.
+room-confirm-free-download = Meet Luft laadib Lufti (umbes { $size }) sinna alla. Muu kettal ei muutu. Hoia arvuti võrguühenduses.
 room-erase-title = Kas kustutada { $drive }?
 room-erase-description = Kõik sellel kettal ({ $size }) kustutatakse kohe, enne kui Luft käivitub. Seda ei saa tagasi võtta. Praegu on sellel:
 room-erase-empty = Windows ei suuda sellelt kettalt ({ $size }) midagi lugeda, kuid kõik, mis sellel on, kustutatakse kohe. Seda ei saa tagasi võtta.
@@ -136,71 +136,71 @@ room-erase-confirm = Kustuta ja tee ruumi
 ## Luft is ready on Windows
 
 ready-title = Luft on valmis
-ready-description = Valige, kuidas soovite sellega tutvuda. Windows käivitub hiljem tavapäraselt, kui te just Lufti ei installi ega seda ei vali.
+ready-description = Vali, kuidas soovid sellega tutvuda. Windows käivitub hiljem tavapäraselt, kui sa just Lufti ei installi ega seda ei vali.
 ready-update-title = Hangi uusim Luft
-ready-update-description = Saadaval on uuem järk. See asendab praeguse ning jätab alles ruumi ja kõik, mille olete pakkinud.
+ready-update-description = Saadaval on uuem järk. See asendab praeguse ning jätab alles ruumi ja kõik, mille oled pakkinud.
 ready-try-title = Proovi Lufti
-ready-try-description = Taaskäivitage Lufti ilma midagi installimata. Järgmisel korral käivitub Windows tavapäraselt.
-ready-box-description = Pakkige dokumendid, fotod, Wi-Fi-võrgud ja muu, et Luft need pärast installimist lahti pakiks.
+ready-try-description = Taaskäivita Lufti ilma midagi installimata. Järgmisel korral käivitub Windows tavapäraselt.
+ready-box-description = Paki dokumendid, fotod, Wi-Fi-võrgud ja muu, et Luft need pärast installimist lahti pakiks.
 ready-box-packed = Pakitud, { $size }
 ready-install-title = Lufti installimine
-ready-install-description = Taaskäivitage installerisse. Windowsi kõrval olev ruum ({ $size }) ootab seda juba.
-ready-install-drive-description = Taaskäivitage installerisse. Kettal { $drive } olev ruum ({ $size }) ootab seda juba.
-ready-stick-description = Pange Luft mälupulgale, et seda mis tahes arvutis käivitada.
+ready-install-description = Taaskäivita installerisse. Windowsi kõrval olev ruum ({ $size }) ootab seda juba.
+ready-install-drive-description = Taaskäivita installerisse. Kettal { $drive } olev ruum ({ $size }) ootab seda juba.
+ready-stick-description = Pane Luft mälupulgale, et seda mis tahes arvutis käivitada.
 ready-remove = Eemalda Luft sellest arvutist
-ready-restart-try = Salvestage esmalt pooleliolev töö. Luft avaneb umbes minuti pärast ja järgmine taaskäivitus viib teid tagasi Windowsi.
-ready-restart-install = Salvestage esmalt pooleliolev töö. Installer avaneb umbes minuti pärast ja midagi ei muutu enne, kui te seal kinnitate.
+ready-restart-try = Salvesta esmalt pooleliolev töö. Luft avaneb umbes minuti pärast ja järgmine taaskäivitus viib sind tagasi Windowsi.
+ready-restart-install = Salvesta esmalt pooleliolev töö. Installer avaneb umbes minuti pärast ja midagi ei muutu enne, kui sa seal kinnitad.
 ready-fast-startup-title = Lülita Windowsi kiirkäivitus välja
 ready-fast-startup-description = Siis lülitub Windows täielikult välja, nii et heli, Wi-Fi ja Bluetooth käivituvad Luftis puhtalt.
 ready-clock-title = Hoia kell mõlemas õige
-ready-clock-description = Windows loeb arvuti kella samamoodi nagu Luft, nii et aeg ei hüppa enam, kui süsteemi vahetate.
+ready-clock-description = Windows loeb arvuti kella samamoodi nagu Luft, nii et aeg ei hüppa enam, kui süsteemi vahetad.
 ready-remove-title = Kas eemaldada Luft sellest arvutist?
 ready-remove-description = Meet Luft kustutab kõik, mille see lisas, ka kolimiskasti, ja annab Windowsile kogu ruumi tagasi.
 
 ## Luft is ready on Linux
 
-linux-ready-description = Valige, kuidas soovite sellega tutvuda. Süsteem { $system } käivitub tavapäraselt, kuni te teisiti ei otsusta.
+linux-ready-description = Vali, kuidas soovid sellega tutvuda. Süsteem { $system } käivitub tavapäraselt, kuni sa teisiti ei otsusta.
 linux-ready-this-system = see süsteem
 linux-ready-update-description = Saadaval on uuem järk. See asendab Meet Lufti hoitava järgu ja jätab proovimise logid alles.
-linux-ready-try-description = Taaskäivitage Lufti ilma midagi muutmata. Järgmisel korral käivitub { $system } tavapäraselt.
+linux-ready-try-description = Taaskäivita Lufti ilma midagi muutmata. Järgmisel korral käivitub { $system } tavapäraselt.
 linux-ready-replace-title = Asenda { $system }
-linux-ready-replace-description = Luft tuleb selle asemele ja jätab alles teie failid, konto, Wi-Fi-võrgud ja teised kettad. Vana süsteem jääb alles, kuni selle eemaldate.
-linux-ready-install-description = Taaskäivitage installerisse, et panna Luft teisele kettale või vabale ruumile.
+linux-ready-replace-description = Luft tuleb selle asemele ja jätab alles sinu failid, konto, Wi-Fi-võrgud ja teised kettad. Vana süsteem jääb alles, kuni selle eemaldad.
+linux-ready-install-description = Taaskäivita installerisse, et panna Luft teisele kettale või vabale ruumile.
 linux-ready-remove = Eemalda Luft sellest arvutist
-linux-ready-restart-try = Salvestage esmalt pooleliolev töö. Luft avaneb umbes minuti pärast ja järgmine taaskäivitus viib teid tagasi süsteemi { $system }.
-linux-ready-restart-replace = Salvestage esmalt pooleliolev töö. Installer avaneb nii, et asendamiseks on valitud { $system }, ja näitab enne muudatusi, mis alles jääb.
+linux-ready-restart-try = Salvesta esmalt pooleliolev töö. Luft avaneb umbes minuti pärast ja järgmine taaskäivitus viib sind tagasi süsteemi { $system }.
+linux-ready-restart-replace = Salvesta esmalt pooleliolev töö. Installer avaneb nii, et asendamiseks on valitud { $system }, ja näitab enne muudatusi, mis alles jääb.
 linux-ready-remove-title = Kas eemaldada Luft sellest arvutist?
 linux-ready-remove-description = Meet Luft kustutab Lufti failid, käivitusfailid ja käivituskirje. Kõik muu jääb nii, nagu on.
 
 ## Luft is installed on this PC
 ## $drive is the name of a drive, like "Samsung SSD 990 PRO", and $size a size, like "120 GB"
 
-luft-title = Teie Luft
+luft-title = Sinu Luft
 luft-looking = Meet Luft leidis sellest arvutist Lufti.
 luft-checking = Lufti ketta kontrollimine…
 luft-description-beside = Luft on selles arvutis installitud Windowsi kõrvale.
 luft-description-drive = Luft on installitud kettale { $drive }.
 luft-bar-used = { $size }, kasutusel { $used }
 luft-resize-title = Muuda Lufti ruumi suurust
-luft-resize-description = Andke Luftile rohkem Windowsi ruumi või andke osa Windowsile tagasi.
-luft-resize-drive-description = Andke Luftile rohkem vaba ruumi kettal { $drive } või jätke osa sellest vabaks.
+luft-resize-description = Anna Luftile rohkem Windowsi ruumi või anna osa Windowsile tagasi.
+luft-resize-drive-description = Anna Luftile rohkem vaba ruumi kettal { $drive } või jäta osa sellest vabaks.
 luft-resize-passphrase = Lufti ketas avaneb ainult paroolifraasiga ja Luft ei saa seda kolimise ajal ise sisestada.
-luft-resize-start-first = Käivitage Luft üks kord, et see saaks Meet Luftile öelda, kui täis see on, ja tulge siis tagasi.
+luft-resize-start-first = Käivita Luft üks kord, et see saaks Meet Luftile öelda, kui täis see on, ja tule siis tagasi.
 luft-resize-apart = Windowsi ja Lufti vahel on teine partitsioon, nii et nad ei saa oma ruumi jagada.
 luft-pending-grow = Luft kasvab järgmisel käivitamisel
-luft-pending-grow-description = Taaskäivitage Lufti ja jätke see mõneks minutiks sisse, kuni see uude ruumi kolib. Võite seda vahepeal edasi kasutada.
+luft-pending-grow-description = Taaskäivita Lufti ja jäta see mõneks minutiks sisse, kuni see uude ruumi kolib. Võid seda vahepeal edasi kasutada.
 luft-pending-shrink = Luft teeb järgmisel käivitamisel ruumi
-luft-pending-shrink-description = Taaskäivitage Lufti ja jätke see mõneks minutiks sisse, kuni see oma faile teisaldab. Seejärel avage Windowsis uuesti Meet Luft, et Windows ruumi saaks.
+luft-pending-shrink-description = Taaskäivita Lufti ja jäta see mõneks minutiks sisse, kuni see oma faile teisaldab. Seejärel ava Windowsis uuesti Meet Luft, et Windows ruumi saaks.
 luft-pending-trim = Luft muutub järgmisel käivitamisel väiksemaks
-luft-pending-trim-description = Taaskäivitage Lufti ja see teeb end umbes minutiga väiksemaks.
+luft-pending-trim-description = Taaskäivita Lufti ja see teeb end umbes minutiga väiksemaks.
 luft-windows-free-title = Anna vaba ruum Windowsile
 luft-windows-free-description = Kohe Windowsi järel olev { $size } on kasutamata. Windows saab selle tagasi võtta.
 luft-leftovers-title = Korista pärast Lufti proovimist
 luft-leftovers-description = Partitsioonid, mille Meet Luft Lufti käivitamiseks tegi, on endiselt alles. Luft ei vaja neid enam.
 luft-start = Taaskäivita Lufti
 luft-cancel = Tühista muudatus
-luft-restart = Salvestage esmalt pooleliolev töö. Luft käivitub umbes minuti pärast ja järgmine taaskäivitus viib teid tagasi Windowsi.
-luft-restart-pending = Salvestage esmalt pooleliolev töö. Luft käivitub umbes minuti pärast ja teisaldab oma failid ise, mis võtab mõne minuti. Võite seda vahepeal kasutada.
+luft-restart = Salvesta esmalt pooleliolev töö. Luft käivitub umbes minuti pärast ja järgmine taaskäivitus viib sind tagasi Windowsi.
+luft-restart-pending = Salvesta esmalt pooleliolev töö. Luft käivitub umbes minuti pärast ja teisaldab oma failid ise, mis võtab mõne minuti. Võid seda vahepeal kasutada.
 luft-remove = Eemalda Luft sellest arvutist
 luft-remove-title = Kas eemaldada Luft sellest arvutist?
 luft-remove-description = Luft ja kõik selles kustutatakse, kokku { $size }, ja Windows saab ruumi tagasi. Arvuti käivitab Windowsi nagu varem. Seda ei saa tagasi võtta.
@@ -211,26 +211,26 @@ luft-remove-confirm = Eemalda Luft
 ## $size is a size, like "20 GB"
 
 resize-title = Kui palju ruumi Luftile?
-resize-description = Lohistage, et jagada ketas Windowsi ja Lufti vahel. Luft teeb muudatuse ise järgmisel käivitamisel.
+resize-description = Lohista, et jagada ketas Windowsi ja Lufti vahel. Luft teeb muudatuse ise järgmisel käivitamisel.
 resize-measuring = Windows arvutab, kui palju ruumi see loovutada saab. Suurel kettal võib see võtta mõne minuti.
-resize-full = Luft on teisaldamiseks liiga täis ja Windows ei saa sellele piisavalt ruumi loovutada. Tehke esmalt ruumi Luftis või Windowsis.
-resize-drive-description = Lohistage, et valida, kui palju kettast { $drive } Luft võtab. Luft teeb muudatuse ise järgmisel käivitamisel.
+resize-full = Luft on teisaldamiseks liiga täis ja Windows ei saa sellele piisavalt ruumi loovutada. Tee esmalt ruumi Luftis või Windowsis.
+resize-drive-description = Lohista, et valida, kui palju kettast { $drive } Luft võtab. Luft teeb muudatuse ise järgmisel käivitamisel.
 resize-drive-free = { $size } vaba kettal { $drive }
 resize-used = Lufti failid võtavad { $size }.
-resize-least = Muutke vähemalt { $size } võrra.
+resize-least = Muuda vähemalt { $size } võrra.
 resize-apply = Muuda
 resize-grow-title = Kas anda Luftile { $size } juurde?
-resize-grow-description = Windows teeb end kohe väiksemaks. Luft kolib uude ruumi järgmisel käivitamisel, mis võtab mõne minuti. Hoidke arvuti vooluvõrgus.
+resize-grow-description = Windows teeb end kohe väiksemaks. Luft kolib uude ruumi järgmisel käivitamisel, mis võtab mõne minuti. Hoia arvuti vooluvõrgus.
 resize-grow-drive-description = Luft võtab järgmisel käivitamisel kettal { $drive } oleva vaba ruumi, mis võtab vaid hetke.
 resize-trim-title = Kas teha Luft { $size } väiksemaks?
 resize-trim-description = Luft teeb end järgmisel käivitamisel väiksemaks ja ruum jääb kettal { $drive } vabaks.
 resize-shrink-title = Kas anda Windowsile { $size } tagasi?
-resize-shrink-description = Luft teisaldab oma failid järgmisel käivitamisel, mis võtab mõne minuti. Seejärel avage uuesti Meet Luft ja Windows võtab ruumi tagasi. Hoidke arvuti vooluvõrgus.
+resize-shrink-description = Luft teisaldab oma failid järgmisel käivitamisel, mis võtab mõne minuti. Seejärel ava uuesti Meet Luft ja Windows võtab ruumi tagasi. Hoia arvuti vooluvõrgus.
 
 ## Packing things to take along to Luft (the moving box)
 
-box-title = Võtke oma asjad kaasa
-box-description = Valige, mida kaasa võtta. Luft pakib selle pärast installimist teie uude kontosse lahti ja Windowsist ei eemaldata midagi.
+box-title = Võta oma asjad kaasa
+box-description = Vali, mida kaasa võtta. Luft pakib selle pärast installimist sinu uude kontosse lahti ja Windowsist ei eemaldata midagi.
 box-looking = Kaustade läbivaatamine…
 box-folder-desktop = Töölaud
 box-folder-documents = Dokumendid
@@ -252,8 +252,8 @@ box-bluetooth-description =
        *[other] { $devices } seadet, valmis ilma uuesti sidumata
     }
 box-wallpaper-title = Taustapilt
-box-wallpaper-description = Teie Windowsi töölaua pilt
-box-account-title = Teie nimi ja pilt
+box-wallpaper-description = Sinu Windowsi töölaua pilt
+box-account-title = Sinu nimi ja pilt
 box-total-slow =
     { $size }, pakkimine võtab umbes { $minutes ->
         [one] { $minutes } minuti
@@ -271,30 +271,30 @@ working-partitioning = Lufti ruumi seadistamine
     .description = Partitsioonide ettevalmistamine, millelt Luft käivitub.
 working-downloading = Lufti toomine
     .description = Luft kopeeritakse otse tema enda ruumi ja kontrollitakse teel.
-working-packing = Teie asjade pakkimine
+working-packing = Sinu asjade pakkimine
     .description = Kõik valitu kopeeritakse kolimiskasti. Suured kaustad võtavad aega.
 working-removing = Lufti eemaldamine
     .description = Ruum antakse Windowsile tagasi.
 working-removing-linux = Lufti eemaldamine
     .description = Selle failide ja käivituskirje eemaldamine.
 working-writing = Mälupulga tegemine
-    .description = Luft kirjutatakse kogu mälupulgale. Hoidke see ühendatuna.
+    .description = Luft kirjutatakse kogu mälupulgale. Hoia see ühendatuna.
 working-copying = Lufti lisamine Ventoysse
-    .description = Luft kopeeritakse mälupulgale teiste ISO-failide kõrvale. Hoidke see ühendatuna.
+    .description = Luft kopeeritakse mälupulgale teiste ISO-failide kõrvale. Hoia see ühendatuna.
 working-verifying = Mälupulga kontrollimine
     .description = Kõik loetakse tagasi, et see kindlasti käivituks.
 working-stick-downloading = Lufti allalaadimine
     .description = Seda kontrollitakse teel ja hoitakse alles, nii et järgmine mälupulk valmib kiiremini.
 working-progress = { $done } / { $total }
-working-keep-open = Hoidke see aken avatuna.
+working-keep-open = Hoia see aken avatuna.
 
 ## After Luft was removed
 
 removed-title = Kõik on nagu enne
 removed-description =
     { $platform ->
-        [linux] Lufti failid ja käivituskirje on eemaldatud ning arvuti käivitub täpselt nagu varem. Tulge tagasi millal iganes.
-       *[windows] Lufti partitsioonid ja käivituskirje on eemaldatud ning Windowsil on taas kogu oma ruum. Tulge tagasi millal iganes.
+        [linux] Lufti failid ja käivituskirje on eemaldatud ning arvuti käivitub täpselt nagu varem. Tule tagasi millal iganes.
+       *[windows] Lufti partitsioonid ja käivituskirje on eemaldatud ning Windowsil on taas kogu oma ruum. Tule tagasi millal iganes.
     }
 
 ## Making a USB stick
@@ -302,7 +302,7 @@ removed-description =
 stick-title = Tee USB-mälupulk
 stick-description = Luft käivitub sellelt mis tahes arvutis, et seda proovida või installida.
 stick-looking = USB-draivide otsimine…
-stick-none = Ühendage USB-mälupulk, mille maht on vähemalt { $size }. See ilmub siia.
+stick-none = Ühenda USB-mälupulk, mille maht on vähemalt { $size }. See ilmub siia.
 stick-drives-label = USB-draivid
 stick-offer = { $name }, { $size }
 stick-make = Tee mälupulk
@@ -326,15 +326,15 @@ stick-keep =
     }
 stick-replace = Asenda
 stick-full-title = Luftile pole ruumi
-stick-full-description = Luft vajab { $needed } ja sellel mälupulgal on vaba { $free }. Tehke sellele ruumi või kustutage see ja tehke sellest Lufti mälupulk.
+stick-full-description = Luft vajab { $needed } ja sellel mälupulgal on vaba { $free }. Tee sellele ruumi või kustuta see ja tee sellest Lufti mälupulk.
 stick-erase-title = Kas kustutada { $name }?
 stick-erase-description = Kõik sellel mälupulgal ({ $size }) kustutatakse ja asendatakse Luftiga. Seda ei saa tagasi võtta.
 stick-erase-confirm = Kustuta ja tee mälupulk
-stick-done-title = Teie Lufti mälupulk on valmis
-stick-done-ventoy-title = Luft on teie Ventoy mälupulgal
-stick-done-take-out = Nüüd võite selle eemaldada.
-stick-done-eject = Väljutage see enne eemaldamist.
-stick-done-start = Sellelt käivitamiseks ühendage see ja valige see arvuti alglaadimismenüüst, mis avaneb kohe pärast sisselülitamist klahviga, nagu F12, F8 või Esc.
+stick-done-title = Sinu Lufti mälupulk on valmis
+stick-done-ventoy-title = Luft on sinu Ventoy mälupulgal
+stick-done-take-out = Nüüd võid selle eemaldada.
+stick-done-eject = Väljuta see enne eemaldamist.
+stick-done-start = Sellelt käivitamiseks ühenda see ja vali see arvuti alglaadimismenüüst, mis avaneb kohe pärast sisselülitamist klahviga, nagu F12, F8 või Esc.
 stick-done-ventoy-key = Kui Secure Boot on sees, palub Ventoy esimesel käivitamisel ühe korra oma võtme registreerida.
 stick-done = Valmis
 stick-done-another = Tee veel üks

@@ -1,5 +1,5 @@
 import { activationToken } from '@luft/ui';
-import type { Signal } from '#lib/bridge/types.js';
+import type { Signal } from '#lib/bindings.js';
 import { app } from '#lib/state/app.svelte.js';
 import { notices } from '#lib/state/notices.svelte.js';
 import { processes } from '#lib/state/processes.svelte.js';

@@ -4,6 +4,7 @@ use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 use luft_app::Events;
 
 use super::{Control, Shared};
+use crate::events::{APPS, CATALOG, DEVICES, PROCESSES, TICK};
 use crate::system::System;
 use crate::tasks::apps::{self, AppSampler};
 use crate::tasks::{Table, process_ids};
@@ -100,7 +101,7 @@ impl Sampler<'_> {
         if self.system.refresh() {
             let devices = self.system.devices();
             if control.visible {
-                self.events.emit("barometer.devices", &devices);
+                self.events.emit(DEVICES, &devices);
             }
             *self.shared.devices.lock() = Some(devices);
         }
@@ -108,7 +109,7 @@ impl Sampler<'_> {
         let tick = self.system.sample(unix_time(), elapsed, page);
         self.tasks(control, true);
         if control.visible {
-            self.events.emit("barometer.tick", &tick);
+            self.events.emit(TICK, &tick);
         }
         let mut history = self.shared.history.lock();
         let oldest = tick.time.saturating_sub(control.history.as_millis() as u64);
@@ -137,7 +138,7 @@ impl Sampler<'_> {
                 apps::mark_background(&mut usage, &members, windowed);
             }
             if emit {
-                self.events.emit("barometer.apps", &usage);
+                self.events.emit(APPS, &usage);
             }
             let mut expanded: Vec<u32> = control
                 .expanded
@@ -159,10 +160,10 @@ impl Sampler<'_> {
         };
         let (catalog, rows) = self.table.sample(&mut scopes, &pids, control.disk, &gpu);
         if !catalog.is_empty() {
-            self.events.emit("barometer.catalog", &catalog);
+            self.events.emit(CATALOG, &catalog);
         }
         if emit && (!rows.is_empty() || !catalog.is_empty()) {
-            self.events.emit_bytes("barometer.processes", rows);
+            self.events.emit_bytes(PROCESSES, rows);
         }
     }
 }

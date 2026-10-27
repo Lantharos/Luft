@@ -1,3 +1,4 @@
+use specta::Type;
 use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::time::Instant;
@@ -12,9 +13,9 @@ use crate::system::{self, procfile::ProcFile};
 
 const YOUNG_SECONDS: f64 = 5.0;
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
-struct Entry {
+struct ProcessEntry {
     pid: u32,
     ppid: u32,
     name: String,
@@ -25,11 +26,11 @@ struct Entry {
     started: f64,
 }
 
-#[derive(Serialize, Default)]
+#[derive(Serialize, Default, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Catalog {
     reset: bool,
-    added: Vec<Entry>,
+    added: Vec<ProcessEntry>,
     removed: Vec<u32>,
     apps: Vec<AppInfo>,
 }
@@ -203,7 +204,7 @@ impl Table {
             {
                 catalog.apps.push(info.clone());
             }
-            catalog.added.push(Entry {
+            catalog.added.push(ProcessEntry {
                 pid,
                 ppid: process.ppid,
                 name: process.name.clone(),

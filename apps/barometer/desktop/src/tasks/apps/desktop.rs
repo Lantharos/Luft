@@ -1,3 +1,4 @@
+use specta::Type;
 use std::collections::HashMap;
 
 use luft_app::apps::App;
@@ -15,7 +16,7 @@ pub fn is_desktop_app(key: &str) -> bool {
     !key.starts_with(PSEUDO) && key != SABINE_RUNTIME
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct AppInfo {
     pub key: String,

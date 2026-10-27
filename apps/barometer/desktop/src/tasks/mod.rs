@@ -5,4 +5,4 @@ mod process;
 mod table;
 mod users;
 
-pub use table::{Table, process_ids};
+pub use table::{Catalog, Table, process_ids};

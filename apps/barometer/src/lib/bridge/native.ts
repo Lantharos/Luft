@@ -1,5 +1,5 @@
-import { invoke, listen } from '@lantharos/sabine';
-import type { AppState, AppUsage, Backend, Catalog, Details, Devices, Snapshot, Tick } from './types';
+import { commands, events } from '#lib/bindings.js';
+import type { Backend } from './types';
 
 const AUTHENTICATION = { timeoutMs: 10 * 60 * 1000 };
 
@@ -9,8 +9,8 @@ function flush() {
 	for (const apply of pending.splice(0)) apply();
 }
 
-function batched<T>(name: string, callback: (payload: T) => void) {
-	listen<T>(name, (payload) => {
+function batched<T>(listen: (callback: (payload: T) => void) => unknown, callback: (payload: T) => void) {
+	listen((payload) => {
 		if (pending.push(() => callback(payload)) === 1) requestAnimationFrame(flush);
 	});
 }
@@ -21,20 +21,20 @@ function floats(bytes: Uint8Array) {
 }
 
 export const native: Backend = {
-	appState: () => invoke<AppState>('app_state'),
-	saveSettings: (settings) => invoke('settings_write', settings),
-	view: (view) => invoke('monitor_view', { ...view }),
-	configure: (interval, history) => invoke('monitor_configure', { interval, history }),
-	snapshot: (after) => invoke<Snapshot>('monitor_snapshot', { after }),
-	details: (pid) => invoke<Details>('process_details', { pid }),
-	signal: (pids, signal) => invoke('process_signal', { pids, signal }, AUTHENTICATION),
-	signalApp: (key, signal) => invoke('app_signal', { key, signal }, AUTHENTICATION),
-	openApp: (key, token) => invoke('app_open', { key, token }),
-	stopApp: (key) => invoke('app_stop', { key }),
-	priority: (pid, nice) => invoke('process_priority', { pid, nice }, AUTHENTICATION),
-	onTick: (callback) => batched<Tick>('barometer.tick', callback),
-	onDevices: (callback) => batched<Devices>('barometer.devices', callback),
-	onApps: (callback) => batched<AppUsage[]>('barometer.apps', callback),
-	onCatalog: (callback) => batched<Catalog>('barometer.catalog', callback),
-	onProcesses: (callback) => batched<Uint8Array>('barometer.processes', (bytes) => callback(floats(bytes)))
+	appState: () => commands.appState(),
+	saveSettings: (settings) => commands.settingsWrite(settings),
+	view: (view) => commands.monitorView(view),
+	configure: (interval, history) => commands.monitorConfigure({ interval, history }),
+	snapshot: (after) => commands.monitorSnapshot({ after }),
+	details: (pid) => commands.processDetails({ pid }),
+	signal: (pids, signal) => commands.processSignal({ pids, signal }, AUTHENTICATION),
+	signalApp: (key, signal) => commands.appSignal({ key, signal }, AUTHENTICATION),
+	openApp: (key, token) => commands.appOpen({ key, token }),
+	stopApp: (key) => commands.appStop({ key }),
+	priority: (pid, nice) => commands.processPriority({ pid, nice }, AUTHENTICATION),
+	onTick: (callback) => batched(events.barometerTick, callback),
+	onDevices: (callback) => batched(events.barometerDevices, callback),
+	onApps: (callback) => batched(events.barometerApps, callback),
+	onCatalog: (callback) => batched(events.barometerCatalog, callback),
+	onProcesses: (callback) => batched(events.barometerProcesses, (bytes) => callback(floats(bytes)))
 };

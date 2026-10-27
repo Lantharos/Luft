@@ -12,13 +12,31 @@ use super::procfile::{ProcFile, read_number, read_text, udev_property};
 const BLOCK: &str = "/sys/block";
 const SECTOR: u64 = 512;
 
+#[derive(Serialize, Clone, Copy, Type)]
+#[serde(rename_all = "lowercase")]
+pub enum DriveKind {
+    Nvme,
+    Ssd,
+    Hdd,
+    Usb,
+    Sd,
+    Emmc,
+    Optical,
+    Loop,
+    Zram,
+    Mapper,
+    Encrypted,
+    Raid,
+    Virtual,
+}
+
 #[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct DriveInfo {
     pub id: String,
     name: String,
     model: Option<String>,
-    kind: &'static str,
+    kind: DriveKind,
     size: u64,
     removable: bool,
     #[serde(rename = "virtual")]
@@ -37,12 +55,12 @@ pub struct DriveSample {
     write_total: u64,
     temperature: Option<f32>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    space: Option<Space>,
+    space: Option<DriveSpace>,
 }
 
 #[derive(Serialize, Clone, Default, Type)]
 #[serde(rename_all = "camelCase")]
-struct Space {
+struct DriveSpace {
     used: u64,
     size: u64,
     mounts: Vec<String>,
@@ -189,7 +207,12 @@ impl Drive {
         let kind = kind(name, &path, removable || usb);
         let is_virtual = matches!(
             kind,
-            "loop" | "zram" | "mapper" | "encrypted" | "raid" | "virtual"
+            DriveKind::Loop
+                | DriveKind::Zram
+                | DriveKind::Mapper
+                | DriveKind::Encrypted
+                | DriveKind::Raid
+                | DriveKind::Virtual
         );
         let mut devices = HashSet::from([name.to_owned()]);
         for partition in partitions(&path, name) {
@@ -217,8 +240,8 @@ impl Drive {
         })
     }
 
-    fn space(&self, mounts: &HashMap<String, Vec<PathBuf>>) -> Space {
-        let mut space = Space::default();
+    fn space(&self, mounts: &HashMap<String, Vec<PathBuf>>) -> DriveSpace {
+        let mut space = DriveSpace::default();
         for device in &self.devices {
             let Some(points) = mounts.get(device) else {
                 continue;
@@ -261,40 +284,40 @@ fn natural(name: &str) -> (u8, &str, usize) {
     (rank, digits, name[digits.len()..].parse().unwrap_or(0))
 }
 
-fn kind(name: &str, path: &Path, removable: bool) -> &'static str {
+fn kind(name: &str, path: &Path, removable: bool) -> DriveKind {
     let prefixed = |prefix: &str| name.starts_with(prefix);
     if prefixed("loop") {
-        "loop"
+        DriveKind::Loop
     } else if prefixed("zram") {
-        "zram"
+        DriveKind::Zram
     } else if prefixed("dm-") {
         let uuid = read_text(path.join("dm/uuid")).unwrap_or_default();
         if uuid.starts_with("CRYPT-") {
-            "encrypted"
+            DriveKind::Encrypted
         } else {
-            "mapper"
+            DriveKind::Mapper
         }
     } else if prefixed("md") {
-        "raid"
+        DriveKind::Raid
     } else if prefixed("sr") {
-        "optical"
+        DriveKind::Optical
     } else if prefixed("nbd") || prefixed("ram") || prefixed("vd") && !path.join("device").exists()
     {
-        "virtual"
+        DriveKind::Virtual
     } else if prefixed("nvme") {
-        "nvme"
+        DriveKind::Nvme
     } else if prefixed("mmcblk") {
         if read_text(path.join("device/type")).as_deref() == Some("MMC") {
-            "emmc"
+            DriveKind::Emmc
         } else {
-            "sd"
+            DriveKind::Sd
         }
     } else if removable {
-        "usb"
+        DriveKind::Usb
     } else if read_number::<u8>(path.join("queue/rotational")) == Some(1) {
-        "hdd"
+        DriveKind::Hdd
     } else {
-        "ssd"
+        DriveKind::Ssd
     }
 }
 

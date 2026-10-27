@@ -1,4 +1,5 @@
 mod bridge;
+mod events;
 mod gpu;
 mod monitor;
 mod settings;

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { bytes } from '@luft/ui';
-	import type { NetworkInfo, NetworkSample } from '#lib/bridge/types.js';
+	import type { NetworkInfo, NetworkSample } from '#lib/bindings.js';
 	import { networkRate } from '#lib/format.js';
 	import Chart from '#lib/resources/common/Chart.svelte';
 	import Facts from '#lib/resources/common/Facts.svelte';

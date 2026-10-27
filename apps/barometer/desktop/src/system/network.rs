@@ -11,12 +11,23 @@ use super::procfile::{ProcFile, link_name, read_number, read_text, udev_property
 
 const NET: &str = "/sys/class/net";
 
+#[derive(Serialize, Clone, Copy, Type)]
+#[serde(rename_all = "lowercase")]
+pub enum NetworkKind {
+    Wifi,
+    Ethernet,
+    Bridge,
+    Vpn,
+    Mobile,
+    Virtual,
+}
+
 #[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct NetworkInfo {
     pub id: String,
     name: String,
-    kind: &'static str,
+    kind: NetworkKind,
     #[serde(rename = "virtual")]
     is_virtual: bool,
     model: Option<String>,
@@ -34,12 +45,12 @@ pub struct NetworkSample {
     received_total: u64,
     sent_total: u64,
     #[serde(skip_serializing_if = "Option::is_none")]
-    link: Option<Link>,
+    link: Option<NetworkLink>,
 }
 
 #[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
-struct Link {
+struct NetworkLink {
     connected: bool,
     speed: Option<u32>,
     mtu: Option<u32>,
@@ -165,22 +176,22 @@ fn interface_names() -> Vec<String> {
     names
 }
 
-fn kind(name: &str, path: &Path) -> Option<&'static str> {
+fn kind(name: &str, path: &Path) -> Option<NetworkKind> {
     let kind = read_number::<u32>(path.join("type"))?;
     Some(match kind {
         772 => return None,
-        _ if path.join("wireless").exists() || path.join("phy80211").exists() => "wifi",
-        _ if path.join("bridge").exists() => "bridge",
-        _ if path.join("tun_flags").exists() || kind == 65534 => "vpn",
-        _ if name.starts_with("wwan") || kind == 519 => "mobile",
-        _ if !path.join("device").exists() => "virtual",
-        _ => "ethernet",
+        _ if path.join("wireless").exists() || path.join("phy80211").exists() => NetworkKind::Wifi,
+        _ if path.join("bridge").exists() => NetworkKind::Bridge,
+        _ if path.join("tun_flags").exists() || kind == 65534 => NetworkKind::Vpn,
+        _ if name.starts_with("wwan") || kind == 519 => NetworkKind::Mobile,
+        _ if !path.join("device").exists() => NetworkKind::Virtual,
+        _ => NetworkKind::Ethernet,
     })
 }
 
-fn link(name: &str) -> Link {
+fn link(name: &str) -> NetworkLink {
     let path = Path::new(NET).join(name);
-    Link {
+    NetworkLink {
         connected: read_text(path.join("operstate"))
             .is_some_and(|state| state == "up" || state == "unknown")
             && read_number::<u8>(path.join("carrier")) == Some(1),

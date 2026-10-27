@@ -1,7 +1,7 @@
-use luft_app::{Appearance, Commands};
+use luft_app::{Appearance, Commands, Empty};
 use sabine::SabineWindow;
 use serde::Serialize;
-use serde_json::Value;
+use serde_json::{Map, Value};
 use specta::Type;
 
 use crate::monitor::Monitor;
@@ -12,15 +12,15 @@ use crate::tasks::{control, details};
 struct AppState {
     #[serde(flatten)]
     appearance: Appearance,
-    settings: Option<Value>,
+    settings: Option<Map<String, Value>>,
 }
 
 pub fn register(window: SabineWindow, monitor: &Monitor) -> SabineWindow {
-    window
-        .command("sample_system", |_: Value| {
+    crate::events::declare(window)
+        .command("sample_system", |Empty {}| {
             Ok::<_, String>(luft_app::sample_system())
         })
-        .command_async("app_state", |_: Value| async {
+        .command_async("app_state", |Empty {}| async {
             Ok(AppState {
                 appearance: Appearance::current().await,
                 settings: settings::read(),

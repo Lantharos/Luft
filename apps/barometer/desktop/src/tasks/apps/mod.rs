@@ -1,3 +1,4 @@
+use specta::Type;
 mod desktop;
 mod scopes;
 mod windows;
@@ -15,7 +16,7 @@ pub use scopes::{Scopes, members};
 pub use windows::OpenWindows;
 use windows::Windowed;
 
-#[derive(Serialize, Clone, Default)]
+#[derive(Serialize, Clone, Default, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct AppUsage {
     key: String,

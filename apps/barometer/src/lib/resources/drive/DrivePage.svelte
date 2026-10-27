@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { bytes } from '@luft/ui';
-	import type { DriveInfo, DriveSample } from '#lib/bridge/types.js';
+	import type { DriveInfo, DriveSample } from '#lib/bindings.js';
 	import { percent, rate, temperature } from '#lib/format.js';
 	import Chart from '#lib/resources/common/Chart.svelte';
 	import Facts from '#lib/resources/common/Facts.svelte';

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { memoryBytes, watts } from '@luft/ui';
-	import type { GpuInfo, GpuSample } from '#lib/bridge/types.js';
+	import type { GpuInfo, GpuSample } from '#lib/bindings.js';
 	import { frequency, percent, temperature } from '#lib/format.js';
 	import Chart from '#lib/resources/common/Chart.svelte';
 	import Facts from '#lib/resources/common/Facts.svelte';

@@ -1,5 +1,6 @@
+import type { AppUsage, Catalog, Details, Devices, Signal, Tick } from '#lib/bindings.js';
 import { encode } from '../rows';
-import type { AppUsage, Catalog, Details, Devices, Signal, SystemBackend, Tick, View } from '../types';
+import type { SystemBackend, View } from '../types';
 import { advance, apps, createProcesses } from './processes';
 import { devices, tick } from './system';
 

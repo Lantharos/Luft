@@ -1,7 +1,8 @@
 import { appWindow } from '@lantharos/sabine';
 import { appearance } from '@luft/ui';
+import type { Devices } from '#lib/bindings.js';
 import { connect } from '#lib/bridge/index.js';
-import type { Backend, Devices } from '#lib/bridge/types.js';
+import type { Backend } from '#lib/bridge/types.js';
 import { monitor } from './monitor.svelte';
 import { processes } from './processes.svelte';
 import { settings } from './settings.svelte';

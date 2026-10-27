@@ -1,4 +1,4 @@
-import type { Devices, Tick } from '../types';
+import type { Devices, Tick } from '#lib/bindings.js';
 
 const GIB = 1024 ** 3;
 const CORES = 16;

@@ -1,5 +1,5 @@
+import type { AppInfo, ProcessEntry } from '#lib/bindings.js';
 import type { Usage } from '../rows';
-import type { AppInfo, ProcessEntry } from '../types';
 
 const MIB = 1024 ** 2;
 

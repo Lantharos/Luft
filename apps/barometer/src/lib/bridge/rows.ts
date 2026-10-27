@@ -1,4 +1,4 @@
-import type { ProcessEntry } from './types';
+import type { ProcessEntry } from '#lib/bindings.js';
 
 export interface Usage {
 	cpu: number;

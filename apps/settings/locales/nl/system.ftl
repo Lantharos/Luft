@@ -174,7 +174,6 @@ settings-updates-firmware-installing = Installeren…
 settings-updates-firmware-update = Bijwerken
 settings-updates-firmware-failed = De firmware kon niet worden bijgewerkt
 settings-updates-download = Downloaden
-settings-updates-done = Klaar
 settings-updates-released = Uitgebracht: { $when }
 settings-updates-improvements = Oplossingen en verbeteringen in het hele systeem
 settings-updates-download-size = { $size } te downloaden

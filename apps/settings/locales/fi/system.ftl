@@ -174,7 +174,6 @@ settings-updates-firmware-installing = Asennetaan…
 settings-updates-firmware-update = Päivitä
 settings-updates-firmware-failed = Laiteohjelmistoa ei voitu päivittää
 settings-updates-download = Lataa
-settings-updates-done = Valmis
 settings-updates-released = Julkaistu { $when }
 settings-updates-improvements = Korjauksia ja parannuksia koko järjestelmään
 settings-updates-download-size = Ladattavaa { $size }

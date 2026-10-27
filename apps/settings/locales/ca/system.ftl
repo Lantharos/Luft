@@ -174,7 +174,6 @@ settings-updates-firmware-installing = S’està instal·lant…
 settings-updates-firmware-update = Actualitza
 settings-updates-firmware-failed = No s’ha pogut actualitzar el microprogramari
 settings-updates-download = Baixa
-settings-updates-done = Fet
 settings-updates-released = Publicada { $when }
 settings-updates-improvements = Correccions i millores a tot el sistema
 settings-updates-download-size = { $size } per baixar

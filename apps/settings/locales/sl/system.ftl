@@ -180,7 +180,6 @@ settings-updates-firmware-installing = Nameščanje …
 settings-updates-firmware-update = Posodobi
 settings-updates-firmware-failed = Vdelane programske opreme ni bilo mogoče posodobiti
 settings-updates-download = Prenesi
-settings-updates-done = Končano
 settings-updates-released = Izdano { $when }
 settings-updates-improvements = Popravki in izboljšave v celotnem sistemu
 settings-updates-download-size = Za prenos: { $size }

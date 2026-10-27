@@ -174,7 +174,6 @@ settings-updates-firmware-installing = Installation…
 settings-updates-firmware-update = Mettre à jour
 settings-updates-firmware-failed = Impossible de mettre à jour le micrologiciel
 settings-updates-download = Télécharger
-settings-updates-done = Terminé
 settings-updates-released = Publication : { $when }
 settings-updates-improvements = Corrections et améliorations dans tout le système
 settings-updates-download-size = { $size } à télécharger

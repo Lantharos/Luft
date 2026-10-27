@@ -174,7 +174,6 @@ settings-updates-firmware-installing = Се инсталира…
 settings-updates-firmware-update = Ажурирај
 settings-updates-firmware-failed = Фирмверот не може да се ажурира
 settings-updates-download = Преземи
-settings-updates-done = Готово
 settings-updates-released = Објавено { $when }
 settings-updates-improvements = Поправки и подобрувања низ целиот систем
 settings-updates-download-size = { $size } за преземање

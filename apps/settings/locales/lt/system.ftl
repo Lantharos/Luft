@@ -180,7 +180,6 @@ settings-updates-firmware-installing = Diegiama…
 settings-updates-firmware-update = Atnaujinti
 settings-updates-firmware-failed = Nepavyko atnaujinti programinės aparatinės įrangos
 settings-updates-download = Atsisiųsti
-settings-updates-done = Atlikta
 settings-updates-released = Išleista { $when }
 settings-updates-improvements = Pataisymai ir patobulinimai visoje sistemoje
 settings-updates-download-size = Atsisiuntimo dydis: { $size }

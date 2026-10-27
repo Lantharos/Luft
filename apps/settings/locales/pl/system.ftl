@@ -180,7 +180,6 @@ settings-updates-firmware-installing = Instalowanie…
 settings-updates-firmware-update = Zaktualizuj
 settings-updates-firmware-failed = Nie udało się zaktualizować oprogramowania układowego
 settings-updates-download = Pobierz
-settings-updates-done = Gotowe
 settings-updates-released = Wydano { $when }
 settings-updates-improvements = Poprawki i ulepszenia w całym systemie
 settings-updates-download-size = Do pobrania: { $size }

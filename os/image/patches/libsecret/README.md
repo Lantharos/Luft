@@ -10,4 +10,4 @@ The patch is against libsecret 0.21.8.2, the version Fedora 45 ships.
 
 ## Upstream
 
-Upstream libsecret still prefers the file backend over `SECRET_BACKEND` in Flatpak and Snap sandboxes, so Flatpak apps built on Chromium that can reach the Secret Service have the same problem on every desktop ([flathub/com.vscodium.codium#239](https://github.com/flathub/com.vscodium.codium/issues/239)). Flatpak apps bring their own libsecret, which this patch doesn't change.
+Upstream libsecret still prefers the file backend over `SECRET_BACKEND` in Flatpak and Snap sandboxes, so Flatpak apps built on Chromium that can reach the Secret Service have the same problem on every desktop ([flathub/com.vscodium.codium#239](https://github.com/flathub/com.vscodium.codium/issues/239)). Flatpak apps bring their own libsecret, which this patch doesn't change; Luft's [xdg-desktop-portal patch](../xdg-desktop-portal/README.md) keeps them on the Secret Service instead. [UPSTREAM.md](UPSTREAM.md) is the merge request drafted for libsecret.

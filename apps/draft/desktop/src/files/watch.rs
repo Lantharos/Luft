@@ -16,8 +16,8 @@ pub struct Folders {
     paths: Vec<PathBuf>,
 }
 
-#[derive(Serialize)]
-struct Changed {
+#[derive(Serialize, Type)]
+pub struct FilesChanged {
     paths: Vec<String>,
 }
 
@@ -42,7 +42,7 @@ impl Watcher {
                 .into_iter()
                 .map(|path| path.to_string_lossy().into_owned())
                 .collect();
-            events.emit(FILES_CHANGED, Changed { paths });
+            events.emit(FILES_CHANGED, FilesChanged { paths });
         });
         Self(watcher.ok())
     }

@@ -1,6 +1,6 @@
 import type { EditorState, Text } from '@codemirror/state';
 import { basename } from '@luft/ui';
-import type { Stat } from '#lib/bridge/types.js';
+import type { Stat } from '#lib/bindings.js';
 import type { Indentation } from '#lib/editor/indentation.js';
 import type { LineEnding } from './encodings';
 

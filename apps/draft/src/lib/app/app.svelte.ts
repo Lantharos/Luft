@@ -1,7 +1,8 @@
-import { appWindow } from '@lantharos/sabine';
+import { appWindow, events as sabineEvents } from '@lantharos/sabine';
 import { appearance, PaletteState } from '@luft/ui';
 import { tick } from 'svelte';
-import type { Backend } from '#lib/bridge/index.js';
+import { commands, events } from '#lib/bindings.js';
+import { CHOOSER, readStore, takeOpenedFiles } from '#lib/bridge/index.js';
 import { buildCommands, type Command } from '#lib/commands/registry.js';
 import { checkAll, filesChanged, watchedFolders } from '#lib/documents/disk.js';
 import type { Document } from '#lib/documents/document.svelte.js';
@@ -18,7 +19,6 @@ const WATCH_DELAY_MS = 150;
 const DEFAULT_FONT_SIZE = 14;
 
 export class App {
-	readonly backend: Backend;
 	readonly settings = new SettingsStore();
 	readonly palette = new PaletteState();
 	readonly menus = new Menus();
@@ -32,10 +32,9 @@ export class App {
 	#watch: ReturnType<typeof debounce>;
 	#watched = '';
 
-	constructor(backend: Backend) {
-		this.backend = backend;
-		this.workspace = new Workspace(backend, this.settings, () => this.#changed());
-		this.files = new FileIndex(backend);
+	constructor() {
+		this.workspace = new Workspace(this.settings, () => this.#changed());
+		this.files = new FileIndex();
 		this.commands = buildCommands(this);
 		this.#persist = sessionWriter(this.workspace);
 		this.#watch = debounce(() => this.#syncWatches(), WATCH_DELAY_MS);
@@ -43,10 +42,10 @@ export class App {
 
 	async start() {
 		this.#listen();
-		const [state, opened] = await Promise.all([this.backend.appState(), this.backend.takeOpenedFiles(), this.settings.load(this.backend)]);
+		const [state, opened] = await Promise.all([commands.appState(), takeOpenedFiles(), this.settings.load()]);
 		this.workspace.browsing = state.folders.length > 0 || opened.length === 0;
 		this.configured = true;
-		const session = await this.backend.readStore<Session>(sessionName(this.workspace.browsing));
+		const session = await readStore<Session>(sessionName(this.workspace.browsing));
 		appearance.start(state);
 		this.workspace.editor.setWrap(this.settings.value.wrap);
 		this.workspace.home = state.home;
@@ -58,13 +57,13 @@ export class App {
 	}
 
 	#listen() {
-		this.backend.onFilesOpened(async () => this.openPaths(await this.backend.takeOpenedFiles()));
-		this.backend.onFilesChanged((paths) => {
+		sabineEvents.openUrlsAvailable(async () => this.openPaths(await takeOpenedFiles()));
+		events.draftFiles(({ paths }) => {
 			this.files.invalidate();
 			void filesChanged(this.workspace, paths);
 		});
-		this.backend.onActivation(async (activation) => {
-			const [folder] = await this.backend.activationFolders(activation);
+		sabineEvents.singleInstance(async (activation) => {
+			const [folder] = await commands.activationFolders(activation);
 			if (folder) await this.workspace.showFolder(folder);
 		});
 	}
@@ -79,7 +78,7 @@ export class App {
 		const key = folders.join('\n');
 		if (key === this.#watched) return;
 		this.#watched = key;
-		void this.backend.watch(folders);
+		void commands.watch({ paths: folders });
 	}
 
 	async openPaths(paths: string[]) {
@@ -90,7 +89,7 @@ export class App {
 	}
 
 	async openDropped(paths: string[]) {
-		const stats = await Promise.all(paths.map((path) => this.backend.stat(path)));
+		const stats = await Promise.all(paths.map((path) => commands.fileStat({ path })));
 		const folder = paths.find((_, index) => !stats[index]);
 		if (folder) await this.workspace.showFolder(folder);
 		await this.openPaths(paths.filter((_, index) => stats[index]));
@@ -102,11 +101,11 @@ export class App {
 
 	async openFiles() {
 		const folder = this.workspace.tree.root ?? this.workspace.home;
-		await this.openPaths(await this.backend.chooseFiles(folder).catch(() => []));
+		await this.openPaths(await commands.chooseFiles({ folder }, CHOOSER).catch(() => []));
 	}
 
 	async openFolder() {
-		const folder = await this.backend.chooseFolder(this.workspace.tree.root ?? this.workspace.home).catch(() => null);
+		const folder = await commands.chooseFolder({ folder: this.workspace.tree.root ?? this.workspace.home }, CHOOSER).catch(() => null);
 		if (folder) await this.workspace.showFolder(folder);
 	}
 

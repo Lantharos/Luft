@@ -1,16 +1,16 @@
-use luft_app::Commands;
+use luft_app::{Commands, Empty};
 use sabine::SabineWindow;
-use serde_json::Value;
 
 use crate::desktop;
+use crate::events;
 use crate::files::{self, encoding, index, listing};
 use crate::launch;
 use crate::state::{self, DraftState};
 use crate::store;
 
 pub fn register(window: SabineWindow, state: &DraftState) -> SabineWindow {
-    window
-        .command_async("app_state", |_: Value| state::app_state())
+    events::declare(window)
+        .command_async("app_state", |Empty {}| state::app_state())
         .command("activation_folders", launch::activation_folders)
         .command("store_read", store::read)
         .command("store_write", store::write)

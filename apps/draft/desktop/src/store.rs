@@ -7,7 +7,7 @@ use specta::Type;
 
 #[derive(Deserialize, Clone, Copy, Type)]
 #[serde(rename_all = "lowercase")]
-pub enum Name {
+pub enum StoreName {
     Settings,
     Session,
     Files,
@@ -15,12 +15,12 @@ pub enum Name {
 
 #[derive(Deserialize, Type)]
 pub struct Read {
-    name: Name,
+    name: StoreName,
 }
 
 #[derive(Deserialize, Type)]
 pub struct Write {
-    name: Name,
+    name: StoreName,
     value: Value,
 }
 
@@ -33,11 +33,11 @@ fn failed(error: impl std::fmt::Display) -> String {
     error.to_string()
 }
 
-fn file(name: Name) -> &'static str {
+fn file(name: StoreName) -> &'static str {
     match name {
-        Name::Settings => "draft/settings.json",
-        Name::Session => "draft/session.json",
-        Name::Files => "draft/files-session.json",
+        StoreName::Settings => "draft/settings.json",
+        StoreName::Session => "draft/session.json",
+        StoreName::Files => "draft/files-session.json",
     }
 }
 

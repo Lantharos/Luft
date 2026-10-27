@@ -1,11 +1,12 @@
 import type { App } from '#lib/app/app.svelte.js';
+import { showInFolder } from '#lib/bridge/index.js';
 import type { Document } from '#lib/documents/document.svelte.js';
 import { openPath } from '#lib/documents/opening.js';
 import type { MenuEntry } from '#lib/app/menus.svelte.js';
 
-function pathEntries(app: App, path: string): MenuEntry[] {
+function pathEntries(path: string): MenuEntry[] {
 	return [
-		{ label: 'Show in Rover', run: () => void app.backend.showInFolder(path) },
+		{ label: 'Show in Rover', run: () => void showInFolder(path) },
 		{ label: 'Copy Path', run: () => void navigator.clipboard.writeText(path) }
 	];
 }
@@ -17,11 +18,11 @@ export function documentMenu(app: App, document: Document): MenuEntry[][] {
 			{ label: 'Close', run: () => void workspace.close(document) },
 			...(workspace.documents.length > 1 ? [{ label: 'Close Others', run: () => void workspace.closeOthers(document) }] : [])
 		],
-		document.path ? [...(workspace.tree.root ? [{ label: 'Reveal in Sidebar', run: () => void app.reveal(document) }] : []), ...pathEntries(app, document.path)] : []
+		document.path ? [...(workspace.tree.root ? [{ label: 'Reveal in Sidebar', run: () => void app.reveal(document) }] : []), ...pathEntries(document.path)] : []
 	];
 }
 
 export function entryMenu(app: App, path: string, folder: boolean): MenuEntry[][] {
 	const open = folder ? { label: 'Open as Folder', run: () => void app.workspace.showFolder(path) } : { label: 'Open', run: () => void openPath(app.workspace, path) };
-	return [[open], pathEntries(app, path)];
+	return [[open], pathEntries(path)];
 }

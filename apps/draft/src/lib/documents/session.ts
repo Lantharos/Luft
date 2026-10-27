@@ -1,3 +1,4 @@
+import { writeStore } from '#lib/bridge/index.js';
 import type { Cursor } from '#lib/editor/editor.js';
 import { debounce } from '#lib/utils/debounce.js';
 import { openPath, restoreUntitled, type OpenOptions } from './opening';
@@ -41,7 +42,7 @@ export function sessionName(browsing: boolean) {
 }
 
 export function writeSession(workspace: Workspace) {
-	return workspace.backend.writeStore(sessionName(workspace.browsing), snapshot(workspace));
+	return writeStore(sessionName(workspace.browsing), snapshot(workspace));
 }
 
 export function sessionWriter(workspace: Workspace) {

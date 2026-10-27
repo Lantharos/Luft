@@ -1,4 +1,6 @@
 import { Text } from '@codemirror/state';
+import { commands } from '#lib/bindings.js';
+import { readFile } from '#lib/bridge/index.js';
 import type { Cursor } from '#lib/editor/editor.js';
 import { detectIndentation } from '#lib/editor/indentation.js';
 import { detectLanguage } from '#lib/editor/languages.js';
@@ -48,8 +50,8 @@ function describe(decoded: DecodedText, document: Document) {
 
 async function readDocument(workspace: Workspace, path: string, options: OpenOptions) {
 	const document = new Document(path, options.id);
-	const [bytes, stat] = await Promise.all([workspace.backend.read(path), workspace.backend.stat(path)]);
-	const decoded = await decode(bytes, path, workspace.backend);
+	const [bytes, stat] = await Promise.all([readFile(path), commands.fileStat({ path })]);
+	const decoded = await decode(bytes, path);
 	describe(decoded, document);
 	document.stat = stat;
 	const backup = options.backup ? await readBackup(workspace, options.backup) : null;
@@ -65,7 +67,7 @@ async function readDocument(workspace: Workspace, path: string, options: OpenOpt
 
 async function readBackup(workspace: Workspace, name: string) {
 	try {
-		return new TextDecoder().decode(await workspace.backend.read(workspace.backups.path(name)));
+		return new TextDecoder().decode(await readFile(workspace.backups.path(name)));
 	} catch {
 		return null;
 	}
@@ -109,8 +111,8 @@ export async function restoreUntitled(workspace: Workspace, backup: string, opti
 export async function reload(workspace: Workspace, document: Document, encoding?: string) {
 	if (!document.path) return;
 	try {
-		const [bytes, stat] = await Promise.all([workspace.backend.read(document.path), workspace.backend.stat(document.path)]);
-		const decoded = await decode(bytes, document.path, workspace.backend, encoding);
+		const [bytes, stat] = await Promise.all([readFile(document.path), commands.fileStat({ path: document.path })]);
+		const decoded = await decode(bytes, document.path, encoding);
 		describe(decoded, document);
 		document.stat = stat;
 		document.markSaved(workspace.editor.replaceText(document, decoded.text));

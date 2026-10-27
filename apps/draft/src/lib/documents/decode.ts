@@ -1,4 +1,4 @@
-import type { Backend } from '#lib/bridge/index.js';
+import { commands } from '#lib/bindings.js';
 import type { LineEnding } from './encodings';
 
 const SNIFF_BYTES = 8000;
@@ -32,13 +32,13 @@ function strictUtf8(bytes: Uint8Array) {
 	}
 }
 
-export async function decode(bytes: Uint8Array, path: string, backend: Backend, forced?: string): Promise<DecodedText> {
+export async function decode(bytes: Uint8Array, path: string, forced?: string): Promise<DecodedText> {
 	const marked = byteOrderMark(bytes);
 	const encoding = forced ?? marked;
 	if (!encoding?.startsWith('utf-16') && bytes.subarray(0, SNIFF_BYTES).includes(0)) throw new Error('This file doesn’t contain text');
 	const text = encoding ? new TextDecoder(encoding).decode(bytes) : strictUtf8(bytes);
 	if (text !== null) return { text, encoding: encoding ?? 'utf-8', bom: marked !== null && marked === encoding, lineEnding: lineEnding(text) };
-	const detected = await backend.detectEncoding(path);
+	const detected = await commands.fileEncoding({ path });
 	const decoded = new TextDecoder(detected).decode(bytes);
 	return { text: decoded, encoding: detected, bom: false, lineEnding: lineEnding(decoded) };
 }

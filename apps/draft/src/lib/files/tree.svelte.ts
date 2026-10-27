@@ -1,7 +1,7 @@
 import { isInside, parent } from '@luft/ui';
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
-import type { Backend } from '#lib/bridge/index.js';
-import type { Entry } from '#lib/bridge/types.js';
+import { commands } from '#lib/bindings.js';
+import type { Entry } from '#lib/bindings.js';
 
 export interface TreeRow {
 	entry: Entry;
@@ -13,7 +13,6 @@ export class FolderTree {
 	root = $state<string | null>(null);
 	expanded = new SvelteSet<string>();
 	#listings = new SvelteMap<string, Entry[]>();
-	#backend: Backend;
 	#onchange: () => void;
 
 	rows = $derived.by(() => {
@@ -29,8 +28,7 @@ export class FolderTree {
 		return rows;
 	});
 
-	constructor(backend: Backend, onchange: () => void) {
-		this.#backend = backend;
+	constructor(onchange: () => void) {
 		this.#onchange = onchange;
 	}
 
@@ -87,7 +85,7 @@ export class FolderTree {
 	}
 
 	async #load(folder: string) {
-		const entries = await this.#backend.list(folder).catch(() => null);
+		const entries = await commands.dirList({ path: folder }).catch(() => null);
 		if (entries) this.#listings.set(folder, entries);
 		else {
 			this.#listings.delete(folder);

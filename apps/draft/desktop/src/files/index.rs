@@ -12,12 +12,12 @@ use super::Target;
 const LIMIT: usize = 200_000;
 
 #[derive(Serialize, Type)]
-pub struct Index {
+pub struct FileIndex {
     files: Vec<String>,
     truncated: bool,
 }
 
-pub fn files(Target { path }: Target) -> Result<Index, String> {
+pub fn files(Target { path }: Target) -> Result<FileIndex, String> {
     let root = Path::new(&path);
     let files = Arc::new(Mutex::new(Vec::new()));
     let count = Arc::new(AtomicUsize::new(0));
@@ -45,7 +45,7 @@ pub fn files(Target { path }: Target) -> Result<Index, String> {
             })
         });
     let files = std::mem::take(&mut *files.lock());
-    Ok(Index {
+    Ok(FileIndex {
         truncated: count.load(Ordering::Relaxed) > LIMIT,
         files,
     })

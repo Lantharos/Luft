@@ -2,7 +2,6 @@ import { errorText } from '@luft/ui';
 import { countColumn } from '@codemirror/state';
 import type { ViewUpdate } from '@codemirror/view';
 import { tick } from 'svelte';
-import type { Backend } from '#lib/bridge/index.js';
 import { Editor } from '#lib/editor/editor.js';
 import { FolderTree } from '#lib/files/tree.svelte.js';
 import type { SettingsStore } from '#lib/app/settings.svelte.js';
@@ -24,7 +23,6 @@ export interface CloseRequest {
 const START_CURSOR: CursorStatus = { line: 1, column: 1, selections: 1, selected: 0 };
 
 export class Workspace {
-	readonly backend: Backend;
 	readonly settings: SettingsStore;
 	readonly editor: Editor;
 	readonly tree: FolderTree;
@@ -39,12 +37,11 @@ export class Workspace {
 	home = '';
 	#onchange: () => void;
 
-	constructor(backend: Backend, settings: SettingsStore, onchange: () => void) {
-		this.backend = backend;
+	constructor(settings: SettingsStore, onchange: () => void) {
 		this.settings = settings;
 		this.#onchange = onchange;
 		this.editor = new Editor(settings.value.wrap, (document, update) => this.#updated(document, update));
-		this.tree = new FolderTree(backend, onchange);
+		this.tree = new FolderTree(onchange);
 		this.backups = new Backups(this);
 	}
 

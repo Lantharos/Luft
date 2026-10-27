@@ -3,6 +3,7 @@
 	import { SvelteSet } from 'svelte/reactivity';
 	import { highlight } from '@luft/ui/code';
 	import { useApp } from '#lib/app/context.js';
+	import { openLink } from '#lib/bridge/index.js';
 	import { openPath } from '#lib/documents/opening.js';
 
 	const app = useApp();
@@ -75,7 +76,7 @@
 		const href = anchor?.getAttribute('href');
 		if (!href) return;
 		event.preventDefault();
-		if (WEB_LINK.test(href)) return void app.backend.openLink(href);
+		if (WEB_LINK.test(href)) return void openLink(href);
 		if (href.startsWith('#')) return;
 		const path = workspace.active?.path;
 		if (path) void openPath(workspace, href.startsWith('/') ? href : join(parent(path), decodeURI(href.split('#')[0])));

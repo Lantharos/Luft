@@ -13,7 +13,7 @@
 <div class="disk-bar" role="status">
 	{#if document.disk === 'changed'}
 		<span class="flex-1 truncate">This file changed on disk while you were editing it.</span>
-		<button type="button" class="plain-button" onclick={() => void keepMine(app.workspace, document)}>Keep mine</button>
+		<button type="button" class="plain-button" onclick={() => void keepMine(document)}>Keep mine</button>
 		<button type="button" class="button" onclick={() => void reload(app.workspace, document)}>Reload</button>
 	{:else}
 		<span class="flex-1 truncate">This file was deleted or moved.</span>

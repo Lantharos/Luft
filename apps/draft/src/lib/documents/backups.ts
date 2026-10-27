@@ -1,4 +1,6 @@
 import { join } from '@luft/ui';
+import { commands } from '#lib/bindings.js';
+import { writeFile } from '#lib/bridge/index.js';
 import { textChunks } from './chunks';
 import type { Document } from './document.svelte';
 import type { Workspace } from './workspace.svelte';
@@ -39,7 +41,7 @@ export class Backups {
 		if (!document.backup) return;
 		const name = document.backup;
 		document.backup = null;
-		await this.#workspace.backend.removeBackup(name).catch(() => {});
+		await commands.backupRemove({ name }).catch(() => {});
 		this.#workspace.changed();
 	}
 
@@ -52,7 +54,7 @@ export class Backups {
 		if (!document.dirty || !this.preserves(document) || !this.#workspace.documents.includes(document)) return this.remove(document);
 		const name = `${document.id}.txt`;
 		const text = this.#workspace.editor.state(document).doc;
-		await this.#workspace.backend.write(textChunks(text, '\n'), { path: this.path(name), encoding: 'utf-8', bom: false });
+		await writeFile(textChunks(text, '\n'), { path: this.path(name), encoding: 'utf-8', bom: false });
 		if (document.backup !== name) {
 			document.backup = name;
 			this.#workspace.changed();

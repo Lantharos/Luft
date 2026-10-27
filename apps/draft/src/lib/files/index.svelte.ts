@@ -1,4 +1,4 @@
-import type { Backend } from '#lib/bridge/index.js';
+import { commands } from '#lib/bindings.js';
 
 export interface IndexedFile {
 	path: string;
@@ -11,12 +11,6 @@ export class FileIndex {
 	files = $state.raw<IndexedFile[]>([]);
 	#root: string | null = null;
 	#stale = true;
-	#backend: Backend;
-
-	constructor(backend: Backend) {
-		this.#backend = backend;
-	}
-
 	invalidate() {
 		this.#stale = true;
 	}
@@ -29,7 +23,7 @@ export class FileIndex {
 		}
 		if (!root || !this.#stale) return;
 		this.#stale = false;
-		const { files } = await this.#backend.index(root);
+		const { files } = await commands.dirFiles({ path: root }, { timeoutMs: 5 * 60 * 1000 });
 		if (root !== this.#root) return;
 		this.files = files.map((relative) => ({
 			path: `${root}/${relative}`,

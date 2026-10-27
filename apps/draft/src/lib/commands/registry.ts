@@ -2,6 +2,7 @@ import { selectSelectionMatches } from '@codemirror/search';
 import { addCursorAbove, addCursorBelow, toggleComment } from '@codemirror/commands';
 import type { EditorView } from '@codemirror/view';
 import type { App } from '#lib/app/app.svelte.js';
+import { showInFolder } from '#lib/bridge/index.js';
 import { reload } from '#lib/documents/opening.js';
 import { save, saveAll, saveAs } from '#lib/documents/saving.js';
 import { openSearch } from '#lib/editor/search/panel.js';
@@ -76,7 +77,7 @@ export function buildCommands(app: App): Command[] {
 		{ id: 'settings.indentation', title: 'Change Default Indentation…', run: () => palette.show(defaultIndentationPicker(app)) },
 		{ id: 'document.lineEndings', title: 'Change Line Endings…', available: hasDocument, run: pick(lineEndingPicker) },
 		{ id: 'file.reveal', title: 'Reveal in Sidebar', available: () => Boolean(active()?.path && workspace.tree.root), run: () => app.reveal(active()!) },
-		{ id: 'file.showInFolder', title: 'Show in Rover', available: () => Boolean(active()?.path), run: () => void app.backend.showInFolder(active()!.path!) },
+		{ id: 'file.showInFolder', title: 'Show in Rover', available: () => Boolean(active()?.path), run: () => void showInFolder(active()!.path!) },
 		{ id: 'file.copyPath', title: 'Copy Path', available: () => Boolean(active()?.path), run: () => void navigator.clipboard.writeText(active()!.path!) }
 	];
 }

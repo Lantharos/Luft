@@ -1,4 +1,5 @@
 import { parent } from '@luft/ui';
+import { commands } from '#lib/bindings.js';
 import type { Document } from './document.svelte';
 import { reload } from './opening';
 import type { Workspace } from './workspace.svelte';
@@ -11,7 +12,7 @@ export function watchedFolders(workspace: Workspace) {
 
 async function check(workspace: Workspace, document: Document) {
 	if (!document.path || document.saving) return;
-	const stat = await workspace.backend.stat(document.path);
+	const stat = await commands.fileStat({ path: document.path });
 	if (!stat) {
 		document.disk = 'deleted';
 		return;
@@ -36,7 +37,7 @@ export function checkAll(workspace: Workspace) {
 	return Promise.all(workspace.documents.map((document) => check(workspace, document)));
 }
 
-export async function keepMine(workspace: Workspace, document: Document) {
-	document.stat = document.path ? await workspace.backend.stat(document.path) : null;
+export async function keepMine(document: Document) {
+	document.stat = document.path ? await commands.fileStat({ path: document.path }) : null;
 	document.disk = 'current';
 }

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { TextField } from '@luft/ui';
-	import * as api from '#lib/bridge/index.js';
-	import type { Identity } from '#lib/bridge/index.js';
+	import { commands } from '#lib/bindings.js';
+	import type { Identity } from '#lib/bindings.js';
 	import { signatureHtml } from '#lib/compose/html.js';
 	import { mail } from '#lib/mail/mail.svelte.js';
 	import { toasts } from '#lib/shell/toasts.svelte.js';
@@ -30,7 +30,7 @@
 		if (!valid || saving) return;
 		saving = true;
 		try {
-			await api.saveIdentity({ ...identity, name: name.trim(), address: address.trim().toLowerCase(), replyTo: replyTo.trim(), signature, preferred });
+			await commands.saveIdentity({ identity: { ...identity, name: name.trim(), address: address.trim().toLowerCase(), replyTo: replyTo.trim(), signature, preferred } });
 			await mail.reloadIdentities();
 			onclose();
 		} catch (error) {
@@ -41,7 +41,7 @@
 	}
 
 	async function remove() {
-		await api.removeIdentity(identity.id).catch(toasts.fail);
+		await commands.removeIdentity({ id: identity.id }).catch(toasts.fail);
 		await mail.reloadIdentities();
 		onclose();
 	}

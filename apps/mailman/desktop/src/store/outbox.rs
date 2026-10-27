@@ -1,7 +1,7 @@
 use rusqlite::{OptionalExtension, Row, params};
-use serde_json::Value;
 
 use super::{Store, now};
+use crate::mail::compose::Draft;
 
 const RETRY_SECONDS: i64 = 60;
 
@@ -36,15 +36,16 @@ impl Store {
     pub fn queue_outgoing(
         &self,
         outgoing: &Outgoing,
-        draft: &Value,
+        draft: &Draft,
         send_at: i64,
     ) -> Result<i64, String> {
         let recipients =
             serde_json::to_string(&outgoing.recipients).map_err(|error| error.to_string())?;
+        let draft = serde_json::to_string(draft).map_err(|error| error.to_string())?;
         self.writing(|connection| {
             connection.execute(
                 "INSERT INTO outbox (account, raw, sender, recipients, draft, send_at, remind_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
-                params![outgoing.account, outgoing.raw, outgoing.sender, recipients, draft.to_string(), send_at, outgoing.remind_at],
+                params![outgoing.account, outgoing.raw, outgoing.sender, recipients, draft, send_at, outgoing.remind_at],
             )?;
             Ok(connection.last_insert_rowid())
         })
@@ -65,7 +66,7 @@ impl Store {
         })
     }
 
-    pub fn cancel_outgoing(&self, id: i64) -> Result<Option<Value>, String> {
+    pub fn cancel_outgoing(&self, id: i64) -> Result<Option<Draft>, String> {
         self.writing(|connection| {
             connection
                 .query_row(

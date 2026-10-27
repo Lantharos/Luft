@@ -1,9 +1,10 @@
 use mail_parser::Message;
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use super::envelope::Address;
 
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum Category {
     #[default]
@@ -20,6 +21,15 @@ impl Category {
             Category::Newsletter => "newsletter",
             Category::Receipt => "receipt",
             Category::Notification => "notification",
+        }
+    }
+
+    pub fn parse(category: &str) -> Self {
+        match category {
+            "newsletter" => Category::Newsletter,
+            "receipt" => Category::Receipt,
+            "notification" => Category::Notification,
+            _ => Category::Primary,
         }
     }
 }

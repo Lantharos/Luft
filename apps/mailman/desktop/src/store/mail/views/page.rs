@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 use specta::Type;
 
 use super::{FROM, Filter, RECENCY, Scope, View, counts, filter};
+use crate::mail::classify::Category;
 use crate::store::{Settings, Store};
 
 const AFTER: &str = "(m.date < :date OR (m.date = :date AND m.thread < :thread))";
@@ -48,7 +49,7 @@ pub struct ThreadRow {
     pub flagged: bool,
     pub attachments: bool,
     pub draft: bool,
-    pub category: String,
+    pub category: Category,
     pub unsubscribe: bool,
     pub snoozed_until: Option<i64>,
 }
@@ -64,6 +65,7 @@ fn thread_row(row: &Row) -> rusqlite::Result<Option<ThreadRow>> {
     let Some(date) = row.get::<_, Option<i64>>(1)? else {
         return Ok(None);
     };
+    let category: String = row.get(13)?;
     let unsubscribe: Option<String> = row.get(14)?;
     Ok(Some(ThreadRow {
         thread: row.get(0)?,
@@ -79,7 +81,7 @@ fn thread_row(row: &Row) -> rusqlite::Result<Option<ThreadRow>> {
         flagged: row.get(10)?,
         attachments: row.get(11)?,
         draft: row.get(12)?,
-        category: row.get(13)?,
+        category: Category::parse(&category),
         unsubscribe: unsubscribe.is_some(),
         participants: row.get::<_, Option<String>>(15)?.unwrap_or_default(),
         snoozed_until: row.get(16)?,

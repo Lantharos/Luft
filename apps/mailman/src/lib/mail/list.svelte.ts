@@ -1,6 +1,6 @@
 import { SvelteSet } from 'svelte/reactivity';
-import * as api from '#lib/bridge/index.js';
-import type { ThreadRow } from '#lib/bridge/index.js';
+import { commands } from '#lib/bindings.js';
+import type { ThreadRow } from '#lib/bindings.js';
 import { mail } from './mail.svelte';
 import { BUNDLES } from './views';
 
@@ -64,7 +64,7 @@ class ThreadList {
 		const generation = ++this.generation;
 		this.loading = true;
 		const limit = Math.min(MAX_RELOAD, Math.max(PAGE, this.rows.length));
-		const [page, summaries] = await Promise.all([api.threads(this.view, this.query || null, null, limit), this.loadSummaries()]);
+		const [page, summaries] = await Promise.all([commands.threads({ view: this.view, query: this.query || null, after: null, limit }), this.loadSummaries()]);
 		if (generation !== this.generation) return;
 		const last = page.rows.at(-1);
 		const fresh = new Set(page.rows.map((row) => row.thread));
@@ -81,7 +81,7 @@ class ThreadList {
 		if (this.fetchingMore || this.exhausted || !last) return;
 		this.fetchingMore = true;
 		const generation = this.generation;
-		const page = await api.threads(this.view, this.query || null, { date: last.date, thread: last.thread }, PAGE).finally(() => (this.fetchingMore = false));
+		const page = await commands.threads({ view: this.view, query: this.query || null, after: { date: last.date, thread: last.thread }, limit: PAGE }).finally(() => (this.fetchingMore = false));
 		if (generation !== this.generation) return;
 		const known = new Set(this.rows.map((row) => row.thread));
 		this.rows = [...this.rows, ...page.rows.filter((row) => !known.has(row.thread))];
@@ -93,14 +93,14 @@ class ThreadList {
 		const summaries: Summary[] = [];
 		const counts = mail.counts;
 		if (mail.settings.screener && counts.screener > 0) {
-			const page = await api.threads('screener', null, null, 4);
+			const page = await commands.threads({ view: 'screener', query: null, after: null, limit: 4 });
 			summaries.push({ view: 'screener', label: 'New senders', count: counts.screener, names: names(page.rows) });
 		}
 		if (!mail.settings.bundles) return summaries;
 		for (const bundle of BUNDLES) {
 			const count = bundle.count?.(counts) ?? 0;
 			if (!count) continue;
-			const page = await api.threads(bundle.id, null, null, 6);
+			const page = await commands.threads({ view: bundle.id, query: null, after: null, limit: 6 });
 			summaries.push({ view: bundle.id, label: bundle.label, count, names: names(page.rows.filter((row) => row.unread > 0)) });
 		}
 		return summaries;

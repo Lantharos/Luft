@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { Avatar, errorText, longDateTime } from '@luft/ui';
 	import Reply from '@lucide/svelte/icons/reply';
-	import * as api from '#lib/bridge/index.js';
-	import type { OpenedFile } from '#lib/bridge/index.js';
+	import { commands } from '#lib/bindings.js';
+	import type { OpenedFile } from '#lib/bindings.js';
 	import { composer } from '#lib/compose/composer.svelte.js';
 	import { mail } from '#lib/mail/mail.svelte.js';
 	import Attachments from './Attachments.svelte';
@@ -22,8 +22,8 @@
 	$effect(() => {
 		opened = null;
 		failure = '';
-		void api
-			.openMessageFile(path)
+		void commands
+			.openMessageFile({ path })
 			.then((file) => (opened = file))
 			.catch((error: unknown) => (failure = errorText(error)));
 	});

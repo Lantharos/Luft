@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { events as sabineEvents } from '@lantharos/sabine';
 	import { appearance, basename, CommandPalette, GlassShell, PaletteState, plural, Toast, tooltip } from '@luft/ui';
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
+	import { commands, events } from '#lib/bindings.js';
 	import * as api from '#lib/bridge/index.js';
-	import { commands, paletteSource, type Shell } from '#lib/app/commands.js';
+	import { paletteSource, shellCommands, type Shell } from '#lib/app/commands.js';
 	import { handleKeydown } from '#lib/app/keyboard.js';
 	import { opened } from '#lib/app/launch.svelte.js';
 	import { followSidebarRegions, layout } from '#lib/app/layout.svelte.js';
@@ -69,23 +71,23 @@
 
 	onMount(() => {
 		const stops = [
-			api.events.changed(scheduleRefresh),
-			api.events.status(mail.receiveStatus),
-			api.events.body(reader.receive),
-			api.events.images(remoteImages.receive),
-			api.events.identities(() => void mail.reloadSenders()),
-			api.events.open(() => void takeOpening()),
-			api.events.outbox(({ error }) => {
+			events.mailmanChanged(scheduleRefresh),
+			events.mailmanStatus(mail.receiveStatus),
+			events.mailmanBody(reader.receive),
+			events.mailmanImages(remoteImages.receive),
+			events.mailmanIdentities(() => void mail.reloadSenders()),
+			events.mailmanOpen(() => void takeOpening()),
+			events.mailmanOutbox(({ error }) => {
 				if (error) toasts.show(`Couldn't send: ${error}. Mailman will try again.`, { failed: true });
 			}),
-			api.events.launched(() => void api.takeLaunches().then((launches) => opened.handle(launches, false)))
+			sabineEvents.openUrlsAvailable(() => void api.takeLaunches().then((launches) => opened.handle(launches, false)))
 		];
 		void start();
 		return () => stops.forEach((stop) => stop());
 	});
 
 	async function start() {
-		const state = await api.appState();
+		const state = await commands.appState();
 		appearance.start(state);
 		mail.start(state);
 		opened.handle(await api.takeLaunches(), true);
@@ -94,7 +96,7 @@
 	}
 
 	async function takeOpening() {
-		const opening = await api.takeOpening();
+		const opening = await commands.takeOpening();
 		if (!opening) return;
 		opened.close();
 		if (opening.thread === null) return navigate('inbox');
@@ -131,7 +133,7 @@
 		const paths = await Promise.all(wanted.map((file) => api.stashFile(file))).catch(toasts.fail);
 		if (!paths?.length) return;
 		if (!composer.current) return void (opened.file = paths[0]);
-		const attached = await api.describeFiles(paths).catch(toasts.fail);
+		const attached = await commands.describeFiles({ paths }).catch(toasts.fail);
 		if (attached && composer.current) composer.current.attachments = [...composer.current.attachments, ...attached.map((file) => ({ ...file, cid: null }))];
 	}
 
@@ -142,9 +144,9 @@
 
 <svelte:window
 	bind:innerWidth={layout.width}
-	onkeydown={(event) => palette.open || handleKeydown(event, { commands: () => commands(shell), palette: showPalette })}
-	onfocus={() => void api.setFocused(true)}
-	onblur={() => void api.setFocused(false)}
+	onkeydown={(event) => palette.open || handleKeydown(event, { commands: () => shellCommands(shell), palette: showPalette })}
+	onfocus={() => void commands.setFocused({ focused: true })}
+	onblur={() => void commands.setFocused({ focused: false })}
 	ondragover={dragOver}
 	ondrop={drop}
 />
@@ -225,5 +227,5 @@
 	<AddAccount onclose={() => (adding = false)} />
 {/if}
 {#if shortcuts}
-	<Shortcuts commands={commands(shell)} onclose={() => (shortcuts = false)} />
+	<Shortcuts commands={shellCommands(shell)} onclose={() => (shortcuts = false)} />
 {/if}

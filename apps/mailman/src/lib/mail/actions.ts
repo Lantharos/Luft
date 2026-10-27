@@ -1,6 +1,7 @@
 import { ago } from '@luft/ui';
+import { commands } from '#lib/bindings.js';
+import type { Action } from '#lib/bindings.js';
 import * as api from '#lib/bridge/index.js';
-import type { Action } from '#lib/bridge/index.js';
 import { reader } from '#lib/reader/reader.svelte.js';
 import { toasts } from '#lib/shell/toasts.svelte.js';
 import { list } from './list.svelte';
@@ -30,12 +31,12 @@ function leave(threads: number[]) {
 
 async function undoable(action: Action, threads: number[], message: string) {
 	try {
-		const undo = await api.act(action, { threads });
+		const undo = await commands.act({ ...action, threads });
 		toasts.show(message, {
 			action: undo.moves.length
 				? { label: 'Undo', run: () => void restore(undo.moves) }
 				: action.action === 'snooze'
-					? { label: 'Undo', run: () => void api.act({ action: 'unsnooze' }, { threads }).then(refreshAll) }
+					? { label: 'Undo', run: () => void commands.act({ action: 'unsnooze', threads }).then(refreshAll) }
 					: undefined
 		});
 	} catch (error) {
@@ -45,7 +46,7 @@ async function undoable(action: Action, threads: number[], message: string) {
 }
 
 async function restore(moves: { id: number; mailbox: number }[]) {
-	await api.act({ action: 'restore', moves }, { ids: moves.map((move) => move.id) });
+	await commands.act({ action: 'restore', moves, ids: moves.map((move) => move.id) });
 	await refreshAll();
 }
 
@@ -75,7 +76,7 @@ export function snooze(at: number, threads: number[]) {
 
 export async function wake(threads: number[]) {
 	if (list.view === 'later') leave(threads);
-	await api.act({ action: 'unsnooze' }, { threads }).catch(toasts.fail);
+	await commands.act({ action: 'unsnooze', threads }).catch(toasts.fail);
 	await refreshAll();
 }
 
@@ -84,7 +85,7 @@ export async function setRead(threads: number[], read: boolean) {
 		const row = list.rows.find((candidate) => candidate.thread === thread);
 		list.update(thread, { unread: read ? 0 : Math.max(1, row?.count ?? 1) });
 	}
-	await api.act({ action: read ? 'read' : 'unread' }, { threads }).catch(toasts.fail);
+	await commands.act({ action: read ? 'read' : 'unread', threads }).catch(toasts.fail);
 	void mail.refresh();
 	if (reader.thread !== null && threads.includes(reader.thread)) void reader.refresh();
 }
@@ -92,16 +93,16 @@ export async function setRead(threads: number[], read: boolean) {
 export async function setStar(threads: number[], starred: boolean) {
 	for (const thread of threads) list.update(thread, { flagged: starred });
 	if (!starred && list.view === 'starred') leave(threads);
-	await api.act({ action: starred ? 'star' : 'unstar' }, { threads }).catch(toasts.fail);
+	await commands.act({ action: starred ? 'star' : 'unstar', threads }).catch(toasts.fail);
 	if (reader.thread !== null && threads.includes(reader.thread)) void reader.refresh();
 }
 
 export async function screen(address: string, verdict: 'approved' | 'denied', threads: number[]) {
 	if (list.view === 'screener' || list.view === 'screened') leave(threads);
-	const previous = await api.screen(address, verdict).catch(toasts.fail);
+	const previous = await commands.screen({ address, verdict }).catch(toasts.fail);
 	if (previous)
 		toasts.show(verdict === 'approved' ? `${address} can reach your inbox` : `${address} is screened out`, {
-			action: { label: 'Undo', run: () => void api.screen(address, previous).then(refreshAll) }
+			action: { label: 'Undo', run: () => void commands.screen({ address, verdict: previous }).then(refreshAll) }
 		});
 	await refreshAll();
 }

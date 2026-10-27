@@ -1,4 +1,4 @@
-import type { Attached } from '#lib/bridge/index.js';
+import type { Attached } from '#lib/bindings.js';
 import type { Content } from './composer.svelte';
 import { escapeHtml } from './html';
 

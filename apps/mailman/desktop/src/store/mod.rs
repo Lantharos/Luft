@@ -20,6 +20,7 @@ pub use accounts::Identity;
 pub use mail::{Cursor, Fetched, Flag, Flags, Inserted, Located, NewMessage, Notable, View};
 pub use mailboxes::{Mailbox, RemoteFolder};
 pub use outbox::Outgoing;
+pub use senders::Verdict;
 pub use settings::Settings;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, Type)]

@@ -1,22 +1,49 @@
 use rusqlite::{OptionalExtension, params};
+use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use super::Store;
 use crate::mail::envelope::Address;
 
+#[derive(Clone, Copy, Serialize, Deserialize, Type)]
+#[serde(rename_all = "lowercase")]
+pub enum Verdict {
+    Approved,
+    Denied,
+    Pending,
+}
+
+impl Verdict {
+    fn as_str(self) -> &'static str {
+        match self {
+            Verdict::Approved => "approved",
+            Verdict::Denied => "denied",
+            Verdict::Pending => "pending",
+        }
+    }
+
+    fn parse(verdict: &str) -> Self {
+        match verdict {
+            "approved" => Verdict::Approved,
+            "denied" => Verdict::Denied,
+            _ => Verdict::Pending,
+        }
+    }
+}
+
 impl Store {
-    pub fn set_verdict(&self, address: &str, verdict: &str) -> Result<String, String> {
+    pub fn set_verdict(&self, address: &str, verdict: Verdict) -> Result<Verdict, String> {
         self.writing(|connection| {
             let transaction = connection.transaction()?;
-            let previous: String = transaction
+            let previous: Option<String> = transaction
                 .query_row("SELECT verdict FROM senders WHERE address = ?1", [address], |row| row.get(0))
-                .optional()?
-                .unwrap_or_else(|| "pending".into());
+                .optional()?;
             transaction.execute(
                 "INSERT INTO senders (address, verdict) VALUES (?1, ?2) ON CONFLICT (address) DO UPDATE SET verdict = excluded.verdict",
-                params![address, verdict],
+                params![address, verdict.as_str()],
             )?;
             transaction.commit()?;
-            Ok(previous)
+            Ok(previous.map_or(Verdict::Pending, |previous| Verdict::parse(&previous)))
         })
     }
 

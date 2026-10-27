@@ -3,8 +3,8 @@
 	import ImageOff from '@lucide/svelte/icons/image-off';
 	import Reply from '@lucide/svelte/icons/reply';
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
-	import * as api from '#lib/bridge/index.js';
-	import type { Address, Message } from '#lib/bridge/index.js';
+	import { commands } from '#lib/bindings.js';
+	import type { Address, ConversationMessage } from '#lib/bindings.js';
 	import { composer } from '#lib/compose/composer.svelte.js';
 	import { mail } from '#lib/mail/mail.svelte.js';
 	import Attachments from './Attachments.svelte';
@@ -12,7 +12,7 @@
 	import { reader } from './reader.svelte';
 
 	interface Props {
-		message: Message;
+		message: ConversationMessage;
 		expanded: boolean;
 	}
 
@@ -31,7 +31,7 @@
 
 	$effect(() => {
 		const sender = message.sender;
-		void api.imagesAllowed(sender).then((allowed) => {
+		void commands.imagesAllowed({ email: sender }).then((allowed) => {
 			remembered = allowed;
 			images = allowed;
 		});
@@ -44,7 +44,7 @@
 	async function always() {
 		images = true;
 		remembered = true;
-		await api.allowImages(message.sender, true);
+		await commands.allowImages({ address: message.sender, allowed: true });
 	}
 </script>
 

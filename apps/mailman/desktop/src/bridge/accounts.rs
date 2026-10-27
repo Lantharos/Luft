@@ -1,4 +1,4 @@
-use luft_app::Commands;
+use luft_app::{Commands, Empty};
 use sabine::SabineWindow;
 
 use super::params::*;

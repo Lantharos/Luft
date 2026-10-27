@@ -1,5 +1,5 @@
 import { SvelteMap } from 'svelte/reactivity';
-import * as api from '#lib/bridge/index.js';
+import { commands } from '#lib/bindings.js';
 
 class RemoteImages {
 	loaded = new SvelteMap<string, string>();
@@ -8,7 +8,7 @@ class RemoteImages {
 	request(urls: string[]) {
 		const missing = urls.filter((url) => !this.requested.has(url));
 		missing.forEach((url) => this.requested.add(url));
-		if (missing.length) void api.remoteImages(missing);
+		if (missing.length) void commands.remoteImages({ urls: missing });
 	}
 
 	receive = (pairs: [string, string | null][]) => {

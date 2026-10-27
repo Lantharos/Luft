@@ -17,8 +17,10 @@ use parking_lot::Mutex;
 use crate::accounts::{Account, Credentials, Login, Protocol};
 use crate::services::notify::Notifier;
 use crate::store::Store;
+pub use fetcher::BodyArrived;
 pub use ops::{Operation, Target};
 use worker::{Job, Queue};
+pub use worker::{OutboxEvent, SyncStatus};
 
 #[derive(Clone)]
 pub struct Shared {

@@ -3,14 +3,15 @@ mod compose;
 mod mail;
 mod params;
 
-use luft_app::Commands;
+use luft_app::{Commands, Empty};
 use sabine::SabineWindow;
 
+use crate::events;
 use crate::state::MailmanState;
 use params::*;
 
 pub fn register(window: SabineWindow, state: &MailmanState) -> SabineWindow {
-    let window = window
+    let window = events::declare(window)
         .with_async("app_state", state, |state, Empty {}| state.app_state())
         .with("take_opening", state, |state, Empty {}| {
             Ok(state.notifier.take_opening())

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Row, TextField } from '@luft/ui';
-	import * as api from '#lib/bridge/index.js';
-	import type { Account } from '#lib/bridge/index.js';
+	import { commands } from '#lib/bindings.js';
+	import type { Account } from '#lib/bindings.js';
 	import { mail } from '#lib/mail/mail.svelte.js';
 	import { toasts } from '#lib/shell/toasts.svelte.js';
 	import Identities from './Identities.svelte';
@@ -21,7 +21,7 @@
 	async function rename() {
 		const renamed = name.trim() || account.email;
 		if (renamed === account.name) return;
-		await api.renameAccount(account.id, renamed);
+		await commands.renameAccount({ id: account.id, name: renamed });
 		await mail.reloadAccounts();
 	}
 
@@ -31,7 +31,7 @@
 	}
 
 	async function remove() {
-		await api.removeAccount(account.id);
+		await commands.removeAccount({ id: account.id });
 		await mail.reloadAccounts();
 		toasts.show(`${account.email} was removed from Mailman`);
 	}

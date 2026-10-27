@@ -3,7 +3,7 @@ use std::path::PathBuf;
 
 use gio::prelude::*;
 use luft_app::portal::FileChooser;
-use luft_app::{Commands, launch};
+use luft_app::{Commands, Empty, launch};
 use sabine::SabineWindow;
 use serde::Serialize;
 use specta::Type;
@@ -19,7 +19,7 @@ use crate::store::View;
 
 #[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
-struct Opened {
+struct OpenedFile {
     subject: String,
     from: Address,
     to: Vec<Address>,
@@ -122,14 +122,14 @@ async fn save_attachment(state: MailmanState, part: Part) -> Result<Option<Strin
     Ok(Some(path.to_string_lossy().into_owned()))
 }
 
-fn open_file(Path { path }: Path) -> Result<Opened, String> {
+fn open_file(Path { path }: Path) -> Result<OpenedFile, String> {
     let raw = std::fs::read(&path).map_err(|error| error.to_string())?;
     let parsed = render::parse(&raw).ok_or("This file isn't an email")?;
     let envelope = envelope::from_message(&parsed);
     let folder = cache_folder()
         .join("files")
         .join(format!("{:x}", digest(&path)));
-    Ok(Opened {
+    Ok(OpenedFile {
         subject: envelope.subject,
         from: envelope.from,
         to: envelope.recipients.to,
@@ -182,8 +182,8 @@ pub fn register(window: SabineWindow, state: &MailmanState) -> SabineWindow {
         .with("act", state, |state, request: actions::Request| {
             actions::act(state, request)
         })
-        .with("screen", state, |state, Verdict { address, verdict }| {
-            state.store.set_verdict(&address, &verdict)
+        .with("screen", state, |state, Screening { address, verdict }| {
+            state.store.set_verdict(&address, verdict)
         })
         .with("open_attachment", state, open_attachment)
         .with_async("save_attachment", state, save_attachment)

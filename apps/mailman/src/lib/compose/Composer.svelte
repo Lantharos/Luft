@@ -13,8 +13,9 @@
 	import Trash from '@lucide/svelte/icons/trash-2';
 	import X from '@lucide/svelte/icons/x';
 	import { fly } from 'svelte/transition';
+	import { commands } from '#lib/bindings.js';
+	import type { Template } from '#lib/bindings.js';
 	import * as api from '#lib/bridge/index.js';
-	import type { Template } from '#lib/bridge/index.js';
 	import { REMINDERS, SEND_LATER } from '#lib/app/when.js';
 	import { toasts } from '#lib/shell/toasts.svelte.js';
 	import { composer, type Composition } from './composer.svelte';
@@ -67,19 +68,19 @@
 	}
 
 	async function attach() {
-		const chosen = await api.chooseFiles().catch(toasts.fail);
+		const chosen = await commands.chooseFiles(api.FOREVER).catch(toasts.fail);
 		if (chosen) composition.attachments = [...composition.attachments, ...chosen.map((file) => ({ ...file, cid: null }))];
 	}
 
 	async function loadTemplates() {
-		templates = await api.templates();
+		templates = await commands.templates();
 	}
 
 	async function saveTemplate() {
 		const content = editor?.content();
 		if (!content || content.empty) return toasts.show('Write something first');
 		const name = composition.subject.trim() || content.text.split('\n')[0].slice(0, 40);
-		await api.saveTemplate(null, name, content.source);
+		await commands.saveTemplate({ id: null, name, body: content.source });
 		toasts.show(`Saved “${name}” as a template`);
 	}
 

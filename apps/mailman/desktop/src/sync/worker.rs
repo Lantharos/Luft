@@ -5,6 +5,7 @@ use std::time::{Duration, Instant};
 
 use crossbeam_channel::{Receiver, Sender, TryRecvError, select};
 use serde::Serialize;
+use specta::Type;
 
 use super::Shared;
 use super::ops::Operation;
@@ -64,17 +65,25 @@ impl Queue {
     }
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
+#[serde(rename_all = "lowercase")]
+pub enum SyncState {
+    Syncing,
+    Ready,
+    Error,
+}
+
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
-struct Status<'a> {
+pub struct SyncStatus {
     account: i64,
-    state: &'a str,
+    state: SyncState,
     message: Option<String>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
-struct OutboxEvent {
+pub struct OutboxEvent {
     id: i64,
     error: Option<String>,
 }
@@ -169,10 +178,10 @@ impl Worker {
         }
     }
 
-    fn status(&self, state: &str, message: Option<String>) {
+    fn status(&self, state: SyncState, message: Option<String>) {
         self.shared.events.emit(
             STATUS,
-            Status {
+            SyncStatus {
                 account: self.account.id,
                 state,
                 message,
@@ -195,7 +204,7 @@ impl Worker {
         self.connection = None;
         self.poll_at = self.poll_at.min(Instant::now() + self.retry);
         self.retry = (self.retry * 2).min(POLL);
-        self.status("error", Some(error));
+        self.status(SyncState::Error, Some(error));
     }
 
     fn handle(&mut self, job: Job) {
@@ -212,7 +221,7 @@ impl Worker {
         match result {
             Ok(()) => {
                 self.retry = FIRST_RETRY;
-                self.status("ready", None);
+                self.status(SyncState::Ready, None);
             }
             Err(error) => self.fail(error),
         }
@@ -262,7 +271,7 @@ impl Worker {
 
     fn sync_all(&mut self) -> Result<(), String> {
         self.poll_at = Instant::now() + POLL;
-        self.status("syncing", None);
+        self.status(SyncState::Syncing, None);
         self.flush()?;
         for mailbox in self.folders()? {
             self.sync_mailbox(&mailbox)?;
@@ -333,7 +342,7 @@ impl Worker {
                 Ok(()) => self.shared.store.dequeue(item.id)?,
                 Err(error) if item.attempts + 1 >= GIVE_UP_AFTER => {
                     self.shared.store.dequeue(item.id)?;
-                    self.status("error", Some(error));
+                    self.status(SyncState::Error, Some(error));
                 }
                 Err(error) => {
                     self.shared.store.attempted(item.id)?;

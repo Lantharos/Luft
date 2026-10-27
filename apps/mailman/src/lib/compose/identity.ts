@@ -1,4 +1,4 @@
-import type { Identity, Message } from '#lib/bridge/index.js';
+import type { ConversationMessage, Identity } from '#lib/bindings.js';
 
 export interface Sending {
 	identity: Identity;
@@ -49,7 +49,7 @@ export function ownIdentity(address: string, identities: Identity[]): Sending | 
 	return found ? { identity: found, from: isWildcard(found) ? lower : null } : null;
 }
 
-export function sendingFor(message: Message, identities: Identity[]): Sending | null {
+export function sendingFor(message: ConversationMessage, identities: Identity[]): Sending | null {
 	const own = ownIdentity(message.sender, identities);
 	if (own) return own;
 	const recipients = [...message.recipients.to, ...message.recipients.cc, ...(message.recipients.delivered ?? [])].map((address) => address.address.toLowerCase());

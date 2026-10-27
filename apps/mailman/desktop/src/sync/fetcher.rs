@@ -1,5 +1,6 @@
 use crossbeam_channel::{Receiver, Sender};
 use serde::Serialize;
+use specta::Type;
 
 use super::Shared;
 use super::remote::{self, Connection};
@@ -7,8 +8,8 @@ use super::worker::keep;
 use crate::accounts::Account;
 use crate::events::BODY;
 
-#[derive(Serialize)]
-struct Arrived {
+#[derive(Serialize, Type)]
+pub struct BodyArrived {
     id: i64,
     error: Option<String>,
 }
@@ -44,7 +45,7 @@ impl Fetcher {
             }
             self.shared.events.emit(
                 BODY,
-                Arrived {
+                BodyArrived {
                     id,
                     error: fetched.err(),
                 },

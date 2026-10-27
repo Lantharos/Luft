@@ -4,8 +4,9 @@
 	import File from '@lucide/svelte/icons/file';
 	import FileImage from '@lucide/svelte/icons/file-image';
 	import FileText from '@lucide/svelte/icons/file-text';
+	import { commands } from '#lib/bindings.js';
+	import type { Attachment } from '#lib/bindings.js';
 	import * as api from '#lib/bridge/index.js';
-	import type { Attachment } from '#lib/bridge/index.js';
 	import { toasts } from '#lib/shell/toasts.svelte.js';
 
 	interface Props {
@@ -24,7 +25,7 @@
 	}
 
 	async function save(index: number) {
-		const path = await api.saveAttachment(source, index).catch(toasts.fail);
+		const path = await commands.saveAttachment({ ...source, index }, api.FOREVER).catch(toasts.fail);
 		if (path) toasts.show('Saved', { action: { label: 'Open', run: () => void api.openUri(`file://${path}`) } });
 	}
 </script>

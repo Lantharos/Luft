@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { ContextMenu, MenuItem, MenuSeparator } from '@luft/ui';
-	import type { ThreadRow } from '#lib/bridge/index.js';
+	import type { ThreadRow } from '#lib/bindings.js';
 	import * as actions from '#lib/mail/actions.js';
 	import { list } from '#lib/mail/list.svelte.js';
 	import { mail } from '#lib/mail/mail.svelte.js';

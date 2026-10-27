@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { Dialog, errorText, PasswordField, Segmented, TextField } from '@luft/ui';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import { commands } from '#lib/bindings.js';
+	import type { AccountConfig, NewSecret, Provider, Server } from '#lib/bindings.js';
 	import * as api from '#lib/bridge/index.js';
-	import type { AccountConfig, Provider, Server } from '#lib/bridge/index.js';
 	import { mail } from '#lib/mail/mail.svelte.js';
 	import { toasts } from '#lib/shell/toasts.svelte.js';
 	import ServerFields from './ServerFields.svelte';
@@ -37,8 +38,8 @@
 		if (!VALID.test(email.trim())) return (error = 'Enter your full email address');
 		error = '';
 		busy = true;
-		const found = await api
-			.discover(email.trim())
+		const found = await commands
+			.discover({ email: email.trim() }, api.LONG)
 			.catch((failure: unknown) => ((error = errorText(failure)), null))
 			.finally(() => (busy = false));
 		if (!found) return;
@@ -67,7 +68,7 @@
 		error = '';
 		busy = true;
 		try {
-			const secret: api.Secret = canOAuth ? { kind: 'oAuth', provider: oauth! } : { kind: 'password', password };
+			const secret: NewSecret = canOAuth ? { kind: 'oAuth', provider: oauth! } : { kind: 'password', password };
 			const account = await api.addAccount(email.trim(), name.trim(), config(), secret);
 			await mail.reloadAccounts();
 			toasts.show(`${account.email} is ready`);

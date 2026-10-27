@@ -1,9 +1,10 @@
 use rusqlite::{OptionalExtension, Row};
 use serde::Serialize;
-use serde_json::Value;
 use specta::Type;
 
 use super::views::approved;
+use crate::mail::classify::Category;
+use crate::mail::envelope::{Recipients, Unsubscribe};
 use crate::store::{Role, Settings, Store};
 
 #[derive(Serialize, Type)]
@@ -17,7 +18,7 @@ pub struct ConversationMessage {
     pub subject: String,
     pub sender_name: String,
     pub sender: String,
-    pub recipients: Value,
+    pub recipients: Recipients,
     pub date: i64,
     pub snippet: String,
     pub seen: bool,
@@ -25,8 +26,8 @@ pub struct ConversationMessage {
     pub answered: bool,
     pub draft: bool,
     pub attachments: bool,
-    pub category: String,
-    pub unsubscribe: Option<Value>,
+    pub category: Category,
+    pub unsubscribe: Option<Unsubscribe>,
     pub references: String,
 }
 
@@ -52,6 +53,7 @@ const CONVERSATION: &str = "SELECT m.id, m.account, m.mailbox, b.role, m.message
 fn conversation_message(row: &Row) -> rusqlite::Result<ConversationMessage> {
     let role: Option<String> = row.get(3)?;
     let recipients: String = row.get(8)?;
+    let category: String = row.get(16)?;
     let unsubscribe: Option<String> = row.get(17)?;
     Ok(ConversationMessage {
         id: row.get(0)?,
@@ -62,7 +64,7 @@ fn conversation_message(row: &Row) -> rusqlite::Result<ConversationMessage> {
         subject: row.get(5)?,
         sender_name: row.get(6)?,
         sender: row.get(7)?,
-        recipients: serde_json::from_str(&recipients).unwrap_or(Value::Null),
+        recipients: serde_json::from_str(&recipients).unwrap_or_default(),
         date: row.get(9)?,
         snippet: row.get(10)?,
         seen: row.get(11)?,
@@ -70,7 +72,7 @@ fn conversation_message(row: &Row) -> rusqlite::Result<ConversationMessage> {
         answered: row.get(13)?,
         draft: row.get(14)?,
         attachments: row.get(15)?,
-        category: row.get(16)?,
+        category: Category::parse(&category),
         unsubscribe: unsubscribe.and_then(|unsubscribe| serde_json::from_str(&unsubscribe).ok()),
         references: row.get(18)?,
     })

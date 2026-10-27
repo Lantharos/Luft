@@ -3,10 +3,7 @@ use specta::Type;
 
 use crate::accounts::{AccountConfig, Provider};
 use crate::mail::compose::Draft;
-use crate::store::{Cursor, Identity, Settings};
-
-#[derive(Deserialize, Type)]
-pub struct Empty {}
+use crate::store::{Cursor, Identity, Settings, Verdict};
 
 #[derive(Deserialize, Type)]
 pub struct Id {
@@ -81,9 +78,9 @@ pub struct Images {
 }
 
 #[derive(Deserialize, Type)]
-pub struct Verdict {
+pub struct Screening {
     pub address: String,
-    pub verdict: String,
+    pub verdict: Verdict,
 }
 
 #[derive(Deserialize, Type)]

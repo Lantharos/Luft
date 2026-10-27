@@ -1,5 +1,5 @@
-import * as api from '#lib/bridge/index.js';
-import type { Account, AppState, Counts, Identity, Mailbox, Provider, Settings, Status } from '#lib/bridge/index.js';
+import { commands } from '#lib/bindings.js';
+import type { Account, AppState, Counts, Identity, Mailbox, Provider, Settings, SyncStatus } from '#lib/bindings.js';
 
 const CHECK_FEEDBACK = 700;
 const EMPTY_COUNTS: Counts = { inbox: 0, screener: 0, later: 0, drafts: 0, newsletter: 0, receipt: 0, notification: 0, mailboxes: [] };
@@ -11,7 +11,7 @@ class MailState {
 	counts = $state<Counts>(EMPTY_COUNTS);
 	settings = $state<Settings>({ screener: true, bundles: true, notifications: true, undoSeconds: 10, darkMail: true });
 	oauth = $state<Provider[]>([]);
-	status = $state<Record<number, Status>>({});
+	status = $state<Record<number, SyncStatus>>({});
 	ready = $state(false);
 	syncing = $derived(Object.values(this.status).some((status) => status.state === 'syncing'));
 	private requested = $state(false);
@@ -37,7 +37,7 @@ class MailState {
 			return this.refreshing;
 		}
 		this.refreshing = (async () => {
-			const [counts, mailboxes] = await Promise.all([api.counts(), api.mailboxes()]);
+			const [counts, mailboxes] = await Promise.all([commands.counts(), commands.mailboxes()]);
 			this.counts = counts;
 			this.mailboxes = mailboxes;
 		})().finally(() => {
@@ -51,22 +51,22 @@ class MailState {
 	};
 
 	async reloadAccounts() {
-		[this.accounts, this.identities] = await Promise.all([api.accounts(), api.identities()]);
+		[this.accounts, this.identities] = await Promise.all([commands.accounts(), commands.identities()]);
 		await this.refresh();
 	}
 
 	reloadIdentities = async () => {
-		this.identities = await api.identities();
+		this.identities = await commands.identities();
 	};
 
 	reloadSenders = async () => {
-		[this.accounts, this.identities] = await Promise.all([api.accounts(), api.identities()]);
+		[this.accounts, this.identities] = await Promise.all([commands.accounts(), commands.identities()]);
 	};
 
 	async preferIdentity(identity: Identity) {
 		if (identity.preferred) return;
 		this.identities = this.identities.map((candidate) => (candidate.account === identity.account ? { ...candidate, preferred: candidate.id === identity.id } : candidate));
-		await api.preferIdentity(identity.id);
+		await commands.preferIdentity({ id: identity.id });
 	}
 
 	identitiesOf(account: number) {
@@ -81,11 +81,11 @@ class MailState {
 	checkNow = () => {
 		if (this.requested) return;
 		this.requested = true;
-		void api.syncNow();
+		void commands.syncNow();
 		setTimeout(() => (this.requested = false), CHECK_FEEDBACK);
 	};
 
-	receiveStatus = (status: Status) => {
+	receiveStatus = (status: SyncStatus) => {
 		this.status = { ...this.status, [status.account]: status };
 	};
 
@@ -103,7 +103,7 @@ class MailState {
 
 	async updateSettings(change: Partial<Settings>) {
 		this.settings = { ...this.settings, ...change };
-		await api.saveSettings(this.settings);
+		await commands.saveSettings({ settings: this.settings });
 		await this.refresh();
 	}
 }

@@ -2,8 +2,8 @@
 	import { untrack } from 'svelte';
 	import X from '@lucide/svelte/icons/x';
 	import { tooltip } from '@luft/ui';
-	import * as api from '#lib/bridge/index.js';
-	import type { Address } from '#lib/bridge/index.js';
+	import { commands } from '#lib/bindings.js';
+	import type { Address } from '#lib/bindings.js';
 	import ComposeField from './ComposeField.svelte';
 
 	interface Props {
@@ -33,7 +33,7 @@
 			suggestions = [];
 			return;
 		}
-		void api.contacts(query).then((found) => {
+		void commands.contacts({ query }).then((found) => {
 			if (current !== request) return;
 			suggestions = found.filter((candidate) => !addresses.some((address) => address.address === candidate.address));
 			highlighted = 0;

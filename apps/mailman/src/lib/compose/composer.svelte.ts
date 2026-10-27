@@ -1,6 +1,7 @@
 import { longDateTime } from '@luft/ui';
+import { commands } from '#lib/bindings.js';
+import type { Address, Attached, ConversationMessage, Draft, Rendered } from '#lib/bindings.js';
 import * as api from '#lib/bridge/index.js';
-import type { Address, Attached, Draft, Message, Rendered } from '#lib/bridge/index.js';
 import { list } from '#lib/mail/list.svelte.js';
 import { mail } from '#lib/mail/mail.svelte.js';
 import { reader } from '#lib/reader/reader.svelte.js';
@@ -44,7 +45,7 @@ function prefixed(subject: string, prefix: 'Re' | 'Fwd') {
 	return new RegExp(`^${prefix}:`, 'i').test(subject) ? subject : `${prefix}: ${subject}`;
 }
 
-function quoteOf(message: Message, rendered: Rendered | null) {
+function quoteOf(message: ConversationMessage, rendered: Rendered | null) {
 	const name = message.senderName || message.sender;
 	const body = rendered ? (rendered.plain ? `<div style="white-space:pre-wrap">${escapeHtml(rendered.text)}</div>` : rendered.html) : escapeHtml(message.snippet);
 	return `<div>On ${escapeHtml(longDateTime(message.date))}, ${escapeHtml(name)} wrote:</div><blockquote type="cite" style="margin:0 0 0 .8ex;border-left:2px solid #ccc;padding-left:1ex">${body}</blockquote>`;
@@ -94,7 +95,7 @@ class Composer {
 		};
 	}
 
-	reply(message: Message, rendered: Rendered | null, all: boolean) {
+	reply(message: ConversationMessage, rendered: Rendered | null, all: boolean) {
 		const isOwn = (address: string) => mail.accounts.some((account) => account.email === address) || ownIdentity(address, mail.identities) !== null;
 		const recipients = message.recipients;
 		const from = { name: message.senderName, address: message.sender };
@@ -115,7 +116,7 @@ class Composer {
 		});
 	}
 
-	forward(message: Message, rendered: Rendered | null) {
+	forward(message: ConversationMessage, rendered: Rendered | null) {
 		const header = `<div>---------- Forwarded message ----------<br>From: ${escapeHtml(message.senderName)} &lt;${escapeHtml(message.sender)}&gt;<br>Date: ${escapeHtml(longDateTime(message.date))}<br>Subject: ${escapeHtml(message.subject)}</div>`;
 		const body = rendered ? (rendered.plain ? `<div style="white-space:pre-wrap">${escapeHtml(rendered.text)}</div>` : rendered.html) : '';
 		this.start({
@@ -140,7 +141,7 @@ class Composer {
 	async reopen(id: number) {
 		try {
 			await reader.body(id);
-			const draft = await api.reopenDraft(id);
+			const draft = await commands.reopenDraft({ id }, api.LONG);
 			const from = draft.from.toLowerCase();
 			const own = ownIdentity(from, mail.identitiesOf(draft.account));
 			const fallback = mail.preferredIdentity(draft.account);
@@ -184,8 +185,8 @@ class Composer {
 		this.sending = true;
 		try {
 			const draft = this.draft(composition, content, sendAt);
-			const queued = await api.send(draft);
-			if (composition.replaces !== null) await api.act({ action: 'deleteForever' }, { ids: [composition.replaces] });
+			const queued = await commands.send({ draft });
+			if (composition.replaces !== null) await commands.act({ action: 'deleteForever', ids: [composition.replaces] });
 			this.current = null;
 			this.expanded = false;
 			const later = sendAt !== null;
@@ -201,7 +202,7 @@ class Composer {
 	}
 
 	private async undo(id: number, composition: Composition) {
-		const restored = await api.cancelSend(id);
+		const restored = await commands.cancelSend({ id });
 		if (!restored) return toasts.show('It was already sent');
 		this.current = { ...composition, key: ++this.keys };
 	}
@@ -212,7 +213,7 @@ class Composer {
 		this.expanded = false;
 		if (!composition || !content || (content.empty && !composition.subject && !composition.to.length)) return;
 		try {
-			await api.saveDraft(this.draft(composition, content, null), composition.replaces);
+			await commands.saveDraft({ draft: this.draft(composition, content, null), replaces: composition.replaces });
 			toasts.show('Saved to Drafts');
 		} catch (error) {
 			toasts.fail(error);
@@ -223,7 +224,7 @@ class Composer {
 		const replaces = this.current?.replaces;
 		this.current = null;
 		this.expanded = false;
-		if (replaces) void api.act({ action: 'deleteForever' }, { ids: [replaces] });
+		if (replaces) void commands.act({ action: 'deleteForever', ids: [replaces] });
 	}
 }
 

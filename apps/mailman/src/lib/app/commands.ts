@@ -1,5 +1,5 @@
 import { matchItems, type PaletteSource } from '@luft/ui';
-import * as api from '#lib/bridge/index.js';
+import { commands } from '#lib/bindings.js';
 import { composer } from '#lib/compose/composer.svelte.js';
 import * as actions from '#lib/mail/actions.js';
 import { list } from '#lib/mail/list.svelte.js';
@@ -50,7 +50,7 @@ function replyTo(all: boolean) {
 		});
 }
 
-export function commands(shell: Shell): Command[] {
+export function shellCommands(shell: Shell): Command[] {
 	const views = [...PRIMARY, ...BUNDLES]
 		.filter((view) => view.id !== 'screener' || mail.settings.screener)
 		.map((view) => ({
@@ -96,7 +96,7 @@ export function commands(shell: Shell): Command[] {
 		{ id: 'toggle-screener', title: mail.settings.screener ? 'Turn off the Screener' : 'Turn on the Screener', run: () => void mail.updateSettings({ screener: !mail.settings.screener }).then(list.load) },
 		{ id: 'toggle-bundles', title: mail.settings.bundles ? 'Show bundled mail in the inbox' : 'Bundle newsletters, receipts and updates', run: () => void mail.updateSettings({ bundles: !mail.settings.bundles }).then(list.load) },
 		{ id: 'shortcuts', title: 'Keyboard shortcuts', keys: '?', run: shell.showShortcuts },
-		{ id: 'quit', title: 'Quit Mailman', keys: 'Ctrl Q', run: () => void api.quit() }
+		{ id: 'quit', title: 'Quit Mailman', keys: 'Ctrl Q', run: () => void commands.quit() }
 	];
 }
 
@@ -104,7 +104,7 @@ export function paletteSource(shell: Shell, search: (query: string) => void): Pa
 	return {
 		placeholder: list.searching ? 'Type a command' : 'Type a command or search',
 		items: (query) => {
-			const matches = matchItems(commands(shell).map(({ id, title, keys, run }) => ({ key: id, label: title, hint: keys, run })), query);
+			const matches = matchItems(shellCommands(shell).map(({ id, title, keys, run }) => ({ key: id, label: title, hint: keys, run })), query);
 			const trimmed = query.trim();
 			return trimmed ? [...matches, { key: 'search-for', label: `Search mail for “${trimmed}”`, hint: 'Enter', run: () => search(trimmed) }] : matches;
 		}

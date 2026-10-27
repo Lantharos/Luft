@@ -2,11 +2,10 @@ use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
 use luft_app::launch;
 use serde::Serialize;
-use serde_json::json;
 use specta::Type;
 
 use crate::mail::compose::{self, Draft, Sender};
-use crate::mail::envelope::{Address, Unsubscribe};
+use crate::mail::envelope::{Address, Recipients};
 use crate::mail::render;
 use crate::protocols::net;
 use crate::state::MailmanState;
@@ -25,6 +24,16 @@ pub struct Queued {
 pub enum Unsubscribed {
     Done,
     Opened,
+}
+
+#[derive(Serialize, Type)]
+pub struct ReopenedDraft {
+    account: i64,
+    from: String,
+    recipients: Recipients,
+    subject: String,
+    html: String,
+    text: String,
 }
 
 fn is_address(address: &str) -> bool {
@@ -93,7 +102,6 @@ pub fn send(state: &MailmanState, draft: Draft) -> Result<Queued, String> {
         .send_at
         .unwrap_or_else(|| now() + state.store.settings().undo_seconds);
     let remind_at = draft.remind_after.map(|after| send_at + after);
-    let saved = serde_json::to_value(&draft).map_err(|error| error.to_string())?;
     let outgoing = Outgoing {
         id: 0,
         account: draft.account,
@@ -102,7 +110,7 @@ pub fn send(state: &MailmanState, draft: Draft) -> Result<Queued, String> {
         recipients: built.recipients,
         remind_at,
     };
-    let id = state.store.queue_outgoing(&outgoing, &saved, send_at)?;
+    let id = state.store.queue_outgoing(&outgoing, &draft, send_at)?;
     let recipients: Vec<Address> = draft
         .to
         .iter()
@@ -146,7 +154,7 @@ pub fn save_draft(state: &MailmanState, draft: Draft, replaces: Option<i64>) -> 
     Ok(())
 }
 
-pub fn reopen(state: &MailmanState, id: i64) -> Result<serde_json::Value, String> {
+pub fn reopen(state: &MailmanState, id: i64) -> Result<ReopenedDraft, String> {
     let message = state.store.message(id)?.ok_or("That draft is gone")?;
     let raw = state
         .store
@@ -161,14 +169,14 @@ pub fn reopen(state: &MailmanState, id: i64) -> Result<serde_json::Value, String
         .body_text(0)
         .map(|text| text.into_owned())
         .unwrap_or_default();
-    Ok(json!({
-        "account": message.account,
-        "from": message.sender,
-        "recipients": message.recipients,
-        "subject": message.subject,
-        "html": html,
-        "text": text,
-    }))
+    Ok(ReopenedDraft {
+        account: message.account,
+        from: message.sender,
+        recipients: message.recipients,
+        subject: message.subject,
+        html,
+        text,
+    })
 }
 
 pub fn unsubscribe(
@@ -177,9 +185,8 @@ pub fn unsubscribe(
     token: Option<&str>,
 ) -> Result<Unsubscribed, String> {
     let message = state.store.message(id)?.ok_or("That message is gone")?;
-    let unsubscribe: Unsubscribe = message
+    let unsubscribe = message
         .unsubscribe
-        .and_then(|value| serde_json::from_value(value).ok())
         .ok_or("This sender doesn't offer a way to unsubscribe")?;
     if let (true, Some(url)) = (unsubscribe.one_click, &unsubscribe.http) {
         net::http()

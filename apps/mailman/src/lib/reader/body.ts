@@ -1,5 +1,5 @@
 import { fileUrl } from '@lantharos/sabine';
-import type { Rendered } from '#lib/bridge/index.js';
+import type { Rendered } from '#lib/bindings.js';
 
 const QUOTES = [
 	'.mm-quote',

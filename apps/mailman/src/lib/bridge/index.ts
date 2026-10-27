@@ -1,43 +1,13 @@
-import { app, events as sabine, invoke, listen } from '@lantharos/sabine';
+import { app, invoke } from '@lantharos/sabine';
 import { activationToken, fileUrlPath } from '@luft/ui';
-import type {
-	Account,
-	AccountConfig,
-	Action,
-	Address,
-	AppState,
-	Chosen,
-	Counts,
-	Cursor,
-	Discovery,
-	Draft,
-	Identity,
-	Launch,
-	Mailbox,
-	Message,
-	OpenedFile,
-	OutboxEvent,
-	Placement,
-	Provider,
-	Rendered,
-	Settings,
-	Status,
-	Template,
-	ThreadPage
-} from './types';
+import { commands } from '#lib/bindings.js';
+import type { AccountConfig, NewSecret } from '#lib/bindings.js';
 
-export * from './types';
+export const LONG = { timeoutMs: 10 * 60 * 1000 };
+export const FOREVER = { timeoutMs: 24 * 60 * 60 * 1000 };
 
-const LONG = 10 * 60 * 1000;
-const FOREVER = 24 * 60 * 60 * 1000;
-
-function call<T>(name: string, params: Record<string, unknown> = {}, timeoutMs?: number): Promise<T> {
-	return invoke<T>(name, params, timeoutMs ? { timeoutMs } : undefined);
-}
-
-export type Secret = { kind: 'password'; password: string } | { kind: 'oAuth'; provider: Provider };
-
-export const appState = () => call<AppState>('app_state');
+export type Launch = { kind: 'mailto'; url: string } | { kind: 'message'; path: string };
+export type PartSource = { id: number } | { file: string };
 
 function launch(url: string): Launch | null {
 	if (url.toLowerCase().startsWith('mailto:')) return { kind: 'mailto', url };
@@ -46,62 +16,10 @@ function launch(url: string): Launch | null {
 }
 
 export const takeLaunches = async () => (await app.takeOpenUrls()).map(launch).filter((launch) => launch !== null);
-export const takeOpening = () => call<{ thread: number | null } | null>('take_opening');
-export const quit = () => call<void>('quit');
-export const setFocused = (focused: boolean) => call<void>('set_focused', { focused });
-export const saveSettings = (settings: Settings) => call<void>('save_settings', { settings });
-
-export const discover = (email: string) => call<Discovery>('discover', { email }, LONG);
-export const addAccount = async (email: string, name: string, config: AccountConfig, secret: Secret) =>
-	call<Account>('add_account', { email, name, config, secret, token: await activationToken() }, LONG);
-export const removeAccount = (id: number) => call<void>('remove_account', { id });
-export const renameAccount = (id: number, name: string) => call<void>('rename_account', { id, name });
-export const identities = () => call<Identity[]>('identities');
-export const saveIdentity = (identity: Identity) => call<number>('save_identity', { identity });
-export const preferIdentity = (id: number) => call<void>('prefer_identity', { id });
-export const removeIdentity = (id: number) => call<void>('remove_identity', { id });
-export const accounts = () => call<Account[]>('accounts');
-export const mailboxes = () => call<Mailbox[]>('mailboxes');
-export const syncNow = () => call<void>('sync_now');
-export const syncMailbox = (account: number, mailbox: number) => call<void>('sync_mailbox', { account, mailbox });
-
-export const threads = (view: string, query: string | null, after: Cursor | null, limit: number) => call<ThreadPage>('threads', { view, query, after, limit });
-export const counts = () => call<Counts>('counts');
-export const conversation = (thread: number) => call<Message[]>('conversation', { thread });
-export const messageBody = (id: number) => call<Rendered | null>('message_body', { id });
-export const remoteImages = (urls: string[]) => call<void>('remote_images', { urls });
-export const allowImages = (address: string, allowed: boolean) => call<void>('allow_images', { address, allowed });
-export const imagesAllowed = (email: string) => call<boolean>('images_allowed', { email });
-export const act = (action: Action, target: { threads?: number[]; ids?: number[] }) => call<{ moves: Placement[] }>('act', { ...action, ...target });
-export type Verdict = 'approved' | 'denied' | 'pending';
-export const screen = (address: string, verdict: Verdict) => call<Verdict>('screen', { address, verdict });
-export type PartSource = { id: number } | { file: string };
+export const addAccount = async (email: string, name: string, config: AccountConfig, secret: NewSecret) =>
+	commands.addAccount({ email, name, config, secret, token: await activationToken() }, LONG);
 export const openAttachment = async (source: PartSource, index: number) =>
-	call<void>('open_attachment', { ...source, index, token: await activationToken() }, LONG);
-export const saveAttachment = (source: PartSource, index: number) => call<string | null>('save_attachment', { ...source, index }, FOREVER);
-export const contacts = (query: string) => call<Address[]>('contacts', { query });
-export const openMessageFile = (path: string) => call<OpenedFile>('open_message_file', { path });
-export const openUri = async (uri: string) => call<void>('open_uri', { uri, token: await activationToken() });
-
-export const send = (draft: Draft) => call<{ id: number; sendAt: number }>('send', { draft });
-export const cancelSend = (id: number) => call<Draft | null>('cancel_send', { id });
-export const saveDraft = (draft: Draft, replaces: number | null) => call<void>('save_draft', { draft, replaces });
-export const reopenDraft = (id: number) => call<{ account: number; from: string; recipients: Message['recipients']; subject: string; html: string; text: string }>('reopen_draft', { id }, LONG);
-export const unsubscribe = async (id: number) => call<'done' | 'opened'>('unsubscribe', { id, token: await activationToken() }, LONG);
-export const chooseFiles = () => call<Chosen[]>('choose_files', {}, FOREVER);
-export const describeFiles = (paths: string[]) => call<Chosen[]>('describe_files', { paths });
+	commands.openAttachment({ ...source, index, token: await activationToken() }, LONG);
+export const openUri = async (uri: string) => commands.openUri({ uri, token: await activationToken() });
+export const unsubscribe = async (id: number) => commands.unsubscribe({ id, token: await activationToken() }, LONG);
 export const stashFile = (file: File, name = file.name) => invoke<string>('stash_file', { name }, { body: file });
-export const templates = () => call<Template[]>('templates');
-export const saveTemplate = (id: number | null, name: string, body: string) => call<void>('save_template', { id, name, body });
-export const deleteTemplate = (id: number) => call<void>('delete_template', { id });
-
-export const events = {
-	changed: (callback: (account: number) => void) => listen('mailman.changed', callback),
-	status: (callback: (status: Status) => void) => listen('mailman.status', callback),
-	open: (callback: () => void) => listen('mailman.open', callback),
-	outbox: (callback: (event: OutboxEvent) => void) => listen('mailman.outbox', callback),
-	body: (callback: (arrived: { id: number; error: string | null }) => void) => listen('mailman.body', callback),
-	images: (callback: (images: [string, string | null][]) => void) => listen('mailman.images', callback),
-	identities: (callback: (account: number) => void) => listen('mailman.identities', callback),
-	launched: (callback: () => void) => sabine.openUrlsAvailable(callback)
-};

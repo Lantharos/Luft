@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Plus from '@lucide/svelte/icons/plus';
-	import type { Account, Identity } from '#lib/bridge/index.js';
+	import type { Account, Identity } from '#lib/bindings.js';
 	import { mail } from '#lib/mail/mail.svelte.js';
 	import IdentityEditor from './IdentityEditor.svelte';
 

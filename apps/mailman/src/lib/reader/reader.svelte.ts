@@ -1,13 +1,13 @@
 import { errorText } from '@luft/ui';
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
-import * as api from '#lib/bridge/index.js';
-import type { Message, Rendered } from '#lib/bridge/index.js';
+import { commands } from '#lib/bindings.js';
+import type { ConversationMessage, Rendered } from '#lib/bindings.js';
 
 const CACHE_LIMIT = 80;
 
 class Reader {
 	thread = $state<number | null>(null);
-	messages = $state.raw<Message[]>([]);
+	messages = $state.raw<ConversationMessage[]>([]);
 	expanded = new SvelteSet<number>();
 	bodies = new SvelteMap<number, Rendered>();
 	failures = new SvelteMap<number, string>();
@@ -26,7 +26,7 @@ class Reader {
 			this.messages = [];
 			return;
 		}
-		const messages = await api.conversation(thread);
+		const messages = await commands.conversation({ thread });
 		if (generation !== this.generation) return;
 		this.expanded.clear();
 		const unread = messages.filter((message) => !message.seen);
@@ -38,7 +38,7 @@ class Reader {
 
 	async refresh() {
 		if (this.thread === null) return;
-		const messages = await api.conversation(this.thread);
+		const messages = await commands.conversation({ thread: this.thread });
 		if (!messages.length) return this.open(null);
 		this.messages = messages;
 	}
@@ -86,14 +86,14 @@ class Reader {
 
 	private async fetch(id: number): Promise<Rendered> {
 		const arrived = new Promise<string | null>((resolve) => this.waiting.set(id, resolve));
-		const rendered = await api.messageBody(id);
+		const rendered = await commands.messageBody({ id });
 		if (rendered) {
 			this.waiting.delete(id);
 			return rendered;
 		}
 		const error = await arrived;
 		if (error) throw new Error(error);
-		const fetched = await api.messageBody(id);
+		const fetched = await commands.messageBody({ id });
 		if (!fetched) throw new Error('This message is still on its way');
 		return fetched;
 	}

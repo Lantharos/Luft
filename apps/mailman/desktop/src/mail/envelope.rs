@@ -34,7 +34,7 @@ pub struct Address {
     pub address: String,
 }
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Recipients {
     pub to: Vec<Address>,
@@ -44,7 +44,7 @@ pub struct Recipients {
     pub delivered: Vec<Address>,
 }
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Unsubscribe {
     pub http: Option<String>,

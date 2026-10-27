@@ -1,7 +1,7 @@
-use specta::Type;
 use std::sync::{Arc, Mutex, PoisonError};
 
 use serde::{Deserialize, Serialize};
+use specta::Type;
 use xkbcommon::xkb;
 
 use super::definition::Method;

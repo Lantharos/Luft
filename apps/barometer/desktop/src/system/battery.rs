@@ -1,8 +1,8 @@
-use specta::Type;
 use std::fs;
 use std::path::PathBuf;
 
 use serde::Serialize;
+use specta::Type;
 
 use super::procfile::{read_number, read_text};
 

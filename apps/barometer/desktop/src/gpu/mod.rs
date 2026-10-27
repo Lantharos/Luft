@@ -1,4 +1,3 @@
-use specta::Type;
 mod amd;
 mod drm;
 mod intel;
@@ -18,6 +17,7 @@ use amd::Amd;
 use drm::DrmClients;
 use intel::Intel;
 use nvidia::Nvidia;
+use specta::Type;
 
 const DRM: &str = "/sys/class/drm";
 const PROCESS_REFRESH: Duration = Duration::from_secs(2);

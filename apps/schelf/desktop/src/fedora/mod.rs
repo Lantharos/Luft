@@ -1,4 +1,3 @@
-use specta::Type;
 mod appstream;
 mod catalog;
 mod jobs;
@@ -17,6 +16,7 @@ use tokio::task::spawn_blocking;
 use crate::library::InstalledApp;
 use crate::updates::AppUpdate;
 use appstream::Component;
+use specta::Type;
 
 pub use jobs::Job;
 pub use library::is_installed;

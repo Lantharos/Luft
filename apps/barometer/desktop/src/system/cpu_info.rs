@@ -1,8 +1,8 @@
-use specta::Type;
 use std::collections::HashSet;
 use std::fs;
 
 use serde::Serialize;
+use specta::Type;
 
 use super::procfile::{read_number, read_text};
 

@@ -1,10 +1,10 @@
-use specta::Type;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
 
 use exif::{Exif, In, Tag, Value};
 use serde::Serialize;
+use specta::Type;
 
 const ROTATED_ORIENTATIONS: [u32; 4] = [5, 6, 7, 8];
 

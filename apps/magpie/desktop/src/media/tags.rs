@@ -1,4 +1,3 @@
-use specta::Type;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::thread;
@@ -7,6 +6,7 @@ use lofty::file::{AudioFile, TaggedFileExt};
 use lofty::picture::{Picture, PictureType};
 use lofty::tag::{Accessor, ItemKey, Tag};
 use serde::Serialize;
+use specta::Type;
 
 use crate::cache;
 

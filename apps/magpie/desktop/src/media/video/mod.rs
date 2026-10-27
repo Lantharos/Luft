@@ -1,4 +1,3 @@
-use specta::Type;
 mod external;
 mod matroska;
 mod mp4;
@@ -6,6 +5,7 @@ mod mp4;
 use std::path::Path;
 
 use serde::Serialize;
+use specta::Type;
 
 use crate::folder::kinds::extension;
 

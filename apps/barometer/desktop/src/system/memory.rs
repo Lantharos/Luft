@@ -1,7 +1,7 @@
-use specta::Type;
 use std::fs;
 
 use serde::Serialize;
+use specta::Type;
 
 use super::procfile::{ProcFile, read_text};
 

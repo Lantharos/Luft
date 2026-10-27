@@ -1,4 +1,3 @@
-use specta::Type;
 pub mod kinds;
 mod places;
 mod watch;
@@ -11,6 +10,7 @@ use serde::Serialize;
 
 use kinds::Kind;
 pub use places::places;
+use specta::Type;
 pub use watch::FolderWatcher;
 
 #[derive(Serialize, Type)]

@@ -1,4 +1,3 @@
-use specta::Type;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use luft_app::Commands;
@@ -9,6 +8,7 @@ use luft_software::system::updates;
 use sabine::SabineWindow;
 use serde::Serialize;
 use serde_json::Value;
+use specta::Type;
 use tokio::task::{JoinHandle, spawn_blocking};
 
 use crate::fedora;

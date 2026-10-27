@@ -1,9 +1,9 @@
-use specta::Type;
 use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::sync::OnceLock;
 
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 const CHARACTERS: &str = include_str!("../../../../kestrel/engine/data/characters.json");
 const EMOJI: &str = include_str!("../../../../kestrel/engine/data/emoji.json");

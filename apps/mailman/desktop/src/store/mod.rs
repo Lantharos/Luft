@@ -1,4 +1,3 @@
-use specta::Type;
 mod accounts;
 mod mail;
 mod mailboxes;
@@ -15,6 +14,7 @@ use std::sync::Arc;
 use parking_lot::Mutex;
 use rusqlite::Connection;
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 pub use accounts::Identity;
 pub use mail::{Cursor, Fetched, Flag, Flags, Inserted, Located, NewMessage, Notable, View};

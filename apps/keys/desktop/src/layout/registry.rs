@@ -1,4 +1,3 @@
-use specta::Type;
 use std::fmt::Write;
 use std::fs;
 use std::path::Path;
@@ -7,6 +6,7 @@ use std::sync::OnceLock;
 use luft_app::files;
 use roxmltree::{Document, Node, ParsingOptions};
 use serde::Serialize;
+use specta::Type;
 
 use crate::paths;
 

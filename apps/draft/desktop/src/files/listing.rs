@@ -1,8 +1,8 @@
-use specta::Type;
 use std::cmp::Ordering;
 use std::fs;
 
 use serde::Serialize;
+use specta::Type;
 
 use super::{Target, failed};
 

@@ -1,10 +1,10 @@
-use specta::Type;
 use std::collections::{HashMap, HashSet};
 use std::ffi::CString;
 use std::fs;
 use std::path::{Path, PathBuf};
 
 use serde::Serialize;
+use specta::Type;
 
 use super::hwmon::{self, Sensor};
 use super::procfile::{ProcFile, read_number, read_text, udev_property};

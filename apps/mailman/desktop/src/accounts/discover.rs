@@ -1,9 +1,9 @@
-use specta::Type;
 use std::time::Duration;
 
 use hickory_resolver::TokioResolver;
 use hickory_resolver::proto::rr::RData;
 use serde::Serialize;
+use specta::Type;
 
 use super::oauth::Provider;
 use crate::protocols::net::{Security, Server};

@@ -1,10 +1,10 @@
-use specta::Type;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use luft_app::{Activation, Appearance, Events};
 use parking_lot::RwLock;
 use serde::Serialize;
+use specta::Type;
 
 use crate::launch::LaunchRequest;
 use crate::pty::{Sessions, Size};

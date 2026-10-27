@@ -1,10 +1,10 @@
-use specta::Type;
 use std::path::PathBuf;
 use std::time::Duration;
 
 use luft_app::Events;
 use luft_app::watch::{FolderWatcher, Report, Watch, WatchMask};
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use crate::events::FILES_CHANGED;
 

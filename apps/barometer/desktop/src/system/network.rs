@@ -1,4 +1,3 @@
-use specta::Type;
 use std::collections::HashMap;
 use std::ffi::CStr;
 use std::fs;
@@ -6,6 +5,7 @@ use std::net::{Ipv4Addr, Ipv6Addr};
 use std::path::Path;
 
 use serde::Serialize;
+use specta::Type;
 
 use super::procfile::{ProcFile, link_name, read_number, read_text, udev_property};
 

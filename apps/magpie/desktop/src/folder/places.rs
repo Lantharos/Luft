@@ -1,7 +1,7 @@
-use specta::Type;
 use std::path::PathBuf;
 
 use serde::Serialize;
+use specta::Type;
 
 #[derive(Serialize, Type)]
 #[serde(rename_all = "lowercase")]

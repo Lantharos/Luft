@@ -1,7 +1,7 @@
-use specta::Type;
 use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use crate::state::MailmanState;
 use crate::store::{Flag, Located, Role};

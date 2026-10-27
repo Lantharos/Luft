@@ -1,10 +1,10 @@
-use specta::Type;
 use std::path::Path;
 
 use mail_builder::MessageBuilder;
 use mail_builder::headers::address::Address as BuiltAddress;
 use rand::RngExt;
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use super::envelope::Address;
 

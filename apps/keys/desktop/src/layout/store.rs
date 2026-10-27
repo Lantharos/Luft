@@ -1,10 +1,10 @@
-use specta::Type;
 use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
 
 use luft_app::files;
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use super::compile::{self, Keys};
 use super::dead::{self, DeadKey};

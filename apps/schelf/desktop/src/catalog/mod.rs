@@ -1,4 +1,3 @@
-use specta::Type;
 pub mod cache;
 pub mod flathub;
 pub mod tools;
@@ -7,6 +6,7 @@ use luft_app::Commands;
 use luft_software::apps::toolbox::Repositories;
 use sabine::SabineWindow;
 use serde::Deserialize;
+use specta::Type;
 
 #[derive(Deserialize, Type)]
 struct Path {

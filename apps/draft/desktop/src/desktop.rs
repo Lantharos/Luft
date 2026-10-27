@@ -1,10 +1,10 @@
-use specta::Type;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 use luft_app::portal::{FileChooser, uri_path};
 use luft_app::{dbus, file_manager, launch};
 use serde::Deserialize;
+use specta::Type;
 use zbus::{OwnedObjectPath, Proxy, Variant};
 
 use crate::files::failed;

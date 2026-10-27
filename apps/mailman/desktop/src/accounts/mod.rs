@@ -1,9 +1,9 @@
-use specta::Type;
 mod credentials;
 mod discover;
 mod oauth;
 
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use crate::protocols::net::Server;
 

@@ -1,4 +1,3 @@
-use specta::Type;
 use std::io::{BufRead, BufReader, Write};
 use std::net::TcpListener;
 use std::time::{Duration, Instant};
@@ -9,6 +8,7 @@ use luft_app::launch;
 use rand::RngExt;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
+use specta::Type;
 
 use crate::protocols::net;
 use crate::store::now;

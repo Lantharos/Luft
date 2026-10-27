@@ -1,8 +1,8 @@
-use specta::Type;
 use std::collections::HashSet;
 
 use rusqlite::{CachedStatement, Connection, Row, Rows, ToSql};
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use super::{FROM, Filter, RECENCY, Scope, View, counts, filter};
 use crate::store::{Settings, Store};

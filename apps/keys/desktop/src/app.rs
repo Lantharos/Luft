@@ -1,4 +1,3 @@
-use specta::Type;
 use std::path::PathBuf;
 
 use luft_app::portal;
@@ -6,6 +5,7 @@ use luft_app::{Activation, Appearance, Commands};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use specta::Type;
 
 use crate::compose::Reloader;
 use crate::{characters, layout, method, sources};

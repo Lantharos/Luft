@@ -1,9 +1,9 @@
-use specta::Type;
 use std::fmt::Write;
 use std::fs;
 use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use crate::paths;
 

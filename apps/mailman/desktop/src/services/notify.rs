@@ -1,4 +1,3 @@
-use specta::Type;
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, OnceLock};
@@ -8,6 +7,7 @@ use luft_app::{Events, dbus};
 use parking_lot::Mutex;
 use sabine::SabineProcessHandle;
 use serde::Serialize;
+use specta::Type;
 use zbus::{Proxy, Variant};
 
 use crate::APP_ID;

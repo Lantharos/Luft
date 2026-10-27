@@ -1,4 +1,3 @@
-use specta::Type;
 pub mod compile;
 pub mod dead;
 pub mod keys;
@@ -26,6 +25,7 @@ use compile::Keys;
 pub use dead::DeadKey;
 use meta::Options;
 use registry::Entry;
+use specta::Type;
 use store::{Draft, Origin};
 use symbol::Symbol;
 use tester::Tester;

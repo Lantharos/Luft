@@ -1,4 +1,3 @@
-use specta::Type;
 mod sampler;
 
 use std::collections::VecDeque;
@@ -10,6 +9,7 @@ use std::time::Duration;
 use luft_app::Events;
 use parking_lot::{Condvar, Mutex};
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use crate::system::{Devices, System, Tick};
 use crate::tasks::apps::{OpenWindows, Scopes};

@@ -1,9 +1,9 @@
-use specta::Type;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 use mail_parser::{Message, MessageParser, MimeHeaders, PartType};
 use serde::Serialize;
+use specta::Type;
 
 use super::{plain, sanitize};
 

@@ -1,4 +1,3 @@
-use specta::Type;
 use std::collections::HashMap;
 use std::io::Read;
 use std::path::{Path, PathBuf};
@@ -7,6 +6,7 @@ use std::time::UNIX_EPOCH;
 
 use flate2::read::GzDecoder;
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use super::appstream::{self, Component};
 use crate::catalog::cache::Entry;

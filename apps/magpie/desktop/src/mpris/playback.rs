@@ -1,9 +1,9 @@
-use specta::Type;
 use std::collections::HashMap;
 use std::time::Instant;
 
 use gio::prelude::*;
 use serde::{Deserialize, Serialize};
+use specta::Type;
 use zbus::{ObjectPath, OwnedVariant, Variant};
 
 const MICROSECONDS: f64 = 1_000_000.0;

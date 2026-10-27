@@ -1,7 +1,7 @@
-use specta::Type;
 use std::path::Path;
 
 use serde::Serialize;
+use specta::Type;
 
 #[derive(Clone, Copy, PartialEq, Eq, Serialize, Type)]
 #[serde(rename_all = "lowercase")]

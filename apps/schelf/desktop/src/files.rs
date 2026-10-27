@@ -1,4 +1,3 @@
-use specta::Type;
 use std::collections::HashMap;
 use std::hash::{DefaultHasher, Hash, Hasher};
 use std::io::Read;
@@ -15,6 +14,7 @@ use luft_software::system::system_packages;
 use quick_xml::events::Event;
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use crate::catalog::cache;
 use crate::fedora;

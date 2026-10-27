@@ -1,4 +1,3 @@
-use specta::Type;
 pub mod encoding;
 pub mod index;
 pub mod listing;
@@ -10,6 +9,7 @@ use std::path::Path;
 use std::time::UNIX_EPOCH;
 
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 #[derive(Deserialize, Type)]
 pub struct Target {

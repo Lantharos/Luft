@@ -1,4 +1,3 @@
-use specta::Type;
 pub mod bus;
 mod jobs;
 
@@ -12,6 +11,7 @@ use luft_software::task::{CANCELLED, Cancel, Task};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use specta::Type;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender, unbounded_channel};
 
 pub use jobs::{Action, Job};

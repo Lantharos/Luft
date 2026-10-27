@@ -1,4 +1,3 @@
-use specta::Type;
 mod appimages;
 mod debian;
 mod flatpaks;
@@ -13,6 +12,7 @@ use luft_software::apps::flatpak::{self, Installation, Permissions};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use specta::Type;
 
 use crate::fedora;
 

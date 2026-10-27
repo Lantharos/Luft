@@ -1,4 +1,3 @@
-use specta::Type;
 use std::path::Path;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicUsize, Ordering};
@@ -6,6 +5,7 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use ignore::{WalkBuilder, WalkState};
 use parking_lot::Mutex;
 use serde::Serialize;
+use specta::Type;
 
 use super::Target;
 

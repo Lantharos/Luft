@@ -1,4 +1,3 @@
-use specta::Type;
 mod battery;
 mod cpu;
 mod cpu_info;
@@ -21,6 +20,7 @@ use cpu_info::CpuInfo;
 use drives::{DriveInfo, DriveSample, Drives};
 use memory::{Memory, MemorySample};
 use network::{NetworkInfo, NetworkSample, Networks};
+use specta::Type;
 
 #[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]

@@ -1,9 +1,9 @@
-use specta::Type;
 use std::fs;
 use std::path::{Path, PathBuf};
 
 use luft_app::fonts;
 use serde::Serialize;
+use specta::Type;
 
 use super::data::FontData;
 use super::faces::{self, Identity};

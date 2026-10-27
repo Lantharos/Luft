@@ -1,4 +1,3 @@
-use specta::Type;
 use std::fs::{self, File};
 use std::io::{BufWriter, Write};
 use std::path::{Path, PathBuf};
@@ -9,6 +8,7 @@ use std::thread;
 use gio::glib;
 use glycin::{Frame, Loader, MainContextSelector, MemoryFormat, MemoryFormatSelection};
 use serde::Serialize;
+use specta::Type;
 
 use crate::cache;
 

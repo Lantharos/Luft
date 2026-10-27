@@ -1,4 +1,3 @@
-use specta::Type;
 use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
@@ -9,6 +8,7 @@ use std::time::{Duration, Instant};
 use gio::prelude::*;
 use luft_app::launch;
 use serde::Deserialize;
+use specta::Type;
 
 use super::apps::members;
 

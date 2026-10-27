@@ -1,8 +1,8 @@
-use specta::Type;
 use std::path::PathBuf;
 
 use luft_app::{Appearance, Events};
 use serde::Serialize;
+use specta::Type;
 
 use crate::accounts::{Account, Credentials, Provider, oauth_providers};
 use crate::services::notify::Notifier;

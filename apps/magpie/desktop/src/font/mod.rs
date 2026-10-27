@@ -1,4 +1,3 @@
-use specta::Type;
 mod data;
 mod faces;
 mod install;
@@ -10,6 +9,7 @@ use serde::Serialize;
 
 use data::FontData;
 use faces::Face;
+use specta::Type;
 
 pub use install::{install, remove, status, use_as};
 pub use preview::source;

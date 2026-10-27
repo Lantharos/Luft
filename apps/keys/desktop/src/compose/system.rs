@@ -1,9 +1,9 @@
-use specta::Type;
 use std::collections::HashMap;
 use std::ffi::{CStr, CString, c_char, c_void};
 use std::sync::OnceLock;
 
 use serde::Serialize;
+use specta::Type;
 use xkbcommon::xkb;
 
 use crate::layout::dead;

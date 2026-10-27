@@ -1,4 +1,3 @@
-use specta::Type;
 use std::io::{Read, Write};
 use std::net::{TcpStream, ToSocketAddrs};
 use std::sync::{Arc, OnceLock};
@@ -9,6 +8,7 @@ use rustls::{ClientConfig, ClientConnection, StreamOwned};
 use rustls_platform_verifier::ConfigVerifierExt;
 use serde::{Deserialize, Serialize};
 use socket2::{SockRef, TcpKeepalive};
+use specta::Type;
 
 const CONNECT_TIMEOUT: Duration = Duration::from_secs(15);
 const HTTP_TIMEOUT: Duration = Duration::from_secs(30);

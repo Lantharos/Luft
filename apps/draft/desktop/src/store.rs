@@ -1,9 +1,9 @@
-use specta::Type;
 use std::fs;
 use std::path::PathBuf;
 
 use serde::Deserialize;
 use serde_json::Value;
+use specta::Type;
 
 #[derive(Deserialize, Clone, Copy, Type)]
 #[serde(rename_all = "lowercase")]

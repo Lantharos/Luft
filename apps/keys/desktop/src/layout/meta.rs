@@ -1,9 +1,9 @@
-use specta::Type;
 use std::fs;
 use std::path::PathBuf;
 
 use luft_app::files;
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use super::dead::DeadKey;
 use crate::paths;

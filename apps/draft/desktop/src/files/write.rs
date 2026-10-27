@@ -1,4 +1,3 @@
-use specta::Type;
 use std::collections::HashMap;
 use std::fs::{self, File};
 use std::io::Write as _;
@@ -8,6 +7,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 
 use parking_lot::Mutex;
 use serde::Deserialize;
+use specta::Type;
 
 use super::encoding::encode;
 use super::{Stat, failed};

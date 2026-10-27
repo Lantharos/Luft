@@ -1,9 +1,9 @@
-use specta::Type;
 use std::fs;
 use std::path::{Path, PathBuf};
 
 use gio::prelude::*;
 use serde::Serialize;
+use specta::Type;
 
 #[derive(Serialize, Type)]
 #[serde(rename_all = "lowercase")]

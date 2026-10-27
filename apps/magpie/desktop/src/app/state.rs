@@ -1,9 +1,9 @@
-use specta::Type;
 use std::sync::Arc;
 
 use luft_app::thumbnails::Thumbnails;
 use luft_app::{Activation, Appearance, Events};
 use serde::Serialize;
+use specta::Type;
 
 use crate::app::events::THUMBNAILS_READY;
 use crate::folder::FolderWatcher;

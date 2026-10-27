@@ -1,12 +1,12 @@
 use futures_util::StreamExt;
-use luft_app::{Events, dbus};
-use serde_json::Value;
+use luft_app::{Empty, Events, dbus};
+use sabine::BridgeEvent;
 use zbus::Proxy;
 
 const SERVICE: &str = "org.freedesktop.NetworkManager";
 const PATH: &str = "/org/freedesktop/NetworkManager";
 const FULL: u32 = 4;
-const ONLINE: &str = "signin.online";
+pub const ONLINE: BridgeEvent<()> = BridgeEvent::new("signin.online");
 
 async fn network_manager() -> Option<Proxy<'static>> {
     let connection = dbus::system().await.ok()?;
@@ -40,7 +40,7 @@ pub fn watch(events: Events) {
     });
 }
 
-pub async fn check(events: Events, _: Value) -> Result<(), String> {
+pub async fn check(events: Events, Empty {}: Empty) -> Result<(), String> {
     if let Some(manager) = network_manager().await
         && manager.call::<_, _, u32>("CheckConnectivity", &()).await == Ok(FULL)
     {

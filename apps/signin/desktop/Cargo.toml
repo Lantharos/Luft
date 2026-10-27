@@ -16,7 +16,7 @@ luft-app.workspace = true
 sabine.workspace = true
 sabine-service.workspace = true
 serde.workspace = true
-serde_json.workspace = true
+specta.workspace = true
 url.workspace = true
 zbus = { workspace = true, features = ["proxy", "tokio"] }
 

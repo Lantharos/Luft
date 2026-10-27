@@ -1,11 +1,12 @@
 use serde::Serialize;
+use specta::Type;
 use url::{Url, form_urlencoded};
 
 use crate::connectivity;
 
 const SCHEME: &str = "kestrel-signin:";
 
-#[derive(Debug, PartialEq, Serialize)]
+#[derive(Debug, PartialEq, Serialize, Type)]
 pub struct Target {
     network: String,
     url: String,

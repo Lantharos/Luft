@@ -1,18 +1,6 @@
-import { Guest, appWindow, events, invoke, listen } from '@lantharos/sabine';
-import { appearance, type Appearance } from '@luft/ui';
-
-interface Target {
-	network: string;
-	url: string;
-}
-
-interface AppState extends Appearance {
-	target: Target | null;
-}
-
-interface Activation {
-	arguments: string[];
-}
+import { Guest, appWindow, events as sabineEvents } from '@lantharos/sabine';
+import { appearance } from '@luft/ui';
+import { commands, events, type Target } from '#lib/bindings.js';
 
 const PARTITION = 'portal';
 
@@ -32,19 +20,19 @@ class SignIn {
 	}
 
 	async start(): Promise<() => void> {
-		const state = await invoke<AppState>('app_state');
+		const state = await commands.appState();
 		const stops = [
 			appearance.start(state),
-			listen('signin.online', () => appWindow.close()),
-			listen<Activation>('singleInstance.activate', async ({ arguments: args }) => {
+			events.signinOnline(() => appWindow.close()),
+			sabineEvents.singleInstance(async (activation) => {
 				appWindow.focus();
-				const target = await invoke<Target | null>('activation_target', { arguments: args });
+				const target = await commands.activationTarget(activation);
 				if (target) await this.open(target);
 			}),
-			events.guestNavigated(({ url }) => {
+			sabineEvents.guestNavigated(({ url }) => {
 				this.address = url;
 				this.loading = false;
-				void invoke('check_connectivity');
+				void commands.checkConnectivity();
 			})
 		];
 		if (state.target) await this.open(state.target);

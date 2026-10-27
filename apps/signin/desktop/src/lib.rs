@@ -2,10 +2,10 @@ mod connectivity;
 mod link;
 mod profile;
 
-use luft_app::{Activation, Appearance, Commands, Events, GlassWindow};
+use luft_app::{Activation, Appearance, Commands, Empty, Events, GlassWindow};
 use sabine::SabineWindow;
 use serde::Serialize;
-use serde_json::Value;
+use specta::Type;
 
 use link::Target;
 
@@ -18,14 +18,14 @@ const WINDOW: GlassWindow = GlassWindow {
     single_instance: Some(APP_ID),
 };
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 struct AppState {
     #[serde(flatten)]
     appearance: Appearance,
     target: Option<Target>,
 }
 
-async fn app_state(_: Value) -> Result<AppState, String> {
+async fn app_state(Empty {}: Empty) -> Result<AppState, String> {
     Ok(AppState {
         appearance: Appearance::current().await,
         target: link::verified(Activation::current_process().arguments()).await,
@@ -48,6 +48,7 @@ pub fn run_app() -> ! {
 
 fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     window
+        .bridge_event(&connectivity::ONLINE)
         .command_async("app_state", app_state)
         .command_async("activation_target", activation_target)
         .with_async("check_connectivity", events, connectivity::check)

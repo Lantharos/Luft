@@ -2,6 +2,7 @@ use std::path::Path;
 
 use luft_app::dbus::service::{Service, get};
 use serde::Serialize;
+use specta::Type;
 
 const INPUT: &str = "/sys/class/input";
 const UDEV_DATA: &str = "/run/udev/data";
@@ -14,7 +15,7 @@ const UPOWER: Service = Service {
     interface: "org.freedesktop.UPower",
 };
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Hardware {
     nvidia: bool,

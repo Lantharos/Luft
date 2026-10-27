@@ -1,8 +1,9 @@
 use serde::Serialize;
+use specta::Type;
 
 const ZONES: &str = "/usr/share/zoneinfo/zone1970.tab";
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Zone {
     id: String,
     city: String,

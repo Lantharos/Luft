@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { appWindow } from '@lantharos/sabine';
 	import { t } from '@luft/i18n';
-	import { finishFirstBoot } from '#lib/bridge/installer.js';
-	import { finishSetup, restart } from '#lib/bridge/system.js';
+	import { commands } from '#lib/bindings.js';
+	import { WAIT_FOR_PERSON } from '#lib/bridge/system.js';
 	import StepFrame from '#lib/components/StepFrame.svelte';
 	import EnrollSteps from '#lib/components/trust/EnrollSteps.svelte';
 	import { setup } from '#lib/state/setup.svelte.js';
@@ -14,9 +14,9 @@
 		busy = true;
 		problem = '';
 		try {
-			await finishFirstBoot();
-			if (setup.secureBootCode) await restart();
-			else if (!(await finishSetup())) await appWindow.close();
+			await commands.installerFinishFirstBoot(WAIT_FOR_PERSON);
+			if (setup.secureBootCode) await commands.sessionRestart(WAIT_FOR_PERSON);
+			else if (!(await commands.sessionFinish())) await appWindow.close();
 		} catch (error) {
 			problem = String(error);
 			busy = false;

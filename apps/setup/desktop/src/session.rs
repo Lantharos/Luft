@@ -1,10 +1,9 @@
 use gio::prelude::*;
-use luft_app::Commands;
 use luft_app::dbus::{self, failed};
 use luft_app::launch::{self, Token};
+use luft_app::{Commands, Empty};
 use luft_i18n::t;
 use sabine::SabineWindow;
-use serde_json::Value;
 use zbus::Connection;
 use zbus::fdo::DBusProxy;
 use zbus::names::WellKnownName;
@@ -28,7 +27,7 @@ async fn in_setup(session: &Connection) -> bool {
         .unwrap_or(false)
 }
 
-async fn finish(_: Value) -> Result<bool, String> {
+async fn finish(Empty {}: Empty) -> Result<bool, String> {
     let session = dbus::session().await?;
     if !in_setup(session).await {
         return Ok(false);
@@ -40,7 +39,7 @@ async fn finish(_: Value) -> Result<bool, String> {
     Ok(true)
 }
 
-async fn restart(_: Value) -> Result<(), String> {
+async fn restart(Empty {}: Empty) -> Result<(), String> {
     dbus::system()
         .await?
         .call_method(

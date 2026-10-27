@@ -1,3 +1,4 @@
+mod contract;
 mod fingerprint;
 mod hardware;
 mod installer;
@@ -5,12 +6,12 @@ mod regional;
 mod session;
 mod trust;
 
-use luft_app::{Appearance, Commands, Events};
+use luft_app::{Appearance, Commands, Empty, Events};
 use luft_i18n::{Localizer, localizer, t};
 use luft_meet::{Handoff, Intent};
 use sabine::{SabineLifecyclePolicy, SabineWindow, SingleInstancePolicy, WindowRegion};
 use serde::Serialize;
-use serde_json::Value;
+use specta::Type;
 
 const APP_ID: &str = "com.lantharos.setup";
 const SIZE: (u32, u32) = (820, 600);
@@ -19,7 +20,7 @@ const MEET_NOTES: &str = "/run/initramfs/live/meet.json";
 
 pub static L10N: Localizer = localizer!("locales", ["desktop"]);
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 struct AppState {
     #[serde(flatten)]
     appearance: Appearance,
@@ -45,7 +46,7 @@ fn window(window: SabineWindow) -> SabineWindow {
         .single_instance(SingleInstancePolicy::FocusExisting)
 }
 
-async fn app_state(_: Value) -> Result<AppState, String> {
+async fn app_state(Empty {}: Empty) -> Result<AppState, String> {
     Ok(AppState {
         appearance: Appearance::current().await,
         hardware: hardware::detect().await,

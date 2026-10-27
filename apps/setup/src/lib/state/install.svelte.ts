@@ -1,9 +1,10 @@
-import * as installer from '#lib/bridge/installer.js';
-import type { Drive, Encryption, InstallerState, Intent, LinuxSystem, Survey, Target, WindowsChoices } from '#lib/bridge/installer.js';
-import { NO_HARDWARE, type Hardware } from '#lib/bridge/system.js';
+import { commands, events, type Hardware, type InstallerState, type Intent } from '#lib/bindings.js';
+import type { Drive, Encryption, LinuxSystem, Survey, Target, WindowsChoices } from '#lib/bridge/installer.js';
+import { NO_HARDWARE, WAIT_FOR_PERSON } from '#lib/bridge/system.js';
 import { regional } from './regional.svelte.js';
 
 const NAME_FALLBACK = 'luft';
+const SURVEY_TIMEOUT = { timeoutMs: 120_000 };
 
 class InstallState {
 	status = $state<InstallerState | null>(null);
@@ -33,8 +34,8 @@ class InstallState {
 	async start(hardware: Hardware, intent: Intent | null) {
 		this.hardware = hardware;
 		this.intent = intent;
-		this.status = await installer.state();
-		const stop = installer.onChanged((status) => (this.status = status));
+		this.status = await commands.installerState();
+		const stop = events.installerChanged((status) => (this.status = status));
 		if (this.status?.phase === 'live') void this.look();
 		return stop;
 	}
@@ -43,7 +44,7 @@ class InstallState {
 		this.surveying = true;
 		this.surveyError = '';
 		try {
-			this.survey = await installer.survey();
+			this.survey = await commands.installerSurvey(SURVEY_TIMEOUT);
 			regional.suggestFrom(this.survey.hints);
 		} catch (error) {
 			this.surveyError = String(error);
@@ -56,9 +57,12 @@ class InstallState {
 		this.starting = true;
 		this.startError = '';
 		try {
-			await installer.install(target, this.hardware.nvidia ? 'nvidia' : 'default', $state.snapshot(this.windowsChoices), encryption);
+			await commands.installerInstall(
+				{ target, variant: this.hardware.nvidia ? 'nvidia' : 'default', windows: $state.snapshot(this.windowsChoices), encryption },
+				WAIT_FOR_PERSON
+			);
 			this.replacing = target.kind === 'replace' ? (this.systems.find((system) => system.id === target.system) ?? null) : null;
-			this.status = await installer.state();
+			this.status = await commands.installerState();
 			await this.configure();
 			return true;
 		} catch (error) {
@@ -71,18 +75,21 @@ class InstallState {
 
 	configure() {
 		const name = this.user || this.replacing?.owner?.name || NAME_FALLBACK;
-		return installer.configure({
-			locale: regional.language.locale,
-			keyboard: $state.snapshot(regional.keyboard),
-			timezone: regional.zone,
-			hostname: `${name}-${this.hardware.portable ? 'laptop' : 'computer'}`
-		});
+		return commands.installerConfigure(
+			{
+				locale: regional.language.locale,
+				keyboard: $state.snapshot(regional.keyboard),
+				timezone: regional.zone,
+				hostname: `${name}-${this.hardware.portable ? 'laptop' : 'computer'}`
+			},
+			WAIT_FOR_PERSON
+		);
 	}
 
 	async createAccount(name: string, fullName: string, password: string) {
 		this.user = name;
 		await this.configure();
-		await installer.createAccount(name, fullName, password);
+		await commands.installerAccount({ name, fullName, password }, WAIT_FOR_PERSON);
 	}
 
 	encryptable(target: Target) {

@@ -1,11 +1,10 @@
 use std::sync::OnceLock;
 
 use futures_util::StreamExt;
-use luft_app::{Commands, Events, dbus};
-use luft_fingerprint::{PROGRESS, Progress};
+use luft_app::{Commands, Empty, Events, dbus};
+use luft_fingerprint::{EnrollProgress, PROGRESS};
 use sabine::SabineWindow;
 use serde::Deserialize;
-use serde_json::Value;
 use zbus::message::Type;
 use zbus::{MatchRule, MessageStream};
 
@@ -15,7 +14,7 @@ const STATUS: &str = "FingerprintStatus";
 
 static LISTENING: OnceLock<()> = OnceLock::new();
 
-#[derive(Deserialize)]
+#[derive(Deserialize, specta::Type)]
 struct Finger {
     finger: String,
 }
@@ -40,7 +39,7 @@ async fn listen(events: Events) {
         if let Ok((result, done)) =
             message.and_then(|message| message.body().deserialize::<(String, bool)>())
         {
-            events.emit(PROGRESS, Progress { result, done });
+            events.emit(PROGRESS, EnrollProgress { result, done });
         }
     }
 }
@@ -54,8 +53,9 @@ async fn enroll(events: Events, Finger { finger }: Finger) -> Result<(), String>
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     luft_fingerprint::register_reader(window)
+        .bridge_event(&PROGRESS)
         .with_async("fingerprint_enroll", events, enroll)
-        .command_async("fingerprint_stop", |_: Value| async {
+        .command_async("fingerprint_stop", |Empty {}| async {
             installer::call::<_, ()>("StopFingerprint", &()).await
         })
 }

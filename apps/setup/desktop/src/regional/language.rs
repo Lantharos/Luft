@@ -1,5 +1,6 @@
 use luft_app::dbus::{self, failed};
 use serde::Deserialize;
+use specta::Type;
 use zbus::{OwnedObjectPath, Proxy};
 
 use crate::{L10N, installer};
@@ -8,7 +9,7 @@ const ACCOUNTS: &str = "org.freedesktop.Accounts";
 const ACCOUNTS_PATH: &str = "/org/freedesktop/Accounts";
 const USER: &str = "org.freedesktop.Accounts.User";
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Language {
     language: String,
 }

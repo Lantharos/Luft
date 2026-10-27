@@ -1,8 +1,9 @@
 use gio::prelude::*;
+use luft_app::Empty;
 use luft_app::dbus::failed;
 use luft_app::dbus::service::get;
 use serde::Deserialize;
-use serde_json::Value;
+use specta::Type;
 
 use super::TIME;
 
@@ -10,7 +11,7 @@ const ZONES: &str = "/usr/share/zoneinfo/zone.tab";
 const LOCALE: &str = "org.gnome.system.locale";
 const REGION: &str = "region";
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Formats {
     region: String,
 }
@@ -27,7 +28,7 @@ fn country_of(zone: &str) -> Option<String> {
         })
 }
 
-pub async fn unset_country(_: Value) -> Result<Option<String>, String> {
+pub async fn unset_country(Empty {}: Empty) -> Result<Option<String>, String> {
     if !gio::Settings::new(LOCALE).string(REGION).is_empty() {
         return Ok(None);
     }

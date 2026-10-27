@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Checkbox, PasswordField, RecoveryKey } from '@luft/ui';
-	import { printKey, recoveryKey, saveKey } from '#lib/bridge/system.js';
+	import { commands } from '#lib/bindings.js';
+	import { WAIT_FOR_PERSON } from '#lib/bridge/system.js';
 	import StepFrame from '#lib/components/StepFrame.svelte';
 	import { install } from '#lib/state/install.svelte.js';
 	import { setup } from '#lib/state/setup.svelte.js';
@@ -23,7 +24,8 @@
 	let ready = $derived(Boolean(key) && kept && passphraseReady);
 
 	$effect(() => {
-		void recoveryKey()
+		void commands
+			.trustRecoveryKey()
 			.then((made) => (key = made))
 			.catch((error) => (problem = String(error)));
 	});
@@ -42,7 +44,7 @@
 	<div class="flex max-w-[560px] flex-col gap-5">
 		<p class="text-[14px] leading-relaxed text-[var(--text-soft)]">{t('setup-protect-keep-safe')}</p>
 		{#if key}
-			<RecoveryKey {key} onsave={() => saveKey(key)} onprint={() => printKey(key)} copyable={false} />
+			<RecoveryKey {key} onsave={() => commands.trustSaveKey({ key }, WAIT_FOR_PERSON)} onprint={() => commands.trustPrintKey({ key }, WAIT_FOR_PERSON)} copyable={false} />
 		{/if}
 		{#if !tpm}
 			<div class="grid grid-cols-2 gap-3">

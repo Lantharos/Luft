@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { enrollKey, restart } from '#lib/bridge/system.js';
+	import { commands } from '#lib/bindings.js';
+	import { WAIT_FOR_PERSON } from '#lib/bridge/system.js';
 	import StepFrame from '#lib/components/StepFrame.svelte';
 	import EnrollSteps from '#lib/components/trust/EnrollSteps.svelte';
 	import { flow } from '#lib/state/flow.svelte.js';
@@ -13,7 +14,7 @@
 		busy = true;
 		problem = '';
 		try {
-			setup.secureBootCode = await enrollKey();
+			setup.secureBootCode = await commands.trustEnroll(WAIT_FOR_PERSON);
 		} catch (error) {
 			problem = String(error);
 		} finally {
@@ -23,7 +24,7 @@
 
 	async function restartNow() {
 		problem = '';
-		await restart().catch((error) => (problem = String(error)));
+		await commands.sessionRestart(WAIT_FOR_PERSON).catch((error) => (problem = String(error)));
 	}
 </script>
 

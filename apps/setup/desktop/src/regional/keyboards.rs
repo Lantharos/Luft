@@ -1,5 +1,6 @@
 use luft_i18n::SystemCatalog;
 use serde::Serialize;
+use specta::Type;
 
 use crate::L10N;
 
@@ -7,8 +8,8 @@ const NAMES: &[&str] = &["xkeyboard-config-2", "xkeyboard-config"];
 const RULES: &str = "/usr/share/X11/xkb/rules/evdev.xml";
 const UNDETERMINED: &str = "und";
 
-#[derive(Serialize)]
-pub struct Keyboard {
+#[derive(Serialize, Type)]
+pub struct KeyboardLayout {
     layout: String,
     variant: String,
     name: String,
@@ -33,7 +34,7 @@ fn text<'a>(node: roxmltree::Node<'a, '_>, name: &str) -> Option<&'a str> {
         .text()
 }
 
-pub fn all() -> Vec<Keyboard> {
+pub fn all() -> Vec<KeyboardLayout> {
     let Ok(rules) = std::fs::read_to_string(RULES) else {
         return Vec::new();
     };
@@ -45,12 +46,12 @@ pub fn all() -> Vec<Keyboard> {
         return Vec::new();
     };
     let names = SystemCatalog::load(NAMES, L10N.locale());
-    let mut keyboards: Vec<Keyboard> = document
+    let mut keyboards: Vec<KeyboardLayout> = document
         .descendants()
         .filter(|node| node.has_tag_name("layout") && !placeholder(*node))
         .flat_map(|layout| {
             let id = text(layout, "name").unwrap_or_default().to_owned();
-            let base = Keyboard {
+            let base = KeyboardLayout {
                 layout: id.clone(),
                 variant: String::new(),
                 name: names
@@ -61,7 +62,7 @@ pub fn all() -> Vec<Keyboard> {
                 .descendants()
                 .filter(|node| node.has_tag_name("variant"))
                 .filter_map(|variant| {
-                    Some(Keyboard {
+                    Some(KeyboardLayout {
                         layout: id.clone(),
                         variant: text(variant, "name")?.to_owned(),
                         name: names.translate(text(variant, "description")?).to_owned(),

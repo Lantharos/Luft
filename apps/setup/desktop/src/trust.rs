@@ -1,54 +1,74 @@
-use luft_app::Commands;
 use luft_app::recovery::for_this_computer;
+use luft_app::{Commands, Empty};
 use luft_i18n::t;
 use luft_trust::{TRUST, get, group};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
+use specta::Type;
 
+use crate::installer::named;
 use crate::{L10N, installer};
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize, Default, Type)]
+#[serde(rename_all = "kebab-case")]
+enum SecureBoot {
+    On,
+    Off,
+    Setup,
+    #[default]
+    Unsupported,
+}
+
+#[derive(Serialize, Deserialize, Default, Type)]
+#[serde(rename_all = "kebab-case")]
+enum SigningKey {
+    #[default]
+    None,
+    Pending,
+    Enrolled,
+}
+
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
-struct State {
-    secure_boot: String,
-    key: String,
+struct TrustState {
+    secure_boot: SecureBoot,
+    key: SigningKey,
     key_available: bool,
     tpm: bool,
 }
 
-#[derive(Deserialize)]
-struct Key {
+#[derive(Deserialize, Type)]
+struct RecoveryKey {
     key: String,
 }
 
-async fn state(_: Value) -> Result<Option<State>, String> {
+async fn state(Empty {}: Empty) -> Result<Option<TrustState>, String> {
     Ok(TRUST.read().await?.map(|properties| {
         let key = group(&properties, "SigningKey");
-        State {
-            secure_boot: get(&properties, "SecureBoot").unwrap_or_default(),
-            key: get(&key, "State").unwrap_or_default(),
+        TrustState {
+            secure_boot: named(get(&properties, "SecureBoot")),
+            key: named(get(&key, "State")),
             key_available: get(&key, "Available").unwrap_or_default(),
             tpm: get(&group(&properties, "Tpm"), "Usable").unwrap_or_default(),
         }
     }))
 }
 
-async fn enroll(_: Value) -> Result<String, String> {
+async fn enroll(Empty {}: Empty) -> Result<String, String> {
     installer::call("EnrollSigningKey", &()).await
 }
 
-async fn recovery_key(_: Value) -> Result<String, String> {
+async fn recovery_key(Empty {}: Empty) -> Result<String, String> {
     luft_trust::call(&TRUST, "GenerateRecoveryKey", &()).await
 }
 
-async fn save_key(Key { key }: Key) -> Result<bool, String> {
+async fn save_key(RecoveryKey { key }: RecoveryKey) -> Result<bool, String> {
     for_this_computer(&key)
         .save(&t!(L10N, "desktop-recovery-file-name"))
         .await
 }
 
-async fn print_key(Key { key }: Key) -> Result<bool, String> {
+async fn print_key(RecoveryKey { key }: RecoveryKey) -> Result<bool, String> {
     for_this_computer(&key).print().await
 }
 

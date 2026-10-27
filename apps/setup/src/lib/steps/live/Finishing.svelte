@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { i18n, t } from '@luft/i18n';
 	import { ProgressBar } from '@luft/ui';
-	import { restart, finishSetup } from '#lib/bridge/system.js';
+	import { commands } from '#lib/bindings.js';
+	import { WAIT_FOR_PERSON } from '#lib/bridge/system.js';
 	import StepFrame from '#lib/components/StepFrame.svelte';
 	import EnrollSteps from '#lib/components/trust/EnrollSteps.svelte';
 	import { install } from '#lib/state/install.svelte.js';
@@ -25,7 +26,7 @@
 
 	async function restartNow() {
 		problem = '';
-		await restart().catch((error) => (problem = String(error)));
+		await commands.sessionRestart(WAIT_FOR_PERSON).catch((error) => (problem = String(error)));
 	}
 </script>
 
@@ -35,7 +36,7 @@
 			{t(fromStick ? 'setup-finishing-failed-stick' : 'setup-finishing-failed-trying')}
 		</p>
 		{#snippet actions()}
-			<button type="button" class="plain-button large" onclick={() => finishSetup()}>{t(fromStick ? 'setup-finishing-use-stick' : 'setup-finishing-keep-trying')}</button>
+			<button type="button" class="plain-button large" onclick={() => commands.sessionFinish()}>{t(fromStick ? 'setup-finishing-use-stick' : 'setup-finishing-keep-trying')}</button>
 			<button type="button" class="button large px-6" onclick={restartNow}>{t('setup-restart')}</button>
 		{/snippet}
 	</StepFrame>

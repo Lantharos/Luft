@@ -8,8 +8,8 @@
 	import SlidersHorizontal from '@lucide/svelte/icons/sliders-horizontal';
 	import { t } from '@luft/i18n';
 	import { bytes, Choice } from '@luft/ui';
+	import { commands } from '#lib/bindings.js';
 	import type { Drive, Target, WindowsVolume } from '#lib/bridge/installer.js';
-	import { finishSetup } from '#lib/bridge/system.js';
 	import StepFrame from '#lib/components/StepFrame.svelte';
 	import { flow } from '#lib/state/flow.svelte.js';
 	import { install } from '#lib/state/install.svelte.js';
@@ -80,7 +80,7 @@
 	});
 
 	async function justTry() {
-		if (!(await finishSetup().catch(() => false))) await appWindow.close();
+		if (!(await commands.sessionFinish().catch(() => false))) await appWindow.close();
 	}
 
 	function choose() {

@@ -1,11 +1,8 @@
-import { invoke, listen } from '@lantharos/sabine';
+import type { Intent } from '#lib/bindings.js';
 
-export type Phase = 'live' | 'first-boot' | 'installed';
-export type Stage = 'idle' | 'preparing' | 'copying' | 'waiting' | 'configuring' | 'finished' | 'failed';
 export type DriveKind = 'nvme' | 'ssd' | 'hdd' | 'usb' | 'card' | 'optical' | 'image';
 export type DriveBlock = 'running' | 'read-only' | 'too-small';
 export type WindowsBlock = 'bitlocker' | 'hibernated' | 'dirty' | 'full';
-export type Intent = 'try' | 'install' | 'replace';
 export type Layout = 'subvolumes' | 'separateHome' | 'single' | 'encrypted' | 'unknown';
 export type SystemBlock = 'layout' | 'read-only' | 'startup' | 'no-account' | 'running';
 
@@ -23,14 +20,6 @@ export interface LinuxSystem {
 	packages: number;
 	keepsOld: boolean;
 	startup: 'esp' | 'boot' | null;
-}
-
-export interface InstallerState {
-	phase: Phase;
-	stage: Stage;
-	progress: number;
-	error: string;
-	secureBootCode: string;
 }
 
 export interface Space {
@@ -113,22 +102,16 @@ export interface WindowsChoices {
 	bluetooth: boolean;
 }
 
-export interface Regional {
+export type Regional = {
 	locale: string;
 	keyboard: Keyboard;
 	timezone: string;
 	hostname: string;
-}
+};
 
-const SURVEY_TIMEOUT = 120_000;
-const WAIT_FOR_PERSON = 300_000;
-
-export const state = () => invoke<InstallerState | null>('installer_state');
-export const survey = () => invoke<Survey>('installer_survey', {}, { timeoutMs: SURVEY_TIMEOUT });
-export const install = (target: Target, variant: string, windows: WindowsChoices, encryption: Encryption | null) =>
-	invoke<void>('installer_install', { value: { target, variant, windows, encryption } }, { timeoutMs: WAIT_FOR_PERSON });
-export const configure = (regional: Regional) => invoke<void>('installer_configure', { value: regional }, { timeoutMs: WAIT_FOR_PERSON });
-export const createAccount = (name: string, fullName: string, password: string) =>
-	invoke<void>('installer_account', { name, fullName, password }, { timeoutMs: WAIT_FOR_PERSON });
-export const finishFirstBoot = () => invoke<void>('installer_finish_first_boot', {}, { timeoutMs: WAIT_FOR_PERSON });
-export const onChanged = (callback: (state: InstallerState) => void) => listen<InstallerState>('installer.changed', callback);
+export type InstallPlan = {
+	target: Target;
+	variant: string;
+	windows: WindowsChoices;
+	encryption: Encryption | null;
+};

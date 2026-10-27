@@ -5,12 +5,12 @@ mod zones;
 
 use std::time::Duration;
 
-use luft_app::Commands;
 use luft_app::dbus::failed;
 use luft_app::dbus::service::{Service, get};
+use luft_app::{Commands, Empty};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
+use specta::Type;
 
 const LOCALE: Service = Service {
     name: "org.freedesktop.locale1",
@@ -31,25 +31,25 @@ const FULL_CONNECTIVITY: u32 = 4;
 const LOCATION: &str = "https://geoip.fedoraproject.org/city";
 const LOCATION_TIMEOUT: Duration = Duration::from_secs(5);
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 struct Catalog {
-    keyboards: Vec<keyboards::Keyboard>,
+    keyboards: Vec<keyboards::KeyboardLayout>,
     zones: Vec<zones::Zone>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Keyboard {
     layout: String,
     variant: String,
 }
 
-#[derive(Deserialize)]
-struct Zone {
+#[derive(Deserialize, Type)]
+struct TimeZone {
     zone: String,
 }
 
-#[derive(Deserialize, Serialize)]
-struct Location {
+#[derive(Deserialize, Serialize, Type)]
+struct Geolocation {
     time_zone: Option<String>,
     country_code: Option<String>,
 }
@@ -64,7 +64,7 @@ async fn online() -> bool {
         == Some(FULL_CONNECTIVITY)
 }
 
-async fn locate(_: Value) -> Result<Option<Location>, String> {
+async fn locate(Empty {}: Empty) -> Result<Option<Geolocation>, String> {
     if !online().await {
         return Ok(None);
     }
@@ -74,7 +74,7 @@ async fn locate(_: Value) -> Result<Option<Location>, String> {
         .map(Some)
 }
 
-fn fetch_location() -> Result<Location, String> {
+fn fetch_location() -> Result<Geolocation, String> {
     let agent = ureq::Agent::config_builder()
         .timeout_global(Some(LOCATION_TIMEOUT))
         .build()
@@ -96,7 +96,7 @@ async fn set_keyboard(Keyboard { layout, variant }: Keyboard) -> Result<(), Stri
         .map_err(failed)
 }
 
-async fn set_zone(Zone { zone }: Zone) -> Result<(), String> {
+async fn set_zone(TimeZone { zone }: TimeZone) -> Result<(), String> {
     TIME.change::<_, ()>("SetTimezone", &(zone, true))
         .await
         .map_err(failed)
@@ -104,7 +104,7 @@ async fn set_zone(Zone { zone }: Zone) -> Result<(), String> {
 
 pub fn register(window: SabineWindow) -> SabineWindow {
     window
-        .command("regional_catalog", |_: Value| {
+        .command("regional_catalog", |Empty {}| {
             Ok(Catalog {
                 keyboards: keyboards::all(),
                 zones: zones::all(),

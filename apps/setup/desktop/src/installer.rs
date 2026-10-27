@@ -1,15 +1,18 @@
 use futures_util::StreamExt;
 use luft_app::dbus::service::{Map, Service, absent, get};
 use luft_app::dbus::{error_message, error_name, failed};
-use luft_app::{Commands, Events};
+use luft_app::{Commands, Empty, Events};
 use luft_i18n::t;
-use sabine::SabineWindow;
+use sabine::{BridgeEvent, SabineWindow};
+use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use specta::Type;
 use zbus::DynamicType;
 use zbus::wire::DynamicDeserialize;
 
 use crate::L10N;
+use crate::contract::{Contract, InstallPlan, Regional, Survey};
 
 pub const INSTALLER: Service = Service {
     name: "com.lantharos.Installer1",
@@ -17,19 +20,41 @@ pub const INSTALLER: Service = Service {
     interface: "com.lantharos.Installer1",
 };
 const ERROR: &str = "com.lantharos.Installer1.Error.";
-const CHANGED: &str = "installer.changed";
+const CHANGED: BridgeEvent<InstallerState> = BridgeEvent::new("installer.changed");
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize, Default, Type)]
+#[serde(rename_all = "kebab-case")]
+pub enum Phase {
+    Live,
+    FirstBoot,
+    #[default]
+    Installed,
+}
+
+#[derive(Serialize, Deserialize, Default, Type)]
+#[serde(rename_all = "kebab-case")]
+pub enum Stage {
+    #[default]
+    Idle,
+    Preparing,
+    Copying,
+    Waiting,
+    Configuring,
+    Finished,
+    Failed,
+}
+
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct State {
-    phase: String,
-    stage: String,
+pub struct InstallerState {
+    phase: Phase,
+    stage: Stage,
     progress: f64,
     error: String,
     secure_boot_code: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 struct Account {
     name: String,
@@ -37,19 +62,20 @@ struct Account {
     password: String,
 }
 
-#[derive(Deserialize)]
-struct Json {
-    value: Value,
-}
-
 fn text(map: &Map, key: &str) -> String {
     get(map, key).unwrap_or_default()
 }
 
-pub async fn state() -> Result<Option<State>, String> {
-    Ok(INSTALLER.read().await?.map(|map| State {
-        phase: text(&map, "Phase"),
-        stage: text(&map, "Stage"),
+/// Reads one of a service's names for a state, such as `first-boot`, as the matching variant.
+pub fn named<T: DeserializeOwned + Default>(name: Option<String>) -> T {
+    name.and_then(|name| serde_json::from_value(Value::String(name)).ok())
+        .unwrap_or_default()
+}
+
+pub async fn state() -> Result<Option<InstallerState>, String> {
+    Ok(INSTALLER.read().await?.map(|map| InstallerState {
+        phase: named(get(&map, "Phase")),
+        stage: named(get(&map, "Stage")),
         progress: get(&map, "Progress").unwrap_or_default(),
         error: text(&map, "Error"),
         secure_boot_code: text(&map, "SecureBootCode"),
@@ -75,17 +101,17 @@ where
         .map_err(|error| explain(&error))
 }
 
-async fn survey(_: Value) -> Result<Value, String> {
+async fn survey(Empty {}: Empty) -> Result<Contract<Survey>, String> {
     let survey: String = call("Survey", &()).await?;
     serde_json::from_str(&survey).map_err(failed)
 }
 
-async fn install(Json { value }: Json) -> Result<(), String> {
-    call("Install", &(value.to_string(),)).await
+async fn install(plan: Contract<InstallPlan>) -> Result<(), String> {
+    call("Install", &(plan.value.to_string(),)).await
 }
 
-async fn configure(Json { value }: Json) -> Result<(), String> {
-    call("Configure", &(value.to_string(),)).await
+async fn configure(regional: Contract<Regional>) -> Result<(), String> {
+    call("Configure", &(regional.value.to_string(),)).await
 }
 
 async fn create_account(
@@ -101,7 +127,7 @@ async fn create_account(
     call("CreateAccount", &(name, full_name, password)).await
 }
 
-async fn finish_first_boot(_: Value) -> Result<(), String> {
+async fn finish_first_boot(Empty {}: Empty) -> Result<(), String> {
     call("FinishFirstBoot", &()).await
 }
 
@@ -120,7 +146,8 @@ pub fn watch(events: Events) {
 
 pub fn register(window: SabineWindow) -> SabineWindow {
     window
-        .command_async("installer_state", |_: Value| state())
+        .bridge_event(&CHANGED)
+        .command_async("installer_state", |Empty {}| state())
         .command_async("installer_survey", survey)
         .command_async("installer_install", install)
         .command_async("installer_configure", configure)

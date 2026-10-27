@@ -26,6 +26,8 @@ roxmltree.workspace = true
 sabine.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+specta.workspace = true
+specta-typescript.workspace = true
 tokio = { workspace = true, features = ["rt"] }
 ureq.workspace = true
 zbus = { workspace = true, features = ["proxy", "tokio"] }

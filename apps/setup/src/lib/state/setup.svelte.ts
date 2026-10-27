@@ -1,6 +1,7 @@
 import { i18n } from '@luft/i18n';
 import { appearance } from '@luft/ui';
-import { appState, NO_HARDWARE, trustState, type Hardware, type TrustState } from '#lib/bridge/system.js';
+import { commands, type Hardware, type TrustState } from '#lib/bindings.js';
+import { NO_HARDWARE } from '#lib/bridge/system.js';
 import { flow, type Step } from './flow.svelte.js';
 import { install } from './install.svelte.js';
 import { regional } from './regional.svelte.js';
@@ -20,13 +21,13 @@ class SetupState {
 	ready = $state(false);
 
 	async start() {
-		const state = await appState();
+		const state = await commands.appState();
 		const stops = [appearance.start(state)];
 		await i18n.ready;
 		this.hardware = state.hardware;
 		stops.push(await install.start(state.hardware, state.meet));
 		const phase = install.status?.phase ?? 'live';
-		this.trust = await trustState().catch(() => null);
+		this.trust = await commands.trustState().catch(() => null);
 		if (phase === 'first-boot') {
 			void regional.adoptFormats().catch(() => {});
 			flow.begin(phase, firstBootSkips(this.trust, this.hardware));

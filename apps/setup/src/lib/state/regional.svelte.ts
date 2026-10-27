@@ -1,6 +1,7 @@
 import { i18n } from '@luft/i18n';
-import { catalog, formatsCountry, locate, setFormats, useKeyboard, useLanguage, useZone, type Catalog, type KeyboardLayout, type Zone } from '#lib/bridge/system.js';
+import { commands, type Catalog, type KeyboardLayout, type Zone } from '#lib/bindings.js';
 import type { Hints, Keyboard } from '#lib/bridge/installer.js';
+import { WAIT_FOR_PERSON } from '#lib/bridge/system.js';
 import { describe, outranks, type Field, type Guesses, type Source } from '#lib/regional/guesses.js';
 import { namedZones } from '#lib/regional/zones.js';
 import { countryOf, DEFAULT_LANGUAGE, formatsIn, keyboardFor, languageFor, languageNamed, LANGUAGES, languageTag, type Language } from '#lib/regional/languages.js';
@@ -24,13 +25,13 @@ class RegionalState {
 	description = $derived(describe(this.guesses));
 
 	async start() {
-		this.catalog = await catalog();
+		this.catalog = await commands.regionalCatalog();
 		await this.locate();
 	}
 
 	async locate() {
 		if (this.located) return;
-		const location = await locate().catch(() => null);
+		const location = await commands.regionalLocate().catch(() => null);
 		if (!location?.time_zone) return;
 		this.located = true;
 		if (this.guess('zone', 'network')) this.applyZone(location.time_zone);
@@ -48,9 +49,9 @@ class RegionalState {
 	}
 
 	async adoptFormats() {
-		const country = await formatsCountry();
+		const country = await commands.regionalFormatsCountry();
 		const formats = country && formatsIn(i18n.formats, country);
-		if (formats) await setFormats(formats);
+		if (formats) await commands.regionalSetFormats({ region: formats });
 	}
 
 	chooseLanguage(language: Language) {
@@ -79,21 +80,22 @@ class RegionalState {
 		this.language = language;
 		const tag = languageTag(language);
 		void i18n.use(tag, tag);
-		void useLanguage(language.locale)
-			.then(async () => (this.catalog = await catalog()))
+		void commands
+			.regionalLanguage({ language: language.locale })
+			.then(async () => (this.catalog = await commands.regionalCatalog()))
 			.catch(() => {});
 	}
 
 	private applyKeyboard(keyboard: Keyboard) {
 		if (sameKeyboard(keyboard, this.keyboard)) return;
 		this.keyboard = keyboard;
-		void useKeyboard(keyboard.layout, keyboard.variant).catch(() => {});
+		void commands.regionalKeyboard({ layout: keyboard.layout, variant: keyboard.variant }, WAIT_FOR_PERSON).catch(() => {});
 	}
 
 	private applyZone(zone: string) {
 		if (zone === this.zone) return;
 		this.zone = zone;
-		void useZone(zone).catch(() => {});
+		void commands.regionalZone({ zone }, WAIT_FOR_PERSON).catch(() => {});
 	}
 
 	get languages() {

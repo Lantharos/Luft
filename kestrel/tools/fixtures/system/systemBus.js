@@ -40,7 +40,7 @@ publish(CALLS, {
 publishSecurity(publish, calls, publishUdisks(calls));
 publishWindows(publish);
 publishSleep(publish, calls);
-publishUpdater(publish);
+publishUpdater(publish, calls);
 
 for (const name of [...BASIC_NAMES, ACCOUNTS_NAME, NETWORK_MANAGER_NAME, 'com.lantharos.KestrelChecks', 'org.freedesktop.UDisks2', WINDOWS_NAME, SLEEP_NAME, UPDATER_NAME, ...SECURITY_NAMES])
   Gio.bus_own_name_on_connection(Gio.DBus.system, name, Gio.BusNameOwnerFlags.NONE, null, null);

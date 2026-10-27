@@ -174,6 +174,7 @@ settings-updates-firmware-installing = Telepítés…
 settings-updates-firmware-update = Frissítés
 settings-updates-firmware-failed = Nem sikerült frissíteni a firmware-t
 settings-updates-download = Letöltés
+settings-updates-done = Kész
 settings-updates-released = Megjelent: { $when }
 settings-updates-improvements = Javítások és fejlesztések a rendszer egészében
 settings-updates-download-size = Letöltendő: { $size }

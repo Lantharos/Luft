@@ -174,6 +174,7 @@ settings-updates-firmware-installing = Installazione…
 settings-updates-firmware-update = Aggiorna
 settings-updates-firmware-failed = Impossibile aggiornare il firmware
 settings-updates-download = Scarica
+settings-updates-done = Fine
 settings-updates-released = Pubblicato { $when }
 settings-updates-improvements = Correzioni e miglioramenti in tutto il sistema
 settings-updates-download-size = { $size } da scaricare

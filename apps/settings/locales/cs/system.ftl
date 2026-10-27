@@ -180,6 +180,7 @@ settings-updates-firmware-installing = Instalace…
 settings-updates-firmware-update = Aktualizovat
 settings-updates-firmware-failed = Firmware se nepodařilo aktualizovat
 settings-updates-download = Stáhnout
+settings-updates-done = Hotovo
 settings-updates-released = Vydáno { $when }
 settings-updates-improvements = Opravy a vylepšení v celém systému
 settings-updates-download-size = Ke stažení: { $size }

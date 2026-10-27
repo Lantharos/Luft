@@ -195,6 +195,7 @@ settings-updates-firmware-update = Update
 settings-updates-firmware-failed = The firmware couldn’t be updated
 # Button, verb
 settings-updates-download = Download
+settings-updates-done = Done
 # $when is a relative time, like 3 days ago
 settings-updates-released = Released { $when }
 settings-updates-improvements = Fixes and improvements across the system

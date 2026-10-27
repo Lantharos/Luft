@@ -174,6 +174,7 @@ settings-updates-firmware-installing = Installerer…
 settings-updates-firmware-update = Opdater
 settings-updates-firmware-failed = Firmwaren kunne ikke opdateres
 settings-updates-download = Hent
+settings-updates-done = Udført
 settings-updates-released = Udgivet { $when }
 settings-updates-improvements = Rettelser og forbedringer i hele systemet
 settings-updates-download-size = { $size } skal hentes

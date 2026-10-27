@@ -183,6 +183,7 @@ settings-updates-firmware-installing = Qed jiġi installat…
 settings-updates-firmware-update = Aġġorna
 settings-updates-firmware-failed = Il-firmware ma setax jiġi aġġornat
 settings-updates-download = Niżżel
+settings-updates-done = Lest
 settings-updates-released = Ħareġ: { $when }
 settings-updates-improvements = Tiswijiet u titjib fis-sistema kollha
 settings-updates-download-size = { $size } biex jitniżżlu

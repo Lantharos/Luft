@@ -174,6 +174,7 @@ settings-updates-firmware-installing = Installerar …
 settings-updates-firmware-update = Uppdatera
 settings-updates-firmware-failed = Det gick inte att uppdatera firmware
 settings-updates-download = Hämta
+settings-updates-done = Klar
 settings-updates-released = Släpptes { $when }
 settings-updates-improvements = Korrigeringar och förbättringar i hela systemet
 settings-updates-download-size = { $size } att hämta

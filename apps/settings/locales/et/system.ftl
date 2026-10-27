@@ -177,6 +177,7 @@ settings-updates-firmware-installing = Installimine…
 settings-updates-firmware-update = Värskenda
 settings-updates-firmware-failed = Püsivara ei õnnestunud värskendada
 settings-updates-download = Laadi alla
+settings-updates-done = Valmis
 settings-updates-released = Avaldatud { $when }
 settings-updates-improvements = Parandused ja täiustused kogu süsteemis
 settings-updates-download-size = Allalaadimise maht: { $size }

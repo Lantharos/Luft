@@ -183,6 +183,7 @@ settings-updates-firmware-installing = Á shuiteáil…
 settings-updates-firmware-update = Nuashonraigh
 settings-updates-firmware-failed = Níorbh fhéidir na dochtearraí a nuashonrú
 settings-updates-download = Íoslódáil
+settings-updates-done = Déanta
 settings-updates-released = Eisithe { $when }
 settings-updates-improvements = Deisiúcháin agus feabhsuithe ar fud an chórais
 settings-updates-download-size = { $size } le híoslódáil

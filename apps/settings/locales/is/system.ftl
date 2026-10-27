@@ -174,6 +174,7 @@ settings-updates-firmware-installing = Setur upp…
 settings-updates-firmware-update = Uppfæra
 settings-updates-firmware-failed = Ekki tókst að uppfæra fastbúnaðinn
 settings-updates-download = Sækja
+settings-updates-done = Lokið
 settings-updates-released = Gefið út { $when }
 settings-updates-improvements = Lagfæringar og endurbætur um allt kerfið
 settings-updates-download-size = { $size } til að sækja

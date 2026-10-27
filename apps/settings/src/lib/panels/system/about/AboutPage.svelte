@@ -83,11 +83,13 @@
 					{/snippet}
 				</Row>
 			{/if}
-			<Switch
-				label={t('settings-about-mount-internal')}
-				checked={drives.values['mount-internal'] ?? true}
-				onchange={(on) => drives.set('mount-internal', on)}
-			/>
+			<Row title={t('settings-about-mount-internal')}>
+				<Switch
+					label={t('settings-about-mount-internal')}
+					checked={drives.values['mount-internal'] ?? true}
+					onchange={(on) => drives.set('mount-internal', on)}
+				/>
+			</Row>
 			{#each others as system (system.id)}
 				<Row title={system.name} description={describe(system)}>
 					<button type="button" class="button" onclick={() => removeSystem(system.id)}>{t('settings-about-remove')}</button>

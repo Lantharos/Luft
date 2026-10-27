@@ -2,6 +2,7 @@ use std::path::PathBuf;
 
 use luft_i18n::t;
 use serde::Deserialize;
+use zbus::proxy::CacheProperties;
 use zbus::{Connection, proxy};
 
 use crate::L10N;
@@ -24,7 +25,12 @@ struct Drive {
 }
 
 pub async fn hibernated(system: &Connection) -> zbus::Result<bool> {
-    let listed = WindowsProxy::new(system).await?.drives().await?;
+    let listed = WindowsProxy::builder(system)
+        .cache_properties(CacheProperties::No)
+        .build()
+        .await?
+        .drives()
+        .await?;
     let drives: Vec<Drive> =
         serde_json::from_str(&listed).map_err(|error| zbus::Error::Failure(error.to_string()))?;
     Ok(drives.iter().any(|drive| drive.hibernated))

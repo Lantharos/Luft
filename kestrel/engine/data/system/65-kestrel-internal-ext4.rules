@@ -1,0 +1,1 @@
+SUBSYSTEM=="block", ENV{ID_FS_TYPE}=="ext2|ext3|ext4|ext4dev", ENV{ID_BUS}!="usb|ieee1394", KERNEL!="mmcblk*", TEST!="/run/trustd/held/%k", ENV{UDISKS_AUTO}=""

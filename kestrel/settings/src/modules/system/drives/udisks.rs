@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use luft_dbus::objects::Object;
+use zbus::proxy::CacheProperties;
 use zbus::{Connection, Variant, proxy};
 
 pub const SERVICE: &str = "org.freedesktop.UDisks2";
@@ -31,7 +32,11 @@ async fn filesystem<'a>(
     system: &'a Connection,
     block: &'a str,
 ) -> zbus::Result<FilesystemProxy<'a>> {
-    FilesystemProxy::builder(system).path(block).build().await
+    FilesystemProxy::builder(system)
+        .path(block)
+        .cache_properties(CacheProperties::No)
+        .build()
+        .await
 }
 
 pub async fn mount(system: &Connection, block: &str, options: &str) -> zbus::Result<String> {

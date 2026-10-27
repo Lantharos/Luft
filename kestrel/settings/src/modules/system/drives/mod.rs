@@ -5,9 +5,11 @@ mod windows;
 
 use std::collections::HashSet;
 use std::path::PathBuf;
+use std::sync::Arc;
 
 use futures_util::future::join_all;
 use luft_dbus::objects::{Objects, settle, signals};
+use tokio::sync::Notify;
 use zbus::Connection;
 
 use crate::context::Context;
@@ -24,6 +26,13 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
     let mut changes = signals(&context.system, udisks::SERVICE, udisks::ROOT)
         .await
         .map_err(zbus::Error::Failure)?;
+    let appeared = Arc::new(Notify::new());
+    let notifier = appeared.clone();
+    tokio::spawn(async move {
+        while settle(&mut changes).await {
+            notifier.notify_one();
+        }
+    });
     let system = context.system.clone();
     let session = context.session.clone();
     tokio::spawn(async move {
@@ -42,7 +51,7 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
             }
             tokio::select! {
                 _ = settings.changed() => {}
-                changed = settle(&mut changes) => if !changed { return },
+                () = appeared.notified() => {}
             }
         }
     });

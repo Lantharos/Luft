@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { bytes, Row, Section } from '@luft/ui';
-	import type { InstalledApp, Job, OpenedFile } from '#lib/bridge/types.js';
+	import { commands, type InstalledApp, type Job, type OpenedFile } from '#lib/bindings.js';
 	import AppArt from '#lib/components/AppArt.svelte';
 	import Description from '#lib/components/Description.svelte';
 	import ProgressButton from '#lib/components/ProgressButton.svelte';
 	import SourceTrustDialog from '#lib/components/SourceTrustDialog.svelte';
 	import TrustDialog from '#lib/components/TrustDialog.svelte';
-	import { backend } from '#lib/bridge/index.js';
+	import { launch } from '#lib/bridge/index.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
 	import { operations } from '#lib/state/operations.svelte.js';
@@ -43,8 +43,8 @@
 		file = null;
 		error = null;
 		started = false;
-		backend
-			.inspectFile(current)
+		commands
+			.filesInspect({ path: current })
 			.then((result) => current === path && (file = result))
 			.catch((reason) => current === path && (error = String(reason)));
 	});
@@ -123,7 +123,7 @@
 					{#if operation && operation.state !== 'failed'}
 						<ProgressButton {operation} large />
 					{:else if desktop && (finished || file.kind !== 'appImage')}
-						<button type="button" class="button primary large" onclick={() => backend.launch(desktop)}>Open</button>
+						<button type="button" class="button primary large" onclick={() => launch(desktop)}>Open</button>
 					{:else if finished && file.kind === 'flatpakRepo'}
 						<button type="button" class="button large" onclick={() => navigation.open({ page: 'discover' })}>Done</button>
 					{:else if (file.kind === 'package' || file.kind === 'deb') && (file.installed || installed)}
@@ -154,7 +154,7 @@
 						{#if flathubOperation && flathubOperation.state !== 'failed'}
 							<ProgressButton operation={flathubOperation} />
 						{:else if fromFlathub?.desktop}
-							<button type="button" class="button primary" onclick={() => backend.launch(fromFlathub.desktop!)}>Open</button>
+							<button type="button" class="button primary" onclick={() => launch(fromFlathub.desktop!)}>Open</button>
 						{:else}
 							<button type="button" class="button primary" onclick={installFromFlathub}>Install from Flathub</button>
 						{/if}

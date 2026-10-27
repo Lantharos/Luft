@@ -1,7 +1,6 @@
-import type { InstalledApp } from '#lib/bridge/types.js';
+import type { InstalledApp } from '#lib/bindings.js';
 import * as flathub from '#lib/catalog/flathub.js';
 import type { AppDetails } from '#lib/catalog/types.js';
-import { backend } from '#lib/bridge/index.js';
 import { library } from '#lib/state/library.svelte.js';
 import type { AppTarget } from '#lib/state/navigation.svelte.js';
 
@@ -14,7 +13,7 @@ export interface Loaded {
 async function fetchDetails(id: string | null): Promise<{ details: AppDetails | null; error: string | null }> {
 	if (!id) return { details: null, error: null };
 	try {
-		return { details: await flathub.details(backend, id), error: null };
+		return { details: await flathub.details(id), error: null };
 	} catch (reason) {
 		return { details: null, error: String(reason) };
 	}

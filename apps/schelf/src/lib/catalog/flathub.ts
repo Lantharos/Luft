@@ -1,5 +1,5 @@
-import { commands, type Permissions, type Screenshot } from '#lib/bindings.js';
-import type { AppDetails, CatalogApp, Page } from './types';
+import { commands, type Permissions } from '#lib/bindings.js';
+import type { AppDetails, CatalogApp, Page, Screenshot } from './types';
 import type { CategoryId } from './categories';
 
 export type Collection = 'popular' | 'trending' | 'recently-updated' | 'recently-added';

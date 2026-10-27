@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Dialog } from '@luft/ui';
-	import type { InstalledApp } from '#lib/bridge/types.js';
+	import type { InstalledApp } from '#lib/bindings.js';
 	import { removeJob } from '#lib/app/jobs.js';
 	import { operations } from '#lib/state/operations.svelte.js';
 

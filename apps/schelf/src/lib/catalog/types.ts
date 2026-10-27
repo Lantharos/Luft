@@ -1,4 +1,4 @@
-import type { Permissions, Screenshot } from '#lib/bindings.js';
+import type { Permissions } from '#lib/bindings.js';
 
 export interface CatalogApp {
 	key: string;
@@ -7,6 +7,11 @@ export interface CatalogApp {
 	summary: string;
 	icon: string | null;
 	developer: string | null;
+}
+
+export interface Screenshot {
+	url: string;
+	caption: string | null;
 }
 
 export interface Release {

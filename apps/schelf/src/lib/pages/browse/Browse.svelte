@@ -3,7 +3,6 @@
 	import AppTile from '#lib/components/AppTile.svelte';
 	import * as flathub from '#lib/catalog/flathub.js';
 	import type { CatalogApp, Page } from '#lib/catalog/types.js';
-	import { backend } from '#lib/bridge/index.js';
 	import type { Route } from '#lib/state/navigation.svelte.js';
 
 	type Listing = Extract<Route, { page: 'category' } | { page: 'collection' }>;
@@ -20,7 +19,7 @@
 	let pages = 1;
 
 	function fetchPage(next: number): Promise<Page> {
-		return route.page === 'category' ? flathub.category(backend, route.category, next) : flathub.collection(backend, route.collection, next);
+		return route.page === 'category' ? flathub.category(route.category, next) : flathub.collection(route.collection, next);
 	}
 
 	async function more() {

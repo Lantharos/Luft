@@ -12,13 +12,6 @@ export const commands = {
 		token?: string | null,
 	}, options?: InvokeOptions) => invoke<null>("app_open_url", params, options),
 	appState: (options?: InvokeOptions) => invoke<AppState>("app_state", {}, options),
-	fedoraApp: (params: {
-		id: string,
-	}, options?: InvokeOptions) => invoke<FedoraApp>("fedora_app", params, options),
-	fedoraApps: (options?: InvokeOptions) => invoke<FedoraSummary[]>("fedora_apps", {}, options),
-	fedoraRemovalPlan: (params: {
-		package: string,
-	}, options?: InvokeOptions) => invoke<string[]>("fedora_removal_plan", params, options),
 	filesChooseAppimage: (options?: InvokeOptions) => invoke<string | null>("files_choose_appimage", {}, options),
 	filesInspect: (params: {
 		path: string,
@@ -90,7 +83,7 @@ export const events = {
 	appearanceCorners: (callback: (payload: Corners) => void) => listen<Corners>("appearance.corners", callback),
 	appearanceMotion: (callback: (payload: Motion) => void) => listen<Motion>("appearance.motion", callback),
 	appearanceTypography: (callback: (payload: Typography) => void) => listen<Typography>("appearance.typography", callback),
-	kestrelPalette: (callback: (payload: import("@luft/ui").Palette) => void) => listen<import("@luft/ui").Palette>("kestrel.palette", callback),
+	kestrelPalette: (callback: (payload: Palette) => void) => listen<Palette>("kestrel.palette", callback),
 	schelfLibrary: (callback: (payload: Finished) => void) => listen<Finished>("schelf.library", callback),
 	schelfOperations: (callback: (payload: Operation[]) => void) => listen<Operation[]>("schelf.operations", callback),
 };
@@ -104,10 +97,18 @@ export type AddedSource = {
 	packages: string[],
 };
 
+export type AppIconStyle = "default" | "tinted" | "clear";
+
+export type AppIcons = {
+	style: AppIconStyle,
+	glyphs: string,
+	tinted: IconPaint,
+	clear: IconPaint,
+};
+
 export type AppState = {
 	files: string[],
 	page: string | null,
-	fedora: boolean,
 } & Appearance;
 
 export type AppUpdate = {
@@ -127,7 +128,7 @@ export type AppUpdate = {
 };
 
 export type Appearance = {
-	palette: import("@luft/ui").Palette | null,
+	palette: Palette | null,
 	typography: Typography,
 	motion: Motion,
 	corners: Corners,
@@ -159,40 +160,17 @@ export type DescribedSource = {
 	url: string,
 };
 
-export type FedoraApp = {
-	details: PackageDetails | null,
-} & FedoraComponent;
-
-export type FedoraComponent = {
-	id: string,
-	package: string,
-	name: string,
-	summary: string,
-	description: string,
-	icon: string | null,
-	categories: string[],
-	keywords: string[],
-	developer: string | null,
-	license: string | null,
-	homepage: string | null,
-	screenshots: Screenshot[],
-};
-
-export type FedoraSummary = {
-	id: string,
-	package: string,
-	name: string,
-	summary: string,
-	icon: string | null,
-	categories: string[],
-	keywords: string[],
-	screenshots: number,
-};
-
 export type Finished = {
 	keys: string[],
 	action: Action,
 	succeeded: boolean,
+};
+
+export type IconPaint = {
+	plate: string,
+	ink: string,
+	shade: string,
+	rim: number,
 };
 
 export type Installation = "user" | "system";
@@ -216,7 +194,7 @@ export type InstalledApp = {
 	services: string[],
 };
 
-export type Job = ({ kind: "installFlathub"; id: string }) & { file?: never; installation?: never; name?: never; package?: never; packages?: never; path?: never; reference?: never; references?: never; repository?: never } | ({ kind: "installFlatpakRef"; path: string }) & { file?: never; id?: never; installation?: never; name?: never; package?: never; packages?: never; reference?: never; references?: never; repository?: never } | ({ kind: "installFlatpakBundle"; path: string }) & { file?: never; id?: never; installation?: never; name?: never; package?: never; packages?: never; reference?: never; references?: never; repository?: never } | ({ kind: "installDeb"; path: string }) & { file?: never; id?: never; installation?: never; name?: never; package?: never; packages?: never; reference?: never; references?: never; repository?: never } | ({ kind: "removeDeb"; package: string }) & { file?: never; id?: never; installation?: never; name?: never; packages?: never; path?: never; reference?: never; references?: never; repository?: never } | ({ kind: "updateDebs"; packages: string[] }) & { file?: never; id?: never; installation?: never; name?: never; package?: never; path?: never; reference?: never; references?: never; repository?: never } | ({ kind: "addFlatpakRepo"; path: string; name: string }) & { file?: never; id?: never; installation?: never; package?: never; packages?: never; reference?: never; references?: never; repository?: never } | ({ kind: "installAppImage"; path: string }) & { file?: never; id?: never; installation?: never; name?: never; package?: never; packages?: never; reference?: never; references?: never; repository?: never } | ({ kind: "installTool"; package: string }) & { file?: never; id?: never; installation?: never; name?: never; packages?: never; path?: never; reference?: never; references?: never; repository?: never } | ({ kind: "installToolFile"; path: string }) & { file?: never; id?: never; installation?: never; name?: never; package?: never; packages?: never; reference?: never; references?: never; repository?: never } | ({ kind: "removeFlatpak"; installation: Installation; reference: string }) & { file?: never; id?: never; name?: never; package?: never; packages?: never; path?: never; references?: never; repository?: never } | ({ kind: "removeAppImage"; id: string }) & { file?: never; installation?: never; name?: never; package?: never; packages?: never; path?: never; reference?: never; references?: never; repository?: never } | ({ kind: "removeTool"; package: string }) & { file?: never; id?: never; installation?: never; name?: never; packages?: never; path?: never; reference?: never; references?: never; repository?: never } | ({ kind: "updateFlatpaks"; installation: Installation; references: string[] }) & { file?: never; id?: never; name?: never; package?: never; packages?: never; path?: never; reference?: never; repository?: never } | ({ kind: "updateAppImage"; id: string }) & { file?: never; installation?: never; name?: never; package?: never; packages?: never; path?: never; reference?: never; references?: never; repository?: never } | ({ kind: "updateTools"; packages: string[] }) & { file?: never; id?: never; installation?: never; name?: never; package?: never; path?: never; reference?: never; references?: never; repository?: never } | ({ kind: "installSystemPackages"; packages: string[] }) & { file?: never; id?: never; installation?: never; name?: never; package?: never; path?: never; reference?: never; references?: never; repository?: never } | ({ kind: "removeSystemPackages"; packages: string[] }) & { file?: never; id?: never; installation?: never; name?: never; package?: never; path?: never; reference?: never; references?: never; repository?: never } | ({ kind: "installSystemPackageFile"; path: string; package: string; repository?: RepositoryDraft | null }) & { file?: never; id?: never; installation?: never; name?: never; packages?: never; reference?: never; references?: never } | ({ kind: "removeRepository"; file: string }) & { id?: never; installation?: never; name?: never; package?: never; packages?: never; path?: never; reference?: never; references?: never; repository?: never } | PackageJob;
+export type Job = { kind: "installFlathub"; id: string } | { kind: "installFlatpakRef"; path: string } | { kind: "installFlatpakBundle"; path: string } | { kind: "installDeb"; path: string } | { kind: "removeDeb"; package: string } | { kind: "updateDebs"; packages: string[] } | { kind: "addFlatpakRepo"; path: string; name: string } | { kind: "installAppImage"; path: string } | { kind: "installTool"; package: string } | { kind: "installToolFile"; path: string } | { kind: "removeFlatpak"; installation: Installation; reference: string } | { kind: "removeAppImage"; id: string } | { kind: "removeTool"; package: string } | { kind: "updateFlatpaks"; installation: Installation; references: string[] } | { kind: "updateAppImage"; id: string } | { kind: "updateTools"; packages: string[] } | { kind: "installSystemPackages"; packages: string[] } | { kind: "removeSystemPackages"; packages: string[] } | { kind: "installSystemPackageFile"; path: string; package: string; repository?: RepositoryDraft | null } | { kind: "removeRepository"; file: string };
 
 export type Locale = {
 	languages: string[],
@@ -250,25 +228,15 @@ export type Operation = {
 
 export type OperationState = "queued" | "running" | "failed";
 
-export type PackageDetails = {
-	package: PackageId,
-	summary: string,
-	description: string,
-	url: string,
-	license: string,
-	size: number,
-	downloadSize: number,
+export type Palette = {
+	accent: string,
+	wallpaperAccent: string,
+	pureBlack: boolean,
+	colors: SchemeColors,
+	terminal: SchemeColors,
+	appIcons: AppIcons,
+	taskbar: import("@luft/ui").TaskbarLooks,
 };
-
-export type PackageId = {
-	id: string,
-	name: string,
-	version: string,
-	arch: string,
-	data: string,
-};
-
-export type PackageJob = { kind: "installPackage"; package: string } | { kind: "installPackageFile"; path: string } | { kind: "removePackage"; package: string } | { kind: "updatePackages"; packages: string[] };
 
 export type Permissions = {
 	shared: string[],
@@ -294,12 +262,12 @@ export type RepositoryDraft = {
 	keys: { [key in string]: string },
 };
 
-export type Screenshot = {
-	url: string,
-	caption: string | null,
+export type SchemeColors = {
+	light: { [key in string]: string },
+	dark: { [key in string]: string },
 };
 
-export type Source = "flatpak" | "package" | "appImage" | "tool" | "debian" | "system";
+export type Source = "flatpak" | "appImage" | "tool" | "debian" | "system";
 
 export type SourceKey = {
 	fingerprint: string,

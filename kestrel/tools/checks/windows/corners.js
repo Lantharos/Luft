@@ -1,6 +1,6 @@
 import Gio from 'gi://Gio';
 import St from 'gi://St';
-import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
+import {toggleSurface} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {named, shown, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';

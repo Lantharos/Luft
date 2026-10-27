@@ -1,0 +1,1541 @@
+import Clutter from 'gi://Clutter';
+import Cogl from 'gi://Cogl';
+import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
+import GObject from 'gi://GObject';
+import Meta from 'gi://Meta';
+import Mtk from 'gi://Mtk';
+import Shell from 'gi://Shell';
+import St from 'gi://St';
+
+import * as AltTab from '../switchers/altTab.js';
+import * as KestrelUi from '../../kestrelUi.js';
+import * as Dialog from '../dialogs/dialog.js';
+import * as WorkspaceSwitcherPopup from '../switchers/workspaceSwitcherPopup.js';
+import * as InhibitShortcutsDialog from '../dialogs/inhibitShortcutsDialog.js';
+import * as ModalDialog from '../dialogs/modalDialog.js';
+import * as WindowMenu from './windowMenu.js';
+import * as CloseDialog from './closeDialog.js';
+import * as SwitchMonitor from '../switchers/switchMonitor.js';
+import * as IBusManager from '../input/ibusManager.js';
+import * as WorkspaceAnimation from './workspaceAnimation.js';
+
+import * as Main from '../main.js';
+import {blurBackdrop, followWindowCorners} from '../stage/kestrelGlass.js';
+import {CornerSnap} from './cornerSnap.js';
+import {WindowMorphs} from './effects/morph.js';
+import {OpenCloseEffects} from './effects/openClose.js';
+
+export const SHELL_KEYBINDINGS_SCHEMA = 'com.lantharos.kestrel.keybindings';
+
+const MINIMIZE_PROPERTIES = ['x', 'y', 'scale_x', 'scale_y', 'opacity'];
+const MINIMIZED_WINDOW_SCALE = 0.04;
+const TILE_PREVIEW_GAP = 8;
+const TILE_PREVIEW_RADIUS = 16;
+export const WINDOW_ANIMATION_TIME = 250;
+export const DIM_BRIGHTNESS = -0.3;
+export const DIM_TIME = 500;
+export const UNDIM_TIME = 250;
+
+const ONE_SECOND = 1000; // in ms
+const X11_SETTINGS_TIMEOUT_MS = 10000;
+
+const MIN_NUM_WORKSPACES = 1;
+const MAX_NUM_WORKSPACES = 10;
+
+const WINDOW_DIMMER_EFFECT_NAME = 'kestrel-window-dimmer';
+
+const DisplayChangeDialog = GObject.registerClass(
+class DisplayChangeDialog extends ModalDialog.ModalDialog {
+    _init(wm) {
+        super._init();
+
+        this._wm = wm;
+
+        const monitorManager = global.backend.get_monitor_manager();
+        this._countDown = monitorManager.get_display_configuration_timeout();
+
+        const title = KestrelUi.t('display-change-title');
+        const description = this._formatCountDown();
+
+        this._content = new Dialog.MessageDialogContent({title, description, iconName: 'video-display-symbolic'});
+        this.contentLayout.add_child(this._content);
+
+        this._cancelButton = this.addButton({
+            label: KestrelUi.t('display-change-revert'),
+            action: this._onFailure.bind(this),
+            key: Clutter.KEY_Escape,
+        });
+        this._okButton = this.addButton({
+            label: KestrelUi.t('display-change-keep'),
+            action: this._onSuccess.bind(this),
+            default: true,
+        });
+
+        this._timeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, ONE_SECOND, this._tick.bind(this));
+        GLib.Source.set_name_by_id(this._timeoutId, '[kestrel] this._tick');
+    }
+
+    close(timestamp) {
+        if (this._timeoutId > 0) {
+            GLib.source_remove(this._timeoutId);
+            this._timeoutId = 0;
+        }
+
+        super.close(timestamp);
+    }
+
+    _formatCountDown() {
+        return KestrelUi.t('display-change-countdown', {seconds: this._countDown});
+    }
+
+    _tick() {
+        this._countDown--;
+
+        if (this._countDown === 0) {
+            /* mutter already takes care of failing at timeout */
+            this._timeoutId = 0;
+            this.close();
+            return GLib.SOURCE_REMOVE;
+        }
+
+        this._content.description = this._formatCountDown();
+        return GLib.SOURCE_CONTINUE;
+    }
+
+    _onFailure() {
+        this._wm.complete_display_change(false);
+        this.close();
+    }
+
+    _onSuccess() {
+        this._wm.complete_display_change(true);
+        this.close();
+    }
+});
+
+export const WindowDimmer = GObject.registerClass(
+class WindowDimmer extends Clutter.BrightnessContrastEffect {
+    _init() {
+        super._init({
+            name: WINDOW_DIMMER_EFFECT_NAME,
+            enabled: false,
+        });
+    }
+
+    _syncEnabled(dimmed) {
+        const animating = this.actor.get_transition(`@effects.${this.name}.brightness`) !== null;
+
+        this.enabled = Meta.prefs_get_attach_modal_dialogs() && (animating || dimmed);
+    }
+
+    setDimmed(dimmed, animate) {
+        const val = 127 * (1 + (dimmed ? 1 : 0) * DIM_BRIGHTNESS);
+        const color = new Cogl.Color({
+            red: val,
+            green: val,
+            blue: val,
+            alpha: 255,
+        });
+
+        this.actor.ease_property(`@effects.${this.name}.brightness`, color, {
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+            duration: (dimmed ? DIM_TIME : UNDIM_TIME) * (animate ? 1 : 0),
+            onStopped: () => this._syncEnabled(dimmed),
+        });
+
+        this._syncEnabled(dimmed);
+    }
+});
+
+/**
+ * @param {Meta.WindowActor} actor
+ */
+function getWindowDimmer(actor) {
+    let effect = actor.get_effect(WINDOW_DIMMER_EFFECT_NAME);
+
+    if (!effect) {
+        effect = new WindowDimmer();
+        actor.add_effect(effect);
+    }
+    return effect;
+}
+
+/*
+ * When the last window closed on a workspace is a dialog or splash
+ * screen, we assume that it might be an initial window shown before
+ * the main window of an application, and give the app a grace period
+ * where it can map another window before we remove the workspace.
+ */
+const LAST_WINDOW_GRACE_TIME = 1000;
+
+class WorkspaceTracker {
+    constructor(wm) {
+        this._wm = wm;
+
+        this._workspaces = [];
+        this._checkWorkspacesId = 0;
+
+        this._pauseWorkspaceCheck = false;
+
+        const tracker = Shell.WindowTracker.get_default();
+        tracker.connect('startup-sequence-changed', this._queueCheckWorkspaces.bind(this));
+
+        const workspaceManager = global.workspace_manager;
+        workspaceManager.connect('notify::n-workspaces',
+            this._nWorkspacesChanged.bind(this));
+        workspaceManager.connect('workspaces-reordered', () => {
+            this._workspaces.sort((a, b) => a.index() - b.index());
+        });
+        global.window_manager.connect('switch-workspace',
+            this._queueCheckWorkspaces.bind(this));
+
+        global.display.connect('window-entered-monitor',
+            this._windowEnteredMonitor.bind(this));
+        global.display.connect('window-left-monitor',
+            this._windowLeftMonitor.bind(this));
+
+        this._workspaceSettings = new Gio.Settings({schema_id: 'org.gnome.mutter'});
+        this._workspaceSettings.connect('changed::dynamic-workspaces', this._queueCheckWorkspaces.bind(this));
+
+        this._nWorkspacesChanged();
+    }
+
+    blockUpdates() {
+        this._pauseWorkspaceCheck = true;
+    }
+
+    unblockUpdates() {
+        this._pauseWorkspaceCheck = false;
+    }
+
+    _checkWorkspaces() {
+        const workspaceManager = global.workspace_manager;
+        let i;
+        const emptyWorkspaces = [];
+
+        if (!Meta.prefs_get_dynamic_workspaces()) {
+            this._checkWorkspacesId = 0;
+            return GLib.SOURCE_REMOVE;
+        }
+
+        // Update workspaces only if Dynamic Workspace Management has not been paused by some other function
+        if (this._pauseWorkspaceCheck)
+            return GLib.SOURCE_CONTINUE;
+
+        for (i = 0; i < this._workspaces.length; i++) {
+            const lastRemoved = this._workspaces[i]._lastRemovedWindow;
+            if ((lastRemoved &&
+                 (lastRemoved.get_window_type() === Meta.WindowType.SPLASHSCREEN ||
+                  lastRemoved.get_window_type() === Meta.WindowType.DIALOG ||
+                  lastRemoved.get_window_type() === Meta.WindowType.MODAL_DIALOG)) ||
+                this._workspaces[i]._keepAliveId)
+                emptyWorkspaces[i] = false;
+            else
+                emptyWorkspaces[i] = true;
+        }
+
+        const sequences = Shell.WindowTracker.get_default().get_startup_sequences();
+        for (i = 0; i < sequences.length; i++) {
+            const index = sequences[i].get_workspace();
+            if (index >= 0 && index <= workspaceManager.n_workspaces)
+                emptyWorkspaces[index] = false;
+        }
+
+        const windows = global.get_window_actors();
+        for (i = 0; i < windows.length; i++) {
+            const actor = windows[i];
+            const win = actor.get_meta_window();
+
+            if (win.is_on_all_workspaces())
+                continue;
+
+            const workspaceIndex = win.get_workspace().index();
+            emptyWorkspaces[workspaceIndex] = false;
+        }
+
+        // If we don't have an empty workspace at the end, add one
+        if (!emptyWorkspaces[emptyWorkspaces.length - 1] && workspaceManager.n_workspaces < MAX_NUM_WORKSPACES) {
+            workspaceManager.append_new_workspace(false, global.get_current_time());
+            emptyWorkspaces.push(true);
+        }
+
+        // Enforce minimum number of workspaces
+        while (emptyWorkspaces.length < MIN_NUM_WORKSPACES) {
+            workspaceManager.append_new_workspace(false, global.get_current_time());
+            emptyWorkspaces.push(true);
+        }
+
+        const lastIndex = emptyWorkspaces.length - 1;
+        const activeWorkspaceIndex = workspaceManager.get_active_workspace_index();
+        const lastEmptyIndex = emptyWorkspaces[activeWorkspaceIndex]
+            ? activeWorkspaceIndex
+            : emptyWorkspaces.lastIndexOf(false) + 1;
+        emptyWorkspaces[activeWorkspaceIndex] = false;
+
+        // Delete empty workspaces except for the last one; do it from the end
+        // to avoid index changes
+        for (i = lastIndex; i >= 0; i--) {
+            if (workspaceManager.n_workspaces === MIN_NUM_WORKSPACES)
+                break;
+            if (emptyWorkspaces[i] && i !== lastEmptyIndex)
+                workspaceManager.remove_workspace(this._workspaces[i], global.get_current_time());
+        }
+
+        this._checkWorkspacesId = 0;
+        return GLib.SOURCE_REMOVE;
+    }
+
+    keepWorkspaceAlive(workspace, duration) {
+        if (workspace._keepAliveId)
+            GLib.source_remove(workspace._keepAliveId);
+
+        workspace._keepAliveId = GLib.timeout_add_once(GLib.PRIORITY_DEFAULT, duration, () => {
+            workspace._keepAliveId = 0;
+            this._queueCheckWorkspaces();
+        });
+        GLib.Source.set_name_by_id(workspace._keepAliveId, '[kestrel] this._queueCheckWorkspaces');
+    }
+
+    _windowRemoved(workspace, window) {
+        workspace._lastRemovedWindow = window;
+        this._queueCheckWorkspaces();
+        const id = GLib.timeout_add_once(GLib.PRIORITY_DEFAULT, LAST_WINDOW_GRACE_TIME, () => {
+            if (workspace._lastRemovedWindow === window) {
+                workspace._lastRemovedWindow = null;
+                this._queueCheckWorkspaces();
+            }
+        });
+        GLib.Source.set_name_by_id(id, '[kestrel] this._queueCheckWorkspaces');
+    }
+
+    _windowLeftMonitor(metaDisplay, monitorIndex, _metaWin) {
+        // If the window left the primary monitor, that
+        // might make that workspace empty
+        if (monitorIndex === Main.layoutManager.primaryIndex)
+            this._queueCheckWorkspaces();
+    }
+
+    _windowEnteredMonitor(metaDisplay, monitorIndex, _metaWin) {
+        // If the window entered the primary monitor, that
+        // might make that workspace non-empty
+        if (monitorIndex === Main.layoutManager.primaryIndex)
+            this._queueCheckWorkspaces();
+    }
+
+    _queueCheckWorkspaces() {
+        if (this._checkWorkspacesId === 0) {
+            const laters = global.compositor.get_laters();
+            this._checkWorkspacesId =
+                laters.add(Meta.LaterType.BEFORE_REDRAW, this._checkWorkspaces.bind(this));
+        }
+    }
+
+    _nWorkspacesChanged() {
+        const workspaceManager = global.workspace_manager;
+        const oldNumWorkspaces = this._workspaces.length;
+        const newNumWorkspaces = workspaceManager.n_workspaces;
+
+        if (oldNumWorkspaces === newNumWorkspaces)
+            return false;
+
+        if (newNumWorkspaces > oldNumWorkspaces) {
+            let w;
+
+            // Assume workspaces are only added at the end
+            for (w = oldNumWorkspaces; w < newNumWorkspaces; w++)
+                this._workspaces[w] = workspaceManager.get_workspace_by_index(w);
+
+            for (w = oldNumWorkspaces; w < newNumWorkspaces; w++) {
+                this._workspaces[w].connectObject(
+                    'window-added', this._queueCheckWorkspaces.bind(this),
+                    'window-removed', this._windowRemoved.bind(this), this);
+            }
+        } else {
+            // Assume workspaces are only removed sequentially
+            // (e.g. 2,3,4 - not 2,4,7)
+            let removedIndex;
+            const removedNum = oldNumWorkspaces - newNumWorkspaces;
+            for (let w = 0; w < oldNumWorkspaces; w++) {
+                const workspace = workspaceManager.get_workspace_by_index(w);
+                if (this._workspaces[w] !== workspace) {
+                    removedIndex = w;
+                    break;
+                }
+            }
+
+            const lostWorkspaces = this._workspaces.splice(removedIndex, removedNum);
+            lostWorkspaces.forEach(workspace => workspace.disconnectObject(this));
+        }
+
+        this._queueCheckWorkspaces();
+
+        return false;
+    }
+}
+
+export const TilePreview = GObject.registerClass(
+class TilePreview extends St.Widget {
+    _init() {
+        super._init({style_class: 'tile-preview'});
+        followWindowCorners(this, blurBackdrop(this, TILE_PREVIEW_RADIUS), TILE_PREVIEW_RADIUS);
+        global.window_group.add_child(this);
+
+        this._reset();
+        this._showing = false;
+    }
+
+    open(window, tileRect, monitorIndex) {
+        const windowActor = window.get_compositor_private();
+        if (!windowActor)
+            return;
+
+        global.window_group.set_child_below_sibling(this, windowActor);
+
+        if (this._rect && this._rect.equal(tileRect))
+            return;
+
+        const changeMonitor = this._monitorIndex === -1 ||
+                             this._monitorIndex !== monitorIndex;
+
+        this._monitorIndex = monitorIndex;
+        this._rect = tileRect;
+
+        const monitor = Main.layoutManager.monitors[monitorIndex];
+
+        if (!this._showing || changeMonitor) {
+            const monitorRect = new Mtk.Rectangle({
+                x: monitor.x,
+                y: monitor.y,
+                width: monitor.width,
+                height: monitor.height,
+            });
+            const [, rect] = window.get_frame_rect().intersect(monitorRect);
+            this.set_size(rect.width, rect.height);
+            this.set_position(rect.x, rect.y);
+            this.opacity = 0;
+        }
+
+        this._showing = true;
+        this.show();
+        this.ease({
+            x: tileRect.x + TILE_PREVIEW_GAP,
+            y: tileRect.y + TILE_PREVIEW_GAP,
+            width: tileRect.width - 2 * TILE_PREVIEW_GAP,
+            height: tileRect.height - 2 * TILE_PREVIEW_GAP,
+            opacity: 255,
+            duration: WINDOW_ANIMATION_TIME,
+            mode: Clutter.AnimationMode.EASE_OUT_QUART,
+        });
+    }
+
+    close() {
+        if (!this._showing)
+            return;
+
+        this._showing = false;
+        this.ease({
+            opacity: 0,
+            duration: WINDOW_ANIMATION_TIME,
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+            onComplete: () => this._reset(),
+        });
+    }
+
+    _reset() {
+        this.hide();
+        this._rect = null;
+        this._monitorIndex = -1;
+    }
+});
+
+const ResizePopup = GObject.registerClass(
+class ResizePopup extends St.Widget {
+    _init() {
+        super._init({layout_manager: new Clutter.BinLayout()});
+        this._label = new St.Label({
+            style_class: 'resize-popup',
+            x_align: Clutter.ActorAlign.CENTER,
+            y_align: Clutter.ActorAlign.CENTER,
+            x_expand: true,
+            y_expand: true,
+        });
+        this.add_child(this._label);
+        Main.uiGroup.add_child(this);
+    }
+
+    set(rect, displayW, displayH) {
+        this._label.set_text(KestrelUi.t('window-resize-size', {width: displayW, height: displayH}));
+
+        this.set_position(rect.x, rect.y);
+        this.set_size(rect.width, rect.height);
+    }
+});
+
+export class WindowManager {
+    constructor() {
+        this._shellwm =  global.window_manager;
+
+        this._minimizing = new Set();
+        this._unminimizing = new Set();
+        this._minimizeMotion = new Map();
+        this._openClose = new OpenCloseEffects();
+        this._morphs = new WindowMorphs();
+
+        this._skippedActors = new Set();
+
+        this._allowedKeybindings = {};
+
+        this._isWorkspacePrepended = false;
+        this._blockCount = 0;
+
+        this._shellwm.connect('kill-window-effects', (shellwm, actor) => {
+            this._handOverMinimizeMotion(shellwm, actor);
+            this._openClose.finish(actor);
+            this._morphs.interrupt(actor);
+        });
+
+        this._shellwm.connect('switch-workspace', this._switchWorkspace.bind(this));
+        this._tileRequest = null;
+        this._cornerSnap = new CornerSnap(this._showCornerPreview.bind(this), this.morphWindow.bind(this));
+        this._shellwm.connect('show-tile-preview', this._showTilePreview.bind(this));
+        this._shellwm.connect('hide-tile-preview', this._hideTilePreview.bind(this));
+        this._shellwm.connect('show-window-menu', this._showWindowMenu.bind(this));
+        this._shellwm.connect('minimize', this._minimizeWindow.bind(this));
+        this._shellwm.connect('unminimize', this._unminimizeWindow.bind(this));
+        this._shellwm.connect('size-change', this._sizeChangeWindow.bind(this));
+        this._shellwm.connect('map', this._mapWindow.bind(this));
+        this._shellwm.connect('destroy', this._destroyWindow.bind(this));
+        this._shellwm.connect('filter-keybinding', this._filterKeybinding.bind(this));
+        this._shellwm.connect('confirm-display-change', this._confirmDisplayChange.bind(this));
+        this._shellwm.connect('create-close-dialog', this._createCloseDialog.bind(this));
+        this._shellwm.connect('create-inhibit-shortcuts-dialog', this._createInhibitShortcutsDialog.bind(this));
+
+        this._workspaceSwitcherPopup = null;
+        this._tilePreview = null;
+
+        this.allowKeybinding('switch-to-session-1', Shell.ActionMode.ALL);
+        this.allowKeybinding('switch-to-session-2', Shell.ActionMode.ALL);
+        this.allowKeybinding('switch-to-session-3', Shell.ActionMode.ALL);
+        this.allowKeybinding('switch-to-session-4', Shell.ActionMode.ALL);
+        this.allowKeybinding('switch-to-session-5', Shell.ActionMode.ALL);
+        this.allowKeybinding('switch-to-session-6', Shell.ActionMode.ALL);
+        this.allowKeybinding('switch-to-session-7', Shell.ActionMode.ALL);
+        this.allowKeybinding('switch-to-session-8', Shell.ActionMode.ALL);
+        this.allowKeybinding('switch-to-session-9', Shell.ActionMode.ALL);
+        this.allowKeybinding('switch-to-session-10', Shell.ActionMode.ALL);
+        this.allowKeybinding('switch-to-session-11', Shell.ActionMode.ALL);
+        this.allowKeybinding('switch-to-session-12', Shell.ActionMode.ALL);
+
+        this.setCustomKeybindingHandler('switch-to-workspace-left',
+            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
+            this._showWorkspaceSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('switch-to-workspace-right',
+            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
+            this._showWorkspaceSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('switch-to-workspace-up',
+            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
+            this._showWorkspaceSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('switch-to-workspace-down',
+            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
+            this._showWorkspaceSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('switch-to-workspace-last',
+            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
+            this._showWorkspaceSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('move-to-workspace-left',
+            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
+            this._showWorkspaceSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('move-to-workspace-right',
+            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
+            this._showWorkspaceSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('move-to-workspace-up',
+            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
+            this._showWorkspaceSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('move-to-workspace-down',
+            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
+            this._showWorkspaceSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('switch-to-workspace-1',
+            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
+            this._showWorkspaceSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('switch-to-workspace-2',
+            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
+            this._showWorkspaceSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('switch-to-workspace-3',
+            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
+            this._showWorkspaceSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('switch-to-workspace-4',
+            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
+            this._showWorkspaceSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('switch-to-workspace-5',
+            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
+            this._showWorkspaceSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('switch-to-workspace-6',
+            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
+            this._showWorkspaceSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('switch-to-workspace-7',
+            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
+            this._showWorkspaceSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('switch-to-workspace-8',
+            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
+            this._showWorkspaceSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('switch-to-workspace-9',
+            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
+            this._showWorkspaceSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('switch-to-workspace-10',
+            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
+            this._showWorkspaceSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('switch-to-workspace-11',
+            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
+            this._showWorkspaceSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('switch-to-workspace-12',
+            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
+            this._showWorkspaceSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('move-to-workspace-1',
+            Shell.ActionMode.NORMAL,
+            this._showWorkspaceSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('move-to-workspace-2',
+            Shell.ActionMode.NORMAL,
+            this._showWorkspaceSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('move-to-workspace-3',
+            Shell.ActionMode.NORMAL,
+            this._showWorkspaceSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('move-to-workspace-4',
+            Shell.ActionMode.NORMAL,
+            this._showWorkspaceSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('move-to-workspace-5',
+            Shell.ActionMode.NORMAL,
+            this._showWorkspaceSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('move-to-workspace-6',
+            Shell.ActionMode.NORMAL,
+            this._showWorkspaceSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('move-to-workspace-7',
+            Shell.ActionMode.NORMAL,
+            this._showWorkspaceSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('move-to-workspace-8',
+            Shell.ActionMode.NORMAL,
+            this._showWorkspaceSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('move-to-workspace-9',
+            Shell.ActionMode.NORMAL,
+            this._showWorkspaceSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('move-to-workspace-10',
+            Shell.ActionMode.NORMAL,
+            this._showWorkspaceSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('move-to-workspace-11',
+            Shell.ActionMode.NORMAL,
+            this._showWorkspaceSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('move-to-workspace-12',
+            Shell.ActionMode.NORMAL,
+            this._showWorkspaceSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('move-to-workspace-last',
+            Shell.ActionMode.NORMAL,
+            this._showWorkspaceSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('switch-applications',
+            Shell.ActionMode.NORMAL,
+            this._startSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('switch-group',
+            Shell.ActionMode.NORMAL,
+            this._startSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('switch-applications-backward',
+            Shell.ActionMode.NORMAL,
+            this._startSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('switch-group-backward',
+            Shell.ActionMode.NORMAL,
+            this._startSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('switch-windows',
+            Shell.ActionMode.NORMAL,
+            this._startSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('switch-windows-backward',
+            Shell.ActionMode.NORMAL,
+            this._startSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('cycle-windows',
+            Shell.ActionMode.NORMAL,
+            this._startSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('cycle-windows-backward',
+            Shell.ActionMode.NORMAL,
+            this._startSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('cycle-group',
+            Shell.ActionMode.NORMAL,
+            this._startSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('cycle-group-backward',
+            Shell.ActionMode.NORMAL,
+            this._startSwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('switch-panels',
+            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW |
+            Shell.ActionMode.LOCK_SCREEN | Shell.ActionMode.UNLOCK_SCREEN |
+            Shell.ActionMode.LOGIN_SCREEN,
+            this._startA11ySwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('switch-panels-backward',
+            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW |
+            Shell.ActionMode.LOCK_SCREEN | Shell.ActionMode.UNLOCK_SCREEN |
+            Shell.ActionMode.LOGIN_SCREEN,
+            this._startA11ySwitcher.bind(this));
+
+        this.setCustomKeybindingHandler('switch-monitor',
+            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
+            this._startSwitcher.bind(this));
+
+        this.addKeybinding('toggle-message-tray',
+            new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
+            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
+            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW |
+            Shell.ActionMode.POPUP,
+            this._toggleCalendar.bind(this));
+
+        this.addKeybinding('toggle-quick-settings',
+            new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
+            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
+            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW |
+            Shell.ActionMode.POPUP,
+            this._toggleQuickSettings.bind(this));
+
+        this.addKeybinding('toggle-start',
+            new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
+            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
+            Shell.ActionMode.NORMAL,
+            () => KestrelUi.toggleSurface('start'));
+
+        this.addKeybinding('clipboard-history',
+            new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
+            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
+            Shell.ActionMode.NORMAL,
+            () => KestrelUi.toggleSurface('clipboard'));
+
+        this.addKeybinding('emoji-picker',
+            new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
+            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
+            Shell.ActionMode.NORMAL,
+            () => KestrelUi.toggleSurface('emoji'));
+
+        this.addKeybinding('snap-layouts',
+            new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
+            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
+            Shell.ActionMode.NORMAL,
+            () => KestrelUi.toggleSurface('snap'));
+
+        this.addKeybinding('system-monitor',
+            new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
+            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
+            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW |
+            Shell.ActionMode.POPUP,
+            () => KestrelUi.openSystemMonitor());
+
+        for (let index = 1; index <= 10; index++) {
+            this.addKeybinding(`workspace-${index}`,
+                new Gio.Settings({schema_id: SHELL_KEYBINDINGS_SCHEMA}),
+                Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
+                Shell.ActionMode.NORMAL,
+                () => KestrelUi.switchWorkspace(index - 1));
+        }
+
+        global.display.connect('show-resize-popup', this._showResizePopup.bind(this));
+        global.display.connect('show-osd', (display, monitorIndex, iconName, label) => {
+            const icon = Gio.Icon.new_for_string(iconName);
+            Main.osdWindowManager.showOne(monitorIndex, icon, label);
+        });
+
+        global.display.connect('init-xserver', (display, task) => {
+            if (Main.sessionMode.isPeek) {
+                task.return_boolean(true);
+                return true;
+            }
+
+            IBusManager.getIBusManager().restartDaemon(['--xim']);
+
+            this._shareSettingsWithX11(task);
+
+            return true;
+        });
+        global.display.connect('x11-display-closing', () => {
+            if (!Main.sessionMode.isPeek)
+                IBusManager.getIBusManager().restartDaemon();
+        });
+
+        this._windowMenuManager = new WindowMenu.WindowMenuManager();
+
+        if (Main.sessionMode.hasWorkspaces)
+            this._workspaceTracker = new WorkspaceTracker(this);
+
+        const allowedModes = Shell.ActionMode.NORMAL;
+        const topDragGesture = new Shell.EdgeDragGesture({
+            name: 'Window unfullscreen top drag',
+            side: St.Side.TOP,
+        });
+        topDragGesture.connect('may-recognize', () => {
+            return allowedModes & Main.actionMode;
+        });
+        topDragGesture.connect('end', () => {
+            const currentWindow = global.display.focus_window;
+            if (currentWindow)
+                currentWindow.unmake_fullscreen();
+        });
+
+        const updateUnfullscreenGesture = () => {
+            const currentWindow = global.display.focus_window;
+            topDragGesture.enabled = currentWindow && currentWindow.is_fullscreen();
+        };
+
+        global.display.connect('notify::focus-window', updateUnfullscreenGesture);
+        global.display.connect('in-fullscreen-changed', updateUnfullscreenGesture);
+        updateUnfullscreenGesture();
+
+        global.stage.add_action(topDragGesture);
+
+        this._workspaceAnimation =
+            new WorkspaceAnimation.WorkspaceAnimationController();
+
+        this._shellwm.connect('kill-switch-workspace', () => {
+            this._workspaceAnimation.cancelSwitchAnimation();
+            this._switchWorkspaceDone();
+        });
+    }
+
+    async _shareSettingsWithX11(task) {
+        try {
+            await Gio.DBus.session.call('com.lantharos.Settings', '/com/lantharos/Settings',
+                'com.lantharos.Settings.Xwayland', 'Start',
+                new GLib.Variant('(ss)', [GLib.getenv('GNOME_SETUP_DISPLAY'), GLib.getenv('XAUTHORITY')]),
+                null, Gio.DBusCallFlags.NO_AUTO_START, X11_SETTINGS_TIMEOUT_MS, null);
+        } catch (e) {
+            log(`X11 apps start without the desktop settings: ${e.message}`);
+        } finally {
+            task.return_boolean(true);
+        }
+    }
+
+    insertWorkspace(pos) {
+        const workspaceManager = global.workspace_manager;
+
+        if (!Meta.prefs_get_dynamic_workspaces() || workspaceManager.n_workspaces >= MAX_NUM_WORKSPACES)
+            return;
+
+        workspaceManager.append_new_workspace(false, global.get_current_time());
+
+        const windows = global.get_window_actors().map(a => a.meta_window);
+
+        // To create a new workspace, we slide all the windows on workspaces
+        // below us to the next workspace, leaving a blank workspace for us
+        // to recycle.
+        windows.forEach(window => {
+            // If the window is attached to an ancestor, we don't need/want
+            // to move it
+            if (window.get_transient_for() != null)
+                return;
+            // Same for OR windows
+            if (window.is_override_redirect())
+                return;
+            // Sticky windows don't need moving, in fact moving would
+            // unstick them
+            if (window.on_all_workspaces)
+                return;
+            // Windows on workspaces below pos don't need moving
+            const index = window.get_workspace().index();
+            if (index < pos)
+                return;
+            window.change_workspace_by_index(index + 1, true);
+        });
+
+        // If the new workspace was inserted before the active workspace,
+        // activate the workspace to which its windows went
+        const activeIndex = workspaceManager.get_active_workspace_index();
+        if (activeIndex >= pos) {
+            const newWs = workspaceManager.get_workspace_by_index(activeIndex + 1);
+            this._blockAnimations = true;
+            newWs.activate(global.get_current_time());
+            this._blockAnimations = false;
+        }
+    }
+
+    keepWorkspaceAlive(workspace, duration) {
+        if (!this._workspaceTracker)
+            return;
+
+        this._workspaceTracker.keepWorkspaceAlive(workspace, duration);
+    }
+
+    blockWorkspaceUpdates() {
+        if (++this._blockCount > 1)
+            return;
+
+        if (!this._workspaceTracker)
+            return;
+
+        this._workspaceTracker.blockUpdates();
+    }
+
+    unblockWorkspaceUpdates() {
+        console.assert(this._blockCount > 0,
+            'Unmatched call to unblockWorkspaceUpdates()');
+        if (this._blockCount === 0)
+            return;
+
+        this._blockCount -= 1;
+
+        if (this._blockCount !== 0)
+            return;
+
+        if (!this._workspaceTracker)
+            return;
+
+        this._workspaceTracker.unblockUpdates();
+    }
+
+    skipNextEffect(actor) {
+        this._skippedActors.add(actor);
+    }
+
+    setCustomKeybindingHandler(name, modes, handler) {
+        if (Meta.keybindings_set_custom_handler(name, handler))
+            this.allowKeybinding(name, modes);
+    }
+
+    addKeybinding(name, settings, flags, modes, handler) {
+        const action = global.display.add_keybinding(name, settings, flags, handler);
+        if (action !== Meta.KeyBindingAction.NONE)
+            this.allowKeybinding(name, modes);
+        return action;
+    }
+
+    allowKeybinding(name, modes) {
+        this._allowedKeybindings[name] = modes;
+    }
+
+    _getAnimationWindowType(actor) {
+        const {metaWindow: window} = actor;
+        const {windowType} = window;
+
+        if (windowType !== Meta.WindowType.NORMAL ||
+            window.get_client_type() === Meta.WindowClientType.X11)
+            return windowType;
+
+        // wayland doesn't use the DIALOG type, but for
+        // animations we want transients to behave like ones
+        return window.get_transient_for() != null
+            ? Meta.WindowType.DIALOG
+            : windowType;
+    }
+
+    _shouldAnimate() {
+        return !this._workspaceAnimation.gestureActive;
+    }
+
+    _shouldAnimateActor(actor, types) {
+        if (this._skippedActors.delete(actor))
+            return false;
+
+        if (!this._shouldAnimate())
+            return false;
+
+        if (!actor.get_texture())
+            return false;
+
+        const type = this._getAnimationWindowType(actor);
+        return types.includes(type);
+    }
+
+    _minimizeWindow(shellwm, actor) {
+        const types = [
+            Meta.WindowType.NORMAL,
+            Meta.WindowType.MODAL_DIALOG,
+            Meta.WindowType.DIALOG,
+        ];
+        const motion = this._resumeMinimizeMotion(actor);
+        if (!this._shouldAnimateActor(actor, types)) {
+            shellwm.completed_minimize(actor);
+            return;
+        }
+
+        this._minimizing.add(actor);
+        const done = () => this._minimizeWindowDone(shellwm, actor);
+        const target = !actor.meta_window.is_monitor_sized() && !KestrelUi.reducedMotion()
+            ? this._minimizeTarget(actor) : null;
+
+        if (target) {
+            actor.ease({
+                x: target.x,
+                y: target.y,
+                scale_x: target.scale,
+                scale_y: target.scale,
+                spring: KestrelUi.Spring.smooth,
+                velocity: motion,
+            });
+        }
+        actor.ease({
+            opacity: 0,
+            duration: KestrelUi.Duration.quick,
+            delay: target ? KestrelUi.Duration.quick : 0,
+            curve: KestrelUi.Curve.decelerate,
+            onStopped: done,
+        });
+    }
+
+    _minimizeTarget(actor) {
+        const [hasIcon, icon] = actor.meta_window.get_icon_geometry();
+        const monitor = Main.layoutManager.monitors[actor.meta_window.get_monitor()];
+        if (!hasIcon && !monitor)
+            return null;
+
+        const {x, y, width, height} = hasIcon
+            ? icon
+            : {x: monitor.x + monitor.width / 2, y: monitor.y + monitor.height, width: 0, height: 0};
+        const rect = actor.meta_window.get_buffer_rect();
+        const scale = Math.max(MINIMIZED_WINDOW_SCALE,
+            Math.min(width / rect.width, height / rect.height));
+        return {
+            x: x + width / 2 - rect.width * scale / 2,
+            y: y + height / 2 - rect.height * scale / 2,
+            scale,
+        };
+    }
+
+    _handOverMinimizeMotion(shellwm, actor) {
+        const minimizing = this._minimizing.delete(actor);
+        const unminimizing = this._unminimizing.delete(actor);
+        if (!minimizing && !unminimizing)
+            return;
+
+        const properties = Object.fromEntries(MINIMIZE_PROPERTIES.map(prop => [prop, {
+            value: actor[prop],
+            velocity: actor.get_transition(prop.replaceAll('_', '-'))?.get_velocity?.() ?? 0,
+        }]));
+        const destroyId = actor.connect('destroy', () => this._minimizeMotion.delete(actor));
+        this._minimizeMotion.set(actor, {properties, destroyId});
+        actor.remove_all_transitions();
+        if (minimizing)
+            shellwm.completed_minimize(actor);
+        else
+            shellwm.completed_unminimize(actor);
+    }
+
+    _resumeMinimizeMotion(actor) {
+        const handedOver = this._minimizeMotion.get(actor);
+        this._minimizeMotion.delete(actor);
+        actor.set_pivot_point(0, 0);
+        if (!handedOver) {
+            actor.set_scale(1, 1);
+            actor.opacity = 255;
+            return null;
+        }
+        actor.disconnect(handedOver.destroyId);
+        const motion = handedOver.properties;
+        actor.set_position(motion.x.value, motion.y.value);
+        actor.set_scale(motion.scale_x.value, motion.scale_y.value);
+        actor.opacity = motion.opacity.value;
+        return Object.fromEntries(MINIMIZE_PROPERTIES.map(prop => [prop, motion[prop].velocity]));
+    }
+
+    _minimizeWindowDone(shellwm, actor) {
+        if (this._minimizing.delete(actor)) {
+            actor.remove_all_transitions();
+            actor.set_scale(1.0, 1.0);
+            actor.set_opacity(255);
+            actor.set_pivot_point(0, 0);
+
+            shellwm.completed_minimize(actor);
+        }
+    }
+
+    _unminimizeWindow(shellwm, actor) {
+        const types = [
+            Meta.WindowType.NORMAL,
+            Meta.WindowType.MODAL_DIALOG,
+            Meta.WindowType.DIALOG,
+        ];
+        const motion = this._resumeMinimizeMotion(actor);
+        const rect = actor.meta_window.get_buffer_rect();
+        if (!this._shouldAnimateActor(actor, types)) {
+            actor.set_position(rect.x, rect.y);
+            actor.set_scale(1, 1);
+            actor.opacity = 255;
+            shellwm.completed_unminimize(actor);
+            return;
+        }
+
+        this._unminimizing.add(actor);
+        const done = () => this._unminimizeWindowDone(shellwm, actor);
+        const target = !actor.meta_window.is_monitor_sized() && !KestrelUi.reducedMotion()
+            ? this._minimizeTarget(actor) : null;
+
+        if (!motion) {
+            actor.opacity = 0;
+            if (target) {
+                actor.set_position(target.x, target.y);
+                actor.set_scale(target.scale, target.scale);
+            }
+        }
+        const moves = target || motion;
+        actor.show();
+        actor.ease({
+            opacity: 255,
+            duration: KestrelUi.Duration.quick,
+            curve: KestrelUi.Curve.decelerate,
+            onStopped: moves ? null : done,
+        });
+        if (moves) {
+            actor.ease({
+                x: rect.x,
+                y: rect.y,
+                scale_x: 1,
+                scale_y: 1,
+                spring: KestrelUi.Spring.smooth,
+                velocity: motion,
+                onStopped: done,
+            });
+        }
+    }
+
+    _unminimizeWindowDone(shellwm, actor) {
+        if (this._unminimizing.delete(actor)) {
+            actor.remove_all_transitions();
+            actor.set_scale(1.0, 1.0);
+            actor.set_opacity(255);
+            actor.set_pivot_point(0, 0);
+
+            shellwm.completed_unminimize(actor);
+        }
+    }
+
+    _sizeChangeWindow(shellwm, actor, _change, oldFrameRect) {
+        const completed = () => shellwm.completed_size_change(actor);
+        if (!this._shouldAnimateActor(actor, [Meta.WindowType.NORMAL]) || !this._morphs.begin(actor, oldFrameRect, completed))
+            completed();
+    }
+
+    morphWindow(window) {
+        const actor = window.get_compositor_private();
+        if (actor && this._shouldAnimateActor(actor, [Meta.WindowType.NORMAL]))
+            this._morphs.begin(actor, window.get_frame_rect(), () => {});
+    }
+
+    _checkDimming(window) {
+        const shouldDim = window.has_attached_dialogs();
+
+        if (shouldDim && !window._dimmed) {
+            window._dimmed = true;
+            this._dimWindow(window);
+        } else if (!shouldDim && window._dimmed) {
+            window._dimmed = false;
+            this._undimWindow(window);
+        }
+    }
+
+    _dimWindow(window) {
+        const actor = window.get_compositor_private();
+        if (!actor)
+            return;
+        const dimmer = getWindowDimmer(actor);
+        if (!dimmer)
+            return;
+        dimmer.setDimmed(true, this._shouldAnimate());
+    }
+
+    _undimWindow(window) {
+        const actor = window.get_compositor_private();
+        if (!actor)
+            return;
+        const dimmer = getWindowDimmer(actor);
+        if (!dimmer)
+            return;
+        dimmer.setDimmed(false, this._shouldAnimate());
+    }
+
+    _mapWindow(shellwm, actor) {
+        actor._windowType = actor.meta_window.get_window_type();
+        actor.meta_window.connectObject('notify::window-type', () => {
+            const type = actor.meta_window.get_window_type();
+            if (type === actor._windowType)
+                return;
+            if (type === Meta.WindowType.MODAL_DIALOG ||
+                actor._windowType === Meta.WindowType.MODAL_DIALOG) {
+                const parent = actor.get_meta_window().get_transient_for();
+                if (parent)
+                    this._checkDimming(parent);
+            }
+
+            actor._windowType = type;
+        }, actor);
+        actor.meta_window.connect('unmanaged', window => {
+            const parent = window.get_transient_for();
+            if (parent)
+                this._checkDimming(parent);
+        });
+
+        if (actor.meta_window.is_attached_dialog())
+            this._checkDimming(actor.get_meta_window().get_transient_for());
+
+        const types = [
+            Meta.WindowType.NORMAL,
+            Meta.WindowType.DIALOG,
+            Meta.WindowType.MODAL_DIALOG,
+        ];
+        if (!this._shouldAnimateActor(actor, types)) {
+            shellwm.completed_map(actor);
+            return;
+        }
+
+        const dialog = this._getAnimationWindowType(actor) !== Meta.WindowType.NORMAL;
+        this._openClose.open(actor, dialog, () => shellwm.completed_map(actor));
+    }
+
+    _destroyWindow(shellwm, actor) {
+        const window = actor.meta_window;
+        window.disconnectObject(actor);
+
+        if (window.is_attached_dialog())
+            this._checkDimming(window.get_transient_for());
+
+        const types = [
+            Meta.WindowType.NORMAL,
+            Meta.WindowType.DIALOG,
+            Meta.WindowType.MODAL_DIALOG,
+        ];
+        if (!this._shouldAnimateActor(actor, types)) {
+            shellwm.completed_destroy(actor);
+            return;
+        }
+
+        const parent = window.is_attached_dialog() ? window.get_transient_for() : null;
+        parent?.connectObject('unmanaged', () => this._openClose.finish(actor), actor);
+        this._openClose.close(actor, () => {
+            parent?.disconnectObject(actor);
+            shellwm.completed_destroy(actor);
+        });
+    }
+
+    _filterKeybinding(shellwm, binding) {
+        if (Main.actionMode === Shell.ActionMode.NONE)
+            return true;
+
+        // There's little sense in implementing a keybinding in mutter and
+        // not having it work in NORMAL mode; handle this case generically
+        // so we don't have to explicitly allow all builtin keybindings in
+        // NORMAL mode.
+        if (Main.actionMode === Shell.ActionMode.NORMAL &&
+            binding.is_builtin())
+            return false;
+
+        return !(this._allowedKeybindings[binding.get_name()] & Main.actionMode);
+    }
+
+    _switchWorkspace(shellwm, from, to, direction) {
+        if (!Main.sessionMode.hasWorkspaces || !this._shouldAnimate() || KestrelUi.taskViewOpen()) {
+            shellwm.completed_switch_workspace();
+            return;
+        }
+
+        this._switchInProgress = true;
+
+        this._workspaceAnimation.animateSwitch(from, to, direction, () => {
+            this._shellwm.completed_switch_workspace();
+            this._switchInProgress = false;
+        });
+    }
+
+    swipeWorkspaces(event) {
+        return this._workspaceAnimation.handleScrollEvent(event);
+    }
+
+    _switchWorkspaceDone() {
+        if (!this._switchInProgress)
+            return;
+
+        this._shellwm.completed_switch_workspace();
+        this._switchInProgress = false;
+    }
+
+    _showTilePreview(shellwm, window, tileRect, monitorIndex) {
+        this._tileRequest = [window, tileRect, monitorIndex];
+        if (!this._cornerSnap.active)
+            this._openTilePreview(window, tileRect, monitorIndex);
+    }
+
+    _hideTilePreview() {
+        this._tileRequest = null;
+        if (!this._cornerSnap.active)
+            this._tilePreview?.close();
+    }
+
+    _openTilePreview(window, rect, monitorIndex) {
+        this._tilePreview ??= new TilePreview();
+        this._tilePreview.open(window, rect, monitorIndex);
+    }
+
+    _showCornerPreview(window, rect, monitorIndex) {
+        if (rect)
+            this._openTilePreview(window, rect, monitorIndex);
+        else if (this._tileRequest)
+            this._openTilePreview(...this._tileRequest);
+        else
+            this._tilePreview?.close();
+    }
+
+    activateWithSnapGroup(window) {
+        const time = global.get_current_time();
+        for (const member of this._cornerSnap.group(window).reverse()) {
+            member.unminimize();
+            member.raise();
+        }
+        window.activate(time);
+    }
+
+    snapWindow(window, rect) {
+        this._cornerSnap.snap(window, rect);
+    }
+
+    _showWindowMenu(shellwm, window, menu, rect) {
+        this._windowMenuManager.showWindowMenuForWindow(window, menu, rect);
+    }
+
+    showWindowMenu(window, rect) {
+        this._windowMenuManager.showWindowMenuForWindow(window, Meta.WindowMenuType.WM, rect);
+    }
+
+    _startSwitcher(display, window, event, binding) {
+        const name = binding.get_name();
+        if (name === 'switch-applications' && binding.get_modifiers() & Clutter.ModifierType.SUPER_MASK) {
+            KestrelUi.toggleSurface('tasks');
+            return;
+        }
+        let createPopup = null;
+        switch (name) {
+        case 'switch-applications':
+        case 'switch-applications-backward':
+        case 'switch-group':
+        case 'switch-group-backward':
+        case 'switch-windows':
+        case 'switch-windows-backward':
+            createPopup = () => new AltTab.WindowSwitcherPopup(name);
+            break;
+        case 'cycle-windows':
+        case 'cycle-windows-backward':
+            createPopup = () => new AltTab.WindowCyclerPopup();
+            break;
+        case 'cycle-group':
+        case 'cycle-group-backward':
+            createPopup = () => new AltTab.GroupCyclerPopup();
+            break;
+        case 'switch-monitor':
+            createPopup = () => new SwitchMonitor.SwitchMonitorPopup();
+            break;
+        }
+
+        if (!createPopup)
+            return;
+
+        /* prevent a corner case where both tab and workspace switcher popups show up at once */
+        if (this._workspaceSwitcherPopup != null)
+            this._workspaceSwitcherPopup.destroy();
+
+        const tabPopup = createPopup();
+
+        if (!tabPopup.show(binding.is_reversed(), name, binding.get_mask()))
+            tabPopup.destroy();
+    }
+
+    _startA11ySwitcher(display, window, event, binding) {
+        Main.ctrlAltTabManager.popup(binding.is_reversed(), binding.get_name(), binding.get_mask());
+    }
+
+    _toggleCalendar() {
+        KestrelUi.toggleSurface('notifications');
+    }
+
+    _toggleQuickSettings() {
+        KestrelUi.toggleSurface('quick');
+    }
+
+    _showWorkspaceSwitcher(display, window, event, binding) {
+        const workspaceManager = display.get_workspace_manager();
+
+        if (!Main.sessionMode.hasWorkspaces)
+            return;
+
+        if (workspaceManager.n_workspaces === 1)
+            return;
+
+        let [action,,, target] = binding.get_name().split('-');
+        let newWs;
+        let direction;
+        const vertical = workspaceManager.layout_rows === -1;
+        const rtl = Clutter.get_default_text_direction() === Clutter.TextDirection.RTL;
+
+        if (action === 'move') {
+            // "Moving" a window to another workspace doesn't make sense when
+            // it cannot be unstuck, and is potentially confusing if a new
+            // workspaces is added at the start/end
+            if (window.is_always_on_all_workspaces() ||
+                (Meta.prefs_get_workspaces_only_on_primary() &&
+                 window.get_monitor() !== Main.layoutManager.primaryIndex))
+                return;
+        }
+
+        if (target === 'last') {
+            if (vertical)
+                direction = Meta.MotionDirection.DOWN;
+            else if (rtl)
+                direction = Meta.MotionDirection.LEFT;
+            else
+                direction = Meta.MotionDirection.RIGHT;
+            newWs = workspaceManager.get_workspace_by_index(workspaceManager.n_workspaces - 1);
+        } else if (isNaN(target)) {
+            // Prepend a new workspace dynamically
+            let prependTarget;
+            if (vertical)
+                prependTarget = 'up';
+            else if (rtl)
+                prependTarget = 'right';
+            else
+                prependTarget = 'left';
+            if (workspaceManager.get_active_workspace_index() === 0 &&
+                action === 'move' && target === prependTarget &&
+                this._isWorkspacePrepended === false) {
+                this.insertWorkspace(0);
+                this._isWorkspacePrepended = true;
+            }
+
+            direction = Meta.MotionDirection[target.toUpperCase()];
+            newWs = workspaceManager.get_active_workspace().get_neighbor(direction);
+        } else if ((target > 0) && (target <= workspaceManager.n_workspaces)) {
+            target--;
+            newWs = workspaceManager.get_workspace_by_index(target);
+
+            if (workspaceManager.get_active_workspace_index() > target) {
+                if (vertical)
+                    direction = Meta.MotionDirection.UP;
+                else if (rtl)
+                    direction = Meta.MotionDirection.RIGHT;
+                else
+                    direction = Meta.MotionDirection.LEFT;
+            } else {
+                if (vertical) // eslint-disable-line no-lonely-if
+                    direction = Meta.MotionDirection.DOWN;
+                else if (rtl)
+                    direction = Meta.MotionDirection.LEFT;
+                else
+                    direction = Meta.MotionDirection.RIGHT;
+            }
+        }
+
+        if (workspaceManager.layout_rows === -1 &&
+            direction !== Meta.MotionDirection.UP &&
+            direction !== Meta.MotionDirection.DOWN)
+            return;
+
+        if (workspaceManager.layout_columns === -1 &&
+            direction !== Meta.MotionDirection.LEFT &&
+            direction !== Meta.MotionDirection.RIGHT)
+            return;
+
+        if (action === 'switch')
+            this.actionMoveWorkspace(newWs);
+        else
+            this.actionMoveWindow(window, newWs);
+
+        if (this._workspaceSwitcherPopup == null) {
+            this.blockWorkspaceUpdates();
+            this._workspaceSwitcherPopup = new WorkspaceSwitcherPopup.WorkspaceSwitcherPopup();
+            this._workspaceSwitcherPopup.connect('destroy', () => {
+                this.unblockWorkspaceUpdates();
+                this._workspaceSwitcherPopup = null;
+                this._isWorkspacePrepended = false;
+            });
+        }
+        this._workspaceSwitcherPopup.display(newWs.index());
+    }
+
+    actionMoveWorkspace(workspace) {
+        if (!Main.sessionMode.hasWorkspaces)
+            return;
+
+        if (!workspace.active)
+            workspace.activate(global.get_current_time());
+    }
+
+    actionMoveWindow(window, workspace) {
+        if (!Main.sessionMode.hasWorkspaces)
+            return;
+
+        if (!workspace.active) {
+            // This won't have any effect for "always sticky" windows
+            // (like desktop windows or docks)
+
+            this._workspaceAnimation.movingWindow = window;
+            window.change_workspace(workspace);
+
+            global.display.clear_mouse_mode();
+            workspace.activate_with_focus(window, global.get_current_time());
+        }
+    }
+
+    _confirmDisplayChange() {
+        const dialog = new DisplayChangeDialog(this._shellwm);
+        dialog.open();
+    }
+
+    _createCloseDialog(shellwm, window) {
+        return new CloseDialog.CloseDialog(window);
+    }
+
+    _createInhibitShortcutsDialog(shellwm, window) {
+        return new InhibitShortcutsDialog.InhibitShortcutsDialog(window);
+    }
+
+    _showResizePopup(display, show, rect, displayW, displayH) {
+        if (show) {
+            if (!this._resizePopup)
+                this._resizePopup = new ResizePopup();
+
+            this._resizePopup.set(rect, displayW, displayH);
+        } else {
+            if (!this._resizePopup)
+                return;
+
+            this._resizePopup.destroy();
+            this._resizePopup = null;
+        }
+    }
+}

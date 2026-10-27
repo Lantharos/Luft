@@ -34,3 +34,5 @@ keys-end = Ende
 keys-page-up = Bild auf
 keys-page-down = Bild ab
 keys-print-screen = Druck
+
+date-just-now = Gerade eben

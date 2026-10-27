@@ -36,3 +36,6 @@ keys-end = End
 keys-page-up = Page Up
 keys-page-down = Page Down
 keys-print-screen = Print Screen
+
+# Shown instead of a time on notifications from the last few minutes
+date-just-now = Just now

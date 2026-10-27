@@ -72,7 +72,7 @@ export class PasskeyPrompts {
     const prompt = new PasskeyPrompt(`${PATH}/Prompt${++this.serial}`, sender, request, () => this.prompts.delete(prompt));
     this.prompts.add(prompt);
     this.watch(sender);
-    if (!await prompt.open()) {
+    if (!prompt.open()) {
       prompt.finish();
       invocation.return_dbus_error('org.freedesktop.DBus.Error.Failed', 'The prompt could not be shown');
       return;

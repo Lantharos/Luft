@@ -1,6 +1,6 @@
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
-import {getInputSourceManager} from 'resource:///com/lantharos/kestrel/ui/status/keyboard.js';
+import {getInputSourceManager} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {named} from '../../lib/actors.js';
 import {checks} from '../../lib/check.js';

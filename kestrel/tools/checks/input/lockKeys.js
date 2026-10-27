@@ -1,6 +1,6 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
-import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
+import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {shownStyled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';

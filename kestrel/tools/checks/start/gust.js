@@ -2,7 +2,7 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
-import {formatsLocale} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
+import {formatsLocale} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {named, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';

@@ -1,7 +1,7 @@
 import type AccountsService from 'gi://AccountsService';
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
-import { Avatar } from 'resource:///com/lantharos/kestrel/ui/userWidget.js';
+import { Avatar } from '../../shell/widgets/userWidget.js';
 
 import { t } from '../../shared/i18n/index.js';
 import { displayName } from './accounts.js';

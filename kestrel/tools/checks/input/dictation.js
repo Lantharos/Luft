@@ -3,8 +3,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
-import {taskbarClearance} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
-import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
+import {taskbarClearance, Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {descendants, firstStyled, named, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';

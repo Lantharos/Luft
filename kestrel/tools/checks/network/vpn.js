@@ -4,7 +4,7 @@ import GLib from 'gi://GLib';
 import NM from 'gi://NM';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
-import {VpnSecrets} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
+import {VpnSecrets} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {descendants, labelled, shownStyled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';

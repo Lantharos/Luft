@@ -1,6 +1,5 @@
 import Clutter from 'gi://Clutter';
-import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
-import {SwitcherPopup} from 'resource:///com/lantharos/kestrel/ui/switcherPopup.js';
+import {Main, SwitcherPopup} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {shownStyled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';

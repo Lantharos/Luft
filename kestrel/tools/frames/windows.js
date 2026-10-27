@@ -1,4 +1,4 @@
-import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
+import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {openBoardWindow} from '../checks/board/lib/board.js';
 import {moveTo, pressButton, releaseButton, rest} from '../checks/lib/input/input.js';

@@ -1,8 +1,7 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import St from 'gi://St';
-import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
-import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
+import {toggleSurface, Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {descendants, named, shown, shownStyled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
@@ -54,12 +53,11 @@ async function checkScreenKeyboard() {
     Main.keyboard.open(global.display.get_primary_monitor());
     await eventually(() => Main.keyboard.visible && shown(Main.keyboard.keyboardActor), 'the on-screen keyboard opens');
     await capture('screen-keyboard');
-    const key = descendants(Main.keyboard.keyboardActor).find(actor => actor._extendedKeys?.length && actor.mapped);
-    key._ensureExtendedKeysPopup();
-    key._showSubkeys();
+    const key = descendants(Main.keyboard.keyboardActor).find(actor => actor.extendedKeys?.length && actor.mapped);
+    key.showSubkeys();
     await eventually(() => shownStyled('keyboard-subkeys-boxpointer'), 'a key with extra characters shows them');
     await capture('screen-keyboard-subkeys');
-    key._hideSubkeys();
+    key.hideSubkeys();
     Main.keyboard.close();
     await eventually(() => !Main.keyboard.visible, 'the on-screen keyboard closes');
   } finally {

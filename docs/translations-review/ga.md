@@ -37,11 +37,11 @@ Strings in Luft's Irish translation that a native speaker should check: terms wi
 - `kestrel/ui/locales/ga/portal.ftl` `screen-share-title`: "An bhféadfaidh { $appName } do scáileán a fheiceáil?" — rephrased from "Share your screen with …?" because "le" + "an aip" (unknown-app fallback) would need "leis an"; same pattern used for the USB, account, remote desktop, input capture and shortcuts titles.
 - `kestrel/ui/locales/ga/portal.ftl` `print-title-from-app`: "Priontáil – { $appName }" — dash instead of "ó", which would need "ón aip" for the fallback; same for `print-job-name-from-app`.
 - `kestrel/ui/locales/ga/portal.ftl` `print-paper-letter`: "Letter" — US paper size names (Letter, Legal, Executive, Tabloid, Statement) kept in English; check what Irish printer dialogs use.
-- `kestrel/engine/locales/ga/engine.ftl` `network-menu-hotspot`: "{ $name } (ball te)" — "ball te" for hotspot has no settled OS usage.
-- `kestrel/engine/locales/ga/engine.ftl` `network-menu-tether`: "Teadráil" — term for Bluetooth tethering; check it is understood, also in `network-menu-tethers`.
-- `kestrel/engine/locales/ga/engine.ftl` `switch-monitor-join`: "Leathnaigh" — "Join displays" rendered as Windows' "Extend"; check it fits under 15 characters with the meaning intended.
-- `kestrel/engine/locales/ga/engine.ftl` `display-change-countdown`: "… i gceann { $seconds } shoicind" — lenited for one/two/few, plain for many/other; check counting forms of soicind.
-- `kestrel/engine/locales/ga/engine.ftl` `end-session-remote-user`: "{ $userName } (cian)" — "cian" for remote is terse; maybe "(cianda)".
+- `kestrel/ui/locales/ga/engine.ftl` `network-menu-hotspot`: "{ $name } (ball te)" — "ball te" for hotspot has no settled OS usage.
+- `kestrel/ui/locales/ga/engine.ftl` `network-menu-tether`: "Teadráil" — term for Bluetooth tethering; check it is understood, also in `network-menu-tethers`.
+- `kestrel/ui/locales/ga/engine.ftl` `switch-monitor-join`: "Leathnaigh" — "Join displays" rendered as Windows' "Extend"; check it fits under 15 characters with the meaning intended.
+- `kestrel/ui/locales/ga/engine.ftl` `display-change-countdown`: "… i gceann { $seconds } shoicind" — lenited for one/two/few, plain for many/other; check counting forms of soicind.
+- `kestrel/ui/locales/ga/engine.ftl` `end-session-remote-user`: "{ $userName } (cian)" — "cian" for remote is terse; maybe "(cianda)".
 - `apps/setup/locales/ga/setup.ftl` `setup-region-intro-guessed`: "Bímis ag tosú. Fuaireamar { $guesses }, mar sin athraigh aon rud nach bhfuil i gceart." — guesses are built as "teanga agus méarchlár ó do ríomhaire"; "Fuaireamar" (we got) replaces "we guessed"; check the joined sentence reads naturally.
 - `apps/setup/locales/ga/setup.ftl` `setup-windows-bitlocker`: "… i mBainistíocht Diosca …" — the Irish Windows name of Disk Management and Fast Startup ("Tosú Tapa") should match Microsoft's Irish UI.
 - `apps/setup/locales/ga/setup.ftl` `setup-replace-keeps-tools`: "{ $count } uirlis líne na n-orduithe …" — check the counting form of uirlis and the "n-" after 7–10.

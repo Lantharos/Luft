@@ -1,7 +1,7 @@
 import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
-import * as DND from 'resource:///com/lantharos/kestrel/ui/dnd.js';
+import * as DND from '../../shell/popups/dnd.js';
 
 interface DragItem { id: string; folder: boolean; }
 type DelegateActor = Clutter.Actor & { _delegate?: object };

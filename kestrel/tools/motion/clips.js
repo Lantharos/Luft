@@ -1,6 +1,6 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
-import {dismissImmediately, switchWorkspace, toggleSurface, touchpad as handleTouchpad} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
+import {dismissImmediately, switchWorkspace, toggleSurface, touchpad as handleTouchpad} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {leaveBoard, openBoardWindow, openWindows, showBoard} from '../checks/board/lib/board.js';
 import {touchpad} from '../checks/board/lib/touchpad.js';

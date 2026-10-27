@@ -1,11 +1,11 @@
 import Clutter from 'gi://Clutter';
 import GObject from 'gi://GObject';
 import St from 'gi://St';
-import { EntryField, MessageDialogContent } from 'resource:///com/lantharos/kestrel/ui/dialog.js';
-import type { ModalDialog } from 'resource:///com/lantharos/kestrel/ui/modalDialog.js';
+import { EntryField, MessageDialogContent } from '../../shell/dialogs/dialog.js';
+import { ModalDialog } from '../../shell/dialogs/modalDialog.js';
+import { CapsLockWarning, addContextMenu } from '../../shell/widgets/shellEntry.js';
 
 import { feedbackLabel, showText } from '../../auth/keyring/passwordForm.js';
-import type { DialogModules } from '../../auth/keyring/dialog.js';
 import { t } from '../../shared/i18n/index.js';
 
 interface Choice {
@@ -72,7 +72,7 @@ export class VpnDialog {
   private busy = false;
   private finished = false;
 
-  private constructor(private readonly modal: ModalDialog, private readonly modules: DialogModules, title: string, private readonly events: VpnDialogEvents) {
+  private constructor(private readonly modal: ModalDialog, title: string, private readonly events: VpnDialogEvents) {
     this.content = new MessageDialogContent({ title, icon_name: ICON });
     this.form.add_child(this.warning);
     this.content.add_child(this.form);
@@ -82,8 +82,8 @@ export class VpnDialog {
     });
   }
 
-  static open(modules: DialogModules, title: string, events: VpnDialogEvents): VpnDialog {
-    return new VpnDialog(new modules.ModalDialog({ styleClass: 'prompt-dialog kestrel-vpn-dialog' }), modules, title, events);
+  static open(title: string, events: VpnDialogEvents): VpnDialog {
+    return new VpnDialog(new ModalDialog({ styleClass: 'prompt-dialog kestrel-vpn-dialog' }), title, events);
   }
 
   show(step: Step): boolean {
@@ -126,7 +126,7 @@ export class VpnDialog {
     this.form.destroy_all_children();
     this.controls = new Map(fields.map(field => [field.key, this.control(field)]));
     for (const { actor } of this.controls.values()) this.form.add_child(actor);
-    if (fields.some(field => field.secret)) this.form.add_child(new this.modules.shellEntry.CapsLockWarning());
+    if (fields.some(field => field.secret)) this.form.add_child(new CapsLockWarning());
     this.form.add_child(this.warning);
   }
 
@@ -144,7 +144,7 @@ export class VpnDialog {
     }
     const params = { style_class: 'prompt-dialog-password-entry', text: field.value, can_focus: true, x_expand: true };
     const entry = field.secret ? new St.PasswordEntry(params) : new St.Entry(params);
-    this.modules.shellEntry.addContextMenu(entry);
+    addContextMenu(entry);
     entry.bind_property('reactive', entry.clutter_text, 'editable', GObject.BindingFlags.SYNC_CREATE);
     entry.clutter_text.connect('text-changed', () => this.sync());
     entry.clutter_text.connect('activate', () => this.submit());

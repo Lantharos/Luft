@@ -31,15 +31,15 @@ Strings in Luft's Estonian translation that a native speaker should check. Each 
 - `kestrel/ui/locales/et/system.ftl` `health-gpu-reset-body`: "Arvuti taaskäivitus iseenesest: { $date } kell { $time }." — colon keeps the date in the nominative; check it doesn't feel stiff.
 - `kestrel/ui/locales/et/system.ftl` `privacy-indicator`: "Kasutusel: { $things }" — the privacy-thing items are nominative lowercase (kaamera, mikrofon, ekraan, asukoht, aknad); check the joined list reads naturally.
 - `kestrel/ui/locales/et/portal.ftl` `portal-unknown-app-object`: "see rakendus" — all portal sentences put the app name in the nominative ("Kas { $appName } võib …?"), so both unknown-app forms are nominative; check the question form fits every title.
-- `kestrel/engine/locales/et/engine.ftl` `auto-rotate-title`: "Automaatne pööramine" — may be long for a Quick settings tile.
-- `kestrel/engine/locales/et/engine.ftl` `network-menu-tethers`: "Bluetoothi ühiskasutus" / `network-menu-tether`: "Ühiskasutus" — no settled Estonian term for Bluetooth tethering; check against what Estonian phones show.
-- `kestrel/engine/locales/et/engine.ftl` `network-menu-hotspot`: "Kuumkoht { $name }" — check against Windows' "mobiilne kuumkoht" wording.
-- `kestrel/engine/locales/et/engine.ftl` `switch-monitor-join`: "Laienda" — Windows' word for extending the desktop across displays; English says "Join Displays".
+- `kestrel/ui/locales/et/engine.ftl` `auto-rotate-title`: "Automaatne pööramine" — may be long for a Quick settings tile.
+- `kestrel/ui/locales/et/engine.ftl` `network-menu-tethers`: "Bluetoothi ühiskasutus" / `network-menu-tether`: "Ühiskasutus" — no settled Estonian term for Bluetooth tethering; check against what Estonian phones show.
+- `kestrel/ui/locales/et/engine.ftl` `network-menu-hotspot`: "Kuumkoht { $name }" — check against Windows' "mobiilne kuumkoht" wording.
+- `kestrel/ui/locales/et/engine.ftl` `switch-monitor-join`: "Laienda" — Windows' word for extending the desktop across displays; English says "Join Displays".
 - `apps/setup/locales/et/setup.ftl` `setup-region-field-language`: "keele" — the three field names are genitive because they only appear as the object of "Tuvastasime { $guesses }"; check the whole built sentence.
 - `apps/setup/locales/et/setup.ftl` `setup-windows-hibernated`: "… hoia all Shift-klahvi ja vali Lülita välja …" — should match the label of Shut down in Estonian Windows (possibly "Sule arvuti"); "kiirkäivitus" and "kettahaldus" should likewise match Windows.
 - `apps/setup/locales/et/setup.ftl` `setup-destination-alongside-choice`: "Koos süsteemiga { $windows }" — built to keep "Windows 11" uninflected; check it reads well as an option title.
 - `apps/setup/locales/et/setup.ftl` `setup-network-unavailable`: "Ühenduse saad luua hiljem paneelilt." — unclear which panel the English means; check in context.
-- `kestrel/engine/locales/et/engine.ftl` `backlight-title`: "Klaviatuuri taustvalgustus" — matches the Power page in Settings but may clip on a Quick settings tile.
+- `kestrel/ui/locales/et/engine.ftl` `backlight-title`: "Klaviatuuri taustvalgustus" — matches the Power page in Settings but may clip on a Quick settings tile.
 
 ## Settings
 

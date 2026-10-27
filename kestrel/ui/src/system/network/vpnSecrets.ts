@@ -2,7 +2,6 @@ import Gio from 'gi://Gio';
 import NM from 'gi://NM';
 import Shell from 'gi://Shell';
 
-import { loadDialogModules } from '../../auth/keyring/dialog.js';
 import { t } from '../../shared/i18n/index.js';
 import { OpenConnectSignIn } from './openconnect.js';
 import { externalAuthDialog, planFromAuthDialog, planFromSettings, type Plan } from './pluginSecrets.js';
@@ -69,8 +68,8 @@ export class VpnSecrets {
     else this.finish(Shell.NetworkAgentResponse.USER_CANCELED);
   }
 
-  private async ask(step: Step): Promise<Answer> {
-    this.dialog ??= VpnDialog.open(await loadDialogModules(), this.title, {
+  private ask(step: Step): Promise<Answer> {
+    this.dialog ??= VpnDialog.open(this.title, {
       submit: values => this.answer?.(values),
       cancel: () => {
         this.answer?.(null);

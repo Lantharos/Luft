@@ -22,11 +22,11 @@ Strings in Luft's Bulgarian translation that a native speaker should check. Each
 ## Kestrel and setup
 
 - `kestrel/ui/locales/bg/desktop.ftl` `task-view-desktop`: "Работно пространство { $number }" — follows the glossary (workspace = работно пространство, not работен плот as Windows says); check it doesn't clip in the task view.
-- `kestrel/engine/locales/bg/engine.ftl` `auto-rotate-title`: "Автозавъртане" — shortened for the tile; confirm it reads naturally versus "Автоматично завъртане".
-- `kestrel/engine/locales/bg/engine.ftl` `network-menu-tether`: "Тетъринг" — Android's loanword; check it is the expected term for a Bluetooth tether tile.
-- `kestrel/engine/locales/bg/engine.ftl` `network-menu-mobile`: "Мобилни данни" — chosen for the "Mobile" (broadband) tile, while its settings item and the PIN prompt say "мобилен интернет"; check whether one term should cover both.
-- `kestrel/engine/locales/bg/engine.ftl` `switch-monitor-join`: "Разширяване" — Windows' "Extend" wording for joining displays.
-- `kestrel/engine/locales/bg/engine.ftl` `autorun-connected`: "Свързано: „{ $driveName }“" — phrased this way to avoid gender agreement with an unknown partition name.
+- `kestrel/ui/locales/bg/engine.ftl` `auto-rotate-title`: "Автозавъртане" — shortened for the tile; confirm it reads naturally versus "Автоматично завъртане".
+- `kestrel/ui/locales/bg/engine.ftl` `network-menu-tether`: "Тетъринг" — Android's loanword; check it is the expected term for a Bluetooth tether tile.
+- `kestrel/ui/locales/bg/engine.ftl` `network-menu-mobile`: "Мобилни данни" — chosen for the "Mobile" (broadband) tile, while its settings item and the PIN prompt say "мобилен интернет"; check whether one term should cover both.
+- `kestrel/ui/locales/bg/engine.ftl` `switch-monitor-join`: "Разширяване" — Windows' "Extend" wording for joining displays.
+- `kestrel/ui/locales/bg/engine.ftl` `autorun-connected`: "Свързано: „{ $driveName }“" — phrased this way to avoid gender agreement with an unknown partition name.
 - `kestrel/ui/locales/bg/system.ftl` `oom-closed-body`: "Паметта на компютъра почти се изчерпа и затварянето му помогна всичко останало да продължи да работи гладко." — rephrased so "му" covers both приложението and контейнерът; check it reads naturally.
 - `kestrel/ui/locales/bg/system.ftl` `dictation-unsupported-title`: "Диктовка на { $language } не е налична на този компютър" — $language arrives in English for now, so it will read "на Japanese".
 - `kestrel/ui/locales/bg/system.ftl` `privacy-indicator`: "В употреба: { $things }" — avoids agreement with the list; check the list joiner output looks right.

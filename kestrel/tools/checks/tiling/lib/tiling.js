@@ -1,6 +1,6 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
+import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {openBoardWindow} from '../../board/lib/board.js';
 import {waitForWindow} from '../../lib/processes.js';

@@ -28,10 +28,10 @@ Strings in Luft's Greek translation that a native speaker should check: terms wi
 - `kestrel/ui/locales/el/system.ftl` `media-keys-airplane-mode-hardware`: "Η λειτουργία πτήσης είναι ενεργή από διακόπτη της συσκευής" — "in hardware" interpreted as a hardware switch.
 - `kestrel/ui/locales/el/system.ftl` `oom-closed-body`: "Η μνήμη του υπολογιστή είχε σχεδόν εξαντληθεί, οπότε έκλεισε…" — the subject of «έκλεισε» (the app or container) comes from the title; check it doesn't read as if the memory closed.
 - `kestrel/ui/locales/el/system.ftl` `vpn-field-pre-shared-key`: "Προκοινόχρηστο κλειδί" — Windows' term, also used for `settings-network-wireguard-preshared-key` in connections.ftl; check it's still current.
-- `kestrel/engine/locales/el/engine.ftl` `network-menu-tether`: "Κοινή σύνδεση" — no settled short term for a Bluetooth tether tile.
-- `kestrel/engine/locales/el/engine.ftl` `network-menu-mobile`: "Κινητά δεδομένα" — tile title for mobile broadband.
-- `kestrel/engine/locales/el/engine.ftl` `switch-monitor-built-in-only`: "Μόνο εσωτερική" — shortened to stay under 15 characters; «ενσωματωμένη» would be more precise.
-- `kestrel/engine/locales/el/engine.ftl` `osk-letters-key`: "ΑΒΓ" — Greek letters on the key; check that's right when the active layout is Latin.
+- `kestrel/ui/locales/el/engine.ftl` `network-menu-tether`: "Κοινή σύνδεση" — no settled short term for a Bluetooth tether tile.
+- `kestrel/ui/locales/el/engine.ftl` `network-menu-mobile`: "Κινητά δεδομένα" — tile title for mobile broadband.
+- `kestrel/ui/locales/el/engine.ftl` `switch-monitor-built-in-only`: "Μόνο εσωτερική" — shortened to stay under 15 characters; «ενσωματωμένη» would be more precise.
+- `kestrel/ui/locales/el/engine.ftl` `osk-letters-key`: "ΑΒΓ" — Greek letters on the key; check that's right when the active layout is Latin.
 - `apps/setup/locales/el/setup.ftl` `setup-region-field-language`: "τη γλώσσα" — field names carry the accusative article because they are only used inside «Συμπεράναμε { $guesses }».
 - `apps/setup/locales/el/setup.ftl` `setup-destination-replace-title`: "Αντικατάσταση του { $system }" — assumes a Latin system name (neuter).
 - `apps/setup/locales/el/setup.ftl` `setup-windows-hibernated`: "…τερματίστηκαν με γρήγορη εκκίνηση…" — assumes Greek Windows calls Fast Startup «Γρήγορη εκκίνηση».

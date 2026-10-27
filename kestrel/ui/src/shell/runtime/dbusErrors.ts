@@ -1,0 +1,42 @@
+import GLib from 'gi://GLib';
+import Gio from 'gi://Gio';
+
+function camelcase(str: string): string {
+  const words = str.toLowerCase().split('_');
+  return words.map(w => `${w.at(0)!.toUpperCase()}${w.substring(1)}`).join('');
+}
+
+function decamelcase(str: string): string {
+  return str.replace(/(.)([A-Z])/g, '$1-$2');
+}
+
+function registerErrorDomain(domain: string, errorEnum: Record<string, number>, prefix = 'com.lantharos.Kestrel'): GLib.Quark {
+  const domainName = `shell-${decamelcase(domain).toLowerCase()}-error`;
+  const quark = GLib.quark_from_string(domainName);
+
+  for (const [name, code] of Object.entries(errorEnum))
+    Gio.dbus_error_register_error(quark, code, `${prefix}.${domain}.Error.${camelcase(name)}`);
+  return quark;
+}
+
+export const ModalDialogError = {
+  UNKNOWN_TYPE: 0,
+  GRAB_FAILED: 1,
+} as const;
+export const ModalDialogErrors = registerErrorDomain('ModalDialog', ModalDialogError);
+
+export const NotificationError = {
+  INVALID_APP: 0,
+} as const;
+export const NotificationErrors = registerErrorDomain('Notifications', NotificationError, 'org.gtk');
+
+export const ScreencastError = {
+  ALL_PIPELINES_FAILED: 0,
+  PIPELINE_ERROR: 1,
+  SAVE_TO_DISK_DISABLED: 2,
+  ALREADY_RECORDING: 3,
+  RECORDER_ERROR: 4,
+  SERVICE_CRASH: 5,
+  OUT_OF_DISK_SPACE: 6,
+} as const;
+export const ScreencastErrors = registerErrorDomain('Screencast', ScreencastError);

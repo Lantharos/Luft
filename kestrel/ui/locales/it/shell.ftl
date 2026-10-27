@@ -34,3 +34,5 @@ keys-end = Fine
 keys-page-up = Pag su
 keys-page-down = Pag giù
 keys-print-screen = Stamp
+
+date-just-now = Adesso

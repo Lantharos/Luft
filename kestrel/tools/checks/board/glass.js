@@ -1,6 +1,6 @@
 import Clutter from 'gi://Clutter';
 import Shell from 'gi://Shell';
-import {battery} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
+import {battery} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {descendants, named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';

@@ -1,7 +1,7 @@
 import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
-import { WallClock } from 'resource:///com/lantharos/kestrel/misc/wallClock.js';
+import { WallClock } from '../../../shared/time/wallClock.js';
 
 import { BatteryIndicator } from '../../../shared/battery/indicator.js';
 import { blurSurface } from '../../../shared/layout/surface.js';

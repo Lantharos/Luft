@@ -1,7 +1,7 @@
 import Cairo from 'cairo';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
+import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {checks} from '../lib/check.js';
 import {repository, scratch} from '../lib/processes.js';
@@ -102,10 +102,10 @@ export async function run() {
     setPicture(writePicture(scratch('wallpaper-focus-check.png'), vertical));
     await eventually(() => shows([[leading, MIDDLE, true]]), 'a centered crop hides the picture\'s edge');
 
-    const actor = Main.layoutManager._bgManagers[0].backgroundActor;
+    const actor = Main.layoutManager.backgrounds.managers[0].backgroundActor;
     setFocus(vertical ? [0.5, 0] : [0, 0.5]);
     await eventually(() => shows([[leading, LEADING, true]]), `focus 0 keeps the ${axis} edge of the picture`);
-    require(Main.layoutManager._bgManagers[0].backgroundActor === actor, 'moving the focus keeps the loaded wallpaper');
+    require(Main.layoutManager.backgrounds.managers[0].backgroundActor === actor, 'moving the focus keeps the loaded wallpaper');
 
     setFocus(vertical ? [0.5, 1] : [1, 0.5]);
     await eventually(() => shows([[leading, LEADING, false], ...trailing ? [[trailing, TRAILING, true]] : []]),

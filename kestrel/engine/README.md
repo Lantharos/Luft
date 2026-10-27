@@ -1,6 +1,6 @@
 # Kestrel engine
 
-The native half of Kestrel, forked from GNOME Shell 51.0: the St toolkit, the shell's C library, and the JavaScript that runs on Kestrel's Mutter build for window management, authentication, the lock screen, screenshots, screencasts, notifications and the D-Bus services apps and portals talk to. The panel, Start, quick settings and the rest of the visible shell are TypeScript in [`kestrel/ui`](../ui), built into the engine's resources under `resource:///com/lantharos/kestrel`.
+The native half of Kestrel, forked from GNOME Shell 51.0: the St toolkit and the shell's C library on Kestrel's Mutter build. Everything that runs on them, from window management, the lock screen, screenshots and notifications to the panel, Start and quick settings, is TypeScript in [`kestrel/ui`](../ui), bundled into one module that the engine embeds as `resource:///com/lantharos/kestrel/kestrel.js`. The screencast and notification services are bundled from the same tree into their own programs.
 
 See [Kestrel's README](../README.md) for building and how the parts fit together.
 

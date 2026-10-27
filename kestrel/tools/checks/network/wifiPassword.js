@@ -2,8 +2,7 @@ import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import NM from 'gi://NM';
 import St from 'gi://St';
-import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
-import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
+import {toggleSurface, Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {descendants, named, shown, showsText, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
@@ -31,7 +30,7 @@ async function keyringRuns() {
 }
 
 function wifiToggle() {
-  return descendants(quick()).find(actor => actor._deviceType === NM.DeviceType.WIFI);
+  return descendants(quick()).find(actor => actor.deviceType === NM.DeviceType.WIFI);
 }
 
 function openQuickSettings() {
@@ -100,15 +99,15 @@ export async function run() {
   openQuickSettings();
   await eventually(() => shown(quick()) && wifiToggle(), 'quick settings have a Wi-Fi tile');
   const toggle = wifiToggle();
-  toggle._getDefaultName = () => 'Wi–Fi';
-  toggle._addItem(wifi.device, toggle._createDeviceMenuItem(wifi.device));
+  toggle.defaultName = () => 'Wi–Fi';
+  toggle.addItem(wifi.device, toggle.createDeviceMenuItem(wifi.device));
   try {
     await checkNeverEntered(wifi, toggle);
     await checkRejected(wifi, toggle);
     await checkUnsaved(wifi, toggle);
   } finally {
-    toggle._removeItem(wifi.device);
-    delete toggle._getDefaultName;
+    toggle.removeItem(wifi.device);
+    delete toggle.defaultName;
     if (shown(quick()))
       toggleSurface('quick');
   }

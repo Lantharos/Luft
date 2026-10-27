@@ -11,13 +11,16 @@ export interface ControlMenu {
   close(params?: { animate: boolean }): void;
 }
 
-export interface QuickControl extends St.Button {
-  title?: string | null;
-  subtitle: string | null;
+export interface QuickItem extends St.Button {
   menu?: ControlMenu;
-  _menuManager?: { removeMenu(menu: ControlMenu): void };
+  menuManager?: { removeMenu(menu: ControlMenu): void };
   slider?: St.Widget & { value: number };
-  _menuButton?: St.Button;
+  menuButton?: St.Button;
+}
+
+export interface QuickControl extends QuickItem {
+  title?: string | null;
+  subtitle?: string | null;
 }
 
 interface Indicator extends St.BoxLayout {
@@ -25,24 +28,23 @@ interface Indicator extends St.BoxLayout {
 }
 
 interface NetworkIndicator extends Indicator {
-  _wirelessToggle: QuickControl;
+  wirelessToggle: QuickControl;
 }
 
 export interface QuickSettingsSource {
-  ready: Promise<void>;
-  _network: NetworkIndicator | null;
-  _bluetooth: Indicator | null;
-  _volumeOutput: Indicator;
-  _brightness: Indicator;
-  _powerProfiles: Indicator;
-  _caffeine: Indicator;
-  _nightLight: Indicator;
-  _darkMode: Indicator;
-  _rain: Indicator;
-  _doNotDisturb: Indicator;
-  _rfkill: Indicator;
-  _backlight: Indicator;
-  _autoRotate: Indicator;
+  network: NetworkIndicator;
+  bluetooth: Indicator | null;
+  volumeOutput: Indicator;
+  brightness: Indicator;
+  powerProfiles: Indicator;
+  caffeine: Indicator;
+  nightLight: Indicator;
+  darkMode: Indicator;
+  rain: Indicator;
+  doNotDisturb: Indicator;
+  rfkill: Indicator;
+  backlight: Indicator;
+  autoRotate: Indicator;
 }
 
 export function detach(actor: Clutter.Actor): void {

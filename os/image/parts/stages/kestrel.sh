@@ -123,7 +123,7 @@ stage_presets() {
 }
 
 list_typelibs() {
-  grep -rhoE "gi://[A-Za-z0-9]+" "$kestrel/engine/js" "$kestrel/ui/src" | cut -d/ -f3 | sort -u
+  grep -rhoE "gi://[A-Za-z0-9]+" "$kestrel/ui/src" | cut -d/ -f3 | sort -u
 }
 
 keep_sources_in_work

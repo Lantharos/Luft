@@ -1,5 +1,5 @@
 import GLib from 'gi://GLib';
-import * as IBusManager from 'resource:///com/lantharos/kestrel/misc/ibusManager.js';
+import {IBusManager} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {checks} from '../../lib/check.js';
 import {type} from '../../lib/input/input.js';
@@ -51,7 +51,7 @@ async function checkCandidates() {
   const entry = await openEntry();
   try {
     type('ni');
-    const popup = IBusManager.getIBusManager()._candidatePopup;
+    const popup = IBusManager.getIBusManager().candidatePopup;
     await eventually(() => popup.visible, 'typing a reading shows its words in Kestrel’s candidate popup');
     await settled();
     await capture('keys-candidates');

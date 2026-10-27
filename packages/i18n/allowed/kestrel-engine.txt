@@ -1,40 +1,36 @@
-kestrel/engine/js/dbusServices/notifications/notificationDaemon.js	Invalid notification ID
-kestrel/engine/js/dbusServices/screencast/screencastService.js	Sender has vanished
-kestrel/engine/js/dbusServices/screencast/screencastService.js	Session closed unexpectedly
-kestrel/engine/js/dbusServices/screencast/screencastService.js	All pipelines failed to start
-kestrel/engine/js/dbusServices/screencast/screencastService.js	Unexpected EOS message
-kestrel/engine/js/dbusServices/screencast/screencastService.js	Out of disk space
-kestrel/engine/js/dbusServices/screencast/screencastService.js	Saving to disk is disabled
-kestrel/engine/js/dbusServices/screencast/screencastService.js	Service is already recording
-kestrel/engine/js/misc/ddcutil.js	Invalid display
-kestrel/engine/js/ui/accessDialog.js	Already showing a system access dialog
-kestrel/engine/js/ui/accessDialog.js	Only the focused app is allowed to show a system access dialog
-kestrel/engine/js/ui/components/automountManager.js	No key available with this passphrase
-kestrel/engine/js/ui/components/automountManager.js	No key available to unlock device
-kestrel/engine/js/ui/components/automountManager.js	Failed to activate device: Incorrect passphrase
-kestrel/engine/js/ui/components/automountManager.js	Failed to load device\'s parameters: Invalid argument
-kestrel/engine/js/ui/components/automountManager.js	Failed to load device\'s parameters: Operation not permitted
-kestrel/engine/js/ui/components/automountManager.js	Compiled against a version of libcryptsetup that does not support the VeraCrypt PIM setting
-kestrel/engine/js/ui/endSessionDialog.js	Unknown dialog type requested
-kestrel/engine/js/ui/endSessionDialog.js	Cannot grab pointer and keyboard
-kestrel/engine/js/ui/environment.js	Transition was stopped before completing
-kestrel/engine/js/ui/layout.js	Dummy Cursor
-kestrel/engine/js/ui/layout.js	Background loading was cancelled
-kestrel/engine/js/ui/lockScreen/pages.js	Lock screen swipe tracker
-kestrel/engine/js/ui/main.js	Kestrel started at ${_startDate}
-kestrel/engine/js/ui/notificationDaemon.js	The app by ID "${appId}" could not be found
-kestrel/engine/js/ui/popupMenu.js	Cannot instantiate abstract class ${this.constructor.name}
-kestrel/engine/js/ui/popupMenu.js	Invalid argument to PopupMenuBase.addMenuItem()
-kestrel/engine/js/ui/screenshot.js	Service crashed
-kestrel/engine/js/ui/screenshot.js	There is an ongoing operation for this sender
-kestrel/engine/js/ui/screenshot.js	Saving to disk is disabled
-kestrel/engine/js/ui/screenshot.js	Screenshots are limited to the system. To see or use windows, run peek --help
-kestrel/engine/js/ui/screenshot.js	The area is empty or reaches past the screen
-kestrel/engine/js/ui/screenshot.js	Operation was cancelled
-kestrel/engine/js/ui/shellDBus.js	The screen is locked and only unlocks after signing in
-kestrel/engine/js/ui/status/keyboard.js	Cannot instantiate abstract class ${this.constructor.name}
-kestrel/engine/js/ui/status/network.js	Cannot instantiate abstract type ${this.constructor.name}
-kestrel/engine/js/ui/status/network.js	${this}'s autoConnect item should be visible when otherwise empty
-kestrel/engine/js/ui/userWidget.js	Empty User
-kestrel/engine/js/ui/windowManager.js	Window unfullscreen top drag
-kestrel/engine/js/ui/windowManager.js	Unmatched call to unblockWorkspaceUpdates()
+kestrel/ui/src/services/notifications/notificationDaemon.js	Invalid notification ID
+kestrel/ui/src/services/screencast/screencastService.js	Sender has vanished
+kestrel/ui/src/services/screencast/screencastService.js	Session closed unexpectedly
+kestrel/ui/src/services/screencast/screencastService.js	All pipelines failed to start
+kestrel/ui/src/services/screencast/screencastService.js	Unexpected EOS message
+kestrel/ui/src/services/screencast/screencastService.js	Out of disk space
+kestrel/ui/src/services/screencast/screencastService.js	Saving to disk is disabled
+kestrel/ui/src/services/screencast/screencastService.js	Service is already recording
+kestrel/ui/src/shell/system/ddcutil.js	Invalid display
+kestrel/ui/src/shell/dialogs/accessDialog.js	Already showing a system access dialog
+kestrel/ui/src/shell/dialogs/accessDialog.js	Only the focused app is allowed to show a system access dialog
+kestrel/ui/src/shell/components/automountManager.js	No key available with this passphrase
+kestrel/ui/src/shell/components/automountManager.js	No key available to unlock device
+kestrel/ui/src/shell/components/automountManager.js	Failed to activate device: Incorrect passphrase
+kestrel/ui/src/shell/components/automountManager.js	Failed to load device\'s parameters: Invalid argument
+kestrel/ui/src/shell/components/automountManager.js	Failed to load device\'s parameters: Operation not permitted
+kestrel/ui/src/shell/components/automountManager.js	Compiled against a version of libcryptsetup that does not support the VeraCrypt PIM setting
+kestrel/ui/src/shell/dialogs/endSessionDialog.js	Unknown dialog type requested
+kestrel/ui/src/shell/dialogs/endSessionDialog.js	Cannot grab pointer and keyboard
+kestrel/ui/src/shell/environment.js	Transition was stopped before completing
+kestrel/ui/src/shell/stage/layout.ts	Dummy Cursor
+kestrel/ui/src/shell/stage/layout/backgrounds.ts	Background loading was cancelled
+kestrel/ui/src/shell/lockScreen/pages.js	Lock screen swipe tracker
+kestrel/ui/src/shell/notifications/daemon/gtkDaemon.ts	The app by ID "${appId}" could not be found
+kestrel/ui/src/shell/popups/menu/menuBase.ts	Invalid argument to PopupMenuBase.addMenuItem()
+kestrel/ui/src/shell/screenshot/screenshot.js	Service crashed
+kestrel/ui/src/shell/screenshot/screenshot.js	There is an ongoing operation for this sender
+kestrel/ui/src/shell/screenshot/screenshot.js	Saving to disk is disabled
+kestrel/ui/src/shell/screenshot/screenshot.js	Screenshots are limited to the system. To see or use windows, run peek --help
+kestrel/ui/src/shell/screenshot/screenshot.js	The area is empty or reaches past the screen
+kestrel/ui/src/shell/screenshot/screenshot.js	Operation was cancelled
+kestrel/ui/src/shell/shellDBus.js	The screen is locked and only unlocks after signing in
+kestrel/ui/src/shell/widgets/userWidget.ts	Empty User
+kestrel/ui/src/shell/windows/windowManager.js	Window unfullscreen top drag
+kestrel/ui/src/shell/windows/windowManager.js	Unmatched call to unblockWorkspaceUpdates()
+kestrel/ui/src/shell/main.ts	Kestrel started at ${startDate}

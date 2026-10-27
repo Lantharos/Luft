@@ -2,7 +2,7 @@ import AccountsService from 'gi://AccountsService';
 import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
-import { Avatar } from 'resource:///com/lantharos/kestrel/ui/userWidget.js';
+import { Avatar } from '../../shell/widgets/userWidget.js';
 
 import { t } from '../../shared/i18n/index.js';
 import { animateActor } from '../../shared/motion/motion.js';

@@ -31,9 +31,9 @@ Strings in Luft's Turkish translation that a native speaker should check: terms 
 - `kestrel/ui/locales/tr/surfaces.ftl` `start-search-wifi-on`: "Wi-Fi’ı aç" — suffix follows the "vay fay" pronunciation, as Windows does; confirm.
 - `kestrel/ui/locales/tr/system.ftl` `privacy-indicator`: "Kullanımda: { $things }" — depends on how the list items are joined (ve); check the result reads well.
 - `kestrel/ui/locales/tr/system.ftl` `health-gpu-reset-body`: "Bilgisayarınız kendiliğinden yeniden başladı: bugün, { $time }. …" — built to avoid a suffix on the time; check it doesn't feel stiff.
-- `kestrel/engine/locales/tr/engine.ftl` `caffeine-until`: "{ $time } saatine kadar" — avoids a suffix on the time placeable; check it sounds natural under the tile.
-- `kestrel/engine/locales/tr/engine.ftl` `network-menu-tether`: "Paylaşım" — short tile title for Bluetooth tethering; check it is clear enough.
-- `kestrel/engine/locales/tr/engine.ftl` `switch-monitor-join`: "Genişlet" — Windows' word for extending the desktop across displays.
+- `kestrel/ui/locales/tr/engine.ftl` `caffeine-until`: "{ $time } saatine kadar" — avoids a suffix on the time placeable; check it sounds natural under the tile.
+- `kestrel/ui/locales/tr/engine.ftl` `network-menu-tether`: "Paylaşım" — short tile title for Bluetooth tethering; check it is clear enough.
+- `kestrel/ui/locales/tr/engine.ftl` `switch-monitor-join`: "Genişlet" — Windows' word for extending the desktop across displays.
 - `kestrel/ui/locales/tr/portal.ftl` `portal-unknown-app-subject`: "Uygulama" — sentences with { $appName } avoid "uygulaması" after the placeable so this stand-in doesn't produce "Uygulama uygulaması"; check the sentences still read well with real app names.
 - `apps/setup/locales/tr/setup.ftl` `setup-region-intro-guessed`: "Luft’u kuralım. Bazı seçimleri tahmin ettik: { $guesses }. Yanlış olanı değiştirin." — with guesses like "dil ve klavye bilgisayarınıza göre"; check the assembled sentence with two guesses joined by "ve".
 - `apps/setup/locales/tr/setup.ftl` `setup-account-full-name-example`: "Cahit Arf" — a well-known Turkish mathematician, in the spirit of Ada Lovelace; confirm.

@@ -2,7 +2,7 @@ import Cogl from 'gi://Cogl';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
-import { getStyleVariant, setAccent } from 'resource:///com/lantharos/kestrel/ui/kestrelTheme.js';
+import { getStyleVariant, setAccent } from '../shell/stage/kestrelTheme.js';
 
 import { accentColor, fromHex, isNeutral, readableOn, readableOver, toHex, type Rgb, type Seed } from './color.js';
 import type { Colors, Palette } from './palette.js';

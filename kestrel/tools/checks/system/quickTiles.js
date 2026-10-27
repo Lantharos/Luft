@@ -3,8 +3,7 @@ import GdkPixbuf from 'gi://GdkPixbuf';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
-import {getStyleVariant} from 'resource:///com/lantharos/kestrel/ui/kestrelTheme.js';
-import {accelerometer, toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
+import {getStyleVariant, accelerometer, toggleSurface} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {descendants, named, shown, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
@@ -113,9 +112,9 @@ async function checkToggles(interfaceSettings) {
   await eventually(() => keyboard.width < grid().width / 2 + 1, 'closing options returns the tile to the grid');
 
   const volume = descendants(quick()).find(actor => actor.slider && actor.menu && actor.menuEnabled);
-  volume._menuButton.emit('clicked', 1);
+  volume.menuButton.emit('clicked', 1);
   await eventually(() => volume.menu.isOpen, 'the device chevron opens the device list');
-  volume._menuButton.emit('clicked', 1);
+  volume.menuButton.emit('clicked', 1);
   await eventually(() => !volume.menu.isOpen, 'the same chevron closes it again');
 }
 

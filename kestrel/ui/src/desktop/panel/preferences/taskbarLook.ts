@@ -1,6 +1,6 @@
 import type Shell from 'gi://Shell';
 import type St from 'gi://St';
-import { blurBackdrop } from 'resource:///com/lantharos/kestrel/ui/kestrelGlass.js';
+import { blurBackdrop } from '../../../shell/stage/kestrelGlass.js';
 
 import { isDark, watchScheme } from '../../../shared/display/scheme.js';
 import type { TaskbarLook } from '../../../../../../packages/web/ui/src/taskbar/looks';

@@ -2,15 +2,14 @@ import Clutter from 'gi://Clutter';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 
+import { MessageDialogContent } from '../../shell/dialogs/dialog.js';
+import { ModalDialog } from '../../shell/dialogs/modalDialog.js';
+
 import { t } from '../../shared/i18n/index.js';
 import { canonical, claimable, fromEvent, label, labels } from './accelerators.js';
 import type { AppShortcuts } from './store.js';
 
-export async function recordShortcuts(appId: string, current: AppShortcuts, unavailable: Set<string>): Promise<AppShortcuts | null> {
-  const [{ MessageDialogContent }, { ModalDialog }] = await Promise.all([
-    import('resource:///com/lantharos/kestrel/ui/dialog.js'),
-    import('resource:///com/lantharos/kestrel/ui/modalDialog.js'),
-  ]);
+export function recordShortcuts(appId: string, current: AppShortcuts, unavailable: Set<string>): Promise<AppShortcuts | null> {
   return new Promise(resolve => {
     const edited: AppShortcuts = Object.fromEntries(Object.entries(current).map(([id, shortcut]) => [id, { ...shortcut, shortcuts: [...shortcut.shortcuts] }]));
     const app = Shell.AppSystem.get_default().lookup_app(`${appId}.desktop`);

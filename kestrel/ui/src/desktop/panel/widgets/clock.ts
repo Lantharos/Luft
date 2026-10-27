@@ -2,7 +2,7 @@ import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import Pango from 'gi://Pango';
 import St from 'gi://St';
-import { WallClock } from 'resource:///com/lantharos/kestrel/misc/wallClock.js';
+import { WallClock } from '../../../shared/time/wallClock.js';
 
 import { onLocaleChanged } from '../../../shared/i18n/index.js';
 import { dateText, timeText } from './clockText.js';

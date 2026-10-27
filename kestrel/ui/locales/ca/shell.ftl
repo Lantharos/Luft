@@ -34,3 +34,5 @@ keys-end = Fi
 keys-page-up = Re Pàg
 keys-page-down = Av Pàg
 keys-print-screen = Impr Pant
+
+date-just-now = Ara mateix

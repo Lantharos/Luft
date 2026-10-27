@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
 import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
-import {dismissImmediately, toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
+import {dismissImmediately, toggleSurface} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {named, shown} from '../../lib/actors.js';
 import {scratch} from '../../lib/processes.js';

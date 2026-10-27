@@ -55,7 +55,7 @@ After changing `tokens.json`, run `bun run generate` in `packages/web/motion` to
 `ease()` takes the tokens directly:
 
 ```js
-import {Curve, Duration, Spring} from './kestrelUi.js';
+import { Curve, Duration, Spring } from '../shared/motion/motion.js';
 
 actor.ease({translation_y: 0, spring: Spring.snappy});
 actor.ease({opacity: 255, duration: Duration.standard, curve: Curve.decelerate});

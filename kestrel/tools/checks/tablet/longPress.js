@@ -2,8 +2,7 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
-import {dismissImmediately, toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
-import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
+import {dismissImmediately, toggleSurface, Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {named, shown, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';

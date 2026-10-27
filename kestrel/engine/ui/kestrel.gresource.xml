@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/com/lantharos/kestrel">
+    <file>kestrel.js</file>
+    <file alias="locales/en.ftl">locale-en.ftl</file>
+    <file alias="locales/bs.ftl">locale-bs.ftl</file>
+    <file alias="locales/ca.ftl">locale-ca.ftl</file>
+    <file alias="locales/cs.ftl">locale-cs.ftl</file>
+    <file alias="locales/da.ftl">locale-da.ftl</file>
+    <file alias="locales/de.ftl">locale-de.ftl</file>
+    <file alias="locales/et.ftl">locale-et.ftl</file>
+    <file alias="locales/es.ftl">locale-es.ftl</file>
+    <file alias="locales/fr.ftl">locale-fr.ftl</file>
+    <file alias="locales/ga.ftl">locale-ga.ftl</file>
+    <file alias="locales/hr.ftl">locale-hr.ftl</file>
+    <file alias="locales/is.ftl">locale-is.ftl</file>
+    <file alias="locales/it.ftl">locale-it.ftl</file>
+    <file alias="locales/lv.ftl">locale-lv.ftl</file>
+    <file alias="locales/lt.ftl">locale-lt.ftl</file>
+    <file alias="locales/hu.ftl">locale-hu.ftl</file>
+    <file alias="locales/mt.ftl">locale-mt.ftl</file>
+    <file alias="locales/nl.ftl">locale-nl.ftl</file>
+    <file alias="locales/nb.ftl">locale-nb.ftl</file>
+    <file alias="locales/nn.ftl">locale-nn.ftl</file>
+    <file alias="locales/pl.ftl">locale-pl.ftl</file>
+    <file alias="locales/pt-BR.ftl">locale-pt-BR.ftl</file>
+    <file alias="locales/pt.ftl">locale-pt.ftl</file>
+    <file alias="locales/ro.ftl">locale-ro.ftl</file>
+    <file alias="locales/sq.ftl">locale-sq.ftl</file>
+    <file alias="locales/sk.ftl">locale-sk.ftl</file>
+    <file alias="locales/sl.ftl">locale-sl.ftl</file>
+    <file alias="locales/sr-Latn.ftl">locale-sr-Latn.ftl</file>
+    <file alias="locales/fi.ftl">locale-fi.ftl</file>
+    <file alias="locales/sv.ftl">locale-sv.ftl</file>
+    <file alias="locales/tr.ftl">locale-tr.ftl</file>
+    <file alias="locales/el.ftl">locale-el.ftl</file>
+    <file alias="locales/bg.ftl">locale-bg.ftl</file>
+    <file alias="locales/mk.ftl">locale-mk.ftl</file>
+    <file alias="locales/ru.ftl">locale-ru.ftl</file>
+    <file alias="locales/sr.ftl">locale-sr.ftl</file>
+    <file alias="locales/uk.ftl">locale-uk.ftl</file>
+  </gresource>
+</gresources>

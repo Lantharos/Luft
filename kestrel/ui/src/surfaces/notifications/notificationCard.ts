@@ -13,8 +13,8 @@ export interface SignalSource {
 }
 
 export interface Notification extends SignalSource {
-  title: string;
-  body: string;
+  title: string | null;
+  body: string | null;
   datetime: GLib.DateTime;
   acknowledged: boolean;
   resident: boolean;
@@ -27,7 +27,7 @@ export interface Notification extends SignalSource {
 }
 
 export interface NotificationSource extends SignalSource {
-  title: string;
+  title: string | null;
   icon: Gio.Icon | null;
   policy?: { id?: string };
   notifications: Notification[];
@@ -49,8 +49,8 @@ export class NotificationCard {
     changed: () => void, private readonly close: () => void, private readonly reveal: (actor: Clutter.Actor) => void, motion: CardMotion) {
     this.swipe = new SwipeAway(this.actor, { downward: false, ...motion });
     const header = new St.BoxLayout();
-    const title = new St.Label({ text: notification.title, style_class: 'kestrel-section-title', x_expand: true, y_align: Clutter.ActorAlign.CENTER });
-    const body = new St.Label({ text: notification.body, visible: !!notification.body, style_class: 'kestrel-muted' });
+    const title = new St.Label({ text: notification.title ?? '', style_class: 'kestrel-section-title', x_expand: true, y_align: Clutter.ActorAlign.CENTER });
+    const body = new St.Label({ text: notification.body ?? '', visible: !!notification.body, style_class: 'kestrel-muted' });
     for (const label of [title, body]) {
       label.clutter_text.line_wrap = true;
       label.clutter_text.line_wrap_mode = Pango.WrapMode.WORD_CHAR;
@@ -59,7 +59,7 @@ export class NotificationCard {
     const content = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, x_expand: true, style_class: 'kestrel-notification-content' });
     content.add_child(title);
     content.add_child(body);
-    this.open = new St.Button({ child: content, x_expand: true, can_focus: true, track_hover: true, style_class: 'kestrel-notification-open', accessible_name: notification.title });
+    this.open = new St.Button({ child: content, x_expand: true, can_focus: true, track_hover: true, style_class: 'kestrel-notification-open', accessible_name: notification.title ?? '' });
     this.open.connect('clicked', () => { close(); notification.activate(); });
     this.open.connect('key-focus-in', () => reveal(this.open));
     this.open.connect('key-press-event', (_actor, event) => {
@@ -78,9 +78,9 @@ export class NotificationCard {
 
     let displayed: unknown[] = [];
     this.refresh = () => {
-      title.text = notification.title;
-      this.open.accessible_name = notification.title;
-      body.text = notification.body;
+      title.text = notification.title ?? '';
+      this.open.accessible_name = notification.title ?? '';
+      body.text = notification.body ?? '';
       body.visible = !!notification.body;
       const current = [notification.replyLabel, ...notification.actions];
       if (displayed.length === current.length && displayed.every((entry, index) => entry === current[index])) return;

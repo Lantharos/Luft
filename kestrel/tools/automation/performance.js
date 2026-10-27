@@ -3,9 +3,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
 import System from 'system';
-import {dismissImmediately, surfacesPrepared, toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
-import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
-import * as MessageTray from 'resource:///com/lantharos/kestrel/ui/messageTray.js';
+import {dismissImmediately, surfacesPrepared, toggleSurface, Main, MessageTray} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {descendants, firstStyled, named} from '../checks/lib/actors.js';
 import {gjs, stop, stopAll, waitForWindow, waitForWindows} from '../checks/lib/processes.js';

@@ -1,5 +1,8 @@
 import type Clutter from 'gi://Clutter';
+import type Cogl from 'gi://Cogl';
+import type GDesktopEnums from 'gi://GDesktopEnums';
 import type Gio from 'gi://Gio';
+import type GLib from 'gi://GLib';
 import type GObject from 'gi://GObject';
 import type Mtk from 'gi://Mtk';
 
@@ -38,6 +41,11 @@ declare module '@girs/meta-51/meta-51' {
       }
     }
 
+    interface Background {
+      set_texture(texture: Cogl.Texture, style: GDesktopEnums.BackgroundStyle, colorState: Clutter.ColorState | null): void;
+      set_focus(x: number, y: number): void;
+    }
+
     interface Display {
       set_x11_origin(x: number, y: number): void;
     }
@@ -54,6 +62,49 @@ declare module '@girs/meta-51/meta-51' {
       interface SignalSignatures {
         rotating: (monitor: number, from: number, to: number) => void;
       }
+    }
+  }
+}
+
+declare module '@girs/shell-51/shell-51' {
+  namespace Shell {
+    function systemd_start_app_scope(name: string, pid: number): void;
+    function texture_file_paint_actor(actor: Clutter.Actor): Cogl.Texture | null;
+    function texture_file_encode(texture: Cogl.Texture, metadata: GLib.Bytes): GLib.Bytes;
+    function texture_file_load_async(file: Gio.File, ioPriority: number, cancellable: Gio.Cancellable | null): Promise<[Cogl.Texture, GLib.Bytes]>;
+
+    enum MixerHeadset {
+      HEADPHONES = 1,
+      HEADSET = 2,
+      MICROPHONE = 4,
+    }
+
+    class XkbInfo extends GObject.Object {
+      get_layout_info(id: string): [boolean, string, string, string, string];
+      get_languages_for_layout(id: string): string[];
+    }
+  }
+}
+
+declare module '@girs/st-51/st-51' {
+  namespace St {
+    interface TextureCache {
+      preload_file_to_cairo_surface(file: Gio.File, paintScale: number, resourceScale: number): void;
+    }
+
+    interface ThemeContext {
+      set_theme_and_accent_color(theme: Theme, color: Cogl.Color, fgColor: Cogl.Color): void;
+    }
+
+    enum KeynavFlags {
+      NONE = 0,
+      WRAP_HORIZONTALLY = 1,
+      WRAP_VERTICALLY = 2,
+    }
+
+    interface Widget {
+      get_keynav_flags(): KeynavFlags;
+      set_keynav_flags(flags: KeynavFlags): void;
     }
   }
 }

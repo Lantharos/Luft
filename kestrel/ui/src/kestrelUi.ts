@@ -191,6 +191,7 @@ class KestrelUi {
       place();
       this.syncSession();
     });
+    this.quick.updateStatus();
     const holdPanels = () => this.panels.hold(this.menus.actor.visible || this.previews.actor.visible);
     for (const actor of [this.menus.actor, this.previews.actor]) actor.connect('notify::visible', holdPanels);
     this.disconnectors.push(followUserLanguage());

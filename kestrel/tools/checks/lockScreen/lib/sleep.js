@@ -1,6 +1,6 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import {getLoginManager} from 'resource:///com/lantharos/kestrel/misc/loginManager.js';
+import {getLoginManager} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {call, property} from '../../lib/dbus.js';
 import {waitUntil} from '../../lib/wait.js';

@@ -88,7 +88,6 @@ export class KeyringPrompter {
 
   private serialize(invocation: Invocation, step: () => void): void {
     this.incoming = this.incoming.then(async () => {
-      await this.queue.ready();
       if (await this.authorized(invocation)) step();
       else invocation.return_dbus_error('org.freedesktop.DBus.Error.AccessDenied', 'Only the keyring can ask for passwords');
     }).catch(error => console.error('Kestrel could not show a keyring prompt', error));

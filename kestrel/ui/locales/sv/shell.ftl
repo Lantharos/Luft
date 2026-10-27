@@ -34,3 +34,5 @@ keys-end = End
 keys-page-up = Page Up
 keys-page-down = Page Down
 keys-print-screen = Print Screen
+
+date-just-now = Nyss

@@ -1,4 +1,4 @@
-import {dismissImmediately, toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
+import {dismissImmediately, toggleSurface} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {withApp} from '../apps/lib/apps.js';
 import {show} from '../apps/settings/navigation.js';

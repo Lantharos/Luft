@@ -1,13 +1,13 @@
 import Clutter from 'gi://Clutter';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
-import { CheckBox } from 'resource:///com/lantharos/kestrel/ui/checkBox.js';
-import { MessageDialogContent } from 'resource:///com/lantharos/kestrel/ui/dialog.js';
-import type { ModalDialog } from 'resource:///com/lantharos/kestrel/ui/modalDialog.js';
+import { CheckBox } from '../../shell/widgets/checkBox.js';
+import { MessageDialogContent } from '../../shell/dialogs/dialog.js';
+import { ModalDialog } from '../../shell/dialogs/modalDialog.js';
 
 import { appIcon } from '../../appearance/icons/appIcons.js';
 import { t } from '../../shared/i18n/index.js';
-import { PasswordForm, feedbackLabel, showText, type PasswordEvents, type ShellEntryModule } from './passwordForm.js';
+import { PasswordForm, feedbackLabel, showText, type PasswordEvents } from './passwordForm.js';
 import type { Measure } from './quality.js';
 import type { AccessRequest, PasswordRequest } from './request.js';
 
@@ -21,21 +21,6 @@ interface DialogEvents extends PasswordEvents {
 
 const ICON_SIZE = 44;
 
-export interface DialogModules {
-  ModalDialog: typeof ModalDialog;
-  shellEntry: ShellEntryModule;
-}
-
-let modules: Promise<DialogModules> | null = null;
-
-export function loadDialogModules(): Promise<DialogModules> {
-  modules ??= Promise.all([
-    import('resource:///com/lantharos/kestrel/ui/modalDialog.js'),
-    import('resource:///com/lantharos/kestrel/ui/shellEntry.js'),
-  ]).then(([{ ModalDialog }, shellEntry]) => ({ ModalDialog, shellEntry }));
-  return modules;
-}
-
 export class KeyringDialog {
   readonly kind: Prompt['kind'];
   private readonly header: MessageDialogContent;
@@ -45,7 +30,7 @@ export class KeyringDialog {
   private remember: CheckBox | null = null;
   private password: PasswordForm | null = null;
 
-  private constructor(private readonly modal: ModalDialog, prompt: Prompt, shellEntry: ShellEntryModule, private readonly events: DialogEvents, measure?: Measure) {
+  private constructor(private readonly modal: ModalDialog, prompt: Prompt, private readonly events: DialogEvents, measure?: Measure) {
     this.kind = prompt.kind;
     this.header = new MessageDialogContent({ title: prompt.request.title });
     this.header.add_child(this.form);
@@ -55,15 +40,15 @@ export class KeyringDialog {
       this.buildAccess(prompt.request);
       this.describe(prompt.request);
     } else {
-      this.password = new PasswordForm(this.form, this.hint, modal, shellEntry, events);
+      this.password = new PasswordForm(this.form, this.hint, modal, events);
       if (prompt.request.remember) this.remember = this.addRemember(t('keyring-save'), false);
       this.retry(prompt.request, measure);
     }
   }
 
-  static open({ ModalDialog, shellEntry }: DialogModules, prompt: Prompt, events: DialogEvents, measure?: Measure): KeyringDialog | null {
+  static open(prompt: Prompt, events: DialogEvents, measure?: Measure): KeyringDialog | null {
     const modal = new ModalDialog({ styleClass: 'prompt-dialog kestrel-keyring-dialog' });
-    const dialog = new KeyringDialog(modal, prompt, shellEntry, events, measure);
+    const dialog = new KeyringDialog(modal, prompt, events, measure);
     if (modal.open()) return dialog;
     modal.destroy();
     return null;

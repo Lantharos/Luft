@@ -24,7 +24,7 @@ Strings in Luft's Czech translation that a native speaker should check: term cho
 - `kestrel/ui/locales/cs/system.ftl` `oom-closed-body-with-size`: "Počítači docházela paměť. Zavřením se uvolnilo { $size }, aby vše ostatní dál plynule reagovalo." — rephrased to avoid gender agreement between app and container; English says what it was using, not what was freed.
 - `kestrel/ui/locales/cs/surfaces.ftl` `start-search-keep-awake-off`: "Povolit vypínání obrazovky" — opposite of Nevypínat obrazovku; check it is clear.
 - `kestrel/ui/locales/cs/desktop.ftl` `task-view-desktop`: "Pracovní prostor { $number }" — follows the glossary's workspace; Windows says Plocha 1.
-- `kestrel/engine/locales/cs/engine.ftl` `switch-monitor-join`: "Rozšířit" — Windows' word for extending displays; check it is understood as joining.
+- `kestrel/ui/locales/cs/engine.ftl` `switch-monitor-join`: "Rozšířit" — Windows' word for extending displays; check it is understood as joining.
 - `apps/setup/locales/cs/setup.ftl` `setup-region-intro-guessed`: "Na začátek jsme odhadli { $guesses }. Upravte, co nesedí." — built from pieces; field names are accusative (jazyk, klávesnici, časové pásmo); check the joined list.
 - `apps/setup/locales/cs/setup.ftl` `setup-windows-hibernated`: "…vypnutý s rychlým spuštěním…" — Fast Startup as Windows names it in Czech (Rychlé spuštění); check.
 - `apps/setup/desktop/locales/cs/desktop.ftl` `desktop-window-title`: "Nastavit Luft" — infinitive like Instalovat Luft; avoids clashing with Nastavení.

@@ -211,7 +211,7 @@ config_h = configure_file(
 conf_inc = include_directories('.')
 
 subdir('data')
-subdir('js')
+subdir('ui')
 subdir('src')
 
 gnome.post_install(glib_compile_schemas: true)

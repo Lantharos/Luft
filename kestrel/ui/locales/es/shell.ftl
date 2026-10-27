@@ -34,3 +34,5 @@ keys-end = Fin
 keys-page-up = Re Pág
 keys-page-down = Av Pág
 keys-print-screen = Impr Pant
+
+date-just-now = Ahora mismo

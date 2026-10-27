@@ -29,8 +29,8 @@ Strings in Luft's Slovenian translation that a native speaker should check: term
 - `kestrel/ui/locales/sl/system.ftl` `privacy-indicator`: "V uporabi: { $things }" — dropped "your" so the list items stay in the nominative.
 - `kestrel/ui/locales/sl/portal.ftl` `screen-share-remember-description`: "Naslednjič vas { $appName } ne vpraša znova" — present tense used to avoid gender agreement with the app name.
 - `kestrel/ui/locales/sl/portal.ftl` `usb-description`: "Dokler je naprava priključena, lahko { $appName } z njo komunicira neposredno." — present tense to avoid gender agreement; $appName can also be "aplikacija" when unknown.
-- `kestrel/engine/locales/sl/engine.ftl` `network-menu-connect-to`: "Poveži z omrežjem { $name }" — $name can also be a device (phone tethering), where "omrežjem" is slightly off.
-- `kestrel/engine/locales/sl/engine.ftl` `display-change-title`: "Ohranim nastavitve zaslona?" — must stay under 30 characters; check the first-person form is acceptable.
+- `kestrel/ui/locales/sl/engine.ftl` `network-menu-connect-to`: "Poveži z omrežjem { $name }" — $name can also be a device (phone tethering), where "omrežjem" is slightly off.
+- `kestrel/ui/locales/sl/engine.ftl` `display-change-title`: "Ohranim nastavitve zaslona?" — must stay under 30 characters; check the first-person form is acceptable.
 - `apps/setup/locales/sl/setup.ftl` `setup-region-intro-guessed`: "Začnimo z nastavitvijo. Nekaj smo že izpolnili: { $guesses }. Popravite, kar ni prav." — $guesses joins pieces like "jezik in tipkovnica glede na računalnik"; check it reads well with the list formatter.
 - `apps/setup/locales/sl/setup.ftl` `setup-network-unavailable`: "Povežete se lahko pozneje prek opravilne vrstice." — English says "from the panel"; assumed it means the taskbar.
 

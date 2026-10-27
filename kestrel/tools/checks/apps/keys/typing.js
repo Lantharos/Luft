@@ -3,9 +3,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 import St from 'gi://St';
-import * as IBusManager from 'resource:///com/lantharos/kestrel/misc/ibusManager.js';
-import * as KeyboardManager from 'resource:///com/lantharos/kestrel/misc/keyboardManager.js';
-import {getInputSourceManager} from 'resource:///com/lantharos/kestrel/ui/status/keyboard.js';
+import {IBusManager, KeyboardManager, getInputSourceManager} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {checks} from '../../lib/check.js';
 import {call} from '../../lib/dbus.js';
@@ -55,7 +53,7 @@ export function savedSources() {
 
 async function active([type, id], engineStarts) {
   if (getInputSourceManager().currentSource?.id !== id) return false;
-  const engine = IBusManager.getIBusManager()._currentEngineName;
+  const engine = IBusManager.getIBusManager().currentEngineName;
   if (type === 'xkb') return KeyboardManager.getKeyboardManager().currentLayout?.id === id && engine?.startsWith('xkb:') && simpleEngineRuns();
   return !engineStarts || engine === id;
 }
@@ -69,7 +67,7 @@ export async function useSources(sources, label = `${sources[0][1]} is the input
   const source = await waitUntil(() => Object.values(manager.inputSources).find(candidate => candidate.id === id), `Kestrel offers ${id}`);
   if (manager.currentSource !== source) source.activate(true);
   await eventually(() => active(sources[0], engineStarts), label, SOURCE_TIMEOUT).catch(error => {
-    throw new Error(`${error.message} (the input source is ${getInputSourceManager().currentSource?.id}, IBus uses ${IBusManager.getIBusManager()._currentEngineName})`);
+    throw new Error(`${error.message} (the input source is ${getInputSourceManager().currentSource?.id}, IBus uses ${IBusManager.getIBusManager().currentEngineName})`);
   });
 }
 
@@ -88,7 +86,7 @@ export async function startInputMethods() {
   global.display.disconnect(opened);
   await x11.close();
   if (xwaylandStarted) await within(restarted, SOURCE_TIMEOUT, 'IBus restarts for Xwayland');
-  await eventually(() => ibus._ready, 'IBus runs, so Keys can hand it input methods', IBUS_START);
+  await eventually(() => ibus.ready, 'IBus runs, so Keys can hand it input methods', IBUS_START);
 }
 
 export function keymapChanged() {
@@ -101,7 +99,7 @@ export function keymapChanged() {
 }
 
 export function simpleEngineRestarted() {
-  const connection = IBusManager.getIBusManager()._ibus.get_connection();
+  const connection = IBusManager.getIBusManager().ibus.get_connection();
   let stopped = false;
   return new Promise(resolve => {
     const id = connection.signal_subscribe(null, 'org.freedesktop.DBus', 'NameOwnerChanged', null, null, Gio.DBusSignalFlags.NONE,
@@ -119,7 +117,7 @@ export function simpleEngineRestarted() {
 
 async function simpleEngineRuns() {
   const reply = await call('org.freedesktop.DBus', '/org/freedesktop/DBus', 'org.freedesktop.DBus', 'NameHasOwner',
-    new GLib.Variant('(s)', [SIMPLE_ENGINE]), '(b)', {connection: IBusManager.getIBusManager()._ibus.get_connection()});
+    new GLib.Variant('(s)', [SIMPLE_ENGINE]), '(b)', {connection: IBusManager.getIBusManager().ibus.get_connection()});
   return reply.deepUnpack()[0];
 }
 

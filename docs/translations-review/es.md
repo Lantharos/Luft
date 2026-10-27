@@ -23,8 +23,8 @@ Strings in Luft's Spanish translation that a native speaker should check: terms 
 - `kestrel/ui/locales/es/system.ftl` `privacy-indicator`: "En uso: { $things }" — built as a colon list so the items need no possessive or gender agreement; check it reads well to a screen-reader user.
 - `kestrel/ui/locales/es/system.ftl` `battery-left`: "Queda un { $percent }." — assumes $percent arrives as "8 %"; check "un" before the figure reads naturally in every case.
 - `kestrel/ui/locales/es/surfaces.ftl` `quick-settings-battery-left`: "Quedan { $duration }" — the plural verb is wrong when the span is a single unit such as "1 h"; check whether a neutral wording is better.
-- `kestrel/engine/locales/es/engine.ftl` `network-menu-tether`: "Conexión compartida" — Bluetooth tethering has no settled Spanish term (Android says "Compartir conexión por Bluetooth"); anclaje was avoided because anclar means pin. Check it reads right as a Quick settings tile title.
-- `kestrel/engine/locales/es/engine.ftl` `switch-monitor-external-only`: "Solo externas" — the plural assumes several external displays may be meant; check against the 15-character limit and context.
+- `kestrel/ui/locales/es/engine.ftl` `network-menu-tether`: "Conexión compartida" — Bluetooth tethering has no settled Spanish term (Android says "Compartir conexión por Bluetooth"); anclaje was avoided because anclar means pin. Check it reads right as a Quick settings tile title.
+- `kestrel/ui/locales/es/engine.ftl` `switch-monitor-external-only`: "Solo externas" — the plural assumes several external displays may be meant; check against the 15-character limit and context.
 - `kestrel/ui/locales/es/portal.ftl` `print-paper-statement`: "Media carta" — North American paper names; check they match what Spanish print dialogs show.
 - `apps/setup/locales/es/setup.ftl` `setup-region-guess-from-computer`: "tu { $fields } a partir del ordenador" — "tu" before a joined list ("tu idioma y teclado") is acceptable, but check it reads well with every field combination.
 - `apps/setup/locales/es/setup.ftl` `setup-account-full-name-example`: "Clara Campoamor" — chosen as a well-known Spanish name; confirm.

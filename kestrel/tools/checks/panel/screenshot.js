@@ -1,5 +1,5 @@
 import Gio from 'gi://Gio';
-import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
+import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
@@ -33,12 +33,12 @@ const loaded = manager => new Promise(resolve => {
   });
 });
 
-const fadedIn = manager => manager._container.get_children().every(actor => actor === manager.backgroundActor);
+const fadedIn = manager => manager.container.get_children().every(actor => actor === manager.backgroundActor);
 
 async function showStripes() {
   const uri = STRIPES().get_uri();
   const before = await wallpaperAccent();
-  const managers = Main.layoutManager._bgManagers;
+  const managers = Main.layoutManager.backgrounds.managers;
   const shown = Promise.all(managers.map(loaded));
   for (const key of WALLPAPER_KEYS) background.set_string(key, uri);
   await within(shown, WALLPAPER_TIMEOUT, 'the striped wallpaper loads');

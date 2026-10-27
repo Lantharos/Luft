@@ -33,9 +33,9 @@ Strings in Luft’s Catalan translation that a native speaker should check: term
 - `apps/setup/locales/ca/setup.ftl` `setup-replace-keeps-drives`: "{ $drives }, muntats en arrencar com abans" — plural masculine agreement assumes several drives; with one it should be «muntat».
 - `apps/setup/locales/ca/setup.ftl` `setup-destination-meet-choice-description` etc.: option labels and their descriptions use the singular imperative like buttons (Conserva, Esborra, Fes-hi una ullada), while step titles use vós (Trieu un disc); check this split feels right.
 - `apps/setup/locales/ca/setup.ftl` `setup-windows-fast-startup`: "Desactiva l’inici ràpid de Windows" — Catalan Windows calls Fast Startup «Inici ràpid»; confirm.
-- `kestrel/engine/locales/ca/engine.ftl` `switch-monitor-join`: "Amplia" — Windows' term for extending displays; check it's clear next to Duplica.
-- `kestrel/engine/locales/ca/engine.ftl` `ctrl-alt-tab-panel`: "Barra de tasques" — English says Panel but the comment says it is the taskbar.
-- `kestrel/engine/locales/ca/engine.ftl` `inhibit-shortcuts-title`: "Permet inhibir les dreceres" — GNOME's wording; «inhibir» may feel technical.
+- `kestrel/ui/locales/ca/engine.ftl` `switch-monitor-join`: "Amplia" — Windows' term for extending displays; check it's clear next to Duplica.
+- `kestrel/ui/locales/ca/engine.ftl` `ctrl-alt-tab-panel`: "Barra de tasques" — English says Panel but the comment says it is the taskbar.
+- `kestrel/ui/locales/ca/engine.ftl` `inhibit-shortcuts-title`: "Permet inhibir les dreceres" — GNOME's wording; «inhibir» may feel technical.
 - `kestrel/ui/locales/ca/portal.ftl` `print-paper-statement`: "Statement" — kept in English, there's no common Catalan name for this paper size.
 
 ## Settings

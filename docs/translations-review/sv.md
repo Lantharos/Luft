@@ -25,9 +25,9 @@ Strings in Luft's Swedish translation that a native speaker should check: terms 
 - `kestrel/ui/locales/sv/surfaces.ftl` `start-folder-ungroup`: "Dela upp mappen" — English says "Ungroup apps"; check it is clear that the apps move back to the grid.
 - `kestrel/ui/locales/sv/desktop.ftl` `snap-zone`: "Docka till ett område på { $width } % × { $height } %" — screen-reader phrasing; check it sounds natural when read aloud.
 - `kestrel/ui/locales/sv/auth.ftl` `lock-screen-dwell-click`: "Vilande klick" — no settled Swedish term for dwell click (Settings describes it as "Klicka genom att låta pekaren vila"); check it is understood in the lock screen menu.
-- `kestrel/engine/locales/sv/engine.ftl` `network-menu-tether`: "Delad anslutning" (and `network-menu-tethers` "Delade anslutningar via Bluetooth") — no settled Swedish term for tethering; check it is understood and fits the tile.
-- `kestrel/engine/locales/sv/engine.ftl` `switch-monitor-join`: "Utöka" — Windows' word for extending the desktop; check it is clear next to "Spegla".
-- `kestrel/engine/locales/sv/engine.ftl` `ctrl-alt-tab-unlock`: "Upplåsning" — names the lock screen sign-in prompt in the Ctrl+Alt+Tab switcher; check it is understandable.
+- `kestrel/ui/locales/sv/engine.ftl` `network-menu-tether`: "Delad anslutning" (and `network-menu-tethers` "Delade anslutningar via Bluetooth") — no settled Swedish term for tethering; check it is understood and fits the tile.
+- `kestrel/ui/locales/sv/engine.ftl` `switch-monitor-join`: "Utöka" — Windows' word for extending the desktop; check it is clear next to "Spegla".
+- `kestrel/ui/locales/sv/engine.ftl` `ctrl-alt-tab-unlock`: "Upplåsning" — names the lock screen sign-in prompt in the Ctrl+Alt+Tab switcher; check it is understandable.
 - `apps/setup/locales/sv/setup.ftl` `setup-region-intro-guessed`: "Vi har gissat { $guesses }, så ändra det som inte stämmer." with parts like "tangentbordet utifrån datorn" — check the assembled sentence with two guesses joined by "och".
 - `apps/setup/locales/sv/setup.ftl` `setup-destination-meet-choice-description`: "Använd de { $size } som Meet Luft har gjort plats för bredvid Windows." — check the construction around the size.
 - `apps/setup/installer/locales/sv/installer.ftl` `installer-no-deployment`: "Det nya systemet har ingen driftsättning" — technical ostree term; check whether a plainer word fits better.

@@ -2,8 +2,7 @@ import Cairo from 'cairo';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
-import {LockBackdrop} from 'resource:///com/lantharos/kestrel/ui/lockScreen/backdrop.js';
-import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
+import {LockBackdrop, Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {checks} from '../lib/check.js';
 import {scratch} from '../lib/processes.js';
@@ -40,7 +39,7 @@ async function stored(uri) {
   const probe = new LockBackdrop();
   try {
     const keys = await waitUntil(async () => {
-      const current = await Promise.all(probe._monitors.map(monitor => monitor._key()));
+      const current = await Promise.all(probe.monitors.map(monitor => monitor.key()));
       return current.every(key => key?.startsWith(`${uri} `)) && current;
     }, 'the backdrop shows the new wallpaper');
     await waitUntil(() => keys.every(key => GLib.file_test(storedPath(key), GLib.FileTest.EXISTS)), 'the blurred wallpaper is stored', STORE_TIMEOUT);

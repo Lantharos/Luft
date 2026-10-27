@@ -1,4 +1,5 @@
 import Shell from 'gi://Shell';
+import type GObject from 'gi://GObject';
 
 export enum MixerHeadset {
   HEADPHONES = 1 << 0,
@@ -6,7 +7,7 @@ export enum MixerHeadset {
   MICROPHONE = 1 << 2,
 }
 
-export interface MixerStream {
+export interface MixerStream extends Pick<GObject.Object, 'connectObject' | 'disconnectObject'> {
   readonly description: string | null;
   readonly port: string | null;
   readonly port_description: string | null;
@@ -18,12 +19,21 @@ export interface MixerStream {
   set_muted(muted: boolean): void;
 }
 
-export interface Mixer {
+export interface MixerDevice {
+  get_description(): string;
+  get_origin(): string | null;
+  get_icon_name(): string;
+  get_active(): boolean;
+}
+
+export interface Mixer extends Pick<GObject.Object, 'connectObject' | 'disconnectObject'> {
   readonly output: MixerStream | null;
   readonly input: MixerStream | null;
   readonly recording: boolean;
   readonly dictating: boolean;
   choose_headset(choice: MixerHeadset): void;
+  get_devices(output: boolean): MixerDevice[];
+  activate_device(device: MixerDevice): void;
   connect(signal: 'headset-changed', callback: (mixer: Mixer, choices: MixerHeadset | 0) => void): number;
   connect(signal: 'notify::recording' | 'notify::dictating', callback: () => void): number;
   connect(

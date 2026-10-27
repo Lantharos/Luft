@@ -2,9 +2,7 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
-import {dismissImmediately, toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
-import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
-import * as MessageTray from 'resource:///com/lantharos/kestrel/ui/messageTray.js';
+import {dismissImmediately, toggleSurface, Main, MessageTray} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {descendants, firstStyled, labelled, named, shown, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
@@ -107,14 +105,14 @@ async function checkUpdateWhileHiding() {
   const notification = new MessageTray.Notification({source, title: 'Downloading photos', body: '10 of 40'});
   try {
     source.addNotification(notification);
-    await eventually(() => tray._notification === notification && tray._notificationState === MessageTray.State.SHOWN, 'the download banner shows');
-    tray._notificationExpired = true;
-    tray._updateState();
-    require(tray._notificationState === MessageTray.State.HIDING, 'the banner starts hiding once it expires');
+    await eventually(() => tray.notification === notification && tray.notificationState === MessageTray.State.SHOWN, 'the download banner shows');
+    tray.notificationExpired = true;
+    tray.updateState();
+    require(tray.notificationState === MessageTray.State.HIDING, 'the banner starts hiding once it expires');
     notification.set({body: '20 of 40'});
     notification.acknowledged = false;
-    await eventually(() => tray._notificationState === MessageTray.State.SHOWN, 'the banner comes back when its notification updates while hiding');
-    require(tray._notification === notification && shown(tray._banner), 'the updated notification keeps its banner');
+    await eventually(() => tray.notificationState === MessageTray.State.SHOWN, 'the banner comes back when its notification updates while hiding');
+    require(tray.notification === notification && shown(tray.banner), 'the updated notification keeps its banner');
   } finally {
     source.destroy();
   }
@@ -133,7 +131,7 @@ async function checkAppRules() {
     source.addNotification(notification);
     return notification;
   };
-  const bannered = notification => Main.messageTray._notification === notification || Main.messageTray._notificationQueue.includes(notification);
+  const bannered = notification => Main.messageTray.notification === notification || Main.messageTray.notificationQueue.includes(notification);
   try {
     general.set_boolean('show-banners', false);
     require(!bannered(send(MessageTray.Urgency.NORMAL)) && bannered(send(MessageTray.Urgency.CRITICAL)),
@@ -250,7 +248,7 @@ async function showBanner(title, actions = []) {
   clearAll();
   const id = await notify('Chatter', title, 'Swipe this away', actions);
   const banner = await waitUntil(() => bannerOf(title), `the ${title} banner shows`);
-  await waitUntil(() => Main.messageTray._notificationState === MessageTray.State.SHOWN, `the ${title} banner settles`);
+  await waitUntil(() => Main.messageTray.notificationState === MessageTray.State.SHOWN, `the ${title} banner settles`);
   await settled();
   return {id, banner};
 }

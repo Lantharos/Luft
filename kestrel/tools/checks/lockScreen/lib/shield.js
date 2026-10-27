@@ -1,5 +1,5 @@
 import Clutter from 'gi://Clutter';
-import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
+import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {named, shown, shownStyled, styled} from '../../lib/actors.js';
 import {moveBy, press} from '../../lib/input/input.js';

@@ -2,8 +2,7 @@ import GdkPixbuf from 'gi://GdkPixbuf';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
-import {getStyleVariant} from 'resource:///com/lantharos/kestrel/ui/kestrelTheme.js';
-import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
+import {getStyleVariant, toggleSurface} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {named, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';

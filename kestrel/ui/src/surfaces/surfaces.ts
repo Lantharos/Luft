@@ -1,4 +1,4 @@
-import { freezeSelection } from 'resource:///com/lantharos/kestrel/ui/kestrelGlass.js';
+import { freezeSelection } from '../shell/stage/kestrelGlass.js';
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 

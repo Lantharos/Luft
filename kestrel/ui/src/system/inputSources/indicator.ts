@@ -1,6 +1,6 @@
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
-import { getInputSourceManager, type InputSource } from 'resource:///com/lantharos/kestrel/ui/status/keyboard.js';
+import { getInputSourceManager, type InputSource } from '../../shell/status/devices/keyboard.js';
 
 import type { ContextMenus, MenuEntry } from '../../desktop/menus/contextMenus.js';
 import { localized, t } from '../../shared/i18n/index.js';
@@ -52,7 +52,7 @@ export class InputSourceIndicator {
   private choices(): { choices: Choice[]; current: Choice | undefined } {
     const { keyboardManager, currentSource } = this.manager;
     const external: Choice[] = keyboardManager.isExternal()
-      ? [{ source: null, label: keyboardManager.shortName.toUpperCase(), name: keyboardManager.displayName }]
+      ? [{ source: null, label: (keyboardManager.shortName ?? '').toUpperCase(), name: keyboardManager.displayName ?? '' }]
       : [];
     const choices = keyboardManager.isLocked() ? external : [
       ...external,

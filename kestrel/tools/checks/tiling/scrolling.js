@@ -1,6 +1,5 @@
 import Clutter from 'gi://Clutter';
-import {touchpad as handleTouchpad} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
-import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
+import {touchpad as handleTouchpad, Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {touchpad} from '../board/lib/touchpad.js';
 import {named} from '../lib/actors.js';

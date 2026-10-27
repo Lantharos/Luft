@@ -13,7 +13,7 @@ import { TaskbarDrop } from './taskbarDrop.js';
 import { AppIndicators } from './appIndicators.js';
 import { launcherEntries } from './launcherEntries.js';
 import { appKey, launchHistory } from '../../../shared/apps/launchHistory.js';
-import * as DND from 'resource:///com/lantharos/kestrel/ui/dnd.js';
+import * as DND from '../../../shell/popups/dnd.js';
 
 const DOT_SIZE = 4;
 const DOT_GAP = 3;

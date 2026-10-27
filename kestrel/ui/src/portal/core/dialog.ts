@@ -1,7 +1,8 @@
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
-import type { ButtonInfo, ModalDialog } from 'resource:///com/lantharos/kestrel/ui/modalDialog.js';
+import { MessageDialogContent } from '../../shell/dialogs/dialog.js';
+import { ModalDialog, type ButtonInfo } from '../../shell/dialogs/modalDialog.js';
 import { promptAppeared } from '../../system/sounds/sounds.js';
 import { CANCELLED, ENDED, type Dismissal, type Options, type Outcome } from './request.js';
 
@@ -21,11 +22,7 @@ export interface PortalDialog {
   buttons(buttons: ButtonInfo[]): St.Button[];
 }
 
-export async function openDialog(dismissal: Dismissal | null, spec: DialogSpec, build: (dialog: PortalDialog) => void): Promise<Outcome> {
-  const [{ MessageDialogContent }, { ModalDialog }] = await Promise.all([
-    import('resource:///com/lantharos/kestrel/ui/dialog.js'),
-    import('resource:///com/lantharos/kestrel/ui/modalDialog.js'),
-  ]);
+export function openDialog(dismissal: Dismissal | null, spec: DialogSpec, build: (dialog: PortalDialog) => void): Promise<Outcome> {
   return new Promise(resolve => {
     const modal = new ModalDialog({ styleClass: `kestrel-portal-dialog ${spec.styleClass ?? ''}` });
     const content = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-portal-content', x_expand: true });

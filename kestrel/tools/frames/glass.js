@@ -1,5 +1,4 @@
-import {dismissImmediately, toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
-import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
+import {dismissImmediately, toggleSurface, Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {named} from '../checks/lib/actors.js';
 import {rest, rightClick} from '../checks/lib/input/input.js';

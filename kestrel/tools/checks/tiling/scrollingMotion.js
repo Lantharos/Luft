@@ -1,4 +1,4 @@
-import {touchpad as handleTouchpad} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
+import {touchpad as handleTouchpad} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {touchpad} from '../board/lib/touchpad.js';
 import {checks} from '../lib/check.js';

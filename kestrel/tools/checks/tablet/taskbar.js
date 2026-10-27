@@ -1,8 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
-import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
-import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
+import {toggleSurface, Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {firstStyled, named, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';

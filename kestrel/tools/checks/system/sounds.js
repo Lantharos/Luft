@@ -2,7 +2,7 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
-import {captureScreenshot} from 'resource:///com/lantharos/kestrel/ui/screenshot.js';
+import {captureScreenshot} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {checks} from '../lib/check.js';
 import {call} from '../lib/dbus.js';

@@ -1,5 +1,5 @@
 import Gio from 'gi://Gio';
-import {dismissImmediately, toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
+import {dismissImmediately, toggleSurface} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {descendants, named, shown, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';

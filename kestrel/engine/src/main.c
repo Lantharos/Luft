@@ -599,17 +599,17 @@ main (int argc, char **argv)
       return EXIT_FAILURE;
     }
 
-  /* init.js calls meta_context_start_main_loop(), gjs_context_eval_module_file()
+  /* kestrel.js runs Mutter's main loop, so gjs_context_eval_module_file()
    * will not return until Mutter is exited.
    */
   GjsContext *gjs_context = _shell_global_get_gjs_context (shell_global_get());
   uint8_t status;
   if (!gjs_context_eval_module_file (gjs_context,
-                                     "resource:///com/lantharos/kestrel/ui/init.js",
+                                     "resource:///com/lantharos/kestrel/kestrel.js",
                                      &status,
                                      &error))
     {
-      g_message ("Execution of main.js threw exception: %s", error->message);
+      g_message ("Execution of kestrel.js threw exception: %s", error->message);
       g_error_free (error);
       /* We just exit() here, since in a development environment you'll get the
        * error in your shell output, and it's way better than a busted WM,

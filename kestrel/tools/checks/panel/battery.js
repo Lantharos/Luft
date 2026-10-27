@@ -1,7 +1,6 @@
 import GdkPixbuf from 'gi://GdkPixbuf';
 import Gio from 'gi://Gio';
-import {battery, toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
-import {getStyleVariant} from 'resource:///com/lantharos/kestrel/ui/kestrelTheme.js';
+import {battery, toggleSurface, getStyleVariant} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {named, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';

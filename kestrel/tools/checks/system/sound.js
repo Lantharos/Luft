@@ -1,6 +1,6 @@
 import Clutter from 'gi://Clutter';
 import Shell from 'gi://Shell';
-import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
+import {toggleSurface} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {labelled, named, shown, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
@@ -23,7 +23,7 @@ export async function run() {
   const quick = named('kestrel-quick-settings');
   await eventually(() => shown(quick), 'Quick Settings opens');
   const outputs = styled('kestrel-inline-menu', quick).find(menu => labelled('Headphones', menu));
-  outputs._delegate.sourceActor._menuButton.emit('clicked', Clutter.BUTTON_PRIMARY);
+  outputs._delegate.sourceActor.menuButton.emit('clicked', Clutter.BUTTON_PRIMARY);
   await eventually(() => shown(labelled('Headphones', outputs)) && outputs.height > 0, 'the outputs open beneath the volume slider');
   await capture('sound-outputs');
   outputs._delegate.close();

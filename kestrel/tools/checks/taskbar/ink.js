@@ -1,5 +1,5 @@
 import St from 'gi://St';
-import {battery} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
+import {battery} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {named, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';

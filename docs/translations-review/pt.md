@@ -25,8 +25,8 @@ Strings in Luft's European Portuguese translation that a native speaker should c
 - `kestrel/ui/locales/pt/system.ftl` `health-gpu-reset-body`: "…reiniciou-se sozinho a { $date }, às { $time }." — check "a"/"às" read well with every date and time format (e.g. "à 1:05").
 - `kestrel/ui/locales/pt/portal.ftl` `usb-title`, `screen-share-remote-desktop-title`, `shortcuts-consent-title` and other `$appName` messages: built without an article so they also work with the fallback "a aplicação"/"A aplicação"; check "Permitir que Firefox utilize…" without "o" is acceptable.
 - `kestrel/ui/locales/pt/portal.ftl` `print-paper-letter` … `print-paper-statement`: paper names kept in English (Letter, Legal, Executive, Statement), Tabloid as "Tabloide" — check against what CUPS and GNOME show in Portuguese.
-- `kestrel/engine/locales/pt/engine.ftl` `network-menu-tethers`, `network-menu-tether`: "Partilha de ligação por Bluetooth", "Partilha de ligação" — no settled tile term; check it fits the tile width.
-- `kestrel/engine/locales/pt/engine.ftl` `switch-monitor-join`: "Expandir" — Windows' term for extended displays; check it matches Windows in Portugal ("Expandir estes ecrãs").
+- `kestrel/ui/locales/pt/engine.ftl` `network-menu-tethers`, `network-menu-tether`: "Partilha de ligação por Bluetooth", "Partilha de ligação" — no settled tile term; check it fits the tile width.
+- `kestrel/ui/locales/pt/engine.ftl` `switch-monitor-join`: "Expandir" — Windows' term for extended displays; check it matches Windows in Portugal ("Expandir estes ecrãs").
 - `apps/setup/installer/locales/pt/installer.ftl` `installer-no-deployment`: "implementação" — an ostree deployment; technical, check the wording.
 - `apps/setup/locales/pt/setup.ftl` `setup-region-intro-guessed`: "Deduzimos { $guesses }; …" with fields carrying their article ("o teclado a partir do computador e o fuso horário a partir da rede") — check the assembled sentence.
 - `apps/setup/locales/pt/setup.ftl` `setup-network-unavailable`: "a partir da barra de tarefas" — English says "the panel"; assumed the taskbar's network icons.

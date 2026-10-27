@@ -1,7 +1,6 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import {dismissImmediately} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
-import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
+import {dismissImmediately, Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {leaveBoard, openWindows} from '../checks/board/lib/board.js';
 import {rest} from '../checks/lib/input/input.js';

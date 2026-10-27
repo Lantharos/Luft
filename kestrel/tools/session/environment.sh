@@ -47,7 +47,7 @@ write_dbus_services() {
   mkdir -p "$XDG_DATA_HOME/dbus-1/services"
   dbus_service org.freedesktop.portal.Documents "$(command -v gjs)" -m "$tools/fixtures/session/documentPortal.js" "$session/documents"
   for name in com.lantharos.Kestrel.Notifications com.lantharos.Kestrel.Screencast; do
-    dbus_service "$name" "$(command -v gjs)" -m "$tools/fixtures/session/shellService.js" "$build/js/dbusServices/$name.src.gresource" "$name"
+    dbus_service "$name" "$(command -v gjs)" -m "$build/ui/$name"
   done
   dbus_service com.lantharos.Kestrel.HotplugSniffer "$build/src/hotplug-sniffer/kestrel-hotplug-sniffer"
   dbus_service com.lantharos.Kestrel.Portal "$root/target/release/kestrel-portal"

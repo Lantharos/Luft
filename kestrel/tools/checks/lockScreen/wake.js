@@ -1,4 +1,4 @@
-import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
+import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {checks} from '../lib/check.js';
 import {capture, renderedFrame} from '../lib/screenshots.js';

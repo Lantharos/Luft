@@ -1,6 +1,6 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import {formatsLocale, t} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
+import {formatsLocale, t} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {descendants} from '../lib/actors.js';
 import {checks} from '../lib/check.js';

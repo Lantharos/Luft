@@ -1,5 +1,4 @@
-import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
-import * as MessageTray from 'resource:///com/lantharos/kestrel/ui/messageTray.js';
+import {Main, MessageTray} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {shownStyled, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';

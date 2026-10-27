@@ -1,7 +1,6 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
-import {getStyleVariant} from 'resource:///com/lantharos/kestrel/ui/kestrelTheme.js';
-import {battery} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
+import {getStyleVariant, battery} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {named, showsText, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';

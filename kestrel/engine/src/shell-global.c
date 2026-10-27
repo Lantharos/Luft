@@ -311,9 +311,7 @@ static void
 shell_global_init (ShellGlobal *global)
 {
   const char *datadir = g_getenv ("KESTREL_DATADIR");
-  const char *shell_js = g_getenv("KESTREL_JS");
   g_autofree char *imagedir = NULL;
-  g_auto (GStrv) search_path = NULL;
   g_autofree char *statedir = NULL;
 
   if (!datadir)
@@ -340,45 +338,7 @@ shell_global_init (ShellGlobal *global)
 
   global->settings = g_settings_new ("com.lantharos.kestrel");
 
-  if (shell_js)
-    {
-      int i, j;
-      search_path = g_strsplit (shell_js, ":", -1);
-
-      /* The naive g_strsplit above will split 'resource:///foo/bar' into 'resource',
-       * '///foo/bar'. Combine these back together by looking for a literal 'resource'
-       * in the array. */
-      for (i = 0, j = 0; search_path[i];)
-        {
-          char *out;
-
-          if (strcmp (search_path[i], "resource") == 0 && search_path[i + 1] != NULL)
-            {
-              out = g_strconcat (search_path[i], ":", search_path[i + 1], NULL);
-              g_free (search_path[i]);
-              g_free (search_path[i + 1]);
-              i += 2;
-            }
-          else
-            {
-              out = search_path[i];
-              i += 1;
-            }
-
-          search_path[j++] = out;
-        }
-
-      search_path[j] = NULL; /* NULL-terminate the now possibly shorter array */
-    }
-  else
-    {
-      search_path = g_malloc0 (2 * sizeof (char *));
-      search_path[0] = g_strdup ("resource:///com/lantharos/kestrel");
-    }
-
-  global->js_context = g_object_new (GJS_TYPE_CONTEXT,
-                                     "search-path", search_path,
-                                     NULL);
+  global->js_context = g_object_new (GJS_TYPE_CONTEXT, NULL);
 
   global->save_ops = g_hash_table_new_full (g_file_hash,
                                             (GEqualFunc) g_file_equal,

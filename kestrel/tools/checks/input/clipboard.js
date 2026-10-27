@@ -1,7 +1,6 @@
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
-import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
-import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
+import {toggleSurface, Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {named, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';

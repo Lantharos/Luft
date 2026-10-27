@@ -34,3 +34,5 @@ keys-end = Fin
 keys-page-up = Pg préc
 keys-page-down = Pg suiv
 keys-print-screen = Impr écran
+
+date-just-now = À l’instant

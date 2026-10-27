@@ -1,5 +1,5 @@
 import Clutter from 'gi://Clutter';
-import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
+import {toggleSurface} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';

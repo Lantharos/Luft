@@ -1,5 +1,5 @@
 import IBus from 'gi://IBus';
-import { getIBusManager } from 'resource:///com/lantharos/kestrel/misc/ibusManager.js';
+import { getIBusManager } from '../../shell/input/ibusManager.js';
 
 import type { MenuEntry } from '../../desktop/menus/contextMenus.js';
 

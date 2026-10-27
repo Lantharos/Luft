@@ -1,8 +1,7 @@
 import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
-import {dismissImmediately} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
-import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
+import {dismissImmediately, Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {withApp} from '../apps/lib/apps.js';
 import {show} from '../apps/settings/navigation.js';

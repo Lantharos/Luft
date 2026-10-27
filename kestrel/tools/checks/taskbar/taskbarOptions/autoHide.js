@@ -1,4 +1,4 @@
-import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
+import {toggleSurface} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {moveTo} from '../../lib/input/input.js';
 import {gjs, stop, waitForWindow} from '../../lib/processes.js';

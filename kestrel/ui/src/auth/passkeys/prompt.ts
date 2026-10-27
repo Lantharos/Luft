@@ -29,7 +29,7 @@ export class PasskeyPrompt {
     this.exported.export(Gio.DBus.session, path);
   }
 
-  open(): Promise<boolean> {
+  open(): boolean {
     return this.dialog.open();
   }
 

@@ -1,7 +1,6 @@
 import Clutter from 'gi://Clutter';
 
-import {Spring, touchpad as handleTouchpad} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
-import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
+import {Spring, touchpad as handleTouchpad, Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {checks} from '../lib/check.js';
 import {moveTo, pinch, swipe as swipeOver} from '../lib/input/input.js';

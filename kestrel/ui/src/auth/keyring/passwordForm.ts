@@ -2,15 +2,14 @@ import Clutter from 'gi://Clutter';
 import GObject from 'gi://GObject';
 import Pango from 'gi://Pango';
 import St from 'gi://St';
-import { wiggle } from 'resource:///com/lantharos/kestrel/misc/animationUtils.js';
-import { EntryField } from 'resource:///com/lantharos/kestrel/ui/dialog.js';
-import type { ModalDialog } from 'resource:///com/lantharos/kestrel/ui/modalDialog.js';
+import { wiggle } from '../../shell/runtime/animationUtils.js';
+import { EntryField } from '../../shell/dialogs/dialog.js';
+import type { ModalDialog } from '../../shell/dialogs/modalDialog.js';
+import { CapsLockWarning, addContextMenu } from '../../shell/widgets/shellEntry.js';
 
 import { t } from '../../shared/i18n/index.js';
 import { QualityMeter, type Measure } from './quality.js';
 import type { PasswordRequest } from './request.js';
-
-export type ShellEntryModule = typeof import('resource:///com/lantharos/kestrel/ui/shellEntry.js');
 
 export interface PasswordEvents {
   entered(secret: string): void;
@@ -29,9 +28,9 @@ export function showText(label: St.Label, text: string): void {
   label.visible = !!text;
 }
 
-function passwordEntry(shellEntry: ShellEntryModule): St.PasswordEntry {
+function passwordEntry(): St.PasswordEntry {
   const entry = new St.PasswordEntry({ style_class: 'prompt-dialog-password-entry', can_focus: true, x_expand: true });
-  shellEntry.addContextMenu(entry);
+  addContextMenu(entry);
   entry.bind_property('reactive', entry.clutter_text, 'editable', GObject.BindingFlags.SYNC_CREATE);
   return entry;
 }
@@ -47,16 +46,16 @@ export class PasswordForm {
   private mismatch = '';
   private busy = false;
 
-  constructor(form: St.BoxLayout, private readonly hint: St.Label, modal: ModalDialog, shellEntry: ShellEntryModule, private readonly events: PasswordEvents) {
-    this.entry = passwordEntry(shellEntry);
-    this.confirmEntry = passwordEntry(shellEntry);
+  constructor(form: St.BoxLayout, private readonly hint: St.Label, modal: ModalDialog, private readonly events: PasswordEvents) {
+    this.entry = passwordEntry();
+    this.confirmEntry = passwordEntry();
     this.field = new EntryField(this.entry, '');
     form.add_child(this.field);
     form.add_child(this.quality.actor);
     form.add_child(new EntryField(this.confirmEntry, t('keyring-confirm')));
 
     const feedback = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-auth-feedback' });
-    feedback.add_child(new shellEntry.CapsLockWarning());
+    feedback.add_child(new CapsLockWarning());
     feedback.add_child(this.warning);
     feedback.add_child(hint);
     form.add_child(feedback);

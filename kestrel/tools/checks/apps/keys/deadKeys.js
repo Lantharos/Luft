@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
-import * as IBusManager from 'resource:///com/lantharos/kestrel/misc/ibusManager.js';
+import {IBusManager} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {checks} from '../../lib/check.js';
 import {type} from '../../lib/input/input.js';

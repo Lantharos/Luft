@@ -1,7 +1,7 @@
 import Clutter from 'gi://Clutter';
 import type Shell from 'gi://Shell';
 import St from 'gi://St';
-import { HeaderLayout } from 'resource:///com/lantharos/kestrel/ui/headerLayout.js';
+import { HeaderLayout } from '../../shell/widgets/headerLayout.js';
 
 import { appIcons, sourceApp } from '../../appearance/icons/appIcons.js';
 import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
@@ -70,8 +70,8 @@ export class NotificationGroup {
       card.actor.destroy();
       this.cards.delete(notification);
     }
-    this.title.text = this.source.title;
-    this.clear.accessible_name = t('notifications-clear-app', { app: this.source.title });
+    this.title.text = this.source.title ?? '';
+    this.clear.accessible_name = t('notifications-clear-app', { app: this.source.title ?? '' });
     if (!this.app) this.icon.gicon = this.source.icon;
     this.icon.visible = !!this.app || !!this.source.icon;
     const hidden = notifications.length - COLLAPSED_COUNT;

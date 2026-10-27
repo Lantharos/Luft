@@ -1,5 +1,5 @@
 import Gio from 'gi://Gio';
-import * as MessageTray from 'resource:///com/lantharos/kestrel/ui/messageTray.js';
+import * as MessageTray from '../../shell/notifications/messageTray.js';
 
 import { shortDuration } from '../../shared/time/duration.js';
 import { formatsLocale, t } from '../../shared/i18n/index.js';
@@ -35,7 +35,7 @@ interface Warning {
   title: string;
   body: string;
   icon: string;
-  urgency: number;
+  urgency: MessageTray.Urgency;
 }
 
 function reached(thresholds: number[], percentage: number): number | null {

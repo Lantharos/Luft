@@ -1,6 +1,5 @@
 import Gio from 'gi://Gio';
-import {Spring, switchWorkspace, taskViewOpen, taskViewProgress, toggleSurface, touchpad as handleTouchpad} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
-import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
+import {Spring, switchWorkspace, taskViewOpen, taskViewProgress, toggleSurface, touchpad as handleTouchpad, Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {openBoardWindow} from '../board/lib/board.js';
 import {touchpad} from '../board/lib/touchpad.js';
@@ -69,8 +68,8 @@ const touchpadSettings = new Gio.Settings({schema_id: 'org.gnome.desktop.periphe
 
 function swipe(towardsPrevious) {
   const dx = touchpadSettings.get_boolean('natural-scroll') ? towardsPrevious : -towardsPrevious;
-  const gesture = animation()._swipeTracker._touchpadGesture;
-  const send = event => gesture._handleEvent(global.stage, event);
+  const gesture = animation()._swipeTracker.touchpadGesture;
+  const send = event => gesture.handleEvent(global.stage, event);
   return {
     begin: () => send(touchpad.swipe('begin', 3, 0, 0)),
     still: () => send(touchpad.swipe('update', 3, 0, 0)),
@@ -86,7 +85,7 @@ async function checkWorkspaceSwipe() {
   pushPast.begin();
   pushPast.steps(40);
   const page = animation()._switchData.baseMonitorGroup;
-  const tracked = animation()._swipeTracker._trackedProgress;
+  const tracked = animation()._swipeTracker.trackedProgress;
   require(tracked < -0.3 && page.progress < 0 && page.progress > tracked,
     'swiping past the first workspace rubber-bands instead of stopping or following');
   pushPast.end();

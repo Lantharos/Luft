@@ -75,54 +75,42 @@ function withIcon(options: Options): Options {
 
 export class PinentryPrompter {
   private readonly dbus = Gio.DBusExportedObject.wrapJSObject(PINENTRY_XML, this);
-  private incoming = Promise.resolve();
 
   constructor(private readonly queue: PromptQueue) {
     this.dbus.export(Gio.DBus.session, PINENTRY_PATH);
   }
 
   PasswordAsync([handle, options, index]: [string, Options, number], invocation: Invocation, fdList: Gio.UnixFDList | null): void {
-    this.serialize(() => {
-      const fd = stealFd(fdList, index);
-      if (fd === null) {
-        invocation.return_dbus_error('org.freedesktop.DBus.Error.InvalidArgs', 'The passphrase needs a channel to be handed over');
-        return;
-      }
-      const channel = new Channel(fd);
-      this.queue.receive({
-        key: promptKey(invocation, handle),
-        prompt: { kind: 'password', request: passwordRequest(withIcon(options)) },
-        answer: (response, remember) => {
-          channel.close();
-          invocation.return_value(new GLib.Variant('(ua{sv})', [response, { remember: new GLib.Variant('b', remember) }]));
-        },
-        deliver: secret => channel.deliver(secret),
-        measure: secret => channel.measure(secret),
-      });
+    const fd = stealFd(fdList, index);
+    if (fd === null) {
+      invocation.return_dbus_error('org.freedesktop.DBus.Error.InvalidArgs', 'The passphrase needs a channel to be handed over');
+      return;
+    }
+    const channel = new Channel(fd);
+    this.queue.receive({
+      key: promptKey(invocation, handle),
+      prompt: { kind: 'password', request: passwordRequest(withIcon(options)) },
+      answer: (response, remember) => {
+        channel.close();
+        invocation.return_value(new GLib.Variant('(ua{sv})', [response, { remember: new GLib.Variant('b', remember) }]));
+      },
+      deliver: secret => channel.deliver(secret),
+      measure: secret => channel.measure(secret),
     });
   }
 
   ConfirmAsync([handle, options]: [string, Options], invocation: Invocation): void {
-    this.serialize(() => this.queue.receive({
+    this.queue.receive({
       key: promptKey(invocation, handle),
       prompt: { kind: 'access', request: accessRequest(withIcon(options)) },
       answer: response => invocation.return_value(new GLib.Variant('(u)', [response])),
       deliver: () => Promise.resolve(),
-    }));
-  }
-
-  CloseAsync([handle]: [string], invocation: Invocation): void {
-    this.serialize(() => {
-      this.queue.close(promptKey(invocation, handle));
-      invocation.return_value(null);
     });
   }
 
-  private serialize(step: () => void): void {
-    this.incoming = this.incoming.then(async () => {
-      await this.queue.ready();
-      step();
-    }).catch(error => console.error('Kestrel could not show a passphrase prompt', error));
+  CloseAsync([handle]: [string], invocation: Invocation): void {
+    this.queue.close(promptKey(invocation, handle));
+    invocation.return_value(null);
   }
 
   destroy(): void {

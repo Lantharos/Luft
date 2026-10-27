@@ -2,7 +2,7 @@ import Clutter from 'gi://Clutter';
 import Shell from 'gi://Shell';
 import Gio from 'gi://Gio';
 import St from 'gi://St';
-import {dismissImmediately, Spring, toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
+import {dismissImmediately, Spring, toggleSurface} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';

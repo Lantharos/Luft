@@ -1,5 +1,4 @@
-import {board as currentBoard, touchpad as handleTouchpad} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
-import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
+import {board as currentBoard, touchpad as handleTouchpad, Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {gjs, waitForWindow, windows} from '../../lib/processes.js';
 import {nextFrame, settled, waitUntil} from '../../lib/wait.js';

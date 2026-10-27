@@ -1,5 +1,5 @@
 import GLib from 'gi://GLib';
-import { LIBEXECDIR } from 'resource:///com/lantharos/kestrel/misc/config.js';
+import { LIBEXECDIR } from '../../shell/config.js';
 
 const BUILD_DIRECTORY = GLib.getenv('KESTREL_BUILDDIR');
 

@@ -1,5 +1,5 @@
 import type { Context } from '../../context.js';
-import { KeyringDialog, loadDialogModules, type DialogModules, type Prompt } from './dialog.js';
+import { KeyringDialog, type Prompt } from './dialog.js';
 import { ALLOWED, ALTERNATIVE, DENIED, DISMISSED } from './request.js';
 
 type Session = Pick<Context, 'sessionMode' | 'screenShield'>;
@@ -24,8 +24,6 @@ export class PromptQueue {
   private readonly refused = new Set<string>();
   private readonly disconnectors: (() => void)[] = [];
   private active: Active | null = null;
-  private modules: DialogModules | null = null;
-  private loading: Promise<DialogModules> | null = null;
 
   constructor(private readonly session: Session) {
     const sessionId = session.sessionMode.connect('updated', () => this.syncLock());
@@ -35,11 +33,6 @@ export class PromptQueue {
       const shieldId = shield.connect('active-changed', () => this.syncLock());
       this.disconnectors.push(() => shield.disconnect(shieldId));
     }
-  }
-
-  async ready(): Promise<void> {
-    this.loading ??= loadDialogModules();
-    this.modules = await this.loading;
   }
 
   private get locked(): boolean {
@@ -81,7 +74,7 @@ export class PromptQueue {
   private show(call: Call): void {
     const active: Active = { key: call.key, dialog: null, pending: call, closing: false };
     this.active = active;
-    active.dialog = KeyringDialog.open(this.modules!, call.prompt, {
+    active.dialog = KeyringDialog.open(call.prompt, {
       allowed: remember => this.respond(active, ALLOWED, remember),
       alternative: () => this.respond(active, ALTERNATIVE),
       denied: () => {

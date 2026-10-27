@@ -1,6 +1,6 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
-import {dismissImmediately, toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
+import {dismissImmediately, toggleSurface} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {named} from '../checks/lib/actors.js';
 import {press, rest, type} from '../checks/lib/input/input.js';

@@ -1,5 +1,5 @@
 import Clutter from 'gi://Clutter';
-import {dismissImmediately} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
+import {dismissImmediately} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {named} from '../../lib/actors.js';
 import {press, rightClick} from '../../lib/input/input.js';

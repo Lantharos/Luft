@@ -1,5 +1,5 @@
 import Gio from 'gi://Gio';
-import { askForAudioDevice } from 'resource:///com/lantharos/kestrel/ui/audioDeviceSelection.js';
+import { askForAudioDevice } from '../../shell/dialogs/audioDeviceSelection.js';
 
 import type { Context } from '../../context.js';
 import { playSound } from '../sounds/sounds.js';

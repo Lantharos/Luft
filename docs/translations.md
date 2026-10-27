@@ -16,7 +16,7 @@ Luft is translated into Albanian, Bosnian, Bulgarian, Catalan, Croatian, Czech, 
 | kestrel-portal | `kestrel/ui/locales/*/portal.ftl` | printing, screen sharing, shortcuts and other app requests |
 | kestrel-session | `kestrel/ui/locales/*/session.ftl` | signing out, first-run setup mode |
 | kestrel-portal-service | `kestrel/portal/locales/*/portal.ftl` | print job names and printing failures from `kestrel-portal` |
-| kestrel-engine | `kestrel/engine/locales/*/engine.ftl` | dialogs and menus of Kestrel's engine |
+| kestrel-engine | `kestrel/ui/locales/*/engine.ftl` | dialogs, menus and quick settings of Kestrel's window management, lock screen, notifications and screenshots |
 | ui | `packages/web/ui/locales/*/ui.ftl` | the UI kit every app shares |
 | settings | `apps/settings/locales/*/settings.ftl` | Settings' window, sidebar and its groups, and search |
 | settings-pages | `packages/web/settings-pages/locales/*/pages.ftl` | Settings' page names and search words, also used by Start |
@@ -60,7 +60,7 @@ Message IDs are stable, semantic and start with the feature they belong to, such
 | Where | How |
 | --- | --- |
 | Svelte apps | `import { t, i18n } from '@luft/i18n'`, then `t('id', { count })`. `t` is reactive. Use `i18n.formats` as the locale of every `Intl` formatter |
-| Kestrel | `t`, `bindText(label, id)` and `localized(actor, apply)` from `kestrel/ui/src/shared/i18n`; the engine's JavaScript gets them through `kestrelUi.js`. Widgets that live all session use `bindText` or `localized` so they follow a language change, and `formatsLocale()` is the locale for `Intl` |
+| Kestrel | `t`, `bindText(label, id)` and `localized(actor, apply)` from `kestrel/ui/src/shared/i18n`. Widgets that live all session use `bindText` or `localized` so they follow a language change, and `formatsLocale()` is the locale for `Intl` |
 | Website | `const { t } = localize(Astro)` from `web/site/src/i18n/pages`, then `t('id')`. A message with a link holds the `<a>` itself, with its address as a variable, and goes into the page with `set:html` |
 | Rust | `static L10N: Localizer = luft_i18n::localizer!("locales", ["desktop"]);` once per crate, then `t!(L10N, "id", count = n)` |
 
@@ -96,7 +96,7 @@ LUFT_LOCALE=de kestrel/tools/session.sh nested
 
 1. Add it to `LANGUAGES` in `packages/i18n/src/locales.ts`, `LOCALES` in `packages/i18n/rust/locales.rs` and the `localizer!` macro in `packages/i18n/rust/lib.rs`. `LANGUAGES` is what Settings offers; keep it sorted by the language's own name, English first.
 2. Add its locales, with the country each is spoken in, to `LOCALES` in `apps/setup/src/lib/regional/languages.ts`, which Install Luft offers, and to `FORMATS` in `apps/settings/src/lib/panels/system/language/region/formats.ts`.
-3. Add its file to the outputs of `kestrel-locales` in `kestrel/engine/js/ui/meson.build` and to `kestrel/engine/js/js-resources.gresource.xml`.
+3. Add its file to the outputs of `kestrel-locales` in `kestrel/engine/ui/meson.build` and to `kestrel/engine/ui/kestrel.gresource.xml`.
 4. Add its CEF locale to `languages` in `os/image/parts/stages/runtime.sh` if CEF ships one.
 5. Create its folder with an empty file for every component, a glossary and a style guide. Weblate does the first step for new languages added there.
 

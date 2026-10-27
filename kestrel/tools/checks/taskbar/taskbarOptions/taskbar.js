@@ -1,5 +1,5 @@
 import Gio from 'gi://Gio';
-import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
+import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {named} from '../../lib/actors.js';
 import {checks} from '../../lib/check.js';

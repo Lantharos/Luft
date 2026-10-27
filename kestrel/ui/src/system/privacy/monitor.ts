@@ -1,5 +1,5 @@
 import type Meta from 'gi://Meta';
-import type { getGeoclueAgent } from 'resource:///com/lantharos/kestrel/ui/status/location.js';
+import { getGeoclueAgent } from '../../shell/status/location.js';
 
 import { ownDictation } from '../dictation/listening.js';
 import { windowAccess } from '../peek/access/grants.js';
@@ -19,7 +19,7 @@ export class PrivacyMonitor {
   readonly handles = new Set<Meta.RemoteAccessHandle>();
   private readonly camera = cameraMonitor();
   private readonly mixer = mixer();
-  private geoclue: ReturnType<typeof getGeoclueAgent> | null = null;
+  private readonly geoclue = getGeoclueAgent();
   private readonly disconnectors: (() => void)[] = [];
   private dictationIsOurs = false;
 
@@ -48,13 +48,8 @@ export class PrivacyMonitor {
       () => this.mixer.disconnect(dictating),
       () => { if (handles) controller!.disconnect(handles); },
     );
-    void import('resource:///com/lantharos/kestrel/ui/status/location.js').then(({ getGeoclueAgent }) => {
-      const geoclue = getGeoclueAgent();
-      const location = geoclue.connect('notify::in-use', changed);
-      this.geoclue = geoclue;
-      this.disconnectors.push(() => geoclue.disconnect(location));
-      changed();
-    });
+    const location = this.geoclue.connect('notify::in-use', changed);
+    this.disconnectors.push(() => this.geoclue.disconnect(location));
   }
 
   get ownDictation(): boolean {
@@ -67,7 +62,7 @@ export class PrivacyMonitor {
       microphone: this.mixer.recording || (this.mixer.dictating && !this.dictationIsOurs),
       sharing: [...this.handles].some(handle => !handle.is_recording),
       recording: [...this.handles].some(handle => handle.is_recording),
-      location: this.geoclue?.inUse ?? false,
+      location: this.geoclue.inUse,
       windows: windowAccess.active.length > 0,
     };
   }

@@ -3,9 +3,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 import St from 'gi://St';
-import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
-import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
-import {getInputSourceManager} from 'resource:///com/lantharos/kestrel/ui/status/keyboard.js';
+import {toggleSurface, Main, getInputSourceManager} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {descendants, labelled, named, shown, shownStyled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';

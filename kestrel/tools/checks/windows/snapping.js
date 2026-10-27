@@ -1,6 +1,5 @@
 import Mtk from 'gi://Mtk';
-import {toggleSurface} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
-import * as Main from 'resource:///com/lantharos/kestrel/ui/main.js';
+import {toggleSurface, Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';

@@ -1,25 +1,24 @@
 import Gio from 'gi://Gio';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
-import * as DND from 'resource:///com/lantharos/kestrel/ui/dnd.js';
+import * as DND from '../../../shell/popups/dnd.js';
 
 import { taskbarPreferences } from '../preferences/taskbarPreferences.js';
 
 interface TaskbarSlot { id: string; slot: St.Widget; button: St.Button; }
 interface DraggedItem { id?: string; folder?: boolean; }
 type DelegateActor = St.Widget & { _delegate?: object };
-interface DragEvent { targetActor: St.Widget; }
 
 export class TaskbarDrop {
   private marked: St.Widget | null = null;
   private readonly monitor = {
-    dragMotion: (event: DragEvent) => {
+    dragMotion: (event: DND.DragEvent) => {
       if (!this.actor.contains(event.targetActor)) this.unmark();
       return DND.DragMotionResult.CONTINUE;
     },
     dragDrop: () => {
       this.unmark();
-      return DND.DragMotionResult.CONTINUE;
+      return DND.DragDropResult.CONTINUE;
     },
   };
 

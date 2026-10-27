@@ -24,13 +24,13 @@ Strings in Luft's Norwegian Bokmål translation that a native speaker should che
 - `kestrel/ui/locales/nb/system.ftl` `health-gpu-reset-body`: "Datamaskinen startet seg selv på nytt { $date } kl. { $time }." — check that a bare date without «den» reads naturally with the formatted day and month.
 - `kestrel/ui/locales/nb/surfaces.ftl` `start-search-settings-section`: "Innstillinger: { $page }" — chosen to avoid hyphenating a multi-word page title («Strøm og batteri-innstillinger»); check it reads well as a search-result description.
 - `kestrel/ui/locales/nb/surfaces.ftl` `start-folder-ungroup`: "Løs opp mappen" — English says "Ungroup apps"; check this is clear for an app folder in Start.
-- `kestrel/engine/locales/nb/engine.ftl` `network-menu-tethers`: "Internettdeling via Bluetooth" — no settled short term for Bluetooth tethering; may clip as a menu header.
-- `kestrel/engine/locales/nb/engine.ftl` `switch-monitor-join`: "Utvid skjermer" — follows Windows' «Utvid»; check against the 15-character limit context.
-- `kestrel/engine/locales/nb/engine.ftl` `inhibit-shortcuts-title`: "Tillat at hurtigtaster overstyres" — "inhibit shortcuts" has no settled Norwegian term.
+- `kestrel/ui/locales/nb/engine.ftl` `network-menu-tethers`: "Internettdeling via Bluetooth" — no settled short term for Bluetooth tethering; may clip as a menu header.
+- `kestrel/ui/locales/nb/engine.ftl` `switch-monitor-join`: "Utvid skjermer" — follows Windows' «Utvid»; check against the 15-character limit context.
+- `kestrel/ui/locales/nb/engine.ftl` `inhibit-shortcuts-title`: "Tillat at hurtigtaster overstyres" — "inhibit shortcuts" has no settled Norwegian term.
 - `apps/setup/installer/locales/nb/installer.ftl` `installer-no-deployment`: "Det nye systemet har ingen utrulling" — «utrulling» for an ostree deployment is a technical guess.
 - `apps/setup/locales/nb/setup.ftl` `setup-region-intro-guessed`: "Vi har gjettet { $guesses }" — relies on the joined list ("tastaturet ut fra datamaskinen og tidssonen ut fra nettverket") using «og»; check the list joiner.
-- `kestrel/engine/locales/nb/engine.ftl` `network-menu-hotspot`: "Trådløssone på { $name }" — $name is the Wi-Fi device sharing the connection; check it reads well with the device names people see, and against Windows' «mobilt tilkoblingspunkt».
-- `kestrel/engine/locales/nb/engine.ftl` `screenshot-source`: "Skjermbilder og opptak" — notification source for the screenshot and recording tool; «skjermopptak» alone would mean only recordings.
+- `kestrel/ui/locales/nb/engine.ftl` `network-menu-hotspot`: "Trådløssone på { $name }" — $name is the Wi-Fi device sharing the connection; check it reads well with the device names people see, and against Windows' «mobilt tilkoblingspunkt».
+- `kestrel/ui/locales/nb/engine.ftl` `screenshot-source`: "Skjermbilder og opptak" — notification source for the screenshot and recording tool; «skjermopptak» alone would mean only recordings.
 
 ## Settings
 

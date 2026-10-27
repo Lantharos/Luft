@@ -1,6 +1,6 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import * as MessageTray from 'resource:///com/lantharos/kestrel/ui/messageTray.js';
+import * as MessageTray from '../../shell/notifications/messageTray.js';
 
 import { formatsLocale, t } from '../../shared/i18n/index.js';
 import { openSettings } from '../settingsPages.js';

@@ -1,5 +1,5 @@
 import Clutter from 'gi://Clutter';
-import {touchpad as handleTouchpad} from 'resource:///com/lantharos/kestrel/ui/kestrelUi.js';
+import {touchpad as handleTouchpad} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {openBoardWindow, windowNamed} from '../checks/board/lib/board.js';
 import {touchpad} from '../checks/board/lib/touchpad.js';

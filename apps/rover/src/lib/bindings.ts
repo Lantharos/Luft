@@ -235,7 +235,7 @@ export const events = {
 	appearanceCorners: (callback: (payload: Corners) => void) => listen<Corners>("appearance.corners", callback),
 	appearanceMotion: (callback: (payload: Motion) => void) => listen<Motion>("appearance.motion", callback),
 	appearanceTypography: (callback: (payload: Typography) => void) => listen<Typography>("appearance.typography", callback),
-	kestrelPalette: (callback: (payload: import("@luft/ui").Palette) => void) => listen<import("@luft/ui").Palette>("kestrel.palette", callback),
+	kestrelPalette: (callback: (payload: Palette) => void) => listen<Palette>("kestrel.palette", callback),
 	roverCloud: (callback: (payload: null) => void) => listen<null>("rover.cloud", callback),
 	roverCounts: (callback: (payload: CountBatch) => void) => listen<CountBatch>("rover.counts", callback),
 	roverDirectory: (callback: (payload: DirectoryChanged) => void) => listen<DirectoryChanged>("rover.directory", callback),
@@ -256,6 +256,15 @@ export type App = {
 	icon: string | null,
 };
 
+export type AppIconStyle = "default" | "tinted" | "clear";
+
+export type AppIcons = {
+	style: AppIconStyle,
+	glyphs: string,
+	tinted: IconPaint,
+	clear: IconPaint,
+};
+
 export type AppState = {
 	chooser: ChooserConfig | null,
 	launch: Launch,
@@ -265,7 +274,7 @@ export type AppState = {
 } & Appearance;
 
 export type Appearance = {
-	palette: import("@luft/ui").Palette | null,
+	palette: Palette | null,
 	typography: Typography,
 	motion: Motion,
 	corners: Corners,
@@ -388,6 +397,13 @@ export type HistoryState = {
 	notice: Notice | null,
 };
 
+export type IconPaint = {
+	plate: string,
+	ink: string,
+	shade: string,
+	rim: number,
+};
+
 export type Launch = {
 	paths: string[],
 	reveal: boolean,
@@ -476,6 +492,16 @@ export type Ownership = {
 	editable: boolean,
 };
 
+export type Palette = {
+	accent: string,
+	wallpaperAccent: string,
+	pureBlack: boolean,
+	colors: SchemeColors,
+	terminal: SchemeColors,
+	appIcons: AppIcons,
+	taskbar: import("@luft/ui").TaskbarLooks,
+};
+
 export type Pause = "metered" | "battery";
 
 export type PinnedFolder = {
@@ -499,6 +525,11 @@ export type Renaming = {
 };
 
 export type Resolution = "replace" | "merge" | "skip" | "keepBoth";
+
+export type SchemeColors = {
+	light: { [key in string]: string },
+	dark: { [key in string]: string },
+};
 
 export type SearchKind = "folder" | "image" | "video" | "audio" | "document" | "archive" | "code";
 

@@ -54,7 +54,16 @@ export const events = {
 	barometerDevices: (callback: (payload: Devices) => void) => listen<Devices>("barometer.devices", callback),
 	barometerProcesses: (callback: (payload: Uint8Array) => void) => listen<Uint8Array>("barometer.processes", callback),
 	barometerTick: (callback: (payload: Tick) => void) => listen<Tick>("barometer.tick", callback),
-	kestrelPalette: (callback: (payload: import("@luft/ui").Palette) => void) => listen<import("@luft/ui").Palette>("kestrel.palette", callback),
+	kestrelPalette: (callback: (payload: Palette) => void) => listen<Palette>("kestrel.palette", callback),
+};
+
+export type AppIconStyle = "default" | "tinted" | "clear";
+
+export type AppIcons = {
+	style: AppIconStyle,
+	glyphs: string,
+	tinted: IconPaint,
+	clear: IconPaint,
 };
 
 export type AppInfo = {
@@ -88,7 +97,7 @@ export type AppUsage = {
 };
 
 export type Appearance = {
-	palette: import("@luft/ui").Palette | null,
+	palette: Palette | null,
 	typography: Typography,
 	motion: Motion,
 	corners: Corners,
@@ -254,6 +263,13 @@ export type GpuSample = {
 	fan: number | null,
 };
 
+export type IconPaint = {
+	plate: string,
+	ink: string,
+	shade: string,
+	rim: number,
+};
+
 export type Locale = {
 	languages: string[],
 	formats: string,
@@ -311,6 +327,16 @@ export type NetworkSample = {
 	link?: NetworkLink,
 };
 
+export type Palette = {
+	accent: string,
+	wallpaperAccent: string,
+	pureBlack: boolean,
+	colors: SchemeColors,
+	terminal: SchemeColors,
+	appIcons: AppIcons,
+	taskbar: import("@luft/ui").TaskbarLooks,
+};
+
 export type ProcessEntry = {
 	pid: number,
 	ppid: number,
@@ -320,6 +346,11 @@ export type ProcessEntry = {
 	uid: number,
 	app: string | null,
 	started: number,
+};
+
+export type SchemeColors = {
+	light: { [key in string]: string },
+	dark: { [key in string]: string },
 };
 
 export type Signal = "end" | "kill" | "stop" | "continue";

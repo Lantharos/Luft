@@ -44,9 +44,18 @@ export const events = {
 	appearanceCorners: (callback: (payload: Corners) => void) => listen<Corners>("appearance.corners", callback),
 	appearanceMotion: (callback: (payload: Motion) => void) => listen<Motion>("appearance.motion", callback),
 	appearanceTypography: (callback: (payload: Typography) => void) => listen<Typography>("appearance.typography", callback),
-	kestrelPalette: (callback: (payload: import("@luft/ui").Palette) => void) => listen<import("@luft/ui").Palette>("kestrel.palette", callback),
+	kestrelPalette: (callback: (payload: Palette) => void) => listen<Palette>("kestrel.palette", callback),
 	ternExited: (callback: (payload: TerminalExited) => void) => listen<TerminalExited>("tern.exited", callback),
 	ternOutput: (callback: (payload: TerminalOutput) => void) => listen<TerminalOutput>("tern.output", callback),
+};
+
+export type AppIconStyle = "default" | "tinted" | "clear";
+
+export type AppIcons = {
+	style: AppIconStyle,
+	glyphs: string,
+	tinted: IconPaint,
+	clear: IconPaint,
 };
 
 export type AppState = {
@@ -58,7 +67,7 @@ export type AppState = {
 } & Appearance;
 
 export type Appearance = {
-	palette: import("@luft/ui").Palette | null,
+	palette: Palette | null,
 	typography: Typography,
 	motion: Motion,
 	corners: Corners,
@@ -68,6 +77,13 @@ export type Appearance = {
 export type Corners = "rounded" | "square";
 
 export type CursorStyle = "block" | "bar" | "underline";
+
+export type IconPaint = {
+	plate: string,
+	ink: string,
+	shade: string,
+	rim: number,
+};
 
 export type LaunchRequest = {
 	directory: string | null,
@@ -81,6 +97,21 @@ export type Locale = {
 };
 
 export type Motion = "full" | "reduced" | "off";
+
+export type Palette = {
+	accent: string,
+	wallpaperAccent: string,
+	pureBlack: boolean,
+	colors: SchemeColors,
+	terminal: SchemeColors,
+	appIcons: AppIcons,
+	taskbar: import("@luft/ui").TaskbarLooks,
+};
+
+export type SchemeColors = {
+	light: { [key in string]: string },
+	dark: { [key in string]: string },
+};
 
 export type SchemePreference = "system" | "dark" | "light";
 

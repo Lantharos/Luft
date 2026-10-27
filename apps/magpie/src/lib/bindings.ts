@@ -97,7 +97,7 @@ export const events = {
 	appearanceCorners: (callback: (payload: Corners) => void) => listen<Corners>("appearance.corners", callback),
 	appearanceMotion: (callback: (payload: Motion) => void) => listen<Motion>("appearance.motion", callback),
 	appearanceTypography: (callback: (payload: Typography) => void) => listen<Typography>("appearance.typography", callback),
-	kestrelPalette: (callback: (payload: import("@luft/ui").Palette) => void) => listen<import("@luft/ui").Palette>("kestrel.palette", callback),
+	kestrelPalette: (callback: (payload: Palette) => void) => listen<Palette>("kestrel.palette", callback),
 	magpieFolder: (callback: (payload: Listing) => void) => listen<Listing>("magpie.folder", callback),
 	magpieMedia: (callback: (payload: MediaAction) => void) => listen<MediaAction>("magpie.media", callback),
 	magpieThumbnails: (callback: (payload: ThumbnailBatch) => void) => listen<ThumbnailBatch>("magpie.thumbnails", callback),
@@ -109,12 +109,21 @@ export type App = {
 	icon: string | null,
 };
 
+export type AppIconStyle = "default" | "tinted" | "clear";
+
+export type AppIcons = {
+	style: AppIconStyle,
+	glyphs: string,
+	tinted: IconPaint,
+	clear: IconPaint,
+};
+
 export type AppState = {
 	launchPaths: string[],
 } & Appearance;
 
 export type Appearance = {
-	palette: import("@luft/ui").Palette | null,
+	palette: Palette | null,
 	typography: Typography,
 	motion: Motion,
 	corners: Corners,
@@ -185,6 +194,13 @@ export type FontInstance = {
 
 export type FontStatus = "missing" | "system" | "user";
 
+export type IconPaint = {
+	plate: string,
+	ink: string,
+	shade: string,
+	rim: number,
+};
+
 export type ImageDetails = {
 	width: number | null,
 	height: number | null,
@@ -230,6 +246,16 @@ export type MediaAction = { action: "play" } | { action: "pause" } | { action: "
 
 export type Motion = "full" | "reduced" | "off";
 
+export type Palette = {
+	accent: string,
+	wallpaperAccent: string,
+	pureBlack: boolean,
+	colors: SchemeColors,
+	terminal: SchemeColors,
+	appIcons: AppIcons,
+	taskbar: import("@luft/ui").TaskbarLooks,
+};
+
 export type Pixels = {
 	path: string,
 	width: number,
@@ -250,6 +276,11 @@ export type Ready = {
 export type Repeat = "None" | "Track" | "Playlist";
 
 export type Role = "interface" | "monospace";
+
+export type SchemeColors = {
+	light: { [key in string]: string },
+	dark: { [key in string]: string },
+};
 
 export type SubtitleTrack = {
 	id: string,

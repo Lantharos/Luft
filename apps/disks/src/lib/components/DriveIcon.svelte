@@ -4,10 +4,10 @@
 	import HardDrive from '@lucide/svelte/icons/hard-drive';
 	import MemoryStick from '@lucide/svelte/icons/memory-stick';
 	import Usb from '@lucide/svelte/icons/usb';
-	import type { Kind } from '#lib/bindings.js';
+	import type { DriveKind } from '#lib/bindings.js';
 
 	interface Props {
-		kind: Kind;
+		kind: DriveKind;
 		size?: number;
 	}
 

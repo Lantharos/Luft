@@ -117,15 +117,24 @@ export const events = {
 	appearanceCorners: (callback: (payload: Corners) => void) => listen<Corners>("appearance.corners", callback),
 	appearanceMotion: (callback: (payload: Motion) => void) => listen<Motion>("appearance.motion", callback),
 	appearanceTypography: (callback: (payload: Typography) => void) => listen<Typography>("appearance.typography", callback),
-	kestrelPalette: (callback: (payload: import("@luft/ui").Palette) => void) => listen<import("@luft/ui").Palette>("kestrel.palette", callback),
+	kestrelPalette: (callback: (payload: Palette) => void) => listen<Palette>("kestrel.palette", callback),
 };
 
 export type AltGr = "ralt" | "lalt" | "alt" | "rctrl" | "menu" | "rwin" | "caps";
 
+export type AppIconStyle = "default" | "tinted" | "clear";
+
+export type AppIcons = {
+	style: AppIconStyle,
+	glyphs: string,
+	tinted: IconPaint,
+	clear: IconPaint,
+};
+
 export type AppState = Appearance & Targets;
 
 export type Appearance = {
-	palette: import("@luft/ui").Palette | null,
+	palette: Palette | null,
 	typography: Typography,
 	motion: Motion,
 	corners: Corners,
@@ -157,6 +166,13 @@ export type Entry = {
 };
 
 export type ExportFormat = "symbols" | "keymap" | "compose" | "klc";
+
+export type IconPaint = {
+	plate: string,
+	ink: string,
+	shade: string,
+	rim: number,
+};
 
 export type Kind = "empty" | "character" | "dead" | "compose" | "function";
 
@@ -214,6 +230,16 @@ export type Pair = {
 	next?: string,
 };
 
+export type Palette = {
+	accent: string,
+	wallpaperAccent: string,
+	pureBlack: boolean,
+	colors: SchemeColors,
+	terminal: SchemeColors,
+	appIcons: AppIcons,
+	taskbar: import("@luft/ui").TaskbarLooks,
+};
+
 export type Rule = {
 	keys: string,
 	text: string,
@@ -223,6 +249,11 @@ export type Rule = {
 export type SavedMethod = {
 	id: string,
 } & Method;
+
+export type SchemeColors = {
+	light: { [key in string]: string },
+	dark: { [key in string]: string },
+};
 
 export type Shown = {
 	handled: boolean,

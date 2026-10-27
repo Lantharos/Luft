@@ -170,7 +170,7 @@ export const events = {
 	disksPlan: (callback: (payload: MoveProgress) => void) => listen<MoveProgress>("disks.plan", callback),
 	disksSystem: (callback: (payload: SystemStep) => void) => listen<SystemStep>("disks.system", callback),
 	disksTrust: (callback: (payload: Protection) => void) => listen<Protection>("disks.trust", callback),
-	kestrelPalette: (callback: (payload: import("@luft/ui").Palette) => void) => listen<import("@luft/ui").Palette>("kestrel.palette", callback),
+	kestrelPalette: (callback: (payload: Palette) => void) => listen<Palette>("kestrel.palette", callback),
 	spaceUpdate: (callback: (payload: SpaceUpdate) => void) => listen<SpaceUpdate>("space.update", callback),
 };
 
@@ -183,12 +183,21 @@ export type Activation = {
 	workingDirectory: string | null,
 };
 
+export type AppIconStyle = "default" | "tinted" | "clear";
+
+export type AppIcons = {
+	style: AppIconStyle,
+	glyphs: string,
+	tinted: IconPaint,
+	clear: IconPaint,
+};
+
 export type AppState = {
 	activation: Activation,
 } & Appearance;
 
 export type Appearance = {
-	palette: import("@luft/ui").Palette | null,
+	palette: Palette | null,
 	typography: Typography,
 	motion: Motion,
 	corners: Corners,
@@ -211,7 +220,7 @@ export type Drive = {
 	model: string,
 	serial: string,
 	size: number,
-	kind: Kind,
+	kind: DriveKind,
 	removable: boolean,
 	canPowerOff: boolean,
 	system: boolean,
@@ -237,6 +246,8 @@ export type DriveEncryption = {
 	autoUnlock: boolean,
 	recoveryKeyStored: boolean,
 };
+
+export type DriveKind = "nvme" | "ssd" | "hdd" | "usb" | "card" | "optical" | "image";
 
 export type Encryption = {
 	kind: string,
@@ -276,6 +287,13 @@ export type Health = {
 
 export type HealthState = "good" | "warning" | "failing";
 
+export type IconPaint = {
+	plate: string,
+	ink: string,
+	shade: string,
+	rim: number,
+};
+
 export type ImageProgress = {
 	block: string,
 	restoring: boolean,
@@ -290,8 +308,6 @@ export type Job = {
 	operation: string,
 	progress: number | null,
 };
-
-export type Kind = "nvme" | "ssd" | "hdd" | "usb" | "card" | "optical" | "image";
 
 export type Launch = {
 	target: Target | null,
@@ -329,6 +345,16 @@ export type OtherSystem = {
 
 export type Outcome<T> = ({ done: T }) & { wrongKey?: never } | ({ wrongKey: string }) & { done?: never };
 
+export type Palette = {
+	accent: string,
+	wallpaperAccent: string,
+	pureBlack: boolean,
+	colors: SchemeColors,
+	terminal: SchemeColors,
+	appIcons: AppIcons,
+	taskbar: import("@luft/ui").TaskbarLooks,
+};
+
 export type PartRole = "system" | "reserved" | "recovery" | "meet";
 
 export type PartitionTable = "gpt" | "dos";
@@ -346,6 +372,11 @@ export type Removed = {
 	needsKey: boolean,
 	drive: string,
 	free: Space | null,
+};
+
+export type SchemeColors = {
+	light: { [key in string]: string },
+	dark: { [key in string]: string },
 };
 
 export type Segment = {

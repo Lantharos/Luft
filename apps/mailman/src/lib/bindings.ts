@@ -135,7 +135,7 @@ export const events = {
 	appearanceCorners: (callback: (payload: Corners) => void) => listen<Corners>("appearance.corners", callback),
 	appearanceMotion: (callback: (payload: Motion) => void) => listen<Motion>("appearance.motion", callback),
 	appearanceTypography: (callback: (payload: Typography) => void) => listen<Typography>("appearance.typography", callback),
-	kestrelPalette: (callback: (payload: import("@luft/ui").Palette) => void) => listen<import("@luft/ui").Palette>("kestrel.palette", callback),
+	kestrelPalette: (callback: (payload: Palette) => void) => listen<Palette>("kestrel.palette", callback),
 	mailmanBody: (callback: (payload: BodyArrived) => void) => listen<BodyArrived>("mailman.body", callback),
 	mailmanChanged: (callback: (payload: number) => void) => listen<number>("mailman.changed", callback),
 	mailmanIdentities: (callback: (payload: number) => void) => listen<number>("mailman.identities", callback),
@@ -167,6 +167,15 @@ export type Address = {
 	address: string,
 };
 
+export type AppIconStyle = "default" | "tinted" | "clear";
+
+export type AppIcons = {
+	style: AppIconStyle,
+	glyphs: string,
+	tinted: IconPaint,
+	clear: IconPaint,
+};
+
 export type AppState = {
 	accounts: Account[],
 	identities: Identity[],
@@ -176,7 +185,7 @@ export type AppState = {
 } & Appearance;
 
 export type Appearance = {
-	palette: import("@luft/ui").Palette | null,
+	palette: Palette | null,
 	typography: Typography,
 	motion: Motion,
 	corners: Corners,
@@ -275,6 +284,13 @@ export type Draft = {
 	remindAfter: number | null,
 };
 
+export type IconPaint = {
+	plate: string,
+	ink: string,
+	shade: string,
+	rim: number,
+};
+
 export type Identity = {
 	id: number,
 	account: number,
@@ -323,6 +339,16 @@ export type OutboxEvent = {
 	error: string | null,
 };
 
+export type Palette = {
+	accent: string,
+	wallpaperAccent: string,
+	pureBlack: boolean,
+	colors: SchemeColors,
+	terminal: SchemeColors,
+	appIcons: AppIcons,
+	taskbar: import("@luft/ui").TaskbarLooks,
+};
+
 export type Placement = {
 	id: number,
 	mailbox: number,
@@ -364,6 +390,11 @@ export type ReopenedDraft = {
 };
 
 export type Role = "inbox" | "sent" | "drafts" | "archive" | "all" | "trash" | "junk";
+
+export type SchemeColors = {
+	light: { [key in string]: string },
+	dark: { [key in string]: string },
+};
 
 export type Security = "tls" | "startTls" | "none";
 

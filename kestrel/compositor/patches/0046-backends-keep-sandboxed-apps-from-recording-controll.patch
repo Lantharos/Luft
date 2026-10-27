@@ -25,7 +25,7 @@ ApplyMonitorsConfig, SetBacklight and PowerSaveMode, refuse sandboxed
 callers. Property writes bypass method authorization, so a skeleton
 subclass checks them before the generated setter runs.
 
-Upstream-Status: forwardable a security fix to report to GNOME privately, without Kestrel's service names
+Upstream-Status: luft-only Kestrel owns names sandboxed apps may talk to, which GNOME Shell keeps in separate services
 ---
  src/backends/meta-dbus-session-manager.c    |  46 ++++++
  src/backends/meta-display-config-skeleton.c | 113 ++++++++++++++

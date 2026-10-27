@@ -318,9 +318,12 @@ async function measureIdle() {
 
 export async function run() {
   report(processMetrics());
-  await settled();
-  await surfacesPrepared();
-  await settled(MEASURE_SETTLE);
+  const startupStallMs = await longestStall(async () => {
+    await settled();
+    await surfacesPrepared();
+    await settled(MEASURE_SETTLE);
+  });
+  report({startupStallMs});
   await measureEmojiOpening('first');
   await dismiss();
   await measureEmojiOpening('again');

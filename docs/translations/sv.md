@@ -1,6 +1,6 @@
 # Swedish style guide
 
-How Luft speaks Swedish. The [glossary](../../packages/i18n/glossary/sv.csv) has the agreed terms; Weblate shows them next to every string.
+How Luft speaks Swedish. The [glossary](../../packages/i18n/glossary/sv.tbx) has the agreed terms; Weblate shows them next to every string.
 
 ## Address and tone
 

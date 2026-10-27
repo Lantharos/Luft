@@ -4,15 +4,15 @@ Strings in Luft's Hungarian translation that a native speaker should check: term
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/hu.csv` `you`: formal verb forms without „Ön” everywhere — check this still feels friendly enough for Luft, or whether tegezés (as in many newer apps) would fit better.
-- `packages/i18n/glossary/hu.csv` `tray`: "rendszertálca" — Windows 10/11 say "értesítési terület" or describe it as hidden icons; check which people recognize.
-- `packages/i18n/glossary/hu.csv` `snap`: "illeszt", "illesztési elrendezés", "illesztési csoport" — taken from Windows 11; check against the current Windows wording.
-- `packages/i18n/glossary/hu.csv` `Airplane mode`: "Repülőgép mód" — Windows writes "Repülőgép üzemmód", Android "Repülős üzemmód"; chosen for length.
-- `packages/i18n/glossary/hu.csv` `Power mode`: "Energiamód" — shorter than Windows' "Energiagazdálkodási mód"; check it reads naturally.
-- `packages/i18n/glossary/hu.csv` `power`: "Tápellátás" — check against Windows 11's page name.
-- `packages/i18n/glossary/hu.csv` `sandbox`: "homokozó" — check it reads well to non-technical people, or whether "elkülönített környezet" is better in sentences.
-- `packages/i18n/glossary/hu.csv` `emoji`: "emodzsi" — Microsoft's spelling; many people write "emoji".
-- `packages/i18n/glossary/hu.csv` `USB stick`: "pendrive" — everyday word, but the hyphenated suffixes (pendrive-ot) may look odd in some sentences.
+- `packages/i18n/glossary/hu.tbx` `you`: formal verb forms without „Ön” everywhere — check this still feels friendly enough for Luft, or whether tegezés (as in many newer apps) would fit better.
+- `packages/i18n/glossary/hu.tbx` `tray`: "rendszertálca" — Windows 10/11 say "értesítési terület" or describe it as hidden icons; check which people recognize.
+- `packages/i18n/glossary/hu.tbx` `snap`: "illeszt", "illesztési elrendezés", "illesztési csoport" — taken from Windows 11; check against the current Windows wording.
+- `packages/i18n/glossary/hu.tbx` `Airplane mode`: "Repülőgép mód" — Windows writes "Repülőgép üzemmód", Android "Repülős üzemmód"; chosen for length.
+- `packages/i18n/glossary/hu.tbx` `Power mode`: "Energiamód" — shorter than Windows' "Energiagazdálkodási mód"; check it reads naturally.
+- `packages/i18n/glossary/hu.tbx` `power`: "Tápellátás" — check against Windows 11's page name.
+- `packages/i18n/glossary/hu.tbx` `sandbox`: "homokozó" — check it reads well to non-technical people, or whether "elkülönített környezet" is better in sentences.
+- `packages/i18n/glossary/hu.tbx` `emoji`: "emodzsi" — Microsoft's spelling; many people write "emoji".
+- `packages/i18n/glossary/hu.tbx` `USB stick`: "pendrive" — everyday word, but the hyphenated suffixes (pendrive-ot) may look odd in some sentences.
 - `docs/translations/hu.md` Names: the guide forbids „a(z)”; check that sentences such as „{ $app } alkalmazásban” without an article read acceptably, since many Hungarian programs use „a(z)” there instead.
 - `packages/web/settings-pages/locales/hu/pages.ftl` `settings-page-power`: "Tápellátás és akkumulátor" — long for the sidebar; may clip.
 - `packages/web/settings-pages/locales/hu/pages.ftl` `settings-page-cursors`: "Kurzortémák" — check against "Egérmutató-témák".

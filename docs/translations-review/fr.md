@@ -4,13 +4,13 @@ Strings in Luft's French translation that a native speaker should check: terms w
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/fr.csv` `board`: "tableau" — no OS has this mode; check that it reads as a canvas of windows and not as a table or a dashboard.
-- `packages/i18n/glossary/fr.csv` `tray`: "barre d’état système" — chosen over Windows' "zone de notification" to avoid a clash with the notification center; check it is understood.
-- `packages/i18n/glossary/fr.csv` `Start`: "Start" — kept in English as a name, while French Windows says "Démarrer"; check "le menu Start" reads acceptably.
-- `packages/i18n/glossary/fr.csv` `App Store`: "Boutique d’applications" — long; GNOME says "Logiciels", Ubuntu "Logithèque".
-- `packages/i18n/glossary/fr.csv` `Keep awake`: "Maintenir éveillé" — no OS equivalent; check it fits a Quick settings tile.
-- `packages/i18n/glossary/fr.csv` `shut down`: "éteindre" — Windows' power menu says "Arrêter"; check the choice.
-- `packages/i18n/glossary/fr.csv` `undo`: "Annuler" — same word as cancel; check no screen shows both side by side.
+- `packages/i18n/glossary/fr.tbx` `board`: "tableau" — no OS has this mode; check that it reads as a canvas of windows and not as a table or a dashboard.
+- `packages/i18n/glossary/fr.tbx` `tray`: "barre d’état système" — chosen over Windows' "zone de notification" to avoid a clash with the notification center; check it is understood.
+- `packages/i18n/glossary/fr.tbx` `Start`: "Start" — kept in English as a name, while French Windows says "Démarrer"; check "le menu Start" reads acceptably.
+- `packages/i18n/glossary/fr.tbx` `App Store`: "Boutique d’applications" — long; GNOME says "Logiciels", Ubuntu "Logithèque".
+- `packages/i18n/glossary/fr.tbx` `Keep awake`: "Maintenir éveillé" — no OS equivalent; check it fits a Quick settings tile.
+- `packages/i18n/glossary/fr.tbx` `shut down`: "éteindre" — Windows' power menu says "Arrêter"; check the choice.
+- `packages/i18n/glossary/fr.tbx` `undo`: "Annuler" — same word as cancel; check no screen shows both side by side.
 - `packages/web/ui/locales/fr/ui.ftl` `ui-split-windows-size`: "{ $size }, dont { $used } utilisés" — "utilisés" is plural; reads oddly for values under 2 GB.
 - `packages/web/ui/locales/fr/ui.ftl` `ui-toast-dismiss`: "Ignorer" — Windows' word for closing a notification; "Fermer" is the alternative.
 - `apps/settings/locales/fr/settings.ftl` `settings-subpage-back`: "Retour à { $page }" — page titles without article, like "Retour à Réseau"; check it reads naturally as a screen-reader label.

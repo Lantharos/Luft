@@ -4,13 +4,13 @@ Strings in Luft's Italian translation that a native speaker should check: terms 
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/it.csv` `board`: "lavagna" — check that it reads naturally as the name of an endless canvas of windows, or whether keeping "board" is better.
-- `packages/i18n/glossary/it.csv` `tray`: "vassoio di sistema" — KDE's term; Windows says "area di notifica", avoided here because Luft also has a notification center. Check it feels familiar.
-- `packages/i18n/glossary/it.csv` `App Store`: "Store di app" — no settled generic name; alternatives are "Negozio di app" or GNOME's "Software".
-- `packages/i18n/glossary/it.csv` `Power mode`: "Modalità energia" — shortened from "Modalità di alimentazione"; check it doesn't sound clipped.
-- `packages/i18n/glossary/it.csv` `Keep awake`: "Mantieni attivo" — check it is clear that it keeps the screen on.
-- `packages/i18n/glossary/it.csv` `sign out`: "uscire", button "Esci" — chosen over Windows' "Disconnetti" to avoid a clash with network and device disconnects.
-- `packages/i18n/glossary/it.csv` `undo` / `cancel`: both "Annulla" on buttons, as in Windows — check no screen shows both side by side.
+- `packages/i18n/glossary/it.tbx` `board`: "lavagna" — check that it reads naturally as the name of an endless canvas of windows, or whether keeping "board" is better.
+- `packages/i18n/glossary/it.tbx` `tray`: "vassoio di sistema" — KDE's term; Windows says "area di notifica", avoided here because Luft also has a notification center. Check it feels familiar.
+- `packages/i18n/glossary/it.tbx` `App Store`: "Store di app" — no settled generic name; alternatives are "Negozio di app" or GNOME's "Software".
+- `packages/i18n/glossary/it.tbx` `Power mode`: "Modalità energia" — shortened from "Modalità di alimentazione"; check it doesn't sound clipped.
+- `packages/i18n/glossary/it.tbx` `Keep awake`: "Mantieni attivo" — check it is clear that it keeps the screen on.
+- `packages/i18n/glossary/it.tbx` `sign out`: "uscire", button "Esci" — chosen over Windows' "Disconnetti" to avoid a clash with network and device disconnects.
+- `packages/i18n/glossary/it.tbx` `undo` / `cancel`: both "Annulla" on buttons, as in Windows — check no screen shows both side by side.
 - `packages/web/ui/locales/it/ui.ftl` `ui-fingerprint-place`: "Appoggia { $finger } sul sensore." — the article lives in each finger's .inline form (l’indice, il pollice); check all ten read correctly.
 - `packages/web/ui/locales/it/ui.ftl` `ui-time-just-now`: "adesso" — check it fits wherever relative times appear (it may need "poco fa").
 - `packages/web/ui/locales/it/ui.ftl` `ui-toast-dismiss`: "Ignora" — Windows' label for dismissing a notification; "Chiudi" is the alternative.

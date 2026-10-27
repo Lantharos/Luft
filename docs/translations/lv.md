@@ -1,6 +1,6 @@
 # Latvian style guide
 
-How Luft speaks Latvian. The [glossary](../../packages/i18n/glossary/lv.csv) has the agreed terms; Weblate shows them next to every string.
+How Luft speaks Latvian. The [glossary](../../packages/i18n/glossary/lv.tbx) has the agreed terms; Weblate shows them next to every string.
 
 ## Address and tone
 

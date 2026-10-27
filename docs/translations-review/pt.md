@@ -4,13 +4,13 @@ Strings in Luft's European Portuguese translation that a native speaker should c
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/pt.csv` `tray`: "bandeja do sistema" — KDE's term; Windows in Portugal says "área de notificação", which Luft avoids because the tray holds apps. Check it sounds natural.
-- `packages/i18n/glossary/pt.csv` `board`: "quadro" — no established equivalent; check it's understood as a canvas of windows.
-- `packages/i18n/glossary/pt.csv` `trash`: "Lixo" — GNOME and macOS; Windows users know "Reciclagem". Confirm the choice.
-- `packages/i18n/glossary/pt.csv` `Keep awake`: "Manter ativo" — no settled term; "Manter acordado" is the alternative.
-- `packages/i18n/glossary/pt.csv` `sandbox`: "ambiente isolado" — Flatpak material in Portuguese often keeps "sandbox".
-- `packages/i18n/glossary/pt.csv` `passkey`: "chave de acesso" — Apple in Portugal may use a different term; check what people actually see on websites.
-- `packages/i18n/glossary/pt.csv` `Install Luft`: "Instalar o Luft" — check whether the app name reads better without the article.
+- `packages/i18n/glossary/pt.tbx` `tray`: "bandeja do sistema" — KDE's term; Windows in Portugal says "área de notificação", which Luft avoids because the tray holds apps. Check it sounds natural.
+- `packages/i18n/glossary/pt.tbx` `board`: "quadro" — no established equivalent; check it's understood as a canvas of windows.
+- `packages/i18n/glossary/pt.tbx` `trash`: "Lixo" — GNOME and macOS; Windows users know "Reciclagem". Confirm the choice.
+- `packages/i18n/glossary/pt.tbx` `Keep awake`: "Manter ativo" — no settled term; "Manter acordado" is the alternative.
+- `packages/i18n/glossary/pt.tbx` `sandbox`: "ambiente isolado" — Flatpak material in Portuguese often keeps "sandbox".
+- `packages/i18n/glossary/pt.tbx` `passkey`: "chave de acesso" — Apple in Portugal may use a different term; check what people actually see on websites.
+- `packages/i18n/glossary/pt.tbx` `Install Luft`: "Instalar o Luft" — check whether the app name reads better without the article.
 - `packages/web/ui/locales/pt/ui.ftl` `ui-recovery-key-saved`: "Guardada" — feminine to agree with "chave"; check it reads right where it appears.
 - `packages/web/ui/locales/pt/ui.ftl` `ui-finger-right-little`: "Mindinho direito" — "Dedo mínimo direito" is more formal; check the register.
 - `packages/web/ui/locales/pt/ui.ftl` `ui-media-pause`: "Pausa" — noun, as Windows uses; "Pausar" is the alternative.

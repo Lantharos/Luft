@@ -4,18 +4,18 @@ Strings in Luft's Irish translation that a native speaker should check: terms wi
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/ga.csv` `Start`: "Tosaigh" — follows Irish Windows; check it reads as a menu name and not as a button telling the reader to start.
-- `packages/i18n/glossary/ga.csv` `board`: "clár" — no OS has this mode, and clár also means programme; check it reads as a canvas of windows.
-- `packages/i18n/glossary/ga.csv` `Quick settings`: "Socruithe tapa" — Windows 11's Irish term isn't certain; check whether "Mearshocruithe" is what people know.
-- `packages/i18n/glossary/ga.csv` `snap`, `snap layout`, `snap group`: "snapáil", "leagan amach snapála", "grúpa snapála" — loanword chosen because greamaigh is paste; check against téarma.ie and Windows' Irish Snap terms.
-- `packages/i18n/glossary/ga.csv` `tray`: "tráidire" — chosen over Windows' notification area term to avoid a clash with the notification center; check it is understood.
-- `packages/i18n/glossary/ga.csv` `wallpaper`: "cúlbhrat" — Windows' personalisation page uses cúlra; check cúlbhrat is familiar.
-- `packages/i18n/glossary/ga.csv` `accent color`: "dath béime" — check against Windows' Irish Colours page.
-- `packages/i18n/glossary/ga.csv` `Keep awake`: "Coinnigh múscailte" — no OS equivalent; check it fits a Quick settings tile and reads as keeping the computer awake.
-- `packages/i18n/glossary/ga.csv` `passkey`: "eochair rochtana" — no settled Irish term; check against Microsoft and Google's Irish sign-in pages.
-- `packages/i18n/glossary/ga.csv` `login screen`: "scáileán sínithe isteach" — consistent with sínigh isteach, but long; GNOME says logáil isteach.
-- `packages/i18n/glossary/ga.csv` `emoji`: "emoji", plural "emojithe" — check the plural.
-- `packages/i18n/glossary/ga.csv` `undo`, `cancel`: both "Cealaigh" — same word, as in Microsoft and LibreOffice; check no screen shows both side by side.
+- `packages/i18n/glossary/ga.tbx` `Start`: "Tosaigh" — follows Irish Windows; check it reads as a menu name and not as a button telling the reader to start.
+- `packages/i18n/glossary/ga.tbx` `board`: "clár" — no OS has this mode, and clár also means programme; check it reads as a canvas of windows.
+- `packages/i18n/glossary/ga.tbx` `Quick settings`: "Socruithe tapa" — Windows 11's Irish term isn't certain; check whether "Mearshocruithe" is what people know.
+- `packages/i18n/glossary/ga.tbx` `snap`, `snap layout`, `snap group`: "snapáil", "leagan amach snapála", "grúpa snapála" — loanword chosen because greamaigh is paste; check against téarma.ie and Windows' Irish Snap terms.
+- `packages/i18n/glossary/ga.tbx` `tray`: "tráidire" — chosen over Windows' notification area term to avoid a clash with the notification center; check it is understood.
+- `packages/i18n/glossary/ga.tbx` `wallpaper`: "cúlbhrat" — Windows' personalisation page uses cúlra; check cúlbhrat is familiar.
+- `packages/i18n/glossary/ga.tbx` `accent color`: "dath béime" — check against Windows' Irish Colours page.
+- `packages/i18n/glossary/ga.tbx` `Keep awake`: "Coinnigh múscailte" — no OS equivalent; check it fits a Quick settings tile and reads as keeping the computer awake.
+- `packages/i18n/glossary/ga.tbx` `passkey`: "eochair rochtana" — no settled Irish term; check against Microsoft and Google's Irish sign-in pages.
+- `packages/i18n/glossary/ga.tbx` `login screen`: "scáileán sínithe isteach" — consistent with sínigh isteach, but long; GNOME says logáil isteach.
+- `packages/i18n/glossary/ga.tbx` `emoji`: "emoji", plural "emojithe" — check the plural.
+- `packages/i18n/glossary/ga.tbx` `undo`, `cancel`: both "Cealaigh" — same word, as in Microsoft and LibreOffice; check no screen shows both side by side.
 - `docs/translations/ga.md` Plurals: the `other` form uses the unmutated singular; for 11–19 the spoken form mutates (aon fhógra déag, seacht bhfógra déag), so check this is acceptable with digits.
 - `packages/web/ui/locales/ga/ui.ftl` `ui-finger-*` `.inline`: "do chorrmhéar dheas", "d’ordóg chlé" … — the possessive is inside the inline form so the mutation is right; check the ring finger "méar fáinne dheas" reads naturally.
 - `packages/web/ui/locales/ga/ui.ftl` `ui-edit-select-all`: "Roghnaigh uile" — Microsoft's form; "Roghnaigh gach rud" is the alternative.
@@ -25,8 +25,8 @@ Strings in Luft's Irish translation that a native speaker should check: terms wi
 - `packages/web/settings-pages/locales/ga/pages.ftl` `settings-page-display`: "Scáileáin" — Windows' page is "Taispeáint"; check which people look for.
 - `kestrel/ui/locales/ga/shell.ftl` `keys-space`: "Spás" — the space bar has no printed name; check it reads well in shortcuts like Ctrl+Spás.
 - `kestrel/ui/locales/ga/shell.ftl` `battery-level` `[plugged]`: "Ceallra { $percentage }%, plugáilte isteach" — check it conveys plugged in but not charging.
-- `packages/i18n/glossary/ga.csv` `dark style`: "Stíl dhorcha" — used on the Quick settings tile and in running text so it matches the Stíl row in Settings; Irish Windows may say "Mód dorcha", so check the tile still reads as a switch.
-- `packages/i18n/glossary/ga.csv` `PIN`, `passphrase`: "UAP", "frása faire" — UAP follows Irish Windows Hello and is also used for Bluetooth pairing and mobile broadband PINs; check both read naturally, including "d’UAP" and the plural "UAPanna".
+- `packages/i18n/glossary/ga.tbx` `dark style`: "Stíl dhorcha" — used on the Quick settings tile and in running text so it matches the Stíl row in Settings; Irish Windows may say "Mód dorcha", so check the tile still reads as a switch.
+- `packages/i18n/glossary/ga.tbx` `PIN`, `passphrase`: "UAP", "frása faire" — UAP follows Irish Windows Hello and is also used for Bluetooth pairing and mobile broadband PINs; check both read naturally, including "d’UAP" and the plural "UAPanna".
 
 ## Kestrel and setup
 

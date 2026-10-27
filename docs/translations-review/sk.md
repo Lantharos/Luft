@@ -4,14 +4,14 @@ Strings in Luft's Slovak translation that a native speaker should check, each li
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/sk.csv` `account`: "účet" — Windows says „konto“; check that „účet“ is the better known word for both user and online accounts.
-- `packages/i18n/glossary/sk.csv` `tray`: "systémová lišta" — KDE's word; Windows has no direct equivalent. Check it reads as a button of background app icons.
-- `packages/i18n/glossary/sk.csv` `snap layout`: "rozloženie okien" — Windows uses „rozloženie prichytenia“; check which people recognize.
-- `packages/i18n/glossary/sk.csv` `Keep awake`: "Nezaspávať" — no settled term; check it fits a Quick settings tile.
-- `packages/i18n/glossary/sk.csv` `Power saver`: "Šetrenie energie" — check against how Slovak GNOME and Windows name the power profiles.
-- `packages/i18n/glossary/sk.csv` `remove` / `delete`: "odstrániť" / "vymazať" — Windows uses „odstrániť“ for both; check the split feels natural.
-- `packages/i18n/glossary/sk.csv` `board`: "tabuľa" — new feature with no existing term.
-- `packages/i18n/glossary/sk.csv` `Start`: "Start" — Slovak Windows writes „Štart“; Luft keeps the name unchanged.
+- `packages/i18n/glossary/sk.tbx` `account`: "účet" — Windows says „konto“; check that „účet“ is the better known word for both user and online accounts.
+- `packages/i18n/glossary/sk.tbx` `tray`: "systémová lišta" — KDE's word; Windows has no direct equivalent. Check it reads as a button of background app icons.
+- `packages/i18n/glossary/sk.tbx` `snap layout`: "rozloženie okien" — Windows uses „rozloženie prichytenia“; check which people recognize.
+- `packages/i18n/glossary/sk.tbx` `Keep awake`: "Nezaspávať" — no settled term; check it fits a Quick settings tile.
+- `packages/i18n/glossary/sk.tbx` `Power saver`: "Šetrenie energie" — check against how Slovak GNOME and Windows name the power profiles.
+- `packages/i18n/glossary/sk.tbx` `remove` / `delete`: "odstrániť" / "vymazať" — Windows uses „odstrániť“ for both; check the split feels natural.
+- `packages/i18n/glossary/sk.tbx` `board`: "tabuľa" — new feature with no existing term.
+- `packages/i18n/glossary/sk.tbx` `Start`: "Start" — Slovak Windows writes „Štart“; Luft keeps the name unchanged.
 - `apps/settings/locales/sk/settings.ftl` `settings-subpage-back`: "Späť na stránku { $page }" — page titles stay in the nominative after „stránku“; check it sounds natural with titles like „Klávesnica“.
 - `apps/settings/locales/sk/settings.ftl` `settings-more-show`: "Zobraziť ešte { $count }" — identical in every plural form to avoid guessing the hidden noun's gender.
 - `packages/web/ui/locales/sk/ui.ftl` `ui-select-placeholder`: "Vybrať" — infinitive like buttons; „Vyberte“ might read better as a placeholder.

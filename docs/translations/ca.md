@@ -1,6 +1,6 @@
 # Catalan style guide
 
-How Luft speaks Catalan. The [glossary](../../packages/i18n/glossary/ca.csv) has the agreed terms; Weblate shows them next to every string.
+How Luft speaks Catalan. The [glossary](../../packages/i18n/glossary/ca.tbx) has the agreed terms; Weblate shows them next to every string.
 
 Luft's Catalan is the central standard, following Softcatalà's style guide and the terminology of TERMCAT and Softcatalà, which GNOME, KDE, LibreOffice, Mozilla, Microsoft and Apple largely share.
 

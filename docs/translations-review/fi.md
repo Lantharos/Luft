@@ -4,12 +4,12 @@ Strings in Luft's Finnish translation that a native speaker should check. Each i
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/fi.csv` `snap`: "telakoida", with "ikkuna-asettelu" and "ikkunaryhmä" — Windows uses kiinnittää for both pin and snap; check that telakoida reads naturally for putting a window into half of the screen.
-- `packages/i18n/glossary/fi.csv` `board`: "taulu" — a new feature with no established Finnish word; check it isn't confused with a spreadsheet table or a Kanban board.
-- `packages/i18n/glossary/fi.csv` `tray`: "ilmaisinalue" — Windows' older term for the notification area; check it fits a button that holds background apps.
-- `packages/i18n/glossary/fi.csv` `security`: "suojaus" — chosen to match Windows and suojaussiru; tietoturva may be what people expect as a Settings page name.
-- `packages/i18n/glossary/fi.csv` `sandbox`: "hiekkalaatikko" — check it is understood by ordinary users, not only developers.
-- `packages/i18n/glossary/fi.csv` `turn on`, `turn off`: "ottaa käyttöön", "poistaa käytöstä" — check against "kytkeä päälle/pois" for radios and hardware.
+- `packages/i18n/glossary/fi.tbx` `snap`: "telakoida", with "ikkuna-asettelu" and "ikkunaryhmä" — Windows uses kiinnittää for both pin and snap; check that telakoida reads naturally for putting a window into half of the screen.
+- `packages/i18n/glossary/fi.tbx` `board`: "taulu" — a new feature with no established Finnish word; check it isn't confused with a spreadsheet table or a Kanban board.
+- `packages/i18n/glossary/fi.tbx` `tray`: "ilmaisinalue" — Windows' older term for the notification area; check it fits a button that holds background apps.
+- `packages/i18n/glossary/fi.tbx` `security`: "suojaus" — chosen to match Windows and suojaussiru; tietoturva may be what people expect as a Settings page name.
+- `packages/i18n/glossary/fi.tbx` `sandbox`: "hiekkalaatikko" — check it is understood by ordinary users, not only developers.
+- `packages/i18n/glossary/fi.tbx` `turn on`, `turn off`: "ottaa käyttöön", "poistaa käytöstä" — check against "kytkeä päälle/pois" for radios and hardware.
 - `kestrel/ui/locales/fi/shell.ftl` `keys-shift`, `keys-tab`, `keys-space`, `keys-backspace`: "Vaihto", "Sarkain", "Välilyönti", "Askelpalautin" — follow Microsoft's Finnish shortcut names; Finnish keyboards mostly print arrows on these keys, so check that people prefer these to Shift and Tab.
 - `kestrel/ui/locales/fi/shell.ftl` `keys-delete`, `keys-insert`, `keys-home`, `keys-end`, `keys-page-up`, `keys-page-down`, `keys-print-screen`: kept in English as printed on Finnish keyboards — check against the abbreviations (Del, Ins, PgUp, PrtSc) some keyboards print.
 - `kestrel/ui/locales/fi/shell.ftl` `battery-level`: "Akku { $percentage } %, kytketty verkkovirtaan" — the plugged-in state without charging; check that it doesn't suggest charging.

@@ -1,6 +1,6 @@
 # Maltese style guide
 
-How Luft speaks Maltese. The [glossary](../../packages/i18n/glossary/mt.csv) has the agreed terms; Weblate shows them next to every string.
+How Luft speaks Maltese. The [glossary](../../packages/i18n/glossary/mt.tbx) has the agreed terms; Weblate shows them next to every string.
 
 ## Address and tone
 

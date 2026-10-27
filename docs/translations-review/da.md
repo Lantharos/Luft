@@ -4,13 +4,13 @@ Strings in Luft's Danish translation that a native speaker should check: terms w
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/da.csv` `snap`: "docke, docklayout, dockgruppe" — Windows uses »fastgøre« for both snap and pin; check whether »docke« reads naturally or another verb is better.
-- `packages/i18n/glossary/da.csv` `board`: "tavle" — check it reads as the endless-canvas mode, not a whiteboard app.
-- `packages/i18n/glossary/da.csv` `notification`: "notifikation" — chosen over Windows' »meddelelse«; check it feels right throughout the desktop.
-- `packages/i18n/glossary/da.csv` `tray`: "systembakke" — Windows' Danish label differs; check it is understood.
-- `packages/i18n/glossary/da.csv` `Power saver`: "Strømbesparelse" — Windows' Danish power modes use longer phrases; check it sits well next to the other modes.
-- `packages/i18n/glossary/da.csv` `App Store`: "Appbutik" — generic name of Schelf; check against »App Store«-style usage people know.
-- `packages/i18n/glossary/da.csv` `sign in`: "log ind / log ud" — chosen over Windows' »log på / log af«.
+- `packages/i18n/glossary/da.tbx` `snap`: "docke, docklayout, dockgruppe" — Windows uses »fastgøre« for both snap and pin; check whether »docke« reads naturally or another verb is better.
+- `packages/i18n/glossary/da.tbx` `board`: "tavle" — check it reads as the endless-canvas mode, not a whiteboard app.
+- `packages/i18n/glossary/da.tbx` `notification`: "notifikation" — chosen over Windows' »meddelelse«; check it feels right throughout the desktop.
+- `packages/i18n/glossary/da.tbx` `tray`: "systembakke" — Windows' Danish label differs; check it is understood.
+- `packages/i18n/glossary/da.tbx` `Power saver`: "Strømbesparelse" — Windows' Danish power modes use longer phrases; check it sits well next to the other modes.
+- `packages/i18n/glossary/da.tbx` `App Store`: "Appbutik" — generic name of Schelf; check against »App Store«-style usage people know.
+- `packages/i18n/glossary/da.tbx` `sign in`: "log ind / log ud" — chosen over Windows' »log på / log af«.
 - `kestrel/ui/locales/da/shell.ftl` `keys-backspace`: "Tilbage" — Danish keyboards print an arrow; check whether »Backspace« is the more familiar shortcut label.
 - `kestrel/ui/locales/da/shell.ftl` `keys-shift`: "Skift" — Microsoft's Danish name; check it against what keyboards and people use.
 - `packages/web/ui/locales/da/ui.ftl` `ui-fingerprint-retry`: "Det kunne ikke aflæses ordentligt. Prøv igen." — check it sounds natural.

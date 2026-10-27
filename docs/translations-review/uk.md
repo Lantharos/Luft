@@ -4,19 +4,19 @@ Strings in Luft's Ukrainian translation that a native speaker should check, each
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/uk.csv` `Settings`: "Параметри" — GNOME, macOS and Windows 10 use it, Windows 11 and Android say "Налаштування"/"Настройки"; check it reads naturally in phrases like "Параметри дисплея".
-- `packages/i18n/glossary/uk.csv` `app`: "програма" — what Windows, macOS and GNOME say; "застосунок" is the newer word many Ukrainian apps use. Check which one readers expect today.
-- `packages/i18n/glossary/uk.csv` `Install Luft`: "Встановлення Luft" — a noun like Windows' installer; check it reads as an app name next to "Диски".
-- `packages/i18n/glossary/uk.csv` `Start`: "Пуск" — Windows' name; check it doesn't read dated next to the rest of Luft.
-- `packages/i18n/glossary/uk.csv` `board`: "дошка" — no established term for this canvas mode; check it doesn't read as a whiteboard or notice board.
-- `packages/i18n/glossary/uk.csv` `snap`: "прикріпити" — next to "закріпити" for pin; check the two stay distinct for readers.
-- `packages/i18n/glossary/uk.csv` `tray`: "системний лоток" — KDE's word; Windows users may expect "область сповіщень".
-- `packages/i18n/glossary/uk.csv` `Keep awake`: "Не засинати" — no settled term; check it reads naturally as a tile label.
-- `packages/i18n/glossary/uk.csv` `suspend`: "Сплячий режим" — long for a power menu item; "Сон" is the shorter option.
-- `packages/i18n/glossary/uk.csv` `shut down`: "Вимкнути" — the same word as turn off; Windows says "Завершити роботу".
-- `packages/i18n/glossary/uk.csv` `undo`: "скасувати" — collides with Cancel; "Повернути" is the fallback where both appear.
-- `packages/i18n/glossary/uk.csv` `signed startup`: "підписаний запуск" — no established term; check it doesn't read oddly next to Secure Boot.
-- `packages/i18n/glossary/uk.csv` `security chip`: "процесор безпеки" — Windows' name for the TPM, though it is a chip; check people recognize it.
+- `packages/i18n/glossary/uk.tbx` `Settings`: "Параметри" — GNOME, macOS and Windows 10 use it, Windows 11 and Android say "Налаштування"/"Настройки"; check it reads naturally in phrases like "Параметри дисплея".
+- `packages/i18n/glossary/uk.tbx` `app`: "програма" — what Windows, macOS and GNOME say; "застосунок" is the newer word many Ukrainian apps use. Check which one readers expect today.
+- `packages/i18n/glossary/uk.tbx` `Install Luft`: "Встановлення Luft" — a noun like Windows' installer; check it reads as an app name next to "Диски".
+- `packages/i18n/glossary/uk.tbx` `Start`: "Пуск" — Windows' name; check it doesn't read dated next to the rest of Luft.
+- `packages/i18n/glossary/uk.tbx` `board`: "дошка" — no established term for this canvas mode; check it doesn't read as a whiteboard or notice board.
+- `packages/i18n/glossary/uk.tbx` `snap`: "прикріпити" — next to "закріпити" for pin; check the two stay distinct for readers.
+- `packages/i18n/glossary/uk.tbx` `tray`: "системний лоток" — KDE's word; Windows users may expect "область сповіщень".
+- `packages/i18n/glossary/uk.tbx` `Keep awake`: "Не засинати" — no settled term; check it reads naturally as a tile label.
+- `packages/i18n/glossary/uk.tbx` `suspend`: "Сплячий режим" — long for a power menu item; "Сон" is the shorter option.
+- `packages/i18n/glossary/uk.tbx` `shut down`: "Вимкнути" — the same word as turn off; Windows says "Завершити роботу".
+- `packages/i18n/glossary/uk.tbx` `undo`: "скасувати" — collides with Cancel; "Повернути" is the fallback where both appear.
+- `packages/i18n/glossary/uk.tbx` `signed startup`: "підписаний запуск" — no established term; check it doesn't read oddly next to Secure Boot.
+- `packages/i18n/glossary/uk.tbx` `security chip`: "процесор безпеки" — Windows' name for the TPM, though it is a chip; check people recognize it.
 - `packages/web/ui/locales/uk/ui.ftl` `ui-fingerprint-place`: "Прикладіть { $finger } до сканера." — relies on .inline being accusative, which equals the nominative for every finger name; check it reads naturally.
 - `packages/web/ui/locales/uk/ui.ftl` `ui-media-pause`: "Пауза" — a noun among infinitive buttons, as media players usually label it; "Призупинити" is the alternative.
 - `packages/web/ui/locales/uk/ui.ftl` `ui-select-placeholder`: "Вибрати" — placeholder of an empty dropdown; check whether "Не вибрано" reads better.

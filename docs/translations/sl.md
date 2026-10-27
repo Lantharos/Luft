@@ -1,6 +1,6 @@
 # Slovenian style guide
 
-How Luft speaks Slovenian. The [glossary](../../packages/i18n/glossary/sl.csv) has the agreed terms; Weblate shows them next to every string.
+How Luft speaks Slovenian. The [glossary](../../packages/i18n/glossary/sl.tbx) has the agreed terms; Weblate shows them next to every string.
 
 ## Address and tone
 

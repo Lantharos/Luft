@@ -1,6 +1,6 @@
 # Norwegian Bokmål style guide
 
-How Luft speaks Norwegian Bokmål. The [glossary](../../packages/i18n/glossary/nb.csv) has the agreed terms; Weblate shows them next to every string.
+How Luft speaks Norwegian Bokmål. The [glossary](../../packages/i18n/glossary/nb.tbx) has the agreed terms; Weblate shows them next to every string.
 
 ## Address and tone
 

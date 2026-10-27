@@ -4,15 +4,15 @@ Strings in Luft's Norwegian Bokmål translation that a native speaker should che
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/nb.csv` `snap`: "dokke, dokkeoppsett, dokkegruppe" — Windows uses «feste» for both snap and pin; check whether «dokke» reads naturally or another verb is better.
-- `packages/i18n/glossary/nb.csv` `board`: "tavle" — check it reads as the endless-canvas mode, not a whiteboard app.
-- `packages/i18n/glossary/nb.csv` `tray`: "systemstatusfelt" — Windows' name for the notification area; check it is understood for a button that holds background apps.
-- `packages/i18n/glossary/nb.csv` `sign in`: "logge inn / logge ut", noun «pålogging» — chosen over Windows' «logge på / logge av»; check the mix with «påloggingsskjerm» feels natural.
-- `packages/i18n/glossary/nb.csv` `notification`: "varsel, plural varsler" — check against «varsling», which some apps use.
-- `packages/i18n/glossary/nb.csv` `Media Viewer`: "Medievisning" — generic name of Magpie; check whether «Mediefremviser» or another name is more familiar.
-- `packages/i18n/glossary/nb.csv` `USB stick`: "minnepinne" — check against «USB-pinne» in installer contexts.
-- `packages/i18n/glossary/nb.csv` `accent color`: "aksentfarge" — Windows says «uthevingsfarge»; check which people know better.
-- `packages/i18n/glossary/nb.csv` `passkey`: "tilgangsnøkkel" — Apple uses «passnøkkel»; check which is more widespread.
+- `packages/i18n/glossary/nb.tbx` `snap`: "dokke, dokkeoppsett, dokkegruppe" — Windows uses «feste» for both snap and pin; check whether «dokke» reads naturally or another verb is better.
+- `packages/i18n/glossary/nb.tbx` `board`: "tavle" — check it reads as the endless-canvas mode, not a whiteboard app.
+- `packages/i18n/glossary/nb.tbx` `tray`: "systemstatusfelt" — Windows' name for the notification area; check it is understood for a button that holds background apps.
+- `packages/i18n/glossary/nb.tbx` `sign in`: "logge inn / logge ut", noun «pålogging» — chosen over Windows' «logge på / logge av»; check the mix with «påloggingsskjerm» feels natural.
+- `packages/i18n/glossary/nb.tbx` `notification`: "varsel, plural varsler" — check against «varsling», which some apps use.
+- `packages/i18n/glossary/nb.tbx` `Media Viewer`: "Medievisning" — generic name of Magpie; check whether «Mediefremviser» or another name is more familiar.
+- `packages/i18n/glossary/nb.tbx` `USB stick`: "minnepinne" — check against «USB-pinne» in installer contexts.
+- `packages/i18n/glossary/nb.tbx` `accent color`: "aksentfarge" — Windows says «uthevingsfarge»; check which people know better.
+- `packages/i18n/glossary/nb.tbx` `passkey`: "tilgangsnøkkel" — Apple uses «passnøkkel»; check which is more widespread.
 - `kestrel/ui/locales/nb/shell.ftl` `keys-backspace`: "Tilbake" — Norwegian keyboards print an arrow; check whether «Backspace» is the more familiar shortcut label.
 - `packages/web/ui/locales/nb/ui.ftl` `ui-fingerprint-retry`: "Det ble ikke lest skikkelig. Prøv igjen." — check it sounds natural.
 - `packages/web/ui/locales/nb/ui.ftl` `ui-media-unmute`: "Slå på lyd" — check it is clear next to «Demp».

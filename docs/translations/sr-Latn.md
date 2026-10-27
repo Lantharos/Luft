@@ -1,6 +1,6 @@
 # Serbian (Latin) style guide
 
-Serbian in Latin script follows the [Serbian style guide](sr.md) in everything: address, tone, button forms, plurals and the decisions on terms. The [glossary](../../packages/i18n/glossary/sr-Latn.csv) is the Serbian one in Latin script.
+Serbian in Latin script follows the [Serbian style guide](sr.md) in everything: address, tone, button forms, plurals and the decisions on terms. The [glossary](../../packages/i18n/glossary/sr-Latn.tbx) is the Serbian one in Latin script.
 
 ## One text, two scripts
 

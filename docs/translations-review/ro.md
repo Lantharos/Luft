@@ -4,14 +4,14 @@ Strings in Luft's Romanian translation that a native speaker should check. Each 
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/ro.csv` `snap`: "andoca", snap layout "aranjament de andocare" — Windows' Romanian term for snapping is unclear to me; check it's natural and doesn't clash with pin ("fixa").
-- `packages/i18n/glossary/ro.csv` `tray`: "tava de sistem" — Windows 11 calls this area something else; check it's understood.
-- `packages/i18n/glossary/ro.csv` `board`: "tablă" — no settled term; check it reads as a canvas of windows, not a table.
-- `packages/i18n/glossary/ro.csv` `sign in`: "conecta" — follows Windows, but clashes with connecting to a network or device; "autentifica" is the alternative.
-- `packages/i18n/glossary/ro.csv` `Keyring`: "Portchei" — macOS's word; GNOME's Romanian term may differ.
-- `packages/i18n/glossary/ro.csv` `undo`: "Anulează" — the same button text as Cancel; check that's acceptable where both can appear.
-- `packages/i18n/glossary/ro.csv` `Install Luft`: "Instalează Luft" — imperative as an app name; "Instalare Luft" is the noun alternative.
-- `packages/i18n/glossary/ro.csv` `Keep awake`: "Menține activ" — check it reads as keeping the screen on.
+- `packages/i18n/glossary/ro.tbx` `snap`: "andoca", snap layout "aranjament de andocare" — Windows' Romanian term for snapping is unclear to me; check it's natural and doesn't clash with pin ("fixa").
+- `packages/i18n/glossary/ro.tbx` `tray`: "tava de sistem" — Windows 11 calls this area something else; check it's understood.
+- `packages/i18n/glossary/ro.tbx` `board`: "tablă" — no settled term; check it reads as a canvas of windows, not a table.
+- `packages/i18n/glossary/ro.tbx` `sign in`: "conecta" — follows Windows, but clashes with connecting to a network or device; "autentifica" is the alternative.
+- `packages/i18n/glossary/ro.tbx` `Keyring`: "Portchei" — macOS's word; GNOME's Romanian term may differ.
+- `packages/i18n/glossary/ro.tbx` `undo`: "Anulează" — the same button text as Cancel; check that's acceptable where both can appear.
+- `packages/i18n/glossary/ro.tbx` `Install Luft`: "Instalează Luft" — imperative as an app name; "Instalare Luft" is the noun alternative.
+- `packages/i18n/glossary/ro.tbx` `Keep awake`: "Menține activ" — check it reads as keeping the screen on.
 - `packages/web/ui/locales/ro/ui.ftl` `ui-finger-right-index`: "Arătătorul drept" — articulated finger names used as titles; check they read well in a list.
 - `packages/web/ui/locales/ro/ui.ftl` `ui-split-windows-size`: "{ $size }, ocupat: { $used }" — rephrased to avoid agreement with the size; check it reads naturally.
 - `packages/web/ui/locales/ro/ui.ftl` `ui-recovery-key-saved`: "Salvată" — feminine to agree with "cheie"; check it's clear on its own.

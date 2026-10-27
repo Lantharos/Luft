@@ -4,14 +4,14 @@ Strings in Luft's Brazilian Portuguese translation that a native speaker should 
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/pt-BR.csv` `app`: "app" — chosen over Windows' "aplicativo" for length; check it reads naturally on the Settings page "Apps" and in running text.
-- `packages/i18n/glossary/pt-BR.csv` `tray`: "bandeja do sistema" — Windows 11 in Brazil mostly says "área de notificação" or "estouro do canto da barra de tarefas"; check the better-known word.
-- `packages/i18n/glossary/pt-BR.csv` `snap`: "ajustar", "layout de ajuste", "grupo de ajuste" — Windows' terms; check they don't read as "adjust" out of context.
-- `packages/i18n/glossary/pt-BR.csv` `board`: "quadro" — no settled term; check it suggests a canvas of windows rather than a picture frame.
-- `packages/i18n/glossary/pt-BR.csv` `Keep awake`: "Manter ativo" — check it is clear that the screen stays on.
-- `packages/i18n/glossary/pt-BR.csv` `sandbox`: "sandbox" (feminine) — usage varies between "a sandbox" and "o sandbox".
-- `packages/i18n/glossary/pt-BR.csv` `login screen`: "tela de login" — Windows says "tela de entrada"; check which reads better.
-- `packages/i18n/glossary/pt-BR.csv` `Start`: "Start" — kept as a name; Brazilians know Windows' "Iniciar", so check that "menu Start" doesn't feel odd.
+- `packages/i18n/glossary/pt-BR.tbx` `app`: "app" — chosen over Windows' "aplicativo" for length; check it reads naturally on the Settings page "Apps" and in running text.
+- `packages/i18n/glossary/pt-BR.tbx` `tray`: "bandeja do sistema" — Windows 11 in Brazil mostly says "área de notificação" or "estouro do canto da barra de tarefas"; check the better-known word.
+- `packages/i18n/glossary/pt-BR.tbx` `snap`: "ajustar", "layout de ajuste", "grupo de ajuste" — Windows' terms; check they don't read as "adjust" out of context.
+- `packages/i18n/glossary/pt-BR.tbx` `board`: "quadro" — no settled term; check it suggests a canvas of windows rather than a picture frame.
+- `packages/i18n/glossary/pt-BR.tbx` `Keep awake`: "Manter ativo" — check it is clear that the screen stays on.
+- `packages/i18n/glossary/pt-BR.tbx` `sandbox`: "sandbox" (feminine) — usage varies between "a sandbox" and "o sandbox".
+- `packages/i18n/glossary/pt-BR.tbx` `login screen`: "tela de login" — Windows says "tela de entrada"; check which reads better.
+- `packages/i18n/glossary/pt-BR.tbx` `Start`: "Start" — kept as a name; Brazilians know Windows' "Iniciar", so check that "menu Start" doesn't feel odd.
 - `packages/web/ui/locales/pt-BR/ui.ftl` `ui-recovery-key-saved`: "Salva" — feminine to agree with "chave"; check it reads well alone on the button.
 - `packages/web/ui/locales/pt-BR/ui.ftl` `ui-fingerprint-place`: "Coloque o { $finger } no sensor." — every .inline finger name is masculine; check the sentence with "polegar" and "dedo mínimo".
 - `packages/web/ui/locales/pt-BR/ui.ftl` `ui-time-just-now`: "agora mesmo" — lowercase because it may follow other text; check where it shows.

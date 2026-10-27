@@ -4,13 +4,13 @@ Strings in Luft's Czech translation that a native speaker should check: term cho
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/cs.csv` `board`: "tabule" — no established Czech term for this feature; check that tabule reads naturally next to plátno for the canvas.
-- `packages/i18n/glossary/cs.csv` `workspace`: "pracovní prostor" — GNOME uses pracovní plocha; chosen to avoid confusion with plocha (desktop). Check it's understood.
-- `packages/i18n/glossary/cs.csv` `tray`: "oznamovací oblast" — Windows' classic term, though the button holds background apps rather than notifications.
-- `packages/i18n/glossary/cs.csv` `Keep awake`: "Nevypínat obrazovku" — long for a Quick settings tile; check whether a shorter form fits.
-- `packages/i18n/glossary/cs.csv` `sandbox`: "izolované prostředí" — some readers may know only the English sandbox.
-- `packages/i18n/glossary/cs.csv` `wallpaper`: "tapeta" — Windows and GNOME say pozadí; tapeta follows macOS and phones.
-- `packages/i18n/glossary/cs.csv` `USB stick`: "flash disk" — check against jednotka USB flash used by Windows.
+- `packages/i18n/glossary/cs.tbx` `board`: "tabule" — no established Czech term for this feature; check that tabule reads naturally next to plátno for the canvas.
+- `packages/i18n/glossary/cs.tbx` `workspace`: "pracovní prostor" — GNOME uses pracovní plocha; chosen to avoid confusion with plocha (desktop). Check it's understood.
+- `packages/i18n/glossary/cs.tbx` `tray`: "oznamovací oblast" — Windows' classic term, though the button holds background apps rather than notifications.
+- `packages/i18n/glossary/cs.tbx` `Keep awake`: "Nevypínat obrazovku" — long for a Quick settings tile; check whether a shorter form fits.
+- `packages/i18n/glossary/cs.tbx` `sandbox`: "izolované prostředí" — some readers may know only the English sandbox.
+- `packages/i18n/glossary/cs.tbx` `wallpaper`: "tapeta" — Windows and GNOME say pozadí; tapeta follows macOS and phones.
+- `packages/i18n/glossary/cs.tbx` `USB stick`: "flash disk" — check against jednotka USB flash used by Windows.
 - `packages/web/ui/locales/cs/ui.ftl` `ui-fingerprint-place`: "Dotkněte se snímače { $finger }." — .inline finger names are in the instrumental so they fit both this and the swipe sentence; check it reads naturally for placing a finger.
 - `packages/web/ui/locales/cs/ui.ftl` `ui-toast-dismiss`: "Zavřít" — dismissing a notification bubble; Skrýt would also work.
 - `apps/settings/locales/cs/settings.ftl` `settings-subpage-back`: "Zpět na stránku { $page }" — the page title stays in the nominative as an apposition; check it doesn't sound stiff to screen-reader users.

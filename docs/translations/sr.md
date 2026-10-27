@@ -1,6 +1,6 @@
 # Serbian style guide
 
-How Luft speaks Serbian. The [glossary](../../packages/i18n/glossary/sr.csv) has the agreed terms; Weblate shows them next to every string. This guide covers both scripts: `sr` is Cyrillic, `sr-Latn` is Latin.
+How Luft speaks Serbian. The [glossary](../../packages/i18n/glossary/sr.tbx) has the agreed terms; Weblate shows them next to every string. This guide covers both scripts: `sr` is Cyrillic, `sr-Latn` is Latin.
 
 ## Script
 

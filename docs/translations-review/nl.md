@@ -4,15 +4,15 @@ Strings in Luft's Dutch translation that a native speaker should check: terms wh
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/nl.csv` `board`: "board" — kept as a loanword (het board); check whether it reads naturally or whether "bord" or "canvas" would be better.
-- `packages/i18n/glossary/nl.csv` `workspace`: "werkblad" — GNOME's word; Windows says "bureaublad", which Luft already uses for the desktop. Check that werkblad is understood.
-- `packages/i18n/glossary/nl.csv` `snap`, `snap layout`, `snap group`: "uitlijnen", "uitlijnindeling", "uitlijngroep" — meant to follow Windows 11; verify against current Windows wording.
-- `packages/i18n/glossary/nl.csv` `lock screen`, `login screen`: "vergrendelscherm", "aanmeldscherm" — shorter than Windows' vergrendelingsscherm and aanmeldingsscherm; check that neither reads as a mistake.
-- `packages/i18n/glossary/nl.csv` `Keyring`: "sleutelbos" — GNOME's word; check it isn't too playful next to Apple's "sleutelhanger".
-- `packages/i18n/glossary/nl.csv` `Wi-Fi`, `USB stick`: "wifi", "usb-stick" — Groene Boekje spelling; Windows writes Wi-Fi and USB. Check the lowercase forms look right in the interface.
-- `packages/i18n/glossary/nl.csv` `App Store`: "Appstore" — one word as Dutch compounds go; check it isn't read as Apple's store.
-- `packages/i18n/glossary/nl.csv` `Media Viewer`: "Mediaviewer" — loanword; "Mediaweergave" is the alternative.
-- `packages/i18n/glossary/nl.csv` `done`: "Klaar" — macOS; Windows uses "Gereed".
+- `packages/i18n/glossary/nl.tbx` `board`: "board" — kept as a loanword (het board); check whether it reads naturally or whether "bord" or "canvas" would be better.
+- `packages/i18n/glossary/nl.tbx` `workspace`: "werkblad" — GNOME's word; Windows says "bureaublad", which Luft already uses for the desktop. Check that werkblad is understood.
+- `packages/i18n/glossary/nl.tbx` `snap`, `snap layout`, `snap group`: "uitlijnen", "uitlijnindeling", "uitlijngroep" — meant to follow Windows 11; verify against current Windows wording.
+- `packages/i18n/glossary/nl.tbx` `lock screen`, `login screen`: "vergrendelscherm", "aanmeldscherm" — shorter than Windows' vergrendelingsscherm and aanmeldingsscherm; check that neither reads as a mistake.
+- `packages/i18n/glossary/nl.tbx` `Keyring`: "sleutelbos" — GNOME's word; check it isn't too playful next to Apple's "sleutelhanger".
+- `packages/i18n/glossary/nl.tbx` `Wi-Fi`, `USB stick`: "wifi", "usb-stick" — Groene Boekje spelling; Windows writes Wi-Fi and USB. Check the lowercase forms look right in the interface.
+- `packages/i18n/glossary/nl.tbx` `App Store`: "Appstore" — one word as Dutch compounds go; check it isn't read as Apple's store.
+- `packages/i18n/glossary/nl.tbx` `Media Viewer`: "Mediaviewer" — loanword; "Mediaweergave" is the alternative.
+- `packages/i18n/glossary/nl.tbx` `done`: "Klaar" — macOS; Windows uses "Gereed".
 - `packages/web/settings-pages/locales/nl/pages.ftl` `settings-page-appearance`: "Uiterlijk" — GNOME and KDE; macOS says "Weergave". Check which Dutch users expect.
 - `packages/web/settings-pages/locales/nl/pages.ftl` `settings-page-about`: "Info" — follows Windows and macOS; "Over" is the alternative.
 - `packages/web/ui/locales/nl/ui.ftl` `ui-select-placeholder`: "Selecteren" — dropdown placeholder; "Kies een optie" may read better if space allows.

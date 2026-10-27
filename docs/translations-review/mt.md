@@ -4,19 +4,19 @@ Strings in Luft's Maltese translation that a native speaker should check: places
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/mt.csv` `Start`: "Start" — older Windows packs said "Bidu"/"Ibda"; check that keeping Start, with "il-menù Start" in sentences, feels right.
-- `packages/i18n/glossary/mt.csv` `Settings`: "Settings" — kept in English as Windows in Maltese does, used with the plural article (is-Settings, fis-Settings); check the plural agreement reads naturally.
-- `packages/i18n/glossary/mt.csv` `workspace`: "spazju tax-xogħol" — Windows keeps "workspace" or says "desktop virtwali"; check the Maltese phrase is clear.
-- `packages/i18n/glossary/mt.csv` `Keyring`: "Ċurkett taċ-ċwievet" — a literal key ring; check it is understood as a store of passwords, or whether "Keyring" should stay English.
-- `packages/i18n/glossary/mt.csv` `Media Viewer`: "Viewer tal-midja" — no settled Maltese word for a viewer; check against alternatives such as "Wiri tal-midja".
-- `packages/i18n/glossary/mt.csv` `App Store`: "Store tal-apps" — follows Microsoft Store; "Ħanut tal-apps" is the Maltese alternative.
-- `packages/i18n/glossary/mt.csv` `screenshot`: "screenshot" — Windows says "klipp tal-iskrin"; chosen because it is what people say.
-- `packages/i18n/glossary/mt.csv` `Do Not Disturb`: "Tiddisturbax" — check it works as a switch name in sentences ("ixgħel Tiddisturbax").
-- `packages/i18n/glossary/mt.csv` `shut down`: "Itfi" — the same word as turn off; check the power menu doesn't feel ambiguous next to "Irristartja" and "Sospensjoni".
-- `packages/i18n/glossary/mt.csv` `unpin`: "neħħi" — the same verb as remove; check "Neħħi mit-taskbar" is clear enough.
-- `packages/i18n/glossary/mt.csv` `unlock`: "żblokka" — chosen to keep "iftaħ" for open; check it pairs naturally with "sakkar".
-- `packages/i18n/glossary/mt.csv` `folder`: "fowlder" — Windows' spelling; check it isn't felt as odd next to the English "folder".
-- `packages/i18n/glossary/mt.csv` `taskbar`: "taskbar", masculine — check the gender people use (it-taskbar huwa / hija).
+- `packages/i18n/glossary/mt.tbx` `Start`: "Start" — older Windows packs said "Bidu"/"Ibda"; check that keeping Start, with "il-menù Start" in sentences, feels right.
+- `packages/i18n/glossary/mt.tbx` `Settings`: "Settings" — kept in English as Windows in Maltese does, used with the plural article (is-Settings, fis-Settings); check the plural agreement reads naturally.
+- `packages/i18n/glossary/mt.tbx` `workspace`: "spazju tax-xogħol" — Windows keeps "workspace" or says "desktop virtwali"; check the Maltese phrase is clear.
+- `packages/i18n/glossary/mt.tbx` `Keyring`: "Ċurkett taċ-ċwievet" — a literal key ring; check it is understood as a store of passwords, or whether "Keyring" should stay English.
+- `packages/i18n/glossary/mt.tbx` `Media Viewer`: "Viewer tal-midja" — no settled Maltese word for a viewer; check against alternatives such as "Wiri tal-midja".
+- `packages/i18n/glossary/mt.tbx` `App Store`: "Store tal-apps" — follows Microsoft Store; "Ħanut tal-apps" is the Maltese alternative.
+- `packages/i18n/glossary/mt.tbx` `screenshot`: "screenshot" — Windows says "klipp tal-iskrin"; chosen because it is what people say.
+- `packages/i18n/glossary/mt.tbx` `Do Not Disturb`: "Tiddisturbax" — check it works as a switch name in sentences ("ixgħel Tiddisturbax").
+- `packages/i18n/glossary/mt.tbx` `shut down`: "Itfi" — the same word as turn off; check the power menu doesn't feel ambiguous next to "Irristartja" and "Sospensjoni".
+- `packages/i18n/glossary/mt.tbx` `unpin`: "neħħi" — the same verb as remove; check "Neħħi mit-taskbar" is clear enough.
+- `packages/i18n/glossary/mt.tbx` `unlock`: "żblokka" — chosen to keep "iftaħ" for open; check it pairs naturally with "sakkar".
+- `packages/i18n/glossary/mt.tbx` `folder`: "fowlder" — Windows' spelling; check it isn't felt as odd next to the English "folder".
+- `packages/i18n/glossary/mt.tbx` `taskbar`: "taskbar", masculine — check the gender people use (it-taskbar huwa / hija).
 - `packages/web/ui/locales/mt/ui.ftl` `ui-finger-*` `.inline`: "s-saba’ l-werrej tal-lemin" … — written without the euphonic i because both sentences put it after a verb ending in a vowel (Poġġi, Għaddi); check all ten read well in both sentences.
 - `packages/web/ui/locales/mt/ui.ftl` `ui-finger-right-thumb`: "Is-saba’ l-kbir tal-lemin" — check "saba’ l-kbir" is the usual word for thumb here.
 - `packages/web/ui/locales/mt/ui.ftl` `ui-media-play` / `ui-media-pause`: "Doqq" / "Pawża" — a verb next to a noun, as media players commonly label them; check they feel natural.

@@ -1,6 +1,6 @@
 # Irish style guide
 
-How Luft speaks Irish. The [glossary](../../packages/i18n/glossary/ga.csv) has the agreed terms; Weblate shows them next to every string. Luft follows An Caighdeán Oifigiúil, with the terminology of téarma.ie and of Microsoft's Irish localisation.
+How Luft speaks Irish. The [glossary](../../packages/i18n/glossary/ga.tbx) has the agreed terms; Weblate shows them next to every string. Luft follows An Caighdeán Oifigiúil, with the terminology of téarma.ie and of Microsoft's Irish localisation.
 
 ## Address and tone
 

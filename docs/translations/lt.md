@@ -1,6 +1,6 @@
 # Lithuanian style guide
 
-How Luft speaks Lithuanian. The [glossary](../../packages/i18n/glossary/lt.csv) has the agreed terms; Weblate shows them next to every string.
+How Luft speaks Lithuanian. The [glossary](../../packages/i18n/glossary/lt.tbx) has the agreed terms; Weblate shows them next to every string.
 
 ## Address and tone
 

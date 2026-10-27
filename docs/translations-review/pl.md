@@ -4,14 +4,14 @@ Strings in Luft's Polish translation that a native speaker should check, each li
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/pl.csv` `board`: "tablica" — no established Polish term for this canvas mode; check it doesn't read as a whiteboard or notice board.
-- `packages/i18n/glossary/pl.csv` `Night light`: "Oświetlenie nocne" — Windows' term, longer than GNOME's "Nocne światło"; check it fits a Quick settings tile.
-- `packages/i18n/glossary/pl.csv` `Keep awake`: "Nie usypiaj" — no settled term; check it reads naturally as a tile label.
-- `packages/i18n/glossary/pl.csv` `security chip`: "procesor zabezpieczeń" — Windows' name for the TPM, though it is technically a chip, not a processor; check people recognize it.
-- `packages/i18n/glossary/pl.csv` `Keyring`: "pęk kluczy" — macOS' term for Keychain; GNOME users may know "baza kluczy".
-- `packages/i18n/glossary/pl.csv` `signed startup`: "podpisane uruchamianie" — no established term; check it doesn't read oddly next to Secure Boot.
-- `packages/i18n/glossary/pl.csv` `security`: "bezpieczeństwo" — Windows names its page "Zabezpieczenia"; check which reads better as the Settings page name.
-- `packages/i18n/glossary/pl.csv` `remove`, `delete`: both "usunąć" — Polish has no common pair; check the cases where both appear on one screen.
+- `packages/i18n/glossary/pl.tbx` `board`: "tablica" — no established Polish term for this canvas mode; check it doesn't read as a whiteboard or notice board.
+- `packages/i18n/glossary/pl.tbx` `Night light`: "Oświetlenie nocne" — Windows' term, longer than GNOME's "Nocne światło"; check it fits a Quick settings tile.
+- `packages/i18n/glossary/pl.tbx` `Keep awake`: "Nie usypiaj" — no settled term; check it reads naturally as a tile label.
+- `packages/i18n/glossary/pl.tbx` `security chip`: "procesor zabezpieczeń" — Windows' name for the TPM, though it is technically a chip, not a processor; check people recognize it.
+- `packages/i18n/glossary/pl.tbx` `Keyring`: "pęk kluczy" — macOS' term for Keychain; GNOME users may know "baza kluczy".
+- `packages/i18n/glossary/pl.tbx` `signed startup`: "podpisane uruchamianie" — no established term; check it doesn't read oddly next to Secure Boot.
+- `packages/i18n/glossary/pl.tbx` `security`: "bezpieczeństwo" — Windows names its page "Zabezpieczenia"; check which reads better as the Settings page name.
+- `packages/i18n/glossary/pl.tbx` `remove`, `delete`: both "usunąć" — Polish has no common pair; check the cases where both appear on one screen.
 - `packages/web/ui/locales/pl/ui.ftl` `ui-fingerprint-place`: "Przyłóż { $finger } do czytnika." — relies on .inline being accusative, which equals the nominative for every finger name; check it reads naturally.
 - `packages/web/ui/locales/pl/ui.ftl` `ui-toast-dismiss`: "Odrzuć" — Windows' word for dismissing a notification; "Zamknij" is the alternative.
 - `apps/settings/locales/pl/settings.ftl` `settings-subpage-back`: "Wróć do strony { $page }" — $page stays in the nominative after "strony"; check it reads well with titles like "Zasilanie i bateria".

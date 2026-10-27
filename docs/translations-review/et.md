@@ -5,16 +5,16 @@ Strings in Luft's Estonian translation that a native speaker should check. Each 
 ## Terms and shared strings
 
 - Every string: the move from teie to sina and from parool to salasõna was done by machine; read the whole translation once for verb forms and case endings.
-- `packages/i18n/glossary/et.csv` `notification`: "teavitus" — Windows uses "teatis", phones often "märguanne"; check which reads most natural.
-- `packages/i18n/glossary/et.csv` `snap`, `snap layout`, `snap group`: "paigutama", "paigutusmall", "paigutusrühm" — no settled Estonian term known; check against Windows 11's Estonian name for Snap layouts.
-- `packages/i18n/glossary/et.csv` `tray`: "süsteemisalv" — check whether Windows' current Estonian term is better known.
-- `packages/i18n/glossary/et.csv` `workspace`: "tööala" — check against GNOME's Estonian term.
-- `packages/i18n/glossary/et.csv` `board`: "tahvel" — Luft-specific mode; check it reads as a canvas of windows and not a tablet.
-- `packages/i18n/glossary/et.csv` `App Store`: "Rakendusepood" — "Rakenduste pood" is also common; check the spelling as one word.
-- `packages/i18n/glossary/et.csv` `Install Luft`: "Lufti installimine" — check the genitive without apostrophe and the noun form as an app name.
-- `packages/i18n/glossary/et.csv` `Night light`: "Öövalgus" — check against Windows' current Estonian name.
-- `packages/i18n/glossary/et.csv` `Do Not Disturb`: "Ära sega" — Windows may say "Mitte segada"; check.
-- `packages/i18n/glossary/et.csv` `Power saver`: "Energiasääst" — check it fits next to the other power modes.
+- `packages/i18n/glossary/et.tbx` `notification`: "teavitus" — Windows uses "teatis", phones often "märguanne"; check which reads most natural.
+- `packages/i18n/glossary/et.tbx` `snap`, `snap layout`, `snap group`: "paigutama", "paigutusmall", "paigutusrühm" — no settled Estonian term known; check against Windows 11's Estonian name for Snap layouts.
+- `packages/i18n/glossary/et.tbx` `tray`: "süsteemisalv" — check whether Windows' current Estonian term is better known.
+- `packages/i18n/glossary/et.tbx` `workspace`: "tööala" — check against GNOME's Estonian term.
+- `packages/i18n/glossary/et.tbx` `board`: "tahvel" — Luft-specific mode; check it reads as a canvas of windows and not a tablet.
+- `packages/i18n/glossary/et.tbx` `App Store`: "Rakendusepood" — "Rakenduste pood" is also common; check the spelling as one word.
+- `packages/i18n/glossary/et.tbx` `Install Luft`: "Lufti installimine" — check the genitive without apostrophe and the noun form as an app name.
+- `packages/i18n/glossary/et.tbx` `Night light`: "Öövalgus" — check against Windows' current Estonian name.
+- `packages/i18n/glossary/et.tbx` `Do Not Disturb`: "Ära sega" — Windows may say "Mitte segada"; check.
+- `packages/i18n/glossary/et.tbx` `Power saver`: "Energiasääst" — check it fits next to the other power modes.
 - `docs/translations/et.md` Typography: inner quotes ‚…‘ — check against current EKI recommendation.
 - `packages/web/ui/locales/et/ui.ftl` `ui-fingerprint-place`: "Aseta oma { $finger } andurile." — relies on the imperative object being nominative; check it reads naturally with every finger name.
 - `packages/web/ui/locales/et/ui.ftl` `ui-finger-right-little`: "Parem väike sõrm" — "väikesõrm" is also used; check.

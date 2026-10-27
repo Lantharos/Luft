@@ -4,15 +4,15 @@ Strings in Luft's Slovenian translation that a native speaker should check: term
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/sl.csv` `snap`: "zaskočiti", with "postavitev oken" and "skupina oken" — check what Windows 11 in Slovenian calls Snap and snap layouts; pripeti had to stay free for pin.
-- `packages/i18n/glossary/sl.csv` `tray`: "sistemska vrstica" — the Luft tray is a single taskbar button, so vrstica may read oddly; consider "skrite ikone" or "sistemski pladenj".
-- `packages/i18n/glossary/sl.csv` `board`: "tabla" — no established term; check that it reads naturally for an endless canvas of windows.
-- `packages/i18n/glossary/sl.csv` `Night light`: "Nočna svetloba" — confirm against Windows 11 in Slovenian, which may say "Nočna lučka".
-- `packages/i18n/glossary/sl.csv` `Keep awake`: "Ohrani budnost" — no established term; check it fits a quick settings tile.
-- `packages/i18n/glossary/sl.csv` `Media Viewer`: "Pregledovalnik medijev" — GNOME and KDE sometimes say predstavnost; check which people know better.
-- `packages/i18n/glossary/sl.csv` `notification center`: "središče za obvestila" — Windows has used both središče and center; confirm the current one.
-- `packages/i18n/glossary/sl.csv` `emoji`: "emodži" — check that this spelling is preferred over emoji in Slovenian software.
-- `packages/i18n/glossary/sl.csv` `firmware`: "vdelana programska oprema" — long for labels; check whether a shorter form is acceptable where space is tight.
+- `packages/i18n/glossary/sl.tbx` `snap`: "zaskočiti", with "postavitev oken" and "skupina oken" — check what Windows 11 in Slovenian calls Snap and snap layouts; pripeti had to stay free for pin.
+- `packages/i18n/glossary/sl.tbx` `tray`: "sistemska vrstica" — the Luft tray is a single taskbar button, so vrstica may read oddly; consider "skrite ikone" or "sistemski pladenj".
+- `packages/i18n/glossary/sl.tbx` `board`: "tabla" — no established term; check that it reads naturally for an endless canvas of windows.
+- `packages/i18n/glossary/sl.tbx` `Night light`: "Nočna svetloba" — confirm against Windows 11 in Slovenian, which may say "Nočna lučka".
+- `packages/i18n/glossary/sl.tbx` `Keep awake`: "Ohrani budnost" — no established term; check it fits a quick settings tile.
+- `packages/i18n/glossary/sl.tbx` `Media Viewer`: "Pregledovalnik medijev" — GNOME and KDE sometimes say predstavnost; check which people know better.
+- `packages/i18n/glossary/sl.tbx` `notification center`: "središče za obvestila" — Windows has used both središče and center; confirm the current one.
+- `packages/i18n/glossary/sl.tbx` `emoji`: "emodži" — check that this spelling is preferred over emoji in Slovenian software.
+- `packages/i18n/glossary/sl.tbx` `firmware`: "vdelana programska oprema" — long for labels; check whether a shorter form is acceptable where space is tight.
 - `docs/translations/sl.md` Address and tone: says macOS uses vi in Slovenian — confirm how Apple's Slovenian addresses the reader.
 - `apps/settings/locales/sl/settings.ftl` `settings-subpage-back`: "Nazaj na stran { $page }" — stran keeps the page name in the nominative; check it reads naturally for every panel.
 - `packages/web/settings-pages/locales/sl/pages.ftl` `settings-page-about`: "O sistemu" — Windows says Vizitka; check which fits a Settings sidebar better.

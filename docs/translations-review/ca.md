@@ -4,15 +4,15 @@ Strings in Luft’s Catalan translation that a native speaker should check: term
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/ca.csv` `Start`: "Inici" — translated as in Catalan Windows; check it doesn’t clash with Inici as the Home key name in shortcut labels.
-- `packages/i18n/glossary/ca.csv` `snap layout`: "disposició d’ajust" — check what Catalan Windows 11 calls snap layouts and snap groups; no settled term elsewhere.
-- `packages/i18n/glossary/ca.csv` `board`: "tauler" — no established term in other systems.
-- `packages/i18n/glossary/ca.csv` `Keep awake`: "Mantén actiu" — masculine, implying the computer; check it reads right as a Quick settings tile that keeps the screen on.
-- `packages/i18n/glossary/ca.csv` `Install Luft`: "Instal·la Luft" — imperative like a button; check it works as an app name, or whether «Instal·lació de Luft» reads better.
-- `packages/i18n/glossary/ca.csv` `signed startup`: "arrencada signada" — no settled term.
-- `packages/i18n/glossary/ca.csv` `sandbox`: "entorn aïllat" — Softcatalà also uses «entorn de proves»; check which is clearer next to Accés complet.
-- `packages/i18n/glossary/ca.csv` `USB stick`: "memòria USB" — Windows says «unitat flaix USB»; check the everyday word.
-- `packages/i18n/glossary/ca.csv` `Power saver`: "Estalvi d’energia" — check it doesn’t read as Windows’ «Estalvi de bateria», a different feature.
+- `packages/i18n/glossary/ca.tbx` `Start`: "Inici" — translated as in Catalan Windows; check it doesn’t clash with Inici as the Home key name in shortcut labels.
+- `packages/i18n/glossary/ca.tbx` `snap layout`: "disposició d’ajust" — check what Catalan Windows 11 calls snap layouts and snap groups; no settled term elsewhere.
+- `packages/i18n/glossary/ca.tbx` `board`: "tauler" — no established term in other systems.
+- `packages/i18n/glossary/ca.tbx` `Keep awake`: "Mantén actiu" — masculine, implying the computer; check it reads right as a Quick settings tile that keeps the screen on.
+- `packages/i18n/glossary/ca.tbx` `Install Luft`: "Instal·la Luft" — imperative like a button; check it works as an app name, or whether «Instal·lació de Luft» reads better.
+- `packages/i18n/glossary/ca.tbx` `signed startup`: "arrencada signada" — no settled term.
+- `packages/i18n/glossary/ca.tbx` `sandbox`: "entorn aïllat" — Softcatalà also uses «entorn de proves»; check which is clearer next to Accés complet.
+- `packages/i18n/glossary/ca.tbx` `USB stick`: "memòria USB" — Windows says «unitat flaix USB»; check the everyday word.
+- `packages/i18n/glossary/ca.tbx` `Power saver`: "Estalvi d’energia" — check it doesn’t read as Windows’ «Estalvi de bateria», a different feature.
 - `docs/translations/ca.md` address: vós in running text with tu imperatives on buttons follows Softcatalà, while Catalan Windows and macOS now use tu throughout; check the mix still reads natural.
 - `packages/web/ui/locales/ca/ui.ftl` `ui-select-placeholder`: "Trieu" — short vós imperative in a dropdown; check it doesn’t look abrupt.
 - `packages/web/ui/locales/ca/ui.ftl` `ui-recovery-key-saved`: "Desada" — feminine, agreeing with clau; check it’s only ever shown next to the recovery key.

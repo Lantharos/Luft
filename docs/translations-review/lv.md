@@ -4,14 +4,14 @@ Strings in Luft's Latvian translation that a native speaker should check: terms 
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/lv.csv` `board`: "tāfele" — no settled term for an endless window canvas; check it reads naturally next to "darbvieta"
-- `packages/i18n/glossary/lv.csv` `tray`: "sistēmas tekne" — Windows has used both this and "paziņojumu apgabals"; confirm which Latvian users know
-- `packages/i18n/glossary/lv.csv` `accent color`: "akcenta krāsa" — check against the current Windows Latvian term ("izcēluma krāsa" is also seen)
-- `packages/i18n/glossary/lv.csv` `Keep awake`: "Neaizmigt" — no OS precedent; check it reads as a quick settings tile
-- `packages/i18n/glossary/lv.csv` `Keyring`: "atslēgu saišķis" — GNOME's term as remembered; confirm against current GNOME Latvian
-- `packages/i18n/glossary/lv.csv` `signed startup`: "parakstīta startēšana" — no settled term; matches "startēšana" used for the computer starting elsewhere, "parakstīta sāknēšana" is an alternative
-- `packages/i18n/glossary/lv.csv` `shut down`: "izslēgt" — same word as turn off; check no screen needs both side by side
-- `packages/i18n/glossary/lv.csv` `firmware`: "aparātprogrammatūra" — long; check it fits in labels
+- `packages/i18n/glossary/lv.tbx` `board`: "tāfele" — no settled term for an endless window canvas; check it reads naturally next to "darbvieta"
+- `packages/i18n/glossary/lv.tbx` `tray`: "sistēmas tekne" — Windows has used both this and "paziņojumu apgabals"; confirm which Latvian users know
+- `packages/i18n/glossary/lv.tbx` `accent color`: "akcenta krāsa" — check against the current Windows Latvian term ("izcēluma krāsa" is also seen)
+- `packages/i18n/glossary/lv.tbx` `Keep awake`: "Neaizmigt" — no OS precedent; check it reads as a quick settings tile
+- `packages/i18n/glossary/lv.tbx` `Keyring`: "atslēgu saišķis" — GNOME's term as remembered; confirm against current GNOME Latvian
+- `packages/i18n/glossary/lv.tbx` `signed startup`: "parakstīta startēšana" — no settled term; matches "startēšana" used for the computer starting elsewhere, "parakstīta sāknēšana" is an alternative
+- `packages/i18n/glossary/lv.tbx` `shut down`: "izslēgt" — same word as turn off; check no screen needs both side by side
+- `packages/i18n/glossary/lv.tbx` `firmware`: "aparātprogrammatūra" — long; check it fits in labels
 - `packages/web/ui/locales/lv/ui.ftl` `ui-fingerprint-swipe`: "Pārvelciet ar { $finger } pāri sensoram." — relies on the .inline accusative doubling as the instrumental after "ar"
 - `packages/web/ui/locales/lv/ui.ftl` `ui-split-space`: "Vieta sistēmai Luft" — added "sistēmai" so Luft needn't decline; check it isn't too stiff
 - `apps/settings/locales/lv/settings.ftl` `settings-subpage-back`: "Atpakaļ: { $page }" — avoids declining the page name after "uz"; check it sounds right to screen-reader users

@@ -4,17 +4,17 @@ Strings in Luft's Nynorsk translation that a native speaker should check: terms 
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/nn.csv` `snap`: "dokke, dokkingsoppsett, dokkingsgruppe" — Windows uses «feste» for both snap and pin; check «dokke» reads naturally for windows and doesn't suggest «doll».
-- `packages/i18n/glossary/nn.csv` `notification`: "varsling, varslingar" — chosen over «varsel» (same form in singular and plural); check it feels right throughout the desktop.
-- `packages/i18n/glossary/nn.csv` `tray`: "systemfelt" — Norwegian Windows says «systemstatusfelt»; check the shorter word is understood.
-- `packages/i18n/glossary/nn.csv` `board`: "tavle" — check it reads as the endless-canvas mode, not a whiteboard app.
-- `packages/i18n/glossary/nn.csv` `File Manager`: "Filhandsamar" — KDE's word; check against GNOME's plain «Filer».
-- `packages/i18n/glossary/nn.csv` `Text Editor`: "Tekstredigerar" — check against «Tekstredigering» or «Skriveprogram».
-- `packages/i18n/glossary/nn.csv` `accessibility`: "Tilgjenge" — KDE's word; check it is understood as accessibility rather than access.
-- `packages/i18n/glossary/nn.csv` `security`: "tryggleik" — chosen over «sikkerheit»; check it suits technical contexts like Secure Boot and encryption.
-- `packages/i18n/glossary/nn.csv` `keyboard shortcut`: "snarveg" — check it is clear next to file shortcuts; «tastatursnarveg» is the fallback.
-- `packages/i18n/glossary/nn.csv` `passkey`: "tilgangsnøkkel" — Apple says «passnøkkel» in Norwegian; check which people know.
-- `packages/i18n/glossary/nn.csv` `search`: "søkje" — the norm also allows «søke»; the guide picks the classic -je forms (leggje, setje, søkje), check that's the preferred house style.
+- `packages/i18n/glossary/nn.tbx` `snap`: "dokke, dokkingsoppsett, dokkingsgruppe" — Windows uses «feste» for both snap and pin; check «dokke» reads naturally for windows and doesn't suggest «doll».
+- `packages/i18n/glossary/nn.tbx` `notification`: "varsling, varslingar" — chosen over «varsel» (same form in singular and plural); check it feels right throughout the desktop.
+- `packages/i18n/glossary/nn.tbx` `tray`: "systemfelt" — Norwegian Windows says «systemstatusfelt»; check the shorter word is understood.
+- `packages/i18n/glossary/nn.tbx` `board`: "tavle" — check it reads as the endless-canvas mode, not a whiteboard app.
+- `packages/i18n/glossary/nn.tbx` `File Manager`: "Filhandsamar" — KDE's word; check against GNOME's plain «Filer».
+- `packages/i18n/glossary/nn.tbx` `Text Editor`: "Tekstredigerar" — check against «Tekstredigering» or «Skriveprogram».
+- `packages/i18n/glossary/nn.tbx` `accessibility`: "Tilgjenge" — KDE's word; check it is understood as accessibility rather than access.
+- `packages/i18n/glossary/nn.tbx` `security`: "tryggleik" — chosen over «sikkerheit»; check it suits technical contexts like Secure Boot and encryption.
+- `packages/i18n/glossary/nn.tbx` `keyboard shortcut`: "snarveg" — check it is clear next to file shortcuts; «tastatursnarveg» is the fallback.
+- `packages/i18n/glossary/nn.tbx` `passkey`: "tilgangsnøkkel" — Apple says «passnøkkel» in Norwegian; check which people know.
+- `packages/i18n/glossary/nn.tbx` `search`: "søkje" — the norm also allows «søke»; the guide picks the classic -je forms (leggje, setje, søkje), check that's the preferred house style.
 - `kestrel/ui/locales/nn/shell.ftl` `keys-backspace`: "Tilbaketast" — Norwegian keyboards print an arrow; check whether «Backspace» is the more familiar shortcut label.
 - `kestrel/ui/locales/nn/shell.ftl` `battery-level`: "Batteri { $percentage } %, fullada" — check «fullada» vs «fulladd» for the participle.
 - `packages/web/ui/locales/nn/ui.ftl` `ui-fingerprint-retry`: "Fingeren vart ikkje lesen godt nok. Prøv igjen." — check it sounds natural.

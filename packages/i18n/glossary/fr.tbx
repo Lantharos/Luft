@@ -1,0 +1,1643 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE martif PUBLIC "ISO 12200:1999A//DTD MARTIF core (DXFcdV04)//EN" "TBXcdv04.dtd">
+<martif type="TBX" xml:lang="en">
+  <martifHeader>
+    <fileDesc>
+      <sourceDesc>
+        <p>Luft glossary for fr</p>
+      </sourceDesc>
+    </fileDesc>
+  </martifHeader>
+  <text>
+    <body>
+      <termEntry id="1">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Luft</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Luft</term>
+            <note from="translator">Not translated. Name of the operating system; masculine (le système)</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="2">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Kestrel</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Kestrel</term>
+            <note from="translator">Not translated. Name of Luft's desktop</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="3">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Rover</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Rover</term>
+            <note from="translator">Not translated. App name, the file manager</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="4">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Magpie</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Magpie</term>
+            <note from="translator">Not translated. App name, the viewer for photos, videos, music and PDFs</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="5">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Mailman</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Mailman</term>
+            <note from="translator">Not translated. App name, the mail app</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="6">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Draft</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Draft</term>
+            <note from="translator">Not translated. App name, the text and code editor</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="7">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Tern</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Tern</term>
+            <note from="translator">Not translated. App name, the terminal</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="8">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Schelf</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Schelf</term>
+            <note from="translator">Not translated. App name, the app store</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="9">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Barometer</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Barometer</term>
+            <note from="translator">Not translated. App name, the system monitor</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="10">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Keys</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Keys</term>
+            <note from="translator">Not translated. App name, makes keyboard layouts and input methods</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="11">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Meet Luft</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Meet Luft</term>
+            <note from="translator">Not translated. Name of the Windows app that prepares a PC for Luft</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="12">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Helium</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Helium</term>
+            <note from="translator">Not translated. Name of the default browser</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="13">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Flatpak</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Flatpak</term>
+            <note from="translator">Not translated. App packaging format</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="14">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Secure Boot</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Secure Boot</term>
+            <note from="translator">Not translated. UEFI feature, named this way in every PC's firmware setup</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="15">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>TPM</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>TPM</term>
+            <note from="translator">Not translated. Trusted Platform Module; in the interface usually called the security chip</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="16">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Bluetooth</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Bluetooth</term>
+            <note from="translator">Not translated. Trademark</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="17">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Wi-Fi</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Wi-Fi</term>
+            <note from="translator">Wireless network; masculine (le Wi-Fi)</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="18">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Settings</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Paramètres</term>
+            <note from="translator">App name and the general word for settings; masculine plural, les Paramètres for the app</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="19">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Disks</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Disques</term>
+            <note from="translator">App name for the disk utility</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="20">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Install Luft</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Installer Luft</term>
+            <note from="translator">App name of the installer</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="21">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Network Sign-In</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Connexion au réseau</term>
+            <note from="translator">App that opens the sign-in page of a public Wi-Fi</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="22">
+        <langSet xml:lang="en">
+          <tig>
+            <term>File Manager</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Gestionnaire de fichiers</term>
+            <note from="translator">Generic name of Rover</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="23">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Media Viewer</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Visionneuse multimédia</term>
+            <note from="translator">Generic name of Magpie</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="24">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Mail</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Courrier</term>
+            <note from="translator">Generic name of Mailman</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="25">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Text Editor</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Éditeur de texte</term>
+            <note from="translator">Generic name of Draft</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="26">
+        <langSet xml:lang="en">
+          <tig>
+            <term>App Store</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Boutique d’applications</term>
+            <note from="translator">Generic name of Schelf</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="27">
+        <langSet xml:lang="en">
+          <tig>
+            <term>System Monitor</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Moniteur système</term>
+            <note from="translator">Generic name of Barometer</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="28">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Keyboard Layouts</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Dispositions de clavier</term>
+            <note from="translator">Generic name of Keys</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="29">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Start</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Start</term>
+            <note from="translator">The menu opened with Super or the Luft mark; a name, stays English; masculine, le menu Start</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="30">
+        <langSet xml:lang="en">
+          <tig>
+            <term>board</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>tableau</term>
+            <note from="translator">Mode that lays a workspace's windows side by side on an endless canvas; masculine, plural tableaux</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="31">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Quick settings</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Paramètres rapides</term>
+            <note from="translator">Panel of switches and sliders opened from the status icons; masculine plural</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="32">
+        <langSet xml:lang="en">
+          <tig>
+            <term>notification center</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>centre de notifications</term>
+            <note from="translator">Panel with notifications, media and the calendar, opened from the clock; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="33">
+        <langSet xml:lang="en">
+          <tig>
+            <term>All windows</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Toutes les fenêtres</term>
+            <note from="translator">The task view: every window of a workspace and the workspaces, Super+Tab</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="34">
+        <langSet xml:lang="en">
+          <tig>
+            <term>snap</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>ancrer</term>
+            <note from="translator">verb: put a window into a half, third or quarter of the screen</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="35">
+        <langSet xml:lang="en">
+          <tig>
+            <term>snap layout</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>disposition d’ancrage</term>
+            <note from="translator">One of the arrangements offered by Super+Z; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="36">
+        <langSet xml:lang="en">
+          <tig>
+            <term>snap group</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>groupe d’ancrage</term>
+            <note from="translator">Windows snapped side by side that come back together; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="37">
+        <langSet xml:lang="en">
+          <tig>
+            <term>taskbar</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>barre des tâches</term>
+            <note from="translator">The bar along the bottom of the screen; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="38">
+        <langSet xml:lang="en">
+          <tig>
+            <term>tray</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>barre d’état système</term>
+            <note from="translator">Taskbar button holding the icons of apps running in the background; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="39">
+        <langSet xml:lang="en">
+          <tig>
+            <term>status icons</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>icônes d’état</term>
+            <note from="translator">Taskbar icons for network, sound and battery that open Quick settings; feminine plural</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="40">
+        <langSet xml:lang="en">
+          <tig>
+            <term>lock screen</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>écran de verrouillage</term>
+            <note from="translator">Screen shown while the session is locked; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="41">
+        <langSet xml:lang="en">
+          <tig>
+            <term>login screen</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>écran de connexion</term>
+            <note from="translator">Screen listing the people on the computer before anyone signs in; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="42">
+        <langSet xml:lang="en">
+          <tig>
+            <term>workspace</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>espace de travail</term>
+            <note from="translator">One of up to ten separate desktops; masculine, plural espaces de travail</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="43">
+        <langSet xml:lang="en">
+          <tig>
+            <term>desktop</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>bureau</term>
+            <note from="translator">The background area behind the windows; also the whole desktop environment; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="44">
+        <langSet xml:lang="en">
+          <tig>
+            <term>wallpaper</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>fond d’écran</term>
+            <note from="translator">Picture behind the desktop; masculine, plural fonds d’écran</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="45">
+        <langSet xml:lang="en">
+          <tig>
+            <term>accent color</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>couleur d’accentuation</term>
+            <note from="translator">Color taken from the wallpaper and used for highlights; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="46">
+        <langSet xml:lang="en">
+          <tig>
+            <term>dark style</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Mode sombre</term>
+            <note from="translator">Quick settings tile that switches between light and dark</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="47">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Night light</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Éclairage nocturne</term>
+            <note from="translator">Warmer screen colors in the evening; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="48">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Do Not Disturb</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Ne pas déranger</term>
+            <note from="translator">Holds back notification banners and sounds; masculine (le mode Ne pas déranger)</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="49">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Airplane mode</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Mode avion</term>
+            <note from="translator">Turns off every radio</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="50">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Keep awake</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Maintenir éveillé</term>
+            <note from="translator">Keeps the screen on for a while</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="51">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Power mode</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Mode d’alimentation</term>
+            <note from="translator">Performance, Balanced or Power saver: Performances, Équilibré, Économie d’énergie</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="52">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Power saver</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Économie d’énergie</term>
+            <note from="translator">Power mode</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="53">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Dictation</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Dictée</term>
+            <note from="translator">Typing by speaking; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="54">
+        <langSet xml:lang="en">
+          <tig>
+            <term>clipboard</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>presse-papiers</term>
+            <note from="translator">Holds what was copied; masculine, invariable</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="55">
+        <langSet xml:lang="en">
+          <tig>
+            <term>clipboard history</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>historique du presse-papiers</term>
+            <note from="translator">List of recently copied items, Super+V</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="56">
+        <langSet xml:lang="en">
+          <tig>
+            <term>emoji</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>emoji</term>
+            <note from="translator">noun; masculine, plural emojis</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="57">
+        <langSet xml:lang="en">
+          <tig>
+            <term>screenshot</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>capture d’écran</term>
+            <note from="translator">Picture of the screen; feminine, plural captures d’écran</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="58">
+        <langSet xml:lang="en">
+          <tig>
+            <term>screen recording</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>enregistrement de l’écran</term>
+            <note from="translator">Video of the screen; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="59">
+        <langSet xml:lang="en">
+          <tig>
+            <term>privacy indicator</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>indicateur de confidentialité</term>
+            <note from="translator">Taskbar icon shown while the camera, microphone, location or screen is in use; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="60">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Full access</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Accès complet</term>
+            <note from="translator">Schelf switch that lets a Flatpak app leave its sandbox: all files, clipboard in the background, other apps' windows; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="61">
+        <langSet xml:lang="en">
+          <tig>
+            <term>sandbox</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>bac à sable</term>
+            <note from="translator">Isolation Flatpak apps run in; masculine, plural bacs à sable</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="62">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Keyring</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>trousseau</term>
+            <note from="translator">Luft Keyring, which keeps passwords, tokens and keys; masculine; full name Trousseau de Luft</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="63">
+        <langSet xml:lang="en">
+          <tig>
+            <term>passkey</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>clé d’accès</term>
+            <note from="translator">Sign-in key that replaces a password on websites; feminine, plural clés d’accès</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="64">
+        <langSet xml:lang="en">
+          <tig>
+            <term>recovery key</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>clé de récupération</term>
+            <note from="translator">Long code that unlocks an encrypted disk when the TPM can't; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="65">
+        <langSet xml:lang="en">
+          <tig>
+            <term>security chip</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>puce de sécurité</term>
+            <note from="translator">How the interface names the TPM; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="66">
+        <langSet xml:lang="en">
+          <tig>
+            <term>device encryption</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>chiffrement de l’appareil</term>
+            <note from="translator">Encryption of the whole disk; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="67">
+        <langSet xml:lang="en">
+          <tig>
+            <term>encryption</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>chiffrement</term>
+            <note from="translator">noun; masculine; never cryptage</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="68">
+        <langSet xml:lang="en">
+          <tig>
+            <term>signed startup</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>démarrage signé</term>
+            <note from="translator">Startup where every step is checked against Luft's signature; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="69">
+        <langSet xml:lang="en">
+          <tig>
+            <term>firmware</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>micrologiciel</term>
+            <note from="translator">Software built into the hardware; masculine, plural micrologiciels</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="70">
+        <langSet xml:lang="en">
+          <tig>
+            <term>window</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>fenêtre</term>
+            <note from="translator">noun; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="71">
+        <langSet xml:lang="en">
+          <tig>
+            <term>pin</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>épingler</term>
+            <note from="translator">verb: keep an app on the taskbar or in Start</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="72">
+        <langSet xml:lang="en">
+          <tig>
+            <term>unpin</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>détacher</term>
+            <note from="translator">verb</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="73">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Pin to taskbar</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Épingler à la barre des tâches</term>
+            <note from="translator">Menu item</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="74">
+        <langSet xml:lang="en">
+          <tig>
+            <term>open</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>ouvrir</term>
+            <note from="translator">verb</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="75">
+        <langSet xml:lang="en">
+          <tig>
+            <term>close</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>fermer</term>
+            <note from="translator">verb</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="76">
+        <langSet xml:lang="en">
+          <tig>
+            <term>remove</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>retirer</term>
+            <note from="translator">verb; supprimer is delete</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="77">
+        <langSet xml:lang="en">
+          <tig>
+            <term>delete</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>supprimer</term>
+            <note from="translator">verb</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="78">
+        <langSet xml:lang="en">
+          <tig>
+            <term>turn on</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>activer</term>
+            <note from="translator">verb, for a feature or setting; allumer only for a device such as the screen</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="79">
+        <langSet xml:lang="en">
+          <tig>
+            <term>turn off</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>désactiver</term>
+            <note from="translator">verb, for a feature or setting; éteindre only for a device such as the screen</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="80">
+        <langSet xml:lang="en">
+          <tig>
+            <term>sign in</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>se connecter</term>
+            <note from="translator">verb; noun connexion</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="81">
+        <langSet xml:lang="en">
+          <tig>
+            <term>sign out</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>se déconnecter</term>
+            <note from="translator">verb, also Log out; noun déconnexion</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="82">
+        <langSet xml:lang="en">
+          <tig>
+            <term>restart</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>redémarrer</term>
+            <note from="translator">verb</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="83">
+        <langSet xml:lang="en">
+          <tig>
+            <term>shut down</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>éteindre</term>
+            <note from="translator">verb, also Power off; power menu item Éteindre</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="84">
+        <langSet xml:lang="en">
+          <tig>
+            <term>suspend</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>mettre en veille</term>
+            <note from="translator">verb, also Sleep; power menu item Mettre en veille, the state veille</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="85">
+        <langSet xml:lang="en">
+          <tig>
+            <term>hibernate</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>mettre en veille prolongée</term>
+            <note from="translator">verb and power menu item Mettre en veille prolongée, the state veille prolongée</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="86">
+        <langSet xml:lang="en">
+          <tig>
+            <term>lock</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>verrouiller</term>
+            <note from="translator">verb</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="87">
+        <langSet xml:lang="en">
+          <tig>
+            <term>unlock</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>déverrouiller</term>
+            <note from="translator">verb</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="88">
+        <langSet xml:lang="en">
+          <tig>
+            <term>install</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>installer</term>
+            <note from="translator">verb</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="89">
+        <langSet xml:lang="en">
+          <tig>
+            <term>update</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>mettre à jour</term>
+            <note from="translator">verb</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="90">
+        <langSet xml:lang="en">
+          <tig>
+            <term>updates</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>mises à jour</term>
+            <note from="translator">noun, new versions of Luft or apps; feminine plural; singular la mise à jour</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="91">
+        <langSet xml:lang="en">
+          <tig>
+            <term>cancel</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Annuler</term>
+            <note from="translator">button</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="92">
+        <langSet xml:lang="en">
+          <tig>
+            <term>save</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>enregistrer</term>
+            <note from="translator">verb</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="93">
+        <langSet xml:lang="en">
+          <tig>
+            <term>allow</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>autoriser</term>
+            <note from="translator">verb</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="94">
+        <langSet xml:lang="en">
+          <tig>
+            <term>forget</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>oublier</term>
+            <note from="translator">verb, for a saved network or device, as Windows says</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="95">
+        <langSet xml:lang="en">
+          <tig>
+            <term>share</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>partager</term>
+            <note from="translator">verb</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="96">
+        <langSet xml:lang="en">
+          <tig>
+            <term>search</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>rechercher</term>
+            <note from="translator">verb and noun; noun: recherche</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="97">
+        <langSet xml:lang="en">
+          <tig>
+            <term>set up</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>configurer</term>
+            <note from="translator">verb</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="98">
+        <langSet xml:lang="en">
+          <tig>
+            <term>try again</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Réessayer</term>
+            <note from="translator">button</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="99">
+        <langSet xml:lang="en">
+          <tig>
+            <term>undo</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>annuler</term>
+            <note from="translator">verb; button: Annuler, as in every French editor</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="100">
+        <langSet xml:lang="en">
+          <tig>
+            <term>done</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Terminé</term>
+            <note from="translator">button</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="101">
+        <langSet xml:lang="en">
+          <tig>
+            <term>next</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Suivant</term>
+            <note from="translator">button that moves to the next step</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="102">
+        <langSet xml:lang="en">
+          <tig>
+            <term>app</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>application</term>
+            <note from="translator">noun, also app; feminine, plural applications</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="103">
+        <langSet xml:lang="en">
+          <tig>
+            <term>file</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>fichier</term>
+            <note from="translator">noun; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="104">
+        <langSet xml:lang="en">
+          <tig>
+            <term>folder</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>dossier</term>
+            <note from="translator">noun; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="105">
+        <langSet xml:lang="en">
+          <tig>
+            <term>trash</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>Corbeille</term>
+            <note from="translator">Where deleted files wait; feminine, capitalized as a place name</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="106">
+        <langSet xml:lang="en">
+          <tig>
+            <term>device</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>appareil</term>
+            <note from="translator">noun; masculine; périphérique only for something plugged into the computer</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="107">
+        <langSet xml:lang="en">
+          <tig>
+            <term>disk</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>disque</term>
+            <note from="translator">noun, also drive; masculine; lecteur for a drive you plug in</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="108">
+        <langSet xml:lang="en">
+          <tig>
+            <term>USB stick</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>clé USB</term>
+            <note from="translator">noun; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="109">
+        <langSet xml:lang="en">
+          <tig>
+            <term>computer</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>ordinateur</term>
+            <note from="translator">noun, also PC; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="110">
+        <langSet xml:lang="en">
+          <tig>
+            <term>network</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>réseau</term>
+            <note from="translator">noun; masculine, plural réseaux</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="111">
+        <langSet xml:lang="en">
+          <tig>
+            <term>battery</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>batterie</term>
+            <note from="translator">noun; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="112">
+        <langSet xml:lang="en">
+          <tig>
+            <term>power</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>alimentation</term>
+            <note from="translator">Settings page and button for power; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="113">
+        <langSet xml:lang="en">
+          <tig>
+            <term>display</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>écran</term>
+            <note from="translator">noun, a monitor or built-in screen; also screen; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="114">
+        <langSet xml:lang="en">
+          <tig>
+            <term>sound</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>son</term>
+            <note from="translator">noun, the Settings page and audio in general; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="115">
+        <langSet xml:lang="en">
+          <tig>
+            <term>notification</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>notification</term>
+            <note from="translator">noun; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="116">
+        <langSet xml:lang="en">
+          <tig>
+            <term>keyboard shortcut</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>raccourci clavier</term>
+            <note from="translator">noun; masculine, plural raccourcis clavier</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="117">
+        <langSet xml:lang="en">
+          <tig>
+            <term>keyboard layout</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>disposition du clavier</term>
+            <note from="translator">noun; feminine; disposition de clavier when not about one keyboard</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="118">
+        <langSet xml:lang="en">
+          <tig>
+            <term>input method</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>méthode de saisie</term>
+            <note from="translator">Turns what you type into something else, such as Compose sequences or word choices; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="119">
+        <langSet xml:lang="en">
+          <tig>
+            <term>touchpad</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>pavé tactile</term>
+            <note from="translator">noun; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="120">
+        <langSet xml:lang="en">
+          <tig>
+            <term>privacy</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>confidentialité</term>
+            <note from="translator">noun; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="121">
+        <langSet xml:lang="en">
+          <tig>
+            <term>security</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>sécurité</term>
+            <note from="translator">noun; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="122">
+        <langSet xml:lang="en">
+          <tig>
+            <term>account</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>compte</term>
+            <note from="translator">noun, a user account or online account; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="123">
+        <langSet xml:lang="en">
+          <tig>
+            <term>password</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>mot de passe</term>
+            <note from="translator">noun; masculine, plural mots de passe</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="124">
+        <langSet xml:lang="en">
+          <tig>
+            <term>accessibility</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="fr">
+          <tig>
+            <term>accessibilité</term>
+            <note from="translator">noun; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+    </body>
+  </text>
+</martif>

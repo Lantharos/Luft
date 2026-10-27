@@ -4,14 +4,14 @@ Strings in Luft's Spanish translation that a native speaker should check: terms 
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/es.csv` `Start`: "Inicio" — the brief keeps Start in English, but Spanish Windows says menú Inicio and Start can't inflect; check it doesn't clash with Inicio as the Home key name in shortcut labels.
-- `packages/i18n/glossary/es.csv` `Settings`: "Configuración" — Apple now says Ajustes; check Configuración still reads as the app name and not only as an abstract noun.
-- `packages/i18n/glossary/es.csv` `tray`: "bandeja del sistema" — Windows 11 no longer names it; check it is understood on a taskbar button.
-- `packages/i18n/glossary/es.csv` `board`: "tablero" — no established term in other systems.
-- `packages/i18n/glossary/es.csv` `snap layout`: "diseño de acoplamiento" — Windows' term, but long; check it fits in Super+Z labels.
-- `packages/i18n/glossary/es.csv` `Keep awake`: "Mantener activo" — the screen is feminine; check it reads right as a Quick settings tile.
-- `packages/i18n/glossary/es.csv` `signed startup`: "arranque firmado" — no settled term.
-- `packages/i18n/glossary/es.csv` `computer`: "ordenador" — Spain-only; Windows uses the neutral equipo.
+- `packages/i18n/glossary/es.tbx` `Start`: "Inicio" — the brief keeps Start in English, but Spanish Windows says menú Inicio and Start can't inflect; check it doesn't clash with Inicio as the Home key name in shortcut labels.
+- `packages/i18n/glossary/es.tbx` `Settings`: "Configuración" — Apple now says Ajustes; check Configuración still reads as the app name and not only as an abstract noun.
+- `packages/i18n/glossary/es.tbx` `tray`: "bandeja del sistema" — Windows 11 no longer names it; check it is understood on a taskbar button.
+- `packages/i18n/glossary/es.tbx` `board`: "tablero" — no established term in other systems.
+- `packages/i18n/glossary/es.tbx` `snap layout`: "diseño de acoplamiento" — Windows' term, but long; check it fits in Super+Z labels.
+- `packages/i18n/glossary/es.tbx` `Keep awake`: "Mantener activo" — the screen is feminine; check it reads right as a Quick settings tile.
+- `packages/i18n/glossary/es.tbx` `signed startup`: "arranque firmado" — no settled term.
+- `packages/i18n/glossary/es.tbx` `computer`: "ordenador" — Spain-only; Windows uses the neutral equipo.
 - `packages/web/ui/locales/es/ui.ftl` `ui-recovery-key-saved`: "Guardada" — feminine, agreeing with clave; check it's only ever shown next to the recovery key.
 - `packages/web/ui/locales/es/ui.ftl` `ui-fingerprint-place`: "Coloca el { $finger } en el sensor." — the article sits in the sentence, so every finger's .inline form must be masculine (they all are).
 - `packages/web/ui/locales/es/ui.ftl` `ui-finger-right-middle`: "Dedo corazón derecho" — corazón is Spain's word; Latin America says medio.

@@ -1,0 +1,1643 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE martif PUBLIC "ISO 12200:1999A//DTD MARTIF core (DXFcdV04)//EN" "TBXcdv04.dtd">
+<martif type="TBX" xml:lang="en">
+  <martifHeader>
+    <fileDesc>
+      <sourceDesc>
+        <p>Luft glossary for mt</p>
+      </sourceDesc>
+    </fileDesc>
+  </martifHeader>
+  <text>
+    <body>
+      <termEntry id="1">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Luft</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Luft</term>
+            <note from="translator">Not translated. Name of the operating system; no article, masculine agreement: Luft huwa aġġornat</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="2">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Kestrel</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Kestrel</term>
+            <note from="translator">Not translated. Name of Luft's desktop</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="3">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Rover</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Rover</term>
+            <note from="translator">Not translated. App name, the file manager</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="4">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Magpie</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Magpie</term>
+            <note from="translator">Not translated. App name, the viewer for photos, videos, music and PDFs</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="5">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Mailman</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Mailman</term>
+            <note from="translator">Not translated. App name, the mail app</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="6">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Draft</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Draft</term>
+            <note from="translator">Not translated. App name, the text and code editor</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="7">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Tern</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Tern</term>
+            <note from="translator">Not translated. App name, the terminal</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="8">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Schelf</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Schelf</term>
+            <note from="translator">Not translated. App name, the app store</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="9">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Barometer</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Barometer</term>
+            <note from="translator">Not translated. App name, the system monitor</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="10">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Keys</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Keys</term>
+            <note from="translator">Not translated. App name, makes keyboard layouts and input methods</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="11">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Meet Luft</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Meet Luft</term>
+            <note from="translator">Not translated. Name of the Windows app that prepares a PC for Luft</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="12">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Helium</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Helium</term>
+            <note from="translator">Not translated. Name of the default browser</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="13">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Flatpak</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Flatpak</term>
+            <note from="translator">Not translated. App packaging format</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="14">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Secure Boot</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Secure Boot</term>
+            <note from="translator">Not translated. UEFI feature, named this way in every PC's firmware setup</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="15">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>TPM</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>TPM</term>
+            <note from="translator">Not translated. Trusted Platform Module; in the interface usually called the security chip</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="16">
+        <descrip type="Translation needed">No</descrip>
+        <langSet xml:lang="en">
+          <tig>
+            <term>Bluetooth</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Bluetooth</term>
+            <note from="translator">Not translated. Trademark</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="17">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Wi-Fi</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Wi-Fi</term>
+            <note from="translator">Wireless network; kept as in Windows; masculine, il-Wi-Fi</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="18">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Settings</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Settings</term>
+            <note from="translator">App name and the general word for settings, kept in English as in Windows in Maltese; plural, is-Settings</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="19">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Disks</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Diski</term>
+            <note from="translator">App name for the disk utility; plural of diska</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="20">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Install Luft</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Installa Luft</term>
+            <note from="translator">App name of the installer</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="21">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Network Sign-In</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Dħul fin-netwerk</term>
+            <note from="translator">App that opens the sign-in page of a public Wi-Fi</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="22">
+        <langSet xml:lang="en">
+          <tig>
+            <term>File Manager</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Maniġer tal-fajls</term>
+            <note from="translator">Generic name of Rover</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="23">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Media Viewer</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Viewer tal-midja</term>
+            <note from="translator">Generic name of Magpie</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="24">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Mail</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Posta</term>
+            <note from="translator">Generic name of Mailman</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="25">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Text Editor</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Editur tat-test</term>
+            <note from="translator">Generic name of Draft</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="26">
+        <langSet xml:lang="en">
+          <tig>
+            <term>App Store</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Store tal-apps</term>
+            <note from="translator">Generic name of Schelf; Store as in Microsoft Store</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="27">
+        <langSet xml:lang="en">
+          <tig>
+            <term>System Monitor</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Monitor tas-sistema</term>
+            <note from="translator">Generic name of Barometer</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="28">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Keyboard Layouts</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Tqassim tat-tastiera</term>
+            <note from="translator">Generic name of Keys; tqassim is the same in singular and plural</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="29">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Start</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Start</term>
+            <note from="translator">The menu opened with Super or the Luft mark; a name, not translated; il-menù Start when it needs an article</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="30">
+        <langSet xml:lang="en">
+          <tig>
+            <term>board</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>bord</term>
+            <note from="translator">Mode that lays a workspace's windows side by side on an endless canvas; masculine, il-bord, plural bordijiet</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="31">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Quick settings</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Settings rapidi</term>
+            <note from="translator">Panel of switches and sliders opened from the status icons; plural, is-Settings rapidi</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="32">
+        <langSet xml:lang="en">
+          <tig>
+            <term>notification center</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>ċentru tan-notifiki</term>
+            <note from="translator">Panel with notifications, media and the calendar, opened from the clock; masculine, iċ-ċentru tan-notifiki</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="33">
+        <langSet xml:lang="en">
+          <tig>
+            <term>All windows</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>It-twieqi kollha</term>
+            <note from="translator">The task view: every window of a workspace and the workspaces, Super+Tab</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="34">
+        <langSet xml:lang="en">
+          <tig>
+            <term>snap</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>allinja</term>
+            <note from="translator">verb: put a window into a half, third or quarter of the screen; button form Allinja</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="35">
+        <langSet xml:lang="en">
+          <tig>
+            <term>snap layout</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>tqassim tal-allinjament</term>
+            <note from="translator">One of the arrangements offered by Super+Z; masculine, plural the same</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="36">
+        <langSet xml:lang="en">
+          <tig>
+            <term>snap group</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>grupp ta’ allinjament</term>
+            <note from="translator">Windows snapped side by side that come back together; masculine, plural gruppi ta’ allinjament</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="37">
+        <langSet xml:lang="en">
+          <tig>
+            <term>taskbar</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>taskbar</term>
+            <note from="translator">The bar along the bottom of the screen; kept in English as in Windows; masculine, it-taskbar</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="38">
+        <langSet xml:lang="en">
+          <tig>
+            <term>tray</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>trej tas-sistema</term>
+            <note from="translator">Taskbar button holding the icons of apps running in the background; masculine, it-trej tas-sistema</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="39">
+        <langSet xml:lang="en">
+          <tig>
+            <term>status icons</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>ikoni tal-istatus</term>
+            <note from="translator">Taskbar icons for network, sound and battery that open Quick settings; feminine plural, singular ikona</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="40">
+        <langSet xml:lang="en">
+          <tig>
+            <term>lock screen</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>skrin imsakkar</term>
+            <note from="translator">Screen shown while the session is locked; masculine, l-iskrin imsakkar</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="41">
+        <langSet xml:lang="en">
+          <tig>
+            <term>login screen</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>skrin tad-dħul</term>
+            <note from="translator">Screen listing the people on the computer before anyone signs in; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="42">
+        <langSet xml:lang="en">
+          <tig>
+            <term>workspace</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>spazju tax-xogħol</term>
+            <note from="translator">One of up to ten separate desktops; masculine, plural spazji tax-xogħol</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="43">
+        <langSet xml:lang="en">
+          <tig>
+            <term>desktop</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>desktop</term>
+            <note from="translator">The background area behind the windows; also the whole desktop environment; masculine, id-desktop</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="44">
+        <langSet xml:lang="en">
+          <tig>
+            <term>wallpaper</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>sfond</term>
+            <note from="translator">Picture behind the desktop; masculine, l-isfond, plural sfondi</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="45">
+        <langSet xml:lang="en">
+          <tig>
+            <term>accent color</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>kulur ta’ aċċent</term>
+            <note from="translator">Color taken from the wallpaper and used for highlights; masculine, il-kulur ta’ aċċent</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="46">
+        <langSet xml:lang="en">
+          <tig>
+            <term>dark style</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Modalità skura</term>
+            <note from="translator">Quick settings tile that switches between light and dark; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="47">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Night light</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Dawl ta’ billejl</term>
+            <note from="translator">Warmer screen colors in the evening; masculine, id-dawl ta’ billejl</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="48">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Do Not Disturb</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Tiddisturbax</term>
+            <note from="translator">Holds back notification banners and sounds; a negative imperative used as a name, no article</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="49">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Airplane mode</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Modalità tal-ajruplan</term>
+            <note from="translator">Turns off every radio; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="50">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Keep awake</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Żomm mixgħul</term>
+            <note from="translator">Keeps the screen on for a while</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="51">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Power mode</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Modalità tal-enerġija</term>
+            <note from="translator">Performance, Balanced or Power saver; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="52">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Power saver</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Iffrankar tal-enerġija</term>
+            <note from="translator">Power mode; the others are Prestazzjoni and Bilanċjat</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="53">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Dictation</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Dettatura</term>
+            <note from="translator">Typing by speaking; feminine, id-dettatura</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="54">
+        <langSet xml:lang="en">
+          <tig>
+            <term>clipboard</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>klibbord</term>
+            <note from="translator">Holds what was copied; masculine, il-klibbord</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="55">
+        <langSet xml:lang="en">
+          <tig>
+            <term>clipboard history</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>storja tal-klibbord</term>
+            <note from="translator">List of recently copied items, Super+V; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="56">
+        <langSet xml:lang="en">
+          <tig>
+            <term>emoji</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>emoji</term>
+            <note from="translator">noun; masculine, l-emoji, plural the same</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="57">
+        <langSet xml:lang="en">
+          <tig>
+            <term>screenshot</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>screenshot</term>
+            <note from="translator">Picture of the screen; masculine, plural screenshots</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="58">
+        <langSet xml:lang="en">
+          <tig>
+            <term>screen recording</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>rekordjar tal-iskrin</term>
+            <note from="translator">Video of the screen; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="59">
+        <langSet xml:lang="en">
+          <tig>
+            <term>privacy indicator</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>indikatur tal-privatezza</term>
+            <note from="translator">Taskbar icon shown while the camera, microphone, location or screen is in use; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="60">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Full access</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Aċċess sħiħ</term>
+            <note from="translator">Schelf switch that lets a Flatpak app leave its sandbox: all files, clipboard in the background, other apps' windows; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="61">
+        <langSet xml:lang="en">
+          <tig>
+            <term>sandbox</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>sandbox</term>
+            <note from="translator">Isolation Flatpak apps run in; masculine, is-sandbox</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="62">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Keyring</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Ċurkett taċ-ċwievet</term>
+            <note from="translator">Luft Keyring, which keeps passwords, tokens and keys; masculine, iċ-ċurkett taċ-ċwievet ta’ Luft</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="63">
+        <langSet xml:lang="en">
+          <tig>
+            <term>passkey</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>passkey</term>
+            <note from="translator">Sign-in key that replaces a password on websites; masculine, plural passkeys</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="64">
+        <langSet xml:lang="en">
+          <tig>
+            <term>recovery key</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>ċavetta tal-irkupru</term>
+            <note from="translator">Long code that unlocks an encrypted disk when the TPM can't; feminine, plural ċwievet tal-irkupru</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="65">
+        <langSet xml:lang="en">
+          <tig>
+            <term>security chip</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>ċippa tas-sigurtà</term>
+            <note from="translator">How the interface names the TPM; feminine, iċ-ċippa tas-sigurtà</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="66">
+        <langSet xml:lang="en">
+          <tig>
+            <term>device encryption</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>ċċifrar tal-apparat</term>
+            <note from="translator">Encryption of the whole disk; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="67">
+        <langSet xml:lang="en">
+          <tig>
+            <term>encryption</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>ċċifrar</term>
+            <note from="translator">noun; masculine, iċ-ċċifrar</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="68">
+        <langSet xml:lang="en">
+          <tig>
+            <term>signed startup</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Startjar iffirmat</term>
+            <note from="translator">Startup where every step is checked against Luft's signature; masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="69">
+        <langSet xml:lang="en">
+          <tig>
+            <term>firmware</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>firmware</term>
+            <note from="translator">Software built into the hardware; masculine, il-firmware</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="70">
+        <langSet xml:lang="en">
+          <tig>
+            <term>window</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>tieqa</term>
+            <note from="translator">noun; feminine, it-tieqa, plural twieqi</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="71">
+        <langSet xml:lang="en">
+          <tig>
+            <term>pin</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>waħħal</term>
+            <note from="translator">verb: keep an app on the taskbar or in Start; button form Waħħal</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="72">
+        <langSet xml:lang="en">
+          <tig>
+            <term>unpin</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>neħħi</term>
+            <note from="translator">verb; Neħħi mit-taskbar, Neħħi minn Start</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="73">
+        <langSet xml:lang="en">
+          <tig>
+            <term>Pin to taskbar</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Waħħal mat-taskbar</term>
+            <note from="translator">Menu item</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="74">
+        <langSet xml:lang="en">
+          <tig>
+            <term>open</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>iftaħ</term>
+            <note from="translator">verb; buttons and menu items use the imperative singular, as here</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="75">
+        <langSet xml:lang="en">
+          <tig>
+            <term>close</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>agħlaq</term>
+            <note from="translator">verb</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="76">
+        <langSet xml:lang="en">
+          <tig>
+            <term>remove</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>neħħi</term>
+            <note from="translator">verb</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="77">
+        <langSet xml:lang="en">
+          <tig>
+            <term>delete</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>ħassar</term>
+            <note from="translator">verb; for removing permanently</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="78">
+        <langSet xml:lang="en">
+          <tig>
+            <term>turn on</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>ixgħel</term>
+            <note from="translator">verb, for a feature or setting; attiva for settings that are not switches</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="79">
+        <langSet xml:lang="en">
+          <tig>
+            <term>turn off</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>itfi</term>
+            <note from="translator">verb, for a feature or setting; iddiżattiva for settings that are not switches</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="80">
+        <langSet xml:lang="en">
+          <tig>
+            <term>sign in</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>idħol</term>
+            <note from="translator">verb, also Log in; noun dħul</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="81">
+        <langSet xml:lang="en">
+          <tig>
+            <term>sign out</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>oħroġ</term>
+            <note from="translator">verb, also Log out; noun ħruġ</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="82">
+        <langSet xml:lang="en">
+          <tig>
+            <term>restart</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>irristartja</term>
+            <note from="translator">verb</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="83">
+        <langSet xml:lang="en">
+          <tig>
+            <term>shut down</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>itfi</term>
+            <note from="translator">verb, also Power off; power menu item Itfi</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="84">
+        <langSet xml:lang="en">
+          <tig>
+            <term>suspend</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Sospensjoni</term>
+            <note from="translator">verb and power menu item, also Sleep; menu item Sospensjoni, the state modalità ta’ sospensjoni</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="85">
+        <langSet xml:lang="en">
+          <tig>
+            <term>hibernate</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Ibernazzjoni</term>
+            <note from="translator">verb and power menu item; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="86">
+        <langSet xml:lang="en">
+          <tig>
+            <term>lock</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>sakkar</term>
+            <note from="translator">verb</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="87">
+        <langSet xml:lang="en">
+          <tig>
+            <term>unlock</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>żblokka</term>
+            <note from="translator">verb; iftaħ is open</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="88">
+        <langSet xml:lang="en">
+          <tig>
+            <term>install</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>installa</term>
+            <note from="translator">verb</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="89">
+        <langSet xml:lang="en">
+          <tig>
+            <term>update</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>aġġorna</term>
+            <note from="translator">verb</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="90">
+        <langSet xml:lang="en">
+          <tig>
+            <term>updates</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>aġġornamenti</term>
+            <note from="translator">noun, new versions of Luft or apps; plural; singular aġġornament, masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="91">
+        <langSet xml:lang="en">
+          <tig>
+            <term>cancel</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Ikkanċella</term>
+            <note from="translator">button</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="92">
+        <langSet xml:lang="en">
+          <tig>
+            <term>save</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>issejvja</term>
+            <note from="translator">verb, as in Windows</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="93">
+        <langSet xml:lang="en">
+          <tig>
+            <term>allow</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>ippermetti</term>
+            <note from="translator">verb</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="94">
+        <langSet xml:lang="en">
+          <tig>
+            <term>forget</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>insa</term>
+            <note from="translator">verb, for a saved network or device: Insa n-netwerk</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="95">
+        <langSet xml:lang="en">
+          <tig>
+            <term>share</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>ixxerja</term>
+            <note from="translator">verb</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="96">
+        <langSet xml:lang="en">
+          <tig>
+            <term>search</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>fittex</term>
+            <note from="translator">verb; noun tiftix, masculine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="97">
+        <langSet xml:lang="en">
+          <tig>
+            <term>set up</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>issettja</term>
+            <note from="translator">verb</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="98">
+        <langSet xml:lang="en">
+          <tig>
+            <term>try again</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Erġa’ pprova</term>
+            <note from="translator">button</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="99">
+        <langSet xml:lang="en">
+          <tig>
+            <term>undo</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>erġa’ lura</term>
+            <note from="translator">verb; button: Erġa’ lura</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="100">
+        <langSet xml:lang="en">
+          <tig>
+            <term>done</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Lest</term>
+            <note from="translator">button</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="101">
+        <langSet xml:lang="en">
+          <tig>
+            <term>next</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Li jmiss</term>
+            <note from="translator">button that moves to the next step</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="102">
+        <langSet xml:lang="en">
+          <tig>
+            <term>app</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>app</term>
+            <note from="translator">noun, also application; feminine, l-app, plural apps</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="103">
+        <langSet xml:lang="en">
+          <tig>
+            <term>file</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>fajl</term>
+            <note from="translator">noun; masculine, il-fajl, plural fajls</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="104">
+        <langSet xml:lang="en">
+          <tig>
+            <term>folder</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>fowlder</term>
+            <note from="translator">noun; masculine, il-fowlder, plural fowlders</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="105">
+        <langSet xml:lang="en">
+          <tig>
+            <term>trash</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>barmil</term>
+            <note from="translator">Where deleted files wait; masculine, il-barmil</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="106">
+        <langSet xml:lang="en">
+          <tig>
+            <term>device</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>apparat</term>
+            <note from="translator">noun; masculine, l-apparat, plural apparati</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="107">
+        <langSet xml:lang="en">
+          <tig>
+            <term>disk</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>diska</term>
+            <note from="translator">noun, also drive; feminine, id-diska, plural diski; drajv for a drive you plug in</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="108">
+        <langSet xml:lang="en">
+          <tig>
+            <term>USB stick</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>drajv USB</term>
+            <note from="translator">noun; masculine, plural drajvs USB</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="109">
+        <langSet xml:lang="en">
+          <tig>
+            <term>computer</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>kompjuter</term>
+            <note from="translator">noun, also PC; masculine, il-kompjuter, plural kompjuters</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="110">
+        <langSet xml:lang="en">
+          <tig>
+            <term>network</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>netwerk</term>
+            <note from="translator">noun; masculine, in-netwerk, plural netwerks</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="111">
+        <langSet xml:lang="en">
+          <tig>
+            <term>battery</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>batterija</term>
+            <note from="translator">noun; feminine, il-batterija</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="112">
+        <langSet xml:lang="en">
+          <tig>
+            <term>power</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>Enerġija</term>
+            <note from="translator">Settings page and button for power; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="113">
+        <langSet xml:lang="en">
+          <tig>
+            <term>display</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>skrin</term>
+            <note from="translator">noun, a monitor or built-in screen; also screen; masculine, l-iskrin, plural skrins</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="114">
+        <langSet xml:lang="en">
+          <tig>
+            <term>sound</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>ħoss</term>
+            <note from="translator">noun, the Settings page and audio in general; masculine, il-ħoss</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="115">
+        <langSet xml:lang="en">
+          <tig>
+            <term>notification</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>notifika</term>
+            <note from="translator">noun; feminine, in-notifika, plural notifiki</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="116">
+        <langSet xml:lang="en">
+          <tig>
+            <term>keyboard shortcut</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>shortcut tat-tastiera</term>
+            <note from="translator">noun; masculine, plural shortcuts tat-tastiera; shortcut alone where the keyboard is obvious</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="117">
+        <langSet xml:lang="en">
+          <tig>
+            <term>keyboard layout</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>tqassim tat-tastiera</term>
+            <note from="translator">noun; masculine, plural the same</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="118">
+        <langSet xml:lang="en">
+          <tig>
+            <term>input method</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>metodu tal-input</term>
+            <note from="translator">Turns what you type into something else, such as Compose sequences or word choices; masculine, plural metodi tal-input</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="119">
+        <langSet xml:lang="en">
+          <tig>
+            <term>touchpad</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>touchpad</term>
+            <note from="translator">noun; masculine, it-touchpad</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="120">
+        <langSet xml:lang="en">
+          <tig>
+            <term>privacy</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>privatezza</term>
+            <note from="translator">noun; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="121">
+        <langSet xml:lang="en">
+          <tig>
+            <term>security</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>sigurtà</term>
+            <note from="translator">noun; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="122">
+        <langSet xml:lang="en">
+          <tig>
+            <term>account</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>kont</term>
+            <note from="translator">noun, a user account or online account; masculine, il-kont, plural kontijiet</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="123">
+        <langSet xml:lang="en">
+          <tig>
+            <term>password</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>password</term>
+            <note from="translator">noun; feminine, il-password, plural passwords</note>
+          </tig>
+        </langSet>
+      </termEntry>
+      <termEntry id="124">
+        <langSet xml:lang="en">
+          <tig>
+            <term>accessibility</term>
+          </tig>
+        </langSet>
+        <langSet xml:lang="mt">
+          <tig>
+            <term>aċċessibilità</term>
+            <note from="translator">noun; feminine</note>
+          </tig>
+        </langSet>
+      </termEntry>
+    </body>
+  </text>
+</martif>

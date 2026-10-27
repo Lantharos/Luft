@@ -1,6 +1,6 @@
 # Dutch style guide
 
-How Luft speaks Dutch. The [glossary](../../packages/i18n/glossary/nl.csv) has the agreed terms; Weblate shows them next to every string. The translation is written in the standard Dutch of the Netherlands and avoids words that only one side of the border uses, so it reads naturally in Flanders too.
+How Luft speaks Dutch. The [glossary](../../packages/i18n/glossary/nl.tbx) has the agreed terms; Weblate shows them next to every string. The translation is written in the standard Dutch of the Netherlands and avoids words that only one side of the border uses, so it reads naturally in Flanders too.
 
 ## Address and tone
 

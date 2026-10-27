@@ -4,18 +4,18 @@ Strings in Luft's Russian translation that a native speaker should check, each l
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/ru.csv` `Settings`: "Настройки" — Windows says "Параметры"; chosen because macOS, GNOME and phones say "Настройки". Check that it doesn't feel foreign to Windows switchers.
-- `packages/i18n/glossary/ru.csv` `Start`: "Пуск" — translated as in Windows; check it reads right next to the Luft mark, which is not a Windows logo.
-- `packages/i18n/glossary/ru.csv` `board`: "доска" — no established term for this canvas mode; check it doesn't read as a whiteboard.
-- `packages/i18n/glossary/ru.csv` `snap`, `snap layout`: "прикрепить", "макет прикрепления" — taken from Windows 11; check against current Windows wording and that it isn't confused with "закрепить" (pin).
-- `packages/i18n/glossary/ru.csv` `tray`: "системный трей" — colloquial but widely known; KDE says "системный лоток", Windows avoids a name.
-- `packages/i18n/glossary/ru.csv` `workspace`: "рабочая область" — GNOME and KDE say "рабочий стол", which Luft keeps for the desktop; check it is understood.
-- `packages/i18n/glossary/ru.csv` `Keep awake`: "Не засыпать" — no settled term; check it reads naturally as a tile label.
-- `packages/i18n/glossary/ru.csv` `security chip`: "чип безопасности" — Windows says "процессор безопасности"; check people recognize it.
-- `packages/i18n/glossary/ru.csv` `signed startup`: "подписанная загрузка" — no established term; check it doesn't read oddly next to Secure Boot.
-- `packages/i18n/glossary/ru.csv` `firmware`: "прошивка" — colloquial next to Windows' "встроенное ПО"; check it suits Settings pages.
-- `packages/i18n/glossary/ru.csv` `Media Viewer`: "Просмотр медиафайлов" — no common generic name for a viewer of photos, video, music and PDFs.
-- `packages/i18n/glossary/ru.csv` `remove`, `delete`: both "удалить", with "убрать" when nothing is lost; check screens where both appear.
+- `packages/i18n/glossary/ru.tbx` `Settings`: "Настройки" — Windows says "Параметры"; chosen because macOS, GNOME and phones say "Настройки". Check that it doesn't feel foreign to Windows switchers.
+- `packages/i18n/glossary/ru.tbx` `Start`: "Пуск" — translated as in Windows; check it reads right next to the Luft mark, which is not a Windows logo.
+- `packages/i18n/glossary/ru.tbx` `board`: "доска" — no established term for this canvas mode; check it doesn't read as a whiteboard.
+- `packages/i18n/glossary/ru.tbx` `snap`, `snap layout`: "прикрепить", "макет прикрепления" — taken from Windows 11; check against current Windows wording and that it isn't confused with "закрепить" (pin).
+- `packages/i18n/glossary/ru.tbx` `tray`: "системный трей" — colloquial but widely known; KDE says "системный лоток", Windows avoids a name.
+- `packages/i18n/glossary/ru.tbx` `workspace`: "рабочая область" — GNOME and KDE say "рабочий стол", which Luft keeps for the desktop; check it is understood.
+- `packages/i18n/glossary/ru.tbx` `Keep awake`: "Не засыпать" — no settled term; check it reads naturally as a tile label.
+- `packages/i18n/glossary/ru.tbx` `security chip`: "чип безопасности" — Windows says "процессор безопасности"; check people recognize it.
+- `packages/i18n/glossary/ru.tbx` `signed startup`: "подписанная загрузка" — no established term; check it doesn't read oddly next to Secure Boot.
+- `packages/i18n/glossary/ru.tbx` `firmware`: "прошивка" — colloquial next to Windows' "встроенное ПО"; check it suits Settings pages.
+- `packages/i18n/glossary/ru.tbx` `Media Viewer`: "Просмотр медиафайлов" — no common generic name for a viewer of photos, video, music and PDFs.
+- `packages/i18n/glossary/ru.tbx` `remove`, `delete`: both "удалить", with "убрать" when nothing is lost; check screens where both appear.
 - `packages/web/ui/locales/ru/ui.ftl` `ui-fingerprint-place`: "Прикоснитесь к сканеру { $finger }." — .inline is instrumental ("правым указательным пальцем") so both fingerprint sentences fit it; check the word order reads naturally.
 - `packages/web/ui/locales/ru/ui.ftl` `ui-select-placeholder`: "Выберите" — an instruction rather than the infinitive buttons use; check it fits as a dropdown placeholder.
 - `apps/settings/locales/ru/settings.ftl` `settings-subpage-back`: "Назад: { $page }" — colon form keeps $page in the nominative; check it sounds right to screen-reader users.

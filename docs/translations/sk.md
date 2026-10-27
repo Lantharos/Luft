@@ -1,6 +1,6 @@
 # Slovak style guide
 
-How Luft speaks Slovak. The [glossary](../../packages/i18n/glossary/sk.csv) has the agreed terms; Weblate shows them next to every string.
+How Luft speaks Slovak. The [glossary](../../packages/i18n/glossary/sk.tbx) has the agreed terms; Weblate shows them next to every string.
 
 ## Address and tone
 

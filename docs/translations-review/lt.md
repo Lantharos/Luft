@@ -4,19 +4,19 @@ Strings in Luft's Lithuanian translation that a native speaker should check: ter
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/lt.csv` `Settings`: "Nustatymai" — Windows says "Parametrai"; confirm Nustatymai is what most people expect
-- `packages/i18n/glossary/lt.csv` `Start`: "Pradžia" — follows Windows; check "meniu Pradžia" reads naturally in sentences
-- `packages/i18n/glossary/lt.csv` `board`: "lenta" — no settled term for an endless window canvas; check it reads naturally next to "darbo sritis"
-- `packages/i18n/glossary/lt.csv` `tray`: "sistemos dėklas" — KDE's term; Windows has used "pranešimų sritis"
-- `packages/i18n/glossary/lt.csv` `snap`: "pritraukti" — check against the current Windows 11 Lithuanian term for Snap layouts
-- `packages/i18n/glossary/lt.csv` `Keep awake`: "Neužmigti" — no OS precedent; check it reads as a quick settings tile
-- `packages/i18n/glossary/lt.csv` `Night light`: "Naktinė šviesa" — Windows says "Naktinis apšvietimas"; chosen for length
-- `packages/i18n/glossary/lt.csv` `Keyring`: "raktinė" — GNOME's term as remembered; confirm against current GNOME Lithuanian
-- `packages/i18n/glossary/lt.csv` `firmware`: "programinė aparatinė įranga" — long; check it fits in labels
-- `packages/i18n/glossary/lt.csv` `touchpad`: "jutiklinis kilimėlis" — Windows may say "jutiklinė planšetė"; check which people know
-- `packages/i18n/glossary/lt.csv` `accessibility`: "Prieinamumas" — Windows, Android and iOS say "Pritaikymas neįgaliesiems"; chosen for length
-- `packages/i18n/glossary/lt.csv` `System Monitor`: "Sistemos monitorius" — GNOME may use a different generic name
-- `packages/i18n/glossary/lt.csv` `Media Viewer`: "Medijos žiūryklė" — no settled generic name
+- `packages/i18n/glossary/lt.tbx` `Settings`: "Nustatymai" — Windows says "Parametrai"; confirm Nustatymai is what most people expect
+- `packages/i18n/glossary/lt.tbx` `Start`: "Pradžia" — follows Windows; check "meniu Pradžia" reads naturally in sentences
+- `packages/i18n/glossary/lt.tbx` `board`: "lenta" — no settled term for an endless window canvas; check it reads naturally next to "darbo sritis"
+- `packages/i18n/glossary/lt.tbx` `tray`: "sistemos dėklas" — KDE's term; Windows has used "pranešimų sritis"
+- `packages/i18n/glossary/lt.tbx` `snap`: "pritraukti" — check against the current Windows 11 Lithuanian term for Snap layouts
+- `packages/i18n/glossary/lt.tbx` `Keep awake`: "Neužmigti" — no OS precedent; check it reads as a quick settings tile
+- `packages/i18n/glossary/lt.tbx` `Night light`: "Naktinė šviesa" — Windows says "Naktinis apšvietimas"; chosen for length
+- `packages/i18n/glossary/lt.tbx` `Keyring`: "raktinė" — GNOME's term as remembered; confirm against current GNOME Lithuanian
+- `packages/i18n/glossary/lt.tbx` `firmware`: "programinė aparatinė įranga" — long; check it fits in labels
+- `packages/i18n/glossary/lt.tbx` `touchpad`: "jutiklinis kilimėlis" — Windows may say "jutiklinė planšetė"; check which people know
+- `packages/i18n/glossary/lt.tbx` `accessibility`: "Prieinamumas" — Windows, Android and iOS say "Pritaikymas neįgaliesiems"; chosen for length
+- `packages/i18n/glossary/lt.tbx` `System Monitor`: "Sistemos monitorius" — GNOME may use a different generic name
+- `packages/i18n/glossary/lt.tbx` `Media Viewer`: "Medijos žiūryklė" — no settled generic name
 - `packages/web/ui/locales/lt/ui.ftl` `ui-window-maximize`: "Maksimizuoti" — check against Windows' title bar tooltips ("Padidinti" is also seen); same for "Minimizuoti"
 - `packages/web/ui/locales/lt/ui.ftl` `ui-fingerprint-swipe`: "Perbraukite { $finger } per jutiklį." — check the accusative .inline forms fit this verb as well as "Uždėkite"
 - `packages/web/ui/locales/lt/ui.ftl` `ui-fingerprint-duplicate`: "Šis pirštas skaitytuve jau įrašytas, tikriausiai per Windows ar kitą paskyrą." — check the "per" construction reads naturally

@@ -1,6 +1,6 @@
 # Spanish style guide
 
-How Luft speaks Spanish. The [glossary](../../packages/i18n/glossary/es.csv) has the agreed terms; Weblate shows them next to every string.
+How Luft speaks Spanish. The [glossary](../../packages/i18n/glossary/es.tbx) has the agreed terms; Weblate shows them next to every string.
 
 Luft's Spanish is the Spanish of Spain, kept neutral wherever that costs nothing: no vosotros, no regional slang, and words a reader in Mexico or Argentina understands too. Where Spain has its own everyday word, such as ordenador or ratón, use it.
 

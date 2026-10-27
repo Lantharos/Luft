@@ -4,14 +4,14 @@ Strings in Luft's Greek translation that a native speaker should check: terms wi
 
 ## Terms and shared strings
 
-- `packages/i18n/glossary/el.csv` `snap`: "τακτοποίηση", snap layout "διάταξη παραθύρων", snap group "ομάδα παραθύρων" — check what Greek Windows 11 calls Snap, Snap layouts and Snap groups and whether to follow it.
-- `packages/i18n/glossary/el.csv` `board`: "πίνακας" — the word also means table and painting; check it reads as Luft's canvas mode in context.
-- `packages/i18n/glossary/el.csv` `tray`: "πλαίσιο συστήματος" — KDE's term; check it's understood for a taskbar button holding background apps.
-- `packages/i18n/glossary/el.csv` `Keep awake`: "Παραμονή σε εγρήγορση" — no standard term; check it's natural for a quick settings tile and fits.
-- `packages/i18n/glossary/el.csv` `Network Sign-In`: "Σύνδεση σε δίκτυο" — "σύνδεση" is both sign in and connect; check it doesn't read as just connecting to a network.
-- `packages/i18n/glossary/el.csv` `sandbox`: "απομονωμένο περιβάλλον" — long; check whether "sandbox" in Latin letters is more common among Greek users.
-- `packages/i18n/glossary/el.csv` `Power mode`: "Λειτουργία ενέργειας" — check against Greek Windows' "Λειτουργία παροχής ενέργειας".
-- `packages/i18n/glossary/el.csv` `USB stick`: "στικ USB" — check against "μονάδα flash USB" and the everyday "στικάκι".
+- `packages/i18n/glossary/el.tbx` `snap`: "τακτοποίηση", snap layout "διάταξη παραθύρων", snap group "ομάδα παραθύρων" — check what Greek Windows 11 calls Snap, Snap layouts and Snap groups and whether to follow it.
+- `packages/i18n/glossary/el.tbx` `board`: "πίνακας" — the word also means table and painting; check it reads as Luft's canvas mode in context.
+- `packages/i18n/glossary/el.tbx` `tray`: "πλαίσιο συστήματος" — KDE's term; check it's understood for a taskbar button holding background apps.
+- `packages/i18n/glossary/el.tbx` `Keep awake`: "Παραμονή σε εγρήγορση" — no standard term; check it's natural for a quick settings tile and fits.
+- `packages/i18n/glossary/el.tbx` `Network Sign-In`: "Σύνδεση σε δίκτυο" — "σύνδεση" is both sign in and connect; check it doesn't read as just connecting to a network.
+- `packages/i18n/glossary/el.tbx` `sandbox`: "απομονωμένο περιβάλλον" — long; check whether "sandbox" in Latin letters is more common among Greek users.
+- `packages/i18n/glossary/el.tbx` `Power mode`: "Λειτουργία ενέργειας" — check against Greek Windows' "Λειτουργία παροχής ενέργειας".
+- `packages/i18n/glossary/el.tbx` `USB stick`: "στικ USB" — check against "μονάδα flash USB" and the everyday "στικάκι".
 - `packages/web/ui/locales/el/ui.ftl` `ui-finger-*` `.inline`: "τον δεξιό δείκτη", "το δεξί μικρό δάχτυλο" — the article is part of `.inline`; check it reads well in "Τοποθετήστε { $finger } στον αισθητήρα." and in any later sentence using these forms.
 - `packages/web/ui/locales/el/ui.ftl` `ui-toast-dismiss`: "Απόρριψη" — check whether "Κλείσιμο" is the more natural screen-reader label for closing a notification.
 - `packages/web/ui/locales/el/ui.ftl` `ui-select-placeholder`: "Επιλογή" — check it reads as a prompt in an empty dropdown.

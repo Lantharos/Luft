@@ -1,6 +1,6 @@
 # European Portuguese style guide
 
-How Luft speaks Portuguese as written in Portugal, with the spelling of the 1990 agreement. The [glossary](../../packages/i18n/glossary/pt.csv) has the agreed terms; Weblate shows them next to every string. Brazilian Portuguese is a separate translation (`pt-BR`); never mix the two.
+How Luft speaks Portuguese as written in Portugal, with the spelling of the 1990 agreement. The [glossary](../../packages/i18n/glossary/pt.tbx) has the agreed terms; Weblate shows them next to every string. Brazilian Portuguese is a separate translation (`pt-BR`); never mix the two.
 
 ## Address and tone
 

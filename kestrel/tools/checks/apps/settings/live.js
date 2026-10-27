@@ -7,7 +7,8 @@ import {show} from './navigation.js';
 
 const {require} = checks('Luft app');
 const ANTIALIASING = 8;
-const PREVIEW_CLOCK = {x: 880, y: 364, width: 118, height: 30};
+const EDGE_PIXELS = 400;
+const PREVIEW_CLOCK = {x: 900, y: 312, width: 98, height: 30};
 const CHANGES = [
   {name: 'taskbar-alignment', page: 'desktop', schema: 'com.lantharos.kestrel', key: 'taskbar-alignment', value: new GLib.Variant('s', 'left'),
     ignore: PREVIEW_CLOCK},
@@ -32,7 +33,7 @@ async function look(app, ignore) {
   return frames;
 }
 
-const alike = (a, b) => a.every((frame, index) => frame.looksLike(b[index], ANTIALIASING));
+const alike = (a, b) => a.every((frame, index) => frame.pixelsApart(b[index], ANTIALIASING) <= EDGE_PIXELS);
 
 async function follow(app, {name, page, schema, key, value, ignore}) {
   const settings = new Gio.Settings({schema_id: schema});

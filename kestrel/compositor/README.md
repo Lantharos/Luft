@@ -7,7 +7,8 @@ Kestrel runs on its own build of Mutter 51: the upstream release plus an ordered
 | `upstream.json` | Upstream repository, release and exact base commit |
 | `series` | Patches in the order they apply |
 | `patches/` | The patches, in Git format |
-| `patches.py` | Prepares, exports and checks the series |
+| `patches.py` | Prepares, exports, checks and trials the series, and lists each patch's upstream status |
+| `upstream/` | Patches drafted for Mutter upstream, one folder per merge request |
 | `build.sh` | Builds and installs the patched Mutter for development |
 
 ## Build
@@ -24,7 +25,7 @@ kestrel/compositor/build.sh
 | `kestrel/run/compositor-build` | Build directory |
 | `kestrel/run/mutter-install` | Installed libraries that development sessions load |
 
-What the patches add, editing them, moving to a new Mutter release and the diagnostics logs are in [the compositor reference](../../docs/components/compositor.md).
+What the patches add, editing them, moving to a new Mutter release and the diagnostics logs are in [the compositor reference](../../docs/components/compositor.md). Where each patch stands upstream is in [Upstream patches](../../docs/upstream.md).
 
 ## License
 

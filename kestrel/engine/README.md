@@ -2,7 +2,7 @@
 
 The native half of Kestrel, forked from GNOME Shell 51.0: the St toolkit and the shell's C library on Kestrel's Mutter build. Everything that runs on them, from window management, the lock screen, screenshots and notifications to the panel, Start and quick settings, is TypeScript in [`kestrel/ui`](../ui), bundled into one module that the engine embeds as `resource:///com/lantharos/kestrel/kestrel.js`. The screencast and notification services are bundled from the same tree into their own programs.
 
-See [Kestrel's README](../README.md) for building and how the parts fit together.
+See [Kestrel's README](../README.md) for building and how the parts fit together. `upstream.json` records the GNOME Shell commit it forked from, and `upstream.py` lists GNOME Shell changes since then to the files it still carries, see [Upstream patches](../../docs/upstream.md).
 
 ## D-Bus names
 

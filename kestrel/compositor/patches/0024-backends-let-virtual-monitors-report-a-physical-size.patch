@@ -6,6 +6,8 @@ Subject: [PATCH 24/53] backends: let virtual monitors report a physical size
 --virtual-monitor accepts an optional :WxHmm suffix, such as
 1920x1080:344x194mm, so headless sessions can stand in for laptop
 panels and HiDPI monitors when choosing a default scale.
+
+Upstream-Status: forwardable
 ---
  src/backends/meta-virtual-monitor.h       |  3 ++
  src/backends/native/meta-output-virtual.c |  2 +

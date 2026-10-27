@@ -6,6 +6,8 @@ Subject: [PATCH 12/53] backends: name monitor makers from the hardware
 
 systemd's hardware database already carries the PNP vendor registry, so
 Mutter no longer needs libgnome-desktop for it.
+
+Upstream-Status: forwardable
 ---
  meson.build                                 |  7 -----
  meson.options                               |  5 ---

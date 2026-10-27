@@ -11,6 +11,8 @@ pointer of an exited compositor floating over that frame, and over a
 splash screen that only sets its primary plane. Cursor buffers are now
 removed, which turns the cursor plane off and keeps the primary plane
 and CRTC as they were.
+
+Upstream-Status: forwardable
 ---
  src/backends/native/meta-cursor-renderer-native.c |  7 +++++--
  src/backends/native/meta-drm-buffer-dumb.c        | 13 +++++++------

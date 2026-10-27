@@ -18,6 +18,8 @@ keeps the display at the rate of its mode.
 With com.lantharos.kestrel.diagnostics log-variable-refresh enabled, the
 compositor logs whenever the window covering a display changes, whether
 the refresh rate follows it and why not.
+
+Upstream-Status: luft-only variable refresh policy set by Kestrel's shell; wp_content_type_v1 alone is GNOME/mutter!5328
 ---
  src/compositor/meta-compositor-native.c      |  10 ++
  src/compositor/meta-compositor-native.h      |   3 +

@@ -11,6 +11,8 @@ gnome-settings-daemon's schemas or services. The brightness profile
 request to org.gnome.SettingsDaemon.Power.Screen is removed along with
 the unused optional build dependency, since nothing provides that
 interface anymore.
+
+Upstream-Status: luft-only follows Kestrel's settings service instead of gnome-settings-daemon
 ---
  .../com.lantharos.Settings.NightLight.xml     |   5 +
  .../org.gnome.SettingsDaemon.Color.xml        |   7 --

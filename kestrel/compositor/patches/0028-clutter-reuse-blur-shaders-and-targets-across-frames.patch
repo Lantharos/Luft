@@ -14,6 +14,8 @@ Blur nodes now take their targets from a small pool of idle ones with the
 same size and radius, and give them back when they are freed. Idle targets
 are released after two seconds. Framebuffer blurs share one saturation and
 noise snippet instead of creating it for every blur.
+
+Upstream-Status: forwardable
 ---
  clutter/clutter/clutter-paint-nodes.c | 233 ++++++++++++++++++++------
  1 file changed, 180 insertions(+), 53 deletions(-)

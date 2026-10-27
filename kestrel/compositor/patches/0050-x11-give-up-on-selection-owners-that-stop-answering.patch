@@ -12,6 +12,8 @@ Fail a conversion after five seconds without an answer or an INCR
 chunk, as ICCCM requestors do, when its cancellable is cancelled, and
 as soon as the selection loses its owner or the X11 display shuts
 down. The requestor then gets an error and its fd is closed.
+
+Upstream-Status: forwardable
 ---
  .../meta-x11-selection-input-stream-private.h |   5 +
  src/x11/meta-x11-selection-input-stream.c     | 165 +++++++++++++++++-

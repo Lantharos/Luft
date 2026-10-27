@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Tue, 20 Oct 2026 17:49:41 +0200
+Subject: [PATCH] wayland/text-input: Drop a pending cursor rectangle when
+ focus moves on
+
+A cursor rectangle update waits for the surface's next pre-state-applied
+signal before it is passed to the input method, and only connects to it
+while no update is pending. When focus left the surface before that,
+for example because its window closed, the signal never came and the
+handler ID stayed set, so no text input focused afterwards told the
+input method where its cursor is.
+
+Disconnect the pending update when focus leaves the surface.
+---
+ src/wayland/meta-wayland-text-input.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/wayland/meta-wayland-text-input.c b/src/wayland/meta-wayland-text-input.c
+index ef1866aea..2ed8af261 100644
+--- a/src/wayland/meta-wayland-text-input.c
++++ b/src/wayland/meta-wayland-text-input.c
+@@ -574,6 +574,8 @@ meta_wayland_text_input_set_focus (MetaWaylandTextInput *text_input,
+           reset_text_input_focus (text_input);
+         }
+ 
++      g_clear_signal_handler (&text_input->cursor_update.signal_id,
++                              text_input->surface);
+       wl_list_remove (&text_input->surface_listener.link);
+       text_input->surface = NULL;
+       /* Wayland set_surrounding_text() does not support to set null string

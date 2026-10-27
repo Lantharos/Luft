@@ -15,6 +15,8 @@ A desktop window also never becomes a view's top window. It fills its
 monitor and is opaque, so on a workspace without other windows it would
 otherwise qualify for direct scanout and variable refresh rate, and
 scanning it out would hide the shell's panels and popups drawn above it.
+
+Upstream-Status: luft-only only shells that make Wayland windows desktop windows need it, which GNOME Shell doesn't
 ---
  src/compositor/meta-compositor-view.c |  3 ++-
  src/core/window.c                     | 15 +++++++++------

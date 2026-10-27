@@ -9,6 +9,8 @@ which had just been cleared, so a new offscreen kept linear filtering
 until the actor was painted into it a second time. Text in a label that
 was only painted once came out blurred whenever the label sat at a
 fractional position, and sharp once anything had repainted it.
+
+Upstream-Status: forwardable
 ---
  clutter/clutter/clutter-offscreen-effect.c | 7 +------
  1 file changed, 1 insertion(+), 6 deletions(-)

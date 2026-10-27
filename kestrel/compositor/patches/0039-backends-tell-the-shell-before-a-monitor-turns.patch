@@ -7,6 +7,8 @@ Emit MetaMonitorManager::rotating for each monitor whose transform a new
 configuration changes, before the configuration is applied. The screen
 still shows the old orientation then, so the shell can take a picture of
 it and turn it into the new one instead of the picture jumping.
+
+Upstream-Status: luft-only API for Kestrel's rotation animation
 ---
  src/backends/meta-monitor-manager.c | 65 +++++++++++++++++++++++++++++
  1 file changed, 65 insertions(+)

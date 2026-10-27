@@ -14,6 +14,8 @@ and mapped again, and destroying the object undoes what it asked for.
 
 Sandboxed clients do not see the global, so a sandboxed app cannot hide
 a window from the taskbar or keep it over others.
+
+Upstream-Status: luft-only Kestrel's private kestrel_window_v1 protocol
 ---
  src/meson.build                            |   3 +
  src/wayland/meta-wayland-kestrel-window.c  | 308 +++++++++++++++++++++

@@ -4,6 +4,7 @@ Date: Fri, 25 Sep 2026 01:05:33 +0200
 Subject: [PATCH 01/53] compositor: round window surfaces and preserve native
  shadows
 
+Upstream-Status: luft-only Kestrel's window shape; GNOME leaves corners to clients
 ---
  clutter/clutter/clutter-paint-nodes.c        |  12 +
  clutter/clutter/clutter-paint-nodes.h        |   3 +

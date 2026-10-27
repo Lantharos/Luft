@@ -10,6 +10,8 @@ elsewhere, such as the trees low in a landscape photo.
 
 meta_background_set_focus() places the visible area at a fraction of the
 cropped range on each axis. The default, 0.5, keeps today's centered crop.
+
+Upstream-Status: luft-only API for Kestrel's wallpapers that GNOME Shell has no use for
 ---
  src/compositor/meta-background.c | 56 +++++++++++++++++++++++++++++---
  src/meta/meta-background.h       |  5 +++

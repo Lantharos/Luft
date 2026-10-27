@@ -20,6 +20,8 @@ and partial damage would be relative to an older frame of our own.
 With com.lantharos.kestrel.diagnostics log-direct-scanout enabled, the
 compositor logs when a display starts and stops scanning out a window,
 why it stopped, and how long the desktop took to come back.
+
+Upstream-Status: forwardable without the logging, which reads Kestrel's diagnostics schema
 ---
  src/compositor/compositor-private.h          |   2 +
  src/compositor/compositor.c                  |  33 +++

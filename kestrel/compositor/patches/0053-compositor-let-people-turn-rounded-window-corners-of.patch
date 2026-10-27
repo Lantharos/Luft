@@ -12,6 +12,8 @@ Floating Wayland windows keep the compositor's shadow and outline with
 square corners, since those no longer follow the rounded corners. When
 the setting changes, every window is redrawn and X11 windows are
 reshaped so their shadows follow.
+
+Upstream-Status: luft-only follows Kestrel's rounded corners setting
 ---
  src/compositor/compositor.c                | 35 +++++++++++++
  src/compositor/meta-window-actor-wayland.c |  5 +-

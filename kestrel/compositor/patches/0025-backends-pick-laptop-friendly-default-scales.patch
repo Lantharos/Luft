@@ -9,6 +9,8 @@ such as 133% elsewhere. Aim for 110 DPI on every screen, which gives 150%
 on 13" and 14" laptop panels, 125% on 15" to 17" ones and 100% on 24"
 and 27" monitors, and prefer quarter steps unless a third fits clearly
 better. Scales people chose are stored and never recalculated.
+
+Upstream-Status: luft-only Luft's 110 DPI target; upstream chose lower scales in GNOME/mutter!2880
 ---
  src/backends/meta-monitor.c | 83 ++++++++++++++++++++++---------------
  1 file changed, 49 insertions(+), 34 deletions(-)

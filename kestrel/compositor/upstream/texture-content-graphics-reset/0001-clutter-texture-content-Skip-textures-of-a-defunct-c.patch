@@ -1,0 +1,29 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Thu, 1 Oct 2026 21:14:44 +0200
+Subject: [PATCH] clutter/texture-content: Skip textures of a defunct context
+
+After a graphics reset, a ClutterTextureContent can still hold a
+texture from the context that was replaced until its owner provides a
+new one. That texture's GL name is stale, and in the new context it can
+name an unrelated texture, which was then painted in its place.
+
+Paint nothing until the owner provides a texture from the new context.
+---
+ clutter/clutter/clutter-texture-content.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/clutter/clutter/clutter-texture-content.c b/clutter/clutter/clutter-texture-content.c
+index 837e25564..4ba0cae0e 100644
+--- a/clutter/clutter/clutter-texture-content.c
++++ b/clutter/clutter/clutter-texture-content.c
+@@ -76,6 +76,9 @@ clutter_texture_content_paint_content (ClutterContent      *content,
+   ClutterTextureContent *texture_content = CLUTTER_TEXTURE_CONTENT (content);
+   ClutterPaintNode *node;
+ 
++  if (cogl_context_is_defunct (cogl_texture_get_context (texture_content->texture)))
++    return;
++
+   node = clutter_actor_create_texture_paint_node (actor,
+                                                   texture_content->texture);
+   clutter_paint_node_set_static_name (node, "Texture Content");

@@ -19,6 +19,8 @@ the tap that focuses a field, and never again while the field keeps
 focus. Show the panel for these clients when they enable a text input
 right after a press or touch on the focused surface, and when such a
 press lands on it while their text input is enabled.
+
+Upstream-Status: upstream https://gitlab.gnome.org/GNOME/mutter/-/merge_requests/5367 covers show and hide; the Chromium part is forwardable
 ---
  src/wayland/meta-wayland-text-input.c | 133 +++++++++++++++++---------
  1 file changed, 89 insertions(+), 44 deletions(-)

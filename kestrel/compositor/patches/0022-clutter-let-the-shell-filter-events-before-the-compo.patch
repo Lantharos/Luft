@@ -8,6 +8,8 @@ Add clutter_event_prepend_filter(), which runs a filter ahead of every
 filter added earlier, including Mutter's own. The shell uses it to check
 input it injects at the moment it is delivered, and to drop it when it
 would land somewhere other than the window it was meant for.
+
+Upstream-Status: luft-only API for Kestrel's shell that GNOME Shell has no use for
 ---
  clutter/clutter/clutter-event.c | 57 ++++++++++++++++++++++++++++-----
  clutter/clutter/clutter-event.h |  7 ++++

@@ -14,6 +14,8 @@ half tile has against the screen. xdg-toplevel then reports them as tiled
 and constrained, X11 clients get them through _GTK_EDGE_CONSTRAINTS, and
 everything else that follows edge constraints, such as window corners,
 treats the window as tiled.
+
+Upstream-Status: luft-only API for Kestrel's tiling
 ---
  src/core/window-private.h |  2 ++
  src/core/window.c         | 64 ++++++++++++++++++++++++++++++++++++---

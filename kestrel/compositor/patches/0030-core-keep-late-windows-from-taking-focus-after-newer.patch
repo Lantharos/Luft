@@ -17,6 +17,8 @@ it and asks for attention instead of taking focus.
   fetch them from the X server when presenting without an event.
 - Every new normal window denied focus demands attention, not only those
   the focus window covers.
+
+Upstream-Status: forwardable
 ---
  src/core/display-private.h                |  3 ++
  src/core/display.c                        |  1 +

@@ -23,6 +23,8 @@ the group is untransformed.
 A window placed beyond every monitor keeps its main monitor as the one
 whose scale it follows, so its surfaces stay aligned to whole pixels at
 fractional scales.
+
+Upstream-Status: luft-only Kestrel's board canvas
 ---
  src/compositor/compositor.c                | 44 ++++++++++++++++------
  src/compositor/edge-resistance.c           |  4 ++

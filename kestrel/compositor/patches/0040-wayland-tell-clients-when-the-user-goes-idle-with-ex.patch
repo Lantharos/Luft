@@ -13,6 +13,8 @@ inactivity have no other way to learn the idle time.
 Timeouts are at least a second, and at least ten seconds for sandboxed
 clients, so no client can follow the rhythm of typing from when it goes
 idle and resumes.
+
+Upstream-Status: forwardable
 ---
  src/meson.build                        |   3 +
  src/wayland/meta-wayland-idle-notify.c | 169 +++++++++++++++++++++++++

@@ -4,6 +4,7 @@ Date: Fri, 25 Sep 2026 01:20:45 +0200
 Subject: [PATCH 02/53] wayland: support xdg-toplevel-icon-v1 and expose window
  icons
 
+Upstream-Status: forwardable
 ---
  meson.build                                |   1 +
  src/core/window-icon.c                     |  24 ++

@@ -13,6 +13,8 @@ meta_window_get_target_frame_rect() returns the rectangle most recently
 sent to a Wayland client that has not drawn it yet, and the frame
 rectangle for every other window, so the shell can start moving a
 window toward where it is going at once.
+
+Upstream-Status: luft-only API for Kestrel's window animations
 ---
  src/core/window.c                 | 22 ++++++++++++++++++++++
  src/meta/window.h                 |  4 ++++

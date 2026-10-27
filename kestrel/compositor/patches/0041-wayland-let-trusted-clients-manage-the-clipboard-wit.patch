@@ -15,6 +15,8 @@ without being focused. Clients that are not sandboxed, including Flatpak
 apps with full access, can already read the clipboard through Xwayland,
 so they get the global. Other sandboxed clients get it only when they
 are apps the shell gave the "background-clipboard" permission.
+
+Upstream-Status: forwardable needs a way to keep the global from sandboxed clients
 ---
  src/meson.build                         |   3 +
  src/wayland/meta-wayland-data-control.c | 499 ++++++++++++++++++++++++

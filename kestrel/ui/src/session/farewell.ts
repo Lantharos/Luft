@@ -3,7 +3,10 @@ import Cogl from 'gi://Cogl';
 import Gio from 'gi://Gio';
 
 import { animateActor } from '../shared/motion/motion.js';
-import { BUS_NAME, FAREWELL_DURATION, MANAGER_PATH } from './manager/interfaces.js';
+
+const BUS_NAME = 'org.gnome.SessionManager';
+const MANAGER_PATH = '/org/gnome/SessionManager';
+const FAREWELL_DURATION = 250;
 
 export class Blackout {
   private cover: Clutter.Actor | null = null;

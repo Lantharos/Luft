@@ -65,6 +65,7 @@ Chromium-based browsers and Electron apps lock their profile with the host name,
 | --- | --- |
 | `kestrel-session` | Started by the login screen; runs `kestrel-session.target` and Kestrel's session manager in place of gnome-session |
 | `kestrel-setup.target` | Kestrel in setup mode with the session manager, before the desktop when setup is pending |
+| `kestrel-session-manager` | `org.gnome.SessionManager` for apps and the shell: inhibitors, registered apps, logging out, restarting and shutting down after Kestrel asks you, idle presence, and `org.freedesktop.ScreenSaver` for players and browsers. Sandboxed apps can't change the session's environment or end it without asking |
 | `kestrel-settings` | Settings service started before the shell |
 | `kestrel-search` | Indexes the names and text of files in your home folder for Start, at idle priority |
 | `kestrel-portal` | `com.lantharos.Kestrel.Portal`, the portal backend for email, printing, accounts, app choosers, launchers, USB devices, wallpapers and lockdown. Its dialogs still open in Kestrel |

@@ -62,15 +62,6 @@ js_resources = gnome.compile_resources(
   dependencies: [kestrel_js, kestrel_locales],
 )
 
-custom_target('kestrel-session',
-  input: files('../../ui/src/session/main.ts'),
-  output: 'kestrel-session.js',
-  depfile: 'kestrel-session.js.d',
-  command: [bun, build_ts, 'session/main.ts', '@OUTPUT@', build_config],
-  install: true,
-  install_dir: pkgdatadir,
-)
-
 dbus_services = {
   'com.lantharos.Kestrel.Notifications': 'surfaces/notifications/service/main.ts',
   'com.lantharos.Kestrel.Screencast': 'system/screencast/main.ts',

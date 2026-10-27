@@ -26,18 +26,15 @@ configure_file(
   install_mode: 'rwxr-xr-x',
 )
 
-managerconf = configuration_data()
-managerconf.set('gjs', gjs.full_path())
-managerconf.set('pkgdatadir', pkgdatadir)
+settingsconf = configuration_data()
+settingsconf.set('libexecdir', libexecdir)
 configure_file(
   input: 'kestrel-session-manager.service.in',
   output: 'kestrel-session-manager.service',
-  configuration: managerconf,
+  configuration: settingsconf,
   install_dir: systemduserunitdir,
 )
 
-settingsconf = configuration_data()
-settingsconf.set('libexecdir', libexecdir)
 configure_file(
   input: 'kestrel-settings.service.in',
   output: 'kestrel-settings.service',

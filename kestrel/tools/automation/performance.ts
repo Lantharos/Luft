@@ -15,6 +15,7 @@ const OPENING = 500_000;
 const IDLE_SAMPLE = 2000;
 const WAKEUP_SAMPLE = 30000;
 const SETTINGS_COMMAND = 'kestrel-setting';
+const SESSION_MANAGER = 'org.gnome.SessionManager';
 const FRAME = 16;
 const START_QUERIES = ['f', 'fi', 'fil', 'files', 'file', 'fi', ''];
 const EMOJI_QUERIES = ['p', 'pa', 'par', 'part', 'party', 'h', 'he', 'heart', 'smiling face', ''];
@@ -30,9 +31,9 @@ const read = (path: string) => new TextDecoder().decode(GLib.file_get_contents(p
 const milliseconds = (microseconds: number) => Number((microseconds / 1000).toFixed(2));
 const report = (values: object) => console.log(`Kestrel performance: ${JSON.stringify(values)}`);
 
-function processMetrics() {
-  const residentKb = Number(/VmRSS:\s+(\d+)/.exec(read('/proc/self/status'))![1]);
-  const startedSeconds = Number(read('/proc/self/stat').split(') ')[1].split(' ')[19]) / 100;
+function processMetrics(pid: number | 'self' = 'self') {
+  const residentKb = Number(/VmRSS:\s+(\d+)/.exec(read(`/proc/${pid}/status`))![1]);
+  const startedSeconds = Number(read(`/proc/${pid}/stat`).split(') ')[1].split(' ')[19]) / 100;
   const runningSeconds = Number(read('/proc/uptime').split(' ')[0]) - startedSeconds;
   return {residentMemoryMb: Math.round(residentKb / 1024), secondsSinceLaunch: Number(runningSeconds.toFixed(2))};
 }
@@ -283,7 +284,7 @@ async function measureTaskViewAdd() {
   }
 }
 
-function threadSwitches(pid = 'self') {
+function threadSwitches(pid: number | string = 'self') {
   const tasks = Gio.File.new_for_path(`/proc/${pid}/task`).enumerate_children('standard::name', Gio.FileQueryInfoFlags.NONE, null);
   const switches = new Map<string, number>();
   for (let info: Gio.FileInfo | null; (info = tasks.next_file(null));) {
@@ -306,21 +307,30 @@ function sessionPidOf(command: string) {
   return null;
 }
 
+function busOwnerPid(name: string) {
+  const reply = Gio.DBus.session.call_sync('org.freedesktop.DBus', '/org/freedesktop/DBus', 'org.freedesktop.DBus', 'GetConnectionUnixProcessID',
+    new GLib.Variant('(s)', [name]), new GLib.VariantType('(u)'), Gio.DBusCallFlags.NONE, -1, null);
+  return reply.deepUnpack<[number]>()[0];
+}
+
 const switchesSince = (before: Map<string, number>, after: Map<string, number>) => [...after].reduce((sum, [thread, count]) => sum + count - (before.get(thread) ?? 0), 0);
 const perSecond = (count: number) => Number((count / (WAKEUP_SAMPLE / 1000)).toFixed(2));
 
-const cpuTicks = () => read('/proc/self/stat').split(') ')[1].split(' ').slice(11, 13).map(Number).reduce((a, b) => a + b);
+const cpuTicks = (pid: number | 'self' = 'self') => read(`/proc/${pid}/stat`).split(') ')[1].split(' ').slice(11, 13).map(Number).reduce((a, b) => a + b);
 
 async function measureIdleWakeups() {
   const settings = sessionPidOf(SETTINGS_COMMAND);
   const before = threadSwitches();
   const settingsBefore = settings ? threadSwitches(settings) : null;
+  const sessionManager = busOwnerPid(SESSION_MANAGER);
+  const sessionManagerBefore = threadSwitches(sessionManager);
   const ticks = cpuTicks();
   await pause(WAKEUP_SAMPLE);
   const seconds = WAKEUP_SAMPLE / 1000;
   report({
     idleWakeupsPerSecond: perSecond(switchesSince(before, threadSwitches())),
     idleSettingsWakeupsPerSecond: settings && settingsBefore ? perSecond(switchesSince(settingsBefore, threadSwitches(settings))) : null,
+    idleSessionManagerWakeupsPerSecond: perSecond(switchesSince(sessionManagerBefore, threadSwitches(sessionManager))),
     idleCpuPercent: Number((((cpuTicks() - ticks) / 100 / seconds) * 100).toFixed(2)),
   });
 }
@@ -333,8 +343,15 @@ async function measureIdle() {
   report({idleFramesOverTwoSeconds: frames});
 }
 
+function measureSessionManager() {
+  const pid = busOwnerPid(SESSION_MANAGER);
+  const {residentMemoryMb, secondsSinceLaunch} = processMetrics(pid);
+  report({sessionManagerResidentMemoryMb: residentMemoryMb, sessionManagerSecondsSinceLaunch: secondsSinceLaunch, sessionManagerCpuSeconds: cpuTicks(pid) / 100});
+}
+
 export async function run() {
   report(processMetrics());
+  measureSessionManager();
   const startupStallMs = await longestStall(async () => {
     await settled();
     await surfacesPrepared();
@@ -355,4 +372,5 @@ export async function run() {
   await measureTaskViewAdd();
   await measureIdle();
   await measureIdleWakeups();
+  measureSessionManager();
 }

@@ -80,7 +80,7 @@ install -d -m 700 "$KESTREL_APP_RUNTIME_DIR" "$PIPEWIRE_RUNTIME_DIR" "$PULSE_RUN
 ln -sfn "$XDG_RUNTIME_DIR/dconf" "$KESTREL_APP_RUNTIME_DIR/dconf"
 rm -f "$KESTREL_AUTHENTICATE_SOCK" "$KESTREL_READY_SOCK"
 start_system_bus
-start gjs -m "$build/ui/kestrel-session.js"
+start "$root/target/release/kestrel-session-manager"
 system_services="$built_fixtures/system/systemBus.js"
 [[ "$mode" == setup ]] && system_services="$built_fixtures/setup/systemBus.js"
 DBUS_SYSTEM_BUS_ADDRESS="$system_bus" start gjs -m "$system_services"

@@ -3817,6 +3817,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "kestrel-session-manager"
+version = "0.1.0"
+dependencies = [
+ "futures-util",
+ "gio",
+ "glib",
+ "luft-dbus",
+ "luft-identity",
+ "tokio",
+ "zbus 6.0.0",
+]
+
+[[package]]
 name = "kestrel-settings"
 version = "0.1.0"
 dependencies = [

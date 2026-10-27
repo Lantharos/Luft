@@ -34,7 +34,7 @@ require_build() {
 build_helpers() {
   glib-compile-schemas "$build/data"
   bun "$tools/build.ts" "$built_tools"
-  (cd "$root" && cargo build --release --quiet -p kestrel-settings -p kestrel-search -p kestrel-portal -p luft-pinentry \
+  (cd "$root" && cargo build --release --quiet -p kestrel-session-manager -p kestrel-settings -p kestrel-search -p kestrel-portal -p luft-pinentry \
     -p kestrel-openconnect -p kestrel-greeter-service -p peek -p luft-accounts-service -p luft-speech-service)
 }
 

@@ -12,13 +12,14 @@ import {centerOf, hold, press, release} from '../lib/input/input.js';
 import {LuftApp} from '../lib/apps/luftApp.js';
 import {fixture, gjs, scratch, spawn, stop, waitForWindow} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
-import {settled, waitUntil} from '../lib/wait.js';
+import {pause, settled, waitUntil} from '../lib/wait.js';
 import {darkened, lock, unlock} from '../lockScreen/lib/shield.js';
 import {fold, tap, touchDown, touchUp} from './lib/touch.js';
 
 const {require, eventually} = checks('on-screen keyboard');
 const ROVER_SEARCH = [142, 32];
 const BROWSER_OPEN_TIMEOUT = 60000;
+const KEYBOARD_DELAY = 600;
 const WORD = 'luft';
 const SERBIAN = new GLib.Variant('a(ss)', [['xkb', 'rs+latin'], ['xkb', 'rs']]);
 
@@ -38,9 +39,15 @@ const layer = actor => Main.layoutManager.uiGroup.get_children().indexOf(actor);
 const keyboardLayer = () => layer(Main.layoutManager.keyboardBox.get_parent());
 const coversPoint = ([x, y]) => keyboard().contains(global.stage.get_actor_at_pos(Clutter.PickMode.REACTIVE, x, y));
 const intoCaret = ({x, y, height}) => [x + 8, y + height / 2];
+const pastCaretHandle = ({x, y, height}) => [x + 120, y + height / 2];
 const emojiKey = () => descendants(keyboard()).find(actor => actor.icon_name === 'osk-emoji-picker-symbolic' && actor.mapped);
 const emojiPane = () => shownStyled('emoji-panel', keyboard());
 const deleteKey = () => descendants(keyboard()).find(actor => actor.icon_name === 'osk-delete-symbolic' && actor.mapped);
+const hideKey = () => descendants(keyboard()).find(actor => actor.icon_name === 'osk-hide-symbolic' && actor.mapped);
+const belowField = window => {
+  const {x, y, width, height} = window.get_frame_rect();
+  return [x + width / 2, y + height - 60];
+};
 
 async function tapsOpen(label, point) {
   await tap(point);
@@ -50,6 +57,13 @@ async function tapsOpen(label, point) {
 async function hide(label, act) {
   await act();
   await eventually(keyboardHidden, `the on-screen keyboard hides when ${label}`);
+}
+
+async function tapsBeside(label, point) {
+  await tap(point);
+  await pause(KEYBOARD_DELAY);
+  await settled();
+  require(keyboardHidden(), `tapping ${label} leaves the on-screen keyboard hidden`);
 }
 
 async function checkGtk() {
@@ -68,7 +82,7 @@ async function checkGtk() {
   }
 }
 
-async function checkToolkit(window, start, clientType) {
+async function checkToolkit(window, start, clientType, {tapsBesideField = false} = {}) {
   const before = new Set(global.get_window_actors().map(actor => actor.meta_window));
   const process = start();
   try {
@@ -77,7 +91,13 @@ async function checkToolkit(window, start, clientType) {
     require(opened.get_client_type() === clientType, `${window} runs as the expected kind of client`);
     await settled();
     await eventually(caret, `the field in ${window} reports where its caret is`);
+    if (tapsBesideField) await tapsBeside(`below the focused field in ${window}`, belowField(opened));
     await tapsOpen(`the field in ${window}`, intoCaret(caret()));
+    if (tapsBesideField) {
+      await hide(`its hide key is tapped over ${window}`, () => tap(centerOf(hideKey())));
+      await tapsBeside(`below the field in ${window} after hiding the keyboard`, belowField(opened));
+      await tapsOpen(`the field in ${window} again`, pastCaretHandle(caret()));
+    }
     await hide(`${window} closes`, () => stop(process));
   } finally {
     await stop(process);
@@ -124,6 +144,8 @@ async function checkChromium(label, argv, clientType, env = {}) {
     await typeOnKeyboard(WORD);
     await eventually(() => window.get_title().startsWith(`Kestrel typed: ${WORD}`), `typing on the on-screen keyboard writes into the field in ${label}`);
     await capture(`tablet-keyboard-${label.replace(/\W+/g, '-').toLowerCase()}`);
+    await hide(`its hide key is tapped over ${label}`, () => tap(centerOf(hideKey())));
+    await tapsOpen(`the focused field in ${label} again`, centerOf(window.get_compositor_private()));
     await hide(`${label} closes`, () => stop(process));
   } finally {
     await stop(process);
@@ -261,7 +283,7 @@ export async function run() {
   try {
     await checkGtk();
     await checkHeldDelete();
-    await checkToolkit('a GTK 3 window', () => gjs('clients/entries/gtk3Entry.js'), Meta.WindowClientType.WAYLAND);
+    await checkToolkit('a GTK 3 window', () => gjs('clients/entries/gtk3Entry.js'), Meta.WindowClientType.WAYLAND, {tapsBesideField: true});
     await checkToolkit('an Xwayland window', () => gjs('clients/windows/window.js', ['--entry'], {env: {GDK_BACKEND: 'x11', GTK_IM_MODULE: 'ibus'}}),
       Meta.WindowClientType.X11);
     await checkStart();

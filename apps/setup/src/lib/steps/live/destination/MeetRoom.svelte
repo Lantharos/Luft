@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { bytes } from '@luft/ui';
-	import type { Drive, Space } from '#lib/bridge/installer.js';
+	import type { Drive, Space } from '#lib/bindings.js';
 	import WindowsOptions from './WindowsOptions.svelte';
 
 	interface Props {

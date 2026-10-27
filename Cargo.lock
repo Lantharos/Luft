@@ -4357,6 +4357,7 @@ dependencies = [
  "luft-disks",
  "luft-i18n",
  "luft-identity",
+ "luft-installer-contract",
  "luft-meet",
  "luft-trust",
  "luft-windows",
@@ -4366,6 +4367,16 @@ dependencies = [
  "toml",
  "toml_edit",
  "zbus 6.0.0",
+]
+
+[[package]]
+name = "luft-installer-contract"
+version = "0.1.0"
+dependencies = [
+ "luft-disks",
+ "luft-meet",
+ "serde",
+ "specta",
 ]
 
 [[package]]
@@ -4862,6 +4873,7 @@ dependencies = [
  "serde_json",
  "sha2",
  "specta",
+ "tokio",
  "ureq",
  "windows",
  "wmi",
@@ -7220,6 +7232,7 @@ dependencies = [
  "luft-app",
  "luft-fingerprint",
  "luft-i18n",
+ "luft-installer-contract",
  "luft-meet",
  "luft-network",
  "luft-trust",
@@ -7229,7 +7242,6 @@ dependencies = [
  "serde",
  "serde_json",
  "specta",
- "specta-typescript",
  "tokio",
  "ureq",
  "zbus 6.0.0",

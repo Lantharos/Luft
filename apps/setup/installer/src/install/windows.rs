@@ -1,22 +1,12 @@
 use std::path::Path;
 
 use anyhow::Result;
+use luft_installer_contract::{WindowsBlock, WindowsChoices};
 use luft_windows::bluetooth::{Pairing, bluez};
 use luft_windows::change::{self, Change};
-use serde::Deserialize;
 
 use super::configure::deployment::Deployment;
 use crate::survey::Survey;
-
-const UNTOUCHABLE: [&str; 3] = ["bitlocker", "hibernated", "dirty"];
-
-#[derive(Deserialize, Default, Clone, Copy)]
-#[serde(rename_all = "camelCase", default)]
-pub struct Choices {
-    pub fast_startup_off: bool,
-    pub universal_clock: bool,
-    pub bluetooth: bool,
-}
 
 pub struct Windows {
     device: String,
@@ -25,18 +15,21 @@ pub struct Windows {
 }
 
 impl Windows {
-    pub fn chosen(survey: &Survey, drive: &str, choices: Choices) -> Option<Self> {
+    pub fn chosen(survey: &Survey, drive: &str, choices: WindowsChoices) -> Option<Self> {
         let windows = survey
+            .found
             .drives
             .iter()
             .find(|candidate| candidate.block == drive)?
             .windows
             .as_ref()
             .filter(|windows| {
-                !windows
-                    .blocked
-                    .is_some_and(|why| UNTOUCHABLE.contains(&why))
+                !matches!(
+                    windows.blocked,
+                    Some(WindowsBlock::Bitlocker | WindowsBlock::Hibernated | WindowsBlock::Dirty)
+                )
             })?;
+        let details = survey.windows.get(drive)?;
         let changes = [
             (
                 choices.fast_startup_off && windows.fast_startup,
@@ -51,12 +44,12 @@ impl Windows {
         .filter_map(|(wanted, change)| wanted.then_some(change))
         .collect();
         let pairings = if choices.bluetooth {
-            windows.bluetooth.clone()
+            details.bluetooth.clone()
         } else {
             Vec::new()
         };
         Some(Self {
-            device: windows.device.clone(),
+            device: details.device.clone(),
             changes,
             pairings,
         })

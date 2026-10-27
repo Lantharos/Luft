@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { bytes, Dialog } from '@luft/ui';
-	import type { Target } from '#lib/bridge/installer.js';
+	import type { Target } from '#lib/bindings.js';
 	import { install } from '#lib/state/install.svelte.js';
 
 	let { target, onconfirm, onclose }: { target: Target; onconfirm: () => void; onclose: () => void } = $props();

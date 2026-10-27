@@ -12,6 +12,7 @@ members = [
     "apps/schelf/desktop",
     "apps/schelf/sandbox",
     "apps/settings/desktop",
+    "apps/setup/contract",
     "apps/setup/desktop",
     "apps/setup/installer",
     "apps/signin/desktop",
@@ -74,6 +75,7 @@ default-members = [
     "apps/schelf/desktop",
     "apps/schelf/sandbox",
     "apps/settings/desktop",
+    "apps/setup/contract",
     "apps/setup/desktop",
     "apps/setup/installer",
     "apps/signin/desktop",
@@ -139,6 +141,7 @@ luft-disks = { path = "packages/system/disks" }
 luft-fingerprint = { path = "packages/system/fingerprint" }
 luft-i18n = { path = "packages/i18n" }
 luft-identity = { path = "packages/identity" }
+luft-installer-contract = { path = "apps/setup/contract" }
 luft-keyring-vault = { path = "kestrel/keyring/vault" }
 luft-keyring-wire = { path = "kestrel/keyring/wire" }
 luft-meet = { path = "packages/system/meet" }

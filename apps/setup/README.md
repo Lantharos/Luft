@@ -11,6 +11,7 @@ Install Luft puts Luft on a computer from the USB stick or from Meet Luft, next 
 | `src` | The setup window |
 | `desktop` | Its native side: regional settings, NetworkManager, the installer and trustd |
 | `installer` | `luft-installer`, the system service that partitions, copies and configures (`com.lantharos.Installer1`) |
+| `contract` | The survey, install plan and regional settings the setup window and `luft-installer` exchange, shared by both |
 
 ## Build and run
 

@@ -3,6 +3,7 @@ use luft_app::dbus::service::{Map, Service, absent, get};
 use luft_app::dbus::{error_message, error_name, failed};
 use luft_app::{Commands, Empty, Events};
 use luft_i18n::t;
+use luft_installer_contract::{InstallPlan, Regional, Survey};
 use sabine::{BridgeEvent, SabineWindow};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
@@ -12,7 +13,6 @@ use zbus::DynamicType;
 use zbus::wire::DynamicDeserialize;
 
 use crate::L10N;
-use crate::contract::{Contract, InstallPlan, Regional, Survey};
 
 pub const INSTALLER: Service = Service {
     name: "com.lantharos.Installer1",
@@ -101,17 +101,21 @@ where
         .map_err(|error| explain(&error))
 }
 
-async fn survey(Empty {}: Empty) -> Result<Contract<Survey>, String> {
+async fn survey(Empty {}: Empty) -> Result<Survey, String> {
     let survey: String = call("Survey", &()).await?;
     serde_json::from_str(&survey).map_err(failed)
 }
 
-async fn install(plan: Contract<InstallPlan>) -> Result<(), String> {
-    call("Install", &(plan.value.to_string(),)).await
+async fn install(plan: InstallPlan) -> Result<(), String> {
+    call("Install", &(serde_json::to_string(&plan).map_err(failed)?,)).await
 }
 
-async fn configure(regional: Contract<Regional>) -> Result<(), String> {
-    call("Configure", &(regional.value.to_string(),)).await
+async fn configure(regional: Regional) -> Result<(), String> {
+    call(
+        "Configure",
+        &(serde_json::to_string(&regional).map_err(failed)?,),
+    )
+    .await
 }
 
 async fn create_account(

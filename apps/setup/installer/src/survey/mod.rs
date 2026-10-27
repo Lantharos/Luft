@@ -3,41 +3,28 @@ pub mod linux;
 pub mod room;
 pub mod windows;
 
+use std::collections::HashMap;
 use std::path::Path;
 
 use luft_disks::udisks::{self, snapshot};
+use luft_installer_contract::{Drive, MeetSurvey};
 use luft_meet::Handoff;
-use luft_meet::regional::Hints;
-use serde::Serialize;
 
 use crate::meet;
 use crate::system::wait;
-pub use drives::{Drive, Space};
+pub use drives::WindowsDetails;
 pub use room::ALIGNMENT;
 
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct MeetSurvey {
-    pub drive: String,
-    pub space: Option<Space>,
-    pub other_drive: bool,
-    #[serde(flatten)]
-    pub summary: meet::Summary,
-}
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct Survey {
-    pub drives: Vec<Drive>,
-    pub hints: Hints,
-    pub smallest_system: u64,
-    pub meet: Option<MeetSurvey>,
-    pub systems: Vec<linux::System>,
+    pub found: luft_installer_contract::Survey,
+    pub windows: HashMap<String, WindowsDetails>,
+    pub plans: HashMap<String, linux::Plan>,
 }
 
 fn meet_survey(drives: &[Drive], handoff: &Handoff, scratch: &Path) -> Option<MeetSurvey> {
     let drive = drives.iter().find(|drive| drive.meet)?;
-    let space = handoff.room().and_then(|room| {
+    let room = handoff.room();
+    let space = room.and_then(|room| {
         drive
             .free
             .iter()
@@ -49,8 +36,10 @@ fn meet_survey(drives: &[Drive], handoff: &Handoff, scratch: &Path) -> Option<Me
     Some(MeetSurvey {
         drive: drive.block.clone(),
         space,
-        other_drive: handoff.room().is_some_and(|room| room.other_drive),
-        summary: meet::summarize(handoff, scratch),
+        other_drive: room.is_some_and(|room| room.other_drive),
+        intent: handoff.intent,
+        room,
+        moving_box: meet::packed(handoff, scratch),
     })
 }
 
@@ -61,28 +50,46 @@ pub fn take(
 ) -> Result<Survey, String> {
     let objects = wait(udisks::objects())?;
     let snapshot = snapshot::build(&objects);
-    let drives: Vec<Drive> = snapshot
+    let (drives, details): (Vec<Drive>, Vec<Option<WindowsDetails>>) = snapshot
         .drives
         .iter()
         .map(|drive| drives::describe(drive, smallest_system, handoff))
-        .collect();
-    let systems = linux::find(&snapshot.drives, &scratch.with_extension("old"));
-    let meet = handoff.and_then(|handoff| meet_survey(&drives, handoff, scratch));
+        .unzip();
     let hints = handoff
         .map(|handoff| handoff.hints.clone())
         .filter(|hints| !hints.is_empty())
         .or_else(|| {
-            drives
+            details
                 .iter()
-                .filter_map(|drive| drive.windows.as_ref())
+                .flatten()
                 .find_map(|windows| windows.hints.clone())
         })
         .unwrap_or_default();
+    let windows = drives
+        .iter()
+        .zip(details)
+        .filter_map(|(drive, details)| Some((drive.block.clone(), details?)))
+        .collect();
+    let mut plans = HashMap::new();
+    let systems = linux::find(&snapshot.drives, &scratch.with_extension("old"))
+        .into_iter()
+        .map(|(system, plan)| {
+            if let Some(plan) = plan {
+                plans.insert(system.id.clone(), plan);
+            }
+            system
+        })
+        .collect();
+    let meet = handoff.and_then(|handoff| meet_survey(&drives, handoff, scratch));
     Ok(Survey {
-        drives,
-        hints,
-        smallest_system,
-        meet,
-        systems,
+        found: luft_installer_contract::Survey {
+            drives,
+            hints,
+            smallest_system,
+            meet,
+            systems,
+        },
+        windows,
+        plans,
     })
 }

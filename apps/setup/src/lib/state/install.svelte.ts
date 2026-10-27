@@ -1,5 +1,16 @@
-import { commands, events, type Hardware, type InstallerState, type Intent } from '#lib/bindings.js';
-import type { Drive, Encryption, LinuxSystem, Survey, Target, WindowsChoices } from '#lib/bridge/installer.js';
+import {
+	commands,
+	events,
+	type Drive,
+	type Encryption,
+	type Hardware,
+	type InstallerState,
+	type Intent,
+	type LinuxSystem,
+	type Survey,
+	type Target,
+	type WindowsChoices,
+} from '#lib/bindings.js';
 import { NO_HARDWARE, WAIT_FOR_PERSON } from '#lib/bridge/system.js';
 import { regional } from './regional.svelte.js';
 
@@ -17,7 +28,7 @@ class InstallState {
 	intent = $state<Intent | null>(null);
 	replacing = $state<LinuxSystem | null>(null);
 	target = $state<Target | null>(null);
-	windowsChoices = $state<WindowsChoices>({ fastStartupOff: true, universalClock: true, bluetooth: true });
+	windowsChoices = $state<Required<WindowsChoices>>({ fastStartupOff: true, universalClock: true, bluetooth: true });
 	private hardware = NO_HARDWARE;
 
 	started = $derived(this.status !== null && this.status.stage !== 'idle');

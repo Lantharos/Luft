@@ -1,35 +1,11 @@
 use anyhow::{Result, bail};
 use luft_i18n::t;
-use serde::Deserialize;
+use luft_installer_contract::{Drive, Target};
 
-use super::encryption::Encryption;
 use super::layout::{self, Part, Startup};
 use crate::L10N;
 use crate::install::Destination;
-use crate::install::windows::Choices;
-use crate::survey::{self, Drive, Survey};
-
-#[derive(Deserialize)]
-#[serde(
-    tag = "kind",
-    rename_all = "camelCase",
-    rename_all_fields = "camelCase"
-)]
-pub enum Target {
-    Whole { drive: String },
-    Alongside { drive: String, size: u64 },
-    Free { drive: String, offset: u64 },
-    Replace { system: String },
-}
-
-#[derive(Deserialize)]
-pub struct Request {
-    pub target: Target,
-    pub variant: String,
-    #[serde(default)]
-    pub windows: Choices,
-    pub encryption: Option<Encryption>,
-}
+use crate::survey::{self, Survey};
 
 pub struct Shrink {
     pub block: String,
@@ -45,7 +21,12 @@ pub struct Plan {
 }
 
 fn drive<'a>(survey: &'a Survey, block: &str) -> Result<&'a Drive> {
-    let Some(drive) = survey.drives.iter().find(|drive| drive.block == block) else {
+    let Some(drive) = survey
+        .found
+        .drives
+        .iter()
+        .find(|drive| drive.block == block)
+    else {
         bail!(t!(L10N, "installer-drive-gone"));
     };
     if drive.blocked.is_some() {
@@ -56,10 +37,15 @@ fn drive<'a>(survey: &'a Survey, block: &str) -> Result<&'a Drive> {
 
 pub fn resolve(survey: &Survey, target: &Target) -> Result<Destination> {
     if let Target::Replace { system } = target {
-        let Some(found) = survey.systems.iter().find(|found| found.id == *system) else {
+        let Some(found) = survey
+            .found
+            .systems
+            .iter()
+            .find(|found| found.id == *system)
+        else {
             bail!(t!(L10N, "installer-system-gone"));
         };
-        let Some(plan) = &found.plan else {
+        let Some(plan) = survey.plans.get(system) else {
             bail!(t!(
                 L10N,
                 "installer-system-unreplaceable",
@@ -97,7 +83,7 @@ fn partitions(survey: &Survey, target: &Target) -> Result<Plan> {
                 bail!(t!(L10N, "installer-windows-unshrinkable"));
             };
             let size = survey::room::align_down(*size);
-            if size < survey.smallest_system + startup.space() || size > windows.room {
+            if size < survey.found.smallest_system + startup.space() || size > windows.room {
                 bail!(t!(L10N, "installer-size-wont-fit"));
             }
             let kept = windows.size - size;
@@ -123,7 +109,7 @@ fn partitions(survey: &Survey, target: &Target) -> Result<Plan> {
             };
             let usable = survey::room::align_down(space.offset + space.size)
                 .saturating_sub(survey::room::align_up(space.offset));
-            if usable < survey.smallest_system + startup.space() {
+            if usable < survey.found.smallest_system + startup.space() {
                 bail!(t!(L10N, "installer-space-too-small"));
             }
             Ok(Plan {

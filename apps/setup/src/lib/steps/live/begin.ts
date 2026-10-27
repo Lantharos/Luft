@@ -1,4 +1,4 @@
-import type { Encryption, Target } from '#lib/bridge/installer.js';
+import type { Encryption, Target } from '#lib/bindings.js';
 import { flow } from '#lib/state/flow.svelte.js';
 import { install } from '#lib/state/install.svelte.js';
 

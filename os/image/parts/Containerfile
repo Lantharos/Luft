@@ -142,6 +142,7 @@ COPY packages/dbus /src/packages/dbus
 COPY packages/identity /src/packages/identity
 COPY packages/i18n /src/packages/i18n
 COPY packages/system /src/packages/system
+COPY apps/setup/contract /src/apps/setup/contract
 COPY apps/setup/installer /src/apps/setup/installer
 COPY os/image/parts/stages/services.sh os/image/parts/stages/needed.sh os/image/parts/stages/source-times.ts os/image/parts/stages/workspace.ts \
   /src/os/image/parts/stages/

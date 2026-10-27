@@ -1,15 +1,15 @@
 use std::fs::File;
 use std::io::BufReader;
 
-use luft_disks::udisks::snapshot::{self, Kind};
+use luft_disks::udisks::snapshot;
+use luft_disks::udisks::snapshot::Kind;
 use luft_disks::udisks::volumes::{Segment, Volume};
-use serde::Serialize;
-
-use super::room;
+use luft_installer_contract::{Drive, DriveBlock, Space, WindowsBlock, WindowsVolume};
 use luft_meet::Handoff;
 use luft_meet::regional::Hints;
 use luft_windows::bluetooth::Pairing;
 
+use super::room;
 use super::windows;
 use crate::install::drive::layout::{ESP_TYPE, Startup};
 
@@ -17,53 +17,10 @@ const LIVE_MEDIUM: &str = "/run/initramfs";
 const BITLOCKER: &str = "BitLocker";
 const NTFS: &str = "ntfs";
 
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Drive {
-    pub block: String,
+pub struct WindowsDetails {
     pub device: String,
-    pub name: String,
-    pub size: u64,
-    pub kind: Kind,
-    pub removable: bool,
-    pub blocked: Option<&'static str>,
-    pub partitions: usize,
-    pub esp: Option<Space>,
-    pub startup_space: u64,
-    pub windows: Option<WindowsVolume>,
-    pub free: Vec<Space>,
-    pub meet: bool,
-}
-
-#[derive(Serialize, Clone, Copy, PartialEq, Eq, Debug)]
-pub struct Space {
-    pub offset: u64,
-    pub size: u64,
-}
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct WindowsVolume {
-    pub block: String,
-    #[serde(skip)]
-    pub device: String,
-    pub offset: u64,
-    pub size: u64,
-    pub used: u64,
-    pub smallest: u64,
-    pub room: u64,
-    pub version: Option<String>,
-    pub fast_startup: bool,
-    pub universal_clock: bool,
-    #[serde(serialize_with = "count")]
     pub bluetooth: Vec<Pairing>,
-    pub blocked: Option<&'static str>,
-    #[serde(skip)]
     pub hints: Option<Hints>,
-}
-
-fn count<S: serde::Serializer>(pairings: &[Pairing], serializer: S) -> Result<S::Ok, S::Error> {
-    serializer.serialize_u64(pairings.len() as u64)
 }
 
 fn volumes(drive: &snapshot::Drive) -> impl Iterator<Item = &Volume> {
@@ -93,19 +50,23 @@ fn blocked(
     drive: &snapshot::Drive,
     smallest_system: u64,
     handoff: Option<&Handoff>,
-) -> Option<&'static str> {
+) -> Option<DriveBlock> {
     if runs_from(drive, handoff) {
-        Some("running")
+        Some(DriveBlock::Running)
     } else if drive.read_only || matches!(drive.kind, Kind::Optical | Kind::Image) {
-        Some("read-only")
+        Some(DriveBlock::ReadOnly)
     } else if drive.size < smallest_system {
-        Some("too-small")
+        Some(DriveBlock::TooSmall)
     } else {
         None
     }
 }
 
-pub fn describe(drive: &snapshot::Drive, smallest_system: u64, handoff: Option<&Handoff>) -> Drive {
+pub fn describe(
+    drive: &snapshot::Drive,
+    smallest_system: u64,
+    handoff: Option<&Handoff>,
+) -> (Drive, Option<WindowsDetails>) {
     let esp = volumes(drive)
         .filter(|volume| !from_meet(volume, handoff))
         .find(|volume| {
@@ -118,12 +79,13 @@ pub fn describe(drive: &snapshot::Drive, smallest_system: u64, handoff: Option<&
             offset: volume.offset,
             size: volume.size,
         });
-    let windows = if drive.removable {
+    let (windows, details) = if drive.removable {
         None
     } else {
         find_windows(drive, smallest_system)
-    };
-    Drive {
+    }
+    .unzip();
+    let described = Drive {
         block: drive.block.clone(),
         device: drive.device.clone(),
         name: drive.name.clone(),
@@ -147,14 +109,18 @@ pub fn describe(drive: &snapshot::Drive, smallest_system: u64, handoff: Option<&
             })
             .collect(),
         windows,
-    }
+    };
+    (described, details)
 }
 
-fn find_windows(drive: &snapshot::Drive, smallest_system: u64) -> Option<WindowsVolume> {
+fn find_windows(
+    drive: &snapshot::Drive,
+    smallest_system: u64,
+) -> Option<(WindowsVolume, WindowsDetails)> {
     let readable = volumes(drive)
         .filter(|volume| volume.fs_type == NTFS)
         .filter_map(|volume| inspect(volume, smallest_system))
-        .max_by_key(|windows| windows.size);
+        .max_by_key(|(windows, _)| windows.size);
     readable.or_else(|| {
         volumes(drive)
             .filter(|volume| volume.fs_type == BITLOCKER)
@@ -163,7 +129,7 @@ fn find_windows(drive: &snapshot::Drive, smallest_system: u64) -> Option<Windows
     })
 }
 
-fn inspect(volume: &Volume, smallest_system: u64) -> Option<WindowsVolume> {
+fn inspect(volume: &Volume, smallest_system: u64) -> Option<(WindowsVolume, WindowsDetails)> {
     let file = File::open(&volume.device)
         .inspect_err(|error| eprintln!("Couldn't read {}: {error}", volume.device))
         .ok()?;
@@ -173,17 +139,16 @@ fn inspect(volume: &Volume, smallest_system: u64) -> Option<WindowsVolume> {
     let smallest = room::smallest_windows(found.used, volume.size);
     let room = room::room_for_luft(volume.size, smallest);
     let blocked = if found.hibernated {
-        Some("hibernated")
+        Some(WindowsBlock::Hibernated)
     } else if found.dirty {
-        Some("dirty")
+        Some(WindowsBlock::Dirty)
     } else if room < smallest_system {
-        Some("full")
+        Some(WindowsBlock::Full)
     } else {
         None
     };
-    Some(WindowsVolume {
+    let windows = WindowsVolume {
         block: volume.block.clone(),
-        device: volume.device.clone(),
         offset: volume.offset,
         size: volume.size,
         used: found.used,
@@ -192,16 +157,20 @@ fn inspect(volume: &Volume, smallest_system: u64) -> Option<WindowsVolume> {
         version: found.version,
         fast_startup: found.fast_startup,
         universal_clock: found.universal_clock,
-        bluetooth: found.bluetooth,
+        bluetooth: found.bluetooth.len(),
         blocked,
+    };
+    let details = WindowsDetails {
+        device: volume.device.clone(),
+        bluetooth: found.bluetooth,
         hints: Some(found.hints),
-    })
+    };
+    Some((windows, details))
 }
 
-fn locked(volume: &Volume) -> WindowsVolume {
-    WindowsVolume {
+fn locked(volume: &Volume) -> (WindowsVolume, WindowsDetails) {
+    let windows = WindowsVolume {
         block: volume.block.clone(),
-        device: volume.device.clone(),
         offset: volume.offset,
         size: volume.size,
         used: 0,
@@ -210,8 +179,13 @@ fn locked(volume: &Volume) -> WindowsVolume {
         version: None,
         fast_startup: false,
         universal_clock: false,
+        bluetooth: 0,
+        blocked: Some(WindowsBlock::Bitlocker),
+    };
+    let details = WindowsDetails {
+        device: volume.device.clone(),
         bluetooth: Vec::new(),
-        blocked: Some("bitlocker"),
         hints: None,
-    }
+    };
+    (windows, details)
 }

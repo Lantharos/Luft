@@ -43,20 +43,22 @@ const SURVEY = {
         block: '/org/freedesktop/UDisks2/block_devices/nvme0n1p3', offset: 129 * MIB, size: 998 * GB, used: 212 * GB,
         smallest: 233 * GB, room: 765 * GB, version: 'Windows 11 Home', fastStartup: true, universalClock: false, bluetooth: 3, blocked: null,
       },
-      free: [],
+      free: [], meet: false,
     },
     {
       block: '/org/freedesktop/UDisks2/block_devices/sda', device: '/dev/sda', name: 'WD Blue SA510', size: 500 * GB,
       kind: 'ssd', removable: false, blocked: null, partitions: 1, esp: null, startupSpace: GIB, windows: null,
-      free: [{offset: 400 * GB, size: 100 * GB}],
+      free: [{offset: 400 * GB, size: 100 * GB}], meet: false,
     },
     {
       block: '/org/freedesktop/UDisks2/block_devices/sdb', device: '/dev/sdb', name: 'SanDisk Ultra', size: 32 * GB,
-      kind: 'usb', removable: true, blocked: 'running', partitions: 2, esp: null, startupSpace: GIB, windows: null, free: [],
+      kind: 'usb', removable: true, blocked: 'running', partitions: 2, esp: null, startupSpace: GIB, windows: null, free: [], meet: false,
     },
   ],
   hints: {language: 'en_US', locale: 'de_DE', timezone: 'Europe/Berlin', keyboards: [{layout: 'de', variant: 'nodeadkeys'}]},
   smallestSystem: 32 * 1024 ** 3,
+  meet: null,
+  systems: [],
 };
 const ROOM = {offset: 600 * GB, size: 398 * GB};
 const FROM_MEET = {
@@ -68,7 +70,7 @@ const FROM_MEET = {
     language: 'en_US', locale: 'de_AT', timezone: 'Europe/Vienna',
     keyboards: [{layout: 'at', variant: 'nodeadkeys'}, {layout: 'us', variant: ''}],
   },
-  meet: {drive: '/org/freedesktop/UDisks2/block_devices/nvme0n1', space: ROOM, intent: 'install', room: ROOM, movingBox: null},
+  meet: {drive: '/org/freedesktop/UDisks2/block_devices/nvme0n1', space: ROOM, otherDrive: false, intent: 'install', room: ROOM, movingBox: null},
 };
 
 function relay([name, path, iface], method, parameters = null) {

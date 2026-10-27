@@ -1,0 +1,17 @@
+[package]
+name = "luft-installer-contract"
+version = "0.1.0"
+description = "The survey, install plan and regional settings Install Luft and luft-installer exchange over D-Bus"
+authors = ["Kristof"]
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+luft-disks.workspace = true
+luft-meet.workspace = true
+serde.workspace = true
+specta.workspace = true
+
+[lints]
+workspace = true

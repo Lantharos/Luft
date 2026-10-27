@@ -2,10 +2,11 @@ use std::os::unix::fs::DirBuilderExt;
 use std::path::PathBuf;
 
 use anyhow::Result;
+use luft_installer_contract::Encryption;
 use luft_meet::Handoff;
 
 use super::deployment::Deployment;
-use crate::install::drive::encryption::{Encryption, Opened};
+use crate::install::drive::encryption::{self, Opened};
 use crate::system::files::write;
 
 const STATE: &str = "lib/trustd";
@@ -22,7 +23,7 @@ fn state(deployment: &Deployment) -> Result<PathBuf> {
 
 pub fn seal(deployment: &Deployment, encryption: &Encryption, opened: &Opened) -> Result<()> {
     let state = state(deployment)?;
-    encryption.seal(opened, &state)?;
+    encryption::seal(encryption, opened, &state)?;
     deployment.relabel(&[state])
 }
 

@@ -14,6 +14,7 @@ clap.workspace = true
 libc.workspace = true
 luft-dbus.workspace = true
 luft-identity.workspace = true
+luft-installer-contract.workspace = true
 luft-disks.workspace = true
 luft-i18n.workspace = true
 luft-meet.workspace = true

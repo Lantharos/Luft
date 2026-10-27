@@ -1,4 +1,3 @@
-mod contract;
 mod fingerprint;
 mod hardware;
 mod installer;

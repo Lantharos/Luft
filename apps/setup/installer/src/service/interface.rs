@@ -4,6 +4,7 @@ use std::sync::{Arc, Mutex};
 
 use luft_dbus::idle::Idle;
 use luft_i18n::t;
+use luft_installer_contract::{InstallPlan, Regional};
 use luft_meet::Handoff;
 use luft_trust::TRUST;
 use tokio::sync::watch;
@@ -18,9 +19,10 @@ use super::setup::{self, Enrollment};
 use crate::L10N;
 use crate::config::Config;
 use crate::first_boot::fingerprint::Enrolling;
-use crate::install::drive::plan::{self, Request};
+use crate::install::configure::regional;
+use crate::install::drive::plan;
 use crate::install::windows::Windows;
-use crate::install::{self, Account, Answers, Destination, Job, Regional, Stage, Status};
+use crate::install::{self, Account, Answers, Destination, Job, Stage, Status};
 use crate::options::Options;
 use crate::{first_boot, phase, survey};
 
@@ -157,7 +159,7 @@ impl Installer {
         Self::blocking(move || {
             let survey =
                 survey::take(smallest, handoff.as_ref(), &scratch).map_err(anyhow::Error::msg)?;
-            Ok(serde_json::to_string(&survey)?)
+            Ok(serde_json::to_string(&survey.found)?)
         })
         .await
     }
@@ -170,7 +172,7 @@ impl Installer {
         #[zbus(object_server)] server: &ObjectServer,
     ) -> Result<(), Error> {
         self.authorize(connection, &header, INSTALL).await?;
-        let mut request: Request = serde_json::from_str(&request).map_err(|error| {
+        let mut request: InstallPlan = serde_json::from_str(&request).map_err(|error| {
             Error::Failed(t!(
                 L10N,
                 "installer-request-invalid",
@@ -243,7 +245,7 @@ impl Installer {
                 error = error.to_string()
             ))
         })?;
-        regional.check()?;
+        regional::check(&regional)?;
         self.answers.set_regional(regional);
         Ok(())
     }

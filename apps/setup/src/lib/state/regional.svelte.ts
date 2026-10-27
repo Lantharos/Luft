@@ -1,6 +1,5 @@
 import { i18n } from '@luft/i18n';
-import { commands, type Catalog, type KeyboardLayout, type Zone } from '#lib/bindings.js';
-import type { Hints, Keyboard } from '#lib/bridge/installer.js';
+import { commands, type Catalog, type Hints, type Keyboard, type KeyboardLayout, type Zone } from '#lib/bindings.js';
 import { WAIT_FOR_PERSON } from '#lib/bridge/system.js';
 import { describe, outranks, type Field, type Guesses, type Source } from '#lib/regional/guesses.js';
 import { namedZones } from '#lib/regional/zones.js';

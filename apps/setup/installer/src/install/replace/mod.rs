@@ -8,9 +8,10 @@ use std::path::Path;
 
 use anyhow::{Context, Result, bail};
 use luft_i18n::t;
+use luft_installer_contract::Encryption;
 
 use super::configure::deployment::Deployment;
-use super::drive::encryption::Encryption;
+use super::drive::encryption;
 use super::drive::layout::Role;
 use super::drive::target::Mounted;
 use crate::L10N;
@@ -118,7 +119,11 @@ pub fn prepare(
     let mounted = match encryption {
         Some(encryption) => {
             disks::erase(&plan.root, Role::Root)?;
-            Mounted::open_encrypted(encryption.open(&plan.root.device)?, target, esp)?
+            Mounted::open_encrypted(
+                encryption::open(encryption, &plan.root.device)?,
+                target,
+                esp,
+            )?
         }
         None => {
             disks::format(&plan.root, Role::Root)?;

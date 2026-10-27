@@ -1,12 +1,11 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Checkbox, PasswordField, RecoveryKey } from '@luft/ui';
-	import { commands } from '#lib/bindings.js';
+	import { commands, type Encryption } from '#lib/bindings.js';
 	import { WAIT_FOR_PERSON } from '#lib/bridge/system.js';
 	import StepFrame from '#lib/components/StepFrame.svelte';
 	import { install } from '#lib/state/install.svelte.js';
 	import { setup } from '#lib/state/setup.svelte.js';
-	import type { Encryption } from '#lib/bridge/installer.js';
 	import { begin } from './begin.js';
 	import ConfirmInstall from './ConfirmInstall.svelte';
 

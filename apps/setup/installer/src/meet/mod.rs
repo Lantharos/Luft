@@ -5,9 +5,9 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
 use luft_i18n::t;
-use luft_meet::handoff::{self, Handoff, Intent};
+use luft_installer_contract::MovingBox;
+use luft_meet::handoff::{self, Handoff};
 use luft_meet::moving_box::{self, Manifest};
-use serde::Serialize;
 
 use crate::L10N;
 use crate::system::command::Tool;
@@ -60,42 +60,22 @@ impl Drop for Opened {
     }
 }
 
-#[derive(Serialize, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct Packed {
-    pub bytes: u64,
-    pub full_name: Option<String>,
-    pub user_name: Option<String>,
-}
-
-#[derive(Serialize, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct Summary {
-    pub intent: Intent,
-    pub room: Option<luft_meet::Room>,
-    pub moving_box: Option<Packed>,
-}
-
-pub fn summarize(handoff: &Handoff, scratch: &Path) -> Summary {
+pub fn packed(handoff: &Handoff, scratch: &Path) -> Option<MovingBox> {
     let manifest = handoff.moving_box().and_then(|guid| {
         Opened::mount(guid, scratch)
             .and_then(|opened| opened.manifest())
             .inspect_err(|error| eprintln!("The moving box couldn't be read: {error:#}"))
             .ok()
-    });
-    Summary {
-        intent: handoff.intent,
-        room: handoff.room(),
-        moving_box: manifest.map(|manifest| Packed {
-            bytes: manifest.bytes(),
-            full_name: manifest
-                .account
-                .as_ref()
-                .map(|account| account.full_name.clone()),
-            user_name: manifest
-                .account
-                .as_ref()
-                .map(|account| account.user_name.clone()),
-        }),
-    }
+    })?;
+    Some(MovingBox {
+        bytes: manifest.bytes(),
+        full_name: manifest
+            .account
+            .as_ref()
+            .map(|account| account.full_name.clone()),
+        user_name: manifest
+            .account
+            .as_ref()
+            .map(|account| account.user_name.clone()),
+    })
 }

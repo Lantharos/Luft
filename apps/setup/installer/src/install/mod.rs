@@ -9,15 +9,14 @@ use std::path::Path;
 use std::sync::{Condvar, Mutex};
 
 use anyhow::{Context, Result};
+use luft_installer_contract::{Encryption, Regional};
 use luft_meet::Handoff;
 
 pub use configure::account::Account;
-pub use configure::regional::Regional;
 
 use crate::config::Image;
 use configure::deployment::Deployment;
 use configure::{handoff, networks, trust};
-use drive::encryption::Encryption;
 use drive::partition;
 use drive::plan::Plan;
 use drive::target::Mounted;
@@ -231,7 +230,7 @@ fn install(job: &Job, report: &impl Fn(Status)) -> Result<()> {
     if let (Some(encryption), Some(opened)) = (&job.encryption, mounted.encrypted()) {
         trust::seal(&deployment, encryption, opened)?;
     }
-    regional.apply(&deployment)?;
+    configure::regional::apply(&regional, &deployment)?;
     let user = match (&kept, account) {
         (Some(kept), account) => {
             kept.configure(

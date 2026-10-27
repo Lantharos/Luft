@@ -2,7 +2,8 @@
 	import { onDestroy, onMount } from 'svelte';
 	import FingerprintIcon from '@lucide/svelte/icons/fingerprint';
 	import { t } from '@luft/i18n';
-	import { FINGERS, fingerLabel, FingerprintDial, FingerprintEnrollment, fingerprints, Select, type Fingerprints } from '@luft/ui';
+	import { FINGERS, fingerLabel, FingerprintDial, FingerprintEnrollment, Select, type Fingerprints } from '@luft/ui';
+	import { commands } from '#lib/bindings.js';
 	import StepFrame from '#lib/components/StepFrame.svelte';
 	import { flow } from '#lib/state/flow.svelte.js';
 	import { setup } from '#lib/state/setup.svelte.js';
@@ -18,7 +19,7 @@
 	let options = $derived(FINGERS.filter(([value]) => !enrolled.includes(value)).map(([value]) => ({ value, label: fingerLabel(value) })));
 
 	async function look() {
-		reader = await fingerprints().catch(() => null);
+		reader = await commands.fingerprintList().catch(() => null);
 		finger = options.find((option) => !setup.refusedFingers.includes(option.value))?.value ?? options[0]?.value ?? finger;
 	}
 

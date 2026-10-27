@@ -2,19 +2,11 @@ use std::path::Path;
 
 use anyhow::{Context, Result};
 use luft_i18n::t;
-use serde::Deserialize;
+use luft_installer_contract::Encryption;
 
 use super::layout::Role;
 use crate::L10N;
 use crate::system::command::Tool;
-
-#[derive(Deserialize, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct Encryption {
-    recovery_key: String,
-    #[serde(default)]
-    passphrase: String,
-}
 
 pub struct Opened {
     pub partition: String,
@@ -35,38 +27,36 @@ fn uuid_of(device: &str) -> Result<String> {
         .to_owned())
 }
 
-impl Encryption {
-    pub fn open(&self, partition: &str) -> Result<Opened> {
-        let given = format!("{}\n{}\n", self.recovery_key, self.passphrase);
-        let device = trustctl("format", partition)
-            .input(given.as_bytes())
-            .output()
-            .with_context(|| t!(L10N, "installer-encryption-failed"))?
-            .trim()
-            .to_owned();
-        let mut opened = Opened {
-            partition: partition.to_owned(),
-            uuid: String::new(),
-            device,
-        };
-        let (_, label) = Role::Root.filesystem();
-        Tool::new("mkfs.btrfs")
-            .args(["--force", "--label", label])
-            .arg(&opened.device)
-            .run()
-            .with_context(|| t!(L10N, "installer-root-partition-failed"))?;
-        opened.uuid = uuid_of(&opened.device)?;
-        Ok(opened)
-    }
+pub fn open(encryption: &Encryption, partition: &str) -> Result<Opened> {
+    let given = format!("{}\n{}\n", encryption.recovery_key, encryption.passphrase);
+    let device = trustctl("format", partition)
+        .input(given.as_bytes())
+        .output()
+        .with_context(|| t!(L10N, "installer-encryption-failed"))?
+        .trim()
+        .to_owned();
+    let mut opened = Opened {
+        partition: partition.to_owned(),
+        uuid: String::new(),
+        device,
+    };
+    let (_, label) = Role::Root.filesystem();
+    Tool::new("mkfs.btrfs")
+        .args(["--force", "--label", label])
+        .arg(&opened.device)
+        .run()
+        .with_context(|| t!(L10N, "installer-root-partition-failed"))?;
+    opened.uuid = uuid_of(&opened.device)?;
+    Ok(opened)
+}
 
-    pub fn seal(&self, opened: &Opened, state: &Path) -> Result<()> {
-        trustctl("seal", &opened.partition)
-            .arg("--state")
-            .arg(state)
-            .input(format!("{}\n", self.recovery_key).as_bytes())
-            .run()
-            .with_context(|| t!(L10N, "installer-encryption-failed"))
-    }
+pub fn seal(encryption: &Encryption, opened: &Opened, state: &Path) -> Result<()> {
+    trustctl("seal", &opened.partition)
+        .arg("--state")
+        .arg(state)
+        .input(format!("{}\n", encryption.recovery_key).as_bytes())
+        .run()
+        .with_context(|| t!(L10N, "installer-encryption-failed"))
 }
 
 impl Drop for Opened {

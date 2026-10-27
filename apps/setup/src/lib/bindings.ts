@@ -15,11 +15,21 @@ export const commands = {
 		fullName: string,
 		password: string,
 	}, options?: InvokeOptions) => invoke<null>("installer_account", params, options),
-	installerConfigure: (params: import("#lib/bridge/installer.js").Regional, options?: InvokeOptions) => invoke<null>("installer_configure", params, options),
+	installerConfigure: (params: {
+		locale: string,
+		keyboard: Keyboard,
+		timezone: string,
+		hostname: string,
+	}, options?: InvokeOptions) => invoke<null>("installer_configure", params, options),
 	installerFinishFirstBoot: (options?: InvokeOptions) => invoke<null>("installer_finish_first_boot", {}, options),
-	installerInstall: (params: import("#lib/bridge/installer.js").InstallPlan, options?: InvokeOptions) => invoke<null>("installer_install", params, options),
+	installerInstall: (params: {
+		target: Target,
+		variant: string,
+		windows?: WindowsChoices,
+		encryption?: Encryption | null,
+	}, options?: InvokeOptions) => invoke<null>("installer_install", params, options),
 	installerState: (options?: InvokeOptions) => invoke<InstallerState | null>("installer_state", {}, options),
-	installerSurvey: (options?: InvokeOptions) => invoke<import("#lib/bridge/installer.js").Survey>("installer_survey", {}, options),
+	installerSurvey: (options?: InvokeOptions) => invoke<Survey>("installer_survey", {}, options),
 	networkActivate: (params: {
 		connection?: string | null,
 		device?: string | null,
@@ -74,9 +84,9 @@ export const commands = {
 		dns: string[],
 		mtu?: number | null,
 		listenPort?: number | null,
-		peers: Peer[],
+		peers: WireGuardPeer[],
 	}, options?: InvokeOptions) => invoke<null>("network_wireguard_add", params, options),
-	networkWireguardKeys: (options?: InvokeOptions) => invoke<Keys>("network_wireguard_keys", {}, options),
+	networkWireguardKeys: (options?: InvokeOptions) => invoke<WireGuardKeys>("network_wireguard_keys", {}, options),
 	networkWireguardPublicKey: (params: {
 		key: string,
 	}, options?: InvokeOptions) => invoke<string>("network_wireguard_public_key", params, options),
@@ -118,7 +128,7 @@ export const events = {
 	appearanceTypography: (callback: (payload: Typography) => void) => listen<Typography>("appearance.typography", callback),
 	fingerprintEnroll: (callback: (payload: EnrollProgress) => void) => listen<EnrollProgress>("fingerprint.enroll", callback),
 	installerChanged: (callback: (payload: InstallerState) => void) => listen<InstallerState>("installer.changed", callback),
-	kestrelPalette: (callback: (payload: import("@luft/ui").Palette) => void) => listen<import("@luft/ui").Palette>("kestrel.palette", callback),
+	kestrelPalette: (callback: (payload: Palette) => void) => listen<Palette>("kestrel.palette", callback),
 	networkChanged: (callback: (payload: Network) => void) => listen<Network>("network.changed", callback),
 	networkFailed: (callback: (payload: Failure) => void) => listen<Failure>("network.failed", callback),
 };
@@ -128,13 +138,22 @@ export type Airplane = {
 	hardware: boolean,
 };
 
+export type AppIconStyle = "default" | "tinted" | "clear";
+
+export type AppIcons = {
+	style: AppIconStyle,
+	glyphs: string,
+	tinted: IconPaint,
+	clear: IconPaint,
+};
+
 export type AppState = {
 	hardware: Hardware,
 	meet: Intent | null,
 } & Appearance;
 
 export type Appearance = {
-	palette: import("@luft/ui").Palette | null,
+	palette: Palette | null,
 	typography: Typography,
 	motion: Motion,
 	corners: Corners,
@@ -156,13 +175,40 @@ export type Details = {
 	mac: string,
 };
 
+export type Drive = {
+	block: string,
+	device: string,
+	name: string,
+	size: number,
+	kind: DriveKind,
+	removable: boolean,
+	blocked: DriveBlock | null,
+	partitions: number,
+	esp: Space | null,
+	startupSpace: number,
+	windows: WindowsVolume | null,
+	free: Space[],
+	meet: boolean,
+};
+
+export type DriveBlock = "running" | "read-only" | "too-small";
+
+export type DriveKind = "nvme" | "ssd" | "hdd" | "usb" | "card" | "optical" | "image";
+
+export type EapMethod = "peap" | "ttls" | "tls";
+
+export type Encryption = {
+	recoveryKey: string,
+	passphrase?: string,
+};
+
 export type EnrollProgress = {
 	result: string,
 	done: boolean,
 };
 
 export type Enterprise = {
-	method: Method,
+	method: EapMethod,
 	inner: string,
 	identity: string,
 	anonymousIdentity: string,
@@ -198,6 +244,20 @@ export type Hardware = {
 	fingerprint: boolean,
 };
 
+export type Hints = {
+	language: string | null,
+	locale: string | null,
+	timezone: string | null,
+	keyboards: Keyboard[],
+};
+
+export type IconPaint = {
+	plate: string,
+	ink: string,
+	shade: string,
+	rim: number,
+};
+
 export type InstallerState = {
 	phase: Phase,
 	stage: Stage,
@@ -219,15 +279,15 @@ export type Ip = {
 	routes: Route[],
 };
 
+export type Keyboard = {
+	layout: string,
+	variant: string,
+};
+
 export type KeyboardLayout = {
 	layout: string,
 	variant: string,
 	name: string,
-};
-
-export type Keys = {
-	privateKey: string,
-	publicKey: string,
 };
 
 export type Kind = "wired" | "wifi" | "vpn" | "other";
@@ -237,7 +297,25 @@ export type Known = {
 	ssid: string,
 };
 
+export type Layout = "subvolumes" | "separateHome" | "single" | "encrypted" | "unknown";
+
 export type Link = "connected" | "connecting" | "disconnected" | "unplugged";
+
+export type LinuxSystem = {
+	id: string,
+	name: string,
+	drive: string,
+	layout: Layout,
+	blocked: SystemBlock | null,
+	owner: Owner | null,
+	accounts: number,
+	hostname: string | null,
+	networks: number,
+	drives: string[],
+	packages: number,
+	keepsOld: boolean,
+	startup: StartupPartition | null,
+};
 
 export type Locale = {
 	languages: string[],
@@ -245,11 +323,24 @@ export type Locale = {
 	fixed: boolean,
 };
 
+export type MeetSurvey = {
+	drive: string,
+	space: Space | null,
+	otherDrive: boolean,
+	intent: Intent,
+	room: Room | null,
+	movingBox: MovingBox | null,
+};
+
 export type Metered = "automatic" | "yes" | "no";
 
-export type Method = "peap" | "ttls" | "tls";
-
 export type Motion = "full" | "reduced" | "off";
+
+export type MovingBox = {
+	bytes: number,
+	fullName: string | null,
+	userName: string | null,
+};
 
 export type Network = {
 	wifi: Wifi | null,
@@ -259,12 +350,20 @@ export type Network = {
 	airplane: Airplane | null,
 };
 
-export type Peer = {
-	publicKey: string,
-	presharedKey: string,
-	endpoint: string,
-	allowedIps: string[],
-	keepalive?: number | null,
+export type Owner = {
+	name: string,
+	fullName: string,
+	password: boolean,
+};
+
+export type Palette = {
+	accent: string,
+	wallpaperAccent: string,
+	pureBlack: boolean,
+	colors: SchemeColors,
+	terminal: SchemeColors,
+	appIcons: AppIcons,
+	taskbar: import("@luft/ui").TaskbarLooks,
 };
 
 export type Phase = "live" | "first-boot" | "installed";
@@ -292,10 +391,21 @@ export type Radio = {
 
 export type Reason = "password" | "other";
 
+export type Room = {
+	offset: number,
+	size: number,
+	otherDrive: boolean,
+};
+
 export type Route = {
 	destination: string,
 	gateway: string,
 	metric: number | null,
+};
+
+export type SchemeColors = {
+	light: { [key in string]: string },
+	dark: { [key in string]: string },
 };
 
 export type SecureBoot = "on" | "off" | "setup" | "unsupported";
@@ -304,7 +414,26 @@ export type Security = "open" | "owe" | "wep" | "psk" | "sae" | "enterprise";
 
 export type SigningKey = "none" | "pending" | "enrolled";
 
+export type Space = {
+	offset: number,
+	size: number,
+};
+
 export type Stage = "idle" | "preparing" | "copying" | "waiting" | "configuring" | "finished" | "failed";
+
+export type StartupPartition = "esp" | "boot";
+
+export type Survey = {
+	drives: Drive[],
+	hints: Hints,
+	smallestSystem: number,
+	meet: MeetSurvey | null,
+	systems: LinuxSystem[],
+};
+
+export type SystemBlock = "layout" | "read-only" | "startup" | "no-account" | "running";
+
+export type Target = { kind: "whole"; drive: string } | { kind: "alongside"; drive: string; size: number } | { kind: "free"; drive: string; offset: number } | { kind: "replace"; system: string };
 
 export type TrustState = {
 	secureBoot: SecureBoot,
@@ -342,6 +471,41 @@ export type WifiNetwork = {
 	state: Link,
 	details: Details | null,
 	radio: Radio | null,
+};
+
+export type WindowsBlock = "bitlocker" | "hibernated" | "dirty" | "full";
+
+export type WindowsChoices = {
+	fastStartupOff?: boolean,
+	universalClock?: boolean,
+	bluetooth?: boolean,
+};
+
+export type WindowsVolume = {
+	block: string,
+	offset: number,
+	size: number,
+	used: number,
+	smallest: number,
+	room: number,
+	version: string | null,
+	fastStartup: boolean,
+	universalClock: boolean,
+	bluetooth: number,
+	blocked: WindowsBlock | null,
+};
+
+export type WireGuardKeys = {
+	privateKey: string,
+	publicKey: string,
+};
+
+export type WireGuardPeer = {
+	publicKey: string,
+	presharedKey: string,
+	endpoint: string,
+	allowedIps: string[],
+	keepalive?: number | null,
 };
 
 export type Wired = {

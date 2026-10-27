@@ -3,8 +3,8 @@
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import { t } from '@luft/i18n';
 	import { Switch } from '@luft/ui';
-	import * as network from '@luft/network';
-	import type { Network, WifiNetwork } from '@luft/network';
+	import { needsPassword, type Network, type WifiNetwork } from '@luft/network';
+	import { commands, events } from '#lib/bindings.js';
 	import StepFrame from '#lib/components/StepFrame.svelte';
 	import { flow } from '#lib/state/flow.svelte.js';
 	import { regional } from '#lib/state/regional.svelte.js';
@@ -31,13 +31,13 @@
 	let networks = $derived(all ? (wifi?.networks ?? []) : (wifi?.networks.slice(0, SHOWN) ?? []));
 
 	$effect(() => {
-		void network
-			.open()
+		void commands
+			.networkOpen()
 			.then((opened) => (current = opened))
 			.catch(() => (unavailable = true));
 		const stops = [
-			network.onChanged((changed) => (current = changed)),
-			network.onFailed((failure) => {
+			events.networkChanged((changed) => (current = changed)),
+			events.networkFailed((failure) => {
 				if (!attempt || failure.path !== wifi?.device) return;
 				problems[attempt] = failure.reason === 'password' ? WRONG_PASSWORD : FAILED;
 				if (failure.reason === 'password') joining = attempt;
@@ -46,11 +46,11 @@
 		];
 		return () => {
 			stops.forEach((stop) => stop());
-			void network.close();
+			void commands.networkClose();
 		};
 	});
 
-	async function run(ssid: string, action: () => Promise<void>) {
+	async function run(ssid: string, action: () => Promise<unknown>) {
 		delete problems[ssid];
 		attempt = ssid;
 		joining = null;
@@ -62,9 +62,9 @@
 
 	function choose(entry: WifiNetwork) {
 		if (!wifi || entry.state !== 'disconnected') return;
-		if (entry.saved) void run(entry.ssid, () => network.activate({ connection: entry.saved!, device: wifi!.device }));
-		else if (network.needsPassword(entry.security)) joining = joining === entry.ssid ? null : entry.ssid;
-		else void run(entry.ssid, () => network.join({ device: wifi!.device, ssid: entry.ssid, security: entry.security }));
+		if (entry.saved) void run(entry.ssid, () => commands.networkActivate({ connection: entry.saved!, device: wifi!.device }));
+		else if (needsPassword(entry.security)) joining = joining === entry.ssid ? null : entry.ssid;
+		else void run(entry.ssid, () => commands.networkJoin({ device: wifi!.device, ssid: entry.ssid, security: entry.security }));
 	}
 </script>
 
@@ -84,7 +84,7 @@
 			{#if wifi}
 				<div class="flex items-center justify-between px-4 py-2">
 					<span class="text-[14px] font-medium text-[var(--text-soft)]">Wi-Fi</span>
-					<Switch checked={wifi.enabled} label="Wi-Fi" disabled={!wifi.hardwareEnabled} onchange={(enabled) => network.setWifi(enabled)} />
+					<Switch checked={wifi.enabled} label="Wi-Fi" disabled={!wifi.hardwareEnabled} onchange={(enabled) => commands.networkSetWifi({ enabled })} />
 				</div>
 				{#if wifi.enabled}
 					{#each networks as entry (entry.ssid)}
@@ -93,7 +93,7 @@
 							open={joining === entry.ssid}
 							problem={problems[entry.ssid] ? t(problems[entry.ssid]) : ''}
 							onchoose={() => choose(entry)}
-							onjoin={(password) => run(entry.ssid, () => network.join({ device: wifi!.device, ssid: entry.ssid, security: entry.security, password }))}
+							onjoin={(password) => run(entry.ssid, () => commands.networkJoin({ device: wifi!.device, ssid: entry.ssid, security: entry.security, password }))}
 						/>
 					{/each}
 					{#if !all && wifi.networks.length > SHOWN}

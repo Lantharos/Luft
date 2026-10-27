@@ -8,8 +8,8 @@ mod volumes;
 use std::path::{Path, PathBuf};
 
 use luft_disks::udisks::snapshot;
+use luft_installer_contract::{LinuxSystem, Owner, StartupPartition, SystemBlock};
 use luft_meet::Layout;
-use serde::Serialize;
 
 pub use accounts::Account;
 use fstab::Entry;
@@ -27,14 +27,6 @@ const LIVE_MEDIUM: [&str; 2] = ["/run/initramfs", LIVE_HOST];
 const NOT_A_DRIVE: [&str; 7] = ["swap", "tmpfs", "proc", "sysfs", "devpts", "none", "auto"];
 const SYSTEM_MOUNTS: [&str; 5] = ["/", "/home", "/boot", "/boot/efi", "/efi"];
 
-#[derive(Serialize, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct Owner {
-    pub name: String,
-    pub full_name: String,
-    pub password: bool,
-}
-
 #[derive(Clone)]
 pub struct Home {
     pub part: Part,
@@ -50,26 +42,6 @@ pub struct Plan {
     pub esp: Part,
     pub boot: Option<Part>,
     pub drives: Vec<Entry>,
-}
-
-#[derive(Serialize, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct System {
-    pub id: String,
-    pub name: String,
-    pub drive: String,
-    pub layout: Layout,
-    pub blocked: Option<&'static str>,
-    pub owner: Option<Owner>,
-    pub accounts: usize,
-    pub hostname: Option<String>,
-    pub networks: usize,
-    pub drives: Vec<String>,
-    pub packages: usize,
-    pub keeps_old: bool,
-    pub startup: Option<&'static str>,
-    #[serde(skip)]
-    pub plan: Option<Plan>,
 }
 
 struct Found<'a> {
@@ -149,7 +121,7 @@ fn running_from(part: &Part) -> bool {
         .any(|point| LIVE_MEDIUM.iter().any(|medium| point.starts_with(medium)))
 }
 
-fn describe(found: Found, parts: &[Part]) -> System {
+fn describe(found: Found, parts: &[Part]) -> (LinuxSystem, Option<Plan>) {
     let old = &found.old;
     let (layout, home) = match home(&found, parts) {
         Ok(found) => found,
@@ -165,15 +137,15 @@ fn describe(found: Found, parts: &[Part]) -> System {
         password: account.hash.is_some(),
     });
     let blocked = if !layout.replaceable() {
-        Some("layout")
+        Some(SystemBlock::Layout)
     } else if found.drive.read_only {
-        Some("read-only")
+        Some(SystemBlock::ReadOnly)
     } else if startup.is_none() {
-        Some("startup")
+        Some(SystemBlock::Startup)
     } else if owner.is_none() {
-        Some("no-account")
+        Some(SystemBlock::NoAccount)
     } else if layout == Layout::SeparateHome && running_from(found.root) {
-        Some("running")
+        Some(SystemBlock::Running)
     } else {
         None
     };
@@ -188,7 +160,7 @@ fn describe(found: Found, parts: &[Part]) -> System {
         }),
         _ => None,
     };
-    System {
+    let system = LinuxSystem {
         id: format!(
             "{}:{}",
             found.root.block,
@@ -205,11 +177,15 @@ fn describe(found: Found, parts: &[Part]) -> System {
         drives: drives.iter().map(|entry| entry.file.clone()).collect(),
         packages: old.packages.len(),
         keeps_old: layout == Layout::Subvolumes,
-        startup: plan
-            .as_ref()
-            .map(|plan| if plan.boot.is_some() { "boot" } else { "esp" }),
-        plan,
-    }
+        startup: plan.as_ref().map(|plan| {
+            if plan.boot.is_some() {
+                StartupPartition::Boot
+            } else {
+                StartupPartition::Esp
+            }
+        }),
+    };
+    (system, plan)
 }
 
 fn roots_in(top: &Path, fs_type: &str) -> Vec<Option<String>> {
@@ -251,7 +227,12 @@ impl Looking {
     }
 }
 
-fn systems_on(drive: &snapshot::Drive, root: &Part, parts: &[Part], scratch: &Path) -> Vec<System> {
+fn systems_on(
+    drive: &snapshot::Drive,
+    root: &Part,
+    parts: &[Part],
+    scratch: &Path,
+) -> Vec<(LinuxSystem, Option<Plan>)> {
     let opened = match Looking::open(root, scratch) {
         Ok(opened) => opened,
         Err(error) => {
@@ -287,7 +268,7 @@ fn systems_on(drive: &snapshot::Drive, root: &Part, parts: &[Part], scratch: &Pa
         .collect()
 }
 
-pub fn find(drives: &[snapshot::Drive], scratch: &Path) -> Vec<System> {
+pub fn find(drives: &[snapshot::Drive], scratch: &Path) -> Vec<(LinuxSystem, Option<Plan>)> {
     let parts = volumes::parts(drives);
     drives
         .iter()

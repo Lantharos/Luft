@@ -16,7 +16,7 @@ use crate::L10N;
 use crate::plan::gap::{self, Head};
 use crate::plan::layout::{self, Plan, Role};
 use crate::plan::sizes::{self, BOX_CLUSTER};
-use crate::protocol::{Belongings, Prepared, Stage};
+use crate::protocol::{Packing, Prepared, Stage};
 use crate::windows::folders::{Item, verbatim, walk};
 use crate::windows::helper::Context;
 use crate::windows::helper::drive::state::Found;
@@ -189,7 +189,7 @@ fn plan_box(
     Ok((plan, disk))
 }
 
-pub fn pack(context: &Context, belongings: &Belongings) -> Result<Prepared, String> {
+pub fn pack(context: &Context, belongings: &Packing) -> Result<Prepared, String> {
     let storage = Storage::open()?;
     let drive = windows_drive::find()?;
     let found = state::find(&storage.all_partitions()?);

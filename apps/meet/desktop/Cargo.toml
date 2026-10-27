@@ -16,6 +16,7 @@ sabine.workspace = true
 sabine-runtime.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+specta.workspace = true
 sha2.workspace = true
 ureq.workspace = true
 

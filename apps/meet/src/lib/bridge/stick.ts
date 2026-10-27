@@ -1,6 +1,5 @@
-import { call, start, type Source } from '#lib/bridge/meet.js';
-
-export type Way = { kind: 'erase' } | { kind: 'ventoy'; replace: boolean };
+import { commands, type Making, type Source } from '#lib/bindings.js';
+import { call, start } from '#lib/bridge/meet.js';
 
 export interface Volume {
 	label: string | null;
@@ -43,13 +42,7 @@ export interface Finished {
 	ejected: boolean;
 }
 
-export interface Making {
-	source: Source;
-	stick: string;
-	way: Way;
-}
-
 export const sticks = (iso: string | null) => call<Sticks>({ call: 'sticks', iso });
 export const room = (stick: string, needed: number) => call<Room>({ call: 'ventoyRoom', stick, needed });
-export const offer = (source: Source) => start<Offer>('meet_stick_offer', { source });
-export const make = (making: Making) => start<Finished>('meet_make_stick', making);
+export const offer = (source: Source) => start<Offer>((job) => commands.meetStickOffer({ job, request: { source } }));
+export const make = (making: Making) => start<Finished>((job) => commands.meetMakeStick({ job, request: making }));

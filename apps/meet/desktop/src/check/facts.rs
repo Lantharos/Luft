@@ -1,5 +1,6 @@
 use luft_variant::Variant;
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 #[cfg(any(windows, test))]
 use crate::plan::places::Place;
@@ -19,7 +20,7 @@ pub enum Firmware {
     Bios,
 }
 
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum Platform {
     Windows,

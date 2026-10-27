@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { bytes, ProgressBar } from '@luft/ui';
-	import type { Stage } from '#lib/bridge/meet.js';
+	import type { Stage } from '#lib/bindings.js';
 	import { session } from '#lib/state/meet.svelte.js';
 	import { maker } from '#lib/state/stick.svelte.js';
 

@@ -20,3 +20,6 @@ local_files = true
 provider = "github"
 repository = "Lantharos/Luft"
 policy = "disabled"
+
+[bindings]
+path = "src/lib/bindings.ts"

@@ -4,6 +4,7 @@ use std::time::Duration;
 use luft_i18n::t;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
+use specta::Type;
 use ureq::Agent;
 use ureq::tls::{RootCerts, TlsConfig};
 
@@ -17,7 +18,7 @@ const ATTEMPTS: u32 = 6;
 const CONNECT_TIMEOUT: Duration = Duration::from_secs(30);
 const READ_TIMEOUT: Duration = Duration::from_secs(60);
 
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum Channel {
     Latest,

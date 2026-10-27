@@ -3,6 +3,7 @@ use std::sync::OnceLock;
 #[cfg(target_os = "linux")]
 use luft_i18n::{formats, requested as preferred};
 use serde::Serialize;
+use specta::Type;
 
 use crate::L10N;
 #[cfg(windows)]
@@ -16,7 +17,7 @@ struct Chosen {
     formats: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Locale {
     languages: Vec<String>,
     formats: String,

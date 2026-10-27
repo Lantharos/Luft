@@ -1,14 +1,7 @@
-import { invoke, listen } from '@lantharos/sabine';
-import type { Locale } from '@luft/i18n';
+import { commands, events, type Call, type Failure, type Finished, type FolderKind, type Intent, type Packing, type Source, type WindowsChoices } from '#lib/bindings.js';
 
 export type Level = 'fine' | 'note' | 'blocks';
-export type Stage = 'shrinking' | 'erasing' | 'partitioning' | 'downloading' | 'packing' | 'removing' | 'writing' | 'copying' | 'verifying';
-export type Intent = 'try' | 'install' | 'replace';
-export type Platform = 'windows' | 'linux';
 export type Layout = 'subvolumes' | 'separateHome' | 'single' | 'encrypted' | 'unknown';
-export type FolderKind = 'desktop' | 'documents' | 'downloads' | 'music' | 'pictures' | 'videos';
-export type Channel = 'latest' | 'nightly';
-export type Source = { kind: 'download'; channel: Channel } | { kind: 'file'; path: string };
 
 export type Action = 'firmwareSettings' | 'tidy' | 'chooseIso';
 
@@ -96,12 +89,6 @@ export interface Installed {
 	leftovers: boolean;
 }
 
-export interface Progress {
-	stage: Stage;
-	done: number;
-	total: number;
-}
-
 export interface FoundFolder {
 	kind: FolderKind;
 	path: string;
@@ -121,20 +108,6 @@ export interface Belongings {
 	account: Account;
 }
 
-export interface Packing {
-	folders: { kind: FolderKind; path: string }[];
-	wallpaper: string | null;
-	account: Account | null;
-	wifi: boolean;
-	bluetooth: boolean;
-}
-
-export interface WindowsChoices {
-	fastStartupOff: boolean;
-	universalClock: boolean;
-}
-
-export type Failure = 'declined' | 'stopped';
 
 export class Failed extends Error {
 	constructor(
@@ -144,8 +117,6 @@ export class Failed extends Error {
 		super(detail);
 	}
 }
-
-type Finished = { job: number; value: unknown } | { job: number; failure: Failure; detail: string };
 
 interface Waiting {
 	resolve: (value: unknown) => void;
@@ -164,15 +135,15 @@ function settle(finished: Finished) {
 	else job.resolve(finished.value);
 }
 
-export async function start<T>(command: string, request: unknown = {}): Promise<T> {
+export async function start<T>(begin: (job: number) => Promise<null>): Promise<T> {
 	if (!listening) {
-		listen<Finished>('meet.finished', settle);
+		events.meetFinished(settle);
 		listening = true;
 	}
 	const job = nextJob++;
 	const finished = new Promise<T>((resolve, reject) => waiting.set(job, { resolve: resolve as (value: unknown) => void, reject }));
 	try {
-		await invoke(command, { job, request });
+		await begin(job);
 	} catch (error) {
 		waiting.delete(job);
 		throw error;
@@ -180,7 +151,7 @@ export async function start<T>(command: string, request: unknown = {}): Promise<
 	return finished;
 }
 
-export const call = <T>(request: object) => start<T>('meet_call', request);
+export const call = <T>(request: Call) => start<T>((job) => commands.meetCall({ job, request }));
 
 export const check = (source: Source) => call<Report>({ call: 'check', source });
 export const prepare = (luft: number, source: Source, place: string) => call<Prepared>({ call: 'prepare', luft, source, place });
@@ -197,12 +168,8 @@ export const cancelResize = () => call<Installed>({ call: 'cancelResize' });
 export const giveWindows = () => call<Installed>({ call: 'giveWindows' });
 export const startLuft = () => call<null>({ call: 'startLuft' });
 export const removeLuft = () => call<null>({ call: 'removeLuft' });
-export const installed = () => start<boolean>('meet_installed');
-export const pickIso = () => start<string | null>('meet_pick_iso');
-export const saveLogs = () => start<string | null>('meet_save_logs');
-export const showFile = (path: string) => start<null>('meet_show_file', path);
-export const belongings = () => start<Belongings>('meet_belongings');
-export const defaultSource = () => invoke<Source>('meet_source', {});
-export const platform = () => invoke<Platform>('meet_platform', {});
-export const locale = () => invoke<Locale>('meet_locale', {});
-export const onProgress = (callback: (progress: Progress) => void) => listen<Progress>('meet.progress', callback);
+export const installed = () => start<boolean>((job) => commands.meetInstalled({ job, request: {} }));
+export const pickIso = () => start<string | null>((job) => commands.meetPickIso({ job, request: {} }));
+export const saveLogs = () => start<string | null>((job) => commands.meetSaveLogs({ job, request: {} }));
+export const showFile = (path: string) => start<null>((job) => commands.meetShowFile({ job, request: path }));
+export const belongings = () => start<Belongings>((job) => commands.meetBelongings({ job, request: {} }));

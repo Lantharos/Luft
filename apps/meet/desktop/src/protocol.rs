@@ -5,12 +5,13 @@ use luft_meet::moving_box::FolderKind;
 use luft_meet::regional::Hints;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use specta::Type;
 
 use crate::check::common::Finding;
 use crate::live::source::Source;
 use crate::stick::Image;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Type)]
 #[serde(
     tag = "call",
     rename_all = "camelCase",
@@ -30,7 +31,7 @@ pub enum Call {
         source: Source,
     },
     Pack {
-        belongings: Belongings,
+        belongings: Packing,
     },
     Restart {
         intent: Intent,
@@ -53,6 +54,7 @@ pub enum Call {
     Sticks {
         iso: Option<PathBuf>,
     },
+    #[specta(skip)]
     Flash {
         stick: String,
         image: Image,
@@ -61,6 +63,7 @@ pub enum Call {
         stick: String,
         needed: u64,
     },
+    #[specta(skip)]
     AddToVentoy {
         stick: String,
         image: Image,
@@ -83,7 +86,7 @@ impl Call {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, Default)]
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, Default, Type)]
 #[serde(rename_all = "camelCase", default)]
 pub struct WindowsChoices {
     pub fast_startup_off: bool,
@@ -97,7 +100,7 @@ pub struct Request {
     pub call: Call,
 }
 
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum Stage {
     Shrinking,
@@ -111,7 +114,7 @@ pub enum Stage {
     Verifying,
 }
 
-#[derive(Serialize, Deserialize, Clone, Copy, Debug)]
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Progress {
     pub stage: Stage,
@@ -146,14 +149,14 @@ pub struct Report<F> {
     pub outdated: bool,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct ChosenFolder {
     pub kind: FolderKind,
     pub path: String,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct ChosenAccount {
     pub full_name: String,
@@ -161,9 +164,9 @@ pub struct ChosenAccount {
     pub picture: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, Default)]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, Type)]
 #[serde(rename_all = "camelCase", default)]
-pub struct Belongings {
+pub struct Packing {
     pub folders: Vec<ChosenFolder>,
     pub wallpaper: Option<String>,
     pub account: Option<ChosenAccount>,

@@ -2,6 +2,7 @@ use std::time::{Duration, Instant};
 
 use serde::Deserialize;
 use serde_json::Value;
+use specta::Type;
 
 use super::job::Failed;
 use super::{Events, PROGRESS};
@@ -13,20 +14,20 @@ use crate::stick::fetch;
 
 const PROGRESS_INTERVAL: Duration = Duration::from_millis(250);
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Asking {
     source: Source,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 #[serde(tag = "kind", rename_all = "camelCase")]
 enum Way {
     Erase,
     Ventoy { replace: bool },
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Making {
     source: Source,

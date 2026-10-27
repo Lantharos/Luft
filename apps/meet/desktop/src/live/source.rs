@@ -3,10 +3,11 @@ use std::io::{self, Read};
 use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use super::download::{self, Channel, Download};
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 #[serde(tag = "kind", rename_all = "camelCase")]
 pub enum Source {
     Download { channel: Channel },

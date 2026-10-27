@@ -1,22 +1,23 @@
 use std::sync::Arc;
 
-use sabine::{BridgeError, SabineWindow};
+use sabine::{BridgeError, BridgeEvent, SabineWindow};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use specta::Type;
 
 use super::Events;
 
-const FINISHED: &str = "meet.finished";
+pub const FINISHED: BridgeEvent<Finished> = BridgeEvent::new("meet.finished");
 
-#[derive(Serialize, Clone, Copy)]
+#[derive(Serialize, Clone, Copy, Type)]
 #[serde(rename_all = "camelCase")]
 enum Failure {
     Declined,
     Stopped,
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Type)]
 pub struct Failed {
     failure: Failure,
     detail: String,
@@ -44,21 +45,21 @@ impl From<String> for Failed {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Started<Req> {
     job: u64,
     request: Req,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(untagged)]
 enum Outcome {
     Done { value: Value },
     Failed(Failed),
 }
 
-#[derive(Serialize)]
-struct Finished {
+#[derive(Serialize, Type)]
+pub struct Finished {
     job: u64,
     #[serde(flatten)]
     outcome: Outcome,
@@ -66,7 +67,7 @@ struct Finished {
 
 pub fn command<Req, F>(window: SabineWindow, name: &str, events: &Events, work: F) -> SabineWindow
 where
-    Req: DeserializeOwned + Send + 'static,
+    Req: DeserializeOwned + Type + Send + 'static,
     F: Fn(&Events, Req) -> Result<Value, Failed> + Send + Sync + 'static,
 {
     let events = events.clone();
@@ -84,6 +85,6 @@ where
             };
             events.emit(FINISHED, Finished { job, outcome });
         });
-        Ok::<_, BridgeError>(Value::Null)
+        Ok::<_, BridgeError>(())
     })
 }

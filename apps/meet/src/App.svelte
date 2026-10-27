@@ -4,6 +4,7 @@
 	import { cubicOut } from 'svelte/easing';
 	import { t } from '@luft/i18n';
 	import { appearance, GlassShell, Toast, WindowControls } from '@luft/ui';
+	import { commands } from '#lib/bindings.js';
 	import * as meet from '#lib/bridge/meet.js';
 	import { luft } from '#lib/state/luft.svelte.js';
 	import { session } from '#lib/state/meet.svelte.js';
@@ -52,7 +53,7 @@
 		void meet.installed().then((installed) => {
 			if (installed && session.step === 'hello') void luft.open();
 		});
-		void meet.locale().then((locale) => {
+		void commands.meetLocale().then((locale) => {
 			stops.push(appearance.start({ palette: null, typography: { interface: null, monospace: null, textScale: 1 }, motion: 'full', locale }));
 		});
 		return () => stops.forEach((stop) => stop());

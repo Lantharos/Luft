@@ -1,7 +1,8 @@
 import { t } from '@luft/i18n';
 import { Toasts } from '@luft/ui';
+import { commands, events, type Channel, type Intent, type Packing, type Platform, type Progress, type Source, type Stage, type WindowsChoices } from '#lib/bindings.js';
 import * as meet from '#lib/bridge/meet.js';
-import type { Action, Channel, Intent, Packing, PlaceKind, Platform, Prepared, Progress, Report, Source, Stage, WindowsChoices } from '#lib/bridge/meet.js';
+import type { Action, PlaceKind, Prepared, Report } from '#lib/bridge/meet.js';
 
 export type Step = 'hello' | 'luft' | 'resize' | 'check' | 'room' | 'working' | 'ready' | 'box' | 'removed' | 'stick' | 'stickDone';
 export type Task =
@@ -225,9 +226,9 @@ class MeetState {
 	}
 
 	listen() {
-		void meet.defaultSource().then((source) => (this.source = source));
-		void meet.platform().then((platform) => (this.platform = platform));
-		return meet.onProgress((progress) => (this.progress = progress));
+		void commands.meetSource().then((source) => (this.source = source));
+		void commands.meetPlatform().then((platform) => (this.platform = platform));
+		return events.meetProgress((progress) => (this.progress = progress));
 	}
 }
 

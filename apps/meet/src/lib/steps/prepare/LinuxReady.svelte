@@ -6,7 +6,7 @@
 	import Usb from '@lucide/svelte/icons/usb';
 	import { t } from '@luft/i18n';
 	import { Choice, Dialog } from '@luft/ui';
-	import type { Intent } from '#lib/bridge/meet.js';
+	import type { Intent } from '#lib/bindings.js';
 	import Frame from '#lib/components/Frame.svelte';
 	import Problem from '#lib/components/Problem.svelte';
 	import { session } from '#lib/state/meet.svelte.js';

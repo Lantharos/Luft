@@ -6,7 +6,7 @@
 	import Usb from '@lucide/svelte/icons/usb';
 	import { t } from '@luft/i18n';
 	import { bytes, Choice, Dialog, Switch } from '@luft/ui';
-	import type { Intent, WindowsChoices } from '#lib/bridge/meet.js';
+	import type { Intent, WindowsChoices } from '#lib/bindings.js';
 	import Frame from '#lib/components/Frame.svelte';
 	import Problem from '#lib/components/Problem.svelte';
 	import { session } from '#lib/state/meet.svelte.js';
@@ -20,7 +20,7 @@
 
 	let restarting = $state<Intent | null>(null);
 	let removing = $state(false);
-	let choices = $state<WindowsChoices>({ fastStartupOff: true, universalClock: true });
+	let choices = $state<Required<WindowsChoices>>({ fastStartupOff: true, universalClock: true });
 	let prepared = $derived(session.prepared);
 	let facts = $derived(session.windows);
 

@@ -5,11 +5,11 @@ use std::path::Path;
 
 use futures_util::future::{try_join, try_join_all};
 use luft_app::dbus::{self, error_name, failed};
-use luft_app::{Commands, Events};
+use luft_app::{Commands, Empty, Events};
 use luft_i18n::t;
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
+use specta::Type;
 use zbus::proxy::MethodFlags;
 use zbus::{DynamicType, OwnedObjectPath, Proxy};
 
@@ -21,7 +21,7 @@ const USER: &str = "org.freedesktop.Accounts.User";
 const ADMINISTRATOR: i32 = 1;
 const REGULAR_PASSWORD: i32 = 0;
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 struct User {
     user_name: String,
@@ -31,14 +31,14 @@ struct User {
     has_password: bool,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 struct Users {
     me: User,
     others: Vec<User>,
 }
 
-#[derive(Deserialize)]
-struct Rename {
+#[derive(Deserialize, Type)]
+struct UserRename {
     name: String,
 }
 
@@ -96,7 +96,7 @@ async fn describe(path: OwnedObjectPath) -> Result<User, String> {
     })
 }
 
-async fn users(_: Value) -> Result<Users, String> {
+async fn users(Empty {}: Empty) -> Result<Users, String> {
     let cached: Vec<OwnedObjectPath> = accounts()
         .await?
         .call("ListCachedUsers", &())
@@ -108,7 +108,7 @@ async fn users(_: Value) -> Result<Users, String> {
     Ok(Users { me, others })
 }
 
-async fn choose_picture(_: Value) -> Result<bool, String> {
+async fn choose_picture(Empty {}: Empty) -> Result<bool, String> {
     let Some(picture) = picture::choose().await? else {
         return Ok(false);
     };
@@ -119,7 +119,7 @@ async fn choose_picture(_: Value) -> Result<bool, String> {
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     let window = window
         .command_async("users", users)
-        .command_async("users_rename", |Rename { name }| async move {
+        .command_async("users_rename", |UserRename { name }| async move {
             change("SetRealName", &name.trim()).await
         })
         .command_async("users_choose_picture", choose_picture)

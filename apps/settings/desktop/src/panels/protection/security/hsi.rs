@@ -1,5 +1,6 @@
 use luft_app::dbus::failed;
 use serde::Serialize;
+use specta::Type;
 
 use super::properties::{Map, Service, absent, get};
 
@@ -17,7 +18,7 @@ const FIRMWARE_SETTING: u64 = 1 << 12;
 const SYSTEM_SETTING: u64 = 1 << 13;
 const HIGHEST_LEVEL: u32 = 5;
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 enum Fix {
     Maker,
@@ -26,7 +27,7 @@ enum Fix {
     Unknown,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Protection {
     id: String,
@@ -34,7 +35,7 @@ pub struct Protection {
     fix: Fix,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct HostSecurity {
     level: u32,

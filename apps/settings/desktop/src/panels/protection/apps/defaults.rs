@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use luft_app::apps::{self, App};
 use luft_i18n::t;
+use specta::Type;
 
 use crate::L10N;
 
@@ -99,15 +100,15 @@ const CATEGORIES: [Category; 9] = [
     },
 ];
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Handler {
     category: &'static str,
     apps: Vec<App>,
     current: Option<String>,
 }
 
-#[derive(Deserialize)]
-pub struct Choice {
+#[derive(Deserialize, Type)]
+pub struct DefaultApp {
     category: String,
     app: String,
 }
@@ -137,7 +138,7 @@ pub fn list() -> Vec<Handler> {
         .collect()
 }
 
-pub fn set(Choice { category, app }: Choice) -> Result<(), String> {
+pub fn set(DefaultApp { category, app }: DefaultApp) -> Result<(), String> {
     let category = CATEGORIES
         .iter()
         .find(|known| known.id == category)

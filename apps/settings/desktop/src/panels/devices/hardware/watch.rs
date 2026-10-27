@@ -3,13 +3,14 @@ use std::pin::pin;
 use futures_util::{Stream, StreamExt, stream};
 use luft_app::Events;
 use luft_app::dbus::{self, failed, objects};
+use sabine::BridgeEvent;
 use zbus::message::Type;
 use zbus::{MatchRule, MessageStream};
 
-use super::{detect, pointers};
+use super::{Hardware, detect, pointers};
 use crate::panels::connections::bluetooth::rfkill;
 
-const CHANGED: &str = "hardware.changed";
+pub const CHANGED: BridgeEvent<Hardware> = BridgeEvent::new("hardware.changed");
 const BUS: &str = "org.freedesktop.DBus";
 const BLUEZ: &str = "org.bluez";
 const OBJECT_MANAGER: &str = "org.freedesktop.DBus.ObjectManager";

@@ -14,6 +14,7 @@ luft-dbus.workspace = true
 luft-trust.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+specta.workspace = true
 zbus = { workspace = true, features = ["proxy", "tokio"] }
 
 [dev-dependencies]

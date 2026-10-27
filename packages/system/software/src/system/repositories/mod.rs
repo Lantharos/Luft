@@ -18,6 +18,7 @@ const FOLDER: &str = "/etc/yum.repos.d";
 /// A repository file and the keys it names, by the address `gpgkey` gives each, ready to be
 /// checked and added.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename = "RepositoryDraft")]
 pub struct Draft {
     pub file: String,
     pub text: String,
@@ -25,6 +26,7 @@ pub struct Draft {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Type)]
+#[serde(rename = "SourceKey")]
 pub struct Key {
     pub fingerprint: String,
     pub user: String,

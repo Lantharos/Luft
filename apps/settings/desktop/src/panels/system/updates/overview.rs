@@ -3,6 +3,7 @@ use std::sync::{Mutex, MutexGuard};
 use luft_software::system::updates;
 use luft_software::task::Task;
 use serde::Serialize;
+use specta::Type;
 
 use super::backend;
 use super::image;
@@ -10,16 +11,16 @@ use super::packages;
 use super::state;
 use super::store::Checked;
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Type)]
 #[serde(tag = "kind", rename_all = "camelCase")]
 pub enum System {
-    Packages(packages::Overview),
-    Image(Box<image::Overview>),
+    Packages(packages::PackagesOverview),
+    Image(Box<image::ImageOverview>),
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct Overview {
+pub struct UpdatesOverview {
     checked: Option<u64>,
     apps: Option<usize>,
     pub system: System,
@@ -50,7 +51,7 @@ pub fn load(refresh: Option<Task>) -> Result<(), String> {
     } else {
         Checked::load()
     };
-    state::set_overview(Overview {
+    state::set_overview(UpdatesOverview {
         checked: checked.at,
         apps: state::overview().and_then(|overview| overview.apps),
         system,

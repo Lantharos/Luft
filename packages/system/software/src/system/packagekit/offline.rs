@@ -1,5 +1,6 @@
 use luft_app::dbus::{self, failed};
 use serde::Serialize;
+use specta::Type;
 use zbus::Proxy;
 
 use super::package::PackageId;
@@ -7,7 +8,7 @@ use super::transaction::{PATH, SERVICE};
 
 const INTERFACE: &str = "org.freedesktop.PackageKit.Offline";
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Results {
     pub success: bool,

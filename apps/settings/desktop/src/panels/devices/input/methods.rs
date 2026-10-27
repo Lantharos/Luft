@@ -1,5 +1,6 @@
 use luft_app::{dbus, ibus};
 use serde::Serialize;
+use specta::Type;
 use zbus::fdo::PropertiesProxy;
 use zbus::names::InterfaceName;
 use zbus::{OwnedVariant, Structure, Variant};
@@ -11,7 +12,7 @@ const NAME: usize = 2;
 const LONG_NAME: usize = 3;
 const LANGUAGE: usize = 5;
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct InputMethod {
     id: String,
     name: String,

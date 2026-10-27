@@ -6,6 +6,7 @@ use gstreamer::prelude::*;
 use image::{DynamicImage, RgbImage};
 use luft_i18n::t;
 use serde::Deserialize;
+use specta::Type;
 
 use super::cache::{cached_path, failed};
 use super::library::{extension, is_video};
@@ -16,7 +17,7 @@ const DECODABLE_IMAGES: [&str; 5] = ["jpg", "jpeg", "png", "webp", "jxl"];
 const PREROLL_TIMEOUT_SECONDS: u64 = 10;
 const DECODED_FRAME_SINK: &str = "capsfilter caps=video/x-raw ! fakesink";
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Image {
     pub path: String,
 }

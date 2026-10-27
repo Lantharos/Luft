@@ -7,12 +7,13 @@ use gio::prelude::*;
 use luft_i18n::t;
 use serde::Deserialize;
 use serde_json::Value;
+use specta::Type;
 
-pub use watch::Watcher;
+pub use watch::{SETTINGS_CHANGED, Watcher};
 
 use crate::L10N;
 
-#[derive(Deserialize, Clone, PartialEq, Eq, Hash)]
+#[derive(Deserialize, Clone, PartialEq, Eq, Hash, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Location {
     pub schema: String,

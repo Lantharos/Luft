@@ -5,6 +5,7 @@ use luft_software::progress::Progress;
 use luft_software::system::image::{self, Deployments, Release, Status, Update};
 use luft_software::task::{Cancel, Task};
 use serde::Serialize;
+use specta::Type;
 
 use super::backend::{AVAILABLE, Backend, Notice, READY};
 use super::overview::{self, Loaded, System};
@@ -12,7 +13,7 @@ use super::store::{Checked, Found};
 
 pub use switch::run as switch;
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Available {
     #[serde(flatten)]
@@ -20,9 +21,9 @@ pub struct Available {
     size: u64,
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct Overview {
+pub struct ImageOverview {
     #[serde(flatten)]
     status: Status,
     available: Option<Available>,
@@ -65,7 +66,7 @@ impl Backend for Image {
             });
         Ok(Loaded {
             package_apps: 0,
-            system: System::Image(Box::new(Overview {
+            system: System::Image(Box::new(ImageOverview {
                 status,
                 available,
                 offer: switch::offer(deployments, refreshed),

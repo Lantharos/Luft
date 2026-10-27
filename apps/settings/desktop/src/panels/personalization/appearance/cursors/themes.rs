@@ -4,6 +4,7 @@ use std::path::{Path, PathBuf};
 
 use gio::glib;
 use serde::Serialize;
+use specta::Type;
 
 use super::installed::UserThemes;
 
@@ -14,7 +15,7 @@ const DEFAULT_SEARCH_PATH: [&str; 4] = [
     "/usr/share/pixmaps",
 ];
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Theme {
     name: String,

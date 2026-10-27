@@ -7,10 +7,11 @@ use libpulse_binding::sample::{Format, Spec};
 use libpulse_binding::stream::{FlagSet, PeekResult, Stream};
 use luft_app::Events;
 use luft_i18n::t;
+use sabine::BridgeEvent;
 
 use crate::L10N;
 
-const SOUND_LEVEL: &str = "sound.level";
+pub const SOUND_LEVEL: BridgeEvent<f32> = BridgeEvent::new("sound.level");
 const UPDATES_PER_SECOND: u32 = 25;
 
 pub struct Meter {

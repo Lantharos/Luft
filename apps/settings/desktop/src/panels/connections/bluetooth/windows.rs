@@ -1,6 +1,7 @@
 use luft_app::dbus::{self, failed};
 use luft_i18n::t;
 use serde::{Deserialize, Serialize};
+use specta::Type;
 use zbus::Proxy;
 use zbus::proxy::MethodFlags;
 
@@ -19,7 +20,7 @@ struct Installation {
     bluetooth: Vec<Paired>,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Type)]
 pub struct Paired {
     device: String,
     name: Option<String>,

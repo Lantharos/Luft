@@ -1,16 +1,17 @@
 use luft_dbus::objects::{Object, Objects};
 use serde::Serialize;
+use specta::Type;
 
 use super::health::{self, Health};
 use super::volumes::{self, Segment, Span};
 use super::{BLOCK, DRIVE, JOB, LOOP, PARTITION, TABLE, bytes_text, system};
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Snapshot {
     pub drives: Vec<Drive>,
 }
 
-#[derive(Serialize, Clone, Copy, PartialEq)]
+#[derive(Serialize, Clone, Copy, PartialEq, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum Kind {
     Nvme,
@@ -22,7 +23,14 @@ pub enum Kind {
     Image,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone, Copy, PartialEq, Type)]
+#[serde(rename_all = "lowercase")]
+pub enum PartitionTable {
+    Gpt,
+    Dos,
+}
+
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Drive {
     pub id: String,
@@ -37,7 +45,7 @@ pub struct Drive {
     pub can_power_off: bool,
     pub system: bool,
     pub read_only: bool,
-    pub table: Option<String>,
+    pub table: Option<PartitionTable>,
     pub extended: Option<Span>,
     pub segments: Vec<Segment>,
     pub health: Option<Health>,
@@ -46,7 +54,7 @@ pub struct Drive {
     pub(crate) sort_key: String,
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Job {
     pub operation: String,
@@ -125,7 +133,12 @@ fn drive(objects: &Objects, block: Object, jobs: &Jobs, usage: &system::Usage) -
         read_only: block.flag("ReadOnly"),
         table: objects
             .get(block.path, TABLE)
-            .and_then(|table| table.get("Type")),
+            .and_then(|table| table.get::<String>("Type"))
+            .and_then(|kind| match kind.as_str() {
+                "gpt" => Some(PartitionTable::Gpt),
+                "dos" => Some(PartitionTable::Dos),
+                _ => None,
+            }),
         extended: volumes::extended(objects, &block),
         health: drive
             .as_deref()

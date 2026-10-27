@@ -3,17 +3,17 @@ use std::path::PathBuf;
 
 use gio::prelude::*;
 use luft_app::fonts::{self, Defaults, Face, Role};
-use luft_app::launch;
+use luft_app::{Empty, launch};
 use luft_i18n::t;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
+use specta::Type;
 
 use crate::L10N;
 
 const MAGPIE: &str = "com.lantharos.magpie.desktop";
 const REGULAR_STYLES: [&str; 4] = ["regular", "book", "normal", "roman"];
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Family {
     name: String,
@@ -23,24 +23,24 @@ pub struct Family {
     removable: bool,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Open {
     file: String,
     token: Option<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Remove {
     family: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Use {
     role: Role,
     family: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Reset {
     role: Role,
 }
@@ -77,7 +77,7 @@ fn user_files(faces: &[Face]) -> HashSet<PathBuf> {
         .collect()
 }
 
-pub fn list(_: Value) -> Result<Vec<Family>, String> {
+pub fn list(Empty {}: Empty) -> Result<Vec<Family>, String> {
     let faces = fonts::installed()?;
     let user_files = user_files(&faces);
     let mut grouped: HashMap<String, Vec<Face>> = HashMap::new();
@@ -114,7 +114,7 @@ pub fn remove(Remove { family }: Remove) -> Result<(), String> {
     fonts::remove(&files.into_iter().collect::<Vec<_>>())
 }
 
-pub fn defaults(_: Value) -> Result<Defaults, String> {
+pub fn defaults(Empty {}: Empty) -> Result<Defaults, String> {
     Ok(fonts::defaults())
 }
 

@@ -15,7 +15,10 @@ use luft_app::Events;
 use luft_i18n::t;
 
 use super::pulse::Pulse;
-use super::{AlertVolume, Balance, DefaultDevice, Meter, MoveApp, Mute, Port, Profile, Volume};
+use super::{
+    AlertVolume, Balance, DefaultDevice, Meter, MoveApp, Mute, PortSelection, ProfileSelection,
+    Volume,
+};
 use crate::L10N;
 
 const APP_ID: &str = "com.lantharos.settings";
@@ -26,8 +29,8 @@ pub enum Command {
     SetVolume(Volume),
     SetMute(Mute),
     SetBalance(Balance),
-    SetPort(Port),
-    SetProfile(Profile),
+    SetPort(PortSelection),
+    SetProfile(ProfileSelection),
     MoveApp(MoveApp),
     SetAlertVolume(AlertVolume),
     Meter(Meter),

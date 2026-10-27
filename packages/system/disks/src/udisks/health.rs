@@ -1,20 +1,21 @@
 use luft_dbus::objects::Objects;
 use serde::Serialize;
+use specta::Type;
 
 use super::{ATA, NVME};
 
 const KELVIN: f64 = 273.15;
 const FAILING_WARNINGS: &[&str] = &["degraded", "readonly", "volatile_mem", "pmr_readonly"];
 
-#[derive(Serialize, Clone, Copy, PartialEq)]
-#[serde(rename_all = "lowercase")]
+#[derive(Serialize, Clone, Copy, PartialEq, Type)]
+#[serde(rename = "HealthState", rename_all = "lowercase")]
 pub enum State {
     Good,
     Warning,
     Failing,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Health {
     pub state: State,
@@ -25,7 +26,7 @@ pub struct Health {
     pub selftest: Selftest,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Selftest {
     pub status: String,

@@ -9,7 +9,7 @@ use zbus::message::Type;
 use zbus::proxy::MethodFlags;
 use zbus::{DynamicType, MatchRule, MessageStream, OwnedObjectPath, Proxy};
 
-pub const PROGRESS: BridgeEvent<Progress> = BridgeEvent::new("fingerprint.enroll");
+pub const PROGRESS: BridgeEvent<EnrollProgress> = BridgeEvent::new("fingerprint.enroll");
 
 const SERVICE: &str = "net.reactivated.Fprint";
 const MANAGER_PATH: &str = "/net/reactivated/Fprint/Manager";
@@ -31,7 +31,7 @@ struct Finger {
 }
 
 #[derive(Serialize, specta::Type)]
-pub struct Progress {
+pub struct EnrollProgress {
     pub result: String,
     pub done: bool,
 }
@@ -159,7 +159,7 @@ async fn listen(events: Events) {
         if ENROLLING.lock().unwrap().is_none() {
             continue;
         }
-        events.emit(PROGRESS, Progress { result, done });
+        events.emit(PROGRESS, EnrollProgress { result, done });
         if done {
             stop().await;
         }

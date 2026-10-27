@@ -7,47 +7,46 @@ mod sleep;
 
 use futures_util::StreamExt;
 use luft_app::dbus::{self, failed};
-use luft_app::{Commands, Events};
-use sabine::SabineWindow;
+use luft_app::{Commands, Empty, Events};
+use sabine::{BridgeEvent, SabineWindow};
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use tokio::sync::OnceCell;
 use zbus::message::Type;
 use zbus::{Connection, MatchRule, MessageStream};
 
-pub const POWER_CHANGED: &str = "power.changed";
+const POWER_CHANGED: BridgeEvent<PowerState> = BridgeEvent::new("power.changed");
 
 const UPOWER_NAMESPACE: &str = "/org/freedesktop/UPower";
 
 static WATCH: OnceCell<()> = OnceCell::const_new();
 
-#[derive(Serialize)]
+#[derive(Serialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
 struct PowerState {
     battery: Option<battery::Battery>,
-    devices: Vec<battery::Device>,
+    devices: Vec<battery::PowerDevice>,
     keyboard: Option<keyboard::Keyboard>,
     profiles: Option<profiles::Profiles>,
     can_hibernate: bool,
 }
 
-#[derive(Deserialize)]
-struct Profile {
+#[derive(Deserialize, specta::Type)]
+struct PowerProfile {
     profile: String,
 }
 
-#[derive(Deserialize)]
-struct ChargeLimit {
+#[derive(Deserialize, specta::Type)]
+struct ChargeLimitChange {
     enabled: bool,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, specta::Type)]
 struct PowerOffAfter {
     seconds: u32,
 }
 
-#[derive(Deserialize)]
-struct Keyboard {
+#[derive(Deserialize, specta::Type)]
+struct KeyboardBrightness {
     id: String,
     level: i32,
 }
@@ -106,20 +105,20 @@ async fn watch(events: Events) -> Result<(), String> {
     Ok(())
 }
 
-async fn state(events: Events, _: Value) -> Result<PowerState, String> {
+async fn state(events: Events, Empty {}: Empty) -> Result<PowerState, String> {
     WATCH.get_or_try_init(|| watch(events)).await?;
     read().await
 }
 
-async fn set_profile(Profile { profile }: Profile) -> Result<(), String> {
+async fn set_profile(PowerProfile { profile }: PowerProfile) -> Result<(), String> {
     profiles::set(dbus::system().await?, &profile).await
 }
 
-async fn set_charge_limit(ChargeLimit { enabled }: ChargeLimit) -> Result<(), String> {
+async fn set_charge_limit(ChargeLimitChange { enabled }: ChargeLimitChange) -> Result<(), String> {
     limit::set(dbus::system().await?, enabled).await
 }
 
-async fn power_off_after(_: Value) -> Result<Option<u32>, String> {
+async fn power_off_after(Empty {}: Empty) -> Result<Option<u32>, String> {
     Ok(sleep::power_off_after(dbus::system().await?).await)
 }
 
@@ -127,12 +126,13 @@ async fn set_power_off_after(PowerOffAfter { seconds }: PowerOffAfter) -> Result
     sleep::set_power_off_after(dbus::system().await?, seconds).await
 }
 
-async fn set_keyboard(Keyboard { id, level }: Keyboard) -> Result<(), String> {
+async fn set_keyboard(KeyboardBrightness { id, level }: KeyboardBrightness) -> Result<(), String> {
     keyboard::set(dbus::system().await?, &id, level).await
 }
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     window
+        .bridge_event(&POWER_CHANGED)
         .with_async("power_state", events, state)
         .command_async("power_set_profile", set_profile)
         .command_async("power_set_charge_limit", set_charge_limit)

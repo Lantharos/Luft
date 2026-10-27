@@ -3,68 +3,74 @@ use std::sync::Once;
 
 use futures_util::StreamExt;
 use luft_accounts::client::{self, Signal};
-use luft_accounts::types::{Account, Answer, Credentials, Drive, Provider};
-use luft_app::{Commands, Events, launch};
+use luft_accounts::types::{Account, Answer, Credentials, Drive, Provider, Step};
+use luft_app::{Commands, Empty, Events, launch};
 use luft_i18n::t;
-use sabine::SabineWindow;
+use sabine::{BridgeEvent, SabineWindow};
 use serde::{Deserialize, Serialize};
-use serde_json::{Value, json};
+use specta::Type;
 
 use crate::L10N;
 
-const CHANGED: &str = "accounts.changed";
-const STEP: &str = "accounts.step";
+const CHANGED: BridgeEvent<AccountsSnapshot> = BridgeEvent::new("accounts.changed");
+const STEP: BridgeEvent<StepUpdate> = BridgeEvent::new("accounts.step");
 
 static WATCH: Once = Once::new();
 
-#[derive(Serialize)]
-struct Snapshot {
+#[derive(Serialize, Type)]
+struct AccountsSnapshot {
     accounts: Vec<Account>,
     drives: Vec<Drive>,
 }
 
-#[derive(Deserialize)]
+#[derive(Serialize, Type)]
+struct StepUpdate {
+    session: String,
+    step: Step,
+}
+
+#[derive(Deserialize, Type)]
 struct SignIn {
     provider: Provider,
     credentials: Credentials,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct SignInAgain {
     account: String,
     credentials: Credentials,
 }
 
-#[derive(Deserialize)]
-struct Session {
+#[derive(Deserialize, Type)]
+struct SignInSession {
     session: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Answering {
     session: String,
     answer: Answer,
 }
 
-#[derive(Deserialize)]
-struct Rename {
+#[derive(Deserialize, Type)]
+struct AccountRename {
     account: String,
     name: String,
 }
 
-#[derive(Deserialize)]
-struct Target {
+#[derive(Deserialize, Type)]
+struct AccountTarget {
     account: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Address {
     url: String,
     token: Option<String>,
 }
 
-async fn snapshot() -> Result<Snapshot, String> {
-    Ok(Snapshot {
+async fn snapshot() -> Result<AccountsSnapshot, String> {
+    Ok(AccountsSnapshot {
         accounts: client::accounts().await?,
         drives: client::drives().await?,
     })
@@ -83,13 +89,13 @@ async fn watch(events: Events) {
                 }
             }
             Signal::Step { session, step } => {
-                events.emit(STEP, json!({"session": session, "step": step}));
+                events.emit(STEP, StepUpdate { session, step });
             }
         }
     }
 }
 
-async fn accounts(events: Events, _: Value) -> Result<Snapshot, String> {
+async fn accounts(events: Events, Empty {}: Empty) -> Result<AccountsSnapshot, String> {
     let snapshot = snapshot().await?;
     WATCH.call_once(|| {
         luft_app::spawn(watch(events));
@@ -128,20 +134,23 @@ async fn answer(Answering { session, answer }: Answering) -> Result<(), String> 
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     window
+        .bridge_event(&CHANGED)
+        .bridge_event(&STEP)
         .with_async("accounts", events, accounts)
         .command_async("accounts_sign_in", sign_in)
         .command_async("accounts_sign_in_again", sign_in_again)
-        .command_async("accounts_step", |Session { session }| async move {
+        .command_async("accounts_step", |SignInSession { session }| async move {
             client::step(&session).await
         })
         .command_async("accounts_answer", answer)
-        .command_async("accounts_cancel", |Session { session }| async move {
+        .command_async("accounts_cancel", |SignInSession { session }| async move {
             client::cancel(&session).await
         })
-        .command_async("accounts_rename", |Rename { account, name }| async move {
-            client::rename(&account, &name).await
-        })
-        .command_async("accounts_remove", |Target { account }| async move {
+        .command_async(
+            "accounts_rename",
+            |AccountRename { account, name }| async move { client::rename(&account, &name).await },
+        )
+        .command_async("accounts_remove", |AccountTarget { account }| async move {
             client::remove(&account).await
         })
         .command("accounts_open", open)

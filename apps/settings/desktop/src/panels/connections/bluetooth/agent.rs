@@ -4,21 +4,23 @@ use std::sync::{LazyLock, Mutex};
 
 use luft_app::Events;
 use luft_app::dbus::{self, failed};
+use sabine::BridgeEvent;
 use serde::Serialize;
+use specta::Type;
 use tokio::sync::oneshot;
 use zbus::{ObjectPath, OwnedVariant, Proxy};
 
 use super::{DEVICE, SERVICE};
 
-pub const REQUEST: &str = "bluetooth.request";
-pub const CANCEL: &str = "bluetooth.cancel";
+pub const REQUEST: BridgeEvent<Request> = BridgeEvent::new("bluetooth.request");
+pub const CANCEL: BridgeEvent<()> = BridgeEvent::new("bluetooth.cancel");
 
 const PATH: &str = "/com/lantharos/Settings/BluetoothAgent";
 const CAPABILITY: &str = "KeyboardDisplay";
 
-#[derive(Serialize, Clone, Copy)]
+#[derive(Serialize, Clone, Copy, Type)]
 #[serde(rename_all = "lowercase")]
-enum Kind {
+enum PairingKind {
     Confirm,
     Authorize,
     Pin,
@@ -26,13 +28,13 @@ enum Kind {
     Display,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
-struct Request {
+pub struct Request {
     id: u32,
     device: String,
     name: String,
-    kind: Kind,
+    kind: PairingKind,
     code: Option<String>,
 }
 
@@ -80,7 +82,7 @@ impl Agent {
         connection: &zbus::Connection,
         id: u32,
         device: &ObjectPath<'_>,
-        kind: Kind,
+        kind: PairingKind,
         code: Option<String>,
     ) {
         self.events.emit(
@@ -99,7 +101,7 @@ impl Agent {
         &self,
         connection: &zbus::Connection,
         device: &ObjectPath<'_>,
-        kind: Kind,
+        kind: PairingKind,
         code: Option<String>,
     ) -> Result<String, Refusal> {
         let id = next_id();
@@ -125,7 +127,7 @@ impl Agent {
         #[zbus(connection)] connection: &zbus::Connection,
         device: ObjectPath<'_>,
     ) -> Result<String, Refusal> {
-        self.ask(connection, &device, Kind::Pin, None).await
+        self.ask(connection, &device, PairingKind::Pin, None).await
     }
 
     async fn display_pin_code(
@@ -134,8 +136,14 @@ impl Agent {
         device: ObjectPath<'_>,
         pincode: String,
     ) {
-        self.show(connection, next_id(), &device, Kind::Display, Some(pincode))
-            .await;
+        self.show(
+            connection,
+            next_id(),
+            &device,
+            PairingKind::Display,
+            Some(pincode),
+        )
+        .await;
     }
 
     async fn request_passkey(
@@ -143,7 +151,9 @@ impl Agent {
         #[zbus(connection)] connection: &zbus::Connection,
         device: ObjectPath<'_>,
     ) -> Result<u32, Refusal> {
-        let passkey = self.ask(connection, &device, Kind::Passkey, None).await?;
+        let passkey = self
+            .ask(connection, &device, PairingKind::Passkey, None)
+            .await?;
         passkey.trim().parse().map_err(|_| Refusal::Rejected)
     }
 
@@ -155,8 +165,14 @@ impl Agent {
         _entered: u16,
     ) {
         let code = format!("{passkey:06}");
-        self.show(connection, next_id(), &device, Kind::Display, Some(code))
-            .await;
+        self.show(
+            connection,
+            next_id(),
+            &device,
+            PairingKind::Display,
+            Some(code),
+        )
+        .await;
     }
 
     async fn request_confirmation(
@@ -168,7 +184,7 @@ impl Agent {
         self.ask(
             connection,
             &device,
-            Kind::Confirm,
+            PairingKind::Confirm,
             Some(format!("{passkey:06}")),
         )
         .await
@@ -180,7 +196,7 @@ impl Agent {
         #[zbus(connection)] connection: &zbus::Connection,
         device: ObjectPath<'_>,
     ) -> Result<(), Refusal> {
-        self.ask(connection, &device, Kind::Authorize, None)
+        self.ask(connection, &device, PairingKind::Authorize, None)
             .await
             .map(drop)
     }

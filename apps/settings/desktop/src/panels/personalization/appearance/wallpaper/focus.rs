@@ -2,12 +2,13 @@ use std::fs;
 use std::path::Path;
 
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use super::cache::{cached_path, failed, store};
 use super::saliency;
 use super::thumbnail::{Image, preview};
 
-#[derive(Clone, Copy, Serialize, Deserialize)]
+#[derive(Clone, Copy, Serialize, Deserialize, Type)]
 #[serde(from = "(f64, f64)", into = "(f64, f64)")]
 pub struct Focus {
     pub x: f64,

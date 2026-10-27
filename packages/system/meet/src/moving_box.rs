@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 pub const MANIFEST: &str = "box.json";
 pub const FILES: &str = "files";
@@ -8,7 +9,7 @@ pub const WALLPAPER: &str = "wallpaper";
 pub const BLUETOOTH_KEYS: &str = "bluetooth/keys";
 pub const BLUETOOTH_NAMES: &str = "bluetooth/names";
 
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Hash)]
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Hash, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum FolderKind {
     Desktop,

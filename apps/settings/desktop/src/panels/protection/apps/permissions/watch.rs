@@ -8,11 +8,12 @@ use luft_app::dbus;
 use luft_app::identity::permissions::{
     self, BACKGROUND_CLIPBOARD, FOLDERS, FULL_ACCESS, KEYRING_ITEMS,
 };
+use sabine::BridgeEvent;
 use tokio::time::timeout;
 
-use super::read;
+use super::{AppAccess, read};
 
-const CHANGED: &str = "apps.permissions";
+pub const CHANGED: BridgeEvent<Vec<AppAccess>> = BridgeEvent::new("apps.permissions");
 const SETTLE: Duration = Duration::from_millis(120);
 const TABLES: [&str; 6] = [
     "location",

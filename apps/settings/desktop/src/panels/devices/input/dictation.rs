@@ -2,26 +2,26 @@ use std::pin::pin;
 use std::sync::Once;
 
 use futures_util::StreamExt;
-use luft_app::{Commands, Events, launch};
+use luft_app::{Commands, Empty, Events, launch};
 use luft_i18n::t;
 use luft_speech::client;
 use luft_speech::types::Overview;
-use sabine::SabineWindow;
+use sabine::{BridgeEvent, SabineWindow};
 use serde::Deserialize;
-use serde_json::Value;
+use specta::Type;
 
 use crate::L10N;
 
-const CHANGED: &str = "dictation.changed";
+const CHANGED: BridgeEvent<Overview> = BridgeEvent::new("dictation.changed");
 
 static WATCH: Once = Once::new();
 
-#[derive(Deserialize)]
-struct Target {
+#[derive(Deserialize, Type)]
+struct DictationModel {
     model: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Homepage {
     url: String,
     token: Option<String>,
@@ -46,7 +46,7 @@ async fn watch(events: Events) {
     }
 }
 
-async fn overview(events: Events, _: Value) -> Result<Overview, String> {
+async fn overview(events: Events, Empty {}: Empty) -> Result<Overview, String> {
     let overview = client::overview().await?;
     WATCH.call_once(|| {
         luft_app::spawn(watch(events));
@@ -56,14 +56,15 @@ async fn overview(events: Events, _: Value) -> Result<Overview, String> {
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     window
+        .bridge_event(&CHANGED)
         .with_async("dictation", events, overview)
-        .command_async("dictation_install", |Target { model }| async move {
+        .command_async("dictation_install", |DictationModel { model }| async move {
             client::install(&model).await
         })
-        .command_async("dictation_cancel", |Target { model }| async move {
+        .command_async("dictation_cancel", |DictationModel { model }| async move {
             client::cancel_install(&model).await
         })
-        .command_async("dictation_remove", |Target { model }| async move {
+        .command_async("dictation_remove", |DictationModel { model }| async move {
             client::remove(&model).await
         })
         .command("dictation_open_homepage", open_homepage)

@@ -2,8 +2,9 @@ use libpulse_binding::context::introspect::{CardInfo, SinkPortInfo, SourcePortIn
 use libpulse_binding::def::PortAvailable;
 use libpulse_binding::proplist::properties;
 use serde::Serialize;
+use specta::Type;
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Choice {
     name: String,
     description: String,
@@ -15,7 +16,7 @@ pub struct Card {
     profiles: Vec<Choice>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct CardView<'a> {
     index: u32,
     description: &'a str,
@@ -23,7 +24,7 @@ pub struct CardView<'a> {
     profiles: &'a [Choice],
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Port {
     #[serde(flatten)]
     choice: Choice,

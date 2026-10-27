@@ -6,18 +6,18 @@ use std::sync::Once;
 use futures_util::StreamExt;
 use luft_app::dbus::{self, error_message, error_name, failed, service::absent};
 use luft_app::portal::{self, Filter};
-use luft_app::{Commands, Events};
+use luft_app::{Commands, Empty, Events};
 use luft_i18n::t;
-use sabine::SabineWindow;
+use sabine::{BridgeEvent, SabineWindow};
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
+use specta::Type;
 use zbus::proxy::MethodFlags;
 use zbus::{DynamicType, Fd, OwnedVariant, Proxy};
 
 use crate::L10N;
 use crate::panels::personalization::appearance::wallpaper;
 
-pub const LOGIN_CHANGED: &str = "login.changed";
+const LOGIN_CHANGED: BridgeEvent<LoginScreen> = BridgeEvent::new("login.changed");
 
 const GREETER: &str = "com.lantharos.Greeter1";
 const GREETER_PATH: &str = "/com/lantharos/Greeter1";
@@ -29,14 +29,14 @@ static WATCH: Once = Once::new();
 
 type Properties = HashMap<String, OwnedVariant>;
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
-struct Session {
+struct LoginSession {
     id: String,
     name: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 struct LoginScreen {
     shared_wallpaper: Option<String>,
@@ -44,25 +44,25 @@ struct LoginScreen {
     hidden_users: Vec<String>,
     default_session: String,
     automatic_login: String,
-    sessions: Vec<Session>,
+    sessions: Vec<LoginSession>,
 }
 
-#[derive(Deserialize)]
-struct Enabled {
+#[derive(Deserialize, Type)]
+struct ShowUsers {
     enabled: bool,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct HiddenUsers {
     users: Vec<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct DefaultSession {
     session: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct AutomaticLogin {
     user: String,
 }
@@ -113,7 +113,7 @@ async fn read() -> Result<Option<LoginScreen>, String> {
         automatic_login: take(&mut properties, "AutomaticLogin")?,
         sessions: sessions
             .into_iter()
-            .map(|(id, name)| Session { id, name })
+            .map(|(id, name)| LoginSession { id, name })
             .collect(),
     }))
 }
@@ -134,7 +134,7 @@ fn watch(events: Events) {
     });
 }
 
-async fn screen(events: Events, _: Value) -> Result<Option<LoginScreen>, String> {
+async fn screen(events: Events, Empty {}: Empty) -> Result<Option<LoginScreen>, String> {
     let screen = read().await?;
     if screen.is_some() {
         WATCH.call_once(|| watch(events));
@@ -151,7 +151,7 @@ async fn change<B: Serialize + DynamicType>(method: &str, body: &B) -> Result<()
         .map_err(explain)
 }
 
-async fn choose_wallpaper(_: Value) -> Result<bool, String> {
+async fn choose_wallpaper(Empty {}: Empty) -> Result<bool, String> {
     let title = t!(L10N, "desktop-picture-choose-title");
     let filter = t!(L10N, "desktop-picture-filter");
     let Some(uri) = portal::open_file(
@@ -180,12 +180,13 @@ async fn choose_wallpaper(_: Value) -> Result<bool, String> {
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     window
+        .bridge_event(&LOGIN_CHANGED)
         .with_async("login_screen", events, screen)
         .command_async("login_choose_wallpaper", choose_wallpaper)
-        .command_async("login_clear_wallpaper", |_: Value| {
+        .command_async("login_clear_wallpaper", |Empty {}| {
             change("ClearSharedWallpaper", &())
         })
-        .command_async("login_set_show_users", |Enabled { enabled }| async move {
+        .command_async("login_set_show_users", |ShowUsers { enabled }| async move {
             change("SetShowUsers", &enabled).await
         })
         .command_async(

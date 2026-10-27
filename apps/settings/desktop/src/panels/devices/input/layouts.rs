@@ -5,6 +5,7 @@ use std::sync::OnceLock;
 use luft_i18n::SystemCatalog;
 use roxmltree::{Document, Node, ParsingOptions};
 use serde::Serialize;
+use specta::Type;
 
 use crate::L10N;
 
@@ -14,7 +15,7 @@ const NAMES: &[&str] = &["xkeyboard-config-2", "xkeyboard-config"];
 
 static LAYOUTS: OnceLock<Vec<Layout>> = OnceLock::new();
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Type)]
 pub struct Layout {
     id: String,
     name: String,

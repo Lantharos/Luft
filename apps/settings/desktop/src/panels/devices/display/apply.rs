@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use serde::Deserialize;
+use specta::Type;
 use zbus::Variant;
 
 use super::state::{self, MonitorInfo};
@@ -11,13 +12,13 @@ const PASSED_THROUGH: [&str; 2] = ["color-mode", "rgb-range"];
 type MonitorConfig = (String, String, HashMap<&'static str, Variant<'static>>);
 type LogicalConfig = (i32, i32, f64, u32, bool, Vec<MonitorConfig>);
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Apply {
     serial: u32,
     logical: Vec<Logical>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Logical {
     x: i32,
     y: i32,
@@ -27,7 +28,7 @@ struct Logical {
     monitors: Vec<Output>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Output {
     connector: String,
     mode: String,

@@ -1,3 +1,4 @@
+use sabine::BridgeEvent;
 mod ddc;
 mod ddcutil;
 mod panel;
@@ -15,10 +16,11 @@ use super::state;
 use ddc::{Request, Worker};
 use ddcutil::Availability;
 use panel::Panels;
+use specta::Type;
 
-const BRIGHTNESS_CHANGED: &str = "display.brightness";
+pub const BRIGHTNESS_CHANGED: BridgeEvent<Brightness> = BridgeEvent::new("display.brightness");
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Type)]
 #[serde(tag = "state", rename_all = "kebab-case")]
 pub enum Control {
     Ready { level: f64 },
@@ -33,14 +35,14 @@ pub struct Shared {
     availability: Availability,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Brightness {
     displays: BTreeMap<String, Control>,
     external: Availability,
 }
 
-#[derive(Deserialize)]
-pub struct Change {
+#[derive(Deserialize, Type)]
+pub struct BrightnessChange {
     connector: String,
     level: f64,
 }
@@ -127,7 +129,10 @@ pub async fn current(events: Events) -> Result<Brightness, String> {
     Ok(shared.snapshot())
 }
 
-pub async fn set(events: Events, Change { connector, level }: Change) -> Result<(), String> {
+pub async fn set(
+    events: Events,
+    BrightnessChange { connector, level }: BrightnessChange,
+) -> Result<(), String> {
     let service = service(events).await?;
     let target = service
         .publisher

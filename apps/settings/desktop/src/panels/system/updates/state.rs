@@ -1,18 +1,20 @@
+use sabine::BridgeEvent;
 use std::sync::{LazyLock, Mutex, MutexGuard, OnceLock};
 
 use luft_app::Events;
 use luft_software::progress::{Change, Progress};
 use luft_software::task::{Cancel, Task};
 use serde::Serialize;
+use specta::Type;
 
-use super::overview::Overview;
+use super::overview::UpdatesOverview;
 
-const ACTIVITY: &str = "updates.activity";
-const OVERVIEW: &str = "updates.overview";
+pub const ACTIVITY: BridgeEvent<Activity> = BridgeEvent::new("updates.activity");
+pub const OVERVIEW: BridgeEvent<UpdatesOverview> = BridgeEvent::new("updates.overview");
 
-#[derive(Serialize, Clone, Copy, PartialEq, Eq)]
+#[derive(Serialize, Clone, Copy, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
-pub enum Kind {
+pub enum UpdateKind {
     Check,
     Download,
     Firmware,
@@ -21,17 +23,17 @@ pub enum Kind {
     Elsewhere,
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Elsewhere {
     pub by: Option<String>,
     pub change: Option<Change>,
 }
 
-#[derive(Serialize, Clone, Default)]
+#[derive(Serialize, Clone, Default, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Activity {
-    pub running: Option<Kind>,
+    pub running: Option<UpdateKind>,
     pub target: Option<String>,
     pub elsewhere: Option<Elsewhere>,
     pub progress: Option<Progress>,
@@ -39,7 +41,7 @@ pub struct Activity {
 }
 
 impl Activity {
-    pub fn new(kind: Kind) -> Self {
+    pub fn new(kind: UpdateKind) -> Self {
         Self {
             running: Some(kind),
             ..Self::default()
@@ -47,16 +49,16 @@ impl Activity {
     }
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct Status {
-    overview: Option<Overview>,
+pub struct UpdatesStatus {
+    overview: Option<UpdatesOverview>,
     activity: Activity,
 }
 
 #[derive(Default)]
 struct State {
-    overview: Option<Overview>,
+    overview: Option<UpdatesOverview>,
     activity: Activity,
     cancel: Cancel,
 }
@@ -70,9 +72,9 @@ fn state() -> MutexGuard<'static, State> {
         .unwrap_or_else(|poisoned| poisoned.into_inner())
 }
 
-fn emit(name: &str, payload: impl Serialize) {
+fn emit<T: Serialize>(event: BridgeEvent<T>, payload: T) {
     if let Some(events) = EVENTS.get() {
-        events.emit(name, payload);
+        events.emit(event, payload);
     }
 }
 
@@ -84,19 +86,19 @@ pub fn attach(events: &Events) {
     let _ = EVENTS.set(events.clone());
 }
 
-pub fn status() -> Status {
+pub fn status() -> UpdatesStatus {
     let state = state();
-    Status {
+    UpdatesStatus {
         overview: state.overview.clone(),
         activity: state.activity.clone(),
     }
 }
 
-pub fn overview() -> Option<Overview> {
+pub fn overview() -> Option<UpdatesOverview> {
     state().overview.clone()
 }
 
-pub fn edit_overview(edit: impl FnOnce(&mut Overview)) {
+pub fn edit_overview(edit: impl FnOnce(&mut UpdatesOverview)) {
     let overview = {
         let mut state = state();
         let Some(overview) = state.overview.as_mut() else {
@@ -108,7 +110,7 @@ pub fn edit_overview(edit: impl FnOnce(&mut Overview)) {
     emit(OVERVIEW, overview);
 }
 
-pub fn set_overview(overview: Overview) {
+pub fn set_overview(overview: UpdatesOverview) {
     state().overview = Some(overview.clone());
     emit(OVERVIEW, overview);
 }

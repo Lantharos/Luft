@@ -5,11 +5,10 @@ mod state;
 use std::sync::Once;
 
 use futures_util::StreamExt;
-use luft_app::{Commands, Events};
-use sabine::SabineWindow;
-use serde_json::Value;
+use luft_app::{Commands, Empty, Events};
+use sabine::{BridgeEvent, SabineWindow};
 
-const DISPLAYS_CHANGED: &str = "display.changed";
+const DISPLAYS_CHANGED: BridgeEvent<state::Displays> = BridgeEvent::new("display.changed");
 
 static WATCH: Once = Once::new();
 
@@ -28,7 +27,7 @@ async fn watch(events: Events) {
     }
 }
 
-async fn displays(events: Events, _: Value) -> Result<state::Displays, String> {
+async fn displays(events: Events, Empty {}: Empty) -> Result<state::Displays, String> {
     WATCH.call_once(|| {
         luft_app::spawn(watch(events));
     });
@@ -37,9 +36,11 @@ async fn displays(events: Events, _: Value) -> Result<state::Displays, String> {
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     window
+        .bridge_event(&DISPLAYS_CHANGED)
+        .bridge_event(&brightness::BRIGHTNESS_CHANGED)
         .with_async("display_state", events, displays)
         .command_async("display_apply", apply::apply)
-        .with_async("display_brightness", events, |events, _: Value| {
+        .with_async("display_brightness", events, |events, Empty {}| {
             brightness::current(events)
         })
         .with_async("display_set_brightness", events, brightness::set)

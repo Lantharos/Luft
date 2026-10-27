@@ -1,9 +1,10 @@
 use luft_disks::systems::{self, Kind, Role};
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use super::launch_disks;
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct OtherSystem {
     id: String,
@@ -12,7 +13,7 @@ pub struct OtherSystem {
     size: u64,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Removal {
     id: String,
     token: Option<String>,

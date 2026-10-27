@@ -4,11 +4,12 @@ use luft_software::system::image::{self, Deployments};
 use luft_software::task::Task;
 use luft_software::variant::Variant;
 use serde::Serialize;
+use specta::Type;
 
 use super::super::overview::System;
 use super::super::state;
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Offer {
     to: Variant,

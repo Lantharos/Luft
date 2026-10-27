@@ -1,6 +1,7 @@
 use std::path::{Component, Path};
 
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use crate::regional::Hints;
 
@@ -42,7 +43,7 @@ impl Role {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum Intent {
     Try,

@@ -19,7 +19,7 @@ pub use offline::Results;
 pub use package::{Package, PackageId};
 pub use transaction::{Mode, follow};
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Update {
     pub package: PackageId,

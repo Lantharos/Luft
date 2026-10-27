@@ -2,6 +2,7 @@ use luft_dbus::service::{Service, absent};
 use luft_dbus::{error_message, error_name, failed};
 use luft_i18n::{Localizer, localizer, t};
 use serde::Serialize;
+use specta::Type;
 use zbus::wire::DynamicDeserialize;
 use zbus::{DynamicType, OwnedVariant};
 
@@ -24,14 +25,15 @@ pub const DRIVES: Service = Service {
 const ERROR: &str = "com.lantharos.Trust1.Error.";
 const WRONG_KEY: &str = "com.lantharos.Trust1.Error.WrongKey";
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum Outcome<T> {
     Done(T),
     WrongKey(String),
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
+#[serde(rename = "EncryptionCheck")]
 pub struct Check {
     id: String,
     passed: bool,

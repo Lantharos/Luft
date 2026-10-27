@@ -38,6 +38,7 @@ roxmltree.workspace = true
 sabine.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+specta.workspace = true
 tar.workspace = true
 tokio = { workspace = true, features = ["net", "rt", "sync", "time"] }
 ureq.workspace = true

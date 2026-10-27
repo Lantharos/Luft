@@ -8,6 +8,7 @@ use luft_software::system::packagekit::{self, Mode, PackageId, Results, Update, 
 use luft_software::system::updates::PackageUpdates;
 use luft_software::task::{Cancel, Task};
 use serde::Serialize;
+use specta::Type;
 
 use super::backend::{AVAILABLE, Backend, Notice, READY};
 use super::overview::{Loaded, System};
@@ -15,9 +16,9 @@ use super::state;
 use super::store::Checked;
 use crate::L10N;
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct Overview {
+pub struct PackagesOverview {
     updates: Vec<Update>,
     prepared: bool,
     results: Option<Results>,
@@ -62,7 +63,7 @@ async fn load(refresh: Option<Task<'_>>) -> Result<Loaded, String> {
     let (prepared, results) = join(covered(&ids(&packages.system)), offline::results()).await;
     Ok(Loaded {
         package_apps: packages.apps.len(),
-        system: System::Packages(Overview {
+        system: System::Packages(PackagesOverview {
             prepared,
             updates: packages.system,
             results,

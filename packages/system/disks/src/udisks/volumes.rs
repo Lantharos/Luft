@@ -4,6 +4,7 @@ use std::mem::MaybeUninit;
 
 use luft_dbus::objects::{Object, Objects};
 use serde::Serialize;
+use specta::Type;
 use zbus::OwnedVariant;
 
 use super::snapshot::{Job, Jobs};
@@ -13,7 +14,7 @@ use super::{BLOCK, ENCRYPTED, FILESYSTEM, PARTITION, SWAP, TABLE, bytes_text};
 const ALIGNMENT: u64 = 1024 * 1024;
 const SMALLEST_GAP: u64 = 4 * ALIGNMENT;
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(tag = "kind", rename_all = "lowercase")]
 pub enum Segment {
     Volume(Box<Volume>),
@@ -26,7 +27,7 @@ impl Segment {
     }
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Volume {
     pub block: String,
@@ -52,14 +53,14 @@ pub struct Volume {
     pub job: Option<Job>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Encryption {
     pub kind: String,
     pub cleartext: Option<Box<Volume>>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Startup {
     pub directory: String,
@@ -77,7 +78,7 @@ impl Volume {
     }
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Span {
     offset: u64,
     size: u64,

@@ -5,16 +5,18 @@ use gio::glib;
 use gio::prelude::*;
 use luft_app::Events;
 use luft_i18n::t;
+use sabine::BridgeEvent;
 use serde::Serialize;
+use specta::Type;
 
 use super::{Location, open};
 use crate::L10N;
 
-pub const SETTINGS_CHANGED: &str = "settings.changed";
+pub const SETTINGS_CHANGED: BridgeEvent<SettingChange> = BridgeEvent::new("settings.changed");
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
-struct Change {
+pub struct SettingChange {
     schema: String,
     path: Option<String>,
     key: String,
@@ -68,7 +70,7 @@ fn connect(settings: &gio::Settings, location: Location, events: Events) {
     settings.connect_changed(None, move |settings, key| {
         events.emit(
             SETTINGS_CHANGED,
-            Change {
+            SettingChange {
                 schema: location.schema.clone(),
                 path: location.path.clone(),
                 key: key.to_owned(),

@@ -1,15 +1,16 @@
 use std::collections::HashMap;
 
-use luft_app::{Appearance, Commands, Events};
+use luft_app::{Appearance, Commands, Empty, Events};
 use sabine::{BridgeError, SabineWindow};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use specta::Type;
 
 use crate::gsettings::{self, Location, Watcher};
 
 pub const PAGE_SCHEME: &str = "kestrel-settings:";
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 struct AppState {
     #[serde(flatten)]
@@ -17,7 +18,7 @@ struct AppState {
     page: Option<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 struct Read {
     #[serde(flatten)]
@@ -25,7 +26,7 @@ struct Read {
     keys: Vec<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 struct Write {
     #[serde(flatten)]
@@ -34,9 +35,9 @@ struct Write {
     value: Value,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
-struct Key {
+struct SettingKey {
     #[serde(flatten)]
     location: Location,
     key: String,
@@ -46,7 +47,8 @@ pub fn register(window: SabineWindow, events: &Events, watcher: &Watcher) -> Sab
     let watch_events = events.clone();
     let watcher = watcher.clone();
     window
-        .command_async("app_state", |_: Value| async {
+        .bridge_event(&gsettings::SETTINGS_CHANGED)
+        .command_async("app_state", |Empty {}| async {
             Ok(AppState {
                 appearance: Appearance::current().await,
                 page: std::env::args()
@@ -68,7 +70,7 @@ pub fn register(window: SabineWindow, events: &Events, watcher: &Watcher) -> Sab
                  value,
              }| { gsettings::write(&location, &key, &value) },
         )
-        .command("settings_reset", |Key { location, key }| {
+        .command("settings_reset", |SettingKey { location, key }| {
             gsettings::reset(&location, &key)
         })
         .bridge_typed("settings_watch", move |location: Location| {

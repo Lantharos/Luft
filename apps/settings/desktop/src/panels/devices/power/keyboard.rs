@@ -1,4 +1,5 @@
 use serde::Serialize;
+use specta::Type;
 use zbus::{Connection, OwnedObjectPath};
 
 use super::battery::{DESTINATION, PATH};
@@ -6,7 +7,7 @@ use super::failed;
 
 const BACKLIGHT: &str = "org.freedesktop.UPower.KbdBacklight";
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Keyboard {
     id: String,
     level: i32,

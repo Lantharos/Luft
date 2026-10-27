@@ -1,3 +1,4 @@
+use sabine::BridgeEvent;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, OnceLock};
@@ -9,15 +10,17 @@ use luft_app::watch::{FolderWatcher, Report, Watch, WatchMask};
 use luft_app::{Events, launch};
 use luft_i18n::t;
 use serde::Serialize;
+use specta::Type;
 
 use super::cache::failed;
 use crate::L10N;
 
-const WALLPAPERS_CHANGED: &str = "appearance.wallpapers";
+pub const WALLPAPERS_CHANGED: BridgeEvent<Vec<Wallpaper>> =
+    BridgeEvent::new("appearance.wallpapers");
 const IMAGE_EXTENSIONS: [&str; 6] = ["jpg", "jpeg", "png", "webp", "jxl", "avif"];
 const VIDEO_EXTENSIONS: [&str; 4] = ["mp4", "webm", "mkv", "mov"];
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Wallpaper {
     path: String,

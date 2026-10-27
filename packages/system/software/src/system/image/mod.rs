@@ -8,6 +8,7 @@ use std::collections::HashSet;
 
 use luft_variant::Variant;
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use host::{Deployment, Host, Reference};
 use registry::Image;
@@ -17,7 +18,7 @@ pub use updater::{changes, download, downloading, follow, rollback, switch};
 
 const NOT_FROM_AN_IMAGE: &str = "This system doesn't get its updates from an image.";
 
-#[derive(Serialize, Clone, Debug, PartialEq, Eq)]
+#[derive(Serialize, Clone, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Status {
     pub current: Release,

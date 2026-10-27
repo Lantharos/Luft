@@ -2,9 +2,10 @@ use std::collections::HashMap;
 
 use luft_app::identity::permissions::{self, KEYRING_ITEMS, YES};
 use serde::Serialize;
+use specta::Type;
 use zbus::Connection;
 
-#[derive(Serialize, Default, Clone, Copy)]
+#[derive(Serialize, Default, Clone, Copy, Type)]
 pub struct Remembered {
     allowed: usize,
     total: usize,

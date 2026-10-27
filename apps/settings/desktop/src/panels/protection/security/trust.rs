@@ -1,14 +1,15 @@
 use futures_util::future::join;
 use luft_trust::{DRIVES, Map, TRUST, get, group};
 use serde::Serialize;
+use specta::Type;
 
-#[derive(Serialize, Default)]
+#[derive(Serialize, Default, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Tpm {
     usable: bool,
 }
 
-#[derive(Serialize, Default)]
+#[derive(Serialize, Default, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct SigningKey {
     state: String,
@@ -18,7 +19,7 @@ pub struct SigningKey {
     removing_other_keys: bool,
 }
 
-#[derive(Serialize, Default)]
+#[derive(Serialize, Default, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Startup {
     installed: bool,
@@ -26,7 +27,7 @@ pub struct Startup {
     available: bool,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Requirement {
     id: String,
@@ -34,14 +35,14 @@ pub struct Requirement {
     missing: String,
 }
 
-#[derive(Serialize, Default)]
+#[derive(Serialize, Default, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct AntiCheat {
     requirements: Vec<Requirement>,
     uses_luft_key: bool,
 }
 
-#[derive(Serialize, Default)]
+#[derive(Serialize, Default, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Disk {
     device: String,
@@ -52,7 +53,7 @@ pub struct Disk {
     secure_boot_changed: bool,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Changing {
     change: String,
@@ -60,7 +61,7 @@ pub struct Changing {
     progress: f64,
 }
 
-#[derive(Serialize, Default)]
+#[derive(Serialize, Default, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Drives {
     available: bool,
@@ -69,7 +70,7 @@ pub struct Drives {
     changing: Option<Changing>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Trust {
     secure_boot: String,

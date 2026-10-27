@@ -2,11 +2,12 @@ use std::fs;
 
 use luft_app::dbus::{self, failed};
 use serde::{Deserialize, Serialize};
+use specta::Type;
 use zbus::Proxy;
 
 const INCIDENTS: &str = "/var/lib/kestrel-watchdog/incidents";
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Type)]
 pub struct Suggestion {
     step: String,
     detail: String,
@@ -28,7 +29,7 @@ struct Incident {
     suggestions: Vec<Suggestion>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Problem {
     id: String,

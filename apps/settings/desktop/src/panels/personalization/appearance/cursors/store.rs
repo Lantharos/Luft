@@ -5,6 +5,7 @@ use std::time::Duration;
 use luft_i18n::t;
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
+use specta::Type;
 use ureq::Agent;
 use ureq::tls::{RootCerts, TlsConfig};
 
@@ -18,7 +19,7 @@ const CURSOR_CATEGORY: u32 = 107;
 const PAGE_SIZE: u32 = 20;
 const USER_AGENT: &str = "Luft Settings";
 
-#[derive(Deserialize, Clone, Copy)]
+#[derive(Deserialize, Clone, Copy, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum Order {
     Popular,
@@ -36,7 +37,7 @@ impl Order {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Query {
     search: String,
@@ -44,15 +45,15 @@ pub struct Query {
     page: u32,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct Download {
+pub struct CursorDownload {
     pub index: u32,
     pub name: String,
     pub size: u64,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Item {
     id: u64,
@@ -61,10 +62,10 @@ pub struct Item {
     rating: f64,
     downloads: u64,
     preview: Option<String>,
-    files: Vec<Download>,
+    files: Vec<CursorDownload>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Page {
     items: Vec<Item>,
@@ -127,7 +128,7 @@ fn item(item: &Map<String, Value>) -> Item {
         downloads: number(item, "downloads"),
         preview: thumbnail(&text(item, "previewpic1")),
         files: downloads(item)
-            .map(|(index, name)| Download {
+            .map(|(index, name)| CursorDownload {
                 size: number(item, &format!("downloadsize{index}")) * 1024,
                 index,
                 name,

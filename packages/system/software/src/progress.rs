@@ -53,7 +53,7 @@ impl Progress {
     }
 }
 
-#[derive(Serialize, Clone, Copy, PartialEq, Eq, Debug)]
+#[derive(Serialize, Clone, Copy, PartialEq, Eq, Debug, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum Change {
     Refresh,

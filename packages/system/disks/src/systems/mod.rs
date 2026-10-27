@@ -4,22 +4,23 @@ mod names;
 mod remove;
 
 use serde::Serialize;
+use specta::Type;
 
 use crate::udisks::{self, snapshot};
 
 pub use facts::Facts;
 pub use remove::{Removed, Step, grow, remove, remove_old_system_startups};
 
-#[derive(Serialize, Clone, Copy, PartialEq, Eq, Debug)]
-#[serde(rename_all = "kebab-case")]
+#[derive(Serialize, Clone, Copy, PartialEq, Eq, Debug, Type)]
+#[serde(rename = "SystemKind", rename_all = "kebab-case")]
 pub enum Kind {
     Windows,
     Linux,
     OldSystem,
 }
 
-#[derive(Serialize, Clone, Copy, PartialEq, Eq, Debug)]
-#[serde(rename_all = "lowercase")]
+#[derive(Serialize, Clone, Copy, PartialEq, Eq, Debug, Type)]
+#[serde(rename = "PartRole", rename_all = "lowercase")]
 pub enum Role {
     System,
     Reserved,
@@ -27,8 +28,8 @@ pub enum Role {
     Meet,
 }
 
-#[derive(Serialize, Clone, Debug)]
-#[serde(rename_all = "camelCase")]
+#[derive(Serialize, Clone, Debug, Type)]
+#[serde(rename = "SystemPart", rename_all = "camelCase")]
 pub struct Part {
     pub block: String,
     pub device: String,
@@ -40,8 +41,8 @@ pub struct Part {
     pub filesystem: String,
 }
 
-#[derive(Serialize, Clone, Debug)]
-#[serde(rename_all = "camelCase")]
+#[derive(Serialize, Clone, Debug, Type)]
+#[serde(rename = "SystemStartup", rename_all = "camelCase")]
 pub struct Startup {
     #[serde(skip)]
     pub esp: String,
@@ -49,8 +50,8 @@ pub struct Startup {
     pub entries: Vec<String>,
 }
 
-#[derive(Serialize, Clone, Debug)]
-#[serde(rename_all = "camelCase")]
+#[derive(Serialize, Clone, Debug, Type)]
+#[serde(rename = "OtherSystem", rename_all = "camelCase")]
 pub struct System {
     pub id: String,
     pub kind: Kind,

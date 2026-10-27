@@ -3,21 +3,22 @@ mod terminal;
 use luft_i18n::t;
 use serde::{Deserialize, Serialize};
 
+use specta::Type;
 use terminal::Terminal;
 
 use crate::L10N;
 
 const PROGRAM: &str = "passwd";
 
-#[derive(Deserialize)]
-pub struct Change {
+#[derive(Deserialize, Type)]
+pub struct PasswordChange {
     current: Option<String>,
     password: String,
 }
 
-#[derive(Serialize, Clone, Copy)]
+#[derive(Serialize, Clone, Copy, Type)]
 #[serde(rename_all = "camelCase")]
-pub enum Outcome {
+pub enum PasswordOutcome {
     Changed,
     WrongPassword,
     TooShort,
@@ -28,7 +29,7 @@ pub enum Outcome {
 }
 
 enum Step {
-    Answer(Outcome),
+    Answer(PasswordOutcome),
     Current,
     New,
     Wait,
@@ -51,25 +52,25 @@ const SIMPLE: [&str; 6] = [
     "sequence",
 ];
 
-fn rejection(output: &str) -> Outcome {
+fn rejection(output: &str) -> PasswordOutcome {
     let contains = |words: &[&str]| words.iter().any(|word| output.contains(word));
     if contains(&["short", "longer"]) {
-        Outcome::TooShort
+        PasswordOutcome::TooShort
     } else if contains(&["dictionary"]) {
-        Outcome::DictionaryWord
+        PasswordOutcome::DictionaryWord
     } else if contains(&SIMILAR) {
-        Outcome::TooSimilar
+        PasswordOutcome::TooSimilar
     } else if contains(&SIMPLE) {
-        Outcome::TooSimple
+        PasswordOutcome::TooSimple
     } else {
-        Outcome::Rejected
+        PasswordOutcome::Rejected
     }
 }
 
 fn step(output: &str, authenticated: bool) -> Step {
     let output = output.to_lowercase();
     if output.contains("successfully") {
-        return Step::Answer(Outcome::Changed);
+        return Step::Answer(PasswordOutcome::Changed);
     }
     if output.contains("bad password") {
         return Step::Answer(rejection(&output));
@@ -81,7 +82,7 @@ fn step(output: &str, authenticated: bool) -> Step {
         return Step::Answer(if authenticated {
             rejection(&output)
         } else {
-            Outcome::WrongPassword
+            PasswordOutcome::WrongPassword
         });
     }
     if !output.trim_end().ends_with(':') {
@@ -96,7 +97,9 @@ fn step(output: &str, authenticated: bool) -> Step {
     }
 }
 
-pub fn change(Change { current, password }: Change) -> Result<Outcome, String> {
+pub fn change(
+    PasswordChange { current, password }: PasswordChange,
+) -> Result<PasswordOutcome, String> {
     let failed = |error: std::io::Error| {
         t!(
             L10N,
@@ -113,7 +116,7 @@ pub fn change(Change { current, password }: Change) -> Result<Outcome, String> {
             Step::Answer(outcome) => return Ok(outcome),
             Step::Current => {
                 let Some(current) = &current else {
-                    return Ok(Outcome::WrongPassword);
+                    return Ok(PasswordOutcome::WrongPassword);
                 };
                 passwd.answer(current).map_err(failed)?;
             }
@@ -128,6 +131,6 @@ pub fn change(Change { current, password }: Change) -> Result<Outcome, String> {
     Ok(if authenticated {
         rejection(&output.to_lowercase())
     } else {
-        Outcome::WrongPassword
+        PasswordOutcome::WrongPassword
     })
 }

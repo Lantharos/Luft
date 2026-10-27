@@ -1,11 +1,12 @@
 use luft_app::dbus::objects::{Object, Objects};
 use serde::Serialize;
+use specta::Type;
 
 use super::{ADAPTER, BATTERY, DEVICE};
 
 const BLOCKED: &str = "off-blocked";
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Adapter {
     pub path: String,
@@ -17,9 +18,9 @@ pub struct Adapter {
     name: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "lowercase")]
-enum Kind {
+enum BluetoothDeviceKind {
     Headphones,
     Speaker,
     Mouse,
@@ -34,46 +35,46 @@ enum Kind {
     Other,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct Device {
+pub struct BluetoothDevice {
     path: String,
     name: String,
     address: String,
-    kind: Kind,
+    kind: BluetoothDeviceKind,
     connected: bool,
     trusted: bool,
     battery: Option<u8>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Bluetooth {
     pub adapter: Option<Adapter>,
     hardware_blocked: bool,
-    paired: Vec<Device>,
-    nearby: Vec<Device>,
+    paired: Vec<BluetoothDevice>,
+    nearby: Vec<BluetoothDevice>,
 }
 
-fn kind(icon: &str) -> Kind {
+fn kind(icon: &str) -> BluetoothDeviceKind {
     match icon {
-        "audio-headset" | "audio-headphones" => Kind::Headphones,
-        "audio-card" | "audio-speakers" => Kind::Speaker,
-        "input-mouse" => Kind::Mouse,
-        "input-keyboard" => Kind::Keyboard,
-        "input-gaming" => Kind::Gamepad,
-        "phone" => Kind::Phone,
-        "computer" => Kind::Computer,
-        "input-tablet" => Kind::Tablet,
-        "video-display" => Kind::Display,
-        "printer" => Kind::Printer,
-        "camera-photo" | "camera-video" => Kind::Camera,
-        _ => Kind::Other,
+        "audio-headset" | "audio-headphones" => BluetoothDeviceKind::Headphones,
+        "audio-card" | "audio-speakers" => BluetoothDeviceKind::Speaker,
+        "input-mouse" => BluetoothDeviceKind::Mouse,
+        "input-keyboard" => BluetoothDeviceKind::Keyboard,
+        "input-gaming" => BluetoothDeviceKind::Gamepad,
+        "phone" => BluetoothDeviceKind::Phone,
+        "computer" => BluetoothDeviceKind::Computer,
+        "input-tablet" => BluetoothDeviceKind::Tablet,
+        "video-display" => BluetoothDeviceKind::Display,
+        "printer" => BluetoothDeviceKind::Printer,
+        "camera-photo" | "camera-video" => BluetoothDeviceKind::Camera,
+        _ => BluetoothDeviceKind::Other,
     }
 }
 
-fn device(objects: &Objects, device: &Object, name: String) -> Device {
-    Device {
+fn device(objects: &Objects, device: &Object, name: String) -> BluetoothDevice {
+    BluetoothDevice {
         path: device.path.to_owned(),
         name,
         address: device.get("Address").unwrap_or_default(),

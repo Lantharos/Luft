@@ -3,11 +3,10 @@ use std::sync::Once;
 
 use futures_util::StreamExt;
 use luft_app::dbus::{self, explain, objects, service::absent};
-use luft_app::{Commands, Events};
+use luft_app::{Commands, Empty, Events};
 use luft_i18n::t;
-use sabine::SabineWindow;
+use sabine::{BridgeEvent, SabineWindow};
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use zbus::{DynamicType, Proxy, Type};
 
 use crate::L10N;
@@ -15,7 +14,7 @@ use crate::L10N;
 const SERVICE: &str = "com.lantharos.Passkeys";
 const PATH: &str = "/com/lantharos/Passkeys1";
 const INTERFACE: &str = "com.lantharos.Passkeys1";
-const CHANGED: &str = "passkeys.changed";
+const CHANGED: BridgeEvent<Passkeys> = BridgeEvent::new("passkeys.changed");
 
 static WATCH: Once = Once::new();
 
@@ -32,7 +31,7 @@ struct Entry {
     chip: bool,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
 struct Passkey {
     id: String,
@@ -46,7 +45,7 @@ struct Passkey {
     chip: bool,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Passkeys {
     protection: String,
@@ -54,14 +53,14 @@ pub struct Passkeys {
     passkeys: Vec<Passkey>,
 }
 
-#[derive(Deserialize)]
-struct Rename {
+#[derive(Deserialize, specta::Type)]
+struct PasskeyRename {
     id: String,
     name: String,
 }
 
-#[derive(Deserialize)]
-struct Target {
+#[derive(Deserialize, specta::Type)]
+struct PasskeyTarget {
     id: String,
 }
 
@@ -143,7 +142,7 @@ fn watch(events: Events) {
     });
 }
 
-async fn passkeys(events: Events, _: Value) -> Result<Option<Passkeys>, String> {
+async fn passkeys(events: Events, Empty {}: Empty) -> Result<Option<Passkeys>, String> {
     let passkeys = read().await?;
     if passkeys.is_some() {
         WATCH.call_once(|| watch(events));
@@ -161,11 +160,12 @@ async fn call(method: &str, body: &(impl Serialize + DynamicType)) -> Result<(),
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     window
+        .bridge_event(&CHANGED)
         .with_async("passkeys", events, passkeys)
-        .command_async("passkeys_rename", |Rename { id, name }| async move {
+        .command_async("passkeys_rename", |PasskeyRename { id, name }| async move {
             call("Rename", &(unhex(&id)?, name)).await
         })
-        .command_async("passkeys_delete", |Target { id }| async move {
+        .command_async("passkeys_delete", |PasskeyTarget { id }| async move {
             call("Delete", &(unhex(&id)?,)).await
         })
 }

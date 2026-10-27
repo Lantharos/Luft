@@ -9,6 +9,7 @@ use serde::{Deserialize, Serialize};
 
 use luft_app::apps::{self, App};
 use luft_i18n::t;
+use specta::Type;
 
 use crate::L10N;
 
@@ -22,20 +23,20 @@ const EXEC: &str = "Exec";
 const STARTUP_NOTIFY: &str = "StartupNotify";
 const AUTOSTART_ARGUMENTS: &str = "X-Sabine-Autostart-Arguments";
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Entry {
     #[serde(flatten)]
     app: App,
     enabled: bool,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Toggle {
     id: String,
     enabled: bool,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Addition {
     app: String,
 }

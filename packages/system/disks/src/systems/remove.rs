@@ -1,5 +1,6 @@
 use luft_trust::{Outcome, TRUST};
 use serde::Serialize;
+use specta::Type;
 
 use super::{Kind, Role, System, find};
 use crate::partitions;
@@ -10,8 +11,9 @@ use crate::udisks::volumes::{Segment, Volume};
 const ROOTS: [&str; 2] = ["/sysroot", "/"];
 const WORTH_OFFERING: u64 = 1 << 30;
 
-#[derive(Serialize, Clone, Debug)]
+#[derive(Serialize, Clone, Debug, Type)]
 #[serde(
+    rename = "SystemStep",
     tag = "kind",
     rename_all = "kebab-case",
     rename_all_fields = "camelCase"
@@ -23,13 +25,13 @@ pub enum Step {
     Grow,
 }
 
-#[derive(Serialize, Clone, Copy, Debug)]
+#[derive(Serialize, Clone, Copy, Debug, Type)]
 pub struct Space {
     pub offset: u64,
     pub size: u64,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Removed {
     pub grown: u64,

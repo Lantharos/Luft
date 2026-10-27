@@ -6,7 +6,7 @@ use specta::Type;
 use super::transaction;
 
 #[derive(Serialize, Deserialize, Clone, Debug, Type)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename = "ToolSummary", rename_all = "camelCase")]
 pub struct Available {
     pub package: String,
     pub summary: String,

@@ -2,12 +2,13 @@ use std::cmp::Ordering;
 use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use crate::http;
 
 const DOWNLOADS: &str = "https://get.luft.computer";
 
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum Area {
     Desktop,
@@ -16,7 +17,7 @@ pub enum Area {
     Installing,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 pub struct Section {
     pub area: Area,
     pub title: String,

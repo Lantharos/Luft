@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use serde::Serialize;
+use specta::Type;
 use zbus::{Connection, OwnedVariant, Variant};
 
 use super::properties::{self, Properties};
@@ -8,7 +9,7 @@ use super::properties::{self, Properties};
 const DESTINATION: &str = "org.freedesktop.UPower.PowerProfiles";
 const PATH: &str = "/org/freedesktop/UPower/PowerProfiles";
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Profiles {
     active: String,
     available: Vec<String>,

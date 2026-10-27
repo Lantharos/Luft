@@ -1,6 +1,6 @@
 use super::*;
 use crate::systems::facts::WindowsInstall;
-use crate::udisks::snapshot::Kind as DriveKind;
+use crate::udisks::snapshot::{Kind as DriveKind, PartitionTable};
 use crate::udisks::volumes::Encryption;
 
 const GIB: u64 = 1 << 30;
@@ -60,7 +60,7 @@ fn drive(id: &str, volumes: Vec<Volume>) -> Drive {
         can_power_off: false,
         system: volumes.iter().any(Volume::in_use_by_system),
         read_only: false,
-        table: Some("gpt".to_owned()),
+        table: Some(PartitionTable::Gpt),
         extended: None,
         segments: volumes
             .into_iter()

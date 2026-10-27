@@ -7,22 +7,22 @@ mod shortcuts;
 use std::collections::HashMap;
 
 use gio::prelude::*;
-use luft_app::{Commands, Events, launch};
+use luft_app::{Commands, Empty, Events, launch};
 use luft_i18n::t;
 use sabine::SabineWindow;
 use serde::Deserialize;
-use serde_json::Value;
+use specta::Type;
 
 use crate::L10N;
 
 const KEYS: &str = "com.lantharos.keys.desktop";
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Apps {
     ids: Vec<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Link {
     link: String,
     token: Option<String>,
@@ -47,12 +47,12 @@ fn app_names(Apps { ids }: Apps) -> Result<HashMap<String, String>, String> {
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     dictation::register(window, events)
-        .command("keyboard_layouts", |_: Value| Ok(layouts::all()))
-        .command_async("keyboard_input_methods", |_: Value| methods::all())
-        .command("keyboard_keys_installed", |_: Value| {
+        .command("keyboard_layouts", |Empty {}| Ok(layouts::all()))
+        .command_async("keyboard_input_methods", |Empty {}| methods::all())
+        .command("keyboard_keys_installed", |Empty {}| {
             Ok(gio_unix::DesktopAppInfo::new(KEYS).is_some())
         })
         .command("keyboard_open_keys", open_keys)
-        .command("keyboard_shortcuts", |_: Value| Ok(shortcuts::all()))
+        .command("keyboard_shortcuts", |Empty {}| Ok(shortcuts::all()))
         .command("keyboard_app_names", app_names)
 }

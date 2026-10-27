@@ -1,14 +1,13 @@
 use std::fs;
 use std::io::ErrorKind;
 
-use luft_app::Commands;
+use luft_app::{Commands, Empty};
 use luft_i18n::t;
 use sabine::SabineWindow;
-use serde_json::Value;
 
 use crate::L10N;
 
-fn clear_history(_: Value) -> Result<(), String> {
+fn clear_history(Empty {}: Empty) -> Result<(), String> {
     let history = dirs::data_dir()
         .ok_or_else(|| t!(L10N, "desktop-no-data-folder"))?
         .join("recently-used.xbel");

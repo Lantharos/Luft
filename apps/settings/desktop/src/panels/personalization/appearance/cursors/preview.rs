@@ -7,6 +7,7 @@ use image::RgbaImage;
 use image::imageops::{self, FilterType};
 use luft_i18n::t;
 use serde::Deserialize;
+use specta::Type;
 
 use super::xcursor;
 use crate::L10N;
@@ -27,8 +28,8 @@ const SHAPES: [&[&str]; 5] = [
     ],
 ];
 
-#[derive(Deserialize)]
-pub struct Theme {
+#[derive(Deserialize, Type)]
+pub struct ThemePath {
     path: String,
 }
 
@@ -103,7 +104,7 @@ fn render(theme: &Path) -> Option<RgbaImage> {
     Some(strip)
 }
 
-pub fn preview(Theme { path }: Theme) -> Result<String, String> {
+pub fn preview(ThemePath { path }: ThemePath) -> Result<String, String> {
     let theme = Path::new(&path);
     let target = cached_path(theme)?;
     if !target.exists() {

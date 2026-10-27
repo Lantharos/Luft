@@ -13,6 +13,7 @@ icu_time = { workspace = true, features = ["compiled_data"] }
 roxmltree.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+specta.workspace = true
 
 [lints]
 workspace = true

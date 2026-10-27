@@ -1,12 +1,13 @@
 use luft_app::dbus;
 use serde::Deserialize;
+use specta::Type;
 use zbus::Proxy;
 
 const KESTREL: &str = "com.lantharos.Kestrel";
 const SOUNDS_PATH: &str = "/com/lantharos/Kestrel/Sounds";
 const SOUNDS: &str = "com.lantharos.Kestrel.Sounds";
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Sound {
     name: String,
 }

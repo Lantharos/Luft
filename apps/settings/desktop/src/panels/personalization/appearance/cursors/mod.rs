@@ -9,38 +9,38 @@ mod xcursor;
 
 use gio::prelude::*;
 use luft_app::launch::{self, Token};
-use luft_app::{Commands, Events};
-use sabine::SabineWindow;
+use luft_app::{Commands, Empty, Events};
+use sabine::{BridgeEvent, SabineWindow};
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 
-use install::Progress;
+use install::InstallProgress;
 use installed::UserThemes;
+use specta::Type;
 
-const INSTALL_PROGRESS: &str = "appearance.cursorInstall";
+const INSTALL_PROGRESS: BridgeEvent<InstallEvent> = BridgeEvent::new("appearance.cursorInstall");
 
-#[derive(Deserialize)]
-struct Theme {
+#[derive(Deserialize, Type)]
+struct ThemeName {
     name: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Product {
     id: u64,
     token: Option<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Install {
     id: u64,
     file: u32,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 struct InstallEvent {
     id: u64,
     #[serde(flatten)]
-    progress: Progress,
+    progress: InstallProgress,
 }
 
 fn install(events: &Events, Install { id, file }: Install) -> Result<(), String> {
@@ -50,8 +50,8 @@ fn install(events: &Events, Install { id, file }: Install) -> Result<(), String>
             events.emit(INSTALL_PROGRESS, InstallEvent { id, progress });
         };
         report(match install::install(id, file, &report) {
-            Ok(themes) => Progress::Installed { themes },
-            Err(error) => Progress::Failed { error },
+            Ok(themes) => InstallProgress::Installed { themes },
+            Err(error) => InstallProgress::Failed { error },
         });
     });
     Ok(())
@@ -73,9 +73,10 @@ fn open_folder(Token { token }: Token) -> Result<(), String> {
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     window
-        .command("appearance_cursor_themes", |_: Value| Ok(themes::list()))
+        .bridge_event(&INSTALL_PROGRESS)
+        .command("appearance_cursor_themes", |Empty {}| Ok(themes::list()))
         .command("appearance_cursor_preview", preview::preview)
-        .command("appearance_cursor_remove", |Theme { name }| {
+        .command("appearance_cursor_remove", |ThemeName { name }| {
             UserThemes::new()?.remove(&name)
         })
         .command("appearance_cursor_store", store::browse)

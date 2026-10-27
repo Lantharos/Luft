@@ -1,13 +1,14 @@
 mod graphics;
 
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 pub use graphics::nvidia_cards;
 
 const NVIDIA_TAG: &str = "-nvidia";
 pub const NVIDIA_VENDOR: u16 = 0x10de;
 
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum Variant {
     Standard,

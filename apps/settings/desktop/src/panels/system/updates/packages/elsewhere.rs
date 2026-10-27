@@ -2,7 +2,7 @@ use luft_app::dbus;
 use luft_i18n::t;
 use luft_software::progress::Change;
 
-use super::super::state::{Activity, Elsewhere, Kind};
+use super::super::state::{Activity, Elsewhere, UpdateKind};
 use crate::L10N;
 
 const SETTINGS: &str = "settings";
@@ -51,12 +51,12 @@ pub async fn sent_by(sender: &str) -> Option<String> {
 
 pub fn activity(by: Option<String>, change: Option<Change>) -> Activity {
     let kind = match (&by, change) {
-        (None, Some(Change::Refresh)) => Kind::Check,
-        (None, Some(Change::Download)) => Kind::Download,
-        _ => Kind::Elsewhere,
+        (None, Some(Change::Refresh)) => UpdateKind::Check,
+        (None, Some(Change::Download)) => UpdateKind::Download,
+        _ => UpdateKind::Elsewhere,
     };
     Activity {
-        elsewhere: (kind == Kind::Elsewhere).then_some(Elsewhere { by, change }),
+        elsewhere: (kind == UpdateKind::Elsewhere).then_some(Elsewhere { by, change }),
         ..Activity::new(kind)
     }
 }

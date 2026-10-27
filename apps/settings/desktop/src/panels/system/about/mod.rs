@@ -8,18 +8,18 @@ use std::fs;
 use gio::prelude::*;
 use luft_app::dbus::{self, failed};
 use luft_app::launch::{self, Token};
-use luft_app::{Commands, Events};
+use luft_app::{Commands, Empty, Events};
 use luft_i18n::t;
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
+use specta::Type;
 use zbus::Proxy;
 
 use crate::L10N;
 
 const DISKS: &str = "com.lantharos.disks.desktop";
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 struct About {
     device_name: String,
@@ -32,7 +32,7 @@ struct About {
     storage: Option<Storage>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 struct Storage {
     total: u64,
@@ -40,8 +40,8 @@ struct Storage {
     manageable: bool,
 }
 
-#[derive(Deserialize)]
-struct Rename {
+#[derive(Deserialize, Type)]
+struct ComputerRename {
     name: String,
 }
 
@@ -160,7 +160,7 @@ fn pci_name(names: &str, vendor: &str, device: &str) -> Option<String> {
     Some(format!("{short_vendor} {device_name}"))
 }
 
-async fn about(_: Value) -> Result<About, String> {
+async fn about(Empty {}: Empty) -> Result<About, String> {
     let hostnamed = hostnamed().await?;
     let hostname: String = hostnamed
         .get_property("StaticHostname")
@@ -222,7 +222,7 @@ fn hostname_for(name: &str) -> String {
     hostname.trim_end_matches('-').to_owned()
 }
 
-async fn rename(Rename { name }: Rename) -> Result<(), String> {
+async fn rename(ComputerRename { name }: ComputerRename) -> Result<(), String> {
     let name = name.trim();
     let hostnamed = hostnamed().await?;
     hostnamed
@@ -247,10 +247,10 @@ pub fn register(window: SabineWindow, _events: &Events) -> SabineWindow {
         .command("about_open_disks", |Token { token }| {
             launch_disks("file:///", token.as_deref())
         })
-        .command_async("about_other_systems", |_: Value| systems::list())
+        .command_async("about_other_systems", |Empty {}| systems::list())
         .command("about_remove_system", systems::remove)
-        .command("about_problems", |_: Value| problems::problems())
-        .command_async("about_firmware_restart", |_: Value| {
+        .command("about_problems", |Empty {}| problems::problems())
+        .command_async("about_firmware_restart", |Empty {}| {
             problems::restart_to_firmware()
         })
 }

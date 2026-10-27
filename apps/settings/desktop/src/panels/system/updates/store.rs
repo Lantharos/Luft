@@ -5,10 +5,11 @@ use luft_app::files;
 use luft_software::system::image::Update;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 const FOLDER: &str = "com.lantharos.settings";
 
-#[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Default, Debug)]
+#[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Default, Debug, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum Schedule {
     #[default]
@@ -17,7 +18,7 @@ pub enum Schedule {
     Never,
 }
 
-#[derive(Serialize, Deserialize, Clone, Copy, Debug)]
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Preferences {
     pub schedule: Schedule,

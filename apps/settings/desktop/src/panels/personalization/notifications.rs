@@ -1,19 +1,19 @@
 use std::collections::HashSet;
 
 use gio::prelude::*;
-use luft_app::{Commands, Events};
+use luft_app::{Commands, Empty, Events};
 use sabine::SabineWindow;
 use serde::Serialize;
-use serde_json::Value;
 
 use luft_app::apps::App;
+use specta::Type;
 
 const SCHEMA: &str = "org.gnome.desktop.notifications";
 const APPLICATION_SCHEMA: &str = "org.gnome.desktop.notifications.application";
 const APPLICATION_PATH: &str = "/org/gnome/desktop/notifications/application";
 const RULES_PATH: &str = "/com/lantharos/kestrel/notifications/application";
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 struct NotifyingApp {
     path: String,
@@ -43,5 +43,5 @@ fn notifying_apps() -> Vec<NotifyingApp> {
 }
 
 pub fn register(window: SabineWindow, _events: &Events) -> SabineWindow {
-    window.command("notifications_apps", |_: Value| Ok(notifying_apps()))
+    window.command("notifications_apps", |Empty {}| Ok(notifying_apps()))
 }

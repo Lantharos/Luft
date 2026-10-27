@@ -5,21 +5,21 @@ mod model;
 mod pulse;
 mod service;
 
-use luft_app::{Commands, Events};
+use luft_app::{Commands, Empty, Events};
 use sabine::SabineWindow;
 use serde::Deserialize;
-use serde_json::Value;
 
 use service::Command;
+use specta::Type;
 
-#[derive(Deserialize, Clone, Copy)]
+#[derive(Deserialize, Clone, Copy, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum Direction {
     Output,
     Input,
 }
 
-#[derive(Deserialize, Clone, Copy)]
+#[derive(Deserialize, Clone, Copy, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum Target {
     Output,
@@ -27,64 +27,66 @@ pub enum Target {
     App,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct DefaultDevice {
     direction: Direction,
     name: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Volume {
     target: Target,
     index: u32,
     volume: f64,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Mute {
     target: Target,
     index: u32,
     muted: bool,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Balance {
     index: u32,
     balance: f32,
 }
 
-#[derive(Deserialize)]
-pub struct Port {
+#[derive(Deserialize, Type)]
+pub struct PortSelection {
     direction: Direction,
     index: u32,
     port: String,
 }
 
-#[derive(Deserialize)]
-pub struct Profile {
+#[derive(Deserialize, Type)]
+pub struct ProfileSelection {
     card: u32,
     profile: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct MoveApp {
     index: u32,
     output: u32,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct AlertVolume {
     volume: f64,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Meter {
     enabled: bool,
 }
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     window
-        .with("sound_start", events, |events, _: Value| {
+        .bridge_event(&pulse::SOUND_CHANGED)
+        .bridge_event(&meter::SOUND_LEVEL)
+        .with("sound_start", events, |events, Empty {}| {
             service::send(events, Command::Publish)
         })
         .with("sound_set_default", events, |events, request| {

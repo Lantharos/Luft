@@ -1,5 +1,6 @@
 use gio::prelude::*;
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use crate::desktop::typography::{self, INTERFACE, INTERFACE_FONT, MONOSPACE_FONT};
 
@@ -22,7 +23,7 @@ pub fn describe(family: &str, size: f64) -> String {
     format!("{family}{separator}{size}")
 }
 
-#[derive(Clone, Copy, Deserialize)]
+#[derive(Clone, Copy, Deserialize, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum Role {
     Interface,
@@ -38,7 +39,7 @@ impl Role {
     }
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Defaults {
     interface: String,
     monospace: String,

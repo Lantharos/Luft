@@ -8,6 +8,7 @@ use luft_i18n::t;
 use luft_software::http;
 use luft_software::task::Task;
 use serde::Serialize;
+use specta::Type;
 use zbus::fdo::DBusProxy;
 use zbus::{Fd, OwnedVariant, Proxy, Variant};
 
@@ -20,7 +21,7 @@ const NEEDS_SHUTDOWN: u64 = 1 << 17;
 
 type Map = HashMap<String, OwnedVariant>;
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Firmware {
     pub id: String,

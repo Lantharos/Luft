@@ -6,6 +6,7 @@ use libpulse_binding::context::introspect::{SinkInfo, SinkInputInfo, SourceInfo}
 use libpulse_binding::proplist::properties;
 use libpulse_binding::volume::{ChannelVolumes, Volume};
 use serde::Serialize;
+use specta::Type;
 
 use super::card::{Card, CardView, Port, Ports};
 
@@ -46,9 +47,9 @@ pub struct State {
     pub alert: Option<Alert>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct Snapshot<'a> {
+pub struct SoundSnapshot<'a> {
     outputs: Vec<DeviceView<'a>>,
     inputs: Vec<DeviceView<'a>>,
     apps: Vec<AppView<'a>>,
@@ -58,7 +59,7 @@ pub struct Snapshot<'a> {
     alert_volume: Option<f64>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 struct DeviceView<'a> {
     index: u32,
     name: &'a str,
@@ -70,7 +71,7 @@ struct DeviceView<'a> {
     ports: &'a [Port],
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 struct AppView<'a> {
     index: u32,
     name: &'a str,
@@ -188,8 +189,8 @@ impl Alert {
 }
 
 impl State {
-    pub fn snapshot(&self) -> Snapshot<'_> {
-        Snapshot {
+    pub fn snapshot(&self) -> SoundSnapshot<'_> {
+        SoundSnapshot {
             outputs: self
                 .outputs
                 .iter()

@@ -10,14 +10,15 @@ use libpulse_binding::context::subscribe::{Facility, InterestMaskSet, Operation}
 use libpulse_binding::proplist::UpdateMode;
 use libpulse_binding::volume::ChannelVolumes;
 use luft_app::Events;
+use sabine::BridgeEvent;
 
 use super::card::Card;
 use super::meter::Meter;
-use super::model::{ALERT_STREAM, Alert, App, Device, State, scaled};
+use super::model::{ALERT_STREAM, Alert, App, Device, SoundSnapshot, State, scaled};
 use super::service::Command;
 use super::{Direction, Target};
 
-const SOUND_CHANGED: &str = "sound.changed";
+pub const SOUND_CHANGED: BridgeEvent<SoundSnapshot<'static>> = BridgeEvent::new("sound.changed");
 const INITIAL_QUERIES: usize = 6;
 
 type Done = Box<dyn FnOnce(&Pulse)>;

@@ -4,11 +4,12 @@ use std::path::Path;
 use std::process::Command;
 
 use serde::Serialize;
+use specta::Type;
 
 const PROGRAM: &str = "ddcutil";
 const BRIGHTNESS: &str = "10";
 
-#[derive(Serialize, Clone, Copy, Default, PartialEq, Eq)]
+#[derive(Serialize, Clone, Copy, Default, PartialEq, Eq, Type)]
 #[serde(rename_all = "kebab-case")]
 pub enum Availability {
     #[default]

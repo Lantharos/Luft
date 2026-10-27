@@ -1,6 +1,7 @@
 use std::path::{Path, PathBuf};
 
 use serde::Serialize;
+use specta::Type;
 use zbus::{Connection, OwnedObjectPath};
 
 use super::failed;
@@ -19,7 +20,7 @@ const STATE_CHARGING: u32 = 1;
 const PLAUSIBLE_ESTIMATE: std::ops::RangeInclusive<i64> = 60..=24 * 3600;
 const SMALLEST_RATE: f64 = 0.1;
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "kebab-case")]
 enum Charge {
     Charging,
@@ -29,13 +30,13 @@ enum Charge {
     NotCharging,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Capacity {
     full: f64,
     design: f64,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Battery {
     level: f64,
@@ -48,9 +49,9 @@ pub struct Battery {
     limit: Option<ChargeLimit>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "lowercase")]
-enum Kind {
+enum PowerDeviceKind {
     Mouse,
     Keyboard,
     Headphones,
@@ -63,11 +64,11 @@ enum Kind {
     Other,
 }
 
-#[derive(Serialize)]
-pub struct Device {
+#[derive(Serialize, Type)]
+pub struct PowerDevice {
     id: String,
     name: Option<String>,
-    kind: Kind,
+    kind: PowerDeviceKind,
     level: f64,
     charging: bool,
 }
@@ -99,18 +100,18 @@ impl Pack<'_> {
     }
 }
 
-fn kind(device_type: u32) -> Kind {
+fn kind(device_type: u32) -> PowerDeviceKind {
     match device_type {
-        5 => Kind::Mouse,
-        6 => Kind::Keyboard,
-        17 | 19 => Kind::Headphones,
-        18 => Kind::Speaker,
-        12 => Kind::Gamepad,
-        8 => Kind::Phone,
-        10 => Kind::Tablet,
-        13 => Kind::Pen,
-        14 => Kind::Touchpad,
-        _ => Kind::Other,
+        5 => PowerDeviceKind::Mouse,
+        6 => PowerDeviceKind::Keyboard,
+        17 | 19 => PowerDeviceKind::Headphones,
+        18 => PowerDeviceKind::Speaker,
+        12 => PowerDeviceKind::Gamepad,
+        8 => PowerDeviceKind::Phone,
+        10 => PowerDeviceKind::Tablet,
+        13 => PowerDeviceKind::Pen,
+        14 => PowerDeviceKind::Touchpad,
+        _ => PowerDeviceKind::Other,
     }
 }
 
@@ -208,12 +209,12 @@ fn battery(display: &Properties, on_battery: bool, packs: &[Pack]) -> Option<Bat
     })
 }
 
-fn peripheral((path, device): &(OwnedObjectPath, Properties)) -> Option<Device> {
+fn peripheral((path, device): &(OwnedObjectPath, Properties)) -> Option<PowerDevice> {
     let device_type = device.get::<u32>("Type")?;
     if is(device, "PowerSupply") || !is(device, "IsPresent") || device_type == TYPE_LINE_POWER {
         return None;
     }
-    Some(Device {
+    Some(PowerDevice {
         id: path.to_string(),
         name: device
             .get::<String>("Model")
@@ -251,7 +252,7 @@ pub async fn devices(
     Ok(devices)
 }
 
-pub async fn read(connection: &Connection) -> Result<(Option<Battery>, Vec<Device>), String> {
+pub async fn read(connection: &Connection) -> Result<(Option<Battery>, Vec<PowerDevice>), String> {
     let devices = devices(connection).await?;
     let display = Properties::read(connection, DESTINATION, DISPLAY_DEVICE, DEVICE).await?;
     let on_battery = Properties::read(connection, DESTINATION, PATH, DESTINATION)

@@ -11,6 +11,7 @@ rust-version.workspace = true
 luft-dbus.workspace = true
 luft-i18n.workspace = true
 serde.workspace = true
+specta.workspace = true
 zbus = { workspace = true, features = ["proxy", "tokio"] }
 
 [lints]

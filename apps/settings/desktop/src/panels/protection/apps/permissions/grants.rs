@@ -2,13 +2,14 @@ use std::collections::HashMap;
 
 use luft_app::identity::permissions::{self, BACKGROUND_CLIPBOARD, StoreProxy, YES};
 use serde::Deserialize;
+use specta::Type;
 use zbus::Connection;
 
 const NO_LOCATION: &str = "NONE";
 const EXACT_LOCATION: &str = "EXACT";
 const NEVER_USED: &str = "0";
 
-#[derive(Deserialize, Clone, Copy)]
+#[derive(Deserialize, Clone, Copy, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum Switch {
     Location,

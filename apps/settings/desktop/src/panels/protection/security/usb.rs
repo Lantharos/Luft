@@ -1,6 +1,7 @@
 use luft_app::dbus::{error_message, failed};
 use luft_i18n::t;
 use serde::Serialize;
+use specta::Type;
 
 use super::properties::{Service, absent, get};
 use crate::L10N;
@@ -11,19 +12,19 @@ pub const USB_PROTECTION: Service = Service {
     interface: "com.lantharos.UsbProtection1",
 };
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct Device {
+pub struct UsbDevice {
     id: String,
     name: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct UsbProtection {
     enabled: bool,
     guarding: bool,
-    held: Vec<Device>,
+    held: Vec<UsbDevice>,
 }
 
 pub async fn read() -> Result<Option<UsbProtection>, String> {
@@ -34,7 +35,7 @@ pub async fn read() -> Result<Option<UsbProtection>, String> {
             guarding: get(&properties, "Guarding").unwrap_or_default(),
             held: held
                 .into_iter()
-                .map(|(id, name)| Device { id, name })
+                .map(|(id, name)| UsbDevice { id, name })
                 .collect(),
         }
     }))

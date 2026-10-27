@@ -9,24 +9,24 @@ use std::sync::Once;
 use luft_app::apps::App;
 use luft_app::dbus;
 use luft_app::identity::permissions::{self, Apps, DEVICES, FOLDERS};
-use luft_app::{Commands, Events};
+use luft_app::{Commands, Empty, Events};
 use luft_i18n::t;
 use luft_software::apps::{appimage, flatpak};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use zbus::Connection;
 
 use crate::L10N;
 use grants::{SWITCHES, Switch};
 use passwords::Remembered;
-use sandbox::Device;
+use sandbox::SandboxDevice;
+use specta::Type;
 
 const FULL_ACCESS_LINK: &str = "schelf:full-access?";
 
 static WATCH: Once = Once::new();
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 struct AppAccess {
     #[serde(flatten)]
@@ -41,35 +41,35 @@ struct AppAccess {
     devices: Vec<String>,
 }
 
-#[derive(Deserialize)]
-struct Change {
+#[derive(Deserialize, Type)]
+struct PermissionChange {
     kind: Switch,
     app: String,
     allowed: bool,
 }
 
-#[derive(Deserialize)]
-struct Target {
+#[derive(Deserialize, Type)]
+struct AppTarget {
     app: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 struct Revoke {
     app: String,
     app_image: bool,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Folder {
     app: String,
     folder: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct DeviceChange {
     app: String,
-    device: Device,
+    device: SandboxDevice,
     on: bool,
 }
 
@@ -135,12 +135,12 @@ fn explain(error: zbus::Error) -> String {
     dbus::explain(&error)
 }
 
-async fn list(events: Events, _: Value) -> Result<Vec<AppAccess>, String> {
+async fn list(events: Events, Empty {}: Empty) -> Result<Vec<AppAccess>, String> {
     WATCH.call_once(|| watch::watch(events));
     read(dbus::session().await?).await.map_err(explain)
 }
 
-async fn set(Change { kind, app, allowed }: Change) -> Result<(), String> {
+async fn set(PermissionChange { kind, app, allowed }: PermissionChange) -> Result<(), String> {
     grants::set(dbus::session().await?, kind, &app, allowed)
         .await
         .map_err(explain)
@@ -154,7 +154,7 @@ async fn revoke_full_access(Revoke { app, app_image }: Revoke) -> Result<(), Str
     }
 }
 
-fn ask_for_full_access(Target { app }: Target) -> Result<(), String> {
+fn ask_for_full_access(AppTarget { app }: AppTarget) -> Result<(), String> {
     gio::AppInfo::launch_default_for_uri(
         &format!("{FULL_ACCESS_LINK}{app}"),
         None::<&gio::AppLaunchContext>,
@@ -162,13 +162,13 @@ fn ask_for_full_access(Target { app }: Target) -> Result<(), String> {
     .map_err(|error| error.to_string())
 }
 
-async fn forget_passwords(Target { app }: Target) -> Result<(), String> {
+async fn forget_passwords(AppTarget { app }: AppTarget) -> Result<(), String> {
     passwords::forget(dbus::session().await?, &app)
         .await
         .map_err(explain)
 }
 
-async fn add_folder(Target { app }: Target) -> Result<bool, String> {
+async fn add_folder(AppTarget { app }: AppTarget) -> Result<bool, String> {
     sandbox::add_folder(
         dbus::session().await?,
         &app,
@@ -191,6 +191,7 @@ async fn set_device(DeviceChange { app, device, on }: DeviceChange) -> Result<()
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     window
+        .bridge_event(&watch::CHANGED)
         .with_async("apps_permissions", events, list)
         .command_async("apps_permission_set", set)
         .command_async("apps_full_access_revoke", revoke_full_access)

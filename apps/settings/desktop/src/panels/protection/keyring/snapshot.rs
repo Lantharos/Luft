@@ -10,10 +10,10 @@ type Store = (String, String, String, u32);
 type Record = (u64, String, String, String, String);
 type Key = (String, String, String, bool, bool, u64);
 
-#[derive(DeserializeDict, Type, Serialize)]
+#[derive(DeserializeDict, Type, Serialize, specta::Type)]
 #[zbus(signature = "a{sv}", rename_all = "PascalCase")]
 #[serde(rename_all = "camelCase")]
-struct Status {
+struct KeyringStatus {
     locked: bool,
     tpm_sealed: bool,
     fingerprint_unlock: bool,
@@ -30,7 +30,7 @@ struct Agent {
     chip_keys: bool,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, specta::Type)]
 struct Identity {
     key: String,
     name: String,
@@ -38,14 +38,14 @@ struct Identity {
     icon: Option<String>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, specta::Type)]
 struct AppStore {
     #[serde(flatten)]
     app: Identity,
     secrets: u32,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, specta::Type)]
 struct Event {
     time: u64,
     app: String,
@@ -53,7 +53,7 @@ struct Event {
     what: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
 struct SshKey {
     fingerprint: String,
@@ -64,13 +64,13 @@ struct SshKey {
     added: u64,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, specta::Type)]
 pub struct Access {
     stores: Vec<AppStore>,
     history: Vec<Event>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
 struct Ssh {
     socket: String,
@@ -78,10 +78,10 @@ struct Ssh {
     keys: Vec<SshKey>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, specta::Type)]
 pub struct Keyring {
     #[serde(flatten)]
-    status: Status,
+    status: KeyringStatus,
     ssh: Option<Ssh>,
 }
 
@@ -144,7 +144,7 @@ async fn ssh() -> Result<Ssh, Problem> {
 }
 
 pub async fn read() -> Result<Option<Keyring>, Problem> {
-    let Some(status) = bus::optional(bus::properties::<Status>(STATUS).await)? else {
+    let Some(status) = bus::optional(bus::properties::<KeyringStatus>(STATUS).await)? else {
         return Ok(None);
     };
     Ok(Some(Keyring {

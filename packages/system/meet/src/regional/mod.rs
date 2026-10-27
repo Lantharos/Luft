@@ -8,8 +8,9 @@ use icu_locale_core::subtags::script;
 use icu_time::zone::TimeZone;
 use icu_time::zone::iana::IanaParserExtended;
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
-#[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase", default)]
 pub struct Hints {
     pub language: Option<String>,
@@ -18,7 +19,7 @@ pub struct Hints {
     pub keyboards: Vec<Keyboard>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 pub struct Keyboard {
     pub layout: String,
     #[serde(default)]

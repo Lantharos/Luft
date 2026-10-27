@@ -3,13 +3,14 @@ use std::future::ready;
 use futures_util::StreamExt;
 use luft_app::Events;
 use luft_app::dbus::{self, objects};
+use sabine::BridgeEvent;
 use zbus::fdo::PropertiesChanged;
 use zbus::message::Message;
 
 use super::bus::{ACCESS, PATH, PROPERTIES, SERVICE, SSH, STATUS};
-use super::snapshot;
+use super::snapshot::{self, Keyring};
 
-pub const CHANGED: &str = "keyring.changed";
+pub const CHANGED: BridgeEvent<Keyring> = BridgeEvent::new("keyring.changed");
 
 fn concerns_keyring(message: &Message) -> bool {
     let header = message.header();

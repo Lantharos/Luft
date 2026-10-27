@@ -2,16 +2,17 @@ use luft_app::identity::permissions::{self, DEVICES, FOLDERS, FULL_ACCESS, YES};
 use luft_app::portal::FileChooser;
 use luft_app::portal::uri_path;
 use serde::Deserialize;
+use specta::Type;
 use zbus::Connection;
 
-#[derive(Deserialize, Clone, Copy, PartialEq, Eq)]
+#[derive(Deserialize, Clone, Copy, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
-pub enum Device {
+pub enum SandboxDevice {
     Usb,
     Serial,
 }
 
-impl Device {
+impl SandboxDevice {
     fn name(self) -> &'static str {
         match self {
             Self::Usb => "usb",
@@ -74,7 +75,7 @@ pub async fn remove_folder(connection: &Connection, app: &str, folder: &str) -> 
 pub async fn set_device(
     connection: &Connection,
     app: &str,
-    device: Device,
+    device: SandboxDevice,
     on: bool,
 ) -> zbus::Result<()> {
     change(connection, &DEVICES, app, |devices| {

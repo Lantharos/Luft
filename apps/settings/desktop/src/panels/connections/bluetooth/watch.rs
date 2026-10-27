@@ -5,12 +5,14 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use futures_util::{Stream, StreamExt, stream};
 use luft_app::Events;
 use luft_app::dbus::{self, failed, objects};
+use sabine::BridgeEvent;
 use zbus::message::Type;
 use zbus::{MatchRule, MessageStream};
 
+use super::snapshot::Bluetooth;
 use super::{SERVICE, actions, rfkill};
 
-pub const CHANGED: &str = "bluetooth.changed";
+pub const CHANGED: BridgeEvent<Bluetooth> = BridgeEvent::new("bluetooth.changed");
 
 const OBJECT_MANAGER: &str = "org.freedesktop.DBus.ObjectManager";
 

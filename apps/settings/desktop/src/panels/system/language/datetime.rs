@@ -4,13 +4,13 @@ use std::sync::Once;
 
 use futures_util::StreamExt;
 use luft_app::dbus::{self, failed};
-use luft_app::{Commands, Events};
-use sabine::SabineWindow;
+use luft_app::{Commands, Empty, Events};
+use sabine::{BridgeEvent, SabineWindow};
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
+use specta::Type;
 use zbus::{DynamicType, Proxy};
 
-pub const CLOCK_CHANGED: &str = "datetime.changed";
+const CLOCK_CHANGED: BridgeEvent<Clock> = BridgeEvent::new("datetime.changed");
 
 const TIMEDATED: &str = "org.freedesktop.timedate1";
 const TIMEDATED_PATH: &str = "/org/freedesktop/timedate1";
@@ -20,7 +20,7 @@ const UTC: &str = "UTC";
 
 static WATCH: Once = Once::new();
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 struct Clock {
     timezone: String,
@@ -28,23 +28,23 @@ struct Clock {
     can_automatic: bool,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 struct Zone {
     id: String,
     country: Option<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Timezone {
     timezone: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Automatic {
     enabled: bool,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Time {
     usec: i64,
 }
@@ -80,7 +80,7 @@ fn watch(events: Events) {
     });
 }
 
-async fn clock(events: Events, _: Value) -> Result<Clock, String> {
+async fn clock(events: Events, Empty {}: Empty) -> Result<Clock, String> {
     WATCH.call_once(|| watch(events));
     read().await
 }
@@ -99,7 +99,7 @@ fn countries() -> HashMap<String, String> {
         .collect()
 }
 
-async fn zones(_: Value) -> Result<Vec<Zone>, String> {
+async fn zones(Empty {}: Empty) -> Result<Vec<Zone>, String> {
     let listed: Vec<String> = proxy(TIMEDATED)
         .await?
         .call("ListTimezones", &())
@@ -141,6 +141,7 @@ async fn set_time(Time { usec }: Time) -> Result<(), String> {
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     window
+        .bridge_event(&CLOCK_CHANGED)
         .with_async("datetime_clock", events, clock)
         .command_async("datetime_zones", zones)
         .command_async("datetime_set_timezone", set_timezone)

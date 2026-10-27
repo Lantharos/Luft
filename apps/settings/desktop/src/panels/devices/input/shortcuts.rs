@@ -3,6 +3,7 @@ use std::fs;
 use std::path::PathBuf;
 
 use serde::Serialize;
+use specta::Type;
 
 use super::names;
 
@@ -16,7 +17,7 @@ const SCHEMAS: [&str; 5] = [
 const KESTREL: &str = "com.lantharos.kestrel.keybindings";
 const DESCRIPTIONS: &str = "gnome-control-center/keybindings";
 
-#[derive(Serialize, Clone, Copy)]
+#[derive(Serialize, Clone, Copy, Type)]
 #[serde(rename_all = "lowercase")]
 enum Category {
     System,
@@ -27,7 +28,7 @@ enum Category {
     Media,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Shortcut {
     schema: String,
     key: String,

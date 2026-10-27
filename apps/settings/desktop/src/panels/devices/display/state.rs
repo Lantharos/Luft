@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use luft_app::dbus;
 use serde::Serialize;
+use specta::Type;
 use zbus::{OwnedVariant, Proxy};
 
 pub type Properties = HashMap<String, OwnedVariant>;
@@ -13,7 +14,7 @@ pub type CurrentState = (u32, Vec<MonitorInfo>, Vec<LogicalInfo>, Properties);
 
 const LOGICAL_LAYOUT: u32 = 1;
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Displays {
     serial: u32,
@@ -25,7 +26,7 @@ pub struct Displays {
     orientation_managed: bool,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 struct Monitor {
     connector: String,
@@ -34,7 +35,7 @@ struct Monitor {
     modes: Vec<Mode>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 struct Mode {
     id: String,
@@ -48,7 +49,7 @@ struct Mode {
     variable: bool,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 struct LogicalMonitor {
     x: i32,
     y: i32,

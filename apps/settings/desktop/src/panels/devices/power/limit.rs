@@ -1,4 +1,5 @@
 use serde::Serialize;
+use specta::Type;
 use zbus::Connection;
 
 use super::battery::{self, DESTINATION, DEVICE, Pack};
@@ -6,7 +7,7 @@ use super::failed;
 
 const FULL: u32 = 100;
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct ChargeLimit {
     adjustable: bool,

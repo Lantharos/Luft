@@ -3,6 +3,7 @@ use std::path::{Path, PathBuf};
 
 use luft_i18n::t;
 use serde::Serialize;
+use specta::Type;
 
 use super::archive::{self, Format};
 use super::download::download;
@@ -12,9 +13,9 @@ use crate::L10N;
 
 const MAX_SEARCH_DEPTH: usize = 6;
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(tag = "state", rename_all = "camelCase")]
-pub enum Progress {
+pub enum InstallProgress {
     Downloading { received: u64, total: Option<u64> },
     Installing,
     Installed { themes: Vec<String> },
@@ -102,7 +103,11 @@ fn unpack_themes(
         .collect()
 }
 
-pub fn install(id: u64, file: u32, report: &impl Fn(Progress)) -> Result<Vec<String>, String> {
+pub fn install(
+    id: u64,
+    file: u32,
+    report: &impl Fn(InstallProgress),
+) -> Result<Vec<String>, String> {
     let (link, file_name) = store::download_link(id, file)?;
     let format =
         Format::of(&file_name).ok_or_else(|| t!(L10N, "desktop-cursors-not-an-archive"))?;
@@ -110,7 +115,7 @@ pub fn install(id: u64, file: u32, report: &impl Fn(Progress)) -> Result<Vec<Str
     let staging = staging(&user, &format!("{id}-{file}"))?;
     let archive_path = staging.0.join("download");
     download(&link, &archive_path, report)?;
-    report(Progress::Installing);
+    report(InstallProgress::Installing);
     unpack_themes(&user, format, &archive_path, &file_name, &staging.0)
 }
 

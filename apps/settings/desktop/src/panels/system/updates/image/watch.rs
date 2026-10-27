@@ -2,7 +2,7 @@ use futures_util::StreamExt;
 use luft_software::system::image;
 
 use super::super::elsewhere::finished;
-use super::super::state::{self, Activity, Kind};
+use super::super::state::{self, Activity, UpdateKind};
 
 pub fn watch() {
     luft_app::spawn(async {
@@ -22,5 +22,5 @@ pub async fn scan() {
     if state::busy() || !image::downloading().await.unwrap_or(false) {
         return;
     }
-    state::start(Activity::new(Kind::Download), super::follow, finished);
+    state::start(Activity::new(UpdateKind::Download), super::follow, finished);
 }

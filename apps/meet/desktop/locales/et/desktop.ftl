@@ -49,7 +49,7 @@ check-encryption-on-detail = Pole probleemi. Windows teeb ruumi ise ja Meet Luft
 check-encryption-changing = BitLocker alles krüptib või dekrüptib
 check-encryption-changing-detail = Oodake, kuni Windows lõpetab, ja tulge siis tagasi. Edenemist näete Sätetes jaotises Seadme krüptimine.
 check-fast-startup-on = Kiirkäivitus on sees
-check-fast-startup-on-detail = Windows läheb väljalülitamise asemel talveunerežiimi, mis hoiab selle ketast lukus. Meet Luft pakub selle enne installimist välja lülitada.
+check-fast-startup-on-detail = Windows läheb väljalülitamise asemel talveunerežiimi, mis hoiab selle ketast lukus ja helisüsteem ja WiFi võivad jääda olekusse, mida Luft kasutada ei oska. Meet Luft pakub selle enne paigaldamist välja lülitada.
 check-fast-startup-off = Kiirkäivitus on väljas
 check-fast-startup-off-detail = Windows lülitub täielikult välja.
 check-secure-boot-on = Secure Boot on sees
@@ -91,14 +91,16 @@ check-wifi-missing = Wi-Fi puudub
 check-wifi-missing-detail = Kasutage Luftis võrgukaablit või jääge võrguühenduseta.
 check-wifi-detail = Töötab Luftis.
 check-wifi-broadcom = Mõni Broadcomi Wi-Fi-kiip vajab draiverit, mida Luftis pole. Hoidke käepärast võrgukaabel või telefon USB kaudu internetijagamiseks.
-check-start-entries = { $count ->
-    [one] Vana käivituskirje
-   *[other] { $count } vana käivituskirjet
-}
-check-start-entries-detail = { $count ->
-    [one] { $names } viitab süsteemile, mida selles arvutis enam pole. Selle saab ära koristada.
-   *[other] { $names } viitavad süsteemidele, mida selles arvutis enam pole. Need saab ära koristada.
-}
+check-start-entries =
+    { $count ->
+        [one] Vana käivituskirje
+       *[other] { $count } vana käivituskirjet
+    }
+check-start-entries-detail =
+    { $count ->
+        [one] { $names } viitab süsteemile, mida selles arvutis enam pole. Selle saab ära koristada.
+       *[other] { $names } viitavad süsteemidele, mida selles arvutis enam pole. Need saab ära koristada.
+    }
 check-download-unavailable = Lufti ei saa praegu alla laadida
 check-download-unavailable-detail = Meet Luft laadib alla umbes 3 GB. Kontrollige, kas olete võrgus, ja kontrollige uuesti või kasutage olemasolevat Lufti ISO-faili.
 

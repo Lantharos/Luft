@@ -28,7 +28,7 @@ installer-space-too-small = See vaba ruum on Lufti jaoks liiga väike.
 
 installer-user-name-invalid = Seda kasutajanime ei saa kasutada.
 installer-full-name-invalid = Nimi ei tohi sisaldada kooloneid, komasid ega reavahetusi.
-installer-password-missing = Valige parool.
+installer-password-missing = Vali salasõna.
 installer-account-not-saved = Uut kontot ei salvestatud
 installer-account-missing = Uus konto puudub
 installer-regional-invalid = Need piirkonnasätted pole sobivad.

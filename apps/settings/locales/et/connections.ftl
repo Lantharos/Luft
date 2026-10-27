@@ -1,5 +1,6 @@
 ### Network, Bluetooth and Accounts panels
 
+
 ## Network: shared words
 
 settings-network-save = Salvesta
@@ -10,8 +11,8 @@ settings-network-disconnect = Katkesta ühendus
 settings-network-optional = Valikuline
 settings-network-automatic = Automaatne
 settings-network-name = Nimi
-settings-network-password = Parool
-settings-network-password-saved = Salvestatud parool
+settings-network-password = Salasõna
+settings-network-password-saved = Salvestatud salasõna
 settings-network-username = Kasutajanimi
 settings-network-router = Ruuter
 settings-network-dns-servers = DNS-serverid
@@ -67,7 +68,8 @@ settings-network-airplane = Lennukirežiim
 settings-network-airplane-hardware = Sisse lülitatud riistvaralülitiga
 settings-network-known = Tuntud võrgud
     .description = Võrgud, millega see arvuti on varem ühendunud, olgu need läheduses või mitte
-settings-network-known-count = { $count ->
+settings-network-known-count =
+    { $count ->
         [one] { $count } salvestatud võrk
        *[other] { $count } salvestatud võrku
     }
@@ -86,7 +88,7 @@ settings-network-wifi-networks = Wi-Fi-võrgud
 settings-network-wifi-saved = Salvestatud
 settings-network-wifi-enterprise = Logige sisse töö- või koolikontoga
 settings-network-wifi-connect-failed = Selle võrguga ei õnnestunud ühenduda
-settings-network-wifi-saved-password-failed = Salvestatud parool ei sobinud. Sisestage see uuesti.
+settings-network-wifi-saved-password-failed = Salvestatud salasõna ei sobinud. Sisesta see uuesti.
 settings-network-wifi-settings = Võrgu sätted
 settings-network-wifi-searching = Võrkude otsimine…
 settings-network-hidden = Ühenda peidetud võrguga
@@ -97,21 +99,20 @@ settings-network-hidden-name = Võrgu nimi
 
 settings-network-join = Ühenda võrguga „{ $network }“
 settings-network-join-enterprise = Logige sisse oma töö- või koolikontoga.
-settings-network-join-password = Sisestage selle võrgu parool.
+settings-network-join-password = Sisesta selle võrgu salasõna.
 settings-network-join-failed = Selle võrguga ei õnnestunud ühenduda.
-settings-network-join-sign-in-failed = Sisselogimine ebaõnnestus. Kontrollige kasutajanime ja parooli.
-settings-network-join-wrong-password = See parool ei sobinud. Kontrollige seda ja proovige uuesti.
+settings-network-join-sign-in-failed = Sisselogimine ei õnnestunud. Kontrolli kasutajanime ja salasõna.
+settings-network-join-wrong-password = See salasõna ei sobinud. Kontrolli seda ja proovi uuesti.
 
 ## Network: connection settings page
 
 settings-network-forget = Unusta see võrk
-    .description = Eemaldab selle parooli ja sätted sellest arvutist
+    .description = Eemaldab selle salasõna ja seadistused antud arvutist
     .button = Unusta
 settings-network-remove-vpn = Eemalda see VPN
 settings-network-remove-connection = Eemalda see ühendus
 settings-network-remove-description = Kustutab selle sätted sellest arvutist
 settings-network-remove = Eemalda
-
 settings-network-general = Üldine
 settings-network-autoconnect = Ühenda automaatselt
 settings-network-autoconnect-wifi = Ühenda selle võrguga alati, kui see on levialas
@@ -125,10 +126,8 @@ settings-network-metered = Mahupõhine ühendus
 settings-network-metered-automatic = Tuvasta automaatselt
 settings-network-metered-yes = Mahupõhine
 settings-network-metered-no = Pole mahupõhine
-
 settings-network-security = Turve
 settings-network-security-type = Turbe tüüp
-
 settings-network-advanced = Täpsemad
 settings-network-private-address = Privaatne aadress
     .description = Muudab selle arvuti jälgimise selles võrgus raskemaks
@@ -185,7 +184,7 @@ settings-network-eap-ttls = Tunneldatud TLS (TTLS)
 settings-network-eap-tls = Sertifikaat (TLS)
 settings-network-eap-inner = Sisemine autentimine
 settings-network-client-certificate = Teie sertifikaat
-settings-network-private-key-password = Privaatvõtme parool
+settings-network-private-key-password = Privaatvõtme salasõna
     .placeholder = Kui võtmel see on
 settings-network-anonymous-identity = Anonüümne identiteet
     .description = Jätke tühjaks, kui teie võrk seda ei nõua
@@ -216,10 +215,11 @@ settings-network-error-certificate = Valige oma sertifikaat
 settings-network-error-private-key = Valige oma privaatvõti
 settings-network-error-mtu = Kasutage arvu vahemikus { $lowest } kuni { $highest } või jätke väli tühjaks
 settings-network-error-mac = Sisestage aadress kujul 12:34:56:78:9A:BC
-settings-network-error-password = Sisestage parool
-settings-network-error-password-length = { $count ->
-        [one] Parool peab olema vähemalt { $count } märgi pikkune
-       *[other] Parool peab olema vähemalt { $count } märgi pikkune
+settings-network-error-password = Sisesta oma salasõna
+settings-network-error-password-length =
+    { $count ->
+        [one] Salasõna peab olema vähemalt { $count } märgi pikkune
+       *[other] Salasõna peab olema vähemalt { $count } märgi pikkune
     }
 
 ## Network: proxy
@@ -282,7 +282,8 @@ settings-bluetooth-visible = Nähtav lähedalasuvatele seadmetele
     .description = Telefonid ja arvutid saavad selle arvuti leida
 settings-bluetooth-visible-as = Nähtav nimega „{ $name }“
 settings-bluetooth-visible-duration = Nähtavuse kestus
-settings-bluetooth-visible-for = { $minutes ->
+settings-bluetooth-visible-for =
+    { $minutes ->
         [one] { $minutes } minutiks
        *[other] { $minutes } minutiks
     }
@@ -348,11 +349,13 @@ settings-bluetooth-allow = Luba
 ## Bluetooth: devices paired in Windows on the same computer
 
 settings-bluetooth-windows = Tooge oma seadmed üle Windowsist
-    .description = { $count ->
-        [one] Windowsis on seotud { $devices }. Kasutage seda siin ilma uuesti sidumata.
-       *[other] Windowsis on seotud { $devices }. Kasutage neid siin ilma uuesti sidumata.
-    }
-settings-bluetooth-windows-more = { $count ->
+    .description =
+        { $count ->
+            [one] Windowsis on seotud { $devices }. Kasutage seda siin ilma uuesti sidumata.
+           *[other] Windowsis on seotud { $devices }. Kasutage neid siin ilma uuesti sidumata.
+        }
+settings-bluetooth-windows-more =
+    { $count ->
         [one] veel { $count }
        *[other] veel { $count }
     }

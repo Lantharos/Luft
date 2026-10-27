@@ -50,11 +50,11 @@ settings-appearance-wallpaper-battery-description = Muidu peatuvad videotaustapi
 ## Appearance: app icons
 
 settings-appearance-icons = Rakenduste ikoonid
-settings-appearance-icons-original = Originaal
+settings-appearance-icons-original = Algne
 settings-appearance-icons-tinted = Toonitud
 settings-appearance-icons-clear = Läbipaistev
 settings-appearance-tint = Toon
-settings-appearance-tint-description = Esimene värv järgib teie rõhuvärvi
+settings-appearance-tint-description = Esimene värv järgib sinu aktsentvärvi
 settings-appearance-tint-blue = Sinine
 settings-appearance-tint-teal = Sinakasroheline
 settings-appearance-tint-green = Roheline
@@ -130,10 +130,11 @@ settings-fonts-no-match = Sellenimelist fonti pole
 settings-fonts-default = Vaikimisi
 settings-fonts-sample = Põdur Zagrebi tšellomängija-följetonist Ciqo külmetas kehvas garaažis
 settings-fonts-open = Ava { $family }
-settings-fonts-styles = { $count ->
-    [one] { $count } stiil
-   *[other] { $count } stiili
-}
+settings-fonts-styles =
+    { $count ->
+        [one] { $count } stiil
+       *[other] { $count } stiili
+    }
 settings-fonts-more-for = Veel: { $family }
 settings-fonts-more = Veel
 settings-fonts-use-interface = Kasuta süsteemi fondina
@@ -175,10 +176,11 @@ settings-cursors-store-description = GNOME-Looki kogukonna jagatud teemad
 settings-cursors-previous = Eelmine
 settings-cursors-next = Järgmine
 settings-cursors-page = Lehekülg { $page }/{ $pages }
-settings-cursors-downloads = { $count ->
-    [one] { $downloads } allalaadimine
-   *[other] { $downloads } allalaadimist
-}
+settings-cursors-downloads =
+    { $count ->
+        [one] { $downloads } allalaadimine
+       *[other] { $downloads } allalaadimist
+    }
 settings-cursors-installing = Installimine: { $name }
 settings-cursors-in-use = Kasutusel
 settings-cursors-use = Kasuta
@@ -266,11 +268,12 @@ settings-accessibility-cursor-size = Kursori suurus
 settings-accessibility-typing = Tippimine
 settings-accessibility-osk = Ekraaniklaviatuur
 settings-accessibility-typing-assist = Tippimisabi
-settings-accessibility-typing-assist-count = { $count ->
-    [0] Väljas
-    [one] { $count } sees
-   *[other] { $count } sees
-}
+settings-accessibility-typing-assist-count =
+    { $count ->
+        [0] Väljas
+        [one] { $count } sees
+       *[other] { $count } sees
+    }
 settings-accessibility-sticky-keys = Kleepklahvid
 settings-accessibility-slow-keys = Aeglased klahvid
 settings-accessibility-slow-keys-delay = Aeglaste klahvide viivitus
@@ -288,3 +291,17 @@ settings-accessibility-flash = Vilkumine märguandehelide korral
 settings-accessibility-flash-type = Vilkumine
 settings-accessibility-flash-window = Aken
 settings-accessibility-flash-screen = Ekraan
+settings-appearance-rain = Vihm
+settings-appearance-rain-description = Vihm sajab taustapildile ja protsib akendele ja tegumiribale või sinu töötamise ajal esitab heli
+settings-appearance-rain-intensity = Kui tugev peaks vihm olema
+settings-appearance-rain-drizzle = Uduvihm
+settings-appearance-rain-rain = Vihm
+settings-appearance-rain-storm = Torm
+settings-appearance-rain-visible = Näita töölaual
+settings-appearance-rain-visible-description = Vihmapiisad sajavad akendele ja tegumiribale
+settings-appearance-rain-sound = Heli
+settings-appearance-rain-sound-description = Luuakse esitamise ajal ja seega ei kordu iialgi. Jätkab esitamist ka avatud akende taga
+settings-appearance-rain-volume = Vihma valjus
+settings-windows-title = Aknad
+settings-windows-rounded-corners = Ümarad nurgad
+settings-windows-rounded-corners-description = Täisvaates ja paanitud aknad on paratamatult kandilised ja mõned rakendused alati ümardavad omi nurki

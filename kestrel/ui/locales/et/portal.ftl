@@ -3,7 +3,6 @@
 portal-cancel = Loobu
 portal-allow = Luba
 portal-share = Jaga
-
 portal-unknown-app-subject = See rakendus
 portal-unknown-app-object = see rakendus
 
@@ -34,31 +33,33 @@ portal-screenshot-file-name = Kuvatõmmis { $date }
 
 ## Account details
 
-portal-account-title = Kas { $appName } võib näha teie nime ja pilti?
-portal-account-description = { $appName } näeb teie konto nime ja pilti.
+portal-account-title = Kas { $appName } võib näha sinu nime ja pilti?
+portal-account-description = { $appName } näeb sinu konto nime ja pilti.
 
 ## Wallpaper
 
 portal-wallpaper-title = Kas määrata see taustapildiks?
-portal-wallpaper-description = { $appName } soovib muuta teie taustapilti. Seda kasutatakse heledas ja tumedas režiimis ning lukustuskuval.
+portal-wallpaper-description = { $appName } soovib muuta sinu taustapilti. Seda kasutatakse heledas ja tumedas režiimis ning lukustusvaates.
 portal-wallpaper-set = Määra taustapildiks
 
 ## USB devices
 
-usb-title = { $count ->
-    [one] Kas { $appName } võib seda seadet kasutada?
-   *[other] Kas { $appName } võib neid seadmeid kasutada?
-}
-usb-description = { $count ->
-    [one] { $appName } saab seadmega otse suhelda, kuni see on ühendatud.
-   *[other] { $appName } saab seadmetega otse suhelda, kuni need on ühendatud.
-}
+usb-title =
+    { $count ->
+        [one] Kas { $appName } võib seda seadet kasutada?
+       *[other] Kas { $appName } võib neid seadmeid kasutada?
+    }
+usb-description =
+    { $count ->
+        [one] { $appName } saab seadmega otse suhelda, kuni see on ühendatud.
+       *[other] { $appName } saab seadmetega otse suhelda, kuni need on ühendatud.
+    }
 usb-unknown-maker = Tundmatu tootja
 usb-unknown-device = Tundmatu seade
 
 ## Screen sharing, remote control and input capture
 
-screen-share-title = Kas { $appName } võib teie ekraani näha?
+screen-share-title = Kas { $appName } võib sinu ekraani näha?
 screen-share-description = { $appName } näeb seda, mille valite.
 screen-share-screens = Kuvarid
 screen-share-windows = Aknad
@@ -71,17 +72,15 @@ screen-share-remember = Jäta valik meelde
 screen-share-remember-description = { $appName } ei pea uuesti küsima
 screen-share-clipboard = Jaga lõikelauda
 screen-share-clipboard-description = Kopeerimine ja kleepimine mõlemas suunas
-
-screen-share-remote-desktop-title = Kas { $appName } võib teie arvutit juhtida?
+screen-share-remote-desktop-title = Kas { $appName } võib sinu arvutit juhtida?
 screen-share-remote-desktop-with-screen = { $appName } näeb seda, mille valite, ja saab kasutada seadmeid, mida lubate.
 screen-share-remote-desktop-description = { $appName } saab kasutada seadmeid, mida lubate.
 screen-share-devices = Seadmed
 screen-share-device-keyboard = Klaviatuur
 screen-share-device-pointer = Hiir ja puuteplaat
 screen-share-device-touchscreen = Puuteekraan
-
-screen-share-input-capture-title = Kas { $appName } võib teie klaviatuuri ja hiire üle võtta?
-screen-share-input-capture-description = Kui kursor jõuab ekraani servani, saab { $appName } teie klaviatuuri ja hiire üle võtta, näiteks teise arvuti juhtimiseks.
+screen-share-input-capture-title = Kas { $appName } võib sinu klaviatuuri ja hiire üle võtta?
+screen-share-input-capture-description = Kui kursor jõuab ekraani servani, saab { $appName } sinu klaviatuuri ja hiire üle võtta, näiteks teise arvuti juhtimiseks.
 
 ## Keyboard shortcuts apps register for the whole session
 
@@ -101,23 +100,19 @@ print-title = Printimine
 print-title-from-app = Printimine: { $appName }
 print-accept = Prindi
 print-no-printers = Ühtegi printerit pole seadistatud.
-
 print-printer = Printer
 print-printer-not-accepting = Praegu ei võta dokumente vastu
 print-printer-paused = Peatatud
 print-back = Tagasi
-
 print-copies = Koopiad
 print-copies-fewer = Vähem koopiaid
 print-copies-more = Rohkem koopiaid
-
 print-pages = Leheküljed
 print-pages-all = Kõik
 print-pages-current = Praegune
 print-pages-selection = Valik
 print-pages-range = Vahemik
 print-pages-range-hint = Näiteks 1-3, 5
-
 print-paper = Paber
 print-paper-dimensions = { $width } × { $height }
 print-paper-letter = Letter
@@ -126,16 +121,13 @@ print-paper-executive = Executive
 print-paper-tabloid = Tabloid
 print-paper-statement = Statement
 print-paper-envelope = Ümbrik { $size }
-
 print-orientation = Suund
 print-orientation-portrait = Vertikaalpaigutus
 print-orientation-landscape = Horisontaalpaigutus
-
 print-two-sided = Kahepoolne
 print-two-sided-off = Väljas
 print-two-sided-long-edge = Pikk serv
 print-two-sided-short-edge = Lühike serv
-
 print-color = Värv
 print-color-mode-color = Värviline
 print-color-mode-monochrome = Mustvalge

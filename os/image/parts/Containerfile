@@ -91,6 +91,16 @@ RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
 FROM scratch AS libsecret
 COPY --from=libsecret-build /out/ /
 
+FROM builder AS portal-build
+ARG PORTAL
+COPY os/image/patches/xdg-desktop-portal /src/os/image/patches/xdg-desktop-portal
+COPY os/image/parts/stages/rebuild.sh /src/os/image/parts/stages/rebuild.sh
+RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
+    /src/os/image/parts/stages/rebuild.sh xdg-desktop-portal "${PORTAL}" /out/rpms
+
+FROM scratch AS portal
+COPY --from=portal-build /out/ /
+
 FROM builder AS sabine
 ARG SABINE
 RUN --mount=type=cache,from=cache,source=cargo,target=/var/cache/cargo \

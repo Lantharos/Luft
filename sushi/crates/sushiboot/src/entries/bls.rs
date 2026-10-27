@@ -11,6 +11,7 @@ const ENTRIES: &str = "\\loader\\entries";
 struct Entry {
     title: String,
     sort_key: Option<String>,
+    version: Option<String>,
     action: Action,
 }
 
@@ -41,6 +42,7 @@ pub fn scan(volume: &mut Volume, origin: &Origin, secure_boot: bool) -> Found {
                 files::efi_path(path),
                 listed.name.clone(),
                 Some(sort_key.clone()),
+                entry.version.clone(),
             )
         {
             found.images.push(image);
@@ -73,6 +75,7 @@ pub fn scan(volume: &mut Volume, origin: &Origin, secure_boot: bool) -> Found {
 fn parse(text: &str) -> Option<Entry> {
     let mut title = String::from("Linux");
     let mut sort_key = None;
+    let mut version = None;
     let mut linux = None;
     let mut efi = None;
     let mut initrd = None;
@@ -88,6 +91,7 @@ fn parse(text: &str) -> Option<Entry> {
         match key {
             "title" => title = value,
             "sort-key" => sort_key = Some(value),
+            "version" => version = Some(value),
             "linux" => linux = Some(value),
             "efi" | "uki" => efi = Some(value),
             "initrd" => initrd = Some(value),
@@ -108,6 +112,7 @@ fn parse(text: &str) -> Option<Entry> {
     Some(Entry {
         title,
         sort_key,
+        version,
         action,
     })
 }

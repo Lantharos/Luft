@@ -1,7 +1,7 @@
 <script lang="ts">
 	import X from '@lucide/svelte/icons/x';
 	import { ProgressBar, tooltip } from '@luft/ui';
-	import type { Operation } from '#lib/bridge/types.js';
+	import type { Operation } from '#lib/bindings.js';
 	import { activity, percent } from '#lib/format.js';
 	import { operations } from '#lib/state/operations.svelte.js';
 

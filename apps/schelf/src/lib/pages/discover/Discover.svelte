@@ -3,7 +3,6 @@
 	import * as flathub from '#lib/catalog/flathub.js';
 	import type { AppDetails, CatalogApp } from '#lib/catalog/types.js';
 	import { fedora } from '#lib/fedora/fedora.svelte.js';
-	import { backend } from '#lib/bridge/index.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
 	import Spotlight from './Spotlight.svelte';
 
@@ -18,7 +17,7 @@
 	const fedoraApps = $derived(fedora.featured(SHELF_SIZE));
 
 	async function shelf(name: flathub.Collection) {
-		return (await flathub.collection(backend, name, 1, SHELF_SIZE + 1)).apps;
+		return (await flathub.collection(name, 1, SHELF_SIZE + 1)).apps;
 	}
 
 	async function load() {
@@ -28,7 +27,7 @@
 			trending = first.slice(1, SHELF_SIZE + 1);
 			popular = second.slice(0, SHELF_SIZE);
 			updated = third.slice(0, SHELF_SIZE);
-			if (first[0]) spotlight = await flathub.details(backend, first[0].id).catch(() => null);
+			if (first[0]) spotlight = await flathub.details(first[0].id).catch(() => null);
 		} catch {
 			offline = true;
 		}

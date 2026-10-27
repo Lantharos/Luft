@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { Dialog, Row, Section, TextField } from '@luft/ui';
-	import type { AddedSource, CheckedSource } from '#lib/bridge/types.js';
+	import { commands, type AddedSource, type CheckedSource } from '#lib/bindings.js';
 	import ProgressButton from '#lib/components/ProgressButton.svelte';
 	import SourceTrustDialog from '#lib/components/SourceTrustDialog.svelte';
-	import { backend } from '#lib/bridge/index.js';
+	import { SLOW } from '#lib/bridge/index.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { operations } from '#lib/state/operations.svelte.js';
 
@@ -17,8 +17,8 @@
 	const key = (source: AddedSource) => `repository/${source.file}`;
 
 	async function refresh() {
-		sources = await backend
-			.sources()
+		sources = await commands
+			.sourcesList()
 			.catch((reason) => {
 				error = String(reason);
 				return [];
@@ -35,7 +35,7 @@
 		checking = true;
 		error = null;
 		try {
-			const checked = await backend.fetchSource(address.trim());
+			const checked = await commands.sourcesFetch({ source: address.trim() }, SLOW);
 			if (checked.added) error = `${checked.described.sources[0]?.name ?? checked.described.file} is already a software source.`;
 			else trusting = checked;
 		} catch (reason) {
@@ -49,7 +49,7 @@
 		trusting = null;
 		checking = true;
 		try {
-			await backend.addSource(source.draft);
+			await commands.sourcesAdd({ draft: source.draft }, SLOW);
 			address = '';
 			await refresh();
 		} catch (reason) {

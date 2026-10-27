@@ -5,30 +5,29 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, Condvar, Mutex, MutexGuard};
 use std::time::{Duration, Instant};
 
-use luft_app::{Commands, Events};
+use luft_app::{Commands, Empty, Events};
 use luft_software::progress::Progress;
 use luft_software::task::{CANCELLED, Cancel, Task};
-use sabine::SabineWindow;
+use sabine::{BridgeEvent, SabineWindow};
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use specta::Type;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender, unbounded_channel};
 
 pub use jobs::{Action, Job};
 
-const OPERATIONS: &str = "schelf.operations";
-const LIBRARY: &str = "schelf.library";
+const OPERATIONS: BridgeEvent<Vec<Operation>> = BridgeEvent::new("schelf.operations");
+const LIBRARY: BridgeEvent<Finished> = BridgeEvent::new("schelf.library");
 const PROGRESS_INTERVAL: Duration = Duration::from_millis(120);
 
 #[derive(Serialize, Clone, Copy, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
-pub enum State {
+pub enum OperationState {
     Queued,
     Running,
     Failed,
 }
 
-impl State {
+impl OperationState {
     pub fn name(self) -> &'static str {
         match self {
             Self::Queued => "queued",
@@ -46,7 +45,7 @@ struct Operation {
     members: Vec<String>,
     title: String,
     action: Action,
-    state: State,
+    state: OperationState,
     progress: Option<Progress>,
     error: Option<String>,
 }
@@ -57,7 +56,7 @@ struct Entry {
     cancel: Cancel,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 struct Finished {
     keys: Vec<String>,
@@ -77,7 +76,7 @@ pub struct Request {
 pub enum Notice {
     Changed {
         id: u64,
-        state: State,
+        state: OperationState,
         progress: Option<Progress>,
     },
     Finished {
@@ -165,9 +164,9 @@ impl Queue {
         loop {
             if let Some(entry) = entries
                 .iter_mut()
-                .find(|entry| entry.operation.state == State::Queued)
+                .find(|entry| entry.operation.state == OperationState::Queued)
             {
-                entry.operation.state = State::Running;
+                entry.operation.state = OperationState::Running;
                 return (entry.operation.id, entry.job.clone(), entry.cancel.clone());
             }
             entries = self
@@ -184,7 +183,7 @@ impl Queue {
             self.publish();
             self.notify(Notice::Changed {
                 id,
-                state: State::Running,
+                state: OperationState::Running,
                 progress: None,
             });
             let last = Mutex::new(Instant::now() - PROGRESS_INTERVAL);
@@ -204,7 +203,7 @@ impl Queue {
                 self.publish();
                 self.notify(Notice::Changed {
                     id,
-                    state: State::Running,
+                    state: OperationState::Running,
                     progress: Some(progress),
                 });
             };
@@ -229,7 +228,7 @@ impl Queue {
                 });
                 match (result, position) {
                     (Err(error), Some(position)) if !cancel.is_cancelled() => {
-                        entries[position].operation.state = State::Failed;
+                        entries[position].operation.state = OperationState::Failed;
                         entries[position].operation.error = Some(error);
                     }
                     (_, Some(position)) => {
@@ -264,7 +263,7 @@ impl Queue {
                 members,
                 title,
                 action: job.action(),
-                state: State::Queued,
+                state: OperationState::Queued,
                 progress: None,
                 error: None,
             },
@@ -275,7 +274,7 @@ impl Queue {
         self.publish();
         self.notify(Notice::Changed {
             id,
-            state: State::Queued,
+            state: OperationState::Queued,
             progress: None,
         });
         Ok(id)
@@ -291,7 +290,7 @@ impl Queue {
             let mut entries = self.entries();
             let position = entries.iter().position(|entry| entry.operation.id == id);
             match position.map(|position| (position, entries[position].operation.state)) {
-                Some((position, State::Queued)) => {
+                Some((position, OperationState::Queued)) => {
                     entries.remove(position);
                     self.notify(Notice::Finished {
                         id,
@@ -299,11 +298,11 @@ impl Queue {
                     });
                     None
                 }
-                Some((position, State::Failed)) => {
+                Some((position, OperationState::Failed)) => {
                     entries.remove(position);
                     None
                 }
-                Some((position, State::Running)) => Some(entries[position].cancel.clone()),
+                Some((position, OperationState::Running)) => Some(entries[position].cancel.clone()),
                 None => None,
             }
         };
@@ -316,7 +315,9 @@ impl Queue {
 
 pub fn register(window: SabineWindow, queue: &Queue) -> SabineWindow {
     window
-        .with("operations_list", queue, |queue, _: Value| {
+        .bridge_event(&OPERATIONS)
+        .bridge_event(&LIBRARY)
+        .with("operations_list", queue, |queue, Empty {}| {
             Ok(Queue::snapshot(&queue.entries()))
         })
         .with("operations_start", queue, Queue::enqueue)

@@ -5,7 +5,6 @@
 	import * as flathub from '#lib/catalog/flathub.js';
 	import type { CatalogApp, Origin, Page } from '#lib/catalog/types.js';
 	import { fedora } from '#lib/fedora/fedora.svelte.js';
-	import { backend } from '#lib/bridge/index.js';
 	import type { Route } from '#lib/state/navigation.svelte.js';
 
 	type Listing = Extract<Route, { page: 'category' } | { page: 'collection' }>;
@@ -26,7 +25,7 @@
 	const shown = $derived(source === 'flathub' ? apps : fedoraApps);
 
 	function fetchPage(next: number): Promise<Page> {
-		return route.page === 'category' ? flathub.category(backend, route.category, next) : flathub.collection(backend, route.collection, next);
+		return route.page === 'category' ? flathub.category(route.category, next) : flathub.collection(route.collection, next);
 	}
 
 	async function more() {

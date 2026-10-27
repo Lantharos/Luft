@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { CheckedSource } from '#lib/bridge/types.js';
+	import type { CheckedSource } from '#lib/bindings.js';
 
 	let { source }: { source: CheckedSource } = $props();
 

@@ -1,13 +1,12 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use luft_app::Commands;
 use luft_app::apps::App;
+use luft_app::{Commands, Empty};
 use luft_software::apps::flatpak::{self, Installation};
 use luft_software::apps::{debian, toolbox};
 use luft_software::system::updates;
 use sabine::SabineWindow;
 use serde::Serialize;
-use serde_json::Value;
 use specta::Type;
 use tokio::task::{JoinHandle, spawn_blocking};
 
@@ -170,7 +169,7 @@ pub async fn find() -> (Vec<AppUpdate>, Option<String>) {
     (apps, error)
 }
 
-async fn check(_: Value) -> Result<Updates, String> {
+async fn check(Empty {}: Empty) -> Result<Updates, String> {
     let (apps, error) = find().await;
     Ok(Updates {
         apps,

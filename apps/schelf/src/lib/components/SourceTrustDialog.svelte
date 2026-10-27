@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { CheckedSource } from '#lib/bridge/types.js';
+	import type { CheckedSource } from '#lib/bindings.js';
 	import SourceDetails from './SourceDetails.svelte';
 	import TrustDialog from './TrustDialog.svelte';
 

@@ -12,14 +12,14 @@ use crate::operations::Action;
     rename_all = "camelCase",
     rename_all_fields = "camelCase"
 )]
-pub enum Job {
+pub enum PackageJob {
     InstallPackage { package: String },
     InstallPackageFile { path: String },
     RemovePackage { package: String },
     UpdatePackages { packages: Vec<String> },
 }
 
-impl Job {
+impl PackageJob {
     pub fn action(&self) -> Action {
         match self {
             Self::InstallPackage { .. } | Self::InstallPackageFile { .. } => Action::Install,

@@ -4,21 +4,20 @@ mod jobs;
 mod library;
 mod updates;
 
-use luft_app::Commands;
+use luft_app::{Commands, Empty};
 use luft_software::system::System;
 use luft_software::system::packagekit::PackageDetails;
 use luft_software::system::packages;
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
+use specta::Type;
 use tokio::task::spawn_blocking;
 
 use crate::library::InstalledApp;
 use crate::updates::AppUpdate;
-use appstream::Component;
-use specta::Type;
+use appstream::FedoraComponent;
 
-pub use jobs::Job;
+pub use jobs::PackageJob;
 pub use library::is_installed;
 
 pub fn available() -> bool {
@@ -53,19 +52,19 @@ struct Package {
 
 #[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
-struct App {
+struct FedoraApp {
     #[serde(flatten)]
-    component: Component,
+    component: FedoraComponent,
     details: Option<PackageDetails>,
 }
 
-async fn app(Id { id }: Id) -> Result<App, String> {
+async fn app(Id { id }: Id) -> Result<FedoraApp, String> {
     let component = spawn_blocking(move || catalog::find(&id))
         .await
         .map_err(|error| error.to_string())?
         .ok_or("That app isn't in the catalog any more.")?;
     let details = packages::details(&component.package).await;
-    Ok(App { component, details })
+    Ok(FedoraApp { component, details })
 }
 
 async fn removal_plan(Package { package }: Package) -> Result<Vec<String>, String> {
@@ -73,11 +72,8 @@ async fn removal_plan(Package { package }: Package) -> Result<Vec<String>, Strin
 }
 
 pub fn register(window: SabineWindow) -> SabineWindow {
-    if !available() {
-        return window;
-    }
     window
-        .command("fedora_apps", |_: Value| Ok(catalog::list()))
+        .command("fedora_apps", |Empty {}| Ok(catalog::list()))
         .command_async("fedora_app", app)
         .command_async("fedora_removal_plan", removal_plan)
 }

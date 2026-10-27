@@ -1,13 +1,12 @@
 <script lang="ts">
 	import { Segmented } from '@luft/ui';
-	import type { Permissions } from '#lib/bridge/types.js';
+	import { commands, type Permissions } from '#lib/bindings.js';
 	import { APPIMAGE_SANDBOX } from '#lib/app/permissions.js';
 	import AccessList from '#lib/components/AccessList.svelte';
 	import AppArt from '#lib/components/AppArt.svelte';
 	import Description from '#lib/components/Description.svelte';
 	import Screenshots from '#lib/components/Screenshots.svelte';
 	import { fedora } from '#lib/fedora/fedora.svelte.js';
-	import { backend } from '#lib/bridge/index.js';
 	import { navigation, type AppTarget } from '#lib/state/navigation.svelte.js';
 	import AppActions from './AppActions.svelte';
 	import AppFacts from './AppFacts.svelte';
@@ -44,8 +43,8 @@
 		const app = installed;
 		localPermissions = null;
 		if (app?.source !== 'flatpak' || !app.installation || !app.reference) return;
-		void backend
-			.permissions(app.installation, app.reference)
+		void commands
+			.libraryPermissions({ installation: app.installation, reference: app.reference })
 			.then((result) => (localPermissions = result))
 			.catch(() => {});
 	});

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Layers from '@lucide/svelte/icons/layers';
 	import { bytes } from '@luft/ui';
-	import type { AppUpdate } from '#lib/bridge/types.js';
+	import type { AppUpdate } from '#lib/bindings.js';
 	import AppArt from '#lib/components/AppArt.svelte';
 	import ProgressButton from '#lib/components/ProgressButton.svelte';
 	import { updateJob } from '#lib/app/jobs.js';

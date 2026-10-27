@@ -1,12 +1,12 @@
 <script lang="ts">
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
 	import { bytes, MenuButton, MenuItem } from '@luft/ui';
-	import type { InstalledApp } from '#lib/bridge/types.js';
+	import type { InstalledApp } from '#lib/bindings.js';
 	import AppArt from '#lib/components/AppArt.svelte';
 	import ProgressButton from '#lib/components/ProgressButton.svelte';
 	import { updateJob } from '#lib/app/jobs.js';
 	import { sourceName } from '#lib/format.js';
-	import { backend } from '#lib/bridge/index.js';
+	import { launch } from '#lib/bridge/index.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
 	import { operations } from '#lib/state/operations.svelte.js';
@@ -44,7 +44,7 @@
 				<button type="button" class="button" onclick={updateNow}>Update</button>
 			{/if}
 			{#if app.desktop}
-				<button type="button" class="button" onclick={() => backend.launch(app.desktop!)}>Open</button>
+				<button type="button" class="button" onclick={() => launch(app.desktop!)}>Open</button>
 			{/if}
 			<MenuButton label="More for {app.name}" class="icon-button" align="end">
 				{#snippet trigger()}<Ellipsis size={18} />{/snippet}

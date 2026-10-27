@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { ago, bytes, Section } from '@luft/ui';
-	import type { AppUpdate, Job } from '#lib/bridge/types.js';
+	import type { AppUpdate, Job } from '#lib/bindings.js';
 	import { updateJob } from '#lib/app/jobs.js';
 	import { fedora } from '#lib/fedora/fedora.svelte.js';
 	import { library } from '#lib/state/library.svelte.js';

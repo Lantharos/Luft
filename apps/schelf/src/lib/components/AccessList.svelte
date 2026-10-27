@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { Row, Section } from '@luft/ui';
-	import type { Permissions } from '#lib/bridge/types.js';
+	import type { Permissions } from '#lib/bindings.js';
 	import { describe } from '#lib/app/permissions.js';
 
 	let { permissions, children }: { permissions: Permissions | null; children?: Snippet } = $props();

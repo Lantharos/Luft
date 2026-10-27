@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { ToolSummary } from '#lib/bridge/types.js';
+	import { commands, type ToolSummary } from '#lib/bindings.js';
 	import AppArt from '#lib/components/AppArt.svelte';
 	import ProgressButton from '#lib/components/ProgressButton.svelte';
-	import { backend } from '#lib/bridge/index.js';
+	import { SLOW } from '#lib/bridge/index.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
 	import { operations } from '#lib/state/operations.svelte.js';
@@ -31,7 +31,7 @@
 		const current = query;
 		tools = null;
 		error = null;
-		(kind === 'tool' ? backend.searchTools(current) : backend.searchSystem(current))
+		(kind === 'tool' ? commands.toolsSearch({ query: current }, SLOW) : commands.systemSearch({ query: current }, SLOW))
 			.then((result) => {
 				if (current === query) tools = result;
 			})

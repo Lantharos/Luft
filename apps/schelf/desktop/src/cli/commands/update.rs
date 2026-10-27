@@ -99,7 +99,7 @@ fn plans(updates: &[AppUpdate]) -> Vec<Plan> {
         "package-updates",
         "apps from Fedora",
         &of(Source::Package),
-        |packages| Job::Fedora(fedora::Job::UpdatePackages { packages }),
+        |packages| Job::Fedora(fedora::PackageJob::UpdatePackages { packages }),
         package,
     ));
     plans.extend(batch(

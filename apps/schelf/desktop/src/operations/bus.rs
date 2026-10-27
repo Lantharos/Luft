@@ -6,7 +6,7 @@ use zbus::message::Header;
 use zbus::object_server::SignalEmitter;
 use zbus::{Connection, interface, proxy};
 
-use super::{Notice, Queue, Request, State};
+use super::{Notice, OperationState, Queue, Request};
 
 pub const NAME: &str = "com.lantharos.Schelf";
 pub const PATH: &str = "/com/lantharos/Schelf";
@@ -74,7 +74,7 @@ impl Operations {
 async fn changed(
     emitter: &SignalEmitter<'_>,
     id: u64,
-    state: State,
+    state: OperationState,
     progress: Option<Progress>,
 ) -> zbus::Result<()> {
     let stage = progress.map_or("", |progress| progress.stage.name());

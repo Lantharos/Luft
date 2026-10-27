@@ -2,8 +2,8 @@ use std::path::{Path, PathBuf};
 
 use crate::cli::perform::{Plan, Verb};
 use crate::fedora;
-use crate::files::{self, Opened};
-use crate::library::sources::Bundled;
+use crate::files::{self, OpenedFile};
+use crate::library::sources::CheckedSource;
 use crate::operations::{Job, Request};
 use luft_software::system::repositories::Described;
 
@@ -31,18 +31,18 @@ pub struct Prepared {
     pub trust: Option<Described>,
 }
 
-fn job(opened: &Opened) -> Job {
+fn job(opened: &OpenedFile) -> Job {
     match opened {
-        Opened::FlatpakRef { path, .. } => Job::InstallFlatpakRef { path: path.into() },
-        Opened::FlatpakBundle { path, .. } => Job::InstallFlatpakBundle { path: path.into() },
-        Opened::FlatpakRepo { path, name, .. } => Job::AddFlatpakRepo {
+        OpenedFile::FlatpakRef { path, .. } => Job::InstallFlatpakRef { path: path.into() },
+        OpenedFile::FlatpakBundle { path, .. } => Job::InstallFlatpakBundle { path: path.into() },
+        OpenedFile::FlatpakRepo { path, name, .. } => Job::AddFlatpakRepo {
             path: path.into(),
             name: name.clone(),
         },
-        Opened::Package { path, .. } if fedora::available() => {
-            Job::Fedora(fedora::Job::InstallPackageFile { path: path.clone() })
+        OpenedFile::Package { path, .. } if fedora::available() => {
+            Job::Fedora(fedora::PackageJob::InstallPackageFile { path: path.clone() })
         }
-        Opened::Package {
+        OpenedFile::Package {
             path,
             package,
             system: true,
@@ -53,19 +53,19 @@ fn job(opened: &Opened) -> Job {
             package: package.clone(),
             repository: repository.as_ref().map(|bundled| bundled.draft.clone()),
         },
-        Opened::Package { path, .. } => Job::InstallToolFile { path: path.clone() },
-        Opened::AppImage { path, .. } => Job::InstallAppImage { path: path.into() },
-        Opened::Deb { path, .. } => Job::InstallDeb { path: path.into() },
+        OpenedFile::Package { path, .. } => Job::InstallToolFile { path: path.clone() },
+        OpenedFile::AppImage { path, .. } => Job::InstallAppImage { path: path.into() },
+        OpenedFile::Deb { path, .. } => Job::InstallDeb { path: path.into() },
     }
 }
 
-fn title(opened: &Opened) -> &str {
+fn title(opened: &OpenedFile) -> &str {
     match opened {
-        Opened::FlatpakRef { title, .. }
-        | Opened::FlatpakBundle { title, .. }
-        | Opened::FlatpakRepo { title, .. } => title,
-        Opened::Package { package, .. } => package,
-        Opened::AppImage { name, .. } | Opened::Deb { name, .. } => name,
+        OpenedFile::FlatpakRef { title, .. }
+        | OpenedFile::FlatpakBundle { title, .. }
+        | OpenedFile::FlatpakRepo { title, .. } => title,
+        OpenedFile::Package { package, .. } => package,
+        OpenedFile::AppImage { name, .. } | OpenedFile::Deb { name, .. } => name,
     }
 }
 
@@ -78,15 +78,15 @@ pub fn prepare(target: &str) -> Result<Prepared, String> {
     let opened = files::inspect(&shown)?;
     let installed = matches!(
         opened,
-        Opened::Package {
+        OpenedFile::Package {
             installed: true,
             ..
-        } | Opened::Deb {
+        } | OpenedFile::Deb {
             installed: true,
             ..
         }
     );
-    if let Opened::Deb {
+    if let OpenedFile::Deb {
         flathub: Some(flathub),
         ..
     } = &opened
@@ -96,19 +96,19 @@ pub fn prepare(target: &str) -> Result<Prepared, String> {
             flathub.name, flathub.id
         );
     }
-    let verb = if matches!(opened, Opened::FlatpakRepo { .. }) {
+    let verb = if matches!(opened, OpenedFile::FlatpakRepo { .. }) {
         Verb::AddSource
     } else {
         Verb::Install
     };
     let from = path
         .file_name()
-        .filter(|_| !matches!(opened, Opened::FlatpakRef { .. }))
+        .filter(|_| !matches!(opened, OpenedFile::FlatpakRef { .. }))
         .map(|name| name.to_string_lossy().into_owned());
     let trust = match &opened {
-        Opened::Package {
+        OpenedFile::Package {
             repository:
-                Some(Bundled {
+                Some(CheckedSource {
                     described,
                     added: false,
                     ..
@@ -117,7 +117,7 @@ pub fn prepare(target: &str) -> Result<Prepared, String> {
         } => Some(described.clone()),
         _ => None,
     };
-    if let Opened::Package {
+    if let OpenedFile::Package {
         repository_error: Some(error),
         ..
     } = &opened

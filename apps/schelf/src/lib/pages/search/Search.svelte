@@ -5,7 +5,6 @@
 	import type { CatalogApp } from '#lib/catalog/types.js';
 	import { fedora } from '#lib/fedora/fedora.svelte.js';
 	import { sourceName } from '#lib/format.js';
-	import { backend } from '#lib/bridge/index.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
 	import PackageResults from './PackageResults.svelte';
@@ -28,7 +27,7 @@
 		remote = null;
 		error = null;
 		flathub
-			.search(backend, current)
+			.search(current)
 			.then((apps) => {
 				if (current === query) remote = apps.slice(0, LIMIT);
 			})

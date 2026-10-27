@@ -1,4 +1,4 @@
-import type { Operation, Source } from '#lib/bridge/types.js';
+import type { Operation, Source } from '#lib/bindings.js';
 
 export function sourceName(source: Source, origin: string) {
 	if (source === 'appImage') return 'AppImage';

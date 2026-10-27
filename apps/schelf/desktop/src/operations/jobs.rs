@@ -92,7 +92,7 @@ pub enum Job {
         file: String,
     },
     #[serde(untagged)]
-    Fedora(fedora::Job),
+    Fedora(fedora::PackageJob),
 }
 
 impl Job {

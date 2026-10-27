@@ -1,4 +1,4 @@
-import type { Backend, FedoraSummary } from '#lib/bridge/types.js';
+import { commands, type FedoraSummary } from '#lib/bindings.js';
 import type { AppDetails, CatalogApp } from '#lib/catalog/types.js';
 import type { Category } from '#lib/catalog/categories.js';
 
@@ -50,8 +50,8 @@ export function search(apps: FedoraSummary[], query: string): CatalogApp[] {
 		.map((entry) => toApp(entry.app));
 }
 
-export async function details(backend: Backend, id: string): Promise<AppDetails> {
-	const app = await backend.fedoraApp(id);
+export async function details(id: string): Promise<AppDetails> {
+	const app = await commands.fedoraApp({ id });
 	return {
 		origin: 'fedora',
 		id,

@@ -7,11 +7,10 @@ mod system;
 mod tools;
 
 use gio::prelude::*;
-use luft_app::Commands;
+use luft_app::{Commands, Empty};
 use luft_software::apps::flatpak::{self, Installation, Permissions};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use specta::Type;
 
 use crate::fedora;
@@ -100,7 +99,7 @@ fn permissions(
 
 pub fn register(window: SabineWindow) -> SabineWindow {
     sources::register(window)
-        .command("library_installed", |_: Value| Ok(installed()))
+        .command("library_installed", |Empty {}| Ok(installed()))
         .command("library_launch", launch)
         .command("library_permissions", permissions)
         .command_async("library_full_access", full_access::has)

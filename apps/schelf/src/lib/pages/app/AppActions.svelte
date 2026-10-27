@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { InstalledApp, Job } from '#lib/bridge/types.js';
+	import type { InstalledApp, Job } from '#lib/bindings.js';
 	import ProgressButton from '#lib/components/ProgressButton.svelte';
 	import RemoveDialog from '#lib/components/RemoveDialog.svelte';
-	import { backend } from '#lib/bridge/index.js';
+	import { launch } from '#lib/bridge/index.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { operations } from '#lib/state/operations.svelte.js';
 	import { updateJob } from '#lib/app/jobs.js';
@@ -51,7 +51,7 @@
 				<button type="button" class="button large" onclick={updateNow}>Update</button>
 			{/if}
 			{#if installed.desktop}
-				<button type="button" class="button primary large" onclick={() => backend.launch(installed.desktop!)}>Open</button>
+				<button type="button" class="button primary large" onclick={() => launch(installed.desktop!)}>Open</button>
 			{/if}
 		{:else if listing}
 			<button type="button" class="button primary large" onclick={install}>Install</button>

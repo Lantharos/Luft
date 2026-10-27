@@ -1,9 +1,8 @@
-import type { InstalledApp } from '#lib/bridge/types.js';
+import { commands, type InstalledApp } from '#lib/bindings.js';
 import * as flathub from '#lib/catalog/flathub.js';
 import type { AppDetails, Origin } from '#lib/catalog/types.js';
 import { flathubId } from '#lib/fedora/catalog.js';
 import { fedora } from '#lib/fedora/fedora.svelte.js';
-import { backend } from '#lib/bridge/index.js';
 import { library } from '#lib/state/library.svelte.js';
 import type { AppTarget } from '#lib/state/navigation.svelte.js';
 
@@ -22,7 +21,7 @@ export interface Loaded {
 async function fetchDetails(listing: Listing | null): Promise<{ details: AppDetails | null; error: string | null }> {
 	if (!listing) return { details: null, error: null };
 	try {
-		const details = listing.origin === 'flathub' ? await flathub.details(backend, listing.id) : await fedora.details(listing.id);
+		const details = listing.origin === 'flathub' ? await flathub.details(listing.id) : await fedora.details(listing.id);
 		return { details, error: null };
 	} catch (reason) {
 		return { details: null, error: String(reason) };
@@ -42,8 +41,8 @@ async function alternativesFor(listing: Listing): Promise<Listing[]> {
 		return match ? [listing, { origin: 'fedora', id: match.id }] : [];
 	}
 	const id = flathubId(listing.id);
-	const exists = await backend
-		.flathub(`summary/${id}`)
+	const exists = await commands
+		.flathubSummary({ id })
 		.then(() => true)
 		.catch(() => false);
 	return exists ? [{ origin: 'flathub', id }, listing] : [];

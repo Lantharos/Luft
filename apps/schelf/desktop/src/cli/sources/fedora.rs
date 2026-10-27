@@ -49,7 +49,7 @@ pub fn install(package: &str) -> (String, Job) {
     } else {
         (
             format!("package/{package}"),
-            Job::Fedora(fedora::Job::InstallPackage { package }),
+            Job::Fedora(fedora::PackageJob::InstallPackage { package }),
         )
     }
 }

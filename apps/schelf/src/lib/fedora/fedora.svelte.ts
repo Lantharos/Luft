@@ -1,6 +1,5 @@
-import type { FedoraSummary } from '#lib/bridge/types.js';
+import { commands, type FedoraSummary } from '#lib/bindings.js';
 import type { Category } from '#lib/catalog/categories.js';
-import { backend } from '#lib/bridge/index.js';
 import * as catalog from './catalog';
 
 class Fedora {
@@ -10,7 +9,7 @@ class Fedora {
 
 	load() {
 		if (!this.available) return Promise.resolve();
-		this.loading ??= backend
+		this.loading ??= commands
 			.fedoraApps()
 			.then((apps) => void (this.apps = apps))
 			.catch(() => {});
@@ -34,7 +33,7 @@ class Fedora {
 	}
 
 	details(id: string) {
-		return catalog.details(backend, id);
+		return catalog.details(id);
 	}
 }
 

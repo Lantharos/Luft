@@ -1,7 +1,6 @@
-use luft_app::{Activation, Appearance, Commands, launch};
+use luft_app::{Activation, Appearance, Commands, Empty, launch};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use specta::Type;
 
 use crate::fedora;
@@ -39,7 +38,7 @@ fn open_url(Link { url, token }: Link) -> Result<(), String> {
     launch::open(&url, token.as_deref()).map_err(|error| error.to_string())
 }
 
-async fn state(_: Value) -> Result<AppState, String> {
+async fn state(Empty {}: Empty) -> Result<AppState, String> {
     let activation = Activation::current_process();
     Ok(AppState {
         appearance: Appearance::current().await,

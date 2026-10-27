@@ -16,7 +16,7 @@ pub struct Screenshot {
 
 #[derive(Serialize, Deserialize, Clone, Default, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct Component {
+pub struct FedoraComponent {
     pub id: String,
     pub package: String,
     pub name: String,
@@ -40,9 +40,9 @@ struct Shot {
 
 #[derive(Default)]
 struct Parser {
-    components: Vec<Component>,
+    components: Vec<FedoraComponent>,
     origin: String,
-    current: Option<Component>,
+    current: Option<FedoraComponent>,
     icon_width: u32,
     shot: Option<Shot>,
     stack: Vec<String>,
@@ -114,7 +114,7 @@ impl Parser {
             let kind = attribute(element, "type").unwrap_or_default();
             self.current = DESKTOP_TYPES
                 .contains(&kind.as_str())
-                .then(Component::default);
+                .then(FedoraComponent::default);
             self.icon_width = 0;
             return;
         }
@@ -239,7 +239,7 @@ impl Parser {
     }
 }
 
-pub fn parse(xml: &str) -> Vec<Component> {
+pub fn parse(xml: &str) -> Vec<FedoraComponent> {
     let mut reader = Reader::from_str(xml);
     let mut parser = Parser::default();
     loop {

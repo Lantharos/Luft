@@ -12,7 +12,7 @@ import ShieldCheck from '@lucide/svelte/icons/shield-check';
 import SquareTerminal from '@lucide/svelte/icons/square-terminal';
 import Usb from '@lucide/svelte/icons/usb';
 import Volume2 from '@lucide/svelte/icons/volume-2';
-import type { Permissions } from '#lib/bridge/types.js';
+import type { Permissions } from '#lib/bindings.js';
 
 export const APPIMAGE_SANDBOX: Permissions = {
 	shared: ['network', 'ipc'],

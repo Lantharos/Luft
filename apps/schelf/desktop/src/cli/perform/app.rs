@@ -9,7 +9,7 @@ use zbus::names::BusName;
 use super::Failure;
 use crate::cli::terminal::progress::{Status, Update};
 use crate::operations::bus::{NAME, SchelfProxy};
-use crate::operations::{Request, State};
+use crate::operations::{OperationState, Request};
 
 const CLOSED: &str = "Schelf closed before it finished.";
 
@@ -29,7 +29,7 @@ pub async fn connect() -> Option<SchelfProxy<'static>> {
 }
 
 fn update(state: &str, stage: &str, fraction: f64) -> Update {
-    if state == State::Queued.name() {
+    if state == OperationState::Queued.name() {
         return Update::Queued;
     }
     Update::Progress(Progress::new(

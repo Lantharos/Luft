@@ -1,4 +1,4 @@
-import type { Backend, Permissions, Screenshot } from '#lib/bridge/types.js';
+import { commands, type Permissions, type Screenshot } from '#lib/bindings.js';
 import type { AppDetails, CatalogApp, Page } from './types';
 import type { CategoryId } from './categories';
 
@@ -12,7 +12,7 @@ interface Hit {
 	developer_name?: string | null;
 }
 
-interface HitPage {
+export interface HitPage {
 	hits: Hit[];
 	totalPages: number;
 }
@@ -22,7 +22,7 @@ interface ScreenshotSize {
 	src: string;
 }
 
-interface Appstream {
+export interface Appstream {
 	id: string;
 	name: string;
 	summary: string;
@@ -36,7 +36,7 @@ interface Appstream {
 	metadata?: Record<string, string | boolean | null> | null;
 }
 
-interface Summary {
+export interface Summary {
 	download_size?: number;
 	installed_size?: number;
 	metadata?: {
@@ -69,13 +69,11 @@ function toApp(hit: Hit): CatalogApp {
 
 const toPage = (page: HitPage): Page => ({ apps: page.hits.map(toApp), pages: page.totalPages });
 
-export const collection = (backend: Backend, name: Collection, page = 1, size = PAGE_SIZE) =>
-	backend.flathub<HitPage>(`collection/${name}?page=${page}&per_page=${size}`).then(toPage);
+export const collection = (name: Collection, page = 1, perPage = PAGE_SIZE) => commands.flathubCollection({ name, page, perPage }).then(toPage);
 
-export const category = (backend: Backend, id: CategoryId, page = 1) =>
-	backend.flathub<HitPage>(`collection/category/${id}?page=${page}&per_page=${PAGE_SIZE}`).then(toPage);
+export const category = (id: CategoryId, page = 1) => commands.flathubCategory({ category: id, page, perPage: PAGE_SIZE }).then(toPage);
 
-export const search = (backend: Backend, query: string) => backend.flathubSearch<HitPage>(query).then((page) => page.hits.map(toApp));
+export const search = (query: string) => commands.flathubSearch({ query }).then((page) => page.hits.map(toApp));
 
 function screenshot(entry: { caption?: string | null; sizes: ScreenshotSize[] }): Screenshot | null {
 	const sizes = [...entry.sizes].sort((a, b) => Math.abs(Number(a.width) - PREFERRED_WIDTH) - Math.abs(Number(b.width) - PREFERRED_WIDTH));
@@ -103,10 +101,10 @@ function verified(metadata: Appstream['metadata']): string | null {
 	return typeof website === 'string' ? website : typeof login === 'string' ? login : 'Flathub';
 }
 
-export async function details(backend: Backend, id: string): Promise<AppDetails> {
+export async function details(id: string): Promise<AppDetails> {
 	const [appstream, summary] = await Promise.all([
-		backend.flathub<Appstream>(`appstream/${id}`),
-		backend.flathub<Summary>(`summary/${id}`).catch(() => ({}) as Summary)
+		commands.flathubAppstream({ id }),
+		commands.flathubSummary({ id }).catch((): Summary => ({}))
 	]);
 	const release = appstream.releases?.find((entry) => entry.type !== 'development') ?? appstream.releases?.[0];
 	return {

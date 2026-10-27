@@ -8,7 +8,7 @@ use flate2::read::GzDecoder;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
-use super::appstream::{self, Component};
+use super::appstream::{self, FedoraComponent};
 use crate::catalog::cache::Entry;
 
 const CATALOGS: &str = "/usr/share/swcatalog/xml";
@@ -16,7 +16,7 @@ const ICONS: &str = "/usr/share/swcatalog/icons";
 
 #[derive(Serialize, Deserialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct Summary {
+pub struct FedoraSummary {
     pub id: String,
     pub package: String,
     pub name: String,
@@ -30,7 +30,7 @@ pub struct Summary {
 #[derive(Serialize, Deserialize, Default)]
 struct Index {
     stamp: String,
-    components: Vec<Component>,
+    components: Vec<FedoraComponent>,
 }
 
 static INDEX: Mutex<Option<Arc<Index>>> = Mutex::new(None);
@@ -82,7 +82,7 @@ fn read(path: &Path) -> Option<String> {
 }
 
 fn build(files: &[PathBuf], stamp: String) -> Index {
-    let mut components: HashMap<String, Component> = HashMap::new();
+    let mut components: HashMap<String, FedoraComponent> = HashMap::new();
     for file in files {
         let Some(text) = read(file) else { continue };
         for mut component in appstream::parse(&text) {
@@ -93,7 +93,7 @@ fn build(files: &[PathBuf], stamp: String) -> Index {
             components.entry(component.id.clone()).or_insert(component);
         }
     }
-    let mut components: Vec<Component> = components.into_values().collect();
+    let mut components: Vec<FedoraComponent> = components.into_values().collect();
     components.sort_by_cached_key(|component| component.name.to_lowercase());
     Index { stamp, components }
 }
@@ -124,11 +124,11 @@ fn index() -> Arc<Index> {
     index
 }
 
-pub fn list() -> Vec<Summary> {
+pub fn list() -> Vec<FedoraSummary> {
     index()
         .components
         .iter()
-        .map(|component| Summary {
+        .map(|component| FedoraSummary {
             id: component.id.clone(),
             package: component.package.clone(),
             name: component.name.clone(),
@@ -141,7 +141,7 @@ pub fn list() -> Vec<Summary> {
         .collect()
 }
 
-pub fn find(id: &str) -> Option<Component> {
+pub fn find(id: &str) -> Option<FedoraComponent> {
     index()
         .components
         .iter()
@@ -149,7 +149,7 @@ pub fn find(id: &str) -> Option<Component> {
         .cloned()
 }
 
-pub fn find_package(package: &str) -> Option<Component> {
+pub fn find_package(package: &str) -> Option<FedoraComponent> {
     index()
         .components
         .iter()

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Row, Switch } from '@luft/ui';
-	import type { InstalledApp } from '#lib/bridge/types.js';
-	import { backend } from '#lib/bridge/index.js';
+	import { commands, type InstalledApp } from '#lib/bindings.js';
+	import { SLOW } from '#lib/bridge/index.js';
 	import TrustDialog from '#lib/components/TrustDialog.svelte';
 
 	let { app, on = $bindable(false), asking = $bindable(false) }: { app: InstalledApp; on?: boolean; asking?: boolean } = $props();
@@ -21,8 +21,8 @@
 		const id = app.id;
 		on = false;
 		error = null;
-		void backend
-			.fullAccess(id, app.source)
+		void commands
+			.libraryFullAccess({ id, source: app.source })
 			.then((trusted) => {
 				if (app.id === id) on = trusted;
 			})
@@ -34,7 +34,7 @@
 		busy = true;
 		error = null;
 		try {
-			await backend.setFullAccess(app.id, app.source, wanted);
+			await commands.librarySetFullAccess({ id: app.id, source: app.source, on: wanted }, SLOW);
 			on = wanted;
 		} catch (reason) {
 			error = String(reason);

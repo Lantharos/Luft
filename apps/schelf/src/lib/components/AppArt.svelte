@@ -3,7 +3,7 @@
 	import Server from '@lucide/svelte/icons/server';
 	import SquareTerminal from '@lucide/svelte/icons/square-terminal';
 	import { AppIcon } from '@luft/ui';
-	import type { Source } from '#lib/bridge/types.js';
+	import type { Source } from '#lib/bindings.js';
 
 	interface Props {
 		icon: string | null;

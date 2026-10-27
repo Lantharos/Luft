@@ -90,10 +90,7 @@ fn installed() -> HashSet<String> {
 }
 
 fn hits(query: &str) -> Result<Vec<Hit>, String> {
-    let raw = flathub::search(query)?;
-    serde_json::from_str::<Hits>(raw.get())
-        .map(|hits| hits.hits)
-        .map_err(|error| error.to_string())
+    flathub::search(query)?.read::<Hits>().map(|hits| hits.hits)
 }
 
 fn candidates(hits: Vec<Hit>) -> Vec<Candidate> {
@@ -124,13 +121,11 @@ fn looks_like_id(name: &str) -> bool {
 }
 
 pub fn details(id: &str) -> Result<Details, String> {
-    let raw = flathub::get(&format!("appstream/{id}"))?;
-    serde_json::from_str(raw.get()).map_err(|error| error.to_string())
+    flathub::appstream(id)?.read()
 }
 
 pub fn sizes(id: &str) -> Option<Sizes> {
-    let raw = flathub::get(&format!("summary/{id}")).ok()?;
-    serde_json::from_str(raw.get()).ok()
+    flathub::summary(id).ok()?.read().ok()
 }
 
 pub fn find(name: &str) -> Result<Vec<Candidate>, String> {

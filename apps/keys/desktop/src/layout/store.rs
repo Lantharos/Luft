@@ -9,7 +9,7 @@ use specta::Type;
 use super::compile::{self, Keys};
 use super::dead::{self, DeadKey};
 use super::meta::{self, Meta, Options};
-use super::registry::{self, Entry};
+use super::registry::{self, LayoutEntry};
 use super::symbol::Symbol;
 use super::{Layout, symbols};
 use crate::compose::{self, Reloader, sequences};
@@ -105,8 +105,8 @@ fn rekey(draft: &mut Draft) -> Result<(), String> {
     Ok(())
 }
 
-pub fn list() -> Vec<Entry> {
-    let mut entries: Vec<Entry> = registry::user()
+pub fn list() -> Vec<LayoutEntry> {
+    let mut entries: Vec<LayoutEntry> = registry::user()
         .into_iter()
         .filter(|entry| paths::user_symbols().join(&entry.id).is_file())
         .collect();
@@ -235,7 +235,7 @@ pub fn save(layout: &Layout, reloader: &Reloader) -> Result<(), String> {
             dead: layout.dead.clone(),
         },
     )?;
-    let entry = Entry {
+    let entry = LayoutEntry {
         id: layout.id.clone(),
         name: layout.name.trim().to_owned(),
         short: layout.short.trim().to_owned(),
@@ -252,7 +252,7 @@ pub fn save(layout: &Layout, reloader: &Reloader) -> Result<(), String> {
 
 pub fn remove(id: &str, reloader: &Reloader) -> Result<(), String> {
     sources::remove("xkb", id)?;
-    let entries: Vec<Entry> = registry::user()
+    let entries: Vec<LayoutEntry> = registry::user()
         .into_iter()
         .filter(|entry| entry.id != id)
         .collect();

@@ -21,7 +21,7 @@ pub struct Summary {
 }
 
 #[derive(Serialize, Deserialize, Clone, Type)]
-pub struct Stored {
+pub struct SavedMethod {
     pub id: String,
     #[serde(flatten)]
     pub method: Method,
@@ -78,14 +78,14 @@ pub fn list() -> Vec<Summary> {
     methods
 }
 
-pub fn open(id: &str) -> Result<Stored, String> {
-    Ok(Stored {
+pub fn open(id: &str) -> Result<SavedMethod, String> {
+    Ok(SavedMethod {
         id: id.to_owned(),
         method: definition::load(id)?,
     })
 }
 
-pub fn create(mut method: Method) -> Result<Stored, String> {
+pub fn create(mut method: Method) -> Result<SavedMethod, String> {
     method.name = method.name.trim().to_owned();
     if method.name.is_empty() {
         return Err("Give the input method a name".into());
@@ -93,12 +93,12 @@ pub fn create(mut method: Method) -> Result<Stored, String> {
     let id = paths::unique(&paths::slug(&method.name), |candidate| {
         definition::file(candidate).exists()
     });
-    let stored = Stored { id, method };
+    let stored = SavedMethod { id, method };
     save(&stored)?;
     Ok(stored)
 }
 
-pub fn save(stored: &Stored) -> Result<(), String> {
+pub fn save(stored: &SavedMethod) -> Result<(), String> {
     let file = definition::file(&stored.id);
     let before = fs::read_to_string(&file).ok().as_deref().and_then(header);
     files::replace(&file, stored.method.to_text().as_bytes()).map_err(|error| error.to_string())?;

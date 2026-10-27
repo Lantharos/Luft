@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import TryField from '#lib/try/TryField.svelte';
-	import type { DeadKey } from '../api';
+	import type { DeadKey } from '#lib/bindings.js';
 	import type { LayoutEditor } from '../editor.svelte';
 	import { ownDeadKeysym, typeAfter } from './table';
 

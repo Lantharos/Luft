@@ -1,5 +1,5 @@
 import { nameOf } from '#lib/characters/characters.js';
-import type { DeadKey, Symbol } from '#lib/layout/api.js';
+import type { DeadKey, Symbol } from '#lib/bindings.js';
 
 export const LEVEL_NAMES = ['Alone', 'With Shift', 'With AltGr', 'With Shift and AltGr'];
 export const LEVEL_SHORT_NAMES = ['Alone', 'Shift', 'AltGr', 'Shift AltGr'];

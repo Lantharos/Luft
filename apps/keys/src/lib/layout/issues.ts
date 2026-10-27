@@ -1,5 +1,5 @@
 import { caps, type Geometry } from '#lib/keyboard/geometry.js';
-import type { DeadKey, Layout } from './api';
+import type { DeadKey, Layout } from '#lib/bindings.js';
 import { placements } from './dead/table';
 
 export type Target = { tab: 'keys'; key: string; level: number } | { tab: 'dead'; keysym: string } | { tab: 'settings' };

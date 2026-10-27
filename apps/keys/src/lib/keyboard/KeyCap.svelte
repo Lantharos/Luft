@@ -1,5 +1,6 @@
 <script lang="ts">
-	import type { Levels, Symbol } from '#lib/layout/api.js';
+	import type { Symbol } from '#lib/bindings.js';
+	import type { Levels } from '#lib/layout/levels.js';
 	import { typedLevel } from './board';
 
 	interface Props {

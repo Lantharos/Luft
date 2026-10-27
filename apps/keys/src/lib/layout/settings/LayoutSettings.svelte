@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Row, Section, Select, TextField } from '@luft/ui';
-	import type { AltGr, CapsLock, ComposeKey } from '../api';
+	import type { AltGr, CapsLock, ComposeKey } from '#lib/bindings.js';
 	import type { LayoutEditor } from '../editor.svelte';
 
 	interface Props {

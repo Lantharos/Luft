@@ -1,4 +1,4 @@
-import type { Levels } from '#lib/layout/api.js';
+import type { Levels } from '#lib/layout/levels.js';
 import type { Geometry } from './geometry';
 
 export interface Board {

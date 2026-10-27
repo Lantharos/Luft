@@ -2,7 +2,9 @@
 	import PenLine from '@lucide/svelte/icons/pen-line';
 	import { tooltip } from '@luft/ui';
 	import { describe, LEVEL_NAMES, LEVEL_SHORT_NAMES, shown } from '#lib/keyboard/describe.js';
-	import { describeText, EMPTY, type Symbol } from '../api';
+	import { commands } from '#lib/bindings.js';
+	import type { Symbol } from '#lib/bindings.js';
+	import { EMPTY } from '#lib/layout/levels.js';
 	import type { LayoutEditor } from '../editor.svelte';
 	import SymbolPicker from './SymbolPicker.svelte';
 
@@ -60,7 +62,7 @@
 			editor.assign(EMPTY, editor.selected, level);
 		} else if ([...event.key].length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey && event.key !== ' ') {
 			event.preventDefault();
-			editor.assign(await describeText(event.key), editor.selected, level);
+			editor.assign(await commands.layoutDescribe({ text: event.key }), editor.selected, level);
 		}
 	}
 </script>

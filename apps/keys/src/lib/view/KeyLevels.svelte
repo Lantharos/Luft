@@ -2,7 +2,8 @@
 	import { tooltip } from '@luft/ui';
 	import { typedLevel } from '#lib/keyboard/board.js';
 	import { describe, LEVEL_NAMES, LEVEL_SHORT_NAMES, shown } from '#lib/keyboard/describe.js';
-	import type { DeadKey, Levels } from '#lib/layout/api.js';
+	import type { DeadKey } from '#lib/bindings.js';
+	import type { Levels } from '#lib/layout/levels.js';
 
 	interface Props {
 		levels: Levels;

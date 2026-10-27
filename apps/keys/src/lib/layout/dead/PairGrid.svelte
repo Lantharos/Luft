@@ -2,7 +2,7 @@
 	import { tick } from 'svelte';
 	import Plus from '@lucide/svelte/icons/plus';
 	import { SearchField, VirtualScroller, type VirtualHandle } from '@luft/ui';
-	import type { DeadKey, Pair } from '../api';
+	import type { DeadKey, Pair } from '#lib/bindings.js';
 	import type { LayoutEditor } from '../editor.svelte';
 	import { pairProblems, typeable } from '../issues';
 	import PairCell from './PairCell.svelte';

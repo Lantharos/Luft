@@ -1,5 +1,6 @@
 import { US_LABELS } from '#lib/keyboard/geometry.js';
-import type { DeadKey, Levels, Pair, Symbol } from '../api';
+import type { DeadKey, Pair, Symbol } from '#lib/bindings.js';
+import type { Levels } from '#lib/layout/levels.js';
 
 export interface Placement {
 	key: string;

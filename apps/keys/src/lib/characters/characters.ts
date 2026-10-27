@@ -1,9 +1,5 @@
-import { invoke } from '#lib/bridge/index.js';
-
-export interface Character {
-	text: string;
-	name: string;
-}
+import { commands } from '#lib/bindings.js';
+import type { Character } from '#lib/bindings.js';
 
 interface Indexed extends Character {
 	lower: string;
@@ -21,7 +17,7 @@ const LIMIT = 300;
 let loading: Promise<Catalog> | null = null;
 
 function load() {
-	loading ??= invoke<Character[]>('characters').then((list) => {
+	loading ??= commands.characters().then((list) => {
 		const all = list
 			.filter((character) => character.name)
 			.map((character) => {

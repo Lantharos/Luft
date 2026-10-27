@@ -2,7 +2,7 @@
 	import { CODES, PHYSICAL } from '#lib/keyboard/geometry.js';
 	import { toast } from '#lib/state/toast.svelte.js';
 	import TryField, { EDITING_KEYS } from '#lib/try/TryField.svelte';
-	import { tryKey, tryLayout } from '../api';
+	import { commands } from '#lib/bindings.js';
 	import type { LayoutEditor } from '../editor.svelte';
 
 	interface Props {
@@ -35,7 +35,7 @@
 		if (event.ctrlKey || event.metaKey || (event.altKey && event.code !== 'AltRight')) return;
 		const name = PHYSICAL[event.code];
 		if (name) held.add(name);
-		const typed = name ? tryKey(name, true) : null;
+		const typed = name ? commands.layoutTryKey({ key: name, down: true }) : null;
 		if (typed && CODES[event.code]) {
 			event.preventDefault();
 			show(name, true);
@@ -50,7 +50,7 @@
 	function keyup(event: KeyboardEvent) {
 		const name = PHYSICAL[event.code];
 		if (!name || !held.delete(name)) return;
-		void tryKey(name, false);
+		void commands.layoutTryKey({ key: name, down: false });
 		if (!CODES[event.code]) return;
 		event.preventDefault();
 		show(name, false);
@@ -59,7 +59,7 @@
 	function reset() {
 		held = new Set();
 		editor.pressed = new Set();
-		void tryLayout($state.snapshot(editor.layout));
+		void commands.layoutTry($state.snapshot(editor.layout));
 	}
 </script>
 

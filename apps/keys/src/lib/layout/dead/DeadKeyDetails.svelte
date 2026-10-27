@@ -1,7 +1,7 @@
 <script lang="ts">
 	import PenLine from '@lucide/svelte/icons/pen-line';
 	import { Popover, TextField, tooltip } from '@luft/ui';
-	import type { DeadKey } from '../api';
+	import type { DeadKey } from '#lib/bindings.js';
 	import type { LayoutEditor } from '../editor.svelte';
 
 	interface Props {

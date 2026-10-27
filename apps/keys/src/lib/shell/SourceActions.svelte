@@ -14,7 +14,7 @@
 	interface Props {
 		selection: Selection;
 		what: string;
-		onuse: () => Promise<void>;
+		onuse: () => Promise<unknown>;
 		exports: Export[];
 		onremove: () => Promise<void>;
 		menu?: Snippet<[() => void]>;

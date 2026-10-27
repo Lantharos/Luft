@@ -7,7 +7,7 @@
 	import UndoButtons from '#lib/shell/UndoButtons.svelte';
 	import { app } from '#lib/state/app.svelte.js';
 	import { toast } from '#lib/state/toast.svelte.js';
-	import { deleteLayout, exportLayout, openLayout, systemLayouts, useLayout } from './api';
+	import { commands } from '#lib/bindings.js';
 	import DeadKeysPane from './dead/DeadKeysPane.svelte';
 	import { LayoutEditor, type Tab } from './editor.svelte';
 	import KeysPane from './keys/KeysPane.svelte';
@@ -31,11 +31,11 @@
 	let baseName = $state('');
 
 	onMount(() => {
-		openLayout(id)
+		commands.layoutOpen({ id })
 			.then(async (layout) => {
 				editor = new LayoutEditor(layout, () => void app.refresh());
 				const base = layout.base?.replace(/\((.*)\)$/, '+$1');
-				baseName = (base && (await systemLayouts()).find((entry) => entry.id === base)?.name) || '';
+				baseName = (base && (await commands.layoutsSystem()).find((entry) => entry.id === base)?.name) || '';
 			})
 			.catch((error) => {
 				toast.fail(error);
@@ -54,7 +54,7 @@
 
 	async function remove() {
 		editor?.discard();
-		await deleteLayout(id);
+		await commands.layoutDelete({ id });
 		await app.removed();
 	}
 </script>
@@ -69,12 +69,12 @@
 			<SourceActions
 				selection={{ kind: 'layout', id }}
 				what="layout"
-				onuse={() => useLayout(id)}
+				onuse={() => commands.layoutUse({ id })}
 				exports={[
-					{ label: 'Export layout file', run: () => exportLayout(id, 'symbols') },
-					{ label: 'Export as a complete keymap', run: () => exportLayout(id, 'keymap') },
-					...(current.layout.dead.length ? [{ label: 'Export dead keys as a Compose file', run: () => exportLayout(id, 'compose') }] : []),
-					{ label: 'Export for Windows', run: () => exportLayout(id, 'klc') }
+					{ label: 'Export layout file', run: () => commands.layoutExport({ id, format: 'symbols' }) },
+					{ label: 'Export as a complete keymap', run: () => commands.layoutExport({ id, format: 'keymap' }) },
+					...(current.layout.dead.length ? [{ label: 'Export dead keys as a Compose file', run: () => commands.layoutExport({ id, format: 'compose' }) }] : []),
+					{ label: 'Export for Windows', run: () => commands.layoutExport({ id, format: 'klc' }) }
 				]}
 				onremove={remove}
 			>

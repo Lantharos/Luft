@@ -6,20 +6,18 @@ mod store;
 
 use std::path::Path;
 
-use luft_app::Commands;
-use luft_app::files;
 use luft_app::portal::{self, FileChooser, Filter};
+use luft_app::{Commands, Empty, files};
 use sabine::SabineWindow;
 use serde::Deserialize;
-use serde_json::Value;
+use specta::Type;
 use tokio::task::spawn_blocking;
 
 use crate::sources;
 use definition::Method;
 pub use host::SERVE_FLAG;
 use preview::Preview;
-use specta::Type;
-pub use store::{ENGINE_PREFIX, Stored, Summary, engine_name, list};
+pub use store::{ENGINE_PREFIX, SavedMethod, Summary, engine_name, list};
 
 #[derive(Deserialize, Type)]
 struct Id {
@@ -38,11 +36,11 @@ pub fn is_method_file(path: &Path) -> bool {
     )
 }
 
-pub fn import_path(path: &Path) -> Result<Stored, String> {
+pub fn import_path(path: &Path) -> Result<SavedMethod, String> {
     store::create(import::read(path)?)
 }
 
-async fn import(_: Value) -> Result<Option<Stored>, String> {
+async fn import(Empty {}: Empty) -> Result<Option<SavedMethod>, String> {
     let chosen = portal::open_file(
         "Import an input method",
         Filter {
@@ -88,14 +86,14 @@ pub fn register(window: SabineWindow) -> SabineWindow {
     }
     let preview = Preview::default();
     window
-        .command("methods_list", |_: Value| -> Result<Vec<Summary>, String> {
+        .command("methods_list", |Empty {}| -> Result<Vec<Summary>, String> {
             Ok(store::list())
         })
         .command("method_open", |Id { id }| store::open(&id))
         .command("method_create", |Create { name }| {
             store::create(Method::named(&name))
         })
-        .command("method_save", |stored: Stored| store::save(&stored))
+        .command("method_save", |stored: SavedMethod| store::save(&stored))
         .command("method_delete", |Id { id }| store::remove(&id))
         .command("method_use", |Id { id }| {
             sources::add("ibus", &store::engine_name(&id))

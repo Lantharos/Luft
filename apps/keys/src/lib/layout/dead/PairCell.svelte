@@ -2,7 +2,7 @@
 	import ArrowRight from '@lucide/svelte/icons/arrow-right';
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
 	import { MenuButton, MenuItem, MenuSeparator, tooltip } from '@luft/ui';
-	import type { DeadKey, Pair } from '../api';
+	import type { DeadKey, Pair } from '#lib/bindings.js';
 	import type { LayoutEditor } from '../editor.svelte';
 
 	interface Props {

@@ -1,6 +1,7 @@
 import { History } from '#lib/state/history.svelte.js';
 import { toast } from '#lib/state/toast.svelte.js';
-import { saveMethod, tryMethod, type Method } from './api';
+import { commands } from '#lib/bindings.js';
+import type { SavedMethod } from '#lib/bindings.js';
 
 const SAVE_DELAY = 500;
 const TRY_DELAY = 150;
@@ -19,14 +20,14 @@ type Field = 'keys' | 'text' | 'after';
 type Setting = 'name' | 'label' | 'language' | 'candidates' | 'learn' | 'compose';
 
 interface Snapshot {
-	method: Method;
+	method: SavedMethod;
 	rules: Row[];
 	words: Row[];
 	sequences: Row[];
 }
 
 export class MethodEditor {
-	method = $state<Method>() as Method;
+	method = $state<SavedMethod>() as SavedMethod;
 	rules = $state.raw<Row[]>([]);
 	words = $state.raw<Row[]>([]);
 	sequences = $state.raw<Row[]>([]);
@@ -39,14 +40,14 @@ export class MethodEditor {
 	#tryTimer: ReturnType<typeof setTimeout> | undefined;
 	#onsaved: () => void;
 
-	constructor(method: Method, onsaved: () => void) {
+	constructor(method: SavedMethod, onsaved: () => void) {
 		this.method = method;
 		this.rules = method.rules.map((rule) => this.#row(rule.keys, rule.text, rule.after ?? ''));
 		this.words = method.words.map((entry) => this.#row(entry.keys, entry.text));
 		this.sequences = method.sequences.map((entry) => this.#row(entry.keys, entry.text));
 		this.tab = method.rules.length || !method.words.length ? 'rules' : 'words';
 		this.#onsaved = onsaved;
-		void tryMethod(this.snapshot());
+		void commands.methodTry(this.snapshot());
 	}
 
 	#row(keys: string, text: string, after = ''): Row {
@@ -77,7 +78,7 @@ export class MethodEditor {
 		this.#edit(`remove:${table}`, () => (this[table] = this[table].filter((row) => row.uid !== uid)));
 	}
 
-	set<K extends Setting>(key: K, value: Method[K]) {
+	set<K extends Setting>(key: K, value: SavedMethod[K]) {
 		this.#edit(`setting:${key}`, () => (this.method[key] = value));
 	}
 
@@ -112,7 +113,7 @@ export class MethodEditor {
 		this.changed();
 	}
 
-	snapshot(): Method {
+	snapshot(): SavedMethod {
 		const filled = (rows: Row[]) => rows.filter((row) => row.keys && row.text);
 		return {
 			...$state.snapshot(this.method),
@@ -127,7 +128,7 @@ export class MethodEditor {
 		clearTimeout(this.#saveTimer);
 		clearTimeout(this.#tryTimer);
 		this.#saveTimer = setTimeout(() => void this.save(), SAVE_DELAY);
-		this.#tryTimer = setTimeout(() => void tryMethod(this.snapshot()), TRY_DELAY);
+		this.#tryTimer = setTimeout(() => void commands.methodTry(this.snapshot()), TRY_DELAY);
 	}
 
 	discard() {
@@ -139,7 +140,7 @@ export class MethodEditor {
 		clearTimeout(this.#saveTimer);
 		if (this.saved) return;
 		try {
-			await saveMethod(this.snapshot());
+			await commands.methodSave(this.snapshot());
 			this.saved = true;
 			this.#onsaved();
 		} catch (error) {

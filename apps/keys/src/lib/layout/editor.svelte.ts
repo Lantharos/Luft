@@ -1,7 +1,9 @@
 import { History } from '#lib/state/history.svelte.js';
 import { toast } from '#lib/state/toast.svelte.js';
 import { guessGeometry, type Geometry } from '#lib/keyboard/geometry.js';
-import { EMPTY, freeKeysym, saveLayout, systemTable, tryLayout, type DeadKey, type Layout, type Levels, type Options, type Pair, type Symbol } from './api';
+import { commands } from '#lib/bindings.js';
+import type { DeadKey, Layout, Options, Pair, Symbol } from '#lib/bindings.js';
+import { EMPTY, type Levels } from '#lib/layout/levels.js';
 import { capitals, deadSymbol, placements, standardName } from './dead/table';
 
 const SAVE_DELAY = 400;
@@ -38,7 +40,7 @@ export class LayoutEditor {
 		this.geometry = rememberedGeometry(layout);
 		this.chosenDead = layout.dead[0]?.keysym ?? this.systemDead[0]?.keysym ?? null;
 		this.#onsaved = onsaved;
-		void tryLayout(layout);
+		void commands.layoutTry(layout);
 	}
 
 	levels(name: string): Levels {
@@ -101,7 +103,7 @@ export class LayoutEditor {
 	}
 
 	#freeKeysym() {
-		return freeKeysym(this.layout.id, this.layout.dead.map((key) => key.keysym));
+		return commands.layoutFreeKeysym({ id: this.layout.id, taken: this.layout.dead.map((key) => key.keysym) });
 	}
 
 	#replaceOnKeys(keysym: string, symbol: Symbol) {
@@ -119,7 +121,7 @@ export class LayoutEditor {
 	}
 
 	async copySystem(symbol: Symbol) {
-		const [table, keysym] = await Promise.all([systemTable(symbol.keysym), this.#freeKeysym()]);
+		const [table, keysym] = await Promise.all([commands.layoutSystemTable({ keysym: symbol.keysym }), this.#freeKeysym()]);
 		const copy: DeadKey = { keysym, name: standardName(symbol.keysym), symbol: symbol.text, spacing: table.spacing, pairs: table.pairs };
 		this.#edit('dead:copy', () => {
 			this.layout.dead.push(copy);
@@ -194,7 +196,7 @@ export class LayoutEditor {
 		clearTimeout(this.#saveTimer);
 		clearTimeout(this.#tryTimer);
 		this.#saveTimer = setTimeout(() => void this.save(), SAVE_DELAY);
-		this.#tryTimer = setTimeout(() => void tryLayout($state.snapshot(this.layout)), TRY_DELAY);
+		this.#tryTimer = setTimeout(() => void commands.layoutTry($state.snapshot(this.layout)), TRY_DELAY);
 	}
 
 	discard() {
@@ -206,7 +208,7 @@ export class LayoutEditor {
 		clearTimeout(this.#saveTimer);
 		if (this.saved) return;
 		try {
-			await saveLayout($state.snapshot(this.layout));
+			await commands.layoutSave($state.snapshot(this.layout));
 			this.saved = true;
 			this.#onsaved();
 		} catch (error) {

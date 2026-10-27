@@ -5,7 +5,7 @@
 	import { PHYSICAL, TYPING } from '#lib/keyboard/geometry.js';
 	import Keyboard from '#lib/keyboard/Keyboard.svelte';
 	import ShapeItems from '#lib/keyboard/ShapeItems.svelte';
-	import { viewLayout } from '#lib/layout/api.js';
+	import { commands } from '#lib/bindings.js';
 	import Page from '#lib/shell/Page.svelte';
 	import { app } from '#lib/state/app.svelte.js';
 	import { toast } from '#lib/state/toast.svelte.js';
@@ -22,7 +22,7 @@
 	let custom = $state(false);
 
 	onMount(() => {
-		viewLayout(id)
+		commands.layoutView({ id })
 			.then(({ custom: editable, ...layout }) => {
 				custom = editable;
 				viewer = new LayoutViewer(layout, app.sources.find(([type]) => type === 'xkb')?.[1] ?? null);

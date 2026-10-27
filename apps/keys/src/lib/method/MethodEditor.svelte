@@ -6,7 +6,7 @@
 	import UndoButtons from '#lib/shell/UndoButtons.svelte';
 	import { app } from '#lib/state/app.svelte.js';
 	import { toast } from '#lib/state/toast.svelte.js';
-	import { deleteMethod, exportMethod, openMethod, useMethod } from './api';
+	import { commands } from '#lib/bindings.js';
 	import { MethodEditor, type Tab } from './editor.svelte';
 	import EntryTable from './EntryTable.svelte';
 	import MethodSettings from './MethodSettings.svelte';
@@ -29,7 +29,7 @@
 	let editor = $state<MethodEditor | null>(null);
 
 	onMount(() => {
-		openMethod(id)
+		commands.methodOpen({ id })
 			.then((method) => (editor = new MethodEditor(method, () => void app.refresh())))
 			.catch((error) => {
 				toast.fail(error);
@@ -48,7 +48,7 @@
 
 	async function remove() {
 		editor?.discard();
-		await deleteMethod(id);
+		await commands.methodDelete({ id });
 		await app.removed();
 	}
 </script>
@@ -63,8 +63,8 @@
 			<SourceActions
 				selection={{ kind: 'method', id }}
 				what="input method"
-				onuse={() => useMethod(id)}
-				exports={[{ label: 'Export input method', run: () => exportMethod(id) }]}
+				onuse={() => commands.methodUse({ id })}
+				exports={[{ label: 'Export input method', run: () => commands.methodExport({ id }) }]}
 				onremove={remove}
 			/>
 		{/snippet}

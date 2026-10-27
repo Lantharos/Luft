@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { systemTable, type DeadKey, type Symbol } from '../api';
+	import { commands } from '#lib/bindings.js';
+	import type { DeadKey, Symbol } from '#lib/bindings.js';
 	import type { LayoutEditor } from '../editor.svelte';
 	import DeadKeyHeader from './DeadKeyHeader.svelte';
 	import PairGrid from './PairGrid.svelte';
@@ -17,7 +18,7 @@
 	let where = $derived(whereIs(editor.layout.keys, symbol.keysym));
 
 	onMount(() => {
-		void systemTable(symbol.keysym).then(({ spacing, pairs }) => {
+		void commands.layoutSystemTable({ keysym: symbol.keysym }).then(({ spacing, pairs }) => {
 			table = { keysym: symbol.keysym, name: standardName(symbol.keysym), symbol: symbol.text, spacing, pairs };
 		});
 	});

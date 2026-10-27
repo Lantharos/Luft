@@ -1,8 +1,10 @@
 <script lang="ts">
 	import Plus from '@lucide/svelte/icons/plus';
 	import { Popover, SearchField, tooltip, VirtualScroller } from '@luft/ui';
-	import { search, type Character } from '#lib/characters/characters.js';
-	import { describeKeysym, describeText, EMPTY, specials, type Specials, type Symbol } from '../api';
+	import { search } from '#lib/characters/characters.js';
+	import { commands } from '#lib/bindings.js';
+	import type { Character, Specials, Symbol } from '#lib/bindings.js';
+	import { EMPTY } from '#lib/layout/levels.js';
 	import { deadSymbol } from '../dead/table';
 	import type { LayoutEditor } from '../editor.svelte';
 
@@ -23,7 +25,7 @@
 	let extras = $state.raw<Specials | null>(null);
 	let field = $state<SearchField>();
 
-	void specials().then((loaded) => (extras = loaded));
+	void commands.layoutSpecials().then((loaded) => (extras = loaded));
 
 	$effect(() => {
 		const current = query;
@@ -32,7 +34,7 @@
 		});
 		named = null;
 		if (KEYSYM_NAME.test(current.trim())) {
-			void describeKeysym(current.trim())
+			void commands.layoutDescribe({ keysym: current.trim() })
 				.then((symbol) => {
 					if (current === query) named = symbol;
 				})
@@ -51,7 +53,7 @@
 	}
 
 	async function pickText(text: string) {
-		onpick(await describeText(text));
+		onpick(await commands.layoutDescribe({ text }));
 	}
 
 	function keydown(event: KeyboardEvent) {

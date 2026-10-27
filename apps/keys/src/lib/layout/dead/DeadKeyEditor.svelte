@@ -2,7 +2,7 @@
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
 	import Keyboard from '@lucide/svelte/icons/keyboard';
 	import { MenuButton, MenuItem, MenuSeparator, tooltip } from '@luft/ui';
-	import type { DeadKey } from '../api';
+	import type { DeadKey } from '#lib/bindings.js';
 	import type { LayoutEditor } from '../editor.svelte';
 	import DeadKeyDetails from './DeadKeyDetails.svelte';
 	import DeadKeyHeader from './DeadKeyHeader.svelte';

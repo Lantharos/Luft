@@ -1,39 +1,40 @@
+import { events as sabineEvents } from '@lantharos/sabine';
 import { appearance } from '@luft/ui';
-import { activationTargets, appState, inputSources, onActivated, openFile, type Source, type Targets } from '#lib/bridge/index.js';
-import { listLayouts, type Entry } from '#lib/layout/api.js';
-import { ENGINE_PREFIX, listMethods, type Summary } from '#lib/method/api.js';
+import { commands } from '#lib/bindings.js';
+import type { LayoutEntry, Summary, Targets } from '#lib/bindings.js';
 import { toast } from './toast.svelte';
 
 const LINK_SCHEME = 'kestrel-keys:';
+const ENGINE_PREFIX = 'keys:';
 
 export type Selection = { kind: 'layout'; id: string } | { kind: 'method'; id: string } | { kind: 'view'; id: string };
 export type Creating = { kind: 'layout'; from: string | null } | { kind: 'method' };
 
 class AppStore {
-	layouts = $state.raw<Entry[]>([]);
+	layouts = $state.raw<LayoutEntry[]>([]);
 	methods = $state.raw<Summary[]>([]);
-	sources = $state.raw<Source[]>([]);
+	sources = $state.raw<[string, string][]>([]);
 	selection = $state<Selection | null>(null);
 	creating = $state<Creating | null>(null);
 	focused = $state(false);
 
 	async start() {
-		const [state] = await Promise.all([appState(), this.refresh()]);
+		const [state] = await Promise.all([commands.appState(), this.refresh()]);
 		appearance.start(state);
 		this.selection ??= this.first();
 		await this.arrive(state);
 		this.focused = this.selection?.kind === 'view';
-		onActivated(async (activation) => void this.arrive(await activationTargets(activation)));
+		sabineEvents.singleInstance(async (activation) => void this.arrive(await commands.activationTargets(activation)));
 		window.addEventListener('focus', () => void this.refreshSources());
 	}
 
 	async refresh() {
-		[this.layouts, this.methods] = await Promise.all([listLayouts(), listMethods()]);
+		[this.layouts, this.methods] = await Promise.all([commands.layoutsList(), commands.methodsList()]);
 		await this.refreshSources();
 	}
 
 	async refreshSources() {
-		this.sources = await inputSources();
+		this.sources = await commands.inputSources();
 	}
 
 	inSources(selection: Selection) {
@@ -75,7 +76,7 @@ class AppStore {
 
 	async open(path: string) {
 		try {
-			const opened = await openFile(path);
+			const opened = await commands.openFile({ path });
 			await this.refresh();
 			this.select(opened);
 		} catch (error) {

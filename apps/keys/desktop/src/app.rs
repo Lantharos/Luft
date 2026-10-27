@@ -1,10 +1,9 @@
 use std::path::PathBuf;
 
 use luft_app::portal;
-use luft_app::{Activation, Appearance, Commands};
+use luft_app::{Activation, Appearance, Commands, Empty};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use specta::Type;
 
 use crate::compose::Reloader;
@@ -64,7 +63,7 @@ fn open_file(reloader: &Reloader, OpenFile { path }: OpenFile) -> Result<Opened,
     }
 }
 
-async fn app_state(_: Value) -> Result<AppState, String> {
+async fn app_state(Empty {}: Empty) -> Result<AppState, String> {
     Ok(AppState {
         appearance: Appearance::current().await,
         targets: Targets::from(&Activation::current_process()),
@@ -78,6 +77,6 @@ pub fn register(window: SabineWindow, reloader: &Reloader) -> SabineWindow {
             Ok(Targets::from(&activation))
         })
         .with("open_file", reloader, open_file)
-        .command("characters", |_: Value| Ok(characters::all()))
-        .command("input_sources", |_: Value| sources::list())
+        .command("characters", |Empty {}| Ok(characters::all()))
+        .command("input_sources", |Empty {}| sources::list())
 }

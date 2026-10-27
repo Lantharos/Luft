@@ -32,12 +32,12 @@ unsafe extern "C" {
 }
 
 #[derive(Serialize, Clone, Default, Type)]
-pub struct Effective {
+pub struct SystemTable {
     pub spacing: String,
     pub pairs: Vec<dead::Pair>,
 }
 
-static TABLES: OnceLock<HashMap<u32, Effective>> = OnceLock::new();
+static TABLES: OnceLock<HashMap<u32, SystemTable>> = OnceLock::new();
 
 pub fn locale() -> CString {
     let locale = ["LC_ALL", "LC_CTYPE", "LANG"]
@@ -76,9 +76,9 @@ pub fn entries(mut visit: impl FnMut(&[u32], &str)) {
     }
 }
 
-fn collect() -> HashMap<u32, Effective> {
+fn collect() -> HashMap<u32, SystemTable> {
     let space = xkb::Keysym::space.raw();
-    let mut tables: HashMap<u32, Effective> = HashMap::new();
+    let mut tables: HashMap<u32, SystemTable> = HashMap::new();
     entries(|sequence, text| {
         let &[first, second] = sequence else {
             return;
@@ -110,7 +110,7 @@ fn collect() -> HashMap<u32, Effective> {
     tables
 }
 
-pub fn table(keysym: &str) -> Effective {
+pub fn table(keysym: &str) -> SystemTable {
     let keysym = xkb::keysym_from_name(keysym, xkb::KEYSYM_NO_FLAGS).raw();
     TABLES
         .get_or_init(collect)

@@ -2,7 +2,8 @@
 	import { ownDeadKeysym } from '#lib/layout/dead/table.js';
 	import { toast } from '#lib/state/toast.svelte.js';
 	import TryField, { EDITING_KEYS } from '#lib/try/TryField.svelte';
-	import { tryMethod, tryMethodKey, tryMethodPick, type Shown } from './api';
+	import { commands } from '#lib/bindings.js';
+	import type { Shown } from '#lib/bindings.js';
 	import type { MethodEditor } from './editor.svelte';
 
 	interface Props {
@@ -51,7 +52,7 @@
 
 	async function press(key: string, text?: string) {
 		if (!text && ((!composing && key !== 'Compose') || !KEYSYMS[key])) return fallback(key);
-		const next = await tryMethodKey({ text, keysym: text ? undefined : KEYSYMS[key], before: field?.before() ?? '' });
+		const next = await commands.methodTryKey({ text, keysym: text ? undefined : KEYSYMS[key], before: field?.before() ?? '' });
 		show(next);
 		if (!next.handled) fallback(key, text);
 	}
@@ -68,13 +69,13 @@
 	}
 
 	function pick(index: number) {
-		queue(async () => show(await tryMethodPick(index)));
+		queue(async () => show(await commands.methodTryPick({ index })));
 	}
 
 	function settle() {
 		shown = null;
 		field?.finish();
-		void tryMethod(editor.snapshot());
+		void commands.methodTry(editor.snapshot());
 	}
 </script>
 

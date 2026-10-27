@@ -23,7 +23,7 @@ pub enum AltGr {
 
 #[derive(Serialize, Deserialize, Clone, Copy, Default, PartialEq, Eq, Debug, Type)]
 #[serde(rename_all = "lowercase")]
-pub enum Compose {
+pub enum ComposeKey {
     #[default]
     None,
     Ralt,
@@ -37,7 +37,7 @@ pub enum Compose {
 
 #[derive(Serialize, Deserialize, Clone, Copy, Default, PartialEq, Eq, Debug, Type)]
 #[serde(rename_all = "lowercase")]
-pub enum Caps {
+pub enum CapsLock {
     #[default]
     Capslock,
     Shiftlock,
@@ -53,9 +53,9 @@ pub struct Options {
     #[serde(default)]
     pub altgr: AltGr,
     #[serde(default)]
-    pub compose: Compose,
+    pub compose: ComposeKey,
     #[serde(default)]
-    pub caps: Caps,
+    pub caps: CapsLock,
 }
 
 #[derive(Serialize, Deserialize, Default)]
@@ -82,26 +82,26 @@ impl Options {
             });
         }
         includes.extend(match self.compose {
-            Compose::None => None,
-            Compose::Ralt => Some("compose(ralt)"),
-            Compose::Rctrl => Some("compose(rctrl)"),
-            Compose::Menu => Some("compose(menu)"),
-            Compose::Rwin => Some("compose(rwin)"),
-            Compose::Caps => Some("compose(caps)"),
-            Compose::Sclk => Some("compose(sclk)"),
-            Compose::Prsc => Some("compose(prsc)"),
+            ComposeKey::None => None,
+            ComposeKey::Ralt => Some("compose(ralt)"),
+            ComposeKey::Rctrl => Some("compose(rctrl)"),
+            ComposeKey::Menu => Some("compose(menu)"),
+            ComposeKey::Rwin => Some("compose(rwin)"),
+            ComposeKey::Caps => Some("compose(caps)"),
+            ComposeKey::Sclk => Some("compose(sclk)"),
+            ComposeKey::Prsc => Some("compose(prsc)"),
         });
         let caps_taken =
-            self.compose == Compose::Caps || (third_level && self.altgr == AltGr::Caps);
+            self.compose == ComposeKey::Caps || (third_level && self.altgr == AltGr::Caps);
         if !caps_taken {
             includes.extend(match self.caps {
-                Caps::Capslock => None,
-                Caps::Shiftlock => Some("capslock(shiftlock)"),
-                Caps::Escape => Some("capslock(escape)"),
-                Caps::Swapescape => Some("capslock(swapescape)"),
-                Caps::Backspace => Some("capslock(backspace)"),
-                Caps::Ctrl => Some("ctrl(nocaps)"),
-                Caps::None => Some("capslock(none)"),
+                CapsLock::Capslock => None,
+                CapsLock::Shiftlock => Some("capslock(shiftlock)"),
+                CapsLock::Escape => Some("capslock(escape)"),
+                CapsLock::Swapescape => Some("capslock(swapescape)"),
+                CapsLock::Backspace => Some("capslock(backspace)"),
+                CapsLock::Ctrl => Some("ctrl(nocaps)"),
+                CapsLock::None => Some("capslock(none)"),
             });
         }
         includes

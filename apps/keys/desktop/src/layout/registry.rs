@@ -12,11 +12,11 @@ use crate::paths;
 
 const EMPTY_PLACEHOLDER: &str = "custom";
 
-static SYSTEM: OnceLock<Vec<Entry>> = OnceLock::new();
+static SYSTEM: OnceLock<Vec<LayoutEntry>> = OnceLock::new();
 
 #[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct Entry {
+pub struct LayoutEntry {
     pub id: String,
     pub name: String,
     pub short: String,
@@ -30,7 +30,7 @@ fn text<'a>(node: Node<'a, 'a>, tag: &str) -> &'a str {
         .map_or("", str::trim)
 }
 
-fn entry(node: Node, id: impl FnOnce(&str) -> String) -> Option<Entry> {
+fn entry(node: Node, id: impl FnOnce(&str) -> String) -> Option<LayoutEntry> {
     let item = node
         .children()
         .find(|child| child.has_tag_name("configItem"))?;
@@ -44,7 +44,7 @@ fn entry(node: Node, id: impl FnOnce(&str) -> String) -> Option<Entry> {
         .find(|child| child.has_tag_name("iso639Id"))
         .and_then(|child| child.text())
         .unwrap_or_default();
-    Some(Entry {
+    Some(LayoutEntry {
         id: id(name),
         name: description.to_owned(),
         short: text(item, "shortDescription").to_owned(),
@@ -52,7 +52,7 @@ fn entry(node: Node, id: impl FnOnce(&str) -> String) -> Option<Entry> {
     })
 }
 
-fn parse(path: &Path, variants: bool) -> Vec<Entry> {
+fn parse(path: &Path, variants: bool) -> Vec<LayoutEntry> {
     let Ok(xml) = fs::read_to_string(path) else {
         return Vec::new();
     };
@@ -84,7 +84,7 @@ fn parse(path: &Path, variants: bool) -> Vec<Entry> {
     entries
 }
 
-pub fn system() -> &'static [Entry] {
+pub fn system() -> &'static [LayoutEntry] {
     SYSTEM.get_or_init(|| {
         let mut entries = parse(&Path::new(paths::SYSTEM_XKB).join("rules/evdev.xml"), true);
         entries.retain(|entry| entry.id != EMPTY_PLACEHOLDER);
@@ -93,7 +93,7 @@ pub fn system() -> &'static [Entry] {
     })
 }
 
-pub fn user() -> Vec<Entry> {
+pub fn user() -> Vec<LayoutEntry> {
     parse(&paths::user_rules(), false)
 }
 
@@ -104,7 +104,7 @@ fn escape(text: &str) -> String {
         .replace('"', "&quot;")
 }
 
-pub fn write(entries: &[Entry]) -> Result<(), String> {
+pub fn write(entries: &[LayoutEntry]) -> Result<(), String> {
     let mut xml = String::from(
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE xkbConfigRegistry SYSTEM \"xkb.dtd\">\n<xkbConfigRegistry version=\"1.1\">\n  <layoutList>\n",
     );

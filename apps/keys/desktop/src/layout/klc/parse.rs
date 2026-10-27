@@ -229,12 +229,7 @@ pub fn parse(text: &str) -> Result<Klc, String> {
     let keys = raw
         .keys
         .iter()
-        .map(|(key, levels)| {
-            (
-                (*key).to_owned(),
-                levels.iter().map(|level| symbol(*level)).collect(),
-            )
-        })
+        .map(|(key, levels)| ((*key).to_owned(), levels.map(symbol)))
         .collect();
     Ok(Klc {
         name: raw.name,

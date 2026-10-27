@@ -12,11 +12,11 @@ mod tester;
 use std::fs;
 use std::path::Path;
 
-use luft_app::Commands;
 use luft_app::portal::{self, FileChooser, Filter};
+use luft_app::{Commands, Empty};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
+use specta::Type;
 use tokio::task::spawn_blocking;
 
 use crate::compose::{Reloader, sequences, system};
@@ -24,8 +24,7 @@ use crate::{paths, sources};
 use compile::Keys;
 pub use dead::DeadKey;
 use meta::Options;
-use registry::Entry;
-use specta::Type;
+use registry::LayoutEntry;
 use store::{Draft, Origin};
 use symbol::Symbol;
 use tester::Tester;
@@ -62,7 +61,7 @@ struct Describe {
 
 #[derive(Deserialize, Type)]
 #[serde(rename_all = "lowercase")]
-enum Format {
+enum ExportFormat {
     Symbols,
     Keymap,
     Compose,
@@ -72,7 +71,7 @@ enum Format {
 #[derive(Deserialize, Type)]
 struct Export {
     id: String,
-    format: Format,
+    format: ExportFormat,
 }
 
 #[derive(Deserialize, Type)]
@@ -88,7 +87,7 @@ struct FreeKeysym {
 }
 
 #[derive(Deserialize, Type)]
-struct SystemTable {
+struct Keysym {
     keysym: String,
 }
 
@@ -146,7 +145,7 @@ pub fn import_path(path: &Path, reloader: &Reloader) -> Result<Layout, String> {
     )
 }
 
-async fn import(reloader: Reloader, _: Value) -> Result<Option<Layout>, String> {
+async fn import(reloader: Reloader, Empty {}: Empty) -> Result<Option<Layout>, String> {
     let chosen = portal::open_file(
         "Import a layout",
         Filter {
@@ -164,21 +163,21 @@ async fn import(reloader: Reloader, _: Value) -> Result<Option<Layout>, String> 
         .map(Some)
 }
 
-fn contents(id: String, format: Format) -> Result<(Vec<u8>, String), String> {
+fn contents(id: String, format: ExportFormat) -> Result<(Vec<u8>, String), String> {
     Ok(match format {
-        Format::Symbols => (
+        ExportFormat::Symbols => (
             fs::read(paths::user_symbols().join(&id)).map_err(|error| error.to_string())?,
             id.clone(),
         ),
-        Format::Keymap => (
+        ExportFormat::Keymap => (
             compile::layout(&id)?.text().into_bytes(),
             format!("{id}.xkb"),
         ),
-        Format::Compose => (
+        ExportFormat::Compose => (
             sequences::of(&store::open(&id)?).into_bytes(),
             format!("{id}.XCompose"),
         ),
-        Format::Klc => (
+        ExportFormat::Klc => (
             klc::encode(&klc::write(&store::open(&id)?)),
             format!("{id}.klc"),
         ),
@@ -208,12 +207,13 @@ async fn export(Export { id, format }: Export) -> Result<bool, String> {
 pub fn register(window: SabineWindow, reloader: &Reloader) -> SabineWindow {
     let tester = Tester::start();
     window
-        .command("layouts_list", |_: Value| -> Result<Vec<Entry>, String> {
-            Ok(store::list())
-        })
+        .command(
+            "layouts_list",
+            |Empty {}| -> Result<Vec<LayoutEntry>, String> { Ok(store::list()) },
+        )
         .command(
             "layouts_system",
-            |_: Value| -> Result<&'static [Entry], String> { Ok(registry::system()) },
+            |Empty {}| -> Result<&'static [LayoutEntry], String> { Ok(registry::system()) },
         )
         .command("layout_open", |Id { id }| store::open(&id))
         .command("layout_view", |Id { id }| store::view(&id))
@@ -232,7 +232,7 @@ pub fn register(window: SabineWindow, reloader: &Reloader) -> SabineWindow {
         .with_async("layout_import", reloader, import)
         .command_async("layout_export", export)
         .command("layout_describe", describe)
-        .command("layout_specials", |_: Value| {
+        .command("layout_specials", |Empty {}| {
             Ok(Specials {
                 dead: symbol::dead_keys(),
                 compose: symbol::compose(),
@@ -241,7 +241,7 @@ pub fn register(window: SabineWindow, reloader: &Reloader) -> SabineWindow {
         .command("layout_free_keysym", |FreeKeysym { id, taken }| {
             store::free_keysym(&id, &taken)
         })
-        .command("layout_system_table", |SystemTable { keysym }| {
+        .command("layout_system_table", |Keysym { keysym }| {
             Ok::<_, String>(system::table(&keysym))
         })
         .with("layout_try", &tester, |tester, layout: Layout| {

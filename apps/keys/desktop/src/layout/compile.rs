@@ -10,7 +10,7 @@ use super::keys::{EDITABLE, LEVELS};
 use super::symbol::Symbol;
 use crate::paths;
 
-pub type Keys = BTreeMap<String, Vec<Symbol>>;
+pub type Keys = BTreeMap<String, [Symbol; LEVELS]>;
 
 const RULES: &str = "evdev";
 const MODEL: &str = "pc105";
@@ -114,23 +114,21 @@ impl Compiled {
                     .iter()
                     .map(|state| state.key_get_level(key, 0))
                     .collect();
-                let symbols = (0..LEVELS)
-                    .map(|index| {
-                        let repeats = match index {
-                            1 => levels[1] == levels[0],
-                            2 => levels[2] == levels[0],
-                            3 => levels[3] == levels[2] || levels[3] == levels[1],
-                            _ => false,
-                        };
-                        if repeats {
-                            return Symbol::empty();
-                        }
-                        keymap
-                            .key_get_syms_by_level(key, 0, levels[index])
-                            .first()
-                            .map_or_else(Symbol::empty, |keysym| Symbol::from_keysym(*keysym))
-                    })
-                    .collect::<Vec<_>>();
+                let symbols: [Symbol; LEVELS] = std::array::from_fn(|index| {
+                    let repeats = match index {
+                        1 => levels[1] == levels[0],
+                        2 => levels[2] == levels[0],
+                        3 => levels[3] == levels[2] || levels[3] == levels[1],
+                        _ => false,
+                    };
+                    if repeats {
+                        return Symbol::empty();
+                    }
+                    keymap
+                        .key_get_syms_by_level(key, 0, levels[index])
+                        .first()
+                        .map_or_else(Symbol::empty, |keysym| Symbol::from_keysym(*keysym))
+                });
                 symbols
                     .iter()
                     .any(|symbol| !symbol.is_empty())

@@ -4,7 +4,8 @@
 	import { Dialog, SearchField, TextField, VirtualScroller, type VirtualHandle } from '@luft/ui';
 	import { app } from '#lib/state/app.svelte.js';
 	import { toast } from '#lib/state/toast.svelte.js';
-	import { createLayout, importLayout, systemLayouts, type Entry, type Layout, type Origin } from './api';
+	import { commands } from '#lib/bindings.js';
+	import type { Layout, LayoutEntry, Origin } from '#lib/bindings.js';
 
 	interface Props {
 		from: string | null;
@@ -20,7 +21,7 @@
 		origin: Origin;
 	}
 
-	let system = $state.raw<Entry[]>([]);
+	let system = $state.raw<LayoutEntry[]>([]);
 	let query = $state('');
 	let typed = $state<string | null>(null);
 	let chosen = $state<Choice | null>(null);
@@ -38,7 +39,7 @@
 		return needle ? choices.filter((choice) => choice.name.toLowerCase().includes(needle)) : choices;
 	});
 
-	void systemLayouts().then(async (layouts) => {
+	void commands.layoutsSystem().then(async (layouts) => {
 		system = layouts;
 		const preferred = from ?? app.sources.find(([type]) => type === 'xkb')?.[1] ?? 'us';
 		const found = choices.find((choice) => choice.origin.id === preferred);
@@ -61,7 +62,7 @@
 		if (!chosen || busy) return;
 		busy = true;
 		try {
-			oncreated(await createLayout(name, chosen.origin));
+			oncreated(await commands.layoutCreate({ name, from: chosen.origin }));
 		} catch (error) {
 			toast.fail(error);
 		} finally {
@@ -71,7 +72,7 @@
 
 	async function importFile() {
 		try {
-			const imported = await importLayout();
+			const imported = await commands.layoutImport();
 			if (imported) oncreated(imported);
 		} catch (error) {
 			toast.fail(error);

@@ -11,7 +11,8 @@ use crate::check::rules;
 use crate::live::source::Source;
 use crate::plan::layout::{self, Role};
 use crate::plan::places;
-use crate::protocol::{Prepared, Report, Stage};
+use crate::protocol::Stage;
+use crate::protocol::answers::{Prepared, Report};
 use crate::windows::helper::Context;
 use crate::windows::helper::drive::storage::{
     BASIC_TYPE, ESP_TYPE, MSFT_Disk, MSFT_Partition, Storage,
@@ -54,7 +55,7 @@ pub fn now_prepared(storage: &Storage) -> Result<Prepared, String> {
         .ok_or_else(|| t!(L10N, "drive-partitions-gone"))
 }
 
-pub fn check(source: &Source) -> Result<Report<Facts>, String> {
+pub fn check(source: &Source) -> Result<Report, String> {
     let storage = Storage::open()?;
     let drive = windows_drive::find()?;
     let layout = storage.layout(&drive.volume)?;
@@ -90,7 +91,7 @@ pub fn check(source: &Source) -> Result<Report<Facts>, String> {
         outdated: found
             .live_path()
             .is_some_and(|live| live_system::outdated(&live, source)),
-        facts,
+        facts: Facts::Windows(facts),
     })
 }
 

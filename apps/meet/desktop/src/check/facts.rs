@@ -1,11 +1,11 @@
+use luft_meet::Layout;
 use luft_variant::Variant;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
-#[cfg(any(windows, test))]
-use crate::plan::places::Place;
+use super::places::Place;
 
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum Architecture {
     X64,
@@ -13,7 +13,7 @@ pub enum Architecture {
     Other,
 }
 
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum Firmware {
     Uefi,
@@ -27,8 +27,7 @@ pub enum Platform {
     Linux,
 }
 
-#[cfg(any(windows, test))]
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum Encryption {
     Off,
@@ -36,15 +35,14 @@ pub enum Encryption {
     Changing,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Device {
     pub name: String,
     pub vendor: u16,
 }
 
-#[cfg(any(windows, test))]
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 pub struct StartEntry {
     pub number: u16,
     pub name: String,
@@ -54,10 +52,9 @@ pub struct StartEntry {
 
 pub const BROADCOM: u16 = 0x14e4;
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Machine {
-    pub platform: Platform,
     pub architecture: Architecture,
     pub firmware: Firmware,
     pub gpt: bool,
@@ -75,10 +72,9 @@ impl Machine {
     }
 }
 
-#[cfg(any(windows, test))]
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct Facts {
+pub struct WindowsFacts {
     #[serde(flatten)]
     pub machine: Machine,
     pub encryption: Encryption,
@@ -91,4 +87,39 @@ pub struct Facts {
     pub windows_used: u64,
     pub most_room: u64,
     pub places: Vec<Place>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum Readable {
+    Yes,
+    Encrypted,
+    Combined,
+    Filesystem,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct LinuxPlace {
+    pub filesystem: String,
+    pub readable: Readable,
+    pub free: u64,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct LinuxFacts {
+    #[serde(flatten)]
+    pub machine: Machine,
+    pub system: String,
+    pub layout: Layout,
+    pub esp_free: Option<u64>,
+    pub place: LinuxPlace,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
+#[serde(tag = "platform", rename_all = "lowercase")]
+pub enum Facts {
+    Windows(WindowsFacts),
+    Linux(LinuxFacts),
 }

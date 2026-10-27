@@ -1,5 +1,5 @@
 use luft_i18n::t;
-use serde_json::Value;
+use serde::de::DeserializeOwned;
 
 pub use super::regional::hints;
 use super::{link, logs};
@@ -8,10 +8,11 @@ use crate::app::Events;
 use crate::app::job::Failed;
 use crate::check::facts::Platform;
 use crate::protocol::Call;
+use crate::protocol::answers::Belongings;
 
 pub const PLATFORM: Platform = Platform::Linux;
 
-pub fn call(events: &Events, call: Call) -> Result<Value, Failed> {
+pub fn call<T: DeserializeOwned>(events: &Events, call: Call) -> Result<T, Failed> {
     link::call(events, call)
 }
 
@@ -19,7 +20,7 @@ pub fn luft_installed() -> bool {
     false
 }
 
-pub fn belongings() -> Result<Value, Failed> {
+pub fn belongings() -> Result<Belongings, Failed> {
     Err(Failed::from(
         "Luft keeps your files in place on Linux, so there's nothing to pack.".to_owned(),
     ))

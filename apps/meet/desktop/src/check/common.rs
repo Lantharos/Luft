@@ -1,12 +1,13 @@
 use luft_i18n::t;
 use luft_variant::Variant;
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use super::facts::{Architecture, BROADCOM, Machine, Platform};
 use crate::L10N;
 const GIB: u64 = 1 << 30;
 
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum Level {
     Fine,
@@ -14,7 +15,7 @@ pub enum Level {
     Blocks,
 }
 
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum Topic {
     Processor,
@@ -33,7 +34,7 @@ pub enum Topic {
     System,
 }
 
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum Action {
     FirmwareSettings,
@@ -41,7 +42,7 @@ pub enum Action {
     ChooseIso,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Type)]
 pub struct Finding {
     pub topic: Topic,
     pub level: Level,
@@ -78,7 +79,7 @@ pub fn gib(bytes: u64) -> u64 {
     bytes.div_ceil(GIB)
 }
 
-pub fn processor(machine: &Machine) -> Finding {
+pub fn processor(machine: &Machine, platform: Platform) -> Finding {
     match machine.architecture {
         Architecture::X64 => finding(
             Topic::Processor,
@@ -95,7 +96,7 @@ pub fn processor(machine: &Machine) -> Finding {
         Architecture::Other => finding(
             Topic::Processor,
             Level::Blocks,
-            match machine.platform {
+            match platform {
                 Platform::Windows => t!(L10N, "check-processor-32-bit-windows"),
                 Platform::Linux => t!(L10N, "check-processor-32-bit-system"),
             },

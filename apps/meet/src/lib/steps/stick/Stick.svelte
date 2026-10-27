@@ -2,7 +2,7 @@
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import { t } from '@luft/i18n';
 	import { bytes } from '@luft/ui';
-	import type { Stick } from '#lib/bridge/stick.js';
+	import type { Stick } from '#lib/bindings.js';
 	import Frame from '#lib/components/Frame.svelte';
 	import Problem from '#lib/components/Problem.svelte';
 	import Confirm from '#lib/stick/Confirm.svelte';

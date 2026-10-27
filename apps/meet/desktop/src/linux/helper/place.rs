@@ -5,7 +5,7 @@ use luft_meet::Layout;
 
 use super::disks::{self, Block, Mount};
 use crate::L10N;
-use crate::check::linux::{Place, Readable};
+use crate::check::facts::{LinuxPlace, Readable};
 
 const HOME_FOLDER: &str = "/home/.luft-meet";
 const SYSTEM_FOLDER: &str = "/var/lib/luft-meet/live";
@@ -76,9 +76,9 @@ pub fn choose(blocks: &[Block], made: Option<&Path>) -> Result<Spot, String> {
 }
 
 impl Spot {
-    pub fn describe(&self) -> Place {
+    pub fn describe(&self) -> LinuxPlace {
         let parent = self.folder.parent().unwrap_or(Path::new("/"));
-        Place {
+        LinuxPlace {
             filesystem: self.mount.fstype.clone(),
             readable: self.readable,
             free: disks::free_space(parent).unwrap_or(0) + disks::used_by(&self.folder),

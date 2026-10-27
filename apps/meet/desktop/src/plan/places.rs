@@ -1,8 +1,7 @@
-use serde::{Deserialize, Serialize};
-
 use super::gap::gaps;
 use super::layout::{Disk as PlanDisk, Span, Windows, most_room};
 use super::sizes::{ALIGNMENT, MIB, align_down, smallest_luft};
+use crate::check::places::{Contents, Drive, Place, PlaceKind};
 use crate::stick::drives::windows::{Disk, Partition, Storage};
 
 pub const WINDOWS: &str = "windows";
@@ -11,44 +10,6 @@ const ESP_TYPE: &str = "{c12a7328-f81f-11d2-ba4b-00a0c93ec93b}";
 const RESERVED_TYPE: &str = "{e3c9e316-0b5c-4db8-817d-f92df00215ae}";
 const RESERVED_ROOM: u64 = 128 * MIB;
 const NOT_INTERNAL: [u16; 6] = [7, 12, 13, 14, 15, 16];
-
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
-#[serde(rename_all = "camelCase")]
-pub enum Kind {
-    Windows,
-    Free,
-    Whole,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
-#[serde(rename_all = "camelCase")]
-pub struct Contents {
-    pub label: Option<String>,
-    pub letter: Option<String>,
-    pub filesystem: Option<String>,
-    pub size: u64,
-    pub bitlocker: bool,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
-#[serde(rename_all = "camelCase")]
-pub struct Drive {
-    pub name: String,
-    pub size: u64,
-    pub windows: bool,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
-#[serde(rename_all = "camelCase")]
-pub struct Place {
-    pub id: String,
-    pub kind: Kind,
-    pub drive: Drive,
-    pub free: u64,
-    pub smallest: u64,
-    pub most: u64,
-    pub contents: Vec<Contents>,
-}
 
 pub struct Inputs<'a> {
     pub storage: &'a Storage,
@@ -161,7 +122,7 @@ fn beside_windows(inputs: &Inputs, disk: &Disk) -> Option<Place> {
     let smallest = smallest.max(free);
     (most >= smallest).then(|| Place {
         id: WINDOWS.to_owned(),
-        kind: Kind::Windows,
+        kind: PlaceKind::Windows,
         drive: drive(disk, true),
         free,
         smallest,
@@ -174,7 +135,7 @@ fn in_gap(inputs: &Inputs, disk: &Disk, gap: Span, windows: bool) -> Option<Plac
     let room = align_down(gap.size.saturating_sub(inputs.live));
     (room >= smallest_luft(esp_size(inputs.storage, disk.Number))).then(|| Place {
         id: format!("free:{}:{}", disk.id(), gap.offset),
-        kind: Kind::Free,
+        kind: PlaceKind::Free,
         drive: drive(disk, windows),
         free: room,
         smallest: room,
@@ -190,7 +151,7 @@ fn whole(inputs: &Inputs, disk: &Disk) -> Option<Place> {
         && (disk.PartitionStyle != GPT || !inputs.storage.partitions_of(disk.Number).is_empty());
     (erasable && room >= smallest_luft(0)).then(|| Place {
         id: format!("whole:{}", disk.id()),
-        kind: Kind::Whole,
+        kind: PlaceKind::Whole,
         drive: drive(disk, false),
         free: 0,
         smallest: room,
@@ -308,7 +269,7 @@ mod tests {
         let storage = storage();
         let places = find(&inputs(&storage, &[]));
         let beside = &places[0];
-        assert_eq!(beside.kind, Kind::Windows);
+        assert_eq!(beside.kind, PlaceKind::Windows);
         let after = 1017314803712 - windows(&storage).partition.end();
         assert_eq!(beside.free, align_down(after - 4 * GIB));
         assert_eq!(beside.smallest, beside.free);
@@ -322,7 +283,7 @@ mod tests {
         let places = find(&inputs(&storage, &protected));
         let erasable: Vec<&Place> = places
             .iter()
-            .filter(|place| place.kind == Kind::Whole)
+            .filter(|place| place.kind == PlaceKind::Whole)
             .collect();
         assert_eq!(erasable.len(), 1);
         assert_eq!(erasable[0].drive.name, "WDC WD20EZBX-00AYRA0");
@@ -347,7 +308,7 @@ mod tests {
         let storage = storage();
         let places = find(&inputs(&storage, &[]));
         assert!(places.iter().all(|place| {
-            place.kind == Kind::Windows || place.drive.name == "WDC WD20EZBX-00AYRA0"
+            place.kind == PlaceKind::Windows || place.drive.name == "WDC WD20EZBX-00AYRA0"
         }));
     }
 
@@ -360,11 +321,11 @@ mod tests {
         let places = find(&inputs(&storage, &[]));
         let free = places
             .iter()
-            .find(|place| place.kind == Kind::Free)
+            .find(|place| place.kind == PlaceKind::Free)
             .unwrap();
         assert_eq!(free.smallest, free.most);
         assert_eq!(free.most, align_down(2000398934016 - 2 * MIB - 4 * GIB));
-        assert!(!places.iter().any(|place| place.kind == Kind::Whole));
+        assert!(!places.iter().any(|place| place.kind == PlaceKind::Whole));
         let Some(Target::Gap { disk, span }) = target(&storage, &free.id) else {
             panic!("the place leads back to its gap");
         };
@@ -376,6 +337,10 @@ mod tests {
         let storage = storage();
         let mut inputs = inputs(&storage, &[]);
         inputs.iso_disk = Some(3);
-        assert!(!find(&inputs).iter().any(|place| place.kind == Kind::Whole));
+        assert!(
+            !find(&inputs)
+                .iter()
+                .any(|place| place.kind == PlaceKind::Whole)
+        );
     }
 }

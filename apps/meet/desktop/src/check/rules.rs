@@ -4,12 +4,12 @@ use super::common::{
     Action, Finding, LIVE_ESTIMATE, Level, Topic, download, finding, gib, graphics, processor,
     secure_boot, tpm, wifi,
 };
-use super::facts::{Encryption, Facts, Firmware};
+use super::facts::{Encryption, Firmware, Platform, WindowsFacts};
+use super::places::{Place, PlaceKind};
 use crate::L10N;
-use crate::plan::places::{Kind, Place};
 use crate::plan::sizes::smallest_luft;
 
-fn startup(facts: &Facts) -> Finding {
+fn startup(facts: &WindowsFacts) -> Finding {
     match (facts.machine.firmware, facts.machine.gpt) {
         (Firmware::Uefi, true) => finding(
             Topic::Startup,
@@ -32,7 +32,7 @@ fn startup(facts: &Facts) -> Finding {
     }
 }
 
-fn encryption(facts: &Facts) -> Finding {
+fn encryption(facts: &WindowsFacts) -> Finding {
     match facts.encryption {
         Encryption::Off => finding(
             Topic::Encryption,
@@ -55,7 +55,7 @@ fn encryption(facts: &Facts) -> Finding {
     }
 }
 
-fn fast_startup(facts: &Facts) -> Finding {
+fn fast_startup(facts: &WindowsFacts) -> Finding {
     if facts.fast_startup {
         finding(
             Topic::FastStartup,
@@ -75,12 +75,12 @@ fn fast_startup(facts: &Facts) -> Finding {
 
 fn elsewhere(place: &Place) -> String {
     match place.kind {
-        Kind::Whole => t!(
+        PlaceKind::Whole => t!(
             L10N,
             "check-space-erase-drive",
             drive = place.drive.name.as_str()
         ),
-        Kind::Windows | Kind::Free => {
+        PlaceKind::Windows | PlaceKind::Free => {
             t!(
                 L10N,
                 "check-space-other-drive",
@@ -90,18 +90,18 @@ fn elsewhere(place: &Place) -> String {
     }
 }
 
-fn space(facts: &Facts, live: u64) -> Finding {
+fn space(facts: &WindowsFacts, live: u64) -> Finding {
     let needed = smallest_luft(facts.esp_size) + live;
     let free = facts
         .places
         .iter()
-        .find(|place| place.kind == Kind::Windows)
+        .find(|place| place.kind == PlaceKind::Windows)
         .map_or(0, |place| place.free);
     let other = facts
         .places
         .iter()
-        .filter(|place| place.kind != Kind::Windows)
-        .max_by_key(|place| (place.kind == Kind::Free, place.most));
+        .filter(|place| place.kind != PlaceKind::Windows)
+        .max_by_key(|place| (place.kind == PlaceKind::Free, place.most));
     if facts.most_room >= needed {
         finding(
             Topic::Space,
@@ -139,7 +139,7 @@ fn space(facts: &Facts, live: u64) -> Finding {
     }
 }
 
-fn start_entries(facts: &Facts) -> Option<Finding> {
+fn start_entries(facts: &WindowsFacts) -> Option<Finding> {
     let names: Vec<&str> = facts
         .start_entries
         .iter()
@@ -159,9 +159,9 @@ fn start_entries(facts: &Facts) -> Option<Finding> {
     Some(finding(Topic::StartEntries, Level::Note, title, detail).with(Action::Tidy))
 }
 
-pub fn evaluate(facts: &Facts, live: Option<u64>) -> Vec<Finding> {
+pub fn evaluate(facts: &WindowsFacts, live: Option<u64>) -> Vec<Finding> {
     let mut findings = vec![
-        processor(&facts.machine),
+        processor(&facts.machine, Platform::Windows),
         startup(facts),
         space(facts, live.unwrap_or(LIVE_ESTIMATE)),
         encryption(facts),
@@ -178,15 +178,14 @@ pub fn evaluate(facts: &Facts, live: Option<u64>) -> Vec<Finding> {
 
 #[cfg(test)]
 mod tests {
-    use super::super::facts::{Architecture, Device, Machine, Platform};
+    use super::super::facts::{Architecture, Device, Machine};
+    use super::super::places::Drive;
     use super::*;
-    use crate::plan::places::Drive;
     use crate::plan::sizes::GIB;
 
-    fn laptop() -> Facts {
-        Facts {
+    fn laptop() -> WindowsFacts {
+        WindowsFacts {
             machine: Machine {
-                platform: Platform::Windows,
                 architecture: Architecture::X64,
                 firmware: Firmware::Uefi,
                 gpt: true,
@@ -266,7 +265,7 @@ mod tests {
         facts.most_room = 10 * GIB;
         facts.places = vec![Place {
             id: "whole:3".into(),
-            kind: Kind::Whole,
+            kind: PlaceKind::Whole,
             drive: Drive {
                 name: "WDC WD20EZBX".into(),
                 size: 2000 * GIB,
@@ -306,9 +305,9 @@ mod tests {
     #[test]
     fn only_64_bit_uefi_pcs_with_gpt_can_start_luft() {
         for change in [
-            |facts: &mut Facts| facts.machine.architecture = Architecture::Arm64,
-            |facts: &mut Facts| facts.machine.firmware = Firmware::Bios,
-            |facts: &mut Facts| facts.machine.gpt = false,
+            |facts: &mut WindowsFacts| facts.machine.architecture = Architecture::Arm64,
+            |facts: &mut WindowsFacts| facts.machine.firmware = Firmware::Bios,
+            |facts: &mut WindowsFacts| facts.machine.gpt = false,
         ] {
             let mut facts = laptop();
             change(&mut facts);

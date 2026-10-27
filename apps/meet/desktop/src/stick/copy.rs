@@ -5,6 +5,7 @@ use std::path::{Path, PathBuf};
 use luft_i18n::t;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
+use specta::Type;
 
 use super::flash::Aligned;
 use super::{Image, read_back_matches};
@@ -15,14 +16,14 @@ const SETTLE_EVERY: u64 = 64 << 20;
 const SPARE: u64 = 16 << 20;
 const STAGED: &str = ".part";
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Older {
     pub name: String,
     pub size: u64,
 }
 
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum Fit {
     Beside,
@@ -30,7 +31,7 @@ pub enum Fit {
     No,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Room {
     pub free: u64,

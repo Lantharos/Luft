@@ -3,6 +3,7 @@ use std::path::Path;
 
 use luft_i18n::t;
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use super::Image;
 use crate::L10N;
@@ -10,7 +11,7 @@ use crate::live::cache;
 use crate::live::download::{self, Channel, Located, file_name, format_checksum};
 use crate::live::source::Source;
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Offer {
     pub name: String,

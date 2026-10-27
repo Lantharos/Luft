@@ -4,12 +4,14 @@ use luft_i18n::t;
 
 use super::{prepare, undo};
 use crate::L10N;
+use crate::check::places::Place;
 use crate::live::source::Source;
 use crate::plan::gap::{self, Head};
 use crate::plan::layout::{self, Disk, Role, Shortfall, Span, Windows};
-use crate::plan::places::{self, Inputs, Place, Target};
+use crate::plan::places::{self, Inputs, Target};
 use crate::plan::sizes;
-use crate::protocol::{Prepared, Stage};
+use crate::protocol::Stage;
+use crate::protocol::answers::Prepared;
 use crate::windows::helper::Context;
 use crate::windows::helper::drive::bitlocker::BitLocker;
 use crate::windows::helper::drive::snapshot;

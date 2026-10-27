@@ -1,8 +1,8 @@
 import { t } from '@luft/i18n';
 import { Toasts } from '@luft/ui';
-import { commands, events, type Channel, type Intent, type Packing, type Platform, type Progress, type Source, type Stage, type WindowsChoices } from '#lib/bindings.js';
+import { commands, events, type Action, type Channel, type Intent, type PlaceKind, type Platform, type Prepared, type Progress, type Report, type Source, type Stage, type WindowsChoices } from '#lib/bindings.js';
 import * as meet from '#lib/bridge/meet.js';
-import type { Action, PlaceKind, Prepared, Report } from '#lib/bridge/meet.js';
+import type { Packing } from '#lib/bridge/meet.js';
 
 export type Step = 'hello' | 'luft' | 'resize' | 'check' | 'room' | 'working' | 'ready' | 'box' | 'removed' | 'stick' | 'stickDone';
 export type Task =

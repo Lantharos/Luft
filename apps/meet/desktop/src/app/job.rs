@@ -1,14 +1,13 @@
 use std::sync::Arc;
 
-use sabine::{BridgeError, BridgeEvent, SabineWindow};
+use sabine::{BridgeError, SabineWindow};
+use serde::Serialize;
 use serde::de::DeserializeOwned;
-use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use specta::Type;
 
 use super::Events;
-
-pub const FINISHED: BridgeEvent<Finished> = BridgeEvent::new("meet.finished");
+use super::platform;
+use crate::protocol::Call;
 
 #[derive(Serialize, Clone, Copy, Type)]
 #[serde(rename_all = "camelCase")]
@@ -45,46 +44,68 @@ impl From<String> for Failed {
     }
 }
 
-#[derive(Deserialize, Type)]
-struct Started<Req> {
-    job: u64,
-    request: Req,
-}
-
 #[derive(Serialize, Type)]
 #[serde(untagged)]
-enum Outcome {
-    Done { value: Value },
+enum Outcome<T> {
+    Done { value: T },
     Failed(Failed),
 }
 
-#[derive(Serialize, Type)]
-pub struct Finished {
-    job: u64,
-    #[serde(flatten)]
-    outcome: Outcome,
+pub struct Jobs {
+    window: SabineWindow,
+    events: Events,
 }
 
-pub fn command<Req, F>(window: SabineWindow, name: &str, events: &Events, work: F) -> SabineWindow
-where
-    Req: DeserializeOwned + Type + Send + 'static,
-    F: Fn(&Events, Req) -> Result<Value, Failed> + Send + Sync + 'static,
-{
-    let events = events.clone();
-    let work = Arc::new(work);
-    window.bridge_typed(name, move |Started { job, request }: Started<Req>| {
-        let events = events.clone();
-        let work = work.clone();
-        std::thread::spawn(move || {
-            let outcome = match work(&events, request) {
-                Ok(value) => Outcome::Done { value },
-                Err(failed) => {
-                    sabine_runtime::report_error("meet", &failed.detail);
-                    Outcome::Failed(failed)
-                }
-            };
-            events.emit(FINISHED, Finished { job, outcome });
+impl Jobs {
+    pub fn new(window: SabineWindow, events: &Events) -> Self {
+        Self {
+            window,
+            events: events.clone(),
+        }
+    }
+
+    pub fn job<Req, Res, F>(self, name: &str, work: F) -> Self
+    where
+        Req: DeserializeOwned + Type + Send + 'static,
+        Res: Serialize + Type + Send + 'static,
+        F: Fn(&Events, Req) -> Result<Res, Failed> + Send + Sync + 'static,
+    {
+        let events = self.events.clone();
+        let work = Arc::new(work);
+        let window = self.window.bridge_typed_async(name, move |request: Req| {
+            let events = events.clone();
+            let work = work.clone();
+            async move {
+                let answer = tokio::task::spawn_blocking(move || work(&events, request))
+                    .await
+                    .map_err(|error| BridgeError::new(error.to_string()))?;
+                Ok(match answer {
+                    Ok(value) => Outcome::Done { value },
+                    Err(failed) => {
+                        sabine_runtime::report_error("meet", &failed.detail);
+                        Outcome::Failed(failed)
+                    }
+                })
+            }
         });
-        Ok::<_, BridgeError>(())
-    })
+        Self { window, ..self }
+    }
+
+    pub fn helped<Req, Res>(
+        self,
+        name: &str,
+        call: impl Fn(Req) -> Call + Send + Sync + 'static,
+    ) -> Self
+    where
+        Req: DeserializeOwned + Type + Send + 'static,
+        Res: DeserializeOwned + Serialize + Type + Send + 'static,
+    {
+        self.job(name, move |events, request| {
+            platform::call::<Res>(events, call(request))
+        })
+    }
+
+    pub fn window(self) -> SabineWindow {
+        self.window
+    }
 }

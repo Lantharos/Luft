@@ -6,7 +6,6 @@ use std::sync::{Arc, OnceLock};
 
 use sabine::{BridgeError, BridgeEvent, BridgeEventEmitter, SabineWindow, SingleInstancePolicy};
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use specta::Type;
 
 use crate::language;
@@ -14,9 +13,13 @@ use crate::language;
 use crate::linux::app as platform;
 use crate::live::download::Channel;
 use crate::live::source::Source;
-use crate::protocol::{Call, Progress};
+use crate::protocol::answers::{Installed, Prepared, Range, Report};
+use crate::protocol::{Call, Progress, Restarting};
+use crate::stick::Sticks;
+use crate::stick::copy::Room;
 #[cfg(windows)]
 use crate::windows::app as platform;
+use job::Jobs;
 
 const APP_ID: &str = "com.lantharos.meet";
 pub const TITLE: &str = "Meet Luft";
@@ -38,6 +41,11 @@ impl Events {
 #[derive(Deserialize, Type)]
 pub struct Empty {}
 
+#[derive(Deserialize, Type)]
+struct FileAt {
+    path: String,
+}
+
 fn source() -> Source {
     let channel = if std::env::args().any(|argument| argument == NIGHTLY) {
         Channel::Nightly
@@ -55,7 +63,6 @@ fn window(window: SabineWindow, events: &Events) -> SabineWindow {
         .single_instance_id(APP_ID)
         .single_instance(SingleInstancePolicy::FocusExisting)
         .bridge_event(&PROGRESS)
-        .bridge_event(&job::FINISHED)
         .bridge_typed("meet_source", |Empty {}| Ok::<_, BridgeError>(source()))
         .bridge_typed("meet_platform", |Empty {}| {
             Ok::<_, BridgeError>(platform::PLATFORM)
@@ -63,30 +70,41 @@ fn window(window: SabineWindow, events: &Events) -> SabineWindow {
         .bridge_typed("meet_locale", |Empty {}| {
             Ok::<_, BridgeError>(language::locale())
         });
-    let window = job::command(window, "meet_call", events, |events, call: Call| {
-        platform::call(events, call.with_hints(platform::hints))
-    });
-    let window = job::command(window, "meet_installed", events, |_, Empty {}| {
-        Ok(Value::Bool(platform::luft_installed()))
-    });
-    let window = job::command(window, "meet_belongings", events, |_, Empty {}| {
-        platform::belongings()
-    });
-    let window = job::command(window, "meet_save_logs", events, |_, Empty {}| {
-        Ok(platform::save_logs()?.map_or(Value::Null, Value::String))
-    });
-    let window = job::command(window, "meet_show_file", events, |_, path: String| {
-        platform::show_file(&path).map(|()| Value::Null)
-    });
-    let window = job::command(window, "meet_stick_offer", events, |_, asking| {
-        stick::offer(asking)
-    });
-    let window = job::command(window, "meet_make_stick", events, |events, making| {
-        stick::make(events, making, platform::call)
-    });
-    job::command(window, "meet_pick_iso", events, |_, Empty {}| {
-        Ok(platform::pick_iso().map_or(Value::Null, Value::String))
-    })
+    Jobs::new(window, events)
+        .helped::<_, Report>("meet_check", Call::Check)
+        .helped::<_, Prepared>("meet_prepare", Call::Prepare)
+        .helped::<_, Prepared>("meet_refresh", Call::Refresh)
+        .helped::<_, Prepared>("meet_pack", Call::Pack)
+        .helped::<_, ()>("meet_restart", |restarting: Restarting| {
+            Call::Restart(Restarting {
+                hints: platform::hints(),
+                ..restarting
+            })
+        })
+        .helped::<_, ()>("meet_tidy", |Empty {}| Call::Tidy)
+        .helped::<_, ()>("meet_firmware_settings", |Empty {}| Call::FirmwareSettings)
+        .helped::<_, ()>("meet_undo", |Empty {}| Call::Undo)
+        .helped::<_, Option<Installed>>("meet_luft", |Empty {}| Call::Luft)
+        .helped::<_, Option<Range>>("meet_luft_range", |Empty {}| Call::LuftRange)
+        .helped::<_, Installed>("meet_resize_luft", Call::ResizeLuft)
+        .helped::<_, Installed>("meet_cancel_resize", |Empty {}| Call::CancelResize)
+        .helped::<_, Installed>("meet_give_windows", |Empty {}| Call::GiveWindows)
+        .helped::<_, ()>("meet_start_luft", |Empty {}| Call::StartLuft)
+        .helped::<_, ()>("meet_remove_luft", |Empty {}| Call::RemoveLuft)
+        .helped::<_, Sticks>("meet_sticks", Call::Sticks)
+        .helped::<_, Room>("meet_ventoy_room", Call::VentoyRoom)
+        .job("meet_installed", |_, Empty {}| {
+            Ok(platform::luft_installed())
+        })
+        .job("meet_belongings", |_, Empty {}| platform::belongings())
+        .job("meet_save_logs", |_, Empty {}| platform::save_logs())
+        .job("meet_show_file", |_, FileAt { path }| {
+            platform::show_file(&path)
+        })
+        .job("meet_stick_offer", |_, sourced| stick::offer(sourced))
+        .job("meet_make_stick", stick::make)
+        .job("meet_pick_iso", |_, Empty {}| Ok(platform::pick_iso()))
+        .window()
 }
 
 pub fn run() {

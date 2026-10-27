@@ -2,7 +2,7 @@ use std::fs::{File, OpenOptions};
 use std::os::windows::io::FromRawHandle;
 
 use luft_i18n::t;
-use serde_json::Value;
+use serde::de::DeserializeOwned;
 use windows::Win32::Foundation::{CloseHandle, ERROR_CANCELLED, ERROR_PIPE_CONNECTED, HANDLE};
 use windows::Win32::Storage::FileSystem::{
     FILE_FLAG_FIRST_PIPE_INSTANCE, PIPE_ACCESS_INBOUND, PIPE_ACCESS_OUTBOUND,
@@ -154,6 +154,6 @@ fn start(events: &Events) -> Result<Helper, Failed> {
     }))
 }
 
-pub fn call(events: &Events, call: Call) -> Result<Value, Failed> {
+pub fn call<T: DeserializeOwned>(events: &Events, call: Call) -> Result<T, Failed> {
     calls::call(events, call, start)
 }

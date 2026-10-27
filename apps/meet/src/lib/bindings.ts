@@ -3,36 +3,92 @@
 import { invoke, listen, type InvokeOptions } from "@lantharos/sabine";
 
 export const commands = {
-	meetBelongings: (params: Started<Empty>, options?: InvokeOptions) => invoke<null>("meet_belongings", params, options),
-	meetCall: (params: Started<Call>, options?: InvokeOptions) => invoke<null>("meet_call", params, options),
-	meetInstalled: (params: Started<Empty>, options?: InvokeOptions) => invoke<null>("meet_installed", params, options),
+	meetBelongings: (options?: InvokeOptions) => invoke<Outcome<Belongings>>("meet_belongings", {}, options),
+	meetCancelResize: (options?: InvokeOptions) => invoke<Outcome<Installed>>("meet_cancel_resize", {}, options),
+	meetCheck: (params: {
+		source: Source,
+	}, options?: InvokeOptions) => invoke<Outcome<Report>>("meet_check", params, options),
+	meetFirmwareSettings: (options?: InvokeOptions) => invoke<Outcome<null>>("meet_firmware_settings", {}, options),
+	meetGiveWindows: (options?: InvokeOptions) => invoke<Outcome<Installed>>("meet_give_windows", {}, options),
+	meetInstalled: (options?: InvokeOptions) => invoke<Outcome<boolean>>("meet_installed", {}, options),
 	meetLocale: (options?: InvokeOptions) => invoke<Locale>("meet_locale", {}, options),
-	meetMakeStick: (params: Started<Making>, options?: InvokeOptions) => invoke<null>("meet_make_stick", params, options),
-	meetPickIso: (params: Started<Empty>, options?: InvokeOptions) => invoke<null>("meet_pick_iso", params, options),
+	meetLuft: (options?: InvokeOptions) => invoke<Outcome<Installed | null>>("meet_luft", {}, options),
+	meetLuftRange: (options?: InvokeOptions) => invoke<Outcome<Range | null>>("meet_luft_range", {}, options),
+	meetMakeStick: (params: {
+		source: Source,
+		stick: string,
+		way: Way,
+	}, options?: InvokeOptions) => invoke<Outcome<Finished>>("meet_make_stick", params, options),
+	meetPack: (params: {
+		folders?: ChosenFolder[],
+		wallpaper?: string | null,
+		account?: ChosenAccount | null,
+		wifi?: boolean,
+		bluetooth?: boolean,
+	}, options?: InvokeOptions) => invoke<Outcome<Prepared>>("meet_pack", params, options),
+	meetPickIso: (options?: InvokeOptions) => invoke<Outcome<string | null>>("meet_pick_iso", {}, options),
 	meetPlatform: (options?: InvokeOptions) => invoke<Platform>("meet_platform", {}, options),
-	meetSaveLogs: (params: Started<Empty>, options?: InvokeOptions) => invoke<null>("meet_save_logs", params, options),
-	meetShowFile: (params: Started<string>, options?: InvokeOptions) => invoke<null>("meet_show_file", params, options),
+	meetPrepare: (params: {
+		luft: number,
+		source: Source,
+		place?: string,
+	}, options?: InvokeOptions) => invoke<Outcome<Prepared>>("meet_prepare", params, options),
+	meetRefresh: (params: {
+		source: Source,
+	}, options?: InvokeOptions) => invoke<Outcome<Prepared>>("meet_refresh", params, options),
+	meetRemoveLuft: (options?: InvokeOptions) => invoke<Outcome<null>>("meet_remove_luft", {}, options),
+	meetResizeLuft: (params: {
+		size: number,
+	}, options?: InvokeOptions) => invoke<Outcome<Installed>>("meet_resize_luft", params, options),
+	meetRestart: (params: {
+		intent: Intent,
+		windows: WindowsChoices,
+		hints?: Hints,
+	}, options?: InvokeOptions) => invoke<Outcome<null>>("meet_restart", params, options),
+	meetSaveLogs: (options?: InvokeOptions) => invoke<Outcome<string | null>>("meet_save_logs", {}, options),
+	meetShowFile: (params: {
+		path: string,
+	}, options?: InvokeOptions) => invoke<Outcome<null>>("meet_show_file", params, options),
 	meetSource: (options?: InvokeOptions) => invoke<Source>("meet_source", {}, options),
-	meetStickOffer: (params: Started<Asking>, options?: InvokeOptions) => invoke<null>("meet_stick_offer", params, options),
+	meetStartLuft: (options?: InvokeOptions) => invoke<Outcome<null>>("meet_start_luft", {}, options),
+	meetStickOffer: (params: {
+		source: Source,
+	}, options?: InvokeOptions) => invoke<Outcome<Offer>>("meet_stick_offer", params, options),
+	meetSticks: (params: {
+		iso?: string | null,
+	}, options?: InvokeOptions) => invoke<Outcome<Sticks>>("meet_sticks", params, options),
+	meetTidy: (options?: InvokeOptions) => invoke<Outcome<null>>("meet_tidy", {}, options),
+	meetUndo: (options?: InvokeOptions) => invoke<Outcome<null>>("meet_undo", {}, options),
+	meetVentoyRoom: (params: {
+		stick: string,
+		needed: number,
+	}, options?: InvokeOptions) => invoke<Outcome<Room>>("meet_ventoy_room", params, options),
 };
 
 export const events = {
-	meetFinished: (callback: (payload: Finished) => void) => listen<Finished>("meet.finished", callback),
 	meetProgress: (callback: (payload: Progress) => void) => listen<Progress>("meet.progress", callback),
 };
 
-export type Asking = {
-	source: Source,
+export type Action = "firmwareSettings" | "tidy" | "chooseIso";
+
+export type Architecture = "x64" | "arm64" | "other";
+
+export type Belongings = {
+	folders: FoundFolder[],
+	wallpaper: string | null,
+	account: ChosenAccount,
 };
 
-export type Call = { call: "check"; source: Source } | { call: "prepare"; luft: number; source: Source; place?: string } | { call: "refresh"; source: Source } | { call: "pack"; belongings: Packing } | { call: "restart"; intent: Intent; windows: WindowsChoices; hints?: Hints } | { call: "tidy" } | { call: "firmwareSettings" } | { call: "undo" } | { call: "luft" } | { call: "luftRange" } | { call: "resizeLuft"; size: number } | { call: "cancelResize" } | { call: "giveWindows" } | { call: "startLuft" } | { call: "removeLuft" } | { call: "sticks"; iso?: string | null } | { call: "ventoyRoom"; stick: string; needed: number };
+export type Blocked = "busy" | "passphrase" | "apart" | "unreadable";
+
+export type Change = { change: "grow" } | { change: "shrink"; bytes: number } | { change: "trim"; bytes: number };
 
 export type Channel = "latest" | "nightly";
 
 export type ChosenAccount = {
 	fullName: string,
 	userName: string,
-	picture?: string | null,
+	picture: string | null,
 };
 
 export type ChosenFolder = {
@@ -40,7 +96,32 @@ export type ChosenFolder = {
 	path: string,
 };
 
-export type Empty = Record<string, never>;
+export type Contents = {
+	label: string | null,
+	letter: string | null,
+	filesystem: string | null,
+	size: number,
+	bitlocker: boolean,
+};
+
+export type Device = {
+	name: string,
+	vendor: number,
+};
+
+export type Drive = {
+	name: string,
+	size: number,
+	windows: boolean,
+};
+
+export type Encryption = "off" | "on" | "changing";
+
+export type Facts = {
+	platform: "windows",
+} & WindowsFacts | {
+	platform: "linux",
+} & LinuxFacts;
 
 export type Failed = {
 	failure: Failure,
@@ -49,17 +130,50 @@ export type Failed = {
 
 export type Failure = "declined" | "stopped";
 
+export type Finding = {
+	topic: Topic,
+	level: Level,
+	title: string,
+	detail: string,
+	action: Action | null,
+};
+
 export type Finished = {
-	job: number,
-} & Outcome;
+	ejected: boolean,
+};
+
+export type Firmware = "uefi" | "bios";
+
+export type Fit = "beside" | "replacing" | "no";
 
 export type FolderKind = "desktop" | "documents" | "downloads" | "music" | "pictures" | "videos";
+
+export type FoundFolder = {
+	kind: FolderKind,
+	path: string,
+	files: number,
+	bytes: number,
+};
 
 export type Hints = {
 	language?: string | null,
 	locale?: string | null,
 	timezone?: string | null,
 	keyboards?: Keyboard[],
+};
+
+export type Installed = {
+	drive: string,
+	besideWindows: boolean,
+	size: number,
+	allocated: number | null,
+	freeAfter: number,
+	windowsSize: number,
+	windowsUsed: number,
+	blocked: Blocked | null,
+	pending: Change | null,
+	windowsFree: number,
+	leftovers: boolean,
 };
 
 export type Intent = "try" | "install" | "replace";
@@ -69,29 +183,73 @@ export type Keyboard = {
 	variant?: string,
 };
 
+export type Layout = "subvolumes" | "separateHome" | "single" | "encrypted" | "unknown";
+
+export type Level = "fine" | "note" | "blocks";
+
+export type LinuxFacts = {
+	system: string,
+	layout: Layout,
+	espFree: number | null,
+	place: LinuxPlace,
+} & Machine;
+
+export type LinuxPlace = {
+	filesystem: string,
+	readable: Readable,
+	free: number,
+};
+
 export type Locale = {
 	languages: string[],
 	formats: string,
 	fixed: boolean,
 };
 
-export type Making = {
-	source: Source,
-	stick: string,
-	way: Way,
+export type Machine = {
+	architecture: Architecture,
+	firmware: Firmware,
+	gpt: boolean,
+	secureBoot: boolean | null,
+	opensSettings: boolean,
+	maker: string | null,
+	tpm: string | null,
+	graphics: Device[],
+	wifi: Device[],
 };
 
-export type Outcome = { value: Value } | Failed;
-
-export type Packing = {
-	folders?: ChosenFolder[],
-	wallpaper?: string | null,
-	account?: ChosenAccount | null,
-	wifi?: boolean,
-	bluetooth?: boolean,
+export type Offer = {
+	name: string,
+	size: number,
+	kept: boolean,
 };
+
+export type Older = {
+	name: string,
+	size: number,
+};
+
+export type Outcome<T> = { value: T } | Failed;
+
+export type Place = {
+	id: string,
+	kind: PlaceKind,
+	drive: Drive,
+	free: number,
+	smallest: number,
+	most: number,
+	contents: Contents[],
+};
+
+export type PlaceKind = "windows" | "free" | "whole";
 
 export type Platform = "windows" | "linux";
+
+export type Prepared = {
+	room: number,
+	movingBox: number | null,
+	drive: string | null,
+};
 
 export type Progress = {
 	stage: Stage,
@@ -99,16 +257,58 @@ export type Progress = {
 	total: number,
 };
 
+export type Range = {
+	smallest: number,
+	most: number,
+	leastGrow: number,
+	leastShrink: number,
+};
+
+export type Readable = "yes" | "encrypted" | "combined" | "filesystem";
+
+export type Report = {
+	facts: Facts,
+	findings: Finding[],
+	live: number,
+	download: number,
+	prepared: Prepared | null,
+	outdated: boolean,
+};
+
+export type Room = {
+	free: number,
+	older: Older[],
+	fit: Fit,
+};
+
 export type Source = { kind: "download"; channel: Channel } | { kind: "file"; path: string };
 
 export type Stage = "shrinking" | "erasing" | "partitioning" | "downloading" | "packing" | "removing" | "writing" | "copying" | "verifying";
 
-export type Started<Req> = {
-	job: number,
-	request: Req,
+export type StartEntry = {
+	number: number,
+	name: string,
 };
 
-export type Value = null | boolean | number | string | Value[] | { [key in string]: Value };
+export type Stick = {
+	id: string,
+	name: string,
+	size: number,
+	volumes: Volume[],
+	ventoy: boolean,
+};
+
+export type Sticks = {
+	sticks: Stick[],
+};
+
+export type Topic = "processor" | "startup" | "secureBoot" | "tpm" | "encryption" | "fastStartup" | "space" | "graphics" | "wifi" | "startEntries" | "download" | "folder" | "startFiles" | "system";
+
+export type Volume = {
+	label: string | null,
+	filesystem: string | null,
+	size: number,
+};
 
 export type Way = { kind: "erase" } | { kind: "ventoy"; replace: boolean };
 
@@ -116,3 +316,16 @@ export type WindowsChoices = {
 	fastStartupOff?: boolean,
 	universalClock?: boolean,
 };
+
+export type WindowsFacts = {
+	encryption: Encryption,
+	fastStartup: boolean,
+	universalClock: boolean,
+	bluetooth: number,
+	startEntries: StartEntry[],
+	espSize: number,
+	windowsSize: number,
+	windowsUsed: number,
+	mostRoom: number,
+	places: Place[],
+} & Machine;

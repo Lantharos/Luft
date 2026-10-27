@@ -9,6 +9,7 @@ use std::path::PathBuf;
 
 use luft_i18n::t;
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use crate::L10N;
 use crate::live::download::parse_checksum;
@@ -21,13 +22,13 @@ pub struct Image {
     pub checksum: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Sticks {
     pub sticks: Vec<Stick>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Copy, Debug)]
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Finished {
     pub ejected: bool,

@@ -13,7 +13,7 @@ use std::io;
 
 use serde_json::Value;
 
-use crate::protocol::Call;
+use crate::protocol::{Call, Fitting, Preparing, Restarting, Searching, Sourced};
 use crate::serving::{self, Context};
 
 pub const ARGUMENT: &str = "--meet-helper";
@@ -26,29 +26,35 @@ pub fn requested() -> Option<String> {
 
 fn handle(context: &Context, call: Call) -> Result<Value, String> {
     let value = match call {
-        Call::Check { source } => serde_json::to_value(prepare::check(&source)?),
-        Call::Prepare { source, .. } => serde_json::to_value(prepare::prepare(context, &source)?),
-        Call::Refresh { source } => serde_json::to_value(prepare::refresh(context, &source)?),
-        Call::Restart { intent, hints, .. } => {
+        Call::Check(Sourced { source }) => serde_json::to_value(prepare::check(&source)?),
+        Call::Prepare(Preparing { source, .. }) => {
+            serde_json::to_value(prepare::prepare(context, &source)?)
+        }
+        Call::Refresh(Sourced { source }) => {
+            serde_json::to_value(prepare::refresh(context, &source)?)
+        }
+        Call::Restart(Restarting { intent, hints, .. }) => {
             serde_json::to_value(restart::restart(intent, hints)?)
         }
         Call::FirmwareSettings => serde_json::to_value(restart::firmware_settings()?),
         Call::Undo => serde_json::to_value(undo::undo(context)?),
-        Call::Sticks { iso } => serde_json::to_value(stick::sticks(iso.as_deref())?),
+        Call::Sticks(Searching { iso }) => serde_json::to_value(stick::sticks(iso.as_deref())?),
         Call::Flash { stick, image } => {
             serde_json::to_value(stick::flash(context, &stick, &image)?)
         }
-        Call::VentoyRoom { stick, needed } => serde_json::to_value(stick::room(&stick, needed)?),
+        Call::VentoyRoom(Fitting { stick, needed }) => {
+            serde_json::to_value(stick::room(&stick, needed)?)
+        }
         Call::AddToVentoy {
             stick,
             image,
             replace,
         } => serde_json::to_value(stick::add_to_ventoy(context, &stick, &image, replace)?),
         Call::Luft => serde_json::to_value(None::<()>),
-        Call::Pack { .. }
+        Call::Pack(_)
         | Call::Tidy
         | Call::LuftRange
-        | Call::ResizeLuft { .. }
+        | Call::ResizeLuft(_)
         | Call::CancelResize
         | Call::GiveWindows
         | Call::StartLuft

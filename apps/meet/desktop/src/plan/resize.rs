@@ -1,9 +1,8 @@
-use serde::{Deserialize, Serialize};
-
 use luft_meet::resize::needed;
 
 use super::layout::Windows;
 use super::sizes::{GIB, SMALLEST_SYSTEM, align_down};
+use crate::protocol::answers::Range;
 
 pub struct Geometry {
     pub windows: Windows,
@@ -11,15 +10,6 @@ pub struct Geometry {
     pub startup: u64,
     pub root: u64,
     pub allocated: u64,
-}
-
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
-#[serde(rename_all = "camelCase")]
-pub struct Range {
-    pub smallest: u64,
-    pub most: u64,
-    pub least_grow: u64,
-    pub least_shrink: u64,
 }
 
 pub struct InPlace {

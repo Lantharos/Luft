@@ -12,12 +12,13 @@ use super::machine;
 use super::place::{self, Spot};
 use crate::L10N;
 use crate::boot::{entries, load_option};
-use crate::check::linux::{self, LinuxFacts, Readable, START_FILES};
+use crate::check::facts::{Facts, LinuxFacts, Readable};
+use crate::check::linux::{self, START_FILES};
 use crate::linux::record::Made;
 use crate::live::build;
 use crate::live::durable;
 use crate::live::source::Source;
-use crate::protocol::{Prepared, Report};
+use crate::protocol::answers::{Prepared, Report};
 use crate::serving::Context;
 
 const READY: Prepared = Prepared {
@@ -44,7 +45,7 @@ pub fn esp_of(blocks: &[Block], made: &Made) -> Result<Esp, String> {
     esp::find(blocks, made.esp.as_deref()).ok_or_else(|| t!(L10N, "drive-no-esp"))
 }
 
-pub fn check(source: &Source) -> Result<Report<LinuxFacts>, String> {
+pub fn check(source: &Source) -> Result<Report, String> {
     let blocks = disks::blocks()?;
     let made = Made::read();
     let spot = place::choose(&blocks, made.folder.as_deref())?;
@@ -75,7 +76,7 @@ pub fn check(source: &Source) -> Result<Report<LinuxFacts>, String> {
         download: listing.map_or(0, |listing| listing.download),
         prepared: ready.map(|_| READY),
         outdated: ready.is_some_and(|folder| build::outdated(folder, source)),
-        facts,
+        facts: Facts::Linux(facts),
     })
 }
 

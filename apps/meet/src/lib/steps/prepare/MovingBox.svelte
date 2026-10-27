@@ -5,7 +5,7 @@
 	import { bytes, Checkbox } from '@luft/ui';
 	import * as meet from '#lib/bridge/meet.js';
 	import type { FolderKind } from '#lib/bindings.js';
-	import type { Belongings } from '#lib/bridge/meet.js';
+	import type { Belongings } from '#lib/bindings.js';
 	import type { Failure } from '#lib/state/meet.svelte.js';
 	import Frame from '#lib/components/Frame.svelte';
 	import Problem from '#lib/components/Problem.svelte';

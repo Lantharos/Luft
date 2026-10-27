@@ -1,7 +1,6 @@
 use std::path::{Path, PathBuf};
 
 use luft_meet::FolderKind;
-use serde::Serialize;
 use windows::Win32::Foundation::{HANDLE, HLOCAL, LocalFree};
 use windows::Win32::Security::Authentication::Identity::{GetUserNameExW, NameDisplay};
 use windows::Win32::Security::Authorization::ConvertSidToStringSidW;
@@ -19,25 +18,9 @@ use windows::core::{GUID, PWSTR};
 use super::folders::{Item, walk};
 use super::registry::string;
 use crate::protocol::ChosenAccount;
+use crate::protocol::answers::{Belongings, FoundFolder};
 
 const PICTURES: &str = r"SOFTWARE\Microsoft\Windows\CurrentVersion\AccountPicture\Users";
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct FoundFolder {
-    kind: FolderKind,
-    path: String,
-    files: u64,
-    bytes: u64,
-}
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Gathered {
-    folders: Vec<FoundFolder>,
-    wallpaper: Option<String>,
-    account: ChosenAccount,
-}
 
 pub(super) fn known(kind: FolderKind) -> Option<PathBuf> {
     let id: &GUID = match kind {
@@ -137,7 +120,7 @@ fn measure(kind: FolderKind) -> Option<FoundFolder> {
     })
 }
 
-pub fn gather() -> Gathered {
+pub fn gather() -> Belongings {
     let folders = std::thread::scope(|scope| {
         let measuring: Vec<_> = FolderKind::ALL
             .map(|kind| scope.spawn(move || measure(kind)))
@@ -147,7 +130,7 @@ pub fn gather() -> Gathered {
             .filter_map(|thread| thread.join().ok().flatten())
             .collect()
     });
-    Gathered {
+    Belongings {
         folders,
         wallpaper: wallpaper(),
         account: account(),

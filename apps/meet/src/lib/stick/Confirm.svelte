@@ -3,7 +3,7 @@
 	import { i18n, t } from '@luft/i18n';
 	import { bytes, Dialog } from '@luft/ui';
 	import type { Way } from '#lib/bindings.js';
-	import type { Room, Stick } from '#lib/bridge/stick.js';
+	import type { Room, Stick } from '#lib/bindings.js';
 	import { session } from '#lib/state/meet.svelte.js';
 	import { maker } from '#lib/state/stick.svelte.js';
 

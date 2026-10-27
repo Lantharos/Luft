@@ -7,7 +7,7 @@
 	import Usb from '@lucide/svelte/icons/usb';
 	import { t } from '@luft/i18n';
 	import { bytes, Choice, Dialog } from '@luft/ui';
-	import type { Blocked, Change } from '#lib/bridge/meet.js';
+	import type { Blocked, Change } from '#lib/bindings.js';
 	import Frame from '#lib/components/Frame.svelte';
 	import Problem from '#lib/components/Problem.svelte';
 	import SpaceBar from '#lib/components/SpaceBar.svelte';

@@ -2,7 +2,7 @@ use std::path::PathBuf;
 use std::process::{Command, Stdio};
 
 use luft_i18n::t;
-use serde_json::Value;
+use serde::de::DeserializeOwned;
 
 use super::helper::ARGUMENT;
 use crate::L10N;
@@ -43,6 +43,6 @@ fn start(events: &Events) -> Result<Helper, Failed> {
     }))
 }
 
-pub fn call(events: &Events, call: Call) -> Result<Value, Failed> {
+pub fn call<T: DeserializeOwned>(events: &Events, call: Call) -> Result<T, Failed> {
     crate::app::calls::call(events, call, start)
 }

@@ -3,7 +3,7 @@ use std::path::Path;
 use std::process::Command;
 
 use super::efi;
-use crate::check::facts::{Architecture, Device, Firmware, Machine, Platform};
+use crate::check::facts::{Architecture, Device, Firmware, Machine};
 
 const PCI_DEVICES: &str = "/sys/bus/pci/devices";
 const NETWORK: &str = "/sys/class/net";
@@ -97,7 +97,6 @@ fn wifi() -> Vec<Device> {
 pub fn gather(gpt: bool) -> Machine {
     let uefi = efi::uefi();
     Machine {
-        platform: Platform::Linux,
         architecture: architecture(),
         firmware: if uefi { Firmware::Uefi } else { Firmware::Bios },
         gpt,

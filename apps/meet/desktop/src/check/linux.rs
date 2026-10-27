@@ -1,45 +1,16 @@
 use luft_i18n::t;
 use luft_meet::Layout;
-use serde::{Deserialize, Serialize};
 
 use super::common::{
     Finding, LIVE_ESTIMATE, Level, Topic, download, finding, gib, graphics, processor, secure_boot,
     tpm, wifi,
 };
-use super::facts::{Firmware, Machine};
+use super::facts::{Firmware, LinuxFacts, Platform, Readable};
 use crate::L10N;
 
 const MIB: u64 = 1 << 20;
 pub const START_FILES: u64 = 16 * MIB;
 const SPARE: u64 = 1 << 30;
-
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
-#[serde(rename_all = "camelCase")]
-pub enum Readable {
-    Yes,
-    Encrypted,
-    Combined,
-    Filesystem,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
-#[serde(rename_all = "camelCase")]
-pub struct Place {
-    pub filesystem: String,
-    pub readable: Readable,
-    pub free: u64,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
-#[serde(rename_all = "camelCase")]
-pub struct LinuxFacts {
-    #[serde(flatten)]
-    pub machine: Machine,
-    pub system: String,
-    pub layout: Layout,
-    pub esp_free: Option<u64>,
-    pub place: Place,
-}
 
 fn startup(facts: &LinuxFacts) -> Finding {
     let machine = &facts.machine;
@@ -179,7 +150,7 @@ fn system(facts: &LinuxFacts) -> Finding {
 
 pub fn evaluate(facts: &LinuxFacts, live: Option<u64>) -> Vec<Finding> {
     let mut findings = vec![
-        processor(&facts.machine),
+        processor(&facts.machine, Platform::Linux),
         startup(facts),
         folder(facts),
         space(facts, live.unwrap_or(LIVE_ESTIMATE)),
@@ -195,7 +166,7 @@ pub fn evaluate(facts: &LinuxFacts, live: Option<u64>) -> Vec<Finding> {
 
 #[cfg(test)]
 mod tests {
-    use super::super::facts::{Architecture, Device, Platform};
+    use super::super::facts::{Architecture, Device, LinuxPlace, Machine};
     use super::*;
 
     const GIB: u64 = 1 << 30;
@@ -203,7 +174,6 @@ mod tests {
     fn fedora() -> LinuxFacts {
         LinuxFacts {
             machine: Machine {
-                platform: Platform::Linux,
                 architecture: Architecture::X64,
                 firmware: Firmware::Uefi,
                 gpt: true,
@@ -220,7 +190,7 @@ mod tests {
             system: "Fedora Linux 45 (Workstation Edition)".into(),
             layout: Layout::Subvolumes,
             esp_free: Some(560 * MIB),
-            place: Place {
+            place: LinuxPlace {
                 filesystem: "btrfs".into(),
                 readable: Readable::Yes,
                 free: 200 * GIB,

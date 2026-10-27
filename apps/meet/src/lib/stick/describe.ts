@@ -1,6 +1,6 @@
 import { i18n, t } from '@luft/i18n';
 import { bytes } from '@luft/ui';
-import type { Stick } from '#lib/bridge/stick.js';
+import type { Stick } from '#lib/bindings.js';
 
 const FILESYSTEMS: Record<string, string> = {
 	vfat: 'FAT',

@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use luft_meet::resize::ROOT_TYPE;
-use serde_json::Value;
+use serde::de::DeserializeOwned;
 use wmi::{Variant, WMIConnection};
 
 pub use super::regional::hints;
@@ -10,10 +10,11 @@ use crate::app::Events;
 use crate::app::job::Failed;
 use crate::check::facts::Platform;
 use crate::protocol::Call;
+use crate::protocol::answers::Belongings;
 
 pub const PLATFORM: Platform = Platform::Windows;
 
-pub fn call(events: &Events, call: Call) -> Result<Value, Failed> {
+pub fn call<T: DeserializeOwned>(events: &Events, call: Call) -> Result<T, Failed> {
     link::call(events, call)
 }
 
@@ -29,8 +30,8 @@ pub fn luft_installed() -> bool {
         .is_some_and(|found| !found.is_empty())
 }
 
-pub fn belongings() -> Result<Value, Failed> {
-    serde_json::to_value(belongings::gather()).map_err(|error| Failed::from(error.to_string()))
+pub fn belongings() -> Result<Belongings, Failed> {
+    Ok(belongings::gather())
 }
 
 pub fn pick_iso() -> Option<String> {

@@ -11,7 +11,7 @@ use serde_json::Value;
 use windows::Win32::Foundation::HANDLE;
 use windows::Win32::System::Pipes::GetNamedPipeServerProcessId;
 
-use crate::protocol::Call;
+use crate::protocol::{Call, Fitting, Preparing, Resizing, Restarting, Searching, Sourced};
 pub use crate::serving::Context;
 use setup::{pack, prepare, refresh, undo};
 
@@ -41,34 +41,38 @@ fn server_is(pipe: &File, parent: u32) -> bool {
 
 fn handle(context: &Context, call: Call) -> Result<Value, String> {
     let value = match call {
-        Call::Check { source } => serde_json::to_value(prepare::check(&source)?),
-        Call::Prepare {
+        Call::Check(Sourced { source }) => serde_json::to_value(prepare::check(&source)?),
+        Call::Prepare(Preparing {
             luft,
             source,
             place,
-        } => serde_json::to_value(prepare::prepare(context, luft, &source, &place)?),
-        Call::Refresh { source } => serde_json::to_value(refresh::refresh(context, &source)?),
-        Call::Pack { belongings } => serde_json::to_value(pack::pack(context, &belongings)?),
-        Call::Restart {
+        }) => serde_json::to_value(prepare::prepare(context, luft, &source, &place)?),
+        Call::Refresh(Sourced { source }) => {
+            serde_json::to_value(refresh::refresh(context, &source)?)
+        }
+        Call::Pack(packing) => serde_json::to_value(pack::pack(context, &packing)?),
+        Call::Restart(Restarting {
             intent,
             windows,
             hints,
-        } => serde_json::to_value(drive::state::restart(intent, windows, hints)?),
+        }) => serde_json::to_value(drive::state::restart(intent, windows, hints)?),
         Call::Tidy => serde_json::to_value(prepare::tidy()?),
         Call::FirmwareSettings => serde_json::to_value(system::firmware::restart_into_settings()?),
         Call::Undo => serde_json::to_value(undo::undo(context)?),
         Call::Luft => serde_json::to_value(luft::details()?),
         Call::LuftRange => serde_json::to_value(luft::range()?),
-        Call::ResizeLuft { size } => serde_json::to_value(luft::resize(context, size)?),
+        Call::ResizeLuft(Resizing { size }) => serde_json::to_value(luft::resize(context, size)?),
         Call::CancelResize => serde_json::to_value(luft::cancel()?),
         Call::GiveWindows => serde_json::to_value(luft::give_windows()?),
         Call::StartLuft => serde_json::to_value(luft::start()?),
         Call::RemoveLuft => serde_json::to_value(luft::remove(context)?),
-        Call::Sticks { iso } => serde_json::to_value(stick::sticks(iso.as_deref())?),
+        Call::Sticks(Searching { iso }) => serde_json::to_value(stick::sticks(iso.as_deref())?),
         Call::Flash { stick, image } => {
             serde_json::to_value(stick::flash(context, &stick, &image)?)
         }
-        Call::VentoyRoom { stick, needed } => serde_json::to_value(stick::room(&stick, needed)?),
+        Call::VentoyRoom(Fitting { stick, needed }) => {
+            serde_json::to_value(stick::room(&stick, needed)?)
+        }
         Call::AddToVentoy {
             stick,
             image,

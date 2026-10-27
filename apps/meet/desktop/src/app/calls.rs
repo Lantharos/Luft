@@ -5,6 +5,7 @@ use std::sync::mpsc::{Sender, channel};
 use std::sync::{Arc, Mutex};
 
 use luft_i18n::t;
+use serde::de::DeserializeOwned;
 use serde_json::Value;
 
 use super::job::Failed;
@@ -72,11 +73,11 @@ fn read_replies(
     });
 }
 
-pub fn call(
+pub fn call<T: DeserializeOwned>(
     events: &Events,
     call: Call,
     start: impl FnOnce(&Events) -> Result<Helper, Failed>,
-) -> Result<Value, Failed> {
+) -> Result<T, Failed> {
     let id = next_number();
     let (sender, receiver) = channel();
     {
@@ -99,7 +100,8 @@ pub fn call(
             .and_then(|()| helper.calls.flush())
             .map_err(|error| t!(L10N, "helper-stopped-because", error = error.to_string()))?;
     }
-    receiver
+    let value = receiver
         .recv()
-        .map_err(|_| Failed::from(t!(L10N, "helper-stopped")))?
+        .map_err(|_| Failed::from(t!(L10N, "helper-stopped")))??;
+    serde_json::from_value(value).map_err(|error| Failed::from(error.to_string()))
 }

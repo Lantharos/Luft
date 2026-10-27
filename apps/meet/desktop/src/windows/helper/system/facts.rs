@@ -8,9 +8,9 @@ use windows::Win32::System::SystemInformation::{
 use wmi::WMIConnection;
 
 use super::{bluetooth, firmware, registry, settings, start_entries};
-use crate::check::facts::{Architecture, Device, Encryption, Facts, Machine, Platform};
+use crate::check::facts::{Architecture, Device, Encryption, Machine, WindowsFacts};
+use crate::check::places::Place;
 use crate::plan::layout::{Windows, most_room};
-use crate::plan::places::Place;
 use crate::windows::helper::drive::bitlocker::BitLocker;
 use crate::windows::helper::drive::state::Found;
 use crate::windows::helper::drive::storage::{Layout, Storage};
@@ -113,10 +113,9 @@ pub fn gather(
     drive: &str,
     found: &Found,
     places: Vec<Place>,
-) -> Facts {
-    Facts {
+) -> WindowsFacts {
+    WindowsFacts {
         machine: Machine {
-            platform: Platform::Windows,
             architecture: architecture(),
             firmware: firmware::firmware(),
             gpt: layout.gpt(),

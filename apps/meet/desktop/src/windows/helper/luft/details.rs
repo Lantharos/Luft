@@ -1,39 +1,14 @@
 use luft_meet::resize::Change;
-use serde::Serialize;
 
 use super::found::{self, Luft};
 use super::request;
 use crate::plan::gap;
 use crate::plan::layout::{Disk, Windows};
-use crate::plan::resize::{Geometry, InPlace, Range};
+use crate::plan::resize::{Geometry, InPlace};
+use crate::protocol::answers::{Blocked, Installed, Range};
 use crate::windows::helper::drive::state;
 use crate::windows::helper::drive::storage::{Layout, MSFT_Partition, Storage};
 use crate::windows::helper::drive::windows_drive;
-
-#[derive(Serialize, Clone, Copy, Debug, PartialEq, Eq)]
-#[serde(rename_all = "camelCase")]
-pub enum Blocked {
-    Busy,
-    Passphrase,
-    Apart,
-    Unreadable,
-}
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Installed {
-    pub drive: String,
-    pub beside_windows: bool,
-    pub size: u64,
-    pub allocated: Option<u64>,
-    pub free_after: u64,
-    pub windows_size: u64,
-    pub windows_used: u64,
-    pub blocked: Option<Blocked>,
-    pub pending: Option<Change>,
-    pub windows_free: u64,
-    pub leftovers: bool,
-}
 
 pub struct Survey {
     pub storage: Storage,

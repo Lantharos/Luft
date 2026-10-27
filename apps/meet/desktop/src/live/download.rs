@@ -4,9 +4,9 @@ use std::time::Duration;
 use luft_i18n::t;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
+use specta::Type;
 use ureq::Agent;
 use ureq::tls::{RootCerts, TlsConfig};
-use specta::Type;
 
 use super::signature;
 use crate::L10N;

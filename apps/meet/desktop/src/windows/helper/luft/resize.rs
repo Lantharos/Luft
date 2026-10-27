@@ -1,14 +1,14 @@
 use luft_i18n::t;
 use luft_meet::resize::{Change, Request};
 
-use super::details::{Installed, Measure, Survey, survey};
+use super::details::{Measure, Survey, survey};
 use super::request;
 use crate::L10N;
 use crate::boot::entries;
 use crate::boot::load_option;
-use crate::plan::resize::Range;
 use crate::plan::sizes::align_up;
 use crate::protocol::Stage;
+use crate::protocol::answers::{Installed, Range};
 use crate::serving::Context;
 use crate::windows::helper::drive::record::{self, Made};
 use crate::windows::helper::drive::windows_drive;

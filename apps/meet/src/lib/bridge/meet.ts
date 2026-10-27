@@ -1,113 +1,6 @@
-import { commands, events, type Call, type Failure, type Finished, type FolderKind, type Intent, type Packing, type Source, type WindowsChoices } from '#lib/bindings.js';
+import { commands, type Failure, type Intent, type Outcome, type Source, type WindowsChoices } from '#lib/bindings.js';
 
-export type Level = 'fine' | 'note' | 'blocks';
-export type Layout = 'subvolumes' | 'separateHome' | 'single' | 'encrypted' | 'unknown';
-
-export type Action = 'firmwareSettings' | 'tidy' | 'chooseIso';
-
-export interface Finding {
-	topic: string;
-	level: Level;
-	title: string;
-	detail: string;
-	action: Action | null;
-}
-
-export interface Prepared {
-	room: number;
-	movingBox: number | null;
-	drive: string | null;
-}
-
-export type PlaceKind = 'windows' | 'free' | 'whole';
-
-export interface Contents {
-	label: string | null;
-	letter: string | null;
-	filesystem: string | null;
-	size: number;
-	bitlocker: boolean;
-}
-
-export interface Place {
-	id: string;
-	kind: PlaceKind;
-	drive: { name: string; size: number; windows: boolean };
-	free: number;
-	smallest: number;
-	most: number;
-	contents: Contents[];
-}
-
-export interface WindowsFacts {
-	platform: 'windows';
-	windowsSize: number;
-	windowsUsed: number;
-	espSize: number;
-	fastStartup: boolean;
-	universalClock: boolean;
-	bluetooth: number;
-	places: Place[];
-}
-
-export interface LinuxFacts {
-	platform: 'linux';
-	system: string;
-	layout: Layout;
-}
-
-export interface Report {
-	facts: WindowsFacts | LinuxFacts;
-	findings: Finding[];
-	live: number;
-	download: number;
-	prepared: Prepared | null;
-	outdated: boolean;
-}
-
-export type Blocked = 'busy' | 'passphrase' | 'apart' | 'unreadable';
-export type Change = { change: 'grow' } | { change: 'shrink'; bytes: number } | { change: 'trim'; bytes: number };
-
-export interface Range {
-	smallest: number;
-	most: number;
-	leastGrow: number;
-	leastShrink: number;
-}
-
-export interface Installed {
-	drive: string;
-	besideWindows: boolean;
-	size: number;
-	allocated: number | null;
-	freeAfter: number;
-	windowsSize: number;
-	windowsUsed: number;
-	blocked: Blocked | null;
-	pending: Change | null;
-	windowsFree: number;
-	leftovers: boolean;
-}
-
-export interface FoundFolder {
-	kind: FolderKind;
-	path: string;
-	files: number;
-	bytes: number;
-}
-
-export interface Account {
-	fullName: string;
-	userName: string;
-	picture: string | null;
-}
-
-export interface Belongings {
-	folders: FoundFolder[];
-	wallpaper: string | null;
-	account: Account;
-}
-
+export type Packing = Parameters<typeof commands.meetPack>[0];
 
 export class Failed extends Error {
 	constructor(
@@ -118,58 +11,31 @@ export class Failed extends Error {
 	}
 }
 
-interface Waiting {
-	resolve: (value: unknown) => void;
-	reject: (error: Failed) => void;
+export const UNTIL_DONE = { timeoutMs: 2 ** 31 - 1 };
+
+export async function settle<T>(running: Promise<Outcome<T>>): Promise<T> {
+	const outcome = await running;
+	if ('failure' in outcome) throw new Failed(outcome.failure, outcome.detail);
+	return outcome.value;
 }
 
-const waiting = new Map<number, Waiting>();
-let nextJob = 1;
-let listening = false;
-
-function settle(finished: Finished) {
-	const job = waiting.get(finished.job);
-	if (!job) return;
-	waiting.delete(finished.job);
-	if ('failure' in finished) job.reject(new Failed(finished.failure, finished.detail));
-	else job.resolve(finished.value);
-}
-
-export async function start<T>(begin: (job: number) => Promise<null>): Promise<T> {
-	if (!listening) {
-		events.meetFinished(settle);
-		listening = true;
-	}
-	const job = nextJob++;
-	const finished = new Promise<T>((resolve, reject) => waiting.set(job, { resolve: resolve as (value: unknown) => void, reject }));
-	try {
-		await begin(job);
-	} catch (error) {
-		waiting.delete(job);
-		throw error;
-	}
-	return finished;
-}
-
-export const call = <T>(request: Call) => start<T>((job) => commands.meetCall({ job, request }));
-
-export const check = (source: Source) => call<Report>({ call: 'check', source });
-export const prepare = (luft: number, source: Source, place: string) => call<Prepared>({ call: 'prepare', luft, source, place });
-export const refresh = (source: Source) => call<Prepared>({ call: 'refresh', source });
-export const pack = (belongings: Packing) => call<Prepared>({ call: 'pack', belongings });
-export const restart = (intent: Intent, windows: WindowsChoices) => call<null>({ call: 'restart', intent, windows });
-export const tidy = () => call<null>({ call: 'tidy' });
-export const firmwareSettings = () => call<null>({ call: 'firmwareSettings' });
-export const undo = () => call<null>({ call: 'undo' });
-export const luft = () => call<Installed | null>({ call: 'luft' });
-export const luftRange = () => call<Range | null>({ call: 'luftRange' });
-export const resizeLuft = (size: number) => call<Installed>({ call: 'resizeLuft', size });
-export const cancelResize = () => call<Installed>({ call: 'cancelResize' });
-export const giveWindows = () => call<Installed>({ call: 'giveWindows' });
-export const startLuft = () => call<null>({ call: 'startLuft' });
-export const removeLuft = () => call<null>({ call: 'removeLuft' });
-export const installed = () => start<boolean>((job) => commands.meetInstalled({ job, request: {} }));
-export const pickIso = () => start<string | null>((job) => commands.meetPickIso({ job, request: {} }));
-export const saveLogs = () => start<string | null>((job) => commands.meetSaveLogs({ job, request: {} }));
-export const showFile = (path: string) => start<null>((job) => commands.meetShowFile({ job, request: path }));
-export const belongings = () => start<Belongings>((job) => commands.meetBelongings({ job, request: {} }));
+export const check = (source: Source) => settle(commands.meetCheck({ source }, UNTIL_DONE));
+export const prepare = (luft: number, source: Source, place: string) => settle(commands.meetPrepare({ luft, source, place }, UNTIL_DONE));
+export const refresh = (source: Source) => settle(commands.meetRefresh({ source }, UNTIL_DONE));
+export const pack = (packing: Packing) => settle(commands.meetPack(packing, UNTIL_DONE));
+export const restart = (intent: Intent, windows: WindowsChoices) => settle(commands.meetRestart({ intent, windows }, UNTIL_DONE));
+export const tidy = () => settle(commands.meetTidy(UNTIL_DONE));
+export const firmwareSettings = () => settle(commands.meetFirmwareSettings(UNTIL_DONE));
+export const undo = () => settle(commands.meetUndo(UNTIL_DONE));
+export const luft = () => settle(commands.meetLuft(UNTIL_DONE));
+export const luftRange = () => settle(commands.meetLuftRange(UNTIL_DONE));
+export const resizeLuft = (size: number) => settle(commands.meetResizeLuft({ size }, UNTIL_DONE));
+export const cancelResize = () => settle(commands.meetCancelResize(UNTIL_DONE));
+export const giveWindows = () => settle(commands.meetGiveWindows(UNTIL_DONE));
+export const startLuft = () => settle(commands.meetStartLuft(UNTIL_DONE));
+export const removeLuft = () => settle(commands.meetRemoveLuft(UNTIL_DONE));
+export const installed = () => settle(commands.meetInstalled(UNTIL_DONE));
+export const pickIso = () => settle(commands.meetPickIso(UNTIL_DONE));
+export const saveLogs = () => settle(commands.meetSaveLogs(UNTIL_DONE));
+export const showFile = (path: string) => settle(commands.meetShowFile({ path }, UNTIL_DONE));
+export const belongings = () => settle(commands.meetBelongings(UNTIL_DONE));

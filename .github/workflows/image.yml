@@ -10,6 +10,28 @@ on:
         type: boolean
         default: false
       promote:
+        description: Release this tested nightly as the stable version it leads to, such as 1.2-nightly.21
+        type: string
+        default: ""
+
+concurrency:
+  group: image-${{ inputs.promote && 'promote' || github.ref }}
+  cancel-in-progress: ${{ !inputs.promote }}
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE: ghcr.io/lantharos/luft
+  CACHE: ghcr.io/lantharos/luft-cache
+  LUFT_PARTS: ghcr.io/lantharos/luft-parts
+  FEDORA: "45"
+  MAJOR: "1"
+  DOWNLOADS: https://get.luft.computer
+
+jobs:
+  promote:
     name: Promote
     if: inputs.promote
     runs-on: ubuntu-26.04

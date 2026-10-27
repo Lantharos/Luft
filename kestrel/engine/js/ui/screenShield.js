@@ -3,7 +3,6 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Graphene from 'gi://Graphene';
-import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 
@@ -26,7 +25,6 @@ const LOCK_DELAY_KEY = 'lock-delay';
 const LOCKDOWN_SCHEMA = 'org.gnome.desktop.lockdown';
 const DISABLE_LOCK_KEY = 'disable-lock-screen';
 
-const LOCKED_STATE_STR = 'screenShield.locked';
 
 // ScreenShield animation time
 // - STANDARD_FADE_TIME is used when the session goes idle
@@ -85,7 +83,7 @@ export class ScreenShield extends Signals.EventEmitter {
             this._prepareForSleep.bind(this));
 
         this._loginSession = null;
-        this._getLoginSession();
+        this._loginSessionReady = this._getLoginSession();
 
         this._settings = new Gio.Settings({schema_id: SCREENSAVER_SCHEMA});
         this._settings.connect(`changed::${LOCK_ENABLED_KEY}`, this._syncInhibitor.bind(this));
@@ -565,7 +563,6 @@ export class ScreenShield extends Signals.EventEmitter {
         this._activationTime = 0;
         this._setActive(false);
         this._setLocked(false);
-        global.set_runtime_state(LOCKED_STATE_STR, null);
     }
 
     activate(animate) {
@@ -618,17 +615,9 @@ export class ScreenShield extends Signals.EventEmitter {
         this._setLocked(user.password_mode !== AccountsService.UserPasswordMode.NONE);
     }
 
-    // If the previous shell crashed, and gnome-session restarted us, then re-lock
-    lockIfWasLocked() {
-        if (!this._settings.get_boolean(LOCK_ENABLED_KEY))
-            return;
-        const wasLocked = global.get_runtime_state('b', LOCKED_STATE_STR);
-        if (wasLocked === null)
-            return;
-        const laters = global.compositor.get_laters();
-        laters.add(Meta.LaterType.BEFORE_REDRAW, () => {
+    async lockIfWasLocked() {
+        await this._loginSessionReady;
+        if (this._loginSession?.LockedHint)
             this.lock(false);
-            return GLib.SOURCE_REMOVE;
-        });
     }
 }

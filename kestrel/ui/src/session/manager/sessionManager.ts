@@ -35,7 +35,8 @@ export class SessionManager {
   });
   private readonly stopWatchingSession: () => void;
   private readonly nameId: number;
-  private startupWatch: number;
+  private readonly shellWatch: number;
+  private shellRunning = false;
   private state: SessionState = { active: true, locked: false };
 
   constructor() {
@@ -88,11 +89,12 @@ export class SessionManager {
     });
     this.nameId = Gio.bus_own_name_on_connection(Gio.DBus.session, BUS_NAME, Gio.BusNameOwnerFlags.REPLACE, () =>
       this.exported.emit_signal('SessionRunning', new GLib.Variant('()', [])), null);
-    this.startupWatch = Gio.bus_watch_name_on_connection(Gio.DBus.session, SHELL_READY, Gio.BusNameWatcherFlags.NONE, () => this.finishStartup(), null);
+    this.shellWatch = Gio.bus_watch_name_on_connection(Gio.DBus.session, SHELL_READY, Gio.BusNameWatcherFlags.NONE,
+      () => { this.shellRunning = true; }, () => { this.shellRunning = false; });
   }
 
   destroy(): void {
-    this.finishStartup();
+    Gio.bus_unwatch_name(this.shellWatch);
     Gio.bus_unown_name(this.nameId);
     this.stopWatchingSession();
     this.screenSaver.destroy();
@@ -104,21 +106,12 @@ export class SessionManager {
     this.exported.unexport();
   }
 
-  private get initializing(): boolean {
-    return this.startupWatch !== 0;
-  }
-
-  private finishStartup(): void {
-    if (this.startupWatch) Gio.bus_unwatch_name(this.startupWatch);
-    this.startupWatch = 0;
-  }
-
   private async setenv(name: string, value: string, invocation: Invocation): Promise<void> {
     if (await sandboxed(invocation)) {
       invocation.return_dbus_error('org.freedesktop.DBus.Error.AccessDenied', 'Sandboxed apps cannot change the session environment');
       return;
     }
-    if (!this.initializing) {
+    if (this.shellRunning) {
       invocation.return_dbus_error('org.gnome.SessionManager.NotInInitialization', 'The session environment can only change while the session starts');
       return;
     }

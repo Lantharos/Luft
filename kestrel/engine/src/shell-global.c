@@ -64,7 +64,6 @@ struct _ShellGlobal {
   const char *datadir;
   char *imagedir;
   GFile *state_path;
-  GFile *runtime_state_path;
   GFile *automation_script;
 
   ShellWindowTracker *window_tracker;
@@ -315,9 +314,7 @@ shell_global_init (ShellGlobal *global)
   const char *shell_js = g_getenv("KESTREL_JS");
   g_autofree char *imagedir = NULL;
   g_auto (GStrv) search_path = NULL;
-  g_autofree char *path = NULL;
   g_autofree char *statedir = NULL;
-  const char *byteorder_string;
 
   if (!datadir)
     datadir = KESTREL_DATADIR;
@@ -340,20 +337,6 @@ shell_global_init (ShellGlobal *global)
   statedir = g_build_filename (g_get_user_state_dir (), "kestrel", NULL);
   g_mkdir_with_parents (statedir, 0700);
   global->state_path = g_file_new_for_path (statedir);
-
-#if G_BYTE_ORDER == G_LITTLE_ENDIAN
-  byteorder_string = "LE";
-#else
-  byteorder_string = "BE";
-#endif
-
-  /* And the runtime state */
-  path = g_strdup_printf ("%s/kestrel/runtime-state-%s.%s",
-                          g_get_user_runtime_dir (),
-                          byteorder_string,
-                          g_getenv ("DISPLAY"));
-  (void) g_mkdir_with_parents (path, 0700);
-  global->runtime_state_path = g_file_new_for_path (path);
 
   global->settings = g_settings_new ("com.lantharos.kestrel");
 
@@ -431,7 +414,6 @@ shell_global_finalize (GObject *object)
   g_clear_object (&global->switcheroo_cancellable);
 
   g_clear_object (&global->state_path);
-  g_clear_object (&global->runtime_state_path);
 
   g_free (global->session_mode);
   g_free (global->imagedir);
@@ -1247,41 +1229,6 @@ load_variant (GFile      *dir,
     }
 
   return res;
-}
-
-/**
- * shell_global_set_runtime_state:
- * @global: a #ShellGlobal
- * @property_name: Name of the property
- * @variant: (nullable): A #GVariant, or %NULL to unset
- *
- * Change the value of serialized runtime state.
- */
-void
-shell_global_set_runtime_state (ShellGlobal  *global,
-                                const char   *property_name,
-                                GVariant     *variant)
-{
-  save_variant (global, global->runtime_state_path, property_name, variant);
-}
-
-/**
- * shell_global_get_runtime_state:
- * @global: a #ShellGlobal
- * @property_type: Expected data type
- * @property_name: Name of the property
- *
- * The shell maintains "runtime" state which does not persist across
- * logout or reboot.
- *
- * Returns: (transfer floating): The value of a serialized property, or %NULL if none stored
- */
-GVariant *
-shell_global_get_runtime_state (ShellGlobal  *global,
-                                const char   *property_type,
-                                const char   *property_name)
-{
-  return load_variant (global->runtime_state_path, property_type, property_name);
 }
 
 /**

@@ -351,6 +351,7 @@ async function _initializeUI() {
             },
             showOsd: (icon, label, level, maxLevel) => osdWindowManager.showAll(icon, label, level, maxLevel),
         });
+        screenShield.lockIfWasLocked().catch(logError);
     });
     layoutManager.init();
 
@@ -390,9 +391,6 @@ async function _initializeUI() {
     layoutManager.connect('startup-complete', () => {
         if (actionMode === Shell.ActionMode.NONE)
             actionMode = Shell.ActionMode.NORMAL;
-
-        if (screenShield)
-            screenShield.lockIfWasLocked();
 
         GLib.log_structured(LOG_DOMAIN, GLib.LogLevelFlags.LEVEL_MESSAGE, {
             'MESSAGE': `Kestrel started at ${_startDate}`,

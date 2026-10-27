@@ -30,6 +30,7 @@ const LOGIN_USER = `<node><interface name="org.freedesktop.login1.User">
 const LOGIN_SESSION = `<node><interface name="org.freedesktop.login1.Session">
   <property name="Id" type="s" access="read"/>
   <property name="Active" type="b" access="read"/>
+  <property name="LockedHint" type="b" access="read"/>
   <method name="SetLockedHint"><arg type="b" direction="in"/></method>
   <signal name="Lock"/>
   <signal name="Unlock"/>
@@ -114,7 +115,16 @@ export function publishBasics(publish, calls) {
     PrepareForSleep: sleeping => login.emit_signal('PrepareForSleep', new GLib.Variant('(b)', [sleeping])),
   }, '/com/lantharos/KestrelChecks/Login');
   publish(LOGIN_USER, {Display: [SESSION_ID, SESSION_PATH]}, '/org/freedesktop/login1/user/self');
-  publish(LOGIN_SESSION, {Id: SESSION_ID, Active: true, SetLockedHint() {}}, SESSION_PATH);
+  let lockedHint = false;
+  const session = publish(LOGIN_SESSION, {
+    Id: SESSION_ID,
+    Active: true,
+    get LockedHint() { return lockedHint; },
+    SetLockedHint: locked => {
+      lockedHint = locked;
+      session.emit_property_changed('LockedHint', new GLib.Variant('b', locked));
+    },
+  }, SESSION_PATH);
   publish(POLKIT, {
     CheckAuthorization: () => [true, false, {}],
     RegisterAuthenticationAgent() {},

@@ -27,6 +27,15 @@ export class PortalRequest {
   }
 }
 
+export type Dismissal = (end: () => void) => () => void;
+
+export function requested(handle: string): Dismissal {
+  return end => {
+    const request = new PortalRequest(handle, end);
+    return () => request.finish();
+  };
+}
+
 export function respond(invocation: Invocation, [response, results]: Outcome): void {
   invocation.return_value(new GLib.Variant('(ua{sv})', [response, results]));
 }

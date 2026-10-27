@@ -101,11 +101,6 @@ print-title = Печатење
 print-title-from-app = Печатење од { $appName }
 print-accept = Печати
 print-no-printers = Нема поставени печатачи.
-print-job-name = Документ
-print-job-name-from-app = Документ од { $appName }
-print-failed-title = Не може да се печати
-print-failed = Печатачот { $printer } не го прифати документот.
-print-failed-from-app = Печатачот { $printer } не го прифати документот од { $appName }.
 
 print-printer = Печатач
 print-printer-not-accepting = Моментално не прифаќа документи

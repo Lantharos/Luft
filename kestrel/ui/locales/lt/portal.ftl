@@ -101,11 +101,6 @@ print-title = Spausdinti
 print-title-from-app = Spausdinti – { $appName }
 print-accept = Spausdinti
 print-no-printers = Nenustatytas nė vienas spausdintuvas.
-print-job-name = Dokumentas
-print-job-name-from-app = Dokumentas – { $appName }
-print-failed-title = Nepavyko išspausdinti
-print-failed = Spausdintuvas { $printer } nepriėmė dokumento.
-print-failed-from-app = Spausdintuvas { $printer } nepriėmė dokumento, kurį siuntė { $appName }.
 
 print-printer = Spausdintuvas
 print-printer-not-accepting = Šiuo metu dokumentų nepriima

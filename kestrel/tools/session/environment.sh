@@ -32,7 +32,7 @@ require_build() {
 
 build_helpers() {
   glib-compile-schemas "$build/data"
-  (cd "$root" && cargo build --release --quiet -p kestrel-settings -p kestrel-search -p luft-pinentry \
+  (cd "$root" && cargo build --release --quiet -p kestrel-settings -p kestrel-search -p kestrel-portal -p luft-pinentry \
     -p kestrel-openconnect -p kestrel-greeter-service -p peek -p luft-accounts-service -p luft-speech-service)
 }
 
@@ -50,6 +50,7 @@ write_dbus_services() {
     dbus_service "$name" "$(command -v gjs)" -m "$tools/fixtures/session/shellService.js" "$build/js/dbusServices/$name.src.gresource" "$name"
   done
   dbus_service com.lantharos.Kestrel.HotplugSniffer "$build/src/hotplug-sniffer/kestrel-hotplug-sniffer"
+  dbus_service com.lantharos.Kestrel.Portal "$root/target/release/kestrel-portal"
   for name in com.lantharos.Keyring1 org.freedesktop.secrets org.freedesktop.portal.IBus org.freedesktop.portal.Desktop \
     org.gtk.vfs.AfcVolumeMonitor org.gtk.vfs.GPhoto2VolumeMonitor org.gtk.vfs.MTPVolumeMonitor; do
     dbus_service "$name" /usr/bin/false
@@ -134,6 +135,7 @@ prepare_session() {
   write_dbus_services
   mkdir -p "$session/data/xdg-desktop-portal/portals" "$session/config/xdg-desktop-portal"
   ln -sfn "$root/kestrel/engine/data/session/kestrel.portal" "$session/data/xdg-desktop-portal/portals/kestrel.portal"
+  ln -sfn "$root/kestrel/engine/data/session/kestrel-portal.portal" "$session/data/xdg-desktop-portal/portals/kestrel-portal.portal"
   ln -sfn "$root/kestrel/engine/data/session/kestrel-portals.conf" "$session/config/xdg-desktop-portal/kestrel-portals.conf"
   export_build_paths
   [[ "$mode" == nested ]] || use_luft_defaults

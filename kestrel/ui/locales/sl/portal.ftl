@@ -105,11 +105,6 @@ print-title = Tiskanje
 print-title-from-app = Tiskanje iz aplikacije { $appName }
 print-accept = Natisni
 print-no-printers = Ni nastavljenih tiskalnikov.
-print-job-name = Dokument
-print-job-name-from-app = Dokument iz aplikacije { $appName }
-print-failed-title = Tiskanje ni uspelo
-print-failed = Tiskalnik { $printer } ni sprejel dokumenta.
-print-failed-from-app = Tiskalnik { $printer } ni sprejel dokumenta iz aplikacije { $appName }.
 
 print-printer = Tiskalnik
 print-printer-not-accepting = Trenutno ne sprejema dokumentov

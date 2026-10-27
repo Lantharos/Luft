@@ -5,11 +5,15 @@ import {shownStyled} from '../actors.js';
 
 export const BACKEND = 'org.freedesktop.impl.portal.desktop.kestrel';
 export const PORTAL_PATH = '/org/freedesktop/portal/desktop';
+const SERVICE = 'com.lantharos.Kestrel.Portal';
+const SERVED = new Set(['Account', 'AppChooser', 'DynamicLauncher', 'Email', 'Lockdown', 'Print', 'Usb', 'Wallpaper']);
+
+export const backendOf = iface => SERVED.has(iface) ? SERVICE : BACKEND;
 
 let requests = 0;
 
 export function call(iface, method, parameters, replyType, path = PORTAL_PATH) {
-  return Gio.DBus.session.call(BACKEND, path, `org.freedesktop.impl.portal.${iface}`, method, parameters,
+  return Gio.DBus.session.call(backendOf(iface), path, `org.freedesktop.impl.portal.${iface}`, method, parameters,
     replyType ? new GLib.VariantType(replyType) : null, Gio.DBusCallFlags.NONE, -1, null);
 }
 

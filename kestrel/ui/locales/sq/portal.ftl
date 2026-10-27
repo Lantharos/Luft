@@ -101,11 +101,6 @@ print-title = Printo
 print-title-from-app = Printo nga { $appName }
 print-accept = Printo
 print-no-printers = Nuk është konfiguruar asnjë printer.
-print-job-name = Dokument
-print-job-name-from-app = Dokument nga { $appName }
-print-failed-title = Printimi dështoi
-print-failed = { $printer } nuk e pranoi dokumentin.
-print-failed-from-app = { $printer } nuk e pranoi dokumentin nga { $appName }.
 
 print-printer = Printeri
 print-printer-not-accepting = Nuk pranon dokumente tani

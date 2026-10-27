@@ -3,7 +3,7 @@ import St from 'gi://St';
 
 import type { ButtonInfo, ModalDialog } from 'resource:///com/lantharos/kestrel/ui/modalDialog.js';
 import { promptAppeared } from '../../system/sounds/sounds.js';
-import { CANCELLED, ENDED, PortalRequest, type Options, type Outcome } from './request.js';
+import { CANCELLED, ENDED, type Dismissal, type Options, type Outcome } from './request.js';
 
 interface DialogSpec {
   title: string;
@@ -21,7 +21,7 @@ export interface PortalDialog {
   buttons(buttons: ButtonInfo[]): St.Button[];
 }
 
-export async function openDialog(handle: string | null, spec: DialogSpec, build: (dialog: PortalDialog) => void): Promise<Outcome> {
+export async function openDialog(dismissal: Dismissal | null, spec: DialogSpec, build: (dialog: PortalDialog) => void): Promise<Outcome> {
   const [{ MessageDialogContent }, { ModalDialog }] = await Promise.all([
     import('resource:///com/lantharos/kestrel/ui/dialog.js'),
     import('resource:///com/lantharos/kestrel/ui/modalDialog.js'),
@@ -37,7 +37,7 @@ export async function openDialog(handle: string | null, spec: DialogSpec, build:
       outcome = [response, results];
       modal.close();
     };
-    const request = handle ? new PortalRequest(handle, () => finish(ENDED)) : null;
+    const stopListening = dismissal?.(() => finish(ENDED));
     build({
       modal,
       content,
@@ -49,11 +49,11 @@ export async function openDialog(handle: string | null, spec: DialogSpec, build:
       },
     });
     modal.connect('closed', () => {
-      request?.finish();
+      stopListening?.();
       resolve(outcome);
     });
     if (!modal.open()) {
-      request?.finish();
+      stopListening?.();
       modal.destroy();
       resolve([ENDED, {}]);
     } else if (spec.askedBy !== undefined) {

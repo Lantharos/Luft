@@ -101,11 +101,6 @@ print-title = Nyomtatás
 print-title-from-app = Nyomtatás innen: { $appName }
 print-accept = Nyomtatás
 print-no-printers = Nincs beállított nyomtató.
-print-job-name = Dokumentum
-print-job-name-from-app = Dokumentum innen: { $appName }
-print-failed-title = A nyomtatás nem sikerült
-print-failed = { $printer } nyomtató nem fogadta a dokumentumot.
-print-failed-from-app = { $printer } nyomtató nem fogadta { $appName } alkalmazás dokumentumát.
 
 print-printer = Nyomtató
 print-printer-not-accepting = Most nem fogad dokumentumokat

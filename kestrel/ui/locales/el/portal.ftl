@@ -101,11 +101,6 @@ print-title = Εκτύπωση
 print-title-from-app = Εκτύπωση από { $appName }
 print-accept = Εκτύπωση
 print-no-printers = Δεν έχουν ρυθμιστεί εκτυπωτές.
-print-job-name = Έγγραφο
-print-job-name-from-app = Έγγραφο από { $appName }
-print-failed-title = Η εκτύπωση δεν ήταν δυνατή
-print-failed = Ο εκτυπωτής { $printer } δεν δέχτηκε το έγγραφο.
-print-failed-from-app = Ο εκτυπωτής { $printer } δεν δέχτηκε το έγγραφο από { $appName }.
 
 print-printer = Εκτυπωτής
 print-printer-not-accepting = Δεν δέχεται έγγραφα αυτήν τη στιγμή

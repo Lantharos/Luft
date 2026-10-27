@@ -101,11 +101,6 @@ print-title = Yazdır
 print-title-from-app = Yazdır: { $appName }
 print-accept = Yazdır
 print-no-printers = Kurulu yazıcı yok.
-print-job-name = Belge
-print-job-name-from-app = Belge: { $appName }
-print-failed-title = Yazdırılamadı
-print-failed = { $printer } belgeyi kabul etmedi.
-print-failed-from-app = { $printer }, { $appName } tarafından gönderilen belgeyi kabul etmedi.
 
 print-printer = Yazıcı
 print-printer-not-accepting = Şu anda belge kabul etmiyor

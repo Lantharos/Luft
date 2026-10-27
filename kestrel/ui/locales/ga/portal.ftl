@@ -107,11 +107,6 @@ print-title = Priontáil
 print-title-from-app = Priontáil – { $appName }
 print-accept = Priontáil
 print-no-printers = Níl aon phrintéir socraithe.
-print-job-name = Doiciméad
-print-job-name-from-app = Doiciméad – { $appName }
-print-failed-title = Níorbh fhéidir priontáil
-print-failed = Níor ghlac { $printer } leis an doiciméad.
-print-failed-from-app = Níor ghlac { $printer } leis an doiciméad a sheol { $appName }.
 
 print-printer = Printéir
 print-printer-not-accepting = Ní ghlacann sé le doiciméid faoi láthair

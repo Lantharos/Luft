@@ -53,6 +53,7 @@ Chromium-based browsers and Electron apps lock their profile with the host name,
 | `kestrel-setup.target` | Kestrel in setup mode with the session manager, before the desktop when setup is pending |
 | `kestrel-settings` | Settings service started before the shell |
 | `kestrel-search` | Indexes the names and text of files in your home folder for Start, at idle priority |
+| `kestrel-portal` | `com.lantharos.Kestrel.Portal`, the portal backend for email, printing, accounts, app choosers, launchers, USB devices, wallpapers and lockdown. Its dialogs still open in Kestrel |
 | `kestrel-greeter-service` | `com.lantharos.Greeter1` on the system bus, the login screen's settings |
 | `kestrel-authenticate` | Checks lock screen passwords and fingerprints through the `kestrel-unlock` PAM rules |
 | `kestrel-watchdog` | Restarts the computer when the GPU is stuck ([details](../boot.md#graphics-driver-stopped-responding)) |

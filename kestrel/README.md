@@ -14,6 +14,7 @@ Kestrel is Luft's desktop and login screen. It runs on its own patched Mutter 51
 | [`compositor`](compositor/README.md) | Mutter patch series |
 | `settings` | `kestrel-settings`: XSETTINGS, night light, power, printing, housekeeping, time zone, browser profile locks, memory warnings |
 | `search` | `kestrel-search`, the file index behind Start's search |
+| `portal` | `kestrel-portal`, the desktop portal requests that need no compositor: email, printing, accounts, app choosers, launchers, USB devices, wallpapers and lockdown |
 | `greeter` | `kestrel-greeter-service`, which stores the login screen's settings |
 | [`keyring`](keyring/README.md) | Luft Keyring |
 | [`passkeys`](passkeys/README.md) | Luft Passkeys |

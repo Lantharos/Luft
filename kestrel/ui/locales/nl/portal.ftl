@@ -101,11 +101,6 @@ print-title = Afdrukken
 print-title-from-app = Afdrukken vanuit { $appName }
 print-accept = Afdrukken
 print-no-printers = Er zijn geen printers ingesteld.
-print-job-name = Document
-print-job-name-from-app = Document van { $appName }
-print-failed-title = Kan niet afdrukken
-print-failed = { $printer } heeft het document niet aangenomen.
-print-failed-from-app = { $printer } heeft het document van { $appName } niet aangenomen.
 
 print-printer = Printer
 print-printer-not-accepting = Neemt nu geen documenten aan

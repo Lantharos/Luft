@@ -101,11 +101,6 @@ print-title = Printimine
 print-title-from-app = Printimine: { $appName }
 print-accept = Prindi
 print-no-printers = Ühtegi printerit pole seadistatud.
-print-job-name = Dokument
-print-job-name-from-app = Dokument: { $appName }
-print-failed-title = Printimine ebaõnnestus
-print-failed = { $printer } ei võtnud dokumenti vastu.
-print-failed-from-app = { $printer } ei võtnud vastu dokumenti, mille saatis { $appName }.
 
 print-printer = Printer
 print-printer-not-accepting = Praegu ei võta dokumente vastu

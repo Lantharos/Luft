@@ -3781,6 +3781,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "kestrel-portal"
+version = "0.1.0"
+dependencies = [
+ "futures-util",
+ "gio",
+ "gio-unix",
+ "glib",
+ "luft-i18n",
+ "rustix",
+ "sha2",
+ "tokio",
+ "zbus 6.0.0",
+]
+
+[[package]]
 name = "kestrel-search"
 version = "0.1.0"
 dependencies = [

@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=com.lantharos.Kestrel.Portal
+Exec=@libexecdir@/kestrel-portal
+SystemdService=kestrel-portal.service

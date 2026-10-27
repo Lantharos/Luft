@@ -52,9 +52,23 @@ configure_file(
   install_dir: systemduserunitdir,
 )
 
+configure_file(
+  input: 'kestrel-portal.service.in',
+  output: 'kestrel-portal.service',
+  configuration: settingsconf,
+  install_dir: systemduserunitdir,
+)
+
+configure_file(
+  input: 'com.lantharos.Kestrel.Portal.service.in',
+  output: 'com.lantharos.Kestrel.Portal.service',
+  configuration: settingsconf,
+  install_dir: servicedir,
+)
+
 install_data('kestrel-session.target', 'kestrel-setup.target', install_dir: systemduserunitdir)
 install_data('kestrel-portals.conf', install_dir: datadir / 'xdg-desktop-portal')
-install_data('kestrel.portal', install_dir: datadir / 'xdg-desktop-portal' / 'portals')
+install_data('kestrel.portal', 'kestrel-portal.portal', install_dir: datadir / 'xdg-desktop-portal' / 'portals')
 install_data('org.freedesktop.impl.portal.desktop.kestrel.service', install_dir: servicedir)
 foreach slice : ['app', 'background', 'user']
   install_data('slice-oomd.conf', install_dir: systemduserunitdir / slice + '.slice.d', rename: '50-kestrel-oomd.conf')

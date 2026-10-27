@@ -107,11 +107,6 @@ print-title = Ipprintja
 print-title-from-app = Ipprintja minn { $appName }
 print-accept = Ipprintja
 print-no-printers = M’hemm l-ebda printer issettjat.
-print-job-name = Dokument
-print-job-name-from-app = Dokument minn { $appName }
-print-failed-title = Ma setax jiġi pprintjat
-print-failed = { $printer } ma aċċettax id-dokument.
-print-failed-from-app = { $printer } ma aċċettax id-dokument minn { $appName }.
 
 print-printer = Printer
 print-printer-not-accepting = Mhux qed jaċċetta dokumenti bħalissa

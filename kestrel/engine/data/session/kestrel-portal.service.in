@@ -1,0 +1,22 @@
+[Unit]
+Description=Kestrel portal
+CollectMode=inactive-or-failed
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+Slice=session.slice
+Type=dbus
+BusName=com.lantharos.Kestrel.Portal
+ExecStart=@libexecdir@/kestrel-portal
+Restart=on-failure
+TimeoutStopSec=5
+NoNewPrivileges=yes
+RestrictAddressFamilies=AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service

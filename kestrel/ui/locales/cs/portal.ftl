@@ -105,11 +105,6 @@ print-title = Tisk
 print-title-from-app = Tisk z aplikace { $appName }
 print-accept = Vytisknout
 print-no-printers = Nejsou nastavené žádné tiskárny.
-print-job-name = Dokument
-print-job-name-from-app = Dokument z aplikace { $appName }
-print-failed-title = Tisk se nezdařil
-print-failed = Tiskárna { $printer } dokument nepřijala.
-print-failed-from-app = Tiskárna { $printer } nepřijala dokument z aplikace { $appName }.
 
 print-printer = Tiskárna
 print-printer-not-accepting = Momentálně nepřijímá dokumenty

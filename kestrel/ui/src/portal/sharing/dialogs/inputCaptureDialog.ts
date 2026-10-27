@@ -2,7 +2,7 @@ import type St from 'gi://St';
 
 import { t } from '../../../shared/i18n/index.js';
 import { openDialog, type PortalDialog } from '../../core/dialog.js';
-import { SUCCESS } from '../../core/request.js';
+import { requested, SUCCESS } from '../../core/request.js';
 import { list } from '../../core/rows.js';
 import { PERSIST_UNTIL_REVOKED } from '../restore.js';
 import { appNames } from '../../core/apps.js';
@@ -17,7 +17,7 @@ export async function chooseCapture(handle: string, appId: string, clipboardRequ
   opened: (dialog: PortalDialog) => void): Promise<[number, CaptureChoice | null]> {
   const app = appNames(appId);
   let choice: CaptureChoice | null = null;
-  const [response] = await openDialog(handle, {
+  const [response] = await openDialog(requested(handle), {
     title: t('screen-share-input-capture-title', { appName: app.object }),
     description: t('screen-share-input-capture-description', { appName: app.object }),
     icon: 'input-mouse-symbolic',

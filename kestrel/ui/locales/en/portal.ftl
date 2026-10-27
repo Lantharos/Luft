@@ -129,13 +129,6 @@ print-title-from-app = Print from { $appName }
 # Default label of the button that starts printing
 print-accept = Print
 print-no-printers = No printers are set up.
-# Name of the print job in the printer's queue
-print-job-name = Document
-print-job-name-from-app = Document from { $appName }
-print-failed-title = Couldn’t print
-# $printer is the printer's name.
-print-failed = { $printer } didn’t take the document.
-print-failed-from-app = { $printer } didn’t take the document from { $appName }.
 
 # Picker heading and field label
 print-printer = Printer

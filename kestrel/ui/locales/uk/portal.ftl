@@ -101,11 +101,6 @@ print-title = Друк
 print-title-from-app = Друк із програми { $appName }
 print-accept = Друкувати
 print-no-printers = Не налаштовано жодного принтера.
-print-job-name = Документ
-print-job-name-from-app = Документ із програми { $appName }
-print-failed-title = Не вдалося надрукувати
-print-failed = Принтер { $printer } не прийняв документ.
-print-failed-from-app = Принтер { $printer } не прийняв документ із програми { $appName }.
 
 print-printer = Принтер
 print-printer-not-accepting = Зараз не приймає документи

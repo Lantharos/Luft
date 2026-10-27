@@ -105,11 +105,6 @@ print-title = Tlač
 print-title-from-app = Tlač z aplikácie { $appName }
 print-accept = Tlačiť
 print-no-printers = Nie sú nastavené žiadne tlačiarne.
-print-job-name = Dokument
-print-job-name-from-app = Dokument z aplikácie { $appName }
-print-failed-title = Nepodarilo sa vytlačiť
-print-failed = Tlačiareň { $printer } neprijala dokument.
-print-failed-from-app = Tlačiareň { $printer } neprijala dokument z aplikácie { $appName }.
 
 print-printer = Tlačiareň
 print-printer-not-accepting = Momentálne neprijíma dokumenty

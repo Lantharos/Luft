@@ -7,7 +7,7 @@ import {labelled, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {property, subscribe} from '../lib/dbus.js';
 import {click} from '../lib/input/input.js';
-import {BACKEND, call, PORTAL_PATH, portalDialog, requestHandle, sessionHandle} from '../lib/access/portal.js';
+import {backendOf, call, PORTAL_PATH, portalDialog, requestHandle, sessionHandle} from '../lib/access/portal.js';
 import {scratch} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {settled} from '../lib/wait.js';
@@ -123,7 +123,7 @@ async function checkLockdown() {
   const lockdown = new Gio.Settings({schema_id: 'org.gnome.desktop.lockdown'});
   try {
     lockdown.set_boolean('disable-printing', true);
-    await eventually(async () => await property(BACKEND, PORTAL_PATH, 'org.freedesktop.impl.portal.Lockdown', 'disable-printing') === true,
+    await eventually(async () => await property(backendOf('Lockdown'), PORTAL_PATH, 'org.freedesktop.impl.portal.Lockdown', 'disable-printing') === true,
       'apps see when printing is turned off');
   } finally {
     lockdown.reset('disable-printing');

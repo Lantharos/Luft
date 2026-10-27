@@ -1,6 +1,6 @@
 import { t } from '../../../shared/i18n/index.js';
 import { openDialog, type PortalDialog } from '../../core/dialog.js';
-import { SUCCESS } from '../../core/request.js';
+import { requested, SUCCESS } from '../../core/request.js';
 import { list } from '../../core/rows.js';
 import { PERSIST_UNTIL_REVOKED } from '../restore.js';
 import type { Selection, Source } from '../sources.js';
@@ -17,7 +17,7 @@ export async function chooseSources(handle: string, appId: string, selection: Se
   opened: (dialog: PortalDialog) => void): Promise<[number, SourceChoice | null]> {
   const app = appNames(appId);
   let choice: SourceChoice | null = null;
-  const [response] = await openDialog(handle, {
+  const [response] = await openDialog(requested(handle), {
     title: t('screen-share-title', { appName: app.object }),
     description: t('screen-share-description', { appName: app.subject }),
     icon: 'screen-shared-symbolic',

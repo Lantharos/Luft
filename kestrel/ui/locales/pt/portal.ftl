@@ -101,11 +101,6 @@ print-title = Imprimir
 print-title-from-app = Imprimir a partir de { $appName }
 print-accept = Imprimir
 print-no-printers = Não há impressoras configuradas.
-print-job-name = Documento
-print-job-name-from-app = Documento de { $appName }
-print-failed-title = Não foi possível imprimir
-print-failed = A impressora { $printer } não aceitou o documento.
-print-failed-from-app = A impressora { $printer } não aceitou o documento de { $appName }.
 
 print-printer = Impressora
 print-printer-not-accepting = Não está a aceitar documentos de momento

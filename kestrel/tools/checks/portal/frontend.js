@@ -5,7 +5,7 @@ import {labelled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {call, subscribe} from '../lib/dbus.js';
 import {click} from '../lib/input/input.js';
-import {BACKEND, PORTAL_PATH, portalDialog} from '../lib/access/portal.js';
+import {backendOf, PORTAL_PATH, portalDialog} from '../lib/access/portal.js';
 import {settled} from '../lib/wait.js';
 
 const {require, eventually} = checks('frontend');
@@ -25,7 +25,7 @@ async function properties(name, iface) {
 
 async function checkProperties() {
   for (const portal of MIRRORED) {
-    const backend = await properties(BACKEND, `org.freedesktop.impl.portal.${portal}`);
+    const backend = await properties(backendOf(portal), `org.freedesktop.impl.portal.${portal}`);
     const frontend = await properties(FRONTEND, `org.freedesktop.portal.${portal}`);
     require(backend.version > 0 && Object.keys(backend).every(key => JSON.stringify(frontend[key]) === JSON.stringify(backend[key])),
       `apps see everything ${portal} offers from the moment the session starts`);

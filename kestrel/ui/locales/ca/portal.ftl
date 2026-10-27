@@ -101,11 +101,6 @@ print-title = Imprimeix
 print-title-from-app = Imprimeix des de { $appName }
 print-accept = Imprimeix
 print-no-printers = No hi ha cap impressora configurada.
-print-job-name = Document
-print-job-name-from-app = Document de { $appName }
-print-failed-title = No s’ha pogut imprimir
-print-failed = { $printer } no ha acceptat el document.
-print-failed-from-app = { $printer } no ha acceptat el document de { $appName }.
 
 print-printer = Impressora
 print-printer-not-accepting = Ara mateix no accepta documents

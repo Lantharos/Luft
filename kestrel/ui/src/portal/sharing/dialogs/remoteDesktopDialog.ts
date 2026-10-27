@@ -2,7 +2,7 @@ import type St from 'gi://St';
 
 import { t } from '../../../shared/i18n/index.js';
 import { openDialog, type PortalDialog } from '../../core/dialog.js';
-import { SUCCESS } from '../../core/request.js';
+import { requested, SUCCESS } from '../../core/request.js';
 import { list, row } from '../../core/rows.js';
 import { KEYBOARD, POINTER, TOUCHSCREEN } from '../mutter.js';
 import { PERSIST_UNTIL_REVOKED } from '../restore.js';
@@ -35,7 +35,7 @@ export async function chooseControl(handle: string, appId: string, request: Cont
   opened: (dialog: PortalDialog) => void): Promise<[number, ControlChoice | null]> {
   const app = appNames(appId);
   let choice: ControlChoice | null = null;
-  const [response] = await openDialog(handle, {
+  const [response] = await openDialog(requested(handle), {
     title: t('screen-share-remote-desktop-title', { appName: app.object }),
     description: request.selection
       ? t('screen-share-remote-desktop-with-screen', { appName: app.subject })

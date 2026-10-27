@@ -103,11 +103,6 @@ print-title = Drukāt
 print-title-from-app = Drukāt: { $appName }
 print-accept = Drukāt
 print-no-printers = Nav iestatīts neviens printeris.
-print-job-name = Dokuments
-print-job-name-from-app = Dokuments ({ $appName })
-print-failed-title = Neizdevās izdrukāt
-print-failed = Printeris { $printer } nepieņēma dokumentu.
-print-failed-from-app = Printeris { $printer } nepieņēma dokumentu ({ $appName }).
 
 print-printer = Printeris
 print-printer-not-accepting = Pašlaik nepieņem dokumentus

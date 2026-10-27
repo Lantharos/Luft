@@ -4,7 +4,7 @@ import GLib from 'gi://GLib';
 import {firstStyled, labelled, named, shown, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {click, type} from '../lib/input/input.js';
-import {BACKEND, call, PORTAL_PATH, portalDialog, requestHandle} from '../lib/access/portal.js';
+import {backendOf, call, PORTAL_PATH, portalDialog, requestHandle} from '../lib/access/portal.js';
 import {completedJobs, JOB_TIMEOUT, PRINTER, writeDocument} from '../lib/access/printing.js';
 import {scratch} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
@@ -19,7 +19,7 @@ const double = value => new GLib.Variant('d', value);
 
 function printDocument(path, options) {
   const document = Gio.UnixFDList.new_from_array([GLib.open(path, 0, 0)]);
-  return Gio.DBus.session.call_with_unix_fd_list(BACKEND, PORTAL_PATH, 'org.freedesktop.impl.portal.Print', 'Print',
+  return Gio.DBus.session.call_with_unix_fd_list(backendOf('Print'), PORTAL_PATH, 'org.freedesktop.impl.portal.Print', 'Print',
     new GLib.Variant('(osssha{sv})', [requestHandle(), APP, '', 'Print', 0, options]), new GLib.VariantType('(ua{sv})'),
     Gio.DBusCallFlags.NONE, -1, document, null).then(([reply]) => reply.recursiveUnpack());
 }

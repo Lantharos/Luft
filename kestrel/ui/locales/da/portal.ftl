@@ -101,11 +101,6 @@ print-title = Udskriv
 print-title-from-app = Udskriv fra { $appName }
 print-accept = Udskriv
 print-no-printers = Der er ingen printere konfigureret.
-print-job-name = Dokument
-print-job-name-from-app = Dokument fra { $appName }
-print-failed-title = Kunne ikke udskrive
-print-failed = { $printer } tog ikke imod dokumentet.
-print-failed-from-app = { $printer } tog ikke imod dokumentet fra { $appName }.
 
 print-printer = Printer
 print-printer-not-accepting = Tager ikke imod dokumenter lige nu

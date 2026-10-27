@@ -101,11 +101,6 @@ print-title = Skriv ut
 print-title-from-app = Skriv ut frå { $appName }
 print-accept = Skriv ut
 print-no-printers = Ingen skrivarar er sette opp.
-print-job-name = Dokument
-print-job-name-from-app = Dokument frå { $appName }
-print-failed-title = Kunne ikkje skrive ut
-print-failed = { $printer } tok ikkje imot dokumentet.
-print-failed-from-app = { $printer } tok ikkje imot dokumentet frå { $appName }.
 
 print-printer = Skrivar
 print-printer-not-accepting = Tek ikkje imot dokument no

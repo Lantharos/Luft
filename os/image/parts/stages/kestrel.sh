@@ -96,7 +96,7 @@ build_services() {
   local program
   cargo build --release --locked --manifest-path "$luft/Cargo.toml"
   install -Dm755 "$release/peek" "$destdir/usr/bin/peek"
-  for program in kestrel-settings kestrel-search kestrel-openconnect kestrel-greeter-service kestrel-watchdog \
+  for program in kestrel-settings kestrel-search kestrel-portal kestrel-openconnect kestrel-greeter-service kestrel-watchdog \
     luft-keyring luft-keyring-unlock luft-pinentry luft-passkeys luft-passkeys-relay; do
     install -Dm755 "$release/$program" "$destdir$libexec/$program"
   done

@@ -101,11 +101,6 @@ print-title = Prenta
 print-title-from-app = Prenta úr { $appName }
 print-accept = Prenta
 print-no-printers = Enginn prentari hefur verið settur upp.
-print-job-name = Skjal
-print-job-name-from-app = Skjal frá { $appName }
-print-failed-title = Ekki tókst að prenta
-print-failed = { $printer } tók ekki við skjalinu.
-print-failed-from-app = { $printer } tók ekki við skjalinu frá { $appName }.
 
 print-printer = Prentari
 print-printer-not-accepting = Tekur ekki við skjölum eins og er

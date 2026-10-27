@@ -1,14 +1,45 @@
 use luft_app::apps::App;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use zbus::{DeserializeDict, Type};
 
 use super::bus::{self, ACCESS, Problem, SSH, STATUS};
+use crate::parse::parse;
 
 const HISTORY_LIMIT: u32 = 50;
 
 type Store = (String, String, String, u32);
 type Record = (u64, String, String, String, String);
 type Key = (String, String, String, bool, bool, u64);
+
+#[derive(Deserialize, Serialize, Type, specta::Type)]
+#[zvariant(signature = "s")]
+#[serde(rename_all = "kebab-case")]
+enum Chip {
+    Ready,
+    Missing,
+    Unsupported,
+    Disabled,
+    Failing,
+    NoPcrBank,
+    Unavailable,
+}
+
+#[derive(Deserialize, Serialize, specta::Type)]
+#[serde(rename_all = "lowercase")]
+enum Action {
+    Read,
+    Saved,
+    Deleted,
+    Denied,
+    Signed,
+}
+
+#[derive(Deserialize, Serialize, specta::Type)]
+#[serde(rename_all = "lowercase")]
+enum KeyKind {
+    Ed25519,
+    Ecdsa,
+}
 
 #[derive(DeserializeDict, Type, Serialize, specta::Type)]
 #[zbus(signature = "a{sv}", rename_all = "PascalCase")]
@@ -19,7 +50,7 @@ struct KeyringStatus {
     fingerprint_unlock: bool,
     pin: bool,
     item_count: u32,
-    chip: String,
+    chip: Chip,
     lock_with_screen: bool,
 }
 
@@ -46,10 +77,10 @@ struct AppStore {
 }
 
 #[derive(Serialize, specta::Type)]
-struct Event {
+struct AccessEvent {
     time: u64,
     app: String,
-    action: String,
+    action: Action,
     what: String,
 }
 
@@ -58,7 +89,7 @@ struct Event {
 struct SshKey {
     fingerprint: String,
     name: String,
-    kind: String,
+    kind: Option<KeyKind>,
     chip: bool,
     confirm: bool,
     added: u64,
@@ -67,7 +98,7 @@ struct SshKey {
 #[derive(Serialize, specta::Type)]
 pub struct Access {
     stores: Vec<AppStore>,
-    history: Vec<Event>,
+    history: Vec<AccessEvent>,
 }
 
 #[derive(Serialize, specta::Type)]
@@ -112,11 +143,13 @@ pub async fn access() -> Result<Access, Problem> {
     let history = bus::call::<_, Vec<Record>>(ACCESS, "History", &(HISTORY_LIMIT,))
         .await?
         .into_iter()
-        .map(|(time, app, _, action, what)| Event {
-            time,
-            app,
-            action,
-            what,
+        .filter_map(|(time, app, _, action, what)| {
+            Some(AccessEvent {
+                time,
+                app,
+                action: parse(action)?,
+                what,
+            })
         })
         .collect();
     Ok(Access { stores, history })
@@ -130,7 +163,7 @@ async fn ssh() -> Result<Ssh, Problem> {
         .map(|(fingerprint, name, kind, chip, confirm, added)| SshKey {
             fingerprint,
             name,
-            kind,
+            kind: parse(kind),
             chip,
             confirm,
             added,

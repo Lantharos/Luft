@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Row, Select, Switch } from '@luft/ui';
-	import { powerOffAfter, setPowerOffAfter } from './api';
+	import { commands } from '#lib/bindings.js';
 
 	const HOUR = 60 * 60;
 	const DAY = 24 * HOUR;
@@ -25,7 +25,7 @@
 	);
 
 	$effect(() => {
-		void powerOffAfter().then((current) => (seconds = current));
+		void commands.powerOffAfter().then((current) => (seconds = current));
 	});
 
 	async function choose(next: number) {
@@ -33,7 +33,7 @@
 		seconds = next;
 		failed = false;
 		try {
-			await setPowerOffAfter(next);
+			await commands.powerSetPowerOffAfter({ seconds: next });
 		} catch {
 			seconds = previous;
 			failed = true;

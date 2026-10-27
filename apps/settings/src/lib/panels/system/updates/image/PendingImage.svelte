@@ -1,14 +1,15 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { ago, bytes, Row, Section } from '@luft/ui';
-	import { download, restart, rollback, type Activity, type SystemOverview, type Release } from '../api';
+	import { commands } from '#lib/bindings.js';
+	import type { Activity, ImageOverview, Release } from '#lib/bindings.js';
 	import { named, versionName } from '../headline';
 	import NotesDialog from './NotesDialog.svelte';
 
 	interface Props {
-		overview: SystemOverview;
+		overview: ImageOverview;
 		activity: Activity;
-		attempt: (action: () => Promise<void>) => void;
+		attempt: (action: () => Promise<unknown>) => void;
 	}
 
 	let { overview, activity, attempt }: Props = $props();
@@ -32,17 +33,17 @@
 {#if overview.returning}
 	<Section>
 		<Row title={versionName(overview.returning)} description={t('settings-updates-returning-description')}>
-			<button type="button" class="button" disabled={busy} onclick={() => attempt(rollback)}>{named(overview.current, 'settings-updates-stay', 'settings-updates-stay-unversioned')}</button>
-			<button type="button" class="button primary" disabled={busy} onclick={() => attempt(restart)}>{t('settings-updates-restart')}</button>
+			<button type="button" class="button" disabled={busy} onclick={() => attempt(commands.updatesRollback)}>{named(overview.current, 'settings-updates-stay', 'settings-updates-stay-unversioned')}</button>
+			<button type="button" class="button primary" disabled={busy} onclick={() => attempt(commands.updatesRestart)}>{t('settings-updates-restart')}</button>
 		</Row>
 	</Section>
 {:else if next}
 	<Section>
 		<Row title={summary(next)} description={describeNext(next)} truncate>
 			{#if ready}
-				<button type="button" class="button primary" disabled={busy} onclick={() => attempt(restart)}>{t('settings-updates-restart-to-install')}</button>
+				<button type="button" class="button primary" disabled={busy} onclick={() => attempt(commands.updatesRestart)}>{t('settings-updates-restart-to-install')}</button>
 			{:else if activity.running !== 'download'}
-				<button type="button" class="button primary" disabled={busy} onclick={() => attempt(download)}>{t('settings-updates-download')}</button>
+				<button type="button" class="button primary" disabled={busy} onclick={() => attempt(commands.updatesDownload)}>{t('settings-updates-download')}</button>
 			{/if}
 		</Row>
 		{#if next.notes}

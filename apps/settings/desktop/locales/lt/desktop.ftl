@@ -199,7 +199,6 @@ desktop-admin-required = Kad tai pakeistumėte, reikia administratoriaus teisių
 desktop-about-disks-missing = Programa Diskai neįdiegta
 
 ## Apps
-desktop-apps-kind-not-choosable = Tokios programos pasirinkti negalima
 desktop-apps-uninstalled = Ši programa nebeįdiegta
 desktop-apps-no-longer-starts = Ši programa nebepasileidžia automatiškai
 desktop-apps-cannot-autostart = Ši programa negali pasileisti automatiškai

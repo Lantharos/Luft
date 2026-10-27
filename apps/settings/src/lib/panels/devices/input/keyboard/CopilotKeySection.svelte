@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Row, Section, Select, Switch } from '@luft/ui';
+	import { commands } from '#lib/bindings.js';
+	import type { App } from '#lib/bindings.js';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import ChooseAppDialog from '#lib/panels/protection/apps/ChooseAppDialog.svelte';
-	import { installedApps, type App } from '#lib/panels/protection/apps/api.js';
 
 	type Press = 'search' | 'app' | 'nothing';
 	type CopilotKey = { press: Press; app: string; hold: boolean };
@@ -23,7 +24,7 @@
 	let press = $derived(key.values.press ?? 'search');
 	let chosen = $derived(apps.find((app) => app.id === key.values.app));
 
-	void installedApps().then((list) => (apps = list));
+	void commands.appsInstalled().then((list) => (apps = list));
 
 	async function pick(value: Press) {
 		await key.set('press', value);

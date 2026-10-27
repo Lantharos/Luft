@@ -1,4 +1,3 @@
-use specta::Type;
 mod switch;
 mod watch;
 
@@ -6,6 +5,7 @@ use luft_software::progress::Progress;
 use luft_software::system::image::{self, Deployments, Release, Status, Update};
 use luft_software::task::{Cancel, Task};
 use serde::Serialize;
+use specta::Type;
 
 use super::background::{AVAILABLE, Notice, READY};
 use super::store::{Checked, Found};
@@ -23,7 +23,7 @@ pub struct Available {
 
 #[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct Overview {
+pub struct ImageOverview {
     #[serde(flatten)]
     status: Status,
     available: Option<Available>,
@@ -47,7 +47,7 @@ fn follow(task: Task) -> Result<(), String> {
     luft_app::block_on(image::follow(expected_size(), task))
 }
 
-pub fn load(refresh: Option<Task>) -> Result<Overview, String> {
+pub fn load(refresh: Option<Task>) -> Result<ImageOverview, String> {
     let refreshed = refresh.is_some();
     let deployments = luft_app::block_on(Deployments::load())?;
     let update = match refresh {
@@ -61,7 +61,7 @@ pub fn load(refresh: Option<Task>) -> Result<Overview, String> {
             release: update.release,
             size: update.size,
         });
-    Ok(Overview {
+    Ok(ImageOverview {
         status,
         available,
         offer: switch::offer(deployments, refreshed),

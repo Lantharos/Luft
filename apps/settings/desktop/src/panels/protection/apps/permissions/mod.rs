@@ -17,7 +17,7 @@ use serde::{Deserialize, Serialize};
 use zbus::Connection;
 
 use crate::L10N;
-use grants::{SWITCHES, Switch};
+use grants::{SWITCHES, Switchable};
 use passwords::Remembered;
 use sandbox::SandboxDevice;
 use specta::Type;
@@ -43,7 +43,7 @@ struct AppAccess {
 
 #[derive(Deserialize, Type)]
 struct PermissionChange {
-    kind: Switch,
+    kind: Switchable,
     app: String,
     allowed: bool,
 }

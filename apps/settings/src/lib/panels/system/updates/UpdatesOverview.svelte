@@ -2,15 +2,16 @@
 	import { t } from '@luft/i18n';
 	import Info from '@lucide/svelte/icons/info';
 	import { ActionRow, ProgressBar, Row, Section } from '@luft/ui';
+	import { commands } from '#lib/bindings.js';
+	import type { Activity, Firmware, Preferences } from '#lib/bindings.js';
 	import { updates } from '#lib/state/updates.svelte.js';
 	import { downloading, fractionOf } from './activity';
-	import { cancel, check, firmware, load, openApps, preferences as loadPreferences, type Activity, type Firmware, type Preferences } from './api';
+	import { firmware, openApps } from './api';
 	import AutomaticSection from './AutomaticSection.svelte';
 	import FirmwareSection from './FirmwareSection.svelte';
 	import { headline, subline } from './headline';
 	import PendingImage from './image/PendingImage.svelte';
 	import VersionRows from './image/VersionRows.svelte';
-	import { about } from '../about/api';
 	import { percent } from '#lib/format.js';
 
 	let { onabout }: { onabout: () => void } = $props();
@@ -26,7 +27,7 @@
 	const fraction = $derived(fractionOf(activity));
 	const apps = $derived(info?.apps ?? null);
 
-	async function attempt(action: () => Promise<void>) {
+	async function attempt(action: () => Promise<unknown>) {
 		failure = null;
 		await action().catch((reason) => (failure = String(reason)));
 	}
@@ -42,10 +43,10 @@
 		previous = running;
 	});
 
-	void attempt(load);
+	void attempt(commands.updatesLoad);
 	void loadDevices();
-	void loadPreferences().then((loaded) => (preferences = loaded));
-	void about().then((info) => (deviceName = info.deviceName));
+	void commands.updatesPreferences().then((loaded) => (preferences = loaded));
+	void commands.about().then((info) => (deviceName = info.deviceName));
 </script>
 
 <div class="flex flex-col gap-3 px-2 pb-1">
@@ -55,9 +56,9 @@
 			<span class="truncate text-[14px] text-[var(--text-muted)]">{subline(info, activity, failure)}</span>
 		</div>
 		{#if downloading(activity)}
-			<button type="button" class="button" onclick={() => attempt(cancel)}>{t('settings-updates-stop')}</button>
+			<button type="button" class="button" onclick={() => attempt(commands.updatesCancel)}>{t('settings-updates-stop')}</button>
 		{:else}
-			<button type="button" class="button" disabled={busy} onclick={() => attempt(check)}>{activity.running === 'check' ? t('settings-updates-checking-button') : t('settings-updates-check')}</button>
+			<button type="button" class="button" disabled={busy} onclick={() => attempt(commands.updatesCheck)}>{activity.running === 'check' ? t('settings-updates-checking-button') : t('settings-updates-check')}</button>
 		{/if}
 	</div>
 	{#if downloading(activity)}

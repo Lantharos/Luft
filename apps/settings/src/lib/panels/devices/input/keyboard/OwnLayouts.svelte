@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Row, Section } from '@luft/ui';
+	import { commands } from '#lib/bindings.js';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
-	import { keysInstalled, openKeys } from './api';
+	import { openKeys } from './api';
 
 	const inputSources = useSettings<{ sources: [string, string][] }>('org.gnome.desktop.input-sources', ['sources']);
 
@@ -10,7 +11,7 @@
 
 	let firstLayout = $derived((inputSources.values.sources ?? []).find(([type]) => type === 'xkb')?.[1] ?? 'us');
 
-	void keysInstalled().then((installed) => (keys = installed));
+	void commands.keyboardKeysInstalled().then((installed) => (keys = installed));
 </script>
 
 {#if keys}

@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { SearchField, Section } from '@luft/ui';
+	import type { NotifyingApp } from '#lib/bindings.js';
 	import SubPage from '#lib/components/SubPage.svelte';
 	import { matches } from '#lib/panels/protection/apps/api.js';
 	import AppNotifications from './AppNotifications.svelte';
-	import type { NotifyingApp } from './api';
 
 	interface Props {
 		apps: NotifyingApp[];

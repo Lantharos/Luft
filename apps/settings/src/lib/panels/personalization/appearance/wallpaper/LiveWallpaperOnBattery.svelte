@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Row, Switch } from '@luft/ui';
+	import { commands } from '#lib/bindings.js';
 	import { KESTREL_SCHEMA, useSettings } from '#lib/state/gsettings.svelte.js';
-	import { powerState } from '#lib/panels/devices/power/api.js';
 
 	const kestrel = useSettings<{ 'live-wallpaper-on-battery': boolean }>(KESTREL_SCHEMA, ['live-wallpaper-on-battery']);
 
 	let hasBattery = $state(false);
 
-	void powerState().then((state) => (hasBattery = !!state.battery));
+	void commands.powerState().then((state) => (hasBattery = !!state.battery));
 </script>
 
 {#if hasBattery}

@@ -199,7 +199,6 @@ desktop-admin-required = Se necesitan permisos de administrador para cambiar est
 desktop-about-disks-missing = Discos no está instalado
 
 ## Apps
-desktop-apps-kind-not-choosable = No se puede elegir este tipo de aplicación
 desktop-apps-uninstalled = Esta aplicación ya no está instalada
 desktop-apps-no-longer-starts = Esta aplicación ya no se inicia automáticamente
 desktop-apps-cannot-autostart = Esta aplicación no puede iniciarse automáticamente

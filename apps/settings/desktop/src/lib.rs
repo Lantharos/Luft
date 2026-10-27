@@ -1,6 +1,7 @@
 mod app;
 mod gsettings;
 mod panels;
+mod parse;
 
 use luft_app::{Events, GlassWindow};
 use luft_i18n::{Localizer, localizer, t};

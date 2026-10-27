@@ -47,7 +47,7 @@ pub struct Query {
 
 #[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct CursorDownload {
+pub struct StoreFile {
     pub index: u32,
     pub name: String,
     pub size: u64,
@@ -55,20 +55,20 @@ pub struct CursorDownload {
 
 #[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct Item {
+pub struct StoreItem {
     id: u64,
     name: String,
     author: String,
     rating: f64,
     downloads: u64,
     preview: Option<String>,
-    files: Vec<CursorDownload>,
+    files: Vec<StoreFile>,
 }
 
 #[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct Page {
-    items: Vec<Item>,
+pub struct StorePage {
+    items: Vec<StoreItem>,
     pages: u32,
 }
 
@@ -119,8 +119,8 @@ fn downloads(item: &Map<String, Value>) -> impl Iterator<Item = (u32, String)> +
         })
 }
 
-fn item(item: &Map<String, Value>) -> Item {
-    Item {
+fn item(item: &Map<String, Value>) -> StoreItem {
+    StoreItem {
         id: number(item, "id"),
         name: text(item, "name"),
         author: text(item, "personid"),
@@ -128,7 +128,7 @@ fn item(item: &Map<String, Value>) -> Item {
         downloads: number(item, "downloads"),
         preview: thumbnail(&text(item, "previewpic1")),
         files: downloads(item)
-            .map(|(index, name)| CursorDownload {
+            .map(|(index, name)| StoreFile {
                 size: number(item, &format!("downloadsize{index}")) * 1024,
                 index,
                 name,
@@ -180,7 +180,7 @@ pub fn browse(
         order,
         page,
     }: Query,
-) -> Result<Page, String> {
+) -> Result<StorePage, String> {
     let (category, size, page) = (
         CURSOR_CATEGORY.to_string(),
         PAGE_SIZE.to_string(),
@@ -197,7 +197,7 @@ pub fn browse(
         query.push(("search", search));
     }
     let response = get(&format!("{API}/data"), &query)?;
-    Ok(Page {
+    Ok(StorePage {
         items: entries(&response).map(item).collect(),
         pages: number(&response, "totalitems").div_ceil(PAGE_SIZE as u64) as u32,
     })

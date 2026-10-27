@@ -4,8 +4,10 @@
 	import FolderOpen from '@lucide/svelte/icons/folder-open';
 	import ImagePlus from '@lucide/svelte/icons/image-plus';
 	import { Row, Section, Select } from '@luft/ui';
+	import { commands, events } from '#lib/bindings.js';
+	import type { Focus, Wallpaper } from '#lib/bindings.js';
 	import { KESTREL_SCHEMA, useSettings } from '#lib/state/gsettings.svelte.js';
-	import { addWallpapers, CENTER, onWallpapersChanged, openFolder, pathToUri, uriToPath, wallpaperFocus, wallpapers, type Focus, type Wallpaper } from './api';
+	import { CENTER, openFolder, pathToUri, uriToPath } from './api';
 	import LiveWallpaperOnBattery from './LiveWallpaperOnBattery.svelte';
 	import Rain from './Rain.svelte';
 	import { useScreenShape } from './screen.svelte.js';
@@ -60,7 +62,7 @@
 
 	async function choose(wallpaper: Wallpaper) {
 		const uri = pathToUri(wallpaper.path);
-		const position = chosen[uri] ?? (await wallpaperFocus(wallpaper.path));
+		const position = chosen[uri] ?? (await commands.appearanceWallpaperFocus({ path: wallpaper.path }));
 		if (wallpaper.live) {
 			await kestrel.set(liveKey, uri);
 		} else {
@@ -79,8 +81,8 @@
 		return wallpaper.path === current ? focus : chosen[pathToUri(wallpaper.path)];
 	}
 
-	void wallpapers().then((list) => (found = list));
-	onDestroy(onWallpapersChanged((list) => (found = list)));
+	void commands.appearanceWallpapers().then((list) => (found = list));
+	onDestroy(events.appearanceWallpapers((list) => (found = list)));
 </script>
 
 <Section title={t('settings-appearance-wallpaper')} description={dark ? t('settings-appearance-wallpaper-dark-description') : t('settings-appearance-wallpaper-light-description')}>
@@ -96,7 +98,7 @@
 		{#each available as wallpaper (wallpaper.path)}
 			<WallpaperTile {wallpaper} selected={wallpaper.path === current} focus={tileFocus(wallpaper)} shape={screen.aspect} onselect={() => choose(wallpaper)} />
 		{/each}
-		<button type="button" class="add-tile" style:aspect-ratio={screen.aspect} onclick={addWallpapers}>
+		<button type="button" class="add-tile" style:aspect-ratio={screen.aspect} onclick={() => commands.appearanceAddWallpapers()}>
 			<ImagePlus size={22} />
 			<span>{t('settings-appearance-wallpaper-add')}</span>
 		</button>

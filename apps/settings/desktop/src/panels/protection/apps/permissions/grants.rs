@@ -11,15 +11,19 @@ const NEVER_USED: &str = "0";
 
 #[derive(Deserialize, Clone, Copy, Type)]
 #[serde(rename_all = "camelCase")]
-pub enum Switch {
+pub enum Switchable {
     Location,
     Camera,
     Clipboard,
 }
 
-pub const SWITCHES: [Switch; 3] = [Switch::Location, Switch::Camera, Switch::Clipboard];
+pub const SWITCHES: [Switchable; 3] = [
+    Switchable::Location,
+    Switchable::Camera,
+    Switchable::Clipboard,
+];
 
-impl Switch {
+impl Switchable {
     pub fn entry(self) -> (&'static str, &'static str) {
         match self {
             Self::Location => ("location", "location"),
@@ -50,12 +54,12 @@ impl Switch {
 
 pub async fn set(
     connection: &Connection,
-    switch: Switch,
+    switch: Switchable,
     app: &str,
     allowed: bool,
 ) -> zbus::Result<()> {
     let (table, id) = switch.entry();
-    let Switch::Location = switch else {
+    let Switchable::Location = switch else {
         return permissions::set(connection, table, id, app, allowed).await;
     };
     let previous = permissions::lookup(connection, table, id)

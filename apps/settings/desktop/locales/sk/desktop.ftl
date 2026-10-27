@@ -199,7 +199,6 @@ desktop-admin-required = Na zmenu sú potrebné práva správcu
 desktop-about-disks-missing = Aplikácia Disky nie je nainštalovaná
 
 ## Apps
-desktop-apps-kind-not-choosable = Tento druh aplikácie sa nedá vybrať
 desktop-apps-uninstalled = Táto aplikácia už nie je nainštalovaná
 desktop-apps-no-longer-starts = Táto aplikácia sa už nespúšťa automaticky
 desktop-apps-cannot-autostart = Táto aplikácia sa nemôže spúšťať automaticky

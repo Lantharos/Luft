@@ -6,7 +6,8 @@
 	import { t } from '@luft/i18n';
 	import { errorText, IconButton, Row, Section, Switch } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
-	import { importVpn, type Vpn } from '@luft/network';
+	import { waitForPerson, type Vpn } from '@luft/network';
+	import { commands } from '#lib/bindings.js';
 	import type { Target } from '../connection/profile';
 	import type { NetworkState } from '../state.svelte';
 	import WireGuardDialog from './WireGuardDialog.svelte';
@@ -28,7 +29,7 @@
 		importing = true;
 		importProblem = '';
 		try {
-			await importVpn();
+			await commands.networkVpnImport(waitForPerson);
 		} catch (reason) {
 			importProblem = errorText(reason);
 		} finally {

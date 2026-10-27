@@ -199,7 +199,6 @@ desktop-admin-required = Για να το αλλάξετε αυτό, χρειά�
 desktop-about-disks-missing = Η εφαρμογή Δίσκοι δεν είναι εγκατεστημένη
 
 ## Apps
-desktop-apps-kind-not-choosable = Αυτό το είδος εφαρμογής δεν μπορεί να επιλεγεί
 desktop-apps-uninstalled = Αυτή η εφαρμογή δεν είναι πλέον εγκατεστημένη
 desktop-apps-no-longer-starts = Αυτή η εφαρμογή δεν ξεκινά πλέον αυτόματα
 desktop-apps-cannot-autostart = Αυτή η εφαρμογή δεν μπορεί να ξεκινά αυτόματα

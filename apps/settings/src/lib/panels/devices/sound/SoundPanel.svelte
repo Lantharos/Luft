@@ -6,25 +6,11 @@
 	import Volume2 from '@lucide/svelte/icons/volume-2';
 	import VolumeX from '@lucide/svelte/icons/volume-x';
 	import { Row, Section, Select, Slider, Switch } from '@luft/ui';
+	import { commands, events } from '#lib/bindings.js';
+	import type { DeviceView, Direction, Port, SoundSnapshot } from '#lib/bindings.js';
 	import SubPage from '#lib/components/SubPage.svelte';
 	import { percent } from '#lib/format.js';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
-	import {
-		onInputLevel,
-		onSoundChanged,
-		playSound,
-		setBalance,
-		setDefault,
-		setMeter,
-		setMute,
-		setPort,
-		setVolume,
-		startSound,
-		type Device,
-		type Direction,
-		type Port,
-		type Sound
-	} from './api';
 	import AppsSection from './AppsSection.svelte';
 	import DevicesSection from './DevicesSection.svelte';
 	import LevelMeter from './LevelMeter.svelte';
@@ -39,7 +25,7 @@
 
 	const loudness = useSettings<Output>('org.gnome.desktop.sound', ['allow-volume-above-100-percent']);
 
-	let sound = $state<Sound | null>(null);
+	let sound = $state<SoundSnapshot | null>(null);
 	let level = $state(0);
 	let page = $state<'apps' | 'devices' | null>(null);
 
@@ -52,7 +38,7 @@
 		if (page === 'apps' && !playing) page = null;
 	});
 
-	const choices = (devices: Device[]) => devices.map((device) => ({ value: device.name, label: device.description }));
+	const choices = (devices: DeviceView[]) => devices.map((device) => ({ value: device.name, label: device.description }));
 	const connection = (port: Port) => (port.detected ? port.description : t('settings-sound-connection-undetected', { name: port.description }));
 
 	function side(balance: number) {
@@ -61,22 +47,22 @@
 		return balance < 0 ? t('settings-sound-balance-left', amount) : t('settings-sound-balance-right', amount);
 	}
 
-	onDestroy(onSoundChanged((next) => (sound = next)));
-	onDestroy(onInputLevel((next) => (level = next)));
+	onDestroy(events.soundChanged((next) => (sound = next)));
+	onDestroy(events.soundLevel((next) => (level = next)));
 	let open = true;
 	onDestroy(() => {
 		open = false;
-		void setMeter(false);
+		void commands.soundMeter({ enabled: false });
 	});
-	void startSound().then(() => {
-		if (open) void setMeter(true);
+	void commands.soundStart().then(() => {
+		if (open) void commands.soundMeter({ enabled: true });
 	});
 </script>
 
-{#snippet devicePicker(direction: Direction, devices: Device[], current: Device)}
+{#snippet devicePicker(direction: Direction, devices: DeviceView[], current: DeviceView)}
 	{#if devices.length > 1}
 		<Row title={t('settings-sound-device')}>
-			<Select label={direction === 'output' ? t('settings-sound-output-device') : t('settings-sound-input-device')} options={choices(devices)} value={current.name} onchange={(name) => setDefault(direction, name)} />
+			<Select label={direction === 'output' ? t('settings-sound-output-device') : t('settings-sound-input-device')} options={choices(devices)} value={current.name} onchange={(name) => commands.soundSetDefault({ direction, name })} />
 		</Row>
 	{/if}
 	{#if current.ports.length > 1 && current.port}
@@ -85,7 +71,7 @@
 				label={direction === 'output' ? t('settings-sound-output-connection') : t('settings-sound-input-connection')}
 				options={current.ports.map((port) => ({ value: port.name, label: connection(port) }))}
 				value={current.port}
-				onchange={(port) => setPort(direction, current.index, port)}
+				onchange={(port) => commands.soundSetPort({ direction, index: current.index, port })}
 			/>
 		</Row>
 	{/if}
@@ -110,15 +96,15 @@
 				{max}
 				icon={Volume2}
 				mutedIcon={VolumeX}
-				onvolume={(volume) => setVolume('output', output!.index, volume)}
-				onsettle={() => playSound('audio-volume-change')}
-				onmute={(muted) => setMute('output', output!.index, muted)}
+				onvolume={(volume) => commands.soundSetVolume({ target: 'output', index: output!.index, volume })}
+				onsettle={() => commands.soundPlay({ name: 'audio-volume-change' })}
+				onmute={(muted) => commands.soundSetMute({ target: 'output', index: output!.index, muted })}
 			/>
 			{#if output.balance !== null}
 				<Row title={t('settings-sound-balance')}>
 					<span>{side(output.balance)}</span>
 					{#snippet below()}
-						<Slider label={t('settings-sound-balance')} min={-1} max={1} value={output!.balance!} format={side} oninput={(balance) => setBalance(output!.index, balance)} onchange={(balance) => setBalance(output!.index, balance)} />
+						<Slider label={t('settings-sound-balance')} min={-1} max={1} value={output!.balance!} format={side} oninput={(balance) => commands.soundSetBalance({ index: output!.index, balance })} onchange={(balance) => commands.soundSetBalance({ index: output!.index, balance })} />
 					{/snippet}
 				</Row>
 			{/if}
@@ -138,8 +124,8 @@
 				{max}
 				icon={Mic}
 				mutedIcon={MicOff}
-				onvolume={(volume) => setVolume('input', input!.index, volume)}
-				onmute={(muted) => setMute('input', input!.index, muted)}
+				onvolume={(volume) => commands.soundSetVolume({ target: 'input', index: input!.index, volume })}
+				onmute={(muted) => commands.soundSetMute({ target: 'input', index: input!.index, muted })}
 			>
 				<LevelMeter level={input.muted ? 0 : level} />
 			</VolumeRow>

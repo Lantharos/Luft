@@ -199,7 +199,6 @@ desktop-admin-required = Je hebt beheerdersrechten nodig om dit te wijzigen
 desktop-about-disks-missing = Schijven is niet geïnstalleerd
 
 ## Apps
-desktop-apps-kind-not-choosable = Dit soort app kan niet worden gekozen
 desktop-apps-uninstalled = Deze app is niet meer geïnstalleerd
 desktop-apps-no-longer-starts = Deze app start niet meer automatisch
 desktop-apps-cannot-autostart = Deze app kan niet automatisch starten

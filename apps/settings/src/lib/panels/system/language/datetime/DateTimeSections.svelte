@@ -2,8 +2,9 @@
 	import type { Snippet } from 'svelte';
 	import { i18n, t } from '@luft/i18n';
 	import { Row, Section, Segmented, Switch } from '@luft/ui';
+	import { commands, events } from '#lib/bindings.js';
+	import type { Clock, Zone } from '#lib/bindings.js';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
-	import { clock as readClock, onClockChanged, setAutomatic, zones as readZones, type Clock, type Zone } from './api';
 	import DateTimeDialog from './DateTimeDialog.svelte';
 	import TimeZoneDialog from './TimeZoneDialog.svelte';
 	import { useWeekStart } from './weekStart.svelte';
@@ -51,16 +52,16 @@
 	});
 
 	$effect(() => {
-		void readClock().then((state) => (clock = state));
-		void readZones().then((list) => (zones = list));
-		return onClockChanged((state) => (clock = state));
+		void commands.datetimeClock().then((state) => (clock = state));
+		void commands.datetimeZones().then((list) => (zones = list));
+		return events.datetimeChanged((state) => (clock = state));
 	});
 
 	async function toggleAutomatic(enabled: boolean) {
 		if (!clock) return;
 		clock.automatic = enabled;
 		try {
-			await setAutomatic(enabled);
+			await commands.datetimeSetAutomatic({ enabled });
 		} catch {
 			clock.automatic = !enabled;
 		}

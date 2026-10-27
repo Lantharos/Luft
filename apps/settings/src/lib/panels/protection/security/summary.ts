@@ -1,5 +1,5 @@
 import { t } from '@luft/i18n';
-import type { Trust } from './api';
+import type { Trust } from '#lib/bindings.js';
 
 export interface Summary {
 	headline: string;

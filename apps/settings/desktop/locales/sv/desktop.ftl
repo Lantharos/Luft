@@ -199,7 +199,6 @@ desktop-admin-required = Administratörsbehörighet krävs för att ändra det h
 desktop-about-disks-missing = Diskar är inte installerad
 
 ## Apps
-desktop-apps-kind-not-choosable = Den här typen av app kan inte väljas
 desktop-apps-uninstalled = Appen är inte längre installerad
 desktop-apps-no-longer-starts = Appen startar inte längre automatiskt
 desktop-apps-cannot-autostart = Appen kan inte starta automatiskt

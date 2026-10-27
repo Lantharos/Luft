@@ -1,5 +1,5 @@
 import { t } from '@luft/i18n';
-import type { Displays, LogicalConfig, Mode, Monitor } from './api';
+import type { Displays, Logical, Mode, Monitor } from '#lib/bindings.js';
 import { inRow, isValidLayout, normalized, type Rect } from './layout';
 
 export interface Output {
@@ -181,7 +181,7 @@ export function setScale(state: Displays, draft: Draft, output: Output, scale: n
 	}
 }
 
-export function toLogical(draft: Draft): LogicalConfig[] {
+export function toLogical(draft: Draft): Logical[] {
 	const enabled = draft.outputs.filter((output) => output.enabled);
 	const lead = enabled.find((output) => output.primary) ?? enabled[0];
 	const place = (output: Output) => ({ connector: output.connector, mode: output.mode });

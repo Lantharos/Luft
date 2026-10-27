@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { i18n, LANGUAGES, t } from '@luft/i18n';
 	import { Row, Section, Segmented, Select } from '@luft/ui';
+	import { commands } from '#lib/bindings.js';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import { useWeekStart, weekdayName } from '../datetime/weekStart.svelte';
-	import { setLanguage } from './api';
 	import { FORMATS, formatsName, formatsSample, formatsTag } from './formats';
 
 	const locale = useSettings<{ region: string }>('org.gnome.system.locale', ['region']);
@@ -27,7 +27,7 @@
 		if (!chosen) return;
 		problem = '';
 		try {
-			await setLanguage(posix);
+			await commands.regionSetLanguage({ language: posix });
 			await i18n.use(chosen.tag, formatsFor(region, chosen.tag));
 			changed = true;
 		} catch (error) {

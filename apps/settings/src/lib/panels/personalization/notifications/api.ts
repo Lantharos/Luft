@@ -1,11 +1,3 @@
-import { invoke } from '#lib/bridge/index.js';
-import type { App } from '#lib/panels/protection/apps/api.js';
-
-export interface NotifyingApp extends App {
-	path: string;
-	rulesPath: string;
-}
-
 export type AppOptions = {
 	enable: boolean;
 	'show-banners': boolean;
@@ -28,4 +20,3 @@ export const RULES_SCHEMA = 'com.lantharos.kestrel.notifications.application';
 export const RULES_KEYS: (keyof AppRules)[] = ['sound', 'during-do-not-disturb', 'keep-in-list'];
 export const APP_KEYS: (keyof AppOptions)[] = ['enable', 'show-banners', 'show-in-lock-screen', 'details-in-lock-screen'];
 
-export const notifyingApps = () => invoke<NotifyingApp[]>('notifications_apps');

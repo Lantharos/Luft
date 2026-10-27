@@ -3,9 +3,11 @@
 	import Download from '@lucide/svelte/icons/download';
 	import FolderOpen from '@lucide/svelte/icons/folder-open';
 	import { Dialog, errorText, Row, Section, Select } from '@luft/ui';
+	import { commands } from '#lib/bindings.js';
+	import type { CursorTheme } from '#lib/bindings.js';
 	import MoreRow from '#lib/components/MoreRow.svelte';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
-	import { openCursorFolder, removeCursorTheme, type CursorTheme } from './api';
+	import { openCursorFolder } from './api';
 	import { cursors } from './cursors.svelte';
 	import { cursorSizes } from './sizes';
 	import CursorTile from './CursorTile.svelte';
@@ -44,7 +46,7 @@
 		problem = '';
 		try {
 			if (theme.name === current) await desktop.reset('cursor-theme');
-			await removeCursorTheme(theme.name);
+			await commands.appearanceCursorRemove({ name: theme.name });
 			await cursors.load();
 		} catch (reason) {
 			problem = errorText(reason);

@@ -2,7 +2,7 @@
 	import { t } from '@luft/i18n';
 	import { fileUrl } from '@lantharos/sabine';
 	import { Row, Section, Segmented } from '@luft/ui';
-	import { thumbnail } from '#lib/panels/personalization/appearance/wallpaper/api.js';
+	import { commands } from '#lib/bindings.js';
 
 	interface Props {
 		wallpaper: string | null;
@@ -18,7 +18,7 @@
 	$effect(() => {
 		void version;
 		if (!wallpaper) return;
-		void thumbnail(wallpaper).then((path) => (preview = fileUrl(path)));
+		void commands.appearanceThumbnail({ path: wallpaper }).then((path) => (preview = fileUrl(path)));
 	});
 
 	function pick(choice: string) {

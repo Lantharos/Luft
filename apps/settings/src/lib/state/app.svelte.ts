@@ -1,7 +1,8 @@
 import type { Component } from 'svelte';
+import { events as sabineEvents } from '@lantharos/sabine';
 import { i18n } from '@luft/i18n';
 import { appearance } from '@luft/ui';
-import { appState, onActivated } from '#lib/bridge/index.js';
+import { commands } from '#lib/bindings.js';
 import { DEFAULT_PANEL, PANELS, resolveLink, type Panel, type PanelId } from '#lib/panels/registry.js';
 import { hardware } from './hardware.svelte';
 import { updates } from './updates.svelte';
@@ -18,10 +19,10 @@ class AppStore {
 	query = $state('');
 
 	async start() {
-		const [state] = await Promise.all([appState(), hardware.start(), updates.start()]);
+		const [state] = await Promise.all([commands.appState(), hardware.start(), updates.start()]);
 		appearance.start(state);
 		await i18n.ready;
-		onActivated(({ arguments: args }) => {
+		sabineEvents.singleInstance(({ arguments: args }) => {
 			const page = args.find((argument) => argument.startsWith('kestrel-settings:'));
 			if (page) this.open(page);
 		});

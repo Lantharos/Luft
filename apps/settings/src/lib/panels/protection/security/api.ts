@@ -1,110 +1,23 @@
-import { invoke, listen } from '#lib/bridge/index.js';
+import { commands } from '#lib/bindings.js';
 
 const WAIT_FOR_PERMISSION = { timeoutMs: 300_000 };
 
-export type SecureBoot = 'on' | 'off' | 'setup' | 'unsupported';
-export type UnlockMethod = 'tpm' | 'pin' | 'passphrase' | 'recovery-key' | 'security-key';
+export const hostSecurity = () => commands.securityHost({ timeoutMs: 120_000 });
 
-export interface Tpm {
-	usable: boolean;
-}
+export const setUsbProtection = (enabled: boolean) => commands.securitySetUsb({ enabled }, WAIT_FOR_PERMISSION);
 
-export interface SigningKey {
-	state: 'none' | 'pending' | 'enrolled';
-	available: boolean;
-	missed: number;
-	otherKeys: string[];
-	removingOtherKeys: boolean;
-}
+export const setUpTpmUnlock = (pin: string) => (unlock: string) => commands.securitySetUpTpm({ unlock, pin }, WAIT_FOR_PERMISSION);
+export const removeTpmUnlock = (unlock: string) => commands.securityRemoveTpm({ unlock }, WAIT_FOR_PERMISSION);
+export const showRecoveryKey = () => commands.securityShowKey(WAIT_FOR_PERMISSION);
+export const acceptSecureBootChange = () => commands.securityAcceptSecureBoot(WAIT_FOR_PERMISSION);
+export const replaceRecoveryKey = (unlock: string) => commands.securityReplaceKey({ unlock }, WAIT_FOR_PERMISSION);
 
-export interface Requirement {
-	id: string;
-	met: boolean;
-	missing: string;
-}
+export const enrollSigningKey = () => commands.securityEnrollKey(WAIT_FOR_PERMISSION);
+export const cancelSigningKey = () => commands.securityCancelEnrollment(WAIT_FOR_PERMISSION);
+export const removeOtherKeys = () => commands.securityRemoveOtherKeys(WAIT_FOR_PERMISSION);
+export const keepOtherKeys = () => commands.securityKeepOtherKeys(WAIT_FOR_PERMISSION);
+export const installSignedStartup = () => commands.securityInstallStartup(WAIT_FOR_PERMISSION);
 
-export interface AntiCheat {
-	requirements: Requirement[];
-	usesLuftKey: boolean;
-}
-
-export interface Startup {
-	installed: boolean;
-	measured: boolean;
-	available: boolean;
-}
-
-export interface Disk {
-	device: string;
-	encrypted: boolean;
-	unlock: UnlockMethod[];
-	recoveryKeyStored: boolean;
-	tpmRefused: boolean;
-	secureBootChanged: boolean;
-}
-
-export interface Drives {
-	available: boolean;
-	count: number;
-	autoUnlock: number;
-	changing: { change: '' | 'encrypt' | 'decrypt'; state: string; progress: number } | null;
-}
-
-export interface Trust {
-	drives: Drives;
-	secureBoot: SecureBoot;
-	tpm: Tpm;
-	signingKey: SigningKey;
-	startup: Startup;
-	disk: Disk;
-	antiCheat: AntiCheat;
-}
-
-export type Fix = 'maker' | 'firmware' | 'system' | 'unknown';
-
-export interface Protection {
-	id: string;
-	name: string;
-	fix: Fix;
-}
-
-export interface HostSecurity {
-	level: number;
-	highest: number;
-	missing: Protection[];
-	runtime: Protection[];
-}
-
-export interface UsbProtection {
-	enabled: boolean;
-	guarding: boolean;
-	held: { id: string; name: string }[];
-}
-
-export type Outcome<T> = { done: T } | { wrongKey: string };
-
-
-export const trust = () => invoke<Trust | null>('security_trust');
-export const onTrust = (callback: (trust: Trust) => void) => listen<Trust>('security.trust', callback);
-export const hostSecurity = () => invoke<HostSecurity | null>('security_host', {}, { timeoutMs: 120_000 });
-
-
-export const usbProtection = () => invoke<UsbProtection | null>('security_usb');
-export const onUsbProtection = (callback: (usb: UsbProtection) => void) => listen<UsbProtection>('security.usb', callback);
-export const setUsbProtection = (enabled: boolean) => invoke<void>('security_set_usb', { enabled }, WAIT_FOR_PERMISSION);
-
-export const setUpTpmUnlock = (pin: string) => (unlock: string) => invoke<Outcome<string>>('security_set_up_tpm', { unlock, pin }, WAIT_FOR_PERMISSION);
-export const removeTpmUnlock = (unlock: string) => invoke<Outcome<null>>('security_remove_tpm', { unlock }, WAIT_FOR_PERMISSION);
-export const showRecoveryKey = () => invoke<string>('security_show_key', {}, WAIT_FOR_PERMISSION);
-export const acceptSecureBootChange = () => invoke<void>('security_accept_secure_boot', {}, WAIT_FOR_PERMISSION);
-export const replaceRecoveryKey = (unlock: string) => invoke<Outcome<string>>('security_replace_key', { unlock }, WAIT_FOR_PERMISSION);
-
-export const enrollSigningKey = () => invoke<string>('security_enroll_key', {}, WAIT_FOR_PERMISSION);
-export const cancelSigningKey = () => invoke<void>('security_cancel_enrollment', {}, WAIT_FOR_PERMISSION);
-export const removeOtherKeys = () => invoke<string>('security_remove_other_keys', {}, WAIT_FOR_PERMISSION);
-export const keepOtherKeys = () => invoke<void>('security_keep_other_keys', {}, WAIT_FOR_PERMISSION);
-export const installSignedStartup = () => invoke<void>('security_install_startup', {}, WAIT_FOR_PERMISSION);
-
-export const saveRecoveryKey = (key: string) => invoke<boolean>('security_save_key', { key }, WAIT_FOR_PERMISSION);
-export const printRecoveryKey = (key: string) => invoke<boolean>('security_print_key', { key }, WAIT_FOR_PERMISSION);
-export const restart = () => invoke<void>('security_restart', {}, WAIT_FOR_PERMISSION);
+export const saveRecoveryKey = (key: string) => commands.securitySaveKey({ key }, WAIT_FOR_PERMISSION);
+export const printRecoveryKey = (key: string) => commands.securityPrintKey({ key }, WAIT_FOR_PERMISSION);
+export const restart = () => commands.securityRestart(WAIT_FOR_PERMISSION);

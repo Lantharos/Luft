@@ -12,10 +12,10 @@
 	import SquareMousePointer from '@lucide/svelte/icons/square-mouse-pointer';
 	import Tablet from '@lucide/svelte/icons/tablet';
 	import { ProgressBar, Row, Section } from '@luft/ui';
+	import type { PowerDevice, PowerDeviceKind } from '#lib/bindings.js';
 	import { percent } from '#lib/format.js';
-	import type { Device, DeviceKind } from './api';
 
-	const KINDS: Record<DeviceKind, { icon: Component; label: string }> = {
+	const KINDS: Record<PowerDeviceKind, { icon: Component; label: string }> = {
 		mouse: { icon: Mouse, label: 'settings-power-device-mouse' },
 		keyboard: { icon: Keyboard, label: 'settings-power-device-keyboard' },
 		headphones: { icon: Headphones, label: 'settings-power-device-headphones' },
@@ -28,7 +28,7 @@
 		other: { icon: BatteryMedium, label: 'settings-power-device-other' }
 	};
 
-	let { devices }: { devices: Device[] } = $props();
+	let { devices }: { devices: PowerDevice[] } = $props();
 </script>
 
 <Section title={t('settings-power-devices')}>

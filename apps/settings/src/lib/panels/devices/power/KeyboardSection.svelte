@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Row, Section, Segmented, Slider, Switch } from '@luft/ui';
+	import { commands } from '#lib/bindings.js';
+	import type { Keyboard } from '#lib/bindings.js';
 	import { percent } from '#lib/format.js';
-	import { setKeyboard, type Keyboard } from './api';
 
 	const STEPS: Record<number, string[]> = {
 		2: ['settings-power-backlight-off', 'settings-power-backlight-low', 'settings-power-backlight-high'],
@@ -13,7 +14,7 @@
 
 	let steps = $derived(STEPS[keyboard.max]?.map((label, value) => ({ value, label: t(label) })));
 	const share = (level: number) => (level === 0 ? t('settings-power-backlight-off') : percent(level / keyboard.max));
-	const set = (level: number) => setKeyboard(keyboard.id, level);
+	const set = (level: number) => commands.powerSetKeyboard({ id: keyboard.id, level });
 </script>
 
 <Section title={t('settings-power-keyboard')}>

@@ -3,9 +3,10 @@
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import { errorText, Row, SearchField, Section, Segmented } from '@luft/ui';
+	import { commands } from '#lib/bindings.js';
+	import type { Order, StorePage } from '#lib/bindings.js';
 	import SubPage from '#lib/components/SubPage.svelte';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
-	import { browseCursors, type Order, type StorePage } from './api';
 	import StoreItem from './StoreItem.svelte';
 
 	interface Props {
@@ -40,7 +41,7 @@
 		loading = true;
 		problem = '';
 		try {
-			const next = await browseCursors(query, order, page);
+			const next = await commands.appearanceCursorStore({ search: query, order, page });
 			if (current === request) result = next;
 		} catch (reason) {
 			if (current === request) problem = errorText(reason);

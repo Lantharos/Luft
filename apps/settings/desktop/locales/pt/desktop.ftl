@@ -199,7 +199,6 @@ desktop-admin-required = São necessários direitos de administrador para altera
 desktop-about-disks-missing = A aplicação Discos não está instalada
 
 ## Apps
-desktop-apps-kind-not-choosable = Não é possível escolher este tipo de aplicação
 desktop-apps-uninstalled = Esta aplicação já não está instalada
 desktop-apps-no-longer-starts = Esta aplicação já não é iniciada automaticamente
 desktop-apps-cannot-autostart = Esta aplicação não pode ser iniciada automaticamente

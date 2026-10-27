@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Row, Section, Select, Switch } from '@luft/ui';
-	import { setPreferences, type Preferences, type Schedule } from './api';
+	import { commands } from '#lib/bindings.js';
+	import type { Preferences, Schedule } from '#lib/bindings.js';
 
 	let { preferences = $bindable() }: { preferences: Preferences } = $props();
 
@@ -13,7 +14,7 @@
 
 	function change(next: Partial<Preferences>) {
 		preferences = { ...preferences, ...next };
-		void setPreferences(preferences);
+		void commands.updatesSetPreferences(preferences);
 	}
 </script>
 

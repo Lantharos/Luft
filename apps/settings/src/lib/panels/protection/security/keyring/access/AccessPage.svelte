@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Row, Section } from '@luft/ui';
+	import type { Access } from '#lib/bindings.js';
 	import SubPage from '#lib/components/SubPage.svelte';
 	import { app } from '#lib/state/app.svelte.js';
-	import type { Access } from '../api';
 	import HistorySection from './HistorySection.svelte';
 	import StoresSection from './StoresSection.svelte';
 

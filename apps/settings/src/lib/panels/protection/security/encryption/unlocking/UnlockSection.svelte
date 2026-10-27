@@ -1,16 +1,8 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { ConfirmDialog, errorText, RecoveryKeyDialog, Row, Section, Switch } from '@luft/ui';
-	import {
-		acceptSecureBootChange,
-		printRecoveryKey,
-		removeTpmUnlock,
-		replaceRecoveryKey,
-		saveRecoveryKey,
-		setUpTpmUnlock,
-		showRecoveryKey,
-		type Trust
-	} from '../../api';
+	import type { Trust } from '#lib/bindings.js';
+	import { acceptSecureBootChange, printRecoveryKey, removeTpmUnlock, replaceRecoveryKey, saveRecoveryKey, setUpTpmUnlock, showRecoveryKey } from '../../api';
 	import TpmDialog, { type TpmMode } from './TpmDialog.svelte';
 	import { withUnlock } from './unlock.svelte';
 

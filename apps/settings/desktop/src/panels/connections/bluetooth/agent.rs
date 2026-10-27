@@ -12,7 +12,7 @@ use zbus::{ObjectPath, OwnedVariant, Proxy};
 
 use super::{DEVICE, SERVICE};
 
-pub const REQUEST: BridgeEvent<Request> = BridgeEvent::new("bluetooth.request");
+pub const REQUEST: BridgeEvent<PairingRequest> = BridgeEvent::new("bluetooth.request");
 pub const CANCEL: BridgeEvent<()> = BridgeEvent::new("bluetooth.cancel");
 
 const PATH: &str = "/com/lantharos/Settings/BluetoothAgent";
@@ -30,7 +30,7 @@ enum PairingKind {
 
 #[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct Request {
+pub struct PairingRequest {
     id: u32,
     device: String,
     name: String,
@@ -87,7 +87,7 @@ impl Agent {
     ) {
         self.events.emit(
             REQUEST,
-            Request {
+            PairingRequest {
                 id,
                 device: device.to_string(),
                 name: device_name(connection, device).await,

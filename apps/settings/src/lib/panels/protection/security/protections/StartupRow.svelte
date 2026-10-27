@@ -2,7 +2,8 @@
 	import Power from '@lucide/svelte/icons/power';
 	import { t } from '@luft/i18n';
 	import { errorText, Row } from '@luft/ui';
-	import { cancelSigningKey, enrollSigningKey, installSignedStartup, restart, type SigningKey, type Startup } from '../api';
+	import type { SigningKey, Startup } from '#lib/bindings.js';
+	import { cancelSigningKey, enrollSigningKey, installSignedStartup, restart } from '../api';
 	import KeyStepsDialog from './KeyStepsDialog.svelte';
 
 	let { key, startup }: { key: SigningKey; startup: Startup } = $props();

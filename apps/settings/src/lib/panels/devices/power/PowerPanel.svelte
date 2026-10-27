@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Row, Section, Segmented, Select, Switch } from '@luft/ui';
+	import { commands, events } from '#lib/bindings.js';
+	import type { PowerState } from '#lib/bindings.js';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
-	import { onPowerChanged, powerState, setProfile, type PowerState } from './api';
 	import BatterySection from './BatterySection.svelte';
 	import DevicesSection from './DevicesSection.svelte';
 	import { durationOptions } from './format';
@@ -71,8 +72,8 @@
 	}
 
 	$effect(() => {
-		void powerState().then((current) => (state = current));
-		return onPowerChanged((current) => (state = current));
+		void commands.powerState().then((current) => (state = current));
+		return events.powerChanged((current) => (state = current));
 	});
 
 	async function chooseProfile(profile: string) {
@@ -80,7 +81,7 @@
 		const previous = state.profiles.active;
 		state.profiles.active = profile;
 		try {
-			await setProfile(profile);
+			await commands.powerSetProfile({ profile });
 		} catch {
 			state.profiles.active = previous;
 		}

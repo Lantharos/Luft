@@ -1,5 +1,6 @@
 import { onDestroy } from 'svelte';
-import { loadDisplays, onDisplaysChanged, type Displays } from '#lib/panels/devices/display/api.js';
+import { commands, events } from '#lib/bindings.js';
+import type { Displays } from '#lib/bindings.js';
 
 const FALLBACK_SHAPE = 16 / 10;
 
@@ -13,8 +14,8 @@ function mainDisplayShape(state: Displays) {
 
 export function useScreenShape() {
 	let shape = $state(FALLBACK_SHAPE);
-	void loadDisplays().then((state) => (shape = mainDisplayShape(state)));
-	onDestroy(onDisplaysChanged((state) => (shape = mainDisplayShape(state))));
+	void commands.displayState().then((state) => (shape = mainDisplayShape(state)));
+	onDestroy(events.displayChanged((state) => (shape = mainDisplayShape(state))));
 	return {
 		get aspect() {
 			return shape;

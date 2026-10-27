@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { ago, ConfirmDialog, Row, Section } from '@luft/ui';
-	import { clearHistory, type AccessEvent } from '../api';
+	import type { AccessEvent } from '#lib/bindings.js';
+	import { clearHistory } from '../api';
 	import { happened } from '../describe';
 
 	const COLLAPSED = 5;

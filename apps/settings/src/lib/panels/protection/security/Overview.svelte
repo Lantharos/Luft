@@ -6,7 +6,7 @@
 	import ShieldEllipsis from '@lucide/svelte/icons/shield-ellipsis';
 	import { t } from '@luft/i18n';
 	import { ActionRow, Section } from '@luft/ui';
-	import type { Disk } from './api';
+	import type { Disk } from '#lib/bindings.js';
 	import { unlockSummary } from './encryption/describe';
 	import { protection } from './keyring/describe';
 	import type { KeyringState } from './keyring/state.svelte';

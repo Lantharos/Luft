@@ -1,12 +1,13 @@
-import { keyring, onKeyring, type Keyring } from './api';
+import { commands, events } from '#lib/bindings.js';
+import type { Keyring } from '#lib/bindings.js';
 
 export class KeyringState {
 	current = $state<Keyring | null | undefined>();
 
-	private readonly unsubscribe = onKeyring((next) => (this.current = next));
+	private readonly unsubscribe = events.keyringChanged((next) => (this.current = next));
 
 	load = async () => {
-		this.current = await keyring().catch(() => null);
+		this.current = await commands.keyring().catch(() => null);
 	};
 
 	stop() {

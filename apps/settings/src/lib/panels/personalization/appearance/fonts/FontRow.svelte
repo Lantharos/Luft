@@ -2,13 +2,13 @@
 	import { t } from '@luft/i18n';
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
 	import { MenuButton, MenuItem, MenuSeparator, tooltip } from '@luft/ui';
-	import type { FontFamily, FontRole } from './api';
+	import type { FontFamily, Role } from '#lib/bindings.js';
 
 	interface Props {
 		family: FontFamily;
 		divided: boolean;
 		onopen: () => void;
-		onuse: (role: FontRole) => void;
+		onuse: (role: Role) => void;
 		onremove: () => void;
 	}
 

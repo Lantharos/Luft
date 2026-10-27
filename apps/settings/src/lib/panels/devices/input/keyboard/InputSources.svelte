@@ -6,9 +6,10 @@
 	import Plus from '@lucide/svelte/icons/plus';
 	import X from '@lucide/svelte/icons/x';
 	import { IconButton, Row, Section } from '@luft/ui';
+	import { commands } from '#lib/bindings.js';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import AddSourceDialog from './AddSourceDialog.svelte';
-	import { inputMethods, keysInstalled, layouts as readLayouts, openKeys } from './api';
+	import { openKeys } from './api';
 	import ShortcutButton from '../shortcuts/keys/ShortcutButton.svelte';
 	import type { Binding, ShortcutStore } from '../shortcuts/store.svelte';
 	import { fromLayout, fromMethod, type Source } from './sources';
@@ -49,12 +50,12 @@
 	}
 
 	async function refresh() {
-		const [layouts, methods] = await Promise.all([readLayouts(), inputMethods().catch(() => [])]);
+		const [layouts, methods] = await Promise.all([commands.keyboardLayouts(), commands.keyboardInputMethods().catch(() => [])]);
 		available = [...layouts.map(fromLayout), ...methods.map(fromMethod)];
 	}
 
 	void refresh();
-	void keysInstalled().then((installed) => (keys = installed));
+	void commands.keyboardKeysInstalled().then((installed) => (keys = installed));
 </script>
 
 <svelte:window onfocus={() => void refresh()} />

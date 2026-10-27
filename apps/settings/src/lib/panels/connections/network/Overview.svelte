@@ -6,7 +6,8 @@
 	import WifiIcon from '@lucide/svelte/icons/wifi';
 	import { t } from '@luft/i18n';
 	import { ActionRow, Row, Section, Switch } from '@luft/ui';
-	import { setAirplane, setWifi, type Network } from '@luft/network';
+	import type { Network } from '@luft/network';
+	import { commands } from '#lib/bindings.js';
 	import { proxyLabel, type Proxy } from './proxy/proxy.svelte';
 	import type { NetworkState } from './state.svelte';
 
@@ -30,7 +31,7 @@
 		{@const wifi = network.wifi}
 		<ActionRow title={t('settings-network-wifi')} icon={WifiIcon} description={connections.wifiSummary(wifi)} onclick={() => onopen('wifi')}>
 			{#snippet actions()}
-				<Switch label={t('settings-network-wifi')} checked={wifi.enabled} disabled={!wifi.hardwareEnabled} onchange={setWifi} />
+				<Switch label={t('settings-network-wifi')} checked={wifi.enabled} disabled={!wifi.hardwareEnabled} onchange={(enabled) => commands.networkSetWifi({ enabled })} />
 			{/snippet}
 		</ActionRow>
 	{/if}
@@ -55,7 +56,7 @@
 	{#if network.airplane}
 		{@const airplane = network.airplane}
 		<Row title={t('settings-network-airplane')} icon={Plane} description={airplane.hardware ? t('settings-network-airplane-hardware') : t('settings-network-airplane.description')}>
-			<Switch label={t('settings-network-airplane')} checked={airplane.enabled || airplane.hardware} disabled={airplane.hardware} onchange={setAirplane} />
+			<Switch label={t('settings-network-airplane')} checked={airplane.enabled || airplane.hardware} disabled={airplane.hardware} onchange={(enabled) => commands.networkSetAirplane({ enabled })} />
 		</Row>
 	{/if}
 	{#if proxy.available}

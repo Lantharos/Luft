@@ -3,7 +3,8 @@
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import Star from '@lucide/svelte/icons/star';
 	import { bytes, MenuButton, MenuItem, ProgressBar } from '@luft/ui';
-	import { openStorePage, type StoreItem } from './api';
+	import type { StoreItem } from '#lib/bindings.js';
+	import { openStorePage } from './api';
 	import { cursors } from './cursors.svelte';
 
 	interface Props {

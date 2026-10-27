@@ -2,9 +2,11 @@
 	import { t } from '@luft/i18n';
 	import Camera from '@lucide/svelte/icons/camera';
 	import { Avatar, Dialog, ItemRow, Row, Section, TextField, tooltip } from '@luft/ui';
+	import { commands } from '#lib/bindings.js';
+	import type { Users } from '#lib/bindings.js';
 	import FingerprintSection from './FingerprintSection.svelte';
 	import PasswordDialog from './PasswordDialog.svelte';
-	import { accountType, choosePicture, displayName, rename, users, type Users } from './api';
+	import { accountType, choosePicture, displayName } from './api';
 
 	let accounts = $state<Users | null>(null);
 	let version = $state(0);
@@ -15,7 +17,7 @@
 	let renameError = $state('');
 
 	async function load() {
-		accounts = await users();
+		accounts = await commands.users();
 		version += 1;
 	}
 
@@ -37,7 +39,7 @@
 
 	async function saveName() {
 		try {
-			await rename(draft);
+			await commands.usersRename({ name: draft });
 			renaming = false;
 			await load();
 		} catch (reason) {

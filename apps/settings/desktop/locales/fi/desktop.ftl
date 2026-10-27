@@ -199,7 +199,6 @@ desktop-admin-required = Tämän muuttaminen vaatii järjestelmänvalvojan oikeu
 desktop-about-disks-missing = Levyt-sovellusta ei ole asennettu
 
 ## Apps
-desktop-apps-kind-not-choosable = Tämäntyyppistä sovellusta ei voi valita
 desktop-apps-uninstalled = Tätä sovellusta ei ole enää asennettu
 desktop-apps-no-longer-starts = Tämä sovellus ei enää käynnisty automaattisesti
 desktop-apps-cannot-autostart = Tämä sovellus ei voi käynnistyä automaattisesti

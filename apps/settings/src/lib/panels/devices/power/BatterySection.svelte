@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { i18n, t } from '@luft/i18n';
 	import { ProgressBar, Row, Section, Switch, watts } from '@luft/ui';
+	import type { Battery } from '#lib/bindings.js';
 	import { percent } from '#lib/format.js';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
-	import type { Battery } from './api';
 	import ChargeLimit from './ChargeLimit.svelte';
 	import { duration, wattHours } from './format';
 

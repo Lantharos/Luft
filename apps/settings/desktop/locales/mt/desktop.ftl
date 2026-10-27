@@ -199,7 +199,6 @@ desktop-admin-required = Biex tibdel dan għandek bżonn drittijiet ta’ ammini
 desktop-about-disks-missing = Diski mhux installat
 
 ## Apps
-desktop-apps-kind-not-choosable = Dan it-tip ta’ app ma jistax jintgħażel
 desktop-apps-uninstalled = Din l-app m’għadhiex installata
 desktop-apps-no-longer-starts = Din l-app m’għadhiex tibda awtomatikament
 desktop-apps-cannot-autostart = Din l-app ma tistax tibda awtomatikament

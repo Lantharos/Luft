@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Row, Select, Switch } from '@luft/ui';
+	import type { Displays } from '#lib/bindings.js';
 	import { percent } from '#lib/format.js';
 	import { KESTREL_SCHEMA, useSettings } from '#lib/state/gsettings.svelte.js';
-	import type { Displays } from './api';
 	import {
 		commonResolutions,
 		hasVariant,

@@ -199,7 +199,6 @@ desktop-admin-required = Lai to mainītu, nepieciešamas administratora tiesība
 desktop-about-disks-missing = Lietotne Diski nav instalēta
 
 ## Apps
-desktop-apps-kind-not-choosable = Šāda veida lietotni nevar izvēlēties
 desktop-apps-uninstalled = Šī lietotne vairs nav instalēta
 desktop-apps-no-longer-starts = Šī lietotne vairs netiek palaista automātiski
 desktop-apps-cannot-autostart = Šo lietotni nevar palaist automātiski

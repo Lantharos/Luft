@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { AppIcon, ConfirmDialog, ItemRow, Section } from '@luft/ui';
-	import { forgetApp, type AppStore } from '../api';
+	import type { AppStore } from '#lib/bindings.js';
+	import { forgetApp } from '../api';
 
 	let { stores, refresh }: { stores: AppStore[]; refresh: () => Promise<void> } = $props();
 

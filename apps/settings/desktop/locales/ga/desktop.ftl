@@ -199,7 +199,6 @@ desktop-admin-required = Tá cearta riarthóra ag teastáil chun é seo a athrú
 desktop-about-disks-missing = Níl Dioscaí suiteáilte
 
 ## Apps
-desktop-apps-kind-not-choosable = Ní féidir an cineál seo aipe a roghnú
 desktop-apps-uninstalled = Níl an aip seo suiteáilte a thuilleadh
 desktop-apps-no-longer-starts = Ní thosaíonn an aip seo go huathoibríoch a thuilleadh
 desktop-apps-cannot-autostart = Ní féidir leis an aip seo tosú go huathoibríoch

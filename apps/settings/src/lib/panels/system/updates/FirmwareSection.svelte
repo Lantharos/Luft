@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { bytes, Row, Section } from '@luft/ui';
+	import { commands } from '#lib/bindings.js';
+	import type { Activity, Firmware } from '#lib/bindings.js';
 	import { percent } from '#lib/format.js';
-	import type { Activity, Firmware } from './api';
-	import { installFirmware } from './api';
 
 	let { devices, activity }: { devices: Firmware[]; activity: Activity } = $props();
 
@@ -11,7 +11,7 @@
 
 	async function install(device: Firmware) {
 		error = null;
-		await installFirmware(device.id).catch((reason) => (error = String(reason)));
+		await commands.updatesFirmwareInstall({ id: device.id }).catch((reason) => (error = String(reason)));
 	}
 
 	const busy = $derived(activity.running !== null);

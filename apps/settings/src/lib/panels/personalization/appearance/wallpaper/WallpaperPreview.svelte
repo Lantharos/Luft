@@ -2,7 +2,9 @@
 	import { t } from '@luft/i18n';
 	import { fileUrl } from '@lantharos/sabine';
 	import Move from '@lucide/svelte/icons/move';
-	import { objectPosition, thumbnail, type Focus } from './api';
+	import { commands } from '#lib/bindings.js';
+	import type { Focus } from '#lib/bindings.js';
+	import { objectPosition } from './api';
 
 	interface Props {
 		path: string;
@@ -26,7 +28,7 @@
 
 	$effect(() => {
 		const requested = path;
-		void thumbnail(requested).then((preview) => {
+		void commands.appearanceThumbnail({ path: requested }).then((preview) => {
 			if (requested === path) source = fileUrl(preview);
 		});
 	});

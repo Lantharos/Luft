@@ -5,7 +5,8 @@
 	import EnterpriseFields from '../connection/EnterpriseFields.svelte';
 	import { newEnterprise } from '../connection/profile';
 	import { checkEnterprise, minimumPassword, type Errors } from '../connection/validate';
-	import { forget, join, needsPassword, onChanged, onFailed, type Security } from '@luft/network';
+	import { needsPassword, type Security } from '@luft/network';
+	import { commands, events } from '#lib/bindings.js';
 
 	interface Props {
 		device: string;
@@ -54,8 +55,8 @@
 		busy = true;
 		error = '';
 		try {
-			if (replace) await forget(name);
-			await join({
+			if (replace) await commands.networkForget({ ssid: name });
+			await commands.networkJoin({
 				device,
 				ssid: name.trim(),
 				security: choice,
@@ -70,14 +71,14 @@
 	}
 
 	$effect(() => {
-		const stopFailed = onFailed((failure) => {
+		const stopFailed = events.networkFailed((failure) => {
 			if (!busy || failure.path !== device) return;
 			busy = false;
 			if (failure.reason !== 'password') error = t('settings-network-join-failed');
 			else if (corporate) error = t('settings-network-join-sign-in-failed');
 			else error = t('settings-network-join-wrong-password');
 		});
-		const stopChanged = onChanged((network) => {
+		const stopChanged = events.networkChanged((network) => {
 			const joined = network.wifi?.networks.some((candidate) => candidate.ssid === name.trim() && candidate.state === 'connected');
 			if (busy && joined) onclose();
 		});

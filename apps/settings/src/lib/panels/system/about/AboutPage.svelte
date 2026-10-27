@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { bytes, Dialog, Row, Section, Switch, TextField } from '@luft/ui';
+	import { commands } from '#lib/bindings.js';
+	import type { About, OtherSystem } from '#lib/bindings.js';
 	import SubPage from '#lib/components/SubPage.svelte';
 	import { binaryBytes } from '#lib/format.js';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import { builtOn, versionLabel } from '../version';
-	import { about, openDisks, otherSystems, removeSystem, rename, type About, type OtherSystem } from './api';
+	import { openDisks, removeSystem } from './api';
 	import RecentProblems from './RecentProblems.svelte';
 
 	let { onclose }: { onclose: () => void } = $props();
@@ -19,12 +21,12 @@
 	let error = $state('');
 
 	async function load() {
-		info = await about();
+		info = await commands.about();
 	}
 
 	async function saveName() {
 		try {
-			await rename(draft);
+			await commands.aboutRename({ name: draft });
 			renaming = false;
 			await load();
 		} catch (reason) {
@@ -44,7 +46,7 @@
 	}
 
 	void load();
-	otherSystems().then((list) => (others = list));
+	commands.aboutOtherSystems().then((list) => (others = list));
 </script>
 
 <SubPage title={t('settings-page-about')} back={t('settings-page-system')} {onclose}>

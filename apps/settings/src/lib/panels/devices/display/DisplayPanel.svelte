@@ -2,7 +2,8 @@
 	import { t } from '@luft/i18n';
 	import { onDestroy } from 'svelte';
 	import { Row, Section, Select, Switch } from '@luft/ui';
-	import { applyDisplays, loadDisplays, onDisplaysChanged, type Displays } from './api';
+	import { commands, events } from '#lib/bindings.js';
+	import type { Displays } from '#lib/bindings.js';
 	import Arrangement from './Arrangement.svelte';
 	import BrightnessSection from './BrightnessSection.svelte';
 	import { commonResolutions, draftFrom, footprint, mirror, modeOf, monitorOf, toLogical, unmirror, type Draft } from './config';
@@ -65,7 +66,7 @@
 		applying = true;
 		failed = false;
 		try {
-			await applyDisplays(displays!.serial, toLogical(draft!));
+			await commands.displayApply({ serial: displays!.serial, logical: toLogical(draft!) });
 		} catch {
 			failed = true;
 		} finally {
@@ -73,8 +74,8 @@
 		}
 	}
 
-	onDestroy(onDisplaysChanged(receive));
-	void loadDisplays().then(receive);
+	onDestroy(events.displayChanged(receive));
+	void commands.displayState().then(receive);
 </script>
 
 {#if displays && draft && output}

@@ -4,11 +4,11 @@
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import { tick } from 'svelte';
 	import { errorText, Popover, SearchField, VirtualScroller } from '@luft/ui';
-	import type { FontRole } from './api';
+	import type { Role } from '#lib/bindings.js';
 	import { fontLibrary } from './library.svelte';
 
 	interface Props {
-		role: FontRole;
+		role: Role;
 		label: string;
 		family: string;
 		onerror: (message: string) => void;

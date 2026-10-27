@@ -1,5 +1,6 @@
 import { t } from '@luft/i18n';
-import { activate, close, deactivate, disconnect, onChanged, onFailed, open, type Network, type Vpn, type Wifi, type Wired } from '@luft/network';
+import type { Network, Vpn, Wifi, Wired } from '@luft/network';
+import { commands, events } from '#lib/bindings.js';
 import { linkLabel, speedLabel } from './describe';
 
 export class NetworkState {
@@ -7,18 +8,18 @@ export class NetworkState {
 	problems = $state<Record<string, string>>({});
 
 	start() {
-		const stopChanged = onChanged((next) => (this.network = next));
-		const stopFailed = onFailed((failure) => {
+		const stopChanged = events.networkChanged((next) => (this.network = next));
+		const stopFailed = events.networkFailed((failure) => {
 			const vpn = this.network?.vpns.find((candidate) => candidate.active === failure.path || candidate.name === failure.name);
 			const wired = this.network?.wired.find((candidate) => candidate.device === failure.path);
 			const key = wired?.device ?? vpn?.connection;
 			if (key) this.problems[key] = t('settings-network-connect-failed');
 		});
-		void open().then((initial) => (this.network = initial));
+		void commands.networkOpen().then((initial) => (this.network = initial));
 		return () => {
 			stopChanged();
 			stopFailed();
-			void close();
+			void commands.networkClose();
 		};
 	}
 
@@ -43,14 +44,14 @@ export class NetworkState {
 	}
 
 	toggleWired(wired: Wired, on: boolean) {
-		void this.attempt(wired.device, () => (on ? activate({ device: wired.device }) : disconnect(wired.device)));
+		void this.attempt(wired.device, () => (on ? commands.networkActivate({ device: wired.device }) : commands.networkDisconnect({ device: wired.device })));
 	}
 
 	toggleVpn(vpn: Vpn, on: boolean) {
-		void this.attempt(vpn.connection, () => (on ? activate({ connection: vpn.connection }) : deactivate(vpn.active!)));
+		void this.attempt(vpn.connection, () => (on ? commands.networkActivate({ connection: vpn.connection }) : commands.networkDeactivate({ active: vpn.active! })));
 	}
 
-	private async attempt(key: string, action: () => Promise<void>) {
+	private async attempt(key: string, action: () => Promise<unknown>) {
 		delete this.problems[key];
 		try {
 			await action();

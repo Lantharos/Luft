@@ -1,7 +1,7 @@
 import { t } from '@luft/i18n';
-import type { AccessEvent, Action, Keyring, KeyKind } from './api';
+import type { AccessEvent, Action, KeyKind, Keyring } from '#lib/bindings.js';
 
-const KINDS: Record<KeyKind, string> = { ed25519: 'Ed25519', ecdsa: 'ECDSA', rsa: 'RSA' };
+const KINDS: Record<KeyKind, string> = { ed25519: 'Ed25519', ecdsa: 'ECDSA' };
 
 const ACTIONS: Record<Action, { named: string; unnamed: string }> = {
 	read: { named: 'settings-passwords-history-read', unnamed: 'settings-passwords-history-read-unnamed' },
@@ -15,6 +15,6 @@ export const sealed = (keyring: Keyring) => keyring.chip === 'ready' && keyring.
 
 export const protection = (keyring: Keyring) => (sealed(keyring) ? t('settings-passwords-protected-chip') : t('settings-passwords-protected'));
 
-export const kind = (key: KeyKind) => KINDS[key];
+export const kind = (key: KeyKind | null) => key && KINDS[key];
 
 export const happened = ({ action, app, what }: AccessEvent) => t(ACTIONS[action][what ? 'named' : 'unnamed'], { app, item: what });

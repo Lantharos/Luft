@@ -1,5 +1,5 @@
 import { i18n, t } from '@luft/i18n';
-import type { Disk } from '../api';
+import type { Disk } from '#lib/bindings.js';
 
 export function unlockSummary({ unlock }: Disk) {
 	if (unlock.includes('tpm') && unlock.includes('pin')) return t('settings-encryption-unlocks-chip-pin');

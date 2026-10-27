@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Row, Switch } from '@luft/ui';
+	import { commands } from '#lib/bindings.js';
+	import type { ChargeLimit } from '#lib/bindings.js';
 	import { percent } from '#lib/format.js';
-	import { setChargeLimit, type ChargeLimit } from './api';
 
 	let { limit }: { limit: ChargeLimit } = $props();
 
@@ -30,7 +31,7 @@
 		pending = on;
 		failed = false;
 		try {
-			await setChargeLimit(on);
+			await commands.powerSetChargeLimit({ enabled: on });
 		} catch {
 			pending = null;
 			failed = true;

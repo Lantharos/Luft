@@ -2,9 +2,9 @@
 	import { t } from '@luft/i18n';
 	import Play from '@lucide/svelte/icons/play';
 	import { IconButton, Row, Section, Slider, Switch } from '@luft/ui';
+	import { commands } from '#lib/bindings.js';
 	import { percent } from '#lib/format.js';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
-	import { previewSound, setAlertVolume } from './api';
 
 	type Kinds = {
 		notifications: boolean;
@@ -47,13 +47,13 @@
 			<Row title={t('settings-sound-volume')}>
 				<span class="w-11 text-right tabular-nums">{percent(volume)}</span>
 				{#snippet below()}
-					<Slider label={t('settings-sound-system-volume')} value={volume!} format={percent} onchange={setAlertVolume} />
+					<Slider label={t('settings-sound-system-volume')} value={volume!} format={percent} onchange={(volume) => commands.soundSetAlertVolume({ volume })} />
 				{/snippet}
 			</Row>
 		{/if}
 		{#each KINDS as kind (kind.key)}
 			<Row title={t(kind.title)} description={t(kind.description)}>
-				<IconButton icon={Play} label={t(kind.preview)} onclick={() => previewSound(kind.sound)} />
+				<IconButton icon={Play} label={t(kind.preview)} onclick={() => commands.soundPreview({ name: kind.sound })} />
 				<Switch label={t(kind.title)} checked={kinds.values[kind.key] ?? kind.key !== 'keyboard'} onchange={(checked) => kinds.set(kind.key, checked)} />
 			</Row>
 		{/each}

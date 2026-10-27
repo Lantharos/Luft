@@ -199,7 +199,6 @@ desktop-admin-required = Чтобы изменить это, нужны прав
 desktop-about-disks-missing = Приложение Диски не установлено
 
 ## Apps
-desktop-apps-kind-not-choosable = Приложение такого типа нельзя выбрать
 desktop-apps-uninstalled = Это приложение больше не установлено
 desktop-apps-no-longer-starts = Это приложение больше не запускается автоматически
 desktop-apps-cannot-autostart = Это приложение не может запускаться автоматически

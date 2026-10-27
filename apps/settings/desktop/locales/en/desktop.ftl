@@ -236,7 +236,6 @@ desktop-admin-required = Administrator rights are needed to change this
 desktop-about-disks-missing = Disks isn't installed
 
 ## Apps
-desktop-apps-kind-not-choosable = This kind of app can't be chosen
 desktop-apps-uninstalled = This app is no longer installed
 desktop-apps-no-longer-starts = This app no longer starts automatically
 desktop-apps-cannot-autostart = This app can't start automatically

@@ -2,7 +2,8 @@
 	import { onDestroy, untrack } from 'svelte';
 	import { t } from '@luft/i18n';
 	import { Choice, Dialog, PasswordField, TextField } from '@luft/ui';
-	import { cancel, signIn, signInAgain, type Account, type Credentials, type Step } from './api';
+	import { commands } from '#lib/bindings.js';
+	import type { Account, Credentials, Step } from '#lib/bindings.js';
 	import { PROVIDERS, provider as providerOf, type ProviderInfo } from './providers';
 	import SignInFlow from './SignInFlow.svelte';
 
@@ -39,7 +40,7 @@
 	});
 
 	onDestroy(() => {
-		if (session && !['done', 'failed'].includes(step.step)) void cancel(session);
+		if (session && !['done', 'failed'].includes(step.step)) void commands.accountsCancel({ session });
 	});
 
 	if (initial && providerOf(initial.provider).signIn === 'password') stage = 'details';
@@ -78,7 +79,7 @@
 		step = { step: 'working' };
 		stage = 'flow';
 		try {
-			session = again ? await signInAgain(again.id, credentials()) : await signIn(chosen!.id, credentials());
+			session = again ? await commands.accountsSignInAgain({ account: again.id, credentials: credentials() }) : await commands.accountsSignIn({ provider: chosen!.id, credentials: credentials() });
 		} catch (reason) {
 			step = { step: 'failed', message: String(reason) };
 		}
@@ -92,7 +93,7 @@
 	}
 
 	function back() {
-		if (session && !['done', 'failed'].includes(step.step)) void cancel(session);
+		if (session && !['done', 'failed'].includes(step.step)) void commands.accountsCancel({ session });
 		session = '';
 		error = '';
 		stage = 'details';

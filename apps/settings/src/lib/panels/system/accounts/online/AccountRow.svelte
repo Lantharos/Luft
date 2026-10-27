@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { bytes, Row, TextField } from '@luft/ui';
-	import { remove, rename, type Account, type Drive } from './api';
+	import { commands } from '#lib/bindings.js';
+	import type { Account, Drive } from '#lib/bindings.js';
+	import { remove } from './api';
 	import { provider } from './providers';
 
 	interface Props {
@@ -45,7 +47,7 @@
 		const wanted = name.trim();
 		if (!wanted || wanted === account.name) return;
 		problem = '';
-		await rename(account.id, wanted).catch((reason) => (problem = String(reason)));
+		await commands.accountsRename({ account: account.id, name: wanted }).catch((reason) => (problem = String(reason)));
 	}
 
 	function toggle() {

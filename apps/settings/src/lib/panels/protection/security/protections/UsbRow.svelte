@@ -2,7 +2,8 @@
 	import Usb from '@lucide/svelte/icons/usb';
 	import { t } from '@luft/i18n';
 	import { errorText, Row, Switch } from '@luft/ui';
-	import { setUsbProtection, type UsbProtection } from '../api';
+	import type { UsbProtection } from '#lib/bindings.js';
+	import { setUsbProtection } from '../api';
 	import type { SecurityState } from '../state.svelte';
 
 	let { security, usb }: { security: SecurityState; usb: UsbProtection } = $props();

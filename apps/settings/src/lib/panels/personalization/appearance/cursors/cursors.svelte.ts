@@ -1,4 +1,5 @@
-import { cursorThemes, installCursor, onInstallProgress, type CursorTheme, type InstallState } from './api';
+import { commands, events } from '#lib/bindings.js';
+import type { CursorTheme, InstallState } from '#lib/bindings.js';
 
 class Cursors {
 	themes = $state<CursorTheme[] | null>(null);
@@ -6,19 +7,19 @@ class Cursors {
 	private listening = false;
 
 	async load() {
-		this.themes = await cursorThemes();
+		this.themes = await commands.appearanceCursorThemes();
 	}
 
 	async install(id: number, file: number) {
 		if (!this.listening) {
 			this.listening = true;
-			onInstallProgress(({ id, ...progress }) => {
+			events.appearanceCursorInstall(({ id, ...progress }) => {
 				this.installs[id] = progress;
 				if (progress.state === 'installed') void this.load();
 			});
 		}
 		this.installs[id] = { state: 'downloading', received: 0, total: null };
-		await installCursor(id, file);
+		await commands.appearanceCursorInstall({ id, file });
 	}
 }
 

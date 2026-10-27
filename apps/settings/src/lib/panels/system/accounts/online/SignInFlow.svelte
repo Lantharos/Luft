@@ -6,7 +6,9 @@
 	import Smartphone from '@lucide/svelte/icons/smartphone';
 	import { t } from '@luft/i18n';
 	import { Choice, TextField } from '@luft/ui';
-	import { answer, onStep, openAddress, step as currentStep, type Step } from './api';
+	import { commands, events } from '#lib/bindings.js';
+	import type { Step } from '#lib/bindings.js';
+	import { openAddress } from './api';
 
 	interface Props {
 		session: string;
@@ -21,7 +23,7 @@
 	let copied = $state(false);
 	let problem = $state('');
 
-	const stop = onStep((update) => {
+	const stop = events.accountsStep((update) => {
 		if (update.session === session) receive(update.step);
 	});
 	onDestroy(stop);
@@ -49,21 +51,21 @@
 		const digits = code.replace(/\D/g, '');
 		if (digits.length !== 6) return;
 		step = { step: 'working' };
-		await answer(session, { kind: 'code', code: digits });
+		await commands.accountsAnswer({ session, answer: { kind: 'code', code: digits } });
 	}
 
 	async function textMe() {
 		step = { step: 'working' };
-		await answer(session, { kind: 'text' });
+		await commands.accountsAnswer({ session, answer: { kind: 'text' } });
 	}
 
 	async function choosePhone(id: string) {
 		step = { step: 'working' };
-		await answer(session, { kind: 'phone', id });
+		await commands.accountsAnswer({ session, answer: { kind: 'phone', id } });
 	}
 
 	$effect(() => {
-		if (session) void currentStep(session).then(receive).catch(() => {});
+		if (session) void commands.accountsStep({ session }).then(receive).catch(() => {});
 	});
 </script>
 

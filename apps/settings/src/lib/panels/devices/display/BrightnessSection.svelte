@@ -2,8 +2,9 @@
 	import { t } from '@luft/i18n';
 	import { onDestroy } from 'svelte';
 	import { Row, Section, Slider } from '@luft/ui';
+	import { commands, events } from '#lib/bindings.js';
+	import type { Brightness, ExternalBrightness, Monitor } from '#lib/bindings.js';
 	import { percent } from '#lib/format.js';
-	import { loadBrightness, onBrightnessChanged, setBrightness, type Brightness, type ExternalBrightness, type Monitor } from './api';
 
 	const SETUP: Partial<Record<ExternalBrightness, string>> = {
 		'missing-tool': 'settings-display-brightness-missing-tool',
@@ -44,12 +45,12 @@
 			connector,
 			setTimeout(() => release(connector), HOLD)
 		);
-		void setBrightness(connector, level);
+		void commands.displaySetBrightness({ connector, level });
 	}
 
-	onDestroy(onBrightnessChanged(receive));
+	onDestroy(events.displayBrightness(receive));
 	onDestroy(() => timers.forEach(clearTimeout));
-	void loadBrightness().then(receive);
+	void commands.displayBrightness().then(receive);
 </script>
 
 {#if shown.length || waiting.length}

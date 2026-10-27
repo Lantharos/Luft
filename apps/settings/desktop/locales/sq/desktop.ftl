@@ -206,7 +206,6 @@ desktop-admin-required = Për ta ndryshuar këtë duhen të drejta administrator
 desktop-about-disks-missing = Aplikacioni Disqet nuk është i instaluar
 
 ## Apps
-desktop-apps-kind-not-choosable = Ky lloj aplikacioni nuk mund të zgjidhet
 desktop-apps-uninstalled = Ky aplikacion nuk është më i instaluar
 desktop-apps-no-longer-starts = Ky aplikacion nuk niset më automatikisht
 desktop-apps-cannot-autostart = Ky aplikacion nuk mund të niset automatikisht

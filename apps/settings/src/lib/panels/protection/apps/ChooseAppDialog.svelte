@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { AppIcon, Dialog, SearchField } from '@luft/ui';
-	import { installedApps, matches, type App } from './api';
+	import { commands } from '#lib/bindings.js';
+	import type { App } from '#lib/bindings.js';
+	import { matches } from './api';
 
 	interface Props {
 		title: string;
@@ -18,7 +20,7 @@
 
 	let shown = $derived(apps.filter((app) => !exclude.includes(app.id) && matches(app, query)));
 
-	void installedApps().then((list) => (apps = list));
+	void commands.appsInstalled().then((list) => (apps = list));
 </script>
 
 <Dialog {title} {description} {onclose}>

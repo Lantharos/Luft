@@ -2,19 +2,11 @@
 	import { t } from '@luft/i18n';
 	import { onDestroy } from 'svelte';
 	import { Avatar, ItemRow, Row, Section, Select, Switch } from '@luft/ui';
+	import { commands, events } from '#lib/bindings.js';
+	import type { LoginScreen, User } from '#lib/bindings.js';
 	import SubPage from '#lib/components/SubPage.svelte';
-	import { displayName, users, type User } from '../users/api';
-	import {
-		chooseWallpaper,
-		clearWallpaper,
-		loginScreen,
-		onLoginScreenChanged,
-		setAutomaticLogin,
-		setDefaultSession,
-		setHiddenUsers,
-		setShowUsers,
-		type LoginScreen
-	} from './api';
+	import { displayName } from '../users/api';
+	import { chooseWallpaper, clearWallpaper, setAutomaticLogin, setDefaultSession, setHiddenUsers, setShowUsers } from './api';
 	import WallpaperSection from './WallpaperSection.svelte';
 
 	type Area = 'wallpaper' | 'people' | 'signing-in';
@@ -44,16 +36,16 @@
 		} catch (reason) {
 			problem = { area, message: String(reason) };
 		}
-		receive(await loginScreen());
+		receive(await commands.loginScreen());
 	}
 
 	function showPerson(hidden: string[], userName: string, shown: boolean) {
 		return setHiddenUsers(shown ? hidden.filter((name) => name !== userName) : [...hidden, userName]);
 	}
 
-	void loginScreen().then(receive);
-	void users().then((accounts) => (people = [accounts.me, ...accounts.others]));
-	onDestroy(onLoginScreenChanged(receive));
+	void commands.loginScreen().then(receive);
+	void commands.users().then((accounts) => (people = [accounts.me, ...accounts.others]));
+	onDestroy(events.loginChanged(receive));
 </script>
 
 {#snippet trouble(area: Area)}

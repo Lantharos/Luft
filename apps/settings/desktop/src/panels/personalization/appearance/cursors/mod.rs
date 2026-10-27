@@ -13,7 +13,7 @@ use luft_app::{Commands, Empty, Events};
 use sabine::{BridgeEvent, SabineWindow};
 use serde::{Deserialize, Serialize};
 
-use install::InstallProgress;
+use install::InstallState;
 use installed::UserThemes;
 use specta::Type;
 
@@ -40,7 +40,7 @@ struct Install {
 struct InstallEvent {
     id: u64,
     #[serde(flatten)]
-    progress: InstallProgress,
+    progress: InstallState,
 }
 
 fn install(events: &Events, Install { id, file }: Install) -> Result<(), String> {
@@ -50,8 +50,8 @@ fn install(events: &Events, Install { id, file }: Install) -> Result<(), String>
             events.emit(INSTALL_PROGRESS, InstallEvent { id, progress });
         };
         report(match install::install(id, file, &report) {
-            Ok(themes) => InstallProgress::Installed { themes },
-            Err(error) => InstallProgress::Failed { error },
+            Ok(themes) => InstallState::Installed { themes },
+            Err(error) => InstallState::Failed { error },
         });
     });
     Ok(())

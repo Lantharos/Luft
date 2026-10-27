@@ -11,7 +11,7 @@ const BRIGHTNESS: &str = "10";
 
 #[derive(Serialize, Clone, Copy, Default, PartialEq, Eq, Type)]
 #[serde(rename_all = "kebab-case")]
-pub enum Availability {
+pub enum ExternalBrightness {
     #[default]
     Checking,
     Ready,
@@ -39,9 +39,9 @@ fn accessible(path: &Path) -> bool {
         .is_ok_and(|path| unsafe { libc::access(path.as_ptr(), libc::R_OK | libc::W_OK) } == 0)
 }
 
-pub fn availability() -> Availability {
+pub fn availability() -> ExternalBrightness {
     if !installed() {
-        return Availability::MissingTool;
+        return ExternalBrightness::MissingTool;
     }
     let buses: Vec<_> = std::fs::read_dir("/dev")
         .into_iter()
@@ -51,11 +51,11 @@ pub fn availability() -> Availability {
         .map(|entry| entry.path())
         .collect();
     if buses.is_empty() {
-        Availability::NeedsRestart
+        ExternalBrightness::NeedsRestart
     } else if buses.iter().any(|bus| accessible(bus)) {
-        Availability::Ready
+        ExternalBrightness::Ready
     } else {
-        Availability::NoAccess
+        ExternalBrightness::NoAccess
     }
 }
 

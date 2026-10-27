@@ -14,7 +14,7 @@ use zbus::Proxy;
 
 use super::state;
 use ddc::{Request, Worker};
-use ddcutil::Availability;
+use ddcutil::ExternalBrightness;
 use panel::Panels;
 use specta::Type;
 
@@ -22,7 +22,7 @@ pub const BRIGHTNESS_CHANGED: BridgeEvent<Brightness> = BridgeEvent::new("displa
 
 #[derive(Serialize, Clone, Type)]
 #[serde(tag = "state", rename_all = "kebab-case")]
-pub enum Control {
+pub enum BrightnessControl {
     Ready { level: f64 },
     Unresponsive,
     Unsupported,
@@ -31,14 +31,14 @@ pub enum Control {
 #[derive(Default)]
 pub struct Shared {
     panels: Panels,
-    external: BTreeMap<String, Control>,
-    availability: Availability,
+    external: BTreeMap<String, BrightnessControl>,
+    availability: ExternalBrightness,
 }
 
 #[derive(Serialize, Type)]
 pub struct Brightness {
-    displays: BTreeMap<String, Control>,
-    external: Availability,
+    displays: BTreeMap<String, BrightnessControl>,
+    external: ExternalBrightness,
 }
 
 #[derive(Deserialize, Type)]
@@ -53,7 +53,7 @@ impl Shared {
         displays.extend(
             self.panels
                 .levels()
-                .map(|(connector, level)| (connector.clone(), Control::Ready { level })),
+                .map(|(connector, level)| (connector.clone(), BrightnessControl::Ready { level })),
         );
         Brightness {
             displays,

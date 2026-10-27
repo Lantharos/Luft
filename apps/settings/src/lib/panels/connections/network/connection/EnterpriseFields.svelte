@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { basename, PasswordField, Row, Select, TextField } from '@luft/ui';
-	import { chooseCertificate, type EapMethod, type Enterprise } from '@luft/network';
+	import { waitForPerson, type EapMethod, type Enterprise } from '@luft/network';
+	import { commands } from '#lib/bindings.js';
 	import type { Errors } from './validate';
 
 	interface Props {
@@ -51,7 +52,7 @@
 
 	async function chooseAuthority(choice: Authority) {
 		if (choice === 'file' || choice === 'another') {
-			const path = await chooseCertificate('authority');
+			const path = await commands.networkChooseCertificate({ purpose: 'authority' }, waitForPerson);
 			if (!path) return;
 			enterprise.caCertificate = path;
 		} else {
@@ -61,11 +62,11 @@
 	}
 
 	async function chooseClient() {
-		enterprise.clientCertificate = (await chooseCertificate('client')) ?? enterprise.clientCertificate;
+		enterprise.clientCertificate = (await commands.networkChooseCertificate({ purpose: 'client' }, waitForPerson)) ?? enterprise.clientCertificate;
 	}
 
 	async function chooseKey() {
-		enterprise.privateKey = (await chooseCertificate('key')) ?? enterprise.privateKey;
+		enterprise.privateKey = (await commands.networkChooseCertificate({ purpose: 'key' }, waitForPerson)) ?? enterprise.privateKey;
 	}
 </script>
 

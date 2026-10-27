@@ -206,7 +206,6 @@ desktop-admin-required = Dafür sind Administratorrechte nötig
 desktop-about-disks-missing = Datenträger ist nicht installiert
 
 ## Apps
-desktop-apps-kind-not-choosable = Diese Art von App kann nicht ausgewählt werden
 desktop-apps-uninstalled = Diese App ist nicht mehr installiert
 desktop-apps-no-longer-starts = Diese App startet nicht mehr automatisch
 desktop-apps-cannot-autostart = Diese App kann nicht automatisch starten

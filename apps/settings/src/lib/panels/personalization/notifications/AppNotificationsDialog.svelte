@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Dialog, Row, Select, Switch } from '@luft/ui';
+	import type { NotifyingApp } from '#lib/bindings.js';
 	import type { SettingsGroup } from '#lib/state/gsettings.svelte.js';
-	import type { AppOptions, AppRules, DoNotDisturb, NotifyingApp, Sound } from './api';
+	import type { AppOptions, AppRules, DoNotDisturb, Sound } from './api';
 
 	interface Props {
 		app: NotifyingApp;

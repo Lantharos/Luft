@@ -15,7 +15,7 @@ const MAX_SEARCH_DEPTH: usize = 6;
 
 #[derive(Serialize, Type)]
 #[serde(tag = "state", rename_all = "camelCase")]
-pub enum InstallProgress {
+pub enum InstallState {
     Downloading { received: u64, total: Option<u64> },
     Installing,
     Installed { themes: Vec<String> },
@@ -103,11 +103,7 @@ fn unpack_themes(
         .collect()
 }
 
-pub fn install(
-    id: u64,
-    file: u32,
-    report: &impl Fn(InstallProgress),
-) -> Result<Vec<String>, String> {
+pub fn install(id: u64, file: u32, report: &impl Fn(InstallState)) -> Result<Vec<String>, String> {
     let (link, file_name) = store::download_link(id, file)?;
     let format =
         Format::of(&file_name).ok_or_else(|| t!(L10N, "desktop-cursors-not-an-archive"))?;
@@ -115,7 +111,7 @@ pub fn install(
     let staging = staging(&user, &format!("{id}-{file}"))?;
     let archive_path = staging.0.join("download");
     download(&link, &archive_path, report)?;
-    report(InstallProgress::Installing);
+    report(InstallState::Installing);
     unpack_themes(&user, format, &archive_path, &file_name, &staging.0)
 }
 

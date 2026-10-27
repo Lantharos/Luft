@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Section } from '@luft/ui';
+	import type { Trust } from '#lib/bindings.js';
 	import SubPage from '#lib/components/SubPage.svelte';
-	import type { Trust } from '../api';
 	import DrivesRow from './DrivesRow.svelte';
 	import EncryptionRow from './EncryptionRow.svelte';
 	import UnlockSection from './unlocking/UnlockSection.svelte';

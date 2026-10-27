@@ -4,7 +4,8 @@
 	import { t } from '@luft/i18n';
 	import { Row, Section, Switch } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
-	import { setWifi, type Wifi } from '@luft/network';
+	import type { Wifi } from '@luft/network';
+	import { commands } from '#lib/bindings.js';
 	import type { Target } from '../connection/profile';
 	import type { NetworkState } from '../state.svelte';
 	import WifiSection from './WifiSection.svelte';
@@ -25,7 +26,7 @@
 <SubPage title={t('settings-page-wifi')} back={t('settings-page-network')} {onclose}>
 	<Section>
 		<Row title={t('settings-network-wifi')} icon={WifiIcon} description={connections.wifiSummary(wifi)} truncate>
-			<Switch label={t('settings-network-wifi')} checked={wifi.enabled} disabled={!wifi.hardwareEnabled} onchange={setWifi} />
+			<Switch label={t('settings-network-wifi')} checked={wifi.enabled} disabled={!wifi.hardwareEnabled} onchange={(enabled) => commands.networkSetWifi({ enabled })} />
 		</Row>
 		{#if known}
 			<Row title={t('settings-network-known')} icon={History} description={t('settings-network-known-count', { count: known })} onclick={onbrowse} />

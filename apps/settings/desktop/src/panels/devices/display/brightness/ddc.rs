@@ -5,8 +5,8 @@ use std::time::{Duration, Instant};
 use zbus::Proxy;
 
 use super::super::state::{self, MonitorSpec};
-use super::ddcutil::{self, Availability, Found};
-use super::{Control, Publisher};
+use super::ddcutil::{self, ExternalBrightness, Found};
+use super::{BrightnessControl, Publisher};
 
 const SETTLE: Duration = Duration::from_millis(150);
 const QUICK_RETRY: Duration = Duration::from_secs(1);
@@ -56,21 +56,21 @@ impl Bus {
         self.retry_at = Some(Instant::now() + delay);
     }
 
-    fn read(&mut self) -> Control {
+    fn read(&mut self) -> BrightnessControl {
         if self.backing_off() {
-            return Control::Unresponsive;
+            return BrightnessControl::Unresponsive;
         }
         match ddcutil::brightness(self.number) {
             Ok((current, max)) => {
                 self.succeeded();
                 self.max = max;
-                Control::Ready {
+                BrightnessControl::Ready {
                     level: f64::from(current) / f64::from(max),
                 }
             }
             Err(_) => {
                 self.failed();
-                Control::Unresponsive
+                BrightnessControl::Unresponsive
             }
         }
     }
@@ -93,7 +93,7 @@ fn connector_of(display: &Found, monitors: &[MonitorSpec]) -> Option<String> {
 
 pub struct Worker {
     buses: BTreeMap<String, Bus>,
-    controls: BTreeMap<String, Control>,
+    controls: BTreeMap<String, BrightnessControl>,
     publisher: Publisher,
     displays: Proxy<'static>,
 }
@@ -132,7 +132,7 @@ impl Worker {
         }
     }
 
-    fn publish(&self, availability: Availability) {
+    fn publish(&self, availability: ExternalBrightness) {
         let controls = self.controls.clone();
         self.publisher.update(move |shared| {
             shared.availability = availability;
@@ -142,7 +142,7 @@ impl Worker {
 
     fn detect(&mut self) {
         let availability = ddcutil::availability();
-        if availability != Availability::Ready {
+        if availability != ExternalBrightness::Ready {
             self.buses.clear();
             self.controls.clear();
             return self.publish(availability);
@@ -157,7 +157,7 @@ impl Worker {
                 continue;
             };
             if !display.usable {
-                controls.insert(connector, Control::Unsupported);
+                controls.insert(connector, BrightnessControl::Unsupported);
                 continue;
             }
             let mut bus = self
@@ -170,7 +170,7 @@ impl Worker {
         }
         self.buses = buses;
         self.controls = controls;
-        self.publish(Availability::Ready);
+        self.publish(ExternalBrightness::Ready);
     }
 
     fn retry(&mut self) {
@@ -181,7 +181,7 @@ impl Worker {
                 self.controls.insert(connector.clone(), bus.read());
             }
         }
-        self.publish(Availability::Ready);
+        self.publish(ExternalBrightness::Ready);
     }
 
     fn settle(&mut self, requests: &Receiver<Request>, connector: String, level: f64) {
@@ -202,7 +202,7 @@ impl Worker {
         if detect {
             self.detect();
         } else {
-            self.publish(Availability::Ready);
+            self.publish(ExternalBrightness::Ready);
         }
     }
 
@@ -218,12 +218,14 @@ impl Worker {
             Ok(()) => {
                 bus.succeeded();
                 let level = f64::from(value) / f64::from(bus.max);
-                self.controls.insert(connector, Control::Ready { level });
+                self.controls
+                    .insert(connector, BrightnessControl::Ready { level });
             }
             Err(_) => {
                 bus.failed();
                 if bus.backing_off() {
-                    self.controls.insert(connector, Control::Unresponsive);
+                    self.controls
+                        .insert(connector, BrightnessControl::Unresponsive);
                 }
             }
         }

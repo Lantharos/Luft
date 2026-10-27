@@ -199,7 +199,6 @@ desktop-admin-required = Do zmiany tego ustawienia potrzebne są uprawnienia adm
 desktop-about-disks-missing = Aplikacja Dyski nie jest zainstalowana
 
 ## Apps
-desktop-apps-kind-not-choosable = Nie można wybrać tego rodzaju aplikacji
 desktop-apps-uninstalled = Ta aplikacja nie jest już zainstalowana
 desktop-apps-no-longer-starts = Ta aplikacja nie uruchamia się już automatycznie
 desktop-apps-cannot-autostart = Ta aplikacja nie może uruchamiać się automatycznie

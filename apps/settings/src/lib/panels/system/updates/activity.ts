@@ -1,5 +1,5 @@
 import { t } from '@luft/i18n';
-import type { Activity } from './api';
+import type { Activity } from '#lib/bindings.js';
 
 export function describe(activity: Activity) {
 	switch (activity.running) {

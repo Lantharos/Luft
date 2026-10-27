@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Row, Section, Switch } from '@luft/ui';
+	import { commands } from '#lib/bindings.js';
+	import type { Keyring } from '#lib/bindings.js';
 	import { app } from '#lib/state/app.svelte.js';
-	import { lock, reseal, setLockWithScreen, setPin, unlock, type Keyring } from './api';
+	import { reseal, setPin, unlock } from './api';
 	import { protection, sealed } from './describe';
 	import { Runner } from './runner.svelte';
 
@@ -27,7 +29,7 @@
 		{#if keyring.locked}
 			<button type="button" class="button" disabled={runner.busy} onclick={() => runner.run(unlock)}>{t('settings-passwords-unlock')}</button>
 		{:else}
-			<button type="button" class="button" disabled={runner.busy} onclick={() => runner.run(lock)}>{t('settings-passwords-lock')}</button>
+			<button type="button" class="button" disabled={runner.busy} onclick={() => runner.run(commands.keyringLock)}>{t('settings-passwords-lock')}</button>
 		{/if}
 	</Row>
 	{#if resealable}
@@ -58,7 +60,7 @@
 			label={t('settings-passwords-lock-with-screen')}
 			checked={keyring.lockWithScreen}
 			disabled={keyring.locked || runner.busy}
-			onchange={(enabled) => runner.run(() => setLockWithScreen(enabled))}
+			onchange={(enabled) => runner.run(() => commands.keyringLockWithScreen({ enabled }))}
 		/>
 	</Row>
 	<Row

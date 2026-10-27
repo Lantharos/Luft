@@ -1,15 +1,7 @@
-import { fingerprintReader } from '@luft/ui';
+import { commands, events } from '#lib/bindings.js';
+import type { HostSecurity, Trust, UsbProtection } from '#lib/bindings.js';
 import { firmware } from '#lib/panels/system/updates/api.js';
-import {
-	hostSecurity,
-	onTrust,
-	onUsbProtection,
-	trust,
-	usbProtection,
-	type HostSecurity,
-	type Trust,
-	type UsbProtection
-} from './api';
+import { hostSecurity } from './api';
 
 export class SecurityState {
 	trust = $state<Trust | null>(null);
@@ -22,11 +14,11 @@ export class SecurityState {
 	private stops: (() => void)[] = [];
 
 	async start() {
-		this.stops = [onTrust((next) => (this.trust = next)), onUsbProtection((next) => (this.usb = next))];
+		this.stops = [events.securityTrust((next) => (this.trust = next)), events.securityUsb((next) => (this.usb = next))];
 		const [trustState, usbState, reader] = await Promise.all([
-			trust().catch(() => null),
-			usbProtection().catch(() => null),
-			fingerprintReader().catch(() => false)
+			commands.securityTrust().catch(() => null),
+			commands.securityUsb().catch(() => null),
+			commands.fingerprintReader().catch(() => false)
 		]);
 		this.trust = trustState;
 		this.usb = usbState;

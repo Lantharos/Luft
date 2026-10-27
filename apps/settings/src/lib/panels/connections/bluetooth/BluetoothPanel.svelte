@@ -6,29 +6,14 @@
 	import { onMount } from 'svelte';
 	import { t } from '@luft/i18n';
 	import { ActionRow, Dialog, errorText, IconButton, item, reorder, Row, Section, Select, Switch } from '@luft/ui';
+	import { commands, events } from '#lib/bindings.js';
+	import type { Adapter, Bluetooth, BluetoothDevice, PairingRequest } from '#lib/bindings.js';
 	import MoreRow, { COLLAPSED } from '#lib/components/MoreRow.svelte';
 	import { percent } from '#lib/format.js';
 	import DeviceDialog from './DeviceDialog.svelte';
 	import RequestDialog from './RequestDialog.svelte';
 	import WindowsDevices from './WindowsDevices.svelte';
-	import {
-		close,
-		connect,
-		disconnect,
-		forget,
-		onCancel,
-		onChanged,
-		onRequest,
-		open,
-		pair,
-		setPowered,
-		setTrusted,
-		setVisible,
-		type Adapter,
-		type Bluetooth,
-		type Device,
-		type PairingRequest
-	} from './api';
+	import { pair } from './api';
 	import { KIND_ICONS } from './kinds';
 
 	type Busy = 'connecting' | 'disconnecting' | 'pairing';
@@ -43,7 +28,7 @@
 
 	let bluetooth = $state<Bluetooth | null>(null);
 	let request = $state<PairingRequest | null>(null);
-	let forgetting = $state<Device | null>(null);
+	let forgetting = $state<BluetoothDevice | null>(null);
 	let inspecting = $state<string | null>(null);
 	let busy = $state<Record<string, Busy>>({});
 	let expanded = $state(false);
@@ -66,15 +51,15 @@
 	async function changeVisibility(visible: boolean, timeout: number) {
 		delete problems.visibility;
 		try {
-			await setVisible(visible, timeout);
+			await commands.bluetoothSetVisible({ visible, timeout });
 		} catch {
 			problems.visibility = t('settings-bluetooth-visible-failed');
 		}
 	}
 
-	async function trust(device: Device, trusted: boolean) {
+	async function trust(device: BluetoothDevice, trusted: boolean) {
 		try {
-			await setTrusted(device.path, trusted);
+			await commands.bluetoothSetTrusted({ device: device.path, trusted });
 		} catch (reason) {
 			problems[device.path] = errorText(reason);
 		}
@@ -85,14 +70,14 @@
 		if (!sameCode) request = next;
 	}
 
-	function status(device: Device) {
+	function status(device: BluetoothDevice) {
 		if (problems[device.path]) return problems[device.path];
 		if (busy[device.path]) return t(BUSY_LABELS[busy[device.path]]);
 		if (!device.connected) return undefined;
 		return device.battery === null ? t('settings-bluetooth-connected') : t('settings-bluetooth-connected-battery', { battery: percent(device.battery / 100) });
 	}
 
-	async function perform(device: Device, state: Busy, action: (path: string) => Promise<void>) {
+	async function perform(device: BluetoothDevice, state: Busy, action: (path: string) => Promise<unknown>) {
 		if (busy[device.path]) return;
 		busy[device.path] = state;
 		delete problems[device.path];
@@ -106,41 +91,41 @@
 		}
 	}
 
-	function toggle(device: Device) {
-		void (device.connected ? perform(device, 'disconnecting', disconnect) : perform(device, 'connecting', connect));
+	function toggle(device: BluetoothDevice) {
+		void (device.connected ? perform(device, 'disconnecting', (path) => commands.bluetoothDisconnect({ device: path })) : perform(device, 'connecting', (path) => commands.bluetoothConnect({ device: path })));
 	}
 
 	async function power(enabled: boolean) {
 		delete problems.adapter;
 		try {
-			await setPowered(enabled);
+			await commands.bluetoothSetPowered({ enabled });
 		} catch {
 			problems.adapter = enabled ? t('settings-bluetooth-power-on-failed') : t('settings-bluetooth-power-off-failed');
 		}
 	}
 
-	function startForget(device: Device) {
+	function startForget(device: BluetoothDevice) {
 		inspecting = null;
 		forgetting = device;
 	}
 
-	async function confirmForget(device: Device) {
+	async function confirmForget(device: BluetoothDevice) {
 		forgetting = null;
 		try {
-			await forget(device.path);
+			await commands.bluetoothForget({ device: device.path });
 		} catch (reason) {
 			problems[device.path] = errorText(reason);
 		}
 	}
 
 	onMount(() => {
-		const stops = [onChanged((next) => (bluetooth = next)), onRequest(receive), onCancel(() => (request = null))];
-		open()
+		const stops = [events.bluetoothChanged((next) => (bluetooth = next)), events.bluetoothRequest(receive), events.bluetoothCancel(() => (request = null))];
+		commands.bluetoothOpen()
 			.then((initial) => (bluetooth = initial))
 			.catch(() => (bluetooth = { adapter: null, hardwareBlocked: false, paired: [], nearby: [] }));
 		return () => {
 			for (const stop of stops) stop();
-			void close();
+			void commands.bluetoothClose();
 		};
 	});
 </script>

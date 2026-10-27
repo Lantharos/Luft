@@ -1,7 +1,9 @@
 use futures_util::future::join;
 use luft_trust::{DRIVES, Map, TRUST, get, group};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use specta::Type;
+
+use crate::parse::parse;
 
 #[derive(Serialize, Default, Type)]
 #[serde(rename_all = "camelCase")]
@@ -9,10 +11,19 @@ pub struct Tpm {
     usable: bool,
 }
 
+#[derive(Serialize, Deserialize, Default, Type)]
+#[serde(rename_all = "lowercase")]
+enum SigningKeyState {
+    #[default]
+    None,
+    Pending,
+    Enrolled,
+}
+
 #[derive(Serialize, Default, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct SigningKey {
-    state: String,
+    state: SigningKeyState,
     available: bool,
     missed: u32,
     other_keys: Vec<String>,
@@ -42,21 +53,38 @@ pub struct AntiCheat {
     uses_luft_key: bool,
 }
 
+#[derive(Serialize, Deserialize, Type)]
+#[serde(rename_all = "kebab-case")]
+enum UnlockMethod {
+    Tpm,
+    Pin,
+    Passphrase,
+    RecoveryKey,
+    SecurityKey,
+}
+
 #[derive(Serialize, Default, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Disk {
     device: String,
     encrypted: bool,
-    unlock: Vec<String>,
+    unlock: Vec<UnlockMethod>,
     recovery_key_stored: bool,
     tpm_refused: bool,
     secure_boot_changed: bool,
 }
 
+#[derive(Serialize, Deserialize, Type)]
+#[serde(rename_all = "lowercase")]
+enum EncryptionChange {
+    Encrypt,
+    Decrypt,
+}
+
 #[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Changing {
-    change: String,
+    change: Option<EncryptionChange>,
     state: String,
     progress: f64,
 }
@@ -70,10 +98,19 @@ pub struct Drives {
     changing: Option<Changing>,
 }
 
+#[derive(Serialize, Deserialize, Type)]
+#[serde(rename_all = "lowercase")]
+enum SecureBoot {
+    On,
+    Off,
+    Setup,
+    Unsupported,
+}
+
 #[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Trust {
-    secure_boot: String,
+    secure_boot: SecureBoot,
     tpm: Tpm,
     signing_key: SigningKey,
     startup: Startup,
@@ -98,7 +135,7 @@ fn tpm(map: &Map) -> Tpm {
 
 fn signing_key(map: &Map) -> SigningKey {
     SigningKey {
-        state: text(map, "State"),
+        state: parse(text(map, "State")).unwrap_or_default(),
         available: flag(map, "Available"),
         missed: get(map, "Missed").unwrap_or_default(),
         other_keys: get(map, "OtherKeys").unwrap_or_default(),
@@ -129,7 +166,11 @@ fn disk(map: &Map) -> Disk {
     Disk {
         device: text(map, "Device"),
         encrypted: flag(map, "Encrypted"),
-        unlock: get(map, "Unlock").unwrap_or_default(),
+        unlock: get::<Vec<String>>(map, "Unlock")
+            .unwrap_or_default()
+            .into_iter()
+            .filter_map(parse)
+            .collect(),
         recovery_key_stored: flag(map, "RecoveryKeyStored"),
         tpm_refused: flag(map, "TpmRefused"),
         secure_boot_changed: flag(map, "SecureBootChanged"),
@@ -153,7 +194,7 @@ async fn drives() -> Drives {
             .values()
             .find(|entry| text(entry, "State") != "on")
             .map(|entry| Changing {
-                change: text(entry, "Change"),
+                change: parse(text(entry, "Change")),
                 state: text(entry, "State"),
                 progress: get(entry, "Progress").unwrap_or_default(),
             }),
@@ -167,7 +208,7 @@ pub async fn read() -> Result<Option<Trust>, String> {
     };
     Ok(Some(Trust {
         drives,
-        secure_boot: text(&properties, "SecureBoot"),
+        secure_boot: parse(text(&properties, "SecureBoot")).unwrap_or(SecureBoot::Unsupported),
         tpm: tpm(&group(&properties, "Tpm")),
         signing_key: signing_key(&group(&properties, "SigningKey")),
         startup: startup(&group(&properties, "Startup")),

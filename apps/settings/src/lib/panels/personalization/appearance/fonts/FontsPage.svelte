@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { errorText, SearchField, VirtualScroller } from '@luft/ui';
+	import { commands } from '#lib/bindings.js';
+	import type { FontFamily } from '#lib/bindings.js';
 	import SubPage from '#lib/components/SubPage.svelte';
-	import { openFont, removeFont, type FontFamily } from './api';
+	import { openFont } from './api';
 	import FontRow from './FontRow.svelte';
 	import { fontLibrary } from './library.svelte';
 
@@ -23,7 +25,7 @@
 		return needle ? (families ?? []).filter((family) => family.name.toLowerCase().includes(needle)) : (families ?? []);
 	});
 
-	async function attempt(action: () => Promise<void>) {
+	async function attempt(action: () => Promise<unknown>) {
 		problem = '';
 		try {
 			await action();
@@ -34,7 +36,7 @@
 
 	function remove(family: FontFamily) {
 		void attempt(async () => {
-			await removeFont(family.name);
+			await commands.appearanceFontRemove({ family: family.name });
 			await fontLibrary.load();
 		});
 	}

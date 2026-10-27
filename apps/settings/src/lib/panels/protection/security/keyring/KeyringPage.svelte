@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Row, Section } from '@luft/ui';
+	import type { Access } from '#lib/bindings.js';
 	import SubPage from '#lib/components/SubPage.svelte';
 	import PasskeysSection from '../passkeys/PasskeysSection.svelte';
 	import AccessPage from './access/AccessPage.svelte';
-	import { keyringAccess, type Access } from './api';
+	import { keyringAccess } from './api';
 	import SshSection from './ssh/SshSection.svelte';
 	import type { KeyringState } from './state.svelte';
 	import StatusSection from './StatusSection.svelte';

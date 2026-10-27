@@ -199,7 +199,6 @@ desktop-admin-required = Ennek módosításához rendszergazdai jogok szüksége
 desktop-about-disks-missing = A Lemezek alkalmazás nincs telepítve
 
 ## Apps
-desktop-apps-kind-not-choosable = Ilyen típusú alkalmazás nem választható
 desktop-apps-uninstalled = Ez az alkalmazás már nincs telepítve
 desktop-apps-no-longer-starts = Ez az alkalmazás már nem indul el automatikusan
 desktop-apps-cannot-autostart = Ez az alkalmazás nem tud automatikusan elindulni

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { ProgressBar } from '@luft/ui';
-	import type { Activity } from './api';
+	import type { Activity } from '#lib/bindings.js';
 	import { fractionOf } from './activity';
 	import { percent } from '#lib/format.js';
 

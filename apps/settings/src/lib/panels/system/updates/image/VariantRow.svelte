@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { bytes, Row } from '@luft/ui';
-	import { restart, switchVariant, type Activity, type SystemOverview, type Variant, type VariantOffer } from '../api';
+	import { commands } from '#lib/bindings.js';
+	import type { Activity, ImageOverview, Offer, Variant } from '#lib/bindings.js';
 
 	interface Props {
-		overview: SystemOverview;
+		overview: ImageOverview;
 		activity: Activity;
-		attempt: (action: () => Promise<void>) => void;
+		attempt: (action: () => Promise<unknown>) => void;
 	}
 
 	let { overview, activity, attempt }: Props = $props();
@@ -28,18 +29,18 @@
 
 	const busy = $derived(activity.running !== null);
 
-	const describe = (offer: VariantOffer) => [t(REASONS[offer.to]), offer.size ? t('settings-updates-download-size', { size: bytes(offer.size) }) : null].filter(Boolean).join(' · ');
+	const describe = (offer: Offer) => [t(REASONS[offer.to]), offer.size ? t('settings-updates-download-size', { size: bytes(offer.size) }) : null].filter(Boolean).join(' · ');
 </script>
 
 {#if overview.switching}
 	<Row title={t(TITLES[overview.switching])} description={t(READY[overview.switching])}>
-		<button type="button" class="button primary" disabled={busy} onclick={() => attempt(restart)}>{t('settings-updates-restart')}</button>
+		<button type="button" class="button primary" disabled={busy} onclick={() => attempt(commands.updatesRestart)}>{t('settings-updates-restart')}</button>
 	</Row>
 {:else if overview.offer && !overview.returning}
 	{@const offer = overview.offer}
 	<Row title={t(TITLES[offer.to])} description={describe(offer)} truncate>
 		{#if activity.running !== 'switch'}
-			<button type="button" class="button" disabled={busy} onclick={() => attempt(() => switchVariant(offer.to))}>{t('settings-updates-switch')}</button>
+			<button type="button" class="button" disabled={busy} onclick={() => attempt(() => commands.updatesSwitch({ variant: offer.to }))}>{t('settings-updates-switch')}</button>
 		{/if}
 	</Row>
 {/if}

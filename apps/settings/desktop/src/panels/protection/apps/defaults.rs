@@ -7,128 +7,126 @@ use specta::Type;
 
 use crate::L10N;
 
-struct Category {
-    id: &'static str,
-    types: &'static [&'static str],
+#[derive(Serialize, Deserialize, Type, Clone, Copy)]
+#[serde(rename_all = "lowercase")]
+pub enum AppCategory {
+    Browser,
+    Email,
+    Calendar,
+    Music,
+    Video,
+    Photos,
+    Text,
+    Files,
+    Archives,
 }
 
-const CATEGORIES: [Category; 9] = [
-    Category {
-        id: "browser",
-        types: &[
-            "x-scheme-handler/http",
-            "x-scheme-handler/https",
-            "text/html",
-            "application/xhtml+xml",
-        ],
-    },
-    Category {
-        id: "email",
-        types: &["x-scheme-handler/mailto"],
-    },
-    Category {
-        id: "calendar",
-        types: &["text/calendar"],
-    },
-    Category {
-        id: "music",
-        types: &[
-            "audio/mpeg",
-            "audio/flac",
-            "audio/x-flac",
-            "audio/ogg",
-            "audio/x-vorbis+ogg",
-            "audio/x-opus+ogg",
-            "audio/opus",
-            "audio/wav",
-            "audio/x-wav",
-            "audio/mp4",
-            "audio/x-m4a",
-            "audio/aac",
-        ],
-    },
-    Category {
-        id: "video",
-        types: &[
-            "video/mp4",
-            "video/x-matroska",
-            "video/webm",
-            "video/quicktime",
-            "video/x-msvideo",
-            "video/mpeg",
-            "video/ogg",
-        ],
-    },
-    Category {
-        id: "photos",
-        types: &[
-            "image/jpeg",
-            "image/png",
-            "image/gif",
-            "image/webp",
-            "image/avif",
-            "image/jxl",
-            "image/heif",
-            "image/bmp",
-            "image/tiff",
-        ],
-    },
-    Category {
-        id: "text",
-        types: &["text/plain"],
-    },
-    Category {
-        id: "files",
-        types: &["inode/directory"],
-    },
-    Category {
-        id: "archives",
-        types: &[
-            "application/zip",
-            "application/x-7z-compressed",
-            "application/vnd.rar",
-            "application/x-tar",
-            "application/x-compressed-tar",
-            "application/x-bzip2-compressed-tar",
-            "application/x-xz-compressed-tar",
-            "application/x-zstd-compressed-tar",
-            "application/gzip",
-            "application/x-bzip2",
-            "application/x-xz",
-            "application/zstd",
-        ],
-    },
+const CATEGORIES: [AppCategory; 9] = [
+    AppCategory::Browser,
+    AppCategory::Email,
+    AppCategory::Calendar,
+    AppCategory::Music,
+    AppCategory::Video,
+    AppCategory::Photos,
+    AppCategory::Text,
+    AppCategory::Files,
+    AppCategory::Archives,
 ];
+
+impl AppCategory {
+    fn types(self) -> &'static [&'static str] {
+        match self {
+            Self::Browser => &[
+                "x-scheme-handler/http",
+                "x-scheme-handler/https",
+                "text/html",
+                "application/xhtml+xml",
+            ],
+            Self::Email => &["x-scheme-handler/mailto"],
+            Self::Calendar => &["text/calendar"],
+            Self::Music => &[
+                "audio/mpeg",
+                "audio/flac",
+                "audio/x-flac",
+                "audio/ogg",
+                "audio/x-vorbis+ogg",
+                "audio/x-opus+ogg",
+                "audio/opus",
+                "audio/wav",
+                "audio/x-wav",
+                "audio/mp4",
+                "audio/x-m4a",
+                "audio/aac",
+            ],
+            Self::Video => &[
+                "video/mp4",
+                "video/x-matroska",
+                "video/webm",
+                "video/quicktime",
+                "video/x-msvideo",
+                "video/mpeg",
+                "video/ogg",
+            ],
+            Self::Photos => &[
+                "image/jpeg",
+                "image/png",
+                "image/gif",
+                "image/webp",
+                "image/avif",
+                "image/jxl",
+                "image/heif",
+                "image/bmp",
+                "image/tiff",
+            ],
+            Self::Text => &["text/plain"],
+            Self::Files => &["inode/directory"],
+            Self::Archives => &[
+                "application/zip",
+                "application/x-7z-compressed",
+                "application/vnd.rar",
+                "application/x-tar",
+                "application/x-compressed-tar",
+                "application/x-bzip2-compressed-tar",
+                "application/x-xz-compressed-tar",
+                "application/x-zstd-compressed-tar",
+                "application/gzip",
+                "application/x-bzip2",
+                "application/x-xz",
+                "application/zstd",
+            ],
+        }
+    }
+
+    fn representative(self) -> &'static str {
+        self.types()[0]
+    }
+}
 
 #[derive(Serialize, Type)]
 pub struct Handler {
-    category: &'static str,
+    category: AppCategory,
     apps: Vec<App>,
     current: Option<String>,
 }
 
 #[derive(Deserialize, Type)]
 pub struct DefaultApp {
-    category: String,
+    category: AppCategory,
     app: String,
-}
-
-fn representative(category: &Category) -> &'static str {
-    category.types[0]
 }
 
 pub fn list() -> Vec<Handler> {
     CATEGORIES
-        .iter()
+        .into_iter()
         .map(|category| {
-            let kind = representative(category);
+            let kind = category.representative();
             let mut apps: Vec<App> = gio::AppInfo::all_for_type(kind)
                 .iter()
                 .filter_map(App::from_info)
                 .collect();
             apps::sort_by_name(&mut apps);
             Handler {
-                category: category.id,
+                category,
                 apps,
                 current: gio::AppInfo::default_for_type(kind, false)
                     .and_then(|app| app.id())
@@ -139,17 +137,13 @@ pub fn list() -> Vec<Handler> {
 }
 
 pub fn set(DefaultApp { category, app }: DefaultApp) -> Result<(), String> {
-    let category = CATEGORIES
-        .iter()
-        .find(|known| known.id == category)
-        .ok_or_else(|| t!(L10N, "desktop-apps-kind-not-choosable"))?;
     let app =
         gio_unix::DesktopAppInfo::new(&app).ok_or_else(|| t!(L10N, "desktop-apps-uninstalled"))?;
     let supported = app.supported_types();
     let failed = |error: gio::glib::Error| error.to_string();
-    app.set_as_default_for_type(representative(category))
+    app.set_as_default_for_type(category.representative())
         .map_err(failed)?;
-    for kind in &category.types[1..] {
+    for kind in &category.types()[1..] {
         if supported.iter().any(|supported| supported == kind) {
             app.set_as_default_for_type(kind).map_err(failed)?;
         }

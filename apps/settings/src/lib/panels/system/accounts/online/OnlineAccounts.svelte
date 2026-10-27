@@ -3,16 +3,17 @@
 	import Plus from '@lucide/svelte/icons/plus';
 	import { t } from '@luft/i18n';
 	import { ActionRow, Row, Section } from '@luft/ui';
+	import { commands, events } from '#lib/bindings.js';
+	import type { Account, AccountsSnapshot } from '#lib/bindings.js';
 	import { app } from '#lib/state/app.svelte.js';
 	import AccountRow from './AccountRow.svelte';
-	import { accounts, onAccounts, type Account, type Snapshot } from './api';
 	import SignInDialog from './SignInDialog.svelte';
 
-	let snapshot = $state<Snapshot | null | undefined>();
+	let snapshot = $state<AccountsSnapshot | null | undefined>();
 	let adding = $state(false);
 	let again = $state<Account | null>(null);
 
-	const stop = onAccounts((next) => (snapshot = next));
+	const stop = events.accountsChanged((next) => (snapshot = next));
 	onDestroy(stop);
 
 	$effect(() => {
@@ -21,7 +22,7 @@
 		adding = true;
 	});
 
-	void accounts()
+	void commands.accounts()
 		.then((next) => (snapshot = next))
 		.catch(() => (snapshot = null));
 </script>

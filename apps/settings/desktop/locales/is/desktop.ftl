@@ -199,7 +199,6 @@ desktop-admin-required = Stjórnandaréttindi þarf til að breyta þessu
 desktop-about-disks-missing = Forritið Diskar er ekki uppsett
 
 ## Apps
-desktop-apps-kind-not-choosable = Ekki er hægt að velja forrit af þessari gerð
 desktop-apps-uninstalled = Þetta forrit er ekki lengur uppsett
 desktop-apps-no-longer-starts = Þetta forrit ræsist ekki lengur sjálfkrafa
 desktop-apps-cannot-autostart = Þetta forrit getur ekki ræst sjálfkrafa

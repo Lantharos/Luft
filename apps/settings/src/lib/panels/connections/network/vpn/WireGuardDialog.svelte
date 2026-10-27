@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Dialog, errorText, PasswordField, Row, TextField } from '@luft/ui';
-	import { addWireGuard, wireGuardKeys, wireGuardPublicKey } from '@luft/network';
+	import { waitForPerson } from '@luft/network';
+	import { commands } from '#lib/bindings.js';
 
 	interface Props {
 		onclose: () => void;
@@ -34,7 +35,7 @@
 		publicKey = '';
 		copied = false;
 		if (key.length !== KEY_LENGTH) return;
-		wireGuardPublicKey(key).then(
+		commands.networkWireguardPublicKey({ key }).then(
 			(derived) => privateKey.trim() === key && (publicKey = derived),
 			() => {}
 		);
@@ -65,7 +66,7 @@
 	}
 
 	async function generate() {
-		const keys = await wireGuardKeys();
+		const keys = await commands.networkWireguardKeys();
 		privateKey = keys.privateKey;
 	}
 
@@ -74,23 +75,26 @@
 		busy = true;
 		problem = '';
 		try {
-			await addWireGuard({
-				name: name.trim(),
-				privateKey: privateKey.trim(),
-				addresses: list(addresses),
-				dns: list(dns),
-				mtu: null,
-				listenPort: null,
-				peers: [
-					{
-						publicKey: serverKey.trim(),
-						presharedKey: presharedKey.trim(),
-						endpoint: endpoint.trim(),
-						allowedIps: list(allowedIps),
-						keepalive: keepalive.trim() ? Number(keepalive) : null
-					}
-				]
-			});
+			await commands.networkWireguardAdd(
+				{
+					name: name.trim(),
+					privateKey: privateKey.trim(),
+					addresses: list(addresses),
+					dns: list(dns),
+					mtu: null,
+					listenPort: null,
+					peers: [
+						{
+							publicKey: serverKey.trim(),
+							presharedKey: presharedKey.trim(),
+							endpoint: endpoint.trim(),
+							allowedIps: list(allowedIps),
+							keepalive: keepalive.trim() ? Number(keepalive) : null
+						}
+					]
+				},
+				waitForPerson
+			);
 			onclose();
 		} catch (reason) {
 			problem = errorText(reason);

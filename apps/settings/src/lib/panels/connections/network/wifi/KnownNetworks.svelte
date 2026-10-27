@@ -3,7 +3,8 @@
 	import { t } from '@luft/i18n';
 	import { errorText, IconButton, Row, Section } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
-	import { remove, type Known, type Network } from '@luft/network';
+	import { waitForPerson, type Known, type Network } from '@luft/network';
+	import { commands } from '#lib/bindings.js';
 	import type { Target } from '../connection/profile';
 	import { linkLabel } from '../describe';
 
@@ -30,7 +31,7 @@
 		forgetting = known.connection;
 		problem = '';
 		try {
-			await remove(known.connection);
+			await commands.networkRemove({ path: known.connection }, waitForPerson);
 		} catch (reason) {
 			problem = errorText(reason);
 		} finally {

@@ -11,9 +11,10 @@
 	import Mail from '@lucide/svelte/icons/mail';
 	import Music from '@lucide/svelte/icons/music';
 	import { AppIcon, Row, Section, Select } from '@luft/ui';
-	import { defaults, setDefault, type Category, type Handler } from './api';
+	import { commands } from '#lib/bindings.js';
+	import type { AppCategory, Handler } from '#lib/bindings.js';
 
-	const CATEGORIES: Record<Category, { title: string; icon: Component }> = {
+	const CATEGORIES: Record<AppCategory, { title: string; icon: Component }> = {
 		browser: { title: 'settings-apps-browser', icon: Globe },
 		email: { title: 'settings-apps-email', icon: Mail },
 		calendar: { title: 'settings-apps-calendar', icon: Calendar },
@@ -30,13 +31,13 @@
 	let choosable = $derived(handlers.filter((handler) => handler.apps.length));
 
 	async function load() {
-		handlers = await defaults();
+		handlers = await commands.appsDefaults();
 	}
 
 	async function choose(handler: Handler, app: string) {
 		handler.current = app;
 		try {
-			await setDefault(handler.category, app);
+			await commands.appsSetDefault({ category: handler.category, app });
 		} finally {
 			await load();
 		}

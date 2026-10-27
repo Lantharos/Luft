@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { i18n, t } from '@luft/i18n';
 	import { AppIcon, ItemRow, Row, Switch } from '@luft/ui';
-	import type { AppAccess, Device, Permissions, Switchable } from './permissions.svelte';
+	import type { AppAccess, SandboxDevice, Switchable } from '#lib/bindings.js';
+	import type { Permissions } from './permissions.svelte';
 
 	let { app, permissions }: { app: AppAccess; permissions: Permissions } = $props();
 
@@ -12,7 +13,7 @@
 		{ kind: 'camera', label: 'settings-apps-camera' },
 		{ kind: 'clipboard', label: 'settings-apps-clipboard' }
 	];
-	const DEVICES: { device: Device; label: string; hint: string }[] = [
+	const DEVICES: { device: SandboxDevice; label: string; hint: string }[] = [
 		{ device: 'usb', label: 'settings-apps-usb', hint: 'settings-apps-usb-hint' },
 		{ device: 'serial', label: 'settings-apps-serial', hint: 'settings-apps-serial-hint' }
 	];

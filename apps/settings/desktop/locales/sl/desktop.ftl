@@ -199,7 +199,6 @@ desktop-admin-required = Za to spremembo so potrebne skrbniške pravice
 desktop-about-disks-missing = Aplikacija Diski ni nameščena
 
 ## Apps
-desktop-apps-kind-not-choosable = Te vrste aplikacije ni mogoče izbrati
 desktop-apps-uninstalled = Ta aplikacija ni več nameščena
 desktop-apps-no-longer-starts = Ta aplikacija se ne zažene več samodejno
 desktop-apps-cannot-autostart = Ta aplikacija se ne more zagnati samodejno

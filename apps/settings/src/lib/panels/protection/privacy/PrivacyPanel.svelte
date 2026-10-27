@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Dialog, longDuration, Row, Section, Select, Switch } from '@luft/ui';
+	import { commands } from '#lib/bindings.js';
 	import { app } from '#lib/state/app.svelte.js';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
-	import { clearHistory } from './api';
 	import { days, including } from './format';
 
 	type Screensaver = { 'lock-enabled': boolean; 'lock-delay': number };
@@ -52,7 +52,7 @@
 	let cleaning = $derived((privacy.values['remove-old-trash-files'] ?? false) || (privacy.values['remove-old-temp-files'] ?? false));
 
 	async function clear() {
-		await clearHistory();
+		await commands.privacyClearHistory();
 		clearing = false;
 	}
 </script>

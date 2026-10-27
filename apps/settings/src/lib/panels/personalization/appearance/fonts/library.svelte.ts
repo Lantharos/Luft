@@ -1,12 +1,13 @@
-import { fontDefaults, fontFamilies, resetFont, useFont, type FontDefaults, type FontFamily, type FontRole } from './api';
+import { commands } from '#lib/bindings.js';
+import type { Defaults, FontFamily, Role } from '#lib/bindings.js';
 
 class FontLibrary {
 	families = $state.raw<FontFamily[] | null>(null);
-	defaults = $state.raw<FontDefaults | null>(null);
+	defaults = $state.raw<Defaults | null>(null);
 	#loading: Promise<void> | null = null;
 
 	load() {
-		this.#loading ??= Promise.all([fontFamilies(), this.defaults ?? fontDefaults()])
+		this.#loading ??= Promise.all([commands.appearanceFonts(), this.defaults ?? commands.appearanceFontDefaults()])
 			.then(([families, defaults]) => {
 				this.families = families;
 				this.defaults = defaults;
@@ -15,8 +16,8 @@ class FontLibrary {
 		return this.#loading;
 	}
 
-	choose(role: FontRole, family: string) {
-		return family === this.defaults?.[role] ? resetFont(role) : useFont(role, family);
+	choose(role: Role, family: string) {
+		return family === this.defaults?.[role] ? commands.appearanceFontReset({ role }) : commands.appearanceFontUse({ role, family });
 	}
 }
 

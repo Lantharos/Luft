@@ -2,7 +2,8 @@
 	import { t } from '@luft/i18n';
 	import { Row, Section } from '@luft/ui';
 	import { percent } from '#lib/format.js';
-	import { activate, deactivate, disconnect, type Link, type Network } from '@luft/network';
+	import type { Link, Network } from '@luft/network';
+	import { commands } from '#lib/bindings.js';
 	import { bandLabel, detailRows, linkLabel, securityLabel, signalLabel, speedLabel, type DetailRow } from '../describe';
 	import type { Target } from './profile';
 
@@ -14,8 +15,8 @@
 	interface Live {
 		state: Link;
 		rows: DetailRow[];
-		connect: () => Promise<void>;
-		disconnect: () => Promise<void>;
+		connect: () => Promise<unknown>;
+		disconnect: () => Promise<unknown>;
 	}
 
 	let { target, network }: Props = $props();
@@ -38,8 +39,8 @@
 			return {
 				state: found.state,
 				rows: found.details ? [...rows, ...detailRows(found.details)] : rows,
-				connect: () => activate({ connection: target.path, device: wifi.device }),
-				disconnect: () => disconnect(wifi.device)
+				connect: () => commands.networkActivate({ connection: target.path, device: wifi.device }),
+				disconnect: () => commands.networkDisconnect({ device: wifi.device })
 			};
 		}
 		if (target.kind === 'wired') {
@@ -49,8 +50,8 @@
 			return {
 				state: wired.state,
 				rows: wired.details ? [...speed, ...detailRows(wired.details)] : speed,
-				connect: () => activate({ connection: target.path, device: wired.device }),
-				disconnect: () => disconnect(wired.device)
+				connect: () => commands.networkActivate({ connection: target.path, device: wired.device }),
+				disconnect: () => commands.networkDisconnect({ device: wired.device })
 			};
 		}
 		const vpn = network.vpns.find((candidate) => candidate.connection === target.path);
@@ -58,12 +59,12 @@
 		return {
 			state: vpn.state,
 			rows: [],
-			connect: () => activate({ connection: vpn.connection }),
-			disconnect: () => deactivate(vpn.active!)
+			connect: () => commands.networkActivate({ connection: vpn.connection }),
+			disconnect: () => commands.networkDeactivate({ active: vpn.active! })
 		};
 	}
 
-	async function run(action: () => Promise<void>) {
+	async function run(action: () => Promise<unknown>) {
 		busy = true;
 		try {
 			await action();

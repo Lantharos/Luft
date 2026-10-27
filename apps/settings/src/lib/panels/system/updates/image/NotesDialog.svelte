@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Dialog } from '@luft/ui';
-	import type { Release } from '../api';
+	import type { Release } from '#lib/bindings.js';
 	import { named } from '../headline';
 
 	let { release, onclose }: { release: Release; onclose: () => void } = $props();

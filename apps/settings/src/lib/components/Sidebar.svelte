@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { SearchField, selectionPill } from '@luft/ui';
+	import type { Hardware } from '#lib/bindings.js';
 	import { searchPanels, shownGroups, titleOf, type Panel } from '#lib/panels/registry.js';
 	import { app } from '#lib/state/app.svelte.js';
-	import { hardware, type Hardware } from '#lib/state/hardware.svelte.js';
+	import { hardware } from '#lib/state/hardware.svelte.js';
 	import { updates } from '#lib/state/updates.svelte.js';
 	import SidebarProgress from '#lib/panels/system/updates/SidebarProgress.svelte';
 

@@ -7,7 +7,8 @@
 	import Trash from '@lucide/svelte/icons/trash';
 	import { t } from '@luft/i18n';
 	import { ago, ConfirmDialog, errorText, IconButton, Row, Section, Switch } from '@luft/ui';
-	import { publicKey, removeKey, setConfirm, type Ssh, type SshKey } from '../api';
+	import { commands } from '#lib/bindings.js';
+	import type { Ssh, SshKey } from '#lib/bindings.js';
 	import AddKeyDialog from './AddKeyDialog.svelte';
 	import { kind } from '../describe';
 	import { Runner } from '../runner.svelte';
@@ -44,7 +45,7 @@
 	}
 
 	async function remove(key: SshKey) {
-		await removeKey(key.fingerprint);
+		await commands.keyringSshRemove({ fingerprint: key.fingerprint });
 		await refresh();
 	}
 </script>
@@ -55,7 +56,7 @@
 			<IconButton
 				icon={copied === key.fingerprint ? Check : Copy}
 				label={t('settings-passwords-ssh-copy', { name: label(key) })}
-				onclick={() => copy(key.fingerprint, () => publicKey(key.fingerprint))}
+				onclick={() => copy(key.fingerprint, () => commands.keyringSshPublicKey({ fingerprint: key.fingerprint }))}
 			/>
 			<IconButton icon={Trash} label={t('settings-passwords-ssh-remove', { name: label(key) })} onclick={() => (removing = key)} />
 			{#snippet below()}
@@ -65,7 +66,7 @@
 						label={t('settings-passwords-ssh-confirm-label', { name: label(key) })}
 						checked={key.confirm}
 						disabled={runner.busy}
-						onchange={(confirm) => runner.run(() => setConfirm(key.fingerprint, confirm))}
+						onchange={(confirm) => runner.run(() => commands.keyringSshConfirm({ fingerprint: key.fingerprint, confirm }))}
 					/>
 				</div>
 			{/snippet}

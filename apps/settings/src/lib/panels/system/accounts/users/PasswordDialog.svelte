@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Dialog, errorText, PasswordField } from '@luft/ui';
-	import { changePassword, type PasswordOutcome, type User } from './api';
+	import type { PasswordOutcome, User } from '#lib/bindings.js';
+	import { changePassword } from './api';
 	import StrengthMeter from './StrengthMeter.svelte';
 	import { MINIMUM_LENGTH, measure } from './strength';
 

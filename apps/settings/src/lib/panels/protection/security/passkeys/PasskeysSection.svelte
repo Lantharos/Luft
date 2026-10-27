@@ -5,7 +5,9 @@
 	import Trash from '@lucide/svelte/icons/trash';
 	import { t } from '@luft/i18n';
 	import { ago, Dialog, errorText, IconButton, Row, Section } from '@luft/ui';
-	import { accountLabel, deletePasskey, onPasskeys, passkeys, siteLabel, type Passkey, type Passkeys } from './api';
+	import { commands, events } from '#lib/bindings.js';
+	import type { Passkey, Passkeys } from '#lib/bindings.js';
+	import { accountLabel, siteLabel } from './api';
 	import RenameDialog from './RenameDialog.svelte';
 
 	const PROTECTION = {
@@ -24,11 +26,11 @@
 		current ? [...current.passkeys].sort((a, b) => siteLabel(a).localeCompare(siteLabel(b)) || accountLabel(a).localeCompare(accountLabel(b))) : []
 	);
 
-	const stop = onPasskeys((next) => (current = next));
+	const stop = events.passkeysChanged((next) => (current = next));
 	onDestroy(stop);
 
 	async function load() {
-		current = await passkeys().catch(() => null);
+		current = await commands.passkeys().catch(() => null);
 	}
 
 	function protection({ protection }: Passkeys) {
@@ -46,7 +48,7 @@
 		removing = null;
 		problem = '';
 		try {
-			await deletePasskey(passkey.id);
+			await commands.passkeysDelete({ id: passkey.id });
 		} catch (reason) {
 			problem = errorText(reason);
 		}

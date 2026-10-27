@@ -7,7 +7,8 @@
 	import MoreRow, { COLLAPSED } from '#lib/components/MoreRow.svelte';
 	import type { Target } from '../connection/profile';
 	import JoinDialog from './JoinDialog.svelte';
-	import { activate, join, needsPassword, onFailed, type Security, type Wifi, type WifiNetwork } from '@luft/network';
+	import { needsPassword, type Security, type Wifi, type WifiNetwork } from '@luft/network';
+	import { commands, events } from '#lib/bindings.js';
 	import { isSecured, linkLabel, signalIcon } from '../describe';
 
 	interface Props {
@@ -43,7 +44,7 @@
 		if (network.saved) onconfigure({ kind: 'wifi', path: network.saved, ssid: network.ssid }, network.ssid);
 	}
 
-	async function run(ssid: string, action: () => Promise<void>) {
+	async function run(ssid: string, action: () => Promise<unknown>) {
 		delete problems[ssid];
 		attempt = ssid;
 		try {
@@ -58,11 +59,11 @@
 		if (network.state !== 'disconnected') {
 			configure(network);
 		} else if (network.saved) {
-			void run(network.ssid, () => activate({ connection: network.saved!, device: wifi.device }));
+			void run(network.ssid, () => commands.networkActivate({ connection: network.saved!, device: wifi.device }));
 		} else if (needsPassword(network.security) || network.security === 'enterprise') {
 			joining = { ssid: network.ssid, security: network.security };
 		} else {
-			void run(network.ssid, () => join({ device: wifi.device, ssid: network.ssid, security: network.security }));
+			void run(network.ssid, () => commands.networkJoin({ device: wifi.device, ssid: network.ssid, security: network.security }));
 		}
 	}
 
@@ -71,7 +72,7 @@
 	});
 
 	$effect(() =>
-		onFailed((failure) => {
+		events.networkFailed((failure) => {
 			if (failure.path !== wifi.device || !attempt || joining) return;
 			const ssid = attempt;
 			attempt = null;

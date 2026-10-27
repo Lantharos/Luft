@@ -1,16 +1,17 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { ago, Row } from '@luft/ui';
-	import { rollback, type Activity, type SystemOverview, type Release } from '../api';
+	import { commands } from '#lib/bindings.js';
+	import type { Activity, ImageOverview, Release } from '#lib/bindings.js';
 	import { versionLabel } from '../../version';
 	import { named } from '../headline';
 	import NotesDialog from './NotesDialog.svelte';
 	import VariantRow from './VariantRow.svelte';
 
 	interface Props {
-		overview: SystemOverview;
+		overview: ImageOverview;
 		activity: Activity;
-		attempt: (action: () => Promise<void>) => void;
+		attempt: (action: () => Promise<unknown>) => void;
 	}
 
 	let { overview, activity, attempt }: Props = $props();
@@ -30,7 +31,7 @@
 <VariantRow {overview} {activity} {attempt} />
 {#if overview.previous && !overview.returning}
 	<Row title={t('settings-updates-go-back-title')} description={named(overview.previous, 'settings-updates-previous', 'settings-updates-previous-unversioned')}>
-		<button type="button" class="button" disabled={busy} onclick={() => attempt(rollback)}>{t('settings-updates-go-back')}</button>
+		<button type="button" class="button" disabled={busy} onclick={() => attempt(commands.updatesRollback)}>{t('settings-updates-go-back')}</button>
 	</Row>
 {/if}
 

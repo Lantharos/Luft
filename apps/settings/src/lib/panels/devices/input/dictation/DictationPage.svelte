@@ -2,6 +2,8 @@
 	import { i18n, t } from '@luft/i18n';
 	import { onDestroy } from 'svelte';
 	import { Row, Section, Select, Switch } from '@luft/ui';
+	import { commands, events } from '#lib/bindings.js';
+	import type { Model, Overview } from '#lib/bindings.js';
 	import SubPage from '#lib/components/SubPage.svelte';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import { hardware } from '#lib/state/hardware.svelte.js';
@@ -9,7 +11,7 @@
 	import Keys from '../shortcuts/keys/Keys.svelte';
 	import type { Binding, ShortcutStore } from '../shortcuts/store.svelte';
 	import ModelRow from './ModelRow.svelte';
-	import { onOverview, openHomepage, overview, type EngineChoice, type Model, type Overview } from './api';
+	import { openHomepage, type EngineChoice } from './api';
 
 	type Dictation = { enabled: boolean; language: string; engine: EngineChoice };
 	type ShortcutChoice = 'chord' | 'custom' | 'off';
@@ -81,7 +83,7 @@
 
 	async function refresh() {
 		try {
-			info = await overview();
+			info = await commands.dictation();
 			unavailable = false;
 		} catch {
 			unavailable = true;
@@ -95,7 +97,7 @@
 	}
 
 
-	const stop = onOverview((next) => (info = next));
+	const stop = events.dictationChanged((next) => (info = next));
 	onDestroy(stop);
 
 	$effect(() => {

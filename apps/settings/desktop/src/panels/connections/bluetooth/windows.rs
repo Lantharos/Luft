@@ -17,11 +17,11 @@ struct Status {
 
 #[derive(Deserialize)]
 struct Installation {
-    bluetooth: Vec<Paired>,
+    bluetooth: Vec<WindowsDevice>,
 }
 
 #[derive(Deserialize, Serialize, Type)]
-pub struct Paired {
+pub struct WindowsDevice {
     device: String,
     name: Option<String>,
 }
@@ -32,7 +32,7 @@ async fn proxy() -> Result<Proxy<'static>, String> {
         .map_err(failed)
 }
 
-pub async fn waiting() -> Result<Vec<Paired>, String> {
+pub async fn waiting() -> Result<Vec<WindowsDevice>, String> {
     let status: String = proxy().await?.call("Status", &()).await.map_err(failed)?;
     let status: Status = serde_json::from_str(&status).map_err(failed)?;
     Ok(status

@@ -1,21 +1,15 @@
 import { onDestroy } from 'svelte';
-import { invoke, listen } from '#lib/bridge/index.js';
+import { commands, events } from '#lib/bindings.js';
+import type { SettingChange, Value } from '#lib/bindings.js';
 
 export const KESTREL_SCHEMA = 'com.lantharos.kestrel';
 
-type Values = Record<string, unknown>;
-
-interface Change {
-	schema: string;
-	path: string | null;
-	key: string;
-	value: unknown;
-}
+type Values = Record<string, Value>;
 
 const groups = new Set<SettingsGroup<Values>>();
 let unlisten: (() => void) | null = null;
 
-function dispatch(change: Change) {
+function dispatch(change: SettingChange) {
 	for (const group of groups) group.receive(change);
 }
 
@@ -29,7 +23,7 @@ export class SettingsGroup<T extends Values> {
 		readonly path: string | null = null
 	) {
 		groups.add(this as unknown as SettingsGroup<Values>);
-		unlisten ??= listen<Change>('settings.changed', dispatch);
+		unlisten ??= events.settingsChanged(dispatch);
 		void this.load();
 	}
 
@@ -38,12 +32,12 @@ export class SettingsGroup<T extends Values> {
 	}
 
 	async load() {
-		await invoke('settings_watch', this.location);
-		this.values = (await invoke<T>('settings_read', { ...this.location, keys: this.keys })) as T;
+		await commands.settingsWatch(this.location);
+		this.values = (await commands.settingsRead({ ...this.location, keys: this.keys })) as T;
 		this.loaded = true;
 	}
 
-	receive(change: Change) {
+	receive(change: SettingChange) {
 		if (change.schema !== this.schema || (change.path ?? null) !== this.path) return;
 		if (!this.keys.includes(change.key as keyof T & string)) return;
 		(this.values as Values)[change.key] = change.value;
@@ -53,7 +47,7 @@ export class SettingsGroup<T extends Values> {
 		const previous = this.values[key];
 		this.values[key] = value;
 		try {
-			await invoke('settings_write', { ...this.location, key, value });
+			await commands.settingsWrite({ ...this.location, key, value });
 		} catch (error) {
 			this.values[key] = previous;
 			throw error;
@@ -61,7 +55,7 @@ export class SettingsGroup<T extends Values> {
 	}
 
 	async reset<K extends keyof T & string>(key: K) {
-		await invoke('settings_reset', { ...this.location, key });
+		await commands.settingsReset({ ...this.location, key });
 		await this.load();
 	}
 

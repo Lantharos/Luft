@@ -199,7 +199,6 @@ desktop-admin-required = Cal tenir permisos d’administrador per canviar això
 desktop-about-disks-missing = Discs no està instal·lat
 
 ## Apps
-desktop-apps-kind-not-choosable = Aquest tipus d’aplicació no es pot triar
 desktop-apps-uninstalled = Aquesta aplicació ja no està instal·lada
 desktop-apps-no-longer-starts = Aquesta aplicació ja no s’inicia automàticament
 desktop-apps-cannot-autostart = Aquesta aplicació no es pot iniciar automàticament

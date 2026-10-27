@@ -8,10 +8,24 @@ use zbus::Proxy;
 const INCIDENTS: &str = "/var/lib/kestrel-watchdog/incidents";
 
 #[derive(Deserialize, Serialize, Type)]
+#[serde(rename_all = "kebab-case")]
+enum SuggestionAction {
+    FirmwareSettings,
+}
+
+#[derive(Deserialize, Serialize, Type)]
 pub struct Suggestion {
     step: String,
     detail: String,
-    action: Option<String>,
+    action: Option<SuggestionAction>,
+}
+
+#[derive(Deserialize, Serialize, Type)]
+#[serde(rename_all = "lowercase")]
+enum Restart {
+    Graceful,
+    Forced,
+    Emergency,
 }
 
 #[derive(Deserialize)]
@@ -23,7 +37,7 @@ struct Gpu {
 struct Incident {
     id: String,
     time: i64,
-    restart: String,
+    restart: Restart,
     gpus: Vec<Gpu>,
     evidence: Vec<String>,
     suggestions: Vec<Suggestion>,
@@ -34,7 +48,7 @@ struct Incident {
 pub struct Problem {
     id: String,
     time: i64,
-    restart: String,
+    restart: Restart,
     graphics: Vec<String>,
     evidence: Vec<String>,
     suggestions: Vec<Suggestion>,

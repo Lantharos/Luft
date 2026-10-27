@@ -1,13 +1,6 @@
-import { invoke, listen } from '#lib/bridge/index.js';
+import { commands, events } from '#lib/bindings.js';
+import type { Hardware } from '#lib/bindings.js';
 import { SettingsGroup } from './gsettings.svelte.js';
-
-export interface Hardware {
-	bluetooth: boolean;
-	battery: boolean;
-	mouse: boolean;
-	touchpad: boolean;
-	copilotKey: boolean;
-}
 
 class HardwareStore {
 	private detected = $state.raw<Hardware | null>(null);
@@ -19,8 +12,8 @@ class HardwareStore {
 
 	async start() {
 		this.copilotKey = new SettingsGroup('com.lantharos.kestrel.copilot-key', ['seen']);
-		listen<Hardware>('hardware.changed', (next) => (this.detected = next));
-		this.detected = await invoke<Hardware>('hardware');
+		events.hardwareChanged((next) => (this.detected = next));
+		this.detected = await commands.hardware();
 	}
 }
 

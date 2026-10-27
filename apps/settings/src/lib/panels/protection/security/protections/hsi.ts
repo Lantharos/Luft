@@ -1,5 +1,5 @@
 import { t } from '@luft/i18n';
-import type { Fix, HostSecurity, Protection } from '../api';
+import type { Fix, HostSecurity, Protection } from '#lib/bindings.js';
 
 const LEVELS = [
 	'settings-security-hardware-level-0',

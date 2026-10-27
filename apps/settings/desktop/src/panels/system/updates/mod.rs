@@ -1,4 +1,3 @@
-use specta::Type;
 mod background;
 mod firmware;
 mod graphics;
@@ -10,15 +9,15 @@ mod store;
 
 use luft_app::dbus::{self, failed};
 use luft_app::launch::{self, Token};
-use luft_app::{Commands, Events};
+use luft_app::{Commands, Empty, Events};
 use luft_software::variant::Variant;
 use sabine::SabineWindow;
 use serde::Deserialize;
-use serde_json::Value;
+use specta::Type;
 use tokio::sync::OnceCell;
 
 use firmware::Firmware;
-use state::{Activity, Kind, Status};
+use state::{Activity, UpdateKind, UpdatesStatus};
 use store::Preferences;
 
 pub use background::run as check_in_background;
@@ -33,16 +32,16 @@ const APP_UPDATES: &str = "schelf:updates";
 static FIRST_RUN: OnceCell<()> = OnceCell::const_new();
 
 #[derive(Deserialize, Type)]
-struct Device {
+struct FirmwareDevice {
     id: String,
 }
 
 #[derive(Deserialize, Type)]
-struct Switch {
+struct VariantSwitch {
     variant: Variant,
 }
 
-async fn load(_: Value) -> Result<(), String> {
+async fn load(Empty {}: Empty) -> Result<(), String> {
     FIRST_RUN
         .get_or_init(|| async {
             if Preferences::exists() {
@@ -64,17 +63,17 @@ fn scan() {
     luft_app::spawn(image::scan());
 }
 
-fn check(_: Value) -> Result<(), String> {
+fn check(Empty {}: Empty) -> Result<(), String> {
     state::start(
-        Activity::new(Kind::Check),
+        Activity::new(UpdateKind::Check),
         |task| overview::load(Some(task)),
         scan,
     );
     Ok(())
 }
 
-fn download(_: Value) -> Result<(), String> {
-    let started = state::start(Activity::new(Kind::Download), image::download, || {
+fn download(Empty {}: Empty) -> Result<(), String> {
+    let started = state::start(Activity::new(UpdateKind::Download), image::download, || {
         overview::reload();
         scan();
     });
@@ -83,8 +82,8 @@ fn download(_: Value) -> Result<(), String> {
         .ok_or_else(|| t!(L10N, "desktop-updates-already-downloading"))
 }
 
-fn rollback(_: Value) -> Result<(), String> {
-    let started = state::start(Activity::new(Kind::Rollback), image::rollback, || {
+fn rollback(Empty {}: Empty) -> Result<(), String> {
+    let started = state::start(Activity::new(UpdateKind::Rollback), image::rollback, || {
         overview::reload();
         scan();
     });
@@ -93,10 +92,10 @@ fn rollback(_: Value) -> Result<(), String> {
         .ok_or_else(|| t!(L10N, "desktop-updates-system-busy"))
 }
 
-fn switch(Switch { variant }: Switch) -> Result<(), String> {
+fn switch(VariantSwitch { variant }: VariantSwitch) -> Result<(), String> {
     let activity = Activity {
         target: Some(variant.name().to_owned()),
-        ..Activity::new(Kind::Switch)
+        ..Activity::new(UpdateKind::Switch)
     };
     let started = state::start(
         activity,
@@ -111,10 +110,10 @@ fn switch(Switch { variant }: Switch) -> Result<(), String> {
         .ok_or_else(|| t!(L10N, "desktop-updates-system-busy"))
 }
 
-fn install_firmware(Device { id }: Device) -> Result<(), String> {
+fn install_firmware(FirmwareDevice { id }: FirmwareDevice) -> Result<(), String> {
     let activity = Activity {
         target: Some(id.clone()),
-        ..Activity::new(Kind::Firmware)
+        ..Activity::new(UpdateKind::Firmware)
     };
     let started = state::start(activity, move |task| firmware::install(&id, task), scan);
     started
@@ -122,14 +121,14 @@ fn install_firmware(Device { id }: Device) -> Result<(), String> {
         .ok_or_else(|| t!(L10N, "desktop-updates-already-installing"))
 }
 
-async fn firmware_updates(_: Value) -> Result<Vec<Firmware>, String> {
+async fn firmware_updates(Empty {}: Empty) -> Result<Vec<Firmware>, String> {
     if !firmware::available().await {
         return Ok(Vec::new());
     }
     firmware::updates().await
 }
 
-async fn restart(_: Value) -> Result<(), String> {
+async fn restart(Empty {}: Empty) -> Result<(), String> {
     dbus::session()
         .await?
         .call_method(
@@ -161,13 +160,15 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     state::attach(events);
     image::watch();
     window
-        .command("updates_status", |_: Value| {
-            Ok::<Status, String>(state::status())
+        .bridge_event(&state::ACTIVITY)
+        .bridge_event(&state::OVERVIEW)
+        .command("updates_status", |Empty {}| {
+            Ok::<UpdatesStatus, String>(state::status())
         })
         .command_async("updates_load", load)
         .command("updates_check", check)
         .command("updates_download", download)
-        .command("updates_cancel", |_: Value| {
+        .command("updates_cancel", |Empty {}| {
             state::cancel();
             Ok(())
         })
@@ -176,7 +177,7 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .command("updates_rollback", rollback)
         .command("updates_switch", switch)
         .command_async("updates_restart", restart)
-        .command("updates_preferences", |_: Value| {
+        .command("updates_preferences", |Empty {}| {
             Ok::<Preferences, String>(Preferences::load())
         })
         .command_async("updates_set_preferences", set_preferences)

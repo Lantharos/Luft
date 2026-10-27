@@ -4,14 +4,14 @@ use std::path::Path;
 
 use luft_i18n::t;
 
-use super::install::InstallProgress;
+use super::install::InstallState;
 use super::store;
 use crate::L10N;
 
 const MAX_DOWNLOAD_BYTES: u64 = 128 * 1024 * 1024;
 const REPORT_EVERY_BYTES: u64 = 256 * 1024;
 
-pub fn download(url: &str, into: &Path, report: &impl Fn(InstallProgress)) -> Result<(), String> {
+pub fn download(url: &str, into: &Path, report: &impl Fn(InstallState)) -> Result<(), String> {
     let response = store::agent()
         .get(url)
         .call()
@@ -39,11 +39,11 @@ pub fn download(url: &str, into: &Path, report: &impl Fn(InstallProgress)) -> Re
             .map_err(|error| error.to_string())?;
         received += read as u64;
         if received - reported >= REPORT_EVERY_BYTES {
-            report(InstallProgress::Downloading { received, total });
+            report(InstallState::Downloading { received, total });
             reported = received;
         }
     }
     file.flush().map_err(|error| error.to_string())?;
-    report(InstallProgress::Downloading { received, total });
+    report(InstallState::Downloading { received, total });
     Ok(())
 }

@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 use zbus::{DynamicType, Proxy, Type};
 
 use crate::L10N;
+use crate::parse::parse;
 
 const SERVICE: &str = "com.lantharos.Passkeys";
 const PATH: &str = "/com/lantharos/Passkeys1";
@@ -45,10 +46,18 @@ struct Passkey {
     chip: bool,
 }
 
+#[derive(Deserialize, Serialize, specta::Type)]
+#[serde(rename_all = "lowercase")]
+enum PasskeyProtection {
+    Chip,
+    Password,
+    Unavailable,
+}
+
 #[derive(Serialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Passkeys {
-    protection: String,
+    protection: PasskeyProtection,
     ready: bool,
     passkeys: Vec<Passkey>,
 }
@@ -112,10 +121,13 @@ async fn read() -> Result<Option<Passkeys>, String> {
         })
         .collect();
     Ok(Some(Passkeys {
-        protection: proxy
-            .get_property("Protection")
-            .await
-            .map_err(|error| explain(&error))?,
+        protection: parse(
+            proxy
+                .get_property("Protection")
+                .await
+                .map_err(|error| explain(&error))?,
+        )
+        .unwrap_or(PasskeyProtection::Unavailable),
         ready: proxy
             .get_property("Ready")
             .await

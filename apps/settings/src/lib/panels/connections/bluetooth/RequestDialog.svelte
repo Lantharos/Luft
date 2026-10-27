@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Dialog } from '@luft/ui';
-	import { answer, cancelPairing, type PairingRequest } from './api';
+	import { commands } from '#lib/bindings.js';
+	import type { PairingRequest } from '#lib/bindings.js';
 
 	interface Props {
 		request: PairingRequest;
@@ -48,9 +49,9 @@
 
 	function respond(accepted: boolean) {
 		if (request.kind === 'display') {
-			if (!accepted) void cancelPairing(request.device);
+			if (!accepted) void commands.bluetoothCancelPairing({ device: request.device });
 		} else {
-			void answer(request.id, accepted ? value.trim() : null);
+			void commands.bluetoothAnswer({ id: request.id, value: accepted ? value.trim() : null });
 		}
 		onclose();
 	}

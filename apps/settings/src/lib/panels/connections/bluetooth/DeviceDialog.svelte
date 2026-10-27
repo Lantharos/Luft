@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Dialog, Switch } from '@luft/ui';
+	import type { BluetoothDevice } from '#lib/bindings.js';
 	import { percent } from '#lib/format.js';
-	import type { Device } from './api';
 	import { KIND_LABELS } from './kinds';
 
 	interface Props {
-		device: Device;
+		device: BluetoothDevice;
 		busy: boolean;
 		ontrust: (trusted: boolean) => void;
 		ontoggle: () => void;

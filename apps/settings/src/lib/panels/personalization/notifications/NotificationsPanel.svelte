@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Row, Section, Switch } from '@luft/ui';
+	import { commands } from '#lib/bindings.js';
+	import type { NotifyingApp } from '#lib/bindings.js';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import AppsPage from './AppsPage.svelte';
 	import MessageContent from './MessageContent.svelte';
-	import { notifyingApps, type NotifyingApp } from './api';
 
 	type General = {
 		'show-banners': boolean;
@@ -20,7 +21,7 @@
 	let lockScreen = $derived(general.values['show-in-lock-screen'] ?? true);
 
 	$effect(() => {
-		if (general.values['application-children']) void notifyingApps().then((list) => (apps = list));
+		if (general.values['application-children']) void commands.notificationsApps().then((list) => (apps = list));
 	});
 
 </script>

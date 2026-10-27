@@ -11,9 +11,9 @@ import Printer from '@lucide/svelte/icons/printer';
 import Smartphone from '@lucide/svelte/icons/smartphone';
 import Speaker from '@lucide/svelte/icons/speaker';
 import Tablet from '@lucide/svelte/icons/tablet';
-import type { Kind } from './api';
+import type { BluetoothDeviceKind } from '#lib/bindings.js';
 
-export const KIND_ICONS: Record<Kind, Component> = {
+export const KIND_ICONS: Record<BluetoothDeviceKind, Component> = {
 	headphones: Headphones,
 	speaker: Speaker,
 	mouse: Mouse,
@@ -28,7 +28,7 @@ export const KIND_ICONS: Record<Kind, Component> = {
 	other: Bluetooth
 };
 
-export const KIND_LABELS: Record<Kind, string> = {
+export const KIND_LABELS: Record<BluetoothDeviceKind, string> = {
 	headphones: 'settings-bluetooth-kind-headphones',
 	speaker: 'settings-bluetooth-kind-speaker',
 	mouse: 'settings-bluetooth-kind-mouse',

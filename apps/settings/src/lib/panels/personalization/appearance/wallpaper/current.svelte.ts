@@ -1,6 +1,7 @@
 import { fileUrl } from '@lantharos/sabine';
+import { commands } from '#lib/bindings.js';
 import { KESTREL_SCHEMA, useSettings } from '#lib/state/gsettings.svelte.js';
-import { thumbnail, uriToPath } from './api';
+import { uriToPath } from './api';
 
 type Background = { 'picture-uri': string; 'picture-uri-dark': string };
 type Wallpapers = { 'live-wallpaper': string; 'live-wallpaper-dark': string };
@@ -25,7 +26,7 @@ export function currentWallpaper() {
 			current.url = null;
 			return;
 		}
-		void thumbnail(wanted).then((thumb) => {
+		void commands.appearanceThumbnail({ path: wanted }).then((thumb) => {
 			if (wanted === path) current.url = fileUrl(thumb);
 		});
 	});

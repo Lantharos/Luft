@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { bytes, ProgressBar, Row } from '@luft/ui';
-	import { cancelInstall, install, remove, type Model } from './api';
+	import { commands } from '#lib/bindings.js';
+	import type { Model } from '#lib/bindings.js';
 
 	let { model, removable = false }: { model: Model; removable?: boolean } = $props();
 
@@ -24,15 +25,15 @@
 <Row title={model.name} description={describe()} below={downloading ? progress : undefined}>
 	{#if download}
 		{#if download.problem}
-			<button type="button" class="button" onclick={() => install(model.id)}>{t('settings-dictation-model-retry')}</button>
+			<button type="button" class="button" onclick={() => commands.dictationInstall({ model: model.id })}>{t('settings-dictation-model-retry')}</button>
 		{/if}
-		<button type="button" class="button" onclick={() => cancelInstall(model.id)}>{t('settings-dictation-model-cancel')}</button>
+		<button type="button" class="button" onclick={() => commands.dictationCancel({ model: model.id })}>{t('settings-dictation-model-cancel')}</button>
 	{:else}
 		{#if !model.installed}
-			<button type="button" class="button" onclick={() => install(model.id)}>{model.usage > 0 ? t('settings-dictation-model-resume') : t('settings-dictation-model-download')}</button>
+			<button type="button" class="button" onclick={() => commands.dictationInstall({ model: model.id })}>{model.usage > 0 ? t('settings-dictation-model-resume') : t('settings-dictation-model-download')}</button>
 		{/if}
 		{#if removable}
-			<button type="button" class="button" onclick={() => remove(model.id)}>{t('settings-dictation-model-remove')}</button>
+			<button type="button" class="button" onclick={() => commands.dictationRemove({ model: model.id })}>{t('settings-dictation-model-remove')}</button>
 		{/if}
 	{/if}
 </Row>

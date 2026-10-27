@@ -4,7 +4,9 @@
 	import { onMount } from 'svelte';
 	import { i18n, t } from '@luft/i18n';
 	import { ActionRow, errorText, Section } from '@luft/ui';
-	import { importFromWindows, pairedInWindows, type WindowsDevice } from './api';
+	import { commands } from '#lib/bindings.js';
+	import type { WindowsDevice } from '#lib/bindings.js';
+	import { importFromWindows } from './api';
 
 	let devices = $state<WindowsDevice[]>([]);
 	let importing = $state(false);
@@ -22,7 +24,7 @@
 		problem = '';
 		try {
 			await importFromWindows();
-			devices = await pairedInWindows();
+			devices = await commands.bluetoothWindows();
 		} catch (reason) {
 			problem = errorText(reason);
 		} finally {
@@ -31,7 +33,7 @@
 	}
 
 	onMount(() => {
-		pairedInWindows()
+		commands.bluetoothWindows()
 			.then((found) => (devices = found))
 			.catch(() => (devices = []));
 	});

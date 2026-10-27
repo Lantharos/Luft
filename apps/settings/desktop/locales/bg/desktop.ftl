@@ -199,7 +199,6 @@ desktop-admin-required = За да промените това, са нужни 
 desktop-about-disks-missing = Приложението Дискове не е инсталирано
 
 ## Apps
-desktop-apps-kind-not-choosable = Този вид приложение не може да бъде избран
 desktop-apps-uninstalled = Това приложение вече не е инсталирано
 desktop-apps-no-longer-starts = Това приложение вече не се стартира автоматично
 desktop-apps-cannot-autostart = Това приложение не може да се стартира автоматично

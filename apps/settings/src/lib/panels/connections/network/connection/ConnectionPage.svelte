@@ -3,7 +3,8 @@
 	import { t } from '@luft/i18n';
 	import { errorText, Row, Section } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
-	import { forget, loadProfile, loadSecret, remove, saveProfile, type Network, type Profile } from '@luft/network';
+	import { waitForPerson, type Network, type Profile } from '@luft/network';
+	import { commands } from '#lib/bindings.js';
 	import AdvancedSection from './AdvancedSection.svelte';
 	import DetailsSection from './DetailsSection.svelte';
 	import GeneralSection from './GeneralSection.svelte';
@@ -39,7 +40,7 @@
 	async function reveal() {
 		if (savedPassword || passwordNeeded) return;
 		try {
-			savedPassword = (await loadSecret(target.path)) ?? '';
+			savedPassword = (await commands.networkProfileSecret({ path: target.path }, waitForPerson)) ?? '';
 			if (!password) password = savedPassword;
 		} catch (reason) {
 			problem = errorText(reason);
@@ -51,7 +52,7 @@
 		saving = true;
 		problem = '';
 		try {
-			await saveProfile(target.path, prepare($state.snapshot(profile)), password === savedPassword ? null : password);
+			await commands.networkProfileSave({ path: target.path, profile: prepare($state.snapshot(profile)), secret: password === savedPassword ? null : password }, waitForPerson);
 			onclose();
 		} catch (reason) {
 			problem = errorText(reason);
@@ -60,14 +61,14 @@
 	}
 
 	async function forgetNetwork(ssid: string) {
-		await forget(ssid);
+		await commands.networkForget({ ssid });
 		onclose();
 	}
 
 	async function removeConnection() {
 		problem = '';
 		try {
-			await remove(target.path);
+			await commands.networkRemove({ path: target.path }, waitForPerson);
 			onclose();
 		} catch (reason) {
 			problem = errorText(reason);
@@ -75,7 +76,8 @@
 	}
 
 	onMount(() => {
-		loadProfile(target.path)
+		commands
+			.networkProfile({ path: target.path })
 			.then((loaded) => {
 				original = JSON.stringify(loaded);
 				customMac = macChoice(loaded.kind, loaded.mac) === 'custom';

@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Row, Section, Select, Slider, Switch } from '@luft/ui';
+	import { commands } from '#lib/bindings.js';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import { cursorSizes } from '../appearance/cursors/sizes';
-	import { screenReaderInstalled } from './api';
 
 	type Applications = {
 		'screen-reader-enabled': boolean;
@@ -34,7 +34,7 @@
 
 	const times = (factor: number) => t('settings-accessibility-zoom-factor', { factor });
 
-	void screenReaderInstalled().then((installed) => (readerInstalled = installed));
+	void commands.accessibilityScreenReader().then((installed) => (readerInstalled = installed));
 </script>
 
 <Section title={t('settings-accessibility-seeing')}>

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Dialog } from '@luft/ui';
-	import type { HostSecurity } from '../api';
+	import type { HostSecurity } from '#lib/bindings.js';
 	import { byFix, levelSentence } from './hsi';
 
 	let { host, onclose }: { host: HostSecurity; onclose: () => void } = $props();

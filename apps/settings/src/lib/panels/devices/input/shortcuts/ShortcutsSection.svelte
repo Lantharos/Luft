@@ -2,7 +2,7 @@
 	import { i18n, t } from '@luft/i18n';
 	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
 	import { IconButton, Row, Section } from '@luft/ui';
-	import type { Category } from './api';
+	import type { Category } from '#lib/bindings.js';
 	import { labels } from './keys/accelerator';
 	import ShortcutButton from './keys/ShortcutButton.svelte';
 	import type { Binding, ShortcutStore } from './store.svelte';

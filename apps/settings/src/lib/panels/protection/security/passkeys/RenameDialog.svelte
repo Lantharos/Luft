@@ -2,7 +2,9 @@
 	import { untrack } from 'svelte';
 	import { t } from '@luft/i18n';
 	import { Dialog, errorText, TextField } from '@luft/ui';
-	import { accountLabel, renamePasskey, siteLabel, type Passkey } from './api';
+	import { commands } from '#lib/bindings.js';
+	import type { Passkey } from '#lib/bindings.js';
+	import { accountLabel, siteLabel } from './api';
 
 	let { passkey, onclose }: { passkey: Passkey; onclose: () => void } = $props();
 
@@ -14,7 +16,7 @@
 		busy = true;
 		error = '';
 		try {
-			await renamePasskey(passkey.id, name);
+			await commands.passkeysRename({ id: passkey.id, name });
 			onclose();
 		} catch (reason) {
 			error = errorText(reason);

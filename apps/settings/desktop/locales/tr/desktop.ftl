@@ -199,7 +199,6 @@ desktop-admin-required = Bunu değiştirmek için yönetici hakları gerekir
 desktop-about-disks-missing = Diskler uygulaması yüklü değil
 
 ## Apps
-desktop-apps-kind-not-choosable = Bu tür bir uygulama seçilemez
 desktop-apps-uninstalled = Bu uygulama artık yüklü değil
 desktop-apps-no-longer-starts = Bu uygulama artık otomatik olarak başlamıyor
 desktop-apps-cannot-autostart = Bu uygulama otomatik olarak başlayamaz

@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { AppIcon, appearance, Row, Section, type AppIconStyle } from '@luft/ui';
+	import { commands } from '#lib/bindings.js';
+	import type { App } from '#lib/bindings.js';
 	import Swatches from '#lib/components/Swatches.svelte';
 	import { KESTREL_SCHEMA, useSettings } from '#lib/state/gsettings.svelte.js';
-	import { installedApps, type App } from '#lib/panels/protection/apps/api.js';
 
 	type Kestrel = {
 		'app-icon-style': AppIconStyle;
@@ -45,7 +46,7 @@
 	});
 
 	$effect(() => {
-		installedApps().then((apps) => (installed = apps));
+		commands.appsInstalled().then((apps) => (installed = apps));
 	});
 </script>
 

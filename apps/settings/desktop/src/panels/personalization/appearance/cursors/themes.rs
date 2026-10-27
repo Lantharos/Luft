@@ -17,7 +17,7 @@ const DEFAULT_SEARCH_PATH: [&str; 4] = [
 
 #[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct Theme {
+pub struct CursorTheme {
     name: String,
     title: String,
     path: String,
@@ -53,7 +53,7 @@ fn title(dir: &Path, name: &str) -> String {
         .unwrap_or_else(|| name.replace(['-', '_'], " "))
 }
 
-pub fn list() -> Vec<Theme> {
+pub fn list() -> Vec<CursorTheme> {
     let user = UserThemes::new().ok();
     let mut seen = HashSet::new();
     let mut themes = Vec::new();
@@ -71,7 +71,7 @@ pub fn list() -> Vec<Theme> {
             if name.starts_with('.') || !is_theme(&dir) || !seen.insert(name.clone()) {
                 continue;
             }
-            themes.push(Theme {
+            themes.push(CursorTheme {
                 title: title(&dir, &name),
                 path: dir.to_string_lossy().into_owned(),
                 removable: user.as_ref().is_some_and(|user| user.removable(&dir)),

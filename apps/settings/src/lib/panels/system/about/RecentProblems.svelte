@@ -2,8 +2,9 @@
 	import { i18n, t } from '@luft/i18n';
 	import MonitorX from '@lucide/svelte/icons/monitor-x';
 	import { ActionRow, Dialog, Section } from '@luft/ui';
+	import { commands } from '#lib/bindings.js';
+	import type { Problem } from '#lib/bindings.js';
 	import MoreRow, { COLLAPSED } from '#lib/components/MoreRow.svelte';
-	import { problems, restartToFirmware, type Problem } from './api';
 
 	const AFTERMATH: Record<Problem['restart'], string> = {
 		graceful: 'settings-about-problem-graceful',
@@ -19,13 +20,13 @@
 
 	async function restart() {
 		try {
-			await restartToFirmware();
+			await commands.aboutFirmwareRestart();
 		} catch (reason) {
 			error = String(reason);
 		}
 	}
 
-	problems().then((loaded) => (list = loaded));
+	commands.aboutProblems().then((loaded) => (list = loaded));
 </script>
 
 {#if list.length}

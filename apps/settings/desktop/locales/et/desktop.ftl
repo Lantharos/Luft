@@ -216,7 +216,6 @@ desktop-about-disks-missing = Rakendus Kettad pole installitud
 
 ## Apps
 
-desktop-apps-kind-not-choosable = Sellist rakendust ei saa valida
 desktop-apps-uninstalled = See rakendus pole enam installitud
 desktop-apps-no-longer-starts = See rakendus ei käivitu enam automaatselt
 desktop-apps-cannot-autostart = See rakendus ei saa automaatselt käivituda

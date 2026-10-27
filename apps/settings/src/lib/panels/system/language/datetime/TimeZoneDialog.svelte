@@ -2,7 +2,8 @@
 	import { t } from '@luft/i18n';
 	import Check from '@lucide/svelte/icons/check';
 	import { Dialog, SearchField } from '@luft/ui';
-	import { setTimezone, type Zone } from './api';
+	import { commands } from '#lib/bindings.js';
+	import type { Zone } from '#lib/bindings.js';
 	import { city, country, offsetLabel, offsetMinutes, shortTime } from './zones';
 
 	interface Props {
@@ -42,7 +43,7 @@
 		if (zone === current) return onclose();
 		failed = false;
 		try {
-			await setTimezone(zone);
+			await commands.datetimeSetTimezone({ timezone: zone });
 			onclose();
 		} catch {
 			failed = true;

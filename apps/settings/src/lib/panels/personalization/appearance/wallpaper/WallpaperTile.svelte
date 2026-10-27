@@ -2,7 +2,9 @@
 	import { t } from '@luft/i18n';
 	import { fileUrl } from '@lantharos/sabine';
 	import Film from '@lucide/svelte/icons/film';
-	import { CENTER, objectPosition, thumbnail, wallpaperFocus, type Focus, type Wallpaper } from './api';
+	import { commands } from '#lib/bindings.js';
+	import type { Focus, Wallpaper } from '#lib/bindings.js';
+	import { CENTER, objectPosition } from './api';
 
 	interface Props {
 		wallpaper: Wallpaper;
@@ -22,8 +24,8 @@
 		const observer = new IntersectionObserver(async ([entry]) => {
 			if (!entry.isIntersecting) return;
 			observer.disconnect();
-			const preview = await thumbnail(wallpaper.path);
-			estimated = await wallpaperFocus(wallpaper.path);
+			const preview = await commands.appearanceThumbnail({ path: wallpaper.path });
+			estimated = await commands.appearanceWallpaperFocus({ path: wallpaper.path });
 			source = fileUrl(preview);
 		}, { rootMargin: '200px' });
 		observer.observe(tile!);

@@ -2,20 +2,21 @@
 	import { t } from '@luft/i18n';
 	import Plus from '@lucide/svelte/icons/plus';
 	import { AppIcon, ItemRow, Row, Section, Switch } from '@luft/ui';
+	import { commands } from '#lib/bindings.js';
+	import type { Entry } from '#lib/bindings.js';
 	import ChooseAppDialog from './ChooseAppDialog.svelte';
-	import { addStartup, setStartup, startupApps, type StartupApp } from './api';
 
-	let apps = $state<StartupApp[]>([]);
+	let apps = $state<Entry[]>([]);
 	let adding = $state(false);
 
 	async function load() {
-		apps = await startupApps();
+		apps = await commands.appsStartup();
 	}
 
-	async function toggle(app: StartupApp, enabled: boolean) {
+	async function toggle(app: Entry, enabled: boolean) {
 		app.enabled = enabled;
 		try {
-			await setStartup(app.id, enabled);
+			await commands.appsStartupSet({ id: app.id, enabled });
 		} finally {
 			await load();
 		}
@@ -23,7 +24,7 @@
 
 	async function add(id: string) {
 		adding = false;
-		await addStartup(id);
+		await commands.appsStartupAdd({ app: id });
 		await load();
 	}
 

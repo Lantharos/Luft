@@ -1,9 +1,9 @@
-use specta::Type;
 use std::sync::{Mutex, MutexGuard};
 
 use luft_software::apps::updates;
 use luft_software::task::Task;
 use serde::Serialize;
+use specta::Type;
 
 use super::image;
 use super::state;
@@ -11,10 +11,10 @@ use super::store::Checked;
 
 #[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct Overview {
+pub struct UpdatesOverview {
     checked: Option<u64>,
     apps: Option<usize>,
-    pub system: image::Overview,
+    pub system: image::ImageOverview,
 }
 
 #[derive(PartialEq, Eq)]
@@ -34,7 +34,7 @@ pub fn load(refresh: Option<Task>) -> Result<(), String> {
     } else {
         Checked::load()
     };
-    state::set_overview(Overview {
+    state::set_overview(UpdatesOverview {
         checked: checked.at,
         apps: state::overview().and_then(|overview| overview.apps),
         system,

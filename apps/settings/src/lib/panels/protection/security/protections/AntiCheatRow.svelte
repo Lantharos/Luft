@@ -2,7 +2,8 @@
 	import Gamepad2 from '@lucide/svelte/icons/gamepad-2';
 	import { t } from '@luft/i18n';
 	import { errorText, Row, tooltip } from '@luft/ui';
-	import { keepOtherKeys, removeOtherKeys, restart, type AntiCheat, type SigningKey } from '../api';
+	import type { AntiCheat, SigningKey } from '#lib/bindings.js';
+	import { keepOtherKeys, removeOtherKeys, restart } from '../api';
 	import KeyStepsDialog from './KeyStepsDialog.svelte';
 
 	let { antiCheat, key }: { antiCheat: AntiCheat; key: SigningKey } = $props();

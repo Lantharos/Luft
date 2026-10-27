@@ -199,7 +199,6 @@ desktop-admin-required = Pentru a schimba acest lucru, sunt necesare drepturi de
 desktop-about-disks-missing = Aplicația Discuri nu este instalată
 
 ## Apps
-desktop-apps-kind-not-choosable = Acest tip de aplicație nu poate fi ales
 desktop-apps-uninstalled = Această aplicație nu mai este instalată
 desktop-apps-no-longer-starts = Această aplicație nu mai pornește automat
 desktop-apps-cannot-autostart = Această aplicație nu poate porni automat

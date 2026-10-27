@@ -1,4 +1,5 @@
-import type { InputMethod, Layout } from './api';
+import type { InputMethod, Layout } from '#lib/bindings.js';
+
 
 export type SourceType = 'xkb' | 'ibus';
 

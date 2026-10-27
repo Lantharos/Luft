@@ -15,7 +15,7 @@ const REGULAR_STYLES: [&str; 4] = ["regular", "book", "normal", "roman"];
 
 #[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct Family {
+pub struct FontFamily {
     name: String,
     styles: usize,
     monospace: bool,
@@ -49,7 +49,7 @@ fn is_regular(face: &Face) -> bool {
     face.face == 0 && REGULAR_STYLES.contains(&face.style.to_ascii_lowercase().as_str())
 }
 
-fn family(name: String, faces: &[Face], user_files: &HashSet<PathBuf>) -> Family {
+fn family(name: String, faces: &[Face], user_files: &HashSet<PathBuf>) -> FontFamily {
     let shown = faces
         .iter()
         .find(|face| is_regular(face))
@@ -59,7 +59,7 @@ fn family(name: String, faces: &[Face], user_files: &HashSet<PathBuf>) -> Family
         .map(|face| face.style.as_str())
         .filter(|style| !style.is_empty())
         .collect();
-    Family {
+    FontFamily {
         name,
         styles: styles.len().max(1),
         monospace: fonts::is_monospaced(&shown.file, shown.face),
@@ -77,14 +77,14 @@ fn user_files(faces: &[Face]) -> HashSet<PathBuf> {
         .collect()
 }
 
-pub fn list(Empty {}: Empty) -> Result<Vec<Family>, String> {
+pub fn list(Empty {}: Empty) -> Result<Vec<FontFamily>, String> {
     let faces = fonts::installed()?;
     let user_files = user_files(&faces);
     let mut grouped: HashMap<String, Vec<Face>> = HashMap::new();
     for face in faces {
         grouped.entry(face.family.clone()).or_default().push(face);
     }
-    let mut families: Vec<Family> = grouped
+    let mut families: Vec<FontFamily> = grouped
         .into_iter()
         .map(|(name, faces)| family(name, &faces, &user_files))
         .collect();

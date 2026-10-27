@@ -2,7 +2,7 @@
 	import { i18n, t } from '@luft/i18n';
 	import { untrack } from 'svelte';
 	import { Dialog, Segmented } from '@luft/ui';
-	import { setTime } from './api';
+	import { commands } from '#lib/bindings.js';
 	import Calendar from './Calendar.svelte';
 	import TimeStepper from './TimeStepper.svelte';
 	import { dayPeriods, toEpoch, wallTime } from './zones';
@@ -32,7 +32,7 @@
 		failed = false;
 		try {
 			const second = wallTime(zone, Date.now()).second;
-			await setTime(toEpoch(zone, { ...time, second }) * 1000);
+			await commands.datetimeSetTime({ usec: toEpoch(zone, { ...time, second }) * 1000 });
 			onclose();
 		} catch {
 			failed = true;

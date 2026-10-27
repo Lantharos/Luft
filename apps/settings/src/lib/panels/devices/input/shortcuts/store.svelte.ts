@@ -1,6 +1,7 @@
 import { onDestroy, untrack } from 'svelte';
+import { commands } from '#lib/bindings.js';
+import type { Category, Shortcut } from '#lib/bindings.js';
 import { KESTREL_SCHEMA, SettingsGroup } from '#lib/state/gsettings.svelte.js';
-import { appNames, resetSetting, shortcutEntries, writeSetting, type Category, type ShortcutEntry } from './api';
 import { canonical, sameAccelerators } from './keys/accelerator';
 
 const MEDIA_KEYS = 'com.lantharos.kestrel.media-keys';
@@ -40,7 +41,7 @@ function takeTurns(a: Binding, b: Binding) {
 }
 
 export class ShortcutStore {
-	entries = $state.raw<ShortcutEntry[]>([]);
+	entries = $state.raw<Shortcut[]>([]);
 	groups = $state.raw<Record<string, SettingsGroup<Accelerators>>>({});
 	customs = $state.raw<Record<string, SettingsGroup<Custom>>>({});
 	names = $state.raw<Record<string, string>>({});
@@ -109,13 +110,13 @@ export class ShortcutStore {
 			untrack(() => this.syncCustom(paths));
 		});
 		$effect(() => {
-			if (this.appIds) void appNames(this.appIds.split(' ')).then((names) => (this.names = names));
+			if (this.appIds) void commands.keyboardAppNames({ ids: this.appIds.split(' ') }).then((names) => (this.names = names));
 		});
 		onDestroy(() => this.destroy());
 	}
 
 	private async load() {
-		const entries = await shortcutEntries();
+		const entries = await commands.keyboardShortcuts();
 		const schemas = [...new Set(entries.map((entry) => entry.schema))];
 		this.groups = Object.fromEntries(
 			schemas.map((schema) => [
@@ -168,7 +169,7 @@ export class ShortcutStore {
 		let index = 0;
 		while (this.customPaths.includes(`${CUSTOM_ROOT}custom${index}/`)) index += 1;
 		const path = `${CUSTOM_ROOT}custom${index}/`;
-		for (const key of CUSTOM_KEYS) await writeSetting({ schema: CUSTOM_SCHEMA, path }, key, values[key]);
+		for (const key of CUSTOM_KEYS) await commands.settingsWrite({ schema: CUSTOM_SCHEMA, path, key, value: values[key] });
 		await this.media.set('custom-keybindings', [...this.customPaths, path]);
 	}
 
@@ -179,7 +180,7 @@ export class ShortcutStore {
 
 	async removeCustom(binding: CustomBinding) {
 		await this.media.set('custom-keybindings', this.customPaths.filter((path) => path !== binding.path));
-		for (const key of CUSTOM_KEYS) await resetSetting({ schema: CUSTOM_SCHEMA, path: binding.path }, key);
+		for (const key of CUSTOM_KEYS) await commands.settingsReset({ schema: CUSTOM_SCHEMA, path: binding.path, key });
 	}
 
 	private destroy() {

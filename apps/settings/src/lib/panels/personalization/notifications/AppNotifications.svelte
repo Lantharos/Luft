@@ -2,9 +2,10 @@
 	import { t } from '@luft/i18n';
 	import { untrack } from 'svelte';
 	import { AppIcon, ItemRow, Switch } from '@luft/ui';
+	import type { NotifyingApp } from '#lib/bindings.js';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import AppNotificationsDialog from './AppNotificationsDialog.svelte';
-	import { APP_KEYS, APP_SCHEMA, RULES_KEYS, RULES_SCHEMA, type AppOptions, type AppRules, type NotifyingApp } from './api';
+	import { APP_KEYS, APP_SCHEMA, RULES_KEYS, RULES_SCHEMA, type AppOptions, type AppRules } from './api';
 
 	interface Props {
 		app: NotifyingApp;

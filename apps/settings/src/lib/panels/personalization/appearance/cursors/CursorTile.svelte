@@ -3,7 +3,8 @@
 	import { fileUrl } from '@lantharos/sabine';
 	import X from '@lucide/svelte/icons/x';
 	import { tooltip } from '@luft/ui';
-	import { cursorPreview, type CursorTheme } from './api';
+	import { commands } from '#lib/bindings.js';
+	import type { CursorTheme } from '#lib/bindings.js';
 
 	interface Props {
 		theme: CursorTheme;
@@ -22,7 +23,7 @@
 			async ([entry]) => {
 				if (!entry.isIntersecting) return;
 				observer.disconnect();
-				source = fileUrl(await cursorPreview(theme.path));
+				source = fileUrl(await commands.appearanceCursorPreview({ path: theme.path }));
 			},
 			{ rootMargin: '200px' }
 		);

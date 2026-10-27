@@ -2,7 +2,8 @@
 	import { t } from '@luft/i18n';
 	import Fingerprint from '@lucide/svelte/icons/fingerprint';
 	import Trash from '@lucide/svelte/icons/trash';
-	import { deleteFingerprint, Dialog, errorText, fingerInSentence, fingerLabel, fingerprints, type Fingerprints, FINGERS, IconButton, Row, Section } from '@luft/ui';
+	import { Dialog, errorText, fingerInSentence, fingerLabel, type Fingerprints, FINGERS, IconButton, Row, Section } from '@luft/ui';
+	import { commands } from '#lib/bindings.js';
 	import EnrollDialog from './EnrollDialog.svelte';
 
 	let prints = $state<Fingerprints | null>(null);
@@ -13,14 +14,14 @@
 	let available = $derived(prints ? FINGERS.map(([finger]) => finger).filter((finger) => !prints!.enrolled.includes(finger)) : []);
 
 	async function load() {
-		prints = await fingerprints();
+		prints = await commands.fingerprintList();
 	}
 
 	async function remove(finger: string) {
 		removing = null;
 		problem = '';
 		try {
-			await deleteFingerprint(finger);
+			await commands.fingerprintDelete({ finger }, { timeoutMs: 300_000 });
 		} catch (reason) {
 			problem = errorText(reason);
 		}

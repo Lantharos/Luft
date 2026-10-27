@@ -6,8 +6,6 @@ import * as KestrelUi from '../../kestrelUi.js';
 import * as Main from '../main.js';
 import { ShellMountOperation } from '../dialogs/mount/mountOperation.js';
 
-const SETTINGS_SCHEMA = 'org.gnome.desktop.media-handling';
-const SETTING_ENABLE_AUTOMOUNT = 'automount';
 const AUTORUN_EXPIRE_TIMEOUT_SECS = 10;
 
 const WRONG_PASSPHRASE_ERRORS = [
@@ -35,7 +33,6 @@ export function allowsAutorun(volume: AutorunVolume): boolean {
 }
 
 class AutomountManager {
-  private readonly settings = new Gio.Settings({ schema_id: SETTINGS_SCHEMA });
   private readonly activeOperations = new Map<Gio.Volume, ShellMountOperation | null>();
   private readonly session = GnomeSession.SessionManager();
   private readonly volumeMonitor = Gio.VolumeMonitor.get();
@@ -112,7 +109,7 @@ class AutomountManager {
     if (this.inhibited) return;
     if (volume.get_mount()) return;
 
-    if (!this.settings.get_boolean(SETTING_ENABLE_AUTOMOUNT) || !volume.should_automount() || !volume.can_mount()) {
+    if (!volume.should_automount() || !volume.can_mount()) {
       volume.allowAutorun = true;
       this.allowAutorunExpire(volume);
       return;

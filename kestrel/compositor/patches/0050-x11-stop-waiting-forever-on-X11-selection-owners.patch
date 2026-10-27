@@ -1,0 +1,285 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Tue, 20 Oct 2026 21:38:11 +0200
+Subject: [PATCH 50/53] x11: stop waiting forever on X11 selection owners
+
+Reading an X11 selection waited for the owner's SelectionNotify and for
+each INCR chunk while ignoring its cancellable, so an owner that froze
+or went away while a paste was being requested left the Wayland
+requestor waiting forever. MetaSelection's 15 second transfer timeout
+and the clipboard manager's cancellation never reached it.
+
+Fail a conversion, or a read waiting for the next INCR chunk, when its
+cancellable is cancelled, and fail every pending read when the X11
+display shuts down. Also clear the pending read before returning it,
+since its callback can start the next one right away, which was then
+dropped without ever returning, and free the size property of INCR
+transfers.
+
+Upstream-Status: forwardable
+---
+ .../meta-x11-selection-input-stream-private.h |   3 +
+ src/x11/meta-x11-selection-input-stream.c     | 114 ++++++++++++++++--
+ src/x11/meta-x11-selection.c                  |  21 ++++
+ 3 files changed, 130 insertions(+), 8 deletions(-)
+
+diff --git a/src/x11/meta-x11-selection-input-stream-private.h b/src/x11/meta-x11-selection-input-stream-private.h
+index ade8e25c25c28c21df758c826f2d7276cbd1e62d..c13619af86e00e85eee9677ad849a193ca5a3b0e 100644
+--- a/src/x11/meta-x11-selection-input-stream-private.h
++++ b/src/x11/meta-x11-selection-input-stream-private.h
+@@ -45,4 +45,7 @@ GInputStream * meta_x11_selection_input_stream_new_finish    (GAsyncResult
+ gboolean       meta_x11_selection_input_stream_xevent        (MetaX11SelectionInputStream *stream,
+                                                               const XEvent                *xevent);
+ 
++void           meta_x11_selection_input_stream_abort         (MetaX11SelectionInputStream *stream,
++                                                              GError                      *error);
++
+ G_END_DECLS
+diff --git a/src/x11/meta-x11-selection-input-stream.c b/src/x11/meta-x11-selection-input-stream.c
+index da7adb89e70cc910b02d58c1782901843f2d78d5..7072ba9f83ecac6d854668ec25ef2616210112f5 100644
+--- a/src/x11/meta-x11-selection-input-stream.c
++++ b/src/x11/meta-x11-selection-input-stream.c
+@@ -46,6 +46,9 @@ struct MetaX11SelectionInputStreamPrivate
+   GTask *pending_task;
+   uint8_t *pending_data;
+   size_t pending_size;
++  GSource *cancelled_source;
++
++  GError *error;
+ 
+   guint complete : 1;
+   guint incr : 1;
+@@ -120,12 +123,28 @@ meta_x11_selection_input_stream_fill_buffer (MetaX11SelectionInputStream *stream
+   return result;
+ }
+ 
++static void
++stop_watching_cancellable (MetaX11SelectionInputStream *stream)
++{
++  MetaX11SelectionInputStreamPrivate *priv =
++    meta_x11_selection_input_stream_get_instance_private (stream);
++
++  if (!priv->cancelled_source)
++    return;
++
++  g_source_destroy (priv->cancelled_source);
++  g_clear_pointer (&priv->cancelled_source, g_source_unref);
++}
++
+ static void
+ meta_x11_selection_input_stream_flush (MetaX11SelectionInputStream *stream)
+ {
+   MetaX11SelectionInputStreamPrivate *priv =
+     meta_x11_selection_input_stream_get_instance_private (stream);
+   Display *xdisplay = priv->x11_display->xdisplay;
++  g_autoptr (GTask) task = NULL;
++  uint8_t *data;
++  size_t size;
+   gssize written;
+ 
+   mtk_x11_error_trap_push (xdisplay);
+@@ -138,14 +157,20 @@ meta_x11_selection_input_stream_flush (MetaX11SelectionInputStream *stream)
+   if (priv->pending_task == NULL)
+     return;
+ 
+-  written = meta_x11_selection_input_stream_fill_buffer (stream,
+-                                                         priv->pending_data,
+-                                                         priv->pending_size);
+-  g_task_return_int (priv->pending_task, written);
+-
+-  g_clear_object (&priv->pending_task);
+-  priv->pending_data = NULL;
++  stop_watching_cancellable (stream);
++  task = g_steal_pointer (&priv->pending_task);
++  data = g_steal_pointer (&priv->pending_data);
++  size = priv->pending_size;
+   priv->pending_size = 0;
++
++  if (priv->error)
++    {
++      g_task_return_error (task, g_error_copy (priv->error));
++      return;
++    }
++
++  written = meta_x11_selection_input_stream_fill_buffer (stream, data, size);
++  g_task_return_int (task, written);
+ }
+ 
+ static void
+@@ -168,6 +193,61 @@ meta_x11_selection_input_stream_complete (MetaX11SelectionInputStream *stream)
+   g_object_unref (stream);
+ }
+ 
++void
++meta_x11_selection_input_stream_abort (MetaX11SelectionInputStream *stream,
++                                       GError                      *error)
++{
++  MetaX11SelectionInputStreamPrivate *priv =
++    meta_x11_selection_input_stream_get_instance_private (stream);
++
++  if (priv->pending_task &&
++      g_task_get_source_tag (priv->pending_task) == meta_x11_selection_input_stream_new_async)
++    {
++      g_autoptr (GTask) task = g_steal_pointer (&priv->pending_task);
++
++      stop_watching_cancellable (stream);
++      g_task_return_error (task, error);
++    }
++  else
++    {
++      priv->error = error;
++    }
++
++  meta_x11_selection_input_stream_complete (stream);
++}
++
++static gboolean
++on_cancelled (GCancellable *cancellable,
++              gpointer      user_data)
++{
++  MetaX11SelectionInputStream *stream = user_data;
++  GError *error = NULL;
++
++  g_cancellable_set_error_if_cancelled (cancellable, &error);
++  meta_x11_selection_input_stream_abort (stream, error);
++
++  return G_SOURCE_REMOVE;
++}
++
++static void
++watch_cancellable (MetaX11SelectionInputStream *stream,
++                   GCancellable                *cancellable)
++{
++  MetaX11SelectionInputStreamPrivate *priv =
++    meta_x11_selection_input_stream_get_instance_private (stream);
++  g_autoptr (GMainContext) main_context = NULL;
++
++  if (!cancellable)
++    return;
++
++  main_context = g_main_context_ref_thread_default ();
++  priv->cancelled_source = g_cancellable_source_new (cancellable);
++  g_source_set_callback (priv->cancelled_source,
++                         G_SOURCE_FUNC (on_cancelled),
++                         stream, NULL);
++  g_source_attach (priv->cancelled_source, main_context);
++}
++
+ static gssize
+ meta_x11_selection_input_stream_read (GInputStream  *input_stream,
+                                       void          *buffer,
+@@ -177,6 +257,14 @@ meta_x11_selection_input_stream_read (GInputStream  *input_stream,
+ {
+   MetaX11SelectionInputStream *stream =
+     META_X11_SELECTION_INPUT_STREAM (input_stream);
++  MetaX11SelectionInputStreamPrivate *priv =
++    meta_x11_selection_input_stream_get_instance_private (stream);
++
++  if (priv->error)
++    {
++      g_propagate_error (error, g_error_copy (priv->error));
++      return -1;
++    }
+ 
+   return meta_x11_selection_input_stream_fill_buffer (stream, buffer, count);
+ }
+@@ -208,7 +296,12 @@ meta_x11_selection_input_stream_read_async (GInputStream        *input_stream,
+   g_task_set_source_tag (task, meta_x11_selection_input_stream_read_async);
+   g_task_set_priority (task, io_priority);
+ 
+-  if (meta_x11_selection_input_stream_has_data (stream))
++  if (priv->error)
++    {
++      g_task_return_error (task, g_error_copy (priv->error));
++      g_object_unref (task);
++    }
++  else if (meta_x11_selection_input_stream_has_data (stream))
+     {
+       gssize size;
+ 
+@@ -221,6 +314,7 @@ meta_x11_selection_input_stream_read_async (GInputStream        *input_stream,
+       priv->pending_data = buffer;
+       priv->pending_size = count;
+       priv->pending_task = task;
++      watch_cancellable (stream, cancellable);
+     }
+ }
+ 
+@@ -288,6 +382,7 @@ meta_x11_selection_input_stream_finalize (GObject *object)
+   MetaX11Display *x11_display;
+ 
+   g_async_queue_unref (priv->chunks);
++  g_clear_error (&priv->error);
+ 
+   x11_display = priv->x11_display;
+   if (x11_display)
+@@ -464,6 +559,7 @@ meta_x11_selection_input_stream_xevent (MetaX11SelectionInputStream *stream,
+             return FALSE;
+           }
+ 
++        stop_watching_cancellable (stream);
+         task = g_steal_pointer (&priv->pending_task);
+ 
+         if (xevent->xselection.property == None)
+@@ -495,6 +591,7 @@ meta_x11_selection_input_stream_xevent (MetaX11SelectionInputStream *stream,
+                     /* The remainder of the selection will come through PropertyNotify
+                        events on xwindow */
+                     priv->incr = TRUE;
++                    g_bytes_unref (bytes);
+                     meta_x11_selection_input_stream_flush (stream);
+                   }
+                 else
+@@ -564,6 +661,7 @@ meta_x11_selection_input_stream_new_async (MetaX11Display      *x11_display,
+   priv->pending_task = g_task_new (NULL, cancellable, callback, user_data);
+   g_task_set_source_tag (priv->pending_task, meta_x11_selection_input_stream_new_async);
+   g_task_set_priority (priv->pending_task, io_priority);
++  watch_cancellable (stream, cancellable);
+ }
+ 
+ GInputStream *
+diff --git a/src/x11/meta-x11-selection.c b/src/x11/meta-x11-selection.c
+index cb16a495d08777e796882b1485e6e2f6b9ad72c9..61cee4c2acd9ef9389b05197d44c71e328312076 100644
+--- a/src/x11/meta-x11-selection.c
++++ b/src/x11/meta-x11-selection.c
+@@ -24,6 +24,7 @@
+ #include "mtk/mtk.h"
+ #include "mtk/mtk-x11.h"
+ #include "x11/meta-selection-source-x11-private.h"
++#include "x11/meta-x11-selection-input-stream-private.h"
+ #include "x11/meta-x11-selection-output-stream-private.h"
+ #include "x11/meta-x11-selection-private.h"
+ 
+@@ -524,6 +525,24 @@ meta_x11_selection_init (MetaX11Display *x11_display)
+                             x11_display);
+ }
+ 
++static void
++abort_input_streams (MetaX11Display *x11_display)
++{
++  g_autolist (MetaX11SelectionInputStream) streams = NULL;
++  GList *l;
++
++  streams = g_list_copy_deep (x11_display->selection.input_streams,
++                              (GCopyFunc) g_object_ref, NULL);
++
++  for (l = streams; l; l = l->next)
++    {
++      meta_x11_selection_input_stream_abort (l->data,
++                                             g_error_new_literal (G_IO_ERROR,
++                                                                  G_IO_ERROR_CLOSED,
++                                                                  "X11 display closed"));
++    }
++}
++
+ void
+ meta_x11_selection_shutdown (MetaX11Display *x11_display)
+ {
+@@ -552,6 +571,8 @@ meta_x11_selection_shutdown (MetaX11Display *x11_display)
+         }
+     }
+ 
++  abort_input_streams (x11_display);
++
+   if (x11_display->selection.xwindow != None)
+     {
+       XDestroyWindow (x11_display->xdisplay, x11_display->selection.xwindow);

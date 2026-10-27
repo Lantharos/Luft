@@ -1,0 +1,132 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Tue, 27 Oct 2026 18:52:44 +0100
+Subject: [PATCH 4/5] x11/selection: Stop ignoring the cancellable when reading
+ a selection
+
+Reading an X11 selection waited for the owner's SelectionNotify and for
+each INCR chunk without looking at the cancellable it was given. An
+owner that never answered, for example because it went away while the
+request was in flight or because it stopped responding, then kept the
+read pending forever. MetaSelection cancels transfers that take longer
+than 15 seconds, and the clipboard manager cancels its transfer when the
+selection changes, but neither had any effect on X11 selections, so the
+Wayland client waiting for the data waited forever too.
+
+Fail the pending conversion, or the read waiting for more data, when its
+cancellable is cancelled.
+---
+ src/x11/meta-x11-selection-input-stream.c | 51 +++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
+
+diff --git a/src/x11/meta-x11-selection-input-stream.c b/src/x11/meta-x11-selection-input-stream.c
+index 731e6b451f..7072ba9f83 100644
+--- a/src/x11/meta-x11-selection-input-stream.c
++++ b/src/x11/meta-x11-selection-input-stream.c
+@@ -46,6 +46,7 @@ struct MetaX11SelectionInputStreamPrivate
+   GTask *pending_task;
+   uint8_t *pending_data;
+   size_t pending_size;
++  GSource *cancelled_source;
+ 
+   GError *error;
+ 
+@@ -122,6 +123,19 @@ meta_x11_selection_input_stream_fill_buffer (MetaX11SelectionInputStream *stream
+   return result;
+ }
+ 
++static void
++stop_watching_cancellable (MetaX11SelectionInputStream *stream)
++{
++  MetaX11SelectionInputStreamPrivate *priv =
++    meta_x11_selection_input_stream_get_instance_private (stream);
++
++  if (!priv->cancelled_source)
++    return;
++
++  g_source_destroy (priv->cancelled_source);
++  g_clear_pointer (&priv->cancelled_source, g_source_unref);
++}
++
+ static void
+ meta_x11_selection_input_stream_flush (MetaX11SelectionInputStream *stream)
+ {
+@@ -143,6 +157,7 @@ meta_x11_selection_input_stream_flush (MetaX11SelectionInputStream *stream)
+   if (priv->pending_task == NULL)
+     return;
+ 
++  stop_watching_cancellable (stream);
+   task = g_steal_pointer (&priv->pending_task);
+   data = g_steal_pointer (&priv->pending_data);
+   size = priv->pending_size;
+@@ -190,6 +205,7 @@ meta_x11_selection_input_stream_abort (MetaX11SelectionInputStream *stream,
+     {
+       g_autoptr (GTask) task = g_steal_pointer (&priv->pending_task);
+ 
++      stop_watching_cancellable (stream);
+       g_task_return_error (task, error);
+     }
+   else
+@@ -200,6 +216,38 @@ meta_x11_selection_input_stream_abort (MetaX11SelectionInputStream *stream,
+   meta_x11_selection_input_stream_complete (stream);
+ }
+ 
++static gboolean
++on_cancelled (GCancellable *cancellable,
++              gpointer      user_data)
++{
++  MetaX11SelectionInputStream *stream = user_data;
++  GError *error = NULL;
++
++  g_cancellable_set_error_if_cancelled (cancellable, &error);
++  meta_x11_selection_input_stream_abort (stream, error);
++
++  return G_SOURCE_REMOVE;
++}
++
++static void
++watch_cancellable (MetaX11SelectionInputStream *stream,
++                   GCancellable                *cancellable)
++{
++  MetaX11SelectionInputStreamPrivate *priv =
++    meta_x11_selection_input_stream_get_instance_private (stream);
++  g_autoptr (GMainContext) main_context = NULL;
++
++  if (!cancellable)
++    return;
++
++  main_context = g_main_context_ref_thread_default ();
++  priv->cancelled_source = g_cancellable_source_new (cancellable);
++  g_source_set_callback (priv->cancelled_source,
++                         G_SOURCE_FUNC (on_cancelled),
++                         stream, NULL);
++  g_source_attach (priv->cancelled_source, main_context);
++}
++
+ static gssize
+ meta_x11_selection_input_stream_read (GInputStream  *input_stream,
+                                       void          *buffer,
+@@ -266,6 +314,7 @@ meta_x11_selection_input_stream_read_async (GInputStream        *input_stream,
+       priv->pending_data = buffer;
+       priv->pending_size = count;
+       priv->pending_task = task;
++      watch_cancellable (stream, cancellable);
+     }
+ }
+ 
+@@ -510,6 +559,7 @@ meta_x11_selection_input_stream_xevent (MetaX11SelectionInputStream *stream,
+             return FALSE;
+           }
+ 
++        stop_watching_cancellable (stream);
+         task = g_steal_pointer (&priv->pending_task);
+ 
+         if (xevent->xselection.property == None)
+@@ -611,6 +661,7 @@ meta_x11_selection_input_stream_new_async (MetaX11Display      *x11_display,
+   priv->pending_task = g_task_new (NULL, cancellable, callback, user_data);
+   g_task_set_source_tag (priv->pending_task, meta_x11_selection_input_stream_new_async);
+   g_task_set_priority (priv->pending_task, io_priority);
++  watch_cancellable (stream, cancellable);
+ }
+ 
+ GInputStream *

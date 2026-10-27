@@ -25,7 +25,7 @@ as they were.
  7 files changed, 31 insertions(+), 16 deletions(-)
 
 diff --git a/src/backends/native/meta-cursor-renderer-native.c b/src/backends/native/meta-cursor-renderer-native.c
-index 1fd127f45..d8c8aa724 100644
+index 1fd127f458..d8c8aa7241 100644
 --- a/src/backends/native/meta-cursor-renderer-native.c
 +++ b/src/backends/native/meta-cursor-renderer-native.c
 @@ -571,7 +571,8 @@ create_cursor_drm_buffer_gbm (MetaGpuKms         *gpu_kms,
@@ -57,7 +57,7 @@ index 1fd127f45..d8c8aa724 100644
                                                   &error);
        if (!buffer_gbm)
 diff --git a/src/backends/native/meta-drm-buffer-dumb.c b/src/backends/native/meta-drm-buffer-dumb.c
-index d169e761a..a4f49b974 100644
+index d169e761a8..a4f49b974a 100644
 --- a/src/backends/native/meta-drm-buffer-dumb.c
 +++ b/src/backends/native/meta-drm-buffer-dumb.c
 @@ -329,17 +329,18 @@ err_ioctl:
@@ -86,7 +86,7 @@ index d169e761a..a4f49b974 100644
  
    if (!init_dumb_buffer (buffer_dumb, width, height, format, error))
 diff --git a/src/backends/native/meta-drm-buffer-dumb.h b/src/backends/native/meta-drm-buffer-dumb.h
-index 1dca4026a..6255eee4b 100644
+index 1dca4026a8..6255eee4b2 100644
 --- a/src/backends/native/meta-drm-buffer-dumb.h
 +++ b/src/backends/native/meta-drm-buffer-dumb.h
 @@ -29,11 +29,12 @@ G_DECLARE_FINAL_TYPE (MetaDrmBufferDumb,
@@ -108,7 +108,7 @@ index 1dca4026a..6255eee4b 100644
  int meta_drm_buffer_dumb_ensure_dmabuf_fd (MetaDrmBufferDumb  *buffer_dumb,
                                             GError            **error);
 diff --git a/src/backends/native/meta-drm-buffer.c b/src/backends/native/meta-drm-buffer.c
-index 1c83984c9..fa919b5d3 100644
+index 1c83984c94..fa919b5d3c 100644
 --- a/src/backends/native/meta-drm-buffer.c
 +++ b/src/backends/native/meta-drm-buffer.c
 @@ -183,9 +183,16 @@ meta_drm_buffer_release_fb_id (MetaDrmBuffer *buffer)
@@ -132,7 +132,7 @@ index 1c83984c9..fa919b5d3 100644
      g_warning ("drmModeRmFB: %s", g_strerror (-ret));
  
 diff --git a/src/backends/native/meta-drm-buffer.h b/src/backends/native/meta-drm-buffer.h
-index 2419e0326..0503f6779 100644
+index 2419e03265..0503f67794 100644
 --- a/src/backends/native/meta-drm-buffer.h
 +++ b/src/backends/native/meta-drm-buffer.h
 @@ -30,6 +30,7 @@ typedef enum _MetaDrmBufferFlags
@@ -144,7 +144,7 @@ index 2419e0326..0503f6779 100644
  
  #define META_TYPE_DRM_BUFFER (meta_drm_buffer_get_type ())
 diff --git a/src/backends/native/meta-render-device.c b/src/backends/native/meta-render-device.c
-index eb92c3a81..f4fa5b8ee 100644
+index eb92c3a810..f4fa5b8ee2 100644
 --- a/src/backends/native/meta-render-device.c
 +++ b/src/backends/native/meta-render-device.c
 @@ -361,6 +361,7 @@ meta_render_device_allocate_dumb_buf (MetaRenderDevice  *render_device,
@@ -156,7 +156,7 @@ index eb92c3a81..f4fa5b8ee 100644
    if (!buffer_dumb)
      return NULL;
 diff --git a/src/tests/meta-kms-test-utils.c b/src/tests/meta-kms-test-utils.c
-index b14604b60..08e6f40d6 100644
+index b14604b602..08e6f40d67 100644
 --- a/src/tests/meta-kms-test-utils.c
 +++ b/src/tests/meta-kms-test-utils.c
 @@ -138,6 +138,7 @@ meta_create_test_dumb_buffer (MetaKmsDevice *device,

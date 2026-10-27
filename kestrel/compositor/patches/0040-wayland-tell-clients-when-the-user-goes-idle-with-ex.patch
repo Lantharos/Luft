@@ -8,7 +8,9 @@ Implement ext_idle_notifier_v1 on top of the core idle monitor. Plain
 notifications follow idle inhibitors like the session's own idle
 handling; input notifications, from version 2, ignore them. Sandboxed
 apps such as password managers that lock themselves after a while of
-inactivity have no other way to learn the idle time.
+inactivity have no other way to learn the idle time. Each notification counts its
+timeout from when it is created, as the protocol asks, rather than from
+the last input before it.
 
 Timeouts are at least a second, and at least ten seconds for sandboxed
 clients, so no client can follow the rhythm of typing from when it goes
@@ -17,11 +19,11 @@ idle and resumes.
 Upstream-Status: forwardable
 ---
  src/meson.build                        |   3 +
- src/wayland/meta-wayland-idle-notify.c | 169 +++++++++++++++++++++++++
+ src/wayland/meta-wayland-idle-notify.c | 170 +++++++++++++++++++++++++
  src/wayland/meta-wayland-idle-notify.h |   6 +
  src/wayland/meta-wayland-versions.h    |   1 +
  src/wayland/meta-wayland.c             |   2 +
- 5 files changed, 181 insertions(+)
+ 5 files changed, 182 insertions(+)
  create mode 100644 src/wayland/meta-wayland-idle-notify.c
  create mode 100644 src/wayland/meta-wayland-idle-notify.h
 
@@ -48,10 +50,10 @@ index ed4c1ac4ae0327b0baf786d74f69eebfcb6f0765..ce589e3e21965d4ceeaa7f3343a7ef3a
    ['gtk-shell', 'private', ],
 diff --git a/src/wayland/meta-wayland-idle-notify.c b/src/wayland/meta-wayland-idle-notify.c
 new file mode 100644
-index 0000000000000000000000000000000000000000..8d71c085ab88f73ba464808b88a7aa4d5d8cb550
+index 0000000000000000000000000000000000000000..5d216c4ea916bf13a41b81e1f913a415f3c8a8cd
 --- /dev/null
 +++ b/src/wayland/meta-wayland-idle-notify.c
-@@ -0,0 +1,169 @@
+@@ -0,0 +1,170 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
 +#include "config.h"
 +
@@ -158,7 +160,8 @@ index 0000000000000000000000000000000000000000..8d71c085ab88f73ba464808b88a7aa4d
 +    meta_idle_monitor_add_idle_watch_full (notification->monitor,
 +                                           MAX (timeout_msec, min_timeout_msec),
 +                                           on_idle, notification, NULL,
-+                                           flags);
++                                           flags |
++                                           META_IDLE_MONITOR_WATCH_FLAGS_START_NOW);
 +}
 +
 +static void

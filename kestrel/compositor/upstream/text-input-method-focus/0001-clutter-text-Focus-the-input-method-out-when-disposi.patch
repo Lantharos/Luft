@@ -1,14 +1,15 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Tue, 29 Sep 2026 19:24:18 +0200
-Subject: [PATCH] clutter/text: Focus the input method out when disposing a
+Subject: [PATCH 1/2] clutter/text: Focus the input method out when disposing a
  focused text
 
 ClutterText focuses the input method out from its key-focus-out handler,
-but an actor that is destroyed while it has key focus never gets
-key-focus-out. The input method then kept pointing at the destroyed
-text, and the next surrounding text request, such as the one after
-switching input sources, read freed memory.
+but an actor that is being destroyed loses key focus without
+key-focus-out being emitted. A text destroyed while it had key focus
+left the input method focused on its ClutterInputFocus, which still
+points at the destroyed text, so the next surrounding text request,
+such as the one after switching input sources, read freed memory.
 
 Focus the input method out when a text that still has it focused is
 disposed.
@@ -17,7 +18,7 @@ disposed.
  1 file changed, 3 insertions(+)
 
 diff --git a/clutter/clutter/pango/clutter-text.c b/clutter/clutter/pango/clutter-text.c
-index c7566e30f..efdd9aeba 100644
+index c7566e30f1..efdd9aeba6 100644
 --- a/clutter/clutter/pango/clutter-text.c
 +++ b/clutter/clutter/pango/clutter-text.c
 @@ -1952,6 +1952,9 @@ clutter_text_dispose (GObject *gobject)

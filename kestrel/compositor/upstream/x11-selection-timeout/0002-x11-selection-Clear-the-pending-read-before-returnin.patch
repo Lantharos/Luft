@@ -1,0 +1,50 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Tue, 27 Oct 2026 18:56:56 +0100
+Subject: [PATCH 2/5] x11/selection: Clear the pending read before returning it
+
+Returning the result of a pending read can call its callback right
+away, and the callback can start the next read. The pending task was
+only cleared after returning, so a read started from the callback was
+dropped without ever returning, and the transfer reading it stalled.
+
+Clear the pending read before returning its result.
+---
+ src/x11/meta-x11-selection-input-stream.c | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
+
+diff --git a/src/x11/meta-x11-selection-input-stream.c b/src/x11/meta-x11-selection-input-stream.c
+index e616b82ed1..730a10f818 100644
+--- a/src/x11/meta-x11-selection-input-stream.c
++++ b/src/x11/meta-x11-selection-input-stream.c
+@@ -126,6 +126,9 @@ meta_x11_selection_input_stream_flush (MetaX11SelectionInputStream *stream)
+   MetaX11SelectionInputStreamPrivate *priv =
+     meta_x11_selection_input_stream_get_instance_private (stream);
+   Display *xdisplay = priv->x11_display->xdisplay;
++  g_autoptr (GTask) task = NULL;
++  uint8_t *data;
++  size_t size;
+   gssize written;
+ 
+   mtk_x11_error_trap_push (xdisplay);
+@@ -138,14 +141,13 @@ meta_x11_selection_input_stream_flush (MetaX11SelectionInputStream *stream)
+   if (priv->pending_task == NULL)
+     return;
+ 
+-  written = meta_x11_selection_input_stream_fill_buffer (stream,
+-                                                         priv->pending_data,
+-                                                         priv->pending_size);
+-  g_task_return_int (priv->pending_task, written);
+-
+-  g_clear_object (&priv->pending_task);
+-  priv->pending_data = NULL;
++  task = g_steal_pointer (&priv->pending_task);
++  data = g_steal_pointer (&priv->pending_data);
++  size = priv->pending_size;
+   priv->pending_size = 0;
++
++  written = meta_x11_selection_input_stream_fill_buffer (stream, data, size);
++  g_task_return_int (task, written);
+ }
+ 
+ static void

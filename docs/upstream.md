@@ -29,7 +29,7 @@ A patch that is already there or conflicts while its status says upstream can us
 
 ### Drafts
 
-[kestrel/compositor/upstream](../kestrel/compositor/upstream) holds forwardable patches prepared for GNOME's GitLab, one folder per merge request: the patch, rebased onto Mutter's main branch and written the way Mutter's commits are, and `description.md` with the title, the base it was made against and the merge request's text. They are submitted by hand. Once one is open, change the patch's status to `upstream` with its link, and remove the folder when it merges.
+[kestrel/compositor/upstream](../kestrel/compositor/upstream) holds forwardable patches prepared for GNOME's GitLab, one folder per merge request: the patches, rebased onto Mutter's main branch and written the way Mutter's commits are, and `description.md` with the title, the base it was made against and the merge request's text. They are submitted by hand. Once one is open, change the patch's status to `upstream` with its link, and remove the folder when it merges.
 
 ## The engine
 

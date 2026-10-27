@@ -1,14 +1,13 @@
-# wayland: Add ext-idle-notify-v1 support
+# ext-idle-notify-v1: question before a merge request
 
-Based on main at b48811767. Requested in #4117 and #4536.
+Not a merge request yet. #4117 and its duplicates (#4187, #4536) were closed with the answer that a portal is the way to go, and Sebastian Wick said in #4187 that there is no interest in supporting the Wayland protocol. #4117 is closed but not locked, so this is meant as a comment there. The branch is the patch next to this file, based on main at b48811767.
 
-## Description
+## Comment
 
-This implements `ext_idle_notifier_v1` on top of the core idle monitor, at version 2:
+Would you take a native ext-idle-notify-v1 implementation after all, or is the portal still the only way you'd accept?
 
-- `get_idle_notification` follows idle inhibitors, like the session's own idle handling;
-- `get_input_idle_notification` ignores them, using the uninhibitable idle watches from !4422.
+The portal hasn't been proposed yet, and until then sandboxed apps have nothing: break timers, and password managers that lock themselves after a while without input, can't reach org.gnome.Mutter.IdleMonitor from inside Flatpak, while the protocol works for them on other compositors.
 
-Apps that lock themselves or remind people to take a break after a while without input, such as password managers and break timers, use this protocol on other compositors. Inside a sandbox they have no other way to learn the idle time, since the IdleMonitor D-Bus API isn't reachable there by default.
+I have an implementation of version 2 on top of the core idle monitor, about 180 lines, and can push the branch if you'd like to look at it. get_idle_notification follows idle inhibitors like the session's own idle handling, get_input_idle_notification uses the uninhibitable watches from !4422, and every watch counts from its creation, as the protocol asks. So it can't be used to time keystrokes, timeouts under a second are raised to a second.
 
-Timeouts shorter than a second are raised to a second, so the protocol can't be used to time individual key presses. A longer minimum for sandboxed clients would be worth adding once Mutter can tell them apart.
+If it's still the portal, I'd rather help with that instead: propose the portal interface, and add what Mutter needs for it, a way to pass the uninhibitable and start-now flags through AddIdleWatch.

@@ -1,0 +1,363 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Tue, 27 Oct 2026 18:47:00 +0100
+Subject: [PATCH 2/2] tests/wayland: Add test for text input cursor rectangles
+ after focus moves
+
+Check that a cursor rectangle reaches the input method after the
+previously focused surface went away while it still had a cursor
+rectangle update pending.
+---
+ src/tests/meson.build                       |  11 ++
+ src/tests/wayland-test-clients/meson.build  |   3 +
+ src/tests/wayland-test-clients/text-input.c | 182 ++++++++++++++++++++
+ src/tests/wayland-text-input-tests.c        | 115 +++++++++++++
+ 4 files changed, 311 insertions(+)
+ create mode 100644 src/tests/wayland-test-clients/text-input.c
+ create mode 100644 src/tests/wayland-text-input-tests.c
+
+diff --git a/src/tests/meson.build b/src/tests/meson.build
+index 269931c749..da1b2fe6aa 100644
+--- a/src/tests/meson.build
++++ b/src/tests/meson.build
+@@ -1119,6 +1119,17 @@ wayland_test_cases = [
+       test_client_executables.get('idle-inhibit'),
+     ],
+   },
++  {
++    'name': 'wayland-text-input',
++    'suite': 'wayland',
++    'sources': [
++      'wayland-text-input-tests.c',
++      wayland_test_utils,
++    ],
++    'depends': [
++      test_client_executables.get('text-input'),
++    ],
++  },
+   {
+     'name': 'wayland-cursor',
+     'suite': 'wayland',
+diff --git a/src/tests/wayland-test-clients/meson.build b/src/tests/wayland-test-clients/meson.build
+index 9c92663def..c41a67a790 100644
+--- a/src/tests/wayland-test-clients/meson.build
++++ b/src/tests/wayland-test-clients/meson.build
+@@ -101,6 +101,9 @@ wayland_test_clients = [
+   {
+     'name': 'subsurface-reparenting',
+   },
++  {
++    'name': 'text-input',
++  },
+   {
+     'name': 'toplevel-reuse-surface',
+   },
+diff --git a/src/tests/wayland-test-clients/text-input.c b/src/tests/wayland-test-clients/text-input.c
+new file mode 100644
+index 0000000000..33a7a3805f
+--- /dev/null
++++ b/src/tests/wayland-test-clients/text-input.c
+@@ -0,0 +1,182 @@
++/*
++ * Copyright (C) 2026 Kristof Imeri
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of the
++ * License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "config.h"
++
++#include <glib.h>
++#include <wayland-client.h>
++
++#include "wayland-test-client-utils.h"
++
++#include "text-input-unstable-v3-client-protocol.h"
++
++static struct zwp_text_input_manager_v3 *text_input_manager;
++static struct wl_surface *entered_surface;
++
++static void
++text_input_handle_enter (void                     *data,
++                         struct zwp_text_input_v3 *text_input,
++                         struct wl_surface        *surface)
++{
++  entered_surface = surface;
++}
++
++static void
++text_input_handle_leave (void                     *data,
++                         struct zwp_text_input_v3 *text_input,
++                         struct wl_surface        *surface)
++{
++  entered_surface = NULL;
++}
++
++static void
++text_input_handle_preedit_string (void                     *data,
++                                  struct zwp_text_input_v3 *text_input,
++                                  const char               *text,
++                                  int32_t                   cursor_begin,
++                                  int32_t                   cursor_end)
++{
++}
++
++static void
++text_input_handle_commit_string (void                     *data,
++                                 struct zwp_text_input_v3 *text_input,
++                                 const char               *text)
++{
++}
++
++static void
++text_input_handle_delete_surrounding_text (void                     *data,
++                                           struct zwp_text_input_v3 *text_input,
++                                           uint32_t                  before_length,
++                                           uint32_t                  after_length)
++{
++}
++
++static void
++text_input_handle_done (void                     *data,
++                        struct zwp_text_input_v3 *text_input,
++                        uint32_t                  serial)
++{
++}
++
++static const struct zwp_text_input_v3_listener text_input_listener = {
++  text_input_handle_enter,
++  text_input_handle_leave,
++  text_input_handle_preedit_string,
++  text_input_handle_commit_string,
++  text_input_handle_delete_surrounding_text,
++  text_input_handle_done,
++};
++
++static void
++handle_registry_global (void               *user_data,
++                        struct wl_registry *registry,
++                        uint32_t            id,
++                        const char         *interface,
++                        uint32_t            version)
++{
++  if (strcmp (interface, "zwp_text_input_manager_v3") == 0)
++    {
++      text_input_manager = wl_registry_bind (registry, id,
++                                             &zwp_text_input_manager_v3_interface,
++                                             1);
++    }
++}
++
++static void
++handle_registry_global_remove (void               *user_data,
++                               struct wl_registry *registry,
++                               uint32_t            name)
++{
++}
++
++static const struct wl_registry_listener registry_listener = {
++  handle_registry_global,
++  handle_registry_global_remove
++};
++
++static void
++wait_for_enter (WaylandDisplay *display,
++                WaylandSurface *surface)
++{
++  while (entered_surface != surface->wl_surface)
++    wayland_display_dispatch (display);
++}
++
++static void
++cursor_rectangle_after_focus_change (WaylandDisplay           *display,
++                                     struct zwp_text_input_v3 *text_input)
++{
++  g_autoptr (WaylandSurface) closing_surface = NULL;
++  g_autoptr (WaylandSurface) surface = NULL;
++
++  closing_surface = wayland_surface_new (display, "text-input-closing",
++                                         100, 100, 0xffffffff);
++  wl_surface_commit (closing_surface->wl_surface);
++  wait_for_enter (display, closing_surface);
++
++  zwp_text_input_v3_enable (text_input);
++  zwp_text_input_v3_set_cursor_rectangle (text_input, 1, 2, 3, 4);
++  zwp_text_input_v3_commit (text_input);
++  g_clear_object (&closing_surface);
++  wl_display_roundtrip (display->display);
++
++  surface = wayland_surface_new (display, "text-input",
++                                 100, 100, 0xffffffff);
++  wl_surface_commit (surface->wl_surface);
++  wait_for_enter (display, surface);
++
++  zwp_text_input_v3_enable (text_input);
++  zwp_text_input_v3_set_cursor_rectangle (text_input, 10, 20, 30, 40);
++  zwp_text_input_v3_commit (text_input);
++  wl_surface_commit (surface->wl_surface);
++
++  test_driver_sync_point (display->test_driver, 0, NULL);
++  wait_for_sync_event (display, 0);
++}
++
++int
++main (int    argc,
++      char **argv)
++{
++  g_autoptr (WaylandDisplay) display = NULL;
++  struct wl_registry *registry;
++  struct zwp_text_input_v3 *text_input;
++
++  display = wayland_display_new (WAYLAND_DISPLAY_CAPABILITY_TEST_DRIVER);
++  registry = wl_display_get_registry (display->display);
++  wl_registry_add_listener (registry, &registry_listener, NULL);
++  wl_display_roundtrip (display->display);
++
++  g_assert_nonnull (text_input_manager);
++
++  text_input = zwp_text_input_manager_v3_get_text_input (text_input_manager,
++                                                         display->wl_seat);
++  zwp_text_input_v3_add_listener (text_input, &text_input_listener, NULL);
++
++  if (g_strcmp0 (argv[1], "cursor-rectangle-after-focus-change") == 0)
++    cursor_rectangle_after_focus_change (display, text_input);
++  else
++    g_assert_not_reached ();
++
++  zwp_text_input_v3_destroy (text_input);
++  zwp_text_input_manager_v3_destroy (text_input_manager);
++  wl_registry_destroy (registry);
++
++  return EXIT_SUCCESS;
++}
+diff --git a/src/tests/wayland-text-input-tests.c b/src/tests/wayland-text-input-tests.c
+new file mode 100644
+index 0000000000..f60b5acb29
+--- /dev/null
++++ b/src/tests/wayland-text-input-tests.c
+@@ -0,0 +1,115 @@
++/*
++ * Copyright (C) 2026 Kristof Imeri
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of the
++ * License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "config.h"
++
++#include "backends/meta-backend-private.h"
++#include "tests/meta-wayland-test-runner.h"
++#include "tests/meta-wayland-test-utils.h"
++
++#define TEST_TYPE_INPUT_METHOD (test_input_method_get_type ())
++G_DECLARE_FINAL_TYPE (TestInputMethod, test_input_method,
++                      TEST, INPUT_METHOD, ClutterInputMethod)
++
++struct _TestInputMethod
++{
++  ClutterInputMethod parent;
++
++  graphene_rect_t cursor_location;
++};
++
++G_DEFINE_TYPE (TestInputMethod, test_input_method, CLUTTER_TYPE_INPUT_METHOD)
++
++static void
++test_input_method_focus_in (ClutterInputMethod *im,
++                            ClutterInputFocus  *focus)
++{
++}
++
++static void
++test_input_method_focus_out (ClutterInputMethod *im)
++{
++}
++
++static void
++test_input_method_reset (ClutterInputMethod *im)
++{
++}
++
++static void
++test_input_method_set_cursor_location (ClutterInputMethod    *im,
++                                       const graphene_rect_t *rect)
++{
++  TEST_INPUT_METHOD (im)->cursor_location = *rect;
++}
++
++static void
++test_input_method_class_init (TestInputMethodClass *klass)
++{
++  ClutterInputMethodClass *im_class = CLUTTER_INPUT_METHOD_CLASS (klass);
++
++  im_class->focus_in = test_input_method_focus_in;
++  im_class->focus_out = test_input_method_focus_out;
++  im_class->reset = test_input_method_reset;
++  im_class->set_cursor_location = test_input_method_set_cursor_location;
++}
++
++static void
++test_input_method_init (TestInputMethod *im)
++{
++}
++
++static void
++text_input_cursor_rectangle_after_focus_change (void)
++{
++  MetaBackend *backend = meta_context_get_backend (test_context);
++  ClutterBackend *clutter_backend = meta_backend_get_clutter_backend (backend);
++  g_autoptr (TestInputMethod) im = NULL;
++  MetaWaylandTestClient *wayland_test_client;
++
++  im = g_object_new (TEST_TYPE_INPUT_METHOD, NULL);
++  clutter_backend_set_input_method (clutter_backend, CLUTTER_INPUT_METHOD (im));
++
++  wayland_test_client =
++    meta_wayland_test_client_new_with_args (test_context,
++                                            "text-input",
++                                            "cursor-rectangle-after-focus-change",
++                                            NULL);
++  meta_wayland_test_driver_wait_for_sync_point (test_driver, 0);
++
++  g_assert_cmpfloat (im->cursor_location.size.width, ==, 30);
++  g_assert_cmpfloat (im->cursor_location.size.height, ==, 40);
++
++  meta_wayland_test_driver_emit_sync_event (test_driver, 0);
++  meta_wayland_test_client_finish (wayland_test_client);
++
++  clutter_backend_set_input_method (clutter_backend, NULL);
++}
++
++static void
++init_tests (void)
++{
++  g_test_add_func ("/wayland/text-input/cursor-rectangle-after-focus-change",
++                   text_input_cursor_rectangle_after_focus_change);
++}
++
++int
++main (int   argc,
++      char *argv[])
++{
++  return meta_run_wayland_tests (argc, argv, init_tests);
++}

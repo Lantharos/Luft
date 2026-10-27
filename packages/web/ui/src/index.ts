@@ -47,16 +47,7 @@ export { default as NativeVideoSurface } from './playback/NativeVideoSurface.sve
 export { default as SeekBar } from './playback/SeekBar.svelte';
 export { default as VolumeControl } from './playback/VolumeControl.svelte';
 
-export {
-	deleteFingerprint,
-	fingerInSentence,
-	fingerLabel,
-	FINGERS,
-	FingerprintEnrollment,
-	fingerprintReader,
-	fingerprints,
-	type Fingerprints
-} from './security/fingerprint.svelte';
+export { fingerInSentence, fingerLabel, FINGERS, FingerprintEnrollment, type Fingerprints } from './security/fingerprint.svelte';
 export { default as FingerprintDial } from './security/FingerprintDial.svelte';
 export { default as EncryptionWizard, type EncryptionCheck, type EncryptionStep } from './security/EncryptionWizard.svelte';
 export { default as PassphraseFields } from './security/PassphraseFields.svelte';

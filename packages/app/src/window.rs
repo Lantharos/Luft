@@ -114,7 +114,7 @@ pub fn run(
 ) -> ! {
     let events = events.clone();
     SabineWindow::main_with_process(
-        move |window| Ok(desktop::declare_events(build(window))),
+        move |window| Ok(desktop::declare_appearance(build(window))),
         move |process| {
             if let Some(emitter) = process.bridge_event_emitter() {
                 events.attach(emitter);

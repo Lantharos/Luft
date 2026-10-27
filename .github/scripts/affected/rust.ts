@@ -7,7 +7,7 @@ import { git } from './range';
 
 type Table = Record<string, unknown>;
 type Manifest = Table & {
-	package?: { name: string };
+	package?: { name: string; metadata?: { bindings?: { path: string } } };
 	target?: Record<string, Table>;
 	workspace?: { members: string[]; dependencies: Record<string, Table | string> };
 };
@@ -42,7 +42,9 @@ export function buildRust(graph: Graph, files: string[]): Crate[] {
 	const crates = root.workspace!.members.map((dir) => {
 		const manifest = parse(readFileSync(join(dir, 'Cargo.toml'), 'utf8'));
 		const inherits = dependencyNames(manifest);
-		graph.add(dir, inherits.flatMap((name) => paths.get(name) ?? []));
+		const node = graph.add(dir, inherits.flatMap((name) => paths.get(name) ?? []));
+		const bindings = manifest.package!.metadata?.bindings;
+		if (bindings) graph.link(node, join(dir, bindings.path), false);
 		return {
 			dir,
 			name: manifest.package!.name,

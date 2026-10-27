@@ -2,7 +2,8 @@ use std::collections::HashMap;
 
 use futures_util::StreamExt;
 use sabine::BridgeEvent;
-use serde::Serialize;
+use serde::de::{IntoDeserializer, value};
+use serde::{Deserialize, Serialize};
 use specta::datatype::DataType;
 use specta::{Type, Types};
 use zbus::Proxy;
@@ -17,39 +18,52 @@ const DESTINATION: &str = "com.lantharos.Kestrel";
 const PATH: &str = "/com/lantharos/Kestrel/Appearance";
 const INTERFACE: &str = "com.lantharos.Kestrel.Appearance";
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Palette {
     accent: String,
     wallpaper_accent: String,
     pure_black: bool,
-    colors: Schemes,
-    terminal: Schemes,
+    colors: SchemeColors,
+    terminal: SchemeColors,
     app_icons: AppIcons,
-    taskbar: serde_json::Value,
+    taskbar: TaskbarLooks,
 }
 
 #[derive(Serialize)]
+#[serde(transparent)]
+pub struct TaskbarLooks(serde_json::Value);
+
+impl Type for TaskbarLooks {
+    fn definition(_: &mut Types) -> DataType {
+        DataType::Reference(specta_typescript::define(
+            "import(\"@luft/ui\").TaskbarLooks",
+        ))
+    }
+}
+
+#[derive(Deserialize, Serialize, Type)]
+#[serde(rename_all = "lowercase")]
+pub enum AppIconStyle {
+    Default,
+    Tinted,
+    Clear,
+}
+
+#[derive(Serialize, Type)]
 pub struct AppIcons {
-    style: String,
+    style: AppIconStyle,
     glyphs: String,
     tinted: IconPaint,
     clear: IconPaint,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct IconPaint {
     plate: String,
     ink: String,
     shade: String,
     rim: f64,
-}
-
-/// Pages read the palette through `@luft/ui`, which owns its TypeScript type.
-impl Type for Palette {
-    fn definition(_: &mut Types) -> DataType {
-        DataType::Reference(specta_typescript::define("import(\"@luft/ui\").Palette"))
-    }
 }
 
 impl AppIcons {
@@ -65,19 +79,22 @@ impl AppIcons {
         Some(Self {
             tinted: paint("tinted")?,
             clear: paint("clear")?,
-            style: map.remove("style")?,
+            style: AppIconStyle::deserialize(IntoDeserializer::<value::Error>::into_deserializer(
+                map.remove("style")?,
+            ))
+            .ok()?,
             glyphs: map.remove("glyphs")?,
         })
     }
 }
 
-#[derive(Serialize)]
-pub struct Schemes {
+#[derive(Serialize, Type)]
+pub struct SchemeColors {
     light: HashMap<String, String>,
     dark: HashMap<String, String>,
 }
 
-impl Schemes {
+impl SchemeColors {
     async fn read(proxy: &Proxy<'_>, prefix: &str) -> Option<Self> {
         Some(Self {
             light: proxy.get_property(&format!("Light{prefix}")).await.ok()?,
@@ -97,10 +114,12 @@ pub async fn palette() -> Option<Palette> {
         accent,
         wallpaper_accent: proxy.get_property("WallpaperAccentColor").await.ok()?,
         pure_black: proxy.get_property("PureBlack").await.ok()?,
-        colors: Schemes::read(&proxy, "Colors").await?,
-        terminal: Schemes::read(&proxy, "TerminalColors").await?,
+        colors: SchemeColors::read(&proxy, "Colors").await?,
+        terminal: SchemeColors::read(&proxy, "TerminalColors").await?,
         app_icons: AppIcons::from_map(proxy.get_property("AppIcons").await.ok()?)?,
-        taskbar: serde_json::from_str(&proxy.get_property::<String>("Taskbar").await.ok()?).ok()?,
+        taskbar: TaskbarLooks(
+            serde_json::from_str(&proxy.get_property::<String>("Taskbar").await.ok()?).ok()?,
+        ),
     })
 }
 

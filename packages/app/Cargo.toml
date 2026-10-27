@@ -7,6 +7,9 @@ license.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 
+[package.metadata.bindings]
+path = "../web/ui/src/bindings/appearance.ts"
+
 [features]
 apps = ["dep:dirs", "dep:gio", "dep:gio-unix"]
 fonts = ["dep:dirs", "dep:gio", "dep:memmap2", "dep:skrifa"]

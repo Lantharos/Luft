@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use crate::handoff::partition_guid;
 
@@ -12,7 +13,7 @@ const LARGEST: usize = 512;
 const MIB: u64 = 1 << 20;
 const GIB: u64 = 1 << 30;
 
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Type)]
 #[serde(tag = "change", rename_all = "camelCase")]
 pub enum Change {
     Grow,

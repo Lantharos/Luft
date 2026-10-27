@@ -1,20 +1,11 @@
 import { errorText } from '../text/errors';
-import { invoke, listen } from '@lantharos/sabine';
 import { t } from '@luft/i18n';
 
+import { commands, events, type Fingerprints } from '../bindings/fingerprint';
+
+export type { Fingerprints } from '../bindings/fingerprint';
+
 const WAIT_FOR_PERMISSION = 300_000;
-const PROGRESS = 'fingerprint.enroll';
-
-export interface Fingerprints {
-	swipe: boolean;
-	stages: number;
-	enrolled: string[];
-}
-
-interface EnrollProgress {
-	result: string;
-	done: boolean;
-}
 
 export type EnrollPhase = 'choosing' | 'scanning' | 'added' | 'failed';
 
@@ -42,10 +33,6 @@ export const fingerInSentence = (finger: string) => {
 	const messages = MESSAGES.get(finger);
 	return messages ? t(messages[1]) : finger;
 };
-
-export const fingerprintReader = () => invoke<boolean>('fingerprint_reader');
-export const fingerprints = () => invoke<Fingerprints | null>('fingerprint_list');
-export const deleteFingerprint = (finger: string) => invoke<void>('fingerprint_delete', { finger }, { timeoutMs: WAIT_FOR_PERMISSION });
 
 const PROGRESS_MESSAGES: Record<string, string> = {
 	'enroll-retry-scan': 'ui-fingerprint-retry',
@@ -98,7 +85,7 @@ export class FingerprintEnrollment {
 		this.passed = 0;
 		this.result = '';
 		this.describe = () => t(swipe ? 'ui-fingerprint-swipe' : 'ui-fingerprint-place', { finger: fingerInSentence(finger) });
-		this.stopListening ??= listen<EnrollProgress>(PROGRESS, ({ result, done }) => {
+		this.stopListening ??= events.fingerprintEnroll(({ result, done }) => {
 			if (result === 'enroll-stage-passed') this.passed += 1;
 			this.describe = () => progressMessage(result, swipe);
 			if (!done) return;
@@ -106,7 +93,7 @@ export class FingerprintEnrollment {
 			this.phase = result === 'enroll-completed' ? 'added' : 'failed';
 		});
 		try {
-			await invoke<void>('fingerprint_enroll', { finger }, { timeoutMs: WAIT_FOR_PERMISSION });
+			await commands.fingerprintEnroll({ finger }, { timeoutMs: WAIT_FOR_PERMISSION });
 		} catch (reason) {
 			this.phase = 'failed';
 			const message = errorText(reason);
@@ -115,7 +102,7 @@ export class FingerprintEnrollment {
 	}
 
 	cancel() {
-		if (this.phase === 'scanning') void invoke<void>('fingerprint_stop');
+		if (this.phase === 'scanning') void commands.fingerprintStop();
 	}
 
 	choose() {

@@ -8,7 +8,7 @@ const SYSTEM_STORED: u32 = 0;
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Type)]
 #[serde(rename_all = "lowercase")]
-pub enum Method {
+pub enum EapMethod {
     Peap,
     Ttls,
     Tls,
@@ -17,7 +17,7 @@ pub enum Method {
 #[derive(Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Enterprise {
-    method: Method,
+    method: EapMethod,
     inner: String,
     identity: String,
     anonymous_identity: String,
@@ -28,19 +28,19 @@ pub struct Enterprise {
     private_key: Option<String>,
 }
 
-fn method(name: &str) -> Method {
+fn method(name: &str) -> EapMethod {
     match name {
-        "ttls" => Method::Ttls,
-        "tls" => Method::Tls,
-        _ => Method::Peap,
+        "ttls" => EapMethod::Ttls,
+        "tls" => EapMethod::Tls,
+        _ => EapMethod::Peap,
     }
 }
 
-fn method_name(method: Method) -> &'static str {
+fn method_name(method: EapMethod) -> &'static str {
     match method {
-        Method::Peap => "peap",
-        Method::Ttls => "ttls",
-        Method::Tls => "tls",
+        EapMethod::Peap => "peap",
+        EapMethod::Ttls => "ttls",
+        EapMethod::Tls => "tls",
     }
 }
 
@@ -61,15 +61,15 @@ fn put_file(group: &mut Group, key: &str, path: Option<&str>) {
 
 pub fn secret_key(group: Option<&Group>) -> &'static str {
     match load(group).method {
-        Method::Tls => "private-key-password",
-        Method::Peap | Method::Ttls => "password",
+        EapMethod::Tls => "private-key-password",
+        EapMethod::Peap | EapMethod::Ttls => "password",
     }
 }
 
 pub fn load(group: Option<&Group>) -> Enterprise {
     let methods: Vec<String> = read(group, "eap").unwrap_or_default();
     Enterprise {
-        method: methods.first().map_or(Method::Peap, |name| method(name)),
+        method: methods.first().map_or(EapMethod::Peap, |name| method(name)),
         inner: read(group, "phase2-auth").unwrap_or_else(|| "mschapv2".to_owned()),
         identity: read(group, "identity").unwrap_or_default(),
         anonymous_identity: read(group, "anonymous-identity").unwrap_or_default(),
@@ -93,7 +93,7 @@ pub fn store(group: &mut Group, enterprise: &Enterprise, secret: Option<&str>) {
     put_file(group, "ca-cert", enterprise.ca_certificate.as_deref());
     put(group, "system-ca-certs", enterprise.system_certificates);
     group.remove("phase2-autheap");
-    let tls = enterprise.method == Method::Tls;
+    let tls = enterprise.method == EapMethod::Tls;
     let (client_certificate, private_key) = if tls {
         (
             enterprise.client_certificate.as_deref(),

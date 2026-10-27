@@ -1,5 +1,5 @@
 use luft_dbus::objects::{Object, Objects};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use specta::Type;
 
 use super::health::{self, Health};
@@ -11,8 +11,8 @@ pub struct Snapshot {
     pub drives: Vec<Drive>,
 }
 
-#[derive(Serialize, Clone, Copy, PartialEq, Type)]
-#[serde(rename_all = "lowercase")]
+#[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Type)]
+#[serde(rename = "DriveKind", rename_all = "lowercase")]
 pub enum Kind {
     Nvme,
     Ssd,

@@ -10,7 +10,7 @@ use zbus::{OwnedVariant, Proxy};
 use crate::bridge::events::Events;
 use crate::dbus;
 
-pub fn declare_events(window: SabineWindow) -> SabineWindow {
+pub fn declare_appearance(window: SabineWindow) -> SabineWindow {
     window
         .bridge_event(&palette::PALETTE_CHANGED)
         .bridge_event(&typography::TYPOGRAPHY_CHANGED)

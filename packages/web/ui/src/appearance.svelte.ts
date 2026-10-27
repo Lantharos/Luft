@@ -1,67 +1,18 @@
-import { events, listen, system } from '@lantharos/sabine';
-import { i18n, type Locale } from '@luft/i18n';
+import { events as systemEvents, system } from '@lantharos/sabine';
+import { i18n } from '@luft/i18n';
 
-import type { MotionPreference } from './motion';
+import { events, type AppIcons, type Appearance, type Corners, type Motion, type Palette, type SchemeColors, type Typography } from './bindings/appearance';
 import type { TaskbarLooks } from './taskbar/looks';
 
-const PALETTE_CHANGED = 'kestrel.palette';
-const TYPOGRAPHY_CHANGED = 'appearance.typography';
-const MOTION_CHANGED = 'appearance.motion';
-const CORNERS_CHANGED = 'appearance.corners';
+export type { AppIconStyle, Appearance, Palette, SchemeColors } from './bindings/appearance';
+
 const SANS = "'Open Runde', ui-sans-serif, system-ui, sans-serif";
 const MONO = "'Maple Mono NF', ui-monospace, monospace";
-
-export interface SchemeColors {
-	light: Record<string, string>;
-	dark: Record<string, string>;
-}
-
-export type AppIconStyle = 'default' | 'tinted' | 'clear';
-
-export interface AppIconPaint {
-	plate: string;
-	ink: string;
-	shade: string;
-	rim: number;
-}
-
-export interface AppIcons {
-	style: AppIconStyle;
-	glyphs: string;
-	tinted: AppIconPaint;
-	clear: AppIconPaint;
-}
-
-export interface Palette {
-	accent: string;
-	wallpaperAccent: string;
-	pureBlack: boolean;
-	colors: SchemeColors;
-	terminal: SchemeColors;
-	appIcons: AppIcons;
-	taskbar: TaskbarLooks;
-}
 
 const TERMINAL_HUES = ['red', 'green', 'yellow', 'blue', 'magenta', 'cyan'];
 const SCHEMES = ['light', 'dark'] as const;
 
 export type Scheme = 'dark' | 'light';
-
-export type Corners = 'rounded' | 'square';
-
-export interface Typography {
-	interface: string | null;
-	monospace: string | null;
-	textScale: number;
-}
-
-export interface Appearance {
-	palette: Palette | null;
-	typography: Typography;
-	motion: MotionPreference;
-	corners?: Corners;
-	locale?: Locale;
-}
 
 const kebab = (name: string) => name.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
 const fontList = (family: string | null, fallback: string) => (family ? `"${family.replace(/["\\]/g, '\\$&')}", ${fallback}` : fallback);
@@ -77,7 +28,7 @@ class AppearanceState {
 	appIcons = $state<AppIcons | null>(null);
 	taskbar = $state<TaskbarLooks | null>(null);
 	typography = $state<Typography>({ interface: null, monospace: null, textScale: 1 });
-	motion = $state<MotionPreference>('full');
+	motion = $state<Motion>('full');
 	corners = $state<Corners>('rounded');
 	fontSans = $derived(fontList(this.typography.interface, SANS));
 	fontMono = $derived(fontList(this.typography.monospace, MONO));
@@ -87,20 +38,20 @@ class AppearanceState {
 		if (initial.palette) this.receive(initial.palette);
 		this.type(initial.typography);
 		this.move(initial.motion);
-		this.round(initial.corners ?? 'rounded');
+		this.round(initial.corners);
 		void i18n.start(initial.locale);
 		const stops = [
-			listen<Palette>(PALETTE_CHANGED, (palette) => this.receive(palette)),
-			events.appearanceChanged(({ colorScheme }) => (this.scheme = colorScheme)),
-			listen<Typography>(TYPOGRAPHY_CHANGED, (typography) => this.type(typography)),
-			listen<MotionPreference>(MOTION_CHANGED, (motion) => this.move(motion)),
-			listen<Corners>(CORNERS_CHANGED, (corners) => this.round(corners))
+			events.kestrelPalette((palette) => this.receive(palette)),
+			systemEvents.appearanceChanged(({ colorScheme }) => (this.scheme = colorScheme)),
+			events.appearanceTypography((typography) => this.type(typography)),
+			events.appearanceMotion((motion) => this.move(motion)),
+			events.appearanceCorners((corners) => this.round(corners))
 		];
 		void system.appearance().then(({ colorScheme }) => (this.scheme = colorScheme));
 		return () => stops.forEach((stop) => stop());
 	}
 
-	private move(motion: MotionPreference) {
+	private move(motion: Motion) {
 		this.motion = motion;
 		document.documentElement.dataset.motion = motion;
 	}

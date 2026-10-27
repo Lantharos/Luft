@@ -19,7 +19,7 @@ const INTERFACE_LENGTH: usize = 15;
 
 #[derive(Deserialize, Default, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct Peer {
+pub struct WireGuardPeer {
     public_key: String,
     preshared_key: String,
     endpoint: String,
@@ -36,12 +36,12 @@ pub struct WireGuard {
     dns: Vec<String>,
     mtu: Option<u32>,
     listen_port: Option<u32>,
-    peers: Vec<Peer>,
+    peers: Vec<WireGuardPeer>,
 }
 
 #[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct Keys {
+pub struct WireGuardKeys {
     private_key: String,
     public_key: String,
 }
@@ -60,13 +60,13 @@ fn encode(bytes: [u8; 32]) -> String {
     glib::base64_encode(&bytes).to_string()
 }
 
-pub fn generate() -> Result<Keys, String> {
+pub fn generate() -> Result<WireGuardKeys, String> {
     let mut secret = [0_u8; 32];
     getrandom::fill(&mut secret).map_err(failed)?;
     secret[0] &= 248;
     secret[31] &= 127;
     secret[31] |= 64;
-    Ok(Keys {
+    Ok(WireGuardKeys {
         private_key: encode(secret),
         public_key: encode(x25519(secret, X25519_BASEPOINT_BYTES)),
     })
@@ -112,7 +112,7 @@ pub fn parse(text: &str, name: String) -> Result<WireGuard, String> {
             in_peer = false;
         } else if line.eq_ignore_ascii_case("[peer]") {
             in_peer = true;
-            config.peers.push(Peer::default());
+            config.peers.push(WireGuardPeer::default());
         } else if let Some((key, value)) = line.split_once('=') {
             let value = value.trim();
             match (in_peer, config.peers.last_mut()) {
@@ -136,7 +136,7 @@ fn read_interface(config: &mut WireGuard, key: &str, value: &str) -> Result<(), 
     Ok(())
 }
 
-fn read_peer(peer: &mut Peer, key: &str, value: &str) -> Result<(), String> {
+fn read_peer(peer: &mut WireGuardPeer, key: &str, value: &str) -> Result<(), String> {
     match key.to_ascii_lowercase().as_str() {
         "publickey" => peer.public_key = value.to_owned(),
         "presharedkey" => peer.preshared_key = value.to_owned(),
@@ -161,7 +161,7 @@ fn interface(name: &str) -> String {
     }
 }
 
-fn peer(peer: &Peer) -> Result<HashMap<String, Variant<'static>>, String> {
+fn peer(peer: &WireGuardPeer) -> Result<HashMap<String, Variant<'static>>, String> {
     key(&peer.public_key, "server's public key")?;
     let mut entry = HashMap::from([
         (

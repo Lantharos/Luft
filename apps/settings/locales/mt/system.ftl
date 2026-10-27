@@ -136,25 +136,6 @@ settings-updates-downloading = Qed jitniżżlu l-aġġornamenti…
 settings-updates-rolling-back = Qed titħejja l-verżjoni ta’ qabel…
 settings-updates-switching-nvidia = Qed jitniżżel id-drajver ta’ NVIDIA…
 settings-updates-switching-standard = Qed titniżżel l-immaġni standard…
-settings-updates-elsewhere-refresh-by = Qed isir tiftix għal aġġornamenti minn { $app }
-settings-updates-elsewhere-download-by = L-aġġornamenti qed jitniżżlu minn { $app }
-settings-updates-elsewhere-update-by = L-aġġornamenti qed jiġu installati minn { $app }
-settings-updates-elsewhere-update = L-aġġornamenti qed jiġu installati
-settings-updates-elsewhere-install-by = Qed jiġi installat softwer minn { $app }
-settings-updates-elsewhere-install = Qed jiġi installat softwer
-settings-updates-elsewhere-remove-by = Qed jitneħħa softwer minn { $app }
-settings-updates-elsewhere-remove = Qed jitneħħa softwer
-settings-updates-elsewhere-change-by = Qed jinbidel softwer minn { $app }
-settings-updates-elsewhere-change = Qed jinbidel softwer
-settings-updates-elsewhere-wait = Tista’ terġa’ tfittex aġġornamenti meta jispiċċa
-settings-updates-ready = L-aġġornamenti huma lesti biex jiġu installati
-settings-updates-available = { $count ->
-    [one] Hemm { $count } aġġornament disponibbli
-    [two] Hemm { $count } aġġornamenti disponibbli
-    [few] Hemm { $count } aġġornamenti disponibbli
-    [many] Hemm { $count } aġġornament disponibbli
-   *[other] Hemm { $count } aġġornament disponibbli
-}
 settings-updates-up-to-date = Is-sistema hija aġġornata
 settings-updates-version = Verżjoni { $version }
 settings-updates-version-new = Verżjoni ġdida
@@ -166,13 +147,11 @@ settings-updates-version-available = Il-verżjoni { $version } hija disponibbli
 settings-updates-version-available-new = Hemm verżjoni ġdida disponibbli
 settings-updates-version-staged = Il-verżjoni { $version } hija lesta biex tiġi installata
 settings-updates-version-staged-new = Verżjoni ġdida hija lesta biex tiġi installata
-settings-updates-restart-install-them = Irristartja biex tinstallahom. Il-kompjuter jerġa’ jkun lest fi ftit minuti.
 settings-updates-restart-return = Irristartja biex tlesti l-mogħdija lura.
 settings-updates-restart-switch = Irristartja biex tlesti. Il-kompjuter jerġa’ jkun lest fi ftit minuti.
 settings-updates-restart-install-it = Irristartja biex tinstallaha. Il-kompjuter jerġa’ jkun lest fi ftit minuti.
 settings-updates-last-checked = L-aħħar verifika: { $when }
 settings-updates-never-checked = Għadu ma ġiex iċċekkjat
-settings-updates-installed-when = Aġġornamenti installati: { $when }
 settings-updates-stop = Waqqaf
 settings-updates-check = Iċċekkja issa
 settings-updates-checking-button = Qed jiċċekkja…
@@ -202,43 +181,7 @@ settings-updates-firmware-restart = Jitlesta meta tirristartja
 settings-updates-firmware-installing = Qed jiġi installat…
 settings-updates-firmware-update = Aġġorna
 settings-updates-firmware-failed = Il-firmware ma setax jiġi aġġornat
-settings-updates-failed = L-aħħar aġġornamenti ma setgħux jiġu installati
-settings-updates-failed-description = Is-sistema tħalliet kif kienet
-settings-updates-includes = { $parts ->
-    [security] Jinkludu tiswijiet tas-sigurtà
-    [kernel] Jinkludu kernel ġdid ta’ Linux
-    [drivers] Jinkludu drajvers aġġornati
-    [security-kernel] Jinkludu tiswijiet tas-sigurtà u kernel ġdid ta’ Linux
-    [security-drivers] Jinkludu tiswijiet tas-sigurtà u drajvers aġġornati
-    [kernel-drivers] Jinkludu kernel ġdid ta’ Linux u drajvers aġġornati
-    [security-kernel-drivers] Jinkludu tiswijiet tas-sigurtà, kernel ġdid ta’ Linux u drajvers aġġornati
-   *[other] Tiswijiet u titjib fis-sistema kollha
-}
-settings-updates-count-size = { $count ->
-    [one] { $count } aġġornament · { $size }
-    [two] { $count } aġġornamenti · { $size }
-    [few] { $count } aġġornamenti · { $size }
-    [many] { $count } aġġornament · { $size }
-   *[other] { $count } aġġornament · { $size }
-}
-settings-updates-restart-and-install = Irristartja u installa
 settings-updates-download = Niżżel
-settings-updates-see-included = Ara x’fihom
-settings-updates-included = X’fihom
-settings-updates-included-description = { $count ->
-    [one] { $count } aġġornament għas-sistema, id-drajvers u l-libreriji tagħha
-    [two] { $count } aġġornamenti għas-sistema, id-drajvers u l-libreriji tagħha
-    [few] { $count } aġġornamenti għas-sistema, id-drajvers u l-libreriji tagħha
-    [many] { $count } aġġornament għas-sistema, id-drajvers u l-libreriji tagħha
-   *[other] { $count } aġġornament għas-sistema, id-drajvers u l-libreriji tagħha
-}
-settings-updates-security-fix = Tiswija tas-sigurtà
-settings-updates-done = Lest
-settings-updates-area-kernel = Kernel ta’ Linux
-settings-updates-area-drivers = Drajvers u firmware
-settings-updates-area-desktop = Desktop
-settings-updates-area-core = Sistema ewlenija
-settings-updates-area-other = Libreriji u għodod
 settings-updates-released = Ħareġ: { $when }
 settings-updates-improvements = Tiswijiet u titjib fis-sistema kollha
 settings-updates-download-size = { $size } biex jitniżżlu

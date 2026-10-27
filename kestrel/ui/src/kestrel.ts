@@ -11,4 +11,4 @@ export { getInputSourceManager } from './shell/status/devices/keyboard.js';
 export { getStyleVariant } from './shell/stage/kestrelTheme.js';
 export { SwitcherPopup } from './shell/switchers/switcherPopup.js';
 export { getLoginManager } from './shell/system/loginManager.js';
-export { loadPendingUpdates } from './shell/system/pendingUpdates.js';
+export { loadStagedImage } from './shell/system/stagedImage.js';

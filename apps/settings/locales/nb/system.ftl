@@ -130,22 +130,6 @@ settings-updates-downloading = Laster ned oppdateringer…
 settings-updates-rolling-back = Gjør klar den forrige versjonen…
 settings-updates-switching-nvidia = Laster ned NVIDIAs driver…
 settings-updates-switching-standard = Laster ned standardbildet…
-settings-updates-elsewhere-refresh-by = { $app } ser etter oppdateringer
-settings-updates-elsewhere-download-by = Oppdateringer lastes ned av { $app }
-settings-updates-elsewhere-update-by = Oppdateringer installeres av { $app }
-settings-updates-elsewhere-update = Oppdateringer installeres
-settings-updates-elsewhere-install-by = Programvare installeres av { $app }
-settings-updates-elsewhere-install = Programvare installeres
-settings-updates-elsewhere-remove-by = Programvare fjernes av { $app }
-settings-updates-elsewhere-remove = Programvare fjernes
-settings-updates-elsewhere-change-by = Programvare endres av { $app }
-settings-updates-elsewhere-change = Programvare endres
-settings-updates-elsewhere-wait = Du kan se etter oppdateringer igjen når det er ferdig
-settings-updates-ready = Oppdateringer er klare til å installeres
-settings-updates-available = { $count ->
-    [one] { $count } oppdatering er tilgjengelig
-   *[other] { $count } oppdateringer er tilgjengelige
-}
 settings-updates-up-to-date = Systemet ditt er oppdatert
 settings-updates-version = Versjon { $version }
 settings-updates-version-new = En ny versjon
@@ -157,13 +141,11 @@ settings-updates-version-available = Versjon { $version } er tilgjengelig
 settings-updates-version-available-new = En ny versjon er tilgjengelig
 settings-updates-version-staged = Versjon { $version } er klar til å installeres
 settings-updates-version-staged-new = En ny versjon er klar til å installeres
-settings-updates-restart-install-them = Start på nytt for å installere dem. Datamaskinen er tilbake om noen minutter.
 settings-updates-restart-return = Start på nytt for å fullføre tilbakegangen.
 settings-updates-restart-switch = Start på nytt for å fullføre. Datamaskinen er tilbake om noen minutter.
 settings-updates-restart-install-it = Start på nytt for å installere den. Datamaskinen er tilbake om noen minutter.
 settings-updates-last-checked = Sist sjekket { $when }
 settings-updates-never-checked = Ikke sjekket ennå
-settings-updates-installed-when = Oppdateringer installert { $when }
 settings-updates-stop = Stopp
 settings-updates-check = Sjekk nå
 settings-updates-checking-button = Sjekker…
@@ -190,37 +172,7 @@ settings-updates-firmware-restart = Fullføres når du starter på nytt
 settings-updates-firmware-installing = Installerer…
 settings-updates-firmware-update = Oppdater
 settings-updates-firmware-failed = Kunne ikke oppdatere fastvaren
-settings-updates-failed = De siste oppdateringene kunne ikke installeres
-settings-updates-failed-description = Systemet ble latt være som det var
-settings-updates-includes = { $parts ->
-    [security] Inneholder sikkerhetsrettelser
-    [kernel] Inneholder en ny Linux-kjerne
-    [drivers] Inneholder oppdaterte drivere
-    [security-kernel] Inneholder sikkerhetsrettelser og en ny Linux-kjerne
-    [security-drivers] Inneholder sikkerhetsrettelser og oppdaterte drivere
-    [kernel-drivers] Inneholder en ny Linux-kjerne og oppdaterte drivere
-    [security-kernel-drivers] Inneholder sikkerhetsrettelser, en ny Linux-kjerne og oppdaterte drivere
-   *[other] Rettelser og forbedringer i hele systemet
-}
-settings-updates-count-size = { $count ->
-    [one] { $count } oppdatering · { $size }
-   *[other] { $count } oppdateringer · { $size }
-}
-settings-updates-restart-and-install = Start på nytt og installer
 settings-updates-download = Last ned
-settings-updates-see-included = Se hva som er med
-settings-updates-included = Hva som er med
-settings-updates-included-description = { $count ->
-    [one] { $count } oppdatering for systemet, driverne og bibliotekene
-   *[other] { $count } oppdateringer for systemet, driverne og bibliotekene
-}
-settings-updates-security-fix = Sikkerhetsrettelse
-settings-updates-done = Ferdig
-settings-updates-area-kernel = Linux-kjerne
-settings-updates-area-drivers = Drivere og fastvare
-settings-updates-area-desktop = Skrivebord
-settings-updates-area-core = Kjernesystem
-settings-updates-area-other = Biblioteker og verktøy
 settings-updates-released = Utgitt { $when }
 settings-updates-improvements = Rettelser og forbedringer i hele systemet
 settings-updates-download-size = { $size } å laste ned

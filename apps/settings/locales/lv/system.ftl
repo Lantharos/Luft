@@ -132,23 +132,6 @@ settings-updates-downloading = Lejupielādē atjauninājumus…
 settings-updates-rolling-back = Sagatavo iepriekšējo versiju…
 settings-updates-switching-nvidia = Lejupielādē NVIDIA draiveri…
 settings-updates-switching-standard = Lejupielādē standarta attēlu…
-settings-updates-elsewhere-refresh-by = { $app } meklē atjauninājumus
-settings-updates-elsewhere-download-by = { $app } lejupielādē atjauninājumus
-settings-updates-elsewhere-update-by = { $app } instalē atjauninājumus
-settings-updates-elsewhere-update = Notiek atjauninājumu instalēšana
-settings-updates-elsewhere-install-by = { $app } instalē programmatūru
-settings-updates-elsewhere-install = Notiek programmatūras instalēšana
-settings-updates-elsewhere-remove-by = { $app } noņem programmatūru
-settings-updates-elsewhere-remove = Notiek programmatūras noņemšana
-settings-updates-elsewhere-change-by = { $app } maina programmatūru
-settings-updates-elsewhere-change = Notiek programmatūras maiņa
-settings-updates-elsewhere-wait = Kad tas būs pabeigts, atjauninājumus varēs meklēt vēlreiz
-settings-updates-ready = Atjauninājumi ir gatavi instalēšanai
-settings-updates-available = { $count ->
-    [zero] Pieejami { $count } atjauninājumi
-    [one] Pieejams { $count } atjauninājums
-   *[other] Pieejami { $count } atjauninājumi
-}
 settings-updates-up-to-date = Sistēma ir atjaunināta
 settings-updates-version = Versija { $version }
 settings-updates-version-new = Jauna versija
@@ -160,13 +143,11 @@ settings-updates-version-available = Pieejama versija { $version }
 settings-updates-version-available-new = Pieejama jauna versija
 settings-updates-version-staged = Versija { $version } ir gatava instalēšanai
 settings-updates-version-staged-new = Jauna versija ir gatava instalēšanai
-settings-updates-restart-install-them = Restartējiet, lai tos instalētu. Pēc dažām minūtēm dators atkal būs gatavs darbam.
 settings-updates-restart-return = Restartējiet, lai pabeigtu atgriešanos.
 settings-updates-restart-switch = Restartējiet, lai pabeigtu. Pēc dažām minūtēm dators atkal būs gatavs darbam.
 settings-updates-restart-install-it = Restartējiet, lai to instalētu. Pēc dažām minūtēm dators atkal būs gatavs darbam.
 settings-updates-last-checked = Pēdējā pārbaude: { $when }
 settings-updates-never-checked = Vēl nav pārbaudīts
-settings-updates-installed-when = Atjauninājumi instalēti: { $when }
 settings-updates-stop = Apturēt
 settings-updates-check = Pārbaudīt tagad
 settings-updates-checking-button = Pārbauda…
@@ -194,39 +175,7 @@ settings-updates-firmware-restart = Tiks pabeigts pēc restartēšanas
 settings-updates-firmware-installing = Instalē…
 settings-updates-firmware-update = Atjaunināt
 settings-updates-firmware-failed = Aparātprogrammatūru neizdevās atjaunināt
-settings-updates-failed = Pēdējos atjauninājumus neizdevās instalēt
-settings-updates-failed-description = Sistēma palika tāda, kāda bija
-settings-updates-includes = { $parts ->
-    [security] Ietver drošības labojumus
-    [kernel] Ietver jaunu Linux kodolu
-    [drivers] Ietver atjauninātus draiverus
-    [security-kernel] Ietver drošības labojumus un jaunu Linux kodolu
-    [security-drivers] Ietver drošības labojumus un atjauninātus draiverus
-    [kernel-drivers] Ietver jaunu Linux kodolu un atjauninātus draiverus
-    [security-kernel-drivers] Ietver drošības labojumus, jaunu Linux kodolu un atjauninātus draiverus
-   *[other] Labojumi un uzlabojumi visā sistēmā
-}
-settings-updates-count-size = { $count ->
-    [zero] { $count } atjauninājumi · { $size }
-    [one] { $count } atjauninājums · { $size }
-   *[other] { $count } atjauninājumi · { $size }
-}
-settings-updates-restart-and-install = Restartēt un instalēt
 settings-updates-download = Lejupielādēt
-settings-updates-see-included = Skatīt, kas iekļauts
-settings-updates-included = Kas iekļauts
-settings-updates-included-description = { $count ->
-    [zero] { $count } atjauninājumi sistēmai, tās draiveriem un bibliotēkām
-    [one] { $count } atjauninājums sistēmai, tās draiveriem un bibliotēkām
-   *[other] { $count } atjauninājumi sistēmai, tās draiveriem un bibliotēkām
-}
-settings-updates-security-fix = Drošības labojums
-settings-updates-done = Gatavs
-settings-updates-area-kernel = Linux kodols
-settings-updates-area-drivers = Draiveri un aparātprogrammatūra
-settings-updates-area-desktop = Darbvirsma
-settings-updates-area-core = Sistēmas pamats
-settings-updates-area-other = Bibliotēkas un rīki
 settings-updates-released = Izlaists: { $when }
 settings-updates-improvements = Labojumi un uzlabojumi visā sistēmā
 settings-updates-download-size = Lejupielādējams apjoms: { $size }

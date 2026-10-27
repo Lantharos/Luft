@@ -1,6 +1,5 @@
 use super::Origin;
 use crate::cli::perform::{Plan, Verb};
-use crate::fedora;
 use crate::library::{self, InstalledApp, Source};
 use crate::operations::{Job, Request};
 
@@ -64,9 +63,6 @@ fn removal_job(app: &InstalledApp) -> Job {
                 .unwrap_or(luft_software::apps::flatpak::Installation::User),
             reference: app.reference.clone().unwrap_or_default(),
         },
-        Source::Package => Job::Fedora(fedora::Job::RemovePackage {
-            package: app.package.clone().unwrap_or_default(),
-        }),
         Source::Tool => Job::RemoveTool {
             package: app.package.clone().unwrap_or_default(),
         },

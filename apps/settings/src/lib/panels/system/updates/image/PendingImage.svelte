@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { ago, bytes, Row, Section } from '@luft/ui';
-	import { download, restart, rollback, type Activity, type ImageOverview, type Release } from '../api';
+	import { download, restart, rollback, type Activity, type SystemOverview, type Release } from '../api';
 	import { named, versionName } from '../headline';
 	import NotesDialog from './NotesDialog.svelte';
 
 	interface Props {
-		overview: ImageOverview;
+		overview: SystemOverview;
 		activity: Activity;
 		attempt: (action: () => Promise<void>) => void;
 	}

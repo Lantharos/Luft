@@ -49,7 +49,7 @@ Strings in Luft's French translation that a native speaker should check: terms w
 - `apps/settings/locales/fr/devices.ftl` `settings-display-night-light-warmth`: "Chaleur" — Windows calls this slider « Intensité »; check which is clearer.
 - `apps/settings/locales/fr/protection.ftl` `settings-encryption-progress-minutes`: "Terminé à { $percent }, encore environ { $minutes } minute" — also inserted into `settings-security-encrypting-progress` before « . Vous pouvez continuer… »; check it reads well there.
 - `apps/settings/locales/fr/protection.ftl` `settings-protection-remove`: "Supprimer" — one button for passkeys, SSH keys, the startup PIN and the anti-cheat firmware keys; check it suits the PIN, where « Retirer » might read softer.
-- `apps/settings/locales/fr/protection.ftl` `settings-passwords-ssh-added`: "Ajoutée { $when }" — assumes $when reads like « il y a 3 jours » or « hier ». Same for `settings-updates-installed-when` in system.ftl.
+- `apps/settings/locales/fr/protection.ftl` `settings-passwords-ssh-added`: "Ajoutée { $when }" — assumes $when reads like « il y a 3 jours » or « hier ».
 - `apps/settings/locales/fr/personalization.ftl` `settings-appearance-icons-clear`: "Transparentes" — the English "Clear" icon style is ambiguous (glass-like or plain); check against the actual look.
 - `apps/settings/locales/fr/personalization.ftl` `settings-accessibility-typing-assist-count`: "{ $count } activée" — agrees with « aide à la saisie »; check it reads well as a row summary.
 

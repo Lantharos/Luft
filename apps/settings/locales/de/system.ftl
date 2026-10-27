@@ -130,22 +130,6 @@ settings-updates-downloading = Updates werden heruntergeladen …
 settings-updates-rolling-back = Die frühere Version wird vorbereitet …
 settings-updates-switching-nvidia = Der NVIDIA-Treiber wird heruntergeladen …
 settings-updates-switching-standard = Das Standard-Image wird heruntergeladen …
-settings-updates-elsewhere-refresh-by = Nach Updates wird von { $app } gesucht
-settings-updates-elsewhere-download-by = Updates werden von { $app } heruntergeladen
-settings-updates-elsewhere-update-by = Updates werden von { $app } installiert
-settings-updates-elsewhere-update = Updates werden installiert
-settings-updates-elsewhere-install-by = Software wird von { $app } installiert
-settings-updates-elsewhere-install = Software wird installiert
-settings-updates-elsewhere-remove-by = Software wird von { $app } entfernt
-settings-updates-elsewhere-remove = Software wird entfernt
-settings-updates-elsewhere-change-by = Software wird von { $app } geändert
-settings-updates-elsewhere-change = Software wird geändert
-settings-updates-elsewhere-wait = Wenn das erledigt ist, kannst du wieder nach Updates suchen
-settings-updates-ready = Updates sind bereit zur Installation
-settings-updates-available = { $count ->
-    [one] { $count } Update ist verfügbar
-   *[other] { $count } Updates sind verfügbar
-}
 settings-updates-up-to-date = Dein System ist auf dem neuesten Stand
 settings-updates-version = Version { $version }
 settings-updates-version-new = Eine neue Version
@@ -157,13 +141,11 @@ settings-updates-version-available = Version { $version } ist verfügbar
 settings-updates-version-available-new = Eine neue Version ist verfügbar
 settings-updates-version-staged = Version { $version } ist bereit zur Installation
 settings-updates-version-staged-new = Eine neue Version ist bereit zur Installation
-settings-updates-restart-install-them = Starte neu, um sie zu installieren. Dein Computer ist in ein paar Minuten wieder da.
 settings-updates-restart-return = Starte neu, um die Rückkehr abzuschließen.
 settings-updates-restart-switch = Starte neu, um den Wechsel abzuschließen. Dein Computer ist in ein paar Minuten wieder da.
 settings-updates-restart-install-it = Starte neu, um sie zu installieren. Dein Computer ist in ein paar Minuten wieder da.
 settings-updates-last-checked = Zuletzt gesucht { $when }
 settings-updates-never-checked = Noch nicht gesucht
-settings-updates-installed-when = Updates installiert { $when }
 settings-updates-stop = Stoppen
 settings-updates-check = Jetzt suchen
 settings-updates-checking-button = Wird gesucht …
@@ -190,37 +172,7 @@ settings-updates-firmware-restart = Wird beim Neustart abgeschlossen
 settings-updates-firmware-installing = Wird installiert …
 settings-updates-firmware-update = Aktualisieren
 settings-updates-firmware-failed = Die Firmware konnte nicht aktualisiert werden
-settings-updates-failed = Die letzten Updates konnten nicht installiert werden
-settings-updates-failed-description = Dein System ist unverändert geblieben
-settings-updates-includes = { $parts ->
-    [security] Enthält Sicherheitskorrekturen
-    [kernel] Enthält einen neuen Linux-Kernel
-    [drivers] Enthält aktualisierte Treiber
-    [security-kernel] Enthält Sicherheitskorrekturen und einen neuen Linux-Kernel
-    [security-drivers] Enthält Sicherheitskorrekturen und aktualisierte Treiber
-    [kernel-drivers] Enthält einen neuen Linux-Kernel und aktualisierte Treiber
-    [security-kernel-drivers] Enthält Sicherheitskorrekturen, einen neuen Linux-Kernel und aktualisierte Treiber
-   *[other] Korrekturen und Verbesserungen im ganzen System
-}
-settings-updates-count-size = { $count ->
-    [one] { $count } Update · { $size }
-   *[other] { $count } Updates · { $size }
-}
-settings-updates-restart-and-install = Neu starten und installieren
 settings-updates-download = Herunterladen
-settings-updates-see-included = Inhalt ansehen
-settings-updates-included = Inhalt
-settings-updates-included-description = { $count ->
-    [one] { $count } Update für das System, seine Treiber und Bibliotheken
-   *[other] { $count } Updates für das System, seine Treiber und Bibliotheken
-}
-settings-updates-security-fix = Sicherheitskorrektur
-settings-updates-done = Fertig
-settings-updates-area-kernel = Linux-Kernel
-settings-updates-area-drivers = Treiber und Firmware
-settings-updates-area-desktop = Desktop
-settings-updates-area-core = Kernsystem
-settings-updates-area-other = Bibliotheken und Werkzeuge
 settings-updates-released = Veröffentlicht { $when }
 settings-updates-improvements = Korrekturen und Verbesserungen im ganzen System
 settings-updates-download-size = { $size } herunterzuladen

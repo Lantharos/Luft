@@ -16,7 +16,6 @@
     <file preprocess="xml-stripblanks">org.freedesktop.ModemManager1.Modem.ModemCdma.xml</file>
     <file preprocess="xml-stripblanks">org.freedesktop.ModemManager1.Modem.xml</file>
     <file preprocess="xml-stripblanks">org.freedesktop.Notifications.xml</file>
-    <file preprocess="xml-stripblanks">org.freedesktop.PackageKit.Offline.xml</file>
     <file preprocess="xml-stripblanks">org.freedesktop.UPower.Device.xml</file>
     <file preprocess="xml-stripblanks">org.freedesktop.UPower.PowerProfiles.xml</file>
     <file preprocess="xml-stripblanks">org.gnome.Mutter.ScreenCast.xml</file>

@@ -53,7 +53,6 @@ Strings in Luft's Italian translation that a native speaker should check: terms 
 - `apps/settings/locales/it/protection.ftl` `settings-passwords-stores`: "Credenziali delle app" — "sign-ins" apps keep in the keyring rendered as credenziali; check it doesn't sound like passwords in general.
 - `apps/settings/locales/it/protection.ftl` `settings-passwords-ssh-added`: "Aggiunta { $when }" — relies on $when being like "3 giorni fa" or "ieri".
 - `apps/settings/locales/it/system.ftl` `settings-datetime-week-start-regional`: "Come nella tua regione: { $day }" — reordered so a lowercase weekday name doesn't start the label.
-- `apps/settings/locales/it/system.ftl` `settings-updates-installed-when`: "Aggiornamenti installati { $when }" — relies on $when being a relative phrase like "ieri" or "5 minuti fa".
 - `apps/settings/locales/it/system.ftl` `settings-about-storage-free`: "Liberi: { $free } su { $total }" — built with a colon so "liberi" needn't agree with the size.
 
 ## Website

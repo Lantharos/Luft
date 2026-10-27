@@ -1,7 +1,7 @@
 use futures_util::StreamExt;
 use luft_software::system::image;
 
-use super::super::elsewhere::finished;
+use super::super::overview;
 use super::super::state::{self, Activity, Kind};
 
 pub fn watch() {
@@ -23,4 +23,9 @@ pub async fn scan() {
         return;
     }
     state::start(Activity::new(Kind::Download), super::follow, finished);
+}
+
+fn finished() {
+    overview::reload();
+    luft_app::spawn(scan());
 }

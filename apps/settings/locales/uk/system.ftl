@@ -134,24 +134,6 @@ settings-updates-downloading = Завантаження оновлень…
 settings-updates-rolling-back = Підготовка попередньої версії…
 settings-updates-switching-nvidia = Завантаження драйвера NVIDIA…
 settings-updates-switching-standard = Завантаження стандартного образу…
-settings-updates-elsewhere-refresh-by = { $app } шукає оновлення
-settings-updates-elsewhere-download-by = { $app } завантажує оновлення
-settings-updates-elsewhere-update-by = { $app } встановлює оновлення
-settings-updates-elsewhere-update = Встановлюються оновлення
-settings-updates-elsewhere-install-by = { $app } встановлює програмне забезпечення
-settings-updates-elsewhere-install = Встановлюється програмне забезпечення
-settings-updates-elsewhere-remove-by = { $app } вилучає програмне забезпечення
-settings-updates-elsewhere-remove = Вилучається програмне забезпечення
-settings-updates-elsewhere-change-by = { $app } змінює програмне забезпечення
-settings-updates-elsewhere-change = Змінюється програмне забезпечення
-settings-updates-elsewhere-wait = Шукати оновлення знову можна буде, коли це завершиться
-settings-updates-ready = Оновлення готові до встановлення
-settings-updates-available = { $count ->
-    [one] Доступне { $count } оновлення
-    [few] Доступні { $count } оновлення
-    [many] Доступно { $count } оновлень
-   *[other] Доступно { $count } оновлення
-}
 settings-updates-up-to-date = Система оновлена
 settings-updates-version = Версія { $version }
 settings-updates-version-new = Нова версія
@@ -163,13 +145,11 @@ settings-updates-version-available = Доступна версія { $version }
 settings-updates-version-available-new = Доступна нова версія
 settings-updates-version-staged = Версія { $version } готова до встановлення
 settings-updates-version-staged-new = Нова версія готова до встановлення
-settings-updates-restart-install-them = Перезавантажте, щоб встановити їх. Комп’ютер буде знову готовий за кілька хвилин.
 settings-updates-restart-return = Перезавантажте, щоб завершити повернення.
 settings-updates-restart-switch = Перезавантажте, щоб завершити. Комп’ютер буде знову готовий за кілька хвилин.
 settings-updates-restart-install-it = Перезавантажте, щоб встановити її. Комп’ютер буде знову готовий за кілька хвилин.
 settings-updates-last-checked = Остання перевірка: { $when }
 settings-updates-never-checked = Ще не перевірялося
-settings-updates-installed-when = Оновлення встановлено { $when }
 settings-updates-stop = Зупинити
 settings-updates-check = Перевірити зараз
 settings-updates-checking-button = Перевірка…
@@ -198,41 +178,7 @@ settings-updates-firmware-restart = Завершиться після перез
 settings-updates-firmware-installing = Встановлення…
 settings-updates-firmware-update = Оновити
 settings-updates-firmware-failed = Не вдалося оновити мікропрограму
-settings-updates-failed = Не вдалося встановити останні оновлення
-settings-updates-failed-description = Систему залишено без змін
-settings-updates-includes = { $parts ->
-    [security] Містить виправлення безпеки
-    [kernel] Містить нове ядро Linux
-    [drivers] Містить оновлені драйвери
-    [security-kernel] Містить виправлення безпеки й нове ядро Linux
-    [security-drivers] Містить виправлення безпеки й оновлені драйвери
-    [kernel-drivers] Містить нове ядро Linux і оновлені драйвери
-    [security-kernel-drivers] Містить виправлення безпеки, нове ядро Linux і оновлені драйвери
-   *[other] Виправлення й удосконалення в усій системі
-}
-settings-updates-count-size = { $count ->
-    [one] { $count } оновлення · { $size }
-    [few] { $count } оновлення · { $size }
-    [many] { $count } оновлень · { $size }
-   *[other] { $count } оновлення · { $size }
-}
-settings-updates-restart-and-install = Перезавантажити і встановити
 settings-updates-download = Завантажити
-settings-updates-see-included = Що входить до складу
-settings-updates-included = Що входить до складу
-settings-updates-included-description = { $count ->
-    [one] { $count } оновлення для системи, її драйверів і бібліотек
-    [few] { $count } оновлення для системи, її драйверів і бібліотек
-    [many] { $count } оновлень для системи, її драйверів і бібліотек
-   *[other] { $count } оновлення для системи, її драйверів і бібліотек
-}
-settings-updates-security-fix = Виправлення безпеки
-settings-updates-done = Готово
-settings-updates-area-kernel = Ядро Linux
-settings-updates-area-drivers = Драйвери й мікропрограми
-settings-updates-area-desktop = Робочий стіл
-settings-updates-area-core = Основа системи
-settings-updates-area-other = Бібліотеки й інструменти
 settings-updates-released = Випущено { $when }
 settings-updates-improvements = Виправлення й удосконалення в усій системі
 settings-updates-download-size = Обсяг завантаження: { $size }

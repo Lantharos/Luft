@@ -1,5 +1,4 @@
 use luft_app::block_on;
-use luft_software::system::System;
 use luft_software::system::system_packages::{self, SystemPackages};
 
 use super::{InstalledApp, Source};
@@ -43,9 +42,6 @@ fn app(name: &str, packages: &SystemPackages) -> InstalledApp {
 }
 
 pub fn installed() -> Vec<InstalledApp> {
-    if System::current() != System::Image {
-        return Vec::new();
-    }
     let packages = block_on(system_packages::list())
         .inspect_err(|error| eprintln!("Listing the system packages: {error}"))
         .unwrap_or_default();

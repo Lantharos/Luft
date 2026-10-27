@@ -130,22 +130,6 @@ settings-updates-downloading = Изтегляне на актуализации�
 settings-updates-rolling-back = Подготовка на предишната версия…
 settings-updates-switching-nvidia = Изтегляне на драйвера на NVIDIA…
 settings-updates-switching-standard = Изтегляне на стандартния образ…
-settings-updates-elsewhere-refresh-by = { $app } търси актуализации
-settings-updates-elsewhere-download-by = { $app } изтегля актуализации
-settings-updates-elsewhere-update-by = { $app } инсталира актуализации
-settings-updates-elsewhere-update = Инсталират се актуализации
-settings-updates-elsewhere-install-by = { $app } инсталира софтуер
-settings-updates-elsewhere-install = Инсталира се софтуер
-settings-updates-elsewhere-remove-by = { $app } премахва софтуер
-settings-updates-elsewhere-remove = Премахва се софтуер
-settings-updates-elsewhere-change-by = { $app } променя софтуер
-settings-updates-elsewhere-change = Софтуерът се променя
-settings-updates-elsewhere-wait = Можете отново да потърсите актуализации, когато приключи
-settings-updates-ready = Актуализациите са готови за инсталиране
-settings-updates-available = { $count ->
-    [one] Налична е { $count } актуализация
-   *[other] Налични са { $count } актуализации
-}
 settings-updates-up-to-date = Системата ви е актуална
 settings-updates-version = Версия { $version }
 settings-updates-version-new = Нова версия
@@ -157,13 +141,11 @@ settings-updates-version-available = Налична е версия { $version }
 settings-updates-version-available-new = Налична е нова версия
 settings-updates-version-staged = Версия { $version } е готова за инсталиране
 settings-updates-version-staged-new = Нова версия е готова за инсталиране
-settings-updates-restart-install-them = Рестартирайте, за да ги инсталирате. Компютърът ще е готов след няколко минути.
 settings-updates-restart-return = Рестартирайте, за да завършите връщането.
 settings-updates-restart-switch = Рестартирайте, за да завършите. Компютърът ще е готов след няколко минути.
 settings-updates-restart-install-it = Рестартирайте, за да я инсталирате. Компютърът ще е готов след няколко минути.
 settings-updates-last-checked = Последна проверка: { $when }
 settings-updates-never-checked = Още не е проверявано
-settings-updates-installed-when = Последно инсталирани актуализации: { $when }
 settings-updates-stop = Спри
 settings-updates-check = Провери сега
 settings-updates-checking-button = Проверка…
@@ -190,37 +172,7 @@ settings-updates-firmware-restart = Завършва при рестартира
 settings-updates-firmware-installing = Инсталиране…
 settings-updates-firmware-update = Актуализирай
 settings-updates-firmware-failed = Фърмуерът не можа да бъде актуализиран
-settings-updates-failed = Последните актуализации не можаха да бъдат инсталирани
-settings-updates-failed-description = Системата остана непроменена
-settings-updates-includes = { $parts ->
-    [security] Включва поправки на защитата
-    [kernel] Включва ново Linux ядро
-    [drivers] Включва обновени драйвери
-    [security-kernel] Включва поправки на защитата и ново Linux ядро
-    [security-drivers] Включва поправки на защитата и обновени драйвери
-    [kernel-drivers] Включва ново Linux ядро и обновени драйвери
-    [security-kernel-drivers] Включва поправки на защитата, ново Linux ядро и обновени драйвери
-   *[other] Поправки и подобрения в цялата система
-}
-settings-updates-count-size = { $count ->
-    [one] { $count } актуализация · { $size }
-   *[other] { $count } актуализации · { $size }
-}
-settings-updates-restart-and-install = Рестартирай и инсталирай
 settings-updates-download = Изтегли
-settings-updates-see-included = Вижте какво включва
-settings-updates-included = Какво включва
-settings-updates-included-description = { $count ->
-    [one] { $count } актуализация за системата, драйверите и библиотеките ѝ
-   *[other] { $count } актуализации за системата, драйверите и библиотеките ѝ
-}
-settings-updates-security-fix = Поправка на защитата
-settings-updates-done = Готово
-settings-updates-area-kernel = Linux ядро
-settings-updates-area-drivers = Драйвери и фърмуер
-settings-updates-area-desktop = Работна среда
-settings-updates-area-core = Основна система
-settings-updates-area-other = Библиотеки и инструменти
 settings-updates-released = Издадена: { $when }
 settings-updates-improvements = Поправки и подобрения в цялата система
 settings-updates-download-size = За изтегляне: { $size }

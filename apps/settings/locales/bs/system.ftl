@@ -132,23 +132,6 @@ settings-updates-downloading = Preuzimanje ažuriranja…
 settings-updates-rolling-back = Priprema prethodne verzije…
 settings-updates-switching-nvidia = Preuzimanje NVIDIA drajvera…
 settings-updates-switching-standard = Preuzimanje standardne slike sistema…
-settings-updates-elsewhere-refresh-by = { $app } traži ažuriranja
-settings-updates-elsewhere-download-by = Ažuriranja preuzima { $app }
-settings-updates-elsewhere-update-by = Ažuriranja instalira { $app }
-settings-updates-elsewhere-update = Ažuriranja se instaliraju
-settings-updates-elsewhere-install-by = Softver instalira { $app }
-settings-updates-elsewhere-install = Softver se instalira
-settings-updates-elsewhere-remove-by = Softver uklanja { $app }
-settings-updates-elsewhere-remove = Softver se uklanja
-settings-updates-elsewhere-change-by = Softver mijenja { $app }
-settings-updates-elsewhere-change = Softver se mijenja
-settings-updates-elsewhere-wait = Ažuriranja možete ponovo potražiti kad se to završi
-settings-updates-ready = Ažuriranja su spremna za instalaciju
-settings-updates-available = { $count ->
-    [one] Dostupno je { $count } ažuriranje
-    [few] Dostupna su { $count } ažuriranja
-   *[other] Dostupno je { $count } ažuriranja
-}
 settings-updates-up-to-date = Vaš sistem je ažuran
 settings-updates-version = Verzija { $version }
 settings-updates-version-new = Nova verzija
@@ -160,13 +143,11 @@ settings-updates-version-available = Dostupna je verzija { $version }
 settings-updates-version-available-new = Dostupna je nova verzija
 settings-updates-version-staged = Verzija { $version } je spremna za instalaciju
 settings-updates-version-staged-new = Nova verzija je spremna za instalaciju
-settings-updates-restart-install-them = Ponovo pokrenite računar da ih instalirate. Bit će ponovo spreman za nekoliko minuta.
 settings-updates-restart-return = Ponovo pokrenite računar da završite povratak.
 settings-updates-restart-switch = Ponovo pokrenite računar da završite. Bit će ponovo spreman za nekoliko minuta.
 settings-updates-restart-install-it = Ponovo pokrenite računar da je instalirate. Bit će ponovo spreman za nekoliko minuta.
 settings-updates-last-checked = Posljednja provjera: { $when }
 settings-updates-never-checked = Još nije provjereno
-settings-updates-installed-when = Ažuriranja instalirana: { $when }
 settings-updates-stop = Zaustavi
 settings-updates-check = Provjeri sada
 settings-updates-checking-button = Provjera…
@@ -194,39 +175,7 @@ settings-updates-firmware-restart = Završava se pri ponovnom pokretanju
 settings-updates-firmware-installing = Instaliranje…
 settings-updates-firmware-update = Ažuriraj
 settings-updates-firmware-failed = Firmver se nije mogao ažurirati
-settings-updates-failed = Posljednja ažuriranja se nisu mogla instalirati
-settings-updates-failed-description = Sistem je ostao kakav je bio
-settings-updates-includes = { $parts ->
-    [security] Sadrži sigurnosne ispravke
-    [kernel] Sadrži novi Linux kernel
-    [drivers] Sadrži ažurirane drajvere
-    [security-kernel] Sadrži sigurnosne ispravke i novi Linux kernel
-    [security-drivers] Sadrži sigurnosne ispravke i ažurirane drajvere
-    [kernel-drivers] Sadrži novi Linux kernel i ažurirane drajvere
-    [security-kernel-drivers] Sadrži sigurnosne ispravke, novi Linux kernel i ažurirane drajvere
-   *[other] Ispravke i poboljšanja u cijelom sistemu
-}
-settings-updates-count-size = { $count ->
-    [one] { $count } ažuriranje · { $size }
-    [few] { $count } ažuriranja · { $size }
-   *[other] { $count } ažuriranja · { $size }
-}
-settings-updates-restart-and-install = Ponovo pokreni i instaliraj
 settings-updates-download = Preuzmi
-settings-updates-see-included = Pogledaj šta je uključeno
-settings-updates-included = Šta je uključeno
-settings-updates-included-description = { $count ->
-    [one] { $count } ažuriranje za sistem, njegove drajvere i biblioteke
-    [few] { $count } ažuriranja za sistem, njegove drajvere i biblioteke
-   *[other] { $count } ažuriranja za sistem, njegove drajvere i biblioteke
-}
-settings-updates-security-fix = Sigurnosna ispravka
-settings-updates-done = Gotovo
-settings-updates-area-kernel = Linux kernel
-settings-updates-area-drivers = Drajveri i firmver
-settings-updates-area-desktop = Radna površina
-settings-updates-area-core = Jezgro sistema
-settings-updates-area-other = Biblioteke i alati
 settings-updates-released = Objavljeno: { $when }
 settings-updates-improvements = Ispravke i poboljšanja u cijelom sistemu
 settings-updates-download-size = Za preuzimanje: { $size }

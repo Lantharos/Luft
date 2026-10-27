@@ -130,22 +130,6 @@ settings-updates-downloading = Hämtar uppdateringar …
 settings-updates-rolling-back = Förbereder den tidigare versionen …
 settings-updates-switching-nvidia = Hämtar NVIDIA:s drivrutin …
 settings-updates-switching-standard = Hämtar standardavbildningen …
-settings-updates-elsewhere-refresh-by = Sökning efter uppdateringar pågår i { $app }
-settings-updates-elsewhere-download-by = Uppdateringar hämtas av { $app }
-settings-updates-elsewhere-update-by = Uppdateringar installeras av { $app }
-settings-updates-elsewhere-update = Uppdateringar installeras
-settings-updates-elsewhere-install-by = Programvara installeras av { $app }
-settings-updates-elsewhere-install = Programvara installeras
-settings-updates-elsewhere-remove-by = Programvara tas bort av { $app }
-settings-updates-elsewhere-remove = Programvara tas bort
-settings-updates-elsewhere-change-by = Programvara ändras av { $app }
-settings-updates-elsewhere-change = Programvara ändras
-settings-updates-elsewhere-wait = Du kan söka efter uppdateringar igen när det är klart
-settings-updates-ready = Uppdateringarna är redo att installeras
-settings-updates-available = { $count ->
-    [one] { $count } uppdatering är tillgänglig
-   *[other] { $count } uppdateringar är tillgängliga
-}
 settings-updates-up-to-date = Systemet är uppdaterat
 settings-updates-version = Version { $version }
 settings-updates-version-new = En ny version
@@ -157,13 +141,11 @@ settings-updates-version-available = Version { $version } är tillgänglig
 settings-updates-version-available-new = En ny version är tillgänglig
 settings-updates-version-staged = Version { $version } är redo att installeras
 settings-updates-version-staged-new = En ny version är redo att installeras
-settings-updates-restart-install-them = Starta om för att installera dem. Datorn är tillbaka om några minuter.
 settings-updates-restart-return = Starta om för att slutföra återgången.
 settings-updates-restart-switch = Starta om för att slutföra. Datorn är tillbaka om några minuter.
 settings-updates-restart-install-it = Starta om för att installera den. Datorn är tillbaka om några minuter.
 settings-updates-last-checked = Senast kontrollerat { $when }
 settings-updates-never-checked = Inte kontrollerat än
-settings-updates-installed-when = Uppdateringarna installerades { $when }
 settings-updates-stop = Stoppa
 settings-updates-check = Sök nu
 settings-updates-checking-button = Söker …
@@ -190,37 +172,7 @@ settings-updates-firmware-restart = Slutförs när du startar om
 settings-updates-firmware-installing = Installerar …
 settings-updates-firmware-update = Uppdatera
 settings-updates-firmware-failed = Det gick inte att uppdatera firmware
-settings-updates-failed = Det gick inte att installera de senaste uppdateringarna
-settings-updates-failed-description = Systemet lämnades som det var
-settings-updates-includes = { $parts ->
-    [security] Innehåller säkerhetskorrigeringar
-    [kernel] Innehåller en ny Linux-kärna
-    [drivers] Innehåller uppdaterade drivrutiner
-    [security-kernel] Innehåller säkerhetskorrigeringar och en ny Linux-kärna
-    [security-drivers] Innehåller säkerhetskorrigeringar och uppdaterade drivrutiner
-    [kernel-drivers] Innehåller en ny Linux-kärna och uppdaterade drivrutiner
-    [security-kernel-drivers] Innehåller säkerhetskorrigeringar, en ny Linux-kärna och uppdaterade drivrutiner
-   *[other] Korrigeringar och förbättringar i hela systemet
-}
-settings-updates-count-size = { $count ->
-    [one] { $count } uppdatering · { $size }
-   *[other] { $count } uppdateringar · { $size }
-}
-settings-updates-restart-and-install = Starta om och installera
 settings-updates-download = Hämta
-settings-updates-see-included = Se vad som ingår
-settings-updates-included = Vad som ingår
-settings-updates-included-description = { $count ->
-    [one] { $count } uppdatering för systemet, dess drivrutiner och bibliotek
-   *[other] { $count } uppdateringar för systemet, dess drivrutiner och bibliotek
-}
-settings-updates-security-fix = Säkerhetskorrigering
-settings-updates-done = Klar
-settings-updates-area-kernel = Linux-kärna
-settings-updates-area-drivers = Drivrutiner och firmware
-settings-updates-area-desktop = Skrivbord
-settings-updates-area-core = Kärnsystem
-settings-updates-area-other = Bibliotek och verktyg
 settings-updates-released = Släpptes { $when }
 settings-updates-improvements = Korrigeringar och förbättringar i hela systemet
 settings-updates-download-size = { $size } att hämta

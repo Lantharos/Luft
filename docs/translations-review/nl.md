@@ -38,7 +38,7 @@ Strings in Luft's Dutch translation that a native speaker should check: terms wh
 
 - `apps/settings/locales/nl/protection.ftl` `settings-encryption-unlocks-security-key`: "Ontgrendelt bij het opstarten met je beveiligingssleutel" — "beveiligingssleutel" for a hardware security key (Windows' word); check it doesn't read as a software key.
 - `apps/settings/locales/nl/system.ftl` `settings-datetime-week-start-regional`: "{ $day }, volgens je regio" — Dutch weekday names are lowercase, so the label may start with a lowercase letter if the code doesn't capitalize it.
-- `apps/settings/locales/nl/system.ftl` `settings-updates-last-checked`: "Laatst gecontroleerd: { $when }" — colon form chosen so relative times like "gisteren" and "5 minuten geleden" both fit; same for settings-updates-installed-when, settings-updates-released, settings-passwords-ssh-added, settings-passkeys-last-used.
+- `apps/settings/locales/nl/system.ftl` `settings-updates-last-checked`: "Laatst gecontroleerd: { $when }" — colon form chosen so relative times like "gisteren" and "5 minuten geleden" both fit; same for settings-updates-released, settings-passwords-ssh-added, settings-passkeys-last-used.
 - `apps/settings/locales/nl/system.ftl` `settings-updates-switching-standard`: "Standaardimage downloaden…" — "image" for the system image; "de image" vs "het image" is unsettled in Dutch; de is used.
 - `apps/settings/locales/nl/personalization.ftl` `settings-appearance-icons-clear`: "Doorzichtig" — English "Clear" icon style (glassy, like iOS); check it's understood as a look, not as "empty".
 - `apps/settings/locales/nl/personalization.ftl` `settings-fonts-monospace`: "Vaste breedte" — label for the monospace font row; some may expect "Monospace".
@@ -55,7 +55,6 @@ Strings in Luft's Dutch translation that a native speaker should check: terms wh
 - `apps/settings/desktop/locales/nl/desktop.ftl` `desktop-shortcut-switch-panels`: "Wisselen tussen systeembediening" — vague English source; check it makes sense in the shortcut list.
 - `apps/settings/desktop/locales/nl/desktop.ftl` `desktop-shortcut-show-screenshot-ui`: "Schermafbeelding maken met keuzes" — “interactively” has no neat Dutch equivalent.
 - `apps/settings/locales/nl/system.ftl` `settings-accounts-online`: "Onlineaccounts" — one-word compound per the spelling rules; GNOME writes "Online-accounts".
-- `apps/settings/locales/nl/system.ftl` `settings-updates-area-drivers`: "Drivers en firmware" — "driver" is used throughout instead of Windows' "stuurprogramma"; check which Dutch users expect.
 - `apps/settings/locales/nl/personalization.ftl` `settings-appearance-wallpaper-folder-description`: "Afbeeldingen › Wallpapers" — assumes the Pictures folder shows as Afbeeldingen (the Dutch folder name); Wallpapers is the real folder name and stays English.
 
 ## Website

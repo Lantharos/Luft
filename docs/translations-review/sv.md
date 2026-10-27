@@ -53,7 +53,6 @@ Strings in Luft's Swedish translation that a native speaker should check: terms 
 - `apps/settings/locales/sv/protection.ftl` `settings-usb-hold-back`: "Spärra nya USB-enheter" — "spärra" may sound more permanent than holding devices back until unlock.
 - `apps/settings/locales/sv/system.ftl` `settings-datetime-increase`: "Öka { $label }" — $label arrives capitalized (Timme/Minut), so it reads "Öka Timme" to a screen reader.
 - `apps/settings/locales/sv/system.ftl` `settings-about-other-system`: "Ta bort det för att ge dess { $size } till Luft" — "det" assumes the other system is referred to as "systemet" (ett); check against the row title it sits under.
-- `apps/settings/locales/sv/system.ftl` `settings-updates-elsewhere-refresh-by`: "Sökning efter uppdateringar pågår i { $app }" — rephrased so it also reads right when $app is "en annan app"; check it sounds natural next to the other "… av { $app }" lines.
 
 ## Website
 

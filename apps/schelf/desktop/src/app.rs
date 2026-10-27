@@ -3,8 +3,6 @@ use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use crate::fedora;
-
 const PAGE_SCHEME: &str = "schelf:";
 
 #[derive(Serialize)]
@@ -14,7 +12,6 @@ struct AppState {
     appearance: Appearance,
     files: Vec<String>,
     page: Option<String>,
-    fedora: bool,
 }
 
 fn files(activation: &Activation) -> Vec<String> {
@@ -48,7 +45,6 @@ async fn state(_: Value) -> Result<AppState, String> {
             .iter()
             .find(|argument| argument.starts_with(PAGE_SCHEME))
             .cloned(),
-        fedora: fedora::available(),
     })
 }
 

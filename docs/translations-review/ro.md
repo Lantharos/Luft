@@ -50,7 +50,6 @@ Strings in Luft's Romanian translation that a native speaker should check. Each 
 - `apps/settings/locales/ro/devices.ftl` `settings-power-cycles`: "{ $cycles } de cicluri de încărcare" — with a list of numbers the „de” follows the last one only; check it reads acceptably.
 - `apps/settings/locales/ro/devices.ftl` `settings-power-limited-lap`: "…deoarece computerul este pe genunchi" — check this is natural for the lap-detection state.
 - `apps/settings/locales/ro/devices.ftl` `settings-dictation-engine-description`: "{ $engine } recunoaște limba { $language }" — assumes the language name arrives as a nominative noun like „română”.
-- `apps/settings/locales/ro/system.ftl` `settings-updates-elsewhere-download-by` and the other `-by` messages: "Actualizările sunt descărcate de { $app }" — passive so that $app (an app name, a tool like dnf, or „o altă aplicație”) needs no article; check it reads naturally.
 - `apps/settings/desktop/locales/ro/desktop.ftl` `desktop-shortcut-switch-panels`: "Comută între controalele sistemului" — vague English source; check it describes moving focus between taskbar and other desktop parts.
 - `apps/settings/locales/ro/personalization.ftl` `settings-cursors-folder-description`: "Temele puse în Folder personal › .local › share › icons apar aici" — check the home folder name matches what Rover shows in Romanian.
 - `apps/settings/locales/ro/personalization.ftl` `settings-appearance-icons-clear`: "Transparente" — English "Clear" icon style; check it reads right next to Originale and Nuanțate.

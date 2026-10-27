@@ -8,8 +8,6 @@ use luft_software::system::system_packages;
 use luft_software::task::Task;
 use serde::{Deserialize, Serialize};
 
-use crate::fedora;
-
 #[derive(Deserialize, Serialize, Clone, Copy, PartialEq, Eq, Debug)]
 #[serde(rename_all = "camelCase")]
 pub enum Action {
@@ -90,8 +88,6 @@ pub enum Job {
     RemoveRepository {
         file: String,
     },
-    #[serde(untagged)]
-    Fedora(fedora::Job),
 }
 
 impl Job {
@@ -117,7 +113,6 @@ impl Job {
             | Self::UpdateDebs { .. }
             | Self::UpdateAppImage { .. }
             | Self::UpdateTools { .. } => Action::Update,
-            Self::Fedora(job) => job.action(),
         }
     }
 
@@ -198,7 +193,6 @@ impl Job {
             Self::RemoveRepository { file } => {
                 block_on(system_packages::remove_repository(file, task))
             }
-            Self::Fedora(job) => job.run(task),
         }
     }
 }

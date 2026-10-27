@@ -19,7 +19,7 @@ import { DIALOG_CONTENT, DialogType, roundSecondsToInterval, type ConfirmSignal,
 import { ModalDialogErrors, ModalDialogError } from '../runtime/dbusErrors.js';
 
 import { loadInterfaceXML } from '../runtime/fileUtils.js';
-import { loadPendingUpdates, UpdateAction, type PendingUpdates } from '../system/pendingUpdates.js';
+import { loadStagedImage, type StagedImage } from '../system/stagedImage.js';
 
 const ITEM_ICON_SIZE = 64;
 const LOW_BATTERY_THRESHOLD = 30;
@@ -96,7 +96,7 @@ export class EndSessionDialog extends ModalDialog {
   private readonly altCapture = new Clutter.KeyController({ enabled: false });
 
   private canRebootToBootLoaderMenu = false;
-  private pendingUpdates: PendingUpdates | null = null;
+  private stagedImage: StagedImage | null = null;
   private updateScheduled = false;
   private updatePrepared = false;
   private type: number = DialogType.LOGOUT;
@@ -157,7 +157,7 @@ export class EndSessionDialog extends ModalDialog {
     const { checkBoxText } = this.dialogContent;
     if (!checkBoxText) return '';
 
-    const version = this.pendingUpdates?.version;
+    const version = this.stagedImage?.version;
     if (!version) return checkBoxText();
     return KestrelUi.t('end-session-install-version', { version });
   }
@@ -275,17 +275,7 @@ export class EndSessionDialog extends ModalDialog {
   }
 
   private async confirm(signal: ConfirmSignal): Promise<void> {
-    if (this.checkBox.visible) {
-      if (!this.checkBox.checked) {
-        await this.skipUpdates();
-      } else if (signal === 'ConfirmedReboot') {
-        await this.installThroughRestart(UpdateAction.REBOOT);
-      } else if (signal === 'ConfirmedShutdown') {
-        if (await this.installThroughRestart(UpdateAction.POWER_OFF)) signal = 'ConfirmedReboot';
-      }
-    } else if (this.type === DialogType.UPDATE_RESTART) {
-      await this.installThroughRestart(UpdateAction.REBOOT);
-    }
+    if (this.installsStagedImage(signal)) await this.applyStagedImage();
 
     this.fadeOutDialog();
     this.stopTimer();
@@ -293,18 +283,14 @@ export class EndSessionDialog extends ModalDialog {
     this.dbusImpl.emit_signal(signal, null as unknown as GLib.Variant);
   }
 
-  private async installThroughRestart(action: UpdateAction): Promise<boolean> {
-    try {
-      return await this.pendingUpdates!.installThroughRestart(action);
-    } catch (error) {
-      log((error as Error).message);
-      return false;
-    }
+  private installsStagedImage(signal: ConfirmSignal): boolean {
+    if (!this.checkBox.visible) return this.type === DialogType.UPDATE_RESTART;
+    return this.checkBox.checked && (signal === 'ConfirmedReboot' || signal === 'ConfirmedShutdown');
   }
 
-  private async skipUpdates(): Promise<void> {
+  private async applyStagedImage(): Promise<void> {
     try {
-      await this.pendingUpdates!.skip();
+      await this.stagedImage!.apply();
     } catch (error) {
       log((error as Error).message);
     }
@@ -396,10 +382,10 @@ export class EndSessionDialog extends ModalDialog {
     this.totalSecondsToStayOpen = totalSecondsToStayOpen;
     this.type = type;
 
-    const pending = await loadPendingUpdates();
-    this.pendingUpdates = pending?.switching ? null : pending;
-    this.updateScheduled = this.pendingUpdates?.scheduled ?? false;
-    this.updatePrepared = this.pendingUpdates?.prepared ?? false;
+    const staged = await loadStagedImage();
+    this.stagedImage = staged?.switching ? null : staged;
+    this.updateScheduled = this.stagedImage?.scheduled ?? false;
+    this.updatePrepared = this.stagedImage?.prepared ?? false;
 
     if (this.updateScheduled && this.type === DialogType.RESTART) this.type = DialogType.UPDATE_RESTART;
 

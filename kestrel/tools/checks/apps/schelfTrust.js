@@ -9,7 +9,6 @@ const SCHELF = repository('target', 'release', 'schelf');
 const BUILDER = fixture('sandbox', 'trust.sh');
 const APPIMAGE_BUILDER = fixture('sandbox', 'appimage.py');
 const SAFE_STORAGE = fixture('sandbox', 'safeStorage');
-const ON_IMAGE = {LUFT_KERNEL_COMMAND_LINE: fixture('system', 'image.cmdline')};
 const INSTALL_BUTTON = [1030, 110];
 
 async function saved(app, name) {
@@ -25,7 +24,7 @@ async function installClicked(app, name) {
 export async function run() {
   const folder = scratch('schelf-trust');
   require((await outcome(['bash', BUILDER, folder])).ok, 'a Flatpak and two package files are built for the trust dialogs');
-  const env = {...ON_IMAGE, FLATPAK_USER_DIR: GLib.build_filenamev([folder, 'flatpak'])};
+  const env = {FLATPAK_USER_DIR: GLib.build_filenamev([folder, 'flatpak'])};
   await withApp('schelf', ['schelf:full-access?org.example.Notes'], app => saved(app, 'schelf-trust-flatpak'), env);
 
   const electron = GLib.getenv('KESTREL_ELECTRON');

@@ -6,7 +6,7 @@
 	let { app }: { app: CatalogApp } = $props();
 </script>
 
-<button type="button" class="tile" onclick={() => navigation.push({ page: 'app', target: { origin: app.origin, id: app.id }, name: app.name })}>
+<button type="button" class="tile" onclick={() => navigation.push({ page: 'app', target: { id: app.id }, name: app.name })}>
 	<AppArt icon={app.icon} size={52} />
 	<span class="text">
 		<span class="name">{app.name}</span>

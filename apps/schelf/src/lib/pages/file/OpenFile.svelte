@@ -6,7 +6,6 @@
 	import ProgressButton from '#lib/components/ProgressButton.svelte';
 	import SourceTrustDialog from '#lib/components/SourceTrustDialog.svelte';
 	import TrustDialog from '#lib/components/TrustDialog.svelte';
-	import { fedora } from '#lib/fedora/fedora.svelte.js';
 	import { backend } from '#lib/bridge/index.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
@@ -32,7 +31,7 @@
 		if (file.kind === 'flatpakRef' || file.kind === 'flatpakBundle') return library.flatpak(file.id);
 		if (file.kind === 'deb') return library.deb(file.package);
 		if (file.kind === 'package' && file.system) return library.system(file.package);
-		if (file.kind === 'package') return fedora.available ? library.package(file.package) : library.tool(file.package);
+		if (file.kind === 'package') return library.tool(file.package);
 		if (file.kind === 'appImage' && started) return library.installed.find((app) => app.source === 'appImage' && app.name === name) ?? null;
 		return null;
 	});
@@ -57,7 +56,7 @@
 		if (opened.kind === 'flatpakRepo') return { kind: 'addFlatpakRepo', path: opened.path, name: opened.name };
 		if (opened.kind === 'package' && opened.system)
 			return { kind: 'installSystemPackageFile', path: opened.path, package: opened.package, repository: opened.repository?.draft ?? null };
-		if (opened.kind === 'package') return fedora.available ? { kind: 'installPackageFile', path: opened.path } : { kind: 'installToolFile', path: opened.path };
+		if (opened.kind === 'package') return { kind: 'installToolFile', path: opened.path };
 		return { kind: 'installAppImage', path: opened.path };
 	}
 
@@ -98,7 +97,7 @@
 		flatpakBundle: 'Flatpak app',
 		deb: 'App for Debian and Ubuntu',
 		flatpakRepo: 'Flatpak app source',
-		package: fedora.available ? 'System package' : 'Command-line tool',
+		package: 'Command-line tool',
 		appImage: 'AppImage'
 	};
 	const kind = $derived(file?.kind === 'package' && file.system ? 'System package' : file ? KIND[file.kind] : '');
@@ -211,7 +210,7 @@
 					{#if source && sourceName}
 						<Row title="Updates from" description={source.described.sources[0]?.url}><span class="max-w-[320px] truncate">{sourceName}</span></Row>
 					{/if}
-				{:else if file.kind === 'package' && !fedora.available}
+				{:else if file.kind === 'package'}
 					<Row title="Installs to" description="Its commands run in Tern."><span>Tools container</span></Row>
 				{/if}
 				<Row title="File" description={path} />

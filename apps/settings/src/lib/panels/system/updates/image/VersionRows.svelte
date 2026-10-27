@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { ago, Row } from '@luft/ui';
-	import { rollback, type Activity, type ImageOverview, type Release } from '../api';
+	import { rollback, type Activity, type SystemOverview, type Release } from '../api';
 	import { named } from '../headline';
 	import NotesDialog from './NotesDialog.svelte';
 	import VariantRow from './VariantRow.svelte';
 
 	interface Props {
-		overview: ImageOverview;
+		overview: SystemOverview;
 		activity: Activity;
 		attempt: (action: () => Promise<void>) => void;
 	}

@@ -130,22 +130,6 @@ settings-updates-downloading = Ladataan päivityksiä…
 settings-updates-rolling-back = Valmistellaan aiempaa versiota…
 settings-updates-switching-nvidia = Ladataan NVIDIAn ohjainta…
 settings-updates-switching-standard = Ladataan vakiokuvaa…
-settings-updates-elsewhere-refresh-by = { $app } etsii päivityksiä
-settings-updates-elsewhere-download-by = { $app } lataa päivityksiä
-settings-updates-elsewhere-update-by = { $app } asentaa päivityksiä
-settings-updates-elsewhere-update = Päivityksiä asennetaan
-settings-updates-elsewhere-install-by = { $app } asentaa ohjelmistoja
-settings-updates-elsewhere-install = Ohjelmistoja asennetaan
-settings-updates-elsewhere-remove-by = { $app } poistaa ohjelmistoja
-settings-updates-elsewhere-remove = Ohjelmistoja poistetaan
-settings-updates-elsewhere-change-by = { $app } muuttaa ohjelmistoja
-settings-updates-elsewhere-change = Ohjelmistoja muutetaan
-settings-updates-elsewhere-wait = Voit etsiä päivityksiä uudelleen, kun se on valmis
-settings-updates-ready = Päivitykset ovat valmiina asennettaviksi
-settings-updates-available = { $count ->
-    [one] { $count } päivitys saatavilla
-   *[other] { $count } päivitystä saatavilla
-}
 settings-updates-up-to-date = Järjestelmäsi on ajan tasalla
 settings-updates-version = Versio { $version }
 settings-updates-version-new = Uusi versio
@@ -157,13 +141,11 @@ settings-updates-version-available = Versio { $version } on saatavilla
 settings-updates-version-available-new = Uusi versio on saatavilla
 settings-updates-version-staged = Versio { $version } on valmis asennettavaksi
 settings-updates-version-staged-new = Uusi versio on valmis asennettavaksi
-settings-updates-restart-install-them = Asenna ne käynnistämällä uudelleen. Tietokone on taas käytössä muutamassa minuutissa.
 settings-updates-restart-return = Viimeistele paluu käynnistämällä uudelleen.
 settings-updates-restart-switch = Viimeistele käynnistämällä uudelleen. Tietokone on taas käytössä muutamassa minuutissa.
 settings-updates-restart-install-it = Asenna se käynnistämällä uudelleen. Tietokone on taas käytössä muutamassa minuutissa.
 settings-updates-last-checked = Viimeksi tarkistettu { $when }
 settings-updates-never-checked = Ei vielä tarkistettu
-settings-updates-installed-when = Päivitykset asennettu { $when }
 settings-updates-stop = Pysäytä
 settings-updates-check = Tarkista nyt
 settings-updates-checking-button = Tarkistetaan…
@@ -190,37 +172,7 @@ settings-updates-firmware-restart = Valmistuu uudelleenkäynnistyksessä
 settings-updates-firmware-installing = Asennetaan…
 settings-updates-firmware-update = Päivitä
 settings-updates-firmware-failed = Laiteohjelmistoa ei voitu päivittää
-settings-updates-failed = Viimeisimpiä päivityksiä ei voitu asentaa
-settings-updates-failed-description = Järjestelmäsi jätettiin ennalleen
-settings-updates-includes = { $parts ->
-    [security] Sisältää tietoturvakorjauksia
-    [kernel] Sisältää uuden Linux-ytimen
-    [drivers] Sisältää päivitettyjä ohjaimia
-    [security-kernel] Sisältää tietoturvakorjauksia ja uuden Linux-ytimen
-    [security-drivers] Sisältää tietoturvakorjauksia ja päivitettyjä ohjaimia
-    [kernel-drivers] Sisältää uuden Linux-ytimen ja päivitettyjä ohjaimia
-    [security-kernel-drivers] Sisältää tietoturvakorjauksia, uuden Linux-ytimen ja päivitettyjä ohjaimia
-   *[other] Korjauksia ja parannuksia koko järjestelmään
-}
-settings-updates-count-size = { $count ->
-    [one] { $count } päivitys · { $size }
-   *[other] { $count } päivitystä · { $size }
-}
-settings-updates-restart-and-install = Käynnistä uudelleen ja asenna
 settings-updates-download = Lataa
-settings-updates-see-included = Katso, mitä se sisältää
-settings-updates-included = Sisältö
-settings-updates-included-description = { $count ->
-    [one] { $count } päivitys järjestelmään, sen ohjaimiin ja kirjastoihin
-   *[other] { $count } päivitystä järjestelmään, sen ohjaimiin ja kirjastoihin
-}
-settings-updates-security-fix = Tietoturvakorjaus
-settings-updates-done = Valmis
-settings-updates-area-kernel = Linux-ydin
-settings-updates-area-drivers = Ohjaimet ja laiteohjelmisto
-settings-updates-area-desktop = Työpöytä
-settings-updates-area-core = Ydinjärjestelmä
-settings-updates-area-other = Kirjastot ja työkalut
 settings-updates-released = Julkaistu { $when }
 settings-updates-improvements = Korjauksia ja parannuksia koko järjestelmään
 settings-updates-download-size = Ladattavaa { $size }

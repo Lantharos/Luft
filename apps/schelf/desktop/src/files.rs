@@ -8,7 +8,6 @@ use gio::prelude::*;
 use luft_app::portal::{FileChooser, Filter};
 use luft_app::{Commands, block_on};
 use luft_software::apps::{appimage, debian, toolbox};
-use luft_software::system::System;
 use luft_software::system::repositories;
 use luft_software::system::system_packages;
 use quick_xml::events::Event;
@@ -16,7 +15,6 @@ use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 
 use crate::catalog::cache;
-use crate::fedora;
 use crate::library::sources::Bundled;
 
 #[derive(Serialize)]
@@ -310,20 +308,14 @@ fn package(path: &str) -> Result<Opened, String> {
     else {
         return Err("This package file is damaged or isn't meant for this computer.".into());
     };
-    let on_image = !fedora::available() && System::current() == System::Image;
-    let (repository, repository_error) = if on_image {
+    let (repository, repository_error) =
         match repositories::bundled(path).and_then(|draft| draft.map(Bundled::check).transpose()) {
             Ok(repository) => (repository, None),
             Err(error) => (None, Some(error)),
-        }
-    } else {
-        (None, None)
-    };
+        };
     let desktop = repositories::desktop_entry(path)?;
-    let system = on_image && (repository.is_some() || desktop.is_some());
-    let installed = if fedora::available() {
-        fedora::is_installed(name)
-    } else if system {
+    let system = repository.is_some() || desktop.is_some();
+    let installed = if system {
         block_on(system_packages::list())
             .is_ok_and(|packages| packages.requested.iter().any(|known| known == name))
     } else {

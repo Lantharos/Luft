@@ -1,4 +1,3 @@
-use luft_software::system::System;
 use luft_software::system::repositories;
 
 use crate::cli::Exit;
@@ -37,10 +36,6 @@ fn plan(packages: Vec<String>, verb: Verb) -> Plan {
 /// Fedora packages go into the system itself, so services and udev rules they bring work like
 /// on any Fedora install. They're rebuilt with every update of Luft.
 pub fn install(arguments: &Arguments) -> Exit {
-    if System::current() != System::Image {
-        eprintln!("System packages are for Luft. On Fedora, install packages with --fedora.");
-        return Exit::Usage;
-    }
     let ink = Ink::stdout();
     let present: Vec<String> = installed::all(Some(Origin::System))
         .into_iter()

@@ -3,14 +3,13 @@
 	import Info from '@lucide/svelte/icons/info';
 	import { ActionRow, ProgressBar, Row, Section } from '@luft/ui';
 	import { updates } from '#lib/state/updates.svelte.js';
-	import { downloading, fractionOf, showsProgress } from './activity';
+	import { downloading, fractionOf } from './activity';
 	import { cancel, check, firmware, load, openApps, preferences as loadPreferences, type Activity, type Firmware, type Preferences } from './api';
 	import AutomaticSection from './AutomaticSection.svelte';
 	import FirmwareSection from './FirmwareSection.svelte';
 	import { headline, subline } from './headline';
 	import PendingImage from './image/PendingImage.svelte';
 	import VersionRows from './image/VersionRows.svelte';
-	import PackageUpdates from './packages/PackageUpdates.svelte';
 	import { about } from '../about/api';
 	import { percent } from '#lib/format.js';
 
@@ -61,7 +60,7 @@
 			<button type="button" class="button" disabled={busy} onclick={() => attempt(check)}>{activity.running === 'check' ? t('settings-updates-checking-button') : t('settings-updates-check')}</button>
 		{/if}
 	</div>
-	{#if showsProgress(activity)}
+	{#if downloading(activity)}
 		<div class="flex items-center gap-3">
 			<ProgressBar {fraction} class="flex-1" />
 			<span class="w-10 text-right text-[12.5px] text-[var(--text-muted)] tabular-nums">{fraction === null ? '' : percent(fraction)}</span>
@@ -69,14 +68,12 @@
 	{/if}
 </div>
 
-{#if info?.system.kind === 'packages'}
-	<PackageUpdates overview={info.system} {activity} {attempt} />
-{:else if info?.system.kind === 'image'}
+{#if info}
 	<PendingImage overview={info.system} {activity} {attempt} />
 {/if}
 
 <Section title={t('settings-updates-this-computer')}>
-	{#if info?.system.kind === 'image'}
+	{#if info}
 		<VersionRows overview={info.system} {activity} {attempt} />
 	{/if}
 	<ActionRow title={t('settings-page-about')} icon={Info} description={deviceName} onclick={onabout} />

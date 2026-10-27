@@ -1,5 +1,4 @@
 use luft_i18n::t;
-use luft_software::system::System;
 use luft_software::system::image::Deployments;
 use luft_software::variant::{self, Variant};
 
@@ -11,7 +10,7 @@ pub const CHECK_GRAPHICS_ARGUMENT: &str = "--check-graphics";
 
 async fn check() -> Result<(), String> {
     let cards = variant::nvidia_cards();
-    if cards.is_empty() || System::current() != System::Image {
+    if cards.is_empty() {
         return Ok(());
     }
     if GraphicsSeen::load().cards == cards {

@@ -1,7 +1,7 @@
 use std::sync::{LazyLock, Mutex, MutexGuard, OnceLock};
 
 use luft_app::Events;
-use luft_software::progress::{Change, Progress};
+use luft_software::progress::Progress;
 use luft_software::task::{Cancel, Task};
 use serde::Serialize;
 
@@ -18,14 +18,6 @@ pub enum Kind {
     Firmware,
     Rollback,
     Switch,
-    Elsewhere,
-}
-
-#[derive(Serialize, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct Elsewhere {
-    pub by: Option<String>,
-    pub change: Option<Change>,
 }
 
 #[derive(Serialize, Clone, Default)]
@@ -33,7 +25,6 @@ pub struct Elsewhere {
 pub struct Activity {
     pub running: Option<Kind>,
     pub target: Option<String>,
-    pub elsewhere: Option<Elsewhere>,
     pub progress: Option<Progress>,
     pub error: Option<String>,
 }

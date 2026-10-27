@@ -16,20 +16,19 @@ export interface Category {
 	id: CategoryId;
 	title: string;
 	icon: Component;
-	desktop: string[];
 }
 
 export const CATEGORIES: Category[] = [
-	{ id: 'office', title: 'Productivity', icon: Briefcase, desktop: ['Office'] },
-	{ id: 'graphics', title: 'Graphics & Photos', icon: PenTool, desktop: ['Graphics'] },
-	{ id: 'audiovideo', title: 'Audio & Video', icon: Clapperboard, desktop: ['AudioVideo', 'Audio', 'Video'] },
-	{ id: 'game', title: 'Games', icon: Gamepad2, desktop: ['Game'] },
-	{ id: 'development', title: 'Developer Tools', icon: Code, desktop: ['Development'] },
-	{ id: 'education', title: 'Education', icon: GraduationCap, desktop: ['Education'] },
-	{ id: 'science', title: 'Science', icon: FlaskConical, desktop: ['Science'] },
-	{ id: 'network', title: 'Internet', icon: Globe, desktop: ['Network'] },
-	{ id: 'utility', title: 'Utilities', icon: Wrench, desktop: ['Utility'] },
-	{ id: 'system', title: 'System', icon: Settings2, desktop: ['System', 'Settings'] }
+	{ id: 'office', title: 'Productivity', icon: Briefcase },
+	{ id: 'graphics', title: 'Graphics & Photos', icon: PenTool },
+	{ id: 'audiovideo', title: 'Audio & Video', icon: Clapperboard },
+	{ id: 'game', title: 'Games', icon: Gamepad2 },
+	{ id: 'development', title: 'Developer Tools', icon: Code },
+	{ id: 'education', title: 'Education', icon: GraduationCap },
+	{ id: 'science', title: 'Science', icon: FlaskConical },
+	{ id: 'network', title: 'Internet', icon: Globe },
+	{ id: 'utility', title: 'Utilities', icon: Wrench },
+	{ id: 'system', title: 'System', icon: Settings2 }
 ];
 
 export const category = (id: CategoryId) => CATEGORIES.find((entry) => entry.id === id)!;

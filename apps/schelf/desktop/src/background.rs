@@ -3,8 +3,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use luft_software::apps::appimage::{self, Placement};
-use luft_software::apps::{flatpak, toolbox};
-use luft_software::system::updates;
+use luft_software::apps::{flatpak, toolbox, updates};
 use luft_software::task::{Cancel, Task};
 
 const SEEDS: &str = "/usr/share/luft/preinstall";

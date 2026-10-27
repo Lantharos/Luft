@@ -39,7 +39,6 @@ Strings in Luft's Greek translation that a native speaker should check: terms wi
 
 ## Settings
 
-- `apps/settings/desktop/locales/el/desktop.ftl` `desktop-updates-another-app`: "μια άλλη εφαρμογή" — fills `{ $app }` in the `settings-updates-elsewhere-*-by` lines of system.ftl, which start with the bare name: «Μια άλλη εφαρμογή αναζητά ενημερώσεις», «GNOME Software αναζητά ενημερώσεις», «dnf εγκαθιστά λογισμικό». Check the named forms read acceptably without an article.
 - `apps/settings/locales/el/connections.ftl` `settings-bluetooth-request-unnamed`: "τη συσκευή" — accusative so it fits "Σύζευξη με { $name };", "για { $name }"; the .description lines of request-confirm, request-authorize and request-display say «η συσκευή» instead of repeating $name, which the title already shows.
 - `apps/settings/locales/el/connections.ftl` `settings-network-security-owe`: "Βελτιωμένο ανοιχτό" — no settled Greek term for Enhanced Open (OWE); compare with what Windows/Android show.
 - `apps/settings/locales/el/devices.ftl` `settings-keys-keypad`: "Num { $key }" — short label for number-pad keys; check whether Greek users would expect something else.

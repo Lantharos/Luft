@@ -72,7 +72,6 @@ Strings in Luft's Maltese translation that a native speaker should check: places
 - `apps/settings/locales/mt/system.ftl` `settings-users-fingerprint-remove`: "Neħħi { $finger }" — the title form of the finger name starts with a capital (Is-saba’ …) mid-sentence; screen-reader label only.
 - `apps/settings/locales/mt/system.ftl` `settings-login-wallpaper-own`: "Tiegħu stess" — masculine generic; may need a neutral phrasing.
 - `apps/settings/locales/mt/protection.ftl` `settings-privacy-location`: "Post" — location is "post" everywhere (servizzi tal-post, Itfi s-servizzi tal-post); "lokalità" was the alternative but reads as a town or village; check against what people expect.
-- `apps/settings/locales/mt/system.ftl` `settings-updates-elsewhere-refresh-by`: "Qed isir tiftix għal aġġornamenti minn { $app }" — impersonal so it reads with an app name and with "app oħra" without gender agreement; check it doesn't sound stiff.
 - `kestrel/settings/locales/mt/settings.ftl` `drives-windows-read-only`: "għall-qari biss" — used for read-only; check it reads naturally for a drive.
 - `apps/settings/locales/mt/system.ftl` `settings-about-mount-internal`: "Immonta d-drajvs interni" — "immonta" and "drajvs" follow what people say; check they don't feel too English.
 

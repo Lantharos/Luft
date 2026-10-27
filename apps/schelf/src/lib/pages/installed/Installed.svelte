@@ -3,7 +3,6 @@
 	import { bytes, Segmented, VirtualScroller } from '@luft/ui';
 	import type { InstalledApp, Source } from '#lib/bridge/types.js';
 	import RemoveDialog from '#lib/components/RemoveDialog.svelte';
-	import { fedora } from '#lib/fedora/fedora.svelte.js';
 	import { backend } from '#lib/bridge/index.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
@@ -45,7 +44,8 @@
 				options={[
 					{ value: 'all', label: 'All' },
 					{ value: 'flatpak', label: 'Flatpak' },
-					...(fedora.available ? [{ value: 'package' as const, label: 'System' }] : [{ value: 'tool' as const, label: 'Tools' }, { value: 'system' as const, label: 'System' }]),
+					{ value: 'tool', label: 'Tools' },
+					{ value: 'system', label: 'System' },
 					{ value: 'appImage', label: 'AppImage' },
 					...(library.installed.some((app) => app.source === 'debian') ? [{ value: 'debian' as const, label: '.deb' }] : [])
 				]}

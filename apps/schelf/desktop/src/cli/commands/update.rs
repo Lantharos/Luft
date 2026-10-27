@@ -7,7 +7,6 @@ use crate::cli::perform::{Plan, Verb, carry_out};
 use crate::cli::sources::{Origin, installed};
 use crate::cli::terminal::progress::Line;
 use crate::cli::terminal::{Ink, Look, Table};
-use crate::fedora;
 use crate::library::Source;
 use crate::operations::{Job, Request};
 use crate::updates::{self, AppUpdate};
@@ -95,13 +94,6 @@ fn plans(updates: &[AppUpdate]) -> Vec<Plan> {
         ));
     }
     let package = |update: &AppUpdate| update.package.clone().unwrap_or_default();
-    plans.extend(batch(
-        "package-updates",
-        "apps from Fedora",
-        &of(Source::Package),
-        |packages| Job::Fedora(fedora::Job::UpdatePackages { packages }),
-        package,
-    ));
     plans.extend(batch(
         "tool-updates",
         "command-line tools",

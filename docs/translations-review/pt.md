@@ -53,7 +53,7 @@ Strings in Luft's European Portuguese translation that a native speaker should c
 - `apps/settings/locales/pt/personalization.ftl` `settings-accessibility-dwell`: "Clicar ao repousar o ponteiro" — no settled term for dwell click; the lock screen's shorter label is «Clique por permanência».
 - `apps/settings/locales/pt/protection.ftl` `settings-passwords-stores`: "Credenciais das aplicações" — the sign-ins apps store, rendered as credenciais.
 - `apps/settings/locales/pt/protection.ftl` `settings-security-anti-cheat`: "Jogos com anti-batota" — anti-batota is the European word, but gamers may expect "anti-cheat".
-- `apps/settings/locales/pt/protection.ftl` `settings-passwords-ssh-added`: "Adicionada { $when }" — assumes $when reads like «há 3 dias» or «ontem»; the same goes for `settings-passkeys-last-used` and `apps/settings/locales/pt/system.ftl` `settings-updates-installed-when` / `settings-updates-released`.
+- `apps/settings/locales/pt/protection.ftl` `settings-passwords-ssh-added`: "Adicionada { $when }" — assumes $when reads like «há 3 dias» or «ontem»; the same goes for `settings-passkeys-last-used` and `apps/settings/locales/pt/system.ftl` `settings-updates-released`.
 - `apps/settings/locales/pt/system.ftl` `settings-updates-apps-count`: "[0] Geridas no Schelf" — agrees with atualizações; check it fits under the "App updates" row.
 - `apps/settings/locales/pt/system.ftl` `settings-about-hostname`: "Nome do anfitrião" — GNOME's term; Windows just says «Nome do dispositivo».
 

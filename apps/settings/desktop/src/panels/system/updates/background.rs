@@ -9,7 +9,7 @@ use luft_i18n::t;
 use zbus::message::Type;
 use zbus::{MatchRule, MessageStream, Variant};
 
-use super::backend::{self, Notice};
+use super::image;
 use super::schedule;
 use super::store::Preferences;
 use crate::L10N;
@@ -20,6 +20,21 @@ const PAGE: &str = "kestrel-settings:system";
 const WAIT_FOR_CLICK: Duration = Duration::from_secs(6 * 60 * 60);
 
 type Properties<'a> = Vec<(&'a str, Variant<'a>)>;
+
+pub struct Notice {
+    pub summary: &'static str,
+    pub body: &'static str,
+}
+
+pub const AVAILABLE: Notice = Notice {
+    summary: "desktop-updates-available-summary",
+    body: "desktop-updates-available-body",
+};
+
+pub const READY: Notice = Notice {
+    summary: "desktop-updates-ready-summary",
+    body: "desktop-updates-ready-body",
+};
 
 async fn open_updates() -> Result<(), String> {
     let settings = std::env::current_exe()
@@ -111,7 +126,7 @@ pub async fn notify(summary: &str, body: &str) -> Result<(), String> {
 }
 
 fn check() -> Result<(), String> {
-    match backend::current().check_in_background(Preferences::load().download)? {
+    match image::check_in_background(Preferences::load().download)? {
         Some(Notice { summary, body }) => {
             luft_app::block_on(notify(&t!(L10N, summary), &t!(L10N, body)))
         }

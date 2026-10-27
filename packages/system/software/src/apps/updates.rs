@@ -1,23 +1,5 @@
 use crate::apps::appimage::{self, AppImage, Available};
-use crate::apps::classify::Classification;
 use crate::apps::flatpak;
-use crate::system::packagekit::{self, Mode, Update};
-
-pub struct PackageUpdates {
-    pub system: Vec<Update>,
-    pub apps: Vec<Update>,
-}
-
-impl PackageUpdates {
-    pub async fn load(mode: Mode) -> Result<Self, String> {
-        let classification = Classification::current();
-        let (apps, system) = packagekit::updates(mode)
-            .await?
-            .into_iter()
-            .partition(|update| classification.is_app(&update.package.name));
-        Ok(Self { system, apps })
-    }
-}
 
 pub fn appimages() -> Vec<(AppImage, Available)> {
     let apps: Vec<AppImage> = appimage::list()
@@ -43,10 +25,10 @@ pub fn appimages() -> Vec<(AppImage, Available)> {
     })
 }
 
-pub fn app_count(package_apps: usize) -> usize {
+pub fn count() -> usize {
     std::thread::scope(|scope| {
         let flatpaks = scope.spawn(|| flatpak::updates().map(|updates| updates.len()).unwrap_or(0));
         let appimages = scope.spawn(|| appimages().len());
-        package_apps + flatpaks.join().unwrap_or(0) + appimages.join().unwrap_or(0)
+        flatpaks.join().unwrap_or(0) + appimages.join().unwrap_or(0)
     })
 }

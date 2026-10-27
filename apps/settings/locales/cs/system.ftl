@@ -134,24 +134,6 @@ settings-updates-downloading = Stahování aktualizací…
 settings-updates-rolling-back = Příprava předchozí verze…
 settings-updates-switching-nvidia = Stahování ovladače NVIDIA…
 settings-updates-switching-standard = Stahování standardního obrazu…
-settings-updates-elsewhere-refresh-by = Aktualizace hledá { $app }
-settings-updates-elsewhere-download-by = Aktualizace stahuje { $app }
-settings-updates-elsewhere-update-by = Aktualizace instaluje { $app }
-settings-updates-elsewhere-update = Instalují se aktualizace
-settings-updates-elsewhere-install-by = Software instaluje { $app }
-settings-updates-elsewhere-install = Instaluje se software
-settings-updates-elsewhere-remove-by = Software odebírá { $app }
-settings-updates-elsewhere-remove = Odebírá se software
-settings-updates-elsewhere-change-by = Software mění { $app }
-settings-updates-elsewhere-change = Mění se software
-settings-updates-elsewhere-wait = Až to skončí, můžete znovu hledat aktualizace
-settings-updates-ready = Aktualizace jsou připravené k instalaci
-settings-updates-available = { $count ->
-    [one] Je k dispozici { $count } aktualizace
-    [few] Jsou k dispozici { $count } aktualizace
-    [many] Je k dispozici { $count } aktualizace
-   *[other] Je k dispozici { $count } aktualizací
-}
 settings-updates-up-to-date = Systém je aktuální
 settings-updates-version = Verze { $version }
 settings-updates-version-new = Nová verze
@@ -163,13 +145,11 @@ settings-updates-version-available = Je k dispozici verze { $version }
 settings-updates-version-available-new = Je k dispozici nová verze
 settings-updates-version-staged = Verze { $version } je připravená k instalaci
 settings-updates-version-staged-new = Nová verze je připravená k instalaci
-settings-updates-restart-install-them = Po restartu se nainstalují. Počítač bude za pár minut zase připravený.
 settings-updates-restart-return = Návrat se dokončí po restartu.
 settings-updates-restart-switch = Dokončí se po restartu. Počítač bude za pár minut zase připravený.
 settings-updates-restart-install-it = Po restartu se nainstaluje. Počítač bude za pár minut zase připravený.
 settings-updates-last-checked = Naposledy zkontrolováno { $when }
 settings-updates-never-checked = Zatím nezkontrolováno
-settings-updates-installed-when = Aktualizace nainstalovány { $when }
 settings-updates-stop = Zastavit
 settings-updates-check = Zkontrolovat
 settings-updates-checking-button = Kontrola…
@@ -198,41 +178,7 @@ settings-updates-firmware-restart = Dokončí se po restartu
 settings-updates-firmware-installing = Instalace…
 settings-updates-firmware-update = Aktualizovat
 settings-updates-firmware-failed = Firmware se nepodařilo aktualizovat
-settings-updates-failed = Poslední aktualizace se nepodařilo nainstalovat
-settings-updates-failed-description = Systém zůstal beze změny
-settings-updates-includes = { $parts ->
-    [security] Obsahuje opravy zabezpečení
-    [kernel] Obsahuje nové jádro Linuxu
-    [drivers] Obsahuje aktualizované ovladače
-    [security-kernel] Obsahuje opravy zabezpečení a nové jádro Linuxu
-    [security-drivers] Obsahuje opravy zabezpečení a aktualizované ovladače
-    [kernel-drivers] Obsahuje nové jádro Linuxu a aktualizované ovladače
-    [security-kernel-drivers] Obsahuje opravy zabezpečení, nové jádro Linuxu a aktualizované ovladače
-   *[other] Opravy a vylepšení v celém systému
-}
-settings-updates-count-size = { $count ->
-    [one] { $count } aktualizace · { $size }
-    [few] { $count } aktualizace · { $size }
-    [many] { $count } aktualizace · { $size }
-   *[other] { $count } aktualizací · { $size }
-}
-settings-updates-restart-and-install = Restartovat a nainstalovat
 settings-updates-download = Stáhnout
-settings-updates-see-included = Zobrazit obsah
-settings-updates-included = Co obsahují
-settings-updates-included-description = { $count ->
-    [one] { $count } aktualizace systému, jeho ovladačů a knihoven
-    [few] { $count } aktualizace systému, jeho ovladačů a knihoven
-    [many] { $count } aktualizace systému, jeho ovladačů a knihoven
-   *[other] { $count } aktualizací systému, jeho ovladačů a knihoven
-}
-settings-updates-security-fix = Oprava zabezpečení
-settings-updates-done = Hotovo
-settings-updates-area-kernel = Jádro Linuxu
-settings-updates-area-drivers = Ovladače a firmware
-settings-updates-area-desktop = Plocha
-settings-updates-area-core = Základ systému
-settings-updates-area-other = Knihovny a nástroje
 settings-updates-released = Vydáno { $when }
 settings-updates-improvements = Opravy a vylepšení v celém systému
 settings-updates-download-size = Ke stažení: { $size }

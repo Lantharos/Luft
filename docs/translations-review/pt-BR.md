@@ -49,9 +49,8 @@ Strings in Luft's Brazilian Portuguese translation that a native speaker should 
 - `apps/settings/locales/pt-BR/personalization.ftl` `settings-accessibility-pointing`: "Ponteiro" — section heading for pointing aids; "Apontar e clicar" is GNOME's alternative if this feels too narrow.
 - `apps/settings/locales/pt-BR/personalization.ftl` `settings-fonts-sample`: "Um pequeno jabuti xereta viu dez cegonhas felizes" — classic Brazilian pangram (misses k, w, y); check it is the preferred one.
 - `packages/web/ui/locales/pt-BR/ui.ftl` `ui-passphrase-field`: "Frase secreta" — used for "passphrase" throughout to keep it apart from "senha"; GNOME's term, Windows BitLocker just says "senha".
-- `apps/settings/locales/pt-BR/protection.ftl` `settings-passwords-history-read`: "{ $app } usou “{ $item }”" — app names start the sentence without the article the style guide asks for (o Rover), since $app can be any app; same in the other history lines, `settings-passwords-forget-*` and `settings-updates-elsewhere-*-by`.
+- `apps/settings/locales/pt-BR/protection.ftl` `settings-passwords-history-read`: "{ $app } usou “{ $item }”" — app names start the sentence without the article the style guide asks for (o Rover), since $app can be any app; same in the other history lines and `settings-passwords-forget-*`.
 - `apps/settings/locales/pt-BR/protection.ftl` `settings-security-anti-cheat`: "Jogos com antitrapaça" — "anti-cheat" is often left in English by Brazilian gamers; check which reads more natural.
-- `apps/settings/locales/pt-BR/system.ftl` `settings-updates-installed-when`: "Atualizações instaladas { $when }" — relies on $when being "há 3 dias" / "ontem"; same in `settings-updates-released`, `settings-passwords-ssh-added`, `settings-passkeys-last-used`.
 - `apps/settings/locales/pt-BR/system.ftl` `settings-updates-stay`: "Ficar na { $version }" — elided "versão"; check it reads naturally with a version number.
 
 

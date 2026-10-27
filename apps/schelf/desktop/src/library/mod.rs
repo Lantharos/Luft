@@ -13,13 +13,10 @@ use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use crate::fedora;
-
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Debug)]
 #[serde(rename_all = "camelCase")]
 pub enum Source {
     Flatpak,
-    Package,
     AppImage,
     Tool,
     Debian,
@@ -63,17 +60,13 @@ struct FlatpakRef {
 pub fn installed() -> Vec<InstalledApp> {
     let mut apps: Vec<InstalledApp> = std::thread::scope(|scope| {
         let flatpaks = scope.spawn(flatpaks::installed);
-        let packages = scope.spawn(fedora::installed);
-        let tools = (!fedora::available()).then(|| scope.spawn(tools::installed));
+        let tools = scope.spawn(tools::installed);
         let system = scope.spawn(system::installed);
         let debs = scope.spawn(debian::installed);
         let mut apps = appimages::installed();
         apps.extend(debs.join().unwrap_or_default());
         apps.extend(flatpaks.join().unwrap_or_default());
-        apps.extend(packages.join().unwrap_or_default());
-        if let Some(tools) = tools {
-            apps.extend(tools.join().unwrap_or_default());
-        }
+        apps.extend(tools.join().unwrap_or_default());
         apps.extend(system.join().unwrap_or_default());
         apps
     });

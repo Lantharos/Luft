@@ -39,7 +39,6 @@ Strings in Luft's Icelandic translation that a native speaker should check: term
 
 ## Settings
 
-- `apps/settings/locales/is/system.ftl` `settings-updates-elsewhere-*-by`: "{ $app } er að leita að uppfærslum" — the app name is the subject in the nominative; when the app is unknown it reads "Annað forrit er að …". Check both read naturally.
 - `apps/settings/locales/is/devices.ftl` `settings-power-duration-minutes`: "{ $minutes } mínútu" — durations are in the accusative so they fit „eftir { $time }“, „Um { $time } eftir“ and the pickers after „Slökkva á skjánum eftir“; check every use reads well.
 - `apps/settings/locales/is/devices.ftl` `settings-dictation-copilot-key`: "Copilot-lyklinum" — dative, because it fills „Haltu { $keys } inni“; check the joined list „Super+Alt eða Copilot-lyklinum“.
 - `apps/settings/locales/is/devices.ftl` `settings-dictation-engine-description`: "Talgreining með { $engine } – { $language }" — rebuilt so the language name's case doesn't matter.

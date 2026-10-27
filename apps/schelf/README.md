@@ -9,9 +9,6 @@ Schelf is where you get apps on Luft. It finds, installs, updates and removes ap
 | `.deb` files | Your account, in an Ubuntu 26.04 Toolbox container called `luft-ubuntu`, with menu entries and icons copied out, unless the app is on Flathub too, which Schelf offers first |
 | Fedora packages as command-line tools | Your account, in the default Toolbox container, with launchers in `~/.local/bin` |
 | System packages (`--system`) | Everyone, merged over Luft's image as a system extension and rebuilt with each update ([how](../../docs/system-packages.md)), from Fedora, added software sources such as a vendor's RPM repository or a COPR, and desktop-app `.rpm` files |
-| System software sources | Everyone, through PackageKit, on regular Fedora installs only |
-
-Everything for regular Fedora installs lives in `desktop/src/fedora` and `src/lib/fedora`, and is switched off on Luft's image, where command-line tools take its place.
 
 ## Build and run
 

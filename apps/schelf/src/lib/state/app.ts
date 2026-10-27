@@ -1,6 +1,5 @@
 import { appearance } from '@luft/ui';
 import { backend } from '#lib/bridge/index.js';
-import { fedora } from '#lib/fedora/fedora.svelte.js';
 import { library } from './library.svelte';
 import { navigation, type Route } from './navigation.svelte';
 import { operations } from './operations.svelte';
@@ -42,7 +41,6 @@ function openPage(argumentsList: (string | null)[]) {
 
 export async function start() {
 	const state = await backend.appState();
-	fedora.available = state.fedora;
 	appearance.start(state);
 	openPage([state.page]);
 	openFiles(state.files);
@@ -50,6 +48,5 @@ export async function start() {
 		openPage(list);
 		openFiles(await backend.activationFiles(list, workingDirectory));
 	});
-	void fedora.load();
 	await Promise.all([operations.start(), library.start()]);
 }

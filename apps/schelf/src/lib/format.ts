@@ -5,7 +5,6 @@ export function sourceName(source: Source, origin: string) {
 	if (source === 'tool') return 'Tools container';
 	if (source === 'debian') return '.deb file, in the Ubuntu container';
 	if (source === 'system') return origin === 'Fedora' ? 'System package' : `System package from ${origin}`;
-	if (source === 'package') return origin || 'System package';
 	return origin === 'flathub' ? 'Flathub' : origin;
 }
 

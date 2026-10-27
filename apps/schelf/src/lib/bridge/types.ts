@@ -1,12 +1,11 @@
 import type { Appearance } from '@luft/ui';
 
-export type Source = 'flatpak' | 'package' | 'appImage' | 'tool' | 'debian' | 'system';
+export type Source = 'flatpak' | 'appImage' | 'tool' | 'debian' | 'system';
 export type Installation = 'user' | 'system';
 
 export interface AppState extends Appearance {
 	files: string[];
 	page: string | null;
-	fedora: boolean;
 }
 
 export interface InstalledApp {
@@ -88,39 +87,9 @@ export interface Permissions {
 	systemBus: string[];
 }
 
-export interface FedoraSummary {
-	id: string;
-	package: string;
-	name: string;
-	summary: string;
-	icon: string | null;
-	categories: string[];
-	keywords: string[];
-	screenshots: number;
-}
-
 export interface Screenshot {
 	url: string;
 	caption: string | null;
-}
-
-export interface PackageDetails {
-	package: { id: string; name: string; version: string; arch: string; data: string };
-	summary: string;
-	description: string;
-	url: string;
-	license: string;
-	size: number;
-	downloadSize: number;
-}
-
-export interface FedoraApp extends Omit<FedoraSummary, 'screenshots'> {
-	description: string;
-	developer: string | null;
-	license: string | null;
-	homepage: string | null;
-	screenshots: Screenshot[];
-	details: PackageDetails | null;
 }
 
 export type Stage = 'waiting' | 'preparing' | 'downloading' | 'installing' | 'removing' | 'finishing';
@@ -156,17 +125,13 @@ export type Job =
 	| { kind: 'removeDeb'; package: string }
 	| { kind: 'updateDebs'; packages: string[] }
 	| { kind: 'addFlatpakRepo'; path: string; name: string }
-	| { kind: 'installPackage'; package: string }
-	| { kind: 'installPackageFile'; path: string }
 	| { kind: 'installAppImage'; path: string }
 	| { kind: 'installTool'; package: string }
 	| { kind: 'installToolFile'; path: string }
 	| { kind: 'removeFlatpak'; installation: Installation; reference: string }
-	| { kind: 'removePackage'; package: string }
 	| { kind: 'removeAppImage'; id: string }
 	| { kind: 'removeTool'; package: string }
 	| { kind: 'updateFlatpaks'; installation: Installation; references: string[] }
-	| { kind: 'updatePackages'; packages: string[] }
 	| { kind: 'updateAppImage'; id: string }
 	| { kind: 'updateTools'; packages: string[] }
 	| { kind: 'installSystemPackages'; packages: string[] }
@@ -217,11 +182,8 @@ export interface Backend {
 	activationFiles(argumentsList: string[], workingDirectory: string | null): Promise<string[]>;
 	flathub<T>(path: string): Promise<T>;
 	flathubSearch<T>(query: string): Promise<T>;
-	fedoraApps(): Promise<FedoraSummary[]>;
-	fedoraApp(id: string): Promise<FedoraApp>;
 	installed(): Promise<InstalledApp[]>;
 	launch(desktop: string): Promise<void>;
-	fedoraRemovalPlan(packageName: string): Promise<string[]>;
 	searchTools(query: string): Promise<ToolSummary[]>;
 	searchSystem(query: string): Promise<ToolSummary[]>;
 	sources(): Promise<AddedSource[]>;

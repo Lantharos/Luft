@@ -130,22 +130,6 @@ settings-updates-downloading = Frissítések letöltése…
 settings-updates-rolling-back = A korábbi verzió előkészítése…
 settings-updates-switching-nvidia = Az NVIDIA-illesztőprogram letöltése…
 settings-updates-switching-standard = A normál rendszerkép letöltése…
-settings-updates-elsewhere-refresh-by = { $app } frissítéseket keres
-settings-updates-elsewhere-download-by = { $app } frissítéseket tölt le
-settings-updates-elsewhere-update-by = { $app } frissítéseket telepít
-settings-updates-elsewhere-update = Frissítések telepítése folyamatban
-settings-updates-elsewhere-install-by = { $app } szoftvert telepít
-settings-updates-elsewhere-install = Szoftver telepítése folyamatban
-settings-updates-elsewhere-remove-by = { $app } szoftvert távolít el
-settings-updates-elsewhere-remove = Szoftver eltávolítása folyamatban
-settings-updates-elsewhere-change-by = { $app } szoftvert módosít
-settings-updates-elsewhere-change = Szoftver módosítása folyamatban
-settings-updates-elsewhere-wait = Ha ez befejeződött, újra kereshet frissítéseket
-settings-updates-ready = A frissítések készen állnak a telepítésre
-settings-updates-available = { $count ->
-    [one] { $count } frissítés érhető el
-   *[other] { $count } frissítés érhető el
-}
 settings-updates-up-to-date = A rendszer naprakész
 settings-updates-version = { $version } verzió
 settings-updates-version-new = Új verzió
@@ -157,13 +141,11 @@ settings-updates-version-available = { $version } verzió érhető el
 settings-updates-version-available-new = Új verzió érhető el
 settings-updates-version-staged = { $version } verzió készen áll a telepítésre
 settings-updates-version-staged-new = Egy új verzió készen áll a telepítésre
-settings-updates-restart-install-them = A telepítésükhöz indítsa újra a számítógépet. Néhány perc múlva újra használható.
 settings-updates-restart-return = A visszatérés befejezéséhez indítsa újra a számítógépet.
 settings-updates-restart-switch = A befejezéshez indítsa újra a számítógépet. Néhány perc múlva újra használható.
 settings-updates-restart-install-it = A telepítéséhez indítsa újra a számítógépet. Néhány perc múlva újra használható.
 settings-updates-last-checked = Utolsó ellenőrzés: { $when }
 settings-updates-never-checked = Még nem volt ellenőrzés
-settings-updates-installed-when = Frissítések telepítve: { $when }
 settings-updates-stop = Leállítás
 settings-updates-check = Ellenőrzés most
 settings-updates-checking-button = Ellenőrzés…
@@ -190,37 +172,7 @@ settings-updates-firmware-restart = Újraindításkor fejeződik be
 settings-updates-firmware-installing = Telepítés…
 settings-updates-firmware-update = Frissítés
 settings-updates-firmware-failed = Nem sikerült frissíteni a firmware-t
-settings-updates-failed = Nem sikerült telepíteni a legutóbbi frissítéseket
-settings-updates-failed-description = A rendszer változatlan maradt
-settings-updates-includes = { $parts ->
-    [security] Biztonsági javításokat tartalmaz
-    [kernel] Új Linux-kernelt tartalmaz
-    [drivers] Frissített illesztőprogramokat tartalmaz
-    [security-kernel] Biztonsági javításokat és új Linux-kernelt tartalmaz
-    [security-drivers] Biztonsági javításokat és frissített illesztőprogramokat tartalmaz
-    [kernel-drivers] Új Linux-kernelt és frissített illesztőprogramokat tartalmaz
-    [security-kernel-drivers] Biztonsági javításokat, új Linux-kernelt és frissített illesztőprogramokat tartalmaz
-   *[other] Javítások és fejlesztések a rendszer egészében
-}
-settings-updates-count-size = { $count ->
-    [one] { $count } frissítés · { $size }
-   *[other] { $count } frissítés · { $size }
-}
-settings-updates-restart-and-install = Újraindítás és telepítés
 settings-updates-download = Letöltés
-settings-updates-see-included = Tartalom megtekintése
-settings-updates-included = Tartalom
-settings-updates-included-description = { $count ->
-    [one] { $count } frissítés a rendszerhez, az illesztőprogramjaihoz és a könyvtáraihoz
-   *[other] { $count } frissítés a rendszerhez, az illesztőprogramjaihoz és a könyvtáraihoz
-}
-settings-updates-security-fix = Biztonsági javítás
-settings-updates-done = Kész
-settings-updates-area-kernel = Linux-kernel
-settings-updates-area-drivers = Illesztőprogramok és firmware
-settings-updates-area-desktop = Asztal
-settings-updates-area-core = Alaprendszer
-settings-updates-area-other = Könyvtárak és eszközök
 settings-updates-released = Megjelent: { $when }
 settings-updates-improvements = Javítások és fejlesztések a rendszer egészében
 settings-updates-download-size = Letöltendő: { $size }

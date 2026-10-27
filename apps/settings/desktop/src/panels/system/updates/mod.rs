@@ -1,11 +1,8 @@
-mod backend;
 mod background;
-mod elsewhere;
 mod firmware;
 mod graphics;
 mod image;
 mod overview;
-mod packages;
 mod schedule;
 mod state;
 mod store;
@@ -63,7 +60,7 @@ async fn load(_: Value) -> Result<(), String> {
 }
 
 fn scan() {
-    backend::current().scan();
+    luft_app::spawn(image::scan());
 }
 
 fn check(_: Value) -> Result<(), String> {
@@ -76,28 +73,20 @@ fn check(_: Value) -> Result<(), String> {
 }
 
 fn download(_: Value) -> Result<(), String> {
-    let started = state::start(
-        Activity::new(Kind::Download),
-        |task| backend::current().download(task),
-        || {
-            backend::current().downloaded();
-            scan();
-        },
-    );
+    let started = state::start(Activity::new(Kind::Download), image::download, || {
+        overview::reload();
+        scan();
+    });
     started
         .then_some(())
         .ok_or_else(|| t!(L10N, "desktop-updates-already-downloading"))
 }
 
 fn rollback(_: Value) -> Result<(), String> {
-    let started = state::start(
-        Activity::new(Kind::Rollback),
-        |task| backend::current().rollback(task),
-        || {
-            overview::reload();
-            scan();
-        },
-    );
+    let started = state::start(Activity::new(Kind::Rollback), image::rollback, || {
+        overview::reload();
+        scan();
+    });
     started
         .then_some(())
         .ok_or_else(|| t!(L10N, "desktop-updates-system-busy"))
@@ -169,7 +158,7 @@ fn open_apps(Token { token }: Token) -> Result<(), String> {
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     state::attach(events);
-    backend::current().watch();
+    image::watch();
     window
         .command("updates_status", |_: Value| {
             Ok::<Status, String>(state::status())

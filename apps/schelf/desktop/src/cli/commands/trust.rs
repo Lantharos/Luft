@@ -6,8 +6,7 @@ use crate::cli::Exit;
 use crate::cli::arguments::Arguments;
 use crate::cli::sources::{Origin, installed};
 use crate::cli::terminal::{Ink, prompt};
-use crate::library::full_access;
-use crate::library::{InstalledApp, Source};
+use crate::library::{InstalledApp, full_access};
 
 const ABILITIES: [&str; 5] = [
     "read, change and delete all your files",
@@ -18,11 +17,7 @@ const ABILITIES: [&str; 5] = [
 ];
 
 fn sandboxed(app: &InstalledApp) -> bool {
-    match app.source {
-        Source::AppImage => true,
-        Source::Flatpak => full_access::offered_for_flatpaks(),
-        _ => false,
-    }
+    full_access::offered(app.source)
 }
 
 fn sandboxed_named(

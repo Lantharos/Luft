@@ -55,7 +55,6 @@ Strings in Luft's Slovak translation that a native speaker should check, each li
 - `apps/settings/locales/sk/personalization.ftl` `settings-fonts-sample`: "Kŕdeľ ďatľov učí koňa žrať kôru." — short well-known sentence rich in diacritics, not a full pangram.
 - `apps/settings/locales/sk/personalization.ftl` `settings-accessibility-bounce-keys`: "Filtrovanie opakovaných stlačení" — long; check against the term KDE/GNOME Slovak use and whether it clips.
 - `apps/settings/locales/sk/personalization.ftl` `settings-fonts-monospace`: "Neproporcionálne" — some OSes say „s pevnou šírkou“; check preference.
-- `apps/settings/locales/sk/system.ftl` `settings-updates-elsewhere-refresh-by` (and the other `-by` messages): "{ $app } hľadá aktualizácie" — the app name stands alone as the subject, so the fallback reads „Iná aplikácia hľadá aktualizácie“; check it reads well with real names like „Schelf“.
 
 ## Website
 

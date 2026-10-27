@@ -119,15 +119,10 @@ fn fedora_package(candidate: &Candidate, apps: &[InstalledApp]) -> Result<(), St
     } else {
         Kind::Command
     };
-    let place = if fedora::in_toolbox() {
-        ", in your Toolbox"
-    } else {
-        ""
-    };
     let mut facts = Facts(Vec::new());
     facts.add(
         "Source",
-        Some(format!("Fedora, {}{place}", kind.describe())),
+        Some(format!("Fedora, {}, in your Toolbox", kind.describe())),
     );
     facts.add("Version", Some(details.version.clone()));
     facts.add(

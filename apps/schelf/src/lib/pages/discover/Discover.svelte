@@ -2,7 +2,6 @@
 	import Shelf from '#lib/components/Shelf.svelte';
 	import * as flathub from '#lib/catalog/flathub.js';
 	import type { AppDetails, CatalogApp } from '#lib/catalog/types.js';
-	import { fedora } from '#lib/fedora/fedora.svelte.js';
 	import { backend } from '#lib/bridge/index.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
 	import Spotlight from './Spotlight.svelte';
@@ -14,8 +13,6 @@
 	let updated = $state<CatalogApp[] | null>(null);
 	let spotlight = $state<AppDetails | null>(null);
 	let offline = $state(false);
-
-	const fedoraApps = $derived(fedora.featured(SHELF_SIZE));
 
 	async function shelf(name: flathub.Collection) {
 		return (await flathub.collection(backend, name, 1, SHELF_SIZE + 1)).apps;
@@ -42,7 +39,7 @@
 		{#if offline}
 			<div class="flex items-center justify-between gap-4 rounded-[var(--radius-group)] bg-[var(--surface)] px-5 py-4">
 				<p class="text-[14px] text-[var(--text-soft)]">
-					Flathub can't be reached right now. {fedora.available ? 'Apps from Fedora and the ones you have are still here.' : 'The apps you have are still here.'}
+					Flathub can't be reached right now. The apps you have are still here.
 				</p>
 				<button type="button" class="button" onclick={load}>Try again</button>
 			</div>
@@ -55,9 +52,6 @@
 			<Shelf title="Trending" apps={trending} onmore={() => navigation.push({ page: 'collection', collection: 'trending' })} />
 			<Shelf title="Popular" apps={popular} onmore={() => navigation.push({ page: 'collection', collection: 'popular' })} />
 			<Shelf title="New and updated" apps={updated} onmore={() => navigation.push({ page: 'collection', collection: 'recently-updated' })} />
-		{/if}
-		{#if fedora.available}
-			<Shelf title="From Fedora" apps={fedoraApps} />
 		{/if}
 	</div>
 </div>

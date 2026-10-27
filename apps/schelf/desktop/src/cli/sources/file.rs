@@ -1,7 +1,6 @@
 use std::path::{Path, PathBuf};
 
 use crate::cli::perform::{Plan, Verb};
-use crate::fedora;
 use crate::files::{self, Opened};
 use crate::library::sources::Bundled;
 use crate::operations::{Job, Request};
@@ -39,9 +38,6 @@ fn job(opened: &Opened) -> Job {
             path: path.into(),
             name: name.clone(),
         },
-        Opened::Package { path, .. } if fedora::available() => {
-            Job::Fedora(fedora::Job::InstallPackageFile { path: path.clone() })
-        }
         Opened::Package {
             path,
             package,

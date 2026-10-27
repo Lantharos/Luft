@@ -1,6 +1,6 @@
 import { onActivity, onOverview, status, type Activity, type Overview } from '#lib/panels/system/updates/api.js';
 
-const IDLE: Activity = { running: null, target: null, elsewhere: null, progress: null, error: null };
+const IDLE: Activity = { running: null, target: null, progress: null, error: null };
 
 class UpdatesStore {
 	overview = $state.raw<Overview | null>(null);

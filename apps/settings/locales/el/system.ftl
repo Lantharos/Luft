@@ -130,22 +130,6 @@ settings-updates-downloading = Λήψη ενημερώσεων…
 settings-updates-rolling-back = Προετοιμασία της προηγούμενης έκδοσης…
 settings-updates-switching-nvidia = Λήψη του προγράμματος οδήγησης της NVIDIA…
 settings-updates-switching-standard = Λήψη της τυπικής εικόνας…
-settings-updates-elsewhere-refresh-by = { $app } αναζητά ενημερώσεις
-settings-updates-elsewhere-download-by = { $app } κάνει λήψη ενημερώσεων
-settings-updates-elsewhere-update-by = { $app } εγκαθιστά ενημερώσεις
-settings-updates-elsewhere-update = Εγκαθίστανται ενημερώσεις
-settings-updates-elsewhere-install-by = { $app } εγκαθιστά λογισμικό
-settings-updates-elsewhere-install = Εγκαθίσταται λογισμικό
-settings-updates-elsewhere-remove-by = { $app } αφαιρεί λογισμικό
-settings-updates-elsewhere-remove = Αφαιρείται λογισμικό
-settings-updates-elsewhere-change-by = { $app } κάνει αλλαγές στο λογισμικό
-settings-updates-elsewhere-change = Γίνονται αλλαγές στο λογισμικό
-settings-updates-elsewhere-wait = Μπορείτε να αναζητήσετε ξανά ενημερώσεις μόλις ολοκληρωθεί
-settings-updates-ready = Οι ενημερώσεις είναι έτοιμες για εγκατάσταση
-settings-updates-available = { $count ->
-    [one] Υπάρχει { $count } διαθέσιμη ενημέρωση
-   *[other] Υπάρχουν { $count } διαθέσιμες ενημερώσεις
-}
 settings-updates-up-to-date = Το σύστημά σας είναι ενημερωμένο
 settings-updates-version = Έκδοση { $version }
 settings-updates-version-new = Νέα έκδοση
@@ -157,13 +141,11 @@ settings-updates-version-available = Η έκδοση { $version } είναι δ�
 settings-updates-version-available-new = Υπάρχει διαθέσιμη νέα έκδοση
 settings-updates-version-staged = Η έκδοση { $version } είναι έτοιμη για εγκατάσταση
 settings-updates-version-staged-new = Μια νέα έκδοση είναι έτοιμη για εγκατάσταση
-settings-updates-restart-install-them = Κάντε επανεκκίνηση για να εγκατασταθούν. Ο υπολογιστής θα είναι ξανά έτοιμος σε λίγα λεπτά.
 settings-updates-restart-return = Κάντε επανεκκίνηση για να ολοκληρωθεί η επιστροφή.
 settings-updates-restart-switch = Κάντε επανεκκίνηση για να ολοκληρωθεί. Ο υπολογιστής θα είναι ξανά έτοιμος σε λίγα λεπτά.
 settings-updates-restart-install-it = Κάντε επανεκκίνηση για να εγκατασταθεί. Ο υπολογιστής θα είναι ξανά έτοιμος σε λίγα λεπτά.
 settings-updates-last-checked = Τελευταίος έλεγχος: { $when }
 settings-updates-never-checked = Δεν έχει γίνει έλεγχος ακόμη
-settings-updates-installed-when = Τελευταία εγκατάσταση ενημερώσεων: { $when }
 settings-updates-stop = Διακοπή
 settings-updates-check = Έλεγχος τώρα
 settings-updates-checking-button = Έλεγχος…
@@ -190,37 +172,7 @@ settings-updates-firmware-restart = Ολοκληρώνεται κατά την �
 settings-updates-firmware-installing = Εγκατάσταση…
 settings-updates-firmware-update = Ενημέρωση
 settings-updates-firmware-failed = Δεν ήταν δυνατή η ενημέρωση του υλικολογισμικού
-settings-updates-failed = Δεν ήταν δυνατή η εγκατάσταση των τελευταίων ενημερώσεων
-settings-updates-failed-description = Το σύστημά σας έμεινε όπως ήταν
-settings-updates-includes = { $parts ->
-    [security] Περιλαμβάνει διορθώσεις ασφαλείας
-    [kernel] Περιλαμβάνει νέο πυρήνα Linux
-    [drivers] Περιλαμβάνει ενημερωμένα προγράμματα οδήγησης
-    [security-kernel] Περιλαμβάνει διορθώσεις ασφαλείας και νέο πυρήνα Linux
-    [security-drivers] Περιλαμβάνει διορθώσεις ασφαλείας και ενημερωμένα προγράμματα οδήγησης
-    [kernel-drivers] Περιλαμβάνει νέο πυρήνα Linux και ενημερωμένα προγράμματα οδήγησης
-    [security-kernel-drivers] Περιλαμβάνει διορθώσεις ασφαλείας, νέο πυρήνα Linux και ενημερωμένα προγράμματα οδήγησης
-   *[other] Διορθώσεις και βελτιώσεις σε όλο το σύστημα
-}
-settings-updates-count-size = { $count ->
-    [one] { $count } ενημέρωση · { $size }
-   *[other] { $count } ενημερώσεις · { $size }
-}
-settings-updates-restart-and-install = Επανεκκίνηση και εγκατάσταση
 settings-updates-download = Λήψη
-settings-updates-see-included = Τι περιλαμβάνεται
-settings-updates-included = Τι περιλαμβάνεται
-settings-updates-included-description = { $count ->
-    [one] { $count } ενημέρωση για το σύστημα, τα προγράμματα οδήγησης και τις βιβλιοθήκες του
-   *[other] { $count } ενημερώσεις για το σύστημα, τα προγράμματα οδήγησης και τις βιβλιοθήκες του
-}
-settings-updates-security-fix = Διόρθωση ασφαλείας
-settings-updates-done = Τέλος
-settings-updates-area-kernel = Πυρήνας Linux
-settings-updates-area-drivers = Προγράμματα οδήγησης και υλικολογισμικό
-settings-updates-area-desktop = Επιφάνεια εργασίας
-settings-updates-area-core = Βασικό σύστημα
-settings-updates-area-other = Βιβλιοθήκες και εργαλεία
 settings-updates-released = Κυκλοφόρησε { $when }
 settings-updates-improvements = Διορθώσεις και βελτιώσεις σε όλο το σύστημα
 settings-updates-download-size = Μέγεθος λήψης: { $size }

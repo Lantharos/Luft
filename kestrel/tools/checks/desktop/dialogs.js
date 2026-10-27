@@ -3,7 +3,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
-import {toggleSurface, Main, loadPendingUpdates} from 'resource:///com/lantharos/kestrel/kestrel.js';
+import {toggleSurface, Main, loadStagedImage} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {descendants, named, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
@@ -74,13 +74,13 @@ async function checkEndSession() {
 }
 
 async function checkRestart() {
-  const pending = await loadPendingUpdates();
+  const staged = await loadStagedImage();
   await call(...END_SESSION, 'Open', new GLib.Variant('(uuuao)', [RESTART, 0, UNHURRIED, []]));
   await eventually(() => Main.modalCount > 0, 'the restart confirmation opens');
   const checkBox = Main.endSessionDialog.checkBox;
-  require(checkBox.visible === (pending?.prepared ?? false), 'the restart confirmation offers updates exactly when some are waiting');
-  if (pending?.version)
-    require(checkBox.getLabelActor().text === `Install version ${pending.version}`, 'the restart confirmation names the waiting version');
+  require(checkBox.visible === (staged?.prepared ?? false), 'the restart confirmation offers updates exactly when some are waiting');
+  if (staged?.version)
+    require(checkBox.getLabelActor().text === `Install version ${staged.version}`, 'the restart confirmation names the waiting version');
   await capture('restart-dialog');
   await call(...END_SESSION, 'Close');
   await eventually(() => Main.modalCount === 0, 'the restart confirmation closes');

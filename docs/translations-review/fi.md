@@ -62,7 +62,6 @@ Strings in Luft's Finnish translation that a native speaker should check. Each i
 - `apps/settings/locales/fi/personalization.ftl` `settings-accessibility-typing-assist-count`: "Pois", "{ $count } päällä" — check the count reads naturally as a row summary.
 - `apps/settings/locales/fi/protection.ftl` `settings-privacy-screen-off-after`: "Kun { $duration } on kulunut" — built so the duration stays in the nominative; check it reads naturally with "1 minuutti" and "5 minuuttia".
 - `apps/settings/locales/fi/protection.ftl` `settings-passwords-history-signed`: "{ $app } allekirjoitti kohteella ”{ $item }”" — "kohteella" is vague; the item is normally a key.
-- `apps/settings/locales/fi/system.ftl` `settings-updates-includes`: "Sisältää tietoturvakorjauksia" — uses tietoturva rather than the glossary's suojaus, because Windows Update says tietoturvapäivitys.
 - `apps/settings/locales/fi/system.ftl` `settings-updates-switching-standard`: "Ladataan vakiokuvaa…" — the standard system image (without NVIDIA's driver); check it's clear.
 - `apps/settings/locales/fi/system.ftl` `settings-users-fingerprint-remove-description`: "Tämän jälkeen { $finger } ei enää kelpaa kirjautumiseen." — relies on the .inline finger name in the nominative.
 

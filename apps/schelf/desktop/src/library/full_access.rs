@@ -1,5 +1,4 @@
 use luft_software::apps::{appimage, flatpak};
-use luft_software::system::System;
 use serde::Deserialize;
 
 use super::Source;
@@ -17,16 +16,8 @@ pub struct Change {
     pub on: bool,
 }
 
-pub fn offered_for_flatpaks() -> bool {
-    System::current() == System::Image
-}
-
-fn offered(source: Source) -> bool {
-    match source {
-        Source::AppImage => true,
-        Source::Flatpak => offered_for_flatpaks(),
-        _ => false,
-    }
+pub fn offered(source: Source) -> bool {
+    matches!(source, Source::AppImage | Source::Flatpak)
 }
 
 pub async fn has(App { id, source }: App) -> Result<bool, String> {
@@ -36,7 +27,7 @@ pub async fn has(App { id, source }: App) -> Result<bool, String> {
 pub async fn set(Change { id, source, on }: Change) -> Result<(), String> {
     match source {
         Source::AppImage => appimage::set_full_access(&id, on).await,
-        Source::Flatpak if offered(source) => flatpak::set_full_access(&id, on).await,
-        _ => Err("Full access is for Flatpak apps on Luft and for AppImages.".to_owned()),
+        Source::Flatpak => flatpak::set_full_access(&id, on).await,
+        _ => Err("Full access is for Flatpak apps and AppImages.".to_owned()),
     }
 }

@@ -137,6 +137,10 @@ notifications-media-previous = Førre spor
 notifications-media-next = Neste spor
 notifications-media-play = Spel av
 notifications-media-pause = Pause
+messages-unknown-app = Ukjend app
+messages-reply = Svar
+messages-reply-placeholder = Skriv eit svar
+messages-reply-send = Send
 
 ## Calendar
 
@@ -174,3 +178,17 @@ emoji-skin-tone-medium-light = Middels lys hudfarge
 emoji-skin-tone-medium = Middels hudfarge
 emoji-skin-tone-medium-dark = Middels mørk hudfarge
 emoji-skin-tone-dark = Mørk hudfarge
+
+## System notifications
+
+messages-system-source = System
+
+## On-screen keyboard
+
+osk-keyboard-settings = Tastaturinnstillingar
+osk-letters-key = ABC
+
+## Media player controls
+
+mpris-unknown-artist = Ukjend artist
+mpris-unknown-title = Ukjend tittel

@@ -36,3 +36,27 @@ keys-page-down = Page Down
 keys-print-screen = Print Screen
 
 date-just-now = Току-що
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-panel = Панел
+
+## System notifications
+
+unsafe-mode-title = Системата е в небезопасен режим
+unsafe-mode-body = Приложенията вече имат неограничен достъп
+unsafe-mode-undo = Отмени
+privileged-user-title = Влезли сте като привилегирован потребител
+privileged-user-body = От съображения за сигурност е добре сесията да не работи като привилегирован потребител. Ако е възможно, влезте като обикновен потребител.
+
+## Starting programs
+
+spawn-failed = Изпълнението на „{ $command }“ не успя:
+
+## Text field context menu
+
+entry-menu-copy = Копирай
+entry-menu-paste = Постави
+entry-menu-show-text = Покажи текста
+entry-menu-hide-text = Скрий текста
+entry-caps-lock-on = Caps Lock е включен

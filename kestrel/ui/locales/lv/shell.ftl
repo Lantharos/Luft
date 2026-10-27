@@ -36,3 +36,27 @@ keys-page-down = Page Down
 keys-print-screen = Print Screen
 
 date-just-now = Tikko
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-panel = Uzdevumjosla
+
+## System notifications
+
+unsafe-mode-title = Sistēma pārslēgta nedrošā režīmā
+unsafe-mode-body = Lietotnēm tagad ir neierobežota piekļuve
+unsafe-mode-undo = Atsaukt
+privileged-user-title = Pierakstīšanās kā priviliģētam lietotājam
+privileged-user-body = Drošības dēļ sesiju nevajadzētu izmantot kā priviliģētam lietotājam. Ja iespējams, pierakstieties kā parasts lietotājs.
+
+## Starting programs
+
+spawn-failed = Neizdevās izpildīt „{ $command }“:
+
+## Text field context menu
+
+entry-menu-copy = Kopēt
+entry-menu-paste = Ielīmēt
+entry-menu-show-text = Rādīt tekstu
+entry-menu-hide-text = Slēpt tekstu
+entry-caps-lock-on = Caps Lock ir ieslēgts

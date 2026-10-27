@@ -166,3 +166,257 @@ peek-error-unknown-modifier = { $modifier } nėra modifikavimo klavišas. Naudok
 peek-error-display-owner = Šis ekranas priklauso kitai programai
 peek-error-display-run = Programas paslėptame ekrane paleidžia peek run
 peek-error-display-handle = Šis ekranas paleistas kaip { $handle }, o ne { $requested }
+
+## Quick settings tiles
+
+auto-rotate-title = Automatinis pasukimas
+dark-style-title = Tamsusis režimas
+do-not-disturb-title = Netrukdyti
+night-light-title = Naktinė šviesa
+airplane-mode-title = Lėktuvo režimas
+
+## Power mode
+
+power-profile-title = Maitinimo režimas
+power-profile-header = Maitinimo režimas
+power-profile-open-menu = Atidaryti maitinimo režimų meniu
+power-profile-settings = Maitinimo nustatymai
+power-profile-performance = Našumas
+power-profile-balanced = Subalansuotas
+power-profile-power-saver = Energijos taupymas
+power-profile-custom = Pasirinktinis
+
+## Keep awake
+
+caffeine-title = Neužmigti
+caffeine-open-menu = Atidaryti meniu Neužmigti
+caffeine-until = Iki { $time }
+caffeine-until-turned-off = Kol išjungsite
+caffeine-30-minutes = 30 minučių
+caffeine-1-hour = 1 valandą
+caffeine-2-hours = 2 valandas
+caffeine-inhibit-reason = Neužmigti įjungta sparčiuosiuose nustatymuose
+
+## Brightness
+
+brightness-title = Šviesumas
+brightness-open-menu = Atidaryti šviesumo meniu
+
+## Keyboard backlight
+
+backlight-title = Klaviatūros apšvietimas
+backlight-open-menu = Atidaryti klaviatūros šviesumo meniu
+backlight-slider = Klaviatūros šviesumas
+backlight-off = Išjungta
+backlight-low = Silpnas
+backlight-high = Stiprus
+
+## Sound
+
+volume-sound-settings = Garso nustatymai
+volume-mute = Nutildyti
+volume-unmute = Įjungti garsą
+volume-output-slider = Garsumas
+volume-output-title = Garso išvestis
+volume-output-open-menu = Atidaryti garso išvesties meniu
+volume-input-slider = Mikrofonas
+volume-input-title = Garso įvestis
+volume-input-open-menu = Atidaryti garso įvesties meniu
+
+## Bluetooth
+
+bluetooth-title = Bluetooth
+bluetooth-open-menu = Atidaryti Bluetooth meniu
+bluetooth-settings = Bluetooth nustatymai
+bluetooth-connect = Prijungti
+bluetooth-disconnect = Atjungti
+bluetooth-connect-device = Prijungti įrenginį { $deviceName }
+bluetooth-disconnect-device = Atjungti įrenginį { $deviceName }
+bluetooth-no-devices = Nėra pasiekiamų ar prijungtų įrenginių
+bluetooth-turn-on-hint = Įjunkite Bluetooth, kad galėtumėte prijungti įrenginius
+bluetooth-connected-count = { $count ->
+    [one] { $count } prijungtas
+    [few] { $count } prijungti
+    [many] { $count } prijungto
+   *[other] { $count } prijungtų
+}
+
+## Network menus in quick settings
+
+network-menu-unknown-network = <nežinomas>
+network-menu-connect = Prisijungti
+network-menu-disconnect = Atsijungti
+network-menu-connect-to = Prisijungti prie tinklo { $name }
+network-menu-disconnect-from = Atsijungti nuo tinklo { $name }
+network-menu-turn-off = Išjungti
+network-menu-wifi-network = { $secure ->
+    [yes] { $name }, saugus, signalo stiprumas { $strength } %
+   *[no] { $name }, nesaugus, signalo stiprumas { $strength } %
+}
+network-menu-hotspot = Prieigos taškas { $name }
+network-menu-connected-count = { $count ->
+    [one] { $count } prijungtas
+    [few] { $count } prijungti
+    [many] { $count } prijungto
+   *[other] { $count } prijungtų
+}
+network-menu-vpn = VPN
+network-menu-vpn-open-menu = Atidaryti VPN meniu
+network-menu-vpn-settings = VPN nustatymai
+network-menu-wifi = Wi-Fi
+network-menu-wifi-open-menu = Atidaryti Wi-Fi meniu
+network-menu-wifi-settings = Visi tinklai
+network-menu-wired = Laidiniai ryšiai
+network-menu-wired-open-menu = Atidaryti laidinių ryšių meniu
+network-menu-wired-settings = Laidinio ryšio nustatymai
+network-menu-tethers = Bluetooth modemai
+network-menu-tethers-open-menu = Atidaryti Bluetooth modemų meniu
+network-menu-tether = Modemas
+network-menu-tether-settings = Bluetooth nustatymai
+network-menu-mobile-connections = Mobilieji ryšiai
+network-menu-mobile-open-menu = Atidaryti mobiliųjų ryšių meniu
+network-menu-mobile-settings = Mobiliojo interneto nustatymai
+network-menu-mobile = Mobilusis
+network-device-wired = Laidinis
+network-device-named = { $kind } ({ $name })
+network-menu-sign-in = Prisijungti prie tinklo
+network-menu-failed-title = Nepavyko prisijungti
+network-menu-failed-body = Nepavyko suaktyvinti tinklo ryšio
+
+## Location access dialog
+
+location-dialog-title = Leisti pasiekti buvimo vietą
+location-dialog-description = Programa { $appName } nori pasiekti jūsų buvimo vietą
+location-dialog-info = Buvimo vietos prieigą bet kada galite pakeisti Nustatymų skiltyje Privatumas
+location-dialog-deny = Neleisti
+location-dialog-grant = Leisti
+
+## Thunderbolt notifications
+
+thunderbolt-unknown-title = Nežinomas Thunderbolt įrenginys
+thunderbolt-unknown-body = Kol jūsų nebuvo, prijungtas naujas įrenginys. Atjunkite jį ir vėl prijunkite, kad galėtumėte naudoti.
+thunderbolt-unauthorized-title = Nepatvirtintas Thunderbolt įrenginys
+thunderbolt-unauthorized-body = Prijungtas naujas įrenginys, kurį turi patvirtinti administratorius
+thunderbolt-error-title = Thunderbolt patvirtinimo klaida
+thunderbolt-error-body = Nepavyko patvirtinti Thunderbolt įrenginio: { $reason }
+
+## App permission dialog, used when an app asks for access to something
+
+access-dialog-deny = Neleisti
+access-dialog-allow = Leisti
+
+## Display change confirmation
+
+display-change-title = Palikti šiuos nustatymus?
+display-change-countdown = { $seconds ->
+    [one] Nustatymai bus atkurti po { $seconds } sekundės
+    [few] Nustatymai bus atkurti po { $seconds } sekundžių
+    [many] Nustatymai bus atkurti po { $seconds } sekundės
+   *[other] Nustatymai bus atkurti po { $seconds } sekundžių
+}
+display-change-revert = Atkurti
+display-change-keep = Palikti
+
+## Drive connected notification
+
+autorun-connected = Prijungtas „{ $driveName }“
+autorun-ready = Diską jau galima naudoti
+autorun-open-with = Atidaryti programoje { $appName }
+
+## Keyboard accessibility shortcuts
+
+kbd-a11y-slow-keys-on = Lėtieji klavišai įjungti
+kbd-a11y-slow-keys-off = Lėtieji klavišai išjungti
+kbd-a11y-slow-keys-description = Ką tik 8 sekundes laikėte nuspaudę klavišą Shift. Taip įjungiami lėtieji klavišai, kurie keičia klaviatūros veikimą.
+kbd-a11y-sticky-keys-on = Lipnieji klavišai įjungti
+kbd-a11y-sticky-keys-off = Lipnieji klavišai išjungti
+kbd-a11y-sticky-keys-on-description = Ką tik 5 kartus iš eilės paspaudėte klavišą Shift. Taip įjungiami lipnieji klavišai, kurie keičia klaviatūros veikimą.
+kbd-a11y-sticky-keys-off-description = Ką tik paspaudėte du klavišus vienu metu arba 5 kartus iš eilės paspaudėte klavišą Shift. Taip išjungiami lipnieji klavišai, kurie keičia klaviatūros veikimą.
+kbd-a11y-leave-on = Palikti įjungtus
+kbd-a11y-turn-on = Įjungti
+kbd-a11y-turn-off = Išjungti
+kbd-a11y-leave-off = Palikti išjungtus
+
+## Audio device selection, shown after plugging something into the headphone jack
+
+audio-device-title = Pasirinkite garso įrenginį
+audio-device-cancel = Atšaukti
+audio-device-sound-settings = Garso nustatymai
+audio-device-headphones = Ausinės
+audio-device-headset = Ausinės su mikrofonu
+audio-device-microphone = Mikrofonas
+
+## Keyboard shortcut inhibiting, asked when an app wants to receive system shortcuts itself
+
+inhibit-shortcuts-title = Leisti perimti sparčiuosius klavišus
+inhibit-shortcuts-app = Programa { $appName } nori perimti sparčiuosius klavišus
+inhibit-shortcuts-unknown-app = Programa nori perimti sparčiuosius klavišus
+inhibit-shortcuts-restore = Sparčiuosius klavišus galite grąžinti paspaudę { $shortcut }
+inhibit-shortcuts-deny = Neleisti
+inhibit-shortcuts-allow = Leisti
+
+## Unlocking encrypted drives
+
+mount-hidden-volume = Paslėptas tomas
+mount-windows-system-volume = Windows sistemos tomas
+mount-uses-keyfiles = Naudoja raktų failus
+mount-keyfiles-use-app = Norėdami atrakinti tomą, kuriam naudojami raktų failai, naudokite programą <i>{ $appName }</i>
+mount-keyfiles-need-app = Norint atrakinti tomą, kuriam naudojami raktų failai, reikia išorinės programos, pavyzdžiui, <i>Diskai</i>
+mount-pim-number = PIM numeris
+mount-pim-invalid = PIM turi būti skaičius arba tuščias
+mount-password = Slaptažodis
+mount-remember-password = Įsiminti slaptažodį
+mount-cancel = Atšaukti
+mount-unlock = Atrakinti
+mount-open-app = Atidaryti programą { $appName }
+mount-wrong-password = Nepavyko. Bandykite dar kartą.
+mount-unlock-failed = Nepavyko atrakinti tomo
+mount-pim-unsupported = Įdiegta udisks versija nepalaiko PIM nustatymo
+
+## Network passwords, asked when connecting needs one
+
+network-agent-auth-required = Reikia patvirtinti tapatybę
+network-agent-wifi-rejected = Įrašytas tinklo „{ $networkName }“ slaptažodis netiko. Įveskite jį dar kartą.
+network-agent-wifi-secrets = Norint prisijungti prie belaidžio tinklo „{ $networkName }“, reikia slaptažodžių arba šifravimo raktų
+network-agent-wps-hint = Taip pat galite prisijungti paspaudę maršruto parinktuvo mygtuką „WPS“
+network-agent-wired-title = Laidinio 802.1X ryšio tapatybės patvirtinimas
+network-agent-dsl-title = DSL tapatybės patvirtinimas
+network-agent-pin-title = Reikia PIN kodo
+network-agent-pin-body = Mobiliojo interneto įrenginiui reikia PIN kodo
+network-agent-vpn-title = VPN slaptažodis
+network-agent-password-required = Norint prisijungti prie „{ $networkName }“, reikia slaptažodžio
+network-agent-connect = Prisijungti
+network-agent-cancel = Atšaukti
+network-agent-password = Slaptažodis
+network-agent-username = Naudotojo vardas
+network-agent-key = Raktas
+network-agent-private-key-password = Privačiojo rakto slaptažodis
+network-agent-identity = Tapatybė
+network-agent-service = Paslauga
+network-agent-network-name = Tinklo pavadinimas
+network-agent-pin = PIN
+
+## Screenshots and screen recording
+
+screenshot-source = Ekrano fiksavimas
+screenshot-area = Srities pasirinkimas
+screenshot-screen = Ekrano pasirinkimas
+screenshot-window = Lango pasirinkimas
+screenshot-take = Padaryti ekrano kopiją
+screenshot-record = Įrašyti ekraną
+screenshot-show-pointer = Rodyti žymiklį
+screenshot-capture = Fiksuoti
+screenshot-close = Uždaryti
+screenshot-screencasts-folder = Ekrano įrašai
+screenshot-screencast-file = Ekrano įrašas { $date } { $time }
+screenshot-screenshots-folder = Ekrano kopijos
+screenshot-file = Ekrano kopija { $timestamp }
+screenshot-screencast-recorded = Ekrano įrašas paruoštas
+screenshot-screencast-start-failed = Nepavyko pradėti įrašyti ekrano
+screenshot-screencast-out-of-space = Nepavyko įrašyti ekrano: diske trūksta vietos
+screenshot-screencast-try-again = Nepavyko įrašyti ekrano. Bandykite dar kartą.
+screenshot-screencast-failed = Nepavyko įrašyti ekrano
+screenshot-screencast-view = Spustelėkite, kad peržiūrėtumėte vaizdo įrašą
+screenshot-show-in-rover = Rodyti programoje Rover
+screenshot-captured = Ekrano kopija padaryta
+screenshot-captured-body = Paveikslėlį galite įklijuoti iš iškarpinės

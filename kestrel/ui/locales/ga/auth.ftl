@@ -24,6 +24,7 @@ lock-screen-larger-text = Téacs níos mó
 lock-screen-suspend = Codladh
 lock-screen-restart = Atosaigh…
 lock-screen-power-off = Múch…
+lock-inhibit-reason = Caithfidh Kestrel an scáileán a ghlasáil
 
 ## Keyring and passphrase prompts. Apps usually supply their own text; these are the defaults
 
@@ -67,3 +68,89 @@ passkeys-ok = OK
 passkeys-use-this-computer = Úsáid an ríomhaire seo
 passkeys-fingerprint-unavailable = Úsáid do phasfhocal chun leanúint ar aghaidh.
 passkeys-wrong-password = Níl an pasfhocal sin ceart. Bain triail eile as.
+
+## Sign-in prompt
+
+auth-prompt-password = Pasfhocal
+auth-prompt-username = Ainm úsáideora
+auth-prompt-back = Ar ais
+auth-prompt-submit = Seol
+auth-prompt-wrong-password = Níor oibrigh an pasfhocal sin
+auth-prompt-failed = Níor oibrigh sé sin. Bain triail eile as.
+fingerprint-not-recognized = Níor aithníodh an méarlorg
+
+## Administrator authentication
+
+polkit-title = Fíordheimhniú riachtanach
+polkit-administrator = Riarthóir
+polkit-password = Pasfhocal
+polkit-cancel = Cealaigh
+polkit-authenticate = Fíordheimhnigh
+polkit-failed = Níor oibrigh sé sin. Bain triail eile as.
+
+## Log out, power off and restart dialog
+
+end-session-log-out-user = Sínigh amach { $userName }
+end-session-log-out-title = Sínigh amach
+end-session-log-out-user-countdown = { $seconds ->
+    [one] Sínfear { $userName } amach go huathoibríoch i gceann { $seconds } shoicind
+    [two] Sínfear { $userName } amach go huathoibríoch i gceann { $seconds } shoicind
+    [few] Sínfear { $userName } amach go huathoibríoch i gceann { $seconds } shoicind
+    [many] Sínfear { $userName } amach go huathoibríoch i gceann { $seconds } soicind
+   *[other] Sínfear { $userName } amach go huathoibríoch i gceann { $seconds } soicind
+}
+end-session-log-out-countdown = { $seconds ->
+    [one] Sínfear amach thú go huathoibríoch i gceann { $seconds } shoicind
+    [two] Sínfear amach thú go huathoibríoch i gceann { $seconds } shoicind
+    [few] Sínfear amach thú go huathoibríoch i gceann { $seconds } shoicind
+    [many] Sínfear amach thú go huathoibríoch i gceann { $seconds } soicind
+   *[other] Sínfear amach thú go huathoibríoch i gceann { $seconds } soicind
+}
+end-session-log-out-button = Sínigh amach
+end-session-power-off-title = Múch
+end-session-power-off-updates-title = Suiteáil nuashonruithe agus múch
+end-session-power-off-countdown = { $seconds ->
+    [one] Múchfar an córas go huathoibríoch i gceann { $seconds } shoicind
+    [two] Múchfar an córas go huathoibríoch i gceann { $seconds } shoicind
+    [few] Múchfar an córas go huathoibríoch i gceann { $seconds } shoicind
+    [many] Múchfar an córas go huathoibríoch i gceann { $seconds } soicind
+   *[other] Múchfar an córas go huathoibríoch i gceann { $seconds } soicind
+}
+end-session-power-off-button = Múch
+end-session-restart-title = Atosaigh
+end-session-restart-updates-title = Suiteáil nuashonruithe agus atosaigh
+end-session-restart-countdown = { $seconds ->
+    [one] Atosófar an córas go huathoibríoch i gceann { $seconds } shoicind
+    [two] Atosófar an córas go huathoibríoch i gceann { $seconds } shoicind
+    [few] Atosófar an córas go huathoibríoch i gceann { $seconds } shoicind
+    [many] Atosófar an córas go huathoibríoch i gceann { $seconds } soicind
+   *[other] Atosófar an córas go huathoibríoch i gceann { $seconds } soicind
+}
+end-session-restart-button = Atosaigh
+end-session-update-restart-title = Atosaigh agus suiteáil nuashonruithe
+end-session-update-restart-countdown = { $seconds ->
+    [one] Atosófar an córas agus suiteálfar nuashonruithe go huathoibríoch i gceann { $seconds } shoicind
+    [two] Atosófar an córas agus suiteálfar nuashonruithe go huathoibríoch i gceann { $seconds } shoicind
+    [few] Atosófar an córas agus suiteálfar nuashonruithe go huathoibríoch i gceann { $seconds } shoicind
+    [many] Atosófar an córas agus suiteálfar nuashonruithe go huathoibríoch i gceann { $seconds } soicind
+   *[other] Atosófar an córas agus suiteálfar nuashonruithe go huathoibríoch i gceann { $seconds } soicind
+}
+end-session-update-restart-button = Atosaigh agus suiteáil
+end-session-install-updates = Suiteáil na nuashonruithe bogearraí atá ag fanacht
+end-session-install-version = Suiteáil leagan { $version }
+end-session-low-battery = Ceallra íseal: plugáil isteach sula suiteálann tú nuashonruithe
+end-session-busy-apps = Tá roinnt aipeanna gnóthach nó tá obair gan sábháil iontu
+end-session-other-users = Tá úsáideoirí eile sínithe isteach
+end-session-cancel = Cealaigh
+end-session-boot-options = Roghanna tosaithe
+end-session-remote-user = { $userName } (cian)
+end-session-console-user = { $userName } (consól)
+
+## Lock screen clock
+
+lock-clock-swipe-up = Scuab suas
+lock-clock-click-or-press = Cliceáil nó brúigh eochair
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-unlock = Fuinneog díghlasála

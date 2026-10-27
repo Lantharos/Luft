@@ -1,9 +1,9 @@
 import Clutter from 'gi://Clutter';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
-import { CheckBox } from '../../shell/widgets/checkBox.js';
-import { MessageDialogContent } from '../../shell/dialogs/dialog.js';
-import { ModalDialog } from '../../shell/dialogs/modalDialog.js';
+import { CheckBox } from '../../shared/widgets/checkBox.js';
+import { MessageDialogContent } from '../../shared/dialogs/dialog.js';
+import { ModalDialog } from '../../shared/dialogs/modalDialog.js';
 
 import { appIcon } from '../../appearance/icons/appIcons.js';
 import { t } from '../../shared/i18n/index.js';

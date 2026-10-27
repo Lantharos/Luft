@@ -21,11 +21,11 @@ Strings in Luft's Slovak translation that a native speaker should check, each li
 
 ## Kestrel and setup
 
-- `kestrel/ui/locales/sk/engine.ftl` `network-menu-tether`: "Tethering" — English loanword used for Bluetooth tethering; check it reads naturally or whether "Zdieľanie pripojenia" fits the tile.
+- `kestrel/ui/locales/sk/system.ftl` `network-menu-tether`: "Tethering" — English loanword used for Bluetooth tethering; check it reads naturally or whether "Zdieľanie pripojenia" fits the tile.
 - `kestrel/ui/locales/sk/system.ftl` `privacy-indicator`: "Používa sa: { $things }" — built as a label + list to avoid gender agreement with "vaša/váš/vaše"; check it sounds natural with a list like "kamera, mikrofón a obrazovka".
 - `kestrel/ui/locales/sk/portal.ftl` `portal-unknown-app-subject`/`portal-unknown-app-object`: "Táto aplikácia"/"táto aplikácia" — all $appName sentences use the name in the nominative ("Môže { $appName } …?"); check the uninflected real app names read well there.
 - `apps/setup/locales/sk/setup.ftl` `setup-region-field-keyboard`: "klávesnicu" — written in the accusative because it is only used inside "Odhadli sme { $guesses }"; check no other place shows it alone.
-- `kestrel/ui/locales/sk/engine.ftl` `ctrl-alt-tab-unlock`: "Okno odomknutia" — unclear English source ("Unlock Window" as a noun); check wording.
+- `kestrel/ui/locales/sk/auth.ftl` `ctrl-alt-tab-unlock`: "Okno odomknutia" — unclear English source ("Unlock Window" as a noun); check wording.
 - `kestrel/ui/locales/sk/desktop.ftl` `task-view-desktop`: "Pracovný priestor { $number }" — workspace name in the task view, matching Settings; check it fits under each workspace thumbnail.
 - `apps/setup/locales/sk/setup.ftl` `setup-windows-hibernated` / `setup-windows-fast-startup`: "rýchle spustenie" — check the name Slovak Windows uses for Fast Startup (rýchle spúšťanie?) and whether it should be capitalized.
 

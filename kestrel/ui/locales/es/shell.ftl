@@ -36,3 +36,27 @@ keys-page-down = Av Pág
 keys-print-screen = Impr Pant
 
 date-just-now = Ahora mismo
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-panel = Barra de tareas
+
+## System notifications
+
+unsafe-mode-title = El sistema está en modo no seguro
+unsafe-mode-body = Las aplicaciones tienen ahora acceso sin restricciones
+unsafe-mode-undo = Deshacer
+privileged-user-title = Sesión iniciada como usuario con privilegios
+privileged-user-body = Por seguridad, no conviene usar una sesión como usuario con privilegios. Si puedes, inicia sesión como usuario normal.
+
+## Starting programs
+
+spawn-failed = No se ha podido ejecutar «{ $command }»:
+
+## Text field context menu
+
+entry-menu-copy = Copiar
+entry-menu-paste = Pegar
+entry-menu-show-text = Mostrar texto
+entry-menu-hide-text = Ocultar texto
+entry-caps-lock-on = Bloq Mayús está activado

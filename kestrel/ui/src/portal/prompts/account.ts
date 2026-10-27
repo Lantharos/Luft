@@ -1,7 +1,7 @@
 import AccountsService from 'gi://AccountsService';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import { Avatar } from '../../shell/widgets/userWidget.js';
+import { Avatar } from '../../shared/widgets/userWidget.js';
 
 import { t } from '../../shared/i18n/index.js';
 import { appNames } from '../core/apps.js';

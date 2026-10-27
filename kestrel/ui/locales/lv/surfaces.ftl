@@ -140,6 +140,10 @@ notifications-media-previous = Iepriekšējais ieraksts
 notifications-media-next = Nākamais ieraksts
 notifications-media-play = Atskaņot
 notifications-media-pause = Pauzēt
+messages-unknown-app = Nezināma lietotne
+messages-reply = Atbildēt
+messages-reply-placeholder = Rakstiet atbildi
+messages-reply-send = Sūtīt
 
 ## Calendar
 
@@ -177,3 +181,17 @@ emoji-skin-tone-medium-light = Vidēji gaišs ādas tonis
 emoji-skin-tone-medium = Vidējs ādas tonis
 emoji-skin-tone-medium-dark = Vidēji tumšs ādas tonis
 emoji-skin-tone-dark = Tumšs ādas tonis
+
+## System notifications
+
+messages-system-source = Sistēma
+
+## On-screen keyboard
+
+osk-keyboard-settings = Tastatūras iestatījumi
+osk-letters-key = ABC
+
+## Media player controls
+
+mpris-unknown-artist = Nezināms izpildītājs
+mpris-unknown-title = Nezināms nosaukums

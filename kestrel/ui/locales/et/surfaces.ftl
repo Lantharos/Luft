@@ -140,6 +140,10 @@ notifications-media-previous = Eelmine lugu
 notifications-media-next = Järgmine lugu
 notifications-media-play = Esita
 notifications-media-pause = Peata
+messages-unknown-app = Tundmatu rakendus
+messages-reply = Vasta
+messages-reply-placeholder = Kirjuta vastus
+messages-reply-send = Saada
 
 ## Calendar
 
@@ -177,3 +181,17 @@ emoji-skin-tone-medium-light = Keskmiselt hele nahatoon
 emoji-skin-tone-medium = Keskmine nahatoon
 emoji-skin-tone-medium-dark = Keskmiselt tume nahatoon
 emoji-skin-tone-dark = Tume nahatoon
+
+## System notifications
+
+messages-system-source = Süsteem
+
+## On-screen keyboard
+
+osk-keyboard-settings = Klaviatuurisätted
+osk-letters-key = ABC
+
+## Media player controls
+
+mpris-unknown-artist = Tundmatu esitaja
+mpris-unknown-title = Tundmatu pealkiri

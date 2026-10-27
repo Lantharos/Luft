@@ -63,3 +63,45 @@ snap-zone = Zaskoči v območje { $width } % × { $height } %
 title-bar-minimize = Minimiraj
 title-bar-maximize = Maksimiraj
 title-bar-close = Zapri
+
+## Window resizing
+
+window-resize-size = { $width } × { $height }
+
+## App not responding
+
+close-dialog-title = „{ $appName }“ se ne odziva
+close-dialog-description = Počakate lahko, da se aplikacija spet odzove, ali pa jo prisilno zaprete
+close-dialog-force-quit = Prisilno zapri
+close-dialog-wait = Počakaj
+
+## Display mode switcher, keep each label under about 15 characters
+
+switch-monitor-mirror = Zrcaljenje
+switch-monitor-join = Združi zaslone
+switch-monitor-external-only = Samo zunanji
+switch-monitor-built-in-only = Samo vgrajeni
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-windows = Okna
+
+## Window menu, opened by right-clicking a window's title bar
+
+title-bar-menu-screenshot = Zajemi posnetek zaslona
+title-bar-menu-hide = Skrij
+title-bar-menu-restore = Obnovi
+title-bar-menu-maximize = Maksimiraj
+title-bar-menu-move = Premakni
+title-bar-menu-resize = Spremeni velikost
+title-bar-menu-always-on-top = Vedno na vrhu
+title-bar-menu-always-on-visible-workspace = Vedno na vidni delovni površini
+title-bar-menu-workspace-left = Premakni na levo delovno površino
+title-bar-menu-workspace-right = Premakni na desno delovno površino
+title-bar-menu-workspace-up = Premakni na zgornjo delovno površino
+title-bar-menu-workspace-down = Premakni na spodnjo delovno površino
+title-bar-menu-monitor-up = Premakni na zgornji zaslon
+title-bar-menu-monitor-down = Premakni na spodnji zaslon
+title-bar-menu-monitor-left = Premakni na levi zaslon
+title-bar-menu-monitor-right = Premakni na desni zaslon
+title-bar-menu-close = Zapri

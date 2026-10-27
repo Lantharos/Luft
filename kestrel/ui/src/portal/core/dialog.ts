@@ -1,8 +1,8 @@
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
-import { MessageDialogContent } from '../../shell/dialogs/dialog.js';
-import { ModalDialog, type ButtonInfo } from '../../shell/dialogs/modalDialog.js';
+import { MessageDialogContent } from '../../shared/dialogs/dialog.js';
+import { ModalDialog, type ButtonInfo } from '../../shared/dialogs/modalDialog.js';
 import { promptAppeared } from '../../system/sounds/sounds.js';
 import { CANCELLED, ENDED, type Dismissal, type Options, type Outcome } from './request.js';
 

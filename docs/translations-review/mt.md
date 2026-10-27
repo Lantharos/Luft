@@ -38,10 +38,10 @@ Strings in Luft's Maltese translation that a native speaker should check: places
 - `kestrel/ui/locales/mt/system.ftl` `health-gpu-reset-body`: "Il-kompjuter irristartja waħdu ({ $date }, { $time })." — date and time put in brackets to avoid article assimilation with the formatted values.
 - `kestrel/ui/locales/mt/portal.ftl` `screen-share-title`: "Tippermetti li { $appName } tara l-iskrin?" — built around "li" so the unknown-app fallback "l-app" fits without "ma’ l-app"; loses the word "share".
 - `kestrel/ui/locales/mt/portal.ftl` `portal-account-title`: "Tippermetti li { $appName } tara l-isem u l-istampa tal-kont?" — same construction as above.
-- `kestrel/ui/locales/mt/engine.ftl` `caffeine-until`: "Sa { $time }" — "sal-" would need assimilation with the formatted time; check "Sa 14:30" reads acceptably.
-- `kestrel/ui/locales/mt/engine.ftl` `close-dialog-title`: "“{ $appName }” mhix qed tirrispondi" — feminine agreement for an app name; check it reads naturally with names like Firefox.
-- `kestrel/ui/locales/mt/engine.ftl` `network-menu-tethers`: "Tethering bil-Bluetooth" — no settled Maltese term; kept the English tethering.
-- `kestrel/ui/locales/mt/engine.ftl` `screenshot-screencasts-folder`: "Rekordjar tal-iskrin" — folder name on disk; check it's a good folder name versus keeping "Screencasts".
+- `kestrel/ui/locales/mt/system.ftl` `caffeine-until`: "Sa { $time }" — "sal-" would need assimilation with the formatted time; check "Sa 14:30" reads acceptably.
+- `kestrel/ui/locales/mt/desktop.ftl` `close-dialog-title`: "“{ $appName }” mhix qed tirrispondi" — feminine agreement for an app name; check it reads naturally with names like Firefox.
+- `kestrel/ui/locales/mt/system.ftl` `network-menu-tethers`: "Tethering bil-Bluetooth" — no settled Maltese term; kept the English tethering.
+- `kestrel/ui/locales/mt/system.ftl` `screenshot-screencasts-folder`: "Rekordjar tal-iskrin" — folder name on disk; check it's a good folder name versus keeping "Screencasts".
 - `apps/setup/locales/mt/setup.ftl` `setup-region-intro-guessed`: "Ejja nissettjaw kollox. Għażilna { $guesses }, …" — the list is built from "il-lingwa / it-tastiera / iż-żona tal-ħin" plus "skont il-kompjuter / skont in-netwerk"; check the joined sentence flows.
 - `apps/setup/locales/mt/setup.ftl` `setup-replace-keeps-accounts`: "{ $count } kont ieħor fiha, bil-fajls tagħhom" — singular noun with plural possessive for many/other; check the agreement.
 - `apps/setup/installer/locales/mt/installer.ftl` `installer-box-unopened`: "Il-kaxxa tat-trasferiment ma setgħetx tinfetaħ" — "moving box" rendered as transfer box; check it matches what Meet Luft calls it in Maltese.

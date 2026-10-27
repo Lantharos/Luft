@@ -26,8 +26,8 @@ Strings in Luft's Polish translation that a native speaker should check, each li
 - `kestrel/ui/locales/pl/system.ftl` `oom-closed-body`: "Na komputerze kończyła się pamięć. Zamknięcie pozwoliło zachować płynne działanie reszty systemu." — rephrased to avoid gender agreement with an app or container.
 - `kestrel/ui/locales/pl/surfaces.ftl` `quick-settings-on`: "Włączone" — neuter used generically for tiles of any gender (Bluetooth, Tryb samolotowy, Oświetlenie nocne).
 - `kestrel/ui/locales/pl/surfaces.ftl` `start-search-settings-section`: "Ustawienia: { $page }" — check it fits as a search result description.
-- `kestrel/ui/locales/pl/engine.ftl` `auto-rotate-title`: "Autoobracanie" — short tile title; GNOME says "Automatyczne obracanie", which may clip.
-- `kestrel/ui/locales/pl/engine.ftl` `network-menu-tethers`: "Tethering przez Bluetooth" — no settled Polish term; Windows and Android also use "tethering".
+- `kestrel/ui/locales/pl/system.ftl` `auto-rotate-title`: "Autoobracanie" — short tile title; GNOME says "Automatyczne obracanie", which may clip.
+- `kestrel/ui/locales/pl/system.ftl` `network-menu-tethers`: "Tethering przez Bluetooth" — no settled Polish term; Windows and Android also use "tethering".
 - `apps/setup/locales/pl/setup.ftl` `setup-region-field-keyboard`: "klawiaturę" — the field names are in the accusative to fit "Dobrano { $guesses }"; they're only used in that list.
 - `apps/setup/locales/pl/setup.ftl` `setup-network-unavailable`: "Możesz połączyć się później z paska zadań." — English says "from the panel"; check which part of the desktop is meant.
 - `apps/setup/locales/pl/setup.ftl` `setup-windows-hibernated`: "…przytrzymaj Shift i wybierz Zamknij…" — Polish Windows calls Shut down "Zamknij" in the power menu; Fast Startup is "szybkie uruchamianie".

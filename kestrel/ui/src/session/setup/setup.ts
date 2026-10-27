@@ -3,7 +3,7 @@ import Gio from 'gi://Gio';
 import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
-import { LockBackdrop } from '../../shell/lockScreen/backdrop.js';
+import { LockBackdrop } from '../../auth/lockScreen/backdrop.js';
 
 import { AppearanceService } from '../../appearance/service.js';
 import type { Rgb } from '../../appearance/color.js';

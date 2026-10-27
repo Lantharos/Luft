@@ -28,12 +28,12 @@ Strings in Luft's Nynorsk translation that a native speaker should check: terms 
 - `kestrel/ui/locales/nn/system.ftl` `privacy-indicator`: "Brukar { $things }" with definite list items (kameraet, mikrofonen …) — check the list joins naturally without a possessive.
 - `kestrel/ui/locales/nn/system.ftl` `oom-closed-body`: "… så han vart lukka …" — "han" stands for both the app and the container; check it reads naturally.
 - `kestrel/ui/locales/nn/system.ftl` `health-gpu-reset-body`: "… på nytt { $date } klokka { $time }." — check the date placeable (e.g. "3. mars") fits without "den".
-- `kestrel/ui/locales/nn/system.ftl` `battery-device-headset`: "Headset" — English loan, also in `engine.ftl` `audio-device-headset`; check against «hovudtelefonar med mikrofon».
+- `kestrel/ui/locales/nn/system.ftl` `battery-device-headset`: "Headset" — English loan, also in `system.ftl` `audio-device-headset`; check against «hovudtelefonar med mikrofon».
 - `kestrel/ui/locales/nn/portal.ftl` `screen-share-device-touchscreen`: "Trykkskjerm" — no settled Nynorsk term (Bokmål systems say «berøringsskjerm»).
-- `kestrel/ui/locales/nn/engine.ftl` `network-menu-hotspot`: "Tilgangspunkt på { $name }" — check wording for a shared Wi-Fi hotspot.
-- `kestrel/ui/locales/nn/engine.ftl` `network-menu-tethers`: "Deling over Bluetooth" (and `network-menu-tether` "Deling") — no settled term for Bluetooth tethering.
-- `kestrel/ui/locales/nn/engine.ftl` `display-change-title`: "Behalde skjerminnstillingane?" — kept under 30 characters; check the bare infinitive question reads fine.
-- `kestrel/ui/locales/nn/engine.ftl` `end-session-remote-user`: "{ $userName } (eksternt)" — check this is the clearest word for a user signed in over SSH.
+- `kestrel/ui/locales/nn/system.ftl` `network-menu-hotspot`: "Tilgangspunkt på { $name }" — check wording for a shared Wi-Fi hotspot.
+- `kestrel/ui/locales/nn/system.ftl` `network-menu-tethers`: "Deling over Bluetooth" (and `network-menu-tether` "Deling") — no settled term for Bluetooth tethering.
+- `kestrel/ui/locales/nn/system.ftl` `display-change-title`: "Behalde skjerminnstillingane?" — kept under 30 characters; check the bare infinitive question reads fine.
+- `kestrel/ui/locales/nn/auth.ftl` `end-session-remote-user`: "{ $userName } (eksternt)" — check this is the clearest word for a user signed in over SSH.
 - `apps/setup/locales/nn/setup.ftl` `setup-windows-hibernated`: "… Rask oppstart … hald inne Skift medan du vel Avslutt …" — names taken from Norwegian Windows (Rask oppstart, Avslutt, and Diskbehandling in `setup-windows-bitlocker`); verify against a Norwegian Windows.
 - `apps/setup/locales/nn/setup.ftl` `setup-region-intro-guessed`: "Vi har gjetta { $guesses }, …" with parts like "tastaturet ut frå datamaskinen" — check the joined sentence reads naturally.
 - `apps/setup/locales/nn/setup.ftl` `setup-network-unavailable`: "… frå oppgåvelinja." — English says "the panel", read here as the taskbar.

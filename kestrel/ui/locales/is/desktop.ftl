@@ -61,3 +61,45 @@ snap-zone = Raða á svæði sem er { $width }% á breidd og { $height }% á hæ
 title-bar-minimize = Lágmarka
 title-bar-maximize = Hámarka
 title-bar-close = Loka
+
+## Window resizing
+
+window-resize-size = { $width } × { $height }
+
+## App not responding
+
+close-dialog-title = „{ $appName }“ svarar ekki
+close-dialog-description = Þú getur beðið smástund eftir að forritið taki við sér eða þvingað það til að hætta.
+close-dialog-force-quit = Þvinga til að hætta
+close-dialog-wait = Bíða
+
+## Display mode switcher, keep each label under about 15 characters
+
+switch-monitor-mirror = Spegla
+switch-monitor-join = Sameina skjái
+switch-monitor-external-only = Aðeins ytri
+switch-monitor-built-in-only = Aðeins innbyggður
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-windows = Gluggar
+
+## Window menu, opened by right-clicking a window's title bar
+
+title-bar-menu-screenshot = Taka skjámynd
+title-bar-menu-hide = Fela
+title-bar-menu-restore = Endurheimta
+title-bar-menu-maximize = Hámarka
+title-bar-menu-move = Færa
+title-bar-menu-resize = Breyta stærð
+title-bar-menu-always-on-top = Alltaf efst
+title-bar-menu-always-on-visible-workspace = Alltaf á sýnilegu vinnusvæði
+title-bar-menu-workspace-left = Færa á vinnusvæði til vinstri
+title-bar-menu-workspace-right = Færa á vinnusvæði til hægri
+title-bar-menu-workspace-up = Færa á vinnusvæði fyrir ofan
+title-bar-menu-workspace-down = Færa á vinnusvæði fyrir neðan
+title-bar-menu-monitor-up = Færa á skjá fyrir ofan
+title-bar-menu-monitor-down = Færa á skjá fyrir neðan
+title-bar-menu-monitor-left = Færa á skjá til vinstri
+title-bar-menu-monitor-right = Færa á skjá til hægri
+title-bar-menu-close = Loka

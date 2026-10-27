@@ -2,3 +2,25 @@ kestrel/ui/src/system/network/pluginSecrets.ts	Xauth password
 kestrel/ui/src/system/peek/access/scopes.ts	Program started with peek
 kestrel/ui/src/system/peek/service.ts	The mouse button is 1 (left), 2 (middle) or 3 (right)
 kestrel/ui/src/system/peek/service.ts	Launch needs the process to adopt
+kestrel/ui/src/system/screencast/recorder.ts	Sender has vanished
+kestrel/ui/src/system/screencast/recorder.ts	Session closed unexpectedly
+kestrel/ui/src/system/screencast/recorder.ts	All pipelines failed to start
+kestrel/ui/src/system/screencast/recorder.ts	Unexpected EOS message
+kestrel/ui/src/system/screencast/recorder.ts	Out of disk space
+kestrel/ui/src/system/screencast/screencastService.ts	Saving to disk is disabled
+kestrel/ui/src/system/screencast/screencastService.ts	Service is already recording
+kestrel/ui/src/system/display/ddcutil.ts	Invalid display
+kestrel/ui/src/system/privacy/accessDialog.ts	Already showing a system access dialog
+kestrel/ui/src/system/privacy/accessDialog.ts	Only the focused app is allowed to show a system access dialog
+kestrel/ui/src/system/drives/automountManager.ts	No key available with this passphrase
+kestrel/ui/src/system/drives/automountManager.ts	No key available to unlock device
+kestrel/ui/src/system/drives/automountManager.ts	Failed to activate device: Incorrect passphrase
+kestrel/ui/src/system/drives/automountManager.ts	Failed to load device\'s parameters: Invalid argument
+kestrel/ui/src/system/drives/automountManager.ts	Failed to load device\'s parameters: Operation not permitted
+kestrel/ui/src/system/drives/automountManager.ts	Compiled against a version of libcryptsetup that does not support the VeraCrypt PIM setting
+kestrel/ui/src/system/screenshot/ui/screencaster.ts	Service crashed
+kestrel/ui/src/system/screenshot/service/screenshotService.ts	There is an ongoing operation for this sender
+kestrel/ui/src/system/screenshot/service/screenshotService.ts	Saving to disk is disabled
+kestrel/ui/src/system/screenshot/service/screenshotService.ts	Screenshots are limited to the system. To see or use windows, run peek --help
+kestrel/ui/src/system/screenshot/service/screenshotService.ts	The area is empty or reaches past the screen
+kestrel/ui/src/system/screenshot/service/screenshotService.ts	Operation was cancelled

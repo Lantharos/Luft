@@ -137,6 +137,10 @@ notifications-media-previous = Előző szám
 notifications-media-next = Következő szám
 notifications-media-play = Lejátszás
 notifications-media-pause = Szünet
+messages-unknown-app = Ismeretlen alkalmazás
+messages-reply = Válasz
+messages-reply-placeholder = Válasz írása
+messages-reply-send = Küldés
 
 ## Calendar
 
@@ -174,3 +178,17 @@ emoji-skin-tone-medium-light = Közepesen világos bőrszín
 emoji-skin-tone-medium = Közepes bőrszín
 emoji-skin-tone-medium-dark = Közepesen sötét bőrszín
 emoji-skin-tone-dark = Sötét bőrszín
+
+## System notifications
+
+messages-system-source = Rendszer
+
+## On-screen keyboard
+
+osk-keyboard-settings = Billentyűzetbeállítások
+osk-letters-key = ABC
+
+## Media player controls
+
+mpris-unknown-artist = Ismeretlen előadó
+mpris-unknown-title = Ismeretlen cím

@@ -143,6 +143,10 @@ notifications-media-previous = Prejšnja skladba
 notifications-media-next = Naslednja skladba
 notifications-media-play = Predvajaj
 notifications-media-pause = Začasno ustavi
+messages-unknown-app = Neznana aplikacija
+messages-reply = Odgovori
+messages-reply-placeholder = Napišite odgovor
+messages-reply-send = Pošlji
 
 ## Calendar
 
@@ -180,3 +184,17 @@ emoji-skin-tone-medium-light = Srednje svetla barva kože
 emoji-skin-tone-medium = Srednja barva kože
 emoji-skin-tone-medium-dark = Srednje temna barva kože
 emoji-skin-tone-dark = Temna barva kože
+
+## System notifications
+
+messages-system-source = Sistem
+
+## On-screen keyboard
+
+osk-keyboard-settings = Nastavitve tipkovnice
+osk-letters-key = ABC
+
+## Media player controls
+
+mpris-unknown-artist = Neznan izvajalec
+mpris-unknown-title = Neznan naslov

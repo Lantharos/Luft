@@ -24,10 +24,10 @@ Strings in Luft's Dutch translation that a native speaker should check: terms wh
 - `kestrel/ui/locales/nl/desktop.ftl` `snap-zone`: "Uitlijnen op een vlak van { $width }% bij { $height }%" — check that "vlak" reads naturally for a screen area in a screen-reader label.
 - `kestrel/ui/locales/nl/system.ftl` `dictation-unsupported-title`: "{ $language } dicteren is niet beschikbaar op deze computer" — $language currently arrives in English ("Japanese"); the sentence avoids an article so it works with either, but check the word order.
 - `kestrel/ui/locales/nl/system.ftl` `privacy-indicator`: "Gebruikt je { $things }" — depends on how the list in $things is joined (should be "en" in Dutch).
-- `kestrel/ui/locales/nl/engine.ftl` `switch-monitor-mirror`, `switch-monitor-join`: "Dupliceren", "Uitbreiden" — Windows' Win+P words rather than literal "Spiegelen"/"Samenvoegen"; confirm.
-- `kestrel/ui/locales/nl/engine.ftl` `ctrl-alt-tab-panel`: "Taakbalk" — English says "Panel", the comment says it is the taskbar.
-- `kestrel/ui/locales/nl/engine.ftl` `screenshot-screenshots-folder`, `screenshot-screencasts-folder`: "Schermafbeeldingen", "Schermopnamen" — folder names on disk; check they match what other Dutch apps (Rover, Magpie) expect.
-- `kestrel/ui/locales/nl/engine.ftl` `screenshot-source`: "Schermopname" — also the word for screen recording; "Schermafbeelding en -opname" may be clearer but long.
+- `kestrel/ui/locales/nl/desktop.ftl` `switch-monitor-mirror`, `switch-monitor-join`: "Dupliceren", "Uitbreiden" — Windows' Win+P words rather than literal "Spiegelen"/"Samenvoegen"; confirm.
+- `kestrel/ui/locales/nl/shell.ftl` `ctrl-alt-tab-panel`: "Taakbalk" — English says "Panel", the comment says it is the taskbar.
+- `kestrel/ui/locales/nl/system.ftl` `screenshot-screenshots-folder`, `screenshot-screencasts-folder`: "Schermafbeeldingen", "Schermopnamen" — folder names on disk; check they match what other Dutch apps (Rover, Magpie) expect.
+- `kestrel/ui/locales/nl/system.ftl` `screenshot-source`: "Schermopname" — also the word for screen recording; "Schermafbeelding en -opname" may be clearer but long.
 - `apps/setup/locales/nl/setup.ftl` `setup-region-intro-guessed`: "Laten we beginnen. We hebben { $guesses } afgeleid, dus pas aan wat niet klopt." — with $guesses like "je toetsenbord van je computer en je tijdzone van je netwerk"; check the joined sentence reads well.
 - `apps/setup/locales/nl/setup.ftl` `setup-account-full-name-example`: "Rembrandt van Rijn" — check a reviewer is happy with this example name.
 - `apps/setup/locales/nl/setup.ftl` `setup-windows-fast-startup`: "Snel opstarten uitschakelen in Windows" — uses the Dutch Windows name "Snel opstarten"; also used in `setup-windows-hibernated`, along with "Schijfbeheer" for Disk Management.

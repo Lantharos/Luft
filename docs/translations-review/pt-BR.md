@@ -25,8 +25,8 @@ Strings in Luft's Brazilian Portuguese translation that a native speaker should 
 - `kestrel/ui/locales/pt-BR/system.ftl` `dictation-unsupported-title`: "O ditado em { $language } não está disponível neste computador" — $language currently arrives in English (“em Japanese”).
 - `apps/setup/locales/pt-BR/setup.ftl` `setup-region-field-language` (and keyboard, time zone): "o idioma" — fields carry articles so “Detectamos o idioma e o teclado pelo computador” reads well; check they are only used inside these lists.
 - `kestrel/ui/locales/pt-BR/portal.ftl` `print-paper-statement`: "Statement" — no settled Brazilian name for this paper size; kept the English name.
-- `kestrel/ui/locales/pt-BR/engine.ftl` `network-menu-tether`: "Ancoragem" — Android's term for tethering; check it is clear on a quick settings tile.
-- `kestrel/ui/locales/pt-BR/engine.ftl` `switch-monitor-external-only`: "Só externa" / `switch-monitor-built-in-only`: "Só integrada" — shortened to stay under 15 characters; feminine agreeing with “tela”.
+- `kestrel/ui/locales/pt-BR/system.ftl` `network-menu-tether`: "Ancoragem" — Android's term for tethering; check it is clear on a quick settings tile.
+- `kestrel/ui/locales/pt-BR/desktop.ftl` `switch-monitor-external-only`: "Só externa" / `switch-monitor-built-in-only`: "Só integrada" — shortened to stay under 15 characters; feminine agreeing with “tela”.
 - `apps/setup/locales/pt-BR/setup.ftl` `setup-account-full-name-example`: "Clarice Lispector" — chosen as a well-known Brazilian name in place of Ada Lovelace.
 
 ## Settings

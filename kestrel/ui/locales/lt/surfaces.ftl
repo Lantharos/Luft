@@ -143,6 +143,10 @@ notifications-media-previous = Ankstesnis takelis
 notifications-media-next = Kitas takelis
 notifications-media-play = Leisti
 notifications-media-pause = Pristabdyti
+messages-unknown-app = Nežinoma programa
+messages-reply = Atsakyti
+messages-reply-placeholder = Rašykite atsakymą
+messages-reply-send = Siųsti
 
 ## Calendar
 
@@ -180,3 +184,17 @@ emoji-skin-tone-medium-light = Vidutiniškai šviesi odos spalva
 emoji-skin-tone-medium = Vidutinė odos spalva
 emoji-skin-tone-medium-dark = Vidutiniškai tamsi odos spalva
 emoji-skin-tone-dark = Tamsi odos spalva
+
+## System notifications
+
+messages-system-source = Sistema
+
+## On-screen keyboard
+
+osk-keyboard-settings = Klaviatūros nustatymai
+osk-letters-key = ABC
+
+## Media player controls
+
+mpris-unknown-artist = Nežinomas atlikėjas
+mpris-unknown-title = Nežinomas pavadinimas

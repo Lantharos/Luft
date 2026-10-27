@@ -61,3 +61,57 @@ snap-zone = Paiguta alale { $width }% × { $height }%
 title-bar-minimize = Minimeeri
 title-bar-maximize = Maksimeeri
 title-bar-close = Sulge
+
+## Window resizing
+
+window-resize-size = { $width } × { $height }
+
+## App not responding
+
+close-dialog-title = „{ $appName }“ ei reageeri
+close-dialog-description = Võid veidi oodata, kuni see jätkab, või sundida rakenduse täielikult sulguma
+close-dialog-force-quit = Sunni sulgema
+close-dialog-wait = Oota
+
+## Display mode switcher, keep each label under about 15 characters
+
+switch-monitor-mirror = Peegelda
+switch-monitor-join = Laienda
+switch-monitor-external-only = Ainult välised
+switch-monitor-built-in-only = Ainult sisemine
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-windows = Aknad
+
+## Window menu, opened by right-clicking a window's title bar
+
+title-bar-menu-screenshot = Tee kuvatõmmis
+title-bar-menu-hide = Peida
+title-bar-menu-restore = Taasta
+title-bar-menu-maximize = Maksimeeri
+title-bar-menu-move = Teisalda
+title-bar-menu-resize = Muuda suurust
+title-bar-menu-always-on-top = Alati pealmine
+title-bar-menu-always-on-visible-workspace = Alati nähtaval tööalal
+title-bar-menu-workspace-left = Teisalda vasakpoolsele tööalale
+title-bar-menu-workspace-right = Teisalda parempoolsele tööalale
+title-bar-menu-workspace-up = Teisalda ülemisele tööalale
+title-bar-menu-workspace-down = Teisalda alumisele tööalale
+title-bar-menu-monitor-up = Teisalda ülemisele kuvarile
+title-bar-menu-monitor-down = Teisalda alumisele kuvarile
+title-bar-menu-monitor-left = Teisalda vasakpoolsele kuvarile
+title-bar-menu-monitor-right = Teisalda parempoolsele kuvarile
+title-bar-menu-close = Sulge
+
+## Rain
+
+rain-title = Vihm
+rain-open-menu = Ava vihmamenüü
+rain-drizzle = Uduvihm
+rain-rain = Vihm
+rain-storm = Torm
+rain-show = Näita töölaual
+rain-sound = Heli
+rain-volume = Vihma valjus
+rain-settings = Vihma seadistused

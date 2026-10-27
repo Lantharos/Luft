@@ -137,6 +137,10 @@ notifications-media-previous = Предишна песен
 notifications-media-next = Следваща песен
 notifications-media-play = Пусни
 notifications-media-pause = Пауза
+messages-unknown-app = Неизвестно приложение
+messages-reply = Отговори
+messages-reply-placeholder = Напишете отговор
+messages-reply-send = Изпрати
 
 ## Calendar
 
@@ -174,3 +178,17 @@ emoji-skin-tone-medium-light = Средно светъл цвят на кожа�
 emoji-skin-tone-medium = Среден цвят на кожата
 emoji-skin-tone-medium-dark = Средно тъмен цвят на кожата
 emoji-skin-tone-dark = Тъмен цвят на кожата
+
+## System notifications
+
+messages-system-source = Система
+
+## On-screen keyboard
+
+osk-keyboard-settings = Настройки на клавиатурата
+osk-letters-key = АБВ
+
+## Media player controls
+
+mpris-unknown-artist = Неизвестен изпълнител
+mpris-unknown-title = Неизвестно заглавие

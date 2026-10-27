@@ -33,10 +33,10 @@ Strings in Luft's Lithuanian translation that a native speaker should check: ter
 - `kestrel/ui/locales/lt/system.ftl` `oom-closed-body`: "Uždaryta, nes kompiuteriui ėmė trūkti atminties. …" — neuter participle so it fits both an app (feminine) and a container (masculine); check it reads well under the title.
 - `kestrel/ui/locales/lt/system.ftl` `dictation-unsupported-title`: "Diktavimas kalba { $language } …" — $language arrives in English for now (e.g. „kalba Japanese“).
 - `kestrel/ui/locales/lt/system.ftl` `privacy-indicator`: "Naudojama: { $things }" — list items are nominative; check the joined list reads well.
-- `kestrel/ui/locales/lt/engine.ftl` `network-menu-tethers`, `network-menu-tether`: "Bluetooth modemai", "Modemas" — no settled Lithuanian term for Bluetooth tethering; check against Android/GNOME.
-- `kestrel/ui/locales/lt/engine.ftl` `auto-rotate-title`: "Automatinis pasukimas" — may clip on a quick settings tile.
-- `kestrel/ui/locales/lt/engine.ftl` `display-change-title`: "Palikti šiuos nustatymus?" — shortened (dropped „ekrano“) to stay under 30 characters.
-- `kestrel/ui/locales/lt/engine.ftl` `switch-monitor-join`: "Išplėsti" — Windows' word for extending the desktop across displays.
+- `kestrel/ui/locales/lt/system.ftl` `network-menu-tethers`, `network-menu-tether`: "Bluetooth modemai", "Modemas" — no settled Lithuanian term for Bluetooth tethering; check against Android/GNOME.
+- `kestrel/ui/locales/lt/system.ftl` `auto-rotate-title`: "Automatinis pasukimas" — may clip on a quick settings tile.
+- `kestrel/ui/locales/lt/system.ftl` `display-change-title`: "Palikti šiuos nustatymus?" — shortened (dropped „ekrano“) to stay under 30 characters.
+- `kestrel/ui/locales/lt/desktop.ftl` `switch-monitor-join`: "Išplėsti" — Windows' word for extending the desktop across displays.
 - `apps/setup/locales/lt/setup.ftl` `setup-region-intro-guessed`: "Pradėkime. Parinkome { $guesses }, tad …" — fields are accusative („kalbą“, „klaviatūrą“, „laiko juostą“) and each guess reads „… pagal jūsų kompiuterį“; check the assembled sentence.
 - `apps/setup/locales/lt/setup.ftl` `setup-replace-keeps-accounts`: "[1] Kita joje esanti paskyra … / Dar { $count } paskyrų …" — exact [1] plus all four categories with „Dar“; check wording.
 - `apps/setup/locales/lt/setup.ftl` `setup-replace-keeps-tools`: "… – prisijungus, Toolbox aplinkoje" — Toolbox kept as a name; check phrasing.

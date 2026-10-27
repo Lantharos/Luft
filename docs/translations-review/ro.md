@@ -24,12 +24,12 @@ Strings in Luft's Romanian translation that a native speaker should check. Each 
 - `kestrel/ui/locales/ro/system.ftl` `privacy-indicator`: "În uz: { $things }" with articulated list items (camera, microfonul, ecranul, locația, ferestrele) — check it reads naturally with the list joiner, e.g. "În uz: camera, microfonul și ecranul".
 - `kestrel/ui/locales/ro/desktop.ftl` `snap-zone`: "Andochează într-o zonă de { $width }% pe { $height }%" — check "X% pe Y%" is a natural way to say width by height.
 - `kestrel/ui/locales/ro/desktop.ftl` `task-view-desktop`: "Spațiu de lucru { $number }" — follows the workspace term instead of Windows' "Desktop 2"; check it fits under a workspace thumbnail.
-- `kestrel/ui/locales/ro/engine.ftl` `bluetooth-connected-count`: "{ $count } dispozitive conectate" — tile subtitle, may clip; a shorter "{ $count } conectate" is the fallback.
-- `kestrel/ui/locales/ro/engine.ftl` `network-menu-connected-count`: "{ $count } conexiuni active" — tile subtitle, may clip.
-- `kestrel/ui/locales/ro/engine.ftl` `switch-monitor-join`: "Extindere" — Windows' "Extinde" wording; confirm it fits "Join Displays".
-- `kestrel/ui/locales/ro/engine.ftl` `ctrl-alt-tab-unlock`: "Fereastra de deblocare" — the lock screen's sign-in prompt; check the wording.
-- `kestrel/ui/locales/ro/engine.ftl` `end-session-log-out-user-countdown`: "{ $userName } se va deconecta automat în …" — reflexive to avoid gender agreement with the name.
-- `kestrel/ui/locales/ro/engine.ftl` `thunderbolt-unknown-body`: "…a fost conectat cât timp computerul era blocat…" — "while you were away" rendered as "while the computer was locked"; confirm that is the real situation.
+- `kestrel/ui/locales/ro/system.ftl` `bluetooth-connected-count`: "{ $count } dispozitive conectate" — tile subtitle, may clip; a shorter "{ $count } conectate" is the fallback.
+- `kestrel/ui/locales/ro/system.ftl` `network-menu-connected-count`: "{ $count } conexiuni active" — tile subtitle, may clip.
+- `kestrel/ui/locales/ro/desktop.ftl` `switch-monitor-join`: "Extindere" — Windows' "Extinde" wording; confirm it fits "Join Displays".
+- `kestrel/ui/locales/ro/auth.ftl` `ctrl-alt-tab-unlock`: "Fereastra de deblocare" — the lock screen's sign-in prompt; check the wording.
+- `kestrel/ui/locales/ro/auth.ftl` `end-session-log-out-user-countdown`: "{ $userName } se va deconecta automat în …" — reflexive to avoid gender agreement with the name.
+- `kestrel/ui/locales/ro/system.ftl` `thunderbolt-unknown-body`: "…a fost conectat cât timp computerul era blocat…" — "while you were away" rendered as "while the computer was locked"; confirm that is the real situation.
 - `apps/setup/locales/ro/setup.ftl` `setup-region-intro-guessed`: "Am dedus { $guesses }, …" with parts like "limba și tastatura de pe computer" — check the assembled sentence with both sources.
 - `apps/setup/locales/ro/setup.ftl` `setup-windows-bitlocker`, `setup-windows-hibernated`: "Gestionare disc", "Pornire rapidă", "Închidere" — check these match Romanian Windows' exact labels.
 - `apps/setup/locales/ro/setup.ftl` `setup-account-full-name-example`: "Ana Aslan" — chosen as a well-known Romanian name.

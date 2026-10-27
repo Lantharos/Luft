@@ -2,7 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
-import { PACKAGE_VERSION } from '../../shell/config.js';
+import { PACKAGE_VERSION } from '../../core/config.js';
 
 import { readText, removeFile, userFile, writeText } from '../files.js';
 import { styledIcon } from './appIcons.js';

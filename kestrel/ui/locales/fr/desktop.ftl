@@ -61,3 +61,45 @@ snap-zone = Ancrer dans la zone de { $width } % sur { $height } %
 title-bar-minimize = Réduire
 title-bar-maximize = Agrandir
 title-bar-close = Fermer
+
+## Window resizing
+
+window-resize-size = { $width } × { $height }
+
+## App not responding
+
+close-dialog-title = « { $appName } » ne répond pas
+close-dialog-description = Vous pouvez attendre un peu qu’elle reprenne, ou forcer l’application à quitter.
+close-dialog-force-quit = Forcer à quitter
+close-dialog-wait = Attendre
+
+## Display mode switcher, keep each label under about 15 characters
+
+switch-monitor-mirror = Dupliquer
+switch-monitor-join = Étendre
+switch-monitor-external-only = Externe seul
+switch-monitor-built-in-only = Intégré seul
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-windows = Fenêtres
+
+## Window menu, opened by right-clicking a window's title bar
+
+title-bar-menu-screenshot = Prendre une capture d’écran
+title-bar-menu-hide = Réduire
+title-bar-menu-restore = Restaurer
+title-bar-menu-maximize = Agrandir
+title-bar-menu-move = Déplacer
+title-bar-menu-resize = Redimensionner
+title-bar-menu-always-on-top = Toujours au premier plan
+title-bar-menu-always-on-visible-workspace = Sur tous les espaces de travail
+title-bar-menu-workspace-left = Déplacer vers l’espace de travail de gauche
+title-bar-menu-workspace-right = Déplacer vers l’espace de travail de droite
+title-bar-menu-workspace-up = Déplacer vers l’espace de travail du haut
+title-bar-menu-workspace-down = Déplacer vers l’espace de travail du bas
+title-bar-menu-monitor-up = Déplacer vers l’écran du haut
+title-bar-menu-monitor-down = Déplacer vers l’écran du bas
+title-bar-menu-monitor-left = Déplacer vers l’écran de gauche
+title-bar-menu-monitor-right = Déplacer vers l’écran de droite
+title-bar-menu-close = Fermer

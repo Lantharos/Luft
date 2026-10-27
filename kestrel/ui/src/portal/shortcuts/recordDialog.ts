@@ -2,8 +2,8 @@ import Clutter from 'gi://Clutter';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 
-import { MessageDialogContent } from '../../shell/dialogs/dialog.js';
-import { ModalDialog } from '../../shell/dialogs/modalDialog.js';
+import { MessageDialogContent } from '../../shared/dialogs/dialog.js';
+import { ModalDialog } from '../../shared/dialogs/modalDialog.js';
 
 import { t } from '../../shared/i18n/index.js';
 import { canonical, claimable, fromEvent, label, labels } from './accelerators.js';

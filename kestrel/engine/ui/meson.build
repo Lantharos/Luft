@@ -72,8 +72,8 @@ custom_target('kestrel-session',
 )
 
 dbus_services = {
-  'com.lantharos.Kestrel.Notifications': 'services/notifications/main.ts',
-  'com.lantharos.Kestrel.Screencast': 'services/screencast/main.ts',
+  'com.lantharos.Kestrel.Notifications': 'surfaces/notifications/service/main.ts',
+  'com.lantharos.Kestrel.Screencast': 'system/screencast/main.ts',
 }
 
 foreach service, entry : dbus_services

@@ -61,3 +61,57 @@ snap-zone = Mbërthe në zonën { $width }% × { $height }%
 title-bar-minimize = Minimizo
 title-bar-maximize = Maksimizo
 title-bar-close = Mbyll
+
+## Window resizing
+
+window-resize-size = { $width } × { $height }
+
+## App not responding
+
+close-dialog-title = “{ $appName }” nuk po përgjigjet
+close-dialog-description = Mund të presësh pak që të vazhdojë ose ta detyrosh aplikacionin të mbyllet plotësisht
+close-dialog-force-quit = Detyro mbylljen
+close-dialog-wait = Prit
+
+## Display mode switcher, keep each label under about 15 characters
+
+switch-monitor-mirror = Pasqyro
+switch-monitor-join = Bashko ekranet
+switch-monitor-external-only = Vetëm të jashtmit
+switch-monitor-built-in-only = Vetëm i brendshmi
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-windows = Dritaret
+
+## Window menu, opened by right-clicking a window's title bar
+
+title-bar-menu-screenshot = Bëj foto ekrani
+title-bar-menu-hide = Fshih
+title-bar-menu-restore = Rikthe
+title-bar-menu-maximize = Maksimizo
+title-bar-menu-move = Lëviz
+title-bar-menu-resize = Ndrysho përmasat
+title-bar-menu-always-on-top = Gjithmonë sipër
+title-bar-menu-always-on-visible-workspace = Gjithmonë në hapësirën e dukshme të punës
+title-bar-menu-workspace-left = Zhvendos në hapësirën e punës majtas
+title-bar-menu-workspace-right = Zhvendos në hapësirën e punës djathtas
+title-bar-menu-workspace-up = Zhvendos në hapësirën e punës sipër
+title-bar-menu-workspace-down = Zhvendos në hapësirën e punës poshtë
+title-bar-menu-monitor-up = Zhvendos në monitorin sipër
+title-bar-menu-monitor-down = Zhvendos në monitorin poshtë
+title-bar-menu-monitor-left = Zhvendos në monitorin majtas
+title-bar-menu-monitor-right = Zhvendos në monitorin djathtas
+title-bar-menu-close = Mbyll
+
+## Rain
+
+rain-title = Shi
+rain-open-menu = Hap menynë e shiut
+rain-drizzle = Vesë
+rain-rain = Shi
+rain-storm = Stuhi
+rain-show = Shfaqe në desktop
+rain-sound = Zëri
+rain-volume = Volumi i shiut
+rain-settings = Cilësimet e shiut

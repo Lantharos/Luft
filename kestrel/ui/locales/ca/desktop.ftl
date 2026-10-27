@@ -61,3 +61,45 @@ snap-zone = Ajusta a l’àrea de { $width } % per { $height } %
 title-bar-minimize = Minimitza
 title-bar-maximize = Maximitza
 title-bar-close = Tanca
+
+## Window resizing
+
+window-resize-size = { $width } × { $height }
+
+## App not responding
+
+close-dialog-title = «{ $appName }» no respon
+close-dialog-description = Podeu esperar una mica perquè continuï o forçar que l’aplicació es tanqui del tot
+close-dialog-force-quit = Força el tancament
+close-dialog-wait = Espera
+
+## Display mode switcher, keep each label under about 15 characters
+
+switch-monitor-mirror = Duplica
+switch-monitor-join = Amplia
+switch-monitor-external-only = Només externa
+switch-monitor-built-in-only = Només integrada
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-windows = Finestres
+
+## Window menu, opened by right-clicking a window's title bar
+
+title-bar-menu-screenshot = Fes una captura de pantalla
+title-bar-menu-hide = Amaga
+title-bar-menu-restore = Restaura
+title-bar-menu-maximize = Maximitza
+title-bar-menu-move = Mou
+title-bar-menu-resize = Canvia la mida
+title-bar-menu-always-on-top = Sempre al davant
+title-bar-menu-always-on-visible-workspace = Sempre a l’espai de treball visible
+title-bar-menu-workspace-left = Mou a l’espai de treball de l’esquerra
+title-bar-menu-workspace-right = Mou a l’espai de treball de la dreta
+title-bar-menu-workspace-up = Mou a l’espai de treball de dalt
+title-bar-menu-workspace-down = Mou a l’espai de treball de baix
+title-bar-menu-monitor-up = Mou a la pantalla de dalt
+title-bar-menu-monitor-down = Mou a la pantalla de baix
+title-bar-menu-monitor-left = Mou a la pantalla de l’esquerra
+title-bar-menu-monitor-right = Mou a la pantalla de la dreta
+title-bar-menu-close = Tanca

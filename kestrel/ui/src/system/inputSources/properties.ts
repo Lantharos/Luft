@@ -1,5 +1,5 @@
 import IBus from 'gi://IBus';
-import { getIBusManager } from '../../shell/input/ibusManager.js';
+import { getIBusManager } from './ibusManager.js';
 
 import type { MenuEntry } from '../../desktop/menus/contextMenus.js';
 

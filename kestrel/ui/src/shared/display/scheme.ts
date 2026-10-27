@@ -1,5 +1,5 @@
 import St from 'gi://St';
-import { getStyleVariant } from '../../shell/stage/kestrelTheme.js';
+import { getStyleVariant } from '../../appearance/kestrelTheme.js';
 
 export const isDark = (): boolean => getStyleVariant() === 'dark';
 

@@ -24,6 +24,7 @@ lock-screen-larger-text = Μεγαλύτερο κείμενο
 lock-screen-suspend = Αναστολή λειτουργίας
 lock-screen-restart = Επανεκκίνηση…
 lock-screen-power-off = Τερματισμός λειτουργίας…
+lock-inhibit-reason = Το Kestrel πρέπει να κλειδώσει την οθόνη
 
 ## Keyring and passphrase prompts. Apps usually supply their own text; these are the defaults
 
@@ -67,3 +68,74 @@ passkeys-ok = OK
 passkeys-use-this-computer = Χρήση αυτού του υπολογιστή
 passkeys-fingerprint-unavailable = Χρησιμοποιήστε τον κωδικό πρόσβασής σας για να συνεχίσετε.
 passkeys-wrong-password = Ο κωδικός πρόσβασης δεν είναι σωστός. Δοκιμάστε ξανά.
+
+## Sign-in prompt
+
+auth-prompt-password = Κωδικός πρόσβασης
+auth-prompt-username = Όνομα χρήστη
+auth-prompt-back = Πίσω
+auth-prompt-submit = Υποβολή
+auth-prompt-wrong-password = Ο κωδικός πρόσβασης δεν είναι σωστός
+auth-prompt-failed = Δεν λειτούργησε. Δοκιμάστε ξανά.
+fingerprint-not-recognized = Το δακτυλικό αποτύπωμα δεν αναγνωρίστηκε
+
+## Administrator authentication
+
+polkit-title = Απαιτείται έλεγχος ταυτότητας
+polkit-administrator = Διαχειριστής
+polkit-password = Κωδικός πρόσβασης
+polkit-cancel = Ακύρωση
+polkit-authenticate = Έλεγχος ταυτότητας
+polkit-failed = Δεν λειτούργησε. Δοκιμάστε ξανά.
+
+## Log out, power off and restart dialog
+
+end-session-log-out-user = Αποσύνδεση χρήστη { $userName }
+end-session-log-out-title = Αποσύνδεση
+end-session-log-out-user-countdown = { $seconds ->
+    [one] Ο χρήστης { $userName } θα αποσυνδεθεί αυτόματα σε { $seconds } δευτερόλεπτο
+   *[other] Ο χρήστης { $userName } θα αποσυνδεθεί αυτόματα σε { $seconds } δευτερόλεπτα
+}
+end-session-log-out-countdown = { $seconds ->
+    [one] Θα αποσυνδεθείτε αυτόματα σε { $seconds } δευτερόλεπτο
+   *[other] Θα αποσυνδεθείτε αυτόματα σε { $seconds } δευτερόλεπτα
+}
+end-session-log-out-button = Αποσύνδεση
+end-session-power-off-title = Τερματισμός λειτουργίας
+end-session-power-off-updates-title = Εγκατάσταση ενημερώσεων και τερματισμός λειτουργίας
+end-session-power-off-countdown = { $seconds ->
+    [one] Ο υπολογιστής θα τερματίσει αυτόματα τη λειτουργία του σε { $seconds } δευτερόλεπτο
+   *[other] Ο υπολογιστής θα τερματίσει αυτόματα τη λειτουργία του σε { $seconds } δευτερόλεπτα
+}
+end-session-power-off-button = Τερματισμός λειτουργίας
+end-session-restart-title = Επανεκκίνηση
+end-session-restart-updates-title = Εγκατάσταση ενημερώσεων και επανεκκίνηση
+end-session-restart-countdown = { $seconds ->
+    [one] Ο υπολογιστής θα κάνει αυτόματα επανεκκίνηση σε { $seconds } δευτερόλεπτο
+   *[other] Ο υπολογιστής θα κάνει αυτόματα επανεκκίνηση σε { $seconds } δευτερόλεπτα
+}
+end-session-restart-button = Επανεκκίνηση
+end-session-update-restart-title = Επανεκκίνηση και εγκατάσταση ενημερώσεων
+end-session-update-restart-countdown = { $seconds ->
+    [one] Ο υπολογιστής θα κάνει αυτόματα επανεκκίνηση και θα εγκαταστήσει τις ενημερώσεις σε { $seconds } δευτερόλεπτο
+   *[other] Ο υπολογιστής θα κάνει αυτόματα επανεκκίνηση και θα εγκαταστήσει τις ενημερώσεις σε { $seconds } δευτερόλεπτα
+}
+end-session-update-restart-button = Επανεκκίνηση και εγκατάσταση
+end-session-install-updates = Εγκατάσταση εκκρεμών ενημερώσεων λογισμικού
+end-session-install-version = Εγκατάσταση έκδοσης { $version }
+end-session-low-battery = Χαμηλή μπαταρία: συνδέστε τον φορτιστή πριν από την εγκατάσταση ενημερώσεων
+end-session-busy-apps = Ορισμένες εφαρμογές είναι απασχολημένες ή έχουν εργασία που δεν έχει αποθηκευτεί
+end-session-other-users = Είναι συνδεδεμένοι και άλλοι χρήστες
+end-session-cancel = Ακύρωση
+end-session-boot-options = Επιλογές εκκίνησης
+end-session-remote-user = { $userName } (από απόσταση)
+end-session-console-user = { $userName } (κονσόλα)
+
+## Lock screen clock
+
+lock-clock-swipe-up = Σύρετε προς τα πάνω
+lock-clock-click-or-press = Κάντε κλικ ή πατήστε ένα πλήκτρο
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-unlock = Παράθυρο ξεκλειδώματος

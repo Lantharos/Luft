@@ -140,6 +140,10 @@ notifications-media-previous = Piesa anterioară
 notifications-media-next = Piesa următoare
 notifications-media-play = Redă
 notifications-media-pause = Pauză
+messages-unknown-app = Aplicație necunoscută
+messages-reply = Răspunde
+messages-reply-placeholder = Scrieți un răspuns
+messages-reply-send = Trimite
 
 ## Calendar
 
@@ -177,3 +181,17 @@ emoji-skin-tone-medium-light = Nuanță de piele medie-deschisă
 emoji-skin-tone-medium = Nuanță de piele medie
 emoji-skin-tone-medium-dark = Nuanță de piele medie-închisă
 emoji-skin-tone-dark = Nuanță de piele închisă
+
+## System notifications
+
+messages-system-source = Sistem
+
+## On-screen keyboard
+
+osk-keyboard-settings = Setări tastatură
+osk-letters-key = ABC
+
+## Media player controls
+
+mpris-unknown-artist = Artist necunoscut
+mpris-unknown-title = Titlu necunoscut

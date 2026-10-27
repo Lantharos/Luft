@@ -8,16 +8,14 @@ Luft is translated into Albanian, Bosnian, Bulgarian, Catalan, Croatian, Czech, 
 
 | Component | Files | English source |
 | --- | --- | --- |
-| kestrel-desktop | `kestrel/ui/locales/*/desktop.ftl` | taskbar, tray, board, task view, snapping |
-| kestrel-surfaces | `kestrel/ui/locales/*/surfaces.ftl` | Start, quick settings, notifications, calendar, clipboard, emoji |
-| kestrel-shell | `kestrel/ui/locales/*/shell.ftl` | shared pieces such as key names and durations |
-| kestrel-system | `kestrel/ui/locales/*/system.ftl` | network sign-in, VPNs, dictation, system notices |
-| kestrel-auth | `kestrel/ui/locales/*/auth.ftl` | login screen, lock screen, keyring and passkey prompts |
+| kestrel-desktop | `kestrel/ui/locales/*/desktop.ftl` | taskbar, tray, board, task view, snapping, title bars, window menus, switchers, rain |
+| kestrel-surfaces | `kestrel/ui/locales/*/surfaces.ftl` | Start, quick settings, notifications, calendar, clipboard, emoji, the on-screen keyboard |
+| kestrel-shell | `kestrel/ui/locales/*/shell.ftl` | shared pieces such as key names, durations and text field menus |
+| kestrel-system | `kestrel/ui/locales/*/system.ftl` | network menus and sign-in, VPNs, Bluetooth, sound, power, displays, drives, accessibility, screenshots, dictation, system notices |
+| kestrel-auth | `kestrel/ui/locales/*/auth.ftl` | login screen, lock screen, sign-in and administrator prompts, keyring and passkey prompts, signing out and powering off |
 | kestrel-portal | `kestrel/ui/locales/*/portal.ftl` | printing, screen sharing, shortcuts and other app requests |
-| kestrel-session | `kestrel/ui/locales/*/session.ftl` | signing out, first-run setup mode |
 | kestrel-settings | `kestrel/settings/locales/*/settings.ftl` | notifications from `kestrel-settings` about drives |
 | kestrel-portal-service | `kestrel/portal/locales/*/portal.ftl` | print job names and printing failures from `kestrel-portal` |
-| kestrel-engine | `kestrel/ui/locales/*/engine.ftl` | dialogs, menus and quick settings of Kestrel's window management, lock screen, notifications and screenshots |
 | ui | `packages/web/ui/locales/*/ui.ftl` | the UI kit every app shares |
 | settings | `apps/settings/locales/*/settings.ftl` | Settings' window, sidebar and its groups, and search |
 | settings-pages | `packages/web/settings-pages/locales/*/pages.ftl` | Settings' page names and search words, also used by Start |

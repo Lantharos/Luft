@@ -62,3 +62,45 @@ snap-zone = Piesaistīt apgabalam { $width } % × { $height } %
 title-bar-minimize = Minimizēt
 title-bar-maximize = Maksimizēt
 title-bar-close = Aizvērt
+
+## Window resizing
+
+window-resize-size = { $width } × { $height }
+
+## App not responding
+
+close-dialog-title = „{ $appName }“ nereaģē
+close-dialog-description = Varat brīdi pagaidīt, līdz tā turpinās darbu, vai piespiedu kārtā aizvērt lietotni
+close-dialog-force-quit = Piespiedu aizvēršana
+close-dialog-wait = Gaidīt
+
+## Display mode switcher, keep each label under about 15 characters
+
+switch-monitor-mirror = Dublēt
+switch-monitor-join = Paplašināt
+switch-monitor-external-only = Tikai ārējie
+switch-monitor-built-in-only = Tikai iebūvētais
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-windows = Logi
+
+## Window menu, opened by right-clicking a window's title bar
+
+title-bar-menu-screenshot = Uzņemt ekrānuzņēmumu
+title-bar-menu-hide = Paslēpt
+title-bar-menu-restore = Atjaunot
+title-bar-menu-maximize = Maksimizēt
+title-bar-menu-move = Pārvietot
+title-bar-menu-resize = Mainīt izmēru
+title-bar-menu-always-on-top = Vienmēr virspusē
+title-bar-menu-always-on-visible-workspace = Vienmēr redzamajā darbvietā
+title-bar-menu-workspace-left = Pārvietot uz darbvietu pa kreisi
+title-bar-menu-workspace-right = Pārvietot uz darbvietu pa labi
+title-bar-menu-workspace-up = Pārvietot uz darbvietu augšā
+title-bar-menu-workspace-down = Pārvietot uz darbvietu lejā
+title-bar-menu-monitor-up = Pārvietot uz displeju augšā
+title-bar-menu-monitor-down = Pārvietot uz displeju lejā
+title-bar-menu-monitor-left = Pārvietot uz displeju pa kreisi
+title-bar-menu-monitor-right = Pārvietot uz displeju pa labi
+title-bar-menu-close = Aizvērt

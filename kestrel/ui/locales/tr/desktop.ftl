@@ -61,3 +61,45 @@ snap-zone = Genişliği %{ $width }, yüksekliği %{ $height } olan alana yasla
 title-bar-minimize = Simge durumuna küçült
 title-bar-maximize = Ekranı kapla
 title-bar-close = Kapat
+
+## Window resizing
+
+window-resize-size = { $width } × { $height }
+
+## App not responding
+
+close-dialog-title = “{ $appName }” yanıt vermiyor
+close-dialog-description = Uygulamanın devam etmesi için biraz bekleyebilir ya da uygulamayı tamamen kapanmaya zorlayabilirsiniz
+close-dialog-force-quit = Kapanmaya zorla
+close-dialog-wait = Bekle
+
+## Display mode switcher, keep each label under about 15 characters
+
+switch-monitor-mirror = Yansıt
+switch-monitor-join = Genişlet
+switch-monitor-external-only = Yalnızca harici
+switch-monitor-built-in-only = Yalnızca dahili
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-windows = Pencereler
+
+## Window menu, opened by right-clicking a window's title bar
+
+title-bar-menu-screenshot = Ekran görüntüsü al
+title-bar-menu-hide = Gizle
+title-bar-menu-restore = Önceki boyutuna getir
+title-bar-menu-maximize = Ekranı kapla
+title-bar-menu-move = Taşı
+title-bar-menu-resize = Yeniden boyutlandır
+title-bar-menu-always-on-top = Her zaman üstte
+title-bar-menu-always-on-visible-workspace = Her zaman görünür çalışma alanında
+title-bar-menu-workspace-left = Soldaki çalışma alanına taşı
+title-bar-menu-workspace-right = Sağdaki çalışma alanına taşı
+title-bar-menu-workspace-up = Üstteki çalışma alanına taşı
+title-bar-menu-workspace-down = Alttaki çalışma alanına taşı
+title-bar-menu-monitor-up = Üstteki ekrana taşı
+title-bar-menu-monitor-down = Alttaki ekrana taşı
+title-bar-menu-monitor-left = Soldaki ekrana taşı
+title-bar-menu-monitor-right = Sağdaki ekrana taşı
+title-bar-menu-close = Kapat

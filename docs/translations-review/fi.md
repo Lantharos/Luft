@@ -30,10 +30,10 @@ Strings in Luft's Finnish translation that a native speaker should check. Each i
 - `kestrel/ui/locales/fi/surfaces.ftl` `start-search-settings-section`: "Asetukset: { $page }" — built this way to keep the page name in the nominative; check it reads well as a search result description.
 - `kestrel/ui/locales/fi/surfaces.ftl` `quick-settings-on`, `quick-settings-off`: "Päällä", "Pois" — also used for every on/off state in Settings; check they read well as tile subtitles and picker options.
 - `kestrel/ui/locales/fi/auth.ftl` `lock-screen-dwell-click`: "Viivenapsautus" — no settled term; the Settings switch for the same feature says "Napsauta pysäyttämällä osoitin".
-- `kestrel/ui/locales/fi/engine.ftl` `network-menu-tethers`, `network-menu-tether`: "Bluetooth-jakoyhteydet", "Jakoyhteys" — no settled Finnish term for Bluetooth tethering.
-- `kestrel/ui/locales/fi/engine.ftl` `network-menu-mobile`: "Mobiiliverkko" — tile title for mobile broadband; check it fits the tile width.
-- `kestrel/ui/locales/fi/engine.ftl` `switch-monitor-mirror`, `switch-monitor-join`: "Monista", "Laajenna" — Windows' terms for duplicate and extend; check they fit here.
-- `kestrel/ui/locales/fi/engine.ftl` `ctrl-alt-tab-panel`: "Tehtäväpalkki" — English says "Panel"; translated as the taskbar it refers to.
+- `kestrel/ui/locales/fi/system.ftl` `network-menu-tethers`, `network-menu-tether`: "Bluetooth-jakoyhteydet", "Jakoyhteys" — no settled Finnish term for Bluetooth tethering.
+- `kestrel/ui/locales/fi/system.ftl` `network-menu-mobile`: "Mobiiliverkko" — tile title for mobile broadband; check it fits the tile width.
+- `kestrel/ui/locales/fi/desktop.ftl` `switch-monitor-mirror`, `switch-monitor-join`: "Monista", "Laajenna" — Windows' terms for duplicate and extend; check they fit here.
+- `kestrel/ui/locales/fi/shell.ftl` `ctrl-alt-tab-panel`: "Tehtäväpalkki" — English says "Panel"; translated as the taskbar it refers to.
 - `kestrel/ui/locales/fi/system.ftl` `dictation-unsupported-body`: "…puheentunnistinta, jota { $language } vaatii." — the language name may arrive in English (e.g. "Japanese"), so the sentence may read oddly.
 - `kestrel/ui/locales/fi/system.ftl` `peek-error-launch-not-started-by-peek`: "Käynnistää voi vain ohjelman, jonka peek run on itse käynnistänyt" — the English is ambiguous; check the intended meaning.
 - `apps/setup/locales/fi/setup.ftl` `setup-destination-alongside-choice`: "{ $windows } -järjestelmän rinnalle" — compound used to keep "Windows 11" in the nominative; check it doesn't feel heavy.

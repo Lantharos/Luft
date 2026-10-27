@@ -36,3 +36,27 @@ keys-page-down = Page Down
 keys-print-screen = Print Screen
 
 date-just-now = Juuri nyt
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-panel = Tehtäväpalkki
+
+## System notifications
+
+unsafe-mode-title = Järjestelmä on asetettu vaaralliseen tilaan
+unsafe-mode-body = Sovelluksilla on nyt rajoittamaton käyttöoikeus
+unsafe-mode-undo = Kumoa
+privileged-user-title = Kirjauduttu sisään pääkäyttäjänä
+privileged-user-body = Istunnon käyttämistä pääkäyttäjänä kannattaa välttää tietoturvasyistä. Kirjaudu mieluummin sisään tavallisena käyttäjänä.
+
+## Starting programs
+
+spawn-failed = Komennon ”{ $command }” suorittaminen epäonnistui:
+
+## Text field context menu
+
+entry-menu-copy = Kopioi
+entry-menu-paste = Liitä
+entry-menu-show-text = Näytä teksti
+entry-menu-hide-text = Piilota teksti
+entry-caps-lock-on = Caps Lock on päällä

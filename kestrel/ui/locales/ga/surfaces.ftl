@@ -146,6 +146,10 @@ notifications-media-previous = An rian roimhe seo
 notifications-media-next = An chéad rian eile
 notifications-media-play = Seinn
 notifications-media-pause = Cuir ar sos
+messages-unknown-app = Aip anaithnid
+messages-reply = Freagair
+messages-reply-placeholder = Scríobh freagra
+messages-reply-send = Seol
 
 ## Calendar
 
@@ -183,3 +187,17 @@ emoji-skin-tone-medium-light = Dath craicinn meángheal
 emoji-skin-tone-medium = Dath craicinn meánach
 emoji-skin-tone-medium-dark = Dath craicinn meándorcha
 emoji-skin-tone-dark = Dath craicinn dorcha
+
+## System notifications
+
+messages-system-source = Córas
+
+## On-screen keyboard
+
+osk-keyboard-settings = Socruithe méarchláir
+osk-letters-key = ABC
+
+## Media player controls
+
+mpris-unknown-artist = Ealaíontóir anaithnid
+mpris-unknown-title = Teideal anaithnid

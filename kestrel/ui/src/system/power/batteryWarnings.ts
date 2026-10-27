@@ -1,5 +1,5 @@
 import Gio from 'gi://Gio';
-import * as MessageTray from '../../shell/notifications/messageTray.js';
+import * as MessageTray from '../../surfaces/notifications/tray/messageTray.js';
 
 import { shortDuration } from '../../shared/time/duration.js';
 import { formatsLocale, t } from '../../shared/i18n/index.js';

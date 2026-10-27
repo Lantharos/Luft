@@ -1,6 +1,6 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import { setSolidSurfaces, setSquareSurfaces } from '../shell/stage/kestrelGlass.js';
+import { setSolidSurfaces, setSquareSurfaces } from './kestrelGlass.js';
 
 import { accentColor, namedAccent, NEUTRAL, seedFromSamples, toHex, type Rgb, type Seed } from './color.js';
 import { appearanceCss, appearanceJson, type Appearance } from './exports.js';

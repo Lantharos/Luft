@@ -176,6 +176,14 @@ notifications-media-previous = Previous track
 notifications-media-next = Next track
 notifications-media-play = Play
 notifications-media-pause = Pause
+# Shown in a notification's header when the app that sent it has no name
+messages-unknown-app = Unknown App
+# Button that opens the reply field on a notification
+messages-reply = Reply
+# Placeholder of the reply field on a notification
+messages-reply-placeholder = Write a reply
+# Screen-reader label of the button that sends a reply from a notification
+messages-reply-send = Send
 
 ## Calendar
 
@@ -219,3 +227,19 @@ emoji-skin-tone-medium-light = Medium-light skin tone
 emoji-skin-tone-medium = Medium skin tone
 emoji-skin-tone-medium-dark = Medium-dark skin tone
 emoji-skin-tone-dark = Dark skin tone
+
+## System notifications
+
+# Name shown on notifications that come from the system itself
+messages-system-source = System
+
+## On-screen keyboard
+
+osk-keyboard-settings = Keyboard Settings
+# Key on the emoji page of the on-screen keyboard that goes back to the letters, keep very short
+osk-letters-key = ABC
+
+## Media player controls
+
+mpris-unknown-artist = Unknown artist
+mpris-unknown-title = Unknown title

@@ -24,6 +24,7 @@ lock-screen-larger-text = Suurempi teksti
 lock-screen-suspend = Lepotila
 lock-screen-restart = Käynnistä uudelleen…
 lock-screen-power-off = Sammuta…
+lock-inhibit-reason = Kestrelin täytyy lukita näyttö
 
 ## Keyring and passphrase prompts. Apps usually supply their own text; these are the defaults
 
@@ -67,3 +68,74 @@ passkeys-ok = OK
 passkeys-use-this-computer = Käytä tätä tietokonetta
 passkeys-fingerprint-unavailable = Jatka salasanalla.
 passkeys-wrong-password = Salasana on väärä. Yritä uudelleen.
+
+## Sign-in prompt
+
+auth-prompt-password = Salasana
+auth-prompt-username = Käyttäjänimi
+auth-prompt-back = Takaisin
+auth-prompt-submit = Lähetä
+auth-prompt-wrong-password = Salasana ei kelvannut
+auth-prompt-failed = Se ei onnistunut. Yritä uudelleen.
+fingerprint-not-recognized = Sormenjälkeä ei tunnistettu
+
+## Administrator authentication
+
+polkit-title = Tunnistautuminen vaaditaan
+polkit-administrator = Järjestelmänvalvoja
+polkit-password = Salasana
+polkit-cancel = Peruuta
+polkit-authenticate = Tunnistaudu
+polkit-failed = Se ei onnistunut. Yritä uudelleen.
+
+## Log out, power off and restart dialog
+
+end-session-log-out-user = Kirjaa { $userName } ulos
+end-session-log-out-title = Kirjaudu ulos
+end-session-log-out-user-countdown = { $seconds ->
+    [one] { $userName } kirjataan ulos automaattisesti { $seconds } sekunnin kuluttua
+   *[other] { $userName } kirjataan ulos automaattisesti { $seconds } sekunnin kuluttua
+}
+end-session-log-out-countdown = { $seconds ->
+    [one] Sinut kirjataan ulos automaattisesti { $seconds } sekunnin kuluttua
+   *[other] Sinut kirjataan ulos automaattisesti { $seconds } sekunnin kuluttua
+}
+end-session-log-out-button = Kirjaudu ulos
+end-session-power-off-title = Sammuta
+end-session-power-off-updates-title = Asenna päivitykset ja sammuta
+end-session-power-off-countdown = { $seconds ->
+    [one] Järjestelmä sammuu automaattisesti { $seconds } sekunnin kuluttua
+   *[other] Järjestelmä sammuu automaattisesti { $seconds } sekunnin kuluttua
+}
+end-session-power-off-button = Sammuta
+end-session-restart-title = Käynnistä uudelleen
+end-session-restart-updates-title = Asenna päivitykset ja käynnistä uudelleen
+end-session-restart-countdown = { $seconds ->
+    [one] Järjestelmä käynnistyy uudelleen automaattisesti { $seconds } sekunnin kuluttua
+   *[other] Järjestelmä käynnistyy uudelleen automaattisesti { $seconds } sekunnin kuluttua
+}
+end-session-restart-button = Käynnistä uudelleen
+end-session-update-restart-title = Käynnistä uudelleen ja asenna päivitykset
+end-session-update-restart-countdown = { $seconds ->
+    [one] Järjestelmä käynnistyy uudelleen ja asentaa päivitykset automaattisesti { $seconds } sekunnin kuluttua
+   *[other] Järjestelmä käynnistyy uudelleen ja asentaa päivitykset automaattisesti { $seconds } sekunnin kuluttua
+}
+end-session-update-restart-button = Käynnistä ja asenna
+end-session-install-updates = Asenna odottavat päivitykset
+end-session-install-version = Asenna versio { $version }
+end-session-low-battery = Akun varaus on vähissä: kytke laturi ennen päivitysten asentamista
+end-session-busy-apps = Jotkin sovellukset ovat kesken tai niissä on tallentamatonta työtä
+end-session-other-users = Muita käyttäjiä on kirjautuneena
+end-session-cancel = Peruuta
+end-session-boot-options = Käynnistysvalinnat
+end-session-remote-user = { $userName } (etä)
+end-session-console-user = { $userName } (konsoli)
+
+## Lock screen clock
+
+lock-clock-swipe-up = Pyyhkäise ylös
+lock-clock-click-or-press = Napsauta tai paina näppäintä
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-unlock = Lukituksen avaus

@@ -137,6 +137,10 @@ notifications-media-previous = Vorig nummer
 notifications-media-next = Volgend nummer
 notifications-media-play = Afspelen
 notifications-media-pause = Pauzeren
+messages-unknown-app = Onbekende app
+messages-reply = Beantwoorden
+messages-reply-placeholder = Schrijf een antwoord
+messages-reply-send = Versturen
 
 ## Calendar
 
@@ -174,3 +178,17 @@ emoji-skin-tone-medium-light = Middellichte huidskleur
 emoji-skin-tone-medium = Gemiddelde huidskleur
 emoji-skin-tone-medium-dark = Middeldonkere huidskleur
 emoji-skin-tone-dark = Donkere huidskleur
+
+## System notifications
+
+messages-system-source = Systeem
+
+## On-screen keyboard
+
+osk-keyboard-settings = Toetsenbordinstellingen
+osk-letters-key = ABC
+
+## Media player controls
+
+mpris-unknown-artist = Onbekende artiest
+mpris-unknown-title = Onbekende titel

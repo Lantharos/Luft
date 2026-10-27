@@ -36,8 +36,8 @@ Strings in Luft's Ukrainian translation that a native speaker should check, each
 - `kestrel/ui/locales/uk/system.ftl` `privacy-indicator`: "Задіяно: { $things }" — chosen so the list stays in the nominative.
 - `kestrel/ui/locales/uk/system.ftl` `dictation-unsupported-title`: "Диктування для мови { $language } недоступне на цьому комп’ютері" — $language arrives in English, so «для мови» keeps it undeclined.
 - `kestrel/ui/locales/uk/system.ftl` `peek-error-unknown-handle`: "…не має дескриптора { $handle }…" — "handle" rendered as «дескриптор»; a reviewer may prefer «мітка».
-- `kestrel/ui/locales/uk/engine.ftl` `network-menu-tethers`: "Модеми Bluetooth" — Bluetooth tethering; check against KDE/GNOME wording.
-- `kestrel/ui/locales/uk/engine.ftl` `screenshot-source`: "Знімки й записи екрана" — name for "Screen Capture" notifications; «Захоплення екрана» is the alternative.
+- `kestrel/ui/locales/uk/system.ftl` `network-menu-tethers`: "Модеми Bluetooth" — Bluetooth tethering; check against KDE/GNOME wording.
+- `kestrel/ui/locales/uk/system.ftl` `screenshot-source`: "Знімки й записи екрана" — name for "Screen Capture" notifications; «Захоплення екрана» is the alternative.
 - `apps/setup/locales/uk/setup.ftl` `setup-region-intro-guessed`, `setup-region-field-*`: field names are in the accusative (мову, клавіатуру) to follow «Автоматично визначено …» — check the joined list reads well.
 - `apps/setup/locales/uk/setup.ftl` `setup-windows-hibernated`: "…утримуйте Shift, вибираючи «Завершити роботу»…" — Windows' Ukrainian menu item; check it matches current Windows.
 - `apps/setup/locales/uk/setup.ftl` `setup-windows-bitlocker`: "…у програмі «Керування дисками»…" — Windows' Ukrainian name for Disk Management.

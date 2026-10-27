@@ -162,3 +162,251 @@ peek-error-unknown-modifier = { $modifier } er ikkje ein modifikatortast. Bruk c
 peek-error-display-owner = Denne skjermen høyrer til eit anna program
 peek-error-display-run = Program på ein gøymd skjerm blir starta av peek run
 peek-error-display-handle = Denne skjermen vart starta som { $handle }, ikkje { $requested }
+
+## Quick settings tiles
+
+auto-rotate-title = Autorotering
+dark-style-title = Mørk modus
+do-not-disturb-title = Ikkje forstyrr
+night-light-title = Nattlys
+airplane-mode-title = Flymodus
+
+## Power mode
+
+power-profile-title = Straummodus
+power-profile-header = Straummodus
+power-profile-open-menu = Opne menyen for straummodus
+power-profile-settings = Strauminnstillingar
+power-profile-performance = Yting
+power-profile-balanced = Balansert
+power-profile-power-saver = Straumsparing
+power-profile-custom = Tilpassa
+
+## Keep awake
+
+caffeine-title = Hald vaken
+caffeine-open-menu = Opne menyen for Hald vaken
+caffeine-until = Til { $time }
+caffeine-until-turned-off = Til du slår det av
+caffeine-30-minutes = 30 minutt
+caffeine-1-hour = 1 time
+caffeine-2-hours = 2 timar
+caffeine-inhibit-reason = Halden vaken frå hurtiginnstillingane
+
+## Brightness
+
+brightness-title = Lysstyrke
+brightness-open-menu = Opne menyen for lysstyrke
+
+## Keyboard backlight
+
+backlight-title = Tastaturlys
+backlight-open-menu = Opne menyen for tastaturlys
+backlight-slider = Lysstyrke på tastaturet
+backlight-off = Av
+backlight-low = Låg
+backlight-high = Høg
+
+## Sound
+
+volume-sound-settings = Lydinnstillingar
+volume-mute = Slå av lyden
+volume-unmute = Slå på lyden
+volume-output-slider = Lydstyrke
+volume-output-title = Lydutgang
+volume-output-open-menu = Opne menyen for lydutgang
+volume-input-slider = Mikrofon
+volume-input-title = Lydinngang
+volume-input-open-menu = Opne menyen for lydinngang
+
+## Bluetooth
+
+bluetooth-title = Bluetooth
+bluetooth-open-menu = Opne Bluetooth-menyen
+bluetooth-settings = Bluetooth-innstillingar
+bluetooth-connect = Kople til
+bluetooth-disconnect = Kople frå
+bluetooth-connect-device = Kople til { $deviceName }
+bluetooth-disconnect-device = Kople frå { $deviceName }
+bluetooth-no-devices = Ingen tilgjengelege eller tilkopla einingar
+bluetooth-turn-on-hint = Slå på Bluetooth for å kople til einingar
+bluetooth-connected-count = { $count ->
+    [one] { $count } tilkopla
+   *[other] { $count } tilkopla
+}
+
+## Network menus in quick settings
+
+network-menu-unknown-network = <ukjend>
+network-menu-connect = Kople til
+network-menu-disconnect = Kople frå
+network-menu-connect-to = Kople til { $name }
+network-menu-disconnect-from = Kople frå { $name }
+network-menu-turn-off = Slå av
+network-menu-wifi-network = { $secure ->
+    [yes] { $name }, sikra, signalstyrke { $strength } %
+   *[no] { $name }, ikkje sikra, signalstyrke { $strength } %
+}
+network-menu-hotspot = Tilgangspunkt på { $name }
+network-menu-connected-count = { $count ->
+    [one] { $count } tilkopla
+   *[other] { $count } tilkopla
+}
+network-menu-vpn = VPN
+network-menu-vpn-open-menu = Opne VPN-menyen
+network-menu-vpn-settings = VPN-innstillingar
+network-menu-wifi = Wi-Fi
+network-menu-wifi-open-menu = Opne Wi-Fi-menyen
+network-menu-wifi-settings = Alle nettverk
+network-menu-wired = Kabeltilkoplingar
+network-menu-wired-open-menu = Opne menyen for kabeltilkoplingar
+network-menu-wired-settings = Innstillingar for kabelnett
+network-menu-tethers = Deling over Bluetooth
+network-menu-tethers-open-menu = Opne menyen for deling over Bluetooth
+network-menu-tether = Deling
+network-menu-tether-settings = Bluetooth-innstillingar
+network-menu-mobile-connections = Mobiltilkoplingar
+network-menu-mobile-open-menu = Opne menyen for mobiltilkoplingar
+network-menu-mobile-settings = Innstillingar for mobilt breiband
+network-menu-mobile = Mobilnett
+network-device-wired = Kabla
+network-device-named = { $kind } ({ $name })
+network-menu-sign-in = Logg inn på nettverket
+network-menu-failed-title = Tilkoplinga mislukkast
+network-menu-failed-body = Kunne ikkje aktivere nettverkstilkoplinga
+
+## Location access dialog
+
+location-dialog-title = Tillat tilgang til posisjonen
+location-dialog-description = Appen { $appName } vil ha tilgang til posisjonen din
+location-dialog-info = Du kan endre tilgangen til posisjonen når som helst i personverninnstillingane
+location-dialog-deny = Nekt tilgang
+location-dialog-grant = Gje tilgang
+
+## Thunderbolt notifications
+
+thunderbolt-unknown-title = Ukjend Thunderbolt-eining
+thunderbolt-unknown-body = Ei ny eining vart kopla til medan du var borte. Kople eininga frå og til igjen for å ta ho i bruk.
+thunderbolt-unauthorized-title = Thunderbolt-eining utan godkjenning
+thunderbolt-unauthorized-body = Ei ny eining vart kopla til og må godkjennast av ein administrator
+thunderbolt-error-title = Feil ved godkjenning av Thunderbolt-eining
+thunderbolt-error-body = Kunne ikkje godkjenne Thunderbolt-eininga: { $reason }
+
+## App permission dialog, used when an app asks for access to something
+
+access-dialog-deny = Nekt
+access-dialog-allow = Tillat
+
+## Display change confirmation
+
+display-change-title = Behalde skjerminnstillingane?
+display-change-countdown = { $seconds ->
+    [one] Endringane blir tilbakestilte om { $seconds } sekund
+   *[other] Endringane blir tilbakestilte om { $seconds } sekund
+}
+display-change-revert = Tilbakestill
+display-change-keep = Behald endringane
+
+## Drive connected notification
+
+autorun-connected = «{ $driveName }» er kopla til
+autorun-ready = Disken kan no brukast
+autorun-open-with = Opne med { $appName }
+
+## Keyboard accessibility shortcuts
+
+kbd-a11y-slow-keys-on = Trege tastar er slått på
+kbd-a11y-slow-keys-off = Trege tastar er slått av
+kbd-a11y-slow-keys-description = Du heldt nettopp Skift-tasten nede i 8 sekund. Det er snarvegen for Trege tastar, som endrar korleis tastaturet verkar.
+kbd-a11y-sticky-keys-on = Klebrige tastar er slått på
+kbd-a11y-sticky-keys-off = Klebrige tastar er slått av
+kbd-a11y-sticky-keys-on-description = Du trykte nettopp på Skift-tasten 5 gonger på rad. Det er snarvegen for Klebrige tastar, som endrar korleis tastaturet verkar.
+kbd-a11y-sticky-keys-off-description = Du trykte nettopp på to tastar samtidig, eller på Skift-tasten 5 gonger på rad. Det slår av Klebrige tastar, som endrar korleis tastaturet verkar.
+kbd-a11y-leave-on = La vere på
+kbd-a11y-turn-on = Slå på
+kbd-a11y-turn-off = Slå av
+kbd-a11y-leave-off = La vere av
+
+## Audio device selection, shown after plugging something into the headphone jack
+
+audio-device-title = Vel lydeining
+audio-device-cancel = Avbryt
+audio-device-sound-settings = Lydinnstillingar
+audio-device-headphones = Hovudtelefonar
+audio-device-headset = Headset
+audio-device-microphone = Mikrofon
+
+## Keyboard shortcut inhibiting, asked when an app wants to receive system shortcuts itself
+
+inhibit-shortcuts-title = Tillat å blokkere snarvegar
+inhibit-shortcuts-app = Appen { $appName } vil blokkere snarvegar
+inhibit-shortcuts-unknown-app = Ein app vil blokkere snarvegar
+inhibit-shortcuts-restore = Du kan få snarvegane tilbake ved å trykkje { $shortcut }
+inhibit-shortcuts-deny = Nekt
+inhibit-shortcuts-allow = Tillat
+
+## Unlocking encrypted drives
+
+mount-hidden-volume = Gøymt volum
+mount-windows-system-volume = Windows-systemvolum
+mount-uses-keyfiles = Brukar nøkkelfiler
+mount-keyfiles-use-app = Bruk <i>{ $appName }</i> for å låse opp eit volum som brukar nøkkelfiler
+mount-keyfiles-need-app = Du treng eit eige verktøy som <i>Diskar</i> for å låse opp eit volum som brukar nøkkelfiler
+mount-pim-number = PIM-nummer
+mount-pim-invalid = PIM må vere eit tal eller stå tomt
+mount-password = Passord
+mount-remember-password = Hugs passordet
+mount-cancel = Avbryt
+mount-unlock = Lås opp
+mount-open-app = Opne { $appName }
+mount-wrong-password = Det fungerte ikkje. Prøv igjen.
+mount-unlock-failed = Kunne ikkje låse opp volumet
+mount-pim-unsupported = Den installerte versjonen av udisks støttar ikkje PIM-innstillinga
+
+## Network passwords, asked when connecting needs one
+
+network-agent-auth-required = Godkjenning krevst
+network-agent-wifi-rejected = Det lagra passordet for «{ $networkName }» fungerte ikkje. Skriv det inn igjen.
+network-agent-wifi-secrets = Du treng passord eller krypteringsnøklar for å kople til det trådlause nettverket «{ $networkName }»
+network-agent-wps-hint = Du kan òg kople til ved å trykkje på WPS-knappen på ruteren
+network-agent-wired-title = 802.1X-godkjenning for kabelnett
+network-agent-dsl-title = DSL-godkjenning
+network-agent-pin-title = PIN-kode krevst
+network-agent-pin-body = Eininga for mobilt breiband treng ein PIN-kode
+network-agent-vpn-title = VPN-passord
+network-agent-password-required = Du treng eit passord for å kople til «{ $networkName }»
+network-agent-connect = Kople til
+network-agent-cancel = Avbryt
+network-agent-password = Passord
+network-agent-username = Brukarnamn
+network-agent-key = Nøkkel
+network-agent-private-key-password = Passord for privat nøkkel
+network-agent-identity = Identitet
+network-agent-service = Teneste
+network-agent-network-name = Nettverksnamn
+network-agent-pin = PIN
+
+## Screenshots and screen recording
+
+screenshot-source = Skjermfangst
+screenshot-area = Vel område
+screenshot-screen = Vel skjerm
+screenshot-window = Vel vindauge
+screenshot-take = Ta skjermbilete
+screenshot-record = Ta opp skjermen
+screenshot-show-pointer = Vis peikaren
+screenshot-capture = Ta bilete
+screenshot-close = Lukk
+screenshot-screencasts-folder = Skjermopptak
+screenshot-screencast-file = Skjermopptak frå { $date } { $time }
+screenshot-screenshots-folder = Skjermbilete
+screenshot-file = Skjermbilete frå { $timestamp }
+screenshot-screencast-recorded = Skjermopptaket er lagra
+screenshot-screencast-start-failed = Skjermopptaket kunne ikkje starte
+screenshot-screencast-out-of-space = Skjermopptaket stoppa: Disken er full
+screenshot-screencast-try-again = Skjermopptaket mislukkast. Prøv igjen.
+screenshot-screencast-failed = Skjermopptaket mislukkast
+screenshot-screencast-view = Klikk her for å sjå videoen
+screenshot-show-in-rover = Vis i Rover
+screenshot-captured = Skjermbilete teke
+screenshot-captured-body = Du kan lime inn biletet frå utklippstavla

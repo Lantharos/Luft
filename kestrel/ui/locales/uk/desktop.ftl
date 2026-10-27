@@ -61,3 +61,45 @@ snap-zone = Прикріпити в області { $width }% на { $height }%
 title-bar-minimize = Згорнути
 title-bar-maximize = Розгорнути
 title-bar-close = Закрити
+
+## Window resizing
+
+window-resize-size = { $width } × { $height }
+
+## App not responding
+
+close-dialog-title = Програма «{ $appName }» не відповідає
+close-dialog-description = Можна трохи зачекати, поки вона продовжить роботу, або примусово закрити програму
+close-dialog-force-quit = Закрити примусово
+close-dialog-wait = Зачекати
+
+## Display mode switcher, keep each label under about 15 characters
+
+switch-monitor-mirror = Дублювати
+switch-monitor-join = Розширити
+switch-monitor-external-only = Лише зовнішній
+switch-monitor-built-in-only = Лише вбудований
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-windows = Вікна
+
+## Window menu, opened by right-clicking a window's title bar
+
+title-bar-menu-screenshot = Зробити знімок екрана
+title-bar-menu-hide = Згорнути
+title-bar-menu-restore = Відновити
+title-bar-menu-maximize = Розгорнути
+title-bar-menu-move = Перемістити
+title-bar-menu-resize = Змінити розмір
+title-bar-menu-always-on-top = Поверх інших вікон
+title-bar-menu-always-on-visible-workspace = На всіх робочих просторах
+title-bar-menu-workspace-left = Перемістити на робочий простір ліворуч
+title-bar-menu-workspace-right = Перемістити на робочий простір праворуч
+title-bar-menu-workspace-up = Перемістити на робочий простір вище
+title-bar-menu-workspace-down = Перемістити на робочий простір нижче
+title-bar-menu-monitor-up = Перемістити на монітор вище
+title-bar-menu-monitor-down = Перемістити на монітор нижче
+title-bar-menu-monitor-left = Перемістити на монітор ліворуч
+title-bar-menu-monitor-right = Перемістити на монітор праворуч
+title-bar-menu-close = Закрити

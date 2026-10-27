@@ -1,12 +1,12 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import { ensureActorVisibleInScrollView } from '../../shell/runtime/animationUtils.js';
+import { ensureActorVisibleInScrollView } from '../../core/runtime/animationUtils.js';
 import type { NotificationCard, NotificationSource, SignalSource } from './notificationCard.js';
 import { CollapseLayout } from './collapseLayout.js';
 import { NotificationGroup } from './notificationGroup.js';
 import St from 'gi://St';
-import { HeaderLayout } from '../../shell/widgets/headerLayout.js';
+import { HeaderLayout } from '../../shared/widgets/headerLayout.js';
 import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
 import { t } from '../../shared/i18n/index.js';
 import { blurSurface } from '../../shared/layout/surface.js';

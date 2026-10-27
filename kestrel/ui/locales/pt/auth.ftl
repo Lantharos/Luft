@@ -24,6 +24,7 @@ lock-screen-larger-text = Texto maior
 lock-screen-suspend = Suspender
 lock-screen-restart = Reiniciar…
 lock-screen-power-off = Encerrar…
+lock-inhibit-reason = O Kestrel tem de bloquear o ecrã
 
 ## Keyring and passphrase prompts. Apps usually supply their own text; these are the defaults
 
@@ -67,3 +68,79 @@ passkeys-ok = OK
 passkeys-use-this-computer = Utilizar este computador
 passkeys-fingerprint-unavailable = Utilize a palavra-passe para continuar.
 passkeys-wrong-password = A palavra-passe não está correta. Tente novamente.
+
+## Sign-in prompt
+
+auth-prompt-password = Palavra-passe
+auth-prompt-username = Nome de utilizador
+auth-prompt-back = Voltar
+auth-prompt-submit = Enviar
+auth-prompt-wrong-password = A palavra-passe não está correta
+auth-prompt-failed = Não funcionou. Tente novamente.
+fingerprint-not-recognized = Impressão digital não reconhecida
+
+## Administrator authentication
+
+polkit-title = Autenticação necessária
+polkit-administrator = Administrador
+polkit-password = Palavra-passe
+polkit-cancel = Cancelar
+polkit-authenticate = Autenticar
+polkit-failed = Não funcionou. Tente novamente.
+
+## Log out, power off and restart dialog
+
+end-session-log-out-user = Terminar a sessão de { $userName }
+end-session-log-out-title = Terminar sessão
+end-session-log-out-user-countdown = { $seconds ->
+    [0] A sessão de { $userName } vai ser terminada automaticamente em { $seconds } segundos
+    [one] A sessão de { $userName } vai ser terminada automaticamente em { $seconds } segundo
+   *[other] A sessão de { $userName } vai ser terminada automaticamente em { $seconds } segundos
+}
+end-session-log-out-countdown = { $seconds ->
+    [0] A sessão vai ser terminada automaticamente em { $seconds } segundos
+    [one] A sessão vai ser terminada automaticamente em { $seconds } segundo
+   *[other] A sessão vai ser terminada automaticamente em { $seconds } segundos
+}
+end-session-log-out-button = Terminar sessão
+end-session-power-off-title = Encerrar
+end-session-power-off-updates-title = Instalar atualizações e encerrar
+end-session-power-off-countdown = { $seconds ->
+    [0] O sistema vai encerrar automaticamente em { $seconds } segundos
+    [one] O sistema vai encerrar automaticamente em { $seconds } segundo
+   *[other] O sistema vai encerrar automaticamente em { $seconds } segundos
+}
+end-session-power-off-button = Encerrar
+end-session-restart-title = Reiniciar
+end-session-restart-updates-title = Instalar atualizações e reiniciar
+end-session-restart-countdown = { $seconds ->
+    [0] O sistema vai reiniciar automaticamente em { $seconds } segundos
+    [one] O sistema vai reiniciar automaticamente em { $seconds } segundo
+   *[other] O sistema vai reiniciar automaticamente em { $seconds } segundos
+}
+end-session-restart-button = Reiniciar
+end-session-update-restart-title = Reiniciar e instalar atualizações
+end-session-update-restart-countdown = { $seconds ->
+    [0] O sistema vai reiniciar e instalar as atualizações automaticamente em { $seconds } segundos
+    [one] O sistema vai reiniciar e instalar as atualizações automaticamente em { $seconds } segundo
+   *[other] O sistema vai reiniciar e instalar as atualizações automaticamente em { $seconds } segundos
+}
+end-session-update-restart-button = Reiniciar e instalar
+end-session-install-updates = Instalar as atualizações pendentes
+end-session-install-version = Instalar a versão { $version }
+end-session-low-battery = Bateria fraca. Ligue o carregador antes de instalar atualizações.
+end-session-busy-apps = Algumas aplicações estão ocupadas ou têm trabalho por guardar
+end-session-other-users = Há outros utilizadores com sessão iniciada
+end-session-cancel = Cancelar
+end-session-boot-options = Opções de arranque
+end-session-remote-user = { $userName } (remoto)
+end-session-console-user = { $userName } (consola)
+
+## Lock screen clock
+
+lock-clock-swipe-up = Deslize para cima
+lock-clock-click-or-press = Clique ou prima uma tecla
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-unlock = Desbloquear

@@ -30,8 +30,8 @@ Strings in Luft's Russian translation that a native speaker should check, each l
 - `kestrel/ui/locales/ru/system.ftl` `privacy-indicator`: "Используются: { $things }" — list items are nominative (камера, микрофон…); check the joined list, also for a single item like «Используются: окна».
 - `kestrel/ui/locales/ru/system.ftl` `health-gpu-reset-body`: "Компьютер перезагрузился сам: { $date }, { $time }." — built around the placeables to avoid the case of the formatted date; may read a bit dry.
 - `kestrel/ui/locales/ru/system.ftl` `oom-closed-body`: "…поэтому его пришлось закрыть…" — «его» covers both приложение and контейнер; check it reads clearly after either title.
-- `kestrel/ui/locales/ru/engine.ftl` `screenshot-capture`: "Захватить" — shutter button for both screenshots and recordings; «Снять» could be an alternative.
-- `kestrel/ui/locales/ru/engine.ftl` `network-menu-tethers`, `network-menu-tether`: "Модем через Bluetooth", "Модем" — no settled term for Bluetooth tethering.
+- `kestrel/ui/locales/ru/system.ftl` `screenshot-capture`: "Захватить" — shutter button for both screenshots and recordings; «Снять» could be an alternative.
+- `kestrel/ui/locales/ru/system.ftl` `network-menu-tethers`, `network-menu-tether`: "Модем через Bluetooth", "Модем" — no settled term for Bluetooth tethering.
 - `apps/setup/locales/ru/setup.ftl` `setup-region-intro-guessed`: "Начнём настройку. Определено автоматически: { $guesses }. Измените то, что не подходит." — the guess parts are nominative («язык и раскладка клавиатуры по данным компьютера»); check the joined list.
 - `apps/setup/locales/ru/setup.ftl` `setup-account-full-name-example`: "Софья Ковалевская" — a well-known Russian mathematician, the counterpart of Ada Lovelace; check it suits a name placeholder.
 - `apps/setup/locales/ru/setup.ftl` `setup-drive-has-windows`: "На диске { $windows }" — short subtitle under a drive name; check it reads well there.

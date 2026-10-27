@@ -24,6 +24,7 @@ lock-screen-larger-text = Nagy szöveg
 lock-screen-suspend = Alvó állapot
 lock-screen-restart = Újraindítás…
 lock-screen-power-off = Leállítás…
+lock-inhibit-reason = A Kestrelnek zárolnia kell a képernyőt
 
 ## Keyring and passphrase prompts. Apps usually supply their own text; these are the defaults
 
@@ -67,3 +68,74 @@ passkeys-ok = OK
 passkeys-use-this-computer = Ez a számítógép
 passkeys-fingerprint-unavailable = A folytatáshoz adja meg a jelszavát.
 passkeys-wrong-password = Ez a jelszó nem megfelelő. Próbálja újra.
+
+## Sign-in prompt
+
+auth-prompt-password = Jelszó
+auth-prompt-username = Felhasználónév
+auth-prompt-back = Vissza
+auth-prompt-submit = Küldés
+auth-prompt-wrong-password = Ez a jelszó nem működött
+auth-prompt-failed = Ez nem sikerült. Próbálja újra.
+fingerprint-not-recognized = Nem felismert ujjlenyomat
+
+## Administrator authentication
+
+polkit-title = Hitelesítés szükséges
+polkit-administrator = Rendszergazda
+polkit-password = Jelszó
+polkit-cancel = Mégse
+polkit-authenticate = Hitelesítés
+polkit-failed = Ez nem sikerült. Próbálja újra.
+
+## Log out, power off and restart dialog
+
+end-session-log-out-user = Kijelentkezés: { $userName }
+end-session-log-out-title = Kijelentkezés
+end-session-log-out-user-countdown = { $seconds ->
+    [one] { $userName } { $seconds } másodperc múlva automatikusan kijelentkezik
+   *[other] { $userName } { $seconds } másodperc múlva automatikusan kijelentkezik
+}
+end-session-log-out-countdown = { $seconds ->
+    [one] { $seconds } másodperc múlva automatikusan kijelentkezik
+   *[other] { $seconds } másodperc múlva automatikusan kijelentkezik
+}
+end-session-log-out-button = Kijelentkezés
+end-session-power-off-title = Leállítás
+end-session-power-off-updates-title = Frissítések telepítése és leállítás
+end-session-power-off-countdown = { $seconds ->
+    [one] A rendszer { $seconds } másodperc múlva automatikusan leáll
+   *[other] A rendszer { $seconds } másodperc múlva automatikusan leáll
+}
+end-session-power-off-button = Leállítás
+end-session-restart-title = Újraindítás
+end-session-restart-updates-title = Frissítések telepítése és újraindítás
+end-session-restart-countdown = { $seconds ->
+    [one] A rendszer { $seconds } másodperc múlva automatikusan újraindul
+   *[other] A rendszer { $seconds } másodperc múlva automatikusan újraindul
+}
+end-session-restart-button = Újraindítás
+end-session-update-restart-title = Újraindítás és frissítések telepítése
+end-session-update-restart-countdown = { $seconds ->
+    [one] A rendszer { $seconds } másodperc múlva automatikusan újraindul, és telepíti a frissítéseket
+   *[other] A rendszer { $seconds } másodperc múlva automatikusan újraindul, és telepíti a frissítéseket
+}
+end-session-update-restart-button = Újraindítás és telepítés
+end-session-install-updates = Függőben lévő frissítések telepítése
+end-session-install-version = { $version } verzió telepítése
+end-session-low-battery = Alacsony töltöttség: a frissítések telepítése előtt csatlakoztassa a töltőt
+end-session-busy-apps = Néhány alkalmazás még dolgozik, vagy nem mentett munkát tartalmaz
+end-session-other-users = Más felhasználók is be vannak jelentkezve
+end-session-cancel = Mégse
+end-session-boot-options = Rendszerindítási lehetőségek
+end-session-remote-user = { $userName } (távoli)
+end-session-console-user = { $userName } (konzol)
+
+## Lock screen clock
+
+lock-clock-swipe-up = Csúsztasson felfelé
+lock-clock-click-or-press = Kattintson, vagy nyomjon le egy billentyűt
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-unlock = Feloldási ablak

@@ -36,9 +36,9 @@ Strings in Luft's Hungarian translation that a native speaker should check: term
 - `kestrel/ui/locales/hu/system.ftl` `battery-device-headset`: "Headset" — kept English as it is the common word; check against "mikrofonos fejhallgató".
 - `kestrel/ui/locales/hu/auth.ftl` `passkeys-use-this-computer`: "Ez a számítógép" — a button phrased as a noun phrase rather than an action noun; check it is clear.
 - `kestrel/ui/locales/hu/portal.ftl` `print-failed-from-app`: "{ $printer } nyomtató nem fogadta { $appName } alkalmazás dokumentumát." — no article before either placeable; check it reads naturally.
-- `kestrel/ui/locales/hu/engine.ftl` `kbd-a11y-leave-on`: "Megtartás" — used for both Leave On and Leave Off, since each appears in a separate dialog; check this is clear.
-- `kestrel/ui/locales/hu/engine.ftl` `screenshot-capture`: "Rögzítés" — same word as pinning (rögzítés) in other places; check whether "Felvétel" or "Készítés" is better for the shutter button.
-- `kestrel/ui/locales/hu/engine.ftl` `network-menu-mobile`: "Mobilnet" — short tile title for Mobile Broadband; check it is the familiar word.
+- `kestrel/ui/locales/hu/system.ftl` `kbd-a11y-leave-on`: "Megtartás" — used for both Leave On and Leave Off, since each appears in a separate dialog; check this is clear.
+- `kestrel/ui/locales/hu/system.ftl` `screenshot-capture`: "Rögzítés" — same word as pinning (rögzítés) in other places; check whether "Felvétel" or "Készítés" is better for the shutter button.
+- `kestrel/ui/locales/hu/system.ftl` `network-menu-mobile`: "Mobilnet" — short tile title for Mobile Broadband; check it is the familiar word.
 - `apps/setup/locales/hu/setup.ftl` `setup-region-intro-guessed`: "Néhány beállítást előre kitöltöttünk: { $guesses }." with pieces like "nyelv és billentyűzet (a számítógép alapján)" — check the joined list reads well.
 - `apps/setup/locales/hu/setup.ftl` `setup-account-full-name-example`: "Neumann János" — a well-known name in Hungarian order (family name first); check the full name field doesn't assume given-name-first.
 - `apps/setup/locales/hu/setup.ftl` `setup-ready-start`: "Kezdés" — short button for "Start using Luft"; check it is not too vague.

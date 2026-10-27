@@ -36,3 +36,27 @@ keys-page-down = Page Down
 keys-print-screen = Print Screen
 
 date-just-now = Issa stess
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-panel = Taskbar
+
+## System notifications
+
+unsafe-mode-title = Is-sistema tqiegħdet f’modalità mhux sigura
+unsafe-mode-body = L-apps issa għandhom aċċess mingħajr restrizzjonijiet
+unsafe-mode-undo = Erġa’ lura
+privileged-user-title = Dħalt bħala utent privileġġat
+privileged-user-body = Għal raġunijiet ta’ sigurtà, evita li tuża sessjoni bħala utent privileġġat. Jekk tista’, idħol bħala utent normali.
+
+## Starting programs
+
+spawn-failed = Ma setax jitħaddem “{ $command }”:
+
+## Text field context menu
+
+entry-menu-copy = Ikkopja
+entry-menu-paste = Ippejstja
+entry-menu-show-text = Uri t-test
+entry-menu-hide-text = Aħbi t-test
+entry-caps-lock-on = Caps Lock mixgħul

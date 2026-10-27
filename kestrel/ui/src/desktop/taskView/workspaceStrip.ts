@@ -1,7 +1,7 @@
 import Clutter from 'gi://Clutter';
 import Meta from 'gi://Meta';
 import St from 'gi://St';
-import * as DND from '../../shell/popups/dnd.js';
+import * as DND from '../../shared/popups/dnd.js';
 
 import type { BoardFrame } from '../board/board.js';
 import type { Monitor } from '../panel/panel.js';

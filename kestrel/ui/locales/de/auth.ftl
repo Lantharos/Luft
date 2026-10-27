@@ -24,6 +24,7 @@ lock-screen-larger-text = Größerer Text
 lock-screen-suspend = Standby
 lock-screen-restart = Neu starten …
 lock-screen-power-off = Herunterfahren …
+lock-inhibit-reason = Kestrel muss den Bildschirm sperren
 
 ## Keyring and passphrase prompts. Apps usually supply their own text; these are the defaults
 
@@ -67,3 +68,74 @@ passkeys-ok = OK
 passkeys-use-this-computer = Diesen Computer verwenden
 passkeys-fingerprint-unavailable = Gib dein Passwort ein, um fortzufahren.
 passkeys-wrong-password = Das Passwort ist falsch. Versuch es noch einmal.
+
+## Sign-in prompt
+
+auth-prompt-password = Passwort
+auth-prompt-username = Benutzername
+auth-prompt-back = Zurück
+auth-prompt-submit = Senden
+auth-prompt-wrong-password = Das Passwort hat nicht funktioniert
+auth-prompt-failed = Das hat nicht funktioniert. Versuch es noch einmal.
+fingerprint-not-recognized = Fingerabdruck nicht erkannt
+
+## Administrator authentication
+
+polkit-title = Authentifizierung erforderlich
+polkit-administrator = Administrator
+polkit-password = Passwort
+polkit-cancel = Abbrechen
+polkit-authenticate = Authentifizieren
+polkit-failed = Das hat leider nicht funktioniert. Versuch es noch einmal.
+
+## Log out, power off and restart dialog
+
+end-session-log-out-user = { $userName } abmelden
+end-session-log-out-title = Abmelden
+end-session-log-out-user-countdown = { $seconds ->
+    [one] { $userName } wird in { $seconds } Sekunde automatisch abgemeldet
+   *[other] { $userName } wird in { $seconds } Sekunden automatisch abgemeldet
+}
+end-session-log-out-countdown = { $seconds ->
+    [one] Du wirst in { $seconds } Sekunde automatisch abgemeldet
+   *[other] Du wirst in { $seconds } Sekunden automatisch abgemeldet
+}
+end-session-log-out-button = Abmelden
+end-session-power-off-title = Herunterfahren
+end-session-power-off-updates-title = Updates installieren und herunterfahren
+end-session-power-off-countdown = { $seconds ->
+    [one] Das System wird in { $seconds } Sekunde automatisch heruntergefahren
+   *[other] Das System wird in { $seconds } Sekunden automatisch heruntergefahren
+}
+end-session-power-off-button = Herunterfahren
+end-session-restart-title = Neu starten
+end-session-restart-updates-title = Updates installieren und neu starten
+end-session-restart-countdown = { $seconds ->
+    [one] Das System wird in { $seconds } Sekunde automatisch neu gestartet
+   *[other] Das System wird in { $seconds } Sekunden automatisch neu gestartet
+}
+end-session-restart-button = Neu starten
+end-session-update-restart-title = Neu starten und Updates installieren
+end-session-update-restart-countdown = { $seconds ->
+    [one] Das System wird in { $seconds } Sekunde automatisch neu gestartet und installiert die Updates
+   *[other] Das System wird in { $seconds } Sekunden automatisch neu gestartet und installiert die Updates
+}
+end-session-update-restart-button = Neu starten und installieren
+end-session-install-updates = Ausstehende Softwareupdates installieren
+end-session-install-version = Version { $version } installieren
+end-session-low-battery = Akku fast leer: Schließ den Computer an, bevor du Updates installierst
+end-session-busy-apps = Einige Apps sind beschäftigt oder haben ungespeicherte Änderungen
+end-session-other-users = Andere Benutzer sind angemeldet
+end-session-cancel = Abbrechen
+end-session-boot-options = Startoptionen
+end-session-remote-user = { $userName } (entfernt)
+end-session-console-user = { $userName } (Konsole)
+
+## Lock screen clock
+
+lock-clock-swipe-up = Wisch nach oben
+lock-clock-click-or-press = Klick oder drück eine Taste
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-unlock = Entsperrfenster

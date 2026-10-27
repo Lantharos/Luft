@@ -61,3 +61,45 @@ snap-zone = Прилепи во област од { $width }% на { $height }%
 title-bar-minimize = Минимизирај
 title-bar-maximize = Максимизирај
 title-bar-close = Затвори
+
+## Window resizing
+
+window-resize-size = { $width } × { $height }
+
+## App not responding
+
+close-dialog-title = „{ $appName }“ не одговара
+close-dialog-description = Можете да почекате малку апликацијата да продолжи или да ја затворите присилно
+close-dialog-force-quit = Присилно затвори
+close-dialog-wait = Почекај
+
+## Display mode switcher, keep each label under about 15 characters
+
+switch-monitor-mirror = Огледало
+switch-monitor-join = Спои екрани
+switch-monitor-external-only = Само надворешен
+switch-monitor-built-in-only = Само вграден
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-windows = Прозорци
+
+## Window menu, opened by right-clicking a window's title bar
+
+title-bar-menu-screenshot = Направи слика од екранот
+title-bar-menu-hide = Скриј
+title-bar-menu-restore = Врати
+title-bar-menu-maximize = Максимизирај
+title-bar-menu-move = Премести
+title-bar-menu-resize = Промени големина
+title-bar-menu-always-on-top = Секогаш најгоре
+title-bar-menu-always-on-visible-workspace = Секогаш на видливиот работен простор
+title-bar-menu-workspace-left = Премести во работниот простор лево
+title-bar-menu-workspace-right = Премести во работниот простор десно
+title-bar-menu-workspace-up = Премести во работниот простор горе
+title-bar-menu-workspace-down = Премести во работниот простор долу
+title-bar-menu-monitor-up = Премести на екранот горе
+title-bar-menu-monitor-down = Премести на екранот долу
+title-bar-menu-monitor-left = Премести на екранот лево
+title-bar-menu-monitor-right = Премести на екранот десно
+title-bar-menu-close = Затвори

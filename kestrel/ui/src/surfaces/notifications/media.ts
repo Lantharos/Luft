@@ -2,7 +2,7 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import Pango from 'gi://Pango';
 import St from 'gi://St';
-import { MprisSource, type MprisPlayer } from '../../shell/notifications/mpris.js';
+import { MprisSource, type MprisPlayer } from './tray/mpris.js';
 
 import { appIcon } from '../../appearance/icons/appIcons.js';
 import { t } from '../../shared/i18n/index.js';

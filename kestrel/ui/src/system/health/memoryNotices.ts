@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
-import * as MessageTray from '../../shell/notifications/messageTray.js';
+import * as MessageTray from '../../surfaces/notifications/tray/messageTray.js';
 
 import { appIcons } from '../../appearance/icons/appIcons.js';
 import { formatsLocale, t } from '../../shared/i18n/index.js';

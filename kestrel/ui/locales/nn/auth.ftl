@@ -24,6 +24,7 @@ lock-screen-larger-text = Større tekst
 lock-screen-suspend = Kvilemodus
 lock-screen-restart = Start på nytt…
 lock-screen-power-off = Slå av…
+lock-inhibit-reason = Kestrel må låse skjermen
 
 ## Keyring and passphrase prompts. Apps usually supply their own text; these are the defaults
 
@@ -67,3 +68,74 @@ passkeys-ok = OK
 passkeys-use-this-computer = Bruk denne datamaskinen
 passkeys-fingerprint-unavailable = Bruk passordet ditt for å halde fram.
 passkeys-wrong-password = Passordet er feil. Prøv igjen.
+
+## Sign-in prompt
+
+auth-prompt-password = Passord
+auth-prompt-username = Brukarnamn
+auth-prompt-back = Tilbake
+auth-prompt-submit = Send
+auth-prompt-wrong-password = Passordet fungerte ikkje
+auth-prompt-failed = Det fungerte ikkje. Prøv igjen.
+fingerprint-not-recognized = Fingeravtrykket vart ikkje kjent att
+
+## Administrator authentication
+
+polkit-title = Godkjenning krevst
+polkit-administrator = Administrator
+polkit-password = Passord
+polkit-cancel = Avbryt
+polkit-authenticate = Godkjenn
+polkit-failed = Det fungerte ikkje. Prøv igjen.
+
+## Log out, power off and restart dialog
+
+end-session-log-out-user = Logg ut { $userName }
+end-session-log-out-title = Logg ut
+end-session-log-out-user-countdown = { $seconds ->
+    [one] { $userName } blir logga ut automatisk om { $seconds } sekund
+   *[other] { $userName } blir logga ut automatisk om { $seconds } sekund
+}
+end-session-log-out-countdown = { $seconds ->
+    [one] Du blir logga ut automatisk om { $seconds } sekund
+   *[other] Du blir logga ut automatisk om { $seconds } sekund
+}
+end-session-log-out-button = Logg ut
+end-session-power-off-title = Slå av
+end-session-power-off-updates-title = Installer oppdateringar og slå av
+end-session-power-off-countdown = { $seconds ->
+    [one] Systemet blir slått av automatisk om { $seconds } sekund
+   *[other] Systemet blir slått av automatisk om { $seconds } sekund
+}
+end-session-power-off-button = Slå av
+end-session-restart-title = Start på nytt
+end-session-restart-updates-title = Installer oppdateringar og start på nytt
+end-session-restart-countdown = { $seconds ->
+    [one] Systemet startar på nytt automatisk om { $seconds } sekund
+   *[other] Systemet startar på nytt automatisk om { $seconds } sekund
+}
+end-session-restart-button = Start på nytt
+end-session-update-restart-title = Start på nytt og installer oppdateringar
+end-session-update-restart-countdown = { $seconds ->
+    [one] Systemet startar automatisk på nytt og installerer oppdateringar om { $seconds } sekund
+   *[other] Systemet startar automatisk på nytt og installerer oppdateringar om { $seconds } sekund
+}
+end-session-update-restart-button = Start på nytt og installer
+end-session-install-updates = Installer ventande programvareoppdateringar
+end-session-install-version = Installer versjon { $version }
+end-session-low-battery = Lite straum på batteriet: kople til straum før du installerer oppdateringar
+end-session-busy-apps = Nokre appar er opptekne eller har ulagra arbeid
+end-session-other-users = Andre brukarar er logga inn
+end-session-cancel = Avbryt
+end-session-boot-options = Oppstartsval
+end-session-remote-user = { $userName } (eksternt)
+end-session-console-user = { $userName } (konsoll)
+
+## Lock screen clock
+
+lock-clock-swipe-up = Sveip opp
+lock-clock-click-or-press = Klikk eller trykk på ein tast
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-unlock = Opplåsingsvindauge

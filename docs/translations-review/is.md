@@ -32,9 +32,9 @@ Strings in Luft's Icelandic translation that a native speaker should check: term
 - `kestrel/ui/locales/is/portal.ftl` `shortcuts-record-title`: "Flýtilyklar í { $appName }" — "í" so the dative works with the unknown-app fallback; "fyrir" would be more natural but needs the accusative.
 - `kestrel/ui/locales/is/desktop.ftl` `window-menu-close`, `portal.ftl` `usb-title`/`usb-description`, `setup.ftl` `setup-replace-keeps-accounts`: English singular variants without the number became exact [1] variants, since Icelandic [one] also covers 21, 31 ….
 - `kestrel/ui/locales/is/system.ftl` `oom-closed-body`: "…svo þessu var lokað…" — avoids a gendered pronoun for app vs container; check it doesn't read too vague.
-- `kestrel/ui/locales/is/engine.ftl` `network-menu-tethers` / `network-menu-tether`: "Netdeiling um Bluetooth" / "Netdeiling" — no settled term for tethering.
-- `kestrel/ui/locales/is/engine.ftl` `end-session-log-out-user-countdown`: "Notandinn { $userName } verður skráður út…" — "notandinn" carries the masculine agreement so the person's gender doesn't matter; check it sounds natural.
-- `kestrel/ui/locales/is/engine.ftl` `ctrl-alt-tab-unlock`: "Innskráningargluggi" — the lock screen's sign-in prompt; check the term.
+- `kestrel/ui/locales/is/system.ftl` `network-menu-tethers` / `network-menu-tether`: "Netdeiling um Bluetooth" / "Netdeiling" — no settled term for tethering.
+- `kestrel/ui/locales/is/auth.ftl` `end-session-log-out-user-countdown`: "Notandinn { $userName } verður skráður út…" — "notandinn" carries the masculine agreement so the person's gender doesn't matter; check it sounds natural.
+- `kestrel/ui/locales/is/auth.ftl` `ctrl-alt-tab-unlock`: "Innskráningargluggi" — the lock screen's sign-in prompt; check the term.
 - `kestrel/ui/locales/is/system.ftl` `peek-error-no-caller`: "Setubrautin (session bus)" — technical term with no settled Icelandic equivalent.
 
 ## Settings

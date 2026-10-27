@@ -31,10 +31,10 @@ Strings in Luft's Macedonian translation that a native speaker should check. Eac
 - `kestrel/ui/locales/mk/system.ftl` `battery-left`: "Преостанато е { $percent }." — impersonal neuter to avoid number agreement with the percentage; check it sounds natural.
 - `kestrel/ui/locales/mk/system.ftl` `media-keys-airplane-mode-hardware`: "Режимот за авион е вклучен со копче на уредот" — "in hardware" means a physical switch; check the wording.
 - `kestrel/ui/locales/mk/portal.ftl` `portal-unknown-app-subject`: "Апликацијата" — `$appName` stands bare in these sentences because this fallback replaces it, so app names start sentences without „апликацијата“, e.g. „Firefox сака…“.
-- `kestrel/ui/locales/mk/engine.ftl` `network-menu-tether`: "Тетеринг" — no settled Macedonian term; also in `network-menu-tethers` „Тетеринг преку Bluetooth“.
-- `kestrel/ui/locales/mk/engine.ftl` `network-menu-hotspot`: "Хотспот на { $name }" — loanword; „Точка на пристап“ is the alternative.
-- `kestrel/ui/locales/mk/engine.ftl` `screenshot-screencasts-folder`: "Снимки од екранот" — folder name on disk, next to „Слики од екранот“ for screenshots; check the two are distinct enough.
-- `kestrel/ui/locales/mk/engine.ftl` `ctrl-alt-tab-panel`: "Лента со задачи" — English says "Panel", which here means the taskbar.
+- `kestrel/ui/locales/mk/system.ftl` `network-menu-tether`: "Тетеринг" — no settled Macedonian term; also in `network-menu-tethers` „Тетеринг преку Bluetooth“.
+- `kestrel/ui/locales/mk/system.ftl` `network-menu-hotspot`: "Хотспот на { $name }" — loanword; „Точка на пристап“ is the alternative.
+- `kestrel/ui/locales/mk/system.ftl` `screenshot-screencasts-folder`: "Снимки од екранот" — folder name on disk, next to „Слики од екранот“ for screenshots; check the two are distinct enough.
+- `kestrel/ui/locales/mk/shell.ftl` `ctrl-alt-tab-panel`: "Лента со задачи" — English says "Panel", which here means the taskbar.
 - `apps/setup/locales/mk/setup.ftl` `setup-region-intro-guessed`: "Да почнеме со поставувањето. Претпоставивме: { $guesses }. Сменете сè што не е точно." — the list is built from definite nouns („јазикот и тастатурата според компјутерот“); check the joined sentence with real values.
 - `apps/setup/locales/mk/setup.ftl` `setup-account-full-name-example`: "Блаже Конески" — a well-known Macedonian name as the placeholder.
 - `apps/setup/locales/mk/setup.ftl` `setup-windows-fast-startup`: "Исклучи го Брзо стартување во Windows" — assumes Windows calls Fast Startup „Брзо стартување“ in Macedonian; same for „Управување со дискови“ (Disk Management) in `setup-windows-bitlocker`.

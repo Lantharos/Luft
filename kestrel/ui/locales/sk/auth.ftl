@@ -24,6 +24,7 @@ lock-screen-larger-text = Väčší text
 lock-screen-suspend = Režim spánku
 lock-screen-restart = Reštartovať…
 lock-screen-power-off = Vypnúť…
+lock-inhibit-reason = Kestrel musí zamknúť obrazovku
 
 ## Keyring and passphrase prompts. Apps usually supply their own text; these are the defaults
 
@@ -67,3 +68,84 @@ passkeys-ok = OK
 passkeys-use-this-computer = Použiť tento počítač
 passkeys-fingerprint-unavailable = Pokračujte zadaním hesla.
 passkeys-wrong-password = Heslo nie je správne. Skúste to znova.
+
+## Sign-in prompt
+
+auth-prompt-password = Heslo
+auth-prompt-username = Používateľské meno
+auth-prompt-back = Späť
+auth-prompt-submit = Odoslať
+auth-prompt-wrong-password = Heslo nie je správne
+auth-prompt-failed = Nepodarilo sa. Skúste to znova.
+fingerprint-not-recognized = Odtlačok prsta nebol rozpoznaný
+
+## Administrator authentication
+
+polkit-title = Vyžaduje sa overenie
+polkit-administrator = Správca
+polkit-password = Heslo
+polkit-cancel = Zrušiť
+polkit-authenticate = Overiť
+polkit-failed = Nepodarilo sa. Skúste to znova.
+
+## Log out, power off and restart dialog
+
+end-session-log-out-user = Odhlásiť používateľa { $userName }
+end-session-log-out-title = Odhlásiť sa
+end-session-log-out-user-countdown = { $seconds ->
+    [one] Používateľ { $userName } bude automaticky odhlásený o { $seconds } sekundu
+    [few] Používateľ { $userName } bude automaticky odhlásený o { $seconds } sekundy
+    [many] Používateľ { $userName } bude automaticky odhlásený o { $seconds } sekundy
+   *[other] Používateľ { $userName } bude automaticky odhlásený o { $seconds } sekúnd
+}
+end-session-log-out-countdown = { $seconds ->
+    [one] Automaticky budete odhlásení o { $seconds } sekundu
+    [few] Automaticky budete odhlásení o { $seconds } sekundy
+    [many] Automaticky budete odhlásení o { $seconds } sekundy
+   *[other] Automaticky budete odhlásení o { $seconds } sekúnd
+}
+end-session-log-out-button = Odhlásiť sa
+end-session-power-off-title = Vypnúť
+end-session-power-off-updates-title = Nainštalovať aktualizácie a vypnúť
+end-session-power-off-countdown = { $seconds ->
+    [one] Systém sa automaticky vypne o { $seconds } sekundu
+    [few] Systém sa automaticky vypne o { $seconds } sekundy
+    [many] Systém sa automaticky vypne o { $seconds } sekundy
+   *[other] Systém sa automaticky vypne o { $seconds } sekúnd
+}
+end-session-power-off-button = Vypnúť
+end-session-restart-title = Reštartovať
+end-session-restart-updates-title = Nainštalovať aktualizácie a reštartovať
+end-session-restart-countdown = { $seconds ->
+    [one] Systém sa automaticky reštartuje o { $seconds } sekundu
+    [few] Systém sa automaticky reštartuje o { $seconds } sekundy
+    [many] Systém sa automaticky reštartuje o { $seconds } sekundy
+   *[other] Systém sa automaticky reštartuje o { $seconds } sekúnd
+}
+end-session-restart-button = Reštartovať
+end-session-update-restart-title = Reštartovať a nainštalovať aktualizácie
+end-session-update-restart-countdown = { $seconds ->
+    [one] Systém sa o { $seconds } sekundu automaticky reštartuje a nainštaluje aktualizácie
+    [few] Systém sa o { $seconds } sekundy automaticky reštartuje a nainštaluje aktualizácie
+    [many] Systém sa o { $seconds } sekundy automaticky reštartuje a nainštaluje aktualizácie
+   *[other] Systém sa o { $seconds } sekúnd automaticky reštartuje a nainštaluje aktualizácie
+}
+end-session-update-restart-button = Reštartovať a inštalovať
+end-session-install-updates = Nainštalovať čakajúce aktualizácie softvéru
+end-session-install-version = Nainštalovať verziu { $version }
+end-session-low-battery = Batéria je slabá. Pred inštaláciou aktualizácií pripojte napájanie.
+end-session-busy-apps = Niektoré aplikácie sú zaneprázdnené alebo obsahujú neuloženú prácu
+end-session-other-users = Prihlásení sú aj ďalší používatelia
+end-session-cancel = Zrušiť
+end-session-boot-options = Možnosti spustenia
+end-session-remote-user = { $userName } (vzdialene)
+end-session-console-user = { $userName } (konzola)
+
+## Lock screen clock
+
+lock-clock-swipe-up = Potiahnite nahor
+lock-clock-click-or-press = Kliknite alebo stlačte kláves
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-unlock = Okno odomknutia

@@ -1,8 +1,8 @@
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
-import { MessageDialogContent } from '../../shell/dialogs/dialog.js';
-import { ModalDialog } from '../../shell/dialogs/modalDialog.js';
+import { MessageDialogContent } from '../../shared/dialogs/dialog.js';
+import { ModalDialog } from '../../shared/dialogs/modalDialog.js';
 import { choose, list, row } from '../../portal/core/rows.js';
 import { t } from '../../shared/i18n/index.js';
 import { copyFor, needsVerification, type Request } from './copy.js';

@@ -61,3 +61,57 @@ snap-zone = Im Bereich { $width } % × { $height } % andocken
 title-bar-minimize = Minimieren
 title-bar-maximize = Maximieren
 title-bar-close = Schließen
+
+## Window resizing
+
+window-resize-size = { $width } × { $height }
+
+## App not responding
+
+close-dialog-title = „{ $appName }“ reagiert nicht
+close-dialog-description = Du kannst kurz warten, ob die App weiterläuft, oder sie sofort beenden
+close-dialog-force-quit = Sofort beenden
+close-dialog-wait = Warten
+
+## Display mode switcher, keep each label under about 15 characters
+
+switch-monitor-mirror = Spiegeln
+switch-monitor-join = Erweitern
+switch-monitor-external-only = Nur extern
+switch-monitor-built-in-only = Nur intern
+
+## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
+
+ctrl-alt-tab-windows = Fenster
+
+## Window menu, opened by right-clicking a window's title bar
+
+title-bar-menu-screenshot = Bildschirmfoto aufnehmen
+title-bar-menu-hide = Minimieren
+title-bar-menu-restore = Wiederherstellen
+title-bar-menu-maximize = Maximieren
+title-bar-menu-move = Verschieben
+title-bar-menu-resize = Größe ändern
+title-bar-menu-always-on-top = Immer im Vordergrund
+title-bar-menu-always-on-visible-workspace = Auf allen Arbeitsflächen
+title-bar-menu-workspace-left = Auf Arbeitsfläche links verschieben
+title-bar-menu-workspace-right = Auf Arbeitsfläche rechts verschieben
+title-bar-menu-workspace-up = Auf Arbeitsfläche oben verschieben
+title-bar-menu-workspace-down = Auf Arbeitsfläche unten verschieben
+title-bar-menu-monitor-up = Auf Bildschirm oben verschieben
+title-bar-menu-monitor-down = Auf Bildschirm unten verschieben
+title-bar-menu-monitor-left = Auf Bildschirm links verschieben
+title-bar-menu-monitor-right = Auf Bildschirm rechts verschieben
+title-bar-menu-close = Schließen
+
+## Rain
+
+rain-title = Regen
+rain-open-menu = Regenmenü öffnen
+rain-drizzle = Nieselregen
+rain-rain = Regen
+rain-storm = Sturm
+rain-show = Auf dem Desktop zeigen
+rain-sound = Ton
+rain-volume = Lautstärke des Regens
+rain-settings = Regen-Einstellungen

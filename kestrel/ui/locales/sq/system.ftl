@@ -162,3 +162,251 @@ peek-error-unknown-modifier = { $modifier } nuk është modifikues. Përdor ctrl
 peek-error-display-owner = Ky ekran i përket një programi tjetër
 peek-error-display-run = Programet në një ekran të fshehur nisen nga peek run
 peek-error-display-handle = Ky ekran u nis si { $handle }, jo si { $requested }
+
+## Quick settings tiles
+
+auto-rotate-title = Rrotullim automatik
+dark-style-title = Regjimi i errët
+do-not-disturb-title = Mos shqetëso
+night-light-title = Drita e natës
+airplane-mode-title = Regjimi i aeroplanit
+
+## Power mode
+
+power-profile-title = Regjimi i energjisë
+power-profile-header = Regjimi i energjisë
+power-profile-open-menu = Hap menynë e regjimeve të energjisë
+power-profile-settings = Cilësimet e energjisë
+power-profile-performance = Performancë
+power-profile-balanced = I balancuar
+power-profile-power-saver = Kursim energjie
+power-profile-custom = I personalizuar
+
+## Keep awake
+
+caffeine-title = Mbaje zgjuar
+caffeine-open-menu = Hap menynë “Mbaje zgjuar”
+caffeine-until = Deri në { $time }
+caffeine-until-turned-off = Derisa ta çaktivizosh
+caffeine-30-minutes = 30 minuta
+caffeine-1-hour = 1 orë
+caffeine-2-hours = 2 orë
+caffeine-inhibit-reason = Mbajtur zgjuar nga cilësimet e shpejta
+
+## Brightness
+
+brightness-title = Ndriçimi
+brightness-open-menu = Hap menynë e ndriçimit
+
+## Keyboard backlight
+
+backlight-title = Ndriçimi i tastierës
+backlight-open-menu = Hap menynë e ndriçimit të tastierës
+backlight-slider = Ndriçimi i tastierës
+backlight-off = Joaktiv
+backlight-low = I ulët
+backlight-high = I lartë
+
+## Sound
+
+volume-sound-settings = Cilësimet e zërit
+volume-mute = Hesht
+volume-unmute = Hiq heshtjen
+volume-output-slider = Volumi
+volume-output-title = Dalja e zërit
+volume-output-open-menu = Hap menynë e daljes së zërit
+volume-input-slider = Mikrofoni
+volume-input-title = Hyrja e zërit
+volume-input-open-menu = Hap menynë e hyrjes së zërit
+
+## Bluetooth
+
+bluetooth-title = Bluetooth
+bluetooth-open-menu = Hap menynë e Bluetooth
+bluetooth-settings = Cilësimet e Bluetooth
+bluetooth-connect = Lidhu
+bluetooth-disconnect = Shkëputu
+bluetooth-connect-device = Lidhu me { $deviceName }
+bluetooth-disconnect-device = Shkëput { $deviceName }
+bluetooth-no-devices = Nuk ka pajisje të disponueshme ose të lidhura
+bluetooth-turn-on-hint = Aktivizo Bluetooth për t’u lidhur me pajisje
+bluetooth-connected-count = { $count ->
+    [one] { $count } e lidhur
+   *[other] { $count } të lidhura
+}
+
+## Network menus in quick settings
+
+network-menu-unknown-network = <i panjohur>
+network-menu-connect = Lidhu
+network-menu-disconnect = Shkëputu
+network-menu-connect-to = Lidhu me { $name }
+network-menu-disconnect-from = Shkëput { $name }
+network-menu-turn-off = Çaktivizo
+network-menu-wifi-network = { $secure ->
+    [yes] { $name }, i sigurt, fuqia e sinjalit { $strength }%
+   *[no] { $name }, jo i sigurt, fuqia e sinjalit { $strength }%
+}
+network-menu-hotspot = Pika e nxehtë e { $name }
+network-menu-connected-count = { $count ->
+    [one] { $count } e lidhur
+   *[other] { $count } të lidhura
+}
+network-menu-vpn = VPN
+network-menu-vpn-open-menu = Hap menynë VPN
+network-menu-vpn-settings = Cilësimet e VPN
+network-menu-wifi = Wi-Fi
+network-menu-wifi-open-menu = Hap menynë Wi-Fi
+network-menu-wifi-settings = Të gjitha rrjetet
+network-menu-wired = Lidhjet me kabllo
+network-menu-wired-open-menu = Hap menynë e lidhjeve me kabllo
+network-menu-wired-settings = Cilësimet me kabllo
+network-menu-tethers = Internet nga telefoni me Bluetooth
+network-menu-tethers-open-menu = Hap menynë e internetit nga telefoni
+network-menu-tether = Telefoni
+network-menu-tether-settings = Cilësimet e Bluetooth
+network-menu-mobile-connections = Lidhjet celulare
+network-menu-mobile-open-menu = Hap menynë e lidhjeve celulare
+network-menu-mobile-settings = Cilësimet e internetit celular
+network-menu-mobile = Celular
+network-device-wired = Me kabllo
+network-device-named = { $kind } ({ $name })
+network-menu-sign-in = Hyr në rrjet
+network-menu-failed-title = Lidhja dështoi
+network-menu-failed-body = Aktivizimi i lidhjes së rrjetit dështoi
+
+## Location access dialog
+
+location-dialog-title = Lejo qasjen në vendndodhje
+location-dialog-description = Aplikacioni { $appName } kërkon qasje në vendndodhjen tënde
+location-dialog-info = Qasjen në vendndodhje mund ta ndryshosh kurdo te cilësimet e privatësisë
+location-dialog-deny = Refuzo qasjen
+location-dialog-grant = Jep qasje
+
+## Thunderbolt notifications
+
+thunderbolt-unknown-title = Pajisje Thunderbolt e panjohur
+thunderbolt-unknown-body = U zbulua një pajisje e re ndërsa ishe larg. Shkëpute dhe lidhe sërish pajisjen për të nisur ta përdorësh.
+thunderbolt-unauthorized-title = Pajisje Thunderbolt e paautorizuar
+thunderbolt-unauthorized-body = U zbulua një pajisje e re që duhet autorizuar nga një administrator
+thunderbolt-error-title = Gabim në autorizimin e Thunderbolt
+thunderbolt-error-body = Pajisja Thunderbolt nuk u autorizua dot: { $reason }
+
+## App permission dialog, used when an app asks for access to something
+
+access-dialog-deny = Refuzo
+access-dialog-allow = Lejo
+
+## Display change confirmation
+
+display-change-title = Të mbahen këto cilësime?
+display-change-countdown = { $seconds ->
+    [one] Ndryshimet kthehen pas { $seconds } sekonde
+   *[other] Ndryshimet kthehen pas { $seconds } sekondash
+}
+display-change-revert = Kthe cilësimet
+display-change-keep = Mbaj ndryshimet
+
+## Drive connected notification
+
+autorun-connected = “{ $driveName }” u lidh
+autorun-ready = Disku tani mund të përdoret
+autorun-open-with = Hap me { $appName }
+
+## Keyboard accessibility shortcuts
+
+kbd-a11y-slow-keys-on = Tastet e ngadalta u aktivizuan
+kbd-a11y-slow-keys-off = Tastet e ngadalta u çaktivizuan
+kbd-a11y-slow-keys-description = Sapo mbajte të shtypur tastin Shift për 8 sekonda. Kjo është shkurtorja për tastet e ngadalta, që ndryshojnë mënyrën si funksionon tastiera jote.
+kbd-a11y-sticky-keys-on = Tastet ngjitëse u aktivizuan
+kbd-a11y-sticky-keys-off = Tastet ngjitëse u çaktivizuan
+kbd-a11y-sticky-keys-on-description = Sapo shtype tastin Shift 5 herë radhazi. Kjo është shkurtorja për tastet ngjitëse, që ndryshojnë mënyrën si funksionon tastiera jote.
+kbd-a11y-sticky-keys-off-description = Sapo shtype dy taste njëherësh ose shtype tastin Shift 5 herë radhazi. Kjo çaktivizon tastet ngjitëse, që ndryshojnë mënyrën si funksionon tastiera jote.
+kbd-a11y-leave-on = Lëri aktive
+kbd-a11y-turn-on = Aktivizo
+kbd-a11y-turn-off = Çaktivizo
+kbd-a11y-leave-off = Lëri joaktive
+
+## Audio device selection, shown after plugging something into the headphone jack
+
+audio-device-title = Zgjidh pajisjen audio
+audio-device-cancel = Anulo
+audio-device-sound-settings = Cilësimet e zërit
+audio-device-headphones = Kufje
+audio-device-headset = Kufje me mikrofon
+audio-device-microphone = Mikrofon
+
+## Keyboard shortcut inhibiting, asked when an app wants to receive system shortcuts itself
+
+inhibit-shortcuts-title = Lejo çaktivizimin e shkurtoreve
+inhibit-shortcuts-app = Aplikacioni { $appName } kërkon të çaktivizojë shkurtoret
+inhibit-shortcuts-unknown-app = Një aplikacion kërkon të çaktivizojë shkurtoret
+inhibit-shortcuts-restore = Mund t’i rikthesh shkurtoret duke shtypur { $shortcut }
+inhibit-shortcuts-deny = Refuzo
+inhibit-shortcuts-allow = Lejo
+
+## Unlocking encrypted drives
+
+mount-hidden-volume = Vëllim i fshehur
+mount-windows-system-volume = Vëllim sistemi Windows
+mount-uses-keyfiles = Përdor skedarë çelësash
+mount-keyfiles-use-app = Për të zhbllokuar një vëllim që përdor skedarë çelësash, përdor <i>{ $appName }</i>
+mount-keyfiles-need-app = Të duhet një mjet i jashtëm si <i>Disqet</i> për të zhbllokuar një vëllim që përdor skedarë çelësash
+mount-pim-number = Numri PIM
+mount-pim-invalid = PIM duhet të jetë numër ose bosh
+mount-password = Fjalëkalimi
+mount-remember-password = Mbaj mend fjalëkalimin
+mount-cancel = Anulo
+mount-unlock = Zhblloko
+mount-open-app = Hap { $appName }
+mount-wrong-password = Na vjen keq, nuk funksionoi. Provo sërish.
+mount-unlock-failed = Vëllimi nuk u zhbllokua dot
+mount-pim-unsupported = Versioni i instaluar i udisks nuk e mbështet cilësimin PIM
+
+## Network passwords, asked when connecting needs one
+
+network-agent-auth-required = Kërkohet vërtetimi
+network-agent-wifi-rejected = Fjalëkalimi i ruajtur për “{ $networkName }” nuk funksionoi. Shkruaje sërish.
+network-agent-wifi-secrets = Duhen fjalëkalime ose çelësa enkriptimi për t’u lidhur me rrjetin pa tel “{ $networkName }”
+network-agent-wps-hint = Ose mund të lidhesh duke shtypur butonin “WPS” në ruter
+network-agent-wired-title = Vërtetimi 802.1X me kabllo
+network-agent-dsl-title = Vërtetimi DSL
+network-agent-pin-title = Kërkohet kodi PIN
+network-agent-pin-body = Pajisja e internetit celular kërkon kodin PIN
+network-agent-vpn-title = Fjalëkalimi i VPN
+network-agent-password-required = Duhet një fjalëkalim për t’u lidhur me “{ $networkName }”
+network-agent-connect = Lidhu
+network-agent-cancel = Anulo
+network-agent-password = Fjalëkalimi
+network-agent-username = Emri i përdoruesit
+network-agent-key = Çelësi
+network-agent-private-key-password = Fjalëkalimi i çelësit privat
+network-agent-identity = Identiteti
+network-agent-service = Shërbimi
+network-agent-network-name = Emri i rrjetit
+network-agent-pin = PIN
+
+## Screenshots and screen recording
+
+screenshot-source = Kapja e ekranit
+screenshot-area = Zgjedhje zone
+screenshot-screen = Zgjedhje ekrani
+screenshot-window = Zgjedhje dritareje
+screenshot-take = Bëj foto ekrani
+screenshot-record = Regjistro ekranin
+screenshot-show-pointer = Shfaq treguesin
+screenshot-capture = Kap
+screenshot-close = Mbyll
+screenshot-screencasts-folder = Regjistrimet e ekranit
+screenshot-screencast-file = Regjistrim ekrani { $date } { $time }
+screenshot-screenshots-folder = Fotot e ekranit
+screenshot-file = Foto ekrani { $timestamp }
+screenshot-screencast-recorded = Regjistrimi i ekranit u ruajt
+screenshot-screencast-start-failed = Regjistrimi i ekranit nuk nisi
+screenshot-screencast-out-of-space = Regjistrimi i ekranit dështoi: nuk ka hapësirë në disk
+screenshot-screencast-try-again = Regjistrimi i ekranit dështoi, provo sërish
+screenshot-screencast-failed = Regjistrimi i ekranit dështoi
+screenshot-screencast-view = Kliko këtu për të parë videon
+screenshot-show-in-rover = Shfaq në Rover
+screenshot-captured = Foto ekrani u bë
+screenshot-captured-body = Mund ta ngjitësh imazhin nga kujtesa e fragmenteve

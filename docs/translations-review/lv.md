@@ -29,9 +29,9 @@ Strings in Luft's Latvian translation that a native speaker should check: terms 
 - `kestrel/ui/locales/lv/system.ftl` `health-gpu-reset-body`: "Dators restartējās pats: { $date }, { $time }." — built so the date's case doesn't matter; check.
 - `kestrel/ui/locales/lv/system.ftl` `peek-error-declined`: "{ $app } var jautāt vēlreiz pēc tam, kad būs aizvērta." — feminine assumes the program is an app; may be a terminal tool.
 - `kestrel/ui/locales/lv/portal.ftl` `print-two-sided`: "Abpusēja druka" — check against what Latvian print dialogs use.
-- `kestrel/ui/locales/lv/engine.ftl` `network-menu-tether`: "Tīklājs" — internet shared from a phone over Bluetooth, named like the Wi-Fi hotspot (header "Bluetooth tīklāji"); check it is understood as Bluetooth tethering.
-- `kestrel/ui/locales/lv/engine.ftl` `switch-monitor-join`: "Paplašināt" — Windows' Extend; English says "Join Displays".
-- `kestrel/ui/locales/lv/engine.ftl` `screenshot-screencasts-folder`: "Ekrāna ieraksti" — folder name on disk; check against existing XDG/GNOME Latvian folder names.
+- `kestrel/ui/locales/lv/system.ftl` `network-menu-tether`: "Tīklājs" — internet shared from a phone over Bluetooth, named like the Wi-Fi hotspot (header "Bluetooth tīklāji"); check it is understood as Bluetooth tethering.
+- `kestrel/ui/locales/lv/desktop.ftl` `switch-monitor-join`: "Paplašināt" — Windows' Extend; English says "Join Displays".
+- `kestrel/ui/locales/lv/system.ftl` `screenshot-screencasts-folder`: "Ekrāna ieraksti" — folder name on disk; check against existing XDG/GNOME Latvian folder names.
 - `apps/setup/locales/lv/setup.ftl` `setup-region-intro-guessed`: "Mēs noteicām { $guesses }, …" — field names (`setup-region-field-*`) are in the accusative (valodu, tastatūru, laika joslu) to fit this sentence; check the joined list reads well.
 - `apps/setup/locales/lv/setup.ftl` `setup-finishing-installed-title`: "Luft ir instalēta" — Luft is treated as feminine (sistēma) throughout setup and installer; confirm the gender.
 - `apps/setup/locales/lv/setup.ftl` `setup-windows-hibernated`: "…ar ātro startēšanu…" — Windows' Latvian name for Fast Startup; verify.

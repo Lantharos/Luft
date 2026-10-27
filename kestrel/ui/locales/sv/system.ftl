@@ -162,3 +162,251 @@ peek-error-unknown-modifier = { $modifier } är ingen modifieringstangent. Anvä
 peek-error-display-owner = Den här skärmen tillhör ett annat program
 peek-error-display-run = Program på en dold skärm startas av peek run
 peek-error-display-handle = Den här skärmen startades som { $handle }, inte { $requested }
+
+## Quick settings tiles
+
+auto-rotate-title = Rotera automatiskt
+dark-style-title = Mörkt läge
+do-not-disturb-title = Stör ej
+night-light-title = Nattljus
+airplane-mode-title = Flygplansläge
+
+## Power mode
+
+power-profile-title = Energiläge
+power-profile-header = Energiläge
+power-profile-open-menu = Öppna menyn för energilägen
+power-profile-settings = Energiinställningar
+power-profile-performance = Prestanda
+power-profile-balanced = Balanserat
+power-profile-power-saver = Energisparläge
+power-profile-custom = Anpassat
+
+## Keep awake
+
+caffeine-title = Håll vaken
+caffeine-open-menu = Öppna menyn för Håll vaken
+caffeine-until = Till { $time }
+caffeine-until-turned-off = Tills den stängs av
+caffeine-30-minutes = 30 minuter
+caffeine-1-hour = 1 timme
+caffeine-2-hours = 2 timmar
+caffeine-inhibit-reason = Hålls vaken från snabbinställningarna
+
+## Brightness
+
+brightness-title = Ljusstyrka
+brightness-open-menu = Öppna menyn för ljusstyrka
+
+## Keyboard backlight
+
+backlight-title = Tangentbordsbelysning
+backlight-open-menu = Öppna menyn för tangentbordets ljusstyrka
+backlight-slider = Tangentbordets ljusstyrka
+backlight-off = Av
+backlight-low = Låg
+backlight-high = Hög
+
+## Sound
+
+volume-sound-settings = Ljudinställningar
+volume-mute = Stäng av ljudet
+volume-unmute = Slå på ljudet
+volume-output-slider = Volym
+volume-output-title = Ljudutgång
+volume-output-open-menu = Öppna menyn för ljudutgång
+volume-input-slider = Mikrofon
+volume-input-title = Ljudingång
+volume-input-open-menu = Öppna menyn för ljudingång
+
+## Bluetooth
+
+bluetooth-title = Bluetooth
+bluetooth-open-menu = Öppna Bluetooth-menyn
+bluetooth-settings = Bluetooth-inställningar
+bluetooth-connect = Anslut
+bluetooth-disconnect = Koppla från
+bluetooth-connect-device = Anslut till { $deviceName }
+bluetooth-disconnect-device = Koppla från { $deviceName }
+bluetooth-no-devices = Inga tillgängliga eller anslutna enheter
+bluetooth-turn-on-hint = Slå på Bluetooth för att ansluta till enheter
+bluetooth-connected-count = { $count ->
+    [one] { $count } ansluten
+   *[other] { $count } anslutna
+}
+
+## Network menus in quick settings
+
+network-menu-unknown-network = <okänt>
+network-menu-connect = Anslut
+network-menu-disconnect = Koppla från
+network-menu-connect-to = Anslut till { $name }
+network-menu-disconnect-from = Koppla från { $name }
+network-menu-turn-off = Stäng av
+network-menu-wifi-network = { $secure ->
+    [yes] { $name }, säkert, signalstyrka { $strength } %
+   *[no] { $name }, inte säkert, signalstyrka { $strength } %
+}
+network-menu-hotspot = Surfzon på { $name }
+network-menu-connected-count = { $count ->
+    [one] { $count } ansluten
+   *[other] { $count } anslutna
+}
+network-menu-vpn = VPN
+network-menu-vpn-open-menu = Öppna VPN-menyn
+network-menu-vpn-settings = VPN-inställningar
+network-menu-wifi = Wi-Fi
+network-menu-wifi-open-menu = Öppna Wi-Fi-menyn
+network-menu-wifi-settings = Alla nätverk
+network-menu-wired = Trådbundna anslutningar
+network-menu-wired-open-menu = Öppna menyn för trådbundna anslutningar
+network-menu-wired-settings = Inställningar för trådbundet nätverk
+network-menu-tethers = Delade anslutningar via Bluetooth
+network-menu-tethers-open-menu = Öppna menyn för delade anslutningar via Bluetooth
+network-menu-tether = Delad anslutning
+network-menu-tether-settings = Bluetooth-inställningar
+network-menu-mobile-connections = Mobila anslutningar
+network-menu-mobile-open-menu = Öppna menyn för mobila anslutningar
+network-menu-mobile-settings = Inställningar för mobilt bredband
+network-menu-mobile = Mobilt
+network-device-wired = Trådbundet
+network-device-named = { $kind } ({ $name })
+network-menu-sign-in = Logga in på nätverket
+network-menu-failed-title = Anslutningen misslyckades
+network-menu-failed-body = Det gick inte att aktivera nätverksanslutningen
+
+## Location access dialog
+
+location-dialog-title = Tillåt åtkomst till plats
+location-dialog-description = Appen { $appName } vill komma åt din plats
+location-dialog-info = Du kan ändra platsåtkomsten när som helst i integritetsinställningarna
+location-dialog-deny = Neka åtkomst
+location-dialog-grant = Ge åtkomst
+
+## Thunderbolt notifications
+
+thunderbolt-unknown-title = Okänd Thunderbolt-enhet
+thunderbolt-unknown-body = En ny enhet anslöts medan du var borta. Koppla ur den och anslut den igen för att börja använda den.
+thunderbolt-unauthorized-title = Ej godkänd Thunderbolt-enhet
+thunderbolt-unauthorized-body = En ny enhet har anslutits och behöver godkännas av en administratör
+thunderbolt-error-title = Fel vid godkännande av Thunderbolt-enhet
+thunderbolt-error-body = Det gick inte att godkänna Thunderbolt-enheten: { $reason }
+
+## App permission dialog, used when an app asks for access to something
+
+access-dialog-deny = Neka
+access-dialog-allow = Tillåt
+
+## Display change confirmation
+
+display-change-title = Vill du behålla skärminställningarna?
+display-change-countdown = { $seconds ->
+    [one] Ändringarna återställs om { $seconds } sekund
+   *[other] Ändringarna återställs om { $seconds } sekunder
+}
+display-change-revert = Återställ
+display-change-keep = Behåll ändringarna
+
+## Drive connected notification
+
+autorun-connected = ”{ $driveName }” har anslutits
+autorun-ready = Disken kan nu användas
+autorun-open-with = Öppna med { $appName }
+
+## Keyboard accessibility shortcuts
+
+kbd-a11y-slow-keys-on = Långsamma tangenter har slagits på
+kbd-a11y-slow-keys-off = Långsamma tangenter har stängts av
+kbd-a11y-slow-keys-description = Du höll just ned Skift i 8 sekunder. Det är kortkommandot för Långsamma tangenter, som ändrar hur tangentbordet fungerar.
+kbd-a11y-sticky-keys-on = Tröga tangenter har slagits på
+kbd-a11y-sticky-keys-off = Tröga tangenter har stängts av
+kbd-a11y-sticky-keys-on-description = Du tryckte just på Skift 5 gånger i rad. Det är kortkommandot för Tröga tangenter, som ändrar hur tangentbordet fungerar.
+kbd-a11y-sticky-keys-off-description = Du tryckte just på två tangenter samtidigt eller på Skift 5 gånger i rad. Det stänger av Tröga tangenter, som ändrar hur tangentbordet fungerar.
+kbd-a11y-leave-on = Låt vara på
+kbd-a11y-turn-on = Slå på
+kbd-a11y-turn-off = Stäng av
+kbd-a11y-leave-off = Låt vara av
+
+## Audio device selection, shown after plugging something into the headphone jack
+
+audio-device-title = Välj ljudenhet
+audio-device-cancel = Avbryt
+audio-device-sound-settings = Ljudinställningar
+audio-device-headphones = Hörlurar
+audio-device-headset = Headset
+audio-device-microphone = Mikrofon
+
+## Keyboard shortcut inhibiting, asked when an app wants to receive system shortcuts itself
+
+inhibit-shortcuts-title = Tillåt att kortkommandon blockeras
+inhibit-shortcuts-app = Appen { $appName } vill blockera kortkommandon
+inhibit-shortcuts-unknown-app = En app vill blockera kortkommandon
+inhibit-shortcuts-restore = Du kan återställa kortkommandona genom att trycka på { $shortcut }
+inhibit-shortcuts-deny = Neka
+inhibit-shortcuts-allow = Tillåt
+
+## Unlocking encrypted drives
+
+mount-hidden-volume = Dold volym
+mount-windows-system-volume = Windows-systemvolym
+mount-uses-keyfiles = Använder nyckelfiler
+mount-keyfiles-use-app = Använd verktyget <i>{ $appName }</i> för att låsa upp en volym som använder nyckelfiler
+mount-keyfiles-need-app = Du behöver ett externt verktyg som <i>Diskar</i> för att låsa upp en volym som använder nyckelfiler
+mount-pim-number = PIM-nummer
+mount-pim-invalid = PIM måste vara ett tal eller tomt
+mount-password = Lösenord
+mount-remember-password = Kom ihåg lösenordet
+mount-cancel = Avbryt
+mount-unlock = Lås upp
+mount-open-app = Öppna { $appName }
+mount-wrong-password = Det fungerade inte. Försök igen.
+mount-unlock-failed = Det gick inte att låsa upp volymen
+mount-pim-unsupported = Den installerade versionen av udisks stöder inte PIM-inställningen
+
+## Network passwords, asked when connecting needs one
+
+network-agent-auth-required = Autentisering krävs
+network-agent-wifi-rejected = Det sparade lösenordet för ”{ $networkName }” fungerade inte. Ange det igen.
+network-agent-wifi-secrets = Lösenord eller krypteringsnycklar krävs för att ansluta till det trådlösa nätverket ”{ $networkName }”
+network-agent-wps-hint = Du kan också ansluta genom att trycka på WPS-knappen på routern
+network-agent-wired-title = Trådbunden 802.1X-autentisering
+network-agent-dsl-title = DSL-autentisering
+network-agent-pin-title = PIN-kod krävs
+network-agent-pin-body = Enheten för mobilt bredband behöver en PIN-kod
+network-agent-vpn-title = VPN-lösenord
+network-agent-password-required = Ett lösenord krävs för att ansluta till ”{ $networkName }”
+network-agent-connect = Anslut
+network-agent-cancel = Avbryt
+network-agent-password = Lösenord
+network-agent-username = Användarnamn
+network-agent-key = Nyckel
+network-agent-private-key-password = Lösenord för privat nyckel
+network-agent-identity = Identitet
+network-agent-service = Tjänst
+network-agent-network-name = Nätverksnamn
+network-agent-pin = PIN-kod
+
+## Screenshots and screen recording
+
+screenshot-source = Skärmfångst
+screenshot-area = Markera område
+screenshot-screen = Markera skärm
+screenshot-window = Markera fönster
+screenshot-take = Ta en skärmbild
+screenshot-record = Spela in skärmen
+screenshot-show-pointer = Visa pekaren
+screenshot-capture = Ta bild
+screenshot-close = Stäng
+screenshot-screencasts-folder = Skärminspelningar
+screenshot-screencast-file = Skärminspelning från { $date } { $time }
+screenshot-screenshots-folder = Skärmbilder
+screenshot-file = Skärmbild från { $timestamp }
+screenshot-screencast-recorded = Skärminspelningen har sparats
+screenshot-screencast-start-failed = Det gick inte att starta skärminspelningen
+screenshot-screencast-out-of-space = Skärminspelningen misslyckades: diskutrymmet tog slut
+screenshot-screencast-try-again = Skärminspelningen misslyckades. Försök igen.
+screenshot-screencast-failed = Skärminspelningen misslyckades
+screenshot-screencast-view = Klicka här för att visa videon
+screenshot-show-in-rover = Visa i Rover
+screenshot-captured = Skärmbilden har tagits
+screenshot-captured-body = Du kan klistra in bilden från urklipp

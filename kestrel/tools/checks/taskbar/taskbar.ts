@@ -4,7 +4,7 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 import {dismissImmediately, toggleSurface} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
-import {descendants, existing, firstStyled, named, ofType, shown} from '../lib/actors.js';
+import {existing, firstStyled, named, ofType, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {centerOf, moveTo, rest} from '../lib/input/input.js';
 import {gjs, spawn, stop, waitForWindow, waitForWindows} from '../lib/processes.js';
@@ -24,9 +24,14 @@ const launcherEntry = (appId: string) => `
     }]));
   new GLib.MainLoop(null, false).run();`;
 
-async function checkIndicators(panel: Clutter.Actor) {
-  const button = ofType(descendants(panel).find(actor => actor.name?.startsWith('kestrel-app-')) ?? null, St.Button);
-  const launcher = spawn(['gjs', '-c', launcherEntry(button.name!.replace('kestrel-app-', ''))]);
+async function appButton(panel: Clutter.Actor, window: Meta.Window) {
+  const app = Shell.WindowTracker.get_default().get_window_app(window);
+  return {app, button: ofType(await waitUntil(() => named(`kestrel-app-${app.id}`, panel), 'the app gets a taskbar button'), St.Button)};
+}
+
+async function checkIndicators(panel: Clutter.Actor, window: Meta.Window) {
+  const {app, button} = await appButton(panel, window);
+  const launcher = spawn(['gjs', '-c', launcherEntry(app.id)]);
   const badge = ofType(firstStyled('kestrel-task-badge', button), St.Label);
   const fill = ofType(firstStyled('kestrel-task-progress-fill', button), St.Widget);
   await eventually(() => badge.visible && badge.text === '3', 'apps show their unread count');
@@ -60,8 +65,7 @@ async function checkFullscreen(panel: Clutter.Actor, window: Meta.Window) {
 }
 
 async function checkFocus(panel: Clutter.Actor, window: Meta.Window) {
-  const app = Shell.WindowTracker.get_default().get_window_app(window);
-  const button = ofType(named(`kestrel-app-${app.id}`, panel), St.Button);
+  const {button} = await appButton(panel, window);
   await eventually(() => button.has_style_class_name('kestrel-app-focused'), 'the focused app keeps its focus styling');
   const [hasIconGeometry, iconGeometry] = window.get_icon_geometry();
   const [buttonX, buttonY] = button.get_transformed_position();
@@ -116,7 +120,7 @@ export async function run() {
   await checkOpening(panel);
   const app = gjs('clients/windows/window.js', ['--multiple']);
   const windows = await waitForWindows(TITLES);
-  await checkIndicators(panel);
+  await checkIndicators(panel, windows[0]);
   await checkPeek(panel, windows);
   await checkFullscreen(panel, windows[0]);
   await checkFocus(panel, windows[0]);

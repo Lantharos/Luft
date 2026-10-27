@@ -264,6 +264,7 @@ settings-about-memory = Arbeitsspeicher
 settings-about-storage = Speicherplatz
 settings-about-storage-free = { $free } von { $total } frei
 settings-about-manage-drives = Laufwerke verwalten
+settings-about-mount-internal = Interne Laufwerke bei der Anmeldung einhängen
 settings-about-old-system = Beim Wechsel zu Luft behalten · { $size }
 settings-about-other-system = Entfern es, um Luft seine { $size } zu geben
 settings-about-remove = Entfernen

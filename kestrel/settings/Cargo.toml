@@ -8,10 +8,13 @@ license.workspace = true
 [dependencies]
 futures-util = { workspace = true, features = ["std"] }
 gio.workspace = true
-glib = { workspace = true, features = ["v2_68"] }
+glib = { workspace = true, features = ["v2_72"] }
+luft-dbus.workspace = true
+luft-i18n.workspace = true
 pulseaudio.workspace = true
 rustix = { workspace = true, features = ["fs", "process"] }
 serde.workspace = true
+serde_json.workspace = true
 tokio = { workspace = true, features = [
   "fs",
   "io-util",

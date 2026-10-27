@@ -264,6 +264,7 @@ settings-about-memory = Memória
 settings-about-storage = Tárhely
 settings-about-storage-free = { $free } szabad, összesen { $total }
 settings-about-manage-drives = Meghajtók kezelése
+settings-about-mount-internal = Belső meghajtók csatolása bejelentkezéskor
 settings-about-old-system = Megtartva, amikor a Luft lecserélte · { $size }
 settings-about-other-system = Ha eltávolítja, a Luft megkapja a helyét · { $size }
 settings-about-remove = Eltávolítás

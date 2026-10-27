@@ -264,6 +264,7 @@ settings-about-memory = Minne
 settings-about-storage = Lagring
 settings-about-storage-free = { $free } ledigt av { $total }
 settings-about-manage-drives = Hantera diskar
+settings-about-mount-internal = Montera interna diskar när du loggar in
 settings-about-old-system = Behölls när Luft ersatte det · { $size }
 settings-about-other-system = Ta bort det för att ge dess { $size } till Luft
 settings-about-remove = Ta bort

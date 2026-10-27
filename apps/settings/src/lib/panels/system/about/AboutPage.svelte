@@ -1,12 +1,15 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { bytes, Dialog, Row, Section, TextField } from '@luft/ui';
+	import { bytes, Dialog, Row, Section, Switch, TextField } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
 	import { binaryBytes } from '#lib/format.js';
+	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import { about, openDisks, otherSystems, removeSystem, rename, type About, type OtherSystem } from './api';
 	import RecentProblems from './RecentProblems.svelte';
 
 	let { onclose }: { onclose: () => void } = $props();
+
+	const drives = useSettings<{ 'mount-internal': boolean }>('com.lantharos.kestrel.drives', ['mount-internal']);
 
 	let info = $state<About | null>(null);
 	let others = $state<OtherSystem[]>([]);
@@ -80,6 +83,11 @@
 					{/snippet}
 				</Row>
 			{/if}
+			<Switch
+				label={t('settings-about-mount-internal')}
+				checked={drives.values['mount-internal'] ?? true}
+				onchange={(on) => drives.set('mount-internal', on)}
+			/>
 			{#each others as system (system.id)}
 				<Row title={system.name} description={describe(system)}>
 					<button type="button" class="button" onclick={() => removeSystem(system.id)}>{t('settings-about-remove')}</button>

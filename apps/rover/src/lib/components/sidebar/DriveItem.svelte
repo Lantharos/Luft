@@ -27,13 +27,14 @@
 	let used = $derived(drive.totalSpace === 0 ? 0 : Math.min(1, drive.usedSpace / drive.totalSpace));
 	let key = $derived(dropKey('sidebar', drive.mountPoint));
 	let summary = $derived(`${bytes(drive.availableSpace)} free of ${bytes(drive.totalSpace)}`);
+	let unmount = $derived(drive.isRemovable ? 'Eject' : 'Unmount');
 </script>
 
 <SidebarItem
 	class="sidebar-item--drive"
 	icon={ejecting ? RefreshCw : drive.isRemovable ? Usb : HardDrive}
 	spinning={ejecting}
-	label={ejecting ? `${drive.name} · Ejecting` : drive.name}
+	label={ejecting ? `${drive.name} · ${drive.isRemovable ? 'Ejecting' : 'Unmounting'}` : drive.name}
 	{active}
 	dropping={drag.target?.key === key}
 	disabled={ejecting}
@@ -51,14 +52,14 @@
 		</span>
 	{/snippet}
 	{#snippet trailing()}
-		{#if drive.isRemovable}
+		{#if drive.canUnmount}
 			<button
 				class="sidebar-item__action"
 				type="button"
 				disabled={ejecting}
-				aria-label={`Eject ${drive.name}`}
+				aria-label={`${unmount} ${drive.name}`}
 				onclick={() => manager.ejectDrive(drive)}
-				{@attach tooltip('Eject')}
+				{@attach tooltip(unmount)}
 			>
 				<Eject size={15} />
 			</button>

@@ -264,6 +264,7 @@ settings-about-memory = Muisti
 settings-about-storage = Tallennustila
 settings-about-storage-free = { $free } vapaana, yhteensä { $total }
 settings-about-manage-drives = Hallitse asemia
+settings-about-mount-internal = Liitä sisäiset asemat kirjautuessa
 settings-about-old-system = Säilytetty, kun Luft korvasi sen · { $size }
 settings-about-other-system = Poista se, niin Luft saa käyttöönsä { $size }
 settings-about-remove = Poista

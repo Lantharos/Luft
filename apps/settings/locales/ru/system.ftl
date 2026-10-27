@@ -276,6 +276,7 @@ settings-about-memory = Память
 settings-about-storage = Хранилище
 settings-about-storage-free = Свободно { $free } из { $total }
 settings-about-manage-drives = Управление дисками
+settings-about-mount-internal = Подключать внутренние диски при входе
 settings-about-old-system = Сохранена при установке Luft · { $size }
 settings-about-other-system = Удалите её, чтобы отдать { $size } системе Luft
 settings-about-remove = Удалить

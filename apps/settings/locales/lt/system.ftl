@@ -276,6 +276,7 @@ settings-about-memory = Atmintis
 settings-about-storage = Saugykla
 settings-about-storage-free = Laisva { $free } iš { $total }
 settings-about-manage-drives = Tvarkyti diskus
+settings-about-mount-internal = Prisijungus prijungti vidinius diskus
 settings-about-old-system = Palikta, kai ją pakeitė sistema Luft · { $size }
 settings-about-other-system = Pašalinkite ją, kad jos { $size } atitektų sistemai Luft
 settings-about-remove = Pašalinti

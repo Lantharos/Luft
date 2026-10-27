@@ -1,0 +1,8 @@
+<schemalist>
+  <schema id="com.lantharos.kestrel.drives" path="/com/lantharos/kestrel/drives/">
+    <key name="mount-internal" type="b">
+      <default>true</default>
+      <summary>Mount the data drives inside the computer when you sign in</summary>
+    </key>
+  </schema>
+</schemalist>

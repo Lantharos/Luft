@@ -6,6 +6,7 @@
 	{"name": "kestrel-auth", "bundle": "kestrel", "mask": "kestrel/ui/locales/*/auth.ftl", "sources": ["kestrel/ui/src/auth"]},
 	{"name": "kestrel-portal", "bundle": "kestrel", "mask": "kestrel/ui/locales/*/portal.ftl", "sources": ["kestrel/ui/src/portal"]},
 	{"name": "kestrel-session", "bundle": "kestrel", "mask": "kestrel/ui/locales/*/session.ftl", "sources": ["kestrel/ui/src/session"]},
+	{"name": "kestrel-settings", "bundle": "kestrel-settings", "mask": "kestrel/settings/locales/*/settings.ftl", "sources": ["kestrel/settings/src/modules/system/drives"]},
 	{"name": "kestrel-portal-service", "bundle": "kestrel-portal", "mask": "kestrel/portal/locales/*/portal.ftl", "sources": ["kestrel/portal/src"]},
 	{"name": "kestrel-engine", "bundle": "kestrel", "mask": "kestrel/ui/locales/*/engine.ftl", "sources": ["kestrel/ui/src/shell", "kestrel/ui/src/services"]},
 	{"name": "ui", "bundle": "ui", "mask": "packages/web/ui/locales/*/ui.ftl", "sources": ["packages/web/ui/src"]},

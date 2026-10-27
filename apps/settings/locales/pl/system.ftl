@@ -276,6 +276,7 @@ settings-about-memory = Pamięć
 settings-about-storage = Miejsce na dysku
 settings-about-storage-free = Wolne: { $free } z { $total }
 settings-about-manage-drives = Zarządzaj dyskami
+settings-about-mount-internal = Montuj dyski wewnętrzne po zalogowaniu
 settings-about-old-system = Zachowany przy instalacji systemu Luft · { $size }
 settings-about-other-system = Usuń go, aby przekazać { $size } systemowi Luft
 settings-about-remove = Usuń

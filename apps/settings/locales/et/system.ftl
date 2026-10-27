@@ -271,6 +271,7 @@ settings-about-memory = Mälu
 settings-about-storage = Salvestusruum
 settings-about-storage-free = Vaba { $free }, kokku { $total }
 settings-about-manage-drives = Halda kettaid
+settings-about-mount-internal = Haagi sisemised kettad sisselogimisel
 settings-about-old-system = Säilitati, kui Luft selle asendas · { $size }
 settings-about-other-system = Eemalda see, et anda Luftile { $size } ruumi
 settings-about-remove = Eemalda

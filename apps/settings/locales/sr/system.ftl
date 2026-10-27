@@ -270,6 +270,7 @@ settings-about-memory = Меморија
 settings-about-storage = Складиште
 settings-about-storage-free = Слободно { $free } од { $total }
 settings-about-manage-drives = Управљај дисковима
+settings-about-mount-internal = Монтирај унутрашње дискове при пријави
 settings-about-old-system = Задржано када га је Luft заменио · { $size }
 settings-about-other-system = Уклоните га да бисте систему Luft дали { $size }
 settings-about-remove = Уклони

@@ -282,6 +282,7 @@ settings-about-memory = Memorja
 settings-about-storage = Ħażna
 settings-about-storage-free = { $free } liberi minn { $total }
 settings-about-manage-drives = Immaniġġja d-drajvs
+settings-about-mount-internal = Immonta d-drajvs interni meta tidħol
 settings-about-old-system = Inżammet meta Luft ħa postha · { $size }
 settings-about-other-system = Neħħiha biex tagħti l-{ $size } tagħha lil Luft
 settings-about-remove = Neħħi

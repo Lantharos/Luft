@@ -73,9 +73,9 @@
 	{#if opensFolder}
 		{@render item(Plus, 'Open in new tab', openInTab)}
 	{/if}
-	{#if place.kind === 'drive' && place.drive.isRemovable}
+	{#if place.kind === 'drive' && place.drive.canUnmount}
 		{@const drive = place.drive}
-		{@render item(Eject, 'Eject', () => manager.ejectDrive(drive), false, manager.drives.ejecting.has(drive.mountPoint))}
+		{@render item(Eject, drive.isRemovable ? 'Eject' : 'Unmount', () => manager.ejectDrive(drive), false, manager.drives.ejecting.has(drive.mountPoint))}
 	{/if}
 	{#if place.kind === 'drive' && manager.drives.manageable}
 		{@const drive = place.drive}

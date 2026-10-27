@@ -74,7 +74,7 @@ configure_file(
   configuration: schemaconf,
   install_dir: schemadir
 )
-foreach name : ['copilot-key', 'diagnostics', 'dictation', 'media-keys', 'night-light', 'power', 'sounds', 'touchscreen']
+foreach name : ['copilot-key', 'diagnostics', 'dictation', 'drives', 'media-keys', 'night-light', 'power', 'sounds', 'touchscreen']
   configure_file(
     input: 'com.lantharos.kestrel.@0@.gschema.xml'.format(name),
     output: 'com.lantharos.kestrel.@0@.gschema.xml'.format(name),

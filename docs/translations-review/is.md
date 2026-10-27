@@ -61,6 +61,7 @@ Strings in Luft's Icelandic translation that a native speaker should check: term
 - `apps/settings/locales/is/system.ftl` `settings-datetime-week-start-regional`: "{ $day }, samkvæmt svæðinu þínu" — assumes $day is the nominative weekday name.
 - `apps/settings/locales/is/system.ftl` `settings-users-fingerprint-remove-description`: "Þú getur ekki lengur notað { $finger } til að skrá þig inn." — relies on the accusative .inline finger forms from ui.ftl.
 - `apps/settings/locales/is/system.ftl` `settings-about-other-system`: "Fjarlægðu það til að gefa Luft plássið, { $size }" — reworded around the size placeable; check it reads naturally.
+- `apps/settings/locales/is/system.ftl` `settings-about-mount-internal`: "Tengja" — chosen for mount; check it isn't confused with connecting a device.
 
 ## Website
 

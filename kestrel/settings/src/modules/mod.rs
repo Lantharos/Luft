@@ -6,11 +6,12 @@ use crate::context::Context;
 use desktop::{a11y, night_light, xsettings};
 use devices::{keyboard, power, printers, rfkill, sound};
 use system::security::{signing_key, usb_protection};
-use system::{housekeeping, memory, profile_locks, timezone, watchdog};
+use system::{drives, housekeeping, memory, profile_locks, timezone, watchdog};
 
 #[derive(Clone, Copy)]
 pub enum Module {
     A11y,
+    Drives,
     Housekeeping,
     Keyboard,
     Memory,
@@ -28,8 +29,9 @@ pub enum Module {
 }
 
 impl Module {
-    pub const ALL: [Self; 15] = [
+    pub const ALL: [Self; 16] = [
         Self::A11y,
+        Self::Drives,
         Self::Housekeeping,
         Self::Keyboard,
         Self::Memory,
@@ -53,6 +55,7 @@ impl Module {
     fn name(self) -> &'static str {
         match self {
             Self::A11y => "a11y",
+            Self::Drives => "drives",
             Self::Housekeeping => "housekeeping",
             Self::Keyboard => "keyboard",
             Self::Memory => "memory",
@@ -73,6 +76,7 @@ impl Module {
     pub async fn start(self, context: &Context) {
         let started = match self {
             Self::A11y => a11y::start(context).await,
+            Self::Drives => drives::start(context).await,
             Self::Housekeeping => housekeeping::start(context).await,
             Self::Keyboard => keyboard::start(context).await,
             Self::Memory => memory::start(context).await,

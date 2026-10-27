@@ -264,6 +264,7 @@ settings-about-memory = Памет
 settings-about-storage = Хранилище
 settings-about-storage-free = Свободни { $free } от { $total }
 settings-about-manage-drives = Управление на дисковете
+settings-about-mount-internal = Монтиране на вътрешните дискове при вход
 settings-about-old-system = Запазена, когато Luft я замени · { $size }
 settings-about-other-system = Премахнете я, за да дадете нейните { $size } на Luft
 settings-about-remove = Премахни

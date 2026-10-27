@@ -270,6 +270,7 @@ settings-about-memory = Memorie
 settings-about-storage = Stocare
 settings-about-storage-free = Liber: { $free } din { $total }
 settings-about-manage-drives = Gestionează unitățile
+settings-about-mount-internal = Montează unitățile interne la conectare
 settings-about-old-system = Păstrat când sistemul Luft l-a înlocuit · { $size }
 settings-about-other-system = Eliminați-l pentru a oferi sistemului Luft spațiul de { $size }
 settings-about-remove = Elimină

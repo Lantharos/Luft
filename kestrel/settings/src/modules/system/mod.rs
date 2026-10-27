@@ -1,3 +1,4 @@
+pub mod drives;
 pub mod housekeeping;
 pub mod memory;
 pub mod profile_locks;

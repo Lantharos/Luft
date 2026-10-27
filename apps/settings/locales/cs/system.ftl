@@ -276,6 +276,7 @@ settings-about-memory = Paměť
 settings-about-storage = Úložiště
 settings-about-storage-free = Volno { $free } z { $total }
 settings-about-manage-drives = Spravovat jednotky
+settings-about-mount-internal = Připojit interní jednotky po přihlášení
 settings-about-old-system = Ponecháno při nahrazení Luftem · { $size }
 settings-about-other-system = Odebráním uvolníte { $size } pro Luft
 settings-about-remove = Odebrat

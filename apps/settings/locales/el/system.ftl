@@ -264,6 +264,7 @@ settings-about-memory = Μνήμη
 settings-about-storage = Αποθηκευτικός χώρος
 settings-about-storage-free = { $free } ελεύθερα από { $total }
 settings-about-manage-drives = Διαχείριση μονάδων δίσκου
+settings-about-mount-internal = Προσάρτηση εσωτερικών μονάδων δίσκου κατά τη σύνδεση
 settings-about-old-system = Διατηρήθηκε όταν το αντικατέστησε το Luft · { $size }
 settings-about-other-system = Αφαιρέστε το για να δώσετε { $size } στο Luft
 settings-about-remove = Αφαίρεση

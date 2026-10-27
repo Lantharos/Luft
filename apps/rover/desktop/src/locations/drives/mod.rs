@@ -7,7 +7,8 @@ use std::collections::HashMap;
 use std::ffi::CString;
 use std::fs;
 use std::mem::MaybeUninit;
-use std::path::Path;
+use std::os::unix::fs::MetadataExt;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use gio::prelude::*;
@@ -36,6 +37,14 @@ pub struct DriveInfo {
     pub available_space: u64,
     pub used_space: u64,
     pub is_removable: bool,
+    pub can_unmount: bool,
+    pub foreign: bool,
+}
+
+struct Space {
+    total: u64,
+    available: u64,
+    read_only: bool,
 }
 
 pub(crate) fn visible_mount_points() -> Vec<String> {
@@ -50,21 +59,24 @@ pub fn list_drives() -> Vec<DriveInfo> {
     let mut by_device: HashMap<String, DriveInfo> = HashMap::new();
 
     for mount in mounts::visible_mounts() {
-        let Some((total_space, available_space)) = disk_space(&mount.mount_point) else {
+        let Some(space) = disk_space(&mount.mount_point) else {
             continue;
         };
+        let user_media = mounts::is_user_media(&mount.mount_point);
+        let is_removable = is_removable_device(&mount.device).unwrap_or(user_media);
         let drive = DriveInfo {
             name: fs::canonicalize(&mount.device)
                 .ok()
                 .and_then(|device| labels.get(device.to_string_lossy().as_ref()).cloned())
                 .unwrap_or_else(|| fallback_name(&mount.mount_point)),
-            is_removable: is_removable_device(&mount.device)
-                || mounts::is_user_media(&mount.mount_point),
+            can_unmount: is_removable || user_media,
+            is_removable,
+            foreign: !space.read_only && belongs_to_someone_else(&mount.mount_point),
             mount_point: mount.mount_point,
             device: mount.device,
-            total_space,
-            available_space,
-            used_space: total_space.saturating_sub(available_space),
+            total_space: space.total,
+            available_space: space.available,
+            used_space: space.total.saturating_sub(space.available),
         };
         match by_device.get_mut(&drive.device) {
             Some(current) if prefers(&drive, current) => *current = drive,
@@ -103,8 +115,8 @@ pub fn eject_drive(mount_point: String) -> Result<(), String> {
         .into_iter()
         .find(|drive| drive.mount_point == mount_point)
         .ok_or_else(|| format!("Drive not found: {mount_point}"))?;
-    if !drive.is_removable {
-        return Err(format!("{} is not removable", drive.name));
+    if !drive.can_unmount {
+        return Err(format!("{} can't be unmounted", drive.name));
     }
 
     let attempts: [(&str, [&str; 3]); 3] = [
@@ -174,9 +186,14 @@ fn prefers(candidate: &DriveInfo, current: &DriveInfo) -> bool {
         || (current.mount_point != "/" && candidate.mount_point.len() < current.mount_point.len())
 }
 
-fn disk_space(mount_point: &str) -> Option<(u64, u64)> {
+fn disk_space(mount_point: &str) -> Option<Space> {
     if luft_app::sample_system() {
-        return Some(sample_space(mount_point));
+        let (total, available) = sample_space(mount_point);
+        return Some(Space {
+            total,
+            available,
+            read_only: false,
+        });
     }
     let path = CString::new(mount_point).ok()?;
     let mut stat = MaybeUninit::<libc::statvfs>::uninit();
@@ -185,7 +202,22 @@ fn disk_space(mount_point: &str) -> Option<(u64, u64)> {
     }
     let stat = unsafe { stat.assume_init() };
     let total = stat.f_blocks * stat.f_frsize;
-    (total > 0).then_some((total, stat.f_bavail * stat.f_frsize))
+    (total > 0).then_some(Space {
+        total,
+        available: stat.f_bavail * stat.f_frsize,
+        read_only: stat.f_flag & libc::ST_RDONLY != 0,
+    })
+}
+
+fn belongs_to_someone_else(mount_point: &str) -> bool {
+    if luft_app::sample_system() || mount_point == "/" {
+        return false;
+    }
+    let Ok(path) = CString::new(mount_point) else {
+        return false;
+    };
+    fs::metadata(mount_point).is_ok_and(|top| top.uid() != unsafe { libc::getuid() })
+        && unsafe { libc::access(path.as_ptr(), libc::W_OK) } != 0
 }
 
 fn sample_space(mount_point: &str) -> (u64, u64) {
@@ -243,26 +275,31 @@ fn fallback_name(mount_point: &str) -> String {
     )
 }
 
-fn is_removable_device(device: &str) -> bool {
-    let Some(base) = base_block_device(device) else {
-        return false;
-    };
-    let removable = fs::read_to_string(format!("/sys/block/{base}/removable"))
-        .is_ok_and(|content| content.trim() == "1");
-    removable
-        || fs::canonicalize(format!("/sys/block/{base}/device"))
-            .is_ok_and(|path| path.to_string_lossy().contains("/usb"))
+fn is_removable_device(device: &str) -> Option<bool> {
+    let disk = disk_of(device)?;
+    let path = disk.to_string_lossy();
+    Some(
+        fs::read_to_string(disk.join("removable")).is_ok_and(|content| content.trim() == "1")
+            || path.contains("/usb")
+            || path.contains("/mmc"),
+    )
 }
 
-fn base_block_device(device: &str) -> Option<String> {
-    let name = device.strip_prefix("/dev/")?;
-    let name = name.strip_prefix("mapper/").unwrap_or(name);
-    if let Some((base, partition)) = name.rsplit_once('p')
-        && !partition.is_empty()
-        && partition.chars().all(|ch| ch.is_ascii_digit())
-    {
-        return Some(base.to_string());
+fn disk_of(device: &str) -> Option<PathBuf> {
+    let name = fs::canonicalize(device)
+        .ok()?
+        .file_name()?
+        .to_string_lossy()
+        .into_owned();
+    let name = fs::read_dir(format!("/sys/class/block/{name}/slaves"))
+        .ok()
+        .and_then(|mut slaves| slaves.next()?.ok())
+        .map_or(name, |slave| {
+            slave.file_name().to_string_lossy().into_owned()
+        });
+    let node = fs::canonicalize(format!("/sys/class/block/{name}")).ok()?;
+    if node.join("partition").exists() {
+        return node.parent().map(Path::to_path_buf);
     }
-    let base = name.trim_end_matches(|ch: char| ch.is_ascii_digit());
-    (!base.is_empty()).then(|| base.to_string())
+    Some(node)
 }

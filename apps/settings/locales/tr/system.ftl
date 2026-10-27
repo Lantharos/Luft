@@ -264,6 +264,7 @@ settings-about-memory = Bellek
 settings-about-storage = Depolama
 settings-about-storage-free = Toplam { $total }, { $free } boş
 settings-about-manage-drives = Sürücüleri yönet
+settings-about-mount-internal = Oturum açınca dahili sürücüleri bağla
 settings-about-old-system = Luft yerine geçtiğinde saklandı · { $size }
 settings-about-other-system = Kapladığı { $size } alanı Luft’a vermek için kaldırın
 settings-about-remove = Kaldır

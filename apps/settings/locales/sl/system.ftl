@@ -276,6 +276,7 @@ settings-about-memory = Pomnilnik
 settings-about-storage = Shramba
 settings-about-storage-free = Prosto { $free } od { $total }
 settings-about-manage-drives = Upravljanje diskov
+settings-about-mount-internal = Priklopi notranje diske ob prijavi
 settings-about-old-system = Ohranjen, ko ga je zamenjal Luft · { $size }
 settings-about-other-system = Odstranite ga in njegov prostor ({ $size }) dodelite sistemu Luft
 settings-about-remove = Odstrani

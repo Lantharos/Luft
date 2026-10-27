@@ -264,6 +264,7 @@ settings-about-memory = Memoria
 settings-about-storage = Hapësira ruajtëse
 settings-about-storage-free = { $free } të lira nga { $total }
 settings-about-manage-drives = Menaxho disqet
+settings-about-mount-internal = Monto disqet e brendshme kur hyn
 settings-about-old-system = Ruajtur kur Luft e zëvendësoi · { $size }
 settings-about-other-system = Hiqe për t’i dhënë Luft-it { $size } e tij
 settings-about-remove = Hiq

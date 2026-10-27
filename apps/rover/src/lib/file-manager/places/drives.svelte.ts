@@ -8,6 +8,7 @@ export class DrivesState {
 	windows = $state.raw<WindowsDrive[]>([]);
 	readonly ejecting = new SvelteSet<string>();
 	readonly opening = new SvelteSet<string>();
+	readonly understood = new SvelteSet<string>();
 	manageable = $state(false);
 
 	ordered = $derived(this.list.toSorted((a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name)));

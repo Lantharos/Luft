@@ -43,6 +43,8 @@ export interface DriveInfo {
 	availableSpace: number;
 	usedSpace: number;
 	isRemovable: boolean;
+	canUnmount: boolean;
+	foreign: boolean;
 }
 
 export interface WindowsDrive {

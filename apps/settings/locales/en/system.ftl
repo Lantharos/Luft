@@ -297,6 +297,7 @@ settings-about-storage = Storage
 # $free and $total are sizes, like 120 GB
 settings-about-storage-free = { $free } free of { $total }
 settings-about-manage-drives = Manage drives
+settings-about-mount-internal = Mount internal drives when you sign in
 # $size is a size, like 120 GB
 settings-about-old-system = Kept when Luft replaced it · { $size }
 settings-about-other-system = Remove it to give its { $size } to Luft

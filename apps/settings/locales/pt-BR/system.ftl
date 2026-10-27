@@ -264,6 +264,7 @@ settings-about-memory = Memória
 settings-about-storage = Armazenamento
 settings-about-storage-free = { $free } livres de { $total }
 settings-about-manage-drives = Gerenciar unidades
+settings-about-mount-internal = Montar unidades internas quando você entrar
 settings-about-old-system = Mantido quando o Luft o substituiu · { $size }
 settings-about-other-system = Remova-o para dar os { $size } dele ao Luft
 settings-about-remove = Remover

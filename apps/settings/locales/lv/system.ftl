@@ -270,6 +270,7 @@ settings-about-memory = Atmiņa
 settings-about-storage = Krātuve
 settings-about-storage-free = Brīvs: { $free } no { $total }
 settings-about-manage-drives = Pārvaldīt diskus
+settings-about-mount-internal = Montēt iekšējos diskus, kad pierakstāties
 settings-about-old-system = Saglabāta, kad to aizstāja Luft · { $size }
 settings-about-other-system = Noņemiet to, lai tās { $size } atdotu sistēmai Luft
 settings-about-remove = Noņemt

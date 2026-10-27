@@ -264,6 +264,7 @@ settings-about-memory = Minne
 settings-about-storage = Lagring
 settings-about-storage-free = { $free } ledig av { $total }
 settings-about-manage-drives = Handsam stasjonar
+settings-about-mount-internal = Monter interne stasjonar når du loggar inn
 settings-about-old-system = Teke vare på då Luft erstatta det · { $size }
 settings-about-other-system = Fjern det for å gje plassen på { $size } til Luft
 settings-about-remove = Fjern

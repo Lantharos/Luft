@@ -264,6 +264,7 @@ settings-about-memory = Vinnsluminni
 settings-about-storage = Geymslurými
 settings-about-storage-free = { $free } laus af { $total }
 settings-about-manage-drives = Stjórna drifum
+settings-about-mount-internal = Tengja innri drif við innskráningu
 settings-about-old-system = Geymt þegar Luft kom í staðinn · { $size }
 settings-about-other-system = Fjarlægðu það til að gefa Luft plássið, { $size }
 settings-about-remove = Fjarlægja

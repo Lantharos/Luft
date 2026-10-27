@@ -7,6 +7,7 @@ use std::process::ExitCode;
 
 use futures_util::StreamExt;
 use futures_util::future::join_all;
+use luft_i18n::Localizer;
 use tokio::signal::unix::{SignalKind, signal};
 use zbus::fdo::DBusProxy;
 
@@ -14,6 +15,8 @@ use context::Context;
 use options::Options;
 
 const NAME: &str = "com.lantharos.Settings";
+
+static L10N: Localizer = luft_i18n::localizer!("locales", ["settings"]);
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> ExitCode {

@@ -282,6 +282,7 @@ settings-about-memory = Cuimhne
 settings-about-storage = Stóras
 settings-about-storage-free = { $free } saor as { $total }
 settings-about-manage-drives = Bainistigh tiomántáin
+settings-about-mount-internal = Feistigh tiomántáin inmheánacha nuair a shíníonn tú isteach
 settings-about-old-system = Coinníodh é nuair a tháinig Luft ina áit · { $size }
 settings-about-other-system = Bain é chun a spás ({ $size }) a thabhairt do Luft
 settings-about-remove = Bain

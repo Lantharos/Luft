@@ -7,6 +7,7 @@
 	import FilePane from '#lib/components/pane/FilePane.svelte';
 	import QuickLook from '#lib/components/preview/QuickLook.svelte';
 	import CloudNotes from '#lib/components/cloud/CloudNotes.svelte';
+	import ForeignDriveNote from '#lib/components/drives/ForeignDriveNote.svelte';
 	import ChooserBar from '#lib/components/shell/ChooserBar.svelte';
 	import FileContextMenu from '#lib/components/shell/FileContextMenu.svelte';
 	import OperationDock from '#lib/components/shell/OperationDock.svelte';
@@ -118,6 +119,7 @@
 			<TabStrip {manager} {drag} />
 			{#if !chooser}
 				<CloudNotes {manager} />
+				<ForeignDriveNote {manager} />
 			{/if}
 
 			<div class="flex min-h-0 flex-1 overflow-hidden">

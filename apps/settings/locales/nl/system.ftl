@@ -264,6 +264,7 @@ settings-about-memory = Geheugen
 settings-about-storage = Opslag
 settings-about-storage-free = { $free } vrij van { $total }
 settings-about-manage-drives = Schijven beheren
+settings-about-mount-internal = Interne schijven koppelen als je je aanmeldt
 settings-about-old-system = Bewaard toen Luft het verving · { $size }
 settings-about-other-system = Verwijder het om de { $size } aan Luft te geven
 settings-about-remove = Verwijderen
